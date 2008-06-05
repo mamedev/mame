@@ -802,7 +802,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( hyprduel )
 {
-	int i;
+	int i, len = memory_region_length(REGION_GFX1);
 	UINT8 *ROM = memory_region(REGION_GFX1);
 
 	/*
@@ -811,7 +811,7 @@ static DRIVER_INIT( hyprduel )
       tilemap.c handle that, we invert gfx data so the transparent pen becomes 0
       for both tile depths.
     */
-	for (i = 0;i < memory_region_length(REGION_GFX1);i++)
+	for (i = 0;i < len;i++)
 		ROM[i] ^= 0xff;
 
 //  ROM[(0x174b9*0x20)+0x1f] |= 0x0e;       /* I */

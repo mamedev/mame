@@ -94,6 +94,8 @@ WRITE8_HANDLER( nbmj8991_palette_type3_w )
 ******************************************************************************/
 WRITE8_HANDLER( nbmj8991_blitter_w )
 {
+	int gfxlen = memory_region_length(REGION_GFX1);
+
 	switch (offset)
 	{
 		case 0x00:	blitter_src_addr = (blitter_src_addr & 0xff00) | data; break;
@@ -125,12 +127,12 @@ WRITE8_HANDLER( nbmj8991_blitter_w )
 		case 0x70:	nbmj8991_clutsel = data; break;
 	}
 
-	if ((0x20000 * nbmj8991_gfxrom) > (memory_region_length(REGION_GFX1) - 1))
+	if ((0x20000 * nbmj8991_gfxrom) > (gfxlen - 1))
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
-		nbmj8991_gfxrom &= (memory_region_length(REGION_GFX1) / 0x20000 - 1);
+		nbmj8991_gfxrom &= (gfxlen / 0x20000 - 1);
 	}
 }
 
@@ -202,7 +204,7 @@ static void nbmj8991_gfxdraw(void)
 	int skipx, skipy;
 	int ctrx, ctry;
 	UINT8 color, color1, color2;
-	int gfxaddr;
+	int gfxaddr, gfxlen;
 
 	nb1413m3_busyctr = 0;
 
@@ -232,18 +234,19 @@ static void nbmj8991_gfxdraw(void)
 		skipy = -1;
 	}
 
+	gfxlen = memory_region_length(REGION_GFX1);
 	gfxaddr = (nbmj8991_gfxrom << 17) + (blitter_src_addr << 1);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)
 	{
 		for (x = startx, ctrx = sizex; ctrx >= 0; x += skipx, ctrx--)
 		{
-			if ((gfxaddr > (memory_region_length(REGION_GFX1) - 1)))
+			if ((gfxaddr > (gfxlen - 1)))
 			{
 #ifdef MAME_DEBUG
 				popmessage("GFXROM ADDRESS OVER!!");
 #endif
-				gfxaddr &= (memory_region_length(REGION_GFX1) - 1);
+				gfxaddr &= (gfxlen - 1);
 			}
 
 			color = GFX[gfxaddr++];

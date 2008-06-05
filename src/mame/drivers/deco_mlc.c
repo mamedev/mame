@@ -96,12 +96,11 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/decocrpt.h"
 #include "machine/eeprom.h"
 #include "sound/ymz280b.h"
 #include "decoprot.h"
 #include "cpu/arm/arm.h"
-
-extern void decrypt156(void);
 
 VIDEO_START( mlc );
 VIDEO_UPDATE( mlc );
@@ -735,7 +734,7 @@ static DRIVER_INIT( mlc )
         Skull Fung where there probably shouldn't be. */
 	cpunum_set_clockscale(machine, 0, 2.0f);
 	mainCpuIsArm=1;
-	decrypt156();
+	deco156_decrypt();
 	descramble_sound();
 }
 

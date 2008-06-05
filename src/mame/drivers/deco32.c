@@ -241,8 +241,6 @@ static int raster_enable;
 static emu_timer *raster_irq_timer;
 static UINT8 nslasher_sound_irq;
 
-extern void decrypt156(void);
-
 /**********************************************************************************/
 
 static TIMER_CALLBACK( interrupt_gen )
@@ -3277,7 +3275,7 @@ static DRIVER_INIT( nslasher )
 	deco56_decrypt(REGION_GFX1); /* 141 */
 	deco74_decrypt(REGION_GFX2);
 
-	decrypt156();
+	deco156_decrypt();
 
 	soundlatch_setclearedvalue(0xff);
 

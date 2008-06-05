@@ -170,37 +170,7 @@ Games marked * need dumping / redumping
 #include "driver.h"
 #include "deprecat.h"
 #include "sound/ymf271.h"
-
-extern UINT32 *ms32_fce00000;
-extern UINT32 *ms32_roz_ctrl;
-extern UINT32 *ms32_tx_scroll;
-extern UINT32 *ms32_bg_scroll;
-extern UINT32 *ms32_priram;
-extern UINT32 *ms32_palram;
-extern UINT32 *ms32_bgram;
-extern UINT32 *ms32_rozram;
-extern UINT32 *ms32_lineram;
-extern UINT32 *ms32_spram;
-extern UINT32 *ms32_txram;
-extern UINT32 *ms32_mainram;
-
-WRITE32_HANDLER( ms32_brightness_w );
-WRITE32_HANDLER( ms32_palram_w );
-READ32_HANDLER( ms32_txram_r );
-WRITE32_HANDLER( ms32_txram_w );
-READ32_HANDLER( ms32_rozram_r );
-WRITE32_HANDLER( ms32_rozram_w );
-READ32_HANDLER( ms32_lineram_r );
-WRITE32_HANDLER( ms32_lineram_w );
-READ32_HANDLER( ms32_bgram_r );
-WRITE32_HANDLER( ms32_bgram_w );
-READ32_HANDLER( ms32_spram_r );
-WRITE32_HANDLER( ms32_spram_w );
-READ32_HANDLER( ms32_priram_r );
-WRITE32_HANDLER( ms32_priram_w );
-WRITE32_HANDLER( ms32_gfxctrl_w );
-VIDEO_START( ms32 );
-VIDEO_UPDATE( ms32 );
+#include "includes/ms32.h"
 
 static UINT32 *ms32_fc000000;
 

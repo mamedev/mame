@@ -250,12 +250,17 @@ ROM_END
 static DRIVER_INIT( dynadice )
 {
 	int i,j;
-	memory_region(REGION_CPU2)[0x0b]=0x23;	/* bug in game code  Dec HL -> Inc HL*/
+	UINT8 *usr1 = memory_region(REGION_USER1);
+	UINT8 *cpu2 = memory_region(REGION_CPU2);
+	UINT8 *gfx1 = memory_region(REGION_GFX1);
+	UINT8 *gfx2 = memory_region(REGION_GFX2);
+
+	cpu2[0x0b]=0x23;	/* bug in game code  Dec HL -> Inc HL*/
 
 	/* 1bpp tiles -> 3bpp tiles (dy_5.bin  contains bg/fg color data for each tile line) */
 	for(i=0;i<0x800;i++)
 		for(j=0;j<8;j++)
-			memory_region(REGION_GFX2)[(i<<3)+j]=(memory_region(REGION_GFX1)[i]&(0x80>>j))?(memory_region(REGION_USER1)[i]&7):(memory_region(REGION_USER1)[i]>>4);
+			gfx2[(i<<3)+j]=(gfx1[i]&(0x80>>j))?(usr1[i]&7):(usr1[i]>>4);
 
 }
 

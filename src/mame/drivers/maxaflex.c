@@ -531,7 +531,8 @@ ROM_END
 
 static DRIVER_INIT( a600xl )
 {
-	memcpy( memory_region(REGION_CPU1) + 0x5000, memory_region(REGION_CPU1) + 0xd000, 0x800 );
+	UINT8 *rom = memory_region(REGION_CPU1);
+	memcpy( rom + 0x5000, rom + 0xd000, 0x800 );
 }
 
 GAME( 1984, maxaflex, 0,        maxaflex, a600xl, a600xl, ROT0, "Exidy", "Max-A-Flex", GAME_IS_BIOS_ROOT )

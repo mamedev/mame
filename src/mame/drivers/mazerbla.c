@@ -1452,6 +1452,7 @@ static MACHINE_RESET( mazerbla )
 
 static MACHINE_RESET( greatgun )
 {
+	UINT8 *rom = memory_region(REGION_CPU3);
 	game_id = GREATGUN;
 	zpu_int_vector = 0xff;
 	cpunum_set_irq_callback(0, irq_callback);
@@ -1459,11 +1460,11 @@ static MACHINE_RESET( greatgun )
 
 //patch VCU test
 //VCU test starts at PC=0x56f
-	memory_region(REGION_CPU3)[0x05b6] = 0;
-	memory_region(REGION_CPU3)[0x05b7] = 0;
+	rom[0x05b6] = 0;
+	rom[0x05b7] = 0;
 //so we also need to patch ROM checksum test
-	memory_region(REGION_CPU3)[0x037f] = 0;
-	memory_region(REGION_CPU3)[0x0380] = 0;
+	rom[0x037f] = 0;
+	rom[0x0380] = 0;
 }
 
 

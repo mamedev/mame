@@ -198,9 +198,10 @@ static void seibu_adpcm_stop(void *token)
 void seibu_adpcm_decrypt(int region)
 {
 	UINT8 *ROM = memory_region(region);
+	int len = memory_region_length(region);
 	int i;
 
-	for (i = 0; i < memory_region_length(region); i++)
+	for (i = 0; i < len; i++)
 	{
 		ROM[i] = BITSWAP8(ROM[i], 7, 5, 3, 1, 6, 4, 2, 0);
 	}

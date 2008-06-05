@@ -1991,10 +1991,10 @@ static void segaic16_sprites_16b_draw(struct sprite_info *info, bitmap_t *bitmap
 	const UINT16 *spritebase;
   	UINT16 *data;
 
-	if (!memory_region(REGION_GFX2))
+	spritebase = (const UINT16 *)memory_region(REGION_GFX2);
+	if (!spritebase)
 		return;
 
-	spritebase = (const UINT16 *)memory_region(REGION_GFX2);
 	numbanks = memory_region_length(REGION_GFX2) / 0x20000;
 
 	/* first scan forward to find the end of the list */
@@ -2895,6 +2895,8 @@ WRITE16_HANDLER( segaic16_sprites_draw_1_w )
 static void segaic16_road_hangon_decode(struct road_info *info)
 {
 	int x, y;
+	const UINT8 *gfx = memory_region(REGION_GFX3);
+	int len = memory_region_length(REGION_GFX3);
 
 	/* allocate memory for the unpacked road data */
 	info->gfx = auto_malloc(256 * 512);
@@ -2902,7 +2904,7 @@ static void segaic16_road_hangon_decode(struct road_info *info)
 	/* loop over rows */
 	for (y = 0; y < 256; y++)
 	{
-		UINT8 *src = memory_region(REGION_GFX3) + ((y & 0xff) * 0x40) % memory_region_length(REGION_GFX3);
+		const UINT8 *src = gfx + ((y & 0xff) * 0x40) % len;
 		UINT8 *dst = info->gfx + y * 512;
 
 		/* loop over columns */
@@ -3154,6 +3156,8 @@ static void segaic16_road_hangon_draw(struct road_info *info, bitmap_t *bitmap, 
 static void segaic16_road_outrun_decode(struct road_info *info)
 {
 	int x, y;
+	const UINT8 *gfx = memory_region(REGION_GFX3);
+	int len = memory_region_length(REGION_GFX3);
 
 	/* allocate memory for the unpacked road data */
 	info->gfx = auto_malloc((256 * 2 + 1) * 512);
@@ -3161,7 +3165,7 @@ static void segaic16_road_outrun_decode(struct road_info *info)
 	/* loop over rows */
 	for (y = 0; y < 256 * 2; y++)
 	{
-		UINT8 *src = memory_region(REGION_GFX3) + ((y & 0xff) * 0x40 + (y >> 8) * 0x8000) % memory_region_length(REGION_GFX3);
+		const UINT8 *src = gfx + ((y & 0xff) * 0x40 + (y >> 8) * 0x8000) % len;
 		UINT8 *dst = info->gfx + y * 512;
 
 		/* loop over columns */

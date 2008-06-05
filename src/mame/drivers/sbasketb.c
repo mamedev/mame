@@ -16,6 +16,7 @@ MAIN BOARD:
 ***************************************************************************/
 
 #include "driver.h"
+#include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/vlm5030.h"
 #include "sound/dac.h"
@@ -24,8 +25,6 @@ MAIN BOARD:
 extern UINT8 *sbasketb_scroll;
 extern UINT8 *sbasketb_palettebank;
 extern UINT8 *sbasketb_spriteram_select;
-
-void konami1_decode(void);
 
 WRITE8_HANDLER( sbasketb_videoram_w );
 WRITE8_HANDLER( sbasketb_colorram_w );
@@ -382,7 +381,7 @@ ROM_END
 
 static DRIVER_INIT( sbasketb )
 {
-	konami1_decode();
+	konami1_decode(0);
 }
 
 

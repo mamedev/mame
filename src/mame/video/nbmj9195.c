@@ -242,7 +242,7 @@ static void nbmj9195_gfxdraw(int vram)
 	int skipx, skipy;
 	int ctrx, ctry;
 	UINT16 color, color1, color2;
-	int gfxaddr;
+	int gfxaddr, gfxlen;
 
 	nb19010_busyctr = 0;
 
@@ -279,19 +279,20 @@ static void nbmj9195_gfxdraw(int vram)
 		skipy = -1;
 	}
 
+	gfxlen = memory_region_length(REGION_GFX1);
 	gfxaddr = ((blitter_src_addr[vram] + 2) & 0x00ffffff);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)
 	{
 		for (x = startx, ctrx = sizex; ctrx >= 0; x += skipx, ctrx--)
 		{
-			if ((gfxaddr > (memory_region_length(REGION_GFX1) - 1)))
+			if ((gfxaddr > (gfxlen - 1)))
 			{
 #ifdef MAME_DEBUG
 				popmessage("GFXROM ADDR OVER:%08X DX,%d,DY:%d,SX:%d,SY:%d", gfxaddr, startx, starty, sizex,sizey);
 				logerror("GFXROM ADDR OVER:%08X DX,%d,DY:%d,SX:%d,SY:%d\n", gfxaddr, startx, starty, sizex,sizey);
 #endif
-				gfxaddr &= (memory_region_length(REGION_GFX1) - 1);
+				gfxaddr &= (gfxlen - 1);
 			}
 
 			color = GFX[gfxaddr++];

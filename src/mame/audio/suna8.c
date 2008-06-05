@@ -35,11 +35,11 @@ WRITE8_HANDLER( suna8_samples_number_w )
 
 void suna8_sh_start(void)
 {
-	int i;
+	int i, len = memory_region_length(REGION_SOUND1);
 	UINT8 *ROM = memory_region(REGION_SOUND1);
 
-	samplebuf = auto_malloc(memory_region_length(REGION_SOUND1) * sizeof(samplebuf[0]));
+	samplebuf = auto_malloc(len * sizeof(samplebuf[0]));
 
-	for(i=0;i<memory_region_length(REGION_SOUND1);i++)
+	for(i=0;i<len;i++)
 		samplebuf[i] = (INT8)(ROM[i] ^ 0x80) * 256;
 }

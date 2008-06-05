@@ -80,23 +80,11 @@ mw-9.rom = ST M27C1001 / GFX
 #include "driver.h"
 #include "deprecat.h"
 #include "machine/eeprom.h"
+#include "includes/cps1.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 #include "sound/2413intf.h"
 #include "sound/msm5205.h"
-
-/* in machine/kabuki.c */
-void mgakuen2_decode(void);
-void pang_decode(void);
-void cworld_decode(void);
-void hatena_decode(void);
-void spang_decode(void);
-void spangj_decode(void);
-void sbbros_decode(void);
-void marukin_decode(void);
-void qtono1_decode(void);
-void qsangoku_decode(void);
-void block_decode(void);
 
 
 VIDEO_START( pang );
@@ -2360,7 +2348,8 @@ static DRIVER_INIT( blockbl )
 static DRIVER_INIT( mstworld )
 {
 	/* descramble the program rom .. */
-	UINT8* source = malloc_or_die(memory_region_length(REGION_CPU1));
+	int len = memory_region_length(REGION_CPU1);
+	UINT8* source = malloc_or_die(len);
 	UINT8* dst    = memory_region(REGION_CPU1) ;
 	int x;
 
@@ -2388,7 +2377,7 @@ static DRIVER_INIT( mstworld )
 		/* bank f     */12, 12,
 	};
 
-	memcpy(source, dst, memory_region_length(REGION_CPU1));
+	memcpy(source, dst, len);
 	for (x=0;x<40;x+=2)
 	{
 		if (tablebank[x]!=-1)

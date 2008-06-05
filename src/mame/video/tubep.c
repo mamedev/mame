@@ -436,9 +436,9 @@ static void draw_sprite(void)
 	UINT32	XDOT;
 	UINT32	YDOT;
 	UINT8 * romCxx  = memory_region(REGION_USER2)+0x00000;
-	UINT8 * romD10  = memory_region(REGION_USER2)+0x10000;
-	UINT8 * romEF13 = memory_region(REGION_USER2)+0x12000;
-	UINT8 * romHI2  = memory_region(REGION_USER2)+0x14000;
+	UINT8 * romD10  = romCxx+0x10000;
+	UINT8 * romEF13 = romCxx+0x12000;
+	UINT8 * romHI2  = romCxx+0x14000;
 
 
 	for (YDOT=0; (YDOT^YSize) != 0x00; YDOT++)
@@ -739,8 +739,8 @@ VIDEO_UPDATE( rjammer )
 	UINT32 v;
 	UINT8 *text_gfx_base = memory_region(REGION_GFX1);
 	UINT8 *rom13D  = memory_region(REGION_USER1);
-	UINT8 *rom11BD = memory_region(REGION_USER1)+0x1000;
-	UINT8 *rom19C  = memory_region(REGION_USER1)+0x5000;
+	UINT8 *rom11BD = rom13D+0x1000;
+	UINT8 *rom19C  = rom13D+0x5000;
 
 	/* this can be optimized further by extracting constants out of the loop */
 	/* especially read from ROM19C can be done once per 8 pixels*/

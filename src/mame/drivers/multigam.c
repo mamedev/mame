@@ -232,6 +232,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 			if ( multigam3_mmc3_last_bank != ( data & 0xc0 ) )
 			{
 				int bank;
+				UINT8 *prg = memory_region( REGION_CPU1 );
 
 				/* reset the banks */
 				if ( multigam3_mmc3_command & 0x40 )
@@ -239,21 +240,21 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 					/* high bank */
 					bank = multigam3_mmc3_banks[0] * 0x2000 + 0xa0000;
 
-					memcpy( &memory_region( REGION_CPU1 )[0x0c000], &memory_region( REGION_USER1 )[bank], 0x2000 );
-					memcpy( &memory_region( REGION_CPU1 )[0x08000], &memory_region( REGION_USER1 )[0xa0000 + 0x3c000], 0x2000 );
+					memcpy( &prg[0x0c000], &prg[bank], 0x2000 );
+					memcpy( &prg[0x08000], &prg[0xa0000 + 0x3c000], 0x2000 );
 				}
 				else
 				{
 					/* low bank */
 					bank = multigam3_mmc3_banks[0] * 0x2000 + 0xa0000;
 
-					memcpy( &memory_region( REGION_CPU1 )[0x08000], &memory_region( REGION_USER1 )[bank], 0x2000 );
-					memcpy( &memory_region( REGION_CPU1 )[0x0c000], &memory_region( REGION_USER1 )[0xa0000 + 0x3c000], 0x2000 );
+					memcpy( &prg[0x08000], &prg[bank], 0x2000 );
+					memcpy( &prg[0x0c000], &prg[0xa0000 + 0x3c000], 0x2000 );
 				}
 
 				/* mid bank */
 				bank = multigam3_mmc3_banks[1] * 0x2000 + 0xa0000;
-				memcpy( &memory_region( REGION_CPU1 )[0x0a000], &memory_region( REGION_USER1 )[bank], 0x2000 );
+				memcpy( &prg[0x0a000], &prg[bank], 0x2000 );
 
 				multigam3_mmc3_last_bank = data & 0xc0;
 			}
@@ -283,14 +284,16 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 					break;
 
 					case 6: /* program banking */
+					{
+						UINT8 *prg = memory_region( REGION_CPU1 );
 						if ( multigam3_mmc3_command & 0x40 )
 						{
 							/* high bank */
 							multigam3_mmc3_banks[0] = data & 0x1f;
 							bank = ( multigam3_mmc3_banks[0] ) * 0x2000 + 0xa0000;
 
-							memcpy( &memory_region( REGION_CPU1 )[0x0c000], &memory_region( REGION_USER1 )[bank], 0x2000 );
-							memcpy( &memory_region( REGION_CPU1 )[0x08000], &memory_region( REGION_USER1 )[0xa0000 + 0x3c000], 0x2000 );
+							memcpy( &prg[0x0c000], &prg[bank], 0x2000 );
+							memcpy( &prg[0x08000], &prg[0xa0000 + 0x3c000], 0x2000 );
 						}
 						else
 						{
@@ -298,18 +301,20 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 							multigam3_mmc3_banks[0] = data & 0x1f;
 							bank = ( multigam3_mmc3_banks[0] ) * 0x2000 + 0xa0000;
 
-							memcpy( &memory_region( REGION_CPU1 )[0x08000], &memory_region( REGION_USER1 )[bank], 0x2000 );
-							memcpy( &memory_region( REGION_CPU1 )[0x0c000], &memory_region( REGION_USER1 )[0xa0000 + 0x3c000], 0x2000 );
+							memcpy( &prg[0x08000], &prg[bank], 0x2000 );
+							memcpy( &prg[0x0c000], &prg[0xa0000 + 0x3c000], 0x2000 );
 						}
+					}
 					break;
 
 					case 7: /* program banking */
 						{
 							/* mid bank */
+							UINT8 *prg = memory_region( REGION_CPU1 );
 							multigam3_mmc3_banks[1] = data & 0x1f;
 							bank = multigam3_mmc3_banks[1] * 0x2000 + 0xa0000;
 
-							memcpy( &memory_region( REGION_CPU1 )[0x0a000], &memory_region( REGION_USER1 )[bank], 0x2000 );
+							memcpy( &prg[0x0a000], &prg[bank], 0x2000 );
 						}
 					break;
 				}

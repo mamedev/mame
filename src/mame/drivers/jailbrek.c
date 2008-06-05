@@ -21,12 +21,11 @@ ernesto@imagina.com
 
 
 #include "driver.h"
+#include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
 
-
-void konami1_decode(void);
 
 extern UINT8 *jailbrek_scroll_x;
 extern UINT8 *jailbrek_scroll_dir;
@@ -413,7 +412,7 @@ static DRIVER_INIT( jailbrek )
         }
     }
 
-    konami1_decode();
+    konami1_decode(0);
 }
 
 GAME( 1986, jailbrek, 0,        jailbrek, jailbrek, jailbrek, ROT0, "Konami", "Jail Break", GAME_SUPPORTS_SAVE )

@@ -221,6 +221,8 @@ static DRIVER_INIT (tetriunk)
 	int i,j,k;
 	int index=0;
 	UINT8 *region = memory_region(REGION_USER1);
+	UINT8 *gfx = memory_region(REGION_GFX2);
+
 	for(i=0;i<0x20000;i++)
 	{
 		//8 pixels/byte
@@ -230,7 +232,7 @@ static DRIVER_INIT (tetriunk)
 			int pixel=0;
 			for(k=0;k<4;k++)
 			{
-				if(memory_region(REGION_GFX2)[k*0x20000+i]&mask)
+				if(gfx[k*0x20000+i]&mask)
 				{
 					pixel|=(1<<k);
 				}

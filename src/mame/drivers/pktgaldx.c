@@ -64,8 +64,6 @@ VIDEO_UPDATE(pktgaldx);
 VIDEO_START(pktgaldb);
 VIDEO_UPDATE(pktgaldb);
 
-extern void deco102_decrypt(int region, int address_xor, int data_select_xor, int opcode_select_xor);
-
 extern UINT16* pcktgaldb_fgram;
 extern UINT16* pcktgaldb_sprites;
 

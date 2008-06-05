@@ -1316,16 +1316,18 @@ ROM_END
 static DRIVER_INIT(bronx)
 {
 	int i;
+	UINT8 *rom = memory_region(REGION_CPU1);
 	for(i=0;i<0x20000;i++)
-		memory_region(REGION_CPU1)[i]=BITSWAP8(memory_region(REGION_CPU1)[i],0,1,2,3,4,5,6,7);
+		rom[i]=BITSWAP8(rom[i],0,1,2,3,4,5,6,7);
 	nyc_gametype=1;
 }
 
 static DRIVER_INIT(colt)
 {
 	int i;
+	UINT8 *rom = memory_region(REGION_CPU1);
 	for(i=0;i<0x20000;i++)
-		memory_region(REGION_CPU1)[i]=BITSWAP8(memory_region(REGION_CPU1)[i],0,1,2,3,4,5,6,7);
+		rom[i]=BITSWAP8(rom[i],0,1,2,3,4,5,6,7);
 	nyc_gametype=2;
 }
 

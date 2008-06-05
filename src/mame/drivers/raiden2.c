@@ -2167,20 +2167,21 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT(rdx_v33)
 {
-	memory_set_bankptr(1,&memory_region(REGION_CPU1)[0x020000]);
-	memory_set_bankptr(2,&memory_region(REGION_CPU1)[0x030000]);
-	memory_set_bankptr(3,&memory_region(REGION_CPU1)[0x040000]);
-	memory_set_bankptr(4,&memory_region(REGION_CPU1)[0x050000]);
-	memory_set_bankptr(5,&memory_region(REGION_CPU1)[0x060000]);
-	memory_set_bankptr(6,&memory_region(REGION_CPU1)[0x070000]);
-	memory_set_bankptr(7,&memory_region(REGION_CPU1)[0x080000]);
-	memory_set_bankptr(8,&memory_region(REGION_CPU1)[0x090000]);
-	memory_set_bankptr(9,&memory_region(REGION_CPU1)[0x0a0000]);
-	memory_set_bankptr(10,&memory_region(REGION_CPU1)[0x0b0000]);
-	memory_set_bankptr(11,&memory_region(REGION_CPU1)[0x0c0000]);
-	memory_set_bankptr(12,&memory_region(REGION_CPU1)[0x0d0000]);
-	memory_set_bankptr(13,&memory_region(REGION_CPU1)[0x0e0000]);
-	memory_set_bankptr(14,&memory_region(REGION_CPU1)[0x0f0000]);
+	UINT8 *prg = memory_region(REGION_CPU1);
+	memory_set_bankptr(1,&prg[0x020000]);
+	memory_set_bankptr(2,&prg[0x030000]);
+	memory_set_bankptr(3,&prg[0x040000]);
+	memory_set_bankptr(4,&prg[0x050000]);
+	memory_set_bankptr(5,&prg[0x060000]);
+	memory_set_bankptr(6,&prg[0x070000]);
+	memory_set_bankptr(7,&prg[0x080000]);
+	memory_set_bankptr(8,&prg[0x090000]);
+	memory_set_bankptr(9,&prg[0x0a0000]);
+	memory_set_bankptr(10,&prg[0x0b0000]);
+	memory_set_bankptr(11,&prg[0x0c0000]);
+	memory_set_bankptr(12,&prg[0x0d0000]);
+	memory_set_bankptr(13,&prg[0x0e0000]);
+	memory_set_bankptr(14,&prg[0x0f0000]);
 
 	raiden2_decrypt_sprites();
 }

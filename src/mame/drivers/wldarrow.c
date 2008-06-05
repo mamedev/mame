@@ -453,9 +453,10 @@ ROM_END
 static DRIVER_INIT( wldarrow )
 {
 	offs_t i;
+	UINT8 *rom = memory_region(REGION_CPU1);
 
 	for (i = 0; i < 0x3000; i++)
-		memory_region(REGION_CPU1)[i] ^= 0xff;
+		rom[i] ^= 0xff;
 }
 
 

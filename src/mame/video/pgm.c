@@ -2,14 +2,11 @@
 /* see drivers/pgm.c for notes on where improvements can be made */
 
 #include "driver.h"
+#include "includes/pgm.h"
 
-extern UINT16 *pgm_mainram, *pgm_bg_videoram, *pgm_tx_videoram, *pgm_videoregs, *pgm_rowscrollram;
 static tilemap *pgm_tx_tilemap, *pgm_bg_tilemap;
 static UINT16 *pgm_spritebufferram; // buffered spriteram
 static UINT16 *sprite_temp_render;
-
-extern UINT8 *pgm_sprite_a_region;   /* = memory_region       ( REGION_GFX4 ); */
-extern size_t	pgm_sprite_a_region_allocate;
 
 /* Sprites - These are a pain! */
 

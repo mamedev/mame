@@ -1974,7 +1974,7 @@ MACHINE_DRIVER_END
 static void cischeat_untangle_sprites(int region)
 {
 	UINT8		*src = memory_region(region);
-	const UINT8	*end = memory_region(region) + memory_region_length(region);
+	const UINT8	*end = src + memory_region_length(region);
 
 	while (src < end)
 	{

@@ -2169,9 +2169,9 @@ static MACHINE_RESET (htchctch)
 	/* copy protection data every reset */
 
 	UINT16 *PROTDATA = (UINT16*)memory_region(REGION_USER1);
-	int i;
+	int i, len = memory_region_length(REGION_USER1);
 
-	for (i = 0;i < memory_region_length( REGION_USER1 )/2;i++)
+	for (i = 0;i < len/2;i++)
 		tumblepb_mainram[0x000/2 + i] = PROTDATA[i];
 
 }
@@ -3375,7 +3375,7 @@ static DRIVER_INIT( htchctch )
 
 //  UINT16 *HCROM = (UINT16*)memory_region(REGION_CPU1);
 	UINT16 *PROTDATA = (UINT16*)memory_region(REGION_USER1);
-	int i;
+	int i, len = memory_region_length(REGION_USER1);
 	/* simulate RAM initialization done by the protection MCU */
 	/* verified on real hardware */
 //  static UINT16 htchctch_mcu68k[] =
@@ -3387,7 +3387,7 @@ static DRIVER_INIT( htchctch )
 //  for (i = 0;i < sizeof(htchctch_mcu68k)/sizeof(htchctch_mcu68k[0]);i++)
 //      tumblepb_mainram[0x000/2 + i] = htchctch_mcu68k[i];
 
-	for (i = 0;i < memory_region_length( REGION_USER1 )/2;i++)
+	for (i = 0;i < len/2;i++)
 		tumblepb_mainram[0x000/2 + i] = PROTDATA[i];
 
 

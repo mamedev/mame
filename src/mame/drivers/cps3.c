@@ -2515,11 +2515,11 @@ static void precopy_to_flash(void)
 
 	/* precopy gfx roms, good, tests pass */
 	{
-		UINT32 thebase;
+		UINT32 thebase, len = memory_region_length(REGION_USER5);
 		int flashnum = 8;
 		UINT32* romdata = (UINT32*)memory_region(REGION_USER5);
 
-		for (thebase = 0;thebase < memory_region_length(REGION_USER5)/2; thebase+=0x200000)
+		for (thebase = 0;thebase < len/2; thebase+=0x200000)
 		{
 		//  printf("flashnums %d. %d\n",flashnum, flashnum+1);
 
@@ -2587,12 +2587,12 @@ static void copy_from_nvram(void)
 
 	/* copy gfx from loaded flashroms to user reigon 5, where it's used */
 	{
-		UINT32 thebase;
+		UINT32 thebase, len = memory_region_length(REGION_USER5);
 		int flashnum = 8;
 		UINT32* romdata = (UINT32*)memory_region(REGION_USER5);
 		int countoffset = 0;
 
-		for (thebase = 0;thebase < memory_region_length(REGION_USER5)/2; thebase+=0x200000)
+		for (thebase = 0;thebase < len/2; thebase+=0x200000)
 		{
 		//  printf("flashnums %d. %d\n",flashnum, flashnum+1);
 

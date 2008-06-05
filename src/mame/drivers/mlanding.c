@@ -436,8 +436,9 @@ ROM_END
 
 static DRIVER_INIT(mlanding)
 {
-	memory_region(REGION_CPU3)[0x88b]=0x4e;
-	memory_region(REGION_CPU3)[0x88a]=0x71;
+	UINT8 *rom = memory_region(REGION_CPU3);
+	rom[0x88b]=0x4e;
+	rom[0x88a]=0x71;
 }
 
 GAME( 1990, mlanding, 0,        mlanding,   mlanding, mlanding,        ROT0,    "Taito Corporation", "Midnight Landing", GAME_NOT_WORKING|GAME_NO_SOUND )

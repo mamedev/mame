@@ -693,6 +693,7 @@ static void optimize_sprite_data(void)
 	/* convert the sprite graphics data into a format that
        allows faster blitting */
 	int i;
+	int len;
 	UINT8 *src;
 	UINT8 *dest;
 	UINT32 bit;
@@ -713,9 +714,10 @@ static void optimize_sprite_data(void)
 	memset(sprite_gfx, 0, sprite_gfx_address_mask + 1);
 
 	src = memory_region(NEOGEO_REGION_SPRITES);
+	len = memory_region_length(NEOGEO_REGION_SPRITES);
 	dest = sprite_gfx;
 
-	for (i = 0; i < memory_region_length(NEOGEO_REGION_SPRITES); i += 0x80, src += 0x80)
+	for (i = 0; i < len; i += 0x80, src += 0x80)
 	{
 		int y;
 

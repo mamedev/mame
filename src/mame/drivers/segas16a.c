@@ -146,6 +146,7 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 #include "driver.h"
 #include "system16.h"
 #include "machine/8255ppi.h"
+#include "machine/fd1089.h"
 #include "cpu/i8039/i8039.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
@@ -3068,7 +3069,6 @@ static DRIVER_INIT( aceattaa )
 
 static DRIVER_INIT( afighter )
 {
-	void fd1089_decrypt_0018(void);
 	system16a_generic_init(machine);
 	fd1089_decrypt_0018();
 }
@@ -3076,7 +3076,6 @@ static DRIVER_INIT( afighter )
 
 static DRIVER_INIT( alexkid1 )
 {
-	void fd1089_decrypt_alexkidd(void);
 	system16a_generic_init(machine);
 	fd1089_decrypt_alexkidd();
 }
@@ -3084,14 +3083,12 @@ static DRIVER_INIT( alexkid1 )
 
 static DRIVER_INIT( aliensy1 )
 {
-	void fd1089_decrypt_0033(void);
 	system16a_generic_init(machine);
 	fd1089_decrypt_0033();
 }
 
 static DRIVER_INIT( aliensy5 )
 {
-	void fd1089_decrypt_0037(void);
 	system16a_generic_init(machine);
 	fd1089_decrypt_0037();
 }
@@ -3124,7 +3121,6 @@ static DRIVER_INIT( quartet )
 
 static DRIVER_INIT( sdi )
 {
-	void fd1089_decrypt_0027(void);
 	system16a_generic_init(machine);
 	fd1089_decrypt_0027();
 	custom_io_r = sdi_custom_io_r;
@@ -3133,7 +3129,6 @@ static DRIVER_INIT( sdi )
 
 static DRIVER_INIT( sjryukoa )
 {
-	void fd1089_decrypt_5021(void);
 	system16a_generic_init(machine);
 	fd1089_decrypt_5021();
 	custom_io_r = sjryuko_custom_io_r;
@@ -3143,7 +3138,6 @@ static DRIVER_INIT( sjryukoa )
 
 static DRIVER_INIT( timesca1 )
 {
-	void fd1089_decrypt_0024(void);
 	system16a_generic_init(machine);
 	fd1089_decrypt_0024();
 }

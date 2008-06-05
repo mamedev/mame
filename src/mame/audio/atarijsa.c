@@ -107,6 +107,7 @@ static void init_save_state(void)
 void atarijsa_init(running_machine *machine, int testport, int testmask)
 {
 	int i;
+	UINT8 *rgn;
 
 	/* copy in the parameters */
 	cpu_num = mame_find_cpu_index(machine, "jsa");
@@ -115,8 +116,9 @@ void atarijsa_init(running_machine *machine, int testport, int testmask)
 	test_mask = testmask;
 
 	/* predetermine the bank base */
-	bank_base = &memory_region(REGION_CPU1+cpu_num)[0x03000];
-	bank_source_data = &memory_region(REGION_CPU1+cpu_num)[0x10000];
+	rgn = memory_region(REGION_CPU1+cpu_num);
+	bank_base = &rgn[0x03000];
+	bank_source_data = &rgn[0x10000];
 
 	/* determine which sound hardware is installed */
 	has_tms5220 = has_oki6295 = has_pokey = has_ym2151 = 0;

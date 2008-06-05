@@ -88,8 +88,6 @@ Are the OKI M6295 clocks from Heavy Smash are correct at least for the Mitchell 
 
 */
 
-extern void decrypt156(void);
-
 #include "driver.h"
 #include "decocrpt.h"
 #include "deco32.h"
@@ -578,7 +576,7 @@ static DRIVER_INIT(simpl156)
 	free (buf1);
 
 	deco56_decrypt(REGION_GFX1);
-	decrypt156();
+	deco156_decrypt();
 
 	simpl156_default_eeprom = NULL;
 }

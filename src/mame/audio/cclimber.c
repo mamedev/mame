@@ -24,6 +24,7 @@ static void cclimber_sh_start(void)
 static void cclimber_play_sample(int start,int freq,int volume)
 {
 	int len;
+	int romlen = memory_region_length(REGION_SOUND1);
 	const UINT8 *rom = memory_region(REGION_SOUND1);
 
 
@@ -31,7 +32,7 @@ static void cclimber_play_sample(int start,int freq,int volume)
 
 	/* decode the rom samples */
 	len = 0;
-	while (start + len < memory_region_length(REGION_SOUND1) && rom[start+len] != 0x70)
+	while (start + len < romlen && rom[start+len] != 0x70)
 	{
 		int sample;
 

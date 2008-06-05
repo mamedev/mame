@@ -79,7 +79,7 @@ static void SEGAPCM_update(void *param, stream_sample_t **inputs, stream_sample_
 static void *segapcm_start(int sndindex, int clock, const void *config)
 {
 	const struct SEGAPCMinterface *intf = config;
-	int mask, rom_mask;
+	int mask, rom_mask, len;
 	struct segapcm *spcm;
 
 	spcm = auto_malloc(sizeof(*spcm));
@@ -95,7 +95,8 @@ static void *segapcm_start(int sndindex, int clock, const void *config)
 	if(!mask)
 		mask = BANK_MASK7>>16;
 
-	for(rom_mask = 1; rom_mask < memory_region_length(intf->region); rom_mask *= 2);
+	len = memory_region_length(intf->region);
+	for(rom_mask = 1; rom_mask < len; rom_mask *= 2);
 	rom_mask--;
 
 	spcm->bankmask = mask & (rom_mask >> spcm->bankshift);

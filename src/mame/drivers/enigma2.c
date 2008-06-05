@@ -170,8 +170,9 @@ static VIDEO_UPDATE( enigma2 )
 	pen_t pens[NUM_PENS];
 
 	const rectangle *visarea = video_screen_get_visible_area(screen);
-	UINT8 *color_map_base = engima2_flip_screen ? &memory_region(REGION_PROMS)[0x0400] : memory_region(REGION_PROMS);
-	UINT8 *star_map_base = (blink_count & 0x08) ? &memory_region(REGION_PROMS)[0x0c00] : &memory_region(REGION_PROMS)[0x0800];
+	UINT8 *prom = memory_region(REGION_PROMS);
+	UINT8 *color_map_base = engima2_flip_screen ? &prom[0x0400] : &prom[0x0000];
+	UINT8 *star_map_base = (blink_count & 0x08) ? &prom[0x0c00] : &prom[0x0800];
 
 	UINT8 x = 0;
 	UINT16 bitmap_y = visarea->min_y;
@@ -655,10 +656,11 @@ ROM_END
 static DRIVER_INIT(enigma2)
 {
 	offs_t i;
+	UINT8 *rom = memory_region(REGION_CPU2);
 
 	for(i = 0; i < 0x2000; i++)
 	{
-		memory_region(REGION_CPU2)[i] = BITSWAP8(memory_region(REGION_CPU2)[i],4,5,6,0,7,1,3,2);
+		rom[i] = BITSWAP8(rom[i],4,5,6,0,7,1,3,2);
 	}
 }
 

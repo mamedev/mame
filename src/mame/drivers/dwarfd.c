@@ -743,13 +743,13 @@ ROM_END
 static DRIVER_INIT(dwarfd)
 {
 	int i;
+	UINT8 *src, *dst;
 
 	/* expand gfx roms */
+	src    = memory_region       ( REGION_GFX1 );
+	dst    = memory_region       ( REGION_GFX2 );
 	for (i=0;i<0x4000;i++)
 	{
-		UINT8 *src    = memory_region       ( REGION_GFX1 );
-		UINT8 *dst    = memory_region       ( REGION_GFX2 );
-
 		UINT8 dat;
 		dat = (src[i]&0xf0)>>0;
 		dst[i*2] = dat;
@@ -759,9 +759,9 @@ static DRIVER_INIT(dwarfd)
 	}
 
 	/* use low bit as 'interpolation' bit */
+	src    = memory_region       ( REGION_GFX2 );
 	for (i=0;i<0x8000;i++)
 	{
-		UINT8 *src    = memory_region       ( REGION_GFX2 );
 		if (src[i]&0x10)
 		{
 			src[i] = src[i]&0xe0;

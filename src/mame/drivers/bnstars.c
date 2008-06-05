@@ -90,11 +90,10 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 #include "deprecat.h"
 #include "sound/ymf271.h"
 #include "rendlay.h"
+#include "includes/ms32.h"
 
-/* drivers/ms32/c */
-extern void ms32_rearrange_sprites(int region);
-extern void decrypt_ms32_tx(int addr_xor,int data_xor, int region);
-extern void decrypt_ms32_bg(int addr_xor,int data_xor, int region);
+#define ms32_roz_ctrl bnstars_roz_ctrl
+#define ms32_spram bnstars_spram
 
 static tilemap *ms32_tx_tilemap[2];
 static tilemap *ms32_bg_tilemap[2];

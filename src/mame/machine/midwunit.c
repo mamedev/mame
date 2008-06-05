@@ -370,14 +370,15 @@ WRITE16_HANDLER( midxunit_uart_w )
 static void init_wunit_generic(void)
 {
 	UINT8 *base;
-	int i, j;
+	int i, j, len;
 
 	/* register for state saving */
 	register_state_saving();
 
 	/* load the graphics ROMs -- quadruples */
 	midyunit_gfx_rom = base = memory_region(REGION_GFX1);
-	for (i = 0; i < memory_region_length(REGION_GFX1) / 0x400000; i++)
+	len = memory_region_length(REGION_GFX1);
+	for (i = 0; i < len / 0x400000; i++)
 	{
 		memcpy(midwunit_decode_memory, base, 0x400000);
 		for (j = 0; j < 0x100000; j++)
@@ -575,14 +576,15 @@ DRIVER_INIT( rmpgwt )
 DRIVER_INIT( revx )
 {
 	UINT8 *base;
-	int i, j;
+	int i, j, len;
 
 	/* register for state saving */
 	register_state_saving();
 
 	/* load the graphics ROMs -- quadruples */
 	midyunit_gfx_rom = base = memory_region(REGION_GFX1);
-	for (i = 0; i < memory_region_length(REGION_GFX1) / 0x200000; i++)
+	len = memory_region_length(REGION_GFX1);
+	for (i = 0; i < len / 0x200000; i++)
 	{
 		memcpy(midwunit_decode_memory, base, 0x200000);
 		for (j = 0; j < 0x80000; j++)

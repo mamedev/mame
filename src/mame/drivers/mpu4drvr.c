@@ -1567,7 +1567,7 @@ static UINT8 *dealem_videoram;
 
 static PALETTE_INIT( dealem )
 {
-	int i;
+	int i, len;
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_r[3], weights_g[3], weights_b[2];
@@ -1577,7 +1577,8 @@ static PALETTE_INIT( dealem )
 			3,	resistances_rg,	weights_g,	1000,	0,
 			2,	resistances_b,	weights_b,	1000,	0);
 
-	for (i = 0; i < memory_region_length(REGION_PROMS); i++)
+	len = memory_region_length(REGION_PROMS);
+	for (i = 0; i < len; i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 

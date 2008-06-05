@@ -184,56 +184,60 @@ WRITE8_HANDLER( mjsikaku_scrolly_w )
 
 WRITE8_HANDLER( mjsikaku_romsel_w )
 {
+	int gfxlen = memory_region_length(REGION_GFX1);
 	mjsikaku_gfxrom = (data & 0x0f);
 
-	if ((mjsikaku_gfxrom << 17) > (memory_region_length(REGION_GFX1) - 1))
+	if ((mjsikaku_gfxrom << 17) > (gfxlen - 1))
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
-		mjsikaku_gfxrom &= (memory_region_length(REGION_GFX1) / 0x20000 - 1);
+		mjsikaku_gfxrom &= (gfxlen / 0x20000 - 1);
 	}
 }
 
 WRITE8_HANDLER( secolove_romsel_w )
 {
+	int gfxlen = memory_region_length(REGION_GFX1);
 	mjsikaku_gfxrom = ((data & 0xc0) >> 4) + (data & 0x03);
 	mjsikaku_gfxflag2_w(machine, 0, data);
 
-	if ((mjsikaku_gfxrom << 17) > (memory_region_length(REGION_GFX1) - 1))
+	if ((mjsikaku_gfxrom << 17) > (gfxlen - 1))
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
-		mjsikaku_gfxrom &= (memory_region_length(REGION_GFX1) / 0x20000 - 1);
+		mjsikaku_gfxrom &= (gfxlen / 0x20000 - 1);
 	}
 }
 
 WRITE8_HANDLER( crystalg_romsel_w )
 {
+	int gfxlen = memory_region_length(REGION_GFX1);
 	mjsikaku_gfxrom = (data & 0x03);
 	mjsikaku_gfxflag2_w(machine, 0, data);
 
-	if ((mjsikaku_gfxrom << 17) > (memory_region_length(REGION_GFX1) - 1))
+	if ((mjsikaku_gfxrom << 17) > (gfxlen - 1))
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
-		mjsikaku_gfxrom &= (memory_region_length(REGION_GFX1) / 0x20000 - 1);
+		mjsikaku_gfxrom &= (gfxlen / 0x20000 - 1);
 	}
 }
 
 WRITE8_HANDLER( seiha_romsel_w )
 {
+	int gfxlen = memory_region_length(REGION_GFX1);
 	mjsikaku_gfxrom = (data & 0x1f);
 	mjsikaku_gfxflag3_w(machine, 0, data);
 
-	if ((mjsikaku_gfxrom << 17) > (memory_region_length(REGION_GFX1) - 1))
+	if ((mjsikaku_gfxrom << 17) > (gfxlen - 1))
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
-		mjsikaku_gfxrom &= (memory_region_length(REGION_GFX1) / 0x20000 - 1);
+		mjsikaku_gfxrom &= (gfxlen / 0x20000 - 1);
 	}
 }
 
@@ -300,7 +304,7 @@ static void mbmj8688_gfxdraw(int gfxtype)
 	int sizex, sizey;
 	int skipx, skipy;
 	int ctrx, ctry;
-	int gfxaddr;
+	int gfxaddr, gfxlen;
 	UINT16 color, color1, color2;
 
 	if (gfxtype == GFXTYPE_PURE_12BIT)
@@ -335,6 +339,7 @@ static void mbmj8688_gfxdraw(int gfxtype)
 		skipy = -1;
 	}
 
+	gfxlen = memory_region_length(REGION_GFX1);
 	gfxaddr = (mjsikaku_gfxrom << 17) + (blitter_src_addr << 1);
 //popmessage("ADDR:%08X DX:%03d DY:%03d SX:%03d SY:%03d", gfxaddr, startx, starty, sizex, sizey);
 //if (blitter_direction_x|blitter_direction_y) popmessage("ADDR:%08X FX:%01d FY:%01d", gfxaddr, blitter_direction_x, blitter_direction_y);
@@ -343,7 +348,7 @@ static void mbmj8688_gfxdraw(int gfxtype)
 	{
 		for (x = startx, ctrx = sizex; ctrx >= 0; x += skipx, ctrx--)
 		{
-			if ((gfxaddr > (memory_region_length(REGION_GFX1) - 1)))
+			if ((gfxaddr > (gfxlen - 1)))
 			{
 #ifdef MAME_DEBUG
 				popmessage("GFXROM ADDRESS OVER!!");

@@ -84,7 +84,8 @@ UINT16 *ginganin_fgram16, *ginganin_txtram16, *ginganin_vregs16;
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = memory_region(REGION_GFX5)[2*tile_index + 0] * 256 + memory_region(REGION_GFX5)[2*tile_index + 1];
+	UINT8 *gfx = memory_region(REGION_GFX5);
+	int code = gfx[2*tile_index + 0] * 256 + gfx[2*tile_index + 1];
 	SET_TILE_INFO(
 			BG_GFX,
 			code,

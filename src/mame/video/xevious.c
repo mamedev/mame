@@ -329,8 +329,8 @@ WRITE8_HANDLER( xevious_bs_w )
 READ8_HANDLER( xevious_bb_r )
 {
 	UINT8 *rom2a = memory_region(REGION_GFX4);
-	UINT8 *rom2b = memory_region(REGION_GFX4)+0x1000;
-	UINT8 *rom2c = memory_region(REGION_GFX4)+0x3000;
+	UINT8 *rom2b = rom2a+0x1000;
+	UINT8 *rom2c = rom2a+0x3000;
 	int adr_2b,adr_2c;
 	int dat1,dat2;
 

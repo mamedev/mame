@@ -239,7 +239,7 @@ static void dreamwld_oki_setbank( UINT8 chip, UINT8 bank )
 {
 	/* 0x30000-0x3ffff is banked.
         banks are at 0x30000,0x40000,0x50000 and 0x60000 in rom */
-	UINT8 *sound = chip?memory_region(REGION_SOUND1):memory_region(REGION_SOUND2);
+	UINT8 *sound = memory_region(chip ? REGION_SOUND1 : REGION_SOUND2);
 	logerror("OKI%d: set bank %02x\n",chip,bank);
 	memcpy(sound+0x30000, sound+0xb0000+0x10000*bank, 0x10000);
 }

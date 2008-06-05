@@ -13,8 +13,6 @@
 */
 
 #define DE156CPU ARM
-extern void decrypt156(void);
-
 #include "driver.h"
 #include "decocrpt.h"
 #include "deco32.h"
@@ -690,14 +688,14 @@ static void descramble_sound( int region )
 static DRIVER_INIT( hvysmsh )
 {
 	deco56_decrypt(REGION_GFX1); /* 141 */
-	decrypt156();
+	deco156_decrypt();
 	descramble_sound(REGION_SOUND2);
 }
 
 static DRIVER_INIT( wcvol95 )
 {
 	deco56_decrypt(REGION_GFX1); /* 141 */
-	decrypt156();
+	deco156_decrypt();
 	descramble_sound(REGION_SOUND1);
 }
 

@@ -381,11 +381,11 @@ DRIVER_INIT( mooncrsu )
 
 DRIVER_INIT( mooncrst )
 {
-	offs_t i;
+	offs_t i, len = memory_region_length(REGION_CPU1);
 	UINT8 *rom = memory_region(REGION_CPU1);
 
 
-	for (i = 0;i < memory_region_length(REGION_CPU1);i++)
+	for (i = 0;i < len;i++)
 		rom[i] = decode_mooncrst(rom[i],i);
 
 	DRIVER_INIT_CALL(mooncrsu);
@@ -457,11 +457,11 @@ Pin layout is such that links can replace the PAL if encryption is not used.
 		{ 1,4,1,4 }
 	};
 
-	offs_t i;
+	offs_t i, len = memory_region_length(REGION_CPU1);
 	UINT8 *rom = memory_region(REGION_CPU1);
 
 
-	for (i = 0; i < memory_region_length(REGION_CPU1); i++)
+	for (i = 0; i < len; i++)
 	{
 		UINT8 data_xor;
 		int line = i & 0x07;
@@ -483,11 +483,11 @@ DRIVER_INIT( azurian )
 
 DRIVER_INIT( 4in1 )
 {
-	offs_t i;
+	offs_t i, len = memory_region_length(REGION_CPU1);
 	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	/* Decrypt Program Roms */
-	for (i = 0; i < memory_region_length(REGION_CPU1); i++)
+	for (i = 0; i < len; i++)
 		RAM[i] = RAM[i] ^ (i & 0xff);
 
 	/* games are banked at 0x0000 - 0x3fff */

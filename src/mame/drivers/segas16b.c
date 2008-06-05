@@ -871,6 +871,7 @@ CPU  - 317-0092  |--------------------------------------------------------------
 #include "deprecat.h"
 #include "system16.h"
 #include "machine/segaic16.h"
+#include "machine/fd1089.h"
 #include "machine/fd1094.h"
 #include "machine/mc8123.h"
 #include "sound/2151intf.h"
@@ -6127,7 +6128,6 @@ static DRIVER_INIT( generic_5797 )
 
 static DRIVER_INIT( aliensy3_5358 )
 {
-	void fd1089_decrypt_0033(void);
 	DRIVER_INIT_CALL(generic_5358);
 	fd1089_decrypt_0033();
 }
@@ -6163,7 +6163,6 @@ static DRIVER_INIT( altbeas4_5521 )
 
 static DRIVER_INIT( aurail1_5704 )
 {
-	void fd1089_decrypt_0168(void);
 	DRIVER_INIT_CALL(generic_5704);
 	fd1089_decrypt_0168();
 }
@@ -6171,7 +6170,6 @@ static DRIVER_INIT( aurail1_5704 )
 
 static DRIVER_INIT( aurailj_5704 )
 {
-	void fd1089_decrypt_0167(void);
 	DRIVER_INIT_CALL(generic_5704);
 	fd1089_decrypt_0167();
 }
@@ -6186,7 +6184,6 @@ static DRIVER_INIT( ddux_5704 )
 
 static DRIVER_INIT( dunkshot_5358 )
 {
-	void fd1089_decrypt_0022(void);
 	DRIVER_INIT_CALL(generic_5358);
 	fd1089_decrypt_0022();
 	custom_io_r = dunkshot_custom_io_r;
@@ -6232,7 +6229,6 @@ static DRIVER_INIT( sdi_5358 )
 
 static DRIVER_INIT( defense_5358 )
 {
-	void fd1089_decrypt_0028(void);
 	DRIVER_INIT_CALL(generic_5358);
 	fd1089_decrypt_0028();
 	custom_io_r = sdi_custom_io_r;
@@ -6255,7 +6251,6 @@ static DRIVER_INIT( shinobi3_5358 )
 
 static DRIVER_INIT( sjryuko_5358 )
 {
-	void fd1089_decrypt_5021(void);
 	DRIVER_INIT_CALL(generic_5358);
 	fd1089_decrypt_5021();
 	custom_io_r = sjryuko_custom_io_r;

@@ -240,9 +240,11 @@ MACHINE_DRIVER_END
 static DRIVER_INIT(kinstb)
 {
 	INT32 i;
+	UINT8 *rom = memory_region(REGION_USER3);
+
 	for(i=0;i<0x400000;i++)
 	{
-		memory_region(REGION_USER3)[i]=BITSWAP8(memory_region(REGION_USER3)[i],5,0,6,1,7,4,3,2 );
+		rom[i]=BITSWAP8(rom[i],5,0,6,1,7,4,3,2);
 	}
 	DRIVER_INIT_CALL(snes_hirom);
 }

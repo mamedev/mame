@@ -1,6 +1,5 @@
 #include "driver.h"
-
-extern UINT16 *pgm_mainram;
+#include "includes/pgm.h"
 
 /*** ASIC27a (Puzzle Star) -- ARM but with no external rom? behaves a bit like KOV ***/
 
@@ -539,7 +538,6 @@ READ16_HANDLER (ASIC28_r16)
 
 		case 0x21: // PhotoY2k spritenum conversion 3/4
 			if(!ASIC28RCNT) {
-				extern const UINT32 pgmy2ks[];
 				photoy2k_trf[2] = val & 0xffff;
 				logerror("ASIC28: PhotoY2K spr3 %04x %06x (%06x)\n", val & 0xffff, photoy2k_trf[1], activecpu_get_pc());
 				if(photoy2k_trf[0] < 0x3c00)

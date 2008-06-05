@@ -147,38 +147,37 @@ static DRIVER_INIT(dambustr)
 {
 	int i, j, tmp;
 	int tmpram[16];
+	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *usr = memory_region(REGION_USER1);
+	UINT8 *gfx = memory_region(REGION_GFX1);
 
 	// Bit swap addresses
 	for(i=0; i<4096*4; i++) {
-		memory_region(REGION_CPU1)[i] =
-		memory_region(REGION_USER1)[BITSWAP16(i,15,14,13,12, 4,10,9,8,7,6,5,3,11,2,1,0)];
+		rom[i] = usr[BITSWAP16(i,15,14,13,12, 4,10,9,8,7,6,5,3,11,2,1,0)];
 	};
 
 	// Swap program ROMs
 	for(i=0; i<0x1000; i++) {
-		tmp = memory_region(REGION_CPU1)[0x5000+i];
-		memory_region(REGION_CPU1)[0x5000+i] = memory_region(REGION_CPU1)[0x6000+i];
-		memory_region(REGION_CPU1)[0x6000+i] = memory_region(REGION_CPU1)[0x1000+i];
-		memory_region(REGION_CPU1)[0x1000+i] = tmp;
+		tmp = rom[0x5000+i];
+		rom[0x5000+i] = rom[0x6000+i];
+		rom[0x6000+i] = rom[0x1000+i];
+		rom[0x1000+i] = tmp;
 	};
 
 	// Bit swap in $1000-$1fff and $4000-$5fff
 	for(i=0; i<0x1000; i++) {
-		memory_region(REGION_CPU1)[0x1000+i] =
-		BITSWAP8(memory_region(REGION_CPU1)[0x1000+i],7,6,5,1,3,2,4,0);
-		memory_region(REGION_CPU1)[0x4000+i] =
-		BITSWAP8(memory_region(REGION_CPU1)[0x4000+i],7,6,5,1,3,2,4,0);
-		memory_region(REGION_CPU1)[0x5000+i] =
-		BITSWAP8(memory_region(REGION_CPU1)[0x5000+i],7,6,5,1,3,2,4,0);
+		rom[0x1000+i] =	BITSWAP8(rom[0x1000+i],7,6,5,1,3,2,4,0);
+		rom[0x4000+i] =	BITSWAP8(rom[0x4000+i],7,6,5,1,3,2,4,0);
+		rom[0x5000+i] =	BITSWAP8(rom[0x5000+i],7,6,5,1,3,2,4,0);
 	};
 
 	// Swap graphics ROMs
 	for(i=0;i<0x4000;i+=16)	{
 		for(j=0; j<16; j++)
-			tmpram[j] = memory_region(REGION_GFX1)[i+j];
+			tmpram[j] = gfx[i+j];
 		for(j=0; j<8; j++) {
-			memory_region(REGION_GFX1)[i+j] = tmpram[j*2];
-			memory_region(REGION_GFX1)[i+j+8] = tmpram[j*2+1];
+			gfx[i+j] = tmpram[j*2];
+			gfx[i+j+8] = tmpram[j*2+1];
 		};
 	};
 }

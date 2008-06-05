@@ -590,7 +590,7 @@ static int bit(int i,int n)
 
 DRIVER_INIT( anteater )
 {
-	offs_t i;
+	offs_t i, len;
 	UINT8 *RAM;
 	UINT8 *scratch;
 
@@ -603,12 +603,13 @@ DRIVER_INIT( anteater )
     */
 
 	RAM = memory_region(REGION_GFX1);
+	len = memory_region_length(REGION_GFX1);
 
-	scratch = malloc_or_die(memory_region_length(REGION_GFX1));
+	scratch = malloc_or_die(len);
 
-		memcpy(scratch, RAM, memory_region_length(REGION_GFX1));
+		memcpy(scratch, RAM, len);
 
-		for (i = 0; i < memory_region_length(REGION_GFX1); i++)
+		for (i = 0; i < len; i++)
 		{
 			int j;
 
@@ -626,7 +627,7 @@ DRIVER_INIT( anteater )
 
 DRIVER_INIT( rescue )
 {
-	offs_t i;
+	offs_t i, len;
 	UINT8 *RAM;
 	UINT8 *scratch;
 
@@ -639,12 +640,13 @@ DRIVER_INIT( rescue )
     */
 
 	RAM = memory_region(REGION_GFX1);
+	len = memory_region_length(REGION_GFX1);
 
-	scratch = malloc_or_die(memory_region_length(REGION_GFX1));
+	scratch = malloc_or_die(len);
 
-		memcpy(scratch, RAM, memory_region_length(REGION_GFX1));
+		memcpy(scratch, RAM, len);
 
-		for (i = 0; i < memory_region_length(REGION_GFX1); i++)
+		for (i = 0; i < len; i++)
 		{
 			int j;
 
@@ -662,7 +664,7 @@ DRIVER_INIT( rescue )
 
 DRIVER_INIT( minefld )
 {
-	offs_t i;
+	offs_t i, len;
 	UINT8 *RAM;
 	UINT8 *scratch;
 
@@ -674,12 +676,13 @@ DRIVER_INIT( minefld )
     */
 
 	RAM = memory_region(REGION_GFX1);
+	len = memory_region_length(REGION_GFX1);
 
-	scratch = malloc_or_die(memory_region_length(REGION_GFX1));
+	scratch = malloc_or_die(len);
 
-		memcpy(scratch, RAM, memory_region_length(REGION_GFX1));
+		memcpy(scratch, RAM, len);
 
-		for (i = 0; i < memory_region_length(REGION_GFX1); i++)
+		for (i = 0; i < len; i++)
 		{
 			int j;
 
@@ -698,7 +701,7 @@ DRIVER_INIT( minefld )
 
 DRIVER_INIT( losttomb )
 {
-	offs_t i;
+	offs_t i, len;
 	UINT8 *RAM;
 	UINT8 *scratch;
 
@@ -711,12 +714,13 @@ DRIVER_INIT( losttomb )
     */
 
 	RAM = memory_region(REGION_GFX1);
+	len = memory_region_length(REGION_GFX1);
 
-	scratch = malloc_or_die(memory_region_length(REGION_GFX1));
+	scratch = malloc_or_die(len);
 
-		memcpy(scratch, RAM, memory_region_length(REGION_GFX1));
+		memcpy(scratch, RAM, len);
 
-		for (i = 0; i < memory_region_length(REGION_GFX1); i++)
+		for (i = 0; i < len; i++)
 		{
 			int j;
 
@@ -866,11 +870,10 @@ DRIVER_INIT( mrkougb )
 DRIVER_INIT( ad2083 )
 {
 	UINT8 c;
-	int i;
-
+	int i, len = memory_region_length(REGION_CPU1);
 	UINT8 *ROM = memory_region(REGION_CPU1);
 
-	for (i=0; i<memory_region_length(REGION_CPU1); i++)
+	for (i=0; i<len; i++)
 	{
 		c = ROM[i] ^ 0x35;
 		c = BITSWAP8(c, 6,2,5,1,7,3,4,0); /* also swapped inside of the bigger module */

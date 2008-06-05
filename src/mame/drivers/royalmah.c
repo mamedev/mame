@@ -98,12 +98,14 @@ static int palette_base;
 static PALETTE_INIT( royalmah )
 {
 	offs_t i;
+	const UINT8 *prom = memory_region(REGION_PROMS);
+	int len = memory_region_length(REGION_PROMS);
 
-	for (i = 0; i < memory_region_length(REGION_PROMS); i++)
+	for (i = 0; i < len; i++)
 	{
 		UINT8 bit0, bit1, bit2, r, g, b;
 
-		UINT8 data = memory_region(REGION_PROMS)[i];
+		UINT8 data = prom[i];
 
 		/* red component */
 		bit0 = (data >> 0) & 0x01;
@@ -131,10 +133,12 @@ static PALETTE_INIT( royalmah )
 static PALETTE_INIT( mjderngr )
 {
 	offs_t i;
+	const UINT8 *prom = memory_region(REGION_PROMS);
+	int len = memory_region_length(REGION_PROMS);
 
-	for (i = 0; i < memory_region_length(REGION_PROMS) / 2; i++)
+	for (i = 0; i < len / 2; i++)
 	{
-		UINT16 data = (memory_region(REGION_PROMS)[i] << 8) | memory_region(REGION_PROMS)[i + 0x200];
+		UINT16 data = (prom[i] << 8) | prom[i + 0x200];
 
 		/* the bits are in reverse order */
 		UINT8 r = BITSWAP8((data >>  0) & 0x1f,7,6,5,0,1,2,3,4 );

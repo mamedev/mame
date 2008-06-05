@@ -256,6 +256,8 @@ static WRITE16_HANDLER( fifo_data_w )
 static void blit_gfx(void)
 {
 	int tmpptr=0;
+	const UINT8 *rom = memory_region(REGION_USER1);
+
 	while(tmpptr<fptr)
 	{
 		int x,y,romdata;
@@ -271,7 +273,7 @@ static void blit_gfx(void)
 			{
 				for (x=0;x<w;x++)
 				{
-					romdata = memory_region(REGION_USER1)[romoffs&0x1fffff];
+					romdata = rom[romoffs&0x1fffff];
 					if(romdata)
 					{
 						plot_pixel_pal(fifo[tmpptr+5]+fifo[tmpptr+3]-x, fifo[tmpptr+6]+fifo[tmpptr+4]-y, romdata);
@@ -306,16 +308,19 @@ static void render_jpeg(void)
 {
 	int x,y;
 	int addr=jpeg_addr;
+	UINT8 *rom;
+
 	fillbitmap(sliver_bitmap_bg, 0,0);
 	if(jpeg_addr<0)
 	{
 		return;
 	}
+	rom = memory_region(REGION_USER3);
 	for (y=0;y<jpeg_h;y++)
 	{
 		for (x=0;x<jpeg_w;x++)
 		{
-			plot_pixel_rgb(x-x_offset+jpeg_x,jpeg_h-y-y_offset-jpeg_y,memory_region(REGION_USER3)[addr],memory_region(REGION_USER3)[addr+1],memory_region(REGION_USER3)[addr+2]);
+			plot_pixel_rgb(x-x_offset+jpeg_x,jpeg_h-y-y_offset-jpeg_y,rom[addr],rom[addr+1],rom[addr+2]);
 			addr+=3;
 		}
 	}

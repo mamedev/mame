@@ -1633,15 +1633,16 @@ ROM_END
 
 static void gauntlet_common_init(int slapstic, int vindctr2)
 {
+	UINT8 *rom = memory_region(REGION_CPU1);
 	atarigen_eeprom_default = NULL;
 	atarigen_slapstic_init(0, 0x038000, 0, slapstic);
 
 	/* swap the top and bottom halves of the main CPU ROM images */
-	atarigen_swap_mem(memory_region(REGION_CPU1) + 0x000000, memory_region(REGION_CPU1) + 0x008000, 0x8000);
-	atarigen_swap_mem(memory_region(REGION_CPU1) + 0x040000, memory_region(REGION_CPU1) + 0x048000, 0x8000);
-	atarigen_swap_mem(memory_region(REGION_CPU1) + 0x050000, memory_region(REGION_CPU1) + 0x058000, 0x8000);
-	atarigen_swap_mem(memory_region(REGION_CPU1) + 0x060000, memory_region(REGION_CPU1) + 0x068000, 0x8000);
-	atarigen_swap_mem(memory_region(REGION_CPU1) + 0x070000, memory_region(REGION_CPU1) + 0x078000, 0x8000);
+	atarigen_swap_mem(rom + 0x000000, rom + 0x008000, 0x8000);
+	atarigen_swap_mem(rom + 0x040000, rom + 0x048000, 0x8000);
+	atarigen_swap_mem(rom + 0x050000, rom + 0x058000, 0x8000);
+	atarigen_swap_mem(rom + 0x060000, rom + 0x068000, 0x8000);
+	atarigen_swap_mem(rom + 0x070000, rom + 0x078000, 0x8000);
 
 	/* indicate whether or not we are vindicators 2 */
 	vindctr2_screen_refresh = vindctr2;

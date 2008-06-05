@@ -241,15 +241,16 @@ static READ8_HANDLER( showdown_bank0_r );
 
 static NVRAM_HANDLER( exidy440 )
 {
+	UINT8 *rom = memory_region(REGION_CPU1);
 	if (read_or_write)
 		/* the EEROM lives in the uppermost 8k of the top bank */
-		mame_fwrite(file, &memory_region(REGION_CPU1)[0x10000 + 15 * 0x4000 + 0x2000], 0x2000);
+		mame_fwrite(file, &rom[0x10000 + 15 * 0x4000 + 0x2000], 0x2000);
 	else
 	{
 		if (file)
-			mame_fread(file, &memory_region(REGION_CPU1)[0x10000 + 15 * 0x4000 + 0x2000], 0x2000);
+			mame_fread(file, &rom[0x10000 + 15 * 0x4000 + 0x2000], 0x2000);
 		else
-			memset(&memory_region(REGION_CPU1)[0x10000 + 15 * 0x4000 + 0x2000], 0, 0x2000);
+			memset(&rom[0x10000 + 15 * 0x4000 + 0x2000], 0, 0x2000);
 	}
 }
 

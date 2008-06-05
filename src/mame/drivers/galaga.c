@@ -3050,9 +3050,9 @@ static DRIVER_INIT (galaga)
 {
 	/* swap bytes for flipped character so we can decode them together with normal characters */
 	UINT8 *rom = memory_region(REGION_GFX1);
-	int i;
+	int i, len = memory_region_length(REGION_GFX1);
 
-	for (i = 0;i < memory_region_length(REGION_GFX1);i++)
+	for (i = 0;i < len;i++)
 	{
 		if ((i & 0x0808) == 0x0800)
 		{

@@ -742,11 +742,12 @@ static WRITE32_HANDLER( comm1_w )
 static WRITE32_HANDLER( comm_rombank_w )
 {
 	int bank = data >> 24;
-	if (memory_region(REGION_USER3))
+	UINT8 *usr3 = memory_region(REGION_USER3);
+	if (usr3)
 		if( bank != comm_rombank ) {
 			printf("rombank %02X\n", bank);
 			comm_rombank = bank & 0x7f;
-			memory_set_bankptr(1, memory_region(REGION_USER3) + (comm_rombank * 0x10000));
+			memory_set_bankptr(1, usr3 + (comm_rombank * 0x10000));
 		}
 }
 
@@ -974,12 +975,14 @@ static MACHINE_START( hornet )
 
 static MACHINE_RESET( hornet )
 {
-	if (memory_region(REGION_USER3))
-		memory_set_bankptr(1, memory_region(REGION_USER3));
+	UINT8 *usr3 = memory_region(REGION_USER3);
+	UINT8 *usr5 = memory_region(REGION_USER5);
+	if (usr3)
+		memory_set_bankptr(1, usr3);
 	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
 
-	if (memory_region(REGION_USER5))
-		memory_set_bankptr(5, memory_region(REGION_USER5));
+	if (usr5)
+		memory_set_bankptr(5, usr5);
 }
 
 static MACHINE_DRIVER_START( hornet )
@@ -1025,13 +1028,16 @@ MACHINE_DRIVER_END
 
 static MACHINE_RESET( hornet_2board )
 {
-	if (memory_region(REGION_USER3))
-		memory_set_bankptr(1, memory_region(REGION_USER3));
+	UINT8 *usr3 = memory_region(REGION_USER3);
+	UINT8 *usr5 = memory_region(REGION_USER5);
+
+	if (usr3)
+		memory_set_bankptr(1, usr3);
 	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
 	cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, ASSERT_LINE);
 
-	if (memory_region(REGION_USER5))
-		memory_set_bankptr(5, memory_region(REGION_USER5));
+	if (usr5)
+		memory_set_bankptr(5, usr5);
 }
 
 static MACHINE_DRIVER_START( hornet_2board )

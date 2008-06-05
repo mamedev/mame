@@ -52,16 +52,17 @@ WRITE8_HANDLER( hyhoo_blitter_w )
 
 WRITE8_HANDLER( hyhoo_romsel_w )
 {
+	int gfxlen = memory_region_length(REGION_GFX1);
 	hyhoo_gfxrom = (((data & 0xc0) >> 4) + (data & 0x03));
 	hyhoo_highcolorflag = data;
 	nb1413m3_gfxrombank_w(machine, 0, data);
 
-	if ((0x20000 * hyhoo_gfxrom) > (memory_region_length(REGION_GFX1) - 1))
+	if ((0x20000 * hyhoo_gfxrom) > (gfxlen - 1))
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
-		hyhoo_gfxrom &= (memory_region_length(REGION_GFX1) / 0x20000 - 1);
+		hyhoo_gfxrom &= (gfxlen / 0x20000 - 1);
 	}
 }
 
@@ -81,7 +82,7 @@ void hyhoo_gfxdraw(void)
 	int sizex, sizey;
 	int skipx, skipy;
 	int ctrx, ctry;
-	int gfxaddr;
+	int gfxaddr, gfxlen;
 	UINT8 color, color1, color2;
 	int r, g, b;
 	pen_t pen;
@@ -115,13 +116,14 @@ void hyhoo_gfxdraw(void)
 		skipy = -1;
 	}
 
+	gfxlen = memory_region_length(REGION_GFX1);
 	gfxaddr = (hyhoo_gfxrom << 17) + (blitter_src_addr << 1);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)
 	{
 		for (x = startx, ctrx = sizex; ctrx >= 0; x += skipx, ctrx--)
 		{
-			if ((gfxaddr > (memory_region_length(REGION_GFX1) - 1)))
+			if ((gfxaddr > (gfxlen - 1)))
 			{
 #ifdef MAME_DEBUG
 				popmessage("GFXROM ADDRESS OVER!!");

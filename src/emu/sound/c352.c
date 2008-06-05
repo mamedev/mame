@@ -114,7 +114,7 @@ static void c352_mix_one_channel(struct c352_info *info, unsigned long ch, long 
 	UINT16 noisecnt;
 	INT32 frequency, delta, offset, cnt, flag;
 	UINT32 bank;
-	UINT32 pos;
+	UINT32 pos, len;
 
 	frequency = info->c352_ch[ch].pitch;
 	delta=frequency;
@@ -127,6 +127,7 @@ static void c352_mix_one_channel(struct c352_info *info, unsigned long ch, long 
 	noisecnt = info->c352_ch[ch].noisecnt;
 	noisebuf = info->c352_ch[ch].noisebuf;
 
+	len = (UINT32)memory_region_length(info->c352_region);
 	for(i = 0 ; (i < sample_count) && (flag & C352_FLG_BUSY) ; i++)
 	{
 		offset += delta;
@@ -136,7 +137,7 @@ static void c352_mix_one_channel(struct c352_info *info, unsigned long ch, long 
 			offset &= 0xffff;
 		}
 
-		if (pos > (UINT32)memory_region_length(info->c352_region))
+		if (pos > len)
 		{
 			info->c352_ch[ch].flag &= ~C352_FLG_BUSY;
 			return;

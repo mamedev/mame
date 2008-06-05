@@ -5888,12 +5888,12 @@ static DRIVER_INIT( finalb )
 
 static DRIVER_INIT( mjnquest )
 {
-	int i;
+	int i, len = memory_region_length(REGION_GFX2);
 	UINT8 *gfx = memory_region(REGION_GFX2);
 
 	/* the bytes in each longword are in reversed order, put them in the
        order used by the other games. */
-	for (i = 0;i < memory_region_length(REGION_GFX2);i += 2)
+	for (i = 0;i < len;i += 2)
 	{
 		int t;
 

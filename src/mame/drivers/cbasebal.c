@@ -13,13 +13,10 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/cps1.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
-
-
-/* in machine/kabuki.c */
-void pang_decode(void);
 
 
 VIDEO_START( cbasebal );

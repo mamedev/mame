@@ -455,6 +455,7 @@ static WRITE16_HANDLER(srmp6_dma_w)
 	COMBINE_DATA(&dmaram[offset]);
 	if(offset==13 && dmaram[offset]==0x40)
 	{
+		const UINT8 *rom = memory_region(REGION_USER2);
 		UINT32 srctab=2*((((UINT32)dmaram[5])<<16)|dmaram[4]);
 		UINT32 srcdata=2*((((UINT32)dmaram[11])<<16)|dmaram[10]);
 		UINT32 len=4*(((((UINT32)dmaram[7]&3)<<16)|dmaram[6])+1); //??? WRONG!
@@ -485,19 +486,19 @@ static WRITE16_HANDLER(srmp6_dma_w)
 		while(1)
 		{
 			int i;
-			UINT8 ctrl=memory_region(REGION_USER2)[srcdata];
+			UINT8 ctrl=rom[srcdata];
  			++srcdata;
 
 			for(i=0;i<8;++i)
 			{
-				UINT8 p=memory_region(REGION_USER2)[srcdata];
+				UINT8 p=rom[srcdata];
 
 				if(ctrl&0x80)
 				{
 					UINT8 real_byte;
-					real_byte = memory_region(REGION_USER2)[srctab+p*2];
+					real_byte = rom[srctab+p*2];
 					tempidx+=process(real_byte,tempidx);
-					real_byte = memory_region(REGION_USER2)[srctab+p*2+1];//px[DMA_XOR((current_table_address+p*2+1))];
+					real_byte = rom[srctab+p*2+1];//px[DMA_XOR((current_table_address+p*2+1))];
 					tempidx+=process(real_byte,tempidx);
  				}
  				else

@@ -79,6 +79,7 @@ Blitter source graphics
 
 #include "driver.h"
 #include "tutankhm.h"
+#include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/i8039/i8039.h"
 #include "cpu/z80/z80.h"
@@ -86,8 +87,6 @@ Blitter source graphics
 #include "sound/dac.h"
 #include "sound/flt_rc.h"
 
-
-void konami1_decode(void);
 
 static int i8039_status;
 
@@ -435,12 +434,10 @@ ROM_END
 
 static DRIVER_INIT( junofrst )
 {
-	extern UINT8 *konami1_decrypted;
-
-	konami1_decode();
+	UINT8 *decrypt = konami1_decode(0);
 
 	memory_configure_bank(1, 0, 16, memory_region(REGION_CPU1) + 0x10000, 0x1000);
-	memory_configure_bank_decrypted(1, 0, 16, konami1_decrypted + 0x10000, 0x1000);
+	memory_configure_bank_decrypted(1, 0, 16, decrypt + 0x10000, 0x1000);
 }
 
 

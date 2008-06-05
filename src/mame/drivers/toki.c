@@ -750,16 +750,21 @@ static DRIVER_INIT( toki )
 static DRIVER_INIT( tokib )
 {
 	UINT8 *temp = malloc_or_die(65536 * 2);
-	int i, offs;
+	int i, offs, len;
+	UINT8 *rom;
 
 	/* invert the sprite data in the ROMs */
-	for (i = 0; i < memory_region_length(REGION_GFX2); i++)
-		memory_region(REGION_GFX2)[i] ^= 0xff;
+	len = memory_region_length(REGION_GFX2);
+	rom = memory_region(REGION_GFX2);
+	for (i = 0; i < len; i++)
+		rom[i] ^= 0xff;
 
 	/* merge background tile graphics together */
-		for (offs = 0; offs < memory_region_length(REGION_GFX3); offs += 0x20000)
+		len = memory_region_length(REGION_GFX3);
+		rom = memory_region(REGION_GFX3);
+		for (offs = 0; offs < len; offs += 0x20000)
 		{
-			UINT8 *base = &memory_region(REGION_GFX3)[offs];
+			UINT8 *base = &rom[offs];
 			memcpy (temp, base, 65536 * 2);
 			for (i = 0; i < 16; i++)
 			{
@@ -769,9 +774,11 @@ static DRIVER_INIT( tokib )
 				memcpy (&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
 			}
 		}
-		for (offs = 0; offs < memory_region_length(REGION_GFX4); offs += 0x20000)
+		len = memory_region_length(REGION_GFX4);
+		rom = memory_region(REGION_GFX4);
+		for (offs = 0; offs < len; offs += 0x20000)
 		{
-			UINT8 *base = &memory_region(REGION_GFX4)[offs];
+			UINT8 *base = &rom[offs];
 			memcpy (temp, base, 65536 * 2);
 			for (i = 0; i < 16; i++)
 			{

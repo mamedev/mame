@@ -21,10 +21,11 @@ static char *orig_roms;
 static void mystwarr_save_orig_tiles(void)
 {
 	UINT8 *s = memory_region(REGION_GFX1);
-	UINT8 *pFinish = s+memory_region_length(REGION_GFX1)-3;
+	int len = memory_region_length(REGION_GFX1);
+	UINT8 *pFinish = s+len-3;
 
-	orig_roms = malloc_or_die(memory_region_length(REGION_GFX1));
-	memcpy(orig_roms, s, memory_region_length(REGION_GFX1));
+	orig_roms = malloc_or_die(len);
+	memcpy(orig_roms, s, len);
 
 	// now convert the data into a drawable format so we can decode it
 	while (s < pFinish)
@@ -54,9 +55,10 @@ static void mystwarr_save_orig_tiles(void)
 static void mystwarr_rest_orig_tiles(void)
 {
 	UINT8 *s = memory_region(REGION_GFX1);
+	int len = memory_region_length(REGION_GFX1);
 
 	// restore the original data so the ROM test can pass
-	memcpy(s, orig_roms, memory_region_length(REGION_GFX1));
+	memcpy(s, orig_roms, len);
 	free(orig_roms);
 }
 

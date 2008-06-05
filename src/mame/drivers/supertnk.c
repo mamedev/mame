@@ -218,10 +218,11 @@ static WRITE8_HANDLER( supertnk_bitplane_select_1_w )
 static void get_pens(pen_t *pens)
 {
 	offs_t i;
+	const UINT8 *prom = memory_region(REGION_PROMS);
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
-		UINT8 data = memory_region(REGION_PROMS)[i];
+		UINT8 data = prom[i];
 
 		pens[i] = MAKE_RGB(pal1bit(data >> 2), pal1bit(data >> 5), pal1bit(data >> 6));
 	}
@@ -475,10 +476,12 @@ static DRIVER_INIT( supertnk )
 {
 	/* decode the TMS9980 ROMs */
 	offs_t offs;
+	UINT8 *rom = memory_region(REGION_CPU1);
+	size_t len = memory_region_length(REGION_CPU1);
 
-	for (offs = 0; offs < memory_region_length(REGION_CPU1); offs++)
+	for (offs = 0; offs < len; offs++)
 	{
-		memory_region(REGION_CPU1)[offs] = BITSWAP8(memory_region(REGION_CPU1)[offs],0,1,2,3,4,5,6,7);
+		rom[offs] = BITSWAP8(rom[offs],0,1,2,3,4,5,6,7);
 	};
 }
 

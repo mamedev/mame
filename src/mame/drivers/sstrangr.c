@@ -80,7 +80,7 @@ static VIDEO_UPDATE( sstrngr2 )
 
 	get_pens(pens);
 
-	color_map_base = sstrngr_flip_screen ?  memory_region(REGION_PROMS) : &memory_region(REGION_PROMS)[0x0200];
+	color_map_base = &memory_region(REGION_PROMS)[sstrngr_flip_screen ? 0x0000 : 0x0200];
 
 	for (offs = 0; offs < sstrngr_ram_size; offs++)
 	{

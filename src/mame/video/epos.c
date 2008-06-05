@@ -29,12 +29,14 @@ static UINT8 palette;
 static void get_pens(pen_t *pens)
 {
 	offs_t i;
+	const UINT8 *prom = memory_region(REGION_PROMS);
+	int len = memory_region_length(REGION_PROMS);
 
-	for (i = 0; i < memory_region_length(REGION_PROMS); i++)
+	for (i = 0; i < len; i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
-		UINT8 data = memory_region(REGION_PROMS)[i];
+		UINT8 data = prom[i];
 
 		bit0 = (data >> 7) & 0x01;
 		bit1 = (data >> 6) & 0x01;

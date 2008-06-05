@@ -899,7 +899,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/timeplt.o $(AUDIO)/timeplt.o $(VIDEO)/timeplt.o \
 	$(DRIVERS)/tmnt.o $(VIDEO)/tmnt.o \
 	$(DRIVERS)/tp84.o $(VIDEO)/tp84.o \
-	$(DRIVERS)/trackfld.o $(MACHINE)/konami.o $(AUDIO)/trackfld.o $(VIDEO)/trackfld.o \
+	$(DRIVERS)/trackfld.o $(MACHINE)/konami1.o $(AUDIO)/trackfld.o $(VIDEO)/trackfld.o \
 	$(DRIVERS)/tutankhm.o $(VIDEO)/tutankhm.o \
 	$(DRIVERS)/twin16.o $(VIDEO)/twin16.o \
 	$(DRIVERS)/ultrsprt.o \

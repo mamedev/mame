@@ -5,12 +5,11 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 ***************************************************************************/
 
 #include "driver.h"
+#include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/vlm5030.h"
 #include "sound/dac.h"
 
-
-extern void konami1_decode(void);
 
 extern UINT8 *hyperspt_scroll;
 
@@ -592,7 +591,7 @@ ROM_END
 
 static DRIVER_INIT( hyperspt )
 {
-	konami1_decode();
+	konami1_decode(0);
 }
 
 

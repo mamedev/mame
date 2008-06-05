@@ -136,11 +136,11 @@ static INT16 *samplebuf;
 static void pbillian_sh_start(void)
 {
 	UINT8 *src = memory_region(REGION_SOUND1);
-	int i;
+	int i, len = memory_region_length(REGION_SOUND1);
 
 	/* convert 8-bit unsigned samples to 8-bit signed */
-	samplebuf = auto_malloc(memory_region_length(REGION_SOUND1) * 2);
-	for (i = 0;i < memory_region_length(REGION_SOUND1);i++)
+	samplebuf = auto_malloc(len * 2);
+	for (i = 0;i < len;i++)
 		samplebuf[i] = (INT8)(src[i] ^ 0x80) * 256;
 }
 

@@ -130,11 +130,13 @@ VIDEO_UPDATE( invadpt2 )
 {
 	pen_t pens[NUM_PENS];
 	offs_t offs;
+	UINT8 *prom;
 	UINT8 *color_map_base;
 
 	invadpt2_get_pens(pens);
 
-	color_map_base = color_map ? &memory_region(REGION_PROMS)[0x0400] : memory_region(REGION_PROMS);
+	prom = memory_region(REGION_PROMS);
+	color_map_base = color_map ? &prom[0x0400] : &prom[0x0000];
 
 	for (offs = 0; offs < mw8080bw_ram_size; offs++)
 	{
@@ -160,10 +162,12 @@ VIDEO_UPDATE( ballbomb )
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *color_map_base;
+	UINT8 *prom;
 
 	invadpt2_get_pens(pens);
 
-	color_map_base = color_map ? &memory_region(REGION_PROMS)[0x0400] : memory_region(REGION_PROMS);
+	prom = memory_region(REGION_PROMS);
+	color_map_base = color_map ? &prom[0x0400] : &prom[0x0000];
 
 	for (offs = 0; offs < mw8080bw_ram_size; offs++)
 	{
@@ -400,10 +404,12 @@ VIDEO_UPDATE( indianbt )
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *color_map_base;
+	UINT8 *prom;
 
 	cosmo_get_pens(pens);
 
-	color_map_base = color_map ? &memory_region(REGION_PROMS)[0x0400] : memory_region(REGION_PROMS);
+	prom = memory_region(REGION_PROMS);
+	color_map_base = color_map ? &prom[0x0400] : &prom[0x0000];
 
 	for (offs = 0; offs < mw8080bw_ram_size; offs++)
 	{

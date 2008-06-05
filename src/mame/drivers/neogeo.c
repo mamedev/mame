@@ -647,14 +647,14 @@ void neogeo_set_main_cpu_bank_address(UINT32 bank_address)
 static WRITE16_HANDLER( main_cpu_bank_select_w )
 {
 	UINT32 bank_address;
-
-	if ((memory_region_length(NEOGEO_REGION_MAIN_CPU_CARTRIDGE) <= 0x100000) && (data & 0x07))
+	UINT32 len = memory_region_length(NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
+	if ((len <= 0x100000) && (data & 0x07))
 		logerror("PC %06x: warning: bankswitch to %02x but no banks available\n", activecpu_get_pc(), data);
 	else
 	{
 		bank_address = ((data & 0x07) + 1) * 0x100000;
 
-		if (bank_address >= memory_region_length(NEOGEO_REGION_MAIN_CPU_CARTRIDGE))
+		if (bank_address >= len)
 		{
 			logerror("PC %06x: warning: bankswitch to empty bank %02x\n", activecpu_get_pc(), data);
 			bank_address = 0x100000;

@@ -16,8 +16,6 @@ VIDEO_START( dietgo );
 READ16_HANDLER( dietgo_104_prot_r );
 WRITE16_HANDLER( dietgo_104_prot_w );
 
-extern void deco102_decrypt(int region, int address_xor, int data_select_xor, int opcode_select_xor);
-
 
 static ADDRESS_MAP_START( dietgo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM

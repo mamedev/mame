@@ -6,10 +6,9 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/konami1.h"
 #include "audio/timeplt.h"
 
-
-extern void konami1_decode(void);
 
 extern WRITE8_HANDLER( rocnrope_videoram_w );
 extern WRITE8_HANDLER( rocnrope_colorram_w );
@@ -310,16 +309,14 @@ ROM_END
 
 static DRIVER_INIT( rocnrope )
 {
-	extern UINT8 *konami1_decrypted;
+	UINT8 *decrypted = konami1_decode(0);
 
-	konami1_decode();
-
-	konami1_decrypted[0x703d] = 0x98;	/* fix one instruction */
+	decrypted[0x703d] = 0x98;	/* fix one instruction */
 }
 
 static DRIVER_INIT( rocnropk )
 {
-	konami1_decode();
+	konami1_decode(0);
 }
 
 

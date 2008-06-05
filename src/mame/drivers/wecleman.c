@@ -1296,7 +1296,7 @@ static void bitswap(UINT8 *src,size_t len,int _14,int _13,int _12,int _11,int _1
 /* Unpack sprites data and do some patching */
 static DRIVER_INIT( wecleman )
 {
-	int i;
+	int i, len;
 	UINT8 *RAM;
 //  UINT16 *RAM1 = (UINT16 *) memory_region(REGION_CPU1);   /* Main CPU patches */
 //  RAM1[0x08c2/2] = 0x601e;    // faster self test
@@ -1309,7 +1309,8 @@ static DRIVER_INIT( wecleman )
 
 	/* let's swap even and odd *pixels* of the sprites */
 	RAM = memory_region(REGION_GFX1);
-	for (i = 0; i < memory_region_length(REGION_GFX1); i ++)
+	len = memory_region_length(REGION_GFX1);
+	for (i = 0; i < len; i ++)
 	{
 		/* TODO: could be wrong, colors have to be fixed.       */
 		/* The only certain thing is that 87 must convert to f0 */

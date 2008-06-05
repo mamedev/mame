@@ -190,9 +190,10 @@ WRITE8_HANDLER(st0016_vregs_w)
 		UINT32 srcadr=(st0016_vregs[0xa0]|(st0016_vregs[0xa1]<<8)|(st0016_vregs[0xa2]<<16))<<1;
 		UINT32 dstadr=(st0016_vregs[0xa3]|(st0016_vregs[0xa4]<<8)|(st0016_vregs[0xa5]<<16))<<1;
 		UINT32 length=((st0016_vregs[0xa6]|(st0016_vregs[0xa7]<<8)|((st0016_vregs[0xa8]&0x1f)<<16))+1)<<1;
+		UINT32 srclen = (memory_region_length(REGION_CPU1)-0x10000);
 		while(length>0)
 		{
-			if( srcadr < (memory_region_length(REGION_CPU1)-0x10000) && (dstadr < ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE))
+			if( srcadr < srclen && (dstadr < ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE))
 			{
 				st0016_char_bank=dstadr>>5;
 				st0016_character_ram_w(machine,dstadr&0x1f,memory_region(REGION_CPU1)[0x10000+srcadr]);

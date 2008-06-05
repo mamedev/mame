@@ -8,13 +8,12 @@ driver by Nicola Salmoria
 
 #include "driver.h"
 #include "deprecat.h"
+#include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/i8039/i8039.h"
 #include "sound/sn76496.h"
 #include "sound/dac.h"
 
-
-void konami1_decode(void);
 
 extern UINT8 *finalizr_scroll;
 extern UINT8 *finalizr_videoram2,*finalizr_colorram2;
@@ -500,7 +499,7 @@ ROM_END
 
 static DRIVER_INIT( finalizr )
 {
-	konami1_decode();
+	konami1_decode(0);
 }
 
 

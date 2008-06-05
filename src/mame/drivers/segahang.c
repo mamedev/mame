@@ -17,6 +17,7 @@
 #include "deprecat.h"
 #include "system16.h"
 #include "machine/segaic16.h"
+#include "machine/fd1089.h"
 #include "machine/8255ppi.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
@@ -1710,7 +1711,6 @@ static DRIVER_INIT( sharrier )
 
 static DRIVER_INIT( enduror )
 {
-	void fd1089_decrypt_0013A(void);
 	hangon_generic_init();
 	fd1089_decrypt_0013A();
 }

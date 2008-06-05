@@ -451,7 +451,7 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 	int disabled = skns_spc_regs[0x04/4] & 0x08; // RWR1
 	int xsize,ysize, size, xpos=0,ypos=0, pri=0, romoffset, colour=0, xflip,yflip, joint;
 	int sx,sy;
-	int endromoffs=0;
+	int endromoffs=0, gfxlen;
 	UINT16 zoomx, zoomy;
 
 
@@ -503,6 +503,7 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 		sprite_y_scroll += sprite_kludge_y;
 
 
+		gfxlen = memory_region_length (REGION_GFX1);
 		while( source<finish )
 		{
 			xflip = (source[0] & 0x00000200) >> 9;
@@ -590,7 +591,7 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 			zoomx = source[2] >> 16;
 			zoomy = source[3] >> 16;
 
-			romoffset &= memory_region_length (REGION_GFX1)-1;
+			romoffset &= gfxlen-1;
 
 			endromoffs = skns_rle_decode ( romoffset, size );
 

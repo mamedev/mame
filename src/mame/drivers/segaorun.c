@@ -16,6 +16,7 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "system16.h"
+#include "machine/fd1089.h"
 #include "machine/segaic16.h"
 #include "machine/8255ppi.h"
 #include "cpu/m68000/m68000.h"
@@ -1735,7 +1736,6 @@ static DRIVER_INIT( shangon )
 
 static DRIVER_INIT( shangon3 )
 {
-	extern void fd1089_decrypt_0034(void);
 	outrun_generic_init(machine);
 	fd1089_decrypt_0034();
 	custom_io_r = shangon_custom_io_r;

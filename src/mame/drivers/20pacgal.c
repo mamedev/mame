@@ -165,7 +165,10 @@ static WRITE8_HANDLER( rom_bank_select_w )
 	state->game_selected = data & 1;
 
 	if (state->game_selected == 0)
-		memcpy(memory_region(REGION_CPU1)+0x48000, memory_region(REGION_CPU1)+0x8000, 0x2000);
+	{
+		UINT8 *rom = memory_region(REGION_CPU1);
+		memcpy(rom+0x48000, rom+0x8000, 0x2000);
+	}
 }
 
 

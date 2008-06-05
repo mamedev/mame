@@ -7,6 +7,7 @@ To enter service mode, keep 1&2 pressed on reset
 ***************************************************************************/
 
 #include "driver.h"
+#include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/i8039/i8039.h"
 #include "cpu/z80/z80.h"
@@ -14,8 +15,6 @@ To enter service mode, keep 1&2 pressed on reset
 #include "sound/dac.h"
 #include "sound/flt_rc.h"
 
-
-void konami1_decode(void);
 
 extern UINT8 *megazone_scrollx;
 extern UINT8 *megazone_scrolly;
@@ -588,7 +587,7 @@ ROM_END
 
 static DRIVER_INIT( megazone )
 {
-	konami1_decode();
+	konami1_decode(0);
 }
 
 /* these just display a Konami copyright, no logo */

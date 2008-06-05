@@ -1460,18 +1460,21 @@ static DRIVER_INIT( cosmicg )
 {
 	/* Program ROMs have data pins connected different from normal */
 
-	offs_t offs;
+	offs_t offs, len;
+	UINT8 *rom;
 
-    for (offs =0; offs < memory_region_length(REGION_CPU1); offs++)
-	{
-        UINT8 scrambled = memory_region(REGION_CPU1)[offs];
+    len = memory_region_length(REGION_CPU1);
+    rom = memory_region(REGION_CPU1);
+    for (offs =0; offs < len; offs++)
+    {
+        UINT8 scrambled = rom[offs];
 
         UINT8 normal = (scrambled >> 3 & 0x11)
                        | (scrambled >> 1 & 0x22)
                        | (scrambled << 1 & 0x44)
                        | (scrambled << 3 & 0x88);
 
-        memory_region(REGION_CPU1)[offs] = normal;
+        rom[offs] = normal;
     }
 }
 

@@ -14,12 +14,11 @@ To enter service mode, keep 1&2 pressed on reset
 ***************************************************************************/
 
 #include "driver.h"
+#include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/discrete.h"
-
-void konami1_decode(void);
 
 extern UINT8 *circusc_spritebank;
 extern UINT8 *circusc_scroll;
@@ -525,7 +524,7 @@ ROM_END
 
 static DRIVER_INIT( circusc )
 {
-	konami1_decode();
+	konami1_decode(0);
 }
 
 

@@ -809,12 +809,13 @@ static DRIVER_INIT( rainbowe )
 
 static DRIVER_INIT( jumping )
 {
-	int i;
+	int i, len = memory_region_length(REGION_GFX2);
+	UINT8 *rom = memory_region(REGION_GFX2);
 
 	/* Sprite colour map is reversed - switch to normal */
 
-	for (i = 0;i < memory_region_length(REGION_GFX2);i++)
-		memory_region(REGION_GFX2)[i] ^= 0xff;
+	for (i = 0;i < len;i++)
+		rom[i] ^= 0xff;
 
 	state_save_register_global(jumping_latch);
 }

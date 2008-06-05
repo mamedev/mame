@@ -1257,10 +1257,11 @@ static NVRAM_HANDLER(system24)
 
 static MACHINE_START( system24 )
 {
-	if (memory_region(REGION_USER1))
+	UINT8 *usr1 = memory_region(REGION_USER1);
+	if (usr1)
 	{
-		memory_configure_bank(1, 0, 16, memory_region(REGION_USER1), 0x40000);
-		memory_configure_bank(2, 0, 16, memory_region(REGION_USER1), 0x40000);
+		memory_configure_bank(1, 0, 16, usr1, 0x40000);
+		memory_configure_bank(2, 0, 16, usr1, 0x40000);
 	}
 }
 

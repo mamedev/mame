@@ -179,10 +179,11 @@ static DRIVER_INIT(tcl)
 	/* only the first part is decrypted (and verified)*/
 
 	UINT8 *dest = memory_region(REGION_CPU1);
-	UINT8 *src = malloc_or_die(memory_region_length(REGION_CPU1));
+	int len = memory_region_length(REGION_CPU1);
+	UINT8 *src = malloc_or_die(len);
 
 	int i,idx=0;
-	memcpy(src, dest, memory_region_length(REGION_CPU1));
+	memcpy(src, dest, len);
 	for(i=0;i<64*1024;i+=4)
 	{
 		if(i&0x8000)

@@ -308,7 +308,7 @@ PALETTE_INIT( galaxian )
 {
 	static const int rgb_resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
-	int i, minval, midval, maxval;
+	int i, minval, midval, maxval, len;
 	UINT8 starmap[4];
 
 	/*
@@ -343,7 +343,8 @@ PALETTE_INIT( galaxian )
 			2, &rgb_resistances[1], bweights, 470, 0);
 
 	/* decode the palette first */
-	for (i = 0; i < memory_region_length(REGION_PROMS); i++)
+	len = memory_region_length(REGION_PROMS);
+	for (i = 0; i < len; i++)
 	{
 		UINT8 bit0, bit1, bit2, r, g, b;
 

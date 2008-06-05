@@ -424,8 +424,11 @@ READ16_HANDLER( glfgreat_rom_r )
 	if (glfgreat_roz_rom_mode)
 		return memory_region(REGION_GFX3)[glfgreat_roz_char_bank * 0x80000 + offset];
 	else if (offset < 0x40000)
-		return memory_region(REGION_USER1)[offset + 0x80000 + glfgreat_roz_rom_bank * 0x40000] +
-				256 * memory_region(REGION_USER1)[offset + glfgreat_roz_rom_bank * 0x40000];
+	{
+		UINT8 *usr = memory_region(REGION_USER1);
+		return usr[offset + 0x80000 + glfgreat_roz_rom_bank * 0x40000] +
+				256 * usr[offset + glfgreat_roz_rom_bank * 0x40000];
+	}
 	else
 		return memory_region(REGION_USER1)[((offset & 0x3ffff) >> 2) + 0x100000 + glfgreat_roz_rom_bank * 0x10000];
 }
@@ -525,7 +528,10 @@ READ16_HANDLER( prmrsocr_rom_r )
 	if(glfgreat_roz_char_bank)
 		return memory_region(REGION_GFX3)[offset];
 	else
-		return 256 * memory_region(REGION_USER1)[offset] + memory_region(REGION_USER1)[offset + 0x020000];
+	{
+		UINT8 *usr = memory_region(REGION_USER1);
+		return 256 * usr[offset] + usr[offset + 0x020000];
+	}
 }
 
 WRITE16_HANDLER( tmnt_priority_w )

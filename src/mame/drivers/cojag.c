@@ -219,25 +219,27 @@ static UINT32 *rom_base;
 
 static MACHINE_RESET( cojag )
 {
+	UINT8 *rom = memory_region(REGION_USER2);
+
 	/* 68020 only: copy the interrupt vectors into RAM */
 	if (!cojag_is_r3000)
 		memcpy(jaguar_shared_ram, rom_base, 0x10);
 
 	/* configure banks for gfx/sound ROMs */
-	if (memory_region(REGION_USER2))
+	if (rom)
 	{
 		/* graphics banks */
 		if (cojag_is_r3000)
 		{
-			memory_configure_bank(1, 0, 2, memory_region(REGION_USER2) + 0x800000, 0x400000);
+			memory_configure_bank(1, 0, 2, rom + 0x800000, 0x400000);
 			memory_set_bank(1, 0);
 		}
-		memory_configure_bank(8, 0, 2, memory_region(REGION_USER2) + 0x800000, 0x400000);
+		memory_configure_bank(8, 0, 2, rom + 0x800000, 0x400000);
 		memory_set_bank(8, 0);
 
 		/* sound banks */
-		memory_configure_bank(2, 0, 8, memory_region(REGION_USER2) + 0x000000, 0x200000);
-		memory_configure_bank(9, 0, 8, memory_region(REGION_USER2) + 0x000000, 0x200000);
+		memory_configure_bank(2, 0, 8, rom + 0x000000, 0x200000);
+		memory_configure_bank(9, 0, 8, rom + 0x000000, 0x200000);
 		memory_set_bank(2, 0);
 		memory_set_bank(9, 0);
 	}

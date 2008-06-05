@@ -2621,8 +2621,9 @@ static void ddonpach_unpack_sprites(void)
 	const int region		=	REGION_GFX1;	// sprites
 
 	const UINT32 len	=	memory_region_length(region);
-	UINT8 *src		=	memory_region(region) + len / 2 - 1;
-	UINT8 *dst		=	memory_region(region) + len - 1;
+	UINT8 *rgn		=	memory_region(region);
+	UINT8 *src		=	rgn + len / 2 - 1;
+	UINT8 *dst		=	rgn + len - 1;
 
 	while(dst > src)
 	{
@@ -2646,7 +2647,7 @@ static void esprade_unpack_sprites(void)
 	const int region		=	REGION_GFX1;	// sprites
 
 	UINT8 *src		=	memory_region(region);
-	UINT8 *dst		=	memory_region(region) + memory_region_length(region);
+	UINT8 *dst		=	src + memory_region_length(region);
 
 	while(src < dst)
 	{
@@ -4047,8 +4048,10 @@ ROM_END
    Expand the 2 bit part into a 4 bit layout, so we can decode it */
 static void sailormn_unpack_tiles( const int region )
 {
-	UINT8 *src		=	memory_region(region) + (memory_region_length(region)/4)*3 - 1;
-	UINT8 *dst		=	memory_region(region) + (memory_region_length(region)/4)*4 - 2;
+	const UINT32 len	=	memory_region_length(region);
+	UINT8 *rgn		=	memory_region(region);
+	UINT8 *src		=	rgn + (len/4)*3 - 1;
+	UINT8 *dst		=	rgn + (len/4)*4 - 2;
 
 	while(src <= dst)
 	{

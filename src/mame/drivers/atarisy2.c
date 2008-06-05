@@ -3034,6 +3034,7 @@ static DRIVER_INIT( paperboy )
 		0x0000
 	};
 	int i;
+	UINT8 *cpu1 = memory_region(REGION_CPU1);
 
 	atarigen_eeprom_default = compressed_default_eeprom;
 	slapstic_init(105);
@@ -3041,9 +3042,9 @@ static DRIVER_INIT( paperboy )
 	/* expand the 16k program ROMs into full 64k chunks */
 	for (i = 0x10000; i < 0x90000; i += 0x20000)
 	{
-		memcpy(&memory_region(REGION_CPU1)[i + 0x08000], &memory_region(REGION_CPU1)[i], 0x8000);
-		memcpy(&memory_region(REGION_CPU1)[i + 0x10000], &memory_region(REGION_CPU1)[i], 0x8000);
-		memcpy(&memory_region(REGION_CPU1)[i + 0x18000], &memory_region(REGION_CPU1)[i], 0x8000);
+		memcpy(&cpu1[i + 0x08000], &cpu1[i], 0x8000);
+		memcpy(&cpu1[i + 0x10000], &cpu1[i], 0x8000);
+		memcpy(&cpu1[i + 0x18000], &cpu1[i], 0x8000);
 	}
 
 	pedal_count = 0;
@@ -3090,16 +3091,17 @@ static DRIVER_INIT( 720 )
 }
 
 
-static void ssprint_init_common(const UINT16 *default_eeprom)
+static void ssprint_init_common(running_machine *machine, const UINT16 *default_eeprom)
 {
 	int i;
+	UINT8 *cpu1 = memory_region(REGION_CPU1);
 
 	atarigen_eeprom_default = default_eeprom;
 	slapstic_init(108);
 
 	/* expand the 32k program ROMs into full 64k chunks */
 	for (i = 0x10000; i < 0x90000; i += 0x20000)
-		memcpy(&memory_region(REGION_CPU1)[i + 0x10000], &memory_region(REGION_CPU1)[i], 0x10000);
+		memcpy(&cpu1[i + 0x10000], &cpu1[i], 0x10000);
 
 	pedal_count = 3;
 	has_tms5220 = 0;
@@ -3134,7 +3136,7 @@ static DRIVER_INIT( ssprint )
 		0x01D0,0x0125,0x0186,0x0102,0x01C6,0x011D,0x011F,0xFF00,
 		0xFF00,0xFF00,0xFF00,0xFF00,0xFF00,0x0800,0x0000
 	};
-	ssprint_init_common(compressed_default_eeprom);
+	ssprint_init_common(machine, compressed_default_eeprom);
 }
 
 static DRIVER_INIT( ssprint1 )
@@ -3179,7 +3181,7 @@ static DRIVER_INIT( ssprint1 )
 		0x012c,0x0132,0x0102,0x01d0,0x0125,0x0186,0x0102,0x01c6,
 		0x011d,0x011f,0x0200,0x0000
 	};
-	ssprint_init_common(compressed_default_eeprom);
+	ssprint_init_common(machine, compressed_default_eeprom);
 }
 
 
@@ -3216,13 +3218,14 @@ static DRIVER_INIT( csprint )
 		0x0186,0x0100,0x011B,0x01BC,0x011D,0x011F,0x0000
 	};
 	int i;
+	UINT8 *cpu1 = memory_region(REGION_CPU1);
 
 	atarigen_eeprom_default = compressed_default_eeprom;
 	slapstic_init(109);
 
 	/* expand the 32k program ROMs into full 64k chunks */
 	for (i = 0x10000; i < 0x90000; i += 0x20000)
-		memcpy(&memory_region(REGION_CPU1)[i + 0x10000], &memory_region(REGION_CPU1)[i], 0x10000);
+		memcpy(&cpu1[i + 0x10000], &cpu1[i], 0x10000);
 
 	pedal_count = 2;
 	has_tms5220 = 0;

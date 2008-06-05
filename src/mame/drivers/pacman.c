@@ -5216,7 +5216,7 @@ static void eyes_decode(UINT8 *data)
 
 static DRIVER_INIT( eyes )
 {
-	int i;
+	int i, len;
 	UINT8 *RAM;
 
 	/* CPU ROMs */
@@ -5233,20 +5233,22 @@ static DRIVER_INIT( eyes )
 
 	/* Data lines D4 and D6 and address lines A0 and A2 are swapped */
 	RAM = memory_region(REGION_GFX1);
-	for (i = 0;i < memory_region_length(REGION_GFX1);i += 8)
+	len = memory_region_length(REGION_GFX1);
+	for (i = 0;i < len;i += 8)
 		eyes_decode(&RAM[i]);
 }
 
 static DRIVER_INIT( woodpek )
 {
-	int i;
+	int i, len;
 	UINT8 *RAM;
 
 	/* Graphics ROMs */
 
 	/* Data lines D4 and D6 and address lines A0 and A2 are swapped */
 	RAM = memory_region(REGION_GFX1);
-	for (i = 0;i < memory_region_length(REGION_GFX1);i += 8)
+	len = memory_region_length(REGION_GFX1);
+	for (i = 0;i < len;i += 8)
 		eyes_decode(&RAM[i]);
 }
 

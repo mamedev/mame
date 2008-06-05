@@ -791,13 +791,19 @@ static DRIVER_INIT( gypsyjug )
 		0x01,0x80, 0x03,0xc0, 0x03,0xc0, 0x01,0x80
 	};
 	int i;
+	UINT8 *gfx2 = memory_region(REGION_GFX2);
+	UINT8 *gfx3 = memory_region(REGION_GFX3);
+	UINT8 *gfx4 = memory_region(REGION_GFX4);
+	UINT8 *gfx5 = memory_region(REGION_GFX5);
+	int len3 = memory_region_length(REGION_GFX3);
+	int len4 = memory_region_length(REGION_GFX4);
 
-	memcpy(memory_region(REGION_GFX3),memory_region(REGION_GFX2),memory_region_length(REGION_GFX3));
+	memcpy(gfx3,gfx2,len3);
 
-	for (i = 0; i < memory_region_length(REGION_GFX4); i += 16*2)
+	for (i = 0; i < len4; i += 16*2)
 	{
-		memcpy(memory_region(REGION_GFX4) + i, ball, sizeof(ball));
-		memcpy(memory_region(REGION_GFX5) + i, ball, sizeof(ball));
+		memcpy(gfx4 + i, ball, sizeof(ball));
+		memcpy(gfx5 + i, ball, sizeof(ball));
 	}
 }
 

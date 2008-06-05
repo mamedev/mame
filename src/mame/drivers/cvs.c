@@ -1535,19 +1535,21 @@ ROM_END
 
 static DRIVER_INIT( huncholy )
 {
+	UINT8 *ROM = memory_region(REGION_CPU1);
+
 	/* patch out protection */
-	memory_region(REGION_CPU1)[0x0082] = 0xc0;
-	memory_region(REGION_CPU1)[0x0083] = 0xc0;
-	memory_region(REGION_CPU1)[0x0084] = 0xc0;
-	memory_region(REGION_CPU1)[0x00b7] = 0xc0;
-	memory_region(REGION_CPU1)[0x00b8] = 0xc0;
-	memory_region(REGION_CPU1)[0x00b9] = 0xc0;
-	memory_region(REGION_CPU1)[0x00d9] = 0xc0;
-	memory_region(REGION_CPU1)[0x00da] = 0xc0;
-	memory_region(REGION_CPU1)[0x00db] = 0xc0;
-	memory_region(REGION_CPU1)[0x4456] = 0xc0;
-	memory_region(REGION_CPU1)[0x4457] = 0xc0;
-	memory_region(REGION_CPU1)[0x4458] = 0xc0;
+	ROM[0x0082] = 0xc0;
+	ROM[0x0083] = 0xc0;
+	ROM[0x0084] = 0xc0;
+	ROM[0x00b7] = 0xc0;
+	ROM[0x00b8] = 0xc0;
+	ROM[0x00b9] = 0xc0;
+	ROM[0x00d9] = 0xc0;
+	ROM[0x00da] = 0xc0;
+	ROM[0x00db] = 0xc0;
+	ROM[0x4456] = 0xc0;
+	ROM[0x4457] = 0xc0;
+	ROM[0x4458] = 0xc0;
 }
 
 
@@ -1565,47 +1567,51 @@ static DRIVER_INIT( hunchbka )
 
 static DRIVER_INIT( superbik )
 {
+	UINT8 *ROM = memory_region(REGION_CPU1);
+
 	/* patch out protection */
-	memory_region(REGION_CPU1)[0x0079] = 0xc0;
-	memory_region(REGION_CPU1)[0x007a] = 0xc0;
-	memory_region(REGION_CPU1)[0x007b] = 0xc0;
-	memory_region(REGION_CPU1)[0x0081] = 0xc0;
-	memory_region(REGION_CPU1)[0x0082] = 0xc0;
-	memory_region(REGION_CPU1)[0x0083] = 0xc0;
-	memory_region(REGION_CPU1)[0x00b6] = 0xc0;
-	memory_region(REGION_CPU1)[0x00b7] = 0xc0;
-	memory_region(REGION_CPU1)[0x00b8] = 0xc0;
-	memory_region(REGION_CPU1)[0x0168] = 0xc0;
-	memory_region(REGION_CPU1)[0x0169] = 0xc0;
-	memory_region(REGION_CPU1)[0x016a] = 0xc0;
+	ROM[0x0079] = 0xc0;
+	ROM[0x007a] = 0xc0;
+	ROM[0x007b] = 0xc0;
+	ROM[0x0081] = 0xc0;
+	ROM[0x0082] = 0xc0;
+	ROM[0x0083] = 0xc0;
+	ROM[0x00b6] = 0xc0;
+	ROM[0x00b7] = 0xc0;
+	ROM[0x00b8] = 0xc0;
+	ROM[0x0168] = 0xc0;
+	ROM[0x0169] = 0xc0;
+	ROM[0x016a] = 0xc0;
 
 	/* and speed up the protection check */
-	memory_region(REGION_CPU1)[0x0099] = 0xc0;
-	memory_region(REGION_CPU1)[0x009a] = 0xc0;
-	memory_region(REGION_CPU1)[0x009b] = 0xc0;
-	memory_region(REGION_CPU1)[0x00bb] = 0xc0;
-	memory_region(REGION_CPU1)[0x00bc] = 0xc0;
-	memory_region(REGION_CPU1)[0x00bd] = 0xc0;
+	ROM[0x0099] = 0xc0;
+	ROM[0x009a] = 0xc0;
+	ROM[0x009b] = 0xc0;
+	ROM[0x00bb] = 0xc0;
+	ROM[0x00bc] = 0xc0;
+	ROM[0x00bd] = 0xc0;
 }
 
 
 static DRIVER_INIT( hero )
 {
+	UINT8 *ROM = memory_region(REGION_CPU1);
+
 	/* patch out protection */
-	memory_region(REGION_CPU1)[0x0087] = 0xc0;
-	memory_region(REGION_CPU1)[0x0088] = 0xc0;
-	memory_region(REGION_CPU1)[0x0aa1] = 0xc0;
-	memory_region(REGION_CPU1)[0x0aa2] = 0xc0;
-	memory_region(REGION_CPU1)[0x0aa3] = 0xc0;
-	memory_region(REGION_CPU1)[0x0aaf] = 0xc0;
-	memory_region(REGION_CPU1)[0x0ab0] = 0xc0;
-	memory_region(REGION_CPU1)[0x0ab1] = 0xc0;
-	memory_region(REGION_CPU1)[0x0abd] = 0xc0;
-	memory_region(REGION_CPU1)[0x0abe] = 0xc0;
-	memory_region(REGION_CPU1)[0x0abf] = 0xc0;
-	memory_region(REGION_CPU1)[0x4de0] = 0xc0;
-	memory_region(REGION_CPU1)[0x4de1] = 0xc0;
-	memory_region(REGION_CPU1)[0x4de2] = 0xc0;
+	ROM[0x0087] = 0xc0;
+	ROM[0x0088] = 0xc0;
+	ROM[0x0aa1] = 0xc0;
+	ROM[0x0aa2] = 0xc0;
+	ROM[0x0aa3] = 0xc0;
+	ROM[0x0aaf] = 0xc0;
+	ROM[0x0ab0] = 0xc0;
+	ROM[0x0ab1] = 0xc0;
+	ROM[0x0abd] = 0xc0;
+	ROM[0x0abe] = 0xc0;
+	ROM[0x0abf] = 0xc0;
+	ROM[0x4de0] = 0xc0;
+	ROM[0x4de1] = 0xc0;
+	ROM[0x4de2] = 0xc0;
 }
 
 
@@ -1620,9 +1626,9 @@ static DRIVER_INIT( raiders )
 		ROM[offs] = BITSWAP8(ROM[offs],7,1,5,4,3,2,6,0);
 
 	/* patch out protection */
-	memory_region(REGION_CPU1)[0x010a] = 0xc0;
-	memory_region(REGION_CPU1)[0x010b] = 0xc0;
-	memory_region(REGION_CPU1)[0x010c] = 0xc0;
+	ROM[0x010a] = 0xc0;
+	ROM[0x010b] = 0xc0;
+	ROM[0x010c] = 0xc0;
 }
 
 

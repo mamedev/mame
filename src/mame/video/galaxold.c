@@ -166,12 +166,12 @@ static bitmap_t *dambustr_tmpbitmap;
 ***************************************************************************/
 PALETTE_INIT( galaxold )
 {
-	int i;
+	int i, len;
 
 
 	/* first, the character/sprite palette */
-
-	for (i = 0;i < memory_region_length(REGION_PROMS);i++)
+	len = memory_region_length(REGION_PROMS);
+	for (i = 0;i < len;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -247,12 +247,12 @@ PALETTE_INIT( stratgyx )
 
 PALETTE_INIT( rockclim )
 {
-	int i;
+	int i, len;
 
 
 	/* first, the character/sprite palette */
-
-	for (i = 0;i < memory_region_length(REGION_PROMS);i++)
+	len = memory_region_length(REGION_PROMS);
+	for (i = 0;i < len;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 

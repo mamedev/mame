@@ -83,13 +83,15 @@ static WRITE8_HANDLER( thedeep_protection_w )
 		case 0x32:
 		case 0x33:
 		{
+			UINT8 *rom;
 			int new_rombank = protection_command & 3;
 			if (rombank == new_rombank)	break;
 			rombank = new_rombank;
-			memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x10000 + rombank * 0x4000);
+			rom = memory_region(REGION_CPU1);
+			memory_set_bankptr(1, rom + 0x10000 + rombank * 0x4000);
 			/* there's code which falls through from the fixed ROM to bank #1, I have to */
 			/* copy it there otherwise the CPU bank switching support will not catch it. */
-			memcpy(memory_region(REGION_CPU1) + 0x08000,memory_region(REGION_CPU1) + 0x10000 + rombank * 0x4000, 0x4000);
+			memcpy(rom + 0x08000, rom + 0x10000 + rombank * 0x4000, 0x4000);
 		}
 		break;
 

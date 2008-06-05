@@ -311,13 +311,14 @@ ROM_END
 
 static DRIVER_INIT( carpolo )
 {
-	size_t i;
+	size_t i, len;
 	UINT8 *ROM;
 
 
 	/* invert gfx PROM since the bits are active LO */
 	ROM = memory_region(REGION_GFX2);
-	for (i = 0;i < memory_region_length(REGION_GFX2); i++)
+	len = memory_region_length(REGION_GFX2);
+	for (i = 0;i < len; i++)
 		ROM[i] ^= 0x0f;
 }
 

@@ -18,15 +18,12 @@ MAIN BOARD:
 ***************************************************************************/
 
 #include "driver.h"
+#include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
 #include "sound/dac.h"
 #include "sound/msm5205.h"
-
-
-void konami1_decode(void);
-UINT8 konami1_decodebyte( UINT8 opcode, UINT16 address );
 
 
 extern UINT8 *trackfld_scroll;
@@ -1251,25 +1248,23 @@ ROM_END
 
 static DRIVER_INIT( trackfld )
 {
-	konami1_decode();
+	konami1_decode(0);
 }
 
 static DRIVER_INIT( atlantol )
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
-	int size = memory_region_length(REGION_CPU1);
-	UINT8 *decrypt = auto_malloc(size);
+	UINT8 *decrypt;
 	int A;
 
-	memory_set_decrypted_region(0, 0x0000, 0xffff, decrypt);
+	/* "konami1" encrypted opcodes */
+	decrypt = konami1_decode(0);
 
 	/* not encrypted opcodes */
 	for (A = 0;A < 0x6000;A++)
 		decrypt[A] = rom[A];
 
-	/* "konami1" encrypted opcodes */
-	for (A = 0x6000;A < size;A++)
-		decrypt[A] = konami1_decodebyte(rom[A],A);
+	memory_set_decrypted_region(0, 0x0000, 0xffff, decrypt);
 
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1000, 0, 0, SMH_NOP );
 }

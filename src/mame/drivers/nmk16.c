@@ -4596,7 +4596,7 @@ static void decode_gfx(void)
 {
 	/* GFX are scrambled.  We decode them here.  (BIG Thanks to Antiriad for descrambling info) */
 	UINT8 *rom;
-	int A;
+	int A, len;
 
 	static const UINT8 decode_data_bg[8][8] =
 	{
@@ -4626,14 +4626,16 @@ static void decode_gfx(void)
 
 	/* background */
 	rom = memory_region(REGION_GFX2);
-	for (A = 0;A < memory_region_length(REGION_GFX2);A++)
+	len = memory_region_length(REGION_GFX2);
+	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_bg[bjtwin_address_map_bg0(A)]);
 	}
 
 	/* sprites */
 	rom = memory_region(REGION_GFX3);
-	for (A = 0;A < memory_region_length(REGION_GFX3);A += 2)
+	len = memory_region_length(REGION_GFX3);
+	for (A = 0;A < len;A += 2)
 	{
 		UINT16 tmp = decode_word( rom[A+1]*256 + rom[A], decode_data_sprite[bjtwin_address_map_sprites(A)]);
 		rom[A+1] = tmp >> 8;
@@ -4647,7 +4649,7 @@ static void decode_tdragonb(void)
        going Open Source, best of luck in future development. */
 
 	UINT8 *rom;
-	int A;
+	int A, len;
 
 	/* The Main 68k Program of the Bootleg is Bitswapped */
 	static const UINT8 decode_data_tdragonb[1][16] =
@@ -4662,7 +4664,8 @@ static void decode_tdragonb(void)
 	};
 
 	rom = memory_region(REGION_CPU1);
-	for (A = 0;A < memory_region_length(REGION_CPU1);A += 2)
+	len = memory_region_length(REGION_CPU1);
+	for (A = 0;A < len;A += 2)
 	{
 #ifdef LSB_FIRST
 		UINT16 tmp = decode_word( rom[A+1]*256 + rom[A], decode_data_tdragonb[0]);
@@ -4676,13 +4679,15 @@ static void decode_tdragonb(void)
 	}
 
 	rom = memory_region(REGION_GFX2);
-	for (A = 0;A < memory_region_length(REGION_GFX2);A++)
+	len = memory_region_length(REGION_GFX2);
+	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
 	}
 
 	rom = memory_region(REGION_GFX3);
-	for (A = 0;A < memory_region_length(REGION_GFX3);A++)
+	len = memory_region_length(REGION_GFX3);
+	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
 	}
@@ -4692,7 +4697,7 @@ static void decode_ssmissin(void)
 {
 	/* Like Thunder Dragon Bootleg without the Program Rom Swapping */
 	UINT8 *rom;
-	int A;
+	int A, len;
 
 	/* Graphic Roms Could Also Do With Rearranging to make things simpler */
 	static const UINT8 decode_data_tdragonbgfx[1][8] =
@@ -4701,13 +4706,15 @@ static void decode_ssmissin(void)
 	};
 
 	rom = memory_region(REGION_GFX2);
-	for (A = 0;A < memory_region_length(REGION_GFX2);A++)
+	len = memory_region_length(REGION_GFX2);
+	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
 	}
 
 	rom = memory_region(REGION_GFX3);
-	for (A = 0;A < memory_region_length(REGION_GFX3);A++)
+	len = memory_region_length(REGION_GFX3);
+	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
 	}

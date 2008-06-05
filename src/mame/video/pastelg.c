@@ -98,16 +98,17 @@ WRITE8_HANDLER( pastelg_blitter_w )
 
 WRITE8_HANDLER( pastelg_romsel_w )
 {
+	int gfxlen = memory_region_length(REGION_GFX1);
 	pastelg_gfxrom = ((data & 0xc0) >> 6);
 	pastelg_palbank = ((data & 0x10) >> 4);
 	nb1413m3_sndrombank1_w(machine, 0, data);
 
-	if ((pastelg_gfxrom << 16) > (memory_region_length(REGION_GFX1) - 1))
+	if ((pastelg_gfxrom << 16) > (gfxlen - 1))
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
-		pastelg_gfxrom &= (memory_region_length(REGION_GFX1) / 0x20000 - 1);
+		pastelg_gfxrom &= (gfxlen / 0x20000 - 1);
 	}
 }
 
@@ -156,7 +157,7 @@ static void pastelg_gfxdraw(void)
 	int skipx, skipy;
 	int ctrx, ctry;
 	int readflag;
-	int gfxaddr;
+	int gfxaddr, gfxlen;
 	UINT8 color;
 
 	nb1413m3_busyctr = 0;
@@ -186,6 +187,7 @@ static void pastelg_gfxdraw(void)
 		skipy = -1;
 	}
 
+	gfxlen = memory_region_length(REGION_GFX1);
 	gfxaddr = (pastelg_gfxrom << 16) + blitter_src_addr;
 
 	readflag = 0;
@@ -194,7 +196,7 @@ static void pastelg_gfxdraw(void)
 	{
 		for (x = startx, ctrx = sizex; ctrx >= 0; x += skipx, ctrx--)
 		{
-			if ((gfxaddr > (memory_region_length(REGION_GFX1) - 1)))
+			if ((gfxaddr > (gfxlen - 1)))
 			{
 #ifdef MAME_DEBUG
 				popmessage("GFXROM ADDRESS OVER!!");

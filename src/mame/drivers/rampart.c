@@ -532,9 +532,10 @@ static DRIVER_INIT( rampart )
 		0x01FF,0x0E00,0x01FF,0x0E00,0x01FF,0x0E00,0x01FF,0x0E00,
 		0x0000
 	};
+	UINT8 *rom = memory_region(REGION_CPU1);
 
 	atarigen_eeprom_default = compressed_default_eeprom;
-	memcpy(&memory_region(REGION_CPU1)[0x140000], &memory_region(REGION_CPU1)[0x40000], 0x8000);
+	memcpy(&rom[0x140000], &rom[0x40000], 0x8000);
 	atarigen_slapstic_init(0, 0x140000, 0x438000, 118);
 }
 

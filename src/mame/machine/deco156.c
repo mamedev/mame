@@ -121,7 +121,7 @@ static void decrypt(UINT32 *src, UINT32 *dst, int length)
 }
 
 
-void decrypt156(void)
+void deco156_decrypt(void)
 {
 	UINT32 *rom = (UINT32 *)memory_region(REGION_CPU1);
 	int length = memory_region_length(REGION_CPU1);

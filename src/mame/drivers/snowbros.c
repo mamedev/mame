@@ -411,31 +411,27 @@ static READ16_HANDLER( sb3_sound_r )
 
 static void sb3_play_music(int data)
 {
+	UINT8 *snd;
+
 	/* sample is actually played in interrupt function so it loops */
 	sb3_music = data;
 
 	switch (data)
 	{
 		case 0x23:
-		memcpy(memory_region(REGION_SOUND1)+0x20000, memory_region(REGION_SOUND1)+0x80000, 0x20000);
+		case 0x26:
+		snd = memory_region(REGION_SOUND1);
+		memcpy(snd+0x20000, snd+0x80000+0x00000, 0x20000);
 		sb3_music_is_playing = 1;
 		break;
 
 		case 0x24:
-		memcpy(memory_region(REGION_SOUND1)+0x20000, memory_region(REGION_SOUND1)+0x80000+0x20000, 0x20000);
+		snd = memory_region(REGION_SOUND1);
+		memcpy(snd+0x20000, snd+0x80000+0x20000, 0x20000);
 		sb3_music_is_playing = 1;
 		break;
 
 		case 0x25:
-		memcpy(memory_region(REGION_SOUND1)+0x20000, memory_region(REGION_SOUND1)+0x80000+0x40000, 0x20000);
-		sb3_music_is_playing = 1;
-		break;
-
-		case 0x26:
-		memcpy(memory_region(REGION_SOUND1)+0x20000, memory_region(REGION_SOUND1)+0x80000, 0x20000);
-		sb3_music_is_playing = 1;
-		break;
-
 		case 0x27:
 		case 0x28:
 		case 0x29:
@@ -443,7 +439,8 @@ static void sb3_play_music(int data)
 		case 0x2b:
 		case 0x2c:
 		case 0x2d:
-		memcpy(memory_region(REGION_SOUND1)+0x20000, memory_region(REGION_SOUND1)+0x80000+0x40000, 0x20000);
+		snd = memory_region(REGION_SOUND1);
+		memcpy(snd+0x20000, snd+0x80000+0x40000, 0x20000);
 		sb3_music_is_playing = 1;
 		break;
 

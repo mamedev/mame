@@ -56,6 +56,7 @@ and 1 SFX channel controlled by an 8039:
 ***************************************************************************/
 
 #include "driver.h"
+#include "machine/konami1.h"
 #include "cpu/i8039/i8039.h"
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
@@ -65,7 +66,6 @@ extern UINT8 *gyruss_colorram;
 extern UINT8 *gyruss_spriteram;
 extern UINT8 *gyruss_flipscreen;
 
-void konami1_decode_cpu2(void);
 WRITE8_HANDLER( gyruss_spriteram_w );
 READ8_HANDLER( gyruss_scanline_r );
 VIDEO_START( gyruss );
@@ -701,7 +701,7 @@ ROM_END
 
 static DRIVER_INIT( gyruss )
 {
-	konami1_decode_cpu2();
+	konami1_decode(1);
 }
 
 

@@ -1862,9 +1862,10 @@ static void expand_roms(UINT8 cd_rom_mask)
 	UINT8 *temp = malloc_or_die(0x20000);
 	{
 		UINT8 *rom = memory_region(REGION_CPU1);
+		UINT32 len = memory_region_length(REGION_CPU1);
 		UINT32 base;
 
-		for (base = 0x10000; base < memory_region_length(REGION_CPU1); base += 0x30000)
+		for (base = 0x10000; base < len; base += 0x30000)
 		{
 			UINT8 *ab_base = &temp[0x00000];
 			UINT8 *cd_base = &temp[0x10000];
@@ -1928,8 +1929,9 @@ static DRIVER_INIT( stocker )  { expand_roms(EXPAND_ALL);  balsente_shooter = 0;
 static DRIVER_INIT( triviag1 ) { expand_roms(EXPAND_ALL);  balsente_shooter = 0; /* noanalog */ }
 static DRIVER_INIT( triviag2 )
 {
-	memcpy(&memory_region(REGION_CPU1)[0x20000], &memory_region(REGION_CPU1)[0x28000], 0x4000);
-	memcpy(&memory_region(REGION_CPU1)[0x24000], &memory_region(REGION_CPU1)[0x28000], 0x4000);
+	UINT8 *rom = memory_region(REGION_CPU1);
+	memcpy(&rom[0x20000], &rom[0x28000], 0x4000);
+	memcpy(&rom[0x24000], &rom[0x28000], 0x4000);
 	expand_roms(EXPAND_NONE); balsente_shooter = 0; /* noanalog */
 }
 static DRIVER_INIT( triviaes )
