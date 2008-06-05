@@ -1211,7 +1211,10 @@ static int validate_inputs(int drivnum, const machine_config *config)
 	/* allocate the input ports */
 	portlist = input_port_config_alloc(driver->ipt, errorbuf, sizeof(errorbuf));
 	if (errorbuf[0] != 0)
+	{
 		mame_printf_error("%s: %s has input port errors:\n%s\n", driver->source_file, driver->name, errorbuf);
+		error = TRUE;
+	}
 
 	/* check for duplicate tags */
 	for (port = portlist; port != NULL; port = port->next)
