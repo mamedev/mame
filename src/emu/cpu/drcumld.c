@@ -245,29 +245,29 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer)
 		/* if we are outputting a condition but it's "always", skip it */
 		if (func == output_cond)
 		{
-			if (inst->condflags == DRCUML_COND_ALWAYS)
+			if (inst->condition == DRCUML_COND_ALWAYS)
 				continue;
-			param.value = inst->condflags;
+			param.value = inst->condition;
 		}
 
 		/* if we are outputting flags but they are "none", skip it */
 		else if (func == output_flags)
 		{
-			if (inst->condflags == FLAGS_NONE)
+			if (inst->flags == FLAGS_NONE)
 				continue;
-			param.value = inst->condflags;
+			param.value = inst->flags;
 		}
 
 		/* if we are outputting test/cmp flags but they are "all", skip it */
 		else if (func == output_flags_cmptest)
 		{
-			if (inst->opcode == DRCUML_OP_CMP && inst->condflags == FLAGS_ALLI)
+			if (inst->opcode == DRCUML_OP_CMP && inst->flags == FLAGS_ALLI)
 				continue;
-			if (inst->opcode == DRCUML_OP_FCMP && inst->condflags == FLAGS_ALLF)
+			if (inst->opcode == DRCUML_OP_FCMP && inst->flags == FLAGS_ALLF)
 				continue;
-			if (inst->opcode == DRCUML_OP_TEST && inst->condflags == (FLAGS_S|FLAGS_Z))
+			if (inst->opcode == DRCUML_OP_TEST && inst->flags == (FLAGS_S|FLAGS_Z))
 				continue;
-			param.value = inst->condflags;
+			param.value = inst->flags;
 		}
 
 		/* otherwise, we are fetching an actual parameter */

@@ -61,13 +61,13 @@
 ***************************************************************************/
 
 /* opcode validation condition/flag valid bitmasks */
-#define OV_CONDFLAG_NONE		0x00
-#define OV_CONDFLAG_COND		0x80
-#define OV_CONDFLAG_SZ			(DRCUML_FLAG_S | DRCUML_FLAG_Z)
-#define OV_CONDFLAG_SZC			(DRCUML_FLAG_S | DRCUML_FLAG_Z | DRCUML_FLAG_C)
-#define OV_CONDFLAG_SZVC		(DRCUML_FLAG_S | DRCUML_FLAG_Z | DRCUML_FLAG_V | DRCUML_FLAG_C)
-#define OV_CONDFLAG_UZC			(DRCUML_FLAG_U | DRCUML_FLAG_Z | DRCUML_FLAG_C)
-#define OV_CONDFLAG_FLAGS		0x1f
+#define OV_FLAGS_NONE		0x00
+#define OV_FLAGS_SZ			(DRCUML_FLAG_S | DRCUML_FLAG_Z)
+#define OV_FLAGS_SZC		(DRCUML_FLAG_S | DRCUML_FLAG_Z | DRCUML_FLAG_C)
+#define OV_FLAGS_SZV		(DRCUML_FLAG_S | DRCUML_FLAG_Z | DRCUML_FLAG_V)
+#define OV_FLAGS_SZVC		(DRCUML_FLAG_S | DRCUML_FLAG_Z | DRCUML_FLAG_V | DRCUML_FLAG_C)
+#define OV_FLAGS_UZC		(DRCUML_FLAG_U | DRCUML_FLAG_Z | DRCUML_FLAG_C)
+#define OV_FLAGS_FLAGS		0x1f
 
 /* bitmasks of valid parameter types and flags */
 #define OV_PARAM_ALLOWED_NONE	(1 << DRCUML_PTYPE_NONE)
@@ -109,12 +109,9 @@ struct _drcuml_state
 {
 	drccache *				cache;				/* pointer to the codegen cache */
 	drcuml_block *			blocklist;			/* list of active blocks */
-
 	const drcbe_interface *	beintf;				/* backend interface pointer */
 	drcbe_state *			bestate;			/* pointer to the back-end state */
-
 	drcuml_codehandle *		handlelist;			/* head of linked list of handles */
-
 	FILE *					umllog;				/* handle to the UML logfile */
 };
 
@@ -148,7 +145,8 @@ struct _drcuml_opcode_valid
 {
 	drcuml_opcode			opcode;				/* the opcode itself */
 	UINT8					sizes;				/* allowed sizes */
-	UINT8					condflags;			/* allowed conditions/flags */
+	UINT8					condition;			/* conditions? */
+	UINT8					flags;				/* allowed flags */
 	UINT16					ptypes[4];			/* allowed types for parameters */
 };
 
@@ -172,99 +170,99 @@ struct _bevalidate_test
 ***************************************************************************/
 
 /* macro to simplify the table */
-#define OPVALID_ENTRY_0(op,sizes,condflag)				{ DRCUML_OP_##op, sizes, OV_CONDFLAG_##condflag, { OV_PARAM_ALLOWED_NONE, OV_PARAM_ALLOWED_NONE, OV_PARAM_ALLOWED_NONE, OV_PARAM_ALLOWED_NONE } },
-#define OPVALID_ENTRY_1(op,sizes,condflag,p0)			{ DRCUML_OP_##op, sizes, OV_CONDFLAG_##condflag, { OV_PARAM_ALLOWED_##p0, OV_PARAM_ALLOWED_NONE, OV_PARAM_ALLOWED_NONE, OV_PARAM_ALLOWED_NONE } },
-#define OPVALID_ENTRY_2(op,sizes,condflag,p0,p1)		{ DRCUML_OP_##op, sizes, OV_CONDFLAG_##condflag, { OV_PARAM_ALLOWED_##p0, OV_PARAM_ALLOWED_##p1, OV_PARAM_ALLOWED_NONE, OV_PARAM_ALLOWED_NONE } },
-#define OPVALID_ENTRY_3(op,sizes,condflag,p0,p1,p2)		{ DRCUML_OP_##op, sizes, OV_CONDFLAG_##condflag, { OV_PARAM_ALLOWED_##p0, OV_PARAM_ALLOWED_##p1, OV_PARAM_ALLOWED_##p2, OV_PARAM_ALLOWED_NONE } },
-#define OPVALID_ENTRY_4(op,sizes,condflag,p0,p1,p2,p3)	{ DRCUML_OP_##op, sizes, OV_CONDFLAG_##condflag, { OV_PARAM_ALLOWED_##p0, OV_PARAM_ALLOWED_##p1, OV_PARAM_ALLOWED_##p2, OV_PARAM_ALLOWED_##p3 } },
+#define OPVALID_ENTRY_0(op,sizes,cond,flag)				{ DRCUML_OP_##op, sizes, cond, OV_FLAGS_##flag, { OV_PARAM_ALLOWED_NONE, OV_PARAM_ALLOWED_NONE, OV_PARAM_ALLOWED_NONE, OV_PARAM_ALLOWED_NONE } },
+#define OPVALID_ENTRY_1(op,sizes,cond,flag,p0)			{ DRCUML_OP_##op, sizes, cond, OV_FLAGS_##flag, { OV_PARAM_ALLOWED_##p0, OV_PARAM_ALLOWED_NONE, OV_PARAM_ALLOWED_NONE, OV_PARAM_ALLOWED_NONE } },
+#define OPVALID_ENTRY_2(op,sizes,cond,flag,p0,p1)		{ DRCUML_OP_##op, sizes, cond, OV_FLAGS_##flag, { OV_PARAM_ALLOWED_##p0, OV_PARAM_ALLOWED_##p1, OV_PARAM_ALLOWED_NONE, OV_PARAM_ALLOWED_NONE } },
+#define OPVALID_ENTRY_3(op,sizes,cond,flag,p0,p1,p2)	{ DRCUML_OP_##op, sizes, cond, OV_FLAGS_##flag, { OV_PARAM_ALLOWED_##p0, OV_PARAM_ALLOWED_##p1, OV_PARAM_ALLOWED_##p2, OV_PARAM_ALLOWED_NONE } },
+#define OPVALID_ENTRY_4(op,sizes,cond,flag,p0,p1,p2,p3)	{ DRCUML_OP_##op, sizes, cond, OV_FLAGS_##flag, { OV_PARAM_ALLOWED_##p0, OV_PARAM_ALLOWED_##p1, OV_PARAM_ALLOWED_##p2, OV_PARAM_ALLOWED_##p3 } },
 
 /* opcode validation table */
 static const drcuml_opcode_valid opcode_valid_list[] =
 {
 	/* Compile-time opcodes */
-	OPVALID_ENTRY_1(HANDLE,  4,   NONE,  MEM)
-	OPVALID_ENTRY_2(HASH,    4,   NONE,  IMV,  IMV)
-	OPVALID_ENTRY_1(LABEL,   4,   NONE,  IMV)
-	OPVALID_ENTRY_1(COMMENT, 4,   NONE,  ANYMEM)
-	OPVALID_ENTRY_2(MAPVAR,  4,   NONE,  MVAR, IMV)
+	OPVALID_ENTRY_1(HANDLE,  4,   FALSE, NONE,  MEM)
+	OPVALID_ENTRY_2(HASH,    4,   FALSE, NONE,  IMV,  IMV)
+	OPVALID_ENTRY_1(LABEL,   4,   FALSE, NONE,  IMV)
+	OPVALID_ENTRY_1(COMMENT, 4,   FALSE, NONE,  ANYMEM)
+	OPVALID_ENTRY_2(MAPVAR,  4,   FALSE, NONE,  MVAR, IMV)
 
 	/* Control Flow Operations */
-	OPVALID_ENTRY_1(DEBUG,   4,   NONE,  IANY)
-	OPVALID_ENTRY_1(EXIT,    4,   COND,  IANY)
-	OPVALID_ENTRY_3(HASHJMP, 4,   NONE,  IANY, IANY, MEM)
-	OPVALID_ENTRY_1(LABEL,   4,   NONE,  IMV)
-	OPVALID_ENTRY_1(JMP,     4,   COND,  IMV)
-	OPVALID_ENTRY_2(EXH,     4,   COND,  MEM,  IANY)
-	OPVALID_ENTRY_1(CALLH,   4,   COND,  MEM)
-	OPVALID_ENTRY_0(RET,     4,   COND)
-	OPVALID_ENTRY_2(CALLC,   4,   COND,  ANYMEM,ANYMEM)
-	OPVALID_ENTRY_2(RECOVER, 4,   NONE,  IRM,  MVAR)
+	OPVALID_ENTRY_1(DEBUG,   4,   FALSE, NONE,  IANY)
+	OPVALID_ENTRY_1(EXIT,    4,   TRUE,  NONE,  IANY)
+	OPVALID_ENTRY_3(HASHJMP, 4,   FALSE, NONE,  IANY, IANY, MEM)
+	OPVALID_ENTRY_1(LABEL,   4,   FALSE, NONE,  IMV)
+	OPVALID_ENTRY_1(JMP,     4,   TRUE,  NONE,  IMV)
+	OPVALID_ENTRY_2(EXH,     4,   TRUE,  NONE,  MEM,  IANY)
+	OPVALID_ENTRY_1(CALLH,   4,   TRUE,  NONE,  MEM)
+	OPVALID_ENTRY_0(RET,     4,   TRUE,  NONE)
+	OPVALID_ENTRY_2(CALLC,   4,   TRUE,  NONE,  ANYMEM,ANYMEM)
+	OPVALID_ENTRY_2(RECOVER, 4,   FALSE, NONE,  IRM,  MVAR)
 
 	/* Internal Register Operations */
-	OPVALID_ENTRY_1(SETFMOD, 4,   NONE,  IANY)
-	OPVALID_ENTRY_1(GETFMOD, 4,   NONE,  IRM)
-	OPVALID_ENTRY_1(GETEXP,  4,   NONE,  IRM)
-	OPVALID_ENTRY_1(GETFLGS, 4,   NONE,  IRM)
-	OPVALID_ENTRY_1(SAVE,    4,   NONE,  ANYMEM)
-	OPVALID_ENTRY_1(RESTORE, 4,   NONE,  ANYMEM)
+	OPVALID_ENTRY_1(SETFMOD, 4,   FALSE, NONE,  IANY)
+	OPVALID_ENTRY_1(GETFMOD, 4,   FALSE, NONE,  IRM)
+	OPVALID_ENTRY_1(GETEXP,  4,   FALSE, NONE,  IRM)
+	OPVALID_ENTRY_1(GETFLGS, 4,   FALSE, NONE,  IRM)
+	OPVALID_ENTRY_1(SAVE,    4,   FALSE, NONE,  ANYMEM)
+	OPVALID_ENTRY_1(RESTORE, 4,   FALSE, NONE,  ANYMEM)
 
 	/* Integer Operations */
-	OPVALID_ENTRY_4(LOAD,    4|8, NONE,  IRM,   ANYMEM,IANY4, IMV)
-	OPVALID_ENTRY_4(LOADS,   4|8, NONE,  IRM,   ANYMEM,IANY4, IMV)
-	OPVALID_ENTRY_4(STORE,   4|8, NONE,  ANYMEM,IANY4, IANY,  IMV)
-	OPVALID_ENTRY_3(READ,    4|8, NONE,  IRM,   IANY4, IMV)
-	OPVALID_ENTRY_4(READM,   4|8, NONE,  IRM,   IANY4, IANY,  IMV)
-	OPVALID_ENTRY_3(WRITE,   4|8, NONE,  IANY4, IANY,  IMV)
-	OPVALID_ENTRY_4(WRITEM,  4|8, NONE,  IANY4, IANY,  IANY,  IMV)
-	OPVALID_ENTRY_2(CARRY,   4|8, NONE,  IANY,  IANY)
-	OPVALID_ENTRY_2(MOV,     4|8, COND,  IRM,   IANY)
-	OPVALID_ENTRY_1(SET,     4|8, COND,  IRM)
-	OPVALID_ENTRY_3(SEXT,    4|8, NONE,  IRM,   IANY4, IMV)
-	OPVALID_ENTRY_4(ROLAND,  4|8, NONE,  IRM,   IANY,  IANY,  IANY)
-	OPVALID_ENTRY_4(ROLINS,  4|8, NONE,  IRM,   IANY,  IANY,  IANY)
-	OPVALID_ENTRY_3(ADD,     4|8, SZVC,  IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(ADDC,    4|8, SZVC,  IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(SUB,     4|8, SZVC,  IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(SUBB,    4|8, SZVC,  IRM,   IANY,  IANY)
-	OPVALID_ENTRY_2(CMP,     4|8, SZVC,  IANY,  IANY)
-	OPVALID_ENTRY_4(MULU,    4|8, SZ,    IRM,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_4(MULS,    4|8, SZ,    IRM,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_4(DIVU,    4|8, SZ,    IRM,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_4(DIVS,    4|8, SZ,    IRM,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(AND,     4|8, SZ,    IRM,   IANY,  IANY)
-	OPVALID_ENTRY_2(TEST,    4|8, SZ,    IANY,  IANY)
-	OPVALID_ENTRY_3(OR,      4|8, SZ,    IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(XOR,     4|8, SZ,    IRM,   IANY,  IANY)
-	OPVALID_ENTRY_2(LZCNT,   4|8, NONE,  IRM,   IANY)
-	OPVALID_ENTRY_2(BSWAP,   4|8, NONE,  IRM,   IANY)
-	OPVALID_ENTRY_3(SHL,     4|8, SZC,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(SHR,     4|8, SZC,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(SAR,     4|8, SZC,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(ROL,     4|8, SZC,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(ROLC,    4|8, SZC,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(ROR,     4|8, SZC,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(RORC,    4|8, SZC,   IRM,   IANY,  IANY)
+	OPVALID_ENTRY_4(LOAD,    4|8, FALSE, NONE,  IRM,   ANYMEM,IANY4, IMV)
+	OPVALID_ENTRY_4(LOADS,   4|8, FALSE, NONE,  IRM,   ANYMEM,IANY4, IMV)
+	OPVALID_ENTRY_4(STORE,   4|8, FALSE, NONE,  ANYMEM,IANY4, IANY,  IMV)
+	OPVALID_ENTRY_3(READ,    4|8, FALSE, NONE,  IRM,   IANY4, IMV)
+	OPVALID_ENTRY_4(READM,   4|8, FALSE, NONE,  IRM,   IANY4, IANY,  IMV)
+	OPVALID_ENTRY_3(WRITE,   4|8, FALSE, NONE,  IANY4, IANY,  IMV)
+	OPVALID_ENTRY_4(WRITEM,  4|8, FALSE, NONE,  IANY4, IANY,  IANY,  IMV)
+	OPVALID_ENTRY_2(CARRY,   4|8, FALSE, NONE,  IANY,  IANY)
+	OPVALID_ENTRY_2(MOV,     4|8, TRUE,  NONE,  IRM,   IANY)
+	OPVALID_ENTRY_1(SET,     4|8, TRUE,  NONE,  IRM)
+	OPVALID_ENTRY_3(SEXT,    4|8, FALSE, SZ,    IRM,   IANY4, IMV)
+	OPVALID_ENTRY_4(ROLAND,  4|8, FALSE, SZ,    IRM,   IANY,  IANY,  IANY)
+	OPVALID_ENTRY_4(ROLINS,  4|8, FALSE, SZ,    IRM,   IANY,  IANY,  IANY)
+	OPVALID_ENTRY_3(ADD,     4|8, FALSE, SZVC,  IRM,   IANY,  IANY)
+	OPVALID_ENTRY_3(ADDC,    4|8, FALSE, SZVC,  IRM,   IANY,  IANY)
+	OPVALID_ENTRY_3(SUB,     4|8, FALSE, SZVC,  IRM,   IANY,  IANY)
+	OPVALID_ENTRY_3(SUBB,    4|8, FALSE, SZVC,  IRM,   IANY,  IANY)
+	OPVALID_ENTRY_2(CMP,     4|8, FALSE, SZVC,  IANY,  IANY)
+	OPVALID_ENTRY_4(MULU,    4|8, FALSE, SZV,   IRM,   IRM,   IANY,  IANY)
+	OPVALID_ENTRY_4(MULS,    4|8, FALSE, SZV,   IRM,   IRM,   IANY,  IANY)
+	OPVALID_ENTRY_4(DIVU,    4|8, FALSE, SZ,    IRM,   IRM,   IANY,  IANY)
+	OPVALID_ENTRY_4(DIVS,    4|8, FALSE, SZ,    IRM,   IRM,   IANY,  IANY)
+	OPVALID_ENTRY_3(AND,     4|8, FALSE, SZ,    IRM,   IANY,  IANY)
+	OPVALID_ENTRY_2(TEST,    4|8, FALSE, SZ,    IANY,  IANY)
+	OPVALID_ENTRY_3(OR,      4|8, FALSE, SZ,    IRM,   IANY,  IANY)
+	OPVALID_ENTRY_3(XOR,     4|8, FALSE, SZ,    IRM,   IANY,  IANY)
+	OPVALID_ENTRY_2(LZCNT,   4|8, FALSE, SZ,    IRM,   IANY)
+	OPVALID_ENTRY_2(BSWAP,   4|8, FALSE, SZ,    IRM,   IANY)
+	OPVALID_ENTRY_3(SHL,     4|8, FALSE, SZC,   IRM,   IANY,  IANY)
+	OPVALID_ENTRY_3(SHR,     4|8, FALSE, SZC,   IRM,   IANY,  IANY)
+	OPVALID_ENTRY_3(SAR,     4|8, FALSE, SZC,   IRM,   IANY,  IANY)
+	OPVALID_ENTRY_3(ROL,     4|8, FALSE, SZC,   IRM,   IANY,  IANY)
+	OPVALID_ENTRY_3(ROLC,    4|8, FALSE, SZC,   IRM,   IANY,  IANY)
+	OPVALID_ENTRY_3(ROR,     4|8, FALSE, SZC,   IRM,   IANY,  IANY)
+	OPVALID_ENTRY_3(RORC,    4|8, FALSE, SZC,   IRM,   IANY,  IANY)
 
 	/* Floating Point Operations */
-	OPVALID_ENTRY_3(FLOAD,   4|8, NONE,  FRM,   ANYMEM,IANY4)
-	OPVALID_ENTRY_3(FSTORE,  4|8, NONE,  ANYMEM,IANY4, FANY)
-	OPVALID_ENTRY_3(FREAD,   4|8, NONE,  FRM,   IANY4, IMV4)
-	OPVALID_ENTRY_3(FWRITE,  4|8, NONE,  IANY4, FANY,  IMV4)
-	OPVALID_ENTRY_2(FMOV,    4|8, COND,  FRM,   FANY)
-	OPVALID_ENTRY_4(FTOINT,  4|8, NONE,  IRM,   FANY,  IMM,  IMM)
-	OPVALID_ENTRY_3(FFRINT,  4|8, NONE,  FRM,   IANY,  IMM)
-	OPVALID_ENTRY_3(FFRFLT,  4|8, NONE,  FRM,   FANY,  IMM)
-	OPVALID_ENTRY_2(FRNDS,     8, NONE,  FRM,   FANY)
-	OPVALID_ENTRY_3(FADD,    4|8, NONE,  FRM,   FANY,  FANY)
-	OPVALID_ENTRY_3(FSUB,    4|8, NONE,  FRM,   FANY,  FANY)
-	OPVALID_ENTRY_2(FCMP,    4|8, UZC,   FANY,  FANY)
-	OPVALID_ENTRY_3(FMUL,    4|8, NONE,  FRM,   FANY,  FANY)
-	OPVALID_ENTRY_3(FDIV,    4|8, NONE,  FRM,   FANY,  FANY)
-	OPVALID_ENTRY_2(FNEG,    4|8, NONE,  FRM,   FANY)
-	OPVALID_ENTRY_2(FABS,    4|8, NONE,  FRM,   FANY)
-	OPVALID_ENTRY_2(FSQRT,   4|8, NONE,  FRM,   FANY)
-	OPVALID_ENTRY_2(FRECIP,  4|8, NONE,  FRM,   FANY)
-	OPVALID_ENTRY_2(FRSQRT,  4|8, NONE,  FRM,   FANY)
+	OPVALID_ENTRY_3(FLOAD,   4|8, FALSE, NONE,  FRM,   ANYMEM,IANY4)
+	OPVALID_ENTRY_3(FSTORE,  4|8, FALSE, NONE,  ANYMEM,IANY4, FANY)
+	OPVALID_ENTRY_3(FREAD,   4|8, FALSE, NONE,  FRM,   IANY4, IMV4)
+	OPVALID_ENTRY_3(FWRITE,  4|8, FALSE, NONE,  IANY4, FANY,  IMV4)
+	OPVALID_ENTRY_2(FMOV,    4|8, TRUE,  NONE,  FRM,   FANY)
+	OPVALID_ENTRY_4(FTOINT,  4|8, FALSE, NONE,  IRM,   FANY,  IMM,  IMM)
+	OPVALID_ENTRY_3(FFRINT,  4|8, FALSE, NONE,  FRM,   IANY,  IMM)
+	OPVALID_ENTRY_3(FFRFLT,  4|8, FALSE, NONE,  FRM,   FANY,  IMM)
+	OPVALID_ENTRY_2(FRNDS,     8, FALSE, NONE,  FRM,   FANY)
+	OPVALID_ENTRY_3(FADD,    4|8, FALSE, NONE,  FRM,   FANY,  FANY)
+	OPVALID_ENTRY_3(FSUB,    4|8, FALSE, NONE,  FRM,   FANY,  FANY)
+	OPVALID_ENTRY_2(FCMP,    4|8, FALSE, UZC,   FANY,  FANY)
+	OPVALID_ENTRY_3(FMUL,    4|8, FALSE, NONE,  FRM,   FANY,  FANY)
+	OPVALID_ENTRY_3(FDIV,    4|8, FALSE, NONE,  FRM,   FANY,  FANY)
+	OPVALID_ENTRY_2(FNEG,    4|8, FALSE, NONE,  FRM,   FANY)
+	OPVALID_ENTRY_2(FABS,    4|8, FALSE, NONE,  FRM,   FANY)
+	OPVALID_ENTRY_2(FSQRT,   4|8, FALSE, NONE,  FRM,   FANY)
+	OPVALID_ENTRY_2(FRECIP,  4|8, FALSE, NONE,  FRM,   FANY)
+	OPVALID_ENTRY_2(FRSQRT,  4|8, FALSE, NONE,  FRM,   FANY)
 };
 
 
@@ -519,7 +517,7 @@ drcuml_block *drcuml_block_begin(drcuml_state *drcuml, UINT32 maxinst, jmp_buf *
     0 parameters to the block
 -------------------------------------------------*/
 
-void drcuml_block_append_0(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condflags)
+void drcuml_block_append_0(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condition, UINT8 flags)
 {
 	drcuml_instruction *inst = &block->inst[block->nextinst++];
 
@@ -532,7 +530,8 @@ void drcuml_block_append_0(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
 	/* fill in the instruction */
 	inst->opcode = (UINT8)op;
 	inst->size = size;
-	inst->condflags = condflags;
+	inst->condition = condition;
+	inst->flags = flags;
 	inst->numparams = 0;
 
 	/* validation */
@@ -545,7 +544,7 @@ void drcuml_block_append_0(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
     1 parameter to the block
 -------------------------------------------------*/
 
-void drcuml_block_append_1(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condflags, drcuml_ptype p0type, drcuml_pvalue p0value)
+void drcuml_block_append_1(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condition, UINT8 flags, drcuml_ptype p0type, drcuml_pvalue p0value)
 {
 	drcuml_instruction *inst = &block->inst[block->nextinst++];
 
@@ -558,7 +557,8 @@ void drcuml_block_append_1(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
 	/* fill in the instruction */
 	inst->opcode = (UINT8)op;
 	inst->size = size;
-	inst->condflags = condflags;
+	inst->condition = condition;
+	inst->flags = flags;
 	inst->numparams = 1;
 	inst->param[0].type = p0type;
 	inst->param[0].value = p0value;
@@ -573,7 +573,7 @@ void drcuml_block_append_1(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
     2 parameters to the block
 -------------------------------------------------*/
 
-void drcuml_block_append_2(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condflags, drcuml_ptype p0type, drcuml_pvalue p0value, drcuml_ptype p1type, drcuml_pvalue p1value)
+void drcuml_block_append_2(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condition, UINT8 flags, drcuml_ptype p0type, drcuml_pvalue p0value, drcuml_ptype p1type, drcuml_pvalue p1value)
 {
 	drcuml_instruction *inst = &block->inst[block->nextinst++];
 
@@ -586,7 +586,8 @@ void drcuml_block_append_2(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
 	/* fill in the instruction */
 	inst->opcode = (UINT8)op;
 	inst->size = size;
-	inst->condflags = condflags;
+	inst->condition = condition;
+	inst->flags = flags;
 	inst->numparams = 2;
 	inst->param[0].type = p0type;
 	inst->param[0].value = p0value;
@@ -603,7 +604,7 @@ void drcuml_block_append_2(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
     3 parameters to the block
 -------------------------------------------------*/
 
-void drcuml_block_append_3(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condflags, drcuml_ptype p0type, drcuml_pvalue p0value, drcuml_ptype p1type, drcuml_pvalue p1value, drcuml_ptype p2type, drcuml_pvalue p2value)
+void drcuml_block_append_3(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condition, UINT8 flags, drcuml_ptype p0type, drcuml_pvalue p0value, drcuml_ptype p1type, drcuml_pvalue p1value, drcuml_ptype p2type, drcuml_pvalue p2value)
 {
 	drcuml_instruction *inst = &block->inst[block->nextinst++];
 
@@ -616,7 +617,8 @@ void drcuml_block_append_3(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
 	/* fill in the instruction */
 	inst->opcode = (UINT8)op;
 	inst->size = size;
-	inst->condflags = condflags;
+	inst->condition = condition;
+	inst->flags = flags;
 	inst->numparams = 3;
 	inst->param[0].type = p0type;
 	inst->param[0].value = p0value;
@@ -635,7 +637,7 @@ void drcuml_block_append_3(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
     4 parameters to the block
 -------------------------------------------------*/
 
-void drcuml_block_append_4(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condflags, drcuml_ptype p0type, drcuml_pvalue p0value, drcuml_ptype p1type, drcuml_pvalue p1value, drcuml_ptype p2type, drcuml_pvalue p2value, drcuml_ptype p3type, drcuml_pvalue p3value)
+void drcuml_block_append_4(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condition, UINT8 flags, drcuml_ptype p0type, drcuml_pvalue p0value, drcuml_ptype p1type, drcuml_pvalue p1value, drcuml_ptype p2type, drcuml_pvalue p2value, drcuml_ptype p3type, drcuml_pvalue p3value)
 {
 	drcuml_instruction *inst = &block->inst[block->nextinst++];
 
@@ -648,7 +650,8 @@ void drcuml_block_append_4(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
 	/* fill in the instruction */
 	inst->opcode = (UINT8)op;
 	inst->size = size;
-	inst->condflags = condflags;
+	inst->condition = condition;
+	inst->flags = flags;
 	inst->numparams = 4;
 	inst->param[0].type = p0type;
 	inst->param[0].value = p0value;
@@ -877,7 +880,7 @@ void drcuml_add_comment(drcuml_block *block, const char *format, ...)
 	strcpy(comment, buffer);
 
 	/* add an instruction with a pointer */
-	drcuml_block_append_1(block, DRCUML_OP_COMMENT, 4, DRCUML_COND_ALWAYS, MEM(comment));
+	drcuml_block_append_1(block, DRCUML_OP_COMMENT, 4, DRCUML_COND_ALWAYS, 0, MEM(comment));
 }
 
 
@@ -1078,7 +1081,7 @@ static void bevalidate_iterate_over_params(drcuml_state *drcuml, drcuml_codehand
 static void bevalidate_iterate_over_flags(drcuml_state *drcuml, drcuml_codehandle **handles, const bevalidate_test *test, drcuml_parameter *paramlist)
 {
 	const drcuml_opcode_valid *opvalid = &opcode_valid_table[test->opcode];
-	UINT8 flagmask = opvalid->condflags & 0x1f;
+	UINT8 flagmask = opvalid->flags & 0x1f;
 	UINT8 curmask;
 
 	/* iterate over all possible flag combinations */
@@ -1125,23 +1128,23 @@ static void bevalidate_execute(drcuml_state *drcuml, drcuml_codehandle **handles
 	switch (numparams)
 	{
 		case 0:
-			drcuml_block_append_0(block, test->opcode, test->size, flagmask);
+			drcuml_block_append_0(block, test->opcode, test->size, DRCUML_COND_ALWAYS, flagmask);
 			break;
 
 		case 1:
-			drcuml_block_append_1(block, test->opcode, test->size, flagmask, params[0].type, params[0].value);
+			drcuml_block_append_1(block, test->opcode, test->size, DRCUML_COND_ALWAYS, flagmask, params[0].type, params[0].value);
 			break;
 
 		case 2:
-			drcuml_block_append_2(block, test->opcode, test->size, flagmask, params[0].type, params[0].value, params[1].type, params[1].value);
+			drcuml_block_append_2(block, test->opcode, test->size, DRCUML_COND_ALWAYS, flagmask, params[0].type, params[0].value, params[1].type, params[1].value);
 			break;
 
 		case 3:
-			drcuml_block_append_3(block, test->opcode, test->size, flagmask, params[0].type, params[0].value, params[1].type, params[1].value, params[2].type, params[2].value);
+			drcuml_block_append_3(block, test->opcode, test->size, DRCUML_COND_ALWAYS, flagmask, params[0].type, params[0].value, params[1].type, params[1].value, params[2].type, params[2].value);
 			break;
 
 		case 4:
-			drcuml_block_append_4(block, test->opcode, test->size, flagmask, params[0].type, params[0].value, params[1].type, params[1].value, params[2].type, params[2].value, params[3].type, params[3].value);
+			drcuml_block_append_4(block, test->opcode, test->size, DRCUML_COND_ALWAYS, flagmask, params[0].type, params[0].value, params[1].type, params[1].value, params[2].type, params[2].value, params[3].type, params[3].value);
 			break;
 	}
 	testinst = block->inst[block->nextinst - 1];

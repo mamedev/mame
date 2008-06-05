@@ -114,12 +114,12 @@ enum
 */
 
 /* build a short opcode from the raw opcode and size */
-#define MAKE_OPCODE_SHORT(op, size, condflags) \
-	((((size) == 8) << 0) | (((condflags) != 0) << 1) | ((op) << 2))
+#define MAKE_OPCODE_SHORT(op, size, conditionorflags) \
+	((((size) == 8) << 0) | (((conditionorflags) != 0) << 1) | ((op) << 2))
 
 /* build a full opcode from the raw opcode, size, condition/flags, and immediate count */
-#define MAKE_OPCODE_FULL(op, size, condflags, pwords) \
-	(MAKE_OPCODE_SHORT(op, size, condflags) | ((condflags & 0x80) ? (0x1000 << ((condflags) & 15)) : 0) | ((pwords) << 28))
+#define MAKE_OPCODE_FULL(op, size, condition, flags, pwords) \
+	(MAKE_OPCODE_SHORT(op, size, (condition | flags)) | ((condition != DRCUML_COND_ALWAYS) ? (0x1000 << ((condition) & 15)) : 0) | ((pwords) << 28))
 
 /* extract various parts of the opcode */
 #define OPCODE_GET_SHORT(op)		((op) & 0xfff)
@@ -431,7 +431,7 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 			case DRCUML_OP_JMP:
 				assert(inst->numparams == 1);
 				assert(inst->param[0].type == DRCUML_PTYPE_IMMEDIATE);
-				(dst++)->i = MAKE_OPCODE_FULL(opcode, inst->size, inst->condflags, 1);
+				(dst++)->i = MAKE_OPCODE_FULL(opcode, inst->size, inst->condition, inst->flags, 1);
 				dst->inst = (drcbec_instruction *)drclabel_get_codeptr(drcbe->labels, inst->param[0].value, fixup_label, dst);
 				dst++;
 				break;
@@ -501,7 +501,7 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 				immedwords = (immedbytes + sizeof(drcbec_instruction) - 1) / sizeof(drcbec_instruction);
 
 				/* first item is the opcode, size, condition flags and length */
-				(dst++)->i = MAKE_OPCODE_FULL(opcode, inst->size, inst->condflags, inst->numparams + immedwords);
+				(dst++)->i = MAKE_OPCODE_FULL(opcode, inst->size, inst->condition, inst->flags, inst->numparams + immedwords);
 
 				/* immediates start after parameters */
 				immed = dst + inst->numparams;
