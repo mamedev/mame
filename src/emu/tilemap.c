@@ -779,23 +779,26 @@ profiler_mark(PROFILER_TILEMAP_DRAW);
 		int scrolly = effective_colscroll(tmap, 0);
 		int currow, nextrow;
 
-		/* iterate over rows in the tilemap */
-		for (currow = 0; currow < tmap->scrollrows; currow = nextrow)
+		/* iterate over Y to handle wraparound */
+		for (ypos = scrolly - tmap->height; ypos <= original_cliprect.max_y; ypos += tmap->height)
 		{
-			int scrollx = effective_rowscroll(tmap, currow);
+			int const firstrow = MAX((original_cliprect.min_y - ypos) / rowheight, 0);
+			int const lastrow =  MIN((original_cliprect.max_y - ypos) / rowheight, tmap->scrollrows - 1);
 
-			/* scan forward until we find a non-matching row */
-			for (nextrow = currow + 1; nextrow < tmap->scrollrows; nextrow++)
-				if (effective_rowscroll(tmap, nextrow) != scrollx)
-					break;
-
- 			/* skip if disabled */
-			if (scrollx == TILE_LINE_DISABLED)
-				continue;
-
-			/* iterate over Y to handle wraparound */
-			for (ypos = scrolly - tmap->height; ypos <= original_cliprect.max_y; ypos += tmap->height)
+			/* iterate over rows in the tilemap */
+			for (currow = firstrow; currow <= lastrow; currow = nextrow)
 			{
+				int scrollx = effective_rowscroll(tmap, currow);
+
+				/* scan forward until we find a non-matching row */
+				for (nextrow = currow + 1; nextrow <= lastrow; nextrow++)
+					if (effective_rowscroll(tmap, nextrow) != scrollx)
+						break;
+
+				/* skip if disabled */
+				if (scrollx == TILE_LINE_DISABLED)
+					continue;
+
 				/* update the cliprect just for this set of rows */
 				blit.cliprect.min_y = currow * rowheight + ypos;
 				blit.cliprect.max_y = nextrow * rowheight - 1 + ypos;
