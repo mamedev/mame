@@ -47,11 +47,12 @@
 
 #define ADD_MENU_3_ITEMS(name, sub_name, enum)	do { menu_item[total] = name; menu_sub_item[total] = sub_name; menu_index[total] = enum; total++; } while(0)
 
-#define	ADJUST_CURSOR(sel, total)				if(sel < 0) sel = 0; else if(sel > (total - 1)) sel = (total - 1);
-#define	CURSOR_TO_NEXT(sel, total)				if(++sel > (total - 1)) sel = 0;
-#define	CURSOR_TO_PREVIOUS(sel, total)			if(--sel < 0) sel = (total - 1);
-#define	CURSOR_PAGE_UP(sel)						sel -= visible_items; if(sel < 0) sel = 0;
-#define CURSOR_PAGE_DOWN(sel, total)			sel += visible_items; if(sel >= total) sel = (total - 1);
+#define ADJUST_CURSOR(sel, total)				do { if(sel < 0) sel = 0; else if(sel > (total - 1)) sel = (total - 1); } while(0);
+#define CURSOR_TO_NEXT(sel, total)				do { if(++sel > (total - 1)) sel = 0; } while(0)
+#define CURSOR_TO_PREVIOUS(sel, total)			do { if(--sel < 0) sel = (total - 1); } while(0)
+#define CURSOR_PAGE_UP(sel)						do { sel -= visible_items; if(sel < 0) sel = 0; } while (0)
+#define CURSOR_PAGE_DOWN(sel, total)			do { sel += visible_items; if(sel >= total) sel = (total - 1); } while (0)
+#define SET_MESSAGE(type)						do { message_timer = DEFAULT_MESSAGE_TIME; message_type = type; } while(0)
 
 /***************************************************************************
     CONSTANTS
@@ -65,9 +66,10 @@
 #define DEFAULT_CHEAT_OPTIONS					(0xF)
 #endif
 #define DEFAULT_MESSAGE_TIME					(50)
-#define VARIABLE_MAX_ARRAY						(0x0F)		// NOTE : Move code can accept max 16 variables as destination
+#define VARIABLE_MAX_ARRAY						(0x0F)		/* NOTE : Destination in Move code can only accept variable[0]-[3] only */
 #define CHEAT_RETURN_VALUE						(0xFF)
-#define CUSTOM_CODE								(0xFF)
+#define DEFAULT_ADDRESS_LENGTH					(8)
+#define SAFE_SEARCH_REGION_RANGE				(0xFFFF)
 
 /********** BIT FIELD **********/
 
@@ -75,57 +77,54 @@ enum
 {
 	/* type field */
 	DEFINE_BITFIELD_ENUM(OneShot,					0,	0),
-	DEFINE_BITFIELD_ENUM(DelayEnable,				1,	1),
-	DEFINE_BITFIELD_ENUM(PrefillEnable,				2,	2),
-	DEFINE_BITFIELD_ENUM(Return,					3,	3),
-	DEFINE_BITFIELD_ENUM(RestoreValue,				4,	4),
-	DEFINE_BITFIELD_ENUM(DataRead,					5,	5),		// 0 = field, 1 = variable
-	DEFINE_BITFIELD_ENUM(AddressRead,				6,	7),		// 0 = field, 1 = indirect address from variable, 2 = variable
-	DEFINE_BITFIELD_ENUM(CodeParameter,				8,	11),
-	DEFINE_BITFIELD_ENUM(CodeType,					12,	15),
-	DEFINE_BITFIELD_ENUM(Link,						16,	17),	// 0 = master, 1 = link, 2 = sub link for label-selection, 3 = copy link for VWrite, VRWrite
-	DEFINE_BITFIELD_ENUM(LinkValueSelectBCD,		18,	18),	// used by VWrite (link)
-	DEFINE_BITFIELD_ENUM(LinkValueSelectNegative,	19,	19),	// used by VWrite (link)
-	DEFINE_BITFIELD_ENUM(PopupParameter,			18,	19),	// used by Popup
+	DEFINE_BITFIELD_ENUM(DelayEnable,				1,	3),
+	DEFINE_BITFIELD_ENUM(PrefillEnable,				4,	5),
+	DEFINE_BITFIELD_ENUM(Return,					6,	6),
+	DEFINE_BITFIELD_ENUM(RestoreValue,				7,	7),
+	DEFINE_BITFIELD_ENUM(ValueSelectEnable,			8,	8),		/* = CopyValueEnable */
+	DEFINE_BITFIELD_ENUM(ValueSelectMinimumDisplay,	9,	9),
+	DEFINE_BITFIELD_ENUM(ValueSelectMinimum,		10,	10),
+	DEFINE_BITFIELD_ENUM(ValueSelectBCD,			11,	11),	/* = CopyValueBCD */
+	DEFINE_BITFIELD_ENUM(ValueSelectNegative,		12,	12),	/* = CopyValueNegative */
+	DEFINE_BITFIELD_ENUM(PopupParameter,			13,	14),
+	DEFINE_BITFIELD_ENUM(DataRead,					15,	15),	/* 0 = field, 1 = variable */
+	DEFINE_BITFIELD_ENUM(Link,						16,	17),	/* 0 = master, 1 = link, 2 = sub link, 3 = EOL */
+	DEFINE_BITFIELD_ENUM(Endianness,				18,	18),
 	DEFINE_BITFIELD_ENUM(AddressSize,				20,	21),
-	DEFINE_BITFIELD_ENUM(IndexSize,					22,	23),	// used by IWrite, VWrite, Move, Popup
-	DEFINE_BITFIELD_ENUM(CPURegion,					24, 31),	// extract to CPU/Region field
+	DEFINE_BITFIELD_ENUM(AddressRead,				22,	23),	/* 0 = field, 1 = indirect address from variable, 2 = variable */
+	DEFINE_BITFIELD_ENUM(CodeParameter,				24,	27),
+	DEFINE_BITFIELD_ENUM(CodeParameterLower,		24,	25),
+	DEFINE_BITFIELD_ENUM(CodeParameterUpper,		26,	27),
+	DEFINE_BITFIELD_ENUM(CodeType,					28,	31),
 
 	/* extend field */
-	DEFINE_BITFIELD_ENUM(LSB16,						0,	15),	// lower 4 bytes
-	DEFINE_BITFIELD_ENUM(MSB16,						16,	31),	// upper 4 bytes
-
-	/* value-select master code */
-	DEFINE_BITFIELD_ENUM(ValueSelectMinimumDisplay,	8,	8),
-	DEFINE_BITFIELD_ENUM(ValueSelectMinimum,		9,	9),
-	DEFINE_BITFIELD_ENUM(ValueSelectBCD,			10,	10),
-	DEFINE_BITFIELD_ENUM(ValueSelectNegative,		11,	11),
+	DEFINE_BITFIELD_ENUM(LSB16,						0,	15),	/* lower 4 bytes */
+	DEFINE_BITFIELD_ENUM(MSB16,						16,	31),	/* upper 4 bytes */
 
 	/* watch code */
-	DEFINE_BITFIELD_ENUM(WatchDisplayFormat,		8,	9),		// from type field
-	DEFINE_BITFIELD_ENUM(WatchShowLabel,			10,	10),	//
-	DEFINE_BITFIELD_ENUM(WatchNumElements,			0,	7),		// from data field
-	DEFINE_BITFIELD_ENUM(WatchSkip,					8,	15),	//
-	DEFINE_BITFIELD_ENUM(WatchElementsPerLine,		16,	23),	//
-	DEFINE_BITFIELD_ENUM(WatchAddValue,				24,	31),	//
+	DEFINE_BITFIELD_ENUM(WatchDisplayFormat,		24,	25),	/* from type field */
+	DEFINE_BITFIELD_ENUM(WatchShowLabel,			26,	27),	/* from type field */
+	DEFINE_BITFIELD_ENUM(WatchNumElements,			0,	7),		/* from data field */
+	DEFINE_BITFIELD_ENUM(WatchSkip,					8,	15),	/* from data field */
+	DEFINE_BITFIELD_ENUM(WatchElementsPerLine,		16,	23),	/* from data field */
+	DEFINE_BITFIELD_ENUM(WatchAddValue,				24,	31),	/* from data field */
 
 	/* label-selection */
 	DEFINE_BITFIELD_ENUM(LabelSelectUseSelector,	4,	4),
 	DEFINE_BITFIELD_ENUM(LabelSelectQuickClose,		5,	5),
 
 	/* cpu/region field */
-	DEFINE_BITFIELD_ENUM(CPUIndex,					0,	3),		// cpu region
-	DEFINE_BITFIELD_ENUM(AddressSpace,				4,	6),		// cpu region
-	DEFINE_BITFIELD_ENUM(RegionIndex,				0,	6),		// non-cpu region
-	DEFINE_BITFIELD_ENUM(RegionFlag,				7,	7),		// 0 = cpu, 1 = non-cpu
+	DEFINE_BITFIELD_ENUM(CPUIndex,					0,	3),
+	DEFINE_BITFIELD_ENUM(AddressSpace,				4,	6),
+//	DEFINE_BITFIELD_ENUM(RegionIndex,				0,	6),		/* unused ??? */
 
 	/* old code */
-//  DEFINE_BITFIELD_ENUM(OneShot,                   0,  0),
+//	DEFINE_BITFIELD_ENUM(OneShot,					0,	0),		/* = OneShot in new format */
 	DEFINE_BITFIELD_ENUM(Type,						1,	2),
 	DEFINE_BITFIELD_ENUM(Operation,					3,	4),
 	DEFINE_BITFIELD_ENUM(TypeParameter,				5,	7),
-	DEFINE_BITFIELD_ENUM(UserSelectEnable,			8,	8),
-	DEFINE_BITFIELD_ENUM(UserSelectMinimumDisplay,	9,	9),
+	DEFINE_BITFIELD_ENUM(UserSelectEnable,			8,	8),	
+	DEFINE_BITFIELD_ENUM(UserSelectMinimumDisplay,	9,	9),	
 	DEFINE_BITFIELD_ENUM(UserSelectMinimum,			10,	10),
 	DEFINE_BITFIELD_ENUM(UserSelectBCD,				11,	11),
 	DEFINE_BITFIELD_ENUM(Prefill,					12,	13),
@@ -136,7 +135,7 @@ enum
 	DEFINE_BITFIELD_ENUM(OperationParameter,		18,	18),
 	DEFINE_BITFIELD_ENUM(OperationExtend,			19,	19),
 	DEFINE_BITFIELD_ENUM(BytesUsed,					20,	21),
-	DEFINE_BITFIELD_ENUM(Endianness,				22,	22),
+	DEFINE_BITFIELD_ENUM(EndiannessOld,				22,	22),
 	DEFINE_BITFIELD_ENUM(RestorePreviousValue,		23, 23),
 	DEFINE_BITFIELD_ENUM(LocationParameter,			24,	28),
 	DEFINE_BITFIELD_ENUM(LocationType,				29,	31),
@@ -147,7 +146,7 @@ enum
 
 	/* command */
 	DEFINE_BITFIELD_ENUM(SearchBox,					0,	1),
-	DEFINE_BITFIELD_ENUM(DontPrintNewLabels,		2,	2),		// in options menu, it is reversed display
+	DEFINE_BITFIELD_ENUM(DontPrintNewLabels,		2,	2),		/* in options menu, it is reversed display */
 	DEFINE_BITFIELD_ENUM(AutoSaveEnabled,			3,	3),
 	DEFINE_BITFIELD_ENUM(ActivationKeyMessage,		4,	4),
 	DEFINE_BITFIELD_ENUM(LoadOldFormat,				5,	5),
@@ -172,26 +171,27 @@ enum{		// code types
 	kCodeType_IWrite,			// EF = Index
 	kCodeType_RWrite,			// EF = Count/Skip
 	kCodeType_CWrite,			// EF = Condition
-	kCodeType_VWrite,			// EF = Index
-	kCodeType_VRWrite,			// EF = Count/Skip
+	kCodeType_CBit,				// EF = Condition
 	kCodeType_PDWWrite,			// EF = 2nd Data
-	kCodeType_Move,				// EF = Index
-	kCodeType_Branch,			// EF = Jump Code
-	kCodeType_Loop,				// EF = Index
-	kCodeType_Unused1,
-	kCodeType_Unused2,
-	kCodeType_Unused3,
-	kCodeType_Unused4,
-	kCodeType_Popup,			// EF = Index
-	kCodeType_Watch };			// EF = X and Y Position
+	kCodeType_Move,				// DF = Add Value, EF = Destination
+	kCodeType_Branch,			// DF = Jump Code, EF = Condition
+	kCodeType_Loop,
+	kCodeType_Popup,			// EF = Condition
+	kCodeType_Watch,			// EF = position
+	kCodeType_Unused };
 
-enum{		// parameter for IWrite
-	kIWrite_Write = 0,
-	kIWrite_BitSet,
-	kIWrite_BitClear,
-	kIWrite_LimitedMask };
+enum{		/* parameter for IWrite */
+	IWRITE_WRITE = 0,
+	IWRITE_BIT_SET,
+	IWRITE_BIT_CLEAR,
+	IWRITE_LIMITED_MASK };
 
-enum{		// conditions for CWrite, Branch, Popup
+enum{		/* parameter for CBit */
+	CBIT_BIT_SET = 0,
+	CBIT_BIT_CLEAR,
+	CBIT_LIMITED_MASK };
+
+enum{		/* conditions for CWrite, Branch, Popup */
 	kCondition_Equal = 0,
 	kCondition_NotEqual,
 	kCondition_Less,
@@ -209,32 +209,35 @@ enum{		// conditions for CWrite, Branch, Popup
 	kCondition_KeyPressedRepeat,
 	kCondition_True };
 
+enum{		/* conditions for CBit */
+	CONDITION_CBIT_BIT_SET = 0,
+	CONDITION_CBIT_BIT_CLEAR };
+
 enum{		// popup parameter
 	kPopup_Label = 0,
 	kPopup_Value,
 	kPopup_LabelValue,
 	kPopup_ValueLabel };
 
-enum{		// parameter for custom
-	kCustomCode_NoAction = 0,
-	kCustomCode_Comment,
-	kCustomCode_Separator,
-	kCustomCode_LabelSelect,
-	kCustomCode_Layer,
-	kCustomCode_Unused1,
-	kCustomCode_Unused2,
-	kCustomCode_Unused3,
-	kCustomCode_ActivationKey1,
-	kCustomCode_ActivationKey2,
-	kCustomCode_PreEnable,
-	kCustomCode_OverClock,
-	kCustomCode_RefreshRate };
+enum{		/* custom code */
+	CUSTOM_CODE = 0xF0,
+	CUSTOM_CODE_COMMENT,
+	CUSTOM_CODE_SEPARATOR,
+	CUSTOM_CODE_LABEL_SELECT,
+	CUSTOM_CODE_LAYER_TAG,
+	CUSTOM_CODE_UNUSED_1,
+	CUSTOM_CODE_UNUSED_2,
+	CUSTOM_CODE_UNUSED_3,
+	CUSTOM_CODE_ACTIVATION_KEY_1,
+	CUSTOM_CODE_ACTIVATION_KEY_2,
+	CUSTOM_CODE_PRE_ENABLE,
+	CUSTOM_CODE_OVER_CLOCK,
+	CUSTOM_CODE_REFRESH_RATE };
 
 enum{		// link level
 	kLink_Master = 0,
 	kLink_Link,
-	kLink_SubLink,
-	kLink_CopyLink };
+	kLink_SubLink };
 
 enum{		// address read from
 	kReadFrom_Address = 0,			// $xxxx
@@ -314,40 +317,43 @@ enum		// action flags
 	/* set for one shot cheats after the operation is performed */
 	kActionFlag_OperationDone =		1 << 3,
 
-	/* set if the extendData field is being used by index adress reading (IWrite, VWrite, Move, Loop, Popup)*/
+	/* set if the extend data field is being used by index adress reading (IWrite, Move) */
 	kActionFlag_IndexAddress =		1 << 4,
 
-	/* set if the code needs to check the condition (CWrite, Branch, Popup) */
-	kActionFlag_CheckCondition =	1 << 5,
+	/* set if the code uses limited mask which divids data field to 16-bit data and 16-bit mask (IWrite, CBit) */
+	kActionFlag_LimitedMask =		1 << 5,
 
-	/* set if the code needs to repeat writing (RWrite, VRWrite) */
-	kActionFlag_Repeat =			1 << 6,
+	/* set if the code needs to check the condition (CWrite, CBit, Branch, Popup) */
+	kActionFlag_CheckCondition =	1 << 6,
+
+	/* set if the code needs to repeat writing (RWrite) */
+	kActionFlag_Repeat =			1 << 7,
 
 	/* set if the extendData field is being used by 2nd data (PDWWrite) */
-	kActionFlag_PDWWrite =			1 << 7,
+	kActionFlag_PDWWrite =			1 << 8,
 
 	/* set if the lastValue field contains valid data and can be restored if needed */
-	kActionFlag_LastValueGood =		1 << 8,
+	kActionFlag_LastValueGood =		1 << 9,
 
 	/* set after value changes from prefill value */
-	kActionFlag_PrefillDone =		1 << 9,
+	kActionFlag_PrefillDone =		1 << 10,
 
 	/* set after prefill value written */
-	kActionFlag_PrefillWritten =	1 << 10,
+	kActionFlag_PrefillWritten =	1 << 11,
 
 	/* set if the code is a label for label-selection code */
-	kActionFlag_IsLabel =			1 << 11,
+	kActionFlag_IsLabel =			1 << 12,
 
 	/* set when read/write a data after 1st read/write and clear after 2nd read/write (PDWWrite) */
-	kActionFlag_IsFirst =			1 << 12,
+	kActionFlag_IsFirst =			1 << 13,
 
 	/* masks */
-	kActionFlag_StateMask =			kActionFlag_OperationDone |		// used in ResetAction() to clear specified flags
+	kActionFlag_StateMask =			kActionFlag_OperationDone |		/* used in ResetAction() to clear specified flags */
 									kActionFlag_LastValueGood |
 									kActionFlag_PrefillDone |
 									kActionFlag_PrefillWritten,
-	kActionFlag_InfoMask =			kActionFlag_IndexAddress,		// ??? unused ???
-	kActionFlag_PersistentMask =	kActionFlag_OldFormat |			// used in UpdateCheatInfo() to clear other flags
+	kActionFlag_InfoMask =			kActionFlag_IndexAddress,		/* ??? unused ??? */
+	kActionFlag_PersistentMask =	kActionFlag_OldFormat |			/* used in update_cheat_info() to clear other flags */
 									kActionFlag_LastValueGood
 };
 
@@ -380,25 +386,28 @@ enum		// entry flags
 	/* true if selected code is layer index cheat */
 	kCheatFlag_LayerSelected =			1 << 8,
 
+	/* true if selected code requests left/right arrow for sub item */
+	kCheatFlag_RequestArrow =			1 << 9,
+
 	/* true if the cheat has been assigned an 1st activation key */
-	kCheatFlag_HasActivationKey1 =		1 << 9,
+	kCheatFlag_HasActivationKey1 =		1 << 10,
 
 	/* true if the cheat has been assigned an 2nd activation key */
-	kCheatFlag_HasActivationKey2 =		1 << 10,
+	kCheatFlag_HasActivationKey2 =		1 << 11,
 
 	/* true if the cheat is not the newest format */
-	kCheatFlag_OldFormat =				1 << 11,
+	kCheatFlag_OldFormat =				1 << 12,
 
 	/* true if wrong cheat code */
-	kCheatFlag_HasWrongCode =			1 << 12,
+	kCheatFlag_HasWrongCode =			1 << 13,
 
 	/* true if the cheat has been edited or is a new cheat
-       checked at auto-save then save the code if true */
-	kCheatFlag_Dirty =					1 << 13,
+	   checked at auto-save then save the code if true */
+	kCheatFlag_Dirty =					1 << 14,
 
 	/* masks */
 	kCheatFlag_StateMask =			kCheatFlag_Active,					// used in ResetAction() and DeactivateCheat() to clear specified flag
-	kCheatFlag_InfoMask =			kCheatFlag_OneShot |				// used in UpdateCheatInfo() to detect specified flags
+	kCheatFlag_InfoMask =			kCheatFlag_OneShot |				// used in update_cheat_info() to detect specified flags
 									kCheatFlag_Null |
 									kCheatFlag_ExtendComment |
 									kCheatFlag_Separator |
@@ -406,7 +415,7 @@ enum		// entry flags
 									kCheatFlag_Select |
 									kCheatFlag_LayerIndex |
 									kCheatFlag_OldFormat,
-	kCheatFlag_PersistentMask =		kCheatFlag_Active |					// used in UpdateCheatInfo() to extract specified flags
+	kCheatFlag_PersistentMask =		kCheatFlag_Active |					// used in update_cheat_info() to extract specified flags
 									kCheatFlag_HasActivationKey1 |
 									kCheatFlag_HasActivationKey2 |
 									kCheatFlag_Dirty
@@ -433,15 +442,18 @@ enum		// display types
 	kWatchDisplayType_MaxPlusOne
 };
 
-/********** REGION **********/
+/********** SEARCH REGION **********/
 
 enum		// flags
 {
 	/* true if enabled for search */
-	kRegionFlag_Enabled =		1 << 0
+	kRegionFlag_Enabled =			1 << 0,
+
+	/* true if this region has an error */
+	kRegionFlag_HasError =			1 << 1,
 
 	/* true if the memory region has no mapped memory and uses a memory handler (unused?) */
-//  kRegionFlag_UsesHandler =   1 << 1
+/*  kRegionFlag_UsesHandler = */
 };
 
 enum		// types
@@ -450,19 +462,19 @@ enum		// types
 	kRegionType_Memory
 };
 
-enum		// default search regions
+enum		/* search speed */
 {
-	ksearch_speed_Fast = 0,		// RAM + some banks
-	ksearch_speed_Medium,		// RAM + BANKx
-	ksearch_speed_Slow,			// all memory areas except ROM, NOP, and custom handlers
-	ksearch_speed_VerySlow,		// all memory areas except ROM and NOP
-	ksearch_speed_AllMemory,		// entire CPU address space
-	ksearch_speed_UserDefined,	// user defined region
+	SEARCH_SPEED_FAST = 0,		/* RAM + some banks */
+	SEARCH_SPEED_MEDIUM,		/* RAM + BANKx */
+	SEARCH_SPEED_SLOW,			/* all memory areas except ROM, NOP, and custom handlers */
+	SEARCH_SPEED_VERY_SLOW,		/* all memory areas except ROM and NOP */
+	SEARCH_SPEED_ALL_MEMORY,	/* entire CPU address space */
+	SEARCH_SPEED_USER_DEFINED,	/* user defined region */
 
-	ksearch_speed_Max
+	SEARCH_SPEED_MAX
 };
 
-/********** SEARCH **********/
+/********** SEARCH INFO **********/
 
 enum		// operands
 {
@@ -515,6 +527,19 @@ enum		// search menu
 	kSearchBox_Advanced
 };
 
+enum		/* format level */
+{
+	FORMAT_NEW = 1,
+	FORMAT_STANDARD,
+	FORMAT_OLD
+};
+
+enum		/* disposition for resizing a list */
+{
+	REQUEST_DISPOSE = 0,
+	NO_DISPOSE,
+};
+
 enum		// load flags
 {
 	kLoadFlag_CheatOption	= 1,
@@ -546,7 +571,7 @@ enum		// message types
 	kCheatMessage_NoOldValue,
 	kCheatMessage_InitializeMemory,
 	kCheatMessage_InvalidatedRegion,
-	kCheatMessage_DebugOnly,
+	kCheatMessage_FailedToAllocate,
 	kCheatMessage_WrongCode,
 
 	kCheatMessage_Max
@@ -563,11 +588,11 @@ enum{		// error flags
 	kErrorFlag_NoRestorePreviousValue	= 1 << 7,
 	kErrorFlag_NoLabel					= 1 << 8,
 	kErrorFlag_ConflictedSelects		= 1 << 9,
-	kErrorFlag_CopyLinkWithoutSelect	= 1 << 10,	// new
-	kErrorFlag_InvalidDataField			= 1 << 11,
-	kErrorFlag_InvalidExtendDataField	= 1 << 12,
-	kErrorFlag_ForbittenVariable		= 1 << 13,	// new
-	kErrorFlag_NoSelectableValue		= 1 << 14,
+	kErrorFlag_InvalidDataField			= 1 << 10,
+	kErrorFlag_InvalidExtendDataField	= 1 << 11,
+	kErrorFlag_ForbittenVariable		= 1 << 12,	// new
+	kErrorFlag_NoSelectableValue		= 1 << 13,
+	kErrorFlag_InvalidLimitedMaskSize	= 1 << 14,	// new
 	kErrorFlag_NoRepeatCount			= 1 << 15,	// new
 	kErrorFlag_UndefinedAddressRead		= 1 << 16,	// new
 	kErrorFlag_AddressVariableOutRange	= 1 << 17,	// new
@@ -586,107 +611,104 @@ enum{		// error flags
 
 /********** ACTION **********/
 
-struct CheatAction
+typedef struct _cheat_action cheat_action;
+struct _cheat_action
 {
-	UINT32	type;					// packed several information (cpu/region, address size, operation and parameters and so on)
-	UINT8	region;					// the number of cpu or region. in case of cpu, it has a kind of an address space together
-	UINT32	address;				// address. it is changeable by RWrite in the cheat core
-	UINT32	originalAddress;		// address. it is for edit/view/save
-	UINT32	data;					// data. it is changeable by VWrite/VRWrite in the cheat core
-	UINT32	originalDataField;		// data. it is for edit/view/save
-	UINT32	extendData;				// extend parameter. it is different using by each operations
+	UINT32	type;					/* packed several information (cpu/region, address size, operation and parameters and so on) */
+	UINT8	region;					/* the number of cpu or region. in case of cpu, it has a kind of an address space together */
+	UINT32	address;				/* address. it is changeable by RWrite in the cheat core */
+	UINT32	original_address;		/* address. it is for edit/view/save */
+	UINT32	data;					/* data. it is changeable by valuse selector in the cheat core */
+	UINT32	original_data;			/* data. it is for edit/view/save */
+	UINT32	extend_data;			/* extend parameter. it is different using by each operations */
 
-	INT32	frameTimer;				// timer for delay, keep
-	UINT32	* lastValue;			// back up value before cheating to restore value. PDWWrite uses 2 and RWrite uses about a counter
+	INT32	frame_timer;			/* timer for delay/keep */
+	UINT32	*last_value;			/* back up value before cheating to restore value. PDWWrite uses 2 and RWrite uses about a counter */
 
-	UINT32	flags;					// internal flags
+	UINT32	flags;					/* internal flags */
 
-	UINT8	** cachedPointer;		// pointer for data, I/O space or non-cpu region
-	UINT32	cachedOffset;			// offset for mapped memory
+	UINT8	**cached_pointer;		/* pointer to specified address space or mapped memory */
+	UINT32	cached_offset;			/* offset for mapped memory */
 
-	char	* optionalName;			// name to display in edit/view menu. Action doesn't have a comment
+	char	*optional_name;			/* label for label selection or popup */
 };
-
-typedef struct CheatAction	CheatAction;
 
 /********** ENTRY **********/
 
-struct CheatEntry
+typedef struct _cheat_entry cheat_entry;
+struct _cheat_entry
 {
-	char			* name;					// name to display in list menu
-	char			* comment;				// comment
+	char			*name;					/* name to display in list menu */
+	char			*comment;				/* simple comment */
 
-	INT32			actionListLength;		// minimum length = 1
-	CheatAction		* actionList;
+	INT32			action_list_length;		/* total codes of cheat action. NOTE : minimum length is 1 and 0 is ERROR */
+	cheat_action	*action_list;			/* pointer to cheat action */
 
-	int				activationKey1;			// activation key index for 1st key
-	int				activationKey2;			// activation key index for 2nd key
+	int				activation_key1;		/* activation key index for 1st key */
+	int				activation_key2;		/* activation key index for 2nd key */
 
-	int				selection;				// for label-select to set selected label number
-	int				labelIndexLength;		// minimum length = 1
-	int				* labelIndex;			// label index table
-	int				layerIndex;				// layer index for enable/disable menu
+	int				selection;				/* for label-select to set selected label number */
+	int				label_index_length;		/* total tables of index table. NOTE : minimum length is 1 and 0 is ERROR */
+	int				*label_index;			/* pointer of label index table */
 
-	UINT32			flags;					// internal flags
+	int				layer_index;			/* layer index for enable/disable menu */
+	UINT32			flags;					/* internal flags */
 };
-
-typedef struct CheatEntry	CheatEntry;
 
 /********** WATCH **********/
 
-struct WatchInfo
+typedef struct _watch_info watch_info;
+struct _watch_info
 {
-	UINT32			address;
-	UINT8			cpu;
-	UINT8			numElements;
-	UINT8			elementBytes;
-	UINT8			labelType;
-	UINT8			displayType;
-	UINT8			skip;
-	UINT8			elementsPerLine;
-	INT8			addValue;
-	INT8			addressShift;
-	INT8			dataShift;
-	UINT32			xor;
+	UINT32		address;			/* address */
+	UINT8		cpu;				/* target cpu or region */
+	UINT8		num_elements;		/* length of this watchpoint */
+	UINT8		element_bytes;		/* address size of this watchpoint */
+	UINT8		label_type;			/* header label */
+	UINT8		display_type;		/* type of value display */
+	UINT8		skip;				/* address skip */
+	UINT8		elements_per_line;	/* max watchpoints in the same line */
+	INT8		add_value;			/* add value */
+	INT8		address_shift;		/* address shift */
+	INT8		data_shift;			/* data shift */
+	UINT32		xor;				/* xor */
 
-	float			x, y;
+	float		x, y;				/* position */
 
-	CheatEntry *	linkedCheat;
+	cheat_entry	*linked_cheat;		/* relative cheat_entry */
 
-	char			label[256];
+	char		label[256];			/* name of label */
 };
-
-typedef struct WatchInfo	WatchInfo;
 
 /********** REGION **********/
 
 typedef struct _search_region search_region;
 struct _search_region
 {
-	UINT32	address;
-	UINT32	length;
+	UINT32	address;			/* address */
+	UINT32	length;				/* total length */
 
-	UINT8	target_type;
-	UINT8	target_idx;
+	UINT8	target_type;		/* flag for cpu or region */
+	UINT8	target_idx;			/* target cpu/region */
 
-	UINT8	flags;
+	UINT8	flags;				/* internal flags */
 
-	UINT8	** cached_pointer;
+	UINT8	**cached_pointer;	/* pointer to except standard cpu region */
 	const address_map_entry
-			* write_handler;
+			*write_handler;		/* pointer to write handler from address map */
 
-	UINT8	* first;
-	UINT8	* last;
+	UINT8	*first;				/* first value in searching */
+	UINT8	*last;				/* current value in searching */
 
-	UINT8	* status;
+	UINT8	*status;
 
-	UINT8	* backup_last;
-	UINT8	* backup_status;
+	UINT8	*backup_last;		/* previous value in searching */
+	UINT8	*backup_status;		/* flag of backup */
 
-	char	name[64];
+	char	name[64];			/* name of this region. NOTE : used in advanced search only */
 
-	UINT32	num_results;
-	UINT32	old_num_results;
+	UINT32	num_results;		/* total results */
+	UINT32	old_num_results;	/* previous total results */
 };
 
 /********** SEARCH **********/
@@ -773,7 +795,7 @@ struct _menu_string_list
 typedef struct _cheat_menu_item_info cheat_menu_item_info;
 struct _cheat_menu_item_info
 {
-	UINT32	sub_cheat;		/* the number of an item */
+	UINT32	sub_cheat;		/* index of an item */
 	UINT32	field_type;		/* field type of an item */
 	UINT32	extra_data;		/* it stores an extra data but NOT read (so I don't know how to use)*/
 };
@@ -793,34 +815,35 @@ struct _cheat_menu_stack
 typedef const struct _cheat_format cheat_format;
 struct _cheat_format
 {
-	const char *	format_string;			/* string templete of a format */
+	const char		*format_string;			/* string templete of a format */
 	UINT8			arguments_matched;		/* valid arguments of a format */
-	UINT8			length_matched;			/* valid length of a parameter */
-	UINT8			comment_matched;		/* valid argument to add comment */
+	UINT8			type_matched;			/* valid length of a type field */
+	UINT8			data_matched;			/* valid length of a data/extend data field */
+	UINT8			comment_matched;		/* valid arguments to add comment */
 };
 
 static const struct _cheat_format cheat_format_table[] =
 {
 		/* option - :_command:TYPE */
-	{	":_command:%[^:\n\r]",												1,	8,	0	},
+	{	":_command:%[^:\n\r]",																1,	8,	0,	0	},
 #ifdef MESS
-		/* code (new) - >MACHINE_NAME:CRC:TYPE:ADDRESS:DATA:EXTEND_DATA:(DESCRIPTION:COMMENT) */
-	{	">%8[^:\n\r]:%8X:%8X:%X:%8[^:\n\r]:%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",	6,	8,	8	},
+		/* code (new) - :MACHINE_NAME::CRC::TYPE::ADDRESS::DATA::EXTEND_DATA:(DESCRIPTION:COMMENT) */
+	{	":%8[^:\n\r]::%8X::%10[^:\n\r]::%X::%8[^:\n\r]::%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",	6,	10,	8,	8	},
 		/* code (old) - :MACHINE_NAME:CRC:TYPE:ADDRESS:DATA:EXTEND_DATA:(DESCRIPTION:COMMENT) */
-	{	":%8s:%8X:%8X:%X:%8[^:\n\r]:%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",		6,	8,	0	},
+	{	":%8s:8X:%8[^:\n\r]:%X:%8[^:\n\r]:%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",					6,	8,	8,	0	},
 		/* code (older) - :MACHINE_NAME:CRC:CPU:ADDRESS:DATA:TYPE:(DESCRIPTION:COMMENT) */
-	{	"%8[^:\n\r]:%8X:%d:%X:%X:%d:%[^:\n\r]:%[^:\n\r]",					5,	0,	8	},
+	{	"%8[^:\n\r]:%8X:%d:%X:%X:%d:%[^:\n\r]:%[^:\n\r]",									5,	0,	0,	8	},
 		/* user region - :MACHINE_NAME:CRC:CPU:ADDRESS_SPACE:START_ADDRESS:END_ADDRESS:STATUS:(DESCRIPTION) */
-	{	">%8[^:\n\r]:%8X:%2X:%2X:%X:%X:%1X:%[^:\n\r]",						7,	0,	0	},
+	{	":%8[^:\n\r]:%8X:%2X:%2X:%X:%X:%1X:%[^:\n\r]",										7,	0,	0,	0	},
 #else
-		/* code (new) - >GAME_NAME:TYPE:ADDRESS:DATA:EXTEND_DATA:(DESCRIPTION:COMMENT) */
-	{	">%8[^:\n\r]:%8X:%X:%8[^:\n\r]:%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",		5,	8,	7	},
+		/* code (new) - :GAME_NAME::TYPE::ADDRESS::DATA::EXTEND_DATA:(DESCRIPTION:COMMENT) */
+	{	":%8[^:\n\r]::%10[^:\n\r]::%X::%8[^:\n\r]::%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",			5,	10,	8,	7	},
 		/* code (old) - :GAME_NAME:TYPE:ADDRESS:DATA:EXTEND_DATA:(DESCRIPTION:COMMENT) */
-	{	":%8s:%8X:%X:%8[^:\n\r]:%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",			5,	8,	0	},
+	{	":%8s:%8[^:\n\r]:%X:%8[^:\n\r]:%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",						5,	8,	8,	0	},
 		/* code (older) - :GAME_NAME:CPU:ADDRESS:DATA:TYPE:(DESCRIPTION:COMMENT) */
-	{	"%8[^:\n\r]:%d:%X:%X:%d:%[^:\n\r]:%[^:\n\r]",						4,	0,	7	},
+	{	"%8[^:\n\r]:%d:%X:%X:%d:%[^:\n\r]:%[^:\n\r]",										4,	0,	0,	7	},
 		/* user region - :GAME_NAME:CPU:ADDRESS_SPACE:START_ADDRESS:END_ADDRESS:STATUS:(DESCRIPTION) */
-	{	">%8[^:\n\r]:%2X:%2X:%X:%X:%1X:%[^:\n\r]",							6,	0,	0	},
+	{	":%8[^:\n\r]:%2X:%2X:%X:%X:%1X:%[^:\n\r]",											6,	0,	0,	0	},
 #endif	/* MESS */
 	/* end of table */
 	{	0	}
@@ -830,35 +853,35 @@ static const struct _cheat_format cheat_format_table[] =
     EXPORTED VARIABLES
 ***************************************************************************/
 
-static const char			* cheatfile = NULL;
+static const char			*cheat_file = NULL;
 
 /***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
 
-static emu_timer			* periodic_timer;
+static emu_timer			*periodic_timer;
 
-static CheatEntry			* cheatList = NULL;
-static INT32				cheatListLength = 0;		// NOTE : 0 means no cheat entry and error
+static cheat_entry			*cheat_list;
+static INT32				cheat_list_length;
 
-static WatchInfo			* watchList = NULL;
-static INT32				watchListLength = 0;
+static watch_info			*watch_list;
+static INT32				watch_list_length;
 
-static search_info			*search_list = NULL;
-static INT32				search_list_length = 0;
-static INT32				current_search_idx = 0;
+static search_info			*search_list;
+static INT32				search_list_length;
+static INT32				current_search_idx;
 
 static cpu_region_info		cpu_info_list[MAX_CPU];
 static cpu_region_info		region_info_list[REGION_LIST_LENGTH];
 
-static int					foundCheatDatabase = 0;
+static int					found_database = 0;
 static int					cheatsDisabled = 0;
 static int					watchesDisabled = 0;
 
 static int					fullMenuPageHeight;
 static int					visible_items;
 
-static char					mainDatabaseName[CHEAT_FILENAME_MAX_LEN + 1];
+static char					main_database_name[CHEAT_FILENAME_MAX_LEN + 1];
 
 static menu_string_list		menu_strings;
 
@@ -873,10 +896,10 @@ static cheat_menu_stack		menu_stack[CHEAT_MENU_DEPTH];
 
 static int					cheatVariable[VARIABLE_MAX_ARRAY] = { 0 };
 
-static UINT32				cheatOptions;
+static UINT32				cheat_options;
 static UINT32				driverSpecifiedFlag;
-static UINT8				messageType;
-static UINT8				messageTimer;
+static UINT8				message_type;
+static UINT8				message_timer;
 
 static cpu_region_info raw_cpu_info =
 {
@@ -1039,16 +1062,16 @@ static const UINT32 kIncrementDecTable[] =
 
 static const char *const kRegionNames[] = {
 	"INVALID",
-	"CPU1",		"CPU2",		"CPU3",		"CPU4",		"CPU5",		"CPU6",		"CPU7",		"CPU8",		// 01-08    [01-08] : CPU
-	"GFX1",		"GFX2",		"GFX3",		"GFX4",		"GFX5",		"GFX6",		"GFX7",		"GFX8",		// 09-16    [08-10] : GFX
-	"PROMS",																						// 17       [11]    : PROMS
-	"SOUND1",	"SOUND2",	"SOUND3",	"SOUND4",	"SOUND5",	"SOUND6",	"SOUND7",	"SOUND8",	// 18-25    [12-19] : SOUND
-	"USER1",	"USER2",	"USER3",	"USER4",	"USER5",	"USER6",	"USER7",	"USER8",	// 26-45    [1A-2D] : USER
+	"CPU1",		"CPU2",		"CPU3",		"CPU4",		"CPU5",		"CPU6",		"CPU7",		"CPU8",		// 01-08	[01-08]	: CPU
+	"GFX1",		"GFX2",		"GFX3",		"GFX4",		"GFX5",		"GFX6",		"GFX7",		"GFX8",		// 09-16	[08-10]	: GFX
+	"PROMS",																						// 17		[11]	: PROMS
+	"SOUND1",	"SOUND2",	"SOUND3",	"SOUND4",	"SOUND5",	"SOUND6",	"SOUND7",	"SOUND8",	// 18-25	[12-19]	: SOUND
+	"USER1",	"USER2",	"USER3",	"USER4",	"USER5",	"USER6",	"USER7",	"USER8",	// 26-45	[1A-2D]	: USER
 	/* USER9 - PLDS are undefined in old format */
 	"USER9",	"USER10",	"USER11",	"USER12",	"USER13",	"USER14",	"USER15",	"USER16",
 	"USER17",	"USER18",	"USER19",	"USER20",
-	"DISKS",																						// 46       [2E]    : DISKS
-	"PLDS" };																						// 47       [2F]    : PLDS
+	"DISKS",																						// 46		[2E]	: DISKS
+	"PLDS" };																						// 47		[2F]	: PLDS
 
 static const char *const kNumbersTable[] = {
 	"0",	"1",	"2",	"3",	"4",	"5",	"6",	"7",
@@ -1165,41 +1188,38 @@ static int		debug_cheat_menu(running_machine *machine, cheat_menu_stack *menu);
 #endif
 
 /********** ENTRY LIST **********/
-static void		ResizeCheatList(UINT32 newLength);
-static void		ResizeCheatListNoDispose(UINT32 newLength);
+static void		resize_cheat_list(UINT32 new_length, UINT8 dispose);
 
-static void		AddCheatBefore(UINT32 idx);
-static void		DeleteCheatAt(UINT32 idx);
+static void		add_cheat_before(UINT32 idx);
+static void		delete_cheat_at(UINT32 idx);
 
-static void		DisposeCheat(CheatEntry * entry);
-static CheatEntry
-				*GetNewCheat(void);
+static void		dispose_cheat(cheat_entry *entry);
+static cheat_entry
+				*get_new_cheat(void);
 
 /********** ACTION LIST **********/
-static void		ResizeCheatActionList(CheatEntry * entry, UINT32 newLength);
+static void		resize_cheat_action_list(cheat_entry *entry, UINT32 new_length, UINT8 dispose);
 #if 0
-static void		ResizeCheatActionListNoDispose(CheatEntry * entry, UINT32 newLength);
-
 static void		AddActionBefore(CheatEntry * entry, UINT32 idx);
 static void		DeleteActionAt(CheatEntry * entry, UINT32 idx);
 #endif
-static void		DisposeAction(CheatAction * action);
+static void		dispose_action(cheat_action *action);
 
 /********** WATCH LIST **********/
-static void		InitWatch(WatchInfo * info, UINT32 idx);
-static void		ResizeWatchList(UINT32 newLength);
-static void		ResizeWatchListNoDispose(UINT32 newLength);
+static void		init_watch(watch_info *info, UINT32 idx);
+static void		resize_watch_list(UINT32 new_length, UINT8 dispose);
 
-static void		AddWatchBefore(UINT32 idx);
-static void		DeleteWatchAt(UINT32 idx);
-static void		DisposeWatch(WatchInfo * watch);
-static WatchInfo
-				*GetUnusedWatch(void);
+static void		add_watch_before(UINT32 idx);
+static void		delete_watch_at(UINT32 idx);
+static void		dispose_watch(watch_info *watch);
 
-static void		AddCheatFromWatch(WatchInfo * watch);
-static void		SetupCheatFromWatchAsWatch(CheatEntry * entry, WatchInfo * watch);
+static watch_info
+				*get_unused_watch(void);
 
-static void		ResetWatch(WatchInfo * watch);
+static void		add_cheat_from_watch(watch_info *watch);
+static void		add_cheat_from_watch_as_watch(cheat_entry *entry, watch_info *watch);
+
+static void		reset_watch(watch_info *watch);
 
 /********** SEARCH LIST **********/
 static void		resize_search_list(UINT32 newLength);
@@ -1224,27 +1244,28 @@ static void		backup_region(search_region *region);
 static void		restore_region_backup(search_region *region);
 static UINT8	default_enable_region(running_machine *machine, search_region *region, search_info *info);
 static void		set_search_region_default_name(search_region *region);
+static UINT8	is_search_region_in_range(UINT8 cpu, UINT32 length);
 static void		allocate_search_regions(search_info *info);
 static void		build_search_regions(running_machine *machine, search_info *info);
 
 /********** LOADER **********/
 static int		ConvertOldCode(int code, int cpu, int * data, int * extendData);
-static int		ConvertToNewCode(CheatAction * action);
-static void		HandleLocalCommandCheat(running_machine *machine, int cpu, int type, int address, int data, UINT8 format);
+static int		convert_to_new_code(cheat_action *action);
+static void		handle_local_command_cheat(running_machine *machine, int cpu, int type, int address, int data, UINT8 format);
 
-static void		LoadCheatOption(char * fileName);
-static void		LoadCheatCode(running_machine *machine, char * fileName);
-static void		LoadUserDefinedSearchRegion(running_machine *machine, char * fileName);
-static void		LoadCheatDatabase(running_machine *machine, UINT8 flags);
+static void		load_cheat_option(char *file_name);
+static void		load_cheat_code(running_machine *machine, char *file_name);
+static void		load_user_defined_search_region(running_machine *machine, char *file_name);
+static void		load_cheat_database(running_machine *machine, UINT8 flags);
+static void		reload_cheat_database(running_machine *machine);
 
-static void		DisposeCheatDatabase(void);
-static void		ReloadCheatDatabase(running_machine *machine);
+static void		dispose_cheat_database(void);
 
 /********** SAVER **********/
-static void		SaveCheatCode(running_machine *machine, CheatEntry * entry);
-static void		SaveActivationKey(running_machine *machine, CheatEntry * entry, int entryIndex);
-static void		SavePreEnable(running_machine *machine, CheatEntry * entry, int entryIndex);
-static void		SaveCheatOptions(void);
+static void		SaveCheatCode(running_machine *machine, cheat_entry *entry);
+static void		SaveActivationKey(running_machine *machine, cheat_entry *entry, int entryIndex);
+static void		SavePreEnable(running_machine *machine, cheat_entry *entry, int entryIndex);
+static void		Savecheat_options(void);
 static void		SaveDescription(running_machine *machine);
 static void		DoAutoSaveCheats(running_machine *machine);
 
@@ -1283,38 +1304,38 @@ static UINT32	DoMemoryRead(UINT8 * buf, UINT32 address, UINT8 bytes, UINT8 swap,
 static void		DoCPUWrite(UINT32 data, UINT8 cpu, UINT32 address, UINT8 bytes, UINT8 swap);
 static void		DoMemoryWrite(UINT32 data, UINT8 * buf, UINT32 address, UINT8 bytes, UINT8 swap, cpu_region_info *info);
 
-static UINT32	ReadData(CheatAction * action);
-static void		WriteData(CheatAction * action, UINT32 data);
+static UINT32	ReadData(cheat_action *action);
+static void		WriteData(cheat_action *action, UINT32 data);
 
 /********** WATCH **********/
-static void		WatchCheatEntry(CheatEntry * entry, UINT8 associate);
-static void		AddActionWatch(CheatAction * action, CheatEntry * entry);
-static void		RemoveAssociatedWatches(CheatEntry * entry);
+static void		WatchCheatEntry(cheat_entry *entry, UINT8 associate);
+static void		AddActionWatch(cheat_action *action, cheat_entry *entry);
+static void		RemoveAssociatedWatches(cheat_entry *entry);
 
 /********** ACTIVE/DEACTIVE ENTRY **********/
-static void		ResetAction(CheatAction * action);
-static void		ActivateCheat(CheatEntry * entry);
-static void		DeactivateCheat(CheatEntry * entry);
-static void		TempDeactivateCheat(CheatEntry * entry);
+static void		ResetAction(cheat_action *action);
+static void		ActivateCheat(cheat_entry *entry);
+static void		DeactivateCheat(cheat_entry *entry);
+static void		TempDeactivateCheat(cheat_entry *entry);
 
 /********** OPERATION CORE **********/
-static void		cheat_periodicOperation(CheatAction * action);
-static UINT8	cheat_periodicCondition(CheatAction * action);
-static int		cheat_periodicAction(running_machine *machine, CheatAction * action, int selection);
-static void		cheat_periodicEntry(running_machine *machine, CheatEntry * entry);
+static void		cheat_periodicOperation(cheat_action *action);
+static UINT8	cheat_periodicCondition(cheat_action *action);
+static int		cheat_periodicAction(running_machine *machine, cheat_action *action, int selection);
+static void		cheat_periodicEntry(running_machine *machine, cheat_entry *entry);
 
 /********** CONFIGURE ENTRY **********/
-static void		UpdateAllCheatInfo(void);
-static void		UpdateCheatInfo(CheatEntry * entry, UINT8 isLoadTime);
-static UINT32	AnalyseCodeFormat(CheatEntry * entry, CheatAction * action);
-static void		CheckCodeFormat(CheatEntry * entry);
-static void		BuildLabelIndexTable(CheatEntry *entry);
+static void		update_all_cheat_info(void);
+static void		update_cheat_info(cheat_entry *entry, UINT8 is_load_time);
+static UINT32	AnalyseCodeFormat(cheat_entry *entry, cheat_action *action);
+static void		check_code_format(cheat_entry *entry);
+static void		BuildLabelIndexTable(cheat_entry *entry);
 static void		SetLayerIndex(void);
 
 /********** OTHER STUFF **********/
 static void		DisplayCheatMessage(void);
 static UINT8	get_address_length(UINT8 region);
-static char *	get_region_name(UINT8 region);
+static char		*get_region_name(UINT8 region);
 static void		build_cpu_region_info_list(running_machine *machine);
 
 /***************************************************************************
@@ -1351,10 +1372,10 @@ INLINE cpu_region_info *get_region_info(UINT8 region)
 
 INLINE cpu_region_info *get_cpu_or_region_info(UINT8 cpu_region)
 {
-	if(TEST_FIELD(cpu_region, RegionFlag))
-		return get_region_info(cpu_region);
-	else
+	if(cpu_region < REGION_INVALID)
 		return get_cpu_info(cpu_region);
+	else
+		return get_region_info(cpu_region);
 }
 
 /*-----------------
@@ -1363,7 +1384,7 @@ INLINE cpu_region_info *get_cpu_or_region_info(UINT8 cpu_region)
 
 INLINE UINT8 cpu_needs_swap(UINT8 cpu)
 {
-	return cpu_info_list[cpu].endianness | 1;
+	return cpu_info_list[cpu].endianness ^ 1;
 }
 
 /*--------------------
@@ -1375,7 +1396,7 @@ INLINE UINT8 region_needs_swap(UINT8 region)
 	cpu_region_info *temp = get_region_info(region);
 
 	if(temp)
-		return temp->endianness | 1;
+		return temp->endianness ^ 1;
 
 	return 0;
 }
@@ -1404,11 +1425,11 @@ INLINE UINT32 SwapAddress(UINT32 address, UINT8 dataSize, cpu_region_info *info)
 	return address;
 }
 
-/*-------------------
-  IsAddressInRange
--------------------*/
+/*---------------------------------------------------------------------------------
+  is_address_in_range - check the range of address for eeprom and non-cpu region
+---------------------------------------------------------------------------------*/
 
-INLINE int IsAddressInRange(CheatAction * action, UINT32 length)
+INLINE int is_address_in_range(cheat_action *action, UINT32 length)
 {
 	return ((action->address + EXTRACT_FIELD(action->type, AddressSize) + 1) <= length);
 }
@@ -1437,12 +1458,12 @@ static int ShiftKeyPressed(void)
 {
 	return (input_code_pressed(KEYCODE_LSHIFT) || input_code_pressed(KEYCODE_RSHIFT));
 }
-
+ 
 static int ControlKeyPressed(void)
 {
 	return (input_code_pressed(KEYCODE_LCONTROL) || input_code_pressed(KEYCODE_RCONTROL));
 }
-
+ 
 static int AltKeyPressed(void)
 {
 	return (input_code_pressed(KEYCODE_LALT) || input_code_pressed(KEYCODE_RALT));
@@ -1452,208 +1473,128 @@ static int AltKeyPressed(void)
   ReadKeyAsync - dirty hack until osd_readkey_unicode is supported in MAMEW re-implementation of osd_readkey_unicode
 ---------------------------------------------------------------------------------------------------------------------*/
 
-#if 1
-
 #if OSD_READKEY_KLUDGE
 
 static int ReadKeyAsync(int flush)
 {
 	int	code;
 
-	if(flush)		// check key input
+	if(flush)
 	{
+		/* check key input */
 		while(input_code_poll_keyboard_switches(TRUE) != INPUT_CODE_INVALID) ;
 
 		return 0;
 	}
 
-	while(1)		// check pressed key
+	while(1)
 	{
+		/* check pressed key */
 		code = input_code_poll_keyboard_switches(FALSE);
 
 		if(code == INPUT_CODE_INVALID)
 		{
 			return 0;
 		}
-		else if((code >= KEYCODE_A) && (code <= KEYCODE_Z))
+		else if(code >= KEYCODE_A && code <= KEYCODE_Z)
 		{
-			if(ShiftKeyPressed())
-			{
-				return 'A' + (code - KEYCODE_A);
-			}
-			else
-			{
-				return 'a' + (code - KEYCODE_A);
-			}
+			if(ShiftKeyPressed())		return 'A' + (code - KEYCODE_A);
+			else						return 'a' + (code - KEYCODE_A);
 		}
-		else if((code >= KEYCODE_0) && (code <= KEYCODE_9))
+		else if(code >= KEYCODE_0 && code <= KEYCODE_9)
 		{
-			if(ShiftKeyPressed())
-			{
-				return ")!@#$%^&*("[code - KEYCODE_0];
-			}
-			else
-			{
-				return '0' + (code - KEYCODE_0);
-			}
+			if(ShiftKeyPressed())		return ")!@#$%^&*("[code - KEYCODE_0];
+			else						return '0' + (code - KEYCODE_0);
 		}
-		else if((code >= KEYCODE_0_PAD) && (code <= KEYCODE_9_PAD))
+		else if(code >= KEYCODE_0_PAD && code <= KEYCODE_9_PAD)
 		{
-			return '0' + (code - KEYCODE_0_PAD);
+										return '0' + (code - KEYCODE_0_PAD);
 		}
 		else if(code == KEYCODE_TILDE)
 		{
-			if(ShiftKeyPressed())
-			{
-				return '~';
-			}
-			else
-			{
-				return '`';
-			}
+			if(ShiftKeyPressed())		return '~';
+			else						return '`';
 		}
 		else if(code == KEYCODE_MINUS)
 		{
-			if(ShiftKeyPressed())
-			{
-				return '_';
-			}
-			else
-			{
-				return '-';
-			}
+			if(ShiftKeyPressed())		return '_';
+			else						return '-';
 		}
 		else if(code == KEYCODE_EQUALS)
 		{
-			if(ShiftKeyPressed())
-			{
-				return '+';
-			}
-			else
-			{
-				return '=';
-			}
+			if(ShiftKeyPressed())		return '+';
+			else						return '=';
 		}
 		else if(code == KEYCODE_BACKSPACE)
 		{
-			return 0x08;
+										return 0x08;
 		}
 		else if(code == KEYCODE_OPENBRACE)
 		{
-			if(ShiftKeyPressed())
-			{
-				return '{';
-			}
-			else
-			{
-				return '[';
-			}
+			if(ShiftKeyPressed())		return '{';
+			else						return '[';
 		}
 		else if(code == KEYCODE_CLOSEBRACE)
 		{
-			if(ShiftKeyPressed())
-			{
-				return '}';
-			}
-			else
-			{
-				return ']';
-			}
+			if(ShiftKeyPressed())		return '}';
+			else						return ']';
 		}
 		else if(code == KEYCODE_COLON)
 		{
-			if(ShiftKeyPressed())
-			{
-				return ':';
-			}
-			else
-			{
-				return ';';
-			}
+			if(ShiftKeyPressed())		return ':';
+			else						return ';';
 		}
 		else if(code == KEYCODE_QUOTE)
 		{
-			if(ShiftKeyPressed())
-			{
-				return '\"';
-			}
-			else
-			{
-				return '\'';
-			}
+			if(ShiftKeyPressed())		return '\"';
+			else						return '\'';
 		}
 		else if(code == KEYCODE_BACKSLASH)
 		{
-			if(ShiftKeyPressed())
-			{
-				return '|';
-			}
-			else
-			{
-				return '\\';
-			}
+			if(ShiftKeyPressed())		return '|';
+			else						return '\\';
 		}
 		else if(code == KEYCODE_COMMA)
 		{
-			if(ShiftKeyPressed())
-			{
-				return '<';
-			}
-			else
-			{
-				return ',';
-			}
+			if(ShiftKeyPressed())		return '<';
+			else						return ',';
 		}
 		else if(code == KEYCODE_STOP)
 		{
-			if(ShiftKeyPressed())
-			{
-				return '>';
-			}
-			else
-			{
-				return '.';
-			}
+			if(ShiftKeyPressed())		return '>';
+			else						return '.';
 		}
 		else if(code == KEYCODE_SLASH)
 		{
-			if(ShiftKeyPressed())
-			{
-				return '?';
-			}
-			else
-			{
-				return '/';
-			}
+			if(ShiftKeyPressed())		return '?';
+			else						return '/';
 		}
 		else if(code == KEYCODE_SLASH_PAD)
 		{
-			return '/';
+										return '/';
 		}
 		else if(code == KEYCODE_ASTERISK)
 		{
-			return '*';
+										return '*';
 		}
 		else if(code == KEYCODE_MINUS_PAD)
 		{
-			return '-';
+										return '-';
 		}
 		else if(code == KEYCODE_PLUS_PAD)
 		{
-			return '+';
+										return '+';
 		}
 		else if(code == KEYCODE_SPACE)
 		{
-			return ' ';
+										return ' ';
 		}
 	}
 }
 
 #define osd_readkey_unicode ReadKeyAsync
 
-#endif
-
-#endif
+#endif /* OSD_READKEY_KLUDGE */
 
 /*---------------------------------------------------
   ui_pressed_repeat_throttle - key repeat handling
@@ -2051,11 +1992,11 @@ static UINT32 DoDecrementDecField(UINT32 data, UINT8 digits)
 void cheat_init(running_machine *machine)
 {
 	/* initialize lists */
-	cheatList			= NULL;
-	cheatListLength		= 0;
+	cheat_list			= NULL;
+	cheat_list_length	= 0;
 
-	watchList			= NULL;
-	watchListLength		= 0;
+	watch_list			= NULL;
+	watch_list_length	= 0;
 
 	search_list = NULL;
 	search_list_length = 0;
@@ -2066,12 +2007,12 @@ void cheat_init(running_machine *machine)
 
 	/* initialize flags */
 	current_search_idx	= 0;
-	foundCheatDatabase	= 0;
+	found_database	= 0;
 	cheatsDisabled		= 0;
 	watchesDisabled		= 0;
 	editActive			= 0;
 	editCursor			= 0;
-	cheatOptions		= DEFAULT_CHEAT_OPTIONS;
+	cheat_options		= DEFAULT_CHEAT_OPTIONS;
 	driverSpecifiedFlag	= 0;
 
 	fullMenuPageHeight = visible_items = floor(1.0f / ui_get_line_height()) - 1;
@@ -2080,25 +2021,25 @@ void cheat_init(running_machine *machine)
 	build_cpu_region_info_list(machine);
 
 	/* set cheat list from database */
-	LoadCheatDatabase(machine, kLoadFlag_CheatOption | kLoadFlag_CheatCode);
+	load_cheat_database(machine, kLoadFlag_CheatOption | kLoadFlag_CheatCode);
 
 	/* set default search and watch lists */
 	resize_search_list(1);
-	ResizeWatchList(fullMenuPageHeight - 1);
+	resize_watch_list(fullMenuPageHeight - 1, 0);
 
 	/* build search region */
 	{
 		search_info *info = get_current_search();
 
 		/* attemp to load user region */
-		LoadCheatDatabase(machine, kLoadFlag_UserRegion);
+		load_cheat_database(machine, kLoadFlag_UserRegion);
 
 		/* if no user region or fail to load the database, attempt to build default region */
 		if(info->region_list_length)
-			info->search_speed = ksearch_speed_UserDefined;
+			info->search_speed = SEARCH_SPEED_USER_DEFINED;
 		else
 		{
-			info->search_speed = ksearch_speed_VerySlow;
+			info->search_speed = SEARCH_SPEED_VERY_SLOW;
 			build_search_regions(machine, info);
 		}
 
@@ -2128,8 +2069,7 @@ void cheat_init(running_machine *machine)
 	}
 
 	/* NOTE : disable all cheat messages in initializing so that message parameters should be initialized here */
-	messageType		= 0;
-	messageTimer	= 0;
+	SET_MESSAGE(0);
 
 	periodic_timer = timer_alloc(cheat_periodic, NULL);
 	timer_adjust_periodic(periodic_timer, video_screen_get_frame_period(machine->primary_screen), 0, video_screen_get_frame_period(machine->primary_screen));
@@ -2146,21 +2086,21 @@ static void cheat_exit(running_machine *machine)
 	int i;
 
 	/* save all cheats automatically if needed */
-	if(TEST_FIELD(cheatOptions, AutoSaveEnabled))
+	if(TEST_FIELD(cheat_options, AutoSaveEnabled))
 		DoAutoSaveCheats(machine);
 
-	/* free database */
-	DisposeCheatDatabase();
+	/* free cheat list */
+	dispose_cheat_database();
 
 	/* free watch lists */
-	if(watchList)
+	if(watch_list)
 	{
-		for(i = 0; i < watchListLength; i++)
-			DisposeWatch(&watchList[i]);
+		for(i = 0; i < watch_list_length; i++)
+			dispose_watch(&watch_list[i]);
 
-		free(watchList);
+		free(watch_list);
 
-		watchList = NULL;
+		watch_list = NULL;
 	}
 
 	/* free search lists */
@@ -2188,20 +2128,19 @@ static void cheat_exit(running_machine *machine)
 #endif
 
 	/* free flags */
-	cheatListLength		= 0;
-	watchListLength		= 0;
-	search_list_length	= 0;
-	current_search_idx	= 0;
-	foundCheatDatabase	= 0;
-	cheatsDisabled		= 0;
-	watchesDisabled		= 0;
-	mainDatabaseName[0]	= 0;
-	menuItemInfoLength	= 0;
-	cheatVariable[0]	= 0;
-	cheatOptions		= 0;
-	driverSpecifiedFlag	= 0;
-	messageType			= 0;
-	messageTimer		= 0;
+	cheat_list_length		= 0;
+	watch_list_length		= 0;
+	search_list_length		= 0;
+	current_search_idx		= 0;
+	found_database			= 0;
+	cheatsDisabled			= 0;
+	watchesDisabled			= 0;
+	main_database_name[0]	= 0;
+	menuItemInfoLength		= 0;
+	cheatVariable[0]		= 0;
+	cheat_options			= 0;
+	driverSpecifiedFlag		= 0;
+	SET_MESSAGE(0);
 }
 
 /*----------------------------------
@@ -2359,7 +2298,7 @@ static void request_strings(UINT32 length, UINT32 num_strings, UINT32 main_strin
 		changed = 1;
 	}
 
-	/* length of buffer 1*/
+	/* length of buffer 1 */
 	if(menu_strings.main_string_length < main_string_length)
 	{
 		menu_strings.main_string_length = main_string_length;
@@ -2410,7 +2349,7 @@ static char *create_string_copy(char *buf)
 {
 	char *temp = NULL;
 
-	if(buf)
+	if(buf && buf[0] != 0)
 	{
 		/* allocate memory */
 		size_t length = strlen(buf) + 1;
@@ -2535,81 +2474,82 @@ static void free_cheat_menu_stack(void)
 static int user_select_value_menu(running_machine *machine, cheat_menu_stack *menu)
 {
 	int				i;
-	UINT8			isBCD;
+	UINT8			is_bcd;
 	UINT32			min;
 	UINT32			max;
 	static int		master			= 0;
-	static int		displayValue	= -1;
+	static int		display_value	= -1;
 	char			buf[256];
-	char *			stringsBuf		= buf;
-	CheatEntry *	entry			= &cheatList[menu->pre_sel];
-	CheatAction *	action			= NULL;
+	char			*strings_buf	= buf;
+	cheat_entry		*entry			= &cheat_list[menu->pre_sel];
+	cheat_action	*action			= NULL;
 
 	/* first setting 1 : search master code of value-selection */
 	if(menu->first_time)
 	{
-		for(i = 0; i < entry->actionListLength; i++)
+		for(i = 0; i < entry->action_list_length; i++)
 		{
-			/* get value selection master code */
-			if(	EXTRACT_FIELD(entry->actionList[i].type, CodeType) == kCodeType_VWrite ||
-				EXTRACT_FIELD(entry->actionList[i].type, CodeType) == kCodeType_VRWrite)
-			{
-				master = i;
-				break;
-			}
+			if(entry->action_list[0].flags & kActionFlag_OldFormat) {
+				/* NOTE : old format should be always master = 0 */
+				master = 0; break; }
+
+			/* search value selection master code */
+			if(TEST_FIELD(entry->action_list[i].type, ValueSelectEnable)) {
+				master = i; break; }
 		}
 	}
 
-	action = &entry->actionList[master];
+	/* set value selection master code */
+	action = &entry->action_list[master];
 
 	if(TEST_FIELD(action->type, ValueSelectMinimumDisplay) || TEST_FIELD(action->type, ValueSelectMinimum))
 		min = 1;
 	else
 		min = 0;
 
-	max		= action->originalDataField + min;
-	isBCD	= EXTRACT_FIELD(action->type, ValueSelectBCD);
+	max		= action->original_data + min;
+	is_bcd	= EXTRACT_FIELD(action->type, ValueSelectBCD);
 
 	/* first setting 2 : save the value */
 	if(menu->first_time)
 	{
-		displayValue = isBCD ? DecimalToBCD(BCDToDecimal(ReadData(action))) : ReadData(action);
+		display_value = is_bcd ? DecimalToBCD(BCDToDecimal(ReadData(action))) : ReadData(action);
 
-		if(displayValue < min)
-			displayValue = min;
-		else if(displayValue > max)
-			displayValue = max;
+		if(display_value < min)
+			display_value = min;
+		else if(display_value > max)
+			display_value = max;
 		else if(TEST_FIELD(action->type, ValueSelectMinimumDisplay))
-			displayValue++;
+			display_value++;
 
 		menu->first_time = 0;
 	}
 
 	/* ##### MENU CONSTRACTION ##### */
-	stringsBuf += sprintf(stringsBuf, "\t%s\n\t", entry->name);
+	strings_buf += sprintf(strings_buf, "\t%s\n\t", entry->name);
 
 	if(editActive)
 	{
 		for(i = kSearchByteDigitsTable[EXTRACT_FIELD(action->type, AddressSize)] - 1; i >= 0; i--)
 		{
 			if(i == editCursor)
-				stringsBuf += sprintf(stringsBuf, "[%X]", (displayValue & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
+				strings_buf += sprintf(strings_buf, "[%X]", (display_value & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
 			else
-				stringsBuf += sprintf(stringsBuf, "%X", (displayValue & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
+				strings_buf += sprintf(strings_buf, "%X", (display_value & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
 		}
 	}
 	else
-		stringsBuf += sprintf(stringsBuf, "%.*X", kSearchByteDigitsTable[EXTRACT_FIELD(action->type, AddressSize)], displayValue);
+		strings_buf += sprintf(strings_buf, "%.*X", kSearchByteDigitsTable[EXTRACT_FIELD(action->type, AddressSize)], display_value);
 
 	if(TEST_FIELD(action->type, ValueSelectNegative))
-		stringsBuf += sprintf(	stringsBuf, " <%.*X>",
+		strings_buf += sprintf(	strings_buf, " <%.*X>",
 								kSearchByteDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
-								(~displayValue + 1) & kSearchByteMaskTable[EXTRACT_FIELD(action->type, AddressSize)]);
+								(~display_value + 1) & kSearchByteMaskTable[EXTRACT_FIELD(action->type, AddressSize)]);
 
-	if(!isBCD)
-		stringsBuf += sprintf(stringsBuf, " (%d)", displayValue);
+	if(is_bcd == 0)
+		strings_buf += sprintf(strings_buf, " (%d)", display_value);
 
-	stringsBuf += sprintf(stringsBuf, "\n\t OK ");
+	strings_buf += sprintf(strings_buf, "\n\t OK ");
 
 	/* print it */
 	ui_draw_message_window(buf);
@@ -2619,14 +2559,14 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 	{
 		if(editActive)
 		{
-			if(displayValue == max)
-				displayValue = min;
+			if(display_value == max)
+				display_value = min;
 			else
 			{
-				displayValue = isBCD ? DoIncrementDecField(displayValue, editCursor) : DoIncrementHexField(displayValue, editCursor);
+				display_value = is_bcd ? DoIncrementDecField(display_value, editCursor) : DoIncrementHexField(display_value, editCursor);
 
-				if(displayValue > max)
-					displayValue = max;
+				if(display_value > max)
+					display_value = max;
 			}
 		}
 	}
@@ -2634,15 +2574,15 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 	{
 		if(editActive)
 		{
-			if(displayValue == min)
-				displayValue = max;
+			if(display_value == min)
+				display_value = max;
 
 			else
 			{
-				displayValue = isBCD ? DoDecrementDecField(displayValue, editCursor) : DoDecrementHexField(displayValue, editCursor);
+				display_value = is_bcd ? DoDecrementDecField(display_value, editCursor) : DoDecrementHexField(display_value, editCursor);
 
-				if(displayValue > max)
-					displayValue = max;
+				if(display_value > max)
+					display_value = max;
 			}
 		}
 	}
@@ -2655,11 +2595,11 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 		}
 		else
 		{
-			if(displayValue-- == min)
-				displayValue = max;
+			if(display_value-- == min)
+				display_value = max;
 
-			if(isBCD)
-				displayValue = DecimalToBCD(BCDToDecimal(displayValue));
+			if(is_bcd)
+				display_value = DecimalToBCD(BCDToDecimal(display_value));
 		}
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, kHorizontalFastKeyRepeatRate))
@@ -2671,11 +2611,11 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 		}
 		else
 		{
-			if(++displayValue > max)
-				displayValue = min;
+			if(++display_value > max)
+				display_value = min;
 
-			if(isBCD)
-				displayValue = DecimalToBCD(BCDToDecimal(displayValue));
+			if(is_bcd)
+				display_value = DecimalToBCD(BCDToDecimal(display_value));
 		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SELECT))
@@ -2687,45 +2627,46 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 
 		/* adjust a value */
 		if(TEST_FIELD(action->type, ValueSelectMinimumDisplay))
-			displayValue--;
+			display_value--;
 
-		if(TEST_FIELD(action->type, ValueSelectMinimum) && !displayValue)
-			displayValue = 1;
+		if(TEST_FIELD(action->type, ValueSelectMinimum) && display_value == 0)
+			display_value = 1;
 
-		if(TEST_FIELD(action->type, ValueSelectNegative) && displayValue)
-			displayValue = (~displayValue + 1) & kSearchByteMaskTable[EXTRACT_FIELD(action->type, AddressSize)];
+		if(TEST_FIELD(action->type, ValueSelectNegative) && display_value)
+			display_value = (~display_value + 1) & kSearchByteMaskTable[EXTRACT_FIELD(action->type, AddressSize)];
 
-		/* copy value */
-		for(i = 0; i < entry->actionListLength; i++)
+		/* set/copy value */
+		for(i = 0; i < entry->action_list_length; i++)
 		{
-			CheatAction * destination = &entry->actionList[i];
+			cheat_action *destination = &entry->action_list[i];
 
-			int copyValue = displayValue;
+			int copy_value = display_value;
 
-			if(	EXTRACT_FIELD(destination->type, CodeType) == kCodeType_VWrite ||
-				EXTRACT_FIELD(destination->type, CodeType) == kCodeType_VRWrite)
+			if(i == master)
 			{
-				destination->data = displayValue;
+				/* set value */
+				destination->data = display_value;
 			}
-			else if(EXTRACT_FIELD(destination->type, Link) == kLink_CopyLink)
+			else if(TEST_FIELD(destination->type, ValueSelectEnable))
 			{
-				int newData = destination->originalDataField;
+				/* copy value */
+				int new_data = destination->original_data;
 
-				if(TEST_FIELD(destination->type, LinkValueSelectBCD))
+				if(TEST_FIELD(destination->type, ValueSelectBCD))
 				{
-					copyValue	= BCDToDecimal(DecimalToBCD(copyValue));
-					newData		= BCDToDecimal(DecimalToBCD(newData));
+					copy_value	= BCDToDecimal(DecimalToBCD(copy_value));
+					new_data	= BCDToDecimal(DecimalToBCD(new_data));
 				}
 
-				copyValue += newData;
+				copy_value += new_data;
 
-				if(TEST_FIELD(destination->type, LinkValueSelectBCD))
-					copyValue = DecimalToBCD(BCDToDecimal(copyValue));
+				if(TEST_FIELD(destination->type, ValueSelectBCD))
+					copy_value = DecimalToBCD(BCDToDecimal(copy_value));
 
-				if(TEST_FIELD(destination->type, LinkValueSelectNegative))
-					copyValue = (~copyValue + 1) & kSearchByteMaskTable[EXTRACT_FIELD(destination->type, AddressSize)];
+				if(TEST_FIELD(destination->type, ValueSelectNegative))
+					copy_value = (~copy_value + 1) & kSearchByteMaskTable[EXTRACT_FIELD(destination->type, AddressSize)];
 
-				destination->data = copyValue;
+				destination->data = copy_value;
 			}
 		}
 
@@ -2740,27 +2681,25 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
-		if(editActive)
-			editActive = 0;
-		else
-			menu->sel = -1;
+		if(editActive)		editActive = 0;
+		else				menu->sel = -1;
 	}
 
 	/* ##### EDIT ##### */
-	if(!editActive)
+	if(editActive == 0)
 	{
 		UINT32 temp;
 
-		temp			= displayValue;
-		displayValue	= do_edit_hex_field(machine, displayValue) & kCheatSizeMaskTable[EXTRACT_FIELD(action->type, AddressSize)];
+		temp			= display_value;
+		display_value	= do_edit_hex_field(machine, display_value) & kCheatSizeMaskTable[EXTRACT_FIELD(action->type, AddressSize)];
 
-		if(displayValue != temp)
+		if(display_value != temp)
 		{
-			if(isBCD)
-				displayValue = DecimalToBCD(BCDToDecimal(displayValue));
+			if(is_bcd)
+				display_value = DecimalToBCD(BCDToDecimal(display_value));
 
-			if(displayValue < min)	displayValue = max;
-			if(displayValue > max)	displayValue = min;
+			if(display_value < min)	display_value = max;
+			if(display_value > max)	display_value = min;
 		}
 	}
 
@@ -2775,13 +2714,13 @@ static int user_select_label_menu(running_machine *machine, cheat_menu_stack *me
 {
 	int				i;
 	UINT8			total	= 0;
-	const char		** menuItem;
-	char			** buf;
-	CheatEntry		* entry	= &cheatList[menu->pre_sel];
+	const char		**menu_item;
+	char			**buf;
+	cheat_entry		*entry	= &cheat_list[menu->pre_sel];
 
 	/* required items = (total items + return + terminator) & (strings buf * total items [max chars = 100]) */
-	request_strings(entry->actionListLength + 2, entry->actionListLength, 100, 0);
-	menuItem	= menu_strings.main_list;
+	request_strings(entry->action_list_length + 2, entry->action_list_length, 100, 0);
+	menu_item	= menu_strings.main_list;
 	buf			= menu_strings.main_strings;
 
 	/* first setting : compute cursor position from previous menu */
@@ -2792,11 +2731,11 @@ static int user_select_label_menu(running_machine *machine, cheat_menu_stack *me
 	}
 
 	/********** MENU CONSTRUCTION **********/
-	for(i = 0; i < entry->labelIndexLength; i++)
+	for(i = 0; i < entry->label_index_length; i++)
 	{
-		if(!i)
+		if(i == 0)
 		{
-			if(!(entry->flags & kCheatFlag_OneShot))
+			if((entry->flags & kCheatFlag_OneShot) == 0)
 			{
 				/* add "OFF" item if not one shot at the first time */
 				if(!entry->selection)
@@ -2804,41 +2743,41 @@ static int user_select_label_menu(running_machine *machine, cheat_menu_stack *me
 				else
 					sprintf(buf[total], "Off");
 
-				menuItem[total] = buf[total];
+				menu_item[total] = buf[total];
 				total++;
 			}
 
 			continue;
 		}
 		else if(i == entry->selection)
-			sprintf(buf[total], "[ %s ]", entry->actionList[entry->labelIndex[i]].optionalName);
+			sprintf(buf[total], "[ %s ]", entry->action_list[entry->label_index[i]].optional_name);
 		else
-			sprintf(buf[total], "%s", entry->actionList[entry->labelIndex[i]].optionalName);
+			sprintf(buf[total], "%s", entry->action_list[entry->label_index[i]].optional_name);
 
-		menuItem[total] = buf[total];
+		menu_item[total] = buf[total];
 		total++;
 	}
 
 	/* ##### RETURN ##### */
-	menuItem[total++] = "Return to Prior Menu";
+	menu_item[total++] = "Return to Prior Menu";
 
 	/* ##### TERMINATE ARRAY ##### */
-	menuItem[total] = NULL;
+	menu_item[total] = NULL;
 
 	/* adjust current cursor position */
-	ADJUST_CURSOR(menu->sel, total)
+	ADJUST_CURSOR(menu->sel, total);
 
 	/* draw it */
-	old_style_menu(menuItem, NULL, NULL, menu->sel, 0);
+	old_style_menu(menu_item, NULL, NULL, menu->sel, 0);
 
 	/********** KEY HANDLING **********/
 	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_PREVIOUS(menu->sel, total)
+		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_NEXT(menu->sel, total)
+		CURSOR_TO_NEXT(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
@@ -2846,7 +2785,7 @@ static int user_select_label_menu(running_machine *machine, cheat_menu_stack *me
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_DOWN(menu->sel, total)
+		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
@@ -2861,7 +2800,7 @@ static int user_select_label_menu(running_machine *machine, cheat_menu_stack *me
 				DeactivateCheat(entry);
 
 			/* NOTE : the index number of master code should be stored into 1st table */
-			if(TEST_FIELD(entry->actionList[entry->labelIndex[0]].type, LabelSelectQuickClose))
+			if(TEST_FIELD(entry->action_list[entry->label_index[0]].type, LabelSelectQuickClose))
 				menu->sel = -1;
 		}
 		else
@@ -2880,19 +2819,15 @@ static int user_select_label_menu(running_machine *machine, cheat_menu_stack *me
 static int comment_menu(running_machine *machine, cheat_menu_stack *menu)
 {
 	char		buf[2048];
-	const char	* comment;
-	CheatEntry	* entry = &cheatList[menu->pre_sel];
+	const char	*comment;
+	cheat_entry	*entry = &cheat_list[menu->pre_sel];
 
 	/* first setting : NONE */
 	if(menu->first_time)
 		menu->first_time = 0;
 
 	/********** MENU CONSTRUCTION **********/
-	if(entry->comment && entry->comment[0])
-		comment = entry->comment;
-	else
-		comment = "this code doesn't have a comment";
-
+	comment = entry->comment;
 	sprintf(buf, "%s\n\t OK ", comment);
 
 	/* print it */
@@ -2913,64 +2848,61 @@ static int extend_comment_menu(running_machine *machine, cheat_menu_stack *menu)
 {
 	int			i;
 	UINT8		total	= 0;
-	const char	** menuItem;
-	char		** buf;
-	CheatEntry	* entry	= &cheatList[menu->pre_sel];
-
-	if(!entry->actionListLength)
-		return 0;
+	const char	**menu_item;
+	char		**buf;
+	cheat_entry	*entry	= &cheat_list[menu->pre_sel];
 
 	/* first setting : NONE */
 	if(menu->first_time)
 		menu->first_time = 0;
 
 	/* required items = (display comment lines + return + terminator) & (strings buf * display comment lines [max char = 100]) */
-	request_strings(entry->actionListLength + 1, entry->actionListLength - 1, 100, 0);
-	menuItem 	= menu_strings.main_list;
+	request_strings(entry->action_list_length + 1, entry->action_list_length - 1, 100, 0);
+	menu_item 	= menu_strings.main_list;
 	buf			= menu_strings.main_strings;
 
 	/********** MENU CONSTRUCTION **********/
-	for(i = 1; i < entry->actionListLength; i++)
+	for(i = 1; i < entry->action_list_length; i++)
 	{
-		CheatAction * action = &entry->actionList[i];
+		cheat_action *action = &entry->action_list[i];
 
 		/* NOTE : don't display the comment in master code */
-		if(i)
+		if(i != 0)
 		{
-			sprintf(buf[total], "%s", action->optionalName);
-			menuItem[total] = buf[total];
+			sprintf(buf[total], "%s", action->optional_name);
+			menu_item[total] = buf[total];
 			total++;
 		}
 	}
 
 	/* ##### OK ##### */
-	menuItem[total++] = "OK";
+	menu_item[total++] = "OK";
 
 	/* ##### TERMINATE ARRAY ##### */
-	menuItem[total] = NULL;
+	menu_item[total] = NULL;
 
 	/* adjust cursor position */
-	ADJUST_CURSOR(menu->sel, total)
+	ADJUST_CURSOR(menu->sel, total);
 
 	/* draw it */
-	old_style_menu(menuItem, NULL, NULL, menu->sel, 0);
+	old_style_menu(menu_item, NULL, NULL, menu->sel, 0);
 
 	/********** KEY HANDLING **********/
 	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_PREVIOUS(menu->sel, total)
+		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_NEXT(menu->sel, total)
+		CURSOR_TO_NEXT(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_UP(menu->sel)
+		CURSOR_PAGE_UP(menu->sel);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_DOWN(menu->sel, total)
+		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SELECT) || input_ui_pressed(machine, IPT_UI_CANCEL))
 		menu->sel = -1;
@@ -3017,7 +2949,7 @@ static int cheat_main_menu(running_machine *machine, cheat_menu_stack *menu)
 	menu_item[total++].text = "Add/Edit a Cheat";
 
 	/* ##### Search a Cheat ##### */
-	switch(EXTRACT_FIELD(cheatOptions, SearchBox))
+	switch(EXTRACT_FIELD(cheat_options, SearchBox))
 	{
 		case kSearchBox_Minimum:
 			menu_item[total++].text = "Search a Cheat (Minimum Mode)";
@@ -3055,7 +2987,7 @@ static int cheat_main_menu(running_machine *machine, cheat_menu_stack *menu)
 	/* ##### Terminate Array ##### */
 	menu_item[total].text = NULL;
 
-	ADJUST_CURSOR(menu->sel, total)
+	ADJUST_CURSOR(menu->sel, total);
 
 	/* print it */
 	ui_menu_draw(menu_item, total, menu->sel, NULL);
@@ -3063,19 +2995,19 @@ static int cheat_main_menu(running_machine *machine, cheat_menu_stack *menu)
 	/********** KEY HANDLING **********/
 	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_PREVIOUS(menu->sel, total)
+		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_NEXT(menu->sel, total)
+		CURSOR_TO_NEXT(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_UP(menu->sel)
+		CURSOR_PAGE_UP(menu->sel);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_DOWN(menu->sel, total)
+		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
@@ -3090,7 +3022,7 @@ static int cheat_main_menu(running_machine *machine, cheat_menu_stack *menu)
 				break;
 
 			case kMenu_Search:
-				switch(EXTRACT_FIELD(cheatOptions, SearchBox))
+				switch(EXTRACT_FIELD(cheat_options, SearchBox))
 				{
 					case kSearchBox_Minimum:
 						cheat_menu_stack_push(search_minimum_menu, menu->handler, menu->sel);
@@ -3128,7 +3060,7 @@ static int cheat_main_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 	else if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
 	{
-		ReloadCheatDatabase(machine);
+		reload_cheat_database(machine);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
@@ -3146,19 +3078,20 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 {
 	int				i;
 	UINT8			total			= 0;
-	UINT8			length			= cheatListLength ? cheatListLength : 2;
-	UINT8			isEmpty			= 0;
-	UINT8 *			menuIndex;
-	static INT8		currentLayer;
-	const char		** menu_item;
-	const char		** menu_subitem;
-	char			* flagBuf;
-	CheatEntry		* entry;
+	UINT8			length			= cheat_list_length ? cheat_list_length : 2;
+	UINT8			is_empty		= 0;
+	UINT8			request_arrow	= 0;
+	UINT8			*menu_index;
+	static INT8		current_layer;
+	const char		**menu_item;
+	const char		**menu_sub_item;
+	char			*flag_buf;
+	cheat_entry		*entry;
 
 	/* first setting : always starts with root layer level */
 	if(menu->first_time)
 	{
-		currentLayer = 0;
+		current_layer = 0;
 		menu->first_time = 0;
 	}
 
@@ -3166,16 +3099,16 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 	request_strings(length + 2, 0, 0, 0);
 
 	menu_item		= menu_strings.main_list;
-	menu_subitem	= menu_strings.sub_list;
-	flagBuf			= menu_strings.flag_list;
+	menu_sub_item	= menu_strings.sub_list;
+	flag_buf		= menu_strings.flag_list;
 
-	menuIndex = malloc_or_die(sizeof(INT8) * (length + 1));
-	memset(menuIndex, 0, sizeof(INT8) * (length + 1));
+	menu_index = malloc_or_die(sizeof(INT8) * (length + 1));
+	memset(menu_index, 0, sizeof(INT8) * (length + 1));
 
 	/********** MENU CONSTRUCTION **********/
-	for(i = 0; i < cheatListLength; i++)
+	for(i = 0; i < cheat_list_length; i++)
 	{
-		CheatEntry * traverse	= &cheatList[i];
+		cheat_entry *traverse = &cheat_list[i];
 
 		if(total >= fullMenuPageHeight) break;
 
@@ -3186,14 +3119,15 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 			traverse->flags &= ~kCheatFlag_LayerSelected;
 		}
 
-		if(traverse->layerIndex == currentLayer)
+		if(traverse->layer_index == current_layer)
 		{
 			/* ##### SEPARAOTR ##### */
 			if(traverse->flags & kCheatFlag_Separator)
 			{
 				menu_item[total] = MENU_SEPARATOR_ITEM;
-				menu_subitem[total] = NULL;
-				menuIndex[total++] = i;
+				menu_sub_item[total] = NULL;
+				menu_index[total++] = i;
+				traverse->flags &= ~kCheatFlag_RequestArrow;
 			}
 			else
 			{
@@ -3207,120 +3141,134 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 				if(traverse->flags & kCheatFlag_HasWrongCode)
 				{
 					/* "LOCKED" if wrong code */
-					menu_subitem[total] = "Locked";
+					menu_sub_item[total] = "Locked";
 					traverse->selection = 0;
+					traverse->flags &= ~kCheatFlag_RequestArrow;
 				}
 				else if(traverse->flags & kCheatFlag_Select)
 				{
 					/* label or "OFF" if label-selection though one-shot should ignore "OFF" */
 					if(traverse->selection)
-						menu_subitem[total] = traverse->actionList[traverse->labelIndex[traverse->selection]].optionalName;
+						menu_sub_item[total] = traverse->action_list[traverse->label_index[traverse->selection]].optional_name;
 					else
-						menu_subitem[total] = "Off";
+						menu_sub_item[total] = "Off";
+
+					traverse->flags |= kCheatFlag_RequestArrow;
 				}
 				else if(traverse->flags & kCheatFlag_ExtendComment)
 				{
 					/* "READ" if extend comment code */
-					menu_subitem[total] = "Read";
+					menu_sub_item[total] = "Read";
+					traverse->flags &= ~kCheatFlag_RequestArrow;
 				}
 				else if(traverse->flags & kCheatFlag_LayerIndex)
 				{
 					/* ">>>" (next layer) if layer label code */
-					menu_subitem[total] = ">>>";
+					menu_sub_item[total] = ">>>";
+					traverse->flags &= ~kCheatFlag_RequestArrow;
 				}
-				else if(!(traverse->flags & kCheatFlag_Null))
+				else if((traverse->flags & kCheatFlag_Null) == 0)
 				{
 					/* otherwise, add sub-items */
 					if(traverse->flags & kCheatFlag_OneShot)
-						menu_subitem[total] = "Set";
-					else if(traverse->flags & kCheatFlag_Active)
-						menu_subitem[total] = "On";
+					{
+						menu_sub_item[total] = "Set";
+						traverse->flags &= ~kCheatFlag_RequestArrow;
+					}
 					else
-						menu_subitem[total] = "Off";
+					{
+						if(traverse->flags & kCheatFlag_Active)
+							menu_sub_item[total] = "On";
+						else
+							menu_sub_item[total] = "Off";
+
+						traverse->flags |= kCheatFlag_RequestArrow;
+					}
 				}
 
 				/* set highlight flag if comment is set */
 				if(traverse->comment && traverse->comment[0])
-					flagBuf[total] = 1;
+					flag_buf[total] = 1;
 				else
-					flagBuf[total] = 0;
-				menuIndex[total++] = i;
+					flag_buf[total] = 0;
+				menu_index[total++] = i;
 			}
 		}
 		else if(traverse->flags & kCheatFlag_LayerIndex)
 		{
-			if(currentLayer == traverse->actionList[0].data)
+			if(current_layer == traverse->action_list[0].data)
 			{
 				/* specified handling previous layer label code with "<<<" (previous layer) */
 				if(traverse->comment)
 					menu_item[total] = traverse->comment;
 				else
 					menu_item[total] = "Return to Prior Layer";
-				menu_subitem[total] = "<<<";
-				flagBuf[total] = 0;
-				menuIndex[total++] = i;
+				menu_sub_item[total] = "<<<";
+				flag_buf[total] = 0;
+				menu_index[total++] = i;
+				traverse->flags &= ~kCheatFlag_RequestArrow;
 			}
 		}
 	}
 
 	/* if no code, set special message */
-	if(!cheatListLength)
+	if(cheat_list_length == 0)
 	{
-		if(foundCheatDatabase)
+		if(found_database)
 		{
 			/* the database is found but no code */
-			menu_item[total]	= "there are no cheats for this game";
-			menu_subitem[total]	= NULL;
-			menuIndex[total]	= total;
-			flagBuf[total++]	= 0;
-			isEmpty				= 1;
+			menu_item[total]		= "there are no cheats for this game";
+			menu_sub_item[total]	= NULL;
+			menu_index[total]		= total;
+			flag_buf[total++]		= 0;
+			is_empty				= 1;
 		}
 		else
 		{
 			/* the database itself is not found */
-			menu_item[total]	= "cheat database not found";
-			menu_subitem[total]	= NULL;
-			menuIndex[total]	= total;
-			flagBuf[total++]	= 0;
+			menu_item[total]		= "cheat database not found";
+			menu_sub_item[total]	= NULL;
+			menu_index[total]		= total;
+			flag_buf[total++]		= 0;
 
-			menu_item[total]	= "unzip it and place it in the MAME directory";
-			menu_subitem[total]	= NULL;
-			menuIndex[total]	= total;
-			flagBuf[total++]	= 0;
-			isEmpty				= 2;
+			menu_item[total]		= "unzip it and place it in the MAME directory";
+			menu_sub_item[total]	= NULL;
+			menu_index[total]		= total;
+			flag_buf[total++]		= 0;
+			is_empty				= 2;
 		}
 	}
-	else if(currentLayer && total == 1)
+	else if(current_layer && total == 1)
 	{
 		/* selected layer doesn't have code */
-		menu_item[total]	= "selected layer doesn't have sub code";
-		menu_subitem[total]	= NULL;
-		menuIndex[total]	= menuIndex[total - 1];
-		flagBuf[total++]	= 0;
-		isEmpty = 3;
+		menu_item[total]		= "selected layer doesn't have sub code";
+		menu_sub_item[total]	= NULL;
+		menu_index[total]		= menu_index[total - 1];
+		flag_buf[total++]		= 0;
+		is_empty				= 3;
 	}
 
 	/* ##### RETURN ##### */
-	if(currentLayer)
-		menu_item[total] = "Return to Root Layer";
+	if(current_layer)
+		menu_item[total]	= "Return to Root Layer";
 	else
-		menu_item[total] = "Return to Prior Menu";
-	menu_subitem[total] = NULL;
-	flagBuf[total++] = 0;
+		menu_item[total]	= "Return to Prior Menu";
+	menu_sub_item[total]	= NULL;
+	flag_buf[total++]		= 0;
 
 	/* ##### TERMINATE ARRAY ##### */
-	menu_item[total] = NULL;
-	menu_subitem[total] = NULL;
-	flagBuf[total] = 0;
+	menu_item[total]		= NULL;
+	menu_sub_item[total]	= NULL;
+	flag_buf[total]			= 0;
 
 	/* adjust cursor position */
-	switch(isEmpty)
+	switch(is_empty)
 	{
 		default:
-			ADJUST_CURSOR(menu->sel, total)
+			ADJUST_CURSOR(menu->sel, total);
 
 			/* if cursor is on comment code, skip it */
-			while(menu->sel < total - 1 && (cheatList[menuIndex[menu->sel]].flags & kCheatFlag_Null))
+			while(menu->sel < total - 1 && (cheat_list[menu_index[menu->sel]].flags & kCheatFlag_Null))
 				menu->sel++;
 			break;
 
@@ -3336,20 +3284,38 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 				menu->sel = 0;
 	}
 
+	/* set selected item's cheat entry */
+	if(is_empty == 0 && menu->sel < total - 1)
+	{
+		entry = &cheat_list[menu_index[menu->sel]];
+
+		if(entry->flags & kCheatFlag_Null)
+			entry = NULL;
+
+		if(entry->flags & kCheatFlag_Separator)
+			entry = NULL;
+
+		if(entry->flags & kCheatFlag_RequestArrow)
+			request_arrow = 3;
+	}
+	else
+		entry = NULL;
+
 	/* draw it */
-	old_style_menu(menu_item, menu_subitem, flagBuf, menu->sel, 3);
+	old_style_menu(menu_item, menu_sub_item, flag_buf, menu->sel, request_arrow);
 
 	/********** KEY HANDLING **********/
 	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
-		switch(isEmpty)
+		switch(is_empty)
 		{
 			default:
-				CURSOR_TO_PREVIOUS(menu->sel, total)
-				if(cheatListLength)
+				CURSOR_TO_PREVIOUS(menu->sel, total);
+
+				if(cheat_list_length)
 				{
 					/* if cursor is on comment code, skip it */
-					for(i = 0; (i < fullMenuPageHeight / 2) && menu->sel != total - 1 && (cheatList[menuIndex[menu->sel]].flags & kCheatFlag_Null); i++)
+					for(i = 0; (i < fullMenuPageHeight / 2) && menu->sel != total - 1 && (cheat_list[menu_index[menu->sel]].flags & kCheatFlag_Null); i++)
 					{
 						if(--menu->sel < 0)
 							menu->sel = total - 1;
@@ -3369,14 +3335,15 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
-		switch(isEmpty)
+		switch(is_empty)
 		{
 			default:
-				CURSOR_TO_NEXT(menu->sel, total)
-				if(cheatListLength)
+				CURSOR_TO_NEXT(menu->sel, total);
+
+				if(cheat_list_length)
 				{
 					/* if cursor is on comment code, skip it */
-					for(i = 0; (i < fullMenuPageHeight / 2) && menu->sel < total - 1 && (cheatList[menuIndex[menu->sel]].flags & kCheatFlag_Null); i++)
+					for(i = 0; (i < fullMenuPageHeight / 2) && menu->sel < total - 1 && (cheat_list[menu_index[menu->sel]].flags & kCheatFlag_Null); i++)
 						menu->sel++;
 				}
 
@@ -3392,19 +3359,14 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_UP(menu->sel)
+		CURSOR_PAGE_UP(menu->sel);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_DOWN(menu->sel, total)
+		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
 
-	if(menu->sel >= 0 && menu->sel < total - 1)
-		entry = &cheatList[menuIndex[menu->sel]];
-	else
-		entry = NULL;
-
-	if(entry && !(entry->flags & kCheatFlag_Null) && !(entry->flags & kCheatFlag_ExtendComment) && !(entry->flags & kCheatFlag_HasWrongCode))
+	if(entry && (entry->flags & kCheatFlag_Null) == 0 && (entry->flags & kCheatFlag_ExtendComment) == 0&& (entry->flags & kCheatFlag_HasWrongCode) == 0)
 	{
 		UINT8 toggle = 0;
 
@@ -3412,7 +3374,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 		{
 			if(entry->flags & kCheatFlag_Select)
 			{
-				if(TEST_FIELD(entry->actionList[entry->labelIndex[0]].type, LabelSelectUseSelector))
+				if(TEST_FIELD(entry->action_list[entry->label_index[0]].type, LabelSelectUseSelector))
 				{
 					/* activate label selector */
 					cheat_menu_stack_push(user_select_label_menu, menu->handler, menu->sel);
@@ -3421,12 +3383,12 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 				{
 					/* select previous label */
 					if(--entry->selection < 0)
-						entry->selection = entry->labelIndexLength - 1;
+						entry->selection = entry->label_index_length - 1;
 
 					/* NOTE : one shot cheat should not be activated by changing label */
-					if(!entry->labelIndex[entry->selection])
+					if(entry->label_index[entry->selection] == 0)
 						DeactivateCheat(entry);
-					else if(!(entry->flags & kCheatFlag_OneShot) && !(entry->flags & kCheatFlag_Active))
+					else if((entry->flags & kCheatFlag_OneShot) == 0 && (entry->flags & kCheatFlag_Active) == 0)
 						ActivateCheat(entry);
 				}
 			}
@@ -3446,7 +3408,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 			if(entry->flags & kCheatFlag_Select)
 			{
 				/* label-selection special handling */
-				if(TEST_FIELD(entry->actionList[entry->labelIndex[0]].type, LabelSelectUseSelector))
+				if(TEST_FIELD(entry->action_list[entry->label_index[0]].type, LabelSelectUseSelector))
 				{
 					/* activate label selector */
 					cheat_menu_stack_push(user_select_label_menu, menu->handler, menu->sel);
@@ -3454,13 +3416,13 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 				else
 				{
 					/* select next label index */
-					if(++entry->selection >= entry->labelIndexLength)
+					if(++entry->selection >= entry->label_index_length)
 						entry->selection = 0;
 
 					/* NOTE : one shot cheat should not be activated by changing label */
-					if(!entry->labelIndex[entry->selection])
+					if(entry->label_index[entry->selection] == 0)
 						DeactivateCheat(entry);
-					else if(!(entry->flags & kCheatFlag_OneShot) && !(entry->flags & kCheatFlag_Active))
+					else if((entry->flags & kCheatFlag_OneShot) == 0 && (entry->flags & kCheatFlag_Active) == 0)
 						ActivateCheat(entry);
 				}
 			}
@@ -3500,10 +3462,10 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 			case 2:
 				{
 					/* go to next/previous layer level */
-					if(entry->actionList[0].data == currentLayer)
-						currentLayer = entry->actionList[0].address;
+					if(entry->action_list[0].data == current_layer)
+						current_layer = entry->action_list[0].address;
 					else
-						currentLayer = entry->actionList[0].data;
+						current_layer = entry->action_list[0].data;
 
 					entry->flags |= kCheatFlag_LayerSelected;
 				}
@@ -3516,14 +3478,14 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 
 	if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
-		if(!entry)
+		if(entry == NULL)
 		{
-			if(currentLayer)
-				currentLayer = menu->sel = 0;
+			if(current_layer)
+				current_layer = menu->sel = 0;
 			else
 				menu->sel = -1;
 		}
-		else if(!(entry->flags & kCheatFlag_Null))
+		else if((entry->flags & kCheatFlag_Null) == 0)
 		{
 			if(ShiftKeyPressed() && (entry->comment && entry->comment[0]))
 			{
@@ -3532,7 +3494,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 			}
 			else if(entry->flags & kCheatFlag_ExtendComment)
 			{
-				/* activate extend comment menu */
+				/* display extend comment */
 				cheat_menu_stack_push(extend_comment_menu, menu->handler, menu->sel);
 			}
 			else if(entry->flags & kCheatFlag_UserSelect)
@@ -3540,7 +3502,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 				/* activate value-selection menu */
 				cheat_menu_stack_push(user_select_value_menu, menu->handler, menu->sel);
 			}
-			else if((entry->flags & kCheatFlag_Select) && TEST_FIELD(entry->actionList[entry->labelIndex[0]].type, LabelSelectUseSelector))
+			else if((entry->flags & kCheatFlag_Select) && TEST_FIELD(entry->action_list[entry->label_index[0]].type, LabelSelectUseSelector))
 			{
 				/* activate label selector */
 				cheat_menu_stack_push(user_select_label_menu, menu->handler, menu->sel);
@@ -3548,10 +3510,10 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 			else if(entry->flags & kCheatFlag_LayerIndex)
 			{
 				/* go to next/previous layer level */
-				if(entry->actionList[0].data == currentLayer)
-					currentLayer = entry->actionList[0].address;
+				if(entry->action_list[0].data == current_layer)
+					current_layer = entry->action_list[0].address;
 				else
-					currentLayer = entry->actionList[0].data;
+					current_layer = entry->action_list[0].data;
 
 				entry->flags |= kCheatFlag_LayerSelected;
 			}
@@ -3572,36 +3534,32 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 		if(ShiftKeyPressed())
 		{
 			/* shift + save : save all codes */
-			for(i = 0; i < cheatListLength; i++)
-				SaveCheatCode(machine, &cheatList[i]);
+			for(i = 0; i < cheat_list_length; i++)
+				SaveCheatCode(machine, &cheat_list[i]);
 
-			messageTimer = DEFAULT_MESSAGE_TIME;
-			messageType = kCheatMessage_AllCheatSaved;
+			SET_MESSAGE(kCheatMessage_AllCheatSaved);
 		}
 		else if(ControlKeyPressed())
 		{
 			/* ctrl + save : save activation key */
-			SaveActivationKey(machine, entry, menuIndex[menu->sel]);
+			SaveActivationKey(machine, entry, menu_index[menu->sel]);
 		}
 		else if(AltKeyPressed())
 		{
 			/* alt + save : save pre-enable */
-			SavePreEnable(machine, entry, menuIndex[menu->sel]);
+			SavePreEnable(machine, entry, menu_index[menu->sel]);
 		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
 	{
-		AddCheatBefore(menuIndex[menu->sel]);
+		add_cheat_before(menu_index[menu->sel]);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
 		if(entry)
-			DeleteCheatAt(menuIndex[menu->sel]);
+			delete_cheat_at(menu_index[menu->sel]);
 		else
-		{
-			messageType		= kCheatMessage_FailedToDelete;
-			messageTimer	= DEFAULT_MESSAGE_TIME;
-		}
+			SET_MESSAGE(kCheatMessage_FailedToDelete);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))
 	{
@@ -3616,7 +3574,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 	}
 	else if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
 	{
-		ReloadCheatDatabase(machine);
+		reload_cheat_database(machine);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
@@ -3624,7 +3582,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 		menu->sel = -1;
 	}
 
-	free(menuIndex);
+	free(menu_index);
 
 	return menu->sel + 1;
 }
@@ -3636,22 +3594,22 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 static int add_edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 {
 	int				i;
-	UINT8			total			= 0;
-	const char		** menu_item;
-	CheatEntry		* entry;
+	UINT8			total = 0;
+	const char		**menu_item;
+	cheat_entry		*entry;
 
 	/* first setting : NONE */
 	if(menu->first_time)
 		menu->first_time = 0;
 
 	/* required items = total codes + return + terminator */
-	request_strings(cheatListLength + 2, 0, 0, 0);
+	request_strings(cheat_list_length + 2, 0, 0, 0);
 	menu_item = menu_strings.main_list;
 
 	/********** MENU CONSTRUCTION **********/
-	for(i = 0; i < cheatListLength; i++)
+	for(i = 0; i < cheat_list_length; i++)
 	{
-		CheatEntry * traverse = &cheatList[i];
+		cheat_entry *traverse = &cheat_list[i];
 
 		/* ##### NAME ##### */
 		if(traverse->name)
@@ -3667,32 +3625,33 @@ static int add_edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	menu_item[total] = NULL;
 
 	/* adjust cursor position */
-	ADJUST_CURSOR(menu->sel, total)
+	ADJUST_CURSOR(menu->sel, total);
 
 	/* draw it */
 	old_style_menu(menu_item, NULL, NULL, menu->sel, 0);
 
+	/* set entry for selected item if valid, otherwise null (return item) */
 	if(menu->sel < total - 1)
-		entry = &cheatList[menu->sel];
+		entry = &cheat_list[menu->sel];
 	else
 		entry = NULL;
 
 	/********** KEY HANDLING **********/
 	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_PREVIOUS(menu->sel, total)
+		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_NEXT(menu->sel, total)
+		CURSOR_TO_NEXT(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_UP(menu->sel)
+		CURSOR_PAGE_UP(menu->sel);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_DOWN(menu->sel, total)
+		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
@@ -3710,7 +3669,7 @@ static int add_edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 	else if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
 	{
-		ReloadCheatDatabase(machine);
+		reload_cheat_database(machine);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))
 	{
@@ -3726,22 +3685,21 @@ static int add_edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 	else if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
 	{
-		AddCheatBefore(menu->sel);
+		add_cheat_before(menu->sel);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
-		DeleteCheatAt(menu->sel);
+		delete_cheat_at(menu->sel);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
 	{
 		if(ShiftKeyPressed())
 		{
 			/* shift + save = save all codes */
-			for(i = 0; i < cheatListLength; i++)
-				SaveCheatCode(machine, &cheatList[i]);
+			for(i = 0; i < cheat_list_length; i++)
+				SaveCheatCode(machine, &cheat_list[i]);
 
-			messageTimer	= DEFAULT_MESSAGE_TIME;
-			messageType		= kCheatMessage_AllCheatSaved;
+			SET_MESSAGE(kCheatMessage_AllCheatSaved);
 		}
 		else if(ControlKeyPressed())
 		{
@@ -3797,7 +3755,7 @@ static int command_add_edit_menu(running_machine *machine, cheat_menu_stack *men
 	int				i;
 	UINT8			total = 0;
 	ui_menu_item	menu_item[kMenu_Max + 1];
-	CheatEntry		*entry = &cheatList[menu->pre_sel];
+	cheat_entry		*entry = &cheat_list[menu->pre_sel];
 
 	memset(menu_item, 0, sizeof(menu_item));
 
@@ -3829,7 +3787,7 @@ static int command_add_edit_menu(running_machine *machine, cheat_menu_stack *men
 	menu_item[total].text = NULL;
 
 	/* adjust cursor position */
-	ADJUST_CURSOR(menu->sel, total)
+	ADJUST_CURSOR(menu->sel, total);
 
 	/* print it */
 	ui_menu_draw(menu_item, total, menu->sel, NULL);
@@ -3837,19 +3795,19 @@ static int command_add_edit_menu(running_machine *machine, cheat_menu_stack *men
 	/********** KEY HANDLING **********/
 	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_PREVIOUS(menu->sel, total)
+		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_NEXT(menu->sel, total)
+		CURSOR_TO_NEXT(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_UP(menu->sel)
+		CURSOR_PAGE_UP(menu->sel);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_DOWN(menu->sel, total)
+		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
@@ -3863,7 +3821,7 @@ static int command_add_edit_menu(running_machine *machine, cheat_menu_stack *men
 				break;
 
 			case kMenu_ReloadDatabase:
-				ReloadCheatDatabase(machine);
+				reload_cheat_database(machine);
 				cheat_menu_stack_pop();
 				break;
 
@@ -3885,40 +3843,41 @@ static int command_add_edit_menu(running_machine *machine, cheat_menu_stack *men
 
 			case kMenu_SaveAllCodes:
 				{
-					for(i = 0; i < cheatListLength; i++)
-						SaveCheatCode(machine, &cheatList[i]);
+					for(i = 0; i < cheat_list_length; i++)
+						SaveCheatCode(machine, &cheat_list[i]);
 
-					messageTimer	= DEFAULT_MESSAGE_TIME;
-					messageType		= kCheatMessage_AllCheatSaved;
+					SET_MESSAGE(kCheatMessage_AllCheatSaved);
 				}
 				break;
 
 			case kMenu_AddCode:
-				AddCheatBefore(menu->pre_sel);
+				add_cheat_before(menu->pre_sel);
 				menu->sel = -1;
 				break;
 
 			case kMenu_DeleteCode:
-				DeleteCheatAt(menu->pre_sel);
+				delete_cheat_at(menu->pre_sel);
 				menu->sel = -1;
 				break;
 
 #ifdef MAME_DEBUG
 			case kMenu_ConvertFormat:
-				if(!(entry->flags & kCheatFlag_OldFormat))
+				if((entry->flags & kCheatFlag_OldFormat) == 0)
 				{
-					for(i = 0; i < entry->actionListLength; i++)
+					/* new -> old (UNDERCONSTRUCTION) */
+					for(i = 0; i < entry->action_list_length; i++)
 					{
-						entry->actionList[i].flags |= kActionFlag_OldFormat;
-						UpdateCheatInfo(entry, 0);
+						entry->action_list[i].flags |= kActionFlag_OldFormat;
+						update_cheat_info(entry, 0);
 					}
 				}
 				else
 				{
-					for(i = 0; i < entry->actionListLength; i++)
+					/* old -> new (UNDERCONSTRUCTION) */
+					for(i = 0; i < entry->action_list_length; i++)
 					{
-						entry->actionList[i].flags &= ~kActionFlag_OldFormat;
-						UpdateCheatInfo(entry, 0);
+						entry->action_list[i].flags &= ~kActionFlag_OldFormat;
+						update_cheat_info(entry, 0);
 					}
 				}
 				break;
@@ -3934,7 +3893,7 @@ static int command_add_edit_menu(running_machine *machine, cheat_menu_stack *men
 	}
 	else if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
 	{
-		ReloadCheatDatabase(machine);
+		reload_cheat_database(machine);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CANCEL) || input_ui_pressed(machine, IPT_UI_LEFT) || input_ui_pressed(machine, IPT_UI_RIGHT))
 	{
@@ -4736,31 +4695,31 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 		switch(info->fieldType)
 		{
-/*          case kType_ActivationKey1:
-            case kType_ActivationKey2:
-                if(info->fieldType == kType_ActivationKey1)
-                {
-                    entry->activationKey1--;
+/*			case kType_ActivationKey1:
+			case kType_ActivationKey2:
+				if(info->fieldType == kType_ActivationKey1)
+				{
+					entry->activationKey1--;
 
-                if(entry->activationKey1 < 0)
-                        entry->activationKey1 = __code_max - 1;
-                    if(entry->activationKey1 >= __code_max)
-                        entry->activationKey1 = 0;
+				if(entry->activationKey1 < 0)
+						entry->activationKey1 = __code_max - 1;
+					if(entry->activationKey1 >= __code_max)
+						entry->activationKey1 = 0;
 
-                    entry->flags |= kCheatFlag_HasActivationKey1;
-                }
-                else
-                {
-                    entry->activationKey2--;
+					entry->flags |= kCheatFlag_HasActivationKey1;
+				}
+				else
+				{
+					entry->activationKey2--;
 
-                    if(entry->activationKey2 < 0)
-                        entry->activationKey2 = __code_max - 1;
-                    if(entry->activationKey2 >= __code_max)
-                        entry->activationKey2 = 0;
+					if(entry->activationKey2 < 0)
+						entry->activationKey2 = __code_max - 1;
+					if(entry->activationKey2 >= __code_max)
+						entry->activationKey2 = 0;
 
-                    entry->flags |= kCheatFlag_HasActivationKey2;
-                }
-                break;
+					entry->flags |= kCheatFlag_HasActivationKey2;
+				}
+				break;
 */
 			case kType_Link:
 				TOGGLE_MASK_FIELD(action->type, LinkEnable);
@@ -4833,23 +4792,23 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 			break;
 
 			case kType_WatchSize:
-				action->originalDataField = (action->originalDataField & 0xFFFFFF00) | ((action->originalDataField - 0x00000001) & 0x000000FF);
-				action->data = action->originalDataField;
+				action->originalData = (action->originalData & 0xFFFFFF00) | ((action->originalData - 0x00000001) & 0x000000FF);
+				action->data = action->originalData;
 				break;
 
 			case kType_WatchSkip:
-				action->originalDataField = (action->originalDataField & 0xFFFF00FF) | ((action->originalDataField - 0x00000100) & 0x0000FF00);
-				action->data = action->originalDataField;
+				action->original_data = (action->originalData & 0xFFFF00FF) | ((action->originalData - 0x00000100) & 0x0000FF00);
+				action->data = action->originalData;
 				break;
 
 			case kType_WatchPerLine:
-				action->originalDataField = (action->originalDataField & 0xFF00FFFF) | ((action->originalDataField - 0x00010000) & 0x00FF0000);
-				action->data = action->originalDataField;
+				action->originalData = (action->originalData & 0xFF00FFFF) | ((action->originalData - 0x00010000) & 0x00FF0000);
+				action->data = action->originalData;
 				break;
 
 			case kType_WatchAddValue:
-				action->originalDataField = (action->originalDataField & 0x00FFFFFF) | ((action->originalDataField - 0x01000000) & 0xFF000000);
-				action->data = action->originalDataField;
+				action->original_data = (action->originalData & 0x00FFFFFF) | ((action->originalData - 0x01000000) & 0xFF000000);
+				action->data = action->originalData;
 				break;
 
 			case kType_WatchFormat:
@@ -4912,9 +4871,9 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 				break;
 
 			case kType_Data:
-				action->originalDataField -= 1;
-				action->originalDataField &= info->extraData;
-				action->data = action->originalDataField;
+				action->originalData -= 1;
+				action->originalData &= info->extraData;
+				action->data = action->originalData;
 				break;
 
 			case kType_UserSelect:
@@ -5036,31 +4995,31 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 		switch(info->fieldType)
 		{
-/*          case kType_ActivationKey1:
-            case kType_ActivationKey2:
-                if(info->fieldType == kType_ActivationKey1)
-                {
-                    entry->activationKey1++;
+/*			case kType_ActivationKey1:
+			case kType_ActivationKey2:
+				if(info->fieldType == kType_ActivationKey1)
+				{
+					entry->activationKey1++;
 
-                    if(entry->activationKey1 < 0)
-                        entry->activationKey1 = __code_max - 1;
-                    if(entry->activationKey1 >= __code_max)
-                        entry->activationKey1 = 0;
+					if(entry->activationKey1 < 0)
+						entry->activationKey1 = __code_max - 1;
+					if(entry->activationKey1 >= __code_max)
+						entry->activationKey1 = 0;
 
-                    entry->flags |= kCheatFlag_HasActivationKey1;
-                }
-                else
-                {
-                    entry->activationKey2++;
+					entry->flags |= kCheatFlag_HasActivationKey1;
+				}
+				else
+				{
+					entry->activationKey2++;
 
-                    if(entry->activationKey2 < 0)
-                        entry->activationKey2 = __code_max - 1;
-                    if(entry->activationKey2 >= __code_max)
-                        entry->activationKey2 = 0;
+					if(entry->activationKey2 < 0)
+						entry->activationKey2 = __code_max - 1;
+					if(entry->activationKey2 >= __code_max)
+						entry->activationKey2 = 0;
 
-                    entry->flags |= kCheatFlag_HasActivationKey2;
-                }
-                break;
+					entry->flags |= kCheatFlag_HasActivationKey2;
+				}
+				break;
 */
 			case kType_Link:
 				TOGGLE_MASK_FIELD(action->type, LinkEnable);
@@ -5133,23 +5092,23 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 			break;
 
 			case kType_WatchSize:
-				action->originalDataField = (action->originalDataField & 0xFFFFFF00) | ((action->originalDataField + 0x00000001) & 0x000000FF);
-				action->data = action->originalDataField;
+				action->originalData = (action->originalData & 0xFFFFFF00) | ((action->originalData + 0x00000001) & 0x000000FF);
+				action->data = action->originalData;
 				break;
 
 			case kType_WatchSkip:
-				action->originalDataField = (action->originalDataField & 0xFFFF00FF) | ((action->originalDataField + 0x00000100) & 0x0000FF00);
-				action->data = action->originalDataField;
+				action->originalData = (action->originalData & 0xFFFF00FF) | ((action->originalData + 0x00000100) & 0x0000FF00);
+				action->data = action->originalData;
 				break;
 
 			case kType_WatchPerLine:
-				action->originalDataField = (action->originalDataField & 0xFF00FFFF) | ((action->originalDataField + 0x00010000) & 0x00FF0000);
-				action->data = action->originalDataField;
+				action->originalData = (action->originalData & 0xFF00FFFF) | ((action->originalData + 0x00010000) & 0x00FF0000);
+				action->data = action->originalData;
 				break;
 
 			case kType_WatchAddValue:
-				action->originalDataField = (action->originalDataField & 0x00FFFFFF) | ((action->originalDataField + 0x01000000) & 0xFF000000);
-				action->data = action->originalDataField;
+				action->originalData = (action->originalData & 0x00FFFFFF) | ((action->originalData + 0x01000000) & 0xFF000000);
+				action->data = action->originalData;
 				break;
 
 			case kType_WatchFormat:
@@ -5218,9 +5177,9 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 				break;
 
 			case kType_Data:
-				action->originalDataField += 1;
-				action->originalDataField &= info->extraData;
-				action->data = action->originalDataField;
+				action->originalData += 1;
+				action->originalData &= info->extraData;
+				action->data = action->originalData;
 				break;
 
 			case kType_UserSelect:
@@ -5491,47 +5450,47 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 			case kType_WatchSize:
 			{
-				UINT32 temp = (action->originalDataField >> 0) & 0xFF;
+				UINT32 temp = (action->originalData >> 0) & 0xFF;
 
 				temp++;
 				temp = do_edit_hex_field(machine, temp) & 0xFF;
 				temp--;
 
-				action->originalDataField = (action->originalDataField & 0xFFFFFF00) | ((temp << 0) & 0x000000FF);
-				action->data = action->originalDataField;
+				action->originalData = (action->originalData & 0xFFFFFF00) | ((temp << 0) & 0x000000FF);
+				action->data = action->originalData;
 			}
 			break;
 
 			case kType_WatchSkip:
 			{
-				UINT32 temp = (action->originalDataField >> 8) & 0xFF;
+				UINT32 temp = (action->originalData >> 8) & 0xFF;
 
 				temp = do_edit_hex_field(machine, temp) & 0xFF;
 
-				action->originalDataField = (action->originalDataField & 0xFFFF00FF) | ((temp << 8) & 0x0000FF00);
-				action->data = action->originalDataField;
+				action->originalData = (action->originalData & 0xFFFF00FF) | ((temp << 8) & 0x0000FF00);
+				action->data = action->originalData;
 			}
 			break;
 
 			case kType_WatchPerLine:
 			{
-				UINT32 temp = (action->originalDataField >> 16) & 0xFF;
+				UINT32 temp = (action->originalData >> 16) & 0xFF;
 
 				temp = do_edit_hex_field(machine, temp) & 0xFF;
 
-				action->originalDataField = (action->originalDataField & 0xFF00FFFF) | ((temp << 16) & 0x00FF0000);
-				action->data = action->originalDataField;
+				action->originalData = (action->originalData & 0xFF00FFFF) | ((temp << 16) & 0x00FF0000);
+				action->data = action->originalData;
 			}
 			break;
 
 			case kType_WatchAddValue:
 			{
-				UINT32 temp = (action->originalDataField >> 24) & 0xFF;
+				UINT32 temp = (action->originalData >> 24) & 0xFF;
 
 				temp = DoEditHexFieldSigned(temp, 0xFFFFFF80) & 0xFF;
 
-				action->originalDataField = (action->originalDataField & 0x00FFFFFF) | ((temp << 24) & 0xFF000000);
-				action->data = action->originalDataField;
+				action->originalData = (action->originalData & 0x00FFFFFF) | ((temp << 24) & 0xFF000000);
+				action->data = action->originalData;
 			}
 			break;
 
@@ -5588,9 +5547,9 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 			break;
 
 			case kType_Data:
-				action->originalDataField = do_edit_hex_field(machine, action->originalDataField);
-				action->originalDataField &= info->extraData;
-				action->data = action->originalDataField;
+				action->originalData = do_edit_hex_field(machine, action->originalData);
+				action->originalData &= info->extraData;
+				action->data = action->originalData;
 				break;
 
 			case kType_Address:
@@ -5615,9 +5574,9 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 			entry->actionList[info->sub_cheat].extendData = ~0;
 
-			for(i = 0; i < entry->actionListLength; i++)
+			for(i = 0; i < entry->action_list_length; i++)
 			{
-				CheatAction * action = &entry->actionList[i];
+				cheat_action *action = &entry->action_list[i];
 
 				if(i)
 					SET_MASK_FIELD(action->type, LinkEnable);
@@ -5630,8 +5589,7 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 			if(!info->sub_cheat)
 			{
 				/* don't delete MASTER Action due to crash */
-				messageTimer = DEFAULT_MESSAGE_TIME;
-				messageType = kCheatMessage_FailedToDelete;
+				SET_MESSAGE(kCheatMessage_FailedToDelete);
 			}
 			else
 				DeleteActionAt(entry, info->sub_cheat);
@@ -5651,7 +5609,7 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		if(entry->flags & kCheatFlag_Select)
 			BuildLabelIndexTable(entry);
 
-		CheckCodeFormat(entry);
+		check_code_format(entry);
 
 		editActive = 0;
 		dirty = 1;
@@ -5674,52 +5632,75 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		"Program", "Data Space", "I/O Space", "Opcode RAM", "Mapped Memory", "Direct Memory", "EEPROM" };
 
 	static const char *const kCodeTypeNames[] = {
-		"Write", "PDWWrite", "RWrite", "IWrite", "CWrite", "VWrite", "VRWrite", "Move", "Branch", "Loop",
-		"Unused 1", "Unused 2", "Unused 3", "Unused 4",
-		"Popup", "Watch" };
+		"Write", "IWrite", "RWrite", "CWrite", "CBit", "PDWWrite", "Move", "Branch", "Loop", "Popup", "Watch" };
 
 	static const char *const kCustomCodeTypeNames[] = {
-		"No Action", "Comment", "Separator", "Label Select", "Layer",
+		"NOP", "Comment", "Separator", "Label Select", "Layer Tag",
 		"Unused 1", "Unused2", "Unused 3",
 		/* NOTE : the following command codes should be removed when database is loaded */
 		"Activation Key 1", "Activation Key 2", "Pre-enable", "Overclock", "Refresh Rate" };
 
+	static const char *const kIWriteParameterNames[] = {
+		"Write", "Bit Set", "Bit Clear", "Limited Mask" };
+
+	static const char *const kCBitParameterNames[] = {
+		"Bit Set", "Bit Clear", "Limited Mask" };
+
 	static const char *const kConditionNames[] = {
-		"EQ", "NE", "LS", "LSEQ", "GR", "GREQ", "BSET", "BCLR",
+		"Equal", "Not Equal", "Less", "Less or Equal", "Greater", "Greater or Equal", "Bit Set", "Bit Clear",
 		"Unused 1", "Unused 2", "Unused 3", "Unused 4",
-		"PVAL", "KEY", "KEYR", "TRUE" };
+		"Previous Value", "Key Pressed", "Key Hold", "TRUE" };
+
+	static const char *const kCBitConditionNames[] = {
+		"Bis Set", "Bit Clear" };
 
 	static const char *const kDataNames[] = {
-		"Data", "1st Data", "Data", "Data", "Data", "Max Data", "Max Data", "Add Value", "Comparison", "Count",
-		"-----", "-----", "-----", "-----",
-		"Comparison", "-----" };
+		"Data", "Data", "Data", "Data", "Bit", "1st Data", "Add Value", "Jump Index", "-----", "-----", "-----" };
 
 	static const char *const kPopupOptionNames[] = {
 		"Label", "Value", "Label + Value", "Value + Label" };
 
 	enum{
-		kViewMenu_Header = 1,						// format : total index / current index
-		kViewMenu_CodeLayer,						// internal value of code and layer index
-		kViewMenu_Name,								// master code = entry->name, linked code = action->optionalName
+		kViewMenu_Header = 1,						/* format : [total index / current index] */
+		kViewMenu_Layer,							/* internal value of code and layer index */
+		kViewMenu_Name,								/* master code = entry->name, linked code = action->optionalName */
 			kViewMenu_Comment,
 			kViewMenu_ActivationKey1,
 			kViewMenu_ActivationKey2,
-		// if(!CustomCode)
-			kViewMenu_CodeType,							// CodeType - CodeParameter / Return
-			kViewMenu_CPURegion,						// add Address Space if CPU region
+		/* if(CustomCode == 0) */
+			kViewMenu_CPURegion,					/* add address space if CPU region */
+			kViewMenu_CodeType,
+			/* if(CodeType == IWrite) */
+				kViewMenu_IWriteParameter,
+			/* if(CodeType == CWrite, CBit, Branch, Popup) */
+				kViewMenu_Condition,
+			/* if(CodeType == CBit) */
+				kViewMenu_CBitParameter,
+				kViewMenu_CBitCondition,
+			/* if(CodeType == Watch) */
+				kViewMenu_WatchParameter,
+			/* if(CodeType == Popup) */
+				kViewMenu_PopupParameter,
+			/* if(CodeType == RWrite, CWrite, CBit, Branch, Popup */
+				kViewMenu_Extend,
 			kViewMenu_Address,
-			kViewMenu_Size,								// address size / index size
+			kViewMenu_AddressSize,
+			/* if(CodeType == IWrite, Move) */
+				kViewMenu_IndexOffset,
+				kViewMenu_IndexAddressSize,
+			/* if(CodeType == Move) */
+				kViewMenu_MoveParameter,			/* variable 0-3 */
 			kViewMenu_Data,
-			kViewMenu_Extend,
-			// if(ValueSelect)
+			/* if(LimitedMask) */
+				kViewMenu_LimitedMask,				/* for IWrite, CBit */
+			/* if(CodeType == PDWWRite) */
+				kViewMenu_SubData,
+				kViewMenu_SubDataSize,
+			/* if(ValueSelect) */
 				kViewMenu_ValueSelectOptions,
-			// if(Popup)
-				kViewMenu_PopupOptions,
-			// if(CopyLink)
-				kViewMenu_CopyLinkOptions,
-			kViewMenu_Options,							// One-shot, Delay, Prefill, RestoreValue
-		// if(CustomCode)
-			//if(LayerIndex)
+			kViewMenu_Options,						/* One-shot, Delay, Return, Prefill, RestoreValue */
+		/* if(CustomCode) */
+			/* if(LayerIndex) */
 				kViewMenu_LayerDisplayLevel,
 				kViewMenu_LayerSetLevel,
 				kViewMenu_LayerSetLength,
@@ -5729,25 +5710,29 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	int				total = 0;
 	int				menu_index[kViewMenu_Max] = { 0 };
 	static int		page_index = 0;
-	UINT8			address_length = 0;
-	UINT8			address_size = 0;
-	const char		** menu_item;
-	const char		** menu_sub_item;
-	char			* flag_buf;
-	char			* header;
-	char			* buf_code;
-	char			* buf_type;
-	char			* buf_cpu;
-	char			* buf_address;
-	char			* buf_size;
-	char			* buf_data;
-	char			* buf_extend;
-	char			* buf_options;
-	char			* buf_code_type_options;
-	CheatEntry		* entry = &cheatList[menu->pre_sel];
-	CheatAction		* action = NULL;
-	astring			* activation_key_string1 = NULL;
-	astring			* activation_key_string2 = NULL;
+	INT8			code_type = 0;
+	INT8			address_length = 0;
+	INT8			address_size = 0;
+	INT8			request_arrow = 0;
+	const char		**menu_item;
+	const char		**menu_sub_item;
+	char			*flag_buf;
+	char			*header;
+	char			*buf_code;
+	char			*buf_type;
+	char			*buf_cpu;
+	char			*buf_address;
+	char			*buf_size;
+	char			*buf_sub_size;
+	char			*buf_data;
+	char			*buf_extend;
+	char			*buf_limited_mask;
+	char			*buf_options;
+	char			*buf_code_type_options;
+	cheat_entry		*entry = &cheat_list[menu->pre_sel];
+	cheat_action	*action = NULL;
+	astring			*activation_key_string1 = NULL;
+	astring			*activation_key_string2 = NULL;
 
 	/* first setting : forced set page as 0 when first open */
 	if(menu->first_time)
@@ -5756,44 +5741,45 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		menu->first_time = 0;
 	}
 
-	action			= &entry->actionList[page_index];
+	action			= &entry->action_list[page_index];
+	code_type		= EXTRACT_FIELD(action->type, CodeType);
 	address_length	= get_address_length(action->region);
 	address_size	= EXTRACT_FIELD(action->type, AddressSize);
 
-	/* required items = (total items + return + terminator) & (strings buf * 10) */
-	request_strings(kViewMenu_Max + 2, 0x0A, 32, 0);
+	/* required items = (total items + return + terminator) + (strings buf * 12) */
+	request_strings(kViewMenu_Max + 2, 12, 32, 0);
 	menu_item				= menu_strings.main_list;
 	menu_sub_item			= menu_strings.sub_list;
 	flag_buf				= menu_strings.flag_list;
 	header					= menu_strings.main_strings[0];
 	buf_code				= menu_strings.main_strings[1];
-	buf_type				= menu_strings.main_strings[2];
+	buf_type				= menu_strings.main_strings[1];
 	buf_cpu					= menu_strings.main_strings[3];
 	buf_address				= menu_strings.main_strings[4];
 	buf_size				= menu_strings.main_strings[5];
-	buf_data				= menu_strings.main_strings[6];
-	buf_extend				= menu_strings.main_strings[7];
-	buf_options				= menu_strings.main_strings[8];
-	buf_code_type_options	= menu_strings.main_strings[9];
+	buf_sub_size			= menu_strings.main_strings[6];
+	buf_data				= menu_strings.main_strings[7];
+	buf_extend				= menu_strings.main_strings[8];
+	buf_limited_mask		= menu_strings.main_strings[9];
+	buf_options				= menu_strings.main_strings[10];
+	buf_code_type_options	= menu_strings.main_strings[11];
 
 	memset(flag_buf, 0, kViewMenu_Max + 2);
 
 	/********** MENU CONSTRUCTION **********/
 	/* ##### HEADER ##### */
-	sprintf(header, "[%2.2d/%2.2d]", page_index + 1, entry->actionListLength);
+	sprintf(header, "%2.2d/%2.2d", page_index + 1, entry->action_list_length);
 	ADD_MENU_3_ITEMS("Page", header, kViewMenu_Header);
 
-	/* ##### CODE / LAYER INDEX ##### */
-	sprintf(buf_code, "%8.8X / %2.2X", action->type, entry->layerIndex);
-	ADD_MENU_3_ITEMS("Code / Layer", buf_code, kViewMenu_CodeLayer);
+	/* ##### LAYER INDEX ##### */
+	sprintf(buf_code, "%2.2X", entry->layer_index);
+	ADD_MENU_3_ITEMS("Layer Index", buf_code, kViewMenu_Layer);
 
 	/* ##### NAME ##### */
 	if(entry->name)
 	{
-		if(page_index)
-			ADD_MENU_3_ITEMS("Name", action->optionalName, kViewMenu_Name);
-		else
-			ADD_MENU_3_ITEMS("Name", entry->name, kViewMenu_Name);
+		/* NOTE : master code is from cheat entry and others are from cheat action */
+		ADD_MENU_3_ITEMS("Name", page_index ? action->optional_name : entry->name, kViewMenu_Name);
 	}
 	else
 		ADD_MENU_3_ITEMS("Name", "< none >", kViewMenu_Name);
@@ -5808,7 +5794,13 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		if(entry->flags & kCheatFlag_HasActivationKey1)
 		{
 			activation_key_string1 = astring_alloc();
-			ADD_MENU_3_ITEMS("Activation Key", astring_c(input_code_name(activation_key_string1, entry->activationKey1)), kViewMenu_ActivationKey1);
+			ADD_MENU_3_ITEMS("Activation Key - Prev", astring_c(input_code_name(activation_key_string1, entry->activation_key1)), kViewMenu_ActivationKey1);
+		}
+
+		if(entry->flags & kCheatFlag_HasActivationKey2)
+		{
+			activation_key_string2 = astring_alloc();
+			ADD_MENU_3_ITEMS("Activation Key - Next", astring_c(input_code_name(activation_key_string2, entry->activation_key2)), kViewMenu_ActivationKey2);
 		}
 	}
 	else
@@ -5816,14 +5808,22 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		if(entry->flags & kCheatFlag_HasActivationKey1)
 		{
 			activation_key_string1 = astring_alloc();
-			ADD_MENU_3_ITEMS("Activation Key - Prev", astring_c(input_code_name(activation_key_string1, entry->activationKey1)), kViewMenu_ActivationKey1);
+			ADD_MENU_3_ITEMS("Activation Key", astring_c(input_code_name(activation_key_string1, entry->activation_key1)), kViewMenu_ActivationKey1);
 		}
+	}
 
-		if(entry->flags & kCheatFlag_HasActivationKey2)
+	/* ##### CPU/REGION ##### */
+	if((action->flags & kActionFlag_Custom) == 0)
+	{
+		if(action->region < REGION_INVALID)
 		{
-			activation_key_string2 = astring_alloc();
-			ADD_MENU_3_ITEMS("Activation Key - Next", astring_c(input_code_name(activation_key_string2, entry->activationKey2)), kViewMenu_ActivationKey2);
+			/* cpu region */
+			sprintf(buf_cpu, "%s (%s)", kRegionNames[EXTRACT_FIELD(action->region, CPUIndex) + 1], kAddressSpaceNames[EXTRACT_FIELD(action->region, AddressSpace)]);
+			ADD_MENU_3_ITEMS("CPU", buf_cpu, kViewMenu_CPURegion);
 		}
+		else
+			/* non-cpu region */
+			ADD_MENU_3_ITEMS("Region", kRegionNames[action->region - REGION_INVALID], kViewMenu_CPURegion);
 	}
 
 	/* ##### CODE TYPE ##### */
@@ -5833,184 +5833,186 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 	else
 	{
-		char * type_strings = buf_type;
-
-		type_strings += sprintf(type_strings, "%s", kCodeTypeNames[EXTRACT_FIELD(action->type, CodeType)]);
-
-		if(action->flags & kActionFlag_CheckCondition)
-			type_strings += sprintf(type_strings, "-%s", kConditionNames[EXTRACT_FIELD(action->type, CodeParameter)]);
-
-		if(TEST_FIELD(action->type, Return))
-			type_strings += sprintf(type_strings, "/Ret");
-
-		ADD_MENU_3_ITEMS("Type", buf_type, kViewMenu_CodeType);
+		ADD_MENU_3_ITEMS("Code Type", kCodeTypeNames[code_type], kViewMenu_CodeType);
 	}
 
 	if((action->flags & kActionFlag_Custom) == 0)
 	{
-		/* ##### CPU/REGION ##### */
-		if(TEST_FIELD(action->region, RegionFlag))
+		/* ##### CODE PARAMETER ##### */
+		if(code_type == kCodeType_IWrite)
 		{
-			ADD_MENU_3_ITEMS("Region", kRegionNames[EXTRACT_FIELD(action->region, RegionIndex)], kViewMenu_CPURegion);
+			/* writing parameter */
+			ADD_MENU_3_ITEMS("Parameter", kIWriteParameterNames[EXTRACT_FIELD(action->type, CodeParameterUpper)], kViewMenu_IWriteParameter);
 		}
-		else
+
+		if(code_type == kCodeType_RWrite)
 		{
-			sprintf(buf_cpu, "%s (%s)", kRegionNames[EXTRACT_FIELD(action->region, CPUIndex) + 1], kAddressSpaceNames[EXTRACT_FIELD(action->region, AddressSpace)]);
-			ADD_MENU_3_ITEMS("CPU", buf_cpu, kViewMenu_CPURegion);
+			/* repeat parameter */
+			sprintf(buf_extend, "%4.4X / %4.4X",
+						EXTRACT_FIELD(action->extend_data, LSB16),
+						EXTRACT_FIELD(action->extend_data, MSB16));
+			ADD_MENU_3_ITEMS("Count / Skip", buf_extend, kViewMenu_Extend);
+		}
+
+		if(action->flags & kActionFlag_CheckCondition)
+		{
+			if(code_type == kCodeType_CBit)
+			{
+				/* bit parameter for CBit */
+				ADD_MENU_3_ITEMS("Parameter", kCBitParameterNames[EXTRACT_FIELD(action->type, CodeParameterUpper)], kViewMenu_CBitParameter);
+
+				/* bit condition for CBit */
+				ADD_MENU_3_ITEMS("Condition", kCBitConditionNames[EXTRACT_FIELD(action->type, CodeParameterLower)], kViewMenu_CBitCondition);
+
+			}
+			else
+			{
+				/* condition for CWrite, Branch, Popup */
+				ADD_MENU_3_ITEMS("Condition", kConditionNames[EXTRACT_FIELD(action->type, CodeParameter)], kViewMenu_Condition);
+			}
+
+			sprintf(buf_extend, "%*.*X", kCheatSizeDigitsTable[address_size], kCheatSizeDigitsTable[address_size], action->extend_data);
+
+			ADD_MENU_3_ITEMS("Comparison", buf_extend, kViewMenu_Extend);
+		}
+
+		if(code_type == kCodeType_Popup)
+		{
+			/* popup parameter */
+			ADD_MENU_3_ITEMS("Parameter", kPopupOptionNames[EXTRACT_FIELD(action->type, PopupParameter)], kViewMenu_PopupParameter);
 		}
 
 		/* ##### ADDRESS ##### */
 		switch(EXTRACT_FIELD(action->type, AddressRead))
 		{
 			case kReadFrom_Address:
-				sprintf(buf_address, "%*.*X", address_length, address_length, action->originalAddress);
+				sprintf(buf_address, "%*.*X", address_length, address_length, action->original_address);
 				break;
 
 			case kReadFrom_Index:
-				sprintf(buf_address, "(V%s)", kNumbersTable[action->originalAddress]);
+				sprintf(buf_address, "(V%s)", kNumbersTable[action->original_address]);
 				break;
 
 			case kReadFrom_Variable:
-				sprintf(buf_address, "V%s", kNumbersTable[action->originalAddress]);
+				sprintf(buf_address, "V%s", kNumbersTable[action->original_address]);
 		}
 
 		ADD_MENU_3_ITEMS("Address", buf_address, kViewMenu_Address);
 
 		/* ##### SIZE ##### */
-		if(action->flags & kActionFlag_PDWWrite)
-		{
-			sprintf(buf_size, "%s / %s", kByteSizeStringList[address_size], kByteSizeStringList[EXTRACT_FIELD(action->type, IndexSize)]);
-			ADD_MENU_3_ITEMS("Size 1st / 2nd", buf_size, kViewMenu_Size);
-		}
-		else if(action->flags & kActionFlag_IndexAddress)
-		{
-			if(action->extendData != ~0)
-			{
-				sprintf(buf_size, "%s / %s", kByteSizeStringList[address_size], kByteSizeStringList[EXTRACT_FIELD(action->type, IndexSize)]);
-			}
-			else
-				sprintf(buf_size, "%s / < None >", kByteSizeStringList[address_size]);
+		sprintf(buf_size, "%s", kByteSizeStringList[address_size]);
+		ADD_MENU_3_ITEMS("Size", buf_size, kViewMenu_AddressSize);
 
-			ADD_MENU_3_ITEMS("Size Adr / Idx", buf_size, kViewMenu_Size);
-		}
-		else
+		/* ##### INDEX ##### */
+		if(action->flags & kActionFlag_IndexAddress)
 		{
-			sprintf(buf_size, "%s", kByteSizeStringList[address_size]);
-			ADD_MENU_3_ITEMS("Size", buf_size, kViewMenu_Size);
+			/* index offset for IWrite, Move */
+			sprintf(buf_extend, "%*.*X", address_length, address_length, action->extend_data);
+			ADD_MENU_3_ITEMS("Index Offset", buf_extend, kViewMenu_IndexOffset);
+
+			/* index size for IWrite, Move */
+			sprintf(buf_sub_size, "%s", kByteSizeStringList[EXTRACT_FIELD(action->type, CodeParameterLower)]);
+			ADD_MENU_3_ITEMS("Index Size", buf_sub_size, kViewMenu_IndexAddressSize);
+		}
+
+		/* ##### DESTINATION ##### */
+		if(code_type == kCodeType_Move)
+		{
+			sprintf(buf_type, "%s", kNumbersTable[EXTRACT_FIELD(action->type, CodeParameterUpper)]);
+			ADD_MENU_3_ITEMS("Destination", buf_type, kViewMenu_MoveParameter);
 		}
 
 		/* ##### DATA ##### */
-		if(EXTRACT_FIELD(action->type, CodeType) != kCodeType_Watch)
+		if(code_type != kCodeType_Watch)
 		{
-			if(TEST_FIELD(action->type, DataRead))
+			if(action->flags & kActionFlag_LimitedMask)
 			{
-				sprintf(buf_data, "V%s", kNumbersTable[action->originalDataField]);
+				/* NOTE : data is upper 2 bytes from data field in case of limite mask */
+				if(TEST_FIELD(action->type, DataRead))
+					sprintf(buf_data, "V%s", kNumbersTable[EXTRACT_FIELD(action->original_data, MSB16)]);
+				else
+					sprintf(buf_data, "%*.*X", kCheatSizeDigitsTable[address_size], kCheatSizeDigitsTable[address_size], EXTRACT_FIELD(action->original_data, MSB16));
 			}
 			else
 			{
-				sprintf(buf_data, "%*.*X", kCheatSizeDigitsTable[address_size], kCheatSizeDigitsTable[address_size], action->originalDataField);
+				if(TEST_FIELD(action->type, DataRead))
+					sprintf(buf_data, "V%s", kNumbersTable[action->original_data]);
+				else
+					sprintf(buf_data, "%*.*X", kCheatSizeDigitsTable[address_size], kCheatSizeDigitsTable[address_size], action->original_data);
 			}
 
-			if(EXTRACT_FIELD(action->type, Link) != kLink_CopyLink)
-				ADD_MENU_3_ITEMS(kDataNames[EXTRACT_FIELD(action->type, CodeType)], buf_data, kViewMenu_Data);
-			else
-				ADD_MENU_3_ITEMS("Add Value", buf_data, kViewMenu_Data);
+			ADD_MENU_3_ITEMS(kDataNames[EXTRACT_FIELD(action->type, CodeType)], buf_data, kViewMenu_Data);
 		}
 
-		/* ##### EXTEND DATA ##### */
-		if(action->flags & kActionFlag_IndexAddress)
+		/* ##### MASK ##### */
+		if(code_type == kCodeType_Write)
 		{
-			if(action->extendData != ~0)
-				sprintf(buf_extend, "%*.8X", address_length, action->extendData);
-			else
-				sprintf(buf_extend, "< none >");
-
-			ADD_MENU_3_ITEMS("Index", buf_extend, kViewMenu_Extend);
+			sprintf(buf_extend, "%*.*X", address_size, address_size, action->extend_data);
+			ADD_MENU_3_ITEMS("Mask", buf_extend, kViewMenu_Extend);
 		}
-		else if(action->flags & kActionFlag_PDWWrite)
+		else if(action->flags & kActionFlag_LimitedMask)
 		{
+			/* NOTE : mask is lower 2 bytes from data field in case of limited mask */
+			sprintf(buf_limited_mask, "%*.*X", address_size, address_size, EXTRACT_FIELD(action->original_data, LSB16));
+			ADD_MENU_3_ITEMS("Mask", buf_limited_mask, kViewMenu_LimitedMask);
+		}
+
+		/* ##### SUB DATA ##### */
+		if(code_type == kCodeType_PDWWrite)
+		{
+			/* 2nd data */
 			sprintf(buf_extend, "%*.*X",
-				kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, IndexSize)],
-				kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, IndexSize)],
-				action->extendData);
+				kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, CodeParameterLower)],
+				kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, CodeParameterLower)],
+				action->extend_data);
 			ADD_MENU_3_ITEMS("2nd Data", buf_extend, kViewMenu_Extend);
+
+			/* 2nd data size */
+			sprintf(buf_sub_size, "%s", kByteSizeStringList[EXTRACT_FIELD(action->type, CodeParameterLower)]);
+			ADD_MENU_3_ITEMS("2nd Data Size", buf_sub_size, kViewMenu_SubDataSize);
 		}
-		else if(action->flags & kActionFlag_Repeat)
+
+		/* ##### JUMP INDEX ##### */
+		if(code_type == kCodeType_Branch)
 		{
-			sprintf(buf_extend, "%4.4X / %4.4X",
-						EXTRACT_FIELD(action->extendData, LSB16),
-						EXTRACT_FIELD(action->extendData, MSB16));
-			ADD_MENU_3_ITEMS("Count / Skip", buf_extend, kViewMenu_Extend);
-		}
-		else
-		{
-			switch(EXTRACT_FIELD(action->type, CodeType))
-			{
-				case kCodeType_Write:
-				case kCodeType_IWrite:
-				case kCodeType_VWrite:
-					sprintf(buf_extend, "%*.*X", address_size, address_size, action->extendData);
-					ADD_MENU_3_ITEMS("Mask", buf_extend, kViewMenu_Extend);
-					break;
-
-				case kCodeType_CWrite:
-					sprintf(buf_extend, "%*.*X", address_size, address_size, action->extendData);
-					ADD_MENU_3_ITEMS("Comparison", buf_extend, kViewMenu_Extend);
-					break;
-
-				case kCodeType_Branch:
-					sprintf(buf_extend, "%2.2d", action->extendData + 1);
-					ADD_MENU_3_ITEMS("Jump Index", buf_extend, kViewMenu_Extend);
-					break;
-
-				default:
-					ADD_MENU_3_ITEMS("UNKNOWN", "?????", kViewMenu_Extend);
-			}
+			/* jump index for branch */
+			sprintf(buf_extend, "%2.2d", action->extend_data + 1);
+			ADD_MENU_3_ITEMS("Jump Index", buf_extend, kViewMenu_Extend);
 		}
 
 		/* ##### OPTIONS ##### */
-		sprintf(buf_options, "%s %s %s %s",
-					TEST_FIELD(action->type, OneShot) ? "O" : "-",
-					TEST_FIELD(action->type, DelayEnable) ? "D" : "-",
-					TEST_FIELD(action->type, PrefillEnable) ? "P" : "-",
-					TEST_FIELD(action->type, RestoreValue) ? "R" : "-");
+		sprintf(buf_options, "%s %s %s %s %s",
+					TEST_FIELD(action->type, OneShot) ? "One" : "-",
+					TEST_FIELD(action->type, DelayEnable) ? "Del" : "-",
+					TEST_FIELD(action->type, PrefillEnable) ? "Pre" : "-",
+					TEST_FIELD(action->type, Return) ? "Ret" : "-",
+					TEST_FIELD(action->type, RestoreValue) ? "Rst" : "-");
 		ADD_MENU_3_ITEMS("Options", buf_options, kViewMenu_Options);
 
 		/* ##### CODE TYPE OPTIONS ##### */
-		if(	EXTRACT_FIELD(action->type, CodeType) == kCodeType_VWrite ||
-			EXTRACT_FIELD(action->type, CodeType) == kCodeType_VRWrite)
+		if(TEST_FIELD(action->type, ValueSelectEnable))
 		{
 			sprintf(buf_code_type_options, "%s %s %s %s",
-						TEST_FIELD(action->type, ValueSelectMinimumDisplay) ? "D" : "-",
-						TEST_FIELD(action->type, ValueSelectMinimum) ? "M" : "-",
-						TEST_FIELD(action->type, ValueSelectBCD) ? "B" : "-",
-						TEST_FIELD(action->type, ValueSelectNegative) ? "N" : "-");
+						TEST_FIELD(action->type, ValueSelectMinimumDisplay) ? "MinD" : "-",
+						TEST_FIELD(action->type, ValueSelectMinimum) ? "Min" : "-",
+						TEST_FIELD(action->type, ValueSelectBCD) ? "BCD" : "-",
+						TEST_FIELD(action->type, ValueSelectNegative) ? "Neg" : "-");
 			ADD_MENU_3_ITEMS("Value Select Options", buf_code_type_options, kViewMenu_ValueSelectOptions);
-		}
-		else if(EXTRACT_FIELD(action->type, CodeType) == kCodeType_Popup)
-		{
-			ADD_MENU_3_ITEMS("Popup Options", kPopupOptionNames[EXTRACT_FIELD(action->type, PopupParameter)], kViewMenu_PopupOptions);
-		}
-		else if(EXTRACT_FIELD(action->type, Link) == kLink_CopyLink)
-		{
-			sprintf(buf_code_type_options, "%s %s",
-						TEST_FIELD(action->type, LinkValueSelectBCD) ? "B" : "-",
-						TEST_FIELD(action->type, LinkValueSelectNegative) ? "N" : "-");
-			ADD_MENU_3_ITEMS("Copy Link Options", buf_code_type_options, kViewMenu_CopyLinkOptions);
 		}
 	}
 	else
 	{
-		if(EXTRACT_FIELD(action->type, CodeType) == kCustomCode_Layer)
+		/* ##### CUSTOM CODE PARAMETER ##### */
+		if(EXTRACT_FIELD(action->type, CodeType) == CUSTOM_CODE_LAYER_TAG)
 		{
-			/* ##### LAYER ##### */
-			sprintf(buf_address, "%2.2X", action->originalAddress);
+			/* ##### LAYER TAG ##### */
+			sprintf(buf_address, "%2.2X", action->original_address);
 			ADD_MENU_3_ITEMS("Display Level", buf_address, kViewMenu_LayerDisplayLevel);
 
-			sprintf(buf_data, "%2.2X", action->originalDataField);
+			sprintf(buf_data, "%2.2X", action->original_data);
 			ADD_MENU_3_ITEMS("Set Level", buf_data, kViewMenu_LayerSetLevel);
 
-			sprintf(buf_extend, "%2.2X", action->extendData);
+			sprintf(buf_extend, "%2.2X", action->extend_data);
 			ADD_MENU_3_ITEMS("Set Length", buf_extend, kViewMenu_LayerSetLength);
 		}
 	}
@@ -6022,37 +6024,43 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	TERMINATE_MENU_2_ITEMS;
 
 	/* adjust current cursor position */
-	ADJUST_CURSOR(menu->sel, total)
+	ADJUST_CURSOR(menu->sel, total);
+
+	if(menu_index[menu->sel] == kViewMenu_Header)
+	{
+		if(entry->action_list_length > 1)
+			request_arrow = 3;
+	}
 
 	/* draw it */
-	old_style_menu(menu_item, menu_sub_item, flag_buf, menu->sel, 0);
+	old_style_menu(menu_item, menu_sub_item, flag_buf, menu->sel, request_arrow);
 
 	/********** KEY HANDLING **********/
 	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_PREVIOUS(menu->sel, total)
+		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_NEXT(menu->sel, total)
+		CURSOR_TO_NEXT(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
 	{
 		if(--page_index < 0)
-			page_index = entry->actionListLength - 1;
+			page_index = entry->action_list_length - 1;
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
 	{
-		if(++page_index > entry->actionListLength - 1)
+		if(++page_index > entry->action_list_length - 1)
 			page_index = 0;
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_UP(menu->sel)
+		CURSOR_PAGE_UP(menu->sel);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_DOWN(menu->sel, total)
+		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SELECT) || input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
@@ -6088,11 +6096,11 @@ static int analyse_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		"Missing Restore Previous Value flag",
 		"Missing label link code",
 		"Both Value and Label Select are defined",
-		"Copy Link is defined though no value-select code",
 		"Invalid Data Field",
 		"Invalid Extend Data Field",
 		"Don't set Variable in this type",
 		"Value Select can't select any value",
+		"Limited Mask is over length",
 		"RWrite doesn't have counter",
 		"Invalid Address Read",
 		"Invalid Variable in address field",
@@ -6105,75 +6113,75 @@ static int analyse_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 	int				i, j;
 	int				total			= 0;
-	UINT8			isEdit			= 0;
-	const char		** menuItem;
-	CheatEntry		* entry			= &cheatList[menu->pre_sel];
+	UINT8			is_edit			= 0;
+	const char		**menu_item;
+	cheat_entry		*entry			= &cheat_list[menu->pre_sel];
 
 	/* first setting : NONE */
 	if(menu->first_time)
 		menu->first_time = 0;
 
 	/* required items = ((items + header + 2 separators) * total_actions) + edit + return + terminator) */
-	request_strings(((kErrorFlag_Max + 3) * entry->actionListLength) + 3, 0, 0, 0);
-	menuItem = menu_strings.main_list;
+	request_strings(((kErrorFlag_Max + 3) * entry->action_list_length) + 3, 0, 0, 0);
+	menu_item = menu_strings.main_list;
 
 	/********** MENU CONSTRUCTION **********/
-	for(i = 0; i < entry->actionListLength; i++)
+	for(i = 0; i < entry->action_list_length; i++)
 	{
-		CheatAction * action = &entry->actionList[i];
+		cheat_action *action = &entry->action_list[i];
 
 		UINT32 flags = AnalyseCodeFormat(entry, action);
 
-		menuItem[total++] = action->optionalName ? action->optionalName : "(Null)";
-		menuItem[total++] = MENU_SEPARATOR_ITEM;
+		menu_item[total++] = action->optional_name ? action->optional_name : "(Null)";
+		menu_item[total++] = MENU_SEPARATOR_ITEM;
 
 		if(flags)
 		{
 			for(j = 0; j < kErrorFlag_Max; j++)
 			{
 				if((flags >> j) & 1)
-					menuItem[total++] = kAnalyseItemName[j];
+					menu_item[total++] = kAnalyseItemName[j];
 			}
 		}
 		else
-			menuItem[total++] = "No Problem";
+			menu_item[total++] = "No Problem";
 
-		menuItem[total++] = MENU_SEPARATOR_ITEM;
+		menu_item[total++] = MENU_SEPARATOR_ITEM;
 	}
 
-	menuItem[total++] = "Edit This Entry";
-	menuItem[total++] = "Return to Prior Menu";
-	menuItem[total] = NULL;
+	menu_item[total++] = "Edit This Entry";
+	menu_item[total++] = "Return to Prior Menu";
+	menu_item[total] = NULL;
 
 	/* adjust cursor position */
-	ADJUST_CURSOR(menu->sel, total)
+	ADJUST_CURSOR(menu->sel, total);
 
-	old_style_menu(menuItem, NULL, NULL, menu->sel, 0);
+	old_style_menu(menu_item, NULL, NULL, menu->sel, 0);
 
 	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_PREVIOUS(menu->sel, total)
+		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_NEXT(menu->sel, total)
+		CURSOR_TO_NEXT(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_UP(menu->sel)
+		CURSOR_PAGE_UP(menu->sel);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_DOWN(menu->sel, total)
+		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))
 	{
-		isEdit = 1;
+		is_edit = 1;
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		if(menu->sel == total - 2)
-			isEdit = 1;
+			is_edit = 1;
 		else
 			menu->sel = -1;
 	}
@@ -6182,7 +6190,7 @@ static int analyse_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		menu->sel = -1;
 	}
 
-	if(isEdit)
+	if(is_edit)
 	{
 		if(entry->flags & kCheatFlag_OldFormat)
 			cheat_menu_stack_push(edit_cheat_menu, menu->return_handler, menu->pre_sel);
@@ -6224,8 +6232,8 @@ static int search_minimum_menu(running_machine *machine, cheat_menu_stack *menu)
 	const char		* menuSubItem[kMenu_Max + 1]	= { 0 };
 	char			flagBuf[kMenu_Max + 1]			= { 0 };
 	char			cpuBuf[4];
-	char			valueBuf[32];		// "FFFFFFF[F] (4294967295)"    23 chars
-	char			timerBuf[32];		// "-FFFFFFF[F] (4294967295)"   24 chars
+	char			valueBuf[32];		// "FFFFFFF[F] (4294967295)"	23 chars
+	char			timerBuf[32];		// "-FFFFFFF[F] (4294967295)"	24 chars
 	char			numResultsBuf[16];
 	char			* stringsBuf;
 	search_info		*search = get_current_search();
@@ -6446,7 +6454,7 @@ static int search_minimum_menu(running_machine *machine, cheat_menu_stack *menu)
 		}
 		else
 		{
-			CURSOR_TO_PREVIOUS(menu->sel, total)
+			CURSOR_TO_PREVIOUS(menu->sel, total);
 
 			if(menu->sel == kMenu_Divider1 || menu->sel == kMenu_Divider2)
 			{
@@ -6484,7 +6492,7 @@ static int search_minimum_menu(running_machine *machine, cheat_menu_stack *menu)
 		}
 		else
 		{
-			CURSOR_TO_NEXT(menu->sel, total)
+			CURSOR_TO_NEXT(menu->sel, total);
 
 			if(menu->sel == kMenu_Divider1 || menu->sel == kMenu_Divider2)
 				menu->sel++;
@@ -6584,11 +6592,11 @@ static int search_minimum_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_UP(menu->sel)
+		CURSOR_PAGE_UP(menu->sel);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_DOWN(menu->sel, total)
+		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
@@ -6685,8 +6693,7 @@ static int search_minimum_menu(running_machine *machine, cheat_menu_stack *menu)
 					else
 					{
 						/* if no search region (eg, sms.c in HazeMD), don't open result viewer to avoid the crash */
-						messageTimer =	DEFAULT_MESSAGE_TIME;
-						messageType =	kCheatMessage_NoSearchRegion;
+						SET_MESSAGE(kCheatMessage_NoSearchRegion);
 					}
 					break;
 
@@ -6740,11 +6747,9 @@ static int search_minimum_menu(running_machine *machine, cheat_menu_stack *menu)
 		update_search(search);
 
 		if(doneSaveMemory || menu->sel == kMenu_Value)
-			messageType = kCheatMessage_CheatFound;
+			SET_MESSAGE(kCheatMessage_CheatFound);
 		else
-			messageType = kCheatMessage_InitializeMemory;
-
-		messageTimer = DEFAULT_MESSAGE_TIME;
+			SET_MESSAGE(kCheatMessage_InitializeMemory);
 
 		doneSaveMemory = 1;
 
@@ -6752,7 +6757,7 @@ static int search_minimum_menu(running_machine *machine, cheat_menu_stack *menu)
 		{
 			AddCheatFromFirstResult(search);
 
-			messageType = kCheatMessage_1CheatFound;
+			SET_MESSAGE(kCheatMessage_1CheatFound);
 		}
 	}
 
@@ -6991,7 +6996,7 @@ static int search_standard_menu(running_machine *machine, cheat_menu_stack *menu
 	menuSubItem[total] = NULL;
 
 	/* adjust current cursor position */
-	ADJUST_CURSOR(menu->sel, total)
+	ADJUST_CURSOR(menu->sel, total);
 
 	/* draw it */
 	old_style_menu(menuItem, menuSubItem, 0, menu->sel, 0);
@@ -7018,7 +7023,7 @@ static int search_standard_menu(running_machine *machine, cheat_menu_stack *menu
 		}
 		else
 		{
-			CURSOR_TO_PREVIOUS(menu->sel, total)
+			CURSOR_TO_PREVIOUS(menu->sel, total);
 
 			if(menu->sel == kMenu_Separator) menu->sel--;
 		}
@@ -7044,7 +7049,7 @@ static int search_standard_menu(running_machine *machine, cheat_menu_stack *menu
 		}
 		else
 		{
-			CURSOR_TO_NEXT(menu->sel, total)
+			CURSOR_TO_NEXT(menu->sel, total);
 
 			if(menu->sel == kMenu_Separator) menu->sel++;
 		}
@@ -7052,12 +7057,12 @@ static int search_standard_menu(running_machine *machine, cheat_menu_stack *menu
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
 		if(!editActive)
-			CURSOR_PAGE_UP(menu->sel)
+			CURSOR_PAGE_UP(menu->sel);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
 		if(!editActive)
-			CURSOR_PAGE_DOWN(menu->sel, total)
+			CURSOR_PAGE_DOWN(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kHorizontalFastKeyRepeatRate))
 	{
@@ -7405,7 +7410,7 @@ static int search_advanced_menu(running_machine *machine, cheat_menu_stack *menu
 	else
 		sprintf(valueBuffer, "%.*X", kSearchByteDigitsTable[search->bytes], search->value & kSearchByteMaskTable[search->bytes]);
 
-	if(TEST_FIELD(cheatOptions, DontPrintNewLabels))
+	if(TEST_FIELD(cheat_options, DontPrintNewLabels))
 	{
 		menu_item[total] = kOperandNameTable[search->lhs];
 		menu_subitem[total++] = NULL;
@@ -7788,10 +7793,11 @@ static int select_search_region_menu(running_machine *machine, cheat_menu_stack 
 		"User Defined"
 	};
 
-	int				total		= 0;
-	UINT8			doRebuild	= 0;
-	const char		** menuItem;
-	const char		** menuSubItem;
+	int				total			= 0;
+	UINT8			do_rebuild		= 0;
+	UINT8			do_reallocate	= 0;
+	const char		**menu_item;
+	const char		**menu_sub_item;
 	search_info		*search = get_current_search();
 	search_region	*region;
 
@@ -7800,14 +7806,14 @@ static int select_search_region_menu(running_machine *machine, cheat_menu_stack 
 		menu->first_time = 0;
 
 	/* required items = speed + total regions + return + terminator */
-	request_strings(search->region_list_length + 3, 0, 0, 0);
-	menuItem	= menu_strings.main_list;
-	menuSubItem	= menu_strings.sub_list;
+	request_strings(search->region_list_length + 4, 0, 0, 0);
+	menu_item		= menu_strings.main_list;
+	menu_sub_item	= menu_strings.sub_list;
 
 	/********** MENU CONSTRUCTION **********/
 	/* ##### SEARCH SPEED ##### */
-	menuItem[total] = "Search Speed";
-	menuSubItem[total++] = ksearch_speedList[search->search_speed];
+	menu_item[total] = "Search Speed";
+	menu_sub_item[total++] = ksearch_speedList[search->search_speed];
 
 	/* ##### REGIONS ##### */
 	if(search->region_list_length)
@@ -7818,52 +7824,62 @@ static int select_search_region_menu(running_machine *machine, cheat_menu_stack 
 		{
 			search_region *region = &search->region_list[i];
 
-			menuItem[total] = region->name;
-			menuSubItem[total++] = region->flags & kRegionFlag_Enabled ? "On" : "Off";
+			menu_item[total] = region->name;
+
+			if(region->flags & kRegionFlag_HasError)
+				menu_sub_item[total++] = "Locked";
+			else
+				menu_sub_item[total++] = region->flags & kRegionFlag_Enabled ? "On" : "Off";
 		}
 	}
 	else
 	{
-		/* in case of no SearchRegion */
-		menuItem[total] = "No Search Region";
-		menuSubItem[total++] = NULL;
+
+		/* in case of no search region */ 
+		menu_item[total] = "No Search Region";
+		menu_sub_item[total++] = NULL;
 	}
 
 	/* ##### RETURN ##### */
-	menuItem[total] = "Return to Prior Menu";
-	menuSubItem[total++] = NULL;
+	menu_item[total] = "Return to Prior Menu";
+	menu_sub_item[total++] = NULL;
 
 	/* ##### TERMINATE ARRAY ##### */
-	menuItem[total] = NULL;
-	menuSubItem[total] = NULL;
+	menu_item[total] = NULL;
+	menu_sub_item[total] = NULL;
 
 	/* adjust current cursor position */
-	ADJUST_CURSOR(menu->sel, total)
+	ADJUST_CURSOR(menu->sel, total);
 
 	/* draw it */
-	old_style_menu(menuItem, menuSubItem, NULL, menu->sel, 0);
+	old_style_menu(menu_item, menu_sub_item, NULL, menu->sel, 0);
 
-	if(search->region_list_length && menu->sel && menu->sel < total -1)
+	if(search->region_list_length && menu->sel && menu->sel < total - 1)
+	{
 		region = &search->region_list[menu->sel - 1];
+
+		if(region->flags & kRegionFlag_HasError)
+			region = NULL;
+	}
 	else
 		region = NULL;
 
 	/********** KEY HANDLING **********/
 	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_PREVIOUS(menu->sel, total)
+		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_NEXT(menu->sel, total)
+		CURSOR_TO_NEXT(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_UP(menu->sel)
+		CURSOR_PAGE_UP(menu->sel);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_DOWN(menu->sel, total)
+		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
 	{
@@ -7871,14 +7887,17 @@ static int select_search_region_menu(running_machine *machine, cheat_menu_stack 
 		{
 			/* toggle ON/OFF */
 			region->flags ^= kRegionFlag_Enabled;
+
+			do_reallocate = 1;
 		}
-		else if(!menu->sel)
+		else if(menu->sel == 0)
 		{
 			if(--search->search_speed < 0)
 				/* "Fast" -> "User Defined" */
-				search->search_speed = ksearch_speed_Max - 1;
+				search->search_speed = SEARCH_SPEED_MAX - 1;
 
-			doRebuild = 1;
+			do_rebuild = 1;
+			do_reallocate = 1;
 		}
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
@@ -7887,14 +7906,17 @@ static int select_search_region_menu(running_machine *machine, cheat_menu_stack 
 		{
 			/* toggle ON/OFF */
 			region->flags ^= kRegionFlag_Enabled;
-		}
-		else if(!menu->sel)
-		{
-			if(++search->search_speed >= ksearch_speed_Max)
-				/* "User Defined" -> "Fast" */
-				search->search_speed = ksearch_speed_Fast;
 
-			doRebuild = 1;
+			do_reallocate = 1;
+		}
+		else if(menu->sel == 0)
+		{
+			if(++search->search_speed >= SEARCH_SPEED_MAX)
+				/* "User Defined" -> "Fast" */
+				search->search_speed = SEARCH_SPEED_FAST;
+
+			do_rebuild = 1;
+			do_reallocate = 1;
 		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
@@ -7903,40 +7925,47 @@ static int select_search_region_menu(running_machine *machine, cheat_menu_stack 
 		{
 			/* SHIFT + CHEAT DELETE = invalidate selected region */
 			invalidate_entire_region(search, region);
-//          ui_popup_time(1, "region invalidated - %d results remain", search->num_results);
 		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
 	{
-		if(search->search_speed == ksearch_speed_UserDefined)
+		if(search->search_speed == SEARCH_SPEED_USER_DEFINED)
 		/* reload user region */
-			doRebuild = 1;
+			do_rebuild = 1;
+			do_reallocate = 1;
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		if(region)
+		{
 			region->flags ^= kRegionFlag_Enabled;
-		else if(!menu->sel)
-			doRebuild = 1;
-		else
+			do_reallocate = 1;
+		}
+		else if(menu->sel == 0)
+		{
+			do_rebuild = 1;
+			do_reallocate = 1;
+		}
+		else if(menu->sel == total - 1)
 			menu->sel = -1;
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
 		menu->sel = -1;
 
 	/********** REBUILD SEARCH REGION **********/
-	if(doRebuild)
+	if(do_rebuild)
 	{
-		if(search->search_speed != ksearch_speed_UserDefined)
-			/* rebuild SearchRegion from memory map */
+		if(search->search_speed != SEARCH_SPEED_USER_DEFINED)
+			/* rebuild search region from memory map */
 			build_search_regions(machine, search);
 		else
-			/* rebuild SearchRegion from user-defined map */
-			LoadCheatDatabase(machine, kLoadFlag_UserRegion);
-
-		/* reallocate SearchRegions */
-		allocate_search_regions(search);
+			/* rebuild search region from user-defined map */
+			load_cheat_database(machine, kLoadFlag_UserRegion);
 	}
+
+	if(do_reallocate)
+		/* reallocate search region */
+		allocate_search_regions(search);
 
 	return menu->sel + 1;
 }
@@ -8234,8 +8263,7 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 			search->num_results--;
 			region->num_results--;
 
-			messageType = kCheatMessage_SucceededToDelete;
-			messageTimer = DEFAULT_MESSAGE_TIME;
+			SET_MESSAGE(kCheatMessage_SucceededToDelete);
 		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_WATCH_VALUE))
@@ -8328,23 +8356,23 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	UINT8			total			= 0;
 	const char		** menuItem;
 	char			** buf;
-	char			* stringsBuf;	// "USER20 FFFFFFFF (99:32 Bit)"    27 chars
-	WatchInfo		* watch;
+	char			* stringsBuf;	// "USER20 FFFFFFFF (99:32 Bit)"	27 chars
+	watch_info		*watch;
 
 	/* first setting : NONE */
 	if(menu->first_time)
 		menu->first_time = 0;
 
 	/* required items = (total watchpoints + return + terminator) & (strings buf * total watchpoints [max chars = 32]) */
-	request_strings(watchListLength + 2, watchListLength, 32, 0);
+	request_strings(watch_list_length + 2, watch_list_length, 32, 0);
 	menuItem	= menu_strings.main_list;
 	buf			= menu_strings.main_strings;
 
 	/********** MENU CONSTRUCTION **********/
-	for(i = 0; i < watchListLength; i++)
+	for(i = 0; i < watch_list_length; i++)
 	{
-		WatchInfo	* traverse	= &watchList[i];
-		cpu_region_info *info = get_cpu_or_region_info(traverse->cpu);
+		watch_info		*traverse	= &watch_list[i];
+		cpu_region_info	*info		= get_cpu_or_region_info(traverse->cpu);
 
 		/* FORMAT : "CPU/Region : Address (Length : Bytes)" */
 		if(!editActive || menu->sel != i)
@@ -8353,8 +8381,8 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 				get_region_name(traverse->cpu),
 				info->address_chars_needed,
 				traverse->address,
-				traverse->numElements,
-				kByteSizeStringList[traverse->elementBytes]);
+				traverse->num_elements,
+				kByteSizeStringList[traverse->element_bytes]);
 		}
 		else
 		{
@@ -8379,7 +8407,7 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 							stringsBuf += sprintf(stringsBuf, "%X", (traverse->address & kIncrementMaskTable[digits]) / kIncrementValueTable[digits]);
 					}
 
-					stringsBuf += sprintf(stringsBuf, " (%d:%s)", traverse->numElements, kByteSizeStringList[traverse->elementBytes]);
+					stringsBuf += sprintf(stringsBuf, " (%d:%s)", traverse->num_elements, kByteSizeStringList[traverse->element_bytes]);
 				}
 				break;
 
@@ -8388,8 +8416,8 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 						get_region_name(traverse->cpu),
 						info->address_chars_needed,
 						traverse->address,
-						traverse->numElements,
-						kByteSizeStringList[traverse->elementBytes]);
+						traverse->num_elements,
+						kByteSizeStringList[traverse->element_bytes]);
 					break;
 
 				case 0:
@@ -8397,8 +8425,8 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 						get_region_name(traverse->cpu),
 						info->address_chars_needed,
 						traverse->address,
-						traverse->numElements,
-						kByteSizeStringList[traverse->elementBytes]);
+						traverse->num_elements,
+						kByteSizeStringList[traverse->element_bytes]);
 					break;
 			}
 		}
@@ -8414,13 +8442,13 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	menuItem[total] = NULL;
 
 	/* adjust current cursor position */
-	ADJUST_CURSOR(menu->sel, total)
+	ADJUST_CURSOR(menu->sel, total);
 
 	/* draw it */
 	old_style_menu(menuItem, NULL, NULL, menu->sel, 0);
 
-	if(menu->sel < watchListLength)
-		watch = &watchList[menu->sel];
+	if(menu->sel < watch_list_length)
+		watch = &watch_list[menu->sel];
 	else
 		watch = NULL;
 
@@ -8429,7 +8457,7 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	{
 		if(!editActive)
 		{
-			CURSOR_TO_PREVIOUS(menu->sel, total)
+			CURSOR_TO_PREVIOUS(menu->sel, total);
 		}
 		else
 		{
@@ -8440,12 +8468,12 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 					break;
 
 				case 1:
-					if(watch->numElements < 99)
-						watch->numElements++;
+					if(watch->num_elements < 99)
+						watch->num_elements++;
 					break;
 
 				case 0:
-					watch->elementBytes = (watch->elementBytes + 1) & 0x03;
+					watch->element_bytes = (watch->element_bytes + 1) & 0x03;
 					break;
 			}
 		}
@@ -8454,7 +8482,7 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	{
 		if(!editActive)
 		{
-			CURSOR_TO_NEXT(menu->sel, total)
+			CURSOR_TO_NEXT(menu->sel, total);
 		}
 		else
 		{
@@ -8465,12 +8493,12 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 					break;
 
 				case 1:
-					if(watch->numElements > 0)
-						watch->numElements--;
+					if(watch->num_elements > 0)
+						watch->num_elements--;
 					break;
 
 				case 0:
-					watch->elementBytes = (watch->elementBytes - 1) & 0x03;
+					watch->element_bytes = (watch->element_bytes - 1) & 0x03;
 					break;
 			}
 		}
@@ -8478,12 +8506,12 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
 		if(!editActive)
-			CURSOR_PAGE_UP(menu->sel)
+			CURSOR_PAGE_UP(menu->sel);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
 		if(!editActive)
-			CURSOR_PAGE_DOWN(menu->sel, total)
+			CURSOR_PAGE_DOWN(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kVerticalKeyRepeatRate))
 	{
@@ -8522,24 +8550,22 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 		if(!editActive && watch)
 		{
 			if(ShiftKeyPressed())
-				AddCheatFromWatch(watch);
+				add_cheat_from_watch(watch);
 			else if(ControlKeyPressed())
 			{
-				CheatEntry * entry = GetNewCheat();
+				cheat_entry *entry = get_new_cheat();
 
-				DisposeCheat(entry);
-				SetupCheatFromWatchAsWatch(entry, watch);
+				add_cheat_from_watch_as_watch(entry, watch);
 
 				/* when fails to add, delete this entry because it causes the crash */
-				if(messageType == kCheatMessage_FailedToAdd)
+				if(message_type == kCheatMessage_FailedToAdd)
 				{
-					DeleteCheatAt(cheatListLength - 1);
-					messageType		= kCheatMessage_FailedToAdd;
-					messageTimer	= DEFAULT_MESSAGE_TIME;
+					delete_cheat_at(cheat_list_length - 1);
+					SET_MESSAGE(kCheatMessage_FailedToAdd);
 				}
 			}
 			else
-				AddWatchBefore(menu->sel);
+				add_watch_before(menu->sel);
 		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
@@ -8548,17 +8574,17 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 		{
 			if(ShiftKeyPressed())
 			{
-				DeleteWatchAt(menu->sel);
+				delete_watch_at(menu->sel);
 			}
 			else if(ControlKeyPressed())
 			{
-				for(i = 0; i < watchListLength; i++)
-					watchList[i].numElements = 0;
+				for(i = 0; i < watch_list_length; i++)
+					watch_list[i].num_elements = 0;
 			}
 			else
 			{
 				if(watch)
-					watch->numElements = 0;
+					watch->num_elements = 0;
 			}
 		}
 		else if(editActive)
@@ -8570,11 +8596,11 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 					break;
 
 				case 1:
-					watch->numElements = 0;
+					watch->num_elements = 0;
 					break;
 
 				case 0:
-					watch->elementBytes = 0;
+					watch->element_bytes = 0;
 			}
 		}
 	}
@@ -8582,13 +8608,13 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	{
 		if(!editActive && watch)
 		{
-			CheatEntry entry;
+			cheat_entry entry;
 
-			memset(&entry, 0, sizeof(CheatEntry));
+			memset(&entry, 0, sizeof(cheat_entry));
 
-			SetupCheatFromWatchAsWatch(&entry, watch);
+			add_cheat_from_watch_as_watch(&entry, watch);
 			SaveCheatCode(machine, &entry);
-			DisposeCheat(&entry);
+			dispose_cheat(&entry);
 		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))
@@ -8605,20 +8631,19 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 		{
 			if(ShiftKeyPressed())
 			{
-				if(watch)
-					ResetWatch(watch);
+				reset_watch(watch);
 			}
 			else
 			{
-				for(i = 0; i < watchListLength; i++)
-					ResetWatch(&watchList[i]);
+				for(i = 0; i < watch_list_length; i++)
+					reset_watch(&watch_list[i]);
 			}
 		}
 		else
 		{
 			watch->address = 0;
-			watch->numElements = 0;
-			watch->elementBytes = 0;
+			watch->num_elements = 0;
+			watch->element_bytes = 0;
 		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
@@ -8656,7 +8681,7 @@ static int command_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	int				i;
 	UINT8			total	= 0;
 	ui_menu_item	menuItem[kMenu_Max + 1];
-	WatchInfo		* entry	= &watchList[menu->pre_sel];
+	watch_info		*entry	= &watch_list[menu->pre_sel];
 
 	/* first setting : NONE */
 	if(menu->first_time)
@@ -8680,7 +8705,7 @@ static int command_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	menuItem[total].text = NULL;
 
 	/* adjust current cursor position */
-	ADJUST_CURSOR(menu->sel, total)
+	ADJUST_CURSOR(menu->sel, total);
 
 	/* print it */
 	ui_menu_draw(menuItem, total, menu->sel, NULL);
@@ -8688,19 +8713,19 @@ static int command_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	/********** KEY HANDLING **********/
 	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_PREVIOUS(menu->sel, total)
+		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_NEXT(menu->sel, total)
+		CURSOR_TO_NEXT(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_UP(menu->sel)
+		CURSOR_PAGE_UP(menu->sel);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_DOWN(menu->sel, total)
+		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
@@ -8711,40 +8736,38 @@ static int command_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 				break;
 
 			case kMenu_DisableWatch:
-				entry->numElements = 0;
+				entry->num_elements = 0;
 				break;
 
 			case kMenu_DisableAllWatch:
-				for(i = 0; i < watchListLength; i++)
-					watchList[i].numElements = 0;
+				for(i = 0; i < watch_list_length; i++)
+					watch_list[i].num_elements = 0;
 				break;
 
 			case kMenu_ResetWatch:
-				ResetWatch(entry);
+				reset_watch(entry);
 				break;
 
 			case kMenu_ResetAllWatch:
-				for(i = 0; i < watchListLength; i++)
-					ResetWatch(&watchList[i]);
+				for(i = 0; i < watch_list_length; i++)
+					reset_watch(&watch_list[i]);
 				break;
 
 			case kMenu_AddAsCheatCode:
-				AddCheatFromWatch(entry);
+				add_cheat_from_watch(entry);
 				break;
 
 			case kMenu_AddAsWatchCode:
 			{
-				CheatEntry * newEntry = GetNewCheat();
+				cheat_entry *new_entry = get_new_cheat();
 
-				DisposeCheat(newEntry);
-				SetupCheatFromWatchAsWatch(newEntry, entry);
+				add_cheat_from_watch_as_watch(new_entry, entry);
 
 				/* when fails to add, delete this entry because it causes the crash */
-				if(messageType == kCheatMessage_FailedToAdd)
+				if(message_type == kCheatMessage_FailedToAdd)
 				{
-					DeleteCheatAt(cheatListLength - 1);
-					messageType		= kCheatMessage_FailedToAdd;
-					messageTimer	= DEFAULT_MESSAGE_TIME;
+					delete_cheat_at(cheat_list_length - 1);
+					SET_MESSAGE(kCheatMessage_FailedToAdd);
 				}
 			}
 			break;
@@ -8755,13 +8778,13 @@ static int command_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 
 			case kMenu_SaveAsWatchCode:
 			{
-				CheatEntry tempEntry;
+				cheat_entry temp_entry;
 
-				memset(&tempEntry, 0, sizeof(CheatEntry));
+				memset(&temp_entry, 0, sizeof(cheat_entry));
 
-				SetupCheatFromWatchAsWatch(&tempEntry, entry);
-				SaveCheatCode(machine, &tempEntry);
-				DisposeCheat(&tempEntry);
+				add_cheat_from_watch_as_watch(&temp_entry, entry);
+				SaveCheatCode(machine, &temp_entry);
+				dispose_cheat(&temp_entry);
 			}
 			break;
 
@@ -8771,7 +8794,7 @@ static int command_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 	else if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
 	{
-		ReloadCheatDatabase(machine);
+		reload_cheat_database(machine);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CANCEL) || input_ui_pressed(machine, IPT_UI_LEFT) || input_ui_pressed(machine, IPT_UI_RIGHT))
 	{
@@ -8813,8 +8836,8 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	const char		** menuSubItem;
 	char			** buf;
 	char			* flagBuf;
-	WatchInfo		* entry		= &watchList[menu->pre_sel];
-	cpu_region_info *info = get_cpu_or_region_info(entry->cpu);
+	watch_info		*entry		= &watch_list[menu->pre_sel];
+	cpu_region_info *info		= get_cpu_or_region_info(entry->cpu);
 
 	/* first setting : NONE */
 	if(menu->first_time)
@@ -8830,30 +8853,30 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 
 	/********** MENU CONSTRUCTION **********/
 	/* ##### ADDRESS ##### */
-	sprintf(buf[total], "%.*X", info->address_chars_needed, entry->address >> entry->addressShift);
+	sprintf(buf[total], "%.*X", info->address_chars_needed, entry->address >> entry->address_shift);
 	menuItem[total] = "Address";
 	menuSubItem[total] = buf[total];
 	total++;
 
 	/* ##### CPU/REGION ##### */
 	sprintf(buf[total], "%s", get_region_name(entry->cpu));
-	menuItem[total] = TEST_FIELD(entry->cpu, RegionFlag) ? "Region" : "CPU";
+	menuItem[total] = entry->cpu < REGION_INVALID ? "CPU" : "Region";
 	menuSubItem[total] = buf[total];
 	total++;
 
 	/* ##### LENGTH ##### */
-	sprintf(buf[total], "%d", entry->numElements);
+	sprintf(buf[total], "%d", entry->num_elements);
 	menuItem[total] = "Length";
 	menuSubItem[total] = buf[total];
 	total++;
 
 	/* ##### ELEMENT SIZE ##### */
 	menuItem[total] = "Element Size";
-	menuSubItem[total++] = kByteSizeStringList[entry->elementBytes];
+	menuSubItem[total++] = kByteSizeStringList[entry->element_bytes];
 
 	/* ##### LABEL TYPE ##### */
 	menuItem[total] = "Label Type";
-	menuSubItem[total++] = kWatchLabelStringList[entry->labelType];
+	menuSubItem[total++] = kWatchLabelStringList[entry->label_type];
 
 	/* ##### TEXT LABEL ##### */
 	menuItem[total] = "Text Label";
@@ -8864,7 +8887,7 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 
 	/* ##### DISPLAY TYPE ##### */
 	menuItem[total] = "Display Type";
-	menuSubItem[total++] = kWatchDisplayTypeStringList[entry->displayType];
+	menuSubItem[total++] = kWatchDisplayTypeStringList[entry->display_type];
 
 	/* ##### X POSITION ##### */
 	sprintf(buf[total], "%f", entry->x);
@@ -8885,34 +8908,34 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	total++;
 
 	/* ##### ELEMENTS PER LINE ##### */
-	sprintf(buf[total], "%d", entry->elementsPerLine);
+	sprintf(buf[total], "%d", entry->elements_per_line);
 	menuItem[total] = "Elements Per Line";
 	menuSubItem[total] = buf[total];
 	total++;
 
 	/* ##### ADD VALUE ##### */
 	menuItem[total] = "Add Value";
-	if(entry->addValue < 0)
-		sprintf(buf[total], "-%.2X", -entry->addValue);
+	if(entry->add_value < 0)
+		sprintf(buf[total], "-%.2X", -entry->add_value);
 	else
-		sprintf(buf[total], "%.2X", entry->addValue);
+		sprintf(buf[total], "%.2X", entry->add_value);
 	menuSubItem[total] = buf[total];
 	total++;
 
 	/* ##### ADDRESS SHIFT ##### */
-	sprintf(buf[total], "%d", entry->addressShift);
+	sprintf(buf[total], "%d", entry->address_shift);
 	menuItem[total] = "Address Shift";
 	menuSubItem[total] = buf[total];
 	total++;
 
 	/* ##### DATA SHIFT ##### */
-	sprintf(buf[total], "%d", entry->dataShift);
+	sprintf(buf[total], "%d", entry->data_shift);
 	menuItem[total] = "Data Shift";
 	menuSubItem[total] = buf[total];
 	total++;
 
 	/* ##### XOR ##### */
-	sprintf(buf[total], "%.*X", kSearchByteDigitsTable[kWatchSizeConversionTable[entry->elementBytes]], entry->xor);
+	sprintf(buf[total], "%.*X", kSearchByteDigitsTable[kWatchSizeConversionTable[entry->element_bytes]], entry->xor);
 	menuItem[total] = "XOR";
 	menuSubItem[total] = buf[total];
 	total++;
@@ -8926,7 +8949,7 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	menuSubItem[total] = NULL;
 
 	/* adjust current cursor position */
-	ADJUST_CURSOR(menu->sel, total)
+	ADJUST_CURSOR(menu->sel, total);
 
 	/* higlighted sub-item if edit mode */
 	if(editActive)
@@ -8938,19 +8961,19 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	/********** KEY HANDLING **********/
 	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_PREVIOUS(menu->sel, total)
+		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_NEXT(menu->sel, total)
+		CURSOR_TO_NEXT(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_UP(menu->sel)
+		CURSOR_PAGE_UP(menu->sel);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_DOWN(menu->sel, total)
+		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
 	{
@@ -8963,11 +8986,11 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 			switch(menu->sel)
 			{
 				case kMenu_Address:
-					entry->address = DoShift(entry->address, entry->addressShift);
+					entry->address = DoShift(entry->address, entry->address_shift);
 					entry->address -= increment;
-					entry->address = DoShift(entry->address, -entry->addressShift);
+					entry->address = DoShift(entry->address, -entry->address_shift);
 
-					if(!TEST_FIELD(entry->cpu, RegionFlag))
+					if(entry->cpu < REGION_INVALID)
 						entry->address &= info->address_mask;
 					break;
 
@@ -8981,36 +9004,36 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 					break;
 
 				case kMenu_NumElements:
-					if(entry->numElements > 0)
-						entry->numElements--;
+					if(entry->num_elements > 0)
+						entry->num_elements--;
 					else
-						entry->numElements = 0;
+						entry->num_elements = 0;
 					break;
 
 				case kMenu_ElementSize:
-					if(entry->elementBytes > 0)
-						entry->elementBytes--;
+					if(entry->element_bytes > 0)
+						entry->element_bytes--;
 					else
-						entry->elementBytes = 0;
+						entry->element_bytes = 0;
 
-					entry->xor &= kSearchByteMaskTable[kWatchSizeConversionTable[entry->elementBytes]];
+					entry->xor &= kSearchByteMaskTable[kWatchSizeConversionTable[entry->element_bytes]];
 					break;
 
 				case kMenu_LabelType:
-					if(entry->labelType > 0)
-						entry->labelType--;
+					if(entry->label_type > 0)
+						entry->label_type--;
 					else
-						entry->labelType = 0;
+						entry->label_type = 0;
 					break;
 
 				case kMenu_TextLabel:
 					break;
 
 				case kMenu_DisplayType:
-					if(entry->displayType > 0)
-						entry->displayType--;
+					if(entry->display_type > 0)
+						entry->display_type--;
 					else
-						entry->displayType = 0;
+						entry->display_type = 0;
 					break;
 
 				case kMenu_XPosition:
@@ -9027,31 +9050,31 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 					break;
 
 				case kMenu_ElementsPerLine:
-					if(entry->elementsPerLine > 0)
-						entry->elementsPerLine--;
+					if(entry->elements_per_line > 0)
+						entry->elements_per_line--;
 					break;
 
 				case kMenu_AddValue:
-					entry->addValue = (entry->addValue - 1) & 0xFF;
+					entry->add_value = (entry->add_value - 1) & 0xFF;
 					break;
 
 				case kMenu_AddressShift:
-					if(entry->addressShift > -31)
-						entry->addressShift--;
+					if(entry->address_shift > -31)
+						entry->address_shift--;
 					else
-						entry->addressShift = 31;
+						entry->address_shift = 31;
 					break;
 
 				case kMenu_DataShift:
-					if(entry->dataShift > -31)
-						entry->dataShift--;
+					if(entry->data_shift > -31)
+						entry->data_shift--;
 					else
-						entry->dataShift = 31;
+						entry->data_shift = 31;
 					break;
 
 				case kMenu_XOR:
 					entry->xor -= increment;
-					entry->xor &= kSearchByteMaskTable[kWatchSizeConversionTable[entry->elementBytes]];
+					entry->xor &= kSearchByteMaskTable[kWatchSizeConversionTable[entry->element_bytes]];
 			}
 		}
 	}
@@ -9066,11 +9089,11 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 			switch(menu->sel)
 			{
 				case kMenu_Address:
-					entry->address = DoShift(entry->address, entry->addressShift);
+					entry->address = DoShift(entry->address, entry->address_shift);
 					entry->address += increment;
-					entry->address = DoShift(entry->address, -entry->addressShift);
+					entry->address = DoShift(entry->address, -entry->address_shift);
 
-					if(!TEST_FIELD(entry->cpu, RegionFlag))
+					if(entry->cpu < REGION_INVALID)
 						entry->address &= info->address_mask;
 					break;
 
@@ -9084,33 +9107,33 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 					break;
 
 				case kMenu_NumElements:
-					entry->numElements++;
+					entry->num_elements++;
 					break;
 
 				case kMenu_ElementSize:
-					if(entry->elementBytes < kSearchSize_32Bit)
-						entry->elementBytes++;
+					if(entry->element_bytes < kSearchSize_32Bit)
+						entry->element_bytes++;
 					else
-						entry->elementBytes = kSearchSize_32Bit;
+						entry->element_bytes = kSearchSize_32Bit;
 
-					entry->xor &= kSearchByteMaskTable[kWatchSizeConversionTable[entry->elementBytes]];
+					entry->xor &= kSearchByteMaskTable[kWatchSizeConversionTable[entry->element_bytes]];
 					break;
 
 				case kMenu_LabelType:
-					if(entry->labelType < kWatchLabel_MaxPlusOne - 1)
-						entry->labelType++;
+					if(entry->label_type < kWatchLabel_MaxPlusOne - 1)
+						entry->label_type++;
 					else
-						entry->labelType = kWatchLabel_MaxPlusOne - 1;
+						entry->label_type = kWatchLabel_MaxPlusOne - 1;
 					break;
 
 				case kMenu_TextLabel:
 					break;
 
 				case kMenu_DisplayType:
-					if(entry->displayType < kWatchDisplayType_MaxPlusOne - 1)
-						entry->displayType++;
+					if(entry->display_type < kWatchDisplayType_MaxPlusOne - 1)
+						entry->display_type++;
 					else
-						entry->displayType = kWatchDisplayType_MaxPlusOne - 1;
+						entry->display_type = kWatchDisplayType_MaxPlusOne - 1;
 					break;
 
 				case kMenu_XPosition:
@@ -9126,30 +9149,30 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 					break;
 
 				case kMenu_ElementsPerLine:
-					entry->elementsPerLine++;
+					entry->elements_per_line++;
 					break;
 
 				case kMenu_AddValue:
-					entry->addValue = (entry->addValue + 1) & 0xFF;
+					entry->add_value = (entry->add_value + 1) & 0xFF;
 					break;
 
 				case kMenu_AddressShift:
-					if(entry->addressShift < 31)
-						entry->addressShift++;
+					if(entry->address_shift < 31)
+						entry->address_shift++;
 					else
-						entry->addressShift = -31;
+						entry->address_shift = -31;
 					break;
 
 				case kMenu_DataShift:
-					if(entry->dataShift < 31)
-						entry->dataShift++;
+					if(entry->data_shift < 31)
+						entry->data_shift++;
 					else
-						entry->dataShift = -31;
+						entry->data_shift = -31;
 					break;
 
 				case kMenu_XOR:
 					entry->xor += increment;
-					entry->xor &= kSearchByteMaskTable[kWatchSizeConversionTable[entry->elementBytes]];
+					entry->xor &= kSearchByteMaskTable[kWatchSizeConversionTable[entry->element_bytes]];
 			}
 		}
 	}
@@ -9182,7 +9205,7 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CLEAR))
 	{
-		ResetWatch(entry);
+		reset_watch(entry);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
@@ -9197,9 +9220,9 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 		switch(menu->sel)
 		{
 			case kMenu_Address:
-				entry->address = DoShift(entry->address, entry->addressShift);
+				entry->address = DoShift(entry->address, entry->address_shift);
 				entry->address = do_edit_hex_field(machine, entry->address);
-				entry->address = DoShift(entry->address, -entry->addressShift);
+				entry->address = DoShift(entry->address, -entry->address_shift);
 				entry->address &= info->address_mask;
 				break;
 
@@ -9209,7 +9232,7 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 				break;
 
 			case kMenu_NumElements:
-				entry->numElements = DoEditDecField(entry->numElements, 0, 99);
+				entry->num_elements = DoEditDecField(entry->num_elements, 0, 99);
 				break;
 
 			case kMenu_TextLabel:
@@ -9225,40 +9248,40 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 				break;
 
 			case kMenu_AddValue:
-				entry->addValue = DoEditHexFieldSigned(entry->addValue, 0xFFFFFF80) & 0xFF;
+				entry->add_value = DoEditHexFieldSigned(entry->add_value, 0xFFFFFF80) & 0xFF;
 				break;
 
 			case kMenu_AddressShift:
-				entry->addressShift = DoEditDecField(entry->addressShift, -31, 31);
+				entry->address_shift = DoEditDecField(entry->address_shift, -31, 31);
 				break;
 
 			case kMenu_DataShift:
-				entry->dataShift = DoEditDecField(entry->dataShift, -31, 31);
+				entry->data_shift = DoEditDecField(entry->data_shift, -31, 31);
 				break;
 
 			case kMenu_XOR:
 				entry->xor = do_edit_hex_field(machine, entry->xor);
-				entry->xor &= kSearchByteMaskTable[kWatchSizeConversionTable[entry->elementBytes]];
+				entry->xor &= kSearchByteMaskTable[kWatchSizeConversionTable[entry->element_bytes]];
 				break;
 		}
 	}
 	else
 	{
 		if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
-			AddCheatFromWatch(entry);
+			add_cheat_from_watch(entry);
 
 		if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
-			entry->numElements = 0;
+			entry->num_elements = 0;
 
 		if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
 		{
-			CheatEntry tempEntry;
+			cheat_entry temp_entry;
 
-			memset(&tempEntry, 0, sizeof(CheatEntry));
+			memset(&temp_entry, 0, sizeof(cheat_entry));
 
-			SetupCheatFromWatchAsWatch(&tempEntry, entry);
-			SaveCheatCode(machine, &tempEntry);
-			DisposeCheat(&tempEntry);
+			add_cheat_from_watch_as_watch(&temp_entry, entry);
+			SaveCheatCode(machine, &temp_entry);
+			dispose_cheat(&temp_entry);
 		}
 	}
 
@@ -9273,9 +9296,9 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 {
 	enum{
 		kMenu_SelectSearch = 0,
-		kMenu_LoadCheatOptions,
-		kMenu_SaveCheatOptions,
-		kMenu_ResetCheatOptions,
+		kMenu_Loadcheat_options,
+		kMenu_Savecheat_options,
+		kMenu_Resetcheat_options,
 		kMenu_Separator,
 		kMenu_SearchDialogStyle,
 		kMenu_ShowSearchLabels,
@@ -9315,7 +9338,7 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 
 	/* ##### SEARCH MENU ##### */
 	menu_item[total] = "Search Dialog Style";
-	switch(EXTRACT_FIELD(cheatOptions, SearchBox))
+	switch(EXTRACT_FIELD(cheat_options, SearchBox))
 	{
 		case kSearchBox_Minimum:
 			menu_sub_item[total++] = "Minimum";
@@ -9335,20 +9358,20 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 
 	/* ##### SEARCH LABEL ##### */
-	ADD_MENU_2_ITEMS("Show Search Labels", TEST_FIELD(cheatOptions, DontPrintNewLabels) ? "Off" : "On");
+	ADD_MENU_2_ITEMS("Show Search Labels", TEST_FIELD(cheat_options, DontPrintNewLabels) ? "Off" : "On");
 
 	/* ##### AUTO SAVE ##### */
-	ADD_MENU_2_ITEMS("Auto Save Cheats", TEST_FIELD(cheatOptions, AutoSaveEnabled) ? "On" : "Off");
+	ADD_MENU_2_ITEMS("Auto Save Cheats", TEST_FIELD(cheat_options, AutoSaveEnabled) ? "On" : "Off");
 
 	/* ##### ACTIVATION KEY MESSAGE ##### */
-	ADD_MENU_2_ITEMS("Show Activation Key Message", TEST_FIELD(cheatOptions, ActivationKeyMessage) ? "On" : "Off");
+	ADD_MENU_2_ITEMS("Show Activation Key Message", TEST_FIELD(cheat_options, ActivationKeyMessage) ? "On" : "Off");
 
 	/* ##### OLD FORMAT LOADING ##### */
-	ADD_MENU_2_ITEMS("Load Old Format Code", TEST_FIELD(cheatOptions, LoadOldFormat) ? "On" : "Off");
+	ADD_MENU_2_ITEMS("Load Old Format Code", TEST_FIELD(cheat_options, LoadOldFormat) ? "On" : "Off");
 
 #ifdef MESS
 	/* ##### SHARED CODE ##### */
-	ADD_MENU_2_ITEMS("Shared Code", TEST_FIELD(cheatOptions, SharedCode) ? "On" : "Off");
+	ADD_MENU_2_ITEMS("Shared Code", TEST_FIELD(cheat_options, SharedCode) ? "On" : "Off");
 #endif
 
 	/* ##### RETURN ##### */
@@ -9363,25 +9386,25 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 	/********** KEY HANDLING **********/
 	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_PREVIOUS(menu->sel, total)
+		CURSOR_TO_PREVIOUS(menu->sel, total);
 
 		if(menu->sel == kMenu_Separator)
 			menu->sel--;
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_NEXT(menu->sel, total)
+		CURSOR_TO_NEXT(menu->sel, total);
 
 		if(menu->sel == kMenu_Separator)
 			menu->sel++;
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_UP(menu->sel)
+		CURSOR_PAGE_UP(menu->sel);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_DOWN(menu->sel, total)
+		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
 	{
@@ -9389,33 +9412,33 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 		{
 			case kMenu_SearchDialogStyle:
 			{
-				UINT8 length = (EXTRACT_FIELD(cheatOptions, SearchBox) - 1) & 3;
+				UINT8 length = (EXTRACT_FIELD(cheat_options, SearchBox) - 1) & 3;
 
 				if(length > kSearchBox_Advanced)
 					length = kSearchBox_Advanced;
 
-				SET_FIELD(cheatOptions, SearchBox, length);
+				SET_FIELD(cheat_options, SearchBox, length);
 			}
 			break;
 
 			case kMenu_ShowSearchLabels:
-				TOGGLE_MASK_FIELD(cheatOptions, DontPrintNewLabels);
+				TOGGLE_MASK_FIELD(cheat_options, DontPrintNewLabels);
 				break;
 
 			case kMenu_AutoSaveCheats:
-				TOGGLE_MASK_FIELD(cheatOptions, AutoSaveEnabled);
+				TOGGLE_MASK_FIELD(cheat_options, AutoSaveEnabled);
 				break;
 
 			case kMenu_ShowActivationKeyMessage:
-				TOGGLE_MASK_FIELD(cheatOptions, ActivationKeyMessage);
+				TOGGLE_MASK_FIELD(cheat_options, ActivationKeyMessage);
 				break;
 
 			case kMenu_LoadOldFormat:
-				TOGGLE_MASK_FIELD(cheatOptions, LoadOldFormat);
+				TOGGLE_MASK_FIELD(cheat_options, LoadOldFormat);
 				break;
 #ifdef MESS
 			case kMenu_SharedCode:
-				TOGGLE_MASK_FIELD(cheatOptions, SharedCode);
+				TOGGLE_MASK_FIELD(cheat_options, SharedCode);
 #endif
 		}
 	}
@@ -9425,33 +9448,33 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 		{
 			case kMenu_SearchDialogStyle:
 			{
-				UINT8 length = (EXTRACT_FIELD(cheatOptions, SearchBox) + 1) & 3;
+				UINT8 length = (EXTRACT_FIELD(cheat_options, SearchBox) + 1) & 3;
 
 				if(length > kSearchBox_Advanced)
 					length = kSearchBox_Minimum;
 
-				SET_FIELD(cheatOptions, SearchBox, length);
+				SET_FIELD(cheat_options, SearchBox, length);
 			}
 			break;
 
 			case kMenu_ShowSearchLabels:
-				TOGGLE_MASK_FIELD(cheatOptions, DontPrintNewLabels);
+				TOGGLE_MASK_FIELD(cheat_options, DontPrintNewLabels);
 				break;
 
 			case kMenu_AutoSaveCheats:
-				TOGGLE_MASK_FIELD(cheatOptions, AutoSaveEnabled);
+				TOGGLE_MASK_FIELD(cheat_options, AutoSaveEnabled);
 				break;
 
 			case kMenu_ShowActivationKeyMessage:
-				TOGGLE_MASK_FIELD(cheatOptions, ActivationKeyMessage);
+				TOGGLE_MASK_FIELD(cheat_options, ActivationKeyMessage);
 				break;
 
 			case kMenu_LoadOldFormat:
-				TOGGLE_MASK_FIELD(cheatOptions, LoadOldFormat);
+				TOGGLE_MASK_FIELD(cheat_options, LoadOldFormat);
 
 #ifdef MESS
 			case kMenu_SharedCode:
-				TOGGLE_MASK_FIELD(cheatOptions, SharedCode);
+				TOGGLE_MASK_FIELD(cheat_options, SharedCode);
 #endif
 		}
 	}
@@ -9463,16 +9486,16 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 				cheat_menu_stack_push(select_search_menu, menu->handler, menu->sel);
 				break;
 
-			case kMenu_LoadCheatOptions:
-				LoadCheatDatabase(machine, kLoadFlag_CheatOption);
+			case kMenu_Loadcheat_options:
+				load_cheat_database(machine, kLoadFlag_CheatOption);
 				break;
 
-			case kMenu_SaveCheatOptions:
-				SaveCheatOptions();
+			case kMenu_Savecheat_options:
+				Savecheat_options();
 				break;
 
-			case kMenu_ResetCheatOptions:
-				cheatOptions = DEFAULT_CHEAT_OPTIONS;
+			case kMenu_Resetcheat_options:
+				cheat_options = DEFAULT_CHEAT_OPTIONS;
 				break;
 
 			case kMenu_Return:
@@ -9481,11 +9504,11 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
 	{
-		SaveCheatOptions();
+		Savecheat_options();
 	}
 	else if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
 	{
-		LoadCheatDatabase(machine, kLoadFlag_CheatOption);
+		load_cheat_database(machine, kLoadFlag_CheatOption);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
@@ -9769,24 +9792,24 @@ static int view_cpu_region_info_list_menu(running_machine *machine, cheat_menu_s
 	old_style_menu(menuItem, menuSubItem, NULL, menu->sel, 0);
 
 	/* adjust current cursor position */
-	ADJUST_CURSOR(menu->sel, total)
+	ADJUST_CURSOR(menu->sel, total);
 
 	/********** KEY HANDLING **********/
 	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_PREVIOUS(menu->sel, total)
+		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_NEXT(menu->sel, total)
+		CURSOR_TO_NEXT(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_UP(menu->sel)
+		CURSOR_PAGE_UP(menu->sel);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_DOWN(menu->sel, total)
+		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
 	{
@@ -9858,7 +9881,7 @@ static int debug_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		kMenu_CRC,
 #endif
 		kMenu_FullMenuPageHeight,
-		kMenu_CheatListLength,
+		kMenu_cheat_list_length,
 		kMenu_Separator,
 		kMenu_CPURegionInfo,
 		kMenu_KeyCodeChecker,
@@ -9923,7 +9946,7 @@ static int debug_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 	/* ##### CHEAT LIST LENGTH ##### */
 	menuItem[total] = "Total Code Entries";
-	sprintf(numCodeBuf, "%d", cheatListLength);
+	sprintf(numCodeBuf, "%d", cheat_list_length);
 	menuSubItem[total++] = numCodeBuf;
 
 	/* ##### SEPARATOR ##### */
@@ -9947,7 +9970,7 @@ static int debug_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	menuSubItem[total] = NULL;
 
 	/* adjust cursor position */
-	ADJUST_CURSOR(menu->sel, total)
+	ADJUST_CURSOR(menu->sel, total);
 
 	/* draw it */
 	old_style_menu(menuItem, menuSubItem, NULL, menu->sel, 0);
@@ -9955,25 +9978,25 @@ static int debug_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	/********** KEY HANDLING **********/
 	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_PREVIOUS(menu->sel, total)
+		CURSOR_TO_PREVIOUS(menu->sel, total);
 
 		if(menu->sel == kMenu_Separator)
 			menu->sel--;
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_TO_NEXT(menu->sel, total)
+		CURSOR_TO_NEXT(menu->sel, total);
 
 		if(menu->sel == kMenu_Separator)
 			menu->sel++;
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_UP(menu->sel)
+		CURSOR_PAGE_UP(menu->sel);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
-		CURSOR_PAGE_DOWN(menu->sel, total)
+		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
@@ -10024,8 +10047,8 @@ static TIMER_CALLBACK( cheat_periodic )
 
 			if(cheatsDisabled)
 			{
-				for(i = 0; i < cheatListLength; i++)
-					TempDeactivateCheat(&cheatList[i]);
+				for(i = 0; i < cheat_list_length; i++)
+					TempDeactivateCheat(&cheat_list[i]);
 			}
 		}
 	}
@@ -10033,11 +10056,11 @@ static TIMER_CALLBACK( cheat_periodic )
 	if(cheatsDisabled)
 		return;
 
-	for(i = 0; i < cheatListLength; i++)
-		cheat_periodicEntry(machine, &cheatList[i]);
+	for(i = 0; i < cheat_list_length; i++)
+		cheat_periodicEntry(machine, &cheat_list[i]);
 
-	if(EXTRACT_FIELD(cheatOptions, SearchBox) == kSearchBox_Minimum)
-		SET_FIELD(cheatOptions, SearchBox, kSearchBox_Standard);
+	if(EXTRACT_FIELD(cheat_options, SearchBox) == kSearchBox_Minimum)
+		SET_FIELD(cheat_options, SearchBox, kSearchBox_Standard);
 }
 
 /*--------------
@@ -10118,9 +10141,9 @@ void cheat_display_watches(void)
 	if(watchesDisabled)
 		return;
 
-	for(i = 0; i < watchListLength; i++)
+	for(i = 0; i < watch_list_length; i++)
 	{
-		WatchInfo * info = &watchList[i];
+		watch_info *info = &watch_list[i];
 
 		int			j;
 		int			numChars;
@@ -10131,10 +10154,10 @@ void cheat_display_watches(void)
 
 		char		buf[1024];
 
-		if(info->numElements)
+		if(info->num_elements)
 		{
 			/* ##### LABEL ##### */
-			switch(info->labelType)
+			switch(info->label_type)
 			{
 				case kWatchLabel_Address:
 					numChars = sprintf(buf, "%.8X: ", info->address);
@@ -10152,18 +10175,18 @@ void cheat_display_watches(void)
 			}
 
 			/* ##### VALUE ##### */
-			for(j = 0; j < info->numElements; j++)
+			for(j = 0; j < info->num_elements; j++)
 			{
 				UINT32 data = 0;
 
-				if(!TEST_FIELD(info->cpu, RegionFlag))
+				if(info->cpu < REGION_INVALID)
 				{
 					UINT8 cpu = EXTRACT_FIELD(info->cpu, CPUIndex);
 
 					switch(EXTRACT_FIELD(info->cpu, AddressSpace))
 					{
 						case kAddressSpace_Program:
-							data = (DoCPURead(cpu, address, kSearchByteIncrementTable[info->elementBytes], cpu_needs_swap(cpu)) + info->addValue) & kSearchByteMaskTable[info->elementBytes];
+							data = (DoCPURead(cpu, address, kSearchByteIncrementTable[info->element_bytes], cpu_needs_swap(cpu)) + info->add_value) & kSearchByteMaskTable[info->element_bytes];
 							break;
 
 						case kAddressSpace_DataSpace:
@@ -10173,8 +10196,8 @@ void cheat_display_watches(void)
 							UINT8 * buf = (UINT8 *) GetMemoryRegionBasePointer(cpu, EXTRACT_FIELD(info->cpu, AddressSpace), address);
 
 							if(buf)
-								data =	DoMemoryRead(buf, address, kSearchByteIncrementTable[info->elementBytes], cpu_needs_swap(cpu) + info->addValue, get_cpu_info(cpu)) &
-										kSearchByteMaskTable[info->elementBytes];
+								data =	DoMemoryRead(buf, address, kSearchByteIncrementTable[info->element_bytes], cpu_needs_swap(cpu) + info->add_value, get_cpu_info(cpu)) &
+										kSearchByteMaskTable[info->element_bytes];
 						}
 						break;
 
@@ -10187,25 +10210,25 @@ void cheat_display_watches(void)
 					UINT8 * buf = memory_region(info->cpu);
 
 					if(buf)
-						data =	DoMemoryRead(buf, address, kSearchByteIncrementTable[info->elementBytes],
-								region_needs_swap(info->cpu) + info->addValue,
-								get_region_info(info->cpu)) & kSearchByteMaskTable[info->elementBytes];
+						data =	DoMemoryRead(buf, address, kSearchByteIncrementTable[info->element_bytes],
+								region_needs_swap(info->cpu) + info->add_value,
+								get_region_info(info->cpu)) & kSearchByteMaskTable[info->element_bytes];
 				}
 
-				data = DoShift(data, info->dataShift);
+				data = DoShift(data, info->data_shift);
 				data ^= info->xor;
 
-				if(	(lineElements >= info->elementsPerLine) && info->elementsPerLine)
+				if(	(lineElements >= info->elements_per_line) && info->elements_per_line)
 				{
 					lineElements = 0;
 					xOffset = 0;
 					yOffset++;
 				}
 
-				switch(info->displayType)
+				switch(info->display_type)
 				{
 					case kWatchDisplayType_Hex:
-						numChars = sprintf(buf, "%.*X", kSearchByteDigitsTable[info->elementBytes], data);
+						numChars = sprintf(buf, "%.*X", kSearchByteDigitsTable[info->element_bytes], data);
 
 						ui_draw_text(buf, xOffset * ui_get_char_width('0') + info->x, yOffset * ui_get_line_height() + info->y);
 						xOffset += numChars;
@@ -10213,7 +10236,7 @@ void cheat_display_watches(void)
 						break;
 
 					case kWatchDisplayType_Decimal:
-						numChars = sprintf(buf, "%.*d", kSearchByteDecDigitsTable[info->elementBytes], data);
+						numChars = sprintf(buf, "%.*d", kSearchByteDecDigitsTable[info->element_bytes], data);
 
 						ui_draw_text(buf, xOffset * ui_get_char_width('0') + info->x, yOffset * ui_get_line_height() + info->y);
 						xOffset += numChars;
@@ -10221,7 +10244,7 @@ void cheat_display_watches(void)
 						break;
 
 					case kWatchDisplayType_Binary:
-						numChars = PrintBinary(buf, data, kSearchByteMaskTable[info->elementBytes]);
+						numChars = PrintBinary(buf, data, kSearchByteMaskTable[info->element_bytes]);
 
 						ui_draw_text(buf, xOffset * ui_get_char_width('0') + info->x, yOffset * ui_get_line_height() + info->y);
 						xOffset += numChars;
@@ -10229,254 +10252,210 @@ void cheat_display_watches(void)
 						break;
 
 					case kWatchDisplayType_ASCII:
-						numChars = PrintASCII(buf, data, info->elementBytes);
+						numChars = PrintASCII(buf, data, info->element_bytes);
 
 						ui_draw_text(buf, xOffset * ui_get_char_width('0') + info->x, yOffset * ui_get_line_height() + info->y);
 						xOffset += numChars;
 						break;
 				}
 
-				address += kSearchByteIncrementTable[info->elementBytes] + info->skip;
+				address += kSearchByteIncrementTable[info->element_bytes] + info->skip;
 				lineElements++;
 			}
 		}
 	}
 }
 
-/*------------------
-  ResizeCheatList
-------------------*/
+/*--------------------------------------------------------
+  resize_cheat_list - memory allocation for cheat entry
+--------------------------------------------------------*/
 
-static void ResizeCheatList(UINT32 newLength)
+static void resize_cheat_list(UINT32 new_length, UINT8 dispose)
 {
-	if(newLength != cheatListLength)
+	if(new_length != cheat_list_length)
 	{
-		if(newLength < cheatListLength)
+		/* ??? REQUEST_DISPOSE is only when INSERT right now so that it's meaningless ??? */
+		if(dispose == REQUEST_DISPOSE)
 		{
-			int	i;
+			/* free cheat entry if delete */
+			if(new_length < cheat_list_length)
+			{
+				int i;
 
-			for(i = newLength; i < cheatListLength; i++)
-				DisposeCheat(&cheatList[i]);
+				for(i = new_length; i < cheat_list_length; i++)
+					dispose_cheat(&cheat_list[i]);
+			}
 		}
 
-		cheatList = realloc(cheatList, newLength * sizeof(CheatEntry));
+		/* reallocate cheat entry */
+		cheat_list = realloc(cheat_list, new_length * sizeof(cheat_entry));
 
-		if(!cheatList && (newLength != 0))
+		if(cheat_list == NULL && new_length != 0)
 		{
-			logerror("ResizeCheatList: out of memory resizing cheat list\n");
-			ui_popup_time(2, "out of memory while loading cheat database");
-
-			cheatListLength = 0;
-
-			return;
+			fatalerror("cheat: [cheat entry] memory allocation error\n"
+						"	length =		%.8X\n"
+						"	new_length =	%.8X\n"
+						"	cheat_list =	%p\n",
+						cheat_list_length, new_length, cheat_list);
 		}
 
-		if(newLength > cheatListLength)
+		/* add new entry if insert */
+		if(new_length > cheat_list_length)
 		{
-			int	i;
+			int i;
 
-			memset(&cheatList[cheatListLength], 0, (newLength - cheatListLength) * sizeof(CheatEntry));
+			memset(&cheat_list[cheat_list_length], 0, (new_length - cheat_list_length) * sizeof(cheat_entry));
 
-			for(i = cheatListLength; i < newLength; i++)
-				cheatList[i].flags |= kCheatFlag_Dirty;
+			/* set dirty flag to inserted entry */
+			for(i = cheat_list_length; i < new_length; i++)
+				cheat_list[i].flags |= kCheatFlag_Dirty;
 		}
 
-		cheatListLength = newLength;
+		cheat_list_length = new_length;
 	}
 }
 
-/*---------------------------
-  ResizeCheatListNoDispose
----------------------------*/
+/*-----------------------------------------------------------------
+  add_cheat_before - insert new cheat entry before selected code
+-----------------------------------------------------------------*/
 
-static void ResizeCheatListNoDispose(UINT32 newLength)
+static void add_cheat_before(UINT32 idx)
 {
-	if(newLength != cheatListLength)
-	{
-		cheatList = realloc(cheatList, newLength * sizeof(CheatEntry));
+	/* insert new cheat entry */
+	resize_cheat_list(cheat_list_length + 1, REQUEST_DISPOSE);
 
-		if(!cheatList && (newLength != 0))
-		{
-			logerror("ResizeCheatListNoDispose: out of memory resizing cheat list\n");
-			ui_popup_time(2, "out of memory while loading cheat database");
+	/* pack later entry if inserting point is not last */
+	if(idx < cheat_list_length - 1)
+		memmove(&cheat_list[idx + 1], &cheat_list[idx], sizeof(cheat_entry) * (cheat_list_length - 1 - idx));
 
-			cheatListLength = 0;
+	if(idx >= cheat_list_length)
+		idx = cheat_list_length - 1;
 
-			return;
-		}
+	/* initialize inserted entry */
+	memset(&cheat_list[idx], 0, sizeof(cheat_entry));
 
-		if(newLength > cheatListLength)
-		{
-			int	i;
+	/* set dirty flag (meaningelss?) */
+	cheat_list[idx].flags |= kCheatFlag_Dirty;
 
-			memset(&cheatList[cheatListLength], 0, (newLength - cheatListLength) * sizeof(CheatEntry));
+	/* insert new cheat action together */
+	resize_cheat_action_list(&cheat_list[idx], 1, REQUEST_DISPOSE);
 
-			for(i = cheatListLength; i < newLength; i++)
-				cheatList[i].flags |= kCheatFlag_Dirty;
-		}
+	cheat_list[idx].action_list[0].extend_data = ~0;
+	cheat_list[idx].action_list[0].last_value = NULL;
 
-		cheatListLength = newLength;
-	}
-}
-
-/*---------------------------------------------------------------
-  AddCheatBefore - insert new cheat entry before selected code
----------------------------------------------------------------*/
-
-static void AddCheatBefore(UINT32 idx)
-{
-	ResizeCheatList(cheatListLength + 1);
-
-	if(idx < (cheatListLength - 1))
-		memmove(&cheatList[idx + 1], &cheatList[idx], sizeof(CheatEntry) * (cheatListLength - 1 - idx));
-
-	if(idx >= cheatListLength)
-		idx = cheatListLength - 1;
-
-	memset(&cheatList[idx], 0, sizeof(CheatEntry));
-
-	cheatList[idx].flags |= kCheatFlag_Dirty;
-
-	ResizeCheatActionList(&cheatList[idx], 1);
-
-	cheatList[idx].actionList[0].extendData = ~0;
-	cheatList[idx].actionList[0].lastValue = NULL;
-
-	messageType = kCheatMessage_SucceededToAdd;
-	messageTimer = DEFAULT_MESSAGE_TIME;
-}
-
-/*----------------
-  DeleteCheatAt
-----------------*/
-
-static void DeleteCheatAt(UINT32 idx)
-{
-	if(idx >= cheatListLength)
-	{
-		messageType = kCheatMessage_FailedToDelete;
-		messageTimer = DEFAULT_MESSAGE_TIME;
-		return;
-	}
-
-	DisposeCheat(&cheatList[idx]);
-
-	if(idx < (cheatListLength - 1))
-	{
-		memmove(&cheatList[idx], &cheatList[idx + 1], sizeof(CheatEntry) * (cheatListLength - 1 - idx));
-	}
-
-	ResizeCheatListNoDispose(cheatListLength - 1);
-
-	messageType = kCheatMessage_SucceededToDelete;
-	messageTimer = DEFAULT_MESSAGE_TIME;
+	SET_MESSAGE(kCheatMessage_SucceededToAdd);
 }
 
 /*------------------------------------------------
-  DisposeCheat - free memory for selected entry
+  delete_cheat_at - delete selected cheat entry
 ------------------------------------------------*/
 
-static void DisposeCheat(CheatEntry * entry)
+static void delete_cheat_at(UINT32 idx)
+{
+	/* if selected point is not cheat entry, no action */
+	if(idx >= cheat_list_length)
+	{
+		SET_MESSAGE(kCheatMessage_FailedToDelete);
+		return;
+	}
+
+	/* free selected cheat entry */
+	dispose_cheat(&cheat_list[idx]);
+
+	/* pack later cheat entry if selected point is not last */
+	if(idx < cheat_list_length - 1)
+	{
+		memmove(&cheat_list[idx], &cheat_list[idx + 1], sizeof(cheat_entry) * (cheat_list_length - 1 - idx));
+	}
+
+	/* realloc cheat entry */
+	resize_cheat_list(cheat_list_length - 1, NO_DISPOSE);
+
+	SET_MESSAGE(kCheatMessage_SucceededToDelete);
+}
+
+/*--------------------------------------------------------------------------------
+  dispose_cheat - free selected cheat entry and all cheat actions in this entry
+--------------------------------------------------------------------------------*/
+
+static void dispose_cheat(cheat_entry *entry)
 {
 	if(entry)
 	{
-		int	i;
+		int i;
 
 		free(entry->name);
 		free(entry->comment);
-		free(entry->labelIndex);
+		free(entry->label_index);
 
-		for(i = 0; i < entry->actionListLength; i++)
-		{
-			CheatAction	* action = &entry->actionList[i];
+		/* free all cheat actions in selected entry */
+		for(i = 0; i < entry->action_list_length; i++)
+			dispose_action(&entry->action_list[i]);
 
-			DisposeAction(action);
-		}
+		free(entry->action_list);
 
-		free(entry->actionList);
-
-		memset(entry, 0, sizeof(CheatEntry));
+		memset(entry, 0, sizeof(cheat_entry));
 	}
 }
 
-/*-----------------------------------------------------
-  GetNewCheat - insert new cheat entry and return it
------------------------------------------------------*/
+/*-------------------------------------------------------------------------------
+  get_new_cheat - return pointer to new cheat entry inserted at last position
+-------------------------------------------------------------------------------*/
 
-static CheatEntry *	GetNewCheat(void)
+static cheat_entry *get_new_cheat(void)
 {
-	AddCheatBefore(cheatListLength);
+	/* insert new cheat entry at last position */
+	add_cheat_before(cheat_list_length);
 
-	return &cheatList[cheatListLength - 1];
+	return &cheat_list[cheat_list_length - 1];
 }
 
-/*------------------------
-  ResizeCheatActionList
-------------------------*/
+/*-----------------------------------------------------------------------
+  resize_cheat_action_list - reallocate cheat action in selected entry
+-----------------------------------------------------------------------*/
 
-static void ResizeCheatActionList(CheatEntry * entry, UINT32 newLength)
+static void resize_cheat_action_list(cheat_entry *entry, UINT32 new_length, UINT8 dispose)
 {
-	if(newLength != entry->actionListLength)
+	if(new_length != entry->action_list_length)
 	{
-		if(newLength < entry->actionListLength)
+		if(dispose == REQUEST_DISPOSE)
 		{
-			int	i;
+			/* free cheat action if delete */
+			if(new_length < entry->action_list_length)
+			{
+				int i;
 
-			for(i = newLength; i < entry->actionListLength; i++)
-				DisposeAction(&entry->actionList[i]);
+				for(i = new_length; i < entry->action_list_length; i++)
+					dispose_action(&entry->action_list[i]);
+			}
 		}
 
-		entry->actionList = realloc(entry->actionList, newLength * sizeof(CheatAction));
-		if(!entry->actionList && (newLength != 0))
+		/* reallocate cheat action */
+		entry->action_list = realloc(entry->action_list, new_length * sizeof(cheat_action));
+
+		if(entry->action_list == NULL && new_length != 0)
 		{
-			logerror("ResizeCheatActionList: out of memory resizing cheat action list\n");
-			ui_popup_time(2, "out of memory while loading cheat database");
-
-			entry->actionListLength = 0;
-
-			return;
+			fatalerror("cheat: [cheat action] memory allocation error\n"
+						"	length =		%.8X\n"
+						"	new_length =	%.8X\n"
+						"	action_list =	%p\n",
+						entry->action_list_length, new_length, entry->action_list);
 		}
 
-		if(newLength > entry->actionListLength)
+		/* add new action if insert */
+		if(new_length > entry->action_list_length)
 		{
-			memset(&entry->actionList[entry->actionListLength], 0, (newLength - entry->actionListLength) * sizeof(CheatAction));
+			memset(&entry->action_list[entry->action_list_length], 0, (new_length - entry->action_list_length) * sizeof(cheat_action));
 		}
 
-		entry->actionListLength = newLength;
+		entry->action_list_length = new_length;
 	}
 }
 
-/*---------------------------------
-  ResizeCheatActionListNoDispose
----------------------------------*/
 #if 0
-static void ResizeCheatActionListNoDispose(CheatEntry * entry, UINT32 newLength)
-{
-	if(newLength != entry->actionListLength)
-	{
-		entry->actionList = realloc(entry->actionList, newLength * sizeof(CheatAction));
-		if(!entry->actionList && (newLength != 0))
-		{
-			logerror("ResizeCheatActionList: out of memory resizing cheat action list\n");
-			ui_popup_time(2, "out of memory while loading cheat database");
-
-			entry->actionListLength = 0;
-
-			return;
-		}
-
-		if(newLength > entry->actionListLength)
-		{
-			memset(&entry->actionList[entry->actionListLength], 0, (newLength - entry->actionListLength) * sizeof(CheatAction));
-		}
-
-		entry->actionListLength = newLength;
-	}
-}
-
 /*----------------------------------------------------------------
   AddActionBefore - Insert empty Action
-                    This function is only called in EditCheat()
+                    This function is only called in EditCheat() 
 ----------------------------------------------------------------*/
 
 static void AddActionBefore(CheatEntry * entry, UINT32 idx)
@@ -10491,8 +10470,8 @@ static void AddActionBefore(CheatEntry * entry, UINT32 idx)
 
 	memset(&entry->actionList[idx], 0, sizeof(CheatAction));
 
-	cheatList[idx].actionList[0].extendData = ~0;
-	cheatList[idx].actionList[0].lastValue = NULL;
+	cheat_list[idx].actionList[0].extendData = ~0;
+	cheat_list[idx].actionList[0].lastValue = NULL;
 }
 
 /*-----------------
@@ -10503,8 +10482,7 @@ static void DeleteActionAt(CheatEntry * entry, UINT32 idx)
 {
 	if(idx >= entry->actionListLength)
 	{
-		messageType = kCheatMessage_FailedToDelete;
-		messageTimer = DEFAULT_MESSAGE_TIME;
+		SET_MESSAGE(kCheatMessage_FailedToDelete);
 		return;
 	}
 
@@ -10515,307 +10493,279 @@ static void DeleteActionAt(CheatEntry * entry, UINT32 idx)
 
 	ResizeCheatActionListNoDispose(entry, entry->actionListLength - 1);
 
-	messageTimer = DEFAULT_MESSAGE_TIME;
-	messageType = kCheatMessage_SucceededToDelete;
+	SET_MESSAGE(kCheatMessage_SucceededToDelete);
 }
 #endif
-/*----------------
-  DisposeAction
-----------------*/
+/*----------------------------------------------
+  dispose_action - free selected cheat action
+----------------------------------------------*/
 
-static void DisposeAction(CheatAction * action)
+static void dispose_action(cheat_action *action)
 {
-	if(action)
+	if(action != NULL)
 	{
-		free(action->optionalName);
+		free(action->optional_name);
 
-		if(action->lastValue)
-			free(action->lastValue);
+		if(action->last_value)
+			free(action->last_value);
 
-		memset(action, 0, sizeof(CheatAction));
+		memset(action, 0, sizeof(cheat_action));
 	}
 }
 
-/*------------------------------------------------
-  InitWatch - initialize a value for watchpoint
-------------------------------------------------*/
+/*-------------------------------------------------
+  init_watch - initialize a value for watchpoint
+-------------------------------------------------*/
 
-static void InitWatch(WatchInfo * info, UINT32 idx)
+static void init_watch(watch_info *info, UINT32 idx)
 {
 	/* NOTE : 1st watchpoint should be always Y = 0 */
 	if(idx > 0)
-		info->y = watchList[idx - 1].y + ui_get_line_height();
+		info->y = watch_list[idx - 1].y + ui_get_line_height();
 	else
 		info->y = 0;
 }
 
-/*------------------
-  ResizeWatchList
-------------------*/
+/*--------------------------------------------------------------
+  resize_watch_list - reallocate watch list if different size
+--------------------------------------------------------------*/
 
-static void ResizeWatchList(UINT32 newLength)
+static void resize_watch_list(UINT32 new_length, UINT8 dispose)
 {
-	if(newLength != watchListLength)
+	if(new_length != watch_list_length)
 	{
-		if(newLength < watchListLength)
+		/* NOTE : dispose flag is only set when called from delete_watch_at() */
+		if(dispose)
 		{
-			int	i;
+			/* if delete, free deleted or later watch list */
+			if(new_length < watch_list_length)
+			{
+				int i;
 
-			for(i = newLength; i < watchListLength; i++)
-				DisposeWatch(&watchList[i]);
+				for(i = new_length; i < watch_list_length; i++)
+					dispose_watch(&watch_list[i]);
+			}
 		}
 
-		watchList = realloc(watchList, newLength * sizeof(WatchInfo));
-		if(!watchList && (newLength != 0))
+		/* reallocate watch list */
+		watch_list = realloc(watch_list, new_length * sizeof(watch_info));
+
+		if(watch_list == NULL && new_length != 0)
 		{
-			logerror("ResizeWatchList: out of memory resizing watch list\n");
-			ui_popup_time(2, "out of memory while adding watch");
-
-			watchListLength = 0;
-
-			return;
+			/* memory allocation error */
+			fatalerror(	"cheat : [watch list] memory allocation error\n"
+						"	length =		%.8X\n"
+						"	new_length =	%.8X\n"
+						"	watch_list =	%p\n",
+						watch_list_length, new_length, watch_list);
 		}
 
-		if(newLength > watchListLength)
+		/* if insert, move later watch list */
+		if(new_length > watch_list_length)
 		{
-			int	i;
+			int i;
 
-			memset(&watchList[watchListLength], 0, (newLength - watchListLength) * sizeof(WatchInfo));
+			memset(&watch_list[watch_list_length], 0, (new_length - watch_list_length) * sizeof(watch_info));
 
-			for(i = watchListLength; i < newLength; i++)
-				InitWatch(&watchList[i], i);
+			for(i = watch_list_length; i < new_length; i++)
+				init_watch(&watch_list[i], i);
 		}
 
-		watchListLength = newLength;
+		watch_list_length = new_length;
 	}
 }
 
-/*---------------------------
-  ResizeWatchListNoDispose
----------------------------*/
+/*-------------------------------------------
+  add_watch_before - insert new watch list
+-------------------------------------------*/
 
-static void ResizeWatchListNoDispose(UINT32 newLength)
+static void add_watch_before(UINT32 idx)
 {
-	if(newLength != watchListLength)
+	/* reallocate watch list */
+	resize_watch_list(watch_list_length + 1, 0);
+
+	/* if insert position is not last, move later watch list */
+	if(idx < watch_list_length - 1)
+		memmove(&watch_list[idx + 1], &watch_list[idx], sizeof(watch_info) * (watch_list_length - 1 - idx));
+	else
+		idx = watch_list_length - 1;
+
+	/* memory initialize */
+	memset(&watch_list[idx], 0, sizeof(watch_info));
+
+	init_watch(&watch_list[idx], idx);
+}
+
+/*------------------------------------------------
+  delete_watch_at - delete selected watch point
+------------------------------------------------*/
+
+static void delete_watch_at(UINT32 idx)
+{
+	/* if selected item is not watchpoint, no delete */
+	if(idx >= watch_list_length)
 	{
-		watchList = realloc(watchList, newLength * sizeof(WatchInfo));
-		if(!watchList && (newLength != 0))
-		{
-			logerror("ResizeWatchList: out of memory resizing watch list\n");
-			ui_popup_time(2, "out of memory while adding watch");
-
-			watchListLength = 0;
-
-			return;
-		}
-
-		if(newLength > watchListLength)
-		{
-			int	i;
-
-			memset(&watchList[watchListLength], 0, (newLength - watchListLength) * sizeof(WatchInfo));
-
-			for(i = watchListLength; i < newLength; i++)
-				InitWatch(&watchList[i], i);
-		}
-
-		watchListLength = newLength;
-	}
-}
-
-/*-----------------
-  AddWatchBefore
------------------*/
-
-static void AddWatchBefore(UINT32 idx)
-{
-	ResizeWatchList(watchListLength + 1);
-
-	if(idx < (watchListLength - 1))
-		memmove(&watchList[idx + 1], &watchList[idx], sizeof(WatchInfo) * (watchListLength - 1 - idx));
-
-	if(idx >= watchListLength)
-		idx = watchListLength - 1;
-
-	memset(&watchList[idx], 0, sizeof(WatchInfo));
-
-	InitWatch(&watchList[idx], idx);
-}
-
-/*----------------
-  DeleteWatchAt
-----------------*/
-
-static void DeleteWatchAt(UINT32 idx)
-{
-	if(idx >= watchListLength)
+		SET_MESSAGE(kCheatMessage_FailedToDelete);
 		return;
+	}
 
-	DisposeWatch(&watchList[idx]);
+	/* free selected watch list */
+	dispose_watch(&watch_list[idx]);
 
-	if(idx < (watchListLength - 1))
-		memmove(&watchList[idx], &watchList[idx + 1], sizeof(WatchInfo) * (watchListLength - 1 - idx));
+	/* move later watch list */
+	memmove(&watch_list[idx], &watch_list[idx + 1], sizeof(watch_info) * (watch_list_length - 1 - idx));
 
-	ResizeWatchListNoDispose(watchListLength - 1);
+	/* reallocate watch list */
+	resize_watch_list(watch_list_length - 1, 1);
 }
 
-/*---------------
-  DisposeWatch
----------------*/
+/*-------------------------------------------------
+  dispose_watch - initialize selected watch list
+-------------------------------------------------*/
 
-static void DisposeWatch(WatchInfo * watch)
+static void dispose_watch(watch_info *watch)
 {
-	if(watch)
-		memset(watch, 0, sizeof(WatchInfo));
+	memset(watch, 0, sizeof(watch_info));
 }
 
-/*----------------------------------------------------------
-  GetUnusedWatch - search unused watchpoint and return it
-----------------------------------------------------------*/
+/*--------------------------------------------
+  get_unused_watch - find unused watchpoint
+--------------------------------------------*/
 
-static WatchInfo * GetUnusedWatch(void)
+static watch_info *get_unused_watch(void)
 {
 	int			i;
-	WatchInfo	* info;
-	WatchInfo	* theWatch = NULL;
+	watch_info	*info;
+	watch_info	*the_watch = NULL;
 
 	/* search unused watchpoint */
-	for(i = 0; i < watchListLength; i++)
+	for(i = 0; i < watch_list_length; i++)
 	{
-		info = &watchList[i];
+		info = &watch_list[i];
 
-		if(info->numElements == 0)
+		/* NOTE : "unused" means "undisplayed" */
+		if(info->num_elements == 0)
 		{
-			theWatch = info;
+			the_watch = info;
 			break;
 		}
 	}
 
-	/* if unused watchpoint is not found, insert new watchpoint */
-	if(!theWatch)
+	/* if all watchpoints are used, insert new watchpoint */
+	if(the_watch == NULL)
 	{
-		AddWatchBefore(watchListLength);
+		add_watch_before(watch_list_length);
 
-		theWatch = &watchList[watchListLength - 1];
+		the_watch = &watch_list[watch_list_length - 1];
 	}
 
-	return theWatch;
+	return the_watch;
 }
 
-/*----------------------------------------------------------------------------
-  AddCheatFromWatch - add new cheat code from watchpoint list to cheat list
-----------------------------------------------------------------------------*/
+/*------------------------------------------------------------
+  add_cheat_from_watch - add new cheat code from watchpoint
+------------------------------------------------------------*/
 
-static void AddCheatFromWatch(WatchInfo * watch)
+static void add_cheat_from_watch(watch_info *watch)
 {
 	if(watch)
 	{
-		int			tempStringLength;
-		char		tempString[1024];
-		CheatEntry	* entry				= GetNewCheat();
-		CheatAction	* action			= &entry->actionList[0];
+		int				temp_string_length;
+		char			temp_string[1024];
+		cheat_entry		*entry		= get_new_cheat();
+		cheat_action	*action		= &entry->action_list[0];
 
 		/* set parameters */
-		action->region		= watch->cpu;
-		SET_FIELD(action->type, CPURegion, action->region);
-		SET_FIELD(action->type, AddressSize, watch->elementBytes);
-		action->address		= action->originalAddress	= watch->address;
-		action->extendData	= ~0;
-		action->lastValue	= NULL;
-
-		action->data 		= ReadData(action);
+		action->region				= watch->cpu;
+		action->address				= watch->address;
+		action->original_address	= watch->address;
+		action->extend_data			= ~0;
+		action->last_value			= NULL;
+		action->data 				= ReadData(action);
+		SET_FIELD(action->type, AddressSize, watch->element_bytes);
 
 		/* set name */
-		tempStringLength = sprintf(tempString, "%.8X (%d) = %.*X", watch->address, watch->cpu, kSearchByteDigitsTable[watch->elementBytes], action->data);
-		entry->name = create_string_copy(tempString);
+		temp_string_length = sprintf(temp_string, "%.8X (%d) = %.*X", watch->address, watch->cpu, kSearchByteDigitsTable[watch->element_bytes], action->data);
+		entry->name = create_string_copy(temp_string);
 
-		UpdateCheatInfo(entry, 0);
+		update_cheat_info(entry, 0);
 
-		messageType		= kCheatMessage_SucceededToAdd;
-		messageTimer	= DEFAULT_MESSAGE_TIME;
+		SET_MESSAGE(kCheatMessage_SucceededToAdd);
 	}
 	else
-	{
-		messageType		= kCheatMessage_FailedToAdd;
-		messageTimer	= DEFAULT_MESSAGE_TIME;
-	}
+		SET_MESSAGE(kCheatMessage_FailedToAdd);
 }
 
-/*--------------------------------------------------------------------------------------
-  SetupCheatFromWatchAsWatch - add new watch code from watchpoint list to cheat list
-                               If watchpoint is not displayed (length = 0), don't add
---------------------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------
+  add_cheat_from_watch_as_watch - add new watchpoint cheat from watchpoint
+---------------------------------------------------------------------------*/
 
-static void SetupCheatFromWatchAsWatch(CheatEntry * entry, WatchInfo * watch)
+static void add_cheat_from_watch_as_watch(cheat_entry *entry, watch_info *watch)
 {
-	if(watch && entry && watch->numElements)
+	/* NOTE : don't add in case of undisplayed watchpoint */
+	if(watch && entry && watch->num_elements)
 	{
-		char			tempString[256];
-		CheatAction		* action;
+		char			temp_string[256];
+		cheat_action	*action;
 
-		DisposeCheat(entry);
-		ResizeCheatActionList(entry, 1);
+		/* free then add new cheat entry */
+		dispose_cheat(entry);
+		resize_cheat_action_list(entry, 1, REQUEST_DISPOSE);
+		action = &entry->action_list[0];
 
-		action = &entry->actionList[0];
+		/* set name and comments */
+		sprintf(temp_string, "Watch %.8X (%d)", watch->address, watch->cpu);
 
-		sprintf(tempString, "Watch %.8X (%d)", watch->address, watch->cpu);
-
-		/* set name */
-		entry->name		= create_string_copy(tempString);
+		entry->name		= create_string_copy(temp_string);
 		entry->comment	= create_string_copy(watch->label);
 
 		/* set parameters */
+		action->region				= watch->cpu;
+		action->address				= watch->address;
+		action->original_address	= watch->address;
+		action->original_data		= action->data;
+		action->extend_data			= ~0;
+
 		SET_FIELD(action->type, CodeType, kCodeType_Watch);
-		SET_FIELD(action->type, AddressSize, kSearchByteIncrementTable[watch->elementBytes] - 1);
-
-		action->region				=	watch->cpu;
-		action->address				=	watch->address;
-		action->originalAddress		=	action->address;
-		action->originalDataField	=	action->data;
-		action->extendData			=	0xFFFFFFFF;
-
-		SET_FIELD(action->data, WatchNumElements, watch->numElements - 1);
+		SET_FIELD(action->type, AddressSize, kSearchByteIncrementTable[watch->element_bytes] - 1);
+		SET_FIELD(action->data, WatchNumElements, watch->num_elements - 1);
 		SET_FIELD(action->data, WatchSkip, watch->skip);
-		SET_FIELD(action->data, WatchElementsPerLine, watch->elementsPerLine);
-		SET_FIELD(action->data, WatchAddValue, watch->addValue);
+		SET_FIELD(action->data, WatchElementsPerLine, watch->elements_per_line);
+		SET_FIELD(action->data, WatchAddValue, watch->add_value);
 
-		/* set comment */
+		update_cheat_info(entry, 0);
 
-		UpdateCheatInfo(entry, 0);
-
-		messageType		= kCheatMessage_SucceededToAdd;
-		messageTimer	= DEFAULT_MESSAGE_TIME;
+		SET_MESSAGE(kCheatMessage_SucceededToAdd);
 	}
 	else
-	{
-		messageType		= kCheatMessage_FailedToAdd;
-		messageTimer	= DEFAULT_MESSAGE_TIME;
-	}
+		SET_MESSAGE(kCheatMessage_FailedToAdd);
 }
 
-/*-----------------------------------------------------------
-  ResetWatch - clear data in WatchInfo except x/y position
------------------------------------------------------------*/
+/*----------------------------------------------------------------------
+  reset_watch - clear data in selected watch list except the position
+----------------------------------------------------------------------*/
 
-static void ResetWatch(WatchInfo * watch)
+static void reset_watch(watch_info *watch)
 {
 	if(watch)
 	{
-		watch->address			= 0;
-		watch->cpu				= 0;
-		watch->numElements		= 0;
-		watch->elementBytes		= kWatchSizeConversionTable[0];
-		watch->labelType		= kWatchLabel_None;
-		watch->displayType		= kWatchDisplayType_Hex;
-		watch->skip				= 0;
-		watch->elementsPerLine	= 0;
-		watch->addValue			= 0;
-		watch->addressShift		= 0;
-		watch->dataShift		= 0;
-		watch->xor				= 0;
-		watch->linkedCheat		= NULL;
-		watch->label[0]			= 0;
+		watch->address				= 0;
+		watch->cpu					= 0;
+		watch->num_elements			= 0;
+		watch->element_bytes		= kWatchSizeConversionTable[0];
+		watch->label_type			= kWatchLabel_None;
+		watch->display_type			= kWatchDisplayType_Hex;
+		watch->skip					= 0;
+		watch->elements_per_line	= 0;
+		watch->add_value			= 0;
+		watch->address_shift		= 0;
+		watch->data_shift			= 0;
+		watch->xor					= 0;
+		watch->linked_cheat			= NULL;
+		watch->label[0]				= 0;
 	}
+	else
+		SET_MESSAGE(kCheatMessage_FailedToDelete);
 }
 
 /*------------------------------------------------------------------
@@ -10826,7 +10776,7 @@ static void resize_search_list(UINT32 new_length)
 {
 	if(new_length != search_list_length)
 	{
-		/* if delete, dispose deleted or later search lists */
+		/* free search list if delete */
 		if(new_length < search_list_length)
 		{
 			int i;
@@ -10840,16 +10790,14 @@ static void resize_search_list(UINT32 new_length)
 
 		if(search_list == NULL && new_length != 0)
 		{
-			/* memory allocation error */
-			logerror("ResizeSearchList: out of memory resizing search list\n");
-			ui_popup_time(2, "out of memory while adding search");
-
-			search_list_length = 0;
-
-			return;
+			fatalerror("cheat: [search info] memory allocation error\n"
+						"	length =		%.8X\n"
+						"	new_length =	%.8X\n"
+						"	search_list =	%p\n",
+						search_list_length, new_length, search_list);
 		}
 
-		/* if insert, initialize new search list */
+		/* add new search list if insert */
 		if(new_length > search_list_length)
 		{
 			int i;
@@ -10934,7 +10882,7 @@ static void DeleteSearchAt(UINT32 idx)
 static void init_search(search_info *info)
 {
 	if(info)
-		info->search_speed = ksearch_speed_Medium;
+		info->search_speed = SEARCH_SPEED_MEDIUM;
 }
 
 /*---------------------------------------------------------------------------
@@ -10998,7 +10946,7 @@ static search_info *get_current_search(void)
   fill_buffer_from_region - fill selected search region with a value read from search address
 ----------------------------------------------------------------------------------------------*/
 
-static void fill_buffer_from_region(search_region *region, UINT8 * buf)
+static void fill_buffer_from_region(search_region *region, UINT8 *buf)
 {
 	UINT32 offset;
 
@@ -11025,7 +10973,7 @@ static UINT32 read_region_data(search_region *region, UINT32 offset, UINT8 size,
 				UINT8 * buf = (UINT8 *)region->cached_pointer;
 
 				if(buf)
-/*                  return DoMemoryRead(region->cached_pointer, address, size, swap, &raw_cpu_info); */
+/*					return DoMemoryRead(region->cached_pointer, address, size, swap, &raw_cpu_info); */
 					return DoMemoryRead(buf, address, size, cpu_needs_swap(region->target_idx) ^ swap, get_cpu_info(region->target_idx));
 				else
 					return 0;
@@ -11066,8 +11014,7 @@ static void restore_search_backup(search_info *info)
 		info->backup_valid	= 0;
 
 #if 1
-		messageTimer = DEFAULT_MESSAGE_TIME;
-		messageType = kCheatMessage_RestoreValue;
+		SET_MESSAGE(kCheatMessage_RestoreValue);
 #else
 		ui_popup_time(1, "values restored");	/* not displayed when ui is opend */
 #endif
@@ -11075,8 +11022,7 @@ static void restore_search_backup(search_info *info)
 	else
 	{
 #if 1
-		messageTimer = DEFAULT_MESSAGE_TIME;
-		messageType = kCheatMessage_NoOldValue;
+		SET_MESSAGE(kCheatMessage_NoOldValue);
 #else
 		ui_popup_time(1, "there are no old values");	/* not displayed when ui is opend */
 #endif
@@ -11120,23 +11066,16 @@ static void restore_region_backup(search_region *region)
 static UINT8 default_enable_region(running_machine *machine, search_region *region, search_info *info)
 {
 	write8_machine_func	handler			= region->write_handler->write.mhandler8;
-	FPTR				handlerAddress	= (FPTR)handler;
+	FPTR				handler_address	= (FPTR)handler;
 
 	switch(info->search_speed)
 	{
-		case ksearch_speed_Fast:
-#if HAS_SH2
-			if(	machine->config->cpu[0].type == CPU_SH2 &&
-				(info->target_type == kRegionType_CPU && info->target_idx == 0 && region->address == 0x06000000))
-					return 1;
-			else
-				return 0;
-#endif
+		case SEARCH_SPEED_FAST:
 			if(handler == SMH_RAM && region->write_handler->baseptr != NULL)
 				return 1;
 
-		case ksearch_speed_Medium:
-			if(handlerAddress >= (FPTR)SMH_BANK1 && handlerAddress <= (FPTR)SMH_BANK24)
+		case SEARCH_SPEED_MEDIUM:
+			if(handler_address >= (FPTR)SMH_BANK1 && handler_address <= (FPTR)SMH_BANK32)
 				return 1;
 
 			if(handler == SMH_RAM)
@@ -11144,16 +11083,16 @@ static UINT8 default_enable_region(running_machine *machine, search_region *regi
 
 			return 0;
 
-		case ksearch_speed_Slow:
+		case SEARCH_SPEED_SLOW:
 			if(handler == SMH_NOP || handler == SMH_ROM)
 				return 0;
 
-			if(handlerAddress > STATIC_COUNT && region->write_handler->baseptr == NULL)
+			if(handler_address > STATIC_COUNT && region->write_handler->baseptr == NULL)
 				return 0;
 
 			return 1;
 
-		case ksearch_speed_VerySlow:
+		case SEARCH_SPEED_VERY_SLOW:
 			if(handler == SMH_NOP || handler == SMH_ROM)
 				return 0;
 
@@ -11180,7 +11119,7 @@ static void set_search_region_default_name(search_region *region)
 				genf	*handler		= region->write_handler->write.generic;
 				FPTR	handler_address	= (FPTR)handler;
 
-				if(handler_address >= (FPTR)SMH_BANK1 && handler_address <= (FPTR)SMH_BANK24)
+				if(handler_address >= (FPTR)SMH_BANK1 && handler_address <= (FPTR)SMH_BANK32)
 				{
 					sprintf(desc, "BANK%.2d", (int)(handler_address - (FPTR)SMH_BANK1) + 1);
 				}
@@ -11214,9 +11153,28 @@ static void set_search_region_default_name(search_region *region)
 	}
 }
 
-/*-------------------------------------------------------------------------------------
-  allocate_search_regions - free memory for search region then realloc if searchable
--------------------------------------------------------------------------------------*/
+/*------------------------------------------------------------------
+  is_search_region_in_range - check valid range for search region
+------------------------------------------------------------------*/
+
+static UINT8 is_search_region_in_range(UINT8 cpu, UINT32 length)
+{
+	if(length > cpu_info_list[cpu].address_mask)
+		return 0;
+
+	/* all memory in 32-bit cpu causes zero length in several cases */
+	if(length == 0)
+		return 0;
+
+	if(length > SAFE_SEARCH_REGION_RANGE)
+		return 0;
+
+	return 1;
+}
+
+/*----------------------------------------------------------------
+  allocate_search_regions - memory allocation for search region
+----------------------------------------------------------------*/
 
 static void allocate_search_regions(search_info *info)
 {
@@ -11227,10 +11185,9 @@ static void allocate_search_regions(search_info *info)
 
 	for(i = 0; i < info->region_list_length; i++)
 	{
-		search_region *region;
+		search_region *region = &info->region_list[i];
 
-		region				= &info->region_list[i];
-		region->num_results	= 0;
+		region->num_results = 0;
 
 		free(region->first);
 		free(region->last);
@@ -11247,15 +11204,24 @@ static void allocate_search_regions(search_info *info)
 			region->backup_status	= malloc(region->length);
 
 			if(region->first == NULL || region->last == NULL || region->status == NULL || region->backup_last == NULL || region->backup_status == NULL)
-				fatalerror(	"cheat: [search region] memory allocation error\n"
-							"	----- %s -----\n"
-							"	first			= %p\n"
-							"	last			= %p\n"
-							"	status			= %p\n"
-							"	backup_last		= %p\n"
-							"	backup_status	= %p\n",
-							region->name,
-							region->first, region->last, region->status, region->backup_last, region->backup_status);
+			{
+				/* NOTE : ignored memory allocation error but locked this region */
+				free(region->first);
+				free(region->last);
+				free(region->status);
+				free(region->backup_last);
+				free(region->backup_status);
+
+				region->first =			NULL;
+				region->last =			NULL;
+				region->status =		NULL;
+				region->backup_last =	NULL;
+				region->backup_status =	NULL;
+				region->flags &= 		~kRegionFlag_Enabled;
+				region->flags |=		kRegionFlag_HasError;
+
+				SET_MESSAGE(kCheatMessage_FailedToAllocate);
+			}
 		}
 		else
 		{
@@ -11284,7 +11250,7 @@ static void build_search_regions(running_machine *machine, search_info *info)
 	{
 		case kRegionType_CPU:
 		{
-			if(info->search_speed == ksearch_speed_AllMemory)
+			if(info->search_speed == SEARCH_SPEED_ALL_MEMORY)
 			{
 				UINT32			length = cpu_info_list[info->target_idx].address_mask + 1;
 				search_region	*region;
@@ -11303,9 +11269,16 @@ static void build_search_regions(running_machine *machine, search_info *info)
 				region->status			= NULL;
 				region->backup_last		= NULL;
 				region->backup_status	= NULL;
-				region->flags			= kRegionFlag_Enabled;
 
 				set_search_region_default_name(region);
+
+				if(is_search_region_in_range(info->target_idx, length) == 0)
+				{
+					region->flags &= ~kRegionFlag_Enabled;
+					region->flags |= kRegionFlag_HasError;
+				}
+				else
+					region->flags = kRegionFlag_Enabled;
 			}
 			else
 			{
@@ -11342,7 +11315,14 @@ static void build_search_regions(running_machine *machine, search_info *info)
 							traverse->status		= NULL;
 							traverse->backup_last	= NULL;
 							traverse->backup_status	= NULL;
-							traverse->flags			= default_enable_region(machine, traverse, info) ? kRegionFlag_Enabled : 0;
+
+							if(is_search_region_in_range(info->target_idx, length) == 0)
+							{
+								traverse->flags &= ~kRegionFlag_Enabled;
+								traverse->flags |= kRegionFlag_HasError;
+							}
+							else
+								traverse->flags = default_enable_region(machine, traverse, info) ? kRegionFlag_Enabled : 0;
 
 							set_search_region_default_name(traverse);
 
@@ -11506,77 +11486,58 @@ static int ConvertOldCode(int code, int cpu, int * data, int * extendData)
 	return newCode;
 }
 
-/*-------------------
-  ConvertToNewCode
--------------------*/
+/*----------------------
+  convert_to_new_code
+----------------------*/
 
-static int ConvertToNewCode(CheatAction * action)
+static int convert_to_new_code(cheat_action *action)
 {
-	int newType = 0;
+	int new_type = 0;
 
-	if(EXTRACT_FIELD(action->type, LocationType) == kLocation_IndirectIndexed)
-		SET_FIELD(newType, CPURegion, EXTRACT_FIELD(action->type, LocationParameterCPU));
-	else if(EXTRACT_FIELD(action->type, LocationType) != kLocation_Custom)
-		SET_FIELD(newType, CPURegion, EXTRACT_FIELD(action->type, LocationParameter));
-
-	if(TEST_FIELD(action->type, UserSelectEnable))
-		SET_FIELD(newType, CodeType, kCodeType_VWrite);
-	else if(EXTRACT_FIELD(action->type, LocationType) == kLocation_IndirectIndexed)
-	{	SET_FIELD(newType, CodeType, kCodeType_IWrite);
-		SET_FIELD(newType, IndexSize, EXTRACT_FIELD(action->type, LocationParameterOption)); }
-	else
-	{	SET_FIELD(newType, CodeType, kCodeType_PDWWrite);
-		SET_FIELD(newType, IndexSize, kSearchSize_32Bit); }
-
-	SET_FIELD(newType, AddressSize, EXTRACT_FIELD(action->type, BytesUsed));
-
-	if(TEST_FIELD(action->type, LinkEnable))
-		SET_FIELD(newType, Link, kLink_Link);
-
+	if(EXTRACT_FIELD(action->type, LocationType) == kLocation_IndirectIndexed) {
+		SET_FIELD(new_type, CodeType, kCodeType_IWrite);
+		SET_FIELD(new_type, CodeParameter, EXTRACT_FIELD(action->type, LocationParameterOption)); }
+	SET_FIELD(new_type, AddressSize, kSearchSize_32Bit);
+	SET_MASK_FIELD(new_type, Endianness);
 	if(TEST_FIELD(action->type, RestorePreviousValue))
-		SET_MASK_FIELD(newType, RestoreValue);
-
+		SET_MASK_FIELD(new_type, RestoreValue);
 	if(EXTRACT_FIELD(action->type, Prefill))
-		SET_MASK_FIELD(newType, PrefillEnable);
+		SET_FIELD(new_type, PrefillEnable, 0);
+	if(EXTRACT_FIELD(action->type, Type) == kLocation_Standard && EXTRACT_FIELD(action->type, TypeParameter))
+		SET_MASK_FIELD(new_type, DelayEnable);
 
-	if(!EXTRACT_FIELD(action->type, Type) && EXTRACT_FIELD(action->type, TypeParameter))
-		SET_MASK_FIELD(newType, DelayEnable);
-
-	if(TEST_FIELD(action->type, OneShot))
-		SET_MASK_FIELD(newType, OneShot);
-
-	return newType;
+	return new_type;
 }
 
-/*--------------------------
-  HandleLocalCommandCheat
---------------------------*/
+/*-------------------------------------------------------------------
+  handle_local_command_cheat - handle specified cheat command code
+-------------------------------------------------------------------*/
 
-static void HandleLocalCommandCheat(running_machine *machine, int cpu, int type, int address, int data, UINT8 format)
+static void handle_local_command_cheat(running_machine *machine, int cpu, int type, int address, int data, UINT8 format)
 {
 	int command = 0;
 
-	if(format != 1)
+	if(format != FORMAT_NEW)
 	{
 		switch(EXTRACT_FIELD(type, LocationParameter))
 		{
 			case kCustomLocation_AssignActivationKey:
-				command = kCustomCode_ActivationKey1;
+				command = CUSTOM_CODE_ACTIVATION_KEY_1;
 
 				if(TEST_FIELD(type, OneShot))
-					command = kCustomCode_ActivationKey2;
+					command = CUSTOM_CODE_ACTIVATION_KEY_2;
 				break;
 
 			case kCustomLocation_Enable:
-				command = kCustomCode_PreEnable;
+				command = CUSTOM_CODE_PRE_ENABLE;
 				break;
 
 			case kCustomLocation_Overclock:
-				command = kCustomCode_OverClock;
+				command = CUSTOM_CODE_OVER_CLOCK;
 				break;
 
 			case kCustomLocation_RefreshRate:
-				command = kCustomCode_RefreshRate;
+				command = CUSTOM_CODE_REFRESH_RATE;
 				break;
 
 			default:
@@ -11584,51 +11545,51 @@ static void HandleLocalCommandCheat(running_machine *machine, int cpu, int type,
 		}
 	}
 	else
-		command = EXTRACT_FIELD(type, CodeType);
+		command = cpu;
 
 	switch(command)
 	{
-		case kCustomCode_ActivationKey1:
-		case kCustomCode_ActivationKey2:
-			if(address < cheatListLength)
+		case CUSTOM_CODE_ACTIVATION_KEY_1:
+		case CUSTOM_CODE_ACTIVATION_KEY_2:
+			if(address < cheat_list_length)
 			{
-				CheatEntry * entry = &cheatList[address];
+				cheat_entry *entry = &cheat_list[address];
 
-				if(command == kCustomCode_ActivationKey1)
+				if(command == CUSTOM_CODE_ACTIVATION_KEY_1)
 				{
-					entry->activationKey2 = data;
+					entry->activation_key2 = data;
 					entry->flags |= kCheatFlag_HasActivationKey2;
 				}
 				else
 				{
-					entry->activationKey1 = data;
+					entry->activation_key1 = data;
 					entry->flags |= kCheatFlag_HasActivationKey1;
 				}
 			}
 			break;
 
-		case kCustomCode_PreEnable:
-			if(address < cheatListLength)
+		case CUSTOM_CODE_PRE_ENABLE:
+			if(address < cheat_list_length)
 			{
-				CheatEntry * entry = &cheatList[address];
+				cheat_entry *entry = &cheat_list[address];
 
 				ActivateCheat(entry);
 
-				if(data && (data < entry->actionListLength))
+				if(data && data < entry->action_list_length)
 					entry->selection = data;
 			}
 			break;
 
-		case kCustomCode_OverClock:
-			if(VALID_CPU(cpu))
+		case CUSTOM_CODE_OVER_CLOCK:
+			if(VALID_CPU(address))
 			{
-				double	overclock = data / 65536.0;
+				double	over_clock = data / 65536.0;
 
-				cpunum_set_clockscale(machine, address, overclock);
+				cpunum_set_clockscale(machine, address, over_clock);
 			}
 			break;
 
-		case kCustomCode_RefreshRate:
+		case CUSTOM_CODE_REFRESH_RATE:
 			{
 				int width		= video_screen_get_width(machine->primary_screen);
 				int height		= video_screen_get_height(machine->primary_screen);
@@ -11642,127 +11603,126 @@ static void HandleLocalCommandCheat(running_machine *machine, int cpu, int type,
 	}
 }
 
-/*----------------------------------------------------
-  LoadCheatOption - load cheat option from database
-----------------------------------------------------*/
+/*------------------------------------------------------
+  load_cheat_option - load cheat option from database
+------------------------------------------------------*/
 
-static void LoadCheatOption(char * fileName)
+static void load_cheat_option(char *file_name)
 {
 	static char		buf[2048];
-	mame_file *		theFile;
+	mame_file		*the_file;
 	file_error		filerr;
-	cheat_format *	format = &cheat_format_table[0];
+	cheat_format	*format = &cheat_format_table[0];
 
 	/* open the database */
-	filerr = mame_fopen(SEARCHPATH_CHEAT, fileName, OPEN_FLAG_READ, &theFile);
+	filerr = mame_fopen(SEARCHPATH_CHEAT, file_name, OPEN_FLAG_READ, &the_file);
 
 	if(filerr != FILERR_NONE)
 	{
-		messageType		= kCheatMessage_FailedToLoadDatabase;
-		messageTimer	= DEFAULT_MESSAGE_TIME;
+		SET_MESSAGE(kCheatMessage_FailedToLoadDatabase);
 		return;
 	}
 
-	while(mame_fgets(buf, 2048, theFile))
+	while(mame_fgets(buf, 2048, the_file))
 	{
-		char preCommand[9];
+		char pre_command[9];
 
-		if(sscanf(buf, format->format_string, preCommand) == format->arguments_matched)
+		if(sscanf(buf, format->format_string, pre_command) == format->arguments_matched)
 		{
-			if(strlen(preCommand) == format->length_matched)
+			if(strlen(pre_command) == format->type_matched)
 			{
-				sscanf(preCommand, "%X", &cheatOptions);
-				messageType		= kCheatMessage_ReloadCheatOption;
-				messageTimer	= DEFAULT_MESSAGE_TIME;
+				sscanf(pre_command, "%X", &cheat_options);
+				SET_MESSAGE(kCheatMessage_ReloadCheatOption);
 			}
 		}
 	}
 
-	mame_fclose(theFile);
+	mame_fclose(the_file);
 }
 
-/*------------------------------------------------
-  LoadCheatCode - load cheat code from database
-------------------------------------------------*/
+/*--------------------------------------------------
+  load_cheat_code - load cheat code from database
+--------------------------------------------------*/
 
-static void LoadCheatCode(running_machine *machine, char * fileName)
+static void load_cheat_code(running_machine *machine, char *file_name)
 {
-	enum{
-		kFormatLevel_New = 1,
-		kFormatLevel_Standard,
-		kFormatLevel_Old };
-
 	char		buf[2048];
-	mame_file	* theFile;
+	mame_file	*the_file;
 	file_error	filerr;
 
 	/* open the database */
-	filerr = mame_fopen(SEARCHPATH_CHEAT, fileName, OPEN_FLAG_READ, &theFile);
+	filerr = mame_fopen(SEARCHPATH_CHEAT, file_name, OPEN_FLAG_READ, &the_file);
 
 	if(filerr != FILERR_NONE)
 		return;
 
-	foundCheatDatabase = 1;
+	found_database = 1;
 
 	/* get a line from database */
-	while(mame_fgets(buf, 2048, theFile))
+	while(mame_fgets(buf, 2048, the_file))
 	{
-		int			i;
+		int		i;
 #ifdef MESS
-		int			crc;
+		int		crc;
 #endif
-		int			type = 0;
-		int			address = 0;
-		int			data = 0;
-		int			extendData = 0;
-		int			argumentsMatched = 0;
-		int			formatLevel = 0;
-		int			oldCPU = 0;
-		int			oldCode = 0;
-		char		name[16] = { 0 };
-		char		preData[16] = { 0 };
-		char		preExtendData[16] = { 0 };
-		char		description[256] = { 0 };
-		char		comment[256] = { 0 };
-		CheatEntry	* entry;
-		CheatAction	* action;
+		int		type;
+		int		address;
+		int		data;
+		int		extend_data;
+		int		arguments_matched;
+		int		format_level = 0;
+		int		cpu;
+		int		code;
+		char	name[16] = { 0 };
+		char	pre_type[16] = { 0 };
+		char	pre_data[16] = { 0 };
+		char	pre_extend_data[16] = { 0 };
+		char	description[256] = { 0 };
+		char	comment[256] = { 0 };
+
+		cheat_entry		*entry;
+		cheat_action	*action;
 
 		/* scan and check format */
 		for(i = 1; i < 4; i++)
 		{
-			cheat_format * format = &cheat_format_table[i];
+			cheat_format *format = &cheat_format_table[i];
+
+			if(TEST_FIELD(cheat_options, LoadOldFormat) == 0)
+			{
+				if(i != 1)
+					break;
+			}
 
 			/* scan a parameter */
 			switch(i)
 			{
-				case kFormatLevel_New:
-				case kFormatLevel_Standard:
+				case FORMAT_NEW:
+				case FORMAT_STANDARD:
 #ifdef MESS
-					argumentsMatched = sscanf(buf, format->format_string, name, &crc, &type, &address, preData, preExtendData, description, comment);
+					arguments_matched = sscanf(buf, format->format_string, name, &crc, pre_type, &address, pre_data, pre_extend_data, description, comment);
 #else
-					argumentsMatched = sscanf(buf, format->format_string, name, &type, &address, preData, preExtendData, description, comment);
+					arguments_matched = sscanf(buf, format->format_string, name, pre_type, &address, pre_data, pre_extend_data, description, comment);
 #endif
 					break;
 
-				case kFormatLevel_Old:
+				case FORMAT_OLD:
 #ifdef MESS
-					argumentsMatched = sscanf(buf, format->format_string, &crc, name, &oldCPU, &address, &data, &oldCode, description, comment);
+					arguments_matched = sscanf(buf, format->format_string, &crc, name, &cpu, &address, &data, &code, description, comment);
 #else
-					argumentsMatched = sscanf(buf, format->format_string, name, &oldCPU, &address, &data, &oldCode, description, comment);
+					arguments_matched = sscanf(buf, format->format_string, name, &cpu, &address, &data, &code, description, comment);
 #endif
 			}
 
 			/* NOTE : description and comment are not always needed */
-			if(argumentsMatched < format->arguments_matched)
+			if(arguments_matched < format->arguments_matched)
 				continue;
 
 #ifdef MESS
 			/* check name */
-			if(TEST_FIELD(cheatOptions, SharedCode) && strcmp(machine->gamedrv->parent, "0"))
-			{
+			if(TEST_FIELD(cheat_options, SharedCode) && strcmp(machine->gamedrv->parent, "0"))
 				if(strcmp(name, machine->gamedrv->parent))
 					break;
-			}
 			else
 #endif
 			if(strcmp(name, machine->gamedrv->name))
@@ -11772,157 +11732,160 @@ static void LoadCheatCode(running_machine *machine, char * fileName)
 			if(MatchesCRCTable(crc) == 0)
 				break;
 #endif
-			if(i != kFormatLevel_Old)
+			if(i != FORMAT_OLD)
 			{
-				UINT8 hasError = 0;
+				UINT8 is_error = 0;
 
-				/* check the length of data and extendData */
-				if(strlen(preData) != format->length_matched)
+				/* check length */
+				if(strlen(pre_type) != format->type_matched)
 				{
-					logerror("cheat - LoadCheatFile : %s has invalid extend data field length\n", description);
-					messageType = kCheatMessage_WrongCode;
-					hasError++;
+					logerror("cheat: [load code] %s has invalid type field length (%X)\n", description, strlen(pre_type));
+					is_error++;
 				}
 
-				if(strlen(preExtendData) != format->length_matched)
+				if(strlen(pre_data) != format->data_matched)
 				{
-					logerror("cheat - LoadCheatFile : %s has invalid data field length\n", description);
-					messageType = kCheatMessage_WrongCode;
-					hasError++;
+					logerror("cheat: [load code] %s has invalid data field length (%X)\n", description, strlen(pre_type));
+					is_error++;
 				}
 
-				if(hasError)
+				if(strlen(pre_extend_data) != format->data_matched)
+				{
+					logerror("cheat: [load code] %s has invalid extend data field length (%X)\n", description, strlen(pre_extend_data));
+					is_error++;
+				}
+
+				if(is_error)
+				{
+					SET_MESSAGE(kCheatMessage_WrongCode);
 					continue;
+				}
 				else
 				{
-					sscanf(preData, "%X", &data);
-					sscanf(preExtendData, "%X", &extendData);
+					if(i == FORMAT_NEW)
+						sscanf(pre_type, "%2X%8X", &cpu, &type);
+					else
+					{
+						sscanf(pre_type, "%X", &type);
+						cpu = EXTRACT_FIELD(type, LocationParameter) & 0x0F;
+					}
+
+					sscanf(pre_data, "%X", &data);
+					sscanf(pre_extend_data, "%X", &extend_data);
 				}
 			}
 			else
-				type = ConvertOldCode(oldCode, oldCPU, &data, &extendData);
+				type = ConvertOldCode(code, cpu, &data, &extend_data);
 
 			/* matched! */
-			formatLevel = i;
+			format_level = i;
 			break;
 		}
 
 		/* attemp to get next line if unmatched */
-		if(formatLevel == 0)
+		if(format_level == 0 || format_level >= 4)
 			continue;
 
-		//logerror("cheat: processing %s\n", buf);
+		/* logerror("cheat: processing %s\n", buf); */
 
 		/* handle command code */
-		if(formatLevel == kFormatLevel_New)
+		if(cpu >= CUSTOM_CODE_ACTIVATION_KEY_1)
 		{
-			if(EXTRACT_FIELD(type, CPURegion) == CUSTOM_CODE && EXTRACT_FIELD(type, CodeType) >= kCustomCode_ActivationKey1)
-			{
-				// logerror("cheat: cheat line removed\n", buf);
-				HandleLocalCommandCheat(machine, EXTRACT_FIELD(type, CPUIndex), type, address, data, formatLevel);
-				continue;
-			}
-		}
-		else
-		{
-			if(	EXTRACT_FIELD(type, LocationType) == kLocation_Custom &&
-				EXTRACT_FIELD(type, LocationParameter) <= kCustomLocation_AssignActivationKey)
-				{
-					HandleLocalCommandCheat(machine, EXTRACT_FIELD(type, LocationParameter), type, address, data, formatLevel);
-					continue;
-				}
+			/* logerror("cheat: cheat line removed\n", buf); */
+			handle_local_command_cheat(machine, cpu, type, address, data, format_level);
+			continue;
 		}
 
 		/***** ENTRY *****/
 		if(EXTRACT_FIELD(type, Link) == kLink_Master)
 		{
 			/* 1st (master) code in an entry */
-			ResizeCheatList(cheatListLength + 1);
+			resize_cheat_list(cheat_list_length + 1, REQUEST_DISPOSE);
 
-			if(cheatListLength == 0)
+			if(cheat_list_length == 0)
 			{
-				logerror("cheat - LoadCheatFile: cheat list resize failed; bailing\n");
+				logerror("cheat: [load code] cheat list resize failed. bailing\n");
 				goto bail;
 			}
 
-			entry = &cheatList[cheatListLength - 1];
+			entry = &cheat_list[cheat_list_length - 1];
 
 			entry->name = create_string_copy(description);
 
-			if(argumentsMatched == cheat_format_table[formatLevel].comment_matched)
+			if(arguments_matched == cheat_format_table[format_level].comment_matched)
 				entry->comment = create_string_copy(comment);
 		}
 		else
 		{
 			/* 2nd or later (link) code in an entry */
-			if(cheatListLength == 0)
+			if(cheat_list_length == 0)
 			{
-				logerror("cheat - LoadCheatFile: first cheat found was link cheat; bailing\n");
+				logerror("cheat: [load code] first cheat found was link cheat. bailing\n");
 				goto bail;
 			}
 
-			entry = &cheatList[cheatListLength - 1];
+			entry = &cheat_list[cheat_list_length - 1];
 		}
 
 		/***** ACTION *****/
-		ResizeCheatActionList(&cheatList[cheatListLength - 1], entry->actionListLength + 1);
+		resize_cheat_action_list(&cheat_list[cheat_list_length - 1], entry->action_list_length + 1, REQUEST_DISPOSE);
 
-		if(entry->actionListLength == 0)
+		if(entry->action_list_length == 0)
 		{
-			logerror("cheat - LoadCheatFile: action list resize failed; bailing\n");
+			logerror("cheat: [load code] action list resize failed. bailing\n");
 			goto bail;
 		}
 
-		action = &entry->actionList[entry->actionListLength - 1];
+		action						= &entry->action_list[entry->action_list_length - 1];
+		action->flags				= 0;
+		action->type				= type;
+		action->region				= cpu;
+		action->address				= address;
+		action->original_address	= address;
+		action->data				= data;
+		action->original_data		= data;
+		action->extend_data			= extend_data;
+		action->optional_name		= create_string_copy(description);
+		action->last_value			= NULL;
 
-		action->flags = 0;
-		action->type = type;
-		action->address = action->originalAddress = address;
-		action->data = action->originalDataField = data;
-		action->extendData = extendData;
-		action->optionalName = create_string_copy(description);
-		action->lastValue = NULL;
-
-		if(formatLevel != kFormatLevel_New)
+		if(format_level != FORMAT_NEW)
 			action->flags |= kActionFlag_OldFormat;
 	}
 
 	bail:
 
-	/* close the database */
-	mame_fclose(theFile);
+	mame_fclose(the_file);
 }
 
-/*--------------------------------------------------------------------------------
-  LoadUserDefinedSearchRegion - load user region code and rebuild search region
---------------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------------------
+  load_user_defined_search_region - load user region code and rebuild search region
+------------------------------------------------------------------------------------*/
 
-static void LoadUserDefinedSearchRegion(running_machine *machine, char * fileName)
+static void load_user_defined_search_region(running_machine *machine, char *file_name)
 {
 	int		count = 0;
 	char	buf[2048];
 
-	search_info 	*info = get_current_search();
-	mame_file *		theFile;
+	search_info 	*info	= get_current_search();
+	mame_file 		*the_file;
 	file_error		filerr;
-	cheat_format *	format = &cheat_format_table[4];
+	cheat_format 	*format	= &cheat_format_table[4];
 
 	/* 1st, free all search regions in current search_info */
 	dispose_search_reigons(info);
 
 	/* 2nd, attempt to open the memorymap file */
-	filerr = mame_fopen(SEARCHPATH_CHEAT, fileName, OPEN_FLAG_READ, &theFile);
+	filerr = mame_fopen(SEARCHPATH_CHEAT, file_name, OPEN_FLAG_READ, &the_file);
 
 	if(filerr != FILERR_NONE)
 	{
-		info->region_list_length	= 0;
-		messageType				= kCheatMessage_FailedToLoadDatabase;
-		messageTimer			= DEFAULT_MESSAGE_TIME;
+		info->region_list_length = 0;
+		SET_MESSAGE(kCheatMessage_FailedToLoadDatabase);
 		return;
 	}
 
 	/* 3rd, scan parameters from the file */
-	while(mame_fgets(buf, 2048, theFile))
+	while(mame_fgets(buf, 2048, the_file))
 	{
 #ifdef MESS
 		int		crc;
@@ -11932,13 +11895,11 @@ static void LoadUserDefinedSearchRegion(running_machine *machine, char * fileNam
 		int		start;
 		int		end;
 		int		status;
-		char	name[9];
-		char	description[64];
+		char	name[16] = { 0 };
+		char	description[64] = { 0 };
 
 		cpu_region_info *cpu_info;
 		search_region	*region;
-
-		description[0] = 0;
 
 #ifdef MESS
 		if(sscanf(buf, format->format_string, name, &crc, &cpu, &space, &start, &end, &status, description) < format->arguments_matched)
@@ -11949,7 +11910,7 @@ static void LoadUserDefinedSearchRegion(running_machine *machine, char * fileNam
 		else
 		{
 #ifdef MESS
-			if(!MatchesCRCTable(crc))
+			if(MatchesCRCTable(crc) == 0)
 				continue;
 #endif
 			if(cpu != info->target_idx)
@@ -11959,55 +11920,52 @@ static void LoadUserDefinedSearchRegion(running_machine *machine, char * fileNam
 		cpu_info = get_cpu_info(cpu);
 
 		/* check parameters */
+		switch(space)
 		{
-			switch(space)
-			{
-				case kAddressSpace_Program:			// standard program space
-				case kAddressSpace_DirectMemory:	// direct memory access for standard program space
-					/* check length */
-					if(start >= end)
-					{
-						logerror("cheat - LoadUserDefinedSearchRegion : invalid length (start : %X >= end : %X) \n", start, end);
-						continue;
-					}
-
-					/* check bound */
-					if(end > cpu_info->address_mask)
-					{
-						logerror("cheat - LoadUserDefinedSearchRegion : end address (%X) is out of range\n", end);
-						continue;
-					}
-					break;
-
-				case kAddressSpace_DataSpace:	// data space
-				case kAddressSpace_IOSpace:		// I/O space
-					// underconstruction...
-					break;
-
-				default:
-					logerror("cheat - LoadUserDefinedSearchRegion : %X is invalid space\n", space);
+			case kAddressSpace_Program:
+			case kAddressSpace_DirectMemory:
+				/* check length */
+				if(start >= end)
+				{
+					logerror("cheat: [user region] invalid length (start : %.8X >= end : %.8X)\n", start, end);
 					continue;
-			}
+				}
 
-			/* check status */
-			if(status > 1)
-			{
-				logerror("cheat - LoadUserDefinedSearchRegion : %X is invalid status\n", status);
+				/* check bound */
+				if(is_search_region_in_range(info->target_idx, start + end + 1) == 0)
+				{
+					logerror("cheat: [user region] invalid length (%.8X)\n", start - end);
+					continue;
+				}
+				break;
+
+			case kAddressSpace_DataSpace:
+			case kAddressSpace_IOSpace:
+				/* underconstruction... */
+				break;
+
+			default:
+				logerror("cheat: [user region] %X is invalid space\n", space);
 				continue;
-			}
+		}
+
+		/* check status */
+		if(status > kRegionFlag_Enabled)
+		{
+			logerror("cheat: [user region] %X is invalid status\n", status);
+			continue;
 		}
 
 		/* allocate memory for new search region */
 		info->region_list = realloc(info->region_list, (count + 1) * sizeof(search_region));
 
-		if(!info->region_list)
+		if(info->region_list == NULL)
 		{
-			/* memory allocation error */
-			logerror("cheat - LoadUserDefinedSearchRegion: out of memory resizing search region\n");
-			ui_popup_time(2, "out of memory while buiding user search region");
-			info->region_list_length = 0;
-			mame_fclose(theFile);
-			return;
+			mame_fclose(the_file);
+			fatalerror(	"cheat: [user region] memory allocation error\n"
+						"	length =		%.8X\n"
+						"	region_list =	%p\n",
+						count + 1, info->region_list);
 		}
 
 		region = &info->region_list[count];
@@ -12043,137 +12001,134 @@ static void LoadUserDefinedSearchRegion(running_machine *machine, char * fileNam
 								cpu_info->address_chars_needed, region->address + region->length - 1,
 								description);
 
+		if(is_search_region_in_range(cpu, region->length) == 0)
+		{
+			region->flags &= ~kRegionFlag_Enabled;
+			region->flags |= kRegionFlag_HasError;
+		}
+		else
+			region->flags = status;
+
 		count++;
 	}
 
 	info->region_list_length = count;
 
 	if(info->region_list_length)
-	{
-		messageType		= kCheatMessage_ReloadUserRegion;
-		messageTimer	= DEFAULT_MESSAGE_TIME;
-	}
+		SET_MESSAGE(kCheatMessage_ReloadUserRegion);
 
-	mame_fclose(theFile);
+	mame_fclose(the_file);
 }
 
-/*---------------------------------------------------------
-  LoadCheatDatabase - get the database name then load it
----------------------------------------------------------*/
+/*-----------------------------------------------------------
+  load_cheat_database - get the database name then load it
+-----------------------------------------------------------*/
 
-static void LoadCheatDatabase(running_machine *machine, UINT8 flags)
+static void load_cheat_database(running_machine *machine, UINT8 flags)
 {
 	UINT8		first = 1;
-
-	char		buf[256];
+	char		buf[256] = { 0 };
 	char		data;
-	const char	* inTraverse;
-	char		* outTraverse;
-	char		* mainTraverse;
+	const char	*in_traverse;
+	char		*out_traverse;
+	char		*main_traverse;
 
-	cheatfile = options_get_string(mame_options(), OPTION_CHEAT_FILE);
+	cheat_file = options_get_string(mame_options(), OPTION_CHEAT_FILE);
 
-	if (!cheatfile[0])
-		cheatfile = "cheat.dat";
+	if(cheat_file[0] == 0)
+		cheat_file = "cheat.dat";
 
-	inTraverse		= cheatfile;
-	outTraverse		= buf;
-	mainTraverse	= mainDatabaseName;
-
-	buf[0] = 0;
+	in_traverse		= cheat_file;
+	out_traverse	= buf;
+	main_traverse	= main_database_name;
 
 	do
 	{
-		data = *inTraverse;
+		data = *in_traverse;
 
 		/* check separator or end */
-		if(data == ';' || !data)
+		if(data == ';' || data == 0)
 		{
-			*outTraverse++ = 0;
+			*out_traverse++ = 0;
 
 			if(first)
-				*mainTraverse++ = 0;
+				*main_traverse++ = 0;
 
 			if(buf[0])
 			{
 				/* load database based on the name we gotten */
 				if(flags & kLoadFlag_CheatOption)
-					LoadCheatOption(buf);
+					load_cheat_option(buf);
 				if(flags & kLoadFlag_CheatCode)
-					LoadCheatCode(machine, buf);
+					load_cheat_code(machine, buf);
 				if(flags & kLoadFlag_UserRegion)
-					LoadUserDefinedSearchRegion(machine, buf);
+					load_user_defined_search_region(machine, buf);
 
-				outTraverse	= buf;
-				buf[0]		= 0;
-				first		= 0;
+				out_traverse	= buf;
+				buf[0]			= 0;
+				first			= 0;
 				break;
 			}
 		}
 		else
 		{
-			*outTraverse++ = data;
+			*out_traverse++ = data;
 
 			if(first)
-				*mainTraverse++ = data;
+				*main_traverse++ = data;
 		}
 
-		inTraverse++;
+		in_traverse++;
 	}
 	while(data);
 
-	UpdateAllCheatInfo();
+	update_all_cheat_info();
 }
 
-/*---------------------------------------------------------------------------------------
-  DisposeCheatDatabase - deactivate all cheats when reload a code or exit cheat system
----------------------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------
+  reload_cheat_database - reload cheat database directly on the cheat menu
+---------------------------------------------------------------------------*/
 
-static void DisposeCheatDatabase(void)
+static void reload_cheat_database(running_machine *machine)
+{
+	dispose_cheat_database();
+	load_cheat_database(machine, kLoadFlag_CheatCode);
+
+	SET_MESSAGE(found_database ? kCheatMessage_ReloadCheatCode : kCheatMessage_FailedToLoadDatabase);
+}
+
+/*-------------------------------------------------
+  dispose_cheat_database - free all cheat entries
+-------------------------------------------------*/
+
+static void dispose_cheat_database(void)
 {
 	int i;
 
 	/* first, turn all cheats "OFF" */
-	for(i = 0; i < cheatListLength; i++)
-		TempDeactivateCheat(&cheatList[i]);
+	for(i = 0; i < cheat_list_length; i++)
+		TempDeactivateCheat(&cheat_list[i]);
 
 	/* next, free memory for all cheat entries */
-	if(cheatList)
+	if(cheat_list)
 	{
-		for(i = 0; i < cheatListLength; i++)
-			DisposeCheat(&cheatList[i]);
+		for(i = 0; i < cheat_list_length; i++)
+			dispose_cheat(&cheat_list[i]);
 
-		free(cheatList);
+		free(cheat_list);
 
-		cheatList = NULL;
-		cheatListLength = 0;
+		cheat_list = NULL;
+		cheat_list_length = 0;
 	}
-}
-
-/*-------------------------------------------------------------------------
-  ReloadCheatDatabase - reload cheat database directly on the cheat menu
--------------------------------------------------------------------------*/
-
-static void ReloadCheatDatabase(running_machine *machine)
-{
-	DisposeCheatDatabase();
-	LoadCheatDatabase(machine, kLoadFlag_CheatCode);
-
-	if(foundCheatDatabase)
-		messageType	= kCheatMessage_ReloadCheatCode;
-	else
-		messageType	= kCheatMessage_FailedToLoadDatabase;
-
-	messageTimer	= DEFAULT_MESSAGE_TIME;
 }
 
 /*------------------------------------------------------
   SaveCheatCode - save a cheat code into the database
 ------------------------------------------------------*/
 
-static void SaveCheatCode(running_machine *machine, CheatEntry * entry)
+static void SaveCheatCode(running_machine *machine, cheat_entry *entry)
 {
-#ifdef MESS
+#if 0
 	INT8	i;
 	INT8	error = 0;
 	char	buf[4096];
@@ -12181,19 +12136,19 @@ static void SaveCheatCode(running_machine *machine, CheatEntry * entry)
 	mame_file *	theFile;
 	file_error	filerr;
 
-	if(!entry || !entry->actionList || ((entry->flags & kCheatFlag_Select) && entry->actionListLength == 1))
+	if(entry == NULL || entry->action_list == NULL || ((entry->flags & kCheatFlag_Select) && entry->action_list_length == 1))
 		error = 1;
 
 	/* open the database */
 	if(!error)
 	{
-		filerr = mame_fopen(SEARCHPATH_CHEAT, mainDatabaseName, OPEN_FLAG_WRITE, &theFile);
+		filerr = mame_fopen(SEARCHPATH_CHEAT, main_database_name, OPEN_FLAG_WRITE, &theFile);
 
 		if(!theFile)
 			error = 1;
 		else if(filerr != FILERR_NONE)
 		{
-			filerr = mame_fopen(SEARCHPATH_CHEAT, mainDatabaseName, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &theFile);
+			filerr = mame_fopen(SEARCHPATH_CHEAT, main_database_name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &theFile);
 
 			if(filerr != FILERR_NONE)
 				error = 1;
@@ -12202,27 +12157,26 @@ static void SaveCheatCode(running_machine *machine, CheatEntry * entry)
 
 	if(error)
 	{
-		messageType = kCheatMessage_FailedToSave;
-		messageTimer = DEFAULT_MESSAGE_TIME;
+		SET_MESSAGE(kCheatMessage_FailedToSave);
 		return;
 	}
 
 	mame_fseek(theFile, 0, SEEK_END);
 
 	/* write the code to the database */
-	for(i = 0; i < entry->actionListLength; i++)
+	for(i = 0; i < entry->action_list_length; i++)
 	{
 		UINT8		addressLength	= 8;
 		char		* name;
 		char		* bufTraverse	= buf;
 
-		CheatAction	* action		= &entry->actionList[i];
+		cheat_action *action = &entry->action_list[i];
 
 		/* get name */
 		if(!i)
 			name = entry->name;
 		else
-			name = action->optionalName;
+			name = action->optional_name;
 
 		/* get address length of CPU/Region */
 		addressLength = get_address_length(EXTRACT_FIELD(action->type, CPURegion));
@@ -12234,17 +12188,17 @@ static void SaveCheatCode(running_machine *machine, CheatEntry * entry)
 						thisGameCRC,
 						action->type,
 						addressLength,
-						action->originalAddress,
-						action->originalDataField,
-						action->extendData);
+						action->original_address,
+						action->original_data,
+						action->extend_data);
 #else
 		bufTraverse +=	sprintf(bufTraverse, ">%s:%.8X:%.*X:%.8X:%.8X",
 						machine->gamedrv->name,
 						action->type,
 						addressLength,
-						action->originalAddress,
-						action->originalDataField,
-						action->extendData);
+						action->original_address,
+						action->original_data,
+						action->extend_data);
 #endif
 		/* set name */
 		if(name)
@@ -12277,41 +12231,42 @@ static void SaveCheatCode(running_machine *machine, CheatEntry * entry)
 	/* clear dirty flag as "this entry is already saved" */
 	entry->flags &= ~kCheatFlag_Dirty;
 
-	messageType = kCheatMessage_SucceededToSave;
-	messageTimer = DEFAULT_MESSAGE_TIME;
-#endif
+	SET_MESSAGE(kCheatMessage_SucceededToSave);
+#else
 	SaveDescription(machine);
+#endif
 }
 
 /*-----------------------------------------------------------------
   SaveActivationKey - save activation key code into the database
 -----------------------------------------------------------------*/
 
-static void SaveActivationKey(running_machine *machine, CheatEntry * entry, int entryIndex)
+static void SaveActivationKey(running_machine *machine, cheat_entry *entry, int entryIndex)
 {
+#if 0
 	INT8	i;
 	INT8	error = 0;
 	char	buf[4096];
 
-	mame_file *	theFile = NULL;
+	mame_file *	theFile;
 	file_error	filerr;
 
 	if(!(entry->flags & kCheatFlag_HasActivationKey1) && !(entry->flags & kCheatFlag_HasActivationKey2))
 		error = 1;
 
-	if(!error && (!entry || !entry->actionList || ((entry->flags & kCheatFlag_Select) && entry->actionListLength == 1)))
+	if(error == 0 && (entry == NULL || entry->action_list == NULL || ((entry->flags & kCheatFlag_Select) && entry->action_list_length == 1)))
 		error = 2;
 
 	/* open the database */
 	if(!error)
 	{
-		filerr = mame_fopen(SEARCHPATH_CHEAT, mainDatabaseName, OPEN_FLAG_WRITE, &theFile);
+		filerr = mame_fopen(SEARCHPATH_CHEAT, main_database_name, OPEN_FLAG_WRITE, &theFile);
 
 		if(!theFile)
 			error = 2;
 		else if(filerr != FILERR_NONE)
 		{
-			filerr = mame_fopen(SEARCHPATH_CHEAT, mainDatabaseName, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &theFile);
+			filerr = mame_fopen(SEARCHPATH_CHEAT, main_database_name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &theFile);
 
 			if(filerr != FILERR_NONE)
 				error = 2;
@@ -12321,13 +12276,11 @@ static void SaveActivationKey(running_machine *machine, CheatEntry * entry, int 
 	switch(error)
 	{
 		case 1:
-			messageType = kCheatMessage_NoActivationKey;
-			messageTimer = DEFAULT_MESSAGE_TIME;
+			SET_MESSAGE(kCheatMessage_NoActivationKey);
 			return;
 
 		case 2:
-			messageType = kCheatMessage_FailedToSave;
-			messageTimer = DEFAULT_MESSAGE_TIME;
+			SET_MESSAGE(kCheatMessage_FailedToSave);
 			return;
 	}
 
@@ -12337,23 +12290,20 @@ static void SaveActivationKey(running_machine *machine, CheatEntry * entry, int 
 	for(i = 0; i < 2; i++)
 	{
 		int		addressLength	= 8;
-		int		activationKey	= !i ? entry->activationKey1 : entry->activationKey2;
+		int		activationKey	= !i ? entry->activation_key1 : entry->activation_key2;
 		int		type			= 0;
 		char	* bufTraverse	= buf;
 
-		CheatAction	* action = &entry->actionList[0];
-		astring		* name = input_code_name(astring_alloc(), activationKey);
-
-		/* set the flag in type field */
-		SET_FIELD(type, CPURegion, CUSTOM_CODE);
+		cheat_action	*action = &entry->action_list[0];
+		astring			*name = input_code_name(astring_alloc(), activationKey);
 
 		if(activationKey)
-			SET_FIELD(type, CodeType, kCustomCode_ActivationKey1);
+			SET_FIELD(type, CodeType, CUSTOM_CODE_ACTIVATION_KEY_1);
 		else
-			SET_FIELD(type, CodeType, kCustomCode_ActivationKey2);
+			SET_FIELD(type, CodeType, CUSTOM_CODE_ACTIVATION_KEY_2);
 
 		/* get address length of CPU/Region */
-		addressLength = get_address_length(EXTRACT_FIELD(action->type, CPURegion));
+		addressLength = get_address_length(action->region);
 
 		/* if not find 1st activation key at saving 1st key, try to save 2nd key */
 		if(!i && !(entry->flags & kCheatFlag_HasActivationKey1))
@@ -12417,39 +12367,40 @@ static void SaveActivationKey(running_machine *machine, CheatEntry * entry, int 
 	/* close the database */
 	mame_fclose(theFile);
 
-	messageType = kCheatMessage_ActivationKeySaved;
-	messageTimer = DEFAULT_MESSAGE_TIME;
+	SET_MESSAGE(kCheatMessage_ActivationKeySaved);
+#endif
 }
 
 /*-----------------------------------------------------------
   SavePreEnable - save a pre-enable code into the database
 -----------------------------------------------------------*/
 
-static void SavePreEnable(running_machine *machine, CheatEntry * entry, int entryIndex)
+static void SavePreEnable(running_machine *machine, cheat_entry *entry, int entryIndex)
 {
+#if 0
 	int		type			= 0;
 	INT8	error			= 0;
 	INT8	addressLength	= 8;
 	char	buf[4096];
 	char	* bufTraverse	= buf;
 
-	CheatAction		* action = &entry->actionList[0];
-	mame_file *		theFile = NULL;
+	cheat_action	*action = &entry->action_list[0];
+	mame_file		*theFile;
 	file_error		filerr;
 
-	if(!entry || !entry->actionList || ((entry->flags & kCheatFlag_Select) && entry->actionListLength == 1))
+	if(entry == NULL || entry->action_list == NULL || ((entry->flags & kCheatFlag_Select) && entry->action_list_length == 1))
 		error = 1;
 
 	/* open the database */
 	if(!error)
 	{
-		filerr = mame_fopen(SEARCHPATH_CHEAT, mainDatabaseName, OPEN_FLAG_WRITE, &theFile);
+		filerr = mame_fopen(SEARCHPATH_CHEAT, main_database_name, OPEN_FLAG_WRITE, &theFile);
 
 		if(!theFile)
 			error = 1;
 		else if(filerr != FILERR_NONE)
 		{
-			filerr = mame_fopen(SEARCHPATH_CHEAT, mainDatabaseName, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &theFile);
+			filerr = mame_fopen(SEARCHPATH_CHEAT, main_database_name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &theFile);
 
 			if(filerr != FILERR_NONE)
 				error = 1;
@@ -12458,14 +12409,12 @@ static void SavePreEnable(running_machine *machine, CheatEntry * entry, int entr
 
 	if(error)
 	{
-		messageType = kCheatMessage_FailedToSave;
-		messageTimer = DEFAULT_MESSAGE_TIME;
+		SET_MESSAGE(kCheatMessage_FailedToSave);
 		return;
 	}
 	else
 	{
-		SET_FIELD(type, CPURegion, CUSTOM_CODE);
-		SET_FIELD(type, CodeType, kCustomCode_PreEnable);
+		SET_FIELD(type, CodeType, CUSTOM_CODE_PRE_ENABLE);
 	}
 
 	mame_fseek(theFile, 0, SEEK_END);
@@ -12498,7 +12447,7 @@ static void SavePreEnable(running_machine *machine, CheatEntry * entry, int entr
 
 	/* set label name */
 	if(entry->selection)
-		bufTraverse += sprintf(bufTraverse, " Label - %s", entry->actionList[entry->labelIndex[entry->selection]].optionalName);
+		bufTraverse += sprintf(bufTraverse, " Label - %s", entry->action_list[entry->label_index[entry->selection]].optional_name);
 
 	bufTraverse += sprintf(bufTraverse, "\n");
 
@@ -12508,15 +12457,15 @@ static void SavePreEnable(running_machine *machine, CheatEntry * entry, int entr
 	/* close the database */
 	mame_fclose(theFile);
 
-	messageType = kCheatMessage_PreEnableSaved;
-	messageTimer = DEFAULT_MESSAGE_TIME;
+	SET_MESSAGE(kCheatMessage_PreEnableSaved);
+#endif
 }
 
 /*--------------------------------------------------------------
-  SaveCheatOptions - save cheat option code into the database
+  Savecheat_options - save cheat option code into the database
 --------------------------------------------------------------*/
 
-static void SaveCheatOptions(void)
+static void Savecheat_options(void)
 {
 	UINT8		error = 0;
 	char		buf[32];
@@ -12525,13 +12474,13 @@ static void SaveCheatOptions(void)
 	file_error		filerr;
 
 	/* open the database */
-	filerr = mame_fopen(SEARCHPATH_CHEAT, mainDatabaseName, OPEN_FLAG_WRITE, &theFile);
+	filerr = mame_fopen(SEARCHPATH_CHEAT, main_database_name, OPEN_FLAG_WRITE, &theFile);
 
 	if(!theFile)
 		error = 1;
 	else if(filerr != FILERR_NONE)
 	{
-		filerr = mame_fopen(SEARCHPATH_CHEAT, mainDatabaseName, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &theFile);
+		filerr = mame_fopen(SEARCHPATH_CHEAT, main_database_name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &theFile);
 
 		if(filerr != FILERR_NONE)
 			error = 1;
@@ -12539,14 +12488,13 @@ static void SaveCheatOptions(void)
 
 	if(error)
 	{
-		messageType = kCheatMessage_FailedToSave;
-		messageTimer = DEFAULT_MESSAGE_TIME;
+		SET_MESSAGE(kCheatMessage_FailedToSave);
 		return;
 	}
 
 	mame_fseek(theFile, 0, SEEK_END);
 
-	sprintf(buf, ":_command:%.8X\n", cheatOptions);
+	sprintf(buf, ":_command:%.8X\n", cheat_options);
 
 	/* write the command code */
 	mame_fwrite(theFile, buf, (UINT32)strlen(buf));
@@ -12554,8 +12502,7 @@ static void SaveCheatOptions(void)
 	/* close the database */
 	mame_fclose(theFile);
 
-	messageType = kCheatMessage_SucceededToSave;
-	messageTimer = DEFAULT_MESSAGE_TIME;
+	SET_MESSAGE(kCheatMessage_SucceededToSave);
 }
 
 /*------------------
@@ -12570,13 +12517,13 @@ static void SaveDescription(running_machine *machine)
 	mame_file *		theFile;
 	file_error		filerr;
 
-	filerr = mame_fopen(SEARCHPATH_CHEAT, mainDatabaseName, OPEN_FLAG_WRITE, &theFile);
+	filerr = mame_fopen(SEARCHPATH_CHEAT, main_database_name, OPEN_FLAG_WRITE, &theFile);
 
 	if(!theFile)
 		error = 1;
 	else if(filerr != FILERR_NONE)
 	{
-		filerr = mame_fopen(SEARCHPATH_CHEAT, mainDatabaseName, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &theFile);
+		filerr = mame_fopen(SEARCHPATH_CHEAT, main_database_name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &theFile);
 
 		if(filerr != FILERR_NONE)
 			error = 1;
@@ -12584,13 +12531,12 @@ static void SaveDescription(running_machine *machine)
 
 	if(error)
 	{
-		messageType = kCheatMessage_FailedToSave;
-		messageTimer = DEFAULT_MESSAGE_TIME;
+		SET_MESSAGE(kCheatMessage_FailedToSave);
 		return;
 	}
 
 	mame_fseek(theFile, 0, SEEK_END);
-	sprintf(buf, "> [ %s ]\n", machine->gamedrv->description);
+	sprintf(buf, "; [ %s ]\n", machine->gamedrv->description);
 
 	/* write the command code */
 	mame_fwrite(theFile, buf, (UINT32)strlen(buf));
@@ -12598,8 +12544,7 @@ static void SaveDescription(running_machine *machine)
 	/* close the database */
 	mame_fclose(theFile);
 
-	messageType = kCheatMessage_SucceededToSave;
-	messageTimer = DEFAULT_MESSAGE_TIME;
+	SET_MESSAGE(kCheatMessage_SucceededToSave);
 }
 
 /*--------------------------------------------------------------------------
@@ -12610,9 +12555,9 @@ static void DoAutoSaveCheats(running_machine *machine)
 {
 	int i;
 
-	for(i = 0; i < cheatListLength; i++)
+	for(i = 0; i < cheat_list_length; i++)
 	{
-		CheatEntry * entry = &cheatList[i];
+		cheat_entry *entry = &cheat_list[i];
 
 		/* if the entry is not edited/added newly or has not been already saved, save it */
 		if(entry->flags & kCheatFlag_Dirty)
@@ -12628,25 +12573,27 @@ static void AddCheatFromResult(search_info *search, search_region *region, UINT3
 {
 	if((region->target_type == kRegionType_CPU) || (region->target_type == kRegionType_Memory))
 	{
-		CheatEntry	* entry = GetNewCheat();
-		CheatAction	* action = &entry->actionList[0];
-		char		tempString[1024];
-		int			tempStringLength;
-		UINT32		data = read_search_operand(kSearchOperand_First, search, region, address);
+		cheat_entry		*entry		= get_new_cheat();
+		cheat_action	*action		= &entry->action_list[0];
+		char			tempString[1024];
+		int				tempStringLength;
+		UINT32			data = read_search_operand(kSearchOperand_First, search, region, address);
 
 		tempStringLength = sprintf(tempString, "%.8X (%d) = %.*X", address, region->target_idx, kSearchByteDigitsTable[search->bytes], data);
 
 		entry->name = realloc(entry->name, tempStringLength + 1);
 		memcpy(entry->name, tempString, tempStringLength + 1);
 
-		SET_FIELD(action->type, CPURegion, region->target_idx);
-		SET_FIELD(action->type, AddressSize, kSearchByteIncrementTable[search->bytes] - 1);
-		action->address = address;
-		action->data = action->originalDataField = data;
-		action->extendData = 0xFFFFFFFF;
-		action->lastValue = NULL;
+		action->region			= region->target_idx;
+		action->address			= address;
+		action->data			= data;
+		action->original_data	= data;
+		action->extend_data		= 0xFFFFFFFF;
+		action->last_value		= NULL;
 
-		UpdateCheatInfo(entry, 0);
+		SET_FIELD(action->type, AddressSize, kSearchByteIncrementTable[search->bytes] - 1);
+
+		update_cheat_info(entry, 0);
 	}
 }
 
@@ -12688,28 +12635,24 @@ static void AddWatchFromResult(search_info *search, search_region *region, UINT3
 {
 	if(region->target_type == kRegionType_CPU || region->target_type == kRegionType_Memory)
 	{
-		WatchInfo * info = GetUnusedWatch();
+		watch_info *info = get_unused_watch();
 
 		info->address			= address;
 		info->cpu				= region->target_idx;
-		info->numElements		= 1;
-		info->elementBytes		= kWatchSizeConversionTable[search->bytes];
-		info->labelType			= kWatchLabel_None;
-		info->displayType		= kWatchDisplayType_Hex;
+		info->num_elements		= 1;
+		info->element_bytes		= kWatchSizeConversionTable[search->bytes];
+		info->label_type		= kWatchLabel_None;
+		info->display_type		= kWatchDisplayType_Hex;
 		info->skip				= 0;
-		info->elementsPerLine	= 0;
-		info->addValue			= 0;
-		info->linkedCheat		= NULL;
+		info->elements_per_line	= 0;
+		info->add_value			= 0;
+		info->linked_cheat		= NULL;
 		info->label[0]			= 0;
 
-		messageType		= kCheatMessage_SucceededToAdd;
-		messageTimer	= DEFAULT_MESSAGE_TIME;
+		SET_MESSAGE(kCheatMessage_SucceededToAdd);
 	}
 	else
-	{
-		messageType		= kCheatMessage_FailedToAdd;
-		messageTimer	= DEFAULT_MESSAGE_TIME;
-	}
+		SET_MESSAGE(kCheatMessage_FailedToAdd);
 }
 
 /*---------------------
@@ -13437,7 +13380,7 @@ generic:
   ReadData
 -----------*/
 
-static UINT32 ReadData(CheatAction * action)
+static UINT32 ReadData(cheat_action *action)
 {
 	UINT8	addressRead		= EXTRACT_FIELD(action->type, AddressRead);
 	UINT8	bytes			= EXTRACT_FIELD(action->type, AddressSize) + 1;
@@ -13450,7 +13393,7 @@ static UINT32 ReadData(CheatAction * action)
 		if(addressRead == kReadFrom_Address)		address = action->address;
 		else if(addressRead == kReadFrom_Index)		address = cheatVariable[action->address];
 
-		if(!TEST_FIELD(action->region, RegionFlag))
+		if(action->region < REGION_INVALID)
 		{
 			/* read a data from CPU */
 			UINT8 cpu = EXTRACT_FIELD(action->region, CPUIndex);
@@ -13464,15 +13407,15 @@ static UINT32 ReadData(CheatAction * action)
 
 						cpu_region_info *info = get_cpu_info(cpu);
 
-						indexAddress = DoCPURead(cpu, address, EXTRACT_FIELD(action->type, IndexSize) + 1, cpu_needs_swap(cpu));
+						indexAddress = DoCPURead(cpu, address, EXTRACT_FIELD(action->type, CodeParameterLower) + 1, cpu_needs_swap(cpu) ^ EXTRACT_FIELD(action->type, Endianness));
 
 						if(info && info->address_shift)
 							indexAddress = DoShift(indexAddress, info->address_shift);
 
 						if(indexAddress)
 						{
-							indexAddress += action->extendData;
-							return DoCPURead(cpu, indexAddress, bytes, cpu_needs_swap(cpu));
+							indexAddress += action->extend_data;
+							return DoCPURead(cpu, indexAddress, bytes, cpu_needs_swap(cpu) ^ EXTRACT_FIELD(action->type, Endianness));
 						}
 					}
 					else if(action->flags & kActionFlag_PDWWrite)
@@ -13480,17 +13423,17 @@ static UINT32 ReadData(CheatAction * action)
 						if(action->flags & kActionFlag_IsFirst)
 						{
 							address += bytes;
-							bytes = EXTRACT_FIELD(action->type, IndexSize) + 1;
+							bytes = EXTRACT_FIELD(action->type, CodeParameterLower) + 1;
 							action->flags &= ~kActionFlag_IsFirst;
 						}
 						else
 							action->flags |= kActionFlag_IsFirst;
 
-						return DoCPURead(cpu, address, bytes, cpu_needs_swap(cpu));
+						return DoCPURead(cpu, address, bytes, cpu_needs_swap(cpu) ^ EXTRACT_FIELD(action->type, Endianness));
 					}
 					else
 					{
-						return DoCPURead(cpu, address, bytes, cpu_needs_swap(cpu));
+						return DoCPURead(cpu, address, bytes, cpu_needs_swap(cpu) ^ EXTRACT_FIELD(action->type, Endianness));
 					}
 					break;
 
@@ -13501,8 +13444,8 @@ static UINT32 ReadData(CheatAction * action)
 					{
 						UINT8 * buf;
 
-						action->cachedPointer = GetMemoryRegionBasePointer(cpu, EXTRACT_FIELD(action->type, AddressSpace), address);
-						buf = (UINT8 *) action->cachedPointer;
+						action->cached_pointer = GetMemoryRegionBasePointer(cpu, EXTRACT_FIELD(action->type, AddressSpace), address);
+						buf = (UINT8 *) action->cached_pointer;
 
 						if(buf)
 						{
@@ -13511,26 +13454,26 @@ static UINT32 ReadData(CheatAction * action)
 								if(action->flags & kActionFlag_IsFirst)
 								{
 									address += bytes;
-									bytes = EXTRACT_FIELD(action->type, IndexSize) + 1;
+									bytes = EXTRACT_FIELD(action->type, CodeParameterLower) + 1;
 									action->flags &= ~kActionFlag_IsFirst;
 								}
 								else
 									action->flags |= kActionFlag_IsFirst;
 							}
 
-							return DoMemoryRead(buf, address, bytes, cpu_needs_swap(cpu), get_cpu_info(cpu));
+							return DoMemoryRead(buf, address, bytes, cpu_needs_swap(cpu) ^ EXTRACT_FIELD(action->type, Endianness), get_cpu_info(cpu));
 						}
 					}
 					break;
 
 				case kAddressSpace_MappedMemory:
 					{
-						int			relativeAddress;
-						UINT8 **	buf;
+						int		relativeAddress;
+						UINT8	**buf;
 
-						action->cachedPointer = LookupHandlerMemory(cpu, address, &action->cachedOffset);
-						buf = action->cachedPointer;
-						relativeAddress = action->cachedOffset;
+						action->cached_pointer = LookupHandlerMemory(cpu, address, &action->cached_offset);
+						buf = action->cached_pointer;
+						relativeAddress = action->cached_offset;
 
 						if(buf && *buf)
 						{
@@ -13539,14 +13482,14 @@ static UINT32 ReadData(CheatAction * action)
 								if(action->flags & kActionFlag_IsFirst)
 								{
 									relativeAddress += bytes;
-									bytes = EXTRACT_FIELD(action->type, IndexSize) + 1;
+									bytes = EXTRACT_FIELD(action->type, CodeParameterLower) + 1;
 									action->flags &= ~kActionFlag_IsFirst;
 								}
 								else
 									action->flags |= kActionFlag_IsFirst;
 							}
 
-							return DoMemoryRead(*buf, relativeAddress, bytes, cpu_needs_swap(cpu), get_cpu_info(cpu));
+							return DoMemoryRead(*buf, relativeAddress, bytes, cpu_needs_swap(cpu) ^ EXTRACT_FIELD(action->type, Endianness), get_cpu_info(cpu));
 						}
 					}
 					break;
@@ -13554,18 +13497,18 @@ static UINT32 ReadData(CheatAction * action)
 				case kAddressSpace_EEPROM:
 					{
 						int		length;
-						UINT8 *	buf;
+						UINT8	*buf;
 
 						buf = eeprom_get_data_pointer(&length);
 
-						if(IsAddressInRange(action, length))
+						if(is_address_in_range(action, length))
 						{
 							if(action->flags & kActionFlag_PDWWrite)
 							{
 								if(action->flags & kActionFlag_IsFirst)
 								{
 									address += bytes;
-									bytes = EXTRACT_FIELD(action->type, IndexSize) + 1;
+									bytes = EXTRACT_FIELD(action->type, CodeParameterLower) + 1;
 									action->flags &= ~kActionFlag_IsFirst;
 								}
 								else
@@ -13583,23 +13526,23 @@ static UINT32 ReadData(CheatAction * action)
 			/* read a data from region */
 			UINT8 * buf = memory_region(action->region);
 
-			if(buf && IsAddressInRange(action, memory_region_length(action->region)))
+			if(buf && is_address_in_range(action, memory_region_length(action->region)))
 			{
 				if(action->flags & kActionFlag_PDWWrite)
 				{
 					if(action->flags & kActionFlag_IsFirst)
 					{
 						address += bytes;
-						bytes = EXTRACT_FIELD(action->type, IndexSize) + 1;
+						bytes = EXTRACT_FIELD(action->type, CodeParameterLower) + 1;
 						action->flags &= ~kActionFlag_IsFirst;
 					}
 					else
 						action->flags |= kActionFlag_IsFirst;
 
-					return DoMemoryRead(buf, address, bytes, region_needs_swap(action->region), get_region_info(action->region));
+					return DoMemoryRead(buf, address, bytes, region_needs_swap(action->region) ^ EXTRACT_FIELD(action->type, Endianness), get_region_info(action->region));
 				}
 				else
-					return DoMemoryRead(buf, address, bytes, region_needs_swap(action->region), get_region_info(action->region));
+					return DoMemoryRead(buf, address, bytes, region_needs_swap(action->region) ^ EXTRACT_FIELD(action->type, Endianness), get_region_info(action->region));
 			}
 		}
 	}
@@ -13614,7 +13557,7 @@ static UINT32 ReadData(CheatAction * action)
   WriteData - write a data to memory
 -------------------------------------*/
 
-static void WriteData(CheatAction * action, UINT32 data)
+static void WriteData(cheat_action *action, UINT32 data)
 {
 	UINT8	addressRead =	EXTRACT_FIELD(action->type, AddressRead);
 	UINT8	bytes =			EXTRACT_FIELD(action->type, AddressSize) + 1;
@@ -13627,7 +13570,7 @@ static void WriteData(CheatAction * action, UINT32 data)
 		if(addressRead == kReadFrom_Address)		address = action->address;
 		else if(addressRead == kReadFrom_Index)		address = cheatVariable[action->address];
 
-		if(!TEST_FIELD(action->region, RegionFlag))
+		if(action->region < REGION_INVALID)
 		{
 			UINT8 cpu = EXTRACT_FIELD(action->region, CPUIndex);
 
@@ -13640,15 +13583,15 @@ static void WriteData(CheatAction * action, UINT32 data)
 
 						cpu_region_info *info = get_cpu_info(cpu);
 
-						indexAddress = DoCPURead(cpu, address, EXTRACT_FIELD(action->type, IndexSize) + 1, cpu_needs_swap(cpu));
+						indexAddress = DoCPURead(cpu, address, EXTRACT_FIELD(action->type, CodeParameterLower) + 1, cpu_needs_swap(cpu) ^ EXTRACT_FIELD(action->type, Endianness));
 
 						if(info && info->address_shift)
 							indexAddress = DoShift(indexAddress, info->address_shift);
 
 						if(indexAddress)
 						{
-							indexAddress += action->extendData;
-							DoCPUWrite(data, cpu, indexAddress, bytes, cpu_needs_swap(cpu));
+							indexAddress += action->extend_data;
+							DoCPUWrite(data, cpu, indexAddress, bytes, cpu_needs_swap(cpu) ^ EXTRACT_FIELD(action->type, Endianness));
 						}
 					}
 					else if(action->flags & kActionFlag_PDWWrite)
@@ -13656,17 +13599,17 @@ static void WriteData(CheatAction * action, UINT32 data)
 						if(action->flags & kActionFlag_IsFirst)
 						{
 							address += bytes;
-							bytes = EXTRACT_FIELD(action->type, IndexSize) + 1;
+							bytes = EXTRACT_FIELD(action->type, CodeParameterLower) + 1;
 							action->flags &= ~kActionFlag_IsFirst;
 						}
 						else
 							action->flags |= kActionFlag_IsFirst;
 
-						DoCPUWrite(data, cpu, address, bytes, cpu_needs_swap(cpu));
+						DoCPUWrite(data, cpu, address, bytes, cpu_needs_swap(cpu) ^ EXTRACT_FIELD(action->type, Endianness));
 					}
 					else
 					{
-						DoCPUWrite(data, cpu, address, bytes, cpu_needs_swap(cpu));
+						DoCPUWrite(data, cpu, address, bytes, cpu_needs_swap(cpu) ^ EXTRACT_FIELD(action->type, Endianness));
 					}
 					break;
 
@@ -13677,8 +13620,8 @@ static void WriteData(CheatAction * action, UINT32 data)
 					{
 						UINT8 * buf;
 
-						action->cachedPointer = GetMemoryRegionBasePointer(cpu, EXTRACT_FIELD(action->type, AddressSpace), address);
-						buf = (UINT8 *) action->cachedPointer;
+						action->cached_pointer = GetMemoryRegionBasePointer(cpu, EXTRACT_FIELD(action->type, AddressSpace), address);
+						buf = (UINT8 *) action->cached_pointer;
 
 						if(buf)
 						{
@@ -13687,14 +13630,14 @@ static void WriteData(CheatAction * action, UINT32 data)
 								if(action->flags & kActionFlag_IsFirst)
 								{
 									address += bytes;
-									bytes = EXTRACT_FIELD(action->type, IndexSize) + 1;
+									bytes = EXTRACT_FIELD(action->type, CodeParameterLower) + 1;
 									action->flags &= ~kActionFlag_IsFirst;
 								}
 								else
 									action->flags |= kActionFlag_IsFirst;
 							}
 
-							DoMemoryWrite(data, buf, address, bytes, cpu_needs_swap(cpu), get_cpu_info(cpu));
+							DoMemoryWrite(data, buf, address, bytes, cpu_needs_swap(cpu) ^ EXTRACT_FIELD(action->type, Endianness), get_cpu_info(cpu));
 						}
 					}
 					break;
@@ -13704,9 +13647,9 @@ static void WriteData(CheatAction * action, UINT32 data)
 						int			relativeAddress;
 						UINT8 **	buf;
 
-						action->cachedPointer = LookupHandlerMemory(cpu, address, &action->cachedOffset);
-						buf = action->cachedPointer;
-						relativeAddress = action->cachedOffset;
+						action->cached_pointer = LookupHandlerMemory(cpu, address, &action->cached_offset);
+						buf = action->cached_pointer;
+						relativeAddress = action->cached_offset;
 
 						if(buf && *buf)
 						{
@@ -13715,15 +13658,14 @@ static void WriteData(CheatAction * action, UINT32 data)
 								if(action->flags & kActionFlag_IsFirst)
 								{
 									relativeAddress += bytes;
-									bytes = EXTRACT_FIELD(action->type, IndexSize) + 1;
+									bytes = EXTRACT_FIELD(action->type, CodeParameterLower) + 1;
 									action->flags &= ~kActionFlag_IsFirst;
 								}
 								else
 									action->flags |= kActionFlag_IsFirst;
 							}
 
-							DoMemoryWrite(data, *buf, relativeAddress, bytes, cpu_needs_swap(cpu), get_cpu_info(cpu));
-							return;
+							return DoMemoryWrite(data, *buf, relativeAddress, bytes, cpu_needs_swap(cpu) ^ EXTRACT_FIELD(action->type, Endianness), get_cpu_info(cpu));
 						}
 					}
 					break;
@@ -13735,22 +13677,21 @@ static void WriteData(CheatAction * action, UINT32 data)
 
 						buf = eeprom_get_data_pointer(&length);
 
-						if(IsAddressInRange(action, length))
+						if(is_address_in_range(action, length))
 						{
 							if(action->flags & kActionFlag_PDWWrite)
 							{
 								if(action->flags & kActionFlag_IsFirst)
 								{
 									address += bytes;
-									bytes = EXTRACT_FIELD(action->type, IndexSize) + 1;
+									bytes = EXTRACT_FIELD(action->type, CodeParameterLower) + 1;
 									action->flags &= ~kActionFlag_IsFirst;
 								}
 								else
 									action->flags |= kActionFlag_IsFirst;
 							}
 
-							DoMemoryWrite(data, buf, address, bytes, 0, &raw_cpu_info);
-							return;
+							return DoMemoryWrite(data, buf, address, bytes, 0, &raw_cpu_info);
 						}
 					}
 					break;
@@ -13761,22 +13702,21 @@ static void WriteData(CheatAction * action, UINT32 data)
 			/* write a data into region */
 			UINT8 * buf = memory_region(action->region);
 
-			if(buf && IsAddressInRange(action, memory_region_length(action->region)))
+			if(buf && is_address_in_range(action, memory_region_length(action->region)))
 			{
 				if(action->flags & kActionFlag_PDWWrite)
 				{
 					if(action->flags & kActionFlag_IsFirst)
 					{
 						address += bytes;
-						bytes = EXTRACT_FIELD(action->type, IndexSize) + 1;
+						bytes = EXTRACT_FIELD(action->type, CodeParameterLower) + 1;
 						action->flags &= ~kActionFlag_IsFirst;
 					}
 					else
 						action->flags |= kActionFlag_IsFirst;
 				}
 
-				DoMemoryWrite(data, buf, address, bytes, region_needs_swap(action->region), get_region_info(action->region));
-				return;
+				return DoMemoryWrite(data, buf, address, bytes, region_needs_swap(action->region) ^ EXTRACT_FIELD(action->type, Endianness), get_region_info(action->region));
 			}
 		}
 	}
@@ -13788,10 +13728,10 @@ static void WriteData(CheatAction * action, UINT32 data)
   WatchCheatEntry - set watchpoint when watch value key is pressed in several menus
 ------------------------------------------------------------------------------------*/
 
-static void WatchCheatEntry(CheatEntry * entry, UINT8 associate)
+static void WatchCheatEntry(cheat_entry *entry, UINT8 associate)
 {
 	int			i, j;
-	CheatEntry	* associateEntry = NULL;
+	cheat_entry	*associateEntry = NULL;
 
 	/* NOTE : calling with associate = 1 doesn't exist right now */
 	if(associate)
@@ -13799,46 +13739,44 @@ static void WatchCheatEntry(CheatEntry * entry, UINT8 associate)
 
 	if(!entry)
 	{
-		messageType = kCheatMessage_FailedToAdd;
-		messageTimer = DEFAULT_MESSAGE_TIME;
+		SET_MESSAGE(kCheatMessage_FailedToAdd);
 		return;
 	}
 
-	for(i = 0; i < entry->actionListLength; i++)
+	for(i = 0; i < entry->action_list_length; i++)
 	{
-		CheatAction * action = &entry->actionList[i];
+		cheat_action *action = &entry->action_list[i];
 
 		if(!(action->flags & kActionFlag_NoAction) && !EXTRACT_FIELD(action->type, AddressRead))
 		{
 			/* NOTE : unsupported the watchpoint for indirect index right now */
-			if((action->flags & kActionFlag_IndexAddress) && action->extendData != ~0)
+			if((action->flags & kActionFlag_IndexAddress) && action->extend_data != ~0)
 				continue;
 
 			if(!i)
 			{
-				/* first CheatAction */
-				AddActionWatch(&entry->actionList[i], associateEntry);
+				/* first cheat action */
+				AddActionWatch(&entry->action_list[i], associateEntry);
 			}
 			else
 			{
-				/* 2nd or later CheatAction */
+				/* 2nd or later cheat action */
 				UINT8 differentAddress = 1;
 
 				for(j = 0; j < i; j++)
 				{
-					/* if we find the same address CheatAction, skip it */
-					if(entry->actionList[j].address == entry->actionList[i].address)
+					/* if we find the same address cheat action, skip it */
+					if(entry->action_list[j].address == entry->action_list[i].address)
 						differentAddress = 0;
 				}
 
 				if(differentAddress)
-					AddActionWatch(&entry->actionList[i], associateEntry);
+					AddActionWatch(&entry->action_list[i], associateEntry);
 			}
 		}
 	}
 
-	messageType = kCheatMessage_SucceededToAdd;
-	messageTimer = DEFAULT_MESSAGE_TIME;
+	SET_MESSAGE(kCheatMessage_SucceededToAdd);
 }
 
 /*-----------------------------------------------------------------------
@@ -13847,78 +13785,77 @@ static void WatchCheatEntry(CheatEntry * entry, UINT8 associate)
                    or ActivateCheat() via watchpoint code.
 -----------------------------------------------------------------------*/
 
-static void AddActionWatch(CheatAction * action, CheatEntry * entry)
+static void AddActionWatch(cheat_action *action, cheat_entry *entry)
 {
 	switch(EXTRACT_FIELD(action->type, CodeType))
 	{
 		case kCodeType_Write:
-		case kCodeType_PDWWrite:
-		case kCodeType_RWrite:
 		case kCodeType_IWrite:
+		case kCodeType_RWrite:
 		case kCodeType_CWrite:
-		case kCodeType_VWrite:
-		case kCodeType_VRWrite:
-		case kCodeType_Branch:
+		case kCodeType_CBit:
+		case kCodeType_PDWWrite:
 		case kCodeType_Move:
+		case kCodeType_Branch:
 		case kCodeType_Loop:
 		case kCodeType_Popup:
 			{
-				WatchInfo	* info = GetUnusedWatch();
+				watch_info *info = get_unused_watch();
 
 				info->address		= action->address;
 				info->cpu			= action->region;
-				info->displayType	= kWatchDisplayType_Hex;
-				info->elementBytes	= kSearchSize_8Bit;
+				info->display_type	= kWatchDisplayType_Hex;
+				info->element_bytes	= kSearchSize_8Bit;
 				info->label[0]		= 0;
-				info->labelType		= kWatchLabel_None;
-				info->numElements	= EXTRACT_FIELD(action->type, AddressSize) + 1;
-				info->linkedCheat	= entry;
+				info->label_type	= kWatchLabel_None;
+				info->num_elements	= EXTRACT_FIELD(action->type, AddressSize) + 1;
+				info->linked_cheat	= entry;
 				info->skip			= 0;
 
 				if(action->flags & kActionFlag_PDWWrite)
 				{
-					info->numElements += (EXTRACT_FIELD(action->type, IndexSize) + 1);
+					info->num_elements += (EXTRACT_FIELD(action->type, CodeParameterLower) + 1);
 				}
 				else if(action->flags & kActionFlag_Repeat)
 				{
-					info->numElements	= EXTRACT_FIELD(action->extendData, LSB16);
-					info->skip			= EXTRACT_FIELD(action->extendData, MSB16) - 1;
+					info->num_elements	= EXTRACT_FIELD(action->extend_data, LSB16);
+					info->skip			= EXTRACT_FIELD(action->extend_data, MSB16) - 1;
 				}
 			}
 			break;
 
 		case kCodeType_Watch:
 			{
-				WatchInfo * info = GetUnusedWatch();
+				watch_info *info = get_unused_watch();
 
 				info->address			= action->address;
-				info->cpu				= EXTRACT_FIELD(action->type, CPURegion);
-				info->displayType		= EXTRACT_FIELD(action->type, WatchDisplayFormat);
-				info->elementBytes		= kByteConversionTable[EXTRACT_FIELD(action->type, AddressSize)];
+				info->cpu				= action->region;
+				info->display_type		= EXTRACT_FIELD(action->type, WatchDisplayFormat);
+				info->element_bytes		= kByteConversionTable[EXTRACT_FIELD(action->type, AddressSize)];
 				info->label[0]			= 0;
-				info->linkedCheat		= entry;
-				info->numElements		= EXTRACT_FIELD(action->data, WatchNumElements) + 1;
+				info->linked_cheat		= entry;
+				info->num_elements		= EXTRACT_FIELD(action->data, WatchNumElements) + 1;
 				info->skip				= EXTRACT_FIELD(action->data, WatchSkip);
-				info->elementsPerLine	= EXTRACT_FIELD(action->data, WatchElementsPerLine);
-				info->addValue			= EXTRACT_FIELD(action->data, WatchAddValue);
+				info->elements_per_line	= EXTRACT_FIELD(action->data, WatchElementsPerLine);
+				info->add_value			= EXTRACT_FIELD(action->data, WatchAddValue);
 
-				if(info->addValue & 0x80)
-					info->addValue |= ~0xFF;
+				if(info->add_value & 0x80)
+					info->add_value |= ~0xFF;
 
-				if(action->extendData != ~0)
+				if(action->extend_data != ~0)
 				{
 					/* ### fix me... ### */
-					info->x = (float)(EXTRACT_FIELD(action->extendData, LSB16)) / 100;
-					info->y = (float)(EXTRACT_FIELD(action->extendData, MSB16)) / 100;
+					info->x = (float)(EXTRACT_FIELD(action->extend_data, LSB16)) / 100;
+					info->y = (float)(EXTRACT_FIELD(action->extend_data, MSB16)) / 100;
 				}
 
 				if(TEST_FIELD(action->type, WatchShowLabel) && entry->comment && strlen(entry->comment) < 256)
 				{
-					info->labelType = kWatchLabel_String;
+					info->label_type = kWatchLabel_String;
 					strcpy(info->label, entry->comment);
 				}
 				else
-					info->labelType = kWatchLabel_None;
+					info->label_type = kWatchLabel_None;
 			}
 			break;
 	}
@@ -13929,16 +13866,16 @@ static void AddActionWatch(CheatAction * action, CheatEntry * entry)
                             called from DeactivateCheat().
 ------------------------------------------------------------------------------*/
 
-static void RemoveAssociatedWatches(CheatEntry * entry)
+static void RemoveAssociatedWatches(cheat_entry *entry)
 {
 	int i;
 
-	for(i = watchListLength - 1; i >= 0; i--)
+	for(i = watch_list_length - 1; i >= 0; i--)
 	{
-		WatchInfo * info = &watchList[i];
+		watch_info *info = &watch_list[i];
 
-		if(info->linkedCheat == entry)
-			DeleteWatchAt(i);
+		if(info->linked_cheat == entry)
+			delete_watch_at(i);
 	}
 }
 
@@ -13946,47 +13883,58 @@ static void RemoveAssociatedWatches(CheatEntry * entry)
   ResetAction - back up data and set action flags
 --------------------------------------------------*/
 
-static void ResetAction(CheatAction * action)
+static void ResetAction(cheat_action *action)
 {
 	if(action->flags & kActionFlag_NoAction)
 		return;
 
 	/* back up a value */
-	if(!(action->flags & kActionFlag_LastValueGood))
+	if(action->flags & kActionFlag_OldFormat)
 	{
-		switch(EXTRACT_FIELD(action->type, CodeType))
+		UINT32 type = action->type;
+
+		action->last_value = malloc_or_die(sizeof(action->last_value));
+		action->type = convert_to_new_code(action);
+		action->last_value[0] = ReadData(action);
+		action->type = type;
+	}
+	else
+	{
+		if(!(action->flags & kActionFlag_LastValueGood))
 		{
-			default:
-				action->lastValue = malloc_or_die(sizeof(action->lastValue));
-				action->lastValue[0] = ReadData(action);
-				break;
+			switch(EXTRACT_FIELD(action->type, CodeType))
+			{
+				default:
+					action->last_value = malloc_or_die(sizeof(action->last_value));
+					action->last_value[0] = ReadData(action);
+					break;
 
-			case kCodeType_PDWWrite:
-				action->lastValue = malloc_or_die(sizeof(action->lastValue) * 2);
-				action->lastValue[0] = ReadData(action);
-				action->lastValue[1] = ReadData(action);
-				break;
+				case kCodeType_PDWWrite:
+					action->last_value = malloc_or_die(sizeof(action->last_value) * 2);
+					action->last_value[0] = ReadData(action);
+					action->last_value[1] = ReadData(action);
+					break;
 
-			case kCodeType_RWrite:
-			case kCodeType_VRWrite:
-				{
-					int i;
-
-					for(i = 0; i < EXTRACT_FIELD(action->extendData, LSB16); i++)
+				case kCodeType_RWrite:
 					{
-						action->lastValue = realloc(action->lastValue, sizeof(action->lastValue) * EXTRACT_FIELD(action->extendData, LSB16));
-						action->lastValue[i] = ReadData(action);
-						action->address +=	EXTRACT_FIELD(action->extendData, MSB16) ?
-											EXTRACT_FIELD(action->extendData, MSB16) :
-											kSearchByteIncrementTable[EXTRACT_FIELD(action->type, AddressSize)];
+						int i;
+
+						for(i = 0; i < EXTRACT_FIELD(action->extend_data, LSB16); i++)
+						{
+							action->last_value = realloc(action->last_value, sizeof(action->last_value) * EXTRACT_FIELD(action->extend_data, LSB16));
+							action->last_value[i] = ReadData(action);
+							action->address +=	EXTRACT_FIELD(action->extend_data, MSB16) ?
+												EXTRACT_FIELD(action->extend_data, MSB16) :
+												kSearchByteIncrementTable[EXTRACT_FIELD(action->type, AddressSize)];
+						}
+						action->address = action->original_address;
 					}
-					action->address = action->originalAddress;
-				}
-				break;
+					break;
+			}
 		}
 	}
 
-	action->frameTimer = 0;
+	action->frame_timer = 0;
 	action->flags &= ~kActionFlag_StateMask;
 	action->flags |= kActionFlag_LastValueGood;
 
@@ -13995,7 +13943,7 @@ static void ResetAction(CheatAction * action)
 		if(EXTRACT_FIELD(action->type, CodeParameter) == kCondition_PreviousValue)
 		{
 			if(EXTRACT_FIELD(action->type, CodeType) == kCodeType_CWrite)
-				action->extendData = ReadData(action);
+				action->extend_data = ReadData(action);
 			else
 				action->data = ReadData(action);
 		}
@@ -14006,13 +13954,13 @@ static void ResetAction(CheatAction * action)
   ActivateCheat - reset action entry and set activate entry flag when turn CODE "ON"
 -------------------------------------------------------------------------------------*/
 
-static void ActivateCheat(CheatEntry * entry)
+static void ActivateCheat(cheat_entry *entry)
 {
 	int	i;
 
-	for(i = 0; i < entry->actionListLength; i++)
+	for(i = 0; i < entry->action_list_length; i++)
 	{
-		CheatAction * action = &entry->actionList[i];
+		cheat_action *action = &entry->action_list[i];
 
 		ResetAction(action);
 
@@ -14029,13 +13977,13 @@ static void ActivateCheat(CheatEntry * entry)
   DeactivateCheat - restore previous value and remove watchpoint when turn CODE "OFF"
 --------------------------------------------------------------------------------------*/
 
-static void DeactivateCheat(CheatEntry * entry)
+static void DeactivateCheat(cheat_entry *entry)
 {
 	int i;
 
-	for(i = 0; i < entry->actionListLength; i++)
+	for(i = 0; i < entry->action_list_length; i++)
 	{
-		CheatAction * action = &entry->actionList[i];
+		cheat_action *action = &entry->action_list[i];
 
 		/* restore previous value and clear backup flag if needed */
 		if(TEST_FIELD(action->type, RestoreValue) && (action->flags & kActionFlag_LastValueGood))
@@ -14043,34 +13991,33 @@ static void DeactivateCheat(CheatEntry * entry)
 			switch(EXTRACT_FIELD(action->type, CodeType))
 			{
 				default:
-					WriteData(action, (UINT32)action->lastValue[0]);
+					WriteData(action, (UINT32)action->last_value[0]);
 					break;
 
 				case kCodeType_PDWWrite:
-					WriteData(action, (UINT32)action->lastValue[0]);
-					WriteData(action, (UINT32)action->lastValue[1]);
+					WriteData(action, (UINT32)action->last_value[0]);
+					WriteData(action, (UINT32)action->last_value[1]);
 					break;
 
 				case kCodeType_RWrite:
-				case kCodeType_VRWrite:
 					{
 						int j;
 
-						for(j = 0; j < EXTRACT_FIELD(action->extendData, LSB16); j++)
+						for(j = 0; j < EXTRACT_FIELD(action->extend_data, LSB16); j++)
 						{
-							WriteData(action, (UINT32)action->lastValue[j]);
-							action->address +=	EXTRACT_FIELD(action->extendData, MSB16) ?
-												EXTRACT_FIELD(action->extendData, MSB16) :
+							WriteData(action, (UINT32)action->last_value[j]);
+							action->address +=	EXTRACT_FIELD(action->extend_data, MSB16) ?
+												EXTRACT_FIELD(action->extend_data, MSB16) :
 												kSearchByteIncrementTable[EXTRACT_FIELD(action->type, AddressSize)];
 						}
-						action->address = action->originalAddress;
+						action->address = action->original_address;
 					}
 					break;
 			}
 			action->flags &= ~kActionFlag_LastValueGood;
 		}
-		free(action->lastValue);
-		action->lastValue = NULL;
+		free(action->last_value);
+		action->last_value = NULL;
 	}
 
 	/* remove watchpoint */
@@ -14084,44 +14031,43 @@ static void DeactivateCheat(CheatEntry * entry)
   TempDeactivateCheat - restore previous value when turn CHEAT "OFF"
 --------------------------------------------------------------------*/
 
-static void TempDeactivateCheat(CheatEntry * entry)
+static void TempDeactivateCheat(cheat_entry *entry)
 {
 	if(entry->flags & kCheatFlag_Active)
 	{
 		int i;
 
-		for(i = 0; i < entry->actionListLength; i++)
+		for(i = 0; i < entry->action_list_length; i++)
 		{
-			CheatAction * action = &entry->actionList[i];
+			cheat_action *action = &entry->action_list[i];
 
-			action->frameTimer = 0;
+			action->frame_timer = 0;
 			action->flags &= ~kActionFlag_OperationDone;
 
 			/* restore previous value if needed */
 			switch(EXTRACT_FIELD(action->type, CodeType))
 			{
 				default:
-					WriteData(action, (UINT32)action->lastValue[0]);
+					WriteData(action, (UINT32)action->last_value[0]);
 					break;
 
 				case kCodeType_PDWWrite:
-					WriteData(action, (UINT32)action->lastValue[0]);
-					WriteData(action, (UINT32)action->lastValue[1]);
+					WriteData(action, (UINT32)action->last_value[0]);
+					WriteData(action, (UINT32)action->last_value[1]);
 					break;
 
 				case kCodeType_RWrite:
-				case kCodeType_VRWrite:
 					{
 						int j;
 
-						for(j = 0; j < EXTRACT_FIELD(action->extendData, LSB16); j++)
+						for(j = 0; j < EXTRACT_FIELD(action->extend_data, LSB16); j++)
 						{
-							WriteData(action, (UINT32)action->lastValue[j]);
-							action->address +=	EXTRACT_FIELD(action->extendData, MSB16) ?
-												EXTRACT_FIELD(action->extendData, MSB16) :
+							WriteData(action, (UINT32)action->last_value[j]);
+							action->address +=	EXTRACT_FIELD(action->extend_data, MSB16) ?
+												EXTRACT_FIELD(action->extend_data, MSB16) :
 												kSearchByteIncrementTable[EXTRACT_FIELD(action->type, AddressSize)];
 						}
-						action->address = action->originalAddress;
+						action->address = action->original_address;
 					}
 					break;
 			}
@@ -14134,7 +14080,7 @@ static void TempDeactivateCheat(CheatEntry * entry)
   cheat_periodicOperation - management for cheat operations
 ------------------------------------------------------------*/
 
-static void cheat_periodicOperation(CheatAction * action)
+static void cheat_periodicOperation(cheat_action *action)
 {
 	int data = TEST_FIELD(action->type, DataRead) ? cheatVariable[action->data] : action->data;
 
@@ -14142,53 +14088,69 @@ static void cheat_periodicOperation(CheatAction * action)
 	{
 		action->flags &= ~kActionFlag_IsFirst;
 		WriteData(action, data);
-		WriteData(action, action->extendData);
+		WriteData(action, action->extend_data);
 	}
 	else if(action->flags & kActionFlag_Repeat)
 	{
 		int i;
 
-		for(i = 0; i < EXTRACT_FIELD(action->extendData, LSB16); i++)
+		for(i = 0; i < EXTRACT_FIELD(action->extend_data, LSB16); i++)
 		{
 			WriteData(action, data);
-			action->address +=	EXTRACT_FIELD(action->extendData, MSB16) ?
-								EXTRACT_FIELD(action->extendData, MSB16) :
+			action->address +=	EXTRACT_FIELD(action->extend_data, MSB16) ?
+								EXTRACT_FIELD(action->extend_data, MSB16) :
 								kSearchByteIncrementTable[EXTRACT_FIELD(action->type, AddressSize)];
 		}
-		action->address = action->originalAddress;
+		action->address = action->original_address;
 	}
 	else
 	{
 		switch(EXTRACT_FIELD(action->type, CodeType))
 		{
 			case kCodeType_Write:
-				WriteData(action, (data & action->extendData) | (ReadData(action) & ~action->extendData));
+				WriteData(action, (data & action->extend_data) | (ReadData(action) & ~action->extend_data));
 				break;
 
 			case kCodeType_IWrite:
 				switch(EXTRACT_FIELD(action->type, CodeParameter))
 				{
-					case kIWrite_Write:
+					case IWRITE_WRITE:
 						WriteData(action, data);
 						break;
 
-					case kIWrite_BitSet:
+					case IWRITE_BIT_SET:
 						WriteData(action, ReadData(action) | data);
 						break;
 
-					case kIWrite_BitClear:
+					case IWRITE_BIT_CLEAR:
 						WriteData(action, ReadData(action) & ~data);
 						break;
 
-					case kIWrite_LimitedMask:
+					case IWRITE_LIMITED_MASK:
 						WriteData(action, (EXTRACT_FIELD(data, MSB16) & EXTRACT_FIELD(data, LSB16)) | (ReadData(action) & ~EXTRACT_FIELD(data, LSB16)));
 						break;
 				}
 				break;
 
 			case kCodeType_CWrite:
-			case kCodeType_VWrite:
 				WriteData(action, data);
+				break;
+
+			case kCodeType_CBit:
+				switch(EXTRACT_FIELD(action->type, CodeParameterUpper))
+				{
+					case CBIT_BIT_SET:
+						WriteData(action, ReadData(action) | data);
+						break;
+
+					case CBIT_BIT_CLEAR:
+						WriteData(action, ReadData(action) & ~data);
+						break;
+
+					case CBIT_LIMITED_MASK:
+						WriteData(action, (EXTRACT_FIELD(data, MSB16) & EXTRACT_FIELD(data, LSB16)) | (ReadData(action) & ~EXTRACT_FIELD(data, LSB16)));
+						break;
+				}
 				break;
 
 			case kCodeType_Move:
@@ -14199,30 +14161,30 @@ static void cheat_periodicOperation(CheatAction * action)
 				switch(EXTRACT_FIELD(action->type, PopupParameter))
 				{
 					case kPopup_Label:
-						ui_popup_time(1, "%s", action->optionalName);
+						ui_popup_time(1, "%s", action->optional_name);
 						break;
 
 					case kPopup_Value:
 						ui_popup_time(1, "%*.*X",
-										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressRead)],
-										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressRead)],
+										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
+										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
 										ReadData(action));
 						break;
 
 					case kPopup_LabelValue:
 						ui_popup_time(1, "%s %*.*X",
-										action->optionalName,
-										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressRead)],
-										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressRead)],
+										action->optional_name,
+										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
+										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
 										ReadData(action));
 						break;
 
 					case kPopup_ValueLabel:
 						ui_popup_time(1, "%*.*X %s",
-										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressRead)],
-										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressRead)],
+										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
+										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
 										ReadData(action),
-										action->optionalName);
+										action->optional_name);
 						break;
 				}
 				break;
@@ -14236,60 +14198,75 @@ static void cheat_periodicOperation(CheatAction * action)
 
 /*------------------------------------------------------------
   cheat_periodicCondition - management for cheat conditions
-                            used by CWrite, Branch, Popup
 ------------------------------------------------------------*/
 
-static UINT8 cheat_periodicCondition(CheatAction * action)
+static UINT8 cheat_periodicCondition(cheat_action *action)
 {
 	int	data	= ReadData(action);
-	int	value	= EXTRACT_FIELD(action->type, CodeType) == kCodeType_CWrite ? action->extendData : action->data;
+	int	value	= action->extend_data;
 
-	switch(EXTRACT_FIELD(action->type, CodeParameter))
+	if(EXTRACT_FIELD(action->type, CodeType) != kCodeType_CBit)
 	{
-		case kCondition_Equal:
-			return (data == value);
+		/* CWrite, Branch, Popup */
+		switch(EXTRACT_FIELD(action->type, CodeParameter))
+		{
+			case kCondition_Equal:
+				return (data == value);
 
-		case kCondition_NotEqual:
-			return (data != value);
+			case kCondition_NotEqual:
+				return (data != value);
 
-		case kCondition_Less:
-			return (data < value);
+			case kCondition_Less:
+				return (data < value);
 
-		case kCondition_LessOrEqual:
-			return (data <= value);
+			case kCondition_LessOrEqual:
+				return (data <= value);
 
-		case kCondition_Greater:
-			return (data > value);
+			case kCondition_Greater:
+				return (data > value);
 
-		case kCondition_GreaterOrEqual:
-			return (data >= value);
+			case kCondition_GreaterOrEqual:
+				return (data >= value);
 
-		case kCondition_BitSet:
-			return (data & value);
+			case kCondition_BitSet:
+				return (data & value);
 
-		case kCondition_BitClear:
-			return (!(data & value));
+			case kCondition_BitClear:
+				return (!(data & value));
 
-		case kCondition_PreviousValue:
-			if(data != value)
-			{
-				if(EXTRACT_FIELD(action->type, CodeType) == kCodeType_CWrite)
-					action->extendData = data;
-				else
-					action->data = data;
+			case kCondition_PreviousValue:
+				if(data != value)
+				{
+					if(EXTRACT_FIELD(action->type, CodeType) == kCodeType_CWrite)
+						action->extend_data = data;
+					else
+						action->data = data;
 
+					return 1;
+				}
+				break;
+
+			case kCondition_KeyPressedOnce:
+				return (input_code_pressed_once(value));
+
+			case kCondition_KeyPressedRepeat:
+				return (input_code_pressed(value));
+
+			case kCondition_True:
 				return 1;
-			}
-			break;
+		}
+	}
+	else
+	{
+		/* CBit */
+		switch(EXTRACT_FIELD(action->type, CodeParameterLower))
+		{
+			case CONDITION_CBIT_BIT_SET:
+				return (data & value);
 
-		case kCondition_KeyPressedOnce:
-			return (input_code_pressed_once(value));
-
-		case kCondition_KeyPressedRepeat:
-			return (input_code_pressed(value));
-
-		case kCondition_True:
-			return 1;
+			case CONDITION_CBIT_BIT_CLEAR:
+				return (!(data & value));
+		}
 	}
 
 	return 0;
@@ -14299,32 +14276,31 @@ static UINT8 cheat_periodicCondition(CheatAction * action)
   cheat_periodicAction - management for cheat actions
 ------------------------------------------------------*/
 
-static int cheat_periodicAction(running_machine *machine, CheatAction * action, int selection)
+static int cheat_periodicAction(running_machine *machine, cheat_action *action, int selection)
 {
 	UINT8 executeOperation = 0;
 
-	if(driverSpecifiedFlag)
-		return (TEST_FIELD(action->type, Return) ? CHEAT_RETURN_VALUE : selection + 1);
-
-	if(TEST_FIELD(action->type, PrefillEnable) && !(action->flags & kActionFlag_PrefillDone))
+	if(TEST_FIELD(action->type, PrefillEnable))
 	{
-		UINT8 prefillValue = kPrefillValueTable[EXTRACT_FIELD(action->type, PrefillEnable)];
-
-		if(!(action->flags & kActionFlag_PrefillWritten))
+		if((action->flags & kActionFlag_PrefillDone) == 0)
 		{
-			/* set prefill */
-			WriteData(action, prefillValue);
-			action->flags |= kActionFlag_PrefillWritten;
-			return (TEST_FIELD(action->type, Return) ? CHEAT_RETURN_VALUE : selection + 1);
+			UINT8 prefillValue = kPrefillValueTable[EXTRACT_FIELD(action->type, PrefillEnable)];
 
-		}
-		else
-		{
-			/* do re-write */
-			if(ReadData(action) == prefillValue)
+			if((action->flags & kActionFlag_PrefillWritten) == 0)
+			{
+				/* set prefill */
+				WriteData(action, prefillValue);
+				action->flags |= kActionFlag_PrefillWritten;
 				return (TEST_FIELD(action->type, Return) ? CHEAT_RETURN_VALUE : selection + 1);
+			}
+			else
+			{
+				/* do re-write */
+				if(ReadData(action) == prefillValue)
+					return (TEST_FIELD(action->type, Return) ? CHEAT_RETURN_VALUE : selection + 1);
 
-			action->flags |= kActionFlag_PrefillDone;
+				action->flags |= kActionFlag_PrefillDone;
+			}
 		}
 	}
 
@@ -14335,16 +14311,16 @@ static int cheat_periodicAction(running_machine *machine, CheatAction * action, 
 			/* Keep */
 			executeOperation = 1;
 
-			if(action->frameTimer++ >= EXTRACT_FIELD(action->type, DelayEnable) * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds))
+			if(action->frame_timer++ >= EXTRACT_FIELD(action->type, DelayEnable) * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds))
 				action->flags |= kActionFlag_OperationDone;
 		}
 		else
 		{
-			if(action->frameTimer++ >= EXTRACT_FIELD(action->type, DelayEnable) * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds))
+			if(action->frame_timer++ >= EXTRACT_FIELD(action->type, DelayEnable) * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds))
 			{
 				/* Delay */
 				executeOperation = 1;
-				action->frameTimer = 0;
+				action->frame_timer = 0;
 
 				if(TEST_FIELD(action->type, OneShot))
 					action->flags |= kActionFlag_OperationDone;
@@ -14353,19 +14329,27 @@ static int cheat_periodicAction(running_machine *machine, CheatAction * action, 
 	}
 	else
 	{
-		if(action->frameTimer++)
+		if(action->frame_timer++)
 		{
-			if(action->frameTimer >= EXTRACT_FIELD(action->type, DelayEnable) * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds))
-				action->frameTimer = 0;
+			if(action->frame_timer >= EXTRACT_FIELD(action->type, DelayEnable) * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds))
+				action->frame_timer = 0;
 
 			return (TEST_FIELD(action->type, Return) ? CHEAT_RETURN_VALUE : selection + 1);
 		}
 		else
 		{
-			executeOperation = 1;
+				executeOperation = 1;
 
-			action->flags |= kActionFlag_OperationDone;
+				action->flags |= kActionFlag_OperationDone;
 		}
+	}
+
+	if(action->flags & kActionFlag_CheckCondition)
+	{
+		if(cheat_periodicCondition(action))
+			executeOperation = 1;
+		else
+			executeOperation = 0;
 	}
 
 	if(executeOperation)
@@ -14374,38 +14358,30 @@ static int cheat_periodicAction(running_machine *machine, CheatAction * action, 
 		switch(EXTRACT_FIELD(action->type, CodeType))
 		{
 			case kCodeType_Write:
-			case kCodeType_PDWWrite:
-			case kCodeType_RWrite:
 			case kCodeType_IWrite:
-			case kCodeType_VWrite:
-			case kCodeType_VRWrite:
+			case kCodeType_RWrite:
+			case kCodeType_CWrite:
+			case kCodeType_CBit:
+			case kCodeType_PDWWrite:
 			case kCodeType_Move:
+			case kCodeType_Popup:
 				cheat_periodicOperation(action);
 				break;
 
-			case kCodeType_CWrite:
-			case kCodeType_Popup:
-				if(cheat_periodicCondition(action))
-					cheat_periodicOperation(action);
-				break;
-
 			case kCodeType_Branch:
-				if(cheat_periodicCondition(action))
-					return action->extendData;
-				break;
+				return action->data;
 
 			case kCodeType_Loop:
 				{
 					int counter = ReadData(action);
 
-					if(counter)
+					if(counter != 0)
 					{
 						WriteData(action, counter - 1);
 
 						return (TEST_FIELD(action->type, DataRead) ? cheatVariable[action->data] : action->data);
 					}
 				}
-				break;
 		}
 	}
 
@@ -14416,7 +14392,7 @@ static int cheat_periodicAction(running_machine *machine, CheatAction * action, 
   cheat_periodicEntry - management for cheat entries
 -----------------------------------------------------*/
 
-static void cheat_periodicEntry(running_machine *machine, CheatEntry * entry)
+static void cheat_periodicEntry(running_machine *machine, cheat_entry *entry)
 {
 	int		i			= 0;
 	UINT8	pressedKey	= 0;
@@ -14427,9 +14403,9 @@ static void cheat_periodicEntry(running_machine *machine, CheatEntry * entry)
 	if(!ui_is_menu_active())
 	{
 		/* NOTE : activation key should be not checked in activating UI menu because it conflicts activation key checker */
-		if((entry->flags & kCheatFlag_HasActivationKey1) && input_code_pressed_once(entry->activationKey1))
+		if((entry->flags & kCheatFlag_HasActivationKey1) && input_code_pressed_once(entry->activation_key1))
 			pressedKey = 1;
-		else if((entry->flags & kCheatFlag_HasActivationKey2) && input_code_pressed_once(entry->activationKey2))
+		else if((entry->flags & kCheatFlag_HasActivationKey2) && input_code_pressed_once(entry->activation_key2))
 			pressedKey = 2;
 	}
 
@@ -14440,26 +14416,26 @@ static void cheat_periodicEntry(running_machine *machine, CheatEntry * entry)
 			if(pressedKey == 1)
 			{
 				if(--entry->selection < 0)
-					entry->selection = entry->labelIndexLength - 1;
+					entry->selection = entry->label_index_length - 1;
 			}
 			else
 			{
-				if(++entry->selection >= entry->labelIndexLength)
+				if(++entry->selection >= entry->label_index_length)
 					entry->selection = 0;
 			}
 
 			/* NOTE : in handling activatio key, forced to activate a cheat even if one shot */
-			if(!(entry->flags & kCheatFlag_OneShot) && !(entry->labelIndex[entry->selection]))
+			if(!(entry->flags & kCheatFlag_OneShot) && !(entry->label_index[entry->selection]))
 				DeactivateCheat(entry);
 			else
 				ActivateCheat(entry);
 
-			if(TEST_FIELD(cheatOptions, ActivationKeyMessage))
+			if(TEST_FIELD(cheat_options, ActivationKeyMessage))
 			{
 				if(!entry->selection)
 					ui_popup_time(1,"%s disabled", entry->name);
 				else
-					ui_popup_time(1,"%s : %s selected", entry->name, entry->actionList[entry->labelIndex[entry->selection]].optionalName);
+					ui_popup_time(1,"%s : %s selected", entry->name, entry->action_list[entry->label_index[entry->selection]].optional_name);
 			}
 		}
 	}
@@ -14472,21 +14448,21 @@ static void cheat_periodicEntry(running_machine *machine, CheatEntry * entry)
 			{
 				ActivateCheat(entry);
 
-				if(TEST_FIELD(cheatOptions, ActivationKeyMessage))
+				if(TEST_FIELD(cheat_options, ActivationKeyMessage))
 					ui_popup_time(1,"set %s", entry->name);
 			}
 			else if(entry->flags & kCheatFlag_Active)
 			{
 				DeactivateCheat(entry);
 
-				if(TEST_FIELD(cheatOptions, ActivationKeyMessage))
+				if(TEST_FIELD(cheat_options, ActivationKeyMessage))
 					ui_popup_time(1,"%s disabled", entry->name);
 			}
 			else
 			{
 				ActivateCheat(entry);
 
-				if(TEST_FIELD(cheatOptions, ActivationKeyMessage))
+				if(TEST_FIELD(cheat_options, ActivationKeyMessage))
 					ui_popup_time(1,"%s enabled", entry->name);
 			}
 		}
@@ -14495,42 +14471,42 @@ static void cheat_periodicEntry(running_machine *machine, CheatEntry * entry)
 	/* ***** 2nd, do cheat actions ***** */
 
 	/* if "OFF", no action */
-	if(!(entry->flags & kCheatFlag_Active))
+	if(driverSpecifiedFlag != 0 || (entry->flags & kCheatFlag_Active) == 0)
 		return;
 
 	while(1)
 	{
-		if(entry->actionList[i].flags & kActionFlag_Custom)
+		if(entry->action_list[i].flags & kActionFlag_Custom)
 		{
-			if(EXTRACT_FIELD(entry->actionList[i].type, CodeType) == kCustomCode_LabelSelect)
+			if(EXTRACT_FIELD(entry->action_list[i].type, CodeType) == CUSTOM_CODE_LABEL_SELECT)
 			{
-				i = entry->labelIndex[entry->selection];
+				i = entry->label_index[entry->selection];
 				isSelect = 1;
 				continue;
 			}
 			else
 				i++;
 		}
-		else if((entry->actionList[i].flags & kActionFlag_OperationDone) || (entry->actionList[i].flags & kActionFlag_NoAction))
+		else if((entry->action_list[i].flags & kActionFlag_OperationDone) || (entry->action_list[i].flags & kActionFlag_NoAction))
 		{
 			i++;
 		}
-		else if(entry->actionList[i].flags & kActionFlag_OldFormat)
+		else if(entry->action_list[i].flags & kActionFlag_OldFormat)
 		{
-			int	tempType	= entry->actionList[i].type;
+			int	tempType	= entry->action_list[i].type;
 			int	j			= i;
 
-			entry->actionList[i].type = ConvertToNewCode(&entry->actionList[i]);
-			i = cheat_periodicAction(machine, &entry->actionList[i], i);
-			entry->actionList[j].type = tempType;
+			entry->action_list[i].type = convert_to_new_code(&entry->action_list[i]);
+			i = cheat_periodicAction(machine, &entry->action_list[i], i);
+			entry->action_list[j].type = tempType;
 		}
 		else
-			i = cheat_periodicAction(machine, &entry->actionList[i], i);
+			i = cheat_periodicAction(machine, &entry->action_list[i], i);
 
-		if(i >= entry->actionListLength)
+		if(i >= entry->action_list_length)
 			break;
 
-		if(isSelect && EXTRACT_FIELD(entry->actionList[i].type, Link) != kLink_SubLink)
+		if(isSelect && EXTRACT_FIELD(entry->action_list[i].type, Link) != kLink_SubLink)
 			break;
 	}
 
@@ -14545,20 +14521,20 @@ static void cheat_periodicEntry(running_machine *machine, CheatEntry * entry)
 
 		while(1)
 		{
-			if(entry->actionList[i].flags & kActionFlag_Custom)
+			if(entry->action_list[i].flags & kActionFlag_Custom)
 			{
-				if(EXTRACT_FIELD(entry->actionList[i].type, CodeType) == kCustomCode_LabelSelect)
+				if(EXTRACT_FIELD(entry->action_list[i].type, CodeType) == CUSTOM_CODE_LABEL_SELECT)
 				{
-					i = entry->labelIndex[entry->selection];
+					i = entry->label_index[entry->selection];
 					isSelect = 1;
 					continue;
 				}
 			}
-			else if(entry->actionList[i].flags & kActionFlag_NoAction)
+			else if(entry->action_list[i].flags & kActionFlag_NoAction)
 			{
 				i++;
 			}
-			else if(!(entry->actionList[i].flags & kActionFlag_OperationDone))
+			else if(!(entry->action_list[i].flags & kActionFlag_OperationDone))
 			{
 				done = 0;
 				i++;
@@ -14566,10 +14542,10 @@ static void cheat_periodicEntry(running_machine *machine, CheatEntry * entry)
 			else
 				i++;
 
-			if(i >= entry->actionListLength)
+			if(i >= entry->action_list_length)
 				break;
 
-			if(isSelect && EXTRACT_FIELD(entry->actionList[i].type, Link) != kLink_SubLink)
+			if(isSelect && EXTRACT_FIELD(entry->action_list[i].type, Link) != kLink_SubLink)
 				break;
 		}
 
@@ -14578,201 +14554,201 @@ static void cheat_periodicEntry(running_machine *machine, CheatEntry * entry)
 	}
 }
 
-/*------------------------------------------------------------------
-  UpdateAllCheatInfo - update all cheat info when database loaded
-------------------------------------------------------------------*/
+/*---------------------------------------------------------------------
+  update_all_cheat_info - update all cheat info when database loaded
+---------------------------------------------------------------------*/
 
-static void UpdateAllCheatInfo(void)
+static void update_all_cheat_info(void)
 {
 	int i;
 
-	/* update flags for all CheatEntry */
-	for(i = 0; i < cheatListLength; i++)
+	/* update flags for all cheat entry */
+	for(i = 0; i < cheat_list_length; i++)
 	{
-		UpdateCheatInfo(&cheatList[i], 1);
+		update_cheat_info(&cheat_list[i], 1);
 
-		if(cheatList[i].flags & kCheatFlag_Select)
-			BuildLabelIndexTable(&cheatList[i]);
+		if(cheat_list[i].flags & kCheatFlag_Select)
+			BuildLabelIndexTable(&cheat_list[i]);
 	}
 
 	SetLayerIndex();
 }
 
-/*---------------------------------------------------------------------------------------------
-  UpdateCheatInfo - check several fields on CheatEntry and CheatAction then set flags
-                    "isLoadTime" parameter is set when called UpdateAllCheatInfo() right now
----------------------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------------------------------
+  update_cheat_info - check several fields on cheat entry and cheat action then set flags
+                      "isLoadTime" parameter is set when called update_all_cheat_info() right now
+--------------------------------------------------------------------------------------------------*/
 
-static void UpdateCheatInfo(CheatEntry * entry, UINT8 isLoadTime)
+static void update_cheat_info(cheat_entry *entry, UINT8 is_load_time)
 {
 	int		i;
 	int		flags = 0;
-	UINT8	isOneShot = 1;
-	UINT8	isNull = 1;
-	UINT8	isSeparator = 1;
-	UINT8	isNewFormat = 1;
+	UINT8	is_one_shot = 1;
+	UINT8	is_null = 1;
+	UINT8	is_separator = 1;
+	UINT8	is_new_format = 1;
 
 	flags = entry->flags & kCheatFlag_PersistentMask;
 
-	for(i = 0; i < entry->actionListLength; i++)
+	for(i = 0; i < entry->action_list_length; i++)
 	{
-		CheatAction * action = &entry->actionList[i];
+		cheat_action *action = &entry->action_list[i];
 
-		int actionFlags = action->flags & kActionFlag_PersistentMask;
+		int action_flags = action->flags & kActionFlag_PersistentMask;
 
-		action->region = EXTRACT_FIELD(action->type, CPURegion);
+		if(TEST_FIELD(action->type, OneShot) == 0)
+			is_one_shot = 0;
 
-		if(actionFlags & kActionFlag_OldFormat)
+		if(action_flags & kActionFlag_OldFormat)
 		{
 			if(	(EXTRACT_FIELD(action->type, LocationType) == kLocation_Custom) &&
 				(EXTRACT_FIELD(action->type, LocationParameter) == kCustomLocation_Select))
 					flags |= kCheatFlag_Select;
 
 			if(EXTRACT_FIELD(action->type, LocationType) != kLocation_Custom)
-				isNull = 0;
-
-			if(!TEST_FIELD(action->type, OneShot))
-				isOneShot = 0;
+				is_null = 0;
 
 			if(TEST_FIELD(action->type, UserSelectEnable))
 				flags |= kCheatFlag_UserSelect;
 
 			if(	(EXTRACT_FIELD(action->type, LocationType) == kLocation_Custom) &&
 				(EXTRACT_FIELD(action->type, LocationParameter) == kCustomLocation_Select))
-					actionFlags |= kActionFlag_NoAction;
+					action_flags |= kActionFlag_NoAction;
 
 			if(	(EXTRACT_FIELD(action->type, LocationType) == kLocation_IndirectIndexed) ||
 				((EXTRACT_FIELD(action->type, LocationType) != kLocation_Custom) &&
 				((EXTRACT_FIELD(action->type, Operation) | EXTRACT_FIELD(action->type, OperationExtend) << 2) == 1)))
-					actionFlags |= kActionFlag_IndexAddress;
+					action_flags |= kActionFlag_IndexAddress;
 
-			if(i && entry->actionList[i-1].type == entry->actionList[i].type)
+			if(i && entry->action_list[i-1].type == entry->action_list[i].type)
 			{
-				if(	entry->actionList[i].address >= entry->actionList[i-1].address &&
-					entry->actionList[i].address <= entry->actionList[i-1].address + 3)
-						actionFlags |= kActionFlag_NoAction;
+				if(	entry->action_list[i].address >= entry->action_list[i-1].address &&
+					entry->action_list[i].address <= entry->action_list[i-1].address + 3)
+						action_flags |= kActionFlag_NoAction;
 			}
 
-			isNewFormat = 0;
+			is_new_format = 0;
+			is_one_shot = 0;
 		}
 		else
 		{
-			if(action->region != CUSTOM_CODE)
+			if(action->region < CUSTOM_CODE)
 			{
 				switch(EXTRACT_FIELD(action->type, CodeType))
 				{
 					case kCodeType_PDWWrite:
-						actionFlags |= kActionFlag_PDWWrite;
-						break;
-
-					case kCodeType_RWrite:
-						actionFlags |= kActionFlag_Repeat;
+						action_flags |= kActionFlag_PDWWrite;
 						break;
 
 					case kCodeType_IWrite:
+						if(action->extend_data != ~0)
+							action_flags |= kActionFlag_IndexAddress;
+						if(EXTRACT_FIELD(action->type, CodeParameterUpper) == IWRITE_LIMITED_MASK)
+							action_flags |= kActionFlag_LimitedMask;
+						break;
+
+					case kCodeType_CBit:
+						action->flags |= kActionFlag_CheckCondition;
+						if(EXTRACT_FIELD(action->type, CodeParameterUpper) == CBIT_LIMITED_MASK)
+							action_flags |= kActionFlag_LimitedMask;
+						break;
+
+					case kCodeType_RWrite:
+						action_flags |= kActionFlag_Repeat;
+						break;
+
 					case kCodeType_Move:
-					case kCodeType_Loop:
-						if(action->extendData != ~0)
-							actionFlags |= kActionFlag_IndexAddress;
+						if(action->extend_data != ~0)
+							action_flags |= kActionFlag_IndexAddress;
 						break;
 
 					case kCodeType_CWrite:
 					case kCodeType_Branch:
-						actionFlags |= kActionFlag_CheckCondition;
-						break;
-
-					case kCodeType_VWrite:
-						flags |= kCheatFlag_UserSelect;
-
-						if(action->extendData != ~0)
-							actionFlags |= kActionFlag_IndexAddress;
-						break;
-
-					case kCodeType_VRWrite:
-						flags |= kCheatFlag_UserSelect;
-						actionFlags |= kActionFlag_Repeat;
+						action_flags |= kActionFlag_CheckCondition;
 						break;
 
 					case kCodeType_Popup:
-						actionFlags |= kActionFlag_CheckCondition;
+						action_flags |= kActionFlag_CheckCondition;
+						break;
 
-						if(action->extendData != ~0)
-							actionFlags |= kActionFlag_IndexAddress;
+						if(action->extend_data != ~0)
+							action_flags |= kActionFlag_IndexAddress;
 						break;
 
 					case kCodeType_Watch:
-						actionFlags |= kActionFlag_NoAction;
+						action_flags |= kActionFlag_NoAction;
 						break;
 				}
 
-				isNull = 0;
-				isSeparator = 0;
+				if(TEST_FIELD(action->type, ValueSelectEnable))
+					flags |= kCheatFlag_UserSelect;
+
+				is_null = 0;
+				is_separator = 0;
 			}
 			else
 			{
 				/* is label-select? */
-				if(EXTRACT_FIELD(action->type, CodeType) == kCustomCode_LabelSelect)
+				if(action->region == CUSTOM_CODE_LABEL_SELECT)
 					flags |= kCheatFlag_Select;
 
 				/* is comment? */
-				if(EXTRACT_FIELD(action->type, CodeType) != kCustomCode_Comment)
-					isNull = 0;
+				if(action->region != CUSTOM_CODE_COMMENT)
+					is_null = 0;
 
 				/* is separator? */
-				if(EXTRACT_FIELD(action->type, CodeType) != kCustomCode_Separator)
-					isSeparator = 0;
+				if(action->region != CUSTOM_CODE_SEPARATOR)
+					is_separator = 0;
 
 				/* is layer index? */
-				if(EXTRACT_FIELD(action->type, CodeType) == kCustomCode_Layer)
+				if(action->region == CUSTOM_CODE_LAYER_TAG)
 					flags |= kCheatFlag_LayerIndex;
 
-				actionFlags |= kActionFlag_NoAction;
-				actionFlags |= kActionFlag_Custom;
+				action_flags |= kActionFlag_NoAction;
+				action_flags |= kActionFlag_Custom;
 			}
-
-			/* is one shot? */
-			if(!TEST_FIELD(action->type, OneShot))
-				isOneShot = 0;
 		}
 
-		action->flags = actionFlags;
+		action->flags = action_flags;
 	}
 
-	/* one shot is set if "ALL" actions are not an one shot */
-	if(isOneShot)
+	if(is_new_format == 0)
+		flags |= kCheatFlag_OldFormat;
+
+	if(is_one_shot)
 		flags |= kCheatFlag_OneShot;
 
-	if(isNull)
+	if(is_null)
 	{
-		if(entry->actionListLength > 1)
+		if(entry->action_list_length > 1)
 			flags |= kCheatFlag_ExtendComment;
 		else
 			flags |= kCheatFlag_Null;
 	}
 
-	if(isSeparator)
+	if(is_new_format)
 	{
-		flags |= kCheatFlag_Null;
-		flags |= kCheatFlag_Separator;
+		if(is_separator)
+		{
+			flags |= kCheatFlag_Null;
+			flags |= kCheatFlag_Separator;
+		}
 	}
-
-	if(isNewFormat == 0)
-		flags |= kCheatFlag_OldFormat;
 
 	entry->flags = (flags & kCheatFlag_InfoMask) | (entry->flags & ~kCheatFlag_InfoMask);
 
-	/* clear dirty flag as "this entry has already exist in the database" when loaded from a database */
-	if(isLoadTime)
+	/* clear dirty flag */
+	if(is_load_time)
 		entry->flags &= ~kCheatFlag_Dirty;
 
-	CheckCodeFormat(entry);
+	check_code_format(entry);
 }
 
 /*--------------------
   AnalyseCodeFormat
 --------------------*/
 
-static UINT32 AnalyseCodeFormat(CheatEntry * entry, CheatAction * action)
+static UINT32 AnalyseCodeFormat(cheat_entry *entry, cheat_action *action)
 {
 	UINT32 errorFlag = 0;
 
@@ -14812,19 +14788,19 @@ static UINT32 AnalyseCodeFormat(CheatEntry * entry, CheatAction * action)
 
 		if(TEST_FIELD(action->type, UserSelectEnable))
 		{
-			if(!action->originalDataField)
+			if(!action->original_data)
 				errorFlag |= kErrorFlag_NoSelectableValue;
 		}
 
 		if(type == kLocation_Custom && parameter == kCustomLocation_Select)
 		{
-			if(entry->actionListLength == 1)
+			if(entry->action_list_length == 1)
 				errorFlag |= kErrorFlag_NoLabel;
 
-			if(action->originalDataField)
+			if(action->original_data)
 				errorFlag |= kErrorFlag_InvalidDataField;
 
-			if(action->extendData)
+			if(action->extend_data)
 				errorFlag |= kErrorFlag_InvalidExtendDataField;
 		}
 
@@ -14832,12 +14808,12 @@ static UINT32 AnalyseCodeFormat(CheatEntry * entry, CheatAction * action)
 		{
 			if(type == kLocation_Standard)
 			{
-				if(!action->extendData || action->extendData == 0xFF || action->extendData == 0xFFFF || action->extendData == 0xFFFFFF)
+				if(!action->extend_data || action->extend_data == 0xFF || action->extend_data == 0xFFFF || action->extend_data == 0xFFFFFF)
 					errorFlag |= kErrorFlag_InvalidExtendDataField;
 			}
 			else if(type == kLocation_MemoryRegion)
 			{
-				if(action->extendData != ~0)
+				if(action->extend_data != ~0)
 					errorFlag |= kErrorFlag_InvalidExtendDataField;
 			}
 		}
@@ -14849,7 +14825,7 @@ static UINT32 AnalyseCodeFormat(CheatEntry * entry, CheatAction * action)
 			UINT8	codeType		= EXTRACT_FIELD(action->type, CodeType);
 			UINT8	codeParameter	= EXTRACT_FIELD(action->type, CodeParameter);
 
-			if(codeType >= kCodeType_Unused1 && codeType <= kCodeType_Unused4)
+			if(codeType >= kCodeType_Unused)
 				errorFlag |= kErrorFlag_InvalidCodeType;
 
 			if(action->flags & kActionFlag_CheckCondition)
@@ -14864,29 +14840,21 @@ static UINT32 AnalyseCodeFormat(CheatEntry * entry, CheatAction * action)
 					errorFlag |= kErrorFlag_ForbittenVariable;
 			}
 
-			if(EXTRACT_FIELD(action->type, Link) == kLink_CopyLink)
-			{
-				if(!entry->flags & kCheatFlag_UserSelect)
-					errorFlag |= kErrorFlag_CopyLinkWithoutSelect;
-			}
-
-			if(	TEST_FIELD(action->region, RegionFlag) ||
-				EXTRACT_FIELD(action->type, AddressSpace) == kAddressSpace_OpcodeRAM)
+			if(action->region >= REGION_CPU1 || EXTRACT_FIELD(action->type, AddressSpace) == kAddressSpace_OpcodeRAM)
 			{
 				if(!TEST_FIELD(action->type, RestoreValue))
 					errorFlag |= kErrorFlag_NoRestorePreviousValue;
 			}
 
-			if(	EXTRACT_FIELD(action->type, CodeType) == kCodeType_VWrite ||
-				EXTRACT_FIELD(action->type, CodeType) == kCodeType_VRWrite)
+			if(action->flags & kActionFlag_LimitedMask)
 			{
-				if(!action->originalDataField)
-					errorFlag |= kErrorFlag_NoSelectableValue;
+				if(EXTRACT_FIELD(action->type, AddressSize) > kSearchSize_16Bit)
+					errorFlag |= kErrorFlag_InvalidLimitedMaskSize;
 			}
 
 			if(action->flags & kActionFlag_Repeat)
 			{
-				if(!EXTRACT_FIELD(action->extendData, LSB16))
+				if(!EXTRACT_FIELD(action->extend_data, LSB16))
 					errorFlag |= kErrorFlag_NoRepeatCount;
 			}
 
@@ -14907,26 +14875,17 @@ static UINT32 AnalyseCodeFormat(CheatEntry * entry, CheatAction * action)
 
 			if(codeType == kCodeType_Write)
 			{
-				if(!action->extendData || action->extendData == 0xFF || action->extendData == 0xFFFF || action->extendData == 0xFFFFFF)
+				if(!action->extend_data || action->extend_data == 0xFF || action->extend_data == 0xFFFF || action->extend_data == 0xFFFFFF)
 					errorFlag |= kErrorFlag_InvalidExtendDataField;
 			}
 
-			if(!(action->flags & kActionFlag_Custom))
+			if((action->flags & kActionFlag_Custom) == 0)
 			{
-				if(TEST_FIELD(action->region, RegionFlag))
-				{
-					UINT8 region = EXTRACT_FIELD(action->region, RegionIndex);
-
-					if(region >= REGION_MAX)				errorFlag |= kErrorFlag_OutOfCPURegion;
-					else if(!region_info_list[region].type)	errorFlag |= kErrorFlag_InvalidCPURegion;
-					else if(!IsAddressInRange(action, memory_region_length(action->region)))
-															errorFlag |= kErrorFlag_RegionOutOfRange;
-				}
-				else
+				if(action->region < REGION_INVALID)
 				{
 					UINT8 cpu = EXTRACT_FIELD(action->region, CPUIndex);
 
-					if(!VALID_CPU(cpu))
+					if(VALID_CPU(cpu) == 0)
 						errorFlag |= kErrorFlag_OutOfCPURegion;
 					else if(cpu_info_list[cpu].type == 0)
 						errorFlag |= kErrorFlag_InvalidCPURegion;
@@ -14934,11 +14893,20 @@ static UINT32 AnalyseCodeFormat(CheatEntry * entry, CheatAction * action)
 					if(EXTRACT_FIELD(action->type, AddressSpace) > kAddressSpace_EEPROM)
 						errorFlag |= kErrorFlag_InvalidAddressSpace;
 				}
+				else
+				{
+					UINT8 region = action->region - REGION_INVALID;
+
+					if(region >= REGION_MAX)				errorFlag |= kErrorFlag_OutOfCPURegion;
+					else if(!region_info_list[region].type)	errorFlag |= kErrorFlag_InvalidCPURegion;
+					else if(!is_address_in_range(action, memory_region_length(action->region)))
+															errorFlag |= kErrorFlag_RegionOutOfRange;
+				}
 			}
 		}
 		else
 		{
-			if(EXTRACT_FIELD(action->type, CodeParameter) >= kCustomCode_Unused1)
+			if(EXTRACT_FIELD(action->type, CodeParameter) >= CUSTOM_CODE_UNUSED_1)
 				errorFlag |= kErrorFlag_InvalidCustomCode;
 		}
 	}
@@ -14946,28 +14914,27 @@ static UINT32 AnalyseCodeFormat(CheatEntry * entry, CheatAction * action)
 	return errorFlag;
 }
 
-/*----------------------------------------
-  CheckCodeFormat - code format checker
-----------------------------------------*/
+/*------------------------------------------
+  check_code_format - code format checker
+------------------------------------------*/
 
-static void CheckCodeFormat(CheatEntry * entry)
+static void check_code_format(cheat_entry *entry)
 {
 	int		i;
-	UINT8	isError = 0;
+	UINT8	is_error = 0;
 
-	for(i = 0; i < entry->actionListLength; i++)
+	for(i = 0; i < entry->action_list_length; i++)
 	{
-		CheatAction * action = &entry->actionList[i];
+		cheat_action *action = &entry->action_list[i];
 
 		if(AnalyseCodeFormat(entry, action))
-			isError = 1;
+			is_error = 1;
 	}
 
-	if(isError)
+	if(is_error)
 	{
 		entry->flags |= kCheatFlag_HasWrongCode;
-		messageType = kCheatMessage_WrongCode;
-		messageTimer = DEFAULT_MESSAGE_TIME;
+		SET_MESSAGE(kCheatMessage_WrongCode);
 	}
 }
 
@@ -14975,34 +14942,34 @@ static void CheckCodeFormat(CheatEntry * entry)
   BuildLabelIndexTable - create index table for label-selection and calculate index table length
 -------------------------------------------------------------------------------------------------*/
 
-static void BuildLabelIndexTable(CheatEntry *entry)
+static void BuildLabelIndexTable(cheat_entry *entry)
 {
 	int i, j, length = 0;
 
-	entry->labelIndexLength = 0;
+	entry->label_index_length = 0;
 
-	for(i = 0, j = 0; i < entry->actionListLength; i++)
+	for(i = 0, j = 0; i < entry->action_list_length; i++)
 	{
-		CheatAction * action = &entry->actionList[i];
+		cheat_action *action = &entry->action_list[i];
 
-		if((action->flags && kActionFlag_Custom) && EXTRACT_FIELD(action->type, CodeType) == kCustomCode_LabelSelect)
+		if((action->flags && kActionFlag_Custom) && EXTRACT_FIELD(action->type, CodeType) == CUSTOM_CODE_LABEL_SELECT)
 		{
-			entry->labelIndex = malloc_or_die(sizeof(entry->labelIndex) * (++entry->labelIndexLength + 1));
-			entry->labelIndex[j++] = i;
+			entry->label_index = malloc_or_die(sizeof(entry->label_index) * (++entry->label_index_length + 1));
+			entry->label_index[j++] = i;
 
-			length = action->data ? action->data + i : entry->actionListLength;
+			length = action->data ? action->data + i : entry->action_list_length;
 		}
 		else if(EXTRACT_FIELD(action->type, Link) == kLink_Link)
 		{
 			if(length)
 			{
-				entry->labelIndex = realloc(entry->labelIndex, sizeof(entry->labelIndex) * (++entry->labelIndexLength + 1));
-				entry->labelIndex[j++] = i;
+				entry->label_index = realloc(entry->label_index, sizeof(entry->label_index) * (++entry->label_index_length + 1));
+				entry->label_index[j++] = i;
 			}
 		}
 	}
 
-	if(entry->labelIndexLength <= 1)
+	if(entry->label_index_length <= 1)
 	{
 		logerror("cheat - BuildLabelIndexTable : %s fails to build due to invalid or no link\n", entry->name);
 		return;
@@ -15011,9 +14978,9 @@ static void BuildLabelIndexTable(CheatEntry *entry)
 	if(entry->flags & kCheatFlag_OneShot)
 		entry->selection = 1;
 
-	//logerror("Cheat - Finish building index table for %s (length = %x)\n", entry->name, entry->labelIndexLength);
-	//for(i = 0; i < entry->labelIndexLength; i++)
-	//  logerror("IndexTable[%x] = %x\n",i,entry->labelIndex[i]);
+	//logerror("Cheat - Finish building index table for %s (length = %x)\n", entry->name, entry->label_index_length);
+	//for(i = 0; i < entry->label_index_length; i++)
+	//	logerror("IndexTable[%x] = %x\n",i,entry->label_index[i]);
 
 }
 
@@ -15025,24 +14992,24 @@ static void SetLayerIndex(void)
 {
 	int i, j;
 
-	for(i = 0; i < cheatListLength; i++)
+	for(i = 0; i < cheat_list_length; i++)
 	{
-		CheatEntry * entry = &cheatList[i];
+		cheat_entry *entry = &cheat_list[i];
 
 		if(entry->flags & kCheatFlag_LayerIndex)
 		{
-			int length = entry->actionList[0].extendData;
+			int length = entry->action_list[0].extend_data;
 
-			if(length < cheatListLength && (i + length) <= cheatListLength)
+			if(length < cheat_list_length && (i + length) <= cheat_list_length)
 			{
-				entry->layerIndex = entry->actionList[0].address;
+				entry->layer_index = entry->action_list[0].address;
 
 				for(j = i + 1; j <= i + length; j++)
 				{
-					CheatEntry * traverse = &cheatList[j];
+					cheat_entry *traverse = &cheat_list[j];
 
 					if(!(traverse->flags & kCheatFlag_LayerIndex))
-						traverse->layerIndex = entry->actionList[0].data;
+						traverse->layer_index = entry->action_list[0].data;
 				}
 			}
 		}
@@ -15079,19 +15046,19 @@ static void DisplayCheatMessage(void)
 		"there are no old values!",
 		"saved all memory regions",
 		"region invalidated remains results are",
-		"debug mode only!",
+		"failed to allocate memory!",
 		"found wrong code!" };
 
 	char buf[64];
 
-	if(!messageType)
+	if(message_type == 0)
 		return;
 
-	switch(messageType)
+	switch(message_type)
 	{
 		/* simple message */
 		default:
-			sprintf(buf, "%s", kCheatMessageTable[messageType]);
+			sprintf(buf, "%s", kCheatMessageTable[message_type]);
 			break;
 
 		/* message with data */
@@ -15100,17 +15067,17 @@ static void DisplayCheatMessage(void)
 		{
 			search_info *search = get_current_search();
 
-			sprintf(buf, "%d %s", search->num_results, kCheatMessageTable[messageType]);
+			sprintf(buf, "%d %s", search->num_results, kCheatMessageTable[message_type]);
 		}
 		break;
 
 		case kCheatMessage_AllCheatSaved:
-			sprintf(buf, "%d %s", cheatListLength, kCheatMessageTable[messageType]);
+			sprintf(buf, "%d %s", cheat_list_length, kCheatMessageTable[message_type]);
 			break;
 	}
 
 	/* draw it */
-	switch(messageType)
+	switch(message_type)
 	{
 		default:
 			ui_draw_text_box(buf, JUSTIFY_CENTER, 0.5f, 0.9f, UI_FILLCOLOR);
@@ -15125,7 +15092,7 @@ static void DisplayCheatMessage(void)
 		case kCheatMessage_NoSearchRegion:
 		case kCheatMessage_NoOldValue:
 		case kCheatMessage_Max:
-		case kCheatMessage_DebugOnly:
+		case kCheatMessage_FailedToAllocate:
 		case kCheatMessage_WrongCode:
 			/* warning message has red background color */
 			ui_draw_text_box(buf, JUSTIFY_CENTER, 0.5f, 0.9f, UI_REDCOLOR);
@@ -15133,8 +15100,8 @@ static void DisplayCheatMessage(void)
 	}
 
 	/* decrement message timer */
-	if(--messageTimer == 0)
-		messageType = 0;
+	if(--message_timer == 0)
+		message_type = 0;
 }
 
 /*---------------------
@@ -15151,7 +15118,7 @@ static UINT8 get_address_length(UINT8 region)
 			return info->address_chars_needed;
 	}
 
-	return 8;
+	return DEFAULT_ADDRESS_LENGTH;
 }
 
 /*------------------
@@ -15160,15 +15127,15 @@ static UINT8 get_address_length(UINT8 region)
 
 static char *get_region_name(UINT8 region)
 {
-	if(TEST_FIELD(region, RegionIndex))
-	{
-		if(region >= REGION_INVALID && region < REGION_MAX)
-			return (char *)kRegionNames[EXTRACT_FIELD(region, RegionIndex)];
-	}
-	else
+	if(region < REGION_INVALID)
 	{
 		if(VALID_CPU(region))
 			return (char *)kRegionNames[EXTRACT_FIELD(region, CPUIndex) + 1];
+	}
+	else
+	{
+		if(region < REGION_MAX)
+			return (char *)kRegionNames[region - REGION_INVALID];
 	}
 
 	return (char *)kRegionNames[0];
