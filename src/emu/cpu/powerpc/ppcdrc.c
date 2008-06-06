@@ -586,6 +586,30 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, int cl
 	ppc->impstate->drcuml = drcuml_alloc(cache, flags, 8, 32, 2);
 	if (ppc->impstate->drcuml == NULL)
 		fatalerror("Error initializing the UML");
+	
+	/* add symbols for our stuff */
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->pc, sizeof(ppc->pc), "pc");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->icount, sizeof(ppc->icount), "icount");
+	for (regnum = 0; regnum < 32; regnum++)
+	{
+		char buf[10];
+		sprintf(buf, "r%d", regnum);
+		drcuml_symbol_add(ppc->impstate->drcuml, &ppc->r[regnum], sizeof(ppc->r[regnum]), buf);
+		sprintf(buf, "fpr%d", regnum);
+		drcuml_symbol_add(ppc->impstate->drcuml, &ppc->f[regnum], sizeof(ppc->r[regnum]), buf);
+	}
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->cr, sizeof(ppc->cr), "cr");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->fpscr, sizeof(ppc->fpscr), "fpscr");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->msr, sizeof(ppc->msr), "msr");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->sr, sizeof(ppc->sr), "sr");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->spr[SPR_XER], sizeof(ppc->spr[SPR_XER]), "xer");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->spr[SPR_LR], sizeof(ppc->spr[SPR_LR]), "lr");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->spr[SPR_CTR], sizeof(ppc->spr[SPR_CTR]), "ctr");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->spr, sizeof(ppc->spr), "spr");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->dcr, sizeof(ppc->dcr), "dcr");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->param0, sizeof(ppc->param0), "param0");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->param1, sizeof(ppc->param1), "param1");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->irq_pending, sizeof(ppc->irq_pending), "irq_pending");
 
 	/* initialize the front-end helper */
 	if (SINGLE_INSTRUCTION_MODE)
@@ -2080,8 +2104,8 @@ static void generate_compute_flags(drcuml_block *block, int updatecr, UINT32 xer
 
 	/* tricky case: both */
 	UML_GETFLGS(block, IREG(0), DRCUML_FLAG_S | DRCUML_FLAG_Z | xerflags);					// getflgs i0,sz|xerflags
-	if (invertcarry)
-		UML_XOR(block, IREG(2), IREG(2), IMM(DRCUML_FLAG_C));								// xor     i2,i2,FLAG_C
+	if (invertcarry && (xermask & XER_CA))
+		UML_XOR(block, IREG(0), IREG(0), IMM(DRCUML_FLAG_C));								// xor     i0,i0,FLAG_C
 	UML_LOAD(block, IREG(0), ppc->impstate->sz_cr_table, IREG(0), DWORD);					// load    i0,sz_cr_table,i0,dword
 	UML_AND(block, IREG(1), SPR32(SPR_XER), IMM(~xermask));									// and     i1,[xer],~xermask
 	UML_SHL(block, IREG(2), IREG(0), IMM(4));												// shl     i2,i0,4
@@ -2091,9 +2115,7 @@ static void generate_compute_flags(drcuml_block *block, int updatecr, UINT32 xer
 	UML_MOV(block, SPR32(SPR_XER), IREG(1));												// mov     [xer],i1
 	UML_SHR(block, IREG(1), IREG(1), IMM(3));												// shr     i1,i1,3
 	UML_OR(block, IREG(0), IREG(0), IREG(1));												// or      i0,i0,i1
-	UML_AND(block, IREG(1), CR32, IMM(~CRMASK(0)));											// and     i1,[cr],~crmask(0)
-	UML_AND(block, IREG(0), IREG(0), IMM(CRMASK(0)));										// and     i0,i0,crmask(0)
-	UML_OR(block, CR32, IREG(0), IREG(1));													// or      cr32,i0,i1
+	UML_ROLINS(block, CR32, IREG(0), IMM(0), IMM(CRMASK(0)));								// rolins  [cr],i0,0,crmask(0)
 }
 
 

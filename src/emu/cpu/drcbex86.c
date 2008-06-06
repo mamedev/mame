@@ -721,7 +721,7 @@ static void drcbex86_generate(drcbe_state *drcbe, drcuml_block *block, const drc
 		if (drcbe->log != NULL)
 		{
 			char dasm[256];
-			drcuml_disasm(inst, dasm, drcbe->cache);
+			drcuml_disasm(inst, dasm, drcbe->drcuml);
 			x86log_add_comment(drcbe->log, dst, "%s", dasm);
 		}
 

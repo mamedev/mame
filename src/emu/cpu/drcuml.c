@@ -119,6 +119,17 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+/* structure describing a UML symbol */
+typedef struct _drcuml_symbol drcuml_symbol;
+struct _drcuml_symbol
+{
+	drcuml_symbol *			next;				/* link to the next symbol */
+	drccodeptr				base;				/* base of the symbol */
+	UINT32					length;				/* length of the symbol */
+	char					symname[1];			/* name of the symbol */
+};
+
+
 /* structure describing UML generation state */
 struct _drcuml_state
 {
@@ -128,6 +139,8 @@ struct _drcuml_state
 	drcbe_state *			bestate;			/* pointer to the back-end state */
 	drcuml_codehandle *		handlelist;			/* head of linked list of handles */
 	FILE *					umllog;				/* handle to the UML logfile */
+	drcuml_symbol *			symlist;			/* head of linked list of symbols */
+	drcuml_symbol **		symtailptr;			/* pointer to tail of linked list of symbols */
 };
 
 
@@ -158,12 +171,12 @@ struct _drcuml_codehandle
 typedef struct _bevalidate_test bevalidate_test;
 struct _bevalidate_test
 {
-	drcuml_opcode		opcode;
-	UINT8				size;
-	UINT8				destmask;
-	UINT8				iflags;
-	UINT8				flags;
-	UINT64				param[4];
+	drcuml_opcode			opcode;
+	UINT8					size;
+	UINT8					destmask;
+	UINT8					iflags;
+	UINT8					flags;
+	UINT64					param[4];
 };
 
 
@@ -517,6 +530,7 @@ drcuml_state *drcuml_alloc(drccache *cache, UINT32 flags, int modes, int addrbit
 	/* initialize the state */
 	drcuml->cache = cache;
 	drcuml->beintf = (flags & DRCUML_OPTION_USE_C) ? &drcbe_c_be_interface : &NATIVE_DRC;
+	drcuml->symtailptr = &drcuml->symlist;
 
 	/* if we're to log, create the logfile */
 	if (flags & DRCUML_OPTION_LOG_UML)
@@ -609,6 +623,14 @@ void drcuml_free(drcuml_state *drcuml)
 		if (block->inst != NULL)
 			free(block->inst);
 		free(block);
+	}
+	
+	/* free all the symbols */
+	while (drcuml->symlist != NULL)
+	{
+		drcuml_symbol *sym = drcuml->symlist;
+		drcuml->symlist = sym->next;
+		free(sym);
 	}
 
 	/* close any files */
@@ -981,6 +1003,62 @@ const char *drcuml_handle_name(const drcuml_codehandle *handle)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    drcuml_symbol_add - add a symbol to the 
+    internal symbol table
+-------------------------------------------------*/
+
+void drcuml_symbol_add(drcuml_state *drcuml, void *base, UINT32 length, const char *name)
+{
+	drcuml_symbol *symbol;
+
+	/* allocate memory to hold the symbol */
+	symbol = malloc(sizeof(*symbol) + strlen(name));
+	if (symbol == NULL)
+		fatalerror("Out of memory allocating symbol in drcuml_symbol_add");
+	
+	/* fill in the structure */
+	symbol->next = NULL;
+	symbol->base = (drccodeptr)base;
+	symbol->length = length;
+	strcpy(symbol->symname, name);
+	
+	/* add to the tail of the list */
+	*drcuml->symtailptr = symbol;
+	drcuml->symtailptr = &symbol->next;
+}
+
+
+/*-------------------------------------------------
+    drcuml_symbol_find - look up a symbol from the 
+    internal symbol table or return NULL if not 
+    found
+-------------------------------------------------*/
+
+const char *drcuml_symbol_find(drcuml_state *drcuml, void *base, UINT32 *offset)
+{
+	drccodeptr search = base;
+	drcuml_symbol *symbol;
+	
+	/* simple linear search */
+	for (symbol = drcuml->symlist; symbol != NULL; symbol = symbol->next)
+		if (search >= symbol->base && search < symbol->base + symbol->length)
+		{
+			/* if no offset pointer, only match perfectly */
+			if (offset == NULL && search != symbol->base)
+				continue;
+			
+			/* return the offset and name */
+			if (offset != NULL)
+				*offset = search - symbol->base;
+			return symbol->symname;
+		}
+	
+	/* not found; return NULL */
+	return NULL;
+}
+
+
+/*-------------------------------------------------
     drcuml_log_printf - directly printf to the UML
     log if generated
 -------------------------------------------------*/
@@ -1034,7 +1112,7 @@ void drcuml_add_comment(drcuml_block *block, const char *format, ...)
     instruction to the given buffer
 -------------------------------------------------*/
 
-void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drccache *cache)
+void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drcuml_state *drcuml)
 {
 	static const char *conditions[] = { "z", "nz", "s", "ns", "c", "nc", "v", "nv", "u", "nu", "a", "be", "g", "le", "l", "ge" };
 	static const char *pound_size[] = { "?", "?", "?", "?", "s", "?", "?", "?", "d" };
@@ -1066,6 +1144,8 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drccache *cache
 	{
 		const drcuml_parameter *param = &inst->param[pnum];
 		UINT16 typemask = opinfo->param[pnum].typemask;
+		const char *symbol;
+		UINT32 symoffset;
 
 		/* start with a comma for all except the first parameter */
 		if (pnum != 0)
@@ -1145,9 +1225,18 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drccache *cache
 				else if (typemask == PTYPES_STR)
 					dest += sprintf(dest, "%s", (const char *)(FPTR)param->value);
 				
+				/* symbol */
+				else if (drcuml != NULL && (symbol = drcuml_symbol_find(drcuml, (drccodeptr)(FPTR)param->value, &symoffset)) != NULL)
+				{
+					if (symoffset == 0)
+						dest += sprintf(dest, "[%s]", symbol);
+					else
+						dest += sprintf(dest, "[%s+$%X]", symbol, symoffset);
+				}
+				
 				/* cache memory */
-				else if (cache != NULL && drccache_contains_pointer(cache, (void *)(FPTR)param->value))
-					dest += sprintf(dest, "[+$%X]", (drccodeptr)(FPTR)param->value - drccache_near(cache));
+				else if (drcuml != NULL && drccache_contains_pointer(drcuml->cache, (void *)(FPTR)param->value))
+					dest += sprintf(dest, "[+$%X]", (drccodeptr)(FPTR)param->value - drccache_near(drcuml->cache));
 				
 				/* general memory */
 				else
@@ -1580,8 +1669,8 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 	if (memcmp(&orig, inst, sizeof(orig)) != 0)
 	{
 		char disasm1[256], disasm2[256];
-		drcuml_disasm(&orig, disasm1, block->drcuml->cache);
-		drcuml_disasm(inst, disasm2, block->drcuml->cache);
+		drcuml_disasm(&orig, disasm1, block->drcuml);
+		drcuml_disasm(inst, disasm2, block->drcuml);
 		mame_printf_debug("Simplified: %-50.50s -> %s\n", disasm1, disasm2);
 	}
 #endif
@@ -1635,7 +1724,7 @@ static void disassemble_block(drcuml_block *block)
 		else
 		{
 			char dasm[256];
-			drcuml_disasm(&block->inst[instnum], dasm, block->drcuml->cache);
+			drcuml_disasm(&block->inst[instnum], dasm, block->drcuml);
 			
 			/* include the first accumulated comment with this line */
 			if (firstcomment != -1)
@@ -2212,7 +2301,7 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 		char disasm[256];
 
 		/* disassemble the test instruction */
-		drcuml_disasm(testinst, disasm, drcuml->cache);
+		drcuml_disasm(testinst, disasm, drcuml);
 
 		/* output a description of what went wrong */
 		printf("\n");

@@ -491,13 +491,19 @@ const char *drcuml_handle_name(const drcuml_codehandle *handle);
 /* ----- code logging ----- */
 
 /* directly printf to the UML log if generated */
-void drcuml_log_printf(drcuml_state *state, const char *format, ...) ATTR_PRINTF(2,3);
+void drcuml_log_printf(drcuml_state *drcuml, const char *format, ...) ATTR_PRINTF(2,3);
+
+/* add a symbol to the internal symbol table */
+void drcuml_symbol_add(drcuml_state *drcuml, void *base, UINT32 length, const char *name);
+
+/* look up a symbol from the internal symbol table or return NULL if not found */
+const char *drcuml_symbol_find(drcuml_state *drcuml, void *base, UINT32 *offset);
 
 /* attach a comment to the current output location in the specified block */
 void drcuml_add_comment(drcuml_block *block, const char *format, ...) ATTR_PRINTF(2,3);
 
 /* disassemble a UML instruction to the given buffer */
-void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drccache *cache);
+void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drcuml_state *state);
 
 
 #endif
