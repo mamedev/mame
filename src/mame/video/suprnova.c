@@ -15,8 +15,87 @@ Tilemap flip flags were reversed
 */
 
 #include "driver.h"
+#include "deprecat.h"
 
 static bitmap_t *sprite_bitmap;
+
+static bitmap_t *tilemap_bitmap;
+
+/* draws ROZ with linescroll OR columnscroll to 16-bit indexed bitmap */
+static void suprnova_draw_roz(bitmap_t* bitmap, const rectangle *cliprect, tilemap *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, UINT32* scrollram)
+{
+//	const pen_t *clut = &Machine->pens[0];
+	//bitmap_t *destbitmap = bitmap;
+	bitmap_t *srcbitmap = tilemap_get_pixmap(tmap);
+	//bitmap_t *flagsmap = tilemap_get_flagsmap(tmap);
+	const int xmask = srcbitmap->width-1;
+	const int ymask = srcbitmap->height-1;
+	//const int widthshifted = srcbitmap->width << 16;
+	//const int heightshifted = srcbitmap->height << 16;
+	UINT32 cx;
+	UINT32 cy;
+	int x;
+	int sx;
+	int sy;
+	int ex;
+	int ey;
+	UINT16 *dest;
+	UINT8 *pri;
+	//const UINT16 *src;
+	//const UINT8 *maskptr;
+	//int destadvance = destbitmap->bpp / 8;
+
+	/* pre-advance based on the cliprect */
+	startx += cliprect->min_x * incxx + cliprect->min_y * incyx;
+	starty += cliprect->min_x * incxy + cliprect->min_y * incyy;
+
+	/* extract start/end points */
+	sx = cliprect->min_x;
+	sy = cliprect->min_y;
+	ex = cliprect->max_x;
+	ey = cliprect->max_y;
+
+	/* wraparound case */
+	{
+		/* loop over rows */
+		while (sy <= ey)
+		{
+
+			/* initialize X counters */
+			x = sx;
+			cx = startx;
+			cy = starty;
+
+			/* get dest and priority pointers */
+			dest = BITMAP_ADDR16( bitmap, sy, sx);
+
+			/* loop over columns */
+			while (x <= ex)
+			{
+				if (columnscroll)
+				{
+					dest[0] = BITMAP_ADDR16(srcbitmap, ((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask)[0];
+				}
+				else
+				{
+					dest[0] = BITMAP_ADDR16(srcbitmap, (cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask)[0];
+				}
+
+				/* advance in X */
+				cx += incxx;
+				cy += incxy;
+				x++;
+				dest++;
+				pri++;
+			}
+
+			/* advance in Y */
+			startx += incyx;
+			starty += incyy;
+			sy++;
+		}
+	}
+}
 
 
 #define SUPRNOVA_DECODE_BUFFER_SIZE 0x2000
@@ -778,113 +857,80 @@ VIDEO_START(skns)
 		tilemap_set_transparent_pen(skns_tilemap_B,0);
 
 	sprite_bitmap = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
-
+tilemap_bitmap = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
 
 	machine->gfx[2]->color_granularity=256;
 	machine->gfx[3]->color_granularity=256;
 }
 
+void tilemap_copy_bitmap(bitmap_t *bitmap)
+{
+	int x,y;
+	UINT16* src;
+	UINT32* dst;
+	const pen_t *clut = &Machine->pens[0];
+
+
+	for (y=0;y<240;y++)
+	{
+		src = BITMAP_ADDR16(tilemap_bitmap, y, 0);
+		dst = BITMAP_ADDR32(bitmap, y, 0);
+
+		for (x=0;x<320;x++)
+		{
+			UINT16 pendata = src[x]&0x7fff;
+			if (pendata & 0xff)
+			{
+				UINT32 coldat = clut[pendata];
+				dst[x] = coldat;
+			}
+		}
+	}
+
+}
+
 static void supernova_draw_a( bitmap_t *bitmap, const rectangle *cliprect, int tran )
 {
-		int enable_a  = (skns_v3_regs[0x10/4] >> 0) & 0x0001;
+	int enable_a  = (skns_v3_regs[0x10/4] >> 0) & 0x0001;
 	UINT32 startx,starty;
 	int incxx,incxy,incyx,incyy;
+	int columnscroll;
 
 	if (enable_a)
 	{
 		startx = skns_v3_regs[0x1c/4];
-			incyy  = skns_v3_regs[0x30/4]; // was xx, changed for sarukani
+		incyy  = skns_v3_regs[0x30/4]; // was xx, changed for sarukani
 		incyx  = skns_v3_regs[0x2c/4];
 		starty = skns_v3_regs[0x20/4];
 		incxy  = skns_v3_regs[0x28/4];
-			incxx  = skns_v3_regs[0x24/4]; // was yy, changed for sarukani
+		incxx  = skns_v3_regs[0x24/4]; // was yy, changed for sarukani
 
-		if( (incxx == 1<<8) && !incxy & !incyx && (incyy == 1<<8) ) // No Roz, only scroll.
-		{
-			int columnscroll_a = (skns_v3_regs[0x0c/4] >> 1) & 0x0001;
-			int offs;
-
-			startx >>= 8; // Lose Floating point
-			starty >>= 8;
-
-			if(columnscroll_a) {
-				tilemap_set_scroll_rows(skns_tilemap_A,1);
-				tilemap_set_scroll_cols(skns_tilemap_A,0x400);
-
-				tilemap_set_scrollx( skns_tilemap_A, 0, startx );
-				for(offs=0; offs<(0x1000/4); offs++)
-					tilemap_set_scrolly( skns_tilemap_A, offs, starty - (skns_v3slc_ram[offs]&0x3ff) );
-			}
-			else
-			{
-				tilemap_set_scroll_rows(skns_tilemap_A,0x400);
-				tilemap_set_scroll_cols(skns_tilemap_A,1);
-
-				tilemap_set_scrolly( skns_tilemap_A, 0, starty );
-				for(offs=0; offs<(0x1000/4); offs++)
-					tilemap_set_scrollx( skns_tilemap_A, offs, startx - (skns_v3slc_ram[offs]&0x3ff) );
-			}
-				tilemap_draw(bitmap,cliprect,skns_tilemap_A,tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
-		}
-		else
-		{
-			tilemap_draw_roz(bitmap,cliprect,skns_tilemap_A,startx << 8,starty << 8,
-					incxx << 8,incxy << 8,incyx << 8,incyy << 8,
-					1,	/* wraparound */
-						tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
-		}
+		columnscroll = (skns_v3_regs[0x0c/4] >> 1) & 0x0001;
+		fillbitmap(tilemap_bitmap, 0, NULL);
+		suprnova_draw_roz(tilemap_bitmap,cliprect, skns_tilemap_A, startx << 8,starty << 8,	incxx << 8,incxy << 8,incyx << 8,incyy << 8, 1, columnscroll, &skns_v3slc_ram[0]);
+		tilemap_copy_bitmap(bitmap);
 	}
 }
 
 static void supernova_draw_b( bitmap_t *bitmap, const rectangle *cliprect, int tran )
 {
-		int enable_b  = (skns_v3_regs[0x34/4] >> 0) & 0x0001;
+	int enable_b  = (skns_v3_regs[0x34/4] >> 0) & 0x0001;
 	UINT32 startx,starty;
 	int incxx,incxy,incyx,incyy;
+	int columnscroll;
 
 	if (enable_b)
 	{
 		startx = skns_v3_regs[0x40/4];
-			incyy  = skns_v3_regs[0x54/4];
+		incyy  = skns_v3_regs[0x54/4];
 		incyx  = skns_v3_regs[0x50/4];
 		starty = skns_v3_regs[0x44/4];
 		incxy  = skns_v3_regs[0x4c/4];
-			incxx  = skns_v3_regs[0x48/4];
-
-		if( (incxx == 1<<8) && !incxy & !incyx && (incyy == 1<<8) ) // No Roz, only scroll.
-		{
-			int columnscroll_b = (skns_v3_regs[0x0c/4] >> 9) & 0x0001;
-			int offs;
-
-			startx >>= 8;
-			starty >>= 8;
-
-			if(columnscroll_b) {
-				tilemap_set_scroll_rows(skns_tilemap_B,1);
-				tilemap_set_scroll_cols(skns_tilemap_B,0x400);
-
-				tilemap_set_scrollx( skns_tilemap_B, 0, startx );
-				for(offs=0; offs<(0x1000/4); offs++)
-					tilemap_set_scrolly( skns_tilemap_B, offs, starty - (skns_v3slc_ram[offs+(0x1000/4)]&0x3ff) );
-			}
-			else
-			{
-				tilemap_set_scroll_rows(skns_tilemap_B,0x400);
-				tilemap_set_scroll_cols(skns_tilemap_B,1);
-
-				tilemap_set_scrolly( skns_tilemap_B, 0, starty );
-				for(offs=0; offs<(0x1000/4); offs++)
-					tilemap_set_scrollx( skns_tilemap_B, offs, startx - (skns_v3slc_ram[offs+(0x1000/4)]&0x3ff) );
-			}
-				tilemap_draw(bitmap,cliprect,skns_tilemap_B,tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
-		}
-		else
-		{
-			tilemap_draw_roz(bitmap,cliprect,skns_tilemap_B,startx << 8,starty << 8,
-					incxx << 8,incxy << 8,incyx << 8,incyy << 8,
-					1,	/* wraparound */
-						tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
-		}
+		incxx  = skns_v3_regs[0x48/4];
+		columnscroll = (skns_v3_regs[0x0c/4] >> 9) & 0x0001; // selects column scroll or rowscroll
+		fillbitmap(tilemap_bitmap, 0, NULL);
+		suprnova_draw_roz(tilemap_bitmap,cliprect, skns_tilemap_B, startx << 8,starty << 8,	incxx << 8,incxy << 8,incyx << 8,incyy << 8, 1, columnscroll, &skns_v3slc_ram[0x1000/4]);
+		tilemap_copy_bitmap(bitmap);
 	}
 }
 
@@ -981,12 +1027,14 @@ VIDEO_UPDATE(skns)
 
 	}
 
-	fillbitmap(sprite_bitmap, 0x0000, cliprect);
-	skns_draw_sprites(screen->machine, sprite_bitmap, cliprect);
 
 	{
 		int x,y;
 		const pen_t *paldata = screen->machine->pens;
+
+		fillbitmap(sprite_bitmap, 0x0000, cliprect);
+		skns_draw_sprites(screen->machine, sprite_bitmap, cliprect);
+
 
 		for (y=0;y<240;y++)
 		{
