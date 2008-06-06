@@ -804,13 +804,6 @@ static void param_normalize(drcbe_state *drcbe, const drcuml_parameter *src, drc
 			dest->value = src->value;
 			break;
 
-		/* mapvars are converted to immediates with their current value */
-		case DRCUML_PTYPE_MAPVAR:
-			assert(allowed & PTYPE_I);
-			dest->type = DRCUML_PTYPE_IMMEDIATE;
-			dest->value = drcmap_get_last_value(drcbe->map, src->value);
-			break;
-
 		/* memory passes through */
 		case DRCUML_PTYPE_MEMORY:
 			assert(allowed & PTYPE_M);
@@ -2901,42 +2894,6 @@ static void emit_fstp_p(x86code **dst, int size, const drcuml_parameter *param)
 
 
 /***************************************************************************
-    HELPERS TO CONVERT OTHER OPERATIONS TO MOVES
-***************************************************************************/
-
-/*-------------------------------------------------
-    convert_to_mov_imm - convert an instruction
-    into a mov immediate
--------------------------------------------------*/
-
-static x86code *convert_to_mov_imm(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst, const drcuml_parameter *dstp, UINT64 imm)
-{
-	drcuml_instruction temp = *inst;
-	temp.numparams = 2;
-	temp.param[0] = *dstp;
-	temp.param[1].type = DRCUML_PTYPE_IMMEDIATE;
-	temp.param[1].value = imm;
-	return op_mov(drcbe, dst, &temp);
-}
-
-
-/*-------------------------------------------------
-    convert_to_mov_src1 - convert an instruction
-    into a mov src1
--------------------------------------------------*/
-
-static x86code *convert_to_mov_src1(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst, const drcuml_parameter *dstp, const drcuml_parameter *srcp)
-{
-	drcuml_instruction temp = *inst;
-	temp.numparams = 2;
-	temp.param[0] = *dstp;
-	temp.param[1] = *srcp;
-	return op_mov(drcbe, dst, &temp);
-}
-
-
-
-/***************************************************************************
     OUT-OF-BAND CODE FIXUP CALLBACKS
 ***************************************************************************/
 
@@ -3448,7 +3405,7 @@ static x86code *op_callc(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 
 static x86code *op_recover(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp, mvparam;
+	drcuml_parameter dstp;
 
 	/* validate instruction */
 	assert(inst->size == 4);
@@ -3456,7 +3413,7 @@ static x86code *op_recover(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 	assert_no_flags(inst);
 
 	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &mvparam, PTYPE_I);
+	param_normalize(drcbe, &inst->param[0], &dstp, PTYPE_MR);
 
 	/* call the recovery code */
 	emit_mov_r32_m32(&dst, REG_EAX, MABS(&drcbe->stacksave));							// mov   eax,stacksave
@@ -4335,7 +4292,7 @@ static x86code *op_carry(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert_no_condition(inst);
-	assert_no_flags(inst);
+	assert_flags(inst, DRCUML_FLAG_C);
 
 	/* normalize parameters */
 	param_normalize_2(drcbe, inst, &srcp, PTYPE_MRI, &bitp, PTYPE_MRI);
@@ -4469,10 +4426,6 @@ static x86code *op_mov(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 		srcp = inst->param[1];
 	}
 
-	/* degenerate case: dest and source are equal */
-	if (dstp.type == srcp.type && dstp.value == srcp.value)
-		return dst;
-
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
 
@@ -4566,17 +4519,7 @@ static x86code *op_sext(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI, &sizep, PTYPE_I);
-
-	/* degenerate cases -- convert to a move */
-	if (srcp.type == DRCUML_PTYPE_IMMEDIATE)
-	{
-		if (sizep.value == DRCUML_SIZE_BYTE)
-			return convert_to_mov_imm(drcbe, dst, inst, &dstp, (INT8)srcp.value);
-		else if (sizep.value == DRCUML_SIZE_WORD)
-			return convert_to_mov_imm(drcbe, dst, inst, &dstp, (INT16)srcp.value);
-		else if (sizep.value == DRCUML_SIZE_DWORD)
-			return convert_to_mov_imm(drcbe, dst, inst, &dstp, (INT32)srcp.value);
-	}
+	assert(srcp.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = (inst->size == 8) ? REG_EAX : param_select_register(REG_EAX, &dstp, NULL);
@@ -4638,31 +4581,6 @@ static x86code *op_roland(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 
 	/* normalize parameters */
 	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI, &shiftp, PTYPE_MRI, &maskp, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move or simple shift */
-	if (srcp.type == DRCUML_PTYPE_IMMEDIATE && shiftp.type == DRCUML_PTYPE_IMMEDIATE && maskp.type == DRCUML_PTYPE_IMMEDIATE)
-	{
-		if (inst->size == 4)
-			return convert_to_mov_imm(drcbe, dst, inst, &dstp, ((srcp.value << shiftp.value) | (srcp.value >> (32 - shiftp.value))) & maskp.value);
-		else if (inst->size == 8)
-			return convert_to_mov_imm(drcbe, dst, inst, &dstp, ((srcp.value << shiftp.value) | (srcp.value >> (64 - shiftp.value))) & maskp.value);
-	}
-	if (shiftp.type == DRCUML_PTYPE_IMMEDIATE && maskp.type == DRCUML_PTYPE_IMMEDIATE)
-	{
-		if ((inst->size == 4 && maskp.value == (UINT32)(0xffffffffUL << shiftp.value)) || (inst->size == 8 && maskp.value == U64(0xffffffffffffffff) << shiftp.value))
-		{
-			drcuml_instruction temp = *inst;
-			temp.numparams = 3;
-			return op_shl(drcbe, dst, &temp);
-		}
-		if ((inst->size == 4 && maskp.value == (UINT32)(0xffffffffUL >> (32 - shiftp.value))) || (inst->size == 8 && maskp.value == U64(0xffffffffffffffff) >> (64 - shiftp.value)))
-		{
-			drcuml_instruction temp = *inst;
-			temp.numparams = 3;
-			temp.param[2].value = inst->size * 8 - temp.param[2].value;
-			return op_shr(drcbe, dst, &temp);
-		}
-	}
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register2(REG_EAX, &dstp, &shiftp, &maskp);
@@ -4799,12 +4717,7 @@ static x86code *op_add(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* normalize parameters */
 	param_normalize_3_commutative(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move */
-	if (src1p.type == DRCUML_PTYPE_IMMEDIATE && src2p.type == DRCUML_PTYPE_IMMEDIATE && inst->flags == 0)
-		return convert_to_mov_imm(drcbe, dst, inst, &dstp, src1p.value + src2p.value);
-	if (src2p.type == DRCUML_PTYPE_IMMEDIATE && src2p.value == 0 && inst->flags == 0)
-		return convert_to_mov_src1(drcbe, dst, inst, &dstp, &src1p);
+	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -4923,12 +4836,7 @@ static x86code *op_sub(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move */
-	if (src1p.type == DRCUML_PTYPE_IMMEDIATE && src2p.type == DRCUML_PTYPE_IMMEDIATE && inst->flags == 0)
-		return convert_to_mov_imm(drcbe, dst, inst, &dstp, src1p.value - src2p.value);
-	if (src2p.type == DRCUML_PTYPE_IMMEDIATE && src2p.value == 0 && inst->flags == 0)
-		return convert_to_mov_src1(drcbe, dst, inst, &dstp, &src1p);
+	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -5045,13 +4953,6 @@ static x86code *op_cmp(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 	/* normalize parameters */
 	param_normalize_2(drcbe, inst, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
 
-	/* degenerate cases */
-	if (src1p.type == DRCUML_PTYPE_IMMEDIATE && src2p.type == DRCUML_PTYPE_IMMEDIATE && src1p.value == src2p.value)
-	{
-		emit_cmp_r32_r32(&dst, REG_EAX, REG_EAX);										// cmp   eax,eax
-		return dst;
-	}
-
 	/* pick a target register for the general case */
 	src1reg = param_select_register(REG_EAX, &src1p, NULL);
 
@@ -5119,37 +5020,6 @@ static x86code *op_mulu(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	/* normalize parameters */
 	param_normalize_4_commutative(drcbe, inst, &dstp, PTYPE_MR, &edstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
 	compute_hi = (dstp.type != edstp.type || dstp.value != edstp.value);
-
-	/* degenerate cases -- convert to a move */
-	if (src1p.type == DRCUML_PTYPE_IMMEDIATE && src2p.type == DRCUML_PTYPE_IMMEDIATE && inst->flags == 0)
-	{
-		if (inst->size == 4)
-		{
-			if (!compute_hi)
-				return convert_to_mov_imm(drcbe, dst, inst, &dstp, (UINT32)src1p.value * (UINT32)src2p.value);
-			else
-			{
-				UINT64 result = (UINT64)(UINT32)src1p.value * (UINT64)(UINT32)src2p.value;
-				dst = convert_to_mov_imm(drcbe, dst, inst, &dstp, result & 0xffffffff);
-				return convert_to_mov_imm(drcbe, dst, inst, &dstp, result >> 32);
-			}
-		}
-		else if (inst->size == 8)
-		{
-			UINT64 reslo, reshi;
-			if (!compute_hi)
-			{
-				dmulu(&reslo, &reslo, src1p.value, src2p.value);
-				return convert_to_mov_imm(drcbe, dst, inst, &dstp, reslo);
-			}
-			else
-			{
-				dmulu(&reslo, &reshi, src1p.value, src2p.value);
-				dst = convert_to_mov_imm(drcbe, dst, inst, &dstp, reslo);
-				return convert_to_mov_imm(drcbe, dst, inst, &dstp, reshi);
-			}
-		}
-	}
 
 	/* 32-bit form */
 	if (inst->size == 4)
@@ -5269,37 +5139,6 @@ static x86code *op_muls(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	/* normalize parameters */
 	param_normalize_4_commutative(drcbe, inst, &dstp, PTYPE_MR, &edstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
 	compute_hi = (dstp.type != edstp.type || dstp.value != edstp.value);
-
-	/* degenerate cases -- convert to a move */
-	if (src1p.type == DRCUML_PTYPE_IMMEDIATE && src2p.type == DRCUML_PTYPE_IMMEDIATE && inst->flags == 0)
-	{
-		if (inst->size == 4)
-		{
-			if (!compute_hi)
-				return convert_to_mov_imm(drcbe, dst, inst, &dstp, (INT32)src1p.value * (INT32)src2p.value);
-			else
-			{
-				UINT64 result = (INT64)(INT32)src1p.value * (INT64)(INT32)src2p.value;
-				dst = convert_to_mov_imm(drcbe, dst, inst, &dstp, result & 0xffffffff);
-				return convert_to_mov_imm(drcbe, dst, inst, &dstp, result >> 32);
-			}
-		}
-		else if (inst->size == 8)
-		{
-			UINT64 reslo, reshi;
-			if (!compute_hi)
-			{
-				dmuls(&reslo, &reslo, src1p.value, src2p.value);
-				return convert_to_mov_imm(drcbe, dst, inst, &dstp, reslo);
-			}
-			else
-			{
-				dmuls(&reslo, &reshi, src1p.value, src2p.value);
-				dst = convert_to_mov_imm(drcbe, dst, inst, &dstp, reslo);
-				return convert_to_mov_imm(drcbe, dst, inst, &dstp, reshi);
-			}
-		}
-	}
 
 	/* 32-bit form */
 	if (inst->size == 4)
@@ -5442,40 +5281,6 @@ static x86code *op_divu(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &edstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
 	compute_rem = (dstp.type != edstp.type || dstp.value != edstp.value);
 
-	/* degenerate cases -- convert to a move */
-	if (src1p.type == DRCUML_PTYPE_IMMEDIATE && src2p.type == DRCUML_PTYPE_IMMEDIATE && inst->flags == 0)
-	{
-		if (inst->size == 4)
-		{
-			if ((UINT32)src2p.value == 0)
-				return dst;
-			if (!compute_rem)
-				return convert_to_mov_imm(drcbe, dst, inst, &dstp, (UINT32)src1p.value / (UINT32)src2p.value);
-			else
-			{
-				dst = convert_to_mov_imm(drcbe, dst, inst, &dstp, (UINT32)src1p.value / (UINT32)src2p.value);
-				return convert_to_mov_imm(drcbe, dst, inst, &dstp, (UINT32)src1p.value % (UINT32)src2p.value);
-			}
-		}
-		else if (inst->size == 8)
-		{
-			UINT64 reslo, reshi;
-			if (src2p.value == 0)
-				return dst;
-			if (!compute_rem)
-			{
-				ddivu(&reslo, &reslo, src1p.value, src2p.value);
-				return convert_to_mov_imm(drcbe, dst, inst, &dstp, reslo);
-			}
-			else
-			{
-				ddivu(&reslo, &reshi, src1p.value, src2p.value);
-				dst = convert_to_mov_imm(drcbe, dst, inst, &dstp, reslo);
-				return convert_to_mov_imm(drcbe, dst, inst, &dstp, reshi);
-			}
-		}
-	}
-
 	/* 32-bit form */
 	if (inst->size == 4)
 	{
@@ -5539,40 +5344,6 @@ static x86code *op_divs(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &edstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
 	compute_rem = (dstp.type != edstp.type || dstp.value != edstp.value);
 
-	/* degenerate cases -- convert to a move */
-	if (src1p.type == DRCUML_PTYPE_IMMEDIATE && src2p.type == DRCUML_PTYPE_IMMEDIATE && inst->flags == 0)
-	{
-		if (inst->size == 4)
-		{
-			if ((INT32)src2p.value == 0)
-				return dst;
-			if (!compute_rem)
-				return convert_to_mov_imm(drcbe, dst, inst, &dstp, (INT32)src1p.value / (INT32)src2p.value);
-			else
-			{
-				dst = convert_to_mov_imm(drcbe, dst, inst, &dstp, (INT32)src1p.value / (INT32)src2p.value);
-				return convert_to_mov_imm(drcbe, dst, inst, &dstp, (INT32)src1p.value % (INT32)src2p.value);
-			}
-		}
-		else if (inst->size == 8)
-		{
-			UINT64 reslo, reshi;
-			if (src2p.value == 0)
-				return dst;
-			if (!compute_rem)
-			{
-				ddivs(&reslo, &reslo, src1p.value, src2p.value);
-				return convert_to_mov_imm(drcbe, dst, inst, &dstp, reslo);
-			}
-			else
-			{
-				ddivs(&reslo, &reshi, src1p.value, src2p.value);
-				dst = convert_to_mov_imm(drcbe, dst, inst, &dstp, reslo);
-				return convert_to_mov_imm(drcbe, dst, inst, &dstp, reshi);
-			}
-		}
-	}
-
 	/* 32-bit form */
 	if (inst->size == 4)
 	{
@@ -5633,12 +5404,7 @@ static x86code *op_and(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* normalize parameters */
 	param_normalize_3_commutative(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move */
-	if (src1p.type == DRCUML_PTYPE_IMMEDIATE && src2p.type == DRCUML_PTYPE_IMMEDIATE && inst->flags == 0)
-		return convert_to_mov_imm(drcbe, dst, inst, &dstp, src1p.value & src2p.value);
-	if (src2p.type == DRCUML_PTYPE_IMMEDIATE && (src2p.value & size_to_mask[inst->size]) == size_to_mask[inst->size] && inst->flags == 0)
-		return convert_to_mov_src1(drcbe, dst, inst, &dstp, &src1p);
+	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -5747,12 +5513,7 @@ static x86code *op_or(drcbe_state *drcbe, x86code *dst, const drcuml_instruction
 
 	/* normalize parameters */
 	param_normalize_3_commutative(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move */
-	if (src1p.type == DRCUML_PTYPE_IMMEDIATE && src2p.type == DRCUML_PTYPE_IMMEDIATE && inst->flags == 0)
-		return convert_to_mov_imm(drcbe, dst, inst, &dstp, src1p.value | src2p.value);
-	if (src2p.type == DRCUML_PTYPE_IMMEDIATE && src2p.value == 0 && inst->flags == 0)
-		return convert_to_mov_src1(drcbe, dst, inst, &dstp, &src1p);
+	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -5808,12 +5569,7 @@ static x86code *op_xor(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* normalize parameters */
 	param_normalize_3_commutative(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move */
-	if (src1p.type == DRCUML_PTYPE_IMMEDIATE && src2p.type == DRCUML_PTYPE_IMMEDIATE && inst->flags == 0)
-		return convert_to_mov_imm(drcbe, dst, inst, &dstp, src1p.value & src2p.value);
-	if (src2p.type == DRCUML_PTYPE_IMMEDIATE && src2p.value == 0 && inst->flags == 0)
-		return convert_to_mov_src1(drcbe, dst, inst, &dstp, &src1p);
+	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -5869,10 +5625,7 @@ static x86code *op_lzcnt(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 
 	/* normalize parameters */
 	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move */
-	if (srcp.type == DRCUML_PTYPE_IMMEDIATE && inst->flags == 0 && inst->size == 4)
-		return convert_to_mov_imm(drcbe, dst, inst, &dstp, count_leading_zeros(srcp.value));
+	assert(srcp.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &srcp);
@@ -5923,15 +5676,7 @@ static x86code *op_bswap(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 
 	/* normalize parameters */
 	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move */
-	if (srcp.type == DRCUML_PTYPE_IMMEDIATE && inst->flags == 0)
-	{
-		if (inst->size == 4)
-			return convert_to_mov_imm(drcbe, dst, inst, &dstp, FLIPENDIAN_INT32(srcp.value));
-		else if (inst->size == 8)
-			return convert_to_mov_imm(drcbe, dst, inst, &dstp, FLIPENDIAN_INT64(srcp.value));
-	}
+	assert(srcp.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &srcp);
@@ -5972,12 +5717,7 @@ static x86code *op_shl(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move */
-	if (src1p.type == DRCUML_PTYPE_IMMEDIATE && src2p.type == DRCUML_PTYPE_IMMEDIATE && inst->flags == 0)
-		return convert_to_mov_imm(drcbe, dst, inst, &dstp, src1p.value << src2p.value);
-	if (src2p.type == DRCUML_PTYPE_IMMEDIATE && src2p.value == 0 && inst->flags == 0)
-		return convert_to_mov_src1(drcbe, dst, inst, &dstp, &src1p);
+	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -6026,12 +5766,7 @@ static x86code *op_shr(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move */
-	if (src1p.type == DRCUML_PTYPE_IMMEDIATE && src2p.type == DRCUML_PTYPE_IMMEDIATE && inst->flags == 0)
-		return convert_to_mov_imm(drcbe, dst, inst, &dstp, (UINT64)src1p.value >> src2p.value);
-	if (src2p.type == DRCUML_PTYPE_IMMEDIATE && src2p.value == 0 && inst->flags == 0)
-		return convert_to_mov_src1(drcbe, dst, inst, &dstp, &src1p);
+	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -6080,17 +5815,7 @@ static x86code *op_sar(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move */
-	if (src1p.type == DRCUML_PTYPE_IMMEDIATE && src2p.type == DRCUML_PTYPE_IMMEDIATE && inst->flags == 0)
-	{
-		if (inst->size == 4)
-			return convert_to_mov_imm(drcbe, dst, inst, &dstp, (INT32)src1p.value >> src2p.value);
-		else if (inst->size == 8)
-			return convert_to_mov_imm(drcbe, dst, inst, &dstp, (INT64)src1p.value >> src2p.value);
-	}
-	if (src2p.type == DRCUML_PTYPE_IMMEDIATE && src2p.value == 0 && inst->flags == 0)
-		return convert_to_mov_src1(drcbe, dst, inst, &dstp, &src1p);
+	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -6139,12 +5864,7 @@ static x86code *op_rol(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move */
-	if (src1p.type == DRCUML_PTYPE_IMMEDIATE && src2p.type == DRCUML_PTYPE_IMMEDIATE && inst->flags == 0)
-		return convert_to_mov_imm(drcbe, dst, inst, &dstp, (UINT64)src1p.value >> src2p.value);
-	if (src2p.type == DRCUML_PTYPE_IMMEDIATE && src2p.value == 0 && inst->flags == 0)
-		return convert_to_mov_src1(drcbe, dst, inst, &dstp, &src1p);
+	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -6193,12 +5913,7 @@ static x86code *op_ror(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move */
-	if (src1p.type == DRCUML_PTYPE_IMMEDIATE && src2p.type == DRCUML_PTYPE_IMMEDIATE && inst->flags == 0)
-		return convert_to_mov_imm(drcbe, dst, inst, &dstp, (UINT64)src1p.value >> src2p.value);
-	if (src2p.type == DRCUML_PTYPE_IMMEDIATE && src2p.value == 0 && inst->flags == 0)
-		return convert_to_mov_src1(drcbe, dst, inst, &dstp, &src1p);
+	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -6248,12 +5963,6 @@ static x86code *op_rolc(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
 
-	/* degenerate cases -- convert to a move */
-	if (src1p.type == DRCUML_PTYPE_IMMEDIATE && src2p.type == DRCUML_PTYPE_IMMEDIATE && inst->flags == 0)
-		return convert_to_mov_imm(drcbe, dst, inst, &dstp, (UINT64)src1p.value >> src2p.value);
-	if (src2p.type == DRCUML_PTYPE_IMMEDIATE && src2p.value == 0 && inst->flags == 0)
-		return convert_to_mov_src1(drcbe, dst, inst, &dstp, &src1p);
-
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
 
@@ -6301,12 +6010,6 @@ static x86code *op_rorc(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move */
-	if (src1p.type == DRCUML_PTYPE_IMMEDIATE && src2p.type == DRCUML_PTYPE_IMMEDIATE && inst->flags == 0)
-		return convert_to_mov_imm(drcbe, dst, inst, &dstp, (UINT64)src1p.value >> src2p.value);
-	if (src2p.type == DRCUML_PTYPE_IMMEDIATE && src2p.value == 0 && inst->flags == 0)
-		return convert_to_mov_src1(drcbe, dst, inst, &dstp, &src1p);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);

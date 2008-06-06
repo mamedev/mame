@@ -13,9 +13,6 @@
     Future improvements/changes:
 
     * UML optimizer:
-        - detects constant operations, converts to MOV
-        - eliminates no-ops (add i0,i0,0)
-        - determines flags automatically
         - constant folding
 
     * Write a back-end validator:
@@ -42,6 +39,7 @@
 #include "drcuml.h"
 #include "drcumlsh.h"
 #include "deprecat.h"
+#include "eminline.h"
 #include "mame.h"
 #include <stdarg.h>
 #include <setjmp.h>
@@ -52,6 +50,7 @@
 ***************************************************************************/
 
 #define VALIDATE_BACKEND		(0)
+#define LOG_SIMPLIFICATIONS		(0)
 
 
 
@@ -296,6 +295,7 @@ static const drcuml_opcode_info *opcode_info_table[DRCUML_OP_MAX];
 ***************************************************************************/
 
 static void optimize_block(drcuml_block *block);
+static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instruction *inst);
 static void validate_instruction(drcuml_block *block, const drcuml_instruction *inst);
 
 #if 0
@@ -313,6 +313,28 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
+
+/*-------------------------------------------------
+    rol32 - perform a 32-bit left rotate
+-------------------------------------------------*/
+
+INLINE UINT32 rol32(UINT32 source, UINT8 count)
+{
+	count &= 31;
+	return (source << count) | (source >> (32 - count));
+}
+
+
+/*-------------------------------------------------
+    rol64 - perform a 64-bit left rotate
+-------------------------------------------------*/
+
+INLINE UINT64 rol64(UINT64 source, UINT8 count)
+{
+	count &= 63;
+	return (source << count) | (source >> (64 - count));
+}
+
 
 /*-------------------------------------------------
     effective_inflags - return the effective
@@ -384,6 +406,86 @@ INLINE UINT8 effective_psize(const drcuml_instruction *inst, const drcuml_opcode
 		case PSIZE_P4:	assert(inst->param[3].type == DRCUML_PTYPE_IMMEDIATE); return 1 << (inst->param[3].value & 3);
 	}
 	return inst->size;
+}
+
+
+/*-------------------------------------------------
+    param_is_immediate - return TRUE if the
+    given instruction parameter is an immediate
+-------------------------------------------------*/
+
+INLINE int param_is_immediate(const drcuml_instruction *inst, int pnum)
+{
+	return (inst->param[pnum].type == DRCUML_PTYPE_IMMEDIATE);
+}
+
+
+/*-------------------------------------------------
+    param_is_immediate_value - return TRUE if the
+    given instruction parameter is an immediate
+    with the provided value
+-------------------------------------------------*/
+
+INLINE int param_is_immediate_value(const drcuml_instruction *inst, int pnum, UINT64 value)
+{
+	return (inst->param[pnum].type == DRCUML_PTYPE_IMMEDIATE && inst->param[pnum].value == value);
+}
+
+
+/*-------------------------------------------------
+    param_equal - return TRUE if the two provided
+    parameters are equal
+-------------------------------------------------*/
+
+INLINE int param_equal(const drcuml_instruction *inst, int pnum1, int pnum2)
+{
+	return (inst->param[pnum1].type == inst->param[pnum2].type && inst->param[pnum1].value == inst->param[pnum2].value);
+}
+
+
+/*-------------------------------------------------
+    convert_to_nop - convert an instruction
+    inline to a NOP
+-------------------------------------------------*/
+
+INLINE void convert_to_nop(drcuml_instruction *inst)
+{
+	inst->opcode = DRCUML_OP_NOP;
+	inst->size = 4;
+	inst->condition = DRCUML_COND_ALWAYS;
+	inst->numparams = 0;
+}
+
+
+/*-------------------------------------------------
+    convert_to_mov_immediate - convert an 
+    instruction inline to a MOV immediate
+-------------------------------------------------*/
+
+INLINE void convert_to_mov_immediate(drcuml_instruction *inst, UINT64 immediate)
+{
+	inst->opcode = DRCUML_OP_MOV;
+	inst->condition = DRCUML_COND_ALWAYS;
+	inst->numparams = 2;
+	inst->param[1].type = DRCUML_PTYPE_IMMEDIATE;
+	inst->param[1].value = immediate;
+}
+
+
+/*-------------------------------------------------
+    convert_to_mov_param - convert an 
+    instruction inline to a MOV with a source
+    parameter given by the existing parameter
+    index pnum
+-------------------------------------------------*/
+
+INLINE void convert_to_mov_param(drcuml_instruction *inst, int pnum)
+{
+	inst->opcode = DRCUML_OP_MOV;
+	inst->condition = DRCUML_COND_ALWAYS;
+	inst->numparams = 2;
+	if (pnum != 1)
+		inst->param[1] = inst->param[pnum];
 }
 
 
@@ -1099,6 +1201,7 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer)
 
 static void optimize_block(drcuml_block *block)
 {
+	UINT32 mapvar[DRCUML_MAPVAR_END - DRCUML_MAPVAR_M0] = { 0 };
 	int instnum;
 
 	/* iterate over instructions */
@@ -1107,7 +1210,7 @@ static void optimize_block(drcuml_block *block)
 		drcuml_instruction *inst = &block->inst[instnum];
 		const drcuml_opcode_info *opinfo = opcode_info_table[inst->opcode];
 		UINT8 remainingflags;
-		int scannum;
+		int scannum, pnum;
 	
 		/* first compute what flags we need */
 		inst->flags = 0;
@@ -1127,15 +1230,371 @@ static void optimize_block(drcuml_block *block)
 				remainingflags &= ~scaninfo->modflags;
 		}
 		
-		/* track mapvars and convert to immediates here */
+		/* track mapvars */
+		if (inst->opcode == DRCUML_OP_MAPVAR)
+			mapvar[inst->param[0].value - DRCUML_MAPVAR_M0] = inst->param[1].value;
 		
-		/* adjust commutative arguments */
-			
+		/* convert all mapvar parameters to immediates */
+		else if (inst->opcode != DRCUML_OP_RECOVER)
+			for (pnum = 0; pnum < inst->numparams; pnum++)
+				if (inst->param[pnum].type == DRCUML_PTYPE_MAPVAR)
+				{
+					inst->param[pnum].type = DRCUML_PTYPE_IMMEDIATE;
+					inst->param[pnum].value = mapvar[inst->param[pnum].value - DRCUML_MAPVAR_M0];
+				}
+		
 		/* if we don't need any flags, then we can eliminate a lot of dumb operations */
-//		if (inst->flags == 0)
-//			switch (inst->opcode)
-//			{
-//			}
+		if (inst->flags == 0)
+			simplify_instruction_with_no_flags(block, inst);
+	}
+}
+
+
+/*-------------------------------------------------
+    simplify_instruction_with_no_flags - simplify
+    instructions that have immediate values we
+    can evaluate at compile time
+-------------------------------------------------*/
+
+static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instruction *inst)
+{
+	static const UINT64 instsizemask[] = { 0, 0, 0, 0, 0xffffffff, 0, 0, 0, U64(0xffffffffffffffff) };
+	static const UINT64 paramsizemask[] = { 0xff, 0xffff, 0xffffffff, U64(0xffffffffffffffff) };
+	drcuml_opcode origop = inst->opcode;
+#if LOG_SIMPLIFICATIONS
+	drcuml_instruction orig = *inst;
+#endif
+
+	switch (inst->opcode)
+	{
+		/* READM: convert to READ if the mask is wide open */
+		case DRCUML_OP_READM:
+			if (param_is_immediate_value(inst, 2, paramsizemask[inst->param[3].value] & 3))
+			{
+				inst->opcode = DRCUML_OP_READ;
+				inst->numparams = 3;
+				inst->param[2] = inst->param[3];
+			}
+			break;
+
+		/* WRITEM: convert to WRITE if the mask is wide open */
+		case DRCUML_OP_WRITEM:
+			if (param_is_immediate_value(inst, 2, paramsizemask[inst->param[3].value] & 3))
+			{
+				inst->opcode = DRCUML_OP_WRITE;
+				inst->numparams = 3;
+				inst->param[2] = inst->param[3];
+			}
+			break;
+		
+		/* SET: convert to MOV if constant condition */
+		case DRCUML_OP_SET:
+			if (inst->condition == DRCUML_COND_ALWAYS)
+				convert_to_mov_immediate(inst, 1);
+			break;
+		
+		/* MOV: convert to NOP if move-to-self */
+		case DRCUML_OP_MOV:
+			if (param_equal(inst, 0, 1))
+				convert_to_nop(inst);
+			break;
+		
+		/* SEXT: convert immediates to MOV */
+		case DRCUML_OP_SEXT:
+			if (param_is_immediate(inst, 1))
+				switch (inst->param[2].value)
+				{
+					case DRCUML_SIZE_BYTE:	convert_to_mov_immediate(inst, (INT8)inst->param[1].value);		break;
+					case DRCUML_SIZE_WORD:	convert_to_mov_immediate(inst, (INT16)inst->param[1].value);	break;
+					case DRCUML_SIZE_DWORD:	convert_to_mov_immediate(inst, (INT32)inst->param[1].value);	break;
+					case DRCUML_SIZE_QWORD:	convert_to_mov_immediate(inst, (INT64)inst->param[1].value);	break;
+				}
+			break;
+		
+		/* ROLAND: convert to MOV if all immediate, or to ROL or AND if one is not needed, or to SHL/SHR if the mask is right */
+		case DRCUML_OP_ROLAND:
+			if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2) && param_is_immediate(inst, 3))
+			{
+				if (inst->size == 4)
+					convert_to_mov_immediate(inst, rol32(inst->param[1].value, inst->param[2].value) & inst->param[3].value);
+				else
+					convert_to_mov_immediate(inst, rol64(inst->param[1].value, inst->param[2].value) & inst->param[3].value);
+			}
+			else if (param_is_immediate_value(inst, 2, 0))
+			{
+				inst->opcode = DRCUML_OP_AND;
+				inst->numparams = 3;
+				inst->param[2] = inst->param[3];
+			}
+			else if (param_is_immediate_value(inst, 3, instsizemask[inst->size]))
+			{
+				inst->opcode = DRCUML_OP_ROL;
+				inst->numparams = 3;
+			}
+			else if (param_is_immediate(inst, 2) && param_is_immediate_value(inst, 3, ((U64(0xffffffffffffffff) << inst->param[2].value) & instsizemask[inst->size])))
+			{
+				inst->opcode = DRCUML_OP_SHL;
+				inst->numparams = 3;
+			}
+			else if (param_is_immediate(inst, 2) && param_is_immediate_value(inst, 3, instsizemask[inst->size] >> (8 * inst->size - inst->param[2].value)))
+			{
+				inst->opcode = DRCUML_OP_SHR;
+				inst->numparams = 3;
+				inst->param[2].value = 8 * inst->size - inst->param[2].value;
+			}
+			break;
+		
+		/* ROLINS: convert to ROLAND if the mask is full */
+		case DRCUML_OP_ROLINS:
+			if (param_is_immediate_value(inst, 3, instsizemask[inst->size]))
+				inst->opcode = DRCUML_OP_ROLAND;
+			break;
+		
+		/* ADD: convert to MOV if immediate, or if adding 0 */
+		case DRCUML_OP_ADD:
+			if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2))
+				convert_to_mov_immediate(inst, inst->param[1].value + inst->param[2].value);
+			else if (param_is_immediate_value(inst, 1, 0))
+				convert_to_mov_param(inst, 2);
+			else if (param_is_immediate_value(inst, 2, 0))
+				convert_to_mov_param(inst, 1);
+			break;
+		
+		/* SUB: convert to MOV if immediate, or if subtracting 0 */
+		case DRCUML_OP_SUB:
+			if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2))
+				convert_to_mov_immediate(inst, inst->param[1].value - inst->param[2].value);
+			else if (param_is_immediate_value(inst, 2, 0))
+				convert_to_mov_param(inst, 1);
+			break;
+		
+		/* CMP: no-op if no flags needed, compare i0 to i0 if the parameters are equal */
+		case DRCUML_OP_CMP:
+			if (inst->flags == 0)
+				convert_to_nop(inst);
+			else if (param_equal(inst, 1, 2))
+			{
+				inst->param[1].type = inst->param[2].type = DRCUML_PTYPE_INT_REGISTER;
+				inst->param[1].value = inst->param[2].value = DRCUML_REG_I0;
+			}
+			break;
+		
+		/* MULU: convert simple form to MOV if immediate, or if multiplying by 0 */
+		case DRCUML_OP_MULU:
+			if (param_equal(inst, 0, 1))
+			{
+				if (param_is_immediate_value(inst, 2, 0) || param_is_immediate_value(inst, 3, 0))
+					convert_to_mov_immediate(inst, 0);
+				else if (param_is_immediate(inst, 2) && param_is_immediate(inst, 3))
+				{
+					if (inst->size == 4)
+						convert_to_mov_immediate(inst, (UINT32)((UINT32)inst->param[1].value * (UINT32)inst->param[2].value));
+					else if (inst->size == 8)
+						convert_to_mov_immediate(inst, (UINT64)((UINT64)inst->param[1].value * (UINT64)inst->param[2].value));
+				}
+			}
+			break;
+		
+		/* MULS: convert simple form to MOV if immediate, or if multiplying by 0 */
+		case DRCUML_OP_MULS:
+			if (param_equal(inst, 0, 1))
+			{
+				if (param_is_immediate_value(inst, 2, 0) || param_is_immediate_value(inst, 3, 0))
+					convert_to_mov_immediate(inst, 0);
+				else if (param_is_immediate(inst, 2) && param_is_immediate(inst, 3))
+				{
+					if (inst->size == 4)
+						convert_to_mov_immediate(inst, (INT32)((INT32)inst->param[1].value * (INT32)inst->param[2].value));
+					else if (inst->size == 8)
+						convert_to_mov_immediate(inst, (INT64)((INT64)inst->param[1].value * (INT64)inst->param[2].value));
+				}
+			}
+			break;
+
+		/* DIVU: convert simple form to MOV if immediate, or if dividing with 0 */
+		case DRCUML_OP_DIVU:
+			if (param_equal(inst, 0, 1) && !param_is_immediate_value(inst, 3, 0))
+			{
+				if (param_is_immediate_value(inst, 2, 0))
+					convert_to_mov_immediate(inst, 0);
+				else if (param_is_immediate(inst, 2) && param_is_immediate(inst, 3))
+				{
+					if (inst->size == 4)
+						convert_to_mov_immediate(inst, (UINT32)((UINT32)inst->param[1].value / (UINT32)inst->param[2].value));
+					else if (inst->size == 8)
+						convert_to_mov_immediate(inst, (UINT64)((UINT64)inst->param[1].value / (UINT64)inst->param[2].value));
+				}
+			}
+			break;
+
+		/* DIVS: convert simple form to MOV if immediate, or if dividing with 0 */
+		case DRCUML_OP_DIVS:
+			if (param_equal(inst, 0, 1) && !param_is_immediate_value(inst, 3, 0))
+			{
+				if (param_is_immediate_value(inst, 2, 0))
+					convert_to_mov_immediate(inst, 0);
+				else if (param_is_immediate(inst, 2) && param_is_immediate(inst, 3))
+				{
+					if (inst->size == 4)
+						convert_to_mov_immediate(inst, (INT32)((INT32)inst->param[1].value / (INT32)inst->param[2].value));
+					else if (inst->size == 8)
+						convert_to_mov_immediate(inst, (INT64)((INT64)inst->param[1].value / (INT64)inst->param[2].value));
+				}
+			}
+			break;
+
+		/* AND: convert to MOV if immediate, or if anding against 0 or 0xffffffff */
+		case DRCUML_OP_AND:
+			if (param_is_immediate_value(inst, 1, 0) || param_is_immediate_value(inst, 2, 0))
+				convert_to_mov_immediate(inst, 0);
+			else if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2))
+				convert_to_mov_immediate(inst, inst->param[1].value & inst->param[2].value);
+			else if (param_is_immediate_value(inst, 1, instsizemask[inst->size]))
+				convert_to_mov_param(inst, 2);
+			else if (param_is_immediate_value(inst, 2, instsizemask[inst->size]))
+				convert_to_mov_param(inst, 1);
+			break;
+
+		/* TEST: no-op if no flags needed */
+		case DRCUML_OP_TEST:
+			if (inst->flags == 0)
+				convert_to_nop(inst);
+			break;
+		
+		/* OR: convert to MOV if immediate, or if oring against 0 or 0xffffffff */
+		case DRCUML_OP_OR:
+			if (param_is_immediate_value(inst, 1, instsizemask[inst->size]) || param_is_immediate_value(inst, 2, instsizemask[inst->size]))
+				convert_to_mov_immediate(inst, instsizemask[inst->size]);
+			else if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2))
+				convert_to_mov_immediate(inst, inst->param[1].value | inst->param[2].value);
+			else if (param_is_immediate_value(inst, 1, 0))
+				convert_to_mov_param(inst, 2);
+			else if (param_is_immediate_value(inst, 2, 0))
+				convert_to_mov_param(inst, 1);
+			break;
+		
+		/* XOR: convert to MOV if immediate, or if xoring against 0 */
+		case DRCUML_OP_XOR:
+			if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2))
+				convert_to_mov_immediate(inst, inst->param[1].value ^ inst->param[2].value);
+			else if (param_is_immediate_value(inst, 1, 0))
+				convert_to_mov_param(inst, 2);
+			else if (param_is_immediate_value(inst, 2, 0))
+				convert_to_mov_param(inst, 1);
+			break;
+		
+		/* LZCNT: convert to MOV if immediate */
+		case DRCUML_OP_LZCNT:
+			if (param_is_immediate(inst, 1))
+			{
+				if (inst->size == 4)
+					convert_to_mov_immediate(inst, count_leading_zeros(inst->param[1].value));
+				else if (inst->size == 8)
+				{
+					if ((inst->param[1].value >> 32) == 0)
+						convert_to_mov_immediate(inst, 32 + count_leading_zeros(inst->param[1].value));
+					else
+						convert_to_mov_immediate(inst, count_leading_zeros(inst->param[1].value >> 32));
+				}
+			}
+			break;
+		
+		/* BSWAP: convert to MOV if immediate */
+		case DRCUML_OP_BSWAP:
+			if (param_is_immediate(inst, 1))
+			{
+				if (inst->size == 4)
+					convert_to_mov_immediate(inst, FLIPENDIAN_INT32(inst->param[1].value));
+				else if (inst->size == 8)
+					convert_to_mov_immediate(inst, FLIPENDIAN_INT64(inst->param[1].value));
+			}
+			break;
+		
+		/* SHL: convert to MOV if immediate or shifting by 0 */
+		case DRCUML_OP_SHL:
+			if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2))
+				convert_to_mov_immediate(inst, inst->param[1].value << inst->param[2].value);
+			else if (param_is_immediate_value(inst, 2, 0))
+				convert_to_mov_param(inst, 1);
+			break;
+		
+		/* SHR: convert to MOV if immediate or shifting by 0 */
+		case DRCUML_OP_SHR:
+			if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2))
+			{
+				if (inst->size == 4)
+					convert_to_mov_immediate(inst, (UINT32)inst->param[1].value >> inst->param[2].value);
+				else if (inst->size == 8)
+					convert_to_mov_immediate(inst, (UINT64)inst->param[1].value >> inst->param[2].value);
+			}
+			else if (param_is_immediate_value(inst, 2, 0))
+				convert_to_mov_param(inst, 1);
+			break;
+		
+		/* SAR: convert to MOV if immediate or shifting by 0 */
+		case DRCUML_OP_SAR:
+			if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2))
+			{
+				if (inst->size == 4)
+					convert_to_mov_immediate(inst, (INT32)inst->param[1].value >> inst->param[2].value);
+				else if (inst->size == 8)
+					convert_to_mov_immediate(inst, (INT64)inst->param[1].value >> inst->param[2].value);
+			}
+			else if (param_is_immediate_value(inst, 2, 0))
+				convert_to_mov_param(inst, 1);
+			break;
+		
+		/* ROL: convert to NOP if immediate or rotating by 0 */
+		case DRCUML_OP_ROL:
+			if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2))
+			{
+				if (inst->size == 4)
+					convert_to_mov_immediate(inst, rol32(inst->param[1].value, inst->param[2].value));
+				else if (inst->size == 8)
+					convert_to_mov_immediate(inst, rol64(inst->param[1].value, inst->param[2].value));
+			}
+			else if (param_is_immediate_value(inst, 2, 0))
+				convert_to_mov_param(inst, 1);
+			break;
+		
+		/* ROR: convert to NOP if immediate or rotating by 0 */
+		case DRCUML_OP_ROR:
+			if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2))
+			{
+				if (inst->size == 4)
+					convert_to_mov_immediate(inst, rol32(inst->param[1].value, 32 - inst->param[2].value));
+				else if (inst->size == 8)
+					convert_to_mov_immediate(inst, rol64(inst->param[1].value, 64 - inst->param[2].value));
+			}
+			else if (param_is_immediate_value(inst, 2, 0))
+				convert_to_mov_param(inst, 1);
+			break;
+
+		/* FMOV: convert to NOP if move-to-self */
+		case DRCUML_OP_FMOV:
+			if (param_equal(inst, 0, 1))
+				convert_to_nop(inst);
+			break;
+		
+		default:
+			break;
+	}
+	
+#if LOG_SIMPLIFICATIONS
+	if (memcmp(&orig, inst, sizeof(orig)) != 0)
+	{
+		char disasm1[256], disasm2[256];
+		drcuml_disasm(&orig, disasm1);
+		drcuml_disasm(inst, disasm2);
+		mame_printf_debug("Simplified: %-50.50s -> %s\n", disasm1, disasm2);
+	}
+#endif
+
+	/* if the opcode changed, validate and reoptimize */
+	if (inst->opcode != origop)
+	{
+		validate_instruction(block, inst);
+		simplify_instruction_with_no_flags(block, inst);
 	}
 }
 
@@ -1173,24 +1632,45 @@ static void validate_instruction(drcuml_block *block, const drcuml_instruction *
 		assert(param->type > DRCUML_PTYPE_NONE && param->type < DRCUML_PTYPE_MAX);
 		assert((typemask >> param->type) & 1);
 		
-		/* most memory parameters must be in the near cache */
-		if (param->type == DRCUML_PTYPE_MEMORY && typemask != PTYPES_PTR && typemask != PTYPES_STATE && typemask != PTYPES_STR && typemask != PTYPES_CFUNC)
-			assert_in_near_cache(block->drcuml->cache, (void *)(FPTR)param->value);
-		
-		/* validate immediate parameters */
-		if (param->type == DRCUML_PTYPE_IMMEDIATE)
+		/* validate various parameter types */
+		switch (param->type)
 		{
-			if (typemask == PTYPES_SIZE)
-				assert(param->value >= DRCUML_SIZE_BYTE && param->value <= DRCUML_SIZE_QWORD);
-			else if (typemask == PTYPES_SPACE)
-				assert(param->value >= ADDRESS_SPACE_PROGRAM && param->value <= ADDRESS_SPACE_IO);
-			else if (typemask == PTYPES_SPSZ)
-			{
-				assert(param->value % 16 >= DRCUML_SIZE_BYTE && param->value % 16 <= DRCUML_SIZE_QWORD);
-				assert(param->value / 16 >= ADDRESS_SPACE_PROGRAM && param->value / 16 <= ADDRESS_SPACE_IO);
-			}
-			else if (typemask == PTYPES_FMOD)
-				assert(param->value >= DRCUML_FMOD_TRUNC && param->value <= DRCUML_FMOD_DEFAULT);
+			case DRCUML_PTYPE_MEMORY:
+				/* most memory parameters must be in the near cache */
+				if (typemask != PTYPES_PTR && typemask != PTYPES_STATE && typemask != PTYPES_STR && typemask != PTYPES_CFUNC)
+					assert_in_near_cache(block->drcuml->cache, (void *)(FPTR)param->value);
+				break;
+			
+			case DRCUML_PTYPE_IMMEDIATE:
+				/* many special parameter types are encoded as immediately; ensure they are in range */
+				if (typemask == PTYPES_SIZE)
+					assert(param->value >= DRCUML_SIZE_BYTE && param->value <= DRCUML_SIZE_QWORD);
+				else if (typemask == PTYPES_SPACE)
+					assert(param->value >= ADDRESS_SPACE_PROGRAM && param->value <= ADDRESS_SPACE_IO);
+				else if (typemask == PTYPES_SPSZ)
+				{
+					assert(param->value % 16 >= DRCUML_SIZE_BYTE && param->value % 16 <= DRCUML_SIZE_QWORD);
+					assert(param->value / 16 >= ADDRESS_SPACE_PROGRAM && param->value / 16 <= ADDRESS_SPACE_IO);
+				}
+				else if (typemask == PTYPES_FMOD)
+					assert(param->value >= DRCUML_FMOD_TRUNC && param->value <= DRCUML_FMOD_DEFAULT);
+				break;
+			
+			case DRCUML_PTYPE_MAPVAR:
+				assert(param->value >= DRCUML_MAPVAR_M0 && param->value < DRCUML_MAPVAR_END);
+				break;
+			
+			case DRCUML_PTYPE_INT_REGISTER:
+				assert(param->value >= DRCUML_REG_I0 && param->value < DRCUML_REG_I_END);
+				break;
+			
+			case DRCUML_PTYPE_FLOAT_REGISTER:
+				assert(param->value >= DRCUML_REG_F0 && param->value < DRCUML_REG_F_END);
+				break;
+			
+			default:
+				assert(FALSE);
+				break;
 		}
 	}
 
