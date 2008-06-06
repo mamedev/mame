@@ -296,6 +296,10 @@ static const drcuml_opcode_info *opcode_info_table[DRCUML_OP_MAX];
 
 static void optimize_block(drcuml_block *block);
 static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instruction *inst);
+
+static void disassemble_block(drcuml_block *block);
+static const char *get_comment_text(const drcuml_instruction *inst);
+
 static void validate_instruction(drcuml_block *block, const drcuml_instruction *inst);
 
 #if 0
@@ -833,19 +837,7 @@ void drcuml_block_end(drcuml_block *block)
 
 	/* if we have a logfile, generate a disassembly of the block */
 	if (drcuml->umllog != NULL)
-	{
-		int instnum;
-
-		/* iterate over instructions and output */
-		for (instnum = 0; instnum < block->nextinst; instnum++)
-		{
-			char dasm[256];
-			drcuml_disasm(&block->inst[instnum], dasm);
-			drcuml_log_printf(drcuml, "%4d: %s\n", instnum, dasm);
-		}
-		drcuml_log_printf(drcuml, "\n\n");
-		fflush(drcuml->umllog);
-	}
+		disassemble_block(block);
 
 	/* generate the code via the back-end */
 	(*drcuml->beintf->be_generate)(drcuml->bestate, block, block->inst, block->nextinst);
@@ -1042,7 +1034,7 @@ void drcuml_add_comment(drcuml_block *block, const char *format, ...)
     instruction to the given buffer
 -------------------------------------------------*/
 
-void drcuml_disasm(const drcuml_instruction *inst, char *buffer)
+void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drccache *cache)
 {
 	static const char *conditions[] = { "z", "nz", "s", "ns", "c", "nc", "v", "nv", "u", "nu", "a", "be", "g", "le", "l", "ge" };
 	static const char *pound_size[] = { "?", "?", "?", "?", "s", "?", "?", "?", "d" };
@@ -1153,9 +1145,13 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer)
 				else if (typemask == PTYPES_STR)
 					dest += sprintf(dest, "%s", (const char *)(FPTR)param->value);
 				
+				/* cache memory */
+				else if (cache != NULL && drccache_contains_pointer(cache, (void *)(FPTR)param->value))
+					dest += sprintf(dest, "[+$%X]", (drccodeptr)(FPTR)param->value - drccache_near(cache));
+				
 				/* general memory */
 				else
-					dest += sprintf(dest, "[$%p]", (void *)(FPTR)param->value);
+					dest += sprintf(dest, "[[$%p]]", (void *)(FPTR)param->value);
 				break;
 			
 			default:
@@ -1584,8 +1580,8 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 	if (memcmp(&orig, inst, sizeof(orig)) != 0)
 	{
 		char disasm1[256], disasm2[256];
-		drcuml_disasm(&orig, disasm1);
-		drcuml_disasm(inst, disasm2);
+		drcuml_disasm(&orig, disasm1, block->drcuml->cache);
+		drcuml_disasm(inst, disasm2, block->drcuml->cache);
 		mame_printf_debug("Simplified: %-50.50s -> %s\n", disasm1, disasm2);
 	}
 #endif
@@ -1596,6 +1592,101 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 		validate_instruction(block, inst);
 		simplify_instruction_with_no_flags(block, inst);
 	}
+}
+
+
+
+/***************************************************************************
+    LOGGING HELPERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    disassemble_block - disassemble a block of
+    instructions to the log
+-------------------------------------------------*/
+
+static void disassemble_block(drcuml_block *block)
+{
+	int firstcomment = -1;
+	int instnum;
+
+	/* iterate over instructions and output */
+	for (instnum = 0; instnum < block->nextinst; instnum++)
+	{
+		const drcuml_instruction *inst = &block->inst[instnum];
+		int flushcomments = FALSE;
+	
+		/* remember comments and mapvars for later */
+		if (inst->opcode == DRCUML_OP_COMMENT || inst->opcode == DRCUML_OP_MAPVAR)
+		{
+			if (firstcomment == -1)
+				firstcomment = instnum;
+		}
+		
+		/* print labels, handles, and hashes left justified */
+		else if (inst->opcode == DRCUML_OP_LABEL)
+			drcuml_log_printf(block->drcuml, "$%X:\n", (UINT32)inst->param[0].value);
+		else if (inst->opcode == DRCUML_OP_HANDLE)
+			drcuml_log_printf(block->drcuml, "%s:\n", drcuml_handle_name((const drcuml_codehandle *)(FPTR)inst->param[0].value));
+		else if (inst->opcode == DRCUML_OP_HASH)
+			drcuml_log_printf(block->drcuml, "(%X,%X):\n", (UINT32)inst->param[0].value, (UINT32)inst->param[1].value);
+
+		/* indent everything else with a tab */
+		else
+		{
+			char dasm[256];
+			drcuml_disasm(&block->inst[instnum], dasm, block->drcuml->cache);
+			
+			/* include the first accumulated comment with this line */
+			if (firstcomment != -1)
+			{
+				drcuml_log_printf(block->drcuml, "\t%-50.50s; %s\n", dasm, get_comment_text(&block->inst[firstcomment]));
+				firstcomment++;
+				flushcomments = TRUE;
+			}
+			else
+				drcuml_log_printf(block->drcuml, "\t%s\n", dasm);
+		}
+		
+		/* flush any comments pending */
+		if (firstcomment != -1 && (flushcomments || instnum == block->nextinst - 1))
+		{
+			while (firstcomment <= instnum)
+			{
+				const char *text = get_comment_text(&block->inst[firstcomment++]);
+				if (text != NULL)
+					drcuml_log_printf(block->drcuml, "\t%50s; %s\n", "", text);
+			}
+			firstcomment = -1;
+		}
+	}
+	drcuml_log_printf(block->drcuml, "\n\n");
+	fflush(block->drcuml->umllog);
+}
+
+
+/*-------------------------------------------------
+    get_comment_text - determine the text
+    associated with a comment or mapvar
+-------------------------------------------------*/
+
+static const char *get_comment_text(const drcuml_instruction *inst)
+{
+	static char tempbuf[100];
+	
+	/* comments return their strings */
+	if (inst->opcode == DRCUML_OP_COMMENT)
+		return (char *)(FPTR)inst->param[0].value;
+	
+	/* mapvars comment about their values */
+	else if (inst->opcode == DRCUML_OP_MAPVAR)
+	{
+		sprintf(tempbuf, "m%d = $%X", (int)inst->param[0].value - DRCUML_MAPVAR_M0, (UINT32)inst->param[1].value);
+		return tempbuf;
+	}
+	
+	/* everything else is NULL */
+	return NULL;
 }
 
 
@@ -2121,7 +2212,7 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 		char disasm[256];
 
 		/* disassemble the test instruction */
-		drcuml_disasm(testinst, disasm);
+		drcuml_disasm(testinst, disasm, drcuml->cache);
 
 		/* output a description of what went wrong */
 		printf("\n");
