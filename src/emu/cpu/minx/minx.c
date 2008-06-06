@@ -171,7 +171,7 @@ static int minx_execute( int cycles )
 		if ( regs.interrupt_pending )
 		{
 			regs.halted = 0;
-			if ( ! ( regs.F & 0xc0 ) )
+			if ( ! ( regs.F & 0xc0 ) && regs.U == regs.V )
 			{
 				//logerror("minx_execute(): taking IRQ\n");
 				PUSH8( regs.V );

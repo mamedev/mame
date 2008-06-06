@@ -265,9 +265,9 @@ OP(F4) { JMP( regs.HL ); }
 OP(F5) { INT8 d8 = rdop(); regs.BA = regs.BA - 0x0100; if ( regs.BA & 0xFF00 ) { JMP( regs.PC + d8 - 1 ); } }
 OP(F6) { regs.BA = ( regs.BA & 0xFF00 ) | ( ( regs.BA & 0x00F0 ) >> 4 ) | ( ( regs.BA & 0x000F ) << 4 ); }
 OP(F7) { UINT8 d; AD1_IHL; d = RD( addr1 ); WR( addr1, ( ( d & 0xF0 ) >> 4 ) | ( ( d & 0x0F ) << 4 ) ); }
-OP(F8) { regs.PC = POP16(); regs.V = POP8(); }
-OP(F9) { regs.F = POP8(); regs.PC = POP16(); regs.V = POP8(); }
-OP(FA) { regs.PC = POP16() + 2; regs.V = POP8(); }
+OP(F8) { regs.PC = POP16(); regs.V = POP8(); regs.U = regs.V; }
+OP(F9) { regs.F = POP8(); regs.PC = POP16(); regs.V = POP8(); regs.U = regs.V; }
+OP(FA) { regs.PC = POP16() + 2; regs.V = POP8(); regs.U = regs.V; }
 OP(FB) { AD1_I16; CALL( rd16( addr1 ) ); }
 OP(FC) { UINT8 i = rdop() & 0xFE; CALL( rd16(i) ); PUSH8( regs.F ); }
 OP(FD) { UINT8 i = rdop() & 0xFE; JMP( rd16(i) ); /* PUSH8( regs.F );?? */ }
@@ -314,7 +314,7 @@ static const int insnminx_cycles[256] = {
 	 8,  8,  8,  8, 12, 16,  8,  8,  8,  8,  8,  8, 12, 16,  8,  8,
 	 8,  8,  8,  8, 12, 16,  8,  8,  8,  8,  8,  8, 12, 16,  8,  8,
 	 8,  8,  8,  8, 12, 16,  8,  8,  8,  8,  8,  8, 12, 16,  8,  8,
-
+ 
 	 4,  4,  4,  4, 12,  8,  8,  8,  4,  4,  4,  4, 12,  8,  8,  8,
 	 4,  4,  4,  4, 12,  8,  8,  8,  4,  4,  4,  4, 12,  8,  8,  8,
 	 8,  8,  8,  8, 16, 12, 12, 12,  8,  8,  8,  8, 16, 12, 12, 12,
