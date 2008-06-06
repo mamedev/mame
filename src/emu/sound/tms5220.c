@@ -17,6 +17,27 @@
      US patent 4,335,277 describes the complete 52xx chip
      Special Thanks to Larry Brantingham for answering questions regarding the chip details
 
+   TMS5200/TMS5220/TMS5220C:
+
+                 +-----------------+
+        D7(d0)   |  1           28 |  /RS
+        ADD1     |  2           27 |  /WS
+        ROMCLK   |  3           26 |  D6(d1)
+        VDD(-5)  |  4           25 |  ADD2
+        VSS(+5)  |  5           24 |  D5(d2)
+        OSC      |  6           23 |  ADD4
+        T11      |  7           22 |  D4(d3)
+        SPKR     |  8           21 |  ADD8/DATA
+        I/O      |  9           20 |  TEST
+        PROMOUT  | 10           19 |  D3(d4)
+        VREF(GND)| 11           18 |  /READY
+        D2(d5)   | 12           17 |  /INT
+        D1(d6)   | 13           16 |  M1
+        D0(d7)   | 14           15 |  M0
+                 +-----------------+
+Note the standard naming for d* data bits with 7 as MSB and 0 as LSB is in lowercase.
+TI's naming has D7 as LSB and D0 as MSB and is in uppercase
+
 ***********************************************************************************************/
 
 #include "sndintrf.h"

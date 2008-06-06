@@ -30,8 +30,12 @@
    the function is similar than update with 0x80 set to 1
 
   23/04/2007 : Lord Nightmare
-  Major update, implement all three different noise generation algorithms plus
-  the game gear stereo output, and a set_variant call to discern among them.
+  Major update, implement all three different noise generation algorithms and a 
+  set_variant call to discern among them.
+
+  TODO: Implement a function for setting stereo regs for the game gear.
+        Requires either making the entire core stereo and forcing mono out for all
+        chips except gamegear, or somehow making the core support both output typesf.
 ***************************************************************************/
 
 #include "sndintrf.h"
