@@ -19,15 +19,20 @@ Tilemap flip flags were reversed
 
 static bitmap_t *sprite_bitmap;
 
-static bitmap_t *tilemap_bitmap;
+static bitmap_t *tilemap_bitmap_a;
+static bitmap_t *tilemap_bitmapflags_a;
+
+static bitmap_t *tilemap_bitmap_b;
+static bitmap_t *tilemap_bitmapflags_b;
+
 
 /* draws ROZ with linescroll OR columnscroll to 16-bit indexed bitmap */
-static void suprnova_draw_roz(bitmap_t* bitmap, const rectangle *cliprect, tilemap *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, UINT32* scrollram)
+static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rectangle *cliprect, tilemap *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, UINT32* scrollram)
 {
 //	const pen_t *clut = &Machine->pens[0];
 	//bitmap_t *destbitmap = bitmap;
 	bitmap_t *srcbitmap = tilemap_get_pixmap(tmap);
-	//bitmap_t *flagsmap = tilemap_get_flagsmap(tmap);
+	bitmap_t *srcbitmapflags = tilemap_get_flagsmap(tmap);
 	const int xmask = srcbitmap->width-1;
 	const int ymask = srcbitmap->height-1;
 	//const int widthshifted = srcbitmap->width << 16;
@@ -40,6 +45,7 @@ static void suprnova_draw_roz(bitmap_t* bitmap, const rectangle *cliprect, tilem
 	int ex;
 	int ey;
 	UINT16 *dest;
+	UINT8* destflags;
 	UINT8 *pri;
 	//const UINT16 *src;
 	//const UINT8 *maskptr;
@@ -68,6 +74,7 @@ static void suprnova_draw_roz(bitmap_t* bitmap, const rectangle *cliprect, tilem
 
 			/* get dest and priority pointers */
 			dest = BITMAP_ADDR16( bitmap, sy, sx);
+			destflags = BITMAP_ADDR8( bitmapflags, sy, sx);
 
 			/* loop over columns */
 			while (x <= ex)
@@ -75,10 +82,12 @@ static void suprnova_draw_roz(bitmap_t* bitmap, const rectangle *cliprect, tilem
 				if (columnscroll)
 				{
 					dest[0] = BITMAP_ADDR16(srcbitmap, ((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask)[0];
+					destflags[0] = BITMAP_ADDR8(srcbitmapflags, ((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask)[0];
 				}
 				else
 				{
 					dest[0] = BITMAP_ADDR16(srcbitmap, (cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask)[0];
+					destflags[0] = BITMAP_ADDR8(srcbitmapflags, (cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask)[0];
 				}
 
 				/* advance in X */
@@ -86,6 +95,7 @@ static void suprnova_draw_roz(bitmap_t* bitmap, const rectangle *cliprect, tilem
 				cy += incxy;
 				x++;
 				dest++;
+				destflags++;
 				pri++;
 			}
 
@@ -517,7 +527,7 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 
 	/* sprite ram start / end is not really fixed registers change it */
 
-	UINT32 *source = buffered_spriteram32;
+	UINT32 *source = spriteram32;
 	UINT32 *finish = source + spriteram_size/4;
 
 	int group_x_offset[4];
@@ -782,7 +792,7 @@ static TILE_GET_INFO( get_tilemap_A_tile_info )
 {
 	int code = ((skns_tilemapA_ram[tile_index] & 0x001fffff) >> 0 );
 	int colr = ((skns_tilemapA_ram[tile_index] & 0x3f000000) >> 24 );
-//  int pri  = ((skns_tilemapA_ram[tile_index] & 0x00e00000) >> 21 );
+	int pri  = ((skns_tilemapA_ram[tile_index] & 0x00e00000) >> 21 );
 	int depth = (skns_v3_regs[0x0c/4] & 0x0001) << 1;
 	int flags = 0;
 
@@ -794,7 +804,9 @@ static TILE_GET_INFO( get_tilemap_A_tile_info )
 			code,
 			0x40+colr,
 			flags);
-//  tileinfo->category = pri;
+	tileinfo->category = pri;
+
+	//if (pri) popmessage("pri!!\n");
 }
 
 WRITE32_HANDLER ( skns_tilemapA_w )
@@ -807,7 +819,7 @@ static TILE_GET_INFO( get_tilemap_B_tile_info )
 {
 	int code = ((skns_tilemapB_ram[tile_index] & 0x001fffff) >> 0 );
 	int colr = ((skns_tilemapB_ram[tile_index] & 0x3f000000) >> 24 );
-//  int pri  = ((skns_tilemapA_ram[tile_index] & 0x00e00000) >> 21 );
+	int pri  = ((skns_tilemapB_ram[tile_index] & 0x00e00000) >> 21 );
 	int depth = (skns_v3_regs[0x0c/4] & 0x0100) >> 7;
 	int flags = 0;
 
@@ -819,7 +831,9 @@ static TILE_GET_INFO( get_tilemap_B_tile_info )
 			code,
 			0x40+colr,
 			flags);
-//  tileinfo->category = pri;
+	tileinfo->category = pri;
+
+	//if (pri) popmessage("pri!!\n");
 }
 
 WRITE32_HANDLER ( skns_tilemapB_w )
@@ -857,32 +871,47 @@ VIDEO_START(skns)
 		tilemap_set_transparent_pen(skns_tilemap_B,0);
 
 	sprite_bitmap = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
-tilemap_bitmap = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
+
+	tilemap_bitmap_a = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
+	tilemap_bitmapflags_a = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED8);
+
+	tilemap_bitmap_b = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
+	tilemap_bitmapflags_b = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED8);
 
 	machine->gfx[2]->color_granularity=256;
 	machine->gfx[3]->color_granularity=256;
 }
 
-void tilemap_copy_bitmap(bitmap_t *bitmap)
+void tilemap_copy_bitmap(bitmap_t *bitmap, bitmap_t* tilemap_bitmap, bitmap_t* tilemap_bitmapflags)
 {
 	int x,y;
+	UINT8* srcflags;
 	UINT16* src;
 	UINT32* dst;
+	int pri;
 	const pen_t *clut = &Machine->pens[0];
 
 
 	for (y=0;y<240;y++)
 	{
 		src = BITMAP_ADDR16(tilemap_bitmap, y, 0);
+		srcflags = BITMAP_ADDR8(tilemap_bitmapflags, y, 0);
 		dst = BITMAP_ADDR32(bitmap, y, 0);
+
 
 		for (x=0;x<320;x++)
 		{
 			UINT16 pendata = src[x]&0x7fff;
-			if (pendata & 0xff)
+			//UINT16 paldata = skns_palette_ram[pendata];
+
+			pri = (srcflags[x] & 0x0f);
+			//if (pri!=0)
 			{
-				UINT32 coldat = clut[pendata];
-				dst[x] = coldat;
+				if (pendata & 0xff)
+				{
+					UINT32 coldat = clut[pendata];
+					dst[x] = coldat;
+				}
 			}
 		}
 	}
@@ -906,9 +935,10 @@ static void supernova_draw_a( bitmap_t *bitmap, const rectangle *cliprect, int t
 		incxx  = skns_v3_regs[0x24/4]; // was yy, changed for sarukani
 
 		columnscroll = (skns_v3_regs[0x0c/4] >> 1) & 0x0001;
-		fillbitmap(tilemap_bitmap, 0, NULL);
-		suprnova_draw_roz(tilemap_bitmap,cliprect, skns_tilemap_A, startx << 8,starty << 8,	incxx << 8,incxy << 8,incyx << 8,incyy << 8, 1, columnscroll, &skns_v3slc_ram[0]);
-		tilemap_copy_bitmap(bitmap);
+		fillbitmap(tilemap_bitmap_a, 0, NULL);
+		fillbitmap(tilemap_bitmapflags_a, 0, NULL);
+		suprnova_draw_roz(tilemap_bitmap_a,tilemap_bitmapflags_a,cliprect, skns_tilemap_A, startx << 8,starty << 8,	incxx << 8,incxy << 8,incyx << 8,incyy << 8, 1, columnscroll, &skns_v3slc_ram[0]);
+		tilemap_copy_bitmap(bitmap, tilemap_bitmap_a, tilemap_bitmapflags_a);
 	}
 }
 
@@ -928,9 +958,10 @@ static void supernova_draw_b( bitmap_t *bitmap, const rectangle *cliprect, int t
 		incxy  = skns_v3_regs[0x4c/4];
 		incxx  = skns_v3_regs[0x48/4];
 		columnscroll = (skns_v3_regs[0x0c/4] >> 9) & 0x0001; // selects column scroll or rowscroll
-		fillbitmap(tilemap_bitmap, 0, NULL);
-		suprnova_draw_roz(tilemap_bitmap,cliprect, skns_tilemap_B, startx << 8,starty << 8,	incxx << 8,incxy << 8,incyx << 8,incyy << 8, 1, columnscroll, &skns_v3slc_ram[0x1000/4]);
-		tilemap_copy_bitmap(bitmap);
+		fillbitmap(tilemap_bitmap_b, 0, NULL);
+		fillbitmap(tilemap_bitmapflags_b, 0, NULL);
+		suprnova_draw_roz(tilemap_bitmap_b,tilemap_bitmapflags_b, cliprect, skns_tilemap_B, startx << 8,starty << 8,	incxx << 8,incxy << 8,incyx << 8,incyy << 8, 1, columnscroll, &skns_v3slc_ram[0x1000/4]);
+		tilemap_copy_bitmap(bitmap, tilemap_bitmap_b, tilemap_bitmapflags_b);
 	}
 }
 
@@ -1032,8 +1063,6 @@ VIDEO_UPDATE(skns)
 		int x,y;
 		const pen_t *paldata = screen->machine->pens;
 
-		fillbitmap(sprite_bitmap, 0x0000, cliprect);
-		skns_draw_sprites(screen->machine, sprite_bitmap, cliprect);
 
 
 		for (y=0;y<240;y++)
@@ -1089,6 +1118,9 @@ VIDEO_UPDATE(skns)
 			}
 		}
 
+		fillbitmap(sprite_bitmap, 0x0000, cliprect);
+		skns_draw_sprites(screen->machine, sprite_bitmap, cliprect);
+
 	}
 
 	return 0;
@@ -1096,5 +1128,5 @@ VIDEO_UPDATE(skns)
 
 VIDEO_EOF(skns)
 {
-	buffer_spriteram32_w(machine,0,0,0xffffffff);
+//	buffer_spriteram32_w(machine,0,0,0xffffffff);
 }
