@@ -2106,10 +2106,18 @@ static void generate_compute_flags(drcuml_block *block, int updatecr, UINT32 xer
 static void generate_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int source, UINT8 link)
 {
 	compiler_state compiler_temp = *compiler;
+	UINT32 *srcptr = &ppc->spr[source];
 
 	/* set the link if needed */
 	if (link)
+	{
+		if (desc->targetpc == BRANCH_TARGET_DYNAMIC && source == SPR_LR)
+		{
+			UML_MOV(block, MEM(&ppc->impstate->tempaddr), MEM(srcptr));						// mov     [tempaddr],[lr]
+			srcptr = &ppc->impstate->tempaddr;
+		}
 		UML_MOV(block, SPR32(SPR_LR), IMM(desc->pc + 4));									// mov     [lr],desc->pc + 4
+	}
 
 	/* update the cycles and jump through the hash table to the target */
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
@@ -2122,12 +2130,8 @@ static void generate_branch(drcuml_block *block, compiler_state *compiler, const
 	}
 	else
 	{
-UML_CMP(block, SPR32(source), IMM(0xb032));
-UML_MOV(block, MEM(&ppc->impstate->arg0), IMM(desc->pc));
-UML_CALLCc(block, IF_E, cfunc_printf_debug, "b032 @ PC=%08X\n");
-
-		generate_update_cycles(block, &compiler_temp, SPR32(source), TRUE);					// <subtract cycles>
-		UML_HASHJMP(block, IMM(ppc->impstate->mode), SPR32(source), ppc->impstate->nocode);				// hashjmp <mode>,<rsreg>,nocode
+		generate_update_cycles(block, &compiler_temp, MEM(srcptr), TRUE);					// <subtract cycles>
+		UML_HASHJMP(block, IMM(ppc->impstate->mode), MEM(srcptr), ppc->impstate->nocode);	// hashjmp <mode>,<rsreg>,nocode
 	}
 
 	/* update the label */
