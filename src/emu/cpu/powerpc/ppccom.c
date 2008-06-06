@@ -1190,8 +1190,6 @@ static TIMER_CALLBACK( decrementer_int_callback )
     EMBEDDED 4XX HELPERS
 ***************************************************************************/
 
-#if (HAS_PPC403GA || HAS_PPC403GCX)
-
 /*-------------------------------------------------
     ppc4xx_set_irq_line - PowerPC 4XX-specific
     IRQ line management
@@ -1789,4 +1787,3 @@ void ppc4xx_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 	}
 }
 
-#endif
