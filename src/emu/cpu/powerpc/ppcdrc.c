@@ -2126,7 +2126,8 @@ static void generate_branch(drcuml_block *block, compiler_state *compiler, const
 		if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
 			UML_JMP(block, desc->targetpc | 0x80000000);									// jmp     desc->targetpc | 0x80000000
 		else
-			UML_HASHJMP(block, IMM(ppc->impstate->mode), IMM(desc->targetpc), ppc->impstate->nocode);		// hashjmp <mode>,desc->targetpc,nocode
+			UML_HASHJMP(block, IMM(ppc->impstate->mode), IMM(desc->targetpc), ppc->impstate->nocode);
+																							// hashjmp <mode>,desc->targetpc,nocode
 	}
 	else
 	{

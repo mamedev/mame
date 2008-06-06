@@ -24,14 +24,12 @@ DRCOBJ = \
 	$(CPUOBJ)/drccache.o \
 	$(CPUOBJ)/drcfe.o \
 	$(CPUOBJ)/drcuml.o \
-	$(CPUOBJ)/drcumld.o \
 
 DRCDEPS = \
 	$(CPUSRC)/drcbeut.h \
 	$(CPUSRC)/drccache.h \
 	$(CPUSRC)/drcfe.h \
 	$(CPUSRC)/drcuml.h \
-	$(CPUSRC)/drcumld.h \
 	$(CPUSRC)/drcumlsh.h \
 
 # fixme - need to make this work for other target architectures (PPC)

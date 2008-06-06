@@ -41,7 +41,6 @@
 
 #include "drcuml.h"
 #include "drcumlsh.h"
-#include "drcumld.h"
 #include "deprecat.h"
 #include "mame.h"
 #include <stdarg.h>
@@ -186,88 +185,88 @@ struct _bevalidate_test
 static const drcuml_opcode_info opcode_info_source[] =
 {
 	/* Compile-time opcodes */
-	OPINFO1(HANDLE,  "handle",  4,   FALSE, NONE, NONE, NONE, PINFO(IN, OP, HAND))
-	OPINFO2(HASH,    "hash",    4,   FALSE, NONE, NONE, NONE, PINFO(IN, OP, IMV), PINFO(IN, OP, IMV))
-	OPINFO1(LABEL,   "label",   4,   FALSE, NONE, NONE, NONE, PINFO(IN, OP, LAB))
-	OPINFO1(COMMENT, "comment", 4,   FALSE, NONE, NONE, NONE, PINFO(IN, OP, STR))
-	OPINFO2(MAPVAR,  "mapvar",  4,   FALSE, NONE, NONE, NONE, PINFO(OUT, OP, MVAR), PINFO(IN, OP, IMV))
+	OPINFO1(HANDLE,  "handle",   4,   FALSE, NONE, NONE, NONE, PINFO(IN, OP, HAND))
+	OPINFO2(HASH,    "hash",     4,   FALSE, NONE, NONE, NONE, PINFO(IN, OP, IMV), PINFO(IN, OP, IMV))
+	OPINFO1(LABEL,   "label",    4,   FALSE, NONE, NONE, NONE, PINFO(IN, OP, LAB))
+	OPINFO1(COMMENT, "comment",  4,   FALSE, NONE, NONE, NONE, PINFO(IN, OP, STR))
+	OPINFO2(MAPVAR,  "mapvar",   4,   FALSE, NONE, NONE, NONE, PINFO(OUT, OP, MVAR), PINFO(IN, OP, IMV))
 
 	/* Control Flow Operations */
-	OPINFO1(DEBUG,   "debug",   4,   FALSE, NONE, NONE, ALL,  PINFO(IN, OP, IANY))
-	OPINFO1(EXIT,    "exit",    4,   TRUE,  NONE, NONE, ALL,  PINFO(IN, OP, IANY))
-	OPINFO3(HASHJMP, "hashjmp", 4,   FALSE, NONE, NONE, ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, HAND))
-	OPINFO1(JMP,     "jmp",     4,   TRUE,  NONE, NONE, NONE, PINFO(IN, OP, LAB))
-	OPINFO2(EXH,     "exh",     4,   TRUE,  NONE, NONE, ALL,  PINFO(IN, OP, HAND), PINFO(IN, OP, IANY))
-	OPINFO1(CALLH,   "callh",   4,   TRUE,  NONE, NONE, ALL,  PINFO(IN, OP, HAND))
-	OPINFO0(RET,     "ret",     4,   TRUE,  NONE, NONE, ALL)
-	OPINFO2(CALLC,   "callc",   4,   TRUE,  NONE, NONE, ALL,  PINFO(IN, OP, CFUNC), PINFO(IN, OP, PTR))
-	OPINFO2(RECOVER, "recover", 4,   FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, MVAR))
+	OPINFO1(DEBUG,   "debug",    4,   FALSE, NONE, NONE, ALL,  PINFO(IN, OP, IANY))
+	OPINFO1(EXIT,    "exit",     4,   TRUE,  NONE, NONE, ALL,  PINFO(IN, OP, IANY))
+	OPINFO3(HASHJMP, "hashjmp",  4,   FALSE, NONE, NONE, ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, HAND))
+	OPINFO1(JMP,     "jmp",      4,   TRUE,  NONE, NONE, NONE, PINFO(IN, OP, LAB))
+	OPINFO2(EXH,     "exh",      4,   TRUE,  NONE, NONE, ALL,  PINFO(IN, OP, HAND), PINFO(IN, OP, IANY))
+	OPINFO1(CALLH,   "callh",    4,   TRUE,  NONE, NONE, ALL,  PINFO(IN, OP, HAND))
+	OPINFO0(RET,     "ret",      4,   TRUE,  NONE, NONE, ALL)
+	OPINFO2(CALLC,   "callc",    4,   TRUE,  NONE, NONE, ALL,  PINFO(IN, OP, CFUNC), PINFO(IN, OP, PTR))
+	OPINFO2(RECOVER, "recover",  4,   FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, MVAR))
 
 	/* Internal Register Operations */
-	OPINFO1(SETFMOD, "setfmod", 4,   FALSE, NONE, NONE, ALL,  PINFO(IN, OP, IANY))
-	OPINFO1(GETFMOD, "getfmod", 4,   FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM))
-	OPINFO1(GETEXP,  "getexp",  4,   FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM))
-	OPINFO2(GETFLGS, "getflgs", 4,   FALSE, P2,   NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IMV))
-	OPINFO1(SAVE,    "save",    4,   FALSE, ALL,  NONE, ALL,  PINFO(OUT, OP, STATE))
-	OPINFO1(RESTORE, "restore", 4,   FALSE, NONE, ALL,  ALL,  PINFO(IN, OP, STATE))
+	OPINFO1(SETFMOD, "setfmod",  4,   FALSE, NONE, NONE, ALL,  PINFO(IN, OP, IANY))
+	OPINFO1(GETFMOD, "getfmod",  4,   FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM))
+	OPINFO1(GETEXP,  "getexp",   4,   FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM))
+	OPINFO2(GETFLGS, "getflgs",  4,   FALSE, P2,   NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IMV))
+	OPINFO1(SAVE,    "save",     4,   FALSE, ALL,  NONE, ALL,  PINFO(OUT, OP, STATE))
+	OPINFO1(RESTORE, "restore",  4,   FALSE, NONE, ALL,  ALL,  PINFO(IN, OP, STATE))
 
 	/* Integer Operations */
-	OPINFO4(LOAD,    "load",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, SIZE))
-	OPINFO4(LOADS,   "loads",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, SIZE))
-	OPINFO4(STORE,   "store",   4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, IRM), PINFO(IN, OP, SIZE))
-	OPINFO3(READ,    "read",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, 4, IANY), PINFO(IN, OP, SPSZ))
-	OPINFO4(READM,   "readm",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSZ))
-	OPINFO3(WRITE,   "write",   4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSZ))
-	OPINFO4(WRITEM,  "writem",  4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSZ))
-	OPINFO2(CARRY,   "carry",   4|8, FALSE, C,    C,    ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO2(MOV,     "mov",     4|8, TRUE,  NONE, NONE, NONE, PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
-	OPINFO1(SET,     "set",     4|8, TRUE,  NONE, NONE, ALL,  PINFO(OUT, OP, IRM))
-	OPINFO3(SEXT,    "sext",    4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, P3, IANY), PINFO(IN, OP, SIZE))
-	OPINFO4(ROLAND,  "roland",  4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO4(ROLINS,  "rolins",  4|8, FALSE, NONE, SZ,   ALL,  PINFO(INOUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO3(ADD,     "add",     4|8, FALSE, NONE, SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO3(ADDC,    "addc",    4|8, FALSE, C,    SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO3(SUB,     "sub",     4|8, FALSE, NONE, SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO3(SUBB,    "subb",    4|8, FALSE, C,    SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO2(CMP,     "cmp",     4|8, FALSE, NONE, SZVC, ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO4(MULU,    "mulu",    4|8, FALSE, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO4(MULS,    "muls",    4|8, FALSE, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO4(DIVU,    "divu",    4|8, FALSE, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO4(DIVS,    "divs",    4|8, FALSE, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO3(AND,     "and",     4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO2(TEST,    "test",    4|8, FALSE, NONE, SZ,   ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO3(OR,      "or",      4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO3(XOR,     "xor",     4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO2(LZCNT,   "lzcnt",   4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
-	OPINFO2(BSWAP,   "bswap",   4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
-	OPINFO3(SHL,     "shl",     4|8, FALSE, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO3(SHR,     "shr",     4|8, FALSE, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO3(SAR,     "sar",     4|8, FALSE, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO3(ROL,     "rol",     4|8, FALSE, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO3(ROLC,    "rolc",    4|8, FALSE, C,    SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO3(ROR,     "ror",     4|8, FALSE, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
-	OPINFO3(RORC,    "rorc",    4|8, FALSE, C,    SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO4(LOAD,    "!load",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, SIZE))
+	OPINFO4(LOADS,   "!loads",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, SIZE))
+	OPINFO4(STORE,   "!store",   4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, IRM), PINFO(IN, OP, SIZE))
+	OPINFO3(READ,    "!read",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, 4, IANY), PINFO(IN, OP, SPSZ))
+	OPINFO4(READM,   "!readm",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSZ))
+	OPINFO3(WRITE,   "!write",   4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSZ))
+	OPINFO4(WRITEM,  "!writem",  4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSZ))
+	OPINFO2(CARRY,   "!carry",   4|8, FALSE, C,    C,    ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO2(MOV,     "!mov",     4|8, TRUE,  NONE, NONE, NONE, PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
+	OPINFO1(SET,     "!set",     4|8, TRUE,  NONE, NONE, ALL,  PINFO(OUT, OP, IRM))
+	OPINFO3(SEXT,    "!sext",    4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, P3, IANY), PINFO(IN, OP, SIZE))
+	OPINFO4(ROLAND,  "!roland",  4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO4(ROLINS,  "!rolins",  4|8, FALSE, NONE, SZ,   ALL,  PINFO(INOUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(ADD,     "!add",     4|8, FALSE, NONE, SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(ADDC,    "!addc",    4|8, FALSE, C,    SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(SUB,     "!sub",     4|8, FALSE, NONE, SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(SUBB,    "!subb",    4|8, FALSE, C,    SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO2(CMP,     "!cmp",     4|8, FALSE, NONE, SZVC, ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO4(MULU,    "!mulu",    4|8, FALSE, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO4(MULS,    "!muls",    4|8, FALSE, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO4(DIVU,    "!divu",    4|8, FALSE, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO4(DIVS,    "!divs",    4|8, FALSE, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(AND,     "!and",     4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO2(TEST,    "!test",    4|8, FALSE, NONE, SZ,   ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(OR,      "!or",      4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(XOR,     "!xor",     4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO2(LZCNT,   "!lzcnt",   4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
+	OPINFO2(BSWAP,   "!bswap",   4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
+	OPINFO3(SHL,     "!shl",     4|8, FALSE, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(SHR,     "!shr",     4|8, FALSE, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(SAR,     "!sar",     4|8, FALSE, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(ROL,     "!rol",     4|8, FALSE, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(ROLC,    "!rolc",    4|8, FALSE, C,    SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(ROR,     "!ror",     4|8, FALSE, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(RORC,    "!rorc",    4|8, FALSE, C,    SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 
 	/* Floating Point Operations */
-	OPINFO3(FLOAD,   "fload",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY))
-	OPINFO3(FSTORE,  "fstore",  4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, FRM))
-	OPINFO3(FREAD,   "fread",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, 4, IANY), PINFO(IN, OP, SPACE))
-	OPINFO3(FWRITE,  "fwrite",  4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, FANY), PINFO(IN, OP, SPACE))
-	OPINFO2(FMOV,    "fmov",    4|8, TRUE,  NONE, NONE, NONE, PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
-	OPINFO4(FTOINT,  "ftoint",  4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, P3, IRM), PINFO(IN, OP, FANY), PINFO(IN, OP, SIZE), PINFO(IN, OP, FMOD))
-	OPINFO3(FFRINT,  "ffrint",  4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, P3, IANY), PINFO(IN, OP, SIZE))
-	OPINFO3(FFRFLT,  "ffrflt",  4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, P3, FANY), PINFO(IN, OP, SIZE))
-	OPINFO2(FRNDS,   "frnds",     8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, P3, FANY))
-	OPINFO3(FADD,    "fadd",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
-	OPINFO3(FSUB,    "fsub",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
-	OPINFO2(FCMP,    "fcmp",    4|8, FALSE, NONE, UZC,  ALL,  PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
-	OPINFO3(FMUL,    "fmul",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
-	OPINFO3(FDIV,    "fdiv",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
-	OPINFO2(FNEG,    "fneg",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
-	OPINFO2(FABS,    "fabs",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
-	OPINFO2(FSQRT,   "fsqrt",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
-	OPINFO2(FRECIP,  "frecip",  4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
-	OPINFO2(FRSQRT,  "frsqrt",  4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
+	OPINFO3(FLOAD,   "f#load",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY))
+	OPINFO3(FSTORE,  "f#store",  4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, FRM))
+	OPINFO3(FREAD,   "f#read",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, 4, IANY), PINFO(IN, OP, SPACE))
+	OPINFO3(FWRITE,  "f#write",  4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, FANY), PINFO(IN, OP, SPACE))
+	OPINFO2(FMOV,    "f#mov",    4|8, TRUE,  NONE, NONE, NONE, PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
+	OPINFO4(FTOINT,  "f#toint",  4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, P3, IRM), PINFO(IN, OP, FANY), PINFO(IN, OP, SIZE), PINFO(IN, OP, FMOD))
+	OPINFO3(FFRINT,  "f#frint",  4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, P3, IANY), PINFO(IN, OP, SIZE))
+	OPINFO3(FFRFLT,  "f#frflt",  4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, P3, FANY), PINFO(IN, OP, SIZE))
+	OPINFO2(FRNDS,   "f#rnds",     8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, P3, FANY))
+	OPINFO3(FADD,    "f#add",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
+	OPINFO3(FSUB,    "f#sub",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
+	OPINFO2(FCMP,    "f#cmp",    4|8, FALSE, NONE, UZC,  ALL,  PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
+	OPINFO3(FMUL,    "f#mul",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
+	OPINFO3(FDIV,    "f#div",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
+	OPINFO2(FNEG,    "f#neg",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
+	OPINFO2(FABS,    "f#abs",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
+	OPINFO2(FSQRT,   "f#sqrt",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
+	OPINFO2(FRECIP,  "f#recip",  4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
+	OPINFO2(FRSQRT,  "f#rsqrt",  4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
 };
 
 
@@ -733,7 +732,7 @@ void drcuml_block_end(drcuml_block *block)
 		/* iterate over instructions and output */
 		for (instnum = 0; instnum < block->nextinst; instnum++)
 		{
-			char dasm[512];
+			char dasm[256];
 			drcuml_disasm(&block->inst[instnum], dasm);
 			drcuml_log_printf(drcuml, "%4d: %s\n", instnum, dasm);
 		}
@@ -928,6 +927,158 @@ void drcuml_add_comment(drcuml_block *block, const char *format, ...)
 
 	/* add an instruction with a pointer */
 	drcuml_block_append_1(block, DRCUML_OP_COMMENT, 4, DRCUML_COND_ALWAYS, 0, MEM(comment));
+}
+
+
+/*-------------------------------------------------
+    drcuml_disasm - disassemble an
+    instruction to the given buffer
+-------------------------------------------------*/
+
+void drcuml_disasm(const drcuml_instruction *inst, char *buffer)
+{
+	static const char *conditions[] = { "z", "nz", "s", "ns", "c", "nc", "v", "nv", "u", "nu", "a", "be", "g", "le", "l", "ge" };
+	static const char *pound_size[] = { "?", "?", "?", "?", "s", "?", "?", "?", "d" };
+	static const char *bang_size[] = { "?", "b", "h", "?", "", "?", "?", "?", "d" };
+	static const char *fmods[] = { "trunc", "round", "ceil", "floor", "default" };
+	static const char *sizes[] = { "byte", "word", "dword", "qword" };
+	const drcuml_opcode_info *opinfo = opcode_info_table[inst->opcode];
+	char *dest = buffer;
+	const char *opsrc;
+	int pnum;
+
+	assert(inst->opcode != DRCUML_OP_INVALID && inst->opcode < DRCUML_OP_MAX);
+	
+	/* start with the raw mnemonic and substitute sizes */
+	for (opsrc = opinfo->mnemonic; *opsrc != 0; opsrc++)
+		if (*opsrc == '!')
+			dest += sprintf(dest, "%s", bang_size[inst->size]);
+		else if (*opsrc == '#')
+			dest += sprintf(dest, "%s", pound_size[inst->size]);
+		else
+			*dest++ = *opsrc;
+	
+	/* pad to 8 spaces */
+	while (dest < &buffer[8])
+		*dest++ = ' ';
+	
+	/* iterate through parameters */
+	for (pnum = 0; pnum < inst->numparams; pnum++)
+	{
+		const drcuml_parameter *param = &inst->param[pnum];
+		UINT16 typemask = opinfo->param[pnum].typemask;
+
+		/* start with a comma for all except the first parameter */
+		if (pnum != 0)
+			*dest++ = ',';
+		
+		/* ouput based on type */
+		switch (param->type)
+		{
+			/* immediates have several special cases */
+			case DRCUML_PTYPE_IMMEDIATE:
+			
+				/* size immediate */
+				if (typemask == PTYPES_SIZE)
+					dest += sprintf(dest, "%s", sizes[param->value]);
+				
+				/* address space immediate */
+				else if (typemask == PTYPES_SPACE)
+					dest += sprintf(dest, "%s", address_space_names[param->value]);
+				
+				/* size + address space immediate */
+				else if (typemask == PTYPES_SPSZ)
+					dest += sprintf(dest, "%s_%s", address_space_names[param->value / 16], sizes[param->value % 16]);
+				
+				/* fmod immediate */
+				else if (typemask == PTYPES_FMOD)
+					dest += sprintf(dest, "%s", fmods[param->value]);
+				
+				/* general immediate */
+				else
+				{
+					int size = effective_psize(inst, opinfo, pnum);
+					UINT64 value = param->value;
+					
+					/* truncate to size */
+					if (size == 1) value = (UINT8)value;
+					if (size == 2) value = (UINT16)value;
+					if (size == 4) value = (UINT32)value;
+					if ((UINT32)value == value)
+						dest += sprintf(dest, "$%X", (UINT32)value);
+					else
+						dest += sprintf(dest, "$%X%08X", (UINT32)(value >> 32), (UINT32)value);
+				}
+				break;
+			
+			/* integer registers */
+			case DRCUML_PTYPE_INT_REGISTER:
+				if (param->value >= DRCUML_REG_I0 && param->value < DRCUML_REG_I_END)
+					dest += sprintf(dest, "i%d", (UINT32)(param->value - DRCUML_REG_I0));
+				else
+					dest += sprintf(dest, "i(%X?)", (UINT32)param->value);
+				break;
+
+			/* floating point registers */
+			case DRCUML_PTYPE_FLOAT_REGISTER:
+				if (param->value >= DRCUML_REG_F0 && param->value < DRCUML_REG_F_END)
+					dest += sprintf(dest, "f%d", (UINT32)(param->value - DRCUML_REG_F0));
+				else
+					dest += sprintf(dest, "f(%X?)", (UINT32)param->value);
+				break;
+
+			/* map variables */
+			case DRCUML_PTYPE_MAPVAR:
+				if (param->value >= DRCUML_MAPVAR_M0 && param->value < DRCUML_MAPVAR_END)
+					dest += sprintf(dest, "m%d", (UINT32)(param->value - DRCUML_MAPVAR_M0));
+				else
+					dest += sprintf(dest, "m(%X?)", (UINT32)param->value);
+				break;
+
+			/* memory */
+			case DRCUML_PTYPE_MEMORY:
+			
+				/* handle pointer */
+				if (typemask == PTYPES_HAND)
+					dest += sprintf(dest, "%s", drcuml_handle_name((const drcuml_codehandle *)(FPTR)param->value));
+				
+				/* string pointer */
+				else if (typemask == PTYPES_STR)
+					dest += sprintf(dest, "%s", (const char *)(FPTR)param->value);
+				
+				/* general memory */
+				else
+					dest += sprintf(dest, "[$%p]", (void *)(FPTR)param->value);
+				break;
+			
+			default:
+				dest += sprintf(dest, "???");
+				break;
+		}
+	}
+	
+	/* if there's a condition, append it */
+	if (inst->condition != DRCUML_COND_ALWAYS)
+		dest += sprintf(dest, ",%s", conditions[inst->condition & 0x0f]);
+	
+	/* if there are flags, append them */
+	if (inst->flags != 0)
+	{
+		*dest++ = ',';
+		if (inst->flags & DRCUML_FLAG_U)
+			*dest++ = 'U';
+		if (inst->flags & DRCUML_FLAG_S)
+			*dest++ = 'S';
+		if (inst->flags & DRCUML_FLAG_Z)
+			*dest++ = 'Z';
+		if (inst->flags & DRCUML_FLAG_V)
+			*dest++ = 'V';
+		if (inst->flags & DRCUML_FLAG_C)
+			*dest++ = 'C';
+	}
+	
+	/* ensure we are NULL-terminated */
+	*dest = 0;
 }
 
 
@@ -1429,7 +1580,7 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 	/* output the error if we have one */
 	if (errend != errorbuf)
 	{
-		char disasm[100];
+		char disasm[256];
 
 		/* disassemble the test instruction */
 		drcuml_disasm(testinst, disasm);

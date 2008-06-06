@@ -166,7 +166,6 @@
 ***************************************************************************/
 
 #include "drcuml.h"
-#include "drcumld.h"
 #include "drcbeut.h"
 #include "debugger.h"
 #include "x86emit.h"
@@ -912,7 +911,7 @@ static void drcbex64_generate(drcbe_state *drcbe, drcuml_block *block, const drc
 		/* add a comment */
 		if (drcbe->log != NULL)
 		{
-			char dasm[100];
+			char dasm[256];
 			drcuml_disasm(inst, dasm);
 			x86log_add_comment(drcbe->log, dst, "%s", dasm);
 		}

@@ -495,5 +495,8 @@ void drcuml_log_printf(drcuml_state *state, const char *format, ...) ATTR_PRINTF
 /* attach a comment to the current output location in the specified block */
 void drcuml_add_comment(drcuml_block *block, const char *format, ...) ATTR_PRINTF(2,3);
 
+/* disassemble a UML instruction to the given buffer */
+void drcuml_disasm(const drcuml_instruction *inst, char *buffer);
+
 
 #endif
