@@ -3517,21 +3517,21 @@ static x86code *op_getexp(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 
 static x86code *op_getflgs(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp;
+	drcuml_parameter dstp, maskp;
 	int dstreg;
 
 	/* validate instruction */
 	assert(inst->size == 4);
 	assert_no_condition(inst);
-	assert(inst->flags != 0);
+	assert_no_flags(inst);
 
 	/* normalize parameters */
-	param_normalize_1(drcbe, inst, &dstp, PTYPE_MR);
+	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &maskp, PTYPE_I);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
 
-	switch (inst->flags)
+	switch (maskp.value)
 	{
 		/* single flags only */
 		case DRCUML_FLAG_C:

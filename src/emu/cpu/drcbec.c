@@ -700,8 +700,7 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_GETFLGS, 4, 0):	/* GETFLGS dst[,f]                */
-			case MAKE_OPCODE_SHORT(DRCUML_OP_GETFLGS, 4, 1):	/* GETFLGS dst[,f]                */
-				PARAM0 = flags;
+				PARAM0 = flags & PARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_SAVE, 4, 0):		/* SAVE    dst                    */

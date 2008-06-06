@@ -61,42 +61,59 @@
 ***************************************************************************/
 
 /* opcode validation condition/flag valid bitmasks */
-#define OV_FLAGS_NONE		0x00
-#define OV_FLAGS_SZ			(DRCUML_FLAG_S | DRCUML_FLAG_Z)
-#define OV_FLAGS_SZC		(DRCUML_FLAG_S | DRCUML_FLAG_Z | DRCUML_FLAG_C)
-#define OV_FLAGS_SZV		(DRCUML_FLAG_S | DRCUML_FLAG_Z | DRCUML_FLAG_V)
-#define OV_FLAGS_SZVC		(DRCUML_FLAG_S | DRCUML_FLAG_Z | DRCUML_FLAG_V | DRCUML_FLAG_C)
-#define OV_FLAGS_UZC		(DRCUML_FLAG_U | DRCUML_FLAG_Z | DRCUML_FLAG_C)
-#define OV_FLAGS_FLAGS		0x1f
+#define OPFLAGS_NONE	0x00
+#define OPFLAGS_C		DRCUML_FLAG_C
+#define OPFLAGS_SZ		(DRCUML_FLAG_S | DRCUML_FLAG_Z)
+#define OPFLAGS_SZC		(DRCUML_FLAG_S | DRCUML_FLAG_Z | DRCUML_FLAG_C)
+#define OPFLAGS_SZV		(DRCUML_FLAG_S | DRCUML_FLAG_Z | DRCUML_FLAG_V)
+#define OPFLAGS_SZVC	(DRCUML_FLAG_S | DRCUML_FLAG_Z | DRCUML_FLAG_V | DRCUML_FLAG_C)
+#define OPFLAGS_UZC		(DRCUML_FLAG_U | DRCUML_FLAG_Z | DRCUML_FLAG_C)
+#define OPFLAGS_ALL		0x1f
+#define OPFLAGS_P1		0x81
+#define OPFLAGS_P2		0x82
+#define OPFLAGS_P3		0x83
+#define OPFLAGS_P4		0x84
 
-/* bitmasks of valid parameter types and flags */
-#define OV_PARAM_ALLOWED_NONE	(1 << DRCUML_PTYPE_NONE)
-#define OV_PARAM_ALLOWED_IMM	(1 << DRCUML_PTYPE_IMMEDIATE)
-#define OV_PARAM_ALLOWED_IREG	(1 << DRCUML_PTYPE_INT_REGISTER)
-#define OV_PARAM_ALLOWED_FREG	(1 << DRCUML_PTYPE_FLOAT_REGISTER)
-#define OV_PARAM_ALLOWED_MVAR	(1 << DRCUML_PTYPE_MAPVAR)
-#define OV_PARAM_ALLOWED_MEM	(1 << DRCUML_PTYPE_MEMORY)
-#define OV_PARAM_FLAG_ANYMEM	0x100
-#define OV_PARAM_FLAG_FIXED4	0x200
-#define OV_PARAM_FLAG_FIXED8	0x400
+/* parameter input/output states */
+#define PIO_IN			0x01
+#define PIO_OUT			0x02
+#define PIO_INOUT		(PIO_IN | PIO_OUT)
 
-/* opcode validation parameter valid bitmasks */
-#define OV_PARAM_ALLOWED_ANYMEM	(OV_PARAM_ALLOWED_MEM | OV_PARAM_FLAG_ANYMEM)
-#define OV_PARAM_ALLOWED_IMV	(OV_PARAM_ALLOWED_IMM | OV_PARAM_ALLOWED_MVAR)
-#define OV_PARAM_ALLOWED_IMV4	(OV_PARAM_ALLOWED_IMM | OV_PARAM_ALLOWED_MVAR | OV_PARAM_FLAG_FIXED4)
-#define OV_PARAM_ALLOWED_IMV8	(OV_PARAM_ALLOWED_IMM | OV_PARAM_ALLOWED_MVAR | OV_PARAM_FLAG_FIXED8)
-#define OV_PARAM_ALLOWED_IRM	(OV_PARAM_ALLOWED_IREG | OV_PARAM_ALLOWED_MEM)
-#define OV_PARAM_ALLOWED_IRM4	(OV_PARAM_ALLOWED_IREG | OV_PARAM_ALLOWED_MEM | OV_PARAM_FLAG_FIXED4)
-#define OV_PARAM_ALLOWED_IRM8	(OV_PARAM_ALLOWED_IREG | OV_PARAM_ALLOWED_MEM | OV_PARAM_FLAG_FIXED8)
-#define OV_PARAM_ALLOWED_FRM	(OV_PARAM_ALLOWED_FREG | OV_PARAM_ALLOWED_MEM)
-#define OV_PARAM_ALLOWED_FRM4	(OV_PARAM_ALLOWED_FREG | OV_PARAM_ALLOWED_MEM | OV_PARAM_FLAG_FIXED4)
-#define OV_PARAM_ALLOWED_FRM8	(OV_PARAM_ALLOWED_FREG | OV_PARAM_ALLOWED_MEM | OV_PARAM_FLAG_FIXED8)
-#define OV_PARAM_ALLOWED_IANY	(OV_PARAM_ALLOWED_IRM | OV_PARAM_ALLOWED_IMV)
-#define OV_PARAM_ALLOWED_IANY4	(OV_PARAM_ALLOWED_IRM | OV_PARAM_ALLOWED_IMV | OV_PARAM_FLAG_FIXED4)
-#define OV_PARAM_ALLOWED_IANY8	(OV_PARAM_ALLOWED_IRM | OV_PARAM_ALLOWED_IMV | OV_PARAM_FLAG_FIXED8)
-#define OV_PARAM_ALLOWED_FANY	(OV_PARAM_ALLOWED_FRM)
-#define OV_PARAM_ALLOWED_FANY4	(OV_PARAM_ALLOWED_FRM | OV_PARAM_FLAG_FIXED4)
-#define OV_PARAM_ALLOWED_FANY8	(OV_PARAM_ALLOWED_FRM | OV_PARAM_FLAG_FIXED8)
+/* parameter sizes */
+#define PSIZE_4			DRCUML_SIZE_DWORD
+#define PSIZE_8			DRCUML_SIZE_QWORD
+#define PSIZE_OP		0x80
+#define PSIZE_P1		0x81
+#define PSIZE_P2		0x82
+#define PSIZE_P3		0x83
+#define PSIZE_P4		0x84
+
+/* basic parameter types */
+#define PTYPES_NONE		0
+#define PTYPES_IMM		(1 << DRCUML_PTYPE_IMMEDIATE)
+#define PTYPES_IREG		(1 << DRCUML_PTYPE_INT_REGISTER)
+#define PTYPES_FREG		(1 << DRCUML_PTYPE_FLOAT_REGISTER)
+#define PTYPES_MVAR		(1 << DRCUML_PTYPE_MAPVAR)
+#define PTYPES_MEM		(1 << DRCUML_PTYPE_MEMORY)
+
+/* special parameter types */
+#define PTYPES_PTR		(PTYPES_MEM | 0x1000)
+#define PTYPES_STATE	(PTYPES_MEM | 0x2000)
+#define PTYPES_STR		(PTYPES_MEM | 0x3000)
+#define PTYPES_CFUNC	(PTYPES_MEM | 0x4000)
+#define PTYPES_HAND		(PTYPES_MEM | 0x5000)
+#define PTYPES_SIZE		(PTYPES_IMM | 0x8000)
+#define PTYPES_SPACE	(PTYPES_IMM | 0x9000)
+#define PTYPES_SPSZ		(PTYPES_IMM | 0xa000)
+#define PTYPES_FMOD		(PTYPES_IMM | 0xb000)
+#define PTYPES_LAB		(PTYPES_IMM | 0xc000)
+
+/* combinations of types */
+#define PTYPES_IRM		(PTYPES_IREG | PTYPES_MEM)
+#define PTYPES_FRM		(PTYPES_FREG | PTYPES_MEM)
+#define PTYPES_IMV		(PTYPES_IMM | PTYPES_MVAR)
+#define PTYPES_IANY		(PTYPES_IRM | PTYPES_IMV)
+#define PTYPES_FANY		(PTYPES_FRM)
 
 
 
@@ -139,18 +156,6 @@ struct _drcuml_codehandle
 };
 
 
-/* structure describing an opcode for validation */
-typedef struct _drcuml_opcode_valid drcuml_opcode_valid;
-struct _drcuml_opcode_valid
-{
-	drcuml_opcode			opcode;				/* the opcode itself */
-	UINT8					sizes;				/* allowed sizes */
-	UINT8					condition;			/* conditions? */
-	UINT8					flags;				/* allowed flags */
-	UINT16					ptypes[4];			/* allowed types for parameters */
-};
-
-
 /* structure describing back-end validation test */
 typedef struct _bevalidate_test bevalidate_test;
 struct _bevalidate_test
@@ -170,99 +175,99 @@ struct _bevalidate_test
 ***************************************************************************/
 
 /* macro to simplify the table */
-#define OPVALID_ENTRY_0(op,sizes,cond,flag)				{ DRCUML_OP_##op, sizes, cond, OV_FLAGS_##flag, { OV_PARAM_ALLOWED_NONE, OV_PARAM_ALLOWED_NONE, OV_PARAM_ALLOWED_NONE, OV_PARAM_ALLOWED_NONE } },
-#define OPVALID_ENTRY_1(op,sizes,cond,flag,p0)			{ DRCUML_OP_##op, sizes, cond, OV_FLAGS_##flag, { OV_PARAM_ALLOWED_##p0, OV_PARAM_ALLOWED_NONE, OV_PARAM_ALLOWED_NONE, OV_PARAM_ALLOWED_NONE } },
-#define OPVALID_ENTRY_2(op,sizes,cond,flag,p0,p1)		{ DRCUML_OP_##op, sizes, cond, OV_FLAGS_##flag, { OV_PARAM_ALLOWED_##p0, OV_PARAM_ALLOWED_##p1, OV_PARAM_ALLOWED_NONE, OV_PARAM_ALLOWED_NONE } },
-#define OPVALID_ENTRY_3(op,sizes,cond,flag,p0,p1,p2)	{ DRCUML_OP_##op, sizes, cond, OV_FLAGS_##flag, { OV_PARAM_ALLOWED_##p0, OV_PARAM_ALLOWED_##p1, OV_PARAM_ALLOWED_##p2, OV_PARAM_ALLOWED_NONE } },
-#define OPVALID_ENTRY_4(op,sizes,cond,flag,p0,p1,p2,p3)	{ DRCUML_OP_##op, sizes, cond, OV_FLAGS_##flag, { OV_PARAM_ALLOWED_##p0, OV_PARAM_ALLOWED_##p1, OV_PARAM_ALLOWED_##p2, OV_PARAM_ALLOWED_##p3 } },
+#define PINFO(inout, size, types)									{ PIO_##inout, PSIZE_##size, PTYPES_##types }
+#define OPINFO0(op,str,sizes,cond,iflag,oflag,mflag)				{ DRCUML_OP_##op, str, sizes, cond, OPFLAGS_##iflag, OPFLAGS_##oflag, OPFLAGS_##mflag, { { 0 } } },
+#define OPINFO1(op,str,sizes,cond,iflag,oflag,mflag,p0)				{ DRCUML_OP_##op, str, sizes, cond, OPFLAGS_##iflag, OPFLAGS_##oflag, OPFLAGS_##mflag, { p0 } },
+#define OPINFO2(op,str,sizes,cond,iflag,oflag,mflag,p0,p1)			{ DRCUML_OP_##op, str, sizes, cond, OPFLAGS_##iflag, OPFLAGS_##oflag, OPFLAGS_##mflag, { p0, p1 } },
+#define OPINFO3(op,str,sizes,cond,iflag,oflag,mflag,p0,p1,p2)		{ DRCUML_OP_##op, str, sizes, cond, OPFLAGS_##iflag, OPFLAGS_##oflag, OPFLAGS_##mflag, { p0, p1, p2 } },
+#define OPINFO4(op,str,sizes,cond,iflag,oflag,mflag,p0,p1,p2,p3)	{ DRCUML_OP_##op, str, sizes, cond, OPFLAGS_##iflag, OPFLAGS_##oflag, OPFLAGS_##mflag, { p0, p1, p2, p3 } },
 
 /* opcode validation table */
-static const drcuml_opcode_valid opcode_valid_list[] =
+static const drcuml_opcode_info opcode_info_source[] =
 {
 	/* Compile-time opcodes */
-	OPVALID_ENTRY_1(HANDLE,  4,   FALSE, NONE,  MEM)
-	OPVALID_ENTRY_2(HASH,    4,   FALSE, NONE,  IMV,  IMV)
-	OPVALID_ENTRY_1(LABEL,   4,   FALSE, NONE,  IMV)
-	OPVALID_ENTRY_1(COMMENT, 4,   FALSE, NONE,  ANYMEM)
-	OPVALID_ENTRY_2(MAPVAR,  4,   FALSE, NONE,  MVAR, IMV)
+	OPINFO1(HANDLE,  "handle",  4,   FALSE, NONE, NONE, NONE, PINFO(IN, OP, HAND))
+	OPINFO2(HASH,    "hash",    4,   FALSE, NONE, NONE, NONE, PINFO(IN, OP, IMV), PINFO(IN, OP, IMV))
+	OPINFO1(LABEL,   "label",   4,   FALSE, NONE, NONE, NONE, PINFO(IN, OP, LAB))
+	OPINFO1(COMMENT, "comment", 4,   FALSE, NONE, NONE, NONE, PINFO(IN, OP, STR))
+	OPINFO2(MAPVAR,  "mapvar",  4,   FALSE, NONE, NONE, NONE, PINFO(OUT, OP, MVAR), PINFO(IN, OP, IMV))
 
 	/* Control Flow Operations */
-	OPVALID_ENTRY_1(DEBUG,   4,   FALSE, NONE,  IANY)
-	OPVALID_ENTRY_1(EXIT,    4,   TRUE,  NONE,  IANY)
-	OPVALID_ENTRY_3(HASHJMP, 4,   FALSE, NONE,  IANY, IANY, MEM)
-	OPVALID_ENTRY_1(LABEL,   4,   FALSE, NONE,  IMV)
-	OPVALID_ENTRY_1(JMP,     4,   TRUE,  NONE,  IMV)
-	OPVALID_ENTRY_2(EXH,     4,   TRUE,  NONE,  MEM,  IANY)
-	OPVALID_ENTRY_1(CALLH,   4,   TRUE,  NONE,  MEM)
-	OPVALID_ENTRY_0(RET,     4,   TRUE,  NONE)
-	OPVALID_ENTRY_2(CALLC,   4,   TRUE,  NONE,  ANYMEM,ANYMEM)
-	OPVALID_ENTRY_2(RECOVER, 4,   FALSE, NONE,  IRM,  MVAR)
+	OPINFO1(DEBUG,   "debug",   4,   FALSE, NONE, NONE, ALL,  PINFO(IN, OP, IANY))
+	OPINFO1(EXIT,    "exit",    4,   TRUE,  NONE, NONE, ALL,  PINFO(IN, OP, IANY))
+	OPINFO3(HASHJMP, "hashjmp", 4,   FALSE, NONE, NONE, ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, HAND))
+	OPINFO1(JMP,     "jmp",     4,   TRUE,  NONE, NONE, NONE, PINFO(IN, OP, LAB))
+	OPINFO2(EXH,     "exh",     4,   TRUE,  NONE, NONE, ALL,  PINFO(IN, OP, HAND), PINFO(IN, OP, IANY))
+	OPINFO1(CALLH,   "callh",   4,   TRUE,  NONE, NONE, ALL,  PINFO(IN, OP, HAND))
+	OPINFO0(RET,     "ret",     4,   TRUE,  NONE, NONE, ALL)
+	OPINFO2(CALLC,   "callc",   4,   TRUE,  NONE, NONE, ALL,  PINFO(IN, OP, CFUNC), PINFO(IN, OP, PTR))
+	OPINFO2(RECOVER, "recover", 4,   FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, MVAR))
 
 	/* Internal Register Operations */
-	OPVALID_ENTRY_1(SETFMOD, 4,   FALSE, NONE,  IANY)
-	OPVALID_ENTRY_1(GETFMOD, 4,   FALSE, NONE,  IRM)
-	OPVALID_ENTRY_1(GETEXP,  4,   FALSE, NONE,  IRM)
-	OPVALID_ENTRY_1(GETFLGS, 4,   FALSE, NONE,  IRM)
-	OPVALID_ENTRY_1(SAVE,    4,   FALSE, NONE,  ANYMEM)
-	OPVALID_ENTRY_1(RESTORE, 4,   FALSE, NONE,  ANYMEM)
+	OPINFO1(SETFMOD, "setfmod", 4,   FALSE, NONE, NONE, ALL,  PINFO(IN, OP, IANY))
+	OPINFO1(GETFMOD, "getfmod", 4,   FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM))
+	OPINFO1(GETEXP,  "getexp",  4,   FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM))
+	OPINFO2(GETFLGS, "getflgs", 4,   FALSE, P2,   NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IMV))
+	OPINFO1(SAVE,    "save",    4,   FALSE, ALL,  NONE, ALL,  PINFO(OUT, OP, STATE))
+	OPINFO1(RESTORE, "restore", 4,   FALSE, NONE, ALL,  ALL,  PINFO(IN, OP, STATE))
 
 	/* Integer Operations */
-	OPVALID_ENTRY_4(LOAD,    4|8, FALSE, NONE,  IRM,   ANYMEM,IANY4, IMV)
-	OPVALID_ENTRY_4(LOADS,   4|8, FALSE, NONE,  IRM,   ANYMEM,IANY4, IMV)
-	OPVALID_ENTRY_4(STORE,   4|8, FALSE, NONE,  ANYMEM,IANY4, IANY,  IMV)
-	OPVALID_ENTRY_3(READ,    4|8, FALSE, NONE,  IRM,   IANY4, IMV)
-	OPVALID_ENTRY_4(READM,   4|8, FALSE, NONE,  IRM,   IANY4, IANY,  IMV)
-	OPVALID_ENTRY_3(WRITE,   4|8, FALSE, NONE,  IANY4, IANY,  IMV)
-	OPVALID_ENTRY_4(WRITEM,  4|8, FALSE, NONE,  IANY4, IANY,  IANY,  IMV)
-	OPVALID_ENTRY_2(CARRY,   4|8, FALSE, NONE,  IANY,  IANY)
-	OPVALID_ENTRY_2(MOV,     4|8, TRUE,  NONE,  IRM,   IANY)
-	OPVALID_ENTRY_1(SET,     4|8, TRUE,  NONE,  IRM)
-	OPVALID_ENTRY_3(SEXT,    4|8, FALSE, SZ,    IRM,   IANY4, IMV)
-	OPVALID_ENTRY_4(ROLAND,  4|8, FALSE, SZ,    IRM,   IANY,  IANY,  IANY)
-	OPVALID_ENTRY_4(ROLINS,  4|8, FALSE, SZ,    IRM,   IANY,  IANY,  IANY)
-	OPVALID_ENTRY_3(ADD,     4|8, FALSE, SZVC,  IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(ADDC,    4|8, FALSE, SZVC,  IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(SUB,     4|8, FALSE, SZVC,  IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(SUBB,    4|8, FALSE, SZVC,  IRM,   IANY,  IANY)
-	OPVALID_ENTRY_2(CMP,     4|8, FALSE, SZVC,  IANY,  IANY)
-	OPVALID_ENTRY_4(MULU,    4|8, FALSE, SZV,   IRM,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_4(MULS,    4|8, FALSE, SZV,   IRM,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_4(DIVU,    4|8, FALSE, SZ,    IRM,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_4(DIVS,    4|8, FALSE, SZ,    IRM,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(AND,     4|8, FALSE, SZ,    IRM,   IANY,  IANY)
-	OPVALID_ENTRY_2(TEST,    4|8, FALSE, SZ,    IANY,  IANY)
-	OPVALID_ENTRY_3(OR,      4|8, FALSE, SZ,    IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(XOR,     4|8, FALSE, SZ,    IRM,   IANY,  IANY)
-	OPVALID_ENTRY_2(LZCNT,   4|8, FALSE, SZ,    IRM,   IANY)
-	OPVALID_ENTRY_2(BSWAP,   4|8, FALSE, SZ,    IRM,   IANY)
-	OPVALID_ENTRY_3(SHL,     4|8, FALSE, SZC,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(SHR,     4|8, FALSE, SZC,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(SAR,     4|8, FALSE, SZC,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(ROL,     4|8, FALSE, SZC,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(ROLC,    4|8, FALSE, SZC,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(ROR,     4|8, FALSE, SZC,   IRM,   IANY,  IANY)
-	OPVALID_ENTRY_3(RORC,    4|8, FALSE, SZC,   IRM,   IANY,  IANY)
+	OPINFO4(LOAD,    "load",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, SIZE))
+	OPINFO4(LOADS,   "loads",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, SIZE))
+	OPINFO4(STORE,   "store",   4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, IRM), PINFO(IN, OP, SIZE))
+	OPINFO3(READ,    "read",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, 4, IANY), PINFO(IN, OP, SPSZ))
+	OPINFO4(READM,   "readm",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSZ))
+	OPINFO3(WRITE,   "write",   4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSZ))
+	OPINFO4(WRITEM,  "writem",  4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSZ))
+	OPINFO2(CARRY,   "carry",   4|8, FALSE, C,    C,    ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO2(MOV,     "mov",     4|8, TRUE,  NONE, NONE, NONE, PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
+	OPINFO1(SET,     "set",     4|8, TRUE,  NONE, NONE, ALL,  PINFO(OUT, OP, IRM))
+	OPINFO3(SEXT,    "sext",    4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, P3, IANY), PINFO(IN, OP, SIZE))
+	OPINFO4(ROLAND,  "roland",  4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO4(ROLINS,  "rolins",  4|8, FALSE, NONE, SZ,   ALL,  PINFO(INOUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(ADD,     "add",     4|8, FALSE, NONE, SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(ADDC,    "addc",    4|8, FALSE, C,    SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(SUB,     "sub",     4|8, FALSE, NONE, SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(SUBB,    "subb",    4|8, FALSE, C,    SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO2(CMP,     "cmp",     4|8, FALSE, NONE, SZVC, ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO4(MULU,    "mulu",    4|8, FALSE, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO4(MULS,    "muls",    4|8, FALSE, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO4(DIVU,    "divu",    4|8, FALSE, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO4(DIVS,    "divs",    4|8, FALSE, NONE, SZV,  ALL,  PINFO(OUT, OP, IRM), PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(AND,     "and",     4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO2(TEST,    "test",    4|8, FALSE, NONE, SZ,   ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(OR,      "or",      4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(XOR,     "xor",     4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO2(LZCNT,   "lzcnt",   4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
+	OPINFO2(BSWAP,   "bswap",   4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
+	OPINFO3(SHL,     "shl",     4|8, FALSE, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(SHR,     "shr",     4|8, FALSE, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(SAR,     "sar",     4|8, FALSE, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(ROL,     "rol",     4|8, FALSE, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(ROLC,    "rolc",    4|8, FALSE, C,    SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(ROR,     "ror",     4|8, FALSE, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO3(RORC,    "rorc",    4|8, FALSE, C,    SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 
 	/* Floating Point Operations */
-	OPVALID_ENTRY_3(FLOAD,   4|8, FALSE, NONE,  FRM,   ANYMEM,IANY4)
-	OPVALID_ENTRY_3(FSTORE,  4|8, FALSE, NONE,  ANYMEM,IANY4, FANY)
-	OPVALID_ENTRY_3(FREAD,   4|8, FALSE, NONE,  FRM,   IANY4, IMV4)
-	OPVALID_ENTRY_3(FWRITE,  4|8, FALSE, NONE,  IANY4, FANY,  IMV4)
-	OPVALID_ENTRY_2(FMOV,    4|8, TRUE,  NONE,  FRM,   FANY)
-	OPVALID_ENTRY_4(FTOINT,  4|8, FALSE, NONE,  IRM,   FANY,  IMM,  IMM)
-	OPVALID_ENTRY_3(FFRINT,  4|8, FALSE, NONE,  FRM,   IANY,  IMM)
-	OPVALID_ENTRY_3(FFRFLT,  4|8, FALSE, NONE,  FRM,   FANY,  IMM)
-	OPVALID_ENTRY_2(FRNDS,     8, FALSE, NONE,  FRM,   FANY)
-	OPVALID_ENTRY_3(FADD,    4|8, FALSE, NONE,  FRM,   FANY,  FANY)
-	OPVALID_ENTRY_3(FSUB,    4|8, FALSE, NONE,  FRM,   FANY,  FANY)
-	OPVALID_ENTRY_2(FCMP,    4|8, FALSE, UZC,   FANY,  FANY)
-	OPVALID_ENTRY_3(FMUL,    4|8, FALSE, NONE,  FRM,   FANY,  FANY)
-	OPVALID_ENTRY_3(FDIV,    4|8, FALSE, NONE,  FRM,   FANY,  FANY)
-	OPVALID_ENTRY_2(FNEG,    4|8, FALSE, NONE,  FRM,   FANY)
-	OPVALID_ENTRY_2(FABS,    4|8, FALSE, NONE,  FRM,   FANY)
-	OPVALID_ENTRY_2(FSQRT,   4|8, FALSE, NONE,  FRM,   FANY)
-	OPVALID_ENTRY_2(FRECIP,  4|8, FALSE, NONE,  FRM,   FANY)
-	OPVALID_ENTRY_2(FRSQRT,  4|8, FALSE, NONE,  FRM,   FANY)
+	OPINFO3(FLOAD,   "fload",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY))
+	OPINFO3(FSTORE,  "fstore",  4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, FRM))
+	OPINFO3(FREAD,   "fread",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, 4, IANY), PINFO(IN, OP, SPACE))
+	OPINFO3(FWRITE,  "fwrite",  4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, FANY), PINFO(IN, OP, SPACE))
+	OPINFO2(FMOV,    "fmov",    4|8, TRUE,  NONE, NONE, NONE, PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
+	OPINFO4(FTOINT,  "ftoint",  4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, P3, IRM), PINFO(IN, OP, FANY), PINFO(IN, OP, SIZE), PINFO(IN, OP, FMOD))
+	OPINFO3(FFRINT,  "ffrint",  4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, P3, IANY), PINFO(IN, OP, SIZE))
+	OPINFO3(FFRFLT,  "ffrflt",  4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, P3, FANY), PINFO(IN, OP, SIZE))
+	OPINFO2(FRNDS,   "frnds",     8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, P3, FANY))
+	OPINFO3(FADD,    "fadd",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
+	OPINFO3(FSUB,    "fsub",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
+	OPINFO2(FCMP,    "fcmp",    4|8, FALSE, NONE, UZC,  ALL,  PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
+	OPINFO3(FMUL,    "fmul",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
+	OPINFO3(FDIV,    "fdiv",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY), PINFO(IN, OP, FANY))
+	OPINFO2(FNEG,    "fneg",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
+	OPINFO2(FABS,    "fabs",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
+	OPINFO2(FSQRT,   "fsqrt",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
+	OPINFO2(FRECIP,  "frecip",  4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
+	OPINFO2(FRSQRT,  "frsqrt",  4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
 };
 
 
@@ -282,7 +287,7 @@ extern const drcbe_interface NATIVE_DRC;
 #endif
 
 /* table that is built up on first alloc which looks up via opcode */
-static drcuml_opcode_valid opcode_valid_table[DRCUML_OP_MAX];
+static const drcuml_opcode_info *opcode_info_table[DRCUML_OP_MAX];
 
 
 
@@ -291,6 +296,8 @@ static drcuml_opcode_valid opcode_valid_table[DRCUML_OP_MAX];
 ***************************************************************************/
 
 static void validate_instruction(drcuml_block *block, const drcuml_instruction *inst);
+
+#if 0
 static void validate_backend(drcuml_state *drcuml);
 static void bevalidate_iterate_over_params(drcuml_state *drcuml, drcuml_codehandle **handles, const bevalidate_test *test, drcuml_parameter *paramlist, int pnum);
 static void bevalidate_iterate_over_flags(drcuml_state *drcuml, drcuml_codehandle **handles, const bevalidate_test *test, drcuml_parameter *paramlist);
@@ -298,6 +305,7 @@ static void bevalidate_execute(drcuml_state *drcuml, drcuml_codehandle **handles
 static void bevalidate_initialize_random_state(drcuml_block *block, drcuml_machine_state *state);
 static int bevalidate_populate_state(drcuml_block *block, drcuml_machine_state *state, const bevalidate_test *test, const drcuml_parameter *paramlist, drcuml_parameter *params, UINT64 *parammem);
 static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_state *istate, drcuml_machine_state *state, const bevalidate_test *test, const drcuml_parameter *params, const drcuml_instruction *testinst, drccodeptr codestart, drccodeptr codeend, UINT8 flagmask);
+#endif
 
 
 
@@ -306,36 +314,75 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 ***************************************************************************/
 
 /*-------------------------------------------------
-    size_for_param - given a set of parameter
-    flags and the instruction size, return the
-    size of the parameter
+    effective_inflags - return the effective
+    input flags based on any conditions encoded
+    in an instruction
 -------------------------------------------------*/
 
-INLINE int size_for_param(int instsize, UINT16 flags)
+INLINE UINT8 effective_inflags(const drcuml_instruction *inst, const drcuml_opcode_info *opinfo)
 {
-	if (flags & OV_PARAM_FLAG_FIXED4)
-		return 4;
-	else if (flags & OV_PARAM_FLAG_FIXED8)
-		return 8;
-	else
-		return instsize;
+	static const UINT8 flags_for_condition[] =
+	{
+		/* DRCUML_COND_Z */		DRCUML_FLAG_Z,
+		/* DRCUML_COND_NZ */	DRCUML_FLAG_Z,
+		/* DRCUML_COND_S */		DRCUML_FLAG_S,
+		/* DRCUML_COND_NS */	DRCUML_FLAG_S,
+		/* DRCUML_COND_C */		DRCUML_FLAG_C,
+		/* DRCUML_COND_NC */	DRCUML_FLAG_C,
+		/* DRCUML_COND_V */		DRCUML_FLAG_V,
+		/* DRCUML_COND_NV */	DRCUML_FLAG_V,
+		/* DRCUML_COND_U */		DRCUML_FLAG_U,
+		/* DRCUML_COND_NU */	DRCUML_FLAG_U,
+		/* DRCUML_COND_A */		DRCUML_FLAG_C | DRCUML_FLAG_Z,
+		/* DRCUML_COND_BE */	DRCUML_FLAG_C | DRCUML_FLAG_Z,
+		/* DRCUML_COND_G */		DRCUML_FLAG_S | DRCUML_FLAG_V | DRCUML_FLAG_Z,
+		/* DRCUML_COND_LE */	DRCUML_FLAG_S | DRCUML_FLAG_V | DRCUML_FLAG_Z,
+		/* DRCUML_COND_L */		DRCUML_FLAG_S | DRCUML_FLAG_V,
+		/* DRCUML_COND_GE */	DRCUML_FLAG_S | DRCUML_FLAG_V
+	};
+	UINT8 flags = opinfo->inflags;
+	if (flags & 0x80)
+		flags = inst->param[flags - OPFLAGS_P1].value & OPFLAGS_ALL;
+	if (inst->condition != DRCUML_COND_ALWAYS)
+		flags |= flags_for_condition[inst->condition & 0x0f];
+	return flags;
 }
 
 
 /*-------------------------------------------------
-    mask_for_param - given a set of parameter
-    flags and the instruction size, return a
-    mask of valid bits for that parameter
+    effective_outflags - return the effective
+    output flags based on any conditions encoded
+    in an instruction
 -------------------------------------------------*/
 
-INLINE UINT64 mask_for_param(int instsize, UINT16 flags)
+INLINE UINT8 effective_outflags(const drcuml_instruction *inst, const drcuml_opcode_info *opinfo)
 {
-	switch (size_for_param(instsize, flags))
+	UINT8 flags = opinfo->outflags;
+	if (flags & 0x80)
+		flags = inst->param[flags - OPFLAGS_P1].value & OPFLAGS_ALL;
+	return flags;
+}
+
+
+/*-------------------------------------------------
+    effective_psize - return the effective
+    parameter size based on the instruction and
+    parameters passed
+-------------------------------------------------*/
+
+INLINE UINT8 effective_psize(const drcuml_instruction *inst, const drcuml_opcode_info *opinfo, int pnum)
+{
+	switch (opinfo->param[pnum].size)
 	{
-		case 4:		return U64(0x00000000ffffffff);
-		case 8:		return U64(0xffffffffffffffff);
+		case PSIZE_4:	return 4;
+		case PSIZE_8:	return 8;
+		case PSIZE_OP:	return inst->size;
+		case PSIZE_P1:	assert(inst->param[0].type == DRCUML_PTYPE_IMMEDIATE); return 1 << (inst->param[0].value & 3);
+		case PSIZE_P2:	assert(inst->param[1].type == DRCUML_PTYPE_IMMEDIATE); return 1 << (inst->param[1].value & 3);
+		case PSIZE_P3:	assert(inst->param[2].type == DRCUML_PTYPE_IMMEDIATE); return 1 << (inst->param[2].value & 3);
+		case PSIZE_P4:	assert(inst->param[3].type == DRCUML_PTYPE_IMMEDIATE); return 1 << (inst->param[3].value & 3);
 	}
-	return 0;
+	return inst->size;
 }
 
 
@@ -377,8 +424,8 @@ drcuml_state *drcuml_alloc(drccache *cache, UINT32 flags, int modes, int addrbit
 	}
 
 	/* update the valid opcode table */
-	for (opnum = 0; opnum < ARRAY_LENGTH(opcode_valid_list); opnum++)
-		opcode_valid_table[opcode_valid_list[opnum].opcode] = opcode_valid_list[opnum];
+	for (opnum = 0; opnum < ARRAY_LENGTH(opcode_info_source); opnum++)
+		opcode_info_table[opcode_info_source[opnum].opcode] = &opcode_info_source[opnum];
 
 	return drcuml;
 }
@@ -420,7 +467,7 @@ void drcuml_reset(drcuml_state *drcuml)
 	(*drcuml->beintf->be_reset)(drcuml->bestate);
 
 	/* do a one-time validation if requested */
-	if (VALIDATE_BACKEND)
+/*	if (VALIDATE_BACKEND)
 	{
 		static int validated = FALSE;
 		if (!validated)
@@ -428,7 +475,7 @@ void drcuml_reset(drcuml_state *drcuml)
 			validated = TRUE;
 			validate_backend(drcuml);
 		}
-	}
+	}*/
 }
 
 
@@ -896,43 +943,56 @@ void drcuml_add_comment(drcuml_block *block, const char *format, ...)
 
 static void validate_instruction(drcuml_block *block, const drcuml_instruction *inst)
 {
-	const drcuml_opcode_valid *opvalid = &opcode_valid_table[inst->opcode];
+	const drcuml_opcode_info *opinfo = opcode_info_table[inst->opcode];
+	int pnum;
 
-	/* validate information */
+	/* validate raw information */
 	assert(inst->opcode != DRCUML_OP_INVALID && inst->opcode < DRCUML_OP_MAX);
 	assert(inst->size == 1 || inst->size == 2 || inst->size == 4 || inst->size == 8);
-	assert((opvalid->sizes & inst->size) != 0);
-	if (inst->numparams > 0)
+	
+	/* validate against opcode limits */
+	assert((opinfo->sizes & inst->size) != 0);
+	assert(inst->condition == DRCUML_COND_ALWAYS || opinfo->condition);
+	
+	/* validate each parameter */
+	for (pnum = 0; pnum < inst->numparams; pnum++)
 	{
-		assert(inst->param[0].type > DRCUML_PTYPE_NONE && inst->param[0].type < DRCUML_PTYPE_MAX);
-		assert(((opvalid->ptypes[0] >> inst->param[0].type) & 1) != 0);
-		if (inst->param[0].type == DRCUML_PTYPE_MEMORY && !(opvalid->ptypes[0] & OV_PARAM_FLAG_ANYMEM))
-			assert_in_near_cache(block->drcuml->cache, (void *)(FPTR)inst->param[0].value);
+		const drcuml_parameter *param = &inst->param[pnum];
+		UINT16 typemask = opinfo->param[pnum].typemask;
+		
+		/* ensure the type is correct */
+		assert(param->type > DRCUML_PTYPE_NONE && param->type < DRCUML_PTYPE_MAX);
+		assert((typemask >> param->type) & 1);
+		
+		/* most memory parameters must be in the near cache */
+		if (param->type == DRCUML_PTYPE_MEMORY && typemask != PTYPES_PTR && typemask != PTYPES_STATE && typemask != PTYPES_STR && typemask != PTYPES_CFUNC)
+			assert_in_near_cache(block->drcuml->cache, (void *)(FPTR)param->value);
+		
+		/* validate immediate parameters */
+		if (param->type == DRCUML_PTYPE_IMMEDIATE)
+		{
+			if (typemask == PTYPES_SIZE)
+				assert(param->value >= DRCUML_SIZE_BYTE && param->value <= DRCUML_SIZE_QWORD);
+			else if (typemask == PTYPES_SPACE)
+				assert(param->value >= ADDRESS_SPACE_PROGRAM && param->value <= ADDRESS_SPACE_IO);
+			else if (typemask == PTYPES_SPSZ)
+			{
+				assert(param->value % 16 >= DRCUML_SIZE_BYTE && param->value % 16 <= DRCUML_SIZE_QWORD);
+				assert(param->value / 16 >= ADDRESS_SPACE_PROGRAM && param->value / 16 <= ADDRESS_SPACE_IO);
+			}
+			else if (typemask == PTYPES_FMOD)
+				assert(param->value >= DRCUML_FMOD_TRUNC && param->value <= DRCUML_FMOD_DEFAULT);
+		}
 	}
-	if (inst->numparams > 1)
-	{
-		assert(inst->param[1].type > DRCUML_PTYPE_NONE && inst->param[1].type < DRCUML_PTYPE_MAX);
-		assert(((opvalid->ptypes[1] >> inst->param[1].type) & 1) != 0);
-		if (inst->param[1].type == DRCUML_PTYPE_MEMORY && !(opvalid->ptypes[1] & OV_PARAM_FLAG_ANYMEM))
-			assert_in_near_cache(block->drcuml->cache, (void *)(FPTR)inst->param[1].value);
-	}
-	if (inst->numparams > 2)
-	{
-		assert(inst->param[2].type > DRCUML_PTYPE_NONE && inst->param[2].type < DRCUML_PTYPE_MAX);
-		assert(((opvalid->ptypes[2] >> inst->param[2].type) & 1) != 0);
-		if (inst->param[2].type == DRCUML_PTYPE_MEMORY && !(opvalid->ptypes[2] & OV_PARAM_FLAG_ANYMEM))
-			assert_in_near_cache(block->drcuml->cache, (void *)(FPTR)inst->param[2].value);
-	}
-	if (inst->numparams > 3)
-	{
-		assert(inst->param[3].type > DRCUML_PTYPE_NONE && inst->param[3].type < DRCUML_PTYPE_MAX);
-		assert(((opvalid->ptypes[3] >> inst->param[3].type) & 1) != 0);
-		if (inst->param[3].type == DRCUML_PTYPE_MEMORY && !(opvalid->ptypes[3] & OV_PARAM_FLAG_ANYMEM))
-			assert_in_near_cache(block->drcuml->cache, (void *)(FPTR)inst->param[3].value);
-	}
+
+	/* make sure we aren't missing any parameters */
+	if (inst->numparams < ARRAY_LENGTH(opinfo->param))
+		assert(opinfo->param[inst->numparams].typemask == 0);
 }
 
 
+
+#if 0
 
 /***************************************************************************
     BACK-END VALIDATION
@@ -1016,10 +1076,10 @@ static void validate_backend(drcuml_state *drcuml)
 
 static void bevalidate_iterate_over_params(drcuml_state *drcuml, drcuml_codehandle **handles, const bevalidate_test *test, drcuml_parameter *paramlist, int pnum)
 {
-	const drcuml_opcode_valid *opvalid = &opcode_valid_table[test->opcode];
+	const drcuml_opcode_info *opinfo = opcode_info_table[test->opcode];
 
 	/* if no parameters, execute now */
-	if (pnum >= ARRAY_LENGTH(opvalid->ptypes) || opvalid->ptypes[pnum] == OV_PARAM_ALLOWED_NONE)
+	if (pnum >= ARRAY_LENGTH(opinfo->ptypes) || opinfo->ptypes[pnum] == OV_PARAM_ALLOWED_NONE)
 	{
 		bevalidate_iterate_over_flags(drcuml, handles, test, paramlist);
 		return;
@@ -1027,12 +1087,12 @@ static void bevalidate_iterate_over_params(drcuml_state *drcuml, drcuml_codehand
 
 	/* iterate over valid parameter types */
 	for (paramlist[pnum].type = DRCUML_PTYPE_IMMEDIATE; paramlist[pnum].type < DRCUML_PTYPE_MAX; paramlist[pnum].type++)
-		if (opvalid->ptypes[pnum] & (1 << paramlist[pnum].type))
+		if (opinfo->ptypes[pnum] & (1 << paramlist[pnum].type))
 		{
 			int pindex, pcount;
 
 			/* mapvars can only do 32-bit tests */
-			if (paramlist[pnum].type == DRCUML_PTYPE_MAPVAR && size_for_param(test->size, opvalid->ptypes[pnum]) == 8)
+			if (paramlist[pnum].type == DRCUML_PTYPE_MAPVAR && size_for_param(test->size, opinfo->ptypes[pnum]) == 8)
 				continue;
 
 			/* for some parameter types, we wish to iterate over all possibilities */
@@ -1080,8 +1140,8 @@ static void bevalidate_iterate_over_params(drcuml_state *drcuml, drcuml_codehand
 
 static void bevalidate_iterate_over_flags(drcuml_state *drcuml, drcuml_codehandle **handles, const bevalidate_test *test, drcuml_parameter *paramlist)
 {
-	const drcuml_opcode_valid *opvalid = &opcode_valid_table[test->opcode];
-	UINT8 flagmask = opvalid->flags & 0x1f;
+	const drcuml_opcode_info *opinfo = opcode_info_table[test->opcode];
+	UINT8 flagmask = opinfo->flags & 0x1f;
 	UINT8 curmask;
 
 	/* iterate over all possible flag combinations */
@@ -1208,7 +1268,7 @@ static void bevalidate_initialize_random_state(drcuml_block *block, drcuml_machi
 
 static int bevalidate_populate_state(drcuml_block *block, drcuml_machine_state *state, const bevalidate_test *test, const drcuml_parameter *paramlist, drcuml_parameter *params, UINT64 *parammem)
 {
-	const drcuml_opcode_valid *opvalid = &opcode_valid_table[test->opcode];
+	const drcuml_opcode_info *opinfo = opcode_info_table[test->opcode];
 	int numparams = ARRAY_LENGTH(test->param);
 	int pnum;
 
@@ -1218,7 +1278,7 @@ static int bevalidate_populate_state(drcuml_block *block, drcuml_machine_state *
 	/* iterate over parameters */
 	for (pnum = 0; pnum < ARRAY_LENGTH(test->param); pnum++)
 	{
-		int psize = size_for_param(test->size, opvalid->ptypes[pnum]);
+		int psize = size_for_param(test->size, opinfo->ptypes[pnum]);
 		drcuml_parameter *curparam = &params[pnum];
 
 		/* start with a copy of the parameter from the list */
@@ -1279,7 +1339,7 @@ static int bevalidate_populate_state(drcuml_block *block, drcuml_machine_state *
 
 static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_state *istate, drcuml_machine_state *state, const bevalidate_test *test, const drcuml_parameter *params, const drcuml_instruction *testinst, drccodeptr codestart, drccodeptr codeend, UINT8 flagmask)
 {
-	const drcuml_opcode_valid *opvalid = &opcode_valid_table[test->opcode];
+	const drcuml_opcode_info *opinfo = opcode_info_table[test->opcode];
 	UINT8 ireg[DRCUML_REG_I_END - DRCUML_REG_I0] = { 0 };
 	UINT8 freg[DRCUML_REG_F_END - DRCUML_REG_F0] = { 0 };
 	char errorbuf[1024];
@@ -1308,8 +1368,8 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 	for (pnum = 0; pnum < ARRAY_LENGTH(test->param); pnum++)
 		if (test->destmask & (1 << pnum))
 		{
-			UINT64 mask = mask_for_param(test->size, opvalid->ptypes[pnum]);
-			int psize = size_for_param(test->size, opvalid->ptypes[pnum]);
+			UINT64 mask = mask_for_param(test->size, opinfo->ptypes[pnum]);
+			int psize = size_for_param(test->size, opinfo->ptypes[pnum]);
 			UINT64 result = 0;
 
 			/* fetch the result from the parameters */
@@ -1386,3 +1446,5 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 	}
 	return errend != errorbuf;
 }
+
+#endif

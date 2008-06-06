@@ -132,7 +132,7 @@
 #define UML_SETFMOD(block, mode)							do { drcuml_block_append_1(block, DRCUML_OP_SETFMOD, 4, IF_ALWAYS,  FLAGS_NONE, mode); } while (0)
 #define UML_GETFMOD(block, dst)								do { drcuml_block_append_1(block, DRCUML_OP_GETFMOD, 4, IF_ALWAYS,  FLAGS_NONE, dst); } while (0)
 #define UML_GETEXP(block, dst)								do { drcuml_block_append_1(block, DRCUML_OP_GETEXP,  4, IF_ALWAYS,  FLAGS_NONE, dst); } while (0)
-#define UML_GETFLGS(block, dst, flags)						do { drcuml_block_append_1(block, DRCUML_OP_GETFLGS, 4, IF_ALWAYS,  flags,      dst); } while (0)
+#define UML_GETFLGS(block, dst, flags)						do { drcuml_block_append_2(block, DRCUML_OP_GETFLGS, 4, IF_ALWAYS,  FLAGS_NONE, dst, IMM(flags)); } while (0)
 #define UML_SAVE(block, dst)								do { drcuml_block_append_1(block, DRCUML_OP_SAVE,    4, IF_ALWAYS,  FLAGS_NONE, MEM(dst)); } while (0)
 #define UML_RESTORE(block, src)								do { drcuml_block_append_1(block, DRCUML_OP_RESTORE, 4, IF_ALWAYS,  FLAGS_NONE, MEM(src)); } while (0)
 
