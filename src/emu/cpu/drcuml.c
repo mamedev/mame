@@ -192,6 +192,7 @@ static const drcuml_opcode_info opcode_info_source[] =
 	OPINFO2(MAPVAR,  "mapvar",   4,   FALSE, NONE, NONE, NONE, PINFO(OUT, OP, MVAR), PINFO(IN, OP, IMV))
 
 	/* Control Flow Operations */
+	OPINFO0(NOP,     "nop",      4,   FALSE, NONE, NONE, NONE)
 	OPINFO1(DEBUG,   "debug",    4,   FALSE, NONE, NONE, ALL,  PINFO(IN, OP, IANY))
 	OPINFO1(EXIT,    "exit",     4,   TRUE,  NONE, NONE, ALL,  PINFO(IN, OP, IANY))
 	OPINFO3(HASHJMP, "hashjmp",  4,   FALSE, NONE, NONE, ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, HAND))

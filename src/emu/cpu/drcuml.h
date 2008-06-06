@@ -193,6 +193,7 @@ enum _drcuml_opcode
 	DRCUML_OP_MAPVAR,		/* MAPVAR  mapvar,value           */
 
 	/* Control Flow Operations */
+	DRCUML_OP_NOP,			/* NOP                            */
 	DRCUML_OP_DEBUG,		/* DEBUG   pc                     */
 	DRCUML_OP_EXIT,			/* EXIT    src1[,c]               */
 	DRCUML_OP_HASHJMP,		/* HASHJMP mode,pc,handle         */

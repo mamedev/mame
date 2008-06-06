@@ -76,6 +76,7 @@
 
 
 /* ----- Control Flow Operations ----- */
+#define UML_NOP(block)										do { drcuml_block_append_0(block, DRCUML_OP_NOP,     4, IF_ALWAYS); } while (0)
 #define UML_DEBUG(block, pc)								do { drcuml_block_append_1(block, DRCUML_OP_DEBUG,   4, IF_ALWAYS,  pc); } while (0)
 #define UML_EXIT(block, param)								do { drcuml_block_append_1(block, DRCUML_OP_EXIT,    4, IF_ALWAYS,  param); } while (0)
 #define UML_EXITc(block, cond, param)						do { drcuml_block_append_1(block, DRCUML_OP_EXIT,    4, cond,       param); } while (0)

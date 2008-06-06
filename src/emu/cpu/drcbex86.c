@@ -275,6 +275,7 @@ static x86code *op_label(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 static x86code *op_comment(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_mapvar(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 
+static x86code *op_nop(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_debug(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_exit(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_hashjmp(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
@@ -358,6 +359,7 @@ static const opcode_table_entry opcode_table_source[] =
 	{ DRCUML_OP_MAPVAR,  op_mapvar },	/* MAPVAR  mapvar,value           */
 
 	/* Control Flow Operations */
+	{ DRCUML_OP_NOP,     op_nop },		/* NOP                            */
 	{ DRCUML_OP_DEBUG,   op_debug },	/* DEBUG   pc                     */
 	{ DRCUML_OP_EXIT,    op_exit },		/* EXIT    src1[,c]               */
 	{ DRCUML_OP_HASHJMP, op_hashjmp },	/* HASHJMP mode,pc,handle         */
@@ -3118,6 +3120,17 @@ static x86code *op_mapvar(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 /***************************************************************************
     CONTROL FLOW OPCODES
 ***************************************************************************/
+
+/*-------------------------------------------------
+    op_nop - process a NOP opcode
+-------------------------------------------------*/
+
+static x86code *op_nop(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+{
+	/* nothing */
+	return dst;
+}
+
 
 /*-------------------------------------------------
     op_debug - process a DEBUG opcode

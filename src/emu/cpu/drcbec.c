@@ -415,8 +415,9 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 				drclabel_set_codeptr(drcbe->labels, inst->param[0].value, (drccodeptr)dst);
 				break;
 
-			/* ignore COMMENT opcodes */
+			/* ignore COMMENT and NOP opcodes */
 			case DRCUML_OP_COMMENT:
+			case DRCUML_OP_NOP:
 				break;
 
 			/* when we hit a MAPVAR opcode, log the change for the current PC */
@@ -435,7 +436,7 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 				dst->inst = (drcbec_instruction *)drclabel_get_codeptr(drcbe->labels, inst->param[0].value, fixup_label, dst);
 				dst++;
 				break;
-
+			
 			/* generically handle everything else */
 			default:
 
