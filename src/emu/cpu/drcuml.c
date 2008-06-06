@@ -218,7 +218,7 @@ static const drcuml_opcode_info opcode_info_source[] =
 	OPINFO4(READM,   "!readm",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSZ))
 	OPINFO3(WRITE,   "!write",   4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSZ))
 	OPINFO4(WRITEM,  "!writem",  4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSZ))
-	OPINFO2(CARRY,   "!carry",   4|8, FALSE, C,    C,    ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO2(CARRY,   "!carry",   4|8, FALSE, NONE, C,    ALL,  PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO2(MOV,     "!mov",     4|8, TRUE,  NONE, NONE, NONE, PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
 	OPINFO1(SET,     "!set",     4|8, TRUE,  NONE, NONE, ALL,  PINFO(OUT, OP, IRM))
 	OPINFO3(SEXT,    "!sext",    4|8, FALSE, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, P3, IANY), PINFO(IN, OP, SIZE))
@@ -294,6 +294,7 @@ static const drcuml_opcode_info *opcode_info_table[DRCUML_OP_MAX];
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
+static void optimize_block(drcuml_block *block);
 static void validate_instruction(drcuml_block *block, const drcuml_instruction *inst);
 
 #if 0
@@ -563,7 +564,7 @@ drcuml_block *drcuml_block_begin(drcuml_state *drcuml, UINT32 maxinst, jmp_buf *
     0 parameters to the block
 -------------------------------------------------*/
 
-void drcuml_block_append_0(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condition, UINT8 flags)
+void drcuml_block_append_0(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condition)
 {
 	drcuml_instruction *inst = &block->inst[block->nextinst++];
 
@@ -577,7 +578,7 @@ void drcuml_block_append_0(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
 	inst->opcode = (UINT8)op;
 	inst->size = size;
 	inst->condition = condition;
-	inst->flags = flags;
+	inst->flags = 0;
 	inst->numparams = 0;
 
 	/* validation */
@@ -590,7 +591,7 @@ void drcuml_block_append_0(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
     1 parameter to the block
 -------------------------------------------------*/
 
-void drcuml_block_append_1(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condition, UINT8 flags, drcuml_ptype p0type, drcuml_pvalue p0value)
+void drcuml_block_append_1(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condition, drcuml_ptype p0type, drcuml_pvalue p0value)
 {
 	drcuml_instruction *inst = &block->inst[block->nextinst++];
 
@@ -604,7 +605,7 @@ void drcuml_block_append_1(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
 	inst->opcode = (UINT8)op;
 	inst->size = size;
 	inst->condition = condition;
-	inst->flags = flags;
+	inst->flags = 0;
 	inst->numparams = 1;
 	inst->param[0].type = p0type;
 	inst->param[0].value = p0value;
@@ -619,7 +620,7 @@ void drcuml_block_append_1(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
     2 parameters to the block
 -------------------------------------------------*/
 
-void drcuml_block_append_2(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condition, UINT8 flags, drcuml_ptype p0type, drcuml_pvalue p0value, drcuml_ptype p1type, drcuml_pvalue p1value)
+void drcuml_block_append_2(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condition, drcuml_ptype p0type, drcuml_pvalue p0value, drcuml_ptype p1type, drcuml_pvalue p1value)
 {
 	drcuml_instruction *inst = &block->inst[block->nextinst++];
 
@@ -633,7 +634,7 @@ void drcuml_block_append_2(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
 	inst->opcode = (UINT8)op;
 	inst->size = size;
 	inst->condition = condition;
-	inst->flags = flags;
+	inst->flags = 0;
 	inst->numparams = 2;
 	inst->param[0].type = p0type;
 	inst->param[0].value = p0value;
@@ -650,7 +651,7 @@ void drcuml_block_append_2(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
     3 parameters to the block
 -------------------------------------------------*/
 
-void drcuml_block_append_3(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condition, UINT8 flags, drcuml_ptype p0type, drcuml_pvalue p0value, drcuml_ptype p1type, drcuml_pvalue p1value, drcuml_ptype p2type, drcuml_pvalue p2value)
+void drcuml_block_append_3(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condition, drcuml_ptype p0type, drcuml_pvalue p0value, drcuml_ptype p1type, drcuml_pvalue p1value, drcuml_ptype p2type, drcuml_pvalue p2value)
 {
 	drcuml_instruction *inst = &block->inst[block->nextinst++];
 
@@ -664,7 +665,7 @@ void drcuml_block_append_3(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
 	inst->opcode = (UINT8)op;
 	inst->size = size;
 	inst->condition = condition;
-	inst->flags = flags;
+	inst->flags = 0;
 	inst->numparams = 3;
 	inst->param[0].type = p0type;
 	inst->param[0].value = p0value;
@@ -683,7 +684,7 @@ void drcuml_block_append_3(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
     4 parameters to the block
 -------------------------------------------------*/
 
-void drcuml_block_append_4(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condition, UINT8 flags, drcuml_ptype p0type, drcuml_pvalue p0value, drcuml_ptype p1type, drcuml_pvalue p1value, drcuml_ptype p2type, drcuml_pvalue p2value, drcuml_ptype p3type, drcuml_pvalue p3value)
+void drcuml_block_append_4(drcuml_block *block, drcuml_opcode op, UINT8 size, UINT8 condition, drcuml_ptype p0type, drcuml_pvalue p0value, drcuml_ptype p1type, drcuml_pvalue p1value, drcuml_ptype p2type, drcuml_pvalue p2value, drcuml_ptype p3type, drcuml_pvalue p3value)
 {
 	drcuml_instruction *inst = &block->inst[block->nextinst++];
 
@@ -697,7 +698,7 @@ void drcuml_block_append_4(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
 	inst->opcode = (UINT8)op;
 	inst->size = size;
 	inst->condition = condition;
-	inst->flags = flags;
+	inst->flags = 0;
 	inst->numparams = 4;
 	inst->param[0].type = p0type;
 	inst->param[0].value = p0value;
@@ -723,6 +724,9 @@ void drcuml_block_end(drcuml_block *block)
 	drcuml_state *drcuml = block->drcuml;
 
 	assert(block->inuse);
+	
+	/* optimize the resulting code first */
+	optimize_block(block);
 
 	/* if we have a logfile, generate a disassembly of the block */
 	if (drcuml->umllog != NULL)
@@ -926,7 +930,7 @@ void drcuml_add_comment(drcuml_block *block, const char *format, ...)
 	strcpy(comment, buffer);
 
 	/* add an instruction with a pointer */
-	drcuml_block_append_1(block, DRCUML_OP_COMMENT, 4, DRCUML_COND_ALWAYS, 0, MEM(comment));
+	drcuml_block_append_1(block, DRCUML_OP_COMMENT, 4, DRCUML_COND_ALWAYS, MEM(comment));
 }
 
 
@@ -1079,6 +1083,59 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer)
 	
 	/* ensure we are NULL-terminated */
 	*dest = 0;
+}
+
+
+
+/***************************************************************************
+    CODE BLOCK OPTIMIZATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    optimize_block - apply various optimizations
+    to a block of code
+-------------------------------------------------*/
+
+static void optimize_block(drcuml_block *block)
+{
+	int instnum;
+
+	/* iterate over instructions */
+	for (instnum = 0; instnum < block->nextinst; instnum++)
+	{
+		drcuml_instruction *inst = &block->inst[instnum];
+		const drcuml_opcode_info *opinfo = opcode_info_table[inst->opcode];
+		UINT8 remainingflags;
+		int scannum;
+	
+		/* first compute what flags we need */
+		inst->flags = 0;
+		remainingflags = effective_outflags(inst, opinfo);
+		
+		/* scan ahead until we run out of possible remaining flags */
+		for (scannum = instnum + 1; remainingflags != 0 && scannum < block->nextinst; scannum++)
+		{
+			const drcuml_instruction *scan = &block->inst[scannum];
+			const drcuml_opcode_info *scaninfo = opcode_info_table[scan->opcode];
+			
+			/* any input flags are required */
+			inst->flags |= effective_inflags(scan, scaninfo);
+			
+			/* if the scanahead instruction is unconditional, assume his flags are modified */
+			if (scan->condition == DRCUML_COND_ALWAYS)
+				remainingflags &= ~scaninfo->modflags;
+		}
+		
+		/* track mapvars and convert to immediates here */
+		
+		/* adjust commutative arguments */
+			
+		/* if we don't need any flags, then we can eliminate a lot of dumb operations */
+//		if (inst->flags == 0)
+//			switch (inst->opcode)
+//			{
+//			}
+	}
 }
 
 
