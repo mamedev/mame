@@ -931,6 +931,6 @@ GAME( 2001, crysking, crysbios, crystal, crystal, crysking, ROT0, "Brezzasoft", 
 GAME( 2001, evosocc,  crysbios, crystal, crystal,  evosocc, ROT0, "Evoga", "Evolution Soccer", 0 )
 GAME( 2001, topbladv, crysbios, crystal, crystal,  0,       ROT0, "unknown", "Top Blade V", GAME_NOT_WORKING ) // protection
 
-GAME( 2001, officeye,        0, crystal, crystal,  0,       ROT0, "unknown", "Office Yeo ln Cheon Ha", GAME_NOT_WORKING ) // protection
+GAME( 2001, officeye,        0, crystal, crystal,  0,       ROT0, "unknown", "Office Yeo In Cheon Ha", GAME_NOT_WORKING ) // protection
 
 
