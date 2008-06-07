@@ -42,7 +42,7 @@ static UINT32 bankaddress;
 extern UINT16 *m90_video_data;
 
 VIDEO_UPDATE( m90 );
-VIDEO_UPDATE( m90_bootleg );
+VIDEO_UPDATE( dynablsb );
 VIDEO_UPDATE( bomblord );
 WRITE16_HANDLER( m90_video_control_w );
 WRITE16_HANDLER( m90_video_w );
@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bootleg_main_cpu, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( dynablsb_main_cpu, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x6000e, 0x60fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
@@ -854,11 +854,11 @@ MACHINE_DRIVER_END
 
 
 
-static MACHINE_DRIVER_START( bootleg )
+static MACHINE_DRIVER_START( dynablsb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", V30,32000000/4)
-	MDRV_CPU_PROGRAM_MAP(bootleg_main_cpu,0)
+	MDRV_CPU_PROGRAM_MAP(dynablsb_main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io,0)
 	MDRV_CPU_VBLANK_INT("main", m90_interrupt)
 
@@ -882,7 +882,7 @@ static MACHINE_DRIVER_START( bootleg )
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(m90)
-	MDRV_VIDEO_UPDATE(m90)
+	MDRV_VIDEO_UPDATE(dynablsb)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1213,7 +1213,7 @@ GAME( 1991, hasamu,   0,        hasamu,   hasamu,   0,        ROT0, "Irem", "Has
 GAME( 1991, dynablst, 0,        bombrman, dynablst, 0,        ROT0, "Irem (licensed from Hudson Soft)", "Dynablaster / Bomber Man", GAME_NO_COCKTAIL )
 GAME( 1991, bombrman, dynablst, bombrman, bombrman, 0,        ROT0, "Irem (licensed from Hudson Soft)", "Bomber Man (Japan)", GAME_NO_COCKTAIL )
 GAME( 1991, atompunk, dynablst, bombrman, atompunk, 0,        ROT0, "Irem America (licensed from Hudson Soft)", "Atomic Punk (US)", GAME_NO_COCKTAIL )
-GAME( 1991, dynablsb, dynablst, bootleg,  bombrman, 0,        ROT0, "bootleg", "Dynablaster (bootleg)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
+GAME( 1991, dynablsb, dynablst, dynablsb,  bombrman, 0,        ROT0, "bootleg", "Dynablaster (bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
 GAME( 1992, bbmanw,   0,        bbmanw,   bbmanw,   0,        ROT0, "Irem", "Bomber Man World / New Dyna Blaster - Global Quest", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1992, bbmanwj,  bbmanw,   bbmanw,   bbmanwj,  0,        ROT0, "Irem", "Bomber Man World (Japan)", GAME_NO_COCKTAIL )
 GAME( 1992, newapunk, bbmanw,   bbmanw,   bbmanwj,  0,        ROT0, "Irem America", "New Atomic Punk - Global Quest (US)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )

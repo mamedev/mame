@@ -136,15 +136,7 @@ static void bomblord_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 		fx = (spriteram16[offs+3] >> 8) & 0x02;
 		fy = (spriteram16[offs+2] >> 8) & 0x80;
-/*
-		pdrawgfx(bitmap,machine->gfx[1],
-				sprite,
-				colour,
-				fx,fy,
-				x,y,
-				cliprect,TRANSPARENCY_PEN,0,
-				(colour & 0x08) ? 0x00 : 0x02);
-*/
+
 		drawgfx(bitmap,machine->gfx[1],
 				sprite,
 				colour,
@@ -155,43 +147,39 @@ static void bomblord_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 	}
 }
 
-#if 0
-static void bootleg_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void dynablsb_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	int offs;
+	int offs = 0;
+	int x,y,sprite,colour,fx,fy;
 
-	for (offs = 0x0;offs <0x800-8;offs+= 8) {
-		int x,y,sprite,colour,fx,fy;
+	while ((offs < spriteram_size/2) & (spriteram16[offs+0] != 0x8000))
+	{
+		sprite = spriteram16[offs+1];
+		colour = (spriteram16[offs+2] >> 9) & 0x0f;
 
-		if (/*spriteram[offs+0]==0x78 &&*/ spriteram[offs+1]==0x7f) continue;
+		y = (spriteram16[offs+0] & 0x1ff) + 0x98 + 17*8;
+		x = (spriteram16[offs+3] & 0x1ff) + 0x10 - 80;
 
-		y=(spriteram[offs+0] | (spriteram[offs+1]<<8))&0x1ff;
-		x=(spriteram[offs+6] | (spriteram[offs+7]<<8))&0x1ff;
+		x = x - 16;
+		y = 512 - y;
 
-		x = x - /*64 -*/ 16;
-		y = 256 - /*32 -*/ y;
-
-	    sprite=(spriteram[offs+2] | (spriteram[offs+3]<<8));
-		colour=(spriteram[offs+5]>>1)&0xf;
-
-		fx=spriteram[offs+5]&1;
-		fy=0;//spriteram[offs+5]&2;
+		fx = (spriteram16[offs+3] >> 8) & 0x02;
+		fy = (spriteram16[offs+2] >> 8) & 0x80;
 
 		drawgfx(bitmap,machine->gfx[1],
-				sprite&0x1fff,
+				sprite,
 				colour,
 				fx,fy,
 				x,y,
 				cliprect,TRANSPARENCY_PEN,0);
+		offs += 4;
 	}
 }
-#endif
 
 WRITE16_HANDLER( m90_video_control_w )
 {
 	COMBINE_DATA(&m90_video_control_data[offset]);
 }
-
 
 static void markdirty(tilemap *tmap,int page,offs_t offset)
 {
@@ -200,7 +188,6 @@ static void markdirty(tilemap *tmap,int page,offs_t offset)
 	if (offset >= 0 && offset < 0x2000)
 		tilemap_mark_tile_dirty(tmap,offset/2);
 }
-
 
 WRITE16_HANDLER( m90_video_w )
 {
@@ -341,6 +328,33 @@ VIDEO_UPDATE( bomblord )
 	tilemap_draw(bitmap,cliprect,pf1_wide_layer,1,1);
 
 	bomblord_draw_sprites(screen->machine,bitmap,cliprect);
+
+	return 0;
+}
+
+VIDEO_UPDATE( dynablsb )
+{
+	tilemap_mark_all_tiles_dirty(pf1_wide_layer);
+	tilemap_mark_all_tiles_dirty(pf2_wide_layer);
+
+	tilemap_set_scroll_rows(pf1_wide_layer,1);
+	tilemap_set_scroll_rows(pf2_wide_layer,1);
+
+	tilemap_set_scrollx( pf1_wide_layer,0, 0 );
+	tilemap_set_scrollx( pf2_wide_layer,0, 0 );
+
+	tilemap_set_scrolly( pf1_wide_layer,0, 376+17*8 );
+	tilemap_set_scrolly( pf2_wide_layer,0, 376+17*8 );
+
+	fillbitmap(priority_bitmap,0,cliprect);
+
+	tilemap_draw(bitmap,cliprect,pf2_wide_layer,0,0);
+	tilemap_draw(bitmap,cliprect,pf2_wide_layer,1,1);
+
+	tilemap_draw(bitmap,cliprect,pf1_wide_layer,0,0);
+	tilemap_draw(bitmap,cliprect,pf1_wide_layer,1,1);
+
+	dynablsb_draw_sprites(screen->machine,bitmap,cliprect);
 
 	return 0;
 }
