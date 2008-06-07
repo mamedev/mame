@@ -4515,7 +4515,7 @@ static x86code *op_sext(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert_no_condition(inst);
-	assert_no_flags(inst);
+	assert_flags(inst, DRCUML_FLAG_S | DRCUML_FLAG_Z);
 
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI, &sizep, PTYPE_I);
@@ -4550,6 +4550,8 @@ static x86code *op_sext(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		else if (sizep.value == DRCUML_SIZE_DWORD && dstreg != srcp.value)
 			emit_mov_r32_r32(&dst, dstreg, srcp.value);									// mov   dstreg,srcp
 	}
+	if (inst->flags != 0)
+		emit_test_r32_r32(&dst, dstreg, dstreg);										// test  dstreg,dstreg
 
 	/* 32-bit form: store the low 32 bits */
 	if (inst->size == 4)
@@ -4577,7 +4579,7 @@ static x86code *op_roland(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert_no_condition(inst);
-	assert_no_flags(inst);
+	assert_flags(inst, DRCUML_FLAG_S | DRCUML_FLAG_Z);
 
 	/* normalize parameters */
 	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI, &shiftp, PTYPE_MRI, &maskp, PTYPE_MRI);
@@ -4618,7 +4620,7 @@ static x86code *op_rolins(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert_no_condition(inst);
-	assert_no_flags(inst);
+	assert_flags(inst, DRCUML_FLAG_S | DRCUML_FLAG_Z);
 
 	/* normalize parameters */
 	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI, &shiftp, PTYPE_MRI, &maskp, PTYPE_MRI);
@@ -4695,6 +4697,17 @@ static x86code *op_rolins(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 				emit_or_m32_r32(&dst, MABS(dstp.value + 4), REG_EDX);					// or    dstp.hi,edx
 			}
 			emit_mov_r32_m32(&dst, REG_EBX, MBD(REG_ESP, -8));							// mov   ebx,[esp-8]
+		}
+		if (inst->flags == DRCUML_FLAG_Z)
+			emit_or_r32_r32(&dst, REG_EAX, REG_EDX);									// or    eax,edx
+		else if (inst->flags == DRCUML_FLAG_S)
+			;// do nothing -- final OR will have the right result
+		else if (inst->flags == (DRCUML_FLAG_Z | DRCUML_FLAG_S))
+		{
+			emit_movzx_r32_r16(&dst, REG_ECX, REG_AX);									// movzx ecx,ax
+			emit_shr_r32_imm(&dst, REG_EAX, 16);										// shr   eax,16
+			emit_or_r32_r32(&dst, REG_EDX, REG_ECX);									// or    edx,ecx
+			emit_or_r32_r32(&dst, REG_EDX, REG_EAX);									// or    edx,eax
 		}
 	}
 	return dst;

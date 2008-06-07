@@ -1277,6 +1277,7 @@ static int ppc4xx_dma_decrement_count(powerpc_state *ppc, int dmachan)
 		return FALSE;
 
 	/* set the complete bit and handle interrupts */
+	ppc->dcr[DCR4XX_DMASR] |= 1 << (31 - dmachan);
 	ppc->dcr[DCR4XX_DMASR] |= 1 << (27 - dmachan);
 	ppc4xx_dma_update_irq_states(ppc);
 	return TRUE;
@@ -1372,7 +1373,7 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 
 		/* software initiated memory-to-memory mode DMA */
 		case 2:
-			width = dma_transfer_width[(dmaregs[DCR4XX_DMACR0] >> 26) & 0x3];
+			width = dma_transfer_width[(dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_PW_MASK) >> 26];
 			srcinc = (dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_SAI) ? width : 0;
 			destinc = (dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_DAI) ? width : 0;
 

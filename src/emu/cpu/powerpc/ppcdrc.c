@@ -97,11 +97,6 @@ extern offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op);
 
 #define CRMASK(reg)				(0xf0000000 >> ((reg) * 4))
 
-#define FLAGS_RC(op)			((op & M_RC) ? (DRCUML_FLAG_S | DRCUML_FLAG_Z) : 0)
-#define FLAGS_OE(op)			((op & M_OE) ? DRCUML_FLAG_V : 0)
-#define FLAGS_RCOE(op)			(FLAGS_RC(op) | FLAGS_OE(op))
-#define FLAGS_RCOECA(op)		(FLAGS_RCOE(op) | DRCUML_FLAG_C)
-
 /* DSISR values for various addressing types */
 #define DSISR_IMM(op)	((0) |										/* bits 15-16: cleared */			\
 						 ((((op) >> (31- 5)) & 0x01) << (31-17)) |	/* bit  17:    opcode bit 5 */		\
@@ -183,7 +178,7 @@ struct _ppcimp_state
 	UINT32				swcount;					/* counter for sw instructions */
 	UINT32				swreg;						/* reg index for sw instructions */
 	UINT32				tempaddr;					/* temporary address storage */
-	UINT64				tempdata;					/* temporary data storage */
+	drcuml_ireg			tempdata;					/* temporary data storage */
 	double				fp0;						/* floating point 0 */
 
 	/* tables */
@@ -207,6 +202,8 @@ struct _ppcimp_state
 	drcuml_codehandle *	out_of_cycles;				/* out of cycles exception handler */
 	drcuml_codehandle *	tlb_mismatch;				/* tlb mismatch handler */
 	drcuml_codehandle *	swap_tgpr;					/* swap TGPR handler */
+	drcuml_codehandle *	lsw[4][32];					/* lsw entries */
+	drcuml_codehandle *	stsw[4][32];				/* stsw entries */
 	drcuml_codehandle *	read8[4];					/* read byte */
 	drcuml_codehandle *	write8[4];					/* write byte */
 	drcuml_codehandle *	read16[4];					/* read half */
@@ -254,6 +251,8 @@ static void static_generate_tlb_mismatch(drcuml_state *drcuml);
 static void static_generate_exception(drcuml_state *drcuml, UINT8 exception, int recover, const char *name);
 static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int size, int iswrite, int ismasked, const char *name, drcuml_codehandle **handleptr, drcuml_codehandle *masked);
 static void static_generate_swap_tgpr(drcuml_state *drcuml);
+static void static_generate_lsw_entries(drcuml_state *drcuml, int mode);
+static void static_generate_stsw_entries(drcuml_state *drcuml, int mode);
 
 static void generate_update_mode(drcuml_block *block);
 static void generate_update_cycles(drcuml_block *block, compiler_state *compiler, drcuml_ptype ptype, UINT64 pvalue, int allow_exception);
@@ -902,6 +901,8 @@ static void code_flush_cache(drcuml_state *drcuml)
 		static_generate_memory_accessor(drcuml, mode, 8, FALSE, FALSE, "read64",      &ppc->impstate->read64[mode],      ppc->impstate->read64mask[mode]);
 		static_generate_memory_accessor(drcuml, mode, 8, TRUE,  TRUE,  "write64mask", &ppc->impstate->write64mask[mode], NULL);
 		static_generate_memory_accessor(drcuml, mode, 8, TRUE,  FALSE, "write64",     &ppc->impstate->write64[mode],     ppc->impstate->write64mask[mode]);
+		static_generate_lsw_entries(drcuml, mode);
+		static_generate_stsw_entries(drcuml, mode);
 	}
 }
 
@@ -1650,13 +1651,13 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 			if (iswrite)
 			{
 				UML_MOV(block, MEM(&ppc->impstate->tempaddr), IREG(0));						// mov     [tempaddr],i0
-				UML_MOV(block, MEM(&ppc->impstate->tempdata), IREG(1));						// mov     [tempdata],i1
+				UML_MOV(block, MEM(&ppc->impstate->tempdata.w.l), IREG(1));					// mov     [tempdata],i1
 				UML_SUB(block, IREG(0), IREG(0), IMM(1));									// sub     i0,i0,1
 				UML_SHR(block, IREG(1), IREG(1), IMM(8));									// shr     i1,i1,8
 				UML_MOV(block, IREG(2), IMM(0x00ff));										// mov     i2,0x00ff
 				UML_CALLH(block, masked);													// callh   masked
 				UML_ADD(block, IREG(0), MEM(&ppc->impstate->tempaddr), IMM(1));				// add     i0,[tempaddr],1
-				UML_SHL(block, IREG(1), MEM(&ppc->impstate->tempdata), IMM(8));				// shl     i1,[tempdata],8
+				UML_SHL(block, IREG(1), MEM(&ppc->impstate->tempdata.w.l), IMM(8));			// shl     i1,[tempdata],8
 				UML_MOV(block, IREG(2), IMM(0xff00));										// mov     i2,0xff00
 				UML_CALLH(block, masked);													// callh   masked
 			}
@@ -1666,12 +1667,12 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 				UML_SUB(block, IREG(0), IREG(0), IMM(1));									// sub     i0,i0,1
 				UML_MOV(block, IREG(2), IMM(0x00ff));										// mov     i2,0x00ff
 				UML_CALLH(block, masked);													// callh   masked
-				UML_SHL(block, MEM(&ppc->impstate->tempdata), IREG(0), IMM(8));				// shl     [tempdata],i0,8
+				UML_SHL(block, MEM(&ppc->impstate->tempdata.w.l), IREG(0), IMM(8));			// shl     [tempdata],i0,8
 				UML_ADD(block, IREG(0), MEM(&ppc->impstate->tempaddr), IMM(1));				// add     i0,[tempaddr],1
 				UML_MOV(block, IREG(2), IMM(0xff00));										// mov     i2,0xff00
 				UML_CALLH(block, masked);													// callh   masked
 				UML_SHR(block, IREG(0), IREG(0), IMM(8));									// shr     i0,i0,8
-				UML_OR(block, IREG(0), IREG(0), MEM(&ppc->impstate->tempdata));				// or      i0,i0,[tempdata]
+				UML_OR(block, IREG(0), IREG(0), MEM(&ppc->impstate->tempdata.w.l));			// or      i0,i0,[tempdata]
 			}
 		}
 		else if (size == 4)
@@ -1680,7 +1681,7 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 			if (iswrite)
 			{
 				UML_MOV(block, MEM(&ppc->impstate->tempaddr), IREG(0));						// mov     [tempaddr],i0
-				UML_MOV(block, MEM(&ppc->impstate->tempdata), IREG(1));						// mov     [tempdata],i1
+				UML_MOV(block, MEM(&ppc->impstate->tempdata.w.l), IREG(1));					// mov     [tempdata],i1
 				UML_TEST(block, IREG(0), IMM(2));											// test    i0,i0,2
 				UML_JMPc(block, IF_NZ, offs2 = label++);									// jnz     offs2
 				UML_SUB(block, IREG(0), IREG(0), IMM(1));									// sub     i0,i0,1
@@ -1688,7 +1689,7 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 				UML_MOV(block, IREG(2), IMM(0x00ffffff));									// mov     i2,0x00ffffff
 				UML_CALLH(block, masked);													// callh   masked
 				UML_ADD(block, IREG(0), MEM(&ppc->impstate->tempaddr), IMM(3));				// add     i0,[tempaddr],3
-				UML_SHL(block, IREG(1), MEM(&ppc->impstate->tempdata), IMM(24));			// shl     i1,[tempdata],24
+				UML_SHL(block, IREG(1), MEM(&ppc->impstate->tempdata.w.l), IMM(24));		// shl     i1,[tempdata],24
 				UML_MOV(block, IREG(2), IMM(0xff000000));									// mov     i2,0xff000000
 				UML_CALLH(block, masked);													// callh   masked
 				UML_RET(block);																// ret
@@ -1700,7 +1701,7 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 				UML_MOV(block, IREG(2), IMM(0x0000ffff));									// mov     i2,0x0000ffff
 				UML_CALLH(block, masked);													// callh   masked
 				UML_ADD(block, IREG(0), MEM(&ppc->impstate->tempaddr), IMM(2));				// add     i0,[tempaddr],2
-				UML_SHL(block, IREG(1), MEM(&ppc->impstate->tempdata), IMM(16));			// shl     i1,[tempdata],16
+				UML_SHL(block, IREG(1), MEM(&ppc->impstate->tempdata.w.l), IMM(16));		// shl     i1,[tempdata],16
 				UML_MOV(block, IREG(2), IMM(0xffff0000));									// mov     i2,0xffff0000
 				UML_CALLH(block, masked);													// callh   masked
 				UML_RET(block);																// ret
@@ -1710,7 +1711,7 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 				UML_MOV(block, IREG(2), IMM(0x000000ff));									// mov     i2,0x000000ff
 				UML_CALLH(block, masked);													// callh   masked
 				UML_ADD(block, IREG(0), MEM(&ppc->impstate->tempaddr), IMM(1));				// add     i0,[tempaddr],1
-				UML_SHL(block, IREG(1), MEM(&ppc->impstate->tempdata), IMM(8));				// shl     i1,[tempdata],8
+				UML_SHL(block, IREG(1), MEM(&ppc->impstate->tempdata.w.l), IMM(8));			// shl     i1,[tempdata],8
 				UML_MOV(block, IREG(2), IMM(0xffffff00));									// mov     i2,0xffffff00
 				UML_CALLH(block, masked);													// callh   masked
 			}
@@ -1722,12 +1723,12 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 				UML_SUB(block, IREG(0), IREG(0), IMM(1));									// sub     i0,i0,1
 				UML_MOV(block, IREG(2), IMM(0x00ffffff));									// mov     i2,0x00ffffff
 				UML_CALLH(block, masked);													// callh   masked
-				UML_SHL(block, MEM(&ppc->impstate->tempdata), IREG(0), IMM(8));				// shl     [tempdata],i0,8
+				UML_SHL(block, MEM(&ppc->impstate->tempdata.w.l), IREG(0), IMM(8));			// shl     [tempdata],i0,8
 				UML_ADD(block, IREG(0), MEM(&ppc->impstate->tempaddr), IMM(3));				// add     i0,[tempaddr],3
 				UML_MOV(block, IREG(2), IMM(0xff000000));									// mov     i2,0xff000000
 				UML_CALLH(block, masked);													// callh   masked
 				UML_SHR(block, IREG(0), IREG(0), IMM(24));									// shr     i0,i0,24
-				UML_OR(block, IREG(0), IREG(0), MEM(&ppc->impstate->tempdata));				// or      i0,i0,[tempdata]
+				UML_OR(block, IREG(0), IREG(0), MEM(&ppc->impstate->tempdata.w.l));			// or      i0,i0,[tempdata]
 				UML_RET(block);																// ret
 				UML_LABEL(block, offs2);												// offs2:
 				UML_TEST(block, IREG(0), IMM(1));											// test    i0,i0,1
@@ -1735,23 +1736,23 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 				UML_SUB(block, IREG(0), IREG(0), IMM(2));									// sub     i0,i0,2
 				UML_MOV(block, IREG(2), IMM(0x0000ffff));									// mov     i2,0x0000ffff
 				UML_CALLH(block, masked);													// callh   masked
-				UML_SHL(block, MEM(&ppc->impstate->tempdata), IREG(0), IMM(16));			// shl     [tempdata],i0,16
+				UML_SHL(block, MEM(&ppc->impstate->tempdata.w.l), IREG(0), IMM(16));		// shl     [tempdata],i0,16
 				UML_ADD(block, IREG(0), MEM(&ppc->impstate->tempaddr), IMM(2));				// add     i0,[tempaddr],2
 				UML_MOV(block, IREG(2), IMM(0xffff0000));									// mov     i2,0xffff0000
 				UML_CALLH(block, masked);													// callh   masked
 				UML_SHR(block, IREG(0), IREG(0), IMM(16));									// shr     i0,i0,16
-				UML_OR(block, IREG(0), IREG(0), MEM(&ppc->impstate->tempdata));				// or      i0,i0,[tempdata]
+				UML_OR(block, IREG(0), IREG(0), MEM(&ppc->impstate->tempdata.w.l));			// or      i0,i0,[tempdata]
 				UML_RET(block);																// ret
 				UML_LABEL(block, offs3);												// offs3:
 				UML_SUB(block, IREG(0), IREG(0), IMM(3));									// sub     i0,i0,3
 				UML_MOV(block, IREG(2), IMM(0x000000ff));									// mov     i2,0x000000ff
 				UML_CALLH(block, masked);													// callh   masked
-				UML_SHL(block, MEM(&ppc->impstate->tempdata), IREG(0), IMM(24));			// shl     [tempdata],i0,24
+				UML_SHL(block, MEM(&ppc->impstate->tempdata.w.l), IREG(0), IMM(24));		// shl     [tempdata],i0,24
 				UML_ADD(block, IREG(0), MEM(&ppc->impstate->tempaddr), IMM(1));				// add     i0,[tempaddr],1
 				UML_MOV(block, IREG(2), IMM(0xffffff00));									// mov     i2,0xffffff00
 				UML_CALLH(block, masked);													// callh   masked
 				UML_SHR(block, IREG(0), IREG(0), IMM(8));									// shr     i0,i0,8
-				UML_OR(block, IREG(0), IREG(0), MEM(&ppc->impstate->tempdata));				// or      i0,i0,[tempdata]
+				UML_OR(block, IREG(0), IREG(0), MEM(&ppc->impstate->tempdata.w.l));			// or      i0,i0,[tempdata]
 			}
 		}
 		UML_RET(block);																		// ret
@@ -1834,6 +1835,122 @@ static void static_generate_swap_tgpr(drcuml_state *drcuml)
 	drcuml_block_end(block);
 }
 
+
+/*-------------------------------------------------
+    static_generate_lsw_entries - generate a
+    subroutine to perform LSWI/LSWX; one handle
+    for each possible register
+-------------------------------------------------*/
+
+static void static_generate_lsw_entries(drcuml_state *drcuml, int mode)
+{
+	drcuml_block *block;
+	jmp_buf errorbuf;
+	int regnum;
+
+	/* if we get an error back, we're screwed */
+	if (setjmp(errorbuf) != 0)
+		fatalerror("Unrecoverable error in static_generate_lsw_entries");
+
+	/* begin generating */
+	block = drcuml_block_begin(drcuml, 32 * 30, &errorbuf);
+
+	/* iterate over all possible registers */
+	for (regnum = 0; regnum < 32; regnum++)
+	{
+		char temp[20];
+		
+		/* allocate a handle */
+		sprintf(temp, "lsw%d", regnum);
+		alloc_handle(drcuml, &ppc->impstate->lsw[mode][regnum], temp);
+		UML_HANDLE(block, ppc->impstate->lsw[mode][regnum]);								// handle  lsw<regnum>
+		UML_LABEL(block, regnum);														// regnum:
+		UML_ADD(block, IREG(0), MEM(&ppc->impstate->updateaddr), IMM(0));					// add     i0,[updateaddr],0
+		UML_CALLH(block, ppc->impstate->read8[mode]);										// callh   read8
+		UML_ROLAND(block, R32(regnum), IREG(0), IMM(24), IMM(0xff000000));					// roland  reg,i0,24,0xff000000
+		UML_SUB(block, MEM(&ppc->impstate->swcount), MEM(&ppc->impstate->swcount), IMM(1));	// sub     [swcount],[swcount],1
+		UML_RETc(block, IF_Z);																// ret     z
+		UML_ADD(block, IREG(0), MEM(&ppc->impstate->updateaddr), IMM(1));					// add     i0,[updateaddr],1
+		UML_CALLH(block, ppc->impstate->read8[mode]);										// callh   read8
+		UML_ROLAND(block, IREG(0), IREG(0), IMM(16), IMM(0x00ff0000));						// roland  i0,i0,16,0x00ff0000
+		UML_OR(block, R32(regnum), R32(regnum), IREG(0));									// or      reg,i0
+		UML_SUB(block, MEM(&ppc->impstate->swcount), MEM(&ppc->impstate->swcount), IMM(1));	// sub     [swcount],[swcount],1
+		UML_RETc(block, IF_Z);																// ret     z
+		UML_ADD(block, IREG(0), MEM(&ppc->impstate->updateaddr), IMM(2));					// add     i0,[updateaddr],2
+		UML_CALLH(block, ppc->impstate->read8[mode]);										// callh   read8
+		UML_ROLAND(block, IREG(0), IREG(0), IMM(8), IMM(0x0000ff00));						// roland  i0,i0,8,0x0000ff00
+		UML_OR(block, R32(regnum), R32(regnum), IREG(0));									// or      reg,i0
+		UML_SUB(block, MEM(&ppc->impstate->swcount), MEM(&ppc->impstate->swcount), IMM(1));	// sub     [swcount],[swcount],1
+		UML_RETc(block, IF_Z);																// ret     z
+		UML_ADD(block, IREG(0), MEM(&ppc->impstate->updateaddr), IMM(3));					// add     i0,[updateaddr],3
+		UML_ADD(block, MEM(&ppc->impstate->updateaddr), IREG(0), IMM(1));					// add     [updateaddr],i0,1
+		UML_CALLH(block, ppc->impstate->read8[mode]);										// callh   read8
+		UML_ROLAND(block, IREG(0), IREG(0), IMM(0), IMM(0x000000ff));						// roland  i0,i0,0,0x000000ff
+		UML_OR(block, R32(regnum), R32(regnum), IREG(0));									// or      reg,i0
+		UML_SUB(block, MEM(&ppc->impstate->swcount), MEM(&ppc->impstate->swcount), IMM(1));	// sub     [swcount],[swcount],1
+		UML_RETc(block, IF_Z);																// ret     z
+		UML_JMP(block, (regnum + 1) % 32);													// jmp     nextreg
+	}
+
+	drcuml_block_end(block);
+}
+
+
+/*-------------------------------------------------
+    static_generate_stsw_entries - generate a
+    subroutine to perform LSWI/LSWX; one handle
+    for each possible register
+-------------------------------------------------*/
+
+static void static_generate_stsw_entries(drcuml_state *drcuml, int mode)
+{
+	drcuml_block *block;
+	jmp_buf errorbuf;
+	int regnum;
+
+	/* if we get an error back, we're screwed */
+	if (setjmp(errorbuf) != 0)
+		fatalerror("Unrecoverable error in static_generate_stsw_entries");
+
+	/* begin generating */
+	block = drcuml_block_begin(drcuml, 32 * 30, &errorbuf);
+
+	/* iterate over all possible registers */
+	for (regnum = 0; regnum < 32; regnum++)
+	{
+		char temp[20];
+		
+		/* allocate a handle */
+		sprintf(temp, "stsw%d", regnum);
+		alloc_handle(drcuml, &ppc->impstate->stsw[mode][regnum], temp);
+		UML_HANDLE(block, ppc->impstate->stsw[mode][regnum]);								// handle  stsw<regnum>
+		UML_LABEL(block, regnum);														// regnum:
+		UML_ADD(block, IREG(0), MEM(&ppc->impstate->updateaddr), IMM(0));					// add     i0,[updateaddr],0
+		UML_ROLAND(block, IREG(1), R32(regnum), IMM(8), IMM(0xff));							// roland  i1,regnum,8,0xff
+		UML_CALLH(block, ppc->impstate->write8[mode]);										// callh   write8
+		UML_SUB(block, MEM(&ppc->impstate->swcount), MEM(&ppc->impstate->swcount), IMM(1));	// sub     [swcount],[swcount],1
+		UML_RETc(block, IF_Z);																// ret     z
+		UML_ADD(block, IREG(0), MEM(&ppc->impstate->updateaddr), IMM(1));					// add     i0,[updateaddr],1
+		UML_ROLAND(block, IREG(1), R32(regnum), IMM(16), IMM(0xff));						// roland  i1,regnum,16,0xff
+		UML_CALLH(block, ppc->impstate->write8[mode]);										// callh   write8
+		UML_SUB(block, MEM(&ppc->impstate->swcount), MEM(&ppc->impstate->swcount), IMM(1));	// sub     [swcount],[swcount],1
+		UML_RETc(block, IF_Z);																// ret     z
+		UML_ADD(block, IREG(0), MEM(&ppc->impstate->updateaddr), IMM(2));					// add     i0,[updateaddr],2
+		UML_ROLAND(block, IREG(1), R32(regnum), IMM(24), IMM(0xff));						// roland  i1,regnum,24,0xff
+		UML_CALLH(block, ppc->impstate->write8[mode]);										// callh   write8
+		UML_SUB(block, MEM(&ppc->impstate->swcount), MEM(&ppc->impstate->swcount), IMM(1));	// sub     [swcount],[swcount],1
+		UML_RETc(block, IF_Z);																// ret     z
+		UML_ADD(block, IREG(0), MEM(&ppc->impstate->updateaddr), IMM(3));					// add     i0,[updateaddr],3
+		UML_ADD(block, MEM(&ppc->impstate->updateaddr), IREG(0), IMM(1));					// add     [updateaddr],i0,1
+		UML_ROLAND(block, IREG(1), R32(regnum), IMM(0), IMM(0xff));							// roland  i1,regnum,0,0xff
+		UML_CALLH(block, ppc->impstate->write8[mode]);										// callh   write8
+		UML_SUB(block, MEM(&ppc->impstate->swcount), MEM(&ppc->impstate->swcount), IMM(1));	// sub     [swcount],[swcount],1
+		UML_RETc(block, IF_Z);																// ret     z
+		UML_JMP(block, (regnum + 1) % 32);													// jmp     nextreg
+	}
+
+	drcuml_block_end(block);
+}
 
 
 /***************************************************************************
@@ -2238,6 +2355,8 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			UML_CMP(block, R32(G_RA(op)), IMM(G_UIMM(op)));									// cmp     ra,uimm
 			UML_GETFLGS(block, IREG(0), DRCUML_FLAG_Z | DRCUML_FLAG_C);						// getflgs i0,zc
 			UML_LOAD(block, IREG(0), ppc->impstate->cmpl_cr_table, IREG(0), DWORD);			// load    i0,cmpl_cr_table,i0,dword
+			UML_ROLINS(block, IREG(0), SPR32(SPR_XER), IMM(32 - (3 + 4 * G_CRFD(op))), IMM(CRMASK(G_CRFD(op)) & 0x11111111));
+																							// rolins  i0,[xer],32-(3+4*crfd),0x11111111 & crmask[cr]
 			UML_ROLINS(block, CR32, IREG(0), IMM(0), IMM(CRMASK(G_CRFD(op))));				// rolins  cr,i0,0,crmask[cr]
 			return TRUE;
 
@@ -2245,6 +2364,8 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			UML_CMP(block, R32(G_RA(op)), IMM((INT16)G_SIMM(op)));							// cmp     ra,uimm
 			UML_GETFLGS(block, IREG(0), DRCUML_FLAG_Z | DRCUML_FLAG_C | DRCUML_FLAG_S);		// getflgs i0,zcs
 			UML_LOAD(block, IREG(0), ppc->impstate->cmp_cr_table, IREG(0), DWORD);			// load    i0,cmp_cr_table,i0,dword
+			UML_ROLINS(block, IREG(0), SPR32(SPR_XER), IMM(32 - (3 + 4 * G_CRFD(op))), IMM(CRMASK(G_CRFD(op)) & 0x11111111));
+																							// rolins  i0,[xer],32-(3+4*crfd),0x11111111 & crmask[cr]
 			UML_ROLINS(block, CR32, IREG(0), IMM(0), IMM(CRMASK(G_CRFD(op))));				// rolins  cr,i0,0,crmask[cr]
 			return TRUE;
 
@@ -2268,6 +2389,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			return TRUE;
 
 		case 0x11:	/* SC */
+			UML_MAPVAR(block, MAPVAR_PC, desc->pc + 4);										// mapvar  PC,desc->pc+4
 			UML_EXH(block, ppc->impstate->exception[EXCEPTION_SYSCALL], IMM(0));			// exh     syscall,0
 			return TRUE;
 
@@ -2282,30 +2404,21 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			UML_ROLINS(block, R32(G_RA(op)), R32(G_RS(op)), IMM(G_SH(op)), IMM(compute_rlw_mask(G_MB(op), G_ME(op))));
 																							// rolins ra,rs,sh,mask
 			if (op & M_RC)
-			{
-				UML_TEST(block, R32(G_RA(op)), IMM(~0));									// test    ra,~0
 				generate_compute_flags(block, TRUE, 0, FALSE);								// <update flags>
-			}
 			return TRUE;
 
 		case 0x15:	/* RLWINMx */
 			UML_ROLAND(block, R32(G_RA(op)), R32(G_RS(op)), IMM(G_SH(op)), IMM(compute_rlw_mask(G_MB(op), G_ME(op))));
 																							// roland ra,rs,sh,mask
 			if (op & M_RC)
-			{
-				UML_TEST(block, R32(G_RA(op)), IMM(~0));									// test    ra,~0
 				generate_compute_flags(block, TRUE, 0, FALSE);								// <update flags>
-			}
 			return TRUE;
 
 		case 0x17:	/* RLWNMx */
 			UML_ROLAND(block, R32(G_RA(op)), R32(G_RS(op)), R32(G_RB(op)), IMM(compute_rlw_mask(G_MB(op), G_ME(op))));
 																							// roland ra,rs,rb,mask
 			if (op & M_RC)
-			{
-				UML_TEST(block, R32(G_RA(op)), IMM(~0));									// test    ra,~0
 				generate_compute_flags(block, TRUE, 0, FALSE);								// <update flags>
-			}
 			return TRUE;
 
 		case 0x18:	/* ORI */
@@ -2491,8 +2604,8 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			UML_ADD(block, IREG(0), R32Z(G_RA(op)), IMM((INT16)G_SIMM(op)));				// add     i0,ra,simm
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMM(op));									// mapvar  dsisr,DSISR_IMM(op)
 			UML_CALLH(block, ppc->impstate->read32[ppc->impstate->mode & 3]);				// callh   read32
-			UML_MOV(block, MEM(&ppc->impstate->tempdata), IREG(0));							// mov     [tempdata],i0
-			UML_FDFRFLT(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata), DWORD);		// fdfrflt fd,[tempdata],dword
+			UML_MOV(block, MEM(&ppc->impstate->tempdata.w.l), IREG(0));						// mov     [tempdata],i0
+			UML_FDFRFLT(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata.w.l), DWORD);	// fdfrflt fd,[tempdata],dword
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
 			return TRUE;
 
@@ -2500,8 +2613,8 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			UML_ADD(block, IREG(0), R32Z(G_RA(op)), IMM((INT16)G_SIMM(op)));				// add     i0,ra,simm
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMM(op));									// mapvar  dsisr,DSISR_IMM(op)
 			UML_CALLH(block, ppc->impstate->read64[ppc->impstate->mode & 3]);				// callh   read64
-			UML_DMOV(block, MEM(&ppc->impstate->tempdata), IREG(0));						// dmov    [tempdata],i0
-			UML_FDMOV(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata));					// fdmov   fd,[tempdata]
+			UML_DMOV(block, MEM(&ppc->impstate->tempdata.d), IREG(0));						// dmov    [tempdata],i0
+			UML_FDMOV(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata.d));				// fdmov   fd,[tempdata]
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
 			return TRUE;
 
@@ -2510,8 +2623,8 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			UML_MOV(block, MEM(&ppc->impstate->updateaddr), IREG(0));						// mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));								// mapvar  dsisr,DSISR_IMMU(op)
 			UML_CALLH(block, ppc->impstate->read32[ppc->impstate->mode & 3]);				// callh   read32
-			UML_MOV(block, MEM(&ppc->impstate->tempdata), IREG(0));							// mov     [tempdata],i0
-			UML_FDFRFLT(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata), DWORD);		// fdfrflt fd,[tempdata],dword
+			UML_MOV(block, MEM(&ppc->impstate->tempdata.w.l), IREG(0));						// mov     [tempdata],i0
+			UML_FDFRFLT(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata.w.l), DWORD);	// fdfrflt fd,[tempdata],dword
 			UML_MOV(block, R32(G_RA(op)), MEM(&ppc->impstate->updateaddr));					// mov     ra,[updateaddr]
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
 			return TRUE;
@@ -2521,16 +2634,16 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			UML_MOV(block, MEM(&ppc->impstate->updateaddr), IREG(0));						// mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));								// mapvar  dsisr,DSISR_IMMU(op)
 			UML_CALLH(block, ppc->impstate->read64[ppc->impstate->mode & 3]);				// callh   read64
-			UML_DMOV(block, MEM(&ppc->impstate->tempdata), IREG(0));						// dmov    [tempdata],i0
-			UML_FDMOV(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata));					// fdmov   fd,[tempdata]
+			UML_DMOV(block, MEM(&ppc->impstate->tempdata.d), IREG(0));						// dmov    [tempdata],i0
+			UML_FDMOV(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata.d));				// fdmov   fd,[tempdata]
 			UML_MOV(block, R32(G_RA(op)), MEM(&ppc->impstate->updateaddr));					// mov     ra,[updateaddr]
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
 			return TRUE;
 
 		case 0x34:	/* STFS */
 			UML_ADD(block, IREG(0), R32Z(G_RA(op)), IMM((INT16)G_SIMM(op)));				// add     i0,ra,simm
-			UML_FSFRFLT(block, MEM(&ppc->impstate->tempdata), F64(G_RS(op)), QWORD);		// fsfrflt [tempdata],rs,qword
-			UML_MOV(block, IREG(1), MEM(&ppc->impstate->tempdata));							// mov     i1,[tempdata]
+			UML_FSFRFLT(block, MEM(&ppc->impstate->tempdata.w.l), F64(G_RS(op)), QWORD);	// fsfrflt [tempdata],rs,qword
+			UML_MOV(block, IREG(1), MEM(&ppc->impstate->tempdata.w.l));						// mov     i1,[tempdata]
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMM(op));									// mapvar  dsisr,DSISR_IMM(op)
 			UML_CALLH(block, ppc->impstate->write32[ppc->impstate->mode & 3]);				// callh   write32
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
@@ -2538,8 +2651,8 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case 0x36:	/* STFD */
 			UML_ADD(block, IREG(0), R32Z(G_RA(op)), IMM((INT16)G_SIMM(op)));				// add     i0,ra,simm
-			UML_FDMOV(block, MEM(&ppc->impstate->tempdata), F64(G_RS(op)));					// fdmov   [tempdata],rs
-			UML_DMOV(block, IREG(1), MEM(&ppc->impstate->tempdata));						// dmov    i1,[tempdata]
+			UML_FDMOV(block, MEM(&ppc->impstate->tempdata.d), F64(G_RS(op)));				// fdmov   [tempdata],rs
+			UML_DMOV(block, IREG(1), MEM(&ppc->impstate->tempdata.d));						// dmov    i1,[tempdata]
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMM(op));									// mapvar  dsisr,DSISR_IMM(op)
 			UML_CALLH(block, ppc->impstate->write64[ppc->impstate->mode & 3]);				// callh   write64
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
@@ -2547,8 +2660,8 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case 0x35:	/* STFSU */
 			UML_ADD(block, IREG(0), R32(G_RA(op)), IMM((INT16)G_SIMM(op)));					// add     i0,ra,simm
-			UML_FSFRFLT(block, MEM(&ppc->impstate->tempdata), F64(G_RS(op)), QWORD);		// fsfrflt [tempdata],rs,qword
-			UML_MOV(block, IREG(1), MEM(&ppc->impstate->tempdata));							// mov     i1,[tempdata]
+			UML_FSFRFLT(block, MEM(&ppc->impstate->tempdata.w.l), F64(G_RS(op)), QWORD);	// fsfrflt [tempdata],rs,qword
+			UML_MOV(block, IREG(1), MEM(&ppc->impstate->tempdata.w.l));						// mov     i1,[tempdata]
 			UML_MOV(block, MEM(&ppc->impstate->updateaddr), IREG(0));						// mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));								// mapvar  dsisr,DSISR_IMMU(op)
 			UML_CALLH(block, ppc->impstate->write32[ppc->impstate->mode & 3]);				// callh   write32
@@ -2558,8 +2671,8 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case 0x37:	/* STFDU */
 			UML_ADD(block, IREG(0), R32(G_RA(op)), IMM((INT16)G_SIMM(op)));					// add     i0,ra,simm
-			UML_FDMOV(block, MEM(&ppc->impstate->tempdata), F64(G_RS(op)));					// fdmov   [tempdata],rs
-			UML_DMOV(block, IREG(1), MEM(&ppc->impstate->tempdata));						// dmov    i1,[tempdata]
+			UML_FDMOV(block, MEM(&ppc->impstate->tempdata.d), F64(G_RS(op)));				// fdmov   [tempdata],rs
+			UML_DMOV(block, IREG(1), MEM(&ppc->impstate->tempdata.d));						// dmov    i1,[tempdata]
 			UML_MOV(block, MEM(&ppc->impstate->updateaddr), IREG(0));						// mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));								// mapvar  dsisr,DSISR_IMMU(op)
 			UML_CALLH(block, ppc->impstate->write64[ppc->impstate->mode & 3]);				// callh   write64
@@ -2725,7 +2838,6 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 {
 	UINT32 op = *desc->opptr.l;
 	UINT32 opswitch = (op >> 1) & 0x3ff;
-	drcuml_codelabel swloop, swloopend;
 	int item;
 
 	switch (opswitch)
@@ -2851,6 +2963,8 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 			UML_CMP(block, R32(G_RA(op)), R32(G_RB(op)));									// cmp     ra,rb
 			UML_GETFLGS(block, IREG(0), DRCUML_FLAG_Z | DRCUML_FLAG_C | DRCUML_FLAG_S);		// getflgs i0,zcs
 			UML_LOAD(block, IREG(0), ppc->impstate->cmp_cr_table, IREG(0), DWORD);			// load    i0,cmp_cr_table,i0,dword
+			UML_ROLINS(block, IREG(0), SPR32(SPR_XER), IMM(32 - (3 + 4 * G_CRFD(op))), IMM(CRMASK(G_CRFD(op)) & 0x11111111));
+																							// rolins  i0,[xer],32-(3+4*crfd),0x11111111 & crmask[cr]
 			UML_ROLINS(block, CR32, IREG(0), IMM(0), IMM(CRMASK(G_CRFD(op))));				// rolins  cr,i0,0,crmask[cr]
 			return TRUE;
 
@@ -2858,37 +2972,33 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 			UML_CMP(block, R32(G_RA(op)), R32(G_RB(op)));									// cmp     ra,rb
 			UML_GETFLGS(block, IREG(0), DRCUML_FLAG_Z | DRCUML_FLAG_C);						// getflgs i0,zc
 			UML_LOAD(block, IREG(0), ppc->impstate->cmpl_cr_table, IREG(0), DWORD);			// load    i0,cmpl_cr_table,i0,dword
+			UML_ROLINS(block, IREG(0), SPR32(SPR_XER), IMM(32 - (3 + 4 * G_CRFD(op))), IMM(CRMASK(G_CRFD(op)) & 0x11111111));
+																							// rolins  i0,[xer],32-(3+4*crfd),0x11111111 & crmask[cr]
 			UML_ROLINS(block, CR32, IREG(0), IMM(0), IMM(CRMASK(G_CRFD(op))));				// rolins  cr,i0,0,crmask[cr]
 			return TRUE;
 
 		case 0x00b:	/* MULHWUx */
-			UML_MULU(block, IREG(0), R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));			// mulu    i0,rd,ra,rb,FLAGS_RC(op)
-			generate_compute_flags(block, op & M_RC, 0, FALSE);								// <update flags>
+			UML_MULU(block, IREG(0), R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));			// mulu    i0,rd,ra,rb
+			if (op & M_RC)
+			{
+				UML_TEST(block, R32(G_RD(op)), IMM(~0));									// test    rd,~0
+				generate_compute_flags(block, op & M_RC, 0, FALSE);							// <update flags>
+			}
 			return TRUE;
 
 		case 0x04b:	/* MULHWx */
-			UML_MULS(block, IREG(0), R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));			// muls    i0,rd,ra,rb,,FLAGS_RC(op)
-			generate_compute_flags(block, op & M_RC, 0, FALSE);								// <update flags>
+			UML_MULS(block, IREG(0), R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));			// muls    i0,rd,ra,rb
+			if (op & M_RC)
+			{
+				UML_TEST(block, R32(G_RD(op)), IMM(~0));									// test    rd,~0
+				generate_compute_flags(block, op & M_RC, 0, FALSE);							// <update flags>
+			}
 			return TRUE;
 
 		case 0x0eb:	/* MULLWx */
 		case 0x2eb:	/* MULLWOx */
-			if (!(op & M_OE))
-			{
-				UML_MULS(block, R32(G_RD(op)), R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));// muls    rd,rd,ra,rb,FLAGS_RC(op)
-				generate_compute_flags(block, op & M_RC, 0, FALSE);							// <update flags>
-			}
-			else
-			{
-				UML_MULS(block, IREG(0), IREG(1), R32(G_RA(op)), R32(G_RB(op)));			// muls    i0,i1,ra,rb
-				generate_compute_flags(block, op & M_RC, 0, FALSE);							// <update flags>
-				UML_MOV(block, R32(G_RD(op)), IREG(0));										// mov     rd,i0
-				UML_SAR(block, IREG(0), IREG(0), IMM(31));									// sar     i0,i0,31
-				UML_AND(block, SPR32(SPR_XER), SPR32(SPR_XER), IMM(XER_OV));				// and     [xer],[xer],XER_OV
-				UML_XOR(block, IREG(0), IREG(0), IREG(1));									// xor     i0,i0,i1
-				UML_MOVc(block, IF_NZ, IREG(0), IMM(XER_OV | XER_SO));						// mov     i0,XER_OV | XER_SO,NZ
-				UML_OR(block, SPR32(SPR_XER), SPR32(SPR_XER), IREG(0));						// or      [xer],[xer],i0
-			}
+			UML_MULS(block, R32(G_RD(op)), R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));	// muls    rd,rd,ra,rb
+			generate_compute_flags(block, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);	// <update flags>
 			return TRUE;
 
 		case 0x1cb:	/* DIVWUx */
@@ -2954,26 +3064,32 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 			return TRUE;
 
 		case 0x218:	/* SRWx */
-			UML_SHR(block, R32(G_RA(op)), R32(G_RS(op)), R32(G_RB(op)));					// shr     ra,rs,rb
+			UML_MOV(block, IREG(0), R32(G_RS(op)));											// mov     i0,rs
+			UML_TEST(block, R32(G_RB(op)), IMM(0x20));										// test    rb,0x20
+			UML_MOVc(block, IF_NZ, IREG(0), IMM(0));										// mov     i0,0,nz
+			UML_SHR(block, R32(G_RA(op)), IREG(0), R32(G_RB(op)));							// shr     ra,i0,rb
 			generate_compute_flags(block, op & M_RC, 0, FALSE);								// <update flags>
 			return TRUE;
 
 		case 0x318:	/* SRAWx */
-			UML_SHL(block, IREG(1), IMM(0xffffffff), R32(G_RB(op)));						// shl     i1,0xffffffff,rb
+			UML_MOV(block, IREG(2), R32(G_RB(op)));											// mov     i2,rb
+			UML_TEST(block, IREG(2), IMM(0x20));											// test    i2,0x20
+			UML_MOVc(block, IF_NZ, IREG(2), IMM(31));										// mov     i2,31,nz
+			UML_SHL(block, IREG(1), IMM(0xffffffff), IREG(2));								// shl     i1,0xffffffff,i2
 			UML_XOR(block, IREG(1), IREG(1), IMM(~0));										// xor     i1,i1,~0
 			UML_AND(block, IREG(0), R32(G_RS(op)), IREG(1));								// and     i0,rs,i1
 			UML_SAR(block, IREG(1), R32(G_RS(op)), IMM(31));								// sar     i1,rs,31
-			UML_AND(block, IREG(0), IREG(0), IREG(1));										// and     i0,i0,i1
+			UML_TEST(block, IREG(0), IREG(1));												// test    i0,i1
 			UML_SETc(block, IF_NZ, IREG(0));												// set     i0,nz
 			UML_ROLINS(block, SPR32(SPR_XER), IREG(0), IMM(29), IMM(XER_CA));				// rolins  [xer],i0,29,XER_CA
-			UML_SAR(block, R32(G_RA(op)), R32(G_RS(op)), R32(G_RB(op)));					// sar     ra,rs,rb
+			UML_SAR(block, R32(G_RA(op)), R32(G_RS(op)), IREG(2));							// sar     ra,rs,i2
 			generate_compute_flags(block, op & M_RC, 0, FALSE);								// <update flags>
 			return TRUE;
 
 		case 0x338:	/* SRAWIx */
 			UML_AND(block, IREG(0), R32(G_RS(op)), IMM(~(0xffffffff << (G_SH(op) & 31))));	// and     i0,rs,~(0xffffffff << (sh & 31))
 			UML_SAR(block, IREG(1), R32(G_RS(op)), IMM(31));								// sar     i1,rs,31
-			UML_AND(block, IREG(0), IREG(0), IREG(1));										// and     i0,i0,i1
+			UML_TEST(block, IREG(0), IREG(1));												// test    i0,i1
 			UML_SETc(block, IF_NZ, IREG(0));												// set     i0,nz
 			UML_ROLINS(block, SPR32(SPR_XER), IREG(0), IMM(29), IMM(XER_CA));				// rolins  [xer],i0,29,XER_CA
 			UML_SAR(block, R32(G_RA(op)), R32(G_RS(op)), IMM(G_SH(op)));					// sar     ra,rs,sh
@@ -2981,30 +3097,21 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 			return TRUE;
 
 		case 0x01a:	/* CNTLZWx */
-			UML_LZCNT(block, R32(G_RA(op)), R32(G_RS(op)));									// lzcnt   ra,rs,rb
+			UML_LZCNT(block, R32(G_RA(op)), R32(G_RS(op)));									// lzcnt   ra,rs
 			if (op & M_RC)
-			{
-				UML_TEST(block, R32(G_RA(op)), IMM(~0));									// test    ra,~0
 				generate_compute_flags(block, op & M_RC, 0, FALSE);							// <update flags>
-			}
 			return TRUE;
 
 		case 0x3ba:	/* EXTSBx */
 			UML_SEXT(block, R32(G_RA(op)), R32(G_RS(op)), BYTE);							// sext    ra,rs,byte
 			if (op & M_RC)
-			{
-				UML_TEST(block, R32(G_RA(op)), IMM(~0));									// test    ra,~0
 				generate_compute_flags(block, op & M_RC, 0, FALSE);							// <update flags>
-			}
 			return TRUE;
 
 		case 0x39a:	/* EXTSHx */
 			UML_SEXT(block, R32(G_RA(op)), R32(G_RS(op)), WORD);							// sext    ra,rs,word
 			if (op & M_RC)
-			{
-				UML_TEST(block, R32(G_RA(op)), IMM(~0));									// test    ra,~0
 				generate_compute_flags(block, op & M_RC, 0, FALSE);							// <update flags>
-			}
 			return TRUE;
 
 		case 0x057:	/* LBZX */
@@ -3043,8 +3150,8 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 			UML_ADD(block, IREG(0), R32Z(G_RA(op)), R32(G_RB(op)));							// add     i0,ra,rb
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));									// mapvar  dsisr,DSISR_IDX(op)
 			UML_CALLH(block, ppc->impstate->read32[ppc->impstate->mode & 3]);				// callh   read32
-			UML_MOV(block, MEM(&ppc->impstate->tempdata), IREG(0));							// mov     [tempdata],i0
-			UML_FDFRFLT(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata), DWORD);		// fdfrflt fd,[tempdata],dword
+			UML_MOV(block, MEM(&ppc->impstate->tempdata.w.l), IREG(0));						// mov     [tempdata],i0
+			UML_FDFRFLT(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata.w.l), DWORD);	// fdfrflt fd,[tempdata],dword
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
 			return TRUE;
 
@@ -3052,8 +3159,8 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 			UML_ADD(block, IREG(0), R32Z(G_RA(op)), R32(G_RB(op)));							// add     i0,ra,rb
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));									// mapvar  dsisr,DSISR_IDX(op)
 			UML_CALLH(block, ppc->impstate->read64[ppc->impstate->mode & 3]);				// callh   read64
-			UML_DMOV(block, MEM(&ppc->impstate->tempdata), IREG(0));						// dmov    [tempdata],i0
-			UML_FDMOV(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata));					// fdmov   fd,[tempdata]
+			UML_DMOV(block, MEM(&ppc->impstate->tempdata.d), IREG(0));						// dmov    [tempdata],i0
+			UML_FDMOV(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata.d));				// fdmov   fd,[tempdata]
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
 			return TRUE;
 
@@ -3119,8 +3226,8 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 			UML_MOV(block, MEM(&ppc->impstate->updateaddr), IREG(0));						// mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));									// mapvar  dsisr,DSISR_IDX(op)
 			UML_CALLH(block, ppc->impstate->read32[ppc->impstate->mode & 3]);				// callh   read32
-			UML_MOV(block, MEM(&ppc->impstate->tempdata), IREG(0));							// mov     [tempdata],i0
-			UML_FDFRFLT(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata), DWORD);		// fdfrflt fd,[tempdata],dword
+			UML_MOV(block, MEM(&ppc->impstate->tempdata.w.l), IREG(0));						// mov     [tempdata],i0
+			UML_FDFRFLT(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata.w.l), DWORD);	// fdfrflt fd,[tempdata],dword
 			UML_MOV(block, R32(G_RA(op)), MEM(&ppc->impstate->updateaddr));					// mov     ra,[updateaddr]
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
 			return TRUE;
@@ -3130,8 +3237,8 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 			UML_MOV(block, MEM(&ppc->impstate->updateaddr), IREG(0));						// mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));									// mapvar  dsisr,DSISR_IDX(op)
 			UML_CALLH(block, ppc->impstate->read64[ppc->impstate->mode & 3]);				// callh   read64
-			UML_DMOV(block, MEM(&ppc->impstate->tempdata), IREG(0));						// dmov    [tempdata],i0
-			UML_FDMOV(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata));					// fdmov   fd,[tempdata]
+			UML_DMOV(block, MEM(&ppc->impstate->tempdata.d), IREG(0));						// dmov    [tempdata],i0
+			UML_FDMOV(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata.d));				// fdmov   fd,[tempdata]
 			UML_MOV(block, R32(G_RA(op)), MEM(&ppc->impstate->updateaddr));					// mov     ra,[updateaddr]
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
 			return TRUE;
@@ -3145,48 +3252,16 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 			return TRUE;
 
 		case 0x255:	/* LSWI */
-			UML_MOV(block, MEM(&ppc->impstate->swcount), IMM(((G_NB(op) - 1) & 0x1f) + 1));	// mov     [swcount],[xer],G_NB
 			UML_MOV(block, MEM(&ppc->impstate->updateaddr), R32Z(G_RA(op)));				// mov     [updateaddr],ra
-			UML_MOV(block, MEM(&ppc->impstate->swreg), IMM(4 * G_RD(op)));					// mov     [swreg],4*G_RD(op)
-			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));									// mapvar  dsisr,DSISR_IDX(op)
-			save_fast_iregs(block);															// <save fastregs>
-			UML_LABEL(block, swloop = compiler->labelnum++);							// swloop:
-			UML_MOV(block, IREG(0), MEM(&ppc->impstate->updateaddr));						// mov     i0,[updateaddr]
-			UML_ADD(block, MEM(&ppc->impstate->updateaddr), IREG(0), IMM(1));				// add     [updateaddr],i0,1
-			UML_CALLH(block, ppc->impstate->read8[ppc->impstate->mode & 3]);				// callh   read8
-			UML_MOV(block, IREG(1), MEM(&ppc->impstate->swreg));							// mov     i1,[swreg]
-			UML_ADD(block, IREG(2), IREG(1), IMM(1));										// add     i2,i1,1
-			UML_AND(block, MEM(&ppc->impstate->swreg), IREG(2), IMM(0x7f));					// and     [swreg],i2,0x7f
-			UML_XOR(block, IREG(1), IREG(1), IMM(BYTE4_XOR_BE(0)));							// xor     i1,i1,be_xor(0)
-			UML_STORE(block, &ppc->r[0], IREG(1), IREG(0), BYTE);							// store   &r0,i1,i0,byte
-			UML_SUB(block, MEM(&ppc->impstate->swcount), MEM(&ppc->impstate->swcount), IMM(1));
-																							// sub     [swcount],[swcount],1
-			UML_JMPc(block, IF_NZ, swloop);													// jmp     swloop,NZ
-			load_fast_iregs(block);															// <load fastregs>
+			UML_MOV(block, MEM(&ppc->impstate->swcount), IMM(((G_NB(op) - 1) & 0x1f) + 1));	// mov     [swcount],G_NB
+			UML_CALLH(block, ppc->impstate->lsw[ppc->impstate->mode & 3][G_RD(op)]);		// call    lsw[rd]
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
 			return TRUE;
 
 		case 0x215:	/* LSWX */
-			UML_AND(block, MEM(&ppc->impstate->swcount), SPR32(SPR_XER), IMM(0x7f));		// and     [swcount],[xer],0x7f
-			UML_JMPc(block, IF_Z, swloopend = compiler->labelnum++);						// jmp     swloopend,Z
 			UML_ADD(block, MEM(&ppc->impstate->updateaddr), R32Z(G_RA(op)), R32(G_RB(op)));	// add     [updateaddr],ra,rb
-			UML_MOV(block, MEM(&ppc->impstate->swreg), IMM(4 * G_RD(op)));					// mov     [swreg],4*G_RD(op)
-			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));									// mapvar  dsisr,DSISR_IDX(op)
-			save_fast_iregs(block);															// <save fastregs>
-			UML_LABEL(block, swloop = compiler->labelnum++);							// swloop:
-			UML_MOV(block, IREG(0), MEM(&ppc->impstate->updateaddr));						// mov     i0,[updateaddr]
-			UML_ADD(block, MEM(&ppc->impstate->updateaddr), IREG(0), IMM(1));				// add     [updateaddr],i0,1
-			UML_CALLH(block, ppc->impstate->read8[ppc->impstate->mode & 3]);				// callh   read8
-			UML_MOV(block, IREG(1), MEM(&ppc->impstate->swreg));							// mov     i1,[swreg]
-			UML_ADD(block, IREG(2), IREG(1), IMM(1));										// add     i2,i1,1
-			UML_AND(block, MEM(&ppc->impstate->swreg), IREG(2), IMM(0x7f));					// and     [swreg],i2,0x7f
-			UML_XOR(block, IREG(1), IREG(1), IMM(BYTE4_XOR_BE(0)));							// xor     i1,i1,be_xor(0)
-			UML_STORE(block, &ppc->r[0], IREG(1), IREG(0), BYTE);							// store   &r0,i1,i0,byte
-			UML_SUB(block, MEM(&ppc->impstate->swcount), MEM(&ppc->impstate->swcount), IMM(1));
-																							// sub     [swcount],[swcount],1
-			UML_JMPc(block, IF_NZ, swloop);													// jmp     swloop,NZ
-			UML_LABEL(block, swloopend);												// swloopend:
-			load_fast_iregs(block);															// <load fastregs>
+			UML_AND(block, MEM(&ppc->impstate->swcount), SPR32(SPR_XER), IMM(0x7f));		// and     [swcount],[xer],0x7f
+			UML_CALLHc(block, IF_NZ, ppc->impstate->lsw[ppc->impstate->mode & 3][G_RD(op)]);// call    lsw[rd],nz
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
 			return TRUE;
 
@@ -3220,8 +3295,8 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 
 		case 0x297:	/* STFSX */
 			UML_ADD(block, IREG(0), R32Z(G_RA(op)), R32(G_RB(op)));							// add     i0,ra,rb
-			UML_FSFRFLT(block, MEM(&ppc->impstate->tempdata), F64(G_RS(op)), QWORD);		// fsfrflt [tempdata],rs,qword
-			UML_MOV(block, IREG(1), MEM(&ppc->impstate->tempdata));							// mov     i1,[tempdata]
+			UML_FSFRFLT(block, MEM(&ppc->impstate->tempdata.w.l), F64(G_RS(op)), QWORD);	// fsfrflt [tempdata],rs,qword
+			UML_MOV(block, IREG(1), MEM(&ppc->impstate->tempdata.w.l));						// mov     i1,[tempdata]
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));									// mapvar  dsisr,DSISR_IDX(op)
 			UML_CALLH(block, ppc->impstate->write32[ppc->impstate->mode & 3]);				// callh   write32
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
@@ -3229,8 +3304,8 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 
 		case 0x3d7:	/* STFIWX */
 			UML_ADD(block, IREG(0), R32Z(G_RA(op)), R32(G_RB(op)));							// add     i0,ra,rb
-			UML_FDMOV(block, MEM(&ppc->impstate->tempdata), F64(G_RS(op)));					// fdmov   [tempdata],rs
-			UML_MOV(block, IREG(1), MEM((UINT32 *)&ppc->impstate->tempdata + BYTE_XOR_LE(0)));// mov   i1,[tempdata.lo]
+			UML_FDMOV(block, MEM(&ppc->impstate->tempdata.d), F64(G_RS(op)));				// fdmov   [tempdata],rs
+			UML_MOV(block, IREG(1), MEM(&ppc->impstate->tempdata.w.l));						// mov     i1,[tempdata.lo]
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));									// mapvar  dsisr,DSISR_IDX(op)
 			UML_CALLH(block, ppc->impstate->write32[ppc->impstate->mode & 3]);				// callh   write32
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
@@ -3238,8 +3313,8 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 
 		case 0x2d7:	/* STFDX */
 			UML_ADD(block, IREG(0), R32Z(G_RA(op)), R32(G_RB(op)));							// add     i0,ra,rb
-			UML_FDMOV(block, MEM(&ppc->impstate->tempdata), F64(G_RS(op)));					// fdmov   [tempdata],rs
-			UML_DMOV(block, IREG(1), MEM(&ppc->impstate->tempdata));						// dmov    i1,[tempdata]
+			UML_FDMOV(block, MEM(&ppc->impstate->tempdata.d), F64(G_RS(op)));				// fdmov   [tempdata],rs
+			UML_DMOV(block, IREG(1), MEM(&ppc->impstate->tempdata.d));						// dmov    i1,[tempdata]
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));									// mapvar  dsisr,DSISR_IDX(op)
 			UML_CALLH(block, ppc->impstate->write64[ppc->impstate->mode & 3]);				// callh   write64
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
@@ -3294,8 +3369,8 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 
 		case 0x2b7:	/* STFSUX */
 			UML_ADD(block, IREG(0), R32(G_RA(op)), R32(G_RB(op)));							// add     i0,ra,rb
-			UML_FSFRFLT(block, MEM(&ppc->impstate->tempdata), F64(G_RS(op)), QWORD);		// fsfrflt [tempdata],rs,qword
-			UML_MOV(block, IREG(1), MEM(&ppc->impstate->tempdata));							// mov     i1,[tempdata]
+			UML_FSFRFLT(block, MEM(&ppc->impstate->tempdata.w.l), F64(G_RS(op)), QWORD);	// fsfrflt [tempdata],rs,qword
+			UML_MOV(block, IREG(1), MEM(&ppc->impstate->tempdata.w.l));						// mov     i1,[tempdata]
 			UML_MOV(block, MEM(&ppc->impstate->updateaddr), IREG(0));						// mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));									// mapvar  dsisr,DSISR_IDX(op)
 			UML_CALLH(block, ppc->impstate->write32[ppc->impstate->mode & 3]);				// callh   write32
@@ -3305,8 +3380,8 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 
 		case 0x2f7:	/* STFDUX */
 			UML_ADD(block, IREG(0), R32(G_RA(op)), R32(G_RB(op)));							// add     i0,ra,rb
-			UML_FDMOV(block, MEM(&ppc->impstate->tempdata), F64(G_RS(op)));					// fdmov   [tempdata],rs
-			UML_DMOV(block, IREG(1), MEM(&ppc->impstate->tempdata));						// dmov    i1,[tempdata]
+			UML_FDMOV(block, MEM(&ppc->impstate->tempdata.d), F64(G_RS(op)));				// fdmov   [tempdata],rs
+			UML_DMOV(block, IREG(1), MEM(&ppc->impstate->tempdata.d));						// dmov    i1,[tempdata]
 			UML_MOV(block, MEM(&ppc->impstate->updateaddr), IREG(0));						// mov     [updateaddr],i0
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));									// mapvar  dsisr,DSISR_IDX(op)
 			UML_CALLH(block, ppc->impstate->write64[ppc->impstate->mode & 3]);				// callh   write64
@@ -3322,49 +3397,21 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 			UML_AND(block, IREG(0), CR32, IMM(~CRMASK(0)));									// and     i0,cr,~crmask(0)
 			UML_ROLINS(block, IREG(0), SPR32(SPR_XER), IMM(29), IMM(0x10000000));			// rolins  i0,[xer],29,0x10000000
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
+			UML_CMP(block, IREG(0), IREG(0));												// cmp     i0,i0
+			generate_compute_flags(block, TRUE, 0, FALSE);									// <update flags>
 			return TRUE;
 
 		case 0x2d5:	/* STSWI */
-			UML_MOV(block, MEM(&ppc->impstate->swcount), IMM(((G_NB(op) - 1) & 0x1f) + 1));	// mov     [swcount],[xer],G_NB
 			UML_MOV(block, MEM(&ppc->impstate->updateaddr), R32Z(G_RA(op)));				// mov     [updateaddr],ra
-			UML_MOV(block, MEM(&ppc->impstate->swreg), IMM(4 * G_RS(op)));					// mov     [swreg],4*G_RS(op)
-			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));									// mapvar  dsisr,DSISR_IDX(op)
-			save_fast_iregs(block);															// <save fastregs>
-			UML_LABEL(block, swloop = compiler->labelnum++);							// swloop:
-			UML_MOV(block, IREG(0), MEM(&ppc->impstate->updateaddr));						// mov     i0,[updateaddr]
-			UML_ADD(block, MEM(&ppc->impstate->updateaddr), IREG(0), IMM(1));				// add     [updateaddr],i0,1
-			UML_MOV(block, IREG(1), MEM(&ppc->impstate->swreg));							// mov     i1,[swreg]
-			UML_ADD(block, IREG(2), IREG(1), IMM(1));										// add     i2,i1,1
-			UML_AND(block, MEM(&ppc->impstate->swreg), IREG(2), IMM(0x7f));					// and     [swreg],i2,0x7f
-			UML_XOR(block, IREG(1), IREG(1), IMM(BYTE4_XOR_BE(0)));							// xor     i1,i1,be_xor(0)
-			UML_LOAD(block, IREG(1), &ppc->r[0], IREG(1), BYTE);							// load    i1,&r0,i1,byte
-			UML_CALLH(block, ppc->impstate->write8[ppc->impstate->mode & 3]);				// callh   write8
-			UML_SUB(block, MEM(&ppc->impstate->swcount), MEM(&ppc->impstate->swcount), IMM(1));
-																							// sub     [swcount],[swcount],1
-			UML_JMPc(block, IF_NZ, swloop);													// jmp     swloop,NZ
+			UML_MOV(block, MEM(&ppc->impstate->swcount), IMM(((G_NB(op) - 1) & 0x1f) + 1));	// mov     [swcount],G_NB
+			UML_CALLH(block, ppc->impstate->stsw[ppc->impstate->mode & 3][G_RD(op)]);		// call    stsw[rd]
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
 			return TRUE;
 
 		case 0x295:	/* STSWX */
-			UML_AND(block, MEM(&ppc->impstate->swcount), SPR32(SPR_XER), IMM(0x7f));		// and   [swcount],[xer],0x7f
-			UML_JMPc(block, IF_Z, swloopend = compiler->labelnum++);						// jmp     swloopend,Z
 			UML_ADD(block, MEM(&ppc->impstate->updateaddr), R32Z(G_RA(op)), R32(G_RB(op)));	// add     [updateaddr],ra,rb
-			UML_MOV(block, MEM(&ppc->impstate->swreg), IMM(4 * G_RS(op)));					// mov     [swreg],4*G_RS(op)
-			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));									// mapvar  dsisr,DSISR_IDX(op)
-			save_fast_iregs(block);															// <save fastregs>
-			UML_LABEL(block, swloop = compiler->labelnum++);							// swloop:
-			UML_MOV(block, IREG(0), MEM(&ppc->impstate->updateaddr));						// mov     i0,[updateaddr]
-			UML_ADD(block, MEM(&ppc->impstate->updateaddr), IREG(0), IMM(1));				// add     [updateaddr],i0,1
-			UML_MOV(block, IREG(1), MEM(&ppc->impstate->swreg));							// mov     i1,[swreg]
-			UML_ADD(block, IREG(2), IREG(1), IMM(1));										// add     i2,i1,1
-			UML_AND(block, MEM(&ppc->impstate->swreg), IREG(2), IMM(0x7f));					// and     [swreg],i2,0x7f
-			UML_XOR(block, IREG(1), IREG(1), IMM(BYTE4_XOR_BE(0)));							// xor     i1,i1,be_xor(0)
-			UML_LOAD(block, IREG(1), &ppc->r[0], IREG(1), BYTE);							// load    i1,&r0,i1,byte
-			UML_CALLH(block, ppc->impstate->write8[ppc->impstate->mode & 3]);				// callh   write8
-			UML_SUB(block, MEM(&ppc->impstate->swcount), MEM(&ppc->impstate->swcount), IMM(1));
-																							// sub     [swcount],[swcount],1
-			UML_JMPc(block, IF_NZ, swloop);													// jmp     swloop,NZ
-			UML_LABEL(block, swloopend);												// swloopend:
+			UML_AND(block, MEM(&ppc->impstate->swcount), SPR32(SPR_XER), IMM(0x7f));		// and     [swcount],[xer],0x7f
+			UML_CALLHc(block, IF_NZ, ppc->impstate->stsw[ppc->impstate->mode & 3][G_RD(op)]);// call   stsw[rd]
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
 			return TRUE;
 
@@ -3742,14 +3789,14 @@ static int generate_instruction_3f(drcuml_block *block, compiler_state *compiler
 
 			case 0x00e:	/* FCTIWx */
 				UML_FDTOINT(block, IREG(0), F64(G_RB(op)), DWORD, DEFAULT);					// fdtoint i0,rb,dword,default
-				UML_DAND(block, MEM(&ppc->impstate->tempdata), IREG(0), IMM(0xffffffff));	// dand    i0,i0,0xffffffff
-				UML_FDMOV(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata));				// fdmovr  rd,i0
+				UML_DAND(block, MEM(&ppc->impstate->tempdata.w.l), IREG(0), IMM(0xffffffff));// dand    i0,i0,0xffffffff
+				UML_FDMOV(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata.w.l));			// fdmovr  rd,i0
 				return TRUE;
 
 			case 0x00f:	/* FCTIWZx */
 				UML_FDTOINT(block, IREG(0), F64(G_RB(op)), DWORD, TRUNC);					// fdtoint i0,rb,dword,default
-				UML_DAND(block, MEM(&ppc->impstate->tempdata), IREG(0), IMM(0xffffffff));	// dand    i0,i0,0xffffffff
-				UML_FDMOV(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata));				// fdmovr  rd,i0
+				UML_DAND(block, MEM(&ppc->impstate->tempdata.w.l), IREG(0), IMM(0xffffffff));// dand    i0,i0,0xffffffff
+				UML_FDMOV(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata.w.l));			// fdmovr  rd,i0
 				return TRUE;
 
 			case 0x028:	/* FNEGx */
@@ -3784,16 +3831,18 @@ static int generate_instruction_3f(drcuml_block *block, compiler_state *compiler
 				return TRUE;
 
 			case 0x247:	/* MFFSx */
-				UML_MOV(block, R32(G_RD(op)), FPSCR32);										// mov     rd,fpscr
+				UML_MOV(block, MEM(&ppc->impstate->tempdata.w.l), FPSCR32);					// mov     [tempdata],fpscr
+				UML_FSMOV(block, F64(G_RD(op)), MEM(&ppc->impstate->tempdata.d));			// fsmov   rd,fpscr
 				return TRUE;
 
 			case 0x2c7:	/* MTFSFx */
-				UML_ROLINS(block, FPSCR32, R32(G_RB(op)), IMM(0), IMM(compute_crf_mask(G_FM(op))));
+				UML_FDMOV(block, MEM(&ppc->impstate->tempdata.d), F64(G_RB(op)));			// fdmov   [tempdata],fb
+				UML_ROLINS(block, FPSCR32, MEM(&ppc->impstate->tempdata.w.l), IMM(0), IMM(compute_crf_mask(G_FM(op))));
 																							// rolins  fpscr,rb,0,crf_mask
 				return TRUE;
 
 			case 0x086:	/* MTFSFIx */
-				UML_ROLINS(block, FPSCR32, R32(G_IMM(op)), IMM(28 - 4 * G_CRFD(op)), IMM(CRMASK(G_CRFD(op))));
+				UML_ROLINS(block, FPSCR32, IMM(G_IMM(op)), IMM(28 - 4 * G_CRFD(op)), IMM(CRMASK(G_CRFD(op))));
 																							// rolins  fpscr,rb,0,crf_mask
 				return TRUE;
 		}

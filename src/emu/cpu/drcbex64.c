@@ -4468,7 +4468,7 @@ static x86code *op_sext(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert_no_condition(inst);
-	assert_no_flags(inst);
+	assert_flags(inst, DRCUML_FLAG_S | DRCUML_FLAG_Z);
 
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI, &sizep, PTYPE_I);
@@ -4500,6 +4500,8 @@ static x86code *op_sext(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 				emit_mov_r32_r32(&dst, dstreg, srcp.value);								// mov   dstreg,srcp
 		}
 		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
+		if (inst->flags != 0)
+			emit_test_r32_r32(&dst, dstreg, dstreg);									// test  dstreg,dstreg
 	}
 
 	/* 64-bit form */
@@ -4529,6 +4531,8 @@ static x86code *op_sext(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 				emit_mov_r64_r64(&dst, dstreg, srcp.value);								// mov   dstreg,srcp
 		}
 		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
+		if (inst->flags != 0)
+			emit_test_r64_r64(&dst, dstreg, dstreg);									// test  dstreg,dstreg
 	}
 	return dst;
 }
@@ -4546,7 +4550,7 @@ static x86code *op_roland(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert_no_condition(inst);
-	assert_no_flags(inst);
+	assert_flags(inst, DRCUML_FLAG_S | DRCUML_FLAG_Z);
 
 	/* normalize parameters */
 	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI, &shiftp, PTYPE_MRI, &maskp, PTYPE_MRI);
@@ -4587,7 +4591,7 @@ static x86code *op_rolins(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert_no_condition(inst);
-	assert_no_flags(inst);
+	assert_flags(inst, DRCUML_FLAG_S | DRCUML_FLAG_Z);
 
 	/* normalize parameters */
 	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI, &shiftp, PTYPE_MRI, &maskp, PTYPE_MRI);
