@@ -544,6 +544,7 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 	int xsize,ysize, size, xpos=0,ypos=0, pri=0, romoffset, colour=0, xflip,yflip, joint;
 	int sx,sy;
 	int endromoffs=0, gfxlen;
+	int grow;
 	UINT16 zoomx, zoomy;
 
 
@@ -680,8 +681,21 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 				romoffset = endromoffs;
 			}
 
-			zoomx = source[2] >> 16;
-			zoomy = source[3] >> 16;
+			grow = (source[0]>>23) & 1;
+
+			if (!grow)
+			{
+				zoomx = (source[2] >> 16)&0xfcfc;
+				zoomy = (source[3] >> 16)&0xfcfc;
+			}
+			else
+			{
+				// the bad sprites in sengekis all have this not set..
+				// we need to handle sprite shrink properly
+				zoomx = 0;
+				zoomy = 0;
+			}
+
 
 			romoffset &= gfxlen-1;
 
