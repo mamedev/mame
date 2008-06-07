@@ -35,8 +35,8 @@ static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rec
 	bitmap_t *srcbitmapflags = tilemap_get_flagsmap(tmap);
 	const int xmask = srcbitmap->width-1;
 	const int ymask = srcbitmap->height-1;
-	//const int widthshifted = srcbitmap->width << 16;
-	//const int heightshifted = srcbitmap->height << 16;
+	const int widthshifted = srcbitmap->width << 16;
+	const int heightshifted = srcbitmap->height << 16;
 	UINT32 cx;
 	UINT32 cy;
 	int x;
@@ -61,7 +61,6 @@ static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rec
 	ex = cliprect->max_x;
 	ey = cliprect->max_y;
 
-	/* wraparound case */
 	{
 		/* loop over rows */
 		while (sy <= ey)
@@ -79,15 +78,18 @@ static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rec
 			/* loop over columns */
 			while (x <= ex)
 			{
-				if (columnscroll)
+				if ((wraparound) || (cx < widthshifted && cy < heightshifted)) // not sure how this will cope with no wraparound, but row/col scroll..
 				{
-					dest[0] = BITMAP_ADDR16(srcbitmap, ((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask)[0];
-					destflags[0] = BITMAP_ADDR8(srcbitmapflags, ((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask)[0];
-				}
-				else
-				{
-					dest[0] = BITMAP_ADDR16(srcbitmap, (cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask)[0];
-					destflags[0] = BITMAP_ADDR8(srcbitmapflags, (cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask)[0];
+					if (columnscroll)
+					{
+						dest[0] = BITMAP_ADDR16(srcbitmap, ((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask)[0];
+						destflags[0] = BITMAP_ADDR8(srcbitmapflags, ((cy >> 16) - scrollram[(cx>>16)&0x3ff]) & ymask, (cx >> 16) & xmask)[0];
+					}
+					else
+					{
+						dest[0] = BITMAP_ADDR16(srcbitmap, (cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask)[0];
+						destflags[0] = BITMAP_ADDR8(srcbitmapflags, (cy >> 16) & ymask, ((cx >> 16) - scrollram[(cy>>16)&0x3ff]) & xmask)[0];
+					}
 				}
 
 				/* advance in X */
@@ -122,17 +124,18 @@ static int old_depthA=0, depthA=0;
 static int old_depthB=0, depthB=0;
 
 static int sprite_kludge_x=0, sprite_kludge_y=0;
-static int use_spc_bright, use_v3_bright;
+static int use_spc_bright = 1, use_v3_bright = 1; // makes sarukani rather dark, but should be default..
 static UINT8 bright_spc_b=0x00, bright_spc_g=0x00, bright_spc_r=0x00;
 
 static UINT8 bright_spc_b_trans=0x00, bright_spc_g_trans=0x00, bright_spc_r_trans=0x00;
 
 
 static UINT8 bright_v3_b=0x00,  bright_v3_g=0x00,  bright_v3_r=0x00;
-
+static UINT8 bright_v3_b_trans = 0x00, bright_v3_g_trans = 0x00, bright_v3_r_trans = 0x00;
 
 // This ignores the alpha values atm.
 static int spc_changed=0, v3_changed=0, palette_updated=0;
+int suprnova_alt_enable_background = 1, suprnova_alt_enable_sprites = 1;
 
 WRITE32_HANDLER ( skns_pal_regs_w )
 {
@@ -141,11 +144,16 @@ WRITE32_HANDLER ( skns_pal_regs_w )
 
 	switch ( offset )
 	{
+	/* RWRA regs are for SPRITES */
+
 	case (0x00/4): // RWRA0
 		if( use_spc_bright != (data&1) ) {
 			use_spc_bright = data&1;
 			spc_changed = 1;
 		}
+		suprnova_alt_enable_sprites = (data>>8)&1;
+
+
 		break;
 	case (0x04/4): // RWRA1
 		if( bright_spc_g != (data&0xff) ) {
@@ -174,29 +182,43 @@ WRITE32_HANDLER ( skns_pal_regs_w )
 
 		break;
 
+	/* RWRB regs are for BACKGROUND */
+
 	case (0x10/4): // RWRB0
 		if( use_v3_bright != (data&1) ) {
 			use_v3_bright = data&1;
 			v3_changed = 1;
 		}
+
+		suprnova_alt_enable_background = (data>>8)&1;
+
 		break;
 	case (0x14/4): // RWRB1
 		if( bright_v3_g != (data&0xff) ) {
 			bright_v3_g = data&0xff;
 			v3_changed = 1;
 		}
+
+		bright_v3_g_trans = (data>>8)&0xff;
+
 		break;
 	case (0x18/4): // RWRB2
 		if( bright_v3_r != (data&0xff) ) {
 			bright_v3_r = data&0xff;
 			v3_changed = 1;
 		}
+
+		bright_v3_r_trans = (data>>8)&0xff;
+
 		break;
 	case (0x1C/4): // RWRB3
 		if( bright_v3_b != (data&0xff) ) {
 			bright_v3_b = data&0xff;
 			v3_changed = 1;
 		}
+
+		bright_v3_b_trans = (data>>8)&0xff;
+
 		break;
 	}
 }
@@ -548,7 +570,7 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 	UINT16 zoomx, zoomy;
 
 
-	if (!disabled){
+	if ((!disabled) && suprnova_alt_enable_sprites){
 
 		group_enable    = (skns_spc_regs[0x00/4] & 0x0040) >> 6; // RWR0
 
@@ -912,11 +934,16 @@ VIDEO_START(skns)
 static void supernova_draw_a( bitmap_t *bitmap, bitmap_t* bitmap_flags, const rectangle *cliprect, int tran )
 {
 	int enable_a  = (skns_v3_regs[0x10/4] >> 0) & 0x0001;
+	int nowrap_a = (skns_v3_regs[0x10/4] >> 0) & 0x0004;
+
+
 	UINT32 startx,starty;
 	int incxx,incxy,incyx,incyy;
 	int columnscroll;
 
-	if (enable_a)
+	//if(nowrap_a) printf("a\n");
+
+	if (enable_a && suprnova_alt_enable_background)
 	{
 		startx = skns_v3_regs[0x1c/4];
 		incyy  = skns_v3_regs[0x30/4]; // was xx, changed for sarukani
@@ -927,7 +954,7 @@ static void supernova_draw_a( bitmap_t *bitmap, bitmap_t* bitmap_flags, const re
 
 		columnscroll = (skns_v3_regs[0x0c/4] >> 1) & 0x0001;
 
-		suprnova_draw_roz(bitmap,bitmap_flags,cliprect, skns_tilemap_A, startx << 8,starty << 8,	incxx << 8,incxy << 8,incyx << 8,incyy << 8, 1, columnscroll, &skns_v3slc_ram[0]);
+		suprnova_draw_roz(bitmap,bitmap_flags,cliprect, skns_tilemap_A, startx << 8,starty << 8,	incxx << 8,incxy << 8,incyx << 8,incyy << 8, !nowrap_a, columnscroll, &skns_v3slc_ram[0]);
 		//tilemap_copy_bitmap(bitmap, tilemap_bitmap_lower, tilemap_bitmapflags_lower);
 	}
 }
@@ -935,11 +962,16 @@ static void supernova_draw_a( bitmap_t *bitmap, bitmap_t* bitmap_flags, const re
 static void supernova_draw_b( bitmap_t *bitmap, bitmap_t* bitmap_flags, const rectangle *cliprect, int tran )
 {
 	int enable_b  = (skns_v3_regs[0x34/4] >> 0) & 0x0001;
+	int nowrap_b = (skns_v3_regs[0x34/4] >> 0) & 0x0004;
+
+
 	UINT32 startx,starty;
 	int incxx,incxy,incyx,incyy;
 	int columnscroll;
 
-	if (enable_b)
+	//if(nowrap_b) printf("b\n");
+
+	if (enable_b && suprnova_alt_enable_background)
 	{
 		startx = skns_v3_regs[0x40/4];
 		incyy  = skns_v3_regs[0x54/4];
@@ -948,7 +980,7 @@ static void supernova_draw_b( bitmap_t *bitmap, bitmap_t* bitmap_flags, const re
 		incxy  = skns_v3_regs[0x4c/4];
 		incxx  = skns_v3_regs[0x48/4];
 		columnscroll = (skns_v3_regs[0x0c/4] >> 9) & 0x0001; // selects column scroll or rowscroll
-		suprnova_draw_roz(bitmap,bitmap_flags, cliprect, skns_tilemap_B, startx << 8,starty << 8,	incxx << 8,incxy << 8,incyx << 8,incyy << 8, 1, columnscroll, &skns_v3slc_ram[0x1000/4]);
+		suprnova_draw_roz(bitmap,bitmap_flags, cliprect, skns_tilemap_B, startx << 8,starty << 8,	incxx << 8,incxy << 8,incyx << 8,incyy << 8, !nowrap_b, columnscroll, &skns_v3slc_ram[0x1000/4]);
 	}
 }
 
