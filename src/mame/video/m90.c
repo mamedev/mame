@@ -118,6 +118,43 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
+static void bomblord_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+{
+	int offs = 0;
+	int x,y,sprite,colour,fx,fy;
+
+	while ((offs < spriteram_size/2) & (spriteram16[offs+0] != 0x8000))
+	{
+		sprite = spriteram16[offs+1];
+		colour = (spriteram16[offs+2] >> 9) & 0x0f;
+
+		y = (spriteram16[offs+0] & 0x1ff) + 0x98;
+		x = (spriteram16[offs+3] & 0x1ff) + 0x10;
+
+		x = x - 16;
+		y = 512 - y;
+
+		fx = (spriteram16[offs+3] >> 8) & 0x02;
+		fy = (spriteram16[offs+2] >> 8) & 0x80;
+/*
+		pdrawgfx(bitmap,machine->gfx[1],
+				sprite,
+				colour,
+				fx,fy,
+				x,y,
+				cliprect,TRANSPARENCY_PEN,0,
+				(colour & 0x08) ? 0x00 : 0x02);
+*/
+		drawgfx(bitmap,machine->gfx[1],
+				sprite,
+				colour,
+				fx,fy,
+				x,y,
+				cliprect,TRANSPARENCY_PEN,0);
+		offs += 4;
+	}
+}
+
 #if 0
 static void bootleg_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
@@ -277,6 +314,33 @@ VIDEO_UPDATE( m90 )
 	} else {
 		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 	}
+
+	return 0;
+}
+
+VIDEO_UPDATE( bomblord )
+{
+	tilemap_mark_all_tiles_dirty(pf1_wide_layer);
+	tilemap_mark_all_tiles_dirty(pf2_wide_layer);
+
+	tilemap_set_scroll_rows(pf1_wide_layer,1);
+	tilemap_set_scroll_rows(pf2_wide_layer,1);
+
+	tilemap_set_scrollx( pf1_wide_layer,0, -80);
+	tilemap_set_scrollx( pf2_wide_layer,0, -80 );
+
+	tilemap_set_scrolly( pf1_wide_layer,0, 376 );
+	tilemap_set_scrolly( pf2_wide_layer,0, 376 );
+
+	fillbitmap(priority_bitmap,0,cliprect);
+
+	tilemap_draw(bitmap,cliprect,pf2_wide_layer,0,0);
+	tilemap_draw(bitmap,cliprect,pf2_wide_layer,1,1);
+
+	tilemap_draw(bitmap,cliprect,pf1_wide_layer,0,0);
+	tilemap_draw(bitmap,cliprect,pf1_wide_layer,1,1);
+
+	bomblord_draw_sprites(screen->machine,bitmap,cliprect);
 
 	return 0;
 }
