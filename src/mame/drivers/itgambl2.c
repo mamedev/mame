@@ -222,91 +222,6 @@ MACHINE_DRIVER_END
 *        Rom Load        *
 *************************/
 
-/* Laser 2001 (Ver 1.2)
-
-CPU:
-
-1x HD64F3337CP16 (main)
-2x ispLSI1032E-70JL (PLD)
-1x NEC D7759GC (sound)
-1x TDA2003 (audio amp)
-1x oscillator 14.318180 MHz
-1x oscillator 16.000 MHz
-
-ROMs:
-
-1x M27C1001 (0)
-4x M27C4001 (1, 2, 3, 4)
-
-Note:
-
-1x 28x2 edge connector
-1x RS232 connector
-1x 14 legs isp connector
-1x battery
-1x red led
-2x 8x2 switches dip
-2x trimmer
-
-*/
-
-ROM_START( laser2k1 )
-	ROM_REGION( 0x1000000, REGION_CPU1, 0 ) /* all the program code is in here */
-	ROM_LOAD( "laser2k1_ver1.2_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
-
-	ROM_REGION( 0x200000, REGION_GFX1, 0 )
-	ROM_LOAD( "xlep1.bin", 0x000000, 0x80000, CRC(b45c9491) SHA1(1fa0572d3efb847dcf49bb99f429322dcb72b0d1) )
-	ROM_LOAD( "xlep2.bin", 0x080000, 0x80000, CRC(75c82293) SHA1(e6d847a2259393ef8877e9237c7624bf2e36f197) )
-	ROM_LOAD( "xlep3.bin", 0x100000, 0x80000, CRC(3a45d626) SHA1(c804916b6bfe04bacd7ac6f32e5041ed65e7b91e) )
-	ROM_LOAD( "xlep4.bin", 0x180000, 0x80000, CRC(d0381819) SHA1(30bab7e1c68192a2e1c324ef4c8a3d3b5696eb2b) )
-
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) /* NEC D7759GC samples */
-	ROM_LOAD( "xlmsg0.bin", 0x00000, 0x20000, CRC(36287068) SHA1(d964837cb5370c7b878e1e531ef6d8c3840f776c) )
-ROM_END
-
-
-/* Magic Drink (Ver 1.2)
-
-CPU:
-
-1x HD64F3337CP16 (main)
-2x ispLSI1032E-70JL (PLD)
-1x NEC D7759GC (sound)
-1x TDA2003 (audio amp)
-1x oscillator 14.318180 MHz
-1x oscillator 16.000 MHz
-
-ROMs:
-
-1x 27C2000 (s)
-3x M27C4001 (1, 2, 3)
-
-Note:
-
-1x 28x2 edge connector
-1x RS232 connector
-1x 14 legs isp connector
-1x battery
-1x red led
-2x 8x2 switches dip
-2x trimmer
-
-*/
-
-ROM_START( mdrink )
-	ROM_REGION( 0x1000000, REGION_CPU1, 0 ) /* all the program code is in here */
-	ROM_LOAD( "mdrink_ver1.2_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
-
-	ROM_REGION( 0x180000, REGION_GFX1, 0 ) /* only 3 ROMs?? */
-	ROM_LOAD( "mdrink-1.bin", 0x000000, 0x80000, CRC(25a7cea9) SHA1(d67a7264501699c8f7a48c3f3956903a5c95898f) )
-	ROM_LOAD( "mdrink-2.bin", 0x080000, 0x80000, CRC(c2a14bca) SHA1(8d0095333c34d81d103f15ee5731e2e4aa4d1fac) )
-	ROM_LOAD( "mdrink-3.bin", 0x100000, 0x80000, CRC(ff593676) SHA1(b21bb85df0b7b79c07ded2c4b950c94719e08302) )
-
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 ) /* NEC D7759GC samples */
-	ROM_LOAD( "mdrink-s.bin", 0x00000, 0x40000, CRC(d78b7823) SHA1(ca01e4aa3e25c3a40517b4fe07c31915e79af650) )
-ROM_END
-
-
 /* NtCash
 
 CPU:
@@ -390,6 +305,91 @@ ROM_START( wizard )
 
 	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) /* NEC D7759GC samples */
 	ROM_LOAD( "wizardmsg0.bin", 0x00000, 0x20000, CRC(94b28a4b) SHA1(2c10462cd7c8dc79dba735a061841a9c8b423091) )
+ROM_END
+
+
+/* Laser 2001 (Ver 1.2)
+
+CPU:
+
+1x HD64F3337CP16 (main)
+2x ispLSI1032E-70JL (PLD)
+1x NEC D7759GC (sound)
+1x TDA2003 (audio amp)
+1x oscillator 14.318180 MHz
+1x oscillator 16.000 MHz
+
+ROMs:
+
+1x M27C1001 (0)
+4x M27C4001 (1, 2, 3, 4)
+
+Note:
+
+1x 28x2 edge connector
+1x RS232 connector
+1x 14 legs isp connector
+1x battery
+1x red led
+2x 8x2 switches dip
+2x trimmer
+
+*/
+
+ROM_START( laser2k1 )
+	ROM_REGION( 0x1000000, REGION_CPU1, 0 ) /* all the program code is in here */
+	ROM_LOAD( "laser2k1_ver1.2_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 )
+	ROM_LOAD( "xlep1.bin", 0x000000, 0x80000, CRC(b45c9491) SHA1(1fa0572d3efb847dcf49bb99f429322dcb72b0d1) )
+	ROM_LOAD( "xlep2.bin", 0x080000, 0x80000, CRC(75c82293) SHA1(e6d847a2259393ef8877e9237c7624bf2e36f197) )
+	ROM_LOAD( "xlep3.bin", 0x100000, 0x80000, CRC(3a45d626) SHA1(c804916b6bfe04bacd7ac6f32e5041ed65e7b91e) )
+	ROM_LOAD( "xlep4.bin", 0x180000, 0x80000, CRC(d0381819) SHA1(30bab7e1c68192a2e1c324ef4c8a3d3b5696eb2b) )
+
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) /* NEC D7759GC samples */
+	ROM_LOAD( "xlmsg0.bin", 0x00000, 0x20000, CRC(36287068) SHA1(d964837cb5370c7b878e1e531ef6d8c3840f776c) )
+ROM_END
+
+
+/* Magic Drink (Ver 1.2)
+
+CPU:
+
+1x HD64F3337CP16 (main)
+2x ispLSI1032E-70JL (PLD)
+1x NEC D7759GC (sound)
+1x TDA2003 (audio amp)
+1x oscillator 14.318180 MHz
+1x oscillator 16.000 MHz
+
+ROMs:
+
+1x 27C2000 (s)
+3x M27C4001 (1, 2, 3)
+
+Note:
+
+1x 28x2 edge connector
+1x RS232 connector
+1x 14 legs isp connector
+1x battery
+1x red led
+2x 8x2 switches dip
+2x trimmer
+
+*/
+
+ROM_START( mdrink )
+	ROM_REGION( 0x1000000, REGION_CPU1, 0 ) /* all the program code is in here */
+	ROM_LOAD( "mdrink_ver1.2_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x180000, REGION_GFX1, 0 ) /* only 3 ROMs?? */
+	ROM_LOAD( "mdrink-1.bin", 0x000000, 0x80000, CRC(25a7cea9) SHA1(d67a7264501699c8f7a48c3f3956903a5c95898f) )
+	ROM_LOAD( "mdrink-2.bin", 0x080000, 0x80000, CRC(c2a14bca) SHA1(8d0095333c34d81d103f15ee5731e2e4aa4d1fac) )
+	ROM_LOAD( "mdrink-3.bin", 0x100000, 0x80000, CRC(ff593676) SHA1(b21bb85df0b7b79c07ded2c4b950c94719e08302) )
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 ) /* NEC D7759GC samples */
+	ROM_LOAD( "mdrink-s.bin", 0x00000, 0x40000, CRC(d78b7823) SHA1(ca01e4aa3e25c3a40517b4fe07c31915e79af650) )
 ROM_END
 
 
@@ -645,10 +645,10 @@ ROM_END
 *************************/
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT ROT    COMPANY    FULLNAME                          FLAGS  */
+GAME( 1999, ntcash,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "NtCash",                          GAME_NOT_WORKING )
+GAME( 1999, wizard,   0,      itgambl2, itgambl2, 0,   ROT0, "A.A.",    "Wizard (Ver 1.0)",                GAME_NOT_WORKING )
 GAME( 2001, laser2k1, 0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Laser 2001 (Ver 1.2)",            GAME_NOT_WORKING )
 GAME( 2001, mdrink,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Magic Drink (Ver 1.2)",           GAME_NOT_WORKING )
-GAME( 2001, ntcash,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "NtCash",                          GAME_NOT_WORKING )
-GAME( 2001, wizard,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Wizard (Ver 1.0)",                GAME_NOT_WORKING )
 GAME( 2001, te0144,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Unknown italian gambling game",   GAME_NOT_WORKING )
 GAME( 200?, cmagica,  0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Carta Magica (Ver 1.8)",          GAME_NOT_WORKING )
 GAME( 200?, millsun,  0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Millennium Sun",                  GAME_NOT_WORKING )

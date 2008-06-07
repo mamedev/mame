@@ -8096,11 +8096,11 @@ Other Sun games
 	DRIVER( euro2k2a )	/* (c) 2001 Nazionale Elettronica */
 
 	/* H8/3337 italian gambling games */
-	DRIVER( laser2k1 )	/* 200? unknown */
-	DRIVER( mdrink )	/* 200? unknown */
-	DRIVER( ntcash )	/* 200? unknown */
-	DRIVER( wizard )	/* 200? unknown */
-	DRIVER( te0144 )	/* 200? unknown */
+	DRIVER( ntcash )	/* 1999 unknown */
+	DRIVER( wizard )	/* (c) 1999 A.A. */
+	DRIVER( laser2k1 )	/* 2001 unknown */
+	DRIVER( mdrink )	/* 2001 unknown */
+	DRIVER( te0144 )	/* 2001 unknown */
 	DRIVER( cmagica )	/* 200? unknown */
 	DRIVER( millsun )	/* 200? unknown */
 	DRIVER( sspac2k1 )	/* 200? unknown */
