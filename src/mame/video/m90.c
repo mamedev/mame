@@ -186,10 +186,10 @@ VIDEO_UPDATE( m90 )
 	if (m90_video_control_data[5]&0x10) pf1_enable=0; else pf1_enable=1;
 	if (m90_video_control_data[6]&0x10) pf2_enable=0; else pf2_enable=1;
 
-//  tilemap_set_enable(pf1_layer,pf1_enable);
-//  tilemap_set_enable(pf2_layer,pf2_enable);
-//  tilemap_set_enable(pf1_wide_layer,pf1_enable);
-//  tilemap_set_enable(pf2_wide_layer,pf2_enable);
+// tilemap_set_enable(pf1_layer,pf1_enable);
+// tilemap_set_enable(pf2_layer,pf2_enable);
+// tilemap_set_enable(pf1_wide_layer,pf1_enable);
+// tilemap_set_enable(pf2_wide_layer,pf2_enable);
 
 	/* Dirty tilemaps if VRAM base changes */
 	if (pf1_base!=last_pf1)
@@ -253,28 +253,24 @@ VIDEO_UPDATE( m90 )
 
 		if (pf2_enable)
 		{
-			if (m90_video_control_data[6] & 0x4)
+			if (m90_video_control_data[6] & 0x4) {
 				tilemap_draw(bitmap,cliprect,pf2_wide_layer,0,0);
-			else
-				tilemap_draw(bitmap,cliprect,pf2_layer,0,0);
-
-			if (m90_video_control_data[6] & 0x4)
 				tilemap_draw(bitmap,cliprect,pf2_wide_layer,1,1);
-			else
+			} else {
+				tilemap_draw(bitmap,cliprect,pf2_layer,0,0);
 				tilemap_draw(bitmap,cliprect,pf2_layer,1,1);
+			}
 		}
 
 		if (pf1_enable)
 		{
-			if (m90_video_control_data[5] & 0x4)
+			if (m90_video_control_data[5] & 0x4) {
 				tilemap_draw(bitmap,cliprect,pf1_wide_layer,0,0);
-			else
-				tilemap_draw(bitmap,cliprect,pf1_layer,0,0);
-
-			if (m90_video_control_data[5] & 0x4)
 				tilemap_draw(bitmap,cliprect,pf1_wide_layer,1,1);
-			else
+			} else {
+				tilemap_draw(bitmap,cliprect,pf1_layer,0,0);
 				tilemap_draw(bitmap,cliprect,pf1_layer,1,1);
+			}
 		}
 
 		draw_sprites(screen->machine,bitmap,cliprect);
