@@ -113,6 +113,8 @@ VIDEO_START( bomblord )
 
 	tilemap_set_transparent_pen(pf1_layer,0);
 	tilemap_set_transparent_pen(pf1_wide_layer,0);
+	tilemap_set_transparent_pen(pf2_layer,0);
+	tilemap_set_transparent_pen(pf2_wide_layer,0);
 
 	state_save_register_global_array(m90_video_control_data);
 }
@@ -375,6 +377,7 @@ VIDEO_UPDATE( m90 )
 VIDEO_UPDATE( bomblord )
 {
 	fillbitmap(priority_bitmap,0,cliprect);
+	fillbitmap(bitmap,0,cliprect);
 
 	if (m90_video_control_data[6] & 0x02) {
 		tilemap_mark_all_tiles_dirty(pf2_wide_layer);
@@ -402,8 +405,8 @@ VIDEO_UPDATE( bomblord )
 	} else {
 		tilemap_mark_all_tiles_dirty(pf1_layer);
 		tilemap_set_scroll_rows(pf1_layer,1);
-		tilemap_set_scrollx( pf1_layer,0, 0);
-		tilemap_set_scrolly( pf1_layer,0, 0 );
+		tilemap_set_scrollx( pf1_layer,0, -80);
+		tilemap_set_scrolly( pf1_layer,0, -132 );
 		tilemap_draw(bitmap,cliprect,pf1_layer,0,0);
 		tilemap_draw(bitmap,cliprect,pf1_layer,1,1);
 	}
@@ -422,7 +425,7 @@ VIDEO_UPDATE( dynablsb )
 		tilemap_mark_all_tiles_dirty(pf1_layer);
 		tilemap_set_scroll_rows(pf1_layer,1);
 		tilemap_set_scrollx( pf1_layer,0, 0);
-		tilemap_set_scrolly( pf1_layer,0, 0);
+		tilemap_set_scrolly( pf1_layer,0, 4);
 		tilemap_draw(bitmap,cliprect,pf1_layer,0,0);
 		tilemap_draw(bitmap,cliprect,pf1_layer,1,1);
 	} else {
