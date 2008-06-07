@@ -89,8 +89,7 @@ static TILEMAP_MAPPER( funkybee_tilemap_scan )
 
 VIDEO_START( funkybee )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, funkybee_tilemap_scan,
-		 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, funkybee_tilemap_scan, 8, 8, 32, 32);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -128,37 +127,32 @@ static void draw_columns(running_machine *machine, bitmap_t *bitmap, const recta
 
 	for (offs = 0x1f;offs >= 0;offs--)
 	{
+		int const flip = flip_screen_get();
 		int code = videoram[0x1c00 + offs];
 		int color = colorram[0x1f10] & 0x03;
-		int sx = videoram[0x1f10];
+		int sx = flip ? videoram[0x1f1f] : videoram[0x1f10];
 		int sy = offs * 8;
 
-		if (flip_screen_get())
-		{
-			sx = 248 - sx;
+		if (flip)
 			sy = 248 - sy;
-		}
 
 		drawgfx(bitmap,machine->gfx[gfx_bank],
 				code, color,
-				flip_screen_get(), flip_screen_get(),
+				flip, flip,
 				sx, sy,
 				cliprect,TRANSPARENCY_PEN,0);
 
 		code = videoram[0x1d00 + offs];
 		color = colorram[0x1f11] & 0x03;
-		sx = videoram[0x1f11];
+		sx = flip ? videoram[0x1f1e] : videoram[0x1f11];
 		sy = offs * 8;
 
-		if (flip_screen_get())
-		{
-			sx = 248 - sx;
+		if (flip)
 			sy = 248 - sy;
-		}
 
 		drawgfx(bitmap,machine->gfx[gfx_bank],
 				code, color,
-				flip_screen_get(), flip_screen_get(),
+				flip, flip,
 				sx, sy,
 				cliprect,TRANSPARENCY_PEN,0);
 	}
@@ -166,8 +160,6 @@ static void draw_columns(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( funkybee )
 {
-	tilemap_mark_all_tiles_dirty(bg_tilemap);
-
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	draw_columns(screen->machine, bitmap, cliprect);
