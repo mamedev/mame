@@ -663,6 +663,25 @@ static INPUT_PORTS_START( quester )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( tankfrc4 )
+
+	/* How are the controls mapped?  Coins 3 & 4 are right as shown below.  Hit F2 for test screen, then "9" for the controls test screen */
+	/* Start buttons are not used by the game & manual shows P1 buttons 2 & 3 (plus unused JAMMA pins 25 & 26) are P3 UP, DOWN, LEFT & RIGHT */
+	/* Manual shows P2 buttons 2 & 3 (plus unused JAMMA pins c & d) are P4 UP, DOWN, LEFT & RIGHT.  J23 & J24 are P3 button1 & P4 button1 */
+
+	PORT_INCLUDE( ns1 )
+
+	PORT_MODIFY( "CONTROL0" )
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
+
+	PORT_MODIFY( "CONTROL1" )
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4 )
+INPUT_PORTS_END
+
+
+
 static INPUT_PORTS_START( pacmania )
 	PORT_INCLUDE( ns1 )
 
@@ -2351,6 +2370,42 @@ ROM_START( tankfrce )
 	ROM_LOAD( "tf1_obj1.bin",       0x20000, 0x20000, CRC(df674d6d) SHA1(65935c2d6072228fcb2fbca8808fc921db9e0ddd) )
 ROM_END
 
+/* Tank Force US 4 Player version*/
+ROM_START( tankfrc4 )
+	ROM_REGION( 0x2c000, REGION_CPU3, 0 )       /* 176k for the sound cpu */
+	ROM_LOAD( "tf1_snd0.bin",       0x0c000, 0x20000, CRC(4d9cf7aa) SHA1(de51b9b36e9a530a7f3c35672ec72c19b607af04) )
+
+	ROM_REGION( 0x400000, REGION_USER1, 0 ) /* 4M for ROMs */
+	ROM_LOAD_1024( "tf1_prg0.bin",       0x000000, CRC(2ae4b9eb) SHA1(569d2754398b4276cf78a3dd038b5884778dc82e) )
+	ROM_LOAD_1024( "tf1_prg1.bin",       0x080000, CRC(4a8bb251) SHA1(1df46ccf0ad7260398b7965e3825e936ba357062) )
+	/* 100000-17ffff empty */
+	/* 180000-1fffff empty */
+	/* 200000-27ffff empty */
+	/* 280000-2fffff empty */
+	/* 300000-37ffff empty */
+	ROM_LOAD_1024( "tfu4prg7.bin",       0x380000, CRC(162adea0) SHA1(9758433ae97b463253af455c80eefee4243f6c9e) )
+
+	ROM_REGION( 0xd0000, REGION_CPU4, 0 )       /* the MCU & voice */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+	ROM_LOAD( "tf1_voi0.bin",       0x10000, 0x20000, CRC(f542676a) SHA1(38d54db0807c58152bd120c393bf63b68754e8ff) )
+	ROM_LOAD( "tf1_voi1.bin",       0x30000, 0x20000, CRC(615d09cd) SHA1(0aecf7ca6b65ddfcdcf74f8d412169ec800ba3a3) )
+
+	ROM_REGION( 0x20000, REGION_GFX1, 0 )  /* character mask */
+	ROM_LOAD( "tf1_chr8.bin",       0x00000, 0x20000, CRC(7d53b31e) SHA1(7e4b5fc92f7956477392f1e14c6edfc0cada2be0) )
+
+	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE ) /* characters */
+	ROM_LOAD( "tf1_chr0.bin",       0x00000, 0x20000, CRC(9e91794e) SHA1(e873ed31fafae02a3c3d9127801a13f67cbdb5f4) )
+	ROM_LOAD( "tf1_chr1.bin",       0x20000, 0x20000, CRC(76e1bc56) SHA1(f95e4100cad29a8972e4f435b4f9ee3cdc4f4504) )
+	ROM_LOAD( "tf1_chr2.bin",       0x40000, 0x20000, CRC(fcb645d9) SHA1(afedb4c6c1b02444ddb1757ac9808df1b94de2d8) )
+	ROM_LOAD( "tf1_chr3.bin",       0x60000, 0x20000, CRC(a8dbf080) SHA1(115f3b21e0546000076c3c4d588e5bdcc4cf50d5) )
+	ROM_LOAD( "tf1_chr4.bin",       0x80000, 0x20000, CRC(51fedc8c) SHA1(4a0c337fe614ebf66ee0fc3cfb05cad51a048fcf) )
+	ROM_LOAD( "tf1_chr5.bin",       0xa0000, 0x20000, CRC(e6c6609a) SHA1(0c05cdd6b1dc4f082b9ac0e4de252c3d72392bb0) )
+
+	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_DISPOSE ) /* sprites */
+	ROM_LOAD( "tf1_obj0.bin",       0x00000, 0x20000, CRC(4bedd51a) SHA1(fedb972986efe5ff3bd6c75fa16f22f8267ee0b7) )
+	ROM_LOAD( "tf1_obj1.bin",       0x20000, 0x20000, CRC(df674d6d) SHA1(65935c2d6072228fcb2fbca8808fc921db9e0ddd) )
+ROM_END
+
 /* Tank Force (Japan) */
 ROM_START( tankfrcj )
 	ROM_REGION( 0x2c000, REGION_CPU3, 0 )       /* 176k for the sound cpu */
@@ -2420,6 +2475,7 @@ GAME( 1990, pistoldm, 0,        ns1,     ns1,      pistoldm, ROT0,   "Namco", "P
 GAME( 1990, boxyboy,  0,        ns1,     boxyboy,  soukobdx, ROT0,   "Namco", "Boxy Boy (US)", 0 )
 GAME( 1990, soukobdx, boxyboy,  ns1,     boxyboy,  soukobdx, ROT0,   "Namco", "Souko Ban Deluxe (Japan)", 0 )
 GAME( 1990, puzlclub, 0,        ns1,     puzlclub, puzlclub, ROT90,  "Namco", "Puzzle Club (Japan prototype)", 0 )
-GAME( 1991, tankfrce, 0,        ns1,     ns1,      tankfrce, ROT0,   "Namco", "Tank Force (US)", 0 )
+GAME( 1991, tankfrce, 0,        ns1,     ns1,      tankfrce, ROT0,   "Namco", "Tank Force (US, 2 Player)", 0 )
+GAME( 1991, tankfrc4, tankfrce, ns1,     tankfrc4, tankfrce, ROT0,   "Namco", "Tank Force (US, 4 Player)", GAME_NOT_WORKING ) /* No controls */
 GAME( 1991, tankfrcj, tankfrce, ns1,     ns1,      tankfrce, ROT0,   "Namco", "Tank Force (Japan)", 0 )
 

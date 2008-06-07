@@ -719,7 +719,8 @@ const game_driver * const drivers[] =
 	DRIVER( boxyboy )	/* (c) 1990 (US) */
 	DRIVER( soukobdx )	/* (c) 1990 (Japan) */
 	DRIVER( puzlclub )	/* (c) 1990 (Japan) */
-	DRIVER( tankfrce )	/* (c) 1991 (US) */
+	DRIVER( tankfrce )	/* (c) 1991 (US, 2 Player) */
+	DRIVER( tankfrc4 )	/* (c) 1991 (US, 4 Player) */
 	DRIVER( tankfrcj )	/* (c) 1991 (Japan) */
 
 	/* Namco System 2 games */
