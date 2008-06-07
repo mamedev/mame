@@ -122,6 +122,18 @@ static ADDRESS_MAP_START( main_cpu_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x80, 0x8f) AM_WRITE(m90_video_control_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( dynablsb_cpu_io, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x00, 0x01) AM_WRITE(m72_sound_command_w)
+	AM_RANGE(0x00, 0x01) AM_READ(input_port_0_word_r) /* Player 1 & Player 2 */
+	AM_RANGE(0x02, 0x03) AM_WRITE(m90_coincounter_w)
+	AM_RANGE(0x02, 0x03) AM_READ(input_port_1_word_r) /* Coins */
+//	AM_RANGE(0x04, 0x05) AM_WRITE(unknown_w)
+	AM_RANGE(0x04, 0x05) AM_READ(input_port_2_word_r) /* Dip 1 & Dip 2 */
+	AM_RANGE(0x06, 0x07) AM_READ(input_port_3_word_r) /* Player 3 & Player 4 */
+	AM_RANGE(0x80, 0x8f) AM_WRITE(m90_video_control_w)
+//	AM_RANGE(0x90, 0x91) AM_WRITE(unknown_w)
+ADDRESS_MAP_END
+
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -261,6 +273,69 @@ static INPUT_PORTS_START( dynablst )
 
 	IREM_JOYSTICKS_3_4
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( dynablsb )
+	PORT_START
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+
+	IREM_COINS
+
+	PORT_START_TAG("DSW")	 /* Dip switch bank 1 */
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(      0x0002, "2" )
+	PORT_DIPSETTING(      0x0003, "3" )
+	PORT_DIPSETTING(      0x0001, "4" )
+	PORT_DIPSETTING(      0x0000, "5" )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( Medium ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "Game Title" )	PORT_DIPLOCATION("SW1:5") /* Manual says "NOT USE" */
+	PORT_DIPSETTING(      0x0010, "Dynablaster" )
+	PORT_DIPSETTING(      0x0000, "Bomber Man" )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW1:8" )
+	/* Dip switch bank 2 */
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0600, 0x0600, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(      0x0400, "2 Player Upright" )
+	PORT_DIPSETTING(      0x0600, "4 Player Upright A" ) /* Seperate Coin Slots */
+	PORT_DIPSETTING(      0x0200, "4 Player Upright B" ) /* Shared Coin Slots */
+	PORT_DIPSETTING(      0x0000, DEF_STR( Cocktail ) )  /* This setting shows screen with offset, no cocktail support :-( */
+	PORT_DIPNAME( 0x0800, 0x0800, "Coin Mode" ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(      0x0800, "1" )
+	PORT_DIPSETTING(      0x0000, "2" )
+	/* Coin Mode 1 */
+	IREM_COIN_MODE_1_NEW_HIGH
+	/* Coin Mode 2, not supported yet */
+//  IREM_COIN_MODE_2
+
+	IREM_JOYSTICKS_3_4
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( atompunk )
 	PORT_INCLUDE(dynablst)
@@ -844,6 +919,7 @@ static MACHINE_DRIVER_START( bomblord )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_CONFIG(no_table)
 	MDRV_CPU_PROGRAM_MAP(bomblord_main_cpu,0)
+	MDRV_CPU_IO_MAP(dynablsb_cpu_io,0)
 
 	MDRV_VIDEO_START(m90)
 	MDRV_VIDEO_UPDATE(bomblord)
@@ -859,7 +935,7 @@ static MACHINE_DRIVER_START( dynablsb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", V30,32000000/4)
 	MDRV_CPU_PROGRAM_MAP(dynablsb_main_cpu,0)
-	MDRV_CPU_IO_MAP(main_cpu_io,0)
+	MDRV_CPU_IO_MAP(dynablsb_cpu_io,0)
 	MDRV_CPU_VBLANK_INT("main", m90_interrupt)
 
 	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz)
@@ -1213,7 +1289,7 @@ GAME( 1991, hasamu,   0,        hasamu,   hasamu,   0,        ROT0, "Irem", "Has
 GAME( 1991, dynablst, 0,        bombrman, dynablst, 0,        ROT0, "Irem (licensed from Hudson Soft)", "Dynablaster / Bomber Man", GAME_NO_COCKTAIL )
 GAME( 1991, bombrman, dynablst, bombrman, bombrman, 0,        ROT0, "Irem (licensed from Hudson Soft)", "Bomber Man (Japan)", GAME_NO_COCKTAIL )
 GAME( 1991, atompunk, dynablst, bombrman, atompunk, 0,        ROT0, "Irem America (licensed from Hudson Soft)", "Atomic Punk (US)", GAME_NO_COCKTAIL )
-GAME( 1991, dynablsb, dynablst, dynablsb,  bombrman, 0,        ROT0, "bootleg", "Dynablaster (bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+GAME( 1991, dynablsb, dynablst, dynablsb, dynablsb, 0,        ROT0, "bootleg", "Dynablaster (bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
 GAME( 1992, bbmanw,   0,        bbmanw,   bbmanw,   0,        ROT0, "Irem", "Bomber Man World / New Dyna Blaster - Global Quest", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1992, bbmanwj,  bbmanw,   bbmanw,   bbmanwj,  0,        ROT0, "Irem", "Bomber Man World (Japan)", GAME_NO_COCKTAIL )
 GAME( 1992, newapunk, bbmanw,   bbmanw,   bbmanwj,  0,        ROT0, "Irem America", "New Atomic Punk - Global Quest (US)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
