@@ -152,7 +152,7 @@ static void dynablsb_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 	int offs = 0;
 	int x,y,sprite,colour,fx,fy;
 
-	while ((offs < spriteram_size/2) & (spriteram16[offs+0] != 0x8000))
+	while ((offs < spriteram_size/2) & (spriteram16[offs+0] != 0xffff))
 	{
 		sprite = spriteram16[offs+1];
 		colour = (spriteram16[offs+2] >> 9) & 0x0f;
