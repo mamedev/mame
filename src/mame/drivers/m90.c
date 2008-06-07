@@ -41,12 +41,14 @@ static UINT32 bankaddress;
 
 extern UINT16 *m90_video_data;
 
+VIDEO_START( m90 );
+VIDEO_START( dynablsb );
+VIDEO_START( bomblord );
 VIDEO_UPDATE( m90 );
 VIDEO_UPDATE( dynablsb );
 VIDEO_UPDATE( bomblord );
 WRITE16_HANDLER( m90_video_control_w );
 WRITE16_HANDLER( m90_video_w );
-VIDEO_START( m90 );
 
 /***************************************************************************/
 
@@ -921,7 +923,7 @@ static MACHINE_DRIVER_START( bomblord )
 	MDRV_CPU_PROGRAM_MAP(bomblord_main_cpu,0)
 	MDRV_CPU_IO_MAP(dynablsb_cpu_io,0)
 
-	MDRV_VIDEO_START(m90)
+	MDRV_VIDEO_START(bomblord)
 	MDRV_VIDEO_UPDATE(bomblord)
 
 	MDRV_CPU_VBLANK_INT("main", bomblord_interrupt)
@@ -957,7 +959,7 @@ static MACHINE_DRIVER_START( dynablsb )
 	MDRV_GFXDECODE(m90)
 	MDRV_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(m90)
+	MDRV_VIDEO_START(dynablsb)
 	MDRV_VIDEO_UPDATE(dynablsb)
 
 	/* sound hardware */
