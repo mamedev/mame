@@ -211,8 +211,7 @@ static MACHINE_DRIVER_START( mnumber )
 	MDRV_CPU_REPLACE("main", H83044, ALT1_CLOCK_A/2)	/* probably the wrong CPU */
 
 	MDRV_SOUND_REPLACE("oki", OKIM6295, ALT1_CLOCK_B/16)
-//	MDRV_SOUND_REPLACE("oki", OKIM6295, 1584000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
