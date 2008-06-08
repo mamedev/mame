@@ -54,10 +54,10 @@ PALETTE_INIT( mrdo )
 	const int R2 = 120;
 	const int R3 = 100;
 	const int R4 = 75;
-	const int pull = 200;
+	const int pull = 220;
 	float pot[16];
 	int weight[16];
-	const float potadjust = 0.2f;	/* diode voltage drop */
+	const float potadjust = 0.7f;	/* diode voltage drop */
 
 	for (i = 0x0f; i >= 0; i--)
 	{
@@ -86,7 +86,7 @@ PALETTE_INIT( mrdo )
 		int bits0, bits2;
 		int r, g, b;
 
-		a1 = ((i >> 3) & 0x1c) + (i & 0x03) + 32;
+		a1 = ((i >> 3) & 0x1c) + (i & 0x03) + 0x20;
 		a2 = ((i >> 0) & 0x1c) + (i & 0x03);
 
 		/* red component */
@@ -120,11 +120,11 @@ PALETTE_INIT( mrdo )
 		UINT8 ctabentry = color_prom[(i - 0x100) & 0x1f];
 
 		if ((i - 0x100) & 0x20)
-			ctabentry = ctabentry >> 4;		/* high 4 bits are for sprite color n + 8 */
+			ctabentry >>= 4;		/* high 4 bits are for sprite color n + 8 */
 		else
-			ctabentry = ctabentry & 0x0f;	/* low 4 bits are for sprite color n */
+			ctabentry &= 0x0f;	/* low 4 bits are for sprite color n */
 
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		colortable_entry_set_value(machine->colortable, i, ctabentry + ((ctabentry & 0x0c) << 3));
 	}
 }
 
