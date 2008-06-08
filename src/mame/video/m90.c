@@ -437,7 +437,7 @@ VIDEO_UPDATE( dynablsb )
 		tilemap_draw(bitmap,cliprect,pf1_wide_layer,1,1);
 	}
 
-	if (0) {
+	if (!(m90_video_data[0xf008/2] & 0x8000)) {
 		tilemap_mark_all_tiles_dirty(pf2_wide_layer);
 		tilemap_set_scroll_rows(pf2_wide_layer,1);
 		tilemap_set_scrollx( pf2_wide_layer,0, 0);

@@ -39,7 +39,7 @@ To do:
 
 static UINT32 bankaddress;
 
-extern UINT16 *m90_video_data;
+extern UINT16 *m90_video_data,*dynablsb_video_control_data;
 
 VIDEO_START( m90 );
 VIDEO_START( dynablsb );
@@ -47,8 +47,8 @@ VIDEO_START( bomblord );
 VIDEO_UPDATE( m90 );
 VIDEO_UPDATE( dynablsb );
 VIDEO_UPDATE( bomblord );
-WRITE16_HANDLER( m90_video_control_w );
 WRITE16_HANDLER( m90_video_w );
+WRITE16_HANDLER( m90_video_control_w );
 
 /***************************************************************************/
 
@@ -83,6 +83,13 @@ static WRITE16_HANDLER( quizf1_bankswitch_w )
 		set_m90_bank();
 	}
 }
+
+/*
+static WRITE16_HANDLER( unknown_w )
+{
+	printf("%04x    ",data);
+}
+*/
 
 /***************************************************************************/
 
@@ -129,7 +136,7 @@ static ADDRESS_MAP_START( dynablsb_cpu_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x00, 0x01) AM_READ(input_port_0_word_r) /* Player 1 & Player 2 */
 	AM_RANGE(0x02, 0x03) AM_WRITE(m90_coincounter_w)
 	AM_RANGE(0x02, 0x03) AM_READ(input_port_1_word_r) /* Coins */
-//	AM_RANGE(0x04, 0x05) AM_WRITE(unknown_w)
+//	AM_RANGE(0x04, 0x05) AM_WRITE(unknown_w) 					// write continuosly 0x6000
 	AM_RANGE(0x04, 0x05) AM_READ(input_port_2_word_r) /* Dip 1 & Dip 2 */
 	AM_RANGE(0x06, 0x07) AM_READ(input_port_3_word_r) /* Player 3 & Player 4 */
 	AM_RANGE(0x80, 0x8f) AM_WRITE(m90_video_control_w)
