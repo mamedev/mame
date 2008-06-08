@@ -23,26 +23,21 @@ PALETTE_INIT( jackal )
 	/* allocate the colortable */
 	machine->colortable = colortable_alloc(machine, 0x200);
 
-	for (i = 0; i < 0x1000; i++)
+	for (i = 0; i < 0x100; i++)
 	{
-		UINT16 ctabentry = (i & 0xff) | 0x100;
-
-		/* this is surely wrong - is there a PROM missing? */
-		if (i & 0x0f)
-			ctabentry = ctabentry | (i >> 8);
-
+		UINT16 ctabentry = i | 0x100;
 		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 
-	for (i = 0x1000; i < 0x1100; i++)
+	for (i = 0x100; i < 0x200; i++)
 	{
-		UINT8 ctabentry = color_prom[i - 0x1000] & 0x0f;
+		UINT16 ctabentry = color_prom[i - 0x100] & 0x0f;
 		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 
-	for (i = 0x1100; i < 0x1200; i++)
+	for (i = 0x200; i < 0x300; i++)
 	{
-		UINT8 ctabentry = (color_prom[i - 0x1100] & 0x0f) | 0x10;
+		UINT16 ctabentry = (color_prom[i - 0x200] & 0x0f) | 0x10;
 		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 }
@@ -74,7 +69,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 	int attr = RAM[0x2000 + tile_index];
 	int code = RAM[0x2400 + tile_index] + ((attr & 0xc0) << 2) + ((attr & 0x30) << 6);
-	int color = attr & 0x0f;
+	int color = 0;//attr & 0x0f;
 	int flags = ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x20) ? TILE_FLIPY : 0);
 
 	SET_TILE_INFO(0, code, color, flags);

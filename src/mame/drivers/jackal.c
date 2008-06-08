@@ -13,10 +13,61 @@ Notes:
   necessarily mean anything.
 
 TODO:
-- The high score table colors are wrong, are there proms missing?
 - Sprite lag
 - Coin counters don't work correctly, because the register is overwritten by
   other routines and the coin counter bits rapidly toggle between 0 and 1.
+- running the sound CPU at the nominal clock rate, music stops working at the
+  beginning of the game. This is kludged by overclocking the sound CPU. This
+  looks like a CPU communication timing issue however fiddling with the
+  interleave factor has no effect.
+
+
+Memory Map
+----------
+
+MAIN CPU:
+
+Address range 00xxxxxxxxxx---- is handled by the 007343 custom so layout is
+inferred by program behaviour. Note that address lines A8 and A9 are ORed
+together and go to the single A8.9 input of the 007343.
+
+Address          Dir Data     Description
+---------------- --- -------- -----------------------
+00000000000000xx R/W xxxxxxxx 005885 registers
+0000000000000100 R/W xxxxxxxx 005885 registers
+0000000000010000 R   xxxxxxxx DIPSW1
+0000000000010001 R   xxxxxxxx P1 inputs + DIPSW3.4
+0000000000010010 R   xxxxxxxx P2 inputs
+0000000000010011 R   xxxxxxxx Coin inputs + DIPSW3.1-3
+00000000000101-0 R   xxxxxxxx P1 extra inputs (only used by the bootleg for the rotary control)
+00000000000101-1 R   xxxxxxxx P2 extra inputs (only used by the bootleg for the rotary control)
+00000000000110-0 R   xxxxxxxx DIPSW2
+00000000000111-0   W -------x Coin Counter 1 (to 005924 OUT1 input)
+                   W ------x- Coin Counter 2 (to 005924 OUT2 input)
+                   W -----x-- unknown ("END", to connector SVCN4P pin 4)
+                   W ----x--- sprite RAM bank (to 007343 OBJB input)
+                   W ---x---- 005885 select (to 007343 GATEB input)
+                   W --x----- ROM bank
+00000000000111-1 R/W -------- Watchdog reset (to 005924 AFR input)
+00000000001xxxxx R/W xxxxxxxx scroll RAM (005885)
+00000000010xxxxx R/W xxxxxxxx Z RAM (005885)
+000xxxxxxxxxxxxx R/W xxxxxxxx RAM (shared with sound CPU--note that addresses 0000-005F are handled above so they are excluded)
+0010xxxxxxxxxxxx R/W xxxxxxxx video RAM (005885)
+0011xxxxxxxxxxxx R/W xxxxxxxx sprite RAM (005885)
+01xxxxxxxxxxxxxx R   xxxxxxxx ROM (banked)
+10xxxxxxxxxxxxxx R   xxxxxxxx ROM (banked)
+11xxxxxxxxxxxxxx R   xxxxxxxx ROM
+
+
+SOUND CPU:
+
+Address          Dir Data     Description
+---------------- --- -------- -----------------------
+000-------------              n.c.
+001------------x R/W xxxxxxxx YM2151
+010-xxxxxxxxxxxx R/W xxxxxxxx 007327 (palette)
+011xxxxxxxxxxxxx R/W xxxxxxxx RAM (shared with main CPU)
+1xxxxxxxxxxxxxxx R   xxxxxxxx ROM
 
 ***************************************************************************/
 
@@ -66,12 +117,12 @@ static WRITE8_HANDLER( jackal_flipscreen_w )
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0003) AM_RAM AM_BASE(&jackal_videoctrl)	// scroll + other things
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(jackal_flipscreen_w)
-	AM_RANGE(0x0010, 0x0010) AM_READ(input_port_0_r)
-	AM_RANGE(0x0011, 0x0011) AM_READ(input_port_1_r)
-	AM_RANGE(0x0012, 0x0012) AM_READ(input_port_2_r)
-	AM_RANGE(0x0013, 0x0013) AM_READ(input_port_3_r)
+	AM_RANGE(0x0010, 0x0010) AM_READ_PORT("DSW1")
+	AM_RANGE(0x0011, 0x0011) AM_READ_PORT("IN1")
+	AM_RANGE(0x0012, 0x0012) AM_READ_PORT("IN2")
+	AM_RANGE(0x0013, 0x0013) AM_READ_PORT("IN0")
 	AM_RANGE(0x0014, 0x0015) AM_READ(topgunbl_rotary_r)
-	AM_RANGE(0x0018, 0x0018) AM_READ(input_port_4_r)
+	AM_RANGE(0x0018, 0x0018) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0019, 0x0019) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x001c, 0x001c) AM_WRITE(jackal_rambank_w)
 	AM_RANGE(0x0020, 0x005f) AM_READWRITE(jackal_zram_r, jackal_zram_w)				// MAIN   Z RAM,SUB    Z RAM
@@ -85,7 +136,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x2001, 0x2001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(SMH_RAM) AM_BASE(&paletteram)	// self test only checks 0x4000-0x423f)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(SMH_RAM) AM_BASE(&paletteram)	// self test only checks 0x4000-0x423f, 007327 should actually go up to 4fff
 	AM_RANGE(0x6000, 0x605f) AM_RAM																	// SOUND RAM (Self test check 0x6000-605f, 0x7c00-0x7fff)
 	AM_RANGE(0x6060, 0x7fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -95,7 +146,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( jackal )
 	PORT_START_TAG("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION( "SW1:1,2,3,4" )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -112,7 +163,7 @@ static INPUT_PORTS_START( jackal )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION( "SW1:5,6,7,8" )
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
@@ -129,6 +180,45 @@ static INPUT_PORTS_START( jackal )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
 
+	PORT_START_TAG("DSW2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION( "SW2:1,2" )
+	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x00, "7" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) ) PORT_DIPLOCATION( "SW2:3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION( "SW2:4,5" )
+	PORT_DIPSETTING(    0x18, "30K 150K" )
+	PORT_DIPSETTING(    0x10, "50K 200K" )
+	PORT_DIPSETTING(    0x08, "30K" )
+	PORT_DIPSETTING(    0x00, "50K" )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION( "SW2:6,7" )
+	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x20, "Difficult" )
+	PORT_DIPSETTING(    0x00, "Very Difficult" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION( "SW2:8" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION( "SW3:1" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Sound Adjustment" ) PORT_DIPLOCATION( "SW3:2" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x80, 0x00, "Sound Mode" ) PORT_DIPLOCATION( "SW3:3" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Mono ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
+
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
@@ -136,7 +226,10 @@ static INPUT_PORTS_START( jackal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Fire") PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Bomb") PORT_PLAYER(1)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )	// P1 button 3
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION( "SW3:4" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_PLAYER(2)
@@ -145,44 +238,8 @@ static INPUT_PORTS_START( jackal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Fire") PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Bomb") PORT_PLAYER(2)
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START_TAG("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Sound Adjustment" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x00, "Sound Mode" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Mono ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
-
-	PORT_START_TAG("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x03, "2" )
-	PORT_DIPSETTING(    0x02, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x00, "7" )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x18, "30K 150K" )
-	PORT_DIPSETTING(    0x10, "50K 200K" )
-	PORT_DIPSETTING(    0x08, "30K" )
-	PORT_DIPSETTING(    0x00, "50K" )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, "Difficult" )
-	PORT_DIPSETTING(    0x00, "Very Difficult" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )	// P2 button 3
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( topgunbl )
@@ -238,11 +295,11 @@ static const gfx_layout spritelayout8 =
 /* Graphics Decode Information */
 
 static GFXDECODE_START( jackal )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout,               0, 16 )	// colors 256-511 with lookup
-	GFXDECODE_ENTRY( REGION_GFX1, 0x20000, spritelayout,        256*16, 16 )	// colors   0- 15 with lookup
-	GFXDECODE_ENTRY( REGION_GFX1, 0x20000, spritelayout8,       256*16, 16 )	// to handle 8x8 sprites
-	GFXDECODE_ENTRY( REGION_GFX1, 0x60000, spritelayout,  256*16+16*16, 16 )	// colors  16- 31 with lookup
-	GFXDECODE_ENTRY( REGION_GFX1, 0x60000, spritelayout8, 256*16+16*16, 16 )	// to handle 8x8 sprites
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout,        0,  1 )	// colors 256-511 without lookup
+	GFXDECODE_ENTRY( REGION_GFX1, 0x20000, spritelayout,  0x100, 16 )	// colors   0- 15 with lookup
+	GFXDECODE_ENTRY( REGION_GFX1, 0x20000, spritelayout8, 0x100, 16 )	// to handle 8x8 sprites
+	GFXDECODE_ENTRY( REGION_GFX1, 0x60000, spritelayout,  0x200, 16 )	// colors  16- 31 with lookup
+	GFXDECODE_ENTRY( REGION_GFX1, 0x60000, spritelayout8, 0x200, 16 )	// to handle 8x8 sprites
 GFXDECODE_END
 
 /* Interrupt Generator */
@@ -250,7 +307,10 @@ GFXDECODE_END
 static INTERRUPT_GEN( jackal_interrupt )
 {
 	if (irq_enable)
+	{
 		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	}
 }
 
 /* Machine Driver */
@@ -278,7 +338,7 @@ static MACHINE_DRIVER_START( jackal )
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 
 	MDRV_GFXDECODE(jackal)
-	MDRV_PALETTE_LENGTH(256*16+16*16+16*16)
+	MDRV_PALETTE_LENGTH(0x300)
 
 	MDRV_PALETTE_INIT(jackal)
 	MDRV_VIDEO_START(jackal)
@@ -396,7 +456,7 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1986, jackal,   0,      jackal, jackal,   0, ROT90, "Konami", "Jackal (World)", GAME_IMPERFECT_COLORS )
-GAME( 1986, topgunr,  jackal, jackal, jackal,   0, ROT90, "Konami", "Top Gunner (US)", GAME_IMPERFECT_COLORS )
-GAME( 1986, jackalj,  jackal, jackal, jackal,   0, ROT90, "Konami", "Tokushu Butai Jackal (Japan)", GAME_IMPERFECT_COLORS )
-GAME( 1986, topgunbl, jackal, jackal, topgunbl, 0, ROT90, "bootleg", "Top Gunner (bootleg)", GAME_IMPERFECT_COLORS )
+GAME( 1986, jackal,   0,      jackal, jackal,   0, ROT90, "Konami", "Jackal (World)", 0 )
+GAME( 1986, topgunr,  jackal, jackal, jackal,   0, ROT90, "Konami", "Top Gunner (US)", 0 )
+GAME( 1986, jackalj,  jackal, jackal, jackal,   0, ROT90, "Konami", "Tokushu Butai Jackal (Japan)", 0 )
+GAME( 1986, topgunbl, jackal, jackal, topgunbl, 0, ROT90, "bootleg", "Top Gunner (bootleg)", 0 )
