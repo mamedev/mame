@@ -2847,6 +2847,7 @@ static void emit_movsd_p64_r128(drcbe_state *drcbe, x86code **dst, const drcuml_
     into a mov immediate
 -------------------------------------------------*/
 
+#if 0
 static x86code *convert_to_mov_imm(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst, const drcuml_parameter *dstp, UINT64 imm)
 {
 	drcuml_instruction temp = *inst;
@@ -2871,7 +2872,7 @@ static x86code *convert_to_mov_src1(drcbe_state *drcbe, x86code *dst, const drcu
 	temp.param[1] = *srcp;
 	return op_mov(drcbe, dst, &temp);
 }
-
+#endif
 
 
 /***************************************************************************

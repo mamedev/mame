@@ -1236,7 +1236,7 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drcuml_state *d
 				
 				/* cache memory */
 				else if (drcuml != NULL && drccache_contains_pointer(drcuml->cache, (void *)(FPTR)param->value))
-					dest += sprintf(dest, "[+$%X]", (drccodeptr)(FPTR)param->value - drccache_near(drcuml->cache));
+					dest += sprintf(dest, "[+$%X]", (UINT32)(FPTR)((drccodeptr)(FPTR)param->value - drccache_near(drcuml->cache)));
 				
 				/* general memory */
 				else
