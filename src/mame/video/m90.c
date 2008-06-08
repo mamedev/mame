@@ -437,7 +437,6 @@ VIDEO_UPDATE( dynablsb )
 		tilemap_draw(bitmap,cliprect,pf1_wide_layer,0,0);
 		tilemap_draw(bitmap,cliprect,pf1_wide_layer,1,1);
 	} else {
-
 		tilemap_mark_all_tiles_dirty(pf1_layer);
 		tilemap_set_scroll_rows(pf1_layer,1);
 		tilemap_set_scrollx( pf1_layer,0, m90_video_data[0xf004/2]+64);
