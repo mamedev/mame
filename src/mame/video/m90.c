@@ -374,37 +374,47 @@ VIDEO_UPDATE( m90 )
 
 VIDEO_UPDATE( bomblord )
 {
+	int i;
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
+	/* Setup scrolling */
+	if (m90_video_control_data[6]&0x20) {
+		tilemap_set_scroll_rows(pf1_layer,512);
+		tilemap_set_scroll_rows(pf1_wide_layer,512);
+		for (i=0; i<512; i++)
+			tilemap_set_scrollx( pf1_layer,i, m90_video_data[0xf400/2+i]-12);
+		for (i=0; i<512; i++)
+			tilemap_set_scrollx( pf1_wide_layer,i, m90_video_data[0xf400/2+i]-12+256);
+	} else {
+		tilemap_set_scroll_rows(pf1_layer,1);
+		tilemap_set_scroll_rows(pf1_wide_layer,1);
+		tilemap_set_scrollx( pf1_layer,0,  m90_video_data[0xf004/2]-12);
+		tilemap_set_scrollx( pf1_wide_layer,0, m90_video_data[0xf004/2]-12 );
+	}
+
 	if (m90_video_control_data[6] & 0x02) {
 		tilemap_mark_all_tiles_dirty(pf2_wide_layer);
-		tilemap_set_scroll_rows(pf2_wide_layer,1);
-		tilemap_set_scrollx( pf2_wide_layer,0, m90_video_data[0xf000/2]-80+64 );
-		tilemap_set_scrolly( pf2_wide_layer,0, m90_video_data[0xf008/2]+376+12 );
+		tilemap_set_scrollx( pf2_wide_layer,0, m90_video_data[0xf000/2]-16 );
+		tilemap_set_scrolly( pf2_wide_layer,0, m90_video_data[0xf008/2]+388 );
 		tilemap_draw(bitmap,cliprect,pf2_wide_layer,0,0);
 		tilemap_draw(bitmap,cliprect,pf2_wide_layer,1,1);
 	} else {
 		tilemap_mark_all_tiles_dirty(pf2_layer);
-		tilemap_set_scroll_rows(pf2_layer,1);
-		tilemap_set_scrollx( pf2_layer,0, m90_video_data[0xf000/2]-80+64 );
-		tilemap_set_scrolly( pf2_layer,0, m90_video_data[0xf008/2]-132+12 );
+		tilemap_set_scrollx( pf2_layer,0, m90_video_data[0xf000/2]-16 );
+		tilemap_set_scrolly( pf2_layer,0, m90_video_data[0xf008/2]-120 );
 		tilemap_draw(bitmap,cliprect,pf2_layer,0,0);
 		tilemap_draw(bitmap,cliprect,pf2_layer,1,1);
 	}
 
 	if (m90_video_control_data[6] & 0x04) {
 		tilemap_mark_all_tiles_dirty(pf1_wide_layer);
-		tilemap_set_scroll_rows(pf1_wide_layer,1);
-		tilemap_set_scrollx( pf1_wide_layer,0, m90_video_data[0xf004/2]-80+68);
-		tilemap_set_scrolly( pf1_wide_layer,0, m90_video_data[0xf00c/2]+376+16 );
+		tilemap_set_scrolly( pf1_wide_layer,0, m90_video_data[0xf00c/2]+392 );
 		tilemap_draw(bitmap,cliprect,pf1_wide_layer,0,0);
 		tilemap_draw(bitmap,cliprect,pf1_wide_layer,1,1);
 	} else {
 		tilemap_mark_all_tiles_dirty(pf1_layer);
-		tilemap_set_scroll_rows(pf1_layer,1);
-		tilemap_set_scrollx( pf1_layer,0, m90_video_data[0xf004/2]-80+68);
-		tilemap_set_scrolly( pf1_layer,0, m90_video_data[0xf00c/2]-132+16 );
+		tilemap_set_scrolly( pf1_layer,0, m90_video_data[0xf00c/2]-116 );
 		tilemap_draw(bitmap,cliprect,pf1_layer,0,0);
 		tilemap_draw(bitmap,cliprect,pf1_layer,1,1);
 	}
