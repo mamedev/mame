@@ -56,9 +56,10 @@ VIDEO_UPDATE( blackt96 )
 {
 	int y,x;
 	int count = 0;
+	int base;
 	const gfx_element *gfx = screen->machine->gfx[2];
-
 	const gfx_element *gfxbg = screen->machine->gfx[0];
+	const gfx_element *gfxspr = screen->machine->gfx[1];
 
 	count = 0;
 	for (x=0;x<64;x++)
@@ -69,9 +70,93 @@ VIDEO_UPDATE( blackt96 )
 			drawgfx(bitmap,gfxbg,tile,6,0,0,x*16,y*16,cliprect,TRANSPARENCY_NONE,0);
 			count++;
 		}
-
 	}
 
+	/* the sprite are arranged in tilemaps.. I don't know how this works yet */
+	count = 0;
+	base = 0x1000;
+	for (x=0;x<32;x++)
+	{
+		for (y=0;y<32;y++)
+		{
+			UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x1fff);
+			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
+			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x000f)+0x10;
+
+			drawgfx(bitmap,gfxspr,tile,colour,flipx,0,x*16,y*16,cliprect,TRANSPARENCY_PEN,0);
+			count++;
+		}
+	}
+	count = 0;
+	base = 0x1800;
+	for (x=0;x<32;x++)
+	{
+		for (y=0;y<32;y++)
+		{
+			UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x1fff);
+			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
+			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x000f)+0x10;
+
+			drawgfx(bitmap,gfxspr,tile,colour,flipx,0,x*16,y*16,cliprect,TRANSPARENCY_PEN,0);
+			count++;
+		}
+	}
+	count = 0;
+	base = 0x3000;
+	for (x=0;x<32;x++)
+	{
+		for (y=0;y<32;y++)
+		{
+			UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x1fff);
+			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
+			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x000f)+0x10;
+
+			drawgfx(bitmap,gfxspr,tile,colour,flipx,0,x*16,y*16,cliprect,TRANSPARENCY_PEN,0);
+			count++;
+		}
+	}
+	count = 0;
+	base = 0x3800;
+	for (x=0;x<32;x++)
+	{
+		for (y=0;y<32;y++)
+		{
+			UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x1fff);
+			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
+			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x000f)+0x10;
+
+			drawgfx(bitmap,gfxspr,tile,colour,flipx,0,x*16,y*16,cliprect,TRANSPARENCY_PEN,0);
+			count++;
+		}
+	}
+	base = 0x4000;
+	for (x=0;x<32;x++)
+	{
+		for (y=0;y<32;y++)
+		{
+			UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x1fff);
+			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
+			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x000f)+0x10;
+
+			drawgfx(bitmap,gfxspr,tile,colour,flipx,0,x*16,y*16,cliprect,TRANSPARENCY_PEN,0);
+			count++;
+		}
+	}
+	base = 0x4800;
+	for (x=0;x<32;x++)
+	{
+		for (y=0;y<32;y++)
+		{
+			UINT16 tile = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x1fff);
+			UINT16 flipx = (blackt96_tilemapram2[count*2 + (base/2)+1]&0x4000);
+			UINT16 colour = (blackt96_tilemapram2[count*2 + (base/2)]&0x000f)+0x10;
+
+			drawgfx(bitmap,gfxspr,tile,colour,flipx,0,x*16,y*16,cliprect,TRANSPARENCY_PEN,0);
+			count++;
+		}
+	}
+
+	/* Text Layer */
 	count = 0;
 	for (x=0;x<64;x++)
 	{
@@ -364,8 +449,8 @@ static const gfx_layout blackt962_layout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0,4,8, 12 },
-	{ 275,274,273,272,259,258,257,256,19,18,17,16,3,2,1,0 },
+	{ 0,16,8, 24 },
+	{ 519, 515, 518, 514,  517,513,  516,512, 7,3,6,2,5,1,4,0 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32 },
 	32*32
 };
@@ -385,8 +470,8 @@ static const gfx_layout blackt963_layout =
 
 static GFXDECODE_START( blackt96 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, blackt96_layout,   0x0, 0x10  )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, blackt962_layout,   0x0, 0x10  )
-	GFXDECODE_ENTRY( REGION_GFX3, 0, blackt963_layout,   0x0, 0x10  )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, blackt962_layout,   0x0, 0x80  )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, blackt963_layout,   0x0, 0x80  )
 GFXDECODE_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -444,13 +529,13 @@ ROM_START( blackt96 )
 	ROM_REGION( 0x040000, REGION_SOUND2, 0 ) /* Samples */
 	ROM_LOAD( "2", 0x00000, 0x40000, CRC(94009cd4) SHA1(aa36298e280c20bf86d70f3eb3fb33aca4df07e3) )
 
-	ROM_REGION( 0x200000, REGION_GFX1, 0 ) // tiles, 16x16x8
+	ROM_REGION( 0x200000, REGION_GFX1, 0 ) // bg tiles
 	ROM_LOAD16_BYTE( "5", 0x100000, 0x40000, CRC(6e52c331) SHA1(31ef1d352d4ee5f7b3ef336b1f052c3a1468f22e) )
 	ROM_LOAD16_BYTE( "6", 0x100001, 0x40000, CRC(69637a5a) SHA1(a5731478856d8bb91d34b747838b2b47772864ef) )
 	ROM_LOAD16_BYTE( "7", 0x000000, 0x80000, CRC(6b04e8a8) SHA1(309ba1efd60600a30e1ae8f6e8b92939c23cd9c6) )
 	ROM_LOAD16_BYTE( "8", 0x000001, 0x80000, CRC(16c656be) SHA1(06c40c16080a97b01a638776d28f36594ce4fb3b) )
 
-	ROM_REGION( 0x100000, REGION_GFX2, 0 ) // sprite tiles?? (or not tiles?)
+	ROM_REGION( 0x100000, REGION_GFX2, 0 ) // sprite tiles
 	ROM_LOAD32_BYTE( "11", 0x00000, 0x40000, CRC(9eb773a3) SHA1(9c91ee938438a61f5fa650ced6249e34aa5321bd) )
 	ROM_LOAD32_BYTE( "12", 0x00001, 0x40000, CRC(8894e608) SHA1(389974a0b208b7cbf7d5f83641ddc058ad5ebe87) )
 	ROM_LOAD32_BYTE( "13", 0x00002, 0x40000, CRC(0acceb9d) SHA1(e8a85c7eab45d84613ac37a9b7ffbc45b44eb2e5) )
