@@ -1031,6 +1031,26 @@ static void emit_mov_r32_p32(drcbe_state *drcbe, x86code **dst, UINT8 reg, const
 
 
 /*-------------------------------------------------
+    emit_mov_r32_p32_keepflags - move a 32-bit 
+    parameter into a register without affecting
+    any flags
+-------------------------------------------------*/
+
+static void emit_mov_r32_p32_keepflags(drcbe_state *drcbe, x86code **dst, UINT8 reg, const drcuml_parameter *param)
+{
+	if (param->type == DRCUML_PTYPE_IMMEDIATE)
+		emit_mov_r32_imm(dst, reg, param->value);										// mov   reg,param
+	else if (param->type == DRCUML_PTYPE_MEMORY)
+		emit_mov_r32_m32(dst, reg, MABS(param->value));									// mov   reg,[param]
+	else if (param->type == DRCUML_PTYPE_INT_REGISTER)
+	{
+		if (reg != param->value)
+			emit_mov_r32_r32(dst, reg, param->value);									// mov   reg,param
+	}
+}
+
+
+/*-------------------------------------------------
     emit_mov_m32_p32 - move a 32-bit parameter
     into a memory location
 -------------------------------------------------*/
@@ -1157,7 +1177,7 @@ static void emit_adc_m32_p32(drcbe_state *drcbe, x86code **dst, DECLARE_MEMPARAM
 	else
 	{
 		int reg = param_select_register(REG_EAX, param, NULL);
-		emit_mov_r32_p32(drcbe, dst, reg, param);										// mov   reg,param
+		emit_mov_r32_p32_keepflags(drcbe, dst, reg, param);								// mov   reg,param
 		emit_adc_m32_r32(dst, MEMPARAMS, reg);											// adc   [dest],reg
 	}
 }
@@ -1237,7 +1257,7 @@ static void emit_sbb_m32_p32(drcbe_state *drcbe, x86code **dst, DECLARE_MEMPARAM
 	else
 	{
 		int reg = param_select_register(REG_EAX, param, NULL);
-		emit_mov_r32_p32(drcbe, dst, reg, param);										// mov   reg,param
+		emit_mov_r32_p32_keepflags(drcbe, dst, reg, param);								// mov   reg,param
 		emit_sbb_m32_r32(dst, MEMPARAMS, reg);											// sbb   [dest],reg
 	}
 }
@@ -1730,7 +1750,7 @@ static void emit_rcl_r32_p32(drcbe_state *drcbe, x86code **dst, UINT8 reg, const
 	}
 	else
 	{
-		emit_mov_r32_p32(drcbe, dst, REG_ECX, param);									// mov   ecx,param
+		emit_mov_r32_p32_keepflags(drcbe, dst, REG_ECX, param);							// mov   ecx,param
 		emit_rcl_r32_cl(dst, reg);														// rcl   reg,cl
 	}
 }
@@ -1752,7 +1772,7 @@ static void emit_rcl_m32_p32(drcbe_state *drcbe, x86code **dst, DECLARE_MEMPARAM
 	}
 	else
 	{
-		emit_mov_r32_p32(drcbe, dst, REG_ECX, param);									// mov   ecx,param
+		emit_mov_r32_p32_keepflags(drcbe, dst, REG_ECX, param);							// mov   ecx,param
 		emit_rcl_m32_cl(dst, MEMPARAMS);												// rcl   [dest],cl
 	}
 }
@@ -1774,7 +1794,7 @@ static void emit_rcr_r32_p32(drcbe_state *drcbe, x86code **dst, UINT8 reg, const
 	}
 	else
 	{
-		emit_mov_r32_p32(drcbe, dst, REG_ECX, param);									// mov   ecx,param
+		emit_mov_r32_p32_keepflags(drcbe, dst, REG_ECX, param);							// mov   ecx,param
 		emit_rcr_r32_cl(dst, reg);														// rcr   reg,cl
 	}
 }
@@ -1796,7 +1816,7 @@ static void emit_rcr_m32_p32(drcbe_state *drcbe, x86code **dst, DECLARE_MEMPARAM
 	}
 	else
 	{
-		emit_mov_r32_p32(drcbe, dst, REG_ECX, param);									// mov   ecx,param
+		emit_mov_r32_p32_keepflags(drcbe, dst, REG_ECX, param);							// mov   ecx,param
 		emit_rcr_m32_cl(dst, MEMPARAMS);												// rcr   [dest],cl
 	}
 }
@@ -1824,6 +1844,33 @@ static void emit_mov_r64_p64(drcbe_state *drcbe, x86code **dst, UINT8 reglo, UIN
 			emit_xor_r32_r32(dst, reghi, reghi);										// xor   reghi,reghi
 		else
 			emit_mov_r32_imm(dst, reghi, param->value >> 32);							// mov   reghi,param >> 32
+	}
+	else if (param->type == DRCUML_PTYPE_MEMORY)
+	{
+		emit_mov_r32_m32(dst, reglo, MABS(param->value));								// mov   reglo,[param]
+		emit_mov_r32_m32(dst, reghi, MABS(param->value + 4));							// mov   reghi,[param+4]
+	}
+	else if (param->type == DRCUML_PTYPE_INT_REGISTER)
+	{
+		if (reglo != param->value)
+			emit_mov_r32_r32(dst, reglo, param->value);									// mov   reglo,param
+		emit_mov_r32_m32(dst, reghi, MABS(drcbe->reghi[param->value]));					// mov   reghi,reghi[param]
+	}
+}
+
+
+/*-------------------------------------------------
+    emit_mov_r64_p64_keepflags - move a 64-bit 
+    parameter into a pair of registers without
+    affecting any flags
+-------------------------------------------------*/
+
+static void emit_mov_r64_p64_keepflags(drcbe_state *drcbe, x86code **dst, UINT8 reglo, UINT8 reghi, const drcuml_parameter *param)
+{
+	if (param->type == DRCUML_PTYPE_IMMEDIATE)
+	{
+		emit_mov_r32_imm(dst, reglo, param->value);										// mov   reglo,param
+		emit_mov_r32_imm(dst, reghi, param->value >> 32);								// mov   reghi,param >> 32
 	}
 	else if (param->type == DRCUML_PTYPE_MEMORY)
 	{
@@ -1992,7 +2039,7 @@ static void emit_adc_m64_p64(drcbe_state *drcbe, x86code **dst, DECLARE_MEMPARAM
 	else
 	{
 		int reglo = (param->type == DRCUML_PTYPE_INT_REGISTER) ? param->value : REG_EAX;
-		emit_mov_r64_p64(drcbe, dst, reglo, REG_EDX, param);							// mov   edx:reglo,param
+		emit_mov_r64_p64_keepflags(drcbe, dst, reglo, REG_EDX, param);					// mov   edx:reglo,param
 		emit_adc_m32_r32(dst, MEMPARAMS, reglo);										// adc   [dest],reglo
 		if (saveflags) emit_pushf(dst);													// pushf
 		emit_adc_m32_r32(dst, MEMPARAMS + 4, REG_EDX);									// adc   [dest+4],edx
@@ -2108,7 +2155,7 @@ static void emit_sbb_m64_p64(drcbe_state *drcbe, x86code **dst, DECLARE_MEMPARAM
 	else
 	{
 		int reglo = (param->type == DRCUML_PTYPE_INT_REGISTER) ? param->value : REG_EAX;
-		emit_mov_r64_p64(drcbe, dst, reglo, REG_EDX, param);							// mov   edx:reglo,param
+		emit_mov_r64_p64_keepflags(drcbe, dst, reglo, REG_EDX, param);					// mov   edx:reglo,param
 		emit_sbb_m32_r32(dst, MEMPARAMS, reglo);										// sbb   [dest],reglo
 		if (saveflags) emit_pushf(dst);													// pushf
 		emit_sbb_m32_r32(dst, MEMPARAMS + 4, REG_EDX);									// sbb   [dest+4],edx
@@ -2782,7 +2829,7 @@ static void emit_rcl_r64_p64(drcbe_state *drcbe, x86code **dst, UINT8 reglo, UIN
 	emit_link skipall, skiploop;
 	x86code *loop;
 
-	emit_mov_r32_p32(drcbe, dst, REG_ECX, param);										// mov   ecx,param
+	emit_mov_r32_p32_keepflags(drcbe, dst, REG_ECX, param);								// mov   ecx,param
 	if (!saveflags)
 	{
 		loop = *dst;																// loop:
@@ -2824,7 +2871,7 @@ static void emit_rcr_r64_p64(drcbe_state *drcbe, x86code **dst, UINT8 reglo, UIN
 	emit_link skipall, skiploop;
 	x86code *loop;
 
-	emit_mov_r32_p32(drcbe, dst, REG_ECX, param);										// mov   ecx,param
+	emit_mov_r32_p32_keepflags(drcbe, dst, REG_ECX, param);								// mov   ecx,param
 	if (!saveflags)
 	{
 		loop = *dst;																// loop:
@@ -4465,7 +4512,7 @@ static x86code *op_mov(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 		/* general case */
 		else
 		{
-			emit_mov_r32_p32(drcbe, &dst, dstreg, &srcp);								// mov   dstreg,srcp
+			emit_mov_r32_p32_keepflags(drcbe, &dst, dstreg, &srcp);						// mov   dstreg,srcp
 			emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);								// mov   dstp,dstreg
 		}
 	}
@@ -4808,7 +4855,7 @@ static x86code *op_addc(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		/* general case */
 		else
 		{
-			emit_mov_r32_p32(drcbe, &dst, dstreg, &src1p);								// mov   dstreg,src1p
+			emit_mov_r32_p32_keepflags(drcbe, &dst, dstreg, &src1p);					// mov   dstreg,src1p
 			emit_adc_r32_p32(drcbe, &dst, dstreg, &src2p, inst);						// adc   dstreg,src2p
 			emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);								// mov   dstp,dstreg
 		}
@@ -4824,7 +4871,7 @@ static x86code *op_addc(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		/* general case */
 		else
 		{
-			emit_mov_r64_p64(drcbe, &dst, dstreg, REG_EDX, &src1p);						// mov   dstreg:dstp,[src1p]
+			emit_mov_r64_p64_keepflags(drcbe, &dst, dstreg, REG_EDX, &src1p);			// mov   dstreg:dstp,[src1p]
 			emit_adc_r64_p64(drcbe, &dst, dstreg, REG_EDX, &src2p, inst);				// adc   dstreg:dstp,src2p
 			emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg, REG_EDX);						// mov   dstp,dstreg:eax
 		}
@@ -4923,7 +4970,7 @@ static x86code *op_subc(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		/* general case */
 		else
 		{
-			emit_mov_r32_p32(drcbe, &dst, dstreg, &src1p);								// mov   dstreg,src1p
+			emit_mov_r32_p32_keepflags(drcbe, &dst, dstreg, &src1p);					// mov   dstreg,src1p
 			emit_sbb_r32_p32(drcbe, &dst, dstreg, &src2p, inst);						// sbb   dstreg,src2p
 			emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);								// mov   dstp,dstreg
 		}
@@ -4939,7 +4986,7 @@ static x86code *op_subc(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		/* general case */
 		else
 		{
-			emit_mov_r64_p64(drcbe, &dst, dstreg, REG_EDX, &src1p);						// mov   dstreg:dstp,[src1p]
+			emit_mov_r64_p64_keepflags(drcbe, &dst, dstreg, REG_EDX, &src1p);			// mov   dstreg:dstp,[src1p]
 			emit_sbb_r64_p64(drcbe, &dst, dstreg, REG_EDX, &src2p, inst);				// sbb   dstreg:dstp,src2p
 			emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg, REG_EDX);						// mov   dstp,dstreg:eax
 		}
@@ -5989,7 +6036,7 @@ static x86code *op_rolc(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		/* general case */
 		else
 		{
-			emit_mov_r32_p32(drcbe, &dst, dstreg, &src1p);								// mov   dstreg,src1p
+			emit_mov_r32_p32_keepflags(drcbe, &dst, dstreg, &src1p);					// mov   dstreg,src1p
 			emit_rcl_r32_p32(drcbe, &dst, dstreg, &src2p, inst);						// rcl   dstreg,src2p
 			emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);								// mov   dstp,dstreg
 		}
@@ -5999,7 +6046,7 @@ static x86code *op_rolc(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	else if (inst->size == 8)
 	{
 		/* general case */
-		emit_mov_r64_p64(drcbe, &dst, dstreg, REG_EDX, &src1p);							// mov   dstreg:dstp,[src1p]
+		emit_mov_r64_p64_keepflags(drcbe, &dst, dstreg, REG_EDX, &src1p);				// mov   dstreg:dstp,[src1p]
 		emit_rcl_r64_p64(drcbe, &dst, dstreg, REG_EDX, &src2p, inst);					// rcl   dstreg:dstp,src2p
 		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg, REG_EDX);							// mov   dstp,dstreg:eax
 	}
@@ -6037,7 +6084,7 @@ static x86code *op_rorc(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		/* general case */
 		else
 		{
-			emit_mov_r32_p32(drcbe, &dst, dstreg, &src1p);								// mov   dstreg,src1p
+			emit_mov_r32_p32_keepflags(drcbe, &dst, dstreg, &src1p);					// mov   dstreg,src1p
 			emit_rcr_r32_p32(drcbe, &dst, dstreg, &src2p, inst);						// rcr   dstreg,src2p
 			emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);								// mov   dstp,dstreg
 		}
@@ -6047,7 +6094,7 @@ static x86code *op_rorc(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	else if (inst->size == 8)
 	{
 		/* general case */
-		emit_mov_r64_p64(drcbe, &dst, dstreg, REG_EDX, &src1p);							// mov   dstreg:dstp,[src1p]
+		emit_mov_r64_p64_keepflags(drcbe, &dst, dstreg, REG_EDX, &src1p);				// mov   dstreg:dstp,[src1p]
 		emit_rcr_r64_p64(drcbe, &dst, dstreg, REG_EDX, &src2p, inst);					// rcr   dstreg:dstp,src2p
 		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg, REG_EDX);							// mov   dstp,dstreg:eax
 	}
