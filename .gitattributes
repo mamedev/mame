@@ -1961,6 +1961,7 @@ src/mame/drivers/strnskil.c svneol=native#text/plain
 src/mame/drivers/stv.c svneol=native#text/plain
 src/mame/drivers/stvinit.c svneol=native#text/plain
 src/mame/drivers/subs.c svneol=native#text/plain
+src/mame/drivers/subsino.c svneol=native#text/plain
 src/mame/drivers/suna16.c svneol=native#text/plain
 src/mame/drivers/suna8.c svneol=native#text/plain
 src/mame/drivers/supbtime.c svneol=native#text/plain
