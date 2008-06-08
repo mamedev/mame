@@ -421,34 +421,35 @@ VIDEO_UPDATE( dynablsb )
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(bitmap,0,cliprect);
 
-	if (0) {
-		tilemap_mark_all_tiles_dirty(pf1_layer);
-		tilemap_set_scroll_rows(pf1_layer,1);
-		tilemap_set_scrollx( pf1_layer,0, 0);
-		tilemap_set_scrolly( pf1_layer,0, 4);
-		tilemap_draw(bitmap,cliprect,pf1_layer,0,0);
-		tilemap_draw(bitmap,cliprect,pf1_layer,1,1);
-	} else {
+	if (!(m90_video_data[0xf008/2] & 0x4000)) {
 		tilemap_mark_all_tiles_dirty(pf1_wide_layer);
 		tilemap_set_scroll_rows(pf1_wide_layer,1);
-		tilemap_set_scrollx( pf1_wide_layer,0, 0);
-		tilemap_set_scrolly( pf1_wide_layer,0, 376+17*8);
+		tilemap_set_scrollx( pf1_wide_layer,0, m90_video_data[0xf004/2]+0+68);
+		tilemap_set_scrolly( pf1_wide_layer,0, m90_video_data[0xf006/2]+376+17*8);
 		tilemap_draw(bitmap,cliprect,pf1_wide_layer,0,0);
 		tilemap_draw(bitmap,cliprect,pf1_wide_layer,1,1);
+	} else {
+
+		tilemap_mark_all_tiles_dirty(pf1_layer);
+		tilemap_set_scroll_rows(pf1_layer,1);
+		tilemap_set_scrollx( pf1_layer,0, m90_video_data[0xf004/2]+0+68);
+		tilemap_set_scrolly( pf1_layer,0, m90_video_data[0xf006/2]+4);
+		tilemap_draw(bitmap,cliprect,pf1_layer,0,0);
+		tilemap_draw(bitmap,cliprect,pf1_layer,1,1);
 	}
 
 	if (!(m90_video_data[0xf008/2] & 0x8000)) {
 		tilemap_mark_all_tiles_dirty(pf2_wide_layer);
 		tilemap_set_scroll_rows(pf2_wide_layer,1);
-		tilemap_set_scrollx( pf2_wide_layer,0, 0);
-		tilemap_set_scrolly( pf2_wide_layer,0, 376+17*8);
+		tilemap_set_scrollx( pf2_wide_layer,0, m90_video_data[0xf000/2]+0+68);
+		tilemap_set_scrolly( pf2_wide_layer,0, m90_video_data[0xf002/2]+376+17*8);
 		tilemap_draw(bitmap,cliprect,pf2_wide_layer,0,0);
 		tilemap_draw(bitmap,cliprect,pf2_wide_layer,1,1);
 	} else {
 		tilemap_mark_all_tiles_dirty(pf2_layer);
 		tilemap_set_scroll_rows(pf2_layer,1);
-		tilemap_set_scrollx( pf2_layer,0, 0 );
-		tilemap_set_scrolly( pf2_layer,0, 4 );
+		tilemap_set_scrollx( pf2_layer,0, m90_video_data[0xf000/2]+0+68 );
+		tilemap_set_scrolly( pf2_layer,0, m90_video_data[0xf002/2]+4 );
 		tilemap_draw(bitmap,cliprect,pf2_layer,0,0);
 		tilemap_draw(bitmap,cliprect,pf2_layer,1,1);
 	}
