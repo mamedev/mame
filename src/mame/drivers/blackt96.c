@@ -49,7 +49,8 @@ VIDEO_START( blackt96 )
 
 }
 
-UINT16* blackt96_tilemapram;
+static UINT16* blackt96_tilemapram;
+static UINT16* blackt96_tilemapram2;
 
 VIDEO_UPDATE( blackt96 )
 {
@@ -57,17 +58,34 @@ VIDEO_UPDATE( blackt96 )
 	int count = 0;
 	const gfx_element *gfx = screen->machine->gfx[2];
 
+	const gfx_element *gfxbg = screen->machine->gfx[0];
+
+	count = 0;
+	for (x=0;x<64;x++)
+	{
+		for (y=0;y<32;y++)
+		{
+			UINT16 tile = (blackt96_tilemapram2[count*2 + (0x2000/2)+1]);
+			drawgfx(bitmap,gfxbg,tile,6,0,0,x*16,y*16,cliprect,TRANSPARENCY_NONE,0);
+			count++;
+		}
+
+	}
+
+	count = 0;
 	for (x=0;x<64;x++)
 	{
 		for (y=0;y<32;y++)
 		{
 			UINT16 tile = (blackt96_tilemapram[count*2]&0x7ff)+0x800; // +0xc00 for korean text
-
-			drawgfx(bitmap,gfx,tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx(bitmap,gfx,tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
 			count++;
 		}
 
 	}
+
+
+
 
 	return 0;
 }
@@ -78,18 +96,25 @@ static WRITE16_HANDLER( blackt96_c0000_w )
 	printf("blackt96_c0000_w %04x %04x\n",data,mem_mask);
 }
 
+static WRITE16_HANDLER( blackt96_80000_w )
+{
+	// TO sound MCU?
+	//printf("blackt96_80000_w %04x %04x\n",data,mem_mask);
+}
+
+
 static ADDRESS_MAP_START( blackt96_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080001) AM_READ(input_port_0_word_r) AM_WRITE(SMH_NOP)  // PLAYER INPUT
+	AM_RANGE(0x080000, 0x080001) AM_READ(input_port_0_word_r) AM_WRITE(blackt96_80000_w)  // PLAYER INPUT
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(input_port_1_word_r) AM_WRITE(blackt96_c0000_w) // COIN INPUT
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x0e8000, 0x0e8001) AM_READ(input_port_3_word_r)
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ(input_port_4_word_r) // DSW1
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ(input_port_5_word_r) // DSW2
 
-	AM_RANGE(0x100000, 0x100fff) AM_RAM  AM_BASE(&blackt96_tilemapram) // text tilemap
-	AM_RANGE(0x200000, 0x207fff) AM_RAM // sprite list?
-	AM_RANGE(0x400000, 0x400fff) AM_RAM
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE(&blackt96_tilemapram) // text tilemap
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE(&blackt96_tilemapram2)// sprite list?
+	AM_RANGE(0x400000, 0x400fff) AM_RAM AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM // main ram
 
 ADDRESS_MAP_END
@@ -98,53 +123,25 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( blackt96 )
     PORT_START
-    PORT_DIPNAME( 0x0001, 0x0001, "0" )
-    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
     PORT_START
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) // Test mode lists this as Service 1, but it appears to be Coin 1 (uses Coin 1 coinage etc.)
     PORT_DIPNAME( 0x0002, 0x0002, "xx")
     PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -154,7 +151,7 @@ static INPUT_PORTS_START( blackt96 )
     PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
     PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) // Test mode lists this as Coin 1, but it doesn't work
     PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -364,14 +361,15 @@ static const gfx_layout blackt96_layout =
 
 static const gfx_layout blackt962_layout =
 {
-	8,16,
+	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0,1,2,3 },
-	{ 0,4,8,12,16,20,24,28 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 8*32, 9*32, 10*32,11*32,12*32,13*32,14*32,15*32},
-	16*32
+	{ 0,4,8, 12 },
+	{ 275,274,273,272,259,258,257,256,19,18,17,16,3,2,1,0 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32 },
+	32*32
 };
+
 
 /* wrong layout, but we can see some tiles */
 static const gfx_layout blackt963_layout =
@@ -379,23 +377,29 @@ static const gfx_layout blackt963_layout =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0,4 },
+	{ 0,4,8, 12 },
 	{ 131,130,129,128,3,2,1,0 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	16*16
 };
 
 static GFXDECODE_START( blackt96 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, blackt96_layout,   0x0, 2  )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, blackt963_layout,   0x0, 2  )
-	GFXDECODE_ENTRY( REGION_GFX3, 0, blackt963_layout,   0x0, 2  )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, blackt96_layout,   0x0, 0x10  )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, blackt962_layout,   0x0, 0x10  )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, blackt963_layout,   0x0, 0x10  )
 GFXDECODE_END
 
+static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
+ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( blackt96 )
 	MDRV_CPU_ADD_TAG("main", M68000, 18000000 /2)
 	MDRV_CPU_PROGRAM_MAP(blackt96_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+
+	MDRV_CPU_ADD(PIC16C57, 8000000)	/* ? */
+	MDRV_CPU_FLAGS(CPU_DISABLE)
+	MDRV_CPU_IO_MAP(sound_io_map, 0)
 
 	MDRV_GFXDECODE(blackt96)
 
@@ -404,9 +408,10 @@ static MACHINE_DRIVER_START( blackt96 )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*16, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 8*32-1, 0*8, 8*32-1)
+//	MDRV_SCREEN_VISIBLE_AREA(0*8, 16*32-1, 0*8, 16*32-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 8*32-1, 2*8, 8*30-1)
 
-	MDRV_PALETTE_LENGTH(0x200)
+	MDRV_PALETTE_LENGTH(0x800)
 
 	MDRV_VIDEO_START(blackt96)
 	MDRV_VIDEO_UPDATE(blackt96)
@@ -419,7 +424,7 @@ static MACHINE_DRIVER_START( blackt96 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.47)
 
 	MDRV_SOUND_ADD(OKIM6295, 8000000/8)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.47)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.47)
 MACHINE_DRIVER_END
@@ -430,17 +435,20 @@ ROM_START( blackt96 )
 	ROM_LOAD16_BYTE( "3", 0x00001, 0x40000, CRC(fc2c1d79) SHA1(742478237819af16d3fd66039283202b3c07eedd) )
 	ROM_LOAD16_BYTE( "4", 0x00000, 0x40000, CRC(caff5b4a) SHA1(9a388cbb07211fa66f27082a8a5b847168c86a4f) )
 
+	ROM_REGION( 0x80000, REGION_CPU2, 0 ) /* PIC16c57 Code */
+	ROM_LOAD( "pic16c57", 0x00000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x080000, REGION_SOUND1, 0 ) /* Samples */
 	ROM_LOAD( "1", 0x00000, 0x80000, CRC(6a934174) SHA1(087f5fa226dc68ee217f99c64d16cdf14372d44c) )
 
 	ROM_REGION( 0x040000, REGION_SOUND2, 0 ) /* Samples */
 	ROM_LOAD( "2", 0x00000, 0x40000, CRC(94009cd4) SHA1(aa36298e280c20bf86d70f3eb3fb33aca4df07e3) )
 
-	ROM_REGION( 0x400000, REGION_GFX1, 0 ) // tiles, 16x16x8
+	ROM_REGION( 0x200000, REGION_GFX1, 0 ) // tiles, 16x16x8
 	ROM_LOAD16_BYTE( "5", 0x100000, 0x40000, CRC(6e52c331) SHA1(31ef1d352d4ee5f7b3ef336b1f052c3a1468f22e) )
 	ROM_LOAD16_BYTE( "6", 0x100001, 0x40000, CRC(69637a5a) SHA1(a5731478856d8bb91d34b747838b2b47772864ef) )
-	ROM_LOAD16_BYTE( "7", 0x00000, 0x80000, CRC(6b04e8a8) SHA1(309ba1efd60600a30e1ae8f6e8b92939c23cd9c6) )
-	ROM_LOAD16_BYTE( "8", 0x00001, 0x80000, CRC(16c656be) SHA1(06c40c16080a97b01a638776d28f36594ce4fb3b) )
+	ROM_LOAD16_BYTE( "7", 0x000000, 0x80000, CRC(6b04e8a8) SHA1(309ba1efd60600a30e1ae8f6e8b92939c23cd9c6) )
+	ROM_LOAD16_BYTE( "8", 0x000001, 0x80000, CRC(16c656be) SHA1(06c40c16080a97b01a638776d28f36594ce4fb3b) )
 
 	ROM_REGION( 0x100000, REGION_GFX2, 0 ) // sprite tiles?? (or not tiles?)
 	ROM_LOAD32_BYTE( "11", 0x00000, 0x40000, CRC(9eb773a3) SHA1(9c91ee938438a61f5fa650ced6249e34aa5321bd) )
@@ -453,4 +461,4 @@ ROM_START( blackt96 )
 	ROM_LOAD16_BYTE( "10", 0x00001, 0x10000, CRC(b78232a2) SHA1(36a4f01011faf64e46b73f0082ab04843ac8b0e2) )
 ROM_END
 
-GAME( 1996, blackt96,    0,        blackt96,    blackt96,    0, ROT0,  "D.G.R.M.", "Black Touch '96", GAME_NOT_WORKING )
+GAME( 1996, blackt96,    0,        blackt96,    blackt96,    0, ROT0,  "D.G.R.M.", "Black Touch '96", GAME_NOT_WORKING | GAME_NO_SOUND )
