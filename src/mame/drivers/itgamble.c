@@ -551,63 +551,6 @@ ROM_START( mnumber )	/* clocks should be changed for this game */
 ROM_END
 
 
-/* Euro Jolly X5
- 
-CPU:
-
-1x M30624FGAFP-03001A4 (u1)(main)
-
-This one is a Mitsubishi (Renesas) M16/62A 16bit microcomputer.
-It has 256 KB of internal flash ROM + 20 KB of RAM.
-
-1x OKI M6295 (u22)(sound)
-1x TDA2003 (u25)(sound)
-1x LM358M (u23)(sound)
-1x oscillator 16.000MHz (u20)  
-
-
-ROMs:
-
-4x M27C4001 (u21, u15, u16, u17)
-
-
-PLDs:
-
-1x ST93C46 (u18)
-(1K 64 x 16 or 128 x 8 serial microwirw EEPROM)
-
-2x ispLSI1032E-70LJ
-
-
-Note:
-
-1x JAMMA style edge connector
-1x RS232 connector (P1) (along with an ST232C controller (u12)
-1x 6 legs jumper (jp1)
-1x 8 legs jumper (jp_1)
-1x 7 legs jumper (jp2)
-1x 4 legs jumper (jp3)
-1x red led (d7)
-1x battery (bt1)
-2x trimmer (r6,r33) (volume)
-1x pushbutton (s1)
-
-*/
-
-ROM_START( ejollyx5 )	/* CPU and clock should be changed for this game */
-	ROM_REGION( 0x1000000, REGION_CPU1, 0 )	/* all the program code is in here */
-	ROM_LOAD( "ejollyx5_m30624fgafp.mcu", 0x00000, 0x4000, NO_DUMP )
-
-	ROM_REGION( 0x180000, REGION_GFX1, 0 )	/* different encoded gfx */
-	ROM_LOAD( "eurojolly5-ep01.u15", 0x000000, 0x80000, CRC(feb4ef88) SHA1(5a86e92326096e4e0619a8aa6b491553eb46839d) )
-	ROM_LOAD( "eurojolly5-ep02.u17", 0x080000, 0x80000, CRC(83b2dab0) SHA1(a65cae227a444fe7474f8f821dbb6a8b506e4ae6) )
-	ROM_LOAD( "eurojolly5-ep03.u16", 0x100000, 0x80000, CRC(a0599d3c) SHA1(f52928cd75b4374a45fad37b7a7c1d39ea31b5f2) )
-
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 ) /* M6295 samples, identical halves */
-	ROM_LOAD( "eurojolly5-msg0.u21", 0x00000, 0x80000, CRC(edc157bc) SHA1(8400251ca7a74a4a0f2d443ae2c0254f1de955ac) )
-ROM_END
-
-
 /*************************
 *      Game Drivers      *
 *************************/
@@ -622,4 +565,3 @@ GAME( 2001, euro2k2a, euro2k2, itgamble, itgamble, 0,   ROT0, "Nazionale Elettro
 
 /* different hardware */
 GAME( 200?, mnumber,  0,       mnumber,  itgamble, 0,   ROT0, "M.M. - B.R.L.",         "Mystery Number",                GAME_NOT_WORKING )
-GAME( 200?, ejollyx5, 0,       ejollyx5, itgamble, 0,   ROT0, "Solar Games",           "Euro Jolly X5",                 GAME_NOT_WORKING )
