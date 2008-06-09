@@ -201,11 +201,13 @@ static void bomblord_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		sprite = spriteram16[offs+1];
 		colour = (spriteram16[offs+2] >> 9) & 0x0f;
 
-		y = (spriteram16[offs+0] & 0x1ff) + 0x98;
-		x = (spriteram16[offs+3] & 0x1ff) + 0x10;
+		y = (spriteram16[offs+0] & 0x1ff) + 152;
+		x = (spriteram16[offs+3] & 0x1ff) + 16;
 
 		x = x - 16;
 		y = 512 - y;
+
+		if (y < 0) y += 512;
 
 		fx = (spriteram16[offs+3] >> 8) & 0x02;
 		fy = (spriteram16[offs+2] >> 8) & 0x80;
@@ -236,11 +238,13 @@ static void dynablsb_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		sprite = spriteram16[offs+1];
 		colour = (spriteram16[offs+2] >> 9) & 0x0f;
 
-		y = (spriteram16[offs+0] & 0x1ff) + 0x98 + 17*8;
-		x = (spriteram16[offs+3] & 0x1ff) + 0x10 - 80;
+		y = (spriteram16[offs+0] & 0x1ff) + 288;
+		x = (spriteram16[offs+3] & 0x1ff) - 64;
 
 		x = x - 16;
 		y = 512 - y;
+
+		if (y < 0) y += 512;
 
 		fx = (spriteram16[offs+3] >> 8) & 0x02;
 		fy = (spriteram16[offs+2] >> 8) & 0x80;
@@ -468,8 +472,8 @@ VIDEO_UPDATE( dynablsb )
 	} else {
 		tilemap_mark_all_tiles_dirty(pf2_layer);
 		tilemap_set_scroll_rows(pf2_layer,1);
-		tilemap_set_scrollx( pf2_layer,0, m90_video_data[0xf000/2]+68 );
-		tilemap_set_scrolly( pf2_layer,0, m90_video_data[0xf002/2]+4 );
+		tilemap_set_scrollx( pf2_layer,0, m90_video_data[0xf000/2]+68);
+		tilemap_set_scrolly( pf2_layer,0, m90_video_data[0xf002/2]+4);
 		tilemap_draw(bitmap,cliprect,pf2_layer,0,0);
 		tilemap_draw(bitmap,cliprect,pf2_layer,1,1);
 	}
