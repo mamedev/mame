@@ -66,7 +66,10 @@ enum
 	PPC_EXIER,
 	PPC_EXISR,
 	PPC_EVPR,
-	PPC_IOCR
+	PPC_IOCR,
+	PPC_TBL,
+	PPC_TBH,
+	PPC_DEC
 };
 
 

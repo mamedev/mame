@@ -87,7 +87,8 @@ enum
 {
 	EXCEPTION_RESET		= 1,
 	EXCEPTION_MACHCHECK	= 2,
-	EXCEPTION_DSI		= 3,
+	EXCEPTION_DSI		= 3,		/* PPCCAP_OEA */
+	EXCEPTION_PROTECTION= 3,		/* PPCCAP_4XX */
 	EXCEPTION_ISI		= 4,
 	EXCEPTION_EI		= 5,
 	EXCEPTION_ALIGN		= 6,
@@ -544,9 +545,6 @@ struct _powerpc_state
 	UINT8			cap;
 	UINT8			cache_line_size;
 	UINT32			tb_divisor;
-	int				(*spr_read)(powerpc_state *ppc);
-	int				(*spr_write)(powerpc_state *ppc);
-	int				(*tlb_fill)(powerpc_state *ppc);
 
 	/* PowerPC 4xx-specific state */
 	ppc4xx_spu_state spu;

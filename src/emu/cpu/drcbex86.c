@@ -5353,6 +5353,8 @@ static x86code *op_divu(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		emit_mov_p32_r32(drcbe, &dst, &dstp, REG_EAX);									// mov   dstp,eax
 		if (compute_rem)
 			emit_mov_p32_r32(drcbe, &dst, &edstp, REG_EDX);								// mov   edstp,edx
+		if (inst->flags != 0)
+			emit_test_r32_r32(&dst, REG_EAX, REG_EAX);									// test  eax,eax
 		resolve_link(&dst, &skip);													// skip:
 	}
 
@@ -5416,6 +5418,8 @@ static x86code *op_divs(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		emit_mov_p32_r32(drcbe, &dst, &dstp, REG_EAX);									// mov   dstp,eax
 		if (compute_rem)
 			emit_mov_p32_r32(drcbe, &dst, &edstp, REG_EDX);								// mov   edstp,edx
+		if (inst->flags != 0)
+			emit_test_r32_r32(&dst, REG_EAX, REG_EAX);									// test  eax,eax
 		resolve_link(&dst, &skip);													// skip:
 	}
 

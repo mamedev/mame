@@ -62,7 +62,8 @@ extern offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op);
 
 /* mode bits */
 #define MODE_LITTLE_ENDIAN				0x01
-#define MODE_DATA_TRANSLATION			0x02
+#define MODE_DATA_TRANSLATION			0x02		/* OEA */
+#define MODE_PROTECTION					0x02		/* 4XX */
 #define MODE_USER						0x04
 
 /* size of the execution code cache */
@@ -1480,7 +1481,7 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 	}
 
 	/* general case: assume paging and perform a translation */
-	if ((ppc->cap & PPCCAP_OEA) && (mode & MODE_DATA_TRANSLATION))
+	if (((ppc->cap & PPCCAP_OEA) && (mode & MODE_DATA_TRANSLATION)) || (iswrite && (ppc->cap & PPCCAP_4XX) && (mode & MODE_PROTECTION)))
 	{
 		UML_SHR(block, IREG(3), IREG(0), IMM(12));											// shr     i3,i0,12
 		UML_LOAD(block, IREG(3), ppc->tlb_table, IREG(3), DWORD);							// load    i3,[tlb_table],i3,dword
@@ -1781,12 +1782,16 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 		UML_LOAD(block, IREG(3), ppc->tlb_table, IREG(3), DWORD);							// load    i3,[tlb_table],i3,dword
 		UML_JMP(block, tlbreturn);															// jmp     tlbreturn
 		UML_LABEL(block, dsi);															// dsi:
-		if (!(ppc->cap & PPCCAP_603_MMU))
+		
+		/* 4XX case: protection exception */
+		if (ppc->cap & PPCCAP_4XX)
 		{
-			UML_MOV(block, SPR32(SPROEA_DSISR), MEM(&ppc->param0));							// mov     [dsisr],[param0]
+			UML_MOV(block, SPR32(SPR4XX_DEAR), IREG(0));									// mov     [dear],i0
 			UML_EXH(block, ppc->impstate->exception[EXCEPTION_DSI], IREG(0));				// exh     dsi,i0
 		}
-		else
+		
+		/* 603 case: TLBMISS exception */
+		else if (ppc->cap & PPCCAP_603_MMU)
 		{
 			UML_MOV(block, SPR32(SPR603_DMISS), IREG(0));									// mov     [dmiss],i0
 			UML_MOV(block, SPR32(SPR603_DCMP), MEM(&ppc->mmu603_cmp));						// mov     [dcmp],[mmu603_cmp]
@@ -1796,6 +1801,13 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 				UML_EXH(block, ppc->impstate->exception[EXCEPTION_DTLBMISSS], IREG(0));		// exh     dtlbmisss,i0
 			else
 				UML_EXH(block, ppc->impstate->exception[EXCEPTION_DTLBMISSL], IREG(0));		// exh     dtlbmissl,i0
+		}
+		
+		/* general case: DSI exception */
+		else
+		{
+			UML_MOV(block, SPR32(SPROEA_DSISR), MEM(&ppc->param0));							// mov     [dsisr],[param0]
+			UML_EXH(block, ppc->impstate->exception[EXCEPTION_DSI], IREG(0));				// exh     dsi,i0
 		}
 	}
 
@@ -1964,12 +1976,18 @@ static void static_generate_stsw_entries(drcuml_state *drcuml, int mode)
 
 static void generate_update_mode(drcuml_block *block)
 {
+	/* LE in bit 0 of mode */
 	UML_AND(block, IREG(0), MSR32, IMM(MSR_LE));											// and     i0,msr,MSR_LE
-	UML_AND(block, IREG(1), MSR32, IMM(MSROEA_DR));											// and     i1,msr,MSR_DR
-	UML_SHR(block, IREG(1), IREG(1), IMM(3));												// shr     i1,i1,3
+	
+	/* DR (OEA) or PE (4XX) in bit 1 of mode */
+	if (ppc->cap & PPCCAP_OEA)
+		UML_ROLAND(block, IREG(1), MSR32, IMM(29), IMM(0x02));								// roland  i1,[msr],29,0x02
+	else if (ppc->cap & PPCCAP_4XX)
+		UML_ROLAND(block, IREG(1), MSR32, IMM(30), IMM(0x02));								// roland  i1,[msr],30,0x02
 	UML_OR(block, IREG(0), IREG(0), IREG(1));												// or      i0,i0,i1
-	UML_AND(block, IREG(1), MSR32, IMM(MSR_PR));											// and     i1,msr,MSR_PR
-	UML_SHR(block, IREG(1), IREG(1), IMM(12));												// shr     i1,i1,12
+	
+	/* PR in bit 2 of mode */
+	UML_ROLAND(block, IREG(1), MSR32, IMM(20), IMM(0x04));									// roland  i1,[msr],20,0x04
 	UML_OR(block, MEM(&ppc->impstate->mode), IREG(0), IREG(1));								// or      [mode],i0,i1
 }
 

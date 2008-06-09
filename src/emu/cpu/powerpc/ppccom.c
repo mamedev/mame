@@ -14,7 +14,7 @@
     DEBUGGING
 ***************************************************************************/
 
-#define PRINTF_TLB_FILL			(0)
+#define PRINTF_TLB_FILL			(1)
 #define PRINTF_SPU				(0)
 #define PRINTF_DECREMENTER		(0)
 
@@ -421,13 +421,32 @@ void ppccom_tlb_fill(powerpc_state *ppc)
 	int transtype = ppc->param1;
 	offs_t transaddr = address;
 	UINT32 entryval;
+	
+	/* 4xx case: "TLB" really just caches writes and checks compare registers */
+	if (ppc->cap & PPCCAP_4XX)
+	{
+		/* assume success and direct translation */
+		ppc->param0 = 0;
+		transaddr = address;
+		
+		/* only check if PE is enabled */
+		if (ppc->msr & MSR4XX_PE)
+		{
+			/* are we within one of the protection ranges? */
+			int inrange1 = ((address >> 12) >= (ppc->spr[SPR4XX_PBL1] >> 12) && (address >> 12) <= (ppc->spr[SPR4XX_PBU1] >> 12));
+			int inrange2 = ((address >> 12) >= (ppc->spr[SPR4XX_PBL2] >> 12) && (address >> 12) <= (ppc->spr[SPR4XX_PBU2] >> 12));
 
-	/* allow for an implementation-specific override */
-	if (ppc->tlb_fill != NULL && (*ppc->tlb_fill)(ppc))
-		return;
-
-	/* if we can't translate the address, just return (and fail) */
-	ppc->param0 = ppccom_translate_address_internal(ppc, transtype | transuser, &transaddr);
+			/* if PX == 1, writes are only allowed OUTSIDE of the bounds */
+			if (((ppc->msr & MSR4XX_PX) && (inrange1 || inrange2)) || (!(ppc->msr & MSR4XX_PX) && (!inrange1 && !inrange2)))
+				ppc->param0 = 2;
+		}
+	}
+	
+	/* OEA case: perform an address translation */
+	else
+		ppc->param0 = ppccom_translate_address_internal(ppc, transtype | transuser, &transaddr);
+	
+	/* log information and return upon failure */
 	if (PRINTF_TLB_FILL)
 		printf("tlb_fill: %08X (%s%s) -> ", address, (transtype == TRANSLATE_READ) ? "R" : (transtype == TRANSLATE_WRITE) ? "W" : "F", transuser ? " U" : "S");
 	if (ppc->param0 > 1)
@@ -620,14 +639,22 @@ void ppccom_execute_mfspr(powerpc_state *ppc)
 			/* read-through no-ops */
 			case SPR4XX_EVPR:
 			case SPR4XX_ESR:
-			case SPR4XX_DCCR:
-			case SPR4XX_ICCR:
 			case SPR4XX_SRR0:
 			case SPR4XX_SRR1:
 			case SPR4XX_SRR2:
 			case SPR4XX_SRR3:
 			case SPR4XX_TCR:
 			case SPR4XX_TSR:
+			case SPR4XX_IAC1:
+			case SPR4XX_IAC2:
+			case SPR4XX_DAC1:
+			case SPR4XX_DAC2:
+			case SPR4XX_DCCR:
+			case SPR4XX_ICCR:
+			case SPR4XX_PBL1:
+			case SPR4XX_PBU1:
+			case SPR4XX_PBL2:
+			case SPR4XX_PBU2:
 				ppc->param1 = ppc->spr[ppc->param0];
 				return;
 
@@ -749,6 +776,15 @@ void ppccom_execute_mtspr(powerpc_state *ppc)
 			case SPR4XX_SRR2:
 			case SPR4XX_SRR3:
 				ppc->spr[ppc->param0] = ppc->param1;
+				return;
+
+			/* registers that affect the memory map */
+			case SPR4XX_PBL1:
+			case SPR4XX_PBU1:
+			case SPR4XX_PBL2:
+			case SPR4XX_PBU2:
+				ppc->spr[ppc->param0] = ppc->param1;
+				ppccom_tlb_flush(ppc);
 				return;
 
 			/* timer control register */
@@ -963,6 +999,9 @@ void ppccom_set_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + PPC_EXISR:			ppc->dcr[DCR4XX_EXISR] = info->i;		break;
 		case CPUINFO_INT_REGISTER + PPC_EVPR:			ppc->spr[SPR4XX_EVPR] = info->i;		break;
 		case CPUINFO_INT_REGISTER + PPC_IOCR:			ppc->dcr[DCR4XX_IOCR] = info->i;		break;
+		case CPUINFO_INT_REGISTER + PPC_TBL:			set_timebase(ppc, (get_timebase(ppc) & ~U64(0x00ffffff00000000)) | info->i); break;
+		case CPUINFO_INT_REGISTER + PPC_TBH:			set_timebase(ppc, (get_timebase(ppc) & ~U64(0x00000000ffffffff)) | ((UINT64)(ppc->param1 & 0x00ffffff) << 32)); break;
+		case CPUINFO_INT_REGISTER + PPC_DEC:			set_decrementer(ppc, info->i);			break;
 
 		case CPUINFO_INT_REGISTER + PPC_R0:				ppc->r[0] = info->i;					break;
 		case CPUINFO_INT_REGISTER + PPC_R1:				ppc->r[1] = info->i;					break;
@@ -1050,6 +1089,9 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + PPC_EXISR:			info->i = ppc->dcr[DCR4XX_EXISR];		break;
 		case CPUINFO_INT_REGISTER + PPC_EVPR:			info->i = ppc->spr[SPR4XX_EVPR];		break;
 		case CPUINFO_INT_REGISTER + PPC_IOCR:			info->i = ppc->dcr[DCR4XX_IOCR];		break;
+		case CPUINFO_INT_REGISTER + PPC_TBH:			info->i = get_timebase(ppc) >> 32;		break;
+		case CPUINFO_INT_REGISTER + PPC_TBL:			info->i = (UINT32)get_timebase(ppc);	break;
+		case CPUINFO_INT_REGISTER + PPC_DEC:			info->i = get_decrementer(ppc);			break;
 
 		case CPUINFO_INT_REGISTER + PPC_R0:				info->i = ppc->r[0];					break;
 		case CPUINFO_INT_REGISTER + PPC_R1:				info->i = ppc->r[1];					break;
@@ -1123,6 +1165,9 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + PPC_EXISR:			sprintf(info->s, "EXISR: %08X", ppc->dcr[DCR4XX_EXISR]); break;
 		case CPUINFO_STR_REGISTER + PPC_EVPR:			sprintf(info->s, "EVPR: %08X", ppc->spr[SPR4XX_EVPR]); break;
 		case CPUINFO_STR_REGISTER + PPC_IOCR:			sprintf(info->s, "IOCR: %08X", ppc->dcr[DCR4XX_EXISR]); break;
+		case CPUINFO_STR_REGISTER + PPC_TBH:			sprintf(info->s, "TBH: %08X", (UINT32)(get_timebase(ppc) >> 32)); break;
+		case CPUINFO_STR_REGISTER + PPC_TBL:			sprintf(info->s, "TBL: %08X", (UINT32)get_timebase(ppc)); break;
+		case CPUINFO_STR_REGISTER + PPC_DEC:			sprintf(info->s, "DEC: %08X", get_decrementer(ppc)); break;
 
 		case CPUINFO_STR_REGISTER + PPC_R0:				sprintf(info->s, "R0: %08X", ppc->r[0]); break;
 		case CPUINFO_STR_REGISTER + PPC_R1:				sprintf(info->s, "R1: %08X", ppc->r[1]); break;
@@ -1252,7 +1297,7 @@ static void ppc4xx_dma_update_irq_states(powerpc_state *ppc)
 
 	/* update the IRQ state for each DMA channel */
 	for (dmachan = 0; dmachan < 4; dmachan++)
-		if ((ppc->dcr[DCR4XX_DMACR0 + 8 * dmachan] & PPC4XX_DMACR_CIE) && (ppc->dcr[DCR4XX_DMASR] & (1 << (27 - dmachan))))
+		if ((ppc->dcr[DCR4XX_DMACR0 + 8 * dmachan] & PPC4XX_DMACR_CIE) && (ppc->dcr[DCR4XX_DMASR] & (0x11 << (27 - dmachan))))
 			ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_DMA(dmachan), ASSERT_LINE);
 		else
 			ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_DMA(dmachan), CLEAR_LINE);
@@ -1278,7 +1323,7 @@ static int ppc4xx_dma_decrement_count(powerpc_state *ppc, int dmachan)
 
 	/* set the complete bit and handle interrupts */
 	ppc->dcr[DCR4XX_DMASR] |= 1 << (31 - dmachan);
-	ppc->dcr[DCR4XX_DMASR] |= 1 << (27 - dmachan);
+//	ppc->dcr[DCR4XX_DMASR] |= 1 << (27 - dmachan);
 	ppc4xx_dma_update_irq_states(ppc);
 	return TRUE;
 }
