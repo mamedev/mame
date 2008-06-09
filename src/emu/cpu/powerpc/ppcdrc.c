@@ -1490,7 +1490,7 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 	if (((ppc->cap & PPCCAP_OEA) && (mode & MODE_DATA_TRANSLATION)) || (iswrite && (ppc->cap & PPCCAP_4XX) && (mode & MODE_PROTECTION)))
 	{
 		UML_SHR(block, IREG(3), IREG(0), IMM(12));											// shr     i3,i0,12
-		UML_LOAD(block, IREG(3), ppc->tlb_table, IREG(3), BYTE);							// load    i3,[tlb_table],i3,byte
+		UML_LOAD(block, IREG(3), ppc->tlb_table, IREG(3), DWORD);							// load    i3,[tlb_table],i3,dword
 		UML_TEST(block, IREG(3), IMM(iswrite ? TLB_WRITE : TLB_READ));						// test    i3,iswrite ? TLB_WRITE : TLB_READ
 		UML_JMPc(block, IF_Z, tlbmiss = label++);											// jmp     tlbmiss,z
 		UML_LABEL(block, tlbreturn = label++);											// tlbreturn:
@@ -1785,7 +1785,7 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 		UML_CMP(block, MEM(&ppc->param0), IMM(1));											// cmp     [param0],1
 		UML_JMPc(block, IF_A, dsi = label++);												// jmp     dsi,A
 		UML_SHR(block, IREG(3), IREG(0), IMM(12));											// shr     i3,i0,12
-		UML_LOAD(block, IREG(3), ppc->tlb_table, IREG(3), BYTE);							// load    i3,[tlb_table],i3,byte
+		UML_LOAD(block, IREG(3), ppc->tlb_table, IREG(3), DWORD);							// load    i3,[tlb_table],i3,dword
 		UML_JMP(block, tlbreturn);															// jmp     tlbreturn
 		UML_LABEL(block, dsi);															// dsi:
 		
