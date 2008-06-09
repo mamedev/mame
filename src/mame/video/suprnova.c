@@ -46,7 +46,7 @@ static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rec
 	int ey;
 	UINT16 *dest;
 	UINT8* destflags;
-	UINT8 *pri;
+//	UINT8 *pri;
 	//const UINT16 *src;
 	//const UINT8 *maskptr;
 	//int destadvance = destbitmap->bpp / 8;
@@ -98,7 +98,7 @@ static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rec
 				x++;
 				dest++;
 				destflags++;
-				pri++;
+//				pri++;
 			}
 
 			/* advance in Y */
