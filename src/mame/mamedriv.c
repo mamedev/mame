@@ -8102,6 +8102,7 @@ Other Sun games
 	DRIVER( euro2k2 )	/* (c) 2001 Nazionale Elettronica */
 	DRIVER( euro2k2a )	/* (c) 2001 Nazionale Elettronica */
 	DRIVER( mnumber )	/* (c) 200? M.M. - B.R.L. */
+	DRIVER( ejollyx5 )	/* (c) 200? Solar Games */
 
 	/* H8/3337 italian gambling games */
 	DRIVER( ntcash )	/* 1999 unknown */
