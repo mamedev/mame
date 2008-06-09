@@ -21,6 +21,7 @@
     ampkr2b3   clone      American Poker II (bootleg, set 3).
     pkrdewin   clone      Poker De Win.
     ampkr95    clone      American Poker 95.
+    videomat   clone      Videomat (polish bootleg).
     sigmapkr   parent     Sigma Poker.
     sigma2k    parent     Sigma Poker 2000.
 
@@ -275,6 +276,10 @@
 
     --- DRIVER UPDATES ---
 
+
+    [2008-06-09]
+    - Added Videomat (polish bootleg).
+      
 
     [2008-06-02]
 
@@ -1127,6 +1132,17 @@ ROM_START( pkrdewin )
 	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) )
 ROM_END
 
+ROM_START( videomat )	/* polish bootleg */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "rom.bin", 0x0000, 0x10000, CRC(910cd941) SHA1(350ca70370c5082901343d0c0c1424729d77b006) )
+
+	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "rom0.u47", 0x0000, 0x4000, CRC(cefed6c7) SHA1(79591339eab2712b432dfe89929dbc97000a13d2) )
+
+	ROM_REGION( 0x200, REGION_PROMS, 0 )
+	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) )
+ROM_END
+
 ROM_START( sigmapkr )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "sigmapkr.u6", 0x0000, 0x10000, CRC(aa3f429a) SHA1(8c82e86de7280590ba157860cbf9783f893f8554) )
@@ -1161,5 +1177,6 @@ GAMEL( 1990, ampkr2b2, ampoker2, ampoker2, ampoker2, 0,    ROT0, "Bootleg",    "
 GAMEL( 1994, ampkr2b3, ampoker2, ampoker2, ampoker2, 0,    ROT0, "Bootleg",    "American Poker II (bootleg, set 3)", 0,     layout_ampoker2 )
 GAMEL( 1995, ampkr95,  ampoker2, ampoker2, ampkr95,  0,    ROT0, "Bootleg",    "American Poker 95",                  0,     layout_ampoker2 )
 GAMEL( 1990, pkrdewin, ampoker2, ampoker2, ampoker2, 0,    ROT0, "Bootleg",    "Poker De Win",                       0,     layout_ampoker2 )
+GAMEL( 1990, videomat, ampoker2, ampoker2, ampoker2, 0,    ROT0, "Bootleg",    "Videomat (polish bootleg)",          0,     layout_ampoker2 )
 GAMEL( 1995, sigmapkr, 0,        ampoker2, sigmapkr, 0,    ROT0, "Sigma Inc.", "Sigma Poker",                        0,     layout_sigmapkr )
 GAMEL( 1998, sigma2k,  0,        sigma2k,  sigma2k,  0,    ROT0, "Sigma Inc.", "Sigma Poker 2000",                   0,     layout_sigmapkr )

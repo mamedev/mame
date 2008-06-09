@@ -7933,6 +7933,7 @@ Other Sun games
 	DRIVER( ampkr2b3 )	/* 1994 bootleg */
 	DRIVER( pkrdewin )	/* 1990 bootleg */
 	DRIVER( ampkr95 )	/* 1995 bootleg */
+	DRIVER( videomat )	/* 1990 bootleg */
 	DRIVER( sigmapkr )	/* (c) 1995 Sigma */
 	DRIVER( sigma2k )	/* (c) 2000 Sigma */
 	DRIVER( lucky8 )	/* (c) 1989 Falcon */

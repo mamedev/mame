@@ -21,6 +21,7 @@
     ampkr2b3   clone      American Poker II (bootleg, set 3).
     pkrdewin   clone      Poker De Win.
     ampkr95    clone      American Poker 95.
+    videomat   clone      Videomat (polish bootleg).
     sigmapkr   parent     Sigma Poker.
     sigma2k    parent     Sigma Poker 2000.
 
