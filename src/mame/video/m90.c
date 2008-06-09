@@ -186,10 +186,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 static void bomblord_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	int offs = 0;
+	int offs = 0, last_sprite = 0;
 	int x,y,sprite,colour,fx,fy;
 
+
 	while ((offs < spriteram_size/2) & (spriteram16[offs+0] != 0x8000))
+	{
+		last_sprite = offs;
+		offs += 4;
+	}
+
+	for (offs = last_sprite; offs >= 0; offs -= 4)
 	{
 		sprite = spriteram16[offs+1];
 		colour = (spriteram16[offs+2] >> 9) & 0x0f;
@@ -203,22 +210,28 @@ static void bomblord_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		fx = (spriteram16[offs+3] >> 8) & 0x02;
 		fy = (spriteram16[offs+2] >> 8) & 0x80;
 
-		drawgfx(bitmap,machine->gfx[1],
+		pdrawgfx(bitmap,machine->gfx[1],
 				sprite,
 				colour,
 				fx,fy,
 				x,y,
-				cliprect,TRANSPARENCY_PEN,0);
-		offs += 4;
+				cliprect,TRANSPARENCY_PEN,0,
+				(colour & 0x08) ? 0x00 : 0x02);
 	}
 }
 
 static void dynablsb_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	int offs = 0;
+	int offs = 0, last_sprite = 0;
 	int x,y,sprite,colour,fx,fy;
 
 	while ((offs < spriteram_size/2) & (spriteram16[offs+0] != 0xffff))
+	{
+		last_sprite = offs;
+		offs += 4;
+	}
+
+	for (offs = last_sprite; offs >= 0; offs -= 4)
 	{
 		sprite = spriteram16[offs+1];
 		colour = (spriteram16[offs+2] >> 9) & 0x0f;
@@ -232,13 +245,13 @@ static void dynablsb_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		fx = (spriteram16[offs+3] >> 8) & 0x02;
 		fy = (spriteram16[offs+2] >> 8) & 0x80;
 
-		drawgfx(bitmap,machine->gfx[1],
+		pdrawgfx(bitmap,machine->gfx[1],
 				sprite,
 				colour,
 				fx,fy,
 				x,y,
-				cliprect,TRANSPARENCY_PEN,0);
-		offs += 4;
+				cliprect,TRANSPARENCY_PEN,0,
+				(colour & 0x08) ? 0x00 : 0x02);
 	}
 }
 
