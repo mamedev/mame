@@ -8018,6 +8018,7 @@ Other Sun games
 	DRIVER( comg183 )	/* (c) 1983 Cal Omega Inc. */
 	DRIVER( comg185 )	/* (c) 1983 Cal Omega Inc. */
 	DRIVER( comg186 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg187 )	/* (c) 1983 Cal Omega Inc. */
 	DRIVER( comg204 )	/* (c) 1984 Cal Omega Inc. */
 	DRIVER( comg208 )	/* (c) 1984 Cal Omega Inc. */
 	DRIVER( comg227 )	/* (c) 1984 Cal Omega Inc. */

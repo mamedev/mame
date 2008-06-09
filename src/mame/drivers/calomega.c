@@ -92,7 +92,7 @@
    18.4 | Double Draw-Lebanon      |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
    18.5 | Pixels                   |  905   | AUG/83  | PXCG     | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
    18.6 | Pixels                   |  905   | AUG/83  | PXCG     | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
-   18.7 | Amusement Poker (skill)  |  905   | AUG/83  | JKRTWO   | 6300100 | MULTCLR  | 6600070 | Amusement     | No   |      | No
+   18.7 | Amusement Poker (skill)  |  905   | AUG/83  | JKRTWO   | 6300100 | MULTCLR  | 6600070 | Amusement     | Yes  | BD   | Yes
    18.8 | Poker-Lebanon            |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
    18.9 | Pixels (french)          |   ?    |         | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | No   |      | No
    19.0 | Hi-Score Poker           |   ?    |         | JKRTWO   | 6300100 | WLDCLR   | 6600070 | Amusement     | No   |      | No
@@ -369,6 +369,13 @@
 
     UPDATES
     -------
+
+
+    [2008-06-09]
+
+    - Cleaned up the driver following the MAME Coding Conventions.
+    - Added support to Game 18.7 (Amusement Poker).
+    - Updated technical notes.
 
 
     [2008-02-26]
@@ -1575,7 +1582,7 @@ ROM_END
 
 ROM_START( comg183 )	/* Cal Omega v18.3 (Pixels) */
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "18.32", 0xC000, 0x1000, CRC(c793ffc1) SHA1(f2ef82f92a9e18128d28973bcf050d0c3e1819f3) )
+	ROM_LOAD( "18.32", 0xc000, 0x1000, CRC(c793ffc1) SHA1(f2ef82f92a9e18128d28973bcf050d0c3e1819f3) )
 	ROM_LOAD( "18.33", 0xd000, 0x1000, CRC(415a6599) SHA1(648986310a3864652897e5d18b8be06819cce7a8) )
 	ROM_LOAD( "18.34", 0xe000, 0x1000, CRC(fc5d3b89) SHA1(3601401d00d7a0621eac4254da238e9c8929cac4) )
 	ROM_LOAD( "18.35", 0xf000, 0x1000, CRC(6552207f) SHA1(bd8a7546b4dad07d151dc7039028916386aee5e9) )
@@ -1597,7 +1604,7 @@ ROM_END
 
 ROM_START( comg185 )	/* Cal Omega v18.5 (Pixels) */
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "18.52", 0xC000, 0x1000, CRC(19225f7d) SHA1(73d713ee86886f935d9b2c2ca670d8e00d466b7f) )
+	ROM_LOAD( "18.52", 0xc000, 0x1000, CRC(19225f7d) SHA1(73d713ee86886f935d9b2c2ca670d8e00d466b7f) )
 	ROM_LOAD( "18.53", 0xd000, 0x1000, CRC(797e2b70) SHA1(83f974c6c1886eab5c90782766b72900c73045e1) )
 	ROM_LOAD( "18.54", 0xe000, 0x1000, CRC(6becc802) SHA1(e72783db52bffd3fa2f7d35cd8a004415e37b004) )
 	ROM_LOAD( "18.55", 0xf000, 0x1000, CRC(313db76a) SHA1(d81228bf0badc8a3cf08c77de27b3d973953175c) )
@@ -1619,7 +1626,7 @@ ROM_END
 
 ROM_START( comg186 )	/* Cal Omega v18.6 (Pixels) */
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "18.62", 0xC000, 0x1000, CRC(025f4268) SHA1(750a5417fe2b077893d8252dd5eafc42fafd965e) )
+	ROM_LOAD( "18.62", 0xc000, 0x1000, CRC(025f4268) SHA1(750a5417fe2b077893d8252dd5eafc42fafd965e) )
 	ROM_LOAD( "18.63", 0xd000, 0x1000, CRC(948a6ef1) SHA1(6aeb244209f3376042a32d9accb38e3f09cb192a) )
 	ROM_LOAD( "18.64", 0xe000, 0x1000, CRC(9fb6e82b) SHA1(db38564e8060f1c67183f3f412a24439b2253e13) )
 	ROM_LOAD( "18.65", 0xf000, 0x1000, CRC(a68be5ef) SHA1(1ab2bc1b070863260fa281970f886d77e2fa7ccd) )
@@ -1634,6 +1641,28 @@ ROM_START( comg186 )	/* Cal Omega v18.6 (Pixels) */
 
 	ROM_REGION( 0x400, REGION_PROMS, 0 )
 	ROM_LOAD( "pixclr",		0x0000, 0x0100, CRC(67d23e76) SHA1(826cf77ca5a4d492d66e45ee96a7780a94fbe634) )
+	ROM_RELOAD(				0x0100, 0x0100 )
+	ROM_RELOAD(				0x0200, 0x0100 )
+	ROM_RELOAD(				0x0300, 0x0100 )
+ROM_END
+
+ROM_START( comg187 )	/* Cal Omega v18.7 (Amusement Poker) */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "18.72", 0xc000, 0x1000, BAD_DUMP CRC(1a4bd46a) SHA1(76101271ff9b98c3310e1666dfba34a01a0f0bcd) )	/* 1st half seems to be the 2nd one, and 2nd half is filled of 0xff */
+	ROM_LOAD( "18.73", 0xd000, 0x1000, CRC(ca374ecb) SHA1(113495afa88da97cb7239f645fabba7125ce2b4b) )
+	ROM_LOAD( "18.74", 0xe000, 0x1000, CRC(5bb57ca8) SHA1(22dc6f0e2fee5408fa70e4bc60f1833534ee038f) )
+	ROM_LOAD( "18.75", 0xf000, 0x1000, CRC(70a8ccb3) SHA1(b5b7d6a8262ab6e47a1400681c414fd3edd0d7a8) )
+
+	ROM_REGION( 0x0800, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "jkrtwo.cgo",	 0x0000, 0x0800, CRC(987b3e4d) SHA1(ae4b5dc0e4d1195bbf18b375c1a4dbf880f5f38c) )
+
+	ROM_REGION( 0x1800, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "jkrtwo.cgc",	0x0000, 0x0800, CRC(5b96f5e0) SHA1(4733349798eb059998a4814331f57e7f09e02490) )
+	ROM_LOAD( "jkrtwo.cgb",	0x0800, 0x0800, CRC(d77dda31) SHA1(e11b476cf0b609a8a40981b81b4d83b3c86678dc) )
+	ROM_LOAD( "jkrtwo.cga",	0x1000, 0x0800, CRC(def60756) SHA1(fe71424fc638761d9ff65391261a030a2889ad5e) )
+
+	ROM_REGION( 0x400, REGION_PROMS, 0 )
+	ROM_LOAD( "mltclr",		0x0000, 0x0100, CRC(fefb0fa8) SHA1(66d86aa19d9d37ffd2840d6653fcec667bc716d4) )
 	ROM_RELOAD(				0x0100, 0x0100 )
 	ROM_RELOAD(				0x0200, 0x0100 )
 	ROM_RELOAD(				0x0300, 0x0100 )
@@ -2008,7 +2037,7 @@ static DRIVER_INIT( calomega )
 	int x;
 	UINT8 *BPR = memory_region( REGION_PROMS );
 
-	for (x=0x0000;x<0x0400;x++)
+	for (x = 0x0000; x < 0x0400; x++)
 	{
 		if (BPR[x] == 0x07)
 			BPR[x] = 0x04;	/* blue background */
@@ -2025,7 +2054,7 @@ static DRIVER_INIT( elgrande )
 	UINT8 *BPR = memory_region( REGION_PROMS );
 
 	/* Palette transformed by PLDs? */
-	for (x=0x0000;x<0x0400;x++)
+	for (x = 0x0000; x < 0x0400; x++)
 	{
 		if (BPR[x] == 0x07)
 			BPR[x] = 0x00; /* black background */
@@ -2042,7 +2071,7 @@ static DRIVER_INIT( jjpoker )
 	int x;
 	UINT8 *BPR = memory_region( REGION_PROMS );
 
-	for (x=0x0000;x<0x0400;x++)
+	for (x = 0x0000; x < 0x0400; x++)
 	{
 		if (BPR[x] == 0x02)
 			BPR[x] = 0x00;	/* blue background */
@@ -2059,7 +2088,7 @@ static DRIVER_INIT( standard )
 	int x;
 	UINT8 *BPR = memory_region( REGION_PROMS );
 
-	for (x=0x0000;x<0x0400;x++)
+	for (x = 0x0000; x < 0x0400; x++)
 	{
 		if (BPR[x] == 0x07)
 			BPR[x] = 0x04;	/* blue background */
@@ -2096,6 +2125,7 @@ GAME( 1982, comg181,  0,        sys903,   standard, standard, ROT0, "Cal Omega I
 GAME( 1983, comg183,  0,        sys905,   standard, calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.3 (Pixels)",                GAME_NOT_WORKING )
 GAME( 1983, comg185,  0,        sys905,   standard, calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.5 (Pixels)",                GAME_NOT_WORKING )
 GAME( 1983, comg186,  0,        sys905,   standard, calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.6 (Pixels)",                GAME_NOT_WORKING )
+GAME( 1983, comg187,  0,        sys905,   standard, calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.7 (Amusement Poker)",       GAME_NOT_WORKING )
 GAME( 1984, comg204,  0,        sys905,   standard, calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.4 (Super Blackjack)",       GAME_NOT_WORKING )
 GAME( 1984, comg208,  0,        sys905,   standard, calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.8 (Winner's Choice)",       GAME_NOT_WORKING )
 GAME( 1984, comg227,  0,        sys905,   standard, calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 22.7 (Amusement Poker, d/d)",  GAME_NOT_WORKING )
