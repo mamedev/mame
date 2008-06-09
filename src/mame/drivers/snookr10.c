@@ -296,7 +296,12 @@
     *** Driver Updates ***
 
 
-    [2008/06/01]
+    [2008/06/09]
+    - Fixed the tilemap size.
+    - Fixed the screen size.
+    - Updated technical notes.
+
+    [2008/05/29]
     - Switched the color system to RESNET calculations.
     - Hooked the infamous bit7 of Input Port 0x3004 in parallel to DIP switch 1.
       This allow to use the PAYOUT button to trigger the Super Game instead of STOP 5.
@@ -728,7 +733,7 @@ static MACHINE_DRIVER_START( snookr10 )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE((128+1)*4, (30+1)*8)
+	MDRV_SCREEN_SIZE(96*4, 30*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 30*8-1)
 
 	MDRV_GFXDECODE(snookr10)
