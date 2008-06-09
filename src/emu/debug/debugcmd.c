@@ -2055,6 +2055,7 @@ static void execute_map(int ref, int params, const char *param[])
 	const debug_cpu_info *info;
 	int spacenum = ref;
 	offs_t taddress;
+	int intention;
 
 	/* validate parameters */
 	if (!debug_command_parameter_number(param[0], &address))
@@ -2062,23 +2063,26 @@ static void execute_map(int ref, int params, const char *param[])
 	info = debug_get_cpu_info(cpunum);
 
 	/* do the translation first */
-	taddress = ADDR2BYTE_MASKED(address, info, spacenum);
-	if (info->translate != NULL)
+	for (intention = TRANSLATE_READ_DEBUG; intention <= TRANSLATE_FETCH_DEBUG; intention++)
 	{
-		if ((*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &taddress))
-			debug_console_printf("%08X logical -> %08X physical\n", (UINT32)address, BYTE2ADDR(taddress, info, spacenum));
+		static const char *intnames[] = { "Read", "Write", "Fetch" };
+		taddress = ADDR2BYTE_MASKED(address, info, spacenum);
+		if (info->translate != NULL)
+		{
+			if ((*info->translate)(spacenum, intention, &taddress))
+			{
+				const char *mapname = memory_get_handler_string(intention == TRANSLATE_WRITE_DEBUG, cpunum, spacenum, taddress);
+				debug_console_printf("%7s: %08X logical == %08X physical -> %s\n", intnames[intention & 3], (UINT32)address, BYTE2ADDR(taddress, info, spacenum), mapname);
+			}
+			else
+				debug_console_printf("%7s: %08X logical is unmapped\n", intnames[intention & 3], (UINT32)address);
+		}
 		else
 		{
-			debug_console_printf("%08X logical -> unmapped\n", (UINT32)address);
-			return;
+			const char *mapname = memory_get_handler_string(intention == TRANSLATE_WRITE_DEBUG, cpunum, spacenum, taddress);
+			debug_console_printf("%7s: %08X -> %s\n", intnames[intention & 3], BYTE2ADDR(taddress, info, spacenum), mapname);
 		}
 	}
-	else
-		debug_console_printf("%08X physical\n", BYTE2ADDR(taddress, info, spacenum));
-
-	/* now do the mapping */
-	debug_console_printf("  -> read: %s\n", memory_get_handler_string(0, cpunum, spacenum, taddress));
-	debug_console_printf("  -> write: %s\n", memory_get_handler_string(1, cpunum, spacenum, taddress));
 }
 
 
