@@ -106,6 +106,61 @@ INLINE int tlb_entry_allocate(powerpc_state *ppc, int entrynum, offs_t address, 
 
 
 /*-------------------------------------------------
+    get_cr - return the current CR value
+-------------------------------------------------*/
+
+INLINE UINT32 get_cr(powerpc_state *ppc)
+{
+	return 	((ppc->cr[0] & 0x0f) << 28) |
+			((ppc->cr[1] & 0x0f) << 24) |
+			((ppc->cr[2] & 0x0f) << 20) |
+			((ppc->cr[3] & 0x0f) << 16) |
+			((ppc->cr[4] & 0x0f) << 12) |
+			((ppc->cr[5] & 0x0f) << 8) |
+			((ppc->cr[6] & 0x0f) << 4) |
+			((ppc->cr[7] & 0x0f) << 0);
+}
+
+
+/*-------------------------------------------------
+    set_cr - set the current CR value
+-------------------------------------------------*/
+
+INLINE void set_cr(powerpc_state *ppc, UINT32 value)
+{
+	ppc->cr[0] = value >> 28;
+	ppc->cr[1] = value >> 24;
+	ppc->cr[2] = value >> 20;
+	ppc->cr[3] = value >> 16;
+	ppc->cr[4] = value >> 12;
+	ppc->cr[5] = value >> 8;
+	ppc->cr[6] = value >> 4;
+	ppc->cr[7] = value >> 0;
+}
+
+
+/*-------------------------------------------------
+    get_xer - return the current XER value
+-------------------------------------------------*/
+
+INLINE UINT32 get_xer(powerpc_state *ppc)
+{
+	return ppc->spr[SPR_XER] | (ppc->xerso << 31);
+}
+
+
+/*-------------------------------------------------
+    set_xer - set the current XER value
+-------------------------------------------------*/
+
+INLINE void set_xer(powerpc_state *ppc, UINT32 value)
+{
+	ppc->spr[SPR_XER] = value & ~XER_SO;
+	ppc->xerso = value >> 31;
+}
+
+
+/*-------------------------------------------------
     get_timebase - return the current timebase
     value
 -------------------------------------------------*/
@@ -984,10 +1039,10 @@ void ppccom_set_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + PPC_PC:				ppc->pc = info->i;						break;
 		case CPUINFO_INT_REGISTER + PPC_MSR:			ppc->msr = info->i;						break;
-		case CPUINFO_INT_REGISTER + PPC_CR:				ppc->cr = info->i;						break;
+		case CPUINFO_INT_REGISTER + PPC_CR:				set_cr(ppc, info->i);					break;
 		case CPUINFO_INT_REGISTER + PPC_LR:				ppc->spr[SPR_LR] = info->i;				break;
 		case CPUINFO_INT_REGISTER + PPC_CTR:			ppc->spr[SPR_CTR] = info->i;			break;
-		case CPUINFO_INT_REGISTER + PPC_XER:			ppc->spr[SPR_XER] = info->i; 			break;
+		case CPUINFO_INT_REGISTER + PPC_XER:			set_xer(ppc, info->i);		 			break;
 		case CPUINFO_INT_REGISTER + PPC_SRR0:			ppc->spr[SPROEA_SRR0] = info->i;		break;
 		case CPUINFO_INT_REGISTER + PPC_SRR1:			ppc->spr[SPROEA_SRR1] = info->i;		break;
 		case CPUINFO_INT_REGISTER + PPC_SPRG0:			ppc->spr[SPROEA_SPRG0] = info->i;		break;
@@ -1074,10 +1129,10 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + PPC_PC:				info->i = ppc->pc;						break;
 		case CPUINFO_INT_REGISTER + PPC_MSR:			info->i = ppc->msr;						break;
-		case CPUINFO_INT_REGISTER + PPC_CR:				info->i = ppc->cr;						break;
+		case CPUINFO_INT_REGISTER + PPC_CR:				info->i = get_cr(ppc);					break;
 		case CPUINFO_INT_REGISTER + PPC_LR:				info->i = ppc->spr[SPR_LR];				break;
 		case CPUINFO_INT_REGISTER + PPC_CTR:			info->i = ppc->spr[SPR_CTR];			break;
-		case CPUINFO_INT_REGISTER + PPC_XER:			info->i = ppc->spr[SPR_XER]; 			break;
+		case CPUINFO_INT_REGISTER + PPC_XER:			info->i = get_xer(ppc);					break;
 		case CPUINFO_INT_REGISTER + PPC_SRR0:			info->i = ppc->spr[SPROEA_SRR0];		break;
 		case CPUINFO_INT_REGISTER + PPC_SRR1:			info->i = ppc->spr[SPROEA_SRR1];		break;
 		case CPUINFO_INT_REGISTER + PPC_SPRG0:			info->i = ppc->spr[SPROEA_SPRG0];		break;
@@ -1150,10 +1205,10 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 
 		case CPUINFO_STR_REGISTER + PPC_PC:				sprintf(info->s, "PC: %08X", ppc->pc);				break;
 		case CPUINFO_STR_REGISTER + PPC_MSR:			sprintf(info->s, "MSR:%08X", ppc->msr);				break;
-		case CPUINFO_STR_REGISTER + PPC_CR:				sprintf(info->s, "CR: %08X", ppc->cr);				break;
+		case CPUINFO_STR_REGISTER + PPC_CR:				sprintf(info->s, "CR: %08X", get_cr(ppc));			break;
 		case CPUINFO_STR_REGISTER + PPC_LR:				sprintf(info->s, "LR: %08X", ppc->spr[SPR_LR]);		break;
 		case CPUINFO_STR_REGISTER + PPC_CTR:			sprintf(info->s, "CTR:%08X", ppc->spr[SPR_CTR]);	break;
-		case CPUINFO_STR_REGISTER + PPC_XER:			sprintf(info->s, "XER:%08X", ppc->spr[SPR_XER]); 	break;
+		case CPUINFO_STR_REGISTER + PPC_XER:			sprintf(info->s, "XER:%08X", get_xer(ppc));		 	break;
 		case CPUINFO_STR_REGISTER + PPC_SRR0:			sprintf(info->s, "SRR0: %08X", ppc->spr[SPROEA_SRR0]);	break;
 		case CPUINFO_STR_REGISTER + PPC_SRR1:			sprintf(info->s, "SRR1: %08X", ppc->spr[SPROEA_SRR1]);	break;
 		case CPUINFO_STR_REGISTER + PPC_SPRG0:			sprintf(info->s, "SPRG0: %08X", ppc->spr[SPROEA_SPRG0]); break;
