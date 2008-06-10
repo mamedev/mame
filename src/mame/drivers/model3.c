@@ -433,11 +433,6 @@ void model3_set_irq_line(running_machine *machine, UINT8 bit, int state)
 }
 
 
-#define BYTE_REVERSE32(x)		(((x >> 24) & 0xff) | \
-								((x >> 8) & 0xff00) | \
-								((x << 8) & 0xff0000) | \
-								((x << 24) & 0xff000000))
-
 static UINT32 pci_device_get_reg(int device, int reg)
 {
 	switch(device)
@@ -581,7 +576,7 @@ static WRITE64_HANDLER( mpc105_addr_w )
 {
 	if (ACCESSING_BITS_32_63)
 	{
-		UINT32 d = BYTE_REVERSE32((UINT32)(data >> 32));
+		UINT32 d = FLIPENDIAN_INT32((UINT32)(data >> 32));
 		mpc105_addr = data >> 32;
 
 		pci_bus = (d >> 16) & 0xff;
@@ -594,22 +589,22 @@ static WRITE64_HANDLER( mpc105_addr_w )
 static READ64_HANDLER( mpc105_data_r )
 {
 	if(pci_device == 0) {
-		return ((UINT64)(BYTE_REVERSE32(mpc105_regs[(pci_reg/2)+1])) << 32) |
-			   ((UINT64)(BYTE_REVERSE32(mpc105_regs[(pci_reg/2)+0])));
+		return ((UINT64)(FLIPENDIAN_INT32(mpc105_regs[(pci_reg/2)+1])) << 32) |
+			   ((UINT64)(FLIPENDIAN_INT32(mpc105_regs[(pci_reg/2)+0])));
 	}
-	return BYTE_REVERSE32(pci_device_get_reg(pci_device, pci_reg));
+	return FLIPENDIAN_INT32(pci_device_get_reg(pci_device, pci_reg));
 }
 
 static WRITE64_HANDLER( mpc105_data_w )
 {
 	if(pci_device == 0) {
-		mpc105_regs[(pci_reg/2)+1] = BYTE_REVERSE32((UINT32)(data >> 32));
-		mpc105_regs[(pci_reg/2)+0] = BYTE_REVERSE32((UINT32)(data));
+		mpc105_regs[(pci_reg/2)+1] = FLIPENDIAN_INT32((UINT32)(data >> 32));
+		mpc105_regs[(pci_reg/2)+0] = FLIPENDIAN_INT32((UINT32)(data));
 		return;
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		pci_device_set_reg(pci_device, pci_reg, BYTE_REVERSE32((UINT32)data));
+		pci_device_set_reg(pci_device, pci_reg, FLIPENDIAN_INT32((UINT32)data));
 	}
 }
 
@@ -659,7 +654,7 @@ static WRITE64_HANDLER( mpc106_addr_w )
 {
 	if (ACCESSING_BITS_32_63)
 	{
-		UINT32 d = BYTE_REVERSE32((UINT32)(data >> 32));
+		UINT32 d = FLIPENDIAN_INT32((UINT32)(data >> 32));
 
 		if (((d >> 8) & 0xffffff) == 0x800000)
 		{
@@ -680,29 +675,29 @@ static WRITE64_HANDLER( mpc106_addr_w )
 static READ64_HANDLER( mpc106_data_r )
 {
 	if(pci_device == 0) {
-		return ((UINT64)(BYTE_REVERSE32(mpc106_regs[(pci_reg/2)+1])) << 32) |
-			   ((UINT64)(BYTE_REVERSE32(mpc106_regs[(pci_reg/2)+0])));
+		return ((UINT64)(FLIPENDIAN_INT32(mpc106_regs[(pci_reg/2)+1])) << 32) |
+			   ((UINT64)(FLIPENDIAN_INT32(mpc106_regs[(pci_reg/2)+0])));
 	}
 	if (ACCESSING_BITS_32_63)
 	{
-		return (UINT64)(BYTE_REVERSE32(pci_device_get_reg(pci_device, pci_reg))) << 32;
+		return (UINT64)(FLIPENDIAN_INT32(pci_device_get_reg(pci_device, pci_reg))) << 32;
 	}
 	else
 	{
-		return (UINT64)(BYTE_REVERSE32(pci_device_get_reg(pci_device, pci_reg)));
+		return (UINT64)(FLIPENDIAN_INT32(pci_device_get_reg(pci_device, pci_reg)));
 	}
 }
 
 static WRITE64_HANDLER( mpc106_data_w )
 {
 	if(pci_device == 0) {
-		mpc106_regs[(pci_reg/2)+1] = BYTE_REVERSE32((UINT32)(data >> 32));
-		mpc106_regs[(pci_reg/2)+0] = BYTE_REVERSE32((UINT32)(data));
+		mpc106_regs[(pci_reg/2)+1] = FLIPENDIAN_INT32((UINT32)(data >> 32));
+		mpc106_regs[(pci_reg/2)+0] = FLIPENDIAN_INT32((UINT32)(data));
 		return;
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		pci_device_set_reg(pci_device, pci_reg, BYTE_REVERSE32((UINT32)data));
+		pci_device_set_reg(pci_device, pci_reg, FLIPENDIAN_INT32((UINT32)data));
 	}
 }
 
@@ -745,28 +740,28 @@ static READ64_HANDLER(scsi_r)
 	int reg = offset*8;
 	UINT64 r = 0;
 	if (ACCESSING_BITS_56_63) {
-		r |= (UINT64)lsi53c810_reg_r(reg+0) << 56;
+		r |= (UINT64)lsi53c810_reg_r(machine, reg+0) << 56;
 	}
 	if (ACCESSING_BITS_48_55) {
-		r |= (UINT64)lsi53c810_reg_r(reg+1) << 48;
+		r |= (UINT64)lsi53c810_reg_r(machine, reg+1) << 48;
 	}
 	if (ACCESSING_BITS_40_47) {
-		r |= (UINT64)lsi53c810_reg_r(reg+2) << 40;
+		r |= (UINT64)lsi53c810_reg_r(machine, reg+2) << 40;
 	}
 	if (ACCESSING_BITS_32_39) {
-		r |= (UINT64)lsi53c810_reg_r(reg+3) << 32;
+		r |= (UINT64)lsi53c810_reg_r(machine, reg+3) << 32;
 	}
 	if (ACCESSING_BITS_24_31) {
-		r |= (UINT64)lsi53c810_reg_r(reg+4) << 24;
+		r |= (UINT64)lsi53c810_reg_r(machine, reg+4) << 24;
 	}
 	if (ACCESSING_BITS_16_23) {
-		r |= (UINT64)lsi53c810_reg_r(reg+5) << 16;
+		r |= (UINT64)lsi53c810_reg_r(machine, reg+5) << 16;
 	}
 	if (ACCESSING_BITS_8_15) {
-		r |= (UINT64)lsi53c810_reg_r(reg+6) << 8;
+		r |= (UINT64)lsi53c810_reg_r(machine, reg+6) << 8;
 	}
 	if (ACCESSING_BITS_0_7) {
-		r |= (UINT64)lsi53c810_reg_r(reg+7) << 0;
+		r |= (UINT64)lsi53c810_reg_r(machine, reg+7) << 0;
 	}
 
 	return r;
@@ -805,13 +800,12 @@ static UINT32 scsi_fetch(UINT32 dsp)
 {
 	UINT32 result;
 	result = program_read_dword_64be(dsp);
-	return BYTE_REVERSE32(result);
+	return FLIPENDIAN_INT32(result);
 }
 
 static void scsi_irq_callback(running_machine *machine, int state)
 {
 	scsi_irq_state = state;
-//  model3_irq_state |= irq_enable & ~0x60; /* FIXME: enable only SCSI interrupt */
 	update_irq_state(machine);
 }
 
@@ -847,18 +841,18 @@ static WRITE64_HANDLER( real3d_dma_w )
 	{
 		case 0:
 			if(ACCESSING_BITS_32_63) {		/* DMA source address */
-				dma_source = BYTE_REVERSE32((UINT32)(data >> 32));
+				dma_source = FLIPENDIAN_INT32((UINT32)(data >> 32));
 				return;
 			}
 			if(ACCESSING_BITS_0_31) {		/* DMA destination address */
-				dma_dest = BYTE_REVERSE32((UINT32)(data));
+				dma_dest = FLIPENDIAN_INT32((UINT32)(data));
 				return;
 			}
 			break;
 		case 1:
 			if(ACCESSING_BITS_32_63)		/* DMA length */
 			{
-				int length = BYTE_REVERSE32((UINT32)(data >> 32)) * 4;
+				int length = FLIPENDIAN_INT32((UINT32)(data >> 32)) * 4;
 				if (dma_endian & 0x80)
 				{
 					real3d_dma_callback(dma_source, dma_dest, length, 0);
@@ -887,9 +881,9 @@ static WRITE64_HANDLER( real3d_dma_w )
 			break;
 		case 2:
 			if(ACCESSING_BITS_32_63) {		/* DMA command */
-				UINT32 cmd = BYTE_REVERSE32((UINT32)(data >> 32));
+				UINT32 cmd = FLIPENDIAN_INT32((UINT32)(data >> 32));
 				if(cmd & 0x20000000) {
-					dma_data = BYTE_REVERSE32(real3d_device_id);	/* (PCI Vendor & Device ID) */
+					dma_data = FLIPENDIAN_INT32(real3d_device_id);	/* (PCI Vendor & Device ID) */
 				}
 				else if(cmd & 0x80000000) {
 					dma_status ^= 0xffffffff;
@@ -1012,15 +1006,38 @@ static void model3_exit(running_machine *machine)
 	lsi53c810_exit(&scsi_intf);
 }
 
+static void configure_fast_ram(running_machine *machine)
+{
+	/* set conservative DRC options */
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS - PPCDRC_ACCURATE_SINGLES);
+
+	/* configure fast RAM regions for DRC */
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x007fffff);
+	cpunum_set_info_ptr(0, CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+}
+
 static MACHINE_START(model3_10)
 {
 	lsi53c810_init(&scsi_intf);
 	add_exit_callback(machine, model3_exit);
+	configure_fast_ram(machine);
 }
 static MACHINE_START(model3_15)
 {
 	lsi53c810_init(&scsi_intf);
 	add_exit_callback(machine, model3_exit);
+	configure_fast_ram(machine);
+}
+static MACHINE_START(model3_20)
+{
+	configure_fast_ram(machine);
+}
+static MACHINE_START(model3_21)
+{
+	configure_fast_ram(machine);
 }
 
 static void model3_init(running_machine *machine, int step)
@@ -1332,6 +1349,14 @@ static UINT64 real3d_status = 0;
 static READ64_HANDLER(real3d_status_r)
 {
 	real3d_status ^= U64(0xffffffffffffffff);
+	if (offset == 0)
+	{
+		/* pretty sure this is VBLANK */
+		real3d_status &= ~U64(0x0000000200000000);
+		if (video_screen_get_vblank(machine->primary_screen))
+			real3d_status |= U64(0x0000000200000000);
+		return real3d_status;
+	}
 	return real3d_status;
 }
 
@@ -4118,9 +4143,8 @@ static MACHINE_DRIVER_START( model3_10 )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(496, 384)
 	MDRV_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
+	MDRV_SCREEN_SIZE(512, 400)
 
 	MDRV_PALETTE_LENGTH(32768)
 	MDRV_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
@@ -4156,9 +4180,8 @@ static MACHINE_DRIVER_START( model3_15 )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(496, 384)
 	MDRV_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
+	MDRV_SCREEN_SIZE(496, 400)
 
 	MDRV_PALETTE_LENGTH(32768)
 	MDRV_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
@@ -4186,6 +4209,7 @@ static MACHINE_DRIVER_START( model3_20 )
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model3_snd, 0)
 
+	MDRV_MACHINE_START(model3_20)
 	MDRV_MACHINE_RESET(model3_20)
 	MDRV_NVRAM_HANDLER(model3)
 
@@ -4193,9 +4217,8 @@ static MACHINE_DRIVER_START( model3_20 )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(496, 384)
 	MDRV_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
+	MDRV_SCREEN_SIZE(496, 400)
 
 	MDRV_PALETTE_LENGTH(32768)
 	MDRV_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
@@ -4223,6 +4246,7 @@ static MACHINE_DRIVER_START( model3_21 )
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model3_snd, 0)
 
+	MDRV_MACHINE_START(model3_21)
 	MDRV_MACHINE_RESET(model3_21)
 	MDRV_NVRAM_HANDLER(model3)
 
@@ -4231,8 +4255,8 @@ static MACHINE_DRIVER_START( model3_21 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(496, 384)
 	MDRV_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
+	MDRV_SCREEN_SIZE(496, 400)
 
 	MDRV_PALETTE_LENGTH(32768)
 	MDRV_PALETTE_INIT(RRRRR_GGGGG_BBBBB)

@@ -444,10 +444,10 @@ static void dma_exec(void)
 	}
 }
 
-UINT8 lsi53c810_reg_r(int reg)
+READ8_HANDLER( lsi53c810_reg_r )
 {
-	logerror("53c810: read reg %d:0x%x (PC=%x)\n", reg, reg, activecpu_get_pc());
-	switch(reg)
+	logerror("53c810: read reg %d:0x%x (PC=%x)\n", offset, offset, activecpu_get_pc());
+	switch(offset)
 	{
 		case 0x00:		/* SCNTL0 */
 			return lsi810.scntl0;
@@ -497,7 +497,7 @@ UINT8 lsi53c810_reg_r(int reg)
 		case 0x35:
 		case 0x36:
 		case 0x37:
-			return lsi810.scratch_a[reg % 4];
+			return lsi810.scratch_a[offset % 4];
 		case 0x39:		/* DIEN */
 			return lsi810.dien;
 		case 0x3b:		/* DCNTL */
@@ -516,81 +516,81 @@ UINT8 lsi53c810_reg_r(int reg)
 		case 0x5d:
 		case 0x5e:
 		case 0x5f:
-			return lsi810.scratch_b[reg % 4];
+			return lsi810.scratch_b[offset % 4];
 
 		default:
-			fatalerror("LSI53C810: reg_r: Unknown reg %02X", reg);
+			fatalerror("LSI53C810: reg_r: Unknown reg %02X", offset);
 	}
 
 	return 0;
 }
 
-void lsi53c810_reg_w(running_machine *machine, int reg, UINT8 value)
+WRITE8_HANDLER( lsi53c810_reg_w )
 {
-	logerror("53c810: %02x to reg %d:0x%x (PC=%x)\n", value, reg, reg, activecpu_get_pc());
-	switch(reg)
+	logerror("53c810: %02x to reg %d:0x%x (PC=%x)\n", data, offset, offset, activecpu_get_pc());
+	switch(offset)
 	{
 		case 0x00:		/* SCNTL0 */
-			lsi810.scntl0 = value;
+			lsi810.scntl0 = data;
 			break;
 		case 0x01:		/* SCNTL1 */
-			lsi810.scntl1 = value;
+			lsi810.scntl1 = data;
 			break;
 		case 0x02:		/* SCNTL2 */
-			lsi810.scntl2 = value;
+			lsi810.scntl2 = data;
 			break;
 		case 0x03:		/* SCNTL3 */
-			lsi810.scntl3 = value;
+			lsi810.scntl3 = data;
 			break;
 		case 0x04:		/* SCID */
-			lsi810.scid = value;
+			lsi810.scid = data;
 			break;
 		case 0x09:		/* SOCL */
-			lsi810.socl = value;
+			lsi810.socl = data;
 			break;
 		case 0x0d:		/* SSTAT0 */
-			lsi810.sstat0 = value;
+			lsi810.sstat0 = data;
 			break;
 		case 0x0e:		/* SSTAT1 */
-			lsi810.sstat1 = value;
+			lsi810.sstat1 = data;
 			break;
 		case 0x0f:		/* SSTAT2 */
-			lsi810.sstat2 = value;
+			lsi810.sstat2 = data;
 			break;
 		case 0x10:		/* DSA [7-0] */
 			lsi810.dsa &= 0xffffff00;
-			lsi810.dsa |= value;
+			lsi810.dsa |= data;
 			break;
 		case 0x11:		/* DSA [15-8] */
 			lsi810.dsa &= 0xffff00ff;
-			lsi810.dsa |= value << 8;
+			lsi810.dsa |= data << 8;
 			break;
 		case 0x12:		/* DSA [23-16] */
 			lsi810.dsa &= 0xff00ffff;
-			lsi810.dsa |= value << 16;
+			lsi810.dsa |= data << 16;
 			break;
 		case 0x13:		/* DSA [31-24] */
 			lsi810.dsa &= 0x00ffffff;
-			lsi810.dsa |= value << 24;
+			lsi810.dsa |= data << 24;
 			break;
 		case 0x14:		/* ISTAT */
-			lsi810.istat = value;
+			lsi810.istat = data;
 			break;
 		case 0x2c:		/* DSP [7-0] */
 			lsi810.dsp &= 0xffffff00;
-			lsi810.dsp |= value;
+			lsi810.dsp |= data;
 			break;
 		case 0x2d:		/* DSP [15-8] */
 			lsi810.dsp &= 0xffff00ff;
-			lsi810.dsp |= value << 8;
+			lsi810.dsp |= data << 8;
 			break;
 		case 0x2e:		/* DSP [23-16] */
 			lsi810.dsp &= 0xff00ffff;
-			lsi810.dsp |= value << 16;
+			lsi810.dsp |= data << 16;
 			break;
 		case 0x2f:		/* DSP [31-24] */
 			lsi810.dsp &= 0x00ffffff;
-			lsi810.dsp |= value << 24;
+			lsi810.dsp |= data << 24;
 			lsi810.halted = 0;
 			if((lsi810.dmode & 0x1) == 0 && !lsi810.halted) {
 				dma_exec();
@@ -600,16 +600,16 @@ void lsi53c810_reg_w(running_machine *machine, int reg, UINT8 value)
 		case 0x35:
 		case 0x36:
 		case 0x37:
-			lsi810.scratch_a[reg % 4] = value;
+			lsi810.scratch_a[offset % 4] = data;
 			break;
 		case 0x38:		/* DMODE */
-			lsi810.dmode = value;
+			lsi810.dmode = data;
 			break;
 		case 0x39:		/* DIEN */
-			lsi810.dien = value;
+			lsi810.dien = data;
 			break;
 		case 0x3b:		/* DCNTL */
-			lsi810.dcntl = value;
+			lsi810.dcntl = data;
 
 			if(lsi810.dcntl & 0x14 && !lsi810.halted)		/* single-step & start DMA */
 			{
@@ -630,29 +630,29 @@ void lsi53c810_reg_w(running_machine *machine, int reg, UINT8 value)
 			}
 			break;
 		case 0x40:		/* SIEN0 */
-			lsi810.sien0 = value;
+			lsi810.sien0 = data;
 			break;
 		case 0x41:		/* SIEN1 */
-			lsi810.sien1 = value;
+			lsi810.sien1 = data;
 			break;
 		case 0x48:		/* STIME0 */
-			lsi810.stime0 = value;
+			lsi810.stime0 = data;
 			break;
 		case 0x4a:		/* RESPID */
-			lsi810.respid = value;
+			lsi810.respid = data;
 			break;
 		case 0x4d:		/* STEST1 */
-			lsi810.stest1 = value;
+			lsi810.stest1 = data;
 			break;
 		case 0x5c:		/* SCRATCH B */
 		case 0x5d:
 		case 0x5e:
 		case 0x5f:
-			lsi810.scratch_b[reg % 4] = value;
+			lsi810.scratch_b[offset % 4] = data;
 			break;
 
 		default:
-			fatalerror("LSI53C810: reg_w: Unknown reg %02X, %02X", reg, value);
+			fatalerror("LSI53C810: reg_w: Unknown reg %02X, %02X", offset, data);
 	}
 }
 

@@ -482,7 +482,7 @@ void ppccom_tlb_fill(powerpc_state *ppc)
 	{
 		/* assume success and direct translation */
 		ppc->param0 = 0;
-		transaddr = address;
+		transaddr = address & 0x7fffffff;
 		
 		/* only check if PE is enabled */
 		if (ppc->msr & MSR4XX_PE)
@@ -1876,6 +1876,7 @@ void ppc4xx_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_4:	info->i = ppc4xx_get_irq_line(ppc, PPC4XX_IRQ_BIT_EXT4);		break;
 
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 31;					break;
 		case CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACE_PROGRAM: 	info->i = 0;					break;
 

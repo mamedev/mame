@@ -760,24 +760,24 @@ static READ32_HANDLER( comm0_unk_r )
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( hornet_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM AM_BASE(&workram)		/* Work RAM */
-	AM_RANGE(0x74000000, 0x740000ff) AM_MIRROR(0x80000000) AM_READWRITE(K037122_reg_r, K037122_reg_w)
-	AM_RANGE(0x74020000, 0x7403ffff) AM_MIRROR(0x80000000) AM_READWRITE(K037122_sram_r, K037122_sram_w)
-	AM_RANGE(0x74040000, 0x7407ffff) AM_MIRROR(0x80000000) AM_READWRITE(K037122_char_r, K037122_char_w)
-	AM_RANGE(0x78000000, 0x7800ffff) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
-	AM_RANGE(0x780c0000, 0x780c0003) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
-	AM_RANGE(0x7d000000, 0x7d00ffff) AM_MIRROR(0x80000000) AM_READ8(sysreg_r, 0xffffffff)
-	AM_RANGE(0x7d010000, 0x7d01ffff) AM_MIRROR(0x80000000) AM_WRITE8(sysreg_w, 0xffffffff)
-	AM_RANGE(0x7d020000, 0x7d021fff) AM_MIRROR(0x80000000) AM_READWRITE(timekeeper_0_32be_r, timekeeper_0_32be_w)	/* M48T58Y RTC/NVRAM */
-	AM_RANGE(0x7d030000, 0x7d030007) AM_MIRROR(0x80000000) AM_READWRITE(K056800_host_r, K056800_host_w)
-	AM_RANGE(0x7d042000, 0x7d043fff) AM_MIRROR(0x80000000) AM_RAM				/* COMM BOARD 0 */
-	AM_RANGE(0x7d044000, 0x7d044007) AM_MIRROR(0x80000000) AM_READ(comm0_unk_r)
-	AM_RANGE(0x7d048000, 0x7d048003) AM_MIRROR(0x80000000) AM_WRITE(comm1_w)
-	AM_RANGE(0x7d04a000, 0x7d04a003) AM_MIRROR(0x80000000) AM_WRITE(comm_rombank_w)
-	AM_RANGE(0x7d050000, 0x7d05ffff) AM_MIRROR(0x80000000) AM_ROMBANK(1)		/* COMM BOARD 1 */
-	AM_RANGE(0x7e000000, 0x7e7fffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION(REGION_USER2, 0)		/* Data ROM */
-	AM_RANGE(0x7f000000, 0x7f3fffff) AM_MIRROR(0x80000000) AM_ROM AM_SHARE(2)
-	AM_RANGE(0x7fc00000, 0x7fffffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION(REGION_USER1, 0) AM_SHARE(2)	/* Program ROM */
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(&workram)		/* Work RAM */
+	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(K037122_reg_r, K037122_reg_w)
+	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(K037122_sram_r, K037122_sram_w)
+	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE(K037122_char_r, K037122_char_w)
+	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
+	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
+	AM_RANGE(0x7d000000, 0x7d00ffff) AM_READ8(sysreg_r, 0xffffffff)
+	AM_RANGE(0x7d010000, 0x7d01ffff) AM_WRITE8(sysreg_w, 0xffffffff)
+	AM_RANGE(0x7d020000, 0x7d021fff) AM_READWRITE(timekeeper_0_32be_r, timekeeper_0_32be_w)	/* M48T58Y RTC/NVRAM */
+	AM_RANGE(0x7d030000, 0x7d030007) AM_READWRITE(K056800_host_r, K056800_host_w)
+	AM_RANGE(0x7d042000, 0x7d043fff) AM_RAM				/* COMM BOARD 0 */
+	AM_RANGE(0x7d044000, 0x7d044007) AM_READ(comm0_unk_r)
+	AM_RANGE(0x7d048000, 0x7d048003) AM_WRITE(comm1_w)
+	AM_RANGE(0x7d04a000, 0x7d04a003) AM_WRITE(comm_rombank_w)
+	AM_RANGE(0x7d050000, 0x7d05ffff) AM_ROMBANK(1)		/* COMM BOARD 1 */
+	AM_RANGE(0x7e000000, 0x7e7fffff) AM_ROM AM_REGION(REGION_USER2, 0)		/* Data ROM */
+	AM_RANGE(0x7f000000, 0x7f3fffff) AM_ROM AM_SHARE(2)
+	AM_RANGE(0x7fc00000, 0x7fffffff) AM_ROM AM_REGION(REGION_USER1, 0) AM_SHARE(2)	/* Program ROM */
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -967,8 +967,8 @@ static MACHINE_START( hornet )
 
 	/* configure fast RAM regions for DRC */
 	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x80000000);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x803fffff);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x003fffff);
 	cpunum_set_info_ptr(0, CPUINFO_PTR_PPC_FASTRAM_BASE, workram);
 	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 }

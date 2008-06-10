@@ -12,6 +12,7 @@
 #include "machine/konamiic.h"
 
 static UINT32 *vram;
+static UINT32 *workram;
 
 static VIDEO_UPDATE( ultrsprt )
 {
@@ -81,8 +82,26 @@ static WRITE32_HANDLER( int_ack_w )
 	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
+static MACHINE_START( ultrsprt )
+{
+	/* set conservative DRC options */
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
+
+	/* configure fast RAM regions for DRC */
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x0007ffff);
+	cpunum_set_info_ptr(0, CPUINFO_PTR_PPC_FASTRAM_BASE, vram);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_SELECT, 1);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x7f000000);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x7f01ffff);
+	cpunum_set_info_ptr(0, CPUINFO_PTR_PPC_FASTRAM_BASE, workram);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+}
+
 static ADDRESS_MAP_START( ultrsprt_map, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fffffff)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(&vram)
 	AM_RANGE(0x70000000, 0x70000003) AM_READWRITE(eeprom_r, eeprom_w)
 	AM_RANGE(0x70000020, 0x70000023) AM_READ(control1_r)
@@ -90,7 +109,7 @@ static ADDRESS_MAP_START( ultrsprt_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x70000080, 0x70000087) AM_WRITE(K056800_host_w)
 	AM_RANGE(0x70000088, 0x7000008f) AM_READ(K056800_host_r)
 	AM_RANGE(0x700000e0, 0x700000e3) AM_WRITE(int_ack_w)
-	AM_RANGE(0x7f000000, 0x7f01ffff) AM_RAM
+	AM_RANGE(0x7f000000, 0x7f01ffff) AM_RAM AM_BASE(&workram)
 	AM_RANGE(0x7f700000, 0x7f703fff) AM_RAM_WRITE(palette_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x7fa00000, 0x7fbfffff) AM_ROM AM_SHARE(1)
 	AM_RANGE(0x7fc00000, 0x7fdfffff) AM_ROM AM_SHARE(1)
@@ -231,6 +250,7 @@ static MACHINE_DRIVER_START( ultrsprt )
 	MDRV_INTERLEAVE(200)
 
 	MDRV_NVRAM_HANDLER(ultrsprt)
+	MDRV_MACHINE_START(ultrsprt)
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

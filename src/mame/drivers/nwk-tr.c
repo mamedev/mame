@@ -755,25 +755,38 @@ static WRITE32_HANDLER( lanc2_w )
 
 /*****************************************************************************/
 
+static MACHINE_START( nwktr )
+{
+	/* set conservative DRC options */
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
+
+	/* configure fast RAM regions for DRC */
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x003fffff);
+	cpunum_set_info_ptr(0, CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+}
+
 static ADDRESS_MAP_START( nwktr_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM AM_BASE(&work_ram)		/* Work RAM */
-	AM_RANGE(0x74000000, 0x740000ff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_reg_r, K001604_reg_w)
-	AM_RANGE(0x74010000, 0x74017fff) AM_MIRROR(0x80000000) AM_RAM_WRITE(paletteram32_w) AM_BASE(&paletteram32)
-	AM_RANGE(0x74020000, 0x7403ffff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_tile_r, K001604_tile_w)
-	AM_RANGE(0x74040000, 0x7407ffff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_char_r, K001604_char_w)
-	AM_RANGE(0x78000000, 0x7800ffff) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
-	AM_RANGE(0x780c0000, 0x780c0003) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
-	AM_RANGE(0x7d000000, 0x7d00ffff) AM_MIRROR(0x80000000) AM_READ(sysreg_r)
-	AM_RANGE(0x7d010000, 0x7d01ffff) AM_MIRROR(0x80000000) AM_WRITE(sysreg_w)
-	AM_RANGE(0x7d020000, 0x7d021fff) AM_MIRROR(0x80000000) AM_READWRITE(timekeeper_0_32be_r, timekeeper_0_32be_w)	/* M48T58Y RTC/NVRAM */
-	AM_RANGE(0x7d030000, 0x7d030007) AM_MIRROR(0x80000000) AM_READ(K056800_host_r)
-	AM_RANGE(0x7d030000, 0x7d030007) AM_MIRROR(0x80000000) AM_WRITE(K056800_host_w)
-	AM_RANGE(0x7d030008, 0x7d03000f) AM_MIRROR(0x80000000) AM_WRITE(K056800_host_w)
-	AM_RANGE(0x7d040000, 0x7d04ffff) AM_MIRROR(0x80000000) AM_READWRITE(lanc1_r, lanc1_w)
-	AM_RANGE(0x7d050000, 0x7d05ffff) AM_MIRROR(0x80000000) AM_READWRITE(lanc2_r, lanc2_w)
-	AM_RANGE(0x7e000000, 0x7e7fffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION(REGION_USER2, 0)	/* Data ROM */
-	AM_RANGE(0x7f000000, 0x7f1fffff) AM_MIRROR(0x80000000) AM_ROM AM_SHARE(2)
-	AM_RANGE(0x7fe00000, 0x7fffffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION(REGION_USER1, 0) AM_SHARE(2)	/* Program ROM */
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(&work_ram)		/* Work RAM */
+	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(K001604_reg_r, K001604_reg_w)
+	AM_RANGE(0x74010000, 0x74017fff) AM_RAM_WRITE(paletteram32_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(K001604_tile_r, K001604_tile_w)
+	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE(K001604_char_r, K001604_char_w)
+	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
+	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
+	AM_RANGE(0x7d000000, 0x7d00ffff) AM_READ(sysreg_r)
+	AM_RANGE(0x7d010000, 0x7d01ffff) AM_WRITE(sysreg_w)
+	AM_RANGE(0x7d020000, 0x7d021fff) AM_READWRITE(timekeeper_0_32be_r, timekeeper_0_32be_w)	/* M48T58Y RTC/NVRAM */
+	AM_RANGE(0x7d030000, 0x7d030007) AM_READ(K056800_host_r)
+	AM_RANGE(0x7d030000, 0x7d030007) AM_WRITE(K056800_host_w)
+	AM_RANGE(0x7d030008, 0x7d03000f) AM_WRITE(K056800_host_w)
+	AM_RANGE(0x7d040000, 0x7d04ffff) AM_READWRITE(lanc1_r, lanc1_w)
+	AM_RANGE(0x7d050000, 0x7d05ffff) AM_READWRITE(lanc2_r, lanc2_w)
+	AM_RANGE(0x7e000000, 0x7e7fffff) AM_ROM AM_REGION(REGION_USER2, 0)	/* Data ROM */
+	AM_RANGE(0x7f000000, 0x7f1fffff) AM_ROM AM_SHARE(2)
+	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION(REGION_USER1, 0) AM_SHARE(2)	/* Program ROM */
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -906,6 +919,7 @@ static MACHINE_DRIVER_START( nwktr )
 
 	MDRV_INTERLEAVE(100)
 
+	MDRV_MACHINE_START(nwktr)
 	MDRV_MACHINE_RESET(nwktr)
 	MDRV_NVRAM_HANDLER( timekeeper_0 )
 

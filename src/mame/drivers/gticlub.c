@@ -410,25 +410,38 @@ WRITE32_HANDLER( lanc_ram_w )
 
 /******************************************************************/
 
+static MACHINE_START( gticlub )
+{
+	/* set conservative DRC options */
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
+
+	/* configure fast RAM regions for DRC */
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x000fffff);
+	cpunum_set_info_ptr(0, CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+}
+
 static ADDRESS_MAP_START( gticlub_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0x80000000) AM_RAM AM_BASE(&work_ram)		/* Work RAM */
-	AM_RANGE(0x74000000, 0x740000ff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_reg_r, K001604_reg_w)
-	AM_RANGE(0x74010000, 0x7401ffff) AM_MIRROR(0x80000000) AM_RAM_WRITE(paletteram32_w) AM_BASE(&paletteram32)
-	AM_RANGE(0x74020000, 0x7403ffff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_tile_r, K001604_tile_w)
-	AM_RANGE(0x74040000, 0x7407ffff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_char_r, K001604_char_w)
-	AM_RANGE(0x78000000, 0x7800ffff) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
-	AM_RANGE(0x78040000, 0x7804000f) AM_MIRROR(0x80000000) AM_READWRITE(K001006_0_r, K001006_0_w)
-	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE(K001006_1_r, K001006_1_w)
-	AM_RANGE(0x780c0000, 0x780c0003) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
-	AM_RANGE(0x7e000000, 0x7e003fff) AM_MIRROR(0x80000000) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
-	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_READWRITE8(K056230_r, K056230_w, 0xffffffff)
-	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_MIRROR(0x80000000) AM_READWRITE(lanc_ram_r, lanc_ram_w)
-	AM_RANGE(0x7e00c000, 0x7e00c007) AM_MIRROR(0x80000000) AM_WRITE(K056800_host_w)
-	AM_RANGE(0x7e00c000, 0x7e00c007) AM_MIRROR(0x80000000) AM_READ(K056800_host_r)		// Hang Pilot
-	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_MIRROR(0x80000000) AM_READ(K056800_host_r)
-	AM_RANGE(0x7f000000, 0x7f3fffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION(REGION_USER2, 0)	/* Data ROM */
-	AM_RANGE(0x7f800000, 0x7f9fffff) AM_MIRROR(0x80000000) AM_ROM AM_SHARE(2)
-	AM_RANGE(0x7fe00000, 0x7fffffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION(REGION_USER1, 0) AM_SHARE(2)	/* Program ROM */
+	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_BASE(&work_ram)		/* Work RAM */
+	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(K001604_reg_r, K001604_reg_w)
+	AM_RANGE(0x74010000, 0x7401ffff) AM_RAM_WRITE(paletteram32_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(K001604_tile_r, K001604_tile_w)
+	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE(K001604_char_r, K001604_char_w)
+	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
+	AM_RANGE(0x78040000, 0x7804000f) AM_READWRITE(K001006_0_r, K001006_0_w)
+	AM_RANGE(0x78080000, 0x7808000f) AM_READWRITE(K001006_1_r, K001006_1_w)
+	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
+	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
+	AM_RANGE(0x7e008000, 0x7e009fff) AM_READWRITE8(K056230_r, K056230_w, 0xffffffff)
+	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_READWRITE(lanc_ram_r, lanc_ram_w)
+	AM_RANGE(0x7e00c000, 0x7e00c007) AM_WRITE(K056800_host_w)
+	AM_RANGE(0x7e00c000, 0x7e00c007) AM_READ(K056800_host_r)		// Hang Pilot
+	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_READ(K056800_host_r)
+	AM_RANGE(0x7f000000, 0x7f3fffff) AM_ROM AM_REGION(REGION_USER2, 0)	/* Data ROM */
+	AM_RANGE(0x7f800000, 0x7f9fffff) AM_ROM AM_SHARE(2)
+	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION(REGION_USER1, 0) AM_SHARE(2)	/* Program ROM */
 ADDRESS_MAP_END
 
 /**********************************************************************/
@@ -718,6 +731,7 @@ static MACHINE_DRIVER_START( gticlub )
 	MDRV_INTERLEAVE(100)
 
 	MDRV_NVRAM_HANDLER(gticlub)
+	MDRV_MACHINE_START(gticlub)
 	MDRV_MACHINE_RESET(gticlub)
 
  	/* video hardware */
@@ -766,6 +780,7 @@ static MACHINE_DRIVER_START( hangplt )
 	MDRV_INTERLEAVE(100)
 
 	MDRV_NVRAM_HANDLER(gticlub)
+	MDRV_MACHINE_START(gticlub)
 	MDRV_MACHINE_RESET(hangplt)
 
  	/* video hardware */
@@ -973,9 +988,6 @@ static DRIVER_INIT(hangplt)
 static DRIVER_INIT(slrasslt)
 {
 	DRIVER_INIT_CALL(gticlub);
-
-	// enable self-modifying code checks
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_STRICT_VERIFY);
 }
 
 /*************************************************************************/

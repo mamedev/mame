@@ -19,8 +19,8 @@ extern void lsi53c810_write_data(int bytes, UINT8 *pData);
 
 extern void *lsi53c810_get_device(int id);
 
-UINT8 lsi53c810_reg_r(int reg);
-void lsi53c810_reg_w(running_machine *machine, int reg, UINT8 value);
+READ8_HANDLER( lsi53c810_reg_r );
+WRITE8_HANDLER( lsi53c810_reg_w );
 
 unsigned lsi53c810_dasm(char *buf, UINT32 pc);
 

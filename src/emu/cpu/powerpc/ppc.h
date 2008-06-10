@@ -176,8 +176,9 @@ void mpc8240_get_info(UINT32 state, cpuinfo *info);
 
 #define PPCDRC_STRICT_VERIFY		0x0001			/* verify all instructions */
 #define PPCDRC_FLUSH_PC				0x0002			/* flush the PC value before each memory access */
+#define PPCDRC_ACCURATE_SINGLES		0x0004			/* do excessive rounding to make single-precision results "accurate" */
 
-#define PPCDRC_COMPATIBLE_OPTIONS	(PPCDRC_STRICT_VERIFY | PPCDRC_FLUSH_PC)
+#define PPCDRC_COMPATIBLE_OPTIONS	(PPCDRC_STRICT_VERIFY | PPCDRC_FLUSH_PC | PPCDRC_ACCURATE_SINGLES)
 #define PPCDRC_FASTEST_OPTIONS		(0)
 
 #endif	/* __PPC_H__ */

@@ -1224,6 +1224,7 @@ static void static_generate_tlb_mismatch(drcuml_state *drcuml)
 	UML_CALLC(block, ppccom_tlb_fill, ppc);													// callc   tlbfill,ppc
 	UML_CMP(block, MEM(&ppc->param0), IMM(1));												// cmp     [param0],1
 	UML_JMPc(block, IF_A, isi = label++);													// jmp     isi,A
+	UML_MOV(block, MEM(&ppc->pc), IREG(0));													// mov     <pc>,i0
 	save_fast_iregs(block);																	// <save fastregs>
 	UML_EXIT(block, IMM(EXECUTE_MISSING_CODE));												// exit    EXECUTE_MISSING_CODE
 	UML_LABEL(block, isi);																// isi:
@@ -1493,6 +1494,8 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 		UML_LABEL(block, tlbreturn = label++);											// tlbreturn:
 		UML_ROLINS(block, IREG(0), IREG(3), IMM(0), IMM(0xfffff000));						// rolins  i0,i3,0,0xfffff000
 	}
+	else if (ppc->cap & PPCCAP_4XX)
+		UML_AND(block, IREG(0), IREG(0), IMM(0x7fffffff));									// and     i0,i0,0x7fffffff
 	UML_XOR(block, IREG(0), IREG(0), IMM((mode & MODE_LITTLE_ENDIAN) ? (8 - size) : 0));	// xor     i0,i0,8-size
 
 	for (ramnum = 0; ramnum < PPC_MAX_FASTRAM; ramnum++)
@@ -3698,26 +3701,36 @@ static int generate_instruction_3b(drcuml_block *block, compiler_state *compiler
 	switch (opswitch)
 	{
 		case 0x15:	/* FADDSx */
+			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
+				return generate_instruction_3f(block, compiler, desc);
 			UML_FDADD(block, FREG(0), F64(G_RA(op)), F64(G_RB(op)));						// fdadd   f0,ra,rb
 			UML_FDRNDS(block, F64(G_RD(op)), FREG(0));										// fdrnds  rd,f0
 			return TRUE;
 
 		case 0x14:	/* FSUBSx */
+			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
+				return generate_instruction_3f(block, compiler, desc);
 			UML_FDSUB(block, FREG(0), F64(G_RA(op)), F64(G_RB(op)));						// fdsub   f0,ra,rb
 			UML_FDRNDS(block, F64(G_RD(op)), FREG(0));										// fdrnds  rd,f0
 			return TRUE;
 
 		case 0x19:	/* FMULSx */
+			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
+				return generate_instruction_3f(block, compiler, desc);
 			UML_FDMUL(block, FREG(0), F64(G_RA(op)), F64(G_RB(op)));						// fdmul   f0,ra,rb
 			UML_FDRNDS(block, F64(G_RD(op)), FREG(0));										// fdrnds  rd,f0
 			return TRUE;
 
 		case 0x12:	/* FDIVSx */
+			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
+				return generate_instruction_3f(block, compiler, desc);
 			UML_FDDIV(block, FREG(0), F64(G_RA(op)), F64(G_RB(op)));						// fddiv   f0,ra,rb
 			UML_FDRNDS(block, F64(G_RD(op)), FREG(0));										// fdrnds  rd,f0
 			return TRUE;
 
 		case 0x16:	/* FSQRTSx */
+			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
+				return generate_instruction_3f(block, compiler, desc);
 			UML_FDSQRT(block, FREG(0), F64(G_RB(op)));										// fdsqrt  f0,rb
 			UML_FDRNDS(block, F64(G_RD(op)), FREG(0));										// fdrnds  rd,f0
 			return TRUE;
@@ -3729,18 +3742,24 @@ static int generate_instruction_3b(drcuml_block *block, compiler_state *compiler
 			return TRUE;
 
 		case 0x1d:	/* FMADDSx */
+			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
+				return generate_instruction_3f(block, compiler, desc);
 			UML_FDMUL(block, FREG(0), F64(G_RA(op)), F64(G_REGC(op)));						// fdmul   f0,ra,rc
 			UML_FDADD(block, FREG(0), FREG(0), F64(G_RB(op)));								// fdadd   f0,f0,rb
 			UML_FDRNDS(block, F64(G_RD(op)), FREG(0));										// fdrnds  rd,f0
 			return TRUE;
 
 		case 0x1c:	/* FMSUBSx */
+			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
+				return generate_instruction_3f(block, compiler, desc);
 			UML_FDMUL(block, FREG(0), F64(G_RA(op)), F64(G_REGC(op)));						// fdmul   f0,ra,rc
 			UML_FDSUB(block, FREG(0), FREG(0), F64(G_RB(op)));								// fdsub   f0,f0,rb
 			UML_FDRNDS(block, F64(G_RD(op)), FREG(0));										// fdrnds  rd,f0
 			return TRUE;
 
 		case 0x1f:	/* FNMADDSx */
+			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
+				return generate_instruction_3f(block, compiler, desc);
 			UML_FDMUL(block, FREG(0), F64(G_RA(op)), F64(G_REGC(op)));						// fdmul   f0,ra,rc
 			UML_FDADD(block, FREG(0), FREG(0), F64(G_RB(op)));								// fdadd   f0,f0,rb
 			UML_FDNEG(block, FREG(0), FREG(0));												// fdneg   f0,f0
@@ -3748,6 +3767,8 @@ static int generate_instruction_3b(drcuml_block *block, compiler_state *compiler
 			return TRUE;
 
 		case 0x1e:	/* FNMSUBSx */
+			if (!(ppc->impstate->drcoptions & PPCDRC_ACCURATE_SINGLES))
+				return generate_instruction_3f(block, compiler, desc);
 			UML_FDMUL(block, FREG(0), F64(G_RA(op)), F64(G_REGC(op)));						// fdmul   f0,ra,rc
 			UML_FDSUB(block, FREG(0), F64(G_RB(op)), FREG(0));								// fdsub   f0,rb,f0
 			UML_FDRNDS(block, F64(G_RD(op)), FREG(0));										// fdrnds  rd,f0

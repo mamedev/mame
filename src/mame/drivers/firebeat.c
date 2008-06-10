@@ -1744,6 +1744,7 @@ static READ16_HANDLER(spu_unk_r)
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( firebeat_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM
 	AM_RANGE(0x70000000, 0x70000fff) AM_READWRITE(midi_uart_r, midi_uart_w)
 	AM_RANGE(0x70006000, 0x70006003) AM_WRITE(extend_board_irq_w)
 	AM_RANGE(0x70008000, 0x7000800f) AM_READ(keyboard_wheel_r)
@@ -1761,8 +1762,7 @@ static ADDRESS_MAP_START( firebeat_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x7e800100, 0x7e8001ff) AM_READWRITE(gcu1_r, gcu1_w)
 	AM_RANGE(0x7fe00000, 0x7fe0000f) AM_READWRITE(atapi_command_r, atapi_command_w)
 	AM_RANGE(0x7fe80000, 0x7fe8000f) AM_READWRITE(atapi_control_r, atapi_control_w)
-	AM_RANGE(0x80000000, 0x81ffffff) AM_RAM
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1, 0)		/* System BIOS */
+	AM_RANGE(0x7ff80000, 0x7fffffff) AM_ROM AM_REGION(REGION_USER1, 0)		/* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spu_map, ADDRESS_SPACE_PROGRAM, 16 )
