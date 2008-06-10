@@ -2022,6 +2022,7 @@ static MACHINE_DRIVER_START(firebeat)
 	MDRV_CPU_PROGRAM_MAP(firebeat_map, 0)
 	MDRV_CPU_VBLANK_INT("main", firebeat_interrupt)
 
+	MDRV_MACHINE_START(firebeat)
 	MDRV_MACHINE_RESET(firebeat)
 	MDRV_NVRAM_HANDLER(firebeat)
 
