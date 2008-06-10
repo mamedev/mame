@@ -1741,6 +1741,8 @@ $(DRIVERS)/tceptor.o:	$(LAYOUT)/tceptor2.lh
 
 $(DRIVERS)/tetrisp2.o:	$(LAYOUT)/rocknms.lh
 
+$(DRIVERS)/thayers.o:	$(LAYOUT)/dlair.lh
+
 $(DRIVERS)/turbo.o:		$(LAYOUT)/turbo.lh \
 						$(LAYOUT)/subroc3d.lh \
 						$(LAYOUT)/buckrog.lh
