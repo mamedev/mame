@@ -220,6 +220,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 #endif
 ADDRESS_MAP_END
 
+
+
 static ADDRESS_MAP_START( pickin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
@@ -234,10 +236,13 @@ static ADDRESS_MAP_START( pickin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(SMH_RAM) AM_BASE(&bagman_video_enable)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(bagman_coin_counter_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_2_r)
+
+
+
 #if 0
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(SMH_NOP)	/* ???? */
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(SMH_NOP)	/* ???? */
-	AM_RANGE(0xb800, 0xb800) AM_READ(SMH_NOP)
+	AM_RANGE(0xb800, 0xb800) AM_READ(SMH_NOP) /* ???? */
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(SMH_NOP)	/* ???? */
 #endif
 ADDRESS_MAP_END
@@ -785,6 +790,63 @@ ROM_START( botanic )
 	ROM_LOAD( "bota_3a.3a",    0x0020, 0x0020, CRC(edf88f34) SHA1(b9c342d51303d552f87df2543a34e38c30acd07c) )
 ROM_END
 
+/*
+
+Squash (Itisa)
+
+Anno	1984
+Produttore	Itisa-Valadon-gecas
+
+CPU
+
+1x SGS Z8400AB1-Z80ACPU (main)
+2x AY-3-8910 (sound)
+1x LM380 (sound)
+1x oscillator 18432
+ROMs
+
+7x 2732
+2x MMI6331
+Note
+
+1x 22x2 edge connector
+1x trimmer (volume)
+1x 8 switches dip
+
+This is a strange thing: the PCB is marked "Valadon Automation (C) 1983" and "Fabrique
+sous licence par GECAS/MILANO" (manufactured under license from GECAS/MILANO)
+
+But if you look in rom 7 with an hex editor you can see the following: "(C) 1984 ITISA"
+and "UN BONJOUR A JACQUES DE PEPE PETIT ET HENK" (a good morning to Jacques from Pepe
+Petit and Henk). These are the programmers in ITISA, Henk Spits, Josep M. Petit, Josep
+Morillas, the very same 3 persons working on BOTANIC (1984)(ITISA).
+
+Game writings in the eprom are in English and Spanish.
+
+So we have an English/Spanish game with a French easter egg on a French PCB manufactured
+under licence from an Italian company! Let's call it melting pot!
+
+*/
+
+ROM_START( squaitsa )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "sq5.3.9e",    0x0000, 0x1000,CRC(04128d92) SHA1(ca7b7c4be5f40bcefc92b231ce3bba859c9967ee) )
+	ROM_LOAD( "sq6.4.9f",    0x1000, 0x1000,CRC(4ff7dd56) SHA1(1955675a9ee3ad7b9185cd027bc42284e15c7451) )
+	ROM_LOAD( "sq7.5.9j",    0x2000, 0x1000,CRC(e46ecda6) SHA1(25cd94b6c9602cc00fe3459b524639fd3beb72be) )
+
+	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "sq2.1.1e",   0x0000, 0x1000,CRC(0eb6ecad) SHA1(da2facbfa5f2fe233ea09777e9880b4f1d3c1079) )
+	ROM_LOAD( "sq4.2.1j",   0x1000, 0x1000,CRC(8d875b0e) SHA1(f949da71167aa81c1cfaefc6f3d88b57792b6191) )
+
+	ROM_REGION( 0x2000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "sq1.1c",    0x0000, 0x1000,CRC(b6d563e5) SHA1(90a89fd8e892a612c74bd2c7e38acb08c22c6046) )
+	ROM_LOAD( "sq3.1f",    0x1000, 0x1000,CRC(0d9d87e6) SHA1(881039d3b8805bb1a546e28abda3273e79714033) )
+
+	ROM_REGION( 0x0040, REGION_PROMS, 0 )
+	ROM_LOAD( "mmi6331.3p",    0x0000, 0x0020,CRC(06eab7ce) SHA1(d0bafedb340bf12d81446cc672307bb01e5d3026) )
+	ROM_LOAD( "mmi6331.3r",    0x0020, 0x0020,CRC(86c1e7db) SHA1(5c974b51d770a555ddab5c23f03a666c6f286cbf) )
+ROM_END
+
 static DRIVER_INIT( bagnarda )
 {
 	/* initialize video enable because it's not done in the code */
@@ -800,4 +862,5 @@ GAME( 1984, sbagman,  0, 	   bagman,  sbagman, 0,        ROT270, "Valadon Automa
 GAME( 1984, sbagmans, sbagman, bagman,  sbagman, 0,        ROT270, "Valadon Automation (Stern license)", "Super Bagman (Stern)", 0 )
 GAME( 1983, pickin,	  0,	   pickin,  pickin,  0,        ROT270, "Valadon Automation", "Pickin'", 0 )
 GAME( 1984, botanic,  0,       botanic, botanic, 0,        ROT270, "Valadon Automation (Itisa license)", "Botanic", 0 )
+GAME( 1984, squaitsa,  0,       botanic, botanic, 0,        ROT0, "Itisa", "Squash (Itisa)", GAME_NOT_WORKING )
 
