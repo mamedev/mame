@@ -154,9 +154,9 @@ enum
 	SPR4XX_SPRG2		= 0x112,	/* R/W  403GA SPR General 2 */
 	SPR4XX_SPRG3		= 0x113,	/* R/W  403GA SPR General 3 */
 	SPR4XX_PVR			= 0x11f,	/* R    403GA Processor Version Number */
+	SPR4XX_PID			= 0x3b1,	/* R/W  403GCX Process ID */
 	SPR4XX_SGR			= 0x3b9,	/* R/W  403GCX Storage Guarded Register */
 	SPR4XX_DCWR			= 0x3ba,	/* R/W  403GCX Data Cache Write Through */
-	SPR4XX_PID			= 0x3b1,	/* R/W  403GCX Process ID */
 	SPR4XX_TBHU			= 0x3cc,	/* R/W  403GCX Time Base High User-mode */
 	SPR4XX_TBLU			= 0x3cd,	/* R/W  403GCX Time Base Low User-mode */
 	SPR4XX_ICDBDR		= 0x3d3,	/* R    403GA 406GA Instruction Cache Debug Data Register */

@@ -70,6 +70,7 @@ static const int rx_trigger_level[4] = { 1, 4, 8, 14 };
 static void check_interrupts(running_machine *machine, int chip, int channel)
 {
 	PC16552D_CHANNEL *ch = &duart[chip].ch[channel];
+	int signal = 0;
 
 	if (ch->pending_interrupt != 0)
 	{
@@ -78,11 +79,13 @@ static void check_interrupts(running_machine *machine, int chip, int channel)
 			((ch->reg[REG_INT_ENABLE] & INT_ENABLE_RX_LINE_STATUS) && (ch->pending_interrupt & IRQ_RX_LINE_STATUS)) ||
 			((ch->reg[REG_INT_ENABLE] & INT_ENABLE_MODEM_STATUS) && (ch->pending_interrupt & IRQ_MODEM_STATUS)))
 		{
-			if (duart[chip].irq_handler != NULL)
-			{
-				duart[chip].irq_handler(machine, channel, 0);
-			}
+			signal = 1;
 		}
+	}
+
+	if (duart[chip].irq_handler != NULL)
+	{
+		duart[chip].irq_handler(machine, channel, signal ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

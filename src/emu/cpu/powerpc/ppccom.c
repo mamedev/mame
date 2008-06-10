@@ -481,7 +481,7 @@ void ppccom_tlb_fill(powerpc_state *ppc)
 	if (ppc->cap & PPCCAP_4XX)
 	{
 		/* assume success and direct translation */
-		ppc->param0 = 0;
+		ppc->param0 = 1;
 		transaddr = address & 0x7fffffff;
 		
 		/* only check if PE is enabled */
