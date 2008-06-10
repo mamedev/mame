@@ -3543,7 +3543,7 @@ static int load_game_config(running_machine *machine, xml_data_node *portnode, i
 	const char *tag;
 
 	/* read the mask, index, and defvalue attributes */
-	tag = xml_get_attribute_string(portnode, "port", NULL);
+	tag = xml_get_attribute_string(portnode, "tag", NULL);
 	mask = xml_get_attribute_int(portnode, "mask", 0);
 	defvalue = xml_get_attribute_int(portnode, "defvalue", 0);
 
