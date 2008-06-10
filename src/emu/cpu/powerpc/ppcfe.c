@@ -77,6 +77,36 @@ INLINE UINT32 compute_spr(UINT32 spr)
 }
 
 
+/*-------------------------------------------------
+    is_403_class - are we one of the 403 variants?
+-------------------------------------------------*/
+
+INLINE int is_403_class(const powerpc_state *ppc)
+{
+	return (ppc->flavor == PPC_MODEL_403GA || ppc->flavor == PPC_MODEL_403GB || ppc->flavor == PPC_MODEL_403GC || ppc->flavor == PPC_MODEL_403GCX || ppc->flavor == PPC_MODEL_405GP);
+}
+
+
+/*-------------------------------------------------
+    is_601_class - are we one of the 601 variants?
+-------------------------------------------------*/
+
+INLINE int is_601_class(const powerpc_state *ppc)
+{
+	return (ppc->flavor == PPC_MODEL_601);
+}
+
+
+/*-------------------------------------------------
+    is_603_class - are we one of the 603 variants?
+-------------------------------------------------*/
+
+INLINE int is_603_class(const powerpc_state *ppc)
+{
+	return (ppc->flavor == PPC_MODEL_603 || ppc->flavor == PPC_MODEL_603E || ppc->flavor == PPC_MODEL_603EV || ppc->flavor == PPC_MODEL_603R);
+}
+
+
 
 /***************************************************************************
     INSTRUCTION PARSERS
@@ -110,11 +140,21 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 		case 0x03:	/* TWI */
 			GPR_USED(desc, G_RA(op));
 			desc->flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
+			if (is_603_class(ppc))
+				desc->cycles = 2;	/* 603 */
 			return TRUE;
 
 		case 0x07:	/* MULLI */
 			GPR_USED(desc, G_RA(op));
 			GPR_MODIFIED(desc, G_RD(op));
+			if (is_403_class(ppc))
+				desc->cycles = 4;	/* 4XX */
+			else if (is_601_class(ppc))
+				desc->cycles = 5;	/* 601 */
+			else if (is_603_class(ppc))
+				desc->cycles = 2;	/* 603: 2-3 */
+			else
+				desc->cycles = 2;	/* ??? */
 			return TRUE;
 
 		case 0x0e:	/* ADDI */
@@ -166,6 +206,12 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 			if (!(ppc->cap & (PPCCAP_OEA | PPCCAP_4XX)))
 				return FALSE;
 			desc->flags |= OPFLAG_WILL_CAUSE_EXCEPTION;
+			if (is_601_class(ppc))
+				desc->cycles = 16;	/* 601 */
+			else if (is_603_class(ppc))
+				desc->cycles = 3;	/* 603 */
+			else
+				desc->cycles = 3;	/* ??? */
 			return TRUE;
 
 		case 0x12:	/* Bx */
@@ -274,6 +320,7 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 			for (regnum = G_RD(op); regnum < 32; regnum++)
 				GPR_MODIFIED(desc, regnum);
 			desc->flags |= OPFLAG_READS_MEMORY;
+			desc->cycles = 32 - G_RD(op);
 			return TRUE;
 
 		case 0x2f:	/* STMW */
@@ -281,6 +328,7 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 			for (regnum = G_RS(op); regnum < 32; regnum++)
 				GPR_USED(desc, regnum);
 			desc->flags |= OPFLAG_WRITES_MEMORY;
+			desc->cycles = 32 - G_RS(op);
 			return TRUE;
 
 		case 0x30:	/* LFS */
@@ -389,6 +437,12 @@ static int describe_instruction_13(powerpc_state *ppc, UINT32 op, opcode_desc *d
 				return FALSE;
 			desc->flags |= OPFLAG_PRIVILEGED | OPFLAG_CAN_CHANGE_MODES | OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE | OPFLAG_CAN_CAUSE_EXCEPTION;
 			desc->targetpc = BRANCH_TARGET_DYNAMIC;
+			if (is_601_class(ppc))
+				desc->cycles = 13;	/* 601 */
+			else if (is_603_class(ppc))
+				desc->cycles = 3;	/* 603 */
+			else
+				desc->cycles = 3;	/* ??? */
 			return TRUE;
 
 		case 0x033:	/* RFCI */
@@ -401,6 +455,8 @@ static int describe_instruction_13(powerpc_state *ppc, UINT32 op, opcode_desc *d
 		case 0x096:	/* ISYNC */
 			if (!(ppc->cap & (PPCCAP_VEA | PPCCAP_4XX)))
 				return FALSE;
+			if (is_601_class(ppc))
+				desc->cycles = 6;	/* 601 */
 			return TRUE;
 
 		case 0x210:	/* BCCTRx */
@@ -476,6 +532,8 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 			GPR_USED(desc, G_RA(op));
 			GPR_USED(desc, G_RB(op));
 			desc->flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
+			if (is_603_class(ppc))
+				desc->cycles = 2;	/* 603 */
 			return TRUE;
 
 		case 0x008:	/* SUBFCx */
@@ -521,12 +579,48 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 			return TRUE;
 
 		case 0x00b:	/* MULHWUx */
-		case 0x028:	/* SUBFx */
 		case 0x04b:	/* MULHWx */
 		case 0x0eb:	/* MULLWx */
-		case 0x10a:	/* ADDx */
+			GPR_USED(desc, G_RA(op));
+			GPR_USED(desc, G_RB(op));
+			GPR_MODIFIED(desc, G_RD(op));
+			if (op & M_RC)
+			{
+				XER_SO_USED(desc);
+				CR_MODIFIED(desc, 0);
+			}
+			if (is_403_class(ppc))
+				desc->cycles = 4;	/* 4XX */
+			else if (is_601_class(ppc))
+				desc->cycles = 5;	/* 601: 5/9/10 */
+			else if (is_603_class(ppc))
+				desc->cycles = 2;	/* 603: 2,3,4,5,6 */
+			else
+				desc->cycles = 2;	/* ??? */
+			return TRUE;
+
 		case 0x1cb:	/* DIVWUx */
 		case 0x1eb:	/* DIVWx */
+			GPR_USED(desc, G_RA(op));
+			GPR_USED(desc, G_RB(op));
+			GPR_MODIFIED(desc, G_RD(op));
+			if (op & M_RC)
+			{
+				XER_SO_USED(desc);
+				CR_MODIFIED(desc, 0);
+			}
+			if (is_403_class(ppc))
+				desc->cycles = 33;	/* 4XX */
+			else if (is_601_class(ppc))
+				desc->cycles = 36;	/* 601 */
+			else if (is_603_class(ppc))
+				desc->cycles = 37;	/* 603 */
+			else
+				desc->cycles = 33;	/* ??? */
+			return TRUE;
+
+		case 0x028:	/* SUBFx */
+		case 0x10a:	/* ADDx */
 			GPR_USED(desc, G_RA(op));
 			GPR_USED(desc, G_RB(op));
 			GPR_MODIFIED(desc, G_RD(op));
@@ -576,11 +670,45 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 				CR_MODIFIED(desc, 0);
 			return TRUE;
 
-		case 0x228:	/* SUBFOx */
 		case 0x2eb:	/* MULLWOx */
-		case 0x30a:	/* ADDOx */
+			GPR_USED(desc, G_RA(op));
+			GPR_USED(desc, G_RB(op));
+			GPR_MODIFIED(desc, G_RD(op));
+			XER_OV_MODIFIED(desc);
+			XER_SO_MODIFIED(desc);
+			if (op & M_RC)
+				CR_MODIFIED(desc, 0);
+			if (is_403_class(ppc))
+				desc->cycles = 4;	/* 4XX */
+			else if (is_601_class(ppc))
+				desc->cycles = 5;	/* 601: 5/9/10 */
+			else if (is_603_class(ppc))
+				desc->cycles = 2;	/* 603: 2,3,4,5,6 */
+			else
+				desc->cycles = 2;	/* ??? */
+			return TRUE;
+
 		case 0x3cb:	/* DIVWUOx */
 		case 0x3eb:	/* DIVWOx */
+			GPR_USED(desc, G_RA(op));
+			GPR_USED(desc, G_RB(op));
+			GPR_MODIFIED(desc, G_RD(op));
+			XER_OV_MODIFIED(desc);
+			XER_SO_MODIFIED(desc);
+			if (op & M_RC)
+				CR_MODIFIED(desc, 0);
+			if (is_403_class(ppc))
+				desc->cycles = 33;	/* 4XX */
+			else if (is_601_class(ppc))
+				desc->cycles = 36;	/* 601 */
+			else if (is_603_class(ppc))
+				desc->cycles = 37;	/* 603 */
+			else
+				desc->cycles = 33;	/* ??? */
+			return TRUE;
+
+		case 0x228:	/* SUBFOx */
+		case 0x30a:	/* ADDOx */
 			GPR_USED(desc, G_RA(op));
 			GPR_USED(desc, G_RB(op));
 			GPR_MODIFIED(desc, G_RD(op));
@@ -711,11 +839,19 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 			}
 			if (spr & 0x010)
 				desc->flags |= OPFLAG_PRIVILEGED | OPFLAG_CAN_CAUSE_EXCEPTION;
+			if ((ppc->cap & PPCCAP_4XX) && spr == SPR4XX_TBLU)
+				desc->cycles = POWERPC_COUNT_READ_TBL;
+			else if ((ppc->cap & PPCCAP_VEA) && spr == SPRVEA_TBL_R)
+				desc->cycles = POWERPC_COUNT_READ_TBL;
+			else if ((ppc->cap & PPCCAP_OEA) && spr == SPROEA_DEC)
+				desc->cycles = POWERPC_COUNT_READ_DEC;
 			return TRUE;
 
 		case 0x053:	/* MFMSR */
 			GPR_MODIFIED(desc, G_RD(op));
 			desc->flags |= OPFLAG_PRIVILEGED | OPFLAG_CAN_CAUSE_EXCEPTION | OPFLAG_CAN_EXPOSE_EXTERNAL_INT;
+			if (is_601_class(ppc))
+				desc->cycles = 2;	/* 601 */
 			return TRUE;
 
 		case 0x253:	/* MFSR */
@@ -733,6 +869,9 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 			if (!(ppc->cap & PPCCAP_VEA))
 				return FALSE;
 			GPR_MODIFIED(desc, G_RD(op));
+			spr = compute_spr(G_SPR(op));
+			if (spr == SPRVEA_TBL_R)
+				desc->cycles = POWERPC_COUNT_READ_TBL;
 			return TRUE;
 
 		case 0x068:	/* NEGx */
@@ -769,6 +908,10 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 		case 0x092:	/* MTMSR */
 			GPR_USED(desc, G_RS(op));
 			desc->flags |= OPFLAG_PRIVILEGED | OPFLAG_CAN_CAUSE_EXCEPTION | OPFLAG_CAN_CHANGE_MODES | OPFLAG_END_SEQUENCE;
+			if (is_601_class(ppc))
+				desc->cycles = 17;	/* 601 */
+			else if (is_603_class(ppc))
+				desc->cycles = 2;	/* 603 */
 			return TRUE;
 
 		case 0x0d2:	/* MTSR */
@@ -909,9 +1052,10 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 
 		case 0x255:	/* LSWI */
 			GPR_USED_OR_ZERO(desc, G_RA(op));
-			for (regnum = 0; regnum < G_NB(op); regnum += 4)
+			for (regnum = 0; regnum < ((G_NB(op) - 1) & 0x1f) + 1; regnum += 4)
 				GPR_MODIFIED(desc, (G_RD(op) + regnum / 4) % 32);
 			desc->flags |= OPFLAG_READS_MEMORY;
+			desc->cycles = (((G_NB(op) - 1) & 0x1f) + 1 + 3) / 4;
 			return TRUE;
 
 		case 0x295:	/* STSWX */
@@ -925,9 +1069,10 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 		
 		case 0x2d5:	/* STSWI */
 			GPR_USED_OR_ZERO(desc, G_RA(op));
-			for (regnum = 0; regnum < G_NB(op); regnum += 4)
+			for (regnum = 0; regnum < ((G_NB(op) - 1) & 0x1f) + 1; regnum += 4)
 				GPR_USED(desc, (G_RD(op) + regnum / 4) % 32);
 			desc->flags |= OPFLAG_WRITES_MEMORY;
+			desc->cycles = (((G_NB(op) - 1) & 0x1f) + 1 + 3) / 4;
 			return TRUE;
 
 		case 0x297:	/* STFSX */
@@ -1042,6 +1187,19 @@ static int describe_instruction_3b(powerpc_state *ppc, UINT32 op, opcode_desc *d
 	switch (opswitch)
 	{
 		case 0x12:	/* FDIVSx */
+			FPR_USED(desc, G_RA(op));
+			FPR_USED(desc, G_RB(op));
+			FPR_MODIFIED(desc, G_RD(op));
+			if (op & M_RC)
+				CR_MODIFIED(desc, 1);
+			if (is_601_class(ppc))
+				desc->cycles = 17;	/* 601 */
+			else if (is_603_class(ppc))
+				desc->cycles = 18;	/* 603 */
+			else
+				desc->cycles = 17;	/* ??? */
+			return TRUE;
+
 		case 0x14:	/* FSUBSx */
 		case 0x15:	/* FADDSx */
 		case 0x19:	/* FMULSx */
@@ -1096,9 +1254,30 @@ static int describe_instruction_3f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 		switch (opswitch)
 		{
 			case 0x12:	/* FDIVx */
+				FPR_USED(desc, G_RA(op));
+				FPR_USED(desc, G_RB(op));
+				FPR_MODIFIED(desc, G_RD(op));
+				if (op & M_RC)
+					CR_MODIFIED(desc, 1);
+				if (is_601_class(ppc))
+					desc->cycles = 31;	/* 601 */
+				else if (is_603_class(ppc))
+					desc->cycles = 33;	/* 603 */
+				else
+					desc->cycles = 31;	/* ??? */
+				return TRUE;
+
+			case 0x19:	/* FMULx */
+				FPR_USED(desc, G_RA(op));
+				FPR_USED(desc, G_RB(op));
+				FPR_MODIFIED(desc, G_RD(op));
+				if (op & M_RC)
+					CR_MODIFIED(desc, 1);
+				desc->cycles = 2;	/* 601/603 */
+				return TRUE;
+
 			case 0x14:	/* FSUBx */
 			case 0x15:	/* FADDx */
-			case 0x19:	/* FMULx */
 				FPR_USED(desc, G_RA(op));
 				FPR_USED(desc, G_RB(op));
 				FPR_MODIFIED(desc, G_RD(op));
@@ -1125,6 +1304,7 @@ static int describe_instruction_3f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 				FPR_MODIFIED(desc, G_RD(op));
 				if (op & M_RC)
 					CR_MODIFIED(desc, 1);
+				desc->cycles = 2;	/* 601/603 */
 				return TRUE;
 		}
 	}

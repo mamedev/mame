@@ -835,11 +835,18 @@ CPUOBJS += $(CPUOBJ)/mips/mips3com.o $(CPUOBJ)/mips/mips3fe.o $(CPUOBJ)/mips/mip
 DBGOBJS += $(CPUOBJ)/mips/mips3dsm.o
 endif
 
-$(CPUOBJ)/mips/mips3drc.o:	$(CPUSRC)/mips/mips3drc.c \
-							$(CPUSRC)/mips/mips3.h \
-							$(CPUSRC)/mips/mips3com.h \
-							$(CPUSRC)/mips/mips3fe.h \
-							$(DRCDEPS)
+$(CPUOBJ)/powerpc/mips3com.o:	$(CPUSRC)/powerpc/mips3.h \
+								$(CPUSRC)/powerpc/mips3com.h
+
+$(CPUOBJ)/powerpc/mips3fe.o:	$(CPUSRC)/powerpc/mips3.h \
+								$(CPUSRC)/powerpc/mips3com.h \
+								$(CPUSRC)/powerpc/mips3fe.h
+
+$(CPUOBJ)/mips/mips3drc.o:		$(CPUSRC)/mips/mips3drc.c \
+								$(CPUSRC)/mips/mips3.h \
+								$(CPUSRC)/mips/mips3com.h \
+								$(CPUSRC)/mips/mips3fe.h \
+								$(DRCDEPS)
 
 
 
@@ -1132,6 +1139,13 @@ OBJDIRS += $(CPUOBJ)/powerpc
 CPUOBJS += $(CPUOBJ)/powerpc/ppccom.o $(CPUOBJ)/powerpc/ppcfe.o $(CPUOBJ)/powerpc/ppcdrc.o $(DRCOBJ)
 DBGOBJS += $(CPUOBJ)/powerpc/ppc_dasm.o
 endif
+
+$(CPUOBJ)/powerpc/ppccom.o:	$(CPUSRC)/powerpc/ppc.h \
+							$(CPUSRC)/powerpc/ppccom.h
+
+$(CPUOBJ)/powerpc/ppcfe.o:	$(CPUSRC)/powerpc/ppc.h \
+							$(CPUSRC)/powerpc/ppccom.h \
+							$(CPUSRC)/powerpc/ppcfe.h
 
 $(CPUOBJ)/powerpc/ppcdrc.o:	$(CPUSRC)/powerpc/ppcdrc.c \
 							$(CPUSRC)/powerpc/ppc.h \

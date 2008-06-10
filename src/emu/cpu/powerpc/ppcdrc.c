@@ -12,10 +12,6 @@
 
     Future improvements/changes:
 
-    * Timing for long instructions (stmw/lmw/mul/div/stswi)
-
-    * Eliminate unnecessary flag calculations using information from the
-        frontend
 
 ***************************************************************************/
 
@@ -3290,6 +3286,7 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 		case 0x215:	/* LSWX */
 			UML_ADD(block, MEM(&ppc->impstate->updateaddr), R32Z(G_RA(op)), R32(G_RB(op)));	// add     [updateaddr],ra,rb
 			UML_AND(block, MEM(&ppc->impstate->swcount), SPR32(SPR_XER), IMM(0x7f));		// and     [swcount],[xer],0x7f
+			UML_SUB(block, MEM(&ppc->icount), MEM(&ppc->icount), MEM(&ppc->impstate->swcount));// sub  icount,icount,[swcount]
 			UML_CALLHc(block, IF_NZ, ppc->impstate->lsw[ppc->impstate->mode & 3][G_RD(op)]);// call    lsw[rd],nz
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
 			return TRUE;
@@ -3438,6 +3435,7 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 		case 0x295:	/* STSWX */
 			UML_ADD(block, MEM(&ppc->impstate->updateaddr), R32Z(G_RA(op)), R32(G_RB(op)));	// add     [updateaddr],ra,rb
 			UML_AND(block, MEM(&ppc->impstate->swcount), SPR32(SPR_XER), IMM(0x7f));		// and     [swcount],[xer],0x7f
+			UML_SUB(block, MEM(&ppc->icount), MEM(&ppc->icount), MEM(&ppc->impstate->swcount));// sub  icount,icount,[swcount]
 			UML_CALLHc(block, IF_NZ, ppc->impstate->stsw[ppc->impstate->mode & 3][G_RD(op)]);// call   stsw[rd]
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
 			return TRUE;

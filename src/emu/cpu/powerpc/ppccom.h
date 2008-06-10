@@ -25,6 +25,11 @@
 #define PPC603_FIXED_TLB_ENTRIES	128
 
 
+/* cycle parameters */
+#define POWERPC_COUNT_READ_TBL		100
+#define POWERPC_COUNT_READ_DEC		100
+
+
 /* internal capabilities flags */
 #define PPCCAP_OEA					0x01		/* TRUE if we conform to the OEA */
 #define PPCCAP_VEA					0x02		/* TRUE if we conform to the VEA */
