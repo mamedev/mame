@@ -16,7 +16,7 @@
 
 #define PRINTF_TLB_FILL			(1)
 #define PRINTF_SPU				(0)
-#define PRINTF_DECREMENTER		(0)
+#define PRINTF_DECREMENTER		(1)
 
 
 

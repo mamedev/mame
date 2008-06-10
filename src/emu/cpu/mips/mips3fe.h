@@ -20,12 +20,16 @@
     CONSTANTS
 ***************************************************************************/
 
-/* register flags */
-#define REGFLAG_R(n)					(((n) == 0) ? 0 : ((UINT64)1 << (n)))
-#define REGFLAG_LO						(REGFLAG_R(REG_LO))
-#define REGFLAG_HI						(REGFLAG_R(REG_HI))
-#define REGFLAG_CPR1(n)					((UINT64)1 << (n))
-#define REGFLAG_FCC						(REGFLAG_CPR1(32))
+/* register flags 0 */
+#define REGFLAG_R(n)					(((n) == 0) ? 0 : (1 << (n)))
+
+/* register flags 1 */
+#define REGFLAG_CPR1(n)					(1 << (n))
+
+/* register flags 2 */
+#define REGFLAG_LO						(1 << 0)
+#define REGFLAG_HI						(1 << 1)
+#define REGFLAG_FCC						(1 << 2)
 
 
 

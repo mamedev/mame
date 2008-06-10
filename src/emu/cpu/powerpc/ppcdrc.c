@@ -41,6 +41,7 @@ extern offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op);
 #define LOG_UML							(0)
 #define LOG_NATIVE						(0)
 
+#define DISABLE_FLAG_OPTIMIZATIONS		(0)
 #define DISABLE_FAST_REGISTERS			(0)
 #define SINGLE_INSTRUCTION_MODE			(0)
 
@@ -268,7 +269,7 @@ static int generate_instruction_3f(drcuml_block *block, compiler_state *compiler
 
 static void log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op);
 static const char *log_desc_flags_to_string(UINT32 flags);
-static void log_register_list(drcuml_state *drcuml, const char *string, UINT64 gprmask, UINT64 fprmask);
+static void log_register_list(drcuml_state *drcuml, const char *string, const UINT32 *reglist, const UINT32 *regnostarlist);
 static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent);
 
 
@@ -2199,9 +2200,19 @@ static void generate_sequence_instruction(drcuml_block *block, compiler_state *c
     generate_compute_flags - compute CR0 and/or XER flags
 ------------------------------------------------------------------*/
 
-static void generate_compute_flags(drcuml_block *block, int updatecr, UINT32 xermask, int invertcarry)
+static void generate_compute_flags(drcuml_block *block, const opcode_desc *desc, int updatecr, UINT32 xermask, int invertcarry)
 {
-	int xerflags = ((xermask & XER_OV) ? DRCUML_FLAG_V : 0) | ((xermask & XER_CA) ? DRCUML_FLAG_C : 0);
+	UINT32 xerflags;
+
+	/* modify inputs based on required flags */
+	if (!DISABLE_FLAG_OPTIMIZATIONS)
+	{
+		if (!(desc->regreq[3] & REGFLAG_XER_CA))
+			xermask &= ~XER_CA;
+		if (!(desc->regreq[2] & REGFLAG_CR(0)))
+			updatecr = 0;
+	}
+	xerflags = ((xermask & XER_OV) ? DRCUML_FLAG_V : 0) | ((xermask & XER_CA) ? DRCUML_FLAG_C : 0);
 
 	/* easy case: nothing to do */
 	if (!updatecr && xermask == 0)
@@ -2379,17 +2390,17 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case 0x08:	/* SUBFIC */
 			UML_SUB(block, R32(G_RD(op)), IMM((INT16)G_SIMM(op)), R32(G_RA(op)));			// sub     rd,simm,ra
-			generate_compute_flags(block, FALSE, XER_CA, TRUE);								// <update flags>
+			generate_compute_flags(block, desc, FALSE, XER_CA, TRUE);						// <update flags>
 			return TRUE;
 
 		case 0x0c:	/* ADDIC */
 			UML_ADD(block, R32(G_RD(op)), R32(G_RA(op)), IMM((INT16)G_SIMM(op)));			// add     rd,ra,simm
-			generate_compute_flags(block, FALSE, XER_CA, FALSE);							// <update flags>
+			generate_compute_flags(block, desc, FALSE, XER_CA, FALSE);						// <update flags>
 			return TRUE;
 
 		case 0x0d:	/* ADDIC. */
 			UML_ADD(block, R32(G_RD(op)), R32(G_RA(op)), IMM((INT16)G_SIMM(op)));			// add     rd,ra,simm
-			generate_compute_flags(block, TRUE, XER_CA, FALSE);								// <update flags>
+			generate_compute_flags(block, desc, TRUE, XER_CA, FALSE);						// <update flags>
 			return TRUE;
 
 		case 0x10:	/* BCx */
@@ -2412,21 +2423,21 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			UML_ROLINS(block, R32(G_RA(op)), R32(G_RS(op)), IMM(G_SH(op)), IMM(compute_rlw_mask(G_MB(op), G_ME(op))));
 																							// rolins ra,rs,sh,mask
 			if (op & M_RC)
-				generate_compute_flags(block, TRUE, 0, FALSE);								// <update flags>
+				generate_compute_flags(block, desc, TRUE, 0, FALSE);						// <update flags>
 			return TRUE;
 
 		case 0x15:	/* RLWINMx */
 			UML_ROLAND(block, R32(G_RA(op)), R32(G_RS(op)), IMM(G_SH(op)), IMM(compute_rlw_mask(G_MB(op), G_ME(op))));
 																							// roland ra,rs,sh,mask
 			if (op & M_RC)
-				generate_compute_flags(block, TRUE, 0, FALSE);								// <update flags>
+				generate_compute_flags(block, desc, TRUE, 0, FALSE);						// <update flags>
 			return TRUE;
 
 		case 0x17:	/* RLWNMx */
 			UML_ROLAND(block, R32(G_RA(op)), R32(G_RS(op)), R32(G_RB(op)), IMM(compute_rlw_mask(G_MB(op), G_ME(op))));
 																							// roland ra,rs,rb,mask
 			if (op & M_RC)
-				generate_compute_flags(block, TRUE, 0, FALSE);								// <update flags>
+				generate_compute_flags(block, desc, TRUE, 0, FALSE);						// <update flags>
 			return TRUE;
 
 		case 0x18:	/* ORI */
@@ -2447,12 +2458,12 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case 0x1c:	/* ANDI. */
 			UML_AND(block, R32(G_RA(op)), R32(G_RS(op)), IMM(G_UIMM(op)));					// and     ra,rs,uimm
-			generate_compute_flags(block, TRUE, 0, FALSE);									// <update flags>
+			generate_compute_flags(block, desc, TRUE, 0, FALSE);							// <update flags>
 			return TRUE;
 
 		case 0x1d:	/* ANDIS. */
 			UML_AND(block, R32(G_RA(op)), R32(G_RS(op)), IMM(G_UIMM(op) << 16));			// and  ra,rs,uimm << 16
-			generate_compute_flags(block, TRUE, 0, FALSE);									// <update flags>
+			generate_compute_flags(block, desc, TRUE, 0, FALSE);							// <update flags>
 			return TRUE;
 
 		case 0x1f:	/* 0x1f group */
@@ -2894,46 +2905,52 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 		case 0x10a:	/* ADDx */
 		case 0x30a:	/* ADDOx */
 			UML_ADD(block, R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));					// add     rd,ra,rb
-			generate_compute_flags(block, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);	// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);
+																							// <update flags>
 			return TRUE;
 
 		case 0x00a:	/* ADDCx */
 		case 0x20a:	/* ADDCOx */
 			UML_ADD(block, R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));					// add     rd,ra,rb
-			generate_compute_flags(block, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), FALSE);// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), FALSE);
+																							// <update flags>
 			return TRUE;
 
 		case 0x08a:	/* ADDEx */
 		case 0x28a:	/* ADDEOx */
 			UML_CARRY(block, SPR32(SPR_XER), IMM(29));										// carry   [xer],XER_CA
 			UML_ADDC(block, R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));					// addc    rd,ra,rb
-			generate_compute_flags(block, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), FALSE);// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), FALSE);
+																							// <update flags>
 			return TRUE;
 
 		case 0x0ca:	/* ADDZEx */
 		case 0x2ca:	/* ADDZEOx */
 			UML_CARRY(block, SPR32(SPR_XER), IMM(29));										// carry   [xer],XER_CA
 			UML_ADDC(block, R32(G_RD(op)), R32(G_RA(op)), IMM(0));							// addc    rd,ra,0
-			generate_compute_flags(block, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), FALSE);// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), FALSE);
+																							// <update flags>
 			return TRUE;
 
 		case 0x0ea:	/* ADDMEx */
 		case 0x2ea:	/* ADDMEOx */
 			UML_CARRY(block, SPR32(SPR_XER), IMM(29));										// carry   [xer],XER_CA
 			UML_ADDC(block, R32(G_RD(op)), R32(G_RA(op)), IMM(-1));							// addc    rd,ra,-1
-			generate_compute_flags(block, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), FALSE);// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), FALSE);
+																							// <update flags>
 			return TRUE;
 
 		case 0x028:	/* SUBFx */
 		case 0x228:	/* SUBFOx */
 			UML_SUB(block, R32(G_RD(op)), R32(G_RB(op)), R32(G_RA(op)));					// sub     rd,rb,ra
-			generate_compute_flags(block, op & M_RC, (op & M_OE) ? XER_OV : 0, TRUE);		// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, (op & M_OE) ? XER_OV : 0, TRUE);	// <update flags>
 			return TRUE;
 
 		case 0x008:	/* SUBFCx */
 		case 0x208:	/* SUBFCOx */
 			UML_SUB(block, R32(G_RD(op)), R32(G_RB(op)), R32(G_RA(op)));					// sub     rd,rb,ra
-			generate_compute_flags(block, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), TRUE);// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), TRUE);
+																							// <update flags>
 			return TRUE;
 
 		case 0x088:	/* SUBFEx */
@@ -2941,7 +2958,8 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 			UML_XOR(block, IREG(0), SPR32(SPR_XER), IMM(XER_CA));							// xor     i0,[xer],XER_CA
 			UML_CARRY(block, IREG(0), IMM(29));												// carry   i0,XER_CA
 			UML_SUBB(block, R32(G_RD(op)), R32(G_RB(op)), R32(G_RA(op)));					// subc    rd,rb,ra
-			generate_compute_flags(block, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), TRUE);// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), TRUE);
+																							// <update flags>
 			return TRUE;
 
 		case 0x0c8:	/* SUBFZEx */
@@ -2949,7 +2967,8 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 			UML_XOR(block, IREG(0), SPR32(SPR_XER), IMM(XER_CA));							// xor     i0,[xer],XER_CA
 			UML_CARRY(block, IREG(0), IMM(29));												// carry   i0,XER_CA
 			UML_SUBB(block, R32(G_RD(op)), IMM(0), R32(G_RA(op)));							// subc    rd,0,ra
-			generate_compute_flags(block, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), TRUE);// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), TRUE);
+																							// <update flags>
 			return TRUE;
 
 		case 0x0e8:	/* SUBFMEx */
@@ -2957,13 +2976,14 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 			UML_XOR(block, IREG(0), SPR32(SPR_XER), IMM(XER_CA));							// xor     i0,[xer],XER_CA
 			UML_CARRY(block, IREG(0), IMM(29));												// carry   i0,XER_CA
 			UML_SUBB(block, R32(G_RD(op)), IMM(-1), R32(G_RA(op)));							// subc    rd,-1,ra
-			generate_compute_flags(block, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), TRUE);// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, XER_CA | ((op & M_OE) ? XER_OV : 0), TRUE);
+																							// <update flags>
 			return TRUE;
 
 		case 0x068:	/* NEGx */
 		case 0x268:	/* NEGOx */
 			UML_SUB(block, R32(G_RD(op)), IMM(0), R32(G_RA(op)));							// sub     rd,0,ra
-			generate_compute_flags(block, op & M_RC, (op & M_OE) ? XER_OV : 0, TRUE);		// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, (op & M_OE) ? XER_OV : 0, TRUE);	// <update flags>
 			return TRUE;
 
 		case 0x000:	/* CMP */
@@ -2985,7 +3005,7 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 			if (op & M_RC)
 			{
 				UML_TEST(block, R32(G_RD(op)), IMM(~0));									// test    rd,~0
-				generate_compute_flags(block, op & M_RC, 0, FALSE);							// <update flags>
+				generate_compute_flags(block, desc, op & M_RC, 0, FALSE);					// <update flags>
 			}
 			return TRUE;
 
@@ -2994,76 +3014,76 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 			if (op & M_RC)
 			{
 				UML_TEST(block, R32(G_RD(op)), IMM(~0));									// test    rd,~0
-				generate_compute_flags(block, op & M_RC, 0, FALSE);							// <update flags>
+				generate_compute_flags(block, desc, op & M_RC, 0, FALSE);					// <update flags>
 			}
 			return TRUE;
 
 		case 0x0eb:	/* MULLWx */
 		case 0x2eb:	/* MULLWOx */
 			UML_MULS(block, R32(G_RD(op)), R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));	// muls    rd,rd,ra,rb
-			generate_compute_flags(block, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);	// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);// <update flags>
 			return TRUE;
 
 		case 0x1cb:	/* DIVWUx */
 		case 0x3cb:	/* DIVWUOx */
 			UML_DIVU(block, R32(G_RD(op)), R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));	// divu    rd,rd,ra,rb
-			generate_compute_flags(block, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);	// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);// <update flags>
 			return TRUE;
 
 		case 0x1eb:	/* DIVWx */
 		case 0x3eb:	/* DIVWOx */
 			UML_DIVS(block, R32(G_RD(op)), R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));	// divs    rd,rd,ra,rb
-			generate_compute_flags(block, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);	// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);// <update flags>
 			return TRUE;
 
 		case 0x01c:	/* ANDx */
 			UML_AND(block, R32(G_RA(op)), R32(G_RS(op)), R32(G_RB(op)));					// and     ra,rs,rb
-			generate_compute_flags(block, op & M_RC, 0, FALSE);								// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);						// <update flags>
 			return TRUE;
 
 		case 0x03c:	/* ANDCx */
 			UML_XOR(block, IREG(0), R32(G_RB(op)), IMM(~0));								// xor     i0,rb,~0
 			UML_AND(block, R32(G_RA(op)), R32(G_RS(op)), IREG(0));							// and     ra,rs,i0
-			generate_compute_flags(block, op & M_RC, 0, FALSE);								// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);						// <update flags>
 			return TRUE;
 
 		case 0x1dc:	/* NANDx */
 			UML_AND(block, IREG(0), R32(G_RS(op)), R32(G_RB(op)));							// and     i0,rs,rb
 			UML_XOR(block, R32(G_RA(op)), IREG(0), IMM(~0));								// xor     ra,i0,~0
-			generate_compute_flags(block, op & M_RC, 0, FALSE);								// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);						// <update flags>
 			return TRUE;
 
 		case 0x1bc:	/* ORx */
 			UML_OR(block, R32(G_RA(op)), R32(G_RS(op)), R32(G_RB(op)));						// or      ra,rs,rb
-			generate_compute_flags(block, op & M_RC, 0, FALSE);								// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);						// <update flags>
 			return TRUE;
 
 		case 0x19c:	/* ORCx */
 			UML_XOR(block, IREG(0), R32(G_RB(op)), IMM(~0));								// xor     i0,rb,~0
 			UML_OR(block, R32(G_RA(op)), R32(G_RS(op)), IREG(0));							// or      ra,rs,i0
-			generate_compute_flags(block, op & M_RC, 0, FALSE);								// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);						// <update flags>
 			return TRUE;
 
 		case 0x07c:	/* NORx */
 			UML_OR(block, IREG(0), R32(G_RS(op)), R32(G_RB(op)));							// or      i0,rs,rb
 			UML_XOR(block, R32(G_RA(op)), IREG(0), IMM(~0));								// xor     ra,i0,~0
-			generate_compute_flags(block, op & M_RC, 0, FALSE);								// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);						// <update flags>
 			return TRUE;
 
 		case 0x13c:	/* XORx */
 			UML_XOR(block, R32(G_RA(op)), R32(G_RS(op)), R32(G_RB(op)));					// xor     ra,rs,rb
-			generate_compute_flags(block, op & M_RC, 0, FALSE);								// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);						// <update flags>
 			return TRUE;
 
 		case 0x11c:	/* EQVx */
 			UML_XOR(block, IREG(0), R32(G_RS(op)), R32(G_RB(op)));							// xor     i0,rs,rb
 			UML_XOR(block, R32(G_RA(op)), IREG(0), IMM(~0));								// xor     ra,i0,~0
-			generate_compute_flags(block, op & M_RC, 0, FALSE);								// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);						// <update flags>
 			return TRUE;
 
 		case 0x018:	/* SLWx */
 			UML_SHL(block, R32(G_RA(op)), R32(G_RS(op)), R32(G_RB(op)));					// shl     ra,rs,rb
-			generate_compute_flags(block, op & M_RC, 0, FALSE);								// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);						// <update flags>
 			return TRUE;
 
 		case 0x218:	/* SRWx */
@@ -3071,50 +3091,56 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 			UML_TEST(block, R32(G_RB(op)), IMM(0x20));										// test    rb,0x20
 			UML_MOVc(block, IF_NZ, IREG(0), IMM(0));										// mov     i0,0,nz
 			UML_SHR(block, R32(G_RA(op)), IREG(0), R32(G_RB(op)));							// shr     ra,i0,rb
-			generate_compute_flags(block, op & M_RC, 0, FALSE);								// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);						// <update flags>
 			return TRUE;
 
 		case 0x318:	/* SRAWx */
 			UML_MOV(block, IREG(2), R32(G_RB(op)));											// mov     i2,rb
 			UML_TEST(block, IREG(2), IMM(0x20));											// test    i2,0x20
 			UML_MOVc(block, IF_NZ, IREG(2), IMM(31));										// mov     i2,31,nz
-			UML_SHL(block, IREG(1), IMM(0xffffffff), IREG(2));								// shl     i1,0xffffffff,i2
-			UML_XOR(block, IREG(1), IREG(1), IMM(~0));										// xor     i1,i1,~0
-			UML_AND(block, IREG(0), R32(G_RS(op)), IREG(1));								// and     i0,rs,i1
-			UML_SAR(block, IREG(1), R32(G_RS(op)), IMM(31));								// sar     i1,rs,31
-			UML_TEST(block, IREG(0), IREG(1));												// test    i0,i1
-			UML_SETc(block, IF_NZ, IREG(0));												// set     i0,nz
-			UML_ROLINS(block, SPR32(SPR_XER), IREG(0), IMM(29), IMM(XER_CA));				// rolins  [xer],i0,29,XER_CA
+			if (DISABLE_FLAG_OPTIMIZATIONS || (desc->regreq[3] & REGFLAG_XER_CA))
+			{
+				UML_SHL(block, IREG(1), IMM(0xffffffff), IREG(2));							// shl     i1,0xffffffff,i2
+				UML_XOR(block, IREG(1), IREG(1), IMM(~0));									// xor     i1,i1,~0
+				UML_AND(block, IREG(0), R32(G_RS(op)), IREG(1));							// and     i0,rs,i1
+				UML_SAR(block, IREG(1), R32(G_RS(op)), IMM(31));							// sar     i1,rs,31
+				UML_TEST(block, IREG(0), IREG(1));											// test    i0,i1
+				UML_SETc(block, IF_NZ, IREG(0));											// set     i0,nz
+				UML_ROLINS(block, SPR32(SPR_XER), IREG(0), IMM(29), IMM(XER_CA));			// rolins  [xer],i0,29,XER_CA
+			}
 			UML_SAR(block, R32(G_RA(op)), R32(G_RS(op)), IREG(2));							// sar     ra,rs,i2
-			generate_compute_flags(block, op & M_RC, 0, FALSE);								// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);						// <update flags>
 			return TRUE;
 
 		case 0x338:	/* SRAWIx */
-			UML_AND(block, IREG(0), R32(G_RS(op)), IMM(~(0xffffffff << (G_SH(op) & 31))));	// and     i0,rs,~(0xffffffff << (sh & 31))
-			UML_SAR(block, IREG(1), R32(G_RS(op)), IMM(31));								// sar     i1,rs,31
-			UML_TEST(block, IREG(0), IREG(1));												// test    i0,i1
-			UML_SETc(block, IF_NZ, IREG(0));												// set     i0,nz
-			UML_ROLINS(block, SPR32(SPR_XER), IREG(0), IMM(29), IMM(XER_CA));				// rolins  [xer],i0,29,XER_CA
+			if (DISABLE_FLAG_OPTIMIZATIONS || (desc->regreq[3] & REGFLAG_XER_CA))
+			{
+				UML_AND(block, IREG(0), R32(G_RS(op)), IMM(~(0xffffffff << (G_SH(op) & 31))));// and   i0,rs,~(0xffffffff << (sh & 31))
+				UML_SAR(block, IREG(1), R32(G_RS(op)), IMM(31));							// sar     i1,rs,31
+				UML_TEST(block, IREG(0), IREG(1));											// test    i0,i1
+				UML_SETc(block, IF_NZ, IREG(0));											// set     i0,nz
+				UML_ROLINS(block, SPR32(SPR_XER), IREG(0), IMM(29), IMM(XER_CA));			// rolins  [xer],i0,29,XER_CA
+			}
 			UML_SAR(block, R32(G_RA(op)), R32(G_RS(op)), IMM(G_SH(op)));					// sar     ra,rs,sh
-			generate_compute_flags(block, op & M_RC, 0, FALSE);								// <update flags>
+			generate_compute_flags(block, desc, op & M_RC, 0, FALSE);						// <update flags>
 			return TRUE;
 
 		case 0x01a:	/* CNTLZWx */
 			UML_LZCNT(block, R32(G_RA(op)), R32(G_RS(op)));									// lzcnt   ra,rs
 			if (op & M_RC)
-				generate_compute_flags(block, op & M_RC, 0, FALSE);							// <update flags>
+				generate_compute_flags(block, desc, op & M_RC, 0, FALSE);					// <update flags>
 			return TRUE;
 
 		case 0x3ba:	/* EXTSBx */
 			UML_SEXT(block, R32(G_RA(op)), R32(G_RS(op)), BYTE);							// sext    ra,rs,byte
 			if (op & M_RC)
-				generate_compute_flags(block, op & M_RC, 0, FALSE);							// <update flags>
+				generate_compute_flags(block, desc, op & M_RC, 0, FALSE);					// <update flags>
 			return TRUE;
 
 		case 0x39a:	/* EXTSHx */
 			UML_SEXT(block, R32(G_RA(op)), R32(G_RS(op)), WORD);							// sext    ra,rs,word
 			if (op & M_RC)
-				generate_compute_flags(block, op & M_RC, 0, FALSE);							// <update flags>
+				generate_compute_flags(block, desc, op & M_RC, 0, FALSE);					// <update flags>
 			return TRUE;
 
 		case 0x057:	/* LBZX */
@@ -3399,7 +3425,7 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 			UML_CALLH(block, ppc->impstate->write32align[ppc->impstate->mode & 3]);			// callh   write32align
 			generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);				// <update cycles>
 			UML_CMP(block, IREG(0), IREG(0));												// cmp     i0,i0
-			generate_compute_flags(block, TRUE, 0, FALSE);									// <update flags>
+			generate_compute_flags(block, desc, TRUE, 0, FALSE);							// <update flags>
 			return TRUE;
 
 		case 0x2d5:	/* STSWI */
@@ -3968,35 +3994,101 @@ static const char *log_desc_flags_to_string(UINT32 flags)
     log_register_list - log a list of GPR registers
 -------------------------------------------------*/
 
-static void log_register_list(drcuml_state *drcuml, const char *string, UINT64 gprmask, UINT64 fprmask)
+static void log_register_list(drcuml_state *drcuml, const char *string, const UINT32 *reglist, const UINT32 *regnostarlist)
 {
+	static const char *crtext[4] = { "lt", "gt", "eq", "so" };
 	int count = 0;
 	int regnum;
+	int crnum;
 
 	/* skip if nothing */
-	if ((gprmask & ~1) == 0 && fprmask == 0)
+	if (reglist[0] == 0 && reglist[1] == 0 && reglist[2] == 0 && reglist[3] == 0)
 		return;
 
 	drcuml_log_printf(drcuml, "[%s:", string);
 
 	for (regnum = 0; regnum < 32; regnum++)
-		if (gprmask & ((UINT64)1 << regnum))
+		if (reglist[0] & REGFLAG_R(regnum))
+		{
 			drcuml_log_printf(drcuml, "%sr%d", (count++ == 0) ? "" : ",", regnum);
-	for (regnum = 0; regnum < 8; regnum++)
-		if (gprmask & ((UINT64)1 << (32 + regnum)))
-			drcuml_log_printf(drcuml, "%scr%d", (count++ == 0) ? "" : ",", regnum);
-	if (gprmask & ((UINT64)1 << 40))
-		drcuml_log_printf(drcuml, "%sxer", (count++ == 0) ? "" : ",");
-	if (gprmask & ((UINT64)1 << 41))
-		drcuml_log_printf(drcuml, "%sctr", (count++ == 0) ? "" : ",");
-	if (gprmask & ((UINT64)1 << 42))
-		drcuml_log_printf(drcuml, "%slr", (count++ == 0) ? "" : ",");
+			if (regnostarlist != NULL && !(regnostarlist[0] & REGFLAG_R(regnum)))
+				drcuml_log_printf(drcuml, "*");
+		}
 
 	for (regnum = 0; regnum < 32; regnum++)
-		if (fprmask & ((UINT64)1 << regnum))
-			drcuml_log_printf(drcuml, "%sfpr%d", (count++ == 0) ? "" : ",", regnum);
-	if (fprmask & ((UINT64)1 << 32))
-		drcuml_log_printf(drcuml, "%sfpscr", (count++ == 0) ? "" : ",");
+		if (reglist[1] & REGFLAG_FR(regnum))
+		{
+			drcuml_log_printf(drcuml, "%sfr%d", (count++ == 0) ? "" : ",", regnum);
+			if (regnostarlist != NULL && !(regnostarlist[1] & REGFLAG_FR(regnum)))
+				drcuml_log_printf(drcuml, "*");
+		}
+
+	for (regnum = 0; regnum < 8; regnum++)
+		if (reglist[2] & REGFLAG_CR(regnum))
+		{
+			if ((reglist[2] & REGFLAG_CR(regnum)) == REGFLAG_CR(regnum) && (regnostarlist == NULL || (regnostarlist[2] & REGFLAG_CR(regnum)) == REGFLAG_CR(regnum)))
+			{
+				drcuml_log_printf(drcuml, "%scr%d", (count++ == 0) ? "" : ",", regnum);
+				if (regnostarlist != NULL && !(regnostarlist[2] & REGFLAG_CR(regnum)))
+					drcuml_log_printf(drcuml, "*");
+			}
+			else
+			{
+				for (crnum = 0; crnum < 4; crnum++)
+					if (reglist[2] & REGFLAG_CR_BIT(regnum * 4 + crnum))
+					{
+						drcuml_log_printf(drcuml, "%scr%d[%s]", (count++ == 0) ? "" : ",", regnum, crtext[crnum]);
+						if (regnostarlist != NULL && !(regnostarlist[2] & REGFLAG_CR_BIT(regnum * 4 + crnum)))
+							drcuml_log_printf(drcuml, "*");
+					}
+			}
+		}
+
+	if (reglist[3] & REGFLAG_XER_CA)
+	{
+		drcuml_log_printf(drcuml, "%sxer_ca", (count++ == 0) ? "" : ",");
+		if (regnostarlist != NULL && !(regnostarlist[3] & REGFLAG_XER_CA))
+			drcuml_log_printf(drcuml, "*");
+	}
+	if (reglist[3] & REGFLAG_XER_OV)
+	{
+		drcuml_log_printf(drcuml, "%sxer_ov", (count++ == 0) ? "" : ",");
+		if (regnostarlist != NULL && !(regnostarlist[3] & REGFLAG_XER_OV))
+			drcuml_log_printf(drcuml, "*");
+	}
+	if (reglist[3] & REGFLAG_XER_SO)
+	{
+		drcuml_log_printf(drcuml, "%sxer_so", (count++ == 0) ? "" : ",");
+		if (regnostarlist != NULL && !(regnostarlist[3] & REGFLAG_XER_SO))
+			drcuml_log_printf(drcuml, "*");
+	}
+	if (reglist[3] & REGFLAG_XER_COUNT)
+	{
+		drcuml_log_printf(drcuml, "%sxer_count", (count++ == 0) ? "" : ",");
+		if (regnostarlist != NULL && !(regnostarlist[3] & REGFLAG_XER_COUNT))
+			drcuml_log_printf(drcuml, "*");
+	}
+	if (reglist[3] & REGFLAG_CTR)
+	{
+		drcuml_log_printf(drcuml, "%sctr", (count++ == 0) ? "" : ",");
+		if (regnostarlist != NULL && !(regnostarlist[3] & REGFLAG_CTR))
+			drcuml_log_printf(drcuml, "*");
+	}
+	if (reglist[3] & REGFLAG_LR)
+	{
+		drcuml_log_printf(drcuml, "%slr", (count++ == 0) ? "" : ",");
+		if (regnostarlist != NULL && !(regnostarlist[3] & REGFLAG_LR))
+			drcuml_log_printf(drcuml, "*");
+	}
+
+	for (regnum = 0; regnum < 8; regnum++)
+		if (reglist[3] & REGFLAG_FPSCR(regnum))
+		{
+			drcuml_log_printf(drcuml, "%sfpscr%d", (count++ == 0) ? "" : ",", regnum);
+			if (regnostarlist != NULL && !(regnostarlist[3] & REGFLAG_FPSCR(regnum)))
+				drcuml_log_printf(drcuml, "*");
+		}
+
 	drcuml_log_printf(drcuml, "] ");
 }
 
@@ -4028,10 +4120,8 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 		drcuml_log_printf(drcuml, "%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), buffer);
 
 		/* output register states */
-		log_register_list(drcuml, "use", desclist->gpr.used, desclist->fpr.used);
-		log_register_list(drcuml, "mod", desclist->gpr.modified, desclist->fpr.modified);
-		log_register_list(drcuml, "lrd", desclist->gpr.liveread, desclist->fpr.liveread);
-		log_register_list(drcuml, "lwr", desclist->gpr.livewrite, desclist->fpr.livewrite);
+		log_register_list(drcuml, "use", desclist->regin, NULL);
+		log_register_list(drcuml, "mod", desclist->regout, desclist->regreq);
 		drcuml_log_printf(drcuml, "\n");
 
 		/* if we have a delay slot, output it recursively */

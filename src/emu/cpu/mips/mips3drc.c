@@ -249,7 +249,7 @@ static int generate_cop1x(drcuml_block *block, compiler_state *compiler, const o
 
 static void log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op);
 static const char *log_desc_flags_to_string(UINT32 flags);
-static void log_register_list(drcuml_state *drcuml, const char *string, UINT64 gprmask, UINT64 fprmask);
+static void log_register_list(drcuml_state *drcuml, const char *string, const UINT32 *reglist, const UINT32 *regnostarlist);
 static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent);
 
 
@@ -3424,30 +3424,52 @@ static const char *log_desc_flags_to_string(UINT32 flags)
     log_register_list - log a list of GPR registers
 -------------------------------------------------*/
 
-static void log_register_list(drcuml_state *drcuml, const char *string, UINT64 gprmask, UINT64 fprmask)
+static void log_register_list(drcuml_state *drcuml, const char *string, const UINT32 *reglist, const UINT32 *regnostarlist)
 {
 	int count = 0;
 	int regnum;
 
 	/* skip if nothing */
-	if ((gprmask & ~1) == 0 && fprmask == 0)
+	if (reglist[0] == 0 && reglist[1] == 0 && reglist[2] == 0)
 		return;
 
 	drcuml_log_printf(drcuml, "[%s:", string);
 
 	for (regnum = 1; regnum < 32; regnum++)
-		if (gprmask & ((UINT64)1 << regnum))
+		if (reglist[0] & REGFLAG_R(regnum))
+		{
 			drcuml_log_printf(drcuml, "%sr%d", (count++ == 0) ? "" : ",", regnum);
-	if (gprmask & ((UINT64)1 << REG_LO))
-		drcuml_log_printf(drcuml, "%slo", (count++ == 0) ? "" : ",");
-	if (gprmask & ((UINT64)1 << REG_HI))
-		drcuml_log_printf(drcuml, "%shi", (count++ == 0) ? "" : ",");
+			if (regnostarlist != NULL && !(regnostarlist[0] & REGFLAG_R(regnum)))
+				drcuml_log_printf(drcuml, "*");
+		}
 
 	for (regnum = 0; regnum < 32; regnum++)
-		if (fprmask & ((UINT64)1 << regnum))
-			drcuml_log_printf(drcuml, "%sfpr%d", (count++ == 0) ? "" : ",", regnum);
-	if (fprmask & REGFLAG_FCC)
+		if (reglist[1] & REGFLAG_CPR1(regnum))
+		{
+			drcuml_log_printf(drcuml, "%sfr%d", (count++ == 0) ? "" : ",", regnum);
+			if (regnostarlist != NULL && !(regnostarlist[1] & REGFLAG_CPR1(regnum)))
+				drcuml_log_printf(drcuml, "*");
+		}
+
+	if (reglist[2] & REGFLAG_LO)
+	{
+		drcuml_log_printf(drcuml, "%slo", (count++ == 0) ? "" : ",");
+		if (regnostarlist != NULL && !(regnostarlist[2] & REGFLAG_LO))
+			drcuml_log_printf(drcuml, "*");
+	}
+	if (reglist[2] & REGFLAG_HI)
+	{
+		drcuml_log_printf(drcuml, "%shi", (count++ == 0) ? "" : ",");
+		if (regnostarlist != NULL && !(regnostarlist[2] & REGFLAG_HI))
+			drcuml_log_printf(drcuml, "*");
+	}
+	if (reglist[2] & REGFLAG_FCC)
+	{
 		drcuml_log_printf(drcuml, "%sfcc", (count++ == 0) ? "" : ",");
+		if (regnostarlist != NULL && !(regnostarlist[2] & REGFLAG_FCC))
+			drcuml_log_printf(drcuml, "*");
+	}
+
 	drcuml_log_printf(drcuml, "] ");
 }
 
@@ -3479,10 +3501,8 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 		drcuml_log_printf(drcuml, "%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), buffer);
 
 		/* output register states */
-		log_register_list(drcuml, "use", desclist->gpr.used, desclist->fpr.used);
-		log_register_list(drcuml, "mod", desclist->gpr.modified, desclist->fpr.modified);
-		log_register_list(drcuml, "lrd", desclist->gpr.liveread, desclist->fpr.liveread);
-		log_register_list(drcuml, "lwr", desclist->gpr.livewrite, desclist->fpr.livewrite);
+		log_register_list(drcuml, "use", desclist->regin, NULL);
+		log_register_list(drcuml, "mod", desclist->regout, desclist->regreq);
 		drcuml_log_printf(drcuml, "\n");
 
 		/* if we have a delay slot, output it recursively */

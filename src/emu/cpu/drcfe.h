@@ -75,8 +75,8 @@
 #define OPFLAG_CAN_CHANGE_MODES			0x00080000		/* instruction can change modes */
 
 /* execution semantics */
-#define OPFLAG_READS_MEMORY				0x00080000		/* instruction reads memory */
-#define OPFLAG_WRITES_MEMORY			0x00100000		/* instruction writes memory */
+#define OPFLAG_READS_MEMORY				0x00100000		/* instruction reads memory */
+#define OPFLAG_WRITES_MEMORY			0x00200000		/* instruction writes memory */
 
 
 
@@ -88,24 +88,13 @@
 typedef struct _drcfe_state drcfe_state;
 
 
-/* register information as bitmasks */
-typedef struct _drc_reginfo drc_reginfo;
-struct _drc_reginfo
-{
-	UINT64			used;					/* bitmask of used registers */
-	UINT64			modified;				/* bitmask of modified registers */
-	UINT64			constant;				/* bitmask of constant registers */
-	UINT64			liveread;				/* bitmask of registers that are live for reading */
-	UINT64			livewrite;				/* bitmask of registers that are live for writing */
-};
-
-
 /* description of a given opcode */
 typedef struct _opcode_desc opcode_desc;
 struct _opcode_desc
 {
 	/* links to other descriptions */
 	opcode_desc *	next;					/* pointer to next description */
+	opcode_desc *	prev;					/* pointer to previous description */
 	opcode_desc *	branch;					/* pointer back to branch description for delay slots */
 	opcode_desc *	delay;					/* pointer to delay slot description */
 
@@ -132,8 +121,9 @@ struct _opcode_desc
 	UINT32			cycles;					/* number of cycles needed to execute */
 
 	/* register usage information */
-	drc_reginfo		gpr;					/* register info for GPRs */
-	drc_reginfo		fpr;					/* register info for FPRs */
+	UINT32			regin[4];				/* input registers */
+	UINT32			regout[4];				/* output registers */
+	UINT32			regreq[4];				/* required output registers */
 };
 
 
