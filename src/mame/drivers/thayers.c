@@ -12,7 +12,8 @@
 #include "render.h"
 #include "machine/laserdsc.h"
 #include "cpu/cop400/cop400.h"
-#include "dlair.lh"
+//#include "dlair.lh"
+extern const char layout_dlair[];
 
 static laserdisc_info *discinfo;
 static UINT8 laserdisc_type;

@@ -1602,7 +1602,7 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 				if (!ismasked)
 					UML_WRITE(block, IREG(0), IREG(1), PROGRAM_WORD);						// write   i0,i1,program_word
 				else
-					UML_WRITEM(block, IREG(0), IREG(2), IREG(1), PROGRAM_WORD);				// writem  i0,i2,i1,program_word
+					UML_WRITEM(block, IREG(0), IREG(1), IREG(2), PROGRAM_WORD);				// writem  i0,i2,i1,program_word
 			}
 			else
 			{
@@ -1619,7 +1619,7 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 				if (!ismasked)
 					UML_WRITE(block, IREG(0), IREG(1), PROGRAM_DWORD);						// write   i0,i1,program_dword
 				else
-					UML_WRITEM(block, IREG(0), IREG(2), IREG(1), PROGRAM_DWORD);			// writem  i0,i2,i1,program_dword
+					UML_WRITEM(block, IREG(0), IREG(1), IREG(2), PROGRAM_DWORD);			// writem  i0,i2,i1,program_dword
 			}
 			else
 			{
@@ -1636,7 +1636,7 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 				if (!ismasked)
 					UML_DWRITE(block, IREG(0), IREG(1), PROGRAM_QWORD);						// dwrite  i0,i1,program_qword
 				else
-					UML_DWRITEM(block, IREG(0), IREG(2), IREG(1), PROGRAM_QWORD);			// dwritem i0,i2,i1,program_qword
+					UML_DWRITEM(block, IREG(0), IREG(1), IREG(2), PROGRAM_QWORD);			// dwritem i0,i2,i1,program_qword
 			}
 			else
 			{

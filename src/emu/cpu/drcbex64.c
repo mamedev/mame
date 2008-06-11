@@ -2979,16 +2979,22 @@ static void debug_log_hashjmp(int mode, offs_t pc)
 
 static x86code *op_handle(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
+	emit_link skip;
+
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 	assert(inst->numparams == 1);
 	assert(inst->param[0].type == DRCUML_PTYPE_MEMORY);
+	
+	/* emit a jump around the stack adjust in case code falls through here */
+	emit_jmp_short_link(&dst, &skip);													// jmp   skip
 
 	/* register the current pointer for the handle */
 	drcuml_handle_set_codeptr((drcuml_codehandle *)(FPTR)inst->param[0].value, dst);
 
 	/* by default, the handle points to prolog code that moves the stack pointer */
 	emit_lea_r64_m64(&dst, REG_RSP, MBD(REG_RSP, -40));									// lea   rsp,[rsp-40]
+	resolve_link(&dst, &skip);														// skip:
 	return dst;
 }
 

@@ -65,13 +65,19 @@
         [esp+4]    - input parameter (entry handle)
 
     Runtime stack:
-        [esp]      - temporary space for hash jump
-        [esp+4]    - saved ebp
-        [esp+8]    - saved edi
-        [esp+12]   - saved esi
-        [esp+16]   - saved ebx
-        [esp+20]   - ret
-        [esp+24]   - input parameter (entry handle)
+        [esp]      - param 0
+        [esp+4]    - param 1
+        [esp+8]    - param 2
+        [esp+12]   - param 3
+        [esp+16]   - param 4
+        [esp+20]   - alignment
+        [esp+24]   - alignment
+        [esp+28]   - saved ebp
+        [esp+32]   - saved edi
+        [esp+36]   - saved esi
+        [esp+40]   - saved ebx
+        [esp+44]   - ret
+        [esp+48]   - input parameter (entry handle)
 
 ***************************************************************************/
 
@@ -637,6 +643,7 @@ static void drcbex86_reset(drcbe_state *drcbe)
 	emit_push_r32(dst, REG_ESI);														// push  esi
 	emit_push_r32(dst, REG_EDI);														// push  edi
 	emit_push_r32(dst, REG_EBP);														// push  ebp
+	emit_sub_r32_imm(dst, REG_ESP, 24);													// sub   esp,24
 	emit_mov_m32_r32(dst, MABS(&drcbe->hashstacksave), REG_ESP);						// mov   [hashstacksave],esp
 	emit_sub_r32_imm(dst, REG_ESP, 4);													// sub   esp,4
 	emit_mov_m32_r32(dst, MABS(&drcbe->stacksave), REG_ESP);							// mov   [stacksave],esp
@@ -649,6 +656,7 @@ static void drcbex86_reset(drcbe_state *drcbe)
 	drcbe->exit = *dst;
 	emit_fldcw_m16(dst, MABS(&drcbe->fpumode));											// fldcw [fpumode]
 	emit_mov_r32_m32(dst, REG_ESP, MABS(&drcbe->hashstacksave));						// mov   esp,[hashstacksave]
+	emit_add_r32_imm(dst, REG_ESP, 24);													// add   esp,24
 	emit_pop_r32(dst, REG_EBP);															// pop   ebp
 	emit_pop_r32(dst, REG_EDI);															// pop   edi
 	emit_pop_r32(dst, REG_ESI);															// pop   esi
@@ -1084,22 +1092,6 @@ static void emit_mov_p32_r32(drcbe_state *drcbe, x86code **dst, const drcuml_par
 		if (reg != param->value)
 			emit_mov_r32_r32(dst, param->value, reg);									// mov   param,reg
 	}
-}
-
-
-/*-------------------------------------------------
-    emit_push_p32 - push a 32-bit parameter onto
-    the stack
--------------------------------------------------*/
-
-static void emit_push_p32(drcbe_state *drcbe, x86code **dst, const drcuml_parameter *src)
-{
-	if (src->type == DRCUML_PTYPE_IMMEDIATE)
-		emit_push_imm(dst, src->value);													// push  src
-	else if (src->type == DRCUML_PTYPE_MEMORY)
-		emit_push_m32(dst, MABS(src->value));											// push  [src]
-	else if (src->type == DRCUML_PTYPE_INT_REGISTER)
-		emit_push_r32(dst, src->value);													// push  src
 }
 
 
@@ -1887,6 +1879,34 @@ static void emit_mov_r64_p64_keepflags(drcbe_state *drcbe, x86code **dst, UINT8 
 
 
 /*-------------------------------------------------
+    emit_mov_m64_p64 - move a 64-bit parameter
+    into a memory location
+-------------------------------------------------*/
+
+static void emit_mov_m64_p64(drcbe_state *drcbe, x86code **dst, DECLARE_MEMPARAMS, const drcuml_parameter *param)
+{
+	if (param->type == DRCUML_PTYPE_IMMEDIATE)
+	{
+		emit_mov_m32_imm(dst, MEMPARAMS + 0, param->value);								// mov   [mem],param
+		emit_mov_m32_imm(dst, MEMPARAMS + 4, param->value >> 32);						// mov   [mem],param >> 32
+	}
+	else if (param->type == DRCUML_PTYPE_MEMORY)
+	{
+		emit_mov_r32_m32(dst, REG_EAX, MABS(param->value));								// mov   eax,[param]
+		emit_mov_m32_r32(dst, MEMPARAMS + 0, REG_EAX);									// mov   [mem],eax
+		emit_mov_r32_m32(dst, REG_EAX, MABS(param->value + 4));							// mov   eax,[param+4]
+		emit_mov_m32_r32(dst, MEMPARAMS + 4, REG_EAX);									// mov   [mem+4],eax
+	}
+	else if (param->type == DRCUML_PTYPE_INT_REGISTER)
+	{
+		emit_mov_m32_r32(dst, MEMPARAMS + 0, param->value);								// mov   [mem],param
+		emit_mov_r32_m32(dst, REG_EAX, MABS(drcbe->reghi[param->value]));				// mov   eax,[param.hi]
+		emit_mov_m32_r32(dst, MEMPARAMS + 4, REG_EAX);									// mov   [mem+4],eax
+	}
+}
+
+
+/*-------------------------------------------------
     emit_mov_p64_r64 - move a pair of registers
     into a 64-bit parameter
 -------------------------------------------------*/
@@ -1904,31 +1924,6 @@ static void emit_mov_p64_r64(drcbe_state *drcbe, x86code **dst, const drcuml_par
 		if (reglo != param->value)
 			emit_mov_r32_r32(dst, param->value, reglo);									// mov   param,reglo
 		emit_mov_m32_r32(dst, MABS(drcbe->reghi[param->value]), reghi);					// mov   reghi[param],reghi
-	}
-}
-
-
-/*-------------------------------------------------
-    emit_push_p64 - push a 64-bit parameter onto
-    the stack
--------------------------------------------------*/
-
-static void emit_push_p64(drcbe_state *drcbe, x86code **dst, const drcuml_parameter *src)
-{
-	if (src->type == DRCUML_PTYPE_IMMEDIATE)
-	{
-		emit_push_imm(dst, src->value >> 32);											// push  src >> 32
-		emit_push_imm(dst, src->value);													// push  src
-	}
-	else if (src->type == DRCUML_PTYPE_MEMORY)
-	{
-		emit_push_m32(dst, MABS(src->value + 4));										// push  [src+4]
-		emit_push_m32(dst, MABS(src->value));											// push  [src]
-	}
-	else if (src->type == DRCUML_PTYPE_INT_REGISTER)
-	{
-		emit_push_m32(dst, MABS(drcbe->reghi[src->value]));								// push  reghi[src]
-		emit_push_r32(dst, src->value);													// push  src
 	}
 }
 
@@ -3040,13 +3035,22 @@ static void debug_log_hashjmp(int mode, offs_t pc)
 
 static x86code *op_handle(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
+	emit_link skip;
+
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 	assert(inst->numparams == 1);
 	assert(inst->param[0].type == DRCUML_PTYPE_MEMORY);
 
+	/* emit a jump around the stack adjust in case code falls through here */
+	emit_jmp_short_link(&dst, &skip);													// jmp   skip
+
 	/* register the current pointer for the handle */
 	drcuml_handle_set_codeptr((drcuml_codehandle *)(FPTR)inst->param[0].value, dst);
+
+	/* by default, the handle points to prolog code that moves the stack pointer */
+	emit_lea_r32_m32(&dst, REG_ESP, MBD(REG_ESP, -28));									// lea   rsp,[rsp-28]
+	resolve_link(&dst, &skip);														// skip:
 	return dst;
 }
 
@@ -3156,9 +3160,8 @@ static x86code *op_debug(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 		param_normalize_1(drcbe, inst, &pcp, PTYPE_MRI);
 
 		/* push the parameter */
-		emit_push_p32(drcbe, &dst, &pcp);												// push  pcp
+		emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 0), &pcp);							// mov   [esp],pcp
 		emit_call(&dst, (x86code *)mame_debug_hook);									// call  mame_debug_hook
-		emit_add_r32_imm(&dst, REG_ESP, 4);												// add   esp,4
 	}
 #endif
 
@@ -3210,10 +3213,9 @@ static x86code *op_hashjmp(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 	param_normalize_3(drcbe, inst, &modep, PTYPE_MRI, &pcp, PTYPE_MRI, &exp, PTYPE_M);
 
 #if LOG_HASHJMPS
-	emit_push_p32(drcbe, &dst, &pcp);
-	emit_push_p32(drcbe, &dst, &modep);
+	emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 4), &pcp);
+	emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 0), &modep);
 	emit_call(&dst, (x86code *)debug_log_hashjmp);
-	emit_add_r32_imm(&dst, REG_ESP, 8);
 #endif
 
 	/* load the stack base one word early so we end up at the right spot after our call below */
@@ -3404,6 +3406,7 @@ static x86code *op_ret(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 		emit_jcc_short_link(&dst, X86_NOT_CONDITION(inst->condition), &skip);			// jcc   skip
 
 	/* return */
+	emit_lea_r32_m32(&dst, REG_ESP, MBD(REG_ESP, 28));									// lea   rsp,[rsp+28]
 	emit_ret(&dst);																		// ret
 
 	/* resolve the conditional link */
@@ -3435,9 +3438,8 @@ static x86code *op_callc(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 		emit_jcc_short_link(&dst, X86_NOT_CONDITION(inst->condition), &skip);			// jcc   skip
 
 	/* perform the call */
-	emit_push_imm(&dst, paramp.value);													// push  paramp
+	emit_mov_m32_imm(&dst, MBD(REG_ESP, 0), paramp.value);								// mov   [esp],paramp
 	emit_call(&dst, (x86code *)(FPTR)funcp.value);										// call  funcp
-	emit_add_r32_imm(&dst, REG_ESP, 4);													// add   esp,4
 
 	/* resolve the conditional link */
 	if (inst->condition != DRCUML_COND_ALWAYS)
@@ -3466,11 +3468,10 @@ static x86code *op_recover(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 	emit_mov_r32_m32(&dst, REG_EAX, MABS(&drcbe->stacksave));							// mov   eax,stacksave
 	emit_mov_r32_m32(&dst, REG_EAX, MBD(REG_EAX, -4));									// mov   eax,[eax-4]
 	emit_sub_r32_imm(&dst, REG_EAX, 1);													// sub   eax,1
-	emit_push_imm(&dst, inst->param[1].value);											// push  param1
-	emit_push_r32(&dst, REG_EAX);														// push  eax
-	emit_push_imm(&dst, (FPTR)drcbe->map);												// push  drcbe->map
+	emit_mov_m32_imm(&dst, MBD(REG_ESP, 8), inst->param[1].value);						// mov   [esp+8],param1
+	emit_mov_m32_r32(&dst, MBD(REG_ESP, 4), REG_EAX);									// mov   [esp+4],eax
+	emit_mov_m32_imm(&dst, MBD(REG_ESP, 0), (FPTR)drcbe->map);							// mov   [esp],drcbe->map
 	emit_call(&dst, (x86code *)drcmap_get_value);										// call  drcmap_get_value
-	emit_add_r32_imm(&dst, REG_ESP, 12);												// add   esp,12
 	emit_mov_p32_r32(drcbe, &dst, &dstp, REG_EAX);										// mov   dstp,eax
 
 	return dst;
@@ -4116,7 +4117,7 @@ static x86code *op_read(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
 
 	/* set up a call to the read byte handler */
-	emit_push_p32(drcbe, &dst, &addrp);													// push   addrp
+	emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 0), &addrp);								// mov    [esp],addrp
 	if ((spacesizep.value & 3) == DRCUML_SIZE_BYTE)
 	{
 		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->read_byte);
@@ -4141,7 +4142,6 @@ static x86code *op_read(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 																						// call   read_qword
 		emit_mov_r32_r32(&dst, dstreg, REG_EAX);										// mov    dstreg,eax
 	}
-	emit_add_r32_imm(&dst, REG_ESP, 4);													// add    esp,4
 
 	/* store low 32 bits */
 	emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);										// mov    dstp,dstreg
@@ -4193,10 +4193,10 @@ static x86code *op_readm(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 
 	/* set up a call to the read byte handler */
 	if ((spacesizep.value & 3) != DRCUML_SIZE_QWORD)
-		emit_push_p32(drcbe, &dst, &maskp);												// push   maskp
+		emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 4), &maskp);							// mov    [esp+4],maskp
 	else
-		emit_push_p64(drcbe, &dst, &maskp);												// push   maskp
-	emit_push_p32(drcbe, &dst, &addrp);													// push   addrp
+		emit_mov_m64_p64(drcbe, &dst, MBD(REG_ESP, 4), &maskp);							// mov    [esp+4],maskp
+	emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 0), &addrp);								// mov    [esp],addrp
 	if ((spacesizep.value & 3) == DRCUML_SIZE_WORD)
 	{
 		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->read_word_masked);
@@ -4215,8 +4215,7 @@ static x86code *op_readm(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 																						// call   read_qword_masked
 		emit_mov_r32_r32(&dst, dstreg, REG_EAX);										// mov    dstreg,eax
 	}
-	emit_add_r32_imm(&dst, REG_ESP, ((spacesizep.value & 3) != DRCUML_SIZE_QWORD) ? 8 : 12);
-																						// add    esp,8/12
+
 	/* store low 32 bits */
 	emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);										// mov    dstp,dstreg
 
@@ -4263,10 +4262,10 @@ static x86code *op_write(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 
 	/* set up a call to the write byte handler */
 	if ((spacesizep.value & 3) != DRCUML_SIZE_QWORD)
-		emit_push_p32(drcbe, &dst, &srcp);												// push   srcp
+		emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 4), &srcp);							// mov    [esp+4],srcp
 	else
-		emit_push_p64(drcbe, &dst, &srcp);												// push   srcp
-	emit_push_p32(drcbe, &dst, &addrp);													// push   addrp
+		emit_mov_m64_p64(drcbe, &dst, MBD(REG_ESP, 4), &srcp);							// mov    [esp+4],srcp
+	emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 0), &addrp);								// mov    [esp],addrp
 	if ((spacesizep.value & 3) == DRCUML_SIZE_BYTE)
 		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->write_byte);
 																						// call   write_byte
@@ -4279,8 +4278,6 @@ static x86code *op_write(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	else if ((spacesizep.value & 3) == DRCUML_SIZE_QWORD)
 		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->write_qword);
 																						// call   write_qword
-	emit_add_r32_imm(&dst, REG_ESP, ((spacesizep.value & 3) != DRCUML_SIZE_QWORD) ? 8 : 12);
-																						// add    esp,8/12
 	return dst;
 }
 
@@ -4304,15 +4301,15 @@ static x86code *op_writem(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	/* set up a call to the write byte handler */
 	if ((spacesizep.value & 3) != DRCUML_SIZE_QWORD)
 	{
-		emit_push_p32(drcbe, &dst, &maskp);												// push   maskp
-		emit_push_p32(drcbe, &dst, &srcp);												// push   srcp
+		emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 8), &maskp);							// mov    [esp+8],maskp
+		emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 4), &srcp);							// mov    [esp+4],srcp
 	}
 	else
 	{
-		emit_push_p64(drcbe, &dst, &maskp);												// push   maskp
-		emit_push_p64(drcbe, &dst, &srcp);												// push   srcp
+		emit_mov_m64_p64(drcbe, &dst, MBD(REG_ESP, 12), &maskp);						// mov    [esp+12],maskp
+		emit_mov_m64_p64(drcbe, &dst, MBD(REG_ESP, 4), &srcp);							// mov    [esp+4],srcp
 	}
-	emit_push_p32(drcbe, &dst, &addrp);													// push   addrp
+	emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 0), &addrp);								// mov    [esp],addrp
 	if ((spacesizep.value & 3) == DRCUML_SIZE_WORD)
 		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->write_word_masked);
 																						// call   write_word_masked
@@ -4322,8 +4319,6 @@ static x86code *op_writem(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	else if ((spacesizep.value & 3) == DRCUML_SIZE_QWORD)
 		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->write_qword_masked);
 																						// call   write_qword_masked
-	emit_add_r32_imm(&dst, REG_ESP, ((spacesizep.value & 3) != DRCUML_SIZE_QWORD) ? 12 : 20);
-																						// add    esp,12/20
 	return dst;
 }
 
@@ -5125,15 +5120,14 @@ static x86code *op_mulu(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	else if (inst->size == 8)
 	{
 		/* general case */
-		emit_push_p64(drcbe, &dst, &src2p);												// push  src2p
-		emit_push_p64(drcbe, &dst, &src1p);												// push  src1p
+		emit_mov_m64_p64(drcbe, &dst, MBD(REG_ESP, 16), &src2p);						// mov   [esp+16],src2p
+		emit_mov_m64_p64(drcbe, &dst, MBD(REG_ESP, 8), &src1p);							// mov   [esp+8],src1p
 		if (!compute_hi)
-			emit_push_imm(&dst, (FPTR)&drcbe->reslo);									// push  &reslo
+			emit_mov_m32_imm(&dst, MBD(REG_ESP, 4), (FPTR)&drcbe->reslo);				// mov   [esp+4],&reslo
 		else
-			emit_push_imm(&dst, (FPTR)&drcbe->reshi);									// push  &reshi
-		emit_push_imm(&dst, (FPTR)&drcbe->reslo);										// push  &reslo
+			emit_mov_m32_imm(&dst, MBD(REG_ESP, 4), (FPTR)&drcbe->reshi);				// push  [esp+4],&reshi
+		emit_mov_m32_imm(&dst, MBD(REG_ESP, 0), (FPTR)&drcbe->reslo);					// mov   [esp],&reslo
 		emit_call(&dst, (x86code *)dmulu);												// call  dmulu
-		emit_add_r32_imm(&dst, REG_ESP, 24);											// add   esp,24
 		emit_mov_r32_m32(&dst, REG_EAX, MABS((UINT32 *)&drcbe->reslo + 0));				// mov   eax,reslo.lo
 		emit_mov_r32_m32(&dst, REG_EDX, MABS((UINT32 *)&drcbe->reslo + 1));				// mov   edx,reslo.hi
 		emit_mov_p64_r64(drcbe, &dst, &dstp, REG_EAX, REG_EDX);							// mov   dstp,edx:eax
@@ -5267,15 +5261,14 @@ static x86code *op_muls(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	else if (inst->size == 8)
 	{
 		/* general case */
-		emit_push_p64(drcbe, &dst, &src2p);												// push  src2p
-		emit_push_p64(drcbe, &dst, &src1p);												// push  src1p
+		emit_mov_m64_p64(drcbe, &dst, MBD(REG_ESP, 16), &src2p);						// mov   [esp+16],src2p
+		emit_mov_m64_p64(drcbe, &dst, MBD(REG_ESP, 8), &src1p);							// mov   [esp+8],src1p
 		if (!compute_hi)
-			emit_push_imm(&dst, (FPTR)&drcbe->reslo);									// push  &reslo
+			emit_mov_m32_imm(&dst, MBD(REG_ESP, 4), (FPTR)&drcbe->reslo);				// mov   [esp+4],&reslo
 		else
-			emit_push_imm(&dst, (FPTR)&drcbe->reshi);									// push  &reshi
-		emit_push_imm(&dst, (FPTR)&drcbe->reslo);										// push  &reslo
+			emit_mov_m32_imm(&dst, MBD(REG_ESP, 4), (FPTR)&drcbe->reshi);				// push  [esp+4],&reshi
+		emit_mov_m32_imm(&dst, MBD(REG_ESP, 0), (FPTR)&drcbe->reslo);					// mov   [esp],&reslo
 		emit_call(&dst, (x86code *)dmuls);												// call  dmuls
-		emit_add_r32_imm(&dst, REG_ESP, 24);											// add   esp,24
 		emit_mov_r32_m32(&dst, REG_EAX, MABS((UINT32 *)&drcbe->reslo + 0));				// mov   eax,reslo.lo
 		emit_mov_r32_m32(&dst, REG_EDX, MABS((UINT32 *)&drcbe->reslo + 1));				// mov   edx,reslo.hi
 		emit_mov_p64_r64(drcbe, &dst, &dstp, REG_EAX, REG_EDX);							// mov   dstp,edx:eax
@@ -5362,15 +5355,14 @@ static x86code *op_divu(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	else if (inst->size == 8)
 	{
 		/* general case */
-		emit_push_p64(drcbe, &dst, &src2p);												// push  src2p
-		emit_push_p64(drcbe, &dst, &src1p);												// push  src1p
+		emit_mov_m64_p64(drcbe, &dst, MBD(REG_ESP, 16), &src2p);						// mov   [esp+16],src2p
+		emit_mov_m64_p64(drcbe, &dst, MBD(REG_ESP, 8), &src1p);							// mov   [esp+8],src1p
 		if (!compute_rem)
-			emit_push_imm(&dst, (FPTR)&drcbe->reslo);									// push  &reslo
+			emit_mov_m32_imm(&dst, MBD(REG_ESP, 4), (FPTR)&drcbe->reslo);				// mov   [esp+4],&reslo
 		else
-			emit_push_imm(&dst, (FPTR)&drcbe->reshi);									// push  &reshi
-		emit_push_imm(&dst, (FPTR)&drcbe->reslo);										// push  &reslo
+			emit_mov_m32_imm(&dst, MBD(REG_ESP, 4), (FPTR)&drcbe->reshi);				// push  [esp+4],&reshi
+		emit_mov_m32_imm(&dst, MBD(REG_ESP, 0), (FPTR)&drcbe->reslo);					// mov   [esp],&reslo
 		emit_call(&dst, (x86code *)ddivu);												// call  ddivu
-		emit_add_r32_imm(&dst, REG_ESP, 24);											// add   esp,24
 		emit_mov_r32_m32(&dst, REG_EAX, MABS((UINT32 *)&drcbe->reslo + 0));				// mov   eax,reslo.lo
 		emit_mov_r32_m32(&dst, REG_EDX, MABS((UINT32 *)&drcbe->reslo + 1));				// mov   edx,reslo.hi
 		emit_mov_p64_r64(drcbe, &dst, &dstp, REG_EAX, REG_EDX);							// mov   dstp,edx:eax
@@ -5427,15 +5419,14 @@ static x86code *op_divs(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	else if (inst->size == 8)
 	{
 		/* general case */
-		emit_push_p64(drcbe, &dst, &src2p);												// push  src2p
-		emit_push_p64(drcbe, &dst, &src1p);												// push  src1p
+		emit_mov_m64_p64(drcbe, &dst, MBD(REG_ESP, 16), &src2p);						// mov   [esp+16],src2p
+		emit_mov_m64_p64(drcbe, &dst, MBD(REG_ESP, 8), &src1p);							// mov   [esp+8],src1p
 		if (!compute_rem)
-			emit_push_imm(&dst, (FPTR)&drcbe->reslo);									// push  &reslo
+			emit_mov_m32_imm(&dst, MBD(REG_ESP, 4), (FPTR)&drcbe->reslo);				// mov   [esp+4],&reslo
 		else
-			emit_push_imm(&dst, (FPTR)&drcbe->reshi);									// push  &reshi
-		emit_push_imm(&dst, (FPTR)&drcbe->reslo);										// push  &reslo
+			emit_mov_m32_imm(&dst, MBD(REG_ESP, 4), (FPTR)&drcbe->reshi);				// push  [esp+4],&reshi
+		emit_mov_m32_imm(&dst, MBD(REG_ESP, 0), (FPTR)&drcbe->reslo);					// mov   [esp],&reslo
 		emit_call(&dst, (x86code *)ddivs);												// call  ddivs
-		emit_add_r32_imm(&dst, REG_ESP, 24);											// add   esp,24
 		emit_mov_r32_m32(&dst, REG_EAX, MABS((UINT32 *)&drcbe->reslo + 0));				// mov   eax,reslo.lo
 		emit_mov_r32_m32(&dst, REG_EDX, MABS((UINT32 *)&drcbe->reslo + 1));				// mov   edx,reslo.hi
 		emit_mov_p64_r64(drcbe, &dst, &dstp, REG_EAX, REG_EDX);							// mov   dstp,edx:eax
@@ -6212,12 +6203,11 @@ static x86code *op_fread(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MF, &addrp, PTYPE_MRI, &spacep, PTYPE_I);
 
 	/* set up a call to the read dword/qword handler */
-	emit_push_p32(drcbe, &dst, &addrp);													// push   addrp
+	emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 0), &addrp);								// mov    [esp],addrp
 	if (inst->size == 4)
 		emit_call(&dst, (x86code *)active_address_space[spacep.value].accessors->read_dword);// call   read_dword
 	else if (inst->size == 8)
 		emit_call(&dst, (x86code *)active_address_space[spacep.value].accessors->read_qword);// call   read_qword
-	emit_add_r32_imm(&dst, REG_ESP, 4);													// add    esp,4
 
 	/* store result */
 	if (inst->size == 4)
@@ -6247,15 +6237,14 @@ static x86code *op_fwrite(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 
 	/* set up a call to the write dword/qword handler */
 	if (inst->size == 4)
-		emit_push_p32(drcbe, &dst, &srcp);												// push   srcp
+		emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 4), &srcp);							// mov    [esp+4],srcp
 	else if (inst->size == 8)
-		emit_push_p64(drcbe, &dst, &srcp);												// push   srcp
-	emit_push_p32(drcbe, &dst, &addrp);													// push   addrp
+		emit_mov_m64_p64(drcbe, &dst, MBD(REG_ESP, 4), &srcp);							// mov    [esp+4],srcp
+	emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 0), &addrp);								// mov    [esp],addrp
 	if (inst->size == 4)
 		emit_call(&dst, (x86code *)active_address_space[spacep.value].accessors->write_dword);// call   write_dword
 	else if (inst->size == 8)
 		emit_call(&dst, (x86code *)active_address_space[spacep.value].accessors->write_qword);// call   write_qword
-	emit_add_r32_imm(&dst, REG_ESP, 4 + inst->size);									// add    esp,8
 
 	return dst;
 }
