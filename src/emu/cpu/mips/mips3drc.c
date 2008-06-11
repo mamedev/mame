@@ -44,8 +44,8 @@ extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
 ***************************************************************************/
 
 #define FORCE_C_BACKEND					(0)
-#define LOG_UML							(0)
-#define LOG_NATIVE						(0)
+#define LOG_UML							(1)
+#define LOG_NATIVE						(1)
 
 #define DISABLE_FAST_REGISTERS			(0)
 #define SINGLE_INSTRUCTION_MODE			(0)
@@ -1307,7 +1307,7 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 				if (!ismasked)
 					UML_WRITE(block, IREG(0), IREG(1), PROGRAM_DWORD);				// write   i0,i1,program_dword
 				else
-					UML_WRITEM(block, IREG(0), IREG(2), IREG(1), PROGRAM_DWORD);	// writem  i0,i2,i1,program_dword
+					UML_WRITEM(block, IREG(0), IREG(1), IREG(2), PROGRAM_DWORD);	// writem  i0,i1,i2,program_dword
 			}
 			else
 			{
@@ -1324,7 +1324,7 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 				if (!ismasked)
 					UML_DWRITE(block, IREG(0), IREG(1), PROGRAM_QWORD);				// dwrite  i0,i1,program_qword
 				else
-					UML_DWRITEM(block, IREG(0), IREG(2), IREG(1), PROGRAM_QWORD);	// dwritem i0,i2,i1,program_qword
+					UML_DWRITEM(block, IREG(0), IREG(1), IREG(2), PROGRAM_QWORD);	// dwritem i0,i1,i2,program_qword
 			}
 			else
 			{
@@ -1844,6 +1844,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 		case 0x22:	/* LWL - MIPS I */
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_SHL(block, IREG(1), IREG(0), IMM(3));								// shl     i1,i0,3
+			UML_AND(block, IREG(0), IREG(0), IMM(~3));								// and     i0,i0,~3
 			if (!mips3->bigendian)
 				UML_XOR(block, IREG(1), IREG(1), IMM(0x18));						// xor     i1,i1,0x18
 			UML_SHR(block, IREG(2), IMM(~0), IREG(1));								// shr     i2,~0,i1
@@ -1863,6 +1864,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 		case 0x26:	/* LWR - MIPS I */
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_SHL(block, IREG(1), IREG(0), IMM(3));								// shl     i1,i0,3
+			UML_AND(block, IREG(0), IREG(0), IMM(~3));								// and     i0,i0,~3
 			if (mips3->bigendian)
 				UML_XOR(block, IREG(1), IREG(1), IMM(0x18));						// xor     i1,i1,0x18
 			UML_SHL(block, IREG(2), IMM(~0), IREG(1));								// shl     i2,~0,i1
@@ -1883,6 +1885,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 		case 0x1a:	/* LDL - MIPS III */
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_SHL(block, IREG(1), IREG(0), IMM(3));								// shl     i1,i0,3
+			UML_AND(block, IREG(0), IREG(0), IMM(~7));								// and     i0,i0,~7
 			if (!mips3->bigendian)
 				UML_XOR(block, IREG(1), IREG(1), IMM(0x38));						// xor     i1,i1,0x38
 			UML_DSHR(block, IREG(2), IMM((UINT64)~0), IREG(1));						// dshr    i2,~0,i1
@@ -1900,6 +1903,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 		case 0x1b:	/* LDR - MIPS III */
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_SHL(block, IREG(1), IREG(0), IMM(3));								// shl     i1,i0,3
+			UML_AND(block, IREG(0), IREG(0), IMM(~7));								// and     i0,i0,~7
 			if (mips3->bigendian)
 				UML_XOR(block, IREG(1), IREG(1), IMM(0x38));						// xor     i1,i1,0x38
 			UML_DSHL(block, IREG(2), IMM((UINT64)~0), IREG(1));						// dshl    i2,~0,i1
@@ -1985,6 +1989,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 		case 0x2a:	/* SWL - MIPS I */
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_SHL(block, IREG(3), IREG(0), IMM(3));								// shl     i3,i0,3
+			UML_AND(block, IREG(0), IREG(0), IMM(~3));								// and     i0,i0,~3
 			UML_MOV(block, IREG(1), R32(RTREG));									// mov     i1,<rtreg>
 			if (!mips3->bigendian)
 				UML_XOR(block, IREG(3), IREG(3), IMM(0x18));						// xor     i3,i3,0x18
@@ -1999,6 +2004,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 		case 0x2e:	/* SWR - MIPS I */
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_SHL(block, IREG(3), IREG(0), IMM(3));								// shl     i3,i0,3
+			UML_AND(block, IREG(0), IREG(0), IMM(~3));								// and     i0,i0,~3
 			UML_MOV(block, IREG(1), R32(RTREG));									// mov     i1,<rtreg>
 			if (mips3->bigendian)
 				UML_XOR(block, IREG(3), IREG(3), IMM(0x18));						// xor     i3,i3,0x18
@@ -2013,6 +2019,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 		case 0x2c:	/* SDL - MIPS III */
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_SHL(block, IREG(3), IREG(0), IMM(3));								// shl     i3,i0,3
+			UML_AND(block, IREG(0), IREG(0), IMM(~7));								// and     i0,i0,~7
 			UML_DMOV(block, IREG(1), R64(RTREG));									// dmov    i1,<rtreg>
 			if (!mips3->bigendian)
 				UML_XOR(block, IREG(3), IREG(3), IMM(0x38));						// xor     i3,i3,0x38
@@ -2027,6 +2034,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 		case 0x2d:	/* SDR - MIPS III */
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_SHL(block, IREG(3), IREG(0), IMM(3));								// shl     i3,i0,3
+			UML_AND(block, IREG(0), IREG(0), IMM(~7));								// and     i0,i0,~7
 			UML_DMOV(block, IREG(1), R64(RTREG));									// dmov    i1,<rtreg>
 			if (mips3->bigendian)
 				UML_XOR(block, IREG(3), IREG(3), IMM(0x38));						// xor     i3,i3,0x38
