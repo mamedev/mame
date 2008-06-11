@@ -7104,7 +7104,9 @@ Other Sun games
 	DRIVER( mchampdx )	/* (c) 1999 ESD */
 	DRIVER( mchampda )	/* (c) 1999 ESD */
 	DRIVER( hedpanic )	/* (c) 2000 ESD */
+	DRIVER( hedpanif )	/* (c) 2000 ESD + Fuuki, Co. Ltd. */
 	DRIVER( tangtang )	/* (c) 2000 ESD */
+	DRIVER( swatpolc )	/* (c) 2001 ESD */
 
 	/* Dyna Electronics / Dynax / Nakanihon games */
 	DRIVER( royalmj )	/* (c) 1982 Nichibutsu */
