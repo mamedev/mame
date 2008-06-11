@@ -2075,7 +2075,6 @@ static MACHINE_DRIVER_START( anteater )
 MACHINE_DRIVER_END
 
 
-
 /*************************************
  *
  *  Decryption helpers
@@ -2245,6 +2244,36 @@ static void decode_losttomb_gfx(void)
 	free(scratch);
 }
 
+
+static void decode_superbon(void)
+{
+	offs_t i;
+	UINT8 *RAM;
+
+	/* Deryption worked out by hand by Chris Hardy. */
+
+	RAM = memory_region(REGION_CPU1);
+
+	for (i = 0;i < 0x1000;i++)
+	{
+		/* Code is encrypted depending on bit 7 and 9 of the address */
+		switch (i & 0x0280)
+		{
+		case 0x0000:
+			RAM[i] ^= 0x92;
+			break;
+		case 0x0080:
+			RAM[i] ^= 0x82;
+			break;
+		case 0x0200:
+			RAM[i] ^= 0x12;
+			break;
+		case 0x0280:
+			RAM[i] ^= 0x10;
+			break;
+		}
+	}
+}
 
 
 /*************************************
@@ -2789,5 +2818,15 @@ static DRIVER_INIT( anteater )
 	decode_anteater_gfx();
 }
 
+
+static DRIVER_INIT( superbon )
+{
+
+	/* video extensions */
+	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
+
+	/* decode code */
+	decode_superbon();
+}
 
 #include "galdrvr.c"

@@ -736,39 +736,6 @@ DRIVER_INIT( losttomb )
 		free(scratch);
 }
 
-DRIVER_INIT( superbon )
-{
-	offs_t i;
-	UINT8 *RAM;
-
-
-	DRIVER_INIT_CALL(scramble);
-
-	/* Deryption worked out by hand by Chris Hardy. */
-
-	RAM = memory_region(REGION_CPU1);
-
-	for (i = 0;i < 0x1000;i++)
-	{
-		/* Code is encrypted depending on bit 7 and 9 of the address */
-		switch (i & 0x0280)
-		{
-		case 0x0000:
-			RAM[i] ^= 0x92;
-			break;
-		case 0x0080:
-			RAM[i] ^= 0x82;
-			break;
-		case 0x0200:
-			RAM[i] ^= 0x12;
-			break;
-		case 0x0280:
-			RAM[i] ^= 0x10;
-			break;
-		}
-	}
-}
-
 
 DRIVER_INIT( hustler )
 {
