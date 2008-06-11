@@ -26,6 +26,7 @@ Year + Game            PCB             Notes
 
 Other ESD games:
 
+Head Panic          (c) 1999 - Undumped, original version is (c) 1999
 3 Cushion Billiards (c) 2000 - Undumped
 Deluxe 5            (c) 2000 - Undumped
 Fire Hawk           (c) 2001 - see nmk16.c driver
@@ -721,7 +722,7 @@ ROM_START( multchmp )
 
 	ROM_REGION( 0x24000, REGION_CPU2, 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(7c178bd7) SHA1(8754d3c70d9b2bf369a5ce0cce4cc0696ed22750) )
-	ROM_CONTINUE(             0x10000, 0x14000             )
+	ROM_CONTINUE(          0x10000, 0x14000)
 
 	ROM_REGION( 0x140000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites, 16x16x5 */
 	ROM_LOAD( "esd14.ju03", 0x000000, 0x040000, CRC(a6122225) SHA1(cbcf2b31c4c011daba21f0ae5fd3be63c9a87c00) )
@@ -751,7 +752,7 @@ ROM_START( multchmk )
 
 	ROM_REGION( 0x24000, REGION_CPU2, 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(7c178bd7) SHA1(8754d3c70d9b2bf369a5ce0cce4cc0696ed22750) )
-	ROM_CONTINUE(             0x10000, 0x14000             )
+	ROM_CONTINUE(          0x10000, 0x14000)
 
 	ROM_REGION( 0x140000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites, 16x16x5 */
 	ROM_LOAD( "multchmp.u36", 0x000000, 0x040000, CRC(d8f06fa8) SHA1(f76912f93f99578529612a7f01d82ac7229a8e41) )
@@ -820,6 +821,9 @@ Notes:
           with an EPROM. In between the unpopulated positions are 2x smt pads. These are populated
           with 2x 16M SOP44 smt Mask ROMs.
 
+Note: Some versions of this PCB used larger EPROMs with the data repeated:
+      ESD 3 @ SU06 as a 27C040 with data repeated 2x (CRC32 0x2C0C8813)
+
 */
 
 
@@ -828,9 +832,9 @@ ROM_START( mchampdx )
 	ROM_LOAD16_BYTE( "ver0106_esd2.cu02", 0x000000, 0x040000, CRC(ea98b3fd) SHA1(107ee8adea246141fd6fa9209541ce0a7ed1e24c) )
 	ROM_LOAD16_BYTE( "ver0106_esd1.cu03", 0x000001, 0x040000, CRC(c6e4546b) SHA1(af9a8edffe94d035f92b36b1cd145c2a5ee66f48) )
 
-	ROM_REGION( 0x84000, REGION_CPU2, 0 )		/* Z80 Code */
-	ROM_LOAD( "ver0106_desd3.su06", 0x00000, 0x0c000,  CRC(1b22568c) SHA1(5458e1a798357a6785f8ea1fe9da37768cd4761d) )
-	ROM_CONTINUE(             0x10000, 0x34000             )
+	ROM_REGION( 0x44000, REGION_CPU2, 0 )		/* Z80 Code */
+	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(1b22568c) SHA1(5458e1a798357a6785f8ea1fe9da37768cd4761d) )
+	ROM_CONTINUE(          0x10000, 0x34000)
 
 	/* this has additional copyright sprites in the flash roms for the (c)2000 message.. */
 	ROM_REGION( 0x600000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites, 16x16x5 */
@@ -838,13 +842,13 @@ ROM_START( mchampdx )
 	ROM_LOAD( "ver0106_ju02.bin", 0x000000, 0x200000, CRC(b27a4977) SHA1(b7f94bb04d0046538b3938335e6b0cce330ad79c) )
 	/* expand this to take up 0x200000 bytes too so we can decode it */
 	ROM_LOAD16_BYTE( "ver0106_esd5.ju07", 0x400000, 0x040000, CRC(7a3ac887) SHA1(3c759f9bed396bbaf6bd7298a8bd2bd76df3aa6f) )
-	ROM_FILL( 0x500000, 0x100000, 0 )
+	ROM_FILL(                             0x500000, 0x100000, 0 )
 
 	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE )	/* Layers, 16x16x8 */
 	ROM_LOAD16_BYTE( "rom.fu35", 0x000000, 0x200000, CRC(ba46f3dc) SHA1(4ac7695bdf4237654481f7f74f8650d70a51e691) )
 	ROM_LOAD16_BYTE( "rom.fu34", 0x000001, 0x200000, CRC(2895cf09) SHA1(88756fcd589af1986c3881d4080f086afc11b498) )
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "ver0106_esd4.su10", 0x00000, 0x40000, CRC(ac8ae009) SHA1(2c1c30cc4b3e34a5f14d7dfb6f6e18ff21f526f5) )
 ROM_END
 
@@ -853,23 +857,23 @@ ROM_START( mchampda )
 	ROM_LOAD16_BYTE( "esd2.cu02", 0x000000, 0x040000, CRC(4cca802c) SHA1(5e6e81febbb56b7c4630b530e546e7ab59c6c6c1) )
 	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000, CRC(0af1cd0a) SHA1(d2befcb596d83d523317d17b4c1c71f99de0d33e) )
 
-	ROM_REGION( 0x84000, REGION_CPU2, 0 )		/* Z80 Code */
-	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(2c0c8813) SHA1(ad6b881af4a629a948dcb3c99cea73c20ba1faf4) )
-	ROM_CONTINUE(             0x10000, 0x74000             )
+	ROM_REGION( 0x44000, REGION_CPU2, 0 )		/* Z80 Code */
+	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(1b22568c) SHA1(5458e1a798357a6785f8ea1fe9da37768cd4761d) )
+	ROM_CONTINUE(          0x10000, 0x34000)
 
 	ROM_REGION( 0x600000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites, 16x16x5 */
 	ROM_LOAD( "rom.ju01", 0x200000, 0x200000, CRC(1a749fc2) SHA1(feff4b26ee28244b4d092798a176e33e09d5df2c) )
 	ROM_LOAD( "rom.ju02", 0x000000, 0x200000, CRC(7e87e332) SHA1(f90aa00a64a940846d99053c7aa023e3fd5d070b) )
 	/* expand this to take up 0x200000 bytes too so we can decode it */
 	ROM_LOAD16_BYTE( "esd5.ju07", 0x400000, 0x080000, CRC(6cc871cc) SHA1(710b9695c864e4234686993b88d24590d60e1cb9) )
-	ROM_FILL( 0x500000, 0x100000, 0 )
+	ROM_FILL(                     0x500000, 0x100000, 0 )
 
 	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE )	/* Layers, 16x16x8 */
 	ROM_LOAD16_BYTE( "rom.fu35", 0x000000, 0x200000, CRC(ba46f3dc) SHA1(4ac7695bdf4237654481f7f74f8650d70a51e691) )
 	ROM_LOAD16_BYTE( "rom.fu34", 0x000001, 0x200000, CRC(2895cf09) SHA1(88756fcd589af1986c3881d4080f086afc11b498) )
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 )	/* Samples */
-	ROM_LOAD( "esd4.su10", 0x00000, 0x80000, CRC(14c4a30d) SHA1(d8eb2f08d5293f729cbec1897e3b92b675cc2814) )
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_LOAD( "esd4.su10", 0x00000, 0x40000, CRC(2fbe94ab) SHA1(1bc4a33ec93a80fb598722d2b50bdf3ccaaa984a) )
 ROM_END
 
 /***************************************************************************
@@ -910,6 +914,10 @@ Notes:
       % : ROMs ESD8 and ESD9 are also 16M SOP44 smt Mask ROMs, though these are dedicated smt
           locations (i.e. no option for EPROMs at this location)
 
+Note: Some versions of this PCB used larger EPROMs with the data repeated:
+      ESD 3 @ SU06 as a 27C040 with data repeated 2x (CRC32 0xC668D443)
+      ESD 4 @ SU10 as a 27C040 with data repeated 4x (CRC32 0x5692FE92)
+
 ***************************************************************************/
 
 
@@ -918,7 +926,7 @@ ROM_START( hedpanic ) /* Story line & game instructions in English */
 	ROM_LOAD16_BYTE( "esd2.cu03", 0x000000, 0x040000, CRC(7c7be3bb) SHA1(d43ad7a967e1ef79ee0cf50d3842cc9174fbef3a) )
 	ROM_LOAD16_BYTE( "esd1.cu02", 0x000001, 0x040000, CRC(42405e9d) SHA1(0fa088b8bd921e42cedcc4083dfe41bc9888dfd1) )
 
-	ROM_REGION( 0x84000, REGION_CPU2, 0 )		/* Z80 Code */
+	ROM_REGION( 0x44000, REGION_CPU2, 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) /* AT27C020 mask rom */
 	ROM_CONTINUE(          0x10000, 0x34000)
 
@@ -943,9 +951,9 @@ ROM_START( hedpanif ) /* Story line in Japanese, game instructions in English */
 	ROM_LOAD16_BYTE( "esd2", 0x000000, 0x040000, CRC(8cccc691) SHA1(d6a5dd6c21a67638b9023182f77780282b9b04e5) )
 	ROM_LOAD16_BYTE( "esd1", 0x000001, 0x040000, CRC(d8574925) SHA1(bd4990778b90a49aa6b10f8cf6709ce2424f546a) )
 
-	ROM_REGION( 0x84000, REGION_CPU2, 0 )		/* Z80 Code */
-	ROM_LOAD( "esd3", 0x00000, 0x0c000, CRC(c668d443) SHA1(fa66a5dc5cb10e6ccc3fbdd7790091d912767001) ) // 0x040000 bytes of data repeated 2x
-	ROM_CONTINUE(     0x10000, 0x74000)
+	ROM_REGION( 0x44000, REGION_CPU2, 0 )		/* Z80 Code */
+	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) /* AT27C020 mask rom */
+	ROM_CONTINUE(          0x10000, 0x34000)
 
 	ROM_REGION( 0x600000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites, 16x16x5 */
 	ROM_LOAD( "esd6.ju01", 0x200000, 0x200000, CRC(5858372c) SHA1(dc96112587df681d53cf7449bd39477919978325) )
@@ -958,8 +966,8 @@ ROM_START( hedpanif ) /* Story line in Japanese, game instructions in English */
 	ROM_LOAD16_BYTE( "esd8.fu35", 0x000000, 0x200000, CRC(23aceb4f) SHA1(35d9ebc33b9e1515e47750cfcdfc0bf8bf44b71d) )
 	ROM_LOAD16_BYTE( "esd9.fu34", 0x000001, 0x200000, CRC(76b46cd2) SHA1(679cbf50ae5935e8848868081ecef4ec66424f6c) )
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 )	/* Samples */
-	ROM_LOAD( "esd4", 0x000000, 0x080000, CRC(5692fe92) SHA1(4423039cb437ab36d198b212ef394bf1704be404) ) // 0x020000 bytes of data repeated 4x
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_LOAD( "esd4.su10", 0x000000, 0x020000, CRC(3c11c590) SHA1(cb33845c3dc0501fff8055c2d66f412881089df1) ) /* AT27010 mask rom */
 ROM_END
 
 
@@ -1022,9 +1030,9 @@ ROM_START( tangtang )
 	ROM_LOAD16_BYTE( "esd2.cu02", 0x000000, 0x040000,  CRC(b6dd6e3d) SHA1(44d2663827c45267eb154c873f3bd2e9e2bf3d3f) )
 	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000,  CRC(b6c0f2f4) SHA1(68ad76e7e380c728dda200a852729e034d9c9f4c) )
 
-	ROM_REGION( 0x84000, REGION_CPU2, 0 )		/* Z80 Code */
+	ROM_REGION( 0x44000, REGION_CPU2, 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(d48ecc5c) SHA1(5015dd775980542eb29a08bffe1a09ea87d56272) )
-	ROM_CONTINUE(             0x10000, 0x34000             )
+	ROM_CONTINUE(          0x10000, 0x34000)
 
 	ROM_REGION( 0x140000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites, 16x16x5 */
 	ROM_LOAD( "xju04.bin", 0x000000, 0x040000, CRC(f999b9d7) SHA1(9e4d0e68cdc429c7563b8ad51c072d68ffed09dc) )
@@ -1037,7 +1045,7 @@ ROM_START( tangtang )
 	ROM_LOAD16_BYTE( "fu35.bin", 0x000000, 0x200000, CRC(84f3f833) SHA1(f84e41d93dc47a58ada800b921a7e5902b7631cd) )
 	ROM_LOAD16_BYTE( "fu34.bin", 0x000001, 0x200000, CRC(bf91f543) SHA1(7c149fed8b8044850cd6b798622a91c45336cd47) )
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(f2dfb02d) SHA1(04001488697aad3e5b2d15c9f5a81dc2b7d0952c) )
 ROM_END
 
@@ -1096,7 +1104,7 @@ ROM_START( swatpolc ) /* SWAT Police */
 	ROM_LOAD16_BYTE( "esd.cu02", 0x000000, 0x040000,  CRC(29e0c126) SHA1(7c0356eed4ffdc056b7ec5c1ac07f1c9cc6aeffa) ) /* ESD labels but not numbered */
 	ROM_LOAD16_BYTE( "esd.cu03", 0x000001, 0x040000,  CRC(1070208b) SHA1(1e058774c5aee1de15ffcd26d530b23592286db1) ) /* ESD labels but not numbered */
 
-	ROM_REGION( 0x84000, REGION_CPU2, 0 )		/* Z80 Code */
+	ROM_REGION( 0x44000, REGION_CPU2, 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(80e97dbe) SHA1(d6fae689cd3737777f36c980b9a7d9e42b06a467) ) /* 2 roms on PCB with an ESD3 label */
 	ROM_CONTINUE(          0x10000, 0x34000)
 
@@ -1111,7 +1119,7 @@ ROM_START( swatpolc ) /* SWAT Police */
 	ROM_LOAD16_BYTE( "fu35", 0x000000, 0x200000, CRC(c55897c5) SHA1(f6e0ef1c2fcfe6a511fe787a3abeff4da16d1b54) ) /* No labels on the flash roms */
 	ROM_LOAD16_BYTE( "fu34", 0x000001, 0x200000, CRC(7117a6a2) SHA1(17c0ab02698cffa0582ed2d2b7dbb7fed8cd9393) ) /* No labels on the flash roms */
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "at27c020.su10", 0x00000, 0x40000, CRC(c43efec2) SHA1(4ef328d8703b81328de09ecc4328763aba06e883) ) /* AT27C020 mask rom with no label */
 ROM_END
 
@@ -1135,4 +1143,4 @@ GAME( 2000, hedpanif, hedpanic, hedpanic, hedpanic, 0, ROT0, "ESD / Fuuki", "Hea
 
 /* ESD - This PCB looks identicle to the ESD 08-26-1999 PCB */
 GAME( 2000, tangtang, 0,        tangtang, hedpanic, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)", 0 ) // 26/05/2000 ?
-GAME( 2001, swatpolc, 0,        swatpolc, swatpolc, 0, ROT0, "ESD",         "SWAT Police ", GAME_IMPERFECT_GRAPHICS )
+GAME( 2001, swatpolc, 0,        swatpolc, swatpolc, 0, ROT0, "ESD",         "SWAT Police ", 0 )
