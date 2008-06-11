@@ -39,11 +39,13 @@
     DSW = 3 banks (903/904)
     DSW = 1 bank  (905)
 
-    Inputs use 6 lines from 6520 PIA's port, and multiplexed x4 each.
+    Inputs use 6 lines from 6520 PIA's port, and each one is multiplexed x4.
 
     Some games like Keno and Big Game, also have a key encoder peripheral processor
     based on a 8035, and 1x ROM 2516/2532.
 
+    Systems 903/904 PCBs have 3 pots to control R, G, and B independently.
+    However, it seems to be only related to the background color.
 
 
 ***********************************************************************************
@@ -217,20 +219,32 @@
     mentioned game. It was created by Cal Omega in 1981 for Casino Electronics Inc.
     Cal Omega was bought out by CEI (Casino Electronics Inc.), and CEI was bought by UCMC.
 
-    This game was made before the CEI 906iii system.
+    This is the most famous game from Cal Omega 903 System.
 
-    The game use the same GFX set that Jack Potten's poker for cards and have similar
+    The game uses the same GFX set that Jack Potten's Poker for cards and has similar
     layout, but the game is different and the old discrete pitched sounds were replaced
-    with a better set of sounds through a AY8910/12 implementation. The empty socket in
-    the pcb is maybe for future upgrades instead of sound ROM, since sounds are hardcoded.
+    with a better set of sounds through a AY8912 implementation. The empty socket in
+    the PCB is for future upgrades instead of sound ROM, since sounds are hardcoded.
 
     Inputs are multiplexed and selected through PIA1, portB.
 
-    In game, use "Stand" instead of "Deal/Draw" to conserve all cards without discards.
-    To enter to TEST MODE press F2. Press "Discard 1" + "Discard 2" + "Discard 3" to exit.
-    To enter the STATS MODE press "Show Stats". Press "Deal/Draw" to exit.
-    To pass coin and hopper errors press "Hopper SW". Also keep it pressed to see the status.
-    For payout, press "Manual Collect" an then "Payout" for each credit (manual mode).
+
+    Some instructions....
+
+    - Some versions have a STAND button to conserve all cards without discards.
+
+    - To enter to the Input Test Mode press TEST MODE (key 9) and then SERVICE (key 8).
+      Press DISCARD1 (key Z) + DISCARD2 (key X) + DISCARD3 (key C) to exit.
+
+    - To see the last hand played, press SHOW LAST HAND (key 0) and then SERVICE (key 8).
+      Press DEAL/DRAW button to exit.
+
+    - Depending of the game version, TEST MODE & SHOW LAST HAND buttons could work directly.
+
+    - To pass coin and hopper errors press SERVICE (key 8). Also keep it pressed to see the status.
+
+    - For payout, press MANUAL COLLECT an then PAYOUT for each credit (manual mode).
+
 
 
     El Grande - 5 Card Draw:
@@ -247,7 +261,7 @@
 
     There aren't meter and stats modes. Only for amusement, so... no payout.
     To clear credits press F2.
-    To enter to TEST MODE press F2 twice. Press "Hold 1" + "Hold 2" + "Hold 3" to exit.
+    To enter to TEST MODE press F2 twice. Press HOLD 1 + HOLD 2 + HOLD 3 to exit.
 
 
 
@@ -263,7 +277,7 @@
     $0841 - $0841   AY-8912         ; Write.
     $0880 - $0880   CRTC6845        ; MC6845 adressing.
     $0881 - $0881   CRTC6845        ; MC6845 Read/Write.
-    $08C4 - $08C7   PIA0            ; I/O Ports 0, 1, 2, 3.
+    $08C4 - $08C7   PIA0            ; I/O Ports 0 to 3 (multiplexed).
     $08C8 - $08CB   PIA1            ; I/O Port  4.
 
     $1000 - $13FF   VideoRAM
@@ -277,7 +291,7 @@
     $0000 - $07FF   NVRAM           ; All registers and settings.
     $1080 - $1080   CRTC6845        ; MC6845 adressing.
     $1081 - $1081   CRTC6845        ; MC6845 Read/Write.
-    $10C4 - $10C7   PIA0            ; I/O Ports 0, 1, 2, 3.
+    $10C4 - $10C7   PIA0            ; I/O Ports 0 to 3 (multiplexed).
     $10C8 - $10CB   PIA1            ; I/O Port  4, AY-8912.
 
     $2000 - $23FF   VideoRAM
@@ -369,6 +383,13 @@
 
     UPDATES
     -------
+
+
+    [2008-06-11]
+
+    - Improved the input system for some games.
+    - Fixed some wrong color codes.
+    - Updated technical notes.
 
 
     [2008-06-09]
@@ -546,21 +567,18 @@ static INPUT_PORTS_START( gdrawpkr )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Deal/Draw") PORT_CODE(KEYCODE_2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Cancel Discards") PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("Stand") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Payout") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_8)
-//  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Bit 3") PORT_CODE(KEYCODE_F)
-//  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Bit 4") PORT_CODE(KEYCODE_G)
-//  PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Bit 5") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x08/*0x0c*/, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode") PORT_CODE(KEYCODE_F2)	/* should be splitted? */
-	PORT_BIT( 0x10/*0x14*/, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Hopper SW") PORT_CODE(KEYCODE_9)	/* should be splitted? */
-	PORT_BIT( 0x20/*0x24*/, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Show Stats") PORT_CODE(KEYCODE_0)	/* should be splitted? */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode") PORT_CODE(KEYCODE_9)		/* press this one and then SERVICE to Test Mode */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Show Last Hand") PORT_CODE(KEYCODE_0)	/* press this one and then SERVICE to show the last hand */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Discard 1") PORT_CODE(KEYCODE_Z)
@@ -569,8 +587,8 @@ static INPUT_PORTS_START( gdrawpkr )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Discard 4") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Discard 5") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Small") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN0-3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -579,8 +597,8 @@ static INPUT_PORTS_START( gdrawpkr )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Big") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("SW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -611,26 +629,23 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( comg076 )
 	PORT_START_TAG("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )	/* credits */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Manual Collect") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Double Up") PORT_CODE(KEYCODE_3)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Deal/Draw") PORT_CODE(KEYCODE_2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Cancel Discards") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("Stand") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )	/* credits */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_8)
-//  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Bit 3") PORT_CODE(KEYCODE_F)
-//  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Bit 4") PORT_CODE(KEYCODE_G)
-//  PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Bit 5") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x08/*0x0c*/, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Unk.")   PORT_CODE(KEYCODE_8)	/* should be splitted? */
-	PORT_BIT( 0x10/*0x14*/, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Hopper SW") PORT_CODE(KEYCODE_9)	/* should be splitted? */
-	PORT_BIT( 0x20/*0x24*/, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode") PORT_CODE(KEYCODE_F2)	/* should be splitted? */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Discard 1") PORT_CODE(KEYCODE_Z)
@@ -639,8 +654,8 @@ static INPUT_PORTS_START( comg076 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Discard 4") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Discard 5") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Small") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN0-3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -649,8 +664,8 @@ static INPUT_PORTS_START( comg076 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Big") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("SW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -685,8 +700,8 @@ static INPUT_PORTS_START( comg128 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Deal/Draw") PORT_CODE(KEYCODE_2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Cancel Discards") PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Payout") PORT_CODE(KEYCODE_Q)
@@ -695,8 +710,8 @@ static INPUT_PORTS_START( comg128 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode") PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Discard 1") PORT_CODE(KEYCODE_Z)
@@ -705,8 +720,8 @@ static INPUT_PORTS_START( comg128 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Discard 4") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Discard 5") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN0-3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -715,8 +730,8 @@ static INPUT_PORTS_START( comg128 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Big") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Small") PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("SW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )

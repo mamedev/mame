@@ -45,6 +45,12 @@ static TILE_GET_INFO( get_bg_tile_info )
 	if (attr == 0x3a)	/* Is the palette wrong? */
 		color = 0x3b;	/* 0x3b is the best match */
 
+	if (attr == 0x36)	/* Is the palette wrong? */
+		color = 0x3a;	/* 0x3a is the best match */
+
+	if (attr == 0x32)	/* Is the palette wrong? */
+		color = 0x39;	/* 0x39 is the best match */
+
 	SET_TILE_INFO(bank, code, color, 0);
 }
 
@@ -66,8 +72,7 @@ PALETTE_INIT( calomega )
     ---- ---x   red component.
     ---- --x-   green component.
     ---- -x--   blue component.
-    ---- x---   unknown, aparently unused.
-    xxxx ----   unused.
+    xxxx x---   unused.
 */
 	int i;
 
