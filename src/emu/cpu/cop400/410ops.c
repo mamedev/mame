@@ -915,9 +915,9 @@ INSTRUCTION(lei)
 
 	EN = y;
 
-	if (!BIT(EN, 2))
+	if (BIT(EN, 2))
 	{
-		OUT_L(0);
+		OUT_L(Q);
 	}
 }
 
