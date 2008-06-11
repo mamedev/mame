@@ -68,6 +68,7 @@ VIDEO_UPDATE( esd16 );
 static tilemap *esdtilemap_0;
 static tilemap *esdtilemap_1;
 tilemap *esdtilemap_1_16x16;
+tilemap *esdtilemap_0_16x16;
 
 static TILE_GET_INFO( get_tile_info_0 )
 {
@@ -78,6 +79,17 @@ static TILE_GET_INFO( get_tile_info_0 )
 			esd16_tilemap0_color,
 			0);
 }
+
+static TILE_GET_INFO( get_tile_info_0_16x16 )
+{
+	UINT16 code = esd16_vram_0[tile_index];
+	SET_TILE_INFO(
+			2,
+			code,
+			esd16_tilemap0_color,
+			0);
+}
+
 
 static TILE_GET_INFO( get_tile_info_1 )
 {
@@ -103,6 +115,7 @@ WRITE16_HANDLER( esd16_vram_0_w )
 {
 	COMBINE_DATA(&esd16_vram_0[offset]);
 	tilemap_mark_tile_dirty(esdtilemap_0,offset);
+	tilemap_mark_tile_dirty(esdtilemap_0_16x16,offset);
 }
 
 WRITE16_HANDLER( esd16_vram_1_w )
@@ -138,12 +151,17 @@ VIDEO_START( esd16 )
 	esdtilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
 									8,8,	0x80,0x40);
 
+	/* swatpolc changes tilemap 0 to 16x16 at various times */
+	esdtilemap_0_16x16 = tilemap_create(	get_tile_info_0_16x16, tilemap_scan_rows,
+									16,16,	0x40,0x40);
+
 	/* hedpanic changes tilemap 1 to 16x16 at various times */
 	esdtilemap_1_16x16 = tilemap_create(	get_tile_info_1_16x16, tilemap_scan_rows,
 									16,16,	0x40,0x40);
 
 	tilemap_set_scrolldx(esdtilemap_0, -0x60 + 2, -0x60     );
 	tilemap_set_scrolldx(esdtilemap_1, -0x60    , -0x60 + 2 );
+	tilemap_set_scrolldx(esdtilemap_0_16x16, -0x60 +2 , -0x60  );
 	tilemap_set_scrolldx(esdtilemap_1_16x16, -0x60    , -0x60 + 2 );
 
 	tilemap_set_transparent_pen(esdtilemap_1,0x00);
@@ -340,8 +358,6 @@ VIDEO_UPDATE( hedpanic )
 
 	fillbitmap(priority_bitmap,0,cliprect);
 
-	tilemap_set_scrollx(esdtilemap_0, 0, esd16_scroll_0[0]);
-	tilemap_set_scrolly(esdtilemap_0, 0, esd16_scroll_0[1]);
 
 #ifdef MAME_DEBUG
 if ( input_code_pressed(KEYCODE_Z) )
@@ -352,8 +368,26 @@ if ( input_code_pressed(KEYCODE_Z) )
 	if (msk != 0) layers_ctrl &= msk;	}
 #endif
 
-	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,esdtilemap_0,0,0);
-	else					fillbitmap(bitmap,0,cliprect);
+	if (layers_ctrl & 1)
+	{
+		if (head_layersize[0]&0x0001)
+		{
+			tilemap_set_scrollx(esdtilemap_0_16x16, 0, esd16_scroll_0[0]);
+			tilemap_set_scrolly(esdtilemap_0_16x16, 0, esd16_scroll_0[1]);
+			tilemap_draw(bitmap,cliprect,esdtilemap_0_16x16,0,0);
+		}
+		else
+		{
+			tilemap_set_scrollx(esdtilemap_0, 0, esd16_scroll_0[0]);
+			tilemap_set_scrolly(esdtilemap_0, 0, esd16_scroll_0[1]);
+			tilemap_draw(bitmap,cliprect,esdtilemap_0,0,0);
+		}
+	}
+	else
+	{
+		fillbitmap(bitmap,0,cliprect);
+	}
+
 
 	if (layers_ctrl & 2)
 	{
