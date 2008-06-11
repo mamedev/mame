@@ -1985,12 +1985,19 @@ static void generate_update_mode(drcuml_block *block)
 	/* LE in bit 0 of mode */
 	UML_AND(block, IREG(0), MSR32, IMM(MSR_LE));											// and     i0,msr,MSR_LE
 	
-	/* DR (OEA) or PE (4XX) in bit 1 of mode */
-	if (ppc->cap & PPCCAP_OEA)
+	/* DR (OEA and 403GCX) in bit 1 of mode */
+	if ((ppc->cap & PPCCAP_OEA) || ppc->flavor == PPC_MODEL_403GCX)
+	{
 		UML_ROLAND(block, IREG(1), MSR32, IMM(29), IMM(0x02));								// roland  i1,[msr],29,0x02
-	else if (ppc->cap & PPCCAP_4XX)
+		UML_OR(block, IREG(0), IREG(0), IREG(1));											// or      i0,i0,i1
+	}
+
+	/* (4XX) in bit 1 of mode */
+	if (ppc->cap & PPCCAP_4XX)
+	{
 		UML_ROLAND(block, IREG(1), MSR32, IMM(30), IMM(0x02));								// roland  i1,[msr],30,0x02
-	UML_OR(block, IREG(0), IREG(0), IREG(1));												// or      i0,i0,i1
+		UML_OR(block, IREG(0), IREG(0), IREG(1));											// or      i0,i0,i1
+	}
 	
 	/* PR in bit 2 of mode */
 	UML_ROLAND(block, IREG(1), MSR32, IMM(20), IMM(0x04));									// roland  i1,[msr],20,0x04

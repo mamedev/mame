@@ -484,12 +484,16 @@ void ppccom_tlb_fill(powerpc_state *ppc)
 		ppc->param0 = 1;
 		transaddr = address & 0x7fffffff;
 		
+		/* we don't support the MMU of the 403GCX */
+		if (ppc->flavor == PPC_MODEL_403GCX && (ppc->msr & MSROEA_DR))
+			fatalerror("MMU enabled but not supported!");
+		
 		/* only check if PE is enabled */
-		if (ppc->msr & MSR4XX_PE)
+		if (transtype == TRANSLATE_WRITE && (ppc->msr & MSR4XX_PE))
 		{
 			/* are we within one of the protection ranges? */
-			int inrange1 = ((address >> 12) >= (ppc->spr[SPR4XX_PBL1] >> 12) && (address >> 12) <= (ppc->spr[SPR4XX_PBU1] >> 12));
-			int inrange2 = ((address >> 12) >= (ppc->spr[SPR4XX_PBL2] >> 12) && (address >> 12) <= (ppc->spr[SPR4XX_PBU2] >> 12));
+			int inrange1 = ((address >> 12) >= (ppc->spr[SPR4XX_PBL1] >> 12) && (address >> 12) < (ppc->spr[SPR4XX_PBU1] >> 12));
+			int inrange2 = ((address >> 12) >= (ppc->spr[SPR4XX_PBL2] >> 12) && (address >> 12) < (ppc->spr[SPR4XX_PBU2] >> 12));
 
 			/* if PX == 1, writes are only allowed OUTSIDE of the bounds */
 			if (((ppc->msr & MSR4XX_PX) && (inrange1 || inrange2)) || (!(ppc->msr & MSR4XX_PX) && (!inrange1 && !inrange2)))
@@ -503,7 +507,7 @@ void ppccom_tlb_fill(powerpc_state *ppc)
 	
 	/* log information and return upon failure */
 	if (PRINTF_TLB_FILL)
-		printf("tlb_fill: %08X (%s%s) -> ", address, (transtype == TRANSLATE_READ) ? "R" : (transtype == TRANSLATE_WRITE) ? "W" : "F", transuser ? " U" : "S");
+		printf("tlb_fill: %08X (%s%s) -> ", address, (transtype == TRANSLATE_READ) ? "R" : (transtype == TRANSLATE_WRITE) ? "W" : "F", transuser ? "U" : "S");
 	if (ppc->param0 > 1)
 	{
 		if (PRINTF_TLB_FILL)
