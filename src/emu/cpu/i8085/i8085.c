@@ -116,6 +116,10 @@
  *
  * - Removed archaic i8080_EXACT flag.
  *
+ * 08-June-2008 Miodrag Milanovic
+ *
+ * - Flag setting fix for some instructions and cycle count update
+ *
  *****************************************************************************/
 
 /*int survival_prot = 0; */
@@ -196,14 +200,17 @@ INLINE void execute_one(int opcode)
 		case 0x02: i8085_ICount -= 7;	/* STAX B */
 			WM(I.BC.d, I.AF.b.h);
 			break;
-		case 0x03: i8085_ICount -= 5;	/* INX  B */
+		case 0x03: i8085_ICount -= (I.cputype) ? 6 : 5;	/* INX  B */
 			I.BC.w.l++;
-			if (I.BC.b.l == 0x00) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
+			if( I.cputype ) 
+			{
+				if (I.BC.b.l == 0x00) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
+			}
 			break;
-		case 0x04: i8085_ICount -= 5;	/* INR  B */
+		case 0x04: i8085_ICount -= (I.cputype) ? 4 : 5;	/* INR  B */
 			M_INR(I.BC.b.h);
 			break;
-		case 0x05: i8085_ICount -= 5;	/* DCR  B */
+		case 0x05: i8085_ICount -= (I.cputype) ? 4 : 5;	/* DCR  B */
 			M_DCR(I.BC.b.h);
 			break;
 		case 0x06: i8085_ICount -= 7;	/* MVI  B,nn */
@@ -227,14 +234,17 @@ INLINE void execute_one(int opcode)
 		case 0x0a: i8085_ICount -= 7;	/* LDAX B */
 			I.AF.b.h = RM(I.BC.d);
 			break;
-		case 0x0b: i8085_ICount -= 5;	/* DCX  B */
+		case 0x0b: i8085_ICount -= (I.cputype) ? 6 : 5;	/* DCX  B */
 			I.BC.w.l--;
-			if (I.BC.b.l == 0xff) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
+			if( I.cputype ) 
+			{			
+				if (I.BC.b.l == 0xff) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
+			}
 			break;
-		case 0x0c: i8085_ICount -= 5;	/* INR  C */
+		case 0x0c: i8085_ICount -= (I.cputype) ? 4 : 5;	/* INR  C */
 			M_INR(I.BC.b.l);
 			break;
-		case 0x0d: i8085_ICount -= 5;	/* DCR  C */
+		case 0x0d: i8085_ICount -= (I.cputype) ? 4 : 5;	/* DCR  C */
 			M_DCR(I.BC.b.l);
 			break;
 		case 0x0e: i8085_ICount -= 7;	/* MVI  C,nn */
@@ -259,14 +269,17 @@ INLINE void execute_one(int opcode)
 		case 0x12: i8085_ICount -= 7;	/* STAX D */
 			WM(I.DE.d, I.AF.b.h);
 			break;
-		case 0x13: i8085_ICount -= 5;	/* INX  D */
+		case 0x13: i8085_ICount -= (I.cputype) ? 6 : 5;	/* INX  D */
 			I.DE.w.l++;
-			if (I.DE.b.l == 0x00) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
+			if( I.cputype ) 
+			{			
+				if (I.DE.b.l == 0x00) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
+			}
 			break;
-		case 0x14: i8085_ICount -= 5;	/* INR  D */
+		case 0x14: i8085_ICount -= (I.cputype) ? 4 : 5;	/* INR  D */
 			M_INR(I.DE.b.h);
 			break;
-		case 0x15: i8085_ICount -= 5;	/* DCR  D */
+		case 0x15: i8085_ICount -= (I.cputype) ? 4 : 5;	/* DCR  D */
 			M_DCR(I.DE.b.h);
 			break;
 		case 0x16: i8085_ICount -= 7;	/* MVI  D,nn */
@@ -293,14 +306,17 @@ INLINE void execute_one(int opcode)
 		case 0x1a: i8085_ICount -= 7;	/* LDAX D */
 			I.AF.b.h = RM(I.DE.d);
 			break;
-		case 0x1b: i8085_ICount -= 5;	/* DCX  D */
+		case 0x1b: i8085_ICount -= (I.cputype) ? 6 : 5;	/* DCX  D */
 			I.DE.w.l--;
-			if (I.DE.b.l == 0xff) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
+			if( I.cputype ) 
+			{
+				if (I.DE.b.l == 0xff) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
+			}
 			break;
-		case 0x1c: i8085_ICount -= 5;	/* INR  E */
+		case 0x1c: i8085_ICount -= (I.cputype) ? 4 : 5;	/* INR  E */
 			M_INR(I.DE.b.l);
 			break;
-		case 0x1d: i8085_ICount -= 5;	/* DCR  E */
+		case 0x1d: i8085_ICount -= (I.cputype) ? 4 : 5;	/* DCR  E */
 			M_DCR(I.DE.b.l);
 			break;
 		case 0x1e: i8085_ICount -= 7;	/* MVI  E,nn */
@@ -330,14 +346,17 @@ INLINE void execute_one(int opcode)
 			I.XX.w.l++;
 			WM(I.XX.d, I.HL.b.h);
 			break;
-		case 0x23: i8085_ICount -= 5;	/* INX  H */
+		case 0x23: i8085_ICount -= (I.cputype) ? 6 : 5;	/* INX  H */
 			I.HL.w.l++;
-			if (I.HL.b.l == 0x00) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
+			if( I.cputype ) 
+			{			
+				if (I.HL.b.l == 0x00) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
+			}
 			break;
-		case 0x24: i8085_ICount -= 5;	/* INR  H */
+		case 0x24: i8085_ICount -= (I.cputype) ? 4 : 5;	/* INR  H */
 			M_INR(I.HL.b.h);
 			break;
-		case 0x25: i8085_ICount -= 5;	/* DCR  H */
+		case 0x25: i8085_ICount -= (I.cputype) ? 4 : 5;	/* DCR  H */
 			M_DCR(I.HL.b.h);
 			break;
 		case 0x26: i8085_ICount -= 7;	/* MVI  H,nn */
@@ -349,6 +368,10 @@ INLINE void execute_one(int opcode)
 			if (I.AF.b.l & HF) I.XX.d |= 0x200;
 			if (I.AF.b.l & NF) I.XX.d |= 0x400;
 			I.AF.w.l = DAA[I.XX.d];
+			if( I.cputype==0 ) 
+			{
+				I.AF.b.l &= 0xd5; // Ignore not used flags
+			}
 			break;
 
 		case 0x28:
@@ -369,14 +392,17 @@ INLINE void execute_one(int opcode)
 			I.XX.w.l++;
 			I.HL.b.h = RM(I.XX.d);
 			break;
-		case 0x2b: i8085_ICount -= 5;	/* DCX  H */
+		case 0x2b: i8085_ICount -= (I.cputype) ? 6 : 5;	/* DCX  H */
 			I.HL.w.l--;
-			if (I.HL.b.l == 0xff) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
+			if( I.cputype ) 
+			{
+				if (I.HL.b.l == 0xff) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
+			}
 			break;
-		case 0x2c: i8085_ICount -= 5;	/* INR  L */
+		case 0x2c: i8085_ICount -= (I.cputype) ? 4 : 5;	/* INR  L */
 			M_INR(I.HL.b.l);
 			break;
-		case 0x2d: i8085_ICount -= 5;	/* DCR  L */
+		case 0x2d: i8085_ICount -= (I.cputype) ? 4 : 5;	/* DCR  L */
 			M_DCR(I.HL.b.l);
 			break;
 		case 0x2e: i8085_ICount -= 7;	/* MVI  L,nn */
@@ -425,9 +451,12 @@ INLINE void execute_one(int opcode)
 			I.XX.d = ARG16();
 			WM(I.XX.d, I.AF.b.h);
 			break;
-		case 0x33: i8085_ICount -= 5;	/* INX  SP */
+		case 0x33: i8085_ICount -= (I.cputype) ? 6 : 5;	/* INX  SP */
 			I.SP.w.l++;
-			if (I.SP.b.l == 0x00) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
+			if( I.cputype ) 
+			{
+				if (I.SP.b.l == 0x00) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
+			}
 			break;
 		case 0x34: i8085_ICount -= 10;	/* INR  M */
 			I.XX.b.l = RM(I.HL.d);
@@ -444,7 +473,7 @@ INLINE void execute_one(int opcode)
 			WM(I.HL.d, I.XX.b.l);
 			break;
 		case 0x37: i8085_ICount -= 4;	/* STC  */
-			I.AF.b.l = (I.AF.b.l & ~(HF + NF)) | CF;
+			I.AF.b.l = (I.AF.b.l & 0xfe) | CF;
 			break;
 
 		case 0x38:
@@ -463,171 +492,173 @@ INLINE void execute_one(int opcode)
 			I.XX.d = ARG16();
 			I.AF.b.h = RM(I.XX.d);
 			break;
-		case 0x3b: i8085_ICount -= 5;	/* DCX  SP */
+		case 0x3b: i8085_ICount -= (I.cputype) ? 6 : 5;	/* DCX  SP */
 			I.SP.w.l--;
-			if (I.SP.b.l == 0xff) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
+			if( I.cputype ) 
+			{			
+				if (I.SP.b.l == 0xff) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
+			}
 			break;
-		case 0x3c: i8085_ICount -= 5;	/* INR  A */
+		case 0x3c: i8085_ICount -= (I.cputype) ? 4 : 5;	/* INR  A */
 			M_INR(I.AF.b.h);
 			break;
-		case 0x3d: i8085_ICount -= 5;	/* DCR  A */
+		case 0x3d: i8085_ICount -= (I.cputype) ? 4 : 5;	/* DCR  A */
 			M_DCR(I.AF.b.h);
 			break;
 		case 0x3e: i8085_ICount -= 7;	/* MVI  A,nn */
 			M_MVI(I.AF.b.h);
 			break;
-		case 0x3f: i8085_ICount -= 4;	/* CMF  */
-			I.AF.b.l = ((I.AF.b.l & ~(HF + NF)) |
-					   ((I.AF.b.l & CF) << 4)) ^ CF;
+		case 0x3f: i8085_ICount -= 4;	/* CMC  */			
+			I.AF.b.l = (I.AF.b.l & 0xfe) | ((I.AF.b.l & CF)==1 ? 0 : 1);
 			break;
 
-		case 0x40: i8085_ICount -= 5;	/* MOV  B,B */
+		case 0x40: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  B,B */
 			/* no op */
 			break;
-		case 0x41: i8085_ICount -= 5;	/* MOV  B,C */
+		case 0x41: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  B,C */
 			I.BC.b.h = I.BC.b.l;
 			break;
-		case 0x42: i8085_ICount -= 5;	/* MOV  B,D */
+		case 0x42: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  B,D */
 			I.BC.b.h = I.DE.b.h;
 			break;
-		case 0x43: i8085_ICount -= 5;	/* MOV  B,E */
+		case 0x43: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  B,E */
 			I.BC.b.h = I.DE.b.l;
 			break;
-		case 0x44: i8085_ICount -= 5;	/* MOV  B,H */
+		case 0x44: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  B,H */
 			I.BC.b.h = I.HL.b.h;
 			break;
-		case 0x45: i8085_ICount -= 5;	/* MOV  B,L */
+		case 0x45: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  B,L */
 			I.BC.b.h = I.HL.b.l;
 			break;
 		case 0x46: i8085_ICount -= 7;	/* MOV  B,M */
 			I.BC.b.h = RM(I.HL.d);
 			break;
-		case 0x47: i8085_ICount -= 5;	/* MOV  B,A */
+		case 0x47: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  B,A */
 			I.BC.b.h = I.AF.b.h;
 			break;
 
-		case 0x48: i8085_ICount -= 5;	/* MOV  C,B */
+		case 0x48: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  C,B */
 			I.BC.b.l = I.BC.b.h;
 			break;
-		case 0x49: i8085_ICount -= 5;	/* MOV  C,C */
+		case 0x49: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  C,C */
 			/* no op */
 			break;
-		case 0x4a: i8085_ICount -= 5;	/* MOV  C,D */
+		case 0x4a: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  C,D */
 			I.BC.b.l = I.DE.b.h;
 			break;
-		case 0x4b: i8085_ICount -= 5;	/* MOV  C,E */
+		case 0x4b: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  C,E */
 			I.BC.b.l = I.DE.b.l;
 			break;
-		case 0x4c: i8085_ICount -= 5;	/* MOV  C,H */
+		case 0x4c: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  C,H */
 			I.BC.b.l = I.HL.b.h;
 			break;
-		case 0x4d: i8085_ICount -= 5;	/* MOV  C,L */
+		case 0x4d: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  C,L */
 			I.BC.b.l = I.HL.b.l;
 			break;
 		case 0x4e: i8085_ICount -= 7;	/* MOV  C,M */
 			I.BC.b.l = RM(I.HL.d);
 			break;
-		case 0x4f: i8085_ICount -= 5;	/* MOV  C,A */
+		case 0x4f: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  C,A */
 			I.BC.b.l = I.AF.b.h;
 			break;
 
-		case 0x50: i8085_ICount -= 5;	/* MOV  D,B */
+		case 0x50: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  D,B */
 			I.DE.b.h = I.BC.b.h;
 			break;
-		case 0x51: i8085_ICount -= 5;	/* MOV  D,C */
+		case 0x51: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  D,C */
 			I.DE.b.h = I.BC.b.l;
 			break;
-		case 0x52: i8085_ICount -= 5;	/* MOV  D,D */
+		case 0x52: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  D,D */
 			/* no op */
 			break;
-		case 0x53: i8085_ICount -= 5;	/* MOV  D,E */
+		case 0x53: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  D,E */
 			I.DE.b.h = I.DE.b.l;
 			break;
-		case 0x54: i8085_ICount -= 5;	/* MOV  D,H */
+		case 0x54: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  D,H */
 			I.DE.b.h = I.HL.b.h;
 			break;
-		case 0x55: i8085_ICount -= 5;	/* MOV  D,L */
+		case 0x55: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  D,L */
 			I.DE.b.h = I.HL.b.l;
 			break;
 		case 0x56: i8085_ICount -= 7;	/* MOV  D,M */
 			I.DE.b.h = RM(I.HL.d);
 			break;
-		case 0x57: i8085_ICount -= 5;	/* MOV  D,A */
+		case 0x57: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  D,A */
 			I.DE.b.h = I.AF.b.h;
 			break;
 
-		case 0x58: i8085_ICount -= 5;	/* MOV  E,B */
+		case 0x58: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  E,B */
 			I.DE.b.l = I.BC.b.h;
 			break;
-		case 0x59: i8085_ICount -= 5;	/* MOV  E,C */
+		case 0x59: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  E,C */
 			I.DE.b.l = I.BC.b.l;
 			break;
-		case 0x5a: i8085_ICount -= 5;	/* MOV  E,D */
+		case 0x5a: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  E,D */
 			I.DE.b.l = I.DE.b.h;
 			break;
-		case 0x5b: i8085_ICount -= 5;	/* MOV  E,E */
+		case 0x5b: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  E,E */
 			/* no op */
 			break;
-		case 0x5c: i8085_ICount -= 5;	/* MOV  E,H */
+		case 0x5c: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  E,H */
 			I.DE.b.l = I.HL.b.h;
 			break;
-		case 0x5d: i8085_ICount -= 5;	/* MOV  E,L */
+		case 0x5d: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  E,L */
 			I.DE.b.l = I.HL.b.l;
 			break;
 		case 0x5e: i8085_ICount -= 7;	/* MOV  E,M */
 			I.DE.b.l = RM(I.HL.d);
 			break;
-		case 0x5f: i8085_ICount -= 5;	/* MOV  E,A */
+		case 0x5f: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  E,A */
 			I.DE.b.l = I.AF.b.h;
 			break;
 
-		case 0x60: i8085_ICount -= 5;	/* MOV  H,B */
+		case 0x60: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  H,B */
 			I.HL.b.h = I.BC.b.h;
 			break;
-		case 0x61: i8085_ICount -= 5;	/* MOV  H,C */
+		case 0x61: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  H,C */
 			I.HL.b.h = I.BC.b.l;
 			break;
-		case 0x62: i8085_ICount -= 5;	/* MOV  H,D */
+		case 0x62: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  H,D */
 			I.HL.b.h = I.DE.b.h;
 			break;
-		case 0x63: i8085_ICount -= 5;	/* MOV  H,E */
+		case 0x63: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  H,E */
 			I.HL.b.h = I.DE.b.l;
 			break;
-		case 0x64: i8085_ICount -= 5;	/* MOV  H,H */
+		case 0x64: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  H,H */
 			/* no op */
 			break;
-		case 0x65: i8085_ICount -= 5;	/* MOV  H,L */
+		case 0x65: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  H,L */
 			I.HL.b.h = I.HL.b.l;
 			break;
 		case 0x66: i8085_ICount -= 7;	/* MOV  H,M */
 			I.HL.b.h = RM(I.HL.d);
 			break;
-		case 0x67: i8085_ICount -= 5;	/* MOV  H,A */
+		case 0x67: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  H,A */
 			I.HL.b.h = I.AF.b.h;
 			break;
 
-		case 0x68: i8085_ICount -= 5;	/* MOV  L,B */
+		case 0x68: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  L,B */
 			I.HL.b.l = I.BC.b.h;
 			break;
-		case 0x69: i8085_ICount -= 5;	/* MOV  L,C */
+		case 0x69: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  L,C */
 			I.HL.b.l = I.BC.b.l;
 			break;
-		case 0x6a: i8085_ICount -= 5;	/* MOV  L,D */
+		case 0x6a: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  L,D */
 			I.HL.b.l = I.DE.b.h;
 			break;
-		case 0x6b: i8085_ICount -= 5;	/* MOV  L,E */
+		case 0x6b: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  L,E */
 			I.HL.b.l = I.DE.b.l;
 			break;
-		case 0x6c: i8085_ICount -= 5;	/* MOV  L,H */
+		case 0x6c: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  L,H */
 			I.HL.b.l = I.HL.b.h;
 			break;
-		case 0x6d: i8085_ICount -= 5;	/* MOV  L,L */
+		case 0x6d: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  L,L */
 			/* no op */
 			break;
 		case 0x6e: i8085_ICount -= 7;	/* MOV  L,M */
 			I.HL.b.l = RM(I.HL.d);
 			break;
-		case 0x6f: i8085_ICount -= 5;	/* MOV  L,A */
+		case 0x6f: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  L,A */
 			I.HL.b.l = I.AF.b.h;
 			break;
 
@@ -649,7 +680,7 @@ INLINE void execute_one(int opcode)
 		case 0x75: i8085_ICount -= 7;	/* MOV  M,L */
 			WM(I.HL.d, I.HL.b.l);
 			break;
-		case 0x76: i8085_ICount -= 4;	/* HALT */
+		case 0x76: i8085_ICount -= (I.cputype) ? 5 : 7;	/* HLT */
 			I.PC.w.l--;
 			I.HALT = 1;
 			if (i8085_ICount > 0) i8085_ICount = 0;
@@ -658,28 +689,28 @@ INLINE void execute_one(int opcode)
 			WM(I.HL.d, I.AF.b.h);
 			break;
 
-		case 0x78: i8085_ICount -= 5;	/* MOV  A,B */
+		case 0x78: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  A,B */
 			I.AF.b.h = I.BC.b.h;
 			break;
-		case 0x79: i8085_ICount -= 5;	/* MOV  A,C */
+		case 0x79: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  A,C */
 			I.AF.b.h = I.BC.b.l;
 			break;
-		case 0x7a: i8085_ICount -= 5;	/* MOV  A,D */
+		case 0x7a: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  A,D */
 			I.AF.b.h = I.DE.b.h;
 			break;
-		case 0x7b: i8085_ICount -= 5;	/* MOV  A,E */
+		case 0x7b: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  A,E */
 			I.AF.b.h = I.DE.b.l;
 			break;
-		case 0x7c: i8085_ICount -= 5;	/* MOV  A,H */
+		case 0x7c: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  A,H */
 			I.AF.b.h = I.HL.b.h;
 			break;
-		case 0x7d: i8085_ICount -= 5;	/* MOV  A,L */
+		case 0x7d: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  A,L */
 			I.AF.b.h = I.HL.b.l;
 			break;
 		case 0x7e: i8085_ICount -= 7;	/* MOV  A,M */
 			I.AF.b.h = RM(I.HL.d);
 			break;
-		case 0x7f: i8085_ICount -= 5;	/* MOV  A,A */
+		case 0x7f: i8085_ICount -= (I.cputype) ? 4 : 5;	/* MOV  A,A */
 			/* no op */
 			break;
 
@@ -883,39 +914,39 @@ INLINE void execute_one(int opcode)
 			M_CMP(I.AF.b.h);
 			break;
 
-		case 0xc0: i8085_ICount -= 5;	/* RNZ  */
+		case 0xc0: i8085_ICount -= (I.cputype) ? 6 : 5;	/* RNZ  */
 			M_RET( !(I.AF.b.l & ZF) );
 			break;
 		case 0xc1: i8085_ICount -= 10;	/* POP  B */
 			M_POP(BC);
 			break;
-		case 0xc2: i8085_ICount -= 7;	/* JNZ  nnnn */
+		case 0xc2: i8085_ICount -= 10;	/* JNZ  nnnn */
 			M_JMP( !(I.AF.b.l & ZF) );
 			break;
-		case 0xc3: i8085_ICount -= 7;	/* JMP  nnnn */
+		case 0xc3: i8085_ICount -= 10;	/* JMP  nnnn */
 			M_JMP(1);
 			break;
 		case 0xc4: i8085_ICount -= 11;	/* CNZ  nnnn */
 			M_CALL( !(I.AF.b.l & ZF) );
 			break;
-		case 0xc5: i8085_ICount -= 11;	/* PUSH B */
+		case 0xc5: i8085_ICount -= (I.cputype) ? 12 : 11;	/* PUSH B */
 			M_PUSH(BC);
 			break;
 		case 0xc6: i8085_ICount -= 7;	/* ADI  nn */
 			I.XX.b.l = ARG();
 			M_ADD(I.XX.b.l);
 				break;
-		case 0xc7: i8085_ICount -= 11;	/* RST  0 */
+		case 0xc7: i8085_ICount -= (I.cputype) ? 12 : 11;	/* RST  0 */
 			M_RST(0);
 			break;
 
-		case 0xc8: i8085_ICount -= 5;	/* RZ   */
+		case 0xc8: i8085_ICount -= (I.cputype) ? 6 : 5;	/* RZ   */
 			M_RET( I.AF.b.l & ZF );
 			break;
-		case 0xc9: i8085_ICount -= 4;	/* RET  */
+		case 0xc9: i8085_ICount -= 10;	/* RET  */
 			M_RET(1);
 			break;
-		case 0xca: i8085_ICount -= 7;	/* JZ   nnnn */
+		case 0xca: i8085_ICount -= 10;	/* JZ   nnnn */
 			M_JMP( I.AF.b.l & ZF );
 			break;
 		case 0xcb:
@@ -927,31 +958,31 @@ INLINE void execute_one(int opcode)
 					i8085_ICount -= 6;	/* RST  V */
 				}
 			} else {
-				i8085_ICount -= 7;	/* JMP  nnnn undocumented*/
+				i8085_ICount -= 10;	/* JMP  nnnn undocumented*/
 				M_JMP(1);
 			}
 			break;
 		case 0xcc: i8085_ICount -= 11;	/* CZ   nnnn */
 			M_CALL( I.AF.b.l & ZF );
 			break;
-		case 0xcd: i8085_ICount -= 11;	/* CALL nnnn */
+		case 0xcd: i8085_ICount -= 17;	/* CALL nnnn */
 			M_CALL(1);
 			break;
 		case 0xce: i8085_ICount -= 7;	/* ACI  nn */
 			I.XX.b.l = ARG();
 			M_ADC(I.XX.b.l);
 			break;
-		case 0xcf: i8085_ICount -= 11;	/* RST  1 */
+		case 0xcf: i8085_ICount -= (I.cputype) ? 12 : 11;	/* RST  1 */
 			M_RST(1);
 			break;
 
-		case 0xd0: i8085_ICount -= 5;	/* RNC  */
+		case 0xd0: i8085_ICount -= (I.cputype) ? 6 : 5;	/* RNC  */
 			M_RET( !(I.AF.b.l & CF) );
 			break;
 		case 0xd1: i8085_ICount -= 10;	/* POP  D */
 			M_POP(DE);
 			break;
-		case 0xd2: i8085_ICount -= 7;	/* JNC  nnnn */
+		case 0xd2: i8085_ICount -= 10;	/* JNC  nnnn */
 			M_JMP( !(I.AF.b.l & CF) );
 			break;
 		case 0xd3: i8085_ICount -= 10;	/* OUT  nn */
@@ -960,18 +991,18 @@ INLINE void execute_one(int opcode)
 		case 0xd4: i8085_ICount -= 11;	/* CNC  nnnn */
 			M_CALL( !(I.AF.b.l & CF) );
 			break;
-		case 0xd5: i8085_ICount -= 11;	/* PUSH D */
+		case 0xd5: i8085_ICount -= (I.cputype) ? 12 : 11;	/* PUSH D */
 			M_PUSH(DE);
 			break;
 		case 0xd6: i8085_ICount -= 7;	/* SUI  nn */
 			I.XX.b.l = ARG();
 			M_SUB(I.XX.b.l);
 			break;
-		case 0xd7: i8085_ICount -= 11;	/* RST  2 */
+		case 0xd7: i8085_ICount -= (I.cputype) ? 12 : 11;	/* RST  2 */
 			M_RST(2);
 			break;
 
-		case 0xd8: i8085_ICount -= 5;	/* RC   */
+		case 0xd8: i8085_ICount -= (I.cputype) ? 6 : 5;	/* RC   */
 			M_RET( I.AF.b.l & CF );
 			break;
 		case 0xd9:
@@ -982,11 +1013,11 @@ INLINE void execute_one(int opcode)
 				I.XX.w.l++;
 				WM(I.XX.d, I.HL.b.h);
 			} else {
-				i8085_ICount -= 4;	/* RET undocumented */
+				i8085_ICount -= 10;	/* RET undocumented */
 				M_RET(1);
 			}
 			break;
-		case 0xda: i8085_ICount -= 7;	/* JC   nnnn */
+		case 0xda: i8085_ICount -= 10;	/* JC   nnnn */
 			M_JMP( I.AF.b.l & CF );
 			break;
 		case 0xdb: i8085_ICount -= 10;	/* IN   nn */
@@ -1000,7 +1031,7 @@ INLINE void execute_one(int opcode)
 				i8085_ICount -= 7;		/* JNX  nnnn */
 				M_JMP( !(I.AF.b.l & XF) );
 			} else {
-				i8085_ICount -= 11;	/* CALL nnnn undocumented */
+				i8085_ICount -= 17;	/* CALL nnnn undocumented */
 				M_CALL(1);
 			}
 			break;
@@ -1008,20 +1039,20 @@ INLINE void execute_one(int opcode)
 			I.XX.b.l = ARG();
 			M_SBB(I.XX.b.l);
 			break;
-		case 0xdf: i8085_ICount -= 11;	/* RST  3 */
+		case 0xdf: i8085_ICount -= (I.cputype) ? 12 : 11;	/* RST  3 */
 			M_RST(3);
 			break;
 
-		case 0xe0: i8085_ICount -= 5;	/* RPO    */
+		case 0xe0: i8085_ICount -= (I.cputype) ? 6 : 5;	/* RPO    */
 			M_RET( !(I.AF.b.l & VF) );
 			break;
 		case 0xe1: i8085_ICount -= 10;	/* POP  H */
 			M_POP(HL);
 			break;
-		case 0xe2: i8085_ICount -= 7;	/* JPO  nnnn */
+		case 0xe2: i8085_ICount -= 10;	/* JPO  nnnn */
 			M_JMP( !(I.AF.b.l & VF) );
 			break;
-		case 0xe3: i8085_ICount -= 18;	/* XTHL */
+		case 0xe3: i8085_ICount -= (I.cputype) ? 16 : 18;	/* XTHL */
 			M_POP(XX);
 			M_PUSH(HL);
 			I.HL.d = I.XX.d;
@@ -1029,28 +1060,28 @@ INLINE void execute_one(int opcode)
 		case 0xe4: i8085_ICount -= 11;	/* CPO  nnnn */
 			M_CALL( !(I.AF.b.l & VF) );
 			break;
-		case 0xe5: i8085_ICount -= 11;	/* PUSH H */
+		case 0xe5: i8085_ICount -= (I.cputype) ? 12 : 11;	/* PUSH H */
 			M_PUSH(HL);
 			break;
 		case 0xe6: i8085_ICount -= 7;	/* ANI  nn */
 			I.XX.b.l = ARG();
 			M_ANA(I.XX.b.l);
 			break;
-		case 0xe7: i8085_ICount -= 11;	/* RST  4 */
+		case 0xe7: i8085_ICount -= (I.cputype) ? 12 : 11;	/* RST  4 */
 			M_RST(4);
 			break;
 
-		case 0xe8: i8085_ICount -= 5;	/* RPE  */
+		case 0xe8: i8085_ICount -= (I.cputype) ? 6 : 5;	/* RPE  */
 			M_RET( I.AF.b.l & VF );
 			break;
-		case 0xe9: i8085_ICount -= 5;	/* PCHL */
+		case 0xe9: i8085_ICount -= (I.cputype) ? 6 : 5;	/* PCHL */
 			I.PC.d = I.HL.w.l;
 			change_pc(I.PC.d);
 			break;
-		case 0xea: i8085_ICount -= 7;	/* JPE  nnnn */
+		case 0xea: i8085_ICount -= 10;	/* JPE  nnnn */
 			M_JMP( I.AF.b.l & VF );
 			break;
-		case 0xeb: i8085_ICount -= 4;	/* XCHG */
+		case 0xeb: i8085_ICount -= 5;	/* XCHG */
 			I.XX.d = I.DE.d;
 			I.DE.d = I.HL.d;
 			I.HL.d = I.XX.d;
@@ -1066,7 +1097,7 @@ INLINE void execute_one(int opcode)
 				I.XX.w.l++;
 				I.HL.b.h = RM(I.XX.d);
 			} else {
-				i8085_ICount -= 11;	/* CALL nnnn undocumented */
+				i8085_ICount -= 17;	/* CALL nnnn undocumented */
 				M_CALL(1);
 			}
 			break;
@@ -1074,17 +1105,17 @@ INLINE void execute_one(int opcode)
 			I.XX.b.l = ARG();
 			M_XRA(I.XX.b.l);
 			break;
-		case 0xef: i8085_ICount -= 11;	/* RST  5 */
+		case 0xef: i8085_ICount -= (I.cputype) ? 12 : 11;	/* RST  5 */
 			M_RST(5);
 			break;
 
-		case 0xf0: i8085_ICount -= 5;	/* RP   */
+		case 0xf0: i8085_ICount -= (I.cputype) ? 6 : 5;	/* RP   */
 			M_RET( !(I.AF.b.l&SF) );
 			break;
 		case 0xf1: i8085_ICount -= 10;	/* POP  A */
 			M_POP(AF);
 			break;
-		case 0xf2: i8085_ICount -= 7;	/* JP   nnnn */
+		case 0xf2: i8085_ICount -= 10;	/* JP   nnnn */
 			M_JMP( !(I.AF.b.l & SF) );
 			break;
 		case 0xf3: i8085_ICount -= 4;	/* DI   */
@@ -1094,24 +1125,24 @@ INLINE void execute_one(int opcode)
 		case 0xf4: i8085_ICount -= 11;	/* CP   nnnn */
 			M_CALL( !(I.AF.b.l & SF) );
 			break;
-		case 0xf5: i8085_ICount -= 11;	/* PUSH A */
+		case 0xf5: i8085_ICount -= (I.cputype) ? 12 : 11;	/* PUSH A */
 			M_PUSH(AF);
 			break;
 		case 0xf6: i8085_ICount -= 7;	/* ORI  nn */
 			I.XX.b.l = ARG();
 			M_ORA(I.XX.b.l);
 			break;
-		case 0xf7: i8085_ICount -= 11;	/* RST  6 */
+		case 0xf7: i8085_ICount -= (I.cputype) ? 12 : 11;	/* RST  6 */
 			M_RST(6);
 			break;
 
-		case 0xf8: i8085_ICount -= 5;	/* RM   */
+		case 0xf8: i8085_ICount -= (I.cputype) ? 6 : 5;	/* RM   */
 			M_RET( I.AF.b.l & SF );
 			break;
-		case 0xf9: i8085_ICount -= 5;	/* SPHL */
+		case 0xf9: i8085_ICount -= (I.cputype) ? 6 : 5;	/* SPHL */
 			I.SP.d = I.HL.d;
 			break;
-		case 0xfa: i8085_ICount -= 7;	/* JM   nnnn */
+		case 0xfa: i8085_ICount -= 10;	/* JM   nnnn */
 			M_JMP( I.AF.b.l & SF );
 			break;
 		case 0xfb: i8085_ICount -= 4;	/* EI */
@@ -1172,7 +1203,7 @@ INLINE void execute_one(int opcode)
 				i8085_ICount -= 7;		/* JX   nnnn */
 				M_JMP( I.AF.b.l & XF );
 			} else {
-				i8085_ICount -= 11;	/* CALL nnnn undocumented */
+				i8085_ICount -= 17;	/* CALL nnnn undocumented */
 				M_CALL(1);
 			}
 			break;
@@ -1180,7 +1211,7 @@ INLINE void execute_one(int opcode)
 			I.XX.b.l = ARG();
 			M_CMP(I.XX.b.l);
 			break;
-		case 0xff: i8085_ICount -= 11;	/* RST  7 */
+		case 0xff: i8085_ICount -= (I.cputype) ? 12 : 11;	/* RST  7 */
 			M_RST(7);
 			break;
 	}

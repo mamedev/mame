@@ -36,33 +36,33 @@
 #define ADDR_RST75      0x003c
 #define ADDR_INTR       0x0038
 
-#define M_INR(R) ++R; I.AF.b.l=(I.AF.b.l&CF)|ZS[R]|((R==0x80)?VF:0)|((R&0x0F)?0:HF)
-#define M_DCR(R) I.AF.b.l=(I.AF.b.l&CF)|NF|((R==0x80)?VF:0)|((R&0x0F)?0:HF); I.AF.b.l|=ZS[--R]
+#define M_INR(R) {UINT8 hc = ((R & 0x0f) == 0x0f) ? HF : 0; ++R; I.AF.b.l= (I.AF.b.l & CF ) | ZSP[R] | hc; } 
+#define M_DCR(R) {UINT8 hc = ((R & 0x0f) == 0x00) ? HF : 0; --R; I.AF.b.l= (I.AF.b.l & CF ) | ZSP[R] | hc | NF; } 
 #define M_MVI(R) R=ARG()
 
-#define M_ANA(R) I.AF.b.h&=R; I.AF.b.l=ZSP[I.AF.b.h]|HF
+#define M_ANA(R) { int i = ((I.AF.b.h | R)>>3)&1 * HF; I.AF.b.h&=R; I.AF.b.l=ZSP[I.AF.b.h]; if( I.cputype ) { I.AF.b.l |= HF; } else {I.AF.b.l |= i; } }
 #define M_ORA(R) I.AF.b.h|=R; I.AF.b.l=ZSP[I.AF.b.h]
 #define M_XRA(R) I.AF.b.h^=R; I.AF.b.l=ZSP[I.AF.b.h]
 
 #define M_RLC { 												\
 	I.AF.b.h = (I.AF.b.h << 1) | (I.AF.b.h >> 7);				\
-	I.AF.b.l = (I.AF.b.l & ~(HF+NF+CF)) | (I.AF.b.h & CF);		\
+	I.AF.b.l = (I.AF.b.l & 0xfe) | (I.AF.b.h & CF);				\
 }
 
 #define M_RRC { 												\
-	I.AF.b.l = (I.AF.b.l & ~(HF+NF+CF)) | (I.AF.b.h & CF);		\
+	I.AF.b.l = (I.AF.b.l & 0xfe) | (I.AF.b.h & CF);				\
 	I.AF.b.h = (I.AF.b.h >> 1) | (I.AF.b.h << 7);				\
 }
 
 #define M_RAL { 												\
 	int c = I.AF.b.l&CF;										\
-	I.AF.b.l = (I.AF.b.l & ~(HF+NF+CF)) | (I.AF.b.h >> 7);		\
+	I.AF.b.l = (I.AF.b.l & 0xfe) | (I.AF.b.h >> 7);				\
 	I.AF.b.h = (I.AF.b.h << 1) | c; 							\
 }
 
 #define M_RAR { 												\
 	int c = (I.AF.b.l&CF) << 7; 								\
-	I.AF.b.l = (I.AF.b.l & ~(HF+NF+CF)) | (I.AF.b.h & CF);		\
+	I.AF.b.l = (I.AF.b.l & 0xfe) | (I.AF.b.h & CF);				\
 	I.AF.b.h = (I.AF.b.h >> 1) | c; 							\
 }
 
@@ -141,24 +141,31 @@ int q = I.AF.b.h+R; 							\
 	}															\
 }
 
+// On 8085 jump if condition is not satisfied is shorter
 #define M_JMP(cc) { 											\
 	if (cc) {													\
-		i8085_ICount -= 3;										\
 		I.PC.w.l = ARG16(); 									\
-		change_pc(I.PC.d);									\
-	} else I.PC.w.l += 2;										\
+		change_pc(I.PC.d);										\
+	} else {													\
+		I.PC.w.l += 2;											\
+		i8085_ICount += (I.cputype) ? 3 : 0;					\
+	}															\
 }
 
+// On 8085 call if condition is not satisfied is 9 ticks
 #define M_CALL(cc)												\
 {																\
 	if (cc) 													\
 	{															\
 		UINT16 a = ARG16(); 									\
-		i8085_ICount -= 6;										\
+		i8085_ICount -= (I.cputype) ? 7 : 6 ;					\
 		M_PUSH(PC); 											\
 		I.PC.d = a; 											\
-		change_pc(I.PC.d);									\
-	} else I.PC.w.l += 2;										\
+		change_pc(I.PC.d);										\
+	} else {													\
+		I.PC.w.l += 2;											\
+		i8085_ICount += (I.cputype) ? 2 : 0;					\
+	}															\
 }
 
 #define M_RST(nn) { 											\
