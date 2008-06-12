@@ -423,19 +423,18 @@ static WRITE16_HANDLER( adc_strobe_w )
 
 static READ16_HANDLER( adc_r )
 {
-	char port[5];
+	static const char *adcnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
 
-	sprintf(port, "ADC%d", which_adc);
 	if (which_adc < pedal_count)
-		return ~input_port_read(machine, port);
+		return ~input_port_read(machine, adcnames[which_adc]);
 
-	return input_port_read(machine, port) | 0xff00;
+	return input_port_read(machine, adcnames[which_adc]) | 0xff00;
 }
 
 
 static READ8_HANDLER( leta_r )
 {
-	char port[6];
+	static const char *letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
 
     if (pedal_count == -1)   /* 720 */
 	{
@@ -485,8 +484,7 @@ static READ8_HANDLER( leta_r )
 		}
 	}
 
-	sprintf(port, "LETA%d", (offset & 3));
-	return input_port_read(machine, port);
+	return input_port_read(machine, letanames[offset & 3]);
 }
 
 

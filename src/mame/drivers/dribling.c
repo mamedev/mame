@@ -77,11 +77,11 @@ static READ8_HANDLER( input_mux0_r )
 {
 	/* low value in the given bit selects */
 	if (!(input_mux & 0x01))
-		return input_port_read_indexed(machine, 0);
+		return input_port_read(machine, "MUX0");
 	else if (!(input_mux & 0x02))
-		return input_port_read_indexed(machine, 1);
+		return input_port_read(machine, "MUX1");
 	else if (!(input_mux & 0x04))
-		return input_port_read_indexed(machine, 2);
+		return input_port_read(machine, "MUX2");
 	return 0xff;
 }
 
@@ -250,7 +250,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( dribling )
-	PORT_START	/* IN0 (mux 0) */
+	PORT_START_TAG("MUX0")	/* IN0 (mux 0) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_PLAYER(1)
@@ -260,7 +260,7 @@ static INPUT_PORTS_START( dribling )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_PLAYER(1)
 
-	PORT_START	/* IN0 (mux 1) */
+	PORT_START_TAG("MUX1")	/* IN0 (mux 1) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_PLAYER(2)
@@ -270,7 +270,7 @@ static INPUT_PORTS_START( dribling )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_PLAYER(2)
 
-	PORT_START	/* IN0 (mux 2) */
+	PORT_START_TAG("MUX2")	/* IN0 (mux 2) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -278,7 +278,7 @@ static INPUT_PORTS_START( dribling )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )

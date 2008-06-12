@@ -227,7 +227,7 @@ ProtectionOut( int i, UINT8 data )
 static int
 GetLives( running_machine *machine )
 {
-	int dsw = input_port_read_indexed(machine, 4);
+	int dsw = input_port_read(machine, "DSW2");
 	switch( dsw&0x30 )
 	{
 	case 0x10: return 3;
@@ -240,7 +240,7 @@ GetLives( running_machine *machine )
 
 static WRITE8_HANDLER( coinplus_w )
 {
-	int dsw = input_port_read_indexed(machine, 3);
+	int dsw = input_port_read(machine, "DSW1");
 	coin_counter_w( 0, data&1 );
 	coin_counter_w( 1, data&2 );
 	if( data&1 )
@@ -270,7 +270,7 @@ static WRITE8_HANDLER( coinplus_w )
 static void
 OutputProtectionState( running_machine *machine, int i, int type )
 {
-	int io = ~input_port_read_indexed(machine, 0);
+	int io = ~input_port_read(machine, "IN0");
 	int dat = 0x00;
 
 	switch( mDjBoyState )
@@ -393,7 +393,7 @@ CommonProt( running_machine *machine, int i, int type )
 		displayedCredits = 9;
 	}
 	ProtectionOut( i++, displayedCredits );
-	ProtectionOut( i++, input_port_read_indexed(machine, 0) ); /* COIN/START */
+	ProtectionOut( i++, input_port_read(machine, "IN0") ); /* COIN/START */
 	OutputProtectionState( machine, i, type );
 } /* CommonProt */
 
@@ -408,7 +408,7 @@ static WRITE8_HANDLER( beast_data_w )
 	if( prot_mode == ePROT_WAIT_DSW1_WRITEBACK )
 	{
 		logerror( "[DSW1_WRITEBACK]\n" );
-		ProtectionOut( 0, input_port_read_indexed(machine, 4) ); /* DSW2 */
+		ProtectionOut( 0, input_port_read(machine, "DSW2") ); /* DSW2 */
 		prot_mode = ePROT_WAIT_DSW2_WRITEBACK;
 	}
 	else if( prot_mode == ePROT_WAIT_DSW2_WRITEBACK )
@@ -476,9 +476,9 @@ static WRITE8_HANDLER( beast_data_w )
 			break;
 
 		case 0x05: /* 0x71f4 */
-			ProtectionOut( 0,input_port_read_indexed(machine, 1) ); // to $42
+			ProtectionOut( 0,input_port_read(machine, "IN1") ); // to $42
 			ProtectionOut( 1,0 ); // ?
-			ProtectionOut( 2,input_port_read_indexed(machine, 2) ); // to $43
+			ProtectionOut( 2,input_port_read(machine, "IN2") ); // to $43
 			ProtectionOut( 3,0 ); // ?
 			ProtectionOut( 4,0 ); // ?
 			CommonProt(    machine, 5,0x05 );
@@ -489,11 +489,11 @@ static WRITE8_HANDLER( beast_data_w )
 			break;
 
 		case 0x08: /* pc == 0x727a */
-			ProtectionOut( 0,input_port_read_indexed(machine, 0) ); /* COIN/START */
-			ProtectionOut( 1,input_port_read_indexed(machine, 1) ); /* JOY1 */
-			ProtectionOut( 2,input_port_read_indexed(machine, 2) ); /* JOY2 */
-			ProtectionOut( 3,input_port_read_indexed(machine, 3) ); /* DSW1 */
-			ProtectionOut( 4,input_port_read_indexed(machine, 4) ); /* DSW2 */
+			ProtectionOut( 0,input_port_read(machine, "IN0") ); /* COIN/START */
+			ProtectionOut( 1,input_port_read(machine, "IN1") ); /* JOY1 */
+			ProtectionOut( 2,input_port_read(machine, "IN2") ); /* JOY2 */
+			ProtectionOut( 3,input_port_read(machine, "DSW1") ); /* DSW1 */
+			ProtectionOut( 4,input_port_read(machine, "DSW2") ); /* DSW2 */
 			CommonProt(    machine, 5, 0x08 );
 			break;
 
@@ -531,7 +531,7 @@ static WRITE8_HANDLER( beast_data_w )
 			break;
 
 		case 0xff: /* read DSW (pc == 0x714d) */
-			ProtectionOut( 0,input_port_read_indexed(machine, 3) ); /* DSW1 */
+			ProtectionOut( 0,input_port_read(machine, "DSW1") ); /* DSW1 */
 			prot_mode = ePROT_WAIT_DSW1_WRITEBACK;
 			break;
 
@@ -962,7 +962,7 @@ ROM_START( djboyj )
 ROM_END
 
 static INPUT_PORTS_START( djboy )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -972,7 +972,7 @@ static INPUT_PORTS_START( djboy )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -982,7 +982,7 @@ static INPUT_PORTS_START( djboy )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* jump */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -992,7 +992,7 @@ static INPUT_PORTS_START( djboy )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -1016,7 +1016,7 @@ static INPUT_PORTS_START( djboy )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
 
-	PORT_START
+	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )

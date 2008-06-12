@@ -17,10 +17,11 @@ static int dragrace_gear[2];
 static TIMER_CALLBACK( dragrace_frame_callback )
 {
 	int i;
+	static const char *portnames[] = { "P1", "P2" };
 
 	for (i = 0; i < 2; i++)
 	{
-		switch (input_port_read_indexed(machine, 5 + i))
+		switch (input_port_read(machine, portnames[i]))
 		{
 		case 0x01: dragrace_gear[i] = 1; break;
 		case 0x02: dragrace_gear[i] = 2; break;
@@ -31,7 +32,7 @@ static TIMER_CALLBACK( dragrace_frame_callback )
 	}
 
 	/* watchdog is disabled during service mode */
-	watchdog_enable(machine, input_port_read_indexed(machine, 0) & 0x20);
+	watchdog_enable(machine, input_port_read(machine, "IN0") & 0x20);
 }
 
 
@@ -116,8 +117,9 @@ static WRITE8_HANDLER( dragrace_misc_clear_w )
 
 static READ8_HANDLER( dragrace_input_r )
 {
-	int val = input_port_read_indexed(machine, 2);
-
+	int val = input_port_read(machine, "IN2");
+	static const char *portnames[] = { "IN0", "IN1" };
+	
 	UINT8 maskA = 1 << (offset % 8);
 	UINT8 maskB = 1 << (offset / 8);
 
@@ -125,7 +127,7 @@ static READ8_HANDLER( dragrace_input_r )
 
 	for (i = 0; i < 2; i++)
 	{
-		int in = input_port_read_indexed(machine, i);
+		int in = input_port_read(machine, portnames[i]);
 
 		if (dragrace_gear[i] != 0)
 		{
@@ -146,12 +148,13 @@ static READ8_HANDLER( dragrace_steering_r )
 {
 	int bitA[2];
 	int bitB[2];
+	static const char *dialnames[] = { "DIAL1", "DIAL2" };
 
 	int i;
 
 	for (i = 0; i < 2; i++)
 	{
-		int dial = input_port_read_indexed(machine, 3 + i);
+		int dial = input_port_read(machine, dialnames[i]);
 
 		bitA[i] = ((dial + 1) / 2) & 1;
 		bitB[i] = ((dial + 0) / 2) & 1;
@@ -191,7 +194,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( dragrace )
-	PORT_START /* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Player 1 Gas") PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) /* player 1 gear 1 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) /* player 1 gear 2 */
@@ -204,7 +207,7 @@ static INPUT_PORTS_START( dragrace )
 	PORT_DIPSETTING( 0x40, "4.9 seconds" )
 	PORT_DIPSETTING( 0xc0, "Never" )
 
-	PORT_START /* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Player 2 Gas") PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) /* player 2 gear 1 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) /* player 2 gear 2 */
@@ -216,7 +219,7 @@ static INPUT_PORTS_START( dragrace )
 	PORT_DIPSETTING( 0x80, "4" )
 	PORT_DIPSETTING( 0x00, "5" )
 
-	PORT_START /* IN2 */
+	PORT_START_TAG("IN2")	/* IN2 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) /* IN0 connects here */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) /* IN1 connects here */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -229,20 +232,20 @@ static INPUT_PORTS_START( dragrace )
 	PORT_DIPSETTING( 0x80, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Free_Play ) )
 
-	PORT_START /* IN3 */
+	PORT_START_TAG("DIAL1")	/* IN3 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL_V ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START /* IN4 */
+	PORT_START_TAG("DIAL2")	/* IN4 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL_V ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START /* IN5 */
+	PORT_START_TAG("P1")	/* IN5 */
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Player 1 Gear 1") PORT_PLAYER(1)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Player 1 Gear 2") PORT_PLAYER(1)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Player 1 Gear 3") PORT_PLAYER(1)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Player 1 Gear 4") PORT_PLAYER(1)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Player 1 Neutral") PORT_PLAYER(1)
 
-	PORT_START /* IN6 */
+	PORT_START_TAG("P2")	/* IN6 */
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Player 2 Gear 1") PORT_PLAYER(2)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Player 2 Gear 2") PORT_PLAYER(2)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Player 2 Gear 3") PORT_PLAYER(2)

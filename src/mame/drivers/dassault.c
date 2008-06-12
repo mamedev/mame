@@ -137,19 +137,19 @@ static READ16_HANDLER( dassault_control_r )
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
-			return (input_port_read_indexed(machine, 0) + (input_port_read_indexed(machine, 1) << 8));
+			return (input_port_read(machine, "P1") + (input_port_read(machine, "P2") << 8));
 
 		case 2: /* Player 3 & Player 4 joysticks & fire buttons */
-			return (input_port_read_indexed(machine, 6) + (input_port_read_indexed(machine, 7) << 8));
+			return (input_port_read(machine, "P3") + (input_port_read(machine, "P4") << 8));
 
 		case 4: /* Dip 1 (stored at 0x3f8035) */
-			return input_port_read_indexed(machine, 3);
+			return input_port_read(machine, "DSW1");
 
 		case 6: /* Dip 2 (stored at 0x3f8034) */
-			return input_port_read_indexed(machine, 4);
+			return input_port_read(machine, "DSW2");
 
 		case 8: /* VBL, Credits */
-			return input_port_read_indexed(machine, 2);
+			return input_port_read(machine, "IN0");
 	}
 
 	return 0xffff;
@@ -164,7 +164,7 @@ static WRITE16_HANDLER( dassault_control_w )
 
 static READ16_HANDLER( dassault_sub_control_r )
 {
-	return input_port_read_indexed(machine, 5);
+	return input_port_read(machine, "VBLANK1");
 }
 
 static WRITE16_HANDLER( dassault_sound_w )
@@ -300,13 +300,13 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( thndzone )
-	PORT_START
+	PORT_START_TAG("P1")
 	DASSAULT_PLAYER_INPUT( 1, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("P2")
 	DASSAULT_PLAYER_INPUT( 2, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )			// Adds 4 credits/coins !
@@ -316,7 +316,7 @@ static INPUT_PORTS_START( thndzone )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* Dip switch bank 1 */
+	PORT_START_TAG("DSW1")	/* Dip switch bank 1 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -342,7 +342,7 @@ static INPUT_PORTS_START( thndzone )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	/* Dip switch bank 2 */
+	PORT_START_TAG("DSW2")	/* Dip switch bank 2 */
 	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
@@ -359,30 +359,30 @@ static INPUT_PORTS_START( thndzone )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START /* Cpu 1 vblank */
+	PORT_START_TAG("VBLANK1") /* Cpu 1 vblank */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START
+	PORT_START_TAG("P3")
 	DASSAULT_PLAYER_INPUT( 3, IPT_COIN3 )
 
-	PORT_START
+	PORT_START_TAG("P4")
 	DASSAULT_PLAYER_INPUT( 4, IPT_COIN4 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dassault )
-	PORT_START
+	PORT_START_TAG("P1")
 	DASSAULT_PLAYER_INPUT( 1, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("P2")
 	DASSAULT_PLAYER_INPUT( 2, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START	/* Dip switch bank 1 */
+	PORT_START_TAG("DSW1")	/* Dip switch bank 1 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -408,7 +408,7 @@ static INPUT_PORTS_START( dassault )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	/* Dip switch bank 2 */
+	PORT_START_TAG("DSW2")	/* Dip switch bank 2 */
 	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
@@ -426,30 +426,30 @@ static INPUT_PORTS_START( dassault )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START /* Cpu 1 vblank */
+	PORT_START_TAG("VBLANK1") /* Cpu 1 vblank */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START
+	PORT_START_TAG("P3")
 	DASSAULT_PLAYER_INPUT( 3, IPT_COIN3 )
 
-	PORT_START
+	PORT_START_TAG("P4")
 	DASSAULT_PLAYER_INPUT( 4, IPT_COIN4 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dassaul4 )
-	PORT_START
+	PORT_START_TAG("P1")
 	DASSAULT_PLAYER_INPUT( 1, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("P2")
 	DASSAULT_PLAYER_INPUT( 2, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START	/* Dip switch bank 1 */
+	PORT_START_TAG("DSW1")	/* Dip switch bank 1 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -469,7 +469,7 @@ static INPUT_PORTS_START( dassaul4 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	/* Dip switch bank 2 */
+	PORT_START_TAG("DSW2")	/* Dip switch bank 2 */
 	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
@@ -484,13 +484,13 @@ static INPUT_PORTS_START( dassaul4 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START /* Cpu 1 vblank */
+	PORT_START_TAG("VBLANK1") /* Cpu 1 vblank */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START
+	PORT_START_TAG("P3")
 	DASSAULT_PLAYER_INPUT( 3, IPT_COIN3 )
 
-	PORT_START
+	PORT_START_TAG("P4")
 	DASSAULT_PLAYER_INPUT( 4, IPT_COIN4 )
 INPUT_PORTS_END
 

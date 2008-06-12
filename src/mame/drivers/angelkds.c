@@ -181,23 +181,21 @@ these make the game a bit easier for testing purposes
 static READ8_HANDLER( angelkds_input_r )
 {
 	int fake;
-	char port1[4], port2[6];
+	static const char *portnames[] = { "I81", "I82" };
+	static const char *fakenames[] = { "FAKE1", "FAKE2" };
 
-	sprintf(port1, "I8%d", 1 + offset);
-	sprintf(port2, "FAKE%d", 1 + offset);
-	fake = input_port_read(machine, port2);
+	fake = input_port_read(machine, fakenames[offset]);
 
-	return ((fake & 0x01) ? fake  : input_port_read(machine, port1));
+	return ((fake & 0x01) ? fake  : input_port_read(machine, portnames[offset]));
 }
 
 #else
 
 static READ8_HANDLER( angelkds_input_r )
 {
-	char port[4];
+	static const char *portnames[] = { "I81", "I82" };
 
-	sprintf(port, "I8%d", 1 + offset);
-	return input_port_read(machine, port);
+	return input_port_read(machine, portnames[offset]);
 }
 
 #endif

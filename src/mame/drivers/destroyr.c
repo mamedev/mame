@@ -50,7 +50,7 @@ static TIMER_CALLBACK( destroyr_frame_callback )
 
 	/* PCB supports two dials, but cab has only got one */
 
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, input_port_read_indexed(machine, 3), 0), NULL, 0, destroyr_dial_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, input_port_read(machine, "PADDLE"), 0), NULL, 0, destroyr_dial_callback);
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, destroyr_frame_callback);
 }
 
@@ -137,7 +137,7 @@ static READ8_HANDLER( destroyr_input_r )
 
 	if (offset == 0)
 	{
-		UINT8 ret = input_port_read_indexed(machine, 0);
+		UINT8 ret = input_port_read(machine, "IN0");
 
 		if (destroyr_potsense[0] && destroyr_potmask[0])
 			ret |= 4;
@@ -149,7 +149,7 @@ static READ8_HANDLER( destroyr_input_r )
 
 	if (offset == 1)
 	{
-		return input_port_read_indexed(machine, 1);
+		return input_port_read(machine, "IN1");
 	}
 
 	logerror("unmapped input port %d\n", offset);
@@ -168,7 +168,7 @@ static ADDRESS_MAP_START( destroyr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0xf00) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(destroyr_input_r, destroyr_output_w)
-	AM_RANGE(0x2000, 0x2fff) AM_READ(input_port_2_r)
+	AM_RANGE(0x2000, 0x2fff) AM_READ_PORT("IN2")
 	AM_RANGE(0x3000, 0x30ff) AM_WRITE(SMH_RAM) AM_BASE(&destroyr_alpha_num_ram)
 	AM_RANGE(0x4000, 0x401f) AM_WRITE(SMH_RAM) AM_BASE(&destroyr_major_obj_ram)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(destroyr_cursor_load_w)
@@ -181,7 +181,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( destroyr )
-	PORT_START /* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNUSED ) /* call 7400 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) /* potsense1 */
@@ -194,7 +194,7 @@ static INPUT_PORTS_START( destroyr )
 	PORT_DIPSETTING( 0xc0, "3500 points" )
 	PORT_DIPSETTING( 0x00, "never" )
 
-	PORT_START /* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) /* actually a lever */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -204,7 +204,7 @@ static INPUT_PORTS_START( destroyr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START /* IN2 */
+	PORT_START_TAG("IN2")	/* IN2 */
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ) )
 	PORT_DIPSETTING( 0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING( 0x02, DEF_STR( 1C_1C ) )
@@ -223,7 +223,7 @@ static INPUT_PORTS_START( destroyr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START /* IN3 */
+	PORT_START_TAG("PADDLE")	/* IN3 */
 	PORT_BIT( 0xff, 0x00, IPT_PADDLE_V ) PORT_MINMAX(0,160) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE
 INPUT_PORTS_END
 

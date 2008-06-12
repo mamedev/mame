@@ -317,9 +317,9 @@ READ16_HANDLER( madmax_blitter_vidparam_r )
 {
 	/* analog inputs seem to be hooked up here -- might not actually map to blitter */
 	if (offset == 0x02/2)
-		return input_port_read_indexed(machine, 3);
+		return input_port_read(machine, "2a0002");
 	if (offset == 0x0e/2)
-		return input_port_read_indexed(machine, 4);
+		return input_port_read(machine, "2a000e");
 
 	/* early code polls on this bit, wants it to be 0 */
 	if (offset == 0x36/2)

@@ -53,11 +53,11 @@ extern VIDEO_UPDATE( deadang );
 
 static READ16_HANDLER( ghunter_trackball_low_r )
 {
-	return (input_port_read_indexed(machine, 3) & 0xff) | ((input_port_read_indexed(machine, 4) & 0xff) << 8);
+	return (input_port_read(machine, "TRACKX") & 0xff) | ((input_port_read(machine, "TRACKY") & 0xff) << 8);
 }
 static READ16_HANDLER( ghunter_trackball_high_r )
 {
-	return ((input_port_read_indexed(machine, 3) & 0x0f00) >> 4) | (input_port_read_indexed(machine, 4) & 0x0f00);
+	return ((input_port_read(machine, "TRACKX") & 0x0f00) >> 4) | (input_port_read(machine, "TRACKY") & 0x0f00);
 }
 
 /* Memory Maps */
@@ -94,7 +94,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( deadang )
 	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -111,7 +111,7 @@ static INPUT_PORTS_START( deadang )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START	/* Dip switch A */
+	PORT_START_TAG("DSW")	/* Dip switch A */
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x0004, DEF_STR( 4C_1C ) )
@@ -160,7 +160,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ghunter )
 	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -177,7 +177,7 @@ static INPUT_PORTS_START( ghunter )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START	/* Dip switch A */
+	PORT_START_TAG("DSW")	/* Dip switch A */
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x0004, DEF_STR( 4C_1C ) )
@@ -223,10 +223,10 @@ static INPUT_PORTS_START( ghunter )
 	PORT_DIPSETTING(    0x0000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(    0x8000, "Overseas" )
 
-	PORT_START
+	PORT_START_TAG("TRACKX")
 	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("TRACKY")
 	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(1)
 INPUT_PORTS_END
 

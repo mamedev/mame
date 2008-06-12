@@ -338,7 +338,7 @@ READ8_HANDLER( daikaiju_mcu_r )
 
 READ8_HANDLER( daikaiju_mcu_status_r )
 {
-	int res = input_port_read_indexed(machine, 3);
+	int res = input_port_read(machine, "MCU?");
 
 	res^=mame_rand(machine)&3;
 	res |=((lsasquad_sound_pending & 0x02)^2)<<3; //inverted flag

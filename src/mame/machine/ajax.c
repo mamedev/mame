@@ -109,7 +109,7 @@ static WRITE8_HANDLER( ajax_lamps_w )
 READ8_HANDLER( ajax_ls138_f10_r )
 {
 	int data = 0, index;
-	char port[5];
+	static const char *portnames[] = { "IN0", "IN1", "DSW1", "DSW2" };
 
 	switch ((offset & 0x01c0) >> 6)
 	{
@@ -121,8 +121,7 @@ READ8_HANDLER( ajax_ls138_f10_r )
 			break;
 		case 0x06:	/* 1P inputs + DIPSW #1 & #2 */
 			index = offset & 0x01;
-			sprintf(port, "%s%d", (offset & 0x02) ? "DSW" : "IN", (offset & 0x02) ? index+1 : index);
-			data = input_port_read(machine, port);
+			data = input_port_read(machine, (offset & 0x02) ? portnames[2 + index] : portnames[index]);
 			break;
 		case 0x07:	/* DIPSW #3 */
 			data = input_port_read(machine, "DSW3");

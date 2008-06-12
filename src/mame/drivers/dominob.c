@@ -124,7 +124,7 @@ static WRITE8_HANDLER( dominob_d008_w )
 
 static READ8_HANDLER( dominob_input_2_r )
 {
-	return input_port_read_indexed(machine, 2);
+	return input_port_read(machine, "IN2");
 }
 
 

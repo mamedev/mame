@@ -93,10 +93,9 @@ static READ16_HANDLER( special_port2_r )
 
 static WRITE16_HANDLER( a2d_select_w )
 {
-	char port[5];
+	static const char *portnames[] = { "A2D0", "A2D1" };
 
-	sprintf(port, "A2D%d", (offset != 0));
-	analog_data = input_port_read(machine, port);
+	analog_data = input_port_read(machine, portnames[offset != 0]);
 }
 
 

@@ -344,7 +344,7 @@ static UINT8 dunhuang_hopper;
 static WRITE8_HANDLER( dunhuang_input_w )	{	dunhuang_input = data;	}
 static READ8_HANDLER( dunhuang_service_r )
 {
-	return input_port_read_indexed(machine, 5)
+	return input_port_read(machine, "SERVICE")
 	 | ((dunhuang_hopper && !(video_screen_get_frame_number(machine->primary_screen)%10)) ? 0x00 : 0x08)	// bit 3: hopper sensor
 	 | 0x80																// bit 7 low -> tiles block transferrer busy
 	;
@@ -352,21 +352,21 @@ static READ8_HANDLER( dunhuang_service_r )
 
 static READ8_HANDLER( dunhuang_dsw_r )
 {
-	if (!(dunhuang_input & 0x01))	return input_port_read_indexed(machine, 0);
-	if (!(dunhuang_input & 0x02))	return input_port_read_indexed(machine, 1);
-	if (!(dunhuang_input & 0x04))	return input_port_read_indexed(machine, 2);
-	if (!(dunhuang_input & 0x08))	return input_port_read_indexed(machine, 3);
-	if (!(dunhuang_input & 0x10))	return input_port_read_indexed(machine, 4);
+	if (!(dunhuang_input & 0x01))	return input_port_read(machine, "DSW1");
+	if (!(dunhuang_input & 0x02))	return input_port_read(machine, "DSW2");
+	if (!(dunhuang_input & 0x04))	return input_port_read(machine, "DSW3");
+	if (!(dunhuang_input & 0x08))	return input_port_read(machine, "DSW4");
+	if (!(dunhuang_input & 0x10))	return input_port_read(machine, "DSW5");
 	logerror("%06x: warning, unknown dsw bits read, dunhuang_input = %02x\n", activecpu_get_pc(), dunhuang_input);
 	return 0xff;
 }
 static READ8_HANDLER( dunhuang_input_r )
 {
-	if (!(dunhuang_input & 0x01))	return input_port_read_indexed(machine, 6);
-	if (!(dunhuang_input & 0x02))	return input_port_read_indexed(machine, 7);
-	if (!(dunhuang_input & 0x04))	return input_port_read_indexed(machine, 8);
-	if (!(dunhuang_input & 0x08))	return input_port_read_indexed(machine, 9);
-	if (!(dunhuang_input & 0x10))	return input_port_read_indexed(machine, 10);
+	if (!(dunhuang_input & 0x01))	return input_port_read(machine, "IN0");
+	if (!(dunhuang_input & 0x02))	return input_port_read(machine, "IN1");
+	if (!(dunhuang_input & 0x04))	return input_port_read(machine, "IN2");
+	if (!(dunhuang_input & 0x08))	return input_port_read(machine, "IN3");
+	if (!(dunhuang_input & 0x10))	return input_port_read(machine, "IN4");
 	logerror("%06x: warning, unknown input bits read, dunhuang_input = %02x\n", activecpu_get_pc(), dunhuang_input);
 	return 0xff;
 }
@@ -442,7 +442,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( dunhuang )
-	PORT_START	// IN0 - DSW1
+	PORT_START_TAG("DSW1")		/* IN0 - DSW1 */
 	PORT_DIPNAME( 0x0f, 0x0f, "Main Game Chance (%)" )	PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "78" )
 	PORT_DIPSETTING(    0x01, "80" )
@@ -472,7 +472,7 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_DIPSETTING(    0x80, "Keys" )
 	PORT_DIPSETTING(    0x00, "Payout" )
 
-	PORT_START	// IN1 - DSW2
+	PORT_START_TAG("DSW2")		/* IN1 - DSW2 */
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
 	PORT_DIPNAME( 0x06, 0x06, "Credits Per Coin" )		PORT_DIPLOCATION("SW2:2,3")
 	PORT_DIPSETTING(    0x06, "1" )
@@ -493,7 +493,7 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_DIPSETTING(    0x80, "1000" )
 	PORT_DIPSETTING(    0xc0, "3000" )
 
-	PORT_START	// IN2 - DSW3
+	PORT_START_TAG("DSW3")		/* IN2 - DSW3 */
 	PORT_DIPNAME( 0x03, 0x03, "Min Bet" )				PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -515,7 +515,7 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0xc0, "6" )
 
-	PORT_START	// IN3 - DSW4
+	PORT_START_TAG("DSW4")		/* IN3 - DSW4 */
 	PORT_DIPNAME( 0x07, 0x07, "Credits Limit" )			PORT_DIPLOCATION("SW4:1,2,3")
 	PORT_DIPSETTING(    0x07, "2k" )
 	PORT_DIPSETTING(    0x06, "3k" )
@@ -541,7 +541,7 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	PORT_START	// IN4 - DSW5
+	PORT_START_TAG("DSW5")		/* IN4 - DSW5 */
 	PORT_DIPNAME( 0x03, 0x03, "Douple Up Chance (%)" )	PORT_DIPLOCATION("SW5:1,2")
 	PORT_DIPSETTING(    0x00, "50" )
 	PORT_DIPSETTING(    0x01, "60" )
@@ -565,7 +565,7 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_DIPSETTING(    0x80, "Strong" )
 	PORT_DIPSETTING(    0x00, "Weak" )
 
-	PORT_START	// IN5 - SERVICE
+	PORT_START_TAG("SERVICE")		/* IN5 - SERVICE */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE3 )		// clear (during boot)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE2 )		// book
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE  )		// test (in game: dips, during boot: service mode)
@@ -575,7 +575,7 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )		// 0 = tiles block transferrer busy
 
-	PORT_START	// IN6 - P1
+	PORT_START_TAG("IN0")		/* IN6 - P1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
@@ -585,7 +585,7 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN7 - P1
+	PORT_START_TAG("IN1")		/* IN7 - P1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
@@ -595,7 +595,7 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN8 - P1
+	PORT_START_TAG("IN2")		/* IN8 - P1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
@@ -605,7 +605,7 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN9 - P1
+	PORT_START_TAG("IN3")		/* IN9 - P1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
@@ -615,7 +615,7 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN10 - P1
+	PORT_START_TAG("IN4")		/* IN10 - P1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE	)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )

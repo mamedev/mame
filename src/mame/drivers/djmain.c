@@ -260,26 +260,27 @@ static READ32_HANDLER( v_rom_r )
 
 static READ32_HANDLER( inp1_r )
 {
-	UINT32 result = (input_port_read_indexed(machine, 5)<<24) | (input_port_read_indexed(machine, 2)<<16) | (input_port_read_indexed(machine, 1)<<8) | input_port_read_indexed(machine, 0);
+	UINT32 result = (input_port_read(machine, "DSW3")<<24) | (input_port_read(machine, "IN2")<<16) | (input_port_read(machine, "IN1")<<8) | input_port_read(machine, "IN0"); 
 
 	return result;
 }
 
 static READ32_HANDLER( inp2_r )
 {
-	return (input_port_read_indexed(machine, 3)<<24) | (input_port_read_indexed(machine, 4)<<16) | 0xffff;
+	return (input_port_read(machine, "DSW1")<<24) | (input_port_read(machine, "DSW2")<<16) | 0xffff;
 }
 
 static READ32_HANDLER( turntable_r )
 {
 	UINT32 result = 0;
+	static const char *ttnames[] = { "TT1", "TT2" };
 
 	if (ACCESSING_BITS_8_15)
 	{
 		UINT8 pos;
 		int delta;
 
-		pos = input_port_read_indexed(machine, 6 + turntable_select);
+		pos = input_port_read(machine, ttnames[turntable_select]);
 		delta = pos - turntable_last_pos[turntable_select];
 		if (delta < -128)
 			delta += 256;
@@ -501,7 +502,7 @@ ADDRESS_MAP_END
  *************************************/
 
 #define BEATMANIA_INPUT \
-	PORT_START      /* IN 0 */ \
+	PORT_START_TAG("IN0")		/* IN 0 */ \
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) \
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) \
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) \
@@ -511,7 +512,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) \
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) \
  \
-	PORT_START      /* IN 1 */ \
+	PORT_START_TAG("IN1")		/* IN 1 */ \
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) \
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) \
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) \
@@ -521,21 +522,21 @@ ADDRESS_MAP_END
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START3 ) PORT_NAME("Effect")	/* EFFECT */ \
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) \
  \
-	PORT_START      /* IN 2 */ \
+	PORT_START_TAG("IN2")		/* IN 2 */ \
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2)	/* TEST SW */ \
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service")	/* SERVICE */ \
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Reset")		/* RESET SW */ \
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 #define BEATMANIA_TURNTABLE \
-	PORT_START      /* IN 6: turn table 1P */ \
+	PORT_START_TAG("TT1")		/* IN 6: turn table 1P */ \
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_PLAYER(1) \
  \
-	PORT_START      /* IN 7: turn table 2P */ \
+	PORT_START_TAG("TT2")		/* IN 7: turn table 2P */ \
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_PLAYER(2)
 
 #define BEATMANIA_DSW1(base,mask) \
-	PORT_START      /* IN 3 */ \
+	PORT_START_TAG("DSW1")		/* IN 3 */ \
 	PORT_DIPNAME( 0xff, (0xff & mask) | base, DEF_STR( Coinage ) ) \
 	PORT_DIPSETTING(    (0xe0 & mask) | base, "1P 8C / 2P 16C / Continue 8C" ) \
 	PORT_DIPSETTING(    (0xe1 & mask) | base, "1P 8C / 2P 16C / Continue 7C" ) \
@@ -572,7 +573,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    (0x00 & mask) | base, DEF_STR( Free_Play ) )
 
 #define BM1STMIX_DSW1 \
-	PORT_START      /* IN 3 */ \
+	PORT_START_TAG("DSW1")		/* IN 3 */ \
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
 	PORT_DIPNAME( 0x1f, 0x1f, DEF_STR( Coinage ) ) \
 	PORT_DIPSETTING(    0x1e, "1P 3C / 2P 6C / Continue 3C" ) \
@@ -595,7 +596,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 
 #define BEATMANIA_DSW2 \
-	PORT_START      /* IN 4 */ \
+	PORT_START_TAG("DSW2")		/* IN 4 */ \
 	PORT_DIPNAME( 0x80, 0x80, "Score Display" ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) \
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) ) \
@@ -619,7 +620,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x00, "Level 3" )
 
 #define BEATMANIA_DSW2_OLD_LEVEL \
-	PORT_START      /* IN 4 */ \
+	PORT_START_TAG("DSW2")		/* IN 4 */ \
 	PORT_DIPNAME( 0x80, 0x80, "Score Display" ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) \
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) ) \
@@ -648,7 +649,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x00, "Level 15" )
 
 #define BM1STMIX_DSW2 \
-	PORT_START      /* IN 4 */ \
+	PORT_START_TAG("DSW2")		/* IN 4 */ \
 	PORT_DIPNAME( 0x80, 0x80, "Enable Expert Mode" ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) ) \
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) ) \
@@ -660,7 +661,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
 
 #define BMCOMPMX_DSW2 \
-	PORT_START      /* IN 4 */ \
+	PORT_START_TAG("DSW2")		/* IN 4 */ \
 	PORT_DIPNAME( 0x80, 0x80, "Score Display" ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) \
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) ) \
@@ -689,7 +690,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x00, "Level 15" )
 
 #define BEATMANIA_DSW3 \
-	PORT_START      /* IN 5 */ \
+	PORT_START_TAG("DSW3")		/* IN 5 */ \
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
 	PORT_DIPNAME( 0x20, 0x20, "Event Mode" ) \
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) ) \
@@ -704,11 +705,11 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* DSW 3-6 */
 
 #define BM1STMIX_DSW3 \
-	PORT_START      /* IN 5 */ \
+	PORT_START_TAG("DSW3")		/* IN 5 */ \
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 #define BM2NDMIX_DSW3 \
-	PORT_START      /* IN 5 */ \
+	PORT_START_TAG("DSW3")		/* IN 5 */ \
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
 	PORT_DIPNAME( 0x39, 0x39, "Event Mode / Free Hidden Songs" ) \
 	PORT_DIPSETTING(    0x39, "Off / Off" ) \
@@ -721,7 +722,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* DSW 3-5 */ \
 
 #define BMCOMPMX_DSW3 \
-	PORT_START      /* IN 5 */ \
+	PORT_START_TAG("DSW3")		/* IN 5 */ \
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
 	PORT_DIPNAME( 0x20, 0x20, "Event Mode" ) \
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) ) \
@@ -738,7 +739,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 #define BM4THMIX_DSW3 \
-	PORT_START      /* IN 5 */ \
+	PORT_START_TAG("DSW3")		/* IN 5 */ \
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
 	PORT_DIPNAME( 0x20, 0x20, "Event Mode" ) \
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) ) \
@@ -755,7 +756,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* DSW 3-6 */
 
 #define HMCOMPM2_DSW3 \
-	PORT_START      /* IN 5 */ \
+	PORT_START_TAG("DSW3")		/* IN 5 */ \
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
 	PORT_DIPNAME( 0x20, 0x20, "Event Mode" ) \
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) ) \
@@ -772,7 +773,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* DSW 3-6 */
 
 #define BMDCT_DSW3 \
-	PORT_START      /* IN 5 */ \
+	PORT_START_TAG("DSW3")		/* IN 5 */ \
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
 	PORT_DIPNAME( 0x20, 0x20, "Event Mode" ) \
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) ) \
@@ -853,7 +854,7 @@ INPUT_PORTS_END
 
 
 #define POPN_INPUT \
-	PORT_START      /* IN 0 */ \
+	PORT_START_TAG("IN0")		/* IN 0 */ \
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) \
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) \
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) \
@@ -863,7 +864,7 @@ INPUT_PORTS_END
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) \
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) \
  \
-	PORT_START      /* IN 1 */ \
+	PORT_START_TAG("IN1")		/* IN 1 */ \
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) \
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(1) \
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
@@ -873,14 +874,14 @@ INPUT_PORTS_END
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) \
  \
-	PORT_START      /* IN 2 */ \
+	PORT_START_TAG("IN2")		/* IN 2 */ \
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2)	/* TEST SW */ \
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )	/* SERVICE */ \
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )	/* RESET SW */ \
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 #define POPN_DSW1 \
-	PORT_START      /* IN 3 */ \
+	PORT_START_TAG("DSW1")		/* IN 3 */ \
 	PORT_DIPNAME( 0xc0, 0xc0, "Jamming Gauge Blocks" ) \
 	PORT_DIPSETTING(    0x80, "5" ) \
 	PORT_DIPSETTING(    0xc0, "6" ) \
@@ -924,7 +925,7 @@ INPUT_PORTS_END
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 
 #define POPN1_DSW1 \
-	PORT_START      /* IN 3 */ \
+	PORT_START_TAG("DSW1")		/* IN 3 */ \
 	PORT_DIPNAME( 0xc0, 0xc0, "Jamming Gauge Blocks" ) \
 	PORT_DIPSETTING(    0x80, "5" ) \
 	PORT_DIPSETTING(    0xc0, "6" ) \
@@ -950,7 +951,7 @@ INPUT_PORTS_END
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 
 #define POPN_DSW2 \
-	PORT_START      /* IN 4 */ \
+	PORT_START_TAG("DSW2")		/* IN 4 */ \
 	PORT_DIPNAME( 0x80, 0x80, "Score Display" ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) \
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) ) \
@@ -972,7 +973,7 @@ INPUT_PORTS_END
 	PORT_DIPSETTING(    0x00, "3" )
 
 #define POPN1_DSW2 \
-	PORT_START      /* IN 4 */ \
+	PORT_START_TAG("DSW2")		/* IN 4 */ \
 	PORT_DIPNAME( 0x80, 0x80, "Score Display" ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) \
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) ) \
@@ -996,14 +997,14 @@ INPUT_PORTS_END
 	PORT_DIPSETTING(    0x00, "3" )
 
 #define POPN_DSW3 \
-	PORT_START      /* IN 5 */ \
+	PORT_START_TAG("DSW3")		/* IN 5 */ \
 	PORT_BIT( 0xf7, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
 	PORT_DIPNAME( 0x08, 0x08, "All Song Mode" )		/* DSW 3-3 */ \
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 #define POPN1_DSW3 \
-	PORT_START      /* IN 5 */ \
+	PORT_START_TAG("DSW3")		/* IN 5 */ \
 	PORT_BIT( 0xec, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
 	PORT_DIPNAME( 0x10, 0x10, "All Song Mode" )		/* DSW 3-2 */ \
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) ) \
@@ -1035,7 +1036,7 @@ INPUT_PORTS_END
 #endif
 
 #define POPNST_INPUT \
-	PORT_START      /* IN 0 */ \
+	PORT_START_TAG("IN0")		/* IN 0 */ \
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) \
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) \
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) \
@@ -1045,7 +1046,7 @@ INPUT_PORTS_END
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) \
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) \
  \
-	PORT_START      /* IN 1 */ \
+	PORT_START_TAG("IN1")		/* IN 1 */ \
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) \
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(1) \
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_PLAYER(1) \
@@ -1055,14 +1056,14 @@ INPUT_PORTS_END
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 )	/* RIGHT SELECTION */ \
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) \
  \
-	PORT_START      /* IN 2 */ \
+	PORT_START_TAG("IN2")		/* IN 2 */ \
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2)	/* TEST SW */ \
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )	/* SERVICE */ \
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 #define POPNST_DSW1 \
-	PORT_START      /* IN 3 */ \
+	PORT_START_TAG("DSW1")		/* IN 3 */ \
 	PORT_DIPNAME( 0xe0, 0xe0, "Coinage (6 Buttons)" ) \
 	PORT_DIPSETTING(    0x20, "1P 4C / Continue 2C" ) \
 	PORT_DIPSETTING(    0x40, "1P 3C / Continue 3C" ) \
@@ -1092,7 +1093,7 @@ INPUT_PORTS_END
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 #define POPNST_DSW2 \
-	PORT_START      /* IN 4 */ \
+	PORT_START_TAG("DSW2")		/* IN 4 */ \
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Demo_Sounds ) ) \
 	PORT_DIPSETTING(    0xc0, "Loud" ) \
 	PORT_DIPSETTING(    0x80, DEF_STR ( Medium ) ) \
@@ -1114,7 +1115,7 @@ INPUT_PORTS_END
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 #define POPNST_DSW3 \
-	PORT_START      /* IN 5 */ \
+	PORT_START_TAG("DSW3")		/* IN 5 */ \
 	PORT_BIT( 0xd5, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
 	PORT_DIPNAME( 0x2a, 0x2a, "Enable Secret Mode" ) \
 	PORT_DIPSETTING(    0x2a, DEF_STR( Off ) ) \
@@ -1122,7 +1123,7 @@ INPUT_PORTS_END
 
 #ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( popnstage )
-	POPNST_INPUT			/* IN 0-2 */
+	POPNST_INPUT		/* IN 0-2 */
 	POPNST_DSW1			/* IN 3 */
 	POPNST_DSW2			/* IN 4 */
 	POPNST_DSW3			/* IN 5 */

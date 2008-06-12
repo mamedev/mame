@@ -211,7 +211,7 @@ static TIMER_CALLBACK( delayed_joystick_int )
 static READ16_HANDLER( joystick_r )
 {
 	int newval = 0xff;
-	char port[4];
+	static const char *portnames[] = { "IN0", "IN1" };
 
 	/* digital joystick type */
 	if (joystick_type == 1)
@@ -219,10 +219,7 @@ static READ16_HANDLER( joystick_r )
 
 	/* Hall-effect analog joystick */
 	else if (joystick_type == 2)
-	{
-		sprintf(port, "IN%d", offset & 1);
-		newval = input_port_read(machine, port);
-	}
+		newval = input_port_read(machine, portnames[offset & 1]);
 
 	/* Road Blasters gas pedal */
 	else if (joystick_type == 3)
