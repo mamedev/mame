@@ -2049,19 +2049,17 @@ INLINE void update_timer(int cyc)
 				R_TL0 = count & 0xff;
 
                 //Split Timer 2
-                if(GET_TR1) {
-				    overflow = 0xff;
-				    count = R_TH0;
-				    //Check for overflow
-                    if(count+(cyc/12)>overflow) {
-					    count = overflow-count;
-                        SET_TF1(1);
-                    }
-				    else
-                        count+=(cyc/12);
-				    //Update new values of the counter
-				    R_TH0 = count & 0xff;
+			    overflow = 0xff;
+			    count = R_TH0;
+			    //Check for overflow
+                if(count+(cyc/12)>overflow) {
+				    count = overflow-count;
+                    SET_TF1(1);
                 }
+			    else
+                    count+=(cyc/12);
+			    //Update new values of the counter
+			    R_TH0 = count & 0xff;
 				break;
 		}
 	}
