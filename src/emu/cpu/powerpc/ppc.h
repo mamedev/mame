@@ -1,8 +1,13 @@
 /***************************************************************************
 
     ppc.h
-    Interface file for the portable MIPS III/IV emulator.
-    Written by Aaron Giles
+
+    Interface file for the universal machine language-based 
+    PowerPC emulator.
+
+    Copyright Aaron Giles
+    Released for general non-commercial use under the MAME license
+    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
@@ -13,9 +18,24 @@
 
 
 /***************************************************************************
-    REGISTER ENUMERATION
+    CONSTANTS
 ***************************************************************************/
 
+/* general constants */
+#define PPC_MAX_FASTRAM			4
+#define PPC_MAX_HOTSPOTS		16
+
+
+/* interrupt types */
+#define PPC_IRQ					0		/* external IRQ */
+#define PPC_IRQ_LINE_0			0		/* (4XX) external IRQ0 */
+#define PPC_IRQ_LINE_1			1		/* (4XX) external IRQ1 */
+#define PPC_IRQ_LINE_2			2		/* (4XX) external IRQ2 */
+#define PPC_IRQ_LINE_3			3		/* (4XX) external IRQ3 */
+#define PPC_IRQ_LINE_4			4		/* (4XX) external IRQ4 */
+
+
+/* register enumeration */
 enum
 {
 	PPC_PC = 1,
@@ -73,10 +93,7 @@ enum
 };
 
 
-#define PPC_MAX_FASTRAM			4
-#define PPC_MAX_HOTSPOTS		16
-
-
+/* interface extensions */
 enum
 {
 	CPUINFO_INT_PPC_DRC_OPTIONS = CPUINFO_INT_CPU_SPECIFIC,
@@ -95,30 +112,29 @@ enum
 
 	CPUINFO_PTR_PPC_FASTRAM_BASE = CPUINFO_PTR_CPU_SPECIFIC,
 
-	CPUINFO_PTR_SPU_RX_HANDLER,
 	CPUINFO_PTR_SPU_TX_HANDLER,
 
 	CPUINFO_PTR_CONTEXT			/* temporary */
 };
 
 
+/* compiler-specific options */
+#define PPCDRC_STRICT_VERIFY		0x0001			/* verify all instructions */
+#define PPCDRC_FLUSH_PC				0x0002			/* flush the PC value before each memory access */
+#define PPCDRC_ACCURATE_SINGLES		0x0004			/* do excessive rounding to make single-precision results "accurate" */
 
-/***************************************************************************
-    INTERRUPT CONSTANTS
-***************************************************************************/
 
-#define PPC_IRQ				0		/* external IRQ */
-#define PPC_IRQ_LINE_0		0		/* (4XX) external IRQ0 */
-#define PPC_IRQ_LINE_1		1		/* (4XX) external IRQ1 */
-#define PPC_IRQ_LINE_2		2		/* (4XX) external IRQ2 */
-#define PPC_IRQ_LINE_3		3		/* (4XX) external IRQ3 */
-#define PPC_IRQ_LINE_4		4		/* (4XX) external IRQ4 */
+/* common sets of options */
+#define PPCDRC_COMPATIBLE_OPTIONS	(PPCDRC_STRICT_VERIFY | PPCDRC_FLUSH_PC | PPCDRC_ACCURATE_SINGLES)
+#define PPCDRC_FASTEST_OPTIONS		(0)
 
 
 
 /***************************************************************************
-    STRUCTURES
+    STRUCTURES AND TYPEDEFS
 ***************************************************************************/
+
+typedef void (*ppc4xx_spu_tx_handler)(UINT8 data);
 
 typedef struct _powerpc_config powerpc_config;
 struct _powerpc_config
@@ -171,14 +187,20 @@ void mpc8240_get_info(UINT32 state, cpuinfo *info);
 
 
 /***************************************************************************
-    COMPILER-SPECIFIC OPTIONS
+    INLINE FUNCTIONS
 ***************************************************************************/
 
-#define PPCDRC_STRICT_VERIFY		0x0001			/* verify all instructions */
-#define PPCDRC_FLUSH_PC				0x0002			/* flush the PC value before each memory access */
-#define PPCDRC_ACCURATE_SINGLES		0x0004			/* do excessive rounding to make single-precision results "accurate" */
+INLINE void ppc4xx_spu_set_tx_handler(int cpunum, ppc4xx_spu_tx_handler handler)
+{
+	cpunum_set_info_fct(cpunum, CPUINFO_PTR_SPU_TX_HANDLER, (genf *)handler);
+}
 
-#define PPCDRC_COMPATIBLE_OPTIONS	(PPCDRC_STRICT_VERIFY | PPCDRC_FLUSH_PC | PPCDRC_ACCURATE_SINGLES)
-#define PPCDRC_FASTEST_OPTIONS		(0)
+
+INLINE void ppc4xx_spu_receive_byte(int cpunum, UINT8 byteval)
+{
+	cpunum_set_info_int(cpunum, CPUINFO_INT_PPC_RX_DATA, byteval);
+}
+
+
 
 #endif	/* __PPC_H__ */

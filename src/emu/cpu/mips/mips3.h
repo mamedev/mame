@@ -1,8 +1,13 @@
 /***************************************************************************
 
     mips3.h
-    Interface file for the portable MIPS III/IV emulator.
-    Written by Aaron Giles
+    
+    Interface file for the universal machine language-based 
+    MIPS III/IV emulator.
+
+    Copyright Aaron Giles
+    Released for general non-commercial use under the MAME license
+    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 

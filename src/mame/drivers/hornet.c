@@ -1076,22 +1076,9 @@ MACHINE_DRIVER_END
 
 static void jamma_jvs_cmd_exec(void);
 
-static UINT8 jvs_rdata[1024];
 static UINT8 jvs_sdata[1024];
 
-static int jvs_rdata_ptr = 0;
 static int jvs_sdata_ptr = 0;
-static int jvs_rdata_count = 0;
-
-static int jamma_jvs_r(UINT8 *data)
-{
-	if (jvs_rdata_ptr < jvs_rdata_count)
-	{
-		*data = jvs_rdata[jvs_rdata_ptr++];
-		return TRUE;
-	}
-	return FALSE;
-}
 
 static void jamma_jvs_w(UINT8 data)
 {
@@ -1104,31 +1091,33 @@ static void jamma_jvs_w(UINT8 data)
 		jamma_jvs_cmd_exec();
 }
 
-static int jvs_encode_data(UINT8 *in, UINT8 *out, int length)
+static int jvs_encode_data(UINT8 *in, int length)
 {
-	int outptr = 0;
 	int inptr = 0;
+	int sum = 0;
 
 	while (inptr < length)
 	{
 		UINT8 b = in[inptr++];
 		if (b == 0xe0)
 		{
-			out[outptr++] = 0xd0;
-			out[outptr++] = 0xdf;
+			sum += 0xd0 + 0xdf;
+			ppc4xx_spu_receive_byte(0, 0xd0);
+			ppc4xx_spu_receive_byte(0, 0xdf);
 		}
 		else if (b == 0xd0)
 		{
-			out[outptr++] = 0xd0;
-			out[outptr++] = 0xcf;
+			sum += 0xd0 + 0xcf;
+			ppc4xx_spu_receive_byte(0, 0xd0);
+			ppc4xx_spu_receive_byte(0, 0xcf);
 		}
 		else
 		{
-			out[outptr++] = b;
+			sum += b;
+			ppc4xx_spu_receive_byte(0, b);
 		}
-	};
-
-	return outptr;
+	}
+	return sum;
 }
 
 static int jvs_decode_data(UINT8 *in, UINT8 *out, int length)
@@ -1157,7 +1146,7 @@ static void jamma_jvs_cmd_exec(void)
 {
 	UINT8 sync, node, byte_num;
 	UINT8 data[1024], rdata[1024];
-	int i, length;
+	int length;
 	int rdata_ptr;
 	int sum;
 
@@ -1213,24 +1202,13 @@ static void jamma_jvs_cmd_exec(void)
 	}
 
 	// write jvs return data
-	jvs_rdata[0] = 0xe0;			// sync
-	jvs_rdata[1] = 0x00;			// node
-	jvs_rdata[2] = rdata_ptr+1;		// num of bytes
+	sum = 0x00 + (rdata_ptr+1);
+	ppc4xx_spu_receive_byte(0, 0xe0);			// sync
+	ppc4xx_spu_receive_byte(0, 0x00);			// node
+	ppc4xx_spu_receive_byte(0, rdata_ptr+1);	// num of bytes
+	sum += jvs_encode_data(rdata, rdata_ptr);
+	ppc4xx_spu_receive_byte(0, sum - 1);		// checksum
 
-	length = jvs_encode_data(rdata, &jvs_rdata[3], rdata_ptr);
-
-	// calculate sum
-	sum = 0;
-	for (i=0; i < length+2; i++)
-	{
-		sum += jvs_rdata[1+i];
-	}
-
-	// write sum
-	jvs_rdata[3+length] = (UINT8)(sum-1);
-
-	jvs_rdata_count = length + 4;
-	jvs_rdata_ptr = 0;
 	jvs_sdata_ptr = 0;
 }
 
@@ -1258,8 +1236,7 @@ static void init_hornet(running_machine *machine)
 
 	timekeeper_init(0, TIMEKEEPER_M48T58, backup_ram);
 
-	cpunum_set_info_fct(0, CPUINFO_PTR_SPU_TX_HANDLER, (genf *)jamma_jvs_w);
-	cpunum_set_info_fct(0, CPUINFO_PTR_SPU_RX_HANDLER, (genf *)jamma_jvs_r);
+	ppc4xx_spu_set_tx_handler(0, jamma_jvs_w);
 }
 
 static void init_hornet_2board(running_machine *machine)
@@ -1276,8 +1253,7 @@ static void init_hornet_2board(running_machine *machine)
 
 	timekeeper_init(0, TIMEKEEPER_M48T58, backup_ram);
 
-	cpunum_set_info_fct(0, CPUINFO_PTR_SPU_TX_HANDLER, (genf *)jamma_jvs_w);
-	cpunum_set_info_fct(0, CPUINFO_PTR_SPU_RX_HANDLER, (genf *)jamma_jvs_r);
+	ppc4xx_spu_set_tx_handler(0, jamma_jvs_w);
 }
 
 static DRIVER_INIT(gradius4)

@@ -491,10 +491,6 @@ enum
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
 
-typedef int (*ppc4xx_spu_rx_handler)(UINT8 *data);
-typedef void (*ppc4xx_spu_tx_handler)(UINT8 data);
-
-
 /* PowerPC 4XX-specific serial port state */
 typedef struct _ppc4xx_spu_state ppc4xx_spu_state;
 struct _ppc4xx_spu_state
@@ -503,7 +499,8 @@ struct _ppc4xx_spu_state
 	UINT8			txbuf;
 	UINT8			rxbuf;
 	emu_timer *		timer;
-	ppc4xx_spu_rx_handler rx_handler;
+	UINT8			rxbuffer[256];
+	UINT32			rxin, rxout;
 	ppc4xx_spu_tx_handler tx_handler;
 };
 

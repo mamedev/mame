@@ -2256,7 +2256,7 @@ static void security_w(UINT8 data)
 {
 	int r = ibutton_w(data);
 	if (r >= 0)
-		cpunum_set_info_int(0, CPUINFO_INT_PPC_RX_DATA, r & 0xff);
+		ppc4xx_spu_receive_byte(0, r);
 }
 
 /*****************************************************************************/
@@ -2291,7 +2291,7 @@ static void init_firebeat(running_machine *machine)
 
 	cur_cab_data = cab_data;
 
-	cpunum_set_info_fct(0, CPUINFO_PTR_SPU_TX_HANDLER, (genf *)security_w);
+	ppc4xx_spu_set_tx_handler(0, security_w);
 
 	set_ibutton(rom);
 

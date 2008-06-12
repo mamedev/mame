@@ -16,7 +16,7 @@
 
 #define PRINTF_TLB_FILL			(1)
 #define PRINTF_SPU				(0)
-#define PRINTF_DECREMENTER		(1)
+#define PRINTF_DECREMENTER		(0)
 
 
 
@@ -909,18 +909,22 @@ void ppccom_execute_mfdcr(powerpc_state *ppc)
 		case DCR4XX_DMADA0:
 		case DCR4XX_DMASA0:
 		case DCR4XX_DMACC0:
+		case DCR4XX_DMACR0:
 		case DCR4XX_DMACT1:
 		case DCR4XX_DMADA1:
 		case DCR4XX_DMASA1:
 		case DCR4XX_DMACC1:
+		case DCR4XX_DMACR1:
 		case DCR4XX_DMACT2:
 		case DCR4XX_DMADA2:
 		case DCR4XX_DMASA2:
 		case DCR4XX_DMACC2:
+		case DCR4XX_DMACR2:
 		case DCR4XX_DMACT3:
 		case DCR4XX_DMADA3:
 		case DCR4XX_DMASA3:
 		case DCR4XX_DMACC3:
+		case DCR4XX_DMACR3:
 		case DCR4XX_EXIER:
 		case DCR4XX_EXISR:
 		case DCR4XX_IOCR:
@@ -1634,7 +1638,16 @@ static void ppc4xx_spu_update_irq_states(powerpc_state *ppc)
 
 static void ppc4xx_spu_rx_data(powerpc_state *ppc, UINT8 data)
 {
-	fatalerror("ppc4xx_spu_rx_data unimplemented\n");
+	UINT32 new_rxin;
+
+	/* fail if we are going to overflow */
+	new_rxin = (ppc->spu.rxin + 1) % ARRAY_LENGTH(ppc->spu.rxbuffer);
+	if (new_rxin == ppc->spu.rxout)
+		fatalerror("ppc4xx_spu_rx_data: buffer overrun!");
+	
+	/* store the data and accept the new in index */
+	ppc->spu.rxbuffer[ppc->spu.rxin] = data;
+	ppc->spu.rxin = new_rxin;
 }
 
 
@@ -1656,7 +1669,7 @@ static void ppc4xx_spu_timer_reset(powerpc_state *ppc)
 		attotime charperiod = attotime_mul(clockperiod, divisor * 16 * bpc);
 		timer_adjust_periodic(ppc->spu.timer, charperiod, 0, charperiod);
 		if (PRINTF_SPU)
-			mame_printf_debug("ppc4xx_spu_timer_reset: baud rate = %.0f\n", ATTOSECONDS_TO_HZ(charperiod.attoseconds) * bpc);
+			printf("ppc4xx_spu_timer_reset: baud rate = %.0f\n", ATTOSECONDS_TO_HZ(charperiod.attoseconds) * bpc);
 	}
 
 	/* otherwise, disable the timer */
@@ -1673,7 +1686,6 @@ static void ppc4xx_spu_timer_reset(powerpc_state *ppc)
 static TIMER_CALLBACK( ppc4xx_spu_callback )
 {
 	powerpc_state *ppc = ptr;
-	UINT8 rxbyte;
 
 	/* transmit enabled? */
 	if (ppc->spu.regs[SPU4XX_TX_COMMAND] & 0x80)
@@ -1703,9 +1715,14 @@ static TIMER_CALLBACK( ppc4xx_spu_callback )
 
 	/* receive enabled? */
 	if (ppc->spu.regs[SPU4XX_RX_COMMAND] & 0x80)
-		if (ppc->spu.rx_handler != NULL && (*ppc->spu.rx_handler)(&rxbyte))
+		if (ppc->spu.rxout != ppc->spu.rxin)
 		{
 			int operation = (ppc->spu.regs[SPU4XX_RX_COMMAND] >> 5) & 3;
+			UINT8 rxbyte;
+			
+			/* consume the byte and advance the out pointer */
+			rxbyte = ppc->spu.rxbuffer[ppc->spu.rxout];
+			ppc->spu.rxout = (ppc->spu.rxout + 1) % ARRAY_LENGTH(ppc->spu.rxbuffer);
 
 			/* if we're not full, copy data to the buffer and update the line status */
 			if (!(ppc->spu.regs[SPU4XX_LINE_STATUS] & 0x80))
@@ -1754,7 +1771,7 @@ static READ8_HANDLER( ppc4xx_spu_r )
 			break;
 	}
 	if (PRINTF_SPU)
-		mame_printf_debug("spu_r(%d) = %02X\n", offset, result);
+		printf("spu_r(%d) = %02X\n", offset, result);
 	return result;
 }
 
@@ -1769,7 +1786,7 @@ static WRITE8_HANDLER( ppc4xx_spu_w )
 	UINT8 oldstate, newstate;
 
 	if (PRINTF_SPU)
-		mame_printf_debug("spu_w(%d) = %02X\n", offset, data);
+		printf("spu_w(%d) = %02X\n", offset, data);
 	switch (offset)
 	{
 		/* clear error bits */
@@ -1853,7 +1870,6 @@ void ppc4xx_set_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_PPC_RX_DATA:					ppc4xx_spu_rx_data(ppc, info->i);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SPU_RX_HANDLER:				ppc->spu.rx_handler = (ppc4xx_spu_rx_handler)info->f; break;
 		case CPUINFO_PTR_SPU_TX_HANDLER:				ppc->spu.tx_handler = (ppc4xx_spu_tx_handler)info->f; break;
 
 		/* --- everything else is handled generically --- */
