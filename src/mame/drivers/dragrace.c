@@ -119,7 +119,7 @@ static READ8_HANDLER( dragrace_input_r )
 {
 	int val = input_port_read(machine, "IN2");
 	static const char *portnames[] = { "IN0", "IN1" };
-	
+
 	UINT8 maskA = 1 << (offset % 8);
 	UINT8 maskB = 1 << (offset / 8);
 

@@ -160,7 +160,7 @@ static INPUT_PORTS_START( blockade )
 	PORT_DIPSETTING(	0x70, "6" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 								/* this is really used for the coin latch,  */
-								/* see blockade_interrupt()					*/
+								/* see blockade_interrupt()                 */
 
 	PORT_START_TAG("IN1")		/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
@@ -202,7 +202,7 @@ static INPUT_PORTS_START( comotion )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 								/* this is really used for the coin latch,  */
-								/* see blockade_interrupt()					*/
+								/* see blockade_interrupt()                 */
 
 	PORT_START_TAG("IN1")		/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
@@ -247,7 +247,7 @@ static INPUT_PORTS_START( blasto )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 								/* this is really used for the coin latch,  */
-								/* see blockade_interrupt()					*/
+								/* see blockade_interrupt()                 */
 
 	PORT_START_TAG("IN1")		/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -290,7 +290,7 @@ static INPUT_PORTS_START( hustle )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 								/* this is really used for the coin latch,  */
-								/* see blockade_interrupt()					*/
+								/* see blockade_interrupt()                 */
 
 	PORT_START_TAG("IN1")		/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
@@ -333,7 +333,7 @@ static INPUT_PORTS_START( mineswpr )
 	PORT_DIPSETTING(	0x70, "6" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 								/* this is really used for the coin latch,  */
-								/* see blockade_interrupt()					*/
+								/* see blockade_interrupt()                 */
 
 	PORT_START_TAG("IN1")		/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
@@ -375,7 +375,7 @@ static INPUT_PORTS_START( minesw4p )
 	PORT_DIPSETTING(	0x70, "6" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 								/* this is really used for the coin latch,  */
-								/* see blockade_interrupt()					*/
+								/* see blockade_interrupt()                 */
 
 	PORT_START_TAG("IN1")		/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)

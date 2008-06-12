@@ -202,7 +202,7 @@ INLINE void execute_one(int opcode)
 			break;
 		case 0x03: i8085_ICount -= (I.cputype) ? 6 : 5;	/* INX  B */
 			I.BC.w.l++;
-			if( I.cputype ) 
+			if( I.cputype )
 			{
 				if (I.BC.b.l == 0x00) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
 			}
@@ -236,8 +236,8 @@ INLINE void execute_one(int opcode)
 			break;
 		case 0x0b: i8085_ICount -= (I.cputype) ? 6 : 5;	/* DCX  B */
 			I.BC.w.l--;
-			if( I.cputype ) 
-			{			
+			if( I.cputype )
+			{
 				if (I.BC.b.l == 0xff) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
 			}
 			break;
@@ -271,8 +271,8 @@ INLINE void execute_one(int opcode)
 			break;
 		case 0x13: i8085_ICount -= (I.cputype) ? 6 : 5;	/* INX  D */
 			I.DE.w.l++;
-			if( I.cputype ) 
-			{			
+			if( I.cputype )
+			{
 				if (I.DE.b.l == 0x00) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
 			}
 			break;
@@ -308,7 +308,7 @@ INLINE void execute_one(int opcode)
 			break;
 		case 0x1b: i8085_ICount -= (I.cputype) ? 6 : 5;	/* DCX  D */
 			I.DE.w.l--;
-			if( I.cputype ) 
+			if( I.cputype )
 			{
 				if (I.DE.b.l == 0xff) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
 			}
@@ -348,8 +348,8 @@ INLINE void execute_one(int opcode)
 			break;
 		case 0x23: i8085_ICount -= (I.cputype) ? 6 : 5;	/* INX  H */
 			I.HL.w.l++;
-			if( I.cputype ) 
-			{			
+			if( I.cputype )
+			{
 				if (I.HL.b.l == 0x00) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
 			}
 			break;
@@ -368,7 +368,7 @@ INLINE void execute_one(int opcode)
 			if (I.AF.b.l & HF) I.XX.d |= 0x200;
 			if (I.AF.b.l & NF) I.XX.d |= 0x400;
 			I.AF.w.l = DAA[I.XX.d];
-			if( I.cputype==0 ) 
+			if( I.cputype==0 )
 			{
 				I.AF.b.l &= 0xd5; // Ignore not used flags
 			}
@@ -394,7 +394,7 @@ INLINE void execute_one(int opcode)
 			break;
 		case 0x2b: i8085_ICount -= (I.cputype) ? 6 : 5;	/* DCX  H */
 			I.HL.w.l--;
-			if( I.cputype ) 
+			if( I.cputype )
 			{
 				if (I.HL.b.l == 0xff) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
 			}
@@ -453,7 +453,7 @@ INLINE void execute_one(int opcode)
 			break;
 		case 0x33: i8085_ICount -= (I.cputype) ? 6 : 5;	/* INX  SP */
 			I.SP.w.l++;
-			if( I.cputype ) 
+			if( I.cputype )
 			{
 				if (I.SP.b.l == 0x00) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
 			}
@@ -494,8 +494,8 @@ INLINE void execute_one(int opcode)
 			break;
 		case 0x3b: i8085_ICount -= (I.cputype) ? 6 : 5;	/* DCX  SP */
 			I.SP.w.l--;
-			if( I.cputype ) 
-			{			
+			if( I.cputype )
+			{
 				if (I.SP.b.l == 0xff) I.AF.b.l |= XF; else I.AF.b.l &= ~XF;
 			}
 			break;
@@ -508,7 +508,7 @@ INLINE void execute_one(int opcode)
 		case 0x3e: i8085_ICount -= 7;	/* MVI  A,nn */
 			M_MVI(I.AF.b.h);
 			break;
-		case 0x3f: i8085_ICount -= 4;	/* CMC  */			
+		case 0x3f: i8085_ICount -= 4;	/* CMC  */
 			I.AF.b.l = (I.AF.b.l & 0xfe) | ((I.AF.b.l & CF)==1 ? 0 : 1);
 			break;
 

@@ -511,7 +511,7 @@ INLINE int read_trackball(running_machine *machine, int idx, int switch_port)
 	UINT8 newpos;
 	static const char *portnames[] = { "IN0", "IN1", "IN2" };
 	static const char *tracknames[] = { "TRACK0_X", "TRACK0_Y", "TRACK1_X", "TRACK1_Y" };
-	
+
 	/* adjust idx if we're cocktail flipped */
 	if (centiped_flipscreen)
 		idx += 2;
@@ -1510,7 +1510,7 @@ static INPUT_PORTS_START( bullsdrt )
 	/* 2008-06 FP: was bullsdrt available as cocktail? If not, these can be removed */
 	PORT_START_TAG("TRACK1_X")
 
-	PORT_START_TAG("TRACK1_Y")		
+	PORT_START_TAG("TRACK1_Y")
 INPUT_PORTS_END
 
 

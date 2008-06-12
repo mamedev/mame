@@ -2,7 +2,7 @@
 
     ppc.h
 
-    Interface file for the universal machine language-based 
+    Interface file for the universal machine language-based
     PowerPC emulator.
 
     Copyright Aaron Giles

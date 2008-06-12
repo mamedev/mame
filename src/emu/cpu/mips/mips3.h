@@ -1,8 +1,8 @@
 /***************************************************************************
 
     mips3.h
-    
-    Interface file for the universal machine language-based 
+
+    Interface file for the universal machine language-based
     MIPS III/IV emulator.
 
     Copyright Aaron Giles

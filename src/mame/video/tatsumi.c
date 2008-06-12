@@ -630,7 +630,7 @@ extent_x=extent_y=0;
 
 				for (w=0; w<x_width; w++) {
 					if (rotate)
-						roundupt_drawgfxzoomrotate(machine, 
+						roundupt_drawgfxzoomrotate(machine,
 								temp_bitmap,machine->gfx[0],
 								base,
 								color,fx,0,x_pos,render_y,

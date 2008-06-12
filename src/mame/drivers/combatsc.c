@@ -164,7 +164,7 @@ static READ8_HANDLER( trackball_r )
 	{
 		int i,dir[4];
 		static const char *tracknames[] = { "TRACK0_Y", "TRACK0_X", "TRACK1_Y", "TRACK1_X" };
-		
+
 		for (i = 0; i < 4; i++)
 		{
 			UINT8 curr;

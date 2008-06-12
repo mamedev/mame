@@ -281,10 +281,10 @@ static READ8_HANDLER( sysreg_r )
 		case 1:
 		case 3:
 			return input_port_read_indexed(machine, offset);
-		
+
 		case 2:
 			return adc1038_sars_r(machine) << 7;
-		
+
 		case 4:
 		{
 			// 7        0
@@ -297,7 +297,7 @@ static READ8_HANDLER( sysreg_r )
 			UINT32 adc_bit = (adc1038_do_r() << 2);
 			return (eeprom_bit | adc_bit);
 		}
-		
+
 		default:
 			mame_printf_debug("sysreg_r %d\n", offset);
 			break;
@@ -312,7 +312,7 @@ static WRITE8_HANDLER( sysreg_w )
 		case 0:
 			gticlub_led_reg0 = data;
 			break;
-		
+
 		case 1:
 			gticlub_led_reg1 = data;
 			break;
@@ -322,7 +322,7 @@ static WRITE8_HANDLER( sysreg_w )
 			eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 			eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			break;
-		
+
 		case 4:
 			if (data & 0x80)	/* CG Board 1 IRQ Ack */
 				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
@@ -378,8 +378,8 @@ WRITE8_HANDLER( K056230_w )
 					timer_set(ATTOTIME_IN_USEC(1), NULL, 0, network_irq_clear);
 				}
 			}
-//			else
-//				cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ2, CLEAR_LINE);
+//          else
+//              cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ2, CLEAR_LINE);
 			break;
 		}
 		case 2:		// Sub ID register

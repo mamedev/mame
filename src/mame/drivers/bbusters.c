@@ -292,7 +292,7 @@ static READ16_HANDLER( mechatt_gun_r )
 {
 	int baseport=0,x,y;
 	static const char *port[] = { "IN2", "IN3", "IN4", "IN5" };
-	
+
 	if (offset) baseport=2; /* Player 2 */
 
 	x=input_port_read(machine, port[baseport]);

@@ -511,8 +511,8 @@ ROM_END
 /********** DIFFERENT HARDWARE **********/
 
 
-/* Mystery Number 
- 
+/* Mystery Number
+
 CPU:
 
 1x HD64F3048F16 (main)(u2)

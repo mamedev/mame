@@ -476,18 +476,18 @@ void ppccom_tlb_fill(powerpc_state *ppc)
 	int transtype = ppc->param1;
 	offs_t transaddr = address;
 	UINT32 entryval;
-	
+
 	/* 4xx case: "TLB" really just caches writes and checks compare registers */
 	if (ppc->cap & PPCCAP_4XX)
 	{
 		/* assume success and direct translation */
 		ppc->param0 = 1;
 		transaddr = address & 0x7fffffff;
-		
+
 		/* we don't support the MMU of the 403GCX */
 		if (ppc->flavor == PPC_MODEL_403GCX && (ppc->msr & MSROEA_DR))
 			fatalerror("MMU enabled but not supported!");
-		
+
 		/* only check if PE is enabled */
 		if (transtype == TRANSLATE_WRITE && (ppc->msr & MSR4XX_PE))
 		{
@@ -500,11 +500,11 @@ void ppccom_tlb_fill(powerpc_state *ppc)
 				ppc->param0 = 2;
 		}
 	}
-	
+
 	/* OEA case: perform an address translation */
 	else
 		ppc->param0 = ppccom_translate_address_internal(ppc, transtype | transuser, &transaddr);
-	
+
 	/* log information and return upon failure */
 	if (PRINTF_TLB_FILL)
 		printf("tlb_fill: %08X (%s%s) -> ", address, (transtype == TRANSLATE_READ) ? "R" : (transtype == TRANSLATE_WRITE) ? "W" : "F", transuser ? "U" : "S");
@@ -1386,7 +1386,7 @@ static int ppc4xx_dma_decrement_count(powerpc_state *ppc, int dmachan)
 
 	/* set the complete bit and handle interrupts */
 	ppc->dcr[DCR4XX_DMASR] |= 1 << (31 - dmachan);
-//	ppc->dcr[DCR4XX_DMASR] |= 1 << (27 - dmachan);
+//  ppc->dcr[DCR4XX_DMASR] |= 1 << (27 - dmachan);
 	ppc4xx_dma_update_irq_states(ppc);
 	return TRUE;
 }
@@ -1644,7 +1644,7 @@ static void ppc4xx_spu_rx_data(powerpc_state *ppc, UINT8 data)
 	new_rxin = (ppc->spu.rxin + 1) % ARRAY_LENGTH(ppc->spu.rxbuffer);
 	if (new_rxin == ppc->spu.rxout)
 		fatalerror("ppc4xx_spu_rx_data: buffer overrun!");
-	
+
 	/* store the data and accept the new in index */
 	ppc->spu.rxbuffer[ppc->spu.rxin] = data;
 	ppc->spu.rxin = new_rxin;
@@ -1719,7 +1719,7 @@ static TIMER_CALLBACK( ppc4xx_spu_callback )
 		{
 			int operation = (ppc->spu.regs[SPU4XX_RX_COMMAND] >> 5) & 3;
 			UINT8 rxbyte;
-			
+
 			/* consume the byte and advance the out pointer */
 			rxbyte = ppc->spu.rxbuffer[ppc->spu.rxout];
 			ppc->spu.rxout = (ppc->spu.rxout + 1) % ARRAY_LENGTH(ppc->spu.rxbuffer);

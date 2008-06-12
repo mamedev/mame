@@ -12,8 +12,8 @@
 
     Future improvements/changes:
 
-	* more aggressive handling of needed registers for conditional
-		intrablock branches
+    * more aggressive handling of needed registers for conditional
+        intrablock branches
 
 ***************************************************************************/
 
@@ -485,23 +485,23 @@ static void accumulate_required_backwards(opcode_desc *desc, UINT32 *reqmask)
 	/* recursively handle delay slots */
 	if (desc->delay != NULL)
 		accumulate_required_backwards(desc->delay, reqmask);
-	
+
 	/* if this is a branch, we have to reset our requests */
 	if (desc->flags & OPFLAG_IS_BRANCH)
 		reqmask[0] = reqmask[1] = reqmask[2] = reqmask[3] = 0xffffffff;
-	
+
 	/* determine the required registers */
 	desc->regreq[0] = desc->regout[0] & reqmask[0];
 	desc->regreq[1] = desc->regout[1] & reqmask[1];
 	desc->regreq[2] = desc->regout[2] & reqmask[2];
 	desc->regreq[3] = desc->regout[3] & reqmask[3];
-	
+
 	/* any registers modified by this instruction aren't required upstream until referenced */
 	reqmask[0] &= ~desc->regout[0];
 	reqmask[1] &= ~desc->regout[1];
 	reqmask[2] &= ~desc->regout[2];
 	reqmask[3] &= ~desc->regout[3];
-	
+
 	/* any registers required by this instruction now get marked required */
 	reqmask[0] |= desc->regin[0];
 	reqmask[1] |= desc->regin[1];

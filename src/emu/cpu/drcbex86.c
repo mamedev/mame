@@ -19,11 +19,11 @@
     * Identify common pairs and optimize output
 
     * Convert AND 0xff/0xffff to movzx
-    
+
     * Convert SUB a,0,b to NEG
-    
+
     * Optimize, e.g., and [r5],i0,$FF to use ebx as temporary register
-    	(avoid initial move) if i0 is not needed going forward
+        (avoid initial move) if i0 is not needed going forward
 
 ****************************************************************************
 
@@ -1044,7 +1044,7 @@ static void emit_mov_r32_p32(drcbe_state *drcbe, x86code **dst, UINT8 reg, const
 
 
 /*-------------------------------------------------
-    emit_mov_r32_p32_keepflags - move a 32-bit 
+    emit_mov_r32_p32_keepflags - move a 32-bit
     parameter into a register without affecting
     any flags
 -------------------------------------------------*/
@@ -1845,7 +1845,7 @@ static void emit_mov_r64_p64(drcbe_state *drcbe, x86code **dst, UINT8 reglo, UIN
 
 
 /*-------------------------------------------------
-    emit_mov_r64_p64_keepflags - move a 64-bit 
+    emit_mov_r64_p64_keepflags - move a 64-bit
     parameter into a pair of registers without
     affecting any flags
 -------------------------------------------------*/

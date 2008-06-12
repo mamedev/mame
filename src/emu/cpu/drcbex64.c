@@ -19,11 +19,11 @@
     * Identify common pairs and optimize output
 
     * Convert AND 0xff/0xffff to movzx
-    
+
     * Convert SUB a,0,b to NEG
-    
+
     * Optimize, e.g., and [r5],i0,$FF to use rbx as temporary register
-    	(avoid initial move) if i0 is not needed going forward
+        (avoid initial move) if i0 is not needed going forward
 
 ****************************************************************************
 
@@ -1240,7 +1240,7 @@ static void emit_mov_r32_p32(drcbe_state *drcbe, x86code **dst, UINT8 reg, const
 
 
 /*-------------------------------------------------
-    emit_mov_r32_p32_keepflags - move a 32-bit 
+    emit_mov_r32_p32_keepflags - move a 32-bit
     parameter into a register without affecting
     any flags
 -------------------------------------------------*/
@@ -1995,7 +1995,7 @@ static void emit_mov_r64_p64(drcbe_state *drcbe, x86code **dst, UINT8 reg, const
 
 
 /*-------------------------------------------------
-    emit_mov_r64_p64_keepflags - move a 64-bit 
+    emit_mov_r64_p64_keepflags - move a 64-bit
     parameter into a register without affecting
     any flags
 -------------------------------------------------*/
@@ -2978,7 +2978,7 @@ static x86code *op_handle(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	assert_no_flags(inst);
 	assert(inst->numparams == 1);
 	assert(inst->param[0].type == DRCUML_PTYPE_MEMORY);
-	
+
 	/* emit a jump around the stack adjust in case code falls through here */
 	emit_jmp_short_link(&dst, &skip);													// jmp   skip
 
@@ -3539,7 +3539,7 @@ static x86code *op_getflgs(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-	
+
 	/* compute mask for flags */
 	if (maskp.value & DRCUML_FLAG_C) flagmask |= 0x001;
 	if (maskp.value & DRCUML_FLAG_V) flagmask |= 0x800;
@@ -6079,7 +6079,7 @@ static x86code *op_fstore(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	assert(inst->size == 4 || inst->size == 8);
 	assert_no_condition(inst);
 	assert_no_flags(inst);
-	
+
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &basep, PTYPE_M, &indp, PTYPE_MRI, &srcp, PTYPE_MF);
 

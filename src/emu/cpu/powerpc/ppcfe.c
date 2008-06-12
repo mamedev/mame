@@ -655,7 +655,7 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 			if (op & M_RC)
 				CR_MODIFIED(desc, 0);
 			return TRUE;
-		
+
 		case 0x2c8:	/* SUBFZEOx */
 		case 0x2ca:	/* ADDZEOx */
 		case 0x2e8:	/* SUBFMEOx */
@@ -1066,7 +1066,7 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 				GPR_USED(desc, regnum);
 			desc->flags |= OPFLAG_WRITES_MEMORY;
 			return TRUE;
-		
+
 		case 0x2d5:	/* STSWI */
 			GPR_USED_OR_ZERO(desc, G_RA(op));
 			for (regnum = 0; regnum < ((G_NB(op) - 1) & 0x1f) + 1; regnum += 4)

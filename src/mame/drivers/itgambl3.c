@@ -202,7 +202,7 @@ MACHINE_DRIVER_END
 *************************/
 
 /* Euro Jolly X5
- 
+
 CPU:
 
 1x M30624FGAFP-03001A4 (u1)(main)
@@ -213,7 +213,7 @@ It has 256 KB of internal flash ROM + 20 KB of RAM.
 1x OKI M6295 (u22)(sound)
 1x TDA2003 (u25)(sound)
 1x LM358M (u23)(sound)
-1x oscillator 16.000MHz (u20)  
+1x oscillator 16.000MHz (u20)
 
 
 ROMs:
@@ -259,7 +259,7 @@ ROM_END
 
 
 /* Grand Prix
- 
+
 CPU:
 
 1x M30624FGAFP-251G108 (u21)(main)
@@ -270,7 +270,7 @@ It has 256 KB of internal flash ROM + 20 KB of RAM.
 1x OKI M6295 (u2)(sound)
 1x TDA2003 (u1)(sound)
 1x LM358M (u23)(sound)
-1x oscillator 16.000MHz (u9)  
+1x oscillator 16.000MHz (u9)
 
 
 ROMs:
@@ -297,7 +297,7 @@ Note:
 1x red led (d1)
 1x pushbutton (test mode) (RDP2)
 
-PCB N° KGS0243-DF070283/03 made in Italy
+PCB N? KGS0243-DF070283/03 made in Italy
 
 */
 

@@ -35,7 +35,7 @@ static WRITE8_HANDLER( subsino_tiles_offset_w )
 {
 	tiles_offset = (data & 1) ? 0x1000: 0;
 	tilemap_mark_tile_dirty(tmap, offset);
-//	popmessage("gfx %02x",data);
+//  popmessage("gfx %02x",data);
 }
 
 static WRITE8_HANDLER( subsino_videoram_w )
@@ -94,12 +94,12 @@ static PALETTE_INIT( subsino_depth4 )
 static WRITE8_HANDLER( subsino_out_a_w )
 {
 	coin_counter_w( 0, data & 0x02 );
-//	popmessage("Out A %02x",data);
+//  popmessage("Out A %02x",data);
 }
 static WRITE8_HANDLER( subsino_out_b_w )
 {
 	// leds
-//	popmessage("Out B %02x",data);
+//  popmessage("Out B %02x",data);
 }
 
 static ADDRESS_MAP_START( srider_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -278,7 +278,7 @@ static MACHINE_DRIVER_START( victor5 )
 	MDRV_GFXDECODE(subsino_depth3)
 	MDRV_PALETTE_LENGTH(0x100)
 
-//	MDRV_PALETTE_INIT(subsino_depth3)	// no proms?
+//  MDRV_PALETTE_INIT(subsino_depth3)   // no proms?
 	MDRV_VIDEO_START(subsino)
 	MDRV_VIDEO_UPDATE(subsino)
 
@@ -421,7 +421,7 @@ Sticker on PCB reads V12040
 Info by f205v, Corrado Tomaselli (20/04/2008)
 
 ***************************************************************************/
- 
+
 ROM_START( victor21 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "1.u1", 0x00000, 0x10000, CRC(43999b2d) SHA1(7ce26fd332ffe35fd826a1a6166b228d4bc370b8) )

@@ -1369,8 +1369,8 @@ REF: 950510-1
 
 Notes
 -----
-Gaelco's PROMs IC70 and IC69 has DIP42 package (many wires are routed to GAE1 506, so I guess that they are a gfx rom) 
-Gaelco's PROM IC68 has DIP32 package (may be a sound rom) 
+Gaelco's PROMs IC70 and IC69 has DIP42 package (many wires are routed to GAE1 506, so I guess that they are a gfx rom)
+Gaelco's PROM IC68 has DIP32 package (may be a sound rom)
 TI F20L8 is a Texas Ins. DIP24 (may be a PAL). Is marked as F 406 XF 21869 F20L8-25CNT
 TLC569 (IC2 and IC7) is a 8-bit serial ADC
 

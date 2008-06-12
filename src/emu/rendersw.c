@@ -105,7 +105,7 @@ static UINT32 cosine_table[2049];
 ***************************************************************************/
 
 /*-------------------------------------------------
-    round_nearest - round to nearest in a 
+    round_nearest - round to nearest in a
     predictable way
 -------------------------------------------------*/
 
@@ -166,7 +166,7 @@ INLINE UINT32 ycc_to_rgb(UINT32 ycc)
 
 
 /*-------------------------------------------------
-    get_texel_palette16_nearest - return the 
+    get_texel_palette16_nearest - return the
     nearest neighbor texel from a palettized
     16bpp source
 -------------------------------------------------*/
@@ -178,7 +178,7 @@ INLINE UINT32 get_texel_palette16_nearest(const UINT16 *texbase, INT32 texrp, IN
 
 
 /*-------------------------------------------------
-    get_texel_palette16_bilinear - return a 
+    get_texel_palette16_bilinear - return a
     bilinear filtered texel from a palettized
     16bpp source
 -------------------------------------------------*/
@@ -196,7 +196,7 @@ INLINE UINT32 get_texel_palette16_bilinear(const UINT16 *texbase, INT32 texrp, I
 
 
 /*-------------------------------------------------
-    get_texel_rgb15_nearest - return the 
+    get_texel_rgb15_nearest - return the
     nearest neighbor texel from a 15bpp RGB source
 -------------------------------------------------*/
 
@@ -207,8 +207,8 @@ INLINE UINT32 get_texel_rgb15_nearest(const UINT16 *texbase, INT32 texrp, INT32 
 
 
 /*-------------------------------------------------
-    get_texel_rgb15_bilinear - return the 
-    bilinear filtered texel from a 15bpp RGB 
+    get_texel_rgb15_bilinear - return the
+    bilinear filtered texel from a 15bpp RGB
     source
 -------------------------------------------------*/
 
@@ -230,7 +230,7 @@ INLINE UINT32 get_texel_rgb15_bilinear(const UINT16 *texbase, INT32 texrp, INT32
 
 
 /*-------------------------------------------------
-    get_texel_yuy16_nearest - return the 
+    get_texel_yuy16_nearest - return the
     nearest neighbor texel from a 16bpp YCbCr
     source (pixel is returned as Cr-Cb-Y
 -------------------------------------------------*/
@@ -243,7 +243,7 @@ INLINE UINT32 get_texel_yuy16_nearest(const UINT16 *texbase, INT32 texrp, INT32 
 
 
 /*-------------------------------------------------
-    get_texel_yuy16_bilinear - return the 
+    get_texel_yuy16_bilinear - return the
     nearest neighbor texel from a 16bpp YCbCr
     source (pixel is returned as Cr-Cb-Y
 -------------------------------------------------*/
@@ -277,7 +277,7 @@ INLINE UINT32 get_texel_yuy16_bilinear(const UINT16 *texbase, INT32 texrp, INT32
 
 
 /*-------------------------------------------------
-    get_texel_rgb32_nearest - return the 
+    get_texel_rgb32_nearest - return the
     nearest neighbor texel from a 32bpp RGB source
 -------------------------------------------------*/
 
@@ -288,8 +288,8 @@ INLINE UINT32 get_texel_rgb32_nearest(const UINT32 *texbase, INT32 texrp, INT32 
 
 
 /*-------------------------------------------------
-    get_texel_rgb32_bilinear - return the 
-    bilinear filtered texel from a 32bpp RGB 
+    get_texel_rgb32_bilinear - return the
+    bilinear filtered texel from a 32bpp RGB
     source
 -------------------------------------------------*/
 
@@ -306,8 +306,8 @@ INLINE UINT32 get_texel_rgb32_bilinear(const UINT32 *texbase, INT32 texrp, INT32
 
 
 /*-------------------------------------------------
-    get_texel_argb32_nearest - return the 
-    nearest neighbor texel from a 32bpp ARGB 
+    get_texel_argb32_nearest - return the
+    nearest neighbor texel from a 32bpp ARGB
     source
 -------------------------------------------------*/
 
@@ -318,8 +318,8 @@ INLINE UINT32 get_texel_argb32_nearest(const UINT32 *texbase, INT32 texrp, INT32
 
 
 /*-------------------------------------------------
-    get_texel_argb32_bilinear - return the 
-    bilinear filtered texel from a 32bpp ARGB 
+    get_texel_argb32_bilinear - return the
+    bilinear filtered texel from a 32bpp ARGB
     source
 -------------------------------------------------*/
 

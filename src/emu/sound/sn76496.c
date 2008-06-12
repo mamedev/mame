@@ -30,7 +30,7 @@
    the function is similar than update with 0x80 set to 1
 
   23/04/2007 : Lord Nightmare
-  Major update, implement all three different noise generation algorithms and a 
+  Major update, implement all three different noise generation algorithms and a
   set_variant call to discern among them.
 
   TODO: Implement a function for setting stereo regs for the game gear.

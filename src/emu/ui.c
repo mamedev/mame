@@ -316,7 +316,7 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 	int state;
 
 	/* disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
-	   or if we are debugging */
+       or if we are debugging */
 	if (!first_time || (str > 0 && str < 60*5) || machine->gamedrv == &driver_empty || machine->debug_mode)
 		show_gameinfo = show_warnings = show_disclaimer = FALSE;
 

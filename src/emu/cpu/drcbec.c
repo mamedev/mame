@@ -436,7 +436,7 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 				dst->inst = (drcbec_instruction *)drclabel_get_codeptr(drcbe->labels, inst->param[0].value, fixup_label, dst);
 				dst++;
 				break;
-			
+
 			/* generically handle everything else */
 			default:
 

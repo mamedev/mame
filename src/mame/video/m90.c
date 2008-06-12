@@ -262,7 +262,7 @@ static void dynablsb_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 WRITE16_HANDLER( m90_video_control_w )
 {
 	COMBINE_DATA(&m90_video_control_data[offset]);
-//	printf("%04x-%04x ",offset,m90_video_control_data[offset]);
+//  printf("%04x-%04x ",offset,m90_video_control_data[offset]);
 }
 
 static void markdirty(tilemap *tmap,int page,offs_t offset)

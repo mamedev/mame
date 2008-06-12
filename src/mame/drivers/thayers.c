@@ -1,12 +1,12 @@
 /*
 
-	TODO:
+    TODO:
 
-	- LDV1000 mode
-	- PR7820 INT/_EXT line
-	- coin counter
-	- convert SSI-263 to a sound device
-	- dump laserdisc
+    - LDV1000 mode
+    - PR7820 INT/_EXT line
+    - coin counter
+    - convert SSI-263 to a sound device
+    - dump laserdisc
 
 */
 
@@ -82,18 +82,18 @@ static READ8_HANDLER( irqstate_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		
-		1		
-		2		SSI263 A/_R
-		3		tied to +5V
-		4		_TIMER INT
-		5		_DATA RDY INT
-		6		_CART PRES
-		7		
+        0
+        1
+        2       SSI263 A/_R
+        3       tied to +5V
+        4       _TIMER INT
+        5       _DATA RDY INT
+        6       _CART PRES
+        7
 
-	*/
+    */
 
 	return (data_rdy_int << 5) | (timer_int << 4) | 0x08 | (ssi_data_request << 2);
 }
@@ -116,14 +116,14 @@ static WRITE8_HANDLER( cop_d_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		D0		_TIMER INT
-		D1		_DATA RDY INT
-		D2		
-		D3		
+        D0      _TIMER INT
+        D1      _DATA RDY INT
+        D2
+        D3
 
-	*/
+    */
 
 	if (!BIT(data, 0))
 	{
@@ -178,14 +178,14 @@ static READ8_HANDLER( cop_g_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		G0		U16 Q0
-		G1		U16 Q1
-		G2		U16 Q2
-		G3		
+        G0      U16 Q0
+        G1      U16 Q1
+        G2      U16 Q2
+        G3
 
-	*/
+    */
 
 	return cop_cmd_latch;
 }
@@ -194,18 +194,18 @@ static WRITE8_HANDLER( control_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		
-		1		_CS128A
-		2		_BANKSEL1
-		3		
-		4		
-		5		COP G0
-		6		COP G1
-		7		COP G2
+        0
+        1       _CS128A
+        2       _BANKSEL1
+        3
+        4
+        5       COP G0
+        6       COP G1
+        7       COP G2
 
-	*/
+    */
 
 	cop_cmd_latch = (data >> 5) & 0x07;
 }
@@ -214,14 +214,14 @@ static WRITE8_HANDLER( cop_g_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		G0		
-		G1		
-		G2		
-		G3		U17 enable
+        G0
+        G1
+        G2
+        G3      U17 enable
 
-	*/
+    */
 
 	cop_data_latch_enable = BIT(data, 3);
 }
@@ -234,11 +234,11 @@ static READ8_HANDLER(cop_si_r)
 
 	/*
 
-		Serial communications format
+        Serial communications format
 
-		1, 1, 0, 1, Q8, P0, P1, P2, P3, 0
+        1, 1, 0, 1, Q8, P0, P1, P2, P3, 0
 
-	*/
+    */
 
 	switch (rx_bit)
 	{
@@ -298,18 +298,18 @@ static WRITE8_HANDLER( control2_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0
-		1		_RESOI (?)
-		2		_ENCARTDET
-		3
-		4		
-		5		
-		6		
-		7
+        0
+        1       _RESOI (?)
+        2       _ENCARTDET
+        3
+        4
+        5
+        6
+        7
 
-	*/
+    */
 
 	if (!BIT(data, 2) & cart_present)
 	{
@@ -336,18 +336,18 @@ static WRITE8_HANDLER( laserdsc_control_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0
-		1
-		2
-		3
-		4		coin counter
-		5		U16 output enable
-		6		ENTER if switch B5 closed
-		7		INT/_EXT
+        0
+        1
+        2
+        3
+        4       coin counter
+        5       U16 output enable
+        6       ENTER if switch B5 closed
+        7       INT/_EXT
 
-	*/
+    */
 
 	coin_counter_w(0, BIT(data, 4));
 
@@ -376,18 +376,18 @@ static WRITE8_HANDLER( den1_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		DD0
-		1		DD1
-		2		DD2
-		3		DD3
-		4		DA0
-		5		DA1
-		6		DA2
-		7		DA3
+        0       DD0
+        1       DD1
+        2       DD2
+        3       DD3
+        4       DA0
+        5       DA1
+        6       DA2
+        7       DA3
 
-	*/
+    */
 
 	output_set_digit_value(data >> 4, led_map[data & 0x0f]);
 }
@@ -396,29 +396,29 @@ static WRITE8_HANDLER( den2_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		DD0
-		1		DD1
-		2		DD2
-		3		DD3
-		4		DA0
-		5		DA1
-		6		DA2
-		7		DA3
+        0       DD0
+        1       DD1
+        2       DD2
+        3       DD3
+        4       DA0
+        5       DA1
+        6       DA2
+        7       DA3
 
-	*/
+    */
 
 	output_set_digit_value(8 + (data >> 4), led_map[data & 0x0f]);
 }
 
 /* SSI-263 */
 
-/* 
+/*
 
-	The following information is from the SSI-263A data sheet.
+    The following information is from the SSI-263A data sheet.
 
-	Thayer's Quest uses an SSI-263, so this might be inaccurate, but it works for now
+    Thayer's Quest uses an SSI-263, so this might be inaccurate, but it works for now
 
 */
 
@@ -426,7 +426,7 @@ static WRITE8_HANDLER( den2_w )
 
 static const char SSI263_PHONEMES[0x40][5] =
 {
-	"PA", "E", "E1", "Y", "YI", "AY", "IE", "I", "A", "AI", "EH", "EH1", "AE", "AE1", "AH", "AH1", "W", "O", "OU", "OO", "IU", "IU1", "U", "U1", "UH", "UH1", "UH2", "UH3", "ER", "R", "R1", "R2", 
+	"PA", "E", "E1", "Y", "YI", "AY", "IE", "I", "A", "AI", "EH", "EH1", "AE", "AE1", "AH", "AH1", "W", "O", "OU", "OO", "IU", "IU1", "U", "U1", "UH", "UH1", "UH2", "UH3", "ER", "R", "R1", "R2",
 	"L", "L1", "LF", "W", "B", "D", "KV", "P", "T", "K", "HV", "HVC", "HF", "HFC", "HN", "Z", "S", "J", "SCH", "V", "F", "THV", "TH", "M", "N", "NG", ":A", ":OH", ":U", ":UH", "E2", "LB"
 };
 
@@ -570,7 +570,7 @@ static ADDRESS_MAP_START( thayers_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x07) AM_READWRITE(ssi263_register_r, ssi263_register_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(control_w)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(irqstate_r, control2_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(cop_data_r, cop_data_w) 
+	AM_RANGE(0x80, 0x80) AM_READWRITE(cop_data_r, cop_data_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(timer_int_ack_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(data_rdy_int_ack_w)
 	AM_RANGE(0xf0, 0xf0) AM_READ(laserdsc_data_r)
@@ -578,7 +578,7 @@ static ADDRESS_MAP_START( thayers_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf2, 0xf2) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf3, 0xf3) AM_WRITE(intrq_w)
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(laserdsc_data_w)
-	AM_RANGE(0xf5, 0xf5) AM_WRITE(laserdsc_control_w) 
+	AM_RANGE(0xf5, 0xf5) AM_WRITE(laserdsc_control_w)
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(den1_w)
 	AM_RANGE(0xf7, 0xf7) AM_WRITE(den2_w)
 ADDRESS_MAP_END
@@ -824,6 +824,6 @@ ROM_END
 
 /* Game Drivers */
 
-/*	   YEAR  NAME	   PARENT   MACHINE  INPUT    INIT  MONITOR  COMPANY               FULLNAME                           FLAGS                             LAYOUT */
+/*     YEAR  NAME      PARENT   MACHINE  INPUT    INIT  MONITOR  COMPANY               FULLNAME                           FLAGS                             LAYOUT */
 GAMEL( 1984, thayers,  0,       thayers, thayers, 0,	ROT0,    "RDI Video Systems",  "Thayer's Quest",                  GAME_NOT_WORKING | GAME_NO_SOUND, layout_dlair)
 GAMEL( 1984, thayersa, thayers, thayers, thayers, 0,	ROT0,    "RDI Video Systems",  "Thayer's Quest (Alternate Set)",  GAME_NOT_WORKING | GAME_NO_SOUND, layout_dlair)

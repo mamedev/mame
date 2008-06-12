@@ -260,7 +260,7 @@ static READ32_HANDLER( v_rom_r )
 
 static READ32_HANDLER( inp1_r )
 {
-	UINT32 result = (input_port_read(machine, "DSW3")<<24) | (input_port_read(machine, "IN2")<<16) | (input_port_read(machine, "IN1")<<8) | input_port_read(machine, "IN0"); 
+	UINT32 result = (input_port_read(machine, "DSW3")<<24) | (input_port_read(machine, "IN2")<<16) | (input_port_read(machine, "IN1")<<8) | input_port_read(machine, "IN0");
 
 	return result;
 }

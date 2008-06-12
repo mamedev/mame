@@ -12,7 +12,7 @@
 
     Future improvements/changes:
 
-	* crxor a,a,a / creqv a,a,a / cror a,a,a
+    * crxor a,a,a / creqv a,a,a / cror a,a,a
 
 ***************************************************************************/
 
@@ -582,7 +582,7 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, int cl
 	ppc->impstate->drcuml = drcuml_alloc(cache, flags, 8, 32, 2);
 	if (ppc->impstate->drcuml == NULL)
 		fatalerror("Error initializing the UML");
-	
+
 	/* add symbols for our stuff */
 	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->pc, sizeof(ppc->pc), "pc");
 	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->icount, sizeof(ppc->icount), "icount");
@@ -1798,14 +1798,14 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 		UML_LOAD(block, IREG(3), ppc->tlb_table, IREG(3), DWORD);							// load    i3,[tlb_table],i3,dword
 		UML_JMP(block, tlbreturn);															// jmp     tlbreturn
 		UML_LABEL(block, dsi);															// dsi:
-		
+
 		/* 4XX case: protection exception */
 		if (ppc->cap & PPCCAP_4XX)
 		{
 			UML_MOV(block, SPR32(SPR4XX_DEAR), IREG(0));									// mov     [dear],i0
 			UML_EXH(block, ppc->impstate->exception[EXCEPTION_DSI], IREG(0));				// exh     dsi,i0
 		}
-		
+
 		/* 603 case: TLBMISS exception */
 		else if (ppc->cap & PPCCAP_603_MMU)
 		{
@@ -1818,7 +1818,7 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 			else
 				UML_EXH(block, ppc->impstate->exception[EXCEPTION_DTLBMISSL], IREG(0));		// exh     dtlbmissl,i0
 		}
-		
+
 		/* general case: DSI exception */
 		else
 		{
@@ -1887,7 +1887,7 @@ static void static_generate_lsw_entries(drcuml_state *drcuml, int mode)
 	for (regnum = 0; regnum < 32; regnum++)
 	{
 		char temp[20];
-		
+
 		/* allocate a handle */
 		sprintf(temp, "lsw%d", regnum);
 		alloc_handle(drcuml, &ppc->impstate->lsw[mode][regnum], temp);
@@ -1947,7 +1947,7 @@ static void static_generate_stsw_entries(drcuml_state *drcuml, int mode)
 	for (regnum = 0; regnum < 32; regnum++)
 	{
 		char temp[20];
-		
+
 		/* allocate a handle */
 		sprintf(temp, "stsw%d", regnum);
 		alloc_handle(drcuml, &ppc->impstate->stsw[mode][regnum], temp);
@@ -1994,7 +1994,7 @@ static void generate_update_mode(drcuml_block *block)
 {
 	/* LE in bit 0 of mode */
 	UML_AND(block, IREG(0), MSR32, IMM(MSR_LE));											// and     i0,msr,MSR_LE
-	
+
 	/* DR (OEA and 403GCX) in bit 1 of mode */
 	if ((ppc->cap & PPCCAP_OEA) || ppc->flavor == PPC_MODEL_403GCX)
 	{
@@ -2008,7 +2008,7 @@ static void generate_update_mode(drcuml_block *block)
 		UML_ROLAND(block, IREG(1), MSR32, IMM(30), IMM(0x02));								// roland  i1,[msr],30,0x02
 		UML_OR(block, IREG(0), IREG(0), IREG(1));											// or      i0,i0,i1
 	}
-	
+
 	/* PR in bit 2 of mode */
 	UML_ROLAND(block, IREG(1), MSR32, IMM(20), IMM(0x04));									// roland  i1,[msr],20,0x04
 	UML_OR(block, MEM(&ppc->impstate->mode), IREG(0), IREG(1));								// or      [mode],i0,i1

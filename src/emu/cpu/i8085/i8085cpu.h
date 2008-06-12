@@ -36,8 +36,8 @@
 #define ADDR_RST75      0x003c
 #define ADDR_INTR       0x0038
 
-#define M_INR(R) {UINT8 hc = ((R & 0x0f) == 0x0f) ? HF : 0; ++R; I.AF.b.l= (I.AF.b.l & CF ) | ZSP[R] | hc; } 
-#define M_DCR(R) {UINT8 hc = ((R & 0x0f) == 0x00) ? HF : 0; --R; I.AF.b.l= (I.AF.b.l & CF ) | ZSP[R] | hc | NF; } 
+#define M_INR(R) {UINT8 hc = ((R & 0x0f) == 0x0f) ? HF : 0; ++R; I.AF.b.l= (I.AF.b.l & CF ) | ZSP[R] | hc; }
+#define M_DCR(R) {UINT8 hc = ((R & 0x0f) == 0x00) ? HF : 0; --R; I.AF.b.l= (I.AF.b.l & CF ) | ZSP[R] | hc | NF; }
 #define M_MVI(R) R=ARG()
 
 #define M_ANA(R) { int i = ((I.AF.b.h | R)>>3)&1 * HF; I.AF.b.h&=R; I.AF.b.l=ZSP[I.AF.b.h]; if( I.cputype ) { I.AF.b.l |= HF; } else {I.AF.b.l |= i; } }

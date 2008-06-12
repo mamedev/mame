@@ -475,7 +475,7 @@ INLINE void convert_to_nop(drcuml_instruction *inst)
 
 
 /*-------------------------------------------------
-    convert_to_mov_immediate - convert an 
+    convert_to_mov_immediate - convert an
     instruction inline to a MOV immediate
 -------------------------------------------------*/
 
@@ -490,7 +490,7 @@ INLINE void convert_to_mov_immediate(drcuml_instruction *inst, UINT64 immediate)
 
 
 /*-------------------------------------------------
-    convert_to_mov_param - convert an 
+    convert_to_mov_param - convert an
     instruction inline to a MOV with a source
     parameter given by the existing parameter
     index pnum
@@ -588,15 +588,15 @@ void drcuml_reset(drcuml_state *drcuml)
 	(*drcuml->beintf->be_reset)(drcuml->bestate);
 
 	/* do a one-time validation if requested */
-/*	if (VALIDATE_BACKEND)
-	{
-		static int validated = FALSE;
-		if (!validated)
-		{
-			validated = TRUE;
-			validate_backend(drcuml);
-		}
-	}*/
+/*  if (VALIDATE_BACKEND)
+    {
+        static int validated = FALSE;
+        if (!validated)
+        {
+            validated = TRUE;
+            validate_backend(drcuml);
+        }
+    }*/
 }
 
 
@@ -624,7 +624,7 @@ void drcuml_free(drcuml_state *drcuml)
 			free(block->inst);
 		free(block);
 	}
-	
+
 	/* free all the symbols */
 	while (drcuml->symlist != NULL)
 	{
@@ -853,7 +853,7 @@ void drcuml_block_end(drcuml_block *block)
 	drcuml_state *drcuml = block->drcuml;
 
 	assert(block->inuse);
-	
+
 	/* optimize the resulting code first */
 	optimize_block(block);
 
@@ -1003,7 +1003,7 @@ const char *drcuml_handle_name(const drcuml_codehandle *handle)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    drcuml_symbol_add - add a symbol to the 
+    drcuml_symbol_add - add a symbol to the
     internal symbol table
 -------------------------------------------------*/
 
@@ -1015,13 +1015,13 @@ void drcuml_symbol_add(drcuml_state *drcuml, void *base, UINT32 length, const ch
 	symbol = malloc(sizeof(*symbol) + strlen(name));
 	if (symbol == NULL)
 		fatalerror("Out of memory allocating symbol in drcuml_symbol_add");
-	
+
 	/* fill in the structure */
 	symbol->next = NULL;
 	symbol->base = (drccodeptr)base;
 	symbol->length = length;
 	strcpy(symbol->symname, name);
-	
+
 	/* add to the tail of the list */
 	*drcuml->symtailptr = symbol;
 	drcuml->symtailptr = &symbol->next;
@@ -1029,8 +1029,8 @@ void drcuml_symbol_add(drcuml_state *drcuml, void *base, UINT32 length, const ch
 
 
 /*-------------------------------------------------
-    drcuml_symbol_find - look up a symbol from the 
-    internal symbol table or return NULL if not 
+    drcuml_symbol_find - look up a symbol from the
+    internal symbol table or return NULL if not
     found
 -------------------------------------------------*/
 
@@ -1038,7 +1038,7 @@ const char *drcuml_symbol_find(drcuml_state *drcuml, void *base, UINT32 *offset)
 {
 	drccodeptr search = base;
 	drcuml_symbol *symbol;
-	
+
 	/* simple linear search */
 	for (symbol = drcuml->symlist; symbol != NULL; symbol = symbol->next)
 		if (search >= symbol->base && search < symbol->base + symbol->length)
@@ -1046,13 +1046,13 @@ const char *drcuml_symbol_find(drcuml_state *drcuml, void *base, UINT32 *offset)
 			/* if no offset pointer, only match perfectly */
 			if (offset == NULL && search != symbol->base)
 				continue;
-			
+
 			/* return the offset and name */
 			if (offset != NULL)
 				*offset = search - symbol->base;
 			return symbol->symname;
 		}
-	
+
 	/* not found; return NULL */
 	return NULL;
 }
@@ -1125,7 +1125,7 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drcuml_state *d
 	int pnum;
 
 	assert(inst->opcode != DRCUML_OP_INVALID && inst->opcode < DRCUML_OP_MAX);
-	
+
 	/* start with the raw mnemonic and substitute sizes */
 	for (opsrc = opinfo->mnemonic; *opsrc != 0; opsrc++)
 		if (*opsrc == '!')
@@ -1134,11 +1134,11 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drcuml_state *d
 			dest += sprintf(dest, "%s", pound_size[inst->size]);
 		else
 			*dest++ = *opsrc;
-	
+
 	/* pad to 8 spaces */
 	while (dest < &buffer[8])
 		*dest++ = ' ';
-	
+
 	/* iterate through parameters */
 	for (pnum = 0; pnum < inst->numparams; pnum++)
 	{
@@ -1150,35 +1150,35 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drcuml_state *d
 		/* start with a comma for all except the first parameter */
 		if (pnum != 0)
 			*dest++ = ',';
-		
+
 		/* ouput based on type */
 		switch (param->type)
 		{
 			/* immediates have several special cases */
 			case DRCUML_PTYPE_IMMEDIATE:
-			
+
 				/* size immediate */
 				if (typemask == PTYPES_SIZE)
 					dest += sprintf(dest, "%s", sizes[param->value]);
-				
+
 				/* address space immediate */
 				else if (typemask == PTYPES_SPACE)
 					dest += sprintf(dest, "%s", address_space_names[param->value]);
-				
+
 				/* size + address space immediate */
 				else if (typemask == PTYPES_SPSZ)
 					dest += sprintf(dest, "%s_%s", address_space_names[param->value / 16], sizes[param->value % 16]);
-				
+
 				/* fmod immediate */
 				else if (typemask == PTYPES_FMOD)
 					dest += sprintf(dest, "%s", fmods[param->value]);
-				
+
 				/* general immediate */
 				else
 				{
 					int size = effective_psize(inst, opinfo, pnum);
 					UINT64 value = param->value;
-					
+
 					/* truncate to size */
 					if (size == 1) value = (UINT8)value;
 					if (size == 2) value = (UINT16)value;
@@ -1189,7 +1189,7 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drcuml_state *d
 						dest += sprintf(dest, "$%X%08X", (UINT32)(value >> 32), (UINT32)value);
 				}
 				break;
-			
+
 			/* integer registers */
 			case DRCUML_PTYPE_INT_REGISTER:
 				if (param->value >= DRCUML_REG_I0 && param->value < DRCUML_REG_I_END)
@@ -1216,15 +1216,15 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drcuml_state *d
 
 			/* memory */
 			case DRCUML_PTYPE_MEMORY:
-			
+
 				/* handle pointer */
 				if (typemask == PTYPES_HAND)
 					dest += sprintf(dest, "%s", drcuml_handle_name((const drcuml_codehandle *)(FPTR)param->value));
-				
+
 				/* string pointer */
 				else if (typemask == PTYPES_STR)
 					dest += sprintf(dest, "%s", (const char *)(FPTR)param->value);
-				
+
 				/* symbol */
 				else if (drcuml != NULL && (symbol = drcuml_symbol_find(drcuml, (drccodeptr)(FPTR)param->value, &symoffset)) != NULL)
 				{
@@ -1233,26 +1233,26 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drcuml_state *d
 					else
 						dest += sprintf(dest, "[%s+$%X]", symbol, symoffset);
 				}
-				
+
 				/* cache memory */
 				else if (drcuml != NULL && drccache_contains_pointer(drcuml->cache, (void *)(FPTR)param->value))
 					dest += sprintf(dest, "[+$%X]", (UINT32)(FPTR)((drccodeptr)(FPTR)param->value - drccache_near(drcuml->cache)));
-				
+
 				/* general memory */
 				else
 					dest += sprintf(dest, "[[$%p]]", (void *)(FPTR)param->value);
 				break;
-			
+
 			default:
 				dest += sprintf(dest, "???");
 				break;
 		}
 	}
-	
+
 	/* if there's a condition, append it */
 	if (inst->condition != DRCUML_COND_ALWAYS)
 		dest += sprintf(dest, ",%s", conditions[inst->condition & 0x0f]);
-	
+
 	/* if there are flags, append them */
 	if (inst->flags != 0)
 	{
@@ -1268,7 +1268,7 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drcuml_state *d
 		if (inst->flags & DRCUML_FLAG_C)
 			*dest++ = 'C';
 	}
-	
+
 	/* ensure we are NULL-terminated */
 	*dest = 0;
 }
@@ -1296,29 +1296,29 @@ static void optimize_block(drcuml_block *block)
 		const drcuml_opcode_info *opinfo = opcode_info_table[inst->opcode];
 		UINT8 remainingflags;
 		int scannum, pnum;
-	
+
 		/* first compute what flags we need */
 		inst->flags = 0;
 		remainingflags = effective_outflags(inst, opinfo);
-		
+
 		/* scan ahead until we run out of possible remaining flags */
 		for (scannum = instnum + 1; remainingflags != 0 && scannum < block->nextinst; scannum++)
 		{
 			const drcuml_instruction *scan = &block->inst[scannum];
 			const drcuml_opcode_info *scaninfo = opcode_info_table[scan->opcode];
-			
+
 			/* any input flags are required */
 			inst->flags |= effective_inflags(scan, scaninfo);
-			
+
 			/* if the scanahead instruction is unconditional, assume his flags are modified */
 			if (scan->condition == DRCUML_COND_ALWAYS)
 				remainingflags &= ~scaninfo->modflags;
 		}
-		
+
 		/* track mapvars */
 		if (inst->opcode == DRCUML_OP_MAPVAR)
 			mapvar[inst->param[0].value - DRCUML_MAPVAR_M0] = inst->param[1].value;
-		
+
 		/* convert all mapvar parameters to immediates */
 		else if (inst->opcode != DRCUML_OP_RECOVER)
 			for (pnum = 0; pnum < inst->numparams; pnum++)
@@ -1327,7 +1327,7 @@ static void optimize_block(drcuml_block *block)
 					inst->param[pnum].type = DRCUML_PTYPE_IMMEDIATE;
 					inst->param[pnum].value = mapvar[inst->param[pnum].value - DRCUML_MAPVAR_M0];
 				}
-		
+
 		/* if we don't need any flags, then we can eliminate a lot of dumb operations */
 		if (inst->flags == 0)
 			simplify_instruction_with_no_flags(block, inst);
@@ -1371,19 +1371,19 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 				inst->param[2] = inst->param[3];
 			}
 			break;
-		
+
 		/* SET: convert to MOV if constant condition */
 		case DRCUML_OP_SET:
 			if (inst->condition == DRCUML_COND_ALWAYS)
 				convert_to_mov_immediate(inst, 1);
 			break;
-		
+
 		/* MOV: convert to NOP if move-to-self */
 		case DRCUML_OP_MOV:
 			if (param_equal(inst, 0, 1))
 				convert_to_nop(inst);
 			break;
-		
+
 		/* SEXT: convert immediates to MOV */
 		case DRCUML_OP_SEXT:
 			if (param_is_immediate(inst, 1))
@@ -1395,7 +1395,7 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 					case DRCUML_SIZE_QWORD:	convert_to_mov_immediate(inst, (INT64)inst->param[1].value);	break;
 				}
 			break;
-		
+
 		/* ROLAND: convert to MOV if all immediate, or to ROL or AND if one is not needed, or to SHL/SHR if the mask is right */
 		case DRCUML_OP_ROLAND:
 			if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2) && param_is_immediate(inst, 3))
@@ -1428,13 +1428,13 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 				inst->param[2].value = 8 * inst->size - inst->param[2].value;
 			}
 			break;
-		
+
 		/* ROLINS: convert to ROLAND if the mask is full */
 		case DRCUML_OP_ROLINS:
 			if (param_is_immediate_value(inst, 3, instsizemask[inst->size]))
 				inst->opcode = DRCUML_OP_ROLAND;
 			break;
-		
+
 		/* ADD: convert to MOV if immediate, or if adding 0 */
 		case DRCUML_OP_ADD:
 			if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2))
@@ -1444,7 +1444,7 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 			else if (param_is_immediate_value(inst, 2, 0))
 				convert_to_mov_param(inst, 1);
 			break;
-		
+
 		/* SUB: convert to MOV if immediate, or if subtracting 0 */
 		case DRCUML_OP_SUB:
 			if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2))
@@ -1452,7 +1452,7 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 			else if (param_is_immediate_value(inst, 2, 0))
 				convert_to_mov_param(inst, 1);
 			break;
-		
+
 		/* CMP: no-op if no flags needed, compare i0 to i0 if the parameters are equal */
 		case DRCUML_OP_CMP:
 			if (inst->flags == 0)
@@ -1463,7 +1463,7 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 				inst->param[1].value = inst->param[2].value = DRCUML_REG_I0;
 			}
 			break;
-		
+
 		/* MULU: convert simple form to MOV if immediate, or if multiplying by 0 */
 		case DRCUML_OP_MULU:
 			if (param_equal(inst, 0, 1))
@@ -1479,7 +1479,7 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 				}
 			}
 			break;
-		
+
 		/* MULS: convert simple form to MOV if immediate, or if multiplying by 0 */
 		case DRCUML_OP_MULS:
 			if (param_equal(inst, 0, 1))
@@ -1545,7 +1545,7 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 			if (inst->flags == 0)
 				convert_to_nop(inst);
 			break;
-		
+
 		/* OR: convert to MOV if immediate, or if oring against 0 or 0xffffffff */
 		case DRCUML_OP_OR:
 			if (param_is_immediate_value(inst, 1, instsizemask[inst->size]) || param_is_immediate_value(inst, 2, instsizemask[inst->size]))
@@ -1557,7 +1557,7 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 			else if (param_is_immediate_value(inst, 2, 0))
 				convert_to_mov_param(inst, 1);
 			break;
-		
+
 		/* XOR: convert to MOV if immediate, or if xoring against 0 */
 		case DRCUML_OP_XOR:
 			if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2))
@@ -1567,7 +1567,7 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 			else if (param_is_immediate_value(inst, 2, 0))
 				convert_to_mov_param(inst, 1);
 			break;
-		
+
 		/* LZCNT: convert to MOV if immediate */
 		case DRCUML_OP_LZCNT:
 			if (param_is_immediate(inst, 1))
@@ -1583,7 +1583,7 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 				}
 			}
 			break;
-		
+
 		/* BSWAP: convert to MOV if immediate */
 		case DRCUML_OP_BSWAP:
 			if (param_is_immediate(inst, 1))
@@ -1594,7 +1594,7 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 					convert_to_mov_immediate(inst, FLIPENDIAN_INT64(inst->param[1].value));
 			}
 			break;
-		
+
 		/* SHL: convert to MOV if immediate or shifting by 0 */
 		case DRCUML_OP_SHL:
 			if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2))
@@ -1602,7 +1602,7 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 			else if (param_is_immediate_value(inst, 2, 0))
 				convert_to_mov_param(inst, 1);
 			break;
-		
+
 		/* SHR: convert to MOV if immediate or shifting by 0 */
 		case DRCUML_OP_SHR:
 			if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2))
@@ -1615,7 +1615,7 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 			else if (param_is_immediate_value(inst, 2, 0))
 				convert_to_mov_param(inst, 1);
 			break;
-		
+
 		/* SAR: convert to MOV if immediate or shifting by 0 */
 		case DRCUML_OP_SAR:
 			if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2))
@@ -1628,7 +1628,7 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 			else if (param_is_immediate_value(inst, 2, 0))
 				convert_to_mov_param(inst, 1);
 			break;
-		
+
 		/* ROL: convert to NOP if immediate or rotating by 0 */
 		case DRCUML_OP_ROL:
 			if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2))
@@ -1641,7 +1641,7 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 			else if (param_is_immediate_value(inst, 2, 0))
 				convert_to_mov_param(inst, 1);
 			break;
-		
+
 		/* ROR: convert to NOP if immediate or rotating by 0 */
 		case DRCUML_OP_ROR:
 			if (param_is_immediate(inst, 1) && param_is_immediate(inst, 2))
@@ -1660,11 +1660,11 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 			if (param_equal(inst, 0, 1))
 				convert_to_nop(inst);
 			break;
-		
+
 		default:
 			break;
 	}
-	
+
 #if LOG_SIMPLIFICATIONS
 	if (memcmp(&orig, inst, sizeof(orig)) != 0)
 	{
@@ -1704,14 +1704,14 @@ static void disassemble_block(drcuml_block *block)
 	{
 		const drcuml_instruction *inst = &block->inst[instnum];
 		int flushcomments = FALSE;
-	
+
 		/* remember comments and mapvars for later */
 		if (inst->opcode == DRCUML_OP_COMMENT || inst->opcode == DRCUML_OP_MAPVAR)
 		{
 			if (firstcomment == -1)
 				firstcomment = instnum;
 		}
-		
+
 		/* print labels, handles, and hashes left justified */
 		else if (inst->opcode == DRCUML_OP_LABEL)
 			drcuml_log_printf(block->drcuml, "$%X:\n", (UINT32)inst->param[0].value);
@@ -1725,7 +1725,7 @@ static void disassemble_block(drcuml_block *block)
 		{
 			char dasm[256];
 			drcuml_disasm(&block->inst[instnum], dasm, block->drcuml);
-			
+
 			/* include the first accumulated comment with this line */
 			if (firstcomment != -1)
 			{
@@ -1736,7 +1736,7 @@ static void disassemble_block(drcuml_block *block)
 			else
 				drcuml_log_printf(block->drcuml, "\t%s\n", dasm);
 		}
-		
+
 		/* flush any comments pending */
 		if (firstcomment != -1 && (flushcomments || instnum == block->nextinst - 1))
 		{
@@ -1762,18 +1762,18 @@ static void disassemble_block(drcuml_block *block)
 static const char *get_comment_text(const drcuml_instruction *inst)
 {
 	static char tempbuf[100];
-	
+
 	/* comments return their strings */
 	if (inst->opcode == DRCUML_OP_COMMENT)
 		return (char *)(FPTR)inst->param[0].value;
-	
+
 	/* mapvars comment about their values */
 	else if (inst->opcode == DRCUML_OP_MAPVAR)
 	{
 		sprintf(tempbuf, "m%d = $%X", (int)inst->param[0].value - DRCUML_MAPVAR_M0, (UINT32)inst->param[1].value);
 		return tempbuf;
 	}
-	
+
 	/* everything else is NULL */
 	return NULL;
 }
@@ -1797,21 +1797,21 @@ static void validate_instruction(drcuml_block *block, const drcuml_instruction *
 	/* validate raw information */
 	assert(inst->opcode != DRCUML_OP_INVALID && inst->opcode < DRCUML_OP_MAX);
 	assert(inst->size == 1 || inst->size == 2 || inst->size == 4 || inst->size == 8);
-	
+
 	/* validate against opcode limits */
 	assert((opinfo->sizes & inst->size) != 0);
 	assert(inst->condition == DRCUML_COND_ALWAYS || opinfo->condition);
-	
+
 	/* validate each parameter */
 	for (pnum = 0; pnum < inst->numparams; pnum++)
 	{
 		const drcuml_parameter *param = &inst->param[pnum];
 		UINT16 typemask = opinfo->param[pnum].typemask;
-		
+
 		/* ensure the type is correct */
 		assert(param->type > DRCUML_PTYPE_NONE && param->type < DRCUML_PTYPE_MAX);
 		assert((typemask >> param->type) & 1);
-		
+
 		/* validate various parameter types */
 		switch (param->type)
 		{
@@ -1820,7 +1820,7 @@ static void validate_instruction(drcuml_block *block, const drcuml_instruction *
 				if (typemask != PTYPES_PTR && typemask != PTYPES_STATE && typemask != PTYPES_STR && typemask != PTYPES_CFUNC)
 					assert_in_near_cache(block->drcuml->cache, (void *)(FPTR)param->value);
 				break;
-			
+
 			case DRCUML_PTYPE_IMMEDIATE:
 				/* many special parameter types are encoded as immediately; ensure they are in range */
 				if (typemask == PTYPES_SIZE)
@@ -1835,19 +1835,19 @@ static void validate_instruction(drcuml_block *block, const drcuml_instruction *
 				else if (typemask == PTYPES_FMOD)
 					assert(param->value >= DRCUML_FMOD_TRUNC && param->value <= DRCUML_FMOD_DEFAULT);
 				break;
-			
+
 			case DRCUML_PTYPE_MAPVAR:
 				assert(param->value >= DRCUML_MAPVAR_M0 && param->value < DRCUML_MAPVAR_END);
 				break;
-			
+
 			case DRCUML_PTYPE_INT_REGISTER:
 				assert(param->value >= DRCUML_REG_I0 && param->value < DRCUML_REG_I_END);
 				break;
-			
+
 			case DRCUML_PTYPE_FLOAT_REGISTER:
 				assert(param->value >= DRCUML_REG_F0 && param->value < DRCUML_REG_F_END);
 				break;
-			
+
 			default:
 				assert(FALSE);
 				break;

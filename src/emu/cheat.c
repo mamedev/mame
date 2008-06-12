@@ -7876,7 +7876,7 @@ static int select_search_region_menu(running_machine *machine, cheat_menu_stack 
 	else
 	{
 
-		/* in case of no search region */ 
+		/* in case of no search region */
 		menu_item[total] = "No Search Region";
 		menu_sub_item[total++] = NULL;
 	}
@@ -11128,7 +11128,7 @@ static UINT32 read_region_data(search_region *region, UINT32 offset, UINT8 size,
 		UINT8 *buf = (UINT8 *)region->cached_pointer;
 
 		if(buf)
-//			return do_memory_read(region->cached_pointer, address, size, swap, &raw_cpu_info);
+//          return do_memory_read(region->cached_pointer, address, size, swap, &raw_cpu_info);
 			return do_memory_read(buf, address, size, cpu_needs_swap(region->target_idx) ^ swap, get_cpu_info(region->target_idx));
 		else
 			return 0;

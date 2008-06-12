@@ -779,8 +779,8 @@ ROM_END
 
 Squash (Itisa)
 
-Anno	1984
-Produttore	Itisa-Valadon-gecas
+Anno    1984
+Produttore  Itisa-Valadon-gecas
 
 CPU
 

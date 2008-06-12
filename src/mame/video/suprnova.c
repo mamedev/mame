@@ -29,7 +29,7 @@ static bitmap_t *tilemap_bitmapflags_higher;
 /* draws ROZ with linescroll OR columnscroll to 16-bit indexed bitmap */
 static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rectangle *cliprect, tilemap *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, UINT32* scrollram)
 {
-//	const pen_t *clut = &Machine->pens[0];
+//  const pen_t *clut = &Machine->pens[0];
 	//bitmap_t *destbitmap = bitmap;
 	bitmap_t *srcbitmap = tilemap_get_pixmap(tmap);
 	bitmap_t *srcbitmapflags = tilemap_get_flagsmap(tmap);
@@ -46,7 +46,7 @@ static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rec
 	int ey;
 	UINT16 *dest;
 	UINT8* destflags;
-//	UINT8 *pri;
+//  UINT8 *pri;
 	//const UINT16 *src;
 	//const UINT8 *maskptr;
 	//int destadvance = destbitmap->bpp / 8;
@@ -98,7 +98,7 @@ static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rec
 				x++;
 				dest++;
 				destflags++;
-//				pri++;
+//              pri++;
 			}
 
 			/* advance in Y */
@@ -1075,7 +1075,7 @@ VIDEO_UPDATE(skns)
 			UINT16 pri, pri2, pri3;
 			UINT16 bgpri;
 			const pen_t *clut = &Machine->pens[0];
-//			int drawpri;
+//          int drawpri;
 
 
 			for (y=0;y<240;y++)
@@ -1225,5 +1225,5 @@ VIDEO_UPDATE(skns)
 
 VIDEO_EOF(skns)
 {
-//	buffer_spriteram32_w(machine,0,0,0xffffffff);
+//  buffer_spriteram32_w(machine,0,0,0xffffffff);
 }

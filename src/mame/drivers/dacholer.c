@@ -4,16 +4,16 @@
     Kick Boy    (c) 1983 Nichibutsu
 
     Driver by Pierpaolo Prazzoli
-    
+
     TODO:
     - Add colors when proms are dumped
-  
+
 Mods by Tomasz Slanina (2008.06.12):
 
 - fixed sound cpu interrupts (mode 2 (two vectors)+ nmi)
-- added sound and music. 
-- ay/msm clocks are arbitrary   
-- just a guess - upper nibble of byte from port 3 _probably_ 
+- added sound and music.
+- ay/msm clocks are arbitrary
+- just a guess - upper nibble of byte from port 3 _probably_
   contains sound command (sound cpu writes it to port c)
 
 ******************************************************************************/
@@ -55,7 +55,7 @@ static WRITE8_HANDLER( bg_bank_w )
 	}
 
 	flip_screen_set(data & 0xc); // probably one bit for flipx and one for flipy
-	
+
 }
 
 static WRITE8_HANDLER( coins_w )
@@ -427,13 +427,13 @@ static MACHINE_DRIVER_START( dacholer )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MDRV_SOUND_ADD(AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	
+
 	MDRV_SOUND_ADD(AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	
+
 	MDRV_SOUND_ADD(AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 

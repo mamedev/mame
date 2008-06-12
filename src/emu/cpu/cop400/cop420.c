@@ -14,8 +14,8 @@
     TODO:
 
     - when is the microbus int cleared?
-	- CKO sync input
-	- save internal RAM when CKO is RAM power supply pin
+    - CKO sync input
+    - save internal RAM when CKO is RAM power supply pin
     - run interrupt test suite
     - run production test suite
     - run microbus test suite
