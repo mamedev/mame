@@ -1275,6 +1275,7 @@ input_port_value input_port_read_direct(const input_port_config *port)
 input_port_value input_port_read(running_machine *machine, const char *tag)
 {
 	const input_port_config *port = input_port_by_tag(machine->portconfig, tag);
+	assert_always(mame_get_phase(machine) != MAME_PHASE_INIT, "Input ports cannot be read at init time!");
 	if (port == NULL)
 		fatalerror("Unable to locate input port '%s'", tag);
 	return input_port_read_direct(port);
@@ -1290,6 +1291,7 @@ input_port_value input_port_read(running_machine *machine, const char *tag)
 input_port_value input_port_read_safe(running_machine *machine, const char *tag, UINT32 defvalue)
 {
 	const input_port_config *port = input_port_by_tag(machine->portconfig, tag);
+	assert_always(mame_get_phase(machine) != MAME_PHASE_INIT, "Input ports cannot be read at init time!");
 	return (port == NULL) ? defvalue : input_port_read_direct(port);
 }
 
@@ -1302,6 +1304,7 @@ input_port_value input_port_read_safe(running_machine *machine, const char *tag,
 input_port_value input_port_read_indexed(running_machine *machine, int portnum)
 {
 	const input_port_config *port = input_port_by_index(machine->portconfig, portnum);
+	assert_always(mame_get_phase(machine) != MAME_PHASE_INIT, "Input ports cannot be read at init time!");
 	return (port == NULL) ? 0 : input_port_read_direct(port);
 }
 
