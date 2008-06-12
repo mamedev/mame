@@ -4,17 +4,33 @@
     Kick Boy    (c) 1983 Nichibutsu
 
     Driver by Pierpaolo Prazzoli
-
+    
     TODO:
-    - Add sound
     - Add colors when proms are dumped
+  
+Mods by Tomasz Slanina (2008.06.12):
+
+- fixed sound cpu interrupts (mode 2 (two vectors)+ nmi)
+- added sound and music. 
+- ay/msm clocks are arbitrary   
+- just a guess - upper nibble of byte from port 3 _probably_ 
+  contains sound command (sound cpu writes it to port c)
 
 ******************************************************************************/
 
 #include "driver.h"
+#include "sound/dac.h"
+#include "sound/msm5205.h"
+#include "sound/ay8910.h"
+
+static int msm_data = 0;
+static int msm_toggle=0;
 
 static UINT8 *bgvideoram,*fgvideoram;
 static int bg_bank = 0;
+static UINT8 snd_interrupt_enable=0;
+static UINT8 music_interrupt_enable=0;
+static UINT8 snd_ack;
 
 static tilemap *bg_tilemap,*fg_tilemap;
 
@@ -39,6 +55,7 @@ static WRITE8_HANDLER( bg_bank_w )
 	}
 
 	flip_screen_set(data & 0xc); // probably one bit for flipx and one for flipy
+	
 }
 
 static WRITE8_HANDLER( coins_w )
@@ -50,12 +67,15 @@ static WRITE8_HANDLER( coins_w )
 	set_led_status(1, data & 8);
 }
 
-static WRITE8_HANDLER( snd_irq_w )
+static WRITE8_HANDLER(snd_w)
 {
-	if(data == 1)
-		cpunum_set_input_line_and_vector(machine, 1, 0, ASSERT_LINE, 0x38);
-	else
-		cpunum_set_input_line_and_vector(machine, 1, 0, CLEAR_LINE, 0x38);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+}
+
+static READ8_HANDLER(dswa_r)
+{
+	return (input_port_read(machine, "DSWA")&0x0f)|(snd_ack<<4); //guess ...
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -71,14 +91,14 @@ static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r)
-	AM_RANGE(0x03, 0x03) AM_READ(input_port_3_r)
+	AM_RANGE(0x03, 0x03) AM_READ(dswa_r)
 	AM_RANGE(0x04, 0x04) AM_READ(input_port_4_r)
 	AM_RANGE(0x20, 0x20) AM_WRITE(coins_w)
 	AM_RANGE(0x21, 0x21) AM_WRITE(bg_bank_w)
 	AM_RANGE(0x22, 0x22) AM_WRITENOP
 	AM_RANGE(0x23, 0x23) AM_WRITENOP
 	AM_RANGE(0x24, 0x24) AM_WRITENOP
-	AM_RANGE(0x27, 0x27) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x27, 0x27) AM_WRITE(snd_w)
 ADDRESS_MAP_END
 
 
@@ -87,21 +107,45 @@ static ADDRESS_MAP_START( snd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
+static WRITE8_HANDLER(adpcm_w)
+{
+	msm_data = data;
+	msm_toggle=0;
+}
+
+static WRITE8_HANDLER(snd_ack_w)
+{
+	snd_ack=data;
+}
+
+static WRITE8_HANDLER( snd_irq_w )
+{
+	snd_interrupt_enable=data;
+}
+
+static WRITE8_HANDLER( music_irq_w )
+{
+	music_interrupt_enable=data;
+}
+
 static ADDRESS_MAP_START( snd_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
-	AM_RANGE(0x04, 0x04) AM_WRITENOP // 0 or 1
+	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_r, soundlatch_clear_w )
+	AM_RANGE(0x04, 0x04) AM_WRITE(music_irq_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(snd_irq_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITENOP // it writes the low nibble of the soundlatch when soundlatch & 0x80 == 0x80
-	AM_RANGE(0x80, 0x80) AM_WRITENOP // sound data
-	AM_RANGE(0x86, 0x87) AM_WRITENOP
-	AM_RANGE(0x8a, 0x8b) AM_WRITENOP
-	AM_RANGE(0x8e, 0x8f) AM_WRITENOP
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(snd_ack_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(adpcm_w)
+	AM_RANGE(0x86, 0x86) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x87, 0x87) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x8a, 0x8a) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0x8b, 0x8b) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x8e, 0x8e) AM_WRITE(AY8910_write_port_2_w)
+	AM_RANGE(0x8f, 0x8f) AM_WRITE(AY8910_control_port_2_w)
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( dacholer )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
@@ -111,7 +155,7 @@ static INPUT_PORTS_START( dacholer )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_COCKTAIL
@@ -121,7 +165,7 @@ static INPUT_PORTS_START( dacholer )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -142,10 +186,6 @@ static INPUT_PORTS_START( dacholer )
 	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL )            // to let play the sounds
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START_TAG("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            /* table at 0x0a9c */
@@ -330,6 +370,34 @@ static GFXDECODE_START( dacholer )
 GFXDECODE_END
 
 
+static INTERRUPT_GEN( sound_irq )
+{
+	if(music_interrupt_enable == 1)
+	{
+		cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0x30);
+	}
+}
+
+static INTERRUPT_GEN(adpcm_int)
+{
+	if(snd_interrupt_enable == 1 || (snd_interrupt_enable ==0 && msm_toggle==1))
+	{
+		MSM5205_data_w(0,msm_data >> 4);
+		msm_data<<=4;
+		msm_toggle^=1;
+		if (msm_toggle==0)
+		{
+			cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0x38);
+		}
+	}
+}
+
+static struct MSM5205interface msm_interface =
+{
+	adpcm_int,			/* interrupt function */
+	MSM5205_S96_4B 	/* 1 / 96 = 3906.25Hz playback  - guess */
+};
+
 static MACHINE_DRIVER_START( dacholer )
 
 	/* basic machine hardware */
@@ -341,7 +409,7 @@ static MACHINE_DRIVER_START( dacholer )
 	MDRV_CPU_ADD(Z80, 4000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(snd_map, 0)
 	MDRV_CPU_IO_MAP(snd_io_map, 0)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 120) // too high?
+	MDRV_CPU_VBLANK_INT("main",sound_irq)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -358,7 +426,21 @@ static MACHINE_DRIVER_START( dacholer )
 	MDRV_VIDEO_UPDATE(dacholer)
 
 	/* sound hardware */
-	/* ? */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	
+	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	
+	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	
+	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+
+	MDRV_SOUND_ADD(MSM5205, 375000)
+	MDRV_SOUND_CONFIG(msm_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+
 MACHINE_DRIVER_END
 
 ROM_START( dacholer )
@@ -418,5 +500,5 @@ ROM_START( kickboy )
 	ROM_LOAD( "proms", 0x0000, 0x0020, NO_DUMP )
 ROM_END
 
-GAME( 1983, dacholer, 0, dacholer, dacholer, 0, ROT0, "Nichibutsu", "Dacholer", GAME_WRONG_COLORS | GAME_NO_SOUND )
-GAME( 1983, kickboy,  0, dacholer, kickboy,  0, ROT0, "Nichibutsu", "Kick Boy", GAME_WRONG_COLORS | GAME_NO_SOUND )
+GAME( 1983, dacholer, 0, dacholer, dacholer, 0, ROT0, "Nichibutsu", "Dacholer", GAME_WRONG_COLORS )
+GAME( 1983, kickboy,  0, dacholer, kickboy,  0, ROT0, "Nichibutsu", "Kick Boy", GAME_WRONG_COLORS )
