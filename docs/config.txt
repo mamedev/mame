@@ -718,6 +718,16 @@ Core sound options
 Core input options
 ------------------
 
+-[no]coin_lockout / -[no]coinlock
+
+	Enables simulation of the "coin lockout" feature that is implmeneted
+	on a number of game PCBs. It was up to the operator whether or not
+	the coin lockout outputs were actually connected to the coin
+	mechanisms. If this feature is enabled, then attempts to enter a coin
+	while the lockout is active will fail and will display a popup message
+	in the user interface. If this feature is disabled, the coin lockout
+	signal will be ignored. The default is ON (-coin_lockout).
+
 -ctrlr <controller>
 
 	Enables support for special controllers. Configuration files are

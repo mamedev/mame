@@ -110,6 +110,7 @@
 #define OPTION_VOLUME				"volume"
 
 /* core input options */
+#define OPTION_COIN_LOCKOUT			"coin_lockout"
 #define OPTION_CTRLR				"ctrlr"
 #define OPTION_MOUSE				"mouse"
 #define OPTION_JOYSTICK				"joystick"

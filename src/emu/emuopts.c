@@ -118,6 +118,7 @@ const options_entry mame_core_options[] =
 
 	/* input options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE INPUT OPTIONS" },
+	{ "coin_lockout;coinlock",       "1",         OPTION_BOOLEAN,    "enable coin lockouts to actually lock out coins" },
 	{ "ctrlr",                       NULL,        0,                 "preconfigure for specified controller" },
 	{ "mouse",                       "0",         OPTION_BOOLEAN,    "enable mouse input" },
 	{ "joystick;joy",                "1",         OPTION_BOOLEAN,    "enable joystick input" },
