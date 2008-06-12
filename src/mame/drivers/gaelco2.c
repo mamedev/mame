@@ -10,7 +10,7 @@
     ---------------+------+-----------+----------+--------------------
     Alligator Hunt | 1994 | GAE1 449  | 940411   | DS5002FP, but unprotected version available
     World Rally 2  | 1995 | GAE1 449  | 950510   | DS5002FP
-                   | 1995 | GAE1 506  | 950510-1 | DS5002FP
+    World Rally 2  | 1995 | GAE1 506  | 950510-1 | DS5002FP
     Touch & Go     | 1995 | GAE1 501  | 950906   | DS5002FP
     Touch & Go     | 1995 | GAE1 501  | 950510-1 | DS5002FP
     Maniac Square  | 1996 | Unknown   | ???      | DS5002FP, but unprotected version available
@@ -1369,8 +1369,10 @@ REF: 950510-1
 
 Notes
 -----
-IC68, IC69, IC70 are marked as "GAELCO" (they could be a prom containing gfx and sound data)
-TLC569 (IC2 and IC7) is a 8-bit serial ADC 
+Gaelco's PROMs IC70 and IC69 has DIP42 package (many wires are routed to GAE1 506, so I guess that they are a gfx rom) 
+Gaelco's PROM IC68 has DIP32 package (may be a sound rom) 
+TI F20L8 is a Texas Ins. DIP24 (may be a PAL). Is marked as F 406 XF 21869 F20L8-25CNT
+TLC569 (IC2 and IC7) is a 8-bit serial ADC
 
 */
 
