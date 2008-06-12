@@ -7488,7 +7488,7 @@ Other Sun games
 	DRIVER( crysbios )
 	DRIVER( crysking )	/* 2001 Brezzasoft. Crystal of the kings */
 	DRIVER( evosocc )	/* 2001 Evoga. Evolution Soccer */
-	DRIVER( topbladv )
+	DRIVER( topbladv )	/* 2002 Sonokong. Top Blade V */
 	DRIVER( officeye )
 
 	/* Bell Fruit Cobra Hardware */
@@ -7789,11 +7789,11 @@ Other Sun games
 	DRIVER( lottof2 )	/* (c) 1993 HAR */
 	DRIVER( fredmem )	/* (c) 1994 Coastal Amusements */
 	DRIVER( fredmeus )	/* (c) 1994 Coastal Amusements */
-	DRIVER( fredmeuk )  /* (c) 1994 Coastal Amusements */
+	DRIVER( fredmeuk )	/* (c) 1994 Coastal Amusements */
 	DRIVER( fredmemj )	/* (c) 1994 Coastal Amusements */
-	DRIVER( fredmemc )  /* (c) 1994 Coastal Amusements */
-	DRIVER( fredmesp )  /* (c) 1994 Coastal Amusements */
-	DRIVER( cecmatch )  /* (c) 1993 Coastal Amusements */
+	DRIVER( fredmemc )	/* (c) 1994 Coastal Amusements */
+	DRIVER( fredmesp )	/* (c) 1994 Coastal Amusements */
+	DRIVER( cecmatch )	/* (c) 1993 Coastal Amusements */
 	DRIVER( f15se )		/* (c) 1991 Microprose */
 	DRIVER( f15se21 )	/* (c) 1991 Microprose */
 	DRIVER( botss )		/* (c) 1992 Microprose */
@@ -7853,7 +7853,7 @@ Other Sun games
 	DRIVER( pntnpuzl )	/* Century? */
 	DRIVER( trucocl )	/* (c) 1991 Miky SRL */
 	DRIVER( ertictac )	/* (c) 1992 Sisteme */
-	DRIVER( poizone )   /* (c) 1990 Sisteme */
+	DRIVER( poizone )	/* (c) 1990 Sisteme */
 	DRIVER( ssfindo )	/* (c) 1999 Icarus */
 	DRIVER( ppcar )		/* (c) 1999 Icarus */
 	DRIVER( imolagp )	/* (c) 1981 Leante Games */
@@ -8057,7 +8057,7 @@ Other Sun games
 	DRIVER( 2mindril )	/* (c) 1993 Taito */
 	DRIVER( koikoi )	/* (c) 1983 Kiwako */
 	DRIVER( good )		/* (c) 1983 Kiwako */
-	DRIVER( filetto )
+	DRIVER( filetto )	/* (c) 1990 Novamatic */
 	DRIVER( quizo )		/* (c) 1985 Seoul Coin Corp. */
 	DRIVER( quizoa )	/* (c) 1985 Seoul Coin Corp. */
 	DRIVER( gstream )	/* (c) 2002, Oriental Soft Japan */
@@ -8082,10 +8082,10 @@ Other Sun games
 	DRIVER( pebe0014 )	/* (c) 1994 IGT - International Gaming Technology */
 	DRIVER( peke1012 )	/* (c) 1994 IGT - International Gaming Technology */
 	DRIVER( peps0014 )	/* (c) 1996 IGT - International Gaming Technology */
-    DRIVER( peps0022 )	/* (c) 1996 IGT - International Gaming Technology */
-    DRIVER( peps0043 )	/* (c) 1996 IGT - International Gaming Technology */
-    DRIVER( peps0045 )	/* (c) 1996 IGT - International Gaming Technology */
-    DRIVER( peps0308 )	/* (c) 1996 IGT - International Gaming Technology */
+	DRIVER( peps0022 )	/* (c) 1996 IGT - International Gaming Technology */
+	DRIVER( peps0043 )	/* (c) 1996 IGT - International Gaming Technology */
+	DRIVER( peps0045 )	/* (c) 1996 IGT - International Gaming Technology */
+	DRIVER( peps0308 )	/* (c) 1996 IGT - International Gaming Technology */
 	DRIVER( peps0615 )	/* (c) 1996 IGT - International Gaming Technology */
 	DRIVER( peps0716 )	/* (c) 1996 IGT - International Gaming Technology */
 	DRIVER( pexp0019 )	/* (c) 1995 IGT - International Gaming Technology */
@@ -8097,12 +8097,12 @@ Other Sun games
 	DRIVER( jongkyo )	/* (c) 1985 Kiwako */
 	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
 	DRIVER( gamecstl )	/* MAME based bootleg */
-	DRIVER( drw80pkr )
-	DRIVER( blazlaz )
-	DRIVER( paranoia )
-	DRIVER( vcombat )   /* (c) 1993 VR8 Inc. */
-	DRIVER( shadfgtr )  /* (c) 1989 Sega? */
-	DRIVER( blackt96 )
+	DRIVER( drw80pkr )	/* (c) 1983 IGT */
+	DRIVER( blazlaz )	/* (c) 1989 Hudson Soft */
+	DRIVER( paranoia )	/* (c) 1990 Naxat Soft */
+	DRIVER( vcombat )	/* (c) 1993 VR8 Inc. */
+	DRIVER( shadfgtr )	/* (c) 1989 Sega? */
+	DRIVER( blackt96 )	/* (c) 1996 D.G.R.M. of Korea */
 
 	/* H8/3048 italian gambling games */
 	DRIVER( laperla )	/* (c) 2002 Nazionale Elettronica */
@@ -8129,6 +8129,6 @@ Other Sun games
 	DRIVER( grandprx )	/* (c) 4fun */
 
 	/* Astro Corp. */
-	DRIVER( showhand )
+	DRIVER( showhand )	/* (c) 1999? Astro Corp. */
 
 #endif	/* DRIVER_RECURSIVE */
