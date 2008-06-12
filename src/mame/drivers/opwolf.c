@@ -99,6 +99,7 @@ register. So what is controlling priority.
 #include "audio/taitosnd.h"
 #include "sound/2151intf.h"
 #include "sound/msm5205.h"
+#include "includes/cchip.h"
 
 int opwolf_region;
 
@@ -107,13 +108,6 @@ static UINT8 adpcm_b[0x08];
 static UINT8 adpcm_c[0x08];
 static int opwolf_gun_xoffs, opwolf_gun_yoffs;
 
-void opwolf_cchip_init(void);
-
-READ16_HANDLER( opwolf_cchip_status_r );
-READ16_HANDLER( opwolf_cchip_data_r );
-WRITE16_HANDLER( opwolf_cchip_status_w );
-WRITE16_HANDLER( opwolf_cchip_data_w );
-WRITE16_HANDLER( opwolf_cchip_bank_w );
 WRITE16_HANDLER( rainbow_spritectrl_w );
 WRITE16_HANDLER( rastan_spriteflip_w );
 VIDEO_START( opwolf );

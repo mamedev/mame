@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/wrally.h"
 
 UINT16 *wrally_spriteram;
 UINT16 *wrally_vregs;

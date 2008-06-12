@@ -10,11 +10,10 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
-
+#include "includes/bublbobl.h"
 
 
 UINT8 *bublbobl_mcu_sharedram;
-extern int bublbobl_video_enable;
 
 
 WRITE8_HANDLER( bublbobl_bankswitch_w )

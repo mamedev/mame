@@ -11,14 +11,8 @@
 #include "machine/6522via.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/dac.h"
+#include "includes/beezer.h"
 
-/* from video/beezer.c */
-INTERRUPT_GEN( beezer_interrupt );
-VIDEO_UPDATE( beezer );
-
-/* from machine/beezer.c */
-DRIVER_INIT( beezer );
-WRITE8_HANDLER( beezer_bankswitch_w );
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_RAM)

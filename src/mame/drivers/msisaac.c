@@ -11,6 +11,7 @@
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
+#include "includes/buggychl.h"
 
 /*
 TO DO:
@@ -18,21 +19,6 @@ TO DO:
   - TA7630 emulation needs filter support (characteristics depend on the frequency)
   - TA7630 volume table is hand tuned to match the sample, but still slighty off.
 */
-
-/* in machine/buggychl.c */
-READ8_HANDLER( buggychl_68705_portA_r );
-WRITE8_HANDLER( buggychl_68705_portA_w );
-WRITE8_HANDLER( buggychl_68705_ddrA_w );
-READ8_HANDLER( buggychl_68705_portB_r );
-WRITE8_HANDLER( buggychl_68705_portB_w );
-WRITE8_HANDLER( buggychl_68705_ddrB_w );
-READ8_HANDLER( buggychl_68705_portC_r );
-WRITE8_HANDLER( buggychl_68705_portC_w );
-WRITE8_HANDLER( buggychl_68705_ddrC_w );
-WRITE8_HANDLER( buggychl_mcu_w );
-READ8_HANDLER( buggychl_mcu_r );
-READ8_HANDLER( buggychl_mcu_status_r );
-
 
 //not used
 //WRITE8_HANDLER( msisaac_textbank1_w );

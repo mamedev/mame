@@ -5,6 +5,7 @@ Namco System 1 Video Hardware
 *******************************************************************/
 
 #include "driver.h"
+#include "includes/namcos1.h"
 
 
 /*
@@ -33,7 +34,6 @@ static UINT8 *namcos1_videoram;
 
   so there is just 3x0x2000 RAM, plus the CUS116 internal registers.
 */
-extern UINT8 *namcos1_paletteram;
 static UINT8 namcos1_cus116[0x10];
 
 /*

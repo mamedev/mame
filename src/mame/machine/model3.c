@@ -6,6 +6,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "includes/model3.h"
 
 static int m3_step;
 

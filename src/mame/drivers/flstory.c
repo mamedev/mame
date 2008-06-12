@@ -19,41 +19,7 @@ TODO:
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
 #include "sound/dac.h"
-
-VIDEO_START( flstory );
-VIDEO_UPDATE( flstory );
-VIDEO_START( victnine );
-VIDEO_UPDATE( victnine );
-
-extern UINT8 *flstory_scrlram;
-
-WRITE8_HANDLER( flstory_videoram_w );
-READ8_HANDLER( flstory_palette_r );
-WRITE8_HANDLER( flstory_palette_w );
-WRITE8_HANDLER( flstory_gfxctrl_w );
-READ8_HANDLER( flstory_scrlram_r );
-WRITE8_HANDLER( flstory_scrlram_w );
-READ8_HANDLER( victnine_gfxctrl_r );
-WRITE8_HANDLER( victnine_gfxctrl_w );
-
-READ8_HANDLER( flstory_68705_portA_r );
-WRITE8_HANDLER( flstory_68705_portA_w );
-READ8_HANDLER( flstory_68705_portB_r );
-WRITE8_HANDLER( flstory_68705_portB_w );
-READ8_HANDLER( flstory_68705_portC_r );
-WRITE8_HANDLER( flstory_68705_portC_w );
-WRITE8_HANDLER( flstory_68705_ddrA_w );
-WRITE8_HANDLER( flstory_68705_ddrB_w );
-WRITE8_HANDLER( flstory_68705_ddrC_w );
-WRITE8_HANDLER( flstory_mcu_w );
-READ8_HANDLER( flstory_mcu_r );
-READ8_HANDLER( flstory_mcu_status_r );
-WRITE8_HANDLER( onna34ro_mcu_w );
-READ8_HANDLER( onna34ro_mcu_r );
-READ8_HANDLER( onna34ro_mcu_status_r );
-WRITE8_HANDLER( victnine_mcu_w );
-READ8_HANDLER( victnine_mcu_r );
-READ8_HANDLER( victnine_mcu_status_r );
+#include "includes/flstory.h"
 
 UINT8 *onna34ro_workram;
 UINT8 *victnine_workram;

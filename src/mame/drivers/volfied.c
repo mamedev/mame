@@ -44,18 +44,12 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"
+#include "includes/cchip.h"
 
 WRITE16_HANDLER( volfied_sprite_ctrl_w );
 WRITE16_HANDLER( volfied_video_ram_w );
 WRITE16_HANDLER( volfied_video_ctrl_w );
 WRITE16_HANDLER( volfied_video_mask_w );
-
-void volfied_cchip_init(void);
-READ16_HANDLER( volfied_cchip_ctrl_r );
-READ16_HANDLER( volfied_cchip_ram_r );
-WRITE16_HANDLER( volfied_cchip_ctrl_w );
-WRITE16_HANDLER( volfied_cchip_bank_w );
-WRITE16_HANDLER( volfied_cchip_ram_w );
 
 READ16_HANDLER( volfied_video_ram_r );
 READ16_HANDLER( volfied_video_ctrl_r );

@@ -674,39 +674,8 @@ Notes:
 #include "machine/intelfsh.h"
 #include "sound/okim6295.h"
 #include "sound/ymf271.h"
+#include "includes/seibuspi.h"
 
-void seibuspi_text_decrypt(UINT8 *rom);
-void seibuspi_bg_decrypt(UINT8 *rom, int size);
-void seibuspi_sprite_decrypt(UINT8 *src, int romsize);
-
-void seibuspi_rise10_text_decrypt(UINT8 *rom);
-void seibuspi_rise10_bg_decrypt(UINT8 *rom, int size);
-void seibuspi_rise10_sprite_decrypt(UINT8 *rom, int romsize);
-
-void seibuspi_rise11_text_decrypt(UINT8 *rom);
-void seibuspi_rise11_bg_decrypt(UINT8 *rom, int size);
-void seibuspi_rise11_sprite_decrypt(UINT8 *rom, int romsize);
-
-VIDEO_START( spi );
-VIDEO_UPDATE( spi );
-WRITE32_HANDLER( spi_textlayer_w );
-WRITE32_HANDLER( spi_back_layer_w );
-WRITE32_HANDLER( spi_mid_layer_w );
-WRITE32_HANDLER( spi_fore_layer_w );
-WRITE32_HANDLER( spi_paletteram32_xBBBBBGGGGGRRRRR_w );
-READ32_HANDLER( spi_layer_bank_r );
-WRITE32_HANDLER( spi_layer_bank_w );
-void rf2_set_layer_banks(int banks);
-READ32_HANDLER( spi_layer_enable_r );
-WRITE32_HANDLER( spi_layer_enable_w );
-
-WRITE32_HANDLER( tilemap_dma_start_w );
-WRITE32_HANDLER( palette_dma_start_w );
-WRITE32_HANDLER( video_dma_length_w );
-WRITE32_HANDLER( video_dma_address_w );
-WRITE32_HANDLER( sprite_dma_start_w );
-
-extern UINT32 *spi_scrollram;
 UINT32 *spimainram;
 
 static UINT8 *z80_rom;

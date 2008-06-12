@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "video/konamiic.h"
+#include "includes/ajax.h"
 
 
 UINT8 ajax_priority;

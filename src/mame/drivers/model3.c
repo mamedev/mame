@@ -364,6 +364,7 @@ ALL VROM ROMs are 16M MASK
 #include "machine/eeprom.h"
 #include "machine/53c810.h"
 #include "sound/scsp.h"
+#include "includes/model3.h"
 
 static UINT8 irq_enable;
 static UINT8 irq_state;
@@ -377,38 +378,6 @@ static UINT64 *model3_backup;
 static int model3_crom_bank = 0;
 static int model3_controls_bank;
 static UINT32 real3d_device_id;
-
-extern UINT64 *paletteram64;
-
-/* defined in machine/model3.c */
-extern void model3_machine_init(int step);
-extern int model3_tap_read(void);
-extern void model3_tap_write(int tck, int tms, int tdi, int trst);
-extern void model3_tap_reset(void);
-extern READ32_HANDLER(rtc72421_r);
-extern WRITE32_HANDLER(rtc72421_w);
-
-
-/* defined in video/model3.c */
-READ64_HANDLER(model3_char_r);
-WRITE64_HANDLER(model3_char_w);
-READ64_HANDLER(model3_tile_r);
-WRITE64_HANDLER(model3_tile_w);
-READ64_HANDLER(model3_vid_reg_r);
-WRITE64_HANDLER(model3_vid_reg_w);
-READ64_HANDLER(model3_palette_r);
-WRITE64_HANDLER(model3_palette_w);
-VIDEO_START(model3);
-VIDEO_UPDATE(model3);
-WRITE64_HANDLER(real3d_cmd_w);
-WRITE64_HANDLER(real3d_display_list_w);
-WRITE64_HANDLER(real3d_polygon_ram_w);
-void real3d_display_list_end(void);
-void real3d_display_list1_dma(UINT32 src, UINT32 dst, int length, int byteswap);
-void real3d_display_list2_dma(UINT32 src, UINT32 dst, int length, int byteswap);
-void real3d_vrom_texture_dma(UINT32 src, UINT32 dst, int length, int byteswap);
-void real3d_texture_fifo_dma(UINT32 src, int length, int byteswap);
-void real3d_polygon_ram_dma(UINT32 src, UINT32 dst, int length, int byteswap);
 
 static void real3d_dma_callback(UINT32 src, UINT32 dst, int length, int byteswap);
 

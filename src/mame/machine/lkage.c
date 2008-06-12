@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/lkage.h"
 
 
 static UINT8 from_main,from_mcu;

@@ -14,20 +14,10 @@ TO DO:
 #include "video/konamiic.h"
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
+#include "includes/ajax.h"
 
 static WRITE8_HANDLER( k007232_extvol_w );
 static WRITE8_HANDLER( sound_bank_w );
-
-/* from machine/ajax.c */
-WRITE8_HANDLER( ajax_bankswitch_2_w );
-READ8_HANDLER( ajax_ls138_f10_r );
-WRITE8_HANDLER( ajax_ls138_f10_w );
-MACHINE_RESET( ajax );
-INTERRUPT_GEN( ajax_interrupt );
-
-/* from video/ajax.c */
-VIDEO_START( ajax );
-VIDEO_UPDATE( ajax );
 
 /****************************************************************************/
 

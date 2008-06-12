@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/slapfght.h"
 
 UINT8 *slapfight_videoram;
 UINT8 *slapfight_colorram;

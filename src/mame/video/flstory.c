@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 #include "driver.h"
+#include "includes/flstory.h"
 
 
 static tilemap *bg_tilemap;

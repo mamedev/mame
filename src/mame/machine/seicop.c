@@ -48,6 +48,9 @@
 
 #include "driver.h"
 #include "audio/seibu.h"
+#include "includes/legionna.h"
+#include "includes/raiden2.h"
+#include "machine/seicop.h"
 
 #define seibu_cop_log logerror
 
@@ -69,12 +72,6 @@ static UINT16 cop_clearfill_lasttrigger = 0;
 
 
 static UINT16 copd2_offs = 0;
-
-extern UINT16* legionna_scrollram16;
-extern UINT8 sdgndmrb_pri_n;
-extern void heatbrl_setgfxbank(UINT16 data);
-extern void denjinmk_setgfxbank(UINT16 data);
-extern UINT16 legionna_layer_disable;
 
 static void copd2_set_tableoffset(UINT16 data, running_machine *machine)
 {
@@ -900,7 +897,7 @@ WRITE16_HANDLER( copdxbl_0_w )
 
 // this still probably contains some useful information, but we should handle
 // things as generically as possible
-#if 0
+#ifdef UNUSED_FUNCTION
 /********************************************************************************************
 
   COPX-D2 simulation
@@ -2001,16 +1998,6 @@ READ16_HANDLER( raiden2_mcu_r )
 	}
 }
 
-extern WRITE16_HANDLER( sprcpt_val_1_w );
-extern WRITE16_HANDLER( sprcpt_val_2_w );
-extern WRITE16_HANDLER( sprcpt_data_1_w );
-extern WRITE16_HANDLER( sprcpt_data_2_w );
-extern WRITE16_HANDLER( sprcpt_data_3_w );
-extern WRITE16_HANDLER( sprcpt_data_4_w );
-extern WRITE16_HANDLER( sprcpt_adr_w );
-extern WRITE16_HANDLER( sprcpt_flags_1_w );
-extern WRITE16_HANDLER( sprcpt_flags_2_w );
-
 WRITE16_HANDLER( raiden2_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
@@ -2047,5 +2034,3 @@ WRITE16_HANDLER( raiden2_mcu_w )
 
 	}
 }
-
-

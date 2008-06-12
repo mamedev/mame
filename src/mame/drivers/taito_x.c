@@ -316,7 +316,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "seta.h"
 #include "sound/2610intf.h"
 #include "sound/2151intf.h"
-#include "includes/taito_f2.h"
+#include "includes/cchip.h"
 
 
 

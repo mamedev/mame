@@ -3,10 +3,7 @@
 #include "cpu/konami/konami.h"
 #include "machine/eeprom.h"
 #include "sound/k053260.h"
-
-/* from video */
-extern void simpsons_video_banking( running_machine *machine, int select );
-extern UINT8 *simpsons_xtraram;
+#include "includes/simpsons.h"
 
 int simpsons_firq_enabled;
 

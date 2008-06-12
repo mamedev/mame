@@ -77,44 +77,8 @@ Preliminary COP MCU memory map
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
 #include "cpu/m68000/m68000.h"
-
-/* machine/seicop.c */
-extern UINT16* cop_mcu_ram;
-extern READ16_HANDLER( legionna_mcu_r );
-extern WRITE16_HANDLER( legionna_mcu_w );
-extern READ16_HANDLER( heatbrl_mcu_r );
-extern WRITE16_HANDLER( heatbrl_mcu_w );
-extern READ16_HANDLER( godzilla_mcu_r );
-extern WRITE16_HANDLER( godzilla_mcu_w );
-extern READ16_HANDLER( denjinmk_mcu_r );
-extern WRITE16_HANDLER( denjinmk_mcu_w );
-extern READ16_HANDLER( sdgndmrb_mcu_r );
-extern WRITE16_HANDLER( sdgndmrb_mcu_w );
-extern READ16_HANDLER( cupsoc_mcu_r );
-extern WRITE16_HANDLER( cupsoc_mcu_w );
-extern READ16_HANDLER( copdxbl_0_r );
-extern WRITE16_HANDLER( copdxbl_0_w );
-
-
-
-
-
-extern WRITE16_HANDLER( legionna_background_w );
-extern WRITE16_HANDLER( legionna_foreground_w );
-extern WRITE16_HANDLER( legionna_midground_w );
-extern WRITE16_HANDLER( legionna_text_w );
-extern WRITE16_HANDLER( legionna_control_w );
-
-extern VIDEO_START( legionna );
-extern VIDEO_START( cupsoc );
-extern VIDEO_START( denjinmk );
-extern VIDEO_UPDATE( legionna );
-extern VIDEO_UPDATE( godzilla );
-extern VIDEO_UPDATE( sdgndmrb );
-
-
-extern UINT16 *legionna_back_data,*legionna_fore_data,*legionna_mid_data,*legionna_scrollram16,*legionna_textram;
-
+#include "machine/seicop.h"
+#include "includes/legionna.h"
 
 /*****************************************************************************/
 

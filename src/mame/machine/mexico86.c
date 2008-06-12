@@ -1,5 +1,6 @@
 #include "driver.h"
 #include "deprecat.h"
+#include "includes/mexico86.h"
 
 
 UINT8 *mexico86_protection_ram;

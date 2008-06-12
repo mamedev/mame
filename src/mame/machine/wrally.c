@@ -10,10 +10,7 @@
 #include "driver.h"
 #include "cpu/ds5002fp/ds5002fp.h"
 #include "gaelcrpt.h"
-
-/* from video/wrally.c */
-extern UINT16 *wrally_videoram;
-extern tilemap *wrally_pant[2];
+#include "includes/wrally.h"
 
 /***************************************************************************
 

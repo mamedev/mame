@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "cpu/m6805/m6805.h"
+#include "includes/pitnrun.h"
 
 
 static UINT8 fromz80,toz80;

@@ -11,9 +11,7 @@
 
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
-
-extern UINT8 jackal_interrupt_enable;
-extern void jackal_mark_tile_dirty(int offset);
+#include "includes/jackal.h"
 
 static UINT8 *jackal_rambank = 0;
 static UINT8 *jackal_spritebank = 0;

@@ -83,6 +83,7 @@ In other words,the first three types uses the offset and not the color allocated
 #include "eminline.h"
 #include "profiler.h"
 #include "deprecat.h"
+#include "includes/stv.h"
 
 UINT32* stv_vdp2_regs;
 UINT32* stv_vdp2_vram;
@@ -91,13 +92,10 @@ static UINT8*  stv_vdp2_vram_dirty_8x8x4;
 static UINT8*  stv_vdp2_vram_dirty_8x8x8;
 
 static UINT8* stv_vdp2_gfx_decode;
-extern UINT8* stv_vdp1_gfx_decode;
 
 static int stv_vdp2_render_rbg0;
 
 UINT32* stv_vdp2_cram;
-void video_update_vdp1(running_machine *machine);
-int stv_vdp1_start (running_machine *machine);
 static void stv_vdp2_dynamic_res_change(running_machine *machine);
 static void refresh_palette_data(running_machine *machine);
 static int stv_vdp2_window_process(int x,int y);
@@ -5216,7 +5214,6 @@ WRITE32_HANDLER ( stv_vdp2_regs_w )
 	}
 }
 
-extern int stv_vblank,stv_hblank;
 READ32_HANDLER ( stv_vdp2_regs_r )
 {
 //  if (offset!=1) if(LOG_VDP2) logerror ("VDP2: Read from Registers, Offset %04x\n",offset);
@@ -5620,12 +5617,6 @@ static int stv_vdp2_apply_window_on_layer(rectangle *cliprect)
 }
 
 /* VDP1 Framebuffer handling */
-extern UINT16	**stv_framebuffer_display_lines;
-extern int		 stv_framebuffer_width;
-extern int		 stv_framebuffer_height;
-extern int		 stv_framebuffer_double_interlace;
-extern int       stv_framebuffer_mode;
-
 static int		stv_sprite_priorities_used[8];
 static int		stv_sprite_priorities_usage_valid;
 static UINT8	stv_sprite_priorities_in_fb_line[512][8];
@@ -6064,8 +6055,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 	stv_sprite_priorities_usage_valid = 1;
 }
-
-extern UINT32 *stv_vdp1_vram;
 
 VIDEO_UPDATE( stv_vdp2 )
 {

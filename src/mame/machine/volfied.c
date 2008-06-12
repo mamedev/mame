@@ -15,6 +15,7 @@
 *************************************************************************/
 
 #include "driver.h"
+#include "includes/cchip.h"
 
 static UINT8 current_bank = 0;
 static UINT8 current_flag = 0;

@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "machine/eeprom.h"
+#include "includes/gaelco2.h"
 
 /***************************************************************************
 

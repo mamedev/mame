@@ -1,0 +1,29 @@
+/*----------- defined in machine/gaelco2.c -----------*/
+
+extern UINT16 *snowboar_protection;
+
+DRIVER_INIT( alighunt );
+DRIVER_INIT( touchgo );
+DRIVER_INIT( snowboar );
+WRITE16_HANDLER( gaelco2_coin_w );
+WRITE16_HANDLER( gaelco2_coin2_w );
+WRITE16_HANDLER( wrally2_coin_w );
+NVRAM_HANDLER( gaelco2 );
+READ16_HANDLER( gaelco2_eeprom_r );
+WRITE16_HANDLER( gaelco2_eeprom_cs_w );
+WRITE16_HANDLER( gaelco2_eeprom_sk_w );
+WRITE16_HANDLER( gaelco2_eeprom_data_w );
+READ16_HANDLER( snowboar_protection_r );
+WRITE16_HANDLER( snowboar_protection_w );
+
+/*----------- defined in video/gaelco2.c -----------*/
+
+extern UINT16 *gaelco2_vregs;
+
+WRITE16_HANDLER( gaelco2_vram_w );
+WRITE16_HANDLER( gaelco2_palette_w );
+VIDEO_UPDATE( gaelco2 );
+VIDEO_EOF( gaelco2 );
+VIDEO_START( gaelco2 );
+VIDEO_UPDATE( gaelco2_dual );
+VIDEO_START( gaelco2_dual );

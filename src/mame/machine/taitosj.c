@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "cpu/m6805/m6805.h"
+#include "includes/taitosj.h"
 
 
 #define VERBOSE	1
@@ -24,7 +25,6 @@ static UINT8 protection_value;
 static UINT32 address;
 
 void taitosj_register_main_savestate(void);
-WRITE8_HANDLER( taitosj_bankswitch_w );
 
 MACHINE_START( taitosj )
 {

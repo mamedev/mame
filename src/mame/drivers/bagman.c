@@ -63,22 +63,7 @@ DIP locations verified for:
 #include "sound/ay8910.h"
 #include "sound/5110intf.h"
 #include "sound/tms5110.h"
-
-
-extern READ8_HANDLER( bagman_pal16r6_r );
-extern MACHINE_RESET( bagman );
-extern WRITE8_HANDLER( bagman_pal16r6_w );
-
-
-extern UINT8 *bagman_video_enable;
-
-extern WRITE8_HANDLER( bagman_videoram_w );
-extern WRITE8_HANDLER( bagman_colorram_w );
-extern WRITE8_HANDLER( bagman_flipscreen_w );
-
-extern PALETTE_INIT( bagman );
-extern VIDEO_START( bagman );
-extern VIDEO_UPDATE( bagman );
+#include "includes/bagman.h"
 
 
 static int speech_rom_address = 0;

@@ -1,14 +1,7 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "video/ppu2c0x.h"
-
-/* from machine */
-extern int pc10_sdcs;			/* ShareD Chip Select */
-extern int pc10_dispmask;		/* Display Mask */
-extern int pc10_gun_controller;	/* whether we need to draw a crosshair or not */
-extern int pc10_int_detect;
-extern int pc10_game_mode;
-extern int pc10_dispmask_old;
+#include "includes/playch10.h"
 
 static int pc10_bios;
 

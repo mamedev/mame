@@ -10,6 +10,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/msm5205.h"
+#include "includes/stfight.h"
 
 // this prototype will move to the driver
 static WRITE8_HANDLER( stfight_bank_w );

@@ -49,6 +49,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "includes/cchip.h"
 
 static UINT8* CRAM[8];
 

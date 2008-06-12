@@ -10,6 +10,7 @@
 #include "driver.h"
 #include "machine/namcoio.h"
 #include "sound/samples.h"
+#include "includes/gaplus.h"
 
 UINT8 *gaplus_customio_3;
 

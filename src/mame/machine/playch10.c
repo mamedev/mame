@@ -2,6 +2,7 @@
 #include "deprecat.h"
 #include "video/ppu2c0x.h"
 #include "machine/rp5h01.h"
+#include "includes/playch10.h"
 
 /* Globals */
 int pc10_sdcs;			/* ShareD Chip Select */

@@ -3,6 +3,7 @@
 #include "video/rgbutil.h"
 #include "eminline.h"
 #include <math.h>
+#include "includes/model3.h"
 
 
 #define pz  p[0]
@@ -74,13 +75,6 @@ static void draw_block(UINT32 address);
 static void draw_viewport(int pri, UINT32 address);
 
 /*****************************************************************************/
-
-/* in drivers/model3.c */
-void model3_set_irq_line(running_machine *machine, UINT8 bit, int state);
-
-extern int model3_step;
-
-extern UINT32 *model3_vrom;
 
 UINT64 *paletteram64;
 

@@ -173,11 +173,7 @@ cpu #0 (PC=0601023A): unmapped program memory dword write to 02000000 = 00000000
 #include "machine/scudsp.h"
 #include "sound/scsp.h"
 #include "machine/stvprot.h"
-
-extern UINT32* stv_vdp2_regs;
-extern UINT32* stv_vdp2_vram;
-extern UINT32* stv_vdp2_cram;
-extern UINT32* stv_vdp1_vram;
+#include "includes/stv.h"
 
 #define USE_SLAVE 1
 /*Enable the following to play 'myfairld' without using the -nosound switch.*/
@@ -199,51 +195,6 @@ extern UINT32* stv_vdp1_vram;
 
 #define MASTER_CLOCK_352 57272800
 #define MASTER_CLOCK_320 53748200
-
-/* stvinit.c */
-DRIVER_INIT( ic13 );
-NVRAM_HANDLER( stv );
-void install_stvbios_speedups(running_machine *machine);
-DRIVER_INIT(bakubaku);
-DRIVER_INIT(mausuke);
-DRIVER_INIT(puyosun);
-DRIVER_INIT(shienryu);
-DRIVER_INIT(prikura);
-DRIVER_INIT(hanagumi);
-DRIVER_INIT(cottonbm);
-DRIVER_INIT(cotton2);
-DRIVER_INIT(fhboxers);
-DRIVER_INIT(dnmtdeka);
-DRIVER_INIT(groovef);
-DRIVER_INIT(danchih);
-DRIVER_INIT(astrass);
-DRIVER_INIT(thunt);
-DRIVER_INIT(grdforce);
-DRIVER_INIT(batmanfr);
-DRIVER_INIT(winterht);
-DRIVER_INIT(seabass);
-DRIVER_INIT(vfremix);
-DRIVER_INIT(diehard);
-DRIVER_INIT(sss);
-DRIVER_INIT(othellos);
-DRIVER_INIT(sasissu);
-DRIVER_INIT(gaxeduel);
-DRIVER_INIT(suikoenb);
-DRIVER_INIT(sokyugrt);
-DRIVER_INIT(znpwfv);
-DRIVER_INIT(twcup98);
-DRIVER_INIT(smleague);
-DRIVER_INIT(maruchan);
-DRIVER_INIT(sandor);
-DRIVER_INIT(colmns97);
-DRIVER_INIT(pblbeach);
-DRIVER_INIT(shanhigw);
-DRIVER_INIT(finlarch);
-DRIVER_INIT(elandore);
-DRIVER_INIT(rsgun);
-DRIVER_INIT(ffreveng);
-DRIVER_INIT(decathlt);
-DRIVER_INIT(nameclv3);
 
 /**************************************************************************************/
 /*to be added into a stv Header file,remember to remove all the static...*/
@@ -2059,29 +2010,6 @@ static WRITE32_HANDLER( sinit_w )
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
 }
 
-
-extern WRITE32_HANDLER ( stv_vdp2_vram_w );
-extern READ32_HANDLER ( stv_vdp2_vram_r );
-
-extern WRITE32_HANDLER ( stv_vdp2_cram_w );
-extern READ32_HANDLER ( stv_vdp2_cram_r );
-
-extern WRITE32_HANDLER ( stv_vdp2_regs_w );
-extern READ32_HANDLER ( stv_vdp2_regs_r );
-
-extern VIDEO_START ( stv_vdp2 );
-extern VIDEO_UPDATE( stv_vdp2 );
-
-extern READ32_HANDLER( stv_vdp1_regs_r );
-extern WRITE32_HANDLER( stv_vdp1_regs_w );
-extern READ32_HANDLER ( stv_vdp1_vram_r );
-extern WRITE32_HANDLER ( stv_vdp1_vram_w );
-
-extern WRITE32_HANDLER ( stv_vdp1_framebuffer0_w );
-extern READ32_HANDLER ( stv_vdp1_framebuffer0_r );
-
-extern WRITE32_HANDLER ( stv_vdp1_framebuffer1_w );
-extern READ32_HANDLER ( stv_vdp1_framebuffer1_r );
 
 #ifdef UNUSED_FUNCTION
 static READ32_HANDLER( stv_sh2_random_r )

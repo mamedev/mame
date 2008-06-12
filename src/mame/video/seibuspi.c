@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "includes/seibuspi.h"
 
 static tilemap *text_layer;
 static tilemap *back_layer;
@@ -13,7 +14,6 @@ static UINT32 video_dma_length;
 static UINT32 video_dma_address;
 
 static int rf2_layer_bank[3];
-extern UINT32 *spimainram;
 static UINT32 *tilemap_ram;
 static UINT32 *palette_ram;
 static UINT32 *sprite_ram;

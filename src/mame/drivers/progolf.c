@@ -42,18 +42,7 @@ Twenty four 8116 rams.
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
-
-extern UINT8 *deco_charram;
-
-PALETTE_INIT( btime );
-VIDEO_START( btime );
-VIDEO_UPDATE( progolf );
-
-READ8_HANDLER( btime_mirrorvideoram_r );
-WRITE8_HANDLER( btime_mirrorvideoram_w );
-
-WRITE8_HANDLER( deco_charram_w );
-
+#include "includes/btime.h"
 
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM

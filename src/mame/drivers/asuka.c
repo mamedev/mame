@@ -219,6 +219,7 @@ DIP locations verified for:
 #include "sound/2610intf.h"
 #include "sound/2151intf.h"
 #include "sound/msm5205.h"
+#include "includes/cchip.h"
 
 WRITE16_HANDLER( asuka_spritectrl_w );
 
@@ -229,14 +230,6 @@ VIDEO_START( galmedes );
 VIDEO_START( cadash );
 VIDEO_UPDATE( asuka );
 VIDEO_UPDATE( bonzeadv );
-
-READ16_HANDLER( bonzeadv_cchip_r );
-READ16_HANDLER( bonzeadv_cchip_ctrl_r );
-READ16_HANDLER( bonzeadv_cchip_ram_r );
-WRITE16_HANDLER( bonzeadv_cchip_ctrl_w );
-WRITE16_HANDLER( bonzeadv_cchip_bank_w );
-WRITE16_HANDLER( bonzeadv_cchip_ram_w );
-
 
 /***********************************************************
                 INTERRUPTS

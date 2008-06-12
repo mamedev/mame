@@ -98,25 +98,9 @@ produces a high clock frequency, slow movements a low freq.
 #include "cpu/m68000/m68000.h"
 #include "cpu/ds5002fp/ds5002fp.h"
 #include "sound/okim6295.h"
+#include "includes/wrally.h"
 
-/* from video/wrally.c */
-extern UINT16 *wrally_vregs;
-extern UINT16 *wrally_videoram;
-extern UINT16 *wrally_spriteram;
 static UINT16 *wrally_shareram;
-
-VIDEO_START( wrally );
-VIDEO_UPDATE( wrally );
-
-/* from machine/wrally.c */
-DRIVER_INIT( wrally );
-MACHINE_RESET( wrally );
-READ32_HANDLER( wrally_external_ram_iaddr );
-WRITE16_HANDLER( wrally_vram_w );
-WRITE16_HANDLER( wrally_flipscreen_w );
-WRITE16_HANDLER( OKIM6295_bankswitch_w );
-WRITE16_HANDLER( wrally_coin_counter_w );
-WRITE16_HANDLER( wrally_coin_lockout_w );
 
 static ADDRESS_MAP_START( wrally_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															/* ROM */

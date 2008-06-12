@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/jackal.h"
 
 static UINT8 *jackal_scrollram;
 UINT8 *jackal_videoctrl;

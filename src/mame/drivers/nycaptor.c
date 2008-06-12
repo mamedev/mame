@@ -152,43 +152,12 @@ Stephh's additional notes (based on the game Z80 code and some tests) :
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
+#include "includes/nycaptor.h"
 
-VIDEO_START( nycaptor );
-VIDEO_UPDATE( nycaptor );
-
-
-extern UINT8 *nycaptor_scrlram;
 UINT8 *nycaptor_sharedram;
 static int generic_control_reg = 0;
 static int sound_nmi_enable=0,pending_nmi=0;
 int nyc_gametype=0;
-
-WRITE8_HANDLER( nycaptor_videoram_w );
-WRITE8_HANDLER( nycaptor_spriteram_w );
-WRITE8_HANDLER( nycaptor_palette_w );
-WRITE8_HANDLER( nycaptor_gfxctrl_w );
-WRITE8_HANDLER( nycaptor_scrlram_w );
-WRITE8_HANDLER( nycaptor_68705_portA_w );
-WRITE8_HANDLER( nycaptor_68705_portB_w );
-WRITE8_HANDLER( nycaptor_68705_portC_w );
-WRITE8_HANDLER( nycaptor_68705_ddrA_w );
-WRITE8_HANDLER( nycaptor_68705_ddrB_w );
-WRITE8_HANDLER( nycaptor_68705_ddrC_w );
-WRITE8_HANDLER( nycaptor_mcu_w );
-
-READ8_HANDLER( nycaptor_mcu_r );
-READ8_HANDLER( nycaptor_mcu_status_r1 );
-READ8_HANDLER( nycaptor_mcu_status_r2 );
-READ8_HANDLER( nycaptor_spriteram_r );
-READ8_HANDLER( nycaptor_palette_r );
-READ8_HANDLER( nycaptor_gfxctrl_r );
-READ8_HANDLER( nycaptor_scrlram_r );
-READ8_HANDLER( nycaptor_68705_portC_r );
-READ8_HANDLER( nycaptor_68705_portB_r );
-READ8_HANDLER( nycaptor_68705_portA_r );
-READ8_HANDLER( nycaptor_videoram_r );
-
-
 
 static WRITE8_HANDLER( sub_cpu_halt_w )
 {

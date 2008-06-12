@@ -135,62 +135,12 @@ Changes:
 #include "machine/rp5h01.h"
 #include "sound/dac.h"
 #include "sound/nes_apu.h"
+#include "includes/vsnes.h"
 
 /* clock frequency */
 #define N2A03_DEFAULTCLOCK ( 21477272.724 / 12 )
 
 #define DUAL_RBI 1
-
-/* from video */
-extern VIDEO_START( vsnes );
-extern PALETTE_INIT( vsnes );
-extern VIDEO_UPDATE( vsnes );
-extern VIDEO_START( vsdual );
-extern VIDEO_UPDATE( vsdual );
-extern PALETTE_INIT( vsdual );
-
-/* from machine */
-extern MACHINE_RESET( vsnes );
-extern MACHINE_RESET( vsdual );
-extern DRIVER_INIT( vsnes );
-extern DRIVER_INIT( suprmrio );
-extern DRIVER_INIT( excitebk );
-extern DRIVER_INIT( excitbkj );
-extern DRIVER_INIT( vsnormal );
-extern DRIVER_INIT( duckhunt );
-extern DRIVER_INIT( hogalley );
-extern DRIVER_INIT( goonies );
-extern DRIVER_INIT( machridr );
-extern DRIVER_INIT( vsslalom );
-extern DRIVER_INIT( cstlevna );
-extern DRIVER_INIT( drmario );
-extern DRIVER_INIT( rbibb );
-extern DRIVER_INIT( tkoboxng );
-extern DRIVER_INIT( topgun );
-extern DRIVER_INIT( vsgradus );
-extern DRIVER_INIT( vspinbal );
-extern DRIVER_INIT( MMC3 );
-extern DRIVER_INIT( platoon );
-extern DRIVER_INIT( vstennis );
-extern DRIVER_INIT( wrecking );
-extern DRIVER_INIT( balonfgt );
-extern DRIVER_INIT( vsbball );
-extern DRIVER_INIT( iceclmrj );
-extern DRIVER_INIT( supxevs );
-extern DRIVER_INIT( btlecity );
-extern DRIVER_INIT( vstetris );
-extern DRIVER_INIT( bnglngby );
-extern DRIVER_INIT( jajamaru);
-extern DRIVER_INIT( vsgshoe );
-extern DRIVER_INIT( vsfdf );
-extern DRIVER_INIT( mightybj);
-
-extern READ8_HANDLER( vsnes_in0_r );
-extern READ8_HANDLER( vsnes_in1_r );
-extern READ8_HANDLER( vsnes_in0_1_r );
-extern READ8_HANDLER( vsnes_in1_1_r );
-extern WRITE8_HANDLER( vsnes_in0_w );
-extern WRITE8_HANDLER( vsnes_in0_1_w );
 
 /******************************************************************************/
 

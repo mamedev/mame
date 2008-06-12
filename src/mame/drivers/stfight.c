@@ -231,37 +231,7 @@ DONE? (check on real board)
 #include "driver.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
-
-// machine
-DRIVER_INIT( empcity );
-DRIVER_INIT( stfight );
-MACHINE_RESET( stfight );
-INTERRUPT_GEN( stfight_vb_interrupt );
-INTERRUPT_GEN( stfight_interrupt_1 );
-READ8_HANDLER( stfight_dsw_r );
-WRITE8_HANDLER( stfight_fm_w );
-WRITE8_HANDLER( stfight_voice_w );
-READ8_HANDLER( stfight_coin_r );
-WRITE8_HANDLER( stfight_coin_w );
-WRITE8_HANDLER( stfight_e800_w );
-READ8_HANDLER( stfight_fm_r );
-void stfight_adpcm_int( running_machine *machine, int data );
-WRITE8_HANDLER( stfight_adpcm_control_w );
-
-// video
-PALETTE_INIT( stfight );
-WRITE8_HANDLER( stfight_text_char_w );
-WRITE8_HANDLER( stfight_text_attr_w );
-WRITE8_HANDLER( stfight_vh_latch_w );
-WRITE8_HANDLER( stfight_sprite_bank_w );
-VIDEO_START( stfight );
-VIDEO_UPDATE( stfight );
-
-// video
-extern UINT8 *stfight_text_char_ram;
-extern UINT8 *stfight_text_attr_ram;
-extern UINT8 *stfight_vh_latch_ram;
-extern UINT8 *stfight_sprite_ram;
+#include "includes/stfight.h"
 
 static ADDRESS_MAP_START( readmem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)

@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 #include "driver.h"
+#include "includes/nycaptor.h"
 
 #define NYCAPTOR_DEBUG	0
 
@@ -19,8 +20,6 @@ static int char_bank,palette_bank,gfxctrl;
 UINT8 *nycaptor_scrlram;
 
 static UINT8 *nycaptor_spriteram;
-extern UINT8 *nycaptor_sharedram;
-extern int nyc_gametype;
 
 /*
  298 (e298) - spot (0-3) , 299 (e299) - lives

@@ -30,25 +30,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/2203intf.h"
-
-
-extern UINT8 *lkage_scroll, *lkage_vreg;
-WRITE8_HANDLER( lkage_videoram_w );
-VIDEO_START( lkage );
-VIDEO_UPDATE( lkage );
-
-READ8_HANDLER( lkage_68705_portA_r );
-WRITE8_HANDLER( lkage_68705_portA_w );
-READ8_HANDLER( lkage_68705_portB_r );
-WRITE8_HANDLER( lkage_68705_portB_w );
-READ8_HANDLER( lkage_68705_portC_r );
-WRITE8_HANDLER( lkage_68705_portC_w );
-WRITE8_HANDLER( lkage_68705_ddrA_w );
-WRITE8_HANDLER( lkage_68705_ddrB_w );
-WRITE8_HANDLER( lkage_68705_ddrC_w );
-WRITE8_HANDLER( lkage_mcu_w );
-READ8_HANDLER( lkage_mcu_r );
-READ8_HANDLER( lkage_mcu_status_r );
+#include "includes/lkage.h"
 
 
 static int sound_nmi_enable,pending_nmi;

@@ -22,6 +22,7 @@
 *************************************************************************/
 
 #include "driver.h"
+#include "includes/cchip.h"
 
 static int current_round = 0;
 static int current_bank = 0;

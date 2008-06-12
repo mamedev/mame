@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/legionna.h"
 
 UINT16 *legionna_back_data,*legionna_fore_data,*legionna_mid_data,*legionna_scrollram16,*legionna_textram;
 

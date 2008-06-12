@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "includes/mexico86.h"
 
 UINT8 *mexico86_videoram,*mexico86_objectram;
 size_t mexico86_objectram_size;

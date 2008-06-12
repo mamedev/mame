@@ -633,39 +633,12 @@ Notes:
 #include "cpu/mb86233/mb86233.h"
 #include "sound/multipcm.h"
 #include "sound/2612intf.h"
-
-WRITE16_HANDLER( model1_paletteram_w );
-VIDEO_START(model1);
-VIDEO_UPDATE(model1);
-VIDEO_EOF(model1);
-extern UINT16 *model1_display_list0, *model1_display_list1;
-extern UINT16 *model1_color_xlat;
-READ16_HANDLER( model1_listctl_r );
-WRITE16_HANDLER( model1_listctl_w );
-
-READ16_HANDLER( model1_tgp_copro_r );
-WRITE16_HANDLER( model1_tgp_copro_w );
-READ16_HANDLER( model1_tgp_copro_adr_r );
-WRITE16_HANDLER( model1_tgp_copro_adr_w );
-READ16_HANDLER( model1_tgp_copro_ram_r );
-WRITE16_HANDLER( model1_tgp_copro_ram_w );
-
-/* VR */
-extern READ16_HANDLER( model1_vr_tgp_r );
-extern WRITE16_HANDLER( model1_vr_tgp_w );
-extern READ16_HANDLER( model1_tgp_vr_adr_r );
-extern WRITE16_HANDLER( model1_tgp_vr_adr_w );
-extern READ16_HANDLER( model1_vr_tgp_ram_r );
-extern WRITE16_HANDLER( model1_vr_tgp_ram_w );
-extern void model1_vr_tgp_reset( void );
-ADDRESS_MAP_EXTERN( model1_vr_tgp_map, 32 );
+#include "includes/model1.h"
 
 static int model1_sound_irq;
 
 #define FIFO_SIZE	(8)
 static int to_68k[FIFO_SIZE], fifo_wptr, fifo_rptr;
-
-void model1_tgp_reset(int swa);
 
 static READ16_HANDLER( io_r )
 {
@@ -801,7 +774,6 @@ static WRITE16_HANDLER( network_ctl_w )
 
 static WRITE16_HANDLER(md1_w)
 {
-	extern int model1_dump;
 	COMBINE_DATA(model1_display_list1+offset);
 	if(0 && offset)
 		return;
@@ -811,7 +783,6 @@ static WRITE16_HANDLER(md1_w)
 
 static WRITE16_HANDLER(md0_w)
 {
-	extern int model1_dump;
 	COMBINE_DATA(model1_display_list0+offset);
 	if(0 && offset)
 		return;
@@ -1573,8 +1544,6 @@ static MACHINE_DRIVER_START( model1 )
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
-
-extern struct mb86233_config model1_vr_tgp_config;
 
 static MACHINE_DRIVER_START( model1_vr )
 	MDRV_CPU_ADD(V60, 16000000)

@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/slapfght.h"
 
 
 UINT8 *slapfight_dpram;
@@ -18,7 +19,6 @@ static int getstar_sequence_index;
 static int getstar_sh_intenabled;
 
 static int slapfight_status_state;
-extern UINT8 *getstar_e803;
 
 static UINT8 mcu_val;
 

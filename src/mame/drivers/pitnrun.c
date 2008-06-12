@@ -66,36 +66,7 @@ K1000233A
 #include "driver.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
-
-WRITE8_HANDLER (pitnrun_68705_portA_w);
-WRITE8_HANDLER (pitnrun_68705_portB_w);
-
-READ8_HANDLER (pitnrun_68705_portA_r);
-READ8_HANDLER (pitnrun_68705_portB_r);
-READ8_HANDLER (pitnrun_68705_portC_r);
-
-MACHINE_RESET( pitnrun );
-
-READ8_HANDLER( pitnrun_mcu_data_r );
-READ8_HANDLER( pitnrun_mcu_status_r );
-WRITE8_HANDLER( pitnrun_mcu_data_w );
-
-extern UINT8* pitnrun_videoram2;
-
-WRITE8_HANDLER( pitnrun_videoram_w );
-WRITE8_HANDLER( pitnrun_videoram2_w );
-WRITE8_HANDLER(pitnrun_ha_w);
-WRITE8_HANDLER(pitnrun_h_heed_w);
-WRITE8_HANDLER(pitnrun_v_heed_w);
-WRITE8_HANDLER(pitnrun_color_select_w);
-WRITE8_HANDLER( pitnrun_char_bank_select );
-WRITE8_HANDLER( pitnrun_scroll_w );
-READ8_HANDLER( pitnrun_videoram_r );
-READ8_HANDLER( pitnrun_videoram2_r );
-
-PALETTE_INIT(pitnrun);
-VIDEO_START(pitnrun);
-VIDEO_UPDATE(pitnrun);
+#include "includes/pitnrun.h"
 
 static int pitnrun_nmi;
 

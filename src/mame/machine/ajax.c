@@ -12,8 +12,8 @@
 #include "cpu/z80/z80.h"
 #include "cpu/konami/konami.h"
 #include "video/konamiic.h"
+#include "includes/ajax.h"
 
-extern UINT8 ajax_priority;
 static int firq_enable;
 
 /*  ajax_bankswitch_w:

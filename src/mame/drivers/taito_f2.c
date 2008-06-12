@@ -296,6 +296,7 @@ Notes:
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
 #include "sound/okim6295.h"
+#include "includes/cchip.h"
 
 
 static INT32 banknum = 0;

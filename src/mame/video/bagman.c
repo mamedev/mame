@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
+#include "includes/bagman.h"
 
 
 UINT8 *bagman_video_enable;

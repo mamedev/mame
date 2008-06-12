@@ -242,6 +242,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
+#include "includes/cchip.h"
 
 VIDEO_START( rainbow );
 VIDEO_START( jumping );
@@ -251,13 +252,6 @@ VIDEO_UPDATE( jumping );
 
 WRITE16_HANDLER( jumping_spritectrl_w );
 WRITE16_HANDLER( rainbow_spritectrl_w );
-
-void rainbow_cchip_init(int version);
-READ16_HANDLER( rainbow_cchip_ctrl_r );
-READ16_HANDLER( rainbow_cchip_ram_r );
-WRITE16_HANDLER( rainbow_cchip_ctrl_w );
-WRITE16_HANDLER( rainbow_cchip_bank_w );
-WRITE16_HANDLER( rainbow_cchip_ram_w );
 
 static UINT8 jumping_latch = 0;
 

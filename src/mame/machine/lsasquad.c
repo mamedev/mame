@@ -1,5 +1,6 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "includes/lsasquad.h"
 
 
 /* coin inputs are inverted in storming */

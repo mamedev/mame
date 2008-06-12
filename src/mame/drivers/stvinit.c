@@ -9,16 +9,7 @@ to be honest i think some of these cause more problems than they're worth ...
 #include "machine/eeprom.h"
 #include "cpu/sh2/sh2.h"
 #include "machine/stvprot.h"
-
-extern UINT32 *stv_workram_h;
-extern UINT32 *stv_workram_l;
-extern UINT32 *stv_backupram;
-extern int stv_enable_slave_sh2;
-
-extern int minit_boost,sinit_boost;
-extern attotime minit_boost_timeslice, sinit_boost_timeslice;
-
-DRIVER_INIT ( stv );
+#include "includes/stv.h"
 
 /*
 IC-13 rom shifter routine,on 2000000-21fffff the game maps the rom bytes on the

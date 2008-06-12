@@ -74,28 +74,12 @@ Address          Dir Data     Description
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
+#include "includes/jackal.h"
 
 
 #define MASTER_CLOCK		XTAL_18_432MHz
 #define SOUND_CLOCK			XTAL_3_579545MHz
 
-
-extern UINT8 *jackal_videoctrl;
-
-extern MACHINE_RESET( jackal );
-
-extern READ8_HANDLER( jackal_zram_r );
-extern READ8_HANDLER( jackal_voram_r );
-extern READ8_HANDLER( jackal_spriteram_r );
-
-extern WRITE8_HANDLER( jackal_rambank_w );
-extern WRITE8_HANDLER( jackal_zram_w );
-extern WRITE8_HANDLER( jackal_voram_w );
-extern WRITE8_HANDLER( jackal_spriteram_w );
-
-extern PALETTE_INIT( jackal );
-extern VIDEO_START( jackal );
-extern VIDEO_UPDATE( jackal );
 
 static int irq_enable;
 

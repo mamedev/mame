@@ -8,9 +8,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-
-extern UINT8 *onna34ro_workram;
-extern UINT8 *victnine_workram;
+#include "includes/flstory.h"
 
 static UINT8 from_main,from_mcu;
 static int mcu_sent = 0,main_sent = 0;

@@ -12,6 +12,8 @@ cpu #0 (PC=0033C315): unmapped program memory dword write to 00000524 = 9CAC0000
 
 
 #include "driver.h"
+#include "includes/seibuspi.h"
+
 // add two numbers generating carry from one bit to the next only if
 // the corresponding bit in carry_mask is 1
 static int partial_carry_sum(int add1,int add2,int carry_mask,int bits)

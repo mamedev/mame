@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/gaplus.h"
 
 
 UINT8 *gaplus_videoram;

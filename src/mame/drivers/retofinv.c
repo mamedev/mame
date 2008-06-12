@@ -32,34 +32,7 @@ Notes:
 #include "deprecat.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/sn76496.h"
-
-/* in machine */
-READ8_HANDLER( retofinv_68705_portA_r );
-WRITE8_HANDLER( retofinv_68705_portA_w );
-WRITE8_HANDLER( retofinv_68705_ddrA_w );
-READ8_HANDLER( retofinv_68705_portB_r );
-WRITE8_HANDLER( retofinv_68705_portB_w );
-WRITE8_HANDLER( retofinv_68705_ddrB_w );
-READ8_HANDLER( retofinv_68705_portC_r );
-WRITE8_HANDLER( retofinv_68705_portC_w );
-WRITE8_HANDLER( retofinv_68705_ddrC_w );
-WRITE8_HANDLER( retofinv_mcu_w );
-READ8_HANDLER( retofinv_mcu_r );
-READ8_HANDLER( retofinv_mcu_status_r );
-
-/* in video */
-VIDEO_START( retofinv );
-PALETTE_INIT( retofinv );
-VIDEO_UPDATE( retofinv );
-READ8_HANDLER( retofinv_bg_videoram_r );
-READ8_HANDLER( retofinv_fg_videoram_r );
-WRITE8_HANDLER( retofinv_bg_videoram_w );
-WRITE8_HANDLER( retofinv_fg_videoram_w );
-WRITE8_HANDLER( retofinv_gfx_ctrl_w );
-
-extern UINT8 *retofinv_fg_videoram;
-extern UINT8 *retofinv_bg_videoram;
-extern UINT8 *retofinv_sharedram;
+#include "includes/retofinv.h"
 
 static UINT8 cpu2_m6000=0;
 

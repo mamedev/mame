@@ -1,9 +1,7 @@
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6522via.h"
-
-WRITE8_HANDLER( beezer_map_w );
-READ8_HANDLER( beezer_line_r );
+#include "includes/beezer.h"
 
 static int pbus;
 

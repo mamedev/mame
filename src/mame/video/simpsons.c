@@ -1,5 +1,6 @@
 #include "driver.h"
 #include "video/konamiic.h"
+#include "includes/simpsons.h"
 
 static int bg_colorbase,sprite_colorbase,layer_colorbase[3];
 UINT8 *simpsons_xtraram;

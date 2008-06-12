@@ -62,9 +62,9 @@ Current Problem(s) - in order of priority
 #include "audio/seibu.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
+#include "machine/seicop.h"
+#include "includes/raiden2.h"
 
-/* in machine/r2crypt.c */
-extern void raiden2_decrypt_sprites(void);
 
 static tilemap *background_layer,*midground_layer,*foreground_layer,*text_layer;
 static UINT16 *back_data,*fore_data,*mid_data, *w1ram;
@@ -80,11 +80,6 @@ static void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
 	UINT16 *dest = (UINT16 *)val + BYTE_XOR_LE(offset);
 	COMBINE_DATA(dest);
 }
-
-/* machine/seicop.c */
-extern READ16_HANDLER( raiden2_cop2_r );
-extern WRITE16_HANDLER( raiden2_cop2_w );
-//extern void cop_init(void);
 
 
 
@@ -749,10 +744,6 @@ static MACHINE_RESET(raiden2)
 
 
 /* MEMORY MAPS */
-
-extern UINT16* cop_mcu_ram;
-extern WRITE16_HANDLER( raiden2_mcu_w );
-extern READ16_HANDLER( raiden2_mcu_r );
 
 static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00400, 0x007ff) AM_READWRITE(raiden2_mcu_r, raiden2_mcu_w) AM_BASE(&cop_mcu_ram)

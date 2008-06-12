@@ -6,6 +6,7 @@
 #include "deprecat.h"
 #include "debugger.h"
 #include "cpu/mb86233/mb86233.h"
+#include "includes/model1.h"
 
 enum {FIFO_SIZE = 256};
 enum {MAT_STACK_SIZE = 32};

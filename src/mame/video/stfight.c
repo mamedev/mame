@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/stfight.h"
 
 // Real stuff
 UINT8 *stfight_text_char_ram;

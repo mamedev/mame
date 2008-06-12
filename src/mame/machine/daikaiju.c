@@ -99,6 +99,7 @@ displayed (game) or not (attract mode). Due to above bug message is always displ
 ***************************************************************************/
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "includes/lsasquad.h"
 
 #define ID_DAIKAIJU 0x5a
 
@@ -124,7 +125,6 @@ displayed (game) or not (attract mode). Due to above bug message is always displ
 			daikaiju_cntr=0;
 
 
-extern int lsasquad_sound_pending;
 static int daikaiju_xor, daikaiju_command, daikaiju_length, daikaiju_prev, daikaiju_cnt, daikaiju_cntr;
 
 static int daikaiju_buffer[256];

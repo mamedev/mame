@@ -14,21 +14,7 @@ someone@secureshell.com
 #include "video/konamiic.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
-
-/* from video */
-VIDEO_START( simpsons );
-WRITE8_HANDLER( simpsons_priority_w );
-VIDEO_UPDATE( simpsons );
-
-/* from machine */
-READ8_HANDLER( simpsons_eeprom_r );
-WRITE8_HANDLER( simpsons_eeprom_w );
-WRITE8_HANDLER( simpsons_coin_counter_w );
-READ8_HANDLER( simpsons_sound_interrupt_r );
-READ8_HANDLER( simpsons_sound_r );
-MACHINE_RESET( simpsons );
-NVRAM_HANDLER( simpsons );
-extern int simpsons_firq_enabled;
+#include "includes/simpsons.h"
 
 
 /***************************************************************************

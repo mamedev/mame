@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
+#include "includes/taitosj.h"
 
 
 #define GLOBAL_FLIP_X		 	(*taitosj_video_mode & 0x01)

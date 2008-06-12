@@ -9,6 +9,7 @@ This file is also used by scregg.c
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/btime.h"
 
 
 UINT8 *btime_videoram;

@@ -1,20 +1,9 @@
 #include "driver.h"
 #include "sound/ym2151.h"
 #include "sound/namco.h"
+#include "includes/namcos1.h"
 
 #define NAMCOS1_MAX_BANK 0x400
-
-/* from drivers */
-void namcos1_init_DACs(void);
-
-/* from video */
-READ8_HANDLER( namcos1_videoram_r );
-WRITE8_HANDLER( namcos1_videoram_w );
-WRITE8_HANDLER( namcos1_paletteram_w );
-READ8_HANDLER( namcos1_spriteram_r );
-WRITE8_HANDLER( namcos1_spriteram_w );
-extern void namcos1_set_scroll_offsets( const int *bgx, const int *bgy, int negative, int optimize );
-extern void namcos1_set_sprite_offsets( int x, int y );
 
 UINT8 *namcos1_paletteram;
 

@@ -17,6 +17,7 @@ In debug build press 'w' for spotlight and 'e' for lightning
 
 ***************************************************************************/
 #include "driver.h"
+#include "includes/pitnrun.h"
 
 static int pitnrun_h_heed;
 static int pitnrun_v_heed;

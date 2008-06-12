@@ -17,20 +17,9 @@ OKI M6295 sound ROM dump is bad.
 #include "deprecat.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "includes/bublbobl.h"
 
 static UINT8 *bg_paletteram, *missb2_bgvram;
-
-/* video/bublbobl.c */
-extern UINT8 *bublbobl_objectram;
-extern size_t bublbobl_objectram_size;
-
-/* machine/bublbobl.c */
-WRITE8_HANDLER( bublbobl_bankswitch_w );
-WRITE8_HANDLER( bublbobl_nmitrigger_w );
-WRITE8_HANDLER( bublbobl_sound_command_w );
-WRITE8_HANDLER( bublbobl_sh_nmi_disable_w );
-WRITE8_HANDLER( bublbobl_sh_nmi_enable_w );
-extern int bublbobl_video_enable;
 
 /* Video Hardware */
 

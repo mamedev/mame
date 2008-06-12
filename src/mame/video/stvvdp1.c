@@ -19,14 +19,13 @@ Framebuffer todo:
 #include "driver.h"
 #include "deprecat.h"
 #include "sound/scsp.h"
+#include "includes/stv.h"
 
 static int vdp1_sprite_log = 0;
 
 UINT32 *stv_vdp1_vram;
 static UINT32 *stv_vdp1_regs;
 UINT8* stv_vdp1_gfx_decode;
-
-extern int stv_vblank;
 
 static UINT16	 *stv_framebuffer[2];
 static UINT16	 **stv_framebuffer_draw_lines;
@@ -857,8 +856,6 @@ finish:
 to the framebuffer we CAN'T frameskip the vdp1 drawing as the hardware can READ the framebuffer
 and if we skip the drawing the content could be incorrect when it reads it, although i have no idea
 why they would want to */
-
-extern UINT32* stv_vdp2_cram;
 
 static UINT8* gfxdata;
 static UINT16 sprite_colorbank;
