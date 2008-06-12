@@ -73,7 +73,6 @@ VIDEO_START( theend );
 VIDEO_START( darkplnt );
 VIDEO_START( rescue );
 VIDEO_START( minefld );
-VIDEO_START( calipso );
 VIDEO_START( stratgyx );
 VIDEO_START( mimonkey );
 VIDEO_START( turtles );

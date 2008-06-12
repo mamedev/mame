@@ -59,7 +59,6 @@ static void dambustr_modify_charcode(UINT16 *code,UINT8 x);
 
 static void (*modify_spritecode)(UINT8 *spriteram,int*,int*,int*,int);	/* function to call to do sprite banking */
 static void mshuttle_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-static void  calipso_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
 static void mimonkey_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
 static void  batman2_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
 static void dkongjrm_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
@@ -592,17 +591,6 @@ VIDEO_START( ckongs )
 	VIDEO_START_CALL(scrambold);
 
 	modify_spritecode = mshuttle_modify_spritecode;
-}
-
-VIDEO_START( calipso )
-{
-	VIDEO_START_CALL(galaxold_plain);
-
-	draw_bullets = scramble_draw_bullets;
-
-	draw_background = scramble_draw_background;
-
-	modify_spritecode = calipso_modify_spritecode;
 }
 
 VIDEO_START( mariner )
@@ -1168,13 +1156,6 @@ static void mshuttle_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int
 	*code |= ((spriteram[offs + 2] & 0x30) << 2);
 }
 
-static void calipso_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	/* No flips */
-	*code = spriteram[offs + 1];
-	*flipx = 0;
-	*flipy = 0;
-}
 
 static void mimonkey_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
 {

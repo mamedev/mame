@@ -2153,6 +2153,48 @@ INPUT_PORTS_START( anteater )
 INPUT_PORTS_END
 
 
+/* cocktail mode is N/A */
+static INPUT_PORTS_START( calipso )
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START_TAG("IN1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x08, 0x08, "Cabinet (Not Supported)" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -4716,6 +4758,27 @@ ROM_START( superbon )
 
 ROM_END
 
+ROM_START( calipso )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "calipso.2c",   0x0000, 0x1000, CRC(0fcb703c) SHA1(2bb096f114911973afdf3088c860c9566df06f60) )
+	ROM_LOAD( "calipso.2e",   0x1000, 0x1000, CRC(c6622f14) SHA1(475164aed703a97275ff285ecaec9d8fd4fe723b) )
+	ROM_LOAD( "calipso.2f",   0x2000, 0x1000, CRC(7bacbaba) SHA1(d321d6d09c689123eb1e5d758d95ccecec225252) )
+	ROM_LOAD( "calipso.2h",   0x3000, 0x1000, CRC(a3a8111b) SHA1(3d9500c676563ebfc27aebb07716e6a966f00c35) )
+	ROM_LOAD( "calipso.2j",   0x4000, 0x1000, CRC(fcbd7b9e) SHA1(5cc1edcc8b9867bb7849c8d97d1096bb6464f562) )
+	ROM_LOAD( "calipso.2l",   0x5000, 0x1000, CRC(f7630cab) SHA1(482ee91cccd8a7c5768a1d6a9772d797769fe2dc) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for sound code */
+	ROM_LOAD( "calipso.5c",   0x0000, 0x0800, CRC(9cbc65ab) SHA1(b4ce04d18f9536c0ddd2f9c15edda75570e750e5) )
+	ROM_LOAD( "calipso.5d",   0x0800, 0x0800, CRC(a225ee3b) SHA1(dba111f89851c69fb6fce16219cb2b0cb3294c15) )
+
+	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "calipso.5f",   0x0000, 0x2000, CRC(fd4252e9) SHA1(881b988cdc9b7913f577573f8a15af7a7c7cc67f) )
+	ROM_LOAD( "calipso.5h",   0x2000, 0x2000, CRC(1663a73a) SHA1(95b6ed25b656afdfb70fac35efa2e005185e4343) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_LOAD( "calipso.clr",  0x0000, 0x0020, CRC(01165832) SHA1(bfef0459492dbd5febf3030916b6438eb6be71de) )
+ROM_END
+
 
 /*************************************
  *
@@ -4922,6 +4985,8 @@ GAME( 1982, anteater, 0,        anteater, anteater, anteater, ROT90,  "[Stern] (
 GAME( 1984, spdcoin,  0,        scobra,   spdcoin,  scobra,   ROT90,  "Stern", "Speed Coin (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1985, superbon, 0,        scobra,   superbon, superbon, ROT90,  "Signatron USA", "Agent Super Bond (Scobra Hardware)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 
+GAME( 1982, calipso,  0,        scobra,   calipso,  calipso,  ROT90,  "[Stern] (Tago license)", "Calipso", GAME_SUPPORTS_SAVE )
+
 
 
 /* currently in galaxold.c and should be moved here */
@@ -4975,7 +5040,6 @@ GAME( 1985, superbon, 0,        scobra,   superbon, superbon, ROT90,  "Signatron
 //GAME( 1981, moonwara, moonwar,  scobra/*moonwar*/,  moonwara, moonwar,      ROT90,  "Stern", "Moonwar (older)", GAME_SUPPORTS_SAVE )
 //GAME( 1982, darkplnt, 0,        scobra/*darkplnt*/, darkplnt, darkplnt,     ROT180, "Stern", "Dark Planet", GAME_SUPPORTS_SAVE )
 //GAME( 1982, tazmani2, tazmania, scobra/*type2*/,    tazmania, tazmani2,     ROT90,  "Stern", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
-//GAME( 1982, calipso,  0,        scobra/*calipso*/,  calipso,  scobra,       ROT90,  "[Stern] (Tago license)", "Calipso", GAME_SUPPORTS_SAVE )
 //GAME( 1983, anteatg,  anteater, scobra/*anteatg*/,  anteatg,  scramble_ppi, ROT90,  "TV-Tuning (F.E.G. license)", "Ameisenbaer (German)", GAME_SUPPORTS_SAVE )
 //GAME( 1983, anteatgb, anteater, scobra/*anteatgb*/, anteatgb, scramble_ppi, ROT90,  "Free Enterprise Games", "The Anteater (UK)", GAME_SUPPORTS_SAVE )
 //GAME( 1982, rescue,   0,        scobra/*rescue*/,   rescue,   rescue,       ROT90,  "Stern", "Rescue", GAME_SUPPORTS_SAVE )

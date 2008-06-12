@@ -145,6 +145,16 @@ Notes about 'frogg' :
   bit 5 of IN1 is tested if "Cabinet" Dip Switch is set to "Cocktail".
 
 
+Notes about 'calipso' :
+---------------------
+
+  Calipso was apperantly redesigned for two player simultanious play.
+  There is code at $298a to flip the screen, but location $8669 has to be
+  set to 2. It's set to 1 no matter how many players are playing.
+  It's possible that there is a cocktail version of the game.
+
+
+
 TO DO :
 -------
 
@@ -2827,6 +2837,15 @@ static DRIVER_INIT( superbon )
 
 	/* decode code */
 	decode_superbon();
+}
+
+
+static DRIVER_INIT( calipso )
+{
+
+	/* video extensions */
+	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, calipso_extend_sprite_info);
+
 }
 
 #include "galdrvr.c"
