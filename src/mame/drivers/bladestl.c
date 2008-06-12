@@ -55,9 +55,9 @@ static READ8_HANDLER( trackball_r )
 {
 	static int last[4];
 	int curr,delta;
+	static const char *port[] = { "TRACKBALL_P1_1", "TRACKBALL_P1_2", "TRACKBALL_P2_1", "TRACKBALL_P1_2" };
 
-
-	curr = input_port_read_indexed(machine, 5 + offset);
+	curr = input_port_read(machine, port[offset]);
 	delta = (curr - last[offset]) & 0xff;
 	last[offset] = curr;
 	return (delta & 0x80) | (curr >> 1);
@@ -109,11 +109,11 @@ static ADDRESS_MAP_START( bladestl_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x21ff) AM_READ(K007420_r)			/* Sprite RAM */
 	AM_RANGE(0x2200, 0x23ff) AM_READ(K007342_scroll_r)	/* Scroll RAM */
 	AM_RANGE(0x2400, 0x245f) AM_READ(SMH_RAM)			/* Palette */
-	AM_RANGE(0x2e01, 0x2e01) AM_READ(input_port_3_r)		/* 1P controls */
-	AM_RANGE(0x2e02, 0x2e02) AM_READ(input_port_4_r)		/* 2P controls */
-	AM_RANGE(0x2e03, 0x2e03) AM_READ(input_port_1_r)		/* DISPW #2 */
-	AM_RANGE(0x2e40, 0x2e40) AM_READ(input_port_0_r)		/* DIPSW #1 */
-	AM_RANGE(0x2e00, 0x2e00) AM_READ(input_port_2_r)		/* DIPSW #3, coinsw, startsw */
+	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P1")			/* 1P controls */
+	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P2")			/* 2P controls */
+	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW2")		/* DISPW #2 */
+	AM_RANGE(0x2e40, 0x2e40) AM_READ_PORT("DSW1")		/* DIPSW #1 */
+	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("COINSW")		/* DIPSW #3, coinsw, startsw */
 	AM_RANGE(0x2f00, 0x2f03) AM_READ(trackball_r)		/* Trackballs */
 	AM_RANGE(0x2f80, 0x2f9f) AM_READ(K051733_r)			/* Protection: 051733 */
 	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)			/* Work RAM */

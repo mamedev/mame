@@ -133,8 +133,8 @@ static TIMER_CALLBACK( interrupt_timer )
 		/* we latch the beam values on the first interrupt after VBLANK */
 		if (param == 64 && balsente_shooter)
 		{
-			balsente_shooter_x = input_port_read_indexed(machine, 8);
-			balsente_shooter_y = input_port_read_indexed(machine, 9);
+			balsente_shooter_x = input_port_read(machine, "FAKEX");
+			balsente_shooter_y = input_port_read(machine, "FAKEY");
 		}
 
 		/* which bits get returned depends on which scanline we're at */
@@ -605,13 +605,14 @@ WRITE8_HANDLER( balsente_m6850_sound_w )
 INTERRUPT_GEN( balsente_update_analog_inputs )
 {
 	int i;
+	static const char *analog[] = { "AN0", "AN1", "AN2", "AN3" };
 
 	/* the analog input system helpfully scales the value read by the percentage of time */
 	/* into the current frame we are; unfortunately, this is bad for us, since the analog */
 	/* ports are read once a frame, just at varying intervals. To get around this, we */
 	/* read all the analog inputs at VBLANK time and just return the cached values. */
 	for (i = 0; i < 4; i++)
-		analog_input_data[i] = input_port_read_indexed(machine, 4 + i);
+		analog_input_data[i] = input_port_read(machine, analog[i]);
 }
 
 
@@ -1122,7 +1123,7 @@ WRITE8_HANDLER( balsente_register_addr_w )
 
 READ8_HANDLER( nstocker_port2_r )
 {
-	return (input_port_read_indexed(machine, 2) & 0xf0) | nstocker_bits;
+	return (input_port_read(machine, "IN0") & 0xf0) | nstocker_bits;
 }
 
 
@@ -1167,9 +1168,9 @@ static void update_grudge_steering(running_machine *machine)
 	INT8 diff[3];
 
 	/* read the current steering values */
-	wheel[0] = input_port_read_indexed(machine, 4);
-	wheel[1] = input_port_read_indexed(machine, 5);
-	wheel[2] = input_port_read_indexed(machine, 6);
+	wheel[0] = input_port_read(machine, "AN0");
+	wheel[1] = input_port_read(machine, "AN1");
+	wheel[2] = input_port_read(machine, "AN2");
 
 	/* diff the values */
 	diff[0] = wheel[0] - grudge_last_steering[0];

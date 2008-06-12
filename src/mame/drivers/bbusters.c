@@ -260,6 +260,7 @@ static int gun_select;
 
 static READ16_HANDLER( control_3_r )
 {
+	/* gun_select seems to assume only values 5,6,7... is this correct? */
 	return input_port_read_indexed(machine, gun_select);
 }
 
@@ -289,11 +290,13 @@ static WRITE16_HANDLER( sound_cpu_w )
 
 static READ16_HANDLER( mechatt_gun_r )
 {
-	int baseport=2,x,y;
-	if (offset) baseport=4; /* Player 2 */
+	int baseport=0,x,y;
+	static const char *port[] = { "IN2", "IN3", "IN4", "IN5" };
+	
+	if (offset) baseport=2; /* Player 2 */
 
-	x=input_port_read_indexed(machine, baseport);
-	y=input_port_read_indexed(machine, baseport+1);
+	x=input_port_read(machine, port[baseport]);
+	y=input_port_read(machine, port[baseport+1]);
 
 	/* Todo - does the hardware really clamp like this? */
 	x+=0x18;

@@ -78,14 +78,14 @@ static INTERRUPT_GEN ( bwp1_interrupt )
 		break;
 
 		case 1:
-			if (~input_port_read_indexed(machine, 4) & 0x03)
+			if (~input_port_read(machine, "IN2") & 0x03)
 				{ if (!coin) { coin = 1; cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE); } }
 			else
 				coin = 0;
 		break;
 
 		case 2:
-			if (input_port_read_indexed(machine, 5)) cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+			if (input_port_read(machine, "IN3")) cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
 		break;
 	}
 }
@@ -104,11 +104,11 @@ static WRITE8_HANDLER( bwp3_nmimask_w ) { bwp3_nmimask = data & 0x80; }
 
 static READ8_HANDLER( bwp1_io_r )
 {
-	if (offset == 0) return(input_port_read_indexed(machine, 0));
-	if (offset == 1) return(input_port_read_indexed(machine, 1));
-	if (offset == 2) return(input_port_read_indexed(machine, 2));
-	if (offset == 3) return(input_port_read_indexed(machine, 3));
-	if (offset == 4) return(input_port_read_indexed(machine, 4));
+	if (offset == 0) return(input_port_read(machine, "DSW0"));
+	if (offset == 1) return(input_port_read(machine, "DSW1"));
+	if (offset == 2) return(input_port_read(machine, "IN0"));
+	if (offset == 3) return(input_port_read(machine, "IN1"));
+	if (offset == 4) return(input_port_read(machine, "IN2"));
 
 	return((bwp123_membase[0])[0x1b00 + offset]);
 }
@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( bwp3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bwp3_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_6_r)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("VBLANK")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bwp3_writeport, ADDRESS_SPACE_IO, 8 )
@@ -247,7 +247,7 @@ ADDRESS_MAP_END
 // I/O Port Maps
 
 static INPUT_PORTS_START( bwing )
-	PORT_START
+	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
@@ -271,8 +271,7 @@ static INPUT_PORTS_START( bwing )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-
-	PORT_START
+	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x01, "3" )
@@ -297,7 +296,7 @@ static INPUT_PORTS_START( bwing )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -307,7 +306,7 @@ static INPUT_PORTS_START( bwing )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
@@ -317,7 +316,7 @@ static INPUT_PORTS_START( bwing )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -327,13 +326,13 @@ static INPUT_PORTS_START( bwing )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_TILT )
 
-	PORT_START
+	PORT_START_TAG("VBLANK")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START // a matter of taste
+	PORT_START_TAG("EXTRA") // a matter of taste
 	PORT_DIPNAME( 0x07, 0x00, "RGB" )
 	PORT_DIPSETTING(    0x00, "Default" )
 	PORT_DIPSETTING(    0x01, "More Red" )

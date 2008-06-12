@@ -225,7 +225,7 @@ static WRITE16_HANDLER(via_w)
 
 static READ8_HANDLER(via_b_in)
 {
-	return input_port_read_indexed(machine, 3);
+	return input_port_read(machine, "IN3");
 }
 
 
@@ -360,7 +360,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( bmcbowl )
-	PORT_START	/* DSW 1 */
+	PORT_START_TAG("IN0")	/* DSW 1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )	PORT_NAME("Note")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )	PORT_NAME("Analizer")
 
@@ -381,10 +381,10 @@ static INPUT_PORTS_START( bmcbowl )
 	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Big") PORT_CODE(KEYCODE_G)
 	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Double") PORT_CODE(KEYCODE_H)
 
-	PORT_START	/* DSW 2 */
+	PORT_START_TAG("IN1")	/* DSW 2 */
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x20, "1 COIN 10 CREDITS")
-	PORT_DIPSETTING(    0x00, "2 COINS 10 CREDITS")
+	PORT_DIPSETTING(    0x20, "1 COIN 10 CREDITS" )
+	PORT_DIPSETTING(    0x00, "2 COINS 10 CREDITS" )
 
 	PORT_DIPNAME( 0x01, 0x00, "DSW2 8" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -409,7 +409,7 @@ static INPUT_PORTS_START( bmcbowl )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	/* DSW 4 */
+	PORT_START_TAG("IN2")	/* DSW 4 */
 	PORT_DIPNAME( 0x01, 0x00, "DSW4 8" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -435,10 +435,10 @@ static INPUT_PORTS_START( bmcbowl )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 
 INPUT_PORTS_END
 
@@ -446,8 +446,8 @@ static READ8_HANDLER(dips1_r)
 {
 	switch(bmc_input)
 	{
-			case 0x00:	return  input_port_read_indexed(machine, 1);
-			case 0x40:	return  input_port_read_indexed(machine, 2);
+			case 0x00:	return  input_port_read(machine, "IN1");
+			case 0x40:	return  input_port_read(machine, "IN2");
 	}
 	logerror("unknown input - %X (PC=%X)\n",bmc_input,activecpu_get_previouspc());
 	return 0xff;

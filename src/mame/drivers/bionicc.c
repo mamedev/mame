@@ -97,13 +97,13 @@ logerror("%06x: hacked_controls_r %04x %04x\n",activecpu_get_pc(),offset,bionicc
 
 static WRITE16_HANDLER( bionicc_mpu_trigger_w )
 {
-	data = input_port_read_indexed(machine, 0) >> 12;
+	data = input_port_read(machine, "IN0") >> 12;
 	bionicc_inp[0] = data ^ 0x0f;
 
-	data = input_port_read_indexed(machine, 3); /* player 2 controls */
+	data = input_port_read(machine, "IN2");		/* player 2 controls */
 	bionicc_inp[1] = data ^ 0xff;
 
-	data = input_port_read_indexed(machine, 2); /* player 1 controls */
+	data = input_port_read(machine, "IN1");		/* player 1 controls */
 	bionicc_inp[2] = data ^ 0xff;
 }
 
@@ -195,14 +195,14 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( bionicc )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SWB:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 3C_1C ) )
@@ -247,7 +247,7 @@ static INPUT_PORTS_START( bionicc )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -257,7 +257,7 @@ static INPUT_PORTS_START( bionicc )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL

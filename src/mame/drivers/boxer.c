@@ -44,12 +44,12 @@ static TIMER_CALLBACK( periodic_callback )
 
 		memset(mask, 0, sizeof mask);
 
-		mask[input_port_read_indexed(machine, 3)] |= 0x01;
-		mask[input_port_read_indexed(machine, 4)] |= 0x02;
-		mask[input_port_read_indexed(machine, 5)] |= 0x04;
-		mask[input_port_read_indexed(machine, 6)] |= 0x08;
-		mask[input_port_read_indexed(machine, 7)] |= 0x10;
-		mask[input_port_read_indexed(machine, 8)] |= 0x20;
+		mask[input_port_read(machine, "STICK0_X")] |= 0x01;
+		mask[input_port_read(machine, "STICK0_Y")] |= 0x02;
+		mask[input_port_read(machine, "PADDLE0")]  |= 0x04;
+		mask[input_port_read(machine, "STICK1_X")] |= 0x08;
+		mask[input_port_read(machine, "STICK1_Y")] |= 0x10;
+		mask[input_port_read(machine, "PADDLE1")]  |= 0x20;
 
 		for (i = 1; i < 256; i++)
 			if (mask[i] != 0)
@@ -87,9 +87,9 @@ static MACHINE_RESET( boxer )
 
 static READ8_HANDLER( boxer_input_r )
 {
-	UINT8 val = input_port_read_indexed(machine, 0);
+	UINT8 val = input_port_read(machine, "IN0");
 
-	if (input_port_read_indexed(machine, 9) < video_screen_get_vpos(machine->primary_screen))
+	if (input_port_read(machine, "IN3") < video_screen_get_vpos(machine->primary_screen))
 		val |= 0x02;
 
 	return (val << ((offset & 7) ^ 7)) & 0x80;
@@ -111,11 +111,11 @@ static READ8_HANDLER( boxer_misc_r )
 		break;
 
 	case 2:
-		val = input_port_read_indexed(machine, 1);
+		val = input_port_read(machine, "IN1");
 		break;
 
 	case 3:
-		val = input_port_read_indexed(machine, 2);
+		val = input_port_read(machine, "IN2");
 		break;
 	}
 
@@ -196,7 +196,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( boxer )
 
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) /* TIMER */
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_TILT )
@@ -206,39 +206,39 @@ static INPUT_PORTS_START( boxer )
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_DIPNAME( 0x03, 0x01, "Number of Rounds" )
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) )
 
-	PORT_START
+	PORT_START_TAG("STICK0_X")
 	PORT_BIT ( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(30) PORT_KEYDELTA(16) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("STICK0_Y")
 	PORT_BIT ( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(30) PORT_KEYDELTA(16) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("PADDLE0")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(30) PORT_KEYDELTA(16) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_CENTERDELTA(0) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("STICK1_X")
 	PORT_BIT ( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(30) PORT_KEYDELTA(16) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("STICK1_Y")
 	PORT_BIT ( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(30) PORT_KEYDELTA(16) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("PADDLE1")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(30) PORT_KEYDELTA(16) PORT_CODE_DEC(KEYCODE_Q) PORT_CODE_INC(KEYCODE_W) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_DIPNAME( 0xff, 0x5C, "Round Time" ) /* actually a potentiometer */
 	PORT_DIPSETTING(    0x3C, "15 seconds" )
 	PORT_DIPSETTING(    0x5C, "30 seconds" )

@@ -252,7 +252,7 @@ static MACHINE_START( redbaron )
 
 static INTERRUPT_GEN( bzone_interrupt )
 {
-	if (input_port_read_indexed(machine, 0) & 0x10)
+	if (input_port_read(machine, "IN0") & 0x10)
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -299,7 +299,7 @@ static WRITE8_HANDLER( bzone_coin_counter_w )
 
 static READ8_HANDLER( redbaron_joy_r )
 {
-	return input_port_read_indexed(machine, rb_input_select ? 5 : 6);
+	return input_port_read(machine, rb_input_select ? "FAKE1" : "FAKE2");
 }
 
 
@@ -806,8 +806,10 @@ static READ8_HANDLER( analog_data_r )
 
 static WRITE8_HANDLER( analog_select_w )
 {
+	static const char *analog_port[] = { "AN0", "AN1", "AN2" };
+
 	if (offset <= 2)
-		analog_data = input_port_read_indexed(machine, 6 + offset);
+		analog_data = input_port_read(machine, analog_port[offset]);
 }
 
 

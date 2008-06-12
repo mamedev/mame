@@ -221,13 +221,14 @@ static READ16_HANDLER( bishjan_input_r )
 {
 	int i;
 	UINT16 res = 0xff;
+	static const char *port[] = { "KEYB_0", "KEYB_1", "KEYB_2", "KEYB_3", "KEYB_4" };
 
 	for (i = 0; i < 5; i++)
 		if (bishjan_input & (1 << i))
-			res = input_port_read_indexed(machine, 4+i);
+			res = input_port_read(machine, port[i]);
 
 	return	(res << 8) |
-			input_port_read_indexed(machine, 3) |
+			input_port_read(machine, "IN0") |
 			((bishjan_hopper && !(video_screen_get_frame_number(machine->primary_screen)%10)) ? 0x00 : 0x04)	// bit 2: hopper sensor
 	;
 }
@@ -321,10 +322,10 @@ GFXDECODE_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( bishjan )
-	PORT_START	// IN0 - Reset
+	PORT_START_TAG("RESET")		/* IN0 - Reset */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 
-	PORT_START	// IN1 - DSW(SW1)
+	PORT_START_TAG("DSW")		/* IN1 - DSW(SW1) */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Controls ) )
 	PORT_DIPSETTING(      0x0001, "Keyboard" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Joystick ) )
@@ -350,7 +351,7 @@ static INPUT_PORTS_START( bishjan )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	// IN2 - C
+	PORT_START_TAG("JOY")		/* IN2 - C */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1			)	// start (joy)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	)	// down (joy)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN		)
@@ -360,7 +361,7 @@ static INPUT_PORTS_START( bishjan )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_BET	)	// bet (joy)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2		)	// select (joy)
 
-	PORT_START	// IN3 - A
+	PORT_START_TAG("IN0")		/* IN3 - A */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE		)	// test
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH,IPT_SPECIAL		)	// hopper sensor
@@ -370,7 +371,7 @@ static INPUT_PORTS_START( bishjan )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE3		)	// pay out? "hopper empty"
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2			)	PORT_IMPULSE(2)	// coin
 
-	PORT_START	// IN4 - B(1)
+	PORT_START_TAG("KEYB_0")	/* IN4 - B(1) */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A		)	// a
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_E		)	// e
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_I		)	// i
@@ -380,7 +381,7 @@ static INPUT_PORTS_START( bishjan )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 
-	PORT_START	// IN5 - B(2)
+	PORT_START_TAG("KEYB_1")	/* IN5 - B(2) */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_B		)	// b
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_F		)	// f
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_J		)	// j
@@ -390,7 +391,7 @@ static INPUT_PORTS_START( bishjan )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 
-	PORT_START	// IN6 - B(3)
+	PORT_START_TAG("KEYB_2")	/* IN6 - B(3) */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_C		)	// c
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_G		)	// g
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_K		)	// k
@@ -400,7 +401,7 @@ static INPUT_PORTS_START( bishjan )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 
-	PORT_START	// IN7 - B(4)
+	PORT_START_TAG("KEYB_3")	/* IN7 - B(4) */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_D		)	// d
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_H		)	// h
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_L		)	// l
@@ -410,7 +411,7 @@ static INPUT_PORTS_START( bishjan )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 
-	PORT_START	// IN8 - B(5)
+	PORT_START_TAG("KEYB_4")	/* IN8 - B(5) */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// g2
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// e2

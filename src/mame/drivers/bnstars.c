@@ -533,7 +533,7 @@ static VIDEO_UPDATE(bnstars)
 }
 
 static INPUT_PORTS_START( bnstars )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_E )
@@ -615,7 +615,7 @@ static INPUT_PORTS_START( bnstars )
 	PORT_DIPSETTING(  0x80000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00000000, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_DIPNAME(     0x00000001, 0x00000001, "MAH2" )
 	PORT_DIPSETTING(  0x00000001, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00000000, DEF_STR( On ) )
@@ -703,7 +703,7 @@ static INPUT_PORTS_START( bnstars )
 	PORT_DIPSETTING(  0x80000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00000000, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_DIPNAME(     0x00000001, 0x00000001, "MAH4" )
 	PORT_DIPSETTING(  0x00000001, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00000000, DEF_STR( On ) )
@@ -791,7 +791,7 @@ static INPUT_PORTS_START( bnstars )
 	PORT_DIPSETTING(  0x80000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00000000, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_DIPNAME(     0x00000001, 0x00000001, "MAH6" )
 	PORT_DIPSETTING(  0x00000001, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00000000, DEF_STR( On ) )
@@ -881,7 +881,7 @@ static INPUT_PORTS_START( bnstars )
 	PORT_DIPSETTING(  0x80000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00000000, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN4")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_START2 )
 	/* The follow 4 bits active 4 button each one for the second player */
 	PORT_DIPNAME(     0x00000002, 0x00000002, "P2: A,B,C,D" )
@@ -974,7 +974,7 @@ static INPUT_PORTS_START( bnstars )
 	PORT_DIPSETTING(  0x80000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00000000, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN5")
 	PORT_DIPNAME(     0x00000001, 0x00000001, "Test Mode" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(  0x00000001, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00000000, DEF_STR( On ) )
@@ -1073,7 +1073,7 @@ static INPUT_PORTS_START( bnstars )
 	PORT_DIPSETTING(  0x80000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00000000, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN6")
 	PORT_DIPNAME(     0x00000001, 0x00000001, "4" )
 	PORT_DIPSETTING(  0x00000001, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00000000, DEF_STR( On ) )
@@ -1201,28 +1201,28 @@ static READ32_HANDLER( bnstars1_r )
 			return 0xffffffff;
 
 		case 0x0000:
-			return input_port_read_indexed(machine, 0);
+			return input_port_read(machine, "IN0");
 
 		case 0x0080:
-			return input_port_read_indexed(machine, 1);
+			return input_port_read(machine, "IN1");
 
 		case 0x2000:
-			return input_port_read_indexed(machine, 2);
+			return input_port_read(machine, "IN2");
 
 		case 0x2080:
-			return input_port_read_indexed(machine, 3);
+			return input_port_read(machine, "IN3");
 
 	}
 }
 
 static READ32_HANDLER( bnstars2_r )
 {
-	return input_port_read_indexed(machine, 4);
+	return input_port_read(machine, "IN4");
 }
 
 static READ32_HANDLER( bnstars3_r )
 {
-	return input_port_read_indexed(machine, 5);
+	return input_port_read(machine, "IN5");
 }
 
 static WRITE32_HANDLER( bnstars1_mahjong_select_w )

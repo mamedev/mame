@@ -317,7 +317,7 @@ static READ16_HANDLER(sharedram_r)
 			break;
 
 			case 0x46/2:
-				return (input_port_read_indexed(machine,0)&0xffff)^0xffff;
+				return (input_port_read(machine, "IN0") & 0xffff)^0xffff;
 
 
 		}
@@ -494,8 +494,6 @@ static INPUT_PORTS_START( bigfghtr )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-
-
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "20k then every 60k" )
 	PORT_DIPSETTING(    0x04, "20k then every 80k" )

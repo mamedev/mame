@@ -1172,6 +1172,9 @@ static int pif_channel_handle_command(running_machine *machine, int channel, int
 		{
 			UINT16 buttons = 0;
 			INT8 x = 0, y = 0;
+			/* add here tags for P2, P3 and P4 when implemented */
+			static const char *portnames[] = { "P1", "P1_ANALOG_X", "P1_ANALOG_Y" };
+
 			if (slength != 1 || rlength != 4)
 			{
 				fatalerror("handle_pif: read button values (bytes to send %d, bytes to receive %d)\n", slength, rlength);
@@ -1181,9 +1184,9 @@ static int pif_channel_handle_command(running_machine *machine, int channel, int
 			{
 				case 0:
 				{
-                    buttons = input_port_read_indexed(machine, (channel*3) + 0);
-                    x = input_port_read_indexed(machine, (channel*3) + 1) - 128;
-                    y = input_port_read_indexed(machine, (channel*3) + 2) - 128;
+                    buttons = input_port_read(machine, portnames[(channel*3) + 0]);
+                    x = input_port_read(machine, portnames[(channel*3) + 1]) - 128;
+                    y = input_port_read(machine, portnames[(channel*3) + 2]) - 128;
 
 					rdata[0] = (buttons >> 8) & 0xff;
 					rdata[1] = (buttons >> 0) & 0xff;

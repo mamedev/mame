@@ -73,10 +73,10 @@ READ8_HANDLER( bsktball_in0_r )
 	int p2_vert;
 	int temp;
 
-	p1_horiz = input_port_read_indexed(machine,0);
-	p1_vert  = input_port_read_indexed(machine,1);
-	p2_horiz = input_port_read_indexed(machine,2);
-	p2_vert  = input_port_read_indexed(machine,3);
+	p1_horiz = input_port_read(machine, "TRACK0_X");
+	p1_vert  = input_port_read(machine, "TRACK0_Y");
+	p2_horiz = input_port_read(machine, "TRACK1_X");
+	p2_vert  = input_port_read(machine, "TRACK1_Y");
 
 	/* Set direction bits */
 
@@ -146,7 +146,7 @@ READ8_HANDLER( bsktball_in0_r )
 	}
 	else
 	{
-		temp = input_port_read_indexed(machine, 4) & 0x0F;
+		temp = input_port_read(machine, "IN0") & 0x0F;
 		/* Remap button 1 back to the Start button */
 		/* NOTE:  This is an ADDED feature, not a part of the original hardware! */
 		temp = (temp) & (temp>>2);

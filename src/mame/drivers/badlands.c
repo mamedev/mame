@@ -139,7 +139,7 @@ static void scanline_update(const device_config *screen, int scanline)
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
 		atarigen_6502_irq_ack_r(screen->machine, 0);
-	else if (!(input_port_read_indexed(screen->machine, 0) & 0x40))
+	else if (!(input_port_read(screen->machine, "FE4000") & 0x40))
 		atarigen_6502_irq_gen(screen->machine, 0);
 }
 
@@ -166,7 +166,7 @@ static MACHINE_RESET( badlands )
 
 static INTERRUPT_GEN( vblank_int )
 {
-	int pedal_state = input_port_read_indexed(machine, 4);
+	int pedal_state = input_port_read(machine, "PEDALS");
 	int i;
 
 	/* update the pedals once per frame */
@@ -240,8 +240,8 @@ static READ8_HANDLER( audio_io_r )
                 0x02 = coin 2
                 0x01 = coin 1
             */
-			result = input_port_read_indexed(machine, 3);
-			if (!(input_port_read_indexed(machine, 0) & 0x0080)) result ^= 0x90;
+			result = input_port_read(machine, "AUDIO");
+			if (!(input_port_read(machine, "FE4000") & 0x0080)) result ^= 0x90;
 			if (atarigen_cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen_sound_to_cpu_ready) result ^= 0x20;
 			result ^= 0x10;
@@ -356,7 +356,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( badlands )
-	PORT_START		/* fe4000 */
+	PORT_START_TAG("FE4000")	/* fe4000 */
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -364,15 +364,15 @@ static INPUT_PORTS_START( badlands )
 	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START      /* fe6000 */
+	PORT_START_TAG("FE6000")	/* fe6000 */
 	PORT_BIT( 0x00ff, 0, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START      /* fe6002 */
+	PORT_START_TAG("FE6002")	/* fe6002 */
 	PORT_BIT( 0x00ff, 0, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START		/* audio port */
+	PORT_START_TAG("AUDIO")		/* audio port */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
@@ -382,7 +382,7 @@ static INPUT_PORTS_START( badlands )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )	/* command buffer full */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* self test */
 
-	PORT_START      /* fake for pedals */
+	PORT_START_TAG("PEDALS")	/* fake for pedals */
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xfffc, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -631,7 +631,7 @@ static void scanline_update_bootleg(const device_config *screen, int scanline)
 	/* sound IRQ is on 32V */
 //  if (scanline & 32)
 //      atarigen_6502_irq_ack_r(screen->machine, 0);
-//  else if (!(input_port_read_indexed(machine, 0) & 0x40))
+//  else if (!(input_port_read(machine, "FE4000") & 0x40))
 //      atarigen_6502_irq_gen(screen->machine, 0);
 }
 

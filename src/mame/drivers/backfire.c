@@ -228,20 +228,20 @@ static READ32_HANDLER(backfire_eeprom_r)
 {
 	/* some kind of screen indicator?  checked by backfira set before it will boot */
 	int backfire_screen = mame_rand(machine)&1;
-	return ((eeprom_read_bit()<<24) | input_port_read_indexed(machine, 0) | (input_port_read_indexed(machine, 3)<<16)) ^  (backfire_screen << 26) ;
+	return ((eeprom_read_bit()<<24) | input_port_read(machine, "IN0") | (input_port_read(machine, "IN3")<<16)) ^  (backfire_screen << 26) ;
 }
 
 static READ32_HANDLER(backfire_control2_r)
 {
 //  logerror("%08x:Read eprom %08x (%08x)\n",activecpu_get_pc(),offset<<1,mem_mask);
-	return (eeprom_read_bit()<<24) | input_port_read_indexed(machine, 1) | (input_port_read_indexed(machine, 1)<<16);
+	return (eeprom_read_bit()<<24) | input_port_read(machine, "IN1") | (input_port_read(machine, "IN1")<<16);
 }
 
 #ifdef UNUSED_FUNCTION
 static READ32_HANDLER(backfire_control3_r)
 {
 //  logerror("%08x:Read eprom %08x (%08x)\n",activecpu_get_pc(),offset<<1,mem_mask);
-	return (eeprom_read_bit()<<24) | input_port_read_indexed(machine, 2) | (input_port_read_indexed(machine, 2)<<16);
+	return (eeprom_read_bit()<<24) | input_port_read(machine, "IN2") | (input_port_read(machine, "IN2")<<16);
 }
 #endif
 
@@ -303,7 +303,7 @@ static WRITE32_HANDLER( backfire_pf4_data_w ) { data &=0x0000ffff; mem_mask &=0x
 #ifdef UNUSED_FUNCTION
 READ32_HANDLER( backfire_unknown_wheel_r )
 {
-	return input_port_read_indexed(machine, 4);
+	return input_port_read(machine, "PADDLE0");
 }
 
 READ32_HANDLER( backfire_wheel1_r )
@@ -356,7 +356,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( backfire )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -366,7 +366,7 @@ static INPUT_PORTS_START( backfire )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -376,7 +376,7 @@ static INPUT_PORTS_START( backfire )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -394,7 +394,7 @@ static INPUT_PORTS_START( backfire )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -404,13 +404,13 @@ static INPUT_PORTS_START( backfire )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_VBLANK )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("PADDLE0")
 	PORT_BIT ( 0x00ff, 0x0080, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(1)
 
-	PORT_START
+	PORT_START_TAG("PADDLE1")
 	PORT_BIT ( 0x00ff, 0x0080, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(1)
 
-	PORT_START
+	PORT_START_TAG("UNK")
 	/* ?? */
 INPUT_PORTS_END
 

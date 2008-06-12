@@ -201,7 +201,7 @@ static WRITE8_HANDLER( beg_sharedram_w )
 
 static INPUT_PORTS_START( bigevglf )
 
-	PORT_START	/* port 00 on sub cpu */
+	PORT_START_TAG("PORT00")		/* port 00 on sub cpu */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -211,11 +211,11 @@ static INPUT_PORTS_START( bigevglf )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_START	/* port 04 on sub cpu - bit 0 and bit 1 are coin inputs */
+	PORT_START_TAG("PORT04")		/* port 04 on sub cpu - bit 0 and bit 1 are coin inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 
-	PORT_START_TAG("DSW1")	/* port 05 on sub cpu */
+	PORT_START_TAG("DSW1")			/* port 05 on sub cpu */
 	PORT_DIPNAME( 0x01,   0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x01, DEF_STR( Cocktail ) )
@@ -232,7 +232,7 @@ static INPUT_PORTS_START( bigevglf )
 	PORT_DIPSETTING(      0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0xa0, DEF_STR( 1C_2C ) )
 
-	PORT_START_TAG("DSW2")	/* port 06 on sub cpu */
+	PORT_START_TAG("DSW2")			/* port 06 on sub cpu */
 	PORT_DIPNAME( 0x03,   0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x03, DEF_STR( Normal ) )
@@ -256,10 +256,10 @@ static INPUT_PORTS_START( bigevglf )
 	PORT_DIPSETTING(      0x20, "9" )
 	PORT_DIPSETTING(      0x00, "10" )
 
-	PORT_START  /* TRACKBALL X - port 02 on sub cpu */
+	PORT_START_TAG("TRACKX")	/* TRACKBALL X - port 02 on sub cpu */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X  ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START  /* TRACKBALL Y - port 03 on sub cpu */
+	PORT_START_TAG("TRACKY")	/* TRACKBALL Y - port 03 on sub cpu */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_REVERSE
 INPUT_PORTS_END
 
@@ -350,18 +350,18 @@ static READ8_HANDLER( sub_cpu_mcu_coin_port_r )
 
     */
 	bit5 ^= 0x20;
-	return bigevglf_mcu_status_r(machine,0) | (input_port_read_indexed(machine, 1) & 3) | bit5; /* bit 0 and bit 1 - coin inputs */
+	return bigevglf_mcu_status_r(machine,0) | (input_port_read(machine, "PORT04") & 3) | bit5;	/* bit 0 and bit 1 - coin inputs */
 }
 
 static ADDRESS_MAP_START( bigevglf_sub_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("PORT00")
 	AM_RANGE(0x01, 0x01) AM_READ(SMH_NOP)
-	AM_RANGE(0x02, 0x02) AM_READ(input_port_4_r)
-	AM_RANGE(0x03, 0x03) AM_READ(input_port_5_r)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("TRACKX")
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("TRACKY")
 	AM_RANGE(0x04, 0x04) AM_READ(sub_cpu_mcu_coin_port_r)
-	AM_RANGE(0x05, 0x05) AM_READ(input_port_2_r)
-	AM_RANGE(0x06, 0x06) AM_READ(input_port_3_r)
+	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW1")
+	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")
 	AM_RANGE(0x07, 0x07) AM_READ(SMH_NOP)
 	AM_RANGE(0x0b, 0x0b) AM_READ(bigevglf_mcu_r)
 	AM_RANGE(0x20, 0x20) AM_READ(beg_fromsound_r)

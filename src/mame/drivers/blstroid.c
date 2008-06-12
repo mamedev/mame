@@ -72,7 +72,9 @@ static MACHINE_RESET( blstroid )
 
 static READ16_HANDLER( inputs_r )
 {
-	int temp = input_port_read_indexed(machine, 2 + (offset & 1));
+	static const char *iptnames[] = { "IN0", "IN1" };	
+	int temp = input_port_read(machine, iptnames[offset & 1]);
+
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0040;
 	if (atarigen_get_hblank(machine->primary_screen)) temp ^= 0x0010;
 	return temp;
@@ -118,15 +120,15 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( blstroid )
-	PORT_START      /* ff9800 */
+	PORT_START_TAG("DIAL0")		/* ff9800 */
 	PORT_BIT( 0x00ff, 0, IPT_DIAL ) PORT_SENSITIVITY(60) PORT_KEYDELTA(10) PORT_PLAYER(1)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START      /* ff9804 */
+	PORT_START_TAG("DIAL1")		/* ff9804 */
 	PORT_BIT( 0x00ff, 0, IPT_DIAL ) PORT_SENSITIVITY(60) PORT_KEYDELTA(10) PORT_PLAYER(2)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START		/* ff9c00 */
+	PORT_START_TAG("IN0")		/* ff9c00 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
@@ -137,7 +139,7 @@ static INPUT_PORTS_START( blstroid )
 	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START		/* ff9c02 */
+	PORT_START_TAG("IN1")		/* ff9c02 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)

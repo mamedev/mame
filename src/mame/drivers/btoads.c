@@ -83,7 +83,7 @@ static WRITE16_HANDLER( main_sound_w )
 
 static READ16_HANDLER( special_port_4_r )
 {
-	int result = input_port_read_indexed(machine, 4) & ~0x81;
+	int result = input_port_read(machine, "SPECIAL") & ~0x81;
 
 	if (sound_to_main_ready)
 		result |= 0x01;
@@ -274,10 +274,10 @@ static INPUT_PORTS_START( btoads )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("UNK")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("SPECIAL")
 	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
 	PORT_BIT( 0xfffd, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
