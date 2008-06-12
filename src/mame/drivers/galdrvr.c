@@ -2196,6 +2196,74 @@ static INPUT_PORTS_START( calipso )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( moonwar_common )
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_SPECIAL ) /* the spinner */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	
+	PORT_START_TAG("IN1")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+INPUT_PORTS_END
+	
+
+static INPUT_PORTS_START( moonwar )
+	PORT_INCLUDE( moonwar_common )
+
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )	/* output bits */
+
+	PORT_START_TAG("IN3")      /* IN3/4 - dummy ports for the dial */
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_RESET
+
+	PORT_START_TAG("IN4")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_RESET PORT_COCKTAIL
+INPUT_PORTS_END
+
+/* same as above, but coinage is different */
+static INPUT_PORTS_START( moonwara )
+	PORT_INCLUDE( moonwar_common )
+
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )	/* output bits */
+
+	PORT_START_TAG("IN3")      /* IN3/4 - dummy ports for the dial */
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_RESET
+
+	PORT_START_TAG("IN4")		/* doesn't actually work due to bug in game code */
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_RESET PORT_COCKTAIL
+INPUT_PORTS_END
+
+
 /*************************************
  *
  *  ROM definitions
@@ -4780,6 +4848,45 @@ ROM_START( calipso )
 ROM_END
 
 
+ROM_START( moonwar )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "mw2.2c",       0x0000, 0x1000, CRC(7c11b4d9) SHA1(a27bdff6ce728647ec811df843ac235c32c293d6) )
+	ROM_LOAD( "mw2.2e",       0x1000, 0x1000, CRC(1b6362be) SHA1(2fbd95869146adcc0c8be1df653251fda8849e8e) )
+	ROM_LOAD( "mw2.2f",       0x2000, 0x1000, CRC(4fd8ba4b) SHA1(3da784267a96d05f66b00626a22cb3f06211d202) )
+	ROM_LOAD( "mw2.2h",       0x3000, 0x1000, CRC(56879f0d) SHA1(d1e9932863aebc5761e71fca8d24f3c400e1250d) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "mw2.5c",       0x0000, 0x0800, CRC(c26231eb) SHA1(5b19edfaefe1a535059311d067ea53405879d627) )
+	ROM_LOAD( "mw2.5d",       0x0800, 0x0800, CRC(bb48a646) SHA1(cf51202d16b03bbed12ff24501be68683f28c992) )
+
+	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "mw2.5f",       0x0000, 0x0800, CRC(c5fa1aa0) SHA1(6c6b5b2ce5de278ff436d3e7252ece5b086cc41d) )
+	ROM_LOAD( "mw2.5h",       0x0800, 0x0800, CRC(a6ccc652) SHA1(286b3dc1f3a7da3ac66664e774b441ef075745f1) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_LOAD( "mw2.clr",      0x0000, 0x0020, CRC(99614c6c) SHA1(f068985f3c5e0cd88551a02c32f9baeabfd50241) )
+ROM_END
+
+ROM_START( moonwara )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "2c",           0x0000, 0x1000, CRC(bc20b734) SHA1(c6fe550987d0052979aad43c67aa1b9248049669) )
+	ROM_LOAD( "2e",           0x1000, 0x1000, CRC(db6ffec2) SHA1(0fcd55b1e415e2e7041d10778052a235251f85fe) )
+	ROM_LOAD( "2f",           0x2000, 0x1000, CRC(378931b8) SHA1(663f1eea9b0e8dc38de818df66c5211dac41c33b) )
+	ROM_LOAD( "2h",           0x3000, 0x1000, CRC(031dbc2c) SHA1(5f2ca8b8763398bf161ee0c2c748a12d36cb40ec) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "mw2.5c",       0x0000, 0x0800, CRC(c26231eb) SHA1(5b19edfaefe1a535059311d067ea53405879d627) )
+	ROM_LOAD( "mw2.5d",       0x0800, 0x0800, CRC(bb48a646) SHA1(cf51202d16b03bbed12ff24501be68683f28c992) )
+
+	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "mw2.5f",       0x0000, 0x0800, CRC(c5fa1aa0) SHA1(6c6b5b2ce5de278ff436d3e7252ece5b086cc41d) )
+	ROM_LOAD( "mw2.5h",       0x0800, 0x0800, CRC(a6ccc652) SHA1(286b3dc1f3a7da3ac66664e774b441ef075745f1) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_LOAD( "moonwara.clr", 0x0000, 0x0020, CRC(f58d4f58) SHA1(12a80d1edf3c80dafa0e1e3622d2a03224b62f14) )	/* olive, instead of white */
+ROM_END
+
+
 /*************************************
  *
  *  Game drivers
@@ -4987,6 +5094,9 @@ GAME( 1985, superbon, 0,        scobra,   superbon, superbon, ROT90,  "Signatron
 
 GAME( 1982, calipso,  0,        scobra,   calipso,  calipso,  ROT90,  "[Stern] (Tago license)", "Calipso", GAME_SUPPORTS_SAVE )
 
+GAME( 1981, moonwar,  0,        moonwar,  moonwar,  moonwar,  ROT90,  "Stern", "Moonwar", GAME_SUPPORTS_SAVE )
+GAME( 1981, moonwara, moonwar,  moonwar,  moonwara, moonwar,  ROT90,  "Stern", "Moonwar (older)", GAME_SUPPORTS_SAVE )
+
 
 
 /* currently in galaxold.c and should be moved here */
@@ -5036,8 +5146,6 @@ GAME( 1982, calipso,  0,        scobra,   calipso,  calipso,  ROT90,  "[Stern] (
 /* currently in scobra.c and should be moved here */
 //GAME( 1981, stratgyx, 0,        scobra/*stratgyx*/, stratgyx, stratgyx,     ROT0,   "Konami", "Strategy X", GAME_SUPPORTS_SAVE )
 //GAME( 1981, stratgys, stratgyx, scobra/*stratgyx*/, stratgyx, stratgyx,     ROT0,   "[Konami] (Stern license)", "Strategy X (Stern)", GAME_SUPPORTS_SAVE )
-//GAME( 1981, moonwar,  0,        scobra/*moonwar*/,  moonwar,  moonwar,      ROT90,  "Stern", "Moonwar", GAME_SUPPORTS_SAVE )
-//GAME( 1981, moonwara, moonwar,  scobra/*moonwar*/,  moonwara, moonwar,      ROT90,  "Stern", "Moonwar (older)", GAME_SUPPORTS_SAVE )
 //GAME( 1982, darkplnt, 0,        scobra/*darkplnt*/, darkplnt, darkplnt,     ROT180, "Stern", "Dark Planet", GAME_SUPPORTS_SAVE )
 //GAME( 1982, tazmani2, tazmania, scobra/*type2*/,    tazmania, tazmani2,     ROT90,  "Stern", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
 //GAME( 1983, anteatg,  anteater, scobra/*anteatg*/,  anteatg,  scramble_ppi, ROT90,  "TV-Tuning (F.E.G. license)", "Ameisenbaer (German)", GAME_SUPPORTS_SAVE )

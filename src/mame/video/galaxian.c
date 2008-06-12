@@ -423,7 +423,14 @@ PALETTE_INIT( galaxian )
 	bullet_color[7] = MAKE_RGB(0xff,0xff,0x00);
 }
 
+PALETTE_INIT( moonwar )
+{
+	PALETTE_INIT_CALL(galaxian);
 
+
+	/* wire mod to connect the bullet blue output to the 220 ohm resistor */
+	bullet_color[7] = MAKE_RGB(0xef,0xef,0x97);
+}
 
 /*************************************
  *

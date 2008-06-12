@@ -12,8 +12,6 @@
 #include "machine/8255ppi.h"
 #include "includes/galaxold.h"
 
-static UINT8 moonwar_port_select;
-
 static UINT8 cavelon_bank;
 
 static UINT8 security_2B_counter;
@@ -73,25 +71,6 @@ static READ8_HANDLER( ckongs_input_port_1_r )
 static READ8_HANDLER( ckongs_input_port_2_r )
 {
 	return (input_port_read_indexed(machine, 2) & 0xf9) | ((input_port_read_indexed(machine, 1) & 0x03) << 1);
-}
-
-
-static WRITE8_HANDLER( moonwar_port_select_w )
-{
-	moonwar_port_select = data & 0x10;
-}
-
-static READ8_HANDLER( moonwar_input_port_0_r )
-{
-	UINT8 sign;
-	UINT8 delta;
-
-	delta = (moonwar_port_select ? input_port_read_indexed(machine, 3) : input_port_read_indexed(machine, 4));
-
-	sign = (delta & 0x80) >> 3;
-	delta &= 0x0f;
-
-	return ((input_port_read_indexed(machine, 0) & 0xe0) | delta | sign );
 }
 
 
@@ -258,27 +237,6 @@ const ppi8255_interface stratgyx_ppi8255_intf[2] =
 		NULL,						/* Port A read */
 		NULL,						/* Port B read */
 		stratgyx_input_port_3_r,	/* Port C read */
-		soundlatch_w,				/* Port A write */
-		scramble_sh_irqtrigger_w,	/* Port B write */
-		NULL						/* Port C write */
-	}
-};
-
-
-const ppi8255_interface moonwar_ppi8255_intf[2] =
-{
-	{
-		moonwar_input_port_0_r,		/* Port A read */
-		input_port_1_r,				/* Port B read */
-		input_port_2_r,				/* Port C read */
-		NULL,						/* Port A write */
-		NULL,						/* Port B write */
-		moonwar_port_select_w 		/* Port C write */
-	},
-	{
-		NULL,						/* Port A read */
-		NULL,						/* Port B read */
-		NULL,						/* Port C read */
 		soundlatch_w,				/* Port A write */
 		scramble_sh_irqtrigger_w,	/* Port B write */
 		NULL						/* Port C write */
@@ -525,10 +483,7 @@ DRIVER_INIT( cavelon )
 	state_save_register_global(cavelon_bank);
 }
 
-DRIVER_INIT( moonwar )
-{
-	state_save_register_global(moonwar_port_select);
-}
+
 
 DRIVER_INIT( darkplnt )
 {

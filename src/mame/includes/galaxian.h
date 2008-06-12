@@ -34,6 +34,7 @@ extern UINT8 galaxian_sprite_clip_start;
 extern UINT8 galaxian_sprite_clip_end;
 
 PALETTE_INIT( galaxian );
+PALETTE_INIT( moonwar );
 
 VIDEO_START( galaxian );
 VIDEO_UPDATE( galaxian );

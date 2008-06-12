@@ -31,7 +31,6 @@ extern UINT8 galaxold_stars_on;
 
 PALETTE_INIT( galaxold );
 PALETTE_INIT( scrambold );
-PALETTE_INIT( moonwar );
 PALETTE_INIT( darkplnt );
 PALETTE_INIT( rescue );
 PALETTE_INIT( minefld );
@@ -154,7 +153,6 @@ READ8_HANDLER( gmgalax_input_port_2_r );
 
 extern const ppi8255_interface scramble_ppi_ppi8255_intf[2];
 extern const ppi8255_interface stratgyx_ppi8255_intf[2];
-extern const ppi8255_interface moonwar_ppi8255_intf[2];
 extern const ppi8255_interface darkplnt_ppi8255_intf[2];
 extern const ppi8255_interface scramble_ppi8255_intf[2];
 extern const ppi8255_interface ckongs_ppi8255_intf[2];
@@ -176,7 +174,6 @@ DRIVER_INIT( devilfsh );
 DRIVER_INIT( mars );
 DRIVER_INIT( hotshock );
 DRIVER_INIT( cavelon );
-DRIVER_INIT( moonwar );
 DRIVER_INIT( darkplnt );
 DRIVER_INIT( mimonkey );
 DRIVER_INIT( mimonsco );

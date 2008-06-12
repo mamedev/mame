@@ -211,14 +211,6 @@ PALETTE_INIT( scrambold )
 	palette_set_color(machine,BACKGROUND_COLOR_BASE,MAKE_RGB(0,0,0x56));
 }
 
-PALETTE_INIT( moonwar )
-{
-	PALETTE_INIT_CALL(scrambold);
-
-
-	/* wire mod to connect the bullet blue output to the 220 ohm resistor */
-	palette_set_color(machine,BULLETS_COLOR_BASE+0,MAKE_RGB(0xef,0xef,0x97));
-}
 
 PALETTE_INIT( stratgyx )
 {
