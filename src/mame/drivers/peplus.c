@@ -1208,6 +1208,76 @@ ROM_START( peke1012 ) /* Normal board : Keno (KE1012) */
 	ROM_LOAD( "cap1267.u50", 0x0000, 0x0100, CRC(7051db57) SHA1(76751a3cc47d506983205decb07e99ca0c178a42) )
 ROM_END
 
+ROM_START( peps0014 ) /* Normal board : Super Joker Slots (PS0014) */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "ps0014.u68",   0x00000, 0x10000, CRC(368c3f58) SHA1(ebefcefbb5386659680719936bff72ad61087343) )
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "mro-cg0916.u72",	 0x00000, 0x8000, CRC(d97049d9) SHA1(78f7bb33866ca92922a8b83d5f9ac459edd39176) )
+	ROM_LOAD( "mgo-cg0916.u73",	 0x08000, 0x8000, CRC(6e075788) SHA1(e8e9d8b7943d62e31d1d58f870bc765cba65c203) )
+	ROM_LOAD( "mbo-cg0916.u74",	 0x10000, 0x8000, CRC(a5cdf0f3) SHA1(23b2749fd2cb5b8462ce7c912005779b611f32f9) )
+	ROM_LOAD( "mxo-cg0916.u75",	 0x18000, 0x8000, CRC(1f3a2d72) SHA1(8e07324d436980b628e007d30a835757c1f70f6d) )
+
+	ROM_REGION( 0x100, REGION_PROMS, 0 )
+	ROM_LOAD( "cap0916.u50", 0x0000, 0x0100, CRC(b9a5ee21) SHA1(d3c952f594baca9dc234602d90c506dd537c4dcc) )
+ROM_END
+
+ROM_START( peps0022 ) /* Normal board : Red White & Blue Slots (PS0022) */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "ps0022.u68",   0x00000, 0x10000, CRC(d65c0939) SHA1(d91f472a43f77f9df8845e97561540f988e522e3) )
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "mro-cg0960.u72",	 0x00000, 0x8000, CRC(8c38c6fd) SHA1(5d6e9ac18b9b3f1253bba080bef1c067b2fdd7a8) )
+	ROM_LOAD( "mgo-cg0960.u73",	 0x08000, 0x8000, CRC(b4f44163) SHA1(1bc635a5160fdff2882c8362644aebf983a1a427) )
+	ROM_LOAD( "mbo-cg0960.u74",	 0x10000, 0x8000, CRC(8057e3a8) SHA1(5510872b1607daaf890603e76a8a47680e639e8e) )
+	ROM_LOAD( "mxo-cg0960.u75",	 0x18000, 0x8000, CRC(d57b4c25) SHA1(6ddfbaae87f9958642ddb95e581ac31e1dd55608) )
+
+	ROM_REGION( 0x100, REGION_PROMS, 0 )
+	ROM_LOAD( "cap0960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
+ROM_END
+
+ROM_START( peps0043 ) /* Normal board : Double Diamond Slots (PS0043) */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "ps0043.u68",   0x00000, 0x10000, CRC(d612429c) SHA1(95eb4774482a930066456d517fb2e4f67d4df4cb) )
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "mro-cg1003.u72",	 0x00000, 0x8000, CRC(41ce0395) SHA1(ae90dbae30e4efed33f83ee7038fb2e5171c1945) )
+	ROM_LOAD( "mgo-cg1003.u73",	 0x08000, 0x8000, CRC(5a383fa1) SHA1(27b1febbdda7332e8d474fc0cca683f451a07090) )
+	ROM_LOAD( "mbo-cg1003.u74",	 0x10000, 0x8000, CRC(5ec00224) SHA1(bb70a4326cd1810b200e193a449061df62085f37) )
+	ROM_LOAD( "mxo-cg1003.u75",	 0x18000, 0x8000, CRC(2ffacd52) SHA1(38126ac4998806a1ddd55e6aa1942044240d41d0) )
+
+	ROM_REGION( 0x100, REGION_PROMS, 0 )
+	ROM_LOAD( "cap1003.u50", 0x0000, 0x0100, CRC(cc400805) SHA1(f5ac48ad2a5df64da150f09f2ea5d910230bde56) )
+ROM_END
+
+ROM_START( peps0045 ) /* Normal board : Red White & Blue Slots (PS0045) */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "ps0045.u68",   0x00000, 0x10000, CRC(de180b84) SHA1(0d592d7d535b0aacbd62c18ac222da770fab7b85) )
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "mro-cg0960.u72",	 0x00000, 0x8000, CRC(8c38c6fd) SHA1(5d6e9ac18b9b3f1253bba080bef1c067b2fdd7a8) )
+	ROM_LOAD( "mgo-cg0960.u73",	 0x08000, 0x8000, CRC(b4f44163) SHA1(1bc635a5160fdff2882c8362644aebf983a1a427) )
+	ROM_LOAD( "mbo-cg0960.u74",	 0x10000, 0x8000, CRC(8057e3a8) SHA1(5510872b1607daaf890603e76a8a47680e639e8e) )
+	ROM_LOAD( "mxo-cg0960.u75",	 0x18000, 0x8000, CRC(d57b4c25) SHA1(6ddfbaae87f9958642ddb95e581ac31e1dd55608) )
+
+	ROM_REGION( 0x100, REGION_PROMS, 0 )
+	ROM_LOAD( "cap0960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
+ROM_END
+
+ROM_START( peps0308 ) /* Normal board : Double Jackpot Slots (PS0308) */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "ps0308.u68",   0x00000, 0x10000, CRC(fe30e081) SHA1(d216cbc6336727caf359e6b178c856ab2659cabd) )
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "mro-cg0911.u72",	 0x00000, 0x8000, CRC(48491b50) SHA1(9ec6d3ff34a08d40082a1347a46635838fd31afc) )
+	ROM_LOAD( "mgo-cg0911.u73",	 0x08000, 0x8000, CRC(c1ff7d97) SHA1(78ab138ae9c7f9b3352f9b1ef5fbc473993bb8c8) )
+	ROM_LOAD( "mbo-cg0911.u74",	 0x10000, 0x8000, CRC(202e0f9e) SHA1(51421dfd1b00a9e3b1e938d5bffaa3b7cd4c2b5e) )
+	ROM_LOAD( "mxo-cg0911.u75",	 0x18000, 0x8000, CRC(d97740a2) SHA1(d76926d7fbbc24d2384a1079cb97e654600b134b) )
+
+	ROM_REGION( 0x100, REGION_PROMS, 0 )
+	ROM_LOAD( "cap0911.u50", 0x0000, 0x0100, CRC(f117e781) SHA1(ba9d850c93e5f3abc26b0ba51f67fa7c07e05f59) )
+ROM_END
+
 ROM_START( peps0615 ) /* Normal board : Chaos Slots (PS0615) */
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "ps0615.u68",   0x00000, 0x10000, CRC(d27dd6ab) SHA1(b3f065f507191682edbd93b07b72ed87bf6ae9b1) )
@@ -1219,10 +1289,10 @@ ROM_START( peps0615 ) /* Normal board : Chaos Slots (PS0615) */
 	ROM_LOAD( "mxo-cg2246.u75",	 0x18000, 0x8000, CRC(f0f4a27d) SHA1(3a10ab196aeaa5b50d47b9d3c5b378cfadd6fe96) )
 
 	ROM_REGION( 0x100, REGION_PROMS, 0 ) // WRONG CAP
-	ROM_LOAD( "cap2234.u50", 0x0000, 0x0100, CRC(a930e283) SHA1(61bce50fa13b3e980ece3e72d068835e19bd5049) )
+    ROM_LOAD( "cap0960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
 ROM_END
 
-ROM_START( peps0716 ) /* Normal board : Quarter Mania Slots (PS0716) */
+ROM_START( peps0716 ) /* Normal board : River Gambler Slots (PS0716) */
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "ps0716.u68",   0x00000, 0x10000, CRC(7615d7b6) SHA1(91fe62eec720a0dc2ebf48835065148f19499d16) )
 
@@ -1232,8 +1302,8 @@ ROM_START( peps0716 ) /* Normal board : Quarter Mania Slots (PS0716) */
 	ROM_LOAD( "mbo-cg2266.u74",	 0x10000, 0x8000, CRC(e3df30e1) SHA1(c7d2ae9a7c7e53bfb6197b635efcb5dc231e4fe0) )
 	ROM_LOAD( "mxo-cg2266.u75",	 0x18000, 0x8000, CRC(56271442) SHA1(61ad0756b9f6412516e46ef6625a4c3899104d4e) )
 
-	ROM_REGION( 0x100, REGION_PROMS, 0 ) // WRONG CAP
-	ROM_LOAD( "cap2265.u50", 0x0000, 0x0100, CRC(dfb82a2f) SHA1(c96947bb475bf4497ff2e44053941625a3a7bf62) )
+	ROM_REGION( 0x100, REGION_PROMS, 0 )
+	ROM_LOAD( "cap2266.u50", 0x0000, 0x0100, CRC(5aaff103) SHA1(9cfda9c095cb77a8bb761c131a0f358e79b97abc) )
 ROM_END
 
 ROM_START( pexp0019 ) /* Superboard : Deuces Wild Poker (XP000019) */
@@ -1328,8 +1398,13 @@ GAMEL(1994, pebe0014, 0,      peplus,  peplus_bjack, peplus,   ROT0,  "IGT - Int
 GAMEL(1994, peke1012, 0,      peplus,  peplus_keno,  peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (KE1012) Keno",                          0,   layout_pe_keno )
 
 /* Normal board : slots machine */
+GAMEL(1996, peps0014, 0,      peplus,  peplus_slots, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PS0014) Super Joker Slots",             0,   layout_pe_slots )
+GAMEL(1996, peps0022, 0,      peplus,  peplus_slots, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PS0022) Red White & Blue Slots",        0,   layout_pe_slots )
+GAMEL(1996, peps0043, 0,      peplus,  peplus_slots, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PS0043) Double Diamond Slots",          0,   layout_pe_slots )
+GAMEL(1996, peps0045, 0,      peplus,  peplus_slots, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PS0045) Red White & Blue Slots",        0,   layout_pe_slots )
+GAMEL(1996, peps0308, 0,      peplus,  peplus_slots, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PS0308) Double Jackpot Slots",          0,   layout_pe_slots )
 GAMEL(1996, peps0615, 0,      peplus,  peplus_slots, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PS0615) Chaos Slots",                   0,   layout_pe_slots )
-GAMEL(1996, peps0716, 0,      peplus,  peplus_slots, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PS0716) Quarter Mania Slots",           0,   layout_pe_slots )
+GAMEL(1996, peps0716, 0,      peplus,  peplus_slots, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PS0716) River Gambler Slots",           0,   layout_pe_slots )
 
 /* Superboard : poker */
 GAMEL(1995, pexp0019, 0,      peplus,  peplus_poker, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XP000019) Deuces Wild Poker",           0,   layout_pe_poker )

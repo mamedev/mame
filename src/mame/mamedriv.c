@@ -8081,6 +8081,11 @@ Other Sun games
 	DRIVER( pepp0516 )	/* (c) 1987 IGT - International Gaming Technology */
 	DRIVER( pebe0014 )	/* (c) 1994 IGT - International Gaming Technology */
 	DRIVER( peke1012 )	/* (c) 1994 IGT - International Gaming Technology */
+	DRIVER( peps0014 )	/* (c) 1996 IGT - International Gaming Technology */
+    DRIVER( peps0022 )	/* (c) 1996 IGT - International Gaming Technology */
+    DRIVER( peps0043 )	/* (c) 1996 IGT - International Gaming Technology */
+    DRIVER( peps0045 )	/* (c) 1996 IGT - International Gaming Technology */
+    DRIVER( peps0308 )	/* (c) 1996 IGT - International Gaming Technology */
 	DRIVER( peps0615 )	/* (c) 1996 IGT - International Gaming Technology */
 	DRIVER( peps0716 )	/* (c) 1996 IGT - International Gaming Technology */
 	DRIVER( pexp0019 )	/* (c) 1995 IGT - International Gaming Technology */
