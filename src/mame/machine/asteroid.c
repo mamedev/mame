@@ -122,7 +122,7 @@ READ8_HANDLER( asteroid_DSW1_r )
 	int res;
 	int res1;
 
-	res1 = input_port_read(machine, "DSW");
+	res1 = input_port_read(machine, "DSW1");
 
 	res = 0xfc | ((res1 >> (2 * (3 - (offset & 0x3)))) & 0x3);
 	return res;
