@@ -793,7 +793,7 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				(*active_address_space[PARAM3 / 16].accessors->write_dword_masked)(PARAM0, PARAM1, PARAM2);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_CARRY, 4, 0):		/* CARRY   src,bitnum             */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_CARRY, 4, 1):		/* CARRY   src,bitnum             */
 				flags = (flags & ~DRCUML_FLAG_C) | ((PARAM0 >> (PARAM1 & 31)) & DRCUML_FLAG_C);
 				break;
 
@@ -814,8 +814,20 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				PARAM0 = (INT8)PARAM1;
 				break;
 
+			case MAKE_OPCODE_SHORT(DRCUML_OP_SEXT1, 4, 1):
+				temp32 = (INT8)PARAM1;
+				flags = FLAGS32_NZ(temp32);
+				PARAM0 = temp32;
+				break;
+
 			case MAKE_OPCODE_SHORT(DRCUML_OP_SEXT2, 4, 0):		/* SEXT2   dst,src                */
 				PARAM0 = (INT16)PARAM1;
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_SEXT2, 4, 1):
+				temp32 = (INT16)PARAM1;
+				flags = FLAGS32_NZ(temp32);
+				PARAM0 = temp32;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_ROLAND, 4, 0):		/* ROLAND  dst,src,count,mask[,f] */
@@ -823,9 +835,23 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				PARAM0 = ((PARAM1 << shift) | (PARAM1 >> (32 - shift))) & PARAM3;
 				break;
 
+			case MAKE_OPCODE_SHORT(DRCUML_OP_ROLAND, 4, 1):
+				shift = PARAM2 & 31;
+				temp32 = ((PARAM1 << shift) | (PARAM1 >> (32 - shift))) & PARAM3;
+				flags = FLAGS32_NZ(temp32);
+				PARAM0 = temp32;
+				break;
+
 			case MAKE_OPCODE_SHORT(DRCUML_OP_ROLINS, 4, 0):		/* ROLINS  dst,src,count,mask[,f] */
 				shift = PARAM2 & 31;
 				PARAM0 = (PARAM0 & ~PARAM3) | (((PARAM1 << shift) | (PARAM1 >> (32 - shift))) & PARAM3);
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_ROLINS, 4, 1):
+				shift = PARAM2 & 31;
+				temp32 = (PARAM0 & ~PARAM3) | (((PARAM1 << shift) | (PARAM1 >> (32 - shift))) & PARAM3);
+				flags = FLAGS32_NZ(temp32);
+				PARAM0 = temp32;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_ADD, 4, 0):		/* ADD     dst,src1,src2[,f]      */
@@ -982,8 +1008,20 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				PARAM0 = count_leading_zeros(PARAM1);
 				break;
 
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LZCNT, 4, 1):
+				temp32 = count_leading_zeros(PARAM1);
+				flags = FLAGS32_NZ(temp32);
+				PARAM0 = temp32;
+				break;
+
 			case MAKE_OPCODE_SHORT(DRCUML_OP_BSWAP, 4, 0):		/* BSWAP   dst,src                */
 				temp32 = PARAM1;
+				PARAM0 = FLIPENDIAN_INT32(temp32);
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_BSWAP, 4, 1):
+				temp32 = PARAM1;
+				flags = FLAGS32_NZ(temp32);
 				PARAM0 = FLIPENDIAN_INT32(temp32);
 				break;
 
@@ -1215,12 +1253,30 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				DPARAM0 = (INT8)PARAM1;
 				break;
 
+			case MAKE_OPCODE_SHORT(DRCUML_OP_SEXT1, 8, 1):
+				temp64 = (INT8)PARAM1;
+				flags = FLAGS64_NZ(temp64);
+				DPARAM0 = temp64;
+				break;
+
 			case MAKE_OPCODE_SHORT(DRCUML_OP_SEXT2, 8, 0):		/* DSEXT   dst,src,WORD           */
 				DPARAM0 = (INT16)PARAM1;
 				break;
 
+			case MAKE_OPCODE_SHORT(DRCUML_OP_SEXT2, 8, 1):
+				temp64 = (INT16)PARAM1;
+				flags = FLAGS64_NZ(temp64);
+				DPARAM0 = temp64;
+				break;
+
 			case MAKE_OPCODE_SHORT(DRCUML_OP_SEXT4, 8, 0):		/* DSEXT   dst,src,DWORD          */
 				DPARAM0 = (INT32)PARAM1;
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_SEXT4, 8, 1):
+				temp64 = (INT32)PARAM1;
+				flags = FLAGS64_NZ(temp64);
+				DPARAM0 = temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_ROLAND, 8, 0):		/* DROLAND dst,src,count,mask[,f] */
@@ -1228,9 +1284,23 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				DPARAM0 = ((DPARAM1 << shift) | (DPARAM1 >> (64 - shift))) & DPARAM3;
 				break;
 
+			case MAKE_OPCODE_SHORT(DRCUML_OP_ROLAND, 8, 1):
+				shift = DPARAM2 & 63;
+				temp64 = ((DPARAM1 << shift) | (DPARAM1 >> (64 - shift))) & DPARAM3;
+				flags = FLAGS64_NZ(temp64);
+				DPARAM0 = temp64;
+				break;
+
 			case MAKE_OPCODE_SHORT(DRCUML_OP_ROLINS, 8, 0):		/* DROLINS dst,src,count,mask[,f] */
 				shift = DPARAM2 & 63;
 				DPARAM0 = (DPARAM0 & ~DPARAM3) | (((DPARAM1 << shift) | (DPARAM1 >> (64 - shift))) & DPARAM3);
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_ROLINS, 8, 1):
+				shift = DPARAM2 & 63;
+				temp64 = (DPARAM0 & ~DPARAM3) | (((DPARAM1 << shift) | (DPARAM1 >> (64 - shift))) & DPARAM3);
+				flags = FLAGS64_NZ(temp64);
+				DPARAM0 = temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_ADD, 8, 0):		/* DADD    dst,src1,src2[,f]      */
@@ -1380,8 +1450,23 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 					DPARAM0 = 32 + count_leading_zeros(DPARAM1);
 				break;
 
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LZCNT, 8, 1):
+				if ((UINT32)(DPARAM1 >> 32) != 0)
+					temp64 = count_leading_zeros(DPARAM1 >> 32);
+				else
+					temp64 = 32 + count_leading_zeros(DPARAM1);
+				flags = FLAGS64_NZ(temp64);
+				DPARAM0 = temp64;
+				break;
+
 			case MAKE_OPCODE_SHORT(DRCUML_OP_BSWAP, 8, 0):		/* DBSWAP  dst,src                */
 				temp64 = DPARAM1;
+				DPARAM0 = FLIPENDIAN_INT64(temp64);
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_BSWAP, 8, 1):
+				temp64 = DPARAM1;
+				flags = FLAGS64_NZ(temp64);
 				DPARAM0 = FLIPENDIAN_INT64(temp64);
 				break;
 

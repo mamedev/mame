@@ -12,14 +12,8 @@
 
     Future improvements/changes:
 
-    * change from detecting live to detecting unnecessary
-        - at the end of sequence: mustupdate.all = TRUE;
-        - scan backwards:
-            inst.mustupdate = inst.update & mustupdate;
-            if (inst.modified.reg) mustupdate.reg = FALSE;
-            if (inst.used.reg) mustupdate.reg = TRUE;
-
-     * rename UINT64 gpr, fpr to UINT32 reg[4]
+	* more aggressive handling of needed registers for conditional
+		intrablock branches
 
 ***************************************************************************/
 

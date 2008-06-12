@@ -12,6 +12,7 @@
 
     Future improvements/changes:
 
+	* crxor a,a,a / creqv a,a,a / cror a,a,a
 
 ***************************************************************************/
 
@@ -169,13 +170,11 @@ struct _ppcimp_state
 	UINT32				drcoptions;					/* configurable DRC options */
 
 	/* parameters for subroutines */
-	UINT64				numcycles;					/* return value from gettotalcycles */
 	UINT32				mode;						/* current global mode */
 	UINT32				arg0;						/* print_debug argument 1 */
 	UINT32				arg1;						/* print_debug argument 2 */
 	UINT32				updateaddr;					/* update address storage */
 	UINT32				swcount;					/* counter for sw instructions */
-	UINT32				swreg;						/* reg index for sw instructions */
 	UINT32				tempaddr;					/* temporary address storage */
 	drcuml_ireg			tempdata;					/* temporary data storage */
 	double				fp0;						/* floating point 0 */
@@ -192,7 +191,6 @@ struct _ppcimp_state
 
 	/* register mappings */
 	drcuml_parameter	regmap[32];					/* parameter to register mappings for all 32 integer registers */
-	drcuml_parameter	fsregmap[32];				/* parameter to register mappings for all 32 floating point registers */
 	drcuml_parameter	fdregmap[32];				/* parameter to register mappings for all 32 floating point registers */
 
 	/* subroutines */
@@ -602,6 +600,7 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, int cl
 		sprintf(buf, "cr%d", regnum);
 		drcuml_symbol_add(ppc->impstate->drcuml, &ppc->cr[regnum], sizeof(ppc->cr[regnum]), buf);
 	}
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->xerso, sizeof(ppc->xerso), "xerso");
 	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->fpscr, sizeof(ppc->fpscr), "fpscr");
 	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->msr, sizeof(ppc->msr), "msr");
 	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->sr, sizeof(ppc->sr), "sr");
@@ -613,6 +612,19 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, int cl
 	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->param0, sizeof(ppc->param0), "param0");
 	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->param1, sizeof(ppc->param1), "param1");
 	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->irq_pending, sizeof(ppc->irq_pending), "irq_pending");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->impstate->mode, sizeof(ppc->impstate->mode), "mode");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->impstate->arg0, sizeof(ppc->impstate->arg0), "arg0");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->impstate->arg1, sizeof(ppc->impstate->arg1), "arg1");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->impstate->updateaddr, sizeof(ppc->impstate->updateaddr), "updateaddr");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->impstate->swcount, sizeof(ppc->impstate->swcount), "swcount");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->impstate->tempaddr, sizeof(ppc->impstate->tempaddr), "tempaddr");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->impstate->tempdata, sizeof(ppc->impstate->tempdata), "tempdata");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->impstate->fp0, sizeof(ppc->impstate->fp0), "fp0");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->impstate->fpmode, sizeof(ppc->impstate->fpmode), "fpmode");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->impstate->sz_cr_table, sizeof(ppc->impstate->sz_cr_table), "sz_cr_table");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->impstate->cmp_cr_table, sizeof(ppc->impstate->cmp_cr_table), "cmp_cr_table");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->impstate->cmpl_cr_table, sizeof(ppc->impstate->cmpl_cr_table), "cmpl_cr_table");
+	drcuml_symbol_add(ppc->impstate->drcuml, &ppc->impstate->fcmp_cr_table, sizeof(ppc->impstate->fcmp_cr_table), "fcmp_cr_table");
 
 	/* initialize the front-end helper */
 	if (SINGLE_INSTRUCTION_MODE)
@@ -631,8 +643,6 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, int cl
 	{
 		ppc->impstate->regmap[regnum].type = DRCUML_PTYPE_MEMORY;
 		ppc->impstate->regmap[regnum].value = (FPTR)&ppc->r[regnum];
-		ppc->impstate->fsregmap[regnum].type = DRCUML_PTYPE_MEMORY;
-		ppc->impstate->fsregmap[regnum].value = (FPTR)((UINT32 *)&ppc->f[regnum] + BYTE_XOR_LE(0));
 		ppc->impstate->fdregmap[regnum].type = DRCUML_PTYPE_MEMORY;
 		ppc->impstate->fdregmap[regnum].value = (FPTR)&ppc->f[regnum];
 	}
@@ -2259,9 +2269,14 @@ static void generate_compute_flags(drcuml_block *block, const opcode_desc *desc,
 	if (invertcarry && (xermask & XER_CA))
 		UML_XOR(block, IREG(0), IREG(0), IMM(DRCUML_FLAG_C));								// xor     i0,i0,FLAG_C
 	UML_ROLINS(block, SPR32(SPR_XER), IREG(0), IMM(29), IMM(xermask));						// rolins  [xer],i0,29,xermask
-	UML_ROLAND(block, IREG(0), IREG(0), IMM(31), IMM(1));									// roland  i0,i0,31,0x0001
-	UML_OR(block, XERSO32, XERSO32, IREG(0));												// or      [xerso],i0
-	UML_OR(block, CR32(0), IREG(1), IREG(0));												// or      [cr0],i1,i0
+	if (xermask & XER_OV)
+	{
+		UML_ROLAND(block, IREG(0), IREG(0), IMM(31), IMM(1));								// roland  i0,i0,31,0x0001
+		UML_OR(block, XERSO32, XERSO32, IREG(0));											// or      [xerso],i0
+		UML_OR(block, CR32(0), IREG(1), IREG(0));											// or      [cr0],i1,i0
+	}
+	else
+		UML_OR(block, CR32(0), IREG(1), XERSO32);											// or      [cr0],i1,[xerso]
 }
 
 
@@ -2603,10 +2618,11 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case 0x2e:	/* LMW */
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));								// mapvar  dsisr,DSISR_IMMU(op)
+			UML_MOV(block, MEM(&ppc->impstate->tempaddr), R32Z(G_RA(op)));					// mov     [tempaddr],ra
 			for (regnum = G_RD(op); regnum < 32; regnum++)
 			{
-				UML_ADD(block, IREG(0), R32Z(G_RA(op)), IMM((INT16)G_SIMM(op) + 4 * (regnum - G_RD(op))));
-																							// add     i0,ra,simm + 4*(regnum-rd)
+				UML_ADD(block, IREG(0), MEM(&ppc->impstate->tempaddr), IMM((INT16)G_SIMM(op) + 4 * (regnum - G_RD(op))));
+																							// add     i0,[tempaddr],simm + 4*(regnum-rd)
 				UML_CALLH(block, ppc->impstate->read32align[ppc->impstate->mode & 3]);		// callh   read32align
 				UML_MOV(block, R32(regnum), IREG(0));										// mov     regnum,i0
 			}
@@ -2615,10 +2631,11 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case 0x2f:	/* STMW */
 			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IMMU(op));								// mapvar  dsisr,DSISR_IMMU(op)
+			UML_MOV(block, MEM(&ppc->impstate->tempaddr), R32Z(G_RA(op)));					// mov     [tempaddr],ra
 			for (regnum = G_RS(op); regnum < 32; regnum++)
 			{
-				UML_ADD(block, IREG(0), R32Z(G_RA(op)), IMM((INT16)G_SIMM(op) + 4 * (regnum - G_RS(op))));
-																							// add     i0,ra,simm + 4*(regnum-rs)
+				UML_ADD(block, IREG(0), MEM(&ppc->impstate->tempaddr), IMM((INT16)G_SIMM(op) + 4 * (regnum - G_RS(op))));
+																							// add     i0,[tempaddr],simm + 4*(regnum-rs)
 				UML_MOV(block, IREG(1), R32(regnum));										// mov     i1,regnum
 				UML_CALLH(block, ppc->impstate->write32align[ppc->impstate->mode & 3]);		// callh   write32align
 			}
@@ -3530,9 +3547,8 @@ static int generate_instruction_1f(drcuml_block *block, compiler_state *compiler
 				UML_MOV(block, R32(G_RD(op)), SPR32(spr));									// mov     rd,spr
 			else if (spr == SPR_XER)
 			{
-				UML_MOV(block, IREG(0), SPR32(spr));										// mov     i0,spr
-				UML_SHL(block, IREG(1), XERSO32, IMM(31));									// shl     i1,[xerso],31
-				UML_OR(block, R32(G_RD(op)), IREG(0), IREG(1));								// or      [rd],i0,i1
+				UML_SHL(block, IREG(0), XERSO32, IMM(31));									// shl     i0,[xerso],31
+				UML_OR(block, R32(G_RD(op)), SPR32(spr), IREG(0));							// or      [rd],[xer],i0
 			}
 			else if (spr == SPROEA_PVR)
 				UML_MOV(block, R32(G_RD(op)), IMM(ppc->flavor));							// mov     rd,flavor
