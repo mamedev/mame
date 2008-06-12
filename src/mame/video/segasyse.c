@@ -8,7 +8,6 @@
 *******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 /*-- Variables --*/
 
@@ -43,7 +42,7 @@ static void vdp_setregister(UINT8 chip, UINT16 cmd);
 
 static void draw_tiles_line(UINT8 *dest, int line, UINT8 chip, UINT8 pri);
 static void draw_sprite_line(UINT8 *dest, UINT8 chip, UINT8 line);
-static void segae_drawscanline(int line, int chips, int blank);
+static void segae_drawscanline(running_machine *machine, int line, int chips, int blank);
 
 static void draw_8pix_solid16(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line, UINT8 flipx, UINT8 col);
 static void draw_8pix(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line, UINT8 flipx, UINT8 col);
@@ -72,7 +71,7 @@ VIDEO_UPDATE( megaplay_normal )
 	/*- Draw from cache_bitmap to screen -*/
 
 	for (i = miny; i <= maxy;i++)
-		segae_drawscanline(i-16,0,0);
+		segae_drawscanline(screen->machine, i-16,0,0);
 
 	for (i = miny;i <= maxy;i++)
 		draw_scanline8(bitmap,32,i,256,&cache_bitmap[(i-16) * (16+256+16) +24],&screen->machine->pens[palette_base],0);
@@ -205,7 +204,7 @@ void segae_vdp_ctrl_w ( UINT8 chip, UINT8 data )
 	}
 }
 
-void segae_vdp_data_w ( UINT8 chip, UINT8 data )
+void segae_vdp_data_w ( running_machine *machine, UINT8 chip, UINT8 data )
 {
 	vdp_cmdpart[chip] = 0;
 
@@ -221,7 +220,7 @@ void segae_vdp_data_w ( UINT8 chip, UINT8 data )
 			g = (vdp_cram[chip][vdp_accessaddr[chip]] & 0x0c) >> 2;
 			b = (vdp_cram[chip][vdp_accessaddr[chip]] & 0x30) >> 4;
 
-			palette_set_color_rgb(Machine, vdp_accessaddr[chip] + 32*chip+palette_base, pal2bit(r), pal2bit(g), pal2bit(b));
+			palette_set_color_rgb(machine, vdp_accessaddr[chip] + 32*chip+palette_base, pal2bit(r), pal2bit(g), pal2bit(b));
 		}
 
 		vdp_accessaddr[chip] += 1;
@@ -336,7 +335,7 @@ static void vdp_setregister(UINT8 chip, UINT16 cmd)
 
 *******************************************************************************/
 
-static void segae_drawscanline(int line, int chips, int blank)
+static void segae_drawscanline(running_machine *machine, int line, int chips, int blank)
 {
 
 	UINT8* dest;
@@ -367,7 +366,7 @@ static void segae_drawscanline(int line, int chips, int blank)
 	/* FIX ME!! */
 	if (blank)
 	{
-		if (strcmp(Machine->gamedrv->name,"tetrisse")) /* and we really don't want to do it on tetrise */
+		if (strcmp(machine->gamedrv->name,"tetrisse")) /* and we really don't want to do it on tetrise */
 			memset(dest+16, 32+16, 8); /* Clear Leftmost column, there should be a register for this like on the SMS i imagine    */
 							   			  /* on the SMS this is bit 5 of register 0 (according to CMD's SMS docs) for system E this  */							   			  /* appears to be incorrect, most games need it blanked 99% of the time so we blank it      */
 	}

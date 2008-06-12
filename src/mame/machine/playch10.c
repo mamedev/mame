@@ -49,7 +49,7 @@ MACHINE_RESET( pc10 )
 	RP5H01_enable_w( 0, 1 );
 
 	/* reset the ppu */
-	ppu2c0x_reset( 0, /* video_screen_get_scan_period(machine->primary_screen) * */ 1 );
+	ppu2c0x_reset( machine, 0, /* video_screen_get_scan_period(machine->primary_screen) * */ 1 );
 
 	ppu2c0x_set_mirroring( 0, mirroring );
 }
@@ -113,7 +113,7 @@ WRITE8_HANDLER( pc10_GAMESTOP_w )
 WRITE8_HANDLER( pc10_PPURES_w )
 {
 	if ( data & 1 )
-		ppu2c0x_reset( 0, /* video_screen_get_scan_period(machine->primary_screen) * */ 1 );
+		ppu2c0x_reset( machine, 0, /* video_screen_get_scan_period(machine->primary_screen) * */ 1 );
 }
 
 READ8_HANDLER( pc10_detectclr_r )

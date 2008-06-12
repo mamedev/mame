@@ -124,7 +124,7 @@ static MACHINE_START( tourtabl )
 	r6532_reset(0);
 	r6532_reset(1);
 
-	tia_init( &tourtabl_tia_interface );
+	tia_init( machine, &tourtabl_tia_interface );
 }
 
 

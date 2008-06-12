@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "tatsumi.h"
 
 static tilemap *tx_layer;
@@ -237,7 +236,8 @@ VIDEO_START( bigfight )
 
 /********************************************************************/
 
-INLINE void roundupt_drawgfxzoomrotate( bitmap_t *dest_bmp,const gfx_element *gfx,
+INLINE void roundupt_drawgfxzoomrotate( running_machine *machine,
+		bitmap_t *dest_bmp,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,UINT32 ssx,UINT32 ssy,
 		const rectangle *clip, int scalex, int scaley, int rotate, int write_priority_only )
 {
@@ -271,7 +271,7 @@ INLINE void roundupt_drawgfxzoomrotate( bitmap_t *dest_bmp,const gfx_element *gf
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			const UINT8 *shadow_pens = shadow_pen_array + (gfx->color_granularity * (color % gfx->total_colors));
 			int source_base = (code % gfx->total_elements) * gfx->height;
 
@@ -632,12 +632,14 @@ extent_x=extent_y=0;
 
 				for (w=0; w<x_width; w++) {
 					if (rotate)
-						roundupt_drawgfxzoomrotate(temp_bitmap,machine->gfx[0],
+						roundupt_drawgfxzoomrotate(machine, 
+								temp_bitmap,machine->gfx[0],
 								base,
 								color,fx,0,x_pos,render_y,
 								cliprect,scale,scale,0,write_priority_only);
 					else
-						roundupt_drawgfxzoomrotate(bitmap,machine->gfx[0],
+						roundupt_drawgfxzoomrotate(machine,
+								bitmap,machine->gfx[0],
 								base,
 								color,fx,0,x_pos,render_y,
 								cliprect,scale,scale,0,write_priority_only);

@@ -136,7 +136,6 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/x1_010.h"
 #include "seta.h"
 
@@ -227,17 +226,17 @@ static const struct x_offset *global_offsets;
     ---- --1-       Coin #1 Counter
     ---- ---0       Coin #0 Counter     */
 
-void seta_coin_lockout_w(int data)
+void seta_coin_lockout_w(running_machine *machine, int data)
 {
 	static int seta_coin_lockout = 1;
 	static const game_driver *seta_driver = NULL;
 	static const char *const seta_nolockout[8] = { "blandia", "gundhara", "kamenrid", "zingzip", "eightfrc", "extdwnhl", "sokonuke", "zombraid"};
 
 	/* Only compute seta_coin_lockout when confronted with a new gamedrv */
-	if (seta_driver != Machine->gamedrv)
+	if (seta_driver != machine->gamedrv)
 	{
 		int i;
-		seta_driver = Machine->gamedrv;
+		seta_driver = machine->gamedrv;
 
 		seta_coin_lockout = 1;
 		for (i=0; i<ARRAY_LENGTH(seta_nolockout); i++)
@@ -279,7 +278,7 @@ WRITE16_HANDLER( seta_vregs_w )
         ---- ---- ---- ---0     Coin #0 Counter     */
 			if (ACCESSING_BITS_0_7)
 			{
-				seta_coin_lockout_w (data & 0x0f);
+				seta_coin_lockout_w (machine, data & 0x0f);
 				if (sndti_exists(SOUND_X1_010, 0))
 					seta_sound_enable_w (data & 0x20);
 				coin_counter_w(0,data & 0x01);

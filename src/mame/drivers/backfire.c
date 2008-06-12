@@ -71,7 +71,7 @@ static VIDEO_START(backfire)
 	state_save_register_global_pointer(deco16_pf12_control, 0x10/2);
 	state_save_register_global_pointer(deco16_pf34_control, 0x10/2);
 
-	deco16_2_video_init(0);
+	deco16_2_video_init(machine, 0);
 
 	deco16_pf1_colour_bank = 0x00;
 	deco16_pf2_colour_bank = 0x40;

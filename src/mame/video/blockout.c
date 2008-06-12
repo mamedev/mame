@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 
 
 
@@ -8,7 +7,7 @@ UINT16 *blockout_frontvideoram;
 
 
 
-static void setcolor(int color,int rgb)
+static void setcolor(running_machine *machine,int color,int rgb)
 {
 	int bit0,bit1,bit2,bit3;
 	int r,g,b;
@@ -35,13 +34,13 @@ static void setcolor(int color,int rgb)
 	bit3 = (rgb >> 11) & 0x01;
 	b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	palette_set_color(Machine,color,MAKE_RGB(r,g,b));
+	palette_set_color(machine,color,MAKE_RGB(r,g,b));
 }
 
 WRITE16_HANDLER( blockout_paletteram_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	setcolor(offset,paletteram16[offset]);
+	setcolor(machine,offset,paletteram16[offset]);
 }
 
 WRITE16_HANDLER( blockout_frontcolor_w )
@@ -49,7 +48,7 @@ WRITE16_HANDLER( blockout_frontcolor_w )
 	static UINT16 color;
 
 	COMBINE_DATA(&color);
-	setcolor(512,color);
+	setcolor(machine,512,color);
 }
 
 

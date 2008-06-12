@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 
 static UINT8 bg_color,  old_bg_color;
 #define mainsnk_offset 8
@@ -64,11 +63,11 @@ static void stuff_palette( running_machine *machine, int source_index, int dest_
 
 }
 
-static void update_palette( int type )
+static void update_palette( running_machine *machine, int type )
 {
 	if( bg_color!=old_bg_color )
 	{
-		stuff_palette( Machine, 256+16*(bg_color&0x7), (0x11-type)*16, 16 );
+		stuff_palette( machine, 256+16*(bg_color&0x7), (0x11-type)*16, 16 );
 		old_bg_color = bg_color;
 	}
 }
@@ -185,7 +184,7 @@ VIDEO_UPDATE(mainsnk)
 	tilemap_draw(bitmap,&myclip,me_fg_tilemap,0,0);
 	draw_status(screen->machine,bitmap,cliprect,0,0x400 );
 	draw_status(screen->machine,bitmap,cliprect,32*8,0x40 );
-	update_palette(1);
+	update_palette(screen->machine, 1);
 	return 0;
 }
 
@@ -201,6 +200,6 @@ VIDEO_UPDATE(canvas)
 //  tilemap_draw(bitmap,&myclip,me_fg_tilemap,0,0);
 //  draw_status(screen->machine,bitmap,cliprect,0,0x400 );
 //  draw_status(screen->machine,bitmap,cliprect,32*8,0x40 );
-	update_palette(1);
+	update_palette(screen->machine, 1);
 	return 0;
 }

@@ -13,10 +13,10 @@ extern int deco16_raster_display_position;
 
 extern int deco16_pf1_colour_bank,deco16_pf2_colour_bank,deco16_pf3_colour_bank,deco16_pf4_colour_bank;
 
-void deco16_1_video_init(void);
-void deco16_2_video_init(int split);
-void deco16_2_video_init_half_width(void);
-void deco_allocate_sprite_bitmap(void);
+void deco16_1_video_init(running_machine *machine);
+void deco16_2_video_init(running_machine *machine, int split);
+void deco16_2_video_init_half_width(running_machine *machine);
+void deco_allocate_sprite_bitmap(running_machine *machine);
 
 void deco16_pf12_update(const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr);
 void deco16_pf34_update(const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr);
@@ -37,7 +37,8 @@ void deco16_tilemap_4_draw(bitmap_t *bitmap, const rectangle *cliprect, int flag
 void deco16_tilemap_34_combine_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
 
 void deco16_clear_sprite_priority_bitmap(void);
-void deco16_pdrawgfx(bitmap_t *dest,const gfx_element *gfx,
+void deco16_pdrawgfx(running_machine *machine, 
+		bitmap_t *dest,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,UINT32 pri_mask,UINT32 sprite_mask,UINT8 write_pri);
 

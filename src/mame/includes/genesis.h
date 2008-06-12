@@ -49,7 +49,7 @@ VIDEO_UPDATE( genesis );
 VIDEO_UPDATE( segac2 );
 VIDEO_UPDATE( megaplay );
 
-void	segac2_enable_display(int enable);
+void segac2_enable_display(running_machine *machine, int enable);
 
 READ16_HANDLER ( genesis_vdp_r );
 WRITE16_HANDLER( genesis_vdp_w );

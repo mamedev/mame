@@ -109,7 +109,7 @@ static int mirage_bank_callback(const int bank)
 
 static VIDEO_START(mirage)
 {
-	deco16_1_video_init();
+	deco16_1_video_init(machine);
 
 	deco16_set_tilemap_bank_callback(0, mirage_bank_callback);
 	deco16_set_tilemap_bank_callback(1, mirage_bank_callback);

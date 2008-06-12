@@ -101,7 +101,7 @@ struct _ppu2c0x_interface
 void ppu2c0x_init_palette(running_machine *machine, int first_entry );
 void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface );
 
-void ppu2c0x_reset( int num, int scan_scale );
+void ppu2c0x_reset( running_machine *machine, int num, int scan_scale );
 void ppu2c0x_set_videorom_bank( int num, int start_page, int num_pages, int bank, int bank_size );
 void ppu2c0x_set_videoram_bank( int num, int start_page, int num_pages, int bank, int bank_size );
 void ppu2c0x_spriteram_dma(int num, const UINT8 page );

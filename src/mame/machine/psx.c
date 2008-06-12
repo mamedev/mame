@@ -1490,7 +1490,7 @@ static void gpu_write( UINT32 n_address, INT32 n_size )
 	psx_gpu_write( &g_p_n_psxram[ n_address / 4 ], n_size );
 }
 
-void psx_machine_init( void )
+void psx_machine_init( running_machine *machine )
 {
 	int n;
 
@@ -1531,7 +1531,7 @@ void psx_machine_init( void )
 		m_p_n_sio_tx_bits[ n ] = 0;
 	}
 
-	psx_gpu_reset();
+	psx_gpu_reset(machine);
 }
 
 static STATE_POSTLOAD( psx_postload )

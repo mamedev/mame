@@ -24,9 +24,9 @@ VIDEO_UPDATE( system16b );
 VIDEO_START( system18 );
 VIDEO_UPDATE( system18 );
 
-void system18_set_grayscale(int enable);
-void system18_set_vdp_enable(int eanble);
-void system18_set_vdp_mixing(int mixing);
+void system18_set_grayscale(running_machine *machine, int enable);
+void system18_set_vdp_enable(running_machine *machine, int eanble);
+void system18_set_vdp_mixing(running_machine *machine, int mixing);
 
 /*----------- defined in video/segaorun.c -----------*/
 

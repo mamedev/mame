@@ -45,7 +45,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "kan_pand.h"
 
 static UINT8* pandora_spriteram;
@@ -162,7 +161,7 @@ void pandora_eof(running_machine *machine)
 	pandora_draw(machine, pandora_sprites_bitmap, video_screen_get_visible_area(machine->primary_screen));
 }
 
-void pandora_start(UINT8 region, int x, int y)
+void pandora_start(running_machine *machine, UINT8 region, int x, int y)
 {
 	pandora_region = region;
 	pandora_xoffset = x;
@@ -170,7 +169,7 @@ void pandora_start(UINT8 region, int x, int y)
 	pandora_spriteram = auto_malloc(0x1000);
 	memset(pandora_spriteram,0x00, 0x1000);
 
-	pandora_sprites_bitmap = video_screen_auto_bitmap_alloc(Machine->primary_screen);
+	pandora_sprites_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	pandora_clear_bitmap = 1;
 }
 

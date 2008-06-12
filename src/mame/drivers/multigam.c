@@ -555,13 +555,13 @@ GFXDECODE_END
 static MACHINE_RESET( multigam )
 {
 	/* reset the ppu */
-	ppu2c0x_reset( 0, 1 );
+	ppu2c0x_reset( machine, 0, 1 );
 }
 
 static MACHINE_RESET( multigm3 )
 {
 	/* reset the ppu */
-	ppu2c0x_reset( 0, 1 );
+	ppu2c0x_reset( machine, 0, 1 );
 	multigm3_switch_prg_rom(machine, 0, 0x01 );
 };
 

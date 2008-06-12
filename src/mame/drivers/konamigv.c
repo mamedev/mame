@@ -319,7 +319,7 @@ static DRIVER_INIT( konamigv )
 
 static MACHINE_RESET( konamigv )
 {
-	psx_machine_init();
+	psx_machine_init(machine);
 
 	/* also hook up CDDA audio to the CD-ROM drive */
 	cdda_set_cdrom(0, am53cf96_get_device(SCSI_ID_4));

@@ -11,7 +11,7 @@ VIDEO_START( galpanic )
 	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	sprites_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	pandora_start(0,0, -16);
+	pandora_start(machine,0,0, -16);
 }
 
 PALETTE_INIT( galpanic )

@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "deco16ic.h"
 
 static int twocrude_pri;
@@ -19,7 +18,7 @@ static int bank_callback(const int bank)
 
 VIDEO_START( twocrude )
 {
-	deco16_2_video_init(0);
+	deco16_2_video_init(machine, 0);
 
 	deco16_set_tilemap_bank_callback(0, bank_callback);
 	deco16_set_tilemap_bank_callback(1, bank_callback);
@@ -34,7 +33,7 @@ VIDEO_START( twocrude )
 
 /******************************************************************************/
 
-static void update_24bitcol(int offset)
+static void update_24bitcol(running_machine *machine, int offset)
 {
 	UINT8 r,g,b; /* The highest palette value seems to be 0x8e */
 
@@ -42,19 +41,19 @@ static void update_24bitcol(int offset)
 	g = (UINT8)((float)((paletteram16[offset] >> 8) & 0xff)*1.75);
 	b = (UINT8)((float)((paletteram16_2[offset] >> 0) & 0xff)*1.75);
 
-	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 }
 
 WRITE16_HANDLER( twocrude_palette_24bit_rg_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	update_24bitcol(offset);
+	update_24bitcol(machine, offset);
 }
 
 WRITE16_HANDLER( twocrude_palette_24bit_b_w )
 {
 	COMBINE_DATA(&paletteram16_2[offset]);
-	update_24bitcol(offset);
+	update_24bitcol(machine, offset);
 }
 
 /******************************************************************************/

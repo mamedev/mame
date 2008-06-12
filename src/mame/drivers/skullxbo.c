@@ -68,7 +68,7 @@ static void alpha_row_update(const device_config *screen, int scanline)
 	}
 
 	/* update the playfield and motion objects */
-	skullxbo_scanline_update(scanline);
+	skullxbo_scanline_update(screen->machine, scanline);
 }
 
 

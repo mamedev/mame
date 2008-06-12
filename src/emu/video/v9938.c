@@ -751,7 +751,7 @@ static void v9938_register_write (int reg, int data)
 	vdp->contReg[reg] = data;
 }
 
- static UINT8 v9938_status_r(void)
+ static UINT8 v9938_status_r(running_machine *machine)
 	{
 	int reg;
 	UINT8 ret;
@@ -785,7 +785,7 @@ static void v9938_register_write (int reg, int data)
             if ( (n < 28) || (n > 199) ) vdp.statReg[2] |= 0x20;
             else vdp.statReg[2] &= ~0x20;
 */
-			if (mame_rand(Machine) & 1) vdp->statReg[2] |= 0x20;
+			if (mame_rand(machine) & 1) vdp->statReg[2] |= 0x20;
 			else vdp->statReg[2] &= ~0x20;
 			ret = vdp->statReg[2];
 			break;
@@ -825,13 +825,13 @@ static void v9938_register_write (int reg, int data)
 READ8_HANDLER( v9938_0_status_r )
 {
 	vdp = &vdps[0];
-	return v9938_status_r();
+	return v9938_status_r(machine);
 }
 
 READ8_HANDLER( v9938_1_status_r )
 {
 	vdp = &vdps[1];
-	return v9938_status_r();
+	return v9938_status_r(machine);
 }
 
 /***************************************************************************

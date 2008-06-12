@@ -8,7 +8,6 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 
 #define	VRAM_MAX	2
@@ -42,8 +41,8 @@ static UINT8 *nbmj9195_palette, *nbmj9195_nb22090_palette;
 static UINT8 *nbmj9195_clut[VRAM_MAX];
 
 
-static void nbmj9195_vramflip(int vram);
-static void nbmj9195_gfxdraw(int vram);
+static void nbmj9195_vramflip(running_machine *machine, int vram);
+static void nbmj9195_gfxdraw(running_machine *machine, int vram);
 
 
 /******************************************************************************
@@ -114,7 +113,7 @@ static int nbmj9195_blitter_r(int vram, int offset)
 	return ret;
 }
 
-static void nbmj9195_blitter_w(int vram, int offset, int data)
+static void nbmj9195_blitter_w(running_machine *machine, int vram, int offset, int data)
 {
 	int new_line;
 
@@ -128,11 +127,11 @@ static void nbmj9195_blitter_w(int vram, int offset, int data)
 				//  if (data & 0x20) popmessage("Unknown GFX Flag!! (0x20)");
 					nbmj9195_flipscreen[vram] = (data & 0x40) ? 0 : 1;
 					nbmj9195_dispflag[vram] = (data & 0x80) ? 1 : 0;
-					nbmj9195_vramflip(vram);
+					nbmj9195_vramflip(machine, vram);
 					break;
 		case 0x01:	nbmj9195_scrollx[vram] = (nbmj9195_scrollx[vram] & 0x0100) | data; break;
 		case 0x02:	nbmj9195_scrollx[vram] = (nbmj9195_scrollx[vram] & 0x00ff) | ((data << 8) & 0x0100);
-					new_line = video_screen_get_vpos(Machine->primary_screen);
+					new_line = video_screen_get_vpos(machine->primary_screen);
 					if (nbmj9195_flipscreen[vram])
 					{
 						for ( ; nbmj9195_scanline[vram] < new_line; nbmj9195_scanline[vram]++)
@@ -155,7 +154,7 @@ static void nbmj9195_blitter_w(int vram, int offset, int data)
 		case 0x0b:	blitter_destx[vram] = (blitter_destx[vram]  & 0x00ff) | (data << 8); break;
 		case 0x0c:	blitter_desty[vram] = (blitter_desty[vram]  & 0xff00) | data; break;
 		case 0x0d:	blitter_desty[vram] = (blitter_desty[vram]  & 0x00ff) | (data << 8);
-					nbmj9195_gfxdraw(vram);
+					nbmj9195_gfxdraw(machine, vram);
 					break;
 		default:	break;
 	}
@@ -180,13 +179,13 @@ void nbmj9195_gfxflag2_w(int data)
 
 
 ******************************************************************************/
-static void nbmj9195_vramflip(int vram)
+static void nbmj9195_vramflip(running_machine *machine, int vram)
 {
 	static int nbmj9195_flipscreen_old[VRAM_MAX] = { 0, 0 };
 	int x, y;
 	UINT16 color1, color2;
-	int width = video_screen_get_width(Machine->primary_screen);
-	int height = video_screen_get_height(Machine->primary_screen);
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 
 	if (nbmj9195_flipscreen[vram] == nbmj9195_flipscreen_old[vram]) return;
 
@@ -219,9 +218,9 @@ static void nbmj9195_vramflip(int vram)
 	nbmj9195_screen_refresh = 1;
 }
 
-static void update_pixel(int vram, int x, int y)
+static void update_pixel(running_machine *machine, int vram, int x, int y)
 {
-	UINT16 color = nbmj9195_videoram[vram][(y * video_screen_get_width(Machine->primary_screen)) + x];
+	UINT16 color = nbmj9195_videoram[vram][(y * video_screen_get_width(machine->primary_screen)) + x];
 	*BITMAP_ADDR16(nbmj9195_tmpbitmap[vram], y, x) = color;
 }
 
@@ -230,10 +229,10 @@ static TIMER_CALLBACK( blitter_timer_callback )
 	nb19010_busyflag = 1;
 }
 
-static void nbmj9195_gfxdraw(int vram)
+static void nbmj9195_gfxdraw(running_machine *machine, int vram)
 {
 	UINT8 *GFX = memory_region(REGION_GFX1);
-	int width = video_screen_get_width(Machine->primary_screen);
+	int width = video_screen_get_width(machine->primary_screen);
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -366,12 +365,12 @@ static void nbmj9195_gfxdraw(int vram)
 			if (((color1 & 0x00ff) != 0x00ff) || (!nbmj9195_transparency[vram]))
 			{
 				nbmj9195_videoram[vram][(dy * width) + dx1] = color1;
-				update_pixel(vram, dx1, dy);
+				update_pixel(machine, vram, dx1, dy);
 			}
 			if (((color2 & 0x00ff) != 0x00ff) || (!nbmj9195_transparency[vram]))
 			{
 				nbmj9195_videoram[vram][(dy * width) + dx2] = color2;
-				update_pixel(vram, dx2, dy);
+				update_pixel(machine, vram, dx2, dy);
 			}
 
 			nb19010_busyctr++;
@@ -394,8 +393,8 @@ static void nbmj9195_gfxdraw(int vram)
 
 
 ******************************************************************************/
-WRITE8_HANDLER( nbmj9195_blitter_0_w )	{ nbmj9195_blitter_w(0, offset, data); }
-WRITE8_HANDLER( nbmj9195_blitter_1_w )	{ nbmj9195_blitter_w(1, offset, data); }
+WRITE8_HANDLER( nbmj9195_blitter_0_w )	{ nbmj9195_blitter_w(machine, 0, offset, data); }
+WRITE8_HANDLER( nbmj9195_blitter_1_w )	{ nbmj9195_blitter_w(machine, 1, offset, data); }
 
 READ8_HANDLER( nbmj9195_blitter_0_r )	{ return nbmj9195_blitter_r(0, offset); }
 READ8_HANDLER( nbmj9195_blitter_1_r )	{ return nbmj9195_blitter_r(1, offset); }
@@ -484,10 +483,10 @@ VIDEO_UPDATE( nbmj9195 )
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
 			{
-				update_pixel(0, x, y);
+				update_pixel(screen->machine, 0, x, y);
 
 				if (gfxdraw_mode)
-					update_pixel(1, x, y);
+					update_pixel(screen->machine, 1, x, y);
 			}
 	}
 

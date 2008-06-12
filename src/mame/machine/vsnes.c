@@ -223,7 +223,7 @@ MACHINE_RESET( vsnes )
 	input_latch[2] = input_latch[3] = 0;
 
 	/* reset the ppu */
-	ppu2c0x_reset( 0, 1 );
+	ppu2c0x_reset( machine, 0, 1 );
 
 	/* if we need to remap, install the callback */
 	if ( remapped_colortable )
@@ -241,8 +241,8 @@ MACHINE_RESET( vsdual )
 	input_latch[2] = input_latch[3] = 0;
 
 	/* reset the ppu */
-	ppu2c0x_reset( 0,1);
-	ppu2c0x_reset( 1,1 );
+	ppu2c0x_reset( machine,0,1 );
+	ppu2c0x_reset( machine,1,1 );
 
 	/* if we need to remap, install the callback */
 	if ( remapped_colortable )

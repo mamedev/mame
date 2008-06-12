@@ -947,7 +947,7 @@ static void artifacts_txt(UINT8 * src, UINT8 * dst, int width)
 }
 
 
-static void antic_linerefresh(void)
+static void antic_linerefresh(running_machine *machine)
 {
 	int x, y;
 	UINT8 *src;
@@ -955,7 +955,7 @@ static void antic_linerefresh(void)
 	UINT32 scanline[4 + (HCHARS * 2) + 4];
 
 	/* increment the scanline */
-    if( ++antic.scanline == video_screen_get_height(Machine->primary_screen) )
+    if( ++antic.scanline == video_screen_get_height(machine->primary_screen) )
     {
         /* and return to the top if the frame was complete */
         antic.scanline = 0;
@@ -1055,14 +1055,14 @@ static void antic_linerefresh(void)
 	draw_scanline8(tmpbitmap, 12, y, sizeof(scanline), (const UINT8 *) scanline, NULL, -1);
 }
 
-static int cycle(void)
+static int cycle(running_machine *machine)
 {
-	return video_screen_get_hpos(Machine->primary_screen) * CYCLES_PER_LINE / video_screen_get_width(Machine->primary_screen);
+	return video_screen_get_hpos(machine->primary_screen) * CYCLES_PER_LINE / video_screen_get_width(machine->primary_screen);
 }
 
-static void after(int cycles, timer_fired_func function, const char *funcname)
+static void after(running_machine *machine, int cycles, timer_fired_func function, const char *funcname)
 {
-    attotime duration = attotime_make(0, attotime_to_attoseconds(video_screen_get_scan_period(Machine->primary_screen)) * cycles / CYCLES_PER_LINE);
+    attotime duration = attotime_make(0, attotime_to_attoseconds(video_screen_get_scan_period(machine->primary_screen)) * cycles / CYCLES_PER_LINE);
     (void)funcname;
 	LOG(("           after %3d (%5.1f us) %s\n", cycles, attotime_to_double(duration) * 1.0e6, funcname));
 	timer_set(duration, NULL, 0, function);
@@ -1072,13 +1072,13 @@ static TIMER_CALLBACK( antic_issue_dli )
 {
 	if( antic.w.nmien & DLI_NMI )
 	{
-		LOG(("           @cycle #%3d issue DLI\n", cycle()));
+		LOG(("           @cycle #%3d issue DLI\n", cycle(machine)));
 		antic.r.nmist |= DLI_NMI;
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 	{
-		LOG(("           @cycle #%3d DLI not enabled\n", cycle()));
+		LOG(("           @cycle #%3d DLI not enabled\n", cycle(machine)));
     }
 }
 
@@ -1138,21 +1138,21 @@ static const atari_renderer_func renderer[2][19][5] = {
  *****************************************************************************/
 static TIMER_CALLBACK( antic_line_done )
 {
-	LOG(("           @cycle #%3d antic_line_done\n", cycle()));
+	LOG(("           @cycle #%3d antic_line_done\n", cycle(machine)));
 	if( antic.w.wsync )
     {
-		LOG(("           @cycle #%3d release WSYNC\n", cycle()));
+		LOG(("           @cycle #%3d release WSYNC\n", cycle(machine)));
         /* release the CPU if it was actually waiting for HSYNC */
         cpu_trigger(machine, TRIGGER_HSYNC);
         /* and turn off the 'wait for hsync' flag */
         antic.w.wsync = 0;
     }
-	LOG(("           @cycle #%3d release CPU\n", cycle()));
+	LOG(("           @cycle #%3d release CPU\n", cycle(machine)));
     /* release the CPU (held for emulating cycles stolen by ANTIC DMA) */
 	cpu_trigger(machine, TRIGGER_STEAL);
 
 	/* refresh the display (translate color clocks to pixels) */
-    antic_linerefresh();
+    antic_linerefresh(machine);
 }
 
 /*****************************************************************************
@@ -1166,8 +1166,8 @@ static TIMER_CALLBACK( antic_line_done )
  *****************************************************************************/
 static TIMER_CALLBACK( antic_steal_cycles )
 {
-	LOG(("           @cycle #%3d steal %d cycles\n", cycle(), antic.steal_cycles));
-	after(antic.steal_cycles, antic_line_done, "antic_line_done");
+	LOG(("           @cycle #%3d steal %d cycles\n", cycle(machine), antic.steal_cycles));
+	after(machine, antic.steal_cycles, antic_line_done, "antic_line_done");
     antic.steal_cycles = 0;
 	cpunum_spinuntil_trigger( 0, TRIGGER_STEAL );
 }
@@ -1184,7 +1184,7 @@ static TIMER_CALLBACK( antic_steal_cycles )
 static TIMER_CALLBACK( antic_scanline_render )
 {
 	VIDEO *video = antic.video[antic.scanline];
-	LOG(("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(), (antic.cmd & 0x0f), antic.modelines));
+	LOG(("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(machine), (antic.cmd & 0x0f), antic.modelines));
 
     (*antic_renderer)(video);
 
@@ -1236,7 +1236,7 @@ static TIMER_CALLBACK( antic_scanline_render )
 
     antic.steal_cycles += CYCLES_REFRESH;
 	LOG(("           run CPU for %d cycles\n", CYCLES_HSYNC - CYCLES_HSTART - antic.steal_cycles));
-	after(CYCLES_HSYNC - CYCLES_HSTART - antic.steal_cycles, antic_steal_cycles, "antic_steal_cycles");
+	after(machine, CYCLES_HSYNC - CYCLES_HSTART - antic.steal_cycles, antic_steal_cycles, "antic_steal_cycles");
 }
 
 
@@ -1273,9 +1273,9 @@ INLINE void LMS(int new_cmd)
  *  if so, read a new command and set up the renderer function
  *
  *****************************************************************************/
-static void antic_scanline_dma(int param)
+static void antic_scanline_dma(running_machine *machine, int param)
 {
-	LOG(("           @cycle #%3d DMA fetch\n", cycle()));
+	LOG(("           @cycle #%3d DMA fetch\n", cycle(machine)));
 	if (antic.scanline == VBL_END)
 		antic.r.nmist &= ~VBL_NMI;
     if( antic.w.dmactl & DMA_ANTIC )
@@ -1346,7 +1346,7 @@ static void antic_scanline_dma(int param)
 					{
 						/* remove the DLI bit */
 						new_cmd &= ~ANTIC_DLI;
-						after(CYCLES_DLI_NMI, antic_issue_dli, "antic_issue_dli");
+						after(machine, CYCLES_DLI_NMI, antic_issue_dli, "antic_issue_dli");
 					}
 					/* load memory scan bit set ? */
 					if( new_cmd & ANTIC_LMS )
@@ -1359,7 +1359,7 @@ static void antic_scanline_dma(int param)
                         /* produce empty scanlines until vblank start */
 						antic.modelines = VBL_START + 1 - antic.scanline;
 						if( antic.modelines < 0 )
-							antic.modelines = video_screen_get_height(Machine->primary_screen) - antic.scanline;
+							antic.modelines = video_screen_get_height(machine->primary_screen) - antic.scanline;
 						LOG(("           JVB $%04x\n", antic.dpage|antic.doffs));
 					}
 					else
@@ -1478,9 +1478,9 @@ static void antic_scanline_dma(int param)
 
 	antic.r.nmist &= ~DLI_NMI;
 	if( antic.modelines == 1 && (antic.cmd & antic.w.nmien & DLI_NMI) )
-		after(CYCLES_DLI_NMI, antic_issue_dli, "antic_issue_dli");
+		after(machine, CYCLES_DLI_NMI, antic_issue_dli, "antic_issue_dli");
 
-	after(CYCLES_HSTART, antic_scanline_render, "antic_scanline_render");
+	after(machine, CYCLES_HSTART, antic_scanline_render, "antic_scanline_render");
 }
 
 /*****************************************************************************
@@ -1496,11 +1496,11 @@ static void generic_atari_interrupt(running_machine *machine, void (*handle_keyb
 {
 	int button_port, i;
 
-	LOG(("ANTIC #%3d @cycle #%d scanline interrupt\n", antic.scanline, cycle()));
+	LOG(("ANTIC #%3d @cycle #%d scanline interrupt\n", antic.scanline, cycle(machine)));
 
     if( antic.scanline < VBL_START )
     {
-		antic_scanline_dma(0);
+		antic_scanline_dma(machine, 0);
 		return;
     }
 
@@ -1537,7 +1537,7 @@ static void generic_atari_interrupt(running_machine *machine, void (*handle_keyb
     }
 
 	/* refresh the display (translate color clocks to pixels) */
-    antic_linerefresh();
+    antic_linerefresh(machine);
 }
 
 

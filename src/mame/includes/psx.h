@@ -13,7 +13,7 @@ VIDEO_START( psx_type1 );
 VIDEO_START( psx_type2 );
 VIDEO_UPDATE( psx );
 INTERRUPT_GEN( psx_vblank );
-extern void psx_gpu_reset( void );
+extern void psx_gpu_reset( running_machine *machine );
 extern void psx_gpu_read( UINT32 *p_ram, INT32 n_size );
 extern void psx_gpu_write( UINT32 *p_ram, INT32 n_size );
 READ32_HANDLER( psx_gpu_r );
@@ -53,7 +53,7 @@ extern void psx_sio_input( running_machine *, int, int, int );
 
 WRITE32_HANDLER( psx_mdec_w );
 READ32_HANDLER( psx_mdec_r );
-extern void psx_machine_init( void );
+extern void psx_machine_init( running_machine *machine );
 extern void psx_driver_init( running_machine *machine );
 
 #define PSX_H ( 1 )

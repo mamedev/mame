@@ -120,7 +120,7 @@ VIDEO_START( airbustr )
 
 	sprites_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-	pandora_start(1,0,0);
+	pandora_start(machine,1,0,0);
 
 	tilemap_set_scrolldx(bg_tilemap, 0x094, 0x06a);
 	tilemap_set_scrolldy(bg_tilemap, 0x100, 0x1ff);

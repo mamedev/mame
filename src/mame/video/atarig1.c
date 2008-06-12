@@ -117,7 +117,7 @@ VIDEO_START( atarig1 )
 	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_rows,  8,8, 64,64);
 
 	/* initialize the motion objects */
-	atarirle_init(0, atarig1_pitfight ? &modesc_pitfight : &modesc_hydra);
+	atarirle_init(machine, 0, atarig1_pitfight ? &modesc_pitfight : &modesc_hydra);
 
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);

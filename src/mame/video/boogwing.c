@@ -117,7 +117,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		while (multi >= 0)
 		{
-			deco16_pdrawgfx(bitmap,machine->gfx[gfx_region],
+			deco16_pdrawgfx(machine,
+					bitmap,machine->gfx[gfx_region],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
@@ -144,7 +145,7 @@ static int boogwing_bank_callback2(const int bank)
 
 VIDEO_START(boogwing)
 {
-	deco16_2_video_init(0);
+	deco16_2_video_init(machine, 0);
 
 	deco16_set_tilemap_bank_callback(1,boogwing_bank_callback);
 	deco16_set_tilemap_bank_callback(2,boogwing_bank_callback2);

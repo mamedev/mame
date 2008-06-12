@@ -95,7 +95,6 @@ Todo:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/dec0.h"
 
 static tilemap *pf1_tilemap_0,*pf1_tilemap_1,*pf1_tilemap_2;
@@ -123,7 +122,7 @@ WRITE16_HANDLER( dec0_update_sprites_w )
 
 /******************************************************************************/
 
-static void update_24bitcol(int offset)
+static void update_24bitcol(running_machine *machine, int offset)
 {
 	int r,g,b;
 
@@ -131,19 +130,19 @@ static void update_24bitcol(int offset)
 	g = (paletteram16[offset] >> 8) & 0xff;
 	b = (paletteram16_2[offset] >> 0) & 0xff;
 
-	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 }
 
 WRITE16_HANDLER( dec0_paletteram_rg_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	update_24bitcol(offset);
+	update_24bitcol(machine, offset);
 }
 
 WRITE16_HANDLER( dec0_paletteram_b_w )
 {
 	COMBINE_DATA(&paletteram16_2[offset]);
-	update_24bitcol(offset);
+	update_24bitcol(machine, offset);
 }
 
 /******************************************************************************/

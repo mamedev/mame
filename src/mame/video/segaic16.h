@@ -14,7 +14,7 @@ extern UINT16 *segaic16_roadram_0;
 extern UINT16 *segaic16_rotateram_0;
 
 /* misc functions */
-void segaic16_set_display_enable(int enable);
+void segaic16_set_display_enable(running_machine *machine, int enable);
 
 /* palette handling */
 void segaic16_palette_init(int entries);

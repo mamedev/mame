@@ -91,7 +91,7 @@ static VIDEO_UPDATE( snowbros )
 
 static VIDEO_START( snowbros )
 {
-	pandora_start(0,0,0);
+	pandora_start(machine,0,0,0);
 }
 
 static VIDEO_EOF( snowbros )

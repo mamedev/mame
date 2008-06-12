@@ -522,7 +522,7 @@ UINT32 dma_offset;
 
 static INTERRUPT_GEN( naomi_vblank )
 {
-	dc_vblank();
+	dc_vblank(machine);
 }
 
 static READ64_HANDLER( naomi_arm_r )

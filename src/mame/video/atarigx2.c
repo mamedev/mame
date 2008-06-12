@@ -126,7 +126,7 @@ VIDEO_START( atarigx2 )
 	adjusted_modesc.palettebase = atarigx2_motion_object_base;
 	for (i = 0; i < 8; i++)
 		adjusted_modesc.colormask.data[i] &= atarigx2_motion_object_mask;
-	atarirle_init(0, &adjusted_modesc);
+	atarirle_init(machine, 0, &adjusted_modesc);
 
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);

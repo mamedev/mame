@@ -106,8 +106,8 @@ extern int vball_gfxset;
 
 VIDEO_START( vb );
 VIDEO_UPDATE( vb );
-extern void vb_bgprombank_w(int bank);
-extern void vb_spprombank_w(int bank);
+extern void vb_bgprombank_w(running_machine *machine, int bank);
+extern void vb_spprombank_w(running_machine *machine, int bank);
 extern WRITE8_HANDLER( vb_attrib_w );
 extern WRITE8_HANDLER( vb_videoram_w );
 extern void vb_mark_all_dirty(void);
@@ -161,8 +161,8 @@ static WRITE8_HANDLER( vb_scrollx_hi_w )
 {
 	flip_screen_set(~data&1);
 	vb_scrollx_hi = (data & 0x02) << 7;
-	vb_bgprombank_w((data >> 2)&0x07);
-	vb_spprombank_w((data >> 5)&0x07);
+	vb_bgprombank_w(machine, (data >> 2)&0x07);
+	vb_spprombank_w(machine, (data >> 5)&0x07);
 	//logerror("%04x: vb_scrollx_hi = %d\n",activecpu_get_previouspc(), vb_scrollx_hi);
 }
 

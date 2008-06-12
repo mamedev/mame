@@ -46,7 +46,6 @@ sprite RAM
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "taitoic.h"
 
 
@@ -97,7 +96,7 @@ VIDEO_START( dleague )
   Screen refresh
 ***************************************************************************/
 
-static void syvalion_draw_sprites(bitmap_t *bitmap,const rectangle *cliprect)
+static void syvalion_draw_sprites(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect)
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
@@ -171,7 +170,7 @@ static void syvalion_draw_sprites(bitmap_t *bitmap,const rectangle *cliprect)
 							flipy ^= 0x0080;
 						}
 
-						drawgfxzoom( bitmap, Machine -> gfx[0],
+						drawgfxzoom( bitmap, machine -> gfx[0],
 								 tile,
 								 color,
 								 flipx, flipy,
@@ -190,7 +189,7 @@ static void syvalion_draw_sprites(bitmap_t *bitmap,const rectangle *cliprect)
 	}
 }
 
-static void recordbr_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int priority)
+static void recordbr_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
@@ -283,7 +282,7 @@ static void recordbr_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, i
 							flipy ^= 0x0080;
 						}
 
-						drawgfxzoom( bitmap, Machine -> gfx[0],
+						drawgfxzoom( bitmap, machine -> gfx[0],
 								 tile,
 								 color,
 								 flipx, flipy,
@@ -302,7 +301,7 @@ static void recordbr_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, i
 	}
 }
 
-static void dleague_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int priority)
+static void dleague_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
@@ -384,7 +383,7 @@ static void dleague_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, in
 								flipy ^= 0x0080;
 							}
 
-							drawgfxzoom( bitmap, Machine -> gfx[0],
+							drawgfxzoom( bitmap, machine -> gfx[0],
 									 tile,
 									 color,
 									 flipx, flipy,
@@ -431,7 +430,7 @@ VIDEO_UPDATE( syvalion )
 
 	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
 	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
-	syvalion_draw_sprites(bitmap,cliprect);
+	syvalion_draw_sprites(screen->machine,bitmap,cliprect);
 	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,2,0,0);
 	return 0;
 }
@@ -451,16 +450,16 @@ VIDEO_UPDATE( recordbr )
 	if ( !input_code_pressed(KEYCODE_A) )
 		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
 	if ( !input_code_pressed(KEYCODE_S) )
-		recordbr_draw_sprites(bitmap,cliprect,0);
+		recordbr_draw_sprites(screen->machine,bitmap,cliprect,0);
 	if ( !input_code_pressed(KEYCODE_D) )
 		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
 	if ( !input_code_pressed(KEYCODE_F) )
-		recordbr_draw_sprites(bitmap,cliprect,1);
+		recordbr_draw_sprites(screen->machine,bitmap,cliprect,1);
 #else
 	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
-	recordbr_draw_sprites(bitmap,cliprect,0);
+	recordbr_draw_sprites(screen->machine,bitmap,cliprect,0);
 	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
-	recordbr_draw_sprites(bitmap,cliprect,1);
+	recordbr_draw_sprites(screen->machine,bitmap,cliprect,1);
 #endif
 
 	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,2,0,0);
@@ -482,16 +481,16 @@ VIDEO_UPDATE( dleague )
 	if ( !input_code_pressed(KEYCODE_A) )
 		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
 	if ( !input_code_pressed(KEYCODE_S) )
-		dleague_draw_sprites(bitmap,cliprect,0);
+		dleague_draw_sprites(screen->machine,bitmap,cliprect,0);
 	if ( !input_code_pressed(KEYCODE_D) )
 		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
 	if ( !input_code_pressed(KEYCODE_F) )
-		dleague_draw_sprites(bitmap,cliprect,1);
+		dleague_draw_sprites(screen->machine,bitmap,cliprect,1);
 #else
 	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
-	dleague_draw_sprites (bitmap,cliprect,0);
+	dleague_draw_sprites (screen->machine,bitmap,cliprect,0);
 	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
-	dleague_draw_sprites (bitmap,cliprect,1);
+	dleague_draw_sprites (screen->machine,bitmap,cliprect,1);
 #endif
 
 	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,2,0,0);

@@ -100,7 +100,7 @@ WRITE8_HANDLER( irobot_statwr_w )
 	irobot_combase_mb = comRAM[(data >> 7) ^ 1];
 	irobot_bufsel = data & 0x02;
 	if (((data & 0x01) == 0x01) && (irobot_vg_clear == 0))
-		irobot_poly_clear();
+		irobot_poly_clear(machine);
 
 	irobot_vg_clear = data & 0x01;
 

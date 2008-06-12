@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 
 
@@ -137,10 +136,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-INLINE void changecolor_RRRRGGGGBBBBxxxx(int color,int indx)
+INLINE void changecolor_RRRRGGGGBBBBxxxx(running_machine *machine, int color,int indx)
 {
 	int data = paletteram[2*indx | 1] | (paletteram[2*indx] << 8);
-	palette_set_color_rgb(Machine,color,pal4bit(data >> 12),pal4bit(data >> 8),pal4bit(data >> 4));
+	palette_set_color_rgb(machine,color,pal4bit(data >> 12),pal4bit(data >> 8),pal4bit(data >> 4));
 }
 
 VIDEO_UPDATE( citycon )
@@ -155,7 +154,7 @@ VIDEO_UPDATE( citycon )
 		int i;
 
 		for (i = 0;i < 4;i++)
-			changecolor_RRRRGGGGBBBBxxxx(640 + 4*offs + i,512 + 4*indx + i);
+			changecolor_RRRRGGGGBBBBxxxx(screen->machine, 640 + 4*offs + i,512 + 4*indx + i);
 	}
 
 

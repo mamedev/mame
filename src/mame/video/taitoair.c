@@ -46,7 +46,6 @@ sprite RAM
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "taitoic.h"
 
 
@@ -87,7 +86,7 @@ VIDEO_START( taitoair )
   Screen refresh
 ***************************************************************************/
 
-static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int priority)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
@@ -180,7 +179,7 @@ static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int priori
 							flipy ^= 0x0080;
 						}
 
-						drawgfxzoom( bitmap, Machine -> gfx[0],
+						drawgfxzoom( bitmap, machine -> gfx[0],
 								 tile,
 								 color,
 								 flipx, flipy,
@@ -372,16 +371,16 @@ VIDEO_UPDATE( taitoair )
 	if ( !input_code_pressed(KEYCODE_A) )
 		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,0,0);
 	if ( !input_code_pressed(KEYCODE_S) )
-		draw_sprites(bitmap,cliprect,0);
+		draw_sprites(screen->machine,bitmap,cliprect,0);
 	if ( !input_code_pressed(KEYCODE_D) )
 		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
 	if ( !input_code_pressed(KEYCODE_F) )
-		draw_sprites(bitmap,cliprect,1);
+		draw_sprites(screen->machine,bitmap,cliprect,1);
 #else
 	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,0,0);
-	draw_sprites (bitmap,cliprect,0);
+	draw_sprites (screen->machine,bitmap,cliprect,0);
 	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
-	draw_sprites (bitmap,cliprect,1);
+	draw_sprites (screen->machine,bitmap,cliprect,1);
 #endif
 
 	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,2,0,0);

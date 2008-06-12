@@ -1,7 +1,7 @@
 /* video hardware for Namco System II */
 
 #include "driver.h"
-#include "deprecat.h"
+
 #include "namcos2.h"
 #include "namcoic.h"
 
@@ -254,11 +254,11 @@ GetPaletteRegister( int which )
 }
 
 int
-namcos2_GetPosIrqScanline( void )
+namcos2_GetPosIrqScanline( running_machine *machine )
 {
 	/* PaleteRegister(4)? used by Finest Hour; pc=0x356e */
 	int scanline = GetPaletteRegister(5) - 34;
-	int height = video_screen_get_height(Machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 	if( scanline<0 )
 		scanline = 0;
 	else if( scanline > height )
@@ -268,7 +268,7 @@ namcos2_GetPosIrqScanline( void )
 } /* namcos2_GetPosIrqScanline */
 
 static void
-UpdatePalette( void )
+UpdatePalette( running_machine *machine )
 {
 	int bank;
 	for( bank=0; bank<0x20; bank++ )
@@ -281,7 +281,7 @@ UpdatePalette( void )
 			int r = namcos2_68k_palette_ram[offset | 0x0000] & 0x00ff;
 			int g = namcos2_68k_palette_ram[offset | 0x0800] & 0x00ff;
 			int b = namcos2_68k_palette_ram[offset | 0x1000] & 0x00ff;
-			palette_set_color(Machine,pen++,MAKE_RGB(r,g,b));
+			palette_set_color(machine,pen++,MAKE_RGB(r,g,b));
 			offset++;
 		}
 	}
@@ -290,7 +290,7 @@ UpdatePalette( void )
 /**************************************************************************/
 
 static void
-DrawSpriteInit( void )
+DrawSpriteInit( running_machine *machine )
 {
 	int i;
 	/* set table for sprite color == 0x0f */
@@ -302,7 +302,7 @@ DrawSpriteInit( void )
 	gfx_drawmode_table[255] = DRAWMODE_NONE;
 	for( i = 0; i<16*256; i++ )
 	{
-		Machine->shadow_table[i] = i+0x2000;
+		machine->shadow_table[i] = i+0x2000;
 	}
 }
 
@@ -323,7 +323,7 @@ VIDEO_START( namcos2 )
 	namco_tilemap_init(2,memory_region(REGION_GFX4),TilemapCB);
 	tilemap_roz = tilemap_create(get_tile_info_roz,tilemap_scan_rows,8,8,256,256);
 	tilemap_set_transparent_pen(tilemap_roz,0xff);
-	DrawSpriteInit();
+	DrawSpriteInit(machine);
 }
 
 static void
@@ -345,7 +345,7 @@ VIDEO_UPDATE( namcos2_default )
 	rectangle clip;
 	int pri;
 
-	UpdatePalette();
+	UpdatePalette(screen->machine);
 	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
 	ApplyClip( &clip, cliprect );
 
@@ -373,7 +373,7 @@ VIDEO_UPDATE( namcos2_default )
 VIDEO_START( finallap )
 {
 	namco_tilemap_init(2,memory_region(REGION_GFX4),TilemapCB);
-	DrawSpriteInit();
+	DrawSpriteInit(machine);
 	namco_road_init(machine, 3);
 }
 
@@ -382,7 +382,7 @@ VIDEO_UPDATE( finallap )
 	rectangle clip;
 	int pri;
 
-	UpdatePalette();
+	UpdatePalette(screen->machine);
 	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
 	ApplyClip( &clip, cliprect );
 
@@ -419,7 +419,7 @@ VIDEO_UPDATE( luckywld )
 	rectangle clip;
 	int pri;
 
-	UpdatePalette();
+	UpdatePalette(screen->machine);
 	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
 	ApplyClip( &clip, cliprect );
 
@@ -452,7 +452,7 @@ VIDEO_UPDATE( sgunner )
 	rectangle clip;
 	int pri;
 
-	UpdatePalette();
+	UpdatePalette(screen->machine);
 	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
 	ApplyClip( &clip, cliprect );
 
@@ -478,7 +478,7 @@ VIDEO_UPDATE( metlhawk )
 	rectangle clip;
 	int pri;
 
-	UpdatePalette();
+	UpdatePalette(screen->machine);
 	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
 	ApplyClip( &clip, cliprect );
 

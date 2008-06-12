@@ -85,7 +85,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_START(supbtime)
 {
-	deco16_1_video_init();
+	deco16_1_video_init(machine);
 }
 
 VIDEO_UPDATE(supbtime)

@@ -362,7 +362,7 @@ static MACHINE_START( konamigq )
 
 static MACHINE_RESET( konamigq )
 {
-	psx_machine_init();
+	psx_machine_init(machine);
 	tms57002_init();
 }
 

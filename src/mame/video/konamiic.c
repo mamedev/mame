@@ -1149,7 +1149,6 @@ Registers (word-wise):
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 
 #define VERBOSE 0
@@ -7486,14 +7485,14 @@ void K053250_set_LayerOffset(int chip, int offsx, int offsy)
 
 // The DMA process should be instantaneous but since rendering in MAME is performed at VIDEO_UPDATE()
 // the K053250 memory must be buffered to maintain visual integrity.
-void K053250_dma(int chip, int limiter)
+void K053250_dma(running_machine *machine, int chip, int limiter)
 {
 	struct K053250_CHIPTAG *chip_ptr;
 	int last_frame, current_frame;
 
 	chip_ptr = &K053250_info.chip[chip];
 
-	current_frame = video_screen_get_frame_number(Machine->primary_screen);
+	current_frame = video_screen_get_frame_number(machine->primary_screen);
 	last_frame = chip_ptr->frame;
 
 	if (limiter && current_frame == last_frame) return; // make sure we only do DMA transfer once per frame
@@ -7554,7 +7553,7 @@ WRITE16_HANDLER( K053250_0_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		// start LVC DMA transfer at the falling edge of control register's bit1
-		if (offset == 4 && !(data & 2) && (K053250_info.chip[0].regs[4] & 2)) K053250_dma(0, 1);
+		if (offset == 4 && !(data & 2) && (K053250_info.chip[0].regs[4] & 2)) K053250_dma(machine, 0, 1);
 
 		K053250_info.chip[0].regs[offset] = data;
 	}
@@ -7587,7 +7586,7 @@ WRITE16_HANDLER( K053250_1_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		// start LVC DMA transfer at the falling edge of control register's bit1
-		if (offset == 4 && !(data & 2) && (K053250_info.chip[1].regs[4] & 2)) K053250_dma(1, 1);
+		if (offset == 4 && !(data & 2) && (K053250_info.chip[1].regs[4] & 2)) K053250_dma(machine, 1, 1);
 
 		K053250_info.chip[1].regs[offset] = data;
 	}

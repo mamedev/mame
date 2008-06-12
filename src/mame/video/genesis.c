@@ -8,7 +8,6 @@
 ***********************************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "genesis.h"
 
 /* in video/segasyse.c */
@@ -50,12 +49,12 @@ static const device_config *genesis_screen;
 ******************************************************************************/
 
 static int  vdp_data_r(void);
-static void vdp_data_w(int data);
-static int  vdp_control_r(void);
-static void vdp_control_w(int data);
-static void vdp_register_w(int data, int vblank);
-static void vdp_control_dma(int data);
-static void vdp_dma_68k(void);
+static void vdp_data_w(running_machine *machine, int data);
+static int  vdp_control_r(running_machine *machine);
+static void vdp_control_w(running_machine *machine, int data);
+static void vdp_register_w(running_machine *machine, int data, int vblank);
+static void vdp_control_dma(running_machine *machine, int data);
+static void vdp_dma_68k(running_machine *machine);
 static void vdp_dma_fill(int);
 static void vdp_dma_copy(void);
 
@@ -170,7 +169,7 @@ static void start_genesis_vdp(const device_config *screen)
 
 	/* reset VDP */
     for (i = 0; i < 24; i++)
-        vdp_register_w(0x8000 | (i << 8) | vdp_init[i], 1);
+        vdp_register_w(screen->machine, 0x8000 | (i << 8) | vdp_init[i], 1);
 	vdp_cmdpart = 0;
 	vdp_code    = 0;
 	vdp_address = 0;
@@ -250,9 +249,9 @@ void system18_vdp_start(running_machine *machine)
 ******************************************************************************/
 
 /* set the display enable bit */
-void segac2_enable_display(int enable)
+void segac2_enable_display(running_machine *machine, int enable)
 {
-	video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 	display_enable = enable;
 }
 
@@ -340,7 +339,7 @@ READ16_HANDLER( genesis_vdp_r )
 
 		case 0x02:	/* Status Register */
 		case 0x03:
-			return vdp_control_r();
+			return vdp_control_r(machine);
 
 		case 0x04:	/* HV counter */
 		case 0x05:
@@ -378,7 +377,7 @@ WRITE16_HANDLER( genesis_vdp_w )
 				 else
 				 	data |= data << 8;
 			}
-			vdp_data_w(data);
+			vdp_data_w(machine, data);
 			break;
 
 		case 0x02:	/* Control Write */
@@ -391,7 +390,7 @@ WRITE16_HANDLER( genesis_vdp_w )
 				 else
 				 	data |= data << 8;
 			}
-			vdp_control_w(data);
+			vdp_control_w(machine, data);
 			break;
 
 		case 0x08:	/* SN76489 Write */
@@ -449,7 +448,7 @@ static int vdp_data_r(void)
 }
 
 
-static void vdp_data_w(int data)
+static void vdp_data_w(running_machine *machine, int data)
 {
 	/* kill 2nd write pending flag */
 	vdp_cmdpart = 0;
@@ -470,7 +469,7 @@ static void vdp_data_w(int data)
 			/* if the hscroll RAM is changing, force an update */
 			if (vdp_address >= vdp_hscrollbase &&
 				vdp_address < vdp_hscrollbase + vdp_hscrollsize)
-				video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+				video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 
 			/* write to VRAM */
 			if (vdp_address & 1)
@@ -482,14 +481,14 @@ static void vdp_data_w(int data)
 		case 0x03:		/* Palette write */
 			{
 				int offset = (vdp_address/2) % CRAM_SIZE;
-				palette_set_color_rgb(Machine, offset + genesis_palette_base, pal3bit(data >> 1), pal3bit(data >> 5), pal3bit(data >> 9));
+				palette_set_color_rgb(machine, offset + genesis_palette_base, pal3bit(data >> 1), pal3bit(data >> 5), pal3bit(data >> 9));
 			}
 			break;
 
 		case 0x05:		/* VSRAM write */
 
 			/* vscroll RAM is changing, force an update */
-			video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 
 			/* write to VSRAM */
 			if (vdp_address & 1)
@@ -543,7 +542,7 @@ static void vdp_data_w(int data)
 
 ******************************************************************************/
 
-static int vdp_control_r(void)
+static int vdp_control_r(running_machine *machine)
 {
 	int status = 0x3600; // wwally needs fifo empty set
 
@@ -551,25 +550,25 @@ static int vdp_control_r(void)
 	vdp_cmdpart = 0;
 
 	/* set the VBLANK bit */
-	if (video_screen_get_vblank(Machine->primary_screen))
+	if (video_screen_get_vblank(machine->primary_screen))
 		status |= 0x0008;
 
 	/* set the HBLANK bit */
-	if (video_screen_get_hblank(Machine->primary_screen))
+	if (video_screen_get_hblank(machine->primary_screen))
 		status |= 0x0004;
 
 	return (status);
 }
 
 
-static void vdp_control_w(int data)
+static void vdp_control_w(running_machine *machine, int data)
 {
 	/* case 1: we're not expecting the 2nd half of a command */
 	if (!vdp_cmdpart)
 	{
 		/* if 10xxxxxx xxxxxxxx this is a register setting command */
 		if ((data & 0xc000) == 0x8000)
-			vdp_register_w(data, video_screen_get_vblank(Machine->primary_screen));
+			vdp_register_w(machine, data, video_screen_get_vblank(machine->primary_screen));
 
 		/* otherwise this is the First part of a mode setting command */
 		else
@@ -586,12 +585,12 @@ static void vdp_control_w(int data)
 		vdp_code    = (vdp_code & 0x03) | ((data >> 2) & 0x3c);
 		vdp_address = (vdp_address & 0x3fff) | ((data << 14) & 0xc000);
 		vdp_cmdpart = 0;
-		vdp_control_dma(data);
+		vdp_control_dma(machine, data);
 	}
 }
 
 
-static void vdp_register_w(int data, int vblank)
+static void vdp_register_w(running_machine *machine, int data, int vblank)
 {
 	int scrwidth = 0;
 	static const UINT8 is_important[32] = { 0,0,1,1,1,1,0,1,0,0,0,1,0,1,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0 };
@@ -603,7 +602,7 @@ static void vdp_register_w(int data, int vblank)
 
 	/* these are mostly important writes; force an update if they written */
 	if (is_important[regnum])
-		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 
 	/* For quite a few of the registers its a good idea to set a couple of variable based
        upon the writes here */
@@ -701,7 +700,7 @@ static void vdp_register_w(int data, int vblank)
 }
 
 
-static void vdp_control_dma(int data)
+static void vdp_control_dma(running_machine *machine, int data)
 {
 	if ((vdp_code & 0x20) && (genesis_vdp_regs[1] & 0x10))
 	{
@@ -709,7 +708,7 @@ static void vdp_control_dma(int data)
 		{
 			case 0x00:
 			case 0x40:		/* 68k -> VRAM Tranfser */
-				vdp_dma_68k();
+				vdp_dma_68k(machine);
 				break;
 
 			case 0x80:		/* VRAM fill, can't be done here, requires data write */
@@ -733,7 +732,7 @@ static void vdp_control_dma(int data)
 
 ******************************************************************************/
 
-static void vdp_dma_68k(void)
+static void vdp_dma_68k(running_machine *machine)
 {
 	int length = genesis_vdp_regs[19] | (genesis_vdp_regs[20] << 8);
 	int source = (genesis_vdp_regs[21] << 1) | (genesis_vdp_regs[22] << 9) | ((genesis_vdp_regs[23] & 0x7f) << 17);
@@ -746,7 +745,7 @@ static void vdp_dma_68k(void)
 	/* handle the DMA */
 	for (count = 0; count < length; count++)
 	{
-		vdp_data_w(program_read_word(source));
+		vdp_data_w(machine, program_read_word(source));
 		source += 2;
 	}
 }

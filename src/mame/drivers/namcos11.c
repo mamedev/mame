@@ -867,7 +867,7 @@ static DRIVER_INIT( namcos11 )
 static MACHINE_RESET( namcos11 )
 {
 	memset( namcos11_keycus, 0, namcos11_keycus_size );
-	psx_machine_init();
+	psx_machine_init(machine);
 }
 
 NAMCO_C7X_HARDWARE

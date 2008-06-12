@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
 #include "video/poly.h"
@@ -159,7 +158,7 @@ static bitmap_t *K001005_bitmap[2];
 static bitmap_t *K001005_zbuffer;
 static rectangle K001005_cliprect;
 
-static void render_polygons(void);
+static void render_polygons(running_machine *machine);
 
 static UINT8 *K001005_texture;
 
@@ -176,7 +175,7 @@ static int tex_mirror_table[4][128];
 
 static int K001005_bitmap_page = 0;
 
-void K001005_swap_buffers(void);
+void K001005_swap_buffers(running_machine *machine);
 
 static void K001005_exit(running_machine *machine)
 {
@@ -403,8 +402,8 @@ WRITE32_HANDLER( K001005_w )
 
 			if (data == 2 && K001005_3d_fifo_ptr > 0)
 			{
-				K001005_swap_buffers();
-				render_polygons();
+				K001005_swap_buffers(machine);
+				render_polygons(machine);
 				poly_wait(poly, "render_polygons");
 				K001005_3d_fifo_ptr = 0;
 			}
@@ -527,10 +526,10 @@ static void draw_scanline_tex(void *dest, INT32 scanline, const poly_extent *ext
 static poly_vertex prev_v[4];
 static int prev_poly_type;
 
-static void render_polygons(void)
+static void render_polygons(running_machine *machine)
 {
 	int i, j;
-	const rectangle *visarea = video_screen_get_visible_area(Machine->primary_screen);
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 //  mame_printf_debug("K001005_fifo_ptr = %08X\n", K001005_3d_fifo_ptr);
 
@@ -944,13 +943,13 @@ void K001005_draw(bitmap_t *bitmap, const rectangle *cliprect)
 	}
 }
 
-void K001005_swap_buffers(void)
+void K001005_swap_buffers(running_machine *machine)
 {
 	K001005_bitmap_page ^= 1;
 
 	//if (K001005_status == 2)
 	{
-		fillbitmap(K001005_bitmap[K001005_bitmap_page], Machine->pens[0], &K001005_cliprect);
+		fillbitmap(K001005_bitmap[K001005_bitmap_page], machine->pens[0], &K001005_cliprect);
 		fillbitmap(K001005_zbuffer, 0xffffffff, &K001005_cliprect);
 	}
 }

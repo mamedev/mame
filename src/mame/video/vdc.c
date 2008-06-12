@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "video/vdc.h"
 
 /* VDC segments */
@@ -77,7 +76,7 @@ static void draw_overscan_line(int line);
 static void draw_sgx_overscan_line(int line);
 static void pce_refresh_line(int which, int line, int external_input, UINT8 *drawn, UINT16 *line_buffer);
 static void pce_refresh_sprites(running_machine *machine, int which, int line, UINT8 *drawn, UINT16 *line_buffer);
-static void vdc_do_dma(int which);
+static void vdc_do_dma(running_machine *machine, int which);
 static void vpc_init( running_machine *machine );
 
 INTERRUPT_GEN( pce_interrupt )
@@ -445,7 +444,7 @@ static UINT8 vram_read(int which, offs_t offset)
 }
 
 
-static void vdc_w( int which, offs_t offset, UINT8 data )
+static void vdc_w( running_machine *machine, int which, offs_t offset, UINT8 data )
 {
 	switch(offset&3)
 	{
@@ -520,7 +519,7 @@ static void vdc_w( int which, offs_t offset, UINT8 data )
 					break;
 
 				case LENR:
-					vdc_do_dma( which );
+					vdc_do_dma( machine, which );
 					break;
 				case SOUR:
 //                  logerror("SOUR MSB = %02X\n", data);
@@ -533,7 +532,7 @@ static void vdc_w( int which, offs_t offset, UINT8 data )
 	}
 }
 
-static UINT8 vdc_r( int which, offs_t offset )
+static UINT8 vdc_r( running_machine *machine, int which, offs_t offset )
 {
 	int temp = 0;
 	switch(offset&3)
@@ -541,7 +540,7 @@ static UINT8 vdc_r( int which, offs_t offset )
 		case 0x00:
 			temp = vdc[which].status;
 			vdc[which].status &= ~(VDC_VD | VDC_RR | VDC_CR | VDC_OR | VDC_DS);
-			cpunum_set_input_line(Machine, 0,0,CLEAR_LINE);
+			cpunum_set_input_line(machine, 0,0,CLEAR_LINE);
 			break;
 
 		case 0x02:
@@ -558,10 +557,10 @@ static UINT8 vdc_r( int which, offs_t offset )
 	return (temp);
 }
 
-WRITE8_HANDLER( vdc_0_w ) {	vdc_w( 0, offset, data ); }
-WRITE8_HANDLER( vdc_1_w ) {	vdc_w( 1, offset, data ); }
-READ8_HANDLER( vdc_0_r ) {	return vdc_r( 0, offset ); }
-READ8_HANDLER( vdc_1_r ) {	return vdc_r( 1, offset ); }
+WRITE8_HANDLER( vdc_0_w ) {	vdc_w( machine, 0, offset, data ); }
+WRITE8_HANDLER( vdc_1_w ) {	vdc_w( machine, 1, offset, data ); }
+READ8_HANDLER( vdc_0_r ) {	return vdc_r( machine, 0, offset ); }
+READ8_HANDLER( vdc_1_r ) {	return vdc_r( machine, 1, offset ); }
 
 PALETTE_INIT( vce ) {
 	int i;
@@ -946,7 +945,7 @@ static void pce_refresh_sprites(running_machine *machine, int which, int line, U
 	}
 }
 
-static void vdc_do_dma(int which)
+static void vdc_do_dma(running_machine *machine, int which)
 {
 	int src = vdc[which].vdc_data[SOUR].w;
 	int dst = vdc[which].vdc_data[DESR].w;
@@ -981,7 +980,7 @@ static void vdc_do_dma(int which)
 	vdc[which].vdc_data[LENR].w = len;
 	if(dvc)
 	{
-		cpunum_set_input_line(Machine, 0, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 	}
 
 }

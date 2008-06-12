@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "tia.h"
 #include "sound/tiaintf.h"
 
@@ -1980,9 +1979,9 @@ static void tia_reset(running_machine *machine)
 
 
 
-void tia_init(const struct tia_interface* ti)
+void tia_init(running_machine *machine, const struct tia_interface* ti)
 {
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call tia_init at init time!");
+	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call tia_init at init time!");
 
 	if ( ti ) {
 		tia_read_input_port = ti->read_input_port;
@@ -1994,8 +1993,8 @@ void tia_init(const struct tia_interface* ti)
 		tia_vsync_callback = NULL;
 	}
 
-	tia_reset( Machine );
+	tia_reset( machine );
 
-	add_reset_callback(Machine, tia_reset);
+	add_reset_callback(machine, tia_reset);
 }
 

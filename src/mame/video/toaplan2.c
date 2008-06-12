@@ -145,7 +145,6 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 
 
@@ -836,7 +835,7 @@ WRITE16_HANDLER( toaplan2_1_scroll_reg_select_w )
 }
 
 
-static void toaplan2_scroll_reg_data_w(offs_t offset, UINT16 data, UINT32 mem_mask, int controller)
+static void toaplan2_scroll_reg_data_w(running_machine *machine, offs_t offset, UINT16 data, UINT32 mem_mask, int controller)
 {
 	/************************************************************************/
 	/***** layer X and Y flips can be set independantly, so emulate it ******/
@@ -951,9 +950,9 @@ static void toaplan2_scroll_reg_data_w(offs_t offset, UINT16 data, UINT32 mem_ma
 					if ((toaplan2_sub_cpu == CPU_2_Z80) && (data == 3))
 					{
 						/* HACK! When tilted, sound CPU needs to be reset. */
-						if (Machine->config->sound[0].type == SOUND_YM3812)
+						if (machine->config->sound[0].type == SOUND_YM3812)
 						{
-							cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+							cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 							sndti_reset(SOUND_YM3812, 0);
 						}
 					}
@@ -1031,12 +1030,12 @@ static void toaplan2_scroll_reg_data_w(offs_t offset, UINT16 data, UINT32 mem_ma
 
 WRITE16_HANDLER( toaplan2_0_scroll_reg_data_w )
 {
-	toaplan2_scroll_reg_data_w(offset, data, mem_mask, 0);
+	toaplan2_scroll_reg_data_w(machine, offset, data, mem_mask, 0);
 }
 
 WRITE16_HANDLER( toaplan2_1_scroll_reg_data_w )
 {
-	toaplan2_scroll_reg_data_w(offset, data, mem_mask, 1);
+	toaplan2_scroll_reg_data_w(machine, offset, data, mem_mask, 1);
 }
 
 
@@ -1061,7 +1060,7 @@ WRITE16_HANDLER( pipibibi_scroll_w )
 		}
 
 		toaplan2_scroll_reg[0] = offset;
-		toaplan2_scroll_reg_data_w(offset, data, mem_mask, 0);
+		toaplan2_scroll_reg_data_w(machine, offset, data, mem_mask, 0);
 	}
 }
 
@@ -1256,9 +1255,9 @@ static void toaplan2_log_vram(void)
     Sprite Handlers
 ***************************************************************************/
 
-static void draw_sprites( bitmap_t *bitmap, const rectangle *cliprect, int controller, int priority_to_display, int bank_sel )
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int controller, int priority_to_display, int bank_sel )
 {
-	const gfx_element *gfx = Machine->gfx[ ((controller*2)+1) ];
+	const gfx_element *gfx = machine->gfx[ ((controller*2)+1) ];
 
 	int offs;
 
@@ -1439,7 +1438,7 @@ VIDEO_UPDATE( toaplan2_0 )
 		if (fg_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,fg_tilemap[0],priority,0);
 		if (top_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,top_tilemap[0],priority,0);
 		if (sprite_priority[0][priority])
-			draw_sprites(bitmap,cliprect,0,priority,0);
+			draw_sprites(screen->machine,bitmap,cliprect,0,priority,0);
 	}
 	return 0;
 }
@@ -1466,7 +1465,7 @@ VIDEO_UPDATE( dogyuun_1 )
 		if (fg_tile_priority[1][priority]) tilemap_draw(bitmap,cliprect,fg_tilemap[1],priority,0);
 		if (top_tile_priority[1][priority]) tilemap_draw(bitmap,cliprect,top_tilemap[1],priority,0);
 		if (sprite_priority[1][priority])
-			draw_sprites(bitmap,cliprect,1,priority,0);
+			draw_sprites(screen->machine,bitmap,cliprect,1,priority,0);
 	}
 	for (priority = 0; priority < 16; priority++)
 	{
@@ -1474,7 +1473,7 @@ VIDEO_UPDATE( dogyuun_1 )
 		if (fg_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,fg_tilemap[0],priority,0);
 		if (top_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,top_tilemap[0],priority,0);
 		if (sprite_priority[0][priority])
-			draw_sprites(bitmap,cliprect,0,priority,0);
+			draw_sprites(screen->machine,bitmap,cliprect,0,priority,0);
 	}
 	return 0;
 }
@@ -1503,14 +1502,14 @@ VIDEO_UPDATE( batsugun_1 )
 		if (fg_tile_priority[1][priority]) tilemap_draw(bitmap,cliprect,fg_tilemap[1],priority,0);
 		if (top_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,top_tilemap[0],priority,0);
 		if (sprite_priority[0][priority])
-			draw_sprites(bitmap,cliprect,0,priority,0);
+			draw_sprites(screen->machine,bitmap,cliprect,0,priority,0);
 	}
 
 	for (priority = 0; priority < 16; priority++)
 	{
 		if (top_tile_priority[1][priority]) tilemap_draw(bitmap,cliprect,top_tilemap[1],priority,0);
 		if (sprite_priority[1][priority])
-			draw_sprites(bitmap,cliprect,1,priority,0);
+			draw_sprites(screen->machine,bitmap,cliprect,1,priority,0);
 	}
 
 	return 0;
@@ -1555,7 +1554,7 @@ VIDEO_UPDATE( batrider_0 )
 		if (fg_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,fg_tilemap[0],priority,0);
 		if (top_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,top_tilemap[0],priority,0);
 		if (sprite_priority[0][priority])
-			draw_sprites(bitmap,cliprect,0,priority,1);	/* consider bank select */
+			draw_sprites(screen->machine,bitmap,cliprect,0,priority,1);	/* consider bank select */
 	}
 
 	clip.min_x = visarea->min_x;
@@ -1597,10 +1596,10 @@ VIDEO_UPDATE( mahoudai_0 )
 		if (fg_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,fg_tilemap[0],priority,0);
 		if (top_tile_priority[0][priority]) tilemap_draw(bitmap,cliprect,top_tilemap[0],priority,0);
 		if (sprite_priority[0][priority-1])
-			draw_sprites(bitmap,cliprect,0,priority-1,0);
+			draw_sprites(screen->machine,bitmap,cliprect,0,priority-1,0);
 	}
 	if (sprite_priority[0][15])
-		draw_sprites(bitmap,cliprect,0,15,0);
+		draw_sprites(screen->machine,bitmap,cliprect,0,15,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }

@@ -21,8 +21,8 @@ static tilemap *fg_tilemap;
 
 static rgb_t palette[64];
 
-#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-#define COLOR(gfxn,offs) (Machine->config->gfxdecodeinfo[gfxn].color_codes_start + offs)
+#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+#define COLOR(gfxn,offs) (machine->config->gfxdecodeinfo[gfxn].color_codes_start + offs)
 
 
 

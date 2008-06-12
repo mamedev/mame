@@ -7,7 +7,6 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "nb1413m3.h"
 
 
@@ -24,8 +23,8 @@ static UINT8 *pastelg_videoram;
 static UINT8 *pastelg_clut;
 
 
-static void pastelg_vramflip(void);
-static void pastelg_gfxdraw(void);
+static void pastelg_vramflip(running_machine *machine);
+static void pastelg_gfxdraw(running_machine *machine);
 
 
 /******************************************************************************
@@ -85,13 +84,13 @@ WRITE8_HANDLER( pastelg_blitter_w )
 		case 4: blitter_sizex = data; break;
 		case 5: blitter_sizey = data;
 				/* writing here also starts the blit */
-				pastelg_gfxdraw();
+				pastelg_gfxdraw(machine);
 				break;
 		case 6:	blitter_direction_x = (data & 0x01) ? 1 : 0;
 				blitter_direction_y = (data & 0x02) ? 1 : 0;
 				pastelg_flipscreen = (data & 0x04) ? 0 : 1;
 				pastelg_dispflag = (data & 0x08) ? 0 : 1;
-				pastelg_vramflip();
+				pastelg_vramflip(machine);
 				break;
 	}
 }
@@ -116,13 +115,13 @@ WRITE8_HANDLER( pastelg_romsel_w )
 
 
 ******************************************************************************/
-static void pastelg_vramflip(void)
+static void pastelg_vramflip(running_machine *machine)
 {
 	static int pastelg_flipscreen_old = 0;
 	int x, y;
 	UINT8 color1, color2;
-	int width = video_screen_get_width(Machine->primary_screen);
-	int height = video_screen_get_height(Machine->primary_screen);
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 
 	if (pastelg_flipscreen == pastelg_flipscreen_old) return;
 
@@ -145,10 +144,10 @@ static TIMER_CALLBACK( blitter_timer_callback )
 	nb1413m3_busyflag = 1;
 }
 
-static void pastelg_gfxdraw(void)
+static void pastelg_gfxdraw(running_machine *machine)
 {
 	UINT8 *GFX = memory_region(REGION_GFX1);
-	int width = video_screen_get_width(Machine->primary_screen);
+	int width = video_screen_get_width(machine->primary_screen);
 
 	int x, y;
 	int dx, dy;

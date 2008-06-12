@@ -221,7 +221,7 @@ VIDEO_START( kaneko16_2xVIEW2 )
 VIDEO_START( sandscrp_1xVIEW2 )
 {
 	VIDEO_START_CALL(kaneko16_1xVIEW2);
-	pandora_start(0,0,0);
+	pandora_start(machine,0,0,0);
 
 	tilemap_set_scrolldy( kaneko16_tmap_0, 0, 256 - 1 );
 	tilemap_set_scrolldy( kaneko16_tmap_1, 0, 256 - 1 );

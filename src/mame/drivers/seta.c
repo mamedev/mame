@@ -1768,7 +1768,7 @@ static WRITE16_HANDLER( usclssic_lockout_w )
 		if (old_tiles_offset != seta_tiles_offset)	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 		old_tiles_offset = seta_tiles_offset;
 
-		seta_coin_lockout_w(data);
+		seta_coin_lockout_w(machine, data);
 	}
 }
 
@@ -2817,7 +2817,7 @@ static WRITE8_HANDLER( sub_bankswitch_w )
 static WRITE8_HANDLER( sub_bankswitch_lockout_w )
 {
 	sub_bankswitch_w(machine,offset,data);
-	seta_coin_lockout_w(data);
+	seta_coin_lockout_w(machine, data);
 }
 
 

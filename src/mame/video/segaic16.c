@@ -493,12 +493,12 @@ static struct rotate_info rotate[SEGAIC16_MAX_ROTATE];
  *
  *************************************/
 
-void segaic16_set_display_enable(int enable)
+void segaic16_set_display_enable(running_machine *machine, int enable)
 {
 	enable = (enable != 0);
 	if (segaic16_display_enable != enable)
 	{
-		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 		segaic16_display_enable = enable;
 	}
 }

@@ -17,7 +17,7 @@ extern UINT16 *seta_workram; // Needed for zombraid Crosshair hack
 
 extern int seta_tiles_offset;
 
-void seta_coin_lockout_w(int data);
+void seta_coin_lockout_w(running_machine *machine, int data);
 
 WRITE16_HANDLER( twineagl_tilebank_w );
 

@@ -4,7 +4,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "dc.h"
 #include "cpu/sh4/sh4.h"
 
@@ -662,11 +661,11 @@ VIDEO_UPDATE(dc)
 	return 0;
 }
 
-void dc_vblank(void)
+void dc_vblank(running_machine *machine)
 {
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
 	update_interrupt_status();
 
-	timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(Machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 

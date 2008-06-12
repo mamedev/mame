@@ -412,11 +412,11 @@ static const struct PSXSPUinterface psxspu_interface =
 	psx_dma_install_write_handler
 };
 
-static void zn_machine_init( void )
+static void zn_machine_init( running_machine *machine )
 {
 	m_n_dip_bit = 0;
 	m_b_lastclock = 1;
-	psx_machine_init();
+	psx_machine_init(machine);
 }
 
 static MACHINE_DRIVER_START( zn1_1mb_vram )
@@ -652,7 +652,7 @@ static MACHINE_RESET( coh1000c )
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* fixed game rom */
 	memory_set_bankptr( 2, memory_region( REGION_USER2 ) + 0x400000 ); /* banked game rom */
 	memory_set_bankptr( 3, memory_region( REGION_USER3 ) ); /* country rom */
-	zn_machine_init();
+	zn_machine_init(machine);
 }
 
 static ADDRESS_MAP_START( qsound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -875,7 +875,7 @@ static MACHINE_RESET( coh3002c )
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* fixed game rom */
 	memory_set_bankptr( 2, memory_region( REGION_USER2 ) + 0x400000 ); /* banked game rom */
 	memory_set_bankptr( 3, memory_region( REGION_USER3 ) ); /* country rom */
-	zn_machine_init();
+	zn_machine_init(machine);
 }
 
 static MACHINE_DRIVER_START( coh3002c )
@@ -1221,7 +1221,7 @@ static MACHINE_RESET( coh1000ta )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* banked game rom */
 	memory_set_bankptr( 2, taitofx1_eeprom1 );
-	zn_machine_init();
+	zn_machine_init(machine);
 
 	// patch to make psyforce boot
 	if ((!strcmp(machine->gamedrv->name, "psyforce")) ||
@@ -1340,7 +1340,7 @@ static MACHINE_RESET( coh1000tb )
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* banked game rom */
 	memory_set_bankptr( 2, taitofx1_eeprom1 );
 	memory_set_bankptr( 3, taitofx1_eeprom2 );
-	zn_machine_init();
+	zn_machine_init(machine);
 }
 
 static NVRAM_HANDLER( coh1000tb )
@@ -1527,7 +1527,7 @@ static DRIVER_INIT( coh3002t )
 static MACHINE_RESET( coh3002t )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* GNET boot rom */
-	zn_machine_init();
+	zn_machine_init(machine);
 }
 
 static MACHINE_DRIVER_START( coh3002t )
@@ -1705,7 +1705,7 @@ static DRIVER_INIT( coh1000w )
 static MACHINE_RESET( coh1000w )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* fixed game rom */
-	zn_machine_init();
+	zn_machine_init(machine);
 
 	devtag_reset(machine, IDE_CONTROLLER, "ide");
 	psx_dma_install_read_handler(5, atpsx_dma_read);
@@ -1895,7 +1895,7 @@ static DRIVER_INIT( coh1002e )
 static MACHINE_RESET( coh1002e )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* banked game rom */
-	zn_machine_init();
+	zn_machine_init(machine);
 }
 
 static READ16_HANDLER( psarc_ymf_r )
@@ -2231,7 +2231,7 @@ static DRIVER_INIT( coh1000a )
 static MACHINE_RESET( coh1000a )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* fixed game rom */
-	zn_machine_init();
+	zn_machine_init(machine);
 	if( ( !strcmp( machine->gamedrv->name, "jdredd" ) ) ||
 		( !strcmp( machine->gamedrv->name, "jdreddb" ) ) )
 	{
@@ -2387,7 +2387,7 @@ static DRIVER_INIT( coh1001l )
 static MACHINE_RESET( coh1001l )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* banked rom */
-	zn_machine_init();
+	zn_machine_init(machine);
 }
 
 static MACHINE_DRIVER_START( coh1001l )
@@ -2434,7 +2434,7 @@ static MACHINE_RESET( coh1002v )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* fixed game rom */
 	memory_set_bankptr( 2, memory_region( REGION_USER3 ) ); /* banked rom */
-	zn_machine_init();
+	zn_machine_init(machine);
 }
 
 static INTERRUPT_GEN( coh1002v_vblank )
@@ -2657,7 +2657,7 @@ static DRIVER_INIT( coh1002m )
 static MACHINE_RESET( coh1002m )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) );
-	zn_machine_init();
+	zn_machine_init(machine);
 }
 
 static READ8_HANDLER( cbaj_z80_latch_r )

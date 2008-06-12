@@ -284,7 +284,7 @@ static WRITE16_HANDLER( io_chip_w )
 
 		/* miscellaneous output */
 		case 0x06/2:
-			system18_set_grayscale(~data & 0x40);
+			system18_set_grayscale(machine, ~data & 0x40);
 			segaic16_tilemap_set_flip(0, data & 0x20);
 			segaic16_sprites_set_flip(0, data & 0x20);
 /* These are correct according to cgfm's docs, but mwalker and ddcrew both
@@ -310,9 +310,9 @@ static WRITE16_HANDLER( io_chip_w )
 
 		/* CNT register */
 		case 0x1c/2:
-			segaic16_set_display_enable(data & 2);
+			segaic16_set_display_enable(machine, data & 2);
 			if ((old ^ data) & 4)
-				system18_set_vdp_enable(data & 4);
+				system18_set_vdp_enable(machine, data & 4);
 			break;
 	}
 }
@@ -358,7 +358,7 @@ static WRITE16_HANDLER( misc_io_w )
 		case 0x2000/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				system18_set_vdp_mixing(data & 0xff);
+				system18_set_vdp_mixing(machine, data & 0xff);
 				return;
 			}
 			break;

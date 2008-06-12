@@ -142,7 +142,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "profiler.h"
 #include "segas32.h"
 
@@ -410,14 +409,14 @@ INLINE UINT16 xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(UINT16 value)
 }
 
 
-INLINE void update_color(int offset, UINT16 data)
+INLINE void update_color(running_machine *machine, int offset, UINT16 data)
 {
 	/* note that since we use this RAM directly, we don't technically need */
 	/* to call palette_set_color() at all; however, it does give us that */
 	/* nice display when you hit F4, which is useful for debugging */
 
 	/* set the color */
-	palette_set_color_rgb(Machine, offset, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+	palette_set_color_rgb(machine, offset, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
 
@@ -439,7 +438,7 @@ INLINE UINT16 common_paletteram_r(int which, offs_t offset)
 }
 
 
-static void common_paletteram_w(int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void common_paletteram_w(running_machine *machine, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	UINT16 value;
 	int convert;
@@ -457,7 +456,7 @@ static void common_paletteram_w(int which, offs_t offset, UINT16 data, UINT16 me
 	COMBINE_DATA(&value);
 	if (convert) value = xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(value);
 	system32_paletteram[which][offset] = value;
-	update_color(0x4000*which + offset, value);
+	update_color(machine, 0x4000*which + offset, value);
 
 	/* if blending is enabled, writes go to both halves of palette RAM */
 	if (mixer_control[which][0x4e/2] & 0x0880)
@@ -470,7 +469,7 @@ static void common_paletteram_w(int which, offs_t offset, UINT16 data, UINT16 me
 		COMBINE_DATA(&value);
 		if (convert) value = xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(value);
 		system32_paletteram[which][offset] = value;
-		update_color(0x4000*which + offset, value);
+		update_color(machine, 0x4000*which + offset, value);
 	}
 }
 
@@ -490,7 +489,7 @@ READ16_HANDLER( system32_paletteram_r )
 
 WRITE16_HANDLER( system32_paletteram_w )
 {
-	common_paletteram_w(0, offset, data, mem_mask);
+	common_paletteram_w(machine, 0, offset, data, mem_mask);
 }
 
 
@@ -504,9 +503,9 @@ READ32_HANDLER( multi32_paletteram_0_r )
 WRITE32_HANDLER( multi32_paletteram_0_w )
 {
 	if (ACCESSING_BITS_0_15)
-		common_paletteram_w(0, offset*2+0, data, mem_mask);
+		common_paletteram_w(machine, 0, offset*2+0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		common_paletteram_w(0, offset*2+1, data >> 16, mem_mask >> 16);
+		common_paletteram_w(machine, 0, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
 
@@ -520,9 +519,9 @@ READ32_HANDLER( multi32_paletteram_1_r )
 WRITE32_HANDLER( multi32_paletteram_1_w )
 {
 	if (ACCESSING_BITS_0_15)
-		common_paletteram_w(1, offset*2+0, data, mem_mask);
+		common_paletteram_w(machine, 1, offset*2+0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		common_paletteram_w(1, offset*2+1, data >> 16, mem_mask >> 16);
+		common_paletteram_w(machine, 1, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
 

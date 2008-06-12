@@ -74,10 +74,10 @@ struct atarirle_desc
 ***************************************************************************/
 
 /* setup/shutdown */
-void atarirle_init(int map, const atarirle_desc *desc);
+void atarirle_init(running_machine *machine, int map, const atarirle_desc *desc);
 
 /* control handlers */
-void atarirle_control_w(int map, UINT8 bits);
+void atarirle_control_w(running_machine *machine, int map, UINT8 bits);
 void atarirle_command_w(int map, UINT8 command);
 VIDEO_EOF( atarirle );
 

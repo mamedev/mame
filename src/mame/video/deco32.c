@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "deco16ic.h"
 #include "deco32.h"
 
@@ -327,7 +326,8 @@ static void fghthist_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 
 		while (multi >= 0)
 		{
-			deco16_pdrawgfx(bitmap,machine->gfx[gfxbank],
+			deco16_pdrawgfx(machine,
+					bitmap,machine->gfx[gfxbank],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
@@ -455,7 +455,8 @@ static void nslasher_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 	}
 }
 
-INLINE void dragngun_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
+INLINE void dragngun_drawgfxzoom( running_machine *machine,
+		bitmap_t *dest_bmp,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,
 		int scalex, int scaley,bitmap_t *pri_buffer,UINT32 pri_mask, int sprite_screen_width, int  sprite_screen_height )
@@ -490,7 +491,7 @@ INLINE void dragngun_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			int source_base = (code % gfx->total_elements) * gfx->height;
 
 			if (sprite_screen_width && sprite_screen_height)
@@ -801,7 +802,8 @@ static void dragngun_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 				sprite&=0x7fff;
 
 				if (zoomx!=0x10000 || zoomy!=0x10000)
-					dragngun_drawgfxzoom(bitmap,machine->gfx[bank],
+					dragngun_drawgfxzoom(machine,
+						bitmap,machine->gfx[bank],
 						sprite,
 						colour,
 						fx,fy,
@@ -975,7 +977,7 @@ VIDEO_START( fghthist )
 	pf1a_tilemap =0;
 	dirty_palette = auto_malloc(4096);
 
-	deco_allocate_sprite_bitmap();
+	deco_allocate_sprite_bitmap(machine);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf2_tilemap,0);

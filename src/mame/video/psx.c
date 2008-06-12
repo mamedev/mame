@@ -284,10 +284,10 @@ static int m_n_debugcoordy[ DEBUG_COORDS ];
 
 #define DEBUG_MAX ( 512 )
 
-static void DebugMeshInit( void )
+static void DebugMeshInit( running_machine *machine )
 {
-	int width = video_screen_get_width(Machine->primary_screen);
-	int height = video_screen_get_height(Machine->primary_screen);
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 
 	m_b_debugmesh = 0;
 	m_b_debugtexture = 0;
@@ -298,12 +298,12 @@ static void DebugMeshInit( void )
 	debugmesh = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16 );
 }
 
-static void DebugMesh( int n_coordx, int n_coordy )
+static void DebugMesh( running_machine *machine, int n_coordx, int n_coordy )
 {
 	int n_coord;
 	int n_colour;
-	int width = video_screen_get_width(Machine->primary_screen);
-	int height = video_screen_get_height(Machine->primary_screen);
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 
 	if( m_b_debugclear )
 	{
@@ -418,7 +418,7 @@ static void DebugMeshEnd( void )
 	m_n_debugcoord = 0;
 }
 
-static void DebugCheckKeys( void )
+static void DebugCheckKeys( running_machine *machine )
 {
 	if( input_code_pressed_once( KEYCODE_M ) )
 		m_b_debugmesh = !m_b_debugmesh;
@@ -428,12 +428,12 @@ static void DebugCheckKeys( void )
 
 	if( m_b_debugmesh || m_b_debugtexture )
 	{
-		int width = video_screen_get_width(Machine->primary_screen);
-		int height = video_screen_get_height(Machine->primary_screen);
-		video_screen_set_visarea(Machine->primary_screen, 0, width - 1, 0, height - 1 );
+		int width = video_screen_get_width(machine->primary_screen);
+		int height = video_screen_get_height(machine->primary_screen);
+		video_screen_set_visarea(machine->primary_screen, 0, width - 1, 0, height - 1 );
 	}
 	else
-		video_screen_set_visarea(Machine->primary_screen, 0, m_n_screenwidth - 1, 0, m_n_screenheight - 1 );
+		video_screen_set_visarea(machine->primary_screen, 0, m_n_screenwidth - 1, 0, m_n_screenheight - 1 );
 
 	if( input_code_pressed_once( KEYCODE_I ) )
 	{
@@ -504,14 +504,14 @@ static int DebugMeshDisplay( bitmap_t *bitmap, const rectangle *cliprect )
 	return m_b_debugmesh;
 }
 
-static int DebugTextureDisplay( bitmap_t *bitmap )
+static int DebugTextureDisplay( running_machine *machine, bitmap_t *bitmap )
 {
 	UINT32 n_y;
 
 	if( m_b_debugtexture )
 	{
-		int width = video_screen_get_width(Machine->primary_screen);
-		int height = video_screen_get_height(Machine->primary_screen);
+		int width = video_screen_get_width(machine->primary_screen);
+		int height = video_screen_get_height(machine->primary_screen);
 
 		for( n_y = 0; n_y < height; n_y++ )
 		{
@@ -539,7 +539,7 @@ static int DebugTextureDisplay( bitmap_t *bitmap )
 				}
 				p_n_interleave[ n_x ] = m_p_p_vram[ n_yi ][ n_xi ];
 			}
-			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, Machine->pens, -1 );
+			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, machine->pens, -1 );
 		}
 	}
 	return m_b_debugtexture;
@@ -614,7 +614,7 @@ static STATE_POSTLOAD( updatevisiblearea )
 	visarea.min_x = visarea.min_y = 0;
 	visarea.max_x = m_n_screenwidth - 1;
 	visarea.max_y = m_n_screenheight - 1;
-	video_screen_configure(machine->primary_screen, m_n_screenwidth, m_n_screenheight, &visarea, HZ_TO_ATTOSECONDS(refresh));
+	video_screen_configure(Machine->primary_screen, m_n_screenwidth, m_n_screenheight, &visarea, HZ_TO_ATTOSECONDS(refresh));
 }
 
 static void psx_gpu_init( running_machine *machine )
@@ -628,7 +628,7 @@ static void psx_gpu_init( running_machine *machine )
 	int height = video_screen_get_height(machine->primary_screen);
 
 #if defined( MAME_DEBUG )
-	DebugMeshInit();
+	DebugMeshInit(machine);
 #endif
 
 	m_n_gpustatus = 0x14802000;
@@ -806,7 +806,7 @@ VIDEO_UPDATE( psx )
 	{
 		return 0;
 	}
-	if( DebugTextureDisplay( bitmap ) )
+	if( DebugTextureDisplay( screen->machine, bitmap ) )
 	{
 		return 0;
 	}
@@ -1490,7 +1490,7 @@ static void FlatPolygon( int n_points )
 	}
 	for( n_point = 0; n_point < n_points; n_point++ )
 	{
-		DebugMesh( COORD_X( m_packet.FlatPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
+		DebugMesh( Machine, COORD_X( m_packet.FlatPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
 	}
 	DebugMeshEnd();
 #endif
@@ -1663,7 +1663,7 @@ static void FlatTexturedPolygon( int n_points )
 	}
 	for( n_point = 0; n_point < n_points; n_point++ )
 	{
-		DebugMesh( COORD_X( m_packet.FlatTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
+		DebugMesh( Machine, COORD_X( m_packet.FlatTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
 	}
 	DebugMeshEnd();
 #endif
@@ -1882,7 +1882,7 @@ static void GouraudPolygon( int n_points )
 	}
 	for( n_point = 0; n_point < n_points; n_point++ )
 	{
-		DebugMesh( COORD_X( m_packet.GouraudPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
+		DebugMesh( Machine, COORD_X( m_packet.GouraudPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
 	}
 	DebugMeshEnd();
 #endif
@@ -2113,7 +2113,7 @@ static void GouraudTexturedPolygon( int n_points )
 	}
 	for( n_point = 0; n_point < n_points; n_point++ )
 	{
-		DebugMesh( COORD_X( m_packet.GouraudTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
+		DebugMesh( Machine, COORD_X( m_packet.GouraudTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
 	}
 	DebugMeshEnd();
 #endif
@@ -2371,8 +2371,8 @@ static void MonochromeLine( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.MonochromeLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.MonochromeLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.MonochromeLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.MonochromeLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_y );
+	DebugMesh( Machine, COORD_X( m_packet.MonochromeLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.MonochromeLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_y );
+	DebugMesh( Machine, COORD_X( m_packet.MonochromeLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.MonochromeLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_y );
 	DebugMeshEnd();
 #endif
 
@@ -2477,8 +2477,8 @@ static void GouraudLine( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.GouraudLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.GouraudLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_y );
+	DebugMesh( Machine, COORD_X( m_packet.GouraudLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_y );
+	DebugMesh( Machine, COORD_X( m_packet.GouraudLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_y );
 	DebugMeshEnd();
 #endif
 
@@ -2576,10 +2576,10 @@ static void FrameBufferRectangleDraw( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ), COORD_Y( m_packet.FlatRectangle.n_coord ) );
-	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) );
-	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ), COORD_Y( m_packet.FlatRectangle.n_coord ) + SIZE_H( m_packet.FlatRectangle.n_size ) );
-	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + SIZE_H( m_packet.FlatRectangle.n_size ) );
+	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ), COORD_Y( m_packet.FlatRectangle.n_coord ) );
+	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ) + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) );
+	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ), COORD_Y( m_packet.FlatRectangle.n_coord ) + SIZE_H( m_packet.FlatRectangle.n_size ) );
+	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ) + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + SIZE_H( m_packet.FlatRectangle.n_size ) );
 	DebugMeshEnd();
 #endif
 
@@ -2638,10 +2638,10 @@ static void FlatRectangle( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatRectangle.n_size ) );
-	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatRectangle.n_size ) );
+	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatRectangle.n_size ) );
+	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatRectangle.n_size ) );
 	DebugMeshEnd();
 #endif
 
@@ -2703,10 +2703,10 @@ static void FlatRectangle8x8( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x + 8, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y + 8 );
-	DebugMesh( COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x + 8, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y + 8 );
+	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x + 8, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y + 8 );
+	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x + 8, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y + 8 );
 	DebugMeshEnd();
 #endif
 
@@ -2768,10 +2768,10 @@ static void FlatRectangle16x16( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x + 16, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y + 16 );
-	DebugMesh( COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x + 16, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y + 16 );
+	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x + 16, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y + 16 );
+	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x + 16, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y + 16 );
 	DebugMeshEnd();
 #endif
 
@@ -2844,10 +2844,10 @@ static void FlatTexturedRectangle( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatTexturedRectangle.n_size ), COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatTexturedRectangle.n_size ) );
-	DebugMesh( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatTexturedRectangle.n_size ), COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatTexturedRectangle.n_size ) );
+	DebugMesh( Machine, COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( Machine, COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatTexturedRectangle.n_size ), COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( Machine, COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatTexturedRectangle.n_size ) );
+	DebugMesh( Machine, COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatTexturedRectangle.n_size ), COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatTexturedRectangle.n_size ) );
 	DebugMeshEnd();
 #endif
 
@@ -2942,10 +2942,10 @@ static void Sprite8x8( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y + 7 );
-	DebugMesh( COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y + 7 );
+	DebugMesh( Machine, COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( Machine, COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( Machine, COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y + 7 );
+	DebugMesh( Machine, COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y + 7 );
 	DebugMeshEnd();
 #endif
 
@@ -3040,10 +3040,10 @@ static void Sprite16x16( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y + 7 );
-	DebugMesh( COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y + 7 );
+	DebugMesh( Machine, COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( Machine, COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( Machine, COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y + 7 );
+	DebugMesh( Machine, COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y + 7 );
 	DebugMeshEnd();
 #endif
 
@@ -3113,7 +3113,7 @@ static void Dot( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.Dot.vertex.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Dot.vertex.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( Machine, COORD_X( m_packet.Dot.vertex.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Dot.vertex.n_coord ) + m_n_drawoffset_y );
 	DebugMeshEnd();
 #endif
 
@@ -3151,10 +3151,10 @@ static void MoveImage( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) );
-	DebugMesh( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_W( m_packet.MoveImage.n_size ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) );
-	DebugMesh( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_H( m_packet.MoveImage.n_size ) );
-	DebugMesh( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_W( m_packet.MoveImage.n_size ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_H( m_packet.MoveImage.n_size ) );
+	DebugMesh( Machine, COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) );
+	DebugMesh( Machine, COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_W( m_packet.MoveImage.n_size ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) );
+	DebugMesh( Machine, COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_H( m_packet.MoveImage.n_size ) );
+	DebugMesh( Machine, COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_W( m_packet.MoveImage.n_size ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_H( m_packet.MoveImage.n_size ) );
 	DebugMeshEnd();
 #endif
 
@@ -3898,16 +3898,16 @@ READ32_HANDLER( psx_gpu_r )
 INTERRUPT_GEN( psx_vblank )
 {
 #if defined( MAME_DEBUG )
-	DebugCheckKeys();
+	DebugCheckKeys(machine);
 #endif
 
 	m_n_gpustatus ^= ( 1L << 31 );
 	psx_irq_set( machine, 0x0001 );
 }
 
-void psx_gpu_reset( void )
+void psx_gpu_reset( running_machine *machine )
 {
-	psx_gpu_w( Machine, 1, 0, 0xffffffff );
+	psx_gpu_w( machine, 1, 0, 0xffffffff );
 }
 
 void psx_lightgun_set( int n_x, int n_y )

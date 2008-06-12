@@ -205,7 +205,7 @@ static MACHINE_RESET( cham24 )
 	memcpy( &dst[0xc000], &src[0x0f8000], 0x4000 );
 
 	/* reset the ppu */
-	ppu2c0x_reset( 0, 1 );
+	ppu2c0x_reset( machine, 0, 1 );
 }
 
 static PALETTE_INIT( cham24 )

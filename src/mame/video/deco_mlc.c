@@ -9,7 +9,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 
 extern int mlc_raster_table[9][256];
 extern UINT32 mlc_clipper[32];
@@ -63,7 +62,8 @@ static void blitRaster(bitmap_t *bitmap, int rasterMode)
 }
 #endif
 
-static void mlc_drawgfxzoom(bitmap_t *dest_bmp,const gfx_element *gfx,
+static void mlc_drawgfxzoom(running_machine *machine,
+		bitmap_t *dest_bmp,const gfx_element *gfx,
 		UINT32 code1,UINT32 code2, UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,int use8bpp,
 		int scalex, int scaley)
@@ -98,7 +98,7 @@ static void mlc_drawgfxzoom(bitmap_t *dest_bmp,const gfx_element *gfx,
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			int source_base1 = (code1 % gfx->total_elements) * gfx->height;
 			int source_base2 = (code2 % gfx->total_elements) * gfx->height;
 
@@ -487,7 +487,8 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 				if (rasterMode)
 					rasterDirty=1;
 
-				mlc_drawgfxzoom(/*rasterMode ? temp_bitmap : */bitmap,machine->gfx[0],
+				mlc_drawgfxzoom(machine,
+								/*rasterMode ? temp_bitmap : */bitmap,machine->gfx[0],
 								tile,tile2,
 								color + colorOffset,fx,fy,xbase,ybase,
 								&user_clip,trans,0,

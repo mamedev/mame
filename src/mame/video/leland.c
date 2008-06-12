@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "leland.h"
 
 
@@ -191,7 +190,7 @@ static int leland_vram_port_r(int offset, int num)
  *
  *************************************/
 
-static void leland_vram_port_w(int offset, int data, int num)
+static void leland_vram_port_w(running_machine *machine, int offset, int data, int num)
 {
 	struct vram_state_data *state = vram_state + num;
 	int addr = state->addr;
@@ -200,9 +199,9 @@ static void leland_vram_port_w(int offset, int data, int num)
 
 	/* don't fully understand why this is needed.  Isn't the
        video RAM just one big RAM? */
-	int scanline = video_screen_get_vpos(Machine->primary_screen);
+	int scanline = video_screen_get_vpos(machine->primary_screen);
 	if (scanline > 0)
-		video_screen_update_partial(Machine->primary_screen, scanline - 1);
+		video_screen_update_partial(machine->primary_screen, scanline - 1);
 
 	if (LOG_COMM && addr >= 0xf000)
 		logerror("%04X:%s comm write %04X = %02X\n", activecpu_get_previouspc(), num ? "slave" : "master", addr, data);
@@ -284,7 +283,7 @@ static TIMER_CALLBACK( leland_delayed_mvram_w )
 	int num = (param >> 16) & 1;
 	int offset = (param >> 8) & 0xff;
 	int data = param & 0xff;
-	leland_vram_port_w(offset, data, num);
+	leland_vram_port_w(machine, offset, data, num);
 }
 
 
@@ -315,7 +314,7 @@ WRITE8_HANDLER( leland_slave_video_addr_w )
 
 WRITE8_HANDLER( leland_svram_port_w )
 {
-	leland_vram_port_w(offset, data, 1);
+	leland_vram_port_w(machine, offset, data, 1);
 }
 
 
@@ -342,7 +341,7 @@ WRITE8_HANDLER( ataxx_mvram_port_w )
 WRITE8_HANDLER( ataxx_svram_port_w )
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
-	leland_vram_port_w(offset, data, 1);
+	leland_vram_port_w(machine, offset, data, 1);
 }
 
 

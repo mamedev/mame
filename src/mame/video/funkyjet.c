@@ -11,7 +11,7 @@
 
 VIDEO_START( funkyjet )
 {
-	deco16_1_video_init();
+	deco16_1_video_init(machine);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)

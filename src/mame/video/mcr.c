@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "mcr.h"
 
 
@@ -128,13 +127,13 @@ VIDEO_START( mcr )
  *
  *************************************/
 
-static void mcr_set_color(int index, int data)
+static void mcr_set_color(running_machine *machine, int index, int data)
 {
-	palette_set_color_rgb(Machine, index, pal3bit(data >> 6), pal3bit(data >> 0), pal3bit(data >> 3));
+	palette_set_color_rgb(machine, index, pal3bit(data >> 6), pal3bit(data >> 0), pal3bit(data >> 3));
 }
 
 
-static void journey_set_color(int index, int data)
+static void journey_set_color(running_machine *machine, int index, int data)
 {
 	/* 3 bits each, RGB */
 	int r = (data >> 6) & 7;
@@ -147,7 +146,7 @@ static void journey_set_color(int index, int data)
 	b = (b << 5) | (b << 1);
 
 	/* set the BG color */
-	palette_set_color(Machine, index, MAKE_RGB(r, g, b));
+	palette_set_color(machine, index, MAKE_RGB(r, g, b));
 
 	/* if this is an odd entry in the upper palette bank, the hardware */
 	/* hard-codes a low 1 bit -- this is used for better grayscales */
@@ -159,7 +158,7 @@ static void journey_set_color(int index, int data)
 	}
 
 	/* set the FG color */
-	palette_set_color(Machine, index + 64, MAKE_RGB(r, g, b));
+	palette_set_color(machine, index + 64, MAKE_RGB(r, g, b));
 }
 
 
@@ -167,7 +166,7 @@ WRITE8_HANDLER( mcr_91490_paletteram_w )
 {
 	paletteram[offset] = data;
 	offset &= 0x7f;
-	mcr_set_color((offset / 2) & 0x3f, data | ((offset & 1) << 8));
+	mcr_set_color(machine, (offset / 2) & 0x3f, data | ((offset & 1) << 8));
 }
 
 
@@ -194,9 +193,9 @@ WRITE8_HANDLER( mcr_90010_videoram_w )
 	if ((offset & 0x780) == 0x780)
 	{
 		if (mcr_cpu_board != 91475)
-			mcr_set_color((offset / 2) & 0x3f, data | ((offset & 1) << 8));
+			mcr_set_color(machine, (offset / 2) & 0x3f, data | ((offset & 1) << 8));
 		else
-			journey_set_color((offset / 2) & 0x3f, data | ((offset & 1) << 8));
+			journey_set_color(machine, (offset / 2) & 0x3f, data | ((offset & 1) << 8));
 	}
 }
 
@@ -218,7 +217,7 @@ WRITE8_HANDLER( twotiger_videoram_w )
 
 	/* palette RAM is mapped into the upper 0x80 bytes here */
 	if ((effoffs & 0x780) == 0x780)
-		mcr_set_color(((offset & 0x400) >> 5) | ((offset >> 1) & 0x1f), data | ((offset & 1) << 8));
+		mcr_set_color(machine, ((offset & 0x400) >> 5) | ((offset >> 1) & 0x1f), data | ((offset & 1) << 8));
 }
 
 

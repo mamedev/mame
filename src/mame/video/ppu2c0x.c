@@ -953,7 +953,7 @@ logerror("vlbank ending\n");
  *  PPU Reset
  *
  *************************************/
-void ppu2c0x_reset(int num, int scan_scale )
+void ppu2c0x_reset(running_machine *machine, int num, int scan_scale)
 {
 	int i;
 
@@ -976,7 +976,7 @@ void ppu2c0x_reset(int num, int scan_scale )
 	timer_adjust_oneshot(chips[num].hblank_timer, ATTOTIME_IN_CYCLES(86.67, 0), num); // ??? FIXME - hardcoding NTSC, need better calculation
 
 	// Call us back at the start of the next scanline
-	timer_adjust_oneshot(chips[num].scanline_timer, video_screen_get_time_until_pos(Machine->primary_screen, 1, 0), num);
+	timer_adjust_oneshot(chips[num].scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0), num);
 
 	/* reset the callbacks */
 	chips[num].scanline_callback_proc = 0;

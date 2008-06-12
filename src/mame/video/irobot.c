@@ -85,10 +85,10 @@ static void _irobot_poly_clear(running_machine *machine, UINT8 *bitmap_base)
 	memset(bitmap_base, 0, BITMAP_WIDTH * video_screen_get_height(machine->primary_screen));
 }
 
-void irobot_poly_clear(void)
+void irobot_poly_clear(running_machine *machine)
 {
 	UINT8 *bitmap_base = irobot_bufsel ? polybitmap2 : polybitmap1;
-	_irobot_poly_clear(Machine, bitmap_base);
+	_irobot_poly_clear(machine, bitmap_base);
 }
 
 

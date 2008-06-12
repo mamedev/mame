@@ -351,7 +351,7 @@ static WRITE16_HANDLER( iochip_0_w )
                 D0: Sound section reset (1= normal operation, 0= reset)
             */
 			if (((oldval ^ data) & 0x40) && !(data & 0x40)) watchdog_reset_w(machine,0,0);
-			segaic16_set_display_enable(data & 0x20);
+			segaic16_set_display_enable(machine, data & 0x20);
 			cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			return;
 

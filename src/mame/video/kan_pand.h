@@ -1,6 +1,6 @@
 /* kan_pand.h */
 
-void pandora_start(UINT8 region, int x, int y);
+void pandora_start(running_machine *machine, UINT8 region, int x, int y);
 void pandora_update(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 void pandora_eof(running_machine *machine);
 void pandora_set_clear_bitmap(int clear);

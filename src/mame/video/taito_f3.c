@@ -204,7 +204,6 @@ Playfield tile info:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "taito_f3.h"
 #include "ui.h"
 
@@ -2590,7 +2589,8 @@ static void scanline_draw(running_machine *machine, bitmap_t *bitmap, const rect
 	dest++;						\
 	pri++;
 
-INLINE void f3_drawgfx( bitmap_t *dest_bmp,const gfx_element *gfx,
+INLINE void f3_drawgfx( running_machine *machine,
+		bitmap_t *dest_bmp,const gfx_element *gfx,
 		UINT32 code,
 		UINT32 color,
 		int flipx,int flipy,
@@ -2621,7 +2621,7 @@ INLINE void f3_drawgfx( bitmap_t *dest_bmp,const gfx_element *gfx,
 
 	if( gfx )
 	{
-		const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+		const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 		int source_base = (code % gfx->total_elements) * 16;
 
 		{
@@ -2753,7 +2753,8 @@ INLINE void f3_drawgfx( bitmap_t *dest_bmp,const gfx_element *gfx,
 #undef NEXT_P
 
 
-INLINE void f3_drawgfxzoom(bitmap_t *dest_bmp,const gfx_element *gfx,
+INLINE void f3_drawgfxzoom(running_machine *machine,
+		bitmap_t *dest_bmp,const gfx_element *gfx,
 		UINT32 code,
 		UINT32 color,
 		int flipx,int flipy,
@@ -2785,7 +2786,7 @@ INLINE void f3_drawgfxzoom(bitmap_t *dest_bmp,const gfx_element *gfx,
 
 	if( gfx )
 	{
-		const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+		const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 		int source_base = (code % gfx->total_elements) * 16;
 
 		{
@@ -3168,7 +3169,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		sprite_pri_usage|=1<<pri;
 
 		if(sprite_ptr->zoomx==16 && sprite_ptr->zoomy==16)
-			f3_drawgfx(bitmap,sprite_gfx,
+			f3_drawgfx(machine,
+					bitmap,sprite_gfx,
 					sprite_ptr->code,
 					sprite_ptr->color,
 					sprite_ptr->flipx,sprite_ptr->flipy,
@@ -3176,7 +3178,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					cliprect,
 					pri);
 		else
-			f3_drawgfxzoom(bitmap,sprite_gfx,
+			f3_drawgfxzoom(machine,
+					bitmap,sprite_gfx,
 					sprite_ptr->code,
 					sprite_ptr->color,
 					sprite_ptr->flipx,sprite_ptr->flipy,

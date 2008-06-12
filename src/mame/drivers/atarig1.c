@@ -90,7 +90,7 @@ static MACHINE_RESET( atarig1 )
 static WRITE16_HANDLER( mo_control_w )
 {
 	if (ACCESSING_BITS_0_7)
-		atarirle_control_w(0, data & 7);
+		atarirle_control_w(machine, 0, data & 7);
 }
 
 

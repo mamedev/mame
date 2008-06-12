@@ -49,7 +49,7 @@ static VIDEO_START( wcvol95 )
 	state_save_register_global_pointer(deco16_pf12_control, 0x10/2);
 	state_save_register_global_pointer(paletteram16, 0x1000/2);
 
-	deco16_1_video_init();
+	deco16_1_video_init(machine);
 
 	deco16_set_tilemap_bank_callback(0, simpl156_bank_callback);
 	deco16_set_tilemap_bank_callback(1, simpl156_bank_callback);

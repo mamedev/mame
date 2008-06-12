@@ -491,7 +491,7 @@ static WRITE16_HANDLER( control_w )
 	data &= 0x0f;
 
 	/* bit 0 controls display enable */
-	segac2_enable_display(~data & 1);
+	segac2_enable_display(machine, ~data & 1);
 
 	/* bit 1 resets the protection */
 	if (!(data & 2))

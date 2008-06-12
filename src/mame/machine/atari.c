@@ -843,7 +843,7 @@ DEVICE_IMAGE_LOAD( a800_cart )
 	{
 		size = image_fread(image, &mem[0x12000], 0x2000);
 		a800_cart_is_16k = (size == 0x2000);
-		logerror("%s loaded right cartridge '%s' size 16K\n", Machine->gamedrv->name, image_filename(image) );
+		logerror("%s loaded right cartridge '%s' size 16K\n", image->machine->gamedrv->name, image_filename(image) );
 	}
 	else
 	{
@@ -851,7 +851,7 @@ DEVICE_IMAGE_LOAD( a800_cart )
 		a800_cart_loaded = size > 0x0000;
 		size = image_fread(image, &mem[0x12000], 0x2000);
 		a800_cart_is_16k = size > 0x2000;
-		logerror("%s loaded left cartridge '%s' size %s\n", Machine->gamedrv->name, image_filename(image) , (a800_cart_is_16k) ? "16K":"8K");
+		logerror("%s loaded left cartridge '%s' size %s\n", image->machine->gamedrv->name, image_filename(image) , (a800_cart_is_16k) ? "16K":"8K");
 	}
 	return INIT_PASS;
 }
@@ -895,7 +895,7 @@ DEVICE_IMAGE_LOAD( a800xl_cart )
 	file_error filerr;
 	unsigned size;
 
-	fname = astring_assemble_3(astring_alloc(), Machine->gamedrv->name, PATH_SEPARATOR, "basic.rom");
+	fname = astring_assemble_3(astring_alloc(), image->machine->gamedrv->name, PATH_SEPARATOR, "basic.rom");
 	filerr = mame_fopen(SEARCHPATH_ROM, astring_c(fname), OPEN_FLAG_READ, &basic_fp);
 	astring_free(fname);
 
@@ -904,7 +904,7 @@ DEVICE_IMAGE_LOAD( a800xl_cart )
 		size = mame_fread(basic_fp, &mem[0x14000], 0x2000);
 		if( size < 0x2000 )
 		{
-			logerror("%s image '%s' load failed (less than 8K)\n", Machine->gamedrv->name, astring_c(fname));
+			logerror("%s image '%s' load failed (less than 8K)\n", image->machine->gamedrv->name, astring_c(fname));
 			mame_fclose(basic_fp);
 			return 2;
 		}
@@ -919,7 +919,7 @@ DEVICE_IMAGE_LOAD( a800xl_cart )
 			size = image_fread(image, &mem[0x16000], 0x2000);
 			a800_cart_is_16k = size / 0x2000;
 			logerror("%s loaded cartridge '%s' size %s\n",
-					Machine->gamedrv->name, image_filename(image), (a800_cart_is_16k) ? "16K":"8K");
+					image->machine->gamedrv->name, image_filename(image), (a800_cart_is_16k) ? "16K":"8K");
 		}
 		mame_fclose(basic_fp);
 	}
@@ -967,7 +967,7 @@ DEVICE_IMAGE_LOAD( a5200_cart )
 		}
 	}
 	logerror("%s loaded cartridge '%s' size %dK\n",
-		Machine->gamedrv->name, image_filename(image) , size/1024);
+		image->machine->gamedrv->name, image_filename(image) , size/1024);
 	return INIT_PASS;
 }
 

@@ -1206,7 +1206,7 @@ static READ32_HANDLER( tektagt_protection_2_r )
 
 static MACHINE_RESET( namcos12 )
 {
-	psx_machine_init();
+	psx_machine_init(machine);
 	bankoffset_w(machine,0,0,0xffffffff);
 
 	if( strcmp( machine->gamedrv->name, "tektagt" ) == 0 ||

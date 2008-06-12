@@ -41,7 +41,7 @@ static int mutantf_2_bank_callback(const int bank)
 
 VIDEO_START( cninja )
 {
-	deco16_2_video_init(1);
+	deco16_2_video_init(machine, 1);
 
 	deco16_set_tilemap_bank_callback(2,cninja_bank_callback);
 	deco16_set_tilemap_bank_callback(3,cninja_bank_callback);
@@ -50,7 +50,7 @@ VIDEO_START( cninja )
 
 VIDEO_START( stoneage )
 {
-	deco16_2_video_init(1);
+	deco16_2_video_init(machine, 1);
 
 	deco16_set_tilemap_bank_callback(2,edrandy_bank_callback);
 	deco16_set_tilemap_bank_callback(3,edrandy_bank_callback);
@@ -64,7 +64,7 @@ VIDEO_START( stoneage )
 
 VIDEO_START( edrandy )
 {
-	deco16_2_video_init(0);
+	deco16_2_video_init(machine, 0);
 
 	deco16_set_tilemap_bank_callback(2,edrandy_bank_callback);
 	deco16_set_tilemap_bank_callback(3,edrandy_bank_callback);
@@ -73,7 +73,7 @@ VIDEO_START( edrandy )
 
 VIDEO_START( robocop2 )
 {
-	deco16_2_video_init(0);
+	deco16_2_video_init(machine, 0);
 
 	deco16_set_tilemap_bank_callback(1,robocop2_bank_callback);
 	deco16_set_tilemap_bank_callback(2,robocop2_bank_callback);
@@ -83,7 +83,7 @@ VIDEO_START( robocop2 )
 
 VIDEO_START( mutantf )
 {
-	deco16_2_video_init(0);
+	deco16_2_video_init(machine, 0);
 
 	deco16_set_tilemap_bank_callback(0,mutantf_1_bank_callback);
 	deco16_set_tilemap_bank_callback(1,mutantf_2_bank_callback);

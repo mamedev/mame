@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "includes/skullxbo.h"
 
@@ -183,7 +182,7 @@ WRITE16_HANDLER( skullxbo_playfieldlatch_w )
  *
  *************************************/
 
-void skullxbo_scanline_update(int scanline)
+void skullxbo_scanline_update(running_machine *machine, int scanline)
 {
 	UINT16 *base = &atarigen_alpha[(scanline / 8) * 64 + 42];
 	int x;
@@ -214,7 +213,7 @@ void skullxbo_scanline_update(int scanline)
 
 			/* force a partial update with the previous scroll */
 			if (scanline > 0)
-				video_screen_update_partial(Machine->primary_screen, scanline - 1);
+				video_screen_update_partial(machine->primary_screen, scanline - 1);
 
 			/* update the new scroll */
 			tilemap_set_scrolly(atarigen_playfield_tilemap, 0, newscroll);

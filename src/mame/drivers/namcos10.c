@@ -372,7 +372,7 @@ static DRIVER_INIT( gamshara )
 
 static MACHINE_RESET( namcos10 )
 {
-	psx_machine_init();
+	psx_machine_init(machine);
 }
 
 static MACHINE_DRIVER_START( namcos10 )

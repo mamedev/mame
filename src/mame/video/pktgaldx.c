@@ -78,7 +78,7 @@ static int pktgaldx_bank_callback(const int bank)
 /* Video on the orginal */
 VIDEO_START(pktgaldx)
 {
-	deco16_1_video_init();
+	deco16_1_video_init(machine);
 
 	deco16_set_tilemap_bank_callback(1,pktgaldx_bank_callback);
 }

@@ -86,7 +86,6 @@ Sprites - Data East custom chip 52
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 UINT16 *darkseal_pf12_row,*darkseal_pf34_row;
 UINT16 *darkseal_pf1_data,*darkseal_pf2_data,*darkseal_pf3_data;
@@ -139,7 +138,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 /******************************************************************************/
 
-static void update_24bitcol(int offset)
+static void update_24bitcol(running_machine *machine, int offset)
 {
 	int r,g,b;
 
@@ -147,19 +146,19 @@ static void update_24bitcol(int offset)
 	g = (paletteram16[offset] >> 8) & 0xff;
 	b = (paletteram16_2[offset] >> 0) & 0xff;
 
-	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 }
 
 WRITE16_HANDLER( darkseal_palette_24bit_rg_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	update_24bitcol(offset);
+	update_24bitcol(machine, offset);
 }
 
 WRITE16_HANDLER( darkseal_palette_24bit_b_w )
 {
 	COMBINE_DATA(&paletteram16_2[offset]);
-	update_24bitcol(offset);
+	update_24bitcol(machine, offset);
 }
 
 /******************************************************************************/

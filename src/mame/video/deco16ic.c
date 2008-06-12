@@ -175,7 +175,8 @@ static int (*deco16_bank_callback_1)(const int bank);
 static int (*deco16_bank_callback_2)(const int bank);
 static int (*deco16_bank_callback_3)(const int bank);
 static int (*deco16_bank_callback_4)(const int bank);
-static void custom_tilemap_draw(bitmap_t *bitmap,tilemap *tilemap0_8x8,tilemap *tilemap0_16x16,
+static void custom_tilemap_draw(running_machine *machine,
+	bitmap_t *bitmap,tilemap *tilemap0_8x8,tilemap *tilemap0_16x16,
 	tilemap *tilemap1_8x8,tilemap *tilemap1_16x16, const UINT16 *rowscroll_ptr,const UINT16 scrollx,
 	const UINT16 scrolly,const UINT16 control0, const UINT16 control1,int combine_mask,int combine_shift,int trans_mask,int flags,UINT32 priority);
 
@@ -516,10 +517,10 @@ WRITE16_HANDLER( deco16_pf4_data_w )
 
 /*****************************************************************************************/
 
-static void deco16_video_init(int pf12_only, int split, int full_width)
+static void deco16_video_init(running_machine *machine, int pf12_only, int split, int full_width)
 {
-	int width = video_screen_get_width(Machine->primary_screen);
-	int height = video_screen_get_height(Machine->primary_screen);
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 	sprite_priority_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED8 );
 
 	pf1_tilemap_16x16 =	tilemap_create(get_pf1_tile_info,   deco16_scan_rows, 16,16,64,32);
@@ -582,26 +583,26 @@ static void deco16_video_init(int pf12_only, int split, int full_width)
 	deco16_raster_display_position=0;
 }
 
-void deco16_1_video_init(void)  /* 1 times playfield generator chip */
+void deco16_1_video_init(running_machine *machine)  /* 1 times playfield generator chip */
 {
-	deco16_video_init(1, 0, 1);
+	deco16_video_init(machine, 1, 0, 1);
 }
 
-void deco16_2_video_init(int split) /* 2 times playfield generator chips */
+void deco16_2_video_init(running_machine *machine, int split) /* 2 times playfield generator chips */
 {
-	deco16_video_init(0, split, 1);
+	deco16_video_init(machine, 0, split, 1);
 }
 
-void deco16_2_video_init_half_width(void) /* 2 times playfield generator chips */
+void deco16_2_video_init_half_width(running_machine *machine) /* 2 times playfield generator chips */
 {
-	deco16_video_init(0, 0, 0);
+	deco16_video_init(machine, 0, 0, 0);
 }
 
-void deco_allocate_sprite_bitmap(void)
+void deco_allocate_sprite_bitmap(running_machine *machine)
 {
 	/* Allow sprite bitmap to be used by Deco32 games as well */
-	int width = video_screen_get_width(Machine->primary_screen);
-	int height = video_screen_get_height(Machine->primary_screen);
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 	sprite_priority_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16 );
 }
 
@@ -835,14 +836,15 @@ void deco16_clear_sprite_priority_bitmap(void)
 }
 
 /* A special pdrawgfx z-buffered sprite renderer that is needed to properly draw multiple sprite sources with alpha */
-void deco16_pdrawgfx(bitmap_t *dest,const gfx_element *gfx,
+void deco16_pdrawgfx(running_machine *machine,
+		bitmap_t *dest,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,UINT32 pri_mask,UINT32 sprite_mask,UINT8 write_pri)
 {
 	int ox,oy,cx,cy;
 	int x_index,y_index,x,y;
 
-	const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 	int source_base = (code % gfx->total_elements) * gfx->height;
 
 	/* check bounds */
@@ -904,7 +906,7 @@ void deco16_tilemap_1_draw(bitmap_t *bitmap, const rectangle *cliprect, int flag
 {
 	if (use_custom_pf1)
 	{
-		custom_tilemap_draw(bitmap,pf1_tilemap_8x8,pf1_tilemap_16x16,0,0,pf1_rowscroll_ptr,deco16_pf12_control[1], deco16_pf12_control[2], deco16_pf12_control[5]&0xff, deco16_pf12_control[6]&0xff, 0, 0, deco16_pf1_trans_mask, flags, priority);
+		custom_tilemap_draw(Machine, bitmap,pf1_tilemap_8x8,pf1_tilemap_16x16,0,0,pf1_rowscroll_ptr,deco16_pf12_control[1], deco16_pf12_control[2], deco16_pf12_control[5]&0xff, deco16_pf12_control[6]&0xff, 0, 0, deco16_pf1_trans_mask, flags, priority);
 	}
 	else
 	{
@@ -917,7 +919,7 @@ void deco16_tilemap_2_draw(bitmap_t *bitmap, const rectangle *cliprect, int flag
 {
 	if (use_custom_pf2)
 	{
-		custom_tilemap_draw(bitmap,pf2_tilemap_8x8,pf2_tilemap_16x16,0,0,pf2_rowscroll_ptr,deco16_pf12_control[3], deco16_pf12_control[4], deco16_pf12_control[5]>>8, deco16_pf12_control[6]>>8, 0, 0, deco16_pf2_trans_mask, flags, priority);
+		custom_tilemap_draw(Machine, bitmap,pf2_tilemap_8x8,pf2_tilemap_16x16,0,0,pf2_rowscroll_ptr,deco16_pf12_control[3], deco16_pf12_control[4], deco16_pf12_control[5]>>8, deco16_pf12_control[6]>>8, 0, 0, deco16_pf2_trans_mask, flags, priority);
 	}
 	else
 	{
@@ -928,13 +930,13 @@ void deco16_tilemap_2_draw(bitmap_t *bitmap, const rectangle *cliprect, int flag
 
 void deco16_tilemap_3_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
 {
-	if (use_custom_pf3) custom_tilemap_draw(bitmap,0,pf3_tilemap_16x16,0,0,pf3_rowscroll_ptr,deco16_pf34_control[1], deco16_pf34_control[2], deco16_pf34_control[5]&0xff, deco16_pf34_control[6]&0xff, 0, 0, deco16_pf3_trans_mask, flags, priority);
+	if (use_custom_pf3) custom_tilemap_draw(Machine, bitmap,0,pf3_tilemap_16x16,0,0,pf3_rowscroll_ptr,deco16_pf34_control[1], deco16_pf34_control[2], deco16_pf34_control[5]&0xff, deco16_pf34_control[6]&0xff, 0, 0, deco16_pf3_trans_mask, flags, priority);
 	else if (pf3_tilemap_16x16) tilemap_draw(bitmap,cliprect,pf3_tilemap_16x16,flags,priority);
 }
 
 void deco16_tilemap_4_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
 {
-	if (use_custom_pf4) custom_tilemap_draw(bitmap,0,pf4_tilemap_16x16,0,0,pf4_rowscroll_ptr,deco16_pf34_control[3], deco16_pf34_control[4], deco16_pf34_control[5]>>8, deco16_pf34_control[6]>>8, 0, 0, deco16_pf4_trans_mask, flags, priority);
+	if (use_custom_pf4) custom_tilemap_draw(Machine, bitmap,0,pf4_tilemap_16x16,0,0,pf4_rowscroll_ptr,deco16_pf34_control[3], deco16_pf34_control[4], deco16_pf34_control[5]>>8, deco16_pf34_control[6]>>8, 0, 0, deco16_pf4_trans_mask, flags, priority);
 	else if (pf4_tilemap_16x16) tilemap_draw(bitmap,cliprect,pf4_tilemap_16x16,flags,priority);
 }
 
@@ -943,7 +945,7 @@ void deco16_tilemap_4_draw(bitmap_t *bitmap, const rectangle *cliprect, int flag
 // Combines the output of two 4BPP tilemaps into an 8BPP tilemap
 void deco16_tilemap_34_combine_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
 {
-	custom_tilemap_draw(bitmap,0,pf3_tilemap_16x16,0,pf4_tilemap_16x16,pf3_rowscroll_ptr,deco16_pf34_control[1], deco16_pf34_control[2], deco16_pf34_control[5]&0xff, deco16_pf34_control[6]&0xff, 0xf, 4, 0xff, flags, priority);
+	custom_tilemap_draw(Machine, bitmap,0,pf3_tilemap_16x16,0,pf4_tilemap_16x16,pf3_rowscroll_ptr,deco16_pf34_control[1], deco16_pf34_control[2], deco16_pf34_control[5]&0xff, deco16_pf34_control[6]&0xff, 0xf, 4, 0xff, flags, priority);
 }
 
 /*****************************************************************************************/
@@ -957,6 +959,7 @@ void deco16_tilemap_34_combine_draw(bitmap_t *bitmap, const rectangle *cliprect,
 */
 
 static void custom_tilemap_draw(
+	running_machine *machine,
 	bitmap_t *bitmap,
 	tilemap *tilemap0_8x8,
 	tilemap *tilemap0_16x16,
@@ -1016,7 +1019,7 @@ static void custom_tilemap_draw(
 				src_x=(src_x+1)&width_mask;
 				if ((flags&TILEMAP_DRAW_OPAQUE) || (p&trans_mask))
 				{
-					*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[p];
+					*BITMAP_ADDR16(bitmap, y, x) = machine->pens[p];
 					if (priority_bitmap)
 					{
 						UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
@@ -1041,7 +1044,7 @@ static void custom_tilemap_draw(
 				src_x=(src_x+1)&width_mask;
 				if ((flags&TILEMAP_DRAW_OPAQUE) || (p&trans_mask))
 				{
-					*BITMAP_ADDR32(bitmap, y, x) = Machine->pens[p];
+					*BITMAP_ADDR32(bitmap, y, x) = machine->pens[p];
 					if (priority_bitmap)
 					{
 						UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);

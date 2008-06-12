@@ -11,7 +11,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "m10.h"
 
 static tilemap *		tx_tilemap;
@@ -43,8 +42,6 @@ static const gfx_layout charlayout =
 
 static UINT32 tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
 {
-	//m10_state *state = Machine->driver_data;
-
 	return (31-col)*32 + row;
 }
 
@@ -78,9 +75,9 @@ WRITE8_HANDLER( m15_chargen_w )
 }
 
 
-INLINE void plot_pixel_m10(bitmap_t *bm, int x, int y, int col)
+INLINE void plot_pixel_m10(running_machine *machine, bitmap_t *bm, int x, int y, int col)
 {
-	m10_state *state = Machine->driver_data;
+	m10_state *state = machine->driver_data;
 
 	if (!state->flip)
 		*BITMAP_ADDR16(bm, y, x) = col;
@@ -152,7 +149,7 @@ VIDEO_UPDATE( m10 )
 		int y;
 
 		for (y = IREMM10_VBEND;y < IREMM10_VBSTART;y++)
-			plot_pixel_m10(bitmap,16,y,1);
+			plot_pixel_m10(screen->machine, bitmap,16,y,1);
 	}
 
 	for (offs = videoram_size - 1;offs >= 0;offs--)

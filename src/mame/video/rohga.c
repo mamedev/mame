@@ -28,7 +28,7 @@ VIDEO_START( rohga )
 {
 	rohga_spriteram = (UINT16*)auto_malloc(0x800);
 
-	deco16_2_video_init(0);
+	deco16_2_video_init(machine, 0);
 
 	deco16_set_tilemap_bank_callback(0,wizdfire_bank_callback);
 	deco16_set_tilemap_bank_callback(1,wizdfire_bank_callback);
@@ -38,7 +38,7 @@ VIDEO_START( rohga )
 
 VIDEO_START( wizdfire )
 {
-	deco16_2_video_init(0);
+	deco16_2_video_init(machine, 0);
 
 	deco16_set_tilemap_bank_callback(0,wizdfire_bank_callback);
 	deco16_set_tilemap_bank_callback(1,wizdfire_bank_callback);
@@ -52,7 +52,7 @@ VIDEO_START( wizdfire )
 
 VIDEO_START( nitrobal )
 {
-	deco16_2_video_init_half_width();
+	deco16_2_video_init_half_width(machine);
 
 	deco16_set_tilemap_bank_callback(0,wizdfire_bank_callback);
 	deco16_set_tilemap_bank_callback(1,wizdfire_bank_callback);
@@ -420,7 +420,8 @@ sprite 2:
 
 		for (x=0; x<w; x++) {
 			for (y=0; y<h; y++) {
-				deco16_pdrawgfx(bitmap,machine->gfx[gfxbank],
+				deco16_pdrawgfx(machine,
+						bitmap,machine->gfx[gfxbank],
 						sprite + y + h * x,
 						colour,
 						fx,fy,

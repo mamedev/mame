@@ -7,7 +7,6 @@ Namco System 21 Video Hardware
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "namcos2.h"
 #include "namcoic.h"
 #include "namcos21.h"
@@ -140,7 +139,7 @@ VIDEO_START( namcos21 )
 } /* VIDEO_START( namcos21 ) */
 
 static void
-update_palette( void )
+update_palette( running_machine *machine )
 {
 	int i;
 	INT16 data1,data2;
@@ -172,7 +171,7 @@ update_palette( void )
 		g = data1&0xff;
 		b = data2&0xff;
 
-		palette_set_color( Machine,i, MAKE_RGB(r,g,b) );
+		palette_set_color( machine,i, MAKE_RGB(r,g,b) );
 	}
 } /* update_palette */
 
@@ -181,7 +180,7 @@ VIDEO_UPDATE( namcos21 )
 {
 	int pivot = 3;
 	int pri;
-	update_palette();
+	update_palette(screen->machine);
 	fillbitmap( bitmap, 0xff, cliprect );
 
 	if( namcos2_gametype != NAMCOS21_WINRUN91 )

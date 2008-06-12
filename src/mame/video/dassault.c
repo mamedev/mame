@@ -128,7 +128,8 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 
 			while (multi >= 0)
 			{
-				deco16_pdrawgfx(bitmap,machine->gfx[gfxbank],
+				deco16_pdrawgfx(machine,
+						bitmap,machine->gfx[gfxbank],
 						sprite - multi * inc,
 						colour,
 						fx,fy,
@@ -150,7 +151,7 @@ static int dassault_bank_callback(const int bank)
 
 VIDEO_START( dassault )
 {
-	deco16_2_video_init(0);
+	deco16_2_video_init(machine, 0);
 
 	deco16_set_tilemap_bank_callback(0,dassault_bank_callback);
 	deco16_set_tilemap_bank_callback(1,dassault_bank_callback);

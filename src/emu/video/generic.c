@@ -205,9 +205,9 @@ INLINE UINT32 paletteram32_be(offs_t offset)
     shift values
 -------------------------------------------------*/
 
-INLINE void set_color_444(pen_t color, int rshift, int gshift, int bshift, UINT16 data)
+INLINE void set_color_444(running_machine *machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
-	palette_set_color_rgb(Machine, color, pal4bit(data >> rshift), pal4bit(data >> gshift), pal4bit(data >> bshift));
+	palette_set_color_rgb(machine, color, pal4bit(data >> rshift), pal4bit(data >> gshift), pal4bit(data >> bshift));
 }
 
 
@@ -217,7 +217,7 @@ INLINE void set_color_444(pen_t color, int rshift, int gshift, int bshift, UINT1
     shift values
 -------------------------------------------------*/
 
-INLINE void set_color_4444(pen_t color, int ishift, int rshift, int gshift, int bshift, UINT16 data)
+INLINE void set_color_4444(running_machine *machine, pen_t color, int ishift, int rshift, int gshift, int bshift, UINT16 data)
 {
 	static const UINT8 ztable[16] =
 		{ 0x0, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0x10, 0x11 };
@@ -228,7 +228,7 @@ INLINE void set_color_4444(pen_t color, int ishift, int rshift, int gshift, int 
 	g = ((data >> gshift) & 15) * i;
 	b = ((data >> bshift) & 15) * i;
 
-	palette_set_color_rgb(Machine, color, r, g, b);
+	palette_set_color_rgb(machine, color, r, g, b);
 }
 
 
@@ -238,9 +238,9 @@ INLINE void set_color_4444(pen_t color, int ishift, int rshift, int gshift, int 
     shift values
 -------------------------------------------------*/
 
-INLINE void set_color_555(pen_t color, int rshift, int gshift, int bshift, UINT16 data)
+INLINE void set_color_555(running_machine *machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
-	palette_set_color_rgb(Machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
+	palette_set_color_rgb(machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
 
@@ -250,9 +250,9 @@ INLINE void set_color_555(pen_t color, int rshift, int gshift, int bshift, UINT1
     shift values
 -------------------------------------------------*/
 
-INLINE void set_color_888(pen_t color, int rshift, int gshift, int bshift, UINT32 data)
+INLINE void set_color_888(running_machine *machine, pen_t color, int rshift, int gshift, int bshift, UINT32 data)
 {
-	palette_set_color_rgb(Machine, color, (data >> rshift) & 0xff, (data >> gshift) & 0xff, (data >> bshift) & 0xff);
+	palette_set_color_rgb(machine, color, (data >> rshift) & 0xff, (data >> gshift) & 0xff, (data >> bshift) & 0xff);
 }
 
 
@@ -448,12 +448,12 @@ void buffer_spriteram_2(UINT8 *ptr, int length)
     updateflip - handle global flipping
 -------------------------------------------------*/
 
-static void updateflip(void)
+static void updateflip(running_machine *machine)
 {
-	int width = video_screen_get_width(Machine->primary_screen);
-	int height = video_screen_get_height(Machine->primary_screen);
-	attoseconds_t period = video_screen_get_frame_period(Machine->primary_screen).attoseconds;
-	rectangle visarea = *video_screen_get_visible_area(Machine->primary_screen);
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+	attoseconds_t period = video_screen_get_frame_period(machine->primary_screen).attoseconds;
+	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
 
 	tilemap_set_flip(ALL_TILEMAPS,(TILEMAP_FLIPX & flip_screen_x) | (TILEMAP_FLIPY & flip_screen_y));
 
@@ -474,7 +474,7 @@ static void updateflip(void)
 		visarea.max_y = temp;
 	}
 
-	video_screen_configure(Machine->primary_screen, width, height, &visarea, period);
+	video_screen_configure(machine->primary_screen, width, height, &visarea, period);
 }
 
 
@@ -515,7 +515,7 @@ void flip_screen_x_set(int on)
 	if (flip_screen_x != on)
 	{
 		flip_screen_x = on;
-		updateflip();
+		updateflip(Machine);
 	}
 }
 
@@ -530,7 +530,7 @@ void flip_screen_y_set(int on)
 	if (flip_screen_y != on)
 	{
 		flip_screen_y = on;
-		updateflip();
+		updateflip(Machine);
 	}
 }
 
@@ -719,31 +719,31 @@ WRITE8_HANDLER( paletteram_BBGGRRII_w )
 WRITE8_HANDLER( paletteram_xxxxBBBBGGGGRRRR_le_w )
 {
 	paletteram[offset] = data;
-	set_color_444(offset / 2, 0, 4, 8, paletteram16_le(offset));
+	set_color_444(machine, offset / 2, 0, 4, 8, paletteram16_le(offset));
 }
 
 WRITE8_HANDLER( paletteram_xxxxBBBBGGGGRRRR_be_w )
 {
 	paletteram[offset] = data;
-	set_color_444(offset / 2, 0, 4, 8, paletteram16_be(offset));
+	set_color_444(machine, offset / 2, 0, 4, 8, paletteram16_be(offset));
 }
 
 WRITE8_HANDLER( paletteram_xxxxBBBBGGGGRRRR_split1_w )
 {
 	paletteram[offset] = data;
-	set_color_444(offset, 0, 4, 8, paletteram16_split(offset));
+	set_color_444(machine, offset, 0, 4, 8, paletteram16_split(offset));
 }
 
 WRITE8_HANDLER( paletteram_xxxxBBBBGGGGRRRR_split2_w )
 {
 	paletteram_2[offset] = data;
-	set_color_444(offset, 0, 4, 8, paletteram16_split(offset));
+	set_color_444(machine, offset, 0, 4, 8, paletteram16_split(offset));
 }
 
 WRITE16_HANDLER( paletteram16_xxxxBBBBGGGGRRRR_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	set_color_444(offset, 0, 4, 8, paletteram16[offset]);
+	set_color_444(machine, offset, 0, 4, 8, paletteram16[offset]);
 }
 
 
@@ -754,31 +754,31 @@ WRITE16_HANDLER( paletteram16_xxxxBBBBGGGGRRRR_word_w )
 WRITE8_HANDLER( paletteram_xxxxBBBBRRRRGGGG_le_w )
 {
 	paletteram[offset] = data;
-	set_color_444(offset / 2, 4, 0, 8, paletteram16_le(offset));
+	set_color_444(machine, offset / 2, 4, 0, 8, paletteram16_le(offset));
 }
 
 WRITE8_HANDLER( paletteram_xxxxBBBBRRRRGGGG_be_w )
 {
 	paletteram[offset] = data;
-	set_color_444(offset / 2, 4, 0, 8, paletteram16_be(offset));
+	set_color_444(machine, offset / 2, 4, 0, 8, paletteram16_be(offset));
 }
 
 WRITE8_HANDLER( paletteram_xxxxBBBBRRRRGGGG_split1_w )
 {
 	paletteram[offset] = data;
-	set_color_444(offset, 4, 0, 8, paletteram16_split(offset));
+	set_color_444(machine, offset, 4, 0, 8, paletteram16_split(offset));
 }
 
 WRITE8_HANDLER( paletteram_xxxxBBBBRRRRGGGG_split2_w )
 {
 	paletteram_2[offset] = data;
-	set_color_444(offset, 4, 0, 8, paletteram16_split(offset));
+	set_color_444(machine, offset, 4, 0, 8, paletteram16_split(offset));
 }
 
 WRITE16_HANDLER( paletteram16_xxxxBBBBRRRRGGGG_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	set_color_444(offset, 4, 0, 8, paletteram16[offset]);
+	set_color_444(machine, offset, 4, 0, 8, paletteram16[offset]);
 }
 
 
@@ -789,13 +789,13 @@ WRITE16_HANDLER( paletteram16_xxxxBBBBRRRRGGGG_word_w )
 WRITE8_HANDLER( paletteram_xxxxRRRRBBBBGGGG_split1_w )
 {
 	paletteram[offset] = data;
-	set_color_444(offset, 8, 0, 4, paletteram16_split(offset));
+	set_color_444(machine, offset, 8, 0, 4, paletteram16_split(offset));
 }
 
 WRITE8_HANDLER( paletteram_xxxxRRRRBBBBGGGG_split2_w )
 {
 	paletteram_2[offset] = data;
-	set_color_444(offset, 8, 0, 4, paletteram16_split(offset));
+	set_color_444(machine, offset, 8, 0, 4, paletteram16_split(offset));
 }
 
 
@@ -806,19 +806,19 @@ WRITE8_HANDLER( paletteram_xxxxRRRRBBBBGGGG_split2_w )
 WRITE8_HANDLER( paletteram_xxxxRRRRGGGGBBBB_le_w )
 {
 	paletteram[offset] = data;
-	set_color_444(offset / 2, 8, 4, 0, paletteram16_le(offset));
+	set_color_444(machine, offset / 2, 8, 4, 0, paletteram16_le(offset));
 }
 
 WRITE8_HANDLER( paletteram_xxxxRRRRGGGGBBBB_be_w )
 {
 	paletteram[offset] = data;
-	set_color_444(offset / 2, 8, 4, 0, paletteram16_be(offset));
+	set_color_444(machine, offset / 2, 8, 4, 0, paletteram16_be(offset));
 }
 
 WRITE16_HANDLER( paletteram16_xxxxRRRRGGGGBBBB_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	set_color_444(offset, 8, 4, 0, paletteram16[offset]);
+	set_color_444(machine, offset, 8, 4, 0, paletteram16[offset]);
 }
 
 
@@ -829,25 +829,25 @@ WRITE16_HANDLER( paletteram16_xxxxRRRRGGGGBBBB_word_w )
 WRITE8_HANDLER( paletteram_RRRRGGGGBBBBxxxx_be_w )
 {
 	paletteram[offset] = data;
-	set_color_444(offset / 2, 12, 8, 4, paletteram16_be(offset));
+	set_color_444(machine, offset / 2, 12, 8, 4, paletteram16_be(offset));
 }
 
 WRITE8_HANDLER( paletteram_RRRRGGGGBBBBxxxx_split1_w )
 {
 	paletteram[offset] = data;
-	set_color_444(offset, 12, 8, 4, paletteram16_split(offset));
+	set_color_444(machine, offset, 12, 8, 4, paletteram16_split(offset));
 }
 
 WRITE8_HANDLER( paletteram_RRRRGGGGBBBBxxxx_split2_w )
 {
 	paletteram_2[offset] = data;
-	set_color_444(offset, 12, 8, 4, paletteram16_split(offset));
+	set_color_444(machine, offset, 12, 8, 4, paletteram16_split(offset));
 }
 
 WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBxxxx_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	set_color_444(offset, 12, 8, 4, paletteram16[offset]);
+	set_color_444(machine, offset, 12, 8, 4, paletteram16[offset]);
 }
 
 
@@ -863,31 +863,31 @@ WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBxxxx_word_w )
 WRITE8_HANDLER( paletteram_xBBBBBGGGGGRRRRR_le_w )
 {
 	paletteram[offset] = data;
-	set_color_555(offset / 2, 0, 5, 10, paletteram16_le(offset));
+	set_color_555(machine, offset / 2, 0, 5, 10, paletteram16_le(offset));
 }
 
 WRITE8_HANDLER( paletteram_xBBBBBGGGGGRRRRR_be_w )
 {
 	paletteram[offset] = data;
-	set_color_555(offset / 2, 0, 5, 10, paletteram16_be(offset));
+	set_color_555(machine, offset / 2, 0, 5, 10, paletteram16_be(offset));
 }
 
 WRITE8_HANDLER( paletteram_xBBBBBGGGGGRRRRR_split1_w )
 {
 	paletteram[offset] = data;
-	set_color_555(offset, 0, 5, 10, paletteram16_split(offset));
+	set_color_555(machine, offset, 0, 5, 10, paletteram16_split(offset));
 }
 
 WRITE8_HANDLER( paletteram_xBBBBBGGGGGRRRRR_split2_w )
 {
 	paletteram_2[offset] = data;
-	set_color_555(offset, 0, 5, 10, paletteram16_split(offset));
+	set_color_555(machine, offset, 0, 5, 10, paletteram16_split(offset));
 }
 
 WRITE16_HANDLER( paletteram16_xBBBBBGGGGGRRRRR_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	set_color_555(offset, 0, 5, 10, paletteram16[offset]);
+	set_color_555(machine, offset, 0, 5, 10, paletteram16[offset]);
 }
 
 
@@ -898,13 +898,13 @@ WRITE16_HANDLER( paletteram16_xBBBBBGGGGGRRRRR_word_w )
 WRITE8_HANDLER( paletteram_xBBBBBRRRRRGGGGG_split1_w )
 {
 	paletteram[offset] = data;
-	set_color_555(offset, 5, 0, 10, paletteram16_split(offset));
+	set_color_555(machine, offset, 5, 0, 10, paletteram16_split(offset));
 }
 
 WRITE8_HANDLER( paletteram_xBBBBBRRRRRGGGGG_split2_w )
 {
 	paletteram_2[offset] = data;
-	set_color_555(offset, 5, 0, 10, paletteram16_split(offset));
+	set_color_555(machine, offset, 5, 0, 10, paletteram16_split(offset));
 }
 
 
@@ -915,13 +915,13 @@ WRITE8_HANDLER( paletteram_xBBBBBRRRRRGGGGG_split2_w )
 WRITE8_HANDLER( paletteram_xRRRRRGGGGGBBBBB_le_w )
 {
 	paletteram[offset] = data;
-	set_color_555(offset / 2, 10, 5, 0, paletteram16_le(offset));
+	set_color_555(machine, offset / 2, 10, 5, 0, paletteram16_le(offset));
 }
 
 WRITE16_HANDLER( paletteram16_xRRRRRGGGGGBBBBB_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	set_color_555(offset, 10, 5, 0, paletteram16[offset]);
+	set_color_555(machine, offset, 10, 5, 0, paletteram16[offset]);
 }
 
 
@@ -932,7 +932,7 @@ WRITE16_HANDLER( paletteram16_xRRRRRGGGGGBBBBB_word_w )
 WRITE16_HANDLER( paletteram16_xGGGGGRRRRRBBBBB_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	set_color_555(offset, 5, 10, 0, paletteram16[offset]);
+	set_color_555(machine, offset, 5, 10, 0, paletteram16[offset]);
 }
 
 
@@ -943,7 +943,7 @@ WRITE16_HANDLER( paletteram16_xGGGGGRRRRRBBBBB_word_w )
 WRITE16_HANDLER( paletteram16_xGGGGGBBBBBRRRRR_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	set_color_555(offset, 0, 10, 5, paletteram16[offset]);
+	set_color_555(machine, offset, 0, 10, 5, paletteram16[offset]);
 }
 
 
@@ -954,7 +954,7 @@ WRITE16_HANDLER( paletteram16_xGGGGGBBBBBRRRRR_word_w )
 WRITE16_HANDLER( paletteram16_GGGGGRRRRRBBBBBx_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	set_color_555(offset, 6, 11, 1, paletteram16[offset]);
+	set_color_555(machine, offset, 6, 11, 1, paletteram16[offset]);
 }
 
 /*-------------------------------------------------
@@ -964,7 +964,7 @@ WRITE16_HANDLER( paletteram16_GGGGGRRRRRBBBBBx_word_w )
 WRITE16_HANDLER( paletteram16_RRRRRGGGGGBBBBBx_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	set_color_555(offset, 11, 6, 1, paletteram16[offset]);
+	set_color_555(machine, offset, 11, 6, 1, paletteram16[offset]);
 }
 
 
@@ -994,7 +994,7 @@ WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBRGBx_word_w )
 WRITE16_HANDLER( paletteram16_IIIIRRRRGGGGBBBB_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	set_color_4444(offset, 12, 8, 4, 0, paletteram16[offset]);
+	set_color_4444(machine, offset, 12, 8, 4, 0, paletteram16[offset]);
 }
 
 
@@ -1005,7 +1005,7 @@ WRITE16_HANDLER( paletteram16_IIIIRRRRGGGGBBBB_word_w )
 WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBIIII_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	set_color_4444(offset, 0, 12, 8, 4, paletteram16[offset]);
+	set_color_4444(machine, offset, 0, 12, 8, 4, paletteram16[offset]);
 }
 
 
@@ -1021,7 +1021,7 @@ WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBIIII_word_w )
 WRITE16_HANDLER( paletteram16_xrgb_word_be_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	set_color_888(offset / 2, 16, 8, 0, paletteram32_be(offset));
+	set_color_888(machine, offset / 2, 16, 8, 0, paletteram32_be(offset));
 }
 
 
@@ -1032,5 +1032,5 @@ WRITE16_HANDLER( paletteram16_xrgb_word_be_w )
 WRITE16_HANDLER( paletteram16_xbgr_word_be_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	set_color_888(offset / 2, 0, 8, 16, paletteram32_be(offset));
+	set_color_888(machine, offset / 2, 0, 8, 16, paletteram32_be(offset));
 }

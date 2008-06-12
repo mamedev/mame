@@ -114,7 +114,6 @@ BG0 palette intensity ( $C47F, $C4FF )
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 #include "jalblend.c"
 
@@ -452,20 +451,20 @@ static void argus_write_dummy_rams( int dramoffs, int vromoffs )
 }
 
 
-static void bombsa_change_palette(int color, int data)
+static void bombsa_change_palette(running_machine *machine, int color, int data)
 {
-	palette_set_color_rgb(Machine, color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
+	palette_set_color_rgb(machine, color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
 }
 
 
-static void argus_change_palette(int color, int data)
+static void argus_change_palette(running_machine *machine, int color, int data)
 {
 	jal_blend_table[color] = data & 0x0f ;
 
-	palette_set_color_rgb(Machine, color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
+	palette_set_color_rgb(machine, color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
 }
 
-static void argus_change_bg_palette(int color, int data)
+static void argus_change_bg_palette(running_machine *machine, int color, int data)
 {
 	int r, g, b;
 	int ir, ig, ib;
@@ -490,7 +489,7 @@ static void argus_change_bg_palette(int color, int data)
 			g = 0;
 	}
 
-	palette_set_color_rgb(Machine, color, pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(machine, color, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 
@@ -706,7 +705,7 @@ WRITE8_HANDLER( argus_bg_status_w )
 
 			for (offs = 0x400 ; offs < 0x500 ; offs ++)
 			{
-				argus_change_bg_palette( (offs - 0x0400) + 128,
+				argus_change_bg_palette( machine, (offs - 0x0400) + 128,
 					(argus_paletteram[offs] << 8) | argus_paletteram[offs + 0x0400] );
 			}
 		}
@@ -729,7 +728,7 @@ WRITE8_HANDLER( valtric_bg_status_w )
 
 			for (offs = 0x400 ; offs < 0x600 ; offs += 2)
 			{
-				argus_change_bg_palette( ((offs - 0x0400) >> 1) + 256,
+				argus_change_bg_palette( machine, ((offs - 0x0400) >> 1) + 256,
 					argus_paletteram[offs | 1] | (argus_paletteram[offs & ~1] << 8));
 			}
 		}
@@ -810,7 +809,7 @@ WRITE8_HANDLER( argus_paletteram_w )
 			if (offset & 0x80)
 				offset -= 0x80;
 
-			argus_change_palette( offset,
+			argus_change_palette( machine, offset,
 				(argus_paletteram[offset] << 8) | argus_paletteram[offset + 0x80] );
 		}
 
@@ -820,7 +819,7 @@ WRITE8_HANDLER( argus_paletteram_w )
 			if (offset >= 0x0800)
 				offset -= 0x0400;
 
-			argus_change_bg_palette( (offset - 0x0400) + 128,
+			argus_change_bg_palette( machine, (offset - 0x0400) + 128,
 				(argus_paletteram[offset] << 8) | argus_paletteram[offset + 0x0400] );
 		}
 
@@ -830,7 +829,7 @@ WRITE8_HANDLER( argus_paletteram_w )
 			if (offset >= 0x0900)
 				offset -= 0x0400;
 
-			argus_change_palette( (offset - 0x0500) + 384,
+			argus_change_palette( machine, (offset - 0x0500) + 384,
 				(argus_paletteram[offset] << 8) | argus_paletteram[offset + 0x0400] );
 		}
 
@@ -840,7 +839,7 @@ WRITE8_HANDLER( argus_paletteram_w )
 			if (offset >= 0x0b00)
 				offset -= 0x0400;
 
-			argus_change_palette( (offset - 0x0700) + 640,
+			argus_change_palette( machine, (offset - 0x0700) + 640,
 				(argus_paletteram[offset] << 8) | argus_paletteram[offset + 0x0400] );
 		}
 	}
@@ -850,7 +849,7 @@ WRITE8_HANDLER( argus_paletteram_w )
 
 		for (offs = 0x400 ; offs < 0x500 ; offs ++)
 		{
-			argus_change_bg_palette( (offs - 0x0400) + 128,
+			argus_change_bg_palette( machine, (offs - 0x0400) + 128,
 				(argus_paletteram[offs] << 8) | argus_paletteram[offs + 0x0400] );
 		}
 
@@ -868,17 +867,17 @@ WRITE8_HANDLER( valtric_paletteram_w )
 	{
 		if (offset >= 0x0000 && offset <= 0x01ff)
 		{
-			argus_change_palette( offset >> 1,
+			argus_change_palette( machine, offset >> 1,
 				argus_paletteram[offset | 1] | (argus_paletteram[offset & ~1] << 8));
 		}
 		else if (offset >= 0x0400 && offset <= 0x05ff )
 		{
-			argus_change_bg_palette( ((offset - 0x0400) >> 1) + 256,
+			argus_change_bg_palette( machine, ((offset - 0x0400) >> 1) + 256,
 				argus_paletteram[offset | 1] | (argus_paletteram[offset & ~1] << 8));
 		}
 		else if (offset >= 0x0600 && offset <= 0x07ff )
 		{
-			argus_change_palette( ((offset - 0x0600) >> 1) + 512,
+			argus_change_palette( machine, ((offset - 0x0600) >> 1) + 512,
 				argus_paletteram[offset | 1] | (argus_paletteram[offset & ~1] << 8));
 		}
 	}
@@ -888,7 +887,7 @@ WRITE8_HANDLER( valtric_paletteram_w )
 
 		for (offs = 0x400 ; offs < 0x600 ; offs += 2)
 		{
-			argus_change_bg_palette( ((offs - 0x0400) >> 1) + 256,
+			argus_change_bg_palette( machine, ((offs - 0x0400) >> 1) + 256,
 				argus_paletteram[offs | 1] | (argus_paletteram[offs & ~1] << 8));
 		}
 
@@ -902,30 +901,30 @@ WRITE8_HANDLER( butasan_paletteram_w )
 
 	if (offset < 0x0200 )							/* BG1 color */
 	{
-		argus_change_palette( ((offset - 0x0000) >> 1) + 256,
+		argus_change_palette( machine, ((offset - 0x0000) >> 1) + 256,
 			argus_paletteram[offset | 1] | (argus_paletteram[offset & ~1] << 8));
 	}
 	else if (offset < 0x0240 )						/* BG0 color */
 	{
-		argus_change_palette( ((offset - 0x0200) >> 1) + 192,
+		argus_change_palette( machine, ((offset - 0x0200) >> 1) + 192,
 			argus_paletteram[offset | 1] | (argus_paletteram[offset & ~1] << 8));
 	}
 	else if (offset >= 0x0400 && offset <= 0x04ff )	/* Sprite color */
 	{
 		if (offset < 0x0480)			/* 16 colors */
-			argus_change_palette( ((offset - 0x0400) >> 1) + 0,
+			argus_change_palette( machine, ((offset - 0x0400) >> 1) + 0,
 				argus_paletteram[offset | 1] | (argus_paletteram[offset & ~1] << 8));
 		else							/* 8  colors */
 		{
-			argus_change_palette( (offset & 0x70) + ((offset & 0x00f) >> 1) + 64,
+			argus_change_palette( machine, (offset & 0x70) + ((offset & 0x00f) >> 1) + 64,
 				argus_paletteram[offset | 1] | (argus_paletteram[offset & ~1] << 8));
-			argus_change_palette( (offset & 0x70) + ((offset & 0x00f) >> 1) + 72,
+			argus_change_palette( machine, (offset & 0x70) + ((offset & 0x00f) >> 1) + 72,
 				argus_paletteram[offset | 1] | (argus_paletteram[offset & ~1] << 8));
 		}
 	}
 	else if (offset >= 0x0600 && offset <= 0x07ff )	/* Text color */
 	{
-		argus_change_palette( ((offset - 0x0600) >> 1) + 512,
+		argus_change_palette( machine, ((offset - 0x0600) >> 1) + 512,
 			argus_paletteram[offset | 1] | (argus_paletteram[offset & ~1] << 8));
 	}
 }
@@ -952,7 +951,7 @@ WRITE8_HANDLER( bombsa_paletteram_w )
 	if (bombsa_ram_page==1)
 	{
 		argus_paletteram[ offset ] = data;
-		bombsa_change_palette( offset>>1, argus_paletteram[offset | 1] | (argus_paletteram[offset & ~1] << 8));
+		bombsa_change_palette( machine, offset>>1, argus_paletteram[offset | 1] | (argus_paletteram[offset & ~1] << 8));
 	}
 	else if (bombsa_ram_page==0)
 	{
@@ -1154,7 +1153,8 @@ static void argus_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 			}
 
 			if (priority != pri)
-				jal_blend_drawgfx(bitmap,machine->gfx[0],
+				jal_blend_drawgfx(machine,
+							bitmap,machine->gfx[0],
 							tile,
 							color,
 							flipx, flipy,
@@ -1208,7 +1208,8 @@ static void valtric_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 				flipy ^= 0x20;
 			}
 
-			jal_blend_drawgfx(bitmap,machine->gfx[0],
+			jal_blend_drawgfx(machine,
+						bitmap,machine->gfx[0],
 						tile,
 						color,
 						flipx, flipy,
@@ -1243,7 +1244,8 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 		{
 			if ( (offs >= 0x100 && offs < 0x300) || (offs >= 0x400 && offs < 0x580) )
 			{
-				jal_blend_drawgfx(bitmap,machine->gfx[0],
+				jal_blend_drawgfx(machine,
+							bitmap,machine->gfx[0],
 							tile,
 							color,
 							flipx, flipy,
@@ -1261,7 +1263,8 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 					td = (flipx) ? (1 - i) : i;
 
-					jal_blend_drawgfx(bitmap,machine->gfx[0],
+					jal_blend_drawgfx(machine,
+								bitmap,machine->gfx[0],
 								tile + td,
 								color,
 								flipx, flipy,
@@ -1285,7 +1288,8 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 						else
 							td = (flipx) ? ( (1 - i) * 2 ) + 1 - j : (1 - i) * 2 + j;
 
-						jal_blend_drawgfx(bitmap,machine->gfx[0],
+						jal_blend_drawgfx(machine,
+									bitmap,machine->gfx[0],
 									tile + td,
 									color,
 									flipx, flipy,
@@ -1310,7 +1314,8 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 						else
 							td = (flipx) ? ( (3 - i) * 4 ) + 3 - j : (3 - i) * 4 + j;
 
-						jal_blend_drawgfx(bitmap,machine->gfx[0],
+						jal_blend_drawgfx(machine,
+									bitmap,machine->gfx[0],
 									tile + td,
 									color,
 									flipx, flipy,
@@ -1330,7 +1335,8 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 			if ( (offs >= 0x100 && offs < 0x300) || (offs >= 0x400 && offs < 0x580) )
 			{
-				jal_blend_drawgfx(bitmap,machine->gfx[0],
+				jal_blend_drawgfx(machine,
+							bitmap,machine->gfx[0],
 							tile,
 							color,
 							flipx, flipy,
@@ -1348,7 +1354,8 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 					td = (flipx) ? i : (1 - i);
 
-					jal_blend_drawgfx(bitmap,machine->gfx[0],
+					jal_blend_drawgfx(machine,
+								bitmap,machine->gfx[0],
 								tile + td,
 								color,
 								flipx, flipy,
@@ -1372,7 +1379,8 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 						else
 							td = (flipx) ? i * 2 + j : (i * 2) + 1 - j;
 
-						jal_blend_drawgfx(bitmap,machine->gfx[0],
+						jal_blend_drawgfx(machine,
+									bitmap,machine->gfx[0],
 									tile + td,
 									color,
 									flipx, flipy,
@@ -1397,7 +1405,8 @@ static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 						else
 							td = (flipx) ? i * 4 + j : (i * 4) + 3 - j;
 
-						jal_blend_drawgfx(bitmap,machine->gfx[0],
+						jal_blend_drawgfx(machine,
+									bitmap,machine->gfx[0],
 									tile + td,
 									color,
 									flipx, flipy,

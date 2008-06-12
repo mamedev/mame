@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/tms34010/34010ops.h"
 #include "harddriv.h"
@@ -209,9 +208,9 @@ void hdgsp_read_from_shiftreg(UINT32 address, UINT16 *shiftreg)
  *
  *************************************/
 
-static void update_palette_bank(int newbank)
+static void update_palette_bank(running_machine *machine, int newbank)
 {
-	video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 	gfx_palettebank = newbank;
 }
 
@@ -278,16 +277,16 @@ WRITE16_HANDLER( hdgsp_control_hi_w )
 			break;
 
 		case 0x02:
-			update_palette_bank((gfx_palettebank & ~1) | val);
+			update_palette_bank(machine, (gfx_palettebank & ~1) | val);
 			break;
 
 		case 0x03:
-			update_palette_bank((gfx_palettebank & ~2) | (val << 1));
+			update_palette_bank(machine, (gfx_palettebank & ~2) | (val << 1));
 			break;
 
 		case 0x04:
 			if (machine->config->total_colors >= 256 * 8)
-				update_palette_bank((gfx_palettebank & ~4) | (val << 2));
+				update_palette_bank(machine, (gfx_palettebank & ~4) | (val << 2));
 			break;
 
 		case 0x07:
@@ -369,12 +368,12 @@ WRITE16_HANDLER( hdgsp_vram_2bpp_w )
  *
  *************************************/
 
-INLINE void gsp_palette_change(int offset)
+INLINE void gsp_palette_change(running_machine *machine, int offset)
 {
 	int red = (hdgsp_paletteram_lo[offset] >> 8) & 0xff;
 	int green = hdgsp_paletteram_lo[offset] & 0xff;
 	int blue = hdgsp_paletteram_hi[offset] & 0xff;
-	palette_set_color(Machine, offset, MAKE_RGB(red, green, blue));
+	palette_set_color(machine, offset, MAKE_RGB(red, green, blue));
 }
 
 
@@ -395,7 +394,7 @@ WRITE16_HANDLER( hdgsp_paletteram_lo_w )
 	offset = gfx_palettebank * 0x100 + (offset & 0xff);
 
 	COMBINE_DATA(&hdgsp_paletteram_lo[offset]);
-	gsp_palette_change(offset);
+	gsp_palette_change(machine, offset);
 }
 
 
@@ -423,7 +422,7 @@ WRITE16_HANDLER( hdgsp_paletteram_hi_w )
 	offset = gfx_palettebank * 0x100 + (offset & 0xff);
 
 	COMBINE_DATA(&hdgsp_paletteram_hi[offset]);
-	gsp_palette_change(offset);
+	gsp_palette_change(machine, offset);
 }
 
 

@@ -6,7 +6,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "jalblend.c"
 
 #define	BG_SCROLLX_LSB		0x308
@@ -53,7 +52,7 @@ WRITE8_HANDLER( psychic5_title_screen_w )
 	title_screen = data & 0x01;
 }
 
-static void psychic5_paletteram_w(int color_offs, int offset, int data)
+static void psychic5_paletteram_w(running_machine *machine, int color_offs, int offset, int data)
 {
 	int r,g,b,a,val;
 
@@ -74,7 +73,7 @@ static void psychic5_paletteram_w(int color_offs, int offset, int data)
 
 	jal_blend_table[(offset / 2)-color_offs] = a ;
 
-	palette_set_color_rgb(Machine,(offset / 2)-color_offs,pal4bit(r),pal4bit(g),pal4bit(b));
+	palette_set_color_rgb(machine,(offset / 2)-color_offs,pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
 static void set_background_palette_intensity(running_machine *machine)
@@ -218,7 +217,7 @@ WRITE8_HANDLER( psychic5_paged_ram_w )
 		}
 		else if (offset < 0x600)
 		{
-			psychic5_paletteram_w(000, offset-0x400, data);
+			psychic5_paletteram_w(machine, 000, offset-0x400, data);
 		}
 		else if (offset > 0x5ff && offset< 0x800)
 		{
@@ -226,11 +225,11 @@ WRITE8_HANDLER( psychic5_paged_ram_w )
 		}
 		else if (offset > 0x7ff && offset < 0xa00)
 		{
-			psychic5_paletteram_w(256, offset-0x400, data);
+			psychic5_paletteram_w(machine, 256, offset-0x400, data);
 		}
 		else if (offset > 0x9ff && offset < 0xc00)
 		{
-			psychic5_paletteram_w(256, offset-0x400, data);
+			psychic5_paletteram_w(machine, 256, offset-0x400, data);
 		}
 		else if (offset < 0x1000)
 		{
@@ -290,7 +289,7 @@ VIDEO_START( psychic5 )
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 }
 
-#define DRAW_SPRITE(code, sx, sy) jal_blend_drawgfx(bitmap, machine->gfx[0], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 15);
+#define DRAW_SPRITE(code, sx, sy) jal_blend_drawgfx(machine, bitmap, machine->gfx[0], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 15);
 /* #define DRAW_SPRITE(code, sx, sy) drawgfx(bitmap, machine->gfx[0], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 15); */
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )

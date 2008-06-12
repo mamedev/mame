@@ -1167,7 +1167,7 @@ static WRITE16_HANDLER( standard_io_w )
 			segaic16_tilemap_set_flip(0, data & 0x40);
 			segaic16_sprites_set_flip(0, data & 0x40);
 			if (!disable_screen_blanking)
-				segaic16_set_display_enable(data & 0x20);
+				segaic16_set_display_enable(machine, data & 0x20);
 			set_led_status(1, data & 0x08);
 			set_led_status(0, data & 0x04);
 			coin_counter_w(1, data & 0x02);

@@ -343,7 +343,7 @@ static WRITE8_HANDLER( video_control_w )
         D1: (CONT) - affects sprite hardware
         D0: Sound section reset (1= normal operation, 0= reset)
     */
-	segaic16_set_display_enable(data & 0x20);
+	segaic16_set_display_enable(machine, data & 0x20);
 	adc_select = (data >> 2) & 7;
 	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -472,7 +472,7 @@ static WRITE16_HANDLER( shangon_custom_io_w )
                 D5: Screen display
             */
 			adc_select = (data >> 6) & 3;
-			segaic16_set_display_enable((data >> 5) & 1);
+			segaic16_set_display_enable(machine, (data >> 5) & 1);
 			return;
 
 		case 0x0020/2:

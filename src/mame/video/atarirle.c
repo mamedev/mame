@@ -139,7 +139,7 @@ static UINT16 *rle_table[8];
 static void build_rle_tables(void);
 static int count_objects(const UINT16 *base, int length);
 static void prescan_rle(const atarirle_data *mo, int which);
-static void sort_and_render(atarirle_data *mo);
+static void sort_and_render(running_machine *machine, atarirle_data *mo);
 static void compute_checksum(atarirle_data *mo);
 static void draw_rle(atarirle_data *mo, bitmap_t *bitmap, int code, int color, int hflip, int vflip,
 		int x, int y, int xscale, int yscale, const rectangle *clip);
@@ -269,7 +269,7 @@ INLINE int convert_mask(const atarirle_entry *input, atarirle_mask *result)
     the attribute lookup table.
 ---------------------------------------------------------------*/
 
-void atarirle_init(int map, const atarirle_desc *desc)
+void atarirle_init(running_machine *machine, int map, const atarirle_desc *desc)
 {
 	const UINT16 *base = (const UINT16 *)memory_region(desc->region);
 	atarirle_data *mo = &atarirle[map];
@@ -308,7 +308,7 @@ void atarirle_init(int map, const atarirle_desc *desc)
 	mo->romlength     = memory_region_length(desc->region);
 	mo->objectcount   = count_objects(base, mo->romlength);
 
-	mo->cliprect      = *video_screen_get_visible_area(Machine->primary_screen);
+	mo->cliprect      = *video_screen_get_visible_area(machine->primary_screen);
 	if (desc->rightclip)
 	{
 		mo->cliprect.min_x = desc->leftclip;
@@ -341,8 +341,8 @@ void atarirle_init(int map, const atarirle_desc *desc)
 	memset(mo->spriteram, 0, sizeof(mo->spriteram[0]) * mo->spriteramsize);
 
 	/* allocate bitmaps */
-	width = video_screen_get_width(Machine->primary_screen);
-	height = video_screen_get_height(Machine->primary_screen);
+	width = video_screen_get_width(machine->primary_screen);
+	height = video_screen_get_height(machine->primary_screen);
 
 	mo->vram[0][0] = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 	mo->vram[0][1] = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
@@ -382,10 +382,10 @@ void atarirle_init(int map, const atarirle_desc *desc)
     atarirle_control_w: Write handler for MO control bits.
 ---------------------------------------------------------------*/
 
-void atarirle_control_w(int map, UINT8 bits)
+void atarirle_control_w(running_machine *machine, int map, UINT8 bits)
 {
 	atarirle_data *mo = &atarirle[map];
-	int scanline = video_screen_get_vpos(Machine->primary_screen);
+	int scanline = video_screen_get_vpos(machine->primary_screen);
 	int oldbits = mo->control_bits;
 
 //logerror("atarirle_control_w(%d)\n", bits);
@@ -395,7 +395,7 @@ void atarirle_control_w(int map, UINT8 bits)
 		return;
 
 	/* force a partial update first */
-	video_screen_update_partial(Machine->primary_screen, scanline);
+	video_screen_update_partial(machine->primary_screen, scanline);
 
 	/* if the erase flag was set, erase the front map */
 	if (oldbits & ATARIRLE_CONTROL_ERASE)
@@ -423,7 +423,7 @@ void atarirle_control_w(int map, UINT8 bits)
 	if (!(oldbits & ATARIRLE_CONTROL_MOGO) && (bits & ATARIRLE_CONTROL_MOGO))
 	{
 		if (mo->command == ATARIRLE_COMMAND_DRAW)
-			sort_and_render(mo);
+			sort_and_render(machine, mo);
 		else if (mo->command == ATARIRLE_COMMAND_CHECKSUM)
 			compute_checksum(mo);
 	}
@@ -435,7 +435,7 @@ void atarirle_control_w(int map, UINT8 bits)
 
 
 /*---------------------------------------------------------------
-    atarirle_control_w: Write handler for MO command bits.
+    atarirle_command_w: Write handler for MO command bits.
 ---------------------------------------------------------------*/
 
 void atarirle_command_w(int map, UINT8 command)
@@ -734,7 +734,7 @@ static void compute_checksum(atarirle_data *mo)
     sort_and_render: Render all motion objects in order.
 ---------------------------------------------------------------*/
 
-static void sort_and_render(atarirle_data *mo)
+static void sort_and_render(running_machine *machine, atarirle_data *mo)
 {
 	bitmap_t *bitmap1 = mo->vram[0][(~mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2];
 	bitmap_t *bitmap2 = mo->vram[1][(~mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2];
@@ -843,7 +843,7 @@ if (hilite)
 
 		do
 		{
-			const rectangle *visarea = video_screen_get_visible_area(Machine->primary_screen);
+			const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 			int scaled_width = (scale * info->width + 0x7fff) >> 12;
 			int scaled_height = (scale * info->height + 0x7fff) >> 12;
 			int dx, dy, ex, ey, sx = x, sy = y, tx, ty;
@@ -884,13 +884,13 @@ if (hilite)
 
 			for (ty = sy; ty <= ey; ty++)
 			{
-				*BITMAP_ADDR16(bitmap1, ty, sx) = mame_rand(Machine) & 0xff;
-				*BITMAP_ADDR16(bitmap1, ty, ex) = mame_rand(Machine) & 0xff;
+				*BITMAP_ADDR16(bitmap1, ty, sx) = mame_rand(machine) & 0xff;
+				*BITMAP_ADDR16(bitmap1, ty, ex) = mame_rand(machine) & 0xff;
 			}
 			for (tx = sx; tx <= ex; tx++)
 			{
-				*BITMAP_ADDR16(bitmap1, sy, tx) = mame_rand(Machine) & 0xff;
-				*BITMAP_ADDR16(bitmap1, ey, tx) = mame_rand(Machine) & 0xff;
+				*BITMAP_ADDR16(bitmap1, sy, tx) = mame_rand(machine) & 0xff;
+				*BITMAP_ADDR16(bitmap1, ey, tx) = mame_rand(machine) & 0xff;
 			}
 		} while (0);
 fprintf(stderr, "   Sprite: c=%04X l=%04X h=%d X=%4d (o=%4d w=%3d) Y=%4d (o=%4d h=%d) s=%04X\n",

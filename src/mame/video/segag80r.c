@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "segag80r.h"
 #include "rescap.h"
 #include "video/resnet.h"
@@ -89,7 +88,7 @@ INTERRUPT_GEN( sindbadm_vblank_start )
  *
  *************************************/
 
-static void g80_set_palette_entry(int entry, UINT8 data)
+static void g80_set_palette_entry(running_machine *machine, int entry, UINT8 data)
 {
 	int bit0, bit1, bit2;
 	int r, g, b;
@@ -116,7 +115,7 @@ static void g80_set_palette_entry(int entry, UINT8 data)
 	bit1 = (b >> 1) & 0x01;
 	b = combine_2_weights(bweights, bit0, bit1);
 
-	palette_set_color(Machine, entry, MAKE_RGB(r, g, b));
+	palette_set_color(machine, entry, MAKE_RGB(r, g, b));
 }
 
 
@@ -280,7 +279,7 @@ WRITE8_HANDLER( segag80r_videoram_w )
 	{
 		offset &= 0x3f;
 		paletteram[offset] = data;
-		g80_set_palette_entry(offset, data);
+		g80_set_palette_entry(machine, offset, data);
 		return;
 	}
 
@@ -444,7 +443,7 @@ WRITE8_HANDLER( monsterb_videoram_w )
 	{
 		offs_t paloffs = offset & 0x3f;
 		paletteram[paloffs | 0x40] = data;
-		g80_set_palette_entry(paloffs | 0x40, data);
+		g80_set_palette_entry(machine, paloffs | 0x40, data);
 		/* note that since the background board is not integrated with the main board */
 		/* writes here also write through to regular videoram */
 	}
@@ -514,7 +513,7 @@ WRITE8_HANDLER( pignewt_videoram_w )
 	{
 		offs_t paloffs = offset & 0x3f;
 		paletteram[paloffs | 0x40] = data;
-		g80_set_palette_entry(paloffs | 0x40, data);
+		g80_set_palette_entry(machine, paloffs | 0x40, data);
 		return;
 	}
 
@@ -597,7 +596,7 @@ WRITE8_HANDLER( sindbadm_videoram_w )
 	{
 		offs_t paloffs = offset & 0x3f;
 		paletteram[paloffs | 0x40] = data;
-		g80_set_palette_entry(paloffs | 0x40, data);
+		g80_set_palette_entry(machine, paloffs | 0x40, data);
 		return;
 	}
 

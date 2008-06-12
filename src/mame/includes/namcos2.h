@@ -107,7 +107,7 @@ extern UINT16 *namcos2_sprite_ram;
 WRITE16_HANDLER( namcos2_sprite_ram_w );
 READ16_HANDLER( namcos2_sprite_ram_r );
 
-int namcos2_GetPosIrqScanline( void );
+int namcos2_GetPosIrqScanline( running_machine *machine );
 
 WRITE16_HANDLER( namcos2_gfx_ctrl_w );
 READ16_HANDLER( namcos2_gfx_ctrl_r );

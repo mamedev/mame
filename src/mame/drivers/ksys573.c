@@ -1519,7 +1519,7 @@ static DRIVER_INIT( konami573 )
 
 static MACHINE_RESET( konami573 )
 {
-	psx_machine_init();
+	psx_machine_init(machine);
 
 	if( chiptype[ 0 ] != 0 )
 	{

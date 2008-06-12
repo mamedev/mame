@@ -381,8 +381,8 @@ extern READ32_HANDLER(taitojc_tile_r);
 extern WRITE32_HANDLER(taitojc_tile_w);
 extern READ32_HANDLER(taitojc_char_r);
 extern WRITE32_HANDLER(taitojc_char_w);
-extern void taitojc_clear_frame(void);
-extern void taitojc_render_polygons(UINT16 *polygon_fifo, int length);
+extern void taitojc_clear_frame(running_machine *machine);
+extern void taitojc_render_polygons(running_machine *machine, UINT16 *polygon_fifo, int length);
 
 extern VIDEO_START(taitojc);
 extern VIDEO_UPDATE(taitojc);
@@ -1017,8 +1017,8 @@ static WRITE16_HANDLER(dsp_unk2_w)
 {
 	if (offset == 0)
 	{
-		taitojc_clear_frame();
-		taitojc_render_polygons(polygon_fifo, polygon_fifo_ptr);
+		taitojc_clear_frame(machine);
+		taitojc_render_polygons(machine, polygon_fifo, polygon_fifo_ptr);
 
 		polygon_fifo_ptr = 0;
 	}

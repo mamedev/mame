@@ -143,7 +143,7 @@ VIDEO_START( atarigt )
 	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, atarigt_playfield_scan,  8,8, 128,64);
 
 	/* initialize the motion objects */
-	atarirle_init(0, &adjusted_modesc);
+	atarirle_init(machine, 0, &adjusted_modesc);
 
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);

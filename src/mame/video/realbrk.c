@@ -20,7 +20,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "realbrk.h"
 
 //UINT16 *realbrk_vram_0, *realbrk_vram_1, *realbrk_vram_2, *realbrk_vregs;
@@ -380,12 +379,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 /* DaiDaiKakumei */
 /* layer : 0== bghigh<spr    1== bglow<spr<bghigh     2==spr<bglow    3==boarder */
-static void dai2kaku_draw_sprites( bitmap_t *bitmap,const rectangle *cliprect, int layer)
+static void dai2kaku_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, int layer)
 {
 	int offs;
 
-	int max_x = video_screen_get_width(Machine->primary_screen);
-	int max_y = video_screen_get_height(Machine->primary_screen);
+	int max_x = video_screen_get_width(machine->primary_screen);
+	int max_y = video_screen_get_height(machine->primary_screen);
 
 	for ( offs = 0x3000/2; offs < 0x3600/2; offs += 2/2 )
 	{
@@ -444,7 +443,7 @@ static void dai2kaku_draw_sprites( bitmap_t *bitmap,const rectangle *cliprect, i
 				int scalex = (sx + (x + 1) * xdim) / 0x10000 - currx;
 				int scaley = (sy + (y + 1) * ydim) / 0x10000 - curry;
 
-				drawgfxzoom(	bitmap,Machine->gfx[gfx],
+				drawgfxzoom(	bitmap,machine->gfx[gfx],
 								code++,
 								color,
 								flipx, flipy,
@@ -594,7 +593,7 @@ if ( input_code_pressed(KEYCODE_Z) )
 
 
 	// spr 0
-	if (layers_ctrl & 8)	dai2kaku_draw_sprites(bitmap,cliprect,2);
+	if (layers_ctrl & 8)	dai2kaku_draw_sprites(screen->machine,bitmap,cliprect,2);
 
 	// bglow
 	if( realbrk_vregs[8/2] & (0x8000)){
@@ -604,7 +603,7 @@ if ( input_code_pressed(KEYCODE_Z) )
 	}
 
 	// spr 1
-	if (layers_ctrl & 8)	dai2kaku_draw_sprites(bitmap,cliprect,1);
+	if (layers_ctrl & 8)	dai2kaku_draw_sprites(screen->machine,bitmap,cliprect,1);
 
 	// bghigh
 	if( realbrk_vregs[8/2] & (0x8000)){
@@ -614,7 +613,7 @@ if ( input_code_pressed(KEYCODE_Z) )
 	}
 
 	// spr 2
-	if (layers_ctrl & 8)	dai2kaku_draw_sprites(bitmap,cliprect,0);
+	if (layers_ctrl & 8)	dai2kaku_draw_sprites(screen->machine,bitmap,cliprect,0);
 
 	// fix
 	if (layers_ctrl & 4)	tilemap_draw(bitmap,cliprect,tilemap_2,0,0);
