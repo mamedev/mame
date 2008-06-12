@@ -310,7 +310,7 @@ static int cave_region_byte;
 
 static READ16_HANDLER( gaia_dsw_r )
 {
-	return input_port_read_indexed(machine, 2) | (input_port_read_indexed(machine, 3) << 8);
+	return input_port_read(machine, "DSW1") | (input_port_read(machine, "DSW2") << 8);
 }
 
 static WRITE16_HANDLER( cave_eeprom_msb_w )
@@ -1061,7 +1061,7 @@ ADDRESS_MAP_END
 static READ16_HANDLER( sailormn_input0_r )
 {
 //  watchdog_reset16_r(0,0);    // written too rarely for mame.
-	return input_port_read_indexed(machine, 0);
+	return input_port_read(machine, "IN0");
 }
 
 static READ16_HANDLER( agallet_irq_cause_r )
@@ -1960,7 +1960,7 @@ static MACHINE_RESET( cave )
 	/* modify the eeprom on a reset with the desired region for the games that have the
        region factory set in eeprom */
 	if (cave_region_byte >= 0)
-		eeprom_get_data_pointer(0)[cave_region_byte] =  input_port_read_indexed(machine, 2);
+		eeprom_get_data_pointer(0)[cave_region_byte] =  input_port_read(machine, "EEPROM");
 }
 
 static const struct YMZ280Binterface ymz280b_intf =

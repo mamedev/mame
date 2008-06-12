@@ -345,7 +345,9 @@ static WRITE8_HANDLER( combascb_sh_irqtrigger_w )
 
 static READ8_HANDLER( combascb_io_r )
 {
-	return input_port_read_indexed(machine, offset);
+	static const char *portnames[] = { "IN0", "IN1", "DSW1", "DSW2" };
+	
+	return input_port_read(machine, portnames[offset]);
 }
 
 static WRITE8_HANDLER( combascb_priority_w )

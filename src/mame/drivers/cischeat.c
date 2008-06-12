@@ -532,7 +532,7 @@ static WRITE16_HANDLER( scudhamm_motor_command_w )
 
 READ16_HANDLER( scudhamm_analog_r )
 {
-	return input_port_read_indexed(machine, 1);
+	return input_port_read(machine, "IN1");
 }
 
 /*
@@ -627,17 +627,17 @@ static READ16_HANDLER( armchmp2_analog_r )
 	int armdelta;
 	static int armold = 0;
 
-	armdelta = input_port_read_indexed(machine, 1) - armold;
-	armold = input_port_read_indexed(machine, 1);
+	armdelta = input_port_read(machine, "IN1") - armold;
+	armold = input_port_read(machine, "IN1");
 
 	return ~( scudhamm_motor_command + armdelta );	// + x : x<=0 and player loses, x>0 and player wins
 }
 
 static READ16_HANDLER( armchmp2_buttons_r )
 {
-	int arm_x = input_port_read_indexed(machine, 1);
+	int arm_x = input_port_read(machine, "IN1");
 
-	UINT16 ret = input_port_read_indexed(machine, 0);
+	UINT16 ret = input_port_read(machine, "IN0");
 
 	if (arm_x < 0x40)		ret &= ~1;
 	else if (arm_x > 0xc0)	ret &= ~2;
@@ -1123,7 +1123,7 @@ INPUT_PORTS_END
 //                  [4] DSW 1 & 2   [5] DSW 3       [6] Driving Wheel
 
 static INPUT_PORTS_START( cischeat )
-	PORT_START_TAG("IN0")	// Fake input port - Buttons status
+	PORT_START_TAG("FAKE")	// Fake input port - Buttons status
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Low Gear")\
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 High Gear")\
 
@@ -1210,7 +1210,7 @@ static INPUT_PORTS_START( cischeat )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN6 - Driving Wheel - $80010.w(0)
+	PORT_START_TAG("IN6")	// IN6 - Driving Wheel - $80010.w(0)
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
 INPUT_PORTS_END
 
@@ -1225,7 +1225,7 @@ INPUT_PORTS_END
 //                  [6] Coinage JP&USA  [7] Coinage UK&FR
 
 static INPUT_PORTS_START( f1gpstar )
-	PORT_START_TAG("IN0")	// Fake input port - Buttons status
+	PORT_START_TAG("FAKE")	// Fake input port - Buttons status
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Accelerator")\
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Low Gear")\
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 High Gear")\

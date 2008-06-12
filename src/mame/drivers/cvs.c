@@ -279,12 +279,12 @@ static READ8_HANDLER( cvs_input_r )
 	/* the lower 4 (or 3?) bits select the port to read */
 	switch (offset & 0x0f)	/* might be 0x07 */
 	{
-	case 0x00:  ret = input_port_read_indexed(machine, 0); break;
-	case 0x02:  ret = input_port_read_indexed(machine, 1); break;
-	case 0x03:  ret = input_port_read_indexed(machine, 2); break;
-	case 0x04:  ret = input_port_read_indexed(machine, 3); break;
-	case 0x06:  ret = input_port_read_indexed(machine, 4); break;
-	case 0x07:  ret = input_port_read_indexed(machine, 5); break;
+	case 0x00:  ret = input_port_read(machine, "IN0"); break;
+	case 0x02:  ret = input_port_read(machine, "IN1"); break;
+	case 0x03:  ret = input_port_read(machine, "IN2"); break;
+	case 0x04:  ret = input_port_read(machine, "IN3"); break;
+	case 0x06:  ret = input_port_read(machine, "DSW3"); break;
+	case 0x07:  ret = input_port_read(machine, "DSW2"); break;
 	default:    logerror("%04x : CVS: Reading unmapped input port 0x%02x\n", activecpu_get_pc(), offset & 0x0f); break;
 	}
 
@@ -539,7 +539,7 @@ static ADDRESS_MAP_START( cvs_main_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(cvs_input_r, cvs_scroll_w)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(cvs_collision_clear, cvs_video_fx_w)
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(cvs_collision_r, audio_command_w)
-    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_6_r)
+    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 
@@ -657,7 +657,7 @@ static INPUT_PORTS_START( cvs )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )                  /* can't tell if it's ACTIVE_HIGH or ACTIVE_LOW */
 
-	PORT_START	/* SENSE */
+	PORT_START_TAG("SENSE")	/* SENSE */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 

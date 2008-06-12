@@ -267,7 +267,7 @@ static TIMER_CALLBACK( amerdart_iop_response )
 			break;
 
 		case 0x500:
-			iop_answer = input_port_read_indexed(machine, 0);
+			iop_answer = input_port_read(machine, "IN1");
 			break;
 	}
 

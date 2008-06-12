@@ -21,7 +21,7 @@ VIDEO_START( citycon );
 
 static READ8_HANDLER( citycon_in_r )
 {
-	return input_port_read_indexed(machine, flip_screen_get() ? 1 : 0);
+	return input_port_read(machine, flip_screen_get() ? "IN1" : "IN0");
 }
 
 
@@ -29,8 +29,8 @@ static READ8_HANDLER( citycon_in_r )
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x3000, 0x3000) AM_READ(citycon_in_r)	/* player 1 & 2 inputs multiplexed */
-	AM_RANGE(0x3001, 0x3001) AM_READ(input_port_2_r)
-	AM_RANGE(0x3002, 0x3002) AM_READ(input_port_3_r)
+	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("IN2")
+	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("IN3")
 	AM_RANGE(0x3007, 0x3007) AM_READ(watchdog_reset_r)	/* ? */
 	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END

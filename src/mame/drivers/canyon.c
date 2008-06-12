@@ -64,11 +64,11 @@ static READ8_HANDLER( canyon_switches_r )
 {
 	UINT8 val = 0;
 
-	if ((input_port_read_indexed(machine, 2) >> (offset & 7)) & 1)
+	if ((input_port_read(machine, "IN2") >> (offset & 7)) & 1)
 	{
 		val |= 0x80;
 	}
-	if ((input_port_read_indexed(machine, 1) >> (offset & 3)) & 1)
+	if ((input_port_read(machine, "IN1") >> (offset & 3)) & 1)
 	{
 		val |= 0x01;
 	}
@@ -79,7 +79,7 @@ static READ8_HANDLER( canyon_switches_r )
 
 static READ8_HANDLER( canyon_options_r )
 {
-	return (input_port_read_indexed(machine, 0) >> (2 * (~offset & 3))) & 3;
+	return (input_port_read(machine, "DSW") >> (2 * (~offset & 3))) & 3;
 }
 
 
@@ -129,7 +129,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( canyon )
-	PORT_START      /* DSW */
+	PORT_START_TAG("DSW")		/* DSW */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Language ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Spanish ) )
@@ -146,13 +146,13 @@ static INPUT_PORTS_START( canyon )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 
-	PORT_START      /* IN1 */
+	PORT_START_TAG("IN1")		/* IN1 */
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 
-	PORT_START      /* IN2 */
+	PORT_START_TAG("IN2")		/* IN2 */
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_START1 )

@@ -88,17 +88,17 @@ static READ16_HANDLER( twocrude_control_r )
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
-			return (input_port_read_indexed(machine, 0) + (input_port_read_indexed(machine, 1) << 8));
+			return (input_port_read(machine, "P1") + (input_port_read(machine, "P2") << 8));
 
 		case 2: /* Dip Switches */
-			return (input_port_read_indexed(machine, 3) + (input_port_read_indexed(machine, 4) << 8));
+			return (input_port_read(machine, "DSW1") + (input_port_read(machine, "DSW2") << 8));
 
 		case 4: /* Protection */
 			logerror("%04x : protection control read at 30c000 %d\n",activecpu_get_pc(),offset);
 			return prot;
 
 		case 6: /* Credits, VBL in byte 7 */
-			return input_port_read_indexed(machine, 2);
+			return input_port_read(machine, "COINS");
 	}
 
 	return ~0;
@@ -201,7 +201,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( twocrude )
-	PORT_START	/* Player 1 controls */
+	PORT_START_TAG("P1")	/* Player 1 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -211,7 +211,7 @@ static INPUT_PORTS_START( twocrude )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START	/* Player 2 controls */
+	PORT_START_TAG("P2")	/* Player 2 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -221,7 +221,7 @@ static INPUT_PORTS_START( twocrude )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START	/* Credits */
+	PORT_START_TAG("COINS")	/* Credits */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -231,7 +231,7 @@ static INPUT_PORTS_START( twocrude )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* Dip switch bank 1 */
+	PORT_START_TAG("DSW1")	/* Dip switch bank 1 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -257,7 +257,7 @@ static INPUT_PORTS_START( twocrude )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	/* Dip switch bank 2 */
+	PORT_START_TAG("DSW2")	/* Dip switch bank 2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )

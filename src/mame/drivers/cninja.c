@@ -132,17 +132,15 @@ static WRITE16_HANDLER( cninja_irq_w )
 	logerror("%08x:  Unmapped IRQ write %d %04x\n",activecpu_get_pc(),offset,data);
 }
 
-static READ16_HANDLER( robocop2_dip3_r ) { return input_port_read_indexed(machine, 3); }
-
 static READ16_HANDLER( robocop2_prot_r )
 {
  	switch (offset<<1) {
 		case 0x41a: /* Player 1 & 2 input ports */
-			return input_port_read_indexed(machine, 0);
+			return input_port_read(machine, "IN0");
 		case 0x320: /* Coins */
-			return input_port_read_indexed(machine, 1);
+			return input_port_read(machine, "IN1");
 		case 0x4e6: /* Dip switches */
-			return input_port_read_indexed(machine, 2);
+			return input_port_read(machine, "DSW");
 		case 0x504: /* PC: 6b6.  b4, 2c, 36 written before read */
 			logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",activecpu_get_pc(),offset);
 			return 0x84;
@@ -253,7 +251,7 @@ static ADDRESS_MAP_START( robocop2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x156000, 0x156fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x15e000, 0x15e7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1f8000, 0x1f8001) AM_READ(robocop2_dip3_r ) /* Dipswitch #3 */
+	AM_RANGE(0x1f8000, 0x1f8001) AM_READ_PORT("DSW3") /* Dipswitch #3 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( robocop2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -431,17 +429,16 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( edrandy )
 
-	PORT_START
+	PORT_START_TAG("IN0")
 	DATAEAST_2BUTTON
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
 
 	PORT_START_TAG("DSW")
-
 	DATAEAST_COINAGE
 
 	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
@@ -486,10 +483,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( cninja )
 
-	PORT_START
+	PORT_START_TAG("IN0")
 	DATAEAST_2BUTTON
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -540,7 +537,7 @@ static INPUT_PORTS_START( cninjau )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( robocop2 )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -558,7 +555,7 @@ static INPUT_PORTS_START( robocop2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -597,7 +594,7 @@ static INPUT_PORTS_START( robocop2 )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("DSW3")
 	PORT_DIPNAME( 0x0003, 0x0003, "Bullets" ) PORT_DIPLOCATION("SW3:1,2")	/* Dip switch bank 3 */
 	PORT_DIPSETTING(      0x0000, "Least" )
 	PORT_DIPSETTING(      0x0001, "Less" )
@@ -623,10 +620,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mutantf )
 
-	PORT_START
+	PORT_START_TAG("IN0")
 	DATAEAST_2BUTTON
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )

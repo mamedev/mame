@@ -95,7 +95,7 @@ static UINT8 *mainram;
 
 static void ar_coin_hack(void)
 {
-	if(input_port_read_indexed(Machine, 5)&1)
+	if(input_port_read(Machine, "COIN") & 1)
 	{
 		if(coin_stat==0)
 		{
@@ -221,7 +221,7 @@ static READ8_HANDLER ( cshooter_coin_r )
 	/* Even reads must return 0xff - Odd reads must return the contents of input port 5.
        Code at 0x5061 is executed once during P.O.S.T. where there is one read.
        Code at 0x50b4 is then executed each frame (not sure) where there are 2 reads. */
-	return ( (cshooter_counter++ & 1) ? 0xff : input_port_read_indexed(machine, 5) );
+	return ( (cshooter_counter++ & 1) ? 0xff : input_port_read(machine, "COIN") );
 }
 
 static WRITE8_HANDLER ( cshooter_c500_w )
@@ -262,11 +262,11 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xafff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xb000, 0xb0ff) AM_READ(SMH_RAM)			// sound related ?
 	AM_RANGE(0xc000, 0xc1ff) AM_WRITE(pal_w) AM_READ(pal_r) AM_BASE(&paletteram)
-	AM_RANGE(0xc200, 0xc200) AM_READ(input_port_0_r)
-	AM_RANGE(0xc201, 0xc201) AM_READ(input_port_1_r)
-	AM_RANGE(0xc202, 0xc202) AM_READ(input_port_2_r)
-	AM_RANGE(0xc203, 0xc203) AM_READ(input_port_3_r)
-	AM_RANGE(0xc204, 0xc204) AM_READ(input_port_4_r)
+	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN0")
+	AM_RANGE(0xc201, 0xc201) AM_READ_PORT("IN1")
+	AM_RANGE(0xc202, 0xc202) AM_READ_PORT("IN2")
+	AM_RANGE(0xc203, 0xc203) AM_READ_PORT("DSW2")
+	AM_RANGE(0xc204, 0xc204) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc205, 0xc205) AM_READ(cshooter_coin_r)	// hack until I understand
 	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xd800, 0xdfff) AM_READ(SMH_RAM)
@@ -290,11 +290,11 @@ static ADDRESS_MAP_START( arreadmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xb000, 0xb0ff) AM_RAM			// sound related ?
 	AM_RANGE(0xb100, 0xb1ff) AM_RAM//READ(SMH_BANK1)           // sound related ?
-	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_0_r)
-	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_1_r)
-	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_2_r)
-	AM_RANGE(0xc003, 0xc003) AM_READ(input_port_3_r)
-	AM_RANGE(0xc004, 0xc004) AM_READ(input_port_4_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
+	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
+	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
+	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW2")
+	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xd800, 0xdbff) AM_WRITE(pal2_w) AM_READ(pal_r) AM_BASE(&paletteram)
 	AM_RANGE(0xdc11, 0xdc11) AM_WRITE(bank_w)
@@ -370,7 +370,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( cshooter )
-	PORT_START	/* IN0  (0xc200) */
+	PORT_START_TAG("IN0")	/* IN0  (0xc200) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -380,7 +380,7 @@ static INPUT_PORTS_START( cshooter )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* IN1  (0xc201) */
+	PORT_START_TAG("IN1")	/* IN1  (0xc201) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -390,7 +390,7 @@ static INPUT_PORTS_START( cshooter )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* START    (0xc202) */
+	PORT_START_TAG("IN2")	/* START    (0xc202) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -400,7 +400,7 @@ static INPUT_PORTS_START( cshooter )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* DSW2 (0xc203) */
+	PORT_START_TAG("DSW2")	/* DSW2 (0xc203) */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
@@ -419,7 +419,7 @@ static INPUT_PORTS_START( cshooter )
 	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	/* DSW1 (0xc204) */
+	PORT_START_TAG("DSW1")	/* DSW1 (0xc204) */
 	PORT_DIPNAME( 0x01, 0x01, "Coin Slots" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -439,7 +439,7 @@ static INPUT_PORTS_START( cshooter )
 	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	/* COIN (0xc205) */
+	PORT_START_TAG("COIN")	/* COIN (0xc205) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )

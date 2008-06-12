@@ -189,8 +189,8 @@ static INTERRUPT_GEN( panic_interrupt )
         /* mostly not noticed since sound is */
 		/* only enabled if game in progress! */
 
-    	if ((input_port_read_indexed(machine, 3) & 0xc0) != 0xc0)
-        	panic_sound_output_w(machine,17,1);
+    	if ((input_port_read(machine, "IN0") & 0xc0) != 0xc0)
+        	panic_sound_output_w(machine, 17, 1);
 
 		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);	/* RST 08h */
     }
@@ -204,7 +204,7 @@ static INTERRUPT_GEN( cosmica_interrupt )
 
     if (pixel_clock == 0)
     {
-		if (input_port_read_indexed(machine, 3) & 1)	/* Left Coin */
+		if (input_port_read(machine, "FAKE") & 1)	/* Left Coin */
 			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
     }
 }
@@ -218,7 +218,7 @@ static INTERRUPT_GEN( cosmicg_interrupt )
     It makes sense and works fine, but I cannot be 100% sure this is correct,
     as I have no Cosmic Guerilla console :-) . */
 
-	if ((input_port_read_indexed(machine, 2) & 1)) /* Coin */
+	if ((input_port_read(machine, "IN2") & 1))	/* Coin */
 		/* on tms9980, a 6 on the interrupt bus means level 4 interrupt */
 		cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, 6);
 	else
@@ -228,16 +228,16 @@ static INTERRUPT_GEN( cosmicg_interrupt )
 static INTERRUPT_GEN( magspot_interrupt )
 {
 	/* Coin 1 causes an IRQ, Coin 2 an NMI */
-	if (input_port_read_indexed(machine, 4) & 0x01)
+	if (input_port_read(machine, "COINS") & 0x01)
   		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
-	else if (input_port_read_indexed(machine, 4) & 0x02)
+	else if (input_port_read(machine, "COINS") & 0x02)
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( nomnlnd_interrupt )
 {
 	/* Coin causes an NMI */
-	if (input_port_read_indexed(machine, 4) & 0x01)
+	if (input_port_read(machine, "COIN") & 0x01)
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -252,12 +252,12 @@ static READ8_HANDLER( cosmicg_port_0_r )
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
 
-	return (input_port_read_indexed(machine, 0) & 0xf0) | ((video_screen_get_vpos(machine->primary_screen) & 0xf0) >> 4);
+	return (input_port_read(machine, "IN0") & 0xf0) | ((video_screen_get_vpos(machine->primary_screen) & 0xf0) >> 4);
 }
 
 static READ8_HANDLER( magspot_coinage_dip_r )
 {
-	return (input_port_read_indexed(machine, 5) & (1 << (7 - offset))) ? 0 : 1;
+	return (input_port_read(machine, "DSW") & (1 << (7 - offset))) ? 0 : 1;
 }
 
 
@@ -266,12 +266,12 @@ static READ8_HANDLER( magspot_coinage_dip_r )
 static READ8_HANDLER( nomnlnd_port_0_1_r )
 {
 	int control;
-    int fire = input_port_read_indexed(machine, 3);
+    int fire = input_port_read(machine, "IN3");
 
 	if (offset)
-		control = input_port_read_indexed(machine, 1);
+		control = input_port_read(machine, "IN1");
     else
-		control = input_port_read_indexed(machine, 0);
+		control = input_port_read(machine, "IN0");
 
     /* If firing - stop tank */
 
@@ -298,10 +298,10 @@ static WRITE8_HANDLER( flip_screen_w )
 static ADDRESS_MAP_START( panic_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6800, 0x6800) AM_READ(input_port_0_r) /* IN1 */
-	AM_RANGE(0x6801, 0x6801) AM_READ(input_port_1_r) /* IN2 */
-	AM_RANGE(0x6802, 0x6802) AM_READ(input_port_2_r) /* DSW */
-	AM_RANGE(0x6803, 0x6803) AM_READ(input_port_3_r) /* IN0 */
+	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("IN1")	/* IN1 */
+	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("IN2")	/* IN2 */
+	AM_RANGE(0x6802, 0x6802) AM_READ_PORT("DSW")	/* DSW */
+	AM_RANGE(0x6803, 0x6803) AM_READ_PORT("IN0")	/* IN0 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( panic_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -318,9 +318,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cosmica_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6800, 0x6800) AM_READ(input_port_0_r) /* IN1 */
-	AM_RANGE(0x6801, 0x6801) AM_READ(input_port_1_r) /* IN2 */
-	AM_RANGE(0x6802, 0x6802) AM_READ(input_port_2_r) /* DSW */
+	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("P1")		/* IN1 */
+	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("P2")		/* IN2 */
+	AM_RANGE(0x6802, 0x6802) AM_READ_PORT("DSW")	/* DSW */
 	AM_RANGE(0x6803, 0x6803) AM_READ(cosmica_pixel_clock_r)
 ADDRESS_MAP_END
 
@@ -345,7 +345,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicg_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ(cosmicg_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicg_writeport, ADDRESS_SPACE_IO, 8 )
@@ -357,10 +357,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( magspot_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x3800, 0x3807) AM_READ(magspot_coinage_dip_r)
-	AM_RANGE(0x5000, 0x5000) AM_READ(input_port_0_r)
-	AM_RANGE(0x5001, 0x5001) AM_READ(input_port_1_r)
-	AM_RANGE(0x5002, 0x5002) AM_READ(input_port_2_r)
-	AM_RANGE(0x5003, 0x5003) AM_READ(input_port_3_r)
+	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0")
+	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN1")
+	AM_RANGE(0x5002, 0x5002) AM_READ_PORT("IN2")
+	AM_RANGE(0x5003, 0x5003) AM_READ_PORT("IN3")
 	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -375,7 +375,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( panic )
-	PORT_START      /* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -385,7 +385,7 @@ static INPUT_PORTS_START( panic )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
-	PORT_START      /* IN2 */
+	PORT_START_TAG("IN2")	/* IN2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
@@ -395,7 +395,7 @@ static INPUT_PORTS_START( panic )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 
-	PORT_START      /* DSW */
+	PORT_START_TAG("DSW")	/* DSW */
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 2C_3C ) )
@@ -403,7 +403,7 @@ static INPUT_PORTS_START( panic )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
-/* 0x06 and 0x07 disabled */
+	/* 0x06 and 0x07 disabled */
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
@@ -419,7 +419,7 @@ static INPUT_PORTS_START( panic )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_3C ) )
 
-	PORT_START      /* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -432,7 +432,7 @@ static INPUT_PORTS_START( panic )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cosmica )
-	PORT_START      /* IN0 */
+	PORT_START_TAG("P1")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
@@ -442,7 +442,7 @@ static INPUT_PORTS_START( cosmica )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START      /* IN1 */
+	PORT_START_TAG("P2")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
@@ -452,7 +452,7 @@ static INPUT_PORTS_START( cosmica )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START      /* IN2 */
+	PORT_START_TAG("DSW")	/* IN2 */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -478,7 +478,7 @@ static INPUT_PORTS_START( cosmica )
 	/* trigger exactly one interrupt, without having to check when the */
 	/* user releases the key. */
 
-	PORT_START	/* FAKE */
+	PORT_START_TAG("FAKE")	/* FAKE */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 
 INPUT_PORTS_END
@@ -489,14 +489,14 @@ INPUT_PORTS_END
 /* Offsets are in BYTES, so bits 0-7 are at offset 0 etc.   */
 
 static INPUT_PORTS_START( cosmicg )
-	PORT_START /* 4-7 */
+	PORT_START_TAG("IN0")	/* 4-7 */
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL )	/* pixel clock */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 
-	PORT_START /* 8-15 */
+	PORT_START_TAG("IN1")	/* 8-15 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_2WAY PORT_COCKTAIL
@@ -513,7 +513,7 @@ static INPUT_PORTS_START( cosmicg )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x80, "5" )
 
-	PORT_START      /* Hard wired settings */
+	PORT_START_TAG("IN2")	/* Hard wired settings */
 
 	/* The coin slots are not memory mapped. Coin causes INT 4  */
 	/* This fake input port is used by the interrupt handler    */
@@ -539,7 +539,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( magspot )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -550,14 +550,14 @@ static INPUT_PORTS_START( magspot )
 	PORT_DIPSETTING(    0xc0, "15000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN2 */
+	PORT_START_TAG("IN2")	/* IN2 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x01, "2000" )
 	PORT_DIPSETTING(    0x02, "3000" )
@@ -577,7 +577,7 @@ static INPUT_PORTS_START( magspot )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START	/* IN3 */
+	PORT_START_TAG("IN3")	/* IN3 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
 	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNUSED )		/* always HI */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL )	/* reads what was written to 4808.  Probably not used?? */
@@ -585,12 +585,12 @@ static INPUT_PORTS_START( magspot )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	/* Fake port to handle coins */
-	PORT_START	/* IN4 */
+	PORT_START_TAG("COINS")	/* IN4 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
 
 	/* Fake port to handle coinage dip switches. Each bit goes to 3800-3807 */
-	PORT_START	/* IN5 */
+	PORT_START_TAG("DSW")	/* IN5 */
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
@@ -628,21 +628,21 @@ static INPUT_PORTS_START( magspot )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( devzone )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN2 */
+	PORT_START_TAG("IN2")	/* IN2 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x01, "4000" )
 	PORT_DIPSETTING(    0x02, "6000" )
@@ -662,18 +662,18 @@ static INPUT_PORTS_START( devzone )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START	/* IN3 */
+	PORT_START_TAG("IN3")	/* IN3 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	/* Fake port to handle coins */
-	PORT_START	/* IN4 */
+	PORT_START_TAG("COINS")	/* IN4 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
 
-	PORT_START	/* IN5 */
+	PORT_START_TAG("DSW")	/* IN5 */
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
@@ -712,21 +712,21 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( devzone2 )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN2 */
+	PORT_START_TAG("IN2")	/* IN2 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x01, "2000" )
 	PORT_DIPSETTING(    0x02, "3000" )
@@ -746,18 +746,18 @@ static INPUT_PORTS_START( devzone2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START	/* IN3 */
+	PORT_START_TAG("IN3")	/* IN3 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	/* Fake port to handle coins */
-	PORT_START	/* IN4 */
+	PORT_START_TAG("COINS")	/* IN4 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
 
-	PORT_START	/* IN5 */
+	PORT_START_TAG("DSW")	/* IN5 */
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
@@ -796,21 +796,21 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( nomnlnd )
-	PORT_START	/* Controls - Remapped for game */
+	PORT_START_TAG("IN0")	/* Controls - Remapped for game */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x55, IP_ACTIVE_LOW, IPT_SPECIAL )	/* diagonals */
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x55, IP_ACTIVE_LOW, IPT_SPECIAL )	/* diagonals */
 
-	PORT_START	/* IN2 */
+	PORT_START_TAG("IN2")	/* IN2 */
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x01, "2000" )
 	PORT_DIPSETTING(    0x02, "3000" )
@@ -830,7 +830,7 @@ static INPUT_PORTS_START( nomnlnd )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START	/* IN3 */
+	PORT_START_TAG("IN3")	/* IN3 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
 	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNUSED )		/* always HI */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL )	/* reads what was written to 4808.  Probably not used?? */
@@ -838,27 +838,27 @@ static INPUT_PORTS_START( nomnlnd )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	/* Fake port to handle coin */
-	PORT_START	/* IN4 */
+	PORT_START_TAG("COIN")	/* IN4 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( nomnlndg )
-	PORT_START	/* Controls - Remapped for game */
+	PORT_START_TAG("IN0")	/* Controls - Remapped for game */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x55, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x55, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN2 */
+	PORT_START_TAG("IN2")	/* IN2 */
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x01, "3000" )
 	PORT_DIPSETTING(    0x02, "5000" )
@@ -878,7 +878,7 @@ static INPUT_PORTS_START( nomnlndg )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START	/* IN3 */
+	PORT_START_TAG("IN3")	/* IN3 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
 	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNUSED )		/* always HI */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL )	/* reads what was written to 4808.  Probably not used?? */
@@ -886,7 +886,7 @@ static INPUT_PORTS_START( nomnlndg )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	/* Fake port to handle coin */
-	PORT_START	/* IN4 */
+	PORT_START_TAG("COIN")	/* IN4 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 INPUT_PORTS_END
 

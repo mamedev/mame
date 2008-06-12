@@ -162,9 +162,11 @@ static WRITE8_HANDLER( cliff_port_bank_w )
 
 static READ8_HANDLER( cliff_port_r )
 {
+	static const char *banknames[] = { "BANK0", "BANK1", "BANK2", "BANK3", "BANK4", "BANK5", "BANK6" };
+	
 	if ( port_bank < 7 )
 	{
-		return input_port_read_indexed(machine,  port_bank );
+		return input_port_read(machine,  banknames[port_bank]);
 	}
 
 	/* output is pulled up for non-mapped ports */

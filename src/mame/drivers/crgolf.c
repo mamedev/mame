@@ -80,13 +80,15 @@ static MACHINE_START( crgolf )
 
 static READ8_HANDLER( switch_input_r )
 {
-	return input_port_read_indexed(machine, port_select);
+	static const char *portnames[] = { "IN0", "IN1", "P1", "P2", "DSW", "UNUSED0", "UNUSED1" };
+
+	return input_port_read(machine, portnames[port_select]);
 }
 
 
 static READ8_HANDLER( analog_input_r )
 {
-	return ((input_port_read_indexed(machine, 7) >> 4) | (input_port_read_indexed(machine, 8) & 0xf0)) ^ 0x88;
+	return ((input_port_read(machine, "STICK0") >> 4) | (input_port_read(machine, "STICK1") & 0xf0)) ^ 0x88;
 }
 
 
@@ -269,12 +271,12 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( crgolf )
-	PORT_START	/* CREDIT */
+	PORT_START_TAG("IN0")	/* CREDIT */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START	/* SELECT */
+	PORT_START_TAG("IN1")	/* SELECT */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
@@ -282,7 +284,7 @@ static INPUT_PORTS_START( crgolf )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START4 )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START	/* PLAY1 */
+	PORT_START_TAG("P1")	/* PLAY1 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)			/* club select */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)			/* backward address */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)			/* forward address */
@@ -292,7 +294,7 @@ static INPUT_PORTS_START( crgolf )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)	/* direction right */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)			/* shot switch */
 
-	PORT_START	/* PLAY2 */
+	PORT_START_TAG("P2")	/* PLAY2 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_COCKTAIL		/* club select */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL		/* backward address */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL		/* forward address */
@@ -302,7 +304,7 @@ static INPUT_PORTS_START( crgolf )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL	/* direction right */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL		/* shot switch */
 
-	PORT_START	/* DIPSW */
+	PORT_START_TAG("DSW")	/* DIPSW */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Difficulty ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
@@ -323,16 +325,16 @@ static INPUT_PORTS_START( crgolf )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
-	PORT_START
+	PORT_START_TAG("UNUSED0")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("UNUSED1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("STICK0")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(16) PORT_REVERSE
 
-	PORT_START
+	PORT_START_TAG("STICK1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(16) PORT_REVERSE PORT_COCKTAIL
 INPUT_PORTS_END
 

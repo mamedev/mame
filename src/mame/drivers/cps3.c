@@ -1773,12 +1773,12 @@ static WRITE32_HANDLER( cram_gfxflash_bank_w )
 
 static READ32_HANDLER( cps3_io1_r )
 {
-	return input_port_read_indexed(machine, 0);
+	return input_port_read(machine, "IN0");
 }
 
 static READ32_HANDLER( cps3_io2_r )
 {
-	return input_port_read_indexed(machine, 1);
+	return input_port_read(machine, "IN1");
 }
 
 // this seems to be dma active flags, and maybe vblank... not if it is anything else
@@ -2364,7 +2364,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( cps3 )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
@@ -2392,7 +2392,7 @@ static INPUT_PORTS_START( cps3 )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0000000, IP_ACTIVE_LOW, IPT_UNUSED ) // nothing here?
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001ffff, IP_ACTIVE_LOW, IPT_UNUSED ) // nothing here?
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)

@@ -241,7 +241,7 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 
 
 	/* check the coins here as well - they drive the clock of the flip-flops */
-	port_value = input_port_read_indexed(machine, 0);
+	port_value = input_port_read(machine, "IN0");
 
 	TTL7474_clock_w(TTL7474_2S_1, port_value & 0x01);
 	TTL7474_clock_w(TTL7474_2S_2, port_value & 0x02);
@@ -259,9 +259,9 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 	{
 		int movement_flip_flop = TTL7474_1F_1 + (2 * player);
 		int dir_flip_flop      = movement_flip_flop + 1;
+		static const char *portnames[] = { "DIAL0", "DIAL1", "DIAL2", "DIAL3" };
 
-
-		port_value = input_port_read_indexed(machine, 2 + player);
+		port_value = input_port_read(machine, portnames[player]);
 
 		if (port_value != last_wheel_value[player])
 		{
@@ -282,7 +282,7 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 
 
 	/* finally read the accelerator pedals */
-	port_value = input_port_read_indexed(machine, 6);
+	port_value = input_port_read(machine, "PEDALS");
 
 	for (player = 0; player < 4; player++)
 	{
@@ -446,7 +446,7 @@ static READ8_HANDLER( pia_1_port_a_r )
 		  (TTL7474_output_r(TTL7474_1C_2) ? 0x02 : 0x00) |
 		  (TTL7474_output_r(TTL7474_1D_2) ? 0x04 : 0x00) |
 		  (TTL7474_output_r(TTL7474_1F_2) ? 0x08 : 0x00) |
-		  (input_port_read_indexed(machine, 7) & 0xf0);
+		  (input_port_read(machine, "IN2") & 0xf0);
 
 	return ret;
 }

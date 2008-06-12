@@ -161,7 +161,7 @@ static WRITE8_HANDLER( custom_io_w )
 {
 	switch (data)
 	{
-		case 0x00: protection_res = input_port_read_indexed(machine, 7); break;
+		case 0x00: protection_res = input_port_read(machine, "5091"); break;
 		case 0x20: protection_res = 0x49; break;
 		case 0x21: protection_res = 0x47; break;
 		case 0x22: protection_res = 0x53; break;
@@ -194,16 +194,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpoker_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_WRITE(cpk_palette_w)
 	AM_RANGE(0x2800, 0x2fff) AM_WRITE(cpk_palette2_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ(input_port_0_r)		/* DSW1 */
-	AM_RANGE(0x4001, 0x4001) AM_READ(input_port_1_r)		/* DSW2 */
-	AM_RANGE(0x4002, 0x4002) AM_READ(input_port_2_r)		/* DSW3 */
-	AM_RANGE(0x4003, 0x4003) AM_READ(input_port_3_r)		/* DSW4 */
-	AM_RANGE(0x4004, 0x4004) AM_READ(input_port_4_r)		/* DSW5 */
-	AM_RANGE(0x5081, 0x5081) AM_READ(input_port_5_r)		/* Services */
-	AM_RANGE(0x5082, 0x5082) AM_READ(input_port_6_r)		/* Coing & Kbd */
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")			/* DSW1 */
+	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")			/* DSW2 */
+	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")			/* DSW3 */
+	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")			/* DSW4 */
+	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")			/* DSW5 */
+	AM_RANGE(0x5081, 0x5081) AM_READ_PORT("5081")			/* Services */
+	AM_RANGE(0x5082, 0x5082) AM_READ_PORT("5082")			/* Coing & Kbd */
 	AM_RANGE(0x5090, 0x5090) AM_WRITE(custom_io_w)
-	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r)		/* Keyboard */
-	AM_RANGE(0x50a0, 0x50a0) AM_READ(input_port_8_r)		/* Not connected */
+	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r)			/* Keyboard */
+	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("50A0")			/* Not connected */
 	AM_RANGE(0x50b0, 0x50b0) AM_WRITE(YM2413_register_port_0_w)
 	AM_RANGE(0x50b1, 0x50b1) AM_WRITE(YM2413_data_port_0_w)
 	AM_RANGE(0x6800, 0x6fff) AM_WRITE(SMH_RAM) AM_BASE(&cpk_expram)
@@ -215,15 +215,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( csk227_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_WRITE(cpk_palette_w)
 	AM_RANGE(0x2800, 0x2fff) AM_WRITE(cpk_palette2_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ(input_port_0_r)		/* DSW1 */
-	AM_RANGE(0x4001, 0x4001) AM_READ(input_port_1_r)		/* DSW2 */
-	AM_RANGE(0x4002, 0x4002) AM_READ(input_port_2_r)		/* DSW3 */
-	AM_RANGE(0x4003, 0x4003) AM_READ(input_port_3_r)		/* DSW4 */
-	AM_RANGE(0x4004, 0x4004) AM_READ(input_port_4_r)		/* DSW5 */
-	AM_RANGE(0x5081, 0x5081) AM_READ(input_port_5_r)		/* Services */
-	AM_RANGE(0x5082, 0x5082) AM_READ(input_port_6_r)		/* Coing & Kbd */
-	AM_RANGE(0x5091, 0x5091) AM_READ(input_port_7_r)		/* Keyboard */
-	AM_RANGE(0x50a0, 0x50a0) AM_READ(input_port_8_r)		/* Not connected */
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")			/* DSW1 */
+	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")			/* DSW2 */
+	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")			/* DSW3 */
+	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")			/* DSW4 */
+	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")			/* DSW5 */
+	AM_RANGE(0x5081, 0x5081) AM_READ_PORT("5081")			/* Services */
+	AM_RANGE(0x5082, 0x5082) AM_READ_PORT("5082")			/* Coing & Kbd */
+	AM_RANGE(0x5091, 0x5091) AM_READ_PORT("5091")			/* Keyboard */
+	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("50A0")			/* Not connected */
 	AM_RANGE(0x50b0, 0x50b0) AM_WRITE(YM2413_register_port_0_w)
 	AM_RANGE(0x50b1, 0x50b1) AM_WRITE(YM2413_data_port_0_w)
 	AM_RANGE(0x6800, 0x6fff) AM_WRITE(SMH_RAM) AM_BASE(&cpk_expram)
@@ -235,16 +235,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( csk234_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_WRITE(cpk_palette_w)
 	AM_RANGE(0x2800, 0x2fff) AM_WRITE(cpk_palette2_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ(input_port_0_r)		/* DSW1 */
-	AM_RANGE(0x4001, 0x4001) AM_READ(input_port_1_r)		/* DSW2 */
-	AM_RANGE(0x4002, 0x4002) AM_READ(input_port_2_r)		/* DSW3 */
-	AM_RANGE(0x4003, 0x4003) AM_READ(input_port_3_r)		/* DSW4 */
-	AM_RANGE(0x4004, 0x4004) AM_READ(input_port_4_r)		/* DSW5 */
-	AM_RANGE(0x5081, 0x5081) AM_READ(input_port_5_r)		/* Services */
-	AM_RANGE(0x5082, 0x5082) AM_READ(input_port_6_r)		/* Coing & Kbd */
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")			/* DSW1 */
+	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")			/* DSW2 */
+	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")			/* DSW3 */
+	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")			/* DSW4 */
+	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")			/* DSW5 */
+	AM_RANGE(0x5081, 0x5081) AM_READ_PORT("5081")			/* Services */
+	AM_RANGE(0x5082, 0x5082) AM_READ_PORT("5082")			/* Coing & Kbd */
 	AM_RANGE(0x5090, 0x5090) AM_WRITE(custom_io_w)
 	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r)			/* used for protection and other */
-	AM_RANGE(0x50a0, 0x50a0) AM_READ(input_port_8_r)		/* Not connected */
+	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("50A0")			/* Not connected */
 	AM_RANGE(0x50b0, 0x50b0) AM_WRITE(YM2413_register_port_0_w)
 	AM_RANGE(0x50b1, 0x50b1) AM_WRITE(YM2413_data_port_0_w)
 	AM_RANGE(0x6800, 0x6fff) AM_WRITE(SMH_RAM) AM_BASE(&cpk_expram)
@@ -410,6 +410,7 @@ static INPUT_PORTS_START( csk227 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold1/High/Low")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold2/Red/Black")
+
 	PORT_START_TAG("50A0")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 

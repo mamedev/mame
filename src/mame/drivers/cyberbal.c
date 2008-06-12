@@ -105,7 +105,7 @@ static MACHINE_RESET( cyberb2p )
 
 static READ16_HANDLER( special_port0_r )
 {
-	int temp = input_port_read_indexed(machine, 0);
+	int temp = input_port_read(machine, "IN0");
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0080;
 	return temp;
 }
@@ -113,7 +113,7 @@ static READ16_HANDLER( special_port0_r )
 
 static READ16_HANDLER( special_port2_r )
 {
-	int temp = input_port_read_indexed(machine, 2);
+	int temp = input_port_read(machine, "IN2");
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x2000;
 	return temp;
 }
@@ -277,7 +277,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( cyberbal )
-	PORT_START      /* fe0000 */
+	PORT_START_TAG("IN0")		/* fe0000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
@@ -294,7 +294,7 @@ static INPUT_PORTS_START( cyberbal )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 
-	PORT_START      /* fe1000 */
+	PORT_START_TAG("IN1")		/* fe1000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
@@ -311,10 +311,11 @@ static INPUT_PORTS_START( cyberbal )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_VBLANK )
 
-	PORT_START		/* fake port for screen switching */
+	PORT_START_TAG("IN2")		/* fake port for screen switching */
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START		/* audio board port */
+	/* 2008-06 FP: I tag this as JSAII (even if it's not) to simplify cyberbal_special_port3_r */
+	PORT_START_TAG("JSAII")		/* audio board port */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN4 )
@@ -327,7 +328,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( cyberb2p )
-	PORT_START      /* fc0000 */
+	PORT_START_TAG("IN0")		/* fc0000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
@@ -336,7 +337,7 @@ static INPUT_PORTS_START( cyberb2p )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START      /* fc2000 */
+	PORT_START_TAG("IN1")		/* fc2000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
@@ -345,7 +346,7 @@ static INPUT_PORTS_START( cyberb2p )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START		/* fc4000 */
+	PORT_START_TAG("IN2")		/* fc4000 */
 	PORT_BIT( 0x1fff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_VBLANK )

@@ -159,8 +159,8 @@ static UINT8 last_trackball_val[2] = {0,0};
 static READ8_HANDLER( trackball_r )
 {
 	UINT8 ret;
-	UINT8 port4 = input_port_read_indexed(machine, 4);
-	UINT8 port5 = input_port_read_indexed(machine, 5);
+	UINT8 port4 = input_port_read(machine, "FAKEX");
+	UINT8 port5 = input_port_read(machine, "FAKEY");
 
 	ret = (((port4 - last_trackball_val[0]) & 0x0f)<<4) | ((port5 - last_trackball_val[1]) & 0x0f);
 
@@ -201,10 +201,10 @@ static ADDRESS_MAP_START( champbwl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(SMH_RAM) AM_BASE(&tnzs_bg_flag)	/* enable / disable background transparency */
 
 	AM_RANGE(0xf000, 0xf000) AM_READ(trackball_r)
-	AM_RANGE(0xf002, 0xf002) AM_READ(input_port_0_r)
-	AM_RANGE(0xf004, 0xf004) AM_READ(input_port_1_r)
-	AM_RANGE(0xf006, 0xf006) AM_READ(input_port_2_r)
-	AM_RANGE(0xf007, 0xf007) AM_READ(input_port_3_r)
+	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN0")
+	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("IN1")
+	AM_RANGE(0xf006, 0xf006) AM_READ_PORT("IN2")
+	AM_RANGE(0xf007, 0xf007) AM_READ_PORT("IN3")
 
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(champbwl_misc_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITENOP //buttons light?
@@ -214,7 +214,7 @@ static ADDRESS_MAP_START( champbwl_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( champbwl )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -224,7 +224,7 @@ static INPUT_PORTS_START( champbwl )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) // INT( 4M)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) // INT(16M)
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -250,7 +250,7 @@ static INPUT_PORTS_START( champbwl )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_SERVICE_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
@@ -274,7 +274,7 @@ static INPUT_PORTS_START( champbwl )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -299,10 +299,10 @@ static INPUT_PORTS_START( champbwl )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	/* FAKE */
+	PORT_START_TAG("FAKEX")		/* FAKE */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X )PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_CENTERDELTA(0)
 
-	PORT_START	/* FAKE */
+	PORT_START_TAG("FAKEY")		/* FAKE */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(45) PORT_CENTERDELTA(0) PORT_REVERSE
 INPUT_PORTS_END
 

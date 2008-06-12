@@ -1072,10 +1072,10 @@ static READ8_HANDLER( mux_port_r )
 {
 	switch( mux_data&0xf0 )	/* bits 4-7 */
 	{
-		case 0x10: return input_port_read_indexed(machine, 0);
-		case 0x20: return input_port_read_indexed(machine, 1);
-		case 0x40: return input_port_read_indexed(machine, 2);
-		case 0x80: return input_port_read_indexed(machine, 3);
+		case 0x10: return input_port_read(machine, "IN0-0");
+		case 0x20: return input_port_read(machine, "IN0-1");
+		case 0x40: return input_port_read(machine, "IN0-2");
+		case 0x80: return input_port_read(machine, "IN0-3");
 	}
 	return 0xff;
 }

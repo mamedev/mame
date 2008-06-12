@@ -124,8 +124,8 @@ static READ8_HANDLER( analog_read_r )
 	static int accel, wheel;
 
 	switch (analog_ctrl & 0x03){
-		case 0x00: return (accel = input_port_read_indexed(machine, 5));	/* accelerator */
-		case 0x01: return (wheel = input_port_read_indexed(machine, 6));	/* steering */
+		case 0x00: return (accel = input_port_read(machine, "IN3"));	/* accelerator */
+		case 0x01: return (wheel = input_port_read(machine, "IN4"));	/* steering */
 		case 0x02: return accel;						/* accelerator (previous?) */
 		case 0x03: return wheel;						/* steering (previous?) */
 	}
@@ -148,12 +148,12 @@ static ADDRESS_MAP_START( chqflag_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2007) AM_READ(K051937_r)					/* Sprite control registers */
 	AM_RANGE(0x2400, 0x27ff) AM_READ(K051960_r)					/* Sprite RAM */
 	AM_RANGE(0x2800, 0x2fff) AM_READ(SMH_BANK3)					/* 051316 zoom/rotation (chip 2) */
-	AM_RANGE(0x3100, 0x3100) AM_READ(input_port_0_r)				/* DIPSW #1  */
-	AM_RANGE(0x3200, 0x3200) AM_READ(input_port_3_r)				/* COINSW, STARTSW, test mode */
-	AM_RANGE(0x3201, 0x3201) AM_READ(input_port_2_r)				/* DIPSW #3, SW 4 */
-	AM_RANGE(0x3203, 0x3203) AM_READ(input_port_1_r)				/* DIPSW #2 */
+	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW1")				/* DIPSW #1  */
+	AM_RANGE(0x3200, 0x3200) AM_READ_PORT("IN1")				/* COINSW, STARTSW, test mode */
+	AM_RANGE(0x3201, 0x3201) AM_READ_PORT("IN0")				/* DIPSW #3, SW 4 */
+	AM_RANGE(0x3203, 0x3203) AM_READ_PORT("DSW2")				/* DIPSW #2 */
 	AM_RANGE(0x3400, 0x341f) AM_READ(K051733_r)					/* 051733 (protection) */
-	AM_RANGE(0x3701, 0x3701) AM_READ(input_port_4_r)				/* Brake + Shift + ? */
+	AM_RANGE(0x3701, 0x3701) AM_READ_PORT("IN2")				/* Brake + Shift + ? */
 	AM_RANGE(0x3702, 0x3702) AM_READ(analog_read_r)				/* accelerator/wheel */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK4)					/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)					/* ROM */
@@ -220,7 +220,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( chqflag )
-	PORT_START	/* DSW #1 */
+	PORT_START_TAG("DSW1")	/* DSW #1 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -256,7 +256,7 @@ static INPUT_PORTS_START( chqflag )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
 //  PORT_DIPSETTING(    0x00, "Coin Slot 2 Invalidity" )
 
-	PORT_START	/* DSW #2 (according to the manual SW1 thru SW5 are not used) */
+	PORT_START_TAG("DSW2")	/* DSW #2 (according to the manual SW1 thru SW5 are not used) */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
@@ -281,13 +281,13 @@ static INPUT_PORTS_START( chqflag )
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )	/* DIPSW #3 - SW4 */
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	/* COINSW + STARTSW */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -303,16 +303,16 @@ static INPUT_PORTS_START( chqflag )
 	PORT_DIPSETTING(	0x00, "Checkered Flag" )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	/* Brake, Shift + ??? */
+	PORT_START_TAG("IN2")	/* Brake, Shift + ??? */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* if this is set, it goes directly to test mode */
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* if bit 7 == 0, the game resets */
 
-	PORT_START	/* Accelerator */
+	PORT_START_TAG("IN3")	/* Accelerator */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 
-	PORT_START	/* Driving wheel */
+	PORT_START_TAG("IN4")	/* Driving wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xef) PORT_SENSITIVITY(80) PORT_KEYDELTA(8)
 INPUT_PORTS_END
 

@@ -290,7 +290,9 @@ static WRITE8_HANDLER( bankswitch_w )
 
 static READ8_HANDLER( leta_r )
 {
-	return input_port_read_indexed(machine, 2 + offset);
+	static const char *letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
+
+	return input_port_read(machine, letanames[offset]);
 }
 
 
@@ -346,7 +348,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8e00, 0x8fff) AM_BASE(&spriteram)
 	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0300) AM_RAM AM_BASE(&nvram_stage) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x01fc) AM_READ(leta_r)
-	AM_RANGE(0x9600, 0x97ff) AM_READ(input_port_0_r)
+	AM_RANGE(0x9600, 0x97ff) AM_READ_PORT("IN0")
 	AM_RANGE(0x9800, 0x980f) AM_MIRROR(0x01f0) AM_READWRITE(pokey1_r, pokey1_w)
 	AM_RANGE(0x9a00, 0x9a0f) AM_MIRROR(0x01f0) AM_READWRITE(pokey2_r, pokey2_w)
 	AM_RANGE(0x9c00, 0x9c7f) AM_WRITE(nvram_recall_w)
@@ -373,7 +375,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( ccastles )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -383,7 +385,7 @@ static INPUT_PORTS_START( ccastles )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )					/* 1p Jump, non-cocktail start1 */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)		/* 2p Jump, non-cocktail start2 */
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

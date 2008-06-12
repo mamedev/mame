@@ -95,7 +95,7 @@ static WRITE8_HANDLER( changela_68705_ddrA_w )
 
 static READ8_HANDLER( changela_68705_portB_r )
 {
-	return (portB_out & ddrB) | (input_port_read_indexed(machine, 4) & ~ddrB);
+	return (portB_out & ddrB) | (input_port_read(machine, "MCU") & ~ddrB);
 }
 
 static WRITE8_HANDLER( changela_68705_portB_w )
@@ -177,7 +177,7 @@ static READ8_HANDLER( changela_25_r )
 
 static READ8_HANDLER( changela_30_r )
 {
-	return input_port_read_indexed(machine, 7) & 0x0f;	//wheel control (clocked input) signal on bits 3,2,1,0
+	return input_port_read(machine, "WHEEL") & 0x0f;	//wheel control (clocked input) signal on bits 3,2,1,0
 }
 
 static READ8_HANDLER( changela_31_r )
@@ -186,7 +186,7 @@ static READ8_HANDLER( changela_31_r )
        or if the new value is greater than the old value, and it did wrap around,
        then we are moving LEFT. */
 	static UINT8 prev_value = 0;
-	UINT8 curr_value = input_port_read_indexed(machine, 7);
+	UINT8 curr_value = input_port_read(machine, "WHEEL");
 	static int dir = 0;
 
 	if( (curr_value < prev_value && (prev_value - curr_value) < 0x80)
@@ -204,7 +204,7 @@ static READ8_HANDLER( changela_31_r )
 
 static READ8_HANDLER( changela_2c_r )
 {
-	int val = input_port_read_indexed(machine, 5);
+	int val = input_port_read(machine, "IN0");
 
     val = (val&0x30) | ((val&1)<<7) | (((val&1)^1)<<6);
 
@@ -221,7 +221,7 @@ static READ8_HANDLER( changela_2d_r )
 		v8 = 1;
 
 	/* Gas pedal is made up of 2 switches, 1 active low, 1 active high */
-	switch(input_port_read_indexed(machine, 6) & 0x03)
+	switch(input_port_read(machine, "IN1") & 0x03)
 	{
 		case 0x02:
 			gas = 0x80;
@@ -234,7 +234,7 @@ static READ8_HANDLER( changela_2d_r )
 			break;
 	}
 
-	return (input_port_read_indexed(machine, 6) & 0x20) | gas | (v8<<4);
+	return (input_port_read(machine, "IN1") & 0x20) | gas | (v8<<4);
 }
 
 static WRITE8_HANDLER( mcu_PC0_w )
@@ -318,7 +318,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( changela )
-	PORT_START /* 0 */ /* DSWA */
+	PORT_START_TAG("DSWA")	/* DSWA */
 	PORT_DIPNAME( 0x07, 0x01, "Steering Wheel Ratio" )
 	PORT_DIPSETTING(    0x01, "Recommended" )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
@@ -337,7 +337,7 @@ static INPUT_PORTS_START( changela )
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 
-	PORT_START /* 1 */ /* DSWB */
+	PORT_START_TAG("DSWB")	/* DSWB */
 	PORT_DIPNAME( 0x03, 0x00, "Max Bonus Fuels" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -360,7 +360,7 @@ static INPUT_PORTS_START( changela )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START /* 2 */ /* DSWC - coinage */
+	PORT_START_TAG("DSWC")	/* DSWC - coinage */
 	PORT_DIPNAME( 0xf0, 0x10, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(	0x90, DEF_STR( 2C_1C ) )
@@ -394,7 +394,7 @@ static INPUT_PORTS_START( changela )
 	PORT_DIPSETTING(	0x06, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(	0x07, DEF_STR( 1C_7C ) )
 
-	PORT_START /* 3 */ /* DSWD - bonus */
+	PORT_START_TAG("DSWD")	/* DSWD - bonus */
 	PORT_DIPNAME( 0x01, 0x01, "Right Coin Counter" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -416,7 +416,7 @@ static INPUT_PORTS_START( changela )
 	PORT_DIPSETTING(    0x40, "Short Name" )
 	PORT_DIPSETTING(    0x00, "Long Name" )
 
-	PORT_START /* port 4 */ /* MCU */
+	PORT_START_TAG("MCU") /* MCU */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
@@ -428,21 +428,21 @@ static INPUT_PORTS_START( changela )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START /* 5 */ /* 0xDx2C */
+	PORT_START_TAG("IN0") /* 0xDx2C */
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Shift") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE /* Gear shift */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* FWD - negated bit 7 */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* REV - gear position */
 
-	PORT_START /* 6 */ /* 0xDx2D */
+	PORT_START_TAG("IN1") /* 0xDx2D */
 	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0x02) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) //gas pedal
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_TILT )
 	//PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) //gas1
 	//PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) //gas2
 
-	PORT_START /* 7 */ /* 0xDx30 DRIVING_WHEEL */
+	PORT_START_TAG("WHEEL") /* 0xDx30 DRIVING_WHEEL */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(8)
 
 
