@@ -10,6 +10,7 @@
     ---------------+------+-----------+----------+--------------------
     Alligator Hunt | 1994 | GAE1 449  | 940411   | DS5002FP, but unprotected version available
     World Rally 2  | 1995 | GAE1 449  | 950510   | DS5002FP
+                   | 1995 | GAE1 506  | 950510-1 | DS5002FP
     Touch & Go     | 1995 | GAE1 501  | 950906   | DS5002FP
     Touch & Go     | 1995 | GAE1 501  | 950510-1 | DS5002FP
     Maniac Square  | 1996 | Unknown   | ???      | DS5002FP, but unprotected version available
@@ -1351,6 +1352,54 @@ CONN1: RGBSync OUT (additional to JAMMA RGBSync)
 CONN2: Right speaker sound OUT (for second cabinat)
 CONN3: For connection of wheel etc
 POT1/2: Volume adjust of left/right channel
+
+PCB Layout:
+
+REF: 950510-1
+
+------------------------------------------------------------------------------
+ |         POT1              TI F20LB         KM428C256J-6 (x4)               |
+ |         POT2                                                               |
+ |                                                                            |
+ |                                                                            |
+ |                                              PROM IC68                     |
+ |---                                           PROM IC69                     |
+    |                                           PROM IC70                     |
+    |                                                                         |
+ |---                                                                         |
+ |                                                                            |
+ |                                                                            |
+ |                                                                            |
+ |                                            |----------|                    |
+ | J                                          |          |                    |
+ |                                            | GAE1 506 |                    |
+ | A                              65764       | (QFP160) |                    |
+ |                                65764       |          |                    |
+ | M                                          |----------|                    |
+ |                                                                            |
+ | M                       |-------------------------|                        |
+ |                         |                         |  34.000MHz     62256   |
+ | A                       |  62256  DS5002  BATT_3V |                62256   |
+ |                         |                         |                        |
+ |                         |-------------------------|                        |
+ |    TLC569   TLC569                                                         |
+ |---                                    62256                                |
+    |                                    62256                                |
+    |  DSW1                                                                   |
+ |---  DSW2                                                                   |
+ |                                                                            |
+ |                                26.000MHz      MC68000P12      WR2.63       |
+ | CONN1                                                         WR2.64       |
+ |                                                                            |
+ | CONN2    CONN3                                                             |
+ -----------------------------------------------------------------------------|
+
+
+Notes
+-----
+IC68, IC69, IC70 are marked as "GAELCO" (they could be a prom containing gfx and sound data)
+TLC569 (IC2 and IC7) is a 8-bit serial ADC 
+
 */
 
 ROM_START( wrally2 )
