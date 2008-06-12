@@ -55,6 +55,11 @@ VIDEO_START( system18 )
 {
 	int width, height;
 
+	tempbitmap = NULL;
+	grayscale_enable = 0;
+	vdp_enable = 0;
+	vdp_mixing = 0;
+
 	/* compute palette info */
 	segaic16_palette_init(0x800);
 
