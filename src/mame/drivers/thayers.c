@@ -2,9 +2,11 @@
 
 	TODO:
 
-	- game gets stuck in a loop at 2224
-	- SSI263 sound
-	- laserdisc
+	- LDV1000 mode
+	- PR7820 INT/_EXT line
+	- coin counter
+	- convert SSI-263 to a sound device
+	- dump laserdisc
 
 */
 
@@ -13,6 +15,7 @@
 #include "machine/laserdsc.h"
 #include "cpu/cop400/cop400.h"
 //#include "dlair.lh"
+
 extern const char layout_dlair[];
 
 static laserdisc_info *discinfo;
@@ -32,9 +35,9 @@ static int data_rdy_int = 1;
 static int ssi_data_request = 1;
 
 static int cart_present;
+static int pr7820_enter;
 
-static const UINT8 led_map[16] =
-	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
+static const UINT8 led_map[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x00 };
 
 /* Video */
 
@@ -83,7 +86,7 @@ static READ8_HANDLER( irqstate_r )
 
 		0		
 		1		
-		2		SSI263 data request
+		2		SSI263 A/_R
 		3		tied to +5V
 		4		_TIMER INT
 		5		_DATA RDY INT
@@ -329,7 +332,7 @@ static WRITE8_HANDLER( laserdsc_data_w )
 	laserdisc_data = data;
 }
 
-static WRITE8_HANDLER( counter_w )
+static WRITE8_HANDLER( laserdsc_control_w )
 {
 	/*
 
@@ -342,41 +345,31 @@ static WRITE8_HANDLER( counter_w )
 		4		coin counter
 		5		U16 output enable
 		6		ENTER if switch B5 closed
-		7
+		7		INT/_EXT
 
 	*/
 
-	coin_counter_w(0, !BIT(data, 4));
+	coin_counter_w(0, BIT(data, 4));
 
 	if (BIT(data, 5))
 	{
 		laserdisc_data_w(discinfo, laserdisc_data);
 	}
 
-	if (laserdisc_type == LASERDISC_TYPE_PR7820)
+	switch (laserdisc_type)
 	{
-		laserdisc_line_w(discinfo, LASERDISC_LINE_ENTER, BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE);
+	case LASERDISC_TYPE_PR7820:
+		pr7820_enter = BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE;
+
+		laserdisc_line_w(discinfo, LASERDISC_LINE_ENTER, pr7820_enter);
+
+		// BIT(data, 7) is INT/_EXT, but there is no such input line in laserdsc.h
+		break;
+
+	case LASERDISC_TYPE_LDV1000:
+		laserdisc_line_w(discinfo, LASERDISC_LINE_ENTER, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+		break;
 	}
-}
-
-static READ8_HANDLER( laserdsc_status_r )
-{
-	/*
-
-		bit		description
-
-		0
-		1
-		2
-		3
-		4
-		5
-		6		
-		7		INT/_EXT
-
-	*/
-
-	return 0;
 }
 
 static WRITE8_HANDLER( den1_w )
@@ -419,7 +412,17 @@ static WRITE8_HANDLER( den2_w )
 	output_set_digit_value(8 + (data >> 4), led_map[data & 0x0f]);
 }
 
-/* SSI 263 */
+/* SSI-263 */
+
+/* 
+
+	The following information is from the SSI-263A data sheet.
+
+	Thayer's Quest uses an SSI-263, so this might be inaccurate, but it works for now
+
+*/
+
+#define SSI263_CLOCK (XTAL_4MHz/2)
 
 static const char SSI263_PHONEMES[0x40][5] =
 {
@@ -437,29 +440,57 @@ static struct SSI263
 	UINT8 c;
 	UINT8 a;
 	UINT8 f;
+	UINT8 mode;
 } ssi263;
+
+static TIMER_CALLBACK( ssi263_phoneme_tick )
+{
+	ssi_data_request = 0;
+	check_interrupt(machine);
+}
 
 static WRITE8_HANDLER( ssi263_register_w )
 {
 	switch (offset)
 	{
 	case 0:
+		{
+		int frame_time = ((4096 * (16 - ssi263.r)) / 2); // us, /2 should actually be /SSI263_CLOCK, but this way we get microseconds directly
+		int phoneme_time = frame_time * (4 - ssi263.dr); // us
+
 		// duration/phoneme register
-		ssi263.dr = data >> 5;
+		ssi263.dr = (data >> 5) & 0x03;
 		ssi263.p = data & 0x3f;
 
 		ssi_data_request = 1;
 		check_interrupt(machine);
 
-		logerror("SSI263 Phoneme Duration: %u\n", ssi263.dr);
-		logerror("SSI263 Phoneme: %02x %s\n", ssi263.p, SSI263_PHONEMES[ssi263.p]);
+		switch (ssi263.mode)
+		{
+		case 0:
+		case 1:
+			// phoneme timing response
+			timer_set(ATTOTIME_IN_USEC(phoneme_time), NULL, 0, ssi263_phoneme_tick);
+			break;
+		case 2:
+			// frame timing response
+			timer_set(ATTOTIME_IN_USEC(frame_time), NULL, 0, ssi263_phoneme_tick);
+			break;
+		case 3:
+			// disable A/_R output
+			break;
+		}
+
+		//logerror("SSI263 Phoneme Duration: %u\n", ssi263.dr);
+		//logerror("SSI263 Phoneme: %02x %s\n", ssi263.p, SSI263_PHONEMES[ssi263.p]);
+		}
 		break;
 
 	case 1:
 		// inflection register
 		ssi263.i = (data << 3) | (ssi263.i & 0x403);
 
-		logerror("SSI263 Inflection: %u\n", ssi263.i);
+		//logerror("SSI263 Inflection: %u\n", ssi263.i);
 		break;
 
 	case 2:
@@ -467,24 +498,34 @@ static WRITE8_HANDLER( ssi263_register_w )
 		ssi263.i = (BIT(data, 4) << 11) | (ssi263.i & 0x7f8) | (data & 0x07);
 		ssi263.r = data >> 4;
 
-		logerror("SSI263 Inflection: %u\n", ssi263.i);
-		logerror("SSI263 Rate: %u\n", ssi263.r);
+		//logerror("SSI263 Inflection: %u\n", ssi263.i);
+		//logerror("SSI263 Rate: %u\n", ssi263.r);
 		break;
 
 	case 3:
 		// control/articulation/amplitude register
 		if (ssi263.c && !BIT(data, 7))
 		{
-			switch (ssi263.dr)
+			ssi263.mode = ssi263.dr;
+
+			switch (ssi263.mode)
 			{
 			case 0:
-			case 1:
-			case 2:
-				ssi_data_request = 0;
-				check_interrupt(machine);
+				//logerror("SSI263 Phoneme Timing Response, Transitioned Inflection\n");
 				break;
+
+			case 1:
+				//logerror("SSI263 Phoneme Timing Response, Immediate Inflection\n");
+				break;
+
+			case 2:
+				// activate A/_R
+				//logerror("SSI263 Frame Timing Response, Immediate Inflection\n");
+				break;
+
 			case 3:
 				// disable A/_R output
+				//logerror("SSI263 A/R Output Disabled\n");
 				break;
 			}
 		}
@@ -493,9 +534,9 @@ static WRITE8_HANDLER( ssi263_register_w )
 		ssi263.t = (data >> 4) & 0x07;
 		ssi263.a = data & 0x0f;
 
-		logerror("SSI263 Control: %u\n", ssi263.c);
-		logerror("SSI263 Articulation: %u\n", ssi263.t);
-		logerror("SSI263 Amplitude: %u\n", ssi263.a);
+		//logerror("SSI263 Control: %u\n", ssi263.c);
+		//logerror("SSI263 Articulation: %u\n", ssi263.t);
+		//logerror("SSI263 Amplitude: %u\n", ssi263.a);
 		break;
 
 	case 4:
@@ -504,13 +545,15 @@ static WRITE8_HANDLER( ssi263_register_w )
 	case 7:
 		// filter frequency register
 		ssi263.f = data;
-		logerror("SSI263 Filter Frequency: %u\n", ssi263.f);
+		//logerror("SSI263 Filter Frequency: %u\n", ssi263.f);
 		break;
 	}
 }
 
 static READ8_HANDLER( ssi263_register_r )
 {
+	// D7 becomes an output, as the inverted state of A/_R. The register address bits are ignored.
+
 	return !ssi_data_request << 7;
 }
 
@@ -535,7 +578,7 @@ static ADDRESS_MAP_START( thayers_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf2, 0xf2) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf3, 0xf3) AM_WRITE(intrq_w)
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(laserdsc_data_w)
-	AM_RANGE(0xf5, 0xf5) AM_READWRITE(laserdsc_status_r, counter_w) 
+	AM_RANGE(0xf5, 0xf5) AM_WRITE(laserdsc_control_w) 
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(den1_w)
 	AM_RANGE(0xf7, 0xf7) AM_WRITE(den2_w)
 ADDRESS_MAP_END
@@ -548,14 +591,13 @@ static ADDRESS_MAP_START( thayers_cop_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READWRITE(cop_l_r, cop_l_w)
 	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_READWRITE(cop_g_r, cop_g_w)
 	AM_RANGE(COP400_PORT_D, COP400_PORT_D) AM_WRITE(cop_d_w)
-	AM_RANGE(COP400_PORT_IN, COP400_PORT_IN) AM_READNOP
 	AM_RANGE(COP400_PORT_SK, COP400_PORT_SK) AM_WRITENOP
 	AM_RANGE(COP400_PORT_SIO, COP400_PORT_SIO) AM_READ(cop_si_r) AM_WRITE(cop_so_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
 
-static CUSTOM_INPUT( laserdisc_status_r )
+static CUSTOM_INPUT( laserdisc_enter_r )
 {
 	if (discinfo == NULL)
 		return 0;
@@ -563,7 +605,7 @@ static CUSTOM_INPUT( laserdisc_status_r )
 	switch (laserdisc_type)
 	{
 	case LASERDISC_TYPE_PR7820:
-		return 0;
+		return pr7820_enter;
 
 	case LASERDISC_TYPE_LDV1000:
 		return (laserdisc_line_r(discinfo, LASERDISC_LINE_STATUS) == ASSERT_LINE) ? 0 : 1;
@@ -572,7 +614,7 @@ static CUSTOM_INPUT( laserdisc_status_r )
 	return 0;
 }
 
-static CUSTOM_INPUT( laserdisc_command_r )
+static CUSTOM_INPUT( laserdisc_ready_r )
 {
 	if (discinfo == NULL)
 		return 0;
@@ -618,7 +660,7 @@ static INPUT_PORTS_START( thayers )
 	PORT_SERVICE_DIPLOC( 0x01, 0x01, "B:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "B:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "B:3" )
-	PORT_DIPNAME( 0x18, 0x18, "LD Player" ) PORT_DIPLOCATION( "B:5,4" )
+	PORT_DIPNAME( 0x18, 0x00, "LD Player" ) PORT_DIPLOCATION( "B:5,4" )
 	PORT_DIPSETTING(    0x18, "LDV-1000" )
 	PORT_DIPSETTING(    0x00, "PR-7820" )
 	PORT_DIPUNUSED_DIPLOC( 0xe0, IP_ACTIVE_LOW, "B:8,7,6" )
@@ -626,8 +668,8 @@ static INPUT_PORTS_START( thayers )
 	PORT_START_TAG("COIN")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(laserdisc_command_r, 0 )	/* Enter pin on LD player */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(laserdisc_status_r, 0 )	/* Ready pin on LD player */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(laserdisc_enter_r, 0 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(laserdisc_ready_r, 0 )
 
 	PORT_START_TAG("R0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "2" ) PORT_CODE( KEYCODE_F2 )
@@ -697,6 +739,8 @@ static MACHINE_START( thayers )
 	laserdisc_type = LASERDISC_TYPE_LDV1000;
 
 	discinfo = laserdisc_init(laserdisc_type, get_disk_handle(0), 0);
+
+	memset(&ssi263, 0, sizeof(ssi263));
 }
 
 static MACHINE_RESET( thayers )
@@ -732,7 +776,7 @@ static MACHINE_DRIVER_START( thayers )
 	MDRV_MACHINE_START(thayers)
 	MDRV_MACHINE_RESET(thayers)
 
-	MDRV_CPU_ADD(COP420, XTAL_4MHz/2) // COP421L-PCA/N
+	MDRV_CPU_ADD(COP421, XTAL_4MHz/2) // COP421L-PCA/N
 	MDRV_CPU_PROGRAM_MAP(thayers_cop_map, 0)
 	MDRV_CPU_IO_MAP(thayers_cop_io_map, 0)
 	MDRV_CPU_CONFIG(thayers_cop_intf)

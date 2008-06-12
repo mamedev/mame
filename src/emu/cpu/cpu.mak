@@ -268,6 +268,7 @@ $(CPUOBJ)/cdp1802/cdp1802.o:	$(CPUSRC)/cdp1802/cdp1802.c \
 CPUDEFS += -DHAS_COP410=$(if $(filter COP410,$(CPUS)),1,0)
 CPUDEFS += -DHAS_COP411=$(if $(filter COP411,$(CPUS)),1,0)
 CPUDEFS += -DHAS_COP420=$(if $(filter COP420,$(CPUS)),1,0)
+CPUDEFS += -DHAS_COP421=$(if $(filter COP421,$(CPUS)),1,0)
 
 ifneq ($(filter COP410 COP411,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/cop400
@@ -275,7 +276,7 @@ CPUOBJS += $(CPUOBJ)/cop400/cop410.o
 DBGOBJS += $(CPUOBJ)/cop400/cop410ds.o
 endif
 
-ifneq ($(filter COP420,$(CPUS)),)
+ifneq ($(filter COP420 COP421,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/cop400
 CPUOBJS += $(CPUOBJ)/cop400/cop420.o
 DBGOBJS += $(CPUOBJ)/cop400/cop420ds.o

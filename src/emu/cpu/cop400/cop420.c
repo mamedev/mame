@@ -14,6 +14,8 @@
     TODO:
 
     - when is the microbus int cleared?
+	- CKO sync input
+	- save internal RAM when CKO is RAM power supply pin
     - run interrupt test suite
     - run production test suite
     - run microbus test suite
@@ -57,6 +59,7 @@ typedef struct
 	UINT16	counter;
 	UINT8	G_mask;
 	UINT8	D_mask;
+	UINT8	IN_mask;
 	UINT4	IL;
 	UINT4	in[4];
 	UINT8	si;
@@ -227,6 +230,7 @@ ADDRESS_MAP_END
 static TIMER_CALLBACK(cop420_counter_tick)
 {
 	cpuintrf_push_context(param);
+
 	R.counter++;
 
 	if (R.counter == 1024)
@@ -234,6 +238,7 @@ static TIMER_CALLBACK(cop420_counter_tick)
 		R.counter = 0;
 		R.timerlatch = 1;
 	}
+
 	cpuintrf_pop_context();
 }
 
@@ -245,6 +250,7 @@ static TIMER_CALLBACK(cop420_inil_tick)
 	int i;
 
 	cpuintrf_push_context(param);
+
 	in = IN_IN();
 	for (i = 0; i < 4; i++)
 	{
@@ -255,6 +261,7 @@ static TIMER_CALLBACK(cop420_inil_tick)
 			IL |= (1 << i);
 		}
 	}
+
 	cpuintrf_pop_context();
 }
 
@@ -265,7 +272,9 @@ static TIMER_CALLBACK(cop420_microbus_tick)
 	UINT8 in;
 
 	cpuintrf_push_context(param);
+
 	in = IN_IN();
+
 	if (!BIT(in, 2))
 	{
 		// chip select
@@ -287,6 +296,7 @@ static TIMER_CALLBACK(cop420_microbus_tick)
 			R.microbus_int = 0;
 		}
 	}
+
 	cpuintrf_pop_context();
 }
 
@@ -305,8 +315,9 @@ static void cop420_init(int index, int clock, const void *config, int (*irqcallb
 
 	/* set output pin masks */
 
-	R.G_mask = 0x0f;
-	R.D_mask = 0x0f;
+	R.G_mask = 0x0f;	// G0-G3 available
+	R.D_mask = 0x0f;	// D0-D3 available
+	R.IN_mask = 0x0f;	// IN0-IN3 available
 
 	/* set clock divider */
 
@@ -375,6 +386,7 @@ static void cop420_init(int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("cop420", index, R.counter);
 	state_save_register_item("cop420", index, R.G_mask);
 	state_save_register_item("cop420", index, R.D_mask);
+	state_save_register_item("cop420", index, R.IN_mask);
 	state_save_register_item("cop420", index, R.si);
 	state_save_register_item("cop420", index, R.last_skip);
 	state_save_register_item_array("cop420", index, R.in);
@@ -382,12 +394,32 @@ static void cop420_init(int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("cop420", index, R.halt);
 }
 
+static void cop421_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	cop420_init(index, clock, config, irqcallback);
+
+	/* microbus option is not available */
+
+	assert(R.intf->microbus != COP400_MICROBUS_ENABLED);
+
+	/* set output pin masks */
+
+	R.IN_mask = 0; // IN lines not available
+}
+
 static void cop422_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	cop420_init(index, clock, config, irqcallback);
 
+	/* microbus option is not available */
+
+	assert(R.intf->microbus != COP400_MICROBUS_ENABLED);
+
+	/* set output pin masks */
+
 	R.G_mask = 0x0e; // only G2, G3 available
 	R.D_mask = 0x0e; // only D2, D3 available
+	R.IN_mask = 0; // IN lines not available
 }
 
 /****************************************************************************
@@ -652,17 +684,20 @@ void cop421_get_info(UINT32 state, cpuinfo *info)
 
 	switch (state)
 	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_PTR_INIT:							info->init = cop421_init;				break;
+
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "COP421");				break;
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "National Semiconductor COPS"); break;
 
-		default: cop410_get_info(state, info); break;
+		default: cop420_get_info(state, info); break;
 	}
 }
 
 void cop422_get_info(UINT32 state, cpuinfo *info)
 {
-	// COP422 is a 20-pin package version of the COP420, lacking the IN ports
+	// COP422 is a 20-pin package version of the COP420, lacking G0/G1, D0/D1, and the IN ports
 
 	switch (state)
 	{
@@ -673,7 +708,7 @@ void cop422_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "COP422");				break;
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "National Semiconductor COPS"); break;
 
-		default: cop410_get_info(state, info); break;
+		default: cop420_get_info(state, info); break;
 	}
 }
 

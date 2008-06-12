@@ -190,6 +190,7 @@ void alpha8201_get_info(UINT32 state, cpuinfo *info);
 void alpha8301_get_info(UINT32 state, cpuinfo *info);
 void cdp1802_get_info(UINT32 state, cpuinfo *info);
 void cop420_get_info(UINT32 state, cpuinfo *info);
+void cop421_get_info(UINT32 state, cpuinfo *info);
 void cop410_get_info(UINT32 state, cpuinfo *info);
 void cop411_get_info(UINT32 state, cpuinfo *info);
 void tmp90840_get_info(UINT32 state, cpuinfo *info);
@@ -765,6 +766,9 @@ static const struct
 #endif
 #if (HAS_COP420)
 	{ CPU_COP420, cop420_get_info },
+#endif
+#if (HAS_COP421)
+	{ CPU_COP421, cop421_get_info },
 #endif
 #if (HAS_COP410)
 	{ CPU_COP410, cop410_get_info },
