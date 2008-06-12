@@ -37,7 +37,7 @@ MACHINE_RESET( sfx )
 	sfx_sh_init();
 }
 
-int monsterz_count = 0;
+static int monsterz_count = 0;
 MACHINE_RESET( monsterz )
 {
 /*

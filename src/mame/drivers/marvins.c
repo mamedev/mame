@@ -96,8 +96,6 @@ extern WRITE8_HANDLER( marvins_palette_bank_w );
 **
 ***************************************************************************/
 
-extern WRITE8_HANDLER( snkwave_w );
-
 static int sound_cpu_busy;
 
 static const struct namco_interface snkwave_interface =

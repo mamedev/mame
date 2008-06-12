@@ -649,10 +649,6 @@ ADDRESS_MAP_END
 VIDEO_START( megaplay_normal );
 VIDEO_UPDATE( megaplay_normal );
 
-/* give us access to the megadriv start and update functions so that we can call them */
-VIDEO_START( megadriv );
-VIDEO_UPDATE( megadriv );
-
 static VIDEO_START(megplay)
 {
 	//printf("megplay vs\n");

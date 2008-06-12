@@ -31,6 +31,7 @@
 */
 
 #include "driver.h"
+#include "includes/decocrpt.h"
 
 
 static void decrypt(UINT32 *src, UINT32 *dst, int length)

@@ -167,7 +167,7 @@ READ16_HANDLER( cps1_dsw_r )
 	return (in << 8) | 0xff;
 }
 
-READ16_HANDLER( cps1_hack_dsw_r )
+static READ16_HANDLER( cps1_hack_dsw_r )
 {
 	static const char *const dswname[] = { "IN0", "DSWA", "DSWB", "DSWC" };
 	int in = input_port_read(machine, dswname[offset]);

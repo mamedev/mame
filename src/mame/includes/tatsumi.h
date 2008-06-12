@@ -1,5 +1,7 @@
 /*----------- defined in drivers/tatsumi.c -----------*/
 
+extern UINT16 bigfight_a40000[2];
+
 extern UINT8* tatsumi_rom_sprite_lookup1;
 extern UINT8* tatsumi_rom_sprite_lookup2;
 extern UINT8* tatsumi_rom_clut0;

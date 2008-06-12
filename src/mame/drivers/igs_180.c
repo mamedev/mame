@@ -73,7 +73,7 @@ static VIDEO_START(igs_180)
 
 
 static UINT8 *sprites_gfx;
-int sprites_gfx_size;
+static int sprites_gfx_size;
 
 // Eeach 16 bit word in the sprites gfx roms contains three 5 bit pens: x-22222-11111-00000.
 // This routine expands each word into three bytes.

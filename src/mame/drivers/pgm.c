@@ -1790,10 +1790,6 @@ static DRIVER_INIT( martmast )
 }
 
 
-extern READ16_HANDLER( PSTARS_protram_r );
-extern READ16_HANDLER( PSTARS_r16 );
-extern WRITE16_HANDLER( PSTARS_w16 );
-
 static DRIVER_INIT( pstar )
 {
 	pgm_basic_init();

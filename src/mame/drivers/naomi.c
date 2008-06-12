@@ -516,7 +516,6 @@ Virtua Striker 2 2000      840-0010C  21929C       15         315-6213   317-025
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
 static UINT32 *dc_sound_ram;
-extern UINT64 *dc_texture_ram;
 static UINT32 rom_offset, dma_count;
 UINT32 dma_offset;
 

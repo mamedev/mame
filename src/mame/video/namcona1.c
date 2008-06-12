@@ -15,8 +15,8 @@ TODO:
 UINT16 *namcona1_vreg;
 UINT16 *namcona1_scroll;
 UINT16 *namcona1_workram;
-UINT16 *namcona1_sparevram;
-UINT16 *namcona1_pixmap;
+//UINT16 *namcona1_sparevram;
+//UINT16 *namcona1_pixmap;
 
 /* private variables */
 static char *dirtychar;

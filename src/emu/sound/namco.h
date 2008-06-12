@@ -8,6 +8,8 @@ struct namco_interface
 	int stereo;		/* set to 1 to indicate stereo (e.g., System 1) */
 };
 
+WRITE8_HANDLER( snkwave_w );
+
 WRITE8_HANDLER( pacman_sound_enable_w );
 WRITE8_HANDLER( pacman_sound_w );
 

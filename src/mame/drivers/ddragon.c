@@ -1932,7 +1932,7 @@ static DRIVER_INIT( toffy )
 	/* should the sound rom be bitswapped too? */
 }
 
-DRIVER_INIT( ddgn6809 )
+static DRIVER_INIT( ddgn6809 )
 {
 	/* Descramble GFX here */
 

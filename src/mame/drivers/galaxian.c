@@ -1527,18 +1527,18 @@ static const gfx_layout galaxian_spritelayout =
  *
  *************************************/
 
-GFXDECODE_START(galaxian)
+static GFXDECODE_START(galaxian)
 	GFXDECODE_SCALE(REGION_GFX1, 0x0000, galaxian_charlayout,   0, 8, GALAXIAN_XSCALE,1)
 	GFXDECODE_SCALE(REGION_GFX1, 0x0000, galaxian_spritelayout, 0, 8, GALAXIAN_XSCALE,1)
 GFXDECODE_END
 
-GFXDECODE_START(gmgalax)
+static GFXDECODE_START(gmgalax)
 	GFXDECODE_SCALE(REGION_GFX1, 0x0000, galaxian_charlayout,   0, 16, GALAXIAN_XSCALE,1)
 	GFXDECODE_SCALE(REGION_GFX1, 0x0000, galaxian_spritelayout, 0, 16, GALAXIAN_XSCALE,1)
 GFXDECODE_END
 
 /* separate character and sprite ROMs */
-GFXDECODE_START(pacmanbl)
+static GFXDECODE_START(pacmanbl)
 	GFXDECODE_SCALE(REGION_GFX1, 0x0000, galaxian_charlayout,   0, 8, GALAXIAN_XSCALE,1)
 	GFXDECODE_SCALE(REGION_GFX2, 0x0000, galaxian_spritelayout, 0, 8, GALAXIAN_XSCALE,1)
 GFXDECODE_END

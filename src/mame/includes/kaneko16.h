@@ -28,6 +28,10 @@ WRITE16_HANDLER( toybox_mcu_com2_w );
 WRITE16_HANDLER( toybox_mcu_com3_w );
 READ16_HANDLER( toybox_mcu_status_r );
 
+extern void (*toybox_mcu_run)(running_machine *machine);	/* one of the following */
+void bloodwar_mcu_run(running_machine *machine);
+void bonkadv_mcu_run(running_machine *machine);
+void gtmr_mcu_run(running_machine *machine);
 
 
 /*----------- defined in drivers/kaneko16.c -----------*/
@@ -102,6 +106,12 @@ VIDEO_START( sandscrp_1xVIEW2 );
 VIDEO_UPDATE( kaneko16 );
 VIDEO_UPDATE( sandscrp );
 VIDEO_UPDATE( berlwall );
+
+VIDEO_START( galsnew );
+VIDEO_UPDATE( galsnew );
+
+extern UINT16* galsnew_bg_pixram;
+extern UINT16* galsnew_fg_pixram;
 
 
 /*----------- defined in drivers/galpani2.c -----------*/

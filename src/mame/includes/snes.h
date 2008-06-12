@@ -351,6 +351,9 @@
 
 /*----------- defined in machine/snes.c -----------*/
 
+extern DRIVER_INIT( snes );
+extern DRIVER_INIT( snes_hirom );
+
 extern MACHINE_START( snes );
 extern MACHINE_RESET( snes );
 

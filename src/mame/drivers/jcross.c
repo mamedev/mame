@@ -24,8 +24,6 @@ Could be bad dump ('final' romset is made of two sets marked as 'bad' )
 
 UINT8 *jcr_textram;
 
-WRITE8_HANDLER( snkwave_w );
-
 READ8_HANDLER( jcross_background_ram_r );
 WRITE8_HANDLER( jcross_background_ram_w );
 

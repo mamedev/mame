@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( godzilla_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 /* did they swap the lines, or does the protection device swap the words during the DMA?? */
-WRITE16_HANDLER( denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w )
+static WRITE16_HANDLER( denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w )
 {
 	offset^=1;
 	COMBINE_DATA(&paletteram16[offset]);
@@ -990,7 +990,7 @@ static const gfx_layout legionna_new_charlayout =
 };
 
 
-void descramble_legionnaire_gfx(UINT8* src)
+static void descramble_legionnaire_gfx(UINT8* src)
 {
 	UINT8 *buffer;
 	int len = 0x10000;
@@ -2089,7 +2089,7 @@ static DRIVER_INIT( denjinmk )
 	ROM[0x5fe4/2] = 0x4e71;
 }
 
-DRIVER_INIT( legiongfx )
+static DRIVER_INIT( legiongfx )
 {
 	descramble_legionnaire_gfx( memory_region(REGION_GFX5) );
 }

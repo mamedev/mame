@@ -130,24 +130,6 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 static UINT16 ip_select, ip_select_values[5];
 static UINT8 megasys1_ignore_oki_status = 0;	/* used in MACHINE_RESET */
 
-/* Variables defined in video: */
-
-
-
-/* Functions defined in video: */
-
-PALETTE_INIT( megasys1 );
-VIDEO_START( megasys1 );
-VIDEO_UPDATE( megasys1 );
-
-READ16_HANDLER( megasys1_vregs_C_r );
-
-WRITE16_HANDLER( megasys1_vregs_A_w );
-WRITE16_HANDLER( megasys1_vregs_C_w );
-WRITE16_HANDLER( megasys1_vregs_D_w );
-
-
-
 
 static MACHINE_RESET( megasys1 )
 {

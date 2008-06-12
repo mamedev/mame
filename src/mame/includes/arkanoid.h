@@ -27,6 +27,8 @@ extern VIDEO_UPDATE( arkanoid );
 
 /*----------- defined in machine/arkanoid.c -----------*/
 
+extern UINT8 arkanoid_paddle_select;
+
 extern MACHINE_START( arkanoid );
 extern MACHINE_RESET( arkanoid );
 

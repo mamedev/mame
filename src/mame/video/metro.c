@@ -125,11 +125,13 @@ static TILEMAP_MAPPER( tilemap_scan_gstrik2 )
 
 ***************************************************************************/
 
+#ifdef UNUSED_FUNCTION
 WRITE16_HANDLER( metro_paletteram_w )
 {
 	data = COMBINE_DATA(&paletteram16[offset]);
 	palette_set_color_rgb(machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
+#endif
 
 
 /***************************************************************************

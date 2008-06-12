@@ -238,7 +238,7 @@ VIDEO_UPDATE( tnk3 )
 	return 0;
 }
 
-void athena_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xscroll, int yscroll )
+static void athena_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xscroll, int yscroll )
 {
 	const gfx_element *gfx = machine->gfx[2];
 

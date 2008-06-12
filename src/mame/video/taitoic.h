@@ -4,6 +4,14 @@
 
 extern const int TC0100SCN_SINGLE_VDU;	/* value set in taitoic.c */
 
+extern UINT8 TC0360PRI_regs[16];
+
+extern UINT16	*TC0080VCO_chain_ram_0;
+extern UINT16	*TC0080VCO_chain_ram_1;
+extern UINT16	*TC0080VCO_spriteram;
+extern UINT16	*TC0080VCO_scroll_ram;
+extern int	TC0080VCO_flipscreen;
+
 int number_of_TC0100SCN(void);
 int has_TC0110PCR(void);
 int has_second_TC0110PCR(void);

@@ -27,8 +27,6 @@ static UINT32 mi_version;
 static UINT32 mi_interrupt = 0;
 static UINT32 mi_intr_mask = 0;
 
-extern int fb_width;
-
 void signal_rcp_interrupt(int interrupt)
 {
 	if (mi_intr_mask & interrupt)

@@ -51,6 +51,9 @@ VIDEO_UPDATE( megaplay );
 
 void segac2_enable_display(running_machine *machine, int enable);
 
+void system18_vdp_start(running_machine *machine);
+void system18_vdp_update(bitmap_t *bitmap, const rectangle *cliprect);
+
 READ16_HANDLER ( genesis_vdp_r );
 WRITE16_HANDLER( genesis_vdp_w );
 

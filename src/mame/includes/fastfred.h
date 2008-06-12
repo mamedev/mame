@@ -7,6 +7,8 @@
 
 /*----------- defined in video/fastfred.c -----------*/
 
+extern int fastfred_hardware_type;
+
 extern UINT8 *fastfred_videoram;
 extern UINT8 *fastfred_spriteram;
 extern size_t fastfred_spriteram_size;

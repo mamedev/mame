@@ -405,7 +405,7 @@ INLINE void set_color_555(pen_t color, int rshift, int gshift, int bshift, UINT1
 }
 
 
-WRITE16_HANDLER( tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w )
+static WRITE16_HANDLER( tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w )
 {
 	COMBINE_DATA(&tilemap_paletteram16[offset]);
 	set_color_555(offset+0x4000, 5, 10, 0, tilemap_paletteram16[offset]);
@@ -714,7 +714,7 @@ static void tecmosys_render_sprites_to_bitmap(bitmap_t *bitmap, UINT16 extrax, U
 	}
 }
 
-void tecmosys_tilemap_copy_to_compose(UINT16 pri)
+static void tecmosys_tilemap_copy_to_compose(UINT16 pri)
 {
 	int y,x;
 	UINT16 *srcptr;
@@ -731,7 +731,7 @@ void tecmosys_tilemap_copy_to_compose(UINT16 pri)
 	}
 }
 
-void tecmosys_do_final_mix(bitmap_t* bitmap)
+static void tecmosys_do_final_mix(bitmap_t* bitmap)
 {
 	const pen_t *paldata = Machine->pens;
 	int y,x;
@@ -1106,7 +1106,7 @@ static MACHINE_RESET( deroon )
 	device_status = DS_IDLE;
 }
 
-void tecmosys_decramble(void)
+static void tecmosys_decramble(void)
 {
 	UINT8 *gfxsrc    = memory_region       ( REGION_GFX1 );
 	size_t  srcsize = memory_region_length( REGION_GFX1 );

@@ -24,3 +24,6 @@ void decoprot_reset(void);
 
 extern UINT16 *deco16_prot_ram;
 extern UINT32 *deco32_prot_ram;
+
+READ16_HANDLER( dietgo_104_prot_r );
+WRITE16_HANDLER( dietgo_104_prot_w );

@@ -857,8 +857,6 @@ ROM_START( imago )
 	ROM_LOAD( "imago.97", 0x0200, 0x0100, CRC(e28a7f00) SHA1(05b4882c5ea5da332735866d858872bc5eeaca24) )
 ROM_END
 
-extern int fastfred_hardware_type;
-
 static DRIVER_INIT( flyboy )
 {
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc085, 0xc099, 0, 0, flyboy_custom1_io_r);

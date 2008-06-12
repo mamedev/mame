@@ -13,7 +13,7 @@
 
 #include "machine/8255ppi.h"
 
-/*----------- defined in video/galaxian.c -----------*/
+/*----------- defined in video/galaxold.c -----------*/
 
 extern UINT8 *galaxold_videoram;
 extern UINT8 *galaxold_spriteram;
@@ -27,6 +27,7 @@ extern UINT8 *racknrol_tiles_bank;
 extern size_t galaxold_spriteram_size;
 extern size_t galaxold_spriteram2_size;
 extern size_t galaxold_bulletsram_size;
+extern UINT8 galaxold_stars_on;
 
 PALETTE_INIT( galaxold );
 PALETTE_INIT( scrambold );
@@ -37,7 +38,10 @@ PALETTE_INIT( minefld );
 PALETTE_INIT( stratgyx );
 PALETTE_INIT( mariner );
 PALETTE_INIT( rockclim );
+PALETTE_INIT( dambustr );
 PALETTE_INIT( turtles );
+
+VIDEO_START( dambustr );
 
 WRITE8_HANDLER( galaxold_videoram_w );
 READ8_HANDLER( galaxold_videoram_r );
@@ -45,6 +49,8 @@ READ8_HANDLER( galaxold_videoram_r );
 WRITE8_HANDLER( rockclim_videoram_w );
 WRITE8_HANDLER( rockclim_scroll_w );
 READ8_HANDLER( rockclim_videoram_r );
+WRITE8_HANDLER( dambustr_bg_split_line_w );
+WRITE8_HANDLER( dambustr_bg_color_w );
 
 WRITE8_HANDLER( galaxold_attributesram_w );
 
@@ -60,13 +66,8 @@ WRITE8_HANDLER( racknrol_tiles_bank_w );
 VIDEO_START( galaxold_plain );
 VIDEO_START( galaxold );
 VIDEO_START( mooncrst );
-VIDEO_START( mooncrgx );
-VIDEO_START( moonqsr );
-VIDEO_START( mshuttle );
 VIDEO_START( pisces );
 VIDEO_START( batman2 );
-VIDEO_START( jumpbug );
-VIDEO_START( azurian );
 VIDEO_START( dkongjrm );
 VIDEO_START( scrambold );
 VIDEO_START( theend );
@@ -75,13 +76,9 @@ VIDEO_START( rescue );
 VIDEO_START( minefld );
 VIDEO_START( stratgyx );
 VIDEO_START( mimonkey );
-VIDEO_START( turtles );
-VIDEO_START( frogger );
 VIDEO_START( mariner );
 VIDEO_START( ckongs );
-VIDEO_START( froggers );
 VIDEO_START( newsin7 );
-VIDEO_START( sfx );
 VIDEO_START( rockclim );
 VIDEO_START( drivfrcg );
 VIDEO_START( bongo );
@@ -89,7 +86,11 @@ VIDEO_START( scorpion );
 VIDEO_START( racknrol );
 VIDEO_START( ad2083 );
 
+void galaxold_init_stars(running_machine *machine, int colors_offset);
+void galaxold_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+
 VIDEO_UPDATE( galaxold );
+VIDEO_UPDATE( dambustr );
 
 WRITE8_HANDLER( galaxold_gfxbank_w );
 WRITE8_HANDLER( galaxold_flip_screen_x_w );
@@ -98,7 +99,7 @@ WRITE8_HANDLER( gteikob2_flip_screen_x_w );
 WRITE8_HANDLER( gteikob2_flip_screen_y_w );
 
 
-/*----------- defined in machine/galaxian.c -----------*/
+/*----------- defined in machine/galaxold.c -----------*/
 
 DRIVER_INIT( zigzag );
 DRIVER_INIT( pisces );
@@ -130,8 +131,6 @@ WRITE8_HANDLER( galaxold_leds_w );
 
 READ8_HANDLER( scramblb_protection_1_r );
 READ8_HANDLER( scramblb_protection_2_r );
-
-READ8_HANDLER( jumpbug_protection_r );
 
 WRITE8_HANDLER( kingball_speech_dip_w );
 WRITE8_HANDLER( kingball_sound1_w );
@@ -203,18 +202,6 @@ READ8_HANDLER( triplep_pap_r );
 
 READ8_HANDLER( hunchbks_mirror_r );
 WRITE8_HANDLER( hunchbks_mirror_w );
-
-
-
-/*----------- defined in audio/galaxian.c -----------*/
-
-extern const struct Samplesinterface galaxian_samples_interface;
-WRITE8_HANDLER( galaxian_pitch_w );
-WRITE8_HANDLER( galaxian_vol_w );
-WRITE8_HANDLER( galaxian_noise_enable_w );
-WRITE8_HANDLER( galaxian_background_enable_w );
-WRITE8_HANDLER( galaxian_shoot_enable_w );
-WRITE8_HANDLER( galaxian_lfo_freq_w );
 
 
 /*----------- defined in audio/scramble.c -----------*/

@@ -25,6 +25,7 @@ WRITE8_HANDLER( nitedrvr_out0_w );
 WRITE8_HANDLER( nitedrvr_out1_w );
 
 void nitedrvr_crash_toggle(running_machine *machine);
+void nitedrvr_register_machine_vars(void);
 
 
 /*----------- defined in audio/nitedrvr.c -----------*/
@@ -35,5 +36,9 @@ DISCRETE_SOUND_EXTERN( nitedrvr );
 /*----------- defined in video/nitedrvr.c -----------*/
 
 extern UINT8 *nitedrvr_hvc;
+
 WRITE8_HANDLER( nitedrvr_hvc_w );
+WRITE8_HANDLER( nitedrvr_videoram_w );
+
+VIDEO_START( nitedrvr );
 VIDEO_UPDATE( nitedrvr );

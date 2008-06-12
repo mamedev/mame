@@ -2,7 +2,7 @@
 #include "streams.h"
 #include "deprecat.h"
 #include "sound/samples.h"
-#include "includes/galaxold.h"
+#include "includes/galaxian.h"
 
 #define VERBOSE 0
 

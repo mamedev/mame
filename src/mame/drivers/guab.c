@@ -255,7 +255,7 @@ static VIDEO_UPDATE( guab )
  *
  *************************************/
 
-struct wd1770
+static struct wd1770
 {
 	UINT32	status;
 	UINT8	cmd;

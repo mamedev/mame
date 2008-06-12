@@ -316,13 +316,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "seta.h"
 #include "sound/2610intf.h"
 #include "sound/2151intf.h"
-
-MACHINE_RESET( cchip1 );
-READ16_HANDLER( cchip1_ctrl_r );
-READ16_HANDLER( cchip1_ram_r );
-WRITE16_HANDLER( cchip1_ctrl_w );
-WRITE16_HANDLER( cchip1_bank_w );
-WRITE16_HANDLER( cchip1_ram_w );
+#include "includes/taito_f2.h"
 
 
 

@@ -6,6 +6,7 @@
 
 #include "driver.h"
 #include "segaic16.h"
+#include "includes/genesis.h"
 #include "includes/system16.h"
 
 
@@ -31,17 +32,6 @@ static bitmap_t *tempbitmap;
 static UINT8 grayscale_enable;
 static UINT8 vdp_enable;
 static UINT8 vdp_mixing;
-
-
-
-/*************************************
- *
- *  Prototypes
- *
- *************************************/
-
-void system18_vdp_start(running_machine *machine);
-void system18_vdp_update(bitmap_t *bitmap, const rectangle *cliprect);
 
 
 

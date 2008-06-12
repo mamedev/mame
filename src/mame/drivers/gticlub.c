@@ -65,11 +65,6 @@ READ32_HANDLER(K001604_reg_r);
 
 
 
-VIDEO_START( gticlub );
-VIDEO_UPDATE( gticlub );
-
-
-
 static WRITE32_HANDLER( paletteram32_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);

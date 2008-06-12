@@ -9,12 +9,11 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "decocrpt.h"
+#include "decoprot.h"
 #include "deco16ic.h"
 
 VIDEO_UPDATE( dietgo );
 VIDEO_START( dietgo );
-READ16_HANDLER( dietgo_104_prot_r );
-WRITE16_HANDLER( dietgo_104_prot_w );
 
 
 static ADDRESS_MAP_START( dietgo_map, ADDRESS_SPACE_PROGRAM, 16 )

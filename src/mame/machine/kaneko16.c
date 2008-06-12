@@ -541,10 +541,7 @@ probably the MCU model string, so this one should be in internal MCU ROM (anothe
 TODO: look at this one since this remark is only driver-based.
 */
 
-void (*toybox_mcu_run)(running_machine *machine);	/* One of the following */
-void bloodwar_mcu_run(running_machine *machine);
-void bonkadv_mcu_run(running_machine *machine);
-void gtmr_mcu_run(running_machine *machine);
+void (*toybox_mcu_run)(running_machine *machine);
 
 static UINT16 toybox_mcu_com[4];
 

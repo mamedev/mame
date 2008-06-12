@@ -54,7 +54,7 @@ WRITE16_HANDLER( wrally_coin_lockout_w )
 }
 
 /* Converts memory offsets to the format expected by the Dallas */
-READ32_HANDLER( wrally_external_ram_iaddr )
+static READ32_HANDLER( wrally_external_ram_iaddr )
 {
 	return offset ^= 0x0001;
 }

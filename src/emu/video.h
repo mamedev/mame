@@ -267,7 +267,6 @@ int video_mng_is_movie_active(const device_config *screen);
 void video_mng_begin_recording(const device_config *screen, const char *name);
 void video_mng_end_recording(const device_config *screen);
 
-int video_avi_is_movie_active(const device_config *screen);
 void video_avi_begin_recording(const device_config *screen, const char *name);
 void video_avi_end_recording(const device_config *screen);
 void video_avi_add_sound(running_machine *machine, const INT16 *sound, int numsamples);

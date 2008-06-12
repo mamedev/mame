@@ -76,7 +76,7 @@ extern void heatbrl_setgfxbank(UINT16 data);
 extern void denjinmk_setgfxbank(UINT16 data);
 extern UINT16 legionna_layer_disable;
 
-void copd2_set_tableoffset(UINT16 data, running_machine *machine)
+static void copd2_set_tableoffset(UINT16 data, running_machine *machine)
 {
 	logerror("mcu_offs %04x\n", data);
 	copd2_offs = data;
@@ -125,7 +125,7 @@ void copd2_set_tableoffset(UINT16 data, running_machine *machine)
 
 }
 
-void copd2_set_tabledata(UINT16 data, running_machine *machine)
+static void copd2_set_tabledata(UINT16 data, running_machine *machine)
 {
 	copd2_table[copd2_offs] = data;
 	logerror("mcu_data %04x\n", data);

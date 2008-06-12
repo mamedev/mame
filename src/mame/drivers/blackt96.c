@@ -44,7 +44,7 @@ Notes:
 #include "driver.h"
 #include "sound/okim6295.h"
 
-VIDEO_START( blackt96 )
+static VIDEO_START( blackt96 )
 {
 
 }
@@ -52,7 +52,7 @@ VIDEO_START( blackt96 )
 static UINT16* blackt96_tilemapram;
 static UINT16* blackt96_tilemapram2;
 
-VIDEO_UPDATE( blackt96 )
+static VIDEO_UPDATE( blackt96 )
 {
 	int y,x;
 	int count = 0;

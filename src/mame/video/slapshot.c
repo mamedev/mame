@@ -4,8 +4,6 @@
 #define TC0480SCP_GFX_NUM 1
 #define TC0100SCN_GFX_NUM 1
 
-extern UINT8 TC0360PRI_regs[16];
-
 struct tempsprite
 {
 	int gfx;

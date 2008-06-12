@@ -9,10 +9,7 @@
 #include "driver.h"
 #include "video/resnet.h"
 #include "fastfred.h"
-
-extern UINT8 galaxold_stars_on;
-void galaxold_init_stars(running_machine *machine, int colors_offset);
-void galaxold_draw_stars(running_machine *machine, bitmap_t *bitmap);
+#include "includes/galaxold.h"
 
 UINT8 *fastfred_videoram;
 UINT8 *fastfred_spriteram;
@@ -390,7 +387,7 @@ VIDEO_START( imago )
 VIDEO_UPDATE( imago )
 {
 	tilemap_draw(bitmap,cliprect,web_tilemap,0,0);
-	galaxold_draw_stars(screen->machine, bitmap);
+	galaxold_draw_stars(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);

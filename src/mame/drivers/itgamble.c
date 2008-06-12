@@ -62,11 +62,11 @@
 *     Video Hardware     *
 *************************/
 
-VIDEO_START( itgamble )
+static VIDEO_START( itgamble )
 {
 }
 
-VIDEO_UPDATE( itgamble )
+static VIDEO_UPDATE( itgamble )
 {
 	return 0;
 }
@@ -168,7 +168,7 @@ GFXDECODE_END
 *      Machine Reset      *
 **************************/
 
-MACHINE_RESET( itgamble )
+static MACHINE_RESET( itgamble )
 {
 	/* stop the CPU, we have no code for it anyway */
 	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);

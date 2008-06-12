@@ -222,7 +222,7 @@ INLINE void saturn_mem_unconfig(void)
 	if (saturn.config&&saturn.config->unconfig) saturn.config->unconfig(Machine, S64_READ_A(C));
 }
 
-int monitor_id;
+static int monitor_id;
 
 INLINE void saturn_mem_id(void)
 {
@@ -271,7 +271,7 @@ INLINE void saturn_out_cs(void)
 	if (saturn.config&&saturn.config->out) saturn.config->out(Machine, saturn.out);
 }
 
-int monitor_in;
+static int monitor_in;
 
 INLINE void saturn_in(int reg)
 {

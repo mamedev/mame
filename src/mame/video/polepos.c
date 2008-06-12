@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "includes/polepos.h"
 
 UINT16 *polepos_view16_memory;
 UINT16 *polepos_road16_memory;

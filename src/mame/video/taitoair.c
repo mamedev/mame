@@ -49,12 +49,6 @@ sprite RAM
 #include "taitoic.h"
 
 
-extern UINT16	*TC0080VCO_chain_ram_0;
-extern UINT16	*TC0080VCO_chain_ram_1;
-extern UINT16	*TC0080VCO_spriteram;
-extern UINT16	*TC0080VCO_scroll_ram;
-extern int		TC0080VCO_flipscreen;
-
 /* These are hand-tuned values */
 static const int zoomy_conv_table[] =
 {

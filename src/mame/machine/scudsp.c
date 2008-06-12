@@ -53,6 +53,7 @@ Changelog:
 #include "deprecat.h"
 #include "machine/scudsp.h"
 #include "osd_cpu.h"
+#include "sound/scsp.h"
 
 /*DSP macros*/
 #define PRF ((stv_scu[32] & 0x04000000) >> 26)
@@ -103,8 +104,6 @@ static struct {
 	   UINT32 ra0,wa0;								   /*DSP DMA registers*/
 	   UINT32 internal_prg[0x100];
 } dsp_reg;
-
-extern UINT32* stv_scu;
 
 static UINT32 opcode;
 static UINT8 update_mul = 0;

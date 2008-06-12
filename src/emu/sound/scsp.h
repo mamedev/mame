@@ -25,4 +25,6 @@ WRITE16_HANDLER( SCSP_1_w );
 WRITE16_HANDLER( SCSP_MidiIn );
 READ16_HANDLER( SCSP_MidiOutR );
 
+extern UINT32* stv_scu;
+
 #endif

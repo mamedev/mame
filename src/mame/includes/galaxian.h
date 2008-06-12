@@ -98,7 +98,6 @@ void pisces_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *f
 
 /* Batman Part 2 extensions */
 void batman2_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
-void batman2_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
 
 /* Moon Cresta extensions */
 void mooncrst_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
@@ -123,7 +122,9 @@ void jumpbug_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *
 
 /*----------- defined in audio/galaxian.c -----------*/
 
+extern const struct Samplesinterface galaxian_samples_interface;
 extern const struct Samplesinterface galaxian_custom_interface;
+
 WRITE8_HANDLER( galaxian_sound_w );
 WRITE8_HANDLER( galaxian_pitch_w );
 WRITE8_HANDLER( galaxian_vol_w );

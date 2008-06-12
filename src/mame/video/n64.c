@@ -11,20 +11,6 @@
 static FILE *rdp_exec;
 #endif
 
-/* defined in systems/n64.c */
-extern UINT32 *rdram;
-extern UINT32 *rsp_imem;
-extern UINT32 *rsp_dmem;
-extern void dp_full_sync(void);
-
-extern UINT32 n64_vi_origin;
-extern UINT32 n64_vi_control;
-
-extern UINT32 dp_start;
-extern UINT32 dp_end;
-extern UINT32 dp_current;
-extern UINT32 dp_status;
-
 static UINT32 rdp_cmd_data[0x1000];
 static int rdp_cmd_ptr = 0;
 static int rdp_cmd_cur = 0;

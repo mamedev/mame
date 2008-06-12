@@ -544,7 +544,7 @@ static ADDRESS_MAP_START( i8742_writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-WRITE8_HANDLER( jpopnics_palette_w )
+static WRITE8_HANDLER( jpopnics_palette_w )
 {
 	int r,g,b;
 	UINT16 paldata;
@@ -575,6 +575,7 @@ static ADDRESS_MAP_START( jpopnics_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_WRITE(jpopnics_palette_w) AM_BASE(&paletteram)
 ADDRESS_MAP_END
 
+#ifdef UNUSED_FUNCTION
 READ8_HANDLER( moo_r )
 {
 	return mame_rand(machine);
@@ -584,8 +585,9 @@ READ8_HANDLER( bbb_r )
 {
 	return 0xff;
 }
+#endif
 
-WRITE8_HANDLER( jpopnics_subbankswitch_w )
+static WRITE8_HANDLER( jpopnics_subbankswitch_w )
 {
 	UINT8 *RAM = memory_region(REGION_CPU2);
 

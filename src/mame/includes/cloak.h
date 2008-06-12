@@ -6,6 +6,9 @@
 
 /*----------- defined in video/cloak.c -----------*/
 
+WRITE8_HANDLER( cloak_videoram_w );
+WRITE8_HANDLER( cloak_flipscreen_w );
+
 WRITE8_HANDLER( cloak_paletteram_w );
 READ8_HANDLER( graph_processor_r );
 WRITE8_HANDLER( graph_processor_w );

@@ -25,8 +25,6 @@ WRITE8_HANDLER( sega005_sound_b_w );
 
 WRITE8_HANDLER( spaceod_sound_w );
 
- READ8_HANDLER( monsterb_audio_8255_r );
-
 
 /*----------- defined in video/segag80r.c -----------*/
 

@@ -110,19 +110,9 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "sound/pokey.h"
+#include "includes/cloak.h"
 
 static int cloak_nvram_enabled;
-
-extern WRITE8_HANDLER( cloak_videoram_w );
-extern WRITE8_HANDLER( cloak_paletteram_w );
-extern WRITE8_HANDLER( cloak_clearbmp_w );
-extern WRITE8_HANDLER( graph_processor_w );
-extern WRITE8_HANDLER( cloak_flipscreen_w );
-extern READ8_HANDLER( graph_processor_r );
-
-extern VIDEO_START( cloak );
-extern VIDEO_UPDATE( cloak );
-
 
 /*************************************
  *

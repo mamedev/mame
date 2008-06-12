@@ -25,7 +25,6 @@
 #include "sound/gaelco.h"
 #include "rendlay.h"
 
-extern UINT16 *gaelco_sndregs;
 extern UINT16 *gaelco2_vregs;
 extern UINT16 *snowboar_protection;
 

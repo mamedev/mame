@@ -381,7 +381,7 @@ void kbash_okisnd_w(running_machine *machine, int data);
 void fixeight_okisnd_w(running_machine *machine, int data);
 void batsugun_okisnd_w(running_machine *machine, int data);
 
-MACHINE_RESET(batsugun);
+static MACHINE_RESET(batsugun);
 #if USE_V25
 static READ16_HANDLER( batsugun_share_r );
 static READ16_HANDLER( batsugun_share2_r );
@@ -674,7 +674,7 @@ static WRITE16_HANDLER( toaplan2_coin_word_w )
 	}
 }
 
-WRITE16_HANDLER( toaplan2_v25_coin_word_w )
+static WRITE16_HANDLER( toaplan2_v25_coin_word_w )
 {
 	// logerror("toaplan2_v25_coin_word_w %04x\n",data);
 
@@ -3895,20 +3895,20 @@ static MACHINE_DRIVER_START( vfive )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-MACHINE_RESET(batsugun)
+static MACHINE_RESET(batsugun)
 {
 	#if USE_V25
 	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 	#endif
 }
 
-void batsugun_ym2151_irqhandler(running_machine *machine, int linestate)
+static void batsugun_ym2151_irqhandler(running_machine *machine, int linestate)
 {
 	logerror("batsugun_ym2151_irqhandler %02x\n",linestate);
 //  update_irq_lines(machine, linestate ? assert : clear);
 }
 
-const struct YM2151interface batsugun_ym2151_interface =
+static const struct YM2151interface batsugun_ym2151_interface =
 {
 	batsugun_ym2151_irqhandler
 };

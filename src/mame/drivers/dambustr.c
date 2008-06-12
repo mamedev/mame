@@ -11,14 +11,9 @@ Reverse-engineering and MAME Driver by Norbert Kehrer (August 2006)
 #include "driver.h"
 
 #include "cpu/z80/z80.h"
+#include "includes/galaxian.h"
 #include "galaxold.h"
 
-
-PALETTE_INIT( dambustr );
-WRITE8_HANDLER( dambustr_bg_split_line_w );
-WRITE8_HANDLER( dambustr_bg_color_w );
-VIDEO_START( dambustr );
-VIDEO_UPDATE( dambustr );
 
 static int noise_data = 0;
 

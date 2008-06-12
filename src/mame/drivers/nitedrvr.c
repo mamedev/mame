@@ -39,22 +39,6 @@
 #include "sound/discrete.h"
 #include "nitedrvr.h"
 
-READ8_HANDLER( nitedrvr_in0_r );
-READ8_HANDLER( nitedrvr_in1_r );
-READ8_HANDLER( nitedrvr_steering_reset_r );
-WRITE8_HANDLER( nitedrvr_steering_reset_w );
-WRITE8_HANDLER( nitedrvr_out0_w );
-WRITE8_HANDLER( nitedrvr_out1_w );
-void nitedrvr_register_machine_vars(void);
-
-extern UINT8 *nitedrvr_hvc;
-
-WRITE8_HANDLER( nitedrvr_videoram_w );
-WRITE8_HANDLER( nitedrvr_hvc_w );
-
-VIDEO_START( nitedrvr );
-VIDEO_UPDATE( nitedrvr );
-
 /* Memory Map */
 
 static ADDRESS_MAP_START( nitedrvr_map, ADDRESS_SPACE_PROGRAM, 8 )

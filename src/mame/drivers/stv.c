@@ -254,7 +254,6 @@ static UINT8 *smpc_ram;
 UINT32* stv_workram_l;
 UINT32* stv_workram_h;
 static UINT32* stv_backupram;
-extern UINT32* stv_scu;
 static UINT32* ioga;
 static UINT16* scsp_regs;
 static UINT16* sound_ram;

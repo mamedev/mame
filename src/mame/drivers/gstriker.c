@@ -181,11 +181,6 @@ Frequencies: 68k is XTAL_32MHZ/2
 //UINT16 *gs_videoram3;
 static UINT16 *gs_mixer_regs;
 
-/* in video */
-VIDEO_UPDATE( gstriker );
-VIDEO_START( gstriker );
-VIDEO_START( twrldc94 );
-
 
 /*** MISC READ / WRITE HANDLERS **********************************************/
 

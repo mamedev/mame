@@ -78,11 +78,6 @@ Dip locations verified from manual for:
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 
-extern void (*toybox_mcu_run)(running_machine *machine);	/* one of the following */
-void bloodwar_mcu_run(running_machine *machine);
-void bonkadv_mcu_run(running_machine *machine);
-void gtmr_mcu_run(running_machine *machine);
-
 /***************************************************************************
 
 

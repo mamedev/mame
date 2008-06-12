@@ -91,19 +91,6 @@ UINT32 bios_ctrl_inputs;
 
 #define MASTER_CLOCK		53693100
 
-/* give us access to the megadriv start and update functions so that we can call them */
-VIDEO_UPDATE( megadriv );
-VIDEO_START( megadriv );
-VIDEO_EOF( megadriv );
-MACHINE_RESET( megadriv );
-
-/* in drivers/segae.c */
-VIDEO_UPDATE( megatech_bios );
-VIDEO_EOF( megatech_bios );
-MACHINE_RESET( megatech_bios );
-DRIVER_INIT( megatech_bios );
-
-
 /* not currently used */
 static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_INCLUDE(megadriv)

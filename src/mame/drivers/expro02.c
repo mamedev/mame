@@ -123,13 +123,6 @@ U78 (22CV10)
 #include "includes/kaneko16.h"
 #include "sound/okim6295.h"
 
-//extern DRIVER_INIT(berlwall);
-extern VIDEO_START(galsnew);
-extern VIDEO_UPDATE(galsnew);
-extern PALETTE_INIT(berlwall);
-extern UINT16* galsnew_bg_pixram;
-extern UINT16* galsnew_fg_pixram;
-
 static INPUT_PORTS_START( galsnew )
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unused ) )

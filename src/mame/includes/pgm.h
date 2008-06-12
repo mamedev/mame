@@ -24,7 +24,8 @@ void pgm_puzzli2_decrypt(void);
 /*----------- defined in machine/pgmprot.c -----------*/
 
 READ16_HANDLER (PSTARS_protram_r);
-READ16_HANDLER (PSTARS_r16);
+READ16_HANDLER ( PSTARS_r16 );
+WRITE16_HANDLER( PSTARS_w16 );
 
 READ16_HANDLER( pgm_asic3_r );
 WRITE16_HANDLER( pgm_asic3_w );

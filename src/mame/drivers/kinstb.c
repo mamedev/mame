@@ -36,8 +36,6 @@
 #include "driver.h"
 #include "includes/snes.h"
 
-extern DRIVER_INIT( snes_hirom );
-
 static INT8 shared_ram[0x100];
 
 static READ8_HANDLER(sharedram_r)

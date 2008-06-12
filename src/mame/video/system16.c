@@ -91,16 +91,9 @@ type1       type0           function
 #include "driver.h"
 #include "system16.h"
 #include "video/resnet.h"
+#include "includes/genesis.h"
 
-/* video/segac2.c */
-void system18_vdp_update( bitmap_t *bitmap, const rectangle *cliprect );
-void system18_vdp_start(running_machine *machine);
-READ16_HANDLER( segac2_vdp_r );
-WRITE16_HANDLER( segac2_vdp_w );
-UINT16 sys18_ddcrew_bankregs[0x20];
-
-
-
+static UINT16 sys18_ddcrew_bankregs[0x20];
 
 /* callback to poll video registers */
 void (* sys16_update_proc)( void );

@@ -181,12 +181,22 @@ extern int megasys1_bits_per_color_code;
 
 /* Functions */
 VIDEO_START( megasys1 );
+VIDEO_UPDATE( megasys1 );
+
+PALETTE_INIT( megasys1 );
+
+READ16_HANDLER( megasys1_vregs_C_r );
+
+WRITE16_HANDLER( megasys1_vregs_A_w );
+WRITE16_HANDLER( megasys1_vregs_C_w );
+WRITE16_HANDLER( megasys1_vregs_D_w );
 
 WRITE16_HANDLER( megasys1_scrollram_0_w );
 WRITE16_HANDLER( megasys1_scrollram_1_w );
 WRITE16_HANDLER( megasys1_scrollram_2_w );
 
 void megasys1_set_vreg_flag(int which, int data);
+
 
 /*----------- defined in drivers/megasys1.c -----------*/
 
