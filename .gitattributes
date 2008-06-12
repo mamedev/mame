@@ -2606,6 +2606,7 @@ src/mame/machine/segas24.c svneol=native#text/plain
 src/mame/machine/segas32.c svneol=native#text/plain
 src/mame/machine/seibuspi.c svneol=native#text/plain
 src/mame/machine/seicop.c svneol=native#text/plain
+src/mame/machine/seicop.h svneol=native#text/plain
 src/mame/machine/simpsons.c svneol=native#text/plain
 src/mame/machine/slapfght.c svneol=native#text/plain
 src/mame/machine/slapstic.c svneol=native#text/plain
