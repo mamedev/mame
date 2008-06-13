@@ -12371,7 +12371,7 @@ static void save_cheat_code(running_machine *machine, cheat_entry *entry)
 		buf_strings +=	sprintf(buf_strings,":%s::%.8X::%.2X%.8X::%.*X::%.8X::%.8X",
 								machine->gamedrv->name,							/* name */
 								thisGameCRC,									/* CRC */
-								action->reion, action->type,					/* type */
+								action->region, action->type,					/* type */
 								address_length, action->original_address,		/* address */
 								action->original_data,							/* data */
 								action->extend_data);							/* extend data */
