@@ -186,7 +186,7 @@ struct _mips3_state
 	/* COP registers */
 	UINT64			cpr[3][32];
 	UINT64			ccr[3][32];
-	UINT8			cf[3][8];
+	UINT32			llbit;
 
 	/* internal stuff */
 	mips3_flavor	flavor;
@@ -201,8 +201,6 @@ struct _mips3_state
 	data_accessors	memory;
 
 	/* cache memory */
-	UINT32 *		icache;
-	UINT32 *		dcache;
 	size_t			icache_size;
 	size_t			dcache_size;
 

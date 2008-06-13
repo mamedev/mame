@@ -168,10 +168,15 @@ int mips3fe_describe(void *param, opcode_desc *desc)
 		case 0x2c:	/* SDL */
 		case 0x2d:	/* SDR */
 		case 0x2e:	/* SWR */
-		case 0x38:	/* SC */
-		case 0x3c:	/* SCD */
 		case 0x3f:	/* SD */
 			desc->regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
+			desc->flags |= OPFLAG_WRITES_MEMORY | OPFLAG_CAN_CAUSE_EXCEPTION;
+			return TRUE;
+
+		case 0x38:	/* SC */
+		case 0x3c:	/* SCD */
+			desc->regin[0] |= REGFLAG_R(RSREG) | REGFLAG_R(RTREG);
+			desc->regout[0] |= REGFLAG_R(RTREG);
 			desc->flags |= OPFLAG_WRITES_MEMORY | OPFLAG_CAN_CAUSE_EXCEPTION;
 			return TRUE;
 

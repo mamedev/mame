@@ -46,7 +46,7 @@ size_t mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int 
 
 	/* if no memory, return the amount needed */
 	if (memory == NULL)
-		return config->icache + config->dcache + (sizeof(mips->tlb_table[0]) * (1 << (MIPS3_MAX_PADDR_SHIFT - MIPS3_MIN_PAGE_SHIFT)));
+		return sizeof(mips->tlb_table[0]) * (1 << (MIPS3_MAX_PADDR_SHIFT - MIPS3_MIN_PAGE_SHIFT));
 
 	/* initialize based on the config */
 	memset(mips, 0, sizeof(*mips));
@@ -62,9 +62,7 @@ size_t mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int 
 	mips->memory = *memory_get_accessors(ADDRESS_SPACE_PROGRAM, 32, mips->bigendian ? CPU_IS_BE : CPU_IS_LE);
 
 	/* allocate memory */
-	mips->icache = memory;
-	mips->dcache = (void *)((UINT8 *)memory + config->icache);
-	mips->tlb_table = (void *)((UINT8 *)memory + config->dcache);
+	mips->tlb_table = memory;
 
 	/* initialize the TLB state */
 	for (tlbindex = 0; tlbindex < ARRAY_LENGTH(mips->tlb); tlbindex++)
