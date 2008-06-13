@@ -44,8 +44,8 @@ extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
 ***************************************************************************/
 
 #define FORCE_C_BACKEND					(0)
-#define LOG_UML							(1)
-#define LOG_NATIVE						(1)
+#define LOG_UML							(0)
+#define LOG_NATIVE						(0)
 
 #define DISABLE_FAST_REGISTERS			(0)
 #define SINGLE_INSTRUCTION_MODE			(0)
