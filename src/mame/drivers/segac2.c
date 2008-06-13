@@ -9,12 +9,15 @@
     Sega's C2 was used between 1989 and 1994, the hardware being very similar to that
     used by the Sega MegaDrive/Genesis Home Console Sega produced around the same time.
 
+    The Columns manual call this system 'System 14' instead of system C/C2.
+
+
     todo: fill in protection chip data
 
-    Year  Game                       Developer         Protection Chip  Board
-    ====  ====================       ================  ===============  =====
+    Year  Game                       Developer         Protection Chip  Board  Number
+    ====  ====================       ================  ===============  =====  ======
     1989  Bloxeed                    Sega / Elorg      n/a              C
-    1990  Columns                    Sega              317-0149         C
+    1990  Columns                    Sega              317-0149         C      171-5880B
     1990  Columns II                 Sega              317-0160         C
     1990  ThunderForce AC            Sega / Technosoft 317-0172         C2
     1990  Borench                    Sega              317-0173         C2
