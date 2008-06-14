@@ -223,13 +223,13 @@ static ADDRESS_MAP_START( pickin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_2_r)
 
 
-
-#if 0
+	AM_RANGE(0xa005, 0xa005) AM_WRITE(SMH_NOP)	/* ???? */
+	AM_RANGE(0xa006, 0xa006) AM_WRITE(SMH_NOP)	/* ???? */
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(SMH_NOP)	/* ???? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(SMH_NOP)	/* ???? */
-	AM_RANGE(0xb800, 0xb800) AM_READ(SMH_NOP) /* ???? */
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(SMH_NOP)	/* ???? */
-#endif
+
+	/* guess */
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0xb800, 0xb800) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
@@ -342,6 +342,53 @@ static INPUT_PORTS_START( botanic )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( squaitsa )
+	PORT_START_TAG("IN0")
+ 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+ 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+ 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+ 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+ 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+ 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY // these must be tied to a spinner somehow?
+ 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY // ^
+ 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+
+ 	PORT_START_TAG("IN1")
+ 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
+ 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
+ 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
+ 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+ 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+ 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL // these must be tied to a spinner somehow?
+ 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL // ^
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+
+	PORT_START_TAG("DSW")
+    PORT_DIPNAME(    0x01, 0x01, DEF_STR( Unknown ) )
+    PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
+    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+    PORT_DIPNAME(    0x02, 0x02, DEF_STR( Unknown ) )
+    PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
+    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+    PORT_DIPNAME(    0x04, 0x04, DEF_STR( Unknown ) )
+    PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
+    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+    PORT_DIPNAME(    0x08, 0x08, DEF_STR( Unknown ) )
+    PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+    PORT_DIPNAME(    0x10, 0x10, DEF_STR( Unknown ) )
+    PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
+    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+    PORT_DIPNAME(    0x20, 0x20, DEF_STR( Unknown ) )
+    PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+    PORT_DIPNAME(    0x40, 0x40, DEF_STR( Unknown ) )
+    PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
+    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+    PORT_DIPNAME(    0x80, 0x00, "Protection?" )
+    PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
+    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
@@ -388,6 +435,16 @@ static const struct AY8910interface ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	input_port_0_r,
 	input_port_1_r,
+	NULL,
+	NULL
+};
+
+static const struct AY8910interface ay8910_interface_2 =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	NULL,
 	NULL
 };
@@ -464,6 +521,11 @@ static MACHINE_DRIVER_START( pickin )
 	MDRV_SOUND_ADD(AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+
+	/* maybe */
+	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_CONFIG(ay8910_interface_2)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
 
 /*
@@ -513,6 +575,10 @@ static MACHINE_DRIVER_START( botanic )
 
 	MDRV_SOUND_ADD(AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+
+	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
 
@@ -847,5 +913,5 @@ GAME( 1984, sbagman,  0, 	   bagman,  sbagman, 0,        ROT270, "Valadon Automa
 GAME( 1984, sbagmans, sbagman, bagman,  sbagman, 0,        ROT270, "Valadon Automation (Stern license)", "Super Bagman (Stern)", 0 )
 GAME( 1983, pickin,	  0,	   pickin,  pickin,  0,        ROT270, "Valadon Automation", "Pickin'", 0 )
 GAME( 1984, botanic,  0,       botanic, botanic, 0,        ROT270, "Valadon Automation (Itisa license)", "Botanic", 0 )
-GAME( 1984, squaitsa,  0,       botanic, botanic, 0,        ROT0, "Itisa", "Squash (Itisa)", GAME_NOT_WORKING )
+GAME( 1984, squaitsa,  0,       botanic, squaitsa, 0,        ROT0, "Itisa", "Squash (Itisa)", GAME_NOT_WORKING )
 
