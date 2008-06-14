@@ -15,10 +15,16 @@ Crazy Climber 2
 Armed Formation
 (c)1988 Nichibutsu
 
+Based on the notes below I suspect several of the supported sets are
+actually bootlegs.
+
 68000 + Z80
 
 TODO:
 - simulate the mcu/blitter (particularly needed in terrafu and legion)
+   -- or figure out which chip it is, decap it, and emulate it.
+
+
 
 
 Stephh's notes (based on the games M68000 code and some tests) :
@@ -201,6 +207,7 @@ static WRITE16_HANDLER( terraf_io_w )
 	/* bit 12 seems to handle screen flipping */
 	flip_screen_set(armedf_vreg & 0x1000);
 
+
 	if ((armedf_vreg & 0x4000) && !(armedf_vreg & 0x0100))
 	{
 		int i;
@@ -212,6 +219,7 @@ static WRITE16_HANDLER( terraf_io_w )
 		//logerror("vreg WIPE TX\n");
 	}
 	//logerror("VReg = %04x\n", armedf_vreg);
+
 }
 
 static WRITE16_HANDLER( kodure_io_w )
@@ -249,6 +257,32 @@ static WRITE16_HANDLER( legion_command_c )
 
 
 static ADDRESS_MAP_START( terraf_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x04ffff) AM_ROM
+	AM_RANGE(0x060000, 0x0603ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x060400, 0x063fff) AM_RAM
+	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
+	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
+	AM_RANGE(0x06c000, 0x06c9ff) AM_RAM
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
+	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
+	AM_RANGE(0x078000, 0x078001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x078002, 0x078003) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x078004, 0x078005) AM_READ(input_port_2_word_r)
+	AM_RANGE(0x078006, 0x078007) AM_READ(input_port_3_word_r)
+	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(terraf_io_w)
+	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
+	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
+	AM_RANGE(0x07c006, 0x07c007) AM_WRITE(terraf_fg_scrollx_w)			/* not use in terrafu, 0x07c008 neither */
+	AM_RANGE(0x07c008, 0x07c009) AM_WRITE(terraf_fg_scrolly_w)			/* written twice, lsb and msb */
+	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
+	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITE(SMH_NOP)					/* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
+	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(armedf_mcu_cmd)				/* MCU Command ? */
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(terraf_fg_scroll_msb_arm_w)	/* written between two consecutive writes to 7c008 */
+ADDRESS_MAP_END
+
+/* the same for now */
+static ADDRESS_MAP_START( terrafb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
 	AM_RANGE(0x060000, 0x0603ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x060400, 0x063fff) AM_RAM
@@ -398,6 +432,16 @@ static ADDRESS_MAP_START( cclimbr2_soundmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( terrafb_extraz80_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( terrafb_extraz80_portmap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+ADDRESS_MAP_END
+
 
 static READ8_HANDLER( soundlatch_clear_r )
 {
@@ -749,6 +793,53 @@ static MACHINE_DRIVER_START( terraf )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( terrafb )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz?? */
+	MDRV_CPU_PROGRAM_MAP(terrafb_map,0)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+
+	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz???? */
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_IO_MAP(sound_portmap,0)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
+
+	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz???? */
+	MDRV_CPU_PROGRAM_MAP(terrafb_extraz80_map,0)
+	MDRV_CPU_IO_MAP(terrafb_extraz80_portmap,0)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
+
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(57)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 )
+	MDRV_GFXDECODE(armedf)
+	MDRV_PALETTE_LENGTH(2048)
+
+	MDRV_VIDEO_EOF(armedf)
+	MDRV_VIDEO_START(armedf)
+	MDRV_VIDEO_UPDATE(armedf)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(YM3812, 4000000)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( kodure )
 
 	/* basic machine hardware */
@@ -1053,6 +1144,72 @@ ROM_START( terraf )
 	ROM_LOAD( "n82s129an.11j", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* N82S129AN or compatible labled "TF" */
 ROM_END
 
+/*
+
+CPU
+
+Main cpu 68000,Z80B*
+Sound cpu Z80
+Sound ic ym3812
+Osc 16 and 24 Mhz
+
+Note:
+
+The custom mcu of original was been replaced by a small daughterboard inversely
+connected to the main cpu board.It has a Z80B*,which uses 2kb of ram (6116 SRAM x1),
+and some standard TTL ics.
+
+ROMs
+
+tfb-1 to 3 and tfb-6 to 8 main program
+tfb-10 Z80B* program (mcu hack)
+the rest of roms (sound program and gfx data) are the same of existing set
+
+All roms are 24128,24256,27512
+Note
+
+This romset comes from a bootleg/hacked pcb.Game differences from original are:
+Company logo and copyright string removed.
+
+*/
+
+
+ROM_START( terrafb )
+	ROM_REGION( 0x50000, REGION_CPU1, 0 )	/* 64K*8 for 68000 code */
+	ROM_LOAD16_BYTE( "tfb-8.bin", 0x00000, 0x10000, CRC(b11a6fa7) SHA1(7bb2b98be02d8913796a6d4fa20eed16226ce6b9) )
+	ROM_LOAD16_BYTE( "tfb-3.bin", 0x00001, 0x10000, CRC(6c6aa7ed) SHA1(ee5fdeb5411034ce0fd1c883ee25bf1fe9a3ec52) )
+	ROM_LOAD16_BYTE( "tfb-7.bin", 0x20000, 0x10000, CRC(fde8de7e) SHA1(6b0d27ec49c8c0609c110ad97938bec8c077ad18) )
+	ROM_LOAD16_BYTE( "tfb-2.bin", 0x20001, 0x10000, CRC(db987414) SHA1(0a1734794c626cf9083d7854c9000c5daadfc3fd) )
+	ROM_LOAD16_BYTE( "tfb-6.bin", 0x40000, 0x08000, CRC(1de681a1) SHA1(bddf404988226698d65e075b4c21de736a862df1) )
+	ROM_LOAD16_BYTE( "tfb-1.bin", 0x40001, 0x08000, CRC(6a0b94c7) SHA1(55fb32ab859bf51a1c79bf962bb677fa557216ed) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* Z80 code (sound) */
+	ROM_LOAD( "tf-001.17k", 0x00000, 0x10000, CRC(eb6b4138) SHA1(04c53bf46d87a156d3fad86f051985d0df79bd20) )
+
+	ROM_REGION( 0x4000, REGION_CPU3, 0 )	/* z80 program (replacement mcu/blitter) */
+	ROM_LOAD( "tfb-10.bin", 0x0000, 0x4000, CRC(3f9aa367) SHA1(8278fb357b2d68869e39efa01ff19005807b41f8) )
+
+	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "9.11e", 0x00000, 0x08000, CRC(bc6f7cbc) SHA1(20b8a34de4bfa0c2fdcd2f7743a0ab35141f4bf9) ) /* characters */
+
+	ROM_REGION( 0x20000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "5.15h", 0x00000, 0x10000, CRC(25d23dfd) SHA1(da32895c1aca403209b7fb181fa4fa23a8e74d32) ) /* foreground tiles */
+	ROM_LOAD( "4.13h", 0x10000, 0x10000, CRC(b9b0fe27) SHA1(983c48239ba1524b517f89f281f2b70564bea1e9) )
+
+	ROM_REGION( 0x20000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "15.8a", 0x00000, 0x10000, CRC(2144d8e0) SHA1(ed89da11abf3d79753b478603009970c2600ab60) ) /* background tiles */
+	ROM_LOAD( "14.6a", 0x10000, 0x10000, CRC(744f5c9e) SHA1(696223a087bb575c7cfaba11e682b221ada461e4) )
+
+	ROM_REGION( 0x20000, REGION_GFX4, ROMREGION_DISPOSE )
+	ROM_LOAD( "tf-003.7d", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
+	ROM_LOAD( "tf-002.9d", 0x10000, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
+
+
+	ROM_REGION( 0x0100, REGION_PROMS, 0 )	/* Unknown use */
+	ROM_LOAD( "n82s129an.11j", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* N82S129AN or compatible labled "TF" */
+ROM_END
+
+
 ROM_START( terrafu )
 	ROM_REGION( 0x50000, REGION_CPU1, 0 )	/* 64K*8 for 68000 code */
 	ROM_LOAD16_BYTE( "tf-8.6e", 0x00000, 0x10000, CRC(fea6dd64) SHA1(682eae338ce14808f134897f594fae1c69e75a1a) )
@@ -1309,6 +1466,7 @@ static DRIVER_INIT( cclimbr2 )
 GAME( 1987, legion,   0,        legion,   legion,   legion,   ROT270, "Nichibutsu",     "Chouji Meikyuu Legion (ver 2.03)",               GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, legiono,  legion,   legiono,  legion,   legiono,  ROT270, "Nichibutsu",     "Chouji Meikyuu Legion (ver 1.05)",               GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, terraf,   0,        terraf,   terraf,   terraf,   ROT0,   "Nichibutsu",     "Terra Force (set 1)",             GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, terrafb,  terraf,   terrafb,  terraf,   terrafu,  ROT0,   "bootleg",     "Terra Force (bootleg with additional Z80)",GAME_NOT_WORKING )
 GAME( 1987, terrafa,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu",     "Terra Force (set 2)",             GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, terrafu,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US)",                GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, kodure,   0,        kodure,   kodure,   kodure,   ROT0,   "Nichibutsu",     "Kodure Ookami (Japan)",           GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )

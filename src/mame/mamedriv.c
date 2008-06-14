@@ -396,6 +396,7 @@ const game_driver * const drivers[] =
 	DRIVER( legion )	/* (c) 1986 */
 	DRIVER( legiono )	/* (c) 1986 */
 	DRIVER( terraf )	/* (c) 1987 */
+	DRIVER( terrafb )	/* (c) 1987 */
 	DRIVER( terrafa )	/* (c) 1987 */
 	DRIVER( terrafu )	/* (c) 1987 Nichibutsu USA */
 	DRIVER( kodure )	/* (c) 1987 (Japan) */
