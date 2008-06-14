@@ -639,6 +639,7 @@ static VIDEO_UPDATE(crystal)
 	UINT16 *srcline;
 	int y;
 	UINT16 head,tail;
+	UINT32 width=video_screen_get_width(screen);
 
 	if(GetVidReg(0x8e)&1)
 	{
@@ -681,7 +682,7 @@ static VIDEO_UPDATE(crystal)
 
 	srcline=(UINT16 *) Visible;
 	for(y=0;y<240;y++)
-		memcpy(BITMAP_ADDR16(bitmap, y, 0), &srcline[y*512], 320*2);
+		memcpy(BITMAP_ADDR16(bitmap, y, 0), &srcline[y*512], width*2);
 
 	return 0;
 }
@@ -833,6 +834,18 @@ static MACHINE_DRIVER_START( crystal )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
 
+/*
+	Top blade screen is 32 pixels wider
+*/
+static MACHINE_DRIVER_START( topbladv )
+	MDRV_IMPORT_FROM(crystal)
+
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_SIZE(320+32, 240)
+	MDRV_SCREEN_VISIBLE_AREA(0, 319+32, 0, 239)
+
+MACHINE_DRIVER_END
+
 ROM_START( crysbios )
 	ROM_REGION( 0x20000, REGION_CPU1, 0 ) // bios
 	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(BEFF39A9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb) )
@@ -926,11 +939,48 @@ static DRIVER_INIT(evosocc)
 	Rom[WORD_XOR_LE(0x974ED2/2)]=0x9001;	//PUSH R0
 }
 
+static DRIVER_INIT(topbladv)
+{
+	UINT16 *Rom=(UINT16*) memory_region(REGION_USER1);
+
+	Rom[WORD_XOR_LE(0x12d7a/2)]=0x90FC;	//PUSH R7-R6-R5-R4-R3-R2
+	Rom[WORD_XOR_LE(0x12d7c/2)]=0x9001;	//PUSH R0
+
+	Rom[WORD_XOR_LE(0x2fe18/2)]=0x9001;	//PUSH R0
+	Rom[WORD_XOR_LE(0x2fe1a/2)]=0x9200;	//PUSH SR
+
+	Rom[WORD_XOR_LE(0x18880/2)]=0x9001;	//PUSH R0
+	Rom[WORD_XOR_LE(0x18882/2)]=0x9200;	//PUSH SR
+
+	Rom[WORD_XOR_LE(0xDACE/2)]=0x901C;	//PUSH R4-R3-R2
+	Rom[WORD_XOR_LE(0xDAD0/2)]=0x9001;	//PUSH R0
+
+}
+
+static DRIVER_INIT(officeye)
+{
+	UINT16 *Rom=(UINT16*) memory_region(REGION_USER1);
+
+	Rom[WORD_XOR_LE(0x9c9e/2)]=0x901C;	//PUSH R4-R3-R2
+	Rom[WORD_XOR_LE(0x9ca0/2)]=0x9001;	//PUSH R0
+
+	Rom[WORD_XOR_LE(0x9EE4/2)]=0x907C;	//PUSH R6-R5-R4-R3-R2
+	Rom[WORD_XOR_LE(0x9EE6/2)]=0x9001;	//PUSH R0
+
+	Rom[WORD_XOR_LE(0x4B2E0/2)]=0x9004;	//PUSH R2
+	Rom[WORD_XOR_LE(0x4B2E2/2)]=0x9001;	//PUSH R0
+
+/*
+	Rom[WORD_XOR_LE(0x18880/2)]=0x9001;	//PUSH R0
+	Rom[WORD_XOR_LE(0x18882/2)]=0x9200;	//PUSH SR
+ */
+}
+
+
+
 GAME( 2001, crysbios,        0, crystal, crystal,        0, ROT0, "Brezzasoft", "Crystal System BIOS", GAME_IS_BIOS_ROOT )
 GAME( 2001, crysking, crysbios, crystal, crystal, crysking, ROT0, "Brezzasoft", "The Crystal of Kings", 0 )
 GAME( 2001, evosocc,  crysbios, crystal, crystal,  evosocc, ROT0, "Evoga", "Evolution Soccer", 0 )
-GAME( 2001, topbladv, crysbios, crystal, crystal,  0,       ROT0, "unknown", "Top Blade V", GAME_NOT_WORKING ) // protection
-
-GAME( 2001, officeye,        0, crystal, crystal,  0,       ROT0, "unknown", "Office Yeo In Cheon Ha", GAME_NOT_WORKING ) // protection
-
+GAME( 2003, topbladv, crysbios, topbladv,crystal, topbladv, ROT0, "SonoKong / Expotato", "Top Blade V", GAME_NOT_WORKING ) // protection
+GAME( 2001, officeye,        0, crystal, crystal, officeye, ROT0, "Danbi", "Office Yeo In Cheon Ha (version 1.2)", GAME_NOT_WORKING ) // protection
 
