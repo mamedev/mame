@@ -41,7 +41,7 @@ DRIVER_INIT( pistoldm );
 DRIVER_INIT( soukobdx );
 DRIVER_INIT( puzlclub );
 DRIVER_INIT( tankfrce );
-
+DRIVER_INIT( tankfrc4 );
 
 /*----------- defined in video/namcos1.c -----------*/
 

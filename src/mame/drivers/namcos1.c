@@ -2435,6 +2435,6 @@ GAME( 1990, boxyboy,  0,        ns1,     boxyboy,  soukobdx, ROT0,   "Namco", "B
 GAME( 1990, soukobdx, boxyboy,  ns1,     boxyboy,  soukobdx, ROT0,   "Namco", "Souko Ban Deluxe (Japan)", 0 )
 GAME( 1990, puzlclub, 0,        ns1,     puzlclub, puzlclub, ROT90,  "Namco", "Puzzle Club (Japan prototype)", 0 )
 GAME( 1991, tankfrce, 0,        ns1,     ns1,      tankfrce, ROT0,   "Namco", "Tank Force (US, 2 Player)", 0 )
-GAME( 1991, tankfrc4, tankfrce, ns1,     tankfrc4, tankfrce, ROT0,   "Namco", "Tank Force (US, 4 Player)", GAME_NOT_WORKING ) /* No controls */
+GAME( 1991, tankfrc4, tankfrce, ns1,     tankfrc4, tankfrc4, ROT0,   "Namco", "Tank Force (US, 4 Player)", GAME_NOT_WORKING ) /* No controls */
 GAME( 1991, tankfrcj, tankfrce, ns1,     ns1,      tankfrce, ROT0,   "Namco", "Tank Force (Japan)", 0 )
 

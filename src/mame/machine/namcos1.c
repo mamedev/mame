@@ -542,6 +542,7 @@ static READ8_HANDLER( key_type3_r )
        it happens to work correctly also using the standard handling for 0058.
        The schematics don't show A11 being used, so I go for this handling.
       */
+
 	op = (offset & 0x70) >> 4;
 
 	if (op == key_reg)		return key_id;
@@ -1207,6 +1208,34 @@ DRIVER_INIT( tankfrce )
 		key_type3_r,key_type3_w, 185, 5,-1, 1,-1, 2,-1
 	};
 	namcos1_driver_init(&tankfrce_specific);
+}
+
+// Inputs are multiplexed, somehow
+READ8_HANDLER( tankfrc4_input_r )
+{
+
+	switch (offset)
+	{
+		case 0:
+			return mame_rand(machine);
+
+		case 1:
+			return mame_rand(machine);
+
+	}
+	return 0x00;
+
+}
+
+DRIVER_INIT( tankfrc4 )
+{
+	static const struct namcos1_specific tankfrce_specific=
+	{
+		key_type3_r,key_type3_w, 185, 5,-1, 1,-1, 2,-1
+	};
+	namcos1_driver_init(&tankfrce_specific);
+
+	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x1400, 0x1401, 0, 0, tankfrc4_input_r);
 }
 
 /*******************************************************************************
