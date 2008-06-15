@@ -341,7 +341,7 @@ ADDRESS_MAP_END
 
 /* Both IPT_START1 assignments are needed. The game will reset during */
 /* the "continue" sequence if the assignment on the first port        */
-/* is missing.                                                        */.
+/* is missing.                                                        */
 
 static INPUT_PORTS_START( overdriv )
 	PORT_START
