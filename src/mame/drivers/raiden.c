@@ -49,6 +49,7 @@ WRITE16_HANDLER( raiden_text_w );
 VIDEO_START( raiden );
 VIDEO_START( raidena );
 WRITE16_HANDLER( raiden_control_w );
+WRITE16_HANDLER( raidena_control_w );
 VIDEO_UPDATE( raiden );
 
 static UINT16 *raiden_shared_ram;
@@ -86,9 +87,9 @@ static ADDRESS_MAP_START( alt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE(1) AM_BASE(&raiden_shared_ram)
 	AM_RANGE(0x0a000, 0x0a00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
-	AM_RANGE(0x0b000, 0x0b007) AM_WRITE(raiden_control_w)
 	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE(&videoram16)
 	AM_RANGE(0x0e000, 0x0e001) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x0e000, 0x0e007) AM_WRITE(raidena_control_w)
 	AM_RANGE(0x0e002, 0x0e003) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x0f000, 0x0f035) AM_WRITE(SMH_RAM) AM_BASE(&raiden_scroll_ram)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM

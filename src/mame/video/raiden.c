@@ -100,6 +100,17 @@ WRITE16_HANDLER( raiden_control_w )
 	}
 }
 
+WRITE16_HANDLER( raidena_control_w )
+{
+	/* raidena uses 0x40 instead of 0x02 */
+
+	/* Flipscreen */
+	if (offset==3 && ACCESSING_BITS_0_7) {
+		flipscreen=data&0x40;
+		tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	}
+}
+
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri_mask)
 {
 	int offs,fx,fy,x,y,color,sprite;
