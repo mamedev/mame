@@ -339,7 +339,9 @@ static ADDRESS_MAP_START( overdriv_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
-
+/* Both IPT_START1 assignments are needed. The game will reset during */
+/* the "continue" sequence if the assignment on the first port        */
+/* is missing.                                                        */.
 
 static INPUT_PORTS_START( overdriv )
 	PORT_START
