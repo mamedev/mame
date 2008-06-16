@@ -556,8 +556,7 @@ INLINE void set_cop0_reg(int idx, UINT64 val)
 			if ((mips3.core.cpr[0][idx] ^ val) & 0xff)
 			{
 				mips3.core.cpr[0][idx] = val;
-				mips3com_unmap_tlb_entries(&mips3.core);
-				mips3com_map_tlb_entries(&mips3.core);
+				mips3com_asid_changed(&mips3.core);
 			}
 			mips3.core.cpr[0][idx] = val;
 			break;

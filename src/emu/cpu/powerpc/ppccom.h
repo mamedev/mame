@@ -11,6 +11,7 @@
 
 #include "cpuintrf.h"
 #include "ppc.h"
+#include "cpu/vtlb.h"
 
 
 /***************************************************************************
@@ -37,11 +38,6 @@
 #define PPCCAP_MISALIGNED			0x08		/* TRUE if misaligned accesses are supported */
 #define PPCCAP_4XX					0x10		/* TRUE if we are a non-OEA 4XX class chip */
 #define PPCCAP_603_MMU				0x20		/* TRUE if we have 603-class MMU features */
-
-
-/* bits in our internal TLB */
-#define TLB_READ					0x01		/* reads are allowed */
-#define TLB_WRITE					0x02		/* writes are allowed */
 
 
 /* PowerPC flavors */
@@ -531,9 +527,7 @@ struct _powerpc_state
 	UINT32			param1;
 
 	/* MMU */
-	UINT32 *		tlb_table;
-	UINT32 *		tlb_entries;
-	UINT32			tlb_index;
+	vtlb_state *	vtlb;
 
 	/* architectural distinctions */
 	powerpc_flavor	flavor;
@@ -574,7 +568,9 @@ struct _powerpc_state
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-size_t ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, int clock, const powerpc_config *config, int (*irqcallback)(int), void *memory);
+void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, int clock, const powerpc_config *config, int (*irqcallback)(int));
+void ppccom_exit(powerpc_state *ppc);
+
 void ppccom_reset(powerpc_state *ppc);
 #ifdef ENABLE_DEBUGGER
 offs_t ppccom_dasm(powerpc_state *ppc, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);

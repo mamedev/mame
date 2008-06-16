@@ -13,7 +13,7 @@
     DEBUGGING
 ***************************************************************************/
 
-#define PRINTF_TLB				(1)
+#define PRINTF_TLB				(0)
 
 
 
@@ -26,8 +26,36 @@ static TIMER_CALLBACK( compare_int_callback );
 static UINT32 compute_config_register(const mips3_state *mips);
 static UINT32 compute_prid_register(const mips3_state *mips);
 
-static void tlb_write_common(mips3_state *mips, int index);
-static void tlb_entry_log_half(mips3_tlb_entry *tlbent, int index, int which);
+static void tlb_map_entry(mips3_state *mips, int tlbindex);
+static void tlb_write_common(mips3_state *mips, int tlbindex);
+static void tlb_entry_log_half(mips3_tlb_entry *entry, int tlbindex, int which);
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    tlb_entry_matches_asid - TRUE if the given
+    TLB entry matches the provided ASID
+-------------------------------------------------*/
+
+INLINE int tlb_entry_matches_asid(const mips3_tlb_entry *entry, UINT8 asid)
+{
+	return (entry->entry_hi & 0xff) == asid;
+}
+
+
+/*-------------------------------------------------
+    tlb_entry_is_global - TRUE if the given
+    TLB entry is global
+-------------------------------------------------*/
+
+INLINE int tlb_entry_is_global(const mips3_tlb_entry *entry)
+{
+	return (entry->entry_lo[0] & entry->entry_lo[1] & TLB_GLOBAL);
+}
 
 
 
@@ -40,14 +68,8 @@ static void tlb_entry_log_half(mips3_tlb_entry *tlbent, int index, int which);
     structure based on the configured type
 -------------------------------------------------*/
 
-size_t mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index, int clock, const mips3_config *config, int (*irqcallback)(int), void *memory)
+void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index, int clock, const mips3_config *config, int (*irqcallback)(int))
 {
-	int tlbindex;
-
-	/* if no memory, return the amount needed */
-	if (memory == NULL)
-		return sizeof(mips->tlb_table[0]) * (1 << (MIPS3_MAX_PADDR_SHIFT - MIPS3_MIN_PAGE_SHIFT));
-
 	/* initialize based on the config */
 	memset(mips, 0, sizeof(*mips));
 	mips->flavor = flavor;
@@ -61,25 +83,25 @@ size_t mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int 
 	/* set up the endianness */
 	mips->memory = *memory_get_accessors(ADDRESS_SPACE_PROGRAM, 32, mips->bigendian ? CPU_IS_BE : CPU_IS_LE);
 
-	/* allocate memory */
-	mips->tlb_table = memory;
-
-	/* initialize the TLB state */
-	for (tlbindex = 0; tlbindex < ARRAY_LENGTH(mips->tlb); tlbindex++)
-	{
-		mips3_tlb_entry *tlbent = &mips->tlb[tlbindex];
-		tlbent->page_mask = 0;
-		tlbent->entry_hi = 0xffffffff;
-		tlbent->entry_lo[0] = 0xfffffff8;
-		tlbent->entry_lo[1] = 0xfffffff8;
-	}
+	/* allocate the virtual TLB */
+	mips->vtlb = vtlb_alloc(cpu_getactivecpu(), ADDRESS_SPACE_PROGRAM, 2 * MIPS3_TLB_ENTRIES + 2, 0);
 
 	/* allocate a timer for the compare interrupt */
 	mips->compare_int_timer = timer_alloc(compare_int_callback, NULL);
 
 	/* reset the state */
 	mips3com_reset(mips);
-	return 0;
+}
+
+
+/*-------------------------------------------------
+    mips3com_exit - common cleanup/exit
+-------------------------------------------------*/
+
+void mips3com_exit(mips3_state *mips)
+{
+	if (mips->vtlb != NULL)
+		vtlb_free(mips->vtlb);
 }
 
 
@@ -90,6 +112,8 @@ size_t mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int 
 
 void mips3com_reset(mips3_state *mips)
 {
+	int tlbindex;
+	
 	/* initialize the state */
 	mips->pc = 0xbfc00000;
 	mips->cpr[0][COP0_Status] = SR_BEV | SR_ERL;
@@ -100,8 +124,21 @@ void mips3com_reset(mips3_state *mips)
 	mips->cpr[0][COP0_PRId] = compute_prid_register(mips);
 	mips->count_zero_time = activecpu_gettotalcycles();
 
-	/* recompute the TLB table */
-	mips3com_recompute_tlb_table(mips);
+	/* initialize the TLB state */
+	for (tlbindex = 0; tlbindex < ARRAY_LENGTH(mips->tlb); tlbindex++)
+	{
+		mips3_tlb_entry *entry = &mips->tlb[tlbindex];
+		entry->page_mask = 0;
+		entry->entry_hi = 0xffffffff;
+		entry->entry_lo[0] = 0xfffffff8;
+		entry->entry_lo[1] = 0xfffffff8;
+		vtlb_load(mips->vtlb, 2 * tlbindex + 0, 0, 0, 0);
+		vtlb_load(mips->vtlb, 2 * tlbindex + 1, 0, 0, 0);
+	}
+
+	/* load the fixed TLB range */
+	vtlb_load(mips->vtlb, 2 * MIPS3_TLB_ENTRIES + 0, (0xa0000000 - 0x80000000) >> MIPS3_MIN_PAGE_SHIFT, 0x80000000, 0x00000000 | VTLB_READ_ALLOWED | VTLB_WRITE_ALLOWED | VTLB_FETCH_ALLOWED | VTLB_FLAG_VALID);
+	vtlb_load(mips->vtlb, 2 * MIPS3_TLB_ENTRIES + 1, (0xc0000000 - 0xa0000000) >> MIPS3_MIN_PAGE_SHIFT, 0xa0000000, 0x00000000 | VTLB_READ_ALLOWED | VTLB_WRITE_ALLOWED | VTLB_FETCH_ALLOWED | VTLB_FLAG_VALID);
 }
 
 
@@ -154,99 +191,18 @@ void mips3com_update_cycle_counting(mips3_state *mips)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    mips3com_map_tlb_entries - map entries from the
-    TLB into the tlb_table
+    mips3com_asid_changed - remap all non-global
+    TLB entries
 -------------------------------------------------*/
 
-void mips3com_map_tlb_entries(mips3_state *mips)
+void mips3com_asid_changed(mips3_state *mips)
 {
-	int valid_asid = mips->cpr[0][COP0_EntryHi] & 0xff;
-	int index;
+	int tlbindex;
 
-	/* iterate over all TLB entries */
-	for (index = 0; index < ARRAY_LENGTH(mips->tlb); index++)
-	{
-		mips3_tlb_entry *tlbent = &mips->tlb[index];
-
-		/* only process if the ASID matches or if global */
-		if (valid_asid == (tlbent->entry_hi & 0xff) || ((tlbent->entry_lo[0] & tlbent->entry_lo[1]) & TLB_GLOBAL))
-		{
-			UINT32 count = (tlbent->page_mask >> 13) & 0x00fff;
-			UINT32 vpn = ((tlbent->entry_hi >> 13) & 0x07ffffff) << 1;
-			int which, i;
-
-			/* ignore if the virtual address is beyond 32 bits */
-			if (vpn < (1 << (MIPS3_MAX_PADDR_SHIFT - MIPS3_MIN_PAGE_SHIFT)))
-
-				/* loop over both the even and odd pages */
-				for (which = 0; which < 2; which++)
-				{
-					UINT64 lo = tlbent->entry_lo[which];
-					UINT32 pfn = (lo >> 6) & 0x00ffffff;
-					UINT32 wp = (lo & 7) | TLB_PRESENT;
-
-					/* ensure that if the valid bit is clear, the dirty bit is as well */
-					/* this way we can always test dirty for writes, and valid for reads */
-					if (!(wp & TLB_VALID))
-						wp &= ~TLB_DIRTY;
-
-					for (i = 0; i <= count; i++, vpn++, pfn++)
-						if (vpn < 0x80000 || vpn >= 0xc0000)
-							mips->tlb_table[vpn] = (pfn << MIPS3_MIN_PAGE_SHIFT) | wp;
-				}
-		}
-	}
-}
-
-
-/*-------------------------------------------------
-    mips3com_unmap_tlb_entries - unmap entries from
-    the TLB into the tlb_table
--------------------------------------------------*/
-
-void mips3com_unmap_tlb_entries(mips3_state *mips)
-{
-	int index;
-
-	/* iterate over all TLB entries */
-	for (index = 0; index < ARRAY_LENGTH(mips->tlb); index++)
-	{
-		mips3_tlb_entry *tlbent = &mips->tlb[index];
-		UINT32 count = (tlbent->page_mask >> 13) & 0x00fff;
-		UINT32 vpn = ((tlbent->entry_hi >> 13) & 0x07ffffff) << 1;
-		int which, i;
-
-		/* ignore if the virtual address is beyond 32 bits */
-		if (vpn < (1 << (MIPS3_MAX_PADDR_SHIFT - MIPS3_MIN_PAGE_SHIFT)))
-
-			/* loop over both the even and odd pages */
-			for (which = 0; which < 2; which++)
-				for (i = 0; i <= count; i++, vpn++)
-					if (vpn < 0x80000 || vpn >= 0xc0000)
-						mips->tlb_table[vpn] = 0;
-	}
-}
-
-
-/*-------------------------------------------------
-    mips3com_recompute_tlb_table - recompute the TLB
-    table from scratch
--------------------------------------------------*/
-
-void mips3com_recompute_tlb_table(mips3_state *mips)
-{
-	UINT32 addr;
-
-	/* map in the hard-coded spaces */
-	for (addr = 0x80000000; addr < 0xc0000000; addr += MIPS3_MIN_PAGE_SIZE)
-		mips->tlb_table[addr >> MIPS3_MIN_PAGE_SHIFT] = (addr & 0x1ffff000) | TLB_PRESENT | TLB_DIRTY | TLB_VALID | TLB_GLOBAL;
-
-	/* reset everything else to unmapped */
-	memset(&mips->tlb_table[0x00000000 >> MIPS3_MIN_PAGE_SHIFT], 0, sizeof(mips->tlb_table[0]) * (0x80000000 >> MIPS3_MIN_PAGE_SHIFT));
-	memset(&mips->tlb_table[0xc0000000 >> MIPS3_MIN_PAGE_SHIFT], 0, sizeof(mips->tlb_table[0]) * (0x40000000 >> MIPS3_MIN_PAGE_SHIFT));
-
-	/* remap all the entries in the TLB */
-	mips3com_map_tlb_entries(mips);
+	/* iterate over all non-global TLB entries and remap them */
+	for (tlbindex = 0; tlbindex < ARRAY_LENGTH(mips->tlb); tlbindex++)
+		if (!tlb_entry_is_global(&mips->tlb[tlbindex]))
+			tlb_map_entry(mips, tlbindex);
 }
 
 
@@ -260,10 +216,11 @@ int mips3com_translate_address(mips3_state *mips, int space, int intention, offs
 	/* only applies to the program address space */
 	if (space == ADDRESS_SPACE_PROGRAM)
 	{
-		UINT32 result = mips->tlb_table[*address >> MIPS3_MIN_PAGE_SHIFT];
-		if (!(result & TLB_PRESENT) || !(result & TLB_VALID))
+		const vtlb_entry *table = vtlb_table(mips->vtlb);
+		vtlb_entry entry = table[*address >> MIPS3_MIN_PAGE_SHIFT];
+		if ((entry & (1 << (intention & (TRANSLATE_TYPE_MASK | TRANSLATE_USER_MASK)))) == 0)
 			return FALSE;
-		*address = (result & ~MIPS3_MIN_PAGE_MASK) | (*address & MIPS3_MIN_PAGE_MASK);
+		*address = (entry & ~MIPS3_MIN_PAGE_MASK) | (*address & MIPS3_MIN_PAGE_MASK);
 	}
 	return TRUE;
 }
@@ -275,18 +232,18 @@ int mips3com_translate_address(mips3_state *mips, int space, int intention, offs
 
 void mips3com_tlbr(mips3_state *mips)
 {
-	UINT32 index = mips->cpr[0][COP0_Index] & 0x3f;
+	UINT32 tlbindex = mips->cpr[0][COP0_Index] & 0x3f;
 
 	/* only handle entries within the TLB */
-	if (index < ARRAY_LENGTH(mips->tlb))
+	if (tlbindex < ARRAY_LENGTH(mips->tlb))
 	{
-		mips3_tlb_entry *tlbent = &mips->tlb[index];
+		mips3_tlb_entry *entry = &mips->tlb[tlbindex];
 
 		/* copy data from the TLB entry into the COP0 registers */
-		mips->cpr[0][COP0_PageMask] = tlbent->page_mask;
-		mips->cpr[0][COP0_EntryHi] = tlbent->entry_hi;
-		mips->cpr[0][COP0_EntryLo0] = tlbent->entry_lo[0];
-		mips->cpr[0][COP0_EntryLo1] = tlbent->entry_lo[1];
+		mips->cpr[0][COP0_PageMask] = entry->page_mask;
+		mips->cpr[0][COP0_EntryHi] = entry->entry_hi;
+		mips->cpr[0][COP0_EntryLo0] = entry->entry_lo[0];
+		mips->cpr[0][COP0_EntryLo1] = entry->entry_lo[1];
 	}
 }
 
@@ -310,14 +267,14 @@ void mips3com_tlbwr(mips3_state *mips)
 {
 	UINT32 wired = mips->cpr[0][COP0_Wired] & 0x3f;
 	UINT32 unwired = ARRAY_LENGTH(mips->tlb) - wired;
-	UINT32 index = ARRAY_LENGTH(mips->tlb) - 1;
+	UINT32 tlbindex = ARRAY_LENGTH(mips->tlb) - 1;
 
 	/* "random" is based off of the current cycle counting through the non-wired pages */
 	if (unwired > 0)
-		index = ((activecpu_gettotalcycles() - mips->count_zero_time) % unwired + wired) & 0x3f;
+		tlbindex = ((activecpu_gettotalcycles() - mips->count_zero_time) % unwired + wired) & 0x3f;
 
-	/* use the common handler to write to this index */
-	tlb_write_common(mips, index);
+	/* use the common handler to write to this tlbindex */
+	tlb_write_common(mips, tlbindex);
 }
 
 
@@ -327,35 +284,29 @@ void mips3com_tlbwr(mips3_state *mips)
 
 void mips3com_tlbp(mips3_state *mips)
 {
-	UINT32 index;
+	UINT32 tlbindex;
 	UINT64 vpn;
 
 	/* iterate over TLB entries */
-	for (index = 0; index < ARRAY_LENGTH(mips->tlb); index++)
+	for (tlbindex = 0; tlbindex < ARRAY_LENGTH(mips->tlb); tlbindex++)
 	{
-		mips3_tlb_entry *tlbent = &mips->tlb[index];
-		UINT64 mask = ~((tlbent->page_mask >> 13) & 0xfff) << 13;
+		mips3_tlb_entry *entry = &mips->tlb[tlbindex];
+		UINT64 mask = ~((entry->page_mask >> 13) & 0xfff) << 13;
 
 		/* if the relevant bits of EntryHi match the relevant bits of the TLB */
-		if ((tlbent->entry_hi & mask) == (mips->cpr[0][COP0_EntryHi] & mask))
+		if ((entry->entry_hi & mask) == (mips->cpr[0][COP0_EntryHi] & mask))
 
 			/* and if we are either global or matching the current ASID, then stop */
-			if ((tlbent->entry_hi & 0xff) == (mips->cpr[0][COP0_EntryHi] & 0xff) || ((tlbent->entry_lo[0] & tlbent->entry_lo[1]) & TLB_GLOBAL))
+			if ((entry->entry_hi & 0xff) == (mips->cpr[0][COP0_EntryHi] & 0xff) || ((entry->entry_lo[0] & entry->entry_lo[1]) & TLB_GLOBAL))
 				break;
 	}
 
 	/* validate that our tlb_table was in sync */
 	vpn = ((mips->cpr[0][COP0_EntryHi] >> 13) & 0x07ffffff) << 1;
-	if (index != ARRAY_LENGTH(mips->tlb))
-	{
-		assert(mips->tlb_table[vpn & 0xfffff] & TLB_PRESENT);
-		mips->cpr[0][COP0_Index] = index;
-	}
+	if (tlbindex != ARRAY_LENGTH(mips->tlb))
+		mips->cpr[0][COP0_Index] = tlbindex;
 	else
-	{
-		assert(!(mips->tlb_table[vpn & 0xfffff] & TLB_PRESENT));
 		mips->cpr[0][COP0_Index] = 0x80000000;
-	}
 }
 
 
@@ -828,32 +779,90 @@ static UINT32 compute_prid_register(const mips3_state *mips)
 
 
 /*-------------------------------------------------
+    tlb_map_entry - map a single TLB
+    entry
+-------------------------------------------------*/
+
+static void tlb_map_entry(mips3_state *mips, int tlbindex)
+{
+	int current_asid = mips->cpr[0][COP0_EntryHi] & 0xff;
+	mips3_tlb_entry *entry = &mips->tlb[tlbindex];
+	UINT32 count, vpn;
+	int which;
+	
+	/* the ASID doesn't match the current ASID, and if the page isn't global, unmap it from the TLB */
+	if (!tlb_entry_matches_asid(entry, current_asid) && !tlb_entry_is_global(entry))
+	{
+		vtlb_load(mips->vtlb, 2 * tlbindex + 0, 0, 0, 0);
+		vtlb_load(mips->vtlb, 2 * tlbindex + 1, 0, 0, 0);
+		return;
+	}
+
+	/* extract the VPN index; ignore if the virtual address is beyond 32 bits */
+	vpn = ((entry->entry_hi >> 13) & 0x07ffffff) << 1;
+	if (vpn >= (1 << (MIPS3_MAX_PADDR_SHIFT - MIPS3_MIN_PAGE_SHIFT)))
+	{
+		vtlb_load(mips->vtlb, 2 * tlbindex + 0, 0, 0, 0);
+		vtlb_load(mips->vtlb, 2 * tlbindex + 1, 0, 0, 0);
+		return;
+	}
+
+	/* get the number of pages from the page mask */
+	count = ((entry->page_mask >> 13) & 0x00fff) + 1;
+
+	/* loop over both the even and odd pages */
+	for (which = 0; which < 2; which++)
+	{
+		UINT32 effvpn = vpn + count * which;
+		UINT64 lo = entry->entry_lo[which];
+		UINT32 pfn = (lo >> 6) & 0x00ffffff;
+		UINT32 flags = 0;
+		
+		/* valid? */
+		if ((lo & 2) != 0)
+		{
+			flags |= VTLB_FLAG_VALID | VTLB_READ_ALLOWED | VTLB_FETCH_ALLOWED;
+			
+			/* writable? */
+			if ((lo & 4) != 0)
+				flags |= VTLB_WRITE_ALLOWED;
+			
+			/* mirror the flags for user mode if the VPN is in user space */
+			if (effvpn < (0x80000000 >> MIPS3_MIN_PAGE_SHIFT))
+				flags |= (flags << 4) & (VTLB_USER_READ_ALLOWED | VTLB_USER_WRITE_ALLOWED | VTLB_USER_FETCH_ALLOWED);
+		}
+
+		/* load the virtual TLB with the corresponding entries */
+		if ((effvpn + count) <= (0x80000000 >> MIPS3_MIN_PAGE_SHIFT) || effvpn >= (0xc0000000 >> MIPS3_MIN_PAGE_SHIFT))
+			vtlb_load(mips->vtlb, 2 * tlbindex + which, count, effvpn << MIPS3_MIN_PAGE_SHIFT, (pfn << MIPS3_MIN_PAGE_SHIFT) | flags);
+	}
+}
+
+
+/*-------------------------------------------------
     tlb_write_common - common routine for writing
     a TLB entry
 -------------------------------------------------*/
 
-static void tlb_write_common(mips3_state *mips, int index)
+static void tlb_write_common(mips3_state *mips, int tlbindex)
 {
 	/* only handle entries within the TLB */
-	if (index < ARRAY_LENGTH(mips->tlb))
+	if (tlbindex < ARRAY_LENGTH(mips->tlb))
 	{
-		mips3_tlb_entry *tlbent = &mips->tlb[index];
-
-		/* unmap what we have */
-		mips3com_unmap_tlb_entries(mips);
+		mips3_tlb_entry *entry = &mips->tlb[tlbindex];
 
 		/* fill in the new TLB entry from the COP0 registers */
-		tlbent->page_mask = mips->cpr[0][COP0_PageMask];
-		tlbent->entry_hi = mips->cpr[0][COP0_EntryHi] & ~(tlbent->page_mask & U64(0x0000000001ffe000));
-		tlbent->entry_lo[0] = mips->cpr[0][COP0_EntryLo0];
-		tlbent->entry_lo[1] = mips->cpr[0][COP0_EntryLo1];
+		entry->page_mask = mips->cpr[0][COP0_PageMask];
+		entry->entry_hi = mips->cpr[0][COP0_EntryHi] & ~(entry->page_mask & U64(0x0000000001ffe000));
+		entry->entry_lo[0] = mips->cpr[0][COP0_EntryLo0];
+		entry->entry_lo[1] = mips->cpr[0][COP0_EntryLo1];
 
-		/* remap the TLB */
-		mips3com_map_tlb_entries(mips);
+		/* remap this TLB entry */
+		tlb_map_entry(mips, tlbindex);
 
 		/* log the two halves once they are in */
-		tlb_entry_log_half(tlbent, index, 0);
-		tlb_entry_log_half(tlbent, index, 1);
+		tlb_entry_log_half(entry, tlbindex, 0);
+		tlb_entry_log_half(entry, tlbindex, 1);
 	}
 }
 
@@ -863,24 +872,24 @@ static void tlb_write_common(mips3_state *mips, int index)
     entry
 -------------------------------------------------*/
 
-static void tlb_entry_log_half(mips3_tlb_entry *tlbent, int index, int which)
+static void tlb_entry_log_half(mips3_tlb_entry *entry, int tlbindex, int which)
 {
 #if PRINTF_TLB
-	UINT64 hi = tlbent->entry_hi;
-	UINT64 lo = tlbent->entry_lo[which];
+	UINT64 hi = entry->entry_hi;
+	UINT64 lo = entry->entry_lo[which];
 	UINT32 vpn = (((hi >> 13) & 0x07ffffff) << 1);
 	UINT32 asid = hi & 0xff;
 	UINT32 r = (hi >> 62) & 3;
 	UINT32 pfn = (lo >> 6) & 0x00ffffff;
 	UINT32 c = (lo >> 3) & 7;
-	UINT32 pagesize = (((tlbent->page_mask >> 13) & 0xfff) + 1) << MIPS3_MIN_PAGE_SHIFT;
+	UINT32 pagesize = (((entry->page_mask >> 13) & 0xfff) + 1) << MIPS3_MIN_PAGE_SHIFT;
 	UINT64 vaddr = (UINT64)vpn * MIPS3_MIN_PAGE_SIZE;
 	UINT64 paddr = (UINT64)pfn * MIPS3_MIN_PAGE_SIZE;
 
 	vaddr += pagesize * which;
 
-	mame_printf_debug("index=%08X  pagesize=%08X  vaddr=%08X%08X  paddr=%08X%08X  asid=%02X  r=%X  c=%X  dvg=%c%c%c\n",
-			index, pagesize, (UINT32)(vaddr >> 32), (UINT32)vaddr, (UINT32)(paddr >> 32), (UINT32)paddr,
+	printf("index=%08X  pagesize=%08X  vaddr=%08X%08X  paddr=%08X%08X  asid=%02X  r=%X  c=%X  dvg=%c%c%c\n",
+			tlbindex, pagesize, (UINT32)(vaddr >> 32), (UINT32)vaddr, (UINT32)(paddr >> 32), (UINT32)paddr,
 			asid, r, c, (lo & 4) ? 'd' : '.', (lo & 2) ? 'v' : '.', (lo & 1) ? 'g' : '.');
 #endif
 }

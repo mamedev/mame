@@ -14,7 +14,6 @@
     DEBUGGING
 ***************************************************************************/
 
-#define PRINTF_TLB_FILL			(1)
 #define PRINTF_SPU				(0)
 #define PRINTF_DECREMENTER		(0)
 
@@ -57,51 +56,6 @@ INLINE int page_access_allowed(int transtype, UINT8 key, UINT8 protbits)
 		return (transtype == TRANSLATE_WRITE) ? (protbits != 3) : TRUE;
 	else
 		return (transtype == TRANSLATE_WRITE) ? (protbits == 2) : (protbits != 0);
-}
-
-
-/*-------------------------------------------------
-    tlb_entry_free - free an entry from the TLB,
-    by index
--------------------------------------------------*/
-
-INLINE void tlb_entry_free(powerpc_state *ppc, int entrynum)
-{
-	int oldentry = ppc->tlb_entries[entrynum];
-
-	/* if we're mapped to something, free the entry in the table */
-	if (oldentry != 0)
-	{
-		ppc->tlb_table[oldentry - 1] = 0;
-		ppc->tlb_entries[entrynum] = 0;
-	}
-}
-
-
-/*-------------------------------------------------
-    tlb_entry_allocate - allocate a TLB entry
-    for the given address, if needed, and set its
-    new value
--------------------------------------------------*/
-
-INLINE int tlb_entry_allocate(powerpc_state *ppc, int entrynum, offs_t address, UINT32 value)
-{
-	UINT32 *entry = &ppc->tlb_table[address >> 12];
-	int allocated = FALSE;
-
-	/* only need to allocate if we are empty */
-	if (*entry == 0)
-	{
-		/* if there's already a TLB entry at the current index, zap it */
-		tlb_entry_free(ppc, entrynum);
-
-		/* allocate a new entry and advance to the next one */
-		ppc->tlb_entries[entrynum] = (address >> 12) + 1;
-		allocated = TRUE;
-	}
-	*entry = value;
-
-	return allocated;
 }
 
 
@@ -229,12 +183,8 @@ INLINE void set_decrementer(powerpc_state *ppc, UINT32 newdec)
     structure based on the configured type
 -------------------------------------------------*/
 
-size_t ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, int clock, const powerpc_config *config, int (*irqcallback)(int), void *memory)
+void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, int clock, const powerpc_config *config, int (*irqcallback)(int))
 {
-	/* if no memory, return the amount needed */
-	if (memory == NULL)
-		return sizeof(ppc->tlb_table[0]) * (POWERPC_TLB_ENTRIES + PPC603_FIXED_TLB_ENTRIES + (1 << (32 - POWERPC_MIN_PAGE_SHIFT)));
-
 	/* initialize based on the config */
 	memset(ppc, 0, sizeof(*ppc));
 	ppc->cpunum = cpu_getactivecpu();
@@ -247,9 +197,8 @@ size_t ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_
 	ppc->system_clock = (config != NULL) ? config->bus_frequency : clock;
 	ppc->tb_divisor = (ppc->tb_divisor * clock + ppc->system_clock / 2 - 1) / ppc->system_clock;
 
-	/* initialize the TLB state */
-	ppc->tlb_entries = memory;
-	ppc->tlb_table = ppc->tlb_entries + POWERPC_TLB_ENTRIES + PPC603_FIXED_TLB_ENTRIES;
+	/* allocate the virtual TLB */
+	ppc->vtlb = vtlb_alloc(cpu_getactivecpu(), ADDRESS_SPACE_PROGRAM, (cap & PPCCAP_603_MMU) ? PPC603_FIXED_TLB_ENTRIES : 0, POWERPC_TLB_ENTRIES);
 
 	/* allocate a timer for the compare interrupt */
 	if (cap & PPCCAP_OEA)
@@ -265,7 +214,17 @@ size_t ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_
 
 	/* reset the state */
 	ppccom_reset(ppc);
-	return 0;
+}
+
+
+/*-------------------------------------------------
+    ppccom_exit - common cleanup/exit
+-------------------------------------------------*/
+
+void ppccom_exit(powerpc_state *ppc)
+{
+	if (ppc->vtlb != NULL)
+		vtlb_free(ppc->vtlb);
 }
 
 
@@ -276,6 +235,8 @@ size_t ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_
 
 void ppccom_reset(powerpc_state *ppc)
 {
+	int tlbindex;
+	
 	/* initialize the OEA state */
 	if (ppc->cap & PPCCAP_OEA)
 	{
@@ -307,9 +268,10 @@ void ppccom_reset(powerpc_state *ppc)
 	ppc->irq_pending = 0;
 
 	/* flush the TLB */
-	ppc->tlb_index = 0;
-	memset(ppc->tlb_entries, 0, sizeof(ppc->tlb_entries[0]) * (POWERPC_TLB_ENTRIES + PPC603_FIXED_TLB_ENTRIES));
-	memset(ppc->tlb_table, 0, sizeof(ppc->tlb_table[0]) * (1 << (32 - POWERPC_MIN_PAGE_SHIFT)));
+	vtlb_flush_dynamic(ppc->vtlb);
+	if (ppc->cap & PPCCAP_603_MMU)
+		for (tlbindex = 0; tlbindex < PPC603_FIXED_TLB_ENTRIES; tlbindex++)
+			vtlb_load(ppc->vtlb, tlbindex, 0, 0, 0);
 }
 
 
@@ -348,6 +310,28 @@ static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intentio
 	offs_t hash, hashbase, hashmask;
 	int batbase, batnum, hashnum;
 	UINT32 segreg;
+
+	/* 4xx case: "TLB" really just caches writes and checks compare registers */
+	if (ppc->cap & PPCCAP_4XX)
+	{
+		/* we don't support the MMU of the 403GCX */
+		if (ppc->flavor == PPC_MODEL_403GCX && (ppc->msr & MSROEA_DR))
+			fatalerror("MMU enabled but not supported!");
+
+		/* only check if PE is enabled */
+		if (transtype == TRANSLATE_WRITE && (ppc->msr & MSR4XX_PE))
+		{
+			/* are we within one of the protection ranges? */
+			int inrange1 = ((*address >> 12) >= (ppc->spr[SPR4XX_PBL1] >> 12) && (*address >> 12) < (ppc->spr[SPR4XX_PBU1] >> 12));
+			int inrange2 = ((*address >> 12) >= (ppc->spr[SPR4XX_PBL2] >> 12) && (*address >> 12) < (ppc->spr[SPR4XX_PBU2] >> 12));
+
+			/* if PX == 1, writes are only allowed OUTSIDE of the bounds */
+			if (((ppc->msr & MSR4XX_PX) && (inrange1 || inrange2)) || (!(ppc->msr & MSR4XX_PX) && (!inrange1 && !inrange2)))
+				return 0x002;
+		}
+		*address &= 0x7fffffff;
+		return 0x001;
+	}
 
 	/* only applies if we support the OEA */
 	if (!(ppc->cap & PPCCAP_OEA))
@@ -471,56 +455,7 @@ int ppccom_translate_address(powerpc_state *ppc, int space, int intention, offs_
 
 void ppccom_tlb_fill(powerpc_state *ppc)
 {
-	int transuser = (ppc->msr & MSR_PR) ? TRANSLATE_USER_MASK : 0;
-	offs_t address = ppc->param0;
-	int transtype = ppc->param1;
-	offs_t transaddr = address;
-	UINT32 entryval;
-
-	/* 4xx case: "TLB" really just caches writes and checks compare registers */
-	if (ppc->cap & PPCCAP_4XX)
-	{
-		/* assume success and direct translation */
-		ppc->param0 = 1;
-		transaddr = address & 0x7fffffff;
-
-		/* we don't support the MMU of the 403GCX */
-		if (ppc->flavor == PPC_MODEL_403GCX && (ppc->msr & MSROEA_DR))
-			fatalerror("MMU enabled but not supported!");
-
-		/* only check if PE is enabled */
-		if (transtype == TRANSLATE_WRITE && (ppc->msr & MSR4XX_PE))
-		{
-			/* are we within one of the protection ranges? */
-			int inrange1 = ((address >> 12) >= (ppc->spr[SPR4XX_PBL1] >> 12) && (address >> 12) < (ppc->spr[SPR4XX_PBU1] >> 12));
-			int inrange2 = ((address >> 12) >= (ppc->spr[SPR4XX_PBL2] >> 12) && (address >> 12) < (ppc->spr[SPR4XX_PBU2] >> 12));
-
-			/* if PX == 1, writes are only allowed OUTSIDE of the bounds */
-			if (((ppc->msr & MSR4XX_PX) && (inrange1 || inrange2)) || (!(ppc->msr & MSR4XX_PX) && (!inrange1 && !inrange2)))
-				ppc->param0 = 2;
-		}
-	}
-
-	/* OEA case: perform an address translation */
-	else
-		ppc->param0 = ppccom_translate_address_internal(ppc, transtype | transuser, &transaddr);
-
-	/* log information and return upon failure */
-	if (PRINTF_TLB_FILL)
-		printf("tlb_fill: %08X (%s%s) -> ", address, (transtype == TRANSLATE_READ) ? "R" : (transtype == TRANSLATE_WRITE) ? "W" : "F", transuser ? "U" : "S");
-	if (ppc->param0 > 1)
-	{
-		if (PRINTF_TLB_FILL)
-			printf("failed(%08X)\n", ppc->param0);
-		return;
-	}
-
-	/* if we did translate the address, get a pointer to our entry in the TLB table and fill it in */
-	if (PRINTF_TLB_FILL)
-		printf("succeeded(%d) -> %08X\n", ppc->param0, transaddr);
-	entryval = (transaddr & 0xfffff000) | TLB_READ | ((ppc->param0 & 1) ? TLB_WRITE : 0);
-	if (tlb_entry_allocate(ppc, ppc->tlb_index, address, entryval))
-		ppc->tlb_index = (ppc->tlb_index + 1) % POWERPC_TLB_ENTRIES;
+	vtlb_fill(ppc->vtlb, ppc->param0, ppc->param1);
 }
 
 
@@ -531,11 +466,7 @@ void ppccom_tlb_fill(powerpc_state *ppc)
 
 void ppccom_tlb_flush(powerpc_state *ppc)
 {
-	int entnum;
-
-	/* iterate over entries and invalidate them */
-	for (entnum = 0; entnum < POWERPC_TLB_ENTRIES; entnum++)
-		tlb_entry_free(ppc, entnum);
+	vtlb_flush_dynamic(ppc->vtlb);
 }
 
 
@@ -551,10 +482,7 @@ void ppccom_tlb_flush(powerpc_state *ppc)
 
 void ppccom_execute_tlbie(powerpc_state *ppc)
 {
-	offs_t address = ppc->param0;
-
-	/* just nuke it in the table; we may have spare entries referencing it, but no harm */
-	ppc->tlb_table[address >> 12] = 0;
+	vtlb_flush_address(ppc->vtlb, ppc->param0);
 }
 
 
@@ -565,7 +493,7 @@ void ppccom_execute_tlbie(powerpc_state *ppc)
 
 void ppccom_execute_tlbia(powerpc_state *ppc)
 {
-	ppccom_tlb_flush(ppc);
+	vtlb_flush_dynamic(ppc->vtlb);
 }
 
 
@@ -578,19 +506,21 @@ void ppccom_execute_tlbl(powerpc_state *ppc)
 {
 	UINT32 address = ppc->param0;
 	int isitlb = ppc->param1;
-	UINT32 entrynum, entryval;
-
+	vtlb_entry flags = 0;
+	int entrynum;
+	
 	/* determine entry number; we use rand() for associativity */
 	entrynum = ((address >> 12) & 0x1f) | (mame_rand(Machine) & 0x20) | (isitlb ? 0x40 : 0);
 
-	/* invalidate any existing TLB entry here */
-	ppc->tlb_table[address >> 12] = 0;
+	/* determine the flags */
+	flags = VTLB_FLAG_VALID | VTLB_READ_ALLOWED | VTLB_FETCH_ALLOWED;
+	if (ppc->spr[SPR603_RPA] & 0x80)
+		flags |= VTLB_WRITE_ALLOWED;
+	if (isitlb)
+		flags |= VTLB_FETCH_ALLOWED;
 
-	/* allocate this entry */
-	entryval = (ppc->spr[SPR603_RPA] & 0xfffff000) | TLB_READ | ((ppc->spr[SPR603_RPA] & 0x80) ? TLB_WRITE : 0);
-	tlb_entry_allocate(ppc, POWERPC_TLB_ENTRIES + entrynum, address, entryval);
-	if (PRINTF_TLB_FILL)
-		printf("tlb_load: %08X (%sS) -> %08X\n", address, isitlb ? "F" : "R", ppc->spr[SPR603_RPA] & 0xfffff000);
+	/* load the entry */
+	vtlb_load(ppc->vtlb, entrynum, 1, address, (ppc->spr[SPR603_RPA] & 0xfffff000) | flags);
 }
 
 
@@ -1897,8 +1827,8 @@ void ppc4xx_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 31;					break;
-		case CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACE_PROGRAM: 	info->i = 0;					break;
+		case CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
+		case CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACE_PROGRAM: 	info->i = POWERPC_MIN_PAGE_SHIFT;break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							/* provided per-CPU */					break;

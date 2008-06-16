@@ -353,26 +353,19 @@ static void mips3_init(mips3_flavor flavor, int bigendian, int index, int clock,
 	drccache *cache;
 	drcbe_info beinfo;
 	UINT32 flags = 0;
-	size_t extrasize;
-	void *extramem;
 	int regnum;
 
-	/* determine how much memory beyond the core size we need */
- 	extrasize = mips3com_init(NULL, flavor, bigendian, index, clock, config, irqcallback, NULL);
-
 	/* allocate enough space for the cache and the core */
-	cache = drccache_alloc(CACHE_SIZE + sizeof(*mips3) + extrasize);
+	cache = drccache_alloc(CACHE_SIZE + sizeof(*mips3));
 	if (cache == NULL)
-		fatalerror("Unable to allocate cache of size %d", (UINT32)(CACHE_SIZE + sizeof(*mips3) + extrasize));
+		fatalerror("Unable to allocate cache of size %d", (UINT32)(CACHE_SIZE + sizeof(*mips3)));
 
-	/* allocate the core and the extra memory */
+	/* allocate the core memory */
 	mips3 = drccache_memory_alloc_near(cache, sizeof(*mips3));
 	memset(mips3, 0, sizeof(*mips3));
-	extramem = drccache_memory_alloc(cache, extrasize);
-	memset(extramem, 0, extrasize);
 
 	/* initialize the core */
-	mips3com_init(mips3, flavor, bigendian, index, clock, config, irqcallback, extramem);
+	mips3com_init(mips3, flavor, bigendian, index, clock, config, irqcallback);
 
 	/* allocate the implementation-specific state from the full cache */
 	mips3->impstate = drccache_memory_alloc_near(cache, sizeof(*mips3->impstate));
@@ -532,6 +525,8 @@ static int mips3_execute(int cycles)
 
 static void mips3_exit(void)
 {
+	mips3com_exit(mips3);
+
 	/* clean up the DRC */
 	drcfe_exit(mips3->impstate->drcfe);
 	drcuml_free(mips3->impstate->drcuml);
@@ -1063,17 +1058,17 @@ static void static_generate_tlb_mismatch(drcuml_state *drcuml)
 	UML_RECOVER(block, IREG(0), MAPVAR_PC);											// recover i0,PC
 	UML_MOV(block, MEM(&mips3->pc), IREG(0));										// mov     <pc>,i0
 	UML_SHR(block, IREG(1), IREG(0), IMM(12));										// shr     i1,i0,12
-	UML_LOAD(block, IREG(1), mips3->tlb_table, IREG(1), DWORD);						// load    i1,[tlb_table],i1,dword
+	UML_LOAD(block, IREG(1), (void *)vtlb_table(mips3->vtlb), IREG(1), DWORD);		// load    i1,[vtlb_table],i1,dword
 	if (PRINTF_MMU)
 	{
 		UML_MOV(block, MEM(&mips3->impstate->arg0), IREG(0));						// mov     [arg0],i0
 		UML_MOV(block, MEM(&mips3->impstate->arg1), IREG(1));						// mov     [arg1],i1
 		UML_CALLC(block, cfunc_printf_debug, "TLB mismatch @ %08X (ent=%08X)\n");	// callc   printf_debug
 	}
-	UML_TEST(block, IREG(1), IMM(TLB_VALID));										// test    i1,TLB_VALID
+	UML_TEST(block, IREG(1), IMM(VTLB_FETCH_ALLOWED));								// test    i1,VTLB_FETCH_ALLOWED
 	UML_JMPc(block, IF_NZ, 1);														// jmp     1,nz
-	UML_TEST(block, IREG(1), IMM(TLB_PRESENT));										// test    i1,TLB_PRESENT
-	UML_EXHc(block, IF_NZ, mips3->impstate->exception[EXCEPTION_TLBLOAD], IREG(0));	// exh     exception[TLBLOAD],i0,nz
+	UML_TEST(block, IREG(1), IMM(VTLB_FLAG_VALID));									// test    i1,VTLB_FLAG_VALID
+	UML_EXHc(block, IF_Z, mips3->impstate->exception[EXCEPTION_TLBLOAD], IREG(0));	// exh     exception[TLBLOAD],i0,z
 	UML_EXH(block, mips3->impstate->exception[EXCEPTION_TLBLOAD_FILL], IREG(0));	// exh     exception[TLBLOAD_FILL],i0
 	UML_LABEL(block, 1);														// 1:
 	save_fast_iregs(block);
@@ -1229,8 +1224,8 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 
 	/* general case: assume paging and perform a translation */
 	UML_SHR(block, IREG(3), IREG(0), IMM(12));										// shr     i3,i0,12
-	UML_LOAD(block, IREG(3), mips3->tlb_table, IREG(3), DWORD);						// load    i3,[tlb_table],i3,dword
-	UML_TEST(block, IREG(3), IMM(iswrite ? TLB_DIRTY : TLB_VALID));					// test    i3,iswrite ? TLB_DIRTY : TLB_VALID
+	UML_LOAD(block, IREG(3), (void *)vtlb_table(mips3->vtlb), IREG(3), DWORD);		// load    i3,[vtlb_table],i3,dword
+	UML_TEST(block, IREG(3), IMM(iswrite ? VTLB_WRITE_ALLOWED : VTLB_READ_ALLOWED));// test    i3,iswrite ? VTLB_WRITE_ALLOWED : VTLB_READ_ALLOWED
 	UML_JMPc(block, IF_Z, tlbmiss = label++);										// jmp     tlbmiss,z
 	UML_ROLINS(block, IREG(0), IREG(3), IMM(0), IMM(0xfffff000));					// rolins  i0,i3,0,0xfffff000
 
@@ -1385,12 +1380,12 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 		UML_LABEL(block, tlbmiss);												// tlbmiss:
 		if (iswrite)
 		{
-			UML_TEST(block, IREG(3), IMM(TLB_VALID));								// test    i3,TLB_VALID
+			UML_TEST(block, IREG(3), IMM(VTLB_READ_ALLOWED));						// test    i3,VTLB_READ_ALLOWED
 			UML_EXHc(block, IF_NZ, mips3->impstate->exception[EXCEPTION_TLBMOD], IREG(0));
 																					// exh     tlbmod,i0,nz
 		}
-		UML_TEST(block, IREG(3), IMM(TLB_PRESENT));									// test    i3,TLB_PRESENT
-		UML_EXHc(block, IF_NZ, exception_tlb, IREG(0));								// exh     tlb,i0,nz
+		UML_TEST(block, IREG(3), IMM(VTLB_FLAG_VALID));								// test    i3,VTLB_FLAG_VALID
+		UML_EXHc(block, IF_Z, exception_tlb, IREG(0));								// exh     tlb,i0,z
 		UML_EXH(block, exception_tlbfill, IREG(0));									// exh     tlbfill,i0
 	}
 
@@ -1590,16 +1585,18 @@ static void generate_sequence_instruction(drcuml_block *block, compiler_state *c
 	/* validate our TLB entry at this PC; if we fail, we need to handle it */
 	if ((desc->flags & OPFLAG_VALIDATE_TLB) && (desc->pc < 0x80000000 || desc->pc >= 0xc0000000))
 	{
+		const vtlb_entry *tlbtable = vtlb_table(mips3->vtlb);
+		
 		/* if we currently have a valid TLB read entry, we just verify */
-		if (mips3->tlb_table[desc->pc >> 12] & TLB_VALID)
+		if (tlbtable[desc->pc >> 12] & VTLB_FETCH_ALLOWED)
 		{
 			if (PRINTF_MMU)
 			{
 				UML_MOV(block, MEM(&mips3->impstate->arg0), IMM(desc->pc));			// mov     [arg0],desc->pc
 				UML_CALLC(block, cfunc_printf_debug, "Checking TLB at @ %08X\n");	// callc   printf_debug
 			}
-			UML_LOAD(block, IREG(0), &mips3->tlb_table[desc->pc >> 12], IMM(0), DWORD);// load i0,tlb_table[desc->pc >> 12],0,dword
-			UML_CMP(block, IREG(0), IMM(mips3->tlb_table[desc->pc >> 12]));			// cmp     i0,*tlbentry
+			UML_LOAD(block, IREG(0), &tlbtable[desc->pc >> 12], IMM(0), DWORD);		// load i0,tlbtable[desc->pc >> 12],0,dword
+			UML_CMP(block, IREG(0), IMM(tlbtable[desc->pc >> 12]));					// cmp     i0,*tlbentry
 			UML_EXHc(block, IF_NE, mips3->impstate->tlb_mismatch, IMM(0));			// exh     tlb_mismatch,0,NE
 		}
 
@@ -2781,8 +2778,7 @@ static int generate_set_cop0_reg(drcuml_block *block, compiler_state *compiler, 
 			UML_MOV(block, CPR032(reg), IREG(0));									// mov     cpr0[reg],i0
 			UML_TEST(block, IREG(1), IMM(0xff));									// test    i1,0xff
 			UML_JMPc(block, IF_Z, link = compiler->labelnum++);						// jmp     link,z
-			UML_CALLC(block, mips3com_unmap_tlb_entries, mips3);					// callc   mips3com_unmap_tlb_entries
-			UML_CALLC(block, mips3com_map_tlb_entries, mips3);						// callc   mips3com_map_tlb_entries
+			UML_CALLC(block, mips3com_asid_changed, mips3);							// callc   mips3com_asid_changed
 			UML_LABEL(block, link);												// link:
 			return TRUE;
 
