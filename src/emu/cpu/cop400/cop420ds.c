@@ -269,7 +269,7 @@ offs_t cop420_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 					break;
 
 				case 0x2C:
-					sprintf(buffer, "COMA");
+					sprintf(buffer, "CQMA");
 					break;
 
 				case 0x2E:
