@@ -1,5 +1,6 @@
 /*
 To Do:
+- redump COP420 internal ROM
 - get sound working
 - map and test any remaining input ports
 
@@ -10,7 +11,7 @@ Looping
         TMS9995
 
     COP420 Microcontroller
-        manages CPU communnication?
+        protection
 
     Sound CPU
         TMS9980
@@ -716,7 +717,7 @@ ROM_START( looping )
 	ROM_LOAD( "i-o.11a",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) /* speech */
 
 	ROM_REGION( 0x1000, REGION_CPU3, 0 ) /* COP420 microcontroller code */
-	ROM_LOAD( "cop.bin",		0x0000, 0x1000, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) )
+	ROM_LOAD( "cop.bin",		0x0000, 0x1000, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "log2.8a",		0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
@@ -740,7 +741,7 @@ ROM_START( loopinga )
 	ROM_LOAD( "i-o.11a",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
 
 	ROM_REGION( 0x1000, REGION_CPU3, 0 ) /* COP420 microcontroller code */
-	ROM_LOAD( "cop.bin",		0x0000, 0x1000, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) )
+	ROM_LOAD( "cop.bin",		0x0000, 0x1000, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "log2.8a",		0x0000, 0x800, CRC(ef3284ac) SHA1(8719c9df8c972a56c306b3c707aaa53092ffa2d6) )
@@ -763,7 +764,7 @@ ROM_START( skybump )
 	ROM_LOAD( "snd.11a",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
 
 	ROM_REGION( 0x1000, REGION_CPU3, 0 ) /* COP420 microcontroller code */
-	ROM_LOAD( "cop.bin",		0x0000, 0x1000, CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) )
+	ROM_LOAD( "cop.bin",		0x0000, 0x1000, BAD_DUMP CRC(bbfd26d5) SHA1(5f78b32b6e7c003841ef5b635084db2cdfebf0e1) ) // overdumped 4 times, and starting PC is not 0
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "vid.8a",			0x0000, 0x800, CRC(459ccc55) SHA1(747f6789605b48be9e22f779f9e3f6c98ad4e594) )
