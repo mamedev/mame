@@ -1673,21 +1673,21 @@ $(CPUOBJ)/z80/z80.o:	$(CPUSRC)/z80/z80.c \
 
 
 #-------------------------------------------------
-# Game Boy Z-80
+# Sharp LR35902 (Game Boy CPU)
 #-------------------------------------------------
 
-CPUDEFS += -DHAS_Z80GB=$(if $(filter Z80GB,$(CPUS)),1,0)
+CPUDEFS += -DHAS_LR35902=$(if $(filter LR35902,$(CPUS)),1,0)
 
-ifneq ($(filter Z80GB,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/z80gb
-CPUOBJS += $(CPUOBJ)/z80gb/z80gb.o
-DBGOBJS += $(CPUOBJ)/z80gb/z80gbd.o
+ifneq ($(filter LR35902,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/lr35902
+CPUOBJS += $(CPUOBJ)/lr35902/lr35902.o
+DBGOBJS += $(CPUOBJ)/lr35902/lr35902d.o
 endif
 
-$(CPUOBJ)/z80gb/z80gb.o:	$(CPUSRC)/z80gb/z80gb.c \
-							$(CPUSRC)/z80gb/z80gb.h \
-							$(CPUSRC)/z80gb/opc_cb.h \
-							$(CPUSRC)/z80gb/opc_main.h
+$(CPUOBJ)/lr35902/lr35902.o:	$(CPUSRC)/lr35902/lr35902.c \
+								$(CPUSRC)/lr35902/lr35902.h \
+								$(CPUSRC)/lr35902/opc_cb.h \
+								$(CPUSRC)/lr35902/opc_main.h
 
 
 

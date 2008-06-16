@@ -1,5 +1,5 @@
-#ifndef z80gb_H
-#define z80gb_H
+#ifndef lr35902_H
+#define lr35902_H
 
 #include "cpuintrf.h"
 
@@ -7,26 +7,26 @@ typedef struct {
 	const UINT16	*regs;
 	UINT8	features;
 	void	(*timer_fired_func)(int cycles);
-} Z80GB_CONFIG;
+} LR35902_CONFIG;
 
 enum {
-	Z80GB_PC=1, Z80GB_SP, Z80GB_AF, Z80GB_BC, Z80GB_DE, Z80GB_HL,
-	Z80GB_IRQ_STATE,
+	LR35902_PC=1, LR35902_SP, LR35902_AF, LR35902_BC, LR35902_DE, LR35902_HL,
+	LR35902_IRQ_STATE,
 	/* Pseudo registers to keep track of the interrupt statuses */
-	Z80GB_IE, Z80GB_IF,
+	LR35902_IE, LR35902_IF,
 	/* Pseudo register to change and check the cpu operating speed */
-	Z80GB_SPEED,
+	LR35902_SPEED,
 };
 
-#define Z80GB_FEATURE_HALT_BUG	0x01
+#define LR35902_FEATURE_HALT_BUG	0x01
 
 /****************************************************************************/
 /* Return register contents                                                 */
 /****************************************************************************/
-extern void z80gb_get_info(UINT32 state, cpuinfo *info);
+extern void lr35902_get_info(UINT32 state, cpuinfo *info);
 
 #ifdef ENABLE_DEBUGGER
-extern unsigned z80gb_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram );
+extern unsigned lr35902_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram );
 #endif /* ENABLE_DEBUGGER */
 
 #endif

@@ -1,7 +1,7 @@
 /*****************************************************************************
  *
- *   z80gbd.c
- *   Portable Z80 Gameboy disassembler
+ *   lr35902d.c
+ *   Portable Sharp LR35902 disassembler
  *
  *   Copyright The MESS Team.
  *
@@ -20,7 +20,7 @@
  *****************************************************************************/
 
 #include "debugger.h"
-#include "z80gb.h"
+#include "lr35902.h"
 
 enum e_mnemonics
 {
@@ -61,9 +61,9 @@ typedef struct
 {
 	UINT8	mnemonic;
 	const char *arguments;
-}	z80gbdasm;
+}	lr35902dasm;
 
-static const z80gbdasm mnemonic_cb[256] = {
+static const lr35902dasm mnemonic_cb[256] = {
 	{zRLC,"b"},     {zRLC,"c"},     {zRLC,"d"},     {zRLC,"e"},
 	{zRLC,"h"},     {zRLC,"l"},     {zRLC,"(hl)"},  {zRLC,"a"},
 	{zRRC,"b"},     {zRRC,"c"},     {zRRC,"d"},     {zRRC,"e"},
@@ -130,7 +130,7 @@ static const z80gbdasm mnemonic_cb[256] = {
 	{zSET,"7,h"},   {zSET,"7,l"},   {zSET,"7,(hl)"},{zSET,"7,a"}
 };
 
-static const z80gbdasm mnemonic_main[256]= {
+static const lr35902dasm mnemonic_main[256]= {
 	{zNOP,0},		{zLD,"bc,N"},   {zLD,"(bc),a"}, {zINC,"bc"},
 	{zINC,"b"},     {zDEC,"b"},     {zLD,"b,B"},    {zRLCA,0},
 	{zLD,"(W),sp"}, {zADD,"hl,bc"}, {zLD,"a,(bc)"}, {zDEC,"bc"},
@@ -201,9 +201,9 @@ static const z80gbdasm mnemonic_main[256]= {
  * Disassemble opcode at PC and return number of bytes it takes
  ****************************************************************************/
 
-unsigned z80gb_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram )
+unsigned lr35902_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram )
 {
-	const z80gbdasm *d;
+	const lr35902dasm *d;
 	const char *symbol, *src;
 	char *dst;
 	INT8 offset = 0;

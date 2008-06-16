@@ -1,9 +1,9 @@
 /*************************************************************/
 /**                                                         **/
-/**                          z80gb.c                        **/
+/**                        lr35902.c                        **/
 /**                                                         **/
 /** This file contains implementation for the GameBoy CPU.  **/
-/** See z80gb.h for the relevant definitions. Please, note  **/
+/** See lr35902.h for the relevant definitions. Please, note**/
 /** that this code can not be used to emulate a generic Z80 **/
 /** because the GameBoy version of it differs from Z80 in   **/
 /** many ways.                                              **/
@@ -37,14 +37,14 @@
 /**                                                         **/
 /*************************************************************/
 #include "debugger.h"
-#include "z80gb.h"
+#include "lr35902.h"
 
 #define FLAG_Z	0x80
 #define FLAG_N  0x40
 #define FLAG_H  0x20
 #define FLAG_C  0x10
 
-#define CYCLES_PASSED(X)		z80gb_ICount -= ((X) / (Regs.w.gb_speed));	\
+#define CYCLES_PASSED(X)		lr35902_ICount -= ((X) / (Regs.w.gb_speed));	\
 					if ( Regs.w.timer_fired_func ) {			\
 						Regs.w.timer_fired_func( X );		\
 					}
@@ -75,8 +75,8 @@ typedef struct {
 	int doHALTbug;
 	int haltIFstatus;
 	UINT8	features;
-	const Z80GB_CONFIG *config;
-} z80gb_16BitRegs;
+	const LR35902_CONFIG *config;
+} lr35902_16BitRegs;
 
 #ifdef LSB_FIRST
 typedef struct {
@@ -88,7 +88,7 @@ typedef struct {
 	UINT8 D;
 	UINT8 L;
 	UINT8 H;
-} z80gb_8BitRegs;
+} lr35902_8BitRegs;
 #else
 typedef struct {
 	UINT8 A;
@@ -99,17 +99,17 @@ typedef struct {
 	UINT8 E;
 	UINT8 H;
 	UINT8 L;
-} z80gb_8BitRegs;
+} lr35902_8BitRegs;
 #endif
 
 typedef union {
-	z80gb_16BitRegs w;
-	z80gb_8BitRegs b;
-} z80gb_regs;
+	lr35902_16BitRegs w;
+	lr35902_8BitRegs b;
+} lr35902_regs;
 
 typedef int (*OpcodeEmulator) (void);
 
-static z80gb_regs Regs;
+static lr35902_regs Regs;
 
 #define IME     0x01
 #define HALTED	0x02
@@ -135,7 +135,7 @@ INLINE void mem_WriteWord (UINT32 address, UINT16 value)
 }
 
 /* Nr of cycles to run */
-static int z80gb_ICount;
+static int lr35902_ICount;
 
 static const int Cycles[256] =
 {
@@ -177,18 +177,18 @@ static const int CyclesCB[256] =
 	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8
 };
 
-static void z80gb_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static void lr35902_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	Regs.w.config = (const Z80GB_CONFIG *) config;
+	Regs.w.config = (const LR35902_CONFIG *) config;
 	Regs.w.irq_callback = irqcallback;
 }
 
-/*** Reset Z80 registers: *********************************/
-/*** This function can be used to reset the register    ***/
-/*** file before starting execution with z80gb_execute()***/
-/*** It sets the registers to their initial values.     ***/
-/**********************************************************/
-static void z80gb_reset(void)
+/*** Reset lr353902 registers: ******************************/
+/*** This function can be used to reset the register      ***/
+/*** file before starting execution with lr35902_execute()***/
+/*** It sets the registers to their initial values.       ***/
+/************************************************************/
+static void lr35902_reset(void)
 {
 	Regs.w.AF = 0x0000;
 	Regs.w.BC = 0x0000;
@@ -197,7 +197,7 @@ static void z80gb_reset(void)
 	Regs.w.SP = 0x0000;
 	Regs.w.PC = 0x0000;
 	Regs.w.timer_fired_func = NULL;
-	Regs.w.features = Z80GB_FEATURE_HALT_BUG;
+	Regs.w.features = LR35902_FEATURE_HALT_BUG;
 	if (Regs.w.config)
 	{
 		if ( Regs.w.config->regs ) {
@@ -222,7 +222,7 @@ static void z80gb_reset(void)
 	Regs.w.gb_speed = 1;
 }
 
-INLINE void z80gb_ProcessInterrupts (void)
+INLINE void lr35902_ProcessInterrupts (void)
 {
 	UINT8 irq = Regs.w.IE & Regs.w.IF;
 
@@ -233,15 +233,15 @@ INLINE void z80gb_ProcessInterrupts (void)
 	}
 
 	/*
-       logerror("Attempting to process Z80GB Interrupt IRQ $%02X\n", irq);
-       logerror("Attempting to process Z80GB Interrupt IE $%02X\n", Regs.w.IE);
-       logerror("Attempting to process Z80GB Interrupt IF $%02X\n", Regs.w.IF);
+       logerror("Attempting to process LR35902 Interrupt IRQ $%02X\n", irq);
+       logerror("Attempting to process LR35902 Interrupt IE $%02X\n", Regs.w.IE);
+       logerror("Attempting to process LR35902 Interrupt IF $%02X\n", Regs.w.IF);
     */
 	if (irq)
 	{
 		int irqline = 0;
 		/*
-           logerror("Z80GB Interrupt IRQ $%02X\n", irq);
+           logerror("LR35902 Interrupt IRQ $%02X\n", irq);
         */
 
 		for( ; irqline < 5; irqline++ )
@@ -253,7 +253,7 @@ INLINE void z80gb_ProcessInterrupts (void)
 					Regs.w.enable &= ~HALTED;
 					Regs.w.IF &= ~(1 << irqline);
 					Regs.w.PC++;
-					if ( Regs.w.features & Z80GB_FEATURE_HALT_BUG ) {
+					if ( Regs.w.features & LR35902_FEATURE_HALT_BUG ) {
 						if ( ! Regs.w.enable & IME ) {
 							/* Old cpu core (dmg/mgb/sgb) */
 							/* check if the HALT bug should be performed */
@@ -279,7 +279,7 @@ INLINE void z80gb_ProcessInterrupts (void)
 					Regs.w.SP -= 2;
 					mem_WriteWord (Regs.w.SP, Regs.w.PC);
 					Regs.w.PC = 0x40 + irqline * 8;
-					/*logerror("Z80GB Interrupt PC $%04X\n", Regs.w.PC );*/
+					/*logerror("LR35902 Interrupt PC $%04X\n", Regs.w.PC );*/
 					return;
 				}
 			}
@@ -287,13 +287,13 @@ INLINE void z80gb_ProcessInterrupts (void)
 	}
 }
 
-/**********************************************************/
-/*** Execute z80gb code for cycles cycles, return nr of ***/
-/*** cycles actually executed.                          ***/
-/**********************************************************/
-static int z80gb_execute (int cycles)
+/************************************************************/
+/*** Execute lr35902 code for cycles cycles, return nr of ***/
+/*** cycles actually executed.                            ***/
+/************************************************************/
+static int lr35902_execute (int cycles)
 {
-	z80gb_ICount = cycles;
+	lr35902_ICount = cycles;
 
 	do
 	{
@@ -305,7 +305,7 @@ static int z80gb_execute (int cycles)
 			}
 		} else {
 			/* Fetch and count cycles */
-			z80gb_ProcessInterrupts ();
+			lr35902_ProcessInterrupts ();
 			CALL_DEBUGGER(Regs.w.PC);
 			if ( Regs.w.enable & HALTED ) {
 				CYCLES_PASSED( Cycles[0x76] );
@@ -320,43 +320,43 @@ static int z80gb_execute (int cycles)
 			}
 		}
 		Regs.w.execution_state ^= 1;
-	} while (z80gb_ICount > 0);
+	} while (lr35902_ICount > 0);
 
-	return cycles - z80gb_ICount;
+	return cycles - lr35902_ICount;
 }
 
-static void z80gb_burn(int cycles)
+static void lr35902_burn(int cycles)
 {
     if( cycles > 0 )
     {
         /* NOP takes 4 cycles per instruction */
         int n = (cycles + 3) / 4;
-        z80gb_ICount -= 4 * n;
+        lr35902_ICount -= 4 * n;
     }
 }
 
 /****************************************************************************/
 /* Set all registers to given values                                        */
 /****************************************************************************/
-static void z80gb_set_context (void *src)
+static void lr35902_set_context (void *src)
 {
 	if( src )
-		Regs = *(z80gb_regs *)src;
+		Regs = *(lr35902_regs *)src;
 	change_pc(Regs.w.PC);
 }
 
 /****************************************************************************/
 /* Get all registers in given buffer                                        */
 /****************************************************************************/
-static void z80gb_get_context (void *dst)
+static void lr35902_get_context (void *dst)
 {
 	if( dst )
-		*(z80gb_regs *)dst = Regs;
+		*(lr35902_regs *)dst = Regs;
 }
 
 
 
-static void z80gb_set_irq_line (int irqline, int state)
+static void lr35902_set_irq_line (int irqline, int state)
 {
 	/*logerror("setting irq line 0x%02x state 0x%08x\n", irqline, state);*/
 	//if( Regs.w.irq_state == state )
@@ -367,24 +367,24 @@ static void z80gb_set_irq_line (int irqline, int state)
 	{
 
 		Regs.w.IF |= (0x01 << irqline);
-		/*logerror("Z80GB assert irq line %d ($%02X)\n", irqline, Regs.w.IF);*/
+		/*logerror("LR35902 assert irq line %d ($%02X)\n", irqline, Regs.w.IF);*/
 
 	}
 	else
 	{
 
 		Regs.w.IF &= ~(0x01 << irqline);
-		/*logerror("Z80GB clear irq line %d ($%02X)\n", irqline, Regs.w.IF);*/
+		/*logerror("LR35902 clear irq line %d ($%02X)\n", irqline, Regs.w.IF);*/
 
      }
 }
 
-/*static void z80gb_clear_pending_interrupts (void)
+/*static void lr35902_clear_pending_interrupts (void)
 {
     Regs.w.IF = 0;
 }*/
 
-static void z80gb_set_info(UINT32 state, cpuinfo *info)
+static void lr35902_set_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
@@ -393,24 +393,24 @@ static void z80gb_set_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_INT_INPUT_STATE + 1:
 	case CPUINFO_INT_INPUT_STATE + 2:
 	case CPUINFO_INT_INPUT_STATE + 3:
-	case CPUINFO_INT_INPUT_STATE + 4:				z80gb_set_irq_line(state-CPUINFO_INT_INPUT_STATE, info->i); break;
+	case CPUINFO_INT_INPUT_STATE + 4:			lr35902_set_irq_line(state-CPUINFO_INT_INPUT_STATE, info->i); break;
 
 	case CPUINFO_INT_SP:						Regs.w.SP = info->i;						break;
 	case CPUINFO_INT_PC:						Regs.w.PC = info->i; change_pc(Regs.w.PC);	break;
 
-	case CPUINFO_INT_REGISTER + Z80GB_PC:		Regs.w.PC = info->i; change_pc(Regs.w.PC);	break;
-	case CPUINFO_INT_REGISTER + Z80GB_SP:		Regs.w.SP = info->i;						break;
-	case CPUINFO_INT_REGISTER + Z80GB_AF:		Regs.w.AF = info->i;						break;
-	case CPUINFO_INT_REGISTER + Z80GB_BC:		Regs.w.BC = info->i;						break;
-	case CPUINFO_INT_REGISTER + Z80GB_DE:		Regs.w.DE = info->i;						break;
-	case CPUINFO_INT_REGISTER + Z80GB_HL:		Regs.w.HL = info->i;						break;
-	case CPUINFO_INT_REGISTER + Z80GB_IE:		Regs.w.IE = info->i; break;
-	case CPUINFO_INT_REGISTER + Z80GB_IF:		Regs.w.IF = info->i; break;
-	case CPUINFO_INT_REGISTER + Z80GB_SPEED:	Regs.w.gb_speed_change_pending = info->i & 0x01; break;
+	case CPUINFO_INT_REGISTER + LR35902_PC:		Regs.w.PC = info->i; change_pc(Regs.w.PC);	break;
+	case CPUINFO_INT_REGISTER + LR35902_SP:		Regs.w.SP = info->i;						break;
+	case CPUINFO_INT_REGISTER + LR35902_AF:		Regs.w.AF = info->i;						break;
+	case CPUINFO_INT_REGISTER + LR35902_BC:		Regs.w.BC = info->i;						break;
+	case CPUINFO_INT_REGISTER + LR35902_DE:		Regs.w.DE = info->i;						break;
+	case CPUINFO_INT_REGISTER + LR35902_HL:		Regs.w.HL = info->i;						break;
+	case CPUINFO_INT_REGISTER + LR35902_IE:		Regs.w.IE = info->i; break;
+	case CPUINFO_INT_REGISTER + LR35902_IF:		Regs.w.IF = info->i; break;
+	case CPUINFO_INT_REGISTER + LR35902_SPEED:	Regs.w.gb_speed_change_pending = info->i & 0x01; break;
 	}
 }
 
-void z80gb_get_info(UINT32 state, cpuinfo *info)
+void lr35902_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
@@ -446,33 +446,33 @@ void z80gb_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_INT_INPUT_STATE + 3:
 	case CPUINFO_INT_INPUT_STATE + 4:					info->i = Regs.w.IF & (1 << (state-CPUINFO_INT_INPUT_STATE)); break;
 
-	case CPUINFO_INT_REGISTER + Z80GB_PC:			info->i = Regs.w.PC;					break;
-	case CPUINFO_INT_REGISTER + Z80GB_SP:			info->i = Regs.w.SP;					break;
-	case CPUINFO_INT_REGISTER + Z80GB_AF:			info->i = Regs.w.AF;					break;
-	case CPUINFO_INT_REGISTER + Z80GB_BC:			info->i = Regs.w.BC;					break;
-	case CPUINFO_INT_REGISTER + Z80GB_DE:			info->i = Regs.w.DE;					break;
-	case CPUINFO_INT_REGISTER + Z80GB_HL:			info->i = Regs.w.HL;					break;
-	case CPUINFO_INT_REGISTER + Z80GB_IE:			info->i = Regs.w.IE;					break;
-	case CPUINFO_INT_REGISTER + Z80GB_IF:			info->i = Regs.w.IF;					break;
-	case CPUINFO_INT_REGISTER + Z80GB_SPEED:		info->i = 0x7E | ( ( Regs.w.gb_speed - 1 ) << 7 ) | Regs.w.gb_speed_change_pending; break;
+	case CPUINFO_INT_REGISTER + LR35902_PC:			info->i = Regs.w.PC;					break;
+	case CPUINFO_INT_REGISTER + LR35902_SP:			info->i = Regs.w.SP;					break;
+	case CPUINFO_INT_REGISTER + LR35902_AF:			info->i = Regs.w.AF;					break;
+	case CPUINFO_INT_REGISTER + LR35902_BC:			info->i = Regs.w.BC;					break;
+	case CPUINFO_INT_REGISTER + LR35902_DE:			info->i = Regs.w.DE;					break;
+	case CPUINFO_INT_REGISTER + LR35902_HL:			info->i = Regs.w.HL;					break;
+	case CPUINFO_INT_REGISTER + LR35902_IE:			info->i = Regs.w.IE;					break;
+	case CPUINFO_INT_REGISTER + LR35902_IF:			info->i = Regs.w.IF;					break;
+	case CPUINFO_INT_REGISTER + LR35902_SPEED:		info->i = 0x7E | ( ( Regs.w.gb_speed - 1 ) << 7 ) | Regs.w.gb_speed_change_pending; break;
 
 	/* --- the following bits of info are returned as pointers to data or functions --- */
-	case CPUINFO_PTR_SET_INFO:						info->setinfo = z80gb_set_info;			break;
-	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = z80gb_get_context;	break;
-	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = z80gb_set_context;	break;
-	case CPUINFO_PTR_INIT:							info->init = z80gb_init;				break;
-	case CPUINFO_PTR_RESET:							info->reset = z80gb_reset;				break;
-	case CPUINFO_PTR_EXECUTE:						info->execute = z80gb_execute;			break;
-	case CPUINFO_PTR_BURN:							info->burn = z80gb_burn;						break;
+	case CPUINFO_PTR_SET_INFO:						info->setinfo = lr35902_set_info;		break;
+	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = lr35902_get_context;	break;
+	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = lr35902_set_context;	break;
+	case CPUINFO_PTR_INIT:							info->init = lr35902_init;				break;
+	case CPUINFO_PTR_RESET:							info->reset = lr35902_reset;			break;
+	case CPUINFO_PTR_EXECUTE:						info->execute = lr35902_execute;		break;
+	case CPUINFO_PTR_BURN:							info->burn = lr35902_burn;				break;
 
 #ifdef ENABLE_DEBUGGER
-	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = z80gb_dasm;	break;
+	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = lr35902_dasm;		break;
 #endif
-	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &z80gb_ICount;			break;
+	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &lr35902_ICount;			break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case CPUINFO_STR_NAME: 							strcpy(info->s, "Z80GB"); break;
-	case CPUINFO_STR_CORE_FAMILY: 					strcpy(info->s, "Nintendo Z80"); break;
+	case CPUINFO_STR_NAME: 							strcpy(info->s, "LR35902"); break;
+	case CPUINFO_STR_CORE_FAMILY: 					strcpy(info->s, "Sharp LR35902"); break;
 	case CPUINFO_STR_CORE_VERSION: 					strcpy(info->s, "1.4"); break;
 	case CPUINFO_STR_CORE_FILE: 					strcpy(info->s, __FILE__); break;
 	case CPUINFO_STR_CORE_CREDITS: 					strcpy(info->s, "Copyright The MESS Team."); break;
@@ -489,14 +489,14 @@ void z80gb_get_info(UINT32 state, cpuinfo *info)
 			Regs.b.F & 0x01 ? '0':'.');
 		break;
 
-	case CPUINFO_STR_REGISTER + Z80GB_PC: sprintf(info->s, "PC:%04X", Regs.w.PC); break;
-	case CPUINFO_STR_REGISTER + Z80GB_SP: sprintf(info->s, "SP:%04X", Regs.w.SP); break;
-	case CPUINFO_STR_REGISTER + Z80GB_AF: sprintf(info->s, "AF:%04X", Regs.w.AF); break;
-	case CPUINFO_STR_REGISTER + Z80GB_BC: sprintf(info->s, "BC:%04X", Regs.w.BC); break;
-	case CPUINFO_STR_REGISTER + Z80GB_DE: sprintf(info->s, "DE:%04X", Regs.w.DE); break;
-	case CPUINFO_STR_REGISTER + Z80GB_HL: sprintf(info->s, "HL:%04X", Regs.w.HL); break;
-	case CPUINFO_STR_REGISTER + Z80GB_IRQ_STATE: sprintf(info->s, "IRQ:%X", Regs.w.enable & IME ); break;
-	case CPUINFO_STR_REGISTER + Z80GB_IE: sprintf(info->s, "IE:%02X", Regs.w.IE); break;
-	case CPUINFO_STR_REGISTER + Z80GB_IF: sprintf(info->s, "IF:%02X", Regs.w.IF); break;
+	case CPUINFO_STR_REGISTER + LR35902_PC: sprintf(info->s, "PC:%04X", Regs.w.PC); break;
+	case CPUINFO_STR_REGISTER + LR35902_SP: sprintf(info->s, "SP:%04X", Regs.w.SP); break;
+	case CPUINFO_STR_REGISTER + LR35902_AF: sprintf(info->s, "AF:%04X", Regs.w.AF); break;
+	case CPUINFO_STR_REGISTER + LR35902_BC: sprintf(info->s, "BC:%04X", Regs.w.BC); break;
+	case CPUINFO_STR_REGISTER + LR35902_DE: sprintf(info->s, "DE:%04X", Regs.w.DE); break;
+	case CPUINFO_STR_REGISTER + LR35902_HL: sprintf(info->s, "HL:%04X", Regs.w.HL); break;
+	case CPUINFO_STR_REGISTER + LR35902_IRQ_STATE: sprintf(info->s, "IRQ:%X", Regs.w.enable & IME ); break;
+	case CPUINFO_STR_REGISTER + LR35902_IE: sprintf(info->s, "IE:%02X", Regs.w.IE); break;
+	case CPUINFO_STR_REGISTER + LR35902_IF: sprintf(info->s, "IF:%02X", Regs.w.IF); break;
 	}
 }
