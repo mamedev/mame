@@ -17,6 +17,7 @@
 #include "mamecore.h"
 #include "devintrf.h"
 #include "timer.h"
+#include "render.h"
 
 
 /***************************************************************************
@@ -270,5 +271,11 @@ void video_mng_end_recording(running_machine *machine);
 void video_avi_begin_recording(running_machine *machine, const char *name);
 void video_avi_end_recording(running_machine *machine);
 void video_avi_add_sound(running_machine *machine, const INT16 *sound, int numsamples);
+
+
+/* ----- configuration helpers ----- */
+
+/* select a view for a given target */
+int video_get_view_for_target(running_machine *machine, render_target *target, const char *viewname, int targetindex, int numtargets);
 
 #endif	/* __VIDEO_H__ */

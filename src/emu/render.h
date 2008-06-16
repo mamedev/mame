@@ -12,7 +12,6 @@
 #ifndef __RENDER_H__
 #define __RENDER_H__
 
-#include "driver.h"
 #include "osdepend.h"
 
 #include <math.h>

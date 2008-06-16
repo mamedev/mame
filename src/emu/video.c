@@ -360,24 +360,7 @@ void video_init(running_machine *machine)
 	
 	/* otherwise, find the requested view and select it */
 	else
-	{
-		int viewindex;
-
-		/* scan for a match or partial match */
-		for (viewindex = 0; ; viewindex++)
-		{
-			const char *name = render_target_get_view_name(global.snap_target, viewindex);
-
-			/* stop scanning when we hit NULL */
-			if (name == NULL)
-				break;
-			if (mame_strnicmp(name, viewname, strlen(viewname)) == 0)
-			{
-				render_target_set_view(global.snap_target, viewindex);
-				break;
-			}
-		}
-	}
+		render_target_set_view(global.snap_target, video_get_view_for_target(machine, global.snap_target, viewname, 0, 1));
 	
 	/* extract snap resolution if present */
 	if (sscanf(options_get_string(mame_options(), OPTION_SNAPSIZE), "%dx%d", &global.snap_width, &global.snap_height) != 2)
@@ -2616,6 +2599,83 @@ void video_avi_add_sound(running_machine *machine, const INT16 *sound, int numsa
 
 		profiler_mark(PROFILER_END);
 	}
+}
+
+
+
+/***************************************************************************
+    CONFIGURATION HELPERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    video_get_view_for_target - select a view
+    for a given target
+-------------------------------------------------*/
+
+int video_get_view_for_target(running_machine *machine, render_target *target, const char *viewname, int targetindex, int numtargets)
+{
+	int viewindex = -1;
+
+	/* auto view just selects the nth view */
+	if (strcmp(viewname, "auto") != 0)
+	{
+		/* scan for a matching view name */
+		for (viewindex = 0; ; viewindex++)
+		{
+			const char *name = render_target_get_view_name(target, viewindex);
+
+			/* stop scanning when we hit NULL */
+			if (name == NULL)
+			{
+				viewindex = -1;
+				break;
+			}
+			if (mame_strnicmp(name, viewname, strlen(viewname)) == 0)
+				break;
+		}
+	}
+
+	/* if we don't have a match, default to the nth view */
+	if (viewindex == -1)
+	{
+		int scrcount = video_screen_count(machine->config);
+
+		/* if we have enough targets to be one per screen, assign in order */
+		if (numtargets >= scrcount)
+		{
+			/* find the first view with this screen and this screen only */
+			for (viewindex = 0; ; viewindex++)
+			{
+				UINT32 viewscreens = render_target_get_view_screens(target, viewindex);
+				if (viewscreens == (1 << targetindex))
+					break;
+				if (viewscreens == 0)
+				{
+					viewindex = -1;
+					break;
+				}
+			}
+		}
+
+		/* otherwise, find the first view that has all the screens */
+		if (viewindex == -1)
+		{
+			for (viewindex = 0; ; viewindex++)
+			{
+				UINT32 viewscreens = render_target_get_view_screens(target, viewindex);
+				if (viewscreens == (1 << scrcount) - 1)
+					break;
+				if (viewscreens == 0)
+					break;
+			}
+		}
+	}
+
+	/* make sure it's a valid view */
+	if (render_target_get_view_name(target, viewindex) == NULL)
+		viewindex = 0;
+	
+	return viewindex;
 }
 
 

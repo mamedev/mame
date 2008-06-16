@@ -487,8 +487,9 @@ Core state/playback options
 	Note that <viewname> does not need to be a perfect match; rather, it
 	will select the first view whose name matches all the characters
 	specified by <viewname>. For example, -snapview native will match the 
-	"Native (15:14)" view even though it is not a perfect match. The
-	default value is 'internal'.
+	"Native (15:14)" view even though it is not a perfect match. 
+	<viewname> can also be 'auto', which selects the first view with all
+	screens present. The default value is 'internal'.
 
 -mngwrite <filename>
 
