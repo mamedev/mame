@@ -2028,7 +2028,7 @@ static void execute_snap(int ref, int params, const char *param[])
 			return;
 		}
 
-		video_screen_save_snapshot(screen, fp);
+		video_screen_save_snapshot(screen->machine, screen, fp);
 		mame_fclose(fp);
 		debug_console_printf("Saved screen #%d snapshot as '%s'\n", scrnum, filename);
 	}

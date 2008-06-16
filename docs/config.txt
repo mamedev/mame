@@ -467,6 +467,29 @@ Core state/playback options
 	and names the snapshots under it starting with 0000 and increasing
 	from there.
 
+-snapsize <width>x<height> 
+
+	Hard-codes the size for snapshots and movie recording. By default,
+	MAME will create snapshots at the game's current resolution in raw
+	pixels, and will create movies at the game's starting resolution in
+	raw pixels. If you specify this option, then MAME will create both
+	snapshots and movies at the size specified, and will bilinear filter
+	the result. Note that this size does not automatically rotate if the 
+	game is vertically oriented. The default is 'auto'.
+
+-snapview <viewname> 
+
+	Specifies the view to use when rendering snapshots and movies. By
+	default, both use a special 'internal' view, which renders a separate
+	snapshot per screen or renders movies only of the first screen. By
+	specifying this option, you can override this default behavior and
+	select a single view that will apply to all snapshots and movies.
+	Note that <viewname> does not need to be a perfect match; rather, it
+	will select the first view whose name matches all the characters
+	specified by <viewname>. For example, -snapview native will match the 
+	"Native (15:14)" view even though it is not a perfect match. The
+	default value is 'internal'.
+
 -mngwrite <filename>
 
 	Writes each video frame to the given <filename> in MNG format,
