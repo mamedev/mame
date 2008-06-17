@@ -1520,10 +1520,10 @@ INPUT_PORTS_START( ssf2ghw )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 
-//  PORT_START_TAG("RESET")		/* Buttons on Genesis Console */
+//  PORT_START_TAG("RESET")     /* Buttons on Genesis Console */
 //  PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 
-//  PORT_START_TAG("REGION")	/* Buttons on Genesis Console */
+//  PORT_START_TAG("REGION")    /* Buttons on Genesis Console */
 //  /* Region setting for Console */
 //  PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 //  PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
@@ -1675,10 +1675,10 @@ INPUT_PORTS_START( aladbl )
 
 	PORT_START_TAG("IN0")		/* 3rd I/O port */
 
-//  PORT_START_TAG("RESET")		/* Buttons on Genesis Console */
+//  PORT_START_TAG("RESET")     /* Buttons on Genesis Console */
 //  PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 
-//  PORT_START_TAG("REGION")	/* Region setting for Console */
+//  PORT_START_TAG("REGION")    /* Region setting for Console */
 //  /* Region setting for Console */
 //  PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 //  PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )

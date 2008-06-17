@@ -835,7 +835,7 @@ static MACHINE_DRIVER_START( crystal )
 MACHINE_DRIVER_END
 
 /*
-	Top blade screen is 32 pixels wider
+    Top blade screen is 32 pixels wider
 */
 static MACHINE_DRIVER_START( topbladv )
 	MDRV_IMPORT_FROM(crystal)
@@ -971,8 +971,8 @@ static DRIVER_INIT(officeye)
 	Rom[WORD_XOR_LE(0x4B2E2/2)]=0x9001;	//PUSH R0
 
 /*
-	Rom[WORD_XOR_LE(0x18880/2)]=0x9001;	//PUSH R0
-	Rom[WORD_XOR_LE(0x18882/2)]=0x9200;	//PUSH SR
+    Rom[WORD_XOR_LE(0x18880/2)]=0x9001; //PUSH R0
+    Rom[WORD_XOR_LE(0x18882/2)]=0x9200; //PUSH SR
  */
 }
 

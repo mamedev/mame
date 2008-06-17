@@ -324,7 +324,7 @@ static READ16_HANDLER( misc_io_r )
 	static const char *portnames[] = { "SERVICE", "COINAGE" };
 
 	offset &= 0x1fff;
-	
+
 	switch (offset & (0x3000/2))
 	{
 		/* I/O chip */

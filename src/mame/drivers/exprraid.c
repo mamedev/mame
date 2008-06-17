@@ -289,12 +289,12 @@ static INTERRUPT_GEN( exprraid_interrupt )
 
 	if ((~input_port_read(machine, "IN2")) & 0xc0 )
 	{
-		if ( coin == 0 ) 
+		if ( coin == 0 )
 		{
 			coin = 1;
 			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 		}
-	} 
+	}
 	else
 		coin = 0;
 }

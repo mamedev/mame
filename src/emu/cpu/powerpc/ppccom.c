@@ -236,7 +236,7 @@ void ppccom_exit(powerpc_state *ppc)
 void ppccom_reset(powerpc_state *ppc)
 {
 	int tlbindex;
-	
+
 	/* initialize the OEA state */
 	if (ppc->cap & PPCCAP_OEA)
 	{
@@ -508,7 +508,7 @@ void ppccom_execute_tlbl(powerpc_state *ppc)
 	int isitlb = ppc->param1;
 	vtlb_entry flags = 0;
 	int entrynum;
-	
+
 	/* determine entry number; we use rand() for associativity */
 	entrynum = ((address >> 12) & 0x1f) | (mame_rand(Machine) & 0x20) | (isitlb ? 0x40 : 0);
 

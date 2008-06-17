@@ -688,7 +688,7 @@ static READ8_HANDLER( sysreg_r )
 {
 	UINT8 r = 0;
 	static const char *portnames[] = { "IN0", "IN1", "IN2" };
-	
+
 	switch (offset)
 	{
 		case 0:

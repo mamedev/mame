@@ -48,18 +48,18 @@ struct _vtlb_state
 ***************************************************************************/
 
 /*-------------------------------------------------
-    vtlb_alloc - allocate a new VTLB for the 
+    vtlb_alloc - allocate a new VTLB for the
     given CPU
 -------------------------------------------------*/
 
 vtlb_state *vtlb_alloc(int cpunum, int space, int fixed_entries, int dynamic_entries)
 {
 	vtlb_state *vtlb;
-	
+
 	/* allocate memory for the core structure */
 	vtlb = malloc_or_die(sizeof(*vtlb));
 	memset(vtlb, 0, sizeof(*vtlb));
-	
+
 	/* fill in CPU information */
 	vtlb->space = space;
 	vtlb->dynamic = dynamic_entries;
@@ -72,22 +72,22 @@ vtlb_state *vtlb_alloc(int cpunum, int space, int fixed_entries, int dynamic_ent
 	assert((1 << vtlb->pageshift) > VTLB_FLAGS_MASK);
 	assert(vtlb->translate != NULL);
 	assert(vtlb->addrwidth > vtlb->pageshift);
-	
+
 	/* allocate the entry array */
 	vtlb->live = malloc_or_die(sizeof(vtlb->live[0]) * (fixed_entries + dynamic_entries));
 	memset(vtlb->live, 0, sizeof(vtlb->live[0]) * (fixed_entries + dynamic_entries));
-	
+
 	/* allocate the lookup table */
 	vtlb->table = malloc_or_die(sizeof(vtlb->table[0]) << (vtlb->addrwidth - vtlb->pageshift));
 	memset(vtlb->table, 0, sizeof(vtlb->table[0]) << (vtlb->addrwidth - vtlb->pageshift));
-	
+
 	/* allocate the fixed page count array */
 	if (fixed_entries > 0)
 	{
 		vtlb->fixedpages = malloc_or_die(sizeof(vtlb->fixedpages[0]) * fixed_entries);
 		memset(vtlb->fixedpages, 0, sizeof(vtlb->fixedpages[0]) * fixed_entries);
 	}
-	
+
 	return vtlb;
 }
 
@@ -108,7 +108,7 @@ void vtlb_free(vtlb_state *vtlb)
 	if (vtlb->table != NULL)
 		free(vtlb->table);
 
-	/* and then the VTLB object itself */	
+	/* and then the VTLB object itself */
 	free(vtlb);
 }
 
@@ -119,7 +119,7 @@ void vtlb_free(vtlb_state *vtlb)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    vtlb_fill - rcalled by the CPU core in 
+    vtlb_fill - rcalled by the CPU core in
     response to an unmapped access
 -------------------------------------------------*/
 
@@ -133,8 +133,8 @@ int vtlb_fill(vtlb_state *vtlb, offs_t address, int intention)
 		printf("vtlb_fill: %08X(%X) ... ", address, intention);
 
 	/* should not be called here if the entry is in the table already */
-//	assert((entry & (1 << intention)) == 0);
-	
+//  assert((entry & (1 << intention)) == 0);
+
 	/* if we have no dynamic entries, we always fail */
 	if (vtlb->dynamic == 0)
 	{
@@ -142,7 +142,7 @@ int vtlb_fill(vtlb_state *vtlb, offs_t address, int intention)
 			printf("failed: no dynamic entries\n");
 		return FALSE;
 	}
-	
+
 	/* ask the CPU core to translate for us */
 	taddress = address;
 	if (!(*vtlb->translate)(vtlb->space, intention, &taddress))
@@ -151,19 +151,19 @@ int vtlb_fill(vtlb_state *vtlb, offs_t address, int intention)
 			printf("failed: no translation\n");
 		return FALSE;
 	}
-	
+
 	/* if this is the first successful translation for this address, allocate a new entry */
 	if ((entry & VTLB_FLAGS_MASK) == 0)
 	{
 		int liveindex = vtlb->dynindex++ % vtlb->dynamic;
-		
+
 		/* if an entry already exists at this index, free it */
 		if (vtlb->live[liveindex] != 0)
 			vtlb->table[vtlb->live[liveindex] - 1] = 0;
-		
+
 		/* claim this new entry */
 		vtlb->live[liveindex] = tableindex + 1;
-		
+
 		/* form a new blank entry */
 		entry = (taddress >> vtlb->pageshift) << vtlb->pageshift;
 		entry |= VTLB_FLAG_VALID;
@@ -171,7 +171,7 @@ int vtlb_fill(vtlb_state *vtlb, offs_t address, int intention)
 		if (PRINTF_TLB)
 			printf("success (%08X), new entry\n", taddress);
 	}
-	
+
 	/* otherwise, ensure that different intentions do not produce different addresses */
 	else
 	{
@@ -181,7 +181,7 @@ int vtlb_fill(vtlb_state *vtlb, offs_t address, int intention)
 		if (PRINTF_TLB)
 			printf("success (%08X), existing entry\n", taddress);
 	}
-	
+
 	/* add the intention to the list of valid intentions and store */
 	entry |= 1 << (intention & (TRANSLATE_TYPE_MASK | TRANSLATE_USER_MASK));
 	vtlb->table[tableindex] = entry;
@@ -201,10 +201,10 @@ void vtlb_load(vtlb_state *vtlb, int entrynum, int numpages, offs_t address, vtl
 
 	/* must be in range */
 	assert(entrynum >= 0 && entrynum < vtlb->fixed);
-	
+
 	if (PRINTF_TLB)
 		printf("vtlb_load %d for %d pages at %08X == %08X\n", entrynum, numpages, address, value);
-	
+
 	/* if an entry already exists at this index, free it */
 	if (vtlb->live[liveindex] != 0)
 	{
@@ -212,7 +212,7 @@ void vtlb_load(vtlb_state *vtlb, int entrynum, int numpages, offs_t address, vtl
 		for (pagenum = 0; pagenum < pagecount; pagenum++)
 			vtlb->table[vtlb->live[liveindex] - 1 + pagenum] = 0;
 	}
-	
+
 	/* claim this new entry */
 	vtlb->live[liveindex] = tableindex + 1;
 
@@ -229,7 +229,7 @@ void vtlb_load(vtlb_state *vtlb, int entrynum, int numpages, offs_t address, vtl
 ***************************************************************************/
 
 /*-------------------------------------------------
-    vtlb_flush_dynamic - flush all knowledge 
+    vtlb_flush_dynamic - flush all knowledge
     from the dynamic part of the VTLB
 -------------------------------------------------*/
 
@@ -239,7 +239,7 @@ void vtlb_flush_dynamic(vtlb_state *vtlb)
 
 	if (PRINTF_TLB)
 		printf("vtlb_flush_dynamic\n");
-	
+
 	/* loop over live entries and release them from the table */
 	for (liveindex = 0; liveindex < vtlb->dynamic; liveindex++)
 		if (vtlb->live[liveindex] != 0)
@@ -252,17 +252,17 @@ void vtlb_flush_dynamic(vtlb_state *vtlb)
 
 
 /*-------------------------------------------------
-    vtlb_flush_address - flush knowledge of a 
+    vtlb_flush_address - flush knowledge of a
     particular address from the VTLB
 -------------------------------------------------*/
 
 void vtlb_flush_address(vtlb_state *vtlb, offs_t address)
 {
 	offs_t tableindex = address >> vtlb->pageshift;
-	
+
 	if (PRINTF_TLB)
 		printf("vtlb_flush_address %08X\n", address);
-	
+
 	/* free the entry in the table; for speed, we leave the entry in the live array */
 	vtlb->table[tableindex] = 0;
 }
@@ -274,7 +274,7 @@ void vtlb_flush_address(vtlb_state *vtlb, offs_t address)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    vtlb_table - return a pointer to the base of 
+    vtlb_table - return a pointer to the base of
     the linear VTLB lookup table
 -------------------------------------------------*/
 

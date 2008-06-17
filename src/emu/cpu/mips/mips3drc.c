@@ -1586,7 +1586,7 @@ static void generate_sequence_instruction(drcuml_block *block, compiler_state *c
 	if ((desc->flags & OPFLAG_VALIDATE_TLB) && (desc->pc < 0x80000000 || desc->pc >= 0xc0000000))
 	{
 		const vtlb_entry *tlbtable = vtlb_table(mips3->vtlb);
-		
+
 		/* if we currently have a valid TLB read entry, we just verify */
 		if (tlbtable[desc->pc >> 12] & VTLB_FETCH_ALLOWED)
 		{

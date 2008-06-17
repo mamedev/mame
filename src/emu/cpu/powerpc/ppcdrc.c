@@ -1451,7 +1451,7 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 	int tlbmiss = 0;
 	int label = 1;
 	int ramnum;
-	
+
 	if (mode & MODE_USER)
 		translate_type = iswrite ? TRANSLATE_WRITE_USER : TRANSLATE_READ_USER;
 	else
@@ -2166,7 +2166,7 @@ static void generate_sequence_instruction(drcuml_block *block, compiler_state *c
 	if ((desc->flags & OPFLAG_VALIDATE_TLB) && (ppc->impstate->mode & MODE_DATA_TRANSLATION))
 	{
 		const vtlb_entry *tlbtable = vtlb_table(ppc->vtlb);
-		
+
 		/* if we currently have a valid TLB read entry, we just verify */
 		if (tlbtable[desc->pc >> 12] != 0)
 		{

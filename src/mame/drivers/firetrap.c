@@ -544,9 +544,9 @@ static INTERRUPT_GEN( firetrap )
 	static int coin_command_pending=0;
 
 	/* Check for coin IRQ */
-	if (cpu_getiloops()) 
+	if (cpu_getiloops())
 	{
-		if ((input_port_read(machine, "COIN") & 0x7) != 0x7 && !latch) 
+		if ((input_port_read(machine, "COIN") & 0x7) != 0x7 && !latch)
 		{
 			coin_command_pending = ~input_port_read(machine, "COIN");
 			latch=1;

@@ -89,7 +89,7 @@ extern VIDEO_UPDATE( funkybee );
 static READ8_HANDLER( funkybee_input_port_0_r )
 {
 	watchdog_reset_r(machine, 0);
-	return input_port_read(machine, "IN0"); 
+	return input_port_read(machine, "IN0");
 }
 
 static WRITE8_HANDLER( funkybee_coin_counter_w )

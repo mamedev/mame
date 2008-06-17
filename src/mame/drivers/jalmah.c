@@ -320,7 +320,7 @@ static void second_mcu_run(running_machine *machine)
 		MCU_READ("KEY1", 0x0002, 0x200/2, 0x13);		/*CHI*/
 		MCU_READ("KEY0", 0x0004, 0x200/2, 0x14);		/*START1*/
 
-//      MCU_READ("KEY0", 0x0004, 0x7b8/2, 0x03);		/*START1(correct?)  */
+//      MCU_READ("KEY0", 0x0004, 0x7b8/2, 0x03);        /*START1(correct?)  */
 	}
 	jm_regs[0x20c/2] = mame_rand(machine) & 0xffff; //kakumei2
 

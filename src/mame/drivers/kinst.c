@@ -331,7 +331,7 @@ static READ32_HANDLER( kinst_control_r )
 {
 	UINT32 result;
 	static const char *portnames[] = { "P1", "P2", "IN0", "IN1", "DSW" };
-	
+
 	/* apply shuffling */
 	offset = control_map[offset / 2];
 	result = kinst_control[offset];

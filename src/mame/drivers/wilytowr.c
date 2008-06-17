@@ -15,13 +15,13 @@ Tomasz Slanina 2008.06.14:
 - Addedd sound emulation - atomboy and fghtbskt req different interrupt (T1)
   timing than wilytowr, otherwise music/fx tempo is too fast. Maybe both
   tmings are wrong - must be verified on real pcb.
-- Extra space in atomboy 2764 eproms is filled with garbage z80 code 
+- Extra space in atomboy 2764 eproms is filled with garbage z80 code
   (taken from one of code roms, but from different offset)
 - Fghtbskt has one AY, but every frame writes 0 to 2nd AY regs - probably
-  leftover from Wily Tower sound driver/code 
+  leftover from Wily Tower sound driver/code
 - I'm not sure about sound_status write - maybe it's something else or
   different data (p1?) is used as status
-  
+
 TODO:
 - Sprite positioning is wacky. The electric 'bands' that go along the pipes
   are drawn 2 pixels off in x/y directions. If you fix that, then the player
@@ -236,7 +236,7 @@ static WRITE8_HANDLER( snd_irq_w )
 static WRITE8_HANDLER( snddata_w )
 {
 	int num_ays = (sndti_exists(SOUND_AY8910, 1)) ? 2 : 1;
-	
+
 	if ((p2 & 0xf0) == 0xe0)
 		AY8910_control_port_0_w(machine,0,offset);
 	else if ((p2 & 0xf0) == 0xa0)
@@ -665,7 +665,7 @@ ROM_START( wilytowr )
 
 	ROM_REGION( 0x2000, REGION_USER1, 0 )
 	ROM_LOAD( "wt_a-6d.bin",  0x0000, 0x1000, CRC(a5dde29b) SHA1(8f7545d2022da7c98d47112179dce717f6c3c5e2) )
-	
+
 
 	ROM_REGION( 0x0320, REGION_PROMS, 0 )
 	ROM_LOAD( "wt_a-5s-.bpr", 0x0000, 0x0100, CRC(041950e7) SHA1(8276068bec3f4c5013c773033fca3cd3ed9e82ef) )	/* red */
@@ -704,7 +704,7 @@ ROM_START( atomboy )
 	ROM_LOAD( "wt_a-3p-b.bin",  0x8000, 0x2000, CRC(3018b840) SHA1(77df9d4f1c8d76d30c435d03d51ef9e7509fab9c) )
 	ROM_LOAD( "wt_a-3s-b.bin",  0xa000, 0x2000, CRC(05a251d4) SHA1(1cd9102871507ab988d5fe799024d63b93807448) )
 
-	ROM_REGION( 0x2000, REGION_USER1, 0 )	
+	ROM_REGION( 0x2000, REGION_USER1, 0 )
 	ROM_LOAD( "wt_a-6d.bin",  0x0000, 0x1000, CRC(a5dde29b) SHA1(8f7545d2022da7c98d47112179dce717f6c3c5e2) )
 
 	ROM_REGION( 0x0320, REGION_PROMS, 0 )
@@ -745,7 +745,7 @@ ROM_START( atomboya )
 	ROM_LOAD( "wt_a-3p.bin",  0x4000, 0x1000, CRC(7299f362) SHA1(5ba309d789df8432c08d67e4f9e8bf6c447fc425) )
 	ROM_LOAD( "wt_a-3s.bin",  0x5000, 0x1000, CRC(9b37d50d) SHA1(a08d4a7654b815cb652be66dbaa097011327f5d5) )
 
-	ROM_REGION( 0x1000, REGION_USER1, 0 )	
+	ROM_REGION( 0x1000, REGION_USER1, 0 )
 	ROM_LOAD( "wt_a-6d.bin",  0x0000, 0x1000, CRC(a5dde29b) SHA1(8f7545d2022da7c98d47112179dce717f6c3c5e2) )
 
 	ROM_REGION( 0x0320, REGION_PROMS, 0 )
@@ -765,7 +765,7 @@ ROM_START( fghtbskt )
 
 	ROM_REGION( 0x1000, REGION_CPU2, 0 )	/* 8039 */
 	ROM_LOAD( "fb07.0b",      0x0000, 0x1000, CRC(50432dbd) SHA1(35a2218ed243bde47dbe06b5a11a65502ba734ea) )
-	
+
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "fb08.12f",     0x0000, 0x1000, CRC(271cd7b8) SHA1(00cfeb6ba429cf6cc59d6542dea8de2ca79155ed) )
 	ROM_FILL(				  0x1000, 0x1000, 0 )
@@ -789,7 +789,7 @@ ROM_START( fghtbskt )
 	ROM_LOAD( "fb03.40a",     0x4000, 0x2000, CRC(c71269ed) SHA1(71cc6f43877b28d50beb744587c189dabbbaa067) )
 	ROM_LOAD( "fb04.39a",     0x6000, 0x2000, CRC(02ddc42d) SHA1(9d40967071f674592c174b5a5470db56a5f99adf) )
 	ROM_LOAD( "fb05.38a",     0x8000, 0x2000, CRC(72ea6b49) SHA1(e081a1cad5abf373a2489169b5c86ee63dcf5823) )
-	
+
 	ROM_REGION( 0x2000, REGION_USER1, 0 )
 	ROM_LOAD( "fb06.12a",     0x0000, 0x2000, CRC(bea3df99) SHA1(18b795f8626b22f6a1620e04c23f4967c3122c89) )
 
@@ -797,8 +797,8 @@ ROM_START( fghtbskt )
 	ROM_LOAD( "fb_r.9e",      0x0000, 0x0100, CRC(c5cdc8ba) SHA1(3fcef3ebe0dda72dfa35e042ff611758c345d749) )
 	ROM_LOAD( "fb_g.10e",     0x0100, 0x0100, CRC(1460c936) SHA1(f99a544c83931de098a6cfac391f63ae43f5cdd0) )
 	ROM_LOAD( "fb_b.11e",     0x0200, 0x0100, CRC(fca5bf0e) SHA1(5846f43aa2906cac58e300fdab197b99f896e3ef) )
-	
-	
+
+
 ROM_END
 
 static DRIVER_INIT( wilytowr )

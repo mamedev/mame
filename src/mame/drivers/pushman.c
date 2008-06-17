@@ -15,7 +15,7 @@
     The hardware is actually very similar to F1-Dream and Tiger Road but
     with a 68705 for protection.
 
-	There is a Top Tronic licensed version currently not dumped
+    There is a Top Tronic licensed version currently not dumped
 
  **************************************************************************
 

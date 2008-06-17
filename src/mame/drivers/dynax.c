@@ -551,8 +551,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hnoridur_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE	( dynax_blitter_rev2_w		)	// Blitter
-//  AM_RANGE( 0x10, 0x10 ) AM_WRITE ( SMH_NOP					)   // CRT Controller
-//  AM_RANGE( 0x11, 0x11 ) AM_WRITE ( SMH_NOP					)   // CRT Controller
+//  AM_RANGE( 0x10, 0x10 ) AM_WRITE ( SMH_NOP                   )   // CRT Controller
+//  AM_RANGE( 0x11, 0x11 ) AM_WRITE ( SMH_NOP                   )   // CRT Controller
 	AM_RANGE( 0x20, 0x20 ) AM_WRITE	( hanamai_keyboard_w		)	// keyboard row select
 	AM_RANGE( 0x21, 0x21 ) AM_READ_PORT	( "IN0"					)	// Coins
 	AM_RANGE( 0x22, 0x22 ) AM_READ	( hanamai_keyboard_1_r		)	// P2
@@ -756,8 +756,8 @@ static ADDRESS_MAP_START( sprtmtch_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE		( dynax_blitter_rev2_w		)	// Blitter
 	AM_RANGE( 0x10, 0x10 ) AM_READWRITE	( YM2203_status_port_0_r, YM2203_control_port_0_w	)	// YM2203
 	AM_RANGE( 0x11, 0x11 ) AM_READWRITE	( YM2203_read_port_0_r,   YM2203_write_port_0_w		)	// 2 x DSW
-//  AM_RANGE( 0x12, 0x12 ) AM_WRITE     ( SMH_NOP					)   // CRT Controller
-//  AM_RANGE( 0x13, 0x13 ) AM_WRITE     ( SMH_NOP					)   // CRT Controller
+//  AM_RANGE( 0x12, 0x12 ) AM_WRITE     ( SMH_NOP                   )   // CRT Controller
+//  AM_RANGE( 0x13, 0x13 ) AM_WRITE     ( SMH_NOP                   )   // CRT Controller
 	AM_RANGE( 0x20, 0x20 ) AM_READ_PORT	( "P1"						)	// P1
 	AM_RANGE( 0x21, 0x21 ) AM_READ_PORT	( "P2"						)	// P2
 	AM_RANGE( 0x22, 0x22 ) AM_READ_PORT	( "IN0"						)	// Coins
@@ -793,8 +793,8 @@ static ADDRESS_MAP_START( mjfriday_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x15, 0x15 ) AM_WRITE	( dynax_coincounter_1_w		)	//
 	AM_RANGE( 0x16, 0x17 ) AM_WRITE	( mjdialq2_layer_enable_w	)	// Layers Enable
 	AM_RANGE( 0x41, 0x47 ) AM_WRITE	( dynax_blitter_rev2_w		)	// Blitter
-//  AM_RANGE( 0x50, 0x50 ) AM_WRITE ( SMH_NOP					)   // CRT Controller
-//  AM_RANGE( 0x51, 0x51 ) AM_WRITE ( SMH_NOP					)   // CRT Controller
+//  AM_RANGE( 0x50, 0x50 ) AM_WRITE ( SMH_NOP                   )   // CRT Controller
+//  AM_RANGE( 0x51, 0x51 ) AM_WRITE ( SMH_NOP                   )   // CRT Controller
 	AM_RANGE( 0x60, 0x60 ) AM_WRITE	( hanamai_keyboard_w		)	// keyboard row select
 	AM_RANGE( 0x61, 0x61 ) AM_READ_PORT	( "IN0"					)	// Coins
 	AM_RANGE( 0x62, 0x62 ) AM_READ	( hanamai_keyboard_1_r		)	// P2
@@ -803,7 +803,7 @@ static ADDRESS_MAP_START( mjfriday_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x67, 0x67 ) AM_READ_PORT	( "DSW1"				)	// DSW
 	AM_RANGE( 0x70, 0x70 ) AM_WRITE	( YM2413_register_port_0_w	)	// YM2413
 	AM_RANGE( 0x71, 0x71 ) AM_WRITE	( YM2413_data_port_0_w		)	//
-//  AM_RANGE( 0x80, 0x80 ) AM_WRITE ( SMH_NOP					)   // IRQ ack?
+//  AM_RANGE( 0x80, 0x80 ) AM_WRITE ( SMH_NOP                   )   // IRQ ack?
 ADDRESS_MAP_END
 
 
@@ -822,7 +822,7 @@ static ADDRESS_MAP_START( nanajign_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x14, 0x14 ) AM_READ_PORT	( "DSW0"				)	// DSW1
 	AM_RANGE( 0x15, 0x15 ) AM_READ_PORT	( "DSW1"				)	// DSW2
 	AM_RANGE( 0x16, 0x16 ) AM_READ_PORT	( "DSW2"				)	// DSW3
-//  AM_RANGE( 0x20, 0x21 ) AM_WRITE ( SMH_NOP					)   // CRT Controller
+//  AM_RANGE( 0x20, 0x21 ) AM_WRITE ( SMH_NOP                   )   // CRT Controller
 	AM_RANGE( 0x31, 0x37 ) AM_WRITE	( dynax_blitter_rev2_w		)	// Blitter
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE	( dynax_coincounter_0_w		)	// Coin Counter
 	AM_RANGE( 0x50, 0x50 ) AM_WRITE	( dynax_flipscreen_w		)	// Flip Screen
@@ -967,7 +967,7 @@ static READ8_HANDLER( mjelctrn_dsw_r )
 {
 	int dsw = (keyb & 0xc0) >> 6;
 	static const char *dswnames[] = { "DSW2", "DSW1", "DSW3", "DSW4" };
-	
+
 	return input_port_read(machine, dswnames[dsw]);
 }
 
@@ -1200,7 +1200,7 @@ static WRITE8_HANDLER( tenkai_ip_w )
 static READ8_HANDLER( tenkai_ip_r )
 {
 	static const char *keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
-//	static const char *keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
+//  static const char *keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
 
 	switch (offset)
 	{
@@ -3156,7 +3156,7 @@ static INPUT_PORTS_START( neruton )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN	)	// 18A
 
 	PORT_INCLUDE( MAHJONG_KEYS )
-	
+
 	/* 2008-06 FP: the following are needed to make happy the read handlers shared with mjelctrn*/
 	PORT_START_TAG("DSW3")
 	PORT_START_TAG("DSW4")

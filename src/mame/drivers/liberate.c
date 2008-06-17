@@ -499,12 +499,12 @@ static INTERRUPT_GEN( deco16_interrupt )
 {
 	static int latch = 0;
 	int p = ~input_port_read(machine, "IN3");
-	if ((p & 0x43) && !latch) 
+	if ((p & 0x43) && !latch)
 	{
 		cpunum_set_input_line(machine, 0, DECO16_IRQ_LINE, ASSERT_LINE);
 		latch = 1;
-	} 
-	else 
+	}
+	else
 	{
 		if (!(p & 0x43))
 			latch=0;

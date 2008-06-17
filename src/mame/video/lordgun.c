@@ -192,7 +192,7 @@ static const char *gunnames[] = { "LIGHT0_X", "LIGHT1_X", "LIGHT0_Y", "LIGHT1_Y"
 static void lorddgun_calc_gun_scr(running_machine *machine, int i)
 {
 	int x = input_port_read(machine, gunnames[i]) - 0x3c;
-	
+
 	if ( (x < 0) || (x > sizeof(lordgun_gun_x_table)/sizeof(lordgun_gun_x_table[0])) )
 		x = 0;
 

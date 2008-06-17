@@ -113,7 +113,7 @@ void mips3com_exit(mips3_state *mips)
 void mips3com_reset(mips3_state *mips)
 {
 	int tlbindex;
-	
+
 	/* initialize the state */
 	mips->pc = 0xbfc00000;
 	mips->cpr[0][COP0_Status] = SR_BEV | SR_ERL;
@@ -789,7 +789,7 @@ static void tlb_map_entry(mips3_state *mips, int tlbindex)
 	mips3_tlb_entry *entry = &mips->tlb[tlbindex];
 	UINT32 count, vpn;
 	int which;
-	
+
 	/* the ASID doesn't match the current ASID, and if the page isn't global, unmap it from the TLB */
 	if (!tlb_entry_matches_asid(entry, current_asid) && !tlb_entry_is_global(entry))
 	{
@@ -817,16 +817,16 @@ static void tlb_map_entry(mips3_state *mips, int tlbindex)
 		UINT64 lo = entry->entry_lo[which];
 		UINT32 pfn = (lo >> 6) & 0x00ffffff;
 		UINT32 flags = 0;
-		
+
 		/* valid? */
 		if ((lo & 2) != 0)
 		{
 			flags |= VTLB_FLAG_VALID | VTLB_READ_ALLOWED | VTLB_FETCH_ALLOWED;
-			
+
 			/* writable? */
 			if ((lo & 4) != 0)
 				flags |= VTLB_WRITE_ALLOWED;
-			
+
 			/* mirror the flags for user mode if the VPN is in user space */
 			if (effvpn < (0x80000000 >> MIPS3_MIN_PAGE_SHIFT))
 				flags |= (flags << 4) & (VTLB_USER_READ_ALLOWED | VTLB_USER_WRITE_ALLOWED | VTLB_USER_FETCH_ALLOWED);

@@ -850,7 +850,7 @@ static void set_starting_view(running_machine *machine, int index, win_window_in
 	// choose non-auto over auto
 	if (strcmp(view, "auto") == 0 && strcmp(defview, "auto") != 0)
 		view = defview;
-	
+
 	// query the video system to help us pick a view
 	viewindex = video_get_view_for_target(machine, window->target, view, index, video_config.numscreens);
 

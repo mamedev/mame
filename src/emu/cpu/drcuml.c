@@ -1960,7 +1960,7 @@ static const bevalidate_test bevalidate_test_list[] =
 	TEST_ENTRY_3F(SUBB, 8, 0x8123456789abcdef, 0x0000000000000000, 0x7edcba9876543210, DRCUML_FLAG_C, DRCUML_FLAG_C | DRCUML_FLAG_S)
 	TEST_ENTRY_3F(SUBB, 8, 0x123456789abcdef0, 0x123456789abcdef0, 0xffffffffffffffff, DRCUML_FLAG_C, DRCUML_FLAG_C)
 	TEST_ENTRY_3F(SUBB, 8, 0x0000000000000000, 0x123456789abcdef0, 0x123456789abcdeef, DRCUML_FLAG_C, DRCUML_FLAG_Z)
-	
+
 	TEST_ENTRY_2(CMP, 4, 0x7fffffff, 0x6dcba987, 0)
 	TEST_ENTRY_2(CMP, 4, 0x80000000, 0x6dcba988, DRCUML_FLAG_V)
 	TEST_ENTRY_2(CMP, 4, 0xffffffff, 0x6dcba987, DRCUML_FLAG_S)
@@ -1978,7 +1978,7 @@ static const bevalidate_test bevalidate_test_list[] =
 	TEST_ENTRY_4(MULU, 4, 0x00000000, 0x00000000, 0x11111111, 0x00000000, DRCUML_FLAG_Z)
 	TEST_ENTRY_4(MULU, 4, 0xea61d951, 0x37c048d0, 0x77777777, 0x77777777, DRCUML_FLAG_V)
 	TEST_ENTRY_4(MULU, 4, 0x32323233, 0xcdcdcdcc, 0xcdcdcdcd, 0xffffffff, DRCUML_FLAG_V | DRCUML_FLAG_S)
-	
+
 	TEST_ENTRY_4(MULU, 8, 0x7777777777777777, 0x0000000000000000, 0x1111111111111111, 0x0000000000000007, 0)
 	TEST_ENTRY_4(MULU, 8, 0xffffffffffffffff, 0x0000000000000000, 0x1111111111111111, 0x000000000000000f, 0)
 	TEST_ENTRY_4(MULU, 8, 0x0000000000000000, 0x0000000000000000, 0x1111111111111111, 0x0000000000000000, DRCUML_FLAG_Z)
@@ -1990,7 +1990,7 @@ static const bevalidate_test bevalidate_test_list[] =
 	TEST_ENTRY_4(MULS, 4, 0x00000000, 0x00000000, 0x11111111, 0x00000000, DRCUML_FLAG_Z)
 	TEST_ENTRY_4(MULS, 4, 0x9e26af38, 0xc83fb72e, 0x77777777, 0x88888888, DRCUML_FLAG_V | DRCUML_FLAG_S)
 	TEST_ENTRY_4(MULS, 4, 0x32323233, 0x00000000, 0xcdcdcdcd, 0xffffffff, 0)
-	
+
 	TEST_ENTRY_4(MULS, 8, 0x7777777777777777, 0x0000000000000000, 0x1111111111111111, 0x0000000000000007, 0)
 	TEST_ENTRY_4(MULS, 8, 0xffffffffffffffff, 0x0000000000000000, 0x1111111111111111, 0x000000000000000f, DRCUML_FLAG_V)
 	TEST_ENTRY_4(MULS, 8, 0x0000000000000000, 0x0000000000000000, 0x1111111111111111, 0x0000000000000000, DRCUML_FLAG_Z)
@@ -2125,7 +2125,7 @@ static void bevalidate_iterate_over_params(drcuml_state *drcuml, drcuml_codehand
 					for (pscannum = 0; pscannum < pnum; pscannum++)
 						if ((opinfo->param[pscannum].output & PIO_IN) && ptype == paramlist[pscannum].type && pindex == paramlist[pscannum].value)
 							skip = TRUE;
-				
+
 				/* can't duplicate multiple dest parameters */
 				if (opinfo->param[pnum].output & PIO_OUT)
 

@@ -71,10 +71,10 @@ static READ8_HANDLER(vram_r)
 static READ8_HANDLER(input_r)
 {
 	if(inputcnt<0)
-	{		
-		return 0;	
+	{
+		return 0;
 	}
-	
+
 	if(!inputcnt)
 	{
 		int key=input_port_read(machine, "IN1");
@@ -88,17 +88,17 @@ static READ8_HANDLER(input_r)
 		inputval=inputTab[keyval]&0x1f;
 		inputlen=inputTab[keyval]>>5;
 	}
-	
+
 	if(inputlen==++inputcnt) //return expected value
 	{
 		return inputval^0xff;
 	}
-	
+
 	if(inputcnt>4) //end of cycle
 	{
 		inputcnt=-1;
 	}
-	
+
 	return 0xff; //return 0^0xff
 }
 

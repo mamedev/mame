@@ -353,15 +353,15 @@ void video_init(running_machine *machine)
 	else
 		global.snap_target = render_target_alloc(NULL, RENDER_CREATE_HIDDEN);
 	assert(global.snap_target != NULL);
-	
+
 	/* if we are using the native layout, turn off all accoutrements */
 	if (global.snap_native)
 		render_target_set_layer_config(global.snap_target, 0);
-	
+
 	/* otherwise, find the requested view and select it */
 	else
 		render_target_set_view(global.snap_target, video_get_view_for_target(machine, global.snap_target, viewname, 0, 1));
-	
+
 	/* extract snap resolution if present */
 	if (sscanf(options_get_string(mame_options(), OPTION_SNAPSIZE), "%dx%d", &global.snap_width, &global.snap_height) != 2)
 		global.snap_width = global.snap_height = 0;
@@ -2173,7 +2173,7 @@ void video_save_active_screen_snapshots(running_machine *machine)
 	/* validate */
 	assert(machine != NULL);
 	assert(machine->config != NULL);
-	
+
 	/* if we're native, then write one snapshot per visible screen */
 	if (global.snap_native)
 	{
@@ -2189,7 +2189,7 @@ void video_save_active_screen_snapshots(running_machine *machine)
 				}
 			}
 	}
-	
+
 	/* otherwise, just write a single snapshot */
 	else
 	{
@@ -2501,7 +2501,7 @@ void video_avi_begin_recording(running_machine *machine, const char *name)
 		filerr = mame_fopen(SEARCHPATH_MOVIE, name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &tempfile);
 	else
 		filerr = mame_fopen_next(machine, SEARCHPATH_MOVIE, "avi", &tempfile);
-	
+
 	/* reset our tracking */
 	global.movie_frame = 0;
 	global.movie_next_frame_time = timer_get_time();
@@ -2551,7 +2551,7 @@ static void video_avi_record_frame(running_machine *machine)
 		avi_error avierr;
 
 		profiler_mark(PROFILER_MOVIE_REC);
-		
+
 		/* create the bitmap */
 		create_snapshot_bitmap(NULL);
 
@@ -2674,7 +2674,7 @@ int video_get_view_for_target(running_machine *machine, render_target *target, c
 	/* make sure it's a valid view */
 	if (render_target_get_view_name(target, viewindex) == NULL)
 		viewindex = 0;
-	
+
 	return viewindex;
 }
 

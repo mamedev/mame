@@ -842,17 +842,17 @@ static WRITE16_HANDLER( twrldc94_prot_reg_w )
 					case 0x53: PC(0x0000a4c); break; // boot -> main loop
 
 					/*
-						68 and 62 could be sprite or sound changes, or ?
-						68(),61()
-						if( !carry )
-						{
-							68(),65()
-						}
-						else
-						{
-							62(),72()
-						}
-					*/
+                        68 and 62 could be sprite or sound changes, or ?
+                        68(),61()
+                        if( !carry )
+                        {
+                            68(),65()
+                        }
+                        else
+                        {
+                            62(),72()
+                        }
+                    */
 					case 0x68: PC(NULL_SUB); break; // time up doesn't block long enough for pk shootout
 					case 0x61: PC(0x0003AF4); break; // after time up, pk shootout???
 					case 0x65: PC(0x0003F26); break;
@@ -862,25 +862,25 @@ static WRITE16_HANDLER( twrldc94_prot_reg_w )
 					case 0x72: PC(0x000409E); break; // game over
 
 					/*
-						Attract mode is pre programmed loop called from main
-						that runs through top11->demoplay
-						(NOTE: sprites for demo play are being drawn at 0x141000,
-						this address is used in a few places, and there's some activity
-						further up around 0x1410b0.)
+                        Attract mode is pre programmed loop called from main
+                        that runs through top11->demoplay
+                        (NOTE: sprites for demo play are being drawn at 0x141000,
+                        this address is used in a few places, and there's some activity
+                        further up around 0x1410b0.)
 
-						The loop begins with three prot calls:
-						one always present (may be diversion to 0x0010DC8 unreachable code
-						and prot cases 6a,79,6f) and two alternating calls.
-						The loop is 6e -> [6b|69] -> top11 -> (4 segment)playdemo
+                        The loop begins with three prot calls:
+                        one always present (may be diversion to 0x0010DC8 unreachable code
+                        and prot cases 6a,79,6f) and two alternating calls.
+                        The loop is 6e -> [6b|69] -> top11 -> (4 segment)playdemo
 
-						These are the likely suspects for attract mode:
-						0x0010E28 red tecmo on black
-						0x0010EEC bouncing ball and player with game title
-						0x00117A2 single segment demo play with player sprites at 0x140000
-						0x001120A sliding display of player photos
-						0x0010DC8 unreachable code at end of attract loop with cases 6a,79,6f
+                        These are the likely suspects for attract mode:
+                        0x0010E28 red tecmo on black
+                        0x0010EEC bouncing ball and player with game title
+                        0x00117A2 single segment demo play with player sprites at 0x140000
+                        0x001120A sliding display of player photos
+                        0x0010DC8 unreachable code at end of attract loop with cases 6a,79,6f
 
-					*/
+                    */
 					case 0x6e: PC(0x0010E28); break; // loop
 					case 0x6b: PC(0x0010EEC); break; // attract even
 					case 0x69: PC(0x001120A); break; // attract odd
@@ -948,15 +948,15 @@ static READ16_HANDLER( twrldc94_prot_reg_r )
 }
 
 /*
-	vgoalsoc uses a set of programmable timers.
-	There is a code implementation for at 00065F00 that appears to have
-	been RTSed out.
-	I'm guessing it was replaced with an external implementation.
+    vgoalsoc uses a set of programmable timers.
+    There is a code implementation for at 00065F00 that appears to have
+    been RTSed out.
+    I'm guessing it was replaced with an external implementation.
 
-	This does indicate though that the protection could be performing
-	other more complicated functions.
+    This does indicate though that the protection could be performing
+    other more complicated functions.
 
-	The tick count is usually set to 0x3c => it's driven off vblank?
+    The tick count is usually set to 0x3c => it's driven off vblank?
 */
 //work_ram[ (0xffe900 - 0xffc00) ]
 #define COUNTER1_ENABLE work_ram[0x2900/2] >> 8

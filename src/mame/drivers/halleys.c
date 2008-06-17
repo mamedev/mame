@@ -1606,7 +1606,7 @@ static READ8_HANDLER( coin_lockout_r )
 static READ8_HANDLER( io_mirror_r )
 {
 	static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3" };
-	
+
 	return input_port_read(machine, portnames[offset]);
 }
 

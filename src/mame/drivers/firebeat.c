@@ -1484,7 +1484,7 @@ static TIMER_CALLBACK( keyboard_timer_callback )
 	static const char *keynames[] = { "KEYBOARD_P1", "KEYBOARD_P2" };
 	int keyboard;
 	int i;
-	
+
 	for (keyboard=0; keyboard < 2; keyboard++)
 	{
 		UINT32 kbstate = input_port_read(machine, keynames[keyboard]);

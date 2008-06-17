@@ -249,14 +249,14 @@ WRITE8_HANDLER( _4in1_bank_w )
 READ8_HANDLER( _4in1_input_port_1_r )
 {
 	static const char *portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
-  
+
 	return (input_port_read(machine, "IN1") & ~0xc0) | (input_port_read(machine, portnames[_4in1_bank]) & 0xc0);
 }
 
 READ8_HANDLER( _4in1_input_port_2_r )
 {
 	static const char *portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
-  
+
 	return (input_port_read(machine, "DSW0") & 0x04) | (input_port_read(machine, portnames[_4in1_bank]) & ~0xc4);
 }
 

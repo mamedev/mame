@@ -275,7 +275,7 @@ static int adc1038_sars_r(running_machine *machine)
 static READ8_HANDLER( sysreg_r )
 {
 	static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3" };
-	
+
 	switch (offset)
 	{
 		case 0:
