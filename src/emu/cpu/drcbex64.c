@@ -3729,7 +3729,6 @@ static x86code *op_restore(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 	/* validate instruction */
 	assert(inst->size == 4);
 	assert_no_condition(inst);
-	assert_no_flags(inst);
 
 	/* normalize parameters */
 	param_normalize_1(drcbe, inst, &dstp, PTYPE_M);
@@ -4483,7 +4482,6 @@ static x86code *op_sext(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI, &sizep, PTYPE_I);
-	assert(srcp.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
@@ -4665,7 +4663,6 @@ static x86code *op_add(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* normalize parameters */
 	param_normalize_3_commutative(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -4792,7 +4789,6 @@ static x86code *op_sub(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -4825,7 +4821,7 @@ static x86code *op_sub(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 			emit_sub_m64_p64(drcbe, &dst, MABS(drcbe, dstp.value), &src2p, inst);		// sub   [dstp],src2p
 
 		/* reg = reg - imm */
-		else if (dstp.type == DRCUML_PTYPE_INT_REGISTER && src1p.type == DRCUML_PTYPE_INT_REGISTER && src2p.type == DRCUML_PTYPE_IMMEDIATE && short_immediate(src2p.type) && inst->flags == 0)
+		else if (dstp.type == DRCUML_PTYPE_INT_REGISTER && src1p.type == DRCUML_PTYPE_INT_REGISTER && src2p.type == DRCUML_PTYPE_IMMEDIATE && short_immediate(src2p.value) && inst->flags == 0)
 			emit_lea_r64_m64(&dst, dstp.value, MBD(src1p.value, -src2p.value));			// lea   dstp,[src1p-src2p]
 
 		/* general case */
@@ -4956,13 +4952,15 @@ static x86code *op_cmp(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 static x86code *op_mulu(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
+	UINT8 zsflags = inst->flags & (DRCUML_FLAG_Z | DRCUML_FLAG_S);
+	UINT8 vflag =  inst->flags & DRCUML_FLAG_V;
 	drcuml_parameter dstp, edstp, src1p, src2p;
 	int compute_hi;
 
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert_no_condition(inst);
-	assert_flags(inst, /*DRCUML_FLAG_V |*/ DRCUML_FLAG_Z | DRCUML_FLAG_S);
+	assert_flags(inst, DRCUML_FLAG_V | DRCUML_FLAG_Z | DRCUML_FLAG_S);
 
 	/* normalize parameters */
 	param_normalize_4_commutative(drcbe, inst, &dstp, PTYPE_MR, &edstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
@@ -4989,22 +4987,37 @@ static x86code *op_mulu(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		/* compute flags */
 		if (inst->flags != 0)
 		{
-			if (compute_hi)
+			if (zsflags != 0)
 			{
-				if (inst->flags == DRCUML_FLAG_Z)
-					emit_or_r32_r32(&dst, REG_EDX, REG_EAX);							// or    edx,eax
-				else if (inst->flags == DRCUML_FLAG_S)
-					emit_test_r32_r32(&dst, REG_EDX, REG_EDX);							// test  edx,edx
-				else
+				if (vflag)
+					emit_pushf(&dst);													// pushf
+				if (compute_hi)
 				{
-					emit_movzx_r32_r16(&dst, REG_ECX, REG_AX);							// movzx ecx,ax
-					emit_shr_r32_imm(&dst, REG_EAX, 16);								// shr   eax,16
-					emit_or_r32_r32(&dst, REG_EDX, REG_ECX);							// or    edx,ecx
-					emit_or_r32_r32(&dst, REG_EDX, REG_EAX);							// or    edx,eax
+					if (zsflags == DRCUML_FLAG_Z)
+						emit_or_r32_r32(&dst, REG_EDX, REG_EAX);						// or    edx,eax
+					else if (zsflags == DRCUML_FLAG_S)
+						emit_test_r32_r32(&dst, REG_EDX, REG_EDX);						// test  edx,edx
+					else
+					{
+						emit_movzx_r32_r16(&dst, REG_ECX, REG_AX);						// movzx ecx,ax
+						emit_shr_r32_imm(&dst, REG_EAX, 16);							// shr   eax,16
+						emit_or_r32_r32(&dst, REG_EDX, REG_ECX);						// or    edx,ecx
+						emit_or_r32_r32(&dst, REG_EDX, REG_EAX);						// or    edx,eax
+					}
+				}
+				else
+					emit_test_r32_r32(&dst, REG_EAX, REG_EAX);							// test  eax,eax
+
+				/* we rely on the fact that OF is cleared by all logical operations above */
+				if (vflag)
+				{
+					emit_pushf(&dst);													// pushf
+					emit_pop_r64(&dst, REG_RAX);										// pop   rax
+					emit_and_m64_imm(&dst, MBD(REG_RSP, 0), ~0x84);						// and   [rsp],~0x84
+					emit_or_m64_r64(&dst, MBD(REG_RSP, 0), REG_RAX);					// or    [rsp],rax
+					emit_popf(&dst);													// popf
 				}
 			}
-			else
-				emit_test_r32_r32(&dst, REG_EAX, REG_EAX);								// test  eax,eax
 		}
 	}
 
@@ -5029,22 +5042,37 @@ static x86code *op_mulu(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		/* compute flags */
 		if (inst->flags != 0)
 		{
-			if (compute_hi)
+			if (zsflags != 0)
 			{
-				if (inst->flags == DRCUML_FLAG_Z)
-					emit_or_r64_r64(&dst, REG_RDX, REG_RAX);							// or    rdx,rax
-				else if (inst->flags == DRCUML_FLAG_S)
-					emit_test_r64_r64(&dst, REG_RDX, REG_RDX);							// test  rdx,rdx
-				else
+				if (vflag)
+					emit_pushf(&dst);													// pushf
+				if (compute_hi)
 				{
-					emit_mov_r32_r32(&dst, REG_ECX, REG_EAX);							// mov   ecx,eax
-					emit_shr_r64_imm(&dst, REG_RAX, 32);								// shr   rax,32
-					emit_or_r64_r64(&dst, REG_RDX, REG_RCX);							// or    rdx,rcx
-					emit_or_r64_r64(&dst, REG_RDX, REG_RAX);							// or    rdx,rax
+					if (zsflags == DRCUML_FLAG_Z)
+						emit_or_r64_r64(&dst, REG_RDX, REG_RAX);						// or    rdx,rax
+					else if (zsflags == DRCUML_FLAG_S)
+						emit_test_r64_r64(&dst, REG_RDX, REG_RDX);						// test  rdx,rdx
+					else
+					{
+						emit_mov_r32_r32(&dst, REG_ECX, REG_EAX);						// mov   ecx,eax
+						emit_shr_r64_imm(&dst, REG_RAX, 32);							// shr   rax,32
+						emit_or_r64_r64(&dst, REG_RDX, REG_RCX);						// or    rdx,rcx
+						emit_or_r64_r64(&dst, REG_RDX, REG_RAX);						// or    rdx,rax
+					}
+				}
+				else
+					emit_test_r64_r64(&dst, REG_RAX, REG_RAX);							// test  rax,rax
+
+				/* we rely on the fact that OF is cleared by all logical operations above */
+				if (vflag)
+				{
+					emit_pushf(&dst);													// pushf
+					emit_pop_r64(&dst, REG_RAX);										// pop   rax
+					emit_and_m64_imm(&dst, MBD(REG_RSP, 0), ~0x84);						// and   [rsp],~0x84
+					emit_or_m64_r64(&dst, MBD(REG_RSP, 0), REG_RAX);					// or    [rsp],rax
+					emit_popf(&dst);													// popf
 				}
 			}
-			else
-				emit_test_r64_r64(&dst, REG_RAX, REG_RAX);								// test  rax,rax
 		}
 	}
 	return dst;
@@ -5057,13 +5085,15 @@ static x86code *op_mulu(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 
 static x86code *op_muls(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
+	UINT8 zsflags = inst->flags & (DRCUML_FLAG_Z | DRCUML_FLAG_S);
+	UINT8 vflag =  inst->flags & DRCUML_FLAG_V;
 	drcuml_parameter dstp, edstp, src1p, src2p;
 	int compute_hi;
 
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert_no_condition(inst);
-	assert_flags(inst, /*DRCUML_FLAG_V |*/ DRCUML_FLAG_Z | DRCUML_FLAG_S);
+	assert_flags(inst, DRCUML_FLAG_V | DRCUML_FLAG_Z | DRCUML_FLAG_S);
 
 	/* normalize parameters */
 	param_normalize_4_commutative(drcbe, inst, &dstp, PTYPE_MR, &edstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
@@ -5113,22 +5143,37 @@ static x86code *op_muls(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		/* compute flags */
 		if (inst->flags != 0)
 		{
-			if (compute_hi)
+			if (zsflags != 0)
 			{
-				if (inst->flags == DRCUML_FLAG_Z)
-					emit_or_r32_r32(&dst, REG_EDX, REG_EAX);							// or    edx,eax
-				else if (inst->flags == DRCUML_FLAG_S)
-					emit_test_r32_r32(&dst, REG_EDX, REG_EDX);							// test  edx,edx
-				else
+				if (vflag)
+					emit_pushf(&dst);													// pushf
+				if (compute_hi)
 				{
-					emit_movzx_r32_r16(&dst, REG_ECX, REG_AX);							// movzx ecx,ax
-					emit_shr_r32_imm(&dst, REG_EAX, 16);								// shr   eax,16
-					emit_or_r32_r32(&dst, REG_EDX, REG_ECX);							// or    edx,ecx
-					emit_or_r32_r32(&dst, REG_EDX, REG_EAX);							// or    edx,eax
+					if (zsflags == DRCUML_FLAG_Z)
+						emit_or_r32_r32(&dst, REG_EDX, REG_EAX);						// or    edx,eax
+					else if (zsflags == DRCUML_FLAG_S)
+						emit_test_r32_r32(&dst, REG_EDX, REG_EDX);						// test  edx,edx
+					else
+					{
+						emit_movzx_r32_r16(&dst, REG_ECX, REG_AX);						// movzx ecx,ax
+						emit_shr_r32_imm(&dst, REG_EAX, 16);							// shr   eax,16
+						emit_or_r32_r32(&dst, REG_EDX, REG_ECX);						// or    edx,ecx
+						emit_or_r32_r32(&dst, REG_EDX, REG_EAX);						// or    edx,eax
+					}
+				}
+				else
+					emit_test_r32_r32(&dst, REG_EAX, REG_EAX);							// test  eax,eax
+
+				/* we rely on the fact that OF is cleared by all logical operations above */
+				if (vflag)
+				{
+					emit_pushf(&dst);													// pushf
+					emit_pop_r64(&dst, REG_RAX);										// pop   rax
+					emit_and_m64_imm(&dst, MBD(REG_RSP, 0), ~0x84);						// and   [rsp],~0x84
+					emit_or_m64_r64(&dst, MBD(REG_RSP, 0), REG_RAX);					// or    [rsp],rax
+					emit_popf(&dst);													// popf
 				}
 			}
-			else
-				emit_test_r32_r32(&dst, REG_EAX, REG_EAX);								// test  eax,eax
 		}
 	}
 
@@ -5176,22 +5221,37 @@ static x86code *op_muls(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		/* compute flags */
 		if (inst->flags != 0)
 		{
-			if (compute_hi)
+			if (zsflags != 0)
 			{
-				if (inst->flags == DRCUML_FLAG_Z)
-					emit_or_r64_r64(&dst, REG_RDX, REG_RAX);							// or    rdx,rax
-				else if (inst->flags == DRCUML_FLAG_S)
-					emit_test_r64_r64(&dst, REG_RDX, REG_RDX);							// test  rdx,rdx
-				else
+				if (vflag)
+					emit_pushf(&dst);													// pushf
+				if (compute_hi)
 				{
-					emit_mov_r32_r32(&dst, REG_ECX, REG_EAX);							// mov   ecx,eax
-					emit_shr_r64_imm(&dst, REG_RAX, 32);								// shr   rax,32
-					emit_or_r64_r64(&dst, REG_RDX, REG_RCX);							// or    rdx,rcx
-					emit_or_r64_r64(&dst, REG_RDX, REG_RAX);							// or    rdx,rax
+					if (zsflags == DRCUML_FLAG_Z)
+						emit_or_r64_r64(&dst, REG_RDX, REG_RAX);						// or    rdx,rax
+					else if (zsflags == DRCUML_FLAG_S)
+						emit_test_r64_r64(&dst, REG_RDX, REG_RDX);						// test  rdx,rdx
+					else
+					{
+						emit_mov_r32_r32(&dst, REG_ECX, REG_EAX);						// mov   ecx,eax
+						emit_shr_r64_imm(&dst, REG_RAX, 32);							// shr   rax,32
+						emit_or_r64_r64(&dst, REG_RDX, REG_RCX);						// or    rdx,rcx
+						emit_or_r64_r64(&dst, REG_RDX, REG_RAX);						// or    rdx,rax
+					}
+				}
+				else
+					emit_test_r64_r64(&dst, REG_RAX, REG_RAX);							// test  rax,rax
+
+				/* we rely on the fact that OF is cleared by all logical operations above */
+				if (vflag)
+				{
+					emit_pushf(&dst);													// pushf
+					emit_pop_r64(&dst, REG_RAX);										// pop   rax
+					emit_and_m64_imm(&dst, MBD(REG_RSP, 0), ~0x84);						// and   [rsp],~0x84
+					emit_or_m64_r64(&dst, MBD(REG_RSP, 0), REG_RAX);					// or    [rsp],rax
+					emit_popf(&dst);													// popf
 				}
 			}
-			else
-				emit_test_r64_r64(&dst, REG_RAX, REG_RAX);								// test  rax,rax
 		}
 	}
 	return dst;
@@ -5211,7 +5271,7 @@ static x86code *op_divu(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert_no_condition(inst);
-	assert_flags(inst, /*DRCUML_FLAG_V |*/ DRCUML_FLAG_Z | DRCUML_FLAG_S);
+	assert_flags(inst, DRCUML_FLAG_V | DRCUML_FLAG_Z | DRCUML_FLAG_S);
 
 	/* normalize parameters */
 	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &edstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
@@ -5222,6 +5282,11 @@ static x86code *op_divu(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	{
 		/* general case */
 		emit_mov_r32_p32(drcbe, &dst, REG_ECX, &src2p);									// mov   ecx,src2p
+		if (inst->flags != 0)
+		{
+			emit_mov_r32_imm(&dst, REG_EAX, 0xa0000000);								// mov   eax,0xa0000000
+			emit_add_r32_r32(&dst, REG_EAX, REG_EAX);									// add   eax,eax
+		}
 		emit_jecxz_link(&dst, &skip);													// jecxz skip
 		emit_mov_r32_p32(drcbe, &dst, REG_EAX, &src1p);									// mov   eax,src1p
 		emit_xor_r32_r32(&dst, REG_EDX, REG_EDX);										// xor   edx,edx
@@ -5239,6 +5304,11 @@ static x86code *op_divu(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	{
 		/* general case */
 		emit_mov_r64_p64(drcbe, &dst, REG_RCX, &src2p);									// mov   rcx,src2p
+		if (inst->flags != 0)
+		{
+			emit_mov_r32_imm(&dst, REG_EAX, 0xa0000000);								// mov   eax,0xa0000000
+			emit_add_r32_r32(&dst, REG_EAX, REG_EAX);									// add   eax,eax
+		}
 		emit_jrcxz_link(&dst, &skip);													// jrcxz skip
 		emit_mov_r64_p64(drcbe, &dst, REG_RAX, &src1p);									// mov   rax,src1p
 		emit_xor_r32_r32(&dst, REG_EDX, REG_EDX);										// xor   edx,edx
@@ -5267,7 +5337,7 @@ static x86code *op_divs(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert_no_condition(inst);
-	assert_flags(inst, /*DRCUML_FLAG_V |*/ DRCUML_FLAG_Z | DRCUML_FLAG_S);
+	assert_flags(inst, DRCUML_FLAG_V | DRCUML_FLAG_Z | DRCUML_FLAG_S);
 
 	/* normalize parameters */
 	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &edstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
@@ -5278,6 +5348,11 @@ static x86code *op_divs(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	{
 		/* general case */
 		emit_mov_r32_p32(drcbe, &dst, REG_ECX, &src2p);									// mov   ecx,src2p
+		if (inst->flags != 0)
+		{
+			emit_mov_r32_imm(&dst, REG_EAX, 0xa0000000);								// mov   eax,0xa0000000
+			emit_add_r32_r32(&dst, REG_EAX, REG_EAX);									// add   eax,eax
+		}
 		emit_jecxz_link(&dst, &skip);													// jecxz skip
 		emit_mov_r32_p32(drcbe, &dst, REG_EAX, &src1p);									// mov   eax,src1p
 		emit_cdq(&dst);																	// cdq
@@ -5295,6 +5370,11 @@ static x86code *op_divs(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	{
 		/* general case */
 		emit_mov_r64_p64(drcbe, &dst, REG_RCX, &src2p);									// mov   rcx,src2p
+		if (inst->flags != 0)
+		{
+			emit_mov_r32_imm(&dst, REG_EAX, 0xa0000000);								// mov   eax,0xa0000000
+			emit_add_r32_r32(&dst, REG_EAX, REG_EAX);									// add   eax,eax
+		}
 		emit_jrcxz_link(&dst, &skip);													// jrcxz skip
 		emit_mov_r64_p64(drcbe, &dst, REG_RAX, &src1p);									// mov   rax,src1p
 		emit_cqo(&dst);																	// cqo
@@ -5326,7 +5406,6 @@ static x86code *op_and(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* normalize parameters */
 	param_normalize_3_commutative(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -5435,7 +5514,6 @@ static x86code *op_or(drcbe_state *drcbe, x86code *dst, const drcuml_instruction
 
 	/* normalize parameters */
 	param_normalize_3_commutative(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -5491,7 +5569,6 @@ static x86code *op_xor(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* normalize parameters */
 	param_normalize_3_commutative(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -5547,7 +5624,6 @@ static x86code *op_lzcnt(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 
 	/* normalize parameters */
 	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI);
-	assert(srcp.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
@@ -5591,7 +5667,6 @@ static x86code *op_bswap(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 
 	/* normalize parameters */
 	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI);
-	assert(srcp.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_RAX, &dstp, NULL);
@@ -5631,7 +5706,6 @@ static x86code *op_shl(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -5687,7 +5761,6 @@ static x86code *op_shr(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -5743,7 +5816,6 @@ static x86code *op_sar(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -5799,7 +5871,6 @@ static x86code *op_rol(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);
@@ -5855,7 +5926,6 @@ static x86code *op_ror(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &src1p, PTYPE_MRI, &src2p, PTYPE_MRI);
-	assert(src1p.type != DRCUML_PTYPE_IMMEDIATE || src2p.type != DRCUML_PTYPE_IMMEDIATE);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, &src2p);

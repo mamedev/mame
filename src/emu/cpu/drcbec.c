@@ -710,6 +710,7 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_RESTORE, 4, 0):	/* RESTORE dst                    */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_RESTORE, 4, 1):	/* RESTORE dst                    */
 				drcbe->state = *inst[0].state;
 				flags = inst[0].state->flags;
 				break;
@@ -916,6 +917,8 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				flags = FLAGS64_NZ(temp64);
 				PARAM1 = temp64 >> 32;
 				PARAM0 = (UINT32)temp64;
+				if (temp64 != (UINT32)temp64)
+					flags |= DRCUML_FLAG_V;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_MULS, 4, 0):		/* MULS    dst,edst,src1,src2[,f] */
@@ -929,6 +932,8 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				flags = FLAGS64_NZ(temp64);
 				PARAM1 = temp64 >> 32;
 				PARAM0 = (UINT32)temp64;
+				if (temp64 != (INT32)temp64)
+					flags |= DRCUML_FLAG_V;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_DIVU, 4, 0):		/* DIVU    dst,edst,src1,src2[,f] */
@@ -948,6 +953,8 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 					flags = FLAGS32_NZ(temp32);
 					PARAM0 = temp32;
 				}
+				else
+					flags = DRCUML_FLAG_V;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_DIVS, 4, 0):		/* DIVS    dst,edst,src1,src2[,f] */
@@ -967,6 +974,8 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 					flags = FLAGS32_NZ(temp32);
 					PARAM0 = temp32;
 				}
+				else
+					flags = DRCUML_FLAG_V;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_AND, 4, 0):		/* AND     dst,src1,src2[,f]      */
@@ -1387,6 +1396,8 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 					flags = FLAGS64_NZ(temp64);
 					DPARAM0 = temp64;
 				}
+				else
+					flags = DRCUML_FLAG_V;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_DIVS, 8, 0):		/* DDIVS   dst,edst,src1,src2[,f] */
@@ -1406,6 +1417,8 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 					flags = FLAGS64_NZ(temp64);
 					DPARAM0 = temp64;
 				}
+				else
+					flags = DRCUML_FLAG_V;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_AND, 8, 0):		/* DAND    dst,src1,src2[,f]      */
@@ -1952,7 +1965,7 @@ static int dmulu(UINT64 *dstlo, UINT64 *dsthi, UINT64 src1, UINT64 src2, int fla
 	UINT64 a, b, temp;
 
 	/* shortcut if we don't care about the high bits or the flags */
-	if (dstlo == dsthi && !flags)
+	if (dstlo == dsthi && flags == 0)
 	{
 		*dstlo = src1 * src2;
 		return 0;
@@ -1985,7 +1998,7 @@ static int dmulu(UINT64 *dstlo, UINT64 *dsthi, UINT64 src1, UINT64 src2, int fla
 	/* store the results */
 	*dsthi = hi;
 	*dstlo = lo;
-	return ((hi >> 60) & DRCUML_FLAG_S);
+	return ((hi >> 60) & DRCUML_FLAG_S) | ((*dsthi != 0) << 1);
 }
 
 
@@ -1999,7 +2012,7 @@ static int dmuls(UINT64 *dstlo, UINT64 *dsthi, INT64 src1, INT64 src2, int flags
 	UINT64 a, b, temp;
 
 	/* shortcut if we don't care about the high bits or the flags */
-	if (dstlo == dsthi && !flags)
+	if (dstlo == dsthi && flags == 0)
 	{
 		*dstlo = src1 * src2;
 		return 0;
@@ -2039,5 +2052,5 @@ static int dmuls(UINT64 *dstlo, UINT64 *dsthi, INT64 src1, INT64 src2, int flags
 	/* store the results */
 	*dsthi = hi;
 	*dstlo = lo;
-	return ((hi >> 60) & DRCUML_FLAG_S);
+	return ((hi >> 60) & DRCUML_FLAG_S) | ((*dsthi != ((INT64)lo >> 63)) << 1);
 }

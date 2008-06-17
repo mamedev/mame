@@ -113,6 +113,10 @@
 #define PTYPES_IANY		(PTYPES_IRM | PTYPES_IMV)
 #define PTYPES_FANY		(PTYPES_FRM)
 
+/* test result undefined */
+#define UNDEFINED		0x19bb7a1005fde439
+#define UNDEFINED_U64	U64(0x19bb7a1005fde439)
+
 
 
 /***************************************************************************
@@ -173,7 +177,6 @@ struct _bevalidate_test
 {
 	drcuml_opcode			opcode;
 	UINT8					size;
-	UINT8					destmask;
 	UINT8					iflags;
 	UINT8					flags;
 	UINT64					param[4];
@@ -315,15 +318,13 @@ static const char *get_comment_text(const drcuml_instruction *inst);
 
 static void validate_instruction(drcuml_block *block, const drcuml_instruction *inst);
 
-#if 0
 static void validate_backend(drcuml_state *drcuml);
 static void bevalidate_iterate_over_params(drcuml_state *drcuml, drcuml_codehandle **handles, const bevalidate_test *test, drcuml_parameter *paramlist, int pnum);
 static void bevalidate_iterate_over_flags(drcuml_state *drcuml, drcuml_codehandle **handles, const bevalidate_test *test, drcuml_parameter *paramlist);
 static void bevalidate_execute(drcuml_state *drcuml, drcuml_codehandle **handles, const bevalidate_test *test, const drcuml_parameter *paramlist, UINT8 flagmask);
 static void bevalidate_initialize_random_state(drcuml_block *block, drcuml_machine_state *state);
 static int bevalidate_populate_state(drcuml_block *block, drcuml_machine_state *state, const bevalidate_test *test, const drcuml_parameter *paramlist, drcuml_parameter *params, UINT64 *parammem);
-static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_state *istate, drcuml_machine_state *state, const bevalidate_test *test, const drcuml_parameter *params, const drcuml_instruction *testinst, drccodeptr codestart, drccodeptr codeend, UINT8 flagmask);
-#endif
+static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_state *istate, drcuml_machine_state *state, const bevalidate_test *test, UINT32 flags, const drcuml_parameter *params, const drcuml_instruction *testinst, drccodeptr codestart, drccodeptr codeend, UINT8 flagmask);
 
 
 
@@ -423,6 +424,28 @@ INLINE UINT8 effective_psize(const drcuml_instruction *inst, const drcuml_opcode
 		case PSIZE_P4:	assert(inst->param[3].type == DRCUML_PTYPE_IMMEDIATE); return 1 << (inst->param[3].value & 3);
 	}
 	return inst->size;
+}
+
+
+/*-------------------------------------------------
+    effective_test_psize - return the effective
+    parameter size based on the size and fixed
+    array of parameter values
+-------------------------------------------------*/
+
+INLINE UINT8 effective_test_psize(const drcuml_opcode_info *opinfo, int pnum, int instsize, const UINT64 *params)
+{
+	switch (opinfo->param[pnum].size)
+	{
+		case PSIZE_4:	return 4;
+		case PSIZE_8:	return 8;
+		case PSIZE_OP:	return instsize;
+		case PSIZE_P1:	return 1 << (params[0] & 3);
+		case PSIZE_P2:	return 1 << (params[1] & 3);
+		case PSIZE_P3:	return 1 << (params[2] & 3);
+		case PSIZE_P4:	return 1 << (params[3] & 3);
+	}
+	return instsize;
 }
 
 
@@ -588,15 +611,15 @@ void drcuml_reset(drcuml_state *drcuml)
 	(*drcuml->beintf->be_reset)(drcuml->bestate);
 
 	/* do a one-time validation if requested */
-/*  if (VALIDATE_BACKEND)
-    {
-        static int validated = FALSE;
-        if (!validated)
-        {
-            validated = TRUE;
-            validate_backend(drcuml);
-        }
-    }*/
+	if (VALIDATE_BACKEND)
+	{
+		static int validated = FALSE;
+		if (!validated)
+		{
+			validated = TRUE;
+			validate_backend(drcuml);
+		}
+	}
 }
 
 
@@ -1861,46 +1884,140 @@ static void validate_instruction(drcuml_block *block, const drcuml_instruction *
 
 
 
-#if 0
-
 /***************************************************************************
     BACK-END VALIDATION
 ***************************************************************************/
 
-#define TEST_ENTRY_DSS(op, size, p1, p2, p3, flags) { DRCUML_OP_##op, size, 0x01, 0, flags, { U64(p1), U64(p2), U64(p3) } },
-#define TEST_ENTRY_DSSI(op, size, p1, p2, p3, iflags, flags) { DRCUML_OP_##op, size, 0x01, iflags, flags, { U64(p1), U64(p2), U64(p3) } },
+#define TEST_ENTRY_2(op, size, p1, p2, flags) { DRCUML_OP_##op, size, 0, flags, { U64(p1), U64(p2) } },
+#define TEST_ENTRY_2F(op, size, p1, p2, iflags, flags) { DRCUML_OP_##op, size, iflags, flags, { U64(p1), U64(p2) } },
+#define TEST_ENTRY_3(op, size, p1, p2, p3, flags) { DRCUML_OP_##op, size, 0, flags, { U64(p1), U64(p2), U64(p3) } },
+#define TEST_ENTRY_3F(op, size, p1, p2, p3, iflags, flags) { DRCUML_OP_##op, size, iflags, flags, { U64(p1), U64(p2), U64(p3) } },
+#define TEST_ENTRY_4(op, size, p1, p2, p3, p4, flags) { DRCUML_OP_##op, size, 0, flags, { U64(p1), U64(p2), U64(p3), U64(p4) } },
+#define TEST_ENTRY_4F(op, size, p1, p2, p3, p4, iflags, flags) { DRCUML_OP_##op, size, iflags, flags, { U64(p1), U64(p2), U64(p3), U64(p4) } },
 
 static const bevalidate_test bevalidate_test_list[] =
 {
-	TEST_ENTRY_DSS(ADD, 4, 0x7fffffff, 0x12345678, 0x6dcba987, 0)
-	TEST_ENTRY_DSS(ADD, 4, 0x80000000, 0x12345678, 0x6dcba988, FLAGS_V | FLAGS_S)
-	TEST_ENTRY_DSS(ADD, 4, 0xffffffff, 0x92345678, 0x6dcba987, FLAGS_S)
-	TEST_ENTRY_DSS(ADD, 4, 0x00000000, 0x92345678, 0x6dcba988, FLAGS_C | FLAGS_Z)
+	TEST_ENTRY_3(ADD, 4, 0x7fffffff, 0x12345678, 0x6dcba987, 0)
+	TEST_ENTRY_3(ADD, 4, 0x80000000, 0x12345678, 0x6dcba988, DRCUML_FLAG_V | DRCUML_FLAG_S)
+	TEST_ENTRY_3(ADD, 4, 0xffffffff, 0x92345678, 0x6dcba987, DRCUML_FLAG_S)
+	TEST_ENTRY_3(ADD, 4, 0x00000000, 0x92345678, 0x6dcba988, DRCUML_FLAG_C | DRCUML_FLAG_Z)
 
-	TEST_ENTRY_DSS(ADD, 8, 0x7fffffffffffffff, 0x0123456789abcdef, 0x7edcba9876543210, 0)
-	TEST_ENTRY_DSS(ADD, 8, 0x8000000000000000, 0x0123456789abcdef, 0x7edcba9876543211, FLAGS_V | FLAGS_S)
-	TEST_ENTRY_DSS(ADD, 8, 0xffffffffffffffff, 0x8123456789abcdef, 0x7edcba9876543210, FLAGS_S)
-	TEST_ENTRY_DSS(ADD, 8, 0x0000000000000000, 0x8123456789abcdef, 0x7edcba9876543211, FLAGS_C | FLAGS_Z)
+	TEST_ENTRY_3(ADD, 8, 0x7fffffffffffffff, 0x0123456789abcdef, 0x7edcba9876543210, 0)
+	TEST_ENTRY_3(ADD, 8, 0x8000000000000000, 0x0123456789abcdef, 0x7edcba9876543211, DRCUML_FLAG_V | DRCUML_FLAG_S)
+	TEST_ENTRY_3(ADD, 8, 0xffffffffffffffff, 0x8123456789abcdef, 0x7edcba9876543210, DRCUML_FLAG_S)
+	TEST_ENTRY_3(ADD, 8, 0x0000000000000000, 0x8123456789abcdef, 0x7edcba9876543211, DRCUML_FLAG_C | DRCUML_FLAG_Z)
 
-	TEST_ENTRY_DSSI(ADDC, 4, 0x7fffffff, 0x12345678, 0x6dcba987, 0,       0)
-	TEST_ENTRY_DSSI(ADDC, 4, 0x7fffffff, 0x12345678, 0x6dcba986, FLAGS_C, 0)
-	TEST_ENTRY_DSSI(ADDC, 4, 0x80000000, 0x12345678, 0x6dcba988, 0,       FLAGS_V | FLAGS_S)
-	TEST_ENTRY_DSSI(ADDC, 4, 0x80000000, 0x12345678, 0x6dcba987, FLAGS_C, FLAGS_V | FLAGS_S)
-	TEST_ENTRY_DSSI(ADDC, 4, 0xffffffff, 0x92345678, 0x6dcba987, 0,       FLAGS_S)
-	TEST_ENTRY_DSSI(ADDC, 4, 0xffffffff, 0x92345678, 0x6dcba986, FLAGS_C, FLAGS_S)
-	TEST_ENTRY_DSSI(ADDC, 4, 0x00000000, 0x92345678, 0x6dcba988, 0,       FLAGS_C | FLAGS_Z)
-	TEST_ENTRY_DSSI(ADDC, 4, 0x00000000, 0x92345678, 0x6dcba987, FLAGS_C, FLAGS_C | FLAGS_Z)
-	TEST_ENTRY_DSSI(ADDC, 4, 0x12345678, 0x12345678, 0xffffffff, FLAGS_C, FLAGS_C)
+	TEST_ENTRY_3F(ADDC, 4, 0x7fffffff, 0x12345678, 0x6dcba987, 0,       0)
+	TEST_ENTRY_3F(ADDC, 4, 0x7fffffff, 0x12345678, 0x6dcba986, DRCUML_FLAG_C, 0)
+	TEST_ENTRY_3F(ADDC, 4, 0x80000000, 0x12345678, 0x6dcba988, 0,             DRCUML_FLAG_V | DRCUML_FLAG_S)
+	TEST_ENTRY_3F(ADDC, 4, 0x80000000, 0x12345678, 0x6dcba987, DRCUML_FLAG_C, DRCUML_FLAG_V | DRCUML_FLAG_S)
+	TEST_ENTRY_3F(ADDC, 4, 0xffffffff, 0x92345678, 0x6dcba987, 0,             DRCUML_FLAG_S)
+	TEST_ENTRY_3F(ADDC, 4, 0xffffffff, 0x92345678, 0x6dcba986, DRCUML_FLAG_C, DRCUML_FLAG_S)
+	TEST_ENTRY_3F(ADDC, 4, 0x00000000, 0x92345678, 0x6dcba988, 0,             DRCUML_FLAG_C | DRCUML_FLAG_Z)
+	TEST_ENTRY_3F(ADDC, 4, 0x00000000, 0x92345678, 0x6dcba987, DRCUML_FLAG_C, DRCUML_FLAG_C | DRCUML_FLAG_Z)
+	TEST_ENTRY_3F(ADDC, 4, 0x12345678, 0x12345678, 0xffffffff, DRCUML_FLAG_C, DRCUML_FLAG_C)
 
-	TEST_ENTRY_DSSI(ADDC, 8, 0x7fffffffffffffff, 0x0123456789abcdef, 0x7edcba9876543210, 0,       0)
-	TEST_ENTRY_DSSI(ADDC, 8, 0x7fffffffffffffff, 0x0123456789abcdef, 0x7edcba987654320f, FLAGS_C, 0)
-	TEST_ENTRY_DSSI(ADDC, 8, 0x8000000000000000, 0x0123456789abcdef, 0x7edcba9876543211, 0,       FLAGS_V | FLAGS_S)
-	TEST_ENTRY_DSSI(ADDC, 8, 0x8000000000000000, 0x0123456789abcdef, 0x7edcba9876543210, FLAGS_C, FLAGS_V | FLAGS_S)
-	TEST_ENTRY_DSSI(ADDC, 8, 0xffffffffffffffff, 0x8123456789abcdef, 0x7edcba9876543210, 0,       FLAGS_S)
-	TEST_ENTRY_DSSI(ADDC, 8, 0xffffffffffffffff, 0x8123456789abcdef, 0x7edcba987654320f, FLAGS_C, FLAGS_S)
-	TEST_ENTRY_DSSI(ADDC, 8, 0x0000000000000000, 0x8123456789abcdef, 0x7edcba9876543211, 0,       FLAGS_C | FLAGS_Z)
-	TEST_ENTRY_DSSI(ADDC, 8, 0x0000000000000000, 0x8123456789abcdef, 0x7edcba9876543210, FLAGS_C, FLAGS_C | FLAGS_Z)
-	TEST_ENTRY_DSSI(ADDC, 8, 0x123456789abcdef0, 0x123456789abcdef0, 0xffffffffffffffff, FLAGS_C, FLAGS_C)
+	TEST_ENTRY_3F(ADDC, 8, 0x7fffffffffffffff, 0x0123456789abcdef, 0x7edcba9876543210, 0,             0)
+	TEST_ENTRY_3F(ADDC, 8, 0x7fffffffffffffff, 0x0123456789abcdef, 0x7edcba987654320f, DRCUML_FLAG_C, 0)
+	TEST_ENTRY_3F(ADDC, 8, 0x8000000000000000, 0x0123456789abcdef, 0x7edcba9876543211, 0,             DRCUML_FLAG_V | DRCUML_FLAG_S)
+	TEST_ENTRY_3F(ADDC, 8, 0x8000000000000000, 0x0123456789abcdef, 0x7edcba9876543210, DRCUML_FLAG_C, DRCUML_FLAG_V | DRCUML_FLAG_S)
+	TEST_ENTRY_3F(ADDC, 8, 0xffffffffffffffff, 0x8123456789abcdef, 0x7edcba9876543210, 0,             DRCUML_FLAG_S)
+	TEST_ENTRY_3F(ADDC, 8, 0xffffffffffffffff, 0x8123456789abcdef, 0x7edcba987654320f, DRCUML_FLAG_C, DRCUML_FLAG_S)
+	TEST_ENTRY_3F(ADDC, 8, 0x0000000000000000, 0x8123456789abcdef, 0x7edcba9876543211, 0,             DRCUML_FLAG_C | DRCUML_FLAG_Z)
+	TEST_ENTRY_3F(ADDC, 8, 0x0000000000000000, 0x8123456789abcdef, 0x7edcba9876543210, DRCUML_FLAG_C, DRCUML_FLAG_C | DRCUML_FLAG_Z)
+	TEST_ENTRY_3F(ADDC, 8, 0x123456789abcdef0, 0x123456789abcdef0, 0xffffffffffffffff, DRCUML_FLAG_C, DRCUML_FLAG_C)
+
+	TEST_ENTRY_3(SUB, 4, 0x12345678, 0x7fffffff, 0x6dcba987, 0)
+	TEST_ENTRY_3(SUB, 4, 0x12345678, 0x80000000, 0x6dcba988, DRCUML_FLAG_V)
+	TEST_ENTRY_3(SUB, 4, 0x92345678, 0xffffffff, 0x6dcba987, DRCUML_FLAG_S)
+	TEST_ENTRY_3(SUB, 4, 0x92345678, 0x00000000, 0x6dcba988, DRCUML_FLAG_C | DRCUML_FLAG_S)
+	TEST_ENTRY_3(SUB, 4, 0x00000000, 0x12345678, 0x12345678, DRCUML_FLAG_Z)
+
+	TEST_ENTRY_3(SUB, 8, 0x0123456789abcdef, 0x7fffffffffffffff, 0x7edcba9876543210, 0)
+	TEST_ENTRY_3(SUB, 8, 0x0123456789abcdef, 0x8000000000000000, 0x7edcba9876543211, DRCUML_FLAG_V)
+	TEST_ENTRY_3(SUB, 8, 0x8123456789abcdef, 0xffffffffffffffff, 0x7edcba9876543210, DRCUML_FLAG_S)
+	TEST_ENTRY_3(SUB, 8, 0x8123456789abcdef, 0x0000000000000000, 0x7edcba9876543211, DRCUML_FLAG_C | DRCUML_FLAG_S)
+	TEST_ENTRY_3(SUB, 8, 0x0000000000000000, 0x0123456789abcdef, 0x0123456789abcdef, DRCUML_FLAG_Z)
+
+	TEST_ENTRY_3F(SUBB, 4, 0x12345678, 0x7fffffff, 0x6dcba987, 0,             0)
+	TEST_ENTRY_3F(SUBB, 4, 0x12345678, 0x7fffffff, 0x6dcba986, DRCUML_FLAG_C, 0)
+	TEST_ENTRY_3F(SUBB, 4, 0x12345678, 0x80000000, 0x6dcba988, 0,             DRCUML_FLAG_V)
+	TEST_ENTRY_3F(SUBB, 4, 0x12345678, 0x80000000, 0x6dcba987, DRCUML_FLAG_C, DRCUML_FLAG_V)
+	TEST_ENTRY_3F(SUBB, 4, 0x92345678, 0xffffffff, 0x6dcba987, 0,             DRCUML_FLAG_S)
+	TEST_ENTRY_3F(SUBB, 4, 0x92345678, 0xffffffff, 0x6dcba986, DRCUML_FLAG_C, DRCUML_FLAG_S)
+	TEST_ENTRY_3F(SUBB, 4, 0x92345678, 0x00000000, 0x6dcba988, 0,             DRCUML_FLAG_C | DRCUML_FLAG_S)
+	TEST_ENTRY_3F(SUBB, 4, 0x92345678, 0x00000000, 0x6dcba987, DRCUML_FLAG_C, DRCUML_FLAG_C | DRCUML_FLAG_S)
+	TEST_ENTRY_3F(SUBB, 4, 0x12345678, 0x12345678, 0xffffffff, DRCUML_FLAG_C, DRCUML_FLAG_C)
+	TEST_ENTRY_3F(SUBB, 4, 0x00000000, 0x12345678, 0x12345677, DRCUML_FLAG_C, DRCUML_FLAG_Z)
+
+	TEST_ENTRY_3F(SUBB, 8, 0x0123456789abcdef, 0x7fffffffffffffff, 0x7edcba9876543210, 0,             0)
+	TEST_ENTRY_3F(SUBB, 8, 0x0123456789abcdef, 0x7fffffffffffffff, 0x7edcba987654320f, DRCUML_FLAG_C, 0)
+	TEST_ENTRY_3F(SUBB, 8, 0x0123456789abcdef, 0x8000000000000000, 0x7edcba9876543211, 0,             DRCUML_FLAG_V)
+	TEST_ENTRY_3F(SUBB, 8, 0x0123456789abcdef, 0x8000000000000000, 0x7edcba9876543210, DRCUML_FLAG_C, DRCUML_FLAG_V)
+	TEST_ENTRY_3F(SUBB, 8, 0x8123456789abcdef, 0xffffffffffffffff, 0x7edcba9876543210, 0,             DRCUML_FLAG_S)
+	TEST_ENTRY_3F(SUBB, 8, 0x8123456789abcdef, 0xffffffffffffffff, 0x7edcba987654320f, DRCUML_FLAG_C, DRCUML_FLAG_S)
+	TEST_ENTRY_3F(SUBB, 8, 0x8123456789abcdef, 0x0000000000000000, 0x7edcba9876543211, 0,             DRCUML_FLAG_C | DRCUML_FLAG_S)
+	TEST_ENTRY_3F(SUBB, 8, 0x8123456789abcdef, 0x0000000000000000, 0x7edcba9876543210, DRCUML_FLAG_C, DRCUML_FLAG_C | DRCUML_FLAG_S)
+	TEST_ENTRY_3F(SUBB, 8, 0x123456789abcdef0, 0x123456789abcdef0, 0xffffffffffffffff, DRCUML_FLAG_C, DRCUML_FLAG_C)
+	TEST_ENTRY_3F(SUBB, 8, 0x0000000000000000, 0x123456789abcdef0, 0x123456789abcdeef, DRCUML_FLAG_C, DRCUML_FLAG_Z)
+	
+	TEST_ENTRY_2(CMP, 4, 0x7fffffff, 0x6dcba987, 0)
+	TEST_ENTRY_2(CMP, 4, 0x80000000, 0x6dcba988, DRCUML_FLAG_V)
+	TEST_ENTRY_2(CMP, 4, 0xffffffff, 0x6dcba987, DRCUML_FLAG_S)
+	TEST_ENTRY_2(CMP, 4, 0x00000000, 0x6dcba988, DRCUML_FLAG_C | DRCUML_FLAG_S)
+	TEST_ENTRY_2(CMP, 4, 0x12345678, 0x12345678, DRCUML_FLAG_Z)
+
+	TEST_ENTRY_2(CMP, 8, 0x7fffffffffffffff, 0x7edcba9876543210, 0)
+	TEST_ENTRY_2(CMP, 8, 0x8000000000000000, 0x7edcba9876543211, DRCUML_FLAG_V)
+	TEST_ENTRY_2(CMP, 8, 0xffffffffffffffff, 0x7edcba9876543210, DRCUML_FLAG_S)
+	TEST_ENTRY_2(CMP, 8, 0x0000000000000000, 0x7edcba9876543211, DRCUML_FLAG_C | DRCUML_FLAG_S)
+	TEST_ENTRY_2(CMP, 8, 0x0123456789abcdef, 0x0123456789abcdef, DRCUML_FLAG_Z)
+
+	TEST_ENTRY_4(MULU, 4, 0x77777777, 0x00000000, 0x11111111, 0x00000007, 0)
+	TEST_ENTRY_4(MULU, 4, 0xffffffff, 0x00000000, 0x11111111, 0x0000000f, 0)
+	TEST_ENTRY_4(MULU, 4, 0x00000000, 0x00000000, 0x11111111, 0x00000000, DRCUML_FLAG_Z)
+	TEST_ENTRY_4(MULU, 4, 0xea61d951, 0x37c048d0, 0x77777777, 0x77777777, DRCUML_FLAG_V)
+	TEST_ENTRY_4(MULU, 4, 0x32323233, 0xcdcdcdcc, 0xcdcdcdcd, 0xffffffff, DRCUML_FLAG_V | DRCUML_FLAG_S)
+	
+	TEST_ENTRY_4(MULU, 8, 0x7777777777777777, 0x0000000000000000, 0x1111111111111111, 0x0000000000000007, 0)
+	TEST_ENTRY_4(MULU, 8, 0xffffffffffffffff, 0x0000000000000000, 0x1111111111111111, 0x000000000000000f, 0)
+	TEST_ENTRY_4(MULU, 8, 0x0000000000000000, 0x0000000000000000, 0x1111111111111111, 0x0000000000000000, DRCUML_FLAG_Z)
+	TEST_ENTRY_4(MULU, 8, 0x0c83fb72ea61d951, 0x37c048d159e26af3, 0x7777777777777777, 0x7777777777777777, DRCUML_FLAG_V)
+	TEST_ENTRY_4(MULU, 8, 0x3232323232323233, 0xcdcdcdcdcdcdcdcc, 0xcdcdcdcdcdcdcdcd, 0xffffffffffffffff, DRCUML_FLAG_V | DRCUML_FLAG_S)
+
+	TEST_ENTRY_4(MULS, 4, 0x77777777, 0x00000000, 0x11111111, 0x00000007, 0)
+	TEST_ENTRY_4(MULS, 4, 0xffffffff, 0x00000000, 0x11111111, 0x0000000f, DRCUML_FLAG_V)
+	TEST_ENTRY_4(MULS, 4, 0x00000000, 0x00000000, 0x11111111, 0x00000000, DRCUML_FLAG_Z)
+	TEST_ENTRY_4(MULS, 4, 0x9e26af38, 0xc83fb72e, 0x77777777, 0x88888888, DRCUML_FLAG_V | DRCUML_FLAG_S)
+	TEST_ENTRY_4(MULS, 4, 0x32323233, 0x00000000, 0xcdcdcdcd, 0xffffffff, 0)
+	
+	TEST_ENTRY_4(MULS, 8, 0x7777777777777777, 0x0000000000000000, 0x1111111111111111, 0x0000000000000007, 0)
+	TEST_ENTRY_4(MULS, 8, 0xffffffffffffffff, 0x0000000000000000, 0x1111111111111111, 0x000000000000000f, DRCUML_FLAG_V)
+	TEST_ENTRY_4(MULS, 8, 0x0000000000000000, 0x0000000000000000, 0x1111111111111111, 0x0000000000000000, DRCUML_FLAG_Z)
+	TEST_ENTRY_4(MULS, 8, 0x7c048d159e26af38, 0xc83fb72ea61d950c, 0x7777777777777777, 0x8888888888888888, DRCUML_FLAG_V | DRCUML_FLAG_S)
+	TEST_ENTRY_4(MULS, 8, 0x3232323232323233, 0x0000000000000000, 0xcdcdcdcdcdcdcdcd, 0xffffffffffffffff, 0)
+
+	TEST_ENTRY_4(DIVU, 4, 0x02702702, 0x00000003, 0x11111111, 0x00000007, 0)
+	TEST_ENTRY_4(DIVU, 4, 0x00000000, 0x11111111, 0x11111111, 0x11111112, DRCUML_FLAG_Z)
+	TEST_ENTRY_4(DIVU, 4, 0x7fffffff, 0x00000000, 0xfffffffe, 0x00000002, 0)
+	TEST_ENTRY_4(DIVU, 4, 0xfffffffe, 0x00000000, 0xfffffffe, 0x00000001, DRCUML_FLAG_S)
+	TEST_ENTRY_4(DIVU, 4, UNDEFINED,  UNDEFINED,  0xffffffff, 0x00000000, DRCUML_FLAG_V)
+
+	TEST_ENTRY_4(DIVU, 8, 0x0270270270270270, 0x0000000000000001, 0x1111111111111111, 0x0000000000000007, 0)
+	TEST_ENTRY_4(DIVU, 8, 0x0000000000000000, 0x1111111111111111, 0x1111111111111111, 0x1111111111111112, DRCUML_FLAG_Z)
+	TEST_ENTRY_4(DIVU, 8, 0x7fffffffffffffff, 0x0000000000000000, 0xfffffffffffffffe, 0x0000000000000002, 0)
+	TEST_ENTRY_4(DIVU, 8, 0xfffffffffffffffe, 0x0000000000000000, 0xfffffffffffffffe, 0x0000000000000001, DRCUML_FLAG_S)
+	TEST_ENTRY_4(DIVU, 8, UNDEFINED,          UNDEFINED,          0xffffffffffffffff, 0x0000000000000000, DRCUML_FLAG_V)
+
+	TEST_ENTRY_4(DIVS, 4, 0x02702702, 0x00000003, 0x11111111, 0x00000007, 0)
+	TEST_ENTRY_4(DIVS, 4, 0x00000000, 0x11111111, 0x11111111, 0x11111112, DRCUML_FLAG_Z)
+	TEST_ENTRY_4(DIVS, 4, 0xffffffff, 0x00000000, 0xfffffffe, 0x00000002, DRCUML_FLAG_S)
+	TEST_ENTRY_4(DIVS, 4, UNDEFINED,  UNDEFINED,  0xffffffff, 0x00000000, DRCUML_FLAG_V)
+
+	TEST_ENTRY_4(DIVS, 8, 0x0270270270270270, 0x0000000000000001, 0x1111111111111111, 0x0000000000000007, 0)
+	TEST_ENTRY_4(DIVS, 8, 0x0000000000000000, 0x1111111111111111, 0x1111111111111111, 0x1111111111111112, DRCUML_FLAG_Z)
+	TEST_ENTRY_4(DIVS, 8, 0xffffffffffffffff, 0x0000000000000000, 0xfffffffffffffffe, 0x0000000000000002, DRCUML_FLAG_S)
+	TEST_ENTRY_4(DIVS, 8, UNDEFINED,          UNDEFINED,          0xffffffffffffffff, 0x0000000000000000, DRCUML_FLAG_V)
 };
 
 
@@ -1921,14 +2038,32 @@ static void validate_backend(drcuml_state *drcuml)
 
 	/* iterate over test entries */
 	printf("Backend validation....\n");
-	for (tnum = 0; tnum < ARRAY_LENGTH(bevalidate_test_list); tnum++)
+	for (tnum = 31; tnum < ARRAY_LENGTH(bevalidate_test_list); tnum++)
 	{
 		const bevalidate_test *test = &bevalidate_test_list[tnum];
 		drcuml_parameter param[ARRAY_LENGTH(test->param)];
+		char mnemonic[20], *dst;
+		const char *src;
+
+		/* progress */
+		dst = mnemonic;
+		for (src = opcode_info_table[test->opcode]->mnemonic; *src != 0; src++)
+		{
+			if (*src == '!')
+			{
+				if (test->size == 8)
+					*dst++ = 'd';
+			}
+			else if (*src == '#')
+				*dst++ = (test->size == 8) ? 'd' : 's';
+			else
+				*dst++ = *src;
+		}
+		*dst = 0;
+		printf("Executing test %d/%d (%s)", tnum + 1, (int)ARRAY_LENGTH(bevalidate_test_list), mnemonic);
 
 		/* reset parameter list and iterate */
 		memset(param, 0, sizeof(param));
-		printf("Executing test %d/%d", tnum + 1, (int)ARRAY_LENGTH(bevalidate_test_list));
 		bevalidate_iterate_over_params(drcuml, handles, test, param, 0);
 		printf("\n");
 	}
@@ -1946,30 +2081,30 @@ static void validate_backend(drcuml_state *drcuml)
 static void bevalidate_iterate_over_params(drcuml_state *drcuml, drcuml_codehandle **handles, const bevalidate_test *test, drcuml_parameter *paramlist, int pnum)
 {
 	const drcuml_opcode_info *opinfo = opcode_info_table[test->opcode];
+	drcuml_ptype ptype;
 
 	/* if no parameters, execute now */
-	if (pnum >= ARRAY_LENGTH(opinfo->ptypes) || opinfo->ptypes[pnum] == OV_PARAM_ALLOWED_NONE)
+	if (pnum >= ARRAY_LENGTH(opinfo->param) || opinfo->param[pnum].typemask == PTYPES_NONE)
 	{
 		bevalidate_iterate_over_flags(drcuml, handles, test, paramlist);
 		return;
 	}
 
 	/* iterate over valid parameter types */
-	for (paramlist[pnum].type = DRCUML_PTYPE_IMMEDIATE; paramlist[pnum].type < DRCUML_PTYPE_MAX; paramlist[pnum].type++)
-		if (opinfo->ptypes[pnum] & (1 << paramlist[pnum].type))
+	for (ptype = DRCUML_PTYPE_IMMEDIATE; ptype < DRCUML_PTYPE_MAX; ptype++)
+		if (opinfo->param[pnum].typemask & (1 << ptype))
 		{
 			int pindex, pcount;
 
 			/* mapvars can only do 32-bit tests */
-			if (paramlist[pnum].type == DRCUML_PTYPE_MAPVAR && size_for_param(test->size, opinfo->ptypes[pnum]) == 8)
+			if (ptype == DRCUML_PTYPE_MAPVAR && effective_test_psize(opinfo, pnum, test->size, test->param) == 8)
 				continue;
 
 			/* for some parameter types, we wish to iterate over all possibilities */
-			switch (paramlist[pnum].type)
+			switch (ptype)
 			{
 				case DRCUML_PTYPE_INT_REGISTER:		pcount = DRCUML_REG_I_END - DRCUML_REG_I0;		break;
 				case DRCUML_PTYPE_FLOAT_REGISTER:	pcount = DRCUML_REG_F_END - DRCUML_REG_F0;		break;
-				case DRCUML_PTYPE_MAPVAR:			pcount = DRCUML_MAPVAR_END - DRCUML_MAPVAR_M0;	break;
 				default:							pcount = 1;										break;
 			}
 
@@ -1984,16 +2119,25 @@ static void bevalidate_iterate_over_params(drcuml_state *drcuml, drcuml_codehand
 					printf(".");
 
 				/* can't duplicate multiple source parameters unless they are immediates */
-				if (paramlist[pnum].type != DRCUML_PTYPE_IMMEDIATE && ((test->destmask >> pnum) & 1) == 0)
+				if (ptype != DRCUML_PTYPE_IMMEDIATE && (opinfo->param[pnum].output & PIO_IN))
 
 					/* loop over all parameters we've done before; if the parameter is a source and matches us, skip this case */
 					for (pscannum = 0; pscannum < pnum; pscannum++)
-						if (((test->destmask >> pscannum) & 1) == 0 && paramlist[pnum].type == paramlist[pscannum].type && pindex == paramlist[pscannum].value)
+						if ((opinfo->param[pscannum].output & PIO_IN) && ptype == paramlist[pscannum].type && pindex == paramlist[pscannum].value)
+							skip = TRUE;
+				
+				/* can't duplicate multiple dest parameters */
+				if (opinfo->param[pnum].output & PIO_OUT)
+
+					/* loop over all parameters we've done before; if the parameter is a source and matches us, skip this case */
+					for (pscannum = 0; pscannum < pnum; pscannum++)
+						if ((opinfo->param[pscannum].output & PIO_OUT) && ptype == paramlist[pscannum].type && pindex == paramlist[pscannum].value)
 							skip = TRUE;
 
 				/* iterate over the next parameter in line */
 				if (!skip)
 				{
+					paramlist[pnum].type = ptype;
 					paramlist[pnum].value = pindex;
 					bevalidate_iterate_over_params(drcuml, handles, test, paramlist, pnum + 1);
 				}
@@ -2010,7 +2154,7 @@ static void bevalidate_iterate_over_params(drcuml_state *drcuml, drcuml_codehand
 static void bevalidate_iterate_over_flags(drcuml_state *drcuml, drcuml_codehandle **handles, const bevalidate_test *test, drcuml_parameter *paramlist)
 {
 	const drcuml_opcode_info *opinfo = opcode_info_table[test->opcode];
-	UINT8 flagmask = opinfo->flags & 0x1f;
+	UINT8 flagmask = opinfo->outflags;
 	UINT8 curmask;
 
 	/* iterate over all possible flag combinations */
@@ -2036,7 +2180,7 @@ static void bevalidate_execute(drcuml_state *drcuml, drcuml_codehandle **handles
 	int numparams;
 
 	/* allocate memory for parameters */
-	parammem = drccache_memory_alloc_near(drcuml->cache, sizeof(UINT64) * ARRAY_LENGTH(test->param));
+	parammem = drccache_memory_alloc_near(drcuml->cache, sizeof(UINT64) * (ARRAY_LENGTH(test->param) + 1));
 
 	/* flush the cache */
 	drcuml_reset(drcuml);
@@ -2057,27 +2201,28 @@ static void bevalidate_execute(drcuml_state *drcuml, drcuml_codehandle **handles
 	switch (numparams)
 	{
 		case 0:
-			drcuml_block_append_0(block, test->opcode, test->size, DRCUML_COND_ALWAYS, flagmask);
+			drcuml_block_append_0(block, test->opcode, test->size, DRCUML_COND_ALWAYS);
 			break;
 
 		case 1:
-			drcuml_block_append_1(block, test->opcode, test->size, DRCUML_COND_ALWAYS, flagmask, params[0].type, params[0].value);
+			drcuml_block_append_1(block, test->opcode, test->size, DRCUML_COND_ALWAYS, params[0].type, params[0].value);
 			break;
 
 		case 2:
-			drcuml_block_append_2(block, test->opcode, test->size, DRCUML_COND_ALWAYS, flagmask, params[0].type, params[0].value, params[1].type, params[1].value);
+			drcuml_block_append_2(block, test->opcode, test->size, DRCUML_COND_ALWAYS, params[0].type, params[0].value, params[1].type, params[1].value);
 			break;
 
 		case 3:
-			drcuml_block_append_3(block, test->opcode, test->size, DRCUML_COND_ALWAYS, flagmask, params[0].type, params[0].value, params[1].type, params[1].value, params[2].type, params[2].value);
+			drcuml_block_append_3(block, test->opcode, test->size, DRCUML_COND_ALWAYS, params[0].type, params[0].value, params[1].type, params[1].value, params[2].type, params[2].value);
 			break;
 
 		case 4:
-			drcuml_block_append_4(block, test->opcode, test->size, DRCUML_COND_ALWAYS, flagmask, params[0].type, params[0].value, params[1].type, params[1].value, params[2].type, params[2].value, params[3].type, params[3].value);
+			drcuml_block_append_4(block, test->opcode, test->size, DRCUML_COND_ALWAYS, params[0].type, params[0].value, params[1].type, params[1].value, params[2].type, params[2].value, params[3].type, params[3].value);
 			break;
 	}
 	testinst = block->inst[block->nextinst - 1];
 	UML_HANDLE(block, handles[2]);
+	UML_GETFLGS(block, MEM(&parammem[ARRAY_LENGTH(test->param)]), flagmask);
 	UML_SAVE(block, &fstate);
 	UML_EXIT(block, IMM(0));
 
@@ -2088,10 +2233,10 @@ static void bevalidate_execute(drcuml_state *drcuml, drcuml_codehandle **handles
 	drcuml_execute(drcuml, handles[0]);
 
 	/* verify the results */
-	bevalidate_verify_state(drcuml, &istate, &fstate, test, params, &testinst, handles[1]->code, handles[2]->code, flagmask);
+	bevalidate_verify_state(drcuml, &istate, &fstate, test, *(UINT32 *)&parammem[ARRAY_LENGTH(test->param)], params, &testinst, handles[1]->code, handles[2]->code, flagmask);
 
 	/* free memory */
-	drccache_memory_free(drcuml->cache, parammem, sizeof(UINT64) * ARRAY_LENGTH(test->param));
+	drccache_memory_free(drcuml->cache, parammem, sizeof(UINT64) * (ARRAY_LENGTH(test->param) + 1));
 }
 
 
@@ -2147,7 +2292,7 @@ static int bevalidate_populate_state(drcuml_block *block, drcuml_machine_state *
 	/* iterate over parameters */
 	for (pnum = 0; pnum < ARRAY_LENGTH(test->param); pnum++)
 	{
-		int psize = size_for_param(test->size, opinfo->ptypes[pnum]);
+		int psize = effective_test_psize(opinfo, pnum, test->size, test->param);
 		drcuml_parameter *curparam = &params[pnum];
 
 		/* start with a copy of the parameter from the list */
@@ -2206,7 +2351,7 @@ static int bevalidate_populate_state(drcuml_block *block, drcuml_machine_state *
     discrepancies
 -------------------------------------------------*/
 
-static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_state *istate, drcuml_machine_state *state, const bevalidate_test *test, const drcuml_parameter *params, const drcuml_instruction *testinst, drccodeptr codestart, drccodeptr codeend, UINT8 flagmask)
+static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_state *istate, drcuml_machine_state *state, const bevalidate_test *test, UINT32 flags, const drcuml_parameter *params, const drcuml_instruction *testinst, drccodeptr codestart, drccodeptr codeend, UINT8 flagmask)
 {
 	const drcuml_opcode_info *opinfo = opcode_info_table[test->opcode];
 	UINT8 ireg[DRCUML_REG_I_END - DRCUML_REG_I0] = { 0 };
@@ -2218,14 +2363,14 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 	*errend = 0;
 
 	/* check flags */
-	if ((state->flags & flagmask) != (test->flags & flagmask))
+	if (flags != (test->flags & flagmask))
 	{
 		errend += sprintf(errend, "  Flags ... result:%c%c%c%c%c  expected:%c%c%c%c%c\n",
-			(flagmask & DRCUML_FLAG_U) ? ((state->flags & DRCUML_FLAG_U) ? 'U' : '.') : '-',
-			(flagmask & DRCUML_FLAG_S) ? ((state->flags & DRCUML_FLAG_S) ? 'S' : '.') : '-',
-			(flagmask & DRCUML_FLAG_Z) ? ((state->flags & DRCUML_FLAG_Z) ? 'Z' : '.') : '-',
-			(flagmask & DRCUML_FLAG_V) ? ((state->flags & DRCUML_FLAG_V) ? 'V' : '.') : '-',
-			(flagmask & DRCUML_FLAG_C) ? ((state->flags & DRCUML_FLAG_C) ? 'C' : '.') : '-',
+			(flagmask & DRCUML_FLAG_U) ? ((flags & DRCUML_FLAG_U) ? 'U' : '.') : '-',
+			(flagmask & DRCUML_FLAG_S) ? ((flags & DRCUML_FLAG_S) ? 'S' : '.') : '-',
+			(flagmask & DRCUML_FLAG_Z) ? ((flags & DRCUML_FLAG_Z) ? 'Z' : '.') : '-',
+			(flagmask & DRCUML_FLAG_V) ? ((flags & DRCUML_FLAG_V) ? 'V' : '.') : '-',
+			(flagmask & DRCUML_FLAG_C) ? ((flags & DRCUML_FLAG_C) ? 'C' : '.') : '-',
 			(flagmask & DRCUML_FLAG_U) ? ((test->flags & DRCUML_FLAG_U) ? 'U' : '.') : '-',
 			(flagmask & DRCUML_FLAG_S) ? ((test->flags & DRCUML_FLAG_S) ? 'S' : '.') : '-',
 			(flagmask & DRCUML_FLAG_Z) ? ((test->flags & DRCUML_FLAG_Z) ? 'Z' : '.') : '-',
@@ -2235,10 +2380,10 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 
 	/* check destination parameters */
 	for (pnum = 0; pnum < ARRAY_LENGTH(test->param); pnum++)
-		if (test->destmask & (1 << pnum))
+		if (opinfo->param[pnum].output & PIO_OUT)
 		{
-			UINT64 mask = mask_for_param(test->size, opinfo->ptypes[pnum]);
-			int psize = size_for_param(test->size, opinfo->ptypes[pnum]);
+			int psize = effective_test_psize(opinfo, pnum, test->size, test->param);
+			UINT64 mask = U64(0xffffffffffffffff) >> (64 - 8 * psize);
 			UINT64 result = 0;
 
 			/* fetch the result from the parameters */
@@ -2269,7 +2414,7 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 			}
 
 			/* check against the mask */
-			if ((result & mask) != (test->param[pnum] & mask))
+			if (test->param[pnum] != UNDEFINED_U64 && (result & mask) != (test->param[pnum] & mask))
 			{
 				if ((UINT32)mask == mask)
 					errend += sprintf(errend, "  Parameter %d ... result:%08X  expected:%08X\n", pnum,
@@ -2315,5 +2460,3 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 	}
 	return errend != errorbuf;
 }
-
-#endif
