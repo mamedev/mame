@@ -7705,8 +7705,7 @@ ROM_START( pang3j )
 	ROM_LOAD( "pa3-06.11d",  0x20000, 0x20000, CRC(affa4f82) SHA1(27b9292bbc121cf585f53297a79fe8f0d0a729ae) )
 ROM_END
 
-/* B-Board uncertain but should be 91634B/91635B from the program ROM names */
-/* there's a photo of a 91635B board but it's clearly not original */
+/* B-Board 91634B */
 ROM_START( megaman )
 	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "rcma_23b.rom",   0x000000, 0x80000, CRC(61e4a397) SHA1(a90b1cbef4206a4554398bc458a4b3e2c46d4c4f) )
@@ -7952,15 +7951,15 @@ GAME( 1992, varth,    0,        cps1_12MHz, varth,    cps1,     ROT270, "Capcom"
 GAME( 1992, varthr1,  varth,    cps1_12MHz, varth,    cps1,     ROT270, "Capcom", "Varth - Operation Thunderstorm (World 920612)" , 0)		// "ETC"
 GAME( 1992, varthu,   varth,    cps1_12MHz, varth,    cps1,     ROT270, "Capcom (Romstar license)", "Varth - Operation Thunderstorm (US 920612)", 0 )
 GAME( 1992, varthj,   varth,    cps1_12MHz, varth,    cps1,     ROT270, "Capcom", "Varth - Operation Thunderstorm (Japan 920714)", 0 )
-GAME( 1992, cworld2j, 0,        cps1_10MHz, cworld2j, cps1,     ROT0,   "Capcom", "Capcom World 2 (Japan 920611)", 0 )
+GAME( 1992, cworld2j, 0,        cps1_12MHz, cworld2j, cps1,     ROT0,   "Capcom", "Capcom World 2 (Japan 920611)", 0 )
 GAME( 1992, sf2hf,    sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Hyper Fighting (World 921209)", 0 )
 GAME( 1992, sf2t,     sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Hyper Fighting (US 921209)", 0 )
 GAME( 1992, sf2tj,    sf2ce,    cps1_12MHz, sf2j,     cps1,     ROT0,   "Capcom", "Street Fighter II' Turbo - Hyper Fighting (Japan 921209)", 0 )
 GAME( 1992, qad,      0,        cps1_12MHz, qad,      cps1,     ROT0,   "Capcom", "Quiz & Dragons (US 920701)", 0 )	// 12MHz verified
-GAME( 1994, qadj,     qad,      cps1_10MHz, qadj,     cps1,     ROT0,   "Capcom", "Quiz & Dragons (Japan 940921)", 0 )
-GAME( 1995, qtono2,   0,        cps1_10MHz, qtono2,   cps1,     ROT0,   "Capcom", "Quiz Tonosama no Yabou 2 Zenkoku-ban (Japan 950123)", 0 )
-GAME( 1995, megaman,  0,        cps1_10MHz, megaman,  cps1,     ROT0,   "Capcom", "Mega Man - The Power Battle (CPS1 Asia 951006)", 0 )
-GAME( 1995, rockmanj, megaman,  cps1_10MHz, rockmanj, cps1,     ROT0,   "Capcom", "Rockman - The Power Battle (CPS1 Japan 950922)", 0 )
+GAME( 1994, qadj,     qad,      cps1_12MHz, qadj,     cps1,     ROT0,   "Capcom", "Quiz & Dragons (Japan 940921)", 0 )
+GAME( 1995, qtono2,   0,        cps1_12MHz, qtono2,   cps1,     ROT0,   "Capcom", "Quiz Tonosama no Yabou 2 Zenkoku-ban (Japan 950123)", 0 )
+GAME( 1995, megaman,  0,        cps1_12MHz, megaman,  cps1,     ROT0,   "Capcom", "Mega Man - The Power Battle (CPS1 Asia 951006)", 0 )
+GAME( 1995, rockmanj, megaman,  cps1_12MHz, rockmanj, cps1,     ROT0,   "Capcom", "Rockman - The Power Battle (CPS1 Japan 950922)", 0 )
 
 GAME( 1992, wof,      0,        qsound,     wof,      wof,      ROT0,   "Capcom", "Warriors of Fate (World 921002)" , 0)				// "ETC"
 GAME( 1992, wofa,     wof,      qsound,     wof,      wof,      ROT0,   "Capcom", "Sangokushi II (Asia 921005)" , 0)					// World "warning"
@@ -7978,7 +7977,7 @@ GAME( 1993, mbomberj, slammast, qsound,     slammast, slammast, ROT0,   "Capcom"
 GAME( 1993, mbombrd,  0,        qsound,     slammast, slammast, ROT0,   "Capcom", "Muscle Bomber Duo - Ultimate Team Battle (World 931206)" , 0)  // "ETC"
 GAME( 1993, mbombrdj, mbombrd,  qsound,     slammast, slammast, ROT0,   "Capcom", "Muscle Bomber Duo - Heat Up Warriors (Japan 931206)", 0 )
 
-GAME( 1994, pnickj,   0,        cps1_10MHz, pnickj,   cps1,     ROT0,   "Compile (Capcom license)", "Pnickies (Japan 940608)", 0 )
+GAME( 1994, pnickj,   0,        cps1_12MHz, pnickj,   cps1,     ROT0,   "Compile (Capcom license)", "Pnickies (Japan 940608)", 0 )
 /* Japanese version of Pang 3 is encrypted, Euro version is not */
 GAME( 1995, pang3,    0,        pang3,      pang3,    pang3,    ROT0,   "Mitchell", "Pang! 3 (Euro 950511)", 0 )
 GAME( 1995, pang3j,   pang3,    pang3,      pang3,    pang3j,   ROT0,   "Mitchell", "Pang! 3 (Japan 950511)", 0 )

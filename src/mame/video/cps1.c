@@ -86,7 +86,7 @@ Muscle Bomber Duo*                          1993  ?         ?                   
 Quiz Tonosama no Yabou 2                    1995  ?         ?                      ?          ?
 Pnickies                                    1994  ?         ?                      ?          CPS-B-21? DL-0921-10014? ?
 Pang 3                                      1995  94916-10  CP1B1F,CP1B8K,CP1B9KA  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
-Megaman the Power Battle                    1995  91634B-2  RCM63B   BPRG1   IOB1  ?          CPS-B-21  DL-0921-10014  C632  IOC1
+Megaman the Power Battle                    1995  91634B-2  RCM63B   BPRG1  IOB1  92631C-6    CPS-B-21  DL-0921-10014  C632  IOC1
 
 @actually CPS-B-01, the original number was scratched out and "04" stamped over it
 *denotes Suicide Battery
