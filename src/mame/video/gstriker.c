@@ -449,8 +449,8 @@ static void CG10103_draw_sprite(running_machine *machine, bitmap_t* screen, cons
 		for (x=0;x<xnum;x++)
 		{
 			// Hack to handle horizontal wrapping
-			drawgfxzoom(screen, machine->gfx[CG10103_cur_chip->gfx_region], tile, color+CG10103_cur_chip->pal_base, flipx, flipy, xp>>16, ypos>>16, cliprect, TRANSPARENCY_PEN, 0x0, xfact, yfact);
-			drawgfxzoom(screen, machine->gfx[CG10103_cur_chip->gfx_region], tile, color+CG10103_cur_chip->pal_base, flipx, flipy, (xp>>16) - 0x200, ypos>>16, cliprect, TRANSPARENCY_PEN, 0x0, xfact, yfact);
+			drawgfxzoom(screen, machine->gfx[CG10103_cur_chip->gfx_region], tile, color+CG10103_cur_chip->pal_base, flipx, flipy, xp>>16, ypos>>16, cliprect, TRANSPARENCY_PEN, CG10103_cur_chip->transpen, xfact, yfact);
+			drawgfxzoom(screen, machine->gfx[CG10103_cur_chip->gfx_region], tile, color+CG10103_cur_chip->pal_base, flipx, flipy, (xp>>16) - 0x200, ypos>>16, cliprect, TRANSPARENCY_PEN, CG10103_cur_chip->transpen, xfact, yfact);
 			xp += xstep;
 			tile++;
 		}
@@ -514,6 +514,10 @@ static void CG10103_set_gfx_region(int numchip, int gfx_region)
 	CG10103[numchip].gfx_region = gfx_region;
 }
 
+static void CG10103_set_transpen(int numchip, int transpen)
+{
+	CG10103[numchip].transpen = transpen;
+}
 
 
 /*** VIDEO UPDATE/START **********************************************/
@@ -578,6 +582,7 @@ VIDEO_START(gstriker)
 	CG10103_init(1);
 	CG10103_set_gfx_region(0, 2);
 	CG10103_set_pal_base(0, 0x10);
+	CG10103_set_transpen(0, 0x0);
 }
 
 VIDEO_START(twrldc94)
@@ -600,5 +605,28 @@ VIDEO_START(twrldc94)
 	CG10103_init(1);
 	CG10103_set_gfx_region(0, 2);
 	CG10103_set_pal_base(0, 0x60);
+	CG10103_set_transpen(0, 0x0);
 }
 
+VIDEO_START(vgoalsoc)
+{
+	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
+
+	// Initalize the chip for the score plane
+	VS920A_init(1);
+	VS920A_set_gfx_region(0, 0);
+	VS920A_set_pal_base(0, 0x30);
+	tilemap_set_transparent_pen(VS920A_get_tilemap(0),  0xf);
+
+	// Initalize the chip for the screen plane
+	MB60553_init(1);
+	MB60553_set_gfx_region(0, 1);
+	MB60553_set_pal_base(0, 0x20);
+	tilemap_set_transparent_pen(MB60553_get_tilemap(0), 0xf);
+
+	// Initialize the sprite generator
+	CG10103_init(1);
+	CG10103_set_gfx_region(0, 2);
+	CG10103_set_pal_base(0, 0x00);
+	CG10103_set_transpen(0, 0xf);
+}
