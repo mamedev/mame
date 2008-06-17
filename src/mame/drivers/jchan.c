@@ -302,7 +302,7 @@ static void jchan_mcu_run(running_machine *machine)
 
 		case 0x03: 	// DSW
 		{
-			mcu_ram[mcu_offset] = input_port_read_indexed(machine, 3);
+			mcu_ram[mcu_offset] = input_port_read(machine, "DSW");
 			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n",activecpu_get_pc(),mcu_command,mcu_offset*2);
 		}
 		break;
@@ -455,8 +455,8 @@ static READ16_HANDLER ( jchan_ctrl_r )
 {
 	switch(offset)
 	{
-		case 0/2: return input_port_read_indexed(machine, 0); // Player 1 controls
-		case 2/2: return input_port_read_indexed(machine, 1); // Player 2 controls
+		case 0/2: return input_port_read(machine, "IN0"); // Player 1 controls
+		case 2/2: return input_port_read(machine, "IN1"); // Player 2 controls
 		default: logerror("jchan_ctrl_r unknown!"); break;
 	}
 	return jchan_ctrl[offset];
@@ -704,7 +704,7 @@ static INPUT_PORTS_START( jchan )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1	)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 
-	PORT_START_TAG("IN3")	// DSW provided by the MCU - $200098.b <- $300200
+	PORT_START_TAG("DSW")	// DSW provided by the MCU - $200098.b <- $300200
 	PORT_DIPNAME( 0x0100, 0x0100, "Test Mode" )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

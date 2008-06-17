@@ -323,7 +323,7 @@ static WRITE16_HANDLER( igs_##NUM##_input_w )	\
 {												\
 	COMBINE_DATA(&igs_input_sel);				\
 												\
-	if ( (igs_input_sel & 0xff00) || ((~igs_input_sel) & ((1 << NUM)-1)) )	\
+	if ( (igs_input_sel & 0xff00) || ((~igs_input_sel) & ((1 << NUM)-1)) )		\
 		logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", activecpu_get_pc(), igs_input_sel);	\
 }												\
 												\
@@ -331,10 +331,11 @@ static READ16_HANDLER( igs_##NUM##_input_r )	\
 {												\
 	int i;										\
 	UINT16 ret=0;								\
+	static const char *dipnames[] = { "DSW1", "DSW2", "DSW3", "DSW4", "DSW5" };	\
 												\
 	for (i = 0; i < NUM; i++)					\
 		if ((~igs_input_sel) & (1 << i) )		\
-			ret = input_port_read_indexed(machine, i);				\
+			ret = input_port_read(machine, dipnames[i]);				\
 												\
 	/* 0x0100 is blitter busy */				\
 	return 	(ret & 0xff) | 0x0000;				\
@@ -663,11 +664,11 @@ static READ16_HANDLER( chmplst2_magic_r )
 	switch(igs_magic[0])
 	{
 		case 0x01:
-			if (~igs_input_sel2 & 0x01)	return input_port_read_indexed(machine, 4);
-			if (~igs_input_sel2 & 0x02)	return input_port_read_indexed(machine, 5);
-			if (~igs_input_sel2 & 0x04)	return input_port_read_indexed(machine, 6);
-			if (~igs_input_sel2 & 0x08)	return input_port_read_indexed(machine, 7);
-			if (~igs_input_sel2 & 0x10)	return input_port_read_indexed(machine, 8);
+			if (~igs_input_sel2 & 0x01)	return input_port_read(machine, "KEY0");
+			if (~igs_input_sel2 & 0x02)	return input_port_read(machine, "KEY1");
+			if (~igs_input_sel2 & 0x04)	return input_port_read(machine, "KEY2");
+			if (~igs_input_sel2 & 0x08)	return input_port_read(machine, "KEY3");
+			if (~igs_input_sel2 & 0x10)	return input_port_read(machine, "KEY4");
 			/* fall through */
 		default:
 			logerror("%06x: warning, reading with igs_magic = %02x\n", activecpu_get_pc(), igs_magic[0]);
@@ -736,9 +737,9 @@ static READ16_HANDLER( chindrag_magic_r )
 {
 	switch(igs_magic[0])
 	{
-		case 0x00:	return input_port_read_indexed(machine, 4);
-		case 0x01:	return input_port_read_indexed(machine, 5);
-		case 0x02:	return input_port_read_indexed(machine, 6);
+		case 0x00:	return input_port_read(machine, "IN0");
+		case 0x01:	return input_port_read(machine, "IN1");
+		case 0x02:	return input_port_read(machine, "IN2");
 
 		case 0x20:	return 0x49;
 		case 0x21:	return 0x47;
@@ -803,7 +804,7 @@ static READ16_HANDLER( grtwall_magic_r )
 {
 	switch(igs_magic[0])
 	{
-		case 0x00:	return input_port_read_indexed(machine, 5);
+		case 0x00:	return input_port_read(machine, "IN0");
 
 		case 0x20:	return 0x49;
 		case 0x21:	return 0x47;
@@ -873,11 +874,11 @@ static READ16_HANDLER( lhb_input2_r )
 		case 0:		return igs_input_sel2;
 
 		case 1:
-			if (~igs_input_sel2 & 0x01)	return input_port_read_indexed(machine, 6);
-			if (~igs_input_sel2 & 0x02)	return input_port_read_indexed(machine, 7);
-			if (~igs_input_sel2 & 0x04)	return input_port_read_indexed(machine, 8);
-			if (~igs_input_sel2 & 0x08)	return input_port_read_indexed(machine, 9);
-			if (~igs_input_sel2 & 0x10)	return input_port_read_indexed(machine, 10);
+			if (~igs_input_sel2 & 0x01)	return input_port_read(machine, "KEY0");
+			if (~igs_input_sel2 & 0x02)	return input_port_read(machine, "KEY1");
+			if (~igs_input_sel2 & 0x04)	return input_port_read(machine, "KEY2");
+			if (~igs_input_sel2 & 0x08)	return input_port_read(machine, "KEY3");
+			if (~igs_input_sel2 & 0x10)	return input_port_read(machine, "KEY4");
 
 			logerror("%06x: warning, reading with igs_input_sel2 = %02x\n", activecpu_get_pc(), igs_input_sel2);
 			break;
@@ -918,8 +919,8 @@ static READ16_HANDLER( vbowl_magic_r )
 {
 	switch(igs_magic[0])
 	{
-		case 0x00:	return input_port_read_indexed(machine, 5);
-		case 0x01:	return input_port_read_indexed(machine, 6);
+		case 0x00:	return input_port_read(machine, "IN0");
+		case 0x01:	return input_port_read(machine, "IN1");
 
 		case 0x20:	return 0x49;
 		case 0x21:	return 0x47;
@@ -985,14 +986,14 @@ static READ16_HANDLER( xymg_magic_r )
 {
 	switch(igs_magic[0])
 	{
-		case 0x00:	return input_port_read_indexed(machine, 3);
+		case 0x00:	return input_port_read(machine, "COIN");
 
 		case 0x02:
-			if (~igs_input_sel2 & 0x01)	return input_port_read_indexed(machine, 4);
-			if (~igs_input_sel2 & 0x02)	return input_port_read_indexed(machine, 5);
-			if (~igs_input_sel2 & 0x04)	return input_port_read_indexed(machine, 6);
-			if (~igs_input_sel2 & 0x08)	return input_port_read_indexed(machine, 7);
-			if (~igs_input_sel2 & 0x10)	return input_port_read_indexed(machine, 8);
+			if (~igs_input_sel2 & 0x01)	return input_port_read(machine, "KEY0");
+			if (~igs_input_sel2 & 0x02)	return input_port_read(machine, "KEY1");
+			if (~igs_input_sel2 & 0x04)	return input_port_read(machine, "KEY2");
+			if (~igs_input_sel2 & 0x08)	return input_port_read(machine, "KEY3");
+			if (~igs_input_sel2 & 0x10)	return input_port_read(machine, "KEY4");
 			/* fall through */
 		default:
 			logerror("%06x: warning, reading with igs_magic = %02x\n", activecpu_get_pc(), igs_magic[0]);
@@ -1194,7 +1195,7 @@ static UINT16 *vbowl_trackball;
 static VIDEO_EOF( vbowl )
 {
 	vbowl_trackball[0] = vbowl_trackball[1];
-	vbowl_trackball[1] = (input_port_read_indexed(machine, 8) << 8) | input_port_read_indexed(machine, 7);
+	vbowl_trackball[1] = (input_port_read(machine, "AN1") << 8) | input_port_read(machine, "AN0");
 }
 
 static WRITE16_HANDLER( vbowl_pen_hi_w )
@@ -1300,7 +1301,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( chindrag )
-	PORT_START	// IN0 - DSW1
+	PORT_START_TAG("DSW1")	// IN0 - DSW1
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
@@ -1325,7 +1326,7 @@ static INPUT_PORTS_START( chindrag )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN1 - DSW2
+	PORT_START_TAG("DSW2")	// IN1 - DSW2
 	PORT_DIPNAME( 0x01, 0x01, "Background" )
 	PORT_DIPSETTING(    0x01, "Girl" )
 	PORT_DIPSETTING(    0x00, "Landscape" )
@@ -1351,12 +1352,12 @@ static INPUT_PORTS_START( chindrag )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-  	PORT_START	// IN2 - DSW3
+  	PORT_START_TAG("DSW3")	// IN2 - DSW3
 	PORT_DIPNAME( 0xff, 0xff, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0xff, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN3
+	PORT_START_TAG("COIN")	// IN3
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)	// keep pressed while booting
@@ -1366,7 +1367,7 @@ static INPUT_PORTS_START( chindrag )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN4
+	PORT_START_TAG("IN0")	// IN4
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -1376,7 +1377,7 @@ static INPUT_PORTS_START( chindrag )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )	// press in girl test to pause, button 3 advances
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN5
+	PORT_START_TAG("IN1")	// IN5
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1386,7 +1387,7 @@ static INPUT_PORTS_START( chindrag )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START	// IN6
+	PORT_START_TAG("IN2")	// IN6
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -1398,9 +1399,8 @@ static INPUT_PORTS_START( chindrag )
 INPUT_PORTS_END
 
 
-
 static INPUT_PORTS_START( chmplst2 )
-	PORT_START	// IN0 - DSW1
+	PORT_START_TAG("DSW1")	// IN0 - DSW1
 	PORT_DIPNAME( 0x07, 0x02, "Pay Out (%)" )
 	PORT_DIPSETTING(    0x07, "50" )
 	PORT_DIPSETTING(    0x06, "54" )
@@ -1425,7 +1425,7 @@ static INPUT_PORTS_START( chmplst2 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN1 - DSW2
+	PORT_START_TAG("DSW2")	// IN1 - DSW2
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )	// Only when bit 4 = 1
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
@@ -1450,7 +1450,7 @@ static INPUT_PORTS_START( chmplst2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-  	PORT_START	// IN2 - DSW3
+  	PORT_START_TAG("DSW3")	// IN2 - DSW3
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x03, "500" )
 	PORT_DIPSETTING(    0x02, "1000" )
@@ -1474,7 +1474,7 @@ static INPUT_PORTS_START( chmplst2 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN3
+	PORT_START_TAG("COIN")	// IN3
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )	// data clear
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)	// keep pressed while booting
@@ -1484,7 +1484,7 @@ static INPUT_PORTS_START( chmplst2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN4
+	PORT_START_TAG("KEY0")	// IN4
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
@@ -1494,7 +1494,7 @@ static INPUT_PORTS_START( chmplst2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	// ? set to 0 both
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	// ? and you can't start a game
 
-	PORT_START	// IN5
+	PORT_START_TAG("KEY1")	// IN5
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
@@ -1504,7 +1504,7 @@ static INPUT_PORTS_START( chmplst2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN6
+	PORT_START_TAG("KEY2")	// IN6
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
@@ -1514,7 +1514,7 @@ static INPUT_PORTS_START( chmplst2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN7
+	PORT_START_TAG("KEY3")	// IN7
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
@@ -1524,7 +1524,7 @@ static INPUT_PORTS_START( chmplst2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN8
+	PORT_START_TAG("KEY4")	// IN8
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1536,9 +1536,8 @@ static INPUT_PORTS_START( chmplst2 )
 INPUT_PORTS_END
 
 
-
 static INPUT_PORTS_START( drgnwrld )
-	PORT_START	// IN0 - DSW1
+	PORT_START_TAG("DSW1")	// IN0 - DSW1
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
@@ -1563,7 +1562,7 @@ static INPUT_PORTS_START( drgnwrld )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN1 - DSW2
+	PORT_START_TAG("DSW2")	// IN1 - DSW2
 	PORT_DIPNAME( 0x01, 0x01, "Open Girl?" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1589,12 +1588,12 @@ static INPUT_PORTS_START( drgnwrld )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-  	PORT_START	// IN2 - DSW3
+  	PORT_START_TAG("DSW3")	// IN2 - DSW3
 	PORT_DIPNAME( 0xff, 0xff, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0xff, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN3
+	PORT_START_TAG("COIN")	// IN3
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)	// keep pressed while booting
@@ -1604,7 +1603,7 @@ static INPUT_PORTS_START( drgnwrld )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN4
+	PORT_START_TAG("IN0")	// IN4
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -1614,7 +1613,7 @@ static INPUT_PORTS_START( drgnwrld )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )	// press in girl test to pause, button 3 advances
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN5
+	PORT_START_TAG("IN1")	// IN5
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1624,7 +1623,7 @@ static INPUT_PORTS_START( drgnwrld )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START	// IN6
+	PORT_START_TAG("IN2")	// IN6
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -1636,14 +1635,13 @@ static INPUT_PORTS_START( drgnwrld )
 INPUT_PORTS_END
 
 
-
 static INPUT_PORTS_START( grtwall )
-	PORT_START	// IN0 - DSW3
+	PORT_START_TAG("DSW1")	// IN0 - DSW3
 	PORT_DIPNAME( 0xff, 0xff, "3" )
 	PORT_DIPSETTING(    0xff, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN1 - DSW2
+	PORT_START_TAG("DSW2")	// IN1 - DSW2
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x03, "1000" )
 	PORT_DIPSETTING(    0x02, "1500" )
@@ -1667,7 +1665,7 @@ static INPUT_PORTS_START( grtwall )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-  	PORT_START	// IN2 - DSW1
+  	PORT_START_TAG("DSW3")	// IN2 - DSW1
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
@@ -1691,12 +1689,12 @@ static INPUT_PORTS_START( grtwall )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START	// IN3 - DSW4
+	PORT_START_TAG("DSW4")	// IN3 - DSW4
 	PORT_DIPNAME( 0xff, 0xff, "4" )
 	PORT_DIPSETTING(    0xff, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN4
+	PORT_START_TAG("COIN")	// IN4
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)	// keep pressed while booting
@@ -1706,7 +1704,7 @@ static INPUT_PORTS_START( grtwall )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN5
+	PORT_START_TAG("IN0")	// IN5
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -1719,7 +1717,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( lhb )
-	PORT_START	// IN0 - DSW1
+	PORT_START_TAG("DSW1")	// IN0 - DSW1
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out (%)" )
 	PORT_DIPSETTING(    0x0f, "96" )
 	PORT_DIPSETTING(    0x0e, "93" )
@@ -1748,7 +1746,7 @@ static INPUT_PORTS_START( lhb )
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
 
-	PORT_START	// IN1 - DSW2
+	PORT_START_TAG("DSW2")	// IN1 - DSW2
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
@@ -1772,7 +1770,7 @@ static INPUT_PORTS_START( lhb )
 	PORT_DIPSETTING(    0x80, "2" )
 //  PORT_DIPSETTING(    0x00, "2" )
 
-  	PORT_START	// IN2 - DSW3
+  	PORT_START_TAG("DSW3")	// IN2 - DSW3
 	PORT_DIPNAME( 0x03, 0x03, "Max Credit" )
 	PORT_DIPSETTING(    0x03, "1000" )
 	PORT_DIPSETTING(    0x02, "2000" )
@@ -1795,7 +1793,7 @@ static INPUT_PORTS_START( lhb )
 	PORT_DIPSETTING(    0x40, "5" )
 	PORT_DIPSETTING(    0x00, "8" )
 
-	PORT_START	// IN3 - DSW4
+	PORT_START_TAG("DSW4")	// IN3 - DSW4
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1820,12 +1818,12 @@ static INPUT_PORTS_START( lhb )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	PORT_START	// IN4 - DSW5
+	PORT_START_TAG("DSW5")	// IN4 - DSW5
 	PORT_DIPNAME( 0xff, 0xff, "5" )
 	PORT_DIPSETTING(    0xff, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN5
+	PORT_START_TAG("COIN")	// IN5
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)	// keep pressed while booting
@@ -1835,7 +1833,7 @@ static INPUT_PORTS_START( lhb )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN6
+	PORT_START_TAG("KEY0")	// IN6
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
@@ -1845,7 +1843,7 @@ static INPUT_PORTS_START( lhb )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN7
+	PORT_START_TAG("KEY1")	// IN7
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
@@ -1855,7 +1853,7 @@ static INPUT_PORTS_START( lhb )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN8
+	PORT_START_TAG("KEY2")	// IN8
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
@@ -1865,7 +1863,7 @@ static INPUT_PORTS_START( lhb )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN9
+	PORT_START_TAG("KEY3")	// IN9
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
@@ -1875,7 +1873,7 @@ static INPUT_PORTS_START( lhb )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN10
+	PORT_START_TAG("KEY4")	// IN10
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1888,7 +1886,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( vbowl )
-	PORT_START	// IN0 - DSW1
+	PORT_START_TAG("DSW1")	// IN0 - DSW1
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
@@ -1914,7 +1912,7 @@ static INPUT_PORTS_START( vbowl )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN1 - DSW2
+	PORT_START_TAG("DSW2")	// IN1 - DSW2
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy   ) )	// 5
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )	// 7
@@ -1938,7 +1936,7 @@ static INPUT_PORTS_START( vbowl )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-  	PORT_START	// IN2 - DSW3
+  	PORT_START_TAG("DSW3")	// IN2 - DSW3
 	PORT_DIPNAME( 0x03, 0x03, "Cabinet ID" )
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -1961,7 +1959,7 @@ static INPUT_PORTS_START( vbowl )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	// IN3 - DSW4
+	PORT_START_TAG("DSW4")	// IN3 - DSW4
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1987,7 +1985,7 @@ static INPUT_PORTS_START( vbowl )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN4
+	PORT_START_TAG("COIN")	// IN4
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1997,7 +1995,7 @@ static INPUT_PORTS_START( vbowl )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN5
+	PORT_START_TAG("IN0")	// IN5
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -2007,7 +2005,7 @@ static INPUT_PORTS_START( vbowl )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
 
-	PORT_START	// IN6
+	PORT_START_TAG("IN1")	// IN6
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
@@ -2017,16 +2015,16 @@ static INPUT_PORTS_START( vbowl )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START	// IN7
+	PORT_START_TAG("AN0")	// IN7
     PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
-	PORT_START	// IN8
+	PORT_START_TAG("AN1")	// IN8
     PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( vbowlj )
-	PORT_START	// IN0 - DSW1
+	PORT_START_TAG("DSW1")	// IN0 - DSW1
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
@@ -2052,7 +2050,7 @@ static INPUT_PORTS_START( vbowlj )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN1 - DSW2
+	PORT_START_TAG("DSW2")	// IN1 - DSW2
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy   ) )	// 5
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )	// 7
@@ -2076,7 +2074,7 @@ static INPUT_PORTS_START( vbowlj )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-  	PORT_START	// IN2 - DSW3
+  	PORT_START_TAG("DSW3")	// IN2 - DSW3
 	PORT_DIPNAME( 0x03, 0x03, "Cabinet ID" )
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -2099,7 +2097,7 @@ static INPUT_PORTS_START( vbowlj )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	// IN3 - DSW4
+	PORT_START_TAG("DSW4")	// IN3 - DSW4
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2125,7 +2123,7 @@ static INPUT_PORTS_START( vbowlj )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN4
+	PORT_START_TAG("COIN")	// IN4
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2135,7 +2133,7 @@ static INPUT_PORTS_START( vbowlj )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN5
+	PORT_START_TAG("IN0")	// IN5
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -2145,7 +2143,7 @@ static INPUT_PORTS_START( vbowlj )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
 
-	PORT_START	// IN6
+	PORT_START_TAG("IN1")	// IN6
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
@@ -2155,16 +2153,16 @@ static INPUT_PORTS_START( vbowlj )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START	// IN7
+	PORT_START_TAG("AN0")	// IN7
     PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
-	PORT_START	// IN8
+	PORT_START_TAG("AN1")	// IN8
     PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( xymg )
-	PORT_START	// IN0 - DSW1
+	PORT_START_TAG("DSW1")	// IN0 - DSW1
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
@@ -2188,7 +2186,7 @@ static INPUT_PORTS_START( xymg )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START	// IN1 - DSW2
+	PORT_START_TAG("DSW2")	// IN1 - DSW2
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x03, "1000" )
 	PORT_DIPSETTING(    0x02, "1500" )
@@ -2212,12 +2210,12 @@ static INPUT_PORTS_START( xymg )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-  	PORT_START	// IN2 - DSW3
+  	PORT_START_TAG("DSW3")	// IN2 - DSW3
 	PORT_DIPNAME( 0xff, 0xff, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0xff, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN3
+	PORT_START_TAG("COIN")	// IN3
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)	// keep pressed while booting
@@ -2227,7 +2225,7 @@ static INPUT_PORTS_START( xymg )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN4
+	PORT_START_TAG("KEY0")	// IN4
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
@@ -2237,7 +2235,7 @@ static INPUT_PORTS_START( xymg )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN5
+	PORT_START_TAG("KEY1")	// IN5
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
@@ -2247,7 +2245,7 @@ static INPUT_PORTS_START( xymg )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN6
+	PORT_START_TAG("KEY2")	// IN6
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
@@ -2257,7 +2255,7 @@ static INPUT_PORTS_START( xymg )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN7
+	PORT_START_TAG("KEY3")	// IN7
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
@@ -2267,7 +2265,7 @@ static INPUT_PORTS_START( xymg )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN8
+	PORT_START_TAG("KEY4")	// IN8
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )

@@ -87,7 +87,7 @@ static int irq_enable;
 
 static READ8_HANDLER( topgunbl_rotary_r )
 {
-	return (1 << (input_port_read_indexed(machine, 5 + offset) * 8 / 256)) ^ 0xff;
+	return (1 << (input_port_read(machine, offset ? "DIAL1" : "DIAL0") * 8 / 256)) ^ 0xff;
 }
 
 static WRITE8_HANDLER( jackal_flipscreen_w )
@@ -232,10 +232,10 @@ static INPUT_PORTS_START( topgunbl )
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	// player 1 8-way rotary control - converted in topgunbl_rotary_r()
+	PORT_START_TAG("DIAL0")	// player 1 8-way rotary control - converted in topgunbl_rotary_r()
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
 
-	PORT_START	// player 2 8-way rotary control - converted in topgunbl_rotary_r()
+	PORT_START_TAG("DIAL1")	// player 2 8-way rotary control - converted in topgunbl_rotary_r()
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
 INPUT_PORTS_END
 

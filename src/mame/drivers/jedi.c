@@ -214,8 +214,8 @@ static READ8_HANDLER( a2d_data_r )
 
 	switch (state->a2d_select)
 	{
-		case 0: ret = input_port_read_indexed(machine, 2); break;
-		case 2: ret = input_port_read_indexed(machine, 3); break;
+		case 0: ret = input_port_read(machine, "STICKY"); break;
+		case 2: ret = input_port_read(machine, "STICKX"); break;
 	}
 
 	return ret;
@@ -309,7 +309,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( jedi )
-	PORT_START	/* 0C00 */
+	PORT_START_TAG("0c00")	/* 0C00 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON1 )
@@ -319,17 +319,17 @@ static INPUT_PORTS_START( jedi )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_COIN1 )
 
-	PORT_START	/* 0C01 */
+	PORT_START_TAG("0c01")	/* 0C01 */
 	PORT_BIT( 0x03, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x18, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(jedi_audio_comm_stat_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START	/* analog Y */
+	PORT_START_TAG("STICKY")	/* analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START	/* analog X */
+	PORT_START_TAG("STICKX")	/* analog X */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 

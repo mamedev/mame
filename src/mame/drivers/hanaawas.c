@@ -47,13 +47,13 @@ static READ8_HANDLER( hanaawas_input_port_0_r )
 	switch( mux )
 	{
 	case 1: /* start buttons */
-		buttons = input_port_read_indexed(machine, 4);
+		buttons = input_port_read(machine, "START");
 		break;
 	case 2: /* player 1 buttons */
-		buttons = input_port_read_indexed(machine, 2);
+		buttons = input_port_read(machine, "P1");
 		break;
 	case 4: /* player 2 buttons */
-		buttons = input_port_read_indexed(machine, 3);
+		buttons = input_port_read(machine, "P2");
 		break;
 	}
 
@@ -69,7 +69,7 @@ static READ8_HANDLER( hanaawas_input_port_0_r )
 		}
 	}
 
-	return (input_port_read_indexed(machine, 0) & 0xf0) | ordinal;
+	return (input_port_read(machine, "IN0") & 0xf0) | ordinal;
 }
 
 static WRITE8_HANDLER( hanaawas_inputs_mux_w )
@@ -109,14 +109,14 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( hanaawas )
-	PORT_START      /* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 
-	PORT_START      /* DSW0 */
+	PORT_START_TAG("DSW")	/* DSW0 */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -141,7 +141,7 @@ static INPUT_PORTS_START( hanaawas )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
 	/* fake port.  The button depressed gets converted to an integer in the 1-10 range */
-	PORT_START      /* IN2 */
+	PORT_START_TAG("P1")	/* IN2 */
 	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_PLAYER(1)
 	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_BUTTON2  ) PORT_PLAYER(1)
 	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_BUTTON3  ) PORT_PLAYER(1)
@@ -154,7 +154,7 @@ static INPUT_PORTS_START( hanaawas )
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_PLAYER(1)
 
 	/* fake port.  The button depressed gets converted to an integer in the 1-10 range */
-	PORT_START      /* IN3 */
+	PORT_START_TAG("P2")	/* IN3 */
 	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_PLAYER(2)
 	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_BUTTON2  ) PORT_PLAYER(2)
 	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_BUTTON3  ) PORT_PLAYER(2)
@@ -166,7 +166,7 @@ static INPUT_PORTS_START( hanaawas )
 	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_BUTTON9  ) PORT_PLAYER(2)
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_PLAYER(2)
 
-	PORT_START      /* IN4 */
+	PORT_START_TAG("START")	/* IN4 */
 	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_START2 )
 INPUT_PORTS_END

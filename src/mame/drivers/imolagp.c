@@ -323,7 +323,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( imolagp_master, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x2000, 0x23ff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2800, 0x2800) AM_READ(input_port_2_r)  /* gas */
+	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("2800")	/* gas */
 	AM_RANGE(0x2802, 0x2802) AM_READ(steerlatch_r) AM_WRITE(SMH_NOP)
 	/*  AM_RANGE(0x2803, 0x2803) ? */
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(vreg_control_w)
@@ -331,10 +331,10 @@ static ADDRESS_MAP_START( imolagp_master, ADDRESS_SPACE_PROGRAM, 8 )
 	/*  AM_RANGE(0x37f7, 0x37f7) ? */
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(vreg_data_w)
 	AM_RANGE(0x3810, 0x3810) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ( input_port_0_r ) /* DSWA */
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSWA")	/* DSWA */
 	AM_RANGE(0x5000, 0x50ff) AM_WRITE(imola_ledram_w)
 	AM_RANGE(0x47ff, 0x4800) AM_WRITE(transmit_data_w)
-	AM_RANGE(0x6000, 0x6000) AM_READ( input_port_1_r ) /* DSWB */
+	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSWB")	/* DSWB */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_slave, ADDRESS_SPACE_IO, 8 )
@@ -371,7 +371,7 @@ static INTERRUPT_GEN( master_interrupt )
 	else
 	{
 		static int oldsteer;
-		int newsteer = input_port_read_indexed(machine, 3)&0xf;
+		int newsteer = input_port_read(machine, "2802") & 0xf;
 		if( newsteer!=oldsteer )
 		{
 			if( imola_steerlatch==0 )
@@ -486,7 +486,7 @@ static INPUT_PORTS_START( imolagp )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START /* 2800 */ /* speed: 08 00 0F 1C 0F 00 1E 3D */
+	PORT_START_TAG("2800") /* 2800 */ /* speed: 08 00 0F 1C 0F 00 1E 3D */
 //  PORT_DIPNAME( 0x03, 0x03, "Pedal" )
 //  PORT_DIPSETTING( 0x01, "STOPPED" )
 //  PORT_DIPSETTING( 0x00, "SLOW" )
@@ -502,7 +502,7 @@ static INPUT_PORTS_START( imolagp )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START /* 2802 */
+	PORT_START_TAG("2802") /* 2802 */
 	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_PLAYER(1)
 INPUT_PORTS_END
 

@@ -459,7 +459,8 @@ static TIMER_CALLBACK( blitter_done )
 READ8_HANDLER( itech8_blitter_r )
 {
 	int result = blitter_data[offset / 2];
-
+	static const char *portnames[] = { "AN_C", "AN_D", "AN_E", "AN_F" };
+	
 	/* debugging */
 	if (FULL_LOGGING) logerror("%04x:blitter_r(%02x)\n", activecpu_get_previouspc(), offset / 2);
 
@@ -478,7 +479,7 @@ READ8_HANDLER( itech8_blitter_r )
 
 	/* a read from offsets 12-15 return input port values */
 	if (offset >= 12 && offset <= 15)
-		result = input_port_read_indexed(machine, 3 + offset - 12);
+		result = input_port_read(machine, portnames[offset - 12]);
 
 	return result;
 }

@@ -70,7 +70,7 @@ static READ8_HANDLER( sound_nmi_ack_r )
 
 static READ8_HANDLER( jcross_port_0_r )
 {
-	return(input_port_read_indexed(machine, 0) | sound_cpu_busy);
+	return(input_port_read(machine, "IN0") | sound_cpu_busy);
 }
 
 static WRITE8_HANDLER(jcross_vregs0_w){jcross_vregs[0]=data;}
@@ -100,11 +100,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_READ(jcross_port_0_r)
-	AM_RANGE(0xa100, 0xa100) AM_READ(input_port_1_r)
-	AM_RANGE(0xa200, 0xa200) AM_READ(input_port_2_r)
+	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("IN1")
+	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("IN2")
 	AM_RANGE(0xa300, 0xa300) AM_WRITE(sound_command_w)
-	AM_RANGE(0xa400, 0xa400) AM_READ(input_port_3_r)
-	AM_RANGE(0xa500, 0xa500) AM_READ(input_port_4_r)
+	AM_RANGE(0xa400, 0xa400) AM_READ_PORT("DSW1")
+	AM_RANGE(0xa500, 0xa500) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa600, 0xa600) AM_WRITE(jcross_palettebank_w)
 	AM_RANGE(0xa700, 0xa700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xd300, 0xd300) AM_WRITE(jcross_vregs0_w)
@@ -339,5 +339,3 @@ ROM_START( jcross )
 ROM_END
 
 GAME( 1984, jcross, 0, jcross, jcross, 0, ROT270,   "SNK", "Jumping Cross",GAME_NO_COCKTAIL|GAME_IMPERFECT_GRAPHICS)
-
-

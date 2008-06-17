@@ -194,47 +194,47 @@ static VIDEO_START( jalmah )
 	tilemap_set_transparent_pen(sc3_tilemap,15);
 }
 
-#define MCU_READ(_number_,_bit_,_offset_,_retval_)\
-if((0xffff - input_port_read_indexed(machine, _number_)) & _bit_) { jm_regs[_offset_] = _retval_; }
+#define MCU_READ(tag, _bit_, _offset_, _retval_) \
+if((0xffff - input_port_read(machine, tag)) & _bit_) { jm_regs[_offset_] = _retval_; }
 
 /*RAM-based protection handlings*/
 static void daireika_mcu_run(running_machine *machine)
 {
 	static UINT16 prg_prot;
 
-	if((0xffff - input_port_read_indexed(machine,0)) & 0x0008)//service_mode
+	if((0xffff - input_port_read(machine, "SYSTEM")) & 0x0008)	//service_mode
 	{
-		jm_regs[0x000/2] = input_port_read_indexed(machine,2);
-		jm_regs[0x002/2] = input_port_read_indexed(machine,3);
-		jm_regs[0x004/2] = input_port_read_indexed(machine,4);
-		jm_regs[0x006/2] = input_port_read_indexed(machine,5);
-		jm_regs[0x008/2] = input_port_read_indexed(machine,6);
-		jm_regs[0x00a/2] = input_port_read_indexed(machine,7);
+		jm_regs[0x000/2] = input_port_read(machine, "KEY0");
+		jm_regs[0x002/2] = input_port_read(machine, "KEY1");
+		jm_regs[0x004/2] = input_port_read(machine, "KEY2");
+		jm_regs[0x006/2] = input_port_read(machine, "KEY3");
+		jm_regs[0x008/2] = input_port_read(machine, "KEY4");
+		jm_regs[0x00a/2] = input_port_read(machine, "KEY5");
 	}
 	else
 	{
 		jm_regs[0x000/2] = 0x0000;
-		MCU_READ(3,0x0001,0x000/2,0x00);/*FF*/
-		MCU_READ(4,0x0400,0x000/2,0x01);/*A*/
-		MCU_READ(4,0x1000,0x000/2,0x02);/*B*/
-		MCU_READ(4,0x0200,0x000/2,0x03);/*C*/
-		MCU_READ(4,0x0800,0x000/2,0x04);/*D*/
-		MCU_READ(4,0x0004,0x000/2,0x05);/*E*/
-		MCU_READ(4,0x0010,0x000/2,0x06);/*F*/
-		MCU_READ(4,0x0002,0x000/2,0x07);/*G*/
-		MCU_READ(4,0x0008,0x000/2,0x08);/*H*/
-		MCU_READ(3,0x0400,0x000/2,0x09);/*I*/
-		MCU_READ(3,0x1000,0x000/2,0x0a);/*J*/
-		MCU_READ(3,0x0200,0x000/2,0x0b);/*K*/
-		MCU_READ(3,0x0800,0x000/2,0x0c);/*L*/
-		MCU_READ(3,0x0004,0x000/2,0x0d);/*M*/
-		MCU_READ(3,0x0010,0x000/2,0x0e);/*N*/
-		MCU_READ(2,0x0200,0x000/2,0x0f);/*RON   (trusted)*/
-		MCU_READ(2,0x1000,0x000/2,0x10);/*REACH (trusted)*/
-		MCU_READ(2,0x0400,0x000/2,0x11);/*KAN            */
-		MCU_READ(3,0x0008,0x000/2,0x12);/*PON            */
-		MCU_READ(3,0x0002,0x000/2,0x13);/*CHI   (trusted)*/
-		MCU_READ(2,0x0004,0x000/2,0x14);/*START1*/
+		MCU_READ("KEY1", 0x0001, 0x000/2, 0x00);		/*FF*/
+		MCU_READ("KEY2", 0x0400, 0x000/2, 0x01);		/*A*/
+		MCU_READ("KEY2", 0x1000, 0x000/2, 0x02);		/*B*/
+		MCU_READ("KEY2", 0x0200, 0x000/2, 0x03);		/*C*/
+		MCU_READ("KEY2", 0x0800, 0x000/2, 0x04);		/*D*/
+		MCU_READ("KEY2", 0x0004, 0x000/2, 0x05);		/*E*/
+		MCU_READ("KEY2", 0x0010, 0x000/2, 0x06);		/*F*/
+		MCU_READ("KEY2", 0x0002, 0x000/2, 0x07);		/*G*/
+		MCU_READ("KEY2", 0x0008, 0x000/2, 0x08);		/*H*/
+		MCU_READ("KEY1", 0x0400, 0x000/2, 0x09);		/*I*/
+		MCU_READ("KEY1", 0x1000, 0x000/2, 0x0a);		/*J*/
+		MCU_READ("KEY1", 0x0200, 0x000/2, 0x0b);		/*K*/
+		MCU_READ("KEY1", 0x0800, 0x000/2, 0x0c);		/*L*/
+		MCU_READ("KEY1", 0x0004, 0x000/2, 0x0d);		/*M*/
+		MCU_READ("KEY1", 0x0010, 0x000/2, 0x0e);		/*N*/
+		MCU_READ("KEY0", 0x0200, 0x000/2, 0x0f);		/*RON   (trusted)*/
+		MCU_READ("KEY0", 0x1000, 0x000/2, 0x10);		/*REACH (trusted)*/
+		MCU_READ("KEY0", 0x0400, 0x000/2, 0x11);		/*KAN            */
+		MCU_READ("KEY1", 0x0008, 0x000/2, 0x12);		/*PON            */
+		MCU_READ("KEY1", 0x0002, 0x000/2, 0x13);		/*CHI   (trusted)*/
+		MCU_READ("KEY0", 0x0004, 0x000/2, 0x14);		/*START1*/
 	}
 	jm_regs[0x00c/2] = mame_rand(machine) & 0xffff;
 	prg_prot++;
@@ -247,39 +247,39 @@ static void urashima_mcu_run(running_machine *machine)
 {
 	static UINT16 prg_prot;
 
-	if((0xffff - input_port_read_indexed(machine,0)) & 0x0008)//service_mode
+	if((0xffff - input_port_read(machine, "SYSTEM")) & 0x0008)	//service_mode
 	{
-		jm_regs[0x300/2] = input_port_read_indexed(machine,2);
-		jm_regs[0x302/2] = input_port_read_indexed(machine,3);
-		jm_regs[0x304/2] = input_port_read_indexed(machine,4);
-		jm_regs[0x306/2] = input_port_read_indexed(machine,5);
-		jm_regs[0x308/2] = input_port_read_indexed(machine,6);
-		jm_regs[0x30a/2] = input_port_read_indexed(machine,7);
+		jm_regs[0x300/2] = input_port_read(machine, "KEY0");
+		jm_regs[0x302/2] = input_port_read(machine, "KEY1");
+		jm_regs[0x304/2] = input_port_read(machine, "KEY2");
+		jm_regs[0x306/2] = input_port_read(machine, "KEY3");
+		jm_regs[0x308/2] = input_port_read(machine, "KEY4");
+		jm_regs[0x30a/2] = input_port_read(machine, "KEY5");
 	}
 	else
 	{
 		jm_regs[0x300/2] = 0x0000;
-		MCU_READ(3,0x0001,0x300/2,0x00);/*FF*/
-		MCU_READ(4,0x0400,0x300/2,0x01);/*A*/
-		MCU_READ(4,0x1000,0x300/2,0x02);/*B*/
-		MCU_READ(4,0x0200,0x300/2,0x03);/*C*/
-		MCU_READ(4,0x0800,0x300/2,0x04);/*D*/
-		MCU_READ(4,0x0004,0x300/2,0x05);/*E*/
-		MCU_READ(4,0x0010,0x300/2,0x06);/*F*/
-		MCU_READ(4,0x0002,0x300/2,0x07);/*G*/
-		MCU_READ(4,0x0008,0x300/2,0x08);/*H*/
-		MCU_READ(3,0x0400,0x300/2,0x09);/*I*/
-		MCU_READ(3,0x1000,0x300/2,0x0a);/*J*/
-		MCU_READ(3,0x0200,0x300/2,0x0b);/*K*/
-		MCU_READ(3,0x0800,0x300/2,0x0c);/*L*/
-		MCU_READ(3,0x0004,0x300/2,0x0d);/*M*/
-		MCU_READ(3,0x0010,0x300/2,0x0e);/*N*/
-		MCU_READ(2,0x0200,0x300/2,0x0f);/*RON   (trusted)*/
-		MCU_READ(2,0x1000,0x300/2,0x10);/*REACH (trusted)*/
-		MCU_READ(2,0x0400,0x300/2,0x11);/*KAN            */
-		MCU_READ(3,0x0008,0x300/2,0x12);/*PON            */
-		MCU_READ(3,0x0002,0x300/2,0x13);/*CHI   (trusted)*/
-		MCU_READ(2,0x0004,0x300/2,0x14);/*START1*/
+		MCU_READ("KEY1", 0x0001, 0x300/2, 0x00);		/*FF*/
+		MCU_READ("KEY2", 0x0400, 0x300/2, 0x01);		/*A*/
+		MCU_READ("KEY2", 0x1000, 0x300/2, 0x02);		/*B*/
+		MCU_READ("KEY2", 0x0200, 0x300/2, 0x03);		/*C*/
+		MCU_READ("KEY2", 0x0800, 0x300/2, 0x04);		/*D*/
+		MCU_READ("KEY2", 0x0004, 0x300/2, 0x05);		/*E*/
+		MCU_READ("KEY2", 0x0010, 0x300/2, 0x06);		/*F*/
+		MCU_READ("KEY2", 0x0002, 0x300/2, 0x07);		/*G*/
+		MCU_READ("KEY2", 0x0008, 0x300/2, 0x08);		/*H*/
+		MCU_READ("KEY1", 0x0400, 0x300/2, 0x09);		/*I*/
+		MCU_READ("KEY1", 0x1000, 0x300/2, 0x0a);		/*J*/
+		MCU_READ("KEY1", 0x0200, 0x300/2, 0x0b);		/*K*/
+		MCU_READ("KEY1", 0x0800, 0x300/2, 0x0c);		/*L*/
+		MCU_READ("KEY1", 0x0004, 0x300/2, 0x0d);		/*M*/
+		MCU_READ("KEY1", 0x0010, 0x300/2, 0x0e);		/*N*/
+		MCU_READ("KEY0", 0x0200, 0x300/2, 0x0f);		/*RON   (trusted)*/
+		MCU_READ("KEY0", 0x1000, 0x300/2, 0x10);		/*REACH (trusted)*/
+		MCU_READ("KEY0", 0x0400, 0x300/2, 0x11);		/*KAN            */
+		MCU_READ("KEY1", 0x0008, 0x300/2, 0x12);		/*PON            */
+		MCU_READ("KEY1", 0x0002, 0x300/2, 0x13);		/*CHI   (trusted)*/
+		MCU_READ("KEY0", 0x0004, 0x300/2, 0x14);		/*START1*/
 	}
 	jm_regs[0x30c/2] = mame_rand(machine) & 0xffff;
 	prg_prot++;
@@ -289,38 +289,38 @@ static void urashima_mcu_run(running_machine *machine)
 
 static void second_mcu_run(running_machine *machine)
 {
-	if((0xffff - input_port_read_indexed(machine,1)) & 0x0004)//service_mode
+	if((0xffff - input_port_read(machine, "DSW")) & 0x0004)	//service_mode
 	{
-		jm_regs[0x200/2] = input_port_read_indexed(machine,2);
-		jm_regs[0x202/2] = input_port_read_indexed(machine,3);
-		jm_regs[0x204/2] = input_port_read_indexed(machine,4);
+		jm_regs[0x200/2] = input_port_read(machine, "KEY0");
+		jm_regs[0x202/2] = input_port_read(machine, "KEY1");
+		jm_regs[0x204/2] = input_port_read(machine, "KEY2");
 	}
 	else
 	{
 		jm_regs[0x200/2] = 0x0000;
-		MCU_READ(3,0x0001,0x200/2,0x00);/*FF*/
-		MCU_READ(4,0x0400,0x200/2,0x01);/*A*/
-		MCU_READ(4,0x1000,0x200/2,0x02);/*B*/
-		MCU_READ(4,0x0200,0x200/2,0x03);/*C*/
-		MCU_READ(4,0x0800,0x200/2,0x04);/*D*/
-		MCU_READ(4,0x0004,0x200/2,0x05);/*E*/
-		MCU_READ(4,0x0010,0x200/2,0x06);/*F*/
-		MCU_READ(4,0x0002,0x200/2,0x07);/*G*/
-		MCU_READ(4,0x0008,0x200/2,0x08);/*H*/
-		MCU_READ(3,0x0400,0x200/2,0x09);/*I*/
-		MCU_READ(3,0x1000,0x200/2,0x0a);/*J*/
-		MCU_READ(3,0x0200,0x200/2,0x0b);/*K*/
-		MCU_READ(3,0x0800,0x200/2,0x0c);/*L*/
-		MCU_READ(3,0x0004,0x200/2,0x0d);/*M*/
-		MCU_READ(3,0x0010,0x200/2,0x0e);/*N*/
-		MCU_READ(2,0x0200,0x200/2,0x0f);/*RON*/
-		MCU_READ(2,0x1000,0x200/2,0x10);/*REACH*/
-		MCU_READ(2,0x0400,0x200/2,0x11);/*KAN*/
-		MCU_READ(3,0x0008,0x200/2,0x12);/*PON*/
-		MCU_READ(3,0x0002,0x200/2,0x13);/*CHI*/
-		MCU_READ(2,0x0004,0x200/2,0x14);/*START1*/
+		MCU_READ("KEY1", 0x0001, 0x200/2, 0x00);		/*FF*/
+		MCU_READ("KEY2", 0x0400, 0x200/2, 0x01);		/*A*/
+		MCU_READ("KEY2", 0x1000, 0x200/2, 0x02);		/*B*/
+		MCU_READ("KEY2", 0x0200, 0x200/2, 0x03);		/*C*/
+		MCU_READ("KEY2", 0x0800, 0x200/2, 0x04);		/*D*/
+		MCU_READ("KEY2", 0x0004, 0x200/2, 0x05);		/*E*/
+		MCU_READ("KEY2", 0x0010, 0x200/2, 0x06);		/*F*/
+		MCU_READ("KEY2", 0x0002, 0x200/2, 0x07);		/*G*/
+		MCU_READ("KEY2", 0x0008, 0x200/2, 0x08);		/*H*/
+		MCU_READ("KEY1", 0x0400, 0x200/2, 0x09);		/*I*/
+		MCU_READ("KEY1", 0x1000, 0x200/2, 0x0a);		/*J*/
+		MCU_READ("KEY1", 0x0200, 0x200/2, 0x0b);		/*K*/
+		MCU_READ("KEY1", 0x0800, 0x200/2, 0x0c);		/*L*/
+		MCU_READ("KEY1", 0x0004, 0x200/2, 0x0d);		/*M*/
+		MCU_READ("KEY1", 0x0010, 0x200/2, 0x0e);		/*N*/
+		MCU_READ("KEY0", 0x0200, 0x200/2, 0x0f);		/*RON*/
+		MCU_READ("KEY0", 0x1000, 0x200/2, 0x10);		/*REACH*/
+		MCU_READ("KEY0", 0x0400, 0x200/2, 0x11);		/*KAN*/
+		MCU_READ("KEY1", 0x0008, 0x200/2, 0x12);		/*PON*/
+		MCU_READ("KEY1", 0x0002, 0x200/2, 0x13);		/*CHI*/
+		MCU_READ("KEY0", 0x0004, 0x200/2, 0x14);		/*START1*/
 
-//      MCU_READ(2,0x0004,0x7b8/2,0x03);/*START1(correct?)  */
+//      MCU_READ("KEY0", 0x0004, 0x7b8/2, 0x03);		/*START1(correct?)  */
 	}
 	jm_regs[0x20c/2] = mame_rand(machine) & 0xffff; //kakumei2
 
@@ -548,11 +548,9 @@ static ADDRESS_MAP_START( jalmah, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-
-
-static INPUT_PORTS_START( jalmah )
+static INPUT_PORTS_START( common )
 	/*System port*/
-	PORT_START
+	PORT_START_TAG("SYSTEM")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -562,7 +560,9 @@ static INPUT_PORTS_START( jalmah )
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -595,7 +595,7 @@ static INPUT_PORTS_START( jalmah )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	/*Dip-SW port*/
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )    // Coin2 is always 1C/1C.
 	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
@@ -646,14 +646,14 @@ static INPUT_PORTS_START( jalmah )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	/*Mahjong Panel ports*/
-	PORT_START
+	PORT_START_TAG("KEY0")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
 	PORT_BIT( 0xe9fb, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("KEY1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_M )
@@ -665,7 +665,7 @@ static INPUT_PORTS_START( jalmah )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_J )
 	PORT_BIT( 0xe1e0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("KEY2")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_H )
@@ -675,15 +675,22 @@ static INPUT_PORTS_START( jalmah )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0xe1e1, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 
-	PORT_START
+static INPUT_PORTS_START( jalmah )
+	PORT_INCLUDE( common )
+
+	PORT_MODIFY("SYSTEM")
+	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
+
+	PORT_START_TAG("KEY3")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) 	PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) 	PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )PORT_PLAYER(2)
 	PORT_BIT( 0xe9fb, IP_ACTIVE_LOW, IPT_UNUSED ) 		PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("KEY4")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) 		 PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_M )		 PORT_PLAYER(2)
@@ -695,7 +702,7 @@ static INPUT_PORTS_START( jalmah )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_J )		 PORT_PLAYER(2)
 	PORT_BIT( 0xe1e0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("KEY5")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_G )PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_E )PORT_PLAYER(2)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_H )PORT_PLAYER(2)
@@ -709,53 +716,9 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( jalmah2 )
-	/*System port*/
-	PORT_START
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_INCLUDE( common )
 
-	/*Dip-SW port*/
-	PORT_START
+	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -763,18 +726,6 @@ static INPUT_PORTS_START( jalmah2 )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE( 0x0004, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -787,103 +738,16 @@ static INPUT_PORTS_START( jalmah2 )
 	PORT_DIPSETTING(      0x0500, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0000, "1 Coin / 99 Credits" )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	/*Mahjong Panel ports*/
-	PORT_START
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0xe9fb, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START
+	PORT_MODIFY("KEY1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("P1 Mahjong Flip Flop?")	PORT_CODE(KEYCODE_2) //? seems a button,affects continue countdown
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0xe1e0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0xe1e1, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( jalmah2a )
-	/*System port*/
-	PORT_START
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_INCLUDE( common )
 
-	/*Dip-SW port*/
-	PORT_START
+	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -891,17 +755,8 @@ static INPUT_PORTS_START( jalmah2a )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE( 0x0004, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
@@ -915,52 +770,12 @@ static INPUT_PORTS_START( jalmah2a )
 	PORT_DIPSETTING(      0x0500, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0000, "1 Coin / 99 Credits" )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	/*Mahjong Panel ports*/
-	PORT_START
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0xe9fb, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START
+	PORT_MODIFY("KEY1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("P1 Mahjong Flip Flop?")	PORT_CODE(KEYCODE_2) //? seems a button,affects continue countdown
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0xe1e0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0xe1e1, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =

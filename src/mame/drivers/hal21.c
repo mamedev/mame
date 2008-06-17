@@ -450,7 +450,7 @@ static INPUT_PORTS_START( aso )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("DSW0")
+	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -475,7 +475,7 @@ static INPUT_PORTS_START( aso )
 	PORT_DIPSETTING(    0x40, "100k 200k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 
-	PORT_START_TAG("DSW1")
+	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Bonus Occurrence" )
 	PORT_DIPSETTING(    0x01, "1st & every 2nd" )
 	PORT_DIPSETTING(    0x00, "1st & 2nd only" )
@@ -550,7 +550,7 @@ GFXDECODE_END
 
 static READ8_HANDLER( CPUC_ready_r ) { snk_sound_busy_bit = 0; return 0; }
 
-static READ8_HANDLER( hal21_input_port_0_r ) { return input_port_read_indexed(machine, 0) | snk_sound_busy_bit; }
+static READ8_HANDLER( hal21_input_port_0_r ) { return input_port_read(machine, "IN0") | snk_sound_busy_bit; }
 
 static WRITE8_HANDLER( hal21_soundcommand_w ) { hal21_sound_scheduler(machine, 1, data); }
 static WRITE8_HANDLER( hal21_soundack_w ) { hal21_sound_scheduler(machine,2, data); }
@@ -611,12 +611,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aso_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ(hal21_input_port_0_r) /* coin, start */
-	AM_RANGE(0xc100, 0xc100) AM_READ(input_port_1_r) /* P1 */
-	AM_RANGE(0xc200, 0xc200) AM_READ(input_port_2_r) /* P2 */
+	AM_RANGE(0xc000, 0xc000) AM_READ(hal21_input_port_0_r)	/* coin, start */
+	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")			/* P1 */
+	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")			/* P2 */
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(aso_soundcommand_w)
-	AM_RANGE(0xc500, 0xc500) AM_READ(input_port_3_r) /* DSW1 */
-	AM_RANGE(0xc600, 0xc600) AM_READ(input_port_4_r) /* DSW2 */
+	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")			/* DSW1 */
+	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")			/* DSW2 */
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(hal21_vreg1_w)
 	AM_RANGE(0xc900, 0xc900) AM_WRITE(hal21_vreg2_w)
@@ -646,12 +646,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hal21_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ(hal21_input_port_0_r) /* coin, start */
-	AM_RANGE(0xc100, 0xc100) AM_READ(input_port_1_r) /* P1 */
-	AM_RANGE(0xc200, 0xc200) AM_READ(input_port_2_r) /* P2 */
+	AM_RANGE(0xc000, 0xc000) AM_READ(hal21_input_port_0_r)	/* coin, start */
+	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")			/* P1 */
+	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")			/* P2 */
 	AM_RANGE(0xc300, 0xc300) AM_WRITE(hal21_soundcommand_w)
-	AM_RANGE(0xc400, 0xc400) AM_READ(input_port_3_r) /* DSW1 */
-	AM_RANGE(0xc500, 0xc500) AM_READ(input_port_4_r) /* DSW2 */
+	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("DSW1")			/* DSW1 */
+	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW2")			/* DSW2 */
 	AM_RANGE(0xc600, 0xc600) AM_WRITE(hal21_vreg0_w)
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xd300, 0xd300) AM_WRITE(hal21_vreg1_w)
