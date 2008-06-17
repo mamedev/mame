@@ -678,15 +678,15 @@ static READ32_HANDLER(input_r)
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= (input_port_read_indexed(machine, 0) & 0xff) << 24;
+		r |= (input_port_read(machine, "IN0") & 0xff) << 24;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= (input_port_read_indexed(machine, 1) & 0xff) << 8;
+		r |= (input_port_read(machine, "IN1") & 0xff) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= (input_port_read_indexed(machine, 2) & 0xff);
+		r |= (input_port_read(machine, "IN2") & 0xff);
 	}
 
 	return r;
@@ -696,11 +696,11 @@ static READ32_HANDLER( sensor_r )
 {
 	if (offset == 0)
 	{
-		return input_port_read_indexed(machine, 3) | 0x01000100;
+		return input_port_read(machine, "SENSOR1") | 0x01000100;
 	}
 	else
 	{
-		return input_port_read_indexed(machine, 4) | 0x01000100;
+		return input_port_read(machine, "SENSOR2") | 0x01000100;
 	}
 }
 
@@ -1394,11 +1394,11 @@ static READ32_HANDLER( keyboard_wheel_r )
 {
 	if (offset == 0)		// Keyboard Wheel (P1)
 	{
-		return input_port_read_indexed(machine, 3) << 24;
+		return input_port_read(machine, "WHEEL_P1") << 24;
 	}
 	else if (offset == 2)	// Keyboard Wheel (P2)
 	{
-		return input_port_read_indexed(machine, 4) << 24;
+		return input_port_read(machine, "WHEEL_P2") << 24;
 	}
 
 	return 0;
@@ -1481,12 +1481,13 @@ static const int keyboard_notes[24] =
 static TIMER_CALLBACK( keyboard_timer_callback )
 {
 	static const int kb_uart_channel[2] = { 1, 0 };
+	static const char *keynames[] = { "KEYBOARD_P1", "KEYBOARD_P2" };
 	int keyboard;
 	int i;
-
+	
 	for (keyboard=0; keyboard < 2; keyboard++)
 	{
-		UINT32 kbstate = input_port_read_indexed(machine, 5 + keyboard);
+		UINT32 kbstate = input_port_read(machine, keynames[keyboard]);
 		int uart_channel = kb_uart_channel[keyboard];
 
 		if (kbstate != keyboard_state[keyboard])

@@ -430,7 +430,7 @@ ROM_END
 static DRIVER_INIT( blstroid )
 {
 	atarigen_eeprom_default = NULL;
-	atarijsa_init(machine, 2, 0x80);
+	atarijsa_init(machine, "IN0", 0x80);
 }
 
 

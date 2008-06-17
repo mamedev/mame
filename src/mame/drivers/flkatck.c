@@ -60,15 +60,15 @@ static READ8_HANDLER( flkatck_ls138_r )
 	int data = 0;
 
 	switch ((offset & 0x1c) >> 2){
-		case 0x00:	/* inputs + DIPSW #3 + coinsw */
+		case 0x00:
 			if (offset & 0x02)
-				data = input_port_read_indexed(machine, 2 + (offset & 0x01));
+				data = input_port_read(machine, (offset & 0x01) ? "COIN" : "DSW3");
 			else
-				data = input_port_read_indexed(machine, 4 + (offset & 0x01));
+				data = input_port_read(machine, (offset & 0x01) ? "P2" : "P1");
 			break;
-		case 0x01:	/* DIPSW #1 & DIPSW #2 */
+		case 0x01:
 			if (offset & 0x02)
-				data = input_port_read_indexed(machine, 1 - (offset & 0x01));
+				data = input_port_read(machine, (offset & 0x01) ? "DSW1" : "DSW2");
 			break;
 	}
 
@@ -150,7 +150,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( flkatck )
-	PORT_START	/* DSW #1 */
+	PORT_START_TAG("DSW1")	/* DSW #1 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(	0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(	0x05, DEF_STR( 3C_1C ) )
@@ -186,7 +186,7 @@ static INPUT_PORTS_START( flkatck )
 	PORT_DIPSETTING(	0x90, DEF_STR( 1C_7C ) )
 	//PORT_DIPSETTING(    0x00, "Invalid" )
 
-	PORT_START	/* DSW #2 */
+	PORT_START_TAG("DSW2")	/* DSW #2 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(	0x03, "1" )
 	PORT_DIPSETTING(	0x02, "2" )
@@ -209,7 +209,7 @@ static INPUT_PORTS_START( flkatck )
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-	PORT_START	/* DSW #3 */
+	PORT_START_TAG("DSW3")	/* DSW #3 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
@@ -222,7 +222,7 @@ static INPUT_PORTS_START( flkatck )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* COINSW & START */
+	PORT_START_TAG("COIN")	/* COINSW & START */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )	/* service */
@@ -232,7 +232,7 @@ static INPUT_PORTS_START( flkatck )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* PLAYER 1 INPUTS */
+	PORT_START_TAG("P1")	/* PLAYER 1 INPUTS */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	 ) PORT_8WAY PORT_PLAYER(1)
@@ -242,7 +242,7 @@ static INPUT_PORTS_START( flkatck )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* PLAYER 2 INPUTS */
+	PORT_START_TAG("P2")	/* PLAYER 2 INPUTS */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	 ) PORT_8WAY PORT_PLAYER(2)

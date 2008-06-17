@@ -95,7 +95,7 @@ static WRITE16_HANDLER( interrupt_scan_w )
 
 static READ16_HANDLER( special_port1_r )
 {
-	int result = input_port_read_indexed(machine, 1);
+	int result = input_port_read(machine, "FF9000");
 	if (atarigen_get_hblank(machine->primary_screen)) result ^= 0x8000;
 	if (atarigen_cpu_to_sound_ready) result ^= 0x2000;
 	return result;
@@ -151,7 +151,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( toobin )
-	PORT_START	/* ff8800 */
+	PORT_START_TAG("FF8800")	/* ff8800 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 R Paddle Forward") PORT_CODE(KEYCODE_L) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 L Paddle Forward") PORT_CODE(KEYCODE_J) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 L Paddle Backward") PORT_CODE(KEYCODE_U) PORT_PLAYER(2)
@@ -164,7 +164,7 @@ static INPUT_PORTS_START( toobin )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Throw") PORT_CODE(KEYCODE_RCONTROL) PORT_PLAYER(2)
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* ff9000 */
+	PORT_START_TAG("FF9000")	/* ff9000 */
 	PORT_BIT( 0x03ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -617,7 +617,7 @@ ROM_END
 static DRIVER_INIT( toobin )
 {
 	atarigen_eeprom_default = NULL;
-	atarijsa_init(machine, 1, 0x1000);
+	atarijsa_init(machine, "FF9000", 0x1000);
 }
 
 

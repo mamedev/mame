@@ -202,15 +202,15 @@ static READ8_HANDLER( fromance_keymatrix_r )
 	int ret = 0xff;
 
 	if (fromance_portselect & 0x01)
-		ret &= input_port_read_indexed(machine, 4);
+		ret &= input_port_read(machine, "KEY1");
 	if (fromance_portselect & 0x02)
-		ret &= input_port_read_indexed(machine, 5);
+		ret &= input_port_read(machine, "KEY2");
 	if (fromance_portselect & 0x04)
-		ret &= input_port_read_indexed(machine, 6);
+		ret &= input_port_read(machine, "KEY3");
 	if (fromance_portselect & 0x08)
-		ret &= input_port_read_indexed(machine, 7);
+		ret &= input_port_read(machine, "KEY4");
 	if (fromance_portselect & 0x10)
-		ret &= input_port_read_indexed(machine, 8);
+		ret &= input_port_read(machine, "KEY5");
 
 	return ret;
 }
@@ -239,12 +239,12 @@ static WRITE8_HANDLER( fromance_coinctr_w )
 static ADDRESS_MAP_START( nekkyoku_readmem_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf000, 0xf000) AM_READ(input_port_0_r)
+	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN0")
 	AM_RANGE(0xf001, 0xf001) AM_READ(fromance_keymatrix_r)
-	AM_RANGE(0xf002, 0xf002) AM_READ(input_port_1_r)
+	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN1")
 	AM_RANGE(0xf003, 0xf003) AM_READ(fromance_busycheck_main_r)
-	AM_RANGE(0xf004, 0xf004) AM_READ(input_port_3_r)
-	AM_RANGE(0xf005, 0xf005) AM_READ(input_port_2_r)
+	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("DSW2")
+	AM_RANGE(0xf005, 0xf005) AM_READ_PORT("DSW1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nekkyoku_writemem_main, ADDRESS_SPACE_PROGRAM, 8 )
@@ -261,12 +261,12 @@ static ADDRESS_MAP_START( fromance_readmem_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0x9e89, 0x9e89) AM_READ(SMH_NOP)			// unknown (idolmj)
-	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_0_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0")
 	AM_RANGE(0xe001, 0xe001) AM_READ(fromance_keymatrix_r)
-	AM_RANGE(0xe002, 0xe002) AM_READ(input_port_1_r)
+	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN1")
 	AM_RANGE(0xe003, 0xe003) AM_READ(fromance_busycheck_main_r)
-	AM_RANGE(0xe004, 0xe004) AM_READ(input_port_3_r)
-	AM_RANGE(0xe005, 0xe005) AM_READ(input_port_2_r)
+	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("DSW2")
+	AM_RANGE(0xe005, 0xe005) AM_READ_PORT("DSW1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_writemem_main, ADDRESS_SPACE_PROGRAM, 8 )
@@ -391,7 +391,7 @@ ADDRESS_MAP_END
  *************************************/
 
 #define FROMANCE_KEYMATRIX1 \
-	PORT_START_TAG("IN4") \
+	PORT_START_TAG("KEY1") \
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) \
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E ) \
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I ) \
@@ -402,7 +402,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
 
 #define FROMANCE_KEYMATRIX2 \
-	PORT_START_TAG("IN5") \
+	PORT_START_TAG("KEY2") \
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) \
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) \
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J ) \
@@ -413,7 +413,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
 
 #define FROMANCE_KEYMATRIX3 \
-	PORT_START_TAG("IN6") \
+	PORT_START_TAG("KEY3") \
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) \
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G ) \
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K ) \
@@ -424,7 +424,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
 
 #define FROMANCE_KEYMATRIX4 \
-	PORT_START_TAG("IN7") \
+	PORT_START_TAG("KEY4") \
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) \
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) \
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L ) \
@@ -435,7 +435,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 #define FROMANCE_KEYMATRIX5 \
-	PORT_START_TAG("IN8") \
+	PORT_START_TAG("KEY5") \
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) \
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) \
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) \
@@ -975,7 +975,7 @@ static INPUT_PORTS_START( mjnatsu )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START	/* (3) DIPSW-2 */
+	PORT_START_TAG("DSW2")	/* (3) DIPSW-2 */
 	PORT_DIPNAME( 0x01, 0x00, "DIPSW 2-1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )

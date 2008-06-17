@@ -98,7 +98,7 @@ static READ32_HANDLER( f32_input_port_1_r )
 	if ((activecpu_get_pc() == 0x000379de) ||
 	    (activecpu_get_pc() == 0x000379cc) ) activecpu_adjust_icount(-100);
 	//else printf("PC %08x\n", activecpu_get_pc() );
-	return input_port_read_indexed(machine, 1);
+	return input_port_read(machine, "IN1");
 }
 
 
@@ -118,7 +118,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( mosaicf2 )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1)
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1)
@@ -130,7 +130,7 @@ static INPUT_PORTS_START( mosaicf2 )
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x000000ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_COIN2 )

@@ -155,7 +155,7 @@ static READ16_HANDLER( fromanc2_keymatrix_r )
 	UINT16 ret;
 
 	switch (fromanc2_portselect) {
-		case 0x01:	ret = input_port_read(machine, "IN1");	break;
+		case 0x01:	ret = input_port_read(machine, "IN1"); break;
 		case 0x02:	ret = input_port_read(machine, "IN2"); break;
 		case 0x04:	ret = input_port_read(machine, "IN3"); break;
 		case 0x08:	ret = input_port_read(machine, "IN4"); break;
@@ -175,7 +175,7 @@ static READ16_HANDLER( fromanc2_input_r )
 			 ((fromanc2_subcpu_nmi_flag & 1) << 6) |
 			 ((fromanc2_sndcpu_nmi_flag & 1) << 5));
 	eeprom = (eeprom_read_bit() & 1) << 7;		// EEPROM DATA
-	coinsw = input_port_read_indexed(machine, 0) & 0x030f;			// COIN, TEST
+	coinsw = input_port_read(machine, "IN0") & 0x030f;			// COIN, TEST
 
 	return (cflag | eeprom | coinsw);
 }
@@ -186,7 +186,7 @@ static READ16_HANDLER( fromanc4_input_r )
 
 	cflag = (fromanc2_sndcpu_nmi_flag & 1) << 5;
 	eeprom = (eeprom_read_bit() & 1) << 7;		// EEPROM DATA
-	coinsw = input_port_read_indexed(machine, 0) & 0x001f;			// COIN, TEST
+	coinsw = input_port_read(machine, "IN0") & 0x001f;			// COIN, TEST
 
 	return (cflag | eeprom | coinsw);
 }

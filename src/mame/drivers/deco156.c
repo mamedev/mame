@@ -150,7 +150,7 @@ static VIDEO_UPDATE( wcvol95 )
 
 static READ32_HANDLER(hvysmsh_eeprom_r)
 {
-	return (eeprom_read_bit()<<24) | input_port_read_indexed(machine, 0) | (input_port_read_indexed(machine, 1)<<16);
+	return (eeprom_read_bit()<<24) | input_port_read(machine, "IN0") | (input_port_read(machine, "IN1")<<16);
 }
 
 static WRITE32_HANDLER(hvysmsh_eeprom_w)
@@ -193,7 +193,7 @@ static WRITE32_HANDLER(hvysmsh_oki_1_w)
 
 static READ32_HANDLER(wcvol95_eeprom_r)
 {
-	return (eeprom_read_bit()<<24) | input_port_read_indexed(machine, 0) | ((input_port_read_indexed(machine, 1)&0xff)<<16);
+	return (eeprom_read_bit()<<24) | input_port_read(machine, "IN0") | ((input_port_read(machine, "IN1") & 0xff)<<16);
 }
 
 static WRITE32_HANDLER(wcvol95_eeprom_w)
@@ -278,7 +278,7 @@ ADDRESS_MAP_END
 /***************************************************************************/
 
 static INPUT_PORTS_START( hvysmsh )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -296,7 +296,7 @@ static INPUT_PORTS_START( hvysmsh )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -316,7 +316,7 @@ static INPUT_PORTS_START( hvysmsh )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wcvol95 )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -334,7 +334,7 @@ static INPUT_PORTS_START( wcvol95 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )

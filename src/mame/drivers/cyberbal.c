@@ -1009,7 +1009,7 @@ static DRIVER_INIT( cyberbt )
 static DRIVER_INIT( cyberb2p )
 {
 	atarigen_eeprom_default = default_eeprom;
-	atarijsa_init(machine, 2, 0x8000);
+	atarijsa_init(machine, "IN2", 0x8000);
 }
 
 

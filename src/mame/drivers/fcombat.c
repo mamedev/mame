@@ -146,7 +146,7 @@ static READ8_HANDLER( fcombat_protection_r )
 static READ8_HANDLER( fcombat_port01_r )
 {
 	/* the cocktail flip bit muxes between ports 0 and 1 */
-	return fcombat_cocktail_flip ? input_port_read_indexed(machine, 1) : input_port_read_indexed(machine, 0);
+	return fcombat_cocktail_flip ? input_port_read(machine, "IN1") : input_port_read(machine, "IN0");
 }
 
 
@@ -201,8 +201,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xe000, 0xe000) AM_READ(fcombat_port01_r)
-	AM_RANGE(0xe100, 0xe100) AM_READ(input_port_2_r)
-	AM_RANGE(0xe200, 0xe200) AM_READ(input_port_3_r)
+	AM_RANGE(0xe100, 0xe100) AM_READ_PORT("DSW0")
+	AM_RANGE(0xe200, 0xe200) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe300, 0xe300) AM_READ(e300_r)
 	AM_RANGE(0xe400, 0xe400) AM_READ(fcombat_protection_r) // protection?
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(fcombat_videoreg_w)	// at least bit 0 for flip screen and joystick input multiplexor

@@ -41,10 +41,10 @@ static TIMER_CALLBACK( flyball_quarter_callback	)
 
 	memset(potsense, 0, sizeof potsense);
 
-	potsense[input_port_read_indexed(machine, 1)] |= 1;
-	potsense[input_port_read_indexed(machine, 2)] |= 2;
-	potsense[input_port_read_indexed(machine, 3)] |= 4;
-	potsense[input_port_read_indexed(machine, 4)] |= 8;
+	potsense[input_port_read(machine, "STICK1_Y")] |= 1;
+	potsense[input_port_read(machine, "STICK1_X")] |= 2;
+	potsense[input_port_read(machine, "STICK0_Y")] |= 4;
+	potsense[input_port_read(machine, "STICK0_X")] |= 8;
 
 	for (i = 0; i < 64; i++)
 		if (potsense[i] != 0)
@@ -79,7 +79,7 @@ static MACHINE_RESET( flyball )
 
 static READ8_HANDLER( flyball_input_r )
 {
-	return input_port_read_indexed(machine, 0) & input_port_read_indexed(machine, 5);
+	return input_port_read(machine, "IN0") & input_port_read(machine, "IN1");
 }
 
 static READ8_HANDLER( flyball_scanline_r )
@@ -170,7 +170,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( flyball )
-	PORT_START /* IN0 */
+	PORT_START_TAG("IN0") /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -186,19 +186,19 @@ static INPUT_PORTS_START( flyball )
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x80, DEF_STR( On ) )
 
-	PORT_START /* IN1 */
+	PORT_START_TAG("STICK1_Y") /* IN1 */
 	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_Y ) PORT_MINMAX(1,63) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START /* IN2 */
+	PORT_START_TAG("STICK1_X") /* IN2 */
 	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_X ) PORT_MINMAX(1,63) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START /* IN3 */
+	PORT_START_TAG("STICK0_Y") /* IN3 */
 	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_Y ) PORT_MINMAX(1,63) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START /* IN4 */
+	PORT_START_TAG("STICK0_X") /* IN4 */
 	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_X ) PORT_MINMAX(1,63) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START /* IN5 */
+	PORT_START_TAG("IN1") /* IN5 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xFE, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END

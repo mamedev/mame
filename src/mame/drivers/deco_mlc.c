@@ -116,13 +116,13 @@ static int mlc_raster_table[9][256];
 
 static READ32_HANDLER( avengrs_control_r )
 {
-	return (input_port_read_indexed(machine, 1)<<16) | (eeprom_read_bit()<<23) | input_port_read_indexed(machine, 0);
+	return (input_port_read(machine, "IN1")<<16) | (eeprom_read_bit()<<23) | input_port_read(machine, "IN0");
 }
 
 static READ32_HANDLER(test2_r)
 {
 //  if (offset==0)
-//      return input_port_read_indexed(machine, 0); //0xffffffff;
+//      return input_port_read(machine, "IN0"); //0xffffffff;
 //   logerror("%08x:  Test2_r %d\n",activecpu_get_pc(),offset);
 	return mame_rand(machine); //0xffffffff;
 }
@@ -330,7 +330,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( mlc )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -348,7 +348,7 @@ static INPUT_PORTS_START( mlc )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )

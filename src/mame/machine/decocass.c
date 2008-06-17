@@ -181,10 +181,10 @@ WRITE8_HANDLER( decocass_nmi_reset_w )
 WRITE8_HANDLER( decocass_quadrature_decoder_reset_w )
 {
 	/* just latch the analog controls here */
-	decocass_quadrature_decoder[0] = input_port_read_indexed(machine,3);
-	decocass_quadrature_decoder[1] = input_port_read_indexed(machine,4);
-	decocass_quadrature_decoder[2] = input_port_read_indexed(machine,5);
-	decocass_quadrature_decoder[3] = input_port_read_indexed(machine,6);
+	decocass_quadrature_decoder[0] = input_port_read(machine, "AN0");
+	decocass_quadrature_decoder[1] = input_port_read(machine, "AN1");
+	decocass_quadrature_decoder[2] = input_port_read(machine, "AN2");
+	decocass_quadrature_decoder[3] = input_port_read(machine, "AN3");
 }
 
 WRITE8_HANDLER( decocass_adc_w )
@@ -204,10 +204,12 @@ WRITE8_HANDLER( decocass_adc_w )
 READ8_HANDLER( decocass_input_r )
 {
 	UINT8 data = 0xff;
+	static const char *portnames[] = { "IN0", "IN1", "IN2" };
+	
 	switch (offset & 7)
 	{
 	case 0: case 1: case 2:
-		data = input_port_read_indexed(machine, offset & 7);
+		data = input_port_read(machine, portnames[offset & 7]);
 		break;
 	case 3: case 4: case 5: case 6:
 		data = decocass_quadrature_decoder[(offset & 7) - 3];

@@ -350,7 +350,7 @@ READ16_HANDLER( hd68k_port0_r )
             .....
         0x8000 = SW1 #1
     */
-	int temp = input_port_read_indexed(machine, 0);
+	int temp = input_port_read(machine, "IN0");
 	if (atarigen_get_hblank(machine->primary_screen)) temp ^= 0x0002;
 	temp ^= 0x0018;		/* both EOCs always high for now */
 	return temp;
@@ -359,7 +359,7 @@ READ16_HANDLER( hd68k_port0_r )
 
 READ16_HANDLER( hdc68k_port1_r )
 {
-	UINT16 result = input_port_read_indexed(machine, 1);
+	UINT16 result = input_port_read(machine, "a80000");
 	UINT16 diff = result ^ hdc68k_last_port1;
 
 	/* if a new shifter position is selected, use it */
@@ -387,7 +387,7 @@ READ16_HANDLER( hdc68k_port1_r )
 
 READ16_HANDLER( hda68k_port1_r )
 {
-	UINT16 result = input_port_read_indexed(machine, 1);
+	UINT16 result = input_port_read(machine, "a80000");
 
 	/* merge in the wheel edge latch bit */
 	if (hdc68k_wheel_edge)
@@ -400,7 +400,7 @@ READ16_HANDLER( hda68k_port1_r )
 READ16_HANDLER( hdc68k_wheel_r )
 {
 	/* grab the new wheel value and upconvert to 12 bits */
-	UINT16 new_wheel = input_port_read_indexed(machine, 10) << 4;
+	UINT16 new_wheel = input_port_read(machine, "12BADC0") << 4;
 
 	/* hack to display the wheel position */
 	if (input_code_pressed(KEYCODE_LSHIFT))
@@ -445,20 +445,23 @@ READ16_HANDLER( hd68k_sound_reset_r )
 
 WRITE16_HANDLER( hd68k_adc_control_w )
 {
+	static const char *adc8names[] = { "8BADC0", "8BADC1", "8BADC2", "8BADC3", "8BADC4", "8BADC5", "8BADC6", "8BADC7" };
+	static const char *adc12names[] = { "12BADC0", "12BADC1", "12BADC2", "12BADC3" };
+
 	COMBINE_DATA(&adc_control);
 
 	/* handle a write to the 8-bit ADC address select */
 	if (adc_control & 0x08)
 	{
 		adc8_select = adc_control & 0x07;
-		adc8_data = input_port_read_indexed(machine, 2 + adc8_select);
+		adc8_data = input_port_read(machine, adc8names[adc8_select]);
 	}
 
 	/* handle a write to the 12-bit ADC address select */
 	if (adc_control & 0x40)
 	{
 		adc12_select = (adc_control >> 4) & 0x03;
-		adc12_data = input_port_read_indexed(machine, 10 + adc12_select) << 4;
+		adc12_data = input_port_read(machine, adc12names[adc12_select]) << 4;
 	}
 
 	/* bit 7 selects which byte of the 12 bit data to read */

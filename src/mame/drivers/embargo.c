@@ -58,7 +58,7 @@ static VIDEO_UPDATE( embargo )
 
 static READ8_HANDLER( input_port_bit_r )
 {
-	return (input_port_read_indexed(machine, 1) << (7 - input_select)) & 0x80;
+	return (input_port_read(machine, "IN1") << (7 - input_select)) & 0x80;
 }
 
 
@@ -82,14 +82,14 @@ static READ8_HANDLER( dial_r )
 
 	if (dial_enable_1 && !dial_enable_2)
 	{
-		lo = input_port_read_indexed(machine, 3);
-		hi = input_port_read_indexed(machine, 4);
+		lo = input_port_read(machine, "DIAL0");
+		hi = input_port_read(machine, "DIAL1");
 	}
 
 	if (dial_enable_2 && !dial_enable_1)
 	{
-		lo = input_port_read_indexed(machine, 5);
-		hi = input_port_read_indexed(machine, 6);
+		lo = input_port_read(machine, "DIAL2");
+		hi = input_port_read(machine, "DIAL3");
 	}
 
 	lo = 12 * lo / 256;
@@ -185,14 +185,14 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( embargo )
 
-	PORT_START /* port 0x01 */
+	PORT_START_TAG("IN0") /* port 0x01 */
 	PORT_DIPNAME( 0x03, 0x00, "Rounds" )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
 
-	PORT_START /* S2650_CONTROL_PORT */
+	PORT_START_TAG("IN1") /* S2650_CONTROL_PORT */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 )
@@ -202,19 +202,19 @@ static INPUT_PORTS_START( embargo )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 
-	PORT_START /* S2650_DATA_PORT */
+	PORT_START_TAG("IN2") /* S2650_DATA_PORT */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 
-	PORT_START
+	PORT_START_TAG("DIAL0")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("DIAL1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("DIAL2")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_PLAYER(3)
 
-	PORT_START
+	PORT_START_TAG("DIAL3")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_PLAYER(4)
 
 INPUT_PORTS_END

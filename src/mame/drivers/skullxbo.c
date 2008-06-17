@@ -96,7 +96,7 @@ static MACHINE_RESET( skullxbo )
 
 static READ16_HANDLER( special_port1_r )
 {
-	int temp = input_port_read_indexed(machine, 1);
+	int temp = input_port_read(machine, "FF5802");
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0040;
 	if (atarigen_get_hblank(machine->primary_screen)) temp ^= 0x0010;
 	return temp;
@@ -164,7 +164,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( skullxbo )
-	PORT_START      /* ff5800 */
+	PORT_START_TAG("FF5800")      /* ff5800 */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -175,7 +175,7 @@ static INPUT_PORTS_START( skullxbo )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
-	PORT_START      /* ff5802 */
+	PORT_START_TAG("FF5802")      /* ff5802 */
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )	/* HBLANK */
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_VBLANK )
@@ -618,7 +618,7 @@ ROM_END
 static DRIVER_INIT( skullxbo )
 {
 	atarigen_eeprom_default = NULL;
-	atarijsa_init(machine, 1, 0x0080);
+	atarijsa_init(machine, "FF5802", 0x0080);
 	memset(memory_region(REGION_GFX1) + 0x170000, 0, 0x20000);
 }
 

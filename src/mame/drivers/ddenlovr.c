@@ -1307,7 +1307,7 @@ VIDEO_UPDATE(ddenlovr)
 
 static READ16_HANDLER( ddenlovr_special_r )
 {
-	int res = input_port_read_indexed(machine, 2) | (ddenlovr_blitter_irq_flag << 6);
+	int res = input_port_read(machine, "IN2") | (ddenlovr_blitter_irq_flag << 6);
 
 	return res;
 }
@@ -1488,9 +1488,9 @@ static READ8_HANDLER( rongrong_input2_r )
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
 	switch( ddenlovr_select2 )
 	{
-		case 0x00:	return input_port_read_indexed(machine, 0);
-		case 0x01:	return input_port_read_indexed(machine, 1);
-		case 0x02:	return input_port_read_indexed(machine, 2);
+		case 0x00:	return input_port_read(machine, "IN0");
+		case 0x01:	return input_port_read(machine, "IN1");
+		case 0x02:	return input_port_read(machine, "IN2");
 	}
 	return 0xff;
 }
@@ -1498,9 +1498,9 @@ static READ8_HANDLER( rongrong_input2_r )
 
 static READ8_HANDLER( quiz365_input_r )
 {
-	if (!(ddenlovr_select & 0x01))	return input_port_read_indexed(machine, 3);
-	if (!(ddenlovr_select & 0x02))	return input_port_read_indexed(machine, 4);
-	if (!(ddenlovr_select & 0x04))	return input_port_read_indexed(machine, 5);
+	if (!(ddenlovr_select & 0x01))	return input_port_read(machine, "DSW1");
+	if (!(ddenlovr_select & 0x02))	return input_port_read(machine, "DSW2");
+	if (!(ddenlovr_select & 0x04))	return input_port_read(machine, "DSW3");
 	if (!(ddenlovr_select & 0x08))	return 0xff;//mame_rand(machine);
 	if (!(ddenlovr_select & 0x10))	return 0xff;//mame_rand(machine);
 	return 0xff;
@@ -1512,9 +1512,9 @@ static READ16_HANDLER( quiz365_input2_r )
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
 	switch( ddenlovr_select2 )
 	{
-		case 0x10:	return input_port_read_indexed(machine, 0);
-		case 0x11:	return input_port_read_indexed(machine, 1);
-		case 0x12:	return input_port_read_indexed(machine, 2) | (ddenlovr_blitter_irq_flag << 6);
+		case 0x10:	return input_port_read(machine, "IN0");
+		case 0x11:	return input_port_read(machine, "IN1");
+		case 0x12:	return input_port_read(machine, "IN2") | (ddenlovr_blitter_irq_flag << 6);
 	}
 	return 0xff;
 }
@@ -1617,9 +1617,9 @@ static UINT16 *ddenlvrj_dsw_sel;
 static READ16_HANDLER( ddenlvrj_dsw_r )
 {
 	UINT16 dsw = 0;
-	if ((~*ddenlvrj_dsw_sel) & 0x01)	dsw |= input_port_read_indexed(machine, 3);	// dsw 1
-	if ((~*ddenlvrj_dsw_sel) & 0x02)	dsw |= input_port_read_indexed(machine, 4);	// dsw 2
-	if ((~*ddenlvrj_dsw_sel) & 0x04)	dsw |= input_port_read_indexed(machine, 5);	// ?
+	if ((~*ddenlvrj_dsw_sel) & 0x01)	dsw |= input_port_read(machine, "DSW1");	// dsw 1
+	if ((~*ddenlvrj_dsw_sel) & 0x02)	dsw |= input_port_read(machine, "DSW2");	// dsw 2
+	if ((~*ddenlvrj_dsw_sel) & 0x04)	dsw |= input_port_read(machine, "DSW3");	// ?
 	return dsw;
 }
 
@@ -1635,7 +1635,7 @@ static WRITE16_HANDLER( ddenlvrj_coincounter_w )
 
 static READ16_HANDLER( ddenlvrj_blitter_r )
 {
-	return input_port_read_indexed(machine, 2) | (ddenlovr_blitter_irq_flag ? 0x60 : 0x00 );	// bit 4 = 1 -> blitter busy
+	return input_port_read(machine, "IN2") | (ddenlovr_blitter_irq_flag ? 0x60 : 0x00 );	// bit 4 = 1 -> blitter busy
 }
 
 static ADDRESS_MAP_START( ddenlvrj_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1720,14 +1720,14 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( nettoqc_special_r )
 {
-	return input_port_read_indexed(machine, 2) | (ddenlovr_blitter_irq_flag ? 0x60 : 0x00 );
+	return input_port_read(machine, "IN2") | (ddenlovr_blitter_irq_flag ? 0x60 : 0x00 );
 }
 
 static READ16_HANDLER( nettoqc_input_r )
 {
-	if (!(ddenlovr_select & 0x01))	return input_port_read_indexed(machine, 3);
-	if (!(ddenlovr_select & 0x02))	return input_port_read_indexed(machine, 4);
-	if (!(ddenlovr_select & 0x04))	return input_port_read_indexed(machine, 5);
+	if (!(ddenlovr_select & 0x01))	return input_port_read(machine, "DSW1");
+	if (!(ddenlovr_select & 0x02))	return input_port_read(machine, "DSW2");
+	if (!(ddenlovr_select & 0x04))	return input_port_read(machine, "DSW3");
 	return 0xffff;
 }
 
@@ -1812,11 +1812,11 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( rongrong_input_r )
 {
-	if (!(ddenlovr_select & 0x01))	return input_port_read_indexed(machine, 3);
-	if (!(ddenlovr_select & 0x02))	return input_port_read_indexed(machine, 4);
+	if (!(ddenlovr_select & 0x01))	return input_port_read(machine, "DSW1");
+	if (!(ddenlovr_select & 0x02))	return input_port_read(machine, "DSW2");
 	if (!(ddenlovr_select & 0x04))	return 0xff;//mame_rand(machine);
 	if (!(ddenlovr_select & 0x08))	return 0xff;//mame_rand(machine);
-	if (!(ddenlovr_select & 0x10))	return input_port_read_indexed(machine, 5);
+	if (!(ddenlovr_select & 0x10))	return input_port_read(machine, "DSW3");
 	return 0xff;
 }
 
@@ -2017,13 +2017,13 @@ static ADDRESS_MAP_START( mmpanic_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x38, 0x38) AM_READ(unk_r					)	// ? must be 78 on startup
 	AM_RANGE(0x58, 0x58) AM_READ(unk_r					)	// ? must be 78 on startup
 	AM_RANGE(0x63, 0x63) AM_READ(rongrong_gfxrom_r		)	// Video Chip
-	AM_RANGE(0x6a, 0x6a) AM_READ(input_port_0_r			)
-	AM_RANGE(0x6b, 0x6b) AM_READ(input_port_1_r			)
+	AM_RANGE(0x6a, 0x6a) AM_READ_PORT("IN0")
+	AM_RANGE(0x6b, 0x6b) AM_READ_PORT("IN1")
 	AM_RANGE(0x6c, 0x6d) AM_READ(mmpanic_link_r			)	// Other cabinets?
 	AM_RANGE(0x7c, 0x7c) AM_READ(OKIM6295_status_0_r	)	// Sound
-	AM_RANGE(0x94, 0x94) AM_READ(input_port_2_r			)	// DSW 1
-	AM_RANGE(0x98, 0x98) AM_READ(input_port_3_r			)	// DSW 2
-	AM_RANGE(0x9c, 0x9c) AM_READ(input_port_4_r			)	// DSW 1&2 high bits
+	AM_RANGE(0x94, 0x94) AM_READ_PORT("DSW1")				// DSW 1
+	AM_RANGE(0x98, 0x98) AM_READ_PORT("DSW2")				// DSW 2
+	AM_RANGE(0x9c, 0x9c) AM_READ_PORT("DSW3")				// DSW 1&2 high bits
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mmpanic_writeport, ADDRESS_SPACE_IO, 8 )
@@ -2135,9 +2135,9 @@ static WRITE8_HANDLER( funkyfig_rombank_w )
 
 static READ8_HANDLER( funkyfig_dsw_r )
 {
-	if (!(ddenlovr_select & 0x01))	return input_port_read_indexed(machine, 3);
-	if (!(ddenlovr_select & 0x02))	return input_port_read_indexed(machine, 4);
-	if (!(ddenlovr_select & 0x04))	return input_port_read_indexed(machine, 5);
+	if (!(ddenlovr_select & 0x01))	return input_port_read(machine, "DSW1");
+	if (!(ddenlovr_select & 0x02))	return input_port_read(machine, "DSW2");
+	if (!(ddenlovr_select & 0x04))	return input_port_read(machine, "DSW3");
 	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", activecpu_get_pc(), ddenlovr_select);
 	return 0xff;
 }
@@ -2148,7 +2148,7 @@ static READ8_HANDLER( funkyfig_coin_r )
 {
 	switch( ddenlovr_select2 )
 	{
-		case 0x22:	return input_port_read_indexed(machine, 2);
+		case 0x22:	return input_port_read(machine, "IN2");
 		case 0x23:	return funkyfig_lockout;
 	}
 	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", activecpu_get_pc(), ddenlovr_select2);
@@ -2159,8 +2159,8 @@ static READ8_HANDLER( funkyfig_key_r )
 {
 	switch( ddenlovr_select2 )
 	{
-		case 0x20:	return input_port_read_indexed(machine, 0);
-		case 0x21:	return input_port_read_indexed(machine, 1);
+		case 0x20:	return input_port_read(machine, "IN0");
+		case 0x21:	return input_port_read(machine, "IN1");
 	}
 	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", activecpu_get_pc(), ddenlovr_select2);
 	return 0xff;
@@ -2270,23 +2270,23 @@ static READ8_HANDLER( hanakanz_keyb_r )
 {
 	UINT8 val = 0xff;
 
-	if      (!(keyb & 0x01))	val = input_port_read_indexed(machine, offset * 5 + 1);
-	else if (!(keyb & 0x02))	val = input_port_read_indexed(machine, offset * 5 + 2);
-	else if (!(keyb & 0x04))	val = input_port_read_indexed(machine, offset * 5 + 3);
-	else if (!(keyb & 0x08))	val = input_port_read_indexed(machine, offset * 5 + 4);
-	else if (!(keyb & 0x10))	val = input_port_read_indexed(machine, offset * 5 + 5);
+	if      (!(keyb & 0x01))	val = input_port_read(machine, offset ? "KEY5" : "KEY0");
+	else if (!(keyb & 0x02))	val = input_port_read(machine, offset ? "KEY6" : "KEY1");
+	else if (!(keyb & 0x04))	val = input_port_read(machine, offset ? "KEY7" : "KEY2");
+	else if (!(keyb & 0x08))	val = input_port_read(machine, offset ? "KEY8" : "KEY3");
+	else if (!(keyb & 0x10))	val = input_port_read(machine, offset ? "KEY9" : "KEY4");
 
-	val |= input_port_read_indexed(machine, 16 + offset);
+	val |= input_port_read(machine, offset ? "HOPPER" : "BET");
 	return val;
 }
 
 static READ8_HANDLER( hanakanz_dsw_r )
 {
-	if (!(dsw & 0x01))	return input_port_read_indexed(machine, 11);
-	if (!(dsw & 0x02))	return input_port_read_indexed(machine, 12);
-	if (!(dsw & 0x04))	return input_port_read_indexed(machine, 13);
-	if (!(dsw & 0x08))	return input_port_read_indexed(machine, 14);
-	if (!(dsw & 0x10))	return input_port_read_indexed(machine, 15);
+	if (!(dsw & 0x01))	return input_port_read(machine, "DSW1");
+	if (!(dsw & 0x02))	return input_port_read(machine, "DSW2");
+	if (!(dsw & 0x04))	return input_port_read(machine, "DSW3");
+	if (!(dsw & 0x08))	return input_port_read(machine, "DSW4");
+	if (!(dsw & 0x10))	return input_port_read(machine, "DSW5");
 	return 0xff;
 }
 
@@ -2376,7 +2376,7 @@ static ADDRESS_MAP_START( hanakanz_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_G
 	AM_RANGE(0x2c, 0x2c) AM_READ( hanakanz_busy_r			)
 	AM_RANGE(0x32, 0x32) AM_READ( hanakanz_dsw_r			)
 	AM_RANGE(0x83, 0x84) AM_READ( hanakanz_gfxrom_r			)
-	AM_RANGE(0x90, 0x90) AM_READ( input_port_0_r			)
+	AM_RANGE(0x90, 0x90) AM_READ_PORT("IN0")
 	AM_RANGE(0x91, 0x92) AM_READ( hanakanz_keyb_r			)
 	AM_RANGE(0x96, 0x96) AM_READ( hanakanz_rand_r			)
 	AM_RANGE(0xc0, 0xc0) AM_READ( OKIM6295_status_0_r		)
@@ -2403,7 +2403,7 @@ static ADDRESS_MAP_START( hkagerou_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_G
 	AM_RANGE(0x2c, 0x2c) AM_READ( hanakanz_busy_r			)
 	AM_RANGE(0x32, 0x32) AM_READ( hanakanz_dsw_r			)
 	AM_RANGE(0x83, 0x84) AM_READ( hanakanz_gfxrom_r			)
-	AM_RANGE(0xb0, 0xb0) AM_READ( input_port_0_r			)
+	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("IN0")
 	AM_RANGE(0xb1, 0xb2) AM_READ( hanakanz_keyb_r			)
 	AM_RANGE(0xb6, 0xb6) AM_READ( hanakanz_rand_r			)
 	AM_RANGE(0xc0, 0xc0) AM_READ( OKIM6295_status_0_r		)
@@ -2444,7 +2444,7 @@ static ADDRESS_MAP_START( mjreach1_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_G
 	AM_RANGE(0x83, 0x84) AM_READ( hanakanz_gfxrom_r			)
 	AM_RANGE(0x92, 0x92) AM_READ( hanakanz_rand_r			)
 	AM_RANGE(0x93, 0x93) AM_READ( mjreach1_protection_r		)
-	AM_RANGE(0x94, 0x94) AM_READ( input_port_0_r			)
+	AM_RANGE(0x94, 0x94) AM_READ_PORT("IN0")
 	AM_RANGE(0x95, 0x96) AM_READ( hanakanz_keyb_r			)
 	AM_RANGE(0xc0, 0xc0) AM_READ( OKIM6295_status_0_r		)
 	AM_RANGE(0xe0, 0xef) AM_DEVREAD(MSM6242, "rtc", msm6242_r)	// 6242RTC
@@ -2475,13 +2475,13 @@ static READ8_HANDLER( mjchuuka_keyb_r )
 {
 	UINT8 val = 0xff;
 
-	if      (!(keyb & 0x01))	val = input_port_read_indexed(machine, offset * 5 + 1);
-	else if (!(keyb & 0x02))	val = input_port_read_indexed(machine, offset * 5 + 2);
-	else if (!(keyb & 0x04))	val = input_port_read_indexed(machine, offset * 5 + 3);
-	else if (!(keyb & 0x08))	val = input_port_read_indexed(machine, offset * 5 + 4);
-	else if (!(keyb & 0x10))	val = input_port_read_indexed(machine, offset * 5 + 5);
+	if      (!(keyb & 0x01))	val = input_port_read(machine, offset ? "KEY5" : "KEY0");
+	else if (!(keyb & 0x02))	val = input_port_read(machine, offset ? "KEY6" : "KEY1");
+	else if (!(keyb & 0x04))	val = input_port_read(machine, offset ? "KEY7" : "KEY2");
+	else if (!(keyb & 0x08))	val = input_port_read(machine, offset ? "KEY8" : "KEY3");
+	else if (!(keyb & 0x10))	val = input_port_read(machine, offset ? "KEY9" : "KEY4");
 
-	val |= input_port_read_indexed(machine, 16 + offset);
+	val |= input_port_read(machine, offset ? "HOPPER" : "BET");
 	if (offset)	val |= 0x80;	// blitter busy
 	return val;
 }
@@ -2573,14 +2573,14 @@ static WRITE8_HANDLER( mjchuuka_oki_bank_w )
 static ADDRESS_MAP_START( mjchuuka_readport, ADDRESS_SPACE_IO, 8 )	// 16 bit I/O
 	AM_RANGE(0x13, 0x13) AM_MIRROR(0xff00) AM_READ( hanakanz_rand_r			)
 	AM_RANGE(0x23, 0x23) AM_MIRROR(0xff00) AM_READ( mjchuuka_gfxrom_0_r		)
-	AM_RANGE(0x42, 0x42) AM_MIRROR(0xff00) AM_READ( input_port_0_r			)
+	AM_RANGE(0x42, 0x42) AM_MIRROR(0xff00) AM_READ_PORT("IN0")
 	AM_RANGE(0x43, 0x44) AM_MIRROR(0xff00) AM_READ( mjchuuka_keyb_r			)
 	AM_RANGE(0x45, 0x45) AM_MIRROR(0xff00) AM_READ( mjchuuka_gfxrom_1_r		)
-	AM_RANGE(0x60, 0x60) AM_MIRROR(0xff00) AM_READ( input_port_11_r			)	// DSW 1
-	AM_RANGE(0x61, 0x61) AM_MIRROR(0xff00) AM_READ( input_port_12_r			)	// DSW 2
-	AM_RANGE(0x62, 0x62) AM_MIRROR(0xff00) AM_READ( input_port_13_r			)	// DSW 3
-	AM_RANGE(0x63, 0x63) AM_MIRROR(0xff00) AM_READ( input_port_14_r			)	// DSW 4
-	AM_RANGE(0x64, 0x64) AM_MIRROR(0xff00) AM_READ( input_port_15_r			)	// DSW 1-4 high bits
+	AM_RANGE(0x60, 0x60) AM_MIRROR(0xff00) AM_READ_PORT("DSW1")					// DSW 1
+	AM_RANGE(0x61, 0x61) AM_MIRROR(0xff00) AM_READ_PORT("DSW2")					// DSW 2
+	AM_RANGE(0x62, 0x62) AM_MIRROR(0xff00) AM_READ_PORT("DSW3")					// DSW 3
+	AM_RANGE(0x63, 0x63) AM_MIRROR(0xff00) AM_READ_PORT("DSW4")					// DSW 4
+	AM_RANGE(0x64, 0x64) AM_MIRROR(0xff00) AM_READ_PORT("DSW5")					// DSW 1-4 high bits
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_READ( OKIM6295_status_0_r		)
 	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_DEVREAD(MSM6242, "rtc", msm6242_r)	// 6242RTC
 ADDRESS_MAP_END
@@ -2637,7 +2637,7 @@ static READ8_HANDLER( mjmyster_coins_r )
 {
 	switch( ddenlovr_select2 )
 	{
-		case 0x00:	return input_port_read_indexed(machine, 0);
+		case 0x00:	return input_port_read(machine, "IN0");
 		case 0x01:	return 0xff;
 		case 0x02:	return 0xff;	// bit 7 = 0 -> blitter busy, + hopper switch
 		case 0x03:	return 0xff;
@@ -2652,11 +2652,11 @@ static READ8_HANDLER( mjmyster_keyb_r )
 {
 	UINT8 ret = 0xff;
 
-	if		(keyb & 0x01)	ret = input_port_read_indexed(machine, 1);
-	else if	(keyb & 0x02)	ret = input_port_read_indexed(machine, 2);
-	else if	(keyb & 0x04)	ret = input_port_read_indexed(machine, 3);
-	else if	(keyb & 0x08)	ret = input_port_read_indexed(machine, 4);
-	else if	(keyb & 0x10)	ret = input_port_read_indexed(machine, 5);
+	if		(keyb & 0x01)	ret = input_port_read(machine, "KEY0");
+	else if	(keyb & 0x02)	ret = input_port_read(machine, "KEY1");
+	else if	(keyb & 0x04)	ret = input_port_read(machine, "KEY2");
+	else if	(keyb & 0x08)	ret = input_port_read(machine, "KEY3");
+	else if	(keyb & 0x10)	ret = input_port_read(machine, "KEY4");
 	else	logerror("%06x: warning, unknown bits read, keyb = %02x\n", activecpu_get_pc(), keyb);
 
 	keyb <<= 1;
@@ -2666,11 +2666,11 @@ static READ8_HANDLER( mjmyster_keyb_r )
 
 static READ8_HANDLER( mjmyster_dsw_r )
 {
-	if (!(ddenlovr_select & 0x01))	return input_port_read_indexed(machine, 9);
-	if (!(ddenlovr_select & 0x02))	return input_port_read_indexed(machine, 8);
-	if (!(ddenlovr_select & 0x04))	return input_port_read_indexed(machine, 7);
-	if (!(ddenlovr_select & 0x08))	return input_port_read_indexed(machine, 6);
-	if (!(ddenlovr_select & 0x10))	return input_port_read_indexed(machine, 10);
+	if (!(ddenlovr_select & 0x01))	return input_port_read(machine, "DSW4");
+	if (!(ddenlovr_select & 0x02))	return input_port_read(machine, "DSW3");
+	if (!(ddenlovr_select & 0x04))	return input_port_read(machine, "DSW2");
+	if (!(ddenlovr_select & 0x08))	return input_port_read(machine, "DSW1");
+	if (!(ddenlovr_select & 0x10))	return input_port_read(machine, "DSW5");
 	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", activecpu_get_pc(), ddenlovr_select);
 	return 0xff;
 }
@@ -2769,11 +2769,11 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( hginga_dsw_r )
 {
-	if (!(ddenlovr_select & 0x01))	return input_port_read_indexed(machine, 11);
-	if (!(ddenlovr_select & 0x02))	return input_port_read_indexed(machine, 12);
-	if (!(ddenlovr_select & 0x04))	return input_port_read_indexed(machine, 13);
-	if (!(ddenlovr_select & 0x08))	return input_port_read_indexed(machine, 14);
-	if (!(ddenlovr_select & 0x10))	return input_port_read_indexed(machine, 15);
+	if (!(ddenlovr_select & 0x01))	return input_port_read(machine, "DSW4");
+	if (!(ddenlovr_select & 0x02))	return input_port_read(machine, "DSW3");
+	if (!(ddenlovr_select & 0x04))	return input_port_read(machine, "DSW2");
+	if (!(ddenlovr_select & 0x08))	return input_port_read(machine, "DSW1");
+	if (!(ddenlovr_select & 0x10))	return input_port_read(machine, "DSW5");
 	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", activecpu_get_pc(), ddenlovr_select);
 	return 0xff;
 }
@@ -2790,12 +2790,12 @@ static READ8_HANDLER( hginga_coins_r )
 {
 	switch( hginga_select )
 	{
-		case 0x20:	return input_port_read_indexed(machine, 0);
-		case 0x21:	return input_port_read_indexed(machine, 16);
+		case 0x20:	return input_port_read(machine, "IN0");
+		case 0x21:	return input_port_read(machine, "BET");
 		case 0x22:	return 0x7f;	// bit 7 = blitter busy, bit 6 = hopper
 		case 0x23:	return hginga_coins;
 	}
-	logerror("%04x: coins_r with select = %02x\n",activecpu_get_pc(),hginga_select);
+	logerror("%04x: coins_r with select = %02x\n", activecpu_get_pc(), hginga_select);
 	return 0xff;
 }
 
@@ -2823,12 +2823,15 @@ static WRITE8_HANDLER( hginga_coins_w )
 			hginga_coins = data;
 			break;
 		default:
-			logerror("%04x: coins_w with select = %02x, data = %02x\n",activecpu_get_pc(),hginga_select,data);
+			logerror("%04x: coins_w with select = %02x, data = %02x\n", activecpu_get_pc(), hginga_select, data);
 	}
 }
 
 static READ8_HANDLER( hginga_input_r )
 {
+	static const char *keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
+	static const char *keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
+	
 	switch( hginga_select )
 	{
 		case 0x2d:
@@ -2836,13 +2839,13 @@ static READ8_HANDLER( hginga_input_r )
 
 		// player 1
 		case 0xa1:
-			return input_port_read_indexed(machine, 1 + hginga_ip++);
+			return input_port_read(machine, keynames0[hginga_ip++]);
 
 		// player 2
 		case 0xa2:
-			return input_port_read_indexed(machine, 1 + 5 + hginga_ip++);
+			return input_port_read(machine, keynames1[hginga_ip++]);
 	}
-	logerror("%04x: input_r with select = %02x\n",activecpu_get_pc(),hginga_select);
+	logerror("%04x: input_r with select = %02x\n", activecpu_get_pc(), hginga_select);
 	return 0xff;
 }
 
@@ -2918,11 +2921,11 @@ static UINT8 hgokou_player_r(running_machine *machine, int player)
 {
 	UINT8 hopper_bit = ((hgokou_hopper && !(video_screen_get_frame_number(machine->primary_screen)%10)) ? 0 : (1<<6));
 
-	if (!(ddenlovr_select2 & 0x01))	return input_port_read_indexed(machine, player * 5 + 1) | hopper_bit;
-	if (!(ddenlovr_select2 & 0x02))	return input_port_read_indexed(machine, player * 5 + 2) | hopper_bit;
-	if (!(ddenlovr_select2 & 0x04))	return input_port_read_indexed(machine, player * 5 + 3) | hopper_bit;
-	if (!(ddenlovr_select2 & 0x08))	return input_port_read_indexed(machine, player * 5 + 4) | hopper_bit;
-	if (!(ddenlovr_select2 & 0x10))	return input_port_read_indexed(machine, player * 5 + 5) | hopper_bit;
+	if (!(ddenlovr_select2 & 0x01))	return input_port_read(machine, player ? "KEY5" : "KEY0") | hopper_bit;
+	if (!(ddenlovr_select2 & 0x02))	return input_port_read(machine, player ? "KEY6" : "KEY1") | hopper_bit;
+	if (!(ddenlovr_select2 & 0x04))	return input_port_read(machine, player ? "KEY7" : "KEY2") | hopper_bit;
+	if (!(ddenlovr_select2 & 0x08))	return input_port_read(machine, player ? "KEY8" : "KEY3") | hopper_bit;
+	if (!(ddenlovr_select2 & 0x10))	return input_port_read(machine, player ? "KEY9" : "KEY4") | hopper_bit;
 
 	return 0x7f;	// bit 7 = blitter busy, bit 6 = hopper
 }
@@ -2931,7 +2934,7 @@ static READ8_HANDLER( hgokou_input_r )
 {
 	switch (hginga_select)
 	{
-		case 0x20:	return input_port_read_indexed(machine, 0);
+		case 0x20:	return input_port_read(machine, "IN0");
 		case 0x21:	return hgokou_player_r(machine, 1);
 		case 0x22:	return hgokou_player_r(machine, 0);
 		case 0x23:	return hginga_coins;
@@ -3039,14 +3042,17 @@ static WRITE8_HANDLER( hparadis_select_w )
 
 static READ8_HANDLER( hparadis_input_r )
 {
+	static const char *keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
+	static const char *keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
+
 	switch (hginga_select)
 	{
-		case 0x00:	return input_port_read_indexed(machine, 0);				// P1 (Joy)
-		case 0x01:	return input_port_read_indexed(machine, 1);				// P2 (Joy)
-		case 0x02:	return input_port_read_indexed(machine, 2);				// Coins
+		case 0x00:	return input_port_read(machine, "IN0");				// P1 (Joy)
+		case 0x01:	return input_port_read(machine, "IN1");				// P2 (Joy)
+		case 0x02:	return input_port_read(machine, "IN2");				// Coins
 		case 0x0d:	return 0x00;
-		case 0x80:	return input_port_read_indexed(machine, 3 + hginga_ip++);	// P1 (Keys)
-		case 0x81:	return input_port_read_indexed(machine, 8 + hginga_ip++);	// P2 (Keys)
+		case 0x80:	return input_port_read(machine, keynames0[hginga_ip++]);	// P1 (Keys)
+		case 0x81:	return input_port_read(machine, keynames1[hginga_ip++]);	// P2 (Keys)
 	}
 	logerror("%06x: warning, unknown bits read, hginga_select = %02x\n", activecpu_get_pc(), hginga_select);
 	return 0xff;
@@ -3054,11 +3060,11 @@ static READ8_HANDLER( hparadis_input_r )
 
 static READ8_HANDLER( hparadis_dsw_r )
 {
-	if (!(ddenlovr_select & 0x01))	return input_port_read_indexed(machine, 13);
-	if (!(ddenlovr_select & 0x02))	return input_port_read_indexed(machine, 14);
+	if (!(ddenlovr_select & 0x01))	return input_port_read(machine, "DSW1");
+	if (!(ddenlovr_select & 0x02))	return input_port_read(machine, "DSW2");
 	if (!(ddenlovr_select & 0x04))	return 0xff;
 	if (!(ddenlovr_select & 0x08))	return 0xff;
-	if (!(ddenlovr_select & 0x10))	return input_port_read_indexed(machine, 15);
+	if (!(ddenlovr_select & 0x10))	return input_port_read(machine, "DSW3");
 	return 0xff;
 }
 
@@ -3122,7 +3128,7 @@ static READ8_HANDLER( mjmywrld_coins_r )
 {
 	switch( ddenlovr_select2 )
 	{
-		case 0x80:	return input_port_read_indexed(machine, 0);
+		case 0x80:	return input_port_read(machine, "IN0");
 		case 0x81:	return 0x00;
 		case 0x82:	return 0xff;	// bit 7 = 0 -> blitter busy, + hopper switch
 		case 0x83:	return 0x00;
@@ -3198,8 +3204,8 @@ static UINT16 *akamaru_dsw_sel;
 static READ16_HANDLER( akamaru_dsw_r )
 {
 	UINT16 dsw = 0;
-	if (akamaru_dsw_sel[1] == 0xff)	dsw |= input_port_read_indexed(machine, 3);
-	if (akamaru_dsw_sel[0] == 0xff)	dsw |= input_port_read_indexed(machine, 4);
+	if (akamaru_dsw_sel[1] == 0xff)	dsw |= input_port_read(machine, "DSW1");
+	if (akamaru_dsw_sel[0] == 0xff)	dsw |= input_port_read(machine, "DSW2");
 	return dsw;
 }
 
@@ -3284,11 +3290,11 @@ static READ8_HANDLER( mjflove_keyb_r )
 {
 	UINT8 val = 0xff;
 
-	if      (!(keyb & 0x01))	val = input_port_read_indexed(machine, offset * 5 + 1);
-	else if (!(keyb & 0x02))	val = input_port_read_indexed(machine, offset * 5 + 2);
-	else if (!(keyb & 0x04))	val = input_port_read_indexed(machine, offset * 5 + 3);
-	else if (!(keyb & 0x08))	val = input_port_read_indexed(machine, offset * 5 + 4);
-	else if (!(keyb & 0x10))	val = input_port_read_indexed(machine, offset * 5 + 5);
+	if      (!(keyb & 0x01))	val = input_port_read(machine, offset ? "KEY5" : "KEY0");
+	else if (!(keyb & 0x02))	val = input_port_read(machine, offset ? "KEY6" : "KEY1");
+	else if (!(keyb & 0x04))	val = input_port_read(machine, offset ? "KEY7" : "KEY2");
+	else if (!(keyb & 0x08))	val = input_port_read(machine, offset ? "KEY8" : "KEY3");
+	else if (!(keyb & 0x10))	val = input_port_read(machine, offset ? "KEY9" : "KEY4");
 
 	return val;
 }
@@ -3300,7 +3306,7 @@ static READ8_HANDLER( mjflove_blitter_r )
 	// bit 7 = 1 -> blitter busy
 	// bit 6 = 0 -> VBLANK?
 	// bit 5 = 0 -> RTC?
-	return input_port_read_indexed(machine, 0) | mjflove_irq_cause;
+	return input_port_read(machine, "IN0") | mjflove_irq_cause;
 }
 
 static WRITE8_HANDLER( mjflove_blitter_w )
@@ -3322,13 +3328,13 @@ static WRITE8_HANDLER( mjflove_coincounter_w )
 
 static ADDRESS_MAP_START( mjflove_readport, ADDRESS_SPACE_IO, 8 )	// 16 bit I/O
 	AM_RANGE(0x0010, 0x0010) AM_READ( hanakanz_rand_r			)	AM_MIRROR(0xff00)
-	AM_RANGE(0x001c, 0x001c) AM_READ( input_port_12_r			)	AM_MIRROR(0xff00)
+	AM_RANGE(0x001c, 0x001c) AM_READ_PORT("DSW2")					AM_MIRROR(0xff00)
 	AM_RANGE(0x0038, 0x0038) AM_READ( SMH_NOP					)	// ? ack or watchdog
 	AM_RANGE(0x0043, 0x0043) AM_READ( rongrong_gfxrom_r			)
 	AM_RANGE(0x0080, 0x0081) AM_READ( mjflove_keyb_r			)
 	AM_RANGE(0x0082, 0x0082) AM_READ( mjflove_blitter_r			)
 	AM_RANGE(0x00da, 0x00da) AM_READ( mjflove_protection_r		)	AM_MIRROR(0xff00)
-	AM_RANGE(0x0100, 0x0100) AM_READ( input_port_11_r			)
+	AM_RANGE(0x0100, 0x0100) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0280, 0x028f) AM_DEVREAD(MSM6242, "rtc", msm6242_r)	// 6242RTC
 	AM_RANGE(0x0380, 0x0380) AM_READ( OKIM6295_status_0_r		)
 ADDRESS_MAP_END
@@ -3358,7 +3364,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( ddenlvrj )
-	PORT_START	// IN0 - Player 1
+	PORT_START_TAG("IN0")	/* IN0 - Player 1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -3368,7 +3374,7 @@ static INPUT_PORTS_START( ddenlvrj )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN1 - Player 2
+	PORT_START_TAG("IN1")	/* IN1 - Player 2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
@@ -3378,7 +3384,7 @@ static INPUT_PORTS_START( ddenlvrj )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN2 - Coins + ?
+	PORT_START_TAG("IN2")	/* IN2 - Coins + ? */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2    )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
@@ -3388,7 +3394,7 @@ static INPUT_PORTS_START( ddenlvrj )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL  )	// RTC
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL  )
 
-	PORT_START	// IN3 - DSW1
+	PORT_START_TAG("DSW1")	/* IN3 - DSW1 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -3412,7 +3418,7 @@ static INPUT_PORTS_START( ddenlvrj )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN4 - DSW2
+	PORT_START_TAG("DSW2")	/* IN4 - DSW2 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x06, "1 (Easy)" )
 	PORT_DIPSETTING(    0x05, "2" )
@@ -3437,7 +3443,7 @@ static INPUT_PORTS_START( ddenlvrj )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN5 - DSW1 & 2 top bits
+	PORT_START_TAG("DSW3")	/* IN5 - DSW1 & 2 top bits */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3464,7 +3470,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( ddenlovr )
-	PORT_START	// IN0 - Player 1
+	PORT_START_TAG("IN0")	/* IN0 - Player 1 */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -3474,7 +3480,7 @@ static INPUT_PORTS_START( ddenlovr )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN1 - Player 2
+	PORT_START_TAG("IN1")	/* IN1 - Player 2 */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
@@ -3484,7 +3490,7 @@ static INPUT_PORTS_START( ddenlovr )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN2 - Coins + ?
+	PORT_START_TAG("IN2")	/* IN2 - Coins + ? */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW,  IPT_COIN1    )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW,  IPT_COIN2    )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
@@ -3494,7 +3500,7 @@ static INPUT_PORTS_START( ddenlovr )
 	PORT_BIT(  0x40, IP_ACTIVE_HIGH, IPT_SPECIAL  )	// blitter irq flag
 	PORT_BIT(  0x80, IP_ACTIVE_HIGH, IPT_SPECIAL  )	// blitter busy flag
 
-	PORT_START	// IN3 - DSW
+	PORT_START_TAG("DSW")	/* IN3 - DSW */
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x02, 0x02, "Unknown 1-1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
@@ -3520,7 +3526,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( nettoqc )
-	PORT_START	// IN0 - Player 1
+	PORT_START_TAG("IN0")	/* IN0 - Player 1 */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -3530,7 +3536,7 @@ static INPUT_PORTS_START( nettoqc )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN1 - Player 2
+	PORT_START_TAG("IN1")	/* IN1 - Player 2 */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -3540,7 +3546,7 @@ static INPUT_PORTS_START( nettoqc )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN2 - Coins + ?
+	PORT_START_TAG("IN2")	/* IN2 - Coins + ? */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW,  IPT_COIN1    )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW,  IPT_COIN2    )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
@@ -3550,7 +3556,7 @@ static INPUT_PORTS_START( nettoqc )
 	PORT_BIT(  0x40, IP_ACTIVE_HIGH, IPT_SPECIAL  )	// blitter irq flag
 	PORT_BIT(  0x80, IP_ACTIVE_HIGH, IPT_SPECIAL  )
 
-	PORT_START	// IN3 - DSW
+	PORT_START_TAG("DSW1")	/* IN3 - DSW */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -3574,7 +3580,7 @@ static INPUT_PORTS_START( nettoqc )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN4 - DSW
+	PORT_START_TAG("DSW2")	/* IN4 - DSW */
 	PORT_DIPNAME( 0x03, 0x03, "Unknown 2-0&1*" )
 	PORT_DIPSETTING(    0x02, "0" )
 	PORT_DIPSETTING(    0x03, "1" )
@@ -3599,7 +3605,7 @@ static INPUT_PORTS_START( nettoqc )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN5 - DSW
+	PORT_START_TAG("DSW3")	/* IN5 - DSW */
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 1-8*" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3618,7 +3624,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( quiz365 )
-	PORT_START	// IN0 - Player 1
+	PORT_START_TAG("IN0")	/* IN0 - Player 1 */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -3628,7 +3634,7 @@ static INPUT_PORTS_START( quiz365 )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN1 - Player 2
+	PORT_START_TAG("IN1")	/* IN1 - Player 2 */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -3638,17 +3644,17 @@ static INPUT_PORTS_START( quiz365 )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN2 - Coins + ?
+	PORT_START_TAG("IN2")	/* IN2 - Coins + ? */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW,  IPT_COIN1    )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW,  IPT_COIN2    )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)	/* Test */
+	PORT_BIT(  0x08, IP_ACTIVE_LOW,  IPT_SERVICE  ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)	/* Test */
 	PORT_BIT(  0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT(  0x20, IP_ACTIVE_LOW,  IPT_SPECIAL  )	// ? quiz365
 	PORT_BIT(  0x40, IP_ACTIVE_HIGH, IPT_SPECIAL  )	// blitter irq flag
 	PORT_BIT(  0x80, IP_ACTIVE_HIGH, IPT_SPECIAL  )	// blitter busy flag
 
-	PORT_START	// IN3 - DSW
+	PORT_START_TAG("DSW1")	/* IN3 - DSW */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -3671,7 +3677,7 @@ static INPUT_PORTS_START( quiz365 )
 	PORT_DIPSETTING(    0xc0, "2" )
 //  PORT_DIPSETTING(    0x00, "2" )
 
-	PORT_START	// IN4 - DSW
+	PORT_START_TAG("DSW2")	/* IN4 - DSW */
 	PORT_DIPNAME( 0x03, 0x03, "Unknown 2-0&1" )
 	PORT_DIPSETTING(    0x02, "0" )
 	PORT_DIPSETTING(    0x03, "1" )
@@ -3695,7 +3701,7 @@ static INPUT_PORTS_START( quiz365 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN5 - DSW
+	PORT_START_TAG("DSW3")	/* IN5 - DSW */
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 3-0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3711,7 +3717,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( rongrong )
-	PORT_START	// IN0 - Player 1
+	PORT_START_TAG("IN0")	/* IN0 - Player 1 */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -3721,7 +3727,7 @@ static INPUT_PORTS_START( rongrong )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 
-	PORT_START	// IN1 - Player 2
+	PORT_START_TAG("IN1")	/* IN1 - Player 2 */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
@@ -3731,7 +3737,7 @@ static INPUT_PORTS_START( rongrong )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START	// IN2 - Coins + ?
+	PORT_START_TAG("IN2")	/* IN2 - Coins + ? */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_COIN2    )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -3741,7 +3747,7 @@ static INPUT_PORTS_START( rongrong )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_SPECIAL  )	// ? blitter irq flag ?
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_SPECIAL  )	// ? blitter busy flag ?
 
-  	PORT_START	// IN3 - DSW
+  	PORT_START_TAG("DSW1")	/* IN3 - DSW */
  	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -3765,7 +3771,7 @@ static INPUT_PORTS_START( rongrong )
   	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
   	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-  	PORT_START	// IN4 - DSW
+  	PORT_START_TAG("DSW2")	/* IN4 - DSW */
  	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
   	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
   	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -3788,7 +3794,7 @@ static INPUT_PORTS_START( rongrong )
   	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
   	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-  	PORT_START	// IN5 - DSW
+  	PORT_START_TAG("DSW3")	/* IN5 - DSW */
  	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
   	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
   	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3803,7 +3809,7 @@ static INPUT_PORTS_START( rongrong )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( quizchq )
-	PORT_START	// IN0 - Player 1
+	PORT_START_TAG("IN0")	/* IN0 - Player 1 */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -3813,7 +3819,7 @@ static INPUT_PORTS_START( quizchq )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN1 - Player 2
+	PORT_START_TAG("IN1")	/* IN1 - Player 2 */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -3823,7 +3829,7 @@ static INPUT_PORTS_START( quizchq )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN2 - Coins + ?
+	PORT_START_TAG("IN2")	/* IN2 - Coins + ? */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_COIN2    )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -3833,7 +3839,7 @@ static INPUT_PORTS_START( quizchq )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_SPECIAL  )	// ? blitter irq flag ?
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_SPECIAL  )	// ? blitter busy flag ?
 
-	PORT_START	// IN3 - DSW
+	PORT_START_TAG("DSW1")	/* IN3 - DSW */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -3857,7 +3863,7 @@ static INPUT_PORTS_START( quizchq )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN4 - DSW
+	PORT_START_TAG("DSW2")	/* IN4 - DSW */
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3881,7 +3887,7 @@ static INPUT_PORTS_START( quizchq )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	// IN5 - DSW
+	PORT_START_TAG("DSW3")	/* IN5 - DSW */
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 1-0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3898,7 +3904,7 @@ static INPUT_PORTS_START( quizchq )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mmpanic )
-	PORT_START	// IN0 6a (68 = 1:used? 2:normal 3:goes to 69)
+	PORT_START_TAG("IN0")	/* IN0 6a (68 = 1:used? 2:normal 3:goes to 69) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	// tested?
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -3908,7 +3914,7 @@ static INPUT_PORTS_START( mmpanic )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("9") PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	// busy?
 
-	PORT_START	// IN1 6b (68 = 0 & 1)
+	PORT_START_TAG("IN1")	/* IN1 6b (68 = 0 & 1) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)
@@ -3918,7 +3924,7 @@ static INPUT_PORTS_START( mmpanic )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("6") PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("7") PORT_CODE(KEYCODE_7_PAD)
 
-	PORT_START	// IN2 - DSW
+	PORT_START_TAG("DSW1")	/* IN2 - DSW */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -3943,7 +3949,7 @@ static INPUT_PORTS_START( mmpanic )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN3 - DSW
+	PORT_START_TAG("DSW2")	/* IN3 - DSW */
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-0*" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3968,7 +3974,7 @@ static INPUT_PORTS_START( mmpanic )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN4 - DSW
+	PORT_START_TAG("DSW3")	/* IN4 - DSW */
 	PORT_DIPNAME( 0x01, 0x01, "Set Date" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3995,7 +4001,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( animaljr )
-	PORT_START	// IN0 6a (68 = 1:used? 2:normal 3:goes to 69)
+	PORT_START_TAG("IN0")	/* IN0 6a (68 = 1:used? 2:normal 3:goes to 69) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -4005,7 +4011,7 @@ static INPUT_PORTS_START( animaljr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	// busy?
 
-	PORT_START	// IN1 6b (68 = 0 & 1)
+	PORT_START_TAG("IN1")	/* IN1 6b (68 = 0 & 1) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	// tested ?
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)
@@ -4015,7 +4021,7 @@ static INPUT_PORTS_START( animaljr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("6") PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN2 - DSW
+	PORT_START_TAG("DSW1")	/* IN2 - DSW */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -4040,7 +4046,7 @@ static INPUT_PORTS_START( animaljr )
 	PORT_DIPSETTING(    0x20, "6" )
 	PORT_DIPSETTING(    0x00, "7" )
 
-	PORT_START	// IN3 - DSW
+	PORT_START_TAG("DSW2")	/* IN3 - DSW */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -4065,7 +4071,7 @@ static INPUT_PORTS_START( animaljr )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START	// IN4 - DSW
+	PORT_START_TAG("DSW3")	/* IN4 - DSW */
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 3-0*" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -4093,7 +4099,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hanakanz )
 
-	PORT_START	// IN0 - Coins + Service Keys
+	PORT_START_TAG("IN0")	/* IN0 - Coins + Service Keys */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3	)	// medal out
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)	// Test
@@ -4103,8 +4109,9 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1	)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 
-	// keyb 2
-	PORT_START
+	/* keyb 2 */
+	
+	PORT_START_TAG("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	// I
@@ -4112,7 +4119,7 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	// Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	// J
@@ -4120,7 +4127,7 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	// Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )	PORT_PLAYER(2)	// BET
 
-	PORT_START
+	PORT_START_TAG("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	// K
@@ -4128,7 +4135,7 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	// L
@@ -4136,7 +4143,7 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN				)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE		)	PORT_PLAYER(2)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP	)	PORT_PLAYER(2)	// "w"
@@ -4144,8 +4151,9 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG			)	PORT_PLAYER(2)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL		)	PORT_PLAYER(2)	// "s"
 
-	// keyb 1
-	PORT_START
+	/* keyb 1 */
+	
+	PORT_START_TAG("KEY5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD)	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5") PORT_CODE(KEYCODE_5_PAD)	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	// I
@@ -4153,7 +4161,7 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	// Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("KEY6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("6") PORT_CODE(KEYCODE_6_PAD)	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	// J
@@ -4161,7 +4169,7 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	// Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )	// BET
 
-	PORT_START
+	PORT_START_TAG("KEY7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3") PORT_CODE(KEYCODE_3_PAD)	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("7") PORT_CODE(KEYCODE_7_PAD)	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	// K
@@ -4169,7 +4177,7 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("KEY8")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4") PORT_CODE(KEYCODE_4_PAD)	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("8") PORT_CODE(KEYCODE_8_PAD)	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	// L
@@ -4177,7 +4185,7 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("KEY9")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN				)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE		)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP	)	// "w"
@@ -4185,7 +4193,7 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG			)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL		)	// "s"
 
-	PORT_START	// IN11 - DSW1
+	PORT_START_TAG("DSW1")	/* IN11 - DSW1 */
 	PORT_DIPNAME( 0x07, 0x07, "Unknown 1-0&1&2" )
 	PORT_DIPSETTING(    0x07, "0" )
 	PORT_DIPSETTING(    0x06, "1" )
@@ -4210,7 +4218,7 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x80, "10" )
 
-	PORT_START	// IN12 - DSW2
+	PORT_START_TAG("DSW2")	/* IN12 - DSW2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -4232,7 +4240,7 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_DIPSETTING(    0x40, "70" )
 	PORT_DIPSETTING(    0x00, "80" )
 
-	PORT_START	// IN13 - DSW3
+	PORT_START_TAG("DSW3")	/* IN13 - DSW3 */
 	PORT_DIPNAME( 0x03, 0x03, "Game Type" )
 	PORT_DIPSETTING(    0x03, "8 Cards" )
 	PORT_DIPSETTING(    0x02, "6 Cards (Bets)" )
@@ -4255,7 +4263,7 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START	// IN14 - DSW4
+	PORT_START_TAG("DSW4")	/* IN14 - DSW4 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -4281,7 +4289,7 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN15 - DSWs top bits
+	PORT_START_TAG("DSW5")	/* IN15 - DSWs top bits */
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 1-8" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -4304,12 +4312,12 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	// IN16 - Fake DSW
+	PORT_START_TAG("BET")	/* IN16 - Fake DSW */
 	PORT_DIPNAME( 0x40, 0x40, "Allow Bets" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN17 - Fake DSW
+	PORT_START_TAG("HOPPER")	/* IN17 - Fake DSW */
 	PORT_DIPNAME( 0x40, 0x40, "? Hopper M." )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -4319,7 +4327,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hkagerou )
 
-	PORT_START	// IN0 - Coins + Service Keys
+	PORT_START_TAG("IN0")	/* IN0 - Coins + Service Keys */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3	)	// medal out
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)	// Test
@@ -4329,8 +4337,9 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1	)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 
-	// keyb 2
-	PORT_START
+	/* keyb 2 */
+	
+	PORT_START_TAG("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	// I
@@ -4338,7 +4347,7 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	// Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	// J
@@ -4346,7 +4355,7 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	// Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )	PORT_PLAYER(2)	// BET
 
-	PORT_START
+	PORT_START_TAG("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	// K
@@ -4354,7 +4363,7 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	// L
@@ -4362,7 +4371,7 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN				)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE		)	PORT_PLAYER(2)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP	)	PORT_PLAYER(2)	// "w"
@@ -4370,8 +4379,9 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG			)	PORT_PLAYER(2)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL		)	PORT_PLAYER(2)	// "s"
 
-	// keyb 1
-	PORT_START
+	/* keyb 1 */
+	
+	PORT_START_TAG("KEY5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD)	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5") PORT_CODE(KEYCODE_5_PAD)	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	// I
@@ -4379,7 +4389,7 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE		)	// "t"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("KEY6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("6") PORT_CODE(KEYCODE_6_PAD)	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	// J
@@ -4387,7 +4397,7 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL	)	// "s"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET		)	// BET
 
-	PORT_START
+	PORT_START_TAG("KEY7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3") PORT_CODE(KEYCODE_3_PAD)	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("7") PORT_CODE(KEYCODE_7_PAD)	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// K
@@ -4395,7 +4405,7 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 
-	PORT_START
+	PORT_START_TAG("KEY8")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4") PORT_CODE(KEYCODE_4_PAD)	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("8") PORT_CODE(KEYCODE_8_PAD)	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN				)	// L
@@ -4403,7 +4413,7 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("KEY9")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN				)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE		)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP	)	// "w"
@@ -4411,7 +4421,7 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG			)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL		)	// "s"
 
-	PORT_START	// IN11 - DSW1
+	PORT_START_TAG("DSW1")	/* IN11 - DSW1 */
 	PORT_DIPNAME( 0x07, 0x07, "Unknown 1-0&1&2" )
 	PORT_DIPSETTING(    0x07, "0" )
 	PORT_DIPSETTING(    0x06, "1" )
@@ -4436,7 +4446,7 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_DIPSETTING(    0x00, "25" )
 	PORT_DIPSETTING(    0x80, "50" )
 
-	PORT_START	// IN12 - DSW2
+	PORT_START_TAG("DSW2")	/* IN12 - DSW2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
@@ -4458,7 +4468,7 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_DIPSETTING(    0x40, "70" )
 	PORT_DIPSETTING(    0x00, "80" )
 
-	PORT_START	// IN13 - DSW3
+	PORT_START_TAG("DSW3")	/* IN13 - DSW3 */
 	PORT_DIPNAME( 0x01, 0x01, "Game Type?" )
 	PORT_DIPSETTING(    0x01, "0" )
 	PORT_DIPSETTING(    0x00, "1" )
@@ -4482,7 +4492,7 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START	// IN14 - DSW4
+	PORT_START_TAG("DSW4")	/* IN14 - DSW4 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -4508,7 +4518,7 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN15 - DSWs top bits
+	PORT_START_TAG("DSW5")	/* IN15 - DSWs top bits */
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 1-8" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPSETTING(    0x01, "10" )
@@ -4531,12 +4541,12 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	// IN16 - Fake DSW
+	PORT_START_TAG("BET")	/* IN16 - Fake DSW */
 	PORT_DIPNAME( 0x40, 0x40, "Disable Bets" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN17 - Fake DSW
+	PORT_START_TAG("HOPPER")	/* IN17 - Fake DSW */
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -4546,7 +4556,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjreach1 )
 
-	PORT_START	// IN0 - Coins + Service Keys
+	PORT_START_TAG("IN0")	/* IN0 - Coins + Service Keys */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3	)	// medal out
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 	PORT_SERVICE(0x04, IP_ACTIVE_LOW)
@@ -4556,8 +4566,9 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1	)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 
-	// keyb 2
-	PORT_START
+	/* keyb 2 */
+	
+	PORT_START_TAG("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A		)	PORT_PLAYER(2)	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E		)	PORT_PLAYER(2)	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I		)	PORT_PLAYER(2)	// I
@@ -4565,7 +4576,7 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN		)	PORT_PLAYER(2)	// Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2			)	// Start 2
 
-	PORT_START
+	PORT_START_TAG("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B		)	PORT_PLAYER(2)	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F		)	PORT_PLAYER(2)	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J		)	PORT_PLAYER(2)	// J
@@ -4573,7 +4584,7 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH	)	PORT_PLAYER(2)	// Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET		)	PORT_PLAYER(2)	// BET
 
-	PORT_START
+	PORT_START_TAG("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C		)	PORT_PLAYER(2)	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G		)	PORT_PLAYER(2)	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K		)	PORT_PLAYER(2)	// K
@@ -4581,7 +4592,7 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON		)	PORT_PLAYER(2)	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 
-	PORT_START
+	PORT_START_TAG("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D		)	PORT_PLAYER(2)	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H		)	PORT_PLAYER(2)	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L		)	PORT_PLAYER(2)	// L
@@ -4589,7 +4600,7 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 
-	PORT_START
+	PORT_START_TAG("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE	)	PORT_PLAYER(2)	// "l"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE		)	PORT_PLAYER(2)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP	)	PORT_PLAYER(2)	// "w"
@@ -4597,8 +4608,9 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG			)	PORT_PLAYER(2)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL		)	PORT_PLAYER(2)	// "s"
 
-	// keyb 1
-	PORT_START
+	/* keyb 1 */
+	
+	PORT_START_TAG("KEY5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A		)	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E		)	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I		)	// I
@@ -4606,7 +4618,7 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN		)	// Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1			)	// Start 1
 
-	PORT_START
+	PORT_START_TAG("KEY6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B		)	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F		)	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J		)	// J
@@ -4614,7 +4626,7 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH	)	// Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET		)	// BET
 
-	PORT_START
+	PORT_START_TAG("KEY7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C		)	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G		)	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K		)	// K
@@ -4622,7 +4634,7 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON		)	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 
-	PORT_START
+	PORT_START_TAG("KEY8")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D		)	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H		)	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L		)	// L
@@ -4630,7 +4642,7 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 
-	PORT_START
+	PORT_START_TAG("KEY9")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE	)	// "l"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE		)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP	)	// "w"
@@ -4638,7 +4650,7 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG			)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL		)	// "s"
 
-	PORT_START	// IN11 - DSW1
+	PORT_START_TAG("DSW1")	/* IN11 - DSW1 */
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
 	PORT_DIPSETTING(    0x00, "50" )
 	PORT_DIPSETTING(    0x01, "53" )
@@ -4667,7 +4679,7 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
 
-	PORT_START	// IN12 - DSW2
+	PORT_START_TAG("DSW2")	/* IN12 - DSW2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
@@ -4690,7 +4702,7 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN13 - DSW3
+	PORT_START_TAG("DSW3")	/* IN13 - DSW3 */
 	PORT_DIPNAME( 0x07, 0x07, "YAKUMAN Bonus" )
 	PORT_DIPSETTING(    0x07, "Cut" )
 	PORT_DIPSETTING(    0x06, "1 T" )
@@ -4715,7 +4727,7 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN14 - DSW4
+	PORT_START_TAG("DSW4")	/* IN14 - DSW4 */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -4741,7 +4753,7 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_DIPSETTING(    0x80, "Start" )
 	PORT_DIPSETTING(    0x00, "Flip/Flop" )
 
-	PORT_START	// IN15 - DSWs top bits
+	PORT_START_TAG("DSW5")	/* IN15 - DSWs top bits */
 	PORT_DIPNAME( 0x01, 0x01, "Credits Per Note" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
@@ -4766,12 +4778,12 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN16 - Fake DSW
+	PORT_START_TAG("BET")	/* IN16 - Fake DSW */
 	PORT_DIPNAME( 0x40, 0x40, "Bets?" )
 	PORT_DIPSETTING(    0x40, "0" )
 	PORT_DIPSETTING(    0x00, "1" )
 
-	PORT_START	// IN17 - Fake DSW
+	PORT_START_TAG("HOPPER")	/* IN17 - Fake DSW */
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -4781,7 +4793,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjchuuka )
 
-	PORT_START	// IN0 - Coins + Service Keys
+	PORT_START_TAG("IN0")	/* IN0 - Coins + Service Keys */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3	)	// medal out
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 	PORT_SERVICE(0x04, IP_ACTIVE_LOW)
@@ -4791,8 +4803,9 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1	)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 
-	// keyb 2
-	PORT_START
+	/* keyb 2 */
+	
+	PORT_START_TAG("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A		)	PORT_PLAYER(2)	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E		)	PORT_PLAYER(2)	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I		)	PORT_PLAYER(2)	// I
@@ -4800,7 +4813,7 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN		)	PORT_PLAYER(2)	// Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2			)	// Start 2
 
-	PORT_START
+	PORT_START_TAG("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B		)	PORT_PLAYER(2)	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F		)	PORT_PLAYER(2)	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J		)	PORT_PLAYER(2)	// J
@@ -4808,7 +4821,7 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH	)	PORT_PLAYER(2)	// Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET		)	PORT_PLAYER(2)	// BET
 
-	PORT_START
+	PORT_START_TAG("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C		)	PORT_PLAYER(2)	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G		)	PORT_PLAYER(2)	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K		)	PORT_PLAYER(2)	// K
@@ -4816,7 +4829,7 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON		)	PORT_PLAYER(2)	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 
-	PORT_START
+	PORT_START_TAG("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D		)	PORT_PLAYER(2)	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H		)	PORT_PLAYER(2)	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L		)	PORT_PLAYER(2)	// L
@@ -4824,7 +4837,7 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 
-	PORT_START
+	PORT_START_TAG("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE	)	PORT_PLAYER(2)	// "l"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE		)	PORT_PLAYER(2)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP	)	PORT_PLAYER(2)	// "w"
@@ -4832,8 +4845,9 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG			)	PORT_PLAYER(2)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL		)	PORT_PLAYER(2)	// "s"
 
-	// keyb 1
-	PORT_START
+	/* keyb 1 */
+	
+	PORT_START_TAG("KEY5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A		)	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E		)	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I		)	// I
@@ -4841,7 +4855,7 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN		)	// Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1			)	// Start 1
 
-	PORT_START
+	PORT_START_TAG("KEY6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B		)	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F		)	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J		)	// J
@@ -4849,7 +4863,7 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH	)	// Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET		)	// BET
 
-	PORT_START
+	PORT_START_TAG("KEY7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C		)	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G		)	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K		)	// K
@@ -4857,7 +4871,7 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON		)	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 
-	PORT_START
+	PORT_START_TAG("KEY8")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D		)	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H		)	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L		)	// L
@@ -4865,7 +4879,7 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 
-	PORT_START
+	PORT_START_TAG("KEY9")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE	)	// "l"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE		)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP	)	// "w"
@@ -4873,7 +4887,7 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG			)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL		)	// "s"
 
-	PORT_START	// IN11 - DSW1
+	PORT_START_TAG("DSW1")	/* IN11 - DSW1 */
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
 	PORT_DIPSETTING(    0x00, "50" )
 	PORT_DIPSETTING(    0x01, "53" )
@@ -4902,7 +4916,7 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
 
-	PORT_START	// IN12 - DSW2
+	PORT_START_TAG("DSW2")	/* IN12 - DSW2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
@@ -4926,7 +4940,7 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN13 - DSW3
+	PORT_START_TAG("DSW3")	/* IN13 - DSW3 */
 	PORT_DIPNAME( 0x07, 0x07, "YAKUMAN Bonus" )
 	PORT_DIPSETTING(    0x07, "Cut" )
 	PORT_DIPSETTING(    0x06, "1 T" )
@@ -4951,7 +4965,7 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN14 - DSW4
+	PORT_START_TAG("DSW4")	/* IN14 - DSW4 */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -4976,7 +4990,7 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN15 - DSWs top bits
+	PORT_START_TAG("DSW5")	/* IN15 - DSWs top bits */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -5001,12 +5015,12 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN16 - Fake DSW
+	PORT_START_TAG("BET")	/* IN16 - Fake DSW */
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN17 - Fake DSW
+	PORT_START_TAG("HOPPER")	/* IN17 - Fake DSW */
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -5015,7 +5029,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( funkyfig )
-	PORT_START	// IN0 - Keys (port 83 with port 80 = 20)
+	PORT_START_TAG("IN0")	/* IN0 - Keys (port 83 with port 80 = 20) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)
@@ -5025,11 +5039,11 @@ static INPUT_PORTS_START( funkyfig )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("6") PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("7") PORT_CODE(KEYCODE_7_PAD)
 
-	PORT_START	// IN1 - ? (port 83 with port 80 = 21)
+	PORT_START_TAG("IN1")	/* IN1 - ? (port 83 with port 80 = 21) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )	// ?
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN2 - Coins (port 82 with port 80 = 22)
+	PORT_START_TAG("IN2")	/* IN2 - Coins (port 82 with port 80 = 22) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -5039,7 +5053,7 @@ static INPUT_PORTS_START( funkyfig )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("9") PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN3 - DSW1 (low bits, port 1c with rombank = 1e)
+	PORT_START_TAG("DSW1")	/* IN3 - DSW1 (low bits, port 1c with rombank = 1e) */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -5064,7 +5078,7 @@ static INPUT_PORTS_START( funkyfig )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	PORT_START	// IN4 - DSW2 (low bits, port 1c with rombank = 1d)
+	PORT_START_TAG("DSW2")	/* IN4 - DSW2 (low bits, port 1c with rombank = 1d) */
 	PORT_DIPNAME( 0x01, 0x01, "2 Player Game" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
@@ -5088,7 +5102,7 @@ static INPUT_PORTS_START( funkyfig )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
 
-	PORT_START	// IN5 - DSW1 & 2 (high bits, port 1c with rombank = 1b)
+	PORT_START_TAG("DSW3")	/* IN5 - DSW1 & 2 (high bits, port 1c with rombank = 1b) */
 	PORT_DIPNAME( 0x01, 0x01, "Continue?" )	// related to continue
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -5116,7 +5130,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( mjmyster )
-	PORT_START	// IN0 - Coins + Service Keys
+	PORT_START_TAG("IN0")	/* IN0 - Coins + Service Keys */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3	)	// medal out
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
@@ -5126,8 +5140,9 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1	)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 
-	// keyb 1
-	PORT_START
+	/* keyb 1 */
+	
+	PORT_START_TAG("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A		)	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E		)	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I		)	// I
@@ -5135,7 +5150,7 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN		)	// Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1			)	// Start 1
 
-	PORT_START
+	PORT_START_TAG("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B		)	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F		)	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J		)	// J
@@ -5143,7 +5158,7 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH	)	// Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET		)	// BET
 
-	PORT_START
+	PORT_START_TAG("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C		)	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G		)	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K		)	// K
@@ -5151,7 +5166,7 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON		)	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 
-	PORT_START
+	PORT_START_TAG("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D		)	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H		)	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L		)	// L
@@ -5159,7 +5174,7 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 
-	PORT_START
+	PORT_START_TAG("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE	)	// "l"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE		)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP	)	// "w"
@@ -5167,7 +5182,7 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG			)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL		)	// "s"
 
-	PORT_START	// IN6 - DSW1
+	PORT_START_TAG("DSW1")	/* IN6 - DSW1 */
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
 	PORT_DIPSETTING(    0x00, "50" )
 	PORT_DIPSETTING(    0x01, "53" )
@@ -5196,7 +5211,7 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
 
-	PORT_START	// IN7 - DSW2
+	PORT_START_TAG("DSW2")	/* IN7 - DSW2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
@@ -5220,7 +5235,7 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN8 - DSW3
+	PORT_START_TAG("DSW3")	/* IN8 - DSW3 */
 	PORT_DIPNAME( 0x03, 0x03, "YAKUMAN Times" )
 //  PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x03, "1" )
@@ -5244,7 +5259,7 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN9 - DSW4
+	PORT_START_TAG("DSW4")	/* IN9 - DSW4 */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -5270,7 +5285,7 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_DIPSETTING(    0x80, DEF_STR( Japan ) )
 	PORT_DIPSETTING(    0x00, "Hong Kong" )
 
-	PORT_START	// IN10 - DSWs top bits
+	PORT_START_TAG("DSW5")	/* IN10 - DSWs top bits */
 	PORT_DIPNAME( 0x03, 0x03, "Computer Strength?" )
 	PORT_DIPSETTING(    0x03, "Weak" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ))
@@ -5298,7 +5313,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hginga )
 
-	PORT_START	// IN0 - Coins + Service Keys
+	PORT_START_TAG("IN0")	/* IN0 - Coins + Service Keys */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3	)	// medal out
 //  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)	// Test
@@ -5308,8 +5323,9 @@ static INPUT_PORTS_START( hginga )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1	)
 //  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
-	// keyb 2
-	PORT_START
+	/* keyb 2 */
+	
+	PORT_START_TAG("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A	)	PORT_PLAYER(2)	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E	)	PORT_PLAYER(2)	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// I
@@ -5317,7 +5333,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2		)
 
-	PORT_START
+	PORT_START_TAG("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B	)	PORT_PLAYER(2)	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F	)	PORT_PLAYER(2)	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// J
@@ -5325,7 +5341,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET	)	PORT_PLAYER(2)	// BET
 
-	PORT_START
+	PORT_START_TAG("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C	)	PORT_PLAYER(2)	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// K
@@ -5333,7 +5349,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 
-	PORT_START
+	PORT_START_TAG("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D	)	PORT_PLAYER(2)	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// L
@@ -5341,7 +5357,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 
-	PORT_START
+	PORT_START_TAG("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN				)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE		)	PORT_PLAYER(2)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP	)	PORT_PLAYER(2)	// "w"
@@ -5349,8 +5365,9 @@ static INPUT_PORTS_START( hginga )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG			)	PORT_PLAYER(2)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL		)	PORT_PLAYER(2)	// "s"
 
-	// keyb 1
-	PORT_START
+	/* keyb 1 */
+	
+	PORT_START_TAG("KEY5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A	)	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E	)	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// I
@@ -5358,7 +5375,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1		)
 
-	PORT_START
+	PORT_START_TAG("KEY6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B	)	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F	)	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// J
@@ -5366,7 +5383,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET	)	// BET
 
-	PORT_START
+	PORT_START_TAG("KEY7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C	)	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// K
@@ -5374,7 +5391,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 
-	PORT_START
+	PORT_START_TAG("KEY8")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D	)	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// L
@@ -5382,7 +5399,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 
-	PORT_START
+	PORT_START_TAG("KEY9")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN				)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE		)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP	)	// "w"
@@ -5390,7 +5407,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG			)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL		)	// "s"
 
-	PORT_START	// IN11 - DSW4
+	PORT_START_TAG("DSW4")	/* IN11 - DSW4 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -5417,7 +5434,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_DIPSETTING(    0x80, "Numbers" )
 	PORT_DIPSETTING(    0x00, "Letters" )
 
-	PORT_START	// IN12 - DSW3
+	PORT_START_TAG("DSW3")	/* IN12 - DSW3 */
 	PORT_DIPNAME( 0x03, 0x03, "Unknown 3-0&1" )
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -5440,7 +5457,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
 
-	PORT_START	// IN13 - DSW2
+	PORT_START_TAG("DSW2")	/* IN13 - DSW2 */
 	PORT_DIPNAME( 0x03, 0x03, "Unknown 2-0&1" )
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -5463,7 +5480,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_DIPSETTING(    0x40, "70" )
 	PORT_DIPSETTING(    0x00, "80" )
 
-	PORT_START	// IN14 - DSW1
+	PORT_START_TAG("DSW1")	/* IN14 - DSW1 */
 	PORT_DIPNAME( 0x07, 0x07, "Unknown 1-0&1&2" )
 	PORT_DIPSETTING(    0x07, "0" )
 	PORT_DIPSETTING(    0x06, "1" )
@@ -5488,7 +5505,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN15 - DSWs top bits
+	PORT_START_TAG("DSW5")	/* IN15 - DSWs top bits */
 	PORT_DIPNAME( 0x01, 0x01, "Keyboard" )
 	PORT_DIPSETTING(    0x00, "Hanafuda" )	// Requires different inputs
 	PORT_DIPSETTING(    0x01, "Mahjong" )
@@ -5512,7 +5529,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN16 - Fake DSW
+	PORT_START_TAG("BET")	/* IN16 - Fake DSW */
 	PORT_DIPNAME( 0x40, 0x40, "Allow Bets" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
@@ -5520,7 +5537,7 @@ static INPUT_PORTS_START( hginga )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hgokou )
-	PORT_START	// IN0
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3	)	// medal out
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)	PORT_TOGGLE
@@ -5530,8 +5547,9 @@ static INPUT_PORTS_START( hgokou )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1	)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 
-	// keyb 1
-	PORT_START	// IN1
+	/* keyb 1 */
+	
+	PORT_START_TAG("KEY0")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD)	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5") PORT_CODE(KEYCODE_5_PAD)	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// I
@@ -5539,7 +5557,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE	)	// Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1			)
 
-	PORT_START	// IN2
+	PORT_START_TAG("KEY1")	/* IN2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("6") PORT_CODE(KEYCODE_6_PAD)	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// J
@@ -5547,7 +5565,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL	)	// Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// BET
 
-	PORT_START	// IN3
+	PORT_START_TAG("KEY2")	/* IN3 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3") PORT_CODE(KEYCODE_3_PAD)	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// K
@@ -5555,7 +5573,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 
-	PORT_START	// IN4
+	PORT_START_TAG("KEY3")	/* IN4 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4") PORT_CODE(KEYCODE_4_PAD)	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN				)	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN				)	// L
@@ -5563,7 +5581,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN				)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN				)
 
-	PORT_START	// IN5
+	PORT_START_TAG("KEY4")	/* IN5 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN	)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN	)	// "w"
@@ -5571,8 +5589,9 @@ static INPUT_PORTS_START( hgokou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN	)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN	)	// "s"
 
-	// keyb 2
-	PORT_START	// IN6
+	/* keyb 2 */
+	
+	PORT_START_TAG("KEY5")	/* IN6 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A		)	PORT_PLAYER(2)	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E		)	PORT_PLAYER(2)	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// I
@@ -5580,7 +5599,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE	)	PORT_PLAYER(2)	// Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2			)
 
-	PORT_START	// IN7
+	PORT_START_TAG("KEY6")	/* IN7 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B		)	PORT_PLAYER(2)	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F		)	PORT_PLAYER(2)	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// J
@@ -5588,7 +5607,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL	)	PORT_PLAYER(2)	// Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// BET
 
-	PORT_START	// IN8
+	PORT_START_TAG("KEY7")	/* IN8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C	)	PORT_PLAYER(2)	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN		)	PORT_PLAYER(2)	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// K
@@ -5596,7 +5615,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 
-	PORT_START	// IN9
+	PORT_START_TAG("KEY8")	/* IN9 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D			)	PORT_PLAYER(2)	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN				)	PORT_PLAYER(2)	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN				)	// L
@@ -5604,7 +5623,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN				)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN				)
 
-	PORT_START	// IN10
+	PORT_START_TAG("KEY9")	/* IN10 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN	)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN	)	// "w"
@@ -5612,7 +5631,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN	)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN	)	// "s"
 
-	PORT_START	// IN11 - DSW4
+	PORT_START_TAG("DSW4")	/* IN11 - DSW4 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -5639,7 +5658,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_DIPSETTING(    0x80, "Numbers" )
 	PORT_DIPSETTING(    0x00, "Letters" )
 
-	PORT_START	// IN12 - DSW3
+	PORT_START_TAG("DSW3")	/* IN12 - DSW3 */
 	PORT_DIPNAME( 0x03, 0x03, "Unknown 3-0&1" )
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -5662,7 +5681,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
 
-	PORT_START	// IN13 - DSW2
+	PORT_START_TAG("DSW2")	/* IN13 - DSW2 */
 	PORT_DIPNAME( 0x03, 0x03, "Unknown 2-0&1" )
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -5685,7 +5704,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_DIPSETTING(    0x40, "70" )
 	PORT_DIPSETTING(    0x00, "80" )
 
-	PORT_START	// IN14 - DSW1
+	PORT_START_TAG("DSW1")	/* IN14 - DSW1 */
 	PORT_DIPNAME( 0x07, 0x07, "Unknown 1-0&1&2" )
 	PORT_DIPSETTING(    0x07, "0" )
 	PORT_DIPSETTING(    0x06, "1" )
@@ -5710,7 +5729,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN15 - DSWs top bits
+	PORT_START_TAG("DSW5")	/* IN15 - DSWs top bits */
 	PORT_DIPNAME( 0x01, 0x00, "Control Panel" )
 	PORT_DIPSETTING(    0x00, "Hanafuda" )
 	PORT_DIPSETTING(    0x01, "Mahjong" )	// Requires different inputs
@@ -5736,7 +5755,7 @@ static INPUT_PORTS_START( hgokou )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjmyornt )
-	PORT_START	// IN0 - Coins + Service Keys
+	PORT_START_TAG("IN0")	/* IN0 - Coins + Service Keys */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3	)	// medal out
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
@@ -5746,8 +5765,9 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1	)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 
-	// keyb 1
-	PORT_START
+	/* keyb 1 */
+	
+	PORT_START_TAG("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A		)	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E		)	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I		)	// I
@@ -5755,7 +5775,7 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN		)	// Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1			)	// Start 1
 
-	PORT_START
+	PORT_START_TAG("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B		)	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F		)	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J		)	// J
@@ -5763,7 +5783,7 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH	)	// Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET		)	// BET
 
-	PORT_START
+	PORT_START_TAG("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C		)	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G		)	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K		)	// K
@@ -5771,7 +5791,7 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON		)	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 
-	PORT_START
+	PORT_START_TAG("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D		)	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H		)	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L		)	// L
@@ -5779,7 +5799,7 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 
-	PORT_START
+	PORT_START_TAG("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE	)	// "l"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE		)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP	)	// "w"
@@ -5787,7 +5807,7 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG			)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL		)	// "s"
 
-	PORT_START	// IN6 - DSW1
+	PORT_START_TAG("DSW1")	/* IN6 - DSW1 */
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
 	PORT_DIPSETTING(    0x00, "50" )
 	PORT_DIPSETTING(    0x01, "53" )
@@ -5816,7 +5836,7 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
 
-	PORT_START	// IN7 - DSW2
+	PORT_START_TAG("DSW2")	/* IN7 - DSW2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
@@ -5840,7 +5860,7 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN8 - DSW3
+	PORT_START_TAG("DSW3")	/* IN8 - DSW3 */
 	PORT_DIPNAME( 0x03, 0x03, "YAKUMAN Times" )
 //  PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x03, "1" )
@@ -5864,7 +5884,7 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN9 - DSW4
+	PORT_START_TAG("DSW4")	/* IN9 - DSW4 */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -5890,7 +5910,7 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN10 - DSWs top bits
+	PORT_START_TAG("DSW5")	/* IN10 - DSWs top bits */
 	PORT_DIPNAME( 0x03, 0x03, "Computer Strength?" )
 	PORT_DIPSETTING(    0x03, "Weak" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ))
@@ -5918,7 +5938,7 @@ INPUT_PORTS_END
 
 #ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( mjmyuniv )
-	PORT_START	// IN0 - Coins + Service Keys
+	PORT_START_TAG("IN0")	/* IN0 - Coins + Service Keys */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3	)	// medal out
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
@@ -5928,8 +5948,9 @@ static INPUT_PORTS_START( mjmyuniv )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1	)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 
-	// keyb 1
-	PORT_START
+	/* keyb 1 */
+	
+	PORT_START_TAG("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A		)	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E		)	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I		)	// I
@@ -5937,7 +5958,7 @@ static INPUT_PORTS_START( mjmyuniv )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN		)	// Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1			)	// Start 1
 
-	PORT_START
+	PORT_START_TAG("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B		)	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F		)	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J		)	// J
@@ -5945,7 +5966,7 @@ static INPUT_PORTS_START( mjmyuniv )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH	)	// Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET		)	// BET
 
-	PORT_START
+	PORT_START_TAG("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C		)	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G		)	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K		)	// K
@@ -5953,7 +5974,7 @@ static INPUT_PORTS_START( mjmyuniv )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON		)	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 
-	PORT_START
+	PORT_START_TAG("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D		)	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H		)	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L		)	// L
@@ -5961,7 +5982,7 @@ static INPUT_PORTS_START( mjmyuniv )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 
-	PORT_START
+	PORT_START_TAG("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE	)	// "l"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE		)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP	)	// "w"
@@ -5969,7 +5990,7 @@ static INPUT_PORTS_START( mjmyuniv )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG			)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL		)	// "s"
 
-	PORT_START	// IN6 - DSW1
+	PORT_START_TAG("DSW1")	/* IN6 - DSW1 */
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
 	PORT_DIPSETTING(    0x00, "50" )
 	PORT_DIPSETTING(    0x01, "53" )
@@ -5998,7 +6019,7 @@ static INPUT_PORTS_START( mjmyuniv )
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
 
-	PORT_START	// IN7 - DSW2
+	PORT_START_TAG("DSW2")	/* IN7 - DSW2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
@@ -6022,7 +6043,7 @@ static INPUT_PORTS_START( mjmyuniv )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN8 - DSW3
+	PORT_START_TAG("DSW3")	/* IN8 - DSW3 */
 	PORT_DIPNAME( 0x03, 0x03, "YAKUMAN Times" )
 //  PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x03, "1" )
@@ -6046,7 +6067,7 @@ static INPUT_PORTS_START( mjmyuniv )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN9 - DSW4
+	PORT_START_TAG("DSW4")	/* IN9 - DSW4 */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -6072,7 +6093,7 @@ static INPUT_PORTS_START( mjmyuniv )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN10 - DSWs top bits
+	PORT_START_TAG("DSW5")	/* IN10 - DSWs top bits */
 	PORT_DIPNAME( 0x03, 0x03, "Computer Strength?" )
 	PORT_DIPSETTING(    0x03, "Weak" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ))
@@ -6100,7 +6121,7 @@ INPUT_PORTS_END
 #endif
 
 static INPUT_PORTS_START( akamaru )
-	PORT_START	// IN0 - Player 1
+	PORT_START_TAG("IN0")	/* IN0 - Player 1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -6110,7 +6131,7 @@ static INPUT_PORTS_START( akamaru )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN1 - Player 2
+	PORT_START_TAG("IN1")	/* IN1 - Player 2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
@@ -6120,7 +6141,7 @@ static INPUT_PORTS_START( akamaru )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN2 - Coins + ?
+	PORT_START_TAG("IN2")	/* IN2 - Coins + ? */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2    )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
@@ -6130,7 +6151,7 @@ static INPUT_PORTS_START( akamaru )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL  )	// blitter irq flag
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL  )	// blitter busy flag
 
-	PORT_START	// IN3 - DSW1
+	PORT_START_TAG("DSW1")	/* IN3 - DSW1 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -6152,7 +6173,7 @@ static INPUT_PORTS_START( akamaru )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	// IN4 - DSW2
+	PORT_START_TAG("DSW2")	/* IN4 - DSW2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -6179,7 +6200,7 @@ static INPUT_PORTS_START( akamaru )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjflove )
-	PORT_START	// IN0 - Coins + Service Keys
+	PORT_START_TAG("IN0")	/* IN0 - Coins + Service Keys */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2    )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
@@ -6189,8 +6210,9 @@ static INPUT_PORTS_START( mjflove )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL  )	// blitter irq flag
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL  )	// blitter busy flag
 
-	// keyb 1
-	PORT_START
+	/* keyb 1 */
+	
+	PORT_START_TAG("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A		)	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E		)	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I		)	// I
@@ -6198,7 +6220,7 @@ static INPUT_PORTS_START( mjflove )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN		)	// Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1			)	// Start 1
 
-	PORT_START
+	PORT_START_TAG("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B		)	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F		)	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J		)	// J
@@ -6206,7 +6228,7 @@ static INPUT_PORTS_START( mjflove )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH	)	// Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET		)	// BET
 
-	PORT_START
+	PORT_START_TAG("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C		)	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G		)	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K		)	// K
@@ -6214,7 +6236,7 @@ static INPUT_PORTS_START( mjflove )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON		)	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 
-	PORT_START
+	PORT_START_TAG("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D		)	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H		)	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L		)	// L
@@ -6222,7 +6244,7 @@ static INPUT_PORTS_START( mjflove )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 
-	PORT_START
+	PORT_START_TAG("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE	)	// "l"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE		)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP	)	// "w"
@@ -6230,8 +6252,9 @@ static INPUT_PORTS_START( mjflove )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG			)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL		)	// "s"
 
-	// keyb 2
-	PORT_START
+	/* keyb 2 */
+	
+	PORT_START_TAG("KEY5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A		)	PORT_PLAYER(2)	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E		)	PORT_PLAYER(2)	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I		)	PORT_PLAYER(2)	// I
@@ -6239,7 +6262,7 @@ static INPUT_PORTS_START( mjflove )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN		)	PORT_PLAYER(2)	// Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2			)	// Start 2
 
-	PORT_START
+	PORT_START_TAG("KEY6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B		)	PORT_PLAYER(2)	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F		)	PORT_PLAYER(2)	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J		)	PORT_PLAYER(2)	// J
@@ -6247,7 +6270,7 @@ static INPUT_PORTS_START( mjflove )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH	)	PORT_PLAYER(2)	// Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET		)	PORT_PLAYER(2)	// BET
 
-	PORT_START
+	PORT_START_TAG("KEY7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C		)	PORT_PLAYER(2)	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G		)	PORT_PLAYER(2)	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K		)	PORT_PLAYER(2)	// K
@@ -6255,7 +6278,7 @@ static INPUT_PORTS_START( mjflove )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON		)	PORT_PLAYER(2)	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 
-	PORT_START
+	PORT_START_TAG("KEY8")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D		)	PORT_PLAYER(2)	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H		)	PORT_PLAYER(2)	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L		)	PORT_PLAYER(2)	// L
@@ -6263,7 +6286,7 @@ static INPUT_PORTS_START( mjflove )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN			)	// nothing
 
-	PORT_START
+	PORT_START_TAG("KEY9")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE	)	PORT_PLAYER(2)	// "l"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE		)	PORT_PLAYER(2)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP	)	PORT_PLAYER(2)	// "w"
@@ -6271,7 +6294,7 @@ static INPUT_PORTS_START( mjflove )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG			)	PORT_PLAYER(2)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL		)	PORT_PLAYER(2)	// "s"
 
-	PORT_START	// IN11 - DSW1
+	PORT_START_TAG("DSW1")	/* IN11 - DSW1 */
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -6297,7 +6320,7 @@ static INPUT_PORTS_START( mjflove )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN12 - DSW2
+	PORT_START_TAG("DSW2")	/* IN12 - DSW2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -6322,7 +6345,7 @@ static INPUT_PORTS_START( mjflove )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hparadis )
-	PORT_START	// IN0 - Player 1
+	PORT_START_TAG("IN0")	/* IN0 - Player 1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -6332,10 +6355,10 @@ static INPUT_PORTS_START( hparadis )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN1 - Player 2
+	PORT_START_TAG("IN1")	/* IN1 - Player 2 */
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN2
+	PORT_START_TAG("IN2")	/* IN2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2    )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -6345,8 +6368,9 @@ static INPUT_PORTS_START( hparadis )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
-	// keyb 1
-	PORT_START	// IN3
+	/* keyb 1 */
+	
+	PORT_START_TAG("KEY0")	/* IN3 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD)	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5") PORT_CODE(KEYCODE_5_PAD)	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// I
@@ -6354,7 +6378,7 @@ static INPUT_PORTS_START( hparadis )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1		)
 
-	PORT_START	// IN4
+	PORT_START_TAG("KEY1")	/* IN4 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("6") PORT_CODE(KEYCODE_6_PAD)	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// J
@@ -6362,7 +6386,7 @@ static INPUT_PORTS_START( hparadis )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// BET
 
-	PORT_START	// IN5
+	PORT_START_TAG("KEY2")	/* IN5 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3") PORT_CODE(KEYCODE_3_PAD)	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("7") PORT_CODE(KEYCODE_7_PAD)	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// K
@@ -6370,7 +6394,7 @@ static INPUT_PORTS_START( hparadis )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 
-	PORT_START	// IN6
+	PORT_START_TAG("KEY3")	/* IN6 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4") PORT_CODE(KEYCODE_4_PAD)	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("8") PORT_CODE(KEYCODE_8_PAD)	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// L
@@ -6378,7 +6402,7 @@ static INPUT_PORTS_START( hparadis )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 
-	PORT_START	// IN7
+	PORT_START_TAG("KEY4")	/* IN7 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN	)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN	)	// "w"
@@ -6386,8 +6410,9 @@ static INPUT_PORTS_START( hparadis )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN	)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN	)	// "s"
 
-	// keyb 2
-	PORT_START	// IN8
+	/* keyb 2 */
+	
+	PORT_START_TAG("KEY5")	/* IN8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A	)	PORT_PLAYER(2)	// A
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E	)	PORT_PLAYER(2)	// E
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// I
@@ -6395,7 +6420,7 @@ static INPUT_PORTS_START( hparadis )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// Kan
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2		)
 
-	PORT_START	// IN9
+	PORT_START_TAG("KEY6")	/* IN9 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B	)	PORT_PLAYER(2)	// B
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F	)	PORT_PLAYER(2)	// F
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// J
@@ -6403,7 +6428,7 @@ static INPUT_PORTS_START( hparadis )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// Reach
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// BET
 
-	PORT_START	// IN10
+	PORT_START_TAG("KEY7")	/* IN10 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C	)	PORT_PLAYER(2)	// C
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G	)	PORT_PLAYER(2)	// G
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// K
@@ -6411,7 +6436,7 @@ static INPUT_PORTS_START( hparadis )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// Ron
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 
-	PORT_START	// IN11
+	PORT_START_TAG("KEY8")	/* IN11 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D	)	PORT_PLAYER(2)	// D
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H	)	PORT_PLAYER(2)	// H
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// L
@@ -6419,7 +6444,7 @@ static INPUT_PORTS_START( hparadis )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 
-	PORT_START	// IN12
+	PORT_START_TAG("KEY9")	/* IN12 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN	)	// "t"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN	)	// "w"
@@ -6427,7 +6452,7 @@ static INPUT_PORTS_START( hparadis )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN	)	// "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN	)	// "s"
 
-	PORT_START	// IN13 - DSW1
+	PORT_START_TAG("DSW1")	/* IN13 - DSW1 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -6450,7 +6475,7 @@ static INPUT_PORTS_START( hparadis )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	PORT_START	// IN14 - DSW2
+	PORT_START_TAG("DSW2")	/* IN14 - DSW2 */
 	PORT_DIPNAME( 0x03, 0x03, "Unknown 2-0&1" )
 	PORT_DIPSETTING(    0x03, "0" )
 	PORT_DIPSETTING(    0x02, "1" )
@@ -6475,7 +6500,7 @@ static INPUT_PORTS_START( hparadis )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	// IN15 - DSWs top bits
+	PORT_START_TAG("DSW3")	/* IN15 - DSWs top bits */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

@@ -19,20 +19,20 @@ READ16_HANDLER( dec0_controls_r )
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 & 2 joystick & buttons */
-			return (input_port_read_indexed(machine, 0) + (input_port_read_indexed(machine, 1) << 8));
+			return (input_port_read(machine, "IN0") + (input_port_read(machine, "IN1") << 8));
 
 		case 2: /* Credits, start buttons */
-			return input_port_read_indexed(machine, 2);
+			return input_port_read(machine, "IN2");
 
 		case 4: /* Byte 4: Dipswitch bank 2, Byte 5: Dipswitch Bank 1 */
-			return (input_port_read_indexed(machine, 3) + (input_port_read_indexed(machine, 4) << 8));
+			return (input_port_read(machine, "DSW0") + (input_port_read(machine, "DSW1") << 8));
 
 		case 8: /* Intel 8751 mc, Bad Dudes & Heavy Barrel only */
-			//logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n",activecpu_get_pc(),0x30c000+offset);
+			//logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", activecpu_get_pc(), 0x30c000+offset);
 			return i8751_return;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n",activecpu_get_pc(),0x30c000+offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", activecpu_get_pc(), 0x30c000+offset);
 	return ~0;
 }
 
@@ -43,13 +43,13 @@ READ16_HANDLER( dec0_rotary_r )
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 rotary */
-			return ~(1 << (input_port_read_indexed(machine, 5) * 12 / 256));
+			return ~(1 << (input_port_read(machine, "AN0") * 12 / 256));
 
 		case 8: /* Player 2 rotary */
-			return ~(1 << (input_port_read_indexed(machine, 6) * 12 / 256));
+			return ~(1 << (input_port_read(machine, "AN1") * 12 / 256));
 
 		default:
-			logerror("Unknown rotary read at 300000 %02x\n",offset);
+			logerror("Unknown rotary read at 300000 %02x\n", offset);
 	}
 
 	return 0;
@@ -62,25 +62,25 @@ READ16_HANDLER( midres_controls_r )
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 Joystick + start, Player 2 Joystick + start */
-			return (input_port_read_indexed(machine, 0) + (input_port_read_indexed(machine, 1) << 8));
+			return (input_port_read(machine, "IN0") + (input_port_read(machine, "IN1") << 8));
 
 		case 2: /* Dipswitches */
-			return (input_port_read_indexed(machine, 3) + (input_port_read_indexed(machine, 4) << 8));
+			return (input_port_read(machine, "DSW0") + (input_port_read(machine, "DSW1") << 8));
 
 		case 4: /* Player 1 rotary */
-			return ~(1 << (input_port_read_indexed(machine, 5) * 12 / 256));
+			return ~(1 << (input_port_read(machine, "AN0") * 12 / 256));
 
 		case 6: /* Player 2 rotary */
-			return ~(1 << (input_port_read_indexed(machine, 6) * 12 / 256));
+			return ~(1 << (input_port_read(machine, "AN1") * 12 / 256));
 
 		case 8: /* Credits, start buttons */
-			return input_port_read_indexed(machine, 2);
+			return input_port_read(machine, "IN2");
 
 		case 12:
 			return 0;	/* ?? watchdog ?? */
 	}
 
-	logerror("PC %06x unknown control read at %02x\n",activecpu_get_pc(),0x180000+offset);
+	logerror("PC %06x unknown control read at %02x\n", activecpu_get_pc(), 0x180000+offset);
 	return ~0;
 }
 
@@ -91,16 +91,16 @@ READ16_HANDLER( slyspy_controls_r )
 	switch (offset<<1)
 	{
 		case 0: /* Dip Switches */
-			return (input_port_read_indexed(machine, 3) + (input_port_read_indexed(machine, 4) << 8));
+			return (input_port_read(machine, "DSW0") + (input_port_read(machine, "DSW1") << 8));
 
 		case 2: /* Player 1 & Player 2 joysticks & fire buttons */
-			return (input_port_read_indexed(machine, 0) + (input_port_read_indexed(machine, 1) << 8));
+			return (input_port_read(machine, "IN0") + (input_port_read(machine, "IN1") << 8));
 
 		case 4: /* Credits */
-			return input_port_read_indexed(machine, 2);
+			return input_port_read(machine, "IN2");
 	}
 
-	logerror("Unknown control read at 30c000 %d\n",offset);
+	logerror("Unknown control read at 30c000 %d\n", offset);
 	return ~0;
 }
 
@@ -114,7 +114,7 @@ READ16_HANDLER( slyspy_protection_r )
 		case 6:		return 0x2;
 	}
 
-	logerror("%04x, Unknown protection read at 30c000 %d\n",activecpu_get_pc(),offset);
+	logerror("%04x, Unknown protection read at 30c000 %d\n", activecpu_get_pc(), offset);
 	return 0;
 }
 

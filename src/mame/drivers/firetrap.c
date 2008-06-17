@@ -101,7 +101,7 @@ static READ8_HANDLER( firetrap_8751_bootleg_r )
 	/* Check for coin insertion */
 	/* the following only works in the bootleg version, which doesn't have an */
 	/* 8751 - the real thing is much more complicated than that. */
-	if ((input_port_read_indexed(machine, 2) & 0x70) != 0x70) return 0xff;
+	if ((input_port_read(machine, "IN2") & 0x70) != 0x70) return 0xff;
 	return 0;
 }
 
@@ -247,11 +247,11 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xc000, 0xe97f) AM_READ(SMH_RAM)
-	AM_RANGE(0xf010, 0xf010) AM_READ(input_port_0_r)
-	AM_RANGE(0xf011, 0xf011) AM_READ(input_port_1_r)
-	AM_RANGE(0xf012, 0xf012) AM_READ(input_port_2_r)
-	AM_RANGE(0xf013, 0xf013) AM_READ(input_port_3_r)
-	AM_RANGE(0xf014, 0xf014) AM_READ(input_port_4_r)
+	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN0")
+	AM_RANGE(0xf011, 0xf011) AM_READ_PORT("IN1")
+	AM_RANGE(0xf012, 0xf012) AM_READ_PORT("IN2")
+	AM_RANGE(0xf013, 0xf013) AM_READ_PORT("DSW0")
+	AM_RANGE(0xf014, 0xf014) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf016, 0xf016) AM_READ(firetrap_8751_r)
 ADDRESS_MAP_END
 
@@ -278,11 +278,11 @@ static ADDRESS_MAP_START( readmem_bootleg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xc000, 0xe97f) AM_READ(SMH_RAM)
-	AM_RANGE(0xf010, 0xf010) AM_READ(input_port_0_r)
-	AM_RANGE(0xf011, 0xf011) AM_READ(input_port_1_r)
-	AM_RANGE(0xf012, 0xf012) AM_READ(input_port_2_r)
-	AM_RANGE(0xf013, 0xf013) AM_READ(input_port_3_r)
-	AM_RANGE(0xf014, 0xf014) AM_READ(input_port_4_r)
+	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN0")
+	AM_RANGE(0xf011, 0xf011) AM_READ_PORT("IN1")
+	AM_RANGE(0xf012, 0xf012) AM_READ_PORT("IN2")
+	AM_RANGE(0xf013, 0xf013) AM_READ_PORT("DSW0")
+	AM_RANGE(0xf014, 0xf014) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf016, 0xf016) AM_READ(firetrap_8751_bootleg_r)
 	AM_RANGE(0xf800, 0xf8ff) AM_READ(SMH_ROM)	/* extra ROM in the bootleg with unprotection code */
 ADDRESS_MAP_END
@@ -327,7 +327,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( firetrap )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_4WAY
@@ -337,7 +337,7 @@ static INPUT_PORTS_START( firetrap )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_4WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_4WAY
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_4WAY PORT_COCKTAIL
@@ -347,7 +347,7 @@ static INPUT_PORTS_START( firetrap )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_4WAY PORT_COCKTAIL
 
-	PORT_START      /* IN2 */
+	PORT_START_TAG("IN2")	/* IN2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -357,7 +357,7 @@ static INPUT_PORTS_START( firetrap )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START      /* DSW0 */
+	PORT_START_TAG("DSW0")	/* DSW0 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 //  PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
@@ -382,7 +382,7 @@ static INPUT_PORTS_START( firetrap )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START      /* DSW1 */
+	PORT_START_TAG("DSW1")	/* DSW1 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -403,14 +403,14 @@ static INPUT_PORTS_START( firetrap )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START      /* Connected to i8751 directly */
+	PORT_START_TAG("COIN")	/* Connected to i8751 directly */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( firetpbl )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_4WAY
@@ -420,7 +420,7 @@ static INPUT_PORTS_START( firetpbl )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_4WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_4WAY
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_4WAY PORT_COCKTAIL
@@ -430,7 +430,7 @@ static INPUT_PORTS_START( firetpbl )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_4WAY PORT_COCKTAIL
 
-	PORT_START      /* IN2 */
+	PORT_START_TAG("IN2")	/* IN2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -440,7 +440,7 @@ static INPUT_PORTS_START( firetpbl )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )	/* bootleg only */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START      /* DSW0 */
+	PORT_START_TAG("DSW0")	/* DSW0 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 //  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 //  PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
@@ -465,7 +465,7 @@ static INPUT_PORTS_START( firetpbl )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START      /* DSW1 */
+	PORT_START_TAG("DSW1")	/* DSW1 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -544,12 +544,14 @@ static INTERRUPT_GEN( firetrap )
 	static int coin_command_pending=0;
 
 	/* Check for coin IRQ */
-	if (cpu_getiloops()) {
-		if ((input_port_read_indexed(machine, 5) & 0x7) != 0x7 && !latch) {
-			coin_command_pending=~input_port_read_indexed(machine, 5);
+	if (cpu_getiloops()) 
+	{
+		if ((input_port_read(machine, "COIN") & 0x7) != 0x7 && !latch) 
+		{
+			coin_command_pending = ~input_port_read(machine, "COIN");
 			latch=1;
 		}
-		if ((input_port_read_indexed(machine, 5) & 0x7) == 0x7)
+		if ((input_port_read(machine, "COIN") & 0x7) == 0x7)
 			latch=0;
 
 		/* Make sure coin IRQ's aren't generated when another command is pending, the main cpu

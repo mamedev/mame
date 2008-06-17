@@ -66,7 +66,7 @@ static READ16_HANDLER( special_port1_r )
 {
 	static int h256 = 0x0400;
 
-	int result = input_port_read_indexed(machine, 1);
+	int result = input_port_read(machine, "FFE200");
 
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0200;
 	result ^= h256 ^= 0x0400;
@@ -112,7 +112,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( xybots )
-	PORT_START	/* ffe100 */
+	PORT_START_TAG("FFE100")	/* ffe100 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 Twist Right") PORT_CODE(KEYCODE_W) PORT_PLAYER(2)
@@ -130,7 +130,7 @@ static INPUT_PORTS_START( xybots )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 
-	PORT_START	/* ffe200 */
+	PORT_START_TAG("FFE200")	/* ffe200 */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED ) 	/* /AUDBUSY */
@@ -389,7 +389,7 @@ static DRIVER_INIT( xybots )
 {
 	atarigen_eeprom_default = NULL;
 	atarigen_slapstic_init(machine, 0, 0x008000, 0, 107);
-	atarijsa_init(machine, 1, 0x0100);
+	atarijsa_init(machine, "FFE200", 0x0100);
 }
 
 

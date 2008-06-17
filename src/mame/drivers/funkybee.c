@@ -88,8 +88,8 @@ extern VIDEO_UPDATE( funkybee );
 
 static READ8_HANDLER( funkybee_input_port_0_r )
 {
-	watchdog_reset_r(machine,0);
-	return input_port_read_indexed(machine,0);
+	watchdog_reset_r(machine, 0);
+	return input_port_read(machine, "IN0"); 
 }
 
 static WRITE8_HANDLER( funkybee_coin_counter_w )
@@ -103,8 +103,8 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf000, 0xf000) AM_READ(SMH_NOP)	/* IRQ Ack */
 	AM_RANGE(0xf800, 0xf800) AM_READ(funkybee_input_port_0_r)
-	AM_RANGE(0xf801, 0xf801) AM_READ(input_port_1_r)
-	AM_RANGE(0xf802, 0xf802) AM_READ(input_port_2_r)
+	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("IN1")
+	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )

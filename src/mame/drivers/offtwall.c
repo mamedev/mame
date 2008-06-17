@@ -90,7 +90,7 @@ static WRITE16_HANDLER( offtwall_atarivc_w )
 
 static READ16_HANDLER( special_port3_r )
 {
-	int result = input_port_read_indexed(machine, 3);
+	int result = input_port_read(machine, "260010");
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0020;
 	return result;
 }
@@ -310,7 +310,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( offtwall )
-	PORT_START	/* 260000 */
+	PORT_START_TAG("260000")	/* 260000 */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -328,7 +328,7 @@ static INPUT_PORTS_START( offtwall )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
-	PORT_START	/* 260002 */
+	PORT_START_TAG("260002")	/* 260002 */
 	PORT_BIT(  0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
 	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
@@ -341,7 +341,7 @@ static INPUT_PORTS_START( offtwall )
 
 	JSA_III_PORT	/* audio board port */
 
-	PORT_START	/* 260010 */
+	PORT_START_TAG("260010")	/* 260010 */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Controls ) )
 	PORT_DIPSETTING(      0x0000, "Whirly-gigs" )	/* this is official Atari terminology! */
@@ -354,18 +354,18 @@ static INPUT_PORTS_START( offtwall )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* 260012 */
+	PORT_START_TAG("260012")	/* 260012 */
 	PORT_BIT(  0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* 260020 */
+	PORT_START_TAG("260020")	/* 260020 */
     PORT_BIT( 0xff, 0, IPT_DIAL_V ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* 260022 */
+	PORT_START_TAG("260022")	/* 260022 */
     PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* 260024 */
+	PORT_START_TAG("260024")	/* 260024 */
     PORT_BIT( 0xff, 0, IPT_DIAL_V ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(3)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -500,7 +500,7 @@ static const UINT16 default_eeprom[] =
 static DRIVER_INIT( offtwall )
 {
 	atarigen_eeprom_default = default_eeprom;
-	atarijsa_init(machine, 3, 0x0040);
+	atarijsa_init(machine, "260010", 0x0040);
 
 	/* install son-of-slapstic workarounds */
 	spritecache_count = memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3fde42, 0x3fde43, 0, 0, spritecache_count_r);
@@ -512,7 +512,7 @@ static DRIVER_INIT( offtwall )
 static DRIVER_INIT( offtwalc )
 {
 	atarigen_eeprom_default = default_eeprom;
-	atarijsa_init(machine, 3, 0x0040);
+	atarijsa_init(machine, "260010", 0x0040);
 
 	/* install son-of-slapstic workarounds */
 	spritecache_count = memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3fde42, 0x3fde43, 0, 0, spritecache_count_r);

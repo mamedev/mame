@@ -689,7 +689,7 @@ static DRIVER_INIT( roadriot )
 		0x0118,0x0100,0x01C8,0x01D0,0x0000
 	};
 	atarigen_eeprom_default = default_eeprom;
-	atarijsa_init(machine, 2, 0x0040);
+	atarijsa_init(machine, "IN2", 0x0040);
 	atarijsa3_init_adpcm(REGION_SOUND1);
 
 	atarig42_playfield_base = 0x400;
@@ -739,7 +739,7 @@ static DRIVER_INIT( guardian )
 		0x0109,0x0100,0x0108,0x0134,0x0105,0x0148,0x1400,0x0000
 	};
 	atarigen_eeprom_default = default_eeprom;
-	atarijsa_init(machine, 2, 0x0040);
+	atarijsa_init(machine, "IN2", 0x0040);
 	atarijsa3_init_adpcm(REGION_SOUND1);
 
 	atarig42_playfield_base = 0x000;

@@ -139,7 +139,7 @@ static UINT16 exterm_trackball_port_r(running_machine *machine, int which, UINT1
 	UINT16 port;
 
 	/* Read the fake input port */
-	UINT8 trackball_pos = input_port_read_indexed(machine, 3 + which);
+	UINT8 trackball_pos = input_port_read(machine, which ? "DIAL1" : "DIAL0");
 
 	/* Calculate the change from the last position. */
 	UINT8 trackball_diff = trackball_old[which] - trackball_pos;
@@ -155,7 +155,7 @@ static UINT16 exterm_trackball_port_r(running_machine *machine, int which, UINT1
 	aimpos[which] = (aimpos[which] + trackball_diff) & 0x3f;
 
 	/* Combine it with the standard input bits */
-	port = which ? input_port_read_indexed(machine,1) : input_port_read_indexed(machine,0);
+	port = which ? input_port_read(machine, "IN1") : input_port_read(machine, "IN0");
 
 	return (port & 0xc0ff) | (aimpos[which] << 8);
 }
@@ -371,7 +371,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( exterm )
-	PORT_START      /* IN0 */
+	PORT_START_TAG("IN0")		/* IN0 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_8WAY PORT_PLAYER(1)
@@ -384,7 +384,7 @@ static INPUT_PORTS_START( exterm )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 
-	PORT_START      /* IN1 */
+	PORT_START_TAG("IN1")		/* IN1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_8WAY PORT_PLAYER(2)
@@ -396,7 +396,7 @@ static INPUT_PORTS_START( exterm )
 	PORT_BIT( 0x3f00, IP_ACTIVE_LOW, IPT_SPECIAL) /* trackball data */
 	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("DSW")		/* DSW */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unused ) ) /* According to the test screen */
 	PORT_DIPSETTING(	  0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
@@ -425,10 +425,10 @@ static INPUT_PORTS_START( exterm )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START /* IN3, fake trackball input port */
+	PORT_START_TAG("DIAL0") /* IN3, fake trackball input port */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
 
-	PORT_START /* IN4, fake trackball input port. */
+	PORT_START_TAG("DIAL1") /* IN4, fake trackball input port. */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
 INPUT_PORTS_END
 

@@ -534,7 +534,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( harddriv )
-	PORT_START_TAG("600000")
+	PORT_START_TAG("IN0")		/* 600000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )	/* diagnostic switch */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_VBLANK )
@@ -590,7 +590,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( racedriv )
-	PORT_START_TAG("600000")
+	PORT_START_TAG("IN0")		/* 600000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )	/* diagnostic switch */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_VBLANK )
@@ -646,7 +646,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( racedrvc )
-	PORT_START_TAG("60c000")
+	PORT_START_TAG("IN0")		/* 60c000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )	/* diagnostic switch */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_VBLANK )
@@ -708,7 +708,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( stunrun )
-	PORT_START_TAG("60c000")
+	PORT_START_TAG("IN0")		/* 60c000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_VBLANK )
@@ -766,7 +766,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( steeltal )
-	PORT_START_TAG("60c000")
+	PORT_START_TAG("IN0")		/* 60c000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_VBLANK )
@@ -825,7 +825,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( strtdriv )
-	PORT_START_TAG("60c000")
+	PORT_START_TAG("IN0")		/* 60c000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_VBLANK )
@@ -874,21 +874,21 @@ static INPUT_PORTS_START( strtdriv )
 	PORT_START_TAG("8BADC7")		/* b00000 - 8 bit ADC 7 - seat adjust */
 	PORT_BIT( 0xff, 0X80, IPT_UNUSED )
 
-	PORT_START_TAG("400000")		/* 400000 - steering wheel */
+	PORT_START_TAG("12BADC0")		/* 400000 - steering wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 
 	/* dummy ADC ports to end up with the same number as the full version */
-	PORT_START_TAG("12BADCX")
+	PORT_START_TAG("12BADC1")		/* FAKE */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START_TAG("12BADCY")
+	PORT_START_TAG("12BADC2")		/* FAKE */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START_TAG("12BADCZ")
+	PORT_START_TAG("12BADC3")		/* FAKE */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( hdrivair )
-	PORT_START_TAG("60c000")
+	PORT_START_TAG("IN0")		/* 60c000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* HBLANK */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_VBLANK )
@@ -3640,7 +3640,7 @@ static DRIVER_INIT( stunrun )
 	/* initialize the boards */
 	init_multisync(machine, 0);
 	init_adsp(machine);
-	atarijsa_init(machine, 0, 0x0020);
+	atarijsa_init(machine, "IN0", 0x0020);
 
 	/* set up gsp speedup handler */
 	hdgsp_speedup_addr[0] = memory_install_write16_handler(machine, hdcpu_gsp, ADDRESS_SPACE_PROGRAM, 0xfff9fc00, 0xfff9fc0f, 0, 0, hdgsp_speedup1_w);
@@ -3751,7 +3751,7 @@ static void steeltal_init_common(running_machine *machine, offs_t ds3_transfer_p
 	init_ds3(machine);
 	init_dspcom(machine);
 	atarijsa3_init_adpcm(REGION_SOUND1);
-	atarijsa_init(machine, 0, 0x0020);
+	atarijsa_init(machine, "IN0", 0x0020);
 
 	memory_install_read16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x908000, 0x908001, 0, 0, steeltal_dummy_r);
 

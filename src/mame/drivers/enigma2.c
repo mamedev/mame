@@ -324,7 +324,7 @@ if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, activec
 		if (protection_data != 0xff)
 			ret = protection_data ^ 0x88;
 		else
-			ret = input_port_read_indexed(machine, 2);
+			ret = input_port_read(machine, "DSW");
 		break;
 
 	case 0x02:
@@ -370,7 +370,7 @@ if (LOG_PROT) logerror("Protection Data Write: %x at %x\n", data, safe_activecpu
 
 static WRITE8_HANDLER( enigma2_flip_screen_w )
 {
-	engima2_flip_screen = ((data >> 5) & 0x01) && ((input_port_read_indexed(machine, 2) & 0x20) == 0x20);
+	engima2_flip_screen = ((data >> 5) & 0x01) && ((input_port_read(machine, "DSW") & 0x20) == 0x20);
 }
 
 
@@ -453,21 +453,21 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( enigma2 )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(p1_controls_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(p2_controls_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
@@ -507,7 +507,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( enigma2a )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
@@ -515,7 +515,7 @@ static INPUT_PORTS_START( enigma2a )
 	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(p1_controls_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -523,7 +523,7 @@ static INPUT_PORTS_START( enigma2a )
 	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(p2_controls_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )

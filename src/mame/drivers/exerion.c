@@ -31,7 +31,7 @@ static UINT8 *exerion_ram;
 static READ8_HANDLER( exerion_port01_r )
 {
 	/* the cocktail flip bit muxes between ports 0 and 1 */
-	return exerion_cocktail_flip ? input_port_read_indexed(machine, 1) : input_port_read_indexed(machine, 0);
+	return exerion_cocktail_flip ? input_port_read(machine, "IN1") : input_port_read(machine, "IN0");
 }
 
 
@@ -95,8 +95,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x887f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x8800, 0x8bff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(exerion_port01_r)
-	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_2_r)
-	AM_RANGE(0xb000, 0xb000) AM_READ(input_port_3_r)
+	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW0")
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(exerion_videoreg_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(AY8910_control_port_0_w)

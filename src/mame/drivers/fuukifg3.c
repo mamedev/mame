@@ -218,12 +218,13 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 
 ***************************************************************************/
 
+static const char *portnames[] = { "IN0", "IN1", "DSW0", "DSW1" };
 
 #define FUUKI32_INPUT( _N_ ) \
 \
 static READ32_HANDLER( io32_##_N_##_r ) \
 { \
-	return (input_port_read_indexed(machine,  _N_ ) << 16) | input_port_read_indexed(machine,  _N_ ); \
+	return (input_port_read(machine, portnames[ _N_ ]) << 16) | input_port_read(machine, portnames[ _N_ ]); \
 }
 
 FUUKI32_INPUT( 0 ) /* $800000.l Coins Inputs */
@@ -387,7 +388,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( asurabld )
-	PORT_START	// IN0 - $800000.w/$800002.w
+	PORT_START_TAG("IN0")	// IN0 - $800000.w/$800002.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2    )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -399,7 +400,7 @@ static INPUT_PORTS_START( asurabld )
 	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT(  0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
-	PORT_START	// IN1 - $810000.w/$810002.w
+	PORT_START_TAG("IN1")	// IN1 - $810000.w/$810002.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
@@ -417,7 +418,7 @@ static INPUT_PORTS_START( asurabld )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN                      )
 
-	PORT_START	// IN2 - $880000.w/$880002.w
+	PORT_START_TAG("DSW0")	// IN2 - $880000.w/$880002.w
 	PORT_SERVICE( 0x0001, 0x0001 )
 	PORT_DIPNAME( 0x0002, 0x0002, "Blood Colour" ) // Any other censorship? (Tested in 3 locations)
 	PORT_DIPSETTING(      0x0002, "Red" )
@@ -438,7 +439,7 @@ static INPUT_PORTS_START( asurabld )
 	PORT_DIPSETTING(      0x0000, "Joint" )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	// IN3 - $890000.w/$890002.w
+	PORT_START_TAG("DSW1")	// IN3 - $890000.w/$890002.w
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

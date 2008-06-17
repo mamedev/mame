@@ -202,7 +202,9 @@ static WRITE16_HANDLER( digital_w )
 
 static READ16_HANDLER( analog_r )
 {
-	return input_port_read_indexed(machine, whichport);
+	static const char *portnames[] = { "STICK0_X", "STICK1_X", "STICK0_Y", "STICK1_Y" };
+	
+	return input_port_read(machine, portnames[whichport]);
 }
 
 
@@ -262,19 +264,19 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( foodf )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("STICK0_X")	/* IN0 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("STICK1_X")	/* IN1 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL PORT_PLAYER(2)
 
-	PORT_START	/* IN2 */
+	PORT_START_TAG("STICK0_Y")	/* IN2 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START	/* IN3 */
+	PORT_START_TAG("STICK1_Y")	/* IN3 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL PORT_PLAYER(2)
 
-	PORT_START	/* IN4 */
+	PORT_START_TAG("IN0")	/* IN4 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -284,7 +286,7 @@ static INPUT_PORTS_START( foodf )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	/* SW1 */
+	PORT_START_TAG("DSW")	/* SW1 */
 	PORT_DIPNAME( 0x07, 0x00, "Bonus Coins" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x05, "1 for every 2" )
@@ -353,7 +355,7 @@ GFXDECODE_END
 
 static READ8_HANDLER( pot_r )
 {
-	return (input_port_read_indexed(machine, 5) >> offset) << 7;
+	return (input_port_read(machine, "DSW") >> offset) << 7;
 }
 
 static const struct POKEYinterface pokey_interface =

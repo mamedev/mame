@@ -301,7 +301,7 @@ static READ8_HANDLER( disk_iobank_r )
 {
 	printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,activecpu_get_pc());
 	if(offset == 1)
-		return input_port_read_indexed(machine, 1);
+		return input_port_read(machine, "DSW");
 
 	return disk_data[offset];
 }
@@ -565,7 +565,7 @@ static ADDRESS_MAP_START( filetto_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02f8, 0x02ff) AM_RAM //Modem port
 
 	AM_RANGE(0x0310, 0x0311) AM_READWRITE(disk_iobank_r,disk_iobank_w) //Prototyping card (???)
-	AM_RANGE(0x0312, 0x0312) AM_READ(input_port_0_r)
+	AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0")
 
 //  AM_RANGE(0x0300, 0x031f) AM_RAM //Prototyping card (???)
 	AM_RANGE(0x0378, 0x037f) AM_RAM //printer (parallel) port
@@ -582,7 +582,7 @@ static ADDRESS_MAP_START( filetto_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( filetto )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) //START1
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
@@ -602,7 +602,7 @@ static INPUT_PORTS_START( filetto )
     DSW2
     <unused>
     */
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

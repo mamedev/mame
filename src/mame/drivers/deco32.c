@@ -329,9 +329,9 @@ static READ32_HANDLER( captaven_prot_r )
 {
 	/* Protection/IO chip 75, same as Lemmings & Robocop 2 */
 	switch (offset<<2) {
-	case 0x0a0: return input_port_read_indexed(machine, 0); /* Player 1 & 2 controls */
-	case 0x158: return input_port_read_indexed(machine, 1); /* Player 3 & 4 controls */
-	case 0xed4: return input_port_read_indexed(machine, 2); /* Misc */
+	case 0x0a0: return input_port_read(machine, "IN0"); /* Player 1 & 2 controls */
+	case 0x158: return input_port_read(machine, "IN1"); /* Player 3 & 4 controls */
+	case 0xed4: return input_port_read(machine, "IN2"); /* Misc */
 	}
 
 	logerror("%08x: Unmapped protection read %04x\n",activecpu_get_pc(),offset<<2);
@@ -341,14 +341,14 @@ static READ32_HANDLER( captaven_prot_r )
 static READ32_HANDLER( captaven_soundcpu_r )
 {
 	/* Top byte - top bit low == sound cpu busy, bottom word is dips */
-	return 0xffff0000 | input_port_read_indexed(machine, 3);
+	return 0xffff0000 | input_port_read(machine, "DSW");
 }
 
 static READ32_HANDLER( fghthist_control_r )
 {
 	switch (offset) {
-	case 0: return 0xffff0000 | input_port_read_indexed(machine, 0);
-	case 1: return 0xffff0000 | input_port_read_indexed(machine, 1); //check top bits??
+	case 0: return 0xffff0000 | input_port_read(machine, "IN0");
+	case 1: return 0xffff0000 | input_port_read(machine, "IN1"); //check top bits??
 	case 2: return 0xfffffffe | eeprom_read_bit();
 	}
 
@@ -373,7 +373,7 @@ static WRITE32_HANDLER( fghthist_eeprom_w )
 static READ32_HANDLER( dragngun_service_r )
 {
 //  logerror("%08x:Read service\n",activecpu_get_pc());
-	return input_port_read_indexed(machine, 3);
+	return input_port_read(machine, "IN2");
 }
 
 static READ32_HANDLER( lockload_gun_mirror_r )
@@ -381,8 +381,8 @@ static READ32_HANDLER( lockload_gun_mirror_r )
 //logerror("%08x:Read gun %d\n",activecpu_get_pc(),offset);
 //return ((mame_rand(machine)%0xffff)<<16) | mame_rand(machine)%0xffff;
 	if (offset) /* Mirror of player 1 and player 2 fire buttons */
-		return input_port_read_indexed(machine, 5) | ((mame_rand(machine)%0xff)<<16);
-	return input_port_read_indexed(machine, 4) | input_port_read_indexed(machine, 6) | (input_port_read_indexed(machine, 6)<<16) | (input_port_read_indexed(machine, 6)<<24); //((mame_rand(machine)%0xff)<<16);
+		return input_port_read(machine, "IN4") | ((mame_rand(machine)%0xff)<<16);
+	return input_port_read(machine, "IN3") | input_port_read(machine, "LIGHT0_X") | (input_port_read(machine, "LIGHT0_X")<<16) | (input_port_read(machine, "LIGHT0_X")<<24); //((mame_rand(machine)%0xff)<<16);
 }
 
 static READ32_HANDLER( dragngun_prot_r )
@@ -396,9 +396,9 @@ static READ32_HANDLER( dragngun_prot_r )
 //definitely vblank in locked load
 
 	switch (offset<<1) {
-	case 0x140/2: return 0xffff0000 | input_port_read_indexed(machine, 0); /* IN0 */
-	case 0xadc/2: return 0xffff0000 | input_port_read_indexed(machine, 1) | strobe; /* IN1 */
-	case 0x6a0/2: return 0xffff0000 | input_port_read_indexed(machine, 2); /* IN2 (Dip switch) */
+	case 0x140/2: return 0xffff0000 | input_port_read(machine, "IN0"); /* IN0 */
+	case 0xadc/2: return 0xffff0000 | input_port_read(machine, "IN1") | strobe; /* IN1 */
+	case 0x6a0/2: return 0xffff0000 | input_port_read(machine, "DSW"); /* IN2 (Dip switch) */
 	}
 	return 0xffffffff;
 }
@@ -409,10 +409,10 @@ static READ32_HANDLER( dragngun_lightgun_r )
 {
 	/* Ports 0-3 are read, but seem unused */
 	switch (dragngun_lightgun_port) {
-	case 4: return input_port_read_indexed(machine, 4); break;
-	case 5: return input_port_read_indexed(machine, 5); break;
-	case 6: return input_port_read_indexed(machine, 6); break;
-	case 7: return input_port_read_indexed(machine, 7); break;
+	case 4: return input_port_read(machine, "LIGHT0_X"); break;
+	case 5: return input_port_read(machine, "LIGHT1_X"); break;
+	case 6: return input_port_read(machine, "LIGHT0_Y"); break;
+	case 7: return input_port_read(machine, "LIGHT1_Y"); break;
 	}
 
 //  logerror("Illegal lightgun port %d read \n",dragngun_lightgun_port);
@@ -458,8 +458,8 @@ static int tattass_eprom_bit;
 static READ32_HANDLER( tattass_prot_r )
 {
 	switch (offset<<1) {
-	case 0x280: return input_port_read_indexed(machine, 0) << 16; /* IN0 */
-	case 0x4c4: return input_port_read_indexed(machine, 1) << 16; /* IN1 */
+	case 0x280: return input_port_read(machine, "IN0") << 16;
+	case 0x4c4: return input_port_read(machine, "IN1") << 16;
 	case 0x35a: return tattass_eprom_bit << 16;
 	}
 
@@ -621,8 +621,8 @@ static READ32_HANDLER( nslasher_prot_r )
 {
 
 	switch (offset<<1) {
-	case 0x280: return input_port_read_indexed(machine, 0) << 16| 0xffff; /* IN0 */
-	case 0x4c4: return input_port_read_indexed(machine, 1) << 16| 0xffff; /* IN1 */
+	case 0x280: return input_port_read(machine, "IN0") << 16| 0xffff; /* IN0 */
+	case 0x4c4: return input_port_read(machine, "IN1") << 16| 0xffff; /* IN1 */
 	case 0x35a: return (eeprom_read_bit()<< 16) | 0xffff; // Debug switch in low word??
 	}
 
@@ -1244,7 +1244,7 @@ COIN1n adds 100 energy points (based on "Coinage") for player n when ingame if e
 */
 
 static INPUT_PORTS_START( captaven )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1262,7 +1262,7 @@ static INPUT_PORTS_START( captaven )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
@@ -1280,7 +1280,7 @@ static INPUT_PORTS_START( captaven )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1298,7 +1298,7 @@ static INPUT_PORTS_START( captaven )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* Dip switch bank 1 */
+	PORT_START_TAG("DSW")	/* Dip switch bank 1 */
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 2C_1C ) )
@@ -1350,7 +1350,7 @@ static INPUT_PORTS_START( captaven )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fghthist )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -1368,7 +1368,7 @@ static INPUT_PORTS_START( fghthist )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1388,7 +1388,7 @@ static INPUT_PORTS_START( fghthist )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dragngun )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1406,7 +1406,7 @@ static INPUT_PORTS_START( dragngun )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1424,7 +1424,7 @@ static INPUT_PORTS_START( dragngun )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED ) /* Would be a dipswitch, but only 1 present on board */
 	PORT_DIPNAME( 0x0100, 0x0000, "Reset" ) /* Behaves like Reset */
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -1451,7 +1451,7 @@ static INPUT_PORTS_START( dragngun )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x0004, IP_ACTIVE_LOW )
@@ -1461,21 +1461,21 @@ static INPUT_PORTS_START( dragngun )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("LIGHT0_X")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("LIGHT1_X")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("LIGHT0_Y")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("LIGHT1_Y")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lockload )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1493,14 +1493,14 @@ static INPUT_PORTS_START( lockload )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) //check  //test BUTTON F2
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED ) /* Would be a dipswitch, but only 1 present on board */
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
@@ -1527,35 +1527,35 @@ static INPUT_PORTS_START( lockload )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_VBLANK ) //IPT_VBLANK )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0004, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNUSED ) //check  //test BUTTON F2
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) /* mirror of fire buttons */
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("IN4")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("LIGHT0_X")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("LIGHT0_Y")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("LIGHT1_X")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("LIGHT1_Y")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tattass )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1573,7 +1573,7 @@ static INPUT_PORTS_START( tattass )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1593,7 +1593,7 @@ static INPUT_PORTS_START( tattass )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nslasher )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1611,7 +1611,7 @@ static INPUT_PORTS_START( nslasher )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
