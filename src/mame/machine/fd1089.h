@@ -1,7 +1,7 @@
 void *fd1089_get_decrypted_base(void);
 void fd1089_decrypt_0013A(void);
 void fd1089_decrypt_0018(void);
-void fd1089_decrypt_alexkidd(void);
+void fd1089_decrypt_0021(void);
 void fd1089_decrypt_0022(void);
 void fd1089_decrypt_0024(void);
 void fd1089_decrypt_0027(void);
@@ -12,3 +12,4 @@ void fd1089_decrypt_0037(void);
 void fd1089_decrypt_0167(void);
 void fd1089_decrypt_0168(void);
 void fd1089_decrypt_5021(void);
+void fd1089_decrypt_wb35(void);

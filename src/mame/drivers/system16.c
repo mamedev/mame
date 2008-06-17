@@ -2634,6 +2634,8 @@ ROM_START( passht4b )
 	ROM_LOAD( "pas4p.2",  0x10000, 0x10000, CRC(092e016e) SHA1(713638749efa9dce19c547b84308236110bc85fe) )
 ROM_END
 
+/* Passing Shot Bootleg is a decrypted version of Passing Shot Japanese (passshtj). It has been heavily modified */
+
 ROM_START( passshtb )
 	ROM_REGION( 0x020000, REGION_CPU1, 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "pass3_2p.bin", 0x000000, 0x10000, CRC(26bb9299) SHA1(11bacf86dfdd8bcfbfb61f0ebc59890325c48adc) )

@@ -3420,6 +3420,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( tetris3 )	/* (c) 1988 (FD1094, decrypted) S16A */
 	DRIVER( timesca1 )	/* (c) 1987 (FD1089B, decrypted) */
 	DRIVER( wb31 )		/* (c) 1988 Sega / Westone (FD1094, decrypted) */
+	DRIVER( wb35 )		/* (c) 1988 Sega / Westone (FD1089A, decrypted) */
 	DRIVER( pshot16a )	/* (c) 1988 */
 
 	/* System 16B */
@@ -3554,6 +3555,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( toutrun )	/* (c) 1987 (FD1094, decrypted) */
 	DRIVER( toutrun2 )	/* (c) 1987 (FD1094, decrypted) */
 	DRIVER( toutrun1 )	/* (c) 1987 (protected) */
+	DRIVER( toutrunu )	/* (c) 1987 (FD1094, decrypted) */
 	DRIVER( shangon )	/* (c) 1987 (protected) */
 	DRIVER( shangon3 )	/* (c) 1987 (FD1089B, decrypted) */
 	DRIVER( shangon2 )	/* (c) 1987 (FD1089B, decrypted) */
