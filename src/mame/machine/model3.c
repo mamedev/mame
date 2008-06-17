@@ -5,7 +5,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/model3.h"
 
 static int m3_step;
@@ -288,11 +287,11 @@ void model3_machine_init(int step)
 /*****************************************************************************/
 /* Epson RTC-72421 */
 
-static UINT8 rtc_get_reg(int reg)
+static UINT8 rtc_get_reg(running_machine *machine, int reg)
 {
 	mame_system_time systime;
 
-	mame_get_current_datetime(Machine, &systime);
+	mame_get_current_datetime(machine, &systime);
 
 	switch(reg)
 	{
@@ -354,7 +353,7 @@ READ32_HANDLER(rtc72421_r)
 {
 	int reg = offset;
 	UINT32 data;
-	data = rtc_get_reg(reg) << 24;
+	data = rtc_get_reg(machine, reg) << 24;
 	data |= 0x30000;	/* these bits are set to pass the battery voltage test */
 	return data;
 }

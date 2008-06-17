@@ -771,7 +771,6 @@ J1100256A VIDEO PCB
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 #include "video/taitoic.h"
@@ -820,21 +819,21 @@ static WRITE16_HANDLER( sharedram_w )
 	COMBINE_DATA(&taitoz_sharedram[offset]);
 }
 
-static void parse_control(void)
+static void parse_control(running_machine *machine)
 {
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
-static void parse_control_noz80(void)
+static void parse_control_noz80(running_machine *machine)
 {
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
@@ -844,7 +843,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )	/* assumes Z80 sandwiched between 68Ks */
 		data = data >> 8;	/* for Wgp */
 	cpua_ctrl = data;
 
-	parse_control();
+	parse_control(machine);
 
 	// Chase HQ: handle the lights
 	if ((!strcmp(machine->gamedrv->name, "chasehq")) || (!strcmp(machine->gamedrv->name, "chasehqj")))
@@ -862,7 +861,7 @@ static WRITE16_HANDLER( cpua_noz80_ctrl_w )	/* assumes no Z80 */
 		data = data >> 8;	/* for Wgp */
 	cpua_ctrl = data;
 
-	parse_control_noz80();
+	parse_control_noz80(machine);
 
 	logerror("CPU #0 PC %06x: write %04x to cpu control\n",activecpu_get_pc(),data);
 }
@@ -1426,7 +1425,7 @@ static WRITE16_HANDLER( spacegun_pancontrol )
 
 static STATE_POSTLOAD( taitoz_postload )
 {
-	parse_control();
+	parse_control(machine);
 	reset_sound_region();
 }
 
@@ -4340,7 +4339,7 @@ static DRIVER_INIT( taitoz )
 
 static STATE_POSTLOAD( bshark_postload )
 {
-	parse_control_noz80();
+	parse_control_noz80(machine);
 }
 
 static DRIVER_INIT( bshark )

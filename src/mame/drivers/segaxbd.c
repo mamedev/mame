@@ -61,7 +61,7 @@ static UINT16 *backupram1, *backupram2;
  *************************************/
 
 extern void fd1094_machine_init(void);
-extern void fd1094_driver_init(void (*set_decrypted)(UINT8 *));
+extern void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(UINT8 *));
 
 
 
@@ -71,10 +71,10 @@ extern void fd1094_driver_init(void (*set_decrypted)(UINT8 *));
  *
  *************************************/
 
-static void xboard_generic_init(void)
+static void xboard_generic_init(running_machine *machine)
 {
 	/* init the FD1094 */
-	fd1094_driver_init(NULL);
+	fd1094_driver_init(machine, NULL);
 
 	/* set the default road priority */
 	xboard_set_road_priority(1);
@@ -2411,7 +2411,7 @@ ROM_END
 
 static DRIVER_INIT( generic_xboard )
 {
-	xboard_generic_init();
+	xboard_generic_init(machine);
 }
 
 
@@ -2424,7 +2424,7 @@ static DRIVER_INIT( generic_xboard )
 
 static DRIVER_INIT( aburner2 )
 {
-	xboard_generic_init();
+	xboard_generic_init(machine);
 	xboard_set_road_priority(0);
 
 	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x140006, 0x140007, 0, 0x00fff0, aburner2_iochip_0_D_w);
@@ -2433,14 +2433,14 @@ static DRIVER_INIT( aburner2 )
 
 static DRIVER_INIT( aburner )
 {
-	xboard_generic_init();
+	xboard_generic_init(machine);
 	xboard_set_road_priority(0);
 }
 
 
 static DRIVER_INIT( loffire )
 {
-	xboard_generic_init();
+	xboard_generic_init(machine);
 	adc_reverse[1] = adc_reverse[3] = 1;
 
 	/* install extra synchronization on core shared memory */
@@ -2450,14 +2450,14 @@ static DRIVER_INIT( loffire )
 
 static DRIVER_INIT( smgp )
 {
-	xboard_generic_init();
+	xboard_generic_init(machine);
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2f0000, 0x2f3fff, 0, 0, smgp_excs_r, smgp_excs_w);
 }
 
 
 static DRIVER_INIT( gprider )
 {
-	xboard_generic_init();
+	xboard_generic_init(machine);
 	gprider_hack = 1;
 }
 

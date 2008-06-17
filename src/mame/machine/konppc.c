@@ -1,7 +1,6 @@
 /* Konami PowerPC-based 3D games common functions */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/sharc/sharc.h"
 #include "video/voodoo.h"
 #include "konppc.h"
@@ -198,7 +197,7 @@ static UINT32 dsp_comm_sharc_r(int board, int offset)
 	return dsp_comm_ppc[board][offset];
 }
 
-static void dsp_comm_sharc_w(int board, int offset, UINT32 data)
+static void dsp_comm_sharc_w(running_machine *machine, int board, int offset, UINT32 data)
 {
 	if (offset >= 2)
 	{
@@ -210,7 +209,7 @@ static void dsp_comm_sharc_w(int board, int offset, UINT32 data)
 		case CGBOARD_TYPE_ZR107:
 		case CGBOARD_TYPE_GTICLUB:
 		{
-			//cpunum_set_input_line(Machine, 2, SHARC_INPUT_FLAG0, ASSERT_LINE);
+			//cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG0, ASSERT_LINE);
 			cpuintrf_push_context(2);
 			sharc_set_flag_input(0, ASSERT_LINE);
 			cpuintrf_pop_context();
@@ -218,7 +217,7 @@ static void dsp_comm_sharc_w(int board, int offset, UINT32 data)
 			if (offset == 1)
 			{
 				if (data & 0x03)
-					cpunum_set_input_line(Machine, 2, INPUT_LINE_IRQ2, ASSERT_LINE);
+					cpunum_set_input_line(machine, 2, INPUT_LINE_IRQ2, ASSERT_LINE);
 			}
 			break;
 		}
@@ -303,7 +302,7 @@ READ32_HANDLER( cgboard_0_comm_sharc_r )
 
 WRITE32_HANDLER( cgboard_0_comm_sharc_w )
 {
-	dsp_comm_sharc_w(0, offset, data);
+	dsp_comm_sharc_w(machine, 0, offset, data);
 }
 
 READ32_HANDLER( cgboard_0_shared_sharc_r )
@@ -323,7 +322,7 @@ READ32_HANDLER( cgboard_1_comm_sharc_r )
 
 WRITE32_HANDLER( cgboard_1_comm_sharc_w )
 {
-	dsp_comm_sharc_w(1, offset, data);
+	dsp_comm_sharc_w(machine, 1, offset, data);
 }
 
 READ32_HANDLER( cgboard_1_shared_sharc_r )

@@ -70,9 +70,6 @@ Other notes:
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
 
-void fd1094_machine_init(void);
-void fd1094_driver_init(void (*set_decrypted)(UINT8 *));
-
 /* video/segac2.c */
 extern void update_system18_vdp( bitmap_t *bitmap, const rectangle *cliprect );
 extern READ16_HANDLER( segac2_vdp_r );

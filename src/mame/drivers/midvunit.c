@@ -397,7 +397,7 @@ static READ32_HANDLER( offroadc_serial_data_r )
 
 static WRITE32_HANDLER( offroadc_serial_data_w )
 {
-	midway_serial_pic2_w(data >> 16);
+	midway_serial_pic2_w(machine, data >> 16);
 }
 
 
@@ -1429,7 +1429,7 @@ static void init_crusnwld_common(running_machine *machine, offs_t speedup)
 	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x994000, 0x994000, 0, 0, crusnwld_control_w);
 
 	/* valid values are 450 or 460 */
-	midway_serial_pic_init(450);
+	midway_serial_pic_init(machine, 450);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_r);
 	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_w);
@@ -1457,7 +1457,7 @@ static DRIVER_INIT( offroadc )
 	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x994000, 0x994000, 0, 0, crusnwld_control_w);
 
 	/* valid values are 230 or 234 */
-	midway_serial_pic2_init(230, 94);
+	midway_serial_pic2_init(machine, 230, 94);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
 	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_r, offroadc_serial_data_w);
 
@@ -1472,7 +1472,7 @@ static DRIVER_INIT( wargods )
 
 	/* initialize the subsystems */
 	dcs2_init(machine, 2, 0x3839);
-	midway_ioasic_init(0, 452/* no alternates */, 94, NULL);
+	midway_ioasic_init(machine, 0, 452/* no alternates */, 94, NULL);
 	adc_shift = 16;
 
 	/* we need proper VRAM */

@@ -17,7 +17,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/pckeybrd.h"
 
 #ifdef MESS
@@ -318,7 +317,7 @@ static int at_keyboard_charqueue_empty(void);
 
 
 
-void at_keyboard_init(AT_KEYBOARD_TYPE type)
+void at_keyboard_init(running_machine *machine, AT_KEYBOARD_TYPE type)
 {
 	int i;
 
@@ -343,7 +342,7 @@ void at_keyboard_init(AT_KEYBOARD_TYPE type)
 	{
 		char buf[40];
 		sprintf(buf, "pc_keyboard_%d", i);
-		keyboard.ports[i] = input_port_by_tag(Machine->portconfig, buf);
+		keyboard.ports[i] = input_port_by_tag(machine->portconfig, buf);
 	}
 
 #ifdef MESS

@@ -5,16 +5,15 @@ Atari Tank 8 driver
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "tank8.h"
 #include "sound/discrete.h"
 
 static int collision_index;
 
 
-void tank8_set_collision(int index)
+void tank8_set_collision(running_machine *machine, int index)
 {
-	cpunum_set_input_line(Machine, 0, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 
 	collision_index = index;
 }

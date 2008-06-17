@@ -172,7 +172,7 @@ VIDEO_START(gaiapols)
 
 	K055673_vh_start(machine, REGION_GFX2, 1, -61, -22, gaiapols_sprite_callback); // stage2 brick walls
 
-	konamigx_mixer_init(0);
+	konamigx_mixer_init(machine, 0);
 
 	K056832_set_LayerOffset(0, -2+2-1, 0-1);
 	K056832_set_LayerOffset(1,  0+2, 0);
@@ -214,7 +214,7 @@ VIDEO_START(dadandrn)
 
 	K055673_vh_start(machine, REGION_GFX2, 0, -42, -22, gaiapols_sprite_callback);
 
-	konamigx_mixer_init(0);
+	konamigx_mixer_init(machine, 0);
 
 	konamigx_mixer_primode(1);
 
@@ -245,7 +245,7 @@ VIDEO_START(mystwarr)
 
 	K055673_vh_start(machine, REGION_GFX2, 0, -48, -24, mystwarr_sprite_callback);
 
-	konamigx_mixer_init(0);
+	konamigx_mixer_init(machine, 0);
 
 	K056832_set_LayerOffset(0, -2-3, 0);
 	K056832_set_LayerOffset(1,  0-3, 0);
@@ -273,7 +273,7 @@ VIDEO_START(metamrph)
 
 	K055673_vh_start(machine, REGION_GFX2, 1, -51, -22, metamrph_sprite_callback);
 
-	konamigx_mixer_init(0);
+	konamigx_mixer_init(machine, 0);
 
 	// other reference, floor at first boss
 	K056832_set_LayerOffset(0, -2+4, 0); // text
@@ -299,7 +299,7 @@ VIDEO_START(viostorm)
 
 	K055673_vh_start(machine, REGION_GFX2, 1, -62, -23, metamrph_sprite_callback);
 
-	konamigx_mixer_init(0);
+	konamigx_mixer_init(machine, 0);
 
 	K056832_set_LayerOffset(0, -2+1, 0);
 	K056832_set_LayerOffset(1,  0+1, 0);
@@ -322,7 +322,7 @@ VIDEO_START(martchmp)
 
 	K055673_vh_start(machine, REGION_GFX2, 0, -58, -23, martchmp_sprite_callback);
 
-	konamigx_mixer_init(0);
+	konamigx_mixer_init(machine, 0);
 
 	K056832_set_LayerOffset(0, -2-4, 0);
 	K056832_set_LayerOffset(1,  0-4, 0);

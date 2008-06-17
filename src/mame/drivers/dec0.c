@@ -72,7 +72,7 @@ static WRITE16_HANDLER( dec0_control_w )
 			break;
 
 		case 6: /* Intel 8751 microcontroller - Bad Dudes, Heavy Barrel, Birdy Try only */
-			dec0_i8751_write(data);
+			dec0_i8751_write(machine, data);
 			break;
 
 		case 8: /* Interrupt ack (VBL - IRQ 6) */

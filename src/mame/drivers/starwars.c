@@ -570,7 +570,7 @@ static DRIVER_INIT( esb )
 	generic_nvram = auto_malloc(generic_nvram_size);
 
 	/* init the slapstic */
-	slapstic_init(101);
+	slapstic_init(machine, 101);
 	slapstic_source = &memory_region(REGION_CPU1)[0x14000];
 	slapstic_base = &memory_region(REGION_CPU1)[0x08000];
 

@@ -1470,7 +1470,7 @@ WRITE16_HANDLER( hd68k_dsk_control_w )
 			break;
 
 		case 4:	/* ASIC65 reset */
-			asic65_reset(!val);
+			asic65_reset(machine, !val);
 			break;
 
 		case 7:	/* LED */
@@ -1613,7 +1613,7 @@ WRITE16_HANDLER( hddspcom_control_w )
 	switch (offset & 7)
 	{
 		case 2:	/* ASIC65 reset */
-			asic65_reset(!val);
+			asic65_reset(machine, !val);
 			break;
 
 		default:

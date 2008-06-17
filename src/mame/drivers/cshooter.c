@@ -93,9 +93,9 @@ static int coin_stat=0;
 
 static UINT8 *mainram;
 
-static void ar_coin_hack(void)
+static void ar_coin_hack(running_machine *machine)
 {
-	if(input_port_read(Machine, "COIN") & 1)
+	if(input_port_read(machine, "COIN") & 1)
 	{
 		if(coin_stat==0)
 		{
@@ -204,7 +204,7 @@ static INTERRUPT_GEN( cshooter_interrupt )
       cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x10);
 
 	if(mainram!=NULL)
-		ar_coin_hack();
+		ar_coin_hack(machine);
 
 }
 

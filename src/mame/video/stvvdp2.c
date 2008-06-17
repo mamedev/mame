@@ -82,7 +82,6 @@ In other words,the first three types uses the offset and not the color allocated
 #include "driver.h"
 #include "eminline.h"
 #include "profiler.h"
-#include "deprecat.h"
 #include "includes/stv.h"
 
 UINT32* stv_vdp2_regs;
@@ -5259,7 +5258,7 @@ static STATE_POSTLOAD( stv_vdp2_state_save_postload )
 	stv_rbg_cache_data.is_cache_dirty = 3;
 	memset( &stv_vdp2_layer_data_placement, 0, sizeof(stv_vdp2_layer_data_placement));
 
-	refresh_palette_data(Machine);
+	refresh_palette_data(machine);
 }
 
 static int stv_vdp2_start (running_machine *machine)

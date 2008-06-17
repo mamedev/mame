@@ -344,7 +344,7 @@ Notes:
 UINT16* s24_mainram1;
 
 extern void s24_fd1094_machine_init(void);
-extern void s24_fd1094_driver_init(void);
+extern void s24_fd1094_driver_init(running_machine *machine);
 
 VIDEO_START(system24);
 VIDEO_UPDATE(system24);
@@ -688,19 +688,19 @@ static WRITE16_HANDLER( iod_w )
 
 static UINT8 resetcontrol, prev_resetcontrol;
 
-static void reset_reset(void)
+static void reset_reset(running_machine *machine)
 {
 	int changed = resetcontrol ^ prev_resetcontrol;
 	if(changed & 2) {
 		if(resetcontrol & 2) {
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 //          mame_printf_debug("enable 2nd cpu!\n");
 //          DEBUGGER_BREAK;
 			s24_fd1094_machine_init();
 
 		} else
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	if(changed & 4)
 		sndti_reset(SOUND_YM2151, 0);
@@ -711,7 +711,7 @@ static void resetcontrol_w(UINT8 data)
 {
 	resetcontrol = data;
 	logerror("Reset control %02x (%x:%x)\n", resetcontrol, cpu_getactivecpu(), activecpu_get_pc());
-	reset_reset();
+	reset_reset(Machine);
 }
 
 
@@ -1173,7 +1173,7 @@ static DRIVER_INIT(sspirits)
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = 0;
 	track_size = 0x2d00;
-	s24_fd1094_driver_init();
+	s24_fd1094_driver_init(machine);
 
 }
 
@@ -1182,7 +1182,7 @@ static DRIVER_INIT(sspiritj)
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = 0;
 	track_size = 0x2f00;
-	s24_fd1094_driver_init();
+	s24_fd1094_driver_init(machine);
 
 }
 
@@ -1191,7 +1191,7 @@ static DRIVER_INIT(dcclubfd)
 	system24temp_sys16_io_set_callbacks(dcclub_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = dcclub_mlt;
 	track_size = 0x2d00;
-	s24_fd1094_driver_init();
+	s24_fd1094_driver_init(machine);
 
 }
 
@@ -1203,7 +1203,7 @@ static DRIVER_INIT(sgmast)
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = 0;
 	track_size = 0x2d00;
-	s24_fd1094_driver_init();
+	s24_fd1094_driver_init(machine);
 
 }
 
@@ -1212,7 +1212,7 @@ static DRIVER_INIT(qsww)
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = 0;
 	track_size = 0x2d00;
-	s24_fd1094_driver_init();
+	s24_fd1094_driver_init(machine);
 }
 
 static DRIVER_INIT(gground)
@@ -1220,7 +1220,7 @@ static DRIVER_INIT(gground)
 	system24temp_sys16_io_set_callbacks(gground_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = 0;
 	track_size = 0x2d00;
-	s24_fd1094_driver_init();
+	s24_fd1094_driver_init(machine);
 }
 
 static DRIVER_INIT(crkdown)
@@ -1228,7 +1228,7 @@ static DRIVER_INIT(crkdown)
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = 0;
 	track_size = 0x2d00;
-	s24_fd1094_driver_init();
+	s24_fd1094_driver_init(machine);
 }
 
 static DRIVER_INIT(roughrac)
@@ -1236,7 +1236,7 @@ static DRIVER_INIT(roughrac)
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = 0;
 	track_size = 0x2d00;
-	s24_fd1094_driver_init();
+	s24_fd1094_driver_init(machine);
 }
 
 /*************************************

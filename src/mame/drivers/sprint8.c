@@ -5,7 +5,6 @@ Atari Sprint 8 driver
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/sprint8.h"
 
 static int steer_dir[8];
@@ -15,11 +14,11 @@ static int collision_reset;
 static int collision_index;
 
 
-void sprint8_set_collision(int n)
+void sprint8_set_collision(running_machine *machine, int n)
 {
 	if (collision_reset == 0)
 	{
-		cpunum_set_input_line(Machine, 0, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 
 		collision_index = n;
 	}

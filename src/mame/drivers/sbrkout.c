@@ -31,7 +31,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/dac.h"
 
 #include "sbrkout.lh"
@@ -180,19 +179,19 @@ static READ8_HANDLER( switches_r )
 }
 
 
-static void update_nmi_state(void)
+static void update_nmi_state(running_machine *machine)
 {
 	if ((pot_trigger[0] & ~pot_mask[0]) | (pot_trigger[1] & ~pot_mask[1]))
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
 static TIMER_CALLBACK( pot_trigger_callback )
 {
 	pot_trigger[param] = 1;
-	update_nmi_state();
+	update_nmi_state(machine);
 }
 
 
@@ -200,7 +199,7 @@ static WRITE8_HANDLER( pot_mask1_w )
 {
 	pot_mask[0] = ~offset & 1;
 	pot_trigger[0] = 0;
-	update_nmi_state();
+	update_nmi_state(machine);
 }
 
 
@@ -208,7 +207,7 @@ static WRITE8_HANDLER( pot_mask2_w )
 {
 	pot_mask[1] = ~offset & 1;
 	pot_trigger[1] = 0;
-	update_nmi_state();
+	update_nmi_state(machine);
 }
 
 

@@ -7,7 +7,6 @@
  */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 #include "machine/konamigx.h"
 
@@ -208,7 +207,8 @@ void K053936GP_set_cliprect(int chip, int minx, int maxx, int miny, int maxy)
 	cliprect->max_y = maxy;
 }
 
-INLINE void K053936GP_copyroz32clip( bitmap_t *dst_bitmap, bitmap_t *src_bitmap,
+INLINE void K053936GP_copyroz32clip( running_machine *machine,
+		bitmap_t *dst_bitmap, bitmap_t *src_bitmap,
 		const rectangle *dst_cliprect, const rectangle *src_cliprect,
 		UINT32 _startx,UINT32 _starty,int _incxx,int _incxy,int _incyx,int _incyy,
 		int tilebpp, int blend, int clip )
@@ -257,7 +257,7 @@ INLINE void K053936GP_copyroz32clip( bitmap_t *dst_bitmap, bitmap_t *src_bitmap,
 	ecx = tx = -tx;
 
 	tilebpp = (tilebpp-1) & 7;
-	pal_base = Machine->pens;
+	pal_base = machine->pens;
 	cmask = colormask[tilebpp];
 
 	src_pitch = src_bitmap->rowpixels;
@@ -358,7 +358,8 @@ INLINE void K053936GP_copyroz32clip( bitmap_t *dst_bitmap, bitmap_t *src_bitmap,
 }
 
 // adpoted from generic K053936_zoom_draw()
-static void K053936GP_zoom_draw(int chip, UINT16 *ctrl, UINT16 *linectrl,
+static void K053936GP_zoom_draw(running_machine *machine,
+		int chip, UINT16 *ctrl, UINT16 *linectrl,
 		bitmap_t *bitmap, const rectangle *cliprect, tilemap *tmap,
 		int tilebpp, int blend)
 {
@@ -397,7 +398,8 @@ static void K053936GP_zoom_draw(int chip, UINT16 *ctrl, UINT16 *linectrl,
 			startx -= K053936_offset[chip][0] * incxx;
 			starty -= K053936_offset[chip][0] * incxy;
 
-			K053936GP_copyroz32clip(bitmap, src_bitmap, &my_clip, src_cliprect,
+			K053936GP_copyroz32clip(machine,
+					bitmap, src_bitmap, &my_clip, src_cliprect,
 					startx<<5, starty<<5, incxx<<5, incxy<<5, 0, 0,
 					tilebpp, blend, clip);
 			y++;
@@ -421,22 +423,23 @@ static void K053936GP_zoom_draw(int chip, UINT16 *ctrl, UINT16 *linectrl,
 		startx -= K053936_offset[chip][0] * incxx;
 		starty -= K053936_offset[chip][0] * incxy;
 
-		K053936GP_copyroz32clip(bitmap, src_bitmap, cliprect, src_cliprect,
+		K053936GP_copyroz32clip(machine,
+				bitmap, src_bitmap, cliprect, src_cliprect,
 				startx<<5, starty<<5, incxx<<5, incxy<<5, incyx<<5, incyy<<5,
 				tilebpp, blend, clip);
 	}
 }
 
-void K053936GP_0_zoom_draw(bitmap_t *bitmap, const rectangle *cliprect,
+void K053936GP_0_zoom_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 		tilemap *tmap, int tilebpp, int blend)
 {
-	K053936GP_zoom_draw(0,K053936_0_ctrl,K053936_0_linectrl,bitmap,cliprect,tmap,tilebpp,blend);
+	K053936GP_zoom_draw(machine, 0,K053936_0_ctrl,K053936_0_linectrl,bitmap,cliprect,tmap,tilebpp,blend);
 }
 
-void K053936GP_1_zoom_draw(bitmap_t *bitmap, const rectangle *cliprect,
+void K053936GP_1_zoom_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 		tilemap *tmap, int tilebpp, int blend)
 {
-	K053936GP_zoom_draw(1,K053936_1_ctrl,K053936_1_linectrl,bitmap,cliprect,tmap,tilebpp,blend);
+	K053936GP_zoom_draw(machine, 1,K053936_1_ctrl,K053936_1_linectrl,bitmap,cliprect,tmap,tilebpp,blend);
 }
 
 
@@ -457,7 +460,8 @@ void K053936GP_1_zoom_draw(bitmap_t *bitmap, const rectangle *cliprect,
     pri     : 0 = topmost, 255 = backmost (pixel priority)
 */
 
-INLINE void zdrawgfxzoom32GP( bitmap_t *bitmap, const gfx_element *gfx, const rectangle *cliprect,
+INLINE void zdrawgfxzoom32GP( running_machine *machine,
+		bitmap_t *bitmap, const gfx_element *gfx, const rectangle *cliprect,
 		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
 		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri)
 {
@@ -522,8 +526,8 @@ INLINE void zdrawgfxzoom32GP( bitmap_t *bitmap, const gfx_element *gfx, const re
 	src_fh    = 16;
 	src_base  = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
-	pal_base  = Machine->pens + gfx->color_base + (color % gfx->total_colors) * granularity;
-	shd_base  = Machine->shadow_table;
+	pal_base  = machine->pens + gfx->color_base + (color % gfx->total_colors) * granularity;
+	shd_base  = machine->shadow_table;
 
 	dst_ptr   = bitmap->base;
 	dst_pitch = bitmap->rowpixels;
@@ -1192,7 +1196,7 @@ void K053247GP_set_SpriteOffset(int offsx, int offsy)
 	K053247_dy = offsy;
 }
 
-void konamigx_mixer_init(int objdma)
+void konamigx_mixer_init(running_machine *machine, int objdma)
 {
 	gx_objdma = 0;
 	gx_primode = 0;
@@ -1212,7 +1216,7 @@ void konamigx_mixer_init(int objdma)
 	else
 		gx_spriteram = K053247_ram;
 
-	palette_set_shadow_dRGB32(Machine, 3,-80,-80,-80, 0);
+	palette_set_shadow_dRGB32(machine, 3,-80,-80,-80, 0);
 	K054338_invert_alpha(1);
 }
 
@@ -1631,7 +1635,7 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 					l = sub1flags & 0xf;
 
 					if (offs == -2)
-						K053936GP_0_zoom_draw(bitmap, cliprect, sub1, l, k);
+						K053936GP_0_zoom_draw(machine, bitmap, cliprect, sub1, l, k);
 					else
 						K053250_draw(machine, bitmap, cliprect, 0, vcblk[4]<<l, 0, 0);
 				}
@@ -1660,7 +1664,7 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 					l = sub2flags & 0xf;
 
 					if (offs == -3)
-						K053936GP_1_zoom_draw(bitmap, cliprect, sub2, l, k);
+						K053936GP_1_zoom_draw(machine, bitmap, cliprect, sub2, l, k);
 					else
 						K053250_draw(machine, bitmap, cliprect, 1, vcblk[5]<<l, 0, 0);
 				}
@@ -1811,7 +1815,8 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 
 				if (nozoom) { scaley = scalex = 0x10000; } else { scalex = zw << 12; scaley = zh << 12; };
 
-				zdrawgfxzoom32GP(bitmap, K053247_gfx, cliprect,
+				zdrawgfxzoom32GP(machine,
+						bitmap, K053247_gfx, cliprect,
 						temp,
 						color,
 						temp1,temp2,

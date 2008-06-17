@@ -308,7 +308,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
@@ -463,9 +462,9 @@ static void K037122_tile_update(running_machine *machine, int chip)
 	}
 }
 
-static void K037122_tile_draw(int chip, bitmap_t *bitmap, const rectangle *cliprect)
+static void K037122_tile_draw(running_machine *machine, int chip, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	const rectangle *visarea = video_screen_get_visible_area(Machine->primary_screen);
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	if (K037122_reg[chip][0xc] & 0x10000)
 	{
@@ -648,7 +647,7 @@ static VIDEO_UPDATE( hornet )
 	voodoo_update(0, bitmap, cliprect);
 
 	K037122_tile_update(screen->machine, 0);
-	K037122_tile_draw(0, bitmap, cliprect);
+	K037122_tile_draw(screen->machine, 0, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);
@@ -666,7 +665,7 @@ static VIDEO_UPDATE( hornet_2board )
 
 		/* TODO: tilemaps per screen */
 		K037122_tile_update(screen->machine, 0);
-		K037122_tile_draw(0, bitmap, cliprect);
+		K037122_tile_draw(screen->machine, 0, bitmap, cliprect);
 	}
 	else if (screen == right_screen)
 	{
@@ -674,7 +673,7 @@ static VIDEO_UPDATE( hornet_2board )
 
 		/* TODO: tilemaps per screen */
 		K037122_tile_update(screen->machine, 1);
-		K037122_tile_draw(1, bitmap, cliprect);
+		K037122_tile_draw(screen->machine, 1, bitmap, cliprect);
 	}
 
 	draw_7segment_led(bitmap, 3, 3, led_reg0);

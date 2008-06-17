@@ -19,7 +19,7 @@ typedef enum
 	AT_KEYBOARD_TYPE_MF2
 } AT_KEYBOARD_TYPE;
 
-void at_keyboard_init(AT_KEYBOARD_TYPE type);
+void at_keyboard_init(running_machine *machine, AT_KEYBOARD_TYPE type);
 
 void at_keyboard_polling(void);
 int at_keyboard_read(void);

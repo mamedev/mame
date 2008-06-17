@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "victory.h"
 
 
@@ -55,11 +54,11 @@ static struct
 
 /* function prototypes */
 static int command2(void);
-static int command3(void);
-static int command4(void);
-static int command5(void);
+static int command3(running_machine *machine);
+static int command4(running_machine *machine);
+static int command5(running_machine *machine);
 static int command6(void);
-static int command7(void);
+static int command7(running_machine *machine);
 
 
 
@@ -232,7 +231,7 @@ WRITE8_HANDLER( victory_video_control_w )
 			if (micro.cmdlo == 5)
 			{
 				if (LOG_MICROCODE) logerror("  Command 5 triggered by write to IH\n");
-				command5();
+				command5(machine);
 			}
 			break;
 
@@ -262,7 +261,7 @@ WRITE8_HANDLER( victory_video_control_w )
 			if (micro.cmdlo == 3)
 			{
 				if (LOG_MICROCODE) logerror(" Command 3 triggered by write to X\n");
-				command3();
+				command3(machine);
 			}
 			break;
 
@@ -272,7 +271,7 @@ WRITE8_HANDLER( victory_video_control_w )
 			if (micro.cmdlo == 4)
 			{
 				if (LOG_MICROCODE) logerror("  Command 4 triggered by write to Y\n");
-				command4();
+				command4(machine);
 			}
 			break;
 
@@ -292,7 +291,7 @@ WRITE8_HANDLER( victory_video_control_w )
 			else if (micro.cmdlo == 7)
 			{
 				if (LOG_MICROCODE) logerror("  Command 7 triggered by write to B\n");
-				command7();
+				command7(machine);
 			}
 			break;
 
@@ -585,7 +584,7 @@ static int command2(void)
  *
  *************************************/
 
-static int command3(void)
+static int command3(running_machine *machine)
 {
 /*
     Actual microcode:
@@ -674,7 +673,7 @@ static int command3(void)
 					rram[dstoffs + 0] ^= src >> shift;
 					rram[dstoffs + 1] ^= src << nshift;
 				}
-				if (fgcoll) victory_update_irq(Machine);
+				if (fgcoll) victory_update_irq(machine);
 			}
 		}
 	}
@@ -692,7 +691,7 @@ static int command3(void)
  *
  *************************************/
 
-static int command4(void)
+static int command4(running_machine *machine)
 {
 /*
     Actual microcode:
@@ -734,11 +733,11 @@ static int command4(void)
 			case 0:												break;
 			case 1:												break;
 			case 2:	keep_going = command2();					break;
-			case 3:	keep_going = command3();					break;
+			case 3:	keep_going = command3(machine);				break;
 			case 4:	micro.pc = micro.yp << 1; keep_going = 1;	break;
-			case 5:	keep_going = command5();					break;
+			case 5:	keep_going = command5(machine);				break;
 			case 6:	keep_going = command6();					break;
-			case 7:	keep_going = command7();					break;
+			case 7:	keep_going = command7(machine);				break;
 		}
 	} while (keep_going);
 
@@ -755,7 +754,7 @@ static int command4(void)
  *
  *************************************/
 
-static int command5(void)
+static int command5(running_machine *machine)
 {
 /*
     Actual microcode:
@@ -874,7 +873,7 @@ static int command5(void)
 			}
 			acc &= 0xff;
 		}
-		if (fgcoll) victory_update_irq(Machine);
+		if (fgcoll) victory_update_irq(machine);
 	}
 
 	micro.xp = x;
@@ -941,7 +940,7 @@ static int command6(void)
  *
  *************************************/
 
-static int command7(void)
+static int command7(running_machine *machine)
 {
 /*
     Actual microcode:
@@ -1004,7 +1003,7 @@ static int command7(void)
 			rram[addr + 0] ^= micro.r >> shift;
 			rram[addr + 1] ^= micro.r << nshift;
 		}
-		if (fgcoll) victory_update_irq(Machine);
+		if (fgcoll) victory_update_irq(machine);
 	}
 
 	count_states(4);

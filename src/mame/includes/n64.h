@@ -59,9 +59,9 @@ extern UINT32 n64_vi_width;
 extern UINT32 n64_vi_origin;
 extern UINT32 n64_vi_control;
 
-extern void dp_full_sync(void);
-extern void signal_rcp_interrupt(int interrupt);
-extern void clear_rcp_interrupt(int interrupt);
+extern void dp_full_sync(running_machine *machine);
+extern void signal_rcp_interrupt(running_machine *machine, int interrupt);
+extern void clear_rcp_interrupt(running_machine *machine, int interrupt);
 
 
 /* read/write handlers for the N64 subsystems */
@@ -84,6 +84,6 @@ extern WRITE32_HANDLER( n64_si_reg_w );
 extern READ32_HANDLER( n64_pif_ram_r );
 extern WRITE32_HANDLER( n64_pif_ram_w );
 
-void n64_machine_reset(void);
+void n64_machine_reset(running_machine *machine);
 
 #endif

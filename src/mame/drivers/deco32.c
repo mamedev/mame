@@ -3277,7 +3277,7 @@ static DRIVER_INIT( nslasher )
 
 	deco156_decrypt();
 
-	soundlatch_setclearedvalue(0xff);
+	soundlatch_setclearedvalue(machine, 0xff);
 
 	/* The board for Night Slashers is very close to the Fighter's History and
     Tattoo Assassins boards, but has an encrypted ARM cpu. */

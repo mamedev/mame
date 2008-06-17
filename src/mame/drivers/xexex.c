@@ -145,7 +145,7 @@ static WRITE16_HANDLER( K053247_scattered_word_w )
 #endif
 
 
-static void xexex_objdma(int limiter)
+static void xexex_objdma(running_machine *machine, int limiter)
 {
 	static int frame = -1;
 
@@ -153,7 +153,7 @@ static void xexex_objdma(int limiter)
 	UINT16 *src, *dst;
 
 	counter = frame;
-	frame = video_screen_get_frame_number(Machine->primary_screen);
+	frame = video_screen_get_frame_number(machine->primary_screen);
 	if (limiter && counter == frame) return; // make sure we only do DMA transfer once per frame
 
 	K053247_export_config(&dst, 0, 0, 0, &counter);
@@ -328,7 +328,7 @@ static INTERRUPT_GEN( xexex_interrupt )
 			if (K053246_is_IRQ_enabled())
 			{
 				// OBJDMA starts at the beginning of V-blank
-				xexex_objdma(0);
+				xexex_objdma(machine, 0);
 
 				// schedule DMA end interrupt
 				timer_adjust_oneshot(dmadelay_timer, XE_DMADELAY, 0);

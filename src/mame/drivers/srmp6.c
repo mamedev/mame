@@ -91,7 +91,7 @@ static const gfx_layout tiles8x8_layout =
 	8*64
 };
 
-static void update_palette(void)
+static void update_palette(running_machine *machine)
 {
 	INT8 r, g ,b;
 	int brg = brightness - 0x60;
@@ -119,7 +119,7 @@ static void update_palette(void)
 			b += ((0x1F - b) * brg) >> 5;
 			if(b > 0x1F) b = 0x1F;
 		}
-		palette_set_color(Machine, i, MAKE_RGB(r << 3, g << 3, b << 3));
+		palette_set_color(machine, i, MAKE_RGB(r << 3, g << 3, b << 3));
 	}
 }
 
@@ -146,14 +146,14 @@ static VIDEO_START(srmp6)
 
 /* Debug code */
 #ifdef UNUSED_FUNCTION
-static void srmp6_decode_charram(void)
+static void srmp6_decode_charram(running_machine *machine)
 {
 	if(input_code_pressed_once(KEYCODE_Z))
 	{
 		int i;
 		for (i=0;i<(0x100000*16)/0x40;i++)
 		{
-			decodechar(Machine->gfx[0], i, (UINT8*)tileram);
+			decodechar(machine->gfx[0], i, (UINT8*)tileram);
 			dirty_tileram[i] = 0;
 		}
 	}
@@ -181,7 +181,7 @@ static VIDEO_UPDATE(srmp6)
 
 #if 0
 	/* debug */
-	srmp6_decode_charram();
+	srmp6_decode_charram(screen->machine);
 
 
 
@@ -381,7 +381,7 @@ static WRITE16_HANDLER( video_regs_w )
 			data = (!data)?0x60:(data == 0x5e)?0x60:data;
 			if(brightness != data) {
 				brightness = data;
-				update_palette();
+				update_palette(machine);
 			}
 			break;
 

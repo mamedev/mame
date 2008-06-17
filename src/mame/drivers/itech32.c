@@ -286,29 +286,29 @@ INLINE int determine_irq_state(int vint, int xint, int qint)
 }
 
 
-void itech32_update_interrupts(int vint, int xint, int qint)
+void itech32_update_interrupts(running_machine *machine, int vint, int xint, int qint)
 {
 	int level = determine_irq_state(vint, xint, qint);
 
 	/* update it */
 	if (level)
-		cpunum_set_input_line(Machine, 0, level, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, level, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 0, 7, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
 }
 
 
 static INTERRUPT_GEN( generate_int1 )
 {
 	/* signal the NMI */
-	itech32_update_interrupts(1, -1, -1);
+	itech32_update_interrupts(machine, 1, -1, -1);
 	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(machine->primary_screen));
 }
 
 
 static WRITE16_HANDLER( int1_ack_w )
 {
-	itech32_update_interrupts(0, -1, -1);
+	itech32_update_interrupts(machine, 0, -1, -1);
 }
 
 

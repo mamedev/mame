@@ -7,7 +7,7 @@
 
 /*----------- defined in drivers/dcheese.c -----------*/
 
-void dcheese_signal_irq(int which);
+void dcheese_signal_irq(running_machine *machine, int which);
 
 
 /*----------- defined in video/dcheese.c -----------*/

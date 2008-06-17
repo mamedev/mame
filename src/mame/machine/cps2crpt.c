@@ -111,7 +111,6 @@ the decryption keys.
 *******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68kmame.h"
 #include "ui.h"
 #include "includes/cps1.h"
@@ -631,7 +630,7 @@ static void optimise_sboxes(struct optimised_sbox* out, const struct sbox* in)
 
 
 
-static void cps2_decrypt(const UINT32 *master_key, UINT32 upper_limit)
+static void cps2_decrypt(running_machine *machine, const UINT32 *master_key, UINT32 upper_limit)
 {
 	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
 	int length = memory_region_length(REGION_CPU1);
@@ -674,7 +673,7 @@ static void cps2_decrypt(const UINT32 *master_key, UINT32 upper_limit)
 		{
 			char loadingMessage[256]; // for displaying with UI
 			sprintf(loadingMessage, "Decrypting %d%%", i*100/0x10000);
-			ui_set_startup_text(Machine, loadingMessage,FALSE);
+			ui_set_startup_text(machine, loadingMessage,FALSE);
 		}
 
 
@@ -971,7 +970,7 @@ DRIVER_INIT( cps2crpt )
 		if (strcmp(k->name, gamename) == 0)
 		{
 			// we have a proper key so use it to decrypt
-			cps2_decrypt(k->keys, k->upper_limit ? k->upper_limit : 0x400000);
+			cps2_decrypt(machine, k->keys, k->upper_limit ? k->upper_limit : 0x400000);
 
 			break;
 		}

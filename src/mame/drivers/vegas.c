@@ -1345,7 +1345,7 @@ static WRITE32_HANDLER( sio_irq_clear_w )
 		/* bit 0x01 seems to be used to reset the IOASIC */
 		if (!(data & 0x01))
 		{
-			midway_ioasic_reset();
+			midway_ioasic_reset(machine);
 			dcs_reset_w(data & 0x01);
 		}
 
@@ -1473,7 +1473,7 @@ static WRITE32_HANDLER( vegas_watchdog_w )
 
 static WRITE32_HANDLER( asic_fifo_w )
 {
-	midway_ioasic_fifo_w(data);
+	midway_ioasic_fifo_w(machine, data);
 }
 
 
@@ -1523,7 +1523,7 @@ static WRITE32_HANDLER( ethernet_w )
 
 static WRITE32_HANDLER( dcs3_fifo_full_w )
 {
-	midway_ioasic_fifo_full_w(data);
+	midway_ioasic_fifo_full_w(machine, data);
 }
 
 
@@ -2461,7 +2461,7 @@ static void init_common(running_machine *machine, int ioasic, int serialnum)
 	};
 
 	/* initialize the subsystems */
-	midway_ioasic_init(ioasic, serialnum, 80, ioasic_irq);
+	midway_ioasic_init(machine, ioasic, serialnum, 80, ioasic_irq);
 	midway_ioasic_set_auto_ack(1);
 	smc91c94_init(&ethernet_intf);
 

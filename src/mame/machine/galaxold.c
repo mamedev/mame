@@ -309,13 +309,13 @@ READ8_HANDLER( _4in1_input_port_2_r )
 }
 
 
-static void gmgalax_select_game(int game)
+static void gmgalax_select_game(running_machine *machine, int game)
 {
 	gmgalax_selected_game = game;
 
 	memory_set_bank(1, game);
 
-	galaxold_gfxbank_w(Machine, 0, gmgalax_selected_game);
+	galaxold_gfxbank_w(machine, 0, gmgalax_selected_game);
 }
 
 READ8_HANDLER( gmgalax_input_port_0_r )
@@ -517,7 +517,7 @@ DRIVER_INIT( gmgalax )
 
 	state_save_register_global(gmgalax_selected_game);
 
-	gmgalax_select_game(input_port_read_indexed(machine, 6) & 0x01);
+	gmgalax_select_game(machine, input_port_read_indexed(machine, 6) & 0x01);
 }
 
 INTERRUPT_GEN( gmgalax_vh_interrupt )
@@ -527,7 +527,7 @@ INTERRUPT_GEN( gmgalax_vh_interrupt )
 
 	if (gmgalax_selected_game != new_game)
 	{
-		gmgalax_select_game(new_game);
+		gmgalax_select_game(machine, new_game);
 
 		/* Ghost Muncher never clears this */
 		galaxold_stars_enable_w(machine, 0, 0);

@@ -898,8 +898,8 @@ static UINT8 namco_06xx_data_read(running_machine *machine, int chipnum)
 
 	switch (io[chipnum].type)
 	{
-		case NAMCOIO_50XX:   return namco_50xx_read();
-		case NAMCOIO_50XX_2: return namco_50xx_2_read();
+		case NAMCOIO_50XX:   return namco_50xx_read(machine);
+		case NAMCOIO_50XX_2: return namco_50xx_2_read(machine);
 		case NAMCOIO_51XX: return namcoio_51XX_read(machine, chipnum);
 		case NAMCOIO_53XX_DIGDUG:  return namcoio_53XX_digdug_read(machine, chipnum);
 		case NAMCOIO_53XX_POLEPOS: return namcoio_53XX_polepos_read(machine, chipnum);
@@ -916,8 +916,8 @@ static void namco_06xx_data_write(running_machine *machine,int chipnum,UINT8 dat
 
 	switch (io[chipnum].type)
 	{
-		case NAMCOIO_50XX:   namco_50xx_write(data); break;
-		case NAMCOIO_50XX_2: namco_50xx_2_write(data); break;
+		case NAMCOIO_50XX:   namco_50xx_write(machine, data); break;
+		case NAMCOIO_50XX_2: namco_50xx_2_write(machine, data); break;
 		case NAMCOIO_51XX:   namcoio_51XX_write(machine,chipnum,data); break;
 		case NAMCOIO_52XX:   namcoio_52XX_write(data); break;
 		case NAMCOIO_54XX:   namco_54xx_write(data); break;
@@ -928,14 +928,14 @@ static void namco_06xx_data_write(running_machine *machine,int chipnum,UINT8 dat
 }
 
 
-static void namco_06xx_read_request(int chipnum)
+static void namco_06xx_read_request(running_machine *machine, int chipnum)
 {
 	LOG(("requesting read to chip %d\n",chipnum%3));
 
 	switch (io[chipnum].type)
 	{
-		case NAMCOIO_50XX:   namco_50xx_read_request(); break;
-		case NAMCOIO_50XX_2: namco_50xx_2_read_request(); break;
+		case NAMCOIO_50XX:   namco_50xx_read_request(machine); break;
+		case NAMCOIO_50XX_2: namco_50xx_2_read_request(machine); break;
 		default:
 			logerror("%04x: custom IO type %d read_request unsupported\n",activecpu_get_pc(),io[chipnum].type);
 			break;
@@ -995,7 +995,7 @@ static UINT8 namco_06xx_ctrl_r(int chip)
 	return customio_command[chip];
 }
 
-static void namco_06xx_ctrl_w(int chip,int data)
+static void namco_06xx_ctrl_w(running_machine *machine, int chip,int data)
 {
 	LOG(("%04x: 06XX #%d command %02x\n",activecpu_get_pc(),chip,data));
 
@@ -1020,10 +1020,10 @@ static void namco_06xx_ctrl_w(int chip,int data)
 		{
 			switch (customio_command[chip] & 0xf)
 			{
-				case 0x1: namco_06xx_read_request(4*chip + 0); break;
-				case 0x2: namco_06xx_read_request(4*chip + 1); break;
-				case 0x4: namco_06xx_read_request(4*chip + 2); break;
-				case 0x8: namco_06xx_read_request(4*chip + 3); break;
+				case 0x1: namco_06xx_read_request(machine, 4*chip + 0); break;
+				case 0x2: namco_06xx_read_request(machine, 4*chip + 1); break;
+				case 0x4: namco_06xx_read_request(machine, 4*chip + 2); break;
+				case 0x8: namco_06xx_read_request(machine, 4*chip + 3); break;
 				default:
 					logerror("%04x: 06XX #%d read in unsupported mode %02x\n",activecpu_get_pc(),chip,customio_command[chip]);
 			}
@@ -1039,5 +1039,5 @@ WRITE8_HANDLER( namco_06xx_0_data_w )	{ namco_06xx_data_w(machine,0,offset,data)
 WRITE8_HANDLER( namco_06xx_1_data_w )	{ namco_06xx_data_w(machine,1,offset,data); }
 READ8_HANDLER( namco_06xx_0_ctrl_r )		{ return namco_06xx_ctrl_r(0); }
 READ8_HANDLER( namco_06xx_1_ctrl_r )		{ return namco_06xx_ctrl_r(1); }
-WRITE8_HANDLER( namco_06xx_0_ctrl_w )	{ namco_06xx_ctrl_w(0,data); }
-WRITE8_HANDLER( namco_06xx_1_ctrl_w )	{ namco_06xx_ctrl_w(1,data); }
+WRITE8_HANDLER( namco_06xx_0_ctrl_w )	{ namco_06xx_ctrl_w(machine, 0,data); }
+WRITE8_HANDLER( namco_06xx_1_ctrl_w )	{ namco_06xx_ctrl_w(machine, 1,data); }

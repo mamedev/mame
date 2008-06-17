@@ -152,7 +152,7 @@ static STATE_POSTLOAD( s24_fd1094_postload )
 }
 
 /* startup function, to be called from DRIVER_INIT (once on startup) */
-void s24_fd1094_driver_init(void)
+void s24_fd1094_driver_init(running_machine *machine)
 {
 	int i;
 
@@ -179,5 +179,5 @@ void s24_fd1094_driver_init(void)
 
 	state_save_register_global(fd1094_selected_state);
 	state_save_register_global(fd1094_state);
-	state_save_register_postload(Machine, s24_fd1094_postload, NULL);
+	state_save_register_postload(machine, s24_fd1094_postload, NULL);
 }

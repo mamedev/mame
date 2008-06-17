@@ -162,7 +162,7 @@ static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const recta
 
 static TIMER_CALLBACK( sprint8_collision_callback )
 {
-	sprint8_set_collision(param);
+	sprint8_set_collision(machine, param);
 }
 
 

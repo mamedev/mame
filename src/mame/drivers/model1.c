@@ -679,12 +679,12 @@ static WRITE16_HANDLER( bank_w )
 
 static int last_irq;
 
-static void irq_raise(int level)
+static void irq_raise(running_machine *machine, int level)
 {
 	//  logerror("irq: raising %d\n", level);
 	//  irq_status |= (1 << level);
 	last_irq = level;
-	cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
 static IRQ_CALLBACK(irq_callback)
@@ -705,9 +705,9 @@ static IRQ_CALLBACK(irq_callback)
 // 3 = ff54c
 // other = ff568/ff574
 
-static void irq_init(void)
+static void irq_init(running_machine *machine)
 {
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	cpunum_set_irq_callback(0, irq_callback);
 }
 
@@ -715,11 +715,11 @@ static INTERRUPT_GEN(model1_interrupt)
 {
 	if (cpu_getiloops())
 	{
-		irq_raise(1);
+		irq_raise(machine, 1);
 	}
 	else
 	{
-		irq_raise(model1_sound_irq);
+		irq_raise(machine, model1_sound_irq);
 
 		// if the FIFO has something in it, signal the 68k too
 		if (fifo_rptr != fifo_wptr)
@@ -732,7 +732,7 @@ static INTERRUPT_GEN(model1_interrupt)
 static MACHINE_RESET(model1)
 {
 	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x1000000);
-	irq_init();
+	irq_init(machine);
 	model1_tgp_reset(!strcmp(machine->gamedrv->name, "swa") || !strcmp(machine->gamedrv->name, "wingwar") || !strcmp(machine->gamedrv->name, "wingwara"));
 	if (!strcmp(machine->gamedrv->name, "swa"))
 	{
@@ -751,7 +751,7 @@ static MACHINE_RESET(model1)
 static MACHINE_RESET(model1_vr)
 {
 	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x1000000);
-	irq_init();
+	irq_init(machine);
 	model1_vr_tgp_reset();
 	model1_sound_irq = 3;
 

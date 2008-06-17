@@ -930,7 +930,7 @@ static const UINT8 *i8751_initial_config;
  *************************************/
 
 extern void fd1094_machine_init(void);
-extern void fd1094_driver_init(void (*set_decrypted)(UINT8 *));
+extern void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(UINT8 *));
 
 static READ16_HANDLER( misc_io_r );
 static WRITE16_HANDLER( misc_io_w );
@@ -1062,7 +1062,7 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 	segaic16_memory_mapper_init(machine, 0, region_info_list[rom_board], sound_w, NULL);
 
 	/* init the FD1094 */
-	fd1094_driver_init(segaic16_memory_mapper_set_decrypted);
+	fd1094_driver_init(machine, segaic16_memory_mapper_set_decrypted);
 
 	/* reset the custom handlers and other pointers */
 	custom_io_r = NULL;

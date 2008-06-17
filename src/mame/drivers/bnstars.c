@@ -298,7 +298,7 @@ static WRITE32_HANDLER( ms32_roz1_ram_w )
 }
 
 
-static void update_color(int color, int screen)
+static void update_color(running_machine *machine, int color, int screen)
 {
 	int r,g,b;
 
@@ -306,19 +306,19 @@ static void update_color(int color, int screen)
 	g = ((ms32_pal_ram[screen][color*2] & 0x00ff) >>0 );
 	b = ((ms32_pal_ram[screen][color*2+1] & 0x00ff) >>0 );
 
-	palette_set_color(Machine,color+screen*0x8000,MAKE_RGB(r,g,b));
+	palette_set_color(machine,color+screen*0x8000,MAKE_RGB(r,g,b));
 }
 
 static WRITE32_HANDLER( ms32_pal0_ram_w )
 {
 	COMBINE_DATA(&ms32_pal_ram[0][offset]);
-	update_color(offset/2, 0);
+	update_color(machine, offset/2, 0);
 }
 
 static WRITE32_HANDLER( ms32_pal1_ram_w )
 {
 	COMBINE_DATA(&ms32_pal_ram[1][offset]);
-	update_color(offset/2, 1);
+	update_color(machine, offset/2, 1);
 }
 
 static int ms32_reverse_sprite_order = 0;

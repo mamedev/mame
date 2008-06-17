@@ -59,7 +59,6 @@ Dip sw.2
 */
 
 #include "driver.h"
-#include "deprecat.h"
 
 static UINT16 littlerb_vdp_address_low;
 static UINT16 littlerb_vdp_address_high;
@@ -78,7 +77,7 @@ static UINT16* littlerb_region3;
 static UINT16* littlerb_region4;
 
 
-static void littlerb_data_write(UINT16 data)
+static void littlerb_data_write(running_machine *machine, UINT16 data)
 {
 	UINT32 addr = littlerb_write_address>>4; // is this right? should we shift?
 
@@ -105,7 +104,7 @@ static void littlerb_data_write(UINT16 data)
 			r = littlerb_region2[x+1];
 			g = littlerb_region2[x+2];
 
-			palette_set_color(Machine,x/3,MAKE_RGB(r,g,b));
+			palette_set_color(machine,x/3,MAKE_RGB(r,g,b));
 		}
 
 
@@ -175,7 +174,7 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 
 
 		case 2:
-		littlerb_data_write(data);
+		littlerb_data_write(machine, data);
 		break;
 
 		case 3:

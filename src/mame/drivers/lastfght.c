@@ -109,7 +109,7 @@ static VIDEO_UPDATE( lastfght )
 		{
 			for ( x = 0; x < 512; x++ )
 			{
-				data = ( ((count&0xf)==0)&&((count&0x1e00)==0) )? get_white_pen(Machine) : gfxdata[count];	// white grid or data
+				data = ( ((count&0xf)==0)&&((count&0x1e00)==0) )? get_white_pen(screen->machine) : gfxdata[count];	// white grid or data
 				*BITMAP_ADDR16(bitmap, y, x) = data;
 				count++;
 			}

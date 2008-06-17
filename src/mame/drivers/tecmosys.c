@@ -188,7 +188,6 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 #include "sound/okim6295.h"
 #include "sound/262intf.h"
 #include "sound/ymz280b.h"
-#include "deprecat.h"
 
 static UINT16* tecmosys_spriteram;
 static UINT16* tilemap_paletteram16;
@@ -399,16 +398,16 @@ static WRITE16_HANDLER( eeprom_w )
 }
 
 
-INLINE void set_color_555(pen_t color, int rshift, int gshift, int bshift, UINT16 data)
+INLINE void set_color_555(running_machine *machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
-	palette_set_color_rgb(Machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
+	palette_set_color_rgb(machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
 
 static WRITE16_HANDLER( tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w )
 {
 	COMBINE_DATA(&tilemap_paletteram16[offset]);
-	set_color_555(offset+0x4000, 5, 10, 0, tilemap_paletteram16[offset]);
+	set_color_555(machine, offset+0x4000, 5, 10, 0, tilemap_paletteram16[offset]);
 }
 
 static WRITE16_HANDLER( bg0_tilemap_lineram_w )
@@ -731,9 +730,9 @@ static void tecmosys_tilemap_copy_to_compose(UINT16 pri)
 	}
 }
 
-static void tecmosys_do_final_mix(bitmap_t* bitmap)
+static void tecmosys_do_final_mix(running_machine *machine, bitmap_t* bitmap)
 {
-	const pen_t *paldata = Machine->pens;
+	const pen_t *paldata = machine->pens;
 	int y,x;
 	UINT16 *srcptr;
 	UINT16 *srcptr2;
@@ -806,7 +805,7 @@ static void tecmosys_do_final_mix(bitmap_t* bitmap)
 static VIDEO_UPDATE(deroon)
 {
 
-	fillbitmap(bitmap,Machine->pens[0x4000],cliprect);
+	fillbitmap(bitmap,screen->machine->pens[0x4000],cliprect);
 
 
 	tilemap_set_scrolly( bg0tilemap, 0, tecmosys_c80000regs[1]+16);
@@ -837,7 +836,7 @@ static VIDEO_UPDATE(deroon)
 	tecmosys_tilemap_copy_to_compose(0xc000);
 
 
-	tecmosys_do_final_mix(bitmap);
+	tecmosys_do_final_mix(screen->machine, bitmap);
 
 /*
     popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x | %04x %04x %04x %04x  | %04x %04x %04x %04x  | %04x %04x %04x %04x  | %04x %04x %04x %04x",

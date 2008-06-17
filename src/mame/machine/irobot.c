@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "profiler.h"
 #include "cpu/m6809/m6809.h"
 #include "irobot.h"
@@ -27,7 +26,7 @@
 
 #define IR_CPU_STATE \
 	logerror(\
-			"pc: %4x, scanline: %d\n", activecpu_get_previouspc(), video_screen_get_vpos(Machine->primary_screen))
+			"pc: %4x, scanline: %d\n", activecpu_get_previouspc(), video_screen_get_vpos(machine->primary_screen))
 
 
 UINT8 irobot_vg_clear;
@@ -51,7 +50,7 @@ UINT8 *irobot_combase;
 UINT8 irobot_bufsel;
 UINT8 irobot_alphamap;
 
-static void irmb_run(void);
+static void irmb_run(running_machine *machine);
 
 
 /***********************************************************************/
@@ -118,7 +117,7 @@ WRITE8_HANDLER( irobot_statwr_w )
 		irvg_running=1;
 	}
 	if ((data & 0x10) && !(irobot_statwr & 0x10))
-		irmb_run();
+		irmb_run(machine);
 	irobot_statwr = data;
 }
 
@@ -575,7 +574,7 @@ static TIMER_CALLBACK( irmb_done_callback )
 
 
 /* Run mathbox */
-static void irmb_run(void)
+static void irmb_run(running_machine *machine)
 {
 	const irmb_ops *prevop = &mbops[0];
 	const irmb_ops *curop = &mbops[0];
@@ -862,7 +861,7 @@ default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
 		timer_adjust_oneshot(irmb_timer, attotime_mul(ATTOTIME_IN_NSEC(200), icount), 0);
 	}
 #else
-	cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
 #endif
 	irmb_running=1;
 }

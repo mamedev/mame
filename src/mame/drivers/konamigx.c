@@ -817,13 +817,13 @@ static READ32_HANDLER( sound020_r )
 	return(rv);
 }
 
-INLINE void write_snd_020(int reg, int val)
+INLINE void write_snd_020(running_machine *machine, int reg, int val)
 {
 	sndto000[reg] = val;
 
 	if (reg == 7)
 	{
-		cpunum_set_input_line(Machine, 1, 1, HOLD_LINE);
+		cpunum_set_input_line(machine, 1, 1, HOLD_LINE);
 	}
 }
 
@@ -835,14 +835,14 @@ static WRITE32_HANDLER( sound020_w )
 	{
 		reg = offset<<1;
 		val = data>>24;
-		write_snd_020(reg, val);
+		write_snd_020(machine, reg, val);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
 		reg = (offset<<1)+1;
 		val = (data>>8)&0xff;
-		write_snd_020(reg, val);
+		write_snd_020(machine, reg, val);
 	}
 }
 

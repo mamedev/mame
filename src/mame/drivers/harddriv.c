@@ -179,7 +179,7 @@
 #include "sound/dac.h"
 
 /* from slapstic.c */
-void slapstic_init(int chip);
+void slapstic_init(running_machine *machine, int chip);
 
 
 
@@ -3522,7 +3522,7 @@ static void init_dsk(running_machine *machine)
 	hddsk_rom = (UINT16 *)(memory_region(REGION_USER3) + 0x00000);
 
 	/* set up the ASIC65 */
-	asic65_config(ASIC65_STANDARD);
+	asic65_config(machine, ASIC65_STANDARD);
 }
 
 
@@ -3549,7 +3549,7 @@ static void init_dsk2(running_machine *machine)
 	hddsk_rom = (UINT16 *)(memory_region(REGION_USER3) + 0x000000);
 
 	/* set up the ASIC65 */
-	asic65_config(ASIC65_STANDARD);
+	asic65_config(machine, ASIC65_STANDARD);
 }
 
 
@@ -3562,7 +3562,7 @@ static void init_dspcom(running_machine *machine)
 	memory_install_read16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x901000, 0x910001, 0, 0, asic65_io_r);
 
 	/* set up the ASIC65 */
-	asic65_config(ASIC65_STEELTAL);
+	asic65_config(machine, ASIC65_STEELTAL);
 
 	/* install DSPCOM control */
 	memory_install_write16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x904000, 0x90401f, 0, 0, hddspcom_control_w);
@@ -3685,7 +3685,7 @@ static DRIVER_INIT( racedriv )
 	init_driver_sound(machine);
 
 	/* set up the slapstic */
-	slapstic_init(117);
+	slapstic_init(machine, 117);
 	hd68k_slapstic_base = memory_install_readwrite16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0xe0000, 0xfffff, 0, 0, rd68k_slapstic_r, rd68k_slapstic_w);
 
 	/* synchronization */
@@ -3710,7 +3710,7 @@ static void racedrvc_init_common(running_machine *machine, offs_t gsp_protection
 	init_driver_sound(machine);
 
 	/* set up the slapstic */
-	slapstic_init(117);
+	slapstic_init(machine, 117);
 	hd68k_slapstic_base = memory_install_readwrite16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0xe0000, 0xfffff, 0, 0, rd68k_slapstic_r, rd68k_slapstic_w);
 
 	/* synchronization */
@@ -3800,7 +3800,7 @@ static DRIVER_INIT( strtdriv )
 	init_dsk(machine);
 
 	/* set up the slapstic */
-	slapstic_init(117);
+	slapstic_init(machine, 117);
 	hd68k_slapstic_base = memory_install_readwrite16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0xe0000, 0xfffff, 0, 0, rd68k_slapstic_r, rd68k_slapstic_w);
 
 	memory_install_read16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0xa80000, 0xafffff, 0, 0, hda68k_port1_r);

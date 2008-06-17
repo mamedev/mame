@@ -40,7 +40,6 @@ Note: this is quite clearly a 'Korean bootleg' of Shisensho - Joshiryo-Hen / Mat
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 
@@ -83,25 +82,25 @@ static WRITE8_HANDLER( onetwo_soundlatch_w )
 	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void setColor(int offset)
+static void setColor(running_machine *machine, int offset)
 {
 		int r,g,b;
 		r=paletteram[offset]&0x1f;
 		g=paletteram_2[offset]&0x1f;
 		b=((paletteram[offset]&0x60)>>2)|((paletteram_2[offset]&0xe0)>>5);
-		palette_set_color_rgb(Machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 static WRITE8_HANDLER(palette1_w)
 {
 	paletteram[offset]=data;
-	setColor(offset);
+	setColor(machine, offset);
 }
 
 static WRITE8_HANDLER(palette2_w)
 {
 	paletteram_2[offset]=data;
-	setColor(offset);
+	setColor(machine, offset);
 }
 
 /* Main CPU */

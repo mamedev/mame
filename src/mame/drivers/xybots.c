@@ -388,7 +388,7 @@ ROM_END
 static DRIVER_INIT( xybots )
 {
 	atarigen_eeprom_default = NULL;
-	atarigen_slapstic_init(0, 0x008000, 0, 107);
+	atarigen_slapstic_init(machine, 0, 0x008000, 0, 107);
 	atarijsa_init(machine, 1, 0x0100);
 }
 

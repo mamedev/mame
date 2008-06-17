@@ -38,13 +38,13 @@ static void (*set_keyb_int)(int);
 static TIMER_CALLBACK( pc_keyb_timer );
 
 
-void init_pc_common(UINT32 flags, void (*set_keyb_int_func)(int))
+void init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb_int_func)(int))
 {
 	/* PC-XT keyboard */
 	if (flags & PCCOMMON_KEYBOARD_AT)
-		at_keyboard_init(AT_KEYBOARD_TYPE_AT);
+		at_keyboard_init(machine, AT_KEYBOARD_TYPE_AT);
 	else
-		at_keyboard_init(AT_KEYBOARD_TYPE_PC);
+		at_keyboard_init(machine, AT_KEYBOARD_TYPE_PC);
 	at_keyboard_set_scan_code_set(1);
 
 	set_keyb_int = set_keyb_int_func;

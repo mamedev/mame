@@ -578,7 +578,7 @@ static DRIVER_INIT(mtnew)
 
 static VIDEO_START(mtnew)
 {
-	init_for_megadrive(); // create an sms vdp too, for comptibility mode
+	init_for_megadrive(machine); // create an sms vdp too, for comptibility mode
 	VIDEO_START_CALL(megadriv);
 }
 //attotime_never

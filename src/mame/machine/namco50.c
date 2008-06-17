@@ -130,7 +130,6 @@ Flags: 80=high score, 40=first bonus, 20=interval bonus, 10=?
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "namco50.h"
 #include "cpu/mb88xx/mb88xx.h"
 
@@ -258,9 +257,9 @@ static TIMER_CALLBACK( namco_50xx_irq_clear )
 	cpunum_set_input_line(machine, param, 0, CLEAR_LINE);
 }
 
-static void namco_50xx_irq_set(int cpunum)
+static void namco_50xx_irq_set(running_machine *machine, int cpunum)
 {
-	cpunum_set_input_line(Machine, cpunum, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, cpunum, 0, ASSERT_LINE);
 
 	// The execution time of one instruction is ~4us, so we must make sure to
 	// give the cpu time to poll the /IRQ input before we clear it.
@@ -270,70 +269,70 @@ static void namco_50xx_irq_set(int cpunum)
 	timer_set(ATTOTIME_IN_USEC(21), NULL, cpunum, namco_50xx_irq_clear);
 }
 
-void namco_50xx_write(UINT8 data)
+void namco_50xx_write(running_machine *machine, UINT8 data)
 {
-	int cpunum = mame_find_cpu_index(Machine, CPUTAG_50XX);
+	int cpunum = mame_find_cpu_index(machine, CPUTAG_50XX);
 
 	if (cpunum == -1)
 		return;
 
 	timer_call_after_resynch(NULL, data, namco_50xx_latch_callback);
 
-	namco_50xx_irq_set(cpunum);
+	namco_50xx_irq_set(machine, cpunum);
 }
 
-void namco_50xx_2_write(UINT8 data)
+void namco_50xx_2_write(running_machine *machine, UINT8 data)
 {
-	int cpunum = mame_find_cpu_index(Machine, CPUTAG_50XX_2);
+	int cpunum = mame_find_cpu_index(machine, CPUTAG_50XX_2);
 
 	if (cpunum == -1)
 		return;
 
 	timer_call_after_resynch(NULL, data, namco_50xx_2_latch_callback);
 
-	namco_50xx_irq_set(cpunum);
+	namco_50xx_irq_set(machine, cpunum);
 }
 
 
-void namco_50xx_read_request(void)
+void namco_50xx_read_request(running_machine *machine)
 {
-	int cpunum = mame_find_cpu_index(Machine, CPUTAG_50XX);
+	int cpunum = mame_find_cpu_index(machine, CPUTAG_50XX);
 
 	if (cpunum == -1)
 		return;
 
 	timer_call_after_resynch(NULL, 0, namco_50xx_readrequest_callback);
 
-	namco_50xx_irq_set(cpunum);
+	namco_50xx_irq_set(machine, cpunum);
 }
 
-void namco_50xx_2_read_request(void)
+void namco_50xx_2_read_request(running_machine *machine)
 {
-	int cpunum = mame_find_cpu_index(Machine, CPUTAG_50XX_2);
+	int cpunum = mame_find_cpu_index(machine, CPUTAG_50XX_2);
 
 	if (cpunum == -1)
 		return;
 
 	timer_call_after_resynch(NULL, 0, namco_50xx_2_readrequest_callback);
 
-	namco_50xx_irq_set(cpunum);
+	namco_50xx_irq_set(machine, cpunum);
 }
 
 
-UINT8 namco_50xx_read(void)
+UINT8 namco_50xx_read(running_machine *machine)
 {
 	UINT8 res = portO[0];
 
-	namco_50xx_read_request();
+	namco_50xx_read_request(machine);
 
 	return res;
 }
 
-UINT8 namco_50xx_2_read(void)
+UINT8 namco_50xx_2_read(running_machine *machine)
 {
 	UINT8 res = portO[1];
 
-	namco_50xx_2_read_request();
+	namco_50xx_2_read_request(machine);
 
 	return res;
 }

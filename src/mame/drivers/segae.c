@@ -765,7 +765,7 @@ static UINT8 vdp_data_r(struct sms_vdp *chip)
 	return retdata;
 }
 
-static void vdp_data_w(UINT8 data, struct sms_vdp* chip)
+static void vdp_data_w(running_machine *machine, UINT8 data, struct sms_vdp* chip)
 {
 	/* data writes clear the pending flag */
 	chip->cmd_pend = 0;
@@ -801,7 +801,7 @@ static void vdp_data_w(UINT8 data, struct sms_vdp* chip)
 					r = (palword & 0x000f)>>0;
 					g = (palword & 0x00f0)>>4;
 					b = (palword & 0x0f00)>>8;
-					palette_set_color_rgb(Machine,(chip->addr_reg&0x3e)/2, pal4bit(r), pal4bit(g), pal4bit(b));
+					palette_set_color_rgb(machine,(chip->addr_reg&0x3e)/2, pal4bit(r), pal4bit(g), pal4bit(b));
 					chip->cram_mamecolours[(chip->addr_reg&0x3e)/2]=(b<<1)|(g<<6)|(r<<11);
 				}
 			}
@@ -816,7 +816,7 @@ static void vdp_data_w(UINT8 data, struct sms_vdp* chip)
 				r = (data & 0x03)>>0;
 				g = (data & 0x0c)>>2;
 				b = (data & 0x30)>>4;
-				palette_set_color_rgb(Machine,chip->addr_reg&0x1f, pal2bit(r), pal2bit(g), pal2bit(b));
+				palette_set_color_rgb(machine,chip->addr_reg&0x1f, pal2bit(r), pal2bit(g), pal2bit(b));
 				chip->cram_mamecolours[chip->addr_reg&0x1f]=(b<<3)|(g<<8)|(r<<13);
 			}
 
@@ -945,7 +945,7 @@ READ8_HANDLER( md_sms_vdp_data_r )
 
 WRITE8_HANDLER( md_sms_vdp_data_w )
 {
-	vdp_data_w(data, md_sms_vdp);
+	vdp_data_w(machine, data, md_sms_vdp);
 }
 
 READ8_HANDLER( md_sms_vdp_ctrl_r )
@@ -973,7 +973,7 @@ READ8_HANDLER( sms_vdp_data_r )
 
 WRITE8_HANDLER( sms_vdp_data_w )
 {
-	vdp_data_w(data, vdp1);
+	vdp_data_w(machine, data, vdp1);
 }
 
 READ8_HANDLER( sms_vdp_ctrl_r )
@@ -1422,7 +1422,7 @@ static void show_tiles(struct sms_vdp* chip)
  Even though some games set bit 7, it does nothing.
  */
 
-static void end_of_frame(struct sms_vdp *chip)
+static void end_of_frame(running_machine *machine, struct sms_vdp *chip)
 {
 	UINT8 m1 = (chip->regs[0x1]&0x10)>>4;
 	UINT8 m2 = (chip->regs[0x0]&0x02)>>1;
@@ -1440,7 +1440,7 @@ static void end_of_frame(struct sms_vdp *chip)
 		visarea.min_y = 0;
 		visarea.max_y = sms_mode_table[chip->screen_mode].sms2_height-1;
 
-		if (chip->chip_id==3) video_screen_configure(Machine->primary_screen, 256, 256, &visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
+		if (chip->chip_id==3) video_screen_configure(machine->primary_screen, 256, 256, &visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
 
 	}
 	else /* 160x144 */
@@ -1464,7 +1464,7 @@ static void end_of_frame(struct sms_vdp *chip)
 #ifdef UNUSED_FUNCTION
 VIDEO_EOF(sms)
 {
-	end_of_frame(vdp1);
+	end_of_frame(machine, vdp1);
 	//if (SMS_PAUSE_BUTTON) cpunum_set_input_line(machine, 0,INPUT_LINE_NMI,PULSE_LINE); // not on systeme!!!
 }
 #endif
@@ -1954,19 +1954,19 @@ MACHINE_RESET(megatech_bios)
 
 static VIDEO_EOF(systeme)
 {
-	end_of_frame(vdp1);
-	end_of_frame(vdp2);
+	end_of_frame(machine, vdp1);
+	end_of_frame(machine, vdp2);
 }
 
 
 VIDEO_EOF(megatech_md_sms)
 {
-	end_of_frame(md_sms_vdp);
+	end_of_frame(machine, md_sms_vdp);
 }
 
 VIDEO_EOF(megatech_bios)
 {
-	end_of_frame(vdp1);
+	end_of_frame(machine, vdp1);
 }
 
 VIDEO_UPDATE(megatech_md_sms)
@@ -2081,7 +2081,7 @@ static READ8_HANDLER( sms_vdp_2_data_r )
 
 static WRITE8_HANDLER( sms_vdp_2_data_w )
 {
-	vdp_data_w(data, vdp2);
+	vdp_data_w(machine, data, vdp2);
 }
 
 static READ8_HANDLER( sms_vdp_2_ctrl_r )
@@ -2210,9 +2210,9 @@ static void init_systeme_map(running_machine *machine)
 	init_ports_systeme(machine);
 }
 
-void init_for_megadrive(void)
+void init_for_megadrive(running_machine *machine)
 {
-	md_sms_vdp = start_vdp(Machine, GEN_VDP);
+	md_sms_vdp = start_vdp(machine, GEN_VDP);
 	md_sms_vdp->set_irq = sms_vdp_cpu1_irq_callback;
 	md_sms_vdp->is_pal = 0;
 	md_sms_vdp->sms_total_scanlines = 262;

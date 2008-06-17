@@ -38,7 +38,6 @@
 *******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 
@@ -61,7 +60,7 @@ static int microcontroller_id,coin_mask;
 /******************************************************************************/
 
 /* Emulation of the protected microcontroller - for coins & general protection */
-static void karnov_i8751_w(int data)
+static void karnov_i8751_w(running_machine *machine, int data)
 {
 	/* Pending coin operations may cause protection commands to be queued */
 	if (i8751_needs_ack) {
@@ -87,11 +86,11 @@ static void karnov_i8751_w(int data)
 
 //  if (!i8751_return && data!=0x300) logerror("CPU %04x - Unknown Write %02x intel\n",activecpu_get_pc(),data);
 
-	cpunum_set_input_line(Machine, 0,6,HOLD_LINE); /* Signal main cpu task is complete */
+	cpunum_set_input_line(machine, 0,6,HOLD_LINE); /* Signal main cpu task is complete */
 	i8751_needs_ack=1;
 }
 
-static void wndrplnt_i8751_w(int data)
+static void wndrplnt_i8751_w(running_machine *machine, int data)
 {
 	/* The last command hasn't been ACK'd (probably a conflict with coin command) */
 	if (i8751_needs_ack) {
@@ -141,11 +140,11 @@ static void wndrplnt_i8751_w(int data)
 	if (data==0x501) i8751_return=0x6bf8;
 	if (data==0x500) i8751_return=0x4e75;
 
-	cpunum_set_input_line(Machine, 0,6,HOLD_LINE); /* Signal main cpu task is complete */
+	cpunum_set_input_line(machine, 0,6,HOLD_LINE); /* Signal main cpu task is complete */
 	i8751_needs_ack=1;
 }
 
-static void chelnov_i8751_w(int data)
+static void chelnov_i8751_w(running_machine *machine, int data)
 {
 	static int level;
 
@@ -251,7 +250,7 @@ static void chelnov_i8751_w(int data)
 
 //  logerror("CPU %04x - Unknown Write %02x intel\n",activecpu_get_pc(),data);
 
-	cpunum_set_input_line(Machine, 0,6,HOLD_LINE); /* Signal main cpu task is complete */
+	cpunum_set_input_line(machine, 0,6,HOLD_LINE); /* Signal main cpu task is complete */
 	i8751_needs_ack=1;
 }
 
@@ -292,9 +291,9 @@ static WRITE16_HANDLER( karnov_control_w )
 			break;
 
 		case 6: /* SECREQ (Interrupt & Data to i8751) */
-			if (microcontroller_id==KARNOV || microcontroller_id==KARNOVJ) karnov_i8751_w(data);
-			if (microcontroller_id==CHELNOV || microcontroller_id==CHELNOVJ || microcontroller_id==CHELNOVW) chelnov_i8751_w(data);
-			if (microcontroller_id==WNDRPLNT) wndrplnt_i8751_w(data);
+			if (microcontroller_id==KARNOV || microcontroller_id==KARNOVJ) karnov_i8751_w(machine, data);
+			if (microcontroller_id==CHELNOV || microcontroller_id==CHELNOVJ || microcontroller_id==CHELNOVW) chelnov_i8751_w(machine, data);
+			if (microcontroller_id==WNDRPLNT) wndrplnt_i8751_w(machine, data);
 			break;
 
 		case 8: /* HSHIFT (9 bits) - Top bit indicates video flip */

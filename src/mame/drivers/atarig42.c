@@ -111,7 +111,7 @@ static WRITE16_HANDLER( io_latch_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		/* bit 14 controls the ASIC65 reset line */
-		asic65_reset((~data >> 14) & 1);
+		asic65_reset(machine, (~data >> 14) & 1);
 
 		/* bits 13-11 are the MO control bits */
 		atarirle_control_w(machine, 0, (data >> 11) & 7);
@@ -699,7 +699,7 @@ static DRIVER_INIT( roadriot )
 	sloop_base = memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, roadriot_sloop_data_r, roadriot_sloop_data_w);
 	memory_set_opbase_handler(0, sloop_opbase_handler);
 
-	asic65_config(ASIC65_ROMBASED);
+	asic65_config(machine, ASIC65_ROMBASED);
 /*
     Road Riot color MUX
 
@@ -753,7 +753,7 @@ static DRIVER_INIT( guardian )
 	sloop_base = memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, guardians_sloop_data_r, guardians_sloop_data_w);
 	memory_set_opbase_handler(0, sloop_opbase_handler);
 
-	asic65_config(ASIC65_GUARDIANS);
+	asic65_config(machine, ASIC65_GUARDIANS);
 /*
     Guardians color MUX
 

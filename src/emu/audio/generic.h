@@ -55,7 +55,7 @@ WRITE8_HANDLER( soundlatch4_clear_w );
 /* If you're going to use soundlatchX_clear_w, and the cleared value is
    something other than 0x00, use this function from machine_init. Note
    that this one call effects all 4 latches */
-void soundlatch_setclearedvalue(int value);
+void soundlatch_setclearedvalue(running_machine *machine, int value);
 
 
 #endif	/* __SOUND_GENERIC_H__ */

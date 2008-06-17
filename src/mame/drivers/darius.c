@@ -127,7 +127,6 @@ sounds.
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/taitoic.h"
 #include "cpu/z80/z80.h"
 #include "audio/taitosnd.h"
@@ -151,12 +150,12 @@ extern UINT16 *darius_fg_ram;
 WRITE16_HANDLER( darius_fg_layer_w );
 
 
-static void parse_control( void )	/* assumes Z80 sandwiched between 68Ks */
+static void parse_control( running_machine *machine )	/* assumes Z80 sandwiched between 68Ks */
 {
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
@@ -166,7 +165,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 		data = data >> 8;	/* for Wgp */
 	cpua_ctrl = data;
 
-	parse_control();
+	parse_control(machine);
 
 	logerror("CPU #0 PC %06x: write %04x to cpu control\n",activecpu_get_pc(),data);
 }
@@ -1202,7 +1201,7 @@ static DRIVER_INIT( darius )
 
 static STATE_POSTLOAD( darius_postload )
 {
-	parse_control();
+	parse_control(machine);
 	reset_sound_region();
 }
 

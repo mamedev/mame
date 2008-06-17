@@ -42,7 +42,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "grchamp.h"
@@ -337,12 +336,12 @@ static WRITE8_HANDLER( cpu1_outputs_w )
  *
  *************************************/
 
-INLINE UINT8 get_pc3259_bits(grchamp_state *state, int offs)
+INLINE UINT8 get_pc3259_bits(running_machine *machine, grchamp_state *state, int offs)
 {
 	int bits;
 
 	/* force a partial update to the current position */
-	video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 
 	/* get the relevant 4 bits */
 	bits = (state->collide >> (offs*4)) & 0x0f;
@@ -355,28 +354,28 @@ INLINE UINT8 get_pc3259_bits(grchamp_state *state, int offs)
 static READ8_HANDLER( pc3259_0_r )
 {
 	grchamp_state *state = machine->driver_data;
-	return get_pc3259_bits(state, 0);
+	return get_pc3259_bits(machine, state, 0);
 }
 
 
 static READ8_HANDLER( pc3259_1_r )
 {
 	grchamp_state *state = machine->driver_data;
-	return get_pc3259_bits(state, 1);
+	return get_pc3259_bits(machine, state, 1);
 }
 
 
 static READ8_HANDLER( pc3259_2_r )
 {
 	grchamp_state *state = machine->driver_data;
-	return get_pc3259_bits(state, 2);
+	return get_pc3259_bits(machine, state, 2);
 }
 
 
 static READ8_HANDLER( pc3259_3_r )
 {
 	grchamp_state *state = machine->driver_data;
-	return get_pc3259_bits(state, 3);
+	return get_pc3259_bits(machine, state, 3);
 }
 
 

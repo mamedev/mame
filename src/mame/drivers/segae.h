@@ -14,7 +14,7 @@ extern WRITE8_HANDLER( sms_vdp_data_w );
 extern READ8_HANDLER( sms_vdp_ctrl_r );
 extern WRITE8_HANDLER( sms_vdp_ctrl_w );
 
-extern void init_for_megadrive(void);
+extern void init_for_megadrive(running_machine *machine);
 extern void segae_md_sms_stop_scanline_timer(void);
 
 

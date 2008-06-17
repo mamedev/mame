@@ -48,7 +48,6 @@
 *************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/cchip.h"
 
 static UINT8* CRAM[8];
@@ -714,9 +713,9 @@ static void request_world_data(void)
 	}
 }
 
-static void request_goalin_data(void)
+static void request_goalin_data(running_machine *machine)
 {
-	int n = mame_rand(Machine) % 15;
+	int n = mame_rand(machine) % 15;
 
 	CRAM[1][0x14B] = 0x00; /* x coordinates */
 	CRAM[1][0x14D] = 0x10;
@@ -751,7 +750,7 @@ static TIMER_CALLBACK( cchip_timer )
 
 	if (CRAM[1][0x149] == 1)
 	{
-		request_goalin_data();
+		request_goalin_data(machine);
 
 		CRAM[1][0x149] = 0xFF;
 	}

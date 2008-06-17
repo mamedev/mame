@@ -30,7 +30,7 @@ DISCRETE_SOUND_EXTERN( tank8 );
 
 /*----------- defined in drivers/tank8.c -----------*/
 
-void tank8_set_collision(int index);
+void tank8_set_collision(running_machine *machine, int index);
 
 
 /*----------- defined in video/tank8.c -----------*/

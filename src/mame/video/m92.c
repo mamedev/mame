@@ -60,7 +60,7 @@ UINT32 m92_raster_irq_position;
 UINT16 *m92_vram_data,*m92_spritecontrol;
 UINT8 m92_game_kludge;
 
-extern void m92_sprite_interrupt(void);
+extern void m92_sprite_interrupt(running_machine *machine);
 UINT8 m92_sprite_buffer_busy;
 static int m92_palette_bank;
 
@@ -70,7 +70,7 @@ static TIMER_CALLBACK( spritebuffer_callback )
 {
 	m92_sprite_buffer_busy = 1;
 	if (m92_game_kludge!=2) /* Major Title 2 doesn't like this interrupt!? */
-		m92_sprite_interrupt();
+		m92_sprite_interrupt(machine);
 }
 
 WRITE16_HANDLER( m92_spritecontrol_w )

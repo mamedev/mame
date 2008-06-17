@@ -108,7 +108,7 @@ static PIT8253_OUTPUT_CHANGED( v_irq4_w )
 static PIT8253_OUTPUT_CHANGED( v_irq3_w )
 {
 	if (state)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ0, ASSERT_LINE);
+		cpunum_set_input_line(device->machine, 1, INPUT_LINE_IRQ0, ASSERT_LINE);
 
 	update_irq_encoder(INPUT_LINE_IRQ3, state);
 }

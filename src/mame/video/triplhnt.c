@@ -39,7 +39,7 @@ VIDEO_START( triplhnt )
 
 static TIMER_CALLBACK( triplhnt_hit_callback )
 {
-	triplhnt_set_collision(param);
+	triplhnt_set_collision(machine, param);
 }
 
 

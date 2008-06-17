@@ -7,7 +7,6 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/atari.h"
 #include "video/gtia.h"
 

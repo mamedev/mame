@@ -8,7 +8,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "atarigen.h"
 #include "slapstic.h"
 #include "cpu/m6502/m6502.h"
@@ -536,7 +535,7 @@ static OPBASE_HANDLER( atarigen_slapstic_setopbase )
     slapstic and sets the chip number.
 ---------------------------------------------------------------*/
 
-void atarigen_slapstic_init(int cpunum, offs_t base, offs_t mirror, int chipnum)
+void atarigen_slapstic_init(running_machine *machine, int cpunum, offs_t base, offs_t mirror, int chipnum)
 {
 	/* reset in case we have no state */
 	atarigen_slapstic_num = chipnum;
@@ -546,10 +545,10 @@ void atarigen_slapstic_init(int cpunum, offs_t base, offs_t mirror, int chipnum)
 	if (chipnum != 0)
 	{
 		/* initialize the slapstic */
-		slapstic_init(chipnum);
+		slapstic_init(machine, chipnum);
 
 		/* install the memory handlers */
-		atarigen_slapstic = memory_install_readwrite16_handler(Machine, cpunum, ADDRESS_SPACE_PROGRAM, base, base + 0x7fff, 0, mirror, atarigen_slapstic_r, atarigen_slapstic_w);
+		atarigen_slapstic = memory_install_readwrite16_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, base, base + 0x7fff, 0, mirror, atarigen_slapstic_r, atarigen_slapstic_w);
 
 		/* allocate memory for a copy of bank 0 */
 		atarigen_slapstic_bank0 = auto_malloc(0x2000);

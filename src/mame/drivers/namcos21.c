@@ -509,7 +509,7 @@ static int mbNeedsKickstart;
 static UINT16 *master_dsp_code;
 
 void
-namcos21_kickstart( int internal )
+namcos21_kickstart( running_machine *machine, int internal )
 {
 	/* patch dsp watchdog */
 	switch( namcos2_gametype )
@@ -535,8 +535,8 @@ namcos21_kickstart( int internal )
 	mpDspState->slaveOutputSize = 0;
 	mpDspState->masterFinished = 0;
 	mpDspState->slaveActive = 0;
-	cpunum_set_input_line(Machine, 4, 0, HOLD_LINE); /* DSP: master */
-	cpunum_set_input_line(Machine, 5, INPUT_LINE_RESET, PULSE_LINE); /* DSP: slave */
+	cpunum_set_input_line(machine, 4, 0, HOLD_LINE); /* DSP: master */
+	cpunum_set_input_line(machine, 5, INPUT_LINE_RESET, PULSE_LINE); /* DSP: slave */
 }
 
 static UINT16
@@ -558,7 +558,7 @@ ReadWordFromSlaveInput( void )
 } /* ReadWordFromSlaveInput */
 
 static size_t
-GetInputBytesAdvertisedForSlave( void )
+GetInputBytesAdvertisedForSlave( running_machine *machine )
 {
 	if( mpDspState->slaveBytesAdvertised < mpDspState->slaveBytesAvailable )
 	{
@@ -566,7 +566,7 @@ GetInputBytesAdvertisedForSlave( void )
 	}
 	else if( mpDspState->slaveActive && mpDspState->masterFinished && mpDspState->masterSourceAddr )
 	{
-		namcos21_kickstart(0);
+		namcos21_kickstart(machine, 0);
 	}
 	return mpDspState->slaveBytesAdvertised;
 } /* GetInputBytesAdvertisedForSlave */
@@ -880,7 +880,7 @@ static WRITE16_HANDLER(slave_port0_w)
 
 static READ16_HANDLER(slave_port2_r)
 {
-	return GetInputBytesAdvertisedForSlave();
+	return GetInputBytesAdvertisedForSlave(machine);
 } /* slave_port2_r */
 
 static READ16_HANDLER(slave_port3_r)

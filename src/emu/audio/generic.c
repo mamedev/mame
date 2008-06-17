@@ -11,7 +11,6 @@
 
 #include "driver.h"
 #include "generic.h"
-#include "deprecat.h"
 
 
 
@@ -157,8 +156,8 @@ WRITE8_HANDLER( soundlatch4_clear_w ) { latch_clear(3); }
     value for all sound latches
 -------------------------------------------------*/
 
-void soundlatch_setclearedvalue(int value)
+void soundlatch_setclearedvalue(running_machine *machine, int value)
 {
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call soundlatch_setclearedvalue at init time!");
+	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call soundlatch_setclearedvalue at init time!");
 	latch_clear_value = value;
 }

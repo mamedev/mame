@@ -7,7 +7,6 @@ Data East machine functions - Bryan McPhail, mish@tendril.co.uk
 *******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "dec0.h"
 #include "cpu/h6280/h6280.h"
 
@@ -471,14 +470,14 @@ static TIMER_CALLBACK( i8751_callback )
 }
 #endif
 
-void dec0_i8751_write(int data)
+void dec0_i8751_write(running_machine *machine, int data)
 {
 	/* Writes to this address cause an IRQ to the i8751 microcontroller */
 	if (GAME==1) hbarrel_i8751_write(data);
 	if (GAME==2) baddudes_i8751_write(data);
 	if (GAME==3) birdtry_i8751_write(data);
 
-	cpunum_set_input_line(Machine, 0,5,HOLD_LINE);
+	cpunum_set_input_line(machine, 0,5,HOLD_LINE);
 
 	/* Simulate the processing time of the i8751, time value is guessed
     if (i8751_timer)

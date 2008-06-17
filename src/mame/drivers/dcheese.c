@@ -29,7 +29,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "machine/ticket.h"
 #include "sound/bsmt2000.h"
@@ -88,17 +87,17 @@ static IRQ_CALLBACK(irq_callback)
 }
 
 
-void dcheese_signal_irq(int which)
+void dcheese_signal_irq(running_machine *machine, int which)
 {
 	irq_state[which] = 1;
-	update_irq_state(Machine);
+	update_irq_state(machine);
 }
 
 
 static INTERRUPT_GEN( dcheese_vblank )
 {
 	logerror("---- VBLANK ----\n");
-	dcheese_signal_irq(4);
+	dcheese_signal_irq(machine, 4);
 }
 
 

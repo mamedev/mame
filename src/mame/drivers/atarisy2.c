@@ -3033,7 +3033,7 @@ static DRIVER_INIT( paperboy )
 	UINT8 *cpu1 = memory_region(REGION_CPU1);
 
 	atarigen_eeprom_default = compressed_default_eeprom;
-	slapstic_init(105);
+	slapstic_init(machine, 105);
 
 	/* expand the 16k program ROMs into full 64k chunks */
 	for (i = 0x10000; i < 0x90000; i += 0x20000)
@@ -3080,7 +3080,7 @@ static DRIVER_INIT( 720 )
 		0x0000
 	};
 	atarigen_eeprom_default = compressed_default_eeprom;
-	slapstic_init(107);
+	slapstic_init(machine, 107);
 
 	pedal_count = -1;
 	has_tms5220 = 1;
@@ -3093,7 +3093,7 @@ static void ssprint_init_common(running_machine *machine, const UINT16 *default_
 	UINT8 *cpu1 = memory_region(REGION_CPU1);
 
 	atarigen_eeprom_default = default_eeprom;
-	slapstic_init(108);
+	slapstic_init(machine, 108);
 
 	/* expand the 32k program ROMs into full 64k chunks */
 	for (i = 0x10000; i < 0x90000; i += 0x20000)
@@ -3217,7 +3217,7 @@ static DRIVER_INIT( csprint )
 	UINT8 *cpu1 = memory_region(REGION_CPU1);
 
 	atarigen_eeprom_default = compressed_default_eeprom;
-	slapstic_init(109);
+	slapstic_init(machine, 109);
 
 	/* expand the 32k program ROMs into full 64k chunks */
 	for (i = 0x10000; i < 0x90000; i += 0x20000)
@@ -3231,7 +3231,7 @@ static DRIVER_INIT( csprint )
 static DRIVER_INIT( apb )
 {
 	atarigen_eeprom_default = NULL;
-	slapstic_init(110);
+	slapstic_init(machine, 110);
 
 	pedal_count = 2;
 	has_tms5220 = 1;

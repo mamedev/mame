@@ -23,7 +23,6 @@
 #include "machine/6840ptm.h"
 #include "video/tms34061.h"
 #include "sound/sn76496.h"
-#include "deprecat.h"
 
 
 /*************************************
@@ -239,8 +238,8 @@ static VIDEO_UPDATE( guab )
 			UINT8 pen = src[x >> 1];
 
 			/* Draw two 4-bit pixels */
-			*dest++ = Machine->pens[pen >> 4];
-			*dest++ = Machine->pens[pen & 0x0f];
+			*dest++ = screen->machine->pens[pen >> 4];
+			*dest++ = screen->machine->pens[pen & 0x0f];
 		}
 	}
 

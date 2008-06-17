@@ -235,12 +235,12 @@ static INT32  scu_size_0,		/* Transfer DMA size lv 0*/
 			  scu_size_1,		/* lv 1*/
 			  scu_size_2;		/* lv 2*/
 
-static void dma_direct_lv0(void);	/*DMA level 0 direct transfer function*/
-static void dma_direct_lv1(void);   /*DMA level 1 direct transfer function*/
-static void dma_direct_lv2(void);   /*DMA level 2 direct transfer function*/
-static void dma_indirect_lv0(void); /*DMA level 0 indirect transfer function*/
-static void dma_indirect_lv1(void); /*DMA level 1 indirect transfer function*/
-static void dma_indirect_lv2(void); /*DMA level 2 indirect transfer function*/
+static void dma_direct_lv0(running_machine *machine);	/*DMA level 0 direct transfer function*/
+static void dma_direct_lv1(running_machine *machine);   /*DMA level 1 direct transfer function*/
+static void dma_direct_lv2(running_machine *machine);   /*DMA level 2 direct transfer function*/
+static void dma_indirect_lv0(running_machine *machine); /*DMA level 0 indirect transfer function*/
+static void dma_indirect_lv1(running_machine *machine); /*DMA level 1 indirect transfer function*/
+static void dma_indirect_lv2(running_machine *machine); /*DMA level 2 indirect transfer function*/
 
 
 int minit_boost,sinit_boost;
@@ -1234,8 +1234,8 @@ static WRITE32_HANDLER( stv_scu_w32 )
 */
 		if(stv_scu[4] & 1 && ((stv_scu[5] & 7) == 7) && stv_scu[4] & 0x100)
 		{
-			if(DIRECT_MODE(0)) { dma_direct_lv0(); }
-			else			   { dma_indirect_lv0(); }
+			if(DIRECT_MODE(0)) { dma_direct_lv0(machine); }
+			else			   { dma_indirect_lv0(machine); }
 
 			stv_scu[4]^=1;//disable starting bit.
 
@@ -1295,8 +1295,8 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		case 12:
 		if(stv_scu[12] & 1 && ((stv_scu[13] & 7) == 7) && stv_scu[12] & 0x100)
 		{
-			if(DIRECT_MODE(1)) { dma_direct_lv1(); }
-			else			   { dma_indirect_lv1(); }
+			if(DIRECT_MODE(1)) { dma_direct_lv1(machine); }
+			else			   { dma_indirect_lv1(machine); }
 
 			stv_scu[12]^=1;
 
@@ -1345,8 +1345,8 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		case 20:
 		if(stv_scu[20] & 1 && ((stv_scu[21] & 7) == 7) && stv_scu[20] & 0x100)
 		{
-			if(DIRECT_MODE(2)) { dma_direct_lv2(); }
-			else			   { dma_indirect_lv2(); }
+			if(DIRECT_MODE(2)) { dma_direct_lv2(machine); }
+			else			   { dma_indirect_lv2(machine); }
 
 			stv_scu[20]^=1;
 
@@ -1375,7 +1375,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		/*DSP section*/
 		/*Use functions so it is easier to work out*/
 		case 32:
-		dsp_prg_ctrl(data);
+		dsp_prg_ctrl(machine, data);
 		if(LOG_SCU) logerror("SCU DSP: Program Control Port Access %08x\n",data);
 		break;
 		case 33:
@@ -1434,7 +1434,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 	}
 }
 
-static void dma_direct_lv0()
+static void dma_direct_lv0(running_machine *machine)
 {
 	static UINT32 tmp_src,tmp_dst,tmp_size;
 	if(LOG_SCU) logerror("DMA lv 0 transfer START\n"
@@ -1532,7 +1532,7 @@ static void dma_direct_lv0()
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 	if(!(stv_scu[40] & 0x800))/*Lv 0 DMA end irq*/
-		cpunum_set_input_line_and_vector(Machine, 0, 5, HOLD_LINE , 0x4b);
+		cpunum_set_input_line_and_vector(machine, 0, 5, HOLD_LINE , 0x4b);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1544,7 +1544,7 @@ static void dma_direct_lv0()
 	D0MV_0;
 }
 
-static void dma_direct_lv1()
+static void dma_direct_lv1(running_machine *machine)
 {
 	static UINT32 tmp_src,tmp_dst,tmp_size;
 	if(LOG_SCU) logerror("DMA lv 1 transfer START\n"
@@ -1635,7 +1635,7 @@ static void dma_direct_lv1()
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 	if(!(stv_scu[40] & 0x400))/*Lv 1 DMA end irq*/
-		cpunum_set_input_line_and_vector(Machine, 0, 6, HOLD_LINE , 0x4a);
+		cpunum_set_input_line_and_vector(machine, 0, 6, HOLD_LINE , 0x4a);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1647,7 +1647,7 @@ static void dma_direct_lv1()
 	D1MV_0;
 }
 
-static void dma_direct_lv2()
+static void dma_direct_lv2(running_machine *machine)
 {
 	static UINT32 tmp_src,tmp_dst,tmp_size;
 	if(LOG_SCU) logerror("DMA lv 2 transfer START\n"
@@ -1738,7 +1738,7 @@ static void dma_direct_lv2()
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 	if(!(stv_scu[40] & 0x200))/*Lv 2 DMA end irq*/
-		cpunum_set_input_line_and_vector(Machine, 0, 6, HOLD_LINE , 0x49);
+		cpunum_set_input_line_and_vector(machine, 0, 6, HOLD_LINE , 0x49);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1750,7 +1750,7 @@ static void dma_direct_lv2()
 	D2MV_0;
 }
 
-static void dma_indirect_lv0()
+static void dma_indirect_lv0(running_machine *machine)
 {
 	/*Helper to get out of the cycle*/
 	UINT8 job_done = 0;
@@ -1816,12 +1816,12 @@ static void dma_indirect_lv0()
 	}while(job_done == 0);
 
 	if(!(stv_scu[40] & 0x800))/*Lv 0 DMA end irq*/
-		cpunum_set_input_line_and_vector(Machine, 0, 5, HOLD_LINE , 0x4b);
+		cpunum_set_input_line_and_vector(machine, 0, 5, HOLD_LINE , 0x4b);
 
 	D0MV_0;
 }
 
-static void dma_indirect_lv1()
+static void dma_indirect_lv1(running_machine *machine)
 {
 	/*Helper to get out of the cycle*/
 	UINT8 job_done = 0;
@@ -1888,12 +1888,12 @@ static void dma_indirect_lv1()
 	}while(job_done == 0);
 
 	if(!(stv_scu[40] & 0x400))/*Lv 1 DMA end irq*/
-		cpunum_set_input_line_and_vector(Machine, 0, 6, HOLD_LINE , 0x4a);
+		cpunum_set_input_line_and_vector(machine, 0, 6, HOLD_LINE , 0x4a);
 
 	D1MV_0;
 }
 
-static void dma_indirect_lv2()
+static void dma_indirect_lv2(running_machine *machine)
 {
 	/*Helper to get out of the cycle*/
 	UINT8 job_done = 0;
@@ -1959,7 +1959,7 @@ static void dma_indirect_lv2()
 	}while(job_done == 0);
 
 	if(!(stv_scu[40] & 0x200))/*Lv 2 DMA end irq*/
-		cpunum_set_input_line_and_vector(Machine, 0, 6, HOLD_LINE , 0x49);
+		cpunum_set_input_line_and_vector(machine, 0, 6, HOLD_LINE , 0x49);
 
 	D2MV_0;
 }

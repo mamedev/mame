@@ -33,7 +33,7 @@ static int nmi_enabled = 0;
 
 static MACHINE_START( timelimt )
 {
-	soundlatch_setclearedvalue( 0 );
+	soundlatch_setclearedvalue( machine, 0 );
 }
 
 static MACHINE_RESET( timelimt )

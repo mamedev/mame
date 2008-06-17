@@ -1119,7 +1119,7 @@ static void mediagx_set_keyb_int(int state) {
 
 static void init_mediagx(running_machine *machine)
 {
-	init_pc_common(PCCOMMON_KEYBOARD_AT,mediagx_set_keyb_int);
+	init_pc_common(machine, PCCOMMON_KEYBOARD_AT,mediagx_set_keyb_int);
 	mc146818_init(MC146818_STANDARD);
 
 	pci_init();

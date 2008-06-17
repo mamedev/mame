@@ -307,24 +307,24 @@ static WRITE32_HANDLER( timers_w )
 	model2_timerrun[offset] = 1;
 }
 
-static void model2_timer_exp(int tnum, int bit)
+static void model2_timer_exp(running_machine *machine, int tnum, int bit)
 {
 	timer_adjust_oneshot(model2_timers[tnum], attotime_never, 0);
 
 	model2_intreq |= (1<<bit);
 	if (model2_intena & (1<<bit))
 	{
-		cpunum_set_input_line(Machine, 0, I960_IRQ2, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, I960_IRQ2, ASSERT_LINE);
 	}
 
 	model2_timervals[tnum] = 0;
 	model2_timerrun[tnum] = 0;
 }
 
-static TIMER_CALLBACK( model2_timer_0_cb ) { model2_timer_exp(0, 2); }
-static TIMER_CALLBACK( model2_timer_1_cb ) { model2_timer_exp(1, 3); }
-static TIMER_CALLBACK( model2_timer_2_cb ) { model2_timer_exp(2, 4); }
-static TIMER_CALLBACK( model2_timer_3_cb ) { model2_timer_exp(3, 5); }
+static TIMER_CALLBACK( model2_timer_0_cb ) { model2_timer_exp(machine, 0, 2); }
+static TIMER_CALLBACK( model2_timer_1_cb ) { model2_timer_exp(machine, 1, 3); }
+static TIMER_CALLBACK( model2_timer_2_cb ) { model2_timer_exp(machine, 2, 4); }
+static TIMER_CALLBACK( model2_timer_3_cb ) { model2_timer_exp(machine, 3, 5); }
 
 static MACHINE_RESET(model2_common)
 {
@@ -407,18 +407,18 @@ static MACHINE_RESET(model2c)
 	dsp_type = DSP_TYPE_TGPX4;
 }
 
-static void chcolor(pen_t color, UINT16 data)
+static void chcolor(running_machine *machine, pen_t color, UINT16 data)
 {
-	palette_set_color_rgb(Machine,color,pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
+	palette_set_color_rgb(machine,color,pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 }
 
 static WRITE32_HANDLER(pal32_w)
 {
 	COMBINE_DATA(paletteram32+offset);
 	if(ACCESSING_BITS_0_15)
-		chcolor(offset*2, paletteram32[offset]);
+		chcolor(machine, offset*2, paletteram32[offset]);
 	if(ACCESSING_BITS_16_31)
-		chcolor(offset*2+1, paletteram32[offset]>>16);
+		chcolor(machine, offset*2+1, paletteram32[offset]>>16);
 }
 
 static WRITE32_HANDLER(ctrl0_w)
@@ -907,7 +907,7 @@ static int snd_68k_ready_r(void)
 	return 0xff;
 }
 
-static void snd_latch_to_68k_w(int data)
+static void snd_latch_to_68k_w(running_machine *machine, int data)
 {
 	while (!snd_68k_ready_r())
 	{
@@ -916,7 +916,7 @@ static void snd_latch_to_68k_w(int data)
 
 	to_68k = data;
 
-	cpunum_set_input_line(Machine, 1, 2, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 2, HOLD_LINE);
 
 	// give the 68k time to notice
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
@@ -936,7 +936,7 @@ static WRITE32_HANDLER( model2o_serial_w )
 {
 	if (mem_mask == 0x0000ffff)
 	{
-		snd_latch_to_68k_w(data&0xff);
+		snd_latch_to_68k_w(machine, data&0xff);
 	}
 }
 

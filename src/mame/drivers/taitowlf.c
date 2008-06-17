@@ -692,7 +692,7 @@ static DRIVER_INIT( taitowlf )
 {
 	bios_ram = auto_malloc(0x10000);
 
-	init_pc_common(PCCOMMON_KEYBOARD_AT, taitowlf_set_keyb_int);
+	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, taitowlf_set_keyb_int);
 	mc146818_init(MC146818_STANDARD);
 
 	intel82439tx_init();

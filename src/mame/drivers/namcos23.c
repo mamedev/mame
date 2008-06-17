@@ -500,7 +500,6 @@ Notes:
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/h83002/h83002.h"
 #include "sound/c352.h"
@@ -732,7 +731,7 @@ static UINT8 nthbyte( const UINT32 *pSource, int offs )
 	return (pSource[0]<<((offs&3)*8))>>24;
 }
 
-INLINE void UpdatePalette( int entry )
+INLINE void UpdatePalette( running_machine *machine, int entry )
 {
          int j;
 
@@ -742,7 +741,7 @@ INLINE void UpdatePalette( int entry )
 		int r = nthbyte(paletteram32,which+0x00001);
 		int g = nthbyte(paletteram32,which+0x08001);
 		int b = nthbyte(paletteram32,which+0x18001);
-		palette_set_color( Machine,which,MAKE_RGB(r,g,b) );
+		palette_set_color( machine,which,MAKE_RGB(r,g,b) );
 	}
 }
 
@@ -757,7 +756,7 @@ static WRITE32_HANDLER( namcos23_paletteram_w )
 {
 	COMBINE_DATA( &paletteram32[offset] );
 
-	UpdatePalette((offset % (0x8000/4))*2);
+	UpdatePalette(machine, (offset % (0x8000/4))*2);
 }
 
 // must return this magic number

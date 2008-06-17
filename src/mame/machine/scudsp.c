@@ -50,7 +50,6 @@ Changelog:
 
 ******************************************************************************************/
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/scudsp.h"
 #include "osd_cpu.h"
 #include "sound/scsp.h"
@@ -314,12 +313,12 @@ static UINT32 dsp_get_mem_source_dma( UINT32 memcode, UINT32 counter )
 	return 0;
 }
 
-void dsp_prg_ctrl(UINT32 data)
+void dsp_prg_ctrl(running_machine *machine, UINT32 data)
 {
 	if(LEF) dsp_reg.pc = (data & 0xff);
 	if(EXF) dsp_execute_program();
 	if(EF && (!(stv_scu[40] & 0x0020)))
-		cpunum_set_input_line_and_vector(Machine, 0, 0xa, HOLD_LINE , 0x45);
+		cpunum_set_input_line_and_vector(machine, 0, 0xa, HOLD_LINE , 0x45);
 }
 
 void dsp_prg_data(UINT32 data)

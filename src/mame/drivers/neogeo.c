@@ -80,7 +80,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "neogeo.h"
 #include "machine/pd4990a.h"
 #include "cpu/z80/z80.h"
@@ -158,12 +157,12 @@ static void set_output_data(UINT8 data);
 #define IRQ2CTRL_AUTOLOAD_REPEAT	(0x80)
 
 
-static void adjust_display_position_interrupt_timer(void)
+static void adjust_display_position_interrupt_timer(running_machine *machine)
 {
 	if ((display_counter + 1) != 0)
 	{
 		attotime period = attotime_mul(ATTOTIME_IN_HZ(NEOGEO_PIXEL_CLOCK), display_counter + 1);
-		if (LOG_VIDEO_SYSTEM) logerror("adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", video_screen_get_vpos(Machine->primary_screen), video_screen_get_hpos(Machine->primary_screen), (display_counter + 1) / NEOGEO_HTOTAL, (display_counter + 1) % NEOGEO_HTOTAL);
+		if (LOG_VIDEO_SYSTEM) logerror("adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen), (display_counter + 1) / NEOGEO_HTOTAL, (display_counter + 1) % NEOGEO_HTOTAL);
 
 		timer_adjust_oneshot(display_position_interrupt_timer, period, 0);
 	}
@@ -184,7 +183,7 @@ void neogeo_set_display_counter_msb(UINT16 data)
 }
 
 
-void neogeo_set_display_counter_lsb(UINT16 data)
+void neogeo_set_display_counter_lsb(running_machine *machine, UINT16 data)
 {
 	display_counter = (display_counter & 0xffff0000) | data;
 
@@ -193,7 +192,7 @@ void neogeo_set_display_counter_lsb(UINT16 data)
 	if (display_position_interrupt_control & IRQ2CTRL_LOAD_RELATIVE)
 	{
 		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_RELATIVE ");
- 		adjust_display_position_interrupt_timer();
+ 		adjust_display_position_interrupt_timer(machine);
 	}
 }
 
@@ -215,13 +214,13 @@ static void update_interrupts(running_machine *machine)
 }
 
 
-void neogeo_acknowledge_interrupt(UINT16 data)
+void neogeo_acknowledge_interrupt(running_machine *machine, UINT16 data)
 {
 	if (data & 0x01) irq3_pending = 0;
 	if (data & 0x02) display_position_interrupt_pending = 0;
 	if (data & 0x04) vblank_interrupt_pending = 0;
 
-	update_interrupts(Machine);
+	update_interrupts(machine);
 }
 
 
@@ -239,7 +238,7 @@ static TIMER_CALLBACK( display_position_interrupt_callback )
 	if (display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_REPEAT)
 	{
 		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_REPEAT ");
-		adjust_display_position_interrupt_timer();
+		adjust_display_position_interrupt_timer(machine);
 	}
 }
 
@@ -249,7 +248,7 @@ static TIMER_CALLBACK( display_position_vblank_callback )
 	if (display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_VBLANK)
 	{
 		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_VBLANK ");
-		adjust_display_position_interrupt_timer();
+		adjust_display_position_interrupt_timer(machine);
 	}
 
 	/* set timer for next screen */
@@ -737,7 +736,7 @@ static READ8_HANDLER( audio_cpu_bank_select_8000_bfff_r )
 }
 
 
-static void _set_audio_cpu_rom_source(void)
+static void _set_audio_cpu_rom_source(running_machine *machine)
 {
 /*  if (!memory_region(NEOGEO_REGION_AUDIO_CPU_BIOS))   */
 		audio_cpu_rom_source = 1;
@@ -749,22 +748,22 @@ static void _set_audio_cpu_rom_source(void)
 	{
 		audio_cpu_rom_source_last = audio_cpu_rom_source;
 
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 
 		if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: selectign %s ROM\n", safe_activecpu_get_pc(), audio_cpu_rom_source ? "CARTRIDGE" : "BIOS");
 	}
 }
 
 
-static void set_audio_cpu_rom_source(UINT8 data)
+static void set_audio_cpu_rom_source(running_machine *machine, UINT8 data)
 {
 	audio_cpu_rom_source = data;
 
-	_set_audio_cpu_rom_source();
+	_set_audio_cpu_rom_source(machine);
 }
 
 
-static void audio_cpu_banking_init(void)
+static void audio_cpu_banking_init(running_machine *machine)
 {
 	int region;
 	int bank;
@@ -797,7 +796,7 @@ static void audio_cpu_banking_init(void)
 	set_audio_cpu_banking();
 
 	audio_cpu_rom_source_last = 0;
-	set_audio_cpu_rom_source(0);
+	set_audio_cpu_rom_source(machine, 0);
 }
 
 
@@ -819,7 +818,7 @@ static WRITE16_HANDLER( system_control_w )
 		default:
 		case 0x00: neogeo_set_screen_dark(machine, bit); break;
 		case 0x01: set_main_cpu_vector_table_source(bit);
-				   set_audio_cpu_rom_source(bit); /* this is a guess */
+				   set_audio_cpu_rom_source(machine, bit); /* this is a guess */
 				   break;
 		case 0x05: neogeo_set_fixed_layer_source(bit); break;
 		case 0x06: set_save_ram_unlock(bit); break;
@@ -949,7 +948,7 @@ static STATE_POSTLOAD( neogeo_postload )
 	_set_main_cpu_bank_address();
 	_set_main_cpu_vector_table_source();
 	set_audio_cpu_banking();
-	_set_audio_cpu_rom_source();
+	_set_audio_cpu_rom_source(machine);
 	set_outputs();
 }
 
@@ -962,7 +961,7 @@ static MACHINE_START( neogeo )
 	main_cpu_banking_init();
 
 	/* set the initial audio CPU ROM banks */
-	audio_cpu_banking_init();
+	audio_cpu_banking_init(machine);
 
 	create_interrupt_timers();
 

@@ -88,14 +88,14 @@ static void update_scanline_irq(running_machine *machine)
 
 static TIMER_CALLBACK( blitter_scanline_callback )
 {
-	dcheese_signal_irq(3);
+	dcheese_signal_irq(machine, 3);
 	update_scanline_irq(machine);
 }
 
 
 static TIMER_CALLBACK( dcheese_signal_irq_callback )
 {
-	dcheese_signal_irq(param);
+	dcheese_signal_irq(machine, param);
 }
 
 

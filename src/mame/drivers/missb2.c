@@ -14,7 +14,6 @@ OKI M6295 sound ROM dump is bad.
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 #include "includes/bublbobl.h"
@@ -117,15 +116,15 @@ static VIDEO_UPDATE( missb2 )
 	return 0;
 }
 
-INLINE void bg_changecolor_RRRRGGGGBBBBxxxx(pen_t color,int data)
+INLINE void bg_changecolor_RRRRGGGGBBBBxxxx(running_machine *machine,pen_t color,int data)
 {
-	palette_set_color_rgb(Machine,color+256,pal4bit(data >> 12),pal4bit(data >> 8),pal4bit(data >> 4));
+	palette_set_color_rgb(machine,color+256,pal4bit(data >> 12),pal4bit(data >> 8),pal4bit(data >> 4));
 }
 
 static WRITE8_HANDLER( bg_paletteram_RRRRGGGGBBBBxxxx_be_w )
 {
 	bg_paletteram[offset] = data;
-	bg_changecolor_RRRRGGGGBBBBxxxx(offset / 2,bg_paletteram[offset | 1] | (bg_paletteram[offset & ~1] << 8));
+	bg_changecolor_RRRRGGGGBBBBxxxx(machine, offset / 2,bg_paletteram[offset | 1] | (bg_paletteram[offset & ~1] << 8));
 }
 
 static WRITE8_HANDLER( missb2_bg_bank_w )

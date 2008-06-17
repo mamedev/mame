@@ -134,7 +134,7 @@ NVRAM_HANDLER( atarigen );
     SLAPSTIC HANDLING
 ---------------------------------------------------------------*/
 
-void atarigen_slapstic_init(int cpunum, offs_t base, offs_t mirror, int chipnum);
+void atarigen_slapstic_init(running_machine *machine, int cpunum, offs_t base, offs_t mirror, int chipnum);
 void atarigen_slapstic_reset(void);
 
 WRITE16_HANDLER( atarigen_slapstic_w );

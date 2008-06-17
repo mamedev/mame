@@ -40,7 +40,6 @@ Dumping Notes:
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/laserdsc.h"
 
 /* Assumed to be the same as segald hardware */
@@ -93,7 +92,7 @@ INLINE void draw_pixel(bitmap_t *bitmap,const rectangle *cliprect,int x,int y,in
 	*BITMAP_ADDR32(bitmap, y, x) = color;
 }
 
-static void gpworld_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect)
+static void gpworld_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const int SPR_Y_TOP     = 0;
 	const int SPR_Y_BOTTOM  = 1;
@@ -179,10 +178,10 @@ static void gpworld_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect)
 					}
 
 					/* Daphne says "don't draw the pixel if it's black". */
-					draw_pixel(bitmap,cliprect,x+0,y,palette_get_color(Machine, pixel1 + (sprite_color*0x10 + 0x200)));
-					draw_pixel(bitmap,cliprect,x+1,y,palette_get_color(Machine, pixel2 + (sprite_color*0x10 + 0x200)));
-					draw_pixel(bitmap,cliprect,x+2,y,palette_get_color(Machine, pixel3 + (sprite_color*0x10 + 0x200)));
-					draw_pixel(bitmap,cliprect,x+3,y,palette_get_color(Machine, pixel4 + (sprite_color*0x10 + 0x200)));
+					draw_pixel(bitmap,cliprect,x+0,y,palette_get_color(machine, pixel1 + (sprite_color*0x10 + 0x200)));
+					draw_pixel(bitmap,cliprect,x+1,y,palette_get_color(machine, pixel2 + (sprite_color*0x10 + 0x200)));
+					draw_pixel(bitmap,cliprect,x+2,y,palette_get_color(machine, pixel3 + (sprite_color*0x10 + 0x200)));
+					draw_pixel(bitmap,cliprect,x+3,y,palette_get_color(machine, pixel4 + (sprite_color*0x10 + 0x200)));
 
 					x += 4;
 
@@ -207,7 +206,7 @@ static VIDEO_UPDATE( gpworld )
 	fillbitmap(bitmap, 0, cliprect);
 
 	gpworld_draw_tiles(screen->machine, bitmap, cliprect);
-	gpworld_draw_sprites(bitmap, cliprect);
+	gpworld_draw_sprites(screen->machine, bitmap, cliprect);
 
 	/* display disc information */
 	if (discinfo != NULL)

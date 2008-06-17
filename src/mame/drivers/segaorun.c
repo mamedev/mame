@@ -58,7 +58,7 @@ static const UINT8 *custom_map;
  *************************************/
 
 extern void fd1094_machine_init(void);
-extern void fd1094_driver_init(void (*set_decrypted)(UINT8 *));
+extern void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(UINT8 *));
 
 static READ16_HANDLER( misc_io_r );
 static WRITE16_HANDLER( misc_io_w );
@@ -154,7 +154,7 @@ static void outrun_generic_init(running_machine *machine)
 	segaic16_memory_mapper_init(machine, 0, outrun_info, sound_data_w, NULL);
 
 	/* init the FD1094 */
-	fd1094_driver_init(segaic16_memory_mapper_set_decrypted);
+	fd1094_driver_init(machine, segaic16_memory_mapper_set_decrypted);
 
 	/* reset the custom handlers and other pointers */
 	custom_io_r = NULL;

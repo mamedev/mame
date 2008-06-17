@@ -4,7 +4,6 @@
  ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
 #include "includes/toaplan1.h"
@@ -112,26 +111,26 @@ READ16_HANDLER ( demonwld_BIO_r )
 }
 
 
-static void demonwld_dsp(int enable)
+static void demonwld_dsp(running_machine *machine, int enable)
 {
 	demonwld_dsp_on = enable;
 	if (enable)
 	{
 		logerror("Turning DSP on and 68000 off\n");
-		cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
-		cpunum_set_input_line(Machine, 2, 0, ASSERT_LINE); /* TMS32010 INT */
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
+		cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
+		cpunum_set_input_line(machine, 2, 0, ASSERT_LINE); /* TMS32010 INT */
+		cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	else
 	{
 		logerror("Turning DSP off\n");
-		cpunum_set_input_line(Machine, 2, 0, CLEAR_LINE); /* TMS32010 INT */
-		cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
+		cpunum_set_input_line(machine, 2, 0, CLEAR_LINE); /* TMS32010 INT */
+		cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 static STATE_POSTLOAD( demonwld_restore_dsp )
 {
-	demonwld_dsp(demonwld_dsp_on);
+	demonwld_dsp(machine, demonwld_dsp_on);
 }
 
 WRITE16_HANDLER( demonwld_dsp_ctrl_w )
@@ -144,8 +143,8 @@ WRITE16_HANDLER( demonwld_dsp_ctrl_w )
 	{
 		switch (data)
 		{
-			case 0x00:	demonwld_dsp(1); break;	/* Enable the INT line to the DSP */
-			case 0x01:	demonwld_dsp(0); break;	/* Inhibit the INT line to the DSP */
+			case 0x00:	demonwld_dsp(machine, 1); break;	/* Enable the INT line to the DSP */
+			case 0x01:	demonwld_dsp(machine, 0); break;	/* Inhibit the INT line to the DSP */
 			default:	logerror("68000:%04x  Writing unknown command %08x to %08x\n",activecpu_get_previouspc() ,data ,0xe0000a + offset); break;
 		}
 	}

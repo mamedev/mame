@@ -179,7 +179,6 @@
 *************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "slapstic.h"
 #include "cpu/m68000/m68000.h"
 
@@ -810,7 +809,7 @@ static struct slapstic_data slapstic;
  *
  *************************************/
 
-void slapstic_init(int chip)
+void slapstic_init(running_machine *machine, int chip)
 {
 	/* only a small number of chips are known to exist */
 	if (chip < 101 || chip > 118)
@@ -825,8 +824,8 @@ void slapstic_init(int chip)
 	slapstic_reset();
 
 	/* see if we're 68k or 6502/6809 based */
-	access_68k = (Machine->config->cpu[0].type == CPU_M68000 ||
-				  Machine->config->cpu[0].type == CPU_M68010);
+	access_68k = (machine->config->cpu[0].type == CPU_M68000 ||
+				  machine->config->cpu[0].type == CPU_M68010);
 
 	/* save state */
 	state_save_register_item("slapstic", 0, state);

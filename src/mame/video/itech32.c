@@ -462,7 +462,7 @@ static void logblit(const char *tag)
  *
  *************************************/
 
-static void update_interrupts(int fast)
+static void update_interrupts(running_machine *machine, int fast)
 {
 	int scanline_state = 0, blitter_state = 0;
 
@@ -471,7 +471,7 @@ static void update_interrupts(int fast)
 	if (VIDEO_INTSTATE & VIDEO_INTENABLE & VIDEOINT_BLITTER)
 		blitter_state = 1;
 
-	itech32_update_interrupts(-1, blitter_state, scanline_state);
+	itech32_update_interrupts(machine, -1, blitter_state, scanline_state);
 }
 
 
@@ -485,7 +485,7 @@ static TIMER_CALLBACK( scanline_interrupt )
 	VIDEO_INTSTATE |= VIDEOINT_SCANLINE;
 
 	/* update the interrupt state */
-	update_interrupts(0);
+	update_interrupts(machine, 0);
 }
 
 
@@ -1195,7 +1195,7 @@ static void shiftreg_clear(UINT16 *base, UINT16 *zbase)
  *
  *************************************/
 
-static void handle_video_command(void)
+static void handle_video_command(running_machine *machine)
 {
 	/* only 6 known commands */
 	switch (VIDEO_COMMAND)
@@ -1271,7 +1271,7 @@ static void handle_video_command(void)
 
 	/* tell the processor we're done */
 	VIDEO_INTSTATE |= VIDEOINT_BLITTER;
-	update_interrupts(1);
+	update_interrupts(machine, 1);
 }
 
 
@@ -1293,7 +1293,7 @@ WRITE16_HANDLER( itech32_video_w )
 	{
 		case 0x02/2:	/* VIDEO_INTACK */
 			VIDEO_INTSTATE = old & ~data;
-			update_interrupts(1);
+			update_interrupts(machine, 1);
 			break;
 
 		case 0x04/2:	/* VIDEO_TRANSFER */
@@ -1318,11 +1318,11 @@ WRITE16_HANDLER( itech32_video_w )
 			break;
 
 		case 0x08/2:	/* VIDEO_COMMAND */
-			handle_video_command();
+			handle_video_command(machine);
 			break;
 
 		case 0x0a/2:	/* VIDEO_INTENABLE */
-			update_interrupts(1);
+			update_interrupts(machine, 1);
 			break;
 
 		case 0x24/2:	/* VIDEO_LEFTCLIP */

@@ -183,7 +183,6 @@
 **************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
 #include "audio/dcs.h"
@@ -471,7 +470,7 @@ static void galileo_reset(void);
 static TIMER_CALLBACK( galileo_timer_callback );
 static void galileo_perform_dma(running_machine *machine, int which);
 static void voodoo_stall(running_machine *machine, int stall);
-static void widget_reset(void);
+static void widget_reset(running_machine *machine);
 static void update_widget_irq(running_machine *machine);
 
 
@@ -569,7 +568,7 @@ static MACHINE_RESET( seattle )
 	devtag_reset(machine, IDE_CONTROLLER, "ide");
 	voodoo_reset(0);
 	if (board_config == SEATTLE_WIDGET_CONFIG)
-		widget_reset();
+		widget_reset(machine);
 	if (board_config == FLAGSTAFF_CONFIG)
 		smc91c94_reset(machine);
 }
@@ -927,7 +926,7 @@ static TIMER_CALLBACK( galileo_timer_callback )
  *
  *************************************/
 
-static int galileo_dma_fetch_next(int which)
+static int galileo_dma_fetch_next(running_machine *machine, int which)
 {
 	offs_t address = 0;
 	UINT32 data;
@@ -942,7 +941,7 @@ static int galileo_dma_fetch_next(int which)
 		if (galileo.reg[GREG_DMA0_CONTROL + which] & 0x400)
 		{
 			galileo.reg[GREG_INT_STATE] |= 1 << (GINT_DMA0COMP_SHIFT + which);
-			update_galileo_irqs(Machine);
+			update_galileo_irqs(machine);
 		}
 		galileo.reg[GREG_DMA0_CONTROL + which] &= ~0x5000;
 		return 0;
@@ -1053,7 +1052,7 @@ static void galileo_perform_dma(running_machine *machine, int which)
 			galileo.reg[GREG_INT_STATE] |= 1 << (GINT_DMA0COMP_SHIFT + which);
 			update_galileo_irqs(machine);
 		}
-	} while (galileo_dma_fetch_next(which));
+	} while (galileo_dma_fetch_next(machine, which));
 
 	galileo.reg[GREG_DMA0_CONTROL + which] &= ~0x5000;
 }
@@ -1177,7 +1176,7 @@ static WRITE32_HANDLER( galileo_w )
 
 			/* fetch next record */
 			if (data & 0x2000)
-				galileo_dma_fetch_next(which);
+				galileo_dma_fetch_next(machine, which);
 			galileo.reg[offset] &= ~0x2000;
 
 			/* if enabling, start the DMA */
@@ -1489,12 +1488,12 @@ static WRITE32_HANDLER( ethernet_w )
  *
  *************************************/
 
-static void widget_reset(void)
+static void widget_reset(running_machine *machine)
 {
 	UINT8 saved_irq = widget.irq_num;
 	memset(&widget, 0, sizeof(widget));
 	widget.irq_num = saved_irq;
-	smc91c94_reset(Machine);
+	smc91c94_reset(machine);
 }
 
 
@@ -1617,13 +1616,13 @@ static WRITE32_HANDLER( asic_reset_w )
 {
 	COMBINE_DATA(asic_reset);
 	if (!(*asic_reset & 0x0002))
-		midway_ioasic_reset();
+		midway_ioasic_reset(machine);
 }
 
 
 static WRITE32_HANDLER( asic_fifo_w )
 {
-	midway_ioasic_fifo_w(data);
+	midway_ioasic_fifo_w(machine, data);
 }
 
 
@@ -2725,7 +2724,7 @@ ROM_END
 static void init_common(running_machine *machine, int ioasic, int serialnum, int yearoffs, int config)
 {
 	/* initialize the subsystems */
-	midway_ioasic_init(ioasic, serialnum, yearoffs, ioasic_irq);
+	midway_ioasic_init(machine, ioasic, serialnum, yearoffs, ioasic_irq);
 
 	/* switch off the configuration */
 	board_config = config;

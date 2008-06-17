@@ -130,7 +130,7 @@ static UINT8 *imola_videoram[3];
 static int imola_draw_mode;
 
 static void
-InitializeColors( void )
+InitializeColors( running_machine *machine )
 { /* optional runtime remapping of colors */
 	static const UINT8 color[0x10][3] =
 	{ /* wrong! need color-accurate screenshots to fix */
@@ -154,8 +154,8 @@ InitializeColors( void )
 	int i;
 	for( i=0; i<0x10; i++ )
 	{
-		palette_set_color_rgb( Machine,i*2+0,0,0,0 );
-		palette_set_color_rgb( Machine,i*2+1,color[i][0],color[i][1],color[i][2] );
+		palette_set_color_rgb( machine,i*2+0,0,0,0 );
+		palette_set_color_rgb( machine,i*2+1,color[i][0],color[i][1],color[i][2] );
 	}
 }
 
@@ -167,7 +167,7 @@ static VIDEO_START( imolagp )
 		imola_videoram[i] = auto_malloc(0x4000);
 		memset( imola_videoram[i], 0x00, 0x4000 );
 	}
-	InitializeColors();
+	InitializeColors(machine);
 }
 
 

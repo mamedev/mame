@@ -14,7 +14,7 @@
 
 /*----------- defined in drivers/itech32.c -----------*/
 
-void itech32_update_interrupts(int vint, int xint, int qint);
+void itech32_update_interrupts(running_machine *machine, int vint, int xint, int qint);
 
 
 /*----------- defined in video/itech32.c -----------*/

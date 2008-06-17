@@ -169,9 +169,6 @@ DIP locations verified from manual for:
 #include "sound/2151intf.h"
 #include "sound/upd7759.h"
 
-void fd1094_machine_init(void);
-void fd1094_driver_init(void (*set_decrypted)(UINT8 *));
-
 static void sys16_video_config(void (*update)(void), int sprxoffs, const int *bank)
 {
 	static const int bank_default[16] =

@@ -196,7 +196,7 @@ static void draw_bullets(bitmap_t *bitmap, const rectangle *cliprect)
 
 static TIMER_CALLBACK( tank8_collision_callback )
 {
-	tank8_set_collision(param);
+	tank8_set_collision(machine, param);
 }
 
 

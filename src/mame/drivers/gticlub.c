@@ -35,7 +35,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
@@ -146,7 +145,7 @@ static const eeprom_interface eeprom_intf =
 	0				/* reset_delay */
 };
 
-static void eeprom_handler(mame_file *file, int read_or_write)
+static void eeprom_handler(running_machine *machine, mame_file *file, int read_or_write)
 {
 	if (read_or_write)
 	{
@@ -168,7 +167,7 @@ static void eeprom_handler(mame_file *file, int read_or_write)
 			UINT8 eepdata[0x200];
 			memset(eepdata, 0xff, 0x200);
 
-			if (mame_stricmp(Machine->gamedrv->name, "slrasslt") == 0)
+			if (mame_stricmp(machine->gamedrv->name, "slrasslt") == 0)
 			{
 				// magic number
 				eepdata[0x4] = 0x96;
@@ -372,14 +371,14 @@ WRITE8_HANDLER( K056230_w )
 			if (data & 0x20)
 			{
 				// Thunder Hurricane breaks otherwise...
-				if (mame_stricmp(Machine->gamedrv->name, "thunderh") != 0)
+				if (mame_stricmp(machine->gamedrv->name, "thunderh") != 0)
 				{
-					cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ2, ASSERT_LINE);
+					cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ2, ASSERT_LINE);
 					timer_set(ATTOTIME_IN_USEC(1), NULL, 0, network_irq_clear);
 				}
 			}
 //          else
-//              cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ2, CLEAR_LINE);
+//              cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ2, CLEAR_LINE);
 			break;
 		}
 		case 2:		// Sub ID register
@@ -508,7 +507,7 @@ ADDRESS_MAP_END
 
 static NVRAM_HANDLER(gticlub)
 {
-	eeprom_handler(file, read_or_write);
+	eeprom_handler(machine, file, read_or_write);
 }
 
 

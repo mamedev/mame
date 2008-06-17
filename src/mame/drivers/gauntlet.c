@@ -1631,11 +1631,11 @@ ROM_END
  *
  *************************************/
 
-static void gauntlet_common_init(int slapstic, int vindctr2)
+static void gauntlet_common_init(running_machine *machine, int slapstic, int vindctr2)
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
 	atarigen_eeprom_default = NULL;
-	atarigen_slapstic_init(0, 0x038000, 0, slapstic);
+	atarigen_slapstic_init(machine, 0, 0x038000, 0, slapstic);
 
 	/* swap the top and bottom halves of the main CPU ROM images */
 	atarigen_swap_mem(rom + 0x000000, rom + 0x008000, 0x8000);
@@ -1651,19 +1651,19 @@ static void gauntlet_common_init(int slapstic, int vindctr2)
 
 static DRIVER_INIT( gauntlet )
 {
-	gauntlet_common_init(104, 0);
+	gauntlet_common_init(machine, 104, 0);
 }
 
 
 static DRIVER_INIT( gaunt2p )
 {
-	gauntlet_common_init(107, 0);
+	gauntlet_common_init(machine, 107, 0);
 }
 
 
 static DRIVER_INIT( gauntlet2 )
 {
-	gauntlet_common_init(106, 0);
+	gauntlet_common_init(machine, 106, 0);
 }
 
 
@@ -1673,7 +1673,7 @@ static DRIVER_INIT( vindctr2 )
 	UINT8 *data = malloc_or_die(0x8000);
 	int i;
 
-	gauntlet_common_init(118, 1);
+	gauntlet_common_init(machine, 118, 1);
 
 	/* highly strange -- the address bits on the chip at 2J (and only that
        chip) are scrambled -- this is verified on the schematics! */

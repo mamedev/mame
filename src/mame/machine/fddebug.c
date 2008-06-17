@@ -256,9 +256,9 @@ static void					(*key_changed)(void);
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void set_default_key_params(void);
-static void load_overlay_file(void);
-static void save_overlay_file(void);
+static void set_default_key_params(running_machine *machine);
+static void load_overlay_file(running_machine *machine);
+static void save_overlay_file(running_machine *machine);
 static void fd1094_regenerate_key(void);
 
 static int instruction_hook(offs_t curpc);
@@ -479,7 +479,7 @@ INLINE int addr_is_valid(UINT32 addr, UINT32 flags)
     fd1094_init_debugging - set up debugging
 -----------------------------------------------*/
 
-void fd1094_init_debugging(int cpureg, int keyreg, int statreg, void (*changed)(void))
+void fd1094_init_debugging(running_machine *machine, int cpureg, int keyreg, int statreg, void (*changed)(void))
 {
 	/* set the key changed callback */
 	key_changed = changed;
@@ -514,10 +514,10 @@ void fd1094_init_debugging(int cpureg, int keyreg, int statreg, void (*changed)(
 	set_constraint(&constraints[constcount++], 0x000006, FD1094_STATE_RESET, 0x0000, 0xc001);
 
 	/* determine the key parameters */
-	set_default_key_params();
+	set_default_key_params(machine);
 
 	/* read the key overlay file */
-	load_overlay_file();
+	load_overlay_file(machine);
 
 	/* add some commands */
 	debug_console_register_command("fdsave", CMDFLAG_NONE, 0, 0, 0, execute_fdsave);
@@ -552,7 +552,7 @@ void fd1094_init_debugging(int cpureg, int keyreg, int statreg, void (*changed)(
     name, set some defaults
 -----------------------------------------------*/
 
-static void set_default_key_params(void)
+static void set_default_key_params(running_machine *machine)
 {
 	static const struct
 	{
@@ -568,7 +568,7 @@ static void set_default_key_params(void)
 
 	/* look for a matching game and set the key appropriately */
 	for (keynum = 0; keynum < ARRAY_LENGTH(default_keys); keynum++)
-		if (strcmp(Machine->gamedrv->name, default_keys[keynum].gamename) == 0)
+		if (strcmp(machine->gamedrv->name, default_keys[keynum].gamename) == 0)
 		{
 			fd1094_global = default_keys[keynum].global;
 			fd1094_seed = default_keys[keynum].seed;
@@ -583,7 +583,7 @@ static void set_default_key_params(void)
     file
 -----------------------------------------------*/
 
-static void load_overlay_file(void)
+static void load_overlay_file(running_machine *machine)
 {
 	char filename[20];
 	file_error filerr;
@@ -591,7 +591,7 @@ static void load_overlay_file(void)
 	int pcaddr;
 
 	/* determine the filename and open the file */
-	sprintf(filename, "%s.kov", Machine->gamedrv->name);
+	sprintf(filename, "%s.kov", machine->gamedrv->name);
 	filerr = mame_fopen(SEARCHPATH_RAW, filename, OPEN_FLAG_READ, &file);
 	if (filerr == FILERR_NONE)
 	{
@@ -613,7 +613,7 @@ static void load_overlay_file(void)
     file
 -----------------------------------------------*/
 
-static void save_overlay_file(void)
+static void save_overlay_file(running_machine *machine)
 {
 	char filename[20];
 	file_error filerr;
@@ -621,7 +621,7 @@ static void save_overlay_file(void)
 	int pcaddr;
 
 	/* determin the filename and open the file */
-	sprintf(filename, "%s.kov", Machine->gamedrv->name);
+	sprintf(filename, "%s.kov", machine->gamedrv->name);
 	filerr = mame_fopen(SEARCHPATH_RAW, filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
 	if (filerr == FILERR_NONE)
 	{
@@ -748,7 +748,7 @@ static int instruction_hook(offs_t curpc)
 
 static void execute_fdsave(int ref, int params, const char **param)
 {
-	save_overlay_file();
+	save_overlay_file(Machine);
 	debug_console_printf("File saved\n");
 }
 

@@ -536,7 +536,7 @@ static DRIVER_INIT( rampart )
 
 	atarigen_eeprom_default = compressed_default_eeprom;
 	memcpy(&rom[0x140000], &rom[0x40000], 0x8000);
-	atarigen_slapstic_init(0, 0x140000, 0x438000, 118);
+	atarigen_slapstic_init(machine, 0, 0x140000, 0x438000, 118);
 }
 
 

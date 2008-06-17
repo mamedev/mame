@@ -434,39 +434,39 @@ static WRITE16_HANDLER( umk3_palette_hack_w )
 /*  printf("in=%04X%04X  out=%04X%04X\n", umk3_palette[3], umk3_palette[2], umk3_palette[1], umk3_palette[0]); */
 }
 
-static void init_mk3_common(void)
+static void init_mk3_common(running_machine *machine)
 {
 	/* common init */
 	init_wunit_generic();
 
 	/* serial prefixes 439, 528 */
-	midway_serial_pic_init(528);
+	midway_serial_pic_init(machine, 528);
 }
 
 DRIVER_INIT( mk3 )
 {
-	init_mk3_common();
+	init_mk3_common(machine);
 }
 
 DRIVER_INIT( mk3r20 )
 {
-	init_mk3_common();
+	init_mk3_common(machine);
 }
 
 DRIVER_INIT( mk3r10 )
 {
-	init_mk3_common();
+	init_mk3_common(machine);
 }
 
 DRIVER_INIT( umk3 )
 {
-	init_mk3_common();
+	init_mk3_common(machine);
 	umk3_palette = memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0106a060, 0x0106a09f, 0, 0, umk3_palette_hack_w);
 }
 
 DRIVER_INIT( umk3r11 )
 {
-	init_mk3_common();
+	init_mk3_common(machine);
 	umk3_palette = memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0106a060, 0x0106a09f, 0, 0, umk3_palette_hack_w);
 }
 
@@ -479,7 +479,7 @@ DRIVER_INIT( openice )
 	init_wunit_generic();
 
 	/* serial prefixes 438, 528 */
-	midway_serial_pic_init(528);
+	midway_serial_pic_init(machine, 528);
 }
 
 
@@ -491,7 +491,7 @@ DRIVER_INIT( nbahangt )
 	init_wunit_generic();
 
 	/* serial prefixes 459, 470, 528 */
-	midway_serial_pic_init(528);
+	midway_serial_pic_init(machine, 528);
 }
 
 
@@ -555,7 +555,7 @@ DRIVER_INIT( wwfmania )
 	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01800000, 0x0180000f, 0, 0, wwfmania_io_0_w);
 
 	/* serial prefixes 430, 528 */
-	midway_serial_pic_init(528);
+	midway_serial_pic_init(machine, 528);
 }
 
 
@@ -567,7 +567,7 @@ DRIVER_INIT( rmpgwt )
 	init_wunit_generic();
 
 	/* serial prefixes 465, 528 */
-	midway_serial_pic_init(528);
+	midway_serial_pic_init(machine, 528);
 }
 
 
@@ -600,7 +600,7 @@ DRIVER_INIT( revx )
 	dcs_init();
 
 	/* serial prefixes 419, 420 */
-	midway_serial_pic_init(419);
+	midway_serial_pic_init(machine, 419);
 }
 
 

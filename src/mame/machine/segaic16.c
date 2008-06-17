@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "segaic16.h"
 #include "video/resnet.h"
 
@@ -641,14 +640,14 @@ static void update_compare(int which, int update_history)
 }
 
 
-static void timer_interrupt_ack(int which)
+static void timer_interrupt_ack(running_machine *machine, int which)
 {
 	if (compare_timer[which].timer_ack)
-		(*compare_timer[which].timer_ack)(Machine);
+		(*compare_timer[which].timer_ack)(machine);
 }
 
 
-static UINT16 compare_timer_r(int which, offs_t offset, UINT16 mem_mask)
+static UINT16 compare_timer_r(running_machine *machine, int which, offs_t offset, UINT16 mem_mask)
 {
 	offset &= 0xf;
 	if (LOG_COMPARE) logerror("%06X:compare%d_r(%X) = %04X\n", activecpu_get_pc(), which, offset, compare_timer[which].regs[offset]);
@@ -663,13 +662,13 @@ static UINT16 compare_timer_r(int which, offs_t offset, UINT16 mem_mask)
 		case 0x6:	return compare_timer[which].regs[2];
 		case 0x7:	return compare_timer[which].regs[7];
 		case 0x9:
-		case 0xd:	timer_interrupt_ack(which); break;
+		case 0xd:	timer_interrupt_ack(machine, which); break;
 	}
 	return 0xffff;
 }
 
 
-static void compare_timer_w(int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void compare_timer_w(running_machine *machine, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	offset &= 0xf;
 	if (LOG_COMPARE) logerror("%06X:compare%d_w(%X) = %04X\n", activecpu_get_pc(), which, offset, data);
@@ -683,7 +682,7 @@ static void compare_timer_w(int which, offs_t offset, UINT16 data, UINT16 mem_ma
 		case 0x8:
 		case 0xc:	COMBINE_DATA(&compare_timer[which].regs[8]); break;
 		case 0x9:
-		case 0xd:	timer_interrupt_ack(which); break;
+		case 0xd:	timer_interrupt_ack(machine, which); break;
 		case 0xa:
 		case 0xe:	COMBINE_DATA(&compare_timer[which].regs[10]); break;
 		case 0xb:
@@ -696,7 +695,7 @@ static void compare_timer_w(int which, offs_t offset, UINT16 data, UINT16 mem_ma
 }
 
 
-READ16_HANDLER( segaic16_compare_timer_0_r )  { return compare_timer_r(0, offset, mem_mask); }
-READ16_HANDLER( segaic16_compare_timer_1_r )  { return compare_timer_r(1, offset, mem_mask); }
-WRITE16_HANDLER( segaic16_compare_timer_0_w ) { compare_timer_w(0, offset, data, mem_mask); }
-WRITE16_HANDLER( segaic16_compare_timer_1_w ) { compare_timer_w(1, offset, data, mem_mask); }
+READ16_HANDLER( segaic16_compare_timer_0_r )  { return compare_timer_r(machine, 0, offset, mem_mask); }
+READ16_HANDLER( segaic16_compare_timer_1_r )  { return compare_timer_r(machine, 1, offset, mem_mask); }
+WRITE16_HANDLER( segaic16_compare_timer_0_w ) { compare_timer_w(machine, 0, offset, data, mem_mask); }
+WRITE16_HANDLER( segaic16_compare_timer_1_w ) { compare_timer_w(machine, 1, offset, data, mem_mask); }

@@ -5,7 +5,6 @@
  *************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/atarig42.h"
 #include "cpu/tms32010/tms32010.h"
 #include "asic65.h"
@@ -124,11 +123,11 @@ static const UINT8 command_map[3][MAX_COMMANDS] =
  *
  *************************************/
 
-void asic65_config(int asictype)
+void asic65_config(running_machine *machine, int asictype)
 {
 	asic65_type = asictype;
 	if (asic65_type == ASIC65_ROMBASED)
-		asic65_cpunum = mame_find_cpu_index(Machine, "asic65");
+		asic65_cpunum = mame_find_cpu_index(machine, "asic65");
 }
 
 
@@ -139,16 +138,16 @@ void asic65_config(int asictype)
  *
  *************************************/
 
-void asic65_reset(int state)
+void asic65_reset(running_machine *machine, int state)
 {
 	/* rom-based means reset and clear states */
 	if (asic65_type == ASIC65_ROMBASED)
-		cpunum_set_input_line(Machine, asic65_cpunum, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, asic65_cpunum, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* otherwise, do it manually */
 	else
 	{
-		cpunum_suspend(mame_find_cpu_index(Machine, "asic65"), SUSPEND_REASON_DISABLE, 1);
+		cpunum_suspend(mame_find_cpu_index(machine, "asic65"), SUSPEND_REASON_DISABLE, 1);
 
 		/* if reset is being signalled, clear everything */
 		if (state && !asic65_reset_state)
@@ -158,7 +157,7 @@ void asic65_reset(int state)
 		else if (!state && asic65_reset_state)
 		{
 			if (asic65_command != -1)
-				asic65_data_w(Machine, 1, asic65_command, 0xffff);
+				asic65_data_w(machine, 1, asic65_command, 0xffff);
 		}
 
 		/* update the state */

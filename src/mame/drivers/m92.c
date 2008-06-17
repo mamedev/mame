@@ -189,7 +189,6 @@ Notes:
 *****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/m92.h"
 #include "drivers/m92.h"
 #include "machine/irem_cpu.h"
@@ -952,9 +951,9 @@ static const struct IremGA20_interface iremGA20_interface =
 
 /***************************************************************************/
 
-void m92_sprite_interrupt(void)
+void m92_sprite_interrupt(running_machine *machine)
 {
-	cpunum_set_input_line_and_vector(Machine, 0, 0, HOLD_LINE, M92_IRQ_1);
+	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, M92_IRQ_1);
 }
 
 static MACHINE_DRIVER_START( m92 )

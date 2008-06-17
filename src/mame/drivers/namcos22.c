@@ -1225,12 +1225,12 @@ HandleCyberCommandoIO( running_machine *machine )
 /*********************************************************************************************/
 
 static void
-InitDSP( int bSuperSystem22 )
+InitDSP( running_machine *machine, int bSuperSystem22 )
 {
 	mbSuperSystem22 = bSuperSystem22;
-	cpunum_set_input_line(Machine, 1,INPUT_LINE_RESET,ASSERT_LINE); /* master DSP */
-	cpunum_set_input_line(Machine, 2,INPUT_LINE_RESET,ASSERT_LINE); /* slave DSP */
-	cpunum_set_input_line(Machine, 3,INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
+	cpunum_set_input_line(machine, 1,INPUT_LINE_RESET,ASSERT_LINE); /* master DSP */
+	cpunum_set_input_line(machine, 2,INPUT_LINE_RESET,ASSERT_LINE); /* slave DSP */
+	cpunum_set_input_line(machine, 3,INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
 } /* InitDSP */
 
 static READ16_HANDLER( pdp_status_r )
@@ -1408,9 +1408,9 @@ static WRITE16_HANDLER( slave_external_ram_w )
 	COMBINE_DATA( &mpSlaveExternalRAM[offset] );
 }
 
-static void HaltSlaveDSP( void )
+static void HaltSlaveDSP( running_machine *machine )
 {
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static void EnableSlaveDSP( void )
@@ -1495,7 +1495,7 @@ static WRITE16_HANDLER( upload_code_to_slave_dsp_w )
 		logerror( "UPLOAD_READY; cmd = 0x%x\n", data );
 		if( data==0 )
 		{
-			HaltSlaveDSP();
+			HaltSlaveDSP(machine);
 		}
 		else if( data==1 )
 		{
@@ -2333,7 +2333,7 @@ static WRITE16_HANDLER( s22mcu_shared_w )
 
 static MACHINE_RESET(namcoss22)
 {
-	InitDSP(1/*super*/);
+	InitDSP(machine, 1/*super*/);
 }
 
 /*
@@ -3071,7 +3071,7 @@ static INTERRUPT_GEN( namcos22_interrupt )
 
 static MACHINE_RESET(namcos22)
 {
-	InitDSP(0);
+	InitDSP(machine, 0);
 }
 
 static MACHINE_DRIVER_START( namcos22 )

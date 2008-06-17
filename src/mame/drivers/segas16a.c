@@ -180,7 +180,7 @@ static UINT32 n7751_rom_address;
  *************************************/
 
 extern void fd1094_machine_init(void);
-extern void fd1094_driver_init(void (*set_decrypted)(UINT8 *));
+extern void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(UINT8 *));
 
 static READ16_HANDLER( misc_io_r );
 static WRITE16_HANDLER( misc_io_w );
@@ -220,7 +220,7 @@ static void system16a_generic_init(running_machine *machine)
 	MACHINE_RESET_CALL(sys16_onetime);
 
 	/* init the FD1094 */
-	fd1094_driver_init(NULL);
+	fd1094_driver_init(machine, NULL);
 
 	/* reset the custom handlers and other pointers */
 	custom_io_r = NULL;

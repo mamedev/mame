@@ -3,6 +3,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/n64.h"
 
 #define LOG_RDP_EXECUTION 		0
@@ -3003,7 +3004,7 @@ static void rdp_sync_tile(UINT32 w1, UINT32 w2)
 
 static void rdp_sync_full(UINT32 w1, UINT32 w2)
 {
-	dp_full_sync();
+	dp_full_sync(Machine);
 }
 
 static void rdp_set_key_gb(UINT32 w1, UINT32 w2)

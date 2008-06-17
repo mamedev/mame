@@ -9,7 +9,6 @@ make more configurable (select caches per game?)
 */
 
 #include "driver.h"
-#include "deprecat.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/fd1094.h"
@@ -195,7 +194,7 @@ static void key_changed(void)
 
 
 /* startup function, to be called from DRIVER_INIT (once on startup) */
-void fd1094_driver_init(void (*set_decrypted)(UINT8 *))
+void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(UINT8 *))
 {
 	int i;
 
@@ -218,14 +217,14 @@ void fd1094_driver_init(void (*set_decrypted)(UINT8 *))
 
 #ifdef ENABLE_DEBUGGER
 	/* key debugging */
-	if (Machine->debug_mode && memory_region(REGION_USER2) != NULL)
+	if (machine->debug_mode && memory_region(REGION_USER2) != NULL)
 	{
-		void fd1094_init_debugging(int, int, int, void (*changed)(void));
-		fd1094_init_debugging(REGION_CPU1, REGION_USER1, REGION_USER2, key_changed);
+		void fd1094_init_debugging(running_machine *, int, int, int, void (*changed)(void));
+		fd1094_init_debugging(machine, REGION_CPU1, REGION_USER1, REGION_USER2, key_changed);
 	}
 #endif
 
 	state_save_register_global(fd1094_selected_state);
 	state_save_register_global(fd1094_state);
-	state_save_register_postload(Machine, fd1094_postload, NULL);
+	state_save_register_postload(machine, fd1094_postload, NULL);
 }
