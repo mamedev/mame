@@ -75,11 +75,10 @@
  *
  *************************************/
 
-static MACHINE_START( grchamp )
+static MACHINE_RESET( grchamp )
 {
 	/* if the coin system is 1 way, lock Coin B (Page 40) */
-	if (input_port_read(machine, "DSWB") & 0x10)
-		coin_lockout_w(1, 1);
+	coin_lockout_w(1, (input_port_read(machine, "DSWB") & 0x10) ? 1 : 0);
 }
 
 
@@ -691,7 +690,7 @@ static MACHINE_DRIVER_START( grchamp )
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)SOUND_CLOCK/4/16/16/10/16)
 
-	MDRV_MACHINE_START(grchamp)
+	MDRV_MACHINE_RESET(grchamp)
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_INTERLEAVE(100)
 
