@@ -186,22 +186,26 @@ static const int lordgun_gun_x_table[] =
 	0x1B3,0x1B4,0x1B5,0x1B6,0x1B7,0x1B8,0x1B9,0x1BA,0x1BB,0x1BC,0x1BD,0x1BE,0x1BF,0x1BF
 };
 
+
+static const char *gunnames[] = { "LIGHT0_X", "LIGHT1_X", "LIGHT0_Y", "LIGHT1_Y" };
+
 static void lorddgun_calc_gun_scr(running_machine *machine, int i)
 {
-	int x = input_port_read_indexed(machine, 5+i) - 0x3c;
+	int x = input_port_read(machine, gunnames[i]) - 0x3c;
+	
 	if ( (x < 0) || (x > sizeof(lordgun_gun_x_table)/sizeof(lordgun_gun_x_table[0])) )
 		x = 0;
 
 	lordgun_gun[i].scr_x = lordgun_gun_x_table[x];
-	lordgun_gun[i].scr_y = input_port_read_indexed(machine, 7+i);
+	lordgun_gun[i].scr_y = input_port_read(machine, gunnames[i+2]);
 }
 
 void lordgun_update_gun(running_machine *machine, int i)
 {
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	lordgun_gun[i].hw_x = input_port_read_indexed(machine, 5+i);
-	lordgun_gun[i].hw_y = input_port_read_indexed(machine, 7+i);
+	lordgun_gun[i].hw_x = input_port_read(machine, gunnames[i]);
+	lordgun_gun[i].hw_y = input_port_read(machine, gunnames[i+2]);
 
 	lorddgun_calc_gun_scr(machine, i);
 

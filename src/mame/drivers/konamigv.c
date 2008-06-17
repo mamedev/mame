@@ -517,10 +517,11 @@ static READ32_HANDLER( trackball_r )
 		int axis;
 		UINT16 diff;
 		UINT16 value;
+		static const char *axisnames[] = { "TRACK0_X", "TRACK0_Y" };
 
 		for( axis = 0; axis < 2; axis++ )
 		{
-			value = input_port_read_indexed(machine,  axis + 3 );
+			value = input_port_read(machine, axisnames[axis]);
 			diff = value - trackball_prev[ axis ];
 			trackball_prev[ axis ] = value;
 			trackball_data[ axis ] = ( ( diff & 0xf00 ) << 16 ) | ( ( diff & 0xff ) << 8 );
@@ -556,10 +557,10 @@ MACHINE_DRIVER_END
 static INPUT_PORTS_START( simpbowl )
 	PORT_INCLUDE( konamigv )
 
-	PORT_START_TAG("IN3")
+	PORT_START_TAG("TRACK0_X")
 	PORT_BIT( 0xfff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START_TAG("IN4")
+	PORT_START_TAG("TRACK0_Y")
 	PORT_BIT( 0xfff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(1)
 
 INPUT_PORTS_END
@@ -601,10 +602,11 @@ static READ32_HANDLER( btc_trackball_r )
 		int axis;
 		UINT16 diff;
 		UINT16 value;
+		static const char *axisnames[] = { "TRACK0_X", "TRACK0_Y", "TRACK1_X", "TRACK1_Y" };
 
 		for( axis = 0; axis < 4; axis++ )
 		{
-			value = input_port_read_indexed(machine,  axis + 3 );
+			value = input_port_read(machine, axisnames[axis]);
 			diff = value - btc_trackball_prev[ axis ];
 			btc_trackball_prev[ axis ] = value;
 			btc_trackball_data[ axis ] = ( ( diff & 0xf00 ) << 16 ) | ( ( diff & 0xff ) << 8 );
@@ -643,16 +645,16 @@ MACHINE_DRIVER_END
 static INPUT_PORTS_START( btchamp )
 	PORT_INCLUDE( konamigv )
 
-	PORT_START_TAG("IN3")
+	PORT_START_TAG("TRACK0_X")
 	PORT_BIT( 0x7ff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START_TAG("IN4")
+	PORT_START_TAG("TRACK0_Y")
 	PORT_BIT( 0x7ff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(1)
 
-	PORT_START_TAG("IN5")
+	PORT_START_TAG("TRACK1_X")
 	PORT_BIT( 0x7ff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START_TAG("IN6")
+	PORT_START_TAG("TRACK1_Y")
 	PORT_BIT( 0x7ff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(2)
 INPUT_PORTS_END
 

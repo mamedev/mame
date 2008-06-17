@@ -193,7 +193,7 @@ static MACHINE_RESET( gauntlet )
 
 static READ16_HANDLER( port4_r )
 {
-	int temp = input_port_read_indexed(machine, 4);
+	int temp = input_port_read(machine, "IN4");
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0020;
 	if (atarigen_sound_to_cpu_ready) temp ^= 0x0010;
 	return temp;
@@ -237,7 +237,7 @@ static READ8_HANDLER( switch_6502_r )
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x80;
 	if (atarigen_sound_to_cpu_ready) temp ^= 0x40;
 	if (tms5220_ready_r()) temp ^= 0x20;
-	if (!(input_port_read_indexed(machine, 4) & 0x0008)) temp ^= 0x10;
+	if (!(input_port_read(machine, "IN4") & 0x0008)) temp ^= 0x10;
 
 	return temp;
 }

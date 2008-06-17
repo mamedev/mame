@@ -162,14 +162,14 @@ TODO:
 
 ***************************************************************************/
 
-static READ8_HANDLER( in0_l )	{ return input_port_read_indexed(machine, 0); }		// P1 joystick
-static READ8_HANDLER( in0_h )	{ return input_port_read_indexed(machine, 0) >> 4; }	// P2 joystick
-static READ8_HANDLER( in1_l )	{ return input_port_read_indexed(machine, 1); }		// fire and start buttons
-static READ8_HANDLER( in1_h )	{ return input_port_read_indexed(machine, 1) >> 4; }	// coins
-static READ8_HANDLER( dipA_l )	{ return input_port_read_indexed(machine, 2); }		// dips A
-static READ8_HANDLER( dipA_h )	{ return input_port_read_indexed(machine, 2) >> 4; }	// dips A
-static READ8_HANDLER( dipB_l )	{ return input_port_read_indexed(machine, 3); }		// dips B
-static READ8_HANDLER( dipB_h )	{ return input_port_read_indexed(machine, 3) >> 4; }	// dips B
+static READ8_HANDLER( in0_l )	{ return input_port_read(machine, "IN0"); }			// P1 joystick
+static READ8_HANDLER( in0_h )	{ return input_port_read(machine, "IN0") >> 4; }	// P2 joystick
+static READ8_HANDLER( in1_l )	{ return input_port_read(machine, "IN1"); }			// fire and start buttons
+static READ8_HANDLER( in1_h )	{ return input_port_read(machine, "IN1") >> 4; }	// coins
+static READ8_HANDLER( dipA_l )	{ return input_port_read(machine, "DSW0"); }		// dips A
+static READ8_HANDLER( dipA_h )	{ return input_port_read(machine, "DSW0") >> 4; }	// dips A
+static READ8_HANDLER( dipB_l )	{ return input_port_read(machine, "DSW1"); }		// dips B
+static READ8_HANDLER( dipB_h )	{ return input_port_read(machine, "DSW1") >> 4; }	// dips B
 static WRITE8_HANDLER( out_lamps0 )
 {
 	set_led_status(0,data & 1);
@@ -364,7 +364,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gaplus )
 	/* The inputs are not memory mapped, they are handled by three I/O chips. */
-	PORT_START	/* 56XX #0 pins 22-29 */
+	PORT_START_TAG("IN0")	/* 56XX #0 pins 22-29 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -374,7 +374,7 @@ static INPUT_PORTS_START( gaplus )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 
-	PORT_START	/* 56XX #0 pins 30-33 and 38-41 */
+	PORT_START_TAG("IN1")	/* 56XX #0 pins 30-33 and 38-41 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -384,7 +384,7 @@ static INPUT_PORTS_START( gaplus )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_START	/* 58XX #1 pins 30-33 and 38-41 */
+	PORT_START_TAG("DSW0")	/* 58XX #1 pins 30-33 and 38-41 */
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x80, "2" )
 	PORT_DIPSETTING(    0xc0, "3" )
@@ -407,7 +407,7 @@ static INPUT_PORTS_START( gaplus )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 
-	PORT_START	/* 58XX #1 pins 22-29 */
+	PORT_START_TAG("DSW1")	/* 58XX #1 pins 22-29 */
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -433,7 +433,7 @@ static INPUT_PORTS_START( gaplus )
 	PORT_DIPSETTING(    0x05, "50k 150k and every 300k" )
 	PORT_DIPSETTING(    0x06, "50k 150k" )
 
-	PORT_START	/* 62XX #2 pins 24-27 */
+	PORT_START_TAG("IN2")	/* 62XX #2 pins 24-27 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )
@@ -444,145 +444,20 @@ INPUT_PORTS_END
 
 /* identical to gaplus, but service mode is a dip switch instead of coming from edge connector */
 static INPUT_PORTS_START( gapluso )
-	/* The inputs are not memory mapped, they are handled by three I/O chips. */
-	PORT_START	/* 56XX #0 pins 22-29 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_INCLUDE( gaplus )
 
-	PORT_START	/* 56XX #0 pins 30-33 and 38-41 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
-
-	PORT_START	/* 58XX #1 pins 30-33 and 38-41 */
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x80, "2" )
-	PORT_DIPSETTING(    0xc0, "3" )
-	PORT_DIPSETTING(    0x40, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-
-	PORT_START	/* 58XX #1 pins 22-29 */
+	PORT_MODIFY("DSW1")
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x70, "0 - Standard" )
-	PORT_DIPSETTING(    0x60, "1 - Easiest" )
-	PORT_DIPSETTING(    0x50, "2" )
-	PORT_DIPSETTING(    0x40, "3" )
-	PORT_DIPSETTING(    0x30, "4" )
-	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPSETTING(    0x10, "6" )
-	PORT_DIPSETTING(    0x00, "7 - Hardest" )
-	PORT_DIPNAME( 0x08, 0x08, "Round Advance" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "30k 70k and every 70k" )
-	PORT_DIPSETTING(    0x01, "30k 100k and every 100k" )
-	PORT_DIPSETTING(    0x02, "30k 100k and every 200k" )
-	PORT_DIPSETTING(    0x03, "50k 100k and every 100k" )
-	PORT_DIPSETTING(    0x04, "50k 100k and every 200k" )
-	PORT_DIPSETTING(    0x07, "50k 150k and every 150k" )
-	PORT_DIPSETTING(    0x05, "50k 150k and every 300k" )
-	PORT_DIPSETTING(    0x06, "50k 150k" )
 
-	PORT_START	/* 62XX #2 pins 24-27 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	// doesn't seem to be used
 INPUT_PORTS_END
 
 /* identical to gaplus, but different bonus life settings */
 static INPUT_PORTS_START( galaga3a )
-	/* The inputs are not memory mapped, they are handled by three I/O chips. */
-	PORT_START	/* 56XX #0 pins 22-29 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_INCLUDE( gaplus )
 
-	PORT_START	/* 56XX #0 pins 30-33 and 38-41 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
-
-	PORT_START	/* 58XX #1 pins 30-33 and 38-41 */
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x80, "2" )
-	PORT_DIPSETTING(    0xc0, "3" )
-	PORT_DIPSETTING(    0x40, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-
-	PORT_START	/* 58XX #1 pins 22-29 */
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x70, "0 - Standard" )
-	PORT_DIPSETTING(    0x60, "1 - Easiest" )
-	PORT_DIPSETTING(    0x50, "2" )
-	PORT_DIPSETTING(    0x40, "3" )
-	PORT_DIPSETTING(    0x30, "4" )
-	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPSETTING(    0x10, "6" )
-	PORT_DIPSETTING(    0x00, "7 - Hardest" )
-	PORT_DIPNAME( 0x08, 0x08, "Round Advance" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x02, "30k 80k and every 100k" )
 	PORT_DIPSETTING(    0x03, "30k 100k and every 100k" )
@@ -592,78 +467,13 @@ static INPUT_PORTS_START( galaga3a )
 	PORT_DIPSETTING(    0x06, "30k 150k" )
 	PORT_DIPSETTING(    0x00, "50k 150k and every 150k" )
 	PORT_DIPSETTING(    0x01, "50k 150k and every 200k" )
-
-	PORT_START	/* 62XX #2 pins 24-27 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 /* identical to gaplus, but different bonus life settings */
 static INPUT_PORTS_START( galaga3m )
-	/* The inputs are not memory mapped, they are handled by three I/O chips. */
-	PORT_START	/* 56XX #0 pins 22-29 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_INCLUDE( gaplus )
 
-	PORT_START	/* 56XX #0 pins 30-33 and 38-41 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
-
-	PORT_START	/* 58XX #1 pins 30-33 and 38-41 */
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x80, "2" )
-	PORT_DIPSETTING(    0xc0, "3" )
-	PORT_DIPSETTING(    0x40, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-
-	PORT_START	/* 58XX #1 pins 22-29 */
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x70, "0 - Standard" )
-	PORT_DIPSETTING(    0x60, "1 - Easiest" )
-	PORT_DIPSETTING(    0x50, "2" )
-	PORT_DIPSETTING(    0x40, "3" )
-	PORT_DIPSETTING(    0x30, "4" )
-	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPSETTING(    0x10, "6" )
-	PORT_DIPSETTING(    0x00, "7 - Hardest" )
-	PORT_DIPNAME( 0x08, 0x08, "Round Advance" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "30k 150k and every 600k" )
 	PORT_DIPSETTING(    0x01, "50k 150k and every 300k" )
@@ -673,14 +483,6 @@ static INPUT_PORTS_START( galaga3m )
 	PORT_DIPSETTING(    0x07, "100k 300k and every 600k" )
 	PORT_DIPSETTING(    0x05, "150k 400k and every 900k" )
 	PORT_DIPSETTING(    0x06, "150k 400k" )
-
-	PORT_START	/* 62XX #2 pins 24-27 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 

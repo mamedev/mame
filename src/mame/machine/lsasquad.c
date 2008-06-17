@@ -181,7 +181,7 @@ READ8_HANDLER( lsasquad_mcu_r )
 
 READ8_HANDLER( lsasquad_mcu_status_r )
 {
-	int res = input_port_read_indexed(machine, 3);
+	int res = input_port_read(machine, "MCU?");
 
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 1 = when 0, mcu has sent data to the main cpu */

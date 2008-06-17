@@ -79,11 +79,11 @@ static READ16_HANDLER( mahjong_panel_r )
 
 	switch(goodejan_mux_data)
 	{
-		case 1:    ret = input_port_read_indexed(machine, 1); break;
-		case 2:    ret = input_port_read_indexed(machine, 2); break;
-		case 4:    ret = input_port_read_indexed(machine, 3); break;
-		case 8:    ret = input_port_read_indexed(machine, 4); break;
-		case 0x10: ret = input_port_read_indexed(machine, 5); break;
+		case 1:    ret = input_port_read(machine, "KEY0"); break;
+		case 2:    ret = input_port_read(machine, "KEY1"); break;
+		case 4:    ret = input_port_read(machine, "KEY2"); break;
+		case 8:    ret = input_port_read(machine, "KEY3"); break;
+		case 0x10: ret = input_port_read(machine, "KEY4"); break;
 	}
 
 	return ret;
@@ -126,7 +126,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( goodejan )
 	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
-	PORT_START
+	PORT_START_TAG("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
@@ -136,7 +136,7 @@ static INPUT_PORTS_START( goodejan )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
@@ -146,7 +146,7 @@ static INPUT_PORTS_START( goodejan )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
@@ -156,7 +156,7 @@ static INPUT_PORTS_START( goodejan )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
@@ -166,7 +166,7 @@ static INPUT_PORTS_START( goodejan )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
@@ -176,55 +176,55 @@ static INPUT_PORTS_START( goodejan )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
-   PORT_DIPNAME( 0x0001, 0x0001, "4" )
-    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) )  // Freezes if off?
-    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_START_TAG("DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, "4" )
+	PORT_DIPSETTING(	  0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	  0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	  0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	  0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) )  // Freezes if off?
+	PORT_DIPSETTING(	  0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	  0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	  0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	  0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	  0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	  0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	  0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	  0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	  0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	  0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	  0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	  0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 

@@ -117,89 +117,114 @@ static INTERRUPT_GEN (megaplay_bios_irq)
 
 static UINT32 readpos = 1;  // serial bank selection position (9-bit)
 
-#define MEGAPLAY_TEST \
-	PORT_START \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Select") PORT_CODE(KEYCODE_0) \
-    PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_NAME("0x6400 bit 1") PORT_CODE(KEYCODE_W) \
-    PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_NAME("0x6400 bit 2") PORT_CODE(KEYCODE_E) \
-    PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_NAME("0x6400 bit 3") PORT_CODE(KEYCODE_R) \
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6400 bit 4") PORT_CODE(KEYCODE_T) \
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6400 bit 5") PORT_CODE(KEYCODE_Y) \
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_NAME("0x6400 bit 6") PORT_CODE(KEYCODE_U) \
+static INPUT_PORTS_START ( megaplay )
+	PORT_START_TAG("P1_1")	/* Player 1 Controls - part 1 */
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("P1_2")	/* Player 1 Controls - part 2 */
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT(  0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("P2_1")	/* Player 2 Controls - part 1 */
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT  ) PORT_PLAYER(2)
+	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("P2_2")	/* Player 2 Controls - part 2 */
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT(  0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("TEST")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Select") PORT_CODE(KEYCODE_0)
+    PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_NAME("0x6400 bit 1") PORT_CODE(KEYCODE_W)
+    PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_NAME("0x6400 bit 2") PORT_CODE(KEYCODE_E)
+    PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_NAME("0x6400 bit 3") PORT_CODE(KEYCODE_R)
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6400 bit 4") PORT_CODE(KEYCODE_T)
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("0x6400 bit 5") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_NAME("0x6400 bit 6") PORT_CODE(KEYCODE_U)
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
-#define MEGAPLAY_COIN \
-	PORT_START \
- 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) \
-	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) \
-    PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) \
-    PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) \
-    PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 ) \
-    PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
-    PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
+	PORT_START_TAG("COIN")
+ 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+    PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+    PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+    PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+    PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+    PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
     PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 /* Caused 01081:
- *  PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_START1 ) \
+ *  PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_START1 )
  *  PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_START2 )
  */
 
-#define MEGAPLAY_DSWA \
-	PORT_START \
-	PORT_DIPNAME( 0x0f, 0x0f, "Coin slot 1" ) PORT_DIPLOCATION("SW1:1,2,3,4") \
-    PORT_DIPSETTING( 0x07, DEF_STR( 4C_1C ) ) \
-    PORT_DIPSETTING( 0x08, DEF_STR( 3C_1C ) ) \
-    PORT_DIPSETTING( 0x09, DEF_STR( 2C_1C ) ) \
-    PORT_DIPSETTING( 0x05, "2 coins/1 credit - 5 coins/3 credits - 6 coins/4 credits" ) \
-    PORT_DIPSETTING( 0x04, "2 coins/1 credit - 4 coins/3 credits" ) \
-    PORT_DIPSETTING( 0x0f, DEF_STR( 1C_1C ) ) \
-    PORT_DIPSETTING( 0x06, DEF_STR( 2C_3C ) ) \
-    PORT_DIPSETTING( 0x0e, DEF_STR( 1C_2C ) ) \
-    PORT_DIPSETTING( 0x0d, DEF_STR( 1C_3C ) ) \
-    PORT_DIPSETTING( 0x0c, DEF_STR( 1C_4C ) ) \
-    PORT_DIPSETTING( 0x0b, DEF_STR( 1C_5C ) ) \
-    PORT_DIPSETTING( 0x0a, DEF_STR( 1C_6C ) ) \
-    PORT_DIPSETTING( 0x03, "1 coin/1 credit - 5 coins/6 credits" ) \
-    PORT_DIPSETTING( 0x02, "1 coin/1 credit - 4 coins/5 credits" ) \
-    PORT_DIPSETTING( 0x01, "1 coin/1 credit - 2 coins/3 credits" ) \
+	PORT_START_TAG("DSW0")
+	PORT_DIPNAME( 0x0f, 0x0f, "Coin slot 1" ) PORT_DIPLOCATION("SW1:1,2,3,4")
+    PORT_DIPSETTING( 0x07, DEF_STR( 4C_1C ) )
+    PORT_DIPSETTING( 0x08, DEF_STR( 3C_1C ) )
+    PORT_DIPSETTING( 0x09, DEF_STR( 2C_1C ) )
+    PORT_DIPSETTING( 0x05, "2 coins/1 credit - 5 coins/3 credits - 6 coins/4 credits" )
+    PORT_DIPSETTING( 0x04, "2 coins/1 credit - 4 coins/3 credits" )
+    PORT_DIPSETTING( 0x0f, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING( 0x06, DEF_STR( 2C_3C ) )
+    PORT_DIPSETTING( 0x0e, DEF_STR( 1C_2C ) )
+    PORT_DIPSETTING( 0x0d, DEF_STR( 1C_3C ) )
+    PORT_DIPSETTING( 0x0c, DEF_STR( 1C_4C ) )
+    PORT_DIPSETTING( 0x0b, DEF_STR( 1C_5C ) )
+    PORT_DIPSETTING( 0x0a, DEF_STR( 1C_6C ) )
+    PORT_DIPSETTING( 0x03, "1 coin/1 credit - 5 coins/6 credits" )
+    PORT_DIPSETTING( 0x02, "1 coin/1 credit - 4 coins/5 credits" )
+    PORT_DIPSETTING( 0x01, "1 coin/1 credit - 2 coins/3 credits" )
     PORT_DIPSETTING( 0x00, DEF_STR( Free_Play ) )
 
-#define MEGAPLAY_DSWB \
 	PORT_DIPNAME( 0xf0, 0xf0, "Coin slot 2" ) PORT_DIPLOCATION("SW2:1,2,3,4")\
-    PORT_DIPSETTING( 0x70, DEF_STR( 4C_1C ) ) \
-    PORT_DIPSETTING( 0x80, DEF_STR( 3C_1C ) ) \
-    PORT_DIPSETTING( 0x90, DEF_STR( 2C_1C ) ) \
-    PORT_DIPSETTING( 0x50, "2 coins/1 credit - 5 coins/3 credits - 6 coins/4 credits" ) \
-    PORT_DIPSETTING( 0x40, "2 coins/1 credit - 4 coins/3 credits" ) \
-    PORT_DIPSETTING( 0xf0, DEF_STR( 1C_1C ) ) \
-    PORT_DIPSETTING( 0x60, DEF_STR( 2C_3C ) ) \
-    PORT_DIPSETTING( 0xe0, DEF_STR( 1C_2C ) ) \
-    PORT_DIPSETTING( 0xd0, DEF_STR( 1C_3C ) ) \
-    PORT_DIPSETTING( 0xc0, DEF_STR( 1C_4C ) ) \
-    PORT_DIPSETTING( 0xb0, DEF_STR( 1C_5C ) ) \
-    PORT_DIPSETTING( 0xa0, DEF_STR( 1C_6C ) ) \
-    PORT_DIPSETTING( 0x30, "1 coin/1 credit - 5 coins/6 credits" ) \
-    PORT_DIPSETTING( 0x20, "1 coin/1 credit - 4 coins/5 credits" ) \
-    PORT_DIPSETTING( 0x10, "1 coin/1 credit - 2 coins/3 credits" ) \
+    PORT_DIPSETTING( 0x70, DEF_STR( 4C_1C ) )
+    PORT_DIPSETTING( 0x80, DEF_STR( 3C_1C ) )
+    PORT_DIPSETTING( 0x90, DEF_STR( 2C_1C ) )
+    PORT_DIPSETTING( 0x50, "2 coins/1 credit - 5 coins/3 credits - 6 coins/4 credits" )
+    PORT_DIPSETTING( 0x40, "2 coins/1 credit - 4 coins/3 credits" )
+    PORT_DIPSETTING( 0xf0, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING( 0x60, DEF_STR( 2C_3C ) )
+    PORT_DIPSETTING( 0xe0, DEF_STR( 1C_2C ) )
+    PORT_DIPSETTING( 0xd0, DEF_STR( 1C_3C ) )
+    PORT_DIPSETTING( 0xc0, DEF_STR( 1C_4C ) )
+    PORT_DIPSETTING( 0xb0, DEF_STR( 1C_5C ) )
+    PORT_DIPSETTING( 0xa0, DEF_STR( 1C_6C ) )
+    PORT_DIPSETTING( 0x30, "1 coin/1 credit - 5 coins/6 credits" )
+    PORT_DIPSETTING( 0x20, "1 coin/1 credit - 4 coins/5 credits" )
+    PORT_DIPSETTING( 0x10, "1 coin/1 credit - 2 coins/3 credits" )
     PORT_DIPSETTING( 0x00, " 1 coin/1 credit" )
-
-static INPUT_PORTS_START ( megaplay )
-	GENESIS_PORTS
-	MEGAPLAY_TEST
-	MEGAPLAY_COIN
-	MEGAPLAY_DSWA
-	MEGAPLAY_DSWB
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( mp_sonic )
-	GENESIS_PORTS
-	MEGAPLAY_TEST
-	MEGAPLAY_COIN
-	MEGAPLAY_DSWA
-	MEGAPLAY_DSWB
+	PORT_INCLUDE( megaplay )
 
-	PORT_START
-	// DSW C  (per game settings)
+	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x03, 0x01, "Initial Players" ) PORT_DIPLOCATION("SW3:1,2")
     PORT_DIPSETTING( 0x00, "4" )
     PORT_DIPSETTING( 0x01, "3" )
@@ -218,14 +243,9 @@ static INPUT_PORTS_START ( mp_sonic )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( mp_gaxe2 )
-	GENESIS_PORTS
-	MEGAPLAY_TEST
-	MEGAPLAY_COIN
-	MEGAPLAY_DSWA
-	MEGAPLAY_DSWB
+	PORT_INCLUDE( megaplay )
 
-	PORT_START
-	// DSW C  (per game settings)
+	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW3:1")
     PORT_DIPSETTING( 0x01, DEF_STR( Normal ) )
     PORT_DIPSETTING( 0x00, DEF_STR( Hard ) )
@@ -247,14 +267,9 @@ INPUT_PORTS_END
 
 #ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START ( mp_col3 )
-	GENESIS_PORTS
-	MEGAPLAY_TEST
-	MEGAPLAY_COIN
-	MEGAPLAY_DSWA
-	MEGAPLAY_DSWB
+	PORT_INCLUDE( megaplay )
 
-	PORT_START
-	// DSW C  (per game settings)
+	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Language ) ) PORT_DIPLOCATION("SW3:1")
     PORT_DIPSETTING( 0x01, DEF_STR( English ) )
     PORT_DIPSETTING( 0x00, DEF_STR( Japanese ) )
@@ -275,14 +290,9 @@ INPUT_PORTS_END
 #endif
 
 static INPUT_PORTS_START ( mp_twc )
-	GENESIS_PORTS
-	MEGAPLAY_TEST
-	MEGAPLAY_COIN
-	MEGAPLAY_DSWA
-	MEGAPLAY_DSWB
+	PORT_INCLUDE( megaplay )
 
-	PORT_START
-	// DSW C  (per game settings)
+	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x01, 0x01, "Time" ) PORT_DIPLOCATION("SW3:1")
     PORT_DIPSETTING( 0x01, DEF_STR( Normal ) )
     PORT_DIPSETTING( 0x00, "Short" )
@@ -298,14 +308,9 @@ static INPUT_PORTS_START ( mp_twc )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( mp_sor2 )
-	GENESIS_PORTS
-	MEGAPLAY_TEST
-	MEGAPLAY_COIN
-	MEGAPLAY_DSWA
-	MEGAPLAY_DSWB
+	PORT_INCLUDE( megaplay )
 
-	PORT_START
-	// DSW C  (per game settings)
+	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW3:1,2")
     PORT_DIPSETTING( 0x00, "4" )
     PORT_DIPSETTING( 0x01, "3" )
@@ -319,14 +324,9 @@ static INPUT_PORTS_START ( mp_sor2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( mp_bio )
-	GENESIS_PORTS
-	MEGAPLAY_TEST
-	MEGAPLAY_COIN
-	MEGAPLAY_DSWA
-	MEGAPLAY_DSWB
+	PORT_INCLUDE( megaplay )
 
-	PORT_START
-	// DSW C  (per game settings)
+	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW3:1,2")
     PORT_DIPSETTING( 0x00, "5" )
     PORT_DIPSETTING( 0x01, "4" )
@@ -340,14 +340,9 @@ static INPUT_PORTS_START ( mp_bio )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( mp_gslam )
-	GENESIS_PORTS
-	MEGAPLAY_TEST
-	MEGAPLAY_COIN
-	MEGAPLAY_DSWA
-	MEGAPLAY_DSWB
+	PORT_INCLUDE( megaplay )
 
-	PORT_START
-	// DSW C  (per game settings)
+	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x07, 0x04, DEF_STR ( Game_Time ) ) PORT_DIPLOCATION("SW3:1,2,3")
     PORT_DIPSETTING( 0x00, "5:00" )
     PORT_DIPSETTING( 0x01, "4:30" )
@@ -363,14 +358,9 @@ static INPUT_PORTS_START ( mp_gslam )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( mp_mazin )
-	GENESIS_PORTS
-	MEGAPLAY_TEST
-	MEGAPLAY_COIN
-	MEGAPLAY_DSWA
-	MEGAPLAY_DSWB
+	PORT_INCLUDE( megaplay )
 
-	PORT_START
-	// DSW C  (per game settings)
+	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x01, 0x01, "Initial Player" ) PORT_DIPLOCATION("SW3:1")
     PORT_DIPSETTING( 0x01, "2" )
     PORT_DIPSETTING( 0x00, "1" )
@@ -386,14 +376,9 @@ static INPUT_PORTS_START ( mp_mazin )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START ( mp_soni2 )
-	GENESIS_PORTS
-	MEGAPLAY_TEST
-	MEGAPLAY_COIN
-	MEGAPLAY_DSWA
-	MEGAPLAY_DSWB
+	PORT_INCLUDE( megaplay )
 
-	PORT_START
-	// DSW C  (per game settings)
+	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x03, 0x01, "Initial Players (Normal mode)" ) PORT_DIPLOCATION("SW3:1,2")
     PORT_DIPSETTING( 0x00, "4" )
     PORT_DIPSETTING( 0x01, "3" )
@@ -439,13 +424,118 @@ static WRITE8_HANDLER( megaplay_bios_gamesel_w )
 }
 
 
+/* Old code, todo, update the new code instead */
+
+static READ16_HANDLER ( OLD_megaplay_genesis_io_r )
+{
+	/* 8-bit only, data is mirrored in both halves */
+
+	UINT8 return_value = 0;
+
+	switch (offset)
+	{
+		case 0:
+		/* Charles MacDonald ( http://cgfm2.emuviews.com/ )
+            D7 : Console is 1= Export (USA, Europe, etc.) 0= Domestic (Japan)
+            D6 : Video type is 1= PAL, 0= NTSC
+            D5 : Sega CD unit is 1= not present, 0= connected.
+            D4 : Unused (always returns zero)
+            D3 : Bit 3 of version number
+            D2 : Bit 2 of version number
+            D1 : Bit 1 of version number
+            D0 : Bit 0 of version number
+        */
+			return_value = 0x80; /* ? megatech is usa? */
+			break;
+
+		case 1: /* port A data (joypad 1) */
+
+			if (genesis_io_ram[offset] & 0x40)
+				return_value = input_port_read(machine, "P1_1") & (genesis_io_ram[4]^0xff);
+			else
+			{
+				return_value = input_port_read(machine, "P1_2") & (genesis_io_ram[4]^0xff);
+				return_value |= input_port_read(machine, "P1_1") & 0x03;
+			}
+			return_value = (genesis_io_ram[offset] & 0x80) | return_value;
+//          logerror ("reading joypad 1 , type %02x %02x\n",genesis_io_ram[offset] & 0xb0, return_value &0x7f);
+			break;
+
+		case 2: /* port B data (joypad 2) */
+
+			if (genesis_io_ram[offset] & 0x40)
+				return_value = input_port_read(machine, "P2_1") & (genesis_io_ram[5]^0xff);
+			else
+			{
+				return_value = input_port_read(machine, "P2_2") & (genesis_io_ram[5]^0xff);
+				return_value |= input_port_read(machine, "P2_1") & 0x03;
+			}
+			return_value = (genesis_io_ram[offset] & 0x80) | return_value;
+//          logerror ("reading joypad 2 , type %02x %02x\n",genesis_io_ram[offset] & 0xb0, return_value &0x7f);
+			break;
+
+//      case 3: /* port C data */
+//          return_value = bios_6402 << 3;
+//          break;
+
+	default:
+			return_value = genesis_io_ram[offset];
+
+	}
+	return return_value | return_value << 8;
+}
+
+static WRITE16_HANDLER ( OLD_megaplay_genesis_io_w )
+{
+//  logerror ("write io offset :%02x data %04x PC: 0x%06x\n",offset,data,activecpu_get_previouspc());
+
+	switch (offset)
+	{
+		case 0x00:
+		/*??*/
+		break;
+
+		case 0x01:/* port A data */
+		genesis_io_ram[offset] = (data & (genesis_io_ram[0x04])) | (genesis_io_ram[offset] & ~(genesis_io_ram[0x04]));
+		break;
+
+		case 0x02: /* port B data */
+		genesis_io_ram[offset] = (data & (genesis_io_ram[0x05])) | (genesis_io_ram[offset] & ~(genesis_io_ram[0x05]));
+		break;
+
+		case 0x03: /* port C data */
+		genesis_io_ram[offset] = (data & (genesis_io_ram[0x06])) | (genesis_io_ram[offset] & ~(genesis_io_ram[0x06]));
+		bios_6204 = data & 0x07;
+		break;
+
+		case 0x04: /* port A control */
+		genesis_io_ram[offset] = data;
+		break;
+
+		case 0x05: /* port B control */
+		genesis_io_ram[offset] = data;
+		break;
+
+		case 0x06: /* port C control */
+		genesis_io_ram[offset] = data;
+		break;
+
+		case 0x07: /* port A TxData */
+		genesis_io_ram[offset] = data;
+		break;
+
+		default:
+		genesis_io_ram[offset] = data;
+	}
+}
+
 static READ8_HANDLER( bank_r )
 {
 	UINT8* bank = memory_region(REGION_CPU3);
 	UINT8* game = memory_region(REGION_CPU1);
 
 	if(game_banksel == 0x142) // Genesis I/O
-		return megaplay_genesis_io_r(machine, (offset & 0x1f) / 2, 0xffff);
+		return OLD_megaplay_genesis_io_r(machine, (offset & 0x1f) / 2, 0xffff);
 
 	if(bios_mode & MP_ROM)
 	{
@@ -478,7 +568,7 @@ static READ8_HANDLER( bank_r )
 static WRITE8_HANDLER ( bank_w )
 {
 	if(game_banksel == 0x142) // Genesis I/O
-		genesis_io_w(machine, (offset & 0x1f) / 2, data, 0xffff);
+		OLD_megaplay_genesis_io_w(machine, (offset & 0x1f) / 2, data, 0xffff);
 
 	if(offset <= 0x1fff && (bios_width & 0x08))
 		ic37_ram[(0x2000 * (bios_bank & 0x03)) + offset] = data;
@@ -569,10 +659,10 @@ static ADDRESS_MAP_START( megaplay_bios_readmem, ADDRESS_SPACE_PROGRAM, 8 )
  	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x4fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x5000, 0x5fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6200, 0x6200) AM_READ(input_port_7_r)
-	AM_RANGE(0x6201, 0x6201) AM_READ(input_port_8_r)
-	AM_RANGE(0x6400, 0x6400) AM_READ(input_port_5_r)
-	AM_RANGE(0x6401, 0x6401) AM_READ(input_port_6_r)
+	AM_RANGE(0x6200, 0x6200) AM_READ_PORT("DSW0")
+	AM_RANGE(0x6201, 0x6201) AM_READ_PORT("DSW1")
+	AM_RANGE(0x6400, 0x6400) AM_READ_PORT("TEST")
+	AM_RANGE(0x6401, 0x6401) AM_READ_PORT("COIN")
 	AM_RANGE(0x6204, 0x6204) AM_READ(megaplay_bios_6204_r)
 	AM_RANGE(0x6203, 0x6203) AM_READ(megaplay_bios_banksel_r)
 	AM_RANGE(0x6402, 0x6402) AM_READ(megaplay_bios_6402_r)
@@ -852,111 +942,6 @@ static void megplay_stat(void)
 
 	}
 }
-
-/* Old code, todo, update the new code instead */
-static READ16_HANDLER ( OLD_megaplay_genesis_io_r )
-{
-	/* 8-bit only, data is mirrored in both halves */
-
-	UINT8 return_value = 0;
-
-	switch (offset)
-	{
-		case 0:
-		/* Charles MacDonald ( http://cgfm2.emuviews.com/ )
-            D7 : Console is 1= Export (USA, Europe, etc.) 0= Domestic (Japan)
-            D6 : Video type is 1= PAL, 0= NTSC
-            D5 : Sega CD unit is 1= not present, 0= connected.
-            D4 : Unused (always returns zero)
-            D3 : Bit 3 of version number
-            D2 : Bit 2 of version number
-            D1 : Bit 1 of version number
-            D0 : Bit 0 of version number
-        */
-			return_value = 0x80; /* ? megatech is usa? */
-			break;
-
-		case 1: /* port A data (joypad 1) */
-
-			if (genesis_io_ram[offset] & 0x40)
-				return_value = input_port_read_indexed(machine, 1) & (genesis_io_ram[4]^0xff);
-			else
-			{
-				return_value = input_port_read_indexed(machine, 2) & (genesis_io_ram[4]^0xff);
-				return_value |= input_port_read_indexed(machine, 1) & 0x03;
-			}
-			return_value = (genesis_io_ram[offset] & 0x80) | return_value;
-//          logerror ("reading joypad 1 , type %02x %02x\n",genesis_io_ram[offset] & 0xb0, return_value &0x7f);
-			break;
-
-		case 2: /* port B data (joypad 2) */
-
-			if (genesis_io_ram[offset] & 0x40)
-				return_value = input_port_read_indexed(machine, 3) & (genesis_io_ram[5]^0xff);
-			else
-			{
-				return_value = input_port_read_indexed(machine, 4) & (genesis_io_ram[5]^0xff);
-				return_value |= input_port_read_indexed(machine, 3) & 0x03;
-			}
-			return_value = (genesis_io_ram[offset] & 0x80) | return_value;
-//          logerror ("reading joypad 2 , type %02x %02x\n",genesis_io_ram[offset] & 0xb0, return_value &0x7f);
-			break;
-
-//      case 3: /* port C data */
-//          return_value = bios_6402 << 3;
-//          break;
-
-	default:
-			return_value = genesis_io_ram[offset];
-
-	}
-	return return_value | return_value << 8;
-}
-
-static WRITE16_HANDLER ( OLD_megaplay_genesis_io_w )
-{
-//  logerror ("write io offset :%02x data %04x PC: 0x%06x\n",offset,data,activecpu_get_previouspc());
-
-	switch (offset)
-	{
-		case 0x00:
-		/*??*/
-		break;
-
-		case 0x01:/* port A data */
-		genesis_io_ram[offset] = (data & (genesis_io_ram[0x04])) | (genesis_io_ram[offset] & ~(genesis_io_ram[0x04]));
-		break;
-
-		case 0x02: /* port B data */
-		genesis_io_ram[offset] = (data & (genesis_io_ram[0x05])) | (genesis_io_ram[offset] & ~(genesis_io_ram[0x05]));
-		break;
-
-		case 0x03: /* port C data */
-		genesis_io_ram[offset] = (data & (genesis_io_ram[0x06])) | (genesis_io_ram[offset] & ~(genesis_io_ram[0x06]));
-		bios_6204 = data & 0x07;
-		break;
-
-		case 0x04: /* port A control */
-		genesis_io_ram[offset] = data;
-		break;
-
-		case 0x05: /* port B control */
-		genesis_io_ram[offset] = data;
-		break;
-
-		case 0x06: /* port C control */
-		genesis_io_ram[offset] = data;
-		break;
-
-		case 0x07: /* port A TxData */
-		genesis_io_ram[offset] = data;
-		break;
-
-		default:
-		genesis_io_ram[offset] = data;
-	}
-}
-
 
 static READ16_HANDLER( megadriv_68k_read_z80_extra_ram )
 {

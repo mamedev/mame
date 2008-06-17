@@ -21,7 +21,6 @@ extern UINT8 *genesis_z80_ram;
 extern UINT16 *genesis_68k_ram;
 extern MACHINE_START( genesis );
 extern MACHINE_RESET( genesis );
-extern READ16_HANDLER ( megaplay_genesis_io_r );
 extern WRITE16_HANDLER ( genesis_io_w );
 extern UINT16 *genesis_io_ram;
 extern READ16_HANDLER(genesis_ctrl_r);
@@ -31,7 +30,6 @@ extern READ8_HANDLER ( genesis_z80_bank_r );
 extern WRITE8_HANDLER ( genesis_z80_w );
 extern WRITE16_HANDLER(genesis_ctrl_w);
 extern WRITE16_HANDLER ( genesis_68k_to_z80_w );
-extern READ16_HANDLER ( genesis_io_r );
 extern READ16_HANDLER ( genesis_68k_to_z80_r );
 extern INTERRUPT_GEN( genesis_vblank_interrupt );
 extern void genesis_irq2_interrupt(running_machine *machine, int state);
@@ -56,49 +54,3 @@ void system18_vdp_update(bitmap_t *bitmap, const rectangle *cliprect);
 
 READ16_HANDLER ( genesis_vdp_r );
 WRITE16_HANDLER( genesis_vdp_w );
-
-/* Generic Input Ports */
-#define GENESIS_PORTS \
-	PORT_START \
- \
-	PORT_START	/* Player 1 Controls - part 1 */ \
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) \
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) \
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) \
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) \
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) \
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) \
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNUSED ) \
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNUSED ) \
- \
-	PORT_START	/* Player 1 Controls - part 2 */ \
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNUSED ) \
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNUSED ) \
-	PORT_BIT(  0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) \
-	PORT_BIT(  0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) \
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) \
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_START1 ) \
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNUSED ) \
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNUSED ) \
- \
-	PORT_START	/* Player 2 Controls - part 1 */ \
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) \
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) \
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) \
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT  ) PORT_PLAYER(2) \
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) \
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) \
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNUSED ) \
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNUSED ) \
- \
-	PORT_START	/* Player 2 Controls - part 2 */ \
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNUSED ) \
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNUSED ) \
-	PORT_BIT(  0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) \
-	PORT_BIT(  0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) \
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) \
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_START2 ) \
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNUSED ) \
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNUSED ) \
-
-

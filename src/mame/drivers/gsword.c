@@ -177,7 +177,7 @@ static int gsword_protect_hack;
 static int gsword_coins_in(void)
 {
 	/* emulate 8741 coin slot */
-	if (input_port_read_indexed(machine, 4)&0xc0)
+	if (input_port_read(machine, "IN4") & 0xc0)
 	{
 		logerror("Coin In\n");
 		return 0x80;
@@ -215,11 +215,11 @@ static READ8_HANDLER( gsword_8741_2_r )
 	switch (offset)
 	{
 	case 0x01: /* start button , coins */
-		return input_port_read_indexed(machine, 0);
+		return input_port_read(machine, "IN0");
 	case 0x02: /* Player 1 Controller */
-		return input_port_read_indexed(machine, 1);
+		return input_port_read(machine, "IN1");
 	case 0x04: /* Player 2 Controller */
-		return input_port_read_indexed(machine, 3);
+		return input_port_read(machine, "IN3");
 //  default:
 //      logerror("8741-2 unknown read %d PC=%04x\n",offset,activecpu_get_pc());
 	}
@@ -232,11 +232,11 @@ static READ8_HANDLER( gsword_8741_3_r )
 	switch (offset)
 	{
 	case 0x01: /* start button  */
-		return input_port_read_indexed(machine, 2);
+		return input_port_read(machine, "IN2");
 	case 0x02: /* Player 1 Controller? */
-		return input_port_read_indexed(machine, 1);
+		return input_port_read(machine, "IN1");
 	case 0x04: /* Player 2 Controller? */
-		return input_port_read_indexed(machine, 3);
+		return input_port_read(machine, "IN3");
 	}
 	/* unknown */
 //  logerror("8741-3 unknown read %d PC=%04x\n",offset,activecpu_get_pc());
@@ -422,9 +422,9 @@ static ADDRESS_MAP_START( josvolly_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&gsword_cpu2_ram)
 
 	/* 8000 to 8003 looks MCU */
-	AM_RANGE(0x8000, 0x8000) AM_READ(input_port_1_r) // 1PL
-	AM_RANGE(0x8001, 0x8001) AM_READ(input_port_2_r) // 2PL / ACK
-	AM_RANGE(0x8002, 0x8002) AM_READ(input_port_0_r) // START
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN1")	// 1PL
+	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN2")	// 2PL / ACK
+	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN0")	// START
 
 //  AM_RANGE(0x6000, 0x6000) AM_WRITE(adpcm_soundcommand_w)
 	AM_RANGE(0xA000, 0xA001) AM_WRITE(josvolly_8741_1_w) AM_READ(josvolly_8741_1_r)
@@ -443,7 +443,7 @@ static ADDRESS_MAP_START( josvolly_cpu2_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gsword )
-	PORT_START	/* IN0 (8741-2 port1?) */
+	PORT_START_TAG("IN0")		/* IN0 (8741-2 port1?) */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -452,7 +452,8 @@ static INPUT_PORTS_START( gsword )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_START	/* IN1 (8741-2 port2?) */
+
+	PORT_START_TAG("IN1")		/* IN1 (8741-2 port2?) */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -461,7 +462,8 @@ static INPUT_PORTS_START( gsword )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_START	/* IN2 (8741-3 port1?) */
+
+	PORT_START_TAG("IN2")		/* IN2 (8741-3 port1?) */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -469,7 +471,8 @@ static INPUT_PORTS_START( gsword )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_START	/* IN3  (8741-3 port2?) */
+
+	PORT_START_TAG("IN3")		/* IN3  (8741-3 port2?) */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -478,7 +481,8 @@ static INPUT_PORTS_START( gsword )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_START	/* IN4 (coins) */
+
+	PORT_START_TAG("IN4")		/* IN4 (coins) */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -488,7 +492,7 @@ static INPUT_PORTS_START( gsword )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 
-	PORT_START	/* DSW0 */
+	PORT_START_TAG("DSW0")		/* DSW0 */
 	/* NOTE: Switches 0 & 1, 6,7,8 not used      */
 	/*   Coins configurations were handled   */
 	/*   via external hardware & not via program */
@@ -501,7 +505,7 @@ static INPUT_PORTS_START( gsword )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
 
-	PORT_START      /* DSW1 */
+	PORT_START_TAG("DSW1")		/* DSW1 */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -526,7 +530,7 @@ static INPUT_PORTS_START( gsword )
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x80, "255 (Cheat)" )
 
-	PORT_START      /* DSW2 */
+	PORT_START_TAG("DSW2")		/* DSW2 */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -553,7 +557,7 @@ static INPUT_PORTS_START( gsword )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( josvolly )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW , IPT_START2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW , IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW , IPT_COIN2 ) PORT_IMPULSE(1)
@@ -563,7 +567,7 @@ static INPUT_PORTS_START( josvolly )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")		/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -573,7 +577,7 @@ static INPUT_PORTS_START( josvolly )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START	/* IN2 */
+	PORT_START_TAG("IN2")		/* IN2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
@@ -583,7 +587,7 @@ static INPUT_PORTS_START( josvolly )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START	/* DSW1 */
+	PORT_START_TAG("DSW1")		/* DSW1 */
 	PORT_DIPNAME( 0x0c, 0x00, "DIP1-0c(982E)" )
 	PORT_DIPSETTING(    0x0c, "0" )
 	PORT_DIPSETTING(    0x08, "1" )
@@ -601,7 +605,7 @@ static INPUT_PORTS_START( josvolly )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START      /* DSW2 */
+	PORT_START_TAG("DSW2")		/* DSW2 */
 //  PORT_DIPNAME( 0x01, 0x00, "DSW2-0" )
 //  PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 //  PORT_DIPSETTING(    0x01, DEF_STR( On ) )

@@ -177,8 +177,8 @@ static WRITE8_HANDLER( liberatr_trackball_reset_w )
 	/* input becomes the starting point for the trackball counters */
 	if (((data ^ ctrld) & 0x10) && (data & 0x10))
 	{
-		UINT8 trackball = input_port_read_indexed(machine, 4);
-		UINT8 switches = input_port_read_indexed(machine, 0);
+		UINT8 trackball = input_port_read(machine, "FAKE");
+		UINT8 switches = input_port_read(machine, "IN0");
 		trackball_offset = ((trackball & 0xf0) - (switches & 0xf0)) | ((trackball - switches) & 0x0f);
 	}
 	ctrld = data & 0x10;
@@ -190,13 +190,13 @@ static READ8_HANDLER( liberatr_input_port_0_r )
 	/* if ctrld is high, the /ld signal on the LS191 is NOT set, meaning that the trackball is counting */
 	if (ctrld)
 	{
-		UINT8 trackball = input_port_read_indexed(machine, 4);
+		UINT8 trackball = input_port_read(machine, "FAKE");
 		return ((trackball & 0xf0) - (trackball_offset & 0xf0)) | ((trackball - trackball_offset) & 0x0f);
 	}
 
 	/* otherwise, the LS191 is simply passing through the raw switch inputs */
 	else
-		return input_port_read_indexed(machine, 0);
+		return input_port_read(machine, "IN0");
 }
 
 
@@ -246,7 +246,7 @@ static ADDRESS_MAP_START( liberat2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(liberatr_bitmap_xy_r, liberatr_bitmap_xy_w)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(liberatr_bitmap_w) AM_BASE(&liberatr_bitmapram) 	/* overlapping for my convenience */
 	AM_RANGE(0x4000, 0x4000) AM_READ(liberatr_input_port_0_r)
-	AM_RANGE(0x4001, 0x4001) AM_READ(input_port_1_r)
+	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("IN1")
 	AM_RANGE(0x4000, 0x400f) AM_WRITE(SMH_RAM) AM_BASE(&liberatr_base_ram)
 	AM_RANGE(0x4200, 0x421f) AM_WRITE(SMH_RAM) AM_BASE(&liberatr_colorram)
 	AM_RANGE(0x4400, 0x4400) AM_WRITENOP
@@ -275,7 +275,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( liberatr )
-	PORT_START			/* IN0 - $5000 */
+	PORT_START_TAG("IN0")			/* IN0 - $5000 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -287,7 +287,7 @@ static INPUT_PORTS_START( liberatr )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START			/* IN1 - $5001 */
+	PORT_START_TAG("IN1")			/* IN1 - $5001 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -297,7 +297,7 @@ static INPUT_PORTS_START( liberatr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_VBLANK )
 
-	PORT_START			/* IN2  -  Game Option switches DSW @ D4 on PCB */
+	PORT_START_TAG("DSW1")			/* IN2  -  Game Option switches DSW @ D4 on PCB */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
@@ -320,7 +320,7 @@ static INPUT_PORTS_START( liberatr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START			/* IN3  -  Pricing Option switches DSW @ A4 on PCB */
+	PORT_START_TAG("DSW2")			/* IN3  -  Pricing Option switches DSW @ A4 on PCB */
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
@@ -345,7 +345,7 @@ static INPUT_PORTS_START( liberatr )
 	PORT_DIPSETTING (   0xc0, "Freeze Mode" )
 	PORT_DIPSETTING (   0xe0, "Freeze Mode" )
 
-	PORT_START	/* IN4 - FAKE - overlaps IN0 in the HW */
+	PORT_START_TAG("FAKE")			/* IN4 - FAKE - overlaps IN0 in the HW */
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 	PORT_BIT( 0xf0, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 INPUT_PORTS_END

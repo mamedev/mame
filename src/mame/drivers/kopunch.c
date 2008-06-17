@@ -18,12 +18,12 @@ static INTERRUPT_GEN( kopunch_interrupt )
 {
 	if (cpu_getiloops() == 0)
 	{
-		if (~input_port_read_indexed(machine, 1) & 0x80)	/* coin 1 */
+		if (~input_port_read(machine, "IN1") & 0x80)	/* coin 1 */
 		{
 			cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xf7);	/* RST 30h */
 			return;
 		}
-		else if (~input_port_read_indexed(machine, 1) & 0x08)	/* coin 2 */
+		else if (~input_port_read(machine, "IN1") & 0x08)	/* coin 2 */
 		{
 			cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xef);	/* RST 28h */
 			return;
@@ -39,7 +39,7 @@ static READ8_HANDLER( kopunch_in_r )
 	if (offset == 0)
 		return mame_rand(machine);
 	else
-		return (mame_rand(machine) & 0x07) | input_port_read_indexed(machine, 1);
+		return (mame_rand(machine) & 0x07) | input_port_read(machine, "IN1");
 }
 
 static WRITE8_HANDLER( kopunch_lamp_w )
@@ -70,7 +70,7 @@ static ADDRESS_MAP_START( kopunch_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kopunch_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x30, 0x30) AM_READ(input_port_0_r)
+	AM_RANGE(0x30, 0x30) AM_READ_PORT("IN0")
 	AM_RANGE(0x31, 0x32) AM_READ(kopunch_in_r)
 	AM_RANGE(0x33, 0x33) AM_WRITENOP
 	AM_RANGE(0x34, 0x34) AM_WRITE(kopunch_coin_w)
@@ -79,7 +79,7 @@ static ADDRESS_MAP_START( kopunch_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x37, 0x37) AM_WRITENOP
 	AM_RANGE(0x38, 0x38) AM_WRITE(kopunch_lamp_w)
 	AM_RANGE(0x39, 0x39) AM_WRITENOP
-	AM_RANGE(0x3a, 0x3a) AM_READ(input_port_2_r)
+	AM_RANGE(0x3a, 0x3a) AM_READ_PORT("DSW")
 	AM_RANGE(0x3b, 0x3b) AM_WRITENOP
 	AM_RANGE(0x3c, 0x3c) AM_WRITE(kopunch_scroll_x_w)
 	AM_RANGE(0x3d, 0x3d) AM_WRITE(kopunch_scroll_y_w)
@@ -89,7 +89,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( kopunch )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
@@ -99,7 +99,7 @@ static INPUT_PORTS_START( kopunch )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* punch strength (high 3 bits) */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -107,7 +107,7 @@ static INPUT_PORTS_START( kopunch )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -133,7 +133,7 @@ static INPUT_PORTS_START( kopunch )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL

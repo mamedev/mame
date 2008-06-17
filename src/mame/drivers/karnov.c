@@ -651,13 +651,13 @@ static INTERRUPT_GEN( karnov_interrupt )
 	static int latch;
 
 	/* Coin input to the i8751 generates an interrupt to the main cpu */
-	if (input_port_read_indexed(machine, 3) == coin_mask) latch=1;
-	if (input_port_read_indexed(machine, 3) != coin_mask && latch) {
+	if (input_port_read(machine, "FAKE") == coin_mask) latch=1;
+	if (input_port_read(machine, "FAKE") != coin_mask && latch) {
 		if (i8751_needs_ack) {
 			/* i8751 is busy - queue the command */
-			i8751_coin_pending=input_port_read_indexed(machine, 3) | 0x8000;
+			i8751_coin_pending=input_port_read(machine, "FAKE") | 0x8000;
 		} else {
-			i8751_return=input_port_read_indexed(machine, 3) | 0x8000;
+			i8751_return=input_port_read(machine, "FAKE") | 0x8000;
 			cpunum_set_input_line(machine, 0,6,HOLD_LINE);
 			i8751_needs_ack=1;
 		}

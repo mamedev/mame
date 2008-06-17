@@ -306,12 +306,12 @@ static READ16_HANDLER( lastfght_c00002_r )
 {
 	// high byte:
 	// mask 0x1c: from sound?
-	return (mame_rand(machine) & 0x1c00) | input_port_read_indexed(machine, 0);
+	return (mame_rand(machine) & 0x1c00) | input_port_read(machine, "IN0");
 }
 
 static READ16_HANDLER( lastfght_c00004_r )
 {
-	return input_port_read_indexed(machine, 1);
+	return input_port_read(machine, "IN1");
 }
 
 static READ16_HANDLER( lastfght_c00006_r )
@@ -319,7 +319,7 @@ static READ16_HANDLER( lastfght_c00006_r )
 	// low byte:
 	// bit 7 = protection?
 	// bit 5 = blitter?
-	return input_port_read_indexed(machine, 2);
+	return input_port_read(machine, "IN2");
 }
 
 static WRITE16_HANDLER( lastfght_c00006_w )
@@ -384,7 +384,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( lastfght )
-	PORT_START	// IN0 - c00002&3
+	PORT_START_TAG("IN0")	/* IN0 - c00002&3 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1		)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER			) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
@@ -403,7 +403,7 @@ static INPUT_PORTS_START( lastfght )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 
-	PORT_START	// IN1 - c00004&5
+	PORT_START_TAG("IN1")	/* IN1 - c00004&5 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1		)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2		)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN		)
@@ -422,7 +422,7 @@ static INPUT_PORTS_START( lastfght )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN1			)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2			)
 
-	PORT_START	// IN2 - c00006&7
+	PORT_START_TAG("IN2")	/* IN2 - c00006&7 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN		)

@@ -546,9 +546,9 @@ ADDRESS_MAP_END
 
 
 static READ8_HANDLER( scramb2_protection_r ) { return 0x25; }
-static READ8_HANDLER( scramb2_port0_r ) { return (input_port_read_indexed(machine, 0)>>offset)&0x1; }
-static READ8_HANDLER( scramb2_port1_r ) { return (input_port_read_indexed(machine, 1)>>offset)&0x1; }
-static READ8_HANDLER( scramb2_port2_r ) { return (input_port_read_indexed(machine, 2)>>offset)&0x1; }
+static READ8_HANDLER( scramb2_port0_r ) { return (input_port_read(machine, "IN0") >> offset) & 0x1; }
+static READ8_HANDLER( scramb2_port1_r ) { return (input_port_read(machine, "IN1") >> offset) & 0x1; }
+static READ8_HANDLER( scramb2_port2_r ) { return (input_port_read(machine, "IN2") >> offset) & 0x1; }
 
 static ADDRESS_MAP_START( scramb2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
@@ -977,32 +977,6 @@ static ADDRESS_MAP_START( hexpoola_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_3_r)
 ADDRESS_MAP_END
 
-#define GAL_IN0\
-	PORT_START_TAG("IN0")\
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )\
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )\
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY\
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY\
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )\
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )\
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )\
-	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )\
-	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )\
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-
-#define GAL_IN1\
-	PORT_START_TAG("IN1")\
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )\
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )\
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL\
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL\
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL\
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )\
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )\
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )\
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )\
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )\
-	PORT_DIPSETTING(    0xc0, DEF_STR( Free_Play ) )
 
 static INPUT_PORTS_START( scramblb )
 	PORT_START_TAG("IN0")
@@ -1088,20 +1062,6 @@ static INPUT_PORTS_START( scramb2 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
-
-
-#define MOON_IN0\
-	PORT_START_TAG("IN0")\
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )\
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )\
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY\
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY\
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )\
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )\
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )\
-	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )\
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* "reset" on schematics */\
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 static INPUT_PORTS_START( 4in1 )
 	PORT_START_TAG("IN0")

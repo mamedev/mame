@@ -210,10 +210,10 @@ static void adc1038_clk_w(running_machine *machine, int bit)
 
 			switch (adc1038_adr)
 			{
-				case 0: adc1038_adc_data = input_port_read_indexed(machine, 4); break;
-				case 1: adc1038_adc_data = input_port_read_indexed(machine, 5); break;
-				case 2: adc1038_adc_data = input_port_read_indexed(machine, 6); break;
-				case 3: adc1038_adc_data = input_port_read_indexed(machine, 7); break;
+				case 0: adc1038_adc_data = input_port_read(machine, "AN0"); break;
+				case 1: adc1038_adc_data = input_port_read(machine, "AN1"); break;
+				case 2: adc1038_adc_data = input_port_read(machine, "AN2"); break;
+				case 3: adc1038_adc_data = input_port_read(machine, "AN3"); break;
 				case 4: adc1038_adc_data = 0x000; break;
 				case 5: adc1038_adc_data = 0x000; break;
 				case 6: adc1038_adc_data = 0x000; break;
@@ -255,10 +255,10 @@ static int adc1038_sars_r(running_machine *machine)
 
 	switch (adc1038_adr)
 	{
-		case 0: adc1038_adc_data = input_port_read_indexed(machine, 4); break;
-		case 1: adc1038_adc_data = input_port_read_indexed(machine, 5); break;
-		case 2: adc1038_adc_data = input_port_read_indexed(machine, 6); break;
-		case 3: adc1038_adc_data = input_port_read_indexed(machine, 7); break;
+		case 0: adc1038_adc_data = input_port_read(machine, "AN0"); break;
+		case 1: adc1038_adc_data = input_port_read(machine, "AN1"); break;
+		case 2: adc1038_adc_data = input_port_read(machine, "AN2"); break;
+		case 3: adc1038_adc_data = input_port_read(machine, "AN3"); break;
 		case 4: adc1038_adc_data = 0x000; break;
 		case 5: adc1038_adc_data = 0x000; break;
 		case 6: adc1038_adc_data = 0x000; break;
@@ -274,12 +274,14 @@ static int adc1038_sars_r(running_machine *machine)
 
 static READ8_HANDLER( sysreg_r )
 {
+	static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3" };
+	
 	switch (offset)
 	{
 		case 0:
 		case 1:
 		case 3:
-			return input_port_read_indexed(machine, offset);
+			return input_port_read(machine, portnames[offset]);
 
 		case 2:
 			return adc1038_sars_r(machine) << 7;
@@ -512,7 +514,7 @@ static NVRAM_HANDLER(gticlub)
 
 
 static INPUT_PORTS_START( gticlub )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )		// View switch
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) 		// Shift Down
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )		// Shift Up
@@ -520,13 +522,13 @@ static INPUT_PORTS_START( gticlub )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x0b, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -543,37 +545,37 @@ static INPUT_PORTS_START( gticlub )
 	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START /* mask default type                     sens delta min max */
+	PORT_START_TAG("AN0")	/* mask default type             sens delta min max */
 	PORT_BIT( 0x3ff, 0x200, IPT_PADDLE ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START
+	PORT_START_TAG("AN1")
 	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START
+	PORT_START_TAG("AN2")
 	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START
+	PORT_START_TAG("AN3")
 	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL3 ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( slrasslt )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )						// View Shift
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)		// Trigger
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)		// Missile
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)		// Power Up
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -591,16 +593,16 @@ static INPUT_PORTS_START( slrasslt )
 	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("AN0")
 	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
-	PORT_START
+	PORT_START_TAG("AN1")
 	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( thunderh )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -610,7 +612,7 @@ static INPUT_PORTS_START( thunderh )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
@@ -620,10 +622,10 @@ static INPUT_PORTS_START( thunderh )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -644,7 +646,7 @@ static INPUT_PORTS_START( thunderh )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hangplt )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -652,15 +654,15 @@ static INPUT_PORTS_START( hangplt )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x8f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)		// Push limit switch
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)		// Pull limit switch
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )

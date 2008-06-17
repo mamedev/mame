@@ -355,6 +355,7 @@ static void recompute_palette_tables(void)
 
 static READ16_HANDLER( io_chip_r )
 {
+	static const char *portnames[] = { "P1", "P2", "PORTC", "PORTD", "SERVICE", "COINAGE", "DSW", "PORTH" };
 	offset &= 0x1f/2;
 
 	switch (offset)
@@ -374,8 +375,8 @@ static READ16_HANDLER( io_chip_r )
 
 			/* otherwise, return an input port */
 			if (offset == 0x04/2 && sound_banks)
-				return (input_port_read_indexed(machine, offset) & 0xbf) | (upd7759_0_busy_r(machine,0) << 6);
-			return input_port_read_indexed(machine, offset);
+				return (input_port_read(machine, portnames[offset]) & 0xbf) | (upd7759_0_busy_r(machine,0) << 6);
+			return input_port_read(machine, portnames[offset]);
 
 		/* 'SEGA' protection */
 		case 0x10/2:

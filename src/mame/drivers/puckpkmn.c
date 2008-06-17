@@ -18,7 +18,7 @@ Puckman Pockimon - (c)2000 Genie? (there should be a way to show Sun Mixing copy
 static UINT16* main_ram;
 
 static INPUT_PORTS_START( puckpkmn ) /* Puckman Pockimon Input Ports */
-	PORT_START	/* Player 2 Controls ($700011.b) */
+	PORT_START_TAG("P2")	/* Player 2 Controls ($700011.b) */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -28,7 +28,7 @@ static INPUT_PORTS_START( puckpkmn ) /* Puckman Pockimon Input Ports */
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
-	PORT_START	/* Player 1 Controls ($700013.b) */
+	PORT_START_TAG("P1")	/* Player 1 Controls ($700013.b) */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(10)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -38,9 +38,9 @@ static INPUT_PORTS_START( puckpkmn ) /* Puckman Pockimon Input Ports */
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 
-	PORT_START	/* ? ($700015.b) */
+	PORT_START_TAG("IN0")	/* ? ($700015.b) */
 
-	PORT_START	/* DSW 1 ($700017.b) */
+	PORT_START_TAG("DSW1")	/* DSW 1 ($700017.b) */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
@@ -65,7 +65,7 @@ static INPUT_PORTS_START( puckpkmn ) /* Puckman Pockimon Input Ports */
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard )    )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START	/* DSW 1 ($700019.b) */
+	PORT_START_TAG("DSW2")	/* DSW 1 ($700019.b) */
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )

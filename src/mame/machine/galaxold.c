@@ -15,12 +15,7 @@
 static int irq_line;
 static emu_timer *int_timer;
 
-static UINT8 kingball_speech_dip;
-static UINT8 kingball_sound;
-
 static UINT8 _4in1_bank;
-static UINT8 gmgalax_selected_game;
-
 
 static void galaxold_7474_9M_2_callback(void)
 {
@@ -220,42 +215,6 @@ DRIVER_INIT( dingoe )
 }
 
 
-
-/* Hack? If $b003 is high, we'll check our "fake" speech dipswitch (marked as SLAM) */
-static READ8_HANDLER( kingball_IN0_r )
-{
-	if (kingball_speech_dip)
-		return (input_port_read_indexed(machine, 0) & ~0x40) | ((input_port_read_indexed(machine, 3) & 0x01) << 6);
-	else
-		return input_port_read_indexed(machine, 0);
-}
-
-static READ8_HANDLER( kingball_IN1_r )
-{
-	/* bit 5 is the NOISE line from the sound circuit.  The code just verifies
-       that it's working, doesn't actually use return value, so we can just use
-       rand() */
-
-	return (input_port_read_indexed(machine, 1) & ~0x20) | (mame_rand(machine) & 0x20);
-}
-
-WRITE8_HANDLER( kingball_speech_dip_w )
-{
-	kingball_speech_dip = data;
-}
-
-WRITE8_HANDLER( kingball_sound1_w )
-{
-	kingball_sound = (kingball_sound & ~0x01) | data;
-}
-
-WRITE8_HANDLER( kingball_sound2_w )
-{
-	kingball_sound = (kingball_sound & ~0x02) | (data << 1);
-	soundlatch_w (machine, 0, kingball_sound | 0xf0);
-}
-
-
 READ8_HANDLER( scramblb_protection_1_r )
 {
 	switch (activecpu_get_pc())
@@ -280,17 +239,6 @@ READ8_HANDLER( scramblb_protection_2_r )
 }
 
 
-static READ8_HANDLER( azurian_IN1_r )
-{
-	return (input_port_read_indexed(machine, 1) & ~0x40) | ((input_port_read_indexed(machine, 3) & 0x01) << 6);
-}
-
-static READ8_HANDLER( azurian_IN2_r )
-{
-	return (input_port_read_indexed(machine, 2) & ~0x04) | ((input_port_read_indexed(machine, 3) & 0x02) << 1);
-}
-
-
 WRITE8_HANDLER( _4in1_bank_w )
 {
 	_4in1_bank = data & 0x03;
@@ -300,37 +248,16 @@ WRITE8_HANDLER( _4in1_bank_w )
 
 READ8_HANDLER( _4in1_input_port_1_r )
 {
-	return (input_port_read_indexed(machine, 1) & ~0xc0) | (input_port_read_indexed(machine, 3+_4in1_bank) & 0xc0);
+	static const char *portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
+  
+	return (input_port_read(machine, "IN1") & ~0xc0) | (input_port_read(machine, portnames[_4in1_bank]) & 0xc0);
 }
 
 READ8_HANDLER( _4in1_input_port_2_r )
 {
-	return (input_port_read_indexed(machine, 2) & 0x04) | (input_port_read_indexed(machine, 3+_4in1_bank) & ~0xc4);
-}
-
-
-static void gmgalax_select_game(running_machine *machine, int game)
-{
-	gmgalax_selected_game = game;
-
-	memory_set_bank(1, game);
-
-	galaxold_gfxbank_w(machine, 0, gmgalax_selected_game);
-}
-
-READ8_HANDLER( gmgalax_input_port_0_r )
-{
-	return input_port_read_indexed(machine, gmgalax_selected_game ? 3 : 0);
-}
-
-READ8_HANDLER( gmgalax_input_port_1_r )
-{
-	return input_port_read_indexed(machine, gmgalax_selected_game ? 4 : 1);
-}
-
-READ8_HANDLER( gmgalax_input_port_2_r )
-{
-	return input_port_read_indexed(machine, gmgalax_selected_game ? 5 : 2);
+	static const char *portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
+  
+	return (input_port_read(machine, "DSW0") & 0x04) | (input_port_read(machine, portnames[_4in1_bank]) & ~0xc4);
 }
 
 
@@ -350,15 +277,6 @@ DRIVER_INIT( dingo )
 {
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3000, 0, 0, dingo_3000_r);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3035, 0x3035, 0, 0, dingo_3035_r);
-}
-
-DRIVER_INIT( kingball )
-{
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa000, 0, 0, kingball_IN0_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa800, 0xa800, 0, 0, kingball_IN1_r);
-
-	state_save_register_global(kingball_speech_dip);
-	state_save_register_global(kingball_sound);
 }
 
 
@@ -473,14 +391,6 @@ Pin layout is such that links can replace the PAL if encryption is not used.
 	}
 }
 
-DRIVER_INIT( azurian )
-{
-	DRIVER_INIT_CALL(pisces);
-
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6800, 0x6800, 0, 0, azurian_IN1_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x7000, 0, 0, azurian_IN2_r);
-}
-
 DRIVER_INIT( 4in1 )
 {
 	offs_t i, len = memory_region_length(REGION_CPU1);
@@ -507,31 +417,4 @@ DRIVER_INIT( ladybugg )
 {
 /* Doesn't actually use the bank, but it mustn't have a coin lock! */
 memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6002, 0x6002, 0, 0, galaxold_gfxbank_w);
-}
-
-DRIVER_INIT( gmgalax )
-{
-	/* games are banked at 0x0000 - 0x3fff */
-	UINT8 *RAM=memory_region(REGION_CPU1);
-	memory_configure_bank(1, 0, 2, &RAM[0x10000], 0x4000);
-
-	state_save_register_global(gmgalax_selected_game);
-
-	gmgalax_select_game(machine, input_port_read_indexed(machine, 6) & 0x01);
-}
-
-INTERRUPT_GEN( gmgalax_vh_interrupt )
-{
-	// reset the cpu if the selected game changed
-	int new_game = input_port_read_indexed(machine, 6) & 0x01;
-
-	if (gmgalax_selected_game != new_game)
-	{
-		gmgalax_select_game(machine, new_game);
-
-		/* Ghost Muncher never clears this */
-		galaxold_stars_enable_w(machine, 0, 0);
-
-		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ASSERT_LINE);
-	}
 }

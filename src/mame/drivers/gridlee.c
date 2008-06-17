@@ -172,9 +172,10 @@ static READ8_HANDLER( analog_port_r )
 {
 	int delta, sign, magnitude;
 	UINT8 newval;
+	static const char *portnames[] = { "TRACK0_Y", "TRACK0_X", "TRACK1_Y", "TRACK1_X" };
 
 	/* first read the new trackball value and compute the signed delta */
-	newval = input_port_read_indexed(machine, offset + 2 * gridlee_cocktail_flip);
+	newval = input_port_read(machine, portnames[offset + 2 * gridlee_cocktail_flip]);
 	delta = (int)newval - (int)last_analog_input[offset];
 
 	/* handle the case where we wrap around from 0x00 to 0xff, or vice versa */
@@ -300,10 +301,10 @@ static WRITE8_HANDLER( gridlee_coin_counter_w )
 static ADDRESS_MAP_START( readmem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x9500, 0x9501) AM_READ(analog_port_r)
-	AM_RANGE(0x9502, 0x9502) AM_READ(input_port_4_r)
-	AM_RANGE(0x9503, 0x9503) AM_READ(input_port_5_r)
-	AM_RANGE(0x9600, 0x9600) AM_READ(input_port_6_r)
-	AM_RANGE(0x9700, 0x9700) AM_READ(input_port_7_r)
+	AM_RANGE(0x9502, 0x9502) AM_READ_PORT("IN0")
+	AM_RANGE(0x9503, 0x9503) AM_READ_PORT("IN1")
+	AM_RANGE(0x9600, 0x9600) AM_READ_PORT("DSW")
+	AM_RANGE(0x9700, 0x9700) AM_READ_PORT("IN2")
 	AM_RANGE(0x9820, 0x9820) AM_READ(random_num_r)
 	AM_RANGE(0x9c00, 0x9cff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xffff) AM_READ(SMH_ROM)
@@ -335,24 +336,24 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( gridlee )
-	PORT_START	/* 9500 (fake) */
+	PORT_START_TAG("TRACK0_Y")	/* 9500 (fake) */
     PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8)
 
-	PORT_START	/* 9501 (fake) */
+	PORT_START_TAG("TRACK0_X")	/* 9501 (fake) */
     PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_REVERSE
 
-	PORT_START	/* 9500 (fake) */
+	PORT_START_TAG("TRACK1_Y")	/* 9500 (fake) */
     PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_COCKTAIL
 
-	PORT_START	/* 9501 (fake) */
+	PORT_START_TAG("TRACK1_X")	/* 9501 (fake) */
     PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_REVERSE PORT_COCKTAIL
 
-	PORT_START	/* 9502 */
+	PORT_START_TAG("IN0")		/* 9502 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* 9503 */
+	PORT_START_TAG("IN1")		/* 9503 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -363,7 +364,7 @@ static INPUT_PORTS_START( gridlee )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ))
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* 9600 */
+	PORT_START_TAG("DSW")		/* 9600 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Bonus_Life ))
 	PORT_DIPSETTING(    0x00, "8000 points" )
 	PORT_DIPSETTING(    0x01, "10000 points" )
@@ -387,7 +388,7 @@ static INPUT_PORTS_START( gridlee )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ))
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ))
 
-	PORT_START	/* 9700 */
+	PORT_START_TAG("IN2")		/* 9700 */
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )

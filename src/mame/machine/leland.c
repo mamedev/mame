@@ -128,16 +128,16 @@ static int dial_compute_value(int new_val, int indx)
 
 READ8_HANDLER( cerberus_dial_1_r )
 {
-	int original = input_port_read_indexed(machine, 0);
-	int modified = dial_compute_value(input_port_read_indexed(machine, 4), 0);
+	int original = input_port_read(machine, "IN0");
+	int modified = dial_compute_value(input_port_read(machine, "AN0"), 0);
 	return (original & 0xc0) | ((modified & 0x80) >> 2) | (modified & 0x1f);
 }
 
 
 READ8_HANDLER( cerberus_dial_2_r )
 {
-	int original = input_port_read_indexed(machine, 2);
-	int modified = dial_compute_value(input_port_read_indexed(machine, 5), 1);
+	int original = input_port_read(machine, "IN0");
+	int modified = dial_compute_value(input_port_read(machine, "AN1"), 1);
 	return (original & 0xc0) | ((modified & 0x80) >> 2) | (modified & 0x1f);
 }
 
@@ -181,8 +181,8 @@ WRITE8_HANDLER( alleymas_joystick_kludge )
 
 static void update_dangerz_xy(running_machine *machine)
 {
-	UINT8 newy = input_port_read_indexed(machine, 4);
-	UINT8 newx = input_port_read_indexed(machine, 5);
+	UINT8 newy = input_port_read(machine, "AN0");
+	UINT8 newx = input_port_read(machine, "AN1");
 	int deltay = newy - dial_last_input[0];
 	int deltax = newx - dial_last_input[1];
 
@@ -235,27 +235,27 @@ static const UINT8 redline_pedal_value[8] = { 0xf0, 0xe0, 0xc0, 0xd0, 0x90, 0xb0
 
 READ8_HANDLER( redline_pedal_1_r )
 {
-	int pedal = input_port_read_indexed(machine, 0);
+	int pedal = input_port_read(machine, "IN0");
 	return redline_pedal_value[pedal >> 5] | 0x0f;
 }
 
 
 READ8_HANDLER( redline_pedal_2_r )
 {
-	int pedal = input_port_read_indexed(machine, 2);
+	int pedal = input_port_read(machine, "IN2");
 	return redline_pedal_value[pedal >> 5] | 0x0f;
 }
 
 
 READ8_HANDLER( redline_wheel_1_r )
 {
-	return dial_compute_value(input_port_read_indexed(machine, 4), 0);
+	return dial_compute_value(input_port_read(machine, "AN0"), 0);
 }
 
 
 READ8_HANDLER( redline_wheel_2_r )
 {
-	return dial_compute_value(input_port_read_indexed(machine, 5), 1);
+	return dial_compute_value(input_port_read(machine, "AN1"), 1);
 }
 
 
@@ -268,19 +268,19 @@ READ8_HANDLER( redline_wheel_2_r )
 
 READ8_HANDLER( offroad_wheel_1_r )
 {
-	return dial_compute_value(input_port_read_indexed(machine, 7), 0);
+	return dial_compute_value(input_port_read(machine, "AN3"), 0);
 }
 
 
 READ8_HANDLER( offroad_wheel_2_r )
 {
-	return dial_compute_value(input_port_read_indexed(machine, 8), 1);
+	return dial_compute_value(input_port_read(machine, "AN4"), 1);
 }
 
 
 READ8_HANDLER( offroad_wheel_3_r )
 {
-	return dial_compute_value(input_port_read_indexed(machine, 9), 2);
+	return dial_compute_value(input_port_read(machine, "AN5"), 2);
 }
 
 
@@ -293,7 +293,9 @@ READ8_HANDLER( offroad_wheel_3_r )
 
 READ8_HANDLER( ataxx_trackball_r )
 {
-	return dial_compute_value(input_port_read_indexed(machine, 3 + offset), offset);
+	static const char *tracknames[] = { "AN0", "AN1", "AN2", "AN3" };
+
+	return dial_compute_value(input_port_read(machine, tracknames[offset]), offset);
 }
 
 
@@ -306,7 +308,9 @@ READ8_HANDLER( ataxx_trackball_r )
 
 READ8_HANDLER( indyheat_wheel_r )
 {
-	return dial_compute_value(input_port_read_indexed(machine, 3 + offset), offset);
+	static const char *tracknames[] = { "AN0", "AN1", "AN2" };
+
+	return dial_compute_value(input_port_read(machine, tracknames[offset]), offset);
 }
 
 
@@ -333,10 +337,12 @@ READ8_HANDLER( indyheat_analog_r )
 
 WRITE8_HANDLER( indyheat_analog_w )
 {
+	static const char *tracknames[] = { "AN3", "AN4", "AN5" };
+
 	switch (offset)
 	{
 		case 3:
-			analog_result = input_port_read_indexed(machine, 6 + data);
+			analog_result = input_port_read(machine, tracknames[data]);
 			break;
 
 		case 0:
@@ -492,7 +498,7 @@ static TIMER_CALLBACK( ataxx_interrupt_callback )
 INTERRUPT_GEN( leland_master_interrupt )
 {
 	/* check for coins here */
-	if ((input_port_read_indexed(machine, 1) & 0x0e) != 0x0e)
+	if ((input_port_read(machine, "IN1") & 0x0e) != 0x0e)
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -843,7 +849,7 @@ void ataxx_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offse
 
 READ8_HANDLER( ataxx_eeprom_r )
 {
-	int port = input_port_read_indexed(machine, 2);
+	int port = input_port_read(machine, "IN2");
 	if (LOG_EEPROM) logerror("%04X:EE read\n", safe_activecpu_get_pc());
 	return (port & ~0x01) | eeprom_read_bit();
 }
@@ -1107,13 +1113,15 @@ READ8_HANDLER( leland_master_analog_key_r )
 
 WRITE8_HANDLER( leland_master_analog_key_w )
 {
+	static const char *portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5" };
+
 	switch (offset)
 	{
 		case 0x00:	/* FD = analog port trigger */
 			break;
 
 		case 0x01:	/* FE = analog port select/bankswitch */
-			analog_result = input_port_read_indexed(machine, (data & 15) + 4);
+			analog_result = input_port_read(machine, portnames[data & 15]);
 
 			/* update top board banking for some games */
 			if (LOG_BANKSWITCHING_M)
@@ -1144,11 +1152,11 @@ READ8_HANDLER( leland_master_input_r )
 	switch (offset)
 	{
 		case 0x00:	/* /GIN0 */
-			result = input_port_read_indexed(machine, 0);
+			result = input_port_read(machine, "IN0");
 			break;
 
 		case 0x01:	/* /GIN1 */
-			result = input_port_read_indexed(machine, 1);
+			result = input_port_read(machine, "IN1");
 			if (cpunum_get_reg(1, Z80_HALT))
 				result ^= 0x01;
 			break;
@@ -1164,11 +1172,11 @@ READ8_HANDLER( leland_master_input_r )
 			break;
 
 		case 0x10:	/* /GIN0 */
-			result = input_port_read_indexed(machine, 2);
+			result = input_port_read(machine, "IN2");
 			break;
 
 		case 0x11:	/* /GIN1 */
-			result = input_port_read_indexed(machine, 3);
+			result = input_port_read(machine, "IN3");
 			if (LOG_EEPROM) logerror("%04X:EE read\n", safe_activecpu_get_pc());
 			result = (result & ~0x01) | eeprom_read_bit();
 			break;
@@ -1227,11 +1235,11 @@ READ8_HANDLER( ataxx_master_input_r )
 	switch (offset)
 	{
 		case 0x06:	/* /GIN0 */
-			result = input_port_read_indexed(machine, 0);
+			result = input_port_read(machine, "IN0");
 			break;
 
 		case 0x07:	/* /SLVBLK */
-			result = input_port_read_indexed(machine, 1);
+			result = input_port_read(machine, "IN1");
 			if (cpunum_get_reg(1, Z80_HALT))
 				result ^= 0x01;
 			break;

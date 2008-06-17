@@ -47,7 +47,7 @@ static void update_interrupts(running_machine *machine)
 static void scanline_update(const device_config *screen, int scanline)
 {
 	/* generate 32V signals */
-	if ((scanline & 32) == 0 && !(input_port_read_indexed(screen->machine, 0) & 0x800))
+	if ((scanline & 32) == 0 && !(input_port_read(screen->machine, "IN0") & 0x800))
 		atarigen_scanline_int_gen(screen->machine, 0);
 }
 
@@ -137,7 +137,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( klax )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -149,7 +149,7 @@ static INPUT_PORTS_START( klax )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0600, IP_ACTIVE_LOW, IPT_UNUSED )

@@ -1438,8 +1438,9 @@ static void init_megadri6_io(void)
 /* pointers to our io data read/write functions */
 static UINT8 (*megadrive_io_read_data_port_ptr)(int offset);
 static void (*megadrive_io_write_data_port_ptr)(int offset, UINT16 data);
+
 INPUT_PORTS_START( megadri6 )
-	PORT_START /* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START_TAG("PAD1")		/* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1454,7 +1455,7 @@ INPUT_PORTS_START( megadri6 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME("P1 MODE") // mode
 
 
-	PORT_START /* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START_TAG("PAD2")		/* Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -1468,12 +1469,12 @@ INPUT_PORTS_START( megadri6 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("P2 Z") // z
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2) PORT_NAME("P2 MODE") // mode
 
-	PORT_START /* 3rd I/O port */
+	PORT_START_TAG("IN0")		/* 3rd I/O port */
 
-	PORT_START_TAG("RESET") /* Buttons on Genesis Console */
+	PORT_START_TAG("RESET")		/* Buttons on Genesis Console */
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 
-	PORT_START_TAG("REGION") /* Buttons on Genesis Console */
+	PORT_START_TAG("REGION")	/* Buttons on Genesis Console */
 	/* Region setting for Console */
 	PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
@@ -1486,7 +1487,7 @@ INPUT_PORTS_END
 
 
 INPUT_PORTS_START( ssf2ghw )
-	PORT_START /* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START_TAG("PAD1")		/* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1501,7 +1502,7 @@ INPUT_PORTS_START( ssf2ghw )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 
 
-	PORT_START /* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_START_TAG("PAD2")		/* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -1515,14 +1516,14 @@ INPUT_PORTS_START( ssf2ghw )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START /* 3rd I/O port */
+	PORT_START_TAG("IN0")		/* 3rd I/O port */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 
-//  PORT_START_TAG("RESET") /* Buttons on Genesis Console */
+//  PORT_START_TAG("RESET")		/* Buttons on Genesis Console */
 //  PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 
-//  PORT_START_TAG("REGION") /* Buttons on Genesis Console */
+//  PORT_START_TAG("REGION")	/* Buttons on Genesis Console */
 //  /* Region setting for Console */
 //  PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 //  PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
@@ -1616,7 +1617,7 @@ INPUT_PORTS_END
 */
 
 INPUT_PORTS_START( megadriv )
-	PORT_START /* Joypad 1 (3 button + start) NOT READ DIRECTLY */
+	PORT_START_TAG("PAD1")		/* Joypad 1 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1626,7 +1627,7 @@ INPUT_PORTS_START( megadriv )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 C") // c
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 START") // start
 
-	PORT_START /* Joypad 2 (3 button + start) NOT READ DIRECTLY */
+	PORT_START_TAG("PAD2")		/* Joypad 2 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -1636,12 +1637,12 @@ INPUT_PORTS_START( megadriv )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 C") // c
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 START") // start
 
-	PORT_START /* 3rd I/O port */
+	PORT_START_TAG("IN0")		/* 3rd I/O port */
 
-	PORT_START_TAG("RESET") /* Buttons on Genesis Console */
+	PORT_START_TAG("RESET")		/* Buttons on Genesis Console */
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 
-	PORT_START_TAG("REGION") /* Region setting for Console */
+	PORT_START_TAG("REGION")	/* Region setting for Console */
 	/* Region setting for Console */
 	PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
@@ -1652,7 +1653,7 @@ INPUT_PORTS_END
 
 
 INPUT_PORTS_START( aladbl )
-	PORT_START /* Joypad 1 (3 button + start) NOT READ DIRECTLY */
+	PORT_START_TAG("PAD1")		/* Joypad 1 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1662,7 +1663,7 @@ INPUT_PORTS_START( aladbl )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Jump") // c
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 ) // start
 
-	PORT_START /* Joypad 2 (3 button + start) NOT READ DIRECTLY - not used */
+	PORT_START_TAG("PAD2")		/* Joypad 2 (3 button + start) NOT READ DIRECTLY - not used */
 //  PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 //  PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 //  PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -1672,12 +1673,12 @@ INPUT_PORTS_START( aladbl )
 //  PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Jump") // c
 //  PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 ) // start
 
-	PORT_START /* 3rd I/O port */
+	PORT_START_TAG("IN0")		/* 3rd I/O port */
 
-//  PORT_START_TAG("RESET") /* Buttons on Genesis Console */
+//  PORT_START_TAG("RESET")		/* Buttons on Genesis Console */
 //  PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 
-//  PORT_START_TAG("REGION") /* Region setting for Console */
+//  PORT_START_TAG("REGION")	/* Region setting for Console */
 //  /* Region setting for Console */
 //  PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Region ) )
 //  PORT_DIPSETTING(      0x0000, "Use HazeMD Default Choice" )
@@ -1707,22 +1708,20 @@ INPUT_PORTS_START( aladbl )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)     /* needed to avoid credits getting mad */
 INPUT_PORTS_END
 
-
-#define MODE_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x800) >> 11 )
-#define Z_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x400) >> 10 )
-#define Y_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x200) >> 9 )
-#define X_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x100) >> 8 )
-
+#define MODE_BUTTON(player)	( (input_port_read_indexed(Machine, player) & 0x800) >> 11 )
+#define Z_BUTTON(player)	( (input_port_read_indexed(Machine, player) & 0x400) >> 10 )
+#define Y_BUTTON(player)	( (input_port_read_indexed(Machine, player) & 0x200) >> 9 )
+#define X_BUTTON(player)	( (input_port_read_indexed(Machine, player) & 0x100) >> 8 )
 
 #define START_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x80) >> 7 )
-#define C_BUTTON(player)     ( (input_port_read_indexed(Machine, player) & 0x40) >> 6 )
-#define B_BUTTON(player)     ( (input_port_read_indexed(Machine, player) & 0x20) >> 5 )
-#define A_BUTTON(player)     ( (input_port_read_indexed(Machine, player) & 0x10) >> 4 )
+#define C_BUTTON(player)	 ( (input_port_read_indexed(Machine, player) & 0x40) >> 6 )
+#define B_BUTTON(player)	 ( (input_port_read_indexed(Machine, player) & 0x20) >> 5 )
+#define A_BUTTON(player)	 ( (input_port_read_indexed(Machine, player) & 0x10) >> 4 )
 #define RIGHT_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x08) >> 3 )
-#define LEFT_BUTTON(player)  ( (input_port_read_indexed(Machine, player) & 0x04) >> 2 )
-#define DOWN_BUTTON(player)  ( (input_port_read_indexed(Machine, player) & 0x02) >> 1 )
-#define UP_BUTTON(player)    ( (input_port_read_indexed(Machine, player) & 0x01) >> 0 )
-#define MD_RESET_BUTTON      ( (input_port_read_safe(Machine, "RESET",0x00)      & 0x01) >> 0 )
+#define LEFT_BUTTON(player)	 ( (input_port_read_indexed(Machine, player) & 0x04) >> 2 )
+#define DOWN_BUTTON(player)	 ( (input_port_read_indexed(Machine, player) & 0x02) >> 1 )
+#define UP_BUTTON(player)	 ( (input_port_read_indexed(Machine, player) & 0x01) >> 0 )
+#define MD_RESET_BUTTON		 ( (input_port_read_safe(Machine, "RESET", 0x00) & 0x01) >> 0 )
 
 static UINT8 megadrive_io_data_regs[3];
 static UINT8 megadrive_io_ctrl_regs[3];
@@ -4755,7 +4754,7 @@ MACHINE_RESET( megadriv )
 	/* default state of z80 = reset, with bus */
 	mame_printf_debug("Resetting Megadrive / Genesis\n");
 
-	switch (input_port_read_safe(machine, "REGION",0x00))
+	switch (input_port_read_safe(machine, "REGION", 0x00))
 	{
 
 		case 1: // US

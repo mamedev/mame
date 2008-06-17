@@ -176,8 +176,11 @@ maybe some priority issues / sprite placement issues..
 #define SOUND_CLOCK		XTAL_18_432MHz
 
 
-#define GUNX( a ) (( ( input_port_read_indexed(machine,  a ) * 287 ) / 0xff ) + 16)
-#define GUNY( a ) (( ( input_port_read_indexed(machine,  a ) * 223 ) / 0xff ) + 10)
+static const char *gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
+
+/* a = 1, 2 = player # */
+#define GUNX( a ) (( ( input_port_read(machine, gunnames[2 * (a - 1)]) * 287 ) / 0xff ) + 16)
+#define GUNY( a ) (( ( input_port_read(machine, gunnames[2 * (a - 1) + 1]) * 223 ) / 0xff ) + 10)
 
 VIDEO_START(lethalen);
 VIDEO_UPDATE(lethalen);
@@ -229,7 +232,7 @@ static NVRAM_HANDLER( lethalen )
 
 static READ8_HANDLER( control2_r )
 {
-	return 0x02 | eeprom_read_bit() | (input_port_read_indexed(machine, 1) & 0xf0);
+	return 0x02 | eeprom_read_bit() | (input_port_read(machine, "IN1") & 0xf0);
 }
 
 static WRITE8_HANDLER( control2_w )
@@ -455,22 +458,22 @@ static READ8_HANDLER(guns_r)
 	switch (offset)
 	{
 		case 0:
-			return GUNX(2)>>1;
+			return GUNX(1)>>1;
 			break;
 		case 1:
-			if ((240-GUNY(3)) == 7)
+			if ((240-GUNY(1)) == 7)
 				return 0;
 			else
-				return (240-GUNY(3));
+				return (240-GUNY(1));
 			break;
 		case 2:
-			return GUNX(4)>>1;
+			return GUNX(2)>>1;
 			break;
 		case 3:
-			if ((240-GUNY(5)) == 7)
+			if ((240-GUNY(2)) == 7)
 				return 0;
 			else
-				return (240-GUNY(5));
+				return (240-GUNY(2));
 			break;
 	}
 
@@ -481,8 +484,8 @@ static READ8_HANDLER(gunsaux_r)
 {
 	int res = 0;
 
-	if (GUNX(2) & 1) res |= 0x80;
-	if (GUNX(4) & 1) res |= 0x40;
+	if (GUNX(1) & 1) res |= 0x80;
+	if (GUNX(2) & 1) res |= 0x40;
 
 	return res;
 }
@@ -499,7 +502,7 @@ static ADDRESS_MAP_START( le_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x40c8, 0x40d0) AM_WRITE(lethalen_palette_control)	// PCU1-PCU3 on the schematics
 	AM_RANGE(0x40d4, 0x40d7) AM_READ(guns_r)
 	AM_RANGE(0x40d8, 0x40d8) AM_READ(control2_r)
-	AM_RANGE(0x40d9, 0x40d9) AM_READ(input_port_0_r)
+	AM_RANGE(0x40d9, 0x40d9) AM_READ_PORT("IN0")
 	AM_RANGE(0x40db, 0x40db) AM_READ(gunsaux_r)		// top X bit of guns
 	AM_RANGE(0x40dc, 0x40dc) AM_WRITE(le_bankswitch_w)
 	AM_RANGE(0x47fe, 0x47ff) AM_WRITE(le_bgcolor_w)		// BG color
@@ -520,7 +523,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( lethalen )
 	/* IN 0 */
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -531,55 +534,7 @@ static INPUT_PORTS_START( lethalen )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	/* IN 1 */
-	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-        PORT_DIPNAME( 0x10, 0x10, DEF_STR(Language) )
-        PORT_DIPSETTING(    0x10, DEF_STR(English) )
-        PORT_DIPSETTING(    0x00, DEF_STR(Spanish) )
-	PORT_DIPNAME( 0x20, 0x00, "Game Type" )
-	PORT_DIPSETTING(    0x20, "Street" )
-	PORT_DIPSETTING(    0x00, "Arcade" )
-	PORT_DIPNAME( 0x40, 0x40, "Coin Mechanism" )
-	PORT_DIPSETTING(    0x40, "Common" )
-	PORT_DIPSETTING(    0x00, "Independent" )
-	PORT_DIPNAME( 0x0080, 0x0080, "Sound Output" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Mono ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Stereo ) )
-
-	/* IN 2 */
-	PORT_START
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
-
-	/* IN 3 */
-	PORT_START
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
-
-	/* IN 4 */
-	PORT_START
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
-
-	/* IN 5 */
-	PORT_START
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( lethalej )
-	/* IN 0 */
-	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
-
-	/* IN 1 */
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -598,19 +553,67 @@ static INPUT_PORTS_START( lethalej )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Stereo ) )
 
 	/* IN 2 */
-	PORT_START
+	PORT_START_TAG("LIGHT0_X")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	/* IN 3 */
+	PORT_START_TAG("LIGHT0_Y")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	/* IN 4 */
+	PORT_START_TAG("LIGHT1_X")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
+
+	/* IN 5 */
+	PORT_START_TAG("LIGHT1_Y")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( lethalej )
+	/* IN 0 */
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+
+	/* IN 1 */
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR(Language) )
+	PORT_DIPSETTING(    0x10, DEF_STR(English) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Spanish) )
+	PORT_DIPNAME( 0x20, 0x00, "Game Type" )
+	PORT_DIPSETTING(    0x20, "Street" )
+	PORT_DIPSETTING(    0x00, "Arcade" )
+	PORT_DIPNAME( 0x40, 0x40, "Coin Mechanism" )
+	PORT_DIPSETTING(    0x40, "Common" )
+	PORT_DIPSETTING(    0x00, "Independent" )
+	PORT_DIPNAME( 0x0080, 0x0080, "Sound Output" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Mono ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Stereo ) )
+
+	/* IN 2 */
+	PORT_START_TAG("LIGHT0_X")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, -1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_REVERSE
 
 	/* IN 3 */
-	PORT_START
+	PORT_START_TAG("LIGHT0_Y")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_REVERSE
 
 	/* IN 4 */
-	PORT_START
+	PORT_START_TAG("LIGHT1_X")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, -1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_REVERSE
 
 	/* IN 5 */
-	PORT_START
+	PORT_START_TAG("LIGHT1_Y")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_REVERSE
 INPUT_PORTS_END
 

@@ -218,6 +218,7 @@ static MACHINE_RESET( system18 )
 
 static READ16_HANDLER( io_chip_r )
 {
+	static const char *portnames[] = { "P1", "P2", "PORTC", "PORTD", "SERVICE", "COINAGE", "DSW", "PORTH" };
 	offset &= 0x1f/2;
 
 	switch (offset)
@@ -236,7 +237,7 @@ static READ16_HANDLER( io_chip_r )
 				return misc_io_data[offset];
 
 			/* otherwise, return an input port */
-			return input_port_read_indexed(machine, offset);
+			return input_port_read(machine, portnames[offset]);
 
 		/* 'SEGA' protection */
 		case 0x10/2:
@@ -320,7 +321,10 @@ static WRITE16_HANDLER( io_chip_w )
 
 static READ16_HANDLER( misc_io_r )
 {
+	static const char *portnames[] = { "SERVICE", "COINAGE" };
+
 	offset &= 0x1fff;
+	
 	switch (offset & (0x3000/2))
 	{
 		/* I/O chip */
@@ -330,7 +334,7 @@ static READ16_HANDLER( misc_io_r )
 
 		/* video control latch */
 		case 0x2000/2:
-			return input_port_read_indexed(machine, 4 + (offset & 1));
+			return input_port_read(machine, portnames[offset & 1]);
 	}
 	if (custom_io_r)
 		return custom_io_r(machine, offset, mem_mask);

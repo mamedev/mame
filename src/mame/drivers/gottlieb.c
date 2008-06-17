@@ -197,19 +197,19 @@ static int track[2];
 
 static READ8_HANDLER( gottlieb_track_0_r )
 {
-	return input_port_read_indexed(machine, 2) - track[0];
+	return input_port_read(machine, "IN2") - track[0];
 }
 
 static READ8_HANDLER( gottlieb_track_1_r )
 {
-	return input_port_read_indexed(machine, 3) - track[1];
+	return input_port_read(machine, "IN3") - track[1];
 }
 
 static WRITE8_HANDLER( gottlieb_track_reset_w )
 {
 	/* reset the trackball counters */
-	track[0] = input_port_read_indexed(machine, 2);
-	track[1] = input_port_read_indexed(machine, 3);
+	track[0] = input_port_read(machine, "IN2");
+	track[1] = input_port_read(machine, "IN3");
 }
 
 static int joympx;
@@ -601,7 +601,7 @@ static INPUT_PORTS_START( tylz )
 	PORT_DIPSETTING(    0x80, "Normal Hard" )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Hard ) )
 
-	PORT_START_TAG("DSW1")	/* ? */
+	PORT_START_TAG("IN1")	/* ? */
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1) // cycle through test options, hold to do test
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )

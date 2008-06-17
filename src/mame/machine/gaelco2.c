@@ -194,7 +194,7 @@ READ16_HANDLER( gaelco2_eeprom_r )
 	/* bit 6 is EEPROM data (DOUT) */
 	/* bit 7 is EEPROM ready */
 	/* bits 0-5, COINSW, STARTSW & Service */
-	return (1 << 7) | (eeprom_read_bit() << 6) | (input_port_read_indexed(machine, 2) & 0x3f);
+	return (1 << 7) | (eeprom_read_bit() << 6) | (input_port_read(machine, "COIN") & 0x3f);
 }
 
 WRITE16_HANDLER( gaelco2_eeprom_cs_w )

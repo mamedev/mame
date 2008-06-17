@@ -286,7 +286,7 @@ static WRITE8_HANDLER( lazercmd_data_port_w )
 static READ8_HANDLER( lazercmd_data_port_r )
 {
 	int data;
-	data = input_port_read_indexed(machine, 2) & 0x0f;
+	data = input_port_read(machine, "DSW") & 0x0f;
 	return data;
 }
 
@@ -381,16 +381,16 @@ static READ8_HANDLER( lazercmd_hardware_r )
 	switch (offset)
 	{
 		case 0: 			   /* player 1 joysticks */
-			data = input_port_read_indexed(machine, 0);
+			data = input_port_read(machine, "IN0");
 			break;
 		case 1: 			   /* player 2 joysticks */
-			data = input_port_read_indexed(machine, 1);
+			data = input_port_read(machine, "IN1");
 			break;
 		case 2: 			   /* player 1 + 2 buttons */
-			data = input_port_read_indexed(machine, 4);
+			data = input_port_read(machine, "IN3");
 			break;
 		case 3: 			   /* coin slot + start buttons */
-			data = input_port_read_indexed(machine, 3);
+			data = input_port_read(machine, "IN2");
 			break;
 		case 4: 			   /* vertical scan counter */
 			data = ((timer_count&0x10)>>1)|((timer_count&0x20)>>3)|((timer_count&0x40)>>5)|((timer_count&0x80)>>7);
@@ -451,21 +451,21 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( lazercmd )
-	PORT_START					   /* IN0 player 1 controls */
+	PORT_START_TAG("IN0")		/* IN0 player 1 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START					   /* IN1 player 2 controls */
+	PORT_START_TAG("IN1")		/* IN1 player 2 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START					   /* IN2 dip switch */
+	PORT_START_TAG("DSW")		/* IN2 dip switch */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Game_Time ) )
 	PORT_DIPSETTING(	0x00, "60 seconds" )
 	PORT_DIPSETTING(	0x01, "90 seconds" )
@@ -482,7 +482,7 @@ static INPUT_PORTS_START( lazercmd )
 //  PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 //  PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START					   /* IN3 coinage & start */
+	PORT_START_TAG("IN2")		/* IN3 coinage & start */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( 1C_1C ) )
@@ -491,7 +491,7 @@ static INPUT_PORTS_START( lazercmd )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START					   /* IN4 player 1 + 2 buttons */
+	PORT_START_TAG("IN3")		/* IN4 player 1 + 2 buttons */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -500,19 +500,19 @@ static INPUT_PORTS_START( lazercmd )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( medlanes )
-	PORT_START					   /* IN0 player 1 controls */
+	PORT_START_TAG("IN0")		/* IN0 player 1 controls */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START					   /* IN1 player 1 controls */
+	PORT_START_TAG("IN1")		/* IN1 player 1 controls */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hook Left") PORT_CODE(KEYCODE_Z)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hook Right") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START					   /* IN2 dip switch */
+	PORT_START_TAG("DSW")		/* IN2 dip switch */
 	PORT_DIPNAME( 0x01, 0x01, "Game Timer" )
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( On ) )
@@ -530,7 +530,7 @@ static INPUT_PORTS_START( medlanes )
 //  PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 //  PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START					   /* IN3 coinage & start */
+	PORT_START_TAG("IN2")		/* IN3 coinage & start */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( 1C_1C ) )
@@ -538,26 +538,26 @@ static INPUT_PORTS_START( medlanes )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0xf4, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START					   /* IN4 not used */
+	PORT_START_TAG("IN3")		/* IN4 not used */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bbonk )
-	PORT_START					   /* IN0 player 1 controls */
+	PORT_START_TAG("IN0")		/* IN0 player 1 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START					   /* IN1 player 2 controls */
+	PORT_START_TAG("IN1")		/* IN1 player 2 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START					   /* IN2 dip switch */
+	PORT_START_TAG("DSW")		/* IN2 dip switch */
 	PORT_DIPNAME( 0x03, 0x02, "Games to win" )
 	PORT_DIPSETTING(	0x02, "2" )
 	PORT_DIPSETTING(	0x03, "3" )
@@ -572,7 +572,7 @@ static INPUT_PORTS_START( bbonk )
 //  PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 //  PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START					   /* IN3 coinage & start */
+	PORT_START_TAG("IN2")		/* IN3 coinage & start */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( 1C_1C ) )
@@ -580,7 +580,7 @@ static INPUT_PORTS_START( bbonk )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0xf4, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START					   /* IN4 not used */
+	PORT_START_TAG("IN3")		/* IN4 not used */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 

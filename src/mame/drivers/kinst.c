@@ -330,7 +330,8 @@ static WRITE32_DEVICE_HANDLER( kinst_ide_extra_w )
 static READ32_HANDLER( kinst_control_r )
 {
 	UINT32 result;
-
+	static const char *portnames[] = { "P1", "P2", "IN0", "IN1", "DSW" };
+	
 	/* apply shuffling */
 	offset = control_map[offset / 2];
 	result = kinst_control[offset];
@@ -338,7 +339,7 @@ static READ32_HANDLER( kinst_control_r )
 	switch (offset)
 	{
 		case 2:		/* $90 -- sound return */
-			result = 0xffff0000 | input_port_read_indexed(machine, offset);
+			result = 0xffff0000 | input_port_read(machine, portnames[offset]);
 			result &= ~0x0002;
 			if (dcs_control_r() & 0x800)
 				result |= 0x0002;
@@ -347,11 +348,11 @@ static READ32_HANDLER( kinst_control_r )
 		case 0:		/* $80 */
 		case 1:		/* $88 */
 		case 3:		/* $98 */
-			result = 0xffff0000 | input_port_read_indexed(machine, offset);
+			result = 0xffff0000 | input_port_read(machine, portnames[offset]);
 			break;
 
 		case 4:		/* $a0 */
-			result = 0xffff0000 | input_port_read_indexed(machine, offset);
+			result = 0xffff0000 | input_port_read(machine, portnames[offset]);
 			if (activecpu_get_pc() == 0x802d428)
 				cpu_spinuntil_int();
 			break;
@@ -452,7 +453,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( kinst )
-	PORT_START
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
@@ -470,7 +471,7 @@ static INPUT_PORTS_START( kinst )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )	/* door */
 
-	PORT_START
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
@@ -488,17 +489,17 @@ static INPUT_PORTS_START( kinst )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BILL1 )	/* bill */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )	/* coin door */
 
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sound status */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )	/* verify */
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x0003, 0x0003, "Blood Level" )
 	PORT_DIPSETTING(      0x0003, DEF_STR( High ))
 	PORT_DIPSETTING(      0x0002, DEF_STR( Medium ))
@@ -556,7 +557,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( kinst2 )
-	PORT_START
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
@@ -574,7 +575,7 @@ static INPUT_PORTS_START( kinst2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )	/* door */
 
-	PORT_START
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
@@ -592,17 +593,17 @@ static INPUT_PORTS_START( kinst2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BILL1 )	/* bill */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )	/* coin door */
 
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )	/* sound status */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )	/* verify */
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x0003, 0x0003, "Blood Level" )
 	PORT_DIPSETTING(      0x0003, DEF_STR( High ))
 	PORT_DIPSETTING(      0x0002, DEF_STR( Medium ))

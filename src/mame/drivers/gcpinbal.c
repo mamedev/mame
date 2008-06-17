@@ -81,13 +81,13 @@ static READ16_HANDLER( ioc_r )
 	switch (offset)
 	{
 		case 0x80/2:
-			return input_port_read_indexed(machine,0);	/* DSW */
+			return input_port_read(machine, "DSW");
 
 		case 0x84/2:
-			return input_port_read_indexed(machine,1);	/* IN0 */
+			return input_port_read(machine, "IN0");
 
 		case 0x86/2:
-			return input_port_read_indexed(machine,2);	/* IN1 */
+			return input_port_read(machine, "IN1");
 
 		case 0x50:
 		case 0x51:
@@ -231,7 +231,7 @@ ADDRESS_MAP_END
 ***********************************************************/
 
 static INPUT_PORTS_START( gcpinbal )
-	PORT_START	/* DSW */
+	PORT_START_TAG("DSW")	/* DSW */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
@@ -278,7 +278,7 @@ static INPUT_PORTS_START( gcpinbal )
 	PORT_DIPSETTING(      0x8000, "4" )
 	PORT_DIPSETTING(      0x4000, "5" )
 
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -296,7 +296,7 @@ static INPUT_PORTS_START( gcpinbal )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1)	// Tilt left
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )

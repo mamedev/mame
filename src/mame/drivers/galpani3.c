@@ -110,7 +110,7 @@ static VIDEO_UPDATE(galpani3)
 
 static INPUT_PORTS_START( galpani3 )
 
-	PORT_START	// IN0 - Player Controls
+	PORT_START_TAG("P1")	/* IN0 - Player Controls */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	) PORT_8WAY PORT_PLAYER(1)
@@ -120,7 +120,7 @@ static INPUT_PORTS_START( galpani3 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	// IN1 - Player Controls
+	PORT_START_TAG("P2")	/* IN1 - Player Controls */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	) PORT_8WAY PORT_PLAYER(2)
@@ -130,7 +130,7 @@ static INPUT_PORTS_START( galpani3 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	// IN2 - Coins
+	PORT_START_TAG("COIN")	/* IN2 - Coins */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1  ) PORT_IMPULSE(2)
@@ -140,7 +140,7 @@ static INPUT_PORTS_START( galpani3 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED	)
 
-	PORT_START	// IN3 - DSW provided by the MCU - $200386.b <- $400200
+	PORT_START_TAG("DSW")	/* IN3 - DSW provided by the MCU - $200386.b <- $400200 */
 	PORT_DIPNAME( 0x0100, 0x0100, "Test Mode" )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -215,8 +215,8 @@ static void galpani3_mcu_run(running_machine *machine)
 	{
 		case 0x03:	// DSW
 		{
-			mcu_ram[mcu_offset] = input_port_read_indexed(machine, 3);
-			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n",activecpu_get_pc(),mcu_command,mcu_offset*2);
+			mcu_ram[mcu_offset] = input_port_read(machine, "DSW");
+			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
 		}
 		break;
 

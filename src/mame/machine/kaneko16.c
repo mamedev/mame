@@ -342,7 +342,7 @@ static void calc3_mcu_run(running_machine *machine)
 
 			// execute the command:
 
-			kaneko16_mcu_ram[param1 / 2] = ~input_port_read_indexed(machine, 4);	// DSW
+			kaneko16_mcu_ram[param1 / 2] = ~input_port_read(machine, "DSW1");	// DSW
 			kaneko16_mcu_ram[param2 / 2] = 0xffff;				// ? -1 / anything else
 
 			calc3_mcu_command_offset = param3 / 2;	// where next command will be written?
@@ -616,7 +616,7 @@ void bloodwar_mcu_run(running_machine *machine)
 
 		case 0x03:	// DSW
 		{
-			kaneko16_mcu_ram[mcu_offset] = input_port_read_indexed(machine, 4);
+			kaneko16_mcu_ram[mcu_offset] = input_port_read(machine, "DSW1");
 			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
 		}
 		break;
@@ -743,7 +743,7 @@ void bonkadv_mcu_run(running_machine *machine)
 
 		case 0x03:	// DSW
 		{
-			kaneko16_mcu_ram[mcu_offset] = input_port_read_indexed(machine, 4);
+			kaneko16_mcu_ram[mcu_offset] = input_port_read(machine, "DSW1");
 			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
 		}
 		break;
@@ -851,7 +851,7 @@ void gtmr_mcu_run(running_machine *machine)
 
 		case 0x03:	// DSW
 		{
-			kaneko16_mcu_ram[mcu_offset] = input_port_read_indexed(machine, 4);
+			kaneko16_mcu_ram[mcu_offset] = input_port_read(machine, "DSW1");
 		}
 		break;
 

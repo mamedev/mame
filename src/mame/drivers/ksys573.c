@@ -301,11 +301,11 @@ static READ32_HANDLER( jamma_r )
 	switch (offset)
 	{
 	case 0:
-		data = input_port_read_indexed(machine, 0);
+		data = input_port_read(machine, "IN0");
 		break;
 	case 1:
 	{
-		data = input_port_read_indexed(machine, 1);
+		data = input_port_read(machine, "IN1");
 		data |= 0x000000c0;
 
 		if( has_ds2401[ security_cart_number ] )
@@ -341,10 +341,10 @@ static READ32_HANDLER( jamma_r )
 		break;
 	}
 	case 2:
-		data = input_port_read_indexed(machine, 2);
+		data = input_port_read(machine, "IN2");
 		break;
 	case 3:
-		data = input_port_read_indexed(machine, 3);
+		data = input_port_read(machine, "IN3");
 		break;
 	}
 

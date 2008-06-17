@@ -70,10 +70,14 @@ static READ8_HANDLER(vram_r)
 
 static READ8_HANDLER(input_r)
 {
-	if(inputcnt<0){		return 0;	}
+	if(inputcnt<0)
+	{		
+		return 0;	
+	}
+	
 	if(!inputcnt)
 	{
-		int key=input_port_read_indexed(machine,2);
+		int key=input_port_read(machine, "IN1");
 		int keyval=0; //we must return 0 (0x2 in 2nd read) to clear 4 bit at $6600 and allow next read
 
 		if(key)
@@ -84,14 +88,17 @@ static READ8_HANDLER(input_r)
 		inputval=inputTab[keyval]&0x1f;
 		inputlen=inputTab[keyval]>>5;
 	}
+	
 	if(inputlen==++inputcnt) //return expected value
 	{
 		return inputval^0xff;
 	}
+	
 	if(inputcnt>4) //end of cycle
 	{
 		inputcnt=-1;
 	}
+	
 	return 0xff; //return 0^0xff
 }
 
@@ -104,7 +111,7 @@ static READ8_HANDLER(io_r)
 {
 	if(!offset)
 	{
-			return input_port_read_indexed(machine, 1)^ioram[4]; //coin
+			return input_port_read(machine, "IN0")^ioram[4]; //coin
 	}
 	return 0;
 }
@@ -121,7 +128,7 @@ static WRITE8_HANDLER(io_w)
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ( input_port_0_r )
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("DSW")
 	AM_RANGE(0x7000, 0x77ff) AM_READWRITE(vram_r, vram_w) AM_BASE(&videoram)
 	AM_RANGE(0x9000, 0x9007) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END
@@ -136,40 +143,40 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( koikoi )
-	PORT_START	/* DSW */
+	PORT_START_TAG("DSW")	/* DSW */
 	PORT_DIPNAME( 0x03, 0x01, "Timer C" )
-	 PORT_DIPSETTING(    0x00, "50" )
-	 PORT_DIPSETTING(    0x01, "70" )
-	 PORT_DIPSETTING(    0x02, "90" )
-	 PORT_DIPSETTING(    0x03, "110" )
+	PORT_DIPSETTING(	0x00, "50" )
+	PORT_DIPSETTING(	0x01, "70" )
+	PORT_DIPSETTING(	0x02, "90" )
+	PORT_DIPSETTING(	0x03, "110" )
 
 	PORT_DIPNAME( 0x0c, 0x04, "Timer M" )
-	 PORT_DIPSETTING(    0x00, "120" )
-	 PORT_DIPSETTING(    0x04, "150" )
-	 PORT_DIPSETTING(    0x08, "180" )
-	 PORT_DIPSETTING(    0x0c, "210" )
+	PORT_DIPSETTING(	0x00, "120" )
+	PORT_DIPSETTING(	0x04, "150" )
+	PORT_DIPSETTING(	0x08, "180" )
+	PORT_DIPSETTING(	0x0c, "210" )
 
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coin_A ) )
-	 PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	 PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( 1C_2C ) )
 
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( On ) )
 
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
 
 	PORT_DIPNAME( 0x80, 0x00, "Test Mode" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0xbf, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A) //1
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S) //2
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D) //3

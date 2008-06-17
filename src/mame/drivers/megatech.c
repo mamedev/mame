@@ -477,11 +477,6 @@ static WRITE8_HANDLER( bios_ctrl_w )
 }
 
 
-static READ8_HANDLER( megaplay_r0) { return input_port_read(machine, "BIOS_IN0") ; }
-static READ8_HANDLER( megaplay_r1) { return input_port_read(machine, "BIOS_IN1") ; }
-static READ8_HANDLER( megaplay_r2) { return input_port_read(machine, "BIOS_DSW0") ; }
-static READ8_HANDLER( megaplay_r3) { return input_port_read(machine, "BIOS_DSW1") ; }
-
 static int mt_bank_bank_pos = 0;
 static int mt_bank_partial = 0;
 static int mt_bank_addr = 0;
@@ -524,11 +519,11 @@ static ADDRESS_MAP_START( megatech_bios_map, ADDRESS_SPACE_PROGRAM, 8 )
  	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(megatech_banked_ram_r, megatech_banked_ram_w) // copies instruction data here at startup, must be banked
 	AM_RANGE(0x4000, 0x5fff) AM_RAM // plain ram?
 	AM_RANGE(0x6000, 0x6000) AM_WRITE( mt_z80_bank_w )
-	AM_RANGE(0x6400, 0x6400) AM_READ(megaplay_r2)
-	AM_RANGE(0x6401, 0x6401) AM_READ(megaplay_r3)
+	AM_RANGE(0x6400, 0x6400) AM_READ_PORT("BIOS_DSW0")
+	AM_RANGE(0x6401, 0x6401) AM_READ_PORT("BIOS_DSW1")
 	AM_RANGE(0x6404, 0x6404) AM_READWRITE(megatech_cart_select_r, megatech_cart_select_w) // cart select & ram bank
-	AM_RANGE(0x6800, 0x6800) AM_READ(megaplay_r0)
-	AM_RANGE(0x6801, 0x6801) AM_READ(megaplay_r1)
+	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("BIOS_IN0")
+	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("BIOS_IN1")
 	AM_RANGE(0x6802, 0x6807) AM_READWRITE(bios_ctrl_r, bios_ctrl_w)
 //  AM_RANGE(0x6805, 0x6805) AM_READ(input_port_8_r)
  	AM_RANGE(0x7000, 0x77ff) AM_ROM // from bios rom (0x7000-0x77ff populated in ROM)

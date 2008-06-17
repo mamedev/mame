@@ -175,14 +175,14 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	{
 		int i;
 
-		joypad[0].low = input_port_read_indexed(machine,  0 );
-		joypad[0].high = input_port_read_indexed(machine,  1 );
-		joypad[1].low = input_port_read_indexed(machine,  2 );
-		joypad[1].high = input_port_read_indexed(machine,  3 );
-		joypad[2].low = input_port_read_indexed(machine,  4 );
-		joypad[2].high = input_port_read_indexed(machine,  5 );
-		joypad[3].low = input_port_read_indexed(machine,  6 );
-		joypad[3].high = input_port_read_indexed(machine,  7 );
+		joypad[0].low  = input_port_read(machine, "PAD1L");
+		joypad[0].high = input_port_read(machine, "PAD1H");
+		joypad[1].low  = input_port_read(machine, "PAD2L");
+		joypad[1].high = input_port_read(machine, "PAD2H");
+		joypad[2].low  = input_port_read(machine, "PAD3L");
+		joypad[2].high = input_port_read(machine, "PAD3H");
+		joypad[3].low  = input_port_read(machine, "PAD4L");
+		joypad[3].high = input_port_read(machine, "PAD4H");
 
 		// avoid sending signals that could crash games
 		for (i = 0; i < 4; i++)
@@ -952,9 +952,9 @@ READ8_HANDLER( snes_r_io )
 #ifndef MESS
 		case 0x4100:		/* NSS Dip-Switches */
 #ifdef MAME_DEBUG
-			return input_port_read_indexed(machine, 12);
+			return input_port_read_safe(machine, "DEBUG1", 0);
 #else
-			return input_port_read_indexed(machine, 9);
+			return input_port_read(machine, "DSW");
 #endif	/* MAME_DEBUG */
 //      case 0x4101: //PC: a104 - a10e - a12a   //only nss_actr
 //      case 0x420c: //PC: 9c7d - 8fab          //only nss_ssoc

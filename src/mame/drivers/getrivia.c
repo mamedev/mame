@@ -121,7 +121,7 @@ static WRITE8_HANDLER( getrivia_bitmap_w )
 
 static READ8_HANDLER( port1_r )
 {
-	return input_port_read_indexed(machine, 1) | (ticket_dispenser_0_r(machine, 0) >> 5);
+	return input_port_read(machine, "IN0") | (ticket_dispenser_0_r(machine, 0) >> 5);
 }
 
 static WRITE8_HANDLER( lamps_w )
@@ -301,7 +301,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( gselect )
-	PORT_START      /* DSW A */
+	PORT_START_TAG("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, "Poker: Discard Cards" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "3" )
@@ -336,7 +336,7 @@ static INPUT_PORTS_START( gselect )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_IMPULSE(2) PORT_NAME ("Play / Raise")
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_IMPULSE(2)
@@ -347,7 +347,7 @@ static INPUT_PORTS_START( gselect )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_IMPULSE(2) PORT_NAME ("Stand")
 /*  Button 8, 6, 7 order verified in test mode switch test */
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -397,7 +397,7 @@ static INPUT_PORTS_START( getrivia )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )

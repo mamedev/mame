@@ -35,12 +35,13 @@ static UINT8 blank_palette;
 
 INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *y)
 {
+	static const char *gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 	int width = visarea->max_x + 1 - visarea->min_x;
 	int height = visarea->max_y + 1 - visarea->min_y;
 
-	*x = ((input_port_read_indexed(machine, 2 + player * 2) & 0xff) * width) / 255;
-	*y = ((input_port_read_indexed(machine, 3 + player * 2) & 0xff) * height) / 255;
+	*x = ((input_port_read(machine, gunnames[player * 2]) & 0xff) * width) / 255;
+	*y = ((input_port_read(machine, gunnames[1 + player * 2]) & 0xff) * height) / 255;
 }
 
 
