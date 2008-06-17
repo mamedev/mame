@@ -1314,10 +1314,7 @@ static MACHINE_DRIVER_START( konamigx )
 	MDRV_CPU_PROGRAM_MAP(gx_base_memmap, gx_type2_map)
 	MDRV_CPU_VBLANK_INT("main", konamigx_vbinterrupt)
 
-	/* note: part is a -8, crystals are 18.4 and 32.0 MHz, and
-       twinbee yahhoo will not pass POST if the 68000 isn't
-       running at least this fast.  so the higher speed is probably a HACK... */
-	MDRV_CPU_ADD_TAG("sound", M68000, 9200000)
+	MDRV_CPU_ADD_TAG("sound", M68000, 8000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(gxsndmap, 0)
 	MDRV_CPU_PERIODIC_INT(irq2_line_hold, 480)
@@ -1332,8 +1329,14 @@ static MACHINE_DRIVER_START( konamigx )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_RAW_PARAMS(6000000, 288+17+32+49, 0, 287, 224+17+8+16, 0, 223)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
+//	MDRV_SCREEN_RAW_PARAMS(6000000, 288+17+32+49, 0, 287, 224+17+8+16, 0, 223)
+	/* These parameters should be correct according to developer manual,
+	but sound and graphics of tbyahhoo's attract mode doesn't sync correctly.
+	(better than previous 60Hz, though) Setting refresh rate to 58Hz fixes this.
+	We have to check actual value written to the CCU. */
+	MDRV_SCREEN_REFRESH_RATE(58)
+
+//	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)
