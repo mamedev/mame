@@ -142,16 +142,17 @@ static UINT8 last_dial;
  *
  *************************************/
 
-static CUSTOM_INPUT( teetert_input_direction_r )
+static CUSTOM_INPUT( teetert_input_r )
 {
-	int result = 0;
 	UINT8 dial = input_port_read(field->port->machine, "DIAL");
+	int result = 0;
 
-	if (dial != last_dial)
+	result = (dial != last_dial) << 4;
+	if (result != 0)
 	{
 		if (((dial - last_dial) & 0xff) < 0x80)
 		{
-			result = 1;
+			result |= 1;
 			last_dial++;
 		}
 		else
@@ -159,14 +160,6 @@ static CUSTOM_INPUT( teetert_input_direction_r )
 	}
 
 	return result;
-}
-
-
-static CUSTOM_INPUT( teetert_input_movement_r )
-{
-	UINT8 dial = input_port_read(field->port->machine, "DIAL");
-
-	return (dial != last_dial) ? 1 : 0;
 }
 
 
@@ -590,11 +583,10 @@ static INPUT_PORTS_START( teetert )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(teetert_input_direction_r, 0)
+	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(teetert_input_r, 0)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(teetert_input_movement_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START_TAG("INTSOURCE")
@@ -620,7 +612,7 @@ static INPUT_PORTS_START( teetert )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START_TAG("DIAL")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(1) PORT_KEYDELTA(150) PORT_REVERSE
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(5) PORT_KEYDELTA(30) PORT_REVERSE
 INPUT_PORTS_END
 
 
