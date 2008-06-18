@@ -240,6 +240,9 @@ struct _input_type_state
 /* private input port state */
 struct _input_port_private
 {
+	/* global state */
+	UINT8						safe_to_read;		/* clear at start; set after state is loaded */
+
 	/* types */
 	input_type_state *			typestatelist;		/* list of live type states */
 	input_type_state *			type_to_typestate[__ipt_max][MAX_PLAYERS]; /* map from type/player to type state */
@@ -1210,6 +1213,8 @@ input_port_value input_port_read_direct(const input_port_config *port)
 	callback_field_info *custom;
 	input_port_value result;
 
+	assert_always(portdata->safe_to_read, "Input ports cannot be read at init time!");
+
 	/* start with the digital */
 	result = port->state->digital;
 
@@ -1275,7 +1280,6 @@ input_port_value input_port_read_direct(const input_port_config *port)
 input_port_value input_port_read(running_machine *machine, const char *tag)
 {
 	const input_port_config *port = input_port_by_tag(machine->portconfig, tag);
-	assert_always(mame_get_phase(machine) != MAME_PHASE_INIT, "Input ports cannot be read at init time!");
 	if (port == NULL)
 		fatalerror("Unable to locate input port '%s'", tag);
 	return input_port_read_direct(port);
@@ -1291,7 +1295,6 @@ input_port_value input_port_read(running_machine *machine, const char *tag)
 input_port_value input_port_read_safe(running_machine *machine, const char *tag, UINT32 defvalue)
 {
 	const input_port_config *port = input_port_by_tag(machine->portconfig, tag);
-	assert_always(mame_get_phase(machine) != MAME_PHASE_INIT, "Input ports cannot be read at init time!");
 	return (port == NULL) ? defvalue : input_port_read_direct(port);
 }
 
@@ -1304,7 +1307,6 @@ input_port_value input_port_read_safe(running_machine *machine, const char *tag,
 input_port_value input_port_read_indexed(running_machine *machine, int portnum)
 {
 	const input_port_config *port = input_port_by_index(machine->portconfig, portnum);
-	assert_always(mame_get_phase(machine) != MAME_PHASE_INIT, "Input ports cannot be read at init time!");
 	return (port == NULL) ? 0 : input_port_read_direct(port);
 }
 
@@ -3381,7 +3383,10 @@ static void load_config_callback(running_machine *machine, int config_type, xml_
 
 	/* in the completion phase, we finish the initialization with the final ports */
 	if (config_type == CONFIG_TYPE_FINAL)
+	{
+		portdata->safe_to_read = TRUE;
 		frame_update(machine);
+	}
 
 	/* early exit if no data to parse */
 	if (parentnode == NULL)
