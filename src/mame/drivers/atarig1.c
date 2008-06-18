@@ -965,7 +965,7 @@ static void init_g1_common(running_machine *machine, offs_t slapstic_base, int s
 	}
 	else if (slapstic != 0)
 		atarigen_slapstic_init(machine, 0, slapstic_base, 0, slapstic);
-	atarijsa_init(machine, 0, 0x4000);
+	atarijsa_init(machine, "IN0", 0x4000);
 
 	atarig1_pitfight = is_pitfight;
 }
