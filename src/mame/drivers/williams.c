@@ -501,7 +501,24 @@
 #define MASTER_CLOCK		(12000000)
 #define SOUND_CLOCK			(3579000)
 
+#define PORT_MIRROR(port, shift)	PORT_CUSTOM(input_mirror_r, (void *) ((FPTR) (((port)<<4) | (shift))))
 
+/*************************************
+ *
+ *  Input port mirroring
+ *
+ *************************************/
+
+static CUSTOM_INPUT( input_mirror_r )
+{
+	int result;
+	int shift = ((FPTR) param) & 0x0f;
+	int port  = (((FPTR) param) >> 4) & 0x0f;
+
+	result = input_port_read_indexed(field->port->machine, port) >> shift;
+
+	return result;
+}
 
 /*************************************
  *
@@ -935,8 +952,9 @@ static INPUT_PORTS_START( joust )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
-    PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_MIRROR(0, 4) /* IPT_START2 */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_MIRROR(0, 5) /* IPT_START1 */
+
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
