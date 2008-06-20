@@ -230,9 +230,9 @@ static void EG_Calc(struct _MultiPCM *ptChip,struct _SLOT *slot)
 static int PLFO_TRI[256];
 static int ALFO_TRI[256];
 
-static const float LFOFreq[8]={0.168,2.019,3.196,4.206,5.215,5.888,6.224,7.066};	//Hz;
-static const float PSCALE[8]={0.0,3.378,5.065,6.750,10.114,20.170,40.180,79.307};			//cents
-static const float ASCALE[8]={0.0,0.4,0.8,1.5,3.0,6.0,12.0,24.0};					//DB
+static const float LFOFreq[8]={0.168f,2.019f,3.196f,4.206f,5.215f,5.888f,6.224f,7.066f};	//Hz;
+static const float PSCALE[8]={0.0f,3.378f,5.065f,6.750f,10.114f,20.170f,40.180f,79.307f};	//cents
+static const float ASCALE[8]={0.0f,0.4f,0.8f,1.5f,3.0f,6.0f,12.0f,24.0f};					//DB
 static int PSCALES[8][256];
 static int ASCALES[8][256];
 
@@ -276,7 +276,7 @@ static void LFO_Init(void)
 	}
 }
 
-static signed int inline PLFO_Step(struct _LFO *LFO)
+INLINE signed int PLFO_Step(struct _LFO *LFO)
 {
 	int p;
 	LFO->phase+=LFO->phase_step;    
@@ -285,7 +285,7 @@ static signed int inline PLFO_Step(struct _LFO *LFO)
 	return p<<(SHIFT-LFO_SHIFT);
 }
 
-static signed int inline ALFO_Step(struct _LFO *LFO)
+INLINE signed int ALFO_Step(struct _LFO *LFO)
 {
 	int p;
 	LFO->phase+=LFO->phase_step;    
