@@ -186,10 +186,20 @@ INLINE UINT32 get_texel_palette16_nearest(const render_texinfo *texture, INT32 c
 
 INLINE UINT32 get_texel_palette16_bilinear(const render_texinfo *texture, INT32 curu, INT32 curv)
 {
-	const UINT16 *texbase = (const UINT16 *)texture->base + (curv >> 16) * texture->rowpixels + (curu >> 16);
-	INT32 u1 = (((curu >> 16) + 1) < texture->width) ? 1 : 0;
-	INT32 v1 = (((curv >> 16) + 1) < texture->height) ? texture->rowpixels : 0;
+	const UINT16 *texbase = texture->base;
 	rgb_t pix00, pix01, pix10, pix11;
+	INT32 u0, u1, v0, v1;
+	
+	u0 = curu >> 16;
+	u1 = 1;
+	if (u0 < 0) u0 = u1 = 0;
+	else if (u0 + 1 >= texture->width) u0 = texture->width - 1, u1 = 0;
+	v0 = curv >> 16;
+	v1 = texture->rowpixels;
+	if (v0 < 0) v0 = v1 = 0;
+	else if (v0 + 1 >= texture->height) v0 = texture->height - 1, v1 = 0;
+	
+	texbase += v0 * texture->rowpixels + u0;
 
 	pix00 = texture->palette[texbase[0]];
 	pix01 = texture->palette[texbase[u1]];
@@ -219,10 +229,20 @@ INLINE UINT32 get_texel_rgb15_nearest(const render_texinfo *texture, INT32 curu,
 
 INLINE UINT32 get_texel_rgb15_bilinear(const render_texinfo *texture, INT32 curu, INT32 curv)
 {
-	const UINT16 *texbase = (const UINT16 *)texture->base + (curv >> 16) * texture->rowpixels + (curu >> 16);
-	INT32 u1 = (((curu >> 16) + 1) < texture->width) ? 1 : 0;
-	INT32 v1 = (((curv >> 16) + 1) < texture->height) ? texture->rowpixels : 0;
+	const UINT16 *texbase = texture->base;
 	rgb_t pix00, pix01, pix10, pix11, filtered;
+	INT32 u0, u1, v0, v1;
+	
+	u0 = curu >> 16;
+	u1 = 1;
+	if (u0 < 0) u0 = u1 = 0;
+	else if (u0 + 1 >= texture->width) u0 = texture->width - 1, u1 = 0;
+	v0 = curv >> 16;
+	v1 = texture->rowpixels;
+	if (v0 < 0) v0 = v1 = 0;
+	else if (v0 + 1 >= texture->height) v0 = texture->height - 1, v1 = 0;
+	
+	texbase += v0 * texture->rowpixels + u0;
 
 	pix00 = texbase[0];
 	pix01 = texbase[u1];
@@ -258,25 +278,35 @@ INLINE UINT32 get_texel_yuy16_nearest(const render_texinfo *texture, INT32 curu,
 
 INLINE UINT32 get_texel_yuy16_bilinear(const render_texinfo *texture, INT32 curu, INT32 curv)
 {
-	const UINT16 *texbase = (const UINT16 *)texture->base + (curv >> 16) * texture->rowpixels + (curu >> 17) * 2;
-	INT32 u1 = (((curu >> 16) + 1) < texture->width) ? 1 : 0;
-	INT32 v1 = (((curv >> 16) + 1) < texture->height) ? texture->rowpixels : 0;
+	const UINT16 *texbase = texture->base;
 	rgb_t pix00, pix01, pix10, pix11;
+	INT32 u0, u1, v0, v1;
+	
+	u0 = curu >> 16;
+	u1 = 1;
+	if (u0 < 0) u0 = u1 = 0;
+	else if (u0 + 1 >= texture->width) u0 = texture->width - 1, u1 = 0;
+	v0 = curv >> 16;
+	v1 = texture->rowpixels;
+	if (v0 < 0) v0 = v1 = 0;
+	else if (v0 + 1 >= texture->height) v0 = texture->height - 1, v1 = 0;
+	
+	texbase += v0 * texture->rowpixels + u0;
 
 	if ((curu & 0x10000) == 0)
 	{
 		rgb_t cbcr = ((texbase[0] & 0xff) << 8) | ((texbase[1] & 0xff) << 16);
 		pix00 = (texbase[0] >> 8) | cbcr;
-		pix01 = u1 ? ((texbase[1] >> 8) | cbcr) : pix00;
+		pix01 = (texbase[u1] >> 8) | cbcr;
 		cbcr = ((texbase[v1 + 0] & 0xff) << 8) | ((texbase[v1 + 1] & 0xff) << 16);
 		pix10 = (texbase[v1 + 0] >> 8) | cbcr;
-		pix11 = u1 ? ((texbase[v1 + 1] >> 8) | cbcr) : pix10;
+		pix11 = (texbase[v1 + u1] >> 8) | cbcr;
 	}
 	else
 	{
 		rgb_t cbcr = ((texbase[0] & 0xff) << 8) | ((texbase[1] & 0xff) << 16);
 		pix00 = (texbase[1] >> 8) | cbcr;
-		if (u1)
+		if (u1 != 0)
 		{
 			cbcr = ((texbase[2] & 0xff) << 8) | ((texbase[3] & 0xff) << 16);
 			pix01 = (texbase[2] >> 8) | cbcr;
@@ -285,7 +315,7 @@ INLINE UINT32 get_texel_yuy16_bilinear(const render_texinfo *texture, INT32 curu
 			pix01 = pix00;
 		cbcr = ((texbase[v1 + 0] & 0xff) << 8) | ((texbase[v1 + 1] & 0xff) << 16);
 		pix10 = (texbase[v1 + 1] >> 8) | cbcr;
-		if (u1)
+		if (u1 != 0)
 		{
 			cbcr = ((texbase[v1 + 2] & 0xff) << 8) | ((texbase[v1 + 3] & 0xff) << 16);
 			pix11 = (texbase[v1 + 2] >> 8) | cbcr;
@@ -317,10 +347,20 @@ INLINE UINT32 get_texel_rgb32_nearest(const render_texinfo *texture, INT32 curu,
 
 INLINE UINT32 get_texel_rgb32_bilinear(const render_texinfo *texture, INT32 curu, INT32 curv)
 {
-	const UINT32 *texbase = (const UINT32 *)texture->base + (curv >> 16) * texture->rowpixels + (curu >> 16);
-	INT32 u1 = (((curu >> 16) + 1) < texture->width) ? 1 : 0;
-	INT32 v1 = (((curv >> 16) + 1) < texture->height) ? texture->rowpixels : 0;
+	const UINT32 *texbase = texture->base;
 	rgb_t pix00, pix01, pix10, pix11;
+	INT32 u0, u1, v0, v1;
+	
+	u0 = curu >> 16;
+	u1 = 1;
+	if (u0 < 0) u0 = u1 = 0;
+	else if (u0 + 1 >= texture->width) u0 = texture->width - 1, u1 = 0;
+	v0 = curv >> 16;
+	v1 = texture->rowpixels;
+	if (v0 < 0) v0 = v1 = 0;
+	else if (v0 + 1 >= texture->height) v0 = texture->height - 1, v1 = 0;
+	
+	texbase += v0 * texture->rowpixels + u0;
 
 	pix00 = texbase[0];
 	pix01 = texbase[u1];
@@ -351,10 +391,20 @@ INLINE UINT32 get_texel_argb32_nearest(const render_texinfo *texture, INT32 curu
 
 INLINE UINT32 get_texel_argb32_bilinear(const render_texinfo *texture, INT32 curu, INT32 curv)
 {
-	const UINT32 *texbase = (const UINT32 *)texture->base + (curv >> 16) * texture->rowpixels + (curu >> 16);
-	INT32 u1 = (((curu >> 16) + 1) < texture->width) ? 1 : 0;
-	INT32 v1 = (((curv >> 16) + 1) < texture->height) ? texture->rowpixels : 0;
+	const UINT32 *texbase = texture->base;
 	rgb_t pix00, pix01, pix10, pix11;
+	INT32 u0, u1, v0, v1;
+	
+	u0 = curu >> 16;
+	u1 = 1;
+	if (u0 < 0) u0 = u1 = 0;
+	else if (u0 + 1 >= texture->width) u0 = texture->width - 1, u1 = 0;
+	v0 = curv >> 16;
+	v1 = texture->rowpixels;
+	if (v0 < 0) v0 = v1 = 0;
+	else if (v0 + 1 >= texture->height) v0 = texture->height - 1, v1 = 0;
+	
+	texbase += v0 * texture->rowpixels + u0;
 
 	pix00 = texbase[0];
 	pix01 = texbase[u1];
@@ -2017,10 +2067,14 @@ static void FUNC_PREFIX(setup_and_draw_textured_quad)(const render_primitive *pr
 	setup.startv = round_nearest(65536.0f * (float)prim->texture.height * prim->texcoords.tl.v);
 
 	/* advance U/V to the middle of the first texel */
-	if (!BILINEAR_FILTER)
+	setup.startu += (setup.dudx + setup.dudy) / 2;
+	setup.startv += (setup.dvdx + setup.dvdy) / 2;
+	
+	/* if we're bilinear filtering, we need to offset u/v by half a texel */
+	if (BILINEAR_FILTER)
 	{
-		setup.startu += (setup.dudx + setup.dudy) / 2;
-		setup.startv += (setup.dvdx + setup.dvdy) / 2;
+		setup.startu -= 0x8000;
+		setup.startv -= 0x8000;
 	}
 
 	/* render based on the texture coordinates */
