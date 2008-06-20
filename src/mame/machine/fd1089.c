@@ -48,16 +48,17 @@ CPU #   Status   Game                     Notes
 --------- --- ------------------------ ------------------
 FD1089A
 317-0018  [1] Action Fighter
-317-0021? [2] Alex Kidd
+317-0021  [2] Alex Kidd
 317-0022  [1] Dunk Shot
-317-0028  [2] Defense                  same key as 317-0028
+317-0028  [2] Defense                  same key as 317-0027
 317-0033  [1] Alien Syndrome           same key as 317-0037
 317-0167  [2] Aurail                   same key as 317-0168
+317-????  [2] Wonder Boy III
 
 FD1089B
 317-0013A [1] Enduro Racer
 317-0024  [2] Time Scanner             FD1089B 6J2 317-0024
-317-0027  [2] SDI                      same key as 317-0027
+317-0027  [2] SDI                      same key as 317-0028
 317-0034  [1] Super Hang-On
 317-0037  [2] Alien Syndrome           same key as 317-0033
 317-0168  [1] Aurail                   same key as 317-0167
@@ -6849,7 +6850,7 @@ static const UINT8 key_5021[0x2000] =
 static UINT8 key_wb35[0x2000] =
 {
 	/* data */
-	0x54,0x36,0xF5,0x8c,0x1a,0xe3,0x2f,0x3a,0x90,0x09,0x3e,0xde,0x33,0x8f,0x63,0x02,
+	0x54,0x36,0xf5,0x8c,0x1a,0xe3,0x2f,0x3a,0x90,0x09,0x3e,0xde,0x33,0x8f,0x63,0x02,
 	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
 	 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  ,
 	 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  ,
@@ -7107,7 +7108,7 @@ static UINT8 key_wb35[0x2000] =
 	 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  ,
 
 	/* opcodes */
-	0x70,0xE7,0x06,0xc8,0x49,0x28,0x44,0x17,0x6d,0x56,0xf1,0x0c,0xd1,0xe4,0x92,0x5b,
+	0x70,0xe7,0x06,0xc8,0x49,0x28,0x44,0x17,0x6d,0x56,0xf1,0x0c,0xd1,0xe4,0x92,0x5b,
 	 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  ,
 	 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  ,
 	 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  ,
