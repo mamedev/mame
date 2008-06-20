@@ -1313,7 +1313,7 @@ void mooncrst_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x
 void mooncrst_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color)
 {
 	if (gfxbank[2] && (*code & 0x30) == 0x20)
-		*code = (*code & 0x0f) | (gfxbank[1] << 4) | (gfxbank[0] << 5) | 0x40;
+		*code = (*code & 0x0f) | (gfxbank[0] << 4) | (gfxbank[1] << 5) | 0x40;
 }
 
 
