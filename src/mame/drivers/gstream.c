@@ -107,6 +107,35 @@ static tilemap *gstream_tilemap3;
 static UINT32 tilemap1_scrollx, tilemap2_scrollx, tilemap3_scrollx;
 static UINT32 tilemap1_scrolly, tilemap2_scrolly, tilemap3_scrolly;
 
+static CUSTOM_INPUT( gstream_mirror_service_r )
+{
+	int result;
+
+	/* PORT_SERVICE_NO_TOGGLE */
+	result = (input_port_read(field->port->machine, "IN0") & 0x8000) >> 15;
+
+	return ~result;
+}
+
+static CUSTOM_INPUT( gstream_mirror_r )
+{
+	int result;
+
+	/* IPT_COIN1 */
+	result  = ((input_port_read(field->port->machine, "IN0") & 0x200) >>  9)<<0;
+	/* IPT_COIN2 */
+	result |= ((input_port_read(field->port->machine, "IN1") & 0x200) >>  9)<<1;
+	/* IPT_START1 */
+	result |= ((input_port_read(field->port->machine, "IN0") & 0x400) >> 10)<<2;
+	/* IPT_START2 */
+	result |= ((input_port_read(field->port->machine, "IN1") & 0x400) >> 10)<<3;
+	/* PORT_SERVICE_NO_TOGGLE */
+	result |= ((input_port_read(field->port->machine, "IN0") & 0x8000) >> 15)<<6;
+
+	return ~result;
+}
+
+
 static WRITE32_HANDLER( gstream_palette_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
@@ -208,18 +237,17 @@ static WRITE32_HANDLER( gstream_oki_4040_w )
 }
 
 static ADDRESS_MAP_START( gstream_io, ADDRESS_SPACE_IO, 32 )
-	AM_RANGE(0x4000, 0x4003) AM_READ(input_port_0_dword_r)
-	AM_RANGE(0x4010, 0x4013) AM_READ(input_port_1_dword_r)
-	AM_RANGE(0x4020, 0x4023) AM_READ(input_port_2_dword_r) // extra coin switches etc
+	AM_RANGE(0x4000, 0x4003) AM_READ_PORT("IN0")
+	AM_RANGE(0x4010, 0x4013) AM_READ_PORT("IN1")
+	AM_RANGE(0x4020, 0x4023) AM_READ_PORT("IN2") // extra coin switches etc
 	AM_RANGE(0x4030, 0x4033) AM_WRITE(gstream_oki_4030_w) // ??
 	AM_RANGE(0x4040, 0x4043) AM_WRITE(gstream_oki_4040_w) // ??
 	AM_RANGE(0x4050, 0x4053) AM_READWRITE(gstream_oki_1_r, gstream_oki_1_w) // music
 	AM_RANGE(0x4060, 0x4063) AM_READWRITE(gstream_oki_0_r, gstream_oki_0_w) // samples
 ADDRESS_MAP_END
 
-
 static INPUT_PORTS_START( gstream )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
@@ -236,6 +264,7 @@ static INPUT_PORTS_START( gstream )
 	PORT_SERVICE_NO_TOGGLE( 0x8000, IP_ACTIVE_LOW )
 
 	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
@@ -249,15 +278,11 @@ static INPUT_PORTS_START( gstream )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x7000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE_NO_TOGGLE( 0x8000, IP_ACTIVE_LOW )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )	PORT_CUSTOM(gstream_mirror_service_r, 0)
 
-	PORT_START
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) // mirror of some inputs...
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0x004f, IP_ACTIVE_LOW, IPT_SPECIAL )	PORT_CUSTOM(gstream_mirror_r, 0)
     PORT_BIT( 0xffb0, IP_ACTIVE_LOW, IPT_UNUSED )
-    PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 
