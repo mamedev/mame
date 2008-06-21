@@ -17,7 +17,6 @@ void defender_install_io_space(running_machine *machine);
 /* Generic old-Williams PIA interfaces */
 extern const pia6821_interface williams_pia_0_intf;
 extern const pia6821_interface williams_muxed_pia_0_intf;
-extern const pia6821_interface williams_dual_muxed_pia_0_intf;
 extern const pia6821_interface williams_49way_pia_0_intf;
 extern const pia6821_interface williams_49way_muxed_pia_0_intf;
 extern const pia6821_interface williams_pia_1_intf;
@@ -64,6 +63,7 @@ WRITE8_HANDLER( bubbles_cmos_w );
 WRITE8_HANDLER( williams_watchdog_reset_w );
 WRITE8_HANDLER( williams2_watchdog_reset_w );
 WRITE8_HANDLER( williams2_7segment_w );
+CUSTOM_INPUT( williams_mux_r );
 
 /* Mayday protection */
 extern UINT8 *mayday_protection;

@@ -40,9 +40,7 @@ static WRITE8_HANDLER( playball_snd_cmd_w );
 /* input port mapping */
 static UINT8 port_select;
 static WRITE8_HANDLER( williams_port_select_w );
-static READ8_HANDLER( williams_input_port_0_3_r );
 static READ8_HANDLER( williams_input_port_49way_0_5_r );
-static READ8_HANDLER( williams_input_port_1_4_r );
 static READ8_HANDLER( williams_49way_port_0_r );
 
 /* newer-Williams routines */
@@ -79,17 +77,11 @@ const pia6821_interface williams_pia_0_intf =
 };
 
 /* Generic muxing PIA 0, maps to input ports 0/3 and 1; port select is CB2 */
+/* Generic dual muxing PIA 0, maps to input ports 0/3 and 1/4; port select is CB2 */
+/* muxing done in williams_mux_r */
 const pia6821_interface williams_muxed_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ williams_input_port_0_3_r, input_port_1_r, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, 0, 0, williams_port_select_w,
-	/*irqs   : A/B             */ 0, 0
-};
-
-/* Generic dual muxing PIA 0, maps to input ports 0/3 and 1/4; port select is CB2 */
-const pia6821_interface williams_dual_muxed_pia_0_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ williams_input_port_0_3_r, williams_input_port_1_4_r, 0, 0, 0, 0,
+	/*inputs : A/B,CA/B1,CA/B2 */ input_port_0_r, input_port_1_r, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ 0, 0, 0, williams_port_select_w,
 	/*irqs   : A/B             */ 0, 0
 };
@@ -177,7 +169,7 @@ const pia6821_interface spdball_pia_3_intf =
 /* Generic muxing PIA 0, maps to input ports 0/3 and 1; port select is CA2 */
 const pia6821_interface williams2_muxed_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ williams_input_port_0_3_r, input_port_1_r, 0, 0, 0, 0,
+	/*inputs : A/B,CA/B1,CA/B2 */ input_port_0_r, input_port_1_r, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ 0, 0, williams_port_select_w, 0,
 	/*irqs   : A/B             */ 0, 0
 };
@@ -563,18 +555,18 @@ WRITE8_HANDLER( williams_port_select_w )
 	port_select = data;
 }
 
-
-READ8_HANDLER( williams_input_port_0_3_r )
+CUSTOM_INPUT( williams_mux_r )
 {
-	return input_port_read_indexed(machine, port_select ? 3 : 0);
+	static const char *port1[] = { "INP2","INP2A" };
+	static const char *port2[] = { "INP1","INP1A" };
+	int offset = ((FPTR) param) >> 4;
+	int shift = ((FPTR) param) & 0x0f;
+
+	if (port_select == 0)
+		return input_port_read(field->port->machine, port1[offset]) >> shift;
+	else
+		return input_port_read(field->port->machine, port2[offset]) >> shift;
 }
-
-
-READ8_HANDLER( williams_input_port_1_4_r )
-{
-	return input_port_read_indexed(machine, port_select ? 4 : 1);
-}
-
 
 /*
  *  Williams 49-way joystick
@@ -876,9 +868,11 @@ static READ8_HANDLER( lottofun_input_port_0_r )
 static READ8_HANDLER( tshoot_input_port_0_3_r )
 {
 	/* merge in the gun inputs with the standard data */
-	int data = williams_input_port_0_3_r(machine, offset);
+	int data = input_port_0_r(machine, offset);
 	int gun = (data & 0x3f) ^ ((data & 0x3f) >> 1);
 	return (data & 0xc0) | gun;
+
+	return 0;
 }
 
 
