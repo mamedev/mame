@@ -180,7 +180,8 @@ static int FLobjcode2tile( int code )
 VIDEO_START( namcofl )
 {
 	credits1 = credits2 = 0;
-	old_coin_state = input_port_read_indexed(machine, 3)&0x30;
+	old_coin_state = 0x00; 
+	//input_port_read_indexed(machine, 3)&0x30;
 
 	namco_tilemap_init( NAMCONB1_TILEGFX, memory_region(NAMCONB1_TILEMASKREGION), TilemapCB );
 	namco_obj_init(NAMCONB1_SPRITEGFX,0x0,FLobjcode2tile);
