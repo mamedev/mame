@@ -358,9 +358,6 @@ static void *discrete_start(int sndindex, int clock, const void *config)
 	setup_output_nodes(info);
 
 	setup_disc_logs(info);
-
-	/* reset the system, which in turn resets all the nodes and steps them forward one */
-	discrete_reset(info);
 	return info;
 }
 
