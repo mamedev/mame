@@ -137,8 +137,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - In "demo mode", you get no scrolling screen with what the various items do
   - Begining screen when you start a new game
   - Different messages between levels
-  - There was sort of debug address at 0x05fffc.w in ROM area
-    See 'rastan' comments to know what the different bits do
   - Message after beating level 6 boss
   - Copyright message on scrolling credits screen
   - There was sort of debug address at 0x05fffc.w in ROM area
@@ -314,7 +312,7 @@ static INPUT_PORTS_START( rastan )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rastsaga )
