@@ -557,15 +557,12 @@ WRITE8_HANDLER( williams_port_select_w )
 
 CUSTOM_INPUT( williams_mux_r )
 {
-	static const char *port1[] = { "INP2","INP2A" };
-	static const char *port2[] = { "INP1","INP1A" };
-	int offset = ((FPTR) param) >> 4;
-	int shift = ((FPTR) param) & 0x0f;
+	const char *tag = param;
 
-	if (port_select == 0)
-		return input_port_read(field->port->machine, port1[offset]) >> shift;
-	else
-		return input_port_read(field->port->machine, port2[offset]) >> shift;
+	if (port_select != 0) 
+		tag += strlen(tag) + 1;
+	
+	return input_port_read(field->port->machine, tag);	
 }
 
 /*
