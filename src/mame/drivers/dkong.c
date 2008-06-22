@@ -326,8 +326,8 @@ static UINT8 hb_dma_read_byte(int channel, offs_t offset);
 static void hb_dma_write_byte(int channel, offs_t offset, UINT8 data);
 static UINT8 dk_dma_read_byte(int channel, offs_t offset);
 static void dk_dma_write_byte(int channel, offs_t offset, UINT8 data);
-static Z80DMA_READ(dk3_dma_read_byte);
-static Z80DMA_WRITE(dk3_dma_write_byte);
+static READ8_HANDLER(dk3_dma_read_byte);
+static WRITE8_HANDLER(dk3_dma_write_byte);
 static UINT8 p8257_ctl_r(void);
 static void p8257_ctl_w(UINT8 data);
 
@@ -503,7 +503,7 @@ static void dk_dma_write_byte(int channel, offs_t offset, UINT8 data)
 	cpuintrf_pop_context();
 }
 
-static Z80DMA_READ( dk3_dma_read_byte )
+static READ8_HANDLER( dk3_dma_read_byte )
 {
 	UINT8 result;
 
@@ -514,7 +514,7 @@ static Z80DMA_READ( dk3_dma_read_byte )
 	return result;
 }
 
-static Z80DMA_WRITE( dk3_dma_write_byte )
+static WRITE8_HANDLER( dk3_dma_write_byte )
 {
 	cpuintrf_push_context(0);
 	program_write_byte(offset, data);
@@ -819,17 +819,16 @@ static ADDRESS_MAP_START( dkong3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7e80, 0x7e80) AM_WRITE(dkong3_coin_counter_w)
 	AM_RANGE(0x7e81, 0x7e81) AM_WRITE(dkong3_gfxbank_w)
 	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(dkong_flipscreen_w)
-	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(dkong_spritebank_w)						/* 2 PSL Signal */
+	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(dkong_spritebank_w)				/* 2 PSL Signal */
 	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x7e85, 0x7e85) AM_WRITE(z80dma_0_rdy_w)						/* ==> DMA Chip */
+	AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE(Z80DMA, "z80dma", z80dma_rdy_w)	/* ==> DMA Chip */
 	AM_RANGE(0x7e86, 0x7e87) AM_WRITE(dkong_palettebank_w)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM	                        /* DK3 and bootleg DKjr only */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong3_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(z80dma_0_r, z80dma_0_w)	/* dma controller */
-	//AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)   /* dma controller */
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(Z80DMA, "z80dma", z80dma_r, z80dma_w)	/* dma controller */
 ADDRESS_MAP_END
 
 /* Epos conversions */
@@ -1683,7 +1682,7 @@ static MACHINE_DRIVER_START( dkong3 )
 
 	MDRV_MACHINE_START(dkong3)
 
-	MDRV_DEVICE_ADD(Z80DMA_DEV_0_TAG, Z80DMA)
+	MDRV_DEVICE_ADD("z80dma", Z80DMA)
 	MDRV_DEVICE_CONFIG(dk3_dma)
 
 	/* video hardware */
