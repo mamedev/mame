@@ -305,8 +305,6 @@ Donkey Kong Junior Notes
 #include "machine/8257dma.h"
 #include "machine/z80dma.h"
 
-#include "deprecat.h"
-
 /*************************************
  *
  *  Defines
@@ -322,14 +320,12 @@ Donkey Kong Junior Notes
  *
  *************************************/
 
-static UINT8 hb_dma_read_byte(int channel, offs_t offset);
-static void hb_dma_write_byte(int channel, offs_t offset, UINT8 data);
-static UINT8 dk_dma_read_byte(int channel, offs_t offset);
-static void dk_dma_write_byte(int channel, offs_t offset, UINT8 data);
-static READ8_HANDLER(dk3_dma_read_byte);
-static WRITE8_HANDLER(dk3_dma_write_byte);
-static UINT8 p8257_ctl_r(void);
-static void p8257_ctl_w(UINT8 data);
+static READ8_HANDLER( hb_dma_read_byte );
+static WRITE8_HANDLER( hb_dma_write_byte );
+static READ8_HANDLER( dk_dma_read_byte );
+static WRITE8_HANDLER( dk_dma_write_byte );
+static READ8_HANDLER( p8257_ctl_r );
+static WRITE8_HANDLER( p8257_ctl_w );
 
 /*************************************
  *
@@ -342,12 +338,12 @@ static const z80dma_interface dk3_dma =
 	0,
 	CLOCK_1H,
 
-	dk3_dma_read_byte,
-	dk3_dma_write_byte,
+	dk_dma_read_byte,
+	dk_dma_write_byte,
 	0, 0, 0, 0
 };
 
-static const struct dma8257_interface dk_dma =
+static const dma8257_interface dk_dma =
 {
 	0,
 	CLOCK_1H,
@@ -360,7 +356,7 @@ static const struct dma8257_interface dk_dma =
 	{ 0, 0, 0, 0 }
 };
 
-static const struct dma8257_interface hb_dma =
+static const dma8257_interface hb_dma =
 {
 	0,
 	CLOCK_1H,
@@ -394,9 +390,6 @@ static MACHINE_START( dkong2b )
 {
 	dkong_state *state = machine->driver_data;
 
-	dma8257_init(1);
-	dma8257_config(0, &dk_dma);
-
 	state->hardware_type = HARDWARE_TKG04;
 
 	state_save_register_global(state->decrypt_counter);
@@ -412,7 +405,6 @@ static MACHINE_START( hunchbkd )
 	dkong_state *state = machine->driver_data;
 
 	MACHINE_START_CALL(dkong2b);
-	dma8257_config(0, &hb_dma);
 
 	for (i=0;i<0x200;i++)
 		state->rev_map[i] = -1;
@@ -450,7 +442,7 @@ static MACHINE_START( dkong3 )
 
 static MACHINE_RESET( dkong )
 {
-	dma8257_reset();
+	/* nothing */
 }
 
 static MACHINE_RESET( strtheat )
@@ -485,7 +477,7 @@ static MACHINE_RESET( drakton )
  *
  *************************************/
 
-static UINT8 dk_dma_read_byte(int channel, offs_t offset)
+static READ8_HANDLER( dk_dma_read_byte )
 {
 	UINT8 result;
 
@@ -496,34 +488,16 @@ static UINT8 dk_dma_read_byte(int channel, offs_t offset)
 	return result;
 }
 
-static void dk_dma_write_byte(int channel, offs_t offset, UINT8 data)
+static WRITE8_HANDLER( dk_dma_write_byte )
 {
 	cpuintrf_push_context(0);
 	program_write_byte(offset, data);
 	cpuintrf_pop_context();
 }
 
-static READ8_HANDLER( dk3_dma_read_byte )
+static READ8_HANDLER( hb_dma_read_byte )
 {
-	UINT8 result;
-
-	cpuintrf_push_context(0);
-	result = program_read_byte(offset);
-	cpuintrf_pop_context();
-
-	return result;
-}
-
-static WRITE8_HANDLER( dk3_dma_write_byte )
-{
-	cpuintrf_push_context(0);
-	program_write_byte(offset, data);
-	cpuintrf_pop_context();
-}
-
-static UINT8 hb_dma_read_byte(int channel, offs_t offset)
-{
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 	int	  bucket = state->rev_map[(offset>>10) & 0x1ff];
 	int   addr;
 	UINT8 data;
@@ -540,9 +514,9 @@ static UINT8 hb_dma_read_byte(int channel, offs_t offset)
 	return data;
 }
 
-static void hb_dma_write_byte(int channel, offs_t offset, UINT8 data)
+static WRITE8_HANDLER( hb_dma_write_byte )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 	int	  bucket = state->rev_map[(offset>>10) & 0x1ff];
 	int   addr;
 
@@ -556,15 +530,15 @@ static void hb_dma_write_byte(int channel, offs_t offset, UINT8 data)
 	cpuintrf_pop_context();
 }
 
-static UINT8 p8257_ctl_r(void)
+static READ8_HANDLER( p8257_ctl_r )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 	return state->dma_latch;
 }
 
-static void p8257_ctl_w(UINT8 data)
+static WRITE8_HANDLER( p8257_ctl_w )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 	state->dma_latch = data;
 }
 
@@ -580,10 +554,10 @@ static WRITE8_HANDLER( dkong3_coin_counter_w )
 	coin_counter_w(offset, data & 0x01);
 }
 
-static WRITE8_HANDLER( p8257_drq_w )
+static WRITE8_DEVICE_HANDLER( p8257_drq_w )
 {
-	dma8257_drq_write(0, 0, data & 0x01);
-	dma8257_drq_write(0, 1, data & 0x01);
+	dma8257_drq_w(device, 0, data & 0x01);
+	dma8257_drq_w(device, 1, data & 0x01);
 }
 
 static READ8_HANDLER( dkong_in2_r )
@@ -764,7 +738,7 @@ static ADDRESS_MAP_START( dkong_map, ADDRESS_SPACE_PROGRAM, 8 )
 									AM_SIZE_MEMBER(dkong_state, sprite_ram_size)  /* sprite set 1 */
 	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w)
 							 		AM_BASE_MEMBER(dkong_state, video_ram)
-	AM_RANGE(0x7800, 0x780f) AM_READWRITE(dma8257_0_r, dma8257_0_w)				  /* P8257 control registers */
+	AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE(DMA8257, "dma8257", dma8257_r, dma8257_w)	/* P8257 control registers */
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_WRITE(dkong_sh_tuneselect_w)  /* IN0, sound CPU intf */
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(radarscp_grid_color_w)  /* IN1 */
 	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)								  /* IN2 */
@@ -774,7 +748,7 @@ static ADDRESS_MAP_START( dkong_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
 	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)						  /* 2 PSL Signal */
 	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x7d85, 0x7d85) AM_WRITE(p8257_drq_w)								  /* P8257 ==> /DRQ0 /DRQ1 */
+	AM_RANGE(0x7d85, 0x7d85) AM_DEVWRITE(DMA8257, "dma8257", p8257_drq_w)		  /* P8257 ==> /DRQ0 /DRQ1 */
 	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
 ADDRESS_MAP_END
 
@@ -786,7 +760,7 @@ static ADDRESS_MAP_START( dkongjr_map, ADDRESS_SPACE_PROGRAM, 8 )
 									AM_SIZE_MEMBER(dkong_state, sprite_ram_size) /* sprite set 1 */
 	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w)
 									AM_BASE_MEMBER(dkong_state, video_ram)
-	AM_RANGE(0x7800, 0x780f) AM_READWRITE(dma8257_0_r, dma8257_0_w)				/* P8257 control registers */
+	AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE(DMA8257, "dma8257", dma8257_r, dma8257_w)	/* P8257 control registers */
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_WRITE(dkongjr_sh_tuneselect_w)
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(dkongjr_gfxbank_w)
 	AM_RANGE(0x7c81, 0x7c81) AM_WRITE(dkongjr_sh_test6_w)
@@ -797,7 +771,7 @@ static ADDRESS_MAP_START( dkongjr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
 	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)						/* 2 PSL Signal */
 	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x7d85, 0x7d85) AM_WRITE(p8257_drq_w)								/* P8257 ==> /DRQ0 /DRQ1 */
+	AM_RANGE(0x7d85, 0x7d85) AM_DEVWRITE(DMA8257, "dma8257", p8257_drq_w)		/* P8257 ==> /DRQ0 /DRQ1 */
 	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM	                                            /* bootleg DKjr only */
 	AM_RANGE(0xb000, 0xbfff) AM_ROM                                             /* pestplce only */
@@ -852,13 +826,13 @@ static ADDRESS_MAP_START( hunchbkd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1582, 0x1582) AM_WRITE(dkong_flipscreen_w)
 	AM_RANGE(0x1583, 0x1583) AM_WRITE(dkong_spritebank_w)						  /* 2 PSL Signal */
 	AM_RANGE(0x1584, 0x1584) AM_NOP			                                      /* Possibly still interupt enable */
-	AM_RANGE(0x1585, 0x1585) AM_WRITE(p8257_drq_w)								  /* P8257 ==> /DRQ0 /DRQ1 */
+	AM_RANGE(0x1585, 0x1585) AM_DEVWRITE(DMA8257, "dma8257", p8257_drq_w)		  /* P8257 ==> /DRQ0 /DRQ1 */
 	AM_RANGE(0x1586, 0x1587) AM_WRITE(dkong_palettebank_w)
 	AM_RANGE(0x1600, 0x17ff) AM_RAM                                               /* 0x6400  spriteram location */
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(dkong_videoram_w)
 									AM_BASE_MEMBER(dkong_state, video_ram)		  /* 0x7400 */
 	AM_RANGE(0x1C00, 0x1f7f) AM_RAM                                               /* 0x6000 */
-	AM_RANGE(0x1f80, 0x1f8f) AM_READWRITE(dma8257_0_r, dma8257_0_w)				  /* P8257 control registers */
+	AM_RANGE(0x1f80, 0x1f8f) AM_DEVREADWRITE(DMA8257, "dma8257", dma8257_r, dma8257_w)	/* P8257 control registers */
 	/* 0x6800 not remapped */
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(hunchbkd_mirror_r, hunchbkd_mirror_w)
@@ -1601,6 +1575,9 @@ static MACHINE_DRIVER_START( dkong_base )
 	MDRV_MACHINE_START(dkong2b)
 	MDRV_MACHINE_RESET(dkong)
 
+	MDRV_DEVICE_ADD("dma8257", DMA8257)
+	MDRV_DEVICE_CONFIG(dk_dma)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1664,6 +1641,9 @@ static MACHINE_DRIVER_START( hunchbkd )
 	MDRV_CPU_PROGRAM_MAP(hunchbkd_map, 0)
 	MDRV_CPU_IO_MAP(hunchbkd_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", hunchbkd_interrupt)
+
+	MDRV_DEVICE_MODIFY("dma8257", DMA8257)
+	MDRV_DEVICE_CONFIG(hb_dma)
 
 	MDRV_MACHINE_START(hunchbkd)
 

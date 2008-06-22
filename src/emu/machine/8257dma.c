@@ -34,9 +34,10 @@
 #include "memconv.h"
 #include "8257dma.h"
 
-struct dma8257
+typedef struct _dma8257_t dma8257_t;
+struct _dma8257_t
 {
-	const struct dma8257_interface *intf;
+	const dma8257_interface *intf;
 	emu_timer *timer;
 	emu_timer *msbflip_timer;
 
@@ -56,9 +57,6 @@ struct dma8257
 	UINT8 status;
 };
 
-static struct dma8257 *dma;
-static int dma_count;
-
 #define DMA_MODE_AUTOLOAD(mode)		((mode) & 0x80)
 #define DMA_MODE_TCSTOP(mode)		((mode) & 0x40)
 #define DMA_MODE_EXWRITE(mode)		((mode) & 0x20)
@@ -67,102 +65,53 @@ static int dma_count;
 
 static TIMER_CALLBACK( dma8257_timerproc );
 static TIMER_CALLBACK( dma8257_msbflip_timerproc );
-static void dma8257_update_status(int which);
-
-/* ----------------------------------------------------------------------- */
-
-int dma8257_init(int count)
-{
-	int which;
-
-	dma = auto_malloc(count * sizeof(struct dma8257));
-	memset(dma, 0, count * sizeof(struct dma8257));
-	dma_count = count;
-
-	for (which = 0; which < dma_count; which++)
-	{
-		dma[which].status = 0x0F;
-		dma[which].timer = timer_alloc(dma8257_timerproc, NULL);
-		dma[which].msbflip_timer = timer_alloc(dma8257_msbflip_timerproc, NULL);
-
-		state_save_register_item_array("8257", which, dma[which].address);
-		state_save_register_item_array("8257", which, dma[which].count);
-		state_save_register_item_array("8257", which, dma[which].rwmode);
-		state_save_register_item_array("8257", which, dma[which].registers);
-
-		state_save_register_item("8257", which, dma[which].mode);
-		state_save_register_item("8257", which, dma[which].rr);
-		state_save_register_item("8257", which, dma[which].msb);
-		state_save_register_item("8257", which, dma[which].drq);
-		state_save_register_item("8257", which, dma[which].status);
-
-	}
-
-	return 0;
-}
-
-
-
-void dma8257_config(int which, const struct dma8257_interface *intf)
-{
-	dma[which].intf = intf;
-}
-
-
-
-void dma8257_reset(void)
-{
-	int which;
-
-	for (which = 0; which < dma_count; which++)
-	{
-		dma[which].status &= 0xF0;
-		dma[which].mode = 0;
-		dma8257_update_status(which);
-	}
-}
-
+static void dma8257_update_status(running_machine *machine, dma8257_t *dma8257);
 
 
 /* ----------------------------------------------------------------------- */
 
+INLINE dma8257_t *get_safe_token(const device_config *device) {
+	assert( device != NULL );
+	assert( device->token != NULL );
+	assert( device->type == DMA8257 );
+	return ( dma8257_t * ) device->token;
+}
 
-
-static int dma8257_do_operation(int which, int channel)
+static int dma8257_do_operation(running_machine *machine, dma8257_t *dma8257, int channel)
 {
 	int done;
 	UINT8 data;
 	UINT8 mode;
 
-	mode = dma[which].rwmode[channel];
-	if (dma[which].count[channel] == 0x0000)
+	mode = dma8257->rwmode[channel];
+	if (dma8257->count[channel] == 0x0000)
 	{
-		dma[which].status |=  (0x01 << channel);
-		if (dma[which].intf->out_tc_func[channel])
-			dma[which].intf->out_tc_func[channel](ASSERT_LINE);
+		dma8257->status |=  (0x01 << channel);
+		if (dma8257->intf->out_tc[channel])
+			dma8257->intf->out_tc[channel](machine, 0, ASSERT_LINE);
 	}
 	switch(mode) {
 	case 1:
-		data = dma[which].intf->memory_read_func(channel, dma[which].address[channel]);
-		dma[which].intf->channel_write_func[channel](data);
+		data = dma8257->intf->memory_read(machine, dma8257->address[channel]);
+		dma8257->intf->channel_write[channel](machine, 0, data);
 
-		dma[which].address[channel]++;
-		dma[which].count[channel]--;
-		done = (dma[which].count[channel] == 0xFFFF);
+		dma8257->address[channel]++;
+		dma8257->count[channel]--;
+		done = (dma8257->count[channel] == 0xFFFF);
 		break;
 
 	case 2:
-		data = dma[which].intf->channel_read_func[channel]();
-		dma[which].intf->memory_write_func(channel, dma[which].address[channel], data);
+		data = dma8257->intf->channel_read[channel](machine, 0);
+		dma8257->intf->memory_write(machine, dma8257->address[channel], data);
 
-		dma[which].address[channel]++;
-		dma[which].count[channel]--;
-		done = (dma[which].count[channel] == 0xFFFF);
+		dma8257->address[channel]++;
+		dma8257->count[channel]--;
+		done = (dma8257->count[channel] == 0xFFFF);
 		break;
 	case 0: /* verify */
-		dma[which].address[channel]++;
-		dma[which].count[channel]--;
-		done = (dma[which].count[channel] == 0xFFFF);
+		dma8257->address[channel]++;
+		dma8257->count[channel]--;
+		done = (dma8257->count[channel] == 0xFFFF);
 		break;
 	default:
 		fatalerror("dma8257_do_operation: invalid mode!\n");
@@ -170,14 +119,14 @@ static int dma8257_do_operation(int which, int channel)
 	}
 	if (done)
 	{
-		if ((channel==2) && DMA_MODE_AUTOLOAD(dma[which].mode)) {
+		if ((channel==2) && DMA_MODE_AUTOLOAD(dma8257->mode)) {
 			/* in case of autoload at the end channel 3 info is */
 			/* copied to channel 2 info                         */
-			dma[which].registers[4] = dma[which].registers[6];
-			dma[which].registers[5] = dma[which].registers[7];
+			dma8257->registers[4] = dma8257->registers[6];
+			dma8257->registers[5] = dma8257->registers[7];
 		}
-		if (dma[which].intf->out_tc_func[channel])
-			dma[which].intf->out_tc_func[channel](CLEAR_LINE);
+		if (dma8257->intf->out_tc[channel])
+			dma8257->intf->out_tc[channel](machine, 0, CLEAR_LINE);
 	}
 	return done;
 }
@@ -186,28 +135,28 @@ static int dma8257_do_operation(int which, int channel)
 
 static TIMER_CALLBACK( dma8257_timerproc )
 {
-	int which = param;
+	dma8257_t *dma8257 = ptr;
 	int i, channel = 0, rr;
 	int done;
 
-	rr = DMA_MODE_ROTPRIO(dma[which].mode) ? dma[which].rr : 0;
+	rr = DMA_MODE_ROTPRIO(dma8257->mode) ? dma8257->rr : 0;
 	for (i = 0; i < DMA8257_NUM_CHANNELS; i++)
 	{
 		channel = (i + rr) % DMA8257_NUM_CHANNELS;
-		if ((dma[which].status & (1 << channel)) == 0)
-			if (dma[which].mode & dma[which].drq & (1 << channel))
+		if ((dma8257->status & (1 << channel)) == 0)
+			if (dma8257->mode & dma8257->drq & (1 << channel))
 				break;
 	}
-	done = dma8257_do_operation(which, channel);
+	done = dma8257_do_operation(machine, dma8257, channel);
 
-	dma[which].rr = (channel + 1) & 0x03;
+	dma8257->rr = (channel + 1) & 0x03;
 
 	if (done)
 	{
-		dma[which].drq    &= ~(0x01 << channel);
-		dma8257_update_status(which);
-		if (DMA_MODE_TCSTOP(dma[which].mode))
-			dma[which].mode &= ~(0x01 << channel);
+		dma8257->drq    &= ~(0x01 << channel);
+		dma8257_update_status(machine, dma8257);
+		if (DMA_MODE_TCSTOP(dma8257->mode))
+			dma8257->mode &= ~(0x01 << channel);
 	}
 }
 
@@ -215,38 +164,39 @@ static TIMER_CALLBACK( dma8257_timerproc )
 
 static TIMER_CALLBACK( dma8257_msbflip_timerproc )
 {
-	dma[param].msb ^= 1;
+	dma8257_t *dma8257 = ptr;
+	dma8257->msb ^= 1;
 }
 
 
 
-static void dma8257_update_status(int which)
+static void dma8257_update_status(running_machine *machine, dma8257_t *dma8257)
 {
 	UINT16 pending_transfer;
 	attotime next;
 
 	/* no transfer is active right now; is there a transfer pending right now? */
-	pending_transfer = dma[which].drq & (dma[which].mode & 0x0F);
+	pending_transfer = dma8257->drq & (dma8257->mode & 0x0F);
 
 	if (pending_transfer)
 	{
-		next = ATTOTIME_IN_HZ(dma[which].intf->clockhz / 4 );
-		timer_adjust_periodic(dma[which].timer,
+		next = ATTOTIME_IN_HZ(dma8257->intf->clockhz / 4 );
+		timer_adjust_periodic(dma8257->timer,
 			attotime_zero,
-			which,
+			0,
 			/* 1 byte transferred in 4 clock cycles */
 			next);
 	}
 	else
 	{
 		/* no transfers active right now */
-		timer_reset(dma[which].timer, attotime_never);
+		timer_reset(dma8257->timer, attotime_never);
 	}
 
 	/* set the halt line */
-	if (dma[which].intf && dma[which].intf->cpunum >= 0)
+	if (dma8257->intf && dma8257->intf->cpunum >= 0)
 	{
-		cpunum_set_input_line(Machine, dma[which].intf->cpunum, INPUT_LINE_HALT,
+		cpunum_set_input_line(Machine, dma8257->intf->cpunum, INPUT_LINE_HALT,
 			pending_transfer ? ASSERT_LINE : CLEAR_LINE);
 	}
 
@@ -256,15 +206,16 @@ static void dma8257_update_status(int which)
 
 /* ----------------------------------------------------------------------- */
 
-static void prepare_msb_flip(int which)
+static void prepare_msb_flip(dma8257_t *dma8257)
 {
-	timer_adjust_oneshot(dma[which].msbflip_timer, attotime_zero, which);
+	timer_adjust_oneshot(dma8257->msbflip_timer, attotime_zero, 0);
 }
 
 
 
-static UINT8 dma8257_read(int which, offs_t offset)
+READ8_DEVICE_HANDLER( dma8257_r )
 {
+	dma8257_t *dma8257 = get_safe_token(device);
 	UINT8 data = 0xFF;
 
 	switch(offset) {
@@ -277,15 +228,15 @@ static UINT8 dma8257_read(int which, offs_t offset)
 	case 6:
 	case 7:
 		/* DMA address/count register */
-		data = ( dma[which].registers[offset] >> (dma[which].msb ? 8 : 0) ) & 0xFF;
-		prepare_msb_flip(which);
+		data = ( dma8257->registers[offset] >> (dma8257->msb ? 8 : 0) ) & 0xFF;
+		prepare_msb_flip(dma8257);
 		break;
 
 	case 8:
 		/* DMA status register */
-		data = (UINT8) dma[which].status;
+		data = (UINT8) dma8257->status;
 		/* read resets status ! */
-		dma[which].status &= 0xF0;
+		dma8257->status &= 0xF0;
 
 		break;
 
@@ -299,8 +250,9 @@ static UINT8 dma8257_read(int which, offs_t offset)
 
 
 
-static void dma8257_write(int which, offs_t offset, UINT8 data)
+WRITE8_DEVICE_HANDLER( dma8257_w )
 {
+	dma8257_t *dma8257 = get_safe_token(device);
 
 	switch(offset) {
 	case 0:
@@ -312,30 +264,30 @@ static void dma8257_write(int which, offs_t offset, UINT8 data)
 	case 6:
 	case 7:
 		/* DMA address/count register */
-		if (dma[which].msb)
-			dma[which].registers[offset] |= ((UINT16) data) << 8;
+		if (dma8257->msb)
+			dma8257->registers[offset] |= ((UINT16) data) << 8;
 		else
-			dma[which].registers[offset] = data;
+			dma8257->registers[offset] = data;
 
-		if (DMA_MODE_AUTOLOAD(dma[which].mode)) {
+		if (DMA_MODE_AUTOLOAD(dma8257->mode)) {
 			/* in case of autoload when inserting channel 2 info */
 			/* it is automaticaly copied to channel 3 info       */
 			switch(offset) {
 				case 4:
 				case 5:
-					if (dma[which].msb)
-						dma[which].registers[offset+2] |= ((UINT16) data) << 8;
+					if (dma8257->msb)
+						dma8257->registers[offset+2] |= ((UINT16) data) << 8;
 					else
-						dma[which].registers[offset+2] = data;
+						dma8257->registers[offset+2] = data;
 			}
 		}
 
-		prepare_msb_flip(which);
+		prepare_msb_flip(dma8257);
 		break;
 
 	case 8:
 		/* DMA mode register */
-		dma[which].mode = data;
+		dma8257->mode = data;
 		break;
 
 	default:
@@ -348,55 +300,113 @@ static void dma8257_write(int which, offs_t offset, UINT8 data)
 
 static TIMER_CALLBACK( dma8257_drq_write_callback )
 {
-	int which = param >> 3;
-	int channel = (param >> 1) & 0x03;
+	int channel = param >> 1;
 	int state = param & 0x01;
+	dma8257_t *dma8257 = ptr;
 
 	/* normalize state */
 	if (state)
 	{
-		dma[which].drq |= 0x01 << channel;
-		dma[which].address[channel] =  dma[which].registers[channel * 2];
-		dma[which].count[channel] =  dma[which].registers[channel * 2 + 1] & 0x3FFF;
-		dma[which].rwmode[channel] =  dma[which].registers[channel * 2 + 1] >> 14;
+		dma8257->drq |= 0x01 << channel;
+		dma8257->address[channel] =  dma8257->registers[channel * 2];
+		dma8257->count[channel] =  dma8257->registers[channel * 2 + 1] & 0x3FFF;
+		dma8257->rwmode[channel] =  dma8257->registers[channel * 2 + 1] >> 14;
 		/* clear channel TC */
-		dma[which].status &= ~(0x01 << channel);
+		dma8257->status &= ~(0x01 << channel);
 	}
 	else
-		dma[which].drq &= ~(0x01 << channel);
+		dma8257->drq &= ~(0x01 << channel);
 
-	dma8257_update_status(which);
+	dma8257_update_status(machine, dma8257);
 }
 
 
 
-void dma8257_drq_write(int which, int channel, int state)
+WRITE8_DEVICE_HANDLER( dma8257_drq_w )
 {
-	int param;
-
-	param = (which << 3) | (channel << 1) | (state ? 1 : 0);
-	timer_call_after_resynch(NULL, param, dma8257_drq_write_callback);
+	dma8257_t *dma8257 = get_safe_token(device);
+	int param = (offset << 1) | (data ? 1 : 0);
+	
+	timer_call_after_resynch(dma8257, param, dma8257_drq_write_callback);
 }
 
 
-/******************* Standard 8-bit/32-bit/64-bit CPU interfaces *******************/
+/* ----------------------------------------------------------------------- */
 
-READ8_HANDLER( dma8257_0_r )	{ return dma8257_read(0, offset); }
-READ8_HANDLER( dma8257_1_r )	{ return dma8257_read(1, offset); }
-WRITE8_HANDLER( dma8257_0_w ) { dma8257_write(0, offset, data); }
-WRITE8_HANDLER( dma8257_1_w ) { dma8257_write(1, offset, data); }
+/* device interface */
 
-READ16_HANDLER( dma8257_16le_0_r ) { return read16le_with_read8_handler(dma8257_0_r, machine, offset, mem_mask); }
-READ16_HANDLER( dma8257_16le_1_r ) { return read16le_with_read8_handler(dma8257_1_r, machine, offset, mem_mask); }
-WRITE16_HANDLER( dma8257_16le_0_w ) { write16le_with_write8_handler(dma8257_0_w, machine, offset, data, mem_mask); }
-WRITE16_HANDLER( dma8257_16le_1_w ) { write16le_with_write8_handler(dma8257_1_w, machine, offset, data, mem_mask); }
+static DEVICE_START( dma8257 )
+{
+	dma8257_t *dma8257 = get_safe_token(device);
+	char unique_tag[30];
 
-READ32_HANDLER( dma8257_32le_0_r ) { return read32le_with_read8_handler(dma8257_0_r, machine, offset, mem_mask); }
-READ32_HANDLER( dma8257_32le_1_r ) { return read32le_with_read8_handler(dma8257_1_r, machine, offset, mem_mask); }
-WRITE32_HANDLER( dma8257_32le_0_w ) { write32le_with_write8_handler(dma8257_0_w, machine, offset, data, mem_mask); }
-WRITE32_HANDLER( dma8257_32le_1_w ) { write32le_with_write8_handler(dma8257_1_w, machine, offset, data, mem_mask); }
+	/* validate arguments */
+	assert(device != NULL);
+	assert(device->tag != NULL);
+	assert(strlen(device->tag) < 20);
 
-READ64_HANDLER( dma8257_64be_0_r ) { return read64be_with_read8_handler(dma8257_0_r, machine, offset, mem_mask); }
-READ64_HANDLER( dma8257_64be_1_r ) { return read64be_with_read8_handler(dma8257_1_r, machine, offset, mem_mask); }
-WRITE64_HANDLER( dma8257_64be_0_w ) { write64be_with_write8_handler(dma8257_0_w, machine, offset, data, mem_mask); }
-WRITE64_HANDLER( dma8257_64be_1_w ) { write64be_with_write8_handler(dma8257_1_w, machine, offset, data, mem_mask); }
+	//dma8257->device_type = device_type;
+	dma8257->intf = device->static_config;
+
+	dma8257->status = 0x0f;
+	dma8257->timer = timer_alloc(dma8257_timerproc, dma8257);
+	dma8257->msbflip_timer = timer_alloc(dma8257_msbflip_timerproc, dma8257);
+
+	state_save_combine_module_and_tag(unique_tag, "dma8257", device->tag);
+
+	state_save_register_item_array(unique_tag, 0, dma8257->address);
+	state_save_register_item_array(unique_tag, 0, dma8257->count);
+	state_save_register_item_array(unique_tag, 0, dma8257->rwmode);
+	state_save_register_item_array(unique_tag, 0, dma8257->registers);
+
+	state_save_register_item(unique_tag, 0, dma8257->mode);
+	state_save_register_item(unique_tag, 0, dma8257->rr);
+	state_save_register_item(unique_tag, 0, dma8257->msb);
+	state_save_register_item(unique_tag, 0, dma8257->drq);
+	state_save_register_item(unique_tag, 0, dma8257->status);
+
+}
+
+
+static DEVICE_RESET( dma8257 )
+{
+	dma8257_t *dma8257 = get_safe_token(device);
+
+	dma8257->status &= 0xf0;
+	dma8257->mode = 0;
+	dma8257_update_status(device->machine, dma8257 );
+}
+
+
+static DEVICE_SET_INFO( dma8257 )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+DEVICE_GET_INFO( dma8257 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(dma8257_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;							break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;		break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(dma8257); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(dma8257);break;
+		case DEVINFO_FCT_STOP:							/* Nothing */							break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(dma8257);break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "DMA8257";					break;
+		case DEVINFO_STR_FAMILY:						info->s = "DMA controllers";			break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";						break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;						break;
+		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+	}
+}
