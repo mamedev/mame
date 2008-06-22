@@ -467,7 +467,6 @@ UINT32 drcmap_get_value(drcmap_state *drcmap, drccodeptr codebase, UINT32 mapvar
 
 	/* look for the signature */
 	while (curscan < endscan && *curscan++ != drcmap->uniquevalue) ;
-	assert(curscan < endscan);
 	if (curscan >= endscan)
 		return 0;
 
