@@ -724,6 +724,34 @@ static WRITE8_HANDLER( dkong3_2a03_reset_w )
 	}
 }
 
+static READ8_HANDLER( strtheat_inputport_0_r )
+{
+	if(input_port_read_indexed(machine, 3) & 0x40)
+	{
+		/* Joystick inputs */
+		return input_port_read_indexed(machine, 0);
+	}
+	else
+	{
+		/* Steering Wheel inputs */
+		return (input_port_read_indexed(machine, 0) & ~3) | (input_port_read_indexed(machine, 4) & 3);
+	}
+}
+
+static READ8_HANDLER( strtheat_inputport_1_r )
+{
+	if(input_port_read_indexed(machine, 3) & 0x40)
+	{
+		/* Joystick inputs */
+		return input_port_read_indexed(machine, 1);
+	}
+	else
+	{
+		/* Steering Wheel inputs */
+		return (input_port_read_indexed(machine, 1) & ~3) | (input_port_read_indexed(machine, 5) & 3);
+	}
+}
+
 
 /*************************************
  *
@@ -2817,6 +2845,35 @@ ROM_END
 
 /*************************************
  *
+ *  Decryption code
+ *
+ *************************************/
+
+static void drakton_decrypt_rom(UINT8 mod, int offs, int *bs)
+{
+	UINT8 oldbyte,newbyte;
+	UINT8 *ROM;
+	int mem;
+
+	ROM = memory_region(REGION_CPU1);
+
+	for (mem=0;mem<0x4000;mem++)
+	{
+		oldbyte = ROM[mem];
+
+		/*  Note: D2 is inverted and connected to D1, D5 is inverted and
+            connected to D0.  The other six data bits are converted by a
+            PAL10H8 driven by the counter. */
+
+		newbyte = (oldbyte & mod) | (~oldbyte & ~mod);
+		newbyte = BITSWAP8(newbyte, bs[0], bs[1], bs[2], bs[3], bs[4], bs[5], bs[6], bs[7]);
+		
+		ROM[mem + offs] = newbyte;
+	}
+}
+
+/*************************************
+ *
  *  Driver Init Code
  *
  *************************************/
@@ -2840,6 +2897,51 @@ static DRIVER_INIT( herodk )
 }
 
 
+static DRIVER_INIT( drakton )
+{
+	int bs[4][8] = { 
+			{7,6,1,3,0,4,2,5},
+			{7,1,4,3,0,6,2,5},
+			{7,6,1,0,3,4,2,5},
+			{7,1,4,0,3,6,2,5},
+	};
+	
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1 );
+
+	/* While the PAL supports up to 16 decryption methods, only four
+        are actually used in the PAL.  Therefore, we'll take a little
+        memory overhead and decrypt the ROMs using each method in advance. */
+
+	drakton_decrypt_rom(0x02, 0x10000, bs[0]);
+	drakton_decrypt_rom(0x40, 0x14000, bs[1]);
+	drakton_decrypt_rom(0x8a, 0x18000, bs[2]);
+	drakton_decrypt_rom(0xc8, 0x1c000, bs[3]);
+}
+
+
+static DRIVER_INIT( strtheat )
+{
+	int bs[4][8] = { 
+			{0,6,1,7,3,4,2,5},
+			{0,6,4,1,3,7,2,5},
+			{6,3,1,7,0,4,2,5},
+			{6,3,4,1,0,7,2,5},
+	};
+
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1 );
+
+	/* While the PAL supports up to 16 decryption methods, only four
+        are actually used in the PAL.  Therefore, we'll take a little
+        memory overhead and decrypt the ROMs using each method in advance. */
+	drakton_decrypt_rom(0x03, 0x10000, bs[0]);
+	drakton_decrypt_rom(0x81, 0x14000, bs[1]);
+	drakton_decrypt_rom(0x0a, 0x18000, bs[2]);
+	drakton_decrypt_rom(0x88, 0x1c000, bs[3]);
+
+	/* custom handlers supporting Joystick or Steering Wheel */
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7c00, 0x7c00, 0, 0, strtheat_inputport_0_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7c80, 0x7c80, 0, 0, strtheat_inputport_1_r);
+}
 
 /*************************************
  *

@@ -129,18 +129,6 @@ VIDEO_UPDATE( dkong );
 VIDEO_UPDATE( pestplce );
 VIDEO_UPDATE( spclforc );
 
-
-
-/*----------- defined in machine/strtheat.c -----------*/
-
-DRIVER_INIT( strtheat );
-
-
-/*----------- defined in machine/drakton.c -----------*/
-
-DRIVER_INIT( drakton );
-
-
 /*----------- defined in audio/dkong.c -----------*/
 
 READ8_HANDLER( dkong_audio_status_r );
