@@ -46,6 +46,9 @@
  *
  *
  *  **** Change Log ****
+ *  Wilbert Pol (22-Jun-2008) changed version to 0.4
+ *   - Removed i8x41.ram hack.
+ *
  *  HJB (19-Dec-2004) changed version to 0.3
  *   - Tried to handle accesses to registers in get_info/set_info
  *     before i8x41.ram is is initialized.
@@ -179,7 +182,6 @@ static I8X41 i8x41;
 #define PSW 		i8x41.psw
 #define DBBI		i8x41.dbbi
 #define DBBO		i8x41.dbbo
-#define R(n)		i8x41.ram[((PSW & BS) ? M_BANK1:M_BANK0)+(n)]
 #define STATE		i8x41.state
 #define ENABLE		i8x41.enable
 #define PRESCALER	i8x41.prescaler
@@ -189,8 +191,10 @@ static I8X41 i8x41;
 #define CONTROL		i8x41.control
 
 
-static void set_irq_line(int irqline, int state);
+#define GETR(n) (RM(((PSW & BS) ? M_BANK1:M_BANK0)+(n)))
+#define SETR(n,v) (WM(((PSW & BS) ? M_BANK1:M_BANK0)+(n), (v)))
 
+static void set_irq_line(int irqline, int state);
 
 /************************************************************************
  *  Shortcuts
@@ -221,7 +225,7 @@ INLINE void illegal(void)
  ***********************************/
 INLINE void add_r(int r)
 {
-	UINT8 res = A + R(r);
+	UINT8 res = A + GETR(r);
 	if( res < A ) PSW |= FC;
 	if( (res & 0x0f) < (A & 0x0f) ) PSW |= FA;
 	A = res;
@@ -233,7 +237,7 @@ INLINE void add_r(int r)
  ***********************************/
 INLINE void add_rm(int r)
 {
-	UINT8 res = A + RM( M_IRAM + (R(r) & I8X42_intRAM_MASK) );
+	UINT8 res = A + RM( M_IRAM + (GETR(r) & I8X42_intRAM_MASK) );
 	if( res < A ) PSW |= FC;
 	if( (res & 0x0f) < (A & 0x0f) ) PSW |= FA;
 	A = res;
@@ -258,7 +262,7 @@ INLINE void add_i(void)
  ***********************************/
 INLINE void addc_r(int r)
 {
-	UINT8 res = A + R(r) + (PSW >> 7);
+	UINT8 res = A + GETR(r) + (PSW >> 7);
 	if( res <= A ) PSW |= FC;
 	if( (res & 0x0f) <= (A & 0x0f) ) PSW |= FA;
 	A = res;
@@ -270,7 +274,7 @@ INLINE void addc_r(int r)
  ***********************************/
 INLINE void addc_rm(int r)
 {
-	UINT8 res = A + RM( M_IRAM + (R(r) & I8X42_intRAM_MASK) ) + (PSW >> 7);
+	UINT8 res = A + RM( M_IRAM + (GETR(r) & I8X42_intRAM_MASK) ) + (PSW >> 7);
 	if( res <= A ) PSW |= FC;
 	if( (res & 0x0f) <= (A & 0x0f) ) PSW |= FA;
 	A = res;
@@ -295,7 +299,7 @@ INLINE void addc_i(void)
  ***********************************/
 INLINE void anl_r(int r)
 {
-	A = A & R(r);
+	A = A & GETR(r);
 }
 
 /***********************************
@@ -304,7 +308,7 @@ INLINE void anl_r(int r)
  ***********************************/
 INLINE void anl_rm(int r)
 {
-	A = A & RM( M_IRAM + (R(r) & I8X42_intRAM_MASK) );
+	A = A & RM( M_IRAM + (GETR(r) & I8X42_intRAM_MASK) );
 }
 
 /***********************************
@@ -466,7 +470,7 @@ INLINE void dec_a(void)
  ***********************************/
 INLINE void dec_r(int r)
 {
-	R(r) -= 1;
+	SETR(r, GETR(r) - 1);
 }
 
 /***********************************
@@ -495,8 +499,8 @@ INLINE void djnz_r_i(int r)
 {
 	UINT8 adr = ROP_ARG(PC);
 	PC++;
-	R(r) -= 1;
-	if( R(r) )
+	SETR(r, GETR(r) - 1);
+	if( GETR(r) )
 		PC = (PC & 0x700) | adr;
 }
 
@@ -605,7 +609,7 @@ INLINE void inc_a(void)
  ***********************************/
 INLINE void inc_r(int r)
 {
-	R(r) += 1;
+	SETR(r, GETR(r) + 1);
 }
 
 /***********************************
@@ -614,7 +618,7 @@ INLINE void inc_r(int r)
  ***********************************/
 INLINE void inc_rm(int r)
 {
-	UINT16 addr = M_IRAM + (R(r) & I8X42_intRAM_MASK);
+	UINT16 addr = M_IRAM + (GETR(r) & I8X42_intRAM_MASK);
 	WM( addr, RM(addr) + 1 );
 }
 
@@ -848,7 +852,7 @@ INLINE void mov_a_psw(void)
  ***********************************/
 INLINE void mov_a_r(int r)
 {
-	A = R(r);
+	A = GETR(r);
 }
 
 /***********************************
@@ -857,7 +861,7 @@ INLINE void mov_a_r(int r)
  ***********************************/
 INLINE void mov_a_rm(int r)
 {
-	A = RM( M_IRAM + (R(r) & I8X42_intRAM_MASK) );
+	A = RM( M_IRAM + (GETR(r) & I8X42_intRAM_MASK) );
 }
 
 /***********************************
@@ -884,7 +888,7 @@ INLINE void mov_psw_a(void)
  ***********************************/
 INLINE void mov_r_a(int r)
 {
-	R(r) = A;
+	SETR(r, A);
 }
 
 /***********************************
@@ -895,7 +899,7 @@ INLINE void mov_r_i(int r)
 {
 	UINT8 val = ROP_ARG(PC);
 	PC += 1;
-	R(r) = val;
+	SETR(r, val);
 }
 
 /***********************************
@@ -904,7 +908,7 @@ INLINE void mov_r_i(int r)
  ***********************************/
 INLINE void mov_rm_a(int r)
 {
-	WM( M_IRAM + (R(r) & I8X42_intRAM_MASK), A );
+	WM( M_IRAM + (GETR(r) & I8X42_intRAM_MASK), A );
 }
 
 /***********************************
@@ -915,7 +919,7 @@ INLINE void mov_rm_i(int r)
 {
 	UINT8 val = ROP_ARG(PC);
 	PC += 1;
-	WM( M_IRAM + (R(r) & I8X42_intRAM_MASK), val );
+	WM( M_IRAM + (GETR(r) & I8X42_intRAM_MASK), val );
 }
 
 /***********************************
@@ -996,7 +1000,7 @@ INLINE void nop(void)
  ***********************************/
 INLINE void orl_r(int r)
 {
-	A = A | R(r);
+	A = A | GETR(r);
 }
 
 /***********************************
@@ -1005,7 +1009,7 @@ INLINE void orl_r(int r)
  ***********************************/
 INLINE void orl_rm(int r)
 {
-	A = A | RM( M_IRAM + (R(r) & I8X42_intRAM_MASK) );
+	A = A | RM( M_IRAM + (GETR(r) & I8X42_intRAM_MASK) );
 }
 
 /***********************************
@@ -1216,8 +1220,8 @@ INLINE void swap_a(void)
  ***********************************/
 INLINE void xch_a_r(int r)
 {
-	UINT8 tmp = R(r);
-	R(r) = A;
+	UINT8 tmp = GETR(r);
+	SETR(r, A);
 	A = tmp;
 }
 
@@ -1227,7 +1231,7 @@ INLINE void xch_a_r(int r)
  ***********************************/
 INLINE void xch_a_rm(int r)
 {
-	UINT16 addr = M_IRAM + (R(r) & I8X42_intRAM_MASK);
+	UINT16 addr = M_IRAM + (GETR(r) & I8X42_intRAM_MASK);
 	UINT8 tmp = RM(addr);
 	WM( addr, A );
 	A = tmp;
@@ -1239,7 +1243,7 @@ INLINE void xch_a_rm(int r)
  ***********************************/
 INLINE void xchd_a_rm(int r)
 {
-	UINT16 addr = M_IRAM + (R(r) & I8X42_intRAM_MASK);
+	UINT16 addr = M_IRAM + (GETR(r) & I8X42_intRAM_MASK);
 	UINT8 tmp = RM(addr);
 	WM( addr, (tmp & 0xf0) | (A & 0x0f) );
 	A = (A & 0xf0) | (tmp & 0x0f);
@@ -1251,7 +1255,7 @@ INLINE void xchd_a_rm(int r)
  ***********************************/
 INLINE void xrl_r(int r)
 {
-	A = A ^ R(r);
+	A = A ^ GETR(r);
 }
 
 /***********************************
@@ -1260,7 +1264,7 @@ INLINE void xrl_r(int r)
  ***********************************/
 INLINE void xrl_rm(int r)
 {
-	A = A ^ RM( M_IRAM + (R(r) & I8X42_intRAM_MASK) );
+	A = A ^ RM( M_IRAM + (GETR(r) & I8X42_intRAM_MASK) );
 }
 
 /***********************************
@@ -1337,8 +1341,7 @@ static void i8x41_reset(void)
 
 	/* default to 8041 behaviour for DBBI/DBBO and extended commands */
 	i8x41.subtype = 8041;
-	/* ugly hack.. excuse my lazyness */
-	i8x41.ram = memory_region(REGION_CPU1 + cpu_getactivecpu());
+
 	ENABLE = IBFI | TCNTI;
 	DBBI = 0xff;
 	DBBO = 0xff;
@@ -2082,18 +2085,6 @@ static void set_irq_line(int irqline, int state)
 
 
 /**************************************************************************
- * Register accesses catching uninitialized i8x41.ram pointer
- **************************************************************************/
-#define GETR(n) (NULL == i8x41.ram ? 0 : \
-	i8x41.ram[((PSW & BS) ? M_BANK1:M_BANK0)+(n)])
-
-#define SETR(n,v) do { \
-	if (NULL != i8x41.ram) { \
-		i8x41.ram[((PSW & BS) ? M_BANK1:M_BANK0)+(n)] = (v); \
-	} \
-} while (0)
-
-/**************************************************************************
  * Generic set_info
  **************************************************************************/
 
@@ -2276,7 +2267,7 @@ void i8x41_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "I8X41");				break;
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Intel 8x41");			break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.3");					break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.4");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 
