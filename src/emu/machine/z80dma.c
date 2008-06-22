@@ -21,7 +21,6 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "memconv.h"
 #include "z80dma.h"
 
@@ -86,6 +85,7 @@
 
 #define READY_ACTIVE_HIGH(_c) ((WR5(_c)>>3) & 0x01)
 
+typedef struct _z80dma_t z80dma_t;
 struct _z80dma_t
 {
 	running_machine *machine;
@@ -111,9 +111,16 @@ struct _z80dma_t
 };
 
 static TIMER_CALLBACK( z80dma_timerproc );
-static void z80dma_update_status(z80dma_t *z80dma);
+static void z80dma_update_status(running_machine *machine, z80dma_t *z80dma);
 
 /* ----------------------------------------------------------------------- */
+
+INLINE z80dma_t *get_safe_token(const device_config *device) {
+	assert( device != NULL );
+	assert( device->token != NULL );
+	assert( device->type == Z80DMA );
+	return ( z80dma_t * ) device->token;
+}
 
 static void z80dma_do_read(z80dma_t *cntx)
 {
@@ -125,17 +132,17 @@ static void z80dma_do_read(z80dma_t *cntx)
 			if (PORTA_IS_SOURCE(cntx))
 			{
 				if (PORTA_MEMORY(cntx))
-					cntx->latch = cntx->intf->memory_read(cntx->machine, cntx, cntx->addressA);
+					cntx->latch = cntx->intf->memory_read(cntx->machine, cntx->addressA);
 				else
-					cntx->latch = cntx->intf->portA_read(cntx->machine, cntx, cntx->addressA);
+					cntx->latch = cntx->intf->portA_read(cntx->machine, cntx->addressA);
 				cntx->addressA += PORTA_STEP(cntx);
 			}
 			else
 			{
 				if (PORTB_MEMORY(cntx))
-					cntx->latch = cntx->intf->memory_read(cntx->machine, cntx, cntx->addressB);
+					cntx->latch = cntx->intf->memory_read(cntx->machine, cntx->addressB);
 				else
-					cntx->latch = cntx->intf->portB_read(cntx->machine, cntx, cntx->addressB);
+					cntx->latch = cntx->intf->portB_read(cntx->machine, cntx->addressB);
 				cntx->addressB += PORTB_STEP(cntx);
 			}
 			break;
@@ -161,17 +168,17 @@ static int z80dma_do_write(z80dma_t *cntx)
 			if (PORTA_IS_SOURCE(cntx))
 			{
 				if (PORTB_MEMORY(cntx))
-					cntx->intf->memory_write(cntx->machine, cntx, cntx->addressB, cntx->latch);
+					cntx->intf->memory_write(cntx->machine, cntx->addressB, cntx->latch);
 				else
-					cntx->intf->portB_write(cntx->machine, cntx, cntx->addressB, cntx->latch);
+					cntx->intf->portB_write(cntx->machine, cntx->addressB, cntx->latch);
 				cntx->addressB += PORTB_STEP(cntx);
 			}
 			else
 			{
 				if (PORTA_MEMORY(cntx))
-					cntx->intf->memory_write(cntx->machine, cntx, cntx->addressA, cntx->latch);
+					cntx->intf->memory_write(cntx->machine, cntx->addressA, cntx->latch);
 				else
-					cntx->intf->portB_write(cntx->machine, cntx, cntx->addressA, cntx->latch);
+					cntx->intf->portB_write(cntx->machine, cntx->addressA, cntx->latch);
 				cntx->addressA += PORTA_STEP(cntx);
 			}
 			cntx->count--;
@@ -214,11 +221,11 @@ static TIMER_CALLBACK( z80dma_timerproc )
 	if (done)
 	{
 		cntx->dma_enabled = 0; //FIXME: Correct?
-		z80dma_update_status(cntx);
+		z80dma_update_status(machine, cntx);
 	}
 }
 
-static void z80dma_update_status(z80dma_t *z80dma)
+static void z80dma_update_status(running_machine *machine, z80dma_t *z80dma)
 {
 	UINT16 pending_transfer;
 	attotime next;
@@ -247,24 +254,23 @@ static void z80dma_update_status(z80dma_t *z80dma)
 	if (z80dma->intf && z80dma->intf->cpunum >= 0)
 	{
 		//FIXME: Synchronization is done by BUSREQ!
-		cpunum_set_input_line(Machine, z80dma->intf->cpunum, INPUT_LINE_HALT,
+		cpunum_set_input_line(machine, z80dma->intf->cpunum, INPUT_LINE_HALT,
 			pending_transfer ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
 /* ----------------------------------------------------------------------- */
 
-UINT8 z80dma_read(z80dma_t *z80dma)
+READ8_DEVICE_HANDLER( z80dma_r )
 {
 	fatalerror("z80dma_read: not implemented");
 	return 0;
 }
 
 
-
-void z80dma_write(z80dma_t *z80dma, UINT8 data)
+WRITE8_DEVICE_HANDLER( z80dma_w )
 {
-	z80dma_t *cntx = z80dma;
+	z80dma_t *cntx = get_safe_token(device);
 
 	if (cntx->num_follow == 0)
 	{
@@ -340,11 +346,11 @@ void z80dma_write(z80dma_t *z80dma, UINT8 data)
 					break;
 				case 0x83:	/* Disable dma */
 					cntx->dma_enabled = 0;
-					z80dma_rdy_write(cntx, cntx->rdy);
+					z80dma_rdy_w(device, 0, cntx->rdy);
 					break;
 				case 0x87:	/* Enable dma */
 					cntx->dma_enabled = 1;
-					z80dma_rdy_write(cntx, cntx->rdy);
+					z80dma_rdy_w(device, 0, cntx->rdy);
 					break;
 				case 0xBB:
 					cntx->regs_follow[cntx->num_follow++] = GET_REGNUM(cntx, READ_MASK(cntx));
@@ -377,7 +383,6 @@ void z80dma_write(z80dma_t *z80dma, UINT8 data)
 }
 
 
-
 static TIMER_CALLBACK( z80dma_rdy_write_callback )
 {
 	int state = param & 0x01;
@@ -387,17 +392,19 @@ static TIMER_CALLBACK( z80dma_rdy_write_callback )
 	cntx->rdy = 1 ^ state ^ READY_ACTIVE_HIGH(cntx);
 	cntx->status = (cntx->status & 0xFD) | (cntx->rdy<<1);
 
-	z80dma_update_status(cntx);
+	z80dma_update_status(machine, cntx);
 }
 
 
-
-void z80dma_rdy_write(z80dma_t *z80dma, int state)
+WRITE8_DEVICE_HANDLER( z80dma_rdy_w)
 {
+	z80dma_t *z80dma = get_safe_token(device);
 	int param;
 
-	param = (state ? 1 : 0);
-	LOG(("RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH(z80dma)));
+	assert( offset == 0);
+	
+	param = (data ? 1 : 0);
+	LOG(("RDY: %d Active High: %d\n", data, READY_ACTIVE_HIGH(z80dma)));
 	timer_call_after_resynch(z80dma, param, z80dma_rdy_write_callback);
 }
 
@@ -407,7 +414,7 @@ void z80dma_rdy_write(z80dma_t *z80dma, int state)
 
 static DEVICE_START( z80dma )
 {
-	z80dma_t *z80dma = device->token;
+	z80dma_t *z80dma = get_safe_token(device);
 	char unique_tag[30];
 
 	/* validate arguments */
@@ -440,15 +447,16 @@ static DEVICE_START( z80dma )
 	state_save_register_item(unique_tag, 0, z80dma->latch);
 }
 
+
 static DEVICE_RESET( z80dma )
 {
-	z80dma_t *z80dma = device->token;
+	z80dma_t *z80dma = get_safe_token(device);
 
 	z80dma->status = 0;
 	z80dma->rdy = 0;
 	z80dma->num_follow = 0;
 	z80dma->dma_enabled = 0;
-	z80dma_update_status(z80dma);
+	z80dma_update_status(device->machine, z80dma);
 }
 
 
@@ -485,46 +493,3 @@ DEVICE_GET_INFO( z80dma )
 	}
 }
 
-/******************* Standard 8-bit CPU interfaces *******************/
-
-READ8_HANDLER( z80dma_0_r )
-{
-	z80dma_t	*z80dma = devtag_get_token(machine, Z80DMA, Z80DMA_DEV_0_TAG);
-
-	return z80dma_read(z80dma);
-}
-
-READ8_HANDLER( z80dma_1_r )
-{
-	z80dma_t	*z80dma = devtag_get_token(machine, Z80DMA, Z80DMA_DEV_1_TAG);
-
-	return z80dma_read(z80dma);
-}
-
-WRITE8_HANDLER( z80dma_0_w )
-{
-	z80dma_t	*z80dma = devtag_get_token(machine, Z80DMA, Z80DMA_DEV_0_TAG);
-
-	z80dma_write(z80dma, data);
-}
-
-WRITE8_HANDLER( z80dma_1_w )
-{
-	z80dma_t	*z80dma = devtag_get_token(machine, Z80DMA, Z80DMA_DEV_1_TAG);
-
-	z80dma_write(z80dma, data);
-}
-
-WRITE8_HANDLER( z80dma_0_rdy_w )
-{
-	z80dma_t	*z80dma = devtag_get_token(machine, Z80DMA, Z80DMA_DEV_0_TAG);
-
-	z80dma_rdy_write(z80dma, data);
-}
-
-WRITE8_HANDLER( z80dma_1_rdy_w )
-{
-	z80dma_t	*z80dma = devtag_get_token(machine, Z80DMA, Z80DMA_DEV_1_TAG);
-
-	z80dma_rdy_write(z80dma, data);
-}

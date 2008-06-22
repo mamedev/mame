@@ -1612,7 +1612,7 @@ INLINE void resolve_link(x86code **destptr, const emit_link *linkinfo)
 	}
 	else
 	{
-		assert((INT32)delta == delta);
+		//assert((INT32)delta == delta);
 		((INT32 *)linkinfo->target)[-1] = (INT32)delta;
 	}
 }
