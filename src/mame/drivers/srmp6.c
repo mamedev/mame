@@ -20,7 +20,7 @@ according prg ROM (offset $0fff80):
     V1.00
 
 TODO:
- - sound emulation (appears to be really close to st0016)
+ - fix sound emulation
  - fix DMA operations
  - fix video emulation
 
@@ -68,6 +68,7 @@ Dumped 06/15/2000
 
 #include "driver.h"
 #include "deprecat.h"
+#include "sound/nile.h"
 
 static UINT16* tileram;
 static UINT8* dirty_tileram;
@@ -91,7 +92,7 @@ static const gfx_layout tiles8x8_layout =
 	8*64
 };
 
-static void update_palette(running_machine *machine)
+static void update_palette(void)
 {
 	INT8 r, g ,b;
 	int brg = brightness - 0x60;
@@ -119,7 +120,7 @@ static void update_palette(running_machine *machine)
 			b += ((0x1F - b) * brg) >> 5;
 			if(b > 0x1F) b = 0x1F;
 		}
-		palette_set_color(machine, i, MAKE_RGB(r << 3, g << 3, b << 3));
+		palette_set_color(Machine, i, MAKE_RGB(r << 3, g << 3, b << 3));
 	}
 }
 
@@ -146,14 +147,14 @@ static VIDEO_START(srmp6)
 
 /* Debug code */
 #ifdef UNUSED_FUNCTION
-static void srmp6_decode_charram(running_machine *machine)
+static void srmp6_decode_charram(void)
 {
 	if(input_code_pressed_once(KEYCODE_Z))
 	{
 		int i;
 		for (i=0;i<(0x100000*16)/0x40;i++)
 		{
-			decodechar(machine->gfx[0], i, (UINT8*)tileram);
+			decodechar(Machine->gfx[0], i, (UINT8*)tileram);
 			dirty_tileram[i] = 0;
 		}
 	}
@@ -181,7 +182,7 @@ static VIDEO_UPDATE(srmp6)
 
 #if 0
 	/* debug */
-	srmp6_decode_charram(screen->machine);
+	srmp6_decode_charram();
 
 
 
@@ -290,49 +291,17 @@ static VIDEO_UPDATE(srmp6)
 	}
 
 	memcpy(sprram_old, sprram, 0x80000);
+	
+	if(input_code_pressed_once(KEYCODE_Q))
+	{
+		FILE *p=fopen("tileram.bin","wb");
+		fwrite(tileram,1,0x100000*16,p);
+		fclose(p);
+	}
+	
+	
 	return 0;
 }
-
-/***************************************************************************
-    audio - VERY preliminary
-
-    TODO: watch similarities with st0016
-***************************************************************************/
-
-/*
-cpu #0 (PC=00011F7C): unmapped program memory word write to 004E0002 = 0000 & FFFF  0?
-cpu #0 (PC=00011F84): unmapped program memory word write to 004E0004 = 0D50 & FFFF  lo word \ sample start
-cpu #0 (PC=00011F8A): unmapped program memory word write to 004E0006 = 0070 & FFFF  hi word / address?
-
-cpu #0 (PC=00011FBA): unmapped program memory word write to 004E000A = 0000 & FFFF  0?
-cpu #0 (PC=00011FC2): unmapped program memory word write to 004E0018 = 866C & FFFF  lo word \ sample stop
-cpu #0 (PC=00011FC8): unmapped program memory word write to 004E001A = 00AA & FFFF  hi word / address?
-
-cpu #0 (PC=00011FD0): unmapped program memory word write to 004E000C = 0FFF & FFFF
-cpu #0 (PC=00011FD8): unmapped program memory word write to 004E001C = FFFF & FFFF
-cpu #0 (PC=00011FDC): unmapped program memory word write to 004E001E = FFFF & FFFF
-
-cpu #0 (PC=00026EFA): unmapped program memory word write to 004E0100 = 0001 & FFFF  ctrl word r/w: bit 7-0 = voice 8-1 (1=play,0=stop)
-
-voice #1: $4E0000-$4E001F
-voice #2: $4E0020-$4E003F
-voice #3: $4E0040-$4E005F
-...
-voice #8: $4E00E0-$4E00FF
-
-voice regs:
-offset  description
-+00
-+02     always 0?
-+04     lo-word \ sample
-+06     hi-word / counter ?
-+0A
-+18 \
-+1A /
-+1C \
-+1E /
-
-*/
 
 /***************************************************************************
     Main CPU memory handlers
@@ -381,7 +350,7 @@ static WRITE16_HANDLER( video_regs_w )
 			data = (!data)?0x60:(data == 0x5e)?0x60:data;
 			if(brightness != data) {
 				brightness = data;
-				update_palette(machine);
+				update_palette();
 			}
 			break;
 
@@ -592,8 +561,8 @@ static ADDRESS_MAP_START( srmp6, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x5fff00, 0x5fffff) AM_WRITE(dma_w) AM_BASE(&dmaram)
 
 	AM_RANGE(0x4c0000, 0x4c006f) AM_READWRITE(video_regs_r, video_regs_w) AM_BASE(&video_regs)	// ? gfx regs ST-0026 NiLe
-//  AM_RANGE(0x4e0000, 0x4e00ff) AM_READWRITE(sound_regs_r, sound_regs_w) AM_BASE(&sound_regs)  // ? sound regs (data) ST-0026 NiLe
-//  AM_RANGE(0x4e0100, 0x4e0101) AM_READWRITE(sndctrl_reg_r, sndctrl_reg_w)                     // ? sound reg  (ctrl) ST-0026 NiLe
+  	AM_RANGE(0x4e0000, 0x4e00ff) AM_READWRITE(nile_snd_r, nile_snd_w) AM_BASE(&nile_sound_regs)  
+  	AM_RANGE(0x4e0100, 0x4e0101) AM_READWRITE(nile_sndctrl_r, nile_sndctrl_w)                     
 //  AM_RANGE(0x4e0110, 0x4e0111) AM_NOP // ? accessed once ($268dc, written $b.w)
 //  AM_RANGE(0x5fff00, 0x5fff1f) AM_RAM // ? see routine $5ca8, video_regs related ???
 
@@ -707,6 +676,11 @@ static INTERRUPT_GEN(srmp6_interrupt)
 		cpunum_set_input_line(machine, 0,4,HOLD_LINE);
 }
 
+static const struct NiLe_interface nile_interface =
+{
+	REGION_USER2
+};
+
 static MACHINE_DRIVER_START( srmp6 )
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(srmp6,0)
@@ -726,26 +700,19 @@ static MACHINE_DRIVER_START( srmp6 )
 	MDRV_VIDEO_UPDATE(srmp6)
 
 	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD(NILE, 0)
+	MDRV_SOUND_CONFIG(nile_interface)
+	MDRV_SOUND_ROUTE(0, "left", 1.0)
+	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
 
 
 /***************************************************************************
     ROM definition(s)
 ***************************************************************************/
-/*
-CHR?
-    sx011-05.18 '00':[23a640,300000[
-    sx011-04.19
-    sx011-03.20
-    sx011-02.21
-    sx011-01.22 '00':[266670,400000[ (end)
 
-most are 8 bits unsigned PCM 16/32KHz if stereo/mono
-some voices in 2nd rom have lower sample rate
-    sx011-08.15 <- samples: instruments, musics, sound FXs, voices
-    sx011-07.16 <- samples: voices (cont'd), sound FXs, music, theme music
-    sx011-06.17 <- samples: theme music (cont'd)
-*/
 ROM_START( srmp6 )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "sx011-10.4", 0x000001, 0x080000, CRC(8f4318a5) SHA1(44160968cca027b3d42805f2dd42662d11257ef6) )
@@ -767,19 +734,11 @@ ROM_START( srmp6 )
 ROM_END
 
 
-/***************************************************************************
-    Driver initialization
-***************************************************************************/
-
-static DRIVER_INIT( srmp6 )
-{
-}
-
 
 /***************************************************************************
     Game driver(s)
 ***************************************************************************/
 
 /*GAME( YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS)*/
-GAME( 1995, srmp6, 0, srmp6, srmp6, srmp6, ROT0, "Seta", "Super Real Mahjong P6 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND)
+GAME( 1995, srmp6, 0, srmp6, srmp6, 0, ROT0, "Seta", "Super Real Mahjong P6 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
 

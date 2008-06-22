@@ -157,6 +157,7 @@ void ymf271_get_info(void *token, UINT32 state, sndinfo *info);
 void cdda_get_info(void *token, UINT32 state, sndinfo *info);
 void ics2115_get_info(void *token, UINT32 state, sndinfo *info);
 void st0016_get_info(void *token, UINT32 state, sndinfo *info);
+void nile_get_info(void *token, UINT32 state, sndinfo *info);
 void c352_get_info(void *token, UINT32 state, sndinfo *info);
 void vrender0_get_info(void *token, UINT32 state, sndinfo *info);
 void votrax_get_info(void *token, UINT32 state, sndinfo *info);
@@ -437,6 +438,9 @@ static const struct
 #endif
 #if (HAS_ST0016)
 	{ SOUND_ST0016, st0016_get_info },
+#endif
+#if (HAS_NILE)
+	{ SOUND_NILE, nile_get_info },
 #endif
 #if (HAS_C352)
 	{ SOUND_C352, c352_get_info },

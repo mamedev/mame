@@ -458,10 +458,15 @@ endif
 #-------------------------------------------------
 
 SOUNDDEFS += -DHAS_ST0016=$(if $(filter ST0016,$(SOUNDS)),1,0)
+SOUNDDEFS += -DHAS_NILE=$(if $(filter NILE,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_X1_010=$(if $(filter X1_010,$(SOUNDS)),1,0)
 
 ifneq ($(filter ST0016,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/st0016.o
+endif
+
+ifneq ($(filter NILE,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/nile.o
 endif
 
 ifneq ($(filter X1_010,$(SOUNDS)),)
