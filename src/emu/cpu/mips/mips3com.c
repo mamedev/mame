@@ -170,16 +170,14 @@ offs_t mips3com_dasm(mips3_state *mips, char *buffer, offs_t pc, const UINT8 *op
 void mips3com_update_cycle_counting(mips3_state *mips)
 {
 	/* modify the timer to go off */
-	if ((mips->cpr[0][COP0_Status] & SR_IMEX5) && mips->cpr[0][COP0_Compare] != 0xffffffff)
+	if (mips->cpr[0][COP0_Status] & SR_IMEX5)
 	{
 		UINT32 count = (activecpu_gettotalcycles() - mips->count_zero_time) / 2;
 		UINT32 compare = mips->cpr[0][COP0_Compare];
-		if (compare > count)
-		{
-			attotime newtime = ATTOTIME_IN_CYCLES(((INT64)(compare - count) * 2), cpu_getactivecpu());
-			timer_adjust_oneshot(mips->compare_int_timer, newtime, cpu_getactivecpu());
-			return;
-		}
+		UINT32 delta = compare - count;
+		attotime newtime = ATTOTIME_IN_CYCLES(((UINT64)delta * 2), cpu_getactivecpu());
+		timer_adjust_oneshot(mips->compare_int_timer, newtime, cpu_getactivecpu());
+		return;
 	}
 	timer_adjust_oneshot(mips->compare_int_timer, attotime_never, cpu_getactivecpu());
 }

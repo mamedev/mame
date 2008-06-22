@@ -2739,7 +2739,7 @@ static int generate_set_cop0_reg(drcuml_block *block, compiler_state *compiler, 
 			generate_update_cycles(block, compiler, IMM(desc->pc), !in_delay_slot);	// <subtract cycles>
 			UML_MOV(block, IREG(1), CPR032(COP0_Status));							// mov     i1,[Status]
 			UML_MOV(block, CPR032(COP0_Status), IREG(0));							// mov     [Status],i0
-			generate_update_mode(block);
+			generate_update_mode(block);											// <update mode>
 			UML_XOR(block, IREG(0), IREG(0), IREG(1));								// xor     i0,i0,i1
 			UML_TEST(block, IREG(0), IMM(0x8000));									// test    i0,0x8000
 			UML_CALLCc(block, IF_NZ, mips3com_update_cycle_counting, mips3);		// callc   mips3com_update_cycle_counting,mips.core,NZ
