@@ -3206,7 +3206,7 @@ GAME( 1987, aliensy5, aliensyn, system16a,        aliensyn, aliensy5,    ROT0,  
 GAME( 1987, aliensy2, aliensyn, system16a,        aliensyn, aliensy1,    ROT0,   "Sega",           "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", 0 )
 GAME( 1987, aliensy1, aliensyn, system16a,        aliensy1, aliensy1,    ROT0,   "Sega",           "Alien Syndrome (set 1, System 16A, FD1089A 317-0033)", 0 )
 GAME( 1988, aceattaa, aceattac, system16a       , aceattaa, aceattaa,    ROT270, "Sega",           "Ace Attacker (Japan, System 16A, FD1094 317-0060)", 0 )
-GAME( 1986, afighter, 0,        system16a_no7751, afighter, afighter,    ROT270, "Sega",           "Action Fighter, FD1089A 317-0018", 0 )
+GAME( 1986, afighter, 0,        system16a_no7751, afighter, afighter,    ROT270, "Sega",           "Action Fighter (FD1089A 317-0018)", 0 )
 GAME( 1986, alexkidd, 0,        system16a,        alexkidd, generic_16a, ROT0,   "Sega",           "Alex Kidd: The Lost Stars (set 2, unprotected)", 0 )
 GAME( 1986, alexkid1, alexkidd, system16a,        alexkidd, alexkid1,    ROT0,   "Sega",           "Alex Kidd: The Lost Stars (set 1, FD1089A 317-0021)", 0 )
 GAME( 1986, fantzone, 0,        system16a_no7751, fantzone, generic_16a, ROT0,   "Sega",           "Fantasy Zone (set 2, unprotected)", 0 )

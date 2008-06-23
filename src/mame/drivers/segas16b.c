@@ -5365,6 +5365,7 @@ ROM_END
     Shinobi, Sega System 16B
     CPU: 68000 + MC8123B (317-0054)
     ROM Board: 171-5358
+ Game Nunmber: 834-6496-04
 */
 ROM_START( shinobi3 )
 	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68000 code */

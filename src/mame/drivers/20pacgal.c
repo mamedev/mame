@@ -28,6 +28,8 @@
           the Z180, but the cpu core doesn't support that yet.
         * Is the clock divide 3 or 4?
 
+    Versions known to exist but not dumped: v1.03 & v1.04
+
 ***************************************************************************/
 
 #include "driver.h"
