@@ -236,7 +236,7 @@ offs_t i8x41_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 		sprintf(dst, "ill");
 		break;
 	case 0x67: /* 1: 0110 0111 */
-		sprintf(dst, "rlc   a");
+		sprintf(dst, "rrc   a");
 		break;
 	case 0x68: /* 1: 0110 1rrr */
 	case 0x69: /* 1: 0110 1rrr */
