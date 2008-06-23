@@ -171,7 +171,12 @@ static void nile_update(void *param, stream_sample_t **inputs, stream_sample_t *
 					// not looped yet, check sample end
 					if ((info->vpos[v] + sptr) >= eptr)
 					{
-						if (slot[NILE_REG_FLAGS]&0x4) //just a guess
+						// code at 11d8c: 
+						// if bit 2 (0x4) is set, check if loop start = loop end.
+						// if they are equal, clear bit 0 and don't set the loop start/end
+						// registers in the NiLe.  if they aren't, set bit 0 and set
+						// the loop start/end registers in the NiLe.
+						if ((slot[NILE_REG_FLAGS] & 0x5) == 0x5)
 						{
 							info->vpos[v] = (lsptr - sptr);
 							info->lponce[v] = 1;
