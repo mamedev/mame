@@ -10,7 +10,7 @@
    02 - sptr  LO 
    03 - sptr  HI
    04
-   05 - flags? 00000000 0000?L0?   - bit 2 is loop enable, but bit 0 must also be set to actually loop
+   05 - flags? 00000000 0000?L0?   - bit 0 loops, other bits appear to be not used by the chip
    06 - freq
    07 - lsptr LO
    08
@@ -69,6 +69,9 @@ WRITE16_HANDLER(nile_sndctrl_w)
 {
 	struct nile_info *info = sndti_token(SOUND_NILE, 0);
 	UINT16 ctrl=info->ctrl;
+
+	stream_update(info->stream);
+
 	COMBINE_DATA(&info->ctrl);
 
 //	printf("CTRL: %04x -> %04x (PC=%x)\n", ctrl, info->ctrl, activecpu_get_pc());
@@ -114,6 +117,8 @@ WRITE16_HANDLER(nile_snd_w)
 	struct nile_info *info = sndti_token(SOUND_NILE, 0);
 	int v, r;
 
+	stream_update(info->stream);
+
 	COMBINE_DATA(&nile_sound_regs[offset]);
 
 	v = offset / 16;
@@ -125,8 +130,6 @@ WRITE16_HANDLER(nile_snd_w)
 	}
 
 //	printf("v%02d: %04x to reg %02d (PC=%x)\n", v, nile_sound_regs[offset], r, activecpu_get_pc());
-
-	stream_update(info->stream);
 }
 
 static void nile_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
