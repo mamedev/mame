@@ -8008,8 +8008,10 @@ Other Sun games
 	/* Cal Omega */
 	DRIVER( comg076 )	/* (c) 1981 Cal Omega Inc. */
 	DRIVER( comg079 )	/* (c) 1981 Cal Omega Inc. */
+	DRIVER( comg080 )	/* (c) 1981 Cal Omega Inc. */
 	DRIVER( comg094 )	/* (c) 1981 Cal Omega Inc. */
 	DRIVER( comg107 )	/* (c) 1982 Cal Omega Inc. */
+	DRIVER( comg123 )	/* (c) 1982 Cal Omega Inc. */
 	DRIVER( comg125 )	/* (c) 1982 Cal Omega Inc. */
 	DRIVER( comg127 )	/* (c) 1982 Cal Omega Inc. */
 	DRIVER( comg128 )	/* (c) 1982 Cal Omega Inc. */
@@ -8030,6 +8032,7 @@ Other Sun games
 	DRIVER( comg204 )	/* (c) 1984 Cal Omega Inc. */
 	DRIVER( comg208 )	/* (c) 1984 Cal Omega Inc. */
 	DRIVER( comg227 )	/* (c) 1984 Cal Omega Inc. */
+	DRIVER( comg230 )	/* (c) 1984 Cal Omega Inc. */
 	DRIVER( comg236 )	/* (c) 1984 Cal Omega Inc. */
 	DRIVER( comg239 )	/* (c) 1985 Cal Omega / Casino Electronics Inc. */
 	DRIVER( comg246 )	/* (c) 1985 Cal Omega Inc. */
