@@ -39,21 +39,10 @@
 
 static UINT8 backup_ram[0x2000];
 
-static void viper_exit(running_machine *machine)
-{
-	voodoo_exit(0);
-}
-
-static VIDEO_START(viper)
-{
-	add_exit_callback(machine, viper_exit);
-
-	voodoo_start(0, machine->primary_screen, VOODOO_3, 16, 16, 16);
-}
-
 static VIDEO_UPDATE(viper)
 {
-	return voodoo_update(0, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	const device_config *device = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo");
+	return voodoo_update(device, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 
@@ -527,6 +516,7 @@ static void voodoo3_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
 	}
 }
 
+#if 0
 static READ64_HANDLER(voodoo3_io_r)
 {
 	return read64be_with_32le_handler(banshee_io_0_r, machine, offset, mem_mask);
@@ -556,7 +546,7 @@ static WRITE64_HANDLER(voodoo3_lfb_w)
 //  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, activecpu_get_pc());
 	write64be_with_32le_handler(banshee_fb_0_w, machine, offset, data, mem_mask);
 }
-
+#endif
 
 
 static READ64_HANDLER(m48t58_r)
@@ -592,9 +582,9 @@ static WRITE64_HANDLER(m48t58_w)
 static ADDRESS_MAP_START(viper_map, ADDRESS_SPACE_PROGRAM, 64)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_MIRROR(0x1000000) AM_RAM
 	AM_RANGE(0x80000000, 0x800fffff) AM_READWRITE(epic_64be_r, epic_64be_w)
-	AM_RANGE(0x82000000, 0x83ffffff) AM_READWRITE(voodoo3_r, voodoo3_w)
-	AM_RANGE(0x84000000, 0x85ffffff) AM_READWRITE(voodoo3_lfb_r, voodoo3_lfb_w)
-	AM_RANGE(0xfe800000, 0xfe8000ff) AM_READWRITE(voodoo3_io_r, voodoo3_io_w)
+	AM_RANGE(0x82000000, 0x83ffffff) AM_DEVREADWRITE32(VOODOO_GRAPHICS, "voodoo", banshee_r, banshee_w, U64(0xffffffffffffffff))
+	AM_RANGE(0x84000000, 0x85ffffff) AM_DEVREADWRITE32(VOODOO_GRAPHICS, "voodoo", banshee_fb_r, banshee_fb_w, U64(0xffffffffffffffff))
+	AM_RANGE(0xfe800000, 0xfe8000ff) AM_DEVREADWRITE32(VOODOO_GRAPHICS, "voodoo", banshee_io_r, banshee_io_w, U64(0xffffffffffffffff))
 	AM_RANGE(0xfec00000, 0xfedfffff) AM_READWRITE(pci_config_addr_r, pci_config_addr_w)
 	AM_RANGE(0xfee00000, 0xfeefffff) AM_READWRITE(pci_config_data_r, pci_config_data_w)
 	AM_RANGE(0xff300000, 0xff300fff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ata_r, ata_w)
@@ -643,6 +633,7 @@ static MACHINE_DRIVER_START(viper)
 	MDRV_NVRAM_HANDLER(timekeeper_0)
 
 	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
+	MDRV_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "main")
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -653,7 +644,6 @@ static MACHINE_DRIVER_START(viper)
 
 	MDRV_PALETTE_LENGTH(65536)
 
-	MDRV_VIDEO_START(viper)
 	MDRV_VIDEO_UPDATE(viper)
 
 	/* sound hardware */

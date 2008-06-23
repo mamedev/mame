@@ -6,7 +6,10 @@
 
 **************************************************************************/
 
-#define MAX_VOODOO			2
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
 
 /* enumeration specifying which model of Voodoo we are emulating */
 enum
@@ -18,34 +21,99 @@ enum
 	MAX_VOODOO_TYPES
 };
 
-void voodoo_start(int which, const device_config *screen, int type, int fbmem_in_mb, int tmem0_in_mb, int tmem1_in_mb);
-int voodoo_update(int which, bitmap_t *bitmap, const rectangle *cliprect);
-void voodoo_reset(int which);
-void voodoo_exit(int which);
-int voodoo_get_type(int which);
-int voodoo_is_stalled(int which);
-void voodoo_set_init_enable(int which, UINT32 newval);
-void voodoo_set_vblank_callback(int which, void (*vblank)(running_machine *, int));
-void voodoo_set_stall_callback(int which, void (*stall)(running_machine *, int));
 
-READ32_HANDLER( voodoo_0_r );
-WRITE32_HANDLER( voodoo_0_w );
+#define STD_VOODOO_1_CLOCK			50000000
+#define STD_VOODOO_2_CLOCK			90000000
+#define STD_VOODOO_BANSHEE_CLOCK	90000000
+#define STD_VOODOO_3_CLOCK			132000000
 
-READ32_HANDLER( voodoo_1_r );
-WRITE32_HANDLER( voodoo_1_w );
 
-READ32_HANDLER( banshee_0_r );
-WRITE32_HANDLER( banshee_0_w );
-READ32_HANDLER( banshee_fb_0_r );
-WRITE32_HANDLER( banshee_fb_0_w );
-READ32_HANDLER( banshee_io_0_r );
-WRITE32_HANDLER( banshee_io_0_w );
-READ32_HANDLER( banshee_rom_0_r );
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
-READ32_HANDLER( banshee_1_r );
-WRITE32_HANDLER( banshee_1_w );
-READ32_HANDLER( banshee_fb_1_r );
-WRITE32_HANDLER( banshee_fb_1_w );
-READ32_HANDLER( banshee_io_1_r );
-WRITE32_HANDLER( banshee_io_1_w );
-READ32_HANDLER( banshee_rom_1_r );
+typedef void (*voodoo_vblank_func)(const device_config *device, int state);
+typedef void (*voodoo_stall_func)(const device_config *device, int state);
+
+
+typedef struct _voodoo_config voodoo_config;
+struct _voodoo_config
+{
+	int					type;
+	UINT32				clock;
+	UINT8				fbmem;
+	UINT8				tmumem0;
+	UINT8				tmumem1;
+	const char *		screen;
+	voodoo_vblank_func	vblank;
+	voodoo_stall_func	stall;
+};
+
+
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_3DFX_VOODOO_ADD(_tag, _type, _clock, _fbmem, _screen) \
+	MDRV_DEVICE_ADD(_tag, VOODOO_GRAPHICS) \
+	MDRV_DEVICE_CONFIG_DATA32(voodoo_config, type, _type) \
+	MDRV_DEVICE_CONFIG_DATA32(voodoo_config, clock, _clock) \
+	MDRV_DEVICE_CONFIG_DATA32(voodoo_config, fbmem, _fbmem) \
+	MDRV_DEVICE_CONFIG_DATAPTR(voodoo_config, screen, _screen)
+
+#define MDRV_3DFX_VOODOO_1_ADD(_tag, _clock, _fbmem, _screen) \
+	MDRV_3DFX_VOODOO_ADD(_tag, VOODOO_1, _clock, _fbmem, _screen)
+
+#define MDRV_3DFX_VOODOO_2_ADD(_tag, _clock, _fbmem, _screen) \
+	MDRV_3DFX_VOODOO_ADD(_tag, VOODOO_2, _clock, _fbmem, _screen)
+
+#define MDRV_3DFX_VOODOO_BANSHEE_ADD(_tag, _clock, _fbmem, _screen) \
+	MDRV_3DFX_VOODOO_ADD(_tag, VOODOO_BANSHEE, _clock, _fbmem, _screen)
+
+#define MDRV_3DFX_VOODOO_3_ADD(_tag, _clock, _fbmem, _screen) \
+	MDRV_3DFX_VOODOO_ADD(_tag, VOODOO_3, _clock, _fbmem, _screen)
+
+#define MDRV_3DFX_VOODOO_TMU_MEMORY(_tmu, _tmumem) \
+	MDRV_DEVICE_CONFIG_DATA32(voodoo_config, tmumem##_tmu, _tmumem)
+
+#define MDRV_3DFX_VOODOO_VBLANK(_vblank) \
+	MDRV_DEVICE_CONFIG_DATAPTR(voodoo_config, vblank, _vblank)
+
+#define MDRV_3DFX_VOODOO_STALL(_stall) \
+	MDRV_DEVICE_CONFIG_DATAPTR(voodoo_config, stall, _stall)
+
+#define MDRV_3DFX_VOODOO_MODIFY(_tag) \
+	MDRV_DEVICE_MODIFY(_tag, VOODOO_GRAPHICS)
+
+#define MDRV_3DFX_VOODOO_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, VOODOO_GRAPHICS)
+
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+int voodoo_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
+int voodoo_get_type(const device_config *device);
+int voodoo_is_stalled(const device_config *device);
+void voodoo_set_init_enable(const device_config *device, UINT32 newval);
+
+READ32_DEVICE_HANDLER( voodoo_r );
+WRITE32_DEVICE_HANDLER( voodoo_w );
+
+READ32_DEVICE_HANDLER( banshee_r );
+WRITE32_DEVICE_HANDLER( banshee_w );
+READ32_DEVICE_HANDLER( banshee_fb_r );
+WRITE32_DEVICE_HANDLER( banshee_fb_w );
+READ32_DEVICE_HANDLER( banshee_io_r );
+WRITE32_DEVICE_HANDLER( banshee_io_w );
+READ32_DEVICE_HANDLER( banshee_rom_r );
+
+
+/* ----- device interface ----- */
+
+/* device get info callback */
+#define VOODOO_GRAPHICS DEVICE_GET_INFO_NAME(voodoo)
+DEVICE_GET_INFO( voodoo );

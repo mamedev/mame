@@ -31,7 +31,7 @@ struct _ide_config
 
 
 /***************************************************************************
-    TIMER DEVICE CONFIGURATION MACROS
+    DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
 #define MDRV_IDE_CONTROLLER_ADD(_tag, _disknum, _callback) \
@@ -68,7 +68,7 @@ READ16_DEVICE_HANDLER( ide_controller16_r );
 WRITE16_DEVICE_HANDLER( ide_controller16_w );
 
 
-/* ----- timer device interface ----- */
+/* ----- device interface ----- */
 
 /* device get info callback */
 #define IDE_CONTROLLER DEVICE_GET_INFO_NAME(ide_controller)

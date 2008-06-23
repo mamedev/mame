@@ -521,25 +521,24 @@ READ32_HANDLER(K001604_reg_r)
 
 
 
-static void voodoo_vblank_0(running_machine *machine, int param)
+static void voodoo_vblank_0(const device_config *device, int param)
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static VIDEO_START( nwktr )
 {
-	voodoo_start(0, machine->primary_screen, VOODOO_1, 2, 2, 2);
-	voodoo_set_vblank_callback(0, voodoo_vblank_0);
-
 	K001604_vh_start(machine, 0);
 }
 
 
 static VIDEO_UPDATE( nwktr )
 {
+	const device_config *voodoo = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo");
+
 	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
 
-	voodoo_update(0, bitmap, cliprect);
+	voodoo_update(voodoo, bitmap, cliprect);
 
 	K001604_tile_update(screen->machine, 0);
 	K001604_draw_front_layer(0, bitmap, cliprect);
@@ -817,7 +816,7 @@ static ADDRESS_MAP_START( sharc_map, ADDRESS_SPACE_DATA, 32 )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram_r, dsp_dataram_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
-	AM_RANGE(0x2400000, 0x27fffff) AM_READWRITE(nwk_voodoo_0_r, nwk_voodoo_0_w)
+	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE(VOODOO_GRAPHICS, "voodoo", nwk_voodoo_0_r, nwk_voodoo_0_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
 	AM_RANGE(0x3500000, 0x35000ff) AM_READWRITE(K033906_0_r, K033906_0_w)
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK(5)
@@ -922,6 +921,11 @@ static MACHINE_DRIVER_START( nwktr )
 	MDRV_MACHINE_START(nwktr)
 	MDRV_MACHINE_RESET(nwktr)
 	MDRV_NVRAM_HANDLER( timekeeper_0 )
+
+	MDRV_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, 2, "main")
+	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 2)
+	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 2)
+	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

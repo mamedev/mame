@@ -175,8 +175,6 @@ bits(7:4) and bit(24)), X, and Y:
  *
  *************************************/
 
-static voodoo_state *voodoo[MAX_VOODOO];
-
 /* fast dither lookup */
 static UINT8 dither4_lookup[256*16*2];
 static UINT8 dither2_lookup[256*16*2];
@@ -194,25 +192,16 @@ UINT32 voodoo_reciplog[(2 << RECIPLOG_LOOKUP_BITS) + 2];
 
 static void init_fbi(voodoo_state *v, fbi_state *f, void *memory, int fbmem);
 static void init_tmu_shared(tmu_shared_state *s);
-static void init_tmu(voodoo_state *v, tmu_state *t, int type, voodoo_reg *reg, void *memory, int tmem);
+static void init_tmu(voodoo_state *v, tmu_state *t, voodoo_reg *reg, void *memory, int tmem);
 static void soft_reset(voodoo_state *v);
-static void check_stalled_cpu(running_machine *machine, voodoo_state *v, attotime current_time);
+static void check_stalled_cpu(voodoo_state *v, attotime current_time);
 static void flush_fifos(voodoo_state *v, attotime current_time);
 static TIMER_CALLBACK( stall_cpu_callback );
-static void stall_cpu(running_machine *machine, voodoo_state *v, int state, attotime current_time);
+static void stall_cpu(voodoo_state *v, int state, attotime current_time);
 static TIMER_CALLBACK( vblank_callback );
 static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data);
 static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask, int forcefront);
 static INT32 texture_w(voodoo_state *v, offs_t offset, UINT32 data);
-static void voodoo_w(running_machine *machine, voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask);
-static UINT32 voodoo_r(voodoo_state *v, offs_t offset);
-static void banshee_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask);
-static UINT32 banshee_r(voodoo_state *v, offs_t offset, UINT32 mem_mask);
-static void banshee_fb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask);
-static UINT32 banshee_fb_r(voodoo_state *v, offs_t offset, UINT32 mem_mask);
-static void banshee_io_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask);
-static UINT32 banshee_io_r(voodoo_state *v, offs_t offset, UINT32 mem_mask);
-static UINT32 banshee_rom_r(voodoo_state *v, offs_t offset, UINT32 mem_mask);
 
 /* command handlers */
 static INT32 fastfill(voodoo_state *v);
@@ -272,188 +261,22 @@ static const raster_info predef_raster_table[] =
 
 
 
-/*************************************
- *
- *  Main create routine
- *
- *************************************/
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
 
-void voodoo_start(int which, const device_config *screen, int type, int fbmem_in_mb, int tmem0_in_mb, int tmem1_in_mb)
+/*-------------------------------------------------
+    get_safe_token - makes sure that the passed
+    in device is, in fact, an IDE controller
+-------------------------------------------------*/
+
+INLINE voodoo_state *get_safe_token(const device_config *device)
 {
-	const raster_info *info;
-	void *fbmem, *tmumem[2];
-	voodoo_state *v;
-	int val;
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == VOODOO_GRAPHICS);
 
-	/* validate */
-	assert((which >= 0) && (which < MAX_VOODOO));
-	assert(screen != NULL);
-	assert((type >= 0) && (type < MAX_VOODOO_TYPES));
-	assert(fbmem_in_mb >= 0);
-	assert(tmem0_in_mb >= 0);
-	assert(tmem1_in_mb >= 0);
-
-	/* allocate memory */
-	v = auto_malloc(sizeof(*v));
-	memset(v, 0, sizeof(*v));
-	voodoo[which] = v;
-
-	/* create a multiprocessor work queue */
-	v->poly = poly_alloc(64, sizeof(poly_extra_data), 0);
-	v->thread_stats = auto_malloc(sizeof(v->thread_stats[0]) * WORK_MAX_THREADS);
-
-	/* create a table of precomputed 1/n and log2(n) values */
-	/* n ranges from 1.0000 to 2.0000 */
-	for (val = 0; val <= (1 << RECIPLOG_LOOKUP_BITS); val++)
-	{
-		UINT32 value = (1 << RECIPLOG_LOOKUP_BITS) + val;
-		voodoo_reciplog[val*2 + 0] = (1 << (RECIPLOG_LOOKUP_PREC + RECIPLOG_LOOKUP_BITS)) / value;
-		voodoo_reciplog[val*2 + 1] = (UINT32)(LOGB2((double)value / (double)(1 << RECIPLOG_LOOKUP_BITS)) * (double)(1 << RECIPLOG_LOOKUP_PREC));
-	}
-
-	/* create dithering tables */
-	for (val = 0; val < 256*16*2; val++)
-	{
-		int g = (val >> 0) & 1;
-		int x = (val >> 1) & 3;
-		int color = (val >> 3) & 0xff;
-		int y = (val >> 11) & 3;
-
-		if (!g)
-		{
-			dither4_lookup[val] = DITHER_RB(color, dither_matrix_4x4[y * 4 + x]) >> 3;
-			dither2_lookup[val] = DITHER_RB(color, dither_matrix_2x2[y * 4 + x]) >> 3;
-		}
-		else
-		{
-			dither4_lookup[val] = DITHER_G(color, dither_matrix_4x4[y * 4 + x]) >> 2;
-			dither2_lookup[val] = DITHER_G(color, dither_matrix_2x2[y * 4 + x]) >> 2;
-		}
-	}
-
-	/* configure type-specific values */
-	switch (type)
-	{
-		case VOODOO_1:
-			v->freq = 50000000;
-			v->regaccess = voodoo_register_access;
-			v->regnames = voodoo_reg_name;
-			v->alt_regmap = 0;
-			v->fbi.lfb_stride = 10;
-			break;
-
-		case VOODOO_2:
-			v->freq = 90000000;
-			v->regaccess = voodoo2_register_access;
-			v->regnames = voodoo_reg_name;
-			v->alt_regmap = 0;
-			v->fbi.lfb_stride = 10;
-			break;
-
-		case VOODOO_BANSHEE:
-			v->freq = 90000000;
-			v->regaccess = banshee_register_access;
-			v->regnames = banshee_reg_name;
-			v->alt_regmap = 1;
-			v->fbi.lfb_stride = 11;
-			break;
-
-		case VOODOO_3:
-			v->freq = 132000000;
-			v->regaccess = banshee_register_access;
-			v->regnames = banshee_reg_name;
-			v->alt_regmap = 1;
-			v->fbi.lfb_stride = 11;
-			break;
-
-		default:
-			fatalerror("Unsupported voodoo card in voodoo_start!");
-			break;
-	}
-
-	/* set the type, and initialize the chip mask */
-	v->index = which;
-	v->screen = screen;
-	v->type = type;
-	v->chipmask = 0x01;
-	v->attoseconds_per_cycle = ATTOSECONDS_PER_SECOND / v->freq;
-	v->trigger = 51324 + which;
-
-	/* build the rasterizer table */
-	for (info = predef_raster_table; info->callback; info++)
-		add_rasterizer(v, info);
-
-	/* set up the PCI FIFO */
-	v->pci.fifo.base = v->pci.fifo_mem;
-	v->pci.fifo.size = 64*2;
-	v->pci.fifo.in = v->pci.fifo.out = 0;
-	v->pci.stall_state = NOT_STALLED;
-	v->pci.continue_timer = timer_alloc(stall_cpu_callback, v);
-
-	/* allocate memory */
-	if (type <= VOODOO_2)
-	{
-		/* separate FB/TMU memory */
-		fbmem = auto_malloc(fbmem_in_mb << 20);
-		tmumem[0] = auto_malloc(tmem0_in_mb << 20);
-		tmumem[1] = tmem1_in_mb ? auto_malloc(tmem1_in_mb << 20) : NULL;
-	}
-	else
-	{
-		/* shared memory */
-		tmumem[0] = tmumem[1] = fbmem = auto_malloc(fbmem_in_mb << 20);
-	}
-
-	/* set up frame buffer */
-	init_fbi(v, &v->fbi, fbmem, fbmem_in_mb << 20);
-
-	/* build shared TMU tables */
-	init_tmu_shared(&v->tmushare);
-
-	/* set up the TMUs */
-	init_tmu(v, &v->tmu[0], type, &v->reg[0x100], tmumem[0], tmem0_in_mb << 20);
-	v->chipmask |= 0x02;
-	if (tmem1_in_mb)
-	{
-		init_tmu(v, &v->tmu[1], type, &v->reg[0x200], tmumem[1], tmem1_in_mb << 20);
-		v->chipmask |= 0x04;
-	}
-
-	/* initialize some registers */
-	memset(v->reg, 0, sizeof(v->reg));
-	v->pci.init_enable = 0;
-	v->reg[fbiInit0].u = (1 << 4) | (0x10 << 6);
-	v->reg[fbiInit1].u = (1 << 1) | (1 << 8) | (1 << 12) | (2 << 20);
-	v->reg[fbiInit2].u = (1 << 6) | (0x100 << 23);
-	v->reg[fbiInit3].u = (2 << 13) | (0xf << 17);
-	v->reg[fbiInit4].u = (1 << 0);
-
-	/* initialize banshee registers */
-	memset(v->banshee.io, 0, sizeof(v->banshee.io));
-	v->banshee.io[io_pciInit0] = 0x01800040;
-	v->banshee.io[io_sipMonitor] = 0x40000000;
-	v->banshee.io[io_lfbMemoryConfig] = 0x000a2200;
-	v->banshee.io[io_dramInit0] = 0x00579d29;
-	v->banshee.io[io_dramInit1] = 0x00f02200;
-	v->banshee.io[io_tmuGbeInit] = 0x00000bfb;
-
-	/* do a soft reset to reset everything else */
-	soft_reset(v);
-}
-
-
-
-/*************************************
- *
- *  Video exit
- *
- *************************************/
-
-void voodoo_exit(int which)
-{
-	/* release the work queue, ensuring all work is finished */
-	if (voodoo[which] != NULL && voodoo[which]->poly != NULL)
-		poly_free(voodoo[which]->poly);
+	return (voodoo_state *)device->token;
 }
 
 
@@ -464,9 +287,9 @@ void voodoo_exit(int which)
  *
  *************************************/
 
-int voodoo_update(int which, bitmap_t *bitmap, const rectangle *cliprect)
+int voodoo_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	voodoo_state *v = voodoo[which];
+	voodoo_state *v = get_safe_token(device);
 	int changed = v->fbi.video_changed;
 	int drawbuf = v->fbi.frontbuf;
 	int statskey;
@@ -600,178 +423,26 @@ int voodoo_update(int which, bitmap_t *bitmap, const rectangle *cliprect)
  *
  *************************************/
 
-void voodoo_reset(int which)
+int voodoo_get_type(const device_config *device)
 {
-	soft_reset(voodoo[which]);
+	voodoo_state *v = get_safe_token(device);
+	return v->type;
 }
 
 
-int voodoo_get_type(int which)
+int voodoo_is_stalled(const device_config *device)
 {
-	return voodoo[which]->type;
+	voodoo_state *v = get_safe_token(device);
+	return (v->pci.stall_state != NOT_STALLED);
 }
 
 
-int voodoo_is_stalled(int which)
+void voodoo_set_init_enable(const device_config *device, UINT32 newval)
 {
-	return (voodoo[which]->pci.stall_state != NOT_STALLED);
-}
-
-
-void voodoo_set_init_enable(int which, UINT32 newval)
-{
-	voodoo[which]->pci.init_enable = newval;
+	voodoo_state *v = get_safe_token(device);
+	v->pci.init_enable = newval;
 	if (LOG_REGISTERS)
-		logerror("VOODOO.%d.REG:initEnable write = %08X\n", which, newval);
-}
-
-
-void voodoo_set_vblank_callback(int which, void (*vblank)(running_machine *, int))
-{
-	voodoo[which]->fbi.vblank_client = vblank;
-}
-
-
-void voodoo_set_stall_callback(int which, void (*stall)(running_machine *, int))
-{
-	voodoo[which]->pci.stall_callback = stall;
-}
-
-
-
-/*************************************
- *
- *  Specific write handlers
- *
- *************************************/
-
-WRITE32_HANDLER( voodoo_0_w )
-{
-	voodoo_w(machine, voodoo[0], offset, data, mem_mask);
-}
-
-
-WRITE32_HANDLER( voodoo_1_w )
-{
-	voodoo_w(machine, voodoo[1], offset, data, mem_mask);
-}
-
-
-
-/*************************************
- *
- *  Specific read handlers
- *
- *************************************/
-
-READ32_HANDLER( voodoo_0_r )
-{
-	return voodoo_r(voodoo[0], offset);
-}
-
-
-READ32_HANDLER( voodoo_1_r )
-{
-	return voodoo_r(voodoo[1], offset);
-}
-
-
-
-/*************************************
- *
- *  Specific Banshee write handlers
- *
- *************************************/
-
-WRITE32_HANDLER( banshee_0_w )
-{
-	banshee_w(voodoo[0], offset, data, mem_mask);
-}
-
-
-WRITE32_HANDLER( banshee_fb_0_w )
-{
-	banshee_fb_w(voodoo[0], offset, data, mem_mask);
-}
-
-
-WRITE32_HANDLER( banshee_io_0_w )
-{
-	banshee_io_w(voodoo[0], offset, data, mem_mask);
-}
-
-
-WRITE32_HANDLER( banshee_1_w )
-{
-	banshee_w(voodoo[1], offset, data, mem_mask);
-}
-
-
-WRITE32_HANDLER( banshee_fb_1_w )
-{
-	banshee_fb_w(voodoo[1], offset, data, mem_mask);
-}
-
-
-WRITE32_HANDLER( banshee_io_1_w )
-{
-	banshee_io_w(voodoo[1], offset, data, mem_mask);
-}
-
-
-
-
-/*************************************
- *
- *  Specific Banshee read handlers
- *
- *************************************/
-
-READ32_HANDLER( banshee_0_r )
-{
-	return banshee_r(voodoo[0], offset, mem_mask);
-}
-
-
-READ32_HANDLER( banshee_fb_0_r )
-{
-	return banshee_fb_r(voodoo[0], offset, mem_mask);
-}
-
-
-READ32_HANDLER( banshee_io_0_r )
-{
-	return banshee_io_r(voodoo[0], offset, mem_mask);
-}
-
-
-READ32_HANDLER( banshee_rom_0_r )
-{
-	return banshee_rom_r(voodoo[0], offset, mem_mask);
-}
-
-
-READ32_HANDLER( banshee_1_r )
-{
-	return banshee_r(voodoo[1], offset, mem_mask);
-}
-
-
-READ32_HANDLER( banshee_fb_1_r )
-{
-	return banshee_fb_r(voodoo[1], offset, mem_mask);
-}
-
-
-READ32_HANDLER( banshee_io_1_r )
-{
-	return banshee_io_r(voodoo[1], offset, mem_mask);
-}
-
-
-READ32_HANDLER( banshee_rom_1_r )
-{
-	return banshee_rom_r(voodoo[1], offset, mem_mask);
+		logerror("VOODOO.%d.REG:initEnable write = %08X\n", v->index, newval);
 }
 
 
@@ -868,14 +539,14 @@ static void init_tmu_shared(tmu_shared_state *s)
 }
 
 
-static void init_tmu(voodoo_state *v, tmu_state *t, int type, voodoo_reg *reg, void *memory, int tmem)
+static void init_tmu(voodoo_state *v, tmu_state *t, voodoo_reg *reg, void *memory, int tmem)
 {
 	/* allocate texture RAM */
 	t->ram = memory;
 	t->mask = tmem - 1;
 	t->reg = reg;
 	t->regdirty = TRUE;
-	t->bilinear_mask = (type >= VOODOO_2) ? 0xff : 0xf0;
+	t->bilinear_mask = (v->type >= VOODOO_2) ? 0xff : 0xf0;
 
 	/* mark the NCC tables dirty and configure their registers */
 	t->ncc[0].dirty = t->ncc[1].dirty = TRUE;
@@ -889,7 +560,7 @@ static void init_tmu(voodoo_state *v, tmu_state *t, int type, voodoo_reg *reg, v
 	t->texel[3] = v->tmushare.int8;
 	t->texel[4] = v->tmushare.ai44;
 	t->texel[5] = t->palette;
-	t->texel[6] = (type >= VOODOO_2) ? t->palettea : NULL;
+	t->texel[6] = (v->type >= VOODOO_2) ? t->palettea : NULL;
 	t->texel[7] = NULL;
 	t->texel[8] = v->tmushare.rgb332;
 	t->texel[9] = t->ncc[0].texel;
@@ -903,11 +574,11 @@ static void init_tmu(voodoo_state *v, tmu_state *t, int type, voodoo_reg *reg, v
 
 	/* attach the palette to NCC table 0 */
 	t->ncc[0].palette = t->palette;
-	if (type >= VOODOO_2)
+	if (v->type >= VOODOO_2)
 		t->ncc[0].palettea = t->palettea;
 
 	/* set up texture address calculations */
-	if (type <= VOODOO_2)
+	if (v->type <= VOODOO_2)
 	{
 		t->texaddr_mask = 0x0fffff;
 		t->texaddr_shift = 3;
@@ -1027,7 +698,7 @@ static void swap_buffers(voodoo_state *v)
 
 	/* we may be able to unstall now */
 	if (v->pci.stall_state != NOT_STALLED)
-		check_stalled_cpu(v->screen->machine, v, timer_get_time());
+		check_stalled_cpu(v, timer_get_time());
 
 	/* periodically log rasterizer info */
 	v->stats.swaps++;
@@ -1108,8 +779,8 @@ static TIMER_CALLBACK( vblank_off_callback )
 
 	/* set internal state and call the client */
 	v->fbi.vblank = FALSE;
-	if (v->fbi.vblank_client)
-		(*v->fbi.vblank_client)(machine, FALSE);
+	if (v->fbi.vblank_client != NULL)
+		(*v->fbi.vblank_client)(v->device, FALSE);
 
 	/* go to the end of the next frame */
 	adjust_vblank_timer(v);
@@ -1148,8 +819,8 @@ static TIMER_CALLBACK( vblank_callback )
 
 	/* set internal state and call the client */
 	v->fbi.vblank = TRUE;
-	if (v->fbi.vblank_client)
-		(*v->fbi.vblank_client)(machine, TRUE);
+	if (v->fbi.vblank_client != NULL)
+		(*v->fbi.vblank_client)(v->device, TRUE);
 }
 
 
@@ -2149,11 +1820,11 @@ static void cmdfifo_w(voodoo_state *v, cmdfifo_info *f, offs_t offset, UINT32 da
 
 static TIMER_CALLBACK( stall_cpu_callback )
 {
-	check_stalled_cpu(machine, ptr, timer_get_time());
+	check_stalled_cpu(ptr, timer_get_time());
 }
 
 
-static void check_stalled_cpu(running_machine *machine, voodoo_state *v, attotime current_time)
+static void check_stalled_cpu(voodoo_state *v, attotime current_time)
 {
 	int resume = FALSE;
 
@@ -2194,9 +1865,9 @@ static void check_stalled_cpu(running_machine *machine, voodoo_state *v, attotim
 
 		/* either call the callback, or trigger the trigger */
 		if (v->pci.stall_callback)
-			(*v->pci.stall_callback)(machine, FALSE);
+			(*v->pci.stall_callback)(v->device, FALSE);
 		else
-			cpu_trigger(machine, v->trigger);
+			cpu_trigger(v->device->machine, v->trigger);
 	}
 
 	/* if not, set a timer for the next one */
@@ -2207,7 +1878,7 @@ static void check_stalled_cpu(running_machine *machine, voodoo_state *v, attotim
 }
 
 
-static void stall_cpu(running_machine *machine, voodoo_state *v, int state, attotime current_time)
+static void stall_cpu(voodoo_state *v, int state, attotime current_time)
 {
 	/* sanity check */
 	if (!v->pci.op_pending) fatalerror("FIFOs not empty, no op pending!");
@@ -2218,7 +1889,7 @@ static void stall_cpu(running_machine *machine, voodoo_state *v, int state, atto
 
 	/* either call the callback, or spin the CPU */
 	if (v->pci.stall_callback)
-		(*v->pci.stall_callback)(machine, TRUE);
+		(*v->pci.stall_callback)(v->device, TRUE);
 	else
 		cpu_spinuntil_trigger(v->trigger);
 
@@ -3583,8 +3254,9 @@ static void flush_fifos(voodoo_state *v, attotime current_time)
  *
  *************************************/
 
-static void voodoo_w(running_machine *machine, voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
+WRITE32_DEVICE_HANDLER( voodoo_w )
 {
+	voodoo_state *v = get_safe_token(device);
 	int stall = FALSE;
 
 	profiler_mark(PROFILER_USER1);
@@ -3728,7 +3400,7 @@ static void voodoo_w(running_machine *machine, voodoo_state *v, offs_t offset, U
 			fifo_items(&v->fbi.fifo) >= 2 * 32 * FBIINIT0_MEMORY_FIFO_HWM(v->reg[fbiInit0].u))
 		{
 			if (LOG_FIFO) logerror("VOODOO.%d.FIFO:voodoo_w hit memory FIFO HWM -- stalling\n", v->index);
-			stall_cpu(machine, v, STALLED_UNTIL_FIFO_LWM, timer_get_time());
+			stall_cpu(v, STALLED_UNTIL_FIFO_LWM, timer_get_time());
 		}
 	}
 
@@ -3737,14 +3409,14 @@ static void voodoo_w(running_machine *machine, voodoo_state *v, offs_t offset, U
 		fifo_space(&v->pci.fifo) <= 2 * FBIINIT0_PCI_FIFO_LWM(v->reg[fbiInit0].u))
 	{
 		if (LOG_FIFO) logerror("VOODOO.%d.FIFO:voodoo_w hit PCI FIFO free LWM -- stalling\n", v->index);
-		stall_cpu(machine, v, STALLED_UNTIL_FIFO_LWM, timer_get_time());
+		stall_cpu(v, STALLED_UNTIL_FIFO_LWM, timer_get_time());
 	}
 
 	/* if we weren't ready, and this is a non-FIFO access, stall until the FIFOs are clear */
 	if (stall)
 	{
 		if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:voodoo_w wrote non-FIFO register -- stalling until clear\n", v->index);
-		stall_cpu(machine, v, STALLED_UNTIL_FIFO_EMPTY, timer_get_time());
+		stall_cpu(v, STALLED_UNTIL_FIFO_EMPTY, timer_get_time());
 	}
 
 	profiler_mark(PROFILER_END);
@@ -4016,8 +3688,10 @@ static UINT32 lfb_r(voodoo_state *v, offs_t offset, int forcefront)
  *
  *************************************/
 
-static UINT32 voodoo_r(voodoo_state *v, offs_t offset)
+READ32_DEVICE_HANDLER( voodoo_r )
 {
+	voodoo_state *v = get_safe_token(device);
+
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (v->pci.op_pending)
 		flush_fifos(v, timer_get_time());
@@ -4040,8 +3714,9 @@ static UINT32 voodoo_r(voodoo_state *v, offs_t offset)
  *
  *************************************/
 
-static UINT32 banshee_agp_r(voodoo_state *v, offs_t offset, UINT32 mem_mask)
+static READ32_DEVICE_HANDLER( banshee_agp_r )
 {
+	voodoo_state *v = get_safe_token(device);
 	UINT32 result;
 
 	offset &= 0x1ff/4;
@@ -4100,8 +3775,9 @@ static UINT32 banshee_agp_r(voodoo_state *v, offs_t offset, UINT32 mem_mask)
 }
 
 
-static UINT32 banshee_r(voodoo_state *v, offs_t offset, UINT32 mem_mask)
+READ32_DEVICE_HANDLER( banshee_r )
 {
+	voodoo_state *v = get_safe_token(device);
 	UINT32 result = 0xffffffff;
 
 	/* if we have something pending, flush the FIFOs up to the current time */
@@ -4109,9 +3785,9 @@ static UINT32 banshee_r(voodoo_state *v, offs_t offset, UINT32 mem_mask)
 		flush_fifos(v, timer_get_time());
 
 	if (offset < 0x80000/4)
-		result = banshee_io_r(v, offset, mem_mask);
+		result = banshee_io_r(device, offset, mem_mask);
 	else if (offset < 0x100000/4)
-		result = banshee_agp_r(v, offset, mem_mask);
+		result = banshee_agp_r(device, offset, mem_mask);
 	else if (offset < 0x200000/4)
 		logerror("%08X:banshee_r(2D:%X)\n", activecpu_get_pc(), (offset*4) & 0xfffff);
 	else if (offset < 0x600000/4)
@@ -4133,8 +3809,9 @@ static UINT32 banshee_r(voodoo_state *v, offs_t offset, UINT32 mem_mask)
 }
 
 
-static UINT32 banshee_fb_r(voodoo_state *v, offs_t offset, UINT32 mem_mask)
+READ32_DEVICE_HANDLER( banshee_fb_r )
 {
+	voodoo_state *v = get_safe_token(device);
 	UINT32 result = 0xffffffff;
 
 	/* if we have something pending, flush the FIFOs up to the current time */
@@ -4153,8 +3830,9 @@ static UINT32 banshee_fb_r(voodoo_state *v, offs_t offset, UINT32 mem_mask)
 }
 
 
-static UINT8 banshee_vga_r(voodoo_state *v, offs_t offset)
+static READ8_DEVICE_HANDLER( banshee_vga_r )
 {
+	voodoo_state *v = get_safe_token(device);
 	UINT8 result = 0xff;
 
 	offset &= 0x1f;
@@ -4248,8 +3926,9 @@ static UINT8 banshee_vga_r(voodoo_state *v, offs_t offset)
 }
 
 
-static UINT32 banshee_io_r(voodoo_state *v, offs_t offset, UINT32 mem_mask)
+READ32_DEVICE_HANDLER( banshee_io_r )
 {
+	voodoo_state *v = get_safe_token(device);
 	UINT32 result;
 
 	offset &= 0xff/4;
@@ -4272,13 +3951,13 @@ static UINT32 banshee_io_r(voodoo_state *v, offs_t offset, UINT32 mem_mask)
 		case io_vgad0:	case io_vgad4:	case io_vgad8:	case io_vgadc:
 			result = 0;
 			if (ACCESSING_BITS_0_7)
-				result |= banshee_vga_r(v, offset*4+0) << 0;
+				result |= banshee_vga_r(device, offset*4+0) << 0;
 			if (ACCESSING_BITS_8_15)
-				result |= banshee_vga_r(v, offset*4+1) << 8;
+				result |= banshee_vga_r(device, offset*4+1) << 8;
 			if (ACCESSING_BITS_16_23)
-				result |= banshee_vga_r(v, offset*4+2) << 16;
+				result |= banshee_vga_r(device, offset*4+2) << 16;
 			if (ACCESSING_BITS_24_31)
-				result |= banshee_vga_r(v, offset*4+3) << 24;
+				result |= banshee_vga_r(device, offset*4+3) << 24;
 			break;
 
 		default:
@@ -4292,7 +3971,7 @@ static UINT32 banshee_io_r(voodoo_state *v, offs_t offset, UINT32 mem_mask)
 }
 
 
-static UINT32 banshee_rom_r(voodoo_state *v, offs_t offset, UINT32 mem_mask)
+READ32_DEVICE_HANDLER( banshee_rom_r )
 {
 	logerror("%08X:banshee_rom_r(%X)\n", activecpu_get_pc(), offset*4);
 	return 0xffffffff;
@@ -4300,8 +3979,9 @@ static UINT32 banshee_rom_r(voodoo_state *v, offs_t offset, UINT32 mem_mask)
 
 
 
-static void banshee_agp_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
+static WRITE32_DEVICE_HANDLER( banshee_agp_w )
 {
+	voodoo_state *v = get_safe_token(device);
 	offset &= 0x1ff/4;
 
 	/* switch off the offset */
@@ -4391,16 +4071,18 @@ static void banshee_agp_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 me
 }
 
 
-static void banshee_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
+WRITE32_DEVICE_HANDLER( banshee_w )
 {
+	voodoo_state *v = get_safe_token(device);
+	
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (v->pci.op_pending)
 		flush_fifos(v, timer_get_time());
 
 	if (offset < 0x80000/4)
-		banshee_io_w(v, offset, data, mem_mask);
+		banshee_io_w(device, offset, data, mem_mask);
 	else if (offset < 0x100000/4)
-		banshee_agp_w(v, offset, data, mem_mask);
+		banshee_agp_w(device, offset, data, mem_mask);
 	else if (offset < 0x200000/4)
 		logerror("%08X:banshee_w(2D:%X) = %08X & %08X\n", activecpu_get_pc(), (offset*4) & 0xfffff, data, mem_mask);
 	else if (offset < 0x600000/4)
@@ -4421,8 +4103,9 @@ static void banshee_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_ma
 }
 
 
-static void banshee_fb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
+WRITE32_DEVICE_HANDLER( banshee_fb_w )
 {
+	voodoo_state *v = get_safe_token(device);
 	UINT32 addr = offset*4;
 
 	/* if we have something pending, flush the FIFOs up to the current time */
@@ -4447,8 +4130,9 @@ static void banshee_fb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem
 }
 
 
-static void banshee_vga_w(voodoo_state *v, offs_t offset, UINT8 data)
+static WRITE8_DEVICE_HANDLER( banshee_vga_w )
 {
+	voodoo_state *v = get_safe_token(device);
 	offset &= 0x1f;
 
 	/* switch off the offset */
@@ -4506,8 +4190,9 @@ static void banshee_vga_w(voodoo_state *v, offs_t offset, UINT8 data)
 }
 
 
-static void banshee_io_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
+WRITE32_DEVICE_HANDLER( banshee_io_w )
 {
+	voodoo_state *v = get_safe_token(device);
 	UINT32 old;
 
 	offset &= 0xff/4;
@@ -4567,13 +4252,13 @@ static void banshee_io_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem
 		case io_vgac0:	case io_vgac4:	case io_vgac8:	case io_vgacc:
 		case io_vgad0:	case io_vgad4:	case io_vgad8:	case io_vgadc:
 			if (ACCESSING_BITS_0_7)
-				banshee_vga_w(v, offset*4+0, data >> 0);
+				banshee_vga_w(device, offset*4+0, data >> 0);
 			if (ACCESSING_BITS_8_15)
-				banshee_vga_w(v, offset*4+1, data >> 8);
+				banshee_vga_w(device, offset*4+1, data >> 8);
 			if (ACCESSING_BITS_16_23)
-				banshee_vga_w(v, offset*4+2, data >> 16);
+				banshee_vga_w(device, offset*4+2, data >> 16);
 			if (ACCESSING_BITS_24_31)
-				banshee_vga_w(v, offset*4+3, data >> 24);
+				banshee_vga_w(device, offset*4+3, data >> 24);
 			break;
 
 		default:
@@ -4581,6 +4266,262 @@ static void banshee_io_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem
 			if (LOG_REGISTERS)
 				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", activecpu_get_pc(), banshee_io_reg_name[offset], data, mem_mask);
 			break;
+	}
+}
+
+
+
+/***************************************************************************
+    DEVICE INTERFACE
+***************************************************************************/
+
+/*-------------------------------------------------
+    device start callback
+-------------------------------------------------*/
+
+static DEVICE_START( voodoo )
+{
+	const voodoo_config *config = device->inline_config;
+	voodoo_state *v = get_safe_token(device);
+	const raster_info *info;
+	void *fbmem, *tmumem[2];
+	char unique_tag[50];
+	UINT32 tmumem0;
+	int val;
+
+	/* validate some basic stuff */
+	assert(device->static_config == NULL);
+	assert(device->inline_config != NULL);
+	assert(device->machine != NULL);
+	assert(device->machine->config != NULL);
+
+	/* validate configuration */
+	assert(config->screen != NULL);
+	assert(config->type >= VOODOO_1 && config->type < MAX_VOODOO_TYPES);
+	assert(config->fbmem > 0);
+	assert(config->type >= VOODOO_BANSHEE || config->tmumem0 > 0);
+	
+	/* store a pointer back to the device */
+	v->device = device;
+	
+	/* copy config data */
+	v->freq = config->clock;
+	v->fbi.vblank_client = config->vblank;
+	v->pci.stall_callback = config->stall;
+
+	/* create a multiprocessor work queue */
+	v->poly = poly_alloc(64, sizeof(poly_extra_data), 0);
+	v->thread_stats = auto_malloc(sizeof(v->thread_stats[0]) * WORK_MAX_THREADS);
+
+	/* create a table of precomputed 1/n and log2(n) values */
+	/* n ranges from 1.0000 to 2.0000 */
+	for (val = 0; val <= (1 << RECIPLOG_LOOKUP_BITS); val++)
+	{
+		UINT32 value = (1 << RECIPLOG_LOOKUP_BITS) + val;
+		voodoo_reciplog[val*2 + 0] = (1 << (RECIPLOG_LOOKUP_PREC + RECIPLOG_LOOKUP_BITS)) / value;
+		voodoo_reciplog[val*2 + 1] = (UINT32)(LOGB2((double)value / (double)(1 << RECIPLOG_LOOKUP_BITS)) * (double)(1 << RECIPLOG_LOOKUP_PREC));
+	}
+
+	/* create dithering tables */
+	for (val = 0; val < 256*16*2; val++)
+	{
+		int g = (val >> 0) & 1;
+		int x = (val >> 1) & 3;
+		int color = (val >> 3) & 0xff;
+		int y = (val >> 11) & 3;
+
+		if (!g)
+		{
+			dither4_lookup[val] = DITHER_RB(color, dither_matrix_4x4[y * 4 + x]) >> 3;
+			dither2_lookup[val] = DITHER_RB(color, dither_matrix_2x2[y * 4 + x]) >> 3;
+		}
+		else
+		{
+			dither4_lookup[val] = DITHER_G(color, dither_matrix_4x4[y * 4 + x]) >> 2;
+			dither2_lookup[val] = DITHER_G(color, dither_matrix_2x2[y * 4 + x]) >> 2;
+		}
+	}
+
+	/* configure type-specific values */
+	switch (config->type)
+	{
+		case VOODOO_1:
+			v->regaccess = voodoo_register_access;
+			v->regnames = voodoo_reg_name;
+			v->alt_regmap = 0;
+			v->fbi.lfb_stride = 10;
+			break;
+
+		case VOODOO_2:
+			v->regaccess = voodoo2_register_access;
+			v->regnames = voodoo_reg_name;
+			v->alt_regmap = 0;
+			v->fbi.lfb_stride = 10;
+			break;
+
+		case VOODOO_BANSHEE:
+			v->regaccess = banshee_register_access;
+			v->regnames = banshee_reg_name;
+			v->alt_regmap = 1;
+			v->fbi.lfb_stride = 11;
+			break;
+
+		case VOODOO_3:
+			v->regaccess = banshee_register_access;
+			v->regnames = banshee_reg_name;
+			v->alt_regmap = 1;
+			v->fbi.lfb_stride = 11;
+			break;
+
+		default:
+			fatalerror("Unsupported voodoo card in voodoo_start!");
+			break;
+	}
+
+	/* set the type, and initialize the chip mask */
+	v->index = device_list_index(device->machine->config->devicelist, device->type, device->tag);
+	v->screen = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, config->screen);
+	assert_always(v->screen != NULL, "Unable to find screen attached to voodoo");
+	v->type = config->type;
+	v->chipmask = 0x01;
+	v->attoseconds_per_cycle = ATTOSECONDS_PER_SECOND / v->freq;
+	v->trigger = 51324 + v->index;
+
+	/* build the rasterizer table */
+	for (info = predef_raster_table; info->callback; info++)
+		add_rasterizer(v, info);
+
+	/* set up the PCI FIFO */
+	v->pci.fifo.base = v->pci.fifo_mem;
+	v->pci.fifo.size = 64*2;
+	v->pci.fifo.in = v->pci.fifo.out = 0;
+	v->pci.stall_state = NOT_STALLED;
+	v->pci.continue_timer = timer_alloc(stall_cpu_callback, v);
+
+	/* allocate memory */
+	tmumem0 = config->tmumem0;
+	if (config->type <= VOODOO_2)
+	{
+		/* separate FB/TMU memory */
+		fbmem = auto_malloc(config->fbmem << 20);
+		tmumem[0] = auto_malloc(config->tmumem0 << 20);
+		tmumem[1] = (config->tmumem1 != 0) ? auto_malloc(config->tmumem1 << 20) : NULL;
+	}
+	else
+	{
+		/* shared memory */
+		tmumem[0] = tmumem[1] = fbmem = auto_malloc(config->fbmem << 20);
+		tmumem0 = config->fbmem;
+	}
+
+	/* set up frame buffer */
+	init_fbi(v, &v->fbi, fbmem, config->fbmem << 20);
+
+	/* build shared TMU tables */
+	init_tmu_shared(&v->tmushare);
+
+	/* set up the TMUs */
+	init_tmu(v, &v->tmu[0], &v->reg[0x100], tmumem[0], tmumem0 << 20);
+	v->chipmask |= 0x02;
+	if (config->tmumem1 != 0)
+	{
+		init_tmu(v, &v->tmu[1], &v->reg[0x200], tmumem[1], config->tmumem1 << 20);
+		v->chipmask |= 0x04;
+	}
+
+	/* initialize some registers */
+	memset(v->reg, 0, sizeof(v->reg));
+	v->pci.init_enable = 0;
+	v->reg[fbiInit0].u = (1 << 4) | (0x10 << 6);
+	v->reg[fbiInit1].u = (1 << 1) | (1 << 8) | (1 << 12) | (2 << 20);
+	v->reg[fbiInit2].u = (1 << 6) | (0x100 << 23);
+	v->reg[fbiInit3].u = (2 << 13) | (0xf << 17);
+	v->reg[fbiInit4].u = (1 << 0);
+
+	/* initialize banshee registers */
+	memset(v->banshee.io, 0, sizeof(v->banshee.io));
+	v->banshee.io[io_pciInit0] = 0x01800040;
+	v->banshee.io[io_sipMonitor] = 0x40000000;
+	v->banshee.io[io_lfbMemoryConfig] = 0x000a2200;
+	v->banshee.io[io_dramInit0] = 0x00579d29;
+	v->banshee.io[io_dramInit1] = 0x00f02200;
+	v->banshee.io[io_tmuGbeInit] = 0x00000bfb;
+
+	/* do a soft reset to reset everything else */
+	soft_reset(v);
+
+	/* create the name for save states */
+	assert(strlen(device->tag) < 30);
+	state_save_combine_module_and_tag(unique_tag, "voodoo", device->tag);
+
+	/* register states */
+//	state_save_register_item(unique_tag, 0, ide->adapter_control);
+}
+
+
+/*-------------------------------------------------
+    device exit callback
+-------------------------------------------------*/
+
+static DEVICE_STOP( voodoo )
+{
+	voodoo_state *v = get_safe_token(device);
+
+	/* release the work queue, ensuring all work is finished */
+	if (v->poly != NULL)
+		poly_free(v->poly);
+}
+
+
+/*-------------------------------------------------
+    device reset callback
+-------------------------------------------------*/
+
+static DEVICE_RESET( voodoo )
+{
+	voodoo_state *v = get_safe_token(device);
+	soft_reset(v);
+}
+
+
+/*-------------------------------------------------
+    device set info callback
+-------------------------------------------------*/
+
+static DEVICE_SET_INFO( voodoo )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+/*-------------------------------------------------
+    device get info callback
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( voodoo )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(voodoo_state);			break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(voodoo_config);		break;
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(voodoo); break;
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(voodoo); break;
+		case DEVINFO_FCT_STOP:					info->stop = DEVICE_STOP_NAME(voodoo); break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(voodoo);break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:					info->s = "3dfx Voodoo";				break;
+		case DEVINFO_STR_FAMILY:				info->s = "3dfx Voodoo Graphics";		break;
+		case DEVINFO_STR_VERSION:				info->s = "1.0";						break;
+		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;						break;
+		case DEVINFO_STR_CREDITS:				info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
 	}
 }
 

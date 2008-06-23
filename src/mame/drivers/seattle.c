@@ -430,6 +430,7 @@ static UINT32 *rombase;
 static struct galileo_data galileo;
 static struct widget_data widget;
 
+static const device_config *voodoo_device;
 static UINT8 voodoo_stalled;
 static UINT8 cpu_stalled_on_voodoo;
 static UINT32 cpu_stalled_offset;
@@ -469,7 +470,7 @@ static void update_vblank_irq(running_machine *machine);
 static void galileo_reset(void);
 static TIMER_CALLBACK( galileo_timer_callback );
 static void galileo_perform_dma(running_machine *machine, int which);
-static void voodoo_stall(running_machine *machine, int stall);
+static void voodoo_stall(const device_config *device, int stall);
 static void widget_reset(running_machine *machine);
 static void update_widget_irq(running_machine *machine);
 
@@ -481,37 +482,9 @@ static void update_widget_irq(running_machine *machine);
  *
  *************************************/
 
-static void seattle_exit(running_machine *machine)
-{
-	voodoo_exit(0);
-}
-
-
-static VIDEO_START( seattle )
-{
-	add_exit_callback(machine, seattle_exit);
-
-	voodoo_start(0, machine->primary_screen, VOODOO_1, 2, 4, 0);
-
-	voodoo_set_vblank_callback(0, vblank_assert);
-	voodoo_set_stall_callback(0, voodoo_stall);
-}
-
-
-static VIDEO_START( flagstaff )
-{
-	add_exit_callback(machine, seattle_exit);
-
-	voodoo_start(0, machine->primary_screen, VOODOO_1, 2, 4, 4);
-
-	voodoo_set_vblank_callback(0, vblank_assert);
-	voodoo_set_stall_callback(0, voodoo_stall);
-}
-
-
 static VIDEO_UPDATE( seattle )
 {
-	return voodoo_update(0, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return voodoo_update(voodoo_device, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 
@@ -522,8 +495,16 @@ static VIDEO_UPDATE( seattle )
  *
  *************************************/
 
-static MACHINE_RESET( seattle )
+static MACHINE_START( seattle )
 {
+	voodoo_device = device_list_find_by_tag(machine->config->devicelist, VOODOO_GRAPHICS, "voodoo");
+
+	/* allocate timers for the galileo */
+	galileo.timer[0].timer = timer_alloc(galileo_timer_callback, NULL);
+	galileo.timer[1].timer = timer_alloc(galileo_timer_callback, NULL);
+	galileo.timer[2].timer = timer_alloc(galileo_timer_callback, NULL);
+	galileo.timer[3].timer = timer_alloc(galileo_timer_callback, NULL);
+
 	/* set the fastest DRC options, but strict verification */
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
@@ -539,12 +520,11 @@ static MACHINE_RESET( seattle )
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
 	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
+}
 
-	/* allocate timers for the galileo */
-	galileo.timer[0].timer = timer_alloc(galileo_timer_callback, NULL);
-	galileo.timer[1].timer = timer_alloc(galileo_timer_callback, NULL);
-	galileo.timer[2].timer = timer_alloc(galileo_timer_callback, NULL);
-	galileo.timer[3].timer = timer_alloc(galileo_timer_callback, NULL);
+
+static MACHINE_RESET( seattle )
+{
 	galileo.dma_active = -1;
 
 	vblank_irq_num = 0;
@@ -565,8 +545,6 @@ static MACHINE_RESET( seattle )
 
 	/* reset the other devices */
 	galileo_reset();
-	devtag_reset(machine, IDE_CONTROLLER, "ide");
-	voodoo_reset(0);
 	if (board_config == SEATTLE_WIDGET_CONFIG)
 		widget_reset(machine);
 	if (board_config == FLAGSTAFF_CONFIG)
@@ -829,7 +807,7 @@ static void pci_3dfx_w(UINT8 reg, UINT8 type, UINT32 data)
 			break;
 
 		case 0x10:		/* initEnable register */
-			voodoo_set_init_enable(0, data);
+			voodoo_set_init_enable(voodoo_device, data);
 			break;
 	}
 	if (LOG_PCI)
@@ -1017,7 +995,7 @@ static void galileo_perform_dma(running_machine *machine, int which)
 				}
 
 				/* write the data and advance */
-				voodoo_0_w(machine, (dstaddr & 0xffffff) / 4, program_read_dword(srcaddr), 0xffffffff);
+				voodoo_w(voodoo_device, (dstaddr & 0xffffff) / 4, program_read_dword(srcaddr), 0xffffffff);
 				srcaddr += srcinc;
 				dstaddr += dstinc;
 				bytesleft -= 4;
@@ -1294,12 +1272,12 @@ static WRITE32_HANDLER( galileo_w )
  *
  *************************************/
 
-static WRITE32_HANDLER( seattle_voodoo_w )
+static WRITE32_DEVICE_HANDLER( seattle_voodoo_w )
 {
 	/* if we're not stalled, just write and get out */
 	if (!voodoo_stalled)
 	{
-		voodoo_0_w(machine, offset, data, mem_mask);
+		voodoo_w(device, offset, data, mem_mask);
 		return;
 	}
 
@@ -1319,7 +1297,7 @@ static WRITE32_HANDLER( seattle_voodoo_w )
 }
 
 
-static void voodoo_stall(running_machine *machine, int stall)
+static void voodoo_stall(const device_config *device, int stall)
 {
 	/* set the new state */
 	voodoo_stalled = stall;
@@ -1355,7 +1333,7 @@ static void voodoo_stall(running_machine *machine, int stall)
 
 				/* resume execution */
 				cpuintrf_push_context(0);
-				galileo_perform_dma(machine, which);
+				galileo_perform_dma(device->machine, which);
 				cpuintrf_pop_context();
 				break;
 			}
@@ -1365,12 +1343,12 @@ static void voodoo_stall(running_machine *machine, int stall)
 		{
 			/* if the CPU had a pending write, do it now */
 			if (cpu_stalled_on_voodoo)
-				voodoo_0_w(machine, cpu_stalled_offset, cpu_stalled_data, cpu_stalled_mem_mask);
+				voodoo_w(device, cpu_stalled_offset, cpu_stalled_data, cpu_stalled_mem_mask);
 			cpu_stalled_on_voodoo = FALSE;
 
 			/* resume CPU execution */
 			if (LOG_DMA) logerror("Resuming CPU on voodoo\n");
-			cpu_trigger(machine, 45678);
+			cpu_trigger(device->machine, 45678);
 		}
 	}
 }
@@ -1720,7 +1698,7 @@ PCI Mem  = 08000000-09FFFFFF
 static ADDRESS_MAP_START( seattle_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(&rambase)	// wg3dh only has 4MB; sfrush, blitz99 8MB
-	AM_RANGE(0x08000000, 0x08ffffff) AM_READWRITE(voodoo_0_r, seattle_voodoo_w)
+	AM_RANGE(0x08000000, 0x08ffffff) AM_DEVREADWRITE(VOODOO_GRAPHICS, "voodoo", voodoo_r, seattle_voodoo_w)
 	AM_RANGE(0x0a000000, 0x0a0003ff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_controller32_r, ide_controller32_w)
 	AM_RANGE(0x0a00040c, 0x0a00040f) AM_NOP						// IDE-related, but annoying
 	AM_RANGE(0x0a000f00, 0x0a000f07) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_bus_master32_r, ide_bus_master32_w)
@@ -2455,10 +2433,16 @@ static MACHINE_DRIVER_START( seattle_common )
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(seattle_map,0)
 
+	MDRV_MACHINE_START(seattle)
 	MDRV_MACHINE_RESET(seattle)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
+
+	MDRV_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, 2, "main")
+	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
+	MDRV_3DFX_VOODOO_VBLANK(vblank_assert)
+	MDRV_3DFX_VOODOO_STALL(voodoo_stall)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2467,7 +2451,6 @@ static MACHINE_DRIVER_START( seattle_common )
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
-	MDRV_VIDEO_START(seattle)
 	MDRV_VIDEO_UPDATE(seattle)
 
 	/* sound hardware */
@@ -2498,7 +2481,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( flagstaff )
 	MDRV_IMPORT_FROM(seattle_common)
 	MDRV_CPU_REPLACE("main", R5000LE, SYSTEM_CLOCK*4)
-	MDRV_VIDEO_START(flagstaff)
+
+	MDRV_3DFX_VOODOO_MODIFY("voodoo")
+	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 4)
+
 	MDRV_IMPORT_FROM(cage_seattle)
 MACHINE_DRIVER_END
 

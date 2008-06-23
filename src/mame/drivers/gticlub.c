@@ -71,27 +71,18 @@ static WRITE32_HANDLER( paletteram32_w )
 	palette_set_color_rgb(machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-static void voodoo_vblank_0(running_machine *machine, int param)
+static void voodoo_vblank_0(const device_config *device, int param)
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-static void voodoo_vblank_1(running_machine *machine, int param)
+static void voodoo_vblank_1(const device_config *device, int param)
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
+	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 static VIDEO_START( hangplt )
 {
-	const device_config *left_screen = device_list_find_by_tag(machine->config->devicelist, VIDEO_SCREEN, "left");
-	const device_config *right_screen = device_list_find_by_tag(machine->config->devicelist, VIDEO_SCREEN, "right");
-
-	voodoo_start(0, left_screen,  VOODOO_1, 2, 4, 4);
-	voodoo_start(1, right_screen, VOODOO_1, 2, 4, 4);
-
-	voodoo_set_vblank_callback(0, voodoo_vblank_0);
-	voodoo_set_vblank_callback(1, voodoo_vblank_1);
-
 	K001604_vh_start(machine, 0);
 	K001604_vh_start(machine, 1);
 }
@@ -99,26 +90,27 @@ static VIDEO_START( hangplt )
 
 static VIDEO_UPDATE( hangplt )
 {
-	const device_config *left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
-	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
-
 	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
 
-	if (screen == left_screen)
+	if (strcmp(screen->tag, "left") == 0)
 	{
+		const device_config *voodoo = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo0");
+
 		K001604_tile_update(screen->machine, 0);
 	//  K001604_draw_back_layer(bitmap, cliprect);
 
-		voodoo_update(0, bitmap, cliprect);
+		voodoo_update(voodoo, bitmap, cliprect);
 
 		K001604_draw_front_layer(0, bitmap, cliprect);
 	}
-	else if (screen == right_screen)
+	else if (strcmp(screen->tag, "right") == 0)
 	{
+		const device_config *voodoo = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo1");
+
 		K001604_tile_update(screen->machine, 1);
 	//  K001604_draw_back_layer(bitmap, cliprect);
 
-		voodoo_update(1, bitmap, cliprect);
+		voodoo_update(voodoo, bitmap, cliprect);
 
 		K001604_draw_front_layer(1, bitmap, cliprect);
 	}
@@ -487,9 +479,9 @@ static ADDRESS_MAP_START( hangplt_sharc0_map, ADDRESS_SPACE_DATA, 32 )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
-	AM_RANGE(0x2400000, 0x27fffff) AM_READWRITE(nwk_voodoo_0_r, voodoo_0_w)
+	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE(VOODOO_GRAPHICS, "voodoo0", nwk_voodoo_0_r, voodoo_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
-	AM_RANGE(0x3401000, 0x34fffff) AM_WRITE(nwk_fifo_0_w)
+	AM_RANGE(0x3401000, 0x34fffff) AM_DEVWRITE(VOODOO_GRAPHICS, "voodoo0", nwk_fifo_0_w)
 	AM_RANGE(0x3500000, 0x3507fff) AM_READWRITE(K033906_0_r, K033906_0_w)
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK(5)
 ADDRESS_MAP_END
@@ -498,9 +490,9 @@ static ADDRESS_MAP_START( hangplt_sharc1_map, ADDRESS_SPACE_DATA, 32 )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
-	AM_RANGE(0x2400000, 0x27fffff) AM_READWRITE(nwk_voodoo_1_r, voodoo_1_w)
+	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE(VOODOO_GRAPHICS, "voodoo1", nwk_voodoo_1_r, voodoo_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_1_comm_sharc_r, cgboard_1_comm_sharc_w)
-	AM_RANGE(0x3401000, 0x34fffff) AM_WRITE(nwk_fifo_1_w)
+	AM_RANGE(0x3401000, 0x34fffff) AM_DEVWRITE(VOODOO_GRAPHICS, "voodoo1", nwk_fifo_1_w)
 	AM_RANGE(0x3500000, 0x3507fff) AM_READWRITE(K033906_1_r, K033906_1_w)
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK(6)
 ADDRESS_MAP_END
@@ -778,6 +770,16 @@ static MACHINE_DRIVER_START( hangplt )
 	MDRV_NVRAM_HANDLER(gticlub)
 	MDRV_MACHINE_START(gticlub)
 	MDRV_MACHINE_RESET(hangplt)
+
+	MDRV_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "left")
+	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 2)
+	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 2)
+	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
+
+	MDRV_3DFX_VOODOO_1_ADD("voodoo1", STD_VOODOO_1_CLOCK, 2, "right")
+	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 2)
+	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 2)
+	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_1)
 
  	/* video hardware */
 	MDRV_PALETTE_LENGTH(65536)

@@ -579,64 +579,23 @@ static WRITE32_HANDLER(K037122_reg_w)
 	COMBINE_DATA( K037122_reg[chip] + offset );
 }
 
-static int voodoo_version = 0;
-
-static void voodoo_vblank_0(running_machine *machine, int param)
+static void voodoo_vblank_0(const device_config *device, int param)
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-static void voodoo_vblank_1(running_machine *machine, int param)
+static void voodoo_vblank_1(const device_config *device, int param)
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
-}
-
-static void hornet_exit(running_machine *machine)
-{
-	voodoo_exit(0);
-}
-
-static void hornet_2board_exit(running_machine *machine)
-{
-	voodoo_exit(0);
-	voodoo_exit(1);
+	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 static VIDEO_START( hornet )
 {
-	add_exit_callback(machine, hornet_exit);
-
-	if (voodoo_version == 0)
-		voodoo_start(0, machine->primary_screen, VOODOO_1, 2, 4, 0);
-	else
-		voodoo_start(0, machine->primary_screen, VOODOO_2, 2, 4, 0);
-
-	voodoo_set_vblank_callback(0, voodoo_vblank_0);
-
 	K037122_vh_start(machine, 0);
 }
 
 static VIDEO_START( hornet_2board )
 {
-	const device_config *left_screen = device_list_find_by_tag(machine->config->devicelist, VIDEO_SCREEN, "left");
-	const device_config *right_screen = device_list_find_by_tag(machine->config->devicelist, VIDEO_SCREEN, "right");
-
-	add_exit_callback(machine, hornet_2board_exit);
-
-	if (voodoo_version == 0)
-	{
-		voodoo_start(0, left_screen,  VOODOO_1, 2, 4, 0);
-		voodoo_start(1, right_screen, VOODOO_1, 2, 4, 0);
-	}
-	else
-	{
-		voodoo_start(0, left_screen,  VOODOO_2, 2, 4, 0);
-		voodoo_start(1, right_screen, VOODOO_2, 2, 4, 0);
-	}
-
-	voodoo_set_vblank_callback(0, voodoo_vblank_0);
-	voodoo_set_vblank_callback(1, voodoo_vblank_1);
-
 	K037122_vh_start(machine, 0);
 	K037122_vh_start(machine, 1);
 }
@@ -644,7 +603,9 @@ static VIDEO_START( hornet_2board )
 
 static VIDEO_UPDATE( hornet )
 {
-	voodoo_update(0, bitmap, cliprect);
+	const device_config *voodoo = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo0");
+
+	voodoo_update(voodoo, bitmap, cliprect);
 
 	K037122_tile_update(screen->machine, 0);
 	K037122_tile_draw(screen->machine, 0, bitmap, cliprect);
@@ -656,20 +617,19 @@ static VIDEO_UPDATE( hornet )
 
 static VIDEO_UPDATE( hornet_2board )
 {
-	const device_config *left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
-	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
-
-	if (screen == left_screen)
+	if (strcmp(screen->tag, "left") == 0)
 	{
-		voodoo_update(0, bitmap, cliprect);
+		const device_config *voodoo = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo0");
+		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
 		K037122_tile_update(screen->machine, 0);
 		K037122_tile_draw(screen->machine, 0, bitmap, cliprect);
 	}
-	else if (screen == right_screen)
+	else if (strcmp(screen->tag, "right") == 0)
 	{
-		voodoo_update(1, bitmap, cliprect);
+		const device_config *voodoo = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo1");
+		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
 		K037122_tile_update(screen->machine, 1);
@@ -818,7 +778,7 @@ static ADDRESS_MAP_START( sharc0_map, ADDRESS_SPACE_DATA, 32 )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
-	AM_RANGE(0x2400000, 0x27fffff) AM_READWRITE(voodoo_0_r, voodoo_0_w)
+	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE(VOODOO_GRAPHICS, "voodoo0", voodoo_r, voodoo_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
 	AM_RANGE(0x3500000, 0x35000ff) AM_READWRITE(K033906_0_r, K033906_0_w)
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK(5)
@@ -828,7 +788,7 @@ static ADDRESS_MAP_START( sharc1_map, ADDRESS_SPACE_DATA, 32 )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
-	AM_RANGE(0x2400000, 0x27fffff) AM_READWRITE(voodoo_1_r, voodoo_1_w)
+	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE(VOODOO_GRAPHICS, "voodoo1", voodoo_r, voodoo_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_1_comm_sharc_r, cgboard_1_comm_sharc_w)
 	AM_RANGE(0x3500000, 0x35000ff) AM_READWRITE(K033906_1_r, K033906_1_w)
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK(6)
@@ -1003,6 +963,10 @@ static MACHINE_DRIVER_START( hornet )
 
 	MDRV_NVRAM_HANDLER( timekeeper_0 )
 
+	MDRV_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "main")
+	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
+	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
+
  	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -1051,6 +1015,15 @@ static MACHINE_DRIVER_START( hornet_2board )
 	MDRV_VIDEO_START(hornet_2board)
 	MDRV_VIDEO_UPDATE(hornet_2board)
 
+	MDRV_3DFX_VOODOO_REMOVE("voodoo0")
+	MDRV_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "left")
+	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
+	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
+
+	MDRV_3DFX_VOODOO_1_ADD("voodoo1", STD_VOODOO_1_CLOCK, 2, "right")
+	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
+	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_1)
+
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(65536)
 
@@ -1067,6 +1040,20 @@ static MACHINE_DRIVER_START( hornet_2board )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_SIZE(512, 384)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( hornet_2board_v2 )
+	MDRV_IMPORT_FROM(hornet_2board)
+	
+	MDRV_3DFX_VOODOO_REMOVE("voodoo0")
+	MDRV_3DFX_VOODOO_2_ADD("voodoo0", STD_VOODOO_2_CLOCK, 2, "left")
+	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
+	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
+
+	MDRV_3DFX_VOODOO_REMOVE("voodoo1")
+	MDRV_3DFX_VOODOO_2_ADD("voodoo1", STD_VOODOO_2_CLOCK, 2, "right")
+	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
+	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_1)
 MACHINE_DRIVER_END
 
 
@@ -1274,7 +1261,6 @@ static DRIVER_INIT(gradius4)
 	backup_ram[0x0e] = 0x02;	// checksum
 	backup_ram[0x0f] = 0xd7;	// checksum
 
-	voodoo_version = 0;
 	init_hornet(machine);
 }
 
@@ -1308,7 +1294,6 @@ static DRIVER_INIT(nbapbp)
 	backup_ram[0x0e] = (checksum >> 8) & 0xff;	// checksum
 	backup_ram[0x0f] = (checksum >> 0) & 0xff;	// checksum
 
-	voodoo_version = 0;
 	init_hornet(machine);
 }
 
@@ -1342,7 +1327,6 @@ static DRIVER_INIT(terabrst)
 	backup_ram[0x0e] = (checksum >> 8) & 0xff;	// checksum
 	backup_ram[0x0f] = (checksum >> 0) & 0xff;	// checksum
 
-	voodoo_version = 0;
 	init_hornet_2board(machine);
 }
 
@@ -1376,7 +1360,6 @@ static DRIVER_INIT(sscope)
 	backup_ram[0x0e] = (checksum >> 8) & 0xff;	// checksum
 	backup_ram[0x0f] = (checksum >> 0) & 0xff;	// checksum
 
-	voodoo_version = 0;
 	init_hornet_2board(machine);
 }
 
@@ -1438,7 +1421,6 @@ static DRIVER_INIT(sscope2)
 	backup_ram[0x1f4e] = (checksum >> 8) & 0xff;	// checksum
 	backup_ram[0x1f4f] = (checksum >> 0) & 0xff;	// checksum
 
-	voodoo_version = 1;
 	init_hornet_2board(machine);
 }
 
@@ -1579,9 +1561,9 @@ ROM_END
 
 /*************************************************************************/
 
-GAME( 1998, gradius4,	0,		hornet,			hornet,	gradius4,	ROT0,	"Konami",	"Gradius 4: Fukkatsu", GAME_IMPERFECT_SOUND )
-GAME( 1998, nbapbp,		0,		hornet,			hornet,	nbapbp,		ROT0,	"Konami",	"NBA Play By Play", GAME_IMPERFECT_SOUND )
-GAMEL( 1998, terabrst,   0,     hornet_2board,  hornet, terabrst,   ROT0,   "Konami",   "Teraburst", GAME_IMPERFECT_SOUND, layout_dualhsxs )
-GAMEL( 2000, sscope,	0,		hornet_2board,	sscope,	sscope,		ROT0,	"Konami",	"Silent Scope (ver UAB)", GAME_IMPERFECT_SOUND|GAME_NOT_WORKING, layout_dualhsxs )
-GAMEL( 2000, sscopea,	sscope, hornet_2board,	sscope,	sscope,		ROT0,	"Konami",	"Silent Scope (ver UAA)", GAME_IMPERFECT_SOUND|GAME_NOT_WORKING, layout_dualhsxs )
-GAMEL( 2000, sscope2,	0,		hornet_2board,	sscope,	sscope2,	ROT0,	"Konami",	"Silent Scope 2", GAME_IMPERFECT_SOUND|GAME_NOT_WORKING, layout_dualhsxs )
+GAME( 1998, gradius4,	0,		hornet,			  hornet,	gradius4,	ROT0,	"Konami",	"Gradius 4: Fukkatsu", GAME_IMPERFECT_SOUND )
+GAME( 1998, nbapbp,		0,		hornet,			  hornet,	nbapbp,		ROT0,	"Konami",	"NBA Play By Play", GAME_IMPERFECT_SOUND )
+GAMEL( 1998, terabrst,   0,     hornet_2board,    hornet, terabrst,   ROT0,   "Konami",   "Teraburst", GAME_IMPERFECT_SOUND, layout_dualhsxs )
+GAMEL( 2000, sscope,	0,		hornet_2board,	  sscope,	sscope,		ROT0,	"Konami",	"Silent Scope (ver UAB)", GAME_IMPERFECT_SOUND|GAME_NOT_WORKING, layout_dualhsxs )
+GAMEL( 2000, sscopea,	sscope, hornet_2board,	  sscope,	sscope,		ROT0,	"Konami",	"Silent Scope (ver UAA)", GAME_IMPERFECT_SOUND|GAME_NOT_WORKING, layout_dualhsxs )
+GAMEL( 2000, sscope2,	0,		hornet_2board_v2, sscope,	sscope2,	ROT0,	"Konami",	"Silent Scope 2", GAME_IMPERFECT_SOUND|GAME_NOT_WORKING, layout_dualhsxs )

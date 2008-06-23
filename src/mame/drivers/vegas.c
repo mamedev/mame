@@ -475,7 +475,7 @@ static UINT8 cmos_unlocked;
 static UINT32 *timekeeper_nvram;
 static size_t timekeeper_nvram_size;
 
-static UINT8 voodoo_type;
+static const device_config *voodoo_device;
 static UINT8 dcs_idma_cs;
 
 static int dynamic_count;
@@ -501,7 +501,6 @@ static struct dynamic_address
  *
  *************************************/
 
-static void vblank_assert(running_machine *machine, int state);
 static TIMER_CALLBACK( nile_timer_callback );
 static void ide_interrupt(const device_config *device, int state);
 static void remap_dynamic_addresses(running_machine *machine);
@@ -514,42 +513,9 @@ static void remap_dynamic_addresses(running_machine *machine);
  *
  *************************************/
 
-static void vegas_exit(running_machine *machine)
-{
-	voodoo_exit(0);
-}
-
-
-static VIDEO_START( vegas_voodoo2 )
-{
-	add_exit_callback(machine, vegas_exit);
-
-	voodoo_start(0, machine->primary_screen, VOODOO_2, 2, 4, 4);
-	voodoo_set_vblank_callback(0, vblank_assert);
-}
-
-
-static VIDEO_START( vegas_voodoo_banshee )
-{
-	add_exit_callback(machine, vegas_exit);
-
-	voodoo_start(0, machine->primary_screen, VOODOO_BANSHEE, 16, 16, 0);
-	voodoo_set_vblank_callback(0, vblank_assert);
-}
-
-
-static VIDEO_START( vegas_voodoo3 )
-{
-	add_exit_callback(machine, vegas_exit);
-
-	voodoo_start(0, machine->primary_screen, VOODOO_3, 16, 16, 16);
-	voodoo_set_vblank_callback(0, vblank_assert);
-}
-
-
 static VIDEO_UPDATE( vegas )
 {
-	return voodoo_update(0, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return voodoo_update(voodoo_device, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 
@@ -560,8 +526,24 @@ static VIDEO_UPDATE( vegas )
  *
  *************************************/
 
-static MACHINE_RESET( vegas )
+static MACHINE_START( vegas )
 {
+	voodoo_device = device_list_find_by_tag(machine->config->devicelist, VOODOO_GRAPHICS, "voodoo");
+
+	/* allocate timers for the NILE */
+	timer[0] = timer_alloc(NULL, NULL);
+	timer[1] = timer_alloc(NULL, NULL);
+	timer[2] = timer_alloc(nile_timer_callback, NULL);
+	timer[3] = timer_alloc(nile_timer_callback, NULL);
+
+	/* identify our sound board */
+	if (mame_find_cpu_index(machine, "dsio") != -1)
+		dcs_idma_cs = 6;
+	else if (mame_find_cpu_index(machine, "denver") != -1)
+		dcs_idma_cs = 7;
+	else
+		dcs_idma_cs = 0;
+
 	/* set the fastest DRC options, but strict verification */
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
 
@@ -577,13 +559,11 @@ static MACHINE_RESET( vegas )
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
 	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
+}
 
-	/* allocate timers for the NILE */
-	timer[0] = timer_alloc(NULL, NULL);
-	timer[1] = timer_alloc(NULL, NULL);
-	timer[2] = timer_alloc(nile_timer_callback, NULL);
-	timer[3] = timer_alloc(nile_timer_callback, NULL);
 
+static MACHINE_RESET( vegas )
+{
 	/* reset dynamic addressing */
 	memset(nile_regs, 0, 0x1000);
 	memset(pci_ide_regs, 0, sizeof(pci_ide_regs));
@@ -597,23 +577,12 @@ static MACHINE_RESET( vegas )
 	}
 
 	/* reset subsystems */
-	devtag_reset(machine, IDE_CONTROLLER, "ide");
-	voodoo_reset(0);
 	smc91c94_reset(machine);
 
 	/* initialize IRQ states */
 	ide_irq_state = 0;
 	nile_irq_state = 0;
 	sio_irq_state = 0;
-
-	/* find out what type of voodoo we have */
-	voodoo_type = voodoo_get_type(0);
-	if (mame_find_cpu_index(machine, "dsio") != -1)
-		dcs_idma_cs = 6;
-	else if (mame_find_cpu_index(machine, "denver") != -1)
-		dcs_idma_cs = 7;
-	else
-		dcs_idma_cs = 0;
 }
 
 
@@ -806,6 +775,7 @@ static WRITE32_HANDLER( pci_ide_w )
 
 static READ32_HANDLER( pci_3dfx_r )
 {
+	int voodoo_type = voodoo_get_type(voodoo_device);
 	UINT32 result = pci_3dfx_regs[offset];
 
 	switch (offset)
@@ -838,6 +808,8 @@ static READ32_HANDLER( pci_3dfx_r )
 
 static WRITE32_HANDLER( pci_3dfx_w )
 {
+	int voodoo_type = voodoo_get_type(voodoo_device);
+
 	pci_3dfx_regs[offset] = data;
 
 	switch (offset)
@@ -875,7 +847,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 			break;
 
 		case 0x10:		/* initEnable register */
-			voodoo_set_init_enable(0, data);
+			voodoo_set_init_enable(voodoo_device, data);
 			break;
 
 	}
@@ -1569,6 +1541,7 @@ INLINE void _add_dynamic_device_address(const device_config *device, offs_t star
 static void remap_dynamic_addresses(running_machine *machine)
 {
 	const device_config *ide = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
+	int voodoo_type = voodoo_get_type(voodoo_device);
 	offs_t base;
 	int addr;
 
@@ -1667,24 +1640,24 @@ static void remap_dynamic_addresses(running_machine *machine)
 		if (base >= ramsize && base < 0x20000000)
 		{
 			if (voodoo_type == VOODOO_2)
-				add_dynamic_address(base + 0x000000, base + 0xffffff, voodoo_0_r, voodoo_0_w);
+				add_dynamic_device_address(voodoo_device, base + 0x000000, base + 0xffffff, voodoo_r, voodoo_w);
 			else
-				add_dynamic_address(base + 0x000000, base + 0x1ffffff, banshee_0_r, banshee_0_w);
+				add_dynamic_device_address(voodoo_device, base + 0x000000, base + 0x1ffffff, banshee_r, banshee_w);
 		}
 
 		if (voodoo_type >= VOODOO_BANSHEE)
 		{
 			base = pci_3dfx_regs[0x05] & 0xfffffff0;
             if (base >= ramsize && base < 0x20000000)
-				add_dynamic_address(base + 0x0000000, base + 0x1ffffff, banshee_fb_0_r, banshee_fb_0_w);
+				add_dynamic_device_address(voodoo_device, base + 0x0000000, base + 0x1ffffff, banshee_fb_r, banshee_fb_w);
 
 			base = pci_3dfx_regs[0x06] & 0xfffffff0;
             if (base >= ramsize && base < 0x20000000)
-				add_dynamic_address(base + 0x0000000, base + 0x00000ff, banshee_io_0_r, banshee_io_0_w);
+				add_dynamic_device_address(voodoo_device, base + 0x0000000, base + 0x00000ff, banshee_io_r, banshee_io_w);
 
 			base = pci_3dfx_regs[0x0c] & 0xffff0000;
             if (base >= ramsize && base < 0x20000000)
-				add_dynamic_address(base + 0x0000000, base + 0x000ffff, banshee_rom_0_r, NULL);
+				add_dynamic_device_address(voodoo_device, base + 0x0000000, base + 0x000ffff, banshee_rom_r, NULL);
 		}
 	}
 
@@ -2231,10 +2204,16 @@ static MACHINE_DRIVER_START( vegascore )
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(vegas_map_8mb,0)
 
+	MDRV_MACHINE_START(vegas)
 	MDRV_MACHINE_RESET(vegas)
 	MDRV_NVRAM_HANDLER(timekeeper_save)
 
 	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
+
+	MDRV_3DFX_VOODOO_2_ADD("voodoo", STD_VOODOO_2_CLOCK, 2, "main")
+	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
+	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 4)
+	MDRV_3DFX_VOODOO_VBLANK(vblank_assert)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2243,7 +2222,6 @@ static MACHINE_DRIVER_START( vegascore )
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
-	MDRV_VIDEO_START(vegas_voodoo2)
 	MDRV_VIDEO_UPDATE(vegas)
 MACHINE_DRIVER_END
 
@@ -2256,41 +2234,54 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vegas250 )
 	MDRV_IMPORT_FROM(vegascore)
-	MDRV_CPU_REPLACE("main", R5000LE, SYSTEM_CLOCK*2.5)
 	MDRV_IMPORT_FROM(dcs2_audio_2104)
+
+	MDRV_CPU_REPLACE("main", R5000LE, SYSTEM_CLOCK*2.5)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( vegas32m )
 	MDRV_IMPORT_FROM(vegascore)
+	MDRV_IMPORT_FROM(dcs2_audio_dsio)
+
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(vegas_map_32mb,0)
-	MDRV_IMPORT_FROM(dcs2_audio_dsio)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( vegasban )
 	MDRV_IMPORT_FROM(vegascore)
+	MDRV_IMPORT_FROM(dcs2_audio_2104)
+
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(vegas_map_32mb,0)
-	MDRV_IMPORT_FROM(dcs2_audio_2104)
-	MDRV_VIDEO_START(vegas_voodoo_banshee)
+
+	MDRV_3DFX_VOODOO_REMOVE("voodoo")
+	MDRV_3DFX_VOODOO_BANSHEE_ADD("voodoo", STD_VOODOO_BANSHEE_CLOCK, 16, "main")
+	MDRV_3DFX_VOODOO_VBLANK(vblank_assert)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( vegasv3 )
 	MDRV_IMPORT_FROM(vegas32m)
 	MDRV_CPU_REPLACE("main", RM7000LE, SYSTEM_CLOCK*2.5)
-	MDRV_VIDEO_START(vegas_voodoo3)
+
+	MDRV_3DFX_VOODOO_REMOVE("voodoo")
+	MDRV_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "main")
+	MDRV_3DFX_VOODOO_VBLANK(vblank_assert)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( denver )
 	MDRV_IMPORT_FROM(vegascore)
+	MDRV_IMPORT_FROM(dcs2_audio_denver)
+
 	MDRV_CPU_REPLACE("main", RM7000LE, SYSTEM_CLOCK*2.5)
 	MDRV_CPU_PROGRAM_MAP(vegas_map_32mb,0)
-	MDRV_VIDEO_START(vegas_voodoo3)
-	MDRV_IMPORT_FROM(dcs2_audio_denver)
+
+	MDRV_3DFX_VOODOO_REMOVE("voodoo")
+	MDRV_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "main")
+	MDRV_3DFX_VOODOO_VBLANK(vblank_assert)
 MACHINE_DRIVER_END
 
 
@@ -2579,7 +2570,6 @@ static DRIVER_INIT( cartfury )
 	dcs2_init(machine, 4, 0);
 	init_common(machine, MIDWAY_IOASIC_CARNEVIL, 495/* others? */);
 }
-
 
 
 
