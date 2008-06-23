@@ -835,7 +835,7 @@ MACHINE_START( a800 )
 #ifdef MESS
 DEVICE_IMAGE_LOAD( a800_cart )
 {
-	UINT8 *mem = memory_region(machine, REGION_CPU1);
+	UINT8 *mem = memory_region(image->machine, REGION_CPU1);
 	int size;
 
 	/* load an optional (dual) cartridge (e.g. basic.rom) */
@@ -889,7 +889,7 @@ MACHINE_START( a800xl )
 #ifdef MESS
 DEVICE_IMAGE_LOAD( a800xl_cart )
 {
-	UINT8 *mem = memory_region(machine, REGION_CPU1);
+	UINT8 *mem = memory_region(image->machine, REGION_CPU1);
 	astring *fname;
 	mame_file *basic_fp;
 	file_error filerr;
@@ -946,7 +946,7 @@ MACHINE_START( a5200 )
 #ifdef MESS
 DEVICE_IMAGE_LOAD( a5200_cart )
 {
-	UINT8 *mem = memory_region(machine, REGION_CPU1);
+	UINT8 *mem = memory_region(image->machine, REGION_CPU1);
 	int size;
 
 	/* load an optional (dual) cartidge */
@@ -973,8 +973,8 @@ DEVICE_IMAGE_LOAD( a5200_cart )
 
 DEVICE_IMAGE_UNLOAD( a5200_cart )
 {
-	UINT8 *mem = memory_region(machine, REGION_CPU1);
-    /* zap the cartridge memory (again) */
+	UINT8 *mem = memory_region(image->machine, REGION_CPU1);
+	/* zap the cartridge memory (again) */
 	memset(&mem[0x4000], 0x00, 0x8000);
 }
 #endif
