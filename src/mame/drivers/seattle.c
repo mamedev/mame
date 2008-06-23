@@ -379,7 +379,8 @@
  *
  *************************************/
 
-struct galileo_timer
+typedef struct _galileo_timer galileo_timer;
+struct _galileo_timer
 {
 	emu_timer *		timer;
 	UINT32			count;
@@ -387,13 +388,14 @@ struct galileo_timer
 };
 
 
-struct galileo_data
+typedef struct _galileo_data galileo_data;
+struct _galileo_data
 {
 	/* raw register data */
 	UINT32			reg[0x1000/4];
 
 	/* timer info */
-	struct galileo_timer timer[4];
+	galileo_timer 	timer[4];
 
 	/* DMA info */
 	INT8			dma_active;
@@ -406,7 +408,8 @@ struct galileo_data
 };
 
 
-struct widget_data
+typedef struct _widget_data widget_data;
+struct _widget_data
 {
 	/* ethernet register address */
 	UINT8			ethernet_addr;
@@ -427,8 +430,8 @@ struct widget_data
 static UINT32 *rambase;
 static UINT32 *rombase;
 
-static struct galileo_data galileo;
-static struct widget_data widget;
+static galileo_data galileo;
+static widget_data widget;
 
 static const device_config *voodoo_device;
 static UINT8 voodoo_stalled;
@@ -497,6 +500,8 @@ static VIDEO_UPDATE( seattle )
 
 static MACHINE_START( seattle )
 {
+	int index;
+
 	voodoo_device = device_list_find_by_tag(machine->config->devicelist, VOODOO_GRAPHICS, "voodoo");
 
 	/* allocate timers for the galileo */
@@ -520,6 +525,36 @@ static MACHINE_START( seattle )
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
 	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
+	
+	/* register for save states */
+	state_save_register_global_array(galileo.reg);
+	state_save_register_global(galileo.dma_active);
+	state_save_register_global_array(galileo.dma_stalled_on_voodoo);
+	state_save_register_global_array(galileo.pci_bridge_regs);
+	state_save_register_global_array(galileo.pci_3dfx_regs);
+	state_save_register_global_array(galileo.pci_ide_regs);
+	for (index = 0; index < ARRAY_LENGTH(galileo.timer); index++)
+	{
+		state_save_register_item("galileo", index, galileo.timer[index].count);
+		state_save_register_item("galileo", index, galileo.timer[index].active);
+	}
+	state_save_register_global(widget.ethernet_addr);
+	state_save_register_global(widget.irq_num);
+	state_save_register_global(widget.irq_mask);
+	state_save_register_global(voodoo_stalled);
+	state_save_register_global(cpu_stalled_on_voodoo);
+	state_save_register_global(cpu_stalled_offset);
+	state_save_register_global(cpu_stalled_data);
+	state_save_register_global(cpu_stalled_mem_mask);
+	state_save_register_global(board_config);
+	state_save_register_global(ethernet_irq_num);
+	state_save_register_global(ethernet_irq_state);
+	state_save_register_global(vblank_irq_num);
+	state_save_register_global(vblank_latch);
+	state_save_register_global(vblank_state);
+	state_save_register_global(pending_analog_read);
+	state_save_register_global(status_leds);
+	state_save_register_global(cmos_write_enabled);
 }
 
 
@@ -547,8 +582,6 @@ static MACHINE_RESET( seattle )
 	galileo_reset();
 	if (board_config == SEATTLE_WIDGET_CONFIG)
 		widget_reset(machine);
-	if (board_config == FLAGSTAFF_CONFIG)
-		smc91c94_reset(machine);
 }
 
 
@@ -584,12 +617,6 @@ static void ethernet_interrupt(running_machine *machine, int state)
 	else if (board_config == SEATTLE_WIDGET_CONFIG)
 		update_widget_irq(machine);
 }
-
-
-static const struct smc91c9x_interface ethernet_intf =
-{
-	ethernet_interrupt
-};
 
 
 
@@ -875,7 +902,7 @@ static void update_galileo_irqs(running_machine *machine)
 static TIMER_CALLBACK( galileo_timer_callback )
 {
 	int which = param;
-	struct galileo_timer *timer = &galileo.timer[which];
+	galileo_timer *timer = &galileo.timer[which];
 
 	if (LOG_TIMERS)
 		logerror("timer %d fired\n", which);
@@ -1062,7 +1089,7 @@ static READ32_HANDLER( galileo_r )
 		case GREG_TIMER3_COUNT:
 		{
 			int which = offset % 4;
-			struct galileo_timer *timer = &galileo.timer[which];
+			galileo_timer *timer = &galileo.timer[which];
 
 			result = timer->count;
 			if (timer->active)
@@ -1169,7 +1196,7 @@ static WRITE32_HANDLER( galileo_w )
 		case GREG_TIMER3_COUNT:
 		{
 			int which = offset % 4;
-			struct galileo_timer *timer = &galileo.timer[which];
+			galileo_timer *timer = &galileo.timer[which];
 
 			if (which != 0)
 				data &= 0xffffff;
@@ -1188,7 +1215,7 @@ static WRITE32_HANDLER( galileo_w )
 				logerror("%08X:timer/counter control = %08X\n", activecpu_get_pc(), data);
 			for (which = 0, mask = 0x01; which < 4; which++, mask <<= 2)
 			{
-				struct galileo_timer *timer = &galileo.timer[which];
+				galileo_timer *timer = &galileo.timer[which];
 				if (!timer->active && (data & mask))
 				{
 					timer->active = 1;
@@ -1441,21 +1468,21 @@ static WRITE32_HANDLER( carnevil_gun_w )
  *
  *************************************/
 
-static READ32_HANDLER( ethernet_r )
+static READ32_DEVICE_HANDLER( ethernet_r )
 {
 	if (!(offset & 8))
-		return smc91c94_r(machine, offset & 7, mem_mask & 0xffff);
+		return smc91c9x_r(device, offset & 7, mem_mask & 0xffff);
 	else
-		return smc91c94_r(machine, offset & 7, mem_mask & 0x00ff);
+		return smc91c9x_r(device, offset & 7, mem_mask & 0x00ff);
 }
 
 
-static WRITE32_HANDLER( ethernet_w )
+static WRITE32_DEVICE_HANDLER( ethernet_w )
 {
 	if (!(offset & 8))
-		smc91c94_w(machine, offset & 7, data & 0xffff, mem_mask | 0xffff);
+		smc91c9x_w(device, offset & 7, data & 0xffff, mem_mask | 0xffff);
 	else
-		smc91c94_w(machine, offset & 7, data & 0x00ff, mem_mask | 0x00ff);
+		smc91c9x_w(device, offset & 7, data & 0x00ff, mem_mask | 0x00ff);
 }
 
 
@@ -1471,7 +1498,6 @@ static void widget_reset(running_machine *machine)
 	UINT8 saved_irq = widget.irq_num;
 	memset(&widget, 0, sizeof(widget));
 	widget.irq_num = saved_irq;
-	smc91c94_reset(machine);
 }
 
 
@@ -1487,7 +1513,7 @@ static void update_widget_irq(running_machine *machine)
 }
 
 
-static READ32_HANDLER( widget_r )
+static READ32_DEVICE_HANDLER( widget_r )
 {
 	UINT32 result = ~0;
 
@@ -1503,11 +1529,11 @@ static READ32_HANDLER( widget_r )
 			break;
 
 		case WREG_ANALOG:
-			result = analog_port_r(machine, 0, mem_mask);
+			result = analog_port_r(device->machine, 0, mem_mask);
 			break;
 
 		case WREG_ETHER_DATA:
-			result = smc91c94_r(machine, widget.ethernet_addr & 7, mem_mask & 0xffff);
+			result = smc91c9x_r(device, widget.ethernet_addr & 7, mem_mask & 0xffff);
 			break;
 	}
 
@@ -1517,7 +1543,7 @@ static READ32_HANDLER( widget_r )
 }
 
 
-static WRITE32_HANDLER( widget_w )
+static WRITE32_DEVICE_HANDLER( widget_w )
 {
 	if (LOG_WIDGET)
 		logerror("Widget write (%02X) = %08X & %08X\n", offset*4, data, mem_mask);
@@ -1530,15 +1556,15 @@ static WRITE32_HANDLER( widget_w )
 
 		case WREG_INTERRUPT:
 			widget.irq_mask = data;
-			update_widget_irq(machine);
+			update_widget_irq(device->machine);
 			break;
 
 		case WREG_ANALOG:
-			analog_port_w(machine, 0, data, mem_mask);
+			analog_port_w(device->machine, 0, data, mem_mask);
 			break;
 
 		case WREG_ETHER_DATA:
-			smc91c94_w(machine, widget.ethernet_addr & 7, data & 0xffff, mem_mask & 0xffff);
+			smc91c9x_w(device, widget.ethernet_addr & 7, data & 0xffff, mem_mask & 0xffff);
 			break;
 	}
 }
@@ -2459,33 +2485,46 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( phoenixsa )
 	MDRV_IMPORT_FROM(seattle_common)
-	MDRV_CPU_REPLACE("main", R4700LE, SYSTEM_CLOCK*2)
 	MDRV_IMPORT_FROM(dcs2_audio_2115)
+	MDRV_CPU_REPLACE("main", R4700LE, SYSTEM_CLOCK*2)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( seattle150 )
 	MDRV_IMPORT_FROM(seattle_common)
-	MDRV_CPU_REPLACE("main", R5000LE, SYSTEM_CLOCK*3)
 	MDRV_IMPORT_FROM(dcs2_audio_2115)
+	MDRV_CPU_REPLACE("main", R5000LE, SYSTEM_CLOCK*3)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( seattle150_widget )
+	MDRV_IMPORT_FROM(seattle150)
+	MDRV_SMC91C94_ADD("ethernet", ethernet_interrupt)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( seattle200 )
 	MDRV_IMPORT_FROM(seattle_common)
-	MDRV_CPU_REPLACE("main", R5000LE, SYSTEM_CLOCK*4)
 	MDRV_IMPORT_FROM(dcs2_audio_2115)
+	MDRV_CPU_REPLACE("main", R5000LE, SYSTEM_CLOCK*4)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( seattle200_widget )
+	MDRV_IMPORT_FROM(seattle200)
+	MDRV_SMC91C94_ADD("ethernet", ethernet_interrupt)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( flagstaff )
 	MDRV_IMPORT_FROM(seattle_common)
+	MDRV_IMPORT_FROM(cage_seattle)
 	MDRV_CPU_REPLACE("main", R5000LE, SYSTEM_CLOCK*4)
+
+	MDRV_SMC91C94_ADD("ethernet", ethernet_interrupt)
 
 	MDRV_3DFX_VOODOO_MODIFY("voodoo")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 4)
-
-	MDRV_IMPORT_FROM(cage_seattle)
 MACHINE_DRIVER_END
 
 
@@ -2709,6 +2748,8 @@ ROM_END
 
 static void init_common(running_machine *machine, int ioasic, int serialnum, int yearoffs, int config)
 {
+	const device_config *device;
+
 	/* initialize the subsystems */
 	midway_ioasic_init(machine, ioasic, serialnum, yearoffs, ioasic_irq);
 
@@ -2718,13 +2759,13 @@ static void init_common(running_machine *machine, int ioasic, int serialnum, int
 	{
 		case PHOENIX_CONFIG:
 			/* original Phoenix board only has 4MB of RAM */
-			memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00400000, 0x007fffff, 0, 0, SMH_NOP, SMH_NOP);
+			memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00400000, 0x007fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 			break;
 
 		case SEATTLE_WIDGET_CONFIG:
 			/* set up the widget board */
-			memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x16c00000, 0x16c0001f, 0, 0, widget_r, widget_w);
-			smc91c94_init(&ethernet_intf);
+			device = device_list_find_by_tag(machine->config->devicelist, SMC91C94, "ethernet");
+			memory_install_readwrite32_device_handler(device, 0, ADDRESS_SPACE_PROGRAM, 0x16c00000, 0x16c0001f, 0, 0, widget_r, widget_w);
 			break;
 
 		case FLAGSTAFF_CONFIG:
@@ -2732,8 +2773,8 @@ static void init_common(running_machine *machine, int ioasic, int serialnum, int
 			memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x14000000, 0x14000003, 0, 0, analog_port_r, analog_port_w);
 
 			/* set up the ethernet controller */
-			memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x16c00000, 0x16c0003f, 0, 0, ethernet_r, ethernet_w);
-			smc91c94_init(&ethernet_intf);
+			device = device_list_find_by_tag(machine->config->devicelist, SMC91C94, "ethernet");
+			memory_install_readwrite32_device_handler(device, 0, ADDRESS_SPACE_PROGRAM, 0x16c00000, 0x16c0003f, 0, 0, ethernet_r, ethernet_w);
 			break;
 	}
 
@@ -2900,21 +2941,21 @@ static DRIVER_INIT( hyprdriv )
  *************************************/
 
 /* Atari */
-GAME( 1996, wg3dh,    0,        phoenixsa,  wg3dh,    wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey", 0 )
-GAME( 1996, mace,     0,        seattle150, mace,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (boot ROM 1.0ce, HDD 1.0b)", 0 )
-GAME( 1997, macea,    mace,     seattle150, mace,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a", 0 )
-GAME( 1996, sfrush,   0,        flagstaff,  sfrush,   sfrush,   ROT0, "Atari Games",  "San Francisco Rush", 0 )
-GAME( 1996, sfrushrk, 0,        flagstaff,  sfrushrk, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock", GAME_NOT_WORKING )
-GAME( 1998, calspeed, 0,        seattle150, calspeed, calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a, 4/17/98)", 0 )
-GAME( 1998, calspeda, calspeed, seattle150, calspeed, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r7a 3/4/98)", 0 )
-GAME( 1998, vaportrx, 0,        seattle200, vaportrx, vaportrx, ROT0, "Atari Games",  "Vapor TRX", 0 )
-GAME( 1998, vaportrp, vaportrx, seattle200, vaportrx, vaportrx, ROT0, "Atari Games",  "Vapor TRX (prototype)", 0 )
+GAME( 1996, wg3dh,    0,        phoenixsa,         wg3dh,    wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey", GAME_SUPPORTS_SAVE )
+GAME( 1996, mace,     0,        seattle150,        mace,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (boot ROM 1.0ce, HDD 1.0b)", GAME_SUPPORTS_SAVE )
+GAME( 1997, macea,    mace,     seattle150,        mace,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a", GAME_SUPPORTS_SAVE )
+GAME( 1996, sfrush,   0,        flagstaff,         sfrush,   sfrush,   ROT0, "Atari Games",  "San Francisco Rush", GAME_SUPPORTS_SAVE )
+GAME( 1996, sfrushrk, 0,        flagstaff,         sfrushrk, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, calspeed, 0,        seattle150_widget, calspeed, calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a, 4/17/98)", GAME_SUPPORTS_SAVE )
+GAME( 1998, calspeda, calspeed, seattle150_widget, calspeed, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r7a 3/4/98)", GAME_SUPPORTS_SAVE )
+GAME( 1998, vaportrx, 0,        seattle200_widget, vaportrx, vaportrx, ROT0, "Atari Games",  "Vapor TRX", GAME_SUPPORTS_SAVE )
+GAME( 1998, vaportrp, vaportrx, seattle200_widget, vaportrx, vaportrx, ROT0, "Atari Games",  "Vapor TRX (prototype)", GAME_SUPPORTS_SAVE )
 
 /* Midway */
-GAME( 1997, biofreak, 0,        seattle150, biofreak, biofreak, ROT0, "Midway Games", "BioFreaks (prototype)", 0 )
-GAME( 1997, blitz,    0,        seattle150, blitz,    blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.2)", 0 )
-GAME( 1997, blitz11,  blitz,    seattle150, blitz,    blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.1)", 0 )
-GAME( 1998, blitz99,  0,        seattle150, blitz99,  blitz99,  ROT0, "Midway Games", "NFL Blitz '99", 0 )
-GAME( 1999, blitz2k,  0,        seattle150, blitz99,  blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition", 0 )
-GAME( 1998, carnevil, 0,        seattle150, carnevil, carnevil, ROT0, "Midway Games", "CarnEvil", 0 )
-GAME( 1998, hyprdriv, 0,        seattle200, hyprdriv, hyprdriv, ROT0, "Midway Games", "Hyperdrive", 0 )
+GAME( 1997, biofreak, 0,        seattle150,        biofreak, biofreak, ROT0, "Midway Games", "BioFreaks (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1997, blitz,    0,        seattle150,        blitz,    blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.2)", GAME_SUPPORTS_SAVE )
+GAME( 1997, blitz11,  blitz,    seattle150,        blitz,    blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.1)", GAME_SUPPORTS_SAVE )
+GAME( 1998, blitz99,  0,        seattle150,        blitz99,  blitz99,  ROT0, "Midway Games", "NFL Blitz '99", GAME_SUPPORTS_SAVE )
+GAME( 1999, blitz2k,  0,        seattle150,        blitz99,  blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition", GAME_SUPPORTS_SAVE )
+GAME( 1998, carnevil, 0,        seattle150,        carnevil, carnevil, ROT0, "Midway Games", "CarnEvil", GAME_SUPPORTS_SAVE )
+GAME( 1998, hyprdriv, 0,        seattle200_widget, hyprdriv, hyprdriv, ROT0, "Midway Games", "Hyperdrive", GAME_SUPPORTS_SAVE )

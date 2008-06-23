@@ -1523,12 +1523,10 @@ struct _setup_vertex
 typedef struct _fbi_state fbi_state;
 struct _fbi_state
 {
-	void *				ram;					/* pointer to frame buffer RAM */
+	UINT8 *				ram;					/* pointer to frame buffer RAM */
 	UINT32				mask;					/* mask to apply to pointers */
-	UINT16 *			rgb[3];					/* pointer to 3 RGB buffers */
-	UINT16 *			aux;					/* pointer to 1 aux buffer */
-	UINT32				rgbmax[3];				/* maximum valid offset in each RGB buffer */
-	UINT32				auxmax;					/* maximum valid offset in the aux buffer */
+	UINT32				rgboffs[3];				/* word offset to 3 RGB buffers */
+	UINT32				auxoffs;				/* word offset to 1 aux buffer */
 
 	UINT8				frontbuf;				/* front buffer index */
 	UINT8				backbuf;				/* back buffer index */
@@ -3551,7 +3549,7 @@ static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, co
 																				\
 	/* get pointers to the target buffer and depth buffer */					\
 	dest = (UINT16 *)destbase + scry * v->fbi.rowpixels;						\
-	depth = v->fbi.aux ? (v->fbi.aux + scry * v->fbi.rowpixels) : NULL;			\
+	depth = (v->fbi.auxoffs != ~0) ? ((UINT16 *)(v->fbi.ram + v->fbi.auxoffs) + scry * v->fbi.rowpixels) : NULL; \
 																				\
 	/* compute the starting parameters */										\
 	dx = startx - (extra->ax >> 4);												\

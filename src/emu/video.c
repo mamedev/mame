@@ -176,6 +176,9 @@ static void init_buffered_spriteram(void);
 static void allocate_graphics(running_machine *machine, const gfx_decode_entry *gfxdecodeinfo);
 static void decode_graphics(running_machine *machine, const gfx_decode_entry *gfxdecodeinfo);
 
+static void realloc_screen_bitmaps(const device_config *screen);
+static STATE_POSTLOAD( video_screen_postload );
+
 /* global rendering */
 static TIMER_CALLBACK( vblank_begin_callback );
 static TIMER_CALLBACK( vblank_end_callback );
@@ -652,72 +655,19 @@ void video_screen_configure(const device_config *screen, int width, int height, 
 	assert(width > 0);
 	assert(height > 0);
 	assert(visarea != NULL);
+	assert(visarea->min_x >= 0);
+	assert(visarea->min_y >= 0);
+	assert(visarea->min_x < width);
+	assert(visarea->min_y < height);
 	assert(frame_period > 0);
 
-	/* reallocate bitmap if necessary */
-	if (config->type != SCREEN_TYPE_VECTOR)
-	{
-		int curwidth = 0, curheight = 0;
-
-		/* reality checks */
-		assert(visarea->min_x >= 0);
-		assert(visarea->min_y >= 0);
-		assert(visarea->min_x < width);
-		assert(visarea->min_y < height);
-
-		/* extract the current width/height from the bitmap */
-		if (state->bitmap[0] != NULL)
-		{
-			curwidth = state->bitmap[0]->width;
-			curheight = state->bitmap[0]->height;
-		}
-
-		/* if we're too small to contain this width/height, reallocate our bitmaps and textures */
-		if (width > curwidth || height > curheight)
-		{
-			bitmap_format screen_format = config->format;
-
-			/* free what we have currently */
-			if (state->texture[0] != NULL)
-				render_texture_free(state->texture[0]);
-			if (state->texture[1] != NULL)
-				render_texture_free(state->texture[1]);
-			if (state->bitmap[0] != NULL)
-				bitmap_free(state->bitmap[0]);
-			if (state->bitmap[1] != NULL)
-				bitmap_free(state->bitmap[1]);
-
-			/* compute new width/height */
-			curwidth = MAX(width, curwidth);
-			curheight = MAX(height, curheight);
-
-			/* choose the texture format - convert the screen format to a texture format */
-			switch (screen_format)
-			{
-				case BITMAP_FORMAT_INDEXED16:	state->texture_format = TEXFORMAT_PALETTE16;		break;
-				case BITMAP_FORMAT_RGB15:		state->texture_format = TEXFORMAT_RGB15;			break;
-				case BITMAP_FORMAT_RGB32:		state->texture_format = TEXFORMAT_RGB32;			break;
-				default:						fatalerror("Invalid bitmap format!");	break;
-			}
-
-			/* allocate bitmaps */
-			state->bitmap[0] = bitmap_alloc(curwidth, curheight, screen_format);
-			bitmap_set_palette(state->bitmap[0], screen->machine->palette);
-			state->bitmap[1] = bitmap_alloc(curwidth, curheight, screen_format);
-			bitmap_set_palette(state->bitmap[1], screen->machine->palette);
-
-			/* allocate textures */
-			state->texture[0] = render_texture_alloc(NULL, NULL);
-			render_texture_set_bitmap(state->texture[0], state->bitmap[0], visarea, 0, state->texture_format);
-			state->texture[1] = render_texture_alloc(NULL, NULL);
-			render_texture_set_bitmap(state->texture[1], state->bitmap[1], visarea, 0, state->texture_format);
-		}
-	}
-
-	/* now fill in the new parameters */
+	/* fill in the new parameters */
 	state->width = width;
 	state->height = height;
 	state->visarea = *visarea;
+
+	/* reallocate bitmap if necessary */
+	realloc_screen_bitmaps(screen);
 
 	/* compute timing parameters */
 	state->frame_period = frame_period;
@@ -743,6 +693,70 @@ void video_screen_configure(const device_config *screen, int width, int height, 
 
 	/* adjust speed if necessary */
 	update_refresh_speed(screen->machine);
+}
+
+
+/*-------------------------------------------------
+    realloc_screen_bitmaps - reallocate screen
+    bitmaps as necessary
+-------------------------------------------------*/
+
+static void realloc_screen_bitmaps(const device_config *screen)
+{
+	screen_state *state = get_safe_token(screen);
+	screen_config *config = screen->inline_config;
+	if (config->type != SCREEN_TYPE_VECTOR)
+	{
+		int curwidth = 0, curheight = 0;
+
+		/* extract the current width/height from the bitmap */
+		if (state->bitmap[0] != NULL)
+		{
+			curwidth = state->bitmap[0]->width;
+			curheight = state->bitmap[0]->height;
+		}
+
+		/* if we're too small to contain this width/height, reallocate our bitmaps and textures */
+		if (state->width > curwidth || state->height > curheight)
+		{
+			bitmap_format screen_format = config->format;
+
+			/* free what we have currently */
+			if (state->texture[0] != NULL)
+				render_texture_free(state->texture[0]);
+			if (state->texture[1] != NULL)
+				render_texture_free(state->texture[1]);
+			if (state->bitmap[0] != NULL)
+				bitmap_free(state->bitmap[0]);
+			if (state->bitmap[1] != NULL)
+				bitmap_free(state->bitmap[1]);
+
+			/* compute new width/height */
+			curwidth = MAX(state->width, curwidth);
+			curheight = MAX(state->height, curheight);
+
+			/* choose the texture format - convert the screen format to a texture format */
+			switch (screen_format)
+			{
+				case BITMAP_FORMAT_INDEXED16:	state->texture_format = TEXFORMAT_PALETTE16;		break;
+				case BITMAP_FORMAT_RGB15:		state->texture_format = TEXFORMAT_RGB15;			break;
+				case BITMAP_FORMAT_RGB32:		state->texture_format = TEXFORMAT_RGB32;			break;
+				default:						fatalerror("Invalid bitmap format!");	break;
+			}
+
+			/* allocate bitmaps */
+			state->bitmap[0] = bitmap_alloc(curwidth, curheight, screen_format);
+			bitmap_set_palette(state->bitmap[0], screen->machine->palette);
+			state->bitmap[1] = bitmap_alloc(curwidth, curheight, screen_format);
+			bitmap_set_palette(state->bitmap[1], screen->machine->palette);
+
+			/* allocate textures */
+			state->texture[0] = render_texture_alloc(NULL, NULL);
+			render_texture_set_bitmap(state->texture[0], state->bitmap[0], &state->visarea, 0, state->texture_format);
+			state->texture[1] = render_texture_alloc(NULL, NULL);
+			render_texture_set_bitmap(state->texture[1], state->bitmap[1], &state->visarea, 0, state->texture_format);
+		}
+	}
 }
 
 
@@ -1229,11 +1243,35 @@ static DEVICE_START( video_screen )
 	assert(strlen(screen->tag) < 30);
 	state_save_combine_module_and_tag(unique_tag, "video_screen", screen->tag);
 
+	state_save_register_item(unique_tag, 0, state->width);
+	state_save_register_item(unique_tag, 0, state->height);
+	state_save_register_item(unique_tag, 0, state->visarea.min_x);
+	state_save_register_item(unique_tag, 0, state->visarea.min_y);
+	state_save_register_item(unique_tag, 0, state->visarea.max_x);
+	state_save_register_item(unique_tag, 0, state->visarea.max_y);
+	state_save_register_item(unique_tag, 0, state->last_partial_scan);
+	state_save_register_item(unique_tag, 0, state->frame_period);
+	state_save_register_item(unique_tag, 0, state->scantime);
+	state_save_register_item(unique_tag, 0, state->pixeltime);
+	state_save_register_item(unique_tag, 0, state->vblank_period);
 	state_save_register_item(unique_tag, 0, state->vblank_start_time.seconds);
 	state_save_register_item(unique_tag, 0, state->vblank_start_time.attoseconds);
 	state_save_register_item(unique_tag, 0, state->vblank_end_time.seconds);
 	state_save_register_item(unique_tag, 0, state->vblank_end_time.attoseconds);
 	state_save_register_item(unique_tag, 0, state->frame_number);
+	state_save_register_postload(device->machine, video_screen_postload, (void *)device);
+}
+
+
+/*-------------------------------------------------
+    video_screen_postload - after a state load,
+    reconfigure each screen
+-------------------------------------------------*/
+
+static STATE_POSTLOAD( video_screen_postload )
+{
+	const device_config *screen = param;
+	realloc_screen_bitmaps(screen);
 }
 
 

@@ -9,14 +9,56 @@
 #ifndef __SMC91C9X__
 #define __SMC91C9X__
 
-struct smc91c9x_interface
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef void (*smc91c9x_irq_func)(const device_config *device, int state);
+
+
+typedef struct _smc91c9x_config smc91c9x_config;
+struct _smc91c9x_config
 {
-	void (*irq_handler)(running_machine *machine, int state);
+	smc91c9x_irq_func	interrupt;
 };
 
-void smc91c94_init(const struct smc91c9x_interface *config);
-void smc91c94_reset(running_machine *machine);
-READ16_HANDLER( smc91c94_r );
-WRITE16_HANDLER( smc91c94_w );
+
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_SMC91C94_ADD(_tag, _callback) \
+	MDRV_DEVICE_ADD(_tag, SMC91C94) \
+	MDRV_DEVICE_CONFIG_DATAPTR(smc91c9x_config, interrupt, _callback)
+
+#define MDRV_SMC91C96_ADD(_tag, _callback) \
+	MDRV_DEVICE_ADD(_tag, SMC91C96) \
+	MDRV_DEVICE_CONFIG_DATAPTR(smc91c9x_config, interrupt, _callback)
+
+#define MDRV_SMC91C94_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, SMC91C94)
+
+#define MDRV_SMC91C96_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, SMC91C96)
+
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+READ16_DEVICE_HANDLER( smc91c9x_r );
+WRITE16_DEVICE_HANDLER( smc91c9x_w );
+
+
+/* ----- device interface ----- */
+
+/* device get info callbacks */
+#define SMC91C94 DEVICE_GET_INFO_NAME(smc91c94)
+#define SMC91C96 DEVICE_GET_INFO_NAME(smc91c96)
+DEVICE_GET_INFO( smc91c94 );
+DEVICE_GET_INFO( smc91c96 );
 
 #endif

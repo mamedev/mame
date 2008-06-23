@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "mips3com.h"
+#include "deprecat.h"
 
 
 /***************************************************************************
@@ -21,6 +22,7 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
+static STATE_POSTLOAD( mips3_postload );
 static TIMER_CALLBACK( compare_int_callback );
 
 static UINT32 compute_config_register(const mips3_state *mips);
@@ -70,6 +72,8 @@ INLINE int tlb_entry_is_global(const mips3_tlb_entry *entry)
 
 void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index, int clock, const mips3_config *config, int (*irqcallback)(int))
 {
+	int tlbindex;
+	
 	/* initialize based on the config */
 	memset(mips, 0, sizeof(*mips));
 	mips->flavor = flavor;
@@ -91,6 +95,43 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int in
 
 	/* reset the state */
 	mips3com_reset(mips);
+	
+	/* register for save states */
+	state_save_register_item("mips3", index, mips->pc);
+	state_save_register_item_array("mips3", index, mips->r);
+	state_save_register_item_2d_array("mips3", index, mips->cpr);
+	state_save_register_item_2d_array("mips3", index, mips->ccr);
+	state_save_register_item("mips3", index, mips->llbit);
+	state_save_register_item("mips3", index, mips->count_zero_time);
+	for (tlbindex = 0; tlbindex < ARRAY_LENGTH(mips->tlb); tlbindex++)
+	{
+		state_save_register_item("mips3", index * ARRAY_LENGTH(mips->tlb) + tlbindex, mips->tlb[tlbindex].page_mask);
+		state_save_register_item("mips3", index * ARRAY_LENGTH(mips->tlb) + tlbindex, mips->tlb[tlbindex].entry_hi);
+		state_save_register_item_array("mips3", index * ARRAY_LENGTH(mips->tlb) + tlbindex, mips->tlb[tlbindex].entry_lo);
+	}
+	state_save_register_postload(Machine, mips3_postload, mips);
+}
+
+
+/*-------------------------------------------------
+    mips3_postload - post state load callback
+-------------------------------------------------*/
+
+static STATE_POSTLOAD( mips3_postload )
+{
+	mips3_state *mips = param;
+	int tlbindex;
+
+	/* first clear out the existing TLB */	
+	for (tlbindex = 0; tlbindex < ARRAY_LENGTH(mips->tlb); tlbindex++)
+	{
+		vtlb_load(mips->vtlb, 2 * tlbindex + 0, 0, 0, 0);
+		vtlb_load(mips->vtlb, 2 * tlbindex + 1, 0, 0, 0);
+	}
+	
+	/* then remap the TLB */
+	for (tlbindex = 0; tlbindex < ARRAY_LENGTH(mips->tlb); tlbindex++)
+		tlb_map_entry(mips, tlbindex);
 }
 
 

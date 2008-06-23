@@ -501,6 +501,7 @@ static struct dynamic_address
  *
  *************************************/
 
+static STATE_POSTLOAD( vegas_postload );
 static TIMER_CALLBACK( nile_timer_callback );
 static void ide_interrupt(const device_config *device, int state);
 static void remap_dynamic_addresses(running_machine *machine);
@@ -517,7 +518,6 @@ static VIDEO_UPDATE( vegas )
 {
 	return voodoo_update(voodoo_device, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
-
 
 
 /*************************************
@@ -559,6 +559,22 @@ static MACHINE_START( vegas )
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
 	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
+	
+	/* register for save states */
+	state_save_register_global(nile_irq_state);
+	state_save_register_global(ide_irq_state);
+	state_save_register_global_array(pci_bridge_regs);
+	state_save_register_global_array(pci_ide_regs);
+	state_save_register_global_array(pci_3dfx_regs);
+	state_save_register_global(vblank_state);
+	state_save_register_global_array(sio_data);
+	state_save_register_global(sio_irq_clear);
+	state_save_register_global(sio_irq_enable);
+	state_save_register_global(sio_irq_state);
+	state_save_register_global(sio_led_state);
+	state_save_register_global(pending_analog_read);
+	state_save_register_global(cmos_unlocked);
+	state_save_register_postload(machine, vegas_postload, NULL);
 }
 
 
@@ -576,15 +592,17 @@ static MACHINE_RESET( vegas )
 		dcs_reset_w(0);
 	}
 
-	/* reset subsystems */
-	smc91c94_reset(machine);
-
 	/* initialize IRQ states */
 	ide_irq_state = 0;
 	nile_irq_state = 0;
 	sio_irq_state = 0;
 }
 
+
+static STATE_POSTLOAD( vegas_postload )
+{
+	remap_dynamic_addresses(machine);
+}
 
 
 /*************************************
@@ -1292,13 +1310,13 @@ static void ioasic_irq(running_machine *machine, int state)
 }
 
 
-static void ethernet_interrupt(running_machine *machine, int state)
+static void ethernet_interrupt(const device_config *device, int state)
 {
 	if (state)
 		sio_irq_state |= 0x10;
 	else
 		sio_irq_state &= ~0x10;
-	update_sio_irqs(machine);
+	update_sio_irqs(device->machine);
 }
 
 
@@ -1473,23 +1491,23 @@ static WRITE32_DEVICE_HANDLER( ide_alt_w )
 }
 
 
-static READ32_HANDLER( ethernet_r )
+static READ32_DEVICE_HANDLER( ethernet_r )
 {
 	UINT32 result = 0;
 	if (ACCESSING_BITS_0_15)
-		result |= smc91c94_r(machine, offset * 2 + 0, mem_mask);
+		result |= smc91c9x_r(device, offset * 2 + 0, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		result |= smc91c94_r(machine, offset * 2 + 1, mem_mask >> 16) << 16;
+		result |= smc91c9x_r(device, offset * 2 + 1, mem_mask >> 16) << 16;
 	return result;
 }
 
 
-static WRITE32_HANDLER( ethernet_w )
+static WRITE32_DEVICE_HANDLER( ethernet_w )
 {
 	if (ACCESSING_BITS_0_15)
-		smc91c94_w(machine, offset * 2 + 0, data, mem_mask);
+		smc91c9x_w(device, offset * 2 + 0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		smc91c94_w(machine, offset * 2 + 1, data >> 16, mem_mask >> 16);
+		smc91c9x_w(device, offset * 2 + 1, data >> 16, mem_mask >> 16);
 }
 
 
@@ -1540,6 +1558,7 @@ INLINE void _add_dynamic_device_address(const device_config *device, offs_t star
 
 static void remap_dynamic_addresses(running_machine *machine)
 {
+	const device_config *ethernet = device_list_find_by_tag(machine->config->devicelist, SMC91C94, "ethernet");
 	const device_config *ide = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
 	int voodoo_type = voodoo_get_type(voodoo_device);
 	offs_t base;
@@ -1600,7 +1619,7 @@ static void remap_dynamic_addresses(running_machine *machine)
 	base = nile_regs[NREG_DCS7] & 0x1fffff00;
 	if (base >= ramsize)
 	{
-		add_dynamic_address(base + 0x1000, base + 0x100f, ethernet_r, ethernet_w);
+		add_dynamic_device_address(ethernet, base + 0x1000, base + 0x100f, ethernet_r, ethernet_w);
 		if (dcs_idma_cs == 7)
 		{
 			add_dynamic_address(base + 0x5000, base + 0x5003, NULL, dsio_idma_addr_w);
@@ -2210,6 +2229,8 @@ static MACHINE_DRIVER_START( vegascore )
 
 	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
 
+	MDRV_SMC91C94_ADD("ethernet", ethernet_interrupt)
+
 	MDRV_3DFX_VOODOO_2_ADD("voodoo", STD_VOODOO_2_CLOCK, 2, "main")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 4)
@@ -2446,15 +2467,9 @@ ROM_END
 
 static void init_common(running_machine *machine, int ioasic, int serialnum)
 {
-	static const struct smc91c9x_interface ethernet_intf =
-	{
-		ethernet_interrupt
-	};
-
 	/* initialize the subsystems */
 	midway_ioasic_init(machine, ioasic, serialnum, 80, ioasic_irq);
 	midway_ioasic_set_auto_ack(1);
-	smc91c94_init(&ethernet_intf);
 
 	/* allocate RAM for the timekeeper */
 	timekeeper_nvram_size = 0x8000;
@@ -2580,26 +2595,26 @@ static DRIVER_INIT( cartfury )
  *************************************/
 
 /* Vegas + Vegas SIO + Voodoo 2 */
-GAME( 1998, gauntleg, 0,        vegas,    gauntleg, gauntleg, ROT0, "Atari Games",  "Gauntlet Legends (version 1.6)", 0 )
-GAME( 1998, gauntl12, gauntleg, vegas,    gauntleg, gauntleg, ROT0, "Atari Games",  "Gauntlet Legends (version 1.2)", GAME_NO_SOUND )
-GAME( 1998, tenthdeg, 0,        vegas,    tenthdeg, tenthdeg, ROT0, "Atari Games",  "Tenth Degree (prototype)", 0 )
+GAME( 1998, gauntleg, 0,        vegas,    gauntleg, gauntleg, ROT0, "Atari Games",  "Gauntlet Legends (version 1.6)", GAME_SUPPORTS_SAVE )
+GAME( 1998, gauntl12, gauntleg, vegas,    gauntleg, gauntleg, ROT0, "Atari Games",  "Gauntlet Legends (version 1.2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1998, tenthdeg, 0,        vegas,    tenthdeg, tenthdeg, ROT0, "Atari Games",  "Tenth Degree (prototype)", GAME_SUPPORTS_SAVE )
 
 /* Durango + Vegas SIO + Voodoo 2 */
-GAME( 1999, gauntdl,  0,        vegas,    gauntdl,  gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.52)", 0 )
-GAME( 1999, gauntd24, gauntdl,  vegas,    gauntdl,  gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.4)", 0 )
-GAME( 1999, warfa,    0,        vegas250, warfa,    warfa,    ROT0, "Atari Games",  "War: The Final Assault", GAME_NOT_WORKING )
+GAME( 1999, gauntdl,  0,        vegas,    gauntdl,  gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.52)", GAME_SUPPORTS_SAVE )
+GAME( 1999, gauntd24, gauntdl,  vegas,    gauntdl,  gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.4)", GAME_SUPPORTS_SAVE )
+GAME( 1999, warfa,    0,        vegas250, warfa,    warfa,    ROT0, "Atari Games",  "War: The Final Assault", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 /* Durango + DSIO + Voodoo 2 */
-GAME( 1999, roadburn, 0,        vegas32m, roadburn, roadburn, ROT0, "Atari Games",  "Road Burners", GAME_NOT_WORKING )
+GAME( 1999, roadburn, 0,        vegas32m, roadburn, roadburn, ROT0, "Atari Games",  "Road Burners", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 /* Durango + DSIO? + Voodoo banshee */
-GAME( 1998, nbashowt, 0,        vegasban, nbashowt, nbashowt, ROT0, "Midway Games", "NBA Showtime: NBA on NBC", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 1999, nbanfl,   0,        vegasban, nbashowt, nbanfl,   ROT0, "Midway Games", "NBA Showtime / NFL Blitz 2000", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1998, nbashowt, 0,        vegasban, nbashowt, nbashowt, ROT0, "Midway Games", "NBA Showtime: NBA on NBC", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1999, nbanfl,   0,        vegasban, nbashowt, nbanfl,   ROT0, "Midway Games", "NBA Showtime / NFL Blitz 2000", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 /* Durango + Denver SIO + Voodoo 3 */
-GAME( 1998, sf2049,   0,        denver,   sf2049,   sf2049,   ROT0, "Atari Games",  "San Francisco Rush 2049", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 1998, sf2049se, sf2049,   denver,   sf2049se, sf2049se, ROT0, "Atari Games",  "San Francisco Rush 2049: Special Edition", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 1998, sf2049te, sf2049,   denver,   sf2049te, sf2049te, ROT0, "Atari Games",  "San Francisco Rush 2049: Tournament Edition", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1998, sf2049,   0,        denver,   sf2049,   sf2049,   ROT0, "Atari Games",  "San Francisco Rush 2049", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, sf2049se, sf2049,   denver,   sf2049se, sf2049se, ROT0, "Atari Games",  "San Francisco Rush 2049: Special Edition", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, sf2049te, sf2049,   denver,   sf2049te, sf2049te, ROT0, "Atari Games",  "San Francisco Rush 2049: Tournament Edition", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE)
 
 /* Durango + Vegas SIO + Voodoo 3 */
-GAME( 2000, cartfury, 0,        vegasv3,  cartfury, cartfury, ROT0, "Midway Games", "Cart Fury", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000, cartfury, 0,        vegasv3,  cartfury, cartfury, ROT0, "Midway Games", "Cart Fury", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

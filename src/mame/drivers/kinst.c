@@ -144,7 +144,6 @@ Notes:
 static UINT32 *rambase, *rambase2, *rombase;
 static UINT32 *video_base;
 static UINT32 *kinst_control;
-static UINT32 *kinst_speedup;
 
 static const UINT8 *control_map;
 
@@ -223,9 +222,6 @@ static MACHINE_START( kinst )
 
 static MACHINE_RESET( kinst )
 {
-	/* reset the IDE controller */
-	devtag_reset(machine, IDE_CONTROLLER, "ide");
-
 	/* set a safe base location for video */
 	video_base = &rambase[0x30000/4];
 }
@@ -393,37 +389,6 @@ static WRITE32_HANDLER( kinst_control_w )
 			break;
 	}
 }
-
-
-
-/*************************************
- *
- *  Speedups
- *
- *************************************/
-
-static TIMER_CALLBACK( end_spin )
-{
-	cpu_triggerint(machine, 0);
-}
-
-
-static READ32_HANDLER( kinst_speedup_r )
-{
-	if (activecpu_get_pc() == 0x88029890 ||	/* KI */
-		activecpu_get_pc() == 0x8802c2d0	/* KI2 */)
-	{
-		UINT32 r3 = activecpu_get_reg(MIPS3_R3);
-		UINT32 r26 = activecpu_get_reg(MIPS3_R26) - *kinst_speedup;
-		if (r26 < r3)
-		{
-			timer_set(ATTOTIME_IN_CYCLES((r3 - r26) * 2, 0), NULL, 0, end_spin);
-			cpu_spinuntil_int();
-		}
-	}
-	return *kinst_speedup;
-}
-
 
 
 
@@ -689,7 +654,7 @@ static MACHINE_DRIVER_START( kinst )
 	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK )
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -901,9 +866,6 @@ static DRIVER_INIT( kinst )
 
 	/* set up the control register mapping */
 	control_map = kinst_control_map;
-
-	/* optimize one of the non-standard loops */
-	kinst_speedup = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8808f5bc, 0x8808f5bf, 0, 0, kinst_speedup_r);
 }
 
 
@@ -922,9 +884,6 @@ static DRIVER_INIT( kinst2 )
 
 	/* set up the control register mapping */
 	control_map = kinst2_control_map;
-
-	/* optimize one of the non-standard loops */
-	kinst_speedup = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x887ff544, 0x887ff547, 0, 0, kinst_speedup_r);
 }
 
 
@@ -935,13 +894,13 @@ static DRIVER_INIT( kinst2 )
  *
  *************************************/
 
-GAME( 1994, kinst,    0,      kinst, kinst,  kinst,   ROT0, "Rare", "Killer Instinct (v1.5d)", 0 )
-GAME( 1994, kinst14,  kinst,  kinst, kinst2, kinst,   ROT0, "Rare", "Killer Instinct (v1.4)", 0 )
-GAME( 1994, kinst13,  kinst,  kinst, kinst2, kinst,   ROT0, "Rare", "Killer Instinct (v1.3)", 0 )
-GAME( 1994, kinstp,   kinst,  kinst, kinst2, kinst,   ROT0, "Rare", "Killer Instinct (proto v4.7)", 0 )
+GAME( 1994, kinst,    0,      kinst, kinst,  kinst,   ROT0, "Rare", "Killer Instinct (v1.5d)", GAME_SUPPORTS_SAVE )
+GAME( 1994, kinst14,  kinst,  kinst, kinst2, kinst,   ROT0, "Rare", "Killer Instinct (v1.4)", GAME_SUPPORTS_SAVE )
+GAME( 1994, kinst13,  kinst,  kinst, kinst2, kinst,   ROT0, "Rare", "Killer Instinct (v1.3)", GAME_SUPPORTS_SAVE )
+GAME( 1994, kinstp,   kinst,  kinst, kinst2, kinst,   ROT0, "Rare", "Killer Instinct (proto v4.7)", GAME_SUPPORTS_SAVE )
 
-GAME( 1995, kinst2,   0,      kinst, kinst2, kinst2,  ROT0, "Rare", "Killer Instinct 2 (v1.4)", 0 )
-GAME( 1995, kinst2k,  kinst2, kinst, kinst2, kinst2,  ROT0, "Rare", "Killer Instinct 2 (v1.4k, upgrade kit)", GAME_NOT_WORKING )
-GAME( 1995, kinst213, kinst2, kinst, kinst2, kinst2,  ROT0, "Rare", "Killer Instinct 2 (v1.3)", 0 )
-GAME( 1995, kinst211, kinst2, kinst, kinst2, kinst2,  ROT0, "Rare", "Killer Instinct 2 (v1.1)", 0 )
-GAME( 1995, kinst210, kinst2, kinst, kinst2, kinst2,  ROT0, "Rare", "Killer Instinct 2 (v1.0)", 0 )
+GAME( 1995, kinst2,   0,      kinst, kinst2, kinst2,  ROT0, "Rare", "Killer Instinct 2 (v1.4)", GAME_SUPPORTS_SAVE )
+GAME( 1995, kinst2k,  kinst2, kinst, kinst2, kinst2,  ROT0, "Rare", "Killer Instinct 2 (v1.4k, upgrade kit)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1995, kinst213, kinst2, kinst, kinst2, kinst2,  ROT0, "Rare", "Killer Instinct 2 (v1.3)", GAME_SUPPORTS_SAVE )
+GAME( 1995, kinst211, kinst2, kinst, kinst2, kinst2,  ROT0, "Rare", "Killer Instinct 2 (v1.1)", GAME_SUPPORTS_SAVE )
+GAME( 1995, kinst210, kinst2, kinst, kinst2, kinst2,  ROT0, "Rare", "Killer Instinct 2 (v1.0)", GAME_SUPPORTS_SAVE )

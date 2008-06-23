@@ -194,6 +194,7 @@ static void init_fbi(voodoo_state *v, fbi_state *f, void *memory, int fbmem);
 static void init_tmu_shared(tmu_shared_state *s);
 static void init_tmu(voodoo_state *v, tmu_state *t, voodoo_reg *reg, void *memory, int tmem);
 static void soft_reset(voodoo_state *v);
+static void recompute_video_memory(voodoo_state *v);
 static void check_stalled_cpu(voodoo_state *v, attotime current_time);
 static void flush_fifos(voodoo_state *v, attotime current_time);
 static TIMER_CALLBACK( stall_cpu_callback );
@@ -383,12 +384,13 @@ int voodoo_update(const device_config *device, bitmap_t *bitmap, const rectangle
 
 	/* copy from the current front buffer */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-	{
-		UINT16 *src = v->fbi.rgb[drawbuf] + (y - v->fbi.yoffs) * v->fbi.rowpixels - v->fbi.xoffs;
-		UINT32 *dst = BITMAP_ADDR32(bitmap, y, 0);
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-			dst[x] = v->fbi.pen[src[x]];
-	}
+		if (y >= v->fbi.yoffs)
+		{
+			UINT16 *src = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[drawbuf]) + (y - v->fbi.yoffs) * v->fbi.rowpixels - v->fbi.xoffs;
+			UINT32 *dst = BITMAP_ADDR32(bitmap, y, 0);
+			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+				dst[x] = v->fbi.pen[src[x]];
+		}
 
 	/* update stats display */
 	statskey = (input_code_pressed(KEYCODE_BACKSLASH) != 0);
@@ -406,7 +408,7 @@ int voodoo_update(const device_config *device, bitmap_t *bitmap, const rectangle
 	{
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
-			UINT16 *src = v->fbi.aux + (y - v->fbi.yoffs) * v->fbi.rowpixels - v->fbi.xoffs;
+			UINT16 *src = (UINT16 *)(v->fbi.ram + v->fbi.auxoffs) + (y - v->fbi.yoffs) * v->fbi.rowpixels - v->fbi.xoffs;
 			UINT32 *dst = BITMAP_ADDR32(bitmap, y, 0);
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 				dst[x] = ((src[x] << 8) & 0xff0000) | ((src[x] >> 0) & 0xff00) | ((src[x] >> 8) & 0xff);
@@ -460,8 +462,8 @@ static void init_fbi(voodoo_state *v, fbi_state *f, void *memory, int fbmem)
 	/* allocate frame buffer RAM and set pointers */
 	f->ram = memory;
 	f->mask = fbmem - 1;
-	f->rgb[0] = f->rgb[1] = f->rgb[2] = f->ram;
-	f->aux = f->ram;
+	f->rgboffs[0] = f->rgboffs[1] = f->rgboffs[2] = 0;
+	f->auxoffs = ~0;
 
 	/* default to 0x0 */
 	f->frontbuf = 0;
@@ -486,7 +488,7 @@ static void init_fbi(voodoo_state *v, fbi_state *f, void *memory, int fbmem)
 	f->vblank = FALSE;
 
 	/* initialize the memory FIFO */
-	f->fifo.base = f->ram;
+	f->fifo.base = NULL;
 	f->fifo.size = f->fifo.in = f->fifo.out = 0;
 
 	/* set the fog delta mask */
@@ -591,6 +593,192 @@ static void init_tmu(voodoo_state *v, tmu_state *t, voodoo_reg *reg, void *memor
 }
 
 
+static STATE_POSTLOAD( voodoo_postload )
+{
+	voodoo_state *v = param;
+	int index, subindex;
+	
+	v->fbi.clut_dirty = TRUE;
+	for (index = 0; index < ARRAY_LENGTH(v->tmu); index++)
+	{
+		v->tmu[index].regdirty = TRUE;
+		for (subindex = 0; subindex < ARRAY_LENGTH(v->tmu[index].ncc); subindex++)
+			v->tmu[index].ncc[subindex].dirty = TRUE;
+	}
+	
+	/* recompute video memory to get the FBI FIFO base recomputed */
+	if (v->type <= VOODOO_2)
+		recompute_video_memory(v);
+}
+
+
+static void init_save_state(const device_config *device)
+{
+	voodoo_state *v = get_safe_token(device);
+	char unique_tag[50];
+	int index, subindex;
+
+	state_save_register_postload(device->machine, voodoo_postload, v);
+
+	/* create the name for save states */
+	assert(strlen(device->tag) < 30);
+	state_save_combine_module_and_tag(unique_tag, "voodoo", device->tag);
+
+	/* register states: core */
+	state_save_register_item(unique_tag, 0, v->extra_cycles);
+	state_save_register_item_pointer(unique_tag, 0, (&v->reg[0].u), ARRAY_LENGTH(v->reg));
+	state_save_register_item(unique_tag, 0, v->alt_regmap);
+	
+	/* register states: pci */
+	state_save_register_item(unique_tag, 0, v->pci.fifo.in);
+	state_save_register_item(unique_tag, 0, v->pci.fifo.out);
+	state_save_register_item(unique_tag, 0, v->pci.init_enable);
+	state_save_register_item(unique_tag, 0, v->pci.stall_state);
+	state_save_register_item(unique_tag, 0, v->pci.op_pending);
+	state_save_register_item(unique_tag, 0, v->pci.op_end_time.seconds);
+	state_save_register_item(unique_tag, 0, v->pci.op_end_time.attoseconds);
+	state_save_register_item_array(unique_tag, 0, v->pci.fifo_mem);
+
+	/* register states: dac */
+	state_save_register_item_array(unique_tag, 0, v->dac.reg);
+	state_save_register_item(unique_tag, 0, v->dac.read_result);
+
+	/* register states: fbi */
+	state_save_register_item_pointer(unique_tag, 0, v->fbi.ram, v->fbi.mask + 1);
+	state_save_register_item_array(unique_tag, 0, v->fbi.rgboffs);
+	state_save_register_item(unique_tag, 0, v->fbi.auxoffs);
+	state_save_register_item(unique_tag, 0, v->fbi.frontbuf);
+	state_save_register_item(unique_tag, 0, v->fbi.backbuf);
+	state_save_register_item(unique_tag, 0, v->fbi.swaps_pending);
+	state_save_register_item(unique_tag, 0, v->fbi.video_changed);
+	state_save_register_item(unique_tag, 0, v->fbi.yorigin);
+	state_save_register_item(unique_tag, 0, v->fbi.lfb_base);
+	state_save_register_item(unique_tag, 0, v->fbi.lfb_stride);
+	state_save_register_item(unique_tag, 0, v->fbi.width);
+	state_save_register_item(unique_tag, 0, v->fbi.height);
+	state_save_register_item(unique_tag, 0, v->fbi.xoffs);
+	state_save_register_item(unique_tag, 0, v->fbi.yoffs);
+	state_save_register_item(unique_tag, 0, v->fbi.vsyncscan);
+	state_save_register_item(unique_tag, 0, v->fbi.rowpixels);
+	state_save_register_item(unique_tag, 0, v->fbi.vblank);
+	state_save_register_item(unique_tag, 0, v->fbi.vblank_count);
+	state_save_register_item(unique_tag, 0, v->fbi.vblank_swap_pending);
+	state_save_register_item(unique_tag, 0, v->fbi.vblank_swap);
+	state_save_register_item(unique_tag, 0, v->fbi.vblank_dont_swap);
+	state_save_register_item(unique_tag, 0, v->fbi.cheating_allowed);
+	state_save_register_item(unique_tag, 0, v->fbi.sign);
+	state_save_register_item(unique_tag, 0, v->fbi.ax);
+	state_save_register_item(unique_tag, 0, v->fbi.ay);
+	state_save_register_item(unique_tag, 0, v->fbi.bx);
+	state_save_register_item(unique_tag, 0, v->fbi.by);
+	state_save_register_item(unique_tag, 0, v->fbi.cx);
+	state_save_register_item(unique_tag, 0, v->fbi.cy);
+	state_save_register_item(unique_tag, 0, v->fbi.startr);
+	state_save_register_item(unique_tag, 0, v->fbi.startg);
+	state_save_register_item(unique_tag, 0, v->fbi.startb);
+	state_save_register_item(unique_tag, 0, v->fbi.starta);
+	state_save_register_item(unique_tag, 0, v->fbi.startz);
+	state_save_register_item(unique_tag, 0, v->fbi.startw);
+	state_save_register_item(unique_tag, 0, v->fbi.drdx);
+	state_save_register_item(unique_tag, 0, v->fbi.dgdx);
+	state_save_register_item(unique_tag, 0, v->fbi.dbdx);
+	state_save_register_item(unique_tag, 0, v->fbi.dadx);
+	state_save_register_item(unique_tag, 0, v->fbi.dzdx);
+	state_save_register_item(unique_tag, 0, v->fbi.dwdx);
+	state_save_register_item(unique_tag, 0, v->fbi.drdy);
+	state_save_register_item(unique_tag, 0, v->fbi.dgdy);
+	state_save_register_item(unique_tag, 0, v->fbi.dbdy);
+	state_save_register_item(unique_tag, 0, v->fbi.dady);
+	state_save_register_item(unique_tag, 0, v->fbi.dzdy);
+	state_save_register_item(unique_tag, 0, v->fbi.dwdy);
+	state_save_register_item(unique_tag, 0, v->fbi.lfb_stats.pixels_in);
+	state_save_register_item(unique_tag, 0, v->fbi.lfb_stats.pixels_out);
+	state_save_register_item(unique_tag, 0, v->fbi.lfb_stats.chroma_fail);
+	state_save_register_item(unique_tag, 0, v->fbi.lfb_stats.zfunc_fail);
+	state_save_register_item(unique_tag, 0, v->fbi.lfb_stats.afunc_fail);
+	state_save_register_item(unique_tag, 0, v->fbi.lfb_stats.clip_fail);
+	state_save_register_item(unique_tag, 0, v->fbi.lfb_stats.stipple_count);
+	state_save_register_item(unique_tag, 0, v->fbi.sverts);
+	for (index = 0; index < ARRAY_LENGTH(v->fbi.svert); index++)
+	{
+		state_save_register_item(unique_tag, index, v->fbi.svert[index].x);
+		state_save_register_item(unique_tag, index, v->fbi.svert[index].y);
+		state_save_register_item(unique_tag, index, v->fbi.svert[index].a);
+		state_save_register_item(unique_tag, index, v->fbi.svert[index].r);
+		state_save_register_item(unique_tag, index, v->fbi.svert[index].g);
+		state_save_register_item(unique_tag, index, v->fbi.svert[index].b);
+		state_save_register_item(unique_tag, index, v->fbi.svert[index].z);
+		state_save_register_item(unique_tag, index, v->fbi.svert[index].wb);
+		state_save_register_item(unique_tag, index, v->fbi.svert[index].w0);
+		state_save_register_item(unique_tag, index, v->fbi.svert[index].s0);
+		state_save_register_item(unique_tag, index, v->fbi.svert[index].t0);
+		state_save_register_item(unique_tag, index, v->fbi.svert[index].w1);
+		state_save_register_item(unique_tag, index, v->fbi.svert[index].s1);
+		state_save_register_item(unique_tag, index, v->fbi.svert[index].t1);
+	}
+	state_save_register_item(unique_tag, 0, v->fbi.fifo.size);
+	state_save_register_item(unique_tag, 0, v->fbi.fifo.in);
+	state_save_register_item(unique_tag, 0, v->fbi.fifo.out);
+	for (index = 0; index < ARRAY_LENGTH(v->fbi.cmdfifo); index++)
+	{
+		state_save_register_item(unique_tag, index, v->fbi.cmdfifo[index].enable);
+		state_save_register_item(unique_tag, index, v->fbi.cmdfifo[index].count_holes);
+		state_save_register_item(unique_tag, index, v->fbi.cmdfifo[index].base);
+		state_save_register_item(unique_tag, index, v->fbi.cmdfifo[index].end);
+		state_save_register_item(unique_tag, index, v->fbi.cmdfifo[index].rdptr);
+		state_save_register_item(unique_tag, index, v->fbi.cmdfifo[index].amin);
+		state_save_register_item(unique_tag, index, v->fbi.cmdfifo[index].amax);
+		state_save_register_item(unique_tag, index, v->fbi.cmdfifo[index].depth);
+		state_save_register_item(unique_tag, index, v->fbi.cmdfifo[index].holes);
+	}
+	state_save_register_item_array(unique_tag, 0, v->fbi.fogblend);
+	state_save_register_item_array(unique_tag, 0, v->fbi.fogdelta);
+	state_save_register_item_array(unique_tag, 0, v->fbi.clut);
+
+	/* register states: tmu */
+	for (index = 0; index < ARRAY_LENGTH(v->tmu); index++)
+	{
+		tmu_state *tmu = &v->tmu[index];
+		if (tmu->ram == NULL)
+			continue;
+		if (tmu->ram != v->fbi.ram)
+			state_save_register_item_pointer(unique_tag, index, tmu->ram, tmu->mask + 1);
+		state_save_register_item(unique_tag, index, tmu->starts);
+		state_save_register_item(unique_tag, index, tmu->startt);
+		state_save_register_item(unique_tag, index, tmu->startw);
+		state_save_register_item(unique_tag, index, tmu->dsdx);
+		state_save_register_item(unique_tag, index, tmu->dtdx);
+		state_save_register_item(unique_tag, index, tmu->dwdx);
+		state_save_register_item(unique_tag, index, tmu->dsdy);
+		state_save_register_item(unique_tag, index, tmu->dtdy);
+		state_save_register_item(unique_tag, index, tmu->dwdy);
+		for (subindex = 0; subindex < ARRAY_LENGTH(tmu->ncc); subindex++)
+		{
+			state_save_register_item_array(unique_tag, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].ir);
+			state_save_register_item_array(unique_tag, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].ig);
+			state_save_register_item_array(unique_tag, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].ib);
+			state_save_register_item_array(unique_tag, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].qr);
+			state_save_register_item_array(unique_tag, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].qg);
+			state_save_register_item_array(unique_tag, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].qb);
+			state_save_register_item_array(unique_tag, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].y);
+		}
+	}
+
+	/* register states: banshee */
+	if (v->type >= VOODOO_BANSHEE)
+	{
+		state_save_register_item_array(unique_tag, 0, v->banshee.io);
+		state_save_register_item_array(unique_tag, 0, v->banshee.agp);
+		state_save_register_item_array(unique_tag, 0, v->banshee.vga);
+		state_save_register_item_array(unique_tag, 0, v->banshee.crtc);
+		state_save_register_item_array(unique_tag, 0, v->banshee.seq);
+		state_save_register_item_array(unique_tag, 0, v->banshee.gc);
+		state_save_register_item_array(unique_tag, 0, v->banshee.att);
+		state_save_register_item(unique_tag, 0, v->banshee.attff);
+	}
+}
+
+
 
 /*************************************
  *
@@ -665,7 +853,7 @@ static void swap_buffers(voodoo_state *v)
 	{
 		if (v->type < VOODOO_2 || !v->fbi.vblank_dont_swap)
 		{
-			if (v->fbi.rgb[2] == NULL)
+			if (v->fbi.rgboffs[2] == ~0)
 			{
 				v->fbi.frontbuf = 1 - v->fbi.frontbuf;
 				v->fbi.backbuf = 1 - v->fbi.frontbuf;
@@ -678,10 +866,7 @@ static void swap_buffers(voodoo_state *v)
 		}
 	}
 	else
-	{
-		v->fbi.rgb[0] = (UINT16 *)((UINT8 *)v->fbi.ram + (v->reg[leftOverlayBuf].u & v->fbi.mask & ~0x0f));
-		v->fbi.rgbmax[0] = (UINT16 *)((UINT8 *)v->fbi.ram + v->fbi.mask + 1) - v->fbi.rgb[0];
-	}
+		v->fbi.rgboffs[0] = v->reg[leftOverlayBuf].u & v->fbi.mask & ~0x0f;
 
 	/* decrement the pending count and reset our state */
 	if (v->fbi.swaps_pending)
@@ -886,10 +1071,10 @@ static void recompute_video_memory(voodoo_state *v)
 //  logerror("VOODOO.%d.VIDMEM: buffer_pages=%X  fifo=%X-%X  tiles=%X  rowpix=%d\n", v->index, buffer_pages, fifo_start_page, fifo_last_page, v->fbi.x_tiles, v->fbi.rowpixels);
 
 	/* first RGB buffer always starts at 0 */
-	v->fbi.rgb[0] = v->fbi.ram;
+	v->fbi.rgboffs[0] = 0;
 
 	/* second RGB buffer starts immediately afterwards */
-	v->fbi.rgb[1] = (UINT16 *)((UINT8 *)v->fbi.ram + buffer_pages * 0x1000);
+	v->fbi.rgboffs[1] = buffer_pages * 0x1000;
 
 	/* remaining buffers are based on the config */
 	switch (memory_config)
@@ -898,48 +1083,32 @@ static void recompute_video_memory(voodoo_state *v)
 			logerror("VOODOO.%d.ERROR:Unexpected memory configuration in recompute_video_memory!\n", v->index);
 
 		case 0:	/* 2 color buffers, 1 aux buffer */
-			v->fbi.rgb[2] = NULL;
-			v->fbi.aux = (UINT16 *)((UINT8 *)v->fbi.ram + 2 * buffer_pages * 0x1000);
+			v->fbi.rgboffs[2] = ~0;
+			v->fbi.auxoffs = 2 * buffer_pages * 0x1000;
 			break;
 
 		case 1:	/* 3 color buffers, 0 aux buffers */
-			v->fbi.rgb[2] = (UINT16 *)((UINT8 *)v->fbi.ram + 2 * buffer_pages * 0x1000);
-			v->fbi.aux = NULL;
+			v->fbi.rgboffs[2] = 2 * buffer_pages * 0x1000;
+			v->fbi.auxoffs = ~0;
 			break;
 
 		case 2:	/* 3 color buffers, 1 aux buffers */
-			v->fbi.rgb[2] = (UINT16 *)((UINT8 *)v->fbi.ram + 2 * buffer_pages * 0x1000);
-			v->fbi.aux = (UINT16 *)((UINT8 *)v->fbi.ram + 3 * buffer_pages * 0x1000);
+			v->fbi.rgboffs[2] = 2 * buffer_pages * 0x1000;
+			v->fbi.auxoffs = 3 * buffer_pages * 0x1000;
 			break;
 	}
 
 	/* clamp the RGB buffers to video memory */
 	for (buf = 0; buf < 3; buf++)
-	{
-		v->fbi.rgbmax[buf] = 0;
-		if (v->fbi.rgb[buf])
-		{
-			if ((UINT8 *)v->fbi.rgb[buf] > (UINT8 *)v->fbi.ram + v->fbi.mask)
-				v->fbi.rgb[buf] = (UINT16 *)((UINT8 *)v->fbi.ram + v->fbi.mask);
-			v->fbi.rgbmax[buf] = (UINT16 *)((UINT8 *)v->fbi.ram + v->fbi.mask + 1) - v->fbi.rgb[buf];
-		}
-	}
+		if (v->fbi.rgboffs[buf] != ~0 && v->fbi.rgboffs[buf] > v->fbi.mask)
+			v->fbi.rgboffs[buf] = v->fbi.mask;
 
 	/* clamp the aux buffer to video memory */
-	v->fbi.auxmax = 0;
-	if (v->fbi.aux)
-	{
-		if ((UINT8 *)v->fbi.aux > (UINT8 *)v->fbi.ram + v->fbi.mask)
-			v->fbi.aux = (UINT16 *)((UINT8 *)v->fbi.ram + v->fbi.mask);
-		v->fbi.auxmax = (UINT16 *)((UINT8 *)v->fbi.ram + v->fbi.mask + 1) - v->fbi.aux;
-	}
+	if (v->fbi.auxoffs != ~0 && v->fbi.auxoffs > v->fbi.mask)
+		v->fbi.auxoffs = v->fbi.mask;
 
 /*  mame_printf_debug("rgb[0] = %08X   rgb[1] = %08X   rgb[2] = %08X   aux = %08X\n",
-            (UINT8 *)v->fbi.rgb[0] - (UINT8 *)v->fbi.ram,
-            (UINT8 *)v->fbi.rgb[1] - (UINT8 *)v->fbi.ram,
-            v->fbi.rgb[2] ? ((UINT8 *)v->fbi.rgb[2] - (UINT8 *)v->fbi.ram) : 0,
-            (UINT8 *)v->fbi.aux - (UINT8 *)v->fbi.ram);*/
-//  logerror("VOODOO.%d.VIDMEM: rgbmax=%X,%X,%X  auxmax=%X\n", v->index, v->fbi.rgbmax[0], v->fbi.rgbmax[1], v->fbi.rgbmax[2], v->fbi.auxmax);
+            v->fbi.rgboffs[0], v->fbi.rgboffs[1], v->fbi.rgboffs[2], v->fbi.auxoffs);*/
 
 	/* compute the memory FIFO location and size */
 	if (fifo_last_page > v->fbi.mask / 0x1000)
@@ -948,7 +1117,7 @@ static void recompute_video_memory(voodoo_state *v)
 	/* is it valid and enabled? */
 	if (fifo_start_page <= fifo_last_page && FBIINIT0_ENABLE_MEMORY_FIFO(v->reg[fbiInit0].u))
 	{
-		v->fbi.fifo.base = (UINT32 *)((UINT8 *)v->fbi.ram + fifo_start_page * 0x1000);
+		v->fbi.fifo.base = (UINT32 *)(v->fbi.ram + fifo_start_page * 0x1000);
 		v->fbi.fifo.size = (fifo_last_page + 1 - fifo_start_page) * 0x1000 / 4;
 		if (v->fbi.fifo.size > 65536*2)
 			v->fbi.fifo.size = 65536*2;
@@ -965,7 +1134,7 @@ static void recompute_video_memory(voodoo_state *v)
 	fifo_reset(&v->fbi.fifo);
 
 	/* reset our front/back buffers if they are out of range */
-	if (!v->fbi.rgb[2])
+	if (v->fbi.rgboffs[2] == ~0)
 	{
 		if (v->fbi.frontbuf == 2)
 			v->fbi.frontbuf = 0;
@@ -1265,7 +1434,7 @@ INLINE INT32 prepare_tmu(tmu_state *t)
 
 static int cmdfifo_compute_expected_depth(voodoo_state *v, cmdfifo_info *f)
 {
-	UINT32 *fifobase = v->fbi.ram;
+	UINT32 *fifobase = (UINT32 *)v->fbi.ram;
 	UINT32 readptr = f->rdptr;
 	UINT32 command = fifobase[readptr / 4];
 	int i, count = 0;
@@ -1405,7 +1574,7 @@ static int cmdfifo_compute_expected_depth(voodoo_state *v, cmdfifo_info *f)
 
 static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 {
-	UINT32 *fifobase = v->fbi.ram;
+	UINT32 *fifobase = (UINT32 *)v->fbi.ram;
 	UINT32 readptr = f->rdptr;
 	UINT32 *src = &fifobase[readptr / 4];
 	UINT32 command = *src++;
@@ -1746,7 +1915,7 @@ static INT32 cmdfifo_execute_if_ready(voodoo_state *v, cmdfifo_info *f)
 static void cmdfifo_w(voodoo_state *v, cmdfifo_info *f, offs_t offset, UINT32 data)
 {
 	UINT32 addr = f->base + offset * 4;
-	UINT32 *fifobase = v->fbi.ram;
+	UINT32 *fifobase = (UINT32 *)v->fbi.ram;
 
 	if (LOG_CMDFIFO_VERBOSE) logerror("CMDFIFO_w(%04X) = %08X\n", offset, data);
 
@@ -2441,10 +2610,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 			if (v->type == VOODOO_2 && (chips & 1))
 				v->fbi.cmdfifo[0].amin = data;
 			else if (v->type >= VOODOO_BANSHEE && (chips & 1))
-			{
-				v->fbi.rgb[1] = (UINT16 *)((UINT8 *)v->fbi.ram + (data & v->fbi.mask & ~0x0f));
-				v->fbi.rgbmax[1] = (UINT16 *)((UINT8 *)v->fbi.ram + v->fbi.mask + 1) - v->fbi.rgb[1];
-			}
+				v->fbi.rgboffs[1] = data & v->fbi.mask & ~0x0f;
 			break;
 
 		case cmdFifoAMax:
@@ -2465,10 +2631,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 			if (v->type == VOODOO_2 && (chips & 1))
 				v->fbi.cmdfifo[0].depth = data;
 			else if (v->type >= VOODOO_BANSHEE && (chips & 1))
-			{
-				v->fbi.aux = (UINT16 *)((UINT8 *)v->fbi.ram + (data & v->fbi.mask & ~0x0f));
-				v->fbi.auxmax = (UINT16 *)((UINT8 *)v->fbi.ram + v->fbi.mask + 1) - v->fbi.aux;
-			}
+				v->fbi.auxoffs = data & v->fbi.mask & ~0x0f;
 			break;
 
 		case cmdFifoHoles:
@@ -2845,21 +3008,21 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 	switch (destbuf)
 	{
 		case 0:			/* front buffer */
-			dest = v->fbi.rgb[v->fbi.frontbuf];
-			destmax = v->fbi.rgbmax[v->fbi.frontbuf];
+			dest = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.frontbuf]);
+			destmax = (v->fbi.mask + 1 - v->fbi.rgboffs[v->fbi.frontbuf]) / 2;
 			v->fbi.video_changed = TRUE;
 			break;
 
 		case 1:			/* back buffer */
-			dest = v->fbi.rgb[v->fbi.backbuf];
-			destmax = v->fbi.rgbmax[v->fbi.backbuf];
+			dest = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.backbuf]);
+			destmax = (v->fbi.mask + 1 - v->fbi.rgboffs[v->fbi.backbuf]) / 2;
 			break;
 
 		default:		/* reserved */
 			return 0;
 	}
-	depth = v->fbi.aux;
-	depthmax = v->fbi.auxmax;
+	depth = (UINT16 *)(v->fbi.ram + v->fbi.auxoffs);
+	depthmax = (v->fbi.mask + 1 - v->fbi.auxoffs) / 2;
 
 	/* wait for any outstanding work to finish */
 	poly_wait(v->poly, "LFB Write");
@@ -3631,20 +3794,20 @@ static UINT32 lfb_r(voodoo_state *v, offs_t offset, int forcefront)
 	switch (destbuf)
 	{
 		case 0:			/* front buffer */
-			buffer = v->fbi.rgb[v->fbi.frontbuf];
-			bufmax = v->fbi.rgbmax[v->fbi.frontbuf];
+			buffer = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.frontbuf]);
+			bufmax = (v->fbi.mask + 1 - v->fbi.rgboffs[v->fbi.frontbuf]) / 2;
 			break;
 
 		case 1:			/* back buffer */
-			buffer = v->fbi.rgb[v->fbi.backbuf];
-			bufmax = v->fbi.rgbmax[v->fbi.backbuf];
+			buffer = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.backbuf]);
+			bufmax = (v->fbi.mask + 1 - v->fbi.rgboffs[v->fbi.backbuf]) / 2;
 			break;
 
 		case 2:			/* aux buffer */
-			buffer = v->fbi.aux;
-			bufmax = v->fbi.auxmax;
-			if (!buffer)
+			if (v->fbi.auxoffs == ~0)
 				return 0xffffffff;
+			buffer = (UINT16 *)(v->fbi.ram + v->fbi.auxoffs);
+			bufmax = (v->fbi.mask + 1 - v->fbi.auxoffs) / 2;
 			break;
 
 		default:		/* reserved */
@@ -4285,7 +4448,6 @@ static DEVICE_START( voodoo )
 	voodoo_state *v = get_safe_token(device);
 	const raster_info *info;
 	void *fbmem, *tmumem[2];
-	char unique_tag[50];
 	UINT32 tmumem0;
 	int val;
 
@@ -4449,13 +4611,9 @@ static DEVICE_START( voodoo )
 
 	/* do a soft reset to reset everything else */
 	soft_reset(v);
-
-	/* create the name for save states */
-	assert(strlen(device->tag) < 30);
-	state_save_combine_module_and_tag(unique_tag, "voodoo", device->tag);
-
-	/* register states */
-//	state_save_register_item(unique_tag, 0, ide->adapter_control);
+	
+	/* register for save states */
+	init_save_state(device);
 }
 
 
@@ -4503,6 +4661,7 @@ static DEVICE_SET_INFO( voodoo )
 
 DEVICE_GET_INFO( voodoo )
 {
+	const voodoo_config *config = (device != NULL) ? device->inline_config : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -4517,7 +4676,16 @@ DEVICE_GET_INFO( voodoo )
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(voodoo);break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					info->s = "3dfx Voodoo";				break;
+		case DEVINFO_STR_NAME:
+			switch (config->type)
+			{
+				default:
+				case VOODOO_1:					info->s = "3dfx Voodoo Graphics";		break;
+				case VOODOO_2:					info->s = "3dfx Voodoo 2";				break;
+				case VOODOO_BANSHEE:			info->s = "3dfx Voodoo Banshee";		break;
+				case VOODOO_3:					info->s = "3dfx Voodoo 3";				break;
+			}
+			break;
 		case DEVINFO_STR_FAMILY:				info->s = "3dfx Voodoo Graphics";		break;
 		case DEVINFO_STR_VERSION:				info->s = "1.0";						break;
 		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;						break;
@@ -4560,11 +4728,11 @@ static INT32 fastfill(voodoo_state *v)
 		switch (destbuf)
 		{
 			case 0:		/* front buffer */
-				drawbuf = v->fbi.rgb[v->fbi.frontbuf];
+				drawbuf = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.frontbuf]);
 				break;
 
 			case 1:		/* back buffer */
-				drawbuf = v->fbi.rgb[v->fbi.backbuf];
+				drawbuf = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.backbuf]);
 				break;
 
 			default:	/* reserved */
@@ -4698,12 +4866,12 @@ static INT32 triangle(voodoo_state *v)
 	switch (destbuf)
 	{
 		case 0:		/* front buffer */
-			drawbuf = v->fbi.rgb[v->fbi.frontbuf];
+			drawbuf = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.frontbuf]);
 			v->fbi.video_changed = TRUE;
 			break;
 
 		case 1:		/* back buffer */
-			drawbuf = v->fbi.rgb[v->fbi.backbuf];
+			drawbuf = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.backbuf]);
 			break;
 
 		default:	/* reserved */
@@ -5196,11 +5364,11 @@ static void raster_fastfill(void *destbase, INT32 y, const poly_extent *extent, 
 	}
 
 	/* fill this dest buffer row */
-	if (FBZMODE_AUX_BUFFER_MASK(v->reg[fbzMode].u) && v->fbi.aux)
+	if (FBZMODE_AUX_BUFFER_MASK(v->reg[fbzMode].u) && v->fbi.auxoffs != ~0)
 	{
 		UINT16 color = v->reg[zaColor].u;
 		UINT64 expanded = ((UINT64)color << 48) | ((UINT64)color << 32) | (color << 16) | color;
-		UINT16 *dest = v->fbi.aux + scry * v->fbi.rowpixels;
+		UINT16 *dest = (UINT16 *)(v->fbi.ram + v->fbi.auxoffs) + scry * v->fbi.rowpixels;
 
 		for (x = startx; x < stopx && (x & 3) != 0; x++)
 			dest[x] = color;

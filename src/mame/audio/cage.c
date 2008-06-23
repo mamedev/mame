@@ -171,6 +171,16 @@ void cage_init(running_machine *machine, int boot_region, offs_t speedup)
 
 	if (speedup)
 		speedup_ram = memory_install_write32_handler(machine, cage_cpu, ADDRESS_SPACE_PROGRAM, speedup, speedup, 0, 0, speedup_w);
+
+	state_save_register_global(cpu_to_cage_ready);
+	state_save_register_global(cage_to_cpu_ready);
+	state_save_register_global(serial_period_per_word.seconds);
+	state_save_register_global(serial_period_per_word.attoseconds);
+	state_save_register_global(dma_enabled);
+	state_save_register_global(dma_timer_enabled);
+	state_save_register_global_array(cage_timer_enabled);
+	state_save_register_global(cage_from_main);
+	state_save_register_global(cage_control);
 }
 
 
