@@ -10,7 +10,7 @@
    02 - sptr  LO 
    03 - sptr  HI
    04
-   05 - flags? 00000000 0000?L0?   - bit 2 could be looping flag
+   05 - flags? 00000000 0000?L0?   - bit 2 is loop enable, but bit 0 must also be set to actually loop
    06 - freq
    07 - lsptr LO
    08
@@ -68,36 +68,33 @@ WRITE16_HANDLER(nile_sndctrl_w)
 {
 	struct nile_info *info = sndti_token(SOUND_NILE, 0);
 	UINT16 ctrl=info->ctrl;
-	int voice;
 	COMBINE_DATA(&info->ctrl);
+
+//	printf("CTRL: %04x -> %04x (PC=%x)\n", ctrl, info->ctrl, activecpu_get_pc());
 	
 	ctrl^=info->ctrl;
-	//ctrl&=info->ctrl; //0->1
-	
-	for(voice=0;voice<NILE_VOICES;++voice) 
-	{ 
-		if(ctrl&(1<<voice)) 
-		{ 
-			info->vpos[voice] = info->frac[voice] = info->lponce[voice] = 0;
-		}
-	}
 }
 
 READ16_HANDLER(nile_sndctrl_r)
 {
 	struct nile_info *info = sndti_token(SOUND_NILE, 0);
+
+	stream_update(info->stream);
+
 	return info->ctrl;
 }
 
 READ16_HANDLER(nile_snd_r)
 {
+	struct nile_info *info = sndti_token(SOUND_NILE, 0);
 	int reg=offset&0xf;
+
+	stream_update(info->stream);
+
 	if(reg==2 || reg==3)
 	{
 		int slot=offset/16;
-		struct nile_info *info = sndti_token(SOUND_NILE, 0);
 		int sptr = ((nile_sound_regs[slot*16+3]<<16)|nile_sound_regs[slot*16+2])+info->vpos[slot];
-		
 		
 		if(reg==2)
 		{
@@ -113,7 +110,22 @@ READ16_HANDLER(nile_snd_r)
 
 WRITE16_HANDLER(nile_snd_w)
 {
+	struct nile_info *info = sndti_token(SOUND_NILE, 0);
+	int v, r;
+
 	COMBINE_DATA(&nile_sound_regs[offset]);
+
+	v = offset / 16;
+	r = offset % 16;
+
+	if ((r == 2) || (r == 3))
+	{
+		info->vpos[v] = info->frac[v] = info->lponce[v] = 0;
+	}
+
+//	printf("v%02d: %04x to reg %02d (PC=%x)\n", v, nile_sound_regs[offset], r, activecpu_get_pc());
+
+	stream_update(info->stream);
 }
 
 static void nile_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
@@ -183,10 +195,9 @@ static void nile_update(void *param, stream_sample_t **inputs, stream_sample_t *
 						}
 						else
 						{
-						
-						
-							info->ctrl&=~(1<<v);
-							info->vpos[v] = info->frac[v] = 0;
+							info->ctrl &= ~(1<<v);
+							info->vpos[v] = (eptr - sptr);
+							info->frac[v] = 0;
 						}
 						
 					}
