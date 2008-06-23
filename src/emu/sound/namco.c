@@ -12,6 +12,7 @@
 ***************************************************************************/
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "namco.h"
 
@@ -133,7 +134,7 @@ static int build_decoded_waveform(struct namco_sound *chip, int region)
 	}
 
 	if (region != -1)
-		namco_wavedata = memory_region(region);
+		namco_wavedata = memory_region(Machine, region);
 
 	/* We need waveform data. It fails if region is not specified. */
 	if (namco_wavedata)

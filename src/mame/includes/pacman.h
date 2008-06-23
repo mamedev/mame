@@ -48,12 +48,12 @@ WRITE8_HANDLER( jrpacman_bgpriority_w );
 
 /*----------- defined in machine/pacplus.c -----------*/
 
-void pacplus_decode(void);
+void pacplus_decode(running_machine *machine);
 
 
 /*----------- defined in machine/jumpshot.c -----------*/
 
-void jumpshot_decode(void);
+void jumpshot_decode(running_machine *machine);
 
 
 /*----------- defined in machine/theglobp.c -----------*/

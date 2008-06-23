@@ -279,12 +279,12 @@ void neogeo_set_fixed_layer_source(UINT8 data)
 }
 
 
-static void draw_fixed_layer(bitmap_t *bitmap, int scanline)
+static void draw_fixed_layer(running_machine *machine, bitmap_t *bitmap, int scanline)
 {
 	int x;
 
-	UINT8* gfx_base = memory_region(fixed_layer_source ? NEOGEO_REGION_FIXED_LAYER_CARTRIDGE : NEOGEO_REGION_FIXED_LAYER_BIOS);
-	UINT32 addr_mask = memory_region_length(fixed_layer_source ? NEOGEO_REGION_FIXED_LAYER_CARTRIDGE : NEOGEO_REGION_FIXED_LAYER_BIOS) - 1;
+	UINT8* gfx_base = memory_region(machine, fixed_layer_source ? NEOGEO_REGION_FIXED_LAYER_CARTRIDGE : NEOGEO_REGION_FIXED_LAYER_BIOS);
+	UINT32 addr_mask = memory_region_length(machine, fixed_layer_source ? NEOGEO_REGION_FIXED_LAYER_CARTRIDGE : NEOGEO_REGION_FIXED_LAYER_BIOS) - 1;
 	UINT16 *video_data = &neogeo_videoram[0x7000 | (scanline >> 3)];
 	UINT32 *pixel_addr = BITMAP_ADDR32(bitmap, scanline, NEOGEO_HBEND);
 
@@ -413,7 +413,7 @@ INLINE int sprite_on_scanline(int scanline, int y, int rows)
 }
 
 
-static void draw_sprites(bitmap_t *bitmap, int scanline)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int scanline)
 {
 	int sprite_index;
 	int max_sprite_index;
@@ -504,7 +504,7 @@ static void draw_sprites(bitmap_t *bitmap, int scanline)
 				}
 			}
 
-			sprite_y_and_tile = memory_region(NEOGEO_REGION_ZOOM_Y_TABLE)[(zoom_y << 8) | zoom_line];
+			sprite_y_and_tile = memory_region(machine, NEOGEO_REGION_ZOOM_Y_TABLE)[(zoom_y << 8) | zoom_line];
 			sprite_y = sprite_y_and_tile & 0x0f;
 			tile = sprite_y_and_tile >> 4;
 
@@ -688,7 +688,7 @@ static void start_sprite_line_timer(running_machine *machine)
 }
 
 
-static void optimize_sprite_data(void)
+static void optimize_sprite_data(running_machine *machine)
 {
 	/* convert the sprite graphics data into a format that
        allows faster blitting */
@@ -702,7 +702,7 @@ static void optimize_sprite_data(void)
        power of 2 */
 	sprite_gfx_address_mask = 0xffffffff;
 
-	len = memory_region_length(NEOGEO_REGION_SPRITES);
+	len = memory_region_length(machine, NEOGEO_REGION_SPRITES);
 	for (bit = 0x80000000; bit != 0; bit >>= 1)
 	{
 		if (((len * 2) - 1) & bit)
@@ -714,7 +714,7 @@ static void optimize_sprite_data(void)
 	sprite_gfx = auto_malloc(sprite_gfx_address_mask + 1);
 	memset(sprite_gfx, 0, sprite_gfx_address_mask + 1);
 
-	src = memory_region(NEOGEO_REGION_SPRITES);
+	src = memory_region(machine, NEOGEO_REGION_SPRITES);
 	dest = sprite_gfx;
 
 	for (i = 0; i < len; i += 0x80, src += 0x80)
@@ -875,7 +875,7 @@ VIDEO_START( neogeo )
 	compute_rgb_weights();
 	create_sprite_line_timer();
 	create_auto_animation_timer();
-	optimize_sprite_data();
+	optimize_sprite_data(machine);
 
 	/* initialize values that are not modified on a reset */
 	videoram_read_buffer = 0;
@@ -931,9 +931,9 @@ VIDEO_UPDATE( neogeo )
 	/* fill with background color first */
 	fillbitmap(bitmap, pens[0x0fff], cliprect);
 
-	draw_sprites(bitmap, cliprect->min_y);
+	draw_sprites(screen->machine, bitmap, cliprect->min_y);
 
-	draw_fixed_layer(bitmap, cliprect->min_y);
+	draw_fixed_layer(screen->machine, bitmap, cliprect->min_y);
 
 	return 0;
 }

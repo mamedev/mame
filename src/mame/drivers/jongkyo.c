@@ -565,7 +565,7 @@ INPUT_PORTS_END
 static PALETTE_INIT(jongkyo)
 {
 	int i;
-	UINT8* proms = memory_region(REGION_PROMS);
+	UINT8* proms = memory_region(machine, REGION_PROMS);
 	for (i=0;i<0x40;i++)
 	{
 		int data = proms[i];
@@ -639,7 +639,7 @@ ROM_END
 static DRIVER_INIT( jongkyo )
 {
 	int i;
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	/* first of all, do a simple bitswap */
 	for (i = 0x6000; i < 0x9000; ++i)
@@ -648,7 +648,7 @@ static DRIVER_INIT( jongkyo )
 	}
 
 	/* then do the standard Sega decryption */
-	jongkyo_decode();
+	jongkyo_decode(machine);
 
 	videoram2 = auto_malloc(0x4000);
 	state_save_register_global_pointer(videoram2, 0x4000);

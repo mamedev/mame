@@ -770,15 +770,15 @@ ADDRESS_MAP_END
 
 static int cur_sound_region;
 
-static void reset_sound_region(void)
+static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(2, memory_region(REGION_CPU2) + 0x10000 + cur_sound_region*0x4000);
+	memory_set_bankptr(2, memory_region(machine, REGION_CPU2) + 0x10000 + cur_sound_region*0x4000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	cur_sound_region = (data & 0xf);
-	reset_sound_region();
+	reset_sound_region(machine);
 }
 
 /* sound memory maps
@@ -852,14 +852,14 @@ GFXDECODE_END
 
 static STATE_POSTLOAD( mystwarr_postload )
 {
-	reset_sound_region();
+	reset_sound_region(machine);
 }
 
 static MACHINE_START( mystwarr )
 {
 	/* set default bankswitch */
 	cur_sound_region = 2;
-	reset_sound_region();
+	reset_sound_region(machine);
 
 	mw_irq_control = 0;
 

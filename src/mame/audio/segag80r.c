@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "cpu/i8039/i8039.h"
 #include "segag80r.h"
@@ -507,9 +508,9 @@ WRITE8_HANDLER( sega005_sound_a_w )
 }
 
 
-INLINE void sega005_update_sound_data(void)
+INLINE void sega005_update_sound_data(running_machine *machine)
 {
-	UINT8 newval = memory_region(REGION_SOUND1)[sound_addr];
+	UINT8 newval = memory_region(machine, REGION_SOUND1)[sound_addr];
 	UINT8 diff = newval ^ sound_data;
 
 	//mame_printf_debug("  [%03X] = %02X\n", sound_addr, newval);
@@ -564,7 +565,7 @@ WRITE8_HANDLER( sega005_sound_b_w )
 		sound_addr = (sound_addr & 0x780) | ((sound_addr + 1) & 0x07f);
 
 	/* update the sound data */
-	sega005_update_sound_data();
+	sega005_update_sound_data(machine);
 }
 
 
@@ -585,7 +586,7 @@ static void *sega005_custom_start(int clock, const struct CustomSound_interface 
 
 	/* set the initial sound data */
 	sound_data = 0x00;
-	sega005_update_sound_data();
+	sega005_update_sound_data(Machine);
 
 	return auto_malloc(1);
 }
@@ -593,7 +594,7 @@ static void *sega005_custom_start(int clock, const struct CustomSound_interface 
 
 static void sega005_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	const UINT8 *sound_prom = memory_region(REGION_PROMS);
+	const UINT8 *sound_prom = memory_region(Machine, REGION_PROMS);
 	int i;
 
 	/* no implementation yet */
@@ -620,7 +621,7 @@ static TIMER_CALLBACK( sega005_auto_timer )
 	if ((sound_state[1] & 0x20) && !(sound_state[1] & 0x10))
 	{
 		sound_addr = (sound_addr & 0x780) | ((sound_addr + 1) & 0x07f);
-		sega005_update_sound_data();
+		sega005_update_sound_data(machine);
 	}
 }
 
@@ -888,7 +889,7 @@ static WRITE8_HANDLER( monsterb_sound_a_w )
 	tms36xx_note_w(0, 0, data & 15);
 
 	/* Top four data lines address an 82S123 ROM that enables/disables voices */
-	enable_val = memory_region(REGION_SOUND2)[(data & 0xF0) >> 4];
+	enable_val = memory_region(machine, REGION_SOUND2)[(data & 0xF0) >> 4];
 	tms3617_enable_w(0, enable_val >> 2);
 }
 
@@ -956,7 +957,7 @@ static WRITE8_HANDLER( n7751_rom_offset_w )
 static WRITE8_HANDLER( n7751_rom_select_w )
 {
 	/* P7 - ROM selects */
-	int numroms = memory_region_length(REGION_SOUND1) / 0x1000;
+	int numroms = memory_region_length(machine, REGION_SOUND1) / 0x1000;
 	sound_addr &= 0xfff;
 	if (!(data & 0x01) && numroms >= 1) sound_addr |= 0x0000;
 	if (!(data & 0x02) && numroms >= 2) sound_addr |= 0x1000;
@@ -968,7 +969,7 @@ static WRITE8_HANDLER( n7751_rom_select_w )
 static READ8_HANDLER( n7751_rom_r )
 {
 	/* read from BUS */
-	return memory_region(REGION_SOUND1)[sound_addr];
+	return memory_region(machine, REGION_SOUND1)[sound_addr];
 }
 
 

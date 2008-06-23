@@ -9,6 +9,7 @@ K052591 emulation by Eddie Edwards
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "video/konamiic.h"
 #include "sound/2151intf.h"
@@ -316,7 +317,7 @@ static WRITE8_HANDLER( thunderx_1f98_w )
 
 static WRITE8_HANDLER( scontra_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	int offs;
 
 //logerror("%04x: bank switch %02x\n",activecpu_get_pc(),data);
@@ -1024,7 +1025,7 @@ ROM_END
 
 static void thunderx_banking( int lines )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(Machine, REGION_CPU1);
 	int offs;
 
 //  logerror("thunderx %04x: bank select %02x\n", activecpu_get_pc(), lines );
@@ -1036,14 +1037,14 @@ static void thunderx_banking( int lines )
 
 static MACHINE_RESET( scontra )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	paletteram = &RAM[0x30000];
 }
 
 static MACHINE_RESET( thunderx )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)thunderx_banking);
 	memory_set_bankptr( 1, &RAM[0x10000] ); /* init the default bank */

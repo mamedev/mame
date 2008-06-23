@@ -1235,7 +1235,7 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 
 	/* let the cheat engine display its stuff */
 	if (options_get_bool(mame_options(), OPTION_CHEAT))
-		cheat_display_watches();
+		cheat_display_watches(machine);
 
 	/* display any popup messages */
 	if (osd_ticks() < popup_text_end)

@@ -79,7 +79,7 @@ static WRITE8_HANDLER( questions_bank_w )
 {
 	if( data != 0xff )
 	{
-		UINT8 *questions = memory_region(REGION_USER1);
+		UINT8 *questions = memory_region(machine, REGION_USER1);
 		int bankaddr = 0;
 
 		switch( ~data & 0xff )
@@ -1248,17 +1248,17 @@ ROM_END
 
 static DRIVER_INIT( trackfld )
 {
-	konami1_decode(0);
+	konami1_decode(machine, 0);
 }
 
 static DRIVER_INIT( atlantol )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	UINT8 *decrypt;
 	int A;
 
 	/* "konami1" encrypted opcodes */
-	decrypt = konami1_decode(0);
+	decrypt = konami1_decode(machine, 0);
 
 	/* not encrypted opcodes */
 	for (A = 0;A < 0x6000;A++)
@@ -1271,7 +1271,7 @@ static DRIVER_INIT( atlantol )
 
 static DRIVER_INIT( mastkin )
 {
-	UINT8 *prom = memory_region(REGION_PROMS);
+	UINT8 *prom = memory_region(machine, REGION_PROMS);
 	int i;
 
 	/* build a fake palette so the screen won't be all black */
@@ -1292,14 +1292,14 @@ static DRIVER_INIT( mastkin )
 
 static DRIVER_INIT( wizzquiz )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1) + 0xe000;
+	UINT8 *ROM = memory_region(machine, REGION_CPU1) + 0xe000;
 	int i;
 
 	/* decrypt program rom */
 	for( i = 0; i < 0x2000; i++ )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
-	ROM = memory_region(REGION_USER1);
+	ROM = memory_region(machine, REGION_USER1);
 
 	/* decrypt questions roms */
 	for( i = 0; i < 0x40000; i++ )

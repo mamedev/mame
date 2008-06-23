@@ -61,7 +61,7 @@ WRITE8_HANDLER( redalert_bitmap_videoram_w )
  *
  *************************************/
 
-static void get_pens(pen_t *pens)
+static void get_pens(running_machine *machine, pen_t *pens)
 {
 	static const int resistances_bitmap[]     = { 100 };
 	static const int resistances_charmap_rg[] = { 390, 220, 180 };
@@ -76,7 +76,7 @@ static void get_pens(pen_t *pens)
 	double charmap_b_weights[2];
 	double back_r_weight[1];
 	double back_gb_weight[1];
-	const UINT8 *prom = memory_region(REGION_PROMS);
+	const UINT8 *prom = memory_region(machine, REGION_PROMS);
 
 	scaler = compute_resistor_weights(0, 0xff, -1,
 									  1, resistances_bitmap,     bitmap_weight,      470, 0,
@@ -156,7 +156,7 @@ static VIDEO_UPDATE( redalert )
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
-	get_pens(pens);
+	get_pens(screen->machine, pens);
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{
@@ -228,7 +228,7 @@ static VIDEO_UPDATE( demoneye )
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
-	get_pens(pens);
+	get_pens(screen->machine, pens);
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{

@@ -268,10 +268,10 @@ static DRIVER_INIT( mustache )
 {
 	int i;
 
-	int G1 = memory_region_length(REGION_GFX1)/3;
-	int G2 = memory_region_length(REGION_GFX2)/2;
-	UINT8 *gfx1 = memory_region(REGION_GFX1);
-	UINT8 *gfx2 = memory_region(REGION_GFX2);
+	int G1 = memory_region_length(machine, REGION_GFX1)/3;
+	int G2 = memory_region_length(machine, REGION_GFX2)/2;
+	UINT8 *gfx1 = memory_region(machine, REGION_GFX1);
+	UINT8 *gfx2 = memory_region(machine, REGION_GFX2);
 	UINT8 *buf=malloc_or_die(G2*2);
 
 	/* BG data lines */
@@ -309,7 +309,7 @@ static DRIVER_INIT( mustache )
 		gfx2[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,12,11,10,9,8,7,6,5,4,13,14,3,2,1,0)];
 
 	free(buf);
-	seibu_sound_decrypt(REGION_CPU1,0x8000);
+	seibu_sound_decrypt(machine,REGION_CPU1,0x8000);
 }
 
 

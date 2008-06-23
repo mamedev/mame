@@ -32,7 +32,7 @@ static void stuff_palette( running_machine *machine, int source_index, int dest_
 
 
 
-	UINT8 *color_prom = memory_region(REGION_PROMS) + source_index;
+	UINT8 *color_prom = memory_region(machine, REGION_PROMS) + source_index;
 	int i;
 	for( i=0; i<num_colors; i++ )
 	{

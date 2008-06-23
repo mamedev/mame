@@ -54,7 +54,7 @@ READ8_HANDLER( sys16_7751_audio_8255_r )
 /* read from BUS */
 READ8_HANDLER( sys16_7751_sh_rom_r )
 {
-	UINT8 *sound_rom = memory_region(REGION_SOUND1);
+	UINT8 *sound_rom = memory_region(machine, REGION_SOUND1);
 
 	return sound_rom[rom_offset+rom_base];
 }

@@ -767,7 +767,7 @@ ROM_END
 static DRIVER_INIT( lazercmd )
 {
 int i, y;
-UINT8 *gfx = memory_region(REGION_GFX1);
+UINT8 *gfx = memory_region(machine, REGION_GFX1);
 
 /******************************************************************
  * To show the maze bit #6 and #7 of the video ram are used.
@@ -796,7 +796,7 @@ UINT8 *gfx = memory_region(REGION_GFX1);
 static DRIVER_INIT( medlanes )
 {
 int i, y;
-UINT8 *gfx = memory_region(REGION_GFX1);
+UINT8 *gfx = memory_region(machine, REGION_GFX1);
 
 /******************************************************************
  * To show the maze bit #6 and #7 of the video ram are used.
@@ -825,7 +825,7 @@ UINT8 *gfx = memory_region(REGION_GFX1);
 static DRIVER_INIT( bbonk )
 {
 int i, y;
-UINT8 *gfx = memory_region(REGION_GFX1);
+UINT8 *gfx = memory_region(machine, REGION_GFX1);
 
 /******************************************************************
  * To show the maze bit #6 and #7 of the video ram are used.

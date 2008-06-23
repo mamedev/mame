@@ -128,7 +128,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( fuuki16_sound_rombank_w )
 {
 	if (data <= 2)
-		memory_set_bankptr(1, memory_region(REGION_CPU2) + 0x8000 * data + 0x10000);
+		memory_set_bankptr(1, memory_region(machine, REGION_CPU2) + 0x8000 * data + 0x10000);
 	else
 	 	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n",activecpu_get_pc(),data);
 }

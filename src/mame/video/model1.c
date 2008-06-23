@@ -1436,7 +1436,7 @@ VIDEO_START(model1)
 
 	sys24_tile_vh_start(machine, 0x3fff);
 
-	poly_rom = (UINT32 *)memory_region(REGION_USER1);
+	poly_rom = (UINT32 *)memory_region(machine, REGION_USER1);
 	poly_ram = auto_malloc(0x400000*4);
 	memset(poly_ram, 0, 0x400000*4);
 	tgp_ram = auto_malloc((0x100000-0x40000)*2);

@@ -973,8 +973,8 @@ static READ8_HANDLER( z80_coin_r )
 
 static READ32_HANDLER( soundrom_r )
 {
-	UINT8 *sound = (UINT8*)memory_region(REGION_USER2);
-	UINT16 *sound16 = (UINT16*)memory_region(REGION_USER2);
+	UINT8 *sound = (UINT8*)memory_region(machine, REGION_USER2);
+	UINT16 *sound16 = (UINT16*)memory_region(machine, REGION_USER2);
 
 	if (mem_mask == 0x000000ff)
 	{
@@ -1727,9 +1727,9 @@ static IRQ_CALLBACK(spi_irq_callback)
 static MACHINE_RESET( spi )
 {
 	int i;
-	UINT8 *sound = memory_region(REGION_SOUND1);
+	UINT8 *sound = memory_region(machine, REGION_SOUND1);
 
-	UINT8 *rombase = memory_region(REGION_USER1);
+	UINT8 *rombase = memory_region(machine, REGION_USER1);
 	UINT8 flash_data = rombase[0x1ffffc];
 
 	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE );
@@ -1801,7 +1801,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_RESET( sxx2f )
 {
-	UINT8 *rom = memory_region(REGION_CPU2);
+	UINT8 *rom = memory_region(machine, REGION_CPU2);
 
 	z80_rom = auto_malloc(0x40000);
 	memory_set_bankptr(4, z80_rom);
@@ -1974,9 +1974,9 @@ static void init_spi(running_machine *machine)
 	intelflash_init( 0, FLASH_INTEL_E28F008SA, NULL );
 	intelflash_init( 1, FLASH_INTEL_E28F008SA, NULL );
 
-	seibuspi_text_decrypt(memory_region(REGION_GFX1));
-	seibuspi_bg_decrypt(memory_region(REGION_GFX2), memory_region_length(REGION_GFX2));
-	seibuspi_sprite_decrypt(memory_region(REGION_GFX3), 0x400000);
+	seibuspi_text_decrypt(memory_region(machine, REGION_GFX1));
+	seibuspi_bg_decrypt(memory_region(machine, REGION_GFX2), memory_region_length(machine, REGION_GFX2));
+	seibuspi_sprite_decrypt(memory_region(machine, REGION_GFX3), 0x400000);
 }
 
 static DRIVER_INIT( rdft )
@@ -2037,9 +2037,9 @@ static void init_rf2(running_machine *machine)
 	intelflash_init( 1, FLASH_INTEL_E28F008SA, NULL );
 
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0282AC, 0x0282AF, 0, 0, rf2_speedup_r );
-	seibuspi_rise10_text_decrypt(memory_region(REGION_GFX1));
-	seibuspi_rise10_bg_decrypt(memory_region(REGION_GFX2), memory_region_length(REGION_GFX2));
-	seibuspi_rise10_sprite_decrypt(memory_region(REGION_GFX3), 0x600000);
+	seibuspi_rise10_text_decrypt(memory_region(machine, REGION_GFX1));
+	seibuspi_rise10_bg_decrypt(memory_region(machine, REGION_GFX2), memory_region_length(machine, REGION_GFX2));
+	seibuspi_rise10_sprite_decrypt(memory_region(machine, REGION_GFX3), 0x600000);
 
 	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x560, 0x563, 0, 0, sprite_dma_start_w);
 }
@@ -2061,9 +2061,9 @@ static DRIVER_INIT( rfjet )
 	intelflash_init( 1, FLASH_INTEL_E28F008SA, NULL );
 
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x002894c, 0x002894f, 0, 0, rfjet_speedup_r );
-	seibuspi_rise11_text_decrypt(memory_region(REGION_GFX1));
-	seibuspi_rise11_bg_decrypt(memory_region(REGION_GFX2), memory_region_length(REGION_GFX2));
-	seibuspi_rise11_sprite_decrypt(memory_region(REGION_GFX3), 0x800000);
+	seibuspi_rise11_text_decrypt(memory_region(machine, REGION_GFX1));
+	seibuspi_rise11_bg_decrypt(memory_region(machine, REGION_GFX2), memory_region_length(machine, REGION_GFX2));
+	seibuspi_rise11_sprite_decrypt(memory_region(machine, REGION_GFX3), 0x800000);
 
 	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x560, 0x563, 0, 0, sprite_dma_start_w);
 }

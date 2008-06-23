@@ -1577,7 +1577,7 @@ static PALETTE_INIT( dealem )
 			3,	resistances_rg,	weights_g,	1000,	0,
 			2,	resistances_b,	weights_b,	1000,	0);
 
-	len = memory_region_length(REGION_PROMS);
+	len = memory_region_length(machine, REGION_PROMS);
 	for (i = 0; i < len; i++)
 	{
 		int bit0,bit1,bit2,r,g,b;

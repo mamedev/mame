@@ -98,7 +98,7 @@ static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code, attr;
 	if (input_code_pressed(KEYCODE_X))
-	{	UINT8 *rom = memory_region(REGION_CPU1) + 0x10000 + 0x4000*rombank;
+	{	UINT8 *rom = memory_region(machine, REGION_CPU1) + 0x10000 + 0x4000*rombank;
 		code = rom[ 2 * tile_index + 0 ];
 		attr = rom[ 2 * tile_index + 1 ];	}
 	else
@@ -415,7 +415,7 @@ VIDEO_UPDATE( suna8 )
 #if TILEMAPS
 	if (input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X))
 	{
-		int max_tiles = memory_region_length(REGION_GFX1) / (0x400 * 0x20);
+		int max_tiles = memory_region_length(machine, REGION_GFX1) / (0x400 * 0x20);
 
 		if (input_code_pressed_once(KEYCODE_Q))	{ page--;	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);	}
 		if (input_code_pressed_once(KEYCODE_W))	{ page++;	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);	}

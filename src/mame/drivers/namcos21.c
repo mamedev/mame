@@ -328,7 +328,7 @@ static struct
 static INT32
 ReadPointROMData( unsigned offset )
 {
-	const INT32 *pPointData = (INT32 *)memory_region( REGION_USER2 );
+	const INT32 *pPointData = (INT32 *)memory_region( Machine, REGION_USER2 );
 	INT32 result = pPointData[offset];
 	return result;
 }
@@ -602,7 +602,7 @@ static WRITE16_HANDLER( dspram16_w )
 static int
 InitDSP( void )
 {
-	UINT16 *pMem = (UINT16 *)memory_region(CPU_DSP_MASTER_REGION);
+	UINT16 *pMem = (UINT16 *)memory_region(Machine, CPU_DSP_MASTER_REGION);
 	/**
      * DSP BIOS tests "CPU ID" on startup
      * "JAPAN (C)1990 NAMCO LTD. by H.F "
@@ -1235,7 +1235,7 @@ static WRITE16_HANDLER( winrun_dsp_pointrom_addr_w )
 
 static READ16_HANDLER( winrun_dsp_pointrom_data_r )
 {
-	UINT16 *ptrom = (UINT16 *)memory_region(REGION_USER2);
+	UINT16 *ptrom = (UINT16 *)memory_region(machine, REGION_USER2);
 	return ptrom[winrun_pointrom_addr++];
 } /* winrun_dsp_pointrom_data_r */
 
@@ -1277,7 +1277,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( gpu_data_r )
 {
-	const UINT16 *pSrc = (UINT16 *)memory_region( REGION_USER3 );
+	const UINT16 *pSrc = (UINT16 *)memory_region( machine, REGION_USER3 );
 	return pSrc[offset];
 }
 
@@ -1295,7 +1295,7 @@ static WRITE16_HANDLER( winrun_dspbios_w )
 	COMBINE_DATA( &winrun_dspbios[offset] );
 	if( offset==0xfff )
 	{
-		UINT16 *mem = (UINT16 *)memory_region(REGION_CPU5);
+		UINT16 *mem = (UINT16 *)memory_region(machine, REGION_CPU5);
 		memcpy( mem, winrun_dspbios, 0x2000 );
 		winrun_dsp_alive = 1;
 	}
@@ -2184,7 +2184,7 @@ static void namcos21_init( int game_type )
 {
 	namcos2_gametype = game_type;
 	pointram = auto_malloc(PTRAM_SIZE);
-	mpDataROM = (UINT16 *)memory_region( REGION_USER1 );
+	mpDataROM = (UINT16 *)memory_region( Machine, REGION_USER1 );
 	InitDSP();
 	mbNeedsKickstart = 20;
 	if( game_type==NAMCOS21_CYBERSLED )
@@ -2195,7 +2195,7 @@ static void namcos21_init( int game_type )
 
 static DRIVER_INIT( winrun )
 {
-	UINT16 *pMem = (UINT16 *)memory_region(REGION_CPU5);
+	UINT16 *pMem = (UINT16 *)memory_region(machine, REGION_CPU5);
 	int pc = 0;
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
@@ -2203,7 +2203,7 @@ static DRIVER_INIT( winrun )
 	winrun_dspcomram = auto_malloc(sizeof(UINT16)*0x1000*2);
 
 	namcos2_gametype = NAMCOS21_WINRUN91;
-	mpDataROM = (UINT16 *)memory_region( REGION_USER1 );
+	mpDataROM = (UINT16 *)memory_region( machine, REGION_USER1 );
 	pointram = auto_malloc(PTRAM_SIZE);
 	pointram_idx = 0;
 	mbNeedsKickstart = 0;
@@ -2227,7 +2227,7 @@ static DRIVER_INIT( cybsled )
 
 static DRIVER_INIT( solvalou )
 {
-	UINT16 *mem = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *mem = (UINT16 *)memory_region(machine, REGION_CPU1);
 	mem[0x20ce4/2+1] = 0x0000; // $200128
 	mem[0x20cf4/2+0] = 0x4e71; // 2nd ptr_booting
 	mem[0x20cf4/2+1] = 0x4e71;
@@ -2238,13 +2238,13 @@ static DRIVER_INIT( solvalou )
 
 static DRIVER_INIT( driveyes )
 {
-	UINT16 *pMem = (UINT16 *)memory_region(REGION_CPU5);
+	UINT16 *pMem = (UINT16 *)memory_region(machine, REGION_CPU5);
 	int pc = 0;
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
 	winrun_dspcomram = auto_malloc(sizeof(UINT16)*0x1000*2);
 	namcos2_gametype = NAMCOS21_DRIVERS_EYES;
-	mpDataROM = (UINT16 *)memory_region( REGION_USER1 );
+	mpDataROM = (UINT16 *)memory_region( machine, REGION_USER1 );
 	pointram = auto_malloc(PTRAM_SIZE);
 	pointram_idx = 0;
 	mbNeedsKickstart = 0;

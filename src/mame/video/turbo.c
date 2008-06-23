@@ -275,7 +275,7 @@ INLINE UINT32 sprite_xscale(UINT8 dacinput, double vr1, double vr2, double cext)
 
 static void turbo_prepare_sprites(running_machine *machine, turbo_state *state, UINT8 y, sprite_info *info)
 {
-	const UINT8 *pr1119 = memory_region(REGION_PROMS) + 0x200;
+	const UINT8 *pr1119 = memory_region(machine, REGION_PROMS) + 0x200;
 	int sprnum;
 
 	/* initialize the line enable signals to 0 */
@@ -339,9 +339,9 @@ static void turbo_prepare_sprites(running_machine *machine, turbo_state *state, 
 }
 
 
-static UINT32 turbo_get_sprite_bits(UINT8 road, sprite_info *sprinfo)
+static UINT32 turbo_get_sprite_bits(running_machine *machine, UINT8 road, sprite_info *sprinfo)
 {
-	const UINT8 *sprite_gfxdata = memory_region(REGION_GFX1);
+	const UINT8 *sprite_gfxdata = memory_region(machine, REGION_GFX1);
 	UINT8 sprlive = sprinfo->lst;
 	UINT32 sprdata = 0;
 	int level;
@@ -398,8 +398,8 @@ VIDEO_UPDATE( turbo )
 {
 	turbo_state *state = screen->machine->driver_data;
 	bitmap_t *fgpixmap = tilemap_get_pixmap(state->fg_tilemap);
-	const UINT8 *road_gfxdata = memory_region(REGION_GFX3);
-	const UINT8 *prom_base = memory_region(REGION_PROMS);
+	const UINT8 *road_gfxdata = memory_region(screen->machine, REGION_GFX3);
+	const UINT8 *prom_base = memory_region(screen->machine, REGION_PROMS);
 	const UINT8 *pr1114 = prom_base + 0x000;
 	const UINT8 *pr1115 = prom_base + 0x020;
 	const UINT8 *pr1116 = prom_base + 0x040;
@@ -523,7 +523,7 @@ VIDEO_UPDATE( turbo )
 				/*    CDG0-7 = D8 -D15 */
 				/*    CDR0-7 = D16-D23 */
 				/*    PLB0-7 = D24-D31 */
-				sprbits = turbo_get_sprite_bits(road, &sprinfo);
+				sprbits = turbo_get_sprite_bits(screen->machine, road, &sprinfo);
 
 				/* perform collision detection here via lookup in IC20/PR1116 (p. 144) */
 				state->turbo_collision |= pr1116[((sprbits >> 24) & 7) | (slipar_acciar >> 1)];
@@ -632,9 +632,9 @@ VIDEO_UPDATE( turbo )
 
 */
 
-static void subroc3d_prepare_sprites(turbo_state *state, UINT8 y, sprite_info *info)
+static void subroc3d_prepare_sprites(running_machine *machine, turbo_state *state, UINT8 y, sprite_info *info)
 {
-	const UINT8 *pr1449 = memory_region(REGION_PROMS) + 0x300;
+	const UINT8 *pr1449 = memory_region(machine, REGION_PROMS) + 0x300;
 	int sprnum;
 
 	/* initialize the line enable signals to 0 */
@@ -692,7 +692,7 @@ static void subroc3d_prepare_sprites(turbo_state *state, UINT8 y, sprite_info *i
 }
 
 
-static UINT32 subroc3d_get_sprite_bits(sprite_info *sprinfo, UINT8 *plb)
+static UINT32 subroc3d_get_sprite_bits(running_machine *machine, sprite_info *sprinfo, UINT8 *plb)
 {
 	/* see logic on each sprite:
         END = (CDA == 1 && (CDA ^ CDB) == 0 && (CDC ^ CDD) == 0)
@@ -700,7 +700,7 @@ static UINT32 subroc3d_get_sprite_bits(sprite_info *sprinfo, UINT8 *plb)
        end is in bit 1, plb in bit 0
     */
 	static const UINT8 plb_end[16] = { 0,1,1,2, 1,1,1,1, 1,1,1,1, 0,1,1,2 };
-	const UINT8 *sprite_gfxdata = memory_region(REGION_GFX1);
+	const UINT8 *sprite_gfxdata = memory_region(machine, REGION_GFX1);
 	UINT32 sprdata = 0;
 	int level;
 
@@ -753,7 +753,7 @@ VIDEO_UPDATE( subroc3d )
 {
 	turbo_state *state = screen->machine->driver_data;
 	bitmap_t *fgpixmap = tilemap_get_pixmap(state->fg_tilemap);
-	const UINT8 *prom_base = memory_region(REGION_PROMS);
+	const UINT8 *prom_base = memory_region(screen->machine, REGION_PROMS);
 	const UINT8 *pr1419 = prom_base + 0x000;
 	const UINT8 *pr1620 = prom_base + 0x200;
 	const UINT8 *pr1450 = prom_base + 0x500;
@@ -769,7 +769,7 @@ VIDEO_UPDATE( subroc3d )
 
 		/* compute the sprite information; we use y-1 since this info was computed during HBLANK */
 		/* on the previous scanline */
-		subroc3d_prepare_sprites(state, y, &sprinfo);
+		subroc3d_prepare_sprites(screen->machine, state, y, &sprinfo);
 
 		/* loop over columns */
 		for (x = 0; x <= cliprect->max_x; x += TURBO_X_SCALE)
@@ -809,7 +809,7 @@ VIDEO_UPDATE( subroc3d )
 				/*    CDB0-7 = D8 -D15 */
 				/*    CDC0-7 = D16-D23 */
 				/*    CDD0-7 = D24-D31 */
-				sprbits = subroc3d_get_sprite_bits(&sprinfo, &plb);
+				sprbits = subroc3d_get_sprite_bits(screen->machine, &sprinfo, &plb);
 
 				/* MUX0-3 is selected by PLY0-3 and the sprite enable bits, and is the output */
 				/* of IC21/PR1450 (p. 141), unless MPLB = 0, in which case the values are grounded (p. 141) */
@@ -851,9 +851,9 @@ VIDEO_UPDATE( subroc3d )
  *
  *************************************/
 
-static void buckrog_prepare_sprites(turbo_state *state, UINT8 y, sprite_info *info)
+static void buckrog_prepare_sprites(running_machine *machine, turbo_state *state, UINT8 y, sprite_info *info)
 {
-	const UINT8 *pr5196 = memory_region(REGION_PROMS) + 0x100;
+	const UINT8 *pr5196 = memory_region(machine, REGION_PROMS) + 0x100;
 	int sprnum;
 
 	/* initialize the line enable signals to 0 */
@@ -911,7 +911,7 @@ static void buckrog_prepare_sprites(turbo_state *state, UINT8 y, sprite_info *in
 }
 
 
-static UINT32 buckrog_get_sprite_bits(sprite_info *sprinfo, UINT8 *plb)
+static UINT32 buckrog_get_sprite_bits(running_machine *machine, sprite_info *sprinfo, UINT8 *plb)
 {
 	/* see logic on each sprite:
         END = (CDA == 1 && (CDA ^ CDB) == 0 && (CDC ^ CDD) == 0)
@@ -919,7 +919,7 @@ static UINT32 buckrog_get_sprite_bits(sprite_info *sprinfo, UINT8 *plb)
        end is in bit 1, plb in bit 0
     */
 	static const UINT8 plb_end[16] = { 0,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,2 };
-	const UINT8 *sprite_gfxdata = memory_region(REGION_GFX1);
+	const UINT8 *sprite_gfxdata = memory_region(machine, REGION_GFX1);
 	UINT32 sprdata = 0;
 	int level;
 
@@ -972,8 +972,8 @@ VIDEO_UPDATE( buckrog )
 {
 	turbo_state *state = screen->machine->driver_data;
 	bitmap_t *fgpixmap = tilemap_get_pixmap(state->fg_tilemap);
-	const UINT8 *bgcolor = memory_region(REGION_GFX3);
-	const UINT8 *prom_base = memory_region(REGION_PROMS);
+	const UINT8 *bgcolor = memory_region(screen->machine, REGION_GFX3);
+	const UINT8 *prom_base = memory_region(screen->machine, REGION_PROMS);
 	const UINT8 *pr5194 = prom_base + 0x000;
 	const UINT8 *pr5198 = prom_base + 0x500;
 	const UINT8 *pr5199 = prom_base + 0x700;
@@ -988,7 +988,7 @@ VIDEO_UPDATE( buckrog )
 
 		/* compute the sprite information; we use y-1 since this info was computed during HBLANK */
 		/* on the previous scanline */
-		buckrog_prepare_sprites(state, y, &sprinfo);
+		buckrog_prepare_sprites(screen->machine, state, y, &sprinfo);
 
 		/* loop over columns */
 		for (x = 0; x <= cliprect->max_x; x += TURBO_X_SCALE)
@@ -1025,7 +1025,7 @@ VIDEO_UPDATE( buckrog )
 				/*    CDB0-7 = D8 -D15 */
 				/*    CDC0-7 = D16-D23 */
 				/*    CDD0-7 = D24-D31 */
-				sprbits = buckrog_get_sprite_bits(&sprinfo, &plb);
+				sprbits = buckrog_get_sprite_bits(screen->machine, &sprinfo, &plb);
 
 				/* the PLB bits go into an LS148 8-to-1 decoder and become MUX0-3 (PROM board SH 2/10) */
 				if (plb == 0)

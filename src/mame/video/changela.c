@@ -63,11 +63,11 @@ VIDEO_START( changela )
     Obj 0 - Sprite Layer
 
 ***************************************************************************/
-static void draw_obj0(bitmap_t *bitmap, int sy)
+static void draw_obj0(running_machine *machine, bitmap_t *bitmap, int sy)
 {
 	int sx, i;
 
-	UINT8* ROM = memory_region(REGION_USER1);
+	UINT8* ROM = memory_region(machine, REGION_USER1);
 	UINT8* RAM = spriteram;
 
 	for(sx = 0; sx < 256; sx++)
@@ -124,11 +124,11 @@ static void draw_obj0(bitmap_t *bitmap, int sy)
     Obj 1 - Text Layer
 
 ***************************************************************************/
-static void draw_obj1(bitmap_t *bitmap)
+static void draw_obj1(running_machine *machine, bitmap_t *bitmap)
 {
 	int sx, sy;
 
-	UINT8* ROM = memory_region(REGION_GFX2);
+	UINT8* ROM = memory_region(machine, REGION_GFX2);
 	UINT8* RAM = videoram;
 
 	UINT8 reg[4] = { 0 }; /* 4x4-bit registers (U58, U59) */
@@ -187,15 +187,15 @@ static void draw_obj1(bitmap_t *bitmap)
     River Video Generator
 
 ***************************************************************************/
-static void draw_river(bitmap_t *bitmap, int sy)
+static void draw_river(running_machine *machine, bitmap_t *bitmap, int sy)
 {
 	int sx, i, j;
 
-	UINT8* ROM = memory_region(REGION_USER2);
+	UINT8* ROM = memory_region(machine, REGION_USER2);
 	UINT8* RAM = memory_devices + 0x800;
-	UINT8* TILE_ROM = memory_region(REGION_GFX1);
+	UINT8* TILE_ROM = memory_region(machine, REGION_GFX1);
 	UINT8* TILE_RAM = memory_devices + 0x1000;
-	UINT8* PROM = memory_region(REGION_PROMS);
+	UINT8* PROM = memory_region(machine, REGION_PROMS);
 
 	static UINT8 v_count = 0;
 
@@ -366,19 +366,19 @@ static void draw_river(bitmap_t *bitmap, int sy)
     Tree Generators
 
 ***************************************************************************/
-static void draw_tree(bitmap_t *bitmap, int sy, int tree_num)
+static void draw_tree(running_machine *machine, bitmap_t *bitmap, int sy, int tree_num)
 {
 	int sx, i, j;
 
 	/* State machine */
-	UINT8* ROM = memory_region(REGION_USER2);
+	UINT8* ROM = memory_region(machine, REGION_USER2);
 	UINT8* RAM = memory_devices + 0x840 + 0x40*tree_num;
-	UINT8* PROM = memory_region(REGION_PROMS);
+	UINT8* PROM = memory_region(machine, REGION_PROMS);
 
 	/* Tree Data */
 	UINT8* RAM2 = tree_ram + 0x20*tree_num;
-	UINT8* TILE_ROM = ( tree_num ? (memory_region(REGION_USER3) + 0x1000) : (memory_region(REGION_GFX1) + 0x2000) );
-	UINT8* TILE_RAM = ( tree_num ? (memory_region(REGION_USER3)) : (memory_devices + 0x1800) );
+	UINT8* TILE_ROM = ( tree_num ? (memory_region(machine, REGION_USER3) + 0x1000) : (memory_region(machine, REGION_GFX1) + 0x2000) );
+	UINT8* TILE_RAM = ( tree_num ? (memory_region(machine, REGION_USER3)) : (memory_devices + 0x1800) );
 
 	static UINT8 v_count = 0;
 	static int tree_on[2] = { 0 };
@@ -676,10 +676,10 @@ static TIMER_CALLBACK( changela_scanline_callback )
 	fillbitmap(tree0_bitmap, 0x00, &rect);
 	fillbitmap(tree1_bitmap, 0x00, &rect);
 
-	draw_river(river_bitmap, sy);
-	draw_obj0(obj0_bitmap, sy);
-	draw_tree(tree0_bitmap, sy, 0);
-	draw_tree(tree1_bitmap, sy, 1);
+	draw_river(machine, river_bitmap, sy);
+	draw_obj0(machine, obj0_bitmap, sy);
+	draw_tree(machine, tree0_bitmap, sy, 0);
+	draw_tree(machine, tree1_bitmap, sy, 1);
 
 	/* Collision Detection */
 	for(sx = 1; sx < 256; sx++)
@@ -746,7 +746,7 @@ VIDEO_UPDATE( changela )
 	copybitmap_trans(bitmap, obj0_bitmap,  0, 0, 0, 0, cliprect, 0);
 	copybitmap_trans(bitmap, tree0_bitmap, 0, 0, 0, 0, cliprect, 0);
 	copybitmap_trans(bitmap, tree1_bitmap, 0, 0, 0, 0, cliprect, 0);
-	draw_obj1(bitmap);
+	draw_obj1(screen->machine, bitmap);
 
 	return 0;
 }

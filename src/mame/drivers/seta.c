@@ -2808,7 +2808,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sub_bankswitch_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU2);
+	UINT8 *rom = memory_region(machine, REGION_CPU2);
 	int bank = data >> 4;
 
 	memory_set_bankptr(1, &rom[bank * 0x4000 + 0xc000]);
@@ -9347,7 +9347,7 @@ static DRIVER_INIT( arbalest )
 
 static DRIVER_INIT( metafox )
 {
-	UINT16 *RAM = (UINT16 *) memory_region(REGION_CPU1);
+	UINT16 *RAM = (UINT16 *) memory_region(machine, REGION_CPU1);
 
 	/* This game uses the 21c000-21ffff area for protection? */
 //  memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x21c000, 0x21ffff, 0, 0, SMH_NOP, SMH_NOP);
@@ -9370,7 +9370,7 @@ static DRIVER_INIT ( blandia )
 	rom_size = 0x80000;
 	buf = malloc_or_die(rom_size);
 
-	rom = memory_region(REGION_GFX2) + 0x40000;
+	rom = memory_region(machine, REGION_GFX2) + 0x40000;
 
 	for (rpos = 0; rpos < rom_size/2; rpos++) {
 		buf[rpos+0x40000] = rom[rpos*2];
@@ -9379,7 +9379,7 @@ static DRIVER_INIT ( blandia )
 
 	memcpy( rom, buf, rom_size );
 
-	rom = memory_region(REGION_GFX3) + 0x40000;
+	rom = memory_region(machine, REGION_GFX3) + 0x40000;
 
 	for (rpos = 0; rpos < rom_size/2; rpos++) {
 		buf[rpos+0x40000] = rom[rpos*2];
@@ -9407,7 +9407,7 @@ static DRIVER_INIT( zombraid )
 
 static DRIVER_INIT( kiwame )
 {
-	UINT16 *RAM = (UINT16 *) memory_region(REGION_CPU1);
+	UINT16 *RAM = (UINT16 *) memory_region(machine, REGION_CPU1);
 
 	/* WARNING: This game writes to the interrupt vector
        table. Lev 1 routine address is stored at $100 */
@@ -9429,8 +9429,8 @@ static DRIVER_INIT(wiggie)
 	UINT8 temp[16];
 	int i,j;
 
-	src = memory_region(REGION_CPU1);
-	len = memory_region_length(REGION_CPU1);
+	src = memory_region(machine, REGION_CPU1);
+	len = memory_region_length(machine, REGION_CPU1);
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -9460,7 +9460,7 @@ static DRIVER_INIT(wiggie)
 static DRIVER_INIT( crazyfgt )
 {
 	// protection check at boot
-	UINT16 *RAM = (UINT16 *) memory_region(REGION_CPU1);
+	UINT16 *RAM = (UINT16 *) memory_region(machine, REGION_CPU1);
 	RAM[0x1078/2] = 0x4e71;
 
 	// fixed priorities?
@@ -9500,7 +9500,7 @@ static const pia6821_interface inttoote_pia1_intf =
 
 static DRIVER_INIT( inttoote )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( REGION_CPU1 );
+	UINT16 *ROM = (UINT16 *)memory_region( machine, REGION_CPU1 );
 	static UINT16 seta_vregs_unused[3] = {0,0,0};
 
 	// missing / unused video regs

@@ -2714,10 +2714,10 @@ VIDEO_START(model2)
 	add_exit_callback(machine, model2_exit);
 
 	/* initialize the geometry engine */
-	geo_init( (UINT32*)memory_region(REGION_USER2) );
+	geo_init( (UINT32*)memory_region(machine, REGION_USER2) );
 
 	/* initialize the hardware rasterizer */
-	model2_3d_init( (UINT16*)memory_region(REGION_USER3) );
+	model2_3d_init( (UINT16*)memory_region(machine, REGION_USER3) );
 }
 
 static void convert_bitmap( running_machine *machine, bitmap_t *dst, bitmap_t *src, const rectangle *rect )

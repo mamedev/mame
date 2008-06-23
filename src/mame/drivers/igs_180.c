@@ -77,10 +77,10 @@ static int sprites_gfx_size;
 
 // Eeach 16 bit word in the sprites gfx roms contains three 5 bit pens: x-22222-11111-00000.
 // This routine expands each word into three bytes.
-static void expand_sprites(void)
+static void expand_sprites(running_machine *machine)
 {
-	UINT8 *rom	=	memory_region(REGION_GFX1);
-	int size	=	memory_region_length(REGION_GFX1);
+	UINT8 *rom	=	memory_region(machine, REGION_GFX1);
+	int size	=	memory_region_length(machine, REGION_GFX1);
 	int i;
 
 	sprites_gfx_size	=	size / 2 * 3;
@@ -264,8 +264,8 @@ static VIDEO_UPDATE(igs_180)
 
 static void decrypt_program_rom(int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0)
 {
-	int length = memory_region_length(REGION_CPU1);
-	UINT8 *rom = memory_region(REGION_CPU1);
+	int length = memory_region_length(Machine, REGION_CPU1);
+	UINT8 *rom = memory_region(Machine, REGION_CPU1);
 	UINT8 *tmp = auto_malloc(length);
 	int i;
 
@@ -315,9 +315,9 @@ static void decrypt_program_rom(int mask, int a7, int a6, int a5, int a4, int a3
 
 // iqblocka
 
-static void iqblocka_patch_rom(void)
+static void iqblocka_patch_rom(running_machine *machine)
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 //  rom[0x7b64] = 0xc9;
 
@@ -343,9 +343,9 @@ static void iqblocka_patch_rom(void)
 static DRIVER_INIT( iqblocka )
 {
 	decrypt_program_rom(0x11, 7, 6, 5, 4, 3, 2, 1, 0);
-	iqblocka_patch_rom();
+	iqblocka_patch_rom(machine);
 
-	expand_sprites();
+	expand_sprites(machine);
 }
 
 // iqblockf
@@ -353,17 +353,17 @@ static DRIVER_INIT( iqblocka )
 static DRIVER_INIT( iqblockf )
 {
 	decrypt_program_rom(0x11, 7, 6, 5, 4, 3, 2, 1, 0);
-//  iqblockf_patch_rom();
+//  iqblockf_patch_rom(machine);
 
-	expand_sprites();
+	expand_sprites(machine);
 }
 
 // tjsb
 
-static void tjsb_decrypt_sprites(void)
+static void tjsb_decrypt_sprites(running_machine *machine)
 {
-	int length = memory_region_length(REGION_GFX1);
-	UINT8 *rom = memory_region(REGION_GFX1);
+	int length = memory_region_length(machine, REGION_GFX1);
+	UINT8 *rom = memory_region(machine, REGION_GFX1);
 	UINT8 *tmp = auto_malloc(length);
 	int i;
 
@@ -390,19 +390,19 @@ static void tjsb_decrypt_sprites(void)
 	}
 }
 
-static void tjsb_patch_rom(void)
+static void tjsb_patch_rom(running_machine *machine)
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	rom[0x011df] = 0x18;
 }
 
 static DRIVER_INIT( tjsb )
 {
 	decrypt_program_rom(0x05, 7, 6, 3, 2, 5, 4, 1, 0);
-	tjsb_patch_rom();
+	tjsb_patch_rom(machine);
 
-	tjsb_decrypt_sprites();
-	expand_sprites();
+	tjsb_decrypt_sprites(machine);
+	expand_sprites(machine);
 }
 
 /***************************************************************************

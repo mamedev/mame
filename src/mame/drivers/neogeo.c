@@ -80,6 +80,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "neogeo.h"
 #include "machine/pd4990a.h"
 #include "cpu/z80/z80.h"
@@ -627,9 +628,9 @@ static void set_main_cpu_vector_table_source(UINT8 data)
 }
 
 
-static void _set_main_cpu_bank_address(void)
+static void _set_main_cpu_bank_address(running_machine *machine)
 {
-	memory_set_bankptr(NEOGEO_BANK_CARTRIDGE, &memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE)[main_cpu_bank_address]);
+	memory_set_bankptr(NEOGEO_BANK_CARTRIDGE, &memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE)[main_cpu_bank_address]);
 }
 
 
@@ -639,14 +640,15 @@ void neogeo_set_main_cpu_bank_address(UINT32 bank_address)
 
 	main_cpu_bank_address = bank_address;
 
-	_set_main_cpu_bank_address();
+	_set_main_cpu_bank_address(Machine);
 }
 
 
 static WRITE16_HANDLER( main_cpu_bank_select_w )
 {
 	UINT32 bank_address;
-	UINT32 len = memory_region_length(NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
+	UINT32 len = memory_region_length(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
+
 	if ((len <= 0x100000) && (data & 0x07))
 		logerror("PC %06x: warning: bankswitch to %02x but no banks available\n", activecpu_get_pc(), data);
 	else
@@ -664,14 +666,14 @@ static WRITE16_HANDLER( main_cpu_bank_select_w )
 }
 
 
-static void main_cpu_banking_init(void)
+static void main_cpu_banking_init(running_machine *machine)
 {
 	/* create vector banks */
-	memory_configure_bank(NEOGEO_BANK_VECTORS, 0, 1, memory_region(NEOGEO_REGION_MAIN_CPU_BIOS), 0);
-	memory_configure_bank(NEOGEO_BANK_VECTORS, 1, 1, memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE), 0);
+	memory_configure_bank(NEOGEO_BANK_VECTORS, 0, 1, memory_region(machine, NEOGEO_REGION_MAIN_CPU_BIOS), 0);
+	memory_configure_bank(NEOGEO_BANK_VECTORS, 1, 1, memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE), 0);
 
 	/* set initial main CPU bank */
-	if (memory_region_length(NEOGEO_REGION_MAIN_CPU_CARTRIDGE) > 0x100000)
+	if (memory_region_length(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE) > 0x100000)
 		neogeo_set_main_cpu_bank_address(0x100000);
 	else
 		neogeo_set_main_cpu_bank_address(0x000000);
@@ -738,7 +740,7 @@ static READ8_HANDLER( audio_cpu_bank_select_8000_bfff_r )
 
 static void _set_audio_cpu_rom_source(running_machine *machine)
 {
-/*  if (!memory_region(NEOGEO_REGION_AUDIO_CPU_BIOS))   */
+/*  if (!memory_region(machine, NEOGEO_REGION_AUDIO_CPU_BIOS))   */
 		audio_cpu_rom_source = 1;
 
 	memory_set_bank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, audio_cpu_rom_source);
@@ -771,14 +773,14 @@ static void audio_cpu_banking_init(running_machine *machine)
 	UINT32 address_mask;
 
 	/* audio bios/cartridge selection */
- 	if (memory_region(NEOGEO_REGION_AUDIO_CPU_BIOS))
-		memory_configure_bank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 0, 1, memory_region(NEOGEO_REGION_AUDIO_CPU_BIOS), 0);
-	memory_configure_bank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 1, 1, memory_region(NEOGEO_REGION_AUDIO_CPU_CARTRIDGE), 0);
+ 	if (memory_region(machine, NEOGEO_REGION_AUDIO_CPU_BIOS))
+		memory_configure_bank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 0, 1, memory_region(machine, NEOGEO_REGION_AUDIO_CPU_BIOS), 0);
+	memory_configure_bank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 1, 1, memory_region(machine, NEOGEO_REGION_AUDIO_CPU_CARTRIDGE), 0);
 
 	/* audio banking */
-	address_mask = memory_region_length(NEOGEO_REGION_AUDIO_CPU_CARTRIDGE) - 0x10000 - 1;
+	address_mask = memory_region_length(machine, NEOGEO_REGION_AUDIO_CPU_CARTRIDGE) - 0x10000 - 1;
 
-	rgn = memory_region(NEOGEO_REGION_AUDIO_CPU_CARTRIDGE);
+	rgn = memory_region(machine, NEOGEO_REGION_AUDIO_CPU_CARTRIDGE);
 	for (region = 0; region < 4; region++)
 	{
 		for (bank = 0; bank < 0x100; bank++)
@@ -947,7 +949,7 @@ static void set_output_data(UINT8 data)
 
 static STATE_POSTLOAD( neogeo_postload )
 {
-	_set_main_cpu_bank_address();
+	_set_main_cpu_bank_address(machine);
 	_set_main_cpu_vector_table_source();
 	set_audio_cpu_banking();
 	_set_audio_cpu_rom_source(machine);
@@ -957,10 +959,10 @@ static STATE_POSTLOAD( neogeo_postload )
 static MACHINE_START( neogeo )
 {
 	/* set the BIOS bank */
-	memory_set_bankptr(NEOGEO_BANK_BIOS, memory_region(NEOGEO_REGION_MAIN_CPU_BIOS));
+	memory_set_bankptr(NEOGEO_BANK_BIOS, memory_region(machine, NEOGEO_REGION_MAIN_CPU_BIOS));
 
 	/* set the initial main CPU bank */
-	main_cpu_banking_init();
+	main_cpu_banking_init(machine);
 
 	/* set the initial audio CPU ROM banks */
 	audio_cpu_banking_init(machine);
@@ -1276,7 +1278,7 @@ MACHINE_DRIVER_END
 static DRIVER_INIT( neogeo )
 {
 	/* set the Delta-T sample region */
-	ym2610_interface.pcmromb = memory_region(NEOGEO_REGION_AUDIO_DATA_2) ? NEOGEO_REGION_AUDIO_DATA_2 : NEOGEO_REGION_AUDIO_DATA_1;
+	ym2610_interface.pcmromb = memory_region(machine, NEOGEO_REGION_AUDIO_DATA_2) ? NEOGEO_REGION_AUDIO_DATA_2 : NEOGEO_REGION_AUDIO_DATA_1;
 }
 
 

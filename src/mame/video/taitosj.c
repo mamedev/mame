@@ -169,10 +169,10 @@ static STATE_POSTLOAD( taitosj_postload )
 
 ***************************************************************************/
 
-static void compute_draw_order(void)
+static void compute_draw_order(running_machine *machine)
 {
 	int i;
-	UINT8 *color_prom = memory_region(REGION_PROMS);
+	UINT8 *color_prom = memory_region(machine, REGION_PROMS);
 
 	/* do a simple conversion of the PROM into layer priority order. Note that */
 	/* this is a simplification, which assumes the PROM encodes a sensible priority */
@@ -219,7 +219,7 @@ VIDEO_START( taitosj )
 	memset(dirtysprite1, 1, sizeof(dirtysprite1));
 	memset(dirtysprite2, 1, sizeof(dirtysprite2));
 
-	compute_draw_order();
+	compute_draw_order(machine);
 
 	state_save_register_postload(machine, taitosj_postload, NULL);
 }
@@ -233,7 +233,7 @@ READ8_HANDLER( taitosj_gfxrom_r )
 	offs_t offs = taitosj_gfxpointer[0] | (taitosj_gfxpointer[1] << 8);
 
 	if (offs < 0x8000)
-		ret = memory_region(REGION_GFX1)[offs];
+		ret = memory_region(machine, REGION_GFX1)[offs];
 	else
 		ret = 0;
 

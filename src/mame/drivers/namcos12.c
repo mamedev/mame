@@ -922,6 +922,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/mips/psx.h"
 #include "cpu/h83002/h83002.h"
 #include "includes/psx.h"
@@ -1058,8 +1059,8 @@ static void namcos12_rom_read( UINT32 n_address, INT32 n_size )
 		verboselog( 1, "namcos12_rom_read( %08x, %08x ) game %08x\n", n_address, n_size, n_offset );
 	}
 
-	p_n_src = (UINT32 *)( memory_region( n_region ) + n_offset );
-	n_romleft = ( memory_region_length( n_region ) - n_offset ) / 4;
+	p_n_src = (UINT32 *)( memory_region( Machine, n_region ) + n_offset );
+	n_romleft = ( memory_region_length( Machine, n_region ) - n_offset ) / 4;
 	if( n_size > n_romleft )
 	{
 		verboselog( 1, "namcos12_rom_read dma truncated %d to %d passed end of rom\n", n_size, n_romleft );
@@ -1171,7 +1172,7 @@ static UINT8 kcram[ 12 ];
 
 static WRITE32_HANDLER( kcoff_w )
 {
-	memory_set_bankptr( 2, memory_region( REGION_USER1 ) + 0x20280 );
+	memory_set_bankptr( 2, memory_region( machine, REGION_USER1 ) + 0x20280 );
 }
 
 static WRITE32_HANDLER( kcon_w )
@@ -1443,7 +1444,7 @@ static DRIVER_INIT( namcos12 )
 
 	at28c16_init( 0, NULL, NULL );
 
-	memory_configure_bank( 1, 0, memory_region_length( REGION_USER2 ) / 0x200000, memory_region( REGION_USER2 ), 0x200000 );
+	memory_configure_bank( 1, 0, memory_region_length( machine, REGION_USER2 ) / 0x200000, memory_region( machine, REGION_USER2 ), 0x200000 );
 	m_n_bankoffset = 0;
 	memory_set_bank( 1, 0 );
 
@@ -1457,7 +1458,7 @@ static DRIVER_INIT( ptblank2 )
 	DRIVER_INIT_CALL(namcos12);
 
 	/* patch out wait for dma 5 to complete */
-	*( (UINT32 *)( memory_region( REGION_USER1 ) + 0x331c4 ) ) = 0;
+	*( (UINT32 *)( memory_region( machine, REGION_USER1 ) + 0x331c4 ) ) = 0;
 
 	system11gun_install(machine);
 }

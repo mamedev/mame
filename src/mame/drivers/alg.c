@@ -735,7 +735,7 @@ static void alg_init(void)
 
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(REGION_USER1), 0);
+	memory_configure_bank(1, 1, 1, memory_region(Machine, REGION_USER1), 0);
 }
 
 
@@ -748,8 +748,8 @@ static void alg_init(void)
 
 static DRIVER_INIT( palr1 )
 {
-	UINT32 length = memory_region_length(REGION_USER2);
-	UINT8 *rom = memory_region(REGION_USER2);
+	UINT32 length = memory_region_length(machine, REGION_USER2);
+	UINT8 *rom = memory_region(machine, REGION_USER2);
 	UINT8 *original = malloc_or_die(length);
 	UINT32 srcaddr;
 
@@ -768,8 +768,8 @@ static DRIVER_INIT( palr1 )
 
 static DRIVER_INIT( palr3 )
 {
-	UINT32 length = memory_region_length(REGION_USER2);
-	UINT8 *rom = memory_region(REGION_USER2);
+	UINT32 length = memory_region_length(machine, REGION_USER2);
+	UINT8 *rom = memory_region(machine, REGION_USER2);
 	UINT8 *original = malloc_or_die(length);
 	UINT32 srcaddr;
 
@@ -787,8 +787,8 @@ static DRIVER_INIT( palr3 )
 
 static DRIVER_INIT( palr6 )
 {
-	UINT32 length = memory_region_length(REGION_USER2);
-	UINT8 *rom = memory_region(REGION_USER2);
+	UINT32 length = memory_region_length(machine, REGION_USER2);
+	UINT8 *rom = memory_region(machine, REGION_USER2);
 	UINT8 *original = malloc_or_die(length);
 	UINT32 srcaddr;
 
@@ -809,7 +809,7 @@ static DRIVER_INIT( palr6 )
 static DRIVER_INIT( aplatoon )
 {
 	/* NOT DONE TODO FIGURE OUT THE RIGHT ORDER!!!! */
-	UINT8 *rom = memory_region(REGION_USER2);
+	UINT8 *rom = memory_region(machine, REGION_USER2);
 	char *decrypted = auto_malloc(0x40000);
 	int i;
 

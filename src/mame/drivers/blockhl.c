@@ -20,6 +20,7 @@ found it.
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "video/konamiic.h"
 #include "sound/2151intf.h"
@@ -304,7 +305,7 @@ ROM_END
 
 static void blockhl_banking( int lines )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(Machine, REGION_CPU1);
 	int offs;
 
 	/* bits 0-1 = ROM bank */
@@ -331,7 +332,7 @@ static void blockhl_banking( int lines )
 
 static MACHINE_RESET( blockhl )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)blockhl_banking);
 

@@ -159,7 +159,7 @@ static void machine_init(running_machine *machine)
 		memory_set_bankptr(2+i, current_base[i]);
 	}
 	cur_rombank = cur_rombank2 = 0;
-	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x10000);
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x10000);
 
 	for(i=0;i<512;i++)
 	{
@@ -334,7 +334,7 @@ static WRITE8_HANDLER( rombankswitch_w )
 
 //      logerror("robs %d, %02x (%04x)\n", offset, data, activecpu_get_pc());
 		cur_rombank = data;
-		memory_set_bankptr(1, memory_region(REGION_CPU1)+0x10000+0x2000*cur_rombank);
+		memory_set_bankptr(1, memory_region(machine, REGION_CPU1)+0x10000+0x2000*cur_rombank);
 	}
 }
 
@@ -355,7 +355,7 @@ static WRITE8_HANDLER( rombank2switch_w )
 //      logerror("robs2 %02x (%04x)\n", data, activecpu_get_pc());
 
 		cur_rombank2 = data;
-		memory_set_bankptr(6, memory_region(REGION_CPU3)+0x10000+0x4000*cur_rombank2);
+		memory_set_bankptr(6, memory_region(machine, REGION_CPU3)+0x10000+0x4000*cur_rombank2);
 	}
 }
 
@@ -588,7 +588,7 @@ static void champwr_msm5205_vck(running_machine *machine, int chip)
 	}
 	else
 	{
-		adpcm_data = memory_region(REGION_SOUND1)[adpcm_pos];
+		adpcm_data = memory_region(machine, REGION_SOUND1)[adpcm_pos];
 		adpcm_pos = (adpcm_pos + 1) & 0x1ffff;
 		MSM5205_data_w(0, adpcm_data >> 4);
 	}
@@ -800,7 +800,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 	int banknum = (data - 1) & 3;
 
 	memory_set_bankptr (7, &RAM [0x10000 + (banknum * 0x4000)]);
@@ -2258,7 +2258,7 @@ static WRITE8_HANDLER( portA_w )
 	if (cur_bank != (data & 0x03) )
 	{
 		int bankaddress;
-		UINT8 *RAM = memory_region(REGION_CPU2);
+		UINT8 *RAM = memory_region(machine, REGION_CPU2);
 
 		cur_bank = data & 0x03;
 		bankaddress = 0x10000 + (cur_bank-1) * 0x4000;
@@ -3113,7 +3113,7 @@ static DRIVER_INIT( plottina )
 				v |= 1<<(7-j);
 		tab[i] = v;
 	}
-	p = memory_region(REGION_CPU1);
+	p = memory_region(machine, REGION_CPU1);
 	for(i=0;i<0x20000;i++)
 	{
 		*p = tab[*p];
@@ -3123,7 +3123,7 @@ static DRIVER_INIT( plottina )
 
 static DRIVER_INIT( evilston )
 {
-	UINT8 *ROM = memory_region(REGION_CPU2);
+	UINT8 *ROM = memory_region(machine, REGION_CPU2);
 	ROM[0x72]=0x45;	/* reti -> retn  ('dead' loop @ $1104 )*/
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa7fe, 0xa7fe, 0, 0, evilston_snd_w);
 }

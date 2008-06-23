@@ -295,7 +295,7 @@ enum
 
 static TIMER_CALLBACK( fdc_data_callback )
 {
-	UINT8* disk = (UINT8*)memory_region(REGION_USER1);
+	UINT8* disk = (UINT8*)memory_region(machine, REGION_USER1);
 	int more_data = 0;
 
 	/*

@@ -352,9 +352,9 @@ WRITE8_HANDLER( polepos_alpha_w )
 
 ***************************************************************************/
 
-static void draw_road(bitmap_t *bitmap)
+static void draw_road(running_machine *machine, bitmap_t *bitmap)
 {
-	const UINT8 *road_control = memory_region(REGION_GFX5);
+	const UINT8 *road_control = memory_region(machine, REGION_GFX5);
 	const UINT8 *road_bits1 = road_control + 0x2000;
 	const UINT8 *road_bits2 = road_control + 0x4000;
 	int x, y, i;
@@ -433,7 +433,7 @@ static void zoom_sprite(running_machine *machine, bitmap_t *bitmap,int big,
 {
 	const gfx_element *gfx = machine->gfx[big ? 3 : 2];
 	UINT8 *gfxdata = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
-	UINT8 *scaling_rom = memory_region(REGION_GFX6);
+	UINT8 *scaling_rom = memory_region(machine, REGION_GFX6);
 	UINT32 transmask = colortable_get_transpen_mask(machine->colortable, gfx, color, 0x1f);
 	int coloroffs = gfx->color_base + color * gfx->color_granularity;
 	int x,y;
@@ -512,7 +512,7 @@ VIDEO_UPDATE( polepos )
 	rectangle clip = *cliprect;
 	clip.max_y = 127;
 	tilemap_draw(bitmap,&clip,bg_tilemap,0,0);
-	draw_road(bitmap);
+	draw_road(screen->machine, bitmap);
 	draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 /* following code should be enabled only in a debug build */

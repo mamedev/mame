@@ -480,7 +480,7 @@ ROM_END
 static DRIVER_INIT( motorace )
 {
 	int A,j;
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	UINT8 *buffer = malloc_or_die(0x2000);
 
 		memcpy(buffer,rom,0x2000);
@@ -498,7 +498,7 @@ static DRIVER_INIT( motorace )
 static DRIVER_INIT( shtridra )
 {
 	int A;
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	/* D3/D4  and  D5/D6 swapped */
 	for (A = 0; A < 0x2000; A++)

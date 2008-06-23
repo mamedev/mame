@@ -64,7 +64,7 @@ static WRITE8_HANDLER( bottom9_bankedram2_w )
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	int offs;
 
 	/* bit 0 = RAM bank */

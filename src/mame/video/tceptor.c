@@ -258,7 +258,7 @@ static void decode_bg(running_machine *machine, int region)
 	};
 
 	int gfx_index = bg;
-	UINT8 *src = memory_region(region) + 0x8000;
+	UINT8 *src = memory_region(machine, region) + 0x8000;
 	UINT8 *buffer;
 	int len = 0x8000;
 	int i;
@@ -277,7 +277,7 @@ static void decode_bg(running_machine *machine, int region)
 
 	/* decode the graphics */
 	machine->gfx[gfx_index] = allocgfx(&bg_layout);
-	decodegfx(machine->gfx[gfx_index], memory_region(region), 0, machine->gfx[gfx_index]->total_elements);
+	decodegfx(machine->gfx[gfx_index], memory_region(machine, region), 0, machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */
 	machine->gfx[gfx_index]->color_base = 2048;
@@ -315,8 +315,8 @@ static void decode_sprite16(running_machine *machine, int region)
 		2*16*16
 	};
 
-	UINT8 *src = memory_region(region);
-	int len = memory_region_length(region);
+	UINT8 *src = memory_region(machine, region);
+	int len = memory_region_length(machine, region);
 	UINT8 *dst;
 	int i, y;
 
@@ -368,8 +368,8 @@ static void decode_sprite32(running_machine *machine, int region)
 		2*32*32
 	};
 
-	UINT8 *src = memory_region(region);
-	int len = memory_region_length(region);
+	UINT8 *src = memory_region(machine, region);
+	int len = memory_region_length(machine, region);
 	int total = spr32_layout.total;
 	int size = spr32_layout.charincrement / 8;
 	UINT8 *dst;

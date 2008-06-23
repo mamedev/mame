@@ -364,8 +364,8 @@ static DRIVER_INIT( asterix )
 	konami_rom_deinterleave_2(REGION_GFX2);
 
 #if 0
-	*(UINT16 *)(memory_region(REGION_CPU1) + 0x07f34) = 0x602a;
-	*(UINT16 *)(memory_region(REGION_CPU1) + 0x00008) = 0x0400;
+	*(UINT16 *)(memory_region(machine, REGION_CPU1) + 0x07f34) = 0x602a;
+	*(UINT16 *)(memory_region(machine, REGION_CPU1) + 0x00008) = 0x0400;
 #endif
 }
 

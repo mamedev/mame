@@ -215,7 +215,7 @@ static WRITE16_HANDLER( forgottn_dial_1_reset_w )
 
 static WRITE8_HANDLER( cps1_snd_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 	int bankaddr;
 
 	bankaddr = ((data & 1) * 0x4000);
@@ -292,7 +292,7 @@ INTERRUPT_GEN( cps1_qsound_interrupt )
 
 static READ16_HANDLER( qsound_rom_r )
 {
-	UINT8 *rom = memory_region(REGION_USER1);
+	UINT8 *rom = memory_region(machine, REGION_USER1);
 
 	if (rom) return rom[offset] | 0xff00;
 	else
@@ -330,9 +330,9 @@ static WRITE8_HANDLER( qsound_banksw_w )
     Z80 bank register for music note data. It's odd that it isn't encrypted
     though.
     */
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 	int bankaddress=0x10000+((data&0x0f)*0x4000);
-	if (bankaddress >= memory_region_length(REGION_CPU2))
+	if (bankaddress >= memory_region_length(machine, REGION_CPU2))
 	{
 		logerror("WARNING: Q sound bank overflow (%02x)\n", data);
 		bankaddress=0x10000;
@@ -7803,25 +7803,25 @@ static DRIVER_INIT( sf2hack )
 
 static DRIVER_INIT( wof )
 {
-	wof_decode();
+	wof_decode(machine);
 	DRIVER_INIT_CALL(cps1);
 }
 
 static DRIVER_INIT( dino )
 {
-	dino_decode();
+	dino_decode(machine);
 	DRIVER_INIT_CALL(cps1);
 }
 
 static DRIVER_INIT( punisher )
 {
-	punisher_decode();
+	punisher_decode(machine);
 	DRIVER_INIT_CALL(cps1);
 }
 
 static DRIVER_INIT( slammast )
 {
-	slammast_decode();
+	slammast_decode(machine);
 	DRIVER_INIT_CALL(cps1);
 }
 
@@ -7836,7 +7836,7 @@ static DRIVER_INIT( pang3 )
 
 static DRIVER_INIT( pang3j )
 {
-	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
 	int A,src,dst;
 
 	for (A = 0x80000;A < 0x100000;A += 2)

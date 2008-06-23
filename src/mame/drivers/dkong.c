@@ -399,7 +399,7 @@ static MACHINE_START( dkong2b )
 
 static MACHINE_START( hunchbkd )
 {
-	UINT8	*p = memory_region(REGION_USER1);
+	UINT8	*p = memory_region(machine, REGION_USER1);
 	int i;
 
 	dkong_state *state = machine->driver_data;
@@ -448,7 +448,7 @@ static MACHINE_RESET( dkong )
 static MACHINE_RESET( strtheat )
 {
 	dkong_state *state = machine->driver_data;
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	MACHINE_RESET_CALL(dkong);
 
@@ -461,7 +461,7 @@ static MACHINE_RESET( strtheat )
 static MACHINE_RESET( drakton )
 {
 	dkong_state *state = machine->driver_data;
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	MACHINE_RESET_CALL(dkong);
 
@@ -2849,13 +2849,13 @@ ROM_END
  *
  *************************************/
 
-static void drakton_decrypt_rom(UINT8 mod, int offs, int *bs)
+static void drakton_decrypt_rom(running_machine *machine, UINT8 mod, int offs, int *bs)
 {
 	UINT8 oldbyte,newbyte;
 	UINT8 *ROM;
 	int mem;
 
-	ROM = memory_region(REGION_CPU1);
+	ROM = memory_region(machine, REGION_CPU1);
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -2881,7 +2881,7 @@ static void drakton_decrypt_rom(UINT8 mod, int offs, int *bs)
 static DRIVER_INIT( herodk )
 {
 	int A;
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	/* swap data lines D3 and D4 */
 	for (A = 0;A < 0x8000;A++)
@@ -2912,10 +2912,10 @@ static DRIVER_INIT( drakton )
         are actually used in the PAL.  Therefore, we'll take a little
         memory overhead and decrypt the ROMs using each method in advance. */
 
-	drakton_decrypt_rom(0x02, 0x10000, bs[0]);
-	drakton_decrypt_rom(0x40, 0x14000, bs[1]);
-	drakton_decrypt_rom(0x8a, 0x18000, bs[2]);
-	drakton_decrypt_rom(0xc8, 0x1c000, bs[3]);
+	drakton_decrypt_rom(machine, 0x02, 0x10000, bs[0]);
+	drakton_decrypt_rom(machine, 0x40, 0x14000, bs[1]);
+	drakton_decrypt_rom(machine, 0x8a, 0x18000, bs[2]);
+	drakton_decrypt_rom(machine, 0xc8, 0x1c000, bs[3]);
 }
 
 
@@ -2933,10 +2933,10 @@ static DRIVER_INIT( strtheat )
 	/* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
         memory overhead and decrypt the ROMs using each method in advance. */
-	drakton_decrypt_rom(0x03, 0x10000, bs[0]);
-	drakton_decrypt_rom(0x81, 0x14000, bs[1]);
-	drakton_decrypt_rom(0x0a, 0x18000, bs[2]);
-	drakton_decrypt_rom(0x88, 0x1c000, bs[3]);
+	drakton_decrypt_rom(machine, 0x03, 0x10000, bs[0]);
+	drakton_decrypt_rom(machine, 0x81, 0x14000, bs[1]);
+	drakton_decrypt_rom(machine, 0x0a, 0x18000, bs[2]);
+	drakton_decrypt_rom(machine, 0x88, 0x1c000, bs[3]);
 
 	/* custom handlers supporting Joystick or Steering Wheel */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7c00, 0x7c00, 0, 0, strtheat_inputport_0_r);

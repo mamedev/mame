@@ -202,18 +202,18 @@ WRITE8_HANDLER( rthunder_spriteram_w );
 
 static WRITE8_HANDLER( bankswitch1_w )
 {
-	UINT8 *base = memory_region(REGION_CPU1) + 0x10000;
+	UINT8 *base = memory_region(machine, REGION_CPU1) + 0x10000;
 
 	/* if the ROM expansion module is available, don't do anything. This avoids conflict */
 	/* with bankswitch1_ext_w() in wndrmomo */
-	if (memory_region(REGION_USER1)) return;
+	if (memory_region(machine, REGION_USER1)) return;
 
 	memory_set_bankptr(1,base + ((data & 0x03) * 0x2000));
 }
 
 static WRITE8_HANDLER( bankswitch1_ext_w )
 {
-	UINT8 *base = memory_region(REGION_USER1);
+	UINT8 *base = memory_region(machine, REGION_USER1);
 
 	if (base == 0) return;
 
@@ -222,7 +222,7 @@ static WRITE8_HANDLER( bankswitch1_ext_w )
 
 static WRITE8_HANDLER( bankswitch2_w )
 {
-	UINT8 *base = memory_region(REGION_CPU2) + 0x10000;
+	UINT8 *base = memory_region(machine, REGION_CPU2) + 0x10000;
 
 	memory_set_bankptr(2,base + ((data & 0x03) * 0x2000));
 }
@@ -314,7 +314,7 @@ static WRITE8_HANDLER( namcos86_led_w )
 static WRITE8_HANDLER( cus115_w )
 {
 	/* make sure the expansion board is present */
-	if (!memory_region(REGION_USER1))
+	if (!memory_region(machine, REGION_USER1))
 	{
 		popmessage("expansion board not present");
 		return;
@@ -344,7 +344,7 @@ static WRITE8_HANDLER( cus115_w )
 
 static MACHINE_RESET( namco86 )
 {
-	UINT8 *base = memory_region(REGION_CPU1) + 0x10000;
+	UINT8 *base = memory_region(machine, REGION_CPU1) + 0x10000;
 
 	memory_set_bankptr(1,base);
 }
@@ -1553,8 +1553,8 @@ static DRIVER_INIT( namco86 )
 	UINT8 *buffer;
 
 	/* shuffle tile ROMs so regular gfx unpack routines can be used */
-	gfx = memory_region(REGION_GFX1);
-	size = memory_region_length(REGION_GFX1) * 2 / 3;
+	gfx = memory_region(machine, REGION_GFX1);
+	size = memory_region_length(machine, REGION_GFX1) * 2 / 3;
 	buffer = malloc_or_die( size );
 
 	{
@@ -1578,8 +1578,8 @@ static DRIVER_INIT( namco86 )
 		free( buffer );
 	}
 
-	gfx = memory_region(REGION_GFX2);
-	size = memory_region_length(REGION_GFX2) * 2 / 3;
+	gfx = memory_region(machine, REGION_GFX2);
+	size = memory_region_length(machine, REGION_GFX2) * 2 / 3;
 	buffer = malloc_or_die( size );
 
 	{

@@ -4,9 +4,9 @@
 /* set to 1 to fix protection check after bonus round (see notes in pacman.c driver) */
 #define CANNONB_HACK	0
 
-static void cclimber_decode(const UINT8 convtable[8][16])
+static void cclimber_decode(running_machine *machine, const UINT8 convtable[8][16])
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	UINT8 *decrypt = auto_malloc(0x10000);
 	int A;
 
@@ -47,10 +47,10 @@ DRIVER_INIT( cclimber )
 		{   -1,  -1,0x54,0x01,0x15,0x40,0x45,0x41,0x51,0x04,0x50,0x05,0x11,0x44,0x10,0x14 }
 	};
 
-	cclimber_decode(convtable);
+	cclimber_decode(machine, convtable);
 }
 
-void cclimbrj_decode(void)
+void cclimbrj_decode(running_machine *machine)
 {
 	static const UINT8 convtable[8][16] =
 	{
@@ -64,15 +64,15 @@ void cclimbrj_decode(void)
 		{ 0x55,0x50,0x15,0x10,0x01,0x04,0x41,0x44,0x45,0x40,0x05,0x00,0x11,0x14,0x51,0x54 },
 	};
 
-	cclimber_decode(convtable);
+	cclimber_decode(machine, convtable);
 }
 
 DRIVER_INIT( cclimbrj )
 {
-	cclimbrj_decode();
+	cclimbrj_decode(machine);
 }
 
-void mshuttle_decode(void)
+void mshuttle_decode(running_machine *machine)
 {
 	static const UINT8 convtable[8][16] =
 	{
@@ -87,13 +87,13 @@ void mshuttle_decode(void)
 		{ 0x05,0x04,0x51,0x01,  -1,  -1,0x55,  -1,0x00,0x50,0x15,0x14,0x44,0x41,0x40,0x54 },
 	};
 
-	cclimber_decode(convtable);
+	cclimber_decode(machine, convtable);
 }
 
 DRIVER_INIT( ckongb )
 {
 	int A;
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	for (A = 0x0000;A < 0x6000;A++) /* all the program ROMs are encrypted */
 	{
@@ -104,7 +104,7 @@ DRIVER_INIT( ckongb )
 #if CANNONB_HACK
 static void cannonb_patch(void)
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	rom[0x2ba0] = 0x21;
 	rom[0x2ba1] = 0xfb;
@@ -116,7 +116,7 @@ static void cannonb_patch(void)
 DRIVER_INIT( cannonb )
 {
 	int A;
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	for (A = 0x0000;A < 0x1000;A++) /* only first ROM is encrypted */
 	{

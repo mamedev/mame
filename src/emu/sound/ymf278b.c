@@ -59,6 +59,7 @@
 
 #include <math.h>
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
 #include "ymf278b.h"
@@ -678,7 +679,7 @@ static void *ymf278b_start(int sndindex, int clock, const void *config)
 
 	intf = config;
 
-	ymf278b_init(chip, memory_region(intf->region), intf->irq_callback, clock);
+	ymf278b_init(chip, memory_region(Machine, intf->region), intf->irq_callback, clock);
 	chip->stream = stream_create(0, 2, clock/768, chip, ymf278b_pcm_update);
 
 	// Volume table, 1 = -0.375dB, 8 = -3dB, 256 = -96dB

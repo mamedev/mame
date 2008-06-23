@@ -68,7 +68,7 @@ VIDEO_UPDATE( lordgun );
 static DRIVER_INIT( lordgun )
 {
 	int i;
-	UINT16 *src = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *src = (UINT16 *)memory_region(machine, REGION_CPU1);
 
 	int rom_size = 0x100000;
 

@@ -35,7 +35,7 @@ static UINT32 dac_adr,dac_bank,dac_adr_s,dac_adr_e,dac_busy;
 
 static TIMER_CALLBACK( dac_callback )
 {
-	UINT8 *DACROM = memory_region(REGION_SOUND1);
+	UINT8 *DACROM = memory_region(machine, REGION_SOUND1);
 
 	DAC_data_w(0,DACROM[(dac_bank * 0x10000 + dac_adr++) & 0x1ffff]);
 
@@ -68,7 +68,7 @@ static MACHINE_RESET( mjsister )
 
 static WRITE8_HANDLER( mjsister_banksel1_w )
 {
-	UINT8 *BANKROM = memory_region(REGION_CPU1);
+	UINT8 *BANKROM = memory_region(machine, REGION_CPU1);
 	int tmp = mjsister_colorbank;
 
 	switch (data)
@@ -104,7 +104,7 @@ static WRITE8_HANDLER( mjsister_banksel1_w )
 
 static WRITE8_HANDLER( mjsister_banksel2_w )
 {
-	UINT8 *BANKROM = memory_region(REGION_CPU1);
+	UINT8 *BANKROM = memory_region(machine, REGION_CPU1);
 
 	switch (data)
 	{

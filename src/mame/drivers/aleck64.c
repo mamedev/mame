@@ -459,7 +459,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( aleck64 )
 {
-	UINT8 *rom = memory_region(REGION_USER2);
+	UINT8 *rom = memory_region(machine, REGION_USER2);
 
 	rom[0x67c] = 0;
 	rom[0x67d] = 0;

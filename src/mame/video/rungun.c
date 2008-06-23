@@ -98,7 +98,7 @@ VIDEO_START(rng)
 
 	// decode the ttl layer's gfx
 	machine->gfx[ttl_gfx_index] = allocgfx(&charlayout);
-	decodegfx(machine->gfx[ttl_gfx_index], memory_region(REGION_GFX3), 0, machine->gfx[ttl_gfx_index]->total_elements);
+	decodegfx(machine->gfx[ttl_gfx_index], memory_region(machine, REGION_GFX3), 0, machine->gfx[ttl_gfx_index]->total_elements);
 
 	machine->gfx[ttl_gfx_index]->total_colors = machine->config->total_colors / 16;
 

@@ -957,7 +957,7 @@ static MACHINE_START(mediagx)
 
 static MACHINE_RESET(mediagx)
 {
-	UINT8 *rom = memory_region(REGION_USER1);
+	UINT8 *rom = memory_region(machine, REGION_USER1);
 
 	cpunum_set_irq_callback(0, irq_callback);
 

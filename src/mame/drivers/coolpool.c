@@ -381,8 +381,8 @@ static READ16_HANDLER( dsp_hold_line_r )
 
 static READ16_HANDLER( dsp_rom_r )
 {
-	UINT8 *rom = memory_region(REGION_USER2);
-	return rom[iop_romaddr & (memory_region_length(REGION_USER2) - 1)];
+	UINT8 *rom = memory_region(machine, REGION_USER2);
+	return rom[iop_romaddr & (memory_region_length(machine, REGION_USER2) - 1)];
 }
 
 
@@ -944,8 +944,8 @@ static DRIVER_INIT( 9ballsht )
 	UINT16 *rom;
 
 	/* decrypt the main program ROMs */
-	rom = (UINT16 *)memory_region(REGION_USER1);
-	len = memory_region_length(REGION_USER1);
+	rom = (UINT16 *)memory_region(machine, REGION_USER1);
+	len = memory_region_length(machine, REGION_USER1);
 	for (a = 0;a < len/2;a++)
 	{
 		int hi,lo,nhi,nlo;
@@ -968,8 +968,8 @@ static DRIVER_INIT( 9ballsht )
 	}
 
 	/* decrypt the sub data ROMs */
-	rom = (UINT16 *)memory_region(REGION_USER2);
-	len = memory_region_length(REGION_USER2);
+	rom = (UINT16 *)memory_region(machine, REGION_USER2);
+	len = memory_region_length(machine, REGION_USER2);
 	for (a = 1;a < len/2;a+=4)
 	{
 		/* just swap bits 1 and 2 of the address */

@@ -15,6 +15,7 @@
 
 #include <math.h>
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "c352.h"
 
@@ -127,7 +128,7 @@ static void c352_mix_one_channel(struct c352_info *info, unsigned long ch, long 
 	noisecnt = info->c352_ch[ch].noisecnt;
 	noisebuf = info->c352_ch[ch].noisebuf;
 
-	len = (UINT32)memory_region_length(info->c352_region);
+	len = (UINT32)memory_region_length(Machine, info->c352_region);
 	for(i = 0 ; (i < sample_count) && (flag & C352_FLG_BUSY) ; i++)
 	{
 		offset += delta;
@@ -553,7 +554,7 @@ static void *c352_start(int sndindex, int clock, const void *config)
 
 	intf = config;
 
-	info->c352_rom_samples = memory_region(intf->region);
+	info->c352_rom_samples = memory_region(Machine, intf->region);
 	info->c352_region = intf->region;
 
 	info->sample_rate_base = clock / 192;

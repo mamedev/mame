@@ -344,7 +344,7 @@ ROM_END
 
 static DRIVER_INIT( citycon )
 {
-	UINT8 *rom = memory_region(REGION_GFX1);
+	UINT8 *rom = memory_region(machine, REGION_GFX1);
 	int i;
 
 

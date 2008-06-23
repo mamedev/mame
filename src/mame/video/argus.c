@@ -426,14 +426,14 @@ VIDEO_START( bombsa )
 ***************************************************************************/
 
 /* Write bg0 pattern data to dummy bg0 ram */
-static void argus_write_dummy_rams( int dramoffs, int vromoffs )
+static void argus_write_dummy_rams( running_machine *machine, int dramoffs, int vromoffs )
 {
 	int i;
 	int voffs;
 	int offs;
 
-	UINT8 *VROM1 = memory_region( REGION_USER1 );		/* "ag_15.bin" */
-	UINT8 *VROM2 = memory_region( REGION_USER2 );		/* "ag_16.bin" */
+	UINT8 *VROM1 = memory_region( machine, REGION_USER1 );		/* "ag_15.bin" */
+	UINT8 *VROM2 = memory_region( machine, REGION_USER2 );		/* "ag_16.bin" */
 
 	/* offset in pattern data */
 	offs = VROM1[ vromoffs ] | ( VROM1[ vromoffs + 1 ] << 8 );
@@ -1007,7 +1007,7 @@ WRITE8_HANDLER( butasan_bg1_status_w )
   Screen refresh
 ***************************************************************************/
 
-static void argus_bg0_scroll_handle( void )
+static void argus_bg0_scroll_handle( running_machine *machine )
 {
 	int delta;
 	int scrollx;
@@ -1048,7 +1048,7 @@ static void argus_bg0_scroll_handle( void )
 			{
 				for ( j = 0 ; j < 4 ; j ++ )
 				{
-					argus_write_dummy_rams( woffs, roffs );
+					argus_write_dummy_rams( machine, woffs, roffs );
 					woffs += 16;
 					roffs += 2;
 				}
@@ -1090,7 +1090,7 @@ static void argus_bg0_scroll_handle( void )
 			{
 				for ( j = 0 ; j < 4 ; j ++ )
 				{
-					argus_write_dummy_rams( woffs, roffs );
+					argus_write_dummy_rams( machine, woffs, roffs );
 					woffs += 16;
 					roffs += 2;
 				}
@@ -1539,7 +1539,7 @@ static void bombsa_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 VIDEO_UPDATE( argus )
 {
 	/* scroll BG0 and render tile at proper position */
-	argus_bg0_scroll_handle();
+	argus_bg0_scroll_handle(screen->machine);
 
 	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
 

@@ -318,10 +318,10 @@ static void palette_update(running_machine *machine)
 }
 
 
-static int skns_rle_decode ( int romoffset, int size )
+static int skns_rle_decode ( running_machine *machine, int romoffset, int size )
 {
-	UINT8 *src = memory_region (REGION_GFX1);
-	size_t srcsize = memory_region_length (REGION_GFX1);
+	UINT8 *src = memory_region (machine, REGION_GFX1);
+	size_t srcsize = memory_region_length (machine, REGION_GFX1);
 	UINT8 *dst = decodebuffer;
 	int decodeoffset = 0;
 
@@ -342,7 +342,7 @@ static int skns_rle_decode ( int romoffset, int size )
 			} while(code != 0xff);
 		}
 	}
-	return &src[romoffset%srcsize]-memory_region (REGION_GFX1);
+	return &src[romoffset%srcsize]-memory_region (machine, REGION_GFX1);
 }
 
 void skns_sprite_kludge(int x, int y)
@@ -618,7 +618,7 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 		sprite_y_scroll += sprite_kludge_y;
 
 
-		gfxlen = memory_region_length (REGION_GFX1);
+		gfxlen = memory_region_length (machine, REGION_GFX1);
 		while( source<finish )
 		{
 			xflip = (source[0] & 0x00000200) >> 9;
@@ -721,7 +721,7 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 
 			romoffset &= gfxlen-1;
 
-			endromoffs = skns_rle_decode ( romoffset, size );
+			endromoffs = skns_rle_decode ( machine, romoffset, size );
 
 			// in Cyvern
 
@@ -993,7 +993,7 @@ VIDEO_UPDATE(skns)
 
 	palette_update(screen->machine);
 
-	btiles = memory_region (REGION_GFX3);
+	btiles = memory_region (screen->machine, REGION_GFX3);
 
 //  if (!(skns_v3_regs[0x0c/4] & 0x0100)); // if tilemap b is in 8bpp mode
 	{

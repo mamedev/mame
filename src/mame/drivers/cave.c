@@ -1176,7 +1176,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( hotdogst_rombank_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 	int bank = data & 0x0f;
 	if ( data & ~0x0f )	logerror("CPU #1 - PC %04X: Bank %02X\n",activecpu_get_pc(),data);
 	if (bank > 1)	bank+=2;
@@ -1185,7 +1185,7 @@ static WRITE8_HANDLER( hotdogst_rombank_w )
 
 static WRITE8_HANDLER( hotdogst_okibank_w )
 {
-	UINT8 *RAM = memory_region(REGION_SOUND1);
+	UINT8 *RAM = memory_region(machine, REGION_SOUND1);
 	int bank1 = (data >> 0) & 0x3;
 	int bank2 = (data >> 4) & 0x3;
 	memcpy(RAM + 0x20000 * 0, RAM + 0x40000 + 0x20000 * bank1, 0x20000);
@@ -1229,7 +1229,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( mazinger_rombank_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 	int bank = data & 0x07;
 	if ( data & ~0x07 )	logerror("CPU #1 - PC %04X: Bank %02X\n",activecpu_get_pc(),data);
 	if (bank > 1)	bank+=2;
@@ -1273,7 +1273,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( metmqstr_rombank_w )
 {
-	UINT8 *ROM = memory_region(REGION_CPU2);
+	UINT8 *ROM = memory_region(machine, REGION_CPU2);
 	int bank = data & 0xf;
 	if ( bank != data )	logerror("CPU #1 - PC %04X: Bank %02X\n",activecpu_get_pc(),data);
 	if (bank >= 2)	bank += 2;
@@ -1282,7 +1282,7 @@ static WRITE8_HANDLER( metmqstr_rombank_w )
 
 static WRITE8_HANDLER( metmqstr_okibank0_w )
 {
-	UINT8 *ROM = memory_region(REGION_SOUND1);
+	UINT8 *ROM = memory_region(machine, REGION_SOUND1);
 	int bank1 = (data >> 0) & 0x7;
 	int bank2 = (data >> 4) & 0x7;
 	memcpy(ROM + 0x20000 * 0, ROM + 0x40000 + 0x20000 * bank1, 0x20000);
@@ -1291,7 +1291,7 @@ static WRITE8_HANDLER( metmqstr_okibank0_w )
 
 static WRITE8_HANDLER( metmqstr_okibank1_w )
 {
-	UINT8 *ROM = memory_region(REGION_SOUND2);
+	UINT8 *ROM = memory_region(machine, REGION_SOUND2);
 	int bank1 = (data >> 0) & 0x7;
 	int bank2 = (data >> 4) & 0x7;
 	memcpy(ROM + 0x20000 * 0, ROM + 0x40000 + 0x20000 * bank1, 0x20000);
@@ -1336,7 +1336,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( pwrinst2_rombank_w )
 {
-	UINT8 *ROM = memory_region(REGION_CPU2);
+	UINT8 *ROM = memory_region(machine, REGION_CPU2);
 	int bank = data & 0x07;
 	if ( data & ~0x07 )	logerror("CPU #1 - PC %04X: Bank %02X\n",activecpu_get_pc(),data);
 	if (bank > 2)	bank+=1;
@@ -1394,7 +1394,7 @@ static WRITE8_HANDLER( mirror_ram_w )
 
 static WRITE8_HANDLER( sailormn_rombank_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 	int bank = data & 0x1f;
 	if ( data & ~0x1f )	logerror("CPU #1 - PC %04X: Bank %02X\n",activecpu_get_pc(),data);
 	if (bank > 1)	bank+=2;
@@ -1403,7 +1403,7 @@ static WRITE8_HANDLER( sailormn_rombank_w )
 
 static WRITE8_HANDLER( sailormn_okibank0_w )
 {
-	UINT8 *RAM = memory_region(REGION_SOUND1);
+	UINT8 *RAM = memory_region(machine, REGION_SOUND1);
 	int bank1 = (data >> 0) & 0xf;
 	int bank2 = (data >> 4) & 0xf;
 	memcpy(RAM + 0x20000 * 0, RAM + 0x40000 + 0x20000 * bank1, 0x20000);
@@ -1412,7 +1412,7 @@ static WRITE8_HANDLER( sailormn_okibank0_w )
 
 static WRITE8_HANDLER( sailormn_okibank1_w )
 {
-	UINT8 *RAM = memory_region(REGION_SOUND2);
+	UINT8 *RAM = memory_region(machine, REGION_SOUND2);
 	int bank1 = (data >> 0) & 0xf;
 	int bank2 = (data >> 4) & 0xf;
 	memcpy(RAM + 0x20000 * 0, RAM + 0x40000 + 0x20000 * bank1, 0x20000);
@@ -2598,12 +2598,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 /* 4 bits -> 8 bits. Even and odd pixels are swapped */
-static void unpack_sprites(void)
+static void unpack_sprites(running_machine *machine)
 {
 	const int region		=	REGION_GFX1;	// sprites
 
-	const UINT32 len	=	memory_region_length(region);
-	UINT8 *rgn		=	memory_region(region);
+	const UINT32 len	=	memory_region_length(machine, region);
+	UINT8 *rgn		=	memory_region(machine, region);
 	UINT8 *src		=	rgn + len / 2 - 1;
 	UINT8 *dst		=	rgn + len - 1;
 
@@ -2617,12 +2617,12 @@ static void unpack_sprites(void)
 
 
 /* 4 bits -> 8 bits. Even and odd pixels and even and odd words, are swapped */
-static void ddonpach_unpack_sprites(void)
+static void ddonpach_unpack_sprites(running_machine *machine)
 {
 	const int region		=	REGION_GFX1;	// sprites
 
-	const UINT32 len	=	memory_region_length(region);
-	UINT8 *rgn		=	memory_region(region);
+	const UINT32 len	=	memory_region_length(machine, region);
+	UINT8 *rgn		=	memory_region(machine, region);
 	UINT8 *src		=	rgn + len / 2 - 1;
 	UINT8 *dst		=	rgn + len - 1;
 
@@ -2643,12 +2643,12 @@ static void ddonpach_unpack_sprites(void)
 
 
 /* 2 pages of 4 bits -> 8 bits */
-static void esprade_unpack_sprites(void)
+static void esprade_unpack_sprites(running_machine *machine)
 {
 	const int region		=	REGION_GFX1;	// sprites
 
-	UINT8 *src		=	memory_region(region);
-	UINT8 *dst		=	src + memory_region_length(region);
+	UINT8 *src		=	memory_region(machine, region);
+	UINT8 *dst		=	src + memory_region_length(machine, region);
 
 	while(src < dst)
 	{
@@ -4047,10 +4047,10 @@ ROM_END
 
 /* Tiles are 6 bit, 4 bits stored in one rom, 2 bits in the other.
    Expand the 2 bit part into a 4 bit layout, so we can decode it */
-static void sailormn_unpack_tiles( const int region )
+static void sailormn_unpack_tiles( running_machine *machine, const int region )
 {
-	const UINT32 len	=	memory_region_length(region);
-	UINT8 *rgn		=	memory_region(region);
+	const UINT32 len	=	memory_region_length(machine, region);
+	UINT8 *rgn		=	memory_region(machine, region);
 	UINT8 *src		=	rgn + (len/4)*3 - 1;
 	UINT8 *dst		=	rgn + (len/4)*4 - 2;
 
@@ -4085,13 +4085,13 @@ static DRIVER_INIT( agallet )
 {
 	init_cave(machine);
 
-	sailormn_unpack_tiles( REGION_GFX4 );
+	sailormn_unpack_tiles( machine, REGION_GFX4 );
 
 	cave_default_eeprom = cave_default_eeprom_type7;
 	cave_default_eeprom_length = sizeof(cave_default_eeprom_type7);
 	cave_region_byte = 0x1f;
 
-	unpack_sprites();
+	unpack_sprites(machine);
 
 //  Speed Hack
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb80000, 0xb80001, 0, 0, agallet_irq_cause_r);
@@ -4105,7 +4105,7 @@ static DRIVER_INIT( dfeveron )
 	cave_default_eeprom_length = sizeof(cave_default_eeprom_type1);
 	cave_region_byte = -1;
 
-	unpack_sprites();
+	unpack_sprites(machine);
 	cave_kludge = 2;
 }
 
@@ -4117,7 +4117,7 @@ static DRIVER_INIT( feversos )
 	cave_default_eeprom_length = sizeof(cave_default_eeprom_type1feversos);
 	cave_region_byte = -1;
 
-	unpack_sprites();
+	unpack_sprites(machine);
 	cave_kludge = 2;
 }
 
@@ -4129,7 +4129,7 @@ static DRIVER_INIT( ddonpach )
 	cave_default_eeprom_length = sizeof(cave_default_eeprom_type2);
 	cave_region_byte = -1;
 
-	ddonpach_unpack_sprites();
+	ddonpach_unpack_sprites(machine);
 	cave_spritetype = 1;	// "different" sprites (no zooming?)
 	time_vblank_irq = 90;
 }
@@ -4142,7 +4142,7 @@ static DRIVER_INIT( donpachi )
 	cave_default_eeprom_length = sizeof(cave_default_eeprom_type2);
 	cave_region_byte = -1;
 
-	ddonpach_unpack_sprites();
+	ddonpach_unpack_sprites(machine);
 	cave_spritetype = 1;	// "different" sprites (no zooming?)
 	time_vblank_irq = 90;
 
@@ -4157,12 +4157,12 @@ static DRIVER_INIT( esprade )
 	cave_default_eeprom_length = sizeof(cave_default_eeprom_type2);
 	cave_region_byte = -1;
 
-	esprade_unpack_sprites();
+	esprade_unpack_sprites(machine);
 	time_vblank_irq = 2000;	/**/
 
 #if 0		//ROM PATCH
 	{
-		UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
+		UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
 		rom[0x118A/2] = 0x4e71;			//palette fix   118A: 5548              SUBQ.W  #2,A0       --> NOP
 	}
 #endif
@@ -4174,7 +4174,7 @@ static DRIVER_INIT( gaia )
 
 	/* No EEPROM */
 
-	unpack_sprites();
+	unpack_sprites(machine);
 	cave_spritetype = 2;	// Normal sprites with different position handling
 	time_vblank_irq = 2000;	/**/
 }
@@ -4187,7 +4187,7 @@ static DRIVER_INIT( guwange )
 	cave_default_eeprom_length = sizeof(cave_default_eeprom_type1);
 	cave_region_byte = -1;
 
-	esprade_unpack_sprites();
+	esprade_unpack_sprites(machine);
 	time_vblank_irq = 2000;	/**/
 }
 
@@ -4199,7 +4199,7 @@ static DRIVER_INIT( hotdogst )
 	cave_default_eeprom_length = sizeof(cave_default_eeprom_type4);
 	cave_region_byte = -1;
 
-	unpack_sprites();
+	unpack_sprites(machine);
 	cave_spritetype = 2;	// Normal sprites with different position handling
 	time_vblank_irq = 2000;	/**/
 }
@@ -4207,8 +4207,8 @@ static DRIVER_INIT( hotdogst )
 static DRIVER_INIT( mazinger )
 {
 	UINT8 *buffer;
-	UINT8 *src = memory_region(REGION_GFX1);
-	int len = memory_region_length(REGION_GFX1);
+	UINT8 *src = memory_region(machine, REGION_GFX1);
+	int len = memory_region_length(machine, REGION_GFX1);
 
 	init_cave(machine);
 
@@ -4226,13 +4226,13 @@ static DRIVER_INIT( mazinger )
 	cave_default_eeprom_length = sizeof(cave_default_eeprom_type5);
 	cave_region_byte = 0x05;
 
-	unpack_sprites();
+	unpack_sprites(machine);
 	cave_spritetype = 2;	// Normal sprites with different position handling
 	cave_kludge = 3;
 	time_vblank_irq = 2100;
 
 	/* setup extra ROM */
-	memory_set_bankptr(1,memory_region(REGION_USER1));
+	memory_set_bankptr(1,memory_region(machine, REGION_USER1));
 }
 
 
@@ -4240,7 +4240,7 @@ static DRIVER_INIT( metmqstr )
 {
 	init_cave(machine);
 
-	unpack_sprites();
+	unpack_sprites(machine);
 	cave_spritetype = 2;	// Normal sprites with different position handling
 	cave_kludge = 3;
 	time_vblank_irq = 17376;
@@ -4250,8 +4250,8 @@ static DRIVER_INIT( metmqstr )
 static DRIVER_INIT( pwrins2j )
 {
 	UINT8 *buffer;
-	UINT8 *src = memory_region(REGION_GFX1);
-	int len = memory_region_length(REGION_GFX1);
+	UINT8 *src = memory_region(machine, REGION_GFX1);
+	int len = memory_region_length(machine, REGION_GFX1);
 	int i, j;
 
 	init_cave(machine);
@@ -4269,7 +4269,7 @@ static DRIVER_INIT( pwrins2j )
 		free(buffer);
 	}
 
-	unpack_sprites();
+	unpack_sprites(machine);
 	cave_spritetype = 3;
 	cave_kludge = 4;
 	time_vblank_irq = 2000;	/**/
@@ -4285,7 +4285,7 @@ static DRIVER_INIT( pwrinst2 )
 
 #if 1		//ROM PATCH
 	{
-		UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
+		UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
 		rom[0xD46C/2] = 0xD482;			// kurara dash fix  0xd400 -> 0xd482
 	}
 #endif
@@ -4296,8 +4296,8 @@ static DRIVER_INIT( pwrinst2 )
 static DRIVER_INIT( sailormn )
 {
 	UINT8 *buffer;
-	UINT8 *src = memory_region(REGION_GFX1);
-	int len = memory_region_length(REGION_GFX1);
+	UINT8 *src = memory_region(machine, REGION_GFX1);
+	int len = memory_region_length(machine, REGION_GFX1);
 
 	init_cave(machine);
 
@@ -4311,13 +4311,13 @@ static DRIVER_INIT( sailormn )
 		free(buffer);
 	}
 
-	sailormn_unpack_tiles( REGION_GFX4 );
+	sailormn_unpack_tiles( machine, REGION_GFX4 );
 
 	cave_default_eeprom = cave_default_eeprom_type6;
 	cave_default_eeprom_length = sizeof(cave_default_eeprom_type6);
 	cave_region_byte = 0x11;
 
-	unpack_sprites();
+	unpack_sprites(machine);
 	cave_spritetype = 2;	// Normal sprites with different position handling
 	cave_kludge = 1;
 	time_vblank_irq = 2000;
@@ -4331,7 +4331,7 @@ static DRIVER_INIT( uopoko )
 	cave_default_eeprom_length = sizeof(cave_default_eeprom_type4);
 	cave_region_byte = -1;
 
-	unpack_sprites();
+	unpack_sprites(machine);
 	cave_kludge = 2;
 	time_vblank_irq = 2000;	/**/
 }
@@ -4342,7 +4342,7 @@ static DRIVER_INIT( korokoro )
 
 	irq_level = 2;
 
-	unpack_sprites();
+	unpack_sprites(machine);
 	time_vblank_irq = 2000;	/**/
 }
 

@@ -636,8 +636,8 @@ ROM_END
 
 static DRIVER_INIT( dblewing )
 {
-	deco56_decrypt(REGION_GFX1);
-	deco102_decrypt(REGION_CPU1, 0x399d, 0x25, 0x3d);
+	deco56_decrypt(machine, REGION_GFX1);
+	deco102_decrypt(machine, REGION_CPU1, 0x399d, 0x25, 0x3d);
 }
 
 

@@ -44,7 +44,7 @@ static emu_timer *blitter_timer;
 
 PALETTE_INIT( dcheese )
 {
-	const UINT16 *src = (UINT16 *)memory_region(REGION_USER1);
+	const UINT16 *src = (UINT16 *)memory_region(machine, REGION_USER1);
 	int i;
 
 	/* really 65536 colors, but they don't use the later ones so we can stay */
@@ -178,8 +178,8 @@ static void do_blit(running_machine *machine)
 	INT32 dxdy = (INT32)(((blitter_xparam[6] & 0x0fff) | ((blitter_xparam[7] & 0x0fff) << 12)) << 12) >> 12;
 	INT32 dydx = (INT32)(((blitter_yparam[4] & 0x0fff) | ((blitter_yparam[5] & 0x0fff) << 12)) << 12) >> 12;
 	INT32 dydy = (INT32)(((blitter_yparam[6] & 0x0fff) | ((blitter_yparam[7] & 0x0fff) << 12)) << 12) >> 12;
-	UINT8 *src = memory_region(REGION_GFX1);
-	UINT32 pagemask = (memory_region_length(REGION_GFX1) - 1) / 0x40000;
+	UINT8 *src = memory_region(machine, REGION_GFX1);
+	UINT32 pagemask = (memory_region_length(machine, REGION_GFX1) - 1) / 0x40000;
 	int xstart = blitter_xparam[14];
 	int xend = blitter_xparam[15] + 1;
 	int ystart = blitter_yparam[14];

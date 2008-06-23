@@ -63,8 +63,8 @@ static MACHINE_RESET( thunderj )
 	atarivc_reset(machine->primary_screen, atarivc_eof_data, 2);
 	atarijsa_reset();
 
-	rom_base[0] = (UINT16 *)memory_region(REGION_CPU1);
-	rom_base[1] = (UINT16 *)memory_region(REGION_CPU2);
+	rom_base[0] = (UINT16 *)memory_region(machine, REGION_CPU1);
+	rom_base[1] = (UINT16 *)memory_region(machine, REGION_CPU2);
 	memory_set_bankptr(1, shared_ram);
 }
 

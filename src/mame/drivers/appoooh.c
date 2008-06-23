@@ -78,7 +78,7 @@ static void appoooh_adpcm_int(running_machine *machine, int num)
 /* adpcm address write */
 static WRITE8_HANDLER( appoooh_adpcm_w )
 {
-	UINT8 *RAM = memory_region(REGION_SOUND1);
+	UINT8 *RAM = memory_region(machine, REGION_SOUND1);
 	adpcmptr  = &RAM[data*256];
 	MSM5205_reset_w(0,0);
 	appoooh_adpcm_data=-1;
@@ -550,11 +550,11 @@ ROM_END
 
 
 static DRIVER_INIT(robowres){
-	robowres_decode();
+	robowres_decode(machine);
 }
 
 static DRIVER_INIT(robowrb){
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(REGION_CPU1) + 0x1c000);
+	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, REGION_CPU1) + 0x1c000);
 }
 
 

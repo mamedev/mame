@@ -105,7 +105,7 @@ static WRITE16_HANDLER( es5503_word_lsb_w )
 				// if not writing a "halt", set the bank
 				if (!(data & 1))
 				{
-					ES5503_set_base_0(memory_region(REGION_SOUND1) + ((data>>4)*0x10000));
+					ES5503_set_base_0(memory_region(machine, REGION_SOUND1) + ((data>>4)*0x10000));
 				}
 			}
 		}
@@ -337,7 +337,7 @@ static const struct ES5503interface es5503_intf =
 static MACHINE_RESET(mquake)
 {
 	/* set ES5503 wave memory (this is banked in 64k increments) */
-	ES5503_set_base_0(memory_region(REGION_SOUND1));
+	ES5503_set_base_0(memory_region(machine, REGION_SOUND1));
 
 	MACHINE_RESET_CALL(amiga);
 }
@@ -452,7 +452,7 @@ static DRIVER_INIT(mquake)
 
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(REGION_USER1), 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, REGION_USER1), 0);
 }
 
 

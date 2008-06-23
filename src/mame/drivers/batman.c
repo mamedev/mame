@@ -354,7 +354,7 @@ static DRIVER_INIT( batman )
 	};
 	atarigen_eeprom_default = default_eeprom;
 	atarijsa_init(machine, "260010", 0x0040);
-	atarijsa3_init_adpcm(REGION_SOUND1);
+	atarijsa3_init_adpcm(machine, REGION_SOUND1);
 }
 
 

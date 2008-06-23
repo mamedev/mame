@@ -52,9 +52,9 @@ WRITE16_HANDLER( m90_video_control_w );
 
 /***************************************************************************/
 
-static void set_m90_bank(void)
+static void set_m90_bank(running_machine *machine)
 {
-	UINT8 *rom = memory_region(REGION_USER1);
+	UINT8 *rom = memory_region(machine, REGION_USER1);
 
 	if (!rom)
 		popmessage("bankswitch with no banked ROM!");
@@ -80,7 +80,7 @@ static WRITE16_HANDLER( quizf1_bankswitch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		bankaddress = 0x10000 * (data & 0x0f);
-		set_m90_bank();
+		set_m90_bank(machine);
 	}
 }
 
@@ -1260,13 +1260,13 @@ ROM_END
 
 static STATE_POSTLOAD( quizf1_postload )
 {
-	set_m90_bank();
+	set_m90_bank(machine);
 }
 
 static DRIVER_INIT( quizf1 )
 {
 	bankaddress = 0;
-	set_m90_bank();
+	set_m90_bank(machine);
 
 	state_save_register_global(bankaddress);
 	state_save_register_postload(machine, quizf1_postload, NULL);
@@ -1276,7 +1276,7 @@ static DRIVER_INIT( quizf1 )
 
 static DRIVER_INIT( bomblord )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	int i;
 	for (i=0; i<0x100000; i+=8)

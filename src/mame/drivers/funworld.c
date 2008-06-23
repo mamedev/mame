@@ -2330,7 +2330,7 @@ static DRIVER_INIT( tabblue )
 *****************************************************************************************************/
 
 	int x, na, nb, nad, nbd;
-	UINT8 *src = memory_region( REGION_GFX1 );
+	UINT8 *src = memory_region( machine, REGION_GFX1 );
 
 
 	for (x=0x0000; x < 0x10000; x++)
@@ -2354,8 +2354,8 @@ static DRIVER_INIT( jolycdae )
 	/* Decrypting roms... */
 
 	int x;
-	UINT8 *srcp = memory_region( REGION_CPU1 );
-	UINT8 *srcg = memory_region( REGION_GFX1 );
+	UINT8 *srcp = memory_region( machine, REGION_CPU1 );
+	UINT8 *srcg = memory_region( machine, REGION_GFX1 );
 
 	for (x=0x8000;x<0x18000;x++)
 	{
@@ -2387,7 +2387,7 @@ static DRIVER_INIT( jolyc980 )
 
 *************************************************************************************************/
 
-//  UINT8 *ROM = memory_region(REGION_CPU1);
+//  UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 //  ROM[0xc1fc] = 0x4c;
 //  ROM[0xc1fd] = 0x1c;
@@ -2413,7 +2413,7 @@ static DRIVER_INIT( magiccda )
 
 ******************************************************************/
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	ROM[0xc1c6] = 0x92;
 
@@ -2426,8 +2426,8 @@ static DRIVER_INIT( magiccdb )
 /*** same as blue TAB PCB, with the magiccda patch ***/
 {
 	int x, na, nb, nad, nbd;
-	UINT8 *src = memory_region( REGION_GFX1 );
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *src = memory_region( machine, REGION_GFX1 );
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	for (x=0x0000; x < 0x10000; x++)
 	{
@@ -2450,7 +2450,7 @@ static DRIVER_INIT( magiccdb )
 static DRIVER_INIT( soccernw )
 {
 /* temporary patch to avoid hardware errors for debug purposes */
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	ROM[0x80b2] = 0xa9;
 	ROM[0x80b3] = 0x00;

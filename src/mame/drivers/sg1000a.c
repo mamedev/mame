@@ -325,7 +325,7 @@ static DRIVER_INIT( sg1000a )
 static DRIVER_INIT(chwrestl)
 {
 	DRIVER_INIT_CALL(sg1000a);
-	regulus_decode();
+	regulus_decode(machine);
 }
 
 /*************************************

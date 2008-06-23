@@ -84,7 +84,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( OKIM6295_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_SOUND1);
+	UINT8 *RAM = memory_region(machine, REGION_SOUND1);
 
 	if (ACCESSING_BITS_0_7){
 		memcpy(&RAM[0x30000], &RAM[0x40000 + (data & 0x0f)*0x10000], 0x10000);
@@ -299,15 +299,15 @@ ROM_END
 
 ***************************************************************************/
 
-static void glass_ROM16_split(int src_reg, int dst_reg, int start, int length, int dest1, int dest2)
+static void glass_ROM16_split(running_machine *machine, int src_reg, int dst_reg, int start, int length, int dest1, int dest2)
 {
 	int i;
 
 	/* get a pointer to the source data */
-	UINT8 *src = (UINT8 *)memory_region(src_reg);
+	UINT8 *src = (UINT8 *)memory_region(machine, src_reg);
 
 	/* get a pointer to the destination data */
-	UINT8 *dst = (UINT8 *)memory_region(dst_reg);
+	UINT8 *dst = (UINT8 *)memory_region(machine, dst_reg);
 
 	/* fill destination areas with the proper data */
 	for (i = 0; i < length/2; i++){
@@ -331,10 +331,10 @@ static DRIVER_INIT( glass )
     */
 
 	/* split ROM H13 */
-	glass_ROM16_split(REGION_GFX2, REGION_GFX1, 0x0000000, 0x0200000, 0x0000000, 0x0100000);
+	glass_ROM16_split(machine, REGION_GFX2, REGION_GFX1, 0x0000000, 0x0200000, 0x0000000, 0x0100000);
 
 	/* split ROM H11 */
-	glass_ROM16_split(REGION_GFX2, REGION_GFX1, 0x0200000, 0x0200000, 0x0200000, 0x0300000);
+	glass_ROM16_split(machine, REGION_GFX2, REGION_GFX1, 0x0200000, 0x0200000, 0x0200000, 0x0300000);
 }
 
 GAME( 1993, glass,    0,     glass, glass, glass, ROT0, "Gaelco", "Glass (Ver 1.1)",        GAME_UNEMULATED_PROTECTION )

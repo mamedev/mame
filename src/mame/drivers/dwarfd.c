@@ -746,8 +746,8 @@ static DRIVER_INIT(dwarfd)
 	UINT8 *src, *dst;
 
 	/* expand gfx roms */
-	src    = memory_region       ( REGION_GFX1 );
-	dst    = memory_region       ( REGION_GFX2 );
+	src    = memory_region       ( machine, REGION_GFX1 );
+	dst    = memory_region       ( machine, REGION_GFX2 );
 	for (i=0;i<0x4000;i++)
 	{
 		UINT8 dat;
@@ -759,7 +759,7 @@ static DRIVER_INIT(dwarfd)
 	}
 
 	/* use low bit as 'interpolation' bit */
-	src    = memory_region       ( REGION_GFX2 );
+	src    = memory_region       ( machine, REGION_GFX2 );
 	for (i=0;i<0x8000;i++)
 	{
 		if (src[i]&0x10)

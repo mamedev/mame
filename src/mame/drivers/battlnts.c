@@ -34,7 +34,7 @@ static WRITE8_HANDLER( battlnts_sh_irqtrigger_w )
 
 static WRITE8_HANDLER( battlnts_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	int bankaddress;
 
 	/* bits 6 & 7 = bank number */
@@ -406,7 +406,7 @@ static void shuffle(UINT8 *buf,int len)
 static DRIVER_INIT( rackemup )
 {
 	/* rearrange char ROM */
-	shuffle(memory_region(REGION_GFX1),memory_region_length(REGION_GFX1));
+	shuffle(memory_region(machine, REGION_GFX1),memory_region_length(machine, REGION_GFX1));
 }
 
 

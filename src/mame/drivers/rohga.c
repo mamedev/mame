@@ -1410,38 +1410,38 @@ ROM_END
 
 static DRIVER_INIT( rohga )
 {
-	deco56_decrypt(REGION_GFX1);
-	deco56_decrypt(REGION_GFX2);
+	deco56_decrypt(machine, REGION_GFX1);
+	deco56_decrypt(machine, REGION_GFX2);
 
 	decoprot_reset();
 }
 
 static DRIVER_INIT( wizdfire )
 {
-	deco74_decrypt(REGION_GFX1);
-	deco74_decrypt(REGION_GFX2);
-	deco74_decrypt(REGION_GFX3);
+	deco74_decrypt(machine, REGION_GFX1);
+	deco74_decrypt(machine, REGION_GFX2);
+	deco74_decrypt(machine, REGION_GFX3);
 }
 
 static DRIVER_INIT( nitrobal )
 {
-	deco56_decrypt(REGION_GFX1);
-	deco56_decrypt(REGION_GFX2);
-	deco74_decrypt(REGION_GFX3);
+	deco56_decrypt(machine, REGION_GFX1);
+	deco56_decrypt(machine, REGION_GFX2);
+	deco74_decrypt(machine, REGION_GFX3);
 
 	decoprot_reset();
 }
 
 static DRIVER_INIT( schmeisr )
 {
-	const UINT8 *src = memory_region(REGION_GFX2);
-	UINT8 *dst = memory_region(REGION_GFX1);
+	const UINT8 *src = memory_region(machine, REGION_GFX2);
+	UINT8 *dst = memory_region(machine, REGION_GFX1);
 
 	memcpy(dst,src,0x20000);
 	memcpy(dst+0x20000,src+0x80000,0x20000);
 
-	deco74_decrypt(REGION_GFX1);
-	deco74_decrypt(REGION_GFX2);
+	deco74_decrypt(machine, REGION_GFX1);
+	deco74_decrypt(machine, REGION_GFX2);
 
 	decoprot_reset();
 }

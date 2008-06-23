@@ -18,13 +18,13 @@ David Widel d_widel@hotmail.com
 static INT8 counter=0;
 
 
-static void acitya_decrypt_rom_8(void)
+static void acitya_decrypt_rom_8(running_machine *machine)
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
 	UINT8 *RAM;
 
-	RAM = memory_region(REGION_CPU1);
+	RAM = memory_region(machine, REGION_CPU1);
 
 
 	for (mem=0;mem<0x4000;mem++)
@@ -54,13 +54,13 @@ static void acitya_decrypt_rom_8(void)
 }
 
 
-static void acitya_decrypt_rom_9(void)
+static void acitya_decrypt_rom_9(running_machine *machine)
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
 	UINT8 *RAM;
 
-	RAM = memory_region(REGION_CPU1);
+	RAM = memory_region(machine, REGION_CPU1);
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -87,13 +87,13 @@ static void acitya_decrypt_rom_9(void)
 	return;
 }
 
-static void acitya_decrypt_rom_A(void)
+static void acitya_decrypt_rom_A(running_machine *machine)
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
 	UINT8 *RAM;
 
-	RAM = memory_region(REGION_CPU1);
+	RAM = memory_region(machine, REGION_CPU1);
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -120,13 +120,13 @@ static void acitya_decrypt_rom_A(void)
 	return;
 }
 
-static void acitya_decrypt_rom_B(void)
+static void acitya_decrypt_rom_B(running_machine *machine)
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
 	UINT8 *RAM;
 
-	RAM = memory_region(REGION_CPU1);
+	RAM = memory_region(machine, REGION_CPU1);
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -186,15 +186,15 @@ READ8_HANDLER( acitya_decrypt_rom )
 
 MACHINE_RESET( acitya )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	/* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
         memory overhead and decrypt the ROMs using each method in advance. */
-	acitya_decrypt_rom_8();
-	acitya_decrypt_rom_9();
-	acitya_decrypt_rom_A();
-	acitya_decrypt_rom_B();
+	acitya_decrypt_rom_8(machine);
+	acitya_decrypt_rom_9(machine);
+	acitya_decrypt_rom_A(machine);
+	acitya_decrypt_rom_B(machine);
 
 	/* The initial state of the counter is 0x0B */
 	counter = 0x0B;

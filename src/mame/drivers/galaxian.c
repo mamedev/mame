@@ -2166,9 +2166,9 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static void decode_mooncrst(int length, UINT8 *dest)
+static void decode_mooncrst(running_machine *machine, int length, UINT8 *dest)
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int offs;
 
 	for (offs = 0; offs < length; offs++)
@@ -2183,7 +2183,7 @@ static void decode_mooncrst(int length, UINT8 *dest)
 }
 
 
-static void decode_checkman(void)
+static void decode_checkman(running_machine *machine)
 {
 	/*
                              Encryption Table
@@ -2230,8 +2230,8 @@ static void decode_checkman(void)
 		{ 0,2,0,2 },
 		{ 1,4,1,4 }
 	};
-	UINT8 *rombase = memory_region(REGION_CPU1);
-	UINT32 romlength = memory_region_length(REGION_CPU1);
+	UINT8 *rombase = memory_region(machine, REGION_CPU1);
+	UINT32 romlength = memory_region_length(machine, REGION_CPU1);
 	UINT32 offs;
 
 	for (offs = 0; offs < romlength; offs++)
@@ -2245,10 +2245,10 @@ static void decode_checkman(void)
 }
 
 
-static void decode_dingoe(void)
+static void decode_dingoe(running_machine *machine)
 {
-	UINT8 *rombase = memory_region(REGION_CPU1);
-	UINT32 romlength = memory_region_length(REGION_CPU1);
+	UINT8 *rombase = memory_region(machine, REGION_CPU1);
+	UINT32 romlength = memory_region_length(machine, REGION_CPU1);
 	UINT32 offs;
 
 	for (offs = 0; offs < romlength; offs++)
@@ -2268,9 +2268,9 @@ static void decode_dingoe(void)
 }
 
 
-static void decode_frogger_sound(void)
+static void decode_frogger_sound(running_machine *machine)
 {
-	UINT8 *rombase = memory_region(REGION_CPU2);
+	UINT8 *rombase = memory_region(machine, REGION_CPU2);
 	UINT32 offs;
 
 	/* the first ROM of the sound CPU has data lines D0 and D1 swapped */
@@ -2279,9 +2279,9 @@ static void decode_frogger_sound(void)
 }
 
 
-static void decode_frogger_gfx(void)
+static void decode_frogger_gfx(running_machine *machine)
 {
-	UINT8 *rombase = memory_region(REGION_GFX1);
+	UINT8 *rombase = memory_region(machine, REGION_GFX1);
 	UINT32 offs;
 
 	/* the 2nd gfx ROM has data lines D0 and D1 swapped */
@@ -2290,10 +2290,10 @@ static void decode_frogger_gfx(void)
 }
 
 
-static void decode_anteater_gfx(void)
+static void decode_anteater_gfx(running_machine *machine)
 {
-	UINT32 romlength = memory_region_length(REGION_GFX1);
-	UINT8 *rombase = memory_region(REGION_GFX1);
+	UINT32 romlength = memory_region_length(machine, REGION_GFX1);
+	UINT8 *rombase = memory_region(machine, REGION_GFX1);
 	UINT8 *scratch = malloc_or_die(romlength);
 	UINT32 offs;
 
@@ -2310,10 +2310,10 @@ static void decode_anteater_gfx(void)
 }
 
 
-static void decode_losttomb_gfx(void)
+static void decode_losttomb_gfx(running_machine *machine)
 {
-	UINT32 romlength = memory_region_length(REGION_GFX1);
-	UINT8 *rombase = memory_region(REGION_GFX1);
+	UINT32 romlength = memory_region_length(machine, REGION_GFX1);
+	UINT8 *rombase = memory_region(machine, REGION_GFX1);
 	UINT8 *scratch = malloc_or_die(romlength);
 	UINT32 offs;
 
@@ -2330,14 +2330,14 @@ static void decode_losttomb_gfx(void)
 }
 
 
-static void decode_superbon(void)
+static void decode_superbon(running_machine *machine)
 {
 	offs_t i;
 	UINT8 *RAM;
 
 	/* Deryption worked out by hand by Chris Hardy. */
 
-	RAM = memory_region(REGION_CPU1);
+	RAM = memory_region(machine, REGION_CPU1);
 
 	for (i = 0;i < 0x1000;i++)
 	{
@@ -2434,7 +2434,7 @@ static DRIVER_INIT( gmgalax )
 
 	/* ROM is banked */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
-	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 2, memory_region(machine, REGION_CPU1) + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
 	gmgalax_game_changed(machine->portconfig->fieldlist, NULL, 0, 0);
@@ -2486,7 +2486,7 @@ static DRIVER_INIT( mooncrst )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
 
 	/* decrypt program code */
-	decode_mooncrst(0x8000, memory_region(REGION_CPU1));
+	decode_mooncrst(machine, 0x8000, memory_region(machine, REGION_CPU1));
 }
 
 
@@ -2515,7 +2515,7 @@ static DRIVER_INIT( moonqsr )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, moonqsr_extend_tile_info, moonqsr_extend_sprite_info);
 
 	/* decrypt program code */
-	decode_mooncrst(0x8000, decrypt);
+	decode_mooncrst(machine, 0x8000, decrypt);
 	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypt);
 }
 
@@ -2552,8 +2552,8 @@ static DRIVER_INIT( zigzag )
 	/* make ROMs 2 & 3 swappable */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, SMH_BANK1);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, SMH_BANK2);
-	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1) + 0x2000, 0x1000);
-	memory_configure_bank(2, 0, 2, memory_region(REGION_CPU1) + 0x2000, 0x1000);
+	memory_configure_bank(1, 0, 2, memory_region(machine, REGION_CPU1) + 0x2000, 0x1000);
+	memory_configure_bank(2, 0, 2, memory_region(machine, REGION_CPU1) + 0x2000, 0x1000);
 
 	/* handler for doing the swaps */
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7002, 0x7002, 0, 0x07f8, zigzag_bankswap_w);
@@ -2590,7 +2590,7 @@ static DRIVER_INIT( checkman )
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x00, 0x00, 0, 0xffff, checkman_sound_command_w);
 
 	/* decrypt program code */
-	decode_checkman();
+	decode_checkman(machine);
 }
 
 
@@ -2635,7 +2635,7 @@ static DRIVER_INIT( dingoe )
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3001, 0x3001, 0, 0, dingoe_3001_r);	/* Protection check */
 
 	/* decrypt program code */
-	decode_dingoe();
+	decode_dingoe(machine);
 }
 
 
@@ -2653,7 +2653,7 @@ static DRIVER_INIT( skybase )
 
 	/* extend ROM */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x5fff, 0, 0, SMH_BANK2);
-	memory_set_bankptr(2, memory_region(REGION_CPU1));
+	memory_set_bankptr(2, memory_region(machine, REGION_CPU1));
 }
 
 
@@ -2666,7 +2666,7 @@ static DRIVER_INIT( mshuttle )
 	irq_line = 0;
 
 	/* decrypt the code */
-	mshuttle_decode();
+	mshuttle_decode(machine);
 }
 
 
@@ -2679,7 +2679,7 @@ static DRIVER_INIT( mshuttlj )
 	irq_line = 0;
 
 	/* decrypt the code */
-	cclimbrj_decode();
+	cclimbrj_decode(machine);
 }
 
 
@@ -2709,7 +2709,7 @@ static DRIVER_INIT( scorpnmc )
 
 	/* extra ROM */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x67ff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x5000);
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x5000);
 
 	/* install RAM at $4000-$4800 */
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x47ff, 0, 0, SMH_BANK2, SMH_BANK2);
@@ -2771,7 +2771,7 @@ static DRIVER_INIT( sfx )
 
 	/* sound board has space for extra ROM */
 	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(1, memory_region(REGION_CPU2));
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU2));
 }
 
 
@@ -2799,7 +2799,7 @@ static DRIVER_INIT( losttomb )
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
 	/* decrypt */
-	decode_losttomb_gfx();
+	decode_losttomb_gfx(machine);
 }
 
 
@@ -2810,8 +2810,8 @@ static DRIVER_INIT( frogger )
 	galaxian_frogger_adjust = TRUE;
 
 	/* decrypt */
-	decode_frogger_sound();
-	decode_frogger_gfx();
+	decode_frogger_sound(machine);
+	decode_frogger_gfx(machine);
 }
 
 
@@ -2828,7 +2828,7 @@ static DRIVER_INIT( froggrmc )
 	memory_set_bankptr(1, auto_malloc(0x800));
 
 	/* decrypt */
-	decode_frogger_sound();
+	decode_frogger_sound(machine);
 }
 
 
@@ -2838,7 +2838,7 @@ static DRIVER_INIT( froggers )
 	common_init(machine, NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
 
 	/* decrypt */
-	decode_frogger_sound();
+	decode_frogger_sound(machine);
 }
 
 
@@ -2868,7 +2868,7 @@ static DRIVER_INIT( scorpion )
 
 	/* extra ROM */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5800, 0x67ff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x5800);
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x5800);
 
 	/* no background related */
 //  memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6803, 0x6803, 0, 0, SMH_NOP);
@@ -2876,7 +2876,7 @@ static DRIVER_INIT( scorpion )
 	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3000, 0, 0, scorpion_sound_status_r);
 /*
 {
-    const UINT8 *rom = memory_region(REGION_SOUND1);
+    const UINT8 *rom = memory_region(machine, REGION_SOUND1);
     int i;
 
     for (i = 0; i < 0x2c; i++)
@@ -2900,7 +2900,7 @@ static DRIVER_INIT( anteater )
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
 	/* decode graphics */
-	decode_anteater_gfx();
+	decode_anteater_gfx(machine);
 }
 
 
@@ -2911,7 +2911,7 @@ static DRIVER_INIT( superbon )
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
 	/* decode code */
-	decode_superbon();
+	decode_superbon(machine);
 }
 
 

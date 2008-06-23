@@ -11,6 +11,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "sound/custom.h"
 #include "sound/sn76477.h"
@@ -114,11 +115,11 @@ const char *const fantasy_sample_names[] =
 };
 
 
-INLINE void validate_tone_channel(int channel)
+INLINE void validate_tone_channel(running_machine *machine, int channel)
 {
 	if (!tone_channels[channel].mute)
 	{
-		UINT8 *ROM = memory_region(REGION_SOUND1);
+		UINT8 *ROM = memory_region(machine, REGION_SOUND1);
 		UINT8 romdata = ROM[tone_channels[channel].base + tone_channels[channel].offset];
 
 		if (romdata != 0xff)
@@ -134,7 +135,7 @@ static void rockola_tone_update(void *param, stream_sample_t **inputs, stream_sa
 	int i;
 
 	for (i = 0; i < CHANNELS; i++)
-		validate_tone_channel(i);
+		validate_tone_channel(Machine, i);
 
 	while (len-- > 0)
 	{
@@ -169,7 +170,7 @@ static void rockola_tone_update(void *param, stream_sample_t **inputs, stream_sa
 				tone_channels[i].offset++;
 				tone_channels[i].offset &= tone_channels[i].mask;
 
-				validate_tone_channel(i);
+				validate_tone_channel(Machine, i);
 			}
 
 			if (tone_channels[0].offset == 0 && Sound0StopOnRollover)

@@ -629,9 +629,9 @@ ROM_END
 static DRIVER_INIT(champbas)
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
-	UINT8 *rom1 = memory_region(REGION_GFX1);
-	UINT8 *rom2 = memory_region(REGION_GFX2);
-	int len = memory_region_length(REGION_GFX1);
+	UINT8 *rom1 = memory_region(machine, REGION_GFX1);
+	UINT8 *rom2 = memory_region(machine, REGION_GFX2);
+	int len = memory_region_length(machine, REGION_GFX1);
 	int i;
 
 	for (i = 0; i < len/2; ++i)

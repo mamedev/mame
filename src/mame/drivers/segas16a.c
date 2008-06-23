@@ -406,7 +406,7 @@ static WRITE8_HANDLER( n7751_command_w )
         D1    = /CS for ROM 0
         D0    = A14 line to ROMs
     */
-	int numroms = memory_region_length(REGION_SOUND1) / 0x8000;
+	int numroms = memory_region_length(machine, REGION_SOUND1) / 0x8000;
 	n7751_rom_address &= 0x3fff;
 	n7751_rom_address |= (data & 0x01) << 14;
 	if (!(data & 0x02) && numroms >= 1) n7751_rom_address |= 0x00000;
@@ -446,7 +446,7 @@ static WRITE8_HANDLER( n7751_rom_offset_w )
 static READ8_HANDLER( n7751_rom_r )
 {
 	/* read from BUS */
-	return memory_region(REGION_SOUND1)[n7751_rom_address];
+	return memory_region(machine, REGION_SOUND1)[n7751_rom_address];
 }
 
 
@@ -3105,27 +3105,27 @@ static DRIVER_INIT( aceattaa )
 static DRIVER_INIT( afighter )
 {
 	system16a_generic_init(machine);
-	fd1089_decrypt_0018();
+	fd1089_decrypt_0018(machine);
 }
 
 
 static DRIVER_INIT( alexkid1 )
 {
 	system16a_generic_init(machine);
-	fd1089_decrypt_0021();
+	fd1089_decrypt_0021(machine);
 }
 
 
 static DRIVER_INIT( aliensy1 )
 {
 	system16a_generic_init(machine);
-	fd1089_decrypt_0033();
+	fd1089_decrypt_0033(machine);
 }
 
 static DRIVER_INIT( aliensy5 )
 {
 	system16a_generic_init(machine);
-	fd1089_decrypt_0037();
+	fd1089_decrypt_0037(machine);
 }
 
 static DRIVER_INIT( bodyslam )
@@ -3157,7 +3157,7 @@ static DRIVER_INIT( quartet )
 static DRIVER_INIT( sdi )
 {
 	system16a_generic_init(machine);
-	fd1089_decrypt_0027();
+	fd1089_decrypt_0027(machine);
 	custom_io_r = sdi_custom_io_r;
 }
 
@@ -3165,7 +3165,7 @@ static DRIVER_INIT( sdi )
 static DRIVER_INIT( sjryukoa )
 {
 	system16a_generic_init(machine);
-	fd1089_decrypt_5021();
+	fd1089_decrypt_5021(machine);
 	custom_io_r = sjryuko_custom_io_r;
 	lamp_changed_w = sjryuko_lamp_changed_w;
 }
@@ -3174,13 +3174,13 @@ static DRIVER_INIT( sjryukoa )
 static DRIVER_INIT( timesca1 )
 {
 	system16a_generic_init(machine);
-	fd1089_decrypt_0024();
+	fd1089_decrypt_0024(machine);
 }
 
 static DRIVER_INIT( wb35 )
 {
 	system16a_generic_init(machine);
-	fd1089_decrypt_wb35();
+	fd1089_decrypt_wb35(machine);
 }
 
 /*************************************

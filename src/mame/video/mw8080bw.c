@@ -227,7 +227,7 @@ VIDEO_UPDATE( phantom2 )
 
 	UINT16 cloud_counter = phantom2_get_cloud_counter();
 
-	UINT8 *cloud_region = memory_region(REGION_PROMS);
+	UINT8 *cloud_region = memory_region(screen->machine, REGION_PROMS);
 
 	while (1)
 	{

@@ -109,7 +109,7 @@ static TILE_GET_INFO( get_pturn_tile_info )
 static TILE_GET_INFO( get_pturn_bg_tile_info )
 {
 	int tileno,palno;
-	tileno = memory_region(REGION_USER1)[tile_index];
+	tileno = memory_region(machine, REGION_USER1)[tile_index];
 	palno=bgpalette;
 	if(palno==1)
 	{

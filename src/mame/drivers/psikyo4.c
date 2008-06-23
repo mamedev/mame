@@ -345,7 +345,7 @@ static WRITE32_HANDLER( ps4_vidregs_w )
 	{
 		if (ACCESSING_BITS_0_15)	// Bank
 		{
-			UINT8 *ROM = memory_region(REGION_GFX1);
+			UINT8 *ROM = memory_region(machine, REGION_GFX1);
 			memory_set_bankptr(2,&ROM[0x2000 * (psikyo4_vidregs[offset]&0x1fff)]); /* Bank comes from vidregs */
 		}
 	}
@@ -357,7 +357,7 @@ static UINT32 sample_offs = 0;
 
 static READ32_HANDLER( ps4_sample_r ) /* Send sample data for test */
 {
-	UINT8 *ROM = memory_region(REGION_SOUND1);
+	UINT8 *ROM = memory_region(machine, REGION_SOUND1);
 	return ROM[sample_offs++]<<16;
 }
 #endif
@@ -412,10 +412,10 @@ static WRITE32_HANDLER( psh_ymf_pcm_w )
 
 #define PCM_BANK_NO(n)	((ps4_io_select[0] >> (n * 4 + 24)) & 0x07)
 
-static void set_hotgmck_pcm_bank(int n)
+static void set_hotgmck_pcm_bank(running_machine *machine, int n)
 {
-	UINT8 *ymf_pcmbank = memory_region(REGION_SOUND1) + 0x200000;
-	UINT8 *pcm_rom = memory_region(REGION_SOUND2);
+	UINT8 *ymf_pcmbank = memory_region(machine, REGION_SOUND1) + 0x200000;
+	UINT8 *pcm_rom = memory_region(machine, REGION_SOUND2);
 
 	memcpy(ymf_pcmbank + n * 0x100000, pcm_rom + PCM_BANK_NO(n) * 0x100000, 0x100000);
 }
@@ -432,10 +432,10 @@ static WRITE32_HANDLER( hotgmck_pcm_bank_w )
 	new_bank1 = PCM_BANK_NO(1);
 
 	if (old_bank0 != new_bank0)
-		set_hotgmck_pcm_bank(0);
+		set_hotgmck_pcm_bank(machine, 0);
 
 	if (old_bank1 != new_bank1)
-		set_hotgmck_pcm_bank(1);
+		set_hotgmck_pcm_bank(machine, 1);
 }
 
 static ADDRESS_MAP_START( ps4_readmem, ADDRESS_SPACE_PROGRAM, 32 )
@@ -1069,19 +1069,19 @@ PC  :000029F8: BT      $000029EC
 
 static STATE_POSTLOAD( hotgmck_pcm_bank_postload )
 {
-	set_hotgmck_pcm_bank((FPTR)param);
+	set_hotgmck_pcm_bank(machine, (FPTR)param);
 }
 
 static void install_hotgmck_pcm_bank(running_machine *machine)
 {
-	UINT8 *ymf_pcm = memory_region(REGION_SOUND1);
-	UINT8 *pcm_rom = memory_region(REGION_SOUND2);
+	UINT8 *ymf_pcm = memory_region(machine, REGION_SOUND1);
+	UINT8 *pcm_rom = memory_region(machine, REGION_SOUND2);
 
 	memcpy(ymf_pcm, pcm_rom, 0x200000);
 
 	ps4_io_select[0] = (ps4_io_select[0] & 0x00ffffff) | 0x32000000;
-	set_hotgmck_pcm_bank(0);
-	set_hotgmck_pcm_bank(1);
+	set_hotgmck_pcm_bank(machine, 0);
+	set_hotgmck_pcm_bank(machine, 1);
 
 	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5800008, 0x580000b, 0, 0, hotgmck_pcm_bank_w );
 	state_save_register_postload(machine, hotgmck_pcm_bank_postload, (void *)0);
@@ -1090,7 +1090,7 @@ static void install_hotgmck_pcm_bank(running_machine *machine)
 
 static DRIVER_INIT( hotgmck )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(1,&RAM[0x100000]);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5800000, 0x5800007, 0, 0, hotgmck_io32_r ); // Different Inputs
 	install_hotgmck_pcm_bank(machine);	// Banked PCM ROM

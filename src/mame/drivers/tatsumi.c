@@ -1187,9 +1187,9 @@ ROM_END
 
 static DRIVER_INIT( apache3 )
 {
-	UINT8 *dst = memory_region(REGION_GFX1);
-	UINT8 *src1 = memory_region(REGION_GFX2);
-	UINT8 *src2 = memory_region(REGION_GFX3);
+	UINT8 *dst = memory_region(machine, REGION_GFX1);
+	UINT8 *src1 = memory_region(machine, REGION_GFX2);
+	UINT8 *src2 = memory_region(machine, REGION_GFX3);
 	int i;
 
 	cpunum_set_input_line(machine, 3, INPUT_LINE_HALT, ASSERT_LINE); // ?
@@ -1204,19 +1204,19 @@ static DRIVER_INIT( apache3 )
 	}
 
 	// Copy sprite & palette data out of GFX rom area
-	tatsumi_rom_sprite_lookup1 = memory_region(REGION_GFX2);
-	tatsumi_rom_sprite_lookup2 = memory_region(REGION_GFX3);
-	tatsumi_rom_clut0 = memory_region(REGION_GFX2)+ 0x100000 - 0x800;
-	tatsumi_rom_clut1 = memory_region(REGION_GFX3)+ 0x100000 - 0x800;
+	tatsumi_rom_sprite_lookup1 = memory_region(machine, REGION_GFX2);
+	tatsumi_rom_sprite_lookup2 = memory_region(machine, REGION_GFX3);
+	tatsumi_rom_clut0 = memory_region(machine, REGION_GFX2)+ 0x100000 - 0x800;
+	tatsumi_rom_clut1 = memory_region(machine, REGION_GFX3)+ 0x100000 - 0x800;
 
 	tatsumi_reset();
 }
 
 static DRIVER_INIT( roundup5 )
 {
-	UINT8 *dst = memory_region(REGION_GFX1);
-	UINT8 *src1 = memory_region(REGION_GFX2);
-	UINT8 *src2 = memory_region(REGION_GFX3);
+	UINT8 *dst = memory_region(machine, REGION_GFX1);
+	UINT8 *src1 = memory_region(machine, REGION_GFX2);
+	UINT8 *src2 = memory_region(machine, REGION_GFX3);
 	int i;
 
 	for (i=0; i<0xc0000; i+=32) {
@@ -1229,23 +1229,23 @@ static DRIVER_INIT( roundup5 )
 	}
 
 	// Copy sprite & palette data out of GFX rom area
-	tatsumi_rom_sprite_lookup1 = memory_region(REGION_GFX2);
-	tatsumi_rom_sprite_lookup2 = memory_region(REGION_GFX3);
-	tatsumi_rom_clut0 = memory_region(REGION_GFX2)+ 0xc0000 - 0x800;
-	tatsumi_rom_clut1 = memory_region(REGION_GFX3)+ 0xc0000 - 0x800;
+	tatsumi_rom_sprite_lookup1 = memory_region(machine, REGION_GFX2);
+	tatsumi_rom_sprite_lookup2 = memory_region(machine, REGION_GFX3);
+	tatsumi_rom_clut0 = memory_region(machine, REGION_GFX2)+ 0xc0000 - 0x800;
+	tatsumi_rom_clut1 = memory_region(machine, REGION_GFX3)+ 0xc0000 - 0x800;
 
 	tatsumi_reset();
 }
 
 static DRIVER_INIT( cyclwarr )
 {
-	UINT8 *dst = memory_region(REGION_GFX1);
-	UINT8 *src1 = memory_region(REGION_GFX2);
-	int len1 = memory_region_length(REGION_GFX2);
-	UINT8 *src2 = memory_region(REGION_GFX3);
-	int len2 = memory_region_length(REGION_GFX3);
+	UINT8 *dst = memory_region(machine, REGION_GFX1);
+	UINT8 *src1 = memory_region(machine, REGION_GFX2);
+	int len1 = memory_region_length(machine, REGION_GFX2);
+	UINT8 *src2 = memory_region(machine, REGION_GFX3);
+	int len2 = memory_region_length(machine, REGION_GFX3);
 	int i;
-	for (i=0; i<len2; i+=32) {
+	for (i=0; i<len1; i+=32) {
 		memcpy(dst,src1,32);
 		src1+=32;
 		dst+=32;
@@ -1254,11 +1254,11 @@ static DRIVER_INIT( cyclwarr )
 		src2+=32;
 	}
 
-	dst = memory_region(REGION_CPU1);
+	dst = memory_region(machine, REGION_CPU1);
 	memcpy(cyclwarr_cpua_ram,dst,8);
 	memory_set_bankptr(1, dst);
 
-	dst = memory_region(REGION_CPU2);
+	dst = memory_region(machine, REGION_CPU2);
 	memcpy(cyclwarr_cpub_ram,dst,8);
 	memory_set_bankptr(2, dst);
 

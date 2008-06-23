@@ -150,7 +150,7 @@ static NVRAM_HANDLER( konamigv_93C46 )
 		}
 		else
 		{
-			eeprom_set_data( memory_region( REGION_USER2 ), memory_region_length( REGION_USER2 ) );
+			eeprom_set_data( memory_region( machine, REGION_USER2 ), memory_region_length( machine, REGION_USER2 ) );
 		}
 	}
 }

@@ -317,7 +317,7 @@ static void opwolf_msm5205_vck(running_machine *machine, int chip)
 	}
 	else
 	{
-		adpcm_data[chip] = memory_region(REGION_SOUND1)[adpcm_pos[chip]];
+		adpcm_data[chip] = memory_region(machine, REGION_SOUND1)[adpcm_pos[chip]];
 		adpcm_pos[chip] = (adpcm_pos[chip] + 1) & 0x7ffff;
 		MSM5205_data_w(chip, adpcm_data[chip] >> 4);
 	}
@@ -777,7 +777,7 @@ ROM_END
 
 static DRIVER_INIT( opwolf )
 {
-	UINT16* rom=(UINT16*)memory_region(REGION_CPU1);
+	UINT16* rom=(UINT16*)memory_region(machine, REGION_CPU1);
 
 	opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -787,13 +787,13 @@ static DRIVER_INIT( opwolf )
 	opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
 	opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
 
-	memory_configure_bank(10, 0, 4, memory_region(REGION_CPU2) + 0x10000, 0x4000);
+	memory_configure_bank(10, 0, 4, memory_region(machine, REGION_CPU2) + 0x10000, 0x4000);
 }
 
 
 static DRIVER_INIT( opwolfb )
 {
-	UINT16* rom=(UINT16*)memory_region(REGION_CPU1);
+	UINT16* rom=(UINT16*)memory_region(machine, REGION_CPU1);
 
 	opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -801,7 +801,7 @@ static DRIVER_INIT( opwolfb )
 	opwolf_gun_xoffs = -2;
 	opwolf_gun_yoffs = 17;
 
-	memory_configure_bank(10, 0, 4, memory_region(REGION_CPU2) + 0x10000, 0x4000);
+	memory_configure_bank(10, 0, 4, memory_region(machine, REGION_CPU2) + 0x10000, 0x4000);
 }
 
 

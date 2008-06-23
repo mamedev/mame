@@ -272,7 +272,7 @@ WRITE8_HANDLER( nbmj8891_vramsel_w )
 
 WRITE8_HANDLER( nbmj8891_romsel_w )
 {
-	int gfxlen = memory_region_length(REGION_GFX1);
+	int gfxlen = memory_region_length(machine, REGION_GFX1);
 	nbmj8891_gfxrom = (data & 0x0f);
 
 	if ((0x20000 * nbmj8891_gfxrom) > (gfxlen - 1))
@@ -337,7 +337,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 
 static void nbmj8891_gfxdraw(running_machine *machine)
 {
-	UINT8 *GFX = memory_region(REGION_GFX1);
+	UINT8 *GFX = memory_region(machine, REGION_GFX1);
 	int width = video_screen_get_width(machine->primary_screen);
 
 	int x, y;
@@ -376,7 +376,7 @@ static void nbmj8891_gfxdraw(running_machine *machine)
 		skipy = -1;
 	}
 
-	gfxlen = memory_region_length(REGION_GFX1);
+	gfxlen = memory_region_length(machine, REGION_GFX1);
 	gfxaddr = (nbmj8891_gfxrom << 17) + (blitter_src_addr << 1);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)
@@ -494,7 +494,7 @@ static void nbmj8891_gfxdraw(running_machine *machine)
 ******************************************************************************/
 VIDEO_START( nbmj8891_1layer )
 {
-	UINT8 *CLUT = memory_region(REGION_USER1);
+	UINT8 *CLUT = memory_region(machine, REGION_USER1);
 	int i;
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);

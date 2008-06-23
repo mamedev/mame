@@ -109,7 +109,7 @@ static void ssio_compute_ay8910_modulation(void);
  *
  *************************************/
 
-void mcr_sound_init(UINT8 config)
+void mcr_sound_init(running_machine *machine, UINT8 config)
 {
 	int sound_cpu = 1;
 	int dac_index = 0;
@@ -269,7 +269,7 @@ void mcr_sound_reset(void)
 */
 static void ssio_compute_ay8910_modulation(void)
 {
-	UINT8 *prom = memory_region(REGION_PROMS);
+	UINT8 *prom = memory_region(Machine, REGION_PROMS);
 	int volval;
 
 	/* loop over all possible values of the duty cycle */

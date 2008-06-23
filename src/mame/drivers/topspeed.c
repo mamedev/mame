@@ -402,15 +402,15 @@ logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",activecpu_ge
 
 static INT32 banknum = -1;
 
-static void reset_sound_region(void)
+static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr( 10, memory_region(REGION_CPU2) + (banknum * 0x4000) + 0x10000 );
+	memory_set_bankptr( 10, memory_region(machine, REGION_CPU2) + (banknum * 0x4000) + 0x10000 );
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )	/* assumes Z80 sandwiched between 68Ks */
 {
 	banknum = (data - 1) & 7;
-	reset_sound_region();
+	reset_sound_region(machine);
 }
 
 static int adpcm_pos;
@@ -426,7 +426,7 @@ static void topspeed_msm5205_vck(running_machine *machine, int chip)
 	}
 	else
 	{
-		adpcm_data = memory_region(REGION_SOUND1)[adpcm_pos];
+		adpcm_data = memory_region(machine, REGION_SOUND1)[adpcm_pos];
 		adpcm_pos = (adpcm_pos + 1) & 0x1ffff;
 		MSM5205_data_w(0, adpcm_data >> 4);
 	}
@@ -681,7 +681,7 @@ static const struct MSM5205interface msm5205_interface =
 static STATE_POSTLOAD( topspeed_postload )
 {
 	parse_control(machine);
-	reset_sound_region();
+	reset_sound_region(machine);
 }
 
 static MACHINE_START( topspeed )

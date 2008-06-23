@@ -71,7 +71,7 @@ static VIDEO_UPDATE( turbosub )
 static MACHINE_RESET( turbosub )
 {
 #if ROM_PATCHES
-	UINT8 *rom = (UINT8 *)memory_region(REGION_CPU1);
+	UINT8 *rom = (UINT8 *)memory_region(machine, REGION_CPU1);
 
 	rom[0xf564]=0;		/* Display test status */
 	rom[0xf60a]=0x20;	/* Skip on error */
@@ -121,7 +121,7 @@ static READ8_HANDLER( G_STATUS_R )
 static WRITE8_HANDLER( G_STATUS_W )
 {
 	int bankaddress;
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	bankaddress = 0x10000 + (data & 0x03) * 0x10000;
 	memory_set_bankptr(1,&ROM[bankaddress]);
 

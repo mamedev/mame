@@ -604,13 +604,13 @@ static WRITE8_HANDLER(cfb_rom_bank_sel_w)	/* mazer blazer */
 {
 	gfx_rom_bank = data;
 
-	memory_set_bankptr( 1, memory_region(REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x10000 );
+	memory_set_bankptr( 1, memory_region(machine, REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x10000 );
 }
 static WRITE8_HANDLER(cfb_rom_bank_sel_w_gg)	/* great guns */
 {
 	gfx_rom_bank = data>>1;
 
-	memory_set_bankptr( 1, memory_region(REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x10000 );
+	memory_set_bankptr( 1, memory_region(machine, REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x10000 );
 }
 
 
@@ -687,7 +687,7 @@ int bits = 0;
 
 UINT8 color_base=0;
 
-UINT8 * rom = memory_region(REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x10000;
+UINT8 * rom = memory_region(machine, REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x10000;
 
 /*
     if ((mode<=0x07) || (mode>=0x10))
@@ -852,7 +852,7 @@ int bits = 0;
 
 UINT8 color_base=0;
 
-UINT8 * rom = memory_region(REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x10000;
+UINT8 * rom = memory_region(machine, REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x10000;
 
 /*
     //if (0) //(mode != 0x07)
@@ -1452,7 +1452,7 @@ static MACHINE_RESET( mazerbla )
 
 static MACHINE_RESET( greatgun )
 {
-	UINT8 *rom = memory_region(REGION_CPU3);
+	UINT8 *rom = memory_region(machine, REGION_CPU3);
 	game_id = GREATGUN;
 	zpu_int_vector = 0xff;
 	cpunum_set_irq_callback(0, irq_callback);

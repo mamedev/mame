@@ -1272,7 +1272,7 @@ ROM_END
 
 static DRIVER_INIT( bublbobl )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	/* in Bubble Bobble, bank 0 has code falling from 7fff to 8000, */
 	/* so I have to copy it there because bank switching wouldn't catch it */

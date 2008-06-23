@@ -247,9 +247,9 @@ static DRIVER_INIT( suprloco )
 	int i, j, k, color_source, color_dest;
 	UINT8 *source, *dest, *lookup;
 
-	source = memory_region(REGION_GFX1);
+	source = memory_region(machine, REGION_GFX1);
 	dest   = source + 0x6000;
-	lookup = memory_region(REGION_PROMS) + 0x0200;
+	lookup = memory_region(machine, REGION_PROMS) + 0x0200;
 
 	for (i = 0; i < 0x80; i++, lookup += 8)
 	{
@@ -275,7 +275,7 @@ static DRIVER_INIT( suprloco )
 
 
 	/* decrypt program ROMs */
-	suprloco_decode();
+	suprloco_decode(machine);
 }
 
 

@@ -1256,8 +1256,8 @@ static void		dispose_watch(watch_info *watch);
 static watch_info
 				*get_unused_watch(void);
 
-static void		add_cheat_from_watch(watch_info *watch);
-static void		add_cheat_from_watch_as_watch(cheat_entry *entry, watch_info *watch);
+static void		add_cheat_from_watch(running_machine *machine, watch_info *watch);
+static void		add_cheat_from_watch_as_watch(running_machine *machine, cheat_entry *entry, watch_info *watch);
 
 static void		reset_watch(watch_info *watch);
 
@@ -1301,7 +1301,7 @@ static void		load_user_defined_search_region(running_machine *machine, char *fil
 static void		load_cheat_database(running_machine *machine, UINT8 flags);
 static void		reload_cheat_database(running_machine *machine);
 
-static void		dispose_cheat_database(void);
+static void		dispose_cheat_database(running_machine *machine);
 
 /********** SAVER **********/
 static void		save_cheat_code(running_machine *machine, cheat_entry *entry);
@@ -1313,8 +1313,8 @@ static void		save_raw_code(running_machine *machine);
 static void		do_auto_save_cheats(running_machine *machine);
 
 /********** CODE ADDITION **********/
-static void		add_cheat_from_result(search_info *search, search_region *region, UINT32 address);
-static void		add_cheat_from_first_result(search_info *search);
+static void		add_cheat_from_result(running_machine *machine, search_info *search, search_region *region, UINT32 address);
+static void		add_cheat_from_first_result(running_machine *machine, search_info *search);
 static void		add_watch_from_result(search_info *search, search_region *region, UINT32 address);
 
 /********** SEARCH **********/
@@ -1347,8 +1347,8 @@ static UINT32	do_memory_read(UINT8 *buf, UINT32 address, UINT8 bytes, UINT8 swap
 static void		do_cpu_write(UINT32 data, UINT8 cpu, UINT32 address, UINT8 bytes, UINT8 swap);
 static void		do_memory_write(UINT32 data, UINT8 *buf, UINT32 address, UINT8 bytes, UINT8 swap, cpu_region_info *info);
 
-static UINT32	read_data(cheat_action *action);
-static void		write_data(cheat_action *action, UINT32 data);
+static UINT32	read_data(running_machine *machine, cheat_action *action);
+static void		write_data(running_machine *machine, cheat_action *action, UINT32 data);
 
 /********** WATCH **********/
 static void		watch_cheat_entry(cheat_entry *entry, UINT8 associate);
@@ -1356,23 +1356,23 @@ static void		add_action_watch(cheat_action *action, cheat_entry *entry);
 static void		remove_associated_watches(cheat_entry *entry);
 
 /********** ACTIVE/DEACTIVE ENTRY **********/
-static void		reset_action(cheat_action *action);
-static void		activate_cheat(cheat_entry *entry);
-static void		restore_last_value(cheat_action *action);
-static void		deactivate_cheat(cheat_entry *entry);
-static void		temp_deactivate_cheat(cheat_entry *entry);
+static void		reset_action(running_machine *machine, cheat_action *action);
+static void		activate_cheat(running_machine *machine, cheat_entry *entry);
+static void		restore_last_value(running_machine *machine, cheat_action *action);
+static void		deactivate_cheat(running_machine *machine, cheat_entry *entry);
+static void		temp_deactivate_cheat(running_machine *machine, cheat_entry *entry);
 
 /********** OPERATION CORE **********/
-static void		cheat_periodicOperation(cheat_action *action);
-static UINT8	cheat_periodicCondition(cheat_action *action);
+static void		cheat_periodicOperation(running_machine *machine, cheat_action *action);
+static UINT8	cheat_periodicCondition(running_machine *machine, cheat_action *action);
 static int		cheat_periodicAction(running_machine *machine, cheat_action *action, int selection);
 static void		cheat_periodicEntry(running_machine *machine, cheat_entry *entry);
 
 /********** CONFIGURE ENTRY **********/
-static void		update_all_cheat_info(void);
-static void		update_cheat_info(cheat_entry *entry, UINT8 is_load_time);
-static UINT32	analyse_code_format(cheat_entry *entry, cheat_action *action);
-static void		check_code_format(cheat_entry *entry);
+static void		update_all_cheat_info(running_machine *machine);
+static void		update_cheat_info(running_machine *machine, cheat_entry *entry, UINT8 is_load_time);
+static UINT32	analyse_code_format(running_machine *machine, cheat_entry *entry, cheat_action *action);
+static void		check_code_format(running_machine *machine, cheat_entry *entry);
 static void		build_label_index_table(cheat_entry *entry);
 static void		set_layer_index(void);
 
@@ -2134,7 +2134,7 @@ static void cheat_exit(running_machine *machine)
 		do_auto_save_cheats(machine);
 
 	/* free cheat list */
-	dispose_cheat_database();
+	dispose_cheat_database(machine);
 
 	/* free watch lists */
 	if(watch_list)
@@ -2558,7 +2558,7 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 	/* first setting 2 : save the value */
 	if(menu->first_time)
 	{
-		display_value = is_bcd ? DecimalToBCD(BCDToDecimal(read_data(action))) : read_data(action);
+		display_value = is_bcd ? DecimalToBCD(BCDToDecimal(read_data(machine, action))) : read_data(machine, action);
 
 		if(display_value < min)
 			display_value = min;
@@ -2715,7 +2715,7 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 			}
 		}
 
-		activate_cheat(entry);
+		activate_cheat(machine, entry);
 
 		menu->sel = -1;
 	}
@@ -2840,9 +2840,9 @@ static int user_select_label_menu(running_machine *machine, cheat_menu_stack *me
 
 			/* set new label index */
 			if(entry->selection)
-				activate_cheat(entry);
+				activate_cheat(machine, entry);
 			else
-				deactivate_cheat(entry);
+				deactivate_cheat(machine, entry);
 
 			/* NOTE : the index number of master code should be stored into 1st table */
 			if(TEST_FIELD(entry->action_list[entry->label_index[0]].type, LabelSelectQuickClose))
@@ -3426,9 +3426,9 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 
 					/* NOTE : one shot cheat should not be activated by changing label */
 					if(entry->label_index[entry->selection] == 0)
-						deactivate_cheat(entry);
+						deactivate_cheat(machine, entry);
 					else if((entry->flags & kCheatFlag_OneShot) == 0 && (entry->flags & kCheatFlag_Active) == 0)
-						activate_cheat(entry);
+						activate_cheat(machine, entry);
 				}
 			}
 			else if(entry->flags & kCheatFlag_LayerIndex)
@@ -3460,9 +3460,9 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 
 					/* NOTE : one shot cheat should not be activated by changing label */
 					if(entry->label_index[entry->selection] == 0)
-						deactivate_cheat(entry);
+						deactivate_cheat(machine, entry);
 					else if((entry->flags & kCheatFlag_OneShot) == 0 && (entry->flags & kCheatFlag_Active) == 0)
-						activate_cheat(entry);
+						activate_cheat(machine, entry);
 				}
 			}
 			else if(entry->flags & kCheatFlag_LayerIndex)
@@ -3491,9 +3491,9 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 					else
 					{
 						if(active)
-							activate_cheat(entry);
+							activate_cheat(machine, entry);
 						else
-							deactivate_cheat(entry);
+							deactivate_cheat(machine, entry);
 					}
 				}
 				break;
@@ -3564,7 +3564,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 			else
 			{
 				/* activate selected code */
-				activate_cheat(entry);
+				activate_cheat(machine, entry);
 			}
 		}
 	}
@@ -3907,7 +3907,7 @@ static int command_add_edit_menu(running_machine *machine, cheat_menu_stack *men
 					for(i = 0; i < entry->action_list_length; i++)
 					{
 						entry->action_list[i].flags |= kActionFlag_OldFormat;
-						update_cheat_info(entry, 0);
+						update_cheat_info(machine, entry, 0);
 					}
 				}
 				else
@@ -3916,7 +3916,7 @@ static int command_add_edit_menu(running_machine *machine, cheat_menu_stack *men
 					for(i = 0; i < entry->action_list_length; i++)
 					{
 						entry->action_list[i].flags &= ~kActionFlag_OldFormat;
-						update_cheat_info(entry, 0);
+						update_cheat_info(machine, entry, 0);
 					}
 				}
 				break;
@@ -6171,7 +6171,7 @@ static int analyse_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	{
 		cheat_action *action = &entry->action_list[i];
 
-		UINT32 flags = analyse_code_format(entry, action);
+		UINT32 flags = analyse_code_format(machine, entry, action);
 
 		menu_item[total++] = action->optional_name ? action->optional_name : "(Null)";
 		menu_item[total++] = MENU_SEPARATOR_ITEM;
@@ -6796,7 +6796,7 @@ static int search_minimum_menu(running_machine *machine, cheat_menu_stack *menu)
 
 		if(search->num_results == 1)
 		{
-			add_cheat_from_first_result(search);
+			add_cheat_from_first_result(machine, search);
 
 			SET_MESSAGE(CHEAT_MESSAGE_ONE_CHEAT_FOUND);
 		}
@@ -7307,7 +7307,7 @@ static int search_standard_menu(running_machine *machine, cheat_menu_stack *menu
 		doneSaveMemory = 1;
 
 		if(search->num_results == 1)
-			add_cheat_from_first_result(search);
+			add_cheat_from_first_result(machine, search);
 	}
 
 	/********** EDIT **********/
@@ -7747,7 +7747,7 @@ static int search_advanced_menu(running_machine *machine, cheat_menu_stack *menu
 
 					if(search->num_results == 1)
 					{
-						add_cheat_from_first_result(search);
+						add_cheat_from_first_result(machine, search);
 
 						popmessage("1 result found, added to list");
 					}
@@ -8287,7 +8287,7 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 	else if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
 	{
 		if(selectedAddressGood)
-			add_cheat_from_result(search, region, selectedAddress);
+			add_cheat_from_result(machine, search, region, selectedAddress);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
@@ -8591,12 +8591,12 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 		if(!editActive && watch)
 		{
 			if(ShiftKeyPressed())
-				add_cheat_from_watch(watch);
+				add_cheat_from_watch(machine, watch);
 			else if(ControlKeyPressed())
 			{
 				cheat_entry *entry = get_new_cheat();
 
-				add_cheat_from_watch_as_watch(entry, watch);
+				add_cheat_from_watch_as_watch(machine, entry, watch);
 
 				/* when fails to add, delete this entry because it causes the crash */
 				if(message_type == CHEAT_MESSAGE_FAILED_TO_ADD)
@@ -8653,7 +8653,7 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 
 			memset(&entry, 0, sizeof(cheat_entry));
 
-			add_cheat_from_watch_as_watch(&entry, watch);
+			add_cheat_from_watch_as_watch(machine, &entry, watch);
 			save_cheat_code(machine, &entry);
 			dispose_cheat(&entry);
 		}
@@ -8795,14 +8795,14 @@ static int command_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 				break;
 
 			case kMenu_AddAsCheatCode:
-				add_cheat_from_watch(entry);
+				add_cheat_from_watch(machine, entry);
 				break;
 
 			case kMenu_AddAsWatchCode:
 			{
 				cheat_entry *new_entry = get_new_cheat();
 
-				add_cheat_from_watch_as_watch(new_entry, entry);
+				add_cheat_from_watch_as_watch(machine, new_entry, entry);
 
 				/* when fails to add, delete this entry because it causes the crash */
 				if(message_type == CHEAT_MESSAGE_FAILED_TO_ADD)
@@ -8823,7 +8823,7 @@ static int command_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 
 				memset(&temp_entry, 0, sizeof(cheat_entry));
 
-				add_cheat_from_watch_as_watch(&temp_entry, entry);
+				add_cheat_from_watch_as_watch(machine, &temp_entry, entry);
 				save_cheat_code(machine, &temp_entry);
 				dispose_cheat(&temp_entry);
 			}
@@ -9309,7 +9309,7 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	else
 	{
 		if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
-			add_cheat_from_watch(entry);
+			add_cheat_from_watch(machine, entry);
 
 		if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
 			entry->num_elements = 0;
@@ -9320,7 +9320,7 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 
 			memset(&temp_entry, 0, sizeof(cheat_entry));
 
-			add_cheat_from_watch_as_watch(&temp_entry, entry);
+			add_cheat_from_watch_as_watch(machine, &temp_entry, entry);
 			save_cheat_code(machine, &temp_entry);
 			dispose_cheat(&temp_entry);
 		}
@@ -10208,7 +10208,7 @@ static TIMER_CALLBACK( cheat_periodic )
 			if(cheats_disabled)
 			{
 				for(i = 0; i < cheat_list_length; i++)
-					temp_deactivate_cheat(&cheat_list[i]);
+					temp_deactivate_cheat(machine, &cheat_list[i]);
 			}
 		}
 	}
@@ -10294,7 +10294,7 @@ static UINT32 PrintASCII(char * buf, UINT32 data, UINT8 size)
   cheat_display_watches - display watchpoint
 ---------------------------------------------*/
 
-void cheat_display_watches(void)
+void cheat_display_watches(running_machine *machine)
 {
 	int i;
 
@@ -10367,7 +10367,7 @@ void cheat_display_watches(void)
 				}
 				else
 				{
-					UINT8 * buf = memory_region(info->cpu);
+					UINT8 * buf = memory_region(machine, info->cpu);
 
 					if(buf)
 						data =	do_memory_read(buf, address, kSearchByteIncrementTable[info->element_bytes],
@@ -10826,7 +10826,7 @@ static watch_info *get_unused_watch(void)
   add_cheat_from_watch - add new cheat code from watchpoint
 ------------------------------------------------------------*/
 
-static void add_cheat_from_watch(watch_info *watch)
+static void add_cheat_from_watch(running_machine *machine, watch_info *watch)
 {
 	if(watch)
 	{
@@ -10841,14 +10841,14 @@ static void add_cheat_from_watch(watch_info *watch)
 		action->original_address	= watch->address;
 		action->extend_data			= ~0;
 		action->last_value			= NULL;
-		action->data 				= read_data(action);
+		action->data 				= read_data(machine, action);
 		SET_FIELD(action->type, AddressSize, watch->element_bytes);
 
 		/* set name */
 		temp_string_length = sprintf(temp_string, "%.8X (%d) = %.*X", watch->address, watch->cpu, kSearchByteDigitsTable[watch->element_bytes], action->data);
 		entry->name = create_string_copy(temp_string);
 
-		update_cheat_info(entry, 0);
+		update_cheat_info(machine, entry, 0);
 
 		SET_MESSAGE(CHEAT_MESSAGE_SUCCEEDED_TO_ADD);
 	}
@@ -10860,7 +10860,7 @@ static void add_cheat_from_watch(watch_info *watch)
   add_cheat_from_watch_as_watch - add new watchpoint cheat from watchpoint
 ---------------------------------------------------------------------------*/
 
-static void add_cheat_from_watch_as_watch(cheat_entry *entry, watch_info *watch)
+static void add_cheat_from_watch_as_watch(running_machine *machine, cheat_entry *entry, watch_info *watch)
 {
 	/* NOTE : don't add in case of undisplayed watchpoint */
 	if(watch && entry && watch->num_elements)
@@ -10893,7 +10893,7 @@ static void add_cheat_from_watch_as_watch(cheat_entry *entry, watch_info *watch)
 		SET_FIELD(action->data, WatchElementsPerLine, watch->elements_per_line);
 		SET_FIELD(action->data, WatchAddValue, watch->add_value);
 
-		update_cheat_info(entry, 0);
+		update_cheat_info(machine, entry, 0);
 
 		SET_MESSAGE(CHEAT_MESSAGE_SUCCEEDED_TO_ADD);
 	}
@@ -11740,7 +11740,7 @@ static void handle_local_command_cheat(running_machine *machine, int cpu, int ty
 			{
 				cheat_entry *entry = &cheat_list[address];
 
-				activate_cheat(entry);
+				activate_cheat(machine, entry);
 
 				if(data && data < entry->action_list_length)
 					entry->selection = data;
@@ -12279,7 +12279,7 @@ static void load_cheat_database(running_machine *machine, UINT8 flags)
 	while(data);
 
 	if(flags & LOAD_CHEAT_CODE)
-		update_all_cheat_info();
+		update_all_cheat_info(machine);
 }
 
 /*---------------------------------------------------------------------------
@@ -12288,7 +12288,7 @@ static void load_cheat_database(running_machine *machine, UINT8 flags)
 
 static void reload_cheat_database(running_machine *machine)
 {
-	dispose_cheat_database();
+	dispose_cheat_database(machine);
 	load_cheat_database(machine, LOAD_CHEAT_CODE);
 
 	SET_MESSAGE(found_database ? CHEAT_MESSAGE_RELOAD_CHEAT_CODE : CHEAT_MESSAGE_FAILED_TO_LOAD_DATABASE);
@@ -12298,13 +12298,13 @@ static void reload_cheat_database(running_machine *machine)
   dispose_cheat_database - free all cheat entries
 --------------------------------------------------*/
 
-static void dispose_cheat_database(void)
+static void dispose_cheat_database(running_machine *machine)
 {
 	int i;
 
 	/* first, turn all cheats "OFF" */
 	for(i = 0; i < cheat_list_length; i++)
-		temp_deactivate_cheat(&cheat_list[i]);
+		temp_deactivate_cheat(machine, &cheat_list[i]);
 
 	/* next, free memory for all cheat entries */
 	if(cheat_list)
@@ -12696,7 +12696,7 @@ static void do_auto_save_cheats(running_machine *machine)
   add_cheat_from_result - add a code from result viewer to cheat list
 ----------------------------------------------------------------------*/
 
-static void add_cheat_from_result(search_info *search, search_region *region, UINT32 address)
+static void add_cheat_from_result(running_machine *machine, search_info *search, search_region *region, UINT32 address)
 {
 	if(region->target_type == kRegionType_CPU || region->target_type == kRegionType_Memory)
 	{
@@ -12724,7 +12724,7 @@ static void add_cheat_from_result(search_info *search, search_region *region, UI
 		action->last_value		= NULL;
 		SET_FIELD(action->type, AddressSize, kSearchByteIncrementTable[search->bytes] - 1);
 
-		update_cheat_info(entry, 0);
+		update_cheat_info(machine, entry, 0);
 	}
 }
 
@@ -12732,7 +12732,7 @@ static void add_cheat_from_result(search_info *search, search_region *region, UI
   add_cheat_from_first_result - add a code from search box to cheat list if found result is one
 ------------------------------------------------------------------------------------------------*/
 
-static void add_cheat_from_first_result(search_info *search)
+static void add_cheat_from_first_result(running_machine *machine, search_info *search)
 {
 	int i;
 
@@ -12750,7 +12750,7 @@ static void add_cheat_from_first_result(search_info *search)
 
 				if(is_region_offset_valid(search, region, traverse))
 				{
-					add_cheat_from_result(search, region, address);
+					add_cheat_from_result(machine, search, region, address);
 					return;
 				}
 			}
@@ -13514,7 +13514,7 @@ static void do_memory_write(UINT32 data, UINT8 *buf, UINT32 address, UINT8 bytes
   read_data
 ------------*/
 
-static UINT32 read_data(cheat_action *action)
+static UINT32 read_data(running_machine *machine, cheat_action *action)
 {
 	UINT8	read_from	= EXTRACT_FIELD(action->type, AddressRead);
 	UINT8	bytes		= EXTRACT_FIELD(action->type, AddressSize);
@@ -13617,11 +13617,11 @@ static UINT32 read_data(cheat_action *action)
 		else
 		{
 			/* non-CPU region */
-			UINT8 * buf = memory_region(region);
+			UINT8 * buf = memory_region(machine, region);
 
 			if(buf)
 			{
-				if(is_address_in_range(action, memory_region_length(region)))
+				if(is_address_in_range(action, memory_region_length(machine, region)))
 					return	do_memory_read(	buf, address, bytes,
 											region_needs_swap(region) ^ EXTRACT_FIELD(action->type, Endianness),
 											get_region_info(region));
@@ -13641,7 +13641,7 @@ static UINT32 read_data(cheat_action *action)
   write_data - write a data to memory
 --------------------------------------*/
 
-static void write_data(cheat_action *action, UINT32 data)
+static void write_data(running_machine *machine, cheat_action *action, UINT32 data)
 {
 	UINT8	read_from	= EXTRACT_FIELD(action->type, AddressRead);
 	UINT8	bytes		= EXTRACT_FIELD(action->type, AddressSize);
@@ -13745,11 +13745,11 @@ static void write_data(cheat_action *action, UINT32 data)
 		else
 		{
 			/* non-CPU region */
-			UINT8 * buf = memory_region(region);
+			UINT8 * buf = memory_region(machine, region);
 
 			if(buf)
 			{
-				if(is_address_in_range(action, memory_region_length(region)))
+				if(is_address_in_range(action, memory_region_length(machine, region)))
 					do_memory_write(data, buf, address, bytes,
 									region_needs_swap(region) ^ EXTRACT_FIELD(action->type, Endianness),
 									get_region_info(action->region));
@@ -13922,7 +13922,7 @@ static void remove_associated_watches(cheat_entry *entry)
   reset_action - back up data and set action flags
 ---------------------------------------------------*/
 
-static void reset_action(cheat_action *action)
+static void reset_action(running_machine *machine, cheat_action *action)
 {
 	/* back up a value */
 	if(action->flags & kActionFlag_OldFormat)
@@ -13932,7 +13932,7 @@ static void reset_action(cheat_action *action)
 		action->last_value = malloc(sizeof(action->last_value));
 		if(action->last_value == NULL) goto reset_action_error;
 		action->type = convert_to_new_code(action);
-		action->last_value[0] = read_data(action);
+		action->last_value[0] = read_data(machine, action);
 		action->type = type;
 	}
 	else
@@ -13947,15 +13947,15 @@ static void reset_action(cheat_action *action)
 						/* Write, IWrite, CWrite, CBit */
 						action->last_value = malloc(sizeof(action->last_value));
 						if(action->last_value == NULL) goto reset_action_error;
-						action->last_value[0] = read_data(action);
+						action->last_value[0] = read_data(machine, action);
 						break;
 
 					case kCodeType_PDWWrite:
 						action->last_value = malloc(sizeof(action->last_value) * 2);
 						if(action->last_value == NULL) goto reset_action_error;
 						action->flags &= ~kActionFlag_IsFirst;
-						action->last_value[0] = read_data(action);
-						action->last_value[1] = read_data(action);
+						action->last_value[0] = read_data(machine, action);
+						action->last_value[1] = read_data(machine, action);
 						break;
 
 					case kCodeType_RWrite:
@@ -13966,7 +13966,7 @@ static void reset_action(cheat_action *action)
 							{
 								action->last_value = realloc(action->last_value, sizeof(action->last_value) * EXTRACT_FIELD(action->extend_data, LSB16));
 								if(action->last_value == NULL) goto reset_action_error;
-								action->last_value[i] = read_data(action);
+								action->last_value[i] = read_data(machine, action);
 								action->address +=	EXTRACT_FIELD(action->extend_data, MSB16) ?
 													EXTRACT_FIELD(action->extend_data, MSB16) :
 													kSearchByteIncrementTable[EXTRACT_FIELD(action->type, AddressSize)];
@@ -13989,7 +13989,7 @@ static void reset_action(cheat_action *action)
 	if(action->flags & kActionFlag_CheckCondition)
 	{
 		if(EXTRACT_FIELD(action->type, CodeParameter) == kCondition_PreviousValue)
-			action->extend_data = read_data(action);
+			action->extend_data = read_data(machine, action);
 	}
 
 	return;
@@ -14007,7 +14007,7 @@ static void reset_action(cheat_action *action)
   activate_cheat - reset action entry and set activate entry flag when turn CODE "ON"
 --------------------------------------------------------------------------------------*/
 
-static void activate_cheat(cheat_entry *entry)
+static void activate_cheat(running_machine *machine, cheat_entry *entry)
 {
 	int i;
 
@@ -14015,7 +14015,7 @@ static void activate_cheat(cheat_entry *entry)
 	{
 		cheat_action *action = &entry->action_list[i];
 
-		reset_action(action);
+		reset_action(machine, action);
 
 		/* if watchpoint code, add watchpoint */
 		if(EXTRACT_FIELD(action->type, CodeType) == kCodeType_Watch)
@@ -14030,7 +14030,7 @@ static void activate_cheat(cheat_entry *entry)
   restore_last_value - restore previous value if needed
 --------------------------------------------------------*/
 
-static void restore_last_value(cheat_action *action)
+static void restore_last_value(running_machine *machine, cheat_action *action)
 {
 	if(action->flags & kActionFlag_MemoryWrite)
 	{
@@ -14040,13 +14040,13 @@ static void restore_last_value(cheat_action *action)
 			{
 				default:
 					/* Write, IWrite, CWrite, CBit */
-					write_data(action, (UINT32)action->last_value[0]);
+					write_data(machine, action, (UINT32)action->last_value[0]);
 					break;
 
 				case kCodeType_PDWWrite:
 					action->flags &= ~kActionFlag_IsFirst;
-					write_data(action, (UINT32)action->last_value[0]);
-					write_data(action, (UINT32)action->last_value[1]);
+					write_data(machine, action, (UINT32)action->last_value[0]);
+					write_data(machine, action, (UINT32)action->last_value[1]);
 					break;
 
 				case kCodeType_RWrite:
@@ -14055,7 +14055,7 @@ static void restore_last_value(cheat_action *action)
 
 						for(j = 0; j < EXTRACT_FIELD(action->extend_data, LSB16); j++)
 						{
-							write_data(action, (UINT32)action->last_value[j]);
+							write_data(machine, action, (UINT32)action->last_value[j]);
 							action->address +=	EXTRACT_FIELD(action->extend_data, MSB16) ?
 												EXTRACT_FIELD(action->extend_data, MSB16) :
 												kSearchByteIncrementTable[EXTRACT_FIELD(action->type, AddressSize)];
@@ -14072,7 +14072,7 @@ static void restore_last_value(cheat_action *action)
   deactivate_cheat - deactivate selecte cheat entry when turn CODE "OFF"
 -------------------------------------------------------------------------*/
 
-static void deactivate_cheat(cheat_entry *entry)
+static void deactivate_cheat(running_machine *machine, cheat_entry *entry)
 {
 	int i;
 
@@ -14086,7 +14086,7 @@ static void deactivate_cheat(cheat_entry *entry)
 		/* restore previous value if needed */
 		if(action->last_value)
 		{
-			restore_last_value(action);
+			restore_last_value(machine, action);
 			action->flags &= ~kActionFlag_LastValueGood;
 			free(action->last_value);
 		}
@@ -14105,7 +14105,7 @@ static void deactivate_cheat(cheat_entry *entry)
   temp_deactivate_cheat - deactivate cheat when turn CHEAT "OFF"
 -----------------------------------------------------------------*/
 
-static void temp_deactivate_cheat(cheat_entry *entry)
+static void temp_deactivate_cheat(running_machine *machine, cheat_entry *entry)
 {
 	if(entry->flags & kCheatFlag_Active)
 	{
@@ -14120,7 +14120,7 @@ static void temp_deactivate_cheat(cheat_entry *entry)
 
 			/* restore previous value if needed */
 			if(action->last_value)
-				restore_last_value(action);
+				restore_last_value(machine, action);
 		}
 	}
 }
@@ -14129,15 +14129,15 @@ static void temp_deactivate_cheat(cheat_entry *entry)
   cheat_periodicOperation - management for cheat operations
 ------------------------------------------------------------*/
 
-static void cheat_periodicOperation(cheat_action *action)
+static void cheat_periodicOperation(running_machine *machine, cheat_action *action)
 {
 	int data = TEST_FIELD(action->type, DataRead) ? cheat_variable[action->data] : action->data;
 
 	if(action->flags & kActionFlag_PDWWrite)
 	{
 		action->flags &= ~kActionFlag_IsFirst;
-		write_data(action, data);
-		write_data(action, action->extend_data);
+		write_data(machine, action, data);
+		write_data(machine, action, action->extend_data);
 	}
 	else if(action->flags & kActionFlag_Repeat)
 	{
@@ -14145,7 +14145,7 @@ static void cheat_periodicOperation(cheat_action *action)
 
 		for(i = 0; i < EXTRACT_FIELD(action->extend_data, LSB16); i++)
 		{
-			write_data(action, data);
+			write_data(machine, action, data);
 			action->address +=	EXTRACT_FIELD(action->extend_data, MSB16) ?
 								EXTRACT_FIELD(action->extend_data, MSB16) :
 								kSearchByteIncrementTable[EXTRACT_FIELD(action->type, AddressSize)];
@@ -14157,53 +14157,53 @@ static void cheat_periodicOperation(cheat_action *action)
 		switch(EXTRACT_FIELD(action->type, CodeType))
 		{
 			case kCodeType_Write:
-				write_data(action, (data & action->extend_data) | (read_data(action) & ~action->extend_data));
+				write_data(machine, action, (data & action->extend_data) | (read_data(machine, action) & ~action->extend_data));
 				break;
 
 			case kCodeType_IWrite:
 				switch(EXTRACT_FIELD(action->type, CodeParameter))
 				{
 					case IWRITE_WRITE:
-						write_data(action, data);
+						write_data(machine, action, data);
 						break;
 
 					case IWRITE_BIT_SET:
-						write_data(action, read_data(action) | data);
+						write_data(machine, action, read_data(machine, action) | data);
 						break;
 
 					case IWRITE_BIT_CLEAR:
-						write_data(action, read_data(action) & ~data);
+						write_data(machine, action, read_data(machine, action) & ~data);
 						break;
 
 					case IWRITE_LIMITED_MASK:
-						write_data(action, (EXTRACT_FIELD(data, MSB16) & EXTRACT_FIELD(data, LSB16)) | (read_data(action) & ~EXTRACT_FIELD(data, LSB16)));
+						write_data(machine, action, (EXTRACT_FIELD(data, MSB16) & EXTRACT_FIELD(data, LSB16)) | (read_data(machine, action) & ~EXTRACT_FIELD(data, LSB16)));
 						break;
 				}
 				break;
 
 			case kCodeType_CWrite:
-				write_data(action, data);
+				write_data(machine, action, data);
 				break;
 
 			case kCodeType_CBit:
 				switch(EXTRACT_FIELD(action->type, CodeParameterUpper))
 				{
 					case CBIT_BIT_SET:
-						write_data(action, read_data(action) | data);
+						write_data(machine, action, read_data(machine, action) | data);
 						break;
 
 					case CBIT_BIT_CLEAR:
-						write_data(action, read_data(action) & ~data);
+						write_data(machine, action, read_data(machine, action) & ~data);
 						break;
 
 					case CBIT_LIMITED_MASK:
-						write_data(action, (EXTRACT_FIELD(data, MSB16) & EXTRACT_FIELD(data, LSB16)) | (read_data(action) & ~EXTRACT_FIELD(data, LSB16)));
+						write_data(machine, action, (EXTRACT_FIELD(data, MSB16) & EXTRACT_FIELD(data, LSB16)) | (read_data(machine, action) & ~EXTRACT_FIELD(data, LSB16)));
 						break;
 				}
 				break;
 
 			case kCodeType_Move:
-				cheat_variable[EXTRACT_FIELD(action->type, CodeParameter)] = read_data(action) + data;
+				cheat_variable[EXTRACT_FIELD(action->type, CodeParameter)] = read_data(machine, action) + data;
 				break;
 
 			case kCodeType_Popup:
@@ -14217,7 +14217,7 @@ static void cheat_periodicOperation(cheat_action *action)
 						ui_popup_time(1, "%*.*X",
 										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
 										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
-										read_data(action));
+										read_data(machine, action));
 						break;
 
 					case kPopup_LabelValue:
@@ -14225,14 +14225,14 @@ static void cheat_periodicOperation(cheat_action *action)
 										action->optional_name,
 										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
 										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
-										read_data(action));
+										read_data(machine, action));
 						break;
 
 					case kPopup_ValueLabel:
 						ui_popup_time(1, "%*.*X %s",
 										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
 										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
-										read_data(action),
+										read_data(machine, action),
 										action->optional_name);
 						break;
 				}
@@ -14249,9 +14249,9 @@ static void cheat_periodicOperation(cheat_action *action)
   cheat_periodicCondition - management for cheat conditions
 ------------------------------------------------------------*/
 
-static UINT8 cheat_periodicCondition(cheat_action *action)
+static UINT8 cheat_periodicCondition(running_machine *machine, cheat_action *action)
 {
-	int	data	= read_data(action);
+	int	data	= read_data(machine, action);
 	int	value	= action->extend_data;
 
 	if(EXTRACT_FIELD(action->type, CodeType) != kCodeType_CBit)
@@ -14334,14 +14334,14 @@ static int cheat_periodicAction(running_machine *machine, cheat_action *action, 
 			if((action->flags & kActionFlag_PrefillWritten) == 0)
 			{
 				/* set prefill */
-				write_data(action, prefillValue);
+				write_data(machine, action, prefillValue);
 				action->flags |= kActionFlag_PrefillWritten;
 				return (TEST_FIELD(action->type, Return) ? CHEAT_RETURN_VALUE : selection + 1);
 			}
 			else
 			{
 				/* do re-write */
-				if(read_data(action) == prefillValue)
+				if(read_data(machine, action) == prefillValue)
 					return (TEST_FIELD(action->type, Return) ? CHEAT_RETURN_VALUE : selection + 1);
 
 				action->flags |= kActionFlag_PrefillDone;
@@ -14387,7 +14387,7 @@ static int cheat_periodicAction(running_machine *machine, cheat_action *action, 
 
 	if(action->flags & kActionFlag_CheckCondition)
 	{
-		if(cheat_periodicCondition(action))
+		if(cheat_periodicCondition(machine, action))
 			execute_operation = 1;
 		else
 			execute_operation = 0;
@@ -14406,7 +14406,7 @@ static int cheat_periodicAction(running_machine *machine, cheat_action *action, 
 			case kCodeType_PDWWrite:
 			case kCodeType_Move:
 			case kCodeType_Popup:
-				cheat_periodicOperation(action);
+				cheat_periodicOperation(machine, action);
 				break;
 
 			case kCodeType_Branch:
@@ -14414,11 +14414,11 @@ static int cheat_periodicAction(running_machine *machine, cheat_action *action, 
 
 			case kCodeType_Loop:
 				{
-					int counter = read_data(action);
+					int counter = read_data(machine, action);
 
 					if(counter != 0)
 					{
-						write_data(action, counter - 1);
+						write_data(machine, action, counter - 1);
 
 						return (TEST_FIELD(action->type, DataRead) ? cheat_variable[action->data] : action->data);
 					}
@@ -14467,9 +14467,9 @@ static void cheat_periodicEntry(running_machine *machine, cheat_entry *entry)
 
 			/* NOTE : in handling activatio key, forced to activate a cheat even if one shot */
 			if(!(entry->flags & kCheatFlag_OneShot) && !(entry->label_index[entry->selection]))
-				deactivate_cheat(entry);
+				deactivate_cheat(machine, entry);
 			else
-				activate_cheat(entry);
+				activate_cheat(machine, entry);
 
 			if(TEST_FIELD(cheat_options, ActivationKeyMessage))
 			{
@@ -14487,21 +14487,21 @@ static void cheat_periodicEntry(running_machine *machine, cheat_entry *entry)
 		{
 			if(entry->flags & kCheatFlag_OneShot)
 			{
-				activate_cheat(entry);
+				activate_cheat(machine, entry);
 
 				if(TEST_FIELD(cheat_options, ActivationKeyMessage))
 					ui_popup_time(1,"set %s", entry->name);
 			}
 			else if(entry->flags & kCheatFlag_Active)
 			{
-				deactivate_cheat(entry);
+				deactivate_cheat(machine, entry);
 
 				if(TEST_FIELD(cheat_options, ActivationKeyMessage))
 					ui_popup_time(1,"%s disabled", entry->name);
 			}
 			else
 			{
-				activate_cheat(entry);
+				activate_cheat(machine, entry);
 
 				if(TEST_FIELD(cheat_options, ActivationKeyMessage))
 					ui_popup_time(1,"%s enabled", entry->name);
@@ -14587,7 +14587,7 @@ static void cheat_periodicEntry(running_machine *machine, cheat_entry *entry)
 		}
 
 		if(done)
-			deactivate_cheat(entry);
+			deactivate_cheat(machine, entry);
 	}
 }
 
@@ -14595,14 +14595,14 @@ static void cheat_periodicEntry(running_machine *machine, cheat_entry *entry)
   update_all_cheat_info - update all cheat info when database loaded
 ---------------------------------------------------------------------*/
 
-static void update_all_cheat_info(void)
+static void update_all_cheat_info(running_machine *machine)
 {
 	int i;
 
 	/* update flags for all cheat entry */
 	for(i = 0; i < cheat_list_length; i++)
 	{
-		update_cheat_info(&cheat_list[i], 1);
+		update_cheat_info(machine, &cheat_list[i], 1);
 
 		if(cheat_list[i].flags & kCheatFlag_Select)
 			build_label_index_table(&cheat_list[i]);
@@ -14616,7 +14616,7 @@ static void update_all_cheat_info(void)
                       "is_load_time" parameter is set when called update_all_cheat_info() right now
 ----------------------------------------------------------------------------------------------------*/
 
-static void update_cheat_info(cheat_entry *entry, UINT8 is_load_time)
+static void update_cheat_info(running_machine *machine, cheat_entry *entry, UINT8 is_load_time)
 {
 	int		i;
 	int		flags = 0;
@@ -14792,14 +14792,14 @@ static void update_cheat_info(cheat_entry *entry, UINT8 is_load_time)
 	if(is_load_time)
 		entry->flags &= ~kCheatFlag_Dirty;
 
-	check_code_format(entry);
+	check_code_format(machine, entry);
 }
 
 /*----------------------
   analyse_code_format
 ----------------------*/
 
-static UINT32 analyse_code_format(cheat_entry *entry, cheat_action *action)
+static UINT32 analyse_code_format(running_machine *machine, cheat_entry *entry, cheat_action *action)
 {
 	UINT32 errorFlag = 0;
 
@@ -14950,7 +14950,7 @@ static UINT32 analyse_code_format(cheat_entry *entry, cheat_action *action)
 
 					if(region >= REGION_MAX)				errorFlag |= kErrorFlag_OutOfCPURegion;
 					else if(!region_info_list[region].type)	errorFlag |= kErrorFlag_InvalidCPURegion;
-					else if(!is_address_in_range(action, memory_region_length(action->region)))
+					else if(!is_address_in_range(action, memory_region_length(machine, action->region)))
 															errorFlag |= kErrorFlag_RegionOutOfRange;
 				}
 			}
@@ -14969,7 +14969,7 @@ static UINT32 analyse_code_format(cheat_entry *entry, cheat_action *action)
   check_code_format - code format checker
 ------------------------------------------*/
 
-static void check_code_format(cheat_entry *entry)
+static void check_code_format(running_machine *machine, cheat_entry *entry)
 {
 	int		i;
 	UINT8	is_error = 0;
@@ -14978,7 +14978,7 @@ static void check_code_format(cheat_entry *entry)
 	{
 		cheat_action *action = &entry->action_list[i];
 
-		if(analyse_code_format(entry, action))
+		if(analyse_code_format(machine, entry, action))
 			is_error = 1;
 	}
 
@@ -15208,7 +15208,7 @@ static void build_cpu_region_info_list(running_machine *machine)
 				if(region_type >= REGION_GFX1 && region_type <= REGION_PLDS)
 				{
 					UINT8	bit_state		= 0;
-					UINT32	length			= memory_region_length(region_type);
+					UINT32	length			= memory_region_length(machine, region_type);
 					cpu_region_info *info	= &region_info_list[region_type - REGION_INVALID];
 
 					info->type						= region_type;

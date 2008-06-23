@@ -337,7 +337,7 @@ static WRITE8_HANDLER( sprite_dma_w )
 
 static NVRAM_HANDLER( playch10 )
 {
-	UINT8 *mem = memory_region( REGION_CPU2 ) + 0x6000;
+	UINT8 *mem = memory_region( machine, REGION_CPU2 ) + 0x6000;
 
 	if ( read_or_write )
 		mame_fwrite( file, mem, 0x1000 );

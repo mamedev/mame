@@ -179,7 +179,7 @@
 static void lfkp(int mask)
 {
 	int A;
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 
 	for (A = 0x0000;A < 0x8000-14;A++)
@@ -233,13 +233,13 @@ static void look_for_known_plaintext(void)
 }
 #endif
 
-static void sega_decode(const UINT8 convtable[32][4])
+static void sega_decode(running_machine *machine, const UINT8 convtable[32][4])
 {
 	int A;
 
-	int length = memory_region_length(REGION_CPU1);
+	int length = memory_region_length(machine, REGION_CPU1);
 	int cryptlen = MIN(length, 0x8000);
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	UINT8 *decrypted = auto_malloc(0xc000);
 
 	memory_set_decrypted_region(0, 0x0000, cryptlen - 1, decrypted);
@@ -285,7 +285,7 @@ static void sega_decode(const UINT8 convtable[32][4])
 
 
 
-void buckrog_decode(void)
+void buckrog_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -310,11 +310,11 @@ void buckrog_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void pengo_decode(void)
+void pengo_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -339,11 +339,11 @@ void pengo_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void szaxxon_decode(void)
+void szaxxon_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -368,11 +368,11 @@ void szaxxon_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void suprloco_decode(void)
+void suprloco_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -397,11 +397,11 @@ void suprloco_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void yamato_decode(void)
+void yamato_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -426,10 +426,10 @@ void yamato_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
-void toprollr_decode(void)
+void toprollr_decode(running_machine *machine)
 {
 	/* same tables as in Yamato, but encrypted ROM is banked */
 	UINT8 *decrypted;
@@ -458,7 +458,7 @@ void toprollr_decode(void)
 
 	int A;
 
-	UINT8 *rom = memory_region(REGION_USER1);
+	UINT8 *rom = memory_region(machine, REGION_USER1);
 	int bankstart;
 	decrypted = auto_malloc(0x6000*3);
 
@@ -489,14 +489,14 @@ void toprollr_decode(void)
 		rom[A+bankstart] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xor);
 	}
 
-	memory_configure_bank(1,0,3, memory_region(REGION_USER1),0x6000);
+	memory_configure_bank(1,0,3, memory_region(machine, REGION_USER1),0x6000);
 	memory_configure_bank_decrypted(1,0,3,decrypted,0x6000);
 	memory_set_decrypted_region(0, 0x0000, 0x5fff, decrypted);
 	memory_set_bank(1, 0);
 }
 
 
-void sindbadm_decode(void)
+void sindbadm_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -521,11 +521,11 @@ void sindbadm_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void regulus_decode(void)
+void regulus_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -550,11 +550,11 @@ void regulus_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void mrviking_decode(void)
+void mrviking_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -579,11 +579,11 @@ void mrviking_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void swat_decode(void)
+void swat_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -608,11 +608,11 @@ void swat_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void flicky_decode(void)
+void flicky_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -637,11 +637,11 @@ void flicky_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void futspy_decode(void)
+void futspy_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -666,11 +666,11 @@ void futspy_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void wmatch_decode(void)
+void wmatch_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -695,11 +695,11 @@ void wmatch_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void bullfgtj_decode(void)
+void bullfgtj_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -724,11 +724,11 @@ void bullfgtj_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void pbaction_decode(void)
+void pbaction_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -753,11 +753,11 @@ void pbaction_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void spatter_decode(void)
+void spatter_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -782,11 +782,11 @@ void spatter_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void jongkyo_decode(void)
+void jongkyo_decode(running_machine *machine)
 {
 	/* encrypted ROM is banked */
 	UINT8 *decrypted;
@@ -815,7 +815,7 @@ void jongkyo_decode(void)
 
 	int A;
 
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	decrypted = auto_malloc(0x9000);
 
 	for (A = 0x0000;A < 0x9000;A++)
@@ -847,14 +847,14 @@ void jongkyo_decode(void)
 		rom[A] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xor);
 	}
 
-	memory_configure_bank(1,0,8, memory_region(REGION_CPU1)+0x7000,0x0400);
+	memory_configure_bank(1,0,8, memory_region(machine, REGION_CPU1)+0x7000,0x0400);
 	memory_configure_bank_decrypted(1,0,8,decrypted+0x7000,0x0400);
 	memory_set_decrypted_region(0, 0x0000, 0x6bff, decrypted);
 	memory_set_bank(1, 0);
 }
 
 
-void pitfall2_decode(void)
+void pitfall2_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -879,11 +879,11 @@ void pitfall2_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void nprinces_decode(void)
+void nprinces_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -908,11 +908,11 @@ void nprinces_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void seganinj_decode(void)
+void seganinj_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -937,11 +937,11 @@ void seganinj_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void imsorry_decode(void)
+void imsorry_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -966,11 +966,11 @@ void imsorry_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void teddybb_decode(void)
+void teddybb_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -995,11 +995,11 @@ void teddybb_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void myheroj_decode(void)
+void myheroj_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -1024,11 +1024,11 @@ void myheroj_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void hvymetal_decode(void)
+void hvymetal_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -1053,11 +1053,11 @@ void hvymetal_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
-void lvcards_decode(void)
+void lvcards_decode(running_machine *machine)
 {
 	static const UINT8 convtable[32][4] =
 	{
@@ -1082,7 +1082,7 @@ void lvcards_decode(void)
 	};
 
 
-	sega_decode(convtable);
+	sega_decode(machine, convtable);
 }
 
 
@@ -1098,7 +1098,8 @@ void lvcards_decode(void)
 
 ******************************************************************************/
 
-static void sega_decode_2(const UINT8 opcode_xor[64],const int opcode_swap_select[64],
+static void sega_decode_2(running_machine *machine,
+		const UINT8 opcode_xor[64],const int opcode_swap_select[64],
 		const UINT8 data_xor[64],const int data_swap_select[64])
 {
 	int A;
@@ -1113,7 +1114,7 @@ static void sega_decode_2(const UINT8 opcode_xor[64],const int opcode_swap_selec
 	};
 
 
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	UINT8 *decrypted = auto_malloc(0x8000);
 
 	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypted);
@@ -1144,7 +1145,7 @@ static void sega_decode_2(const UINT8 opcode_xor[64],const int opcode_swap_selec
 
 
 
-void fdwarrio_decode(void)
+void fdwarrio_decode(running_machine *machine)
 {
 	static const UINT8 opcode_xor[64] =
 	{
@@ -1188,11 +1189,11 @@ void fdwarrio_decode(void)
 	};
 
 
-	sega_decode_2(opcode_xor,opcode_swap_select,data_xor,data_swap_select);
+	sega_decode_2(machine,opcode_xor,opcode_swap_select,data_xor,data_swap_select);
 }
 
 
-void astrofl_decode(void)
+void astrofl_decode(running_machine *machine)
 {
 	static const UINT8 opcode_xor[64] =
 	{
@@ -1233,11 +1234,11 @@ void astrofl_decode(void)
 	};
 
 
-	sega_decode_2(opcode_xor,opcode_swap_select,data_xor,data_swap_select);
+	sega_decode_2(machine,opcode_xor,opcode_swap_select,data_xor,data_swap_select);
 }
 
 
-void wboy2_decode(void)
+void wboy2_decode(running_machine *machine)
 {
 	static const UINT8 opcode_xor[64] =
 	{
@@ -1298,11 +1299,11 @@ void wboy2_decode(void)
 	};
 
 
-	sega_decode_2(opcode_xor,opcode_swap_select,data_xor,data_swap_select);
+	sega_decode_2(machine,opcode_xor,opcode_swap_select,data_xor,data_swap_select);
 }
 
 
-void robowres_decode(void)
+void robowres_decode(running_machine *machine)
 {
 	static const UINT8 opcode_xor[64] =
 	{
@@ -1351,7 +1352,7 @@ void robowres_decode(void)
 	};
 
 
-	sega_decode_2(opcode_xor,opcode_swap_select,data_xor,data_swap_select);
+	sega_decode_2(machine,opcode_xor,opcode_swap_select,data_xor,data_swap_select);
 }
 
 
@@ -1362,7 +1363,7 @@ void robowres_decode(void)
 
 ******************************************************************************/
 
-static void sega_decode_317(int order, int opcode_shift, int data_shift)
+static void sega_decode_317(running_machine *machine,int order, int opcode_shift, int data_shift)
 {
 	static const UINT8 xor1_317[1+64] =
 	{
@@ -1411,12 +1412,12 @@ static void sega_decode_317(int order, int opcode_shift, int data_shift)
 	};
 
 	if (order)
-		sega_decode_2( xor2_317+opcode_shift, swap2_317+opcode_shift, xor1_317+data_shift, swap1_317+data_shift );
+		sega_decode_2( machine, xor2_317+opcode_shift, swap2_317+opcode_shift, xor1_317+data_shift, swap1_317+data_shift );
 	else
-		sega_decode_2( xor1_317+opcode_shift, swap1_317+opcode_shift, xor2_317+data_shift, swap2_317+data_shift );
+		sega_decode_2( machine, xor1_317+opcode_shift, swap1_317+opcode_shift, xor2_317+data_shift, swap2_317+data_shift );
 }
 
-void spcpostn_decode(void)	{ sega_decode_317( 0, 0, 1 ); }
-void calorie_decode(void)	{ sega_decode_317( 1, 0, 0 ); }
-void gardia_decode(void)	{ sega_decode_317( 1, 1, 1 ); }
-void gardiab_decode(void)	{ sega_decode_317( 0, 1, 2 ); }
+void spcpostn_decode(running_machine *machine)	{ sega_decode_317( machine, 0, 0, 1 ); }
+void calorie_decode(running_machine *machine)	{ sega_decode_317( machine, 1, 0, 0 ); }
+void gardia_decode(running_machine *machine)	{ sega_decode_317( machine, 1, 1, 1 ); }
+void gardiab_decode(running_machine *machine)	{ sega_decode_317( machine, 0, 1, 2 ); }

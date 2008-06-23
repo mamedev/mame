@@ -58,7 +58,7 @@ static TIMER_CALLBACK( dac_irq )
 
 static WRITE8_HANDLER( audio_dac_w)
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int	dac_address = ( data & 0xf0 ) << 8;
 	int	sel = ( ( (~data) >> 1 ) & 2 ) | ( data & 1 );
 

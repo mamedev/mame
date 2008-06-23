@@ -125,7 +125,7 @@ static WRITE16_HANDLER( control_w )
 
 	/* OKI banking here */
 	if (offset == 0)
-		OKIM6295_set_bank_base(0, (((data >> 4) & 1) * 0x40000) % memory_region_length(REGION_SOUND1));
+		OKIM6295_set_bank_base(0, (((data >> 4) & 1) * 0x40000) % memory_region_length(machine, REGION_SOUND1));
 
 	logerror("%06X:control_w(%d) = %04X\n", activecpu_get_pc(), offset, data);
 }

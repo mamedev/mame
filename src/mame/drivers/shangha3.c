@@ -67,7 +67,7 @@ logerror("PC %04x: write %02x to 20004e\n",activecpu_get_pc(),data);
 
 static READ16_HANDLER( heberpop_gfxrom_r )
 {
-	UINT8 *ROM = memory_region(REGION_GFX1);
+	UINT8 *ROM = memory_region(machine, REGION_GFX1);
 
 	return ROM[2*offset] | (ROM[2*offset+1] << 8);
 }

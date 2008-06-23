@@ -15,6 +15,7 @@
 #include <math.h>
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "es8712.h"
 
@@ -232,7 +233,7 @@ static void *es8712_start(int sndindex, int clock, const void *config)
 	chip->repeat = 0;
 
 	chip->bank_offset = 0;
-	chip->region_base = memory_region(intf->region);
+	chip->region_base = memory_region(Machine, intf->region);
 
 	/* generate the name and create the stream */
 	chip->stream = stream_create(0, 1, clock, chip, es8712_update);

@@ -613,9 +613,9 @@ static void fix_bwp3(void)
 
 static DRIVER_INIT( bwing )
 {
-	bwp123_membase[0] = memory_region(REGION_CPU1);
-	bwp123_membase[1] = memory_region(REGION_CPU2);
-	bwp123_membase[2] = memory_region(REGION_CPU3);
+	bwp123_membase[0] = memory_region(machine, REGION_CPU1);
+	bwp123_membase[1] = memory_region(machine, REGION_CPU2);
+	bwp123_membase[2] = memory_region(machine, REGION_CPU3);
 
 	fix_bwp3();
 }

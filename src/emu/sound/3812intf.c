@@ -462,8 +462,8 @@ static void *y8950_start(int sndindex, int clock, const void *config)
 
 	/* ADPCM ROM data */
 	Y8950SetDeltaTMemory(info->chip,
-		(void *)(memory_region(info->intf->rom_region)),
-			memory_region_length(info->intf->rom_region) );
+		(void *)(memory_region(Machine, info->intf->rom_region)),
+			memory_region_length(Machine, info->intf->rom_region) );
 
 	info->stream = stream_create(0,1,rate,info,y8950_stream_update);
 

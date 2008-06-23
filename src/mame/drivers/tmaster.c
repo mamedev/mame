@@ -318,12 +318,12 @@ static WRITE16_HANDLER( tmaster_addr_w )
 	COMBINE_DATA( &tmaster_addr );
 }
 
-static void tmaster_draw(void)
+static void tmaster_draw(running_machine *machine)
 {
 	int x,y,x0,x1,y0,y1,dx,dy,flipx,flipy,sx,sy,sw,sh, addr, mode, layer,buffer, color;
 
-	UINT8 *gfxdata	=	memory_region( REGION_GFX1 );
-	size_t size		=	memory_region_length( REGION_GFX1 );
+	UINT8 *gfxdata	=	memory_region( machine, REGION_GFX1 );
+	size_t size		=	memory_region_length( machine, REGION_GFX1 );
 
 	UINT16 data;
 
@@ -407,7 +407,7 @@ static WRITE16_HANDLER( tmaster_blitter_w )
 	switch (offset*2)
 	{
 		case 0x0e:
-			tmaster_draw();
+			tmaster_draw(machine);
 			cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 			break;
 	}
@@ -540,12 +540,12 @@ static WRITE16_HANDLER( galgames_palette_data_w )
 // Sound
 static READ16_HANDLER( galgames_okiram_r )
 {
-	return memory_region(REGION_SOUND1)[offset] | 0xff00;
+	return memory_region(machine, REGION_SOUND1)[offset] | 0xff00;
 }
 static WRITE16_HANDLER( galgames_okiram_w )
 {
 	if (ACCESSING_BITS_0_7)
-		memory_region(REGION_SOUND1)[offset] = data & 0xff;
+		memory_region(machine, REGION_SOUND1)[offset] = data & 0xff;
 }
 
 
@@ -1190,7 +1190,7 @@ ROM_END
 
 static DRIVER_INIT( tm4k )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( REGION_CPU1 );
+	UINT16 *ROM = (UINT16 *)memory_region( machine, REGION_CPU1 );
 
 	// protection
 	ROM[0x83476/2] = 0x4e75;
@@ -1211,7 +1211,7 @@ Protection starts:
 
 static DRIVER_INIT( tm5k )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( REGION_CPU1 );
+	UINT16 *ROM = (UINT16 *)memory_region( machine, REGION_CPU1 );
 
 	// protection
 	ROM[0x96002/2] = 0x4e75;
@@ -1234,7 +1234,7 @@ Protection starts:
 
 static DRIVER_INIT( tm7k )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( REGION_CPU1 );
+	UINT16 *ROM = (UINT16 *)memory_region( machine, REGION_CPU1 );
 
 	// protection
 	ROM[0x81730/2] = 0x4e75;
@@ -1257,7 +1257,7 @@ Protection starts:
 
 static DRIVER_INIT( tm7ka )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( REGION_CPU1 );
+	UINT16 *ROM = (UINT16 *)memory_region( machine, REGION_CPU1 );
 
 	// protection
 	ROM[0x81594/2] = 0x4e75;
@@ -1280,7 +1280,7 @@ Protection starts:
 
 static DRIVER_INIT( galgames )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	// configure memory banks
 	memory_configure_bank(1, 0, 2, ROM+0x1c0000, 0x40000);
 	memory_configure_bank(3, 0, 2, ROM+0x1c0000, 0x40000);

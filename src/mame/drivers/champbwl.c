@@ -178,7 +178,7 @@ static WRITE8_HANDLER( champbwl_misc_w )
 	coin_lockout_w(0, ~data & 8);
 	coin_lockout_w(1, ~data & 4);
 
-	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x10000 + 0x4000 * ((data & 0x30)>>4));
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x10000 + 0x4000 * ((data & 0x30)>>4));
 }
 
 static WRITE8_HANDLER( champbwl_objctrl_w )

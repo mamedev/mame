@@ -76,9 +76,9 @@ static int musobana_inputport;
 static int musobana_outcoin_flag;
 
 
-static void niyanpai_soundbank_w(int data)
+static void niyanpai_soundbank_w(running_machine *machine, int data)
 {
-	UINT8 *SNDROM = memory_region(REGION_CPU2);
+	UINT8 *SNDROM = memory_region(machine, REGION_CPU2);
 
 	memory_set_bankptr(1, &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
@@ -138,7 +138,7 @@ static void tmpz84c011_pio_w(running_machine *machine, int offset, int data)
 	switch (offset)
 	{
 		case 0:			/* PA_0 */
-			niyanpai_soundbank_w(data & 0x03);
+			niyanpai_soundbank_w(machine, data & 0x03);
 			break;
 		case 1:			/* PB_0 */
 			DAC_1_WRITE(machine, 0, data);
@@ -220,8 +220,8 @@ static MACHINE_RESET( niyanpai )
 
 static DRIVER_INIT( niyanpai )
 {
-	UINT8 *MAINROM = memory_region(REGION_CPU1);
-	UINT8 *SNDROM = memory_region(REGION_CPU2);
+	UINT8 *MAINROM = memory_region(machine, REGION_CPU1);
+	UINT8 *SNDROM = memory_region(machine, REGION_CPU2);
 
 	// main program patch (USR0 -> IRQ LEVEL1)
 	MAINROM[(25 * 4) + 0] = MAINROM[(64 * 4) + 0];
@@ -236,7 +236,7 @@ static DRIVER_INIT( niyanpai )
 	tmpz84c011_init(machine);
 
 	// initialize sound rom bank
-	niyanpai_soundbank_w(0);
+	niyanpai_soundbank_w(machine, 0);
 
 	// initialize out coin flag (musobana)
 	musobana_outcoin_flag = 1;

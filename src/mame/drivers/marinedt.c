@@ -157,7 +157,7 @@ static READ8_HANDLER( marinedt_obj1_x_r )
 	//xxxx---- unknown
 	//----xxxx x pos in tile ram
 
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 if(RAM[0x430e]) --cx; else ++cx;
 //figure out why inc/dec based on 430e?
 	return cx | (cxh<<4);

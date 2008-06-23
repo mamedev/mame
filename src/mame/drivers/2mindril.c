@@ -238,9 +238,9 @@ ROM_END
 static DRIVER_INIT( drill )
 {
 	// rearrange gfx roms to something we can decode, two of the roms form 4bpp of the graphics, the third forms another 2bpp but is in a different format
-	UINT32 *src = (UINT32*)memory_region( REGION_GFX2 );
-	UINT32 *dst = (UINT32*)memory_region( REGION_GFX1 );// + 0x400000;
-	UINT8 *rom = memory_region( REGION_CPU1 );
+	UINT32 *src = (UINT32*)memory_region( machine, REGION_GFX2 );
+	UINT32 *dst = (UINT32*)memory_region( machine, REGION_GFX1 );// + 0x400000;
+	UINT8 *rom = memory_region( machine, REGION_CPU1 );
 	int i;
 
 	for (i=0; i< 0x400000/4; i++)

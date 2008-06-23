@@ -652,7 +652,7 @@ static VIDEO_UPDATE( ss23 )
 #if 0
 	static int bNew = 1;
 	static int code = 0x80;
-	const UINT32 *pSource = (UINT32 *)memory_region(REGION_GFX4);
+	const UINT32 *pSource = (UINT32 *)memory_region(machine, REGION_GFX4);
 
 	pSource = pSource + pSource[code];
 

@@ -186,7 +186,7 @@ VIDEO_RESET( adder2 )
 	adder2_data_to_sc2       = 0;
 
 	{
-		UINT8 *rom = memory_region(REGION_CPU2);
+		UINT8 *rom = memory_region(machine, REGION_CPU2);
 
 		memory_configure_bank(2, 0, 4, &rom[0x00000], 0x08000);
 
@@ -422,11 +422,11 @@ static READ8_HANDLER( adder2_irq_r )
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 
-void adder2_decode_char_roms(void)
+void adder2_decode_char_roms(running_machine *machine)
 {
 	UINT8 *p;
 
-	p = memory_region(REGION_GFX1);
+	p = memory_region(machine, REGION_GFX1);
 
 	if ( p )
 	{

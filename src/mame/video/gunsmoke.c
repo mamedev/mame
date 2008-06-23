@@ -108,7 +108,7 @@ WRITE8_HANDLER( gunsmoke_d806_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *tilerom = memory_region(REGION_GFX4);
+	UINT8 *tilerom = memory_region(machine, REGION_GFX4);
 
 	int offs = tile_index * 2;
 	int attr = tilerom[offs + 1];
@@ -133,7 +133,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 VIDEO_START( gunsmoke )
 {
 	/* configure ROM banking */
-	UINT8 *rombase = memory_region(REGION_CPU1);
+	UINT8 *rombase = memory_region(machine, REGION_CPU1);
 	memory_configure_bank(1, 0, 4, &rombase[0x10000], 0x4000);
 
 	/* create tilemaps */

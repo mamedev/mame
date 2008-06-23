@@ -392,7 +392,7 @@ static READ16_HANDLER( jdredd_hack_r )
  *
  *************************************/
 
-static void init_tunit_generic(int sound)
+static void init_tunit_generic(running_machine *machine, int sound)
 {
 	offs_t gfx_chunk = midyunit_gfx_rom_size / 4;
 	UINT8 *base;
@@ -402,7 +402,7 @@ static void init_tunit_generic(int sound)
 	register_state_saving();
 
 	/* load the graphics ROMs -- quadruples */
-	base = memory_region(REGION_GFX1);
+	base = memory_region(machine, REGION_GFX1);
 	for (i = 0; i < midyunit_gfx_rom_size; i += 4)
 	{
 		midyunit_gfx_rom[i + 0] = base[0 * gfx_chunk + i / 4];
@@ -442,7 +442,7 @@ static void init_tunit_generic(int sound)
 DRIVER_INIT( mktunit )
 {
 	/* common init */
-	init_tunit_generic(SOUND_ADPCM);
+	init_tunit_generic(machine, SOUND_ADPCM);
 
 	/* protection */
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1b00000, 0x1b6ffff, 0, 0, mk_prot_r, mk_prot_w);
@@ -455,7 +455,7 @@ DRIVER_INIT( mktunit )
 static void init_nbajam_common(running_machine *machine, int te_protection)
 {
 	/* common init */
-	init_tunit_generic(SOUND_ADPCM_LARGE);
+	init_tunit_generic(machine, SOUND_ADPCM_LARGE);
 
 	/* protection */
 	if (!te_protection)
@@ -491,7 +491,7 @@ DRIVER_INIT( nbajamte )
 DRIVER_INIT( jdreddp )
 {
 	/* common init */
-	init_tunit_generic(SOUND_ADPCM_LARGE);
+	init_tunit_generic(machine, SOUND_ADPCM_LARGE);
 
 	/* looks like the watchdog needs to be disabled */
 	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d81060, 0x01d8107f, 0, 0, SMH_NOP);
@@ -522,7 +522,7 @@ DRIVER_INIT( jdreddp )
 DRIVER_INIT( mk2 )
 {
 	/* common init */
-	init_tunit_generic(SOUND_DCS);
+	init_tunit_generic(machine, SOUND_DCS);
 	midtunit_gfx_rom_large = 1;
 
 	/* protection */

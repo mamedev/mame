@@ -48,7 +48,7 @@ note: check this, its borrowed from tecmo.c / wc90.c at the moment and could wel
 static WRITE8_HANDLER( tbowlb_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -58,7 +58,7 @@ static WRITE8_HANDLER( tbowlb_bankswitch_w )
 static WRITE8_HANDLER( tbowlc_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -201,7 +201,7 @@ static void tbowl_adpcm_int(running_machine *machine, int num)
 	static int adpcm_data[2] = { -1, -1 };
 
 	if (adpcm_pos[num] >= adpcm_end[num] ||
-				adpcm_pos[num] >= memory_region_length(REGION_SOUND1)/2)
+				adpcm_pos[num] >= memory_region_length(machine, REGION_SOUND1)/2)
 		MSM5205_reset_w(num,1);
 	else if (adpcm_data[num] != -1)
 	{
@@ -210,7 +210,7 @@ static void tbowl_adpcm_int(running_machine *machine, int num)
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(REGION_SOUND1) + 0x10000 * num;
+		UINT8 *ROM = memory_region(machine, REGION_SOUND1) + 0x10000 * num;
 
 		adpcm_data[num] = ROM[adpcm_pos[num]++];
 		MSM5205_data_w(num,adpcm_data[num] >> 4);

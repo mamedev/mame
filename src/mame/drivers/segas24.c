@@ -429,7 +429,7 @@ static WRITE16_HANDLER( fdc_w )
 				break;
 			case 0x9:
 				logerror("Read multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track);
-				fdc_pt = memory_region(REGION_USER2) + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
+				fdc_pt = memory_region(machine, REGION_USER2) + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
 				fdc_span = track_size;
 				fdc_status = 3;
 				fdc_drq = 1;
@@ -437,7 +437,7 @@ static WRITE16_HANDLER( fdc_w )
 				break;
 			case 0xb:
 				logerror("Write multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track);
-				fdc_pt = memory_region(REGION_USER2) + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
+				fdc_pt = memory_region(machine, REGION_USER2) + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
 				fdc_span = track_size;
 				fdc_status = 3;
 				fdc_drq = 1;
@@ -719,9 +719,9 @@ static void resetcontrol_w(UINT8 data)
 
 static UINT8 curbank;
 
-static void reset_bank(void)
+static void reset_bank(running_machine *machine)
 {
-	if (memory_region(REGION_USER1))
+	if (memory_region(machine, REGION_USER1))
 	{
 		memory_set_bank(1, curbank & 15);
 		memory_set_bank(2, curbank & 15);
@@ -737,7 +737,7 @@ static WRITE16_HANDLER( curbank_w )
 {
 	if(ACCESSING_BITS_0_7) {
 		curbank = data & 0xff;
-		reset_bank();
+		reset_bank(machine);
 	}
 }
 
@@ -1250,14 +1250,14 @@ static NVRAM_HANDLER(system24)
 	if(!track_size || !file)
 		return;
 	if(read_or_write)
-		mame_fwrite(file, memory_region(REGION_USER2), 2*track_size);
+		mame_fwrite(file, memory_region(machine, REGION_USER2), 2*track_size);
 	else
-		mame_fread(file, memory_region(REGION_USER2), 2*track_size);
+		mame_fread(file, memory_region(machine, REGION_USER2), 2*track_size);
 }
 
 static MACHINE_START( system24 )
 {
-	UINT8 *usr1 = memory_region(REGION_USER1);
+	UINT8 *usr1 = memory_region(machine, REGION_USER1);
 	if (usr1)
 	{
 		memory_configure_bank(1, 0, 16, usr1, 0x40000);
@@ -1271,7 +1271,7 @@ static MACHINE_RESET(system24)
 	prev_resetcontrol = resetcontrol = 0x06;
 	fdc_init();
 	curbank = 0;
-	reset_bank();
+	reset_bank(machine);
 	irq_init();
 	mlatch = 0x00;
 }

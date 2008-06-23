@@ -129,13 +129,13 @@ static WRITE8_HANDLER( chinagat_video_ctrl_w )
 
 static WRITE8_HANDLER( chinagat_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr( 1,&RAM[ 0x10000 + (0x4000 * (data & 7)) ] );
 }
 
 static WRITE8_HANDLER( chinagat_sub_bankswitch_w )
 {
-	UINT8 *RAM = memory_region( REGION_CPU2 );
+	UINT8 *RAM = memory_region( machine, REGION_CPU2 );
 	memory_set_bankptr( 4,&RAM[ 0x10000 + (0x4000 * (data & 7)) ] );
 }
 
@@ -182,7 +182,7 @@ static WRITE8_HANDLER( saiyugb1_adpcm_control_w )
 {
 	/* i8748 Port 2 write */
 
-	UINT8 *saiyugb1_adpcm_rom = memory_region(REGION_SOUND1);
+	UINT8 *saiyugb1_adpcm_rom = memory_region(machine, REGION_SOUND1);
 
 	if (data & 0x80)	/* Reset m5205 and disable ADPCM ROM outputs */
 	{

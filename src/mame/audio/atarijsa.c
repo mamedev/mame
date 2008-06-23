@@ -116,7 +116,7 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 	test_mask = testmask;
 
 	/* predetermine the bank base */
-	rgn = memory_region(REGION_CPU1+cpu_num);
+	rgn = memory_region(machine, REGION_CPU1+cpu_num);
 	bank_base = &rgn[0x03000];
 	bank_source_data = &rgn[0x10000];
 
@@ -152,9 +152,9 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 }
 
 
-void atarijsa3_init_adpcm(int region)
+void atarijsa3_init_adpcm(running_machine *machine, int region)
 {
-	UINT8 *base = memory_region(region);
+	UINT8 *base = memory_region(machine, region);
 
 	/* expand the ADPCM data to avoid lots of memcpy's during gameplay */
 	/* the upper 128k is fixed, the lower 128k is bankswitched */

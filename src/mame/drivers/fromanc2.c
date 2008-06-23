@@ -291,7 +291,7 @@ static READ8_HANDLER( fromanc2_sndcpu_nmi_clr )
 
 static WRITE8_HANDLER( fromanc2_subcpu_rombank_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU3);
+	UINT8 *RAM = memory_region(machine, REGION_CPU3);
 	int rombank = data & 0x03;
 	int rambank = (data & 0x0c) >> 2;
 

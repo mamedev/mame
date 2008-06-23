@@ -182,7 +182,7 @@ static INTERRUPT_GEN( m79amb_interrupt )
 
 static DRIVER_INIT( m79amb )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int i;
 
 	/* PROM data is active low */

@@ -127,7 +127,7 @@ static WRITE16_HANDLER( gp2_control_w )
 
 static READ16_HANDLER( v_rom_r )
 {
-	UINT8 *mem8 = memory_region(REGION_GFX1);
+	UINT8 *mem8 = memory_region(machine, REGION_GFX1);
 	int bank = K056832_word_r(machine, 0x34/2, 0xffff);
 
 	offset += bank * 0x800 * 4;
@@ -627,7 +627,7 @@ static MACHINE_START( qdrmfgp )
 
 static MACHINE_RESET( qdrmfgp )
 {
-	sndram = memory_region(REGION_SOUND1) + 0x100000;
+	sndram = memory_region(machine, REGION_SOUND1) + 0x100000;
 
 	/* reset the IDE controller */
 	gp2_irq_control = 0;
@@ -636,7 +636,7 @@ static MACHINE_RESET( qdrmfgp )
 
 static MACHINE_RESET( qdrmfgp2 )
 {
-	sndram = memory_region(REGION_SOUND1) + 0x100000;
+	sndram = memory_region(machine, REGION_SOUND1) + 0x100000;
 
 	/* sound irq (CCU? 240Hz) */
 	timer_pulse(ATTOTIME_IN_HZ(18432000/76800), NULL, 0, gp2_timer_callback);

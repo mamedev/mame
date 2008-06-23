@@ -4376,7 +4376,7 @@ static const SNK_INPUT_PORT_TYPE tdfever_io[SNK_MAX_INPUT_PORTS] = {
 };
 
 static DRIVER_INIT( ikari ){
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	/*  Hack ROM test */
 	RAM[0x11a6] = 0x00;
 	RAM[0x11a7] = 0x00;
@@ -4395,7 +4395,7 @@ static DRIVER_INIT( ikari ){
 }
 
 static DRIVER_INIT( ikarijp ){
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	RAM[0x190b] = 0xc9; /* faster test */
 
 	snk_sound_busy_bit = 0x20;
@@ -4406,7 +4406,7 @@ static DRIVER_INIT( ikarijp ){
 }
 
 static DRIVER_INIT( ikarijpb ){
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	RAM[0x190b] = 0xc9; /* faster test */
 
 	snk_sound_busy_bit = 0x20;
@@ -4417,7 +4417,7 @@ static DRIVER_INIT( ikarijpb ){
 }
 
 static DRIVER_INIT( victroad ){
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	/* Hack ROM test */
 	RAM[0x17bd] = 0x00;
 	RAM[0x17be] = 0x00;
@@ -4436,7 +4436,7 @@ static DRIVER_INIT( victroad ){
 }
 
 static DRIVER_INIT( dogosoke ){
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	/* Hack ROM test */
 	RAM[0x179f] = 0x00;
 	RAM[0x17a0] = 0x00;
@@ -4489,7 +4489,7 @@ static DRIVER_INIT( choppera ){
 }
 
 static DRIVER_INIT( bermudat ){
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	// Patch "Turbo Error"
 	RAM[0x127e] = 0xc9;

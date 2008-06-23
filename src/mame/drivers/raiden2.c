@@ -661,7 +661,7 @@ static WRITE16_HANDLER(any_w)
 		logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, activecpu_get_pc());
 
 	//  if(offset == 0x700)
-	//      cpu_setbank(2, memory_region(REGION_USER1)+0x20000*data);
+	//      cpu_setbank(2, memory_region(machine, REGION_USER1)+0x20000*data);
 
 	COMBINE_DATA(&mainram[offset]);
 }
@@ -722,7 +722,7 @@ static void r2_dt(UINT16 sc, UINT16 cc, UINT16 ent, UINT16 tm, UINT16 x, UINT16 
 	logerror("Draw tilemap %04x:%04x  %04x %04x  %04x %04x, bank %d\n",
 			 sc, cc, ent, tm, x, y, bank);
 
-	//  cpu_setbank(2, memory_region(REGION_USER1)+0x20000*bank);
+	//  cpu_setbank(2, memory_region(machine, REGION_USER1)+0x20000*bank);
 }
 
 static void r2_6f6c(UINT16 cc, UINT16 v1, UINT16 v2)
@@ -730,7 +730,7 @@ static void r2_6f6c(UINT16 cc, UINT16 v1, UINT16 v2)
 //  int bank = 0;
 	logerror("6f6c: 9800:%04x  %04x %04x\n",
 			 cc, v1, v2);
-	//  cpu_setbank(2, memory_region(REGION_USER1)+0x20000*bank);
+	//  cpu_setbank(2, memory_region(machine, REGION_USER1)+0x20000*bank);
 }
 #endif
 
@@ -1898,12 +1898,12 @@ ROM_END
 static DRIVER_INIT (raiden2)
 {
 	/* wrong , there must be some banking this just stops it crashing */
-	UINT8 *RAM = memory_region(REGION_USER1);
+	UINT8 *RAM = memory_region(machine, REGION_USER1);
 
 	memory_set_bankptr(1,&RAM[0x100000]);
 	memory_set_bankptr(2,&RAM[0x040000]);
 
-	raiden2_decrypt_sprites();
+	raiden2_decrypt_sprites(machine);
 }
 
 
@@ -2158,7 +2158,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT(rdx_v33)
 {
-	UINT8 *prg = memory_region(REGION_CPU1);
+	UINT8 *prg = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(1,&prg[0x020000]);
 	memory_set_bankptr(2,&prg[0x030000]);
 	memory_set_bankptr(3,&prg[0x040000]);
@@ -2174,7 +2174,7 @@ static DRIVER_INIT(rdx_v33)
 	memory_set_bankptr(13,&prg[0x0e0000]);
 	memory_set_bankptr(14,&prg[0x0f0000]);
 
-	raiden2_decrypt_sprites();
+	raiden2_decrypt_sprites(machine);
 }
 
 

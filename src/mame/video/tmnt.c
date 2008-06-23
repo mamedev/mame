@@ -18,7 +18,7 @@ static int glfgreat_roz_rom_bank,glfgreat_roz_char_bank,glfgreat_roz_rom_mode;
 
 static TILE_GET_INFO( glfgreat_get_roz_tile_info )
 {
-	UINT8 *rom = memory_region(REGION_USER1);
+	UINT8 *rom = memory_region(machine, REGION_USER1);
 	int code;
 
 	tile_index += 0x40000 * glfgreat_roz_rom_bank;
@@ -30,7 +30,7 @@ static TILE_GET_INFO( glfgreat_get_roz_tile_info )
 
 static TILE_GET_INFO( prmrsocr_get_roz_tile_info )
 {
-	UINT8 *rom = memory_region(REGION_USER1);
+	UINT8 *rom = memory_region(machine, REGION_USER1);
 	int code = rom[tile_index+0x20000] + 256*rom[tile_index];
 
 	SET_TILE_INFO(0,code & 0x1fff,code >> 13,0);
@@ -422,15 +422,15 @@ WRITE16_HANDLER( blswhstl_700300_w )
 READ16_HANDLER( glfgreat_rom_r )
 {
 	if (glfgreat_roz_rom_mode)
-		return memory_region(REGION_GFX3)[glfgreat_roz_char_bank * 0x80000 + offset];
+		return memory_region(machine, REGION_GFX3)[glfgreat_roz_char_bank * 0x80000 + offset];
 	else if (offset < 0x40000)
 	{
-		UINT8 *usr = memory_region(REGION_USER1);
+		UINT8 *usr = memory_region(machine, REGION_USER1);
 		return usr[offset + 0x80000 + glfgreat_roz_rom_bank * 0x40000] +
 				256 * usr[offset + glfgreat_roz_rom_bank * 0x40000];
 	}
 	else
-		return memory_region(REGION_USER1)[((offset & 0x3ffff) >> 2) + 0x100000 + glfgreat_roz_rom_bank * 0x10000];
+		return memory_region(machine, REGION_USER1)[((offset & 0x3ffff) >> 2) + 0x100000 + glfgreat_roz_rom_bank * 0x10000];
 }
 
 WRITE16_HANDLER( glfgreat_122000_w )
@@ -526,10 +526,10 @@ WRITE16_HANDLER( prmrsocr_122000_w )
 READ16_HANDLER( prmrsocr_rom_r )
 {
 	if(glfgreat_roz_char_bank)
-		return memory_region(REGION_GFX3)[offset];
+		return memory_region(machine, REGION_GFX3)[offset];
 	else
 	{
-		UINT8 *usr = memory_region(REGION_USER1);
+		UINT8 *usr = memory_region(machine, REGION_USER1);
 		return 256 * usr[offset] + usr[offset + 0x020000];
 	}
 }

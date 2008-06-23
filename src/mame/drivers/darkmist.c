@@ -43,7 +43,7 @@ int darkmist_hw;
 static WRITE8_HANDLER(darkmist_hw_w)
 {
   darkmist_hw=data;
-  memory_set_bankptr(1,&memory_region(REGION_CPU1)[0x010000+((data&0x80)?0x4000:0)]);
+  memory_set_bankptr(1,&memory_region(machine, REGION_CPU1)[0x010000+((data&0x80)?0x4000:0)]);
 }
 
 static READ8_HANDLER(t5182shared_r)
@@ -333,15 +333,15 @@ ROM_START( darkmist )
 ROM_END
 
 
-static void decrypt_gfx(void)
+static void decrypt_gfx(running_machine *machine)
 {
 	UINT8 *buf = malloc_or_die(0x40000);
 	UINT8 *rom;
 	int size;
 	int i;
 
-	rom = memory_region(REGION_GFX1);
-	size = memory_region_length(REGION_GFX1);
+	rom = memory_region(machine, REGION_GFX1);
+	size = memory_region_length(machine, REGION_GFX1);
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -363,8 +363,8 @@ static void decrypt_gfx(void)
 	}
 
 
-	rom = memory_region(REGION_GFX2);
-	size = memory_region_length(REGION_GFX2);
+	rom = memory_region(machine, REGION_GFX2);
+	size = memory_region_length(machine, REGION_GFX2);
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -386,8 +386,8 @@ static void decrypt_gfx(void)
 	}
 
 
-	rom = memory_region(REGION_GFX3);
-	size = memory_region_length(REGION_GFX3);
+	rom = memory_region(machine, REGION_GFX3);
+	size = memory_region_length(machine, REGION_GFX3);
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -411,10 +411,10 @@ static void decrypt_gfx(void)
 	free(buf);
 }
 
-static void decrypt_snd(void)
+static void decrypt_snd(running_machine *machine)
 {
 	int i;
-	UINT8 *ROM = memory_region(REGION_CPU2);
+	UINT8 *ROM = memory_region(machine, REGION_CPU2);
 
 	for(i=0x8000;i<0x10000;i++)
 		ROM[i] = BITSWAP8(ROM[i], 7,1,2,3,4,5,6,0);
@@ -423,13 +423,13 @@ static void decrypt_snd(void)
 static DRIVER_INIT(darkmist)
 {
 	int i, len;
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	UINT8 *buffer = malloc_or_die(0x10000);
 	UINT8 *decrypt = auto_malloc(0x8000);
 
-	decrypt_gfx();
+	decrypt_gfx(machine);
 
-	decrypt_snd();
+	decrypt_snd(machine);
 
 	for(i=0;i<0x8000;i++)
 	{
@@ -459,8 +459,8 @@ static DRIVER_INIT(darkmist)
 	memory_set_bankptr(1,&ROM[0x010000]);
 
 	/* adr line swaps */
-	ROM = memory_region(REGION_USER1);
-	len = memory_region_length(REGION_USER1);
+	ROM = memory_region(machine, REGION_USER1);
+	len = memory_region_length(machine, REGION_USER1);
 	memcpy( buffer, ROM, len );
 
 	for(i=0;i<len;i++)
@@ -468,24 +468,24 @@ static DRIVER_INIT(darkmist)
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,6,5,4,3,2,14,13,12,11,8,7,1,0,10,9)];
 	}
 
-	ROM = memory_region(REGION_USER2);
-	len = memory_region_length(REGION_USER2);
+	ROM = memory_region(machine, REGION_USER2);
+	len = memory_region_length(machine, REGION_USER2);
 	memcpy( buffer, ROM, len );
 	for(i=0;i<len;i++)
 	{
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,6,5,4,3,2,14,13,12,11,8,7,1,0,10,9)];
 	}
 
-	ROM = memory_region(REGION_USER3);
-	len = memory_region_length(REGION_USER3);
+	ROM = memory_region(machine, REGION_USER3);
+	len = memory_region_length(machine, REGION_USER3);
 	memcpy( buffer, ROM, len );
 	for(i=0;i<len;i++)
 	{
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14 ,5,4,3,2,11,10,9,8,13,12,1,0,7,6)];
 	}
 
-	ROM = memory_region(REGION_USER4);
-	len = memory_region_length(REGION_USER4);
+	ROM = memory_region(machine, REGION_USER4);
+	len = memory_region_length(machine, REGION_USER4);
 	memcpy( buffer, ROM, len );
 	for(i=0;i<len;i++)
 	{

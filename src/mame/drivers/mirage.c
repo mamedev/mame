@@ -396,10 +396,10 @@ ROM_START( mirage )
 	ROM_LOAD( "mbl-04.12k", 0x000000, 0x100000, CRC(b533123d) SHA1(2cb2f11331d00c2d282113932ed2836805f4fc6e) )
 ROM_END
 
-static void descramble_sound( int region )
+static void descramble_sound( running_machine *machine, int region )
 {
-	UINT8 *rom = memory_region(region);
-	int length = memory_region_length(region);
+	UINT8 *rom = memory_region(machine, region);
+	int length = memory_region_length(machine, region);
 	UINT8 *buf1 = malloc_or_die(length);
 	UINT32 x;
 
@@ -438,8 +438,8 @@ static void descramble_sound( int region )
 
 static DRIVER_INIT( mirage )
 {
-	deco56_decrypt(REGION_GFX1);
-	descramble_sound(REGION_SOUND1);
+	deco56_decrypt(machine, REGION_GFX1);
+	descramble_sound(machine, REGION_SOUND1);
 }
 
 GAME( 1994, mirage, 0,        mirage, mirage, mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", GAME_NOT_WORKING )

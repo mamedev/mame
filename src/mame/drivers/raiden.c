@@ -485,9 +485,9 @@ static void memory_patcha(running_machine *machine)
 /* This is based on code by Niclas Karlsson Mate, who figured out the
 encryption method! The technique is a combination of a XOR table plus
 bit-swapping */
-static void common_decrypt(void)
+static void common_decrypt(running_machine *machine)
 {
-	UINT16 *RAM = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *RAM = (UINT16 *)memory_region(machine, REGION_CPU1);
 	int i;
 
 	for (i = 0; i < 0x20000; i++)
@@ -499,7 +499,7 @@ static void common_decrypt(void)
 		RAM[0xc0000/2 + i] = data;
 	}
 
-	RAM = (UINT16 *)memory_region(REGION_CPU2);
+	RAM = (UINT16 *)memory_region(machine, REGION_CPU2);
 
 	for (i = 0; i < 0x20000; i++)
 	{
@@ -514,14 +514,14 @@ static void common_decrypt(void)
 static DRIVER_INIT( raidenk )
 {
 	memory_patcha(machine);
-	common_decrypt();
+	common_decrypt(machine);
 }
 
 static DRIVER_INIT( raidena )
 {
 	memory_patcha(machine);
-	common_decrypt();
-	seibu_sound_decrypt(REGION_CPU3,0x20000);
+	common_decrypt(machine);
+	seibu_sound_decrypt(machine,REGION_CPU3,0x20000);
 }
 
 /***************************************************************************/

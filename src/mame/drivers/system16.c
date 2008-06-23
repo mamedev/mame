@@ -291,7 +291,7 @@ static READ8_HANDLER( tturfbl_soundbank_r )
 
 static WRITE8_HANDLER( tturfbl_soundbank_w )
 {
-	UINT8 *mem = memory_region(REGION_CPU2);
+	UINT8 *mem = memory_region(machine, REGION_CPU2);
 
 	switch(data)
 	{
@@ -386,11 +386,11 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( upd7759_bank_w ) //*
 {
-	int offs, size = memory_region_length(REGION_CPU2) - 0x10000;
+	int offs, size = memory_region_length(machine, REGION_CPU2) - 0x10000;
 
 	upd7759_reset_w(0, data & 0x40);
 	offs = 0x10000 + (data * 0x4000) % size;
-	memory_set_bankptr(1, memory_region(REGION_CPU2) + offs);
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU2) + offs);
 }
 
 
@@ -2106,7 +2106,7 @@ static DRIVER_INIT( tturfbl )
 
 	MACHINE_RESET_CALL(sys16_onetime);
 
-	mem = memory_region(REGION_CPU2);
+	mem = memory_region(machine, REGION_CPU2);
 	memcpy(mem, mem+0x10000, 0x8000);
 
 }
@@ -2849,7 +2849,7 @@ GAME( 1988, wb3bbl,   wb3,      wb3bbl,   wb3b,     wb3bbl,   ROT0,   "bootleg",
 
 static DRIVER_INIT( beautyb )
 {
-	UINT16*rom = (UINT16*)memory_region( REGION_CPU1 );
+	UINT16*rom = (UINT16*)memory_region( machine, REGION_CPU1 );
 	int x;
 
 	for (x=0;x<0x8000;x++)

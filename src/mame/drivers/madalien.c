@@ -26,16 +26,16 @@ static INPUT_CHANGED( coin_inserted )
 }
 
 
-INLINE UINT8 shift_common(UINT8 hi, UINT8 lo)
+INLINE UINT8 shift_common(running_machine *machine, UINT8 hi, UINT8 lo)
 {
-	const UINT8 *table = memory_region(REGION_USER2);
+	const UINT8 *table = memory_region(machine, REGION_USER2);
 
 	return table[((hi & 0x07) << 8) | lo];
 }
 
 static READ8_HANDLER( shift_r )
 {
-	return shift_common(*shift_hi, *shift_lo);
+	return shift_common(machine, *shift_hi, *shift_lo);
 }
 
 static READ8_HANDLER( shift_rev_r )
@@ -43,7 +43,7 @@ static READ8_HANDLER( shift_rev_r )
 	UINT8 hi = *shift_hi ^ 0x07;
 	UINT8 lo = BITSWAP8(*shift_lo,0,1,2,3,4,5,6,7);
 
-	UINT8 ret = shift_common(hi, lo);
+	UINT8 ret = shift_common(machine, hi, lo);
 
 	return BITSWAP8(ret,7,0,1,2,3,4,5,6) & 0x7f;
 }

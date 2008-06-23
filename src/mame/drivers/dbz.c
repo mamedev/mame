@@ -562,7 +562,7 @@ static DRIVER_INIT( dbz )
 
 	konami_rom_deinterleave_2(REGION_GFX1);
 
-	ROM = (UINT16 *)memory_region(REGION_CPU1);
+	ROM = (UINT16 *)memory_region(machine, REGION_CPU1);
 
 	// nop out dbz1's mask rom test
 	// tile ROM test

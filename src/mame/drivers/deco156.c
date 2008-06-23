@@ -659,10 +659,10 @@ ROM_END
 
 /**********************************************************************************/
 
-static void descramble_sound( int region )
+static void descramble_sound( running_machine *machine, int region )
 {
-	UINT8 *rom = memory_region(region);
-	int length = memory_region_length(region);
+	UINT8 *rom = memory_region(machine, region);
+	int length = memory_region_length(machine, region);
 	UINT8 *buf1 = malloc_or_die(length);
 	UINT32 x;
 
@@ -687,16 +687,16 @@ static void descramble_sound( int region )
 
 static DRIVER_INIT( hvysmsh )
 {
-	deco56_decrypt(REGION_GFX1); /* 141 */
-	deco156_decrypt();
-	descramble_sound(REGION_SOUND2);
+	deco56_decrypt(machine, REGION_GFX1); /* 141 */
+	deco156_decrypt(machine);
+	descramble_sound(machine, REGION_SOUND2);
 }
 
 static DRIVER_INIT( wcvol95 )
 {
-	deco56_decrypt(REGION_GFX1); /* 141 */
-	deco156_decrypt();
-	descramble_sound(REGION_SOUND1);
+	deco56_decrypt(machine, REGION_GFX1); /* 141 */
+	deco156_decrypt(machine);
+	descramble_sound(machine, REGION_SOUND1);
 }
 
 

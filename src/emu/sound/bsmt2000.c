@@ -14,6 +14,7 @@
 #include <math.h>
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "bsmt2000.h"
 
@@ -132,8 +133,8 @@ static void *bsmt2000_start(int sndindex, int clock, const void *config)
 	chip->clock = clock;
 
 	/* initialize the regions */
-	chip->region_base = (INT8 *)memory_region(intf->region);
-	chip->total_banks = memory_region_length(intf->region) / 0x10000;
+	chip->region_base = (INT8 *)memory_region(Machine, intf->region);
+	chip->total_banks = memory_region_length(Machine, intf->region) / 0x10000;
 
 	/* register chip-wide data for save states */
 	state_save_register_item("bsmt2000", sndindex * 16, chip->last_register);

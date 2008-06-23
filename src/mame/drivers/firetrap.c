@@ -90,7 +90,7 @@ static WRITE8_HANDLER( firetrap_nmi_disable_w )
 static WRITE8_HANDLER( firetrap_bankselect_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x4000;
 	memory_set_bankptr(1,&RAM[bankaddress]);
@@ -212,7 +212,7 @@ static WRITE8_HANDLER( firetrap_sound_2400_w )
 static WRITE8_HANDLER( firetrap_sound_bankselect_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
 	memory_set_bankptr(2,&RAM[bankaddress]);

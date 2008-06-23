@@ -613,7 +613,7 @@ ROM_END
 
 static DRIVER_INIT( pengo )
 {
-	pengo_decode();
+	pengo_decode(machine);
 }
 
 
@@ -660,7 +660,7 @@ static DRIVER_INIT( penta )
 		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 }		/* ...1...1...1.... */
 	};
 	UINT8 *decrypt = auto_malloc(0x8000);
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int A;
 
 	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypt);

@@ -966,7 +966,7 @@ static void draw_bg(running_machine *machine, bitmap_t *dst, tilemap *src, const
         Each tile (0x4000 of them) has a lookup table in ROM to build an individual 3-bit palette
         from sets of 8 bit palettes!
     */
-	const UINT8* tile_cluts = memory_region(REGION_GFX4);
+	const UINT8* tile_cluts = memory_region(machine, REGION_GFX4);
 	const bitmap_t *src_bitmap = tilemap_get_pixmap(src);
 	int src_y_mask=ysize-1;
 	int src_x_mask=xsize-1;

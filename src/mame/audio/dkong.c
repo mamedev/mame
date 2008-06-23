@@ -1058,7 +1058,7 @@ static READ8_HANDLER( dkong_voice_status_r )
 static READ8_HANDLER( dkong_sh_tune_r )
 {
 	dkong_state *state = machine->driver_data;
-	UINT8 *SND = memory_region(REGION_CPU2);
+	UINT8 *SND = memory_region(machine, REGION_CPU2);
 
 	if ( state->page & 0x40 )
 	{

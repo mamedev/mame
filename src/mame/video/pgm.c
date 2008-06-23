@@ -11,10 +11,10 @@ static UINT16 *sprite_temp_render;
 /* Sprites - These are a pain! */
 
 /* this decodes one of the funky sprites to a bitmap so we can draw it more easily -- slow but easier to use*/
-static void pgm_prepare_sprite(int wide, int high,int palt, int boffset)
+static void pgm_prepare_sprite(running_machine *machine, int wide, int high,int palt, int boffset)
 {
-	UINT8 *bdata    = memory_region       ( REGION_GFX4 );
-	size_t  bdatasize = memory_region_length( REGION_GFX4 )-1;
+	UINT8 *bdata    = memory_region       ( machine, REGION_GFX4 );
+	size_t  bdatasize = memory_region_length( machine, REGION_GFX4 )-1;
 	UINT8 *adata    = pgm_sprite_a_region;
 	size_t  adatasize = pgm_sprite_a_region_allocate-1;
 	int xcnt, ycnt;
@@ -109,7 +109,7 @@ static void draw_sprite_line(int wide, UINT16* dest, int xzoom, int xgrow, int y
 	}
 }
 /* this just loops over our decoded bitmap and puts it on the screen */
-static void draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, int palt, int boffset, int flip, bitmap_t* bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow )
+static void draw_sprite_new_zoomed(running_machine *machine, int wide, int high, int xpos, int ypos, int palt, int boffset, int flip, bitmap_t* bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow )
 {
 	int ycnt;
 	int ydrawpos;
@@ -118,7 +118,7 @@ static void draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, int p
 	int ycntdraw;
 	int yzoombit;
 
-	pgm_prepare_sprite( wide,high, palt, boffset );
+	pgm_prepare_sprite( machine, wide,high, palt, boffset );
 
 	/* now draw it */
 	ycnt = 0;
@@ -180,7 +180,7 @@ static void draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, int p
 
 static UINT16 *pgm_sprite_source;
 
-static void draw_sprites(int priority, bitmap_t* bitmap)
+static void draw_sprites(running_machine *machine, int priority, bitmap_t* bitmap)
 {
 	/* ZZZZ Zxxx xxxx xxxx
        zzzz z-yy yyyy yyyy
@@ -234,7 +234,7 @@ static void draw_sprites(int priority, bitmap_t* bitmap)
 
 		if ((priority == 1) && (pri == 0)) break;
 
-		draw_sprite_new_zoomed(wide, high, xpos, ypos, palt, boff, flip, bitmap, xzoom,xgrow, yzoom,ygrow);
+		draw_sprite_new_zoomed(machine, wide, high, xpos, ypos, palt, boff, flip, bitmap, xzoom,xgrow, yzoom,ygrow);
 
 		pgm_sprite_source += 5;
 	}
@@ -325,7 +325,7 @@ VIDEO_UPDATE( pgm )
 	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
 	pgm_sprite_source = pgm_spritebufferram;
-	draw_sprites(1, bitmap);
+	draw_sprites(screen->machine, 1, bitmap);
 
 	tilemap_set_scrolly(pgm_bg_tilemap,0, pgm_videoregs[0x2000/2]);
 
@@ -334,7 +334,7 @@ VIDEO_UPDATE( pgm )
 
 	tilemap_draw(bitmap,cliprect,pgm_bg_tilemap,0,0);
 
-	draw_sprites(0, bitmap);
+	draw_sprites(screen->machine, 0, bitmap);
 
 	tilemap_set_scrolly(pgm_tx_tilemap,0, pgm_videoregs[0x5000/2]);
 	tilemap_set_scrollx(pgm_tx_tilemap,0, pgm_videoregs[0x6000/2]); // Check

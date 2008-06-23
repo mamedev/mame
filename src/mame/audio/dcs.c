@@ -910,8 +910,8 @@ void dcs_init(void)
 	dcs.channels = 1;
 
 	/* configure boot and sound ROMs */
-	dcs.bootrom = (UINT16 *)memory_region(REGION_SOUND1);
-	dcs.bootrom_words = memory_region_length(REGION_SOUND1) / 2;
+	dcs.bootrom = (UINT16 *)memory_region(Machine, REGION_SOUND1);
+	dcs.bootrom_words = memory_region_length(Machine, REGION_SOUND1) / 2;
 	dcs.sounddata = dcs.bootrom;
 	dcs.sounddata_words = dcs.bootrom_words;
 
@@ -950,8 +950,8 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	dcs.channels = 2;
 
 	/* always boot from the base of REGION_SOUND1 */
-	dcs.bootrom = (UINT16 *)memory_region(REGION_SOUND1);
-	dcs.bootrom_words = memory_region_length(REGION_SOUND1) / 2;
+	dcs.bootrom = (UINT16 *)memory_region(machine, REGION_SOUND1);
+	dcs.bootrom_words = memory_region_length(machine, REGION_SOUND1) / 2;
 
 	/* supports both RAM and ROM variants */
 	if (dram_in_mb != 0)

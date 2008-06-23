@@ -253,10 +253,10 @@ static WRITE16_HANDLER( fifo_data_w )
 	}
 }
 
-static void blit_gfx(void)
+static void blit_gfx(running_machine *machine)
 {
 	int tmpptr=0;
-	const UINT8 *rom = memory_region(REGION_USER1);
+	const UINT8 *rom = memory_region(machine, REGION_USER1);
 
 	while(tmpptr<fptr)
 	{
@@ -295,7 +295,7 @@ static WRITE16_HANDLER( fifo_clear_w )
 
 static WRITE16_HANDLER( fifo_flush_w )
 {
-		blit_gfx();
+		blit_gfx(machine);
 }
 
 
@@ -304,7 +304,7 @@ static WRITE16_HANDLER( jpeg1_w )
 		COMBINE_DATA(&jpeg1);
 }
 
-static void render_jpeg(void)
+static void render_jpeg(running_machine *machine)
 {
 	int x,y;
 	int addr=jpeg_addr;
@@ -315,7 +315,7 @@ static void render_jpeg(void)
 	{
 		return;
 	}
-	rom = memory_region(REGION_USER3);
+	rom = memory_region(machine, REGION_USER3);
 	for (y=0;y<jpeg_h;y++)
 	{
 		for (x=0;x<jpeg_w;x++)
@@ -351,7 +351,7 @@ static WRITE16_HANDLER( jpeg2_w )
 				jpeg_addr=gfxlookup[idx][0];
 				jpeg_w=gfxlookup[idx][2];
 				jpeg_h=gfxlookup[idx][3];
-				render_jpeg();
+				render_jpeg(machine);
 		}
 		else
 			{
@@ -379,7 +379,7 @@ static WRITE16_HANDLER(io_data_w)
 		{
 			jpeg_x=tmpx;
 			jpeg_y=tmpy;
-			render_jpeg();
+			render_jpeg(machine);
 		}
 	}
 	else
@@ -426,7 +426,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(oki_setbank)
 {
-	UINT8 *sound = memory_region(REGION_SOUND1);
+	UINT8 *sound = memory_region(machine, REGION_SOUND1);
 	int bank=(data^0xff)&3; //xor or not ?
 	memcpy(sound+0x20000, sound+0x100000+0x20000*bank, 0x20000);
 }

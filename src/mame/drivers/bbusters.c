@@ -210,7 +210,7 @@ WRITE16_HANDLER( bbuster_video_w );
 #if BBUSTERS_HACK
 static MACHINE_RESET( bbusters )
 {
-	UINT16 *RAM = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *RAM = (UINT16 *)memory_region(machine, REGION_CPU1);
 	int data = input_port_read(machine, "FAKE1") & 0x03;
 
 	/* Country/Version :
@@ -229,7 +229,7 @@ static MACHINE_RESET( bbusters )
 #if MECHATT_HACK
 static MACHINE_RESET( mechatt )
 {
-	UINT16 *RAM = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *RAM = (UINT16 *)memory_region(machine, REGION_CPU1);
 	int data = input_port_read(machine, "FAKE1") & 0x03;
 
 	/* Country :
@@ -936,7 +936,7 @@ ROM_END
 static void bbusters_patch_code(UINT16 offset)
 {
 	/* To avoid checksum error */
-	UINT16 *RAM = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *RAM = (UINT16 *)memory_region(machine, REGION_CPU1);
 	RAM[(offset +  0)/2] = 0x4e71;
 	RAM[(offset +  2)/2] = 0x4e71;
 	RAM[(offset + 10)/2] = 0x4e71;

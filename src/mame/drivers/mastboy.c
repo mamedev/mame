@@ -517,7 +517,7 @@ static READ8_HANDLER(banked_ram_r)
 
 		if (bank>0x3) // ROM access
 		{
-			UINT8 *src    = memory_region( REGION_GFX1 );
+			UINT8 *src    = memory_region( machine, REGION_GFX1 );
 			bank &=0x3;
 			return src[offset+(bank*0x4000)];
 		}
@@ -533,7 +533,7 @@ static READ8_HANDLER(banked_ram_r)
 		UINT8 *src;
 		int bank;
 		bank = mastboy_bank & 0x7f;
-		src = memory_region       ( REGION_USER1 ) + bank * 0x4000;
+		src = memory_region       ( machine, REGION_USER1 ) + bank * 0x4000;
 		return src[offset];
 	}
 }
@@ -972,7 +972,7 @@ ROM_END
 
 static DRIVER_INIT( mastboy )
 {
-	mastboy_vram = memory_region( REGION_GFX1 ); // makes decoding the RAM based tiles easier this way
+	mastboy_vram = memory_region( machine, REGION_GFX1 ); // makes decoding the RAM based tiles easier this way
 }
 
 GAME( 1991, mastboy,  0,          mastboy, mastboy, mastboy, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", 0 )

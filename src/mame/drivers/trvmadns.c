@@ -79,7 +79,7 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 	}
 	else if((data & 0xf0) == 0x80 || (data & 0xf0) == 0x90)
 	{
-		rom = memory_region(REGION_USER2);
+		rom = memory_region(machine, REGION_USER2);
 
 		switch(data & 0xf)
 		{
@@ -106,7 +106,7 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 		//      logerror("port80 = %02X\n",old=data);
 			}
 
-		rom = memory_region(REGION_USER1);
+		rom = memory_region(machine, REGION_USER1);
 
 		/*
         7

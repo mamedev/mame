@@ -436,11 +436,11 @@ static WRITE8_HANDLER( cvs_tms5110_pdc_w )
 
 static int speech_rom_read_bit(void)
 {
-	UINT8 *ROM = memory_region(CVS_REGION_SPEECH_DATA);
+	UINT8 *ROM = memory_region(Machine, CVS_REGION_SPEECH_DATA);
     int bit;
 
 	/* before reading the bit, clamp the address to the region length */
-	speech_rom_bit_address = speech_rom_bit_address & ((memory_region_length(CVS_REGION_SPEECH_DATA) * 8) - 1);
+	speech_rom_bit_address = speech_rom_bit_address & ((memory_region_length(Machine, CVS_REGION_SPEECH_DATA) * 8) - 1);
 	bit = (ROM[speech_rom_bit_address >> 3] >> (speech_rom_bit_address & 0x07)) & 0x01;
 
 	/* prepare for next bit */
@@ -1535,7 +1535,7 @@ ROM_END
 
 static DRIVER_INIT( huncholy )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	/* patch out protection */
 	ROM[0x0082] = 0xc0;
@@ -1555,7 +1555,7 @@ static DRIVER_INIT( huncholy )
 
 static DRIVER_INIT( hunchbka )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	offs_t offs;
 
@@ -1567,7 +1567,7 @@ static DRIVER_INIT( hunchbka )
 
 static DRIVER_INIT( superbik )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	/* patch out protection */
 	ROM[0x0079] = 0xc0;
@@ -1595,7 +1595,7 @@ static DRIVER_INIT( superbik )
 
 static DRIVER_INIT( hero )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	/* patch out protection */
 	ROM[0x0087] = 0xc0;
@@ -1617,7 +1617,7 @@ static DRIVER_INIT( hero )
 
 static DRIVER_INIT( raiders )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	offs_t offs;
 

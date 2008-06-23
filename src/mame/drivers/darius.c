@@ -296,17 +296,17 @@ static INT32 banknum = -1;
 static UINT8 adpcm_command = 0;
 static UINT8 nmi_enable = 0;
 
-static void reset_sound_region(void)
+static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr( STATIC_BANK1, memory_region(REGION_CPU2) + (banknum * 0x8000) + 0x10000 );
-//  memory_set_bankptr( 1, memory_region(REGION_CPU2) + (banknum * 0x8000) + 0x10000 );
+	memory_set_bankptr( STATIC_BANK1, memory_region(machine, REGION_CPU2) + (banknum * 0x8000) + 0x10000 );
+//  memory_set_bankptr( 1, memory_region(machine, REGION_CPU2) + (banknum * 0x8000) + 0x10000 );
 
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 		banknum = data &0x03;
-		reset_sound_region();
+		reset_sound_region(machine);
 //      banknum = data;
 //      reset_sound_region();
 }
@@ -1200,7 +1200,7 @@ static DRIVER_INIT( darius )
 static STATE_POSTLOAD( darius_postload )
 {
 	parse_control(machine);
-	reset_sound_region();
+	reset_sound_region(machine);
 }
 
 static MACHINE_START( darius )
@@ -1220,7 +1220,7 @@ static MACHINE_RESET( darius )
 	int  i;
 
 	/**** setup sound bank image ****/
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 
 	for( i = 3; i >= 0; i-- ){
 		memcpy( RAM + 0x8000*i + 0x10000, RAM,            0x4000 );

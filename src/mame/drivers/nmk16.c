@@ -289,7 +289,7 @@ static WRITE16_HANDLER ( ssmissin_sound_w )
 
 static WRITE8_HANDLER ( ssmissin_soundbank_w )
 {
-	UINT8 *rom = memory_region(REGION_SOUND1);
+	UINT8 *rom = memory_region(machine, REGION_SOUND1);
 	int bank;
 
 	bank = data & 0x3;
@@ -349,14 +349,14 @@ static READ16_HANDLER( macross2_sound_result_r )
 
 static WRITE8_HANDLER( macross2_sound_bank_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU2) + 0x10000;
+	UINT8 *rom = memory_region(machine, REGION_CPU2) + 0x10000;
 
 	memory_set_bankptr(1,rom + (data & 0x07) * 0x4000);
 }
 
 static WRITE8_HANDLER( tharrier_oki6295_bankswitch_0_w )
 {
-	UINT8 *rom = memory_region(REGION_SOUND1);
+	UINT8 *rom = memory_region(machine, REGION_SOUND1);
 
 	data &= 3;
 	if (data != 3)
@@ -365,7 +365,7 @@ static WRITE8_HANDLER( tharrier_oki6295_bankswitch_0_w )
 
 static WRITE8_HANDLER( tharrier_oki6295_bankswitch_1_w )
 {
-	UINT8 *rom = memory_region(REGION_SOUND2);
+	UINT8 *rom = memory_region(machine, REGION_SOUND2);
 
 	data &= 3;
 	if (data != 3)
@@ -1067,7 +1067,7 @@ static WRITE8_HANDLER( okibank_w )
 
 static WRITE8_HANDLER( raphero_sound_rombank_w )
 {
-	memory_set_bankptr(1,memory_region(REGION_CPU2) + 0x10000 + (data & 0x07) * 0x4000);
+	memory_set_bankptr(1,memory_region(machine, REGION_CPU2) + 0x10000 + (data & 0x07) * 0x4000);
 }
 
 static ADDRESS_MAP_START( raphero_sound_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -4592,7 +4592,7 @@ static UINT32 bjtwin_address_map_sprites(UINT32 addr)
 }
 
 
-static void decode_gfx(void)
+static void decode_gfx(running_machine *machine)
 {
 	/* GFX are scrambled.  We decode them here.  (BIG Thanks to Antiriad for descrambling info) */
 	UINT8 *rom;
@@ -4625,16 +4625,16 @@ static void decode_gfx(void)
 
 
 	/* background */
-	rom = memory_region(REGION_GFX2);
-	len = memory_region_length(REGION_GFX2);
+	rom = memory_region(machine, REGION_GFX2);
+	len = memory_region_length(machine, REGION_GFX2);
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_bg[bjtwin_address_map_bg0(A)]);
 	}
 
 	/* sprites */
-	rom = memory_region(REGION_GFX3);
-	len = memory_region_length(REGION_GFX3);
+	rom = memory_region(machine, REGION_GFX3);
+	len = memory_region_length(machine, REGION_GFX3);
 	for (A = 0;A < len;A += 2)
 	{
 		UINT16 tmp = decode_word( rom[A+1]*256 + rom[A], decode_data_sprite[bjtwin_address_map_sprites(A)]);
@@ -4643,7 +4643,7 @@ static void decode_gfx(void)
 	}
 }
 
-static void decode_tdragonb(void)
+static void decode_tdragonb(running_machine *machine)
 {
 	/* Descrambling Info Again Taken from Raine, Huge Thanks to Antiriad and the Raine Team for
        going Open Source, best of luck in future development. */
@@ -4663,8 +4663,8 @@ static void decode_tdragonb(void)
 		{0x7,0x6,0x5,0x3,0x4,0x2,0x1,0x0},
 	};
 
-	rom = memory_region(REGION_CPU1);
-	len = memory_region_length(REGION_CPU1);
+	rom = memory_region(machine, REGION_CPU1);
+	len = memory_region_length(machine, REGION_CPU1);
 	for (A = 0;A < len;A += 2)
 	{
 #ifdef LSB_FIRST
@@ -4678,22 +4678,22 @@ static void decode_tdragonb(void)
 #endif
 	}
 
-	rom = memory_region(REGION_GFX2);
-	len = memory_region_length(REGION_GFX2);
+	rom = memory_region(machine, REGION_GFX2);
+	len = memory_region_length(machine, REGION_GFX2);
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
 	}
 
-	rom = memory_region(REGION_GFX3);
-	len = memory_region_length(REGION_GFX3);
+	rom = memory_region(machine, REGION_GFX3);
+	len = memory_region_length(machine, REGION_GFX3);
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
 	}
 }
 
-static void decode_ssmissin(void)
+static void decode_ssmissin(running_machine *machine)
 {
 	/* Like Thunder Dragon Bootleg without the Program Rom Swapping */
 	UINT8 *rom;
@@ -4705,15 +4705,15 @@ static void decode_ssmissin(void)
 		{0x7,0x6,0x5,0x3,0x4,0x2,0x1,0x0},
 	};
 
-	rom = memory_region(REGION_GFX2);
-	len = memory_region_length(REGION_GFX2);
+	rom = memory_region(machine, REGION_GFX2);
+	len = memory_region_length(machine, REGION_GFX2);
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
 	}
 
-	rom = memory_region(REGION_GFX3);
-	len = memory_region_length(REGION_GFX3);
+	rom = memory_region(machine, REGION_GFX3);
+	len = memory_region_length(machine, REGION_GFX3);
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
@@ -4723,12 +4723,12 @@ static void decode_ssmissin(void)
 
 static DRIVER_INIT( nmk )
 {
-	decode_gfx();
+	decode_gfx(machine);
 }
 
 static DRIVER_INIT( hachamf )
 {
-	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
 
 	//rom[0x0006/2] = 0x7dc2;   /* replace reset vector with the "real" one */
 
@@ -4739,9 +4739,9 @@ static DRIVER_INIT( hachamf )
 
 static DRIVER_INIT( tdragonb )
 {
-	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
 
-	decode_tdragonb();
+	decode_tdragonb(machine);
 
 	/* The Following Patch is taken from Raine, Otherwise the game has no Sprites in Attract Mode or After Level 1
        which is rather odd considering its a bootleg.. */
@@ -4750,7 +4750,7 @@ static DRIVER_INIT( tdragonb )
 
 static DRIVER_INIT( tdragon )
 {
-	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
 
 	//rom[0x94b0/2] = 0; /* Patch out JMP to shared memory (protection) */
 	//rom[0x94b2/2] = 0x92f4;
@@ -4762,7 +4762,7 @@ static DRIVER_INIT( tdragon )
 
 static DRIVER_INIT( ssmissin )
 {
-	decode_ssmissin();
+	decode_ssmissin(machine);
 }
 
 static DRIVER_INIT( bjtwin )
@@ -4784,7 +4784,7 @@ static DRIVER_INIT( bjtwin )
  *  008F7E: 207C 000F 9000           movea.l #$f9000, A0
  */
 #if 0
-	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
 	rom[0x09172/2] = 0x6006;    /* patch checksum error */
 	rom[0x08f74/2] = 0x4e71;
 #endif
@@ -5185,12 +5185,12 @@ MACHINE_DRIVER_END
 
 /* Address lines scrambling */
 
-static void decryptcode( int a23, int a22, int a21, int a20, int a19, int a18, int a17, int a16, int a15, int a14, int a13, int a12,
+static void decryptcode( running_machine *machine, int a23, int a22, int a21, int a20, int a19, int a18, int a17, int a16, int a15, int a14, int a13, int a12,
 	int a11, int a10, int a9, int a8, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0 )
 {
 	int i;
-	UINT8 *RAM = memory_region( REGION_CPU1 );
-	size_t  size = memory_region_length( REGION_CPU1 );
+	UINT8 *RAM = memory_region( machine, REGION_CPU1 );
+	size_t  size = memory_region_length( machine, REGION_CPU1 );
 	UINT8 *buffer = malloc_or_die( size );
 
 		memcpy( buffer, RAM, size );
@@ -6479,7 +6479,7 @@ ROM_END
 
 static DRIVER_INIT( redhawk )
 {
-	decryptcode( 23, 22, 21, 20, 19, 18, 16, 15, 14, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
+	decryptcode( machine, 23, 22, 21, 20, 19, 18, 16, 15, 14, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
 }
 
 ROM_START( redhawkb )
@@ -6558,7 +6558,7 @@ ROM_END
 
 static DRIVER_INIT( grdnstrm )
 {
-	decryptcode( 23, 22, 21, 20, 19, 18, 16, 17, 14, 15, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
+	decryptcode( machine, 23, 22, 21, 20, 19, 18, 16, 17, 14, 15, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
 }
 
 /* Pop's Pop's */
@@ -6808,7 +6808,7 @@ ROM_END
 
 static DRIVER_INIT( bubl2000 )
 {
-	decryptcode( 23, 22, 21, 20, 19, 18, 13, 14, 15, 16, 17, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
+	decryptcode( machine, 23, 22, 21, 20, 19, 18, 13, 14, 15, 16, 17, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
 }
 
 /*
@@ -6928,7 +6928,7 @@ ROM_END
 
 static DRIVER_INIT( spec2k )
 {
-	decryptcode( 23, 22, 21, 20,
+	decryptcode( machine, 23, 22, 21, 20,
 		         19, 18, 17, 13,
 	             14, 15, 16, 12,
 		         11, 10, 9,  8,

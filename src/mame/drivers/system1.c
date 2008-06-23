@@ -39,13 +39,13 @@ static MACHINE_RESET( system1 )
 static MACHINE_RESET( system1_banked )
 {
 	MACHINE_RESET_CALL(system1);
-	memory_configure_bank(1, 0, 4, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 4, memory_region(machine, REGION_CPU1) + 0x10000, 0x4000);
 }
 
 static MACHINE_RESET( wbml )
 {
 	system1_define_background_memory(system1_BACKGROUND_MEMORY_BANKED);
-	memory_configure_bank(1, 0, 4, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 4, memory_region(machine, REGION_CPU1) + 0x10000, 0x4000);
 }
 
 // Noboranka: there seems to be some protection? involving reads / writes to ports in the 2x region
@@ -4767,31 +4767,31 @@ ROM_START( noboranb )
 	ROM_LOAD( "nobo_pr.13a", 0x0300, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
-static DRIVER_INIT( regulus )	{ regulus_decode(); }
-static DRIVER_INIT( mrviking )	{ mrviking_decode(); }
-static DRIVER_INIT( swat )		{ swat_decode(); }
-static DRIVER_INIT( flicky )	{ flicky_decode(); }
-static DRIVER_INIT( wmatch )	{ wmatch_decode(); }
-static DRIVER_INIT( bullfgtj )	{ bullfgtj_decode(); }
-static DRIVER_INIT( spatter )	{ spatter_decode(); }
-static DRIVER_INIT( pitfall2 )	{ pitfall2_decode(); }
-static DRIVER_INIT( nprinces )	{ nprinces_decode(); }
-static DRIVER_INIT( seganinj )	{ seganinj_decode(); }
-static DRIVER_INIT( imsorry )	{ imsorry_decode(); }
-static DRIVER_INIT( teddybb )	{ teddybb_decode(); }
-static DRIVER_INIT( hvymetal )	{ hvymetal_decode(); }
-static DRIVER_INIT( myheroj )	{ myheroj_decode(); }
-static DRIVER_INIT( 4dwarrio )	{ fdwarrio_decode(); }
-static DRIVER_INIT( wboy )		{ astrofl_decode(); }
-static DRIVER_INIT( wboy2 )		{ wboy2_decode(); }
-static DRIVER_INIT( gardia )	{ gardia_decode(); }
-static DRIVER_INIT( gardiab )	{ gardiab_decode(); }
+static DRIVER_INIT( regulus )	{ regulus_decode(machine); }
+static DRIVER_INIT( mrviking )	{ mrviking_decode(machine); }
+static DRIVER_INIT( swat )		{ swat_decode(machine); }
+static DRIVER_INIT( flicky )	{ flicky_decode(machine); }
+static DRIVER_INIT( wmatch )	{ wmatch_decode(machine); }
+static DRIVER_INIT( bullfgtj )	{ bullfgtj_decode(machine); }
+static DRIVER_INIT( spatter )	{ spatter_decode(machine); }
+static DRIVER_INIT( pitfall2 )	{ pitfall2_decode(machine); }
+static DRIVER_INIT( nprinces )	{ nprinces_decode(machine); }
+static DRIVER_INIT( seganinj )	{ seganinj_decode(machine); }
+static DRIVER_INIT( imsorry )	{ imsorry_decode(machine); }
+static DRIVER_INIT( teddybb )	{ teddybb_decode(machine); }
+static DRIVER_INIT( hvymetal )	{ hvymetal_decode(machine); }
+static DRIVER_INIT( myheroj )	{ myheroj_decode(machine); }
+static DRIVER_INIT( 4dwarrio )	{ fdwarrio_decode(machine); }
+static DRIVER_INIT( wboy )		{ astrofl_decode(machine); }
+static DRIVER_INIT( wboy2 )		{ wboy2_decode(machine); }
+static DRIVER_INIT( gardia )	{ gardia_decode(machine); }
+static DRIVER_INIT( gardiab )	{ gardiab_decode(machine); }
 
 
 
-static DRIVER_INIT( blockgal )	{ mc8123_decrypt_rom(0, memory_region(REGION_USER1), 0, 0); }
-static DRIVER_INIT( wbml )		{ mc8123_decrypt_rom(0, memory_region(REGION_USER1), 1, 4); }
-static DRIVER_INIT( ufosensi )  { mc8123_decrypt_rom(0, memory_region(REGION_USER1), 1, 4); }
+static DRIVER_INIT( blockgal )	{ mc8123_decrypt_rom(machine, 0, memory_region(machine, REGION_USER1), 0, 0); }
+static DRIVER_INIT( wbml )		{ mc8123_decrypt_rom(machine, 0, memory_region(machine, REGION_USER1), 1, 4); }
+static DRIVER_INIT( ufosensi )  { mc8123_decrypt_rom(machine, 0, memory_region(machine, REGION_USER1), 1, 4); }
 
 static UINT8 dakkochn_control;
 
@@ -4818,7 +4818,7 @@ static WRITE8_HANDLER( dakkochn_port_15_w )
 
 static DRIVER_INIT( dakkochn )
 {
-	mc8123_decrypt_rom(0, memory_region(REGION_USER1), 1, 4);
+	mc8123_decrypt_rom(machine, 0, memory_region(machine, REGION_USER1), 1, 4);
 
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x00, 0x00, 0, 0, dakkochn_port_00_r);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, dakkochn_port_03_r);
@@ -4836,12 +4836,12 @@ static DRIVER_INIT( myherok )
 
 	/* additionally to the usual protection, all the program ROMs have data lines */
 	/* D0 and D1 swapped. */
-	rom = memory_region(REGION_CPU1);
+	rom = memory_region(machine, REGION_CPU1);
 	for (A = 0;A < 0xc000;A++)
 		rom[A] = (rom[A] & 0xfc) | ((rom[A] & 1) << 1) | ((rom[A] & 2) >> 1);
 
 	/* the tile gfx ROMs are mangled as well: */
-	rom = memory_region(REGION_GFX1);
+	rom = memory_region(machine, REGION_GFX1);
 
 	/* the first ROM has data lines D0 and D6 swapped. */
 	for (A = 0x0000;A < 0x4000;A++)
@@ -4870,7 +4870,7 @@ static DRIVER_INIT( myherok )
 		}
 	}
 
-	myheroj_decode();
+	myheroj_decode(machine);
 }
 
 static DRIVER_INIT( noboranb )
@@ -4878,7 +4878,7 @@ static DRIVER_INIT( noboranb )
 	/* Patch to get PRG ROMS ('T', 'R' and 'S) status as "GOOD" in the "test mode" */
 	/* not really needed */
 
-//  UINT8 *ROM = memory_region(REGION_CPU1);
+//  UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 //  ROM[0x3296] = 0x18;     // 'jr' instead of 'jr z' - 'T' (PRG Main ROM)
 //  ROM[0x32be] = 0x18;     // 'jr' instead of 'jr z' - 'R' (Banked ROM 1)
@@ -4890,7 +4890,7 @@ static DRIVER_INIT( noboranb )
 //  ROM[0x10000 + 0 * 0x8000 + 0x3347] = 0x18;  // 'jr' instead of 'jr z'
 
 	/* Patch to get sound in later levels(the program enters into a tight loop)*/
-	UINT8 *ROM2 = memory_region(REGION_CPU2);
+	UINT8 *ROM2 = memory_region(machine, REGION_CPU2);
 
 	ROM2[0x02f9] = 0x28;//'jr z' instead of 'jr'
 }
@@ -4898,14 +4898,14 @@ static DRIVER_INIT( noboranb )
 
 static DRIVER_INIT( bootleg )
 {
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(REGION_CPU1) + 0x10000);
+	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, REGION_CPU1) + 0x10000);
 }
 
 
 static DRIVER_INIT( bootlegb )
 {
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(REGION_CPU1) + 0x20000);
-	memory_configure_bank_decrypted(1, 0, 4, memory_region(REGION_CPU1) + 0x30000, 0x4000);
+	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, REGION_CPU1) + 0x20000);
+	memory_configure_bank_decrypted(1, 0, 4, memory_region(machine, REGION_CPU1) + 0x30000, 0x4000);
 }
 
 

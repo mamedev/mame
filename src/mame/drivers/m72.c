@@ -167,8 +167,8 @@ the NMI handler in the other games.
 #if 0
 static int find_sample(int num)
 {
-	UINT8 *rom = memory_region(REGION_SOUND1);
-	int len = memory_region_length(REGION_SOUND1);
+	UINT8 *rom = memory_region(machine, REGION_SOUND1);
+	int len = memory_region_length(machine, REGION_SOUND1);
 	int addr = 0;
 
 	while (num--)

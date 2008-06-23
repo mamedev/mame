@@ -331,7 +331,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER ( fuuki32_sound_bw_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU2);
+	UINT8 *rom = memory_region(machine, REGION_CPU2);
 
 	memory_set_bankptr(1, rom + 0x10000 + (data * 0x8000));
 }

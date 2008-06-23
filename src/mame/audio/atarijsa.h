@@ -6,7 +6,7 @@
 
 
 void atarijsa_init(running_machine *machine, const char *testport, int testmask);
-void atarijsa3_init_adpcm(int region);
+void atarijsa3_init_adpcm(running_machine *machine, int region);
 void atarijsa_reset(void);
 
 

@@ -385,7 +385,7 @@ static WRITE16_HANDLER( metro_soundstatus_w )
 static WRITE8_HANDLER( metro_sound_rombank_w )
 {
 	int bankaddress;
-	UINT8 *ROM = memory_region(REGION_CPU2);
+	UINT8 *ROM = memory_region(machine, REGION_CPU2);
 
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x03) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x0000;
@@ -396,7 +396,7 @@ static WRITE8_HANDLER( metro_sound_rombank_w )
 static WRITE8_HANDLER( daitorid_sound_rombank_w )
 {
 	int bankaddress;
-	UINT8 *ROM = memory_region(REGION_CPU2);
+	UINT8 *ROM = memory_region(machine, REGION_CPU2);
 
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x07) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x10000;
@@ -616,8 +616,8 @@ static READ16_HANDLER( metro_bankedrom_r )
 {
 	const int region = REGION_GFX1;
 
-	UINT8 *ROM = memory_region( region );
-	size_t  len  = memory_region_length( region );
+	UINT8 *ROM = memory_region( machine, region );
+	size_t  len  = memory_region_length( machine, region );
 
 	offset = offset * 2 + 0x10000 * (*metro_rombank);
 
@@ -707,8 +707,8 @@ static WRITE16_HANDLER( metro_blitter_w )
 	{
 		const int region = REGION_GFX1;
 
-		UINT8 *src	=	memory_region(region);
-		size_t  src_len	=	memory_region_length(region);
+		UINT8 *src	=	memory_region(machine, region);
+		size_t  src_len	=	memory_region_length(machine, region);
 
 		UINT32 tmap		=	(metro_blitter_regs[ 0x00 / 2 ] << 16 ) +
 							 metro_blitter_regs[ 0x02 / 2 ];
@@ -1932,7 +1932,7 @@ static WRITE16_HANDLER( blzntrnd_sound_w )
 
 static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x4000;
@@ -4782,8 +4782,8 @@ static DRIVER_INIT( balcube )
 {
 	const int region	=	REGION_GFX1;
 
-	const size_t len	=	memory_region_length(region);
-	UINT8 *src		=	memory_region(region);
+	const size_t len	=	memory_region_length(machine, region);
+	UINT8 *src		=	memory_region(machine, region);
 	UINT8 *end		=	src + len;
 
 	while(src < end)
@@ -4805,7 +4805,7 @@ static DRIVER_INIT( balcube )
 
 static DRIVER_INIT( dharmak )
 {
-	UINT8 *src = memory_region( REGION_GFX1 );
+	UINT8 *src = memory_region( machine, REGION_GFX1 );
 	int i;
 	for (i=0;i<0x200000;i+=4)
 	{

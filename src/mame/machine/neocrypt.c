@@ -523,18 +523,18 @@ static void decrypt(UINT8 *r0, UINT8 *r1,
 }
 
 
-static void neogeo_gfx_decrypt(int extra_xor)
+static void neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
 {
 	int rom_size;
 	UINT8 *buf;
 	UINT8 *rom;
 	int rpos;
 
-	rom_size = memory_region_length(NEOGEO_REGION_SPRITES);
+	rom_size = memory_region_length(machine, NEOGEO_REGION_SPRITES);
 
 	buf = malloc_or_die(rom_size);
 
-	rom = memory_region(NEOGEO_REGION_SPRITES);
+	rom = memory_region(machine, NEOGEO_REGION_SPRITES);
 
 	// Data xor
 	for (rpos = 0;rpos < rom_size/4;rpos++)
@@ -587,13 +587,13 @@ static void neogeo_gfx_decrypt(int extra_xor)
 
 
 /* the S data comes from the end of the C data */
-static void neogeo_sfix_decrypt(void)
+static void neogeo_sfix_decrypt(running_machine *machine)
 {
 	int i;
-	int rom_size = memory_region_length(NEOGEO_REGION_SPRITES);
-	int tx_size = memory_region_length(NEOGEO_REGION_FIXED_LAYER_CARTRIDGE);
-	UINT8 *src = memory_region(NEOGEO_REGION_SPRITES)+rom_size-tx_size;
-	UINT8 *dst = memory_region(NEOGEO_REGION_FIXED_LAYER_CARTRIDGE);
+	int rom_size = memory_region_length(machine, NEOGEO_REGION_SPRITES);
+	int tx_size = memory_region_length(machine, NEOGEO_REGION_FIXED_LAYER_CARTRIDGE);
+	UINT8 *src = memory_region(machine, NEOGEO_REGION_SPRITES)+rom_size-tx_size;
+	UINT8 *dst = memory_region(machine, NEOGEO_REGION_FIXED_LAYER_CARTRIDGE);
 
 	for (i = 0;i < tx_size;i++)
 		dst[i] = src[(i & ~0x1f) + ((i & 7) << 2) + ((~i & 8) >> 2) + ((i & 0x10) >> 4)];
@@ -601,7 +601,7 @@ static void neogeo_sfix_decrypt(void)
 
 
 /* CMC42 protection chip */
-void kof99_neogeo_gfx_decrypt(int extra_xor)
+void kof99_neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
 {
 	type0_t03 =          kof99_type0_t03;
 	type0_t12 =          kof99_type0_t12;
@@ -612,13 +612,13 @@ void kof99_neogeo_gfx_decrypt(int extra_xor)
 	address_16_23_xor1 = kof99_address_16_23_xor1;
 	address_16_23_xor2 = kof99_address_16_23_xor2;
 	address_0_7_xor =    kof99_address_0_7_xor;
-	neogeo_gfx_decrypt(extra_xor);
-	neogeo_sfix_decrypt();
+	neogeo_gfx_decrypt(machine, extra_xor);
+	neogeo_sfix_decrypt(machine);
 }
 
 
 /* CMC50 protection chip */
-void kof2000_neogeo_gfx_decrypt(int extra_xor)
+void kof2000_neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
 {
 	type0_t03 =          kof2000_type0_t03;
 	type0_t12 =          kof2000_type0_t12;
@@ -629,15 +629,15 @@ void kof2000_neogeo_gfx_decrypt(int extra_xor)
 	address_16_23_xor1 = kof2000_address_16_23_xor1;
 	address_16_23_xor2 = kof2000_address_16_23_xor2;
 	address_0_7_xor =    kof2000_address_0_7_xor;
-	neogeo_gfx_decrypt(extra_xor);
-	neogeo_sfix_decrypt();
+	neogeo_gfx_decrypt(machine, extra_xor);
+	neogeo_sfix_decrypt(machine);
 
 	/* here I should also decrypt the sound ROM */
 }
 
 
 /* CMC42 protection chip */
-void cmc42_neogeo_gfx_decrypt(int extra_xor)
+void cmc42_neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
 {
 	type0_t03 =          kof99_type0_t03;
 	type0_t12 =          kof99_type0_t12;
@@ -648,12 +648,12 @@ void cmc42_neogeo_gfx_decrypt(int extra_xor)
 	address_16_23_xor1 = kof99_address_16_23_xor1;
 	address_16_23_xor2 = kof99_address_16_23_xor2;
 	address_0_7_xor =    kof99_address_0_7_xor;
-	neogeo_gfx_decrypt(extra_xor);
+	neogeo_gfx_decrypt(machine, extra_xor);
 }
 
 
 /* CMC50 protection chip */
-void cmc50_neogeo_gfx_decrypt(int extra_xor)
+void cmc50_neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
 {
 	type0_t03 =          kof2000_type0_t03;
 	type0_t12 =          kof2000_type0_t12;
@@ -664,20 +664,20 @@ void cmc50_neogeo_gfx_decrypt(int extra_xor)
 	address_16_23_xor1 = kof2000_address_16_23_xor1;
 	address_16_23_xor2 = kof2000_address_16_23_xor2;
 	address_0_7_xor =    kof2000_address_0_7_xor;
-	neogeo_gfx_decrypt(extra_xor);
+	neogeo_gfx_decrypt(machine, extra_xor);
 
 	/* here I should also decrypt the sound ROM */
 }
 
 
 /* svcchaos has an additional scramble on top of the standard CMC scrambling */
-void svcpcb_gfx_decrypt(void)
+void svcpcb_gfx_decrypt(running_machine *machine)
 {
 	static const UINT8 xor[ 4 ] = { 0x34, 0x21, 0xc4, 0xe9 };
 	int i;
 	int ofst;
-	int rom_size = memory_region_length( NEOGEO_REGION_SPRITES );
-	UINT8 *rom = memory_region( NEOGEO_REGION_SPRITES );
+	int rom_size = memory_region_length( machine, NEOGEO_REGION_SPRITES );
+	UINT8 *rom = memory_region( machine, NEOGEO_REGION_SPRITES );
 	UINT8 *buf = malloc_or_die( rom_size );
 
 	for( i = 0; i < rom_size; i++ )
@@ -706,11 +706,11 @@ void svcpcb_gfx_decrypt(void)
 
 
 /* and a further swap on the s1 data */
-void svcpcb_s1data_decrypt(void)
+void svcpcb_s1data_decrypt(running_machine *machine)
 {
 	int i;
-	UINT8 *s1 = memory_region( NEOGEO_REGION_FIXED_LAYER_CARTRIDGE );
-	size_t s1_size = memory_region_length( NEOGEO_REGION_FIXED_LAYER_CARTRIDGE );
+	UINT8 *s1 = memory_region( machine, NEOGEO_REGION_FIXED_LAYER_CARTRIDGE );
+	size_t s1_size = memory_region_length( machine, NEOGEO_REGION_FIXED_LAYER_CARTRIDGE );
 
 	for( i = 0; i < s1_size; i++ ) // Decrypt S
 	{
@@ -720,13 +720,13 @@ void svcpcb_s1data_decrypt(void)
 
 
 /* Razoola & Halrin */
-void kf2k3pcb_gfx_decrypt(void)
+void kf2k3pcb_gfx_decrypt(running_machine *machine)
 {
 	static const UINT8 xor[ 4 ] = { 0x34, 0x21, 0xc4, 0xe9 };
 	int i;
 	int ofst;
-	int rom_size = memory_region_length( NEOGEO_REGION_SPRITES );
-	UINT8 *rom = memory_region( NEOGEO_REGION_SPRITES );
+	int rom_size = memory_region_length( machine, NEOGEO_REGION_SPRITES );
+	UINT8 *rom = memory_region( machine, NEOGEO_REGION_SPRITES );
 	UINT8 *buf = malloc_or_die( rom_size );
 
 	for ( i = 0; i < rom_size; i++ )
@@ -757,9 +757,9 @@ NeoGeo 'P' ROM encryption
 ***************************************************************************/
 
 /* Kof98 uses an early encryption, quite different from the others */
-void kof98_decrypt_68k(void)
+void kof98_decrypt_68k(running_machine *machine)
 {
-	UINT8 *src = memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
+	UINT8 *src = memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
 	UINT8 *dst = malloc_or_die(0x200000);
 	int i, j, k;
 	static const UINT32 sec[]={0x000000,0x100000,0x000004,0x100004,0x10000a,0x00000a,0x10000e,0x00000e};
@@ -804,12 +804,12 @@ void kof98_decrypt_68k(void)
 
 
 /* kof99, garou, garouo, mslug3 and kof2000 have and SMA chip which contains program code and decrypts the 68k roms */
-void kof99_decrypt_68k(void)
+void kof99_decrypt_68k(running_machine *machine)
 {
 	UINT16 *rom;
 	int i,j;
 
-	rom = (UINT16 *)(memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE) + 0x100000);
+	rom = (UINT16 *)(memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE) + 0x100000);
 	/* swap data lines on the whole ROMs */
 	for (i = 0;i < 0x800000/2;i++)
 	{
@@ -828,7 +828,7 @@ void kof99_decrypt_68k(void)
 	}
 
 	/* swap address lines & relocate fixed part */
-	rom = (UINT16 *)memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
+	rom = (UINT16 *)memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
 	for (i = 0;i < 0x0c0000/2;i++)
 	{
 		rom[i] = rom[0x700000/2 + BITSWAP24(i,23,22,21,20,19,18,11,6,14,17,16,5,8,10,12,0,4,3,2,7,9,15,13,1)];
@@ -836,13 +836,13 @@ void kof99_decrypt_68k(void)
 }
 
 
-void garou_decrypt_68k(void)
+void garou_decrypt_68k(running_machine *machine)
 {
 	UINT16 *rom;
 	int i,j;
 
 	/* thanks to Razoola and Mr K for the info */
-	rom = (UINT16 *)(memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE) + 0x100000);
+	rom = (UINT16 *)(memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE) + 0x100000);
 	/* swap data lines on the whole ROMs */
 	for (i = 0;i < 0x800000/2;i++)
 	{
@@ -850,14 +850,14 @@ void garou_decrypt_68k(void)
 	}
 
 	/* swap address lines & relocate fixed part */
-	rom = (UINT16 *)memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
+	rom = (UINT16 *)memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
 	for (i = 0;i < 0x0c0000/2;i++)
 	{
 		rom[i] = rom[0x710000/2 + BITSWAP24(i,23,22,21,20,19,18,4,5,16,14,7,9,6,13,17,15,3,1,2,12,11,8,10,0)];
 	}
 
 	/* swap address lines for the banked part */
-	rom = (UINT16 *)(memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE) + 0x100000);
+	rom = (UINT16 *)(memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE) + 0x100000);
 	for (i = 0;i < 0x800000/2;i+=0x8000/2)
 	{
 		UINT16 buffer[0x8000/2];
@@ -870,13 +870,13 @@ void garou_decrypt_68k(void)
 }
 
 
-void garouo_decrypt_68k(void)
+void garouo_decrypt_68k(running_machine *machine)
 {
 	UINT16 *rom;
 	int i,j;
 
 	/* thanks to Razoola and Mr K for the info */
-	rom = (UINT16 *)(memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE) + 0x100000);
+	rom = (UINT16 *)(memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE) + 0x100000);
 	/* swap data lines on the whole ROMs */
 	for (i = 0;i < 0x800000/2;i++)
 	{
@@ -884,14 +884,14 @@ void garouo_decrypt_68k(void)
 	}
 
 	/* swap address lines & relocate fixed part */
-	rom = (UINT16 *)memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
+	rom = (UINT16 *)memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
 	for (i = 0;i < 0x0c0000/2;i++)
 	{
 		rom[i] = rom[0x7f8000/2 + BITSWAP24(i,23,22,21,20,19,18,5,16,11,2,6,7,17,3,12,8,14,4,0,9,1,10,15,13)];
 	}
 
 	/* swap address lines for the banked part */
-	rom = (UINT16 *)(memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE) + 0x100000);
+	rom = (UINT16 *)(memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE) + 0x100000);
 	for (i = 0;i < 0x800000/2;i+=0x8000/2)
 	{
 		UINT16 buffer[0x8000/2];
@@ -904,13 +904,13 @@ void garouo_decrypt_68k(void)
 }
 
 
-void mslug3_decrypt_68k(void)
+void mslug3_decrypt_68k(running_machine *machine)
 {
 	UINT16 *rom;
 	int i,j;
 
 	/* thanks to Razoola and Mr K for the info */
-	rom = (UINT16 *)(memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE) + 0x100000);
+	rom = (UINT16 *)(memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE) + 0x100000);
 	/* swap data lines on the whole ROMs */
 	for (i = 0;i < 0x800000/2;i++)
 	{
@@ -918,14 +918,14 @@ void mslug3_decrypt_68k(void)
 	}
 
 	/* swap address lines & relocate fixed part */
-	rom = (UINT16 *)memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
+	rom = (UINT16 *)memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
 	for (i = 0;i < 0x0c0000/2;i++)
 	{
 		rom[i] = rom[0x5d0000/2 + BITSWAP24(i,23,22,21,20,19,18,15,2,1,13,3,0,9,6,16,4,11,5,7,12,17,14,10,8)];
 	}
 
 	/* swap address lines for the banked part */
-	rom = (UINT16 *)(memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE) + 0x100000);
+	rom = (UINT16 *)(memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE) + 0x100000);
 	for (i = 0;i < 0x800000/2;i+=0x10000/2)
 	{
 		UINT16 buffer[0x10000/2];
@@ -938,13 +938,13 @@ void mslug3_decrypt_68k(void)
 }
 
 
-void kof2000_decrypt_68k(void)
+void kof2000_decrypt_68k(running_machine *machine)
 {
 	UINT16 *rom;
 	int i,j;
 
 	/* thanks to Razoola and Mr K for the info */
-	rom = (UINT16 *)(memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE) + 0x100000);
+	rom = (UINT16 *)(memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE) + 0x100000);
 	/* swap data lines on the whole ROMs */
 	for (i = 0;i < 0x800000/2;i++)
 	{
@@ -963,7 +963,7 @@ void kof2000_decrypt_68k(void)
 	}
 
 	/* swap address lines & relocate fixed part */
-	rom = (UINT16 *)memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
+	rom = (UINT16 *)memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
 	for (i = 0;i < 0x0c0000/2;i++)
 	{
 		rom[i] = rom[0x73a000/2 + BITSWAP24(i,23,22,21,20,19,18,8,4,15,13,3,14,16,2,6,17,7,12,10,0,5,11,1,9)];
@@ -972,11 +972,11 @@ void kof2000_decrypt_68k(void)
 
 
 /* kof2002, matrim, samsho5, samsh5p have some simple block swapping */
-void kof2002_decrypt_68k(void)
+void kof2002_decrypt_68k(running_machine *machine)
 {
 	int i;
 	static const int sec[]={0x100000,0x280000,0x300000,0x180000,0x000000,0x380000,0x200000,0x080000};
-	UINT8 *src = memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE)+0x100000;
+	UINT8 *src = memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE)+0x100000;
 	UINT8 *dst = malloc_or_die(0x400000);
 		memcpy( dst, src, 0x400000 );
 		for( i=0; i<8; ++i )
@@ -987,11 +987,11 @@ void kof2002_decrypt_68k(void)
 }
 
 
-void matrim_decrypt_68k(void)
+void matrim_decrypt_68k(running_machine *machine)
 {
 	int i;
 	static const int sec[]={0x100000,0x280000,0x300000,0x180000,0x000000,0x380000,0x200000,0x080000};
-	UINT8 *src = memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE)+0x100000;
+	UINT8 *src = memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE)+0x100000;
 	UINT8 *dst = malloc_or_die(0x400000);
 		memcpy( dst, src, 0x400000);
 		for( i=0; i<8; ++i )
@@ -1002,11 +1002,11 @@ void matrim_decrypt_68k(void)
 }
 
 
-void samsho5_decrypt_68k(void)
+void samsho5_decrypt_68k(running_machine *machine)
 {
 	int i;
 	static const int sec[]={0x000000,0x080000,0x700000,0x680000,0x500000,0x180000,0x200000,0x480000,0x300000,0x780000,0x600000,0x280000,0x100000,0x580000,0x400000,0x380000};
-	UINT8 *src = memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
+	UINT8 *src = memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
 	UINT8 *dst = malloc_or_die(0x800000);
 
 		memcpy( dst, src, 0x800000 );
@@ -1018,11 +1018,11 @@ void samsho5_decrypt_68k(void)
 }
 
 
-void samsh5p_decrypt_68k(void)
+void samsh5p_decrypt_68k(running_machine *machine)
 {
 	int i;
 	static const int sec[]={0x000000,0x080000,0x500000,0x480000,0x600000,0x580000,0x700000,0x280000,0x100000,0x680000,0x400000,0x780000,0x200000,0x380000,0x300000,0x180000};
-	UINT8 *src = memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
+	UINT8 *src = memory_region(machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
 	UINT8 *dst = malloc_or_die(0x800000);
 
 		memcpy( dst, src, 0x800000 );
@@ -1035,14 +1035,14 @@ void samsh5p_decrypt_68k(void)
 
 
 /* mslug5, svcchaos, kof2003 have updated P rom scramble */
-void mslug5_decrypt_68k(void)
+void mslug5_decrypt_68k(running_machine *machine)
 {
 	static const UINT8 xor1[ 0x20 ] = { 0xc2, 0x4b, 0x74, 0xfd, 0x0b, 0x34, 0xeb, 0xd7, 0x10, 0x6d, 0xf9, 0xce, 0x5d, 0xd5, 0x61, 0x29, 0xf5, 0xbe, 0x0d, 0x82, 0x72, 0x45, 0x0f, 0x24, 0xb3, 0x34, 0x1b, 0x99, 0xea, 0x09, 0xf3, 0x03 };
 	static const UINT8 xor2[ 0x20 ] = { 0x36, 0x09, 0xb0, 0x64, 0x95, 0x0f, 0x90, 0x42, 0x6e, 0x0f, 0x30, 0xf6, 0xe5, 0x08, 0x30, 0x64, 0x08, 0x04, 0x00, 0x2f, 0x72, 0x09, 0xa0, 0x13, 0xc9, 0x0b, 0xa0, 0x3e, 0xc2, 0x00, 0x40, 0x2b };
 	int i;
 	int ofst;
 	int rom_size = 0x800000;
-	UINT8 *rom = memory_region( NEOGEO_REGION_MAIN_CPU_CARTRIDGE );
+	UINT8 *rom = memory_region( machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE );
 	UINT8 *buf = malloc_or_die( rom_size );
 
 	for( i = 0; i < 0x100000; i++ )
@@ -1080,14 +1080,14 @@ void mslug5_decrypt_68k(void)
 }
 
 
-void svcchaos_px_decrypt(void)
+void svcchaos_px_decrypt(running_machine *machine)
 {
 	static const UINT8 xor1[ 0x20 ] = { 0x3b, 0x6a, 0xf7, 0xb7, 0xe8, 0xa9, 0x20, 0x99, 0x9f, 0x39, 0x34, 0x0c, 0xc3, 0x9a, 0xa5, 0xc8, 0xb8, 0x18, 0xce, 0x56, 0x94, 0x44, 0xe3, 0x7a, 0xf7, 0xdd, 0x42, 0xf0, 0x18, 0x60, 0x92, 0x9f };
 	static const UINT8 xor2[ 0x20 ] = { 0x69, 0x0b, 0x60, 0xd6, 0x4f, 0x01, 0x40, 0x1a, 0x9f, 0x0b, 0xf0, 0x75, 0x58, 0x0e, 0x60, 0xb4, 0x14, 0x04, 0x20, 0xe4, 0xb9, 0x0d, 0x10, 0x89, 0xeb, 0x07, 0x30, 0x90, 0x50, 0x0e, 0x20, 0x26 };
 	int i;
 	int ofst;
 	int rom_size = 0x800000;
-	UINT8 *rom = memory_region( NEOGEO_REGION_MAIN_CPU_CARTRIDGE );
+	UINT8 *rom = memory_region( machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE );
 	UINT8 *buf = malloc_or_die( rom_size );
 
 	for( i = 0; i < 0x100000; i++ )
@@ -1125,31 +1125,31 @@ void svcchaos_px_decrypt(void)
 }
 
 
-void kf2k3pcb_decrypt_s1data(void)
+void kf2k3pcb_decrypt_s1data(running_machine *machine)
 {
 	UINT8 *src;
 	UINT8 *dst;
 	int i;
-	int tx_size = memory_region_length( NEOGEO_REGION_FIXED_LAYER_CARTRIDGE );
-	int srom_size = memory_region_length( NEOGEO_REGION_SPRITES );
+	int tx_size = memory_region_length( machine, NEOGEO_REGION_FIXED_LAYER_CARTRIDGE );
+	int srom_size = memory_region_length( machine, NEOGEO_REGION_SPRITES );
 
-	src = memory_region( NEOGEO_REGION_SPRITES ) + srom_size - 0x1000000 - 0x80000; // Decrypt S
-	dst = memory_region( NEOGEO_REGION_FIXED_LAYER_CARTRIDGE );
-
-	for( i = 0; i < tx_size / 2; i++ )
-	{
-		dst[ i ] = src[ (i & ~0x1f) + ((i & 7) << 2) + ((~i & 8) >> 2) + ((i & 0x10) >> 4) ];
-	}
-
-	src = memory_region( NEOGEO_REGION_SPRITES ) + srom_size - 0x80000;
-	dst = memory_region( NEOGEO_REGION_FIXED_LAYER_CARTRIDGE ) + 0x80000;
+	src = memory_region( machine, NEOGEO_REGION_SPRITES ) + srom_size - 0x1000000 - 0x80000; // Decrypt S
+	dst = memory_region( machine, NEOGEO_REGION_FIXED_LAYER_CARTRIDGE );
 
 	for( i = 0; i < tx_size / 2; i++ )
 	{
 		dst[ i ] = src[ (i & ~0x1f) + ((i & 7) << 2) + ((~i & 8) >> 2) + ((i & 0x10) >> 4) ];
 	}
 
-	dst = memory_region( NEOGEO_REGION_FIXED_LAYER_CARTRIDGE );
+	src = memory_region( machine, NEOGEO_REGION_SPRITES ) + srom_size - 0x80000;
+	dst = memory_region( machine, NEOGEO_REGION_FIXED_LAYER_CARTRIDGE ) + 0x80000;
+
+	for( i = 0; i < tx_size / 2; i++ )
+	{
+		dst[ i ] = src[ (i & ~0x1f) + ((i & 7) << 2) + ((~i & 8) >> 2) + ((i & 0x10) >> 4) ];
+	}
+
+	dst = memory_region( machine, NEOGEO_REGION_FIXED_LAYER_CARTRIDGE );
 
 	for( i = 0; i < tx_size; i++ )
 	{
@@ -1158,13 +1158,13 @@ void kf2k3pcb_decrypt_s1data(void)
 }
 
 
-void kf2k3pcb_decrypt_68k(void)
+void kf2k3pcb_decrypt_68k(running_machine *machine)
 {
 	static const UINT8 xor2[ 0x20 ] = { 0xb4, 0x0f, 0x40, 0x6c, 0x38, 0x07, 0xd0, 0x3f, 0x53, 0x08, 0x80, 0xaa, 0xbe, 0x07, 0xc0, 0xfa, 0xd0, 0x08, 0x10, 0xd2, 0xf1, 0x03, 0x70, 0x7e, 0x87, 0x0b, 0x40, 0xf6, 0x2a, 0x0a, 0xe0, 0xf9 };
 	int i;
 	int ofst;
 	int rom_size = 0x900000;
-	UINT8 *rom = memory_region( NEOGEO_REGION_MAIN_CPU_CARTRIDGE );
+	UINT8 *rom = memory_region( machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE );
 	UINT8 *buf = malloc_or_die( rom_size );
 
 	for (i = 0; i < 0x100000; i++)
@@ -1200,14 +1200,14 @@ void kf2k3pcb_decrypt_68k(void)
 }
 
 
-void kof2003_decrypt_68k(void)
+void kof2003_decrypt_68k(running_machine *machine)
 {
 	static const UINT8 xor1[0x20] = { 0x3b, 0x6a, 0xf7, 0xb7, 0xe8, 0xa9, 0x20, 0x99, 0x9f, 0x39, 0x34, 0x0c, 0xc3, 0x9a, 0xa5, 0xc8, 0xb8, 0x18, 0xce, 0x56, 0x94, 0x44, 0xe3, 0x7a, 0xf7, 0xdd, 0x42, 0xf0, 0x18, 0x60, 0x92, 0x9f };
 	static const UINT8 xor2[0x20] = { 0x2f, 0x02, 0x60, 0xbb, 0x77, 0x01, 0x30, 0x08, 0xd8, 0x01, 0xa0, 0xdf, 0x37, 0x0a, 0xf0, 0x65, 0x28, 0x03, 0xd0, 0x23, 0xd3, 0x03, 0x70, 0x42, 0xbb, 0x06, 0xf0, 0x28, 0xba, 0x0f, 0xf0, 0x7a };
 	int i;
 	int ofst;
 	int rom_size = 0x900000;
-	UINT8 *rom = memory_region( NEOGEO_REGION_MAIN_CPU_CARTRIDGE );
+	UINT8 *rom = memory_region( machine, NEOGEO_REGION_MAIN_CPU_CARTRIDGE );
 	UINT8 *buf = malloc_or_die( rom_size );
 
 	for (i = 0; i < 0x100000; i++)
@@ -1247,7 +1247,7 @@ void kof2003_decrypt_68k(void)
 }
 
 
-void kof2003biosdecode(void)
+void kof2003biosdecode(running_machine *machine)
 {
 	static const UINT8 address[0x80]={
 		0xb9,0xb8,0x36,0x37,0x3d,0x3c,0xb2,0xb3,
@@ -1267,7 +1267,7 @@ void kof2003biosdecode(void)
 		0xd3,0xd2,0x5c,0x5d,0x57,0x56,0xd8,0xd9,
 		0xd3,0xd2,0x5c,0x5d,0x57,0x56,0xd8,0xd9,
 	};
-	UINT16*src= (UINT16*)memory_region( NEOGEO_REGION_MAIN_CPU_BIOS );
+	UINT16*src= (UINT16*)memory_region( machine, NEOGEO_REGION_MAIN_CPU_BIOS );
 	UINT16*buf= malloc_or_die(0x80000);
 	int	a,addr;
 
@@ -1307,10 +1307,10 @@ NeoGeo 'V' (PCM) ROM encryption
 ***************************************************************************/
 
 /* Neo-Pcm2 Drivers for Encrypted V Roms */
-void neo_pcm2_snk_1999(int value)
+void neo_pcm2_snk_1999(running_machine *machine, int value)
 {	/* thanks to Elsemi for the NEO-PCM2 info */
-	UINT16 *rom = (UINT16 *)memory_region(NEOGEO_REGION_AUDIO_DATA_1);
-	int size = memory_region_length(NEOGEO_REGION_AUDIO_DATA_1);
+	UINT16 *rom = (UINT16 *)memory_region(machine, NEOGEO_REGION_AUDIO_DATA_1);
+	int size = memory_region_length(machine, NEOGEO_REGION_AUDIO_DATA_1);
 	int i, j;
 
 	if( rom != NULL )
@@ -1331,7 +1331,7 @@ void neo_pcm2_snk_1999(int value)
 
 
 /* the later PCM2 games have additional scrambling */
-void neo_pcm2_swap(int value)
+void neo_pcm2_swap(running_machine *machine, int value)
 {
 	static const UINT32 addrs[7][2]={
 		{0x000000,0xa5000},
@@ -1349,7 +1349,7 @@ void neo_pcm2_swap(int value)
 		{0xcb,0x29,0x7d,0x43,0xd2,0x3a,0xc2,0xb4},
 		{0x4b,0xa4,0x63,0x46,0xf0,0x91,0xea,0x62},
 		{0x4b,0xa4,0x63,0x46,0xf0,0x91,0xea,0x62}};
-	UINT8 *src = memory_region(NEOGEO_REGION_AUDIO_DATA_1);
+	UINT8 *src = memory_region(machine, NEOGEO_REGION_AUDIO_DATA_1);
 	UINT8 *buf = malloc_or_die(0x1000000);
 	int i, j, d;
 

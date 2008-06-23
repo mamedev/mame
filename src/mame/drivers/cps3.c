@@ -689,9 +689,9 @@ static const struct game_keys2 keys_table2[] =
 static void cps3_decrypt_bios(running_machine *machine)
 {
 	int i;
-	UINT32 *coderegion = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *coderegion = (UINT32*)memory_region(machine, REGION_USER1);
 
-	decrypted_bios = (UINT32*)memory_region(REGION_USER1);
+	decrypted_bios = (UINT32*)memory_region(machine, REGION_USER1);
 
 	for (i=0;i<0x80000;i+=4)
 	{
@@ -1355,7 +1355,7 @@ static OPBASE_HANDLER( cps3_opbase_handler )
 	/* BIOS ROM */
 	if (address < 0x80000)
 	{
-		opbase->rom = opbase->ram = memory_region(REGION_USER1);
+		opbase->rom = opbase->ram = memory_region(machine, REGION_USER1);
 		return ~0;
 	}
 	/* RAM */
@@ -1364,7 +1364,7 @@ static OPBASE_HANDLER( cps3_opbase_handler )
 		opbase->rom = (UINT8*)decrypted_gamerom-0x06000000;
 		opbase->ram = (UINT8*)decrypted_gamerom-0x06000000;
 
-		if (cps3_isSpecial) opbase->ram = (UINT8*) memory_region(REGION_USER4)-0x06000000;
+		if (cps3_isSpecial) opbase->ram = (UINT8*) memory_region(machine, REGION_USER4)-0x06000000;
 
 
 		return ~0;
@@ -1512,7 +1512,7 @@ static WRITE32_HANDLER( cps3_gfxflash_w )
 
 	/* make a copy in the linear memory region we actually use for drawing etc.  having it stored in interleaved flash roms isnt' very useful */
 	{
-		UINT32* romdata = (UINT32*)memory_region(REGION_USER5);
+		UINT32* romdata = (UINT32*)memory_region(machine, REGION_USER5);
 		int real_offset = 0;
 		UINT32 newdata;
 		UINT8* ptr1 = intelflash_getmemptr(flash1);
@@ -1646,7 +1646,7 @@ static READ32_HANDLER( cps3_flash2_r )
 	return retvalue;
 }
 
-static void cps3_flashmain_w(int base, UINT32 offset, UINT32 data, UINT32 mem_mask)
+static void cps3_flashmain_w(running_machine *machine, int base, UINT32 offset, UINT32 data, UINT32 mem_mask)
 {
 	int command;
 	if (ACCESSING_BITS_24_31)	// Flash 1
@@ -1676,7 +1676,7 @@ static void cps3_flashmain_w(int base, UINT32 offset, UINT32 data, UINT32 mem_ma
 
 	/* copy data into regions to execute from */
 	{
-		UINT32* romdata =  (UINT32*)memory_region(REGION_USER4);
+		UINT32* romdata =  (UINT32*)memory_region(machine, REGION_USER4);
 		UINT32* romdata2 = (UINT32*)decrypted_gamerom;
 		int real_offset = 0;
 		UINT32 newdata;
@@ -1708,12 +1708,12 @@ static void cps3_flashmain_w(int base, UINT32 offset, UINT32 data, UINT32 mem_ma
 
 static WRITE32_HANDLER( cps3_flash1_w )
 {
-	cps3_flashmain_w(0, offset,data,mem_mask);
+	cps3_flashmain_w(machine,0,offset,data,mem_mask);
 }
 
 static WRITE32_HANDLER( cps3_flash2_w )
 {
-	cps3_flashmain_w(4, offset,data,mem_mask);
+	cps3_flashmain_w(machine,4,offset,data,mem_mask);
 }
 
 static WRITE32_HANDLER( cram_gfxflash_bank_w )
@@ -1951,7 +1951,7 @@ static WRITE32_HANDLER( cps3_palettedma_w )
 			if (data & 0x0002)
 			{
 				int i;
-				UINT16* src = (UINT16*)memory_region(REGION_USER5);
+				UINT16* src = (UINT16*)memory_region(machine, REGION_USER5);
 			//  if(DEBUG_PRINTF) printf("CPS3 pal dma start %08x (real: %08x) dest %08x fade %08x other2 %08x (length %04x)\n", paldma_source, paldma_realsource, paldma_dest, paldma_fade, paldma_other2, paldma_length);
 
 				for (i=0;i<paldma_length;i++)
@@ -2030,9 +2030,9 @@ static UINT32 process_byte( UINT8 real_byte, UINT32 destination, int max_length 
 	}
 }
 
-static void cps3_do_char_dma( UINT32 real_source, UINT32 real_destination, UINT32 real_length )
+static void cps3_do_char_dma( running_machine *machine, UINT32 real_source, UINT32 real_destination, UINT32 real_length )
 {
-	UINT8* sourcedata = (UINT8*)memory_region(REGION_USER5);
+	UINT8* sourcedata = (UINT8*)memory_region(machine, REGION_USER5);
 	int length_remaining;
 
 	last_normal_byte = 0;
@@ -2117,9 +2117,9 @@ static UINT32 ProcessByte8(UINT8 b,UINT32 dst_offset)
  	}
  }
 
-static void cps3_do_alt_char_dma( UINT32 src, UINT32 real_dest, UINT32 real_length )
+static void cps3_do_alt_char_dma( running_machine *machine, UINT32 src, UINT32 real_dest, UINT32 real_length )
 {
-	UINT8* px = (UINT8*)memory_region(REGION_USER5);
+	UINT8* px = (UINT8*)memory_region(machine, REGION_USER5);
 	UINT32 start = real_dest;
 	UINT32 ds = real_dest;
 
@@ -2191,7 +2191,7 @@ static void cps3_process_character_dma(running_machine *machine, UINT32 address)
 		{
 			/* 6bpp DMA decompression
               - this is used for the majority of sprites and backgrounds */
-			cps3_do_char_dma( real_source, real_destination, real_length );
+			cps3_do_char_dma( machine, real_source, real_destination, real_length );
 			cpunum_set_input_line(machine, 0,10, ASSERT_LINE);
 
 		}
@@ -2199,7 +2199,7 @@ static void cps3_process_character_dma(running_machine *machine, UINT32 address)
 		{
 			/* 8bpp DMA decompression
               - this is used on SFIII NG Sean's Stage ONLY */
-			cps3_do_alt_char_dma( real_source, real_destination, real_length);
+			cps3_do_alt_char_dma( machine, real_source, real_destination, real_length);
 			cpunum_set_input_line(machine, 0,10, ASSERT_LINE);
 		}
 		else
@@ -2429,8 +2429,8 @@ static emu_timer* fastboot_timer;
 
 static TIMER_CALLBACK( fastboot_timer_callback )
 {
-	UINT32 *rom =  (UINT32*)decrypted_gamerom;//memory_region ( REGION_USER4 );
-	if (cps3_isSpecial) rom = (UINT32*)memory_region(REGION_USER4);
+	UINT32 *rom =  (UINT32*)decrypted_gamerom;//memory_region ( machine, REGION_USER4 );
+	if (cps3_isSpecial) rom = (UINT32*)memory_region(machine, REGION_USER4);
 
 //  printf("fastboot callback %08x %08x", rom[0], rom[1]);
 	cpunum_set_reg(0,SH2_PC, rom[0]);
@@ -2475,9 +2475,9 @@ static MACHINE_RESET( cps3 )
 
 
 
-static void precopy_to_flash(void)
+static void precopy_to_flash(running_machine *machine)
 {
-	UINT32* romdata = (UINT32*)memory_region(REGION_USER4);
+	UINT32* romdata = (UINT32*)memory_region(machine, REGION_USER4);
 	int i;
 	/* precopy program roms, ok, sfiii2 tests pass, others fail because of how the decryption affects testing */
 	for (i=0;i<0x800000;i+=4)
@@ -2514,10 +2514,10 @@ static void precopy_to_flash(void)
 
 	/* precopy gfx roms, good, tests pass */
 	{
-		UINT32 thebase, len = memory_region_length(REGION_USER5);
+		UINT32 thebase, len = memory_region_length(machine, REGION_USER5);
 		int flashnum = 8;
 
-		romdata = (UINT32*)memory_region(REGION_USER5);
+		romdata = (UINT32*)memory_region(machine, REGION_USER5);
 		for (thebase = 0;thebase < len/2; thebase+=0x200000)
 		{
 		//  printf("flashnums %d. %d\n",flashnum, flashnum+1);
@@ -2541,9 +2541,9 @@ static void precopy_to_flash(void)
 
 
 // make a copy in the regions we execute code / draw gfx from
-static void copy_from_nvram(void)
+static void copy_from_nvram(running_machine *machine)
 {
-	UINT32* romdata = (UINT32*)memory_region(REGION_USER4);
+	UINT32* romdata = (UINT32*)memory_region(machine, REGION_USER4);
 	UINT32* romdata2 = (UINT32*)decrypted_gamerom;
 	int i;
 	/* copy + decrypt program roms which have been loaded from flashroms/nvram */
@@ -2583,11 +2583,11 @@ static void copy_from_nvram(void)
 
 	/* copy gfx from loaded flashroms to user reigon 5, where it's used */
 	{
-		UINT32 thebase, len = memory_region_length(REGION_USER5);
+		UINT32 thebase, len = memory_region_length(machine, REGION_USER5);
 		int flashnum = 8;
 		int countoffset = 0;
 
-		romdata = (UINT32*)memory_region(REGION_USER5);
+		romdata = (UINT32*)memory_region(machine, REGION_USER5);
 		for (thebase = 0;thebase < len/2; thebase+=0x200000)
 		{
 		//  printf("flashnums %d. %d\n",flashnum, flashnum+1);
@@ -2647,13 +2647,13 @@ static NVRAM_HANDLER( cps3 )
 		for (i=0;i<48;i++)
 			nvram_handler_intelflash( machine, i, file, read_or_write );
 
-		copy_from_nvram(); // copy data from flashroms back into user regions + decrypt into regions we execute/draw from.
+		copy_from_nvram(machine); // copy data from flashroms back into user regions + decrypt into regions we execute/draw from.
 	}
 	else
 	{
 		//printf("nothing?\n");
-		precopy_to_flash();  // attempt to copy data from user regions into flash roms (incase this is a NOCD set)
-		copy_from_nvram(); // copy data from flashroms back into user regions + decrypt into regions we execute/draw from.
+		precopy_to_flash(machine);  // attempt to copy data from user regions into flash roms (incase this is a NOCD set)
+		copy_from_nvram(machine); // copy data from flashroms back into user regions + decrypt into regions we execute/draw from.
 	}
 
 
@@ -3052,7 +3052,7 @@ static DRIVER_INIT( jojo )
 
 	// DEVELOPMENT VERSION add 0x70 mask!
 
-//  UINT32 *rom =  (UINT32*)memory_region ( REGION_USER1 );
+//  UINT32 *rom =  (UINT32*)memory_region ( machine, REGION_USER1 );
 //  rom[0x1fec8/4]^=0x00000001; // region hack (clear jpn)
 
 //  rom[0x1fec8/4]^=0x00000004; // region
@@ -3080,7 +3080,7 @@ static DRIVER_INIT (jojoba)
 
 	// DEVELOPMENT VERSION add 0x70 mask!
 
-//  UINT32 *rom =  (UINT32*)memory_region ( REGION_USER1 );
+//  UINT32 *rom =  (UINT32*)memory_region ( machine, REGION_USER1 );
 //  rom[0x1fec8/4]^=0x00000001; // region (clear jpn)
 //  rom[0x1fec8/4]^=0x00000002; // region
 //  rom[0x1fec8/4]^=0x00000070; // DEV mode
@@ -3105,7 +3105,7 @@ static DRIVER_INIT( warzard )
 	// OCEANIA 7
 	// ASIA NCD 8
 
-//  UINT32 *rom =  (UINT32*)memory_region ( REGION_USER1 );
+//  UINT32 *rom =  (UINT32*)memory_region ( machine, REGION_USER1 );
 //  rom[0x1fed8/4]^=0x00000001; // clear region to 0 (invalid)
 //  rom[0x1fed8/4]^=0x00000008; // region 8 - ASIA NO CD - doesn't actually skip the CD test on startup,
 	                            // only during game, must be another flag somewhere too, and we don't have
@@ -3133,7 +3133,7 @@ static DRIVER_INIT( sfiii )
 
 	// bios rom also lists korea, but game rom does not.
 
-//  UINT32 *rom =  (UINT32*)memory_region ( REGION_USER1 );
+//  UINT32 *rom =  (UINT32*)memory_region ( machine, REGION_USER1 );
 //  rom[0x1fec8/4]^=0x00000001; // region (clear region)
 //  rom[0x1fec8/4]^=0x00000008; // region
 //  rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test menu is region is ASIA NCD, otherwise it will report NG, Asia was probably the only NCD region for this
@@ -3157,7 +3157,7 @@ static DRIVER_INIT( sfiii2 )
 	// OCEANIA 7
 	// ASIA 8
 
-//  UINT32 *rom =  (UINT32*)memory_region ( REGION_USER1 );
+//  UINT32 *rom =  (UINT32*)memory_region ( machine, REGION_USER1 );
 //  rom[0x1fec8/4]^=0x00000001; // region (clear region)
 //  rom[0x1fec8/4]^=0x00000008; // region
 //  rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test menu is region is ASIA NCD, otherwise it will report NG, Asia was probably the only NCD region for this
@@ -3180,7 +3180,7 @@ static DRIVER_INIT( sfiii3 )
 	// BRAZIL 6
 	// OCEANIA 7
 
-//  UINT32 *rom =  (UINT32*)memory_region ( REGION_USER1 );
+//  UINT32 *rom =  (UINT32*)memory_region ( machine, REGION_USER1 );
 
 //  rom[0x1fec8/4]^=0x00000004; // region (clear region)
 //  rom[0x1fec8/4]^=0x00000001; // region

@@ -690,7 +690,7 @@ static DRIVER_INIT( roadriot )
 	};
 	atarigen_eeprom_default = default_eeprom;
 	atarijsa_init(machine, "IN2", 0x0040);
-	atarijsa3_init_adpcm(REGION_SOUND1);
+	atarijsa3_init_adpcm(machine, REGION_SOUND1);
 
 	atarig42_playfield_base = 0x400;
 	atarig42_motion_object_base = 0x200;
@@ -740,7 +740,7 @@ static DRIVER_INIT( guardian )
 	};
 	atarigen_eeprom_default = default_eeprom;
 	atarijsa_init(machine, "IN2", 0x0040);
-	atarijsa3_init_adpcm(REGION_SOUND1);
+	atarijsa3_init_adpcm(machine, REGION_SOUND1);
 
 	atarig42_playfield_base = 0x000;
 	atarig42_motion_object_base = 0x400;
@@ -748,7 +748,7 @@ static DRIVER_INIT( guardian )
 
 	/* it looks like they jsr to $80000 as some kind of protection */
 	/* put an RTS there so we don't die */
-	*(UINT16 *)&memory_region(REGION_CPU1)[0x80000] = 0x4E75;
+	*(UINT16 *)&memory_region(machine, REGION_CPU1)[0x80000] = 0x4E75;
 
 	sloop_base = memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, guardians_sloop_data_r, guardians_sloop_data_w);
 	memory_set_opbase_handler(0, sloop_opbase_handler);

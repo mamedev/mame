@@ -569,7 +569,7 @@ static WRITE64_HANDLER( naomi_unknown1_w )
 
 static READ64_HANDLER( naomi_rom_board_r )
 {
-	UINT8 *ROM = (UINT8 *)memory_region(REGION_USER1);
+	UINT8 *ROM = (UINT8 *)memory_region(machine, REGION_USER1);
 
 	// ROM_DATA
 	if ((offset == 1) && ACCESSING_BITS_0_15)

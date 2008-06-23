@@ -89,7 +89,7 @@ static tilemap *bg_tilemap,*fg_tilemap;
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *src = memory_region(REGION_USER1);
+	UINT8 *src = memory_region(machine, REGION_USER1);
 	int bg_base = (calorie_bg & 0x0f) * 0x200;
 	int code  = src[bg_base + tile_index] | (((src[bg_base + tile_index + 0x100]) & 0x10) << 4);
 	int color = src[bg_base + tile_index + 0x100] & 0x0f;
@@ -458,12 +458,12 @@ ROM_END
 
 static DRIVER_INIT( calorie )
 {
-	calorie_decode();
+	calorie_decode(machine);
 }
 
 static DRIVER_INIT( calorieb )
 {
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(REGION_CPU1) + 0x10000);
+	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, REGION_CPU1) + 0x10000);
 }
 
 

@@ -11,7 +11,7 @@
 UINT8 *kangaroo_video_control;
 
 
-static void blitter_execute(void);
+static void blitter_execute(running_machine *machine);
 
 
 
@@ -83,7 +83,7 @@ WRITE8_HANDLER( kangaroo_video_control_w )
 	switch (offset)
 	{
 		case 5:	/* blitter start */
-			blitter_execute();
+			blitter_execute(machine);
 			break;
 
 		case 8:	/* bank select */
@@ -100,10 +100,10 @@ WRITE8_HANDLER( kangaroo_video_control_w )
  *
  *************************************/
 
-static void blitter_execute(void)
+static void blitter_execute(running_machine *machine)
 {
-	UINT32 gfxhalfsize = memory_region_length(REGION_GFX1) / 2;
-	const UINT8 *gfxbase = memory_region(REGION_GFX1);
+	UINT32 gfxhalfsize = memory_region_length(machine, REGION_GFX1) / 2;
+	const UINT8 *gfxbase = memory_region(machine, REGION_GFX1);
 	UINT16 src = kangaroo_video_control[0] + 256 * kangaroo_video_control[1];
 	UINT16 dst = kangaroo_video_control[2] + 256 * kangaroo_video_control[3];
 	UINT8 height = kangaroo_video_control[5];

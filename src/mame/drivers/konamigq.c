@@ -338,7 +338,7 @@ static DRIVER_INIT( konamigq )
 {
 	psx_driver_init(machine);
 
-	m_p_n_pcmram = memory_region( REGION_SOUND1 ) + 0x80000;
+	m_p_n_pcmram = memory_region( machine, REGION_SOUND1 ) + 0x80000;
 }
 
 static void konamigq_exit(running_machine *machine)

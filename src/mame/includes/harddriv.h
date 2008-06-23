@@ -173,7 +173,7 @@ READ16_HANDLER( hdds3_speedup_r );
 
 /*----------- defined in audio/harddriv.c -----------*/
 
-void hdsnd_init(void);
+void hdsnd_init(running_machine *machine);
 
 extern UINT16 *hdsnddsp_ram;
 

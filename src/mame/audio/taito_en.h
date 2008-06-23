@@ -9,7 +9,7 @@ WRITE16_HANDLER(f3_volume_w);
 WRITE16_HANDLER(f3_es5505_bank_w);
 void f3_68681_reset(void);
 
-void taito_f3_soundsystem_reset(void);
+void taito_f3_soundsystem_reset(running_machine *machine);
 
 #define TAITO_F3_SOUND_SYSTEM_CPU(freq)								\
 	MDRV_CPU_ADD(M68000, freq)										\

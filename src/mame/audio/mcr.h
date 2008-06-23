@@ -12,7 +12,7 @@
 
 /************ Generic MCR routines ***************/
 
-void mcr_sound_init(UINT8 config);
+void mcr_sound_init(running_machine *machine, UINT8 config);
 void mcr_sound_reset(void);
 
 WRITE8_HANDLER( ssio_data_w );

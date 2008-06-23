@@ -40,14 +40,14 @@ static TILEMAP_MAPPER( bg_scan )
 
 static TILE_GET_INFO( get_pf3_tile_info )
 {
-	const UINT16 *bgMap = (const UINT16 *)memory_region(REGION_GFX6);
+	const UINT16 *bgMap = (const UINT16 *)memory_region(machine, REGION_GFX6);
 	int code= bgMap[tile_index];
 	SET_TILE_INFO(4,code&0x7ff,code>>12,0);
 }
 
 static TILE_GET_INFO( get_pf2_tile_info )
 {
-	const UINT16 *bgMap = (const UINT16 *)memory_region(REGION_GFX7);
+	const UINT16 *bgMap = (const UINT16 *)memory_region(machine, REGION_GFX7);
 	int code= bgMap[tile_index];
 	SET_TILE_INFO(3,code&0x7ff,code>>12,0);
 }

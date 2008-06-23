@@ -137,7 +137,7 @@ static void plot_byte(bitmap_t *bitmap, UINT8 y, UINT8 x, UINT8 data, UINT8 colo
 
 static VIDEO_UPDATE( astinvad )
 {
-	const UINT8 *color_prom = memory_region(REGION_PROMS);
+	const UINT8 *color_prom = memory_region(screen->machine, REGION_PROMS);
 	UINT8 yoffs = flip_yoffs & screen_flip;
 	int x, y;
 
@@ -156,7 +156,7 @@ static VIDEO_UPDATE( astinvad )
 
 static VIDEO_UPDATE( spaceint )
 {
-	const UINT8 *color_prom = memory_region(REGION_PROMS);
+	const UINT8 *color_prom = memory_region(screen->machine, REGION_PROMS);
 	int offs;
 
 	for (offs = 0; offs < videoram_size; offs++)

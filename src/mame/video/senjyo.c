@@ -32,7 +32,7 @@ DRIVER_INIT( starforc )
 DRIVER_INIT( starfore )
 {
 	/* encrypted CPU */
-	suprloco_decode();
+	suprloco_decode(machine);
 
 	senjyo = 0;
 	scrollhack = 0;

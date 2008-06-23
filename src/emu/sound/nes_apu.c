@@ -691,7 +691,7 @@ static void *nesapu_start(int sndindex, int clock, const void *config)
 	info->buffer_size+=info->samps_per_sync;
 
 	/* Initialize individual chips */
-	(info->APU.dpcm).cpu_mem=memory_region(intf->region);
+	(info->APU.dpcm).cpu_mem=memory_region(Machine, intf->region);
 
 	info->stream = stream_create(0, 1, rate, info, NESPSG_update_sound);
 

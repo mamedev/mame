@@ -272,7 +272,7 @@ ROM_END
 static DRIVER_INIT( progolf )
 {
 	int A;
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	UINT8* decrypted = auto_malloc(0x10000);
 
 	memory_set_decrypted_region(0,0x0000,0xffff, decrypted);

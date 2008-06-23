@@ -23,14 +23,14 @@ static int bg1_bank = 0, bg2_bank = 0;
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	UINT8 *region = memory_region(REGION_GFX3) + 0x200000 + 0x80000 * bg1_bank;
+	UINT8 *region = memory_region(machine, REGION_GFX3) + 0x200000 + 0x80000 * bg1_bank;
 	int code = region[tile_index*2] + (region[tile_index*2+1] << 8);
 	SET_TILE_INFO(2, code, 0, 0);
 }
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	UINT8 *region = memory_region(REGION_GFX2) + 0x200000 + 0x80000 * bg2_bank;
+	UINT8 *region = memory_region(machine, REGION_GFX2) + 0x200000 + 0x80000 * bg2_bank;
 	int code = region[tile_index*2] + (region[tile_index*2+1] << 8);
 	SET_TILE_INFO(1, code, 0, 0);
 }
@@ -98,7 +98,7 @@ static VIDEO_UPDATE( cultures )
 
 static WRITE8_HANDLER( cpu_bankswitch_w )
 {
-	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x4000 * (data & 0xf));
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x4000 * (data & 0xf));
 	video_enable = ~data & 0x20;
 }
 
@@ -116,8 +116,8 @@ static WRITE8_HANDLER( misc_w )
 	if(old_bank != new_bank)
 	{
 		// oki banking
-		UINT8 *src = memory_region(REGION_SOUND1) + 0x40000 + 0x20000 * new_bank;
-		UINT8 *dst = memory_region(REGION_SOUND1) + 0x20000;
+		UINT8 *src = memory_region(machine, REGION_SOUND1) + 0x40000 + 0x20000 * new_bank;
+		UINT8 *dst = memory_region(machine, REGION_SOUND1) + 0x20000;
 		memcpy(dst, src, 0x20000);
 
 		old_bank = new_bank;

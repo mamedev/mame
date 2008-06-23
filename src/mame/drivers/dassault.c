@@ -830,8 +830,8 @@ static READ16_HANDLER( thndzone_main_skip )
 
 static DRIVER_INIT( dassault )
 {
-	const UINT8 *src = memory_region(REGION_GFX1);
-	UINT8 *dst = memory_region(REGION_GFX2);
+	const UINT8 *src = memory_region(machine, REGION_GFX1);
+	UINT8 *dst = memory_region(machine, REGION_GFX2);
 	UINT8 *tmp = malloc_or_die(0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
@@ -850,8 +850,8 @@ static DRIVER_INIT( dassault )
 
 static DRIVER_INIT( thndzone )
 {
-	const UINT8 *src = memory_region(REGION_GFX1);
-	UINT8 *dst = memory_region(REGION_GFX2);
+	const UINT8 *src = memory_region(machine, REGION_GFX1);
+	UINT8 *dst = memory_region(machine, REGION_GFX2);
 	UINT8 *tmp = malloc_or_die(0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier

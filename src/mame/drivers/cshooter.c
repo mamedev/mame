@@ -234,7 +234,7 @@ static WRITE8_HANDLER ( cshooter_c700_w )
 
 static WRITE8_HANDLER ( bank_w )
 {
-	memory_set_bankptr(1,&memory_region(REGION_USER1)[0x4000*((data>>4)&3)]);
+	memory_set_bankptr(1,&memory_region(machine, REGION_USER1)[0x4000*((data>>4)&3)]);
 }
 
 
@@ -706,18 +706,18 @@ ROM_END
 static DRIVER_INIT( cshooter )
 {
 	/* temp so it boots */
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	rom[0xa2] = 0x00;
 	rom[0xa3] = 0x00;
 	rom[0xa4] = 0x00;
-	memory_set_bankptr(1,&memory_region(REGION_USER1)[0]);
+	memory_set_bankptr(1,&memory_region(machine, REGION_USER1)[0]);
 }
 
 static DRIVER_INIT( cshootre )
 {
 	int A;
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	UINT8 *decrypt = auto_malloc(0x8000);
 
 	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypt);
@@ -747,8 +747,8 @@ static DRIVER_INIT( cshootre )
 			rom[A] = BITSWAP8(rom[A],7,6,1,4,3,2,5,0);
 	}
 
-	memory_set_bankptr(1,&memory_region(REGION_USER1)[0]);
-	seibu_sound_decrypt(REGION_CPU2,0x2000);
+	memory_set_bankptr(1,&memory_region(machine, REGION_USER1)[0]);
+	seibu_sound_decrypt(machine,REGION_CPU2,0x2000);
 }
 
 

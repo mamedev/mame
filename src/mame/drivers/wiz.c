@@ -1010,8 +1010,8 @@ static DRIVER_INIT( stinger )
 		{ 5,3,7, 0x80 },
 		{ 5,7,3, 0x28 }
 	};
-	UINT8 *rom = memory_region(REGION_CPU1);
-	int size = memory_region_length(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	int size = memory_region_length(machine, REGION_CPU1);
 	UINT8 *decrypt = auto_malloc(size);
 	int A;
 	const UINT8 *tbl;

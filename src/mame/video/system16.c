@@ -333,8 +333,8 @@ static void draw_sprite(running_machine *machine,
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int b3d ) //*
 {
 	pen_t pen_base = machine->gfx[0]->color_base;
-	const UINT8 *base_gfx = memory_region(REGION_GFX2);
-	const int gfx_rom_size = memory_region_length(REGION_GFX2);
+	const UINT8 *base_gfx = memory_region(machine, REGION_GFX2);
+	const int gfx_rom_size = memory_region_length(machine, REGION_GFX2);
 	const UINT16 *source = sys16_spriteram;
 	struct sys16_sprite_attributes sprite;
 	int xpos, ypos, screen_width, width, logical_height, pitch, flipy, flipx;

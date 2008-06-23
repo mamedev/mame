@@ -472,7 +472,7 @@ INLINE UINT16 get_tx1_datarom_addr(void)
 	return addr & 0x3fff;
 }
 
-static void tx1_update_state(void)
+static void tx1_update_state(running_machine *machine)
 {
 #define LHIEN(a)	!(a & 0x80)
 #define LLOEN(a)	!(a & 0x40)
@@ -538,7 +538,7 @@ static void tx1_update_state(void)
 					data = math.muxlatch;
 				else if ( dsel == 1 )
 				{
-					UINT16 *romdata = (UINT16*)memory_region(REGION_USER1);
+					UINT16 *romdata = (UINT16*)memory_region(machine, REGION_USER1);
 					UINT16 addr = get_tx1_datarom_addr();
 					data = romdata[addr];
 				}
@@ -714,7 +714,7 @@ READ16_HANDLER( tx1_math_r )
                 TODO make this constant somewhere
                 e.g. math.retval =  math.romptr[ get_tx1_datarom_addr() ];
             */
-			UINT16 *romdata = (UINT16*)memory_region(REGION_USER1);
+			UINT16 *romdata = (UINT16*)memory_region(machine, REGION_USER1);
 			UINT16 addr = get_tx1_datarom_addr();
 			math.retval = romdata[addr];
 		}
@@ -741,7 +741,7 @@ READ16_HANDLER( tx1_math_r )
 			if ( math.mux != TX1_SEL_ILDEN )
 			{
 				INC_PROM_ADDR;
-				tx1_update_state();
+				tx1_update_state(machine);
 
 				// MUST RETURN HERE?
 				return math.retval;
@@ -760,12 +760,12 @@ READ16_HANDLER( tx1_math_r )
 	if ( offset & TX1_INSLD )
 	{
 	    math.promaddr = (offset << 2) & 0x1ff;
-		tx1_update_state();
+		tx1_update_state(machine);
 	}
 	else if ( offset & TX1_CNTST )
 	{
 	    INC_PROM_ADDR;
-		tx1_update_state();
+		tx1_update_state(machine);
 	}
 
 	return math.retval;
@@ -849,18 +849,18 @@ WRITE16_HANDLER( tx1_math_w )
 	if ( offset & TX1_INSLD )
 	{
 	    math.promaddr = (offset << 2) & 0x1ff;
-		tx1_update_state();
+		tx1_update_state(machine);
 	}
 	else if ( offset & TX1_CNTST )
 	{
 	    INC_PROM_ADDR;
-		tx1_update_state();
+		tx1_update_state(machine);
 	}
 }
 
 READ16_HANDLER( tx1_spcs_rom_r )
 {
-	math.cpulatch = *(UINT16*)((UINT8*)memory_region(REGION_CPU2) + 0xfc000 + 0x1000 + offset*2);
+	math.cpulatch = *(UINT16*)((UINT8*)memory_region(machine, REGION_CPU2) + 0xfc000 + 0x1000 + offset*2);
 
 	if ( math.mux == TX1_SEL_ILDEN )
 	{
@@ -913,7 +913,7 @@ READ16_HANDLER( tx1_spcs_rom_r )
 	if ( math.mux != TX1_SEL_ILDEN )
 	{
 	    INC_PROM_ADDR;
-		tx1_update_state();
+		tx1_update_state(machine);
 	}
 
 	return math.cpulatch;
@@ -975,7 +975,7 @@ READ16_HANDLER( tx1_spcs_ram_r )
 	if ( math.mux != TX1_SEL_ILDEN )
 	{
 	    INC_PROM_ADDR;
-		tx1_update_state();
+		tx1_update_state(machine);
 	}
 
 	return math.cpulatch;
@@ -1031,7 +1031,7 @@ INLINE UINT16 get_bb_datarom_addr(void)
 	return addr & 0x3fff;
 }
 
-static void buggyboy_update_state(void)
+static void buggyboy_update_state(running_machine *machine)
 {
 #define LHIEN(a)	!(a & 0x80)
 #define LLOEN(a)	!(a & 0x40)
@@ -1068,7 +1068,7 @@ static void buggyboy_update_state(void)
 
 			if ( math.mux == BB_MUX_DPROE )
 			{
-				UINT16 *romdata = (UINT16*)memory_region(REGION_USER1);
+				UINT16 *romdata = (UINT16*)memory_region(machine, REGION_USER1);
 				UINT16 addr = get_bb_datarom_addr();
 				kick_sn74s516(&romdata[addr], ins);
 			}
@@ -1183,7 +1183,7 @@ READ16_HANDLER( buggyboy_math_r )
 	/* /DPROE */
 	else if ( (offset & 0xc00) == 0xc00 )
 	{
-		UINT16 *romdata = (UINT16*)memory_region(REGION_USER1);
+		UINT16 *romdata = (UINT16*)memory_region(machine, REGION_USER1);
 		UINT16 addr = get_bb_datarom_addr();
 
 		math.retval = romdata[addr];
@@ -1198,7 +1198,7 @@ READ16_HANDLER( buggyboy_math_r )
 			if ( math.mux != BB_MUX_ILDEN )
 			{
 				INC_PROM_ADDR;
-				buggyboy_update_state();
+				buggyboy_update_state(machine);
 			}
 		}
 	}
@@ -1214,12 +1214,12 @@ READ16_HANDLER( buggyboy_math_r )
 	if ( offset & BB_INSLD )
 	{
 	    math.promaddr = (offset << 2) & 0x1ff;
-		buggyboy_update_state();
+		buggyboy_update_state(machine);
 	}
 	else if ( offset & BB_CNTST )
 	{
 	    INC_PROM_ADDR;
-		buggyboy_update_state();
+		buggyboy_update_state(machine);
 	}
 
 	return math.retval;
@@ -1300,12 +1300,12 @@ WRITE16_HANDLER( buggyboy_math_w )
 	if ( offset & BB_INSLD )
 	{
 	    math.promaddr = (offset << 2) & 0x1ff;
-		buggyboy_update_state();
+		buggyboy_update_state(machine);
 	}
 	else if ( offset & BB_CNTST )
 	{
 	    INC_PROM_ADDR;
-		buggyboy_update_state();
+		buggyboy_update_state(machine);
 	}
 }
 
@@ -1314,7 +1314,7 @@ WRITE16_HANDLER( buggyboy_math_w )
 */
 READ16_HANDLER( buggyboy_spcs_rom_r )
 {
-	math.cpulatch = *(UINT16*)((UINT8*)memory_region(REGION_CPU2) + 0xfc000 + 0x1000 + offset*2);
+	math.cpulatch = *(UINT16*)((UINT8*)memory_region(machine, REGION_CPU2) + 0xfc000 + 0x1000 + offset*2);
 
 	if ( math.mux == BB_MUX_ILDEN )
 	{
@@ -1367,7 +1367,7 @@ READ16_HANDLER( buggyboy_spcs_rom_r )
 	if ( math.mux != BB_MUX_ILDEN )
 	{
 	    INC_PROM_ADDR;
-		buggyboy_update_state();
+		buggyboy_update_state(machine);
 	}
 
 	return math.cpulatch;
@@ -1435,7 +1435,7 @@ READ16_HANDLER( buggyboy_spcs_ram_r )
 	if ( math.mux != BB_MUX_ILDEN )
 	{
 	    INC_PROM_ADDR;
-		buggyboy_update_state();
+		buggyboy_update_state(machine);
 	}
 
 	return math.cpulatch;
@@ -1473,7 +1473,7 @@ MACHINE_RESET( tx1 )
 MACHINE_START( tx1 )
 {
 	/* Initialise for each game */
-	prom = (UINT16*)memory_region(REGION_USER1) + (0x8000 >> 1);
+	prom = (UINT16*)memory_region(machine, REGION_USER1) + (0x8000 >> 1);
 
 	/* set a timer to run the interrupts */
 	interrupt_timer = timer_alloc(interrupt_callback, NULL);
@@ -1485,7 +1485,7 @@ MACHINE_START( tx1 )
 MACHINE_START( buggyboy )
 {
 	/* Initialise for each game */
-	prom = (UINT16*)memory_region(REGION_USER1) + (0x8000 >> 1);
+	prom = (UINT16*)memory_region(machine, REGION_USER1) + (0x8000 >> 1);
 
 	/* set a timer to run the interrupts */
 	interrupt_timer = timer_alloc(interrupt_callback, NULL);
@@ -1497,7 +1497,7 @@ MACHINE_START( buggyboy )
 MACHINE_START( buggybjr )
 {
 	/* Initialise for each game */
-	prom = (UINT16*)memory_region(REGION_USER1) + (0x8000 >> 1);
+	prom = (UINT16*)memory_region(machine, REGION_USER1) + (0x8000 >> 1);
 
 	/* set a timer to run the interrupts */
 	interrupt_timer = timer_alloc(interrupt_callback, NULL);

@@ -218,11 +218,11 @@ static const UINT8 sdwx_tab[] =
 	0x12,0x56,0x97,0x26,0x1D,0x5F,0xA7,0xF8,0x89,0x3F,0x14,0x36,0x72,0x3B,0x48,0x7B,
 	0xF1,0xED,0x72,0xB7,0x7A,0x56,0x05,0xDE,0x7B,0x27,0x6D,0xCF,0x33,0x4C,0x14,0x86,
 };
-static void sdwx_decrypt(void)
+static void sdwx_decrypt(running_machine *machine)
 {
 
 	int i;
-	UINT16 *src = (UINT16 *) memory_region(REGION_USER1);
+	UINT16 *src = (UINT16 *) memory_region(machine, REGION_USER1);
 
 	int rom_size = 0x80000;
 
@@ -263,11 +263,11 @@ static void sdwx_decrypt(void)
 
 
 
-static void sdwx_gfx_decrypt(void)
+static void sdwx_gfx_decrypt(running_machine *machine)
 {
 	int i;
 	unsigned rom_size = 0x80000;
-	UINT8 *src = (UINT8 *) (memory_region(REGION_GFX1));
+	UINT8 *src = (UINT8 *) (memory_region(machine, REGION_GFX1));
 	UINT8 *result_data = malloc_or_die(rom_size);
 
 	for (i=0; i<rom_size; i++)
@@ -395,8 +395,8 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( sdwx )
 {
-	sdwx_decrypt();
-	sdwx_gfx_decrypt();
+	sdwx_decrypt(machine);
+	sdwx_gfx_decrypt(machine);
 	logerror("init OK!\n");
 }
 

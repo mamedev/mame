@@ -573,7 +573,7 @@ static WRITE8_HANDLER( key_type3_w )
 
 WRITE8_HANDLER( namcos1_sound_bankswitch_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU3) + 0xc000;
+	UINT8 *rom = memory_region(machine, REGION_CPU3) + 0xc000;
 
 	int bank = (data & 0x70) >> 4;
 	memory_set_bankptr(17,rom + 0x4000 * bank);
@@ -787,7 +787,7 @@ static void namcos1_install_bank(int start,int end,read8_machine_func hr,write8_
 
 
 
-static void namcos1_build_banks(read8_machine_func key_r,write8_machine_func key_w)
+static void namcos1_build_banks(running_machine *machine,read8_machine_func key_r,write8_machine_func key_w)
 {
 	int i;
 
@@ -833,7 +833,7 @@ static void namcos1_build_banks(read8_machine_func key_r,write8_machine_func key
 
 	/* PRG0-PRG7 */
 	{
-		UINT8 *rom = memory_region(REGION_USER1);
+		UINT8 *rom = memory_region(machine, REGION_USER1);
 
 		namcos1_install_bank(0x200,0x3ff,0,rom_w,0,rom);
 
@@ -924,7 +924,7 @@ WRITE8_HANDLER( namcos1_mcu_bankswitch_w )
 	/* bit 0-1 : address line A15-A16 */
 	addr += (data & 3) * 0x8000;
 
-	memory_set_bankptr(20, memory_region(REGION_CPU4) + addr);
+	memory_set_bankptr(20, memory_region(machine, REGION_CPU4) + addr);
 }
 
 
@@ -970,7 +970,7 @@ struct namcos1_specific
 	int key_reg6;
 };
 
-static void namcos1_driver_init(const struct namcos1_specific *specific )
+static void namcos1_driver_init( running_machine *machine, const struct namcos1_specific *specific )
 {
 	static const struct namcos1_specific no_key =
 	{
@@ -1004,7 +1004,7 @@ static void namcos1_driver_init(const struct namcos1_specific *specific )
 	memory_set_bankptr( 19, namcos1_triram );
 
 	/* build bank elements */
-	namcos1_build_banks(specific->key_r,specific->key_w);
+	namcos1_build_banks(machine,specific->key_r,specific->key_w);
 }
 
 
@@ -1013,7 +1013,7 @@ static void namcos1_driver_init(const struct namcos1_specific *specific )
 *******************************************************************************/
 DRIVER_INIT( shadowld )
 {
-	namcos1_driver_init(NULL);
+	namcos1_driver_init(machine, NULL);
 }
 
 /*******************************************************************************
@@ -1025,7 +1025,7 @@ DRIVER_INIT( dspirit )
 	{
 		key_type1_r,key_type1_w, 0x36
 	};
-	namcos1_driver_init(&dspirit_specific);
+	namcos1_driver_init(machine, &dspirit_specific);
 }
 
 /*******************************************************************************
@@ -1037,7 +1037,7 @@ DRIVER_INIT( wldcourt )
 	{
 		key_type1_r,key_type1_w, 0x35
 	};
-	namcos1_driver_init(&worldcourt_specific);
+	namcos1_driver_init(machine, &worldcourt_specific);
 }
 
 /*******************************************************************************
@@ -1049,7 +1049,7 @@ DRIVER_INIT( blazer )
 	{
 		key_type1_r,key_type1_w, 0x13
 	};
-	namcos1_driver_init(&blazer_specific);
+	namcos1_driver_init(machine, &blazer_specific);
 }
 
 /*******************************************************************************
@@ -1061,7 +1061,7 @@ DRIVER_INIT( puzlclub )
 	{
 		key_type1_r,key_type1_w, 0x35
 	};
-	namcos1_driver_init(&puzlclub_specific);
+	namcos1_driver_init(machine, &puzlclub_specific);
 }
 
 /*******************************************************************************
@@ -1073,7 +1073,7 @@ DRIVER_INIT( pacmania )
 	{
 		key_type2_r,key_type2_w, 0x12
 	};
-	namcos1_driver_init(&pacmania_specific);
+	namcos1_driver_init(machine, &pacmania_specific);
 }
 
 /*******************************************************************************
@@ -1085,7 +1085,7 @@ DRIVER_INIT( alice )
 	{
 		key_type2_r,key_type2_w, 0x25
 	};
-	namcos1_driver_init(&alice_specific);
+	namcos1_driver_init(machine, &alice_specific);
 }
 
 /*******************************************************************************
@@ -1097,7 +1097,7 @@ DRIVER_INIT( galaga88 )
 	{
 		key_type2_r,key_type2_w, 0x31
 	};
-	namcos1_driver_init(&galaga88_specific);
+	namcos1_driver_init(machine, &galaga88_specific);
 }
 
 /*******************************************************************************
@@ -1109,7 +1109,7 @@ DRIVER_INIT( ws )
 	{
 		key_type2_r,key_type2_w, 0x07
 	};
-	namcos1_driver_init(&ws_specific);
+	namcos1_driver_init(machine, &ws_specific);
 }
 
 /*******************************************************************************
@@ -1121,7 +1121,7 @@ DRIVER_INIT( bakutotu )
 	{
 		key_type2_r,key_type2_w, 0x22
 	};
-	namcos1_driver_init(&bakutotu_specific);
+	namcos1_driver_init(machine, &bakutotu_specific);
 
 #if 0
 	// resolves CPU deadlocks caused by sloppy coding(see driver\namcos1.c)
@@ -1129,7 +1129,7 @@ DRIVER_INIT( bakutotu )
 		static const UINT8 target[8] = {0x34,0x37,0x35,0x37,0x96,0x00,0x2e,0xed};
 		UINT8 *rombase, *srcptr, *endptr, *scanptr;
 
-		rombase = memory_region(REGION_USER1);
+		rombase = memory_region(machine, REGION_USER1);
 		srcptr = rombase + 0x1e000;
 		endptr = srcptr + 0xa000;
 
@@ -1159,7 +1159,7 @@ DRIVER_INIT( splatter )
 		key_type3_r,key_type3_w, 181, 3, 4,-1,-1,-1,-1
 	};
 
-	namcos1_driver_init(&splatter_specific);
+	namcos1_driver_init(machine, &splatter_specific);
 }
 
 /*******************************************************************************
@@ -1171,7 +1171,7 @@ DRIVER_INIT( rompers )
 	{
 		key_type3_r,key_type3_w, 182, 7,-1,-1,-1,-1,-1
 	};
-	namcos1_driver_init(&rompers_specific);
+	namcos1_driver_init(machine, &rompers_specific);
 }
 
 /*******************************************************************************
@@ -1183,7 +1183,7 @@ DRIVER_INIT( blastoff )
 	{
 		key_type3_r,key_type3_w, 183, 0, 7, 3, 5,-1,-1
 	};
-	namcos1_driver_init(&blastoff_specific);
+	namcos1_driver_init(machine, &blastoff_specific);
 }
 
 /*******************************************************************************
@@ -1195,7 +1195,7 @@ DRIVER_INIT( ws89 )
 	{
 		key_type3_r,key_type3_w, 184, 2,-1,-1,-1,-1,-1
 	};
-	namcos1_driver_init(&ws89_specific);
+	namcos1_driver_init(machine, &ws89_specific);
 }
 
 /*******************************************************************************
@@ -1207,7 +1207,7 @@ DRIVER_INIT( tankfrce )
 	{
 		key_type3_r,key_type3_w, 185, 5,-1, 1,-1, 2,-1
 	};
-	namcos1_driver_init(&tankfrce_specific);
+	namcos1_driver_init(machine, &tankfrce_specific);
 }
 
 // Inputs are multiplexed, somehow
@@ -1233,7 +1233,7 @@ DRIVER_INIT( tankfrc4 )
 	{
 		key_type3_r,key_type3_w, 185, 5,-1, 1,-1, 2,-1
 	};
-	namcos1_driver_init(&tankfrce_specific);
+	namcos1_driver_init(machine, &tankfrce_specific);
 
 	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x1400, 0x1401, 0, 0, tankfrc4_input_r);
 }
@@ -1247,7 +1247,7 @@ DRIVER_INIT( dangseed )
 	{
 		key_type3_r,key_type3_w, 308, 6,-1, 5,-1, 0, 4
 	};
-	namcos1_driver_init(&dangseed_specific);
+	namcos1_driver_init(machine, &dangseed_specific);
 }
 
 /*******************************************************************************
@@ -1259,7 +1259,7 @@ DRIVER_INIT( pistoldm )
 	{
 		key_type3_r,key_type3_w, 309, 1, 2, 0,-1, 4,-1
 	};
-	namcos1_driver_init(&pistoldm_specific);
+	namcos1_driver_init(machine, &pistoldm_specific);
 }
 
 /*******************************************************************************
@@ -1271,7 +1271,7 @@ DRIVER_INIT( ws90 )
 	{
 		key_type3_r,key_type3_w, 310, 4,-1, 7,-1, 3,-1
 	};
-	namcos1_driver_init(&ws90_specific);
+	namcos1_driver_init(machine, &ws90_specific);
 }
 
 /*******************************************************************************
@@ -1283,7 +1283,7 @@ DRIVER_INIT( soukobdx )
 	{
 		key_type3_r,key_type3_w, 311, 2, 3/*?*/, 0,-1, 4,-1
 	};
-	namcos1_driver_init(&soukobdx_specific);
+	namcos1_driver_init(machine, &soukobdx_specific);
 }
 
 
@@ -1325,7 +1325,7 @@ static READ8_HANDLER( quester_paddle_r )
 
 DRIVER_INIT( quester )
 {
-	namcos1_driver_init(NULL);
+	namcos1_driver_init(machine, NULL);
 	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x1400, 0x1401, 0, 0, quester_paddle_r);
 }
 
@@ -1414,7 +1414,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 
 DRIVER_INIT( berabohm )
 {
-	namcos1_driver_init(NULL);
+	namcos1_driver_init(machine, NULL);
 	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x1400, 0x1401, 0, 0, berabohm_buttons_r);
 }
 
@@ -1476,6 +1476,6 @@ static READ8_HANDLER( faceoff_inputs_r )
 
 DRIVER_INIT( faceoff )
 {
-	namcos1_driver_init(NULL);
+	namcos1_driver_init(machine, NULL);
 	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x1400, 0x1401, 0, 0, faceoff_inputs_r);
 }

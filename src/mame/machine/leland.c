@@ -397,13 +397,13 @@ MACHINE_RESET( leland )
 	alternate_bank = 0;
 
 	/* initialize the master banks */
-	master_length = memory_region_length(REGION_CPU1);
-	master_base = memory_region(REGION_CPU1);
+	master_length = memory_region_length(machine, REGION_CPU1);
+	master_base = memory_region(machine, REGION_CPU1);
 	(*leland_update_master_bank)();
 
 	/* initialize the slave banks */
-	slave_length = memory_region_length(REGION_CPU2);
-	slave_base = memory_region(REGION_CPU2);
+	slave_length = memory_region_length(machine, REGION_CPU2);
+	slave_base = memory_region(machine, REGION_CPU2);
 	if (slave_length > 0x10000)
 		memory_set_bankptr(3, &slave_base[0x10000]);
 
@@ -430,8 +430,8 @@ MACHINE_RESET( ataxx )
 	timer_adjust_oneshot(master_int_timer, video_screen_get_time_until_pos(machine->primary_screen, 8, 0), 8);
 
 	/* initialize the XROM */
-	xrom_length = memory_region_length(REGION_USER1);
-	xrom_base = memory_region(REGION_USER1);
+	xrom_length = memory_region_length(machine, REGION_USER1);
+	xrom_base = memory_region(machine, REGION_USER1);
 	xrom1_addr = 0;
 	xrom2_addr = 0;
 
@@ -445,13 +445,13 @@ MACHINE_RESET( ataxx )
 	master_bank = 0;
 
 	/* initialize the master banks */
-	master_length = memory_region_length(REGION_CPU1);
-	master_base = memory_region(REGION_CPU1);
+	master_length = memory_region_length(machine, REGION_CPU1);
+	master_base = memory_region(machine, REGION_CPU1);
 	ataxx_bankswitch();
 
 	/* initialize the slave banks */
-	slave_length = memory_region_length(REGION_CPU2);
-	slave_base = memory_region(REGION_CPU2);
+	slave_length = memory_region_length(machine, REGION_CPU2);
+	slave_base = memory_region(machine, REGION_CPU2);
 	if (slave_length > 0x10000)
 		memory_set_bankptr(3, &slave_base[0x10000]);
 
@@ -1475,11 +1475,11 @@ READ8_HANDLER( leland_raster_r )
  *************************************/
 
 /* also called by Ataxx */
-void leland_rotate_memory(int cpunum)
+void leland_rotate_memory(running_machine *machine, int cpunum)
 {
 	int startaddr = 0x10000;
-	int banks = (memory_region_length(REGION_CPU1 + cpunum) - startaddr) / 0x8000;
-	UINT8 *ram = memory_region(REGION_CPU1 + cpunum);
+	int banks = (memory_region_length(machine, REGION_CPU1 + cpunum) - startaddr) / 0x8000;
+	UINT8 *ram = memory_region(machine, REGION_CPU1 + cpunum);
 	UINT8 temp[0x2000];
 	int i;
 

@@ -791,12 +791,12 @@ static DRIVER_INIT( gypsyjug )
 		0x01,0x80, 0x03,0xc0, 0x03,0xc0, 0x01,0x80
 	};
 	int i;
-	UINT8 *gfx2 = memory_region(REGION_GFX2);
-	UINT8 *gfx3 = memory_region(REGION_GFX3);
-	UINT8 *gfx4 = memory_region(REGION_GFX4);
-	UINT8 *gfx5 = memory_region(REGION_GFX5);
-	int len3 = memory_region_length(REGION_GFX3);
-	int len4 = memory_region_length(REGION_GFX4);
+	UINT8 *gfx2 = memory_region(machine, REGION_GFX2);
+	UINT8 *gfx3 = memory_region(machine, REGION_GFX3);
+	UINT8 *gfx4 = memory_region(machine, REGION_GFX4);
+	UINT8 *gfx5 = memory_region(machine, REGION_GFX5);
+	int len3 = memory_region_length(machine, REGION_GFX3);
+	int len4 = memory_region_length(machine, REGION_GFX4);
 
 	memcpy(gfx3,gfx2,len3);
 
@@ -815,8 +815,8 @@ static DRIVER_INIT( minferno )
 	UINT8 *mem;
 
 	/* create an inverted copy of the graphics data */
-	mem = memory_region(REGION_GFX1);
-	length = memory_region_length(REGION_GFX1);
+	mem = memory_region(machine, REGION_GFX1);
+	length = memory_region_length(machine, REGION_GFX1);
 	for (i = 0; i < length/2; i++)
 		mem[i] = ~mem[i + length/2];
 }

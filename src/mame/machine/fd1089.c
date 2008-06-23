@@ -7571,10 +7571,10 @@ static UINT16 fd1089_decrypt(offs_t addr,UINT16 val,const UINT8 *key,int opcode,
 
 static UINT16 *decrypted;
 
-static void sys16_decrypt(const UINT8 *key,int cputype)
+static void sys16_decrypt(running_machine *machine, const UINT8 *key,int cputype)
 {
-	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
-	int size = memory_region_length(REGION_CPU1);
+	UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
+	int size = memory_region_length(machine, REGION_CPU1);
 	int A;
 	decrypted = (UINT16 *)auto_malloc(size);
 
@@ -7599,73 +7599,73 @@ void *fd1089_get_decrypted_base(void)
 
 
 
-void fd1089_decrypt_0013A(void)
+void fd1089_decrypt_0013A(running_machine *machine)
 {
-	sys16_decrypt(key_0013A,FD1089B);
+	sys16_decrypt(machine, key_0013A,FD1089B);
 }
 
-void fd1089_decrypt_0018(void)
+void fd1089_decrypt_0018(running_machine *machine)
 {
-	sys16_decrypt(key_0018,FD1089A);
+	sys16_decrypt(machine, key_0018,FD1089A);
 }
 
-void fd1089_decrypt_0021(void)
+void fd1089_decrypt_0021(running_machine *machine)
 {
-	sys16_decrypt(key_0021,FD1089A);
+	sys16_decrypt(machine, key_0021,FD1089A);
 }
 
-void fd1089_decrypt_0022(void)
+void fd1089_decrypt_0022(running_machine *machine)
 {
-	sys16_decrypt(key_0022,FD1089A);
+	sys16_decrypt(machine, key_0022,FD1089A);
 }
 
-void fd1089_decrypt_0024(void)
+void fd1089_decrypt_0024(running_machine *machine)
 {
-	sys16_decrypt(key_0024,FD1089B);
+	sys16_decrypt(machine, key_0024,FD1089B);
 }
 
-void fd1089_decrypt_0027(void)
+void fd1089_decrypt_0027(running_machine *machine)
 {
-	sys16_decrypt(key_0027,FD1089B);
+	sys16_decrypt(machine, key_0027,FD1089B);
 }
 
-void fd1089_decrypt_0028(void)
+void fd1089_decrypt_0028(running_machine *machine)
 {
-	sys16_decrypt(key_0028,FD1089A);
+	sys16_decrypt(machine, key_0028,FD1089A);
 }
 
-void fd1089_decrypt_0033(void)
+void fd1089_decrypt_0033(running_machine *machine)
 {
-	sys16_decrypt(key_0033,FD1089A);
+	sys16_decrypt(machine, key_0033,FD1089A);
 }
 
-void fd1089_decrypt_0034(void)
+void fd1089_decrypt_0034(running_machine *machine)
 {
-	sys16_decrypt(key_0034,FD1089B);
+	sys16_decrypt(machine, key_0034,FD1089B);
 }
 
-void fd1089_decrypt_0037(void)
+void fd1089_decrypt_0037(running_machine *machine)
 {
-	sys16_decrypt(key_0037,FD1089B);
+	sys16_decrypt(machine, key_0037,FD1089B);
 }
 
-void fd1089_decrypt_0167(void)
+void fd1089_decrypt_0167(running_machine *machine)
 {
-	sys16_decrypt(key_0167,FD1089A);
+	sys16_decrypt(machine, key_0167,FD1089A);
 }
 
-void fd1089_decrypt_0168(void)
+void fd1089_decrypt_0168(running_machine *machine)
 {
-	sys16_decrypt(key_0168,FD1089B);
+	sys16_decrypt(machine, key_0168,FD1089B);
 }
 
-void fd1089_decrypt_5021(void)
+void fd1089_decrypt_5021(running_machine *machine)
 {
-	sys16_decrypt(key_5021,FD1089B);
+	sys16_decrypt(machine, key_5021,FD1089B);
 }
 
-void fd1089_decrypt_wb35(void)
+void fd1089_decrypt_wb35(running_machine *machine)
 {
-	sys16_decrypt(key_wb35,FD1089A);
+	sys16_decrypt(machine, key_wb35,FD1089A);
 }
 

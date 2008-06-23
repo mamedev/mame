@@ -14,8 +14,8 @@ static int poolshrk_da_latch;
 
 static DRIVER_INIT( poolshrk )
 {
-	UINT8* pSprite = memory_region(REGION_GFX1);
-	UINT8* pOffset = memory_region(REGION_PROMS);
+	UINT8* pSprite = memory_region(machine, REGION_GFX1);
+	UINT8* pOffset = memory_region(machine, REGION_PROMS);
 
 	int i;
 	int j;

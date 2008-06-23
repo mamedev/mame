@@ -220,7 +220,7 @@ MACHINE_RESET( vertigo )
 		TTL74148_input_line_w(0, i, 1);
 
 	TTL74148_update(0);
-	vertigo_vproc_init();
+	vertigo_vproc_init(machine);
 
 	irq4_time = timer_get_time();
 	irq_state = 7;

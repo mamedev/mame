@@ -303,7 +303,7 @@ static WRITE8_HANDLER(writeA)
 
 static WRITE8_HANDLER(writeB)
 {
-	memory_set_bankptr(4, memory_region(REGION_SOUND1) + ((data & 0xf) * 0x8000));
+	memory_set_bankptr(4, memory_region(machine, REGION_SOUND1) + ((data & 0xf) * 0x8000));
 }
 
 static void ashnojoe_adpcm_int (running_machine *machine, int data)
@@ -332,7 +332,7 @@ static const struct YM2203interface ym2203_interface =
 
 static DRIVER_INIT( ashnojoe )
 {
-	memory_set_bankptr(4, memory_region(REGION_SOUND1));
+	memory_set_bankptr(4, memory_region(machine, REGION_SOUND1));
 }
 
 static MACHINE_DRIVER_START( ashnojoe )

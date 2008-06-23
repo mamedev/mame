@@ -153,7 +153,7 @@ this is the data written to internal ram on startup:
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int offs;
 
 	/* bit 0 = RAM bank? */
@@ -649,8 +649,8 @@ static void gfx_untangle(void)
 
 static DRIVER_INIT( spy )
 {
-	paletteram = &memory_region(REGION_CPU1)[0x28000];
-	pmcram =     &memory_region(REGION_CPU1)[0x28800];
+	paletteram = &memory_region(machine, REGION_CPU1)[0x28000];
+	pmcram =     &memory_region(machine, REGION_CPU1)[0x28800];
 	gfx_untangle();
 }
 

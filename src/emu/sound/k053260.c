@@ -5,6 +5,7 @@
 *********************************************************/
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
 #include "k053260.h"
@@ -206,8 +207,8 @@ static void *k053260_start(int sndindex, int clock, const void *config)
 	ic->intf = config;
 
 	ic->mode = 0;
-	ic->rom = memory_region(ic->intf->region);
-	ic->rom_size = memory_region_length(ic->intf->region) - 1;
+	ic->rom = memory_region(Machine, ic->intf->region);
+	ic->rom_size = memory_region_length(Machine, ic->intf->region) - 1;
 
 	K053260_reset( ic );
 

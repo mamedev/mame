@@ -223,7 +223,7 @@ static WRITE16_HANDLER( galsnew_6295_bankswitch_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = memory_region(REGION_SOUND1);
+		UINT8 *rom = memory_region(machine, REGION_SOUND1);
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 	}
 }
@@ -344,8 +344,8 @@ MACHINE_DRIVER_END
 /* the tile roms seem lineswapped.. but I don't know how to descramble them yet */
 static DRIVER_INIT(galsnew)
 {
-	UINT8 *src    = memory_region       ( REGION_GFX3 );
-	UINT8 *dst    = memory_region       ( REGION_GFX2 );
+	UINT8 *src    = memory_region       ( machine, REGION_GFX3 );
+	UINT8 *dst    = memory_region       ( machine, REGION_GFX2 );
 	int x;
 
 	for (x=0; x<0x200000;x++)

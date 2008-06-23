@@ -26,6 +26,7 @@
 ***************************************************************************/
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "k005289.h"
 
@@ -172,7 +173,7 @@ static void *k005289_start(int sndindex, int clock, const void *config)
 	if (make_mixer_table(info, 2))
 		return NULL;
 
-	info->sound_prom = memory_region(intf->region);
+	info->sound_prom = memory_region(Machine, intf->region);
 
 	/* reset all the voices */
 	voice[0].frequency = 0;

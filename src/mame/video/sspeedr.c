@@ -93,9 +93,9 @@ WRITE8_HANDLER( sspeedr_track_ice_w )
 }
 
 
-static void draw_track(bitmap_t* bitmap)
+static void draw_track(running_machine *machine, bitmap_t* bitmap)
 {
-	const UINT8* p = memory_region(REGION_GFX3);
+	const UINT8* p = memory_region(machine, REGION_GFX3);
 
 	int x;
 	int y;
@@ -259,7 +259,7 @@ VIDEO_START( sspeedr )
 
 VIDEO_UPDATE( sspeedr )
 {
-	draw_track(bitmap);
+	draw_track(screen->machine, bitmap);
 	draw_drones(screen->machine, bitmap, cliprect);
 	draw_driver(screen->machine, bitmap, cliprect);
 	return 0;

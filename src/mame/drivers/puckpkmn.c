@@ -269,14 +269,14 @@ Screenshots available on my site at http://unemulated.emuunlim.com (under PCB Sh
 
 static DRIVER_INIT( puckpkmn )
 {
-	UINT8 *rom	=	memory_region(REGION_CPU1);
-	size_t len		=	memory_region_length(REGION_CPU1);
+	UINT8 *rom	=	memory_region(machine, REGION_CPU1);
+	size_t len		=	memory_region_length(machine, REGION_CPU1);
 	int i;
 
 	for (i = 0; i < len; i++)
 		rom[i] = BITSWAP8(rom[i],1,4,2,0,7,5,3,6);
 
-	memory_set_bankptr(1, memory_region(REGION_CPU1) );	// VDP reads the roms from here
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) );	// VDP reads the roms from here
 	memory_set_bankptr(2, main_ram );						// VDP reads the ram from here
 }
 

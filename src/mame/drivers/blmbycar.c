@@ -56,7 +56,7 @@ static WRITE16_HANDLER( blmbycar_okibank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *RAM = memory_region(REGION_SOUND1);
+		UINT8 *RAM = memory_region(machine, REGION_SOUND1);
 		memcpy(&RAM[0x30000],&RAM[0x40000 + 0x10000*(data & 0xf)],0x10000);
 	}
 }
@@ -532,8 +532,8 @@ ROM_END
 
 static DRIVER_INIT( blmbycar )
 {
-	UINT16 *RAM  = (UINT16 *) memory_region(REGION_CPU1);
-	size_t    size = memory_region_length(REGION_CPU1) / 2;
+	UINT16 *RAM  = (UINT16 *) memory_region(machine, REGION_CPU1);
+	size_t    size = memory_region_length(machine, REGION_CPU1) / 2;
 	int i;
 
 	for (i = 0; i < size; i++)

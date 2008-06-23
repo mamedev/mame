@@ -207,7 +207,7 @@ VIDEO_UPDATE( gladiatr );
 /*Rom bankswitching*/
 static WRITE8_HANDLER( gladiatr_bankswitch_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU1) + 0x10000;
+	UINT8 *rom = memory_region(machine, REGION_CPU1) + 0x10000;
 
 	memory_set_bankptr(1, rom + 0x6000 * (data & 0x01));
 }
@@ -269,7 +269,7 @@ static MACHINE_RESET( gladiator )
 	TAITO8741_start(&gsword_8741interface);
 	/* 6809 bank memory set */
 	{
-		UINT8 *rom = memory_region(REGION_CPU3) + 0x10000;
+		UINT8 *rom = memory_region(machine, REGION_CPU3) + 0x10000;
 		memory_set_bankptr(2,rom);
 	}
 }
@@ -296,7 +296,7 @@ static void gladiator_ym_irq(running_machine *machine, int irq)
 /*Sound Functions*/
 static WRITE8_HANDLER( glad_adpcm_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU3) + 0x10000;
+	UINT8 *rom = memory_region(machine, REGION_CPU3) + 0x10000;
 
 	/* bit6 = bank offset */
 	memory_set_bankptr(2,rom + ((data & 0x40) ? 0xc000 : 0));
@@ -980,7 +980,7 @@ static DRIVER_INIT( gladiatr )
 	UINT8 *rom;
 	int i,j;
 
-	rom = memory_region(REGION_GFX2);
+	rom = memory_region(machine, REGION_GFX2);
 	// unpack 3bpp graphics
 	for (j = 3; j >= 0; j--)
 	{
@@ -994,7 +994,7 @@ static DRIVER_INIT( gladiatr )
 	swap_block(rom + 0x14000, rom + 0x18000, 0x4000);
 
 
-	rom = memory_region(REGION_GFX3);
+	rom = memory_region(machine, REGION_GFX3);
 	// unpack 3bpp graphics
 	for (j = 5; j >= 0; j--)
 	{
@@ -1025,14 +1025,14 @@ static DRIVER_INIT(ppking)
 	UINT8 *rom;
 	int i,j;
 
-	rom = memory_region(REGION_GFX2);
+	rom = memory_region(machine, REGION_GFX2);
 	// unpack 3bpp graphics
 	for (i = 0; i < 0x2000; i++)
 	{
 		rom[i+0x2000] = rom[i] >> 4;
 	}
 
-	rom = memory_region(REGION_GFX3);
+	rom = memory_region(machine, REGION_GFX3);
 	// unpack 3bpp graphics
 	for (j = 1; j >= 0; j--)
 	{

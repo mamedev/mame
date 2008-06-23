@@ -166,7 +166,7 @@ PALETTE_INIT( arabian )
 
 VIDEO_START( arabian )
 {
-	UINT8 *gfxbase = memory_region(REGION_GFX1);
+	UINT8 *gfxbase = memory_region(machine, REGION_GFX1);
 	int offs;
 
 	/* allocate a common bitmap to use for both planes */

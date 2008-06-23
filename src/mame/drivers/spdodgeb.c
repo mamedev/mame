@@ -92,7 +92,7 @@ static void spd_adpcm_int(running_machine *machine, int chip)
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(REGION_SOUND1) + 0x10000 * chip;
+		UINT8 *ROM = memory_region(machine, REGION_SOUND1) + 0x10000 * chip;
 
 		adpcm_data[chip] = ROM[adpcm_pos[chip]++];
 		MSM5205_data_w(chip,adpcm_data[chip] >> 4);

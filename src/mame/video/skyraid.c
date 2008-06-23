@@ -40,9 +40,9 @@ static void draw_text(running_machine *machine, bitmap_t* bitmap, const rectangl
 }
 
 
-static void draw_terrain(bitmap_t* bitmap, const rectangle *cliprect)
+static void draw_terrain(running_machine *machine, bitmap_t* bitmap, const rectangle *cliprect)
 {
-	const UINT8* p = memory_region(REGION_USER1);
+	const UINT8* p = memory_region(machine, REGION_USER1);
 
 	int x;
 	int y;
@@ -118,9 +118,9 @@ static void draw_missiles(running_machine *machine, bitmap_t* bitmap, const rect
 }
 
 
-static void draw_trapezoid(bitmap_t* dst, bitmap_t* src)
+static void draw_trapezoid(running_machine *machine, bitmap_t* dst, bitmap_t* src)
 {
-	const UINT8* p = memory_region(REGION_USER2);
+	const UINT8* p = memory_region(machine, REGION_USER2);
 
 	int x;
 	int y;
@@ -143,10 +143,10 @@ VIDEO_UPDATE( skyraid )
 {
 	fillbitmap(bitmap, 0, cliprect);
 
-	draw_terrain(helper, cliprect);
+	draw_terrain(screen->machine, helper, cliprect);
 	draw_sprites(screen->machine, helper, cliprect);
 	draw_missiles(screen->machine, helper, cliprect);
-	draw_trapezoid(bitmap, helper);
+	draw_trapezoid(screen->machine, bitmap, helper);
 	draw_text(screen->machine, bitmap, cliprect);
 	return 0;
 }

@@ -63,7 +63,7 @@ VIDEO_START( tail2nos )
 
 	K051316_wraparound_enable(0,1);
 	K051316_set_offset(0,-89,-14);
-	zoomdata = (UINT16 *)memory_region(REGION_GFX3);
+	zoomdata = (UINT16 *)memory_region(machine, REGION_GFX3);
 }
 
 

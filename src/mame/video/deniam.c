@@ -201,10 +201,10 @@ WRITE16_HANDLER( deniam_coinctrl_w )
  *   c  | ---------------- | zoomy like in System 16?
  *   e  | ---------------- |
  */
-static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
-	UINT8 *gfx = memory_region(REGION_GFX2);
+	UINT8 *gfx = memory_region(machine, REGION_GFX2);
 
 	for (offs = spriteram_size/2-8;offs >= 0;offs -= 8)
 	{
@@ -396,6 +396,6 @@ VIDEO_UPDATE( deniam )
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,2);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,4);
 
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }

@@ -9,7 +9,7 @@ extern UINT8 adder2_data;			// data
 extern int adder2_acia_triggered;	// flag <>0, ACIA receive IRQ
 
 GFXDECODE_EXTERN( adder2 );
-extern void adder2_decode_char_roms(void);
+extern void adder2_decode_char_roms(running_machine *machine);
 
 MACHINE_RESET( adder2 );
 INTERRUPT_GEN( adder2_vbl );

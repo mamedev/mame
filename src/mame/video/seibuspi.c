@@ -523,7 +523,7 @@ VIDEO_START( spi )
 	for (i = 6000; i < 6016; i++) { alpha_table[i] = 1; }
 	for (i = 6128; i < 6144; i++) { alpha_table[i] = 1; }
 
-	region_length = memory_region_length(REGION_GFX2);
+	region_length = memory_region_length(machine, REGION_GFX2);
 
 	if (region_length <= 0x300000)
 	{

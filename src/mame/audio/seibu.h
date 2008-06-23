@@ -55,9 +55,9 @@ READ8_HANDLER( seibu_main_data_pending_r );
 WRITE8_HANDLER( seibu_main_data_w );
 MACHINE_RESET( seibu_sound_1 );
 MACHINE_RESET( seibu_sound_2 );
-void seibu_sound_decrypt(int cpu_region,int length);
+void seibu_sound_decrypt(running_machine *machine,int cpu_region,int length);
 
-void seibu_adpcm_decrypt(int region);
+void seibu_adpcm_decrypt(running_machine *machine,int region);
 WRITE8_HANDLER( seibu_adpcm_adr_1_w );
 WRITE8_HANDLER( seibu_adpcm_ctl_1_w );
 WRITE8_HANDLER( seibu_adpcm_adr_2_w );

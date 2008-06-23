@@ -5047,7 +5047,7 @@ static DRIVER_INIT( airco22 )
 
 static DRIVER_INIT( propcycl )
 {
-   UINT32 *pROM = (UINT32 *)memory_region(REGION_CPU1);
+   UINT32 *pROM = (UINT32 *)memory_region(machine, REGION_CPU1);
 
 	/* patch out strange routine (uninitialized-eprom related?) */
 	pROM[0x1992C/4] = 0x4E754E75;
@@ -5123,7 +5123,7 @@ static DRIVER_INIT( raveracw )
 
 static DRIVER_INIT( cybrcomm )
 {
-	UINT32 *pROM = (UINT32 *)memory_region(REGION_CPU1);
+	UINT32 *pROM = (UINT32 *)memory_region(machine, REGION_CPU1);
 	pROM[0x18ade8/4] = 0x4e714e71;
 	pROM[0x18ae38/4] = 0x4e714e71;
 	pROM[0x18ae80/4] = 0x4e714e71;
@@ -5141,7 +5141,7 @@ static DRIVER_INIT( cybrcomm )
 static DRIVER_INIT( cybrcyc )
 {
 	/* patch DSP RAM test */
-	UINT32 *pROM = (UINT32 *)memory_region(REGION_CPU1);
+	UINT32 *pROM = (UINT32 *)memory_region(machine, REGION_CPU1);
 	pROM[0x355C/4] &= 0x0000ffff;
 	pROM[0x355C/4] |= 0x4e710000;
 

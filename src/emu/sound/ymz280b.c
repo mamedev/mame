@@ -643,7 +643,7 @@ static void *ymz280b_start(int sndindex, int clock, const void *config)
 
 	/* initialize the rest of the structure */
 	chip->master_clock = (double)clock / 384.0;
-	chip->region_base = memory_region(intf->region);
+	chip->region_base = memory_region(Machine, intf->region);
 	chip->irq_callback = intf->irq_callback;
 
 	/* create the stream */

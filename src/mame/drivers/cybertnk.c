@@ -205,7 +205,7 @@ static VIDEO_UPDATE( cybertnk )
 static DRIVER_INIT( cybertnk )
 {
 #ifdef IGNORE_MISSING_ROM
-	UINT16 *ROM = (UINT16*)memory_region(REGION_CPU1);
+	UINT16 *ROM = (UINT16*)memory_region(machine, REGION_CPU1);
 
 	/* nop the rom checksum branch */
 	ROM[0x1546/2] = 0x4e71;

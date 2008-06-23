@@ -22,7 +22,7 @@ static int hyhoo_highcolorflag;
 static int hyhoo_flipscreen;
 
 static bitmap_t *hyhoo_tmpbitmap;
-static void hyhoo_gfxdraw(void);
+static void hyhoo_gfxdraw(running_machine *machine);
 
 
 WRITE8_HANDLER( hyhoo_blitter_w )
@@ -38,7 +38,7 @@ WRITE8_HANDLER( hyhoo_blitter_w )
 		case 0x04:	blitter_sizex = data; break;
 		case 0x05:	blitter_sizey = data;
 					/* writing here also starts the blit */
-					hyhoo_gfxdraw();
+					hyhoo_gfxdraw(machine);
 					break;
 		case 0x06:	blitter_direction_x = (data >> 0) & 0x01;
 					blitter_direction_y = (data >> 1) & 0x01;
@@ -52,7 +52,7 @@ WRITE8_HANDLER( hyhoo_blitter_w )
 
 WRITE8_HANDLER( hyhoo_romsel_w )
 {
-	int gfxlen = memory_region_length(REGION_GFX1);
+	int gfxlen = memory_region_length(machine, REGION_GFX1);
 	hyhoo_gfxrom = (((data & 0xc0) >> 4) + (data & 0x03));
 	hyhoo_highcolorflag = data;
 	nb1413m3_gfxrombank_w(machine, 0, data);
@@ -72,9 +72,9 @@ static TIMER_CALLBACK( blitter_timer_callback )
 	nb1413m3_busyflag = 1;
 }
 
-void hyhoo_gfxdraw(void)
+static void hyhoo_gfxdraw(running_machine *machine)
 {
-	UINT8 *GFX = memory_region(REGION_GFX1);
+	UINT8 *GFX = memory_region(machine, REGION_GFX1);
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -116,7 +116,7 @@ void hyhoo_gfxdraw(void)
 		skipy = -1;
 	}
 
-	gfxlen = memory_region_length(REGION_GFX1);
+	gfxlen = memory_region_length(machine, REGION_GFX1);
 	gfxaddr = (hyhoo_gfxrom << 17) + (blitter_src_addr << 1);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)

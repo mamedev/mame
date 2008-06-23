@@ -580,7 +580,7 @@ ROM_END
 
 static DRIVER_INIT( livequiz )
 {
-	UINT16 *rom = (UINT16 *) memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16 *) memory_region(machine, REGION_CPU1);
 
 	// PROTECTION CHECKS
 	rom[0x13345a/2]	=	0x4e75;

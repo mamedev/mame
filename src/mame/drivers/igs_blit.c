@@ -211,10 +211,10 @@ static WRITE16_HANDLER( igs_blit_flags_w )
 	UINT8 trans_pen, clear_pen, pen_hi, *dest;
 	UINT8 pen = 0;
 
-	UINT8 *gfx		=	memory_region(REGION_GFX1);
-	UINT8 *gfx2		=	memory_region(REGION_GFX2);
-	int gfx_size	=	memory_region_length(REGION_GFX1);
-	int gfx2_size	=	memory_region_length(REGION_GFX2);
+	UINT8 *gfx		=	memory_region(machine, REGION_GFX1);
+	UINT8 *gfx2		=	memory_region(machine, REGION_GFX2);
+	int gfx_size	=	memory_region_length(machine, REGION_GFX1);
+	int gfx2_size	=	memory_region_length(machine, REGION_GFX2);
 
 	const rectangle *clip = video_screen_get_visible_area(machine->primary_screen);
 
@@ -369,10 +369,10 @@ static WRITE16_HANDLER( igs_palette_w )
 
 ***************************************************************************/
 
-static void grtwall_decrypt(void)
+static void grtwall_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1));
+	UINT16 *src = (UINT16 *) (memory_region(machine, REGION_CPU1));
 
 	int rom_size = 0x80000;
 
@@ -393,10 +393,10 @@ static void grtwall_decrypt(void)
 }
 
 
-static void lhb_decrypt(void)
+static void lhb_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1));
+	UINT16 *src = (UINT16 *) (memory_region(machine, REGION_CPU1));
 
 	int rom_size = 0x80000;
 
@@ -418,10 +418,10 @@ static void lhb_decrypt(void)
 }
 
 
-static void chindrag_decrypt(void)
+static void chindrag_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1));
+	UINT16 *src = (UINT16 *) (memory_region(machine, REGION_CPU1));
 
 	int rom_size = 0x80000;
 
@@ -447,10 +447,10 @@ static void chindrag_decrypt(void)
 }
 
 
-static void drgnwrld_decrypt(void)
+static void drgnwrld_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1));
+	UINT16 *src = (UINT16 *) (memory_region(machine, REGION_CPU1));
 
 	int rom_size = 0x80000;
 
@@ -476,11 +476,11 @@ static void drgnwrld_decrypt(void)
 }
 
 
-static void chmplst2_decrypt(void)
+static void chmplst2_decrypt(running_machine *machine)
 {
 	int i,j;
 	int rom_size = 0x80000;
-	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1));
+	UINT16 *src = (UINT16 *) (memory_region(machine, REGION_CPU1));
 	UINT16 *result_data = malloc_or_die(rom_size);
 
  	for (i=0; i<rom_size/2; i++)
@@ -508,10 +508,10 @@ static void chmplst2_decrypt(void)
 
 
 
-static void vbowlj_decrypt(void)
+static void vbowlj_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1));
+	UINT16 *src = (UINT16 *) (memory_region(machine, REGION_CPU1));
 
 	int rom_size = 0x80000;
 
@@ -543,10 +543,10 @@ static void vbowlj_decrypt(void)
 
 // To do:
 #ifdef UNUSED_FUNCTION
-void vbowl_decrypt(void)
+void vbowl_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1));
+	UINT16 *src = (UINT16 *) (memory_region(machine, REGION_CPU1));
 
 	int rom_size = 0x80000;
 
@@ -576,11 +576,11 @@ void vbowl_decrypt(void)
 ***************************************************************************/
 
 
-static void chmplst2_decrypt_gfx(void)
+static void chmplst2_decrypt_gfx(running_machine *machine)
 {
 	int i;
 	unsigned rom_size = 0x200000;
-	UINT8 *src = (UINT8 *) (memory_region(REGION_GFX1));
+	UINT8 *src = (UINT8 *) (memory_region(machine, REGION_GFX1));
 	UINT8 *result_data = malloc_or_die(rom_size);
 
 	for (i=0; i<rom_size; i++)
@@ -591,11 +591,11 @@ static void chmplst2_decrypt_gfx(void)
 	free(result_data);
 }
 
-static void chindrag_gfx_decrypt(void)
+static void chindrag_gfx_decrypt(running_machine *machine)
 {
 	int i;
 	unsigned rom_size = 0x400000;
-	UINT8 *src = (UINT8 *) (memory_region(REGION_GFX1));
+	UINT8 *src = (UINT8 *) (memory_region(machine, REGION_GFX1));
 	UINT8 *result_data = malloc_or_die(rom_size);
 
  	for (i=0; i<rom_size; i++)
@@ -2504,10 +2504,10 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( chmplst2 )
 {
-	UINT16 *rom = (UINT16 *) memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16 *) memory_region(machine, REGION_CPU1);
 
-	chmplst2_decrypt();
-	chmplst2_decrypt_gfx();
+	chmplst2_decrypt(machine);
+	chmplst2_decrypt_gfx(machine);
 
 	// PROTECTION CHECKS
 	rom[0x034f4/2]	=	0x4e71;		// 0034F4: 660E    bne 3504   (rom test, fills palette with white otherwise)
@@ -2526,10 +2526,10 @@ static DRIVER_INIT( chmplst2 )
 
 static DRIVER_INIT( chindrag )
 {
-	UINT16 *rom = (UINT16 *) memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16 *) memory_region(machine, REGION_CPU1);
 
-	chindrag_decrypt();
-	chindrag_gfx_decrypt();
+	chindrag_decrypt(machine);
+	chindrag_gfx_decrypt(machine);
 
 	// PROTECTION CHECKS
 	rom[0x033d2/2]	=	0x606c;		// 0033D2: 676C        beq 3440     (ASIC11 CHECK PORT ERROR 3)
@@ -2552,10 +2552,10 @@ static DRIVER_INIT( chindrag )
 
 static DRIVER_INIT( chugokur )
 {
-	UINT16 *rom = (UINT16 *) memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16 *) memory_region(machine, REGION_CPU1);
 
-	chindrag_decrypt();
-	chindrag_gfx_decrypt();
+	chindrag_decrypt(machine);
+	chindrag_gfx_decrypt(machine);
 
 	// PROTECTION CHECKS
 	rom[0x033d2/2]	=	0x606c;		// 0033D2: 676C        beq 3440     (ASIC11 CHECK PORT ERROR 3)
@@ -2579,10 +2579,10 @@ static DRIVER_INIT( chugokur )
 
 static DRIVER_INIT( drgnwrld )
 {
-	UINT16 *rom = (UINT16 *) memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16 *) memory_region(machine, REGION_CPU1);
 
-	drgnwrld_decrypt();
-	chindrag_gfx_decrypt();
+	drgnwrld_decrypt(machine);
+	chindrag_gfx_decrypt(machine);
 
 	// PROTECTION CHECKS
 	rom[0x032ee/2]	=	0x606c;		// 0032EE: 676C        beq 335c     (ASIC11 CHECK PORT ERROR 3)
@@ -2602,9 +2602,9 @@ static DRIVER_INIT( drgnwrld )
 
 static DRIVER_INIT( grtwall )
 {
-	UINT16 *rom = (UINT16 *) memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16 *) memory_region(machine, REGION_CPU1);
 
-	grtwall_decrypt();
+	grtwall_decrypt(machine);
 
 	// PROTECTION CHECKS
 	rom[0x16b96/2]	=	0x6000;		// 016B96: 6700 02FE    beq 16e96  (fills palette with red otherwise)
@@ -2624,9 +2624,9 @@ static DRIVER_INIT( grtwall )
 
 static DRIVER_INIT( lhb )
 {
-	UINT16 *rom = (UINT16 *) memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16 *) memory_region(machine, REGION_CPU1);
 
-	lhb_decrypt();
+	lhb_decrypt(machine);
 
 	// PROTECTION CHECKS
 	rom[0x2eef6/2]	=	0x4e75;		// 02EEF6: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
@@ -2637,11 +2637,11 @@ static DRIVER_INIT( lhb )
 
 static DRIVER_INIT( vbowl )
 {
-	UINT16 *rom = (UINT16 *) memory_region(REGION_CPU1);
-	UINT8  *gfx = (UINT8 *)  memory_region(REGION_GFX1);
+	UINT16 *rom = (UINT16 *) memory_region(machine, REGION_CPU1);
+	UINT8  *gfx = (UINT8 *)  memory_region(machine, REGION_GFX1);
 	int i;
 
-	vbowlj_decrypt();
+	vbowlj_decrypt(machine);
 
 	for (i = 0x400000-1; i >= 0; i--)
 	{
@@ -2655,11 +2655,11 @@ static DRIVER_INIT( vbowl )
 
 static DRIVER_INIT( vbowlj )
 {
-	UINT16 *rom = (UINT16 *) memory_region(REGION_CPU1);
-	UINT8  *gfx = (UINT8 *)  memory_region(REGION_GFX1);
+	UINT16 *rom = (UINT16 *) memory_region(machine, REGION_CPU1);
+	UINT8  *gfx = (UINT8 *)  memory_region(machine, REGION_GFX1);
 	int i;
 
-	vbowlj_decrypt();
+	vbowlj_decrypt(machine);
 
 	for (i = 0x400000-1; i >= 0; i--)
 	{
@@ -2675,9 +2675,9 @@ static DRIVER_INIT( vbowlj )
 
 static DRIVER_INIT( xymg )
 {
-	UINT16 *rom = (UINT16 *) memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16 *) memory_region(machine, REGION_CPU1);
 
-	lhb_decrypt();
+	lhb_decrypt(machine);
 
 	// PROTECTION CHECKS
 	rom[0x00502/2]	=	0x6006;		// 000502: 6050         bra 554

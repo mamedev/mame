@@ -275,7 +275,7 @@ static void snes_init_ram(running_machine *machine)
 	int i;
 
 	/* Init DSP1 */
-	DSP1_reset();
+	DSP1_reset(machine);
 
 	/* Init VRAM */
 	memset( snes_vram, 0, SNES_VRAM_SIZE );
@@ -1530,7 +1530,7 @@ DRIVER_INIT( snes )
 	UINT16 totalblocks, readblocks;
 	UINT8  *rom;
 
-	rom = memory_region( REGION_USER3 );
+	rom = memory_region( machine, REGION_USER3 );
 	snes_ram = auto_malloc(0x1000000);
 	memset( snes_ram, 0, 0x1000000 );
 
@@ -1540,7 +1540,7 @@ DRIVER_INIT( snes )
 
 	/* Find the number of blocks in this ROM */
 	//totalblocks = ((mame_fsize(file) - offset) >> (snes_cart.mode == MODE_20 ? 15 : 16));
-	totalblocks = (memory_region_length(REGION_USER3) / 0x8000) - 1;
+	totalblocks = (memory_region_length(machine, REGION_USER3) / 0x8000) - 1;
 
 	/* FIXME: Insert crc check here */
 
@@ -1581,7 +1581,7 @@ DRIVER_INIT( snes_hirom )
 	UINT16 totalblocks, readblocks;
 	UINT8  *rom;
 
-	rom = memory_region( REGION_USER3 );
+	rom = memory_region( machine, REGION_USER3 );
 	snes_ram = auto_malloc(0x1000000);
 	memset( snes_ram, 0, 0x1000000 );
 
@@ -1590,7 +1590,7 @@ DRIVER_INIT( snes_hirom )
 
 	/* Find the number of blocks in this ROM */
 	//totalblocks = ((mame_fsize(file) - offset) >> (snes_cart.mode == MODE_20 ? 15 : 16));
-	totalblocks = (memory_region_length(REGION_USER3) / 0x10000) - 1;
+	totalblocks = (memory_region_length(machine, REGION_USER3) / 0x10000) - 1;
 
 	/* FIXME: Insert crc check here */
 

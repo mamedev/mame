@@ -124,8 +124,8 @@ static WRITE8_HANDLER( cham24_mapper_w )
 	UINT32 prg_bank_page_size = (offset >> 12) & 0x01;
 	UINT32 gfx_mirroring = (offset >> 13) & 0x01;
 
-	UINT8* dst = memory_region( REGION_CPU1 );
-	UINT8* src = memory_region( REGION_USER1 );
+	UINT8* dst = memory_region( machine, REGION_CPU1 );
+	UINT8* src = memory_region( machine, REGION_USER1 );
 
 	// switch PPU VROM bank
 	ppu2c0x_set_videorom_bank( 0, 0, 8, gfx_bank, 512 );
@@ -198,8 +198,8 @@ static const struct NESinterface cham24_interface_1 =
 static MACHINE_RESET( cham24 )
 {
 	/* switch PRG rom */
-	UINT8* dst = memory_region( REGION_CPU1 );
-	UINT8* src = memory_region( REGION_USER1 );
+	UINT8* dst = memory_region( machine, REGION_CPU1 );
+	UINT8* src = memory_region( machine, REGION_USER1 );
 
 	memcpy( &dst[0x8000], &src[0x0f8000], 0x4000 );
 	memcpy( &dst[0xc000], &src[0x0f8000], 0x4000 );

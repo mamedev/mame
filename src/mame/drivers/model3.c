@@ -1012,13 +1012,13 @@ static MACHINE_START(model3_21)
 static void model3_init(running_machine *machine, int step)
 {
 	model3_step = step;
-	memory_set_bankptr( 1, memory_region( REGION_USER1 ) + 0x800000 ); /* banked CROM */
+	memory_set_bankptr( 1, memory_region( machine, REGION_USER1 ) + 0x800000 ); /* banked CROM */
 
-	memory_set_bankptr(4, memory_region(REGION_SOUND1) + 0x200000);
-	memory_set_bankptr(5, memory_region(REGION_SOUND1) + 0x600000);
+	memory_set_bankptr(4, memory_region(machine, REGION_SOUND1) + 0x200000);
+	memory_set_bankptr(5, memory_region(machine, REGION_SOUND1) + 0x600000);
 
 	// copy the 68k vector table into RAM
-	memcpy(model3_soundram, memory_region(REGION_CPU2)+0x80000, 16);
+	memcpy(model3_soundram, memory_region(machine, REGION_CPU2)+0x80000, 16);
 
 	model3_machine_init(step);	// step 1.5
 	model3_tap_reset();
@@ -1276,7 +1276,7 @@ static WRITE64_HANDLER( model3_sys_w )
 
 				data >>= 56;
 				data = (~data) & 0xf;
-				memory_set_bankptr( 1, memory_region( REGION_USER1 ) + 0x800000 + (data * 0x800000)); /* banked CROM */
+				memory_set_bankptr( 1, memory_region( machine, REGION_USER1 ) + 0x800000 + (data * 0x800000)); /* banked CROM */
 			}
 			if (ACCESSING_BITS_24_31)
 			{
@@ -1495,7 +1495,7 @@ static WRITE64_HANDLER(daytona2_rombank_w)
 	{
 		data >>= 56;
 		data = (~data) & 0xf;
-		memory_set_bankptr( 1, memory_region( REGION_USER1 ) + 0x800000 + (data * 0x800000)); /* banked CROM */
+		memory_set_bankptr( 1, memory_region( machine, REGION_USER1 ) + 0x800000 + (data * 0x800000)); /* banked CROM */
 	}
 }
 
@@ -3998,9 +3998,9 @@ ROM_END
 static WRITE16_HANDLER( model3snd_ctrl )
 {
 	// handle sample banking
-	if (memory_region_length(REGION_SOUND1) > 0x800000)
+	if (memory_region_length(machine, REGION_SOUND1) > 0x800000)
 	{
-		UINT8 *snd = memory_region(REGION_SOUND1);
+		UINT8 *snd = memory_region(machine, REGION_SOUND1);
 		if (data & 0x20)
 		{
 	  		memory_set_bankptr(4, snd + 0x200000);
@@ -4244,13 +4244,13 @@ static MACHINE_DRIVER_START( model3_21 )
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 MACHINE_DRIVER_END
 
-static void interleave_vroms(void)
+static void interleave_vroms(running_machine *machine)
 {
 	int start;
 	int i,j,x;
-	UINT16 *vrom1 = (UINT16*)memory_region(REGION_USER3);
-	UINT16 *vrom2 = (UINT16*)memory_region(REGION_USER4);
-	int vrom_length = memory_region_length(REGION_USER3);
+	UINT16 *vrom1 = (UINT16*)memory_region(machine, REGION_USER3);
+	UINT16 *vrom2 = (UINT16*)memory_region(machine, REGION_USER4);
+	int vrom_length = memory_region_length(machine, REGION_USER3);
 	UINT16 *vrom;
 
 	model3_vrom = auto_malloc(0x4000000);
@@ -4276,7 +4276,7 @@ static void interleave_vroms(void)
 
 static DRIVER_INIT( model3_10 )
 {
-	interleave_vroms();
+	interleave_vroms(machine);
 
 	memory_install_readwrite64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xc0000000, 0xc00000ff, 0, 0, scsi_r, scsi_w );
 
@@ -4289,7 +4289,7 @@ static DRIVER_INIT( model3_10 )
 
 static DRIVER_INIT( model3_15 )
 {
-	interleave_vroms();
+	interleave_vroms(machine);
 	memory_install_read64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_readwrite64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xf0800cf8, 0xf0800cff, 0, 0, mpc105_addr_r, mpc105_addr_w );
@@ -4299,7 +4299,7 @@ static DRIVER_INIT( model3_15 )
 
 static DRIVER_INIT( model3_20 )
 {
-	interleave_vroms();
+	interleave_vroms(machine);
 	memory_install_read64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_readwrite64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xc2000000, 0xc20000ff, 0, 0, real3d_dma_r, real3d_dma_w );
@@ -4311,7 +4311,7 @@ static DRIVER_INIT( model3_20 )
 
 static DRIVER_INIT( lostwsga )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: there's an M68K device at 0xC0000000 - FF, maybe lightgun controls ? */
@@ -4322,7 +4322,7 @@ static DRIVER_INIT( lostwsga )
 
 static DRIVER_INIT( scud )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
@@ -4334,7 +4334,7 @@ static DRIVER_INIT( scud )
 
 static DRIVER_INIT( scudp )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
@@ -4351,7 +4351,7 @@ static DRIVER_INIT( scudp )
 
 static DRIVER_INIT( lemans24 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_15);
 
 	memory_install_readwrite64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xc1000000, 0xc10000ff, 0, 0, scsi_r, scsi_w );
@@ -4365,7 +4365,7 @@ static DRIVER_INIT( lemans24 )
 
 static DRIVER_INIT( vf3 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	DRIVER_INIT_CALL(model3_10);
 
@@ -4378,13 +4378,13 @@ static DRIVER_INIT( vf3 )
 
 static DRIVER_INIT( vs215 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	rom[(0x70dde0^4)/4] = 0x60000000;
 	rom[(0x70e6f0^4)/4] = 0x60000000;
 	rom[(0x70e710^4)/4] = 0x60000000;
 
-	interleave_vroms();
+	interleave_vroms(machine);
 	memory_install_read64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_readwrite64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
@@ -4398,12 +4398,12 @@ static DRIVER_INIT( vs215 )
 
 static DRIVER_INIT( vs29815 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	rom[(0x6028ec^4)/4] = 0x60000000;
 	rom[(0x60290c^4)/4] = 0x60000000;
 
-	interleave_vroms();
+	interleave_vroms(machine);
 	memory_install_read64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_readwrite64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
@@ -4417,12 +4417,12 @@ static DRIVER_INIT( vs29815 )
 
 static DRIVER_INIT( bass )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	rom[(0x7999a8^4)/4] = 0x60000000;
 	rom[(0x7999c8^4)/4] = 0x60000000;
 
-	interleave_vroms();
+	interleave_vroms(machine);
 	memory_install_read64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_readwrite64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
@@ -4436,7 +4436,7 @@ static DRIVER_INIT( bass )
 
 static DRIVER_INIT( getbass )
 {
-	interleave_vroms();
+	interleave_vroms(machine);
 	memory_install_read64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_readwrite64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
@@ -4448,7 +4448,7 @@ static DRIVER_INIT( getbass )
 
 static DRIVER_INIT( vs2 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -4458,7 +4458,7 @@ static DRIVER_INIT( vs2 )
 
 static DRIVER_INIT( vs298 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -4469,7 +4469,7 @@ static DRIVER_INIT( vs298 )
 
 static DRIVER_INIT( vs2v991 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -4479,7 +4479,7 @@ static DRIVER_INIT( vs2v991 )
 
 static DRIVER_INIT( vs299 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -4489,7 +4489,7 @@ static DRIVER_INIT( vs299 )
 
 static DRIVER_INIT( harley )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	memory_install_readwrite64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xc0000000, 0xc00fffff, 0, 0, network_r, network_w );
@@ -4503,7 +4503,7 @@ static DRIVER_INIT( harley )
 
 static DRIVER_INIT( srally2 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x7c0c4^4)/4] = 0x60000000;
@@ -4513,7 +4513,7 @@ static DRIVER_INIT( srally2 )
 
 static DRIVER_INIT( swtrilgy )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0xf0e48^4)/4] = 0x60000000;
@@ -4524,7 +4524,7 @@ static DRIVER_INIT( swtrilgy )
 
 static DRIVER_INIT( swtrilga )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0xf6dd0^4)/4] = 0x60000000;
@@ -4532,7 +4532,7 @@ static DRIVER_INIT( swtrilga )
 
 static DRIVER_INIT( von2 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x189168^4)/4] = 0x60000000;
@@ -4544,7 +4544,7 @@ static DRIVER_INIT( von2 )
 
 static DRIVER_INIT( dirtdvls )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x0600a0^4)/4] = 0x60000000;
@@ -4557,7 +4557,7 @@ static DRIVER_INIT( dirtdvls )
 
 static DRIVER_INIT( daytona2 )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	memory_install_write64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xc3800000, 0xc3800007, 0, 0, daytona2_rombank_w );
@@ -4570,7 +4570,7 @@ static DRIVER_INIT( daytona2 )
 
 static DRIVER_INIT( dayto2pe )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	memory_install_write64_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xc3800000, 0xc3800007, 0, 0, daytona2_rombank_w );
@@ -4584,7 +4584,7 @@ static DRIVER_INIT( dayto2pe )
 
 static DRIVER_INIT( spikeout )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x6059cc^4)/4] = 0x60000000;
@@ -4593,7 +4593,7 @@ static DRIVER_INIT( spikeout )
 
 static DRIVER_INIT( spikeofe )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x6059cc^4)/4] = 0x60000000;
@@ -4602,7 +4602,7 @@ static DRIVER_INIT( spikeofe )
 
 static DRIVER_INIT( eca )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x535580^4)/4] = 0x60000000;
@@ -4612,7 +4612,7 @@ static DRIVER_INIT( eca )
 
 static DRIVER_INIT( skichamp )
 {
-	UINT32 *rom = (UINT32*)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32*)memory_region(machine, REGION_USER1);
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x5263c8^4)/4] = 0x60000000;

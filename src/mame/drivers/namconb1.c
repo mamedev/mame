@@ -443,56 +443,56 @@ static NVRAM_HANDLER( namconb1 )
 
 static DRIVER_INIT( nebulray )
 {
-	UINT8 *pMem = (UINT8 *)memory_region(NAMCONB1_TILEMASKREGION);
+	UINT8 *pMem = (UINT8 *)memory_region(machine, NAMCONB1_TILEMASKREGION);
 	size_t numBytes = (0xfe7-0xe6f)*8;
 	memset( &pMem[0xe6f*8], 0, numBytes );
 
 	namcos2_gametype = NAMCONB1_NEBULRAY;
 
-	namcoc7x_on_driver_init();
+	namcoc7x_on_driver_init(machine);
 } /* nebulray */
 
 static DRIVER_INIT( gslgr94u )
 {
 	namcos2_gametype = NAMCONB1_GSLGR94U;
-	namcoc7x_on_driver_init();
+	namcoc7x_on_driver_init(machine);
 } /* gslgr94u */
 
 static DRIVER_INIT( sws95 )
 {
 	namcos2_gametype = NAMCONB1_SWS95;
-	namcoc7x_on_driver_init();
+	namcoc7x_on_driver_init(machine);
 } /* sws95 */
 
 static DRIVER_INIT( sws96 )
 {
 	namcos2_gametype = NAMCONB1_SWS96;
-	namcoc7x_on_driver_init();
+	namcoc7x_on_driver_init(machine);
 } /* sws96 */
 
 static DRIVER_INIT( sws97 )
 {
 	namcos2_gametype = NAMCONB1_SWS97;
-	namcoc7x_on_driver_init();
+	namcoc7x_on_driver_init(machine);
 } /* sws97 */
 
 static DRIVER_INIT( gunbulet )
 {
 	namcos2_gametype = NAMCONB1_GUNBULET;
-	namcoc7x_on_driver_init();
+	namcoc7x_on_driver_init(machine);
 } /* gunbulet */
 
 static DRIVER_INIT( vshoot )
 {
 	namcos2_gametype = NAMCONB1_VSHOOT;
-	namcoc7x_on_driver_init();
+	namcoc7x_on_driver_init(machine);
 } /* vshoot */
 
 static void
-ShuffleDataROMs( void )
+ShuffleDataROMs( running_machine *machine )
 {
-	size_t len = memory_region_length(REGION_USER1)/4;
-	UINT8 *pMem8 = (UINT8 *)memory_region( REGION_USER1 );
+	size_t len = memory_region_length(machine, REGION_USER1)/4;
+	UINT8 *pMem8 = (UINT8 *)memory_region( machine, REGION_USER1 );
 	UINT32 *pMem32 = (UINT32 *)pMem8;
 	int i;
 
@@ -507,15 +507,15 @@ ShuffleDataROMs( void )
 static DRIVER_INIT( machbrkr )
 {
 	namcos2_gametype = NAMCONB2_MACH_BREAKERS;
-	ShuffleDataROMs();
-	namcoc7x_on_driver_init();
+	ShuffleDataROMs(machine);
+	namcoc7x_on_driver_init(machine);
 }
 
 static DRIVER_INIT( outfxies )
 {
 	namcos2_gametype = NAMCONB2_OUTFOXIES;
-	ShuffleDataROMs();
-	namcoc7x_on_driver_init();
+	ShuffleDataROMs(machine);
+	namcoc7x_on_driver_init(machine);
 }
 
 static READ32_HANDLER( custom_key_r )

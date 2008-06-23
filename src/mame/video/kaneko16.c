@@ -245,7 +245,7 @@ PALETTE_INIT( berlwall )
 VIDEO_START( berlwall )
 {
 	int sx, x,y;
-	UINT8 *RAM	=	memory_region(REGION_GFX3);
+	UINT8 *RAM	=	memory_region(machine, REGION_GFX3);
 
 	/* Render the hi-color static backgrounds held in the ROMs */
 

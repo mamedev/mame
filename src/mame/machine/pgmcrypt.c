@@ -23,11 +23,11 @@ static const UINT8 kov_tab[256] = {
 	0x80, 0xe6, 0xba, 0xb3, 0x08, 0xd8, 0x30, 0x5b, 0x5f, 0xf2, 0x5a, 0xfb, 0x63, 0xb0, 0xa4, 0x41
 };
 
-void pgm_kov_decrypt(void)
+void pgm_kov_decrypt(running_machine *machine)
 {
 
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1)+0x100000);
+	UINT16 *src = (UINT16 *) (memory_region(machine, REGION_CPU1)+0x100000);
 
 	int rom_size = 0x400000;
 
@@ -85,11 +85,11 @@ static const UINT8 kovsh_tab[256] = {
 };
 
 
-void pgm_kovsh_decrypt(void)
+void pgm_kovsh_decrypt(running_machine *machine)
 {
 
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1)+0x100000);
+	UINT16 *src = (UINT16 *) (memory_region(machine, REGION_CPU1)+0x100000);
 
 	int rom_size = 0x400000;
 
@@ -126,11 +126,11 @@ void pgm_kovsh_decrypt(void)
 	}
 }
 
-void pgm_dw2_decrypt(void)
+void pgm_dw2_decrypt(running_machine *machine)
 {
 
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1)+0x100000);
+	UINT16 *src = (UINT16 *) (memory_region(machine, REGION_CPU1)+0x100000);
 
 	int rom_size = 0x80000;
 
@@ -168,11 +168,11 @@ static const UINT8 djlzz_tab[256] = {
   0x92, 0x14, 0x23, 0xae, 0x4b, 0x80, 0xae, 0x6a, 0x56, 0x01, 0xac, 0x55, 0xf7, 0x6d, 0x9b, 0x6d,
 };
 
-void pgm_djlzz_decrypt(void)
+void pgm_djlzz_decrypt(running_machine *machine)
 {
 
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1)+0x100000);
+	UINT16 *src = (UINT16 *) (memory_region(machine, REGION_CPU1)+0x100000);
 
 	int rom_size = 0x400000;
 
@@ -228,11 +228,11 @@ static const UINT8 pstar[256] = {
   0x62, 0x51, 0xf6, 0xe3, 0xa6, 0xea, 0x32, 0x86, 0x67, 0xcc, 0x4a, 0x46, 0x4d, 0x37, 0x45, 0xd5,
 };
 
-void pgm_pstar_decrypt(void)
+void pgm_pstar_decrypt(running_machine *machine)
 {
 
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1)+0x100000);
+	UINT16 *src = (UINT16 *) (memory_region(machine, REGION_CPU1)+0x100000);
 
 	int rom_size = 0x100000;
 
@@ -265,14 +265,14 @@ void pgm_pstar_decrypt(void)
 	}
 }
 
-void pgm_dw3_decrypt(void)
+void pgm_dw3_decrypt(running_machine *machine)
 {
 
 //  int i;
 //  UINT16 *src=(UINT16 *) (OP_ROM+0x100000);
 
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1)+0x100000);
+	UINT16 *src = (UINT16 *) (memory_region(machine, REGION_CPU1)+0x100000);
 
 	int rom_size = 0x100000;
 
@@ -297,14 +297,14 @@ void pgm_dw3_decrypt(void)
 	}
 }
 
-void pgm_killbld_decrypt(void)
+void pgm_killbld_decrypt(running_machine *machine)
 {
 
 //  int i;
 //  UINT16 *src=(UINT16 *) (OP_ROM+0x100000);
 
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1)+0x100000);
+	UINT16 *src = (UINT16 *) (memory_region(machine, REGION_CPU1)+0x100000);
 
 	int rom_size = 0x200000;
 
@@ -341,10 +341,10 @@ static const UINT8 dfront_tab[256] = {
   0x08, 0x75, 0xa1, 0x33, 0xab, 0xd2, 0xda, 0x81, 0xbf, 0x7a, 0x3b, 0x3f, 0x4a, 0xfd, 0x25, 0x36,
 };
 
-void pgm_dfront_decrypt(void)
+void pgm_dfront_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *)(memory_region(REGION_USER1));
+	UINT16 *src = (UINT16 *)(memory_region(machine, REGION_USER1));
 
 	int rom_size = 0x200000;
 
@@ -401,10 +401,10 @@ static const UINT8 ddp2_tab[256] = {
   0xdc, 0xca, 0xd4, 0xda, 0xcd, 0xd2, 0x83, 0xca, 0xeb, 0x4f, 0xf2, 0x2f, 0x2d, 0x2a, 0xec, 0x1f
 };
 
-void pgm_ddp2_decrypt(void)
+void pgm_ddp2_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *)(memory_region(REGION_USER1));
+	UINT16 *src = (UINT16 *)(memory_region(machine, REGION_USER1));
 
 	int rom_size = 0x200000;
 
@@ -456,10 +456,10 @@ static const UINT8 mm_tab[256] = {
   0x7c, 0x01, 0x43, 0xdb, 0x53, 0x85, 0xfe, 0x78, 0x91, 0x40, 0xa3, 0xdf, 0x4f, 0xff, 0x10, 0x6c,
 };
 
-void pgm_mm_decrypt(void)
+void pgm_mm_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *)(memory_region(REGION_USER1));
+	UINT16 *src = (UINT16 *)(memory_region(machine, REGION_USER1));
 
 	int rom_size = 0x200000;
 
@@ -515,10 +515,10 @@ static const UINT8 kov2_tab[256] = {
  0x9c, 0xc8, 0xd4, 0xda, 0xcd, 0xd2, 0x83, 0xca, 0xeb, 0x4f, 0xf2, 0x0f, 0x0d, 0x2a, 0xec, 0x1f,
 };
 
-void pgm_kov2_decrypt(void)
+void pgm_kov2_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *)(memory_region(REGION_USER1));
+	UINT16 *src = (UINT16 *)(memory_region(machine, REGION_USER1));
 
 	int rom_size = 0x200000;
 
@@ -571,10 +571,10 @@ static const UINT8 puzzli2_tab[256] = {
   0x1d, 0x18, 0xa2, 0xb6, 0xb2, 0xa9, 0xac, 0xab, 0xae, 0x91, 0x98, 0x8d, 0x91, 0xbb, 0xb1, 0xc0,
 };
 
-void pgm_puzzli2_decrypt(void)
+void pgm_puzzli2_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(REGION_CPU1)+0x100000);
+	UINT16 *src = (UINT16 *) (memory_region(machine, REGION_CPU1)+0x100000);
 
 	int rom_size = 0x100000;
 

@@ -1065,7 +1065,7 @@ static DRIVER_INIT( peplus )
 /* Superboard */
 static DRIVER_INIT( peplussb )
 {
-    UINT8 *super_data = memory_region(REGION_USER1);
+    UINT8 *super_data = memory_region(machine, REGION_USER1);
 
     /* Distribute Superboard Data */
     memcpy(s3000_ram, &super_data[0x3000], 0x1000);

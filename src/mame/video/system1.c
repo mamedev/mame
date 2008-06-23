@@ -266,7 +266,7 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,int spr_numbe
 
 	src = sprite_base[SPR_GFXOFS_LO] + (sprite_base[SPR_GFXOFS_HI] << 8);
 	bank = 0x8000 * (((sprite_base[SPR_X_HI] & 0x80) >> 7) + ((sprite_base[SPR_X_HI] & 0x40) >> 5));
-	bank &= (memory_region_length(REGION_GFX2)-1);	/* limit to the range of available ROMs */
+	bank &= (memory_region_length(machine, REGION_GFX2)-1);	/* limit to the range of available ROMs */
 	skip = sprite_base[SPR_SKIP_LO] + (sprite_base[SPR_SKIP_HI] << 8);
 
 	height = sprite_base[SPR_Y_BOTTOM] - sprite_base[SPR_Y_TOP];
@@ -275,7 +275,7 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,int spr_numbe
 	sy = sprite_base[SPR_Y_TOP] + 1;
 
 	/* graphics region #2 contains the packed sprite data */
-	gfx = &memory_region(REGION_GFX2)[bank];
+	gfx = &memory_region(machine, REGION_GFX2)[bank];
 
 	for (row = 0;row < height;row++)
 	{
@@ -683,7 +683,7 @@ VIDEO_UPDATE( choplifter )
 #ifdef MAME_DEBUG
 	if (input_code_pressed(KEYCODE_SPACE))		// goto next level
 	{
-		memory_region(REGION_CPU1)[0xC085]=33;
+		memory_region(screen->machine, REGION_CPU1)[0xC085]=33;
 	}
 #endif
 	return 0;

@@ -171,7 +171,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 	profiler_mark(PROFILER_USER1);
 
-	gfx = memory_region(REGION_GFX2);
+	gfx = memory_region(machine, REGION_GFX2);
 	for (offs = 0;offs < spriteram_size;offs += 4)
 	{
 		int sx,sy,flipy,zoom,ch,x,px,y;

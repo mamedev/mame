@@ -432,7 +432,7 @@ static MACHINE_RESET( vfive )
 
 static MACHINE_RESET( bgaregga )
 {
-	UINT8 *Z80 = (UINT8 *)memory_region(REGION_CPU2);
+	UINT8 *Z80 = (UINT8 *)memory_region(machine, REGION_CPU2);
 
 	// Set Z80 bank switch - default bank is 2
 	current_bank = 2;
@@ -476,7 +476,7 @@ static DRIVER_INIT( fixeight )
 
 static DRIVER_INIT( fixeighb )
 {
-	UINT16 *bgdata = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *bgdata = (UINT16 *)memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(1, &bgdata[0x40000]); /* $80000 - $fffff */
 
 	toaplan2_sub_cpu = CPU_2_NONE;
@@ -487,7 +487,7 @@ static DRIVER_INIT( pipibibi )
 	int A;
 	int oldword, newword;
 
-	UINT16 *pipibibi_68k_rom = (UINT16 *)(memory_region(REGION_CPU1));
+	UINT16 *pipibibi_68k_rom = (UINT16 *)(memory_region(machine, REGION_CPU1));
 
 	/* unscramble the 68K ROM data. */
 
@@ -1052,7 +1052,7 @@ static WRITE16_HANDLER( fixeighb_oki_bankswitch_w )
 		data &= 7;
 		if (data <= 4)
 		{
-			UINT8 *fixeighb_oki = memory_region(REGION_SOUND1);
+			UINT8 *fixeighb_oki = memory_region(machine, REGION_SOUND1);
 			memcpy(&fixeighb_oki[0x30000], &fixeighb_oki[(data * 0x10000) + 0x40000], 0x10000);
 		}
 	}
@@ -1108,7 +1108,7 @@ static WRITE8_HANDLER( bgaregga_E00C_w )
 
 static WRITE8_HANDLER( bgaregga_bankswitch_w )
 {
-	UINT8 *RAM = (UINT8 *)memory_region(REGION_CPU2);
+	UINT8 *RAM = (UINT8 *)memory_region(machine, REGION_CPU2);
 	int bankaddress;
 	int bank;
 
@@ -1155,7 +1155,7 @@ static WRITE8_HANDLER( raizing_okim6295_bankselect_3 )
 
 static WRITE8_HANDLER( batrider_bankswitch_w )
 {
-	UINT8 *RAM = (UINT8 *)memory_region(REGION_CPU2);
+	UINT8 *RAM = (UINT8 *)memory_region(machine, REGION_CPU2);
 	int bankaddress;
 	int bank;
 
@@ -1197,7 +1197,7 @@ static WRITE16_HANDLER( batrider_z80_busreq_w )
 
 static READ16_HANDLER( raizing_z80rom_r )
 {
-	UINT8 *Z80_ROM_test = (UINT8 *)memory_region(REGION_CPU2);
+	UINT8 *Z80_ROM_test = (UINT8 *)memory_region(machine, REGION_CPU2);
 
 	if (offset < 0x8000)
 		return Z80_ROM_test[offset] & 0xff;

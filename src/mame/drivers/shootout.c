@@ -460,9 +460,9 @@ ROM_END
 
 static DRIVER_INIT( shootout )
 {
-	int length = memory_region_length(REGION_CPU1);
+	int length = memory_region_length(machine, REGION_CPU1);
 	UINT8 *decrypt = auto_malloc(length - 0x8000);
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int A;
 
 	memory_set_decrypted_region(0, 0x8000, 0xffff, decrypt);
@@ -470,13 +470,13 @@ static DRIVER_INIT( shootout )
 	for (A = 0x8000;A < length;A++)
 		decrypt[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x40) >> 1) | ((rom[A] & 0x20) << 1);
 
-	memory_configure_bank(1, 0, 16, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 16, memory_region(machine, REGION_CPU1) + 0x10000, 0x4000);
 	memory_configure_bank_decrypted(1, 0, 16, decrypt + 0x8000, 0x4000);
 }
 
 static DRIVER_INIT( shootouj )
 {
-	memory_configure_bank(1, 0, 16, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 16, memory_region(machine, REGION_CPU1) + 0x10000, 0x4000);
 }
 
 

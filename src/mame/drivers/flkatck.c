@@ -42,7 +42,7 @@ static INTERRUPT_GEN( flkatck_interrupt )
 
 static WRITE8_HANDLER( flkatck_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	int bankaddress = 0;
 
 	/* bits 3-4: coin counters */

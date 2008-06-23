@@ -62,7 +62,7 @@ WRITE16_HANDLER( prehisle_control16_w )
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	UINT8 *tilerom = memory_region(REGION_GFX5);
+	UINT8 *tilerom = memory_region(machine, REGION_GFX5);
 
 	int offs = tile_index * 2;
 	int attr = tilerom[offs + 1] + (tilerom[offs] << 8);

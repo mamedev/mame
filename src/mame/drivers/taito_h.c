@@ -247,15 +247,15 @@ static READ16_HANDLER( syvalion_input_bypass_r )
 
 static INT32 banknum = -1;
 
-static void reset_sound_region(void)
+static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(1, memory_region(REGION_CPU2) + (banknum * 0x4000) + 0x10000);
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU2) + (banknum * 0x4000) + 0x10000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	banknum = (data - 1) & 3;
-	reset_sound_region();
+	reset_sound_region(machine);
 }
 
 
@@ -567,7 +567,7 @@ GFXDECODE_END
 
 static STATE_POSTLOAD( taitoh_postload )
 {
-	reset_sound_region();
+	reset_sound_region(machine);
 }
 
 static MACHINE_START( taitoh )

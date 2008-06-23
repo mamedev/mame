@@ -913,7 +913,7 @@ static READ8_HANDLER( routex_prot_read )
 
 static DRIVER_INIT( route16 )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	/* Is this actually a bootleg? some of the protection has
        been removed */
 
@@ -928,7 +928,7 @@ static DRIVER_INIT( route16 )
 
 static DRIVER_INIT( route16a )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	/* TO DO : Replace these patches with simulation of the protection device */
 
 	/* patch the protection */

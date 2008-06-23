@@ -347,8 +347,8 @@ static const struct YM2203interface ym2203_interface =
 static PALETTE_INIT(pipeline)
 {
 	int r,g,b,i,c;
-	UINT8 *prom1 = &memory_region(REGION_PROMS)[0x000];
-	UINT8 *prom2 = &memory_region(REGION_PROMS)[0x100];
+	UINT8 *prom1 = &memory_region(machine, REGION_PROMS)[0x000];
+	UINT8 *prom2 = &memory_region(machine, REGION_PROMS)[0x100];
 
 	for(i=0;i<0x100;i++)
 	{

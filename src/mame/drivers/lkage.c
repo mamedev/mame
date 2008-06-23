@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( port_fetch_r )
 {
-	return memory_region(REGION_USER1)[offset];
+	return memory_region(machine, REGION_USER1)[offset];
 }
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )

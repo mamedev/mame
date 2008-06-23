@@ -199,9 +199,9 @@ static void draw_alpha_line(running_machine *machine, bitmap_t *bitmap, const re
 }
 
 
-static void remap_sprite_code(int bank, int code, int *remapped_code, int *flipy)
+static void remap_sprite_code(running_machine *machine, int bank, int code, int *remapped_code, int *flipy)
 {
-	UINT8* PROM = memory_region(REGION_USER1);
+	UINT8* PROM = memory_region(machine, REGION_USER1);
 
 	code = (bank << 4) | code;
 	*remapped_code = PROM[code] & 0x0f;
@@ -214,7 +214,7 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap, const rectan
 {
 	int remapped_code, flipy;
 
-	remap_sprite_code(bank, code, &remapped_code, &flipy);
+	remap_sprite_code(machine, bank, code, &remapped_code, &flipy);
 
 	x = 240 - x;
 	y = 240 - y;
@@ -579,23 +579,23 @@ VIDEO_EOF( carpolo )
 
 	car1_x = carpolo_spriteram[0x00];
 	car1_y = carpolo_spriteram[0x01];
-	remap_sprite_code(0, carpolo_spriteram[0x0c] & 0x0f, &car1_code, &car1_flipy);
+	remap_sprite_code(machine, 0, carpolo_spriteram[0x0c] & 0x0f, &car1_code, &car1_flipy);
 
 	car2_x = carpolo_spriteram[0x02];
 	car2_y = carpolo_spriteram[0x03];
-	remap_sprite_code(0, carpolo_spriteram[0x0c] >> 4,   &car2_code, &car2_flipy);
+	remap_sprite_code(machine, 0, carpolo_spriteram[0x0c] >> 4,   &car2_code, &car2_flipy);
 
 	car3_x = carpolo_spriteram[0x04];
 	car3_y = carpolo_spriteram[0x05];
-	remap_sprite_code(0, carpolo_spriteram[0x0d] & 0x0f, &car3_code, &car3_flipy);
+	remap_sprite_code(machine, 0, carpolo_spriteram[0x0d] & 0x0f, &car3_code, &car3_flipy);
 
 	car4_x = carpolo_spriteram[0x06];
 	car4_y = carpolo_spriteram[0x07];
-	remap_sprite_code(0, carpolo_spriteram[0x0d] >> 4,   &car4_code, &car4_flipy);
+	remap_sprite_code(machine, 0, carpolo_spriteram[0x0d] >> 4,   &car4_code, &car4_flipy);
 
 	ball_x = carpolo_spriteram[0x08];
 	ball_y = carpolo_spriteram[0x09];
-	remap_sprite_code(1, carpolo_spriteram[0x0e] & 0x0f, &ball_code, &ball_flipy);
+	remap_sprite_code(machine, 1, carpolo_spriteram[0x0e] & 0x0f, &ball_code, &ball_flipy);
 
 
 	/* cars 1 and 2 */

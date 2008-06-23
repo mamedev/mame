@@ -92,9 +92,9 @@ static WRITE32_HANDLER( paletteram32_w )
 
 //---------
 
-static void sndram_set_bank(void)
+static void sndram_set_bank(running_machine *machine)
 {
-	sndram = memory_region(REGION_SOUND1) + 0x80000 * sndram_bank;
+	sndram = memory_region(machine, REGION_SOUND1) + 0x80000 * sndram_bank;
 }
 
 static WRITE32_HANDLER( sndram_bank_w )
@@ -102,7 +102,7 @@ static WRITE32_HANDLER( sndram_bank_w )
 	if (ACCESSING_BITS_16_31)
 	{
 		sndram_bank = (data >> 16) & 0x1f;
-		sndram_set_bank();
+		sndram_set_bank(machine);
 	}
 }
 
@@ -203,7 +203,7 @@ static WRITE32_HANDLER( obj_ctrl_w )
 
 static READ32_HANDLER( obj_rom_r )
 {
-	UINT8 *mem8 = memory_region(REGION_GFX1);
+	UINT8 *mem8 = memory_region(machine, REGION_GFX1);
 	int bank = obj_regs[0x28/4] >> 16;
 
 	offset += bank * 0x200;
@@ -239,7 +239,7 @@ static WRITE32_HANDLER( v_ctrl_w )
 
 static READ32_HANDLER( v_rom_r )
 {
-	UINT8 *mem8 = memory_region(REGION_GFX2);
+	UINT8 *mem8 = memory_region(machine, REGION_GFX2);
 	int bank = K056832_word_r(machine, 0x34/2, 0xffff);
 
 	offset *= 2;
@@ -1176,13 +1176,13 @@ static const struct K054539interface k054539_interface =
 
 static STATE_POSTLOAD( djmain_postload )
 {
-	sndram_set_bank();
+	sndram_set_bank(machine);
 }
 
 static MACHINE_START( djmain )
 {
 	const device_config *ide = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
-	UINT8 *region = memory_region(REGION_SOUND1);
+	UINT8 *region = memory_region(machine, REGION_SOUND1);
 
 	if (ide != NULL && ide_master_password != NULL)
 		ide_set_master_password(ide, ide_master_password);
@@ -1203,7 +1203,7 @@ static MACHINE_RESET( djmain )
 {
 	/* reset sound ram bank */
 	sndram_bank = 0;
-	sndram_set_bank();
+	sndram_set_bank(machine);
 
 	/* reset the IDE controller */
 	devtag_reset(machine, IDE_CONTROLLER, "ide");

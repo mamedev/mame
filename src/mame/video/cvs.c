@@ -225,7 +225,7 @@ VIDEO_UPDATE( cvs )
 
 	/* ROM based tiles first */
 	for (code = 0; code < ram_based_char_start_indices[character_banking_mode]; code++)
-		decodechar(screen->machine->gfx[0], code, memory_region(REGION_GFX1));
+		decodechar(screen->machine->gfx[0], code, memory_region(screen->machine, REGION_GFX1));
 
 	/* now the RAM based ones */
 	for (; code < 0x100; code++)

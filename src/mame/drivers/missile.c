@@ -371,7 +371,7 @@ static OPBASE_HANDLER( missile_opbase_handler )
 	/* ROM? */
 	else if (address >= 0x5000)
 	{
-		opbase->rom = opbase->ram = memory_region(REGION_CPU1) - offset;
+		opbase->rom = opbase->ram = memory_region(machine, REGION_CPU1) - offset;
 		return ~0;
 	}
 
@@ -383,7 +383,7 @@ static OPBASE_HANDLER( missile_opbase_handler )
 static MACHINE_START( missile )
 {
 	/* initialize globals */
-	writeprom = memory_region(REGION_PROMS);
+	writeprom = memory_region(machine, REGION_PROMS);
 	flipscreen = 0;
 
 	/* set up an opcode base handler since we use mapped handlers for RAM */
@@ -644,7 +644,7 @@ static READ8_HANDLER( missile_r )
 
 	/* ROM */
 	else if (offset >= 0x5000)
-		result = memory_region(REGION_CPU1)[offset];
+		result = memory_region(machine, REGION_CPU1)[offset];
 
 	/* POKEY */
 	else if (offset < 0x4800)
@@ -1025,7 +1025,7 @@ ROM_END
 static DRIVER_INIT( suprmatk )
 {
 	int i;
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	for (i = 0; i < 0x40; i++)
 	{

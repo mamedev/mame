@@ -132,7 +132,7 @@ static WRITE8_HANDLER( mrgoemon_coin_counter_w )
 
 	/* bits 5-7 = ROM bank select */
 	offs = 0x10000 + ((data & 0xe0) >> 5) * 0x800;
-	memory_set_bankptr(1, &memory_region(REGION_CPU1)[offs]);
+	memory_set_bankptr(1, &memory_region(machine, REGION_CPU1)[offs]);
 }
 
 static WRITE8_HANDLER( mrgoemon_flipscreen_w )

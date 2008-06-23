@@ -540,7 +540,7 @@ static READ8_HANDLER( gfx_rom_r )
 
 	if (gfx_rom_ctrl_mode)
 	{
-		UINT8 *rom = memory_region(REGION_GFX1);
+		UINT8 *rom = memory_region(machine, REGION_GFX1);
 
 		ret = rom[gfx_rom_address];
 

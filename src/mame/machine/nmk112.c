@@ -31,8 +31,8 @@ WRITE8_HANDLER( NMK112_okibank_w )
 	int banknum	=	offset & 3;
 	int paged	=	(page_mask & (1 << chip));
 
-	UINT8 *rom	=	memory_region(REGION_SOUND1 + chip);
-	int size			=	memory_region_length(REGION_SOUND1 + chip) - 0x40000;
+	UINT8 *rom	=	memory_region(machine, REGION_SOUND1 + chip);
+	int size			=	memory_region_length(machine, REGION_SOUND1 + chip) - 0x40000;
 	int bankaddr		=	(data * BANKSIZE) % size;
 
 	if (current_bank[offset] == data) return;

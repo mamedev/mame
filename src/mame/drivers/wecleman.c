@@ -1260,13 +1260,13 @@ ROM_START( wecleman )
 
 ROM_END
 
-static void wecleman_unpack_sprites(void)
+static void wecleman_unpack_sprites(running_machine *machine)
 {
 	const int region       = REGION_GFX1;	// sprites
 
-	const UINT32 len = memory_region_length(region);
-	UINT8 *src     = memory_region(region) + len / 2 - 1;
-	UINT8 *dst     = memory_region(region) + len - 1;
+	const UINT32 len = memory_region_length(machine, region);
+	UINT8 *src     = memory_region(machine, region) + len / 2 - 1;
+	UINT8 *dst     = memory_region(machine, region) + len - 1;
 
 	while(dst > src)
 	{
@@ -1298,7 +1298,7 @@ static DRIVER_INIT( wecleman )
 {
 	int i, len;
 	UINT8 *RAM;
-//  UINT16 *RAM1 = (UINT16 *) memory_region(REGION_CPU1);   /* Main CPU patches */
+//  UINT16 *RAM1 = (UINT16 *) memory_region(machine, REGION_CPU1);   /* Main CPU patches */
 //  RAM1[0x08c2/2] = 0x601e;    // faster self test
 
 	/* Decode GFX Roms - Compensate for the address lines scrambling */
@@ -1308,8 +1308,8 @@ static DRIVER_INIT( wecleman )
         I hope you'll appreciate this effort!  */
 
 	/* let's swap even and odd *pixels* of the sprites */
-	RAM = memory_region(REGION_GFX1);
-	len = memory_region_length(REGION_GFX1);
+	RAM = memory_region(machine, REGION_GFX1);
+	len = memory_region_length(machine, REGION_GFX1);
 	for (i = 0; i < len; i ++)
 	{
 		/* TODO: could be wrong, colors have to be fixed.       */
@@ -1318,18 +1318,18 @@ static DRIVER_INIT( wecleman )
 		RAM[i] = BITSWAP8(RAM[i],7,0,1,2,3,4,5,6);
 	}
 
-	bitswap(memory_region(REGION_GFX1), memory_region_length(REGION_GFX1),
+	bitswap(memory_region(machine, REGION_GFX1), memory_region_length(machine, REGION_GFX1),
 			0,1,20,19,18,17,14,9,16,6,4,7,8,15,10,11,13,5,12,3,2);
 
 	/* Now we can unpack each nibble of the sprites into a pixel (one byte) */
-	wecleman_unpack_sprites();
+	wecleman_unpack_sprites(machine);
 
 	/* Bg & Fg & Txt */
-	bitswap(memory_region(REGION_GFX2), memory_region_length(REGION_GFX2),
+	bitswap(memory_region(machine, REGION_GFX2), memory_region_length(machine, REGION_GFX2),
 			20,19,18,17,16,15,12,7,14,4,2,5,6,13,8,9,11,3,10,1,0);
 
 	/* Road */
-	bitswap(memory_region(REGION_GFX3), memory_region_length(REGION_GFX3),
+	bitswap(memory_region(machine, REGION_GFX3), memory_region_length(machine, REGION_GFX3),
 			20,19,18,17,16,15,14,7,12,4,2,5,6,13,8,9,11,3,10,1,0);
 
 	spr_color_offs = 0x40;
@@ -1389,12 +1389,12 @@ ROM_END
     in a ROM module definition.  This routine unpacks each sprite nibble
     into a byte, doubling the memory consumption. */
 
-static void hotchase_sprite_decode( int num16_banks, int bank_size )
+static void hotchase_sprite_decode( running_machine *machine, int num16_banks, int bank_size )
 {
 	UINT8 *base, *temp;
 	int i;
 
-	base = memory_region(REGION_GFX1);	// sprites
+	base = memory_region(machine, REGION_GFX1);	// sprites
 	temp = malloc_or_die( bank_size );
 
 	for( i = num16_banks; i >0; i-- ){
@@ -1439,7 +1439,7 @@ static void hotchase_sprite_decode( int num16_banks, int bank_size )
 /* Unpack sprites data and do some patching */
 static DRIVER_INIT( hotchase )
 {
-//  UINT16 *RAM1 = (UINT16) memory_region(REGION_CPU1); /* Main CPU patches */
+//  UINT16 *RAM1 = (UINT16) memory_region(machine, REGION_CPU1); /* Main CPU patches */
 //  RAM[0x1140/2] = 0x0015; RAM[0x195c/2] = 0x601A; // faster self test
 
 	UINT8 *RAM;
@@ -1447,13 +1447,13 @@ static DRIVER_INIT( hotchase )
 	/* Decode GFX Roms */
 
 	/* Let's swap even and odd bytes of the sprites gfx roms */
-	RAM = memory_region(REGION_GFX1);
+	RAM = memory_region(machine, REGION_GFX1);
 
 	/* Now we can unpack each nibble of the sprites into a pixel (one byte) */
-	hotchase_sprite_decode(3,0x80000*2);	// num banks, bank len
+	hotchase_sprite_decode(machine,3,0x80000*2);	// num banks, bank len
 
 	/* Let's copy the second half of the fg layer gfx (charset) over the first */
-	RAM = memory_region(REGION_GFX3);
+	RAM = memory_region(machine, REGION_GFX3);
 	memcpy(&RAM[0], &RAM[0x10000/2], 0x10000/2);
 
 	spr_color_offs = 0;

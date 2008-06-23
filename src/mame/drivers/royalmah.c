@@ -98,8 +98,8 @@ static int palette_base;
 static PALETTE_INIT( royalmah )
 {
 	offs_t i;
-	const UINT8 *prom = memory_region(REGION_PROMS);
-	int len = memory_region_length(REGION_PROMS);
+	const UINT8 *prom = memory_region(machine, REGION_PROMS);
+	int len = memory_region_length(machine, REGION_PROMS);
 
 	for (i = 0; i < len; i++)
 	{
@@ -133,8 +133,8 @@ static PALETTE_INIT( royalmah )
 static PALETTE_INIT( mjderngr )
 {
 	offs_t i;
-	const UINT8 *prom = memory_region(REGION_PROMS);
-	int len = memory_region_length(REGION_PROMS);
+	const UINT8 *prom = memory_region(machine, REGION_PROMS);
+	int len = memory_region_length(machine, REGION_PROMS);
 
 	for (i = 0; i < len / 2; i++)
 	{
@@ -285,7 +285,7 @@ static READ8_HANDLER ( suzume_dsw_r )
 
 static WRITE8_HANDLER ( suzume_bank_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int address;
 
 	suzume_bank = data;
@@ -301,7 +301,7 @@ logerror("%04x: bank %02x\n",activecpu_get_pc(),data);
 
 static WRITE8_HANDLER ( mjapinky_bank_w )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	rombank = data;
 	memory_set_bankptr(1,ROM + 0x10000 + 0x8000 * data);
 }
@@ -317,12 +317,12 @@ static WRITE8_HANDLER( mjapinky_palbank_w )
 static READ8_HANDLER( mjapinky_dsw_r )
 {
 	if (rombank == 0x0e)	return input_port_read_indexed(machine, 13);
-	else					return *(memory_region(REGION_CPU1) + 0x10000 + 0x8000 * rombank);
+	else					return *(memory_region(machine, REGION_CPU1) + 0x10000 + 0x8000 * rombank);
 }
 
 static WRITE8_HANDLER ( tontonb_bank_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int address;
 
 logerror("%04x: bank %02x\n",activecpu_get_pc(),data);
@@ -340,7 +340,7 @@ logerror("%04x: bank %02x\n",activecpu_get_pc(),data);
 /* bits 5 and 6 seem to affect which Dip Switch to read in 'majs101b' */
 static WRITE8_HANDLER ( dynax_bank_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int address;
 
 //logerror("%04x: bank %02x\n",activecpu_get_pc(),data);
@@ -516,7 +516,7 @@ static READ8_HANDLER( janptr96_dsw_r )
 
 static WRITE8_HANDLER( janptr96_rombank_w )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(1,ROM + 0x10000 + 0x8000 * data);
 }
 
@@ -570,7 +570,7 @@ static WRITE8_HANDLER( mjifb_coin_counter_w )
 static READ8_HANDLER( mjifb_rom_io_r )
 {
 	if (mjifb_rom_enable)
-		return ((UINT8*)(memory_region(REGION_CPU1) + 0x10000 + rombank * 0x4000))[offset];
+		return ((UINT8*)(memory_region(machine, REGION_CPU1) + 0x10000 + rombank * 0x4000))[offset];
 
 	offset += 0x8000;
 
@@ -677,7 +677,7 @@ ADDRESS_MAP_END
 static READ8_HANDLER( mjdejavu_rom_io_r )
 {
 	if (mjifb_rom_enable)
-		return ((UINT8*)(memory_region(REGION_CPU1) + 0x10000 + rombank * 0x4000))[offset];
+		return ((UINT8*)(memory_region(machine, REGION_CPU1) + 0x10000 + rombank * 0x4000))[offset];
 
 	offset += 0x8000;
 
@@ -736,7 +736,7 @@ static READ8_HANDLER( mjtensin_p3_r )
 
 static void mjtensin_update_rombank(void)
 {
-	memory_set_bankptr( 1, memory_region(REGION_CPU1) + 0x10000 + rombank * 0x8000 );
+	memory_set_bankptr( 1, memory_region(Machine, REGION_CPU1) + 0x10000 + rombank * 0x8000 );
 }
 static WRITE8_HANDLER( mjtensin_p4_w )
 {
@@ -778,7 +778,7 @@ ADDRESS_MAP_END
 
 static void cafetime_update_rombank(void)
 {
-	memory_set_bankptr( 1, memory_region(REGION_CPU1) + 0x10000 + rombank * 0x8000 );
+	memory_set_bankptr( 1, memory_region(Machine, REGION_CPU1) + 0x10000 + rombank * 0x8000 );
 }
 static WRITE8_HANDLER( cafetime_p4_w )
 {
@@ -4247,7 +4247,7 @@ ROM_START( janoh )
 ROM_END
 
 
-static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x8000 );	}
+static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x8000 );	}
 
 static DRIVER_INIT( janptr96 )
 {

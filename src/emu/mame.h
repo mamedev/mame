@@ -322,10 +322,10 @@ UINT8 *new_memory_region(running_machine *machine, int type, UINT32 length, UINT
 void free_memory_region(running_machine *machine, int num);
 
 /* return a pointer to a specified memory region */
-UINT8 *memory_region(int num);
+UINT8 *memory_region(running_machine *machine, int num);
 
 /* return the size (in bytes) of a specified memory region */
-UINT32 memory_region_length(int num);
+UINT32 memory_region_length(running_machine *machine, int num);
 
 /* return the type of a specified memory region */
 UINT32 memory_region_type(running_machine *machine, int num);

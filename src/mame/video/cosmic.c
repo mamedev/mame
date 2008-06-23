@@ -9,7 +9,7 @@
 #include "driver.h"
 
 
-static pen_t (*map_color)(UINT8 x, UINT8 y);
+static pen_t (*map_color)(running_machine *machine, UINT8 x, UINT8 y);
 
 static int color_registers[3];
 static int background_enable;
@@ -23,10 +23,10 @@ WRITE8_HANDLER( cosmic_color_register_w )
 }
 
 
-static pen_t panic_map_color(UINT8 x, UINT8 y)
+static pen_t panic_map_color(running_machine *machine, UINT8 x, UINT8 y)
 {
 	offs_t offs = (color_registers[0] << 9) | (color_registers[2] << 10) | ((x >> 4) << 5) | (y >> 3);
-	pen_t pen = memory_region(REGION_USER1)[offs];
+	pen_t pen = memory_region(machine, REGION_USER1)[offs];
 
 	if (color_registers[1])
 		pen >>= 4;
@@ -34,10 +34,10 @@ static pen_t panic_map_color(UINT8 x, UINT8 y)
 	return pen & 0x0f;
 }
 
-static pen_t cosmica_map_color(UINT8 x, UINT8 y)
+static pen_t cosmica_map_color(running_machine *machine, UINT8 x, UINT8 y)
 {
 	offs_t offs = (color_registers[0] << 9) | ((x >> 4) << 5) | (y >> 3);
-	pen_t pen = memory_region(REGION_USER1)[offs];
+	pen_t pen = memory_region(machine, REGION_USER1)[offs];
 
 	if (color_registers[0])		/* yes, 0 again according to the schematics */
 		pen >>= 4;
@@ -45,20 +45,20 @@ static pen_t cosmica_map_color(UINT8 x, UINT8 y)
 	return pen & 0x07;
 }
 
-static pen_t cosmicg_map_color(UINT8 x, UINT8 y)
+static pen_t cosmicg_map_color(running_machine *machine, UINT8 x, UINT8 y)
 {
 	offs_t offs = (color_registers[0] << 8) | (color_registers[1] << 9) | ((y >> 4) << 4) | (x >> 4);
-	pen_t pen = memory_region(REGION_USER1)[offs];
+	pen_t pen = memory_region(machine, REGION_USER1)[offs];
 
 	/* the upper 4 bits are for cocktail mode support */
 
 	return pen & 0x0f;
 }
 
-static pen_t magspot_map_color(UINT8 x, UINT8 y)
+static pen_t magspot_map_color(running_machine *machine, UINT8 x, UINT8 y)
 {
 	offs_t offs = (color_registers[0] << 9) | ((x >> 3) << 4) | (y >> 4);
-	pen_t pen = memory_region(REGION_USER1)[offs];
+	pen_t pen = memory_region(machine, REGION_USER1)[offs];
 
 	if (color_registers[1])
 		pen >>= 4;
@@ -248,7 +248,7 @@ WRITE8_HANDLER( cosmic_background_enable_w )
 }
 
 
-static void draw_bitmap(bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_bitmap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	offs_t offs;
 
@@ -260,7 +260,7 @@ static void draw_bitmap(bitmap_t *bitmap, const rectangle *cliprect)
 		UINT8 x = offs << 3;
 		UINT8 y = offs >> 5;
 
-		pen_t pen = map_color(x, y);
+		pen_t pen = map_color(machine, x, y);
 
 		for (i = 0; i < 8; i++)
 		{
@@ -318,7 +318,7 @@ static void cosmica_draw_starfield(const device_config *screen, bitmap_t *bitmap
 {
 	UINT8 y = 0;
 	UINT8 map = 0;
-	UINT8 *PROM = memory_region(REGION_USER2);
+	UINT8 *PROM = memory_region(screen->machine, REGION_USER2);
 
 	while (1)
 	{
@@ -363,11 +363,11 @@ static void cosmica_draw_starfield(const device_config *screen, bitmap_t *bitmap
 }
 
 
-static void devzone_draw_grid(bitmap_t *bitmap, const rectangle *cliprect)
+static void devzone_draw_grid(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 y;
-	UINT8 *horz_PROM = memory_region(REGION_USER2);
-	UINT8 *vert_PROM = memory_region(REGION_USER3);
+	UINT8 *horz_PROM = memory_region(machine, REGION_USER2);
+	UINT8 *vert_PROM = memory_region(machine, REGION_USER3);
 	offs_t horz_addr = 0;
 
 	UINT8 count = 0;
@@ -425,7 +425,7 @@ static void nomnlnd_draw_background(const device_config *screen, bitmap_t *bitma
 {
 	UINT8 y = 0;
 	UINT8 water = video_screen_get_frame_number(screen);
-	UINT8 *PROM = memory_region(REGION_USER2);
+	UINT8 *PROM = memory_region(screen->machine, REGION_USER2);
 
 	/* all positioning is via logic gates:
 
@@ -546,7 +546,7 @@ static void nomnlnd_draw_background(const device_config *screen, bitmap_t *bitma
 VIDEO_UPDATE( cosmicg )
 {
 	fillbitmap(bitmap, 0, cliprect);
-	draw_bitmap(bitmap, cliprect);
+	draw_bitmap(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -554,7 +554,7 @@ VIDEO_UPDATE( cosmicg )
 VIDEO_UPDATE( panic )
 {
 	fillbitmap(bitmap, 0, cliprect);
-	draw_bitmap(bitmap, cliprect);
+	draw_bitmap(screen->machine, bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap, cliprect, 0x07, 1);
 	return 0;
 }
@@ -564,7 +564,7 @@ VIDEO_UPDATE( cosmica )
 {
 	fillbitmap(bitmap, 0, cliprect);
 	cosmica_draw_starfield(screen, bitmap, cliprect);
-	draw_bitmap(bitmap, cliprect);
+	draw_bitmap(screen->machine, bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap, cliprect, 0x0f, 0);
 	return 0;
 }
@@ -573,7 +573,7 @@ VIDEO_UPDATE( cosmica )
 VIDEO_UPDATE( magspot )
 {
 	fillbitmap(bitmap, 0, cliprect);
-	draw_bitmap(bitmap, cliprect);
+	draw_bitmap(screen->machine, bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap, cliprect, 0x07, 0);
 	return 0;
 }
@@ -583,10 +583,10 @@ VIDEO_UPDATE( devzone )
 {
 	fillbitmap(bitmap, 0, cliprect);
 
-    if (background_enable)
-    	devzone_draw_grid(bitmap, cliprect);
+	if (background_enable)
+		devzone_draw_grid(screen->machine, bitmap, cliprect);
 
-	draw_bitmap(bitmap, cliprect);
+	draw_bitmap(screen->machine, bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap, cliprect, 0x07, 0);
 	return 0;
 }
@@ -598,7 +598,7 @@ VIDEO_UPDATE( nomnlnd )
        have the highest priority */
 
 	fillbitmap(bitmap, 0, cliprect);
-	draw_bitmap(bitmap, cliprect);
+	draw_bitmap(screen->machine, bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap, cliprect, 0x07, 0);
 
 	if (background_enable)

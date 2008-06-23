@@ -367,7 +367,7 @@ static UINT8 cannonb_bit_to_read;
 
 static MACHINE_RESET( mschamp )
 {
-	UINT8 *rom = memory_region(REGION_CPU1) + 0x10000;
+	UINT8 *rom = memory_region(machine, REGION_CPU1) + 0x10000;
 	int whichbank = input_port_read(machine, "GAME") & 1;
 
 	memory_configure_bank(1, 0, 2, &rom[0x0000], 0x8000);
@@ -664,7 +664,7 @@ static WRITE8_HANDLER( bigbucks_bank_w )
 static READ8_HANDLER( bigbucks_question_r )
 {
 
-	UINT8 *question = memory_region(REGION_USER1);
+	UINT8 *question = memory_region(machine, REGION_USER1);
 	UINT8 ret;
 
 	ret = question[(bigbucks_bank << 16) | (offset ^ 0xffff)];
@@ -768,7 +768,7 @@ static WRITE8_HANDLER( rocktrv2_question_bank_w )
 
 static READ8_HANDLER( rocktrv2_question_r )
 {
-	UINT8 *question = memory_region(REGION_USER1);
+	UINT8 *question = memory_region(machine, REGION_USER1);
 
 	return question[offset | (rocktrv2_question_bank * 0x8000)];
 }
@@ -5100,10 +5100,10 @@ ROM_END
  *
  *************************************/
 
-static void maketrax_rom_decode(void)
+static void maketrax_rom_decode(running_machine *machine)
 {
 	UINT8 *decrypted = auto_malloc(0x4000);
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
@@ -5128,13 +5128,13 @@ static DRIVER_INIT( maketrax )
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5080, 0x50bf, 0, 0, maketrax_special_port2_r);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x50c0, 0x50ff, 0, 0, maketrax_special_port3_r);
 
-	maketrax_rom_decode();
+	maketrax_rom_decode(machine);
 }
 
-static void korosuke_rom_decode(void)
+static void korosuke_rom_decode(running_machine *machine)
 {
 	UINT8 *decrypted = auto_malloc(0x4000);
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
@@ -5159,7 +5159,7 @@ static DRIVER_INIT( korosuke )
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5080, 0x5080, 0, 0, korosuke_special_port2_r);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x50c0, 0x50ff, 0, 0, korosuke_special_port3_r);
 
-	korosuke_rom_decode();
+	korosuke_rom_decode(machine);
 }
 
 static DRIVER_INIT( ponpoko )
@@ -5169,10 +5169,10 @@ static DRIVER_INIT( ponpoko )
 
 	int i, j;
 	UINT8 *RAM, temp;
-	int length = memory_region_length(REGION_GFX1)/2;
+	int length = memory_region_length(machine, REGION_GFX1)/2;
 
 	/* Characters */
-	RAM = memory_region(REGION_GFX1);
+	RAM = memory_region(machine, REGION_GFX1);
 	for (i = 0;i < length;i += 0x10)
 	{
 		for (j = 0; j < 8; j++)
@@ -5184,7 +5184,7 @@ static DRIVER_INIT( ponpoko )
 	}
 
 	/* Sprites */
-	RAM = memory_region(REGION_GFX1)+length;
+	RAM = memory_region(machine, REGION_GFX1)+length;
 	for (i = 0;i < length;i += 0x20)
 	{
 		for (j = 0; j < 8; j++)
@@ -5222,7 +5222,7 @@ static DRIVER_INIT( eyes )
 	/* CPU ROMs */
 
 	/* Data lines D3 and D5 swapped */
-	RAM = memory_region(REGION_CPU1);
+	RAM = memory_region(machine, REGION_CPU1);
 	for (i = 0; i < 0x4000; i++)
 	{
 		RAM[i] = BITSWAP8(RAM[i],7,6,3,4,5,2,1,0);
@@ -5232,8 +5232,8 @@ static DRIVER_INIT( eyes )
 	/* Graphics ROMs */
 
 	/* Data lines D4 and D6 and address lines A0 and A2 are swapped */
-	RAM = memory_region(REGION_GFX1);
-	len = memory_region_length(REGION_GFX1);
+	RAM = memory_region(machine, REGION_GFX1);
+	len = memory_region_length(machine, REGION_GFX1);
 	for (i = 0;i < len;i += 8)
 		eyes_decode(&RAM[i]);
 }
@@ -5246,25 +5246,25 @@ static DRIVER_INIT( woodpek )
 	/* Graphics ROMs */
 
 	/* Data lines D4 and D6 and address lines A0 and A2 are swapped */
-	RAM = memory_region(REGION_GFX1);
-	len = memory_region_length(REGION_GFX1);
+	RAM = memory_region(machine, REGION_GFX1);
+	len = memory_region_length(machine, REGION_GFX1);
 	for (i = 0;i < len;i += 8)
 		eyes_decode(&RAM[i]);
 }
 
 static DRIVER_INIT( pacplus )
 {
-	pacplus_decode();
+	pacplus_decode(machine);
 }
 
 static DRIVER_INIT( jumpshot )
 {
-	jumpshot_decode();
+	jumpshot_decode(machine);
 }
 
 static DRIVER_INIT( drivfrcp )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	int i;
 
 	for( i = 0; i < 4; i++)
@@ -5273,7 +5273,7 @@ static DRIVER_INIT( drivfrcp )
 
 static DRIVER_INIT( 8bpm )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	int i;
 
 	/* Data lines D0 and D6 swapped */
@@ -5288,7 +5288,7 @@ static DRIVER_INIT( 8bpm )
 
 static DRIVER_INIT( porky )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	int i;
 
 	/* Data lines D0 and D4 swapped */
@@ -5307,7 +5307,7 @@ static DRIVER_INIT( porky )
 static DRIVER_INIT( rocktrv2 )
 {
 	/* hack to pass the rom check for the bad rom */
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	ROM[0x7ffe] = 0xa7;
 	ROM[0x7fee] = 0x6d;
@@ -5319,7 +5319,7 @@ socket and run through the 74298.  Clock is tied to system clock.  */
 static DRIVER_INIT( mspacmbe )
 {
 	UINT8 temp;
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	int i;
 
 	/* Address lines A1 and A0 swapped if A2=0 */

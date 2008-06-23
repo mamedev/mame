@@ -9,16 +9,16 @@ extern size_t	pgm_sprite_a_region_allocate;
 /*----------- defined in machine/pgmcrypt.c -----------*/
 
 
-void pgm_kov_decrypt(void);
-void pgm_kovsh_decrypt(void);
-void pgm_kov2_decrypt(void);
-void pgm_mm_decrypt(void);
-void pgm_dw2_decrypt(void);
-void pgm_djlzz_decrypt(void);
-void pgm_dw3_decrypt(void);
-void pgm_killbld_decrypt(void);
-void pgm_pstar_decrypt(void);
-void pgm_puzzli2_decrypt(void);
+void pgm_kov_decrypt(running_machine *machine);
+void pgm_kovsh_decrypt(running_machine *machine);
+void pgm_kov2_decrypt(running_machine *machine);
+void pgm_mm_decrypt(running_machine *machine);
+void pgm_dw2_decrypt(running_machine *machine);
+void pgm_djlzz_decrypt(running_machine *machine);
+void pgm_dw3_decrypt(running_machine *machine);
+void pgm_killbld_decrypt(running_machine *machine);
+void pgm_pstar_decrypt(running_machine *machine);
+void pgm_puzzli2_decrypt(running_machine *machine);
 
 
 /*----------- defined in machine/pgmprot.c -----------*/

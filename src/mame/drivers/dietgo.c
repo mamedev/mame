@@ -350,8 +350,8 @@ ROM_END
 
 static DRIVER_INIT( dietgo )
 {
-	deco56_decrypt(REGION_GFX1);
-	deco102_decrypt(REGION_CPU1, 0xe9ba, 0x01, 0x19);
+	deco56_decrypt(machine, REGION_GFX1);
+	deco102_decrypt(machine, REGION_CPU1, 0xe9ba, 0x01, 0x19);
 }
 
 GAME( 1992, dietgo,   0,      dietgo, dietgo,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (Euro v1.1 1992.09.26)", 0 )

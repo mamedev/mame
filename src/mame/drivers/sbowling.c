@@ -54,7 +54,7 @@ static UINT8 pix[2] = {0, 0};
 
 static TILE_GET_INFO( get_sb_tile_info )
 {
-	UINT8 *rom = memory_region(REGION_USER1);
+	UINT8 *rom = memory_region(machine, REGION_USER1);
 	int tileno = rom[tile_index + bgmap * 1024];
 
 	SET_TILE_INFO(0, tileno, 0, 0);

@@ -304,8 +304,8 @@ WRITE16_HANDLER( seta_vregs_w )
 
 				if (new_bank != seta_samples_bank)
 				{
-					UINT8 *rom = memory_region(REGION_SOUND1);
-					int samples_len = memory_region_length(REGION_SOUND1);
+					UINT8 *rom = memory_region(machine, REGION_SOUND1);
+					int samples_len = memory_region_length(machine, REGION_SOUND1);
 					int addr;
 
 					seta_samples_bank = new_bank;

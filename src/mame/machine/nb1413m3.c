@@ -327,8 +327,8 @@ READ8_HANDLER( nb1413m3_sndrom_r )
 	popmessage("Sound ROM %02X:%05X [B1:%02X B2:%02X]", rombank, offset, nb1413m3_sndrombank1, nb1413m3_sndrombank2);
 #endif
 
-	if (offset < memory_region_length(nb1413m3_sndromregion))
-		return memory_region(nb1413m3_sndromregion)[offset];
+	if (offset < memory_region_length(machine, nb1413m3_sndromregion))
+		return memory_region(machine, nb1413m3_sndromregion)[offset];
 	else
 	{
 		popmessage("read past sound ROM length (%05x[%02X])",offset, rombank);
@@ -351,7 +351,7 @@ WRITE8_HANDLER( nb1413m3_sndrombank2_w )
 
 READ8_HANDLER( nb1413m3_gfxrom_r )
 {
-	UINT8 *GFXROM = memory_region(REGION_GFX1);
+	UINT8 *GFXROM = memory_region(machine, REGION_GFX1);
 
 	return GFXROM[(0x20000 * (nb1413m3_gfxrombank | ((nb1413m3_sndrombank1 & 0x02) << 3))) + ((0x0200 * nb1413m3_gfxradr_h) + (0x0002 * nb1413m3_gfxradr_l)) + (offset & 0x01)];
 }

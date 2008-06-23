@@ -123,7 +123,7 @@ static WRITE16_HANDLER( videoram16_w )
 
 static READ16_HANDLER( extra_rom_r )
 {
-	return ((UINT16 *)memory_region(REGION_GFX3))[offset];
+	return ((UINT16 *)memory_region(machine, REGION_GFX3))[offset];
 }
 
 static READ16_HANDLER( twin16_gfx_rom1_r )
@@ -1434,14 +1434,14 @@ ROM_END
 
 /* Driver Initialization */
 
-static void gfx_untangle( void )
+static void gfx_untangle( running_machine *machine )
 {
 	// sprite, tile data
 
 	int i;
 	UINT16 *temp = malloc_or_die(0x200000);
 
-		twin16_gfx_rom = (UINT16 *)memory_region(REGION_GFX2);
+		twin16_gfx_rom = (UINT16 *)memory_region(machine, REGION_GFX2);
 		memcpy( temp, twin16_gfx_rom, 0x200000 );
 
 		for( i=0; i<0x080000; i++ )
@@ -1454,25 +1454,25 @@ static void gfx_untangle( void )
 
 static DRIVER_INIT( twin16 )
 {
-	gfx_untangle();
+	gfx_untangle(machine);
 	twin16_custom_video = 0;
 }
 
 static DRIVER_INIT( fround )
 {
-	gfx_untangle();
+	gfx_untangle(machine);
 	twin16_custom_video = 1;
 }
 
 static DRIVER_INIT( hpuncher )
 {
-	gfx_untangle();
+	gfx_untangle(machine);
 	twin16_custom_video = 2;
 }
 
 static DRIVER_INIT( cuebrckj )
 {
-	gfx_untangle();
+	gfx_untangle(machine);
 	twin16_custom_video = 2;
 
 	generic_nvram = (UINT8 *)cuebrckj_nvram;

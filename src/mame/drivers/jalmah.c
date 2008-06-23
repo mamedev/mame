@@ -493,7 +493,7 @@ static WRITE16_HANDLER( jalmah_okirom_w )
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		UINT8 *oki = memory_region(REGION_SOUND1);
+		UINT8 *oki = memory_region(machine, REGION_SOUND1);
 		oki_rom = data & 1;
 		memcpy(&oki[0x20000], &oki[(oki_rom * 0x80000) + (oki_bank * 0x20000) + 0x40000], 0x20000);
 	}
@@ -507,7 +507,7 @@ static WRITE16_HANDLER( jalmah_okibank_w )
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		UINT8 *oki = memory_region(REGION_SOUND1);
+		UINT8 *oki = memory_region(machine, REGION_SOUND1);
 		oki_bank = data & 3;
 		memcpy(&oki[0x20000], &oki[(oki_rom * 0x80000) + (oki_bank * 0x20000) + 0x40000], 0x20000);
 	}

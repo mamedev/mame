@@ -681,7 +681,7 @@ static DRIVER_INIT(zr107)
 	init_konami_cgboard(1, CGBOARD_TYPE_ZR107);
 	sharc_dataram = auto_malloc(0x100000);
 
-	K001005_preprocess_texture_data(memory_region(REGION_GFX1), memory_region_length(REGION_GFX1), 0);
+	K001005_preprocess_texture_data(memory_region(machine, REGION_GFX1), memory_region_length(machine, REGION_GFX1), 0);
 
 	K056800_init(sound_irq_callback);
 
@@ -693,7 +693,7 @@ static DRIVER_INIT(jetwave)
 	init_konami_cgboard(1, CGBOARD_TYPE_GTICLUB);
 	sharc_dataram = auto_malloc(0x100000);
 
-	K001005_preprocess_texture_data(memory_region(REGION_GFX1), memory_region_length(REGION_GFX1), 0);
+	K001005_preprocess_texture_data(memory_region(machine, REGION_GFX1), memory_region_length(machine, REGION_GFX1), 0);
 
 	K056800_init(sound_irq_callback);
 

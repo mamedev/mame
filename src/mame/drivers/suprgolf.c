@@ -39,7 +39,7 @@ static READ8_HANDLER( rom_bank_select_r )
 */
 static WRITE8_HANDLER( rom_bank_select_w )
 {
-	UINT8 *region_base = memory_region(REGION_USER1);
+	UINT8 *region_base = memory_region(machine, REGION_USER1);
 
 	suprgolf_rom_bank = data;
 
@@ -49,7 +49,7 @@ static WRITE8_HANDLER( rom_bank_select_w )
 
 static WRITE8_HANDLER( rom2_bank_select_w )
 {
-	UINT8 *region_base = memory_region(REGION_USER2);
+	UINT8 *region_base = memory_region(machine, REGION_USER2);
 	mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,activecpu_get_previouspc());
 	memory_set_bankptr(1, region_base + (data&0x3f ) * 0x4000);
 }

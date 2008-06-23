@@ -338,7 +338,7 @@ static MACHINE_RESET( ssv )
 {
 	requested_int = 0;
 	cpunum_set_irq_callback(0, ssv_irq_callback);
-	memory_set_bankptr(1, memory_region(REGION_USER1));
+	memory_set_bankptr(1, memory_region(machine, REGION_USER1));
 }
 
 
@@ -579,8 +579,8 @@ static WRITE16_HANDLER( gdfs_blitram_w )
 			UINT32 dst	=	(gdfs_blitram[0xc4/2] + (gdfs_blitram[0xc6/2] << 16)) << 4;
 			UINT32 len	=	(gdfs_blitram[0xc8/2]) << 4;
 
-			UINT8 *rom	=	memory_region(REGION_GFX2);
-			size_t size	=	memory_region_length(REGION_GFX2);
+			UINT8 *rom	=	memory_region(machine, REGION_GFX2);
+			size_t size	=	memory_region_length(machine, REGION_GFX2);
 
 			if ( (src+len <= size) && (dst+len <= 4 * 0x100000) )
 			{
@@ -1050,8 +1050,8 @@ static UINT8 trackball_select, gfxrom_select;
 
 static READ16_HANDLER( eaglshot_gfxrom_r )
 {
-	UINT8 *rom	=	memory_region(REGION_GFX1);
-	size_t size	=	memory_region_length(REGION_GFX1);
+	UINT8 *rom	=	memory_region(machine, REGION_GFX1);
+	size_t size	=	memory_region_length(machine, REGION_GFX1);
 
 	offset = offset * 2 + gfxrom_select * 0x200000;
 
@@ -2752,7 +2752,7 @@ static DRIVER_INIT( ryorioh )		{	init_ssv();
 static DRIVER_INIT( srmp4 )		{	init_ssv();
 								ssv_sprites_offsx = -8;	ssv_sprites_offsy = +0xf0;
 								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xf0;
-//  ((UINT16 *)memory_region(REGION_USER1))[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
+//  ((UINT16 *)memory_region(machine, REGION_USER1))[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 							}
 static DRIVER_INIT( srmp7 )		{	init_ssv();
 								ssv_sprites_offsx = +0;	ssv_sprites_offsy = -0xf;

@@ -460,8 +460,8 @@ ROM_END
 
 static DRIVER_INIT( pktgaldx )
 {
-	deco56_decrypt(REGION_GFX1);
-	deco102_decrypt(REGION_CPU1, 0x42ba, 0x00, 0x00);
+	deco56_decrypt(machine, REGION_GFX1);
+	deco102_decrypt(machine, REGION_CPU1, 0x42ba, 0x00, 0x00);
 }
 
 GAME( 1992, pktgaldx, 0,        pktgaldx, pktgaldx, pktgaldx,  ROT0, "Data East Corporation", "Pocket Gal Deluxe (Euro v3.00)", 0 )

@@ -56,7 +56,7 @@ static void mrokumei_handleblit( running_machine *machine, int rom_base )
 	int DestAddr;
 	int BaseAddr;
 	int opcode,data,NumTiles;
-	UINT8 *pBlitData = memory_region(REGION_USER1) + rom_base;
+	UINT8 *pBlitData = memory_region(machine, REGION_USER1) + rom_base;
 
 	DestParam =
 		blitter_param[(blitter_param_count-4)&3]*256+
@@ -142,7 +142,7 @@ static void reikaids_handleblit( running_machine *machine, int rom_base )
 	int flipx;
 	int SourceAddr, BaseAddr;
 	int DestAddr;
-	UINT8 *pBlitData = memory_region(REGION_USER1) + rom_base;
+	UINT8 *pBlitData = memory_region(machine, REGION_USER1) + rom_base;
 
 	int opcode,data,NumTiles;
 
@@ -242,7 +242,7 @@ static void pteacher_handleblit( running_machine *machine, int rom_base )
 	int SourceAddr;
 	int DestAddr, BaseAddr;
 	int opcode,data,NumTiles;
-	UINT8 *pBlitData = memory_region(REGION_USER1) + rom_base;
+	UINT8 *pBlitData = memory_region(machine, REGION_USER1) + rom_base;
 
 	DestParam =
 		blitter_param[(blitter_param_count-4)&3]*256+
@@ -663,7 +663,7 @@ WRITE8_HANDLER( reikaids_blitter_start_w )
 
 WRITE8_HANDLER( pteacher_blitter_start_w )
 {
-	pteacher_handleblit(machine, (blitter_bank >> 5) * 0x10000 & (memory_region_length(REGION_USER1) - 1));
+	pteacher_handleblit(machine, (blitter_bank >> 5) * 0x10000 & (memory_region_length(machine, REGION_USER1) - 1));
 }
 
 

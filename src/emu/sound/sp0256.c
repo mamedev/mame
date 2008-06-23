@@ -33,6 +33,7 @@
 
 #include <math.h>
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
 #include "sp0256.h"
@@ -1205,7 +1206,7 @@ static void *sp0256_start(int sndindex, int clock, const void *config)
     /* -------------------------------------------------------------------- */
     /*  Setup the ROM.                                                      */
     /* -------------------------------------------------------------------- */
-	sp->rom = memory_region(intf->memory_region);
+	sp->rom = memory_region(Machine, intf->memory_region);
 	sp0256_bitrevbuff(sp->rom, 0, 0xffff);
 
 	return sp;

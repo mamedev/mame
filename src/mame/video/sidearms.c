@@ -146,7 +146,7 @@ static TILEMAP_MAPPER( sidearms_tilemap_scan )
 
 VIDEO_START( sidearms )
 {
-	tilerom = memory_region(REGION_GFX4);
+	tilerom = memory_region(machine, REGION_GFX4);
 
 	if (!sidearms_gameid)
 	{
@@ -203,7 +203,7 @@ static void draw_sprites_region(running_machine *machine, bitmap_t *bitmap, cons
 	}
 }
 
-static void sidearms_draw_starfield( bitmap_t *bitmap )
+static void sidearms_draw_starfield( running_machine *machine, bitmap_t *bitmap )
 {
 	int x, y, i;
 	UINT32 hadd_283, vadd_283, _hflop_74a_n, _hcount_191, _vcount_191;
@@ -227,7 +227,7 @@ static void sidearms_draw_starfield( bitmap_t *bitmap )
 	_vcount_191 = vcount_191;
 	_hcount_191 = hcount_191 & 0xff;
 
-	sf_rom = memory_region(REGION_USER1);
+	sf_rom = memory_region(machine, REGION_USER1);
 
 #if 0 // old loop (for reference; easier to read)
 	if (!flipon)
@@ -341,7 +341,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( sidearms )
 {
-	sidearms_draw_starfield(bitmap);
+	sidearms_draw_starfield(screen->machine, bitmap);
 
 	tilemap_set_scrollx(bg_tilemap, 0, sidearms_bg_scrollx[0] + (sidearms_bg_scrollx[1] << 8 & 0xf00));
 	tilemap_set_scrolly(bg_tilemap, 0, sidearms_bg_scrolly[0] + (sidearms_bg_scrolly[1] << 8 & 0xf00));

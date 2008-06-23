@@ -157,7 +157,7 @@ VIDEO_UPDATE( spacefev )
 	int y;
 
 	const UINT8* pRAM = videoram;
-	const UINT8* pPROM = memory_region(REGION_PROMS);
+	const UINT8* pPROM = memory_region(screen->machine, REGION_PROMS);
 
 	for (y = 0; y < 256; y++)
 	{
@@ -224,7 +224,7 @@ VIDEO_UPDATE( sheriff )
 {
 	UINT8 mask = flip_screen_get() ? 0xff : 0x00;
 
-	const UINT8* pPROM = memory_region(REGION_PROMS);
+	const UINT8* pPROM = memory_region(screen->machine, REGION_PROMS);
 
 	int x;
 	int y;

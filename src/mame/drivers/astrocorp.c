@@ -331,7 +331,7 @@ ROM_END
 static DRIVER_INIT( showhand )
 {
 /*
-    UINT16 *rom = (UINT16*)memory_region(REGION_CPU1);
+    UINT16 *rom = (UINT16*)memory_region(machine, REGION_CPU1);
 
     rom[0x0a1a/2] = 0x6000; // hopper jam
 

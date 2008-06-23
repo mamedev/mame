@@ -662,8 +662,8 @@ static DRIVER_INIT( ataxx )
 	};
 	ataxx_init_eeprom(0x00, ataxx_eeprom_data, 0x00);
 
-	leland_rotate_memory(0);
-	leland_rotate_memory(1);
+	leland_rotate_memory(machine, 0);
+	leland_rotate_memory(machine, 1);
 
 	/* set up additional input ports */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x00, 0x03, 0, 0, ataxx_trackball_r);
@@ -685,8 +685,8 @@ static DRIVER_INIT( ataxxj )
 	};
 	ataxx_init_eeprom(0x00, ataxxj_eeprom_data, 0x00);
 
-	leland_rotate_memory(0);
-	leland_rotate_memory(1);
+	leland_rotate_memory(machine, 0);
+	leland_rotate_memory(machine, 1);
 
 	/* set up additional input ports */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x00, 0x03, 0, 0, ataxx_trackball_r);
@@ -708,8 +708,8 @@ static DRIVER_INIT( wsf )
 	};
 	ataxx_init_eeprom(0x00, wsf_eeprom_data, 0x00);
 
-	leland_rotate_memory(0);
-	leland_rotate_memory(1);
+	leland_rotate_memory(machine, 0);
+	leland_rotate_memory(machine, 1);
 
 	/* set up additional input ports */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_3_r);
@@ -733,8 +733,8 @@ static DRIVER_INIT( indyheat )
 	};
 	ataxx_init_eeprom(0x00, indyheat_eeprom_data, 0x00);
 
-	leland_rotate_memory(0);
-	leland_rotate_memory(1);
+	leland_rotate_memory(machine, 0);
+	leland_rotate_memory(machine, 1);
 
 	/* set up additional input ports */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x00, 0x02, 0, 0, indyheat_wheel_r);
@@ -763,8 +763,8 @@ static DRIVER_INIT( brutforc )
 	};
 	ataxx_init_eeprom(0x00, brutforc_eeprom_data, 0x00);
 
-	leland_rotate_memory(0);
-	leland_rotate_memory(1);
+	leland_rotate_memory(machine, 0);
+	leland_rotate_memory(machine, 1);
 
 	/* set up additional input ports */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_3_r);
@@ -788,8 +788,8 @@ static DRIVER_INIT( asylum )
 	};
 	ataxx_init_eeprom(0x00, asylum_eeprom_data, 0x00);
 
-	leland_rotate_memory(0);
-	leland_rotate_memory(1);
+	leland_rotate_memory(machine, 0);
+	leland_rotate_memory(machine, 1);
 
 	/* asylum appears to have some extra RAM for the slave CPU */
 	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xf000, 0xfffb, 0, 0, SMH_BANK4, SMH_BANK4);

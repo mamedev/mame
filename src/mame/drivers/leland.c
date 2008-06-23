@@ -1853,7 +1853,7 @@ ROM_END
 /*
 Copy this code into the init function and modify:
 {
-    UINT8 *ram = memory_region(REGION_CPU1);
+    UINT8 *ram = memory_region(machine, REGION_CPU1);
     FILE *output;
 
     output = fopen("indyheat.m", "w");
@@ -1943,9 +1943,9 @@ static DRIVER_INIT( cerberus )
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = cerberus_bankswitch;
-	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x2000);
-	memory_set_bankptr(2, memory_region(REGION_CPU1) + 0xa000);
-	memory_set_bankptr(3, memory_region(REGION_CPU2) + 0x2000);
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x2000);
+	memory_set_bankptr(2, memory_region(machine, REGION_CPU1) + 0xa000);
+	memory_set_bankptr(3, memory_region(machine, REGION_CPU2) + 0x2000);
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x40, 0x80);
@@ -2211,7 +2211,7 @@ static DRIVER_INIT( redlin2p )
 	/* master CPU bankswitching */
 	leland_update_master_bank = redline_bankswitch;
 
-	leland_rotate_memory(0);
+	leland_rotate_memory(machine, 0);
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x00, 0xc0);
@@ -2242,7 +2242,7 @@ static DRIVER_INIT( quarterb )
 	/* master CPU bankswitching */
 	leland_update_master_bank = viper_bankswitch;
 
-	leland_rotate_memory(0);
+	leland_rotate_memory(machine, 0);
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x40, 0x80);
@@ -2267,9 +2267,9 @@ static DRIVER_INIT( viper )
 	/* master CPU bankswitching */
 	leland_update_master_bank = viper_bankswitch;
 
-	leland_rotate_memory(0);
-	leland_rotate_memory(1);
-	leland_rotate_memory(1);
+	leland_rotate_memory(machine, 0);
+	leland_rotate_memory(machine, 1);
+	leland_rotate_memory(machine, 1);
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x00, 0xc0);
@@ -2298,9 +2298,9 @@ static DRIVER_INIT( teamqb )
 	/* master CPU bankswitching */
 	leland_update_master_bank = viper_bankswitch;
 
-	leland_rotate_memory(0);
-	leland_rotate_memory(1);
-	leland_rotate_memory(1);
+	leland_rotate_memory(machine, 0);
+	leland_rotate_memory(machine, 1);
+	leland_rotate_memory(machine, 1);
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x40, 0x80);
@@ -2328,9 +2328,9 @@ static DRIVER_INIT( aafb )
 	/* master CPU bankswitching */
 	leland_update_master_bank = viper_bankswitch;
 
-	leland_rotate_memory(0);
-	leland_rotate_memory(1);
-	leland_rotate_memory(1);
+	leland_rotate_memory(machine, 0);
+	leland_rotate_memory(machine, 1);
+	leland_rotate_memory(machine, 1);
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x00, 0xc0);
@@ -2358,9 +2358,9 @@ static DRIVER_INIT( aafbb )
 	/* master CPU bankswitching */
 	leland_update_master_bank = viper_bankswitch;
 
-	leland_rotate_memory(0);
-	leland_rotate_memory(1);
-	leland_rotate_memory(1);
+	leland_rotate_memory(machine, 0);
+	leland_rotate_memory(machine, 1);
+	leland_rotate_memory(machine, 1);
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x80, 0x40);
@@ -2388,9 +2388,9 @@ static DRIVER_INIT( aafbd2p )
 	/* master CPU bankswitching */
 	leland_update_master_bank = viper_bankswitch;
 
-	leland_rotate_memory(0);
-	leland_rotate_memory(1);
-	leland_rotate_memory(1);
+	leland_rotate_memory(machine, 0);
+	leland_rotate_memory(machine, 1);
+	leland_rotate_memory(machine, 1);
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x00, 0x40);
@@ -2423,9 +2423,9 @@ static DRIVER_INIT( offroad )
 	/* master CPU bankswitching */
 	leland_update_master_bank = offroad_bankswitch;
 
-	leland_rotate_memory(0);
-	leland_rotate_memory(1);
-	leland_rotate_memory(1);
+	leland_rotate_memory(machine, 0);
+	leland_rotate_memory(machine, 1);
+	leland_rotate_memory(machine, 1);
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x00, 0xc0);
@@ -2460,9 +2460,9 @@ static DRIVER_INIT( offroadt )
 	/* master CPU bankswitching */
 	leland_update_master_bank = offroad_bankswitch;
 
-	leland_rotate_memory(0);
-	leland_rotate_memory(1);
-	leland_rotate_memory(1);
+	leland_rotate_memory(machine, 0);
+	leland_rotate_memory(machine, 1);
+	leland_rotate_memory(machine, 1);
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x80, 0x40);
@@ -2494,9 +2494,9 @@ static DRIVER_INIT( pigout )
 	/* master CPU bankswitching */
 	leland_update_master_bank = offroad_bankswitch;
 
-	leland_rotate_memory(0);
-	leland_rotate_memory(1);
-	leland_rotate_memory(1);
+	leland_rotate_memory(machine, 0);
+	leland_rotate_memory(machine, 1);
+	leland_rotate_memory(machine, 1);
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x00, 0x40);

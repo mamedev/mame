@@ -512,7 +512,7 @@ ROM_END
 
 static DRIVER_INIT( dynduke )
 {
-	seibu_sound_decrypt(REGION_CPU3,0x20000);
+	seibu_sound_decrypt(machine,REGION_CPU3,0x20000);
 }
 
 /* Game Drivers */

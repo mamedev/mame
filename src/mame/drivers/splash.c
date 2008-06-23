@@ -903,7 +903,7 @@ static DRIVER_INIT( roldfrog )
 
 static DRIVER_INIT( rebus )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *ROM = (UINT16 *)memory_region(machine, REGION_CPU1);
 	splash_bitmap_type = 1;
 	splash_sprite_attr2_shift = 0;
 
@@ -931,7 +931,7 @@ static DRIVER_INIT( rebus )
 
 static DRIVER_INIT( funystrp )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *ROM = (UINT16 *)memory_region(machine, REGION_CPU1);
 
 	splash_bitmap_type = 0;
 	splash_sprite_attr2_shift = 0;

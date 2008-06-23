@@ -186,7 +186,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 
 		int x,y;
 		int xsize,ysize;
-		UINT8 *rom = memory_region(REGION_GFX1);
+		UINT8 *rom = memory_region(machine, REGION_GFX1);
 		int dir=0;
 
 
@@ -310,7 +310,7 @@ static VIDEO_UPDATE(wheelfir)
 
     if ( input_code_pressed(KEYCODE_R) )
     {
-        const UINT8 *gfx = memory_region(REGION_GFX1);
+        const UINT8 *gfx = memory_region(machine, REGION_GFX1);
         for (y=0;y<128;y++)
         {
             for (x=0;x<512;x++)
@@ -680,7 +680,7 @@ ROM_END
 
 static DRIVER_INIT(wheelfir)
 {
-	UINT16 *RAM = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *RAM = (UINT16 *)memory_region(machine, REGION_CPU1);
 	RAM[0xdd3da/2] = 0x4e71; // hack!
 }
 

@@ -2146,7 +2146,7 @@ static WRITE8_HANDLER( systeme_bank_w )
 		vdp2->vram = vdp2_vram_bank0;
 	}
 
-	//memcpy(sms_rom+0x8000, memory_region(REGION_USER1)+0x10000+rombank*0x4000, 0x4000);
+	//memcpy(sms_rom+0x8000, memory_region(machine, REGION_USER1)+0x10000+rombank*0x4000, 0x4000);
 	memory_set_bank(1, rombank);
 
 }
@@ -2193,13 +2193,13 @@ static void init_systeme_map(running_machine *machine)
 //  memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, SMH_BANK1, SMH_UNMAP);
 //  memory_set_bankptr( 1, sms_rom );
 
-	memory_configure_bank(1, 0, 16, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 16, memory_region(machine, REGION_CPU1) + 0x10000, 0x4000);
 
 	/* alternate way of accessing video ram */
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, segasyse_videoram_w);
 
 
-//  memcpy(sms_rom, memory_region(REGION_USER1), 0x8000);
+//  memcpy(sms_rom, memory_region(machine, REGION_USER1), 0x8000);
 
 	/* main ram area */
 	sms_mainram = auto_malloc(0x4000);
@@ -2345,21 +2345,21 @@ static DRIVER_INIT( opaopa )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	mc8123_decrypt_rom(0, memory_region(REGION_USER1), 1, 8);
+	mc8123_decrypt_rom(machine, 0, memory_region(machine, REGION_USER1), 1, 8);
 }
 
 static DRIVER_INIT( fantzn2 )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	mc8123_decrypt_rom(0, memory_region(REGION_USER1), 0, 0);
+	mc8123_decrypt_rom(machine, 0, memory_region(machine, REGION_USER1), 0, 0);
 }
 
 static DRIVER_INIT( astrofl )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	astrofl_decode();
+	astrofl_decode(machine);
 }
 
 GAME( 1985, hangonjr, 0,        systeme, hangonjr, hangonjr, ROT0,  "Sega", "Hang-On Jr.", 0 )

@@ -519,7 +519,7 @@ void *leland_80186_sh_start(int clock, const struct CustomSound_interface *confi
 	/* if we have a 2151, install an externally driven DAC stream */
 	if (has_ym2151)
 	{
-		ext_base = memory_region(REGION_SOUND1);
+		ext_base = memory_region(Machine, REGION_SOUND1);
 		extern_stream = stream_create(0, 1, OUTPUT_RATE, NULL, leland_80186_extern_update);
 	}
 

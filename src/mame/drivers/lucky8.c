@@ -410,7 +410,7 @@ ROM_END
 static DRIVER_INIT( lucky8 )
 {
 	// patch rst $10 timing routine that gets stuck in an endless loop
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	ROM[0x0010] = 0xc9;
 }
 

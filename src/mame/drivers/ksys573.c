@@ -1325,7 +1325,7 @@ static ADDRESS_MAP_START( konami573_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-static void flash_init( void )
+static void flash_init( running_machine *machine )
 {
 	int i;
 	int chip;
@@ -1354,7 +1354,7 @@ static void flash_init( void )
 	i = 0;
 	while( flash_init[ i ].start != NULL )
 	{
-		data = memory_region( flash_init[ i ].region );
+		data = memory_region( machine, flash_init[ i ].region );
 		if( data != NULL )
 		{
 			size = 0;
@@ -1365,7 +1365,7 @@ static void flash_init( void )
 				size += flash_init[ i ].size;
 				flash_chips++;
 			}
-			if( size != memory_region_length( flash_init[ i ].region ) )
+			if( size != memory_region_length( machine, flash_init[ i ].region ) )
 			{
 				fatalerror( "flash_init %d incorrect region length\n", i );
 			}
@@ -1408,11 +1408,11 @@ static void *atapi_get_device(void)
 	return ret;
 }
 
-static void security_cart_init( int cart, int eeprom_region, int ds2401_region )
+static void security_cart_init( running_machine *machine, int cart, int eeprom_region, int ds2401_region )
 {
-	UINT8 *eeprom_rom = memory_region( eeprom_region );
-	int eeprom_length = memory_region_length( eeprom_region );
-	UINT8 *ds2401_rom = memory_region( ds2401_region );
+	UINT8 *eeprom_rom = memory_region( machine, eeprom_region );
+	int eeprom_length = memory_region_length( machine, eeprom_region );
+	UINT8 *ds2401_rom = memory_region( machine, ds2401_region );
 
 	if( eeprom_rom != NULL )
 	{
@@ -1501,12 +1501,12 @@ static DRIVER_INIT( konami573 )
 		m_p_timer_root[i] = timer_alloc(root_finished, NULL);
 	}
 
-	timekeeper_init( 0, TIMEKEEPER_M48T58, memory_region( REGION_USER11 ) );
+	timekeeper_init( 0, TIMEKEEPER_M48T58, memory_region( machine, REGION_USER11 ) );
 
 	state_save_register_global( m_n_security_control );
 
-	security_cart_init( 0, REGION_USER2, REGION_USER9 );
-	security_cart_init( 1, REGION_USER8, REGION_USER10 );
+	security_cart_init( machine, 0, REGION_USER2, REGION_USER9 );
+	security_cart_init( machine, 1, REGION_USER8, REGION_USER10 );
 
 	state_save_register_item_array( "KSYS573", 0, m_p_n_root_count );
 	state_save_register_item_array( "KSYS573", 0, m_p_n_root_mode );
@@ -1514,7 +1514,7 @@ static DRIVER_INIT( konami573 )
 	state_save_register_item_array( "KSYS573", 0, m_p_n_root_start );
 
 	adc083x_init( 0, ADC0834, analogue_inputs_callback );
-	flash_init();
+	flash_init(machine);
 }
 
 static MACHINE_RESET( konami573 )

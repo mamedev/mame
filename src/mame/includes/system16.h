@@ -85,7 +85,7 @@ extern int sys16_sprite_quartet2( struct sys16_sprite_attributes *sprite, const 
 
 void *fd1094_get_decrypted_base(void);
 void fd1094_machine_init(void);
-void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(UINT8 *));
+void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(running_machine *, UINT8 *));
 
 /*----------- defined in machine/system16.c -----------*/
 

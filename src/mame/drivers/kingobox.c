@@ -865,7 +865,7 @@ ROM_END
 static DRIVER_INIT( ringkin3 )
 {
 	int i;
-	UINT8 *RAM = memory_region(REGION_PROMS);
+	UINT8 *RAM = memory_region(machine, REGION_PROMS);
 
 	/* expand the first color PROM to look like the kingofb ones... */
 	for (i = 0;i < 0x100;i++)
@@ -875,8 +875,8 @@ static DRIVER_INIT( ringkin3 )
 static DRIVER_INIT( ringkinw )
 {
 	int i,j,k;
-	UINT8 *PROMS = memory_region(REGION_PROMS);
-	UINT8 *USER1 = memory_region(REGION_USER1);
+	UINT8 *PROMS = memory_region(machine, REGION_PROMS);
+	UINT8 *USER1 = memory_region(machine, REGION_USER1);
 
 	/* change the PROMs encode in a simple format to use kingofb decode */
 	for(i=0,j=0; j < 0x40; i++,j++)

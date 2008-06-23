@@ -499,7 +499,7 @@ ROM_END
 
 static DRIVER_INIT( finalizr )
 {
-	konami1_decode(0);
+	konami1_decode(machine, 0);
 }
 
 

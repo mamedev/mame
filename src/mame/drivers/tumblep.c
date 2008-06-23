@@ -383,7 +383,7 @@ ROM_END
 void tumblep_patch_code(UINT16 offset)
 {
 	/* A hack which enables all Dip Switches effects */
-	UINT16 *RAM = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *RAM = (UINT16 *)memory_region(machine, REGION_CPU1);
 	RAM[(offset + 0)/2] = 0x0240;
 	RAM[(offset + 2)/2] = 0xffff;	// andi.w  #$f3ff, D0
 }
@@ -391,7 +391,7 @@ void tumblep_patch_code(UINT16 offset)
 
 static DRIVER_INIT( tumblep )
 {
-	deco56_decrypt(REGION_GFX1);
+	deco56_decrypt(machine, REGION_GFX1);
 
 	#if TUMBLEP_HACK
 	tumblep_patch_code(0x000132);

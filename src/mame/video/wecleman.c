@@ -107,8 +107,8 @@ static struct sprite *sprite_list_create(int num_sprites)
 static void get_sprite_info(running_machine *machine)
 {
 	const pen_t *base_pal = machine->pens;
-	UINT8 *base_gfx = memory_region(REGION_GFX1);
-	int gfx_max     = memory_region_length(REGION_GFX1);
+	UINT8 *base_gfx = memory_region(machine, REGION_GFX1);
+	int gfx_max     = memory_region_length(machine, REGION_GFX1);
 
 	UINT16 *source = spriteram16;
 

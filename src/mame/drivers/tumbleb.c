@@ -483,9 +483,9 @@ static const int tumbleb_sound_lookup[256] = {
 };
 
 /* we use channels 1,2,3 for sound effects, and channel 4 for music */
-static void tumbleb2_set_music_bank(int bank)
+static void tumbleb2_set_music_bank(running_machine *machine, int bank)
 {
-	UINT8 *oki = memory_region(REGION_SOUND1);
+	UINT8 *oki = memory_region(machine, REGION_SOUND1);
 	memcpy(&oki[0x38000], &oki[0x80000+0x38000+0x8000*bank],0x8000);
 }
 
@@ -612,7 +612,7 @@ static void process_tumbleb2_music_command(running_machine *machine, int data)
 					tumblep_music_command = 0x38;
 					break;
 			}
-			tumbleb2_set_music_bank(tumblep_music_bank);
+			tumbleb2_set_music_bank(machine, tumblep_music_bank);
 			tumbleb2_playmusic(machine);
 
 		}
@@ -858,7 +858,7 @@ static WRITE16_HANDLER( semicom_soundcmd_w )
 
 static WRITE8_HANDLER( oki_sound_bank_w )
 {
-	UINT8 *oki = memory_region(REGION_SOUND1);
+	UINT8 *oki = memory_region(machine, REGION_SOUND1);
 	memcpy(&oki[0x30000], &oki[(data * 0x10000) + 0x40000], 0x10000);
 }
 
@@ -882,7 +882,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(jumppop_z80_bank_w)
 {
-	memory_set_bankptr(1, memory_region(REGION_CPU2) + 0x10000 + (0x4000 * data));
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU2) + 0x10000 + (0x4000 * data));
 }
 
 static ADDRESS_MAP_START( jumppop_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -939,8 +939,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( jumpkids_oki_bank_w )
 {
-	UINT8* sound1 = memory_region(REGION_SOUND1);
-	UINT8* sound2 = memory_region(REGION_SOUND2);
+	UINT8* sound1 = memory_region(machine, REGION_SOUND1);
+	UINT8* sound2 = memory_region(machine, REGION_SOUND2);
 	int bank = data & 0x03;
 
 	memcpy (sound1+0x20000, sound2+bank*0x20000, 0x20000);
@@ -2167,8 +2167,8 @@ static MACHINE_RESET (htchctch)
 {
 	/* copy protection data every reset */
 
-	UINT16 *PROTDATA = (UINT16*)memory_region(REGION_USER1);
-	int i, len = memory_region_length(REGION_USER1);
+	UINT16 *PROTDATA = (UINT16*)memory_region(machine, REGION_USER1);
+	int i, len = memory_region_length(machine, REGION_USER1);
 
 	for (i = 0;i < len/2;i++)
 		tumblepb_mainram[0x000/2 + i] = PROTDATA[i];
@@ -3282,17 +3282,17 @@ ROM_END
 void tumblepb_patch_code(UINT16 offset)
 {
 	/* A hack which enables all Dip Switches effects */
-	UINT16 *RAM = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *RAM = (UINT16 *)memory_region(Machine, REGION_CPU1);
 	RAM[(offset + 0)/2] = 0x0240;
 	RAM[(offset + 2)/2] = 0xffff;	// andi.w  #$f3ff, D0
 }
 #endif
 
 
-static void tumblepb_gfx1_rearrange(void)
+static void tumblepb_gfx1_rearrange(running_machine *machine)
 {
-	UINT8 *rom = memory_region(REGION_GFX1);
-	int len = memory_region_length(REGION_GFX1);
+	UINT8 *rom = memory_region(machine, REGION_GFX1);
+	int len = memory_region_length(machine, REGION_GFX1);
 	int i;
 
 	/* gfx data is in the wrong order */
@@ -3312,7 +3312,7 @@ static void tumblepb_gfx1_rearrange(void)
 
 static DRIVER_INIT( tumblepb )
 {
-	tumblepb_gfx1_rearrange();
+	tumblepb_gfx1_rearrange(machine);
 
 	#if TUMBLEP_HACK
 	tumblepb_patch_code(0x000132);
@@ -3321,7 +3321,7 @@ static DRIVER_INIT( tumblepb )
 
 static DRIVER_INIT( tumbleb2 )
 {
-	tumblepb_gfx1_rearrange();
+	tumblepb_gfx1_rearrange(machine);
 
 	#if TUMBLEP_HACK
 	tumblepb_patch_code(0x000132);
@@ -3333,7 +3333,7 @@ static DRIVER_INIT( tumbleb2 )
 
 static DRIVER_INIT( jumpkids )
 {
-	tumblepb_gfx1_rearrange();
+	tumblepb_gfx1_rearrange(machine);
 
 	#if TUMBLEP_HACK
 	tumblepb_patch_code(0x00013a);
@@ -3345,12 +3345,12 @@ static DRIVER_INIT( fncywld )
 	#if FNCYWLD_HACK
 	/* This is a hack to allow you to use the extra features
          of the 2 first "Unused" Dip Switch (see notes above). */
-	UINT16 *RAM = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *RAM = (UINT16 *)memory_region(machine, REGION_CPU1);
 	RAM[0x0005fa/2] = 0x4e71;
 	RAM[0x00060a/2] = 0x4e71;
 	#endif
 
-	tumblepb_gfx1_rearrange();
+	tumblepb_gfx1_rearrange(machine);
 }
 
 
@@ -3363,7 +3363,7 @@ static READ16_HANDLER( bcstory_1a0_read )
 
 static DRIVER_INIT ( bcstory )
 {
-	tumblepb_gfx1_rearrange();
+	tumblepb_gfx1_rearrange(machine);
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x180008, 0x180009, 0, 0, bcstory_1a0_read ); // io should be here??
 }
 
@@ -3372,9 +3372,9 @@ static DRIVER_INIT ( bcstory )
 static DRIVER_INIT( htchctch )
 {
 
-//  UINT16 *HCROM = (UINT16*)memory_region(REGION_CPU1);
-	UINT16 *PROTDATA = (UINT16*)memory_region(REGION_USER1);
-	int i, len = memory_region_length(REGION_USER1);
+//  UINT16 *HCROM = (UINT16*)memory_region(machine, REGION_CPU1);
+	UINT16 *PROTDATA = (UINT16*)memory_region(machine, REGION_USER1);
+	int i, len = memory_region_length(machine, REGION_USER1);
 	/* simulate RAM initialization done by the protection MCU */
 	/* verified on real hardware */
 //  static UINT16 htchctch_mcu68k[] =
@@ -3391,7 +3391,7 @@ static DRIVER_INIT( htchctch )
 
 
 
-	tumblepb_gfx1_rearrange();
+	tumblepb_gfx1_rearrange(machine);
 
 /* trojan.. */
 #if 0
@@ -3624,9 +3624,9 @@ static DRIVER_INIT( htchctch )
 }
 
 
-static void suprtrio_decrypt_code(void)
+static void suprtrio_decrypt_code(running_machine *machine)
 {
-	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
 	UINT16 *buf = malloc_or_die(0x80000);
 	int i;
 
@@ -3644,9 +3644,9 @@ static void suprtrio_decrypt_code(void)
 	}
 }
 
-static void suprtrio_decrypt_gfx(void)
+static void suprtrio_decrypt_gfx(running_machine *machine)
 {
-	UINT16 *rom = (UINT16 *)memory_region(REGION_GFX1);
+	UINT16 *rom = (UINT16 *)memory_region(machine, REGION_GFX1);
 	UINT16 *buf = malloc_or_die(0x100000);
 	int i;
 
@@ -3663,8 +3663,8 @@ static void suprtrio_decrypt_gfx(void)
 
 static DRIVER_INIT( suprtrio )
 {
-	suprtrio_decrypt_code();
-	suprtrio_decrypt_gfx();
+	suprtrio_decrypt_code(machine);
+	suprtrio_decrypt_gfx(machine);
 }
 
 static DRIVER_INIT( chokchok )
@@ -3688,7 +3688,7 @@ static DRIVER_INIT( wlstar )
 
 static DRIVER_INIT ( dquizgo )
 {
-	tumblepb_gfx1_rearrange();
+	tumblepb_gfx1_rearrange(machine);
 }
 
 

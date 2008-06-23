@@ -27,6 +27,7 @@
 
 #include <math.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "includes/snes.h"
 
@@ -1140,7 +1141,7 @@ void *snes_sh_start(int clock, const struct CustomSound_interface *config)
 	UINT8 ii;
 
 	/* put IPL image at the top of RAM */
-	memcpy(snes_ipl_region, memory_region(REGION_USER5), 64);
+	memcpy(snes_ipl_region, memory_region(Machine, REGION_USER5), 64);
 
 	/* default to ROM visible */
 	spc_ram[0xf1] = 0x80;
@@ -1292,7 +1293,7 @@ WRITE8_HANDLER( spc_io_w )
 			{
 				if (data & 0x80)
 				{
-					memcpy(snes_ipl_region, memory_region(REGION_USER5), 64);
+					memcpy(snes_ipl_region, memory_region(machine, REGION_USER5), 64);
 				}
 				else
 				{

@@ -81,7 +81,7 @@ static MACHINE_RESET( nbmj8991 )
 {
 	if (machine->config->cpu[1].type == CPU_Z80)
 	{
-		memory_configure_bank(1, 0, 4, memory_region(REGION_CPU2) + 0x8000, 0x8000);
+		memory_configure_bank(1, 0, 4, memory_region(machine, REGION_CPU2) + 0x8000, 0x8000);
 		memory_set_bank(1, 0);
 	}
 	MACHINE_RESET_CALL(nb1413m3);
@@ -119,7 +119,7 @@ static DRIVER_INIT( vanilla )
 
 static DRIVER_INIT( finalbny )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	int i;
 
 	for (i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
@@ -145,7 +145,7 @@ static DRIVER_INIT( hyouban )
 static DRIVER_INIT( galkaika )
 {
 #if 1
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
@@ -156,7 +156,7 @@ static DRIVER_INIT( galkaika )
 static DRIVER_INIT( tokyogal )
 {
 #if 1
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
@@ -167,7 +167,7 @@ static DRIVER_INIT( tokyogal )
 static DRIVER_INIT( tokimbsj )
 {
 #if 1
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;

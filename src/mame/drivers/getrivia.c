@@ -190,43 +190,43 @@ static WRITE8_HANDLER( nmi_w )
 
 static WRITE8_HANDLER( banksel_1_1_w )
 {
-	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x10000);
+	memory_set_bankptr(1,memory_region(machine, REGION_CPU1) + 0x10000);
 }
 static WRITE8_HANDLER( banksel_2_1_w )
 {
-	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x14000);
+	memory_set_bankptr(1,memory_region(machine, REGION_CPU1) + 0x14000);
 }
 static WRITE8_HANDLER( banksel_3_1_w )
 {
-	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x18000);
+	memory_set_bankptr(1,memory_region(machine, REGION_CPU1) + 0x18000);
 }
 static WRITE8_HANDLER( banksel_4_1_w )
 {
-	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x1c000);
+	memory_set_bankptr(1,memory_region(machine, REGION_CPU1) + 0x1c000);
 }
 static WRITE8_HANDLER( banksel_5_1_w )
 {
-	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x20000);
+	memory_set_bankptr(1,memory_region(machine, REGION_CPU1) + 0x20000);
 }
 static WRITE8_HANDLER( banksel_1_2_w )
 {
-	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x12000);
+	memory_set_bankptr(1,memory_region(machine, REGION_CPU1) + 0x12000);
 }
 static WRITE8_HANDLER( banksel_2_2_w )
 {
-	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x16000);
+	memory_set_bankptr(1,memory_region(machine, REGION_CPU1) + 0x16000);
 }
 static WRITE8_HANDLER( banksel_3_2_w )
 {
-	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x1a000);
+	memory_set_bankptr(1,memory_region(machine, REGION_CPU1) + 0x1a000);
 }
 static WRITE8_HANDLER( banksel_4_2_w )
 {
-	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x1e000);
+	memory_set_bankptr(1,memory_region(machine, REGION_CPU1) + 0x1e000);
 }
 static WRITE8_HANDLER( banksel_5_2_w )
 {
-	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x22000);
+	memory_set_bankptr(1,memory_region(machine, REGION_CPU1) + 0x22000);
 }
 
 static ADDRESS_MAP_START( getrivia_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -840,7 +840,7 @@ ROM_END
 
 static DRIVER_INIT( setbank )
 {
-	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x2000);
+	memory_set_bankptr(1,memory_region(machine, REGION_CPU1) + 0x2000);
 }
 
 GAME( 1982, jokpoker, 0,        gselect,  gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03B)",            GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

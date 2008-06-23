@@ -561,8 +561,8 @@ static void get_sprite_info_cave(running_machine *machine)
 	const int region				=	REGION_GFX1;
 
 	pen_t          base_pal	=	0;
-	const UINT8  *base_gfx	=	memory_region(region);
-	int                   code_max	=	memory_region_length(region) / (16*16);
+	const UINT8  *base_gfx	=	memory_region(machine, region);
+	int                   code_max	=	memory_region_length(machine, region) / (16*16);
 
 	UINT16      *source			=	spriteram16 + ((spriteram_size/2) / 2) * spriteram_bank;
 	UINT16      *finish			=	source + ((spriteram_size/2) / 2);
@@ -682,8 +682,8 @@ static void get_sprite_info_donpachi(running_machine *machine)
 	const int region				=	REGION_GFX1;
 
 	pen_t          base_pal	=	0;
-	const UINT8  *base_gfx	=	memory_region(region);
-	int                   code_max	=	memory_region_length(region) / (16*16);
+	const UINT8  *base_gfx	=	memory_region(machine, region);
+	int                   code_max	=	memory_region_length(machine, region) / (16*16);
 
 	UINT16      *source			=	spriteram16 + ((spriteram_size/2) / 2) * spriteram_bank;
 	UINT16      *finish			=	source + ((spriteram_size/2) / 2);

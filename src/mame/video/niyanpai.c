@@ -85,10 +85,10 @@ WRITE16_HANDLER( niyanpai_palette_w )
 
 
 ******************************************************************************/
-static int niyanpai_blitter_r(int vram, int offset)
+static int niyanpai_blitter_r(running_machine *machine, int vram, int offset)
 {
 	int ret;
-	UINT8 *GFXROM = memory_region(REGION_GFX1);
+	UINT8 *GFXROM = memory_region(machine, REGION_GFX1);
 
 	switch (offset)
 	{
@@ -196,7 +196,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 
 static void niyanpai_gfxdraw(running_machine *machine, int vram)
 {
-	UINT8 *GFX = memory_region(REGION_GFX1);
+	UINT8 *GFX = memory_region(machine, REGION_GFX1);
 	int width = video_screen_get_width(machine->primary_screen);
 
 	int x, y;
@@ -243,7 +243,7 @@ static void niyanpai_gfxdraw(running_machine *machine, int vram)
 		skipy = -1;
 	}
 
-	gfxlen = memory_region_length(REGION_GFX1);
+	gfxlen = memory_region_length(machine, REGION_GFX1);
 	gfxaddr = ((blitter_src_addr[vram] + 2) & 0x00ffffff);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)
@@ -357,9 +357,9 @@ WRITE16_HANDLER( niyanpai_blitter_0_w )	{ niyanpai_blitter_w(machine, 0, offset,
 WRITE16_HANDLER( niyanpai_blitter_1_w )	{ niyanpai_blitter_w(machine, 1, offset, data); }
 WRITE16_HANDLER( niyanpai_blitter_2_w )	{ niyanpai_blitter_w(machine, 2, offset, data); }
 
-READ16_HANDLER( niyanpai_blitter_0_r )	{ return niyanpai_blitter_r(0, offset); }
-READ16_HANDLER( niyanpai_blitter_1_r )	{ return niyanpai_blitter_r(1, offset); }
-READ16_HANDLER( niyanpai_blitter_2_r )	{ return niyanpai_blitter_r(2, offset); }
+READ16_HANDLER( niyanpai_blitter_0_r )	{ return niyanpai_blitter_r(machine, 0, offset); }
+READ16_HANDLER( niyanpai_blitter_1_r )	{ return niyanpai_blitter_r(machine, 1, offset); }
+READ16_HANDLER( niyanpai_blitter_2_r )	{ return niyanpai_blitter_r(machine, 2, offset); }
 
 WRITE16_HANDLER( niyanpai_clut_0_w )	{ niyanpai_clut_w(0, offset, data); }
 WRITE16_HANDLER( niyanpai_clut_1_w )	{ niyanpai_clut_w(1, offset, data); }

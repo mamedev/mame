@@ -226,14 +226,14 @@ static WRITE16_HANDLER( opwolf3_adc_req_w )
 
 static INT32 banknum = -1;
 
-static void reset_sound_region(void)
+static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr( 10, memory_region(REGION_CPU2) + (banknum * 0x4000) + 0x10000 );
+	memory_set_bankptr( 10, memory_region(machine, REGION_CPU2) + (banknum * 0x4000) + 0x10000 );
 }
 
 static STATE_POSTLOAD( slapshot_postload )
 {
-	reset_sound_region();
+	reset_sound_region(machine);
 }
 
 static MACHINE_START( slapshot )
@@ -246,7 +246,7 @@ static MACHINE_START( slapshot )
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	banknum = (data - 1) & 7;
-	reset_sound_region();
+	reset_sound_region(machine);
 }
 
 static WRITE16_HANDLER( slapshot_msb_sound_w )
@@ -727,8 +727,8 @@ ROM_END
 static DRIVER_INIT( slapshot )
 {
 	UINT32 offset,i;
-	UINT8 *gfx = memory_region(REGION_GFX2);
-	int size=memory_region_length(REGION_GFX2);
+	UINT8 *gfx = memory_region(machine, REGION_GFX2);
+	int size=memory_region_length(machine, REGION_GFX2);
 	int data;
 
 	timekeeper_init( 0, TIMEKEEPER_MK48T08, NULL );

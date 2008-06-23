@@ -530,7 +530,7 @@ ROM_END
 
 static DRIVER_INIT( couple )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	#if 0 //quick rom compare test
 	{

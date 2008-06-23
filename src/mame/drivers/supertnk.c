@@ -126,7 +126,7 @@ static WRITE8_HANDLER( supertnk_bankswitch_0_w )
 
 	bank_address = 0x10000 + (supertnk_rom_bank * 0x1000);
 
-	memory_set_bankptr(1, &memory_region(REGION_CPU1)[bank_address]);
+	memory_set_bankptr(1, &memory_region(machine, REGION_CPU1)[bank_address]);
 }
 
 
@@ -138,7 +138,7 @@ static WRITE8_HANDLER( supertnk_bankswitch_1_w )
 
 	bank_address = 0x10000 + (supertnk_rom_bank * 0x1000);
 
-	memory_set_bankptr(1, &memory_region(REGION_CPU1)[bank_address]);
+	memory_set_bankptr(1, &memory_region(machine, REGION_CPU1)[bank_address]);
 }
 
 
@@ -215,10 +215,10 @@ static WRITE8_HANDLER( supertnk_bitplane_select_1_w )
 }
 
 
-static void get_pens(pen_t *pens)
+static void get_pens(running_machine *machine, pen_t *pens)
 {
 	offs_t i;
-	const UINT8 *prom = memory_region(REGION_PROMS);
+	const UINT8 *prom = memory_region(machine, REGION_PROMS);
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
@@ -234,7 +234,7 @@ static VIDEO_UPDATE( supertnk )
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
-	get_pens(pens);
+	get_pens(screen->machine, pens);
 
 	for (offs = 0; offs < supertnk_videoram_size; offs++)
 	{
@@ -476,8 +476,8 @@ static DRIVER_INIT( supertnk )
 {
 	/* decode the TMS9980 ROMs */
 	offs_t offs;
-	UINT8 *rom = memory_region(REGION_CPU1);
-	size_t len = memory_region_length(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	size_t len = memory_region_length(machine, REGION_CPU1);
 
 	for (offs = 0; offs < len; offs++)
 	{

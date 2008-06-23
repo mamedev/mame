@@ -24,6 +24,7 @@
 #include <math.h>
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "okim6295.h"
 
@@ -334,7 +335,7 @@ static void *okim6295_start(int sndindex, int clock, const void *config)
 
 	info->command = -1;
 	info->bank_offset = 0;
-	info->region_base = memory_region(intf->region);
+	info->region_base = memory_region(Machine, intf->region);
 
 	info->master_clock = clock;
 

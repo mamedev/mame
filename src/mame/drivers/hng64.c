@@ -1458,7 +1458,7 @@ static INTERRUPT_GEN( irq_start )
 static MACHINE_RESET(hyperneo)
 {
 	int i ;
-	const UINT8 *rom = memory_region(REGION_USER2);
+	const UINT8 *rom = memory_region(machine, REGION_USER2);
 
 	/* Sound CPU */
 	UINT8 *RAM = (UINT8*)hng64_soundram;

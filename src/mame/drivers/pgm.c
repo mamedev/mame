@@ -1638,11 +1638,11 @@ MACHINE_DRIVER_END
 /* This function expands the 32x32 5-bit data into a format which is easier to
    decode in MAME */
 
-static void expand_32x32x5bpp(void)
+static void expand_32x32x5bpp(running_machine *machine)
 {
-	UINT8 *src    = memory_region       ( REGION_GFX1 );
-	UINT8 *dst    = memory_region       ( REGION_GFX2 );
-	size_t  srcsize = memory_region_length( REGION_GFX1 );
+	UINT8 *src    = memory_region       ( machine, REGION_GFX1 );
+	UINT8 *dst    = memory_region       ( machine, REGION_GFX2 );
+	size_t  srcsize = memory_region_length( machine, REGION_GFX1 );
 	int cnt, pix;
 
 	for (cnt = 0; cnt < srcsize/5 ; cnt ++)
@@ -1664,10 +1664,10 @@ static void expand_32x32x5bpp(void)
 UINT8 *pgm_sprite_a_region;
 size_t	pgm_sprite_a_region_allocate;
 
-static void expand_colourdata(void)
+static void expand_colourdata(running_machine *machine)
 {
-	UINT8 *src    = memory_region       ( REGION_GFX3 );
-	size_t  srcsize = memory_region_length( REGION_GFX3 );
+	UINT8 *src    = memory_region       ( machine, REGION_GFX3 );
+	size_t  srcsize = memory_region_length( machine, REGION_GFX3 );
 	int cnt;
 	size_t	needed = srcsize / 2 * 3;
 
@@ -1691,25 +1691,25 @@ static void expand_colourdata(void)
 	}
 }
 
-static void pgm_basic_init(void)
+static void pgm_basic_init(running_machine *machine)
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(1,&ROM[0x100000]);
 
-	expand_32x32x5bpp();
-	expand_colourdata();
+	expand_32x32x5bpp(machine);
+	expand_colourdata(machine);
 }
 
 static DRIVER_INIT( pgm )
 {
-	pgm_basic_init();
+	pgm_basic_init(machine);
 }
 
 /* Oriental Legend INIT */
 
 static DRIVER_INIT( orlegend )
 {
-	pgm_basic_init();
+	pgm_basic_init(machine);
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xC0400e, 0xC0400f, 0, 0, pgm_asic3_r, pgm_asic3_w);
 	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xC04000, 0xC04001, 0, 0, pgm_asic3_reg_w);
@@ -1717,8 +1717,8 @@ static DRIVER_INIT( orlegend )
 
 static void drgwld2_common_init(running_machine *machine)
 {
-	pgm_basic_init();
-	pgm_dw2_decrypt();
+	pgm_basic_init(machine);
+	pgm_dw2_decrypt(machine);
 	/*
     Info from Elsemi
     Here is how to "bypass" the dw2 hang protection, it fixes the mode
@@ -1730,7 +1730,7 @@ static void drgwld2_common_init(running_machine *machine)
 
 static DRIVER_INIT( drgw2 )
 {	/* incomplete? */
-	UINT16 *mem16 = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, REGION_CPU1);
 	drgwld2_common_init(machine);
 	/* These ROM patches are not hacks, the protection device
        overlays the normal ROM code, this has been confirmed on a real PCB
@@ -1742,7 +1742,7 @@ static DRIVER_INIT( drgw2 )
 
 static DRIVER_INIT( drgw2c )
 {
-	UINT16 *mem16 = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, REGION_CPU1);
 	drgwld2_common_init(machine);
 	/* These ROM patches are not hacks, the protection device
        overlays the normal ROM code, this has been confirmed on a real PCB
@@ -1754,7 +1754,7 @@ static DRIVER_INIT( drgw2c )
 
 static DRIVER_INIT( drgw2j )
 {
-	UINT16 *mem16 = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, REGION_CPU1);
 	drgwld2_common_init(machine);
 	/* These ROM patches are not hacks, the protection device
        overlays the normal ROM code, this has been confirmed on a real PCB
@@ -1766,7 +1766,7 @@ static DRIVER_INIT( drgw2j )
 
 static DRIVER_INIT( kov )
 {
-	pgm_basic_init();
+	pgm_basic_init(machine);
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_r16, ASIC28_w16);
 
@@ -1774,26 +1774,26 @@ static DRIVER_INIT( kov )
       the protection device provides the region code */
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
 
- 	pgm_kov_decrypt();
+ 	pgm_kov_decrypt(machine);
 }
 
 static DRIVER_INIT( kov2 )
 {
-	pgm_basic_init();
-	pgm_kov2_decrypt();
+	pgm_basic_init(machine);
+	pgm_kov2_decrypt(machine);
 }
 
 static DRIVER_INIT( martmast )
 {
-	pgm_basic_init();
-	pgm_mm_decrypt();
+	pgm_basic_init(machine);
+	pgm_mm_decrypt(machine);
 }
 
 
 static DRIVER_INIT( pstar )
 {
-	pgm_basic_init();
- 	pgm_pstar_decrypt();
+	pgm_basic_init(machine);
+ 	pgm_pstar_decrypt(machine);
 
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4f0025, 0, 0, PSTARS_protram_r);
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, PSTARS_r16);
@@ -1804,7 +1804,7 @@ static DRIVER_INIT( pstar )
 
 static DRIVER_INIT( kovsh )
 {
-	pgm_basic_init();
+	pgm_basic_init(machine);
 
 //  memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_r16, ASIC28_w16);
 
@@ -1812,12 +1812,12 @@ static DRIVER_INIT( kovsh )
       the protection device provides the region code */
 //  memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
 
- 	pgm_kovsh_decrypt();
+ 	pgm_kovsh_decrypt(machine);
 }
 
 static DRIVER_INIT( djlzz )
 {
-	pgm_basic_init();
+	pgm_basic_init(machine);
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_r16, ASIC28_w16);
 
@@ -1825,16 +1825,16 @@ static DRIVER_INIT( djlzz )
       the protection device provides the region code */
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
 
- 	pgm_djlzz_decrypt();
+ 	pgm_djlzz_decrypt(machine);
 }
 
 static DRIVER_INIT( dw3 )
 {
-	pgm_basic_init();
+	pgm_basic_init(machine);
 
 //  memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xda0000, 0xdaffff, 0, 0, dw3_prot_r, dw3_prot_w);
 
- 	pgm_dw3_decrypt();
+ 	pgm_dw3_decrypt(machine);
 }
 
 
@@ -1935,7 +1935,7 @@ static WRITE16_HANDLER( killbld_prot_w )
 						/* for now, cheat -- the scramble isn't understood, it might
                            be state based */
 						int x;
-						UINT16 *RAMDUMP = (UINT16*)memory_region(REGION_USER2);
+						UINT16 *RAMDUMP = (UINT16*)memory_region(machine, REGION_USER2);
 						for (x=0;x<size;x++)
 						{
 							UINT16 dat;
@@ -1948,8 +1948,8 @@ static WRITE16_HANDLER( killbld_prot_w )
 					{
 						/* mode 5 seems to be a straight copy */
 						int x;
-						UINT16 *RAMDUMP = (UINT16*)memory_region(REGION_USER2);
-						UINT16 *PROTROM = (UINT16*)memory_region(REGION_USER1);
+						UINT16 *RAMDUMP = (UINT16*)memory_region(machine, REGION_USER2);
+						UINT16 *PROTROM = (UINT16*)memory_region(machine, REGION_USER1);
 						for (x=0;x<size;x++)
 						{
 							UINT16 dat;
@@ -1965,8 +1965,8 @@ static WRITE16_HANDLER( killbld_prot_w )
 					{
 						/* mode 6 seems to swap bytes and nibbles */
 						int x;
-						UINT16 *RAMDUMP = (UINT16*)memory_region(REGION_USER2);
-						UINT16 *PROTROM = (UINT16*)memory_region(REGION_USER1);
+						UINT16 *RAMDUMP = (UINT16*)memory_region(machine, REGION_USER2);
+						UINT16 *PROTROM = (UINT16*)memory_region(machine, REGION_USER1);
 						for (x=0;x<size;x++)
 						{
 							UINT16 dat;
@@ -2052,10 +2052,10 @@ static MACHINE_RESET( killbld )
 
 static DRIVER_INIT( killbld )
 {
-	UINT16 *mem16 = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, REGION_CPU1);
 
-	pgm_basic_init();
- 	pgm_killbld_decrypt();
+	pgm_basic_init(machine);
+ 	pgm_killbld_decrypt(machine);
 
 
 
@@ -2124,7 +2124,7 @@ static WRITE16_HANDLER(ddp2_protram_w)
 
 static DRIVER_INIT( ddp2 )
 {
-	pgm_basic_init();
+	pgm_basic_init(machine);
 
 	/* some kind of busy / counter */
 	/* the actual protection is an arm cpu with internal rom */
@@ -2142,9 +2142,9 @@ static DRIVER_INIT( puzzli2 )
      it uses an arm with no external rom
      an acts in a similar way to kov etc. */
 
-	UINT16 *mem16 = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, REGION_CPU1);
 
-	pgm_basic_init();
+	pgm_basic_init(machine);
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_r16, ASIC28_w16);
 
@@ -2152,7 +2152,7 @@ static DRIVER_INIT( puzzli2 )
       the protection device provides the region code */
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
 
- 	pgm_puzzli2_decrypt();
+ 	pgm_puzzli2_decrypt(machine);
 
 	/* protection related? */
 	mem16[0x1548ec/2]=0x4e71;
@@ -2174,8 +2174,8 @@ static DRIVER_INIT( puzzli2 )
 
 static MACHINE_RESET( olds )
 {
-	UINT16 *mem16 = (UINT16 *)memory_region(REGION_USER2);
-//  UINT16 *mem16_a = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, REGION_USER2);
+//  UINT16 *mem16_a = (UINT16 *)memory_region(machine, REGION_CPU1);
 	int i;
 
 	MACHINE_RESET_CALL(pgm);
@@ -2277,9 +2277,9 @@ static WRITE16_HANDLER( olds_w16 )
 
 static DRIVER_INIT( olds )
 {
-//  UINT16 *mem16 = (UINT16 *)memory_region(REGION_CPU1);
+//  UINT16 *mem16 = (UINT16 *)memory_region(machine, REGION_CPU1);
 
-	pgm_basic_init();
+	pgm_basic_init(machine);
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xdcb400, 0xdcb403, 0, 0, olds_r16, olds_w16);
 

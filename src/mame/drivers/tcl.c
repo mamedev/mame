@@ -178,8 +178,8 @@ static DRIVER_INIT(tcl)
 {
 	/* only the first part is decrypted (and verified)*/
 
-	UINT8 *dest = memory_region(REGION_CPU1);
-	int len = memory_region_length(REGION_CPU1);
+	UINT8 *dest = memory_region(machine, REGION_CPU1);
+	int len = memory_region_length(machine, REGION_CPU1);
 	UINT8 *src = malloc_or_die(len);
 
 	int i,idx=0;

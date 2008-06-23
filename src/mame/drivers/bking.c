@@ -99,7 +99,7 @@ static WRITE8_HANDLER( bking3_addr_h_w )
 
 static READ8_HANDLER( bking3_extrarom_r )
 {
-	UINT8 *rom = memory_region(REGION_USER2);
+	UINT8 *rom = memory_region(machine, REGION_USER2);
 	return rom[bking3_addr_h * 256 + bking3_addr_l];
 }
 

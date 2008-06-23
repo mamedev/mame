@@ -867,9 +867,8 @@ void free_memory_region(running_machine *machine, int num)
     region
 -------------------------------------------------*/
 
-UINT8 *memory_region(int num)
+UINT8 *memory_region(running_machine *machine, int num)
 {
-	running_machine *machine = Machine;
 	mame_private *mame = machine->mame_data;
 
 	/* convert to an index and return the result */
@@ -883,9 +882,8 @@ UINT8 *memory_region(int num)
     memory region
 -------------------------------------------------*/
 
-UINT32 memory_region_length(int num)
+UINT32 memory_region_length(running_machine *machine, int num)
 {
-	running_machine *machine = Machine;
 	mame_private *mame = machine->mame_data;
 
 	/* convert to an index and return the result */

@@ -127,7 +127,7 @@ VIDEO_START( ikki )
 VIDEO_UPDATE( ikki )
 {
 	offs_t offs;
-	UINT8 *VIDEOATTR = memory_region( REGION_USER1 );
+	UINT8 *VIDEOATTR = memory_region( screen->machine, REGION_USER1 );
 
 	/* draw bg layer */
 

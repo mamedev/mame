@@ -81,7 +81,7 @@ void vb_bgprombank_w( running_machine *machine, int bank )
 
 	if (bank==vb_bgprombank) return;
 
-	color_prom = memory_region(REGION_PROMS) + bank*0x80;
+	color_prom = memory_region(machine, REGION_PROMS) + bank*0x80;
 	for (i=0;i<128;i++, color_prom++) {
 		palette_set_color_rgb(machine,i,pal4bit(color_prom[0] >> 0),pal4bit(color_prom[0] >> 4),
 				       pal4bit(color_prom[0x800] >> 0));
@@ -97,7 +97,7 @@ void vb_spprombank_w( running_machine *machine, int bank )
 
 	if (bank==vb_spprombank) return;
 
-	color_prom = memory_region(REGION_PROMS)+0x400 + bank*0x80;
+	color_prom = memory_region(machine, REGION_PROMS)+0x400 + bank*0x80;
 	for (i=128;i<256;i++,color_prom++)	{
 		palette_set_color_rgb(machine,i,pal4bit(color_prom[0] >> 0),pal4bit(color_prom[0] >> 4),
 				       pal4bit(color_prom[0x800] >> 0));

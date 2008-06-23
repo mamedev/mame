@@ -163,7 +163,7 @@ static WRITE16_HANDLER( galpanic_6295_bankswitch_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = memory_region(REGION_SOUND1);
+		UINT8 *rom = memory_region(machine, REGION_SOUND1);
 
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 
@@ -176,7 +176,7 @@ static WRITE16_HANDLER( galpania_6295_bankswitch_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = memory_region(REGION_SOUND1);
+		UINT8 *rom = memory_region(machine, REGION_SOUND1);
 
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 	}

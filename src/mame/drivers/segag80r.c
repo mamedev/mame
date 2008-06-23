@@ -1413,7 +1413,7 @@ static void monsterb_expand_gfx(int region)
 
 	/* expand the background ROMs; A11/A12 of each ROM is independently controlled via */
 	/* banking */
-	dest = memory_region(region);
+	dest = memory_region(Machine, region);
 	temp = malloc_or_die(0x4000);
 	memcpy(temp, dest, 0x4000);
 
@@ -1499,7 +1499,7 @@ static DRIVER_INIT( monsterb )
 static DRIVER_INIT( monster2 )
 {
 	/* configure the 315-5006 security chip */
-	spatter_decode();
+	spatter_decode(machine);
 	sega_security(0);
 
 	/* configure video */
@@ -1536,7 +1536,7 @@ static DRIVER_INIT( pignewt )
 static DRIVER_INIT( sindbadm )
 {
 	/* configure the encrypted Z80 */
-	sindbadm_decode();
+	sindbadm_decode(machine);
 	sega_security(0);
 
 	/* configure video */

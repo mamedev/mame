@@ -73,7 +73,7 @@ static VIDEO_UPDATE(chinsan)
 
 static MACHINE_RESET( chinsan )
 {
-	memory_configure_bank(1, 0, 4, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 4, memory_region(machine, REGION_CPU1) + 0x10000, 0x4000);
 }
 
 
@@ -526,9 +526,9 @@ static DRIVER_INIT( chinsan )
 {
 
 	int i;
-	UINT8 *src = memory_region( REGION_USER3 );
+	UINT8 *src = memory_region( machine, REGION_USER3 );
 
-	mc8123_decrypt_rom(0, memory_region(REGION_USER1), 1, 4);
+	mc8123_decrypt_rom(machine, 0, memory_region(machine, REGION_USER1), 1, 4);
 
 	for (i=0;i<0x100;i++)
 	{

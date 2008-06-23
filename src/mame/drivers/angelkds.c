@@ -161,7 +161,7 @@ VIDEO_UPDATE( angelkds );
 static WRITE8_HANDLER ( angelkds_cpu_bank_write )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(REGION_USER1);
+	UINT8 *RAM = memory_region(machine, REGION_USER1);
 
 	bankaddress = data & 0x0f;
 	memory_set_bankptr(1,&RAM[bankaddress*0x4000]);
@@ -737,7 +737,7 @@ ROM_START( spcpostn )
 ROM_END
 
 
-static DRIVER_INIT( spcpostn )	{ spcpostn_decode(); }
+static DRIVER_INIT( spcpostn )	{ spcpostn_decode(machine); }
 
 
 GAME( 1988, angelkds, 0, angelkds, angelkds,        0,  ROT90,  "Sega / Nasco?", "Angel Kids (Japan)" , 0) /* Nasco not displayed but 'Exa Planning' is */

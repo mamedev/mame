@@ -64,7 +64,7 @@ static WRITE8_HANDLER( onetwo_fgram_w )
 
 static WRITE8_HANDLER( onetwo_cpubank_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1) + 0x10000;
+	UINT8 *RAM = memory_region(machine, REGION_CPU1) + 0x10000;
 
 	memory_set_bankptr(1,&RAM[data * 0x4000]);
 }

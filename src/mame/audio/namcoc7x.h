@@ -20,7 +20,7 @@ ADDRESS_MAP_EXTERN(namcoc7x_mcu_io, 8);
 INTERRUPT_GEN( namcoc7x_interrupt );
 
 void namcoc7x_sound_write16(UINT16 command, UINT32 offset);
-void namcoc7x_on_driver_init(void);
+void namcoc7x_on_driver_init(running_machine *machine);
 void namcoc7x_set_host_ram(UINT32 *hostram);
 
 #define NAMCO_C7X_HARDWARE	\

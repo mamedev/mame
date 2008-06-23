@@ -17,15 +17,15 @@
 
 ***************************************************************************/
 
-static void gaelco2_ROM16_split(int src_reg, int dst_reg, int start, int length, int dest1, int dest2)
+static void gaelco2_ROM16_split(running_machine *machine, int src_reg, int dst_reg, int start, int length, int dest1, int dest2)
 {
 	int i;
 
 	/* get a pointer to the source data */
-	UINT8 *src = (UINT8 *)memory_region(src_reg);
+	UINT8 *src = (UINT8 *)memory_region(machine, src_reg);
 
 	/* get a pointer to the destination data */
-	UINT8 *dst = (UINT8 *)memory_region(dst_reg);
+	UINT8 *dst = (UINT8 *)memory_region(machine, dst_reg);
 
 	/* fill destination areas with the proper data */
 	for (i = 0; i < length/2; i++){
@@ -62,16 +62,16 @@ DRIVER_INIT( alighunt )
     */
 
 	/* split ROM u48 */
-	gaelco2_ROM16_split(REGION_GFX2, REGION_GFX1, 0x0000000, 0x0400000, 0x0000000, 0x0400000);
+	gaelco2_ROM16_split(machine, REGION_GFX2, REGION_GFX1, 0x0000000, 0x0400000, 0x0000000, 0x0400000);
 
 	/* split ROM u47 */
-	gaelco2_ROM16_split(REGION_GFX2, REGION_GFX1, 0x0400000, 0x0400000, 0x0200000, 0x0600000);
+	gaelco2_ROM16_split(machine, REGION_GFX2, REGION_GFX1, 0x0400000, 0x0400000, 0x0200000, 0x0600000);
 
 	/* split ROM u50 */
-	gaelco2_ROM16_split(REGION_GFX2, REGION_GFX1, 0x0800000, 0x0400000, 0x0800000, 0x0c00000);
+	gaelco2_ROM16_split(machine, REGION_GFX2, REGION_GFX1, 0x0800000, 0x0400000, 0x0800000, 0x0c00000);
 
 	/* split ROM u49 */
-	gaelco2_ROM16_split(REGION_GFX2, REGION_GFX1, 0x0c00000, 0x0400000, 0x0a00000, 0x0e00000);
+	gaelco2_ROM16_split(machine, REGION_GFX2, REGION_GFX1, 0x0c00000, 0x0400000, 0x0a00000, 0x0e00000);
 }
 
 
@@ -93,13 +93,13 @@ DRIVER_INIT( touchgo )
     */
 
 	/* split ROM ic65 */
-	gaelco2_ROM16_split(REGION_GFX2, REGION_GFX1, 0x0000000, 0x0400000, 0x0000000, 0x0400000);
+	gaelco2_ROM16_split(machine, REGION_GFX2, REGION_GFX1, 0x0000000, 0x0400000, 0x0000000, 0x0400000);
 
 	/* split ROM ic66 */
-	gaelco2_ROM16_split(REGION_GFX2, REGION_GFX1, 0x0400000, 0x0200000, 0x0200000, 0x0600000);
+	gaelco2_ROM16_split(machine, REGION_GFX2, REGION_GFX1, 0x0400000, 0x0200000, 0x0200000, 0x0600000);
 
 	/* split ROM ic67 */
-	gaelco2_ROM16_split(REGION_GFX2, REGION_GFX1, 0x0800000, 0x0400000, 0x0800000, 0x0c00000);
+	gaelco2_ROM16_split(machine, REGION_GFX2, REGION_GFX1, 0x0800000, 0x0400000, 0x0800000, 0x0c00000);
 }
 
 
@@ -121,13 +121,13 @@ DRIVER_INIT( snowboar )
     */
 
 	/* split ROM sb44 */
-	gaelco2_ROM16_split(REGION_GFX2, REGION_GFX1, 0x0000000, 0x0400000, 0x0000000, 0x0400000);
+	gaelco2_ROM16_split(machine, REGION_GFX2, REGION_GFX1, 0x0000000, 0x0400000, 0x0000000, 0x0400000);
 
 	/* split ROM sb45 */
-	gaelco2_ROM16_split(REGION_GFX2, REGION_GFX1, 0x0400000, 0x0400000, 0x0200000, 0x0600000);
+	gaelco2_ROM16_split(machine, REGION_GFX2, REGION_GFX1, 0x0400000, 0x0400000, 0x0200000, 0x0600000);
 
 	/* split ROM sb46 */
-	gaelco2_ROM16_split(REGION_GFX2, REGION_GFX1, 0x0800000, 0x0400000, 0x0800000, 0x0c00000);
+	gaelco2_ROM16_split(machine, REGION_GFX2, REGION_GFX1, 0x0800000, 0x0400000, 0x0800000, 0x0c00000);
 }
 
 /***************************************************************************

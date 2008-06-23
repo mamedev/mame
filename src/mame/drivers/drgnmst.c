@@ -448,9 +448,9 @@ static UINT8 drgnmst_asciitohex(UINT8 data)
 
 static DRIVER_INIT( drgnmst )
 {
-	UINT8 *drgnmst_PICROM_HEX = memory_region(REGION_USER1);
-	UINT16 *drgnmst_PICROM = (UINT16 *)memory_region(REGION_CPU2);
-	UINT8 *drgnmst_PCM = memory_region(REGION_SOUND1);
+	UINT8 *drgnmst_PICROM_HEX = memory_region(machine, REGION_USER1);
+	UINT16 *drgnmst_PICROM = (UINT16 *)memory_region(machine, REGION_CPU2);
+	UINT8 *drgnmst_PCM = memory_region(machine, REGION_SOUND1);
 	INT32   offs, data;
 	UINT16  src_pos = 0;
 	UINT16  dst_pos = 0;

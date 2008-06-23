@@ -13,4 +13,4 @@ WRITE16_HANDLER( sprcpt_flags_2_w );
 
 /*----------- defined in machine/r2crypt.c -----------*/
 
-void raiden2_decrypt_sprites(void);
+void raiden2_decrypt_sprites(running_machine *machine);

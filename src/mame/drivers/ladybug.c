@@ -951,8 +951,8 @@ static DRIVER_INIT( dorodon )
 
 	offs_t i;
 	UINT8 *decrypted = auto_malloc(0x6000);
-	UINT8 *rom = memory_region(REGION_CPU1);
-	UINT8 *table = memory_region(REGION_USER1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *table = memory_region(machine, REGION_USER1);
 
 	memory_set_decrypted_region(0, 0x0000, 0x5fff, decrypted);
 

@@ -24,7 +24,7 @@ struct segaic16_memory_map_entry
 void segaic16_memory_mapper_init(running_machine *machine, int cpunum, const struct segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(UINT8), UINT8 (*sound_r_callback)(void));
 void segaic16_memory_mapper_reset(running_machine *machine);
 void segaic16_memory_mapper_config(running_machine *machine, const UINT8 *map_data);
-void segaic16_memory_mapper_set_decrypted(UINT8 *decrypted);
+void segaic16_memory_mapper_set_decrypted(running_machine *machine, UINT8 *decrypted);
 READ8_HANDLER( segaic16_memory_mapper_r );
 WRITE8_HANDLER( segaic16_memory_mapper_w );
 READ16_HANDLER( segaic16_memory_mapper_lsb_r );

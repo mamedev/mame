@@ -59,7 +59,7 @@ static UINT32 flash_cmd = 0;
 
 static READ32_HANDLER( flash_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(REGION_USER1);
+	UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_USER1);
 
 	if(offset >= (0x2000000 - flash_roms * 0x400000) / 4)
 	{
@@ -98,7 +98,7 @@ static WRITE32_HANDLER( flash_w )
 		if(data == 0xd0d00000)
 		{
 			// point to game settings
-			UINT8 *rom = (UINT8 *)memory_region(REGION_USER1) + offset*4;
+			UINT8 *rom = (UINT8 *)memory_region(machine, REGION_USER1) + offset*4;
 
 			// erase one block
 			memset(rom, 0xff, 0x10000);
@@ -116,7 +116,7 @@ static WRITE32_HANDLER( flash_w )
 		}
 		else
 		{
-			UINT16 *rom = (UINT16 *)memory_region(REGION_USER1);
+			UINT16 *rom = (UINT16 *)memory_region(machine, REGION_USER1);
 
 			// write game settings
 
@@ -209,7 +209,7 @@ static NVRAM_HANDLER( flashroms )
 	if (read_or_write)
 	{
 		// point to game settings
-		UINT8 *rom = (UINT8 *)memory_region(REGION_USER1) + 0x1c00000 + 0x360000;
+		UINT8 *rom = (UINT8 *)memory_region(machine, REGION_USER1) + 0x1c00000 + 0x360000;
 		UINT8 tmp[0x40000];
 		int i;
 
@@ -222,7 +222,7 @@ static NVRAM_HANDLER( flashroms )
 	else if (file)
 	{
 		// point to game settings
-		UINT8 *rom = (UINT8 *)memory_region(REGION_USER1) + 0x1c00000 + 0x360000;
+		UINT8 *rom = (UINT8 *)memory_region(machine, REGION_USER1) + 0x1c00000 + 0x360000;
 		UINT8 tmp[0x40000];
 		int i;
 
@@ -547,7 +547,7 @@ ROM_END
 
 static DRIVER_INIT( xfiles )
 {
-	UINT8 *rom = (UINT8 *)memory_region(REGION_USER1) + 0x1c00000;
+	UINT8 *rom = (UINT8 *)memory_region(machine, REGION_USER1) + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3aa92e)] = 3;
 	rom[BYTE4_XOR_BE(0x3aa92f)] = 0;
@@ -564,7 +564,7 @@ static DRIVER_INIT( xfiles )
 
 static DRIVER_INIT( kdynastg )
 {
-	UINT8 *rom = (UINT8 *)memory_region(REGION_USER1) + 0x1c00000;
+	UINT8 *rom = (UINT8 *)memory_region(machine, REGION_USER1) + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3aaa10)] = 3; // 129f0 - nopped call
 	rom[BYTE4_XOR_BE(0x3aaa11)] = 0;

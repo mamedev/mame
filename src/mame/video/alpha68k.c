@@ -324,7 +324,7 @@ VIDEO_UPDATE( alpha68k_V_sb )
 static void draw_sprites_I(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int c, int d, int yshift)
 {
 	int data, offs, mx, my, tile, color, fy, i;
-	UINT8 *color_prom = memory_region(REGION_USER1);
+	UINT8 *color_prom = memory_region(machine, REGION_USER1);
 	gfx_element *gfx = machine->gfx[0];
 
 	for (offs=0; offs<0x400; offs+=0x20)
@@ -431,7 +431,7 @@ static void kyros_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 {
 	int offs,mx,my,color,tile,i,bank,fy,fx;
 	int data;
-	UINT8 *color_prom = memory_region(REGION_USER1);
+	UINT8 *color_prom = memory_region(machine, REGION_USER1);
 
 //AT
 	for (offs=0; offs<0x400; offs+=0x20)

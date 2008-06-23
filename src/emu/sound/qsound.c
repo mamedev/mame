@@ -33,6 +33,7 @@
 
 #include <math.h>
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "qsound.h"
 
@@ -105,8 +106,8 @@ static void *qsound_start(int sndindex, int clock, const void *config)
 
 	chip->intf = config;
 
-	chip->sample_rom = (QSOUND_SRC_SAMPLE *)memory_region(chip->intf->region);
-	chip->sample_rom_length = memory_region_length(chip->intf->region);
+	chip->sample_rom = (QSOUND_SRC_SAMPLE *)memory_region(Machine, chip->intf->region);
+	chip->sample_rom_length = memory_region_length(Machine, chip->intf->region);
 
 	memset(chip->channel, 0, sizeof(chip->channel));
 

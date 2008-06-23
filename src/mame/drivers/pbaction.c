@@ -406,7 +406,7 @@ static READ8_HANDLER( pbactio3_prot_kludge_r )
 static DRIVER_INIT( pbactio3 )
 {
 	int i;
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	/* first of all, do a simple bitswap */
 	for (i = 0;i < 0xc000;i++)
@@ -415,7 +415,7 @@ static DRIVER_INIT( pbactio3 )
 	}
 
 	/* then do the standard Sega decryption */
-	pbaction_decode();
+	pbaction_decode(machine);
 
 	/* install a protection (?) workaround */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc000, 0, 0, pbactio3_prot_kludge_r );

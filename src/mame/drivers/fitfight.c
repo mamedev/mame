@@ -988,7 +988,7 @@ ROM_END
 
 static DRIVER_INIT( fitfight )
 {
-//  UINT16 *mem16 = (UINT16 *)memory_region(REGION_CPU1);
+//  UINT16 *mem16 = (UINT16 *)memory_region(machine, REGION_CPU1);
 //  mem16[0x0165B2/2]=0x4e71; // for now so it boots
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x700000, 0x700001, 0, 0, fitfight_700000_r);
 	bbprot_kludge = 0;
@@ -996,7 +996,7 @@ static DRIVER_INIT( fitfight )
 
 static DRIVER_INIT( histryma )
 {
-//  UINT16 *mem16 = (UINT16 *)memory_region(REGION_CPU1);
+//  UINT16 *mem16 = (UINT16 *)memory_region(machine, REGION_CPU1);
 //  mem16[0x017FDC/2]=0x4e71; // for now so it boots
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x700000, 0x700001, 0, 0, histryma_700000_r);
 	bbprot_kludge = 0;

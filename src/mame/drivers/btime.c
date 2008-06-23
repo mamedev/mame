@@ -83,12 +83,12 @@ static void btime_decrypt(void)
 	/* however if the previous instruction was JSR (which caused a write to */
 	/* the stack), fetch the address of the next instruction. */
 	addr1 = activecpu_get_previouspc();
-	src1 = (addr1 < 0x9000) ? rambase : memory_region(REGION_CPU1);
+	src1 = (addr1 < 0x9000) ? rambase : memory_region(Machine, REGION_CPU1);
 	if (decrypted[addr1] == 0x20)	/* JSR $xxxx */
 		addr = src1[addr1+1] + 256 * src1[addr1+2];
 
 	/* If the address of the next instruction is xxxx xxx1 xxxx x1xx, decode it. */
-	src = (addr < 0x9000) ? rambase : memory_region(REGION_CPU1);
+	src = (addr < 0x9000) ? rambase : memory_region(Machine, REGION_CPU1);
 	if ((addr & 0x0104) == 0x0104)
 	{
 		/* 76543210 -> 65342710 bit rotation */
@@ -1629,7 +1629,7 @@ ROM_END
 static void decrypt_C10707_cpu(int cpu, int region)
 {
 	UINT8 *decrypt = auto_malloc(0x10000);
-	UINT8 *rom = memory_region(region);
+	UINT8 *rom = memory_region(Machine, region);
 	offs_t addr;
 
 	memory_set_decrypted_region(cpu, 0x0000, 0xffff, decrypt);
@@ -1644,7 +1644,7 @@ static void decrypt_C10707_cpu(int cpu, int region)
 
 static READ8_HANDLER( wtennis_reset_hack_r )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	/* Otherwise the game goes into test mode and there is no way out that I
        can see.  I'm not sure how it can work, it probably somehow has to do
@@ -1657,7 +1657,7 @@ static READ8_HANDLER( wtennis_reset_hack_r )
 
 static void init_rom1(void)
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(Machine, REGION_CPU1);
 
 	decrypted = auto_malloc(0x10000);
 	memory_set_decrypted_region(0, 0x0000, 0xffff, decrypted);
@@ -1675,7 +1675,7 @@ static DRIVER_INIT( btime )
 
 static DRIVER_INIT( zoar )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	/* At location 0xD50A is what looks like an undocumented opcode. I tried
        implementing it given what opcode 0x23 should do, but it still didn't
@@ -1693,13 +1693,13 @@ static DRIVER_INIT( lnc )
 
 static DRIVER_INIT( cookrace )
 {
-	memcpy(&audio_rambase[0x200], memory_region(REGION_CPU2) + 0xf200, 0x200);
+	memcpy(&audio_rambase[0x200], memory_region(machine, REGION_CPU2) + 0xf200, 0x200);
 	decrypt_C10707_cpu(0, REGION_CPU1);
 }
 
 static DRIVER_INIT( wtennis )
 {
-	memcpy(&audio_rambase[0x200], memory_region(REGION_CPU2) + 0xf200, 0x200);
+	memcpy(&audio_rambase[0x200], memory_region(machine, REGION_CPU2) + 0xf200, 0x200);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
 	decrypt_C10707_cpu(0, REGION_CPU1);
 }

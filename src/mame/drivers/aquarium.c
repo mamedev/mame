@@ -73,7 +73,7 @@ VIDEO_UPDATE(aquarium);
 #if AQUARIUS_HACK
 static MACHINE_RESET( aquarium )
 {
-	UINT16 *RAM = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *RAM = (UINT16 *)memory_region(machine, REGION_CPU1);
 	int data = input_port_read(machine, "FAKE");
 
 	/* Language : 0x0000 = Japanese - Other value = English */
@@ -108,7 +108,7 @@ static WRITE16_HANDLER( aquarium_sound_w )
 static WRITE8_HANDLER( aquarium_z80_bank_w )
 {
 	int soundbank = ((data & 0x7) + 1) * 0x8000;
-	UINT8 *Z80 = (UINT8 *)memory_region(REGION_CPU2);
+	UINT8 *Z80 = (UINT8 *)memory_region(machine, REGION_CPU2);
 
 	memory_set_bankptr(1, &Z80[soundbank + 0x10000]);
 }
@@ -291,8 +291,8 @@ static DRIVER_INIT( aquarium )
        the roms containing the 1bpp data so we can decode it
        correctly */
 
-	UINT8 *DAT2 = memory_region(REGION_GFX1)+0x080000;
-	UINT8 *DAT = memory_region(REGION_USER1);
+	UINT8 *DAT2 = memory_region(machine, REGION_GFX1)+0x080000;
+	UINT8 *DAT = memory_region(machine, REGION_USER1);
 	int len = 0x0200000;
 
 	for (len = 0 ; len < 0x020000 ; len ++ )
@@ -307,8 +307,8 @@ static DRIVER_INIT( aquarium )
 		DAT2[len*4+2] |= (DAT[len] & 0x01) << 3;
 	}
 
-	DAT2 = memory_region(REGION_GFX4)+0x080000;
-	DAT = memory_region(REGION_USER2);
+	DAT2 = memory_region(machine, REGION_GFX4)+0x080000;
+	DAT = memory_region(machine, REGION_USER2);
 
 	for (len = 0 ; len < 0x020000 ; len ++ )
 	{

@@ -531,8 +531,8 @@ static WRITE16_HANDLER ( OLD_megaplay_genesis_io_w )
 
 static READ8_HANDLER( bank_r )
 {
-	UINT8* bank = memory_region(REGION_CPU3);
-	UINT8* game = memory_region(REGION_CPU1);
+	UINT8* bank = memory_region(machine, REGION_CPU3);
+	UINT8* game = memory_region(machine, REGION_CPU1);
 
 	if(game_banksel == 0x142) // Genesis I/O
 		return OLD_megaplay_genesis_io_r(machine, (offset & 0x1f) / 2, 0xffff);
@@ -919,11 +919,11 @@ ROM_START( mp_mazin ) /* Mazin Wars */
 ROM_END
 
 
-static void megplay_stat(void)
+static void megplay_stat(running_machine *machine)
 {
-	UINT8 *src = memory_region(REGION_CPU3);
-	UINT8 *instruction_rom = memory_region(REGION_USER1);
-	UINT8 *game_rom = memory_region(REGION_CPU1);
+	UINT8 *src = memory_region(machine, REGION_CPU3);
+	UINT8 *instruction_rom = memory_region(machine, REGION_USER1);
+	UINT8 *game_rom = memory_region(machine, REGION_CPU1);
 	int offs;
 
 
@@ -973,7 +973,7 @@ static DRIVER_INIT (megaplay)
 	genesis_io_ram = auto_malloc(0x20);
 
 	DRIVER_INIT_CALL(megadrij);
-	megplay_stat();
+	megplay_stat(machine);
 
 	/* for now ... */
 	memory_install_readwrite16_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0xa10000, 0xa1001f, 0, 0, OLD_megaplay_genesis_io_r, OLD_megaplay_genesis_io_w);

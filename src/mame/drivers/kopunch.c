@@ -222,7 +222,7 @@ ROM_END
 
 static DRIVER_INIT( kopunch )
 {
-//  UINT8 *rom = memory_region(REGION_CPU1);
+//  UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	/* It looks like there is a security chip, that changes instruction of the form:
         0334: 3E 0C       ld   a,$0C

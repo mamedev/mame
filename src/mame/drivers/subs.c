@@ -266,7 +266,7 @@ ROM_END
 
 static DRIVER_INIT( subs )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int i;
 
 	/* Merge nibble-wide roms together,

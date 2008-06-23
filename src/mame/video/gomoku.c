@@ -112,9 +112,9 @@ WRITE8_HANDLER( gomoku_bg_dispsw_w )
 
 VIDEO_START( gomoku )
 {
-	UINT8 *GOMOKU_BG_X = memory_region( REGION_USER1 );
-	UINT8 *GOMOKU_BG_Y = memory_region( REGION_USER2 );
-	UINT8 *GOMOKU_BG_D = memory_region( REGION_USER3 );
+	UINT8 *GOMOKU_BG_X = memory_region( machine, REGION_USER1 );
+	UINT8 *GOMOKU_BG_Y = memory_region( machine, REGION_USER2 );
+	UINT8 *GOMOKU_BG_D = memory_region( machine, REGION_USER3 );
 	int x, y;
 	int bgdata;
 	int color;
@@ -154,9 +154,9 @@ VIDEO_START( gomoku )
 
 VIDEO_UPDATE( gomoku )
 {
-	UINT8 *GOMOKU_BG_X = memory_region( REGION_USER1 );
-	UINT8 *GOMOKU_BG_Y = memory_region( REGION_USER2 );
-	UINT8 *GOMOKU_BG_D = memory_region( REGION_USER3 );
+	UINT8 *GOMOKU_BG_X = memory_region( screen->machine, REGION_USER1 );
+	UINT8 *GOMOKU_BG_Y = memory_region( screen->machine, REGION_USER2 );
+	UINT8 *GOMOKU_BG_D = memory_region( screen->machine, REGION_USER3 );
 	int x, y;
 	int bgram;
 	int bgoffs;

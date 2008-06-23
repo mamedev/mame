@@ -42,7 +42,7 @@ static WRITE8_HANDLER( compgolf_ctrl_w )
 	if( bank != new_bank )
 	{
 		bank = new_bank;
-		memory_set_bankptr(1, memory_region(REGION_USER1) + 0x4000 * bank);
+		memory_set_bankptr(1, memory_region(machine, REGION_USER1) + 0x4000 * bank);
 	}
 
 	compgolf_scrollx_hi = (data & 1) << 8;
@@ -292,10 +292,10 @@ ROM_START( compglfo )
 	ROM_LOAD( "cv08-1.bpr",   0x00000, 0x0100, CRC(b7c43db9) SHA1(418b11e4c8a9bce6873b0624ac53a5011c5807d0) )
 ROM_END
 
-static void compgolf_expand_bg(void)
+static void compgolf_expand_bg(running_machine *machine)
 {
-	UINT8 *GFXDST = memory_region(REGION_GFX2);
-	UINT8 *GFXSRC = memory_region(REGION_GFX4);
+	UINT8 *GFXDST = memory_region(machine, REGION_GFX2);
+	UINT8 *GFXSRC = memory_region(machine, REGION_GFX4);
 
 	int x;
 
@@ -308,7 +308,7 @@ static void compgolf_expand_bg(void)
 
 static DRIVER_INIT( compgolf )
 {
-	compgolf_expand_bg();
+	compgolf_expand_bg(machine);
 }
 
 GAME( 1986, compgolf, 0,		compgolf, compgolf, compgolf, ROT0, "Data East", "Competition Golf Final Round (revision 3)", 0 )

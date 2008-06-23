@@ -1971,10 +1971,10 @@ MACHINE_DRIVER_END
 
     We need to untangle it
 */
-static void cischeat_untangle_sprites(int region)
+static void cischeat_untangle_sprites(running_machine *machine, int region)
 {
-	UINT8		*src = memory_region(region);
-	const UINT8	*end = src + memory_region_length(region);
+	UINT8		*src = memory_region(machine, region);
+	const UINT8	*end = src + memory_region_length(machine, region);
 
 	while (src < end)
 	{
@@ -2127,9 +2127,9 @@ ROM_END
 static DRIVER_INIT( bigrun )
 {
 	/* Split ROMs */
-	rom_1 = (UINT16 *) memory_region(REGION_USER1);
+	rom_1 = (UINT16 *) memory_region(machine, REGION_USER1);
 
-	cischeat_untangle_sprites(REGION_GFX4);	// Untangle sprites
+	cischeat_untangle_sprites(machine, REGION_GFX4);	// Untangle sprites
 	phantasm_rom_decode(3);					// Decrypt sound cpu code
 }
 
@@ -2249,19 +2249,19 @@ ROM_END
 static DRIVER_INIT( cischeat )
 {
 	/* Split ROMs */
-	rom_1 = (UINT16 *) (memory_region(REGION_USER1) + 0x00000);
-	rom_2 = (UINT16 *) (memory_region(REGION_CPU2)  + 0x40000);
-	rom_3 = (UINT16 *) (memory_region(REGION_CPU3)  + 0x40000);
+	rom_1 = (UINT16 *) (memory_region(machine, REGION_USER1) + 0x00000);
+	rom_2 = (UINT16 *) (memory_region(machine, REGION_CPU2)  + 0x40000);
+	rom_3 = (UINT16 *) (memory_region(machine, REGION_CPU3)  + 0x40000);
 
-	memcpy(memory_region(REGION_USER1) + 0x80000, rom_2, 0x40000);
+	memcpy(memory_region(machine, REGION_USER1) + 0x80000, rom_2, 0x40000);
 	memset(rom_2, 0, 0x40000);
-	rom_2 = (UINT16 *) (memory_region(REGION_USER1) + 0x80000);
+	rom_2 = (UINT16 *) (memory_region(machine, REGION_USER1) + 0x80000);
 
-	memcpy(memory_region(REGION_USER1) + 0xc0000, rom_3, 0x40000);
+	memcpy(memory_region(machine, REGION_USER1) + 0xc0000, rom_3, 0x40000);
 	memset(rom_3, 0, 0x40000);
-	rom_3 = (UINT16 *) (memory_region(REGION_USER1) + 0xc0000);
+	rom_3 = (UINT16 *) (memory_region(machine, REGION_USER1) + 0xc0000);
 
-	cischeat_untangle_sprites(REGION_GFX4);	// Untangle sprites
+	cischeat_untangle_sprites(machine, REGION_GFX4);	// Untangle sprites
 	astyanax_rom_decode(3);					// Decrypt sound cpu code
 }
 
@@ -2476,9 +2476,9 @@ ROM_END
 static DRIVER_INIT( f1gpstar )
 {
 	/* Split ROMs */
-	rom_1 = (UINT16 *) memory_region(REGION_USER1);
+	rom_1 = (UINT16 *) memory_region(machine, REGION_USER1);
 
-	cischeat_untangle_sprites(REGION_GFX4);
+	cischeat_untangle_sprites(machine, REGION_GFX4);
 }
 
 

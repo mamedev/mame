@@ -253,7 +253,7 @@ static int scroll=0;
 	int i,j;
 	char buf[60];
 	struct osd_bitmap *mybitmap = bitmap;
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 buf[0] = 0;
 for (i = 0;i < 8;i+=2)
@@ -925,8 +925,8 @@ ROM_END
 
 static void zerotrgt_rearrange_gfx(int romsize, int romarea)
 {
-	UINT8 *src = memory_region(REGION_GFX4);
-	UINT8 *dst = memory_region(REGION_GFX3);
+	UINT8 *src = memory_region(Machine, REGION_GFX4);
+	UINT8 *dst = memory_region(Machine, REGION_GFX3);
 	int rm;
 	int cnt1;
 
@@ -946,7 +946,7 @@ static void zerotrgt_rearrange_gfx(int romsize, int romarea)
 #if 0
 static void init_cntsteer(void)
 {
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 
 	RAM[0xc2cf]=0x43; /* Patch out Cpu 1 ram test - it never ends..?! */
 	RAM[0xc2d0]=0x43;

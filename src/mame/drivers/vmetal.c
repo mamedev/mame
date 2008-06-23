@@ -98,7 +98,7 @@ static READ16_HANDLER ( varia_crom_read )
 {
 	/* game reads the cgrom, result is 7772, verified to be correct on the real board */
 
-	UINT8 *cgrom = memory_region(REGION_GFX1);
+	UINT8 *cgrom = memory_region(machine, REGION_GFX1);
 	UINT16 retdat;
 	offset = offset << 1;
 	offset |= (vmetal_videoregs[0x0ab/2]&0x7f) << 16;

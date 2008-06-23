@@ -1747,9 +1747,9 @@ ROM_END
 
 /**********************************************************************************/
 
-static void cninja_patch(void)
+static void cninja_patch(running_machine *machine)
 {
-	UINT16 *RAM = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *RAM = (UINT16 *)memory_region(machine, REGION_CPU1);
 	int i;
 
 	for (i=0; i<0x80000/2; i++) {
@@ -1775,7 +1775,7 @@ static void cninja_patch(void)
 static DRIVER_INIT( cninja )
 {
 	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1bc0a8, 0x1bc0a9, 0, 0, cninja_sound_w);
-	cninja_patch();
+	cninja_patch(machine);
 }
 
 static DRIVER_INIT( stoneage )
@@ -1785,16 +1785,16 @@ static DRIVER_INIT( stoneage )
 
 static DRIVER_INIT( mutantf )
 {
-	const UINT8 *src = memory_region(REGION_GFX2);
-	UINT8 *dst = memory_region(REGION_GFX1);
+	const UINT8 *src = memory_region(machine, REGION_GFX2);
+	UINT8 *dst = memory_region(machine, REGION_GFX1);
 
 	/* The 16x16 graphic has some 8x8 chars in it - decode them in GFX1 */
 	memcpy(dst+0x50000,dst+0x10000,0x10000);
 	memcpy(dst+0x10000,src,0x40000);
 	memcpy(dst+0x60000,src+0x40000,0x40000);
 
-	deco56_decrypt(REGION_GFX1);
-	deco56_decrypt(REGION_GFX2);
+	deco56_decrypt(machine, REGION_GFX1);
+	deco56_decrypt(machine, REGION_GFX2);
 }
 
 /**********************************************************************************/

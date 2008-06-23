@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/galaxold.h"
 
 static const rectangle _spritevisiblearea =
@@ -22,7 +23,7 @@ static const rectangle* spritevisiblearea;
 static const rectangle* spritevisibleareaflipx;
 
 
-#define STARS_COLOR_BASE 		(memory_region_length(REGION_PROMS))
+#define STARS_COLOR_BASE 		(memory_region_length(Machine, REGION_PROMS))
 #define BULLETS_COLOR_BASE		(STARS_COLOR_BASE + 64)
 #define BACKGROUND_COLOR_BASE	(BULLETS_COLOR_BASE + 2)
 
@@ -169,7 +170,7 @@ PALETTE_INIT( galaxold )
 
 
 	/* first, the character/sprite palette */
-	len = memory_region_length(REGION_PROMS);
+	len = memory_region_length(machine, REGION_PROMS);
 	for (i = 0;i < len;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
@@ -242,7 +243,7 @@ PALETTE_INIT( rockclim )
 
 
 	/* first, the character/sprite palette */
-	len = memory_region_length(REGION_PROMS);
+	len = memory_region_length(machine, REGION_PROMS);
 	for (i = 0;i < len;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
@@ -1121,7 +1122,7 @@ static void mariner_modify_charcode(UINT16 *code,UINT8 x)
 
 	/* bit 0 of the PROM controls character banking */
 
-	prom = memory_region(REGION_USER2);
+	prom = memory_region(Machine, REGION_USER2);
 
 	*code |= ((prom[x] & 0x01) << 8);
 }
@@ -1299,7 +1300,7 @@ static void stratgyx_draw_background(bitmap_t *bitmap, const rectangle *cliprect
                  the green gun if BCG is asserted
        bits 2-7 are unconnected */
 
-	prom = memory_region(REGION_USER1);
+	prom = memory_region(Machine, REGION_USER1);
 
 	for (x = 0; x < 32; x++)
 	{
@@ -1368,7 +1369,7 @@ static void mariner_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
        line (column) of the screen.  The first 0x20 bytes for unflipped,
        and the 2nd 0x20 bytes for flipped screen. */
 
-	prom = memory_region(REGION_USER1);
+	prom = memory_region(Machine, REGION_USER1);
 
 	if (flipscreen_x)
 	{
@@ -1663,7 +1664,7 @@ static void mariner_draw_stars(running_machine *machine, bitmap_t *bitmap, const
 
 	/* bit 2 of the PROM controls star visibility */
 
-	prom = memory_region(REGION_USER2);
+	prom = memory_region(machine, REGION_USER2);
 
 	for (offs = 0;offs < STAR_COUNT;offs++)
 	{

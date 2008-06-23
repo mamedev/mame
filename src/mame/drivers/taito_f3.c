@@ -129,7 +129,7 @@ static WRITE32_HANDLER( f3_sound_reset_1_w )
 static WRITE32_HANDLER( f3_sound_bankswitch_w )
 {
 	if (f3_game==KIRAMEKI) {
-		UINT16 *rom = (UINT16 *)memory_region(REGION_CPU2);
+		UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU2);
 		UINT32 idx;
 
 		idx = (offset << 1) & 0x1e;
@@ -398,7 +398,7 @@ static INTERRUPT_GEN( f3_interrupt2 )
 
 static MACHINE_RESET( f3 )
 {
-	taito_f3_soundsystem_reset();
+	taito_f3_soundsystem_reset(machine);
 	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
 	f3_68681_reset();
@@ -3132,12 +3132,12 @@ ROM_END
 
 /******************************************************************************/
 
-static void tile_decode(int uses_5bpp_tiles)
+static void tile_decode(running_machine *machine, int uses_5bpp_tiles)
 {
 	UINT8 lsb,msb;
 	UINT32 offset,i;
-	UINT8 *gfx = memory_region(REGION_GFX2);
-	int size=memory_region_length(REGION_GFX2);
+	UINT8 *gfx = memory_region(machine, REGION_GFX2);
+	int size=memory_region_length(machine, REGION_GFX2);
 	int half=size/2,data;
 
 	/* Setup ROM formats:
@@ -3167,8 +3167,8 @@ static void tile_decode(int uses_5bpp_tiles)
 		offset+=4;
 	}
 
-	gfx = memory_region(REGION_GFX1);
-	size=memory_region_length(REGION_GFX1);
+	gfx = memory_region(machine, REGION_GFX1);
+	size=memory_region_length(machine, REGION_GFX1);
 
 	offset = size/2;
 	for (i = size/2+size/4; i<size; i++)
@@ -3249,59 +3249,59 @@ F3_IRQ_SPEEDUP_2_R(kirameki, 0x12fc6,  0x0414/4, 0x0000ff00 )
 static DRIVER_INIT( ringrage )
 {
 	f3_game=RINGRAGE;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( arabianm )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408124, 0x408127, 0, 0, irq_speedup_r_arabianm );
 	f3_game=ARABIANM;
-	tile_decode(1);
+	tile_decode(machine, 1);
 }
 
 static DRIVER_INIT( ridingf )
 {
 	f3_game=RIDINGF;
-	tile_decode(1);
+	tile_decode(machine, 1);
 }
 
 static DRIVER_INIT( gseeker )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40ad94, 0x40ad97, 0, 0, irq_speedup_r_gseeker );
 	f3_game=GSEEKER;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( gunlock )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400007, 0, 0, irq_speedup_r_gunlock );
 	f3_game=GUNLOCK;
-	tile_decode(1);
+	tile_decode(machine, 1);
 }
 
 static DRIVER_INIT( elvactr )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4007a0, 0x4007a3, 0, 0, irq_speedup_r_eaction2 );
 	f3_game=EACTION2;
-	tile_decode(1);
+	tile_decode(machine, 1);
 }
 
 static DRIVER_INIT( cupfinal )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_cupfinal );
 	f3_game=SCFINALS;
-	tile_decode(1);
+	tile_decode(machine, 1);
 }
 
 static DRIVER_INIT( trstaroj )
 {
 	f3_game=TRSTAR;
-	tile_decode(1);
+	tile_decode(machine, 1);
 }
 
 static DRIVER_INIT( scfinals )
 {
-	UINT32 *RAM = (UINT32 *)memory_region(REGION_CPU1);
+	UINT32 *RAM = (UINT32 *)memory_region(machine, REGION_CPU1);
 
 	/* Doesn't boot without this - eprom related? */
     RAM[0x5af0/4]=0x4e710000|(RAM[0x5af0/4]&0xffff);
@@ -3311,102 +3311,102 @@ static DRIVER_INIT( scfinals )
 
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_scfinals );
 	f3_game=SCFINALS;
-	tile_decode(1);
+	tile_decode(machine, 1);
 }
 
 static DRIVER_INIT( lightbr )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400130, 0x400133, 0, 0, irq_speedup_r_lightbr );
 	f3_game=LIGHTBR;
-	tile_decode(1);
+	tile_decode(machine, 1);
 }
 
 static DRIVER_INIT( kaiserkn )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408110, 0x408113, 0, 0, irq_speedup_r_kaiserkn );
 	f3_game=KAISERKN;
-	tile_decode(1);
+	tile_decode(machine, 1);
 }
 
 static DRIVER_INIT( dariusg )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x406ba8, 0x406bab, 0, 0, irq_speedup_r_dariusg );
 	f3_game=DARIUSG;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( spcinvdj )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400230, 0x400233, 0, 0, irq_speedup_r_spcinvdj );
 	f3_game=SPCINVDX;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( qtheater )
 {
 	f3_game=QTHEATER;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( spcinv95 )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_spcinv95 );
 	f3_game=SPCINV95;
-	tile_decode(1);
+	tile_decode(machine, 1);
 }
 
 static DRIVER_INIT( gekirido )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x406bb0, 0x406bb3, 0, 0, irq_speedup_r_gekirido );
 	f3_game=GEKIRIDO;
-	tile_decode(1);
+	tile_decode(machine, 1);
 }
 
 static DRIVER_INIT( ktiger2 )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400570, 0x400573, 0, 0, irq_speedup_r_ktiger2 );
 	f3_game=KTIGER2;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( bubsymph )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_bubsymph );
 	f3_game=BUBSYMPH;
-	tile_decode(1);
+	tile_decode(machine, 1);
 }
 
 static DRIVER_INIT( bubblem )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_bubblem );
 	f3_game=BUBBLEM;
-	tile_decode(1);
+	tile_decode(machine, 1);
 }
 
 static DRIVER_INIT( cleopatr )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_cleopatr );
 	f3_game=CLEOPATR;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( popnpop )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x401cf8, 0x401cfb, 0, 0, irq_speedup_r_popnpop );
 	f3_game=POPNPOP;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( landmakr )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400824, 0x400827, 0, 0, irq_speedup_r_landmakr );
 	f3_game=LANDMAKR;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( landmkrp )
 {
-	UINT32 *RAM = (UINT32 *)memory_region(REGION_CPU1);
+	UINT32 *RAM = (UINT32 *)memory_region(machine, REGION_CPU1);
 
 	/* For some reason the least significant byte in the last 2 long words of
     ROM is swapped.  As the roms have been verified ok, I assume this is some
@@ -3417,94 +3417,94 @@ static DRIVER_INIT( landmkrp )
 
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400824, 0x400827, 0, 0, irq_speedup_r_landmakr );
 	f3_game=LANDMAKR;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( pbobble3 )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x405af4, 0x405af7, 0, 0, irq_speedup_r_pbobble3 );
 	f3_game=PBOBBLE3;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( pbobble4 )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4058f4, 0x4058f7, 0, 0, irq_speedup_r_pbobble4 );
 	f3_game=PBOBBLE4;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( quizhuhu )
 {
 	f3_game=QUIZHUHU;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( pbobble2 )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x404a50, 0x404a53, 0, 0, irq_speedup_r_pbobble2 );
 	f3_game=PBOBBLE2;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( pbobbl2x )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x405c58, 0x405c5b, 0, 0, irq_speedup_r_pbobbl2x );
 	f3_game=PBOBBLE2;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( hthero95 )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_pwrgoal );
 	f3_game=HTHERO95;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( kirameki )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400414, 0x400417, 0, 0, irq_speedup_r_kirameki );
 	f3_game=KIRAMEKI;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( puchicar )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4024d8, 0x4024db, 0, 0, irq_speedup_r_puchicar );
 	f3_game=PUCHICAR;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( twinqix )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_twinqix );
 	f3_game=TWINQIX;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( arkretrn )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x402154, 0x402157, 0, 0, irq_speedup_r_arkretrn );
 	f3_game=ARKRETRN;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( intcup94 )
 {
 	f3_game=SCFINALS;
-	tile_decode(1);
+	tile_decode(machine, 1);
 }
 
 static DRIVER_INIT( recalh )
 {
 	f3_game=RECALH;
-	tile_decode(0);
+	tile_decode(machine, 0);
 }
 
 static DRIVER_INIT( commandw )
 {
 	f3_game=COMMANDW;
-	tile_decode(1);
+	tile_decode(machine, 1);
 }
 
 /******************************************************************************/

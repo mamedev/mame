@@ -279,7 +279,7 @@ static void sound_nmi(running_machine *machine)
 
 static WRITE8_HANDLER( le_bankswitch_w )
 {
-	UINT8 *prgrom = (UINT8 *)memory_region(REGION_CPU1)+0x10000;
+	UINT8 *prgrom = (UINT8 *)memory_region(machine, REGION_CPU1)+0x10000;
 
 	memory_set_bankptr(1, &prgrom[data * 0x2000]);
 }
@@ -631,7 +631,7 @@ static MACHINE_START( lethalen )
 
 static MACHINE_RESET( lethalen )
 {
-	UINT8 *prgrom = (UINT8 *)memory_region(REGION_CPU1);
+	UINT8 *prgrom = (UINT8 *)memory_region(machine, REGION_CPU1);
 
 	memory_set_bankptr(1, &prgrom[0x10000]);
 	memory_set_bankptr(2, &prgrom[0x48000]);

@@ -50,7 +50,7 @@ static WRITE8_HANDLER( k007121_registers_w )
 static WRITE8_HANDLER( fastlane_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	/* bits 0 & 1 coin counters */
 	coin_counter_w(0,data & 0x01);

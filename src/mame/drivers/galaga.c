@@ -3049,8 +3049,8 @@ ROM_END
 static DRIVER_INIT (galaga)
 {
 	/* swap bytes for flipped character so we can decode them together with normal characters */
-	UINT8 *rom = memory_region(REGION_GFX1);
-	int i, len = memory_region_length(REGION_GFX1);
+	UINT8 *rom = memory_region(machine, REGION_GFX1);
+	int i, len = memory_region_length(machine, REGION_GFX1);
 
 	for (i = 0;i < len;i++)
 	{
@@ -3077,7 +3077,7 @@ static DRIVER_INIT( xevious )
 	UINT8 *rom;
 	int i;
 
-	rom = memory_region(REGION_GFX3) + 0x5000;
+	rom = memory_region(machine, REGION_GFX3) + 0x5000;
 	for (i = 0;i < 0x2000;i++)
 		rom[i + 0x2000] = rom[i] >> 4;
 }
@@ -3089,14 +3089,14 @@ static DRIVER_INIT( xevios )
 
 
 	/* convert one of the sprite ROMs to the format used by Xevious */
-	rom = memory_region(REGION_GFX3);
+	rom = memory_region(machine, REGION_GFX3);
 	for (A = 0x5000;A < 0x7000;A++)
 	{
 		rom[A] = BITSWAP8(rom[A],1,3,5,7,0,2,4,6);
 	}
 
 	/* convert one of tile map ROMs to the format used by Xevious */
-	rom = memory_region(REGION_GFX4);
+	rom = memory_region(machine, REGION_GFX4);
 	for (A = 0x0000;A < 0x1000;A++)
 	{
 		rom[A] = BITSWAP8(rom[A],3,7,5,1,2,6,4,0);

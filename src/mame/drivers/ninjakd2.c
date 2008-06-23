@@ -121,6 +121,7 @@ TODO:
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2203intf.h"
 #include "sound/samples.h"
 #include "machine/mc8123.h"
@@ -151,26 +152,26 @@ static INTERRUPT_GEN( ninjakd2_interrupt )
 static MACHINE_RESET( ninjakd2 )
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(1, 0, 8, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 8, memory_region(machine, REGION_CPU1) + 0x10000, 0x4000);
 	memory_set_bank(1, 0);
 }
 
-static void robokid_init_banks(void)
+static void robokid_init_banks(running_machine *machine)
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(1, 0,  2, memory_region(REGION_CPU1), 0x4000);
-	memory_configure_bank(1, 2, 14, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+	memory_configure_bank(1, 0,  2, memory_region(machine, REGION_CPU1), 0x4000);
+	memory_configure_bank(1, 2, 14, memory_region(machine, REGION_CPU1) + 0x10000, 0x4000);
 	memory_set_bank(1, 0);
 }
 
 static MACHINE_RESET( robokid )
 {
-	robokid_init_banks();
+	robokid_init_banks(machine);
 }
 
 static MACHINE_RESET( omegaf )
 {
-	robokid_init_banks();
+	robokid_init_banks(machine);
 
 	omegaf_io_protection_reset();
 }
@@ -202,9 +203,9 @@ static WRITE8_HANDLER( ninjakd2_soundreset_w )
 
 static void ninjakd2_init_samples(void)
 {
-	const UINT8* const rom = memory_region(REGION_SOUND1);
+	const UINT8* const rom = memory_region(Machine, REGION_SOUND1);
 
-	const int length = memory_region_length(REGION_SOUND1);
+	const int length = memory_region_length(Machine, REGION_SOUND1);
 
 	INT16* const sampledata = auto_malloc(length * sizeof(sampledata[0]));
 
@@ -219,12 +220,12 @@ static void ninjakd2_init_samples(void)
 
 static WRITE8_HANDLER( ninjakd2_pcm_play_w )
 {
-	const UINT8* const rom = memory_region(REGION_SOUND1);
+	const UINT8* const rom = memory_region(machine, REGION_SOUND1);
 
 	// only Ninja Kid II uses this
 	if (rom)
 	{
-		const int length = memory_region_length(REGION_SOUND1);
+		const int length = memory_region_length(machine, REGION_SOUND1);
 
 		const int start = data << 8;
 
@@ -1408,11 +1409,11 @@ by one place all the intervening bits.
 
 ******************************************************************************/
 
-static void lineswap_gfx_roms(const int region, const int bit)
+static void lineswap_gfx_roms(running_machine *machine, const int region, const int bit)
 {
-	const int length = memory_region_length(region);
+	const int length = memory_region_length(machine, region);
 
-	UINT8* const src = memory_region(region);
+	UINT8* const src = memory_region(machine, region);
 
 	UINT8* const temp = malloc_or_die(length);
 
@@ -1432,11 +1433,11 @@ static void lineswap_gfx_roms(const int region, const int bit)
 	free(temp);
 }
 
-static void gfx_unscramble(void)
+static void gfx_unscramble(running_machine *machine)
 {
-	lineswap_gfx_roms(REGION_GFX1, 13);		// fg tiles
-	lineswap_gfx_roms(REGION_GFX2, 14);		// sprites
-	lineswap_gfx_roms(REGION_GFX3, 14);		// bg tiles
+	lineswap_gfx_roms(machine, REGION_GFX1, 13);		// fg tiles
+	lineswap_gfx_roms(machine, REGION_GFX2, 14);		// sprites
+	lineswap_gfx_roms(machine, REGION_GFX3, 14);		// bg tiles
 }
 
 
@@ -1449,21 +1450,21 @@ static void gfx_unscramble(void)
 
 static DRIVER_INIT( ninjakd2 )
 {
-	mc8123_decrypt_rom(1, memory_region(REGION_USER1), 0, 0);
+	mc8123_decrypt_rom(machine, 1, memory_region(machine, REGION_USER1), 0, 0);
 
-	gfx_unscramble();
+	gfx_unscramble(machine);
 }
 
 static DRIVER_INIT( bootleg )
 {
-	memory_set_decrypted_region(1, 0x0000, 0x7fff, memory_region(REGION_CPU2) + 0x10000);
+	memory_set_decrypted_region(1, 0x0000, 0x7fff, memory_region(machine, REGION_CPU2) + 0x10000);
 
-	gfx_unscramble();
+	gfx_unscramble(machine);
 }
 
 static DRIVER_INIT(mnight)
 {
-	gfx_unscramble();
+	gfx_unscramble(machine);
 }
 
 

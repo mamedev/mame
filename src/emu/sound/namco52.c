@@ -46,6 +46,7 @@ Jan 12, 2005.  The 555 is probably an external playback frequency.
 ***************************************************************************/
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "filter.h"
 #include "namco52.h"
@@ -138,8 +139,8 @@ static void *namco_52xx_start(int sndindex, int clock, const void *config)
 	memset(chip, 0, sizeof(*chip));
 
 	chip->intf = config;
-	chip->rom     = memory_region(chip->intf->region);
-	chip->rom_len = memory_region_length(chip->intf->region);
+	chip->rom     = memory_region(Machine, chip->intf->region);
+	chip->rom_len = memory_region_length(Machine, chip->intf->region);
 
 	if (chip->intf->play_rate == 0)
 	{

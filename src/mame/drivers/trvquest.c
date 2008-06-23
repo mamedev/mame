@@ -43,7 +43,7 @@ static READ8_HANDLER( trvquest_question_r )
 {
 	gameplan_state *state = machine->driver_data;
 
-	return memory_region(REGION_USER1)[*state->trvquest_question * 0x2000 + offset];
+	return memory_region(machine, REGION_USER1)[*state->trvquest_question * 0x2000 + offset];
 }
 
 static WRITE8_HANDLER( trvquest_coin_w )

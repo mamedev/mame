@@ -235,7 +235,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( tryout )
 {
-//  UINT8* mem=memory_region(REGION_CPU1);
+//  UINT8* mem=memory_region(machine, REGION_CPU1);
 
 	int scrollx;
 

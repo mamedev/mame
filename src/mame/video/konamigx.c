@@ -34,7 +34,7 @@ static TILE_GET_INFO( get_gx_psac_tile_info )
 static TILE_GET_INFO( get_gx_psac3_tile_info )
 {
 	int tileno, colour, flip;
-	UINT8 *tmap = memory_region(REGION_GFX4);
+	UINT8 *tmap = memory_region(machine, REGION_GFX4);
 
 	tileno = tmap[tile_index*2] | ((tmap[(tile_index*2)+1] & 0x0f)<<8);
 	colour = (psac_colorbase << 8);

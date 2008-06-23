@@ -1453,9 +1453,9 @@ ROM_END
  *
  *************************************/
 
-static void mcr_common_init(int sound_board)
+static void mcr_common_init(running_machine *machine, int sound_board)
 {
-	mcr_sound_init(sound_board);
+	mcr_sound_init(machine, sound_board);
 
 	state_save_register_global(input_mux);
 	state_save_register_global(latched_input);
@@ -1465,7 +1465,7 @@ static void mcr_common_init(int sound_board)
 
 static DRIVER_INIT( demoderm )
 {
-	mcr_common_init(MCR_TURBO_CHIP_SQUEAK);
+	mcr_common_init(machine, MCR_TURBO_CHIP_SQUEAK);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x01, 0x01, 0, 0, demoderm_ip1_r);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x02, 0x02, 0, 0, demoderm_ip2_r);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, demoderm_op6_w);
@@ -1474,14 +1474,14 @@ static DRIVER_INIT( demoderm )
 
 static DRIVER_INIT( sarge )
 {
-	mcr_common_init(MCR_TURBO_CHIP_SQUEAK);
+	mcr_common_init(machine, MCR_TURBO_CHIP_SQUEAK);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, turbocs_data_w);
 }
 
 
 static DRIVER_INIT( maxrpm )
 {
-	mcr_common_init(MCR_TURBO_CHIP_SQUEAK);
+	mcr_common_init(machine, MCR_TURBO_CHIP_SQUEAK);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x01, 0x01, 0, 0, maxrpm_ip1_r);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x02, 0x02, 0, 0, maxrpm_ip2_r);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, maxrpm_op5_w);
@@ -1497,7 +1497,7 @@ static DRIVER_INIT( maxrpm )
 
 static DRIVER_INIT( rampage )
 {
-	mcr_common_init(MCR_SOUNDS_GOOD);
+	mcr_common_init(machine, MCR_SOUNDS_GOOD);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x04, 0x04, 0, 0, rampage_ip4_r);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, rampage_op6_w);
 }
@@ -1505,7 +1505,7 @@ static DRIVER_INIT( rampage )
 
 static DRIVER_INIT( powerdrv )
 {
-	mcr_common_init(MCR_SOUNDS_GOOD);
+	mcr_common_init(machine, MCR_SOUNDS_GOOD);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x02, 0x02, 0, 0, powerdrv_ip2_r);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, powerdrv_op5_w);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, powerdrv_op6_w);
@@ -1514,7 +1514,7 @@ static DRIVER_INIT( powerdrv )
 
 static DRIVER_INIT( stargrds )
 {
-	mcr_common_init(MCR_SOUNDS_GOOD);
+	mcr_common_init(machine, MCR_SOUNDS_GOOD);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x00, 0x00, 0, 0, stargrds_ip0_r);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, stargrds_op5_w);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, stargrds_op6_w);
@@ -1523,7 +1523,7 @@ static DRIVER_INIT( stargrds )
 
 static DRIVER_INIT( spyhunt )
 {
-	mcr_common_init(MCR_SSIO | MCR_CHIP_SQUEAK_DELUXE);
+	mcr_common_init(machine, MCR_SSIO | MCR_CHIP_SQUEAK_DELUXE);
 	ssio_set_custom_input(1, 0x60, spyhunt_ip1_r);
 	ssio_set_custom_input(2, 0xff, spyhunt_ip2_r);
 	ssio_set_custom_output(4, 0xff, spyhunt_op4_w);
@@ -1535,7 +1535,7 @@ static DRIVER_INIT( spyhunt )
 
 static DRIVER_INIT( crater )
 {
-	mcr_common_init(MCR_SSIO);
+	mcr_common_init(machine, MCR_SSIO);
 
 	spyhunt_sprite_color_mask = 0x03;
 	spyhunt_scroll_offset = 96;
@@ -1544,7 +1544,7 @@ static DRIVER_INIT( crater )
 
 static DRIVER_INIT( turbotag )
 {
-	mcr_common_init(MCR_SSIO | MCR_CHIP_SQUEAK_DELUXE);
+	mcr_common_init(machine, MCR_SSIO | MCR_CHIP_SQUEAK_DELUXE);
 	ssio_set_custom_input(1, 0x60, spyhunt_ip1_r);
 	ssio_set_custom_input(2, 0xff, turbotag_ip2_r);
 	ssio_set_custom_output(4, 0xff, spyhunt_op4_w);

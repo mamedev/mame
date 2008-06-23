@@ -8,6 +8,7 @@ Preliminary driver by:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "video/konamiic.h"
 #include "sound/k007232.h"
@@ -480,7 +481,7 @@ ROM_END
 
 static void aliens_banking( int lines )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(Machine, REGION_CPU1);
 	int offs = 0x18000;
 
 
@@ -492,7 +493,7 @@ static void aliens_banking( int lines )
 
 static MACHINE_RESET( aliens )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)aliens_banking);
 

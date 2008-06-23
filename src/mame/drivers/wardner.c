@@ -137,7 +137,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 	if (wardner_membank != data) {
 		int bankaddress = 0;
 
-		UINT8 *RAM = memory_region(REGION_CPU1);
+		UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 		wardner_membank = data;
 

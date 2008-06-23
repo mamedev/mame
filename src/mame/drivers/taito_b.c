@@ -3269,7 +3269,7 @@ MACHINE_DRIVER_END
 #if 0
 static void ryujin_patch(void)
 {
-	UINT16 *rom = (UINT16*)memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16*)memory_region(machine, REGION_CPU1);
 	rom[ 0x62/2 ] = 1;
 	//0 (already in rom) - Taito Corporation 1993
 	//1 - Taito America corp with blue FBI logo
@@ -3316,7 +3316,7 @@ MACHINE_DRIVER_END
 #if 0
 static void sbm_patch(void)
 {
-	UINT16 *rom = (UINT16*)memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16*)memory_region(machine, REGION_CPU1);
 	rom[ 0x7ffff/2 ] = 2; //US version
 }
 #endif
@@ -3995,7 +3995,7 @@ ROM_END
 
 static DRIVER_INIT( taito_b )
 {
-	memory_configure_bank(1, 0, 4, memory_region(REGION_CPU2) + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 4, memory_region(machine, REGION_CPU2) + 0x10000, 0x4000);
 }
 
 GAME( 1989, masterw,  0,       masterw,  masterw,  taito_b, ROT270, "Taito Corporation Japan", "Master of Weapon (World)", GAME_SUPPORTS_SAVE )

@@ -332,7 +332,7 @@ static TIMER_CALLBACK( ad2083_step )
 
 static int ad2083_speech_rom_read_bit(void)
 {
-	UINT8 *ROM = memory_region(REGION_SOUND1);
+	UINT8 *ROM = memory_region(Machine, REGION_SOUND1);
 	int bit;
 
 	speech_rom_address %= 4096;

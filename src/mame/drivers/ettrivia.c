@@ -69,7 +69,7 @@ static WRITE8_HANDLER( ettrivia_control_w )
 
 static READ8_HANDLER( ettrivia_question_r )
 {
-	UINT8 *QUESTIONS = memory_region(REGION_USER1);
+	UINT8 *QUESTIONS = memory_region(machine, REGION_USER1);
 	return QUESTIONS[offset + 0x10000 * question_bank];
 }
 

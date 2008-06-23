@@ -1991,13 +1991,13 @@ ROM_END
 
 static DRIVER_INIT( yamato )
 {
-	yamato_decode();
+	yamato_decode(machine);
 }
 
 
 static DRIVER_INIT( toprollr )
 {
-	toprollr_decode();
+	toprollr_decode(machine);
 }
 
 

@@ -189,7 +189,7 @@ static WRITE8_HANDLER ( question_offset_high_w )
 
 static READ8_HANDLER (statriv2_questions_read)
 {
-	UINT8 *question_data    = memory_region       ( REGION_USER1 );
+	UINT8 *question_data    = memory_region       ( machine, REGION_USER1 );
 	int offs;
 
 	question_offset_low++;
@@ -261,7 +261,7 @@ static READ8_HANDLER (statriv2_questions_read)
 
 static READ8_HANDLER (supertr2_questions_read)
 {
-	UINT8 *question_data = memory_region( REGION_USER1 );
+	UINT8 *question_data = memory_region( machine, REGION_USER1 );
 	int offs;
 	int XORval;
 
@@ -278,7 +278,7 @@ static READ8_HANDLER (supertr2_questions_read)
 
 static READ8_HANDLER (supertr3_questions_read)
 {
-	UINT8 *question_data = memory_region( REGION_USER1 );
+	UINT8 *question_data = memory_region( machine, REGION_USER1 );
 	int offs;
 
 	offs = (question_offset_high << 16) | (question_offset_med << 8) | question_offset_low;
@@ -288,7 +288,7 @@ static READ8_HANDLER (supertr3_questions_read)
 
 static READ8_HANDLER (hangman_questions_read)
 {
-	UINT8 *question_data = memory_region( REGION_USER1 );
+	UINT8 *question_data = memory_region( machine, REGION_USER1 );
 	int offs;
 
 	offs = (question_offset_high << 16) | (question_offset_med << 8) | question_offset_low;

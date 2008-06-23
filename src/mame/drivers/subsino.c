@@ -693,12 +693,12 @@ ROM_END
 
 static DRIVER_INIT( smoto20 )
 {
-	UINT8 *rom = memory_region( REGION_CPU1 );
+	UINT8 *rom = memory_region( machine, REGION_CPU1 );
 	rom[0x12e1] = 0x20;	// "ERROR 951010"
 }
 static DRIVER_INIT( smoto16 )
 {
-	UINT8 *rom = memory_region( REGION_CPU1 );
+	UINT8 *rom = memory_region( machine, REGION_CPU1 );
 	rom[0x12d0] = 0x20;	// "ERROR 951010"
 }
 

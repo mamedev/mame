@@ -22,7 +22,7 @@ READ8_HANDLER( starwars_input_1_r );
 READ8_HANDLER( starwars_adc_r );
 WRITE8_HANDLER( starwars_adc_select_w );
 
-void starwars_mproc_init(void);
+void starwars_mproc_init(running_machine *machine);
 void starwars_mproc_reset(void);
 
 READ8_HANDLER( starwars_prng_r );

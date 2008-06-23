@@ -243,9 +243,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 ***************************************************************************/
 
-static void draw_background(bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 *RAM	=	memory_region(REGION_GFX2);
+	UINT8 *RAM	=	memory_region(machine, REGION_GFX2);
 	int x,y,i;
 
 	/* The foreground stars (sprites) move at twice this speed when
@@ -288,7 +288,7 @@ static void draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 VIDEO_UPDATE( skyfox )
 {
 	fillbitmap(bitmap,255,cliprect);	// the bg is black
-	draw_background(bitmap, cliprect);
+	draw_background(screen->machine, bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

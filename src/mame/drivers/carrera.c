@@ -282,7 +282,7 @@ static const struct AY8910interface ay8910_interface =
 static PALETTE_INIT(carrera)
 {
 	int x;
-	UINT8 *src = memory_region ( REGION_PROMS );
+	UINT8 *src = memory_region ( machine, REGION_PROMS );
 
 	for (x=0;x<32;x++)
 		palette_set_color_rgb(machine, x, pal3bit(src[x] >> 0), pal3bit(src[x] >> 3), pal2bit(src[x] >> 6));

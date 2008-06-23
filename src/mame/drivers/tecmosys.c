@@ -539,7 +539,7 @@ GFXDECODE_END
 
 static WRITE8_HANDLER( deroon_bankswitch_w )
 {
-	memory_set_bankptr( 1, memory_region(REGION_CPU2) + ((data-2) & 0x0f) * 0x4000 + 0x10000 );
+	memory_set_bankptr( 1, memory_region(machine, REGION_CPU2) + ((data-2) & 0x0f) * 0x4000 + 0x10000 );
 }
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -565,7 +565,7 @@ static WRITE8_HANDLER( tecmosys_oki_bank_w )
 {
 	UINT8 upperbank = (data & 0x30) >> 4;
 	UINT8 lowerbank = (data & 0x03) >> 0;
-	UINT8* region = memory_region(REGION_SOUND2);
+	UINT8* region = memory_region(machine, REGION_SOUND2);
 
 	memcpy( region+0x00000, region+0x80000 + lowerbank * 0x20000, 0x20000  );
 	memcpy( region+0x20000, region+0x80000 + upperbank * 0x20000, 0x20000  );
@@ -615,9 +615,9 @@ static VIDEO_START(deroon)
 
 }
 
-static void tecmosys_render_sprites_to_bitmap(bitmap_t *bitmap, UINT16 extrax, UINT16 extray )
+static void tecmosys_render_sprites_to_bitmap(running_machine *machine, bitmap_t *bitmap, UINT16 extrax, UINT16 extray )
 {
-	UINT8 *gfxsrc    = memory_region       ( REGION_GFX1 );
+	UINT8 *gfxsrc    = memory_region       ( machine, REGION_GFX1 );
 	int i;
 
 	/* render sprites (with priority information) to temp bitmap */
@@ -857,7 +857,7 @@ static VIDEO_UPDATE(deroon)
 //    tecmosys_a80000regs[0],     tecmosys_a80000regs[1],     tecmosys_a80000regs[2]);
 
 	// prepare sprites for NEXT frame - causes 1 frame palette errors, but prevents sprite lag in tkdensho, which is correct?
-	tecmosys_render_sprites_to_bitmap(bitmap, tecmosys_880000regs[0x0], tecmosys_880000regs[0x1]);
+	tecmosys_render_sprites_to_bitmap(screen->machine, bitmap, tecmosys_880000regs[0x0], tecmosys_880000regs[0x1]);
 
 
 	return 0;
@@ -1105,10 +1105,10 @@ static MACHINE_RESET( deroon )
 	device_status = DS_IDLE;
 }
 
-static void tecmosys_decramble(void)
+static void tecmosys_decramble(running_machine *machine)
 {
-	UINT8 *gfxsrc    = memory_region       ( REGION_GFX1 );
-	size_t  srcsize = memory_region_length( REGION_GFX1 );
+	UINT8 *gfxsrc    = memory_region       ( machine, REGION_GFX1 );
+	size_t  srcsize = memory_region_length( machine, REGION_GFX1 );
 	int i;
 
 	for (i=0; i < srcsize; i+=4)
@@ -1131,19 +1131,19 @@ static void tecmosys_decramble(void)
 
 static DRIVER_INIT( deroon )
 {
-	tecmosys_decramble();
+	tecmosys_decramble(machine);
 	device_data = &deroon_data;
 }
 
 static DRIVER_INIT( tkdensho )
 {
-	tecmosys_decramble();
+	tecmosys_decramble(machine);
 	device_data = &tkdensho_data;
 }
 
 static DRIVER_INIT( tkdensha )
 {
-	tecmosys_decramble();
+	tecmosys_decramble(machine);
 	device_data = &tkdensha_data;
 }
 GAME( 1995, deroon,      0, deroon, deroon, deroon,     ROT0, "Tecmo", "Deroon DeroDero", 0 )

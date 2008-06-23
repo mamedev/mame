@@ -26,11 +26,11 @@ static UINT8 palette;
 
 ***************************************************************************/
 
-static void get_pens(pen_t *pens)
+static void get_pens(running_machine *machine, pen_t *pens)
 {
 	offs_t i;
-	const UINT8 *prom = memory_region(REGION_PROMS);
-	int len = memory_region_length(REGION_PROMS);
+	const UINT8 *prom = memory_region(machine, REGION_PROMS);
+	int len = memory_region_length(machine, REGION_PROMS);
 
 	for (i = 0; i < len; i++)
 	{
@@ -80,7 +80,7 @@ VIDEO_UPDATE( epos )
 	pen_t pens[0x20];
 	offs_t offs;
 
-	get_pens(pens);
+	get_pens(screen->machine, pens);
 
 	for (offs = 0; offs < videoram_size; offs++)
 	{

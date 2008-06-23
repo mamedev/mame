@@ -64,7 +64,7 @@ static MACHINE_RESET( cyberbal )
 	atarigen_scanline_timer_reset(machine->primary_screen, cyberbal_scanline_update, 8);
 	atarigen_sound_io_reset(1);
 
-	cyberbal_sound_reset();
+	cyberbal_sound_reset(machine);
 
 	/* CPU 2 doesn't run until reset */
 	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);

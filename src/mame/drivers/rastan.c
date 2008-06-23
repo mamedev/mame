@@ -178,7 +178,7 @@ static WRITE8_HANDLER( rastan_bankswitch_w )
 	if (data == 0) offs = 0x0000;
 	else offs = (data-1) * 0x4000 + 0x10000;
 
-	memory_set_bankptr( 1, memory_region(REGION_CPU2) + offs );
+	memory_set_bankptr( 1, memory_region(machine, REGION_CPU2) + offs );
 }
 
 
@@ -195,7 +195,7 @@ static void rastan_msm5205_vck(running_machine *machine, int chip)
 	}
 	else
 	{
-		adpcm_data = memory_region(REGION_SOUND1)[adpcm_pos];
+		adpcm_data = memory_region(machine, REGION_SOUND1)[adpcm_pos];
 		adpcm_pos = (adpcm_pos + 1) & 0xffff;
 		MSM5205_data_w(0, adpcm_data >> 4);
 	}

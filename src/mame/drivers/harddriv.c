@@ -3421,12 +3421,12 @@ static void init_ds3(running_machine *machine)
 	/* if we have a sound DSP, boot it */
 	if (hdcpu_sound != -1 && machine->config->cpu[hdcpu_sound].type == CPU_ADSP2105)
 	{
-		UINT8 *snd = memory_region(REGION_CPU1 + hdcpu_sound);
+		UINT8 *snd = memory_region(machine, REGION_CPU1 + hdcpu_sound);
 		adsp2105_load_boot_data((UINT8 *)(snd + 0x10000), (UINT32 *)(snd));
 	}
 	if (hdcpu_sounddsp != -1 && machine->config->cpu[hdcpu_sounddsp].type == CPU_ADSP2105)
 	{
-		UINT8 *dsp = memory_region(REGION_CPU1 + hdcpu_sounddsp);
+		UINT8 *dsp = memory_region(machine, REGION_CPU1 + hdcpu_sounddsp);
 		adsp2105_load_boot_data((UINT8 *)(dsp + 0x10000), (UINT32 *)(dsp));
 	}
 
@@ -3502,7 +3502,7 @@ static void init_ds3(running_machine *machine)
 /* COMMON INIT: initialize the DSK add-on board */
 static void init_dsk(running_machine *machine)
 {
-	UINT8 *usr3 = memory_region(REGION_USER3);
+	UINT8 *usr3 = memory_region(machine, REGION_USER3);
 
 	/* install ASIC61 */
 	memory_install_readwrite16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x85c000, 0x85c7ff, 0, 0, hd68k_dsk_dsp32_r, hd68k_dsk_dsp32_w);
@@ -3535,7 +3535,7 @@ static void init_dsk(running_machine *machine)
 /* COMMON INIT: initialize the DSK II add-on board */
 static void init_dsk2(running_machine *machine)
 {
-	UINT8 *usr3 = memory_region(REGION_USER3);
+	UINT8 *usr3 = memory_region(machine, REGION_USER3);
 
 	/* install ASIC65 */
 	memory_install_write16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x824000, 0x824003, 0, 0, asic65_data_w);
@@ -3580,7 +3580,7 @@ static void init_dspcom(running_machine *machine)
 /* COMMON INIT: initialize the original "driver" sound board */
 static void init_driver_sound(running_machine *machine)
 {
-	hdsnd_init();
+	hdsnd_init(machine);
 
 	/* install sound handlers */
 	memory_install_readwrite16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x840000, 0x840001, 0, 0, hd68k_snd_data_r, hd68k_snd_data_w);
@@ -3758,7 +3758,7 @@ static void steeltal_init_common(running_machine *machine, offs_t ds3_transfer_p
 	init_multisync(machine, 0);
 	init_ds3(machine);
 	init_dspcom(machine);
-	atarijsa3_init_adpcm(REGION_SOUND1);
+	atarijsa3_init_adpcm(machine, REGION_SOUND1);
 	atarijsa_init(machine, "IN0", 0x0020);
 
 	memory_install_read16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x908000, 0x908001, 0, 0, steeltal_dummy_r);

@@ -62,7 +62,7 @@ static WRITE8_HANDLER(mux_select_w)
 
 WRITE8_HANDLER(st0016_rom_bank_w)
 {
-	memory_set_bankptr( 1, memory_region(REGION_CPU1) + (data* 0x4000) + 0x10000 );
+	memory_set_bankptr( 1, memory_region(machine, REGION_CPU1) + (data* 0x4000) + 0x10000 );
 	st0016_rom_bank=data;
 }
 
@@ -639,13 +639,13 @@ static DRIVER_INIT(nratechu)
 static DRIVER_INIT(mayjinsn)
 {
 	st0016_game=4|0x80;
-	memory_set_bankptr(2, memory_region(REGION_USER1));
+	memory_set_bankptr(2, memory_region(machine, REGION_USER1));
 }
 
 static DRIVER_INIT(mayjisn2)
 {
 	st0016_game=4;
-	memory_set_bankptr(2, memory_region(REGION_USER1));
+	memory_set_bankptr(2, memory_region(machine, REGION_USER1));
 }
 
 /*************************************

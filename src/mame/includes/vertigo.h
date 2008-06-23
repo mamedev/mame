@@ -23,6 +23,6 @@ MACHINE_RESET( vertigo );
 
 extern UINT16 *vertigo_vectorram;
 
-void vertigo_vproc_init(void);
+void vertigo_vproc_init(running_machine *machine);
 void vertigo_vproc(int cycles, int irq4);
 

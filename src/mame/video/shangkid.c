@@ -45,7 +45,7 @@ static TILE_GET_INFO( get_bg_tile_info ){
 	}
 
 	tileinfo->category =
-		(memory_region( REGION_PROMS )[0x800+color*4]==2)?1:0;
+		(memory_region( machine, REGION_PROMS )[0x800+color*4]==2)?1:0;
 }
 
 VIDEO_START( shangkid )

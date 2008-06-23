@@ -66,7 +66,7 @@ static MACHINE_RESET( flyball )
 
 	/* address bits 0 through 8 are inverted */
 
-	UINT8* ROM = memory_region(REGION_CPU1) + 0x2000;
+	UINT8* ROM = memory_region(machine, REGION_CPU1) + 0x2000;
 
 	for (i = 0; i < 0x1000; i++)
 		rombase[i] = ROM[i ^ 0x1ff];

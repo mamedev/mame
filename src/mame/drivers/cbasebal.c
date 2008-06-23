@@ -306,8 +306,8 @@ ROM_END
 
 static DRIVER_INIT( cbasebal )
 {
-	memory_configure_bank(1, 0, 32, memory_region(REGION_CPU1) + 0x10000, 0x4000);
-	pang_decode();
+	memory_configure_bank(1, 0, 32, memory_region(machine, REGION_CPU1) + 0x10000, 0x4000);
+	pang_decode(machine);
 }
 
 

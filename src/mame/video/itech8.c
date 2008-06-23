@@ -198,8 +198,8 @@ VIDEO_START( itech8 )
 	page_select = 0xc0;
 
 	/* fetch the GROM base */
-	grom_base = memory_region(REGION_GFX1);
-	grom_size = memory_region_length(REGION_GFX1);
+	grom_base = memory_region(machine, REGION_GFX1);
+	grom_size = memory_region_length(machine, REGION_GFX1);
 }
 
 

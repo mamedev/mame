@@ -506,7 +506,7 @@ ROM_END
 
 static DRIVER_INIT( commando )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	UINT8 *decrypt = auto_malloc(0xc000);
 	int A;
 
@@ -525,7 +525,7 @@ static DRIVER_INIT( commando )
 
 static DRIVER_INIT( spaceinv )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	UINT8 *decrypt = auto_malloc(0xc000);
 	int A;
 

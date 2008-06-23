@@ -784,8 +784,8 @@ ROM_END
 
 static DRIVER_INIT( looping )
 {
-	int length = memory_region_length(REGION_CPU1);
-	UINT8 *rom = memory_region(REGION_CPU1);
+	int length = memory_region_length(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int i;
 
 	/* bitswap the TMS9995 ROMs */

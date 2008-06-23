@@ -70,7 +70,7 @@ static WRITE8_HANDLER ( funybubl_vidram_bank_w )
 
 static WRITE8_HANDLER ( funybubl_cpurombank_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 		memory_set_bankptr(2,&rom[0x10000+0x4000*(data&0x3f)]);
 }

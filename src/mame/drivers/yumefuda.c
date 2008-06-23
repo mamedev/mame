@@ -184,7 +184,7 @@ static WRITE8_HANDLER( mux_w )
 	//0x14000 bonus game
 	//0x16000 ?
 	if(bank!=new_bank) {
-		UINT8 *ROM = memory_region(REGION_CPU1);
+		UINT8 *ROM = memory_region(machine, REGION_CPU1);
 		UINT32 bankaddress;
 
 		bank = new_bank;

@@ -35,6 +35,7 @@ Registers per channel:
 
 #include "sndintrf.h"
 #include "cpuintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "gaelco.h"
 #include "wavwrite.h"
@@ -261,7 +262,7 @@ static void *gaelcosnd_start(sound_type sndtype, int sndindex, int clock, const 
 		info->banks[j] = intf->banks[j];
 	}
 	info->stream = stream_create(0, 2, 8000, info, gaelco_update);
-	info->snd_data = (UINT8 *)memory_region(intf->region);
+	info->snd_data = (UINT8 *)memory_region(Machine, intf->region);
 
 	/* init volume table */
 	for (vol = 0; vol < VOLUME_LEVELS; vol++){

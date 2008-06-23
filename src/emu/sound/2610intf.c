@@ -151,10 +151,10 @@ static void *ym2610_start(int sndindex, int clock, const void *config)
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2610_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = (void *)(memory_region(info->intf->pcmroma));
-	pcmsizea = memory_region_length(info->intf->pcmroma);
-	pcmbufb  = (void *)(memory_region(info->intf->pcmromb));
-	pcmsizeb = memory_region_length(info->intf->pcmromb);
+	pcmbufa  = (void *)(memory_region(Machine, info->intf->pcmroma));
+	pcmsizea = memory_region_length(Machine, info->intf->pcmroma);
+	pcmbufb  = (void *)(memory_region(Machine, info->intf->pcmromb));
+	pcmsizeb = memory_region_length(Machine, info->intf->pcmromb);
 
 	/**** initialize YM2610 ****/
 	info->chip = YM2610Init(info,sndindex,clock,rate,
@@ -209,10 +209,10 @@ static void *ym2610b_start(int sndindex, int clock, const void *config)
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2610b_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = (void *)(memory_region(info->intf->pcmroma));
-	pcmsizea = memory_region_length(info->intf->pcmroma);
-	pcmbufb  = (void *)(memory_region(info->intf->pcmromb));
-	pcmsizeb = memory_region_length(info->intf->pcmromb);
+	pcmbufa  = (void *)(memory_region(Machine, info->intf->pcmroma));
+	pcmsizea = memory_region_length(Machine, info->intf->pcmroma);
+	pcmbufb  = (void *)(memory_region(Machine, info->intf->pcmromb));
+	pcmsizeb = memory_region_length(Machine, info->intf->pcmromb);
 
 	/**** initialize YM2610 ****/
 	info->chip = YM2610Init(info,sndindex,clock,rate,

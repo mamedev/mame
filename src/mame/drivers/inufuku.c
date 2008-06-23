@@ -120,7 +120,7 @@ static WRITE8_HANDLER( pending_command_clear_w )
 
 static WRITE8_HANDLER( inufuku_soundrombank_w )
 {
-	UINT8 *ROM = memory_region(REGION_CPU2) + 0x10000;
+	UINT8 *ROM = memory_region(machine, REGION_CPU2) + 0x10000;
 
 	memory_set_bankptr(1, ROM + (data & 0x03) * 0x8000);
 }

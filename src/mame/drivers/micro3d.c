@@ -173,7 +173,7 @@ static MACHINE_RESET( micro3d )
 
 static DRIVER_INIT( stankatk )
 {
-       UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
+       UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
        rom[0x1F543]=0x4E71;                                       /* 3ea86 - nop */
        rom[0x1F546]=0x4E71;                                       /* 3ea8c - nop */
        rom[0x1F596]=0x4E71;
@@ -188,7 +188,7 @@ static DRIVER_INIT( stankatk )
 
 static DRIVER_INIT( botss )
 {
-       UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
+       UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
        rom[0x1FCC0]=0x4E71;         /* Eliminate startup Am29000 timeout */
        rom[0x1FBF0]=0x4E71;         /* Skip AM29k code version detect */
        rom[0x1FC88]=0x4E71;
@@ -200,12 +200,12 @@ static DRIVER_INIT( botss )
 
 static DRIVER_INIT( f15se )
 {
-//       UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
+//       UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
 }
 
 static DRIVER_INIT( f15se21 )
 {
-       UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
+       UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
 
        rom[0x2A8B3]=0x6006;                          //055166: 6606                     bne     5516e -> bra
        rom[0x2A8BF]=0x4E71;                          //05517E: 6704                     beq     55184 -> nop

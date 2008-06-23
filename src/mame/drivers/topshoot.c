@@ -304,7 +304,7 @@ static DRIVER_INIT(topshoot)
 	/* hack -- fix vdp emulation instead */
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xC00004, 0xC00005, 0, 0, vdp_fake_r);
 
-	memory_set_bankptr(3, memory_region(REGION_CPU1) );
+	memory_set_bankptr(3, memory_region(machine, REGION_CPU1) );
 	memory_set_bankptr(4, genesis_68k_ram );
 }
 

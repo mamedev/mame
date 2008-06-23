@@ -135,7 +135,7 @@ static WRITE8_HANDLER( fromance_busycheck_sub_w )
 
 static WRITE8_HANDLER( fromance_rombank_w )
 {
-	UINT8 *ROM = memory_region(REGION_CPU2);
+	UINT8 *ROM = memory_region(machine, REGION_CPU2);
 
 	memory_set_bankptr(1, &ROM[0x010000 + (0x4000 * data)]);
 }

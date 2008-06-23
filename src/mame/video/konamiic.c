@@ -1149,6 +1149,7 @@ Registers (word-wise):
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/konamiic.h"
 
 #define VERBOSE 0
@@ -1185,16 +1186,16 @@ static void shuffle(UINT16 *buf,int len)
 /* helper function to join two 16-bit ROMs and form a 32-bit data stream */
 void konami_rom_deinterleave_2(int mem_region)
 {
-	shuffle((UINT16 *)memory_region(mem_region),memory_region_length(mem_region)/2);
+	shuffle((UINT16 *)memory_region(Machine, mem_region),memory_region_length(Machine, mem_region)/2);
 }
 
 /* hacked version of rom_deinterleave_2_half for Lethal Enforcers */
 void konami_rom_deinterleave_2_half(int mem_region)
 {
-	UINT8 *rgn = memory_region(mem_region);
+	UINT8 *rgn = memory_region(Machine, mem_region);
 
-	shuffle((UINT16 *)rgn,memory_region_length(mem_region)/4);
-	shuffle((UINT16 *)(rgn+memory_region_length(mem_region)/2),memory_region_length(mem_region)/4);
+	shuffle((UINT16 *)rgn,memory_region_length(Machine, mem_region)/4);
+	shuffle((UINT16 *)(rgn+memory_region_length(Machine, mem_region)/2),memory_region_length(Machine, mem_region)/4);
 }
 
 /* helper function to join four 16-bit ROMs and form a 64-bit data stream */
@@ -2019,13 +2020,13 @@ void K052109_vh_start(running_machine *machine,int gfx_memory_region,int plane_o
 	switch (plane_order)
 	{
 	case NORMAL_PLANE_ORDER:
-		total = memory_region_length(gfx_memory_region) / 32;
-		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout, 4);
+		total = memory_region_length(machine, gfx_memory_region) / 32;
+		decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &charlayout, 4);
 		break;
 
 	case GRADIUS3_PLANE_ORDER:
 		total = 0x1000;
-		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout_gradius3, 4);
+		decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &charlayout_gradius3, 4);
 		break;
 
 	default:
@@ -2119,11 +2120,11 @@ else
 		(*K052109_callback)(0,bank,&code,&color,&flags,&priority);
 
 		addr = (code << 5) + (offset & 0x1f);
-		addr &= memory_region_length(K052109_memory_region)-1;
+		addr &= memory_region_length(machine, K052109_memory_region)-1;
 
 //      logerror("%04x: off = %04x sub = %02x (bnk = %x) adr = %06x\n",activecpu_get_pc(),offset,K052109_romsubbank,bank,addr);
 
-		return memory_region(K052109_memory_region)[addr];
+		return memory_region(machine, K052109_memory_region)[addr];
 	}
 }
 
@@ -2526,18 +2527,18 @@ void K051960_vh_start(running_machine *machine,int gfx_memory_region,int plane_o
 	switch (plane_order)
 	{
 	case NORMAL_PLANE_ORDER:
-		total = memory_region_length(gfx_memory_region) / 128;
-		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &spritelayout, 4);
+		total = memory_region_length(machine, gfx_memory_region) / 128;
+		decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &spritelayout, 4);
 		break;
 
 	case REVERSE_PLANE_ORDER:
-		total = memory_region_length(gfx_memory_region) / 128;
-		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &spritelayout_reverse, 4);
+		total = memory_region_length(machine, gfx_memory_region) / 128;
+		decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &spritelayout_reverse, 4);
 		break;
 
 	case GRADIUS3_PLANE_ORDER:
 		total = 0x4000;
-		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &spritelayout_gradius3, 4);
+		decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &spritelayout_gradius3, 4);
 		break;
 
 	default:
@@ -2571,7 +2572,7 @@ void K051960_vh_start(running_machine *machine,int gfx_memory_region,int plane_o
 }
 
 
-static int K051960_fetchromdata(int byte)
+static int K051960_fetchromdata(running_machine *machine, int byte)
 {
 	int code,color,pri,shadow,off1,addr;
 
@@ -2586,11 +2587,11 @@ static int K051960_fetchromdata(int byte)
 	(*K051960_callback)(&code,&color,&pri,&shadow);
 
 	addr = (code << 7) | (off1 << 2) | byte;
-	addr &= memory_region_length(K051960_memory_region)-1;
+	addr &= memory_region_length(machine, K051960_memory_region)-1;
 
 //  popmessage("%04x: addr %06x",activecpu_get_pc(),addr);
 
-	return memory_region(K051960_memory_region)[addr];
+	return memory_region(machine, K051960_memory_region)[addr];
 }
 
 READ8_HANDLER( K051960_r )
@@ -2599,7 +2600,7 @@ READ8_HANDLER( K051960_r )
 	{
 		/* the 051960 remembers the last address read and uses it when reading the sprite ROMs */
 		K051960_romoffset = (offset & 0x3fc) >> 2;
-		return K051960_fetchromdata(offset & 3);	/* only 88 Games reads the ROMs from here */
+		return K051960_fetchromdata(machine, offset & 3);	/* only 88 Games reads the ROMs from here */
 	}
 	else
 		return K051960_ram[offset];
@@ -2627,7 +2628,7 @@ READ8_HANDLER( K051937_r )
 {
 	if (K051960_readroms && offset >= 4 && offset < 8)
 	{
-		return K051960_fetchromdata(offset & 3);
+		return K051960_fetchromdata(machine, offset & 3);
 	}
 	else
 	{
@@ -3029,8 +3030,8 @@ void K053245_vh_start(running_machine *machine,int chip, int gfx_memory_region,i
 	switch (plane_order)
 	{
 	case NORMAL_PLANE_ORDER:
-		total = memory_region_length(gfx_memory_region) / 128;
-		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &spritelayout, 4);
+		total = memory_region_length(machine, gfx_memory_region) / 128;
+		decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &spritelayout, 4);
 		break;
 
 	default:
@@ -3123,7 +3124,7 @@ INLINE void K053245_update_buffer( int chip )
 	memcpy(K053245_buffer[chip], K053245_ram[chip], K053245_ramsize[chip]);
 }
 
-static UINT8 K053244_chip_r (int chip, int offset)
+static UINT8 K053244_chip_r (running_machine *machine, int chip, int offset)
 {
 	if ((K053244_regs[chip][5] & 0x10) && offset >= 0x0c && offset < 0x10)
 	{
@@ -3132,11 +3133,11 @@ static UINT8 K053244_chip_r (int chip, int offset)
 		addr = (K053244_rombank[chip] << 19) | ((K053244_regs[chip][11] & 0x7) << 18)
 			| (K053244_regs[chip][8] << 10) | (K053244_regs[chip][9] << 2)
 			| ((offset & 3) ^ 1);
-		addr &= memory_region_length(K053245_memory_region[chip])-1;
+		addr &= memory_region_length(machine, K053245_memory_region[chip])-1;
 
 //  popmessage("%04x: offset %02x addr %06x",activecpu_get_pc(),offset&3,addr);
 
-		return memory_region(K053245_memory_region[chip])[addr];
+		return memory_region(machine, K053245_memory_region[chip])[addr];
 	}
 	else if (offset == 0x06)
 	{
@@ -3152,7 +3153,7 @@ static UINT8 K053244_chip_r (int chip, int offset)
 
 READ8_HANDLER( K053244_r )
 {
-	return K053244_chip_r(0,offset);
+	return K053244_chip_r(machine,0,offset);
 }
 
 static void K053244_chip_w(int chip, int offset, int data)
@@ -3771,8 +3772,8 @@ void K053247_vh_start(running_machine *machine, int gfx_memory_region, int dx, i
 	switch (plane_order)
 	{
 	case NORMAL_PLANE_ORDER:
-		total = memory_region_length(gfx_memory_region) / 128;
-		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &spritelayout, 4);
+		total = memory_region_length(machine, gfx_memory_region) / 128;
+		decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &spritelayout, 4);
 		break;
 
 	default:
@@ -3879,19 +3880,19 @@ void K055673_vh_start(running_machine *machine, int gfx_memory_region, int layou
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
-	K055673_rom = (UINT16 *)memory_region(gfx_memory_region);
+	K055673_rom = (UINT16 *)memory_region(machine, gfx_memory_region);
 
 	/* decode the graphics */
 	switch(layout)
 	{
 	case K055673_LAYOUT_GX:
-		size4 = (memory_region_length(gfx_memory_region)/(1024*1024))/5;
+		size4 = (memory_region_length(machine, gfx_memory_region)/(1024*1024))/5;
 		size4 *= 4*1024*1024;
 		/* set the # of tiles based on the 4bpp section */
 		K055673_rom = auto_malloc(size4 * 5);
 		d = (UINT8 *)K055673_rom;
 		// now combine the graphics together to form 5bpp
-		s1 = memory_region(gfx_memory_region); // 4bpp area
+		s1 = memory_region(machine, gfx_memory_region); // 4bpp area
 		s2 = s1 + (size4);	 // 1bpp area
 		for (i = 0; i < size4; i+= 4)
 		{
@@ -3907,17 +3908,17 @@ void K055673_vh_start(running_machine *machine, int gfx_memory_region, int layou
 		break;
 
 	case K055673_LAYOUT_RNG:
-		total = memory_region_length(gfx_memory_region) / (16*16/2);
+		total = memory_region_length(machine, gfx_memory_region) / (16*16/2);
 		decode_gfx(machine, gfx_index, (UINT8 *)K055673_rom, total, &spritelayout2, 4);
 		break;
 
 	case K055673_LAYOUT_LE2:
-		total = memory_region_length(gfx_memory_region) / (16*16);
+		total = memory_region_length(machine, gfx_memory_region) / (16*16);
 		decode_gfx(machine, gfx_index, (UINT8 *)K055673_rom, total, &spritelayout3, 4);
 		break;
 
 	case K055673_LAYOUT_GX6:
-		total = memory_region_length(gfx_memory_region) / (16*16*6/8);
+		total = memory_region_length(machine, gfx_memory_region) / (16*16*6/8);
 		decode_gfx(machine, gfx_index, (UINT8 *)K055673_rom, total, &spritelayout4, 4);
 		break;
 
@@ -4019,9 +4020,9 @@ WRITE8_HANDLER( K053247_w )
 // in this window, +0 = 32 bits from one set of ROMs, and +8 = 32 bits from another set
 READ16_HANDLER( K055673_rom_word_r )	// 5bpp
 {
-	UINT8 *ROM8 = (UINT8 *)memory_region(K053247_memory_region);
-	UINT16 *ROM = (UINT16 *)memory_region(K053247_memory_region);
-	int size4 = (memory_region_length(K053247_memory_region)/(1024*1024))/5;
+	UINT8 *ROM8 = (UINT8 *)memory_region(machine, K053247_memory_region);
+	UINT16 *ROM = (UINT16 *)memory_region(machine, K053247_memory_region);
+	int size4 = (memory_region_length(machine, K053247_memory_region)/(1024*1024))/5;
 	int romofs;
 
 	size4 *= 4*1024*1024;	// get offset to 5th bit
@@ -4063,7 +4064,7 @@ READ16_HANDLER( K055673_rom_word_r )	// 5bpp
 
 READ16_HANDLER( K055673_GX6bpp_rom_word_r )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(K053247_memory_region);
+	UINT16 *ROM = (UINT16 *)memory_region(machine, K053247_memory_region);
 	int romofs;
 
 	romofs = K053246_regs[6]<<16 | K053246_regs[7]<<8 | K053246_regs[4];
@@ -4108,10 +4109,10 @@ READ8_HANDLER( K053246_r )
 		int addr;
 
 		addr = (K053246_regs[6] << 17) | (K053246_regs[7] << 9) | (K053246_regs[4] << 1) | ((offset & 1) ^ 1);
-		addr &= memory_region_length(K053247_memory_region)-1;
+		addr &= memory_region_length(machine, K053247_memory_region)-1;
 		if (VERBOSE)
 			popmessage("%04x: offset %02x addr %06x",activecpu_get_pc(),offset,addr);
-		return memory_region(K053247_memory_region)[addr];
+		return memory_region(machine, K053247_memory_region)[addr];
 	}
 	else
 	{
@@ -4672,22 +4673,22 @@ static void K051316_vh_start(running_machine *machine,int chip, int gfx_memory_r
 	case -4:
 		total = 0x400;
 		bpp = 4;
-		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout_tail2nos, 4);
+		decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &charlayout_tail2nos, 4);
 		break;
 
 	case 4:
-		total = memory_region_length(gfx_memory_region) / 128;
-		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout4, 4);
+		total = memory_region_length(machine, gfx_memory_region) / 128;
+		decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &charlayout4, 4);
 		break;
 
 	case 7:
-		total = memory_region_length(gfx_memory_region) / 256;
-		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout7, 7);
+		total = memory_region_length(machine, gfx_memory_region) / 256;
+		decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &charlayout7, 7);
 		break;
 
 	case 8:
-		total = memory_region_length(gfx_memory_region) / 256;
-		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout8, 8);
+		total = memory_region_length(machine, gfx_memory_region) / 256;
+		decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &charlayout8, 8);
 		break;
 
 	default:
@@ -4786,7 +4787,7 @@ WRITE8_HANDLER( K051316_2_w )
 }
 
 
-static int K051316_rom_r(int chip, int offset)
+static int K051316_rom_r(running_machine *machine, int chip, int offset)
 {
 	if ((K051316_ctrlram[chip][0x0e] & 0x01) == 0)
 	{
@@ -4794,11 +4795,11 @@ static int K051316_rom_r(int chip, int offset)
 
 		addr = offset + (K051316_ctrlram[chip][0x0c] << 11) + (K051316_ctrlram[chip][0x0d] << 19);
 		if (K051316_bpp[chip] <= 4) addr /= 2;
-		addr &= memory_region_length(K051316_memory_region[chip])-1;
+		addr &= memory_region_length(machine, K051316_memory_region[chip])-1;
 
 //  popmessage("%04x: offset %04x addr %04x",activecpu_get_pc(),offset,addr);
 
-		return memory_region(K051316_memory_region[chip])[addr];
+		return memory_region(machine, K051316_memory_region[chip])[addr];
 	}
 	else
 	{
@@ -4809,17 +4810,17 @@ static int K051316_rom_r(int chip, int offset)
 
 READ8_HANDLER( K051316_rom_0_r )
 {
-	return K051316_rom_r(0,offset);
+	return K051316_rom_r(machine,0,offset);
 }
 
 READ8_HANDLER( K051316_rom_1_r )
 {
-	return K051316_rom_r(1,offset);
+	return K051316_rom_r(machine,1,offset);
 }
 
 READ8_HANDLER( K051316_rom_2_r )
 {
-	return K051316_rom_r(2,offset);
+	return K051316_rom_r(machine,2,offset);
 }
 
 
@@ -5708,33 +5709,33 @@ void K056832_vh_start(running_machine *machine, int gfx_memory_region, int bpp, 
 	switch (bpp)
 	{
 		case K056832_BPP_4:
-			total = memory_region_length(gfx_memory_region) / (i*4);
-			decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout4, 4);
+			total = memory_region_length(machine, gfx_memory_region) / (i*4);
+			decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &charlayout4, 4);
 			break;
 
 		case K056832_BPP_5:
-			total = memory_region_length(gfx_memory_region) / (i*5);
-			decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout5, 4);
+			total = memory_region_length(machine, gfx_memory_region) / (i*5);
+			decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &charlayout5, 4);
 			break;
 
 		case K056832_BPP_6:
-			total = memory_region_length(gfx_memory_region) / (i*6);
-			decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout6, 4);
+			total = memory_region_length(machine, gfx_memory_region) / (i*6);
+			decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &charlayout6, 4);
 			break;
 
 		case K056832_BPP_8:
-			total = memory_region_length(gfx_memory_region) / (i*8);
-			decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout8, 4);
+			total = memory_region_length(machine, gfx_memory_region) / (i*8);
+			decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &charlayout8, 4);
 			break;
 
 		case K056832_BPP_8LE:
-			total = memory_region_length(gfx_memory_region) / (i*8);
-			decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout8le, 4);
+			total = memory_region_length(machine, gfx_memory_region) / (i*8);
+			decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &charlayout8le, 4);
 			break;
 
 		case K056832_BPP_4dj:
-			total = memory_region_length(gfx_memory_region) / (i*4);
-			decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout4dj, 4);
+			total = memory_region_length(machine, gfx_memory_region) / (i*4);
+			decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &charlayout4dj, 4);
 			break;
 
 		default:
@@ -5747,8 +5748,8 @@ void K056832_vh_start(running_machine *machine, int gfx_memory_region, int bpp, 
 	K056832_gfxnum = gfx_index;
 	K056832_callback = callback;
 
-	K056832_rombase = memory_region(gfx_memory_region);
-	K056832_NumGfxBanks = memory_region_length(gfx_memory_region) / 0x2000;
+	K056832_rombase = memory_region(machine, gfx_memory_region);
+	K056832_NumGfxBanks = memory_region_length(machine, gfx_memory_region) / 0x2000;
 	K056832_CurGfxBank = 0;
 	K056832_use_ext_linescroll = 0;
 	K056832_uses_tile_banks = 0;
@@ -5841,12 +5842,12 @@ void K056832_SetExtLinescroll(void)
 }
 
 /* generic helper routine for ROM checksumming */
-static int K056832_rom_read_b(int offset, int blksize, int blksize2, int zerosec)
+static int K056832_rom_read_b(running_machine *machine, int offset, int blksize, int blksize2, int zerosec)
 {
 	UINT8 *rombase;
 	int base, ret;
 
-	rombase = (UINT8 *)memory_region(K056832_memory_region);
+	rombase = (UINT8 *)memory_region(machine, K056832_memory_region);
 
 	if ((K056832_rom_half) && (zerosec))
 	{
@@ -5879,11 +5880,11 @@ READ16_HANDLER( K056832_5bpp_rom_word_r )
 {
 	if (mem_mask == 0xff00)
 	{
-		return K056832_rom_read_b(offset*2, 4, 5, 0)<<8;
+		return K056832_rom_read_b(machine, offset*2, 4, 5, 0)<<8;
 	}
 	else if (mem_mask == 0x00ff)
 	{
-		return K056832_rom_read_b(offset*2+1, 4, 5, 0)<<16;
+		return K056832_rom_read_b(machine, offset*2+1, 4, 5, 0)<<16;
 	}
 	else
 	{
@@ -5896,19 +5897,19 @@ READ32_HANDLER( K056832_5bpp_rom_long_r )
 {
 	if (mem_mask == 0xff000000)
 	{
-		return K056832_rom_read_b(offset*4, 4, 5, 0)<<24;
+		return K056832_rom_read_b(machine, offset*4, 4, 5, 0)<<24;
 	}
 	else if (mem_mask == 0x00ff0000)
 	{
-		return K056832_rom_read_b(offset*4+1, 4, 5, 0)<<16;
+		return K056832_rom_read_b(machine, offset*4+1, 4, 5, 0)<<16;
 	}
 	else if (mem_mask == 0x0000ff00)
 	{
-		return K056832_rom_read_b(offset*4+2, 4, 5, 0)<<8;
+		return K056832_rom_read_b(machine, offset*4+2, 4, 5, 0)<<8;
 	}
 	else if (mem_mask == 0x000000ff)
 	{
-		return K056832_rom_read_b(offset*4+3, 4, 5, 1);
+		return K056832_rom_read_b(machine, offset*4+3, 4, 5, 1);
 	}
 	else
 	{
@@ -5921,19 +5922,19 @@ READ32_HANDLER( K056832_6bpp_rom_long_r )
 {
 	if (mem_mask == 0xff000000)
 	{
-		return K056832_rom_read_b(offset*4, 4, 6, 0)<<24;
+		return K056832_rom_read_b(machine, offset*4, 4, 6, 0)<<24;
 	}
 	else if (mem_mask == 0x00ff0000)
 	{
-		return K056832_rom_read_b(offset*4+1, 4, 6, 0)<<16;
+		return K056832_rom_read_b(machine, offset*4+1, 4, 6, 0)<<16;
 	}
 	else if (mem_mask == 0x0000ff00)
 	{
-		return K056832_rom_read_b(offset*4+2, 4, 6, 0)<<8;
+		return K056832_rom_read_b(machine, offset*4+2, 4, 6, 0)<<8;
 	}
 	else if (mem_mask == 0x000000ff)
 	{
-		return K056832_rom_read_b(offset*4+3, 4, 6, 0);
+		return K056832_rom_read_b(machine, offset*4+3, 4, 6, 0);
 	}
 	else
 	{
@@ -5956,7 +5957,7 @@ READ16_HANDLER( K056832_rom_word_r )
 
 	if (!K056832_rombase)
 	{
-		K056832_rombase = memory_region(K056832_memory_region);
+		K056832_rombase = memory_region(machine, K056832_memory_region);
 	}
 	rombase = (UINT8 *)K056832_rombase;
 
@@ -5982,7 +5983,7 @@ READ16_HANDLER( K056832_mw_rom_word_r )
 
 	if (!K056832_rombase)
 	{
-		K056832_rombase = memory_region(K056832_memory_region);
+		K056832_rombase = memory_region(machine, K056832_memory_region);
 	}
 
 	if (K056832_regsb[2] & 0x8)
@@ -6046,7 +6047,7 @@ READ16_HANDLER( K056832_bishi_rom_word_r )
 
 	if (!K056832_rombase)
 	{
-		K056832_rombase = memory_region(K056832_memory_region);
+		K056832_rombase = memory_region(machine, K056832_memory_region);
 	}
 
 	return K056832_rombase[addr+2] | (K056832_rombase[addr] << 8);
@@ -6058,7 +6059,7 @@ READ16_HANDLER( K056832_rom_word_8000_r )
 
 	if (!K056832_rombase)
 	{
-		K056832_rombase = memory_region(K056832_memory_region);
+		K056832_rombase = memory_region(machine, K056832_memory_region);
 	}
 
 	return K056832_rombase[addr+2] | (K056832_rombase[addr] << 8);
@@ -6070,7 +6071,7 @@ READ16_HANDLER( K056832_old_rom_word_r )
 
 	if (!K056832_rombase)
 	{
-		K056832_rombase = memory_region(K056832_memory_region);
+		K056832_rombase = memory_region(machine, K056832_memory_region);
 	}
 
 	return K056832_rombase[addr+1] | (K056832_rombase[addr] << 8);
@@ -7508,8 +7509,8 @@ void K053250_unpack_pixels(int region)
 	UINT8 *src_ptr, *dst_ptr;
 	int hi_nibble, lo_nibble, offset;
 
-	dst_ptr = src_ptr = memory_region(region);
-	offset = memory_region_length(region) / 2 - 1;
+	dst_ptr = src_ptr = memory_region(Machine, region);
+	offset = memory_region_length(Machine, region) / 2 - 1;
 
 	do
 	{
@@ -7531,14 +7532,14 @@ void K053250_vh_start(int chips, int *region)
 
 	for(chip=0; chip<chips; chip++)
 	{
-		K053250_info.chip[chip].base = memory_region(region[chip]);
+		K053250_info.chip[chip].base = memory_region(Machine, region[chip]);
 		ram = auto_malloc(0x6000);
 		K053250_info.chip[chip].ram = ram;
 		K053250_info.chip[chip].rammax = ram + 0x800;
 		K053250_info.chip[chip].buffer[0] = ram + 0x2000;
 		K053250_info.chip[chip].buffer[1] = ram + 0x2800;
 		memset(ram+0x2000, 0, 0x2000);
-		K053250_info.chip[chip].rommask = memory_region_length(region[chip]);
+		K053250_info.chip[chip].rommask = memory_region_length(Machine, region[chip]);
 		K053250_info.chip[chip].page[1] = K053250_info.chip[chip].page[0] = 0;
 		K053250_info.chip[chip].offsy = K053250_info.chip[chip].offsx = 0;
 		K053250_info.chip[chip].frame = -1;

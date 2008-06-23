@@ -518,7 +518,7 @@ static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *
 				// GEOMETRY
 				;
 
-				threeDRoms = memory_region(REGION_GFX4) ;
+				threeDRoms = memory_region(machine, REGION_GFX4) ;
 
 				/////////////////////////
 				// GET THE HEADER INFO //
@@ -1716,7 +1716,7 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine, bitmap_t *Co
 {
 	float *dp = &(depthBuffer[y*video_screen_get_visible_area(machine->primary_screen)->max_x+x_start]);
 
-	const UINT8 *gfx = memory_region(REGION_GFX3);
+	const UINT8 *gfx = memory_region(machine, REGION_GFX3);
 	const UINT8 *textureOffset ;
 	UINT8 paletteEntry ;
 	float t_coord, s_coord ;

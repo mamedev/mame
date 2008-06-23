@@ -54,9 +54,9 @@ void namcoc7x_sound_write16(UINT16 command, UINT32 offset)
 	namcoc7x_mcuram[offset] = command;
 }
 
-void namcoc7x_on_driver_init(void)
+void namcoc7x_on_driver_init(running_machine *machine)
 {
-	UINT8 *pROM = (UINT8 *)memory_region(REGION_USER4);
+	UINT8 *pROM = (UINT8 *)memory_region(machine, REGION_USER4);
 	int cpunum;
 
 	// clear the first page of the data ROM
@@ -66,8 +66,8 @@ void namcoc7x_on_driver_init(void)
 
 	// install speedup cheat
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-		if (Machine->config->cpu[cpunum].type == CPU_M37702)
-			memory_install_readwrite16_handler(Machine, cpunum, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, speedup_r, speedup_w);
+		if (machine->config->cpu[cpunum].type == CPU_M37702)
+			memory_install_readwrite16_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, speedup_r, speedup_w);
 }
 
 void namcoc7x_set_host_ram(UINT32 *hostram)

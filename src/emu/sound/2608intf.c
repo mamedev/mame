@@ -152,8 +152,8 @@ static void *ym2608_start(int sndindex, int clock, const void *config)
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2608_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = (void *)(memory_region(info->intf->pcmrom));
-	pcmsizea = memory_region_length(info->intf->pcmrom);
+	pcmbufa  = (void *)(memory_region(Machine, info->intf->pcmrom));
+	pcmsizea = memory_region_length(Machine, info->intf->pcmrom);
 
 	/* initialize YM2608 */
 	info->chip = YM2608Init(info,sndindex,clock,rate,

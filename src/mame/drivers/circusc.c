@@ -524,7 +524,7 @@ ROM_END
 
 static DRIVER_INIT( circusc )
 {
-	konami1_decode(0);
+	konami1_decode(machine, 0);
 }
 
 

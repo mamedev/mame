@@ -597,7 +597,7 @@ static READ8_HANDLER( undoukai_mcu_status_r )
 
 static DRIVER_INIT( undoukai )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	memory_configure_bank(1, 0, 2, &ROM[0x10000], 0x2000);
 
 	from_mcu = 0xff;
@@ -611,14 +611,14 @@ static DRIVER_INIT( undoukai )
 
 static DRIVER_INIT( 40love )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	memory_configure_bank(1, 0, 2, &ROM[0x10000], 0x2000);
 
 	#if 0
 		/* character ROM hack
             to show a white line on the opponent side */
 
-		UINT8 *ROM = memory_region(REGION_GFX2);
+		UINT8 *ROM = memory_region(machine, REGION_GFX2);
 		int adr = 0x10 * 0x022b;
 		ROM[adr+0x000a] = 0x00;
 		ROM[adr+0x000b] = 0x00;

@@ -78,9 +78,9 @@ static NVRAM_HANDLER( nbmj9195 )
 	}
 }
 
-static void nbmj9195_soundbank_w(int data)
+static void nbmj9195_soundbank_w(running_machine *machine, int data)
 {
-	UINT8 *SNDROM = memory_region(REGION_CPU2);
+	UINT8 *SNDROM = memory_region(machine, REGION_CPU2);
 
 	memory_set_bankptr(1, &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
@@ -373,7 +373,7 @@ static void tmpz84c011_pio_w(running_machine *machine, int offset, int data)
 				break;
 
 			case 5:			/* PA_1 */
-				nbmj9195_soundbank_w(data);
+				nbmj9195_soundbank_w(machine, data);
 				break;
 			case 6:			/* PB_1 */
 				DAC_1_WRITE(machine, 0, data);
@@ -411,7 +411,7 @@ static void tmpz84c011_pio_w(running_machine *machine, int offset, int data)
 				break;
 
 			case 5:			/* PA_1 */
-				nbmj9195_soundbank_w(data);
+				nbmj9195_soundbank_w(machine, data);
 				break;
 			case 6:			/* PB_1 */
 				DAC_1_WRITE(machine, 0, data);
@@ -546,7 +546,7 @@ static MACHINE_RESET( sailorws )
 
 static DRIVER_INIT( nbmj9195 )
 {
-	UINT8 *ROM = memory_region(REGION_CPU2);
+	UINT8 *ROM = memory_region(machine, REGION_CPU2);
 
 	// sound program patch
 	ROM[0x0213] = 0x00;			// DI -> NOP
@@ -555,7 +555,7 @@ static DRIVER_INIT( nbmj9195 )
 	tmpz84c011_init(machine);
 
 	// initialize sound rom bank
-	nbmj9195_soundbank_w(0);
+	nbmj9195_soundbank_w(machine, 0);
 }
 
 

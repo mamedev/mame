@@ -59,7 +59,7 @@ extern VIDEO_UPDATE( pokechmp );
 
 static WRITE8_HANDLER( pokechmp_bank_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	if (data == 0x00)
 	{
@@ -285,7 +285,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( pokechmp )
 {
-	memory_configure_bank(3, 0, 2, memory_region(REGION_CPU2) + 0x10000, 0x4000);
+	memory_configure_bank(3, 0, 2, memory_region(machine, REGION_CPU2) + 0x10000, 0x4000);
 }
 
 

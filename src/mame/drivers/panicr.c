@@ -126,8 +126,8 @@ static TILE_GET_INFO( get_bgtile_info )
 {
 	int code,attr;
 
-	code=memory_region(REGION_USER1)[tile_index];
-	attr=memory_region(REGION_USER2)[tile_index];
+	code=memory_region(machine, REGION_USER1)[tile_index];
+	attr=memory_region(machine, REGION_USER2)[tile_index];
 	code+=((attr&7)<<8);
 	SET_TILE_INFO(
 		1,
@@ -438,8 +438,8 @@ static DRIVER_INIT( panicr )
 	int size;
 	int i;
 
-	rom = memory_region(REGION_GFX1);
-	size = memory_region_length(REGION_GFX1);
+	rom = memory_region(machine, REGION_GFX1);
+	size = memory_region_length(machine, REGION_GFX1);
 
 	// text data lines
 	for (i = 0;i < size/2;i++)
@@ -461,8 +461,8 @@ static DRIVER_INIT( panicr )
 	}
 
 
-	rom = memory_region(REGION_GFX2);
-	size = memory_region_length(REGION_GFX2);
+	rom = memory_region(machine, REGION_GFX2);
+	size = memory_region_length(machine, REGION_GFX2);
 
 	// tiles data lines
 	for (i = 0;i < size/4;i++)
@@ -488,8 +488,8 @@ static DRIVER_INIT( panicr )
 	}
 
 
-	rom = memory_region(REGION_GFX3);
-	size = memory_region_length(REGION_GFX3);
+	rom = memory_region(machine, REGION_GFX3);
+	size = memory_region_length(machine, REGION_GFX3);
 
 	// sprites data lines
 	for (i = 0;i < size/2;i++)
@@ -514,8 +514,8 @@ static DRIVER_INIT( panicr )
 
 	//rearrange  bg tilemaps a bit....
 
-	rom = memory_region(REGION_USER1);
-	size = memory_region_length(REGION_USER1);
+	rom = memory_region(machine, REGION_USER1);
+	size = memory_region_length(machine, REGION_USER1);
 	memcpy(buf,rom, size);
 
 	{
@@ -527,8 +527,8 @@ static DRIVER_INIT( panicr )
 			}
 	}
 
-	rom = memory_region(REGION_USER2);
-	size = memory_region_length(REGION_USER2);
+	rom = memory_region(machine, REGION_USER2);
+	size = memory_region_length(machine, REGION_USER2);
 
 	memcpy(buf,rom, size);
 	{

@@ -213,15 +213,15 @@ static TIMER_CALLBACK( m92_scanline_interrupt );
 
 /*****************************************************************************/
 
-static void set_m92_bank(void)
+static void set_m92_bank(running_machine *machine)
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(1,&RAM[bankaddress]);
 }
 
 static STATE_POSTLOAD( m92_postload )
 {
-	set_m92_bank();
+	set_m92_bank(machine);
 }
 
 static MACHINE_START( m92 )
@@ -269,14 +269,14 @@ static TIMER_CALLBACK( m92_scanline_interrupt )
 
 static READ16_HANDLER( m92_eeprom_r )
 {
-	UINT8 *RAM = memory_region(REGION_USER1);
+	UINT8 *RAM = memory_region(machine, REGION_USER1);
 //  logerror("%05x: EEPROM RE %04x\n",activecpu_get_pc(),offset);
 	return RAM[offset] | 0xff00;
 }
 
 static WRITE16_HANDLER( m92_eeprom_w )
 {
-	UINT8 *RAM = memory_region(REGION_USER1);
+	UINT8 *RAM = memory_region(machine, REGION_USER1);
 //  logerror("%05x: EEPROM WR %04x\n",activecpu_get_pc(),offset);
 	if (ACCESSING_BITS_0_7)
 		RAM[offset] = data;
@@ -299,7 +299,7 @@ static WRITE16_HANDLER( m92_bankswitch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		bankaddress = 0x100000 + ((data & 0x7) * 0x10000);
-		set_m92_bank();
+		set_m92_bank(machine);
 	}
 }
 
@@ -1994,20 +1994,20 @@ ROM_END
 
 static void init_m92(running_machine *machine, int hasbanks)
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	if (hasbanks)
 	{
 		memcpy(RAM+0xffff0,RAM+0x7fff0,0x10); /* Start vector */
 		bankaddress = 0xa0000; /* Initial bank */
-		set_m92_bank();
+		set_m92_bank(machine);
 
 		/* Mirror used by In The Hunt for protection */
 		memcpy(RAM+0xc0000,RAM+0x00000,0x10000);
 		memory_set_bankptr(2,&RAM[0xc0000]);
 	}
 
-	RAM = memory_region(REGION_CPU2);
+	RAM = memory_region(machine, REGION_CPU2);
 	memcpy(RAM+0xffff0, RAM+0x1fff0, 0x10); /* Sound cpu Start vector */
 
 	m92_game_kludge=0;
@@ -2086,7 +2086,7 @@ static DRIVER_INIT( lethalth )
 
 static DRIVER_INIT( nbbatman )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	init_m92(machine, 1);
 
@@ -2116,7 +2116,7 @@ static DRIVER_INIT( dsccr94j )
 
 static DRIVER_INIT( gunforc2 )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	init_m92(machine, 1);
 	memcpy(RAM+0x80000,RAM+0x100000,0x20000);
 }

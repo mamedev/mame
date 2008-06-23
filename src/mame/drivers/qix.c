@@ -1049,9 +1049,9 @@ static DRIVER_INIT( kram3 )
      ********************************/
 
 	i = 0;
-	patch = memory_region(REGION_USER1);
-	size = memory_region_length(REGION_USER1);
-	rom = memory_region(REGION_CPU1);
+	patch = memory_region(machine, REGION_USER1);
+	size = memory_region_length(machine, REGION_USER1);
+	rom = memory_region(machine, REGION_CPU1);
 	decrypted = auto_malloc(0x6000);
 
 	memory_set_decrypted_region(0, 0xa000, 0xffff, decrypted);
@@ -1069,9 +1069,9 @@ static DRIVER_INIT( kram3 )
 	}
 
 	i = 0;
-	patch = memory_region(REGION_USER2);
-	size = memory_region_length(REGION_USER2);
-	rom = memory_region(REGION_CPU2);
+	patch = memory_region(machine, REGION_USER2);
+	size = memory_region_length(machine, REGION_USER2);
+	rom = memory_region(machine, REGION_CPU2);
 	decrypted = auto_malloc(0x6000);
 
 	memory_set_decrypted_region(1, 0xa000, 0xffff, decrypted);
@@ -1093,8 +1093,8 @@ static DRIVER_INIT( kram3 )
 static DRIVER_INIT( zookeep )
 {
 	/* configure the banking */
-	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU2) + 0xa000, 0);
-	memory_configure_bank(1, 1, 1, memory_region(REGION_CPU2) + 0x10000, 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, REGION_CPU2) + 0xa000, 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, REGION_CPU2) + 0x10000, 0);
 	memory_set_bank(1, 0);
 }
 

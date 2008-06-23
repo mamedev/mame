@@ -896,7 +896,7 @@ static UINT16 dsp_tex_offset = 0;
 
 static READ16_HANDLER( dsp_rom_r )
 {
-	UINT16 *rom = (UINT16*)memory_region(REGION_GFX2);
+	UINT16 *rom = (UINT16*)memory_region(machine, REGION_GFX2);
 	UINT16 data = rom[dsp_rom_pos++];
 	//mame_printf_debug("dsp_rom_r:  %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
 	return data;
@@ -1251,7 +1251,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( taitojc )
 {
-	taito_f3_soundsystem_reset();
+	taito_f3_soundsystem_reset(machine);
 
 	f3_68681_reset();
 

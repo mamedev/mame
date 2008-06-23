@@ -662,7 +662,7 @@ static WRITE8_HANDLER( trigger_nmi_on_cpu0 )
 
 static WRITE8_HANDLER( cpu0_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	unsigned char *RAM = memory_region(machine, REGION_CPU1);
 	data ^= bankxor;
 	memory_set_bankptr(4,&RAM[0x10000]); /* unsure if/how this area is banked */
 	if( data < 4 )
@@ -686,7 +686,7 @@ static WRITE8_HANDLER( cpu0_bankswitch_w )
  */
 static WRITE8_HANDLER( cpu1_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 	djboy_set_videoreg( data );
 	switch( data&0xf )
 	{
@@ -721,7 +721,7 @@ static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 
 static WRITE8_HANDLER( cpu2_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU3);
+	UINT8 *RAM = memory_region(machine, REGION_CPU3);
 
 	if( data<3 )
 	{

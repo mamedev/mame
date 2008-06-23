@@ -189,7 +189,7 @@ static UINT8 *audiobuffer_region;
 
 static MACHINE_RESET( gottlieb )
 {
-	audiobuffer_region = memory_region(REGION_USER1);
+	audiobuffer_region = memory_region(machine, REGION_USER1);
 }
 
 

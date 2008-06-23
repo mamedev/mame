@@ -490,7 +490,7 @@ static NVRAM_HANDLER( syf )
 		}
 		else
 		{
-			eeprom_set_data(memory_region(REGION_USER2),128);
+			eeprom_set_data(memory_region(machine, REGION_USER2),128);
 		}
 	}
 }

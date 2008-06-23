@@ -167,7 +167,7 @@ static VIDEO_UPDATE( discoboy )
 #ifdef UNUSED_FUNCTION
 void discoboy_setrombank(UINT8 data)
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	data &=0x2f;
 	memory_set_bankptr(1, &ROM[0x6000+(data*0x1000)] );
 }
@@ -187,7 +187,7 @@ static WRITE8_HANDLER( discoboy_port_00_w )
 
 static WRITE8_HANDLER( discoboy_port_01_w )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	int rombank;
 
 	// 00 10 20 30 during gameplay  1,2,3 other times?? title screen bit 0x40 toggle
@@ -514,7 +514,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( discoboy )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	discoboy_ram_part1 = auto_malloc(0x800);
 	discoboy_ram_part2 = auto_malloc(0x800);

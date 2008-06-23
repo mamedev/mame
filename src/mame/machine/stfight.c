@@ -39,7 +39,7 @@ static UINT8 *decrypt;
 
 DRIVER_INIT( empcity )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int A;
 
 	decrypt = auto_malloc(0x8000);
@@ -90,7 +90,7 @@ MACHINE_RESET( stfight )
 // - in fact I don't even know how/where it's switched in!
 static WRITE8_HANDLER( stfight_bank_w )
 {
-	UINT8   *ROM2 = memory_region(REGION_CPU1) + 0x10000;
+	UINT8   *ROM2 = memory_region(machine, REGION_CPU1) + 0x10000;
 
 	memory_set_bankptr( 1, &ROM2[data<<14] );
 }
@@ -186,7 +186,7 @@ static int adpcm_data_end;
 void stfight_adpcm_int( running_machine *machine, int data )
 {
 	static int toggle;
-	UINT8 *SAMPLES = memory_region(REGION_SOUND1);
+	UINT8 *SAMPLES = memory_region(machine, REGION_SOUND1);
 	int adpcm_data = SAMPLES[adpcm_data_offs & 0x7fff];
 
     // finished playing sample?

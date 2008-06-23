@@ -453,14 +453,14 @@ ROM_END
 
 static DRIVER_INIT( deadang )
 {
-	seibu_sound_decrypt(REGION_CPU3, 0x2000);
-	seibu_adpcm_decrypt(REGION_SOUND1);
+	seibu_sound_decrypt(machine, REGION_CPU3, 0x2000);
+	seibu_adpcm_decrypt(machine, REGION_SOUND1);
 }
 
 static DRIVER_INIT( ghunter )
 {
-	seibu_sound_decrypt(REGION_CPU3, 0x2000);
-	seibu_adpcm_decrypt(REGION_SOUND1);
+	seibu_sound_decrypt(machine, REGION_CPU3, 0x2000);
+	seibu_adpcm_decrypt(machine, REGION_SOUND1);
 
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x80000, 0x80001, 0, 0, ghunter_trackball_low_r);
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0001, 0, 0, ghunter_trackball_high_r);

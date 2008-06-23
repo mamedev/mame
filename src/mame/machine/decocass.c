@@ -366,7 +366,7 @@ attotime decocass_adjust_tape_time(attotime tape_time)
 }
 
 
-static void tape_update(void)
+static void tape_update(running_machine *machine)
 {
 	static int last_byte;
 	int offset, rclk, rdata, tape_bit, tape_byte, tape_block;
@@ -455,7 +455,7 @@ static void tape_update(void)
 		else
 		if (tape_byte < TAPE_BLOCK)
 		{
-			UINT8 *ptr = memory_region(REGION_USER2) + tape_block * 256 + tape_byte - TAPE_HEADER;
+			UINT8 *ptr = memory_region(machine, REGION_USER2) + tape_block * 256 + tape_byte - TAPE_HEADER;
 			rdata = (*ptr >> tape_bit) & 1;
 			if (tape_byte != last_byte)
 				LOG(4,("tape %5.4fs: DATA(%02x) $%02x\n", attotime_to_double(tape_time), tape_byte - TAPE_HEADER, *ptr));
@@ -607,7 +607,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = memory_region(REGION_USER1);
+		UINT8 *prom = memory_region(machine, REGION_USER1);
 
 		if (firsttime)
 		{
@@ -687,7 +687,7 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = memory_region(REGION_USER1);
+		UINT8 *prom = memory_region(machine, REGION_USER1);
 
 		if (firsttime)
 		{
@@ -767,7 +767,7 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = memory_region(REGION_USER1);
+		UINT8 *prom = memory_region(machine, REGION_USER1);
 
 		if (firsttime)
 		{
@@ -847,7 +847,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = memory_region(REGION_USER1);
+		UINT8 *prom = memory_region(machine, REGION_USER1);
 
 		if (firsttime)
 		{
@@ -929,7 +929,7 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = memory_region(REGION_USER1);
+		UINT8 *prom = memory_region(machine, REGION_USER1);
 
 		if (firsttime)
 		{
@@ -996,7 +996,7 @@ static READ8_HANDLER( decocass_type2_r )
 	{
 		if (1 == (offset & 1))
 		{
-			UINT8 *prom = memory_region(REGION_USER1);
+			UINT8 *prom = memory_region(machine, REGION_USER1);
 			data = prom[256 * type2_d2_latch + type2_promaddr];
 			LOG(3,("%9.7f 6502-PC: %04x decocass_type2_r(%02x): $%02x <- prom[%03x]\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, 256 * type2_d2_latch + type2_promaddr));
 		}
@@ -1076,7 +1076,7 @@ static READ8_HANDLER( decocass_type3_r )
 	{
 		if (1 == type3_pal_19)
 		{
-			UINT8 *prom = memory_region(REGION_USER1);
+			UINT8 *prom = memory_region(machine, REGION_USER1);
 			data = prom[type3_ctrs];
 			LOG(3,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x <- prom[$%03x]\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, type3_ctrs));
 			if (++type3_ctrs == 4096)
@@ -1315,7 +1315,7 @@ static READ8_HANDLER( decocass_type4_r )
 	{
 		if (type4_latch)
 		{
-			UINT8 *prom = memory_region(REGION_USER1);
+			UINT8 *prom = memory_region(machine, REGION_USER1);
 
 			data = prom[type4_ctrs];
 			LOG(3,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- PROM[%04x]\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.', type4_ctrs));
@@ -1595,8 +1595,8 @@ static STATE_POSTLOAD( decocass_state_save_postload )
 #if 0
 	/* fix me - this won't work anymore */
 	int A;
-	UINT8 *mem = memory_region(REGION_CPU1);
-	int diff = memory_region_length(REGION_CPU1) / 2;
+	UINT8 *mem = memory_region(machine, REGION_CPU1);
+	int diff = memory_region_length(machine, REGION_CPU1) / 2;
 
 	memory_set_opcode_base(0, mem + diff);
 
@@ -1650,9 +1650,9 @@ void decocass_machine_state_save_init(running_machine *machine)
  *
  ***************************************************************************/
 
-static void decocass_init_common(void)
+static void decocass_init_common(running_machine *machine)
 {
-	UINT8 *image = memory_region(REGION_USER2);
+	UINT8 *image = memory_region(machine, REGION_USER2);
 	int i, offs;
 
 	tape_dir = 0;
@@ -1662,7 +1662,7 @@ static void decocass_init_common(void)
 	firsttime = 1;
 	tape_present = 1;
 	tape_blocks = 0;
-	for (i = memory_region_length(REGION_USER2) / 256 - 1; !tape_blocks && i > 0; i--)
+	for (i = memory_region_length(machine, REGION_USER2) / 256 - 1; !tape_blocks && i > 0; i--)
 		for (offs = 256 * i; !tape_blocks && offs < 256 * i + 256; offs++)
 			if (image[offs])
 				tape_blocks = i+1;
@@ -1716,26 +1716,26 @@ static void decocass_init_common(void)
 
 MACHINE_RESET( decocass )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 }
 
 MACHINE_RESET( ctsttape )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #1 (DE-0061)\n"));
 	decocass_dongle_r = decocass_type1_pass_136_r;
 }
 
 MACHINE_RESET( chwy )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #1 (DE-0061 own PROM)\n"));
 	decocass_dongle_r = decocass_type1_latch_27_pass_3_inv_2_r;
 }
 
 MACHINE_RESET( clocknch )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #1 (DE-0061 flip 2-3)\n"));
 	decocass_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
 	type1_inmap = MAKE_MAP(0,1,3,2,4,5,6,7);
@@ -1744,7 +1744,7 @@ MACHINE_RESET( clocknch )
 
 MACHINE_RESET( ctisland )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #1 (DE-0061 flip 0-2)\n"));
 	decocass_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
 	type1_inmap = MAKE_MAP(2,1,0,3,4,5,6,7);
@@ -1753,7 +1753,7 @@ MACHINE_RESET( ctisland )
 
 MACHINE_RESET( csuperas )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #1 (DE-0061 flip 4-5)\n"));
 	decocass_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
 	type1_inmap = MAKE_MAP(0,1,2,3,5,4,6,7);
@@ -1762,14 +1762,14 @@ MACHINE_RESET( csuperas )
 
 MACHINE_RESET( castfant )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #1 (DE-0061)\n"));
 	decocass_dongle_r = decocass_type1_latch_16_pass_3_inv_1_r;
 }
 
 MACHINE_RESET( cluckypo )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #1 (DE-0061 flip 1-3)\n"));
 	decocass_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
 	type1_inmap = MAKE_MAP(0,3,2,1,4,5,6,7);
@@ -1778,7 +1778,7 @@ MACHINE_RESET( cluckypo )
 
 MACHINE_RESET( cterrani )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #1 (DE-0061 straight)\n"));
 	decocass_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
 	type1_inmap = MAKE_MAP(0,1,2,3,4,5,6,7);
@@ -1787,14 +1787,14 @@ MACHINE_RESET( cterrani )
 
 MACHINE_RESET( cexplore )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #1 (DE-0061 own PROM)\n"));
 	decocass_dongle_r = decocass_type1_latch_26_pass_5_inv_2_r;
 }
 
 MACHINE_RESET( cprogolf )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #1 (DE-0061 flip 0-1)\n"));
 	decocass_dongle_r = decocass_type1_latch_26_pass_3_inv_2_r;
 	type1_inmap = MAKE_MAP(1,0,2,3,4,5,6,7);
@@ -1803,7 +1803,7 @@ MACHINE_RESET( cprogolf )
 
 MACHINE_RESET( cmissnx )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #2 (CS82-007)\n"));
 	decocass_dongle_r = decocass_type2_r;
 	decocass_dongle_w = decocass_type2_w;
@@ -1811,7 +1811,7 @@ MACHINE_RESET( cmissnx )
 
 MACHINE_RESET( cdiscon1 )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #2 (CS82-007)\n"));
 	decocass_dongle_r = decocass_type2_r;
 	decocass_dongle_w = decocass_type2_w;
@@ -1819,7 +1819,7 @@ MACHINE_RESET( cdiscon1 )
 
 MACHINE_RESET( cptennis )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #2 (CS82-007)\n"));
 	decocass_dongle_r = decocass_type2_r;
 	decocass_dongle_w = decocass_type2_w;
@@ -1827,7 +1827,7 @@ MACHINE_RESET( cptennis )
 
 MACHINE_RESET( ctornado )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #2 (CS82-007)\n"));
 	decocass_dongle_r = decocass_type2_r;
 	decocass_dongle_w = decocass_type2_w;
@@ -1835,7 +1835,7 @@ MACHINE_RESET( ctornado )
 
 MACHINE_RESET( cbnj )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	decocass_dongle_r = decocass_type3_r;
 	decocass_dongle_w = decocass_type3_w;
@@ -1844,7 +1844,7 @@ MACHINE_RESET( cbnj )
 
 MACHINE_RESET( cburnrub )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	decocass_dongle_r = decocass_type3_r;
 	decocass_dongle_w = decocass_type3_w;
@@ -1853,7 +1853,7 @@ MACHINE_RESET( cburnrub )
 
 MACHINE_RESET( cbtime )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	decocass_dongle_r = decocass_type3_r;
 	decocass_dongle_w = decocass_type3_w;
@@ -1862,7 +1862,7 @@ MACHINE_RESET( cbtime )
 
 MACHINE_RESET( cgraplop )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	decocass_dongle_r = decocass_type3_r;
 	decocass_dongle_w = decocass_type3_w;
@@ -1871,7 +1871,7 @@ MACHINE_RESET( cgraplop )
 
 MACHINE_RESET( cgraplp2 )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	decocass_dongle_r = decocass_type3_r;
 	decocass_dongle_w = decocass_type3_w;
@@ -1880,7 +1880,7 @@ MACHINE_RESET( cgraplp2 )
 
 MACHINE_RESET( clapapa )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	decocass_dongle_r = decocass_type3_r;
 	decocass_dongle_w = decocass_type3_w;
@@ -1889,7 +1889,7 @@ MACHINE_RESET( clapapa )
 
 MACHINE_RESET( cfghtice )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	decocass_dongle_r = decocass_type3_r;
 	decocass_dongle_w = decocass_type3_w;
@@ -1898,7 +1898,7 @@ MACHINE_RESET( cfghtice )
 
 MACHINE_RESET( cprobowl )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	decocass_dongle_r = decocass_type3_r;
 	decocass_dongle_w = decocass_type3_w;
@@ -1907,7 +1907,7 @@ MACHINE_RESET( cprobowl )
 
 MACHINE_RESET( cnightst )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	decocass_dongle_r = decocass_type3_r;
 	decocass_dongle_w = decocass_type3_w;
@@ -1916,7 +1916,7 @@ MACHINE_RESET( cnightst )
 
 MACHINE_RESET( cprosocc )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	decocass_dongle_r = decocass_type3_r;
 	decocass_dongle_w = decocass_type3_w;
@@ -1925,7 +1925,7 @@ MACHINE_RESET( cprosocc )
 
 MACHINE_RESET( cppicf )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	decocass_dongle_r = decocass_type3_r;
 	decocass_dongle_w = decocass_type3_w;
@@ -1934,7 +1934,7 @@ MACHINE_RESET( cppicf )
 
 MACHINE_RESET( cscrtry )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #4 (32K ROM)\n"));
 	decocass_dongle_r = decocass_type4_r;
 	decocass_dongle_w = decocass_type4_w;
@@ -1942,7 +1942,7 @@ MACHINE_RESET( cscrtry )
 
 MACHINE_RESET( cbdash )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("dongle type #5 (NOP)\n"));
 	decocass_dongle_r = decocass_type5_r;
 	decocass_dongle_w = decocass_type5_w;
@@ -1950,15 +1950,15 @@ MACHINE_RESET( cbdash )
 
 MACHINE_RESET( cflyball )
 {
-	decocass_init_common();
+	decocass_init_common(machine);
 	LOG(0,("no dongle\n"));
 	decocass_dongle_r = decocass_nodong_r;
 }
 
 MACHINE_RESET( czeroize )
 {
-	UINT8 *mem = memory_region(REGION_USER1);
-	decocass_init_common();
+	UINT8 *mem = memory_region(machine, REGION_USER1);
+	decocass_init_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	decocass_dongle_r = decocass_type3_r;
 	decocass_dongle_w = decocass_type3_w;
@@ -2133,7 +2133,7 @@ READ8_HANDLER( i8041_p2_r )
 	UINT8 data;
 	static int i8041_p2_old;
 
-	tape_update();
+	tape_update(machine);
 
 	data = i8041_p2;
 

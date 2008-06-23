@@ -2003,7 +2003,7 @@ static MACHINE_RESET( firebeat )
 {
 	void *cd;
 	int i;
-	UINT8 *sound = memory_region(REGION_SOUND1);
+	UINT8 *sound = memory_region(machine, REGION_SOUND1);
 
 	for (i=0; i < 0x200000; i++)
 	{
@@ -2274,7 +2274,7 @@ static void init_lights(running_machine *machine, write32_machine_func out1, wri
 
 static void init_firebeat(running_machine *machine)
 {
-	UINT8 *rom = memory_region(REGION_USER2);
+	UINT8 *rom = memory_region(machine, REGION_USER2);
 
 	atapi_init(machine);
 	intelflash_init(0, FLASH_FUJITSU_29F016A, NULL);

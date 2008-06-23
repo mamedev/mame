@@ -532,11 +532,11 @@ ROM_START( wexpresc )
 ROM_END
 
 
-static void exprraid_gfx_expand(void)
+static void exprraid_gfx_expand(running_machine *machine)
 {
 	/* Expand the background rom so we can use regular decode routines */
 
-	UINT8	*gfx = memory_region(REGION_GFX3);
+	UINT8	*gfx = memory_region(machine, REGION_GFX3);
 	int				offs = 0x10000-0x1000;
 	int				i;
 
@@ -554,9 +554,9 @@ static void exprraid_gfx_expand(void)
 }
 
 
-static void patch_rom1(void)
+static void patch_rom1(running_machine *machine)
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int i;
 
 	/* HACK!: Implement custom opcode as regular with a mapped io read */
@@ -575,13 +575,13 @@ static void patch_rom1(void)
 
 static DRIVER_INIT( wexpress )
 {
-	patch_rom1();
-	exprraid_gfx_expand();
+	patch_rom1(machine);
+	exprraid_gfx_expand(machine);
 }
 
 static DRIVER_INIT( exprraid )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 
 	/* decode vectors */
@@ -594,20 +594,20 @@ static DRIVER_INIT( exprraid )
 	rom[0xfffe] = rom[0xfff3];
 	rom[0xffff] = rom[0xfff2];
 
-	patch_rom1();
-	exprraid_gfx_expand();
+	patch_rom1(machine);
+	exprraid_gfx_expand(machine);
 }
 
 static DRIVER_INIT( wexpresb )
 {
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3800, 0x3800, 0, 0, vblank_r);
-	exprraid_gfx_expand();
+	exprraid_gfx_expand(machine);
 }
 
 static DRIVER_INIT( wexpresc )
 {
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xFFC0, 0xFFC0, 0, 0, vblank_r);
-	exprraid_gfx_expand();
+	exprraid_gfx_expand(machine);
 }
 
 

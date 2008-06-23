@@ -43,7 +43,7 @@ paradise: I'm not sure it's working correctly:
 static WRITE8_HANDLER( paradise_rombank_w )
 {
 	int bank = data;
-	int bank_n = memory_region_length(REGION_CPU1)/0x4000 - 1;
+	int bank_n = memory_region_length(machine, REGION_CPU1)/0x4000 - 1;
 	if (bank >= bank_n)
 	{
 		logerror("PC %04X - invalid rom bank %x\n",activecpu_get_pc(),bank);
@@ -51,7 +51,7 @@ static WRITE8_HANDLER( paradise_rombank_w )
 	}
 
 	if (bank >= 3)	bank+=1;
-	memory_set_bankptr(1, memory_region(REGION_CPU1) + bank * 0x4000);
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + bank * 0x4000);
 }
 
 static WRITE8_HANDLER( paradise_okibank_w )

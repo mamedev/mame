@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
 #include "video/poly.h"
@@ -42,7 +43,7 @@ static int K001006_device_sel[MAX_K001006_CHIPS] = { 0, 0 };
 
 static UINT32 K001006_palette[MAX_K001006_CHIPS][0x800];
 
-static UINT32 K001006_r(int chip, int offset, UINT32 mem_mask)
+static UINT32 K001006_r(running_machine *machine, int chip, int offset, UINT32 mem_mask)
 {
 	if (offset == 1)
 	{
@@ -50,7 +51,7 @@ static UINT32 K001006_r(int chip, int offset, UINT32 mem_mask)
 		{
 			case 0x0b:		// CG Board ROM read
 			{
-				UINT16 *rom = (UINT16*)memory_region(REGION_GFX1);
+				UINT16 *rom = (UINT16*)memory_region(machine, REGION_GFX1);
 				return rom[K001006_addr[chip] / 2] << 16;
 			}
 			case 0x0d:		// Palette RAM read
@@ -125,7 +126,7 @@ static void K001006_w(int chip, int offset, UINT32 data, UINT32 mem_mask)
 
 READ32_HANDLER(K001006_0_r)
 {
-	return K001006_r(0, offset, mem_mask);
+	return K001006_r(machine, 0, offset, mem_mask);
 }
 
 WRITE32_HANDLER(K001006_0_w)
@@ -135,7 +136,7 @@ WRITE32_HANDLER(K001006_0_w)
 
 READ32_HANDLER(K001006_1_r)
 {
-	return K001006_r(1, offset, mem_mask);
+	return K001006_r(machine, 1, offset, mem_mask);
 }
 
 WRITE32_HANDLER(K001006_1_w)
@@ -468,7 +469,7 @@ static void draw_scanline_tex(void *dest, INT32 scanline, const poly_extent *ext
 {
 	const poly_extra_data *extra = extradata;
 	bitmap_t *destmap = dest;
-	UINT8 *texrom = memory_region(REGION_GFX1) + (extra->texture_page * 0x40000);
+	UINT8 *texrom = memory_region(Machine, REGION_GFX1) + (extra->texture_page * 0x40000);
 	int pal_chip = (extra->texture_palette & 0x8) ? 1 : 0;
 	int palette_index = (extra->texture_palette & 0x7) * 256;
 	float z = extent->param[0].start;
@@ -1007,7 +1008,7 @@ VIDEO_UPDATE( gticlub )
         int index = (debug_tex_page - 1) * 0x40000;
         int pal = debug_tex_palette & 7;
         int tp = (debug_tex_palette >> 3) & 1;
-        UINT8 *rom = memory_region(REGION_GFX1);
+        UINT8 *rom = memory_region(machine, REGION_GFX1);
 
         for (y=0; y < 384; y++)
         {

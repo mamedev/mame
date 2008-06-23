@@ -675,7 +675,7 @@ static DRIVER_INIT(viper)
 
 	timekeeper_init(0, TIMEKEEPER_M48T58, backup_ram);
 
-	nvram = memory_region(REGION_USER2);
+	nvram = memory_region(machine, REGION_USER2);
 	memcpy(backup_ram, nvram, 0x2000);
 }
 

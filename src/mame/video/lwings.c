@@ -70,8 +70,8 @@ static TILE_GET_INFO( trojan_get_bg1_tile_info )
 static TILE_GET_INFO( get_bg2_tile_info )
 {
 	int code, color;
-	UINT8 *rom = memory_region(REGION_GFX5);
-	int mask = memory_region_length(REGION_GFX5) - 1;
+	UINT8 *rom = memory_region(machine, REGION_GFX5);
+	int mask = memory_region_length(machine, REGION_GFX5) - 1;
 
 	tile_index = (tile_index + bg2_image * 0x20) & mask;
 	code = rom[tile_index];

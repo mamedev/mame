@@ -60,7 +60,7 @@ WRITE16_HANDLER( mcatadv_videoram2_w )
 }
 
 
-static void draw_sprites( bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	UINT16 *source = spriteram_old;
 	UINT16 *finish = source + (spriteram_size/2)/2;
@@ -97,7 +97,7 @@ static void draw_sprites( bitmap_t *bitmap, const rectangle *cliprect )
 		int width = ((source[2]&0xf000)>>12)*16;
 		int offset = tileno * 256;
 
-		UINT8 *sprdata = memory_region ( REGION_GFX1 );
+		UINT8 *sprdata = memory_region ( machine, REGION_GFX1 );
 
 		int drawxpos, drawypos;
 		int xcnt,ycnt;
@@ -244,7 +244,7 @@ VIDEO_UPDATE( mcatadv )
 #ifdef MAME_DEBUG
 	if (!input_code_pressed(KEYCODE_E))
 #endif
-		draw_sprites (bitmap, cliprect);
+		draw_sprites (screen->machine, bitmap, cliprect);
 	profiler_mark(PROFILER_END);
 	return 0;
 }

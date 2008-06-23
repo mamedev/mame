@@ -69,12 +69,12 @@ WRITE8_HANDLER( momoko_flipscreen_w )
 }
 /****************************************************************************/
 
-static void momoko_draw_bg_pri(bitmap_t *bitmap, int chr, int col, int flipx, int flipy, int x,int y, int pri)
+static void momoko_draw_bg_pri(running_machine *machine, bitmap_t *bitmap, int chr, int col, int flipx, int flipy, int x,int y, int pri)
 {
 	int xx,sx,sy,px,py,dot;
 	UINT32 gfxadr;
 	UINT8 d0, d1;
-	UINT8 *BG_GFX = memory_region( REGION_GFX2 );
+	UINT8 *BG_GFX = memory_region( machine, REGION_GFX2 );
 	for (sy=0; sy<8; sy++)
 	{
 		gfxadr = chr*16 + sy*2;
@@ -105,10 +105,10 @@ VIDEO_UPDATE( momoko )
 {
 	int x, y, dx, dy, rx, ry, radr, chr, sy, fx, fy, px, py, offs, col, pri, flip ;
 
-	UINT8 *BG_MAP     = memory_region( REGION_USER1 );
-	UINT8 *BG_COL_MAP = memory_region( REGION_USER2 );
-	UINT8 *FG_MAP     = memory_region( REGION_USER3 );
-	UINT8 *TEXT_COLOR = memory_region( REGION_PROMS );
+	UINT8 *BG_MAP     = memory_region( screen->machine, REGION_USER1 );
+	UINT8 *BG_COL_MAP = memory_region( screen->machine, REGION_USER2 );
+	UINT8 *FG_MAP     = memory_region( screen->machine, REGION_USER3 );
+	UINT8 *TEXT_COLOR = memory_region( screen->machine, REGION_PROMS );
 
 
 	flip = momoko_flipscreen ^ (input_port_read_indexed(screen->machine, 4) & 0x01);
@@ -213,7 +213,7 @@ VIDEO_UPDATE( momoko )
 				{
 					col = col & 0x0f;
 					chr = chr + momoko_bg_select * 512;
-					momoko_draw_bg_pri(bitmap,chr,col,flip,flip,px,py,pri);
+					momoko_draw_bg_pri(screen->machine,bitmap,chr,col,flip,flip,px,py,pri);
 				}
 			}
 		}

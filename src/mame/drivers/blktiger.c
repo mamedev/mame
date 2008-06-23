@@ -246,7 +246,7 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_START( blktiger )
 {
 	/* configure bankswitching */
-	memory_configure_bank(1, 0, 16, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 16, memory_region(machine, REGION_CPU1) + 0x10000, 0x4000);
 }
 
 static MACHINE_DRIVER_START( blktiger )

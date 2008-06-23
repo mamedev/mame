@@ -29,7 +29,7 @@ WRITE16_HANDLER( jleague_protection_w );
 READ16_HANDLER( dbzvrvs_protection_r );
 WRITE16_HANDLER( dbzvrvs_protection_w );
 
-void decrypt_ga2_protrom(void);
+void decrypt_ga2_protrom(running_machine *machine);
 READ16_HANDLER( ga2_dpram_r );
 WRITE16_HANDLER( ga2_dpram_w );
 

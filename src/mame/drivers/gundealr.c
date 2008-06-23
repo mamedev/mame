@@ -86,7 +86,7 @@ static INTERRUPT_GEN( yamyam_interrupt )
 static WRITE8_HANDLER( yamyam_bankswitch_w )
 {
  	int bankaddress;
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	bankaddress = 0x10000 + (data & 0x07) * 0x4000;
 	memory_set_bankptr(1,&RAM[bankaddress]);

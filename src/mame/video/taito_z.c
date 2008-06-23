@@ -168,7 +168,7 @@ confirmed
 
 static void contcirc_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
-	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
+	UINT16 *spritemap = (UINT16 *)memory_region(machine, REGION_USER1);
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -260,7 +260,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 static void chasehq_draw_sprites_16x16(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
-	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
+	UINT16 *spritemap = (UINT16 *)memory_region(machine, REGION_USER1);
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -445,7 +445,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 static void bshark_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
-	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
+	UINT16 *spritemap = (UINT16 *)memory_region(machine, REGION_USER1);
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -538,7 +538,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 static void sci_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
-	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
+	UINT16 *spritemap = (UINT16 *)memory_region(machine, REGION_USER1);
 	int offs, start_offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -640,7 +640,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 static void aquajack_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
-	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
+	UINT16 *spritemap = (UINT16 *)memory_region(machine, REGION_USER1);
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -732,7 +732,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 static void spacegun_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
-	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
+	UINT16 *spritemap = (UINT16 *)memory_region(machine, REGION_USER1);
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -860,7 +860,7 @@ VIDEO_UPDATE( contcirc )
 
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[0],0,0);
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[1],0,1);
-	TC0150ROD_draw(bitmap,cliprect,-3,road_palbank << 6,1,0,1,2);	// -6
+	TC0150ROD_draw(screen->machine,bitmap,cliprect,-3,road_palbank << 6,1,0,1,2);	// -6
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[2],0,4);
 
 	contcirc_draw_sprites_16x8(screen->machine, bitmap,cliprect,5);	// 7
@@ -887,7 +887,7 @@ VIDEO_UPDATE( chasehq )
 
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,0);
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[1],0,1);
-	TC0150ROD_draw(bitmap,cliprect,-1,0xc0,0,0,1,2);
+	TC0150ROD_draw(screen->machine,bitmap,cliprect,-1,0xc0,0,0,1,2);
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[2],0,4);
 
 	chasehq_draw_sprites_16x16(screen->machine, bitmap,cliprect,7);
@@ -912,7 +912,7 @@ VIDEO_UPDATE( bshark )
 
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,0);
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[1],0,1);
-	TC0150ROD_draw(bitmap,cliprect,-1,0xc0,0,1,1,2);
+	TC0150ROD_draw(screen->machine,bitmap,cliprect,-1,0xc0,0,1,1,2);
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[2],0,4);
 
 	bshark_draw_sprites_16x8(screen->machine, bitmap,cliprect,8);
@@ -937,7 +937,7 @@ VIDEO_UPDATE( sci )
 
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,0);
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[1],0,1);
-	TC0150ROD_draw(bitmap,cliprect,-1,0xc0,0,0,1,2);
+	TC0150ROD_draw(screen->machine,bitmap,cliprect,-1,0xc0,0,0,1,2);
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[2],0,4);
 
 	sci_draw_sprites_16x8(screen->machine, bitmap,cliprect,6);
@@ -962,7 +962,7 @@ VIDEO_UPDATE( aquajack )
 
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,0);
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[1],0,1);
-	TC0150ROD_draw(bitmap,cliprect,-1,0,2,1,1,2);
+	TC0150ROD_draw(screen->machine,bitmap,cliprect,-1,0,2,1,1,2);
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[2],0,4);
 
 	aquajack_draw_sprites_16x8(screen->machine, bitmap,cliprect,3);
@@ -1019,7 +1019,7 @@ VIDEO_UPDATE( dblaxle )
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,0);
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,1);
 
-	TC0150ROD_draw(bitmap,cliprect,-1,0xc0,0,0,1,2);
+	TC0150ROD_draw(screen->machine,bitmap,cliprect,-1,0xc0,0,0,1,2);
 	bshark_draw_sprites_16x8(screen->machine, bitmap,cliprect,7);
 
 	/* This layer used for the big numeric displays */

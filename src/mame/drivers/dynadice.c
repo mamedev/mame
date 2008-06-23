@@ -250,10 +250,10 @@ ROM_END
 static DRIVER_INIT( dynadice )
 {
 	int i,j;
-	UINT8 *usr1 = memory_region(REGION_USER1);
-	UINT8 *cpu2 = memory_region(REGION_CPU2);
-	UINT8 *gfx1 = memory_region(REGION_GFX1);
-	UINT8 *gfx2 = memory_region(REGION_GFX2);
+	UINT8 *usr1 = memory_region(machine, REGION_USER1);
+	UINT8 *cpu2 = memory_region(machine, REGION_CPU2);
+	UINT8 *gfx1 = memory_region(machine, REGION_GFX1);
+	UINT8 *gfx2 = memory_region(machine, REGION_GFX2);
 
 	cpu2[0x0b]=0x23;	/* bug in game code  Dec HL -> Inc HL*/
 

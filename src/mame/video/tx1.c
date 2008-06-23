@@ -221,24 +221,24 @@ WRITE16_HANDLER( tx1_flgcs_w )
 
 
 /* Preliminary */
-static void tx1_draw_objects(bitmap_t *bitmap, const rectangle *cliprect)
+static void tx1_draw_objects(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 #define FRAC	16
 
 	UINT32 offs;
 
 	/* The many lookup table ROMs */
-	const UINT8 *const ic48  = (UINT8*)memory_region(REGION_USER3);
-	const UINT8 *const ic281 = (UINT8*)memory_region(REGION_USER3) + 0x2000;
-	const UINT8 *const ic25  = (UINT8*)memory_region(REGION_PROMS) + 0x1000;
+	const UINT8 *const ic48  = (UINT8*)memory_region(machine, REGION_USER3);
+	const UINT8 *const ic281 = (UINT8*)memory_region(machine, REGION_USER3) + 0x2000;
+	const UINT8 *const ic25  = (UINT8*)memory_region(machine, REGION_PROMS) + 0x1000;
 
-	const UINT8 *const ic106 = (UINT8*)memory_region(REGION_USER2);
-	const UINT8 *const ic73  = (UINT8*)memory_region(REGION_USER2) + 0x4000;
+	const UINT8 *const ic106 = (UINT8*)memory_region(machine, REGION_USER2);
+	const UINT8 *const ic73  = (UINT8*)memory_region(machine, REGION_USER2) + 0x4000;
 
-	const UINT8 *const ic190 = (UINT8*)memory_region(REGION_PROMS) + 0xc00;
-	const UINT8 *const ic162 = (UINT8*)memory_region(REGION_PROMS) + 0xe00;
+	const UINT8 *const ic190 = (UINT8*)memory_region(machine, REGION_PROMS) + 0xc00;
+	const UINT8 *const ic162 = (UINT8*)memory_region(machine, REGION_PROMS) + 0xe00;
 
-	const UINT8 *const pixdata_rgn = (UINT8*)memory_region(REGION_GFX2);
+	const UINT8 *const pixdata_rgn = (UINT8*)memory_region(machine, REGION_GFX2);
 
 	for (offs = 0x0; offs <= tx1_objram_size; offs += 8)
 	{
@@ -498,7 +498,7 @@ VIDEO_UPDATE( tx1 )
 //      tilemap_set_scrollx(tx1_tilemap, 0, scroll);
 		tilemap_draw(tx1_bitmap, &rect, tx1_tilemap, 0, 0);
 //      tx1_draw_road(tx1_bitmap, &rect);
-		tx1_draw_objects(tx1_bitmap, &rect);
+		tx1_draw_objects(screen->machine, tx1_bitmap, &rect);
 
 		for (y = 0; y < 240; ++y)
 			memcpy(BITMAP_ADDR16(bitmap, y, 0), BITMAP_ADDR16(tx1_bitmap, y, 0 * 256), sizeof(UINT16) * 256);
@@ -731,7 +731,7 @@ static TILE_GET_INFO( get_buggyboy_tile_info )
   http://philwip.mameworld.info/buggyboy/PAL16L8.150.htm
 
 ***************************************************************************/
-static void buggybjr_draw_road(UINT8 *bitmap)
+static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap)
 {
 #define X_ADJUST 384
 #define LOAD_HPOS_COUNTER( NUM )												\
@@ -768,8 +768,8 @@ static void buggybjr_draw_road(UINT8 *bitmap)
 	UINT32 rva20_6;
 
 	/* ROM/PROM lookup tables */
-	const UINT8 *rcols = (UINT8*)(memory_region(REGION_PROMS) + 0x1500);
-	const UINT8 *rom   = memory_region(REGION_GFX6);
+	const UINT8 *rcols = (UINT8*)(memory_region(machine, REGION_PROMS) + 0x1500);
+	const UINT8 *rom   = memory_region(machine, REGION_GFX6);
 	const UINT8 *prom0 = rom + 0x4000;
 	const UINT8 *prom1 = rom + 0x4200;
 	const UINT8 *prom2 = rom + 0x4400;
@@ -1254,24 +1254,24 @@ static void buggybjr_draw_road(UINT8 *bitmap)
     ------xx xxxxxxxx       X position
 
 **************************************************************************/
-static void buggyboy_draw_objs(UINT8 *bitmap)
+static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap)
 {
 #define FRAC	16
 
 	UINT32 offs;
 
 	/* The many lookup table ROMs */
-	const UINT8 *const bug13  = (UINT8*)memory_region(REGION_USER3);
-	const UINT8 *const bug18s = (UINT8*)memory_region(REGION_USER3) + 0x2000;
-	const UINT8 *const bb8    = (UINT8*)memory_region(REGION_PROMS) + 0x1600;
+	const UINT8 *const bug13  = (UINT8*)memory_region(machine, REGION_USER3);
+	const UINT8 *const bug18s = (UINT8*)memory_region(machine, REGION_USER3) + 0x2000;
+	const UINT8 *const bb8    = (UINT8*)memory_region(machine, REGION_PROMS) + 0x1600;
 
-	const UINT8 *const bug16s = (UINT8*)memory_region(REGION_USER2);
-	const UINT8 *const bug17s = (UINT8*)memory_region(REGION_USER2) + 0x8000;
+	const UINT8 *const bug16s = (UINT8*)memory_region(machine, REGION_USER2);
+	const UINT8 *const bug17s = (UINT8*)memory_region(machine, REGION_USER2) + 0x8000;
 
-	const UINT8 *const bb9o = (UINT8*)memory_region(REGION_PROMS) + 0x500;
-	const UINT8 *const bb9e = (UINT8*)memory_region(REGION_PROMS) + 0xd00;
+	const UINT8 *const bb9o = (UINT8*)memory_region(machine, REGION_PROMS) + 0x500;
+	const UINT8 *const bb9e = (UINT8*)memory_region(machine, REGION_PROMS) + 0xd00;
 
-	const UINT8 *const pixdata_rgn = (UINT8*)memory_region(REGION_GFX2);
+	const UINT8 *const pixdata_rgn = (UINT8*)memory_region(machine, REGION_GFX2);
 
 	profiler_mark(PROFILER_USER1);
 
@@ -1658,7 +1658,7 @@ VIDEO_START( buggybjr )
 /*
     Draw the tilemap with scrolling
 */
-static void buggyboy_draw_char(UINT8 *bitmap)
+static void buggyboy_draw_char(running_machine *machine, UINT8 *bitmap)
 {
 	INT32 x, y;
 	UINT32 scroll_x, scroll_y;
@@ -1667,8 +1667,8 @@ static void buggyboy_draw_char(UINT8 *bitmap)
 	profiler_mark(PROFILER_USER3);
 
 	/* 2bpp characters */
-	gfx1 = memory_region(REGION_GFX1);
-	gfx2 = memory_region(REGION_GFX1) + 0x4000;
+	gfx1 = memory_region(machine, REGION_GFX1);
+	gfx2 = memory_region(machine, REGION_GFX1) + 0x4000;
 
 	/* X/Y scroll values are the last word in char RAM */
 	scroll_y = (buggybjr_vram[0x7ff] >> 10) & 0x3f;
@@ -1743,13 +1743,13 @@ static void buggyboy_draw_char(UINT8 *bitmap)
 VIDEO_UPDATE( buggybjr )
 {
 	int x, y;
-	UINT8 *chr_pal = (memory_region(REGION_PROMS) + 0x400);
+	UINT8 *chr_pal = (memory_region(screen->machine, REGION_PROMS) + 0x400);
 
 	memset(obj_bmp, 0, 256*240);
 
-	buggyboy_draw_char(chr_bmp);
-	buggybjr_draw_road(rod_bmp);
-	buggyboy_draw_objs(obj_bmp);
+	buggyboy_draw_char(screen->machine, chr_bmp);
+	buggybjr_draw_road(screen->machine, rod_bmp);
+	buggyboy_draw_objs(screen->machine, obj_bmp);
 
 	for (y = 0; y < 240; ++y)
 	{

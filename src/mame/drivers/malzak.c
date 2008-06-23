@@ -65,7 +65,7 @@ static READ8_HANDLER( fake_VRLE_r )
 
 static READ8_HANDLER( bank_r )
 {
-	UINT8* bank = memory_region(REGION_USER2);
+	UINT8* bank = memory_region(machine, REGION_USER2);
 
 	return bank[offset + (malzak_bank1 * 0x0400)];
 }

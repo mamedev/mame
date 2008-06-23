@@ -171,7 +171,7 @@ static MACHINE_START( cloud9 )
 	rectangle visarea;
 
 	/* initialize globals */
-	syncprom = memory_region(REGION_PROMS) + 0x000;
+	syncprom = memory_region(machine, REGION_PROMS) + 0x000;
 
 	/* find the start of VBLANK in the SYNC PROM */
 	for (cloud9_vblank_start = 0; cloud9_vblank_start < 256; cloud9_vblank_start++)

@@ -521,7 +521,7 @@ ADDRESS_MAP_END
 /* rom bank is used when testing roms, not currently hooked up */
 static WRITE32_HANDLER ( rabbit_rombank_w )
 {
-	UINT8 *dataroms = memory_region(REGION_USER1);
+	UINT8 *dataroms = memory_region(machine, REGION_USER1);
 	int bank;
 //  mame_printf_debug("rabbit rombank %08x\n",data&0x3ff);
 	bank = data & 0x3ff;
@@ -613,9 +613,9 @@ static TIMER_CALLBACK( rabbit_blit_done )
 	cpunum_set_input_line(machine, 0, rabbit_bltirqlevel, HOLD_LINE);
 }
 
-static void rabbit_do_blit(void)
+static void rabbit_do_blit(running_machine *machine)
 {
-	UINT8 *blt_data = memory_region(REGION_USER1);
+	UINT8 *blt_data = memory_region(machine, REGION_USER1);
 	int blt_source = (rabbit_blitterregs[0]&0x000fffff)>>0;
 	int blt_column = (rabbit_blitterregs[1]&0x00ff0000)>>16;
 	int blt_line   = (rabbit_blitterregs[1]&0x000000ff);
@@ -714,7 +714,7 @@ static WRITE32_HANDLER( rabbit_blitter_w )
 
 	if (offset == 0x0c/4)
 	{
-		rabbit_do_blit();
+		rabbit_do_blit(machine);
 	}
 }
 

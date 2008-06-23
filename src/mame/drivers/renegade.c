@@ -170,7 +170,7 @@ static void *renegade_adpcm_start(int clock, const struct CustomSound_interface 
 	struct renegade_adpcm_state *state = &renegade_adpcm;
 	state->playing = 0;
 	state->stream = stream_create(0, 1, clock, state, renegade_adpcm_callback);
-	state->base = memory_region(REGION_SOUND1);
+	state->base = memory_region(Machine, REGION_SOUND1);
 	reset_adpcm(&state->adpcm);
 	return state;
 }
@@ -237,15 +237,15 @@ static const UINT8 kuniokun_xor_table[0x2a] =
 	0x68, 0x60
 };
 
-static void setbank(void)
+static void setbank(running_machine *machine)
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(1, &RAM[bank ? 0x10000 : 0x4000]);
 }
 
 static STATE_POSTLOAD( renegade_postload )
 {
-	setbank();
+	setbank(machine);
 }
 
 static MACHINE_START( renegade )
@@ -486,7 +486,7 @@ static WRITE8_HANDLER( bankswitch_w )
 	if ((data & 1) != bank)
 	{
 		bank = data & 1;
-		setbank();
+		setbank(machine);
 	}
 }
 
@@ -784,7 +784,7 @@ static const struct CustomSound_interface adpcm_interface =
 static MACHINE_RESET( renegade )
 {
 	bank = 0;
-	setbank();
+	setbank(machine);
 }
 
 

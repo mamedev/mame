@@ -530,8 +530,8 @@ static void SCSP_Init(struct _SCSP *SCSP, const struct SCSPinterface *intf, int 
 
 		if (intf->region)
 		{
-			SCSP->SCSPRAM = memory_region(intf->region);
-			SCSP->SCSPRAM_LENGTH = memory_region_length(intf->region);
+			SCSP->SCSPRAM = memory_region(Machine, intf->region);
+			SCSP->SCSPRAM_LENGTH = memory_region_length(Machine, intf->region);
 			SCSP->DSP.SCSPRAM = (UINT16 *)SCSP->SCSPRAM;
 			SCSP->DSP.SCSPRAM_LENGTH = SCSP->SCSPRAM_LENGTH/2;
 			SCSP->SCSPRAM += intf->roffset;

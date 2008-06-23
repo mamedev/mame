@@ -512,7 +512,7 @@ static DRIVER_INIT( beathead )
 	/* initialize the common systems */
 	atarigen_eeprom_default = NULL;
 	atarijsa_init(machine, "IN2", 0x0040);
-	atarijsa3_init_adpcm(REGION_SOUND1);
+	atarijsa3_init_adpcm(machine, REGION_SOUND1);
 
 	/* prepare the speedups */
 	speedup_data = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000ae8, 0x00000aeb, 0, 0, speedup_r);

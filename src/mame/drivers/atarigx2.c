@@ -2040,7 +2040,7 @@ static DRIVER_INIT( spclords )
 {
 	atarigen_eeprom_default = NULL;
 	atarijsa_init(machine, "IN2", 0x0040);
-	atarijsa3_init_adpcm(REGION_SOUND1);
+	atarijsa3_init_adpcm(machine, REGION_SOUND1);
 
 	atarigx2_playfield_base = 0x000;
 	atarigx2_motion_object_base = 0x400;
@@ -2052,7 +2052,7 @@ static DRIVER_INIT( motofren )
 {
 	atarigen_eeprom_default = NULL;
 	atarijsa_init(machine, "IN2", 0x0040);
-	atarijsa3_init_adpcm(REGION_SOUND1);
+	atarijsa3_init_adpcm(machine, REGION_SOUND1);
 
 	atarigx2_playfield_base = 0x400;
 	atarigx2_motion_object_base = 0x200;
@@ -2090,7 +2090,7 @@ static DRIVER_INIT( rrreveng )
 {
 	atarigen_eeprom_default = NULL;
 	atarijsa_init(machine, "IN2", 0x0040);
-	atarijsa3_init_adpcm(REGION_SOUND1);
+	atarijsa3_init_adpcm(machine, REGION_SOUND1);
 
 	atarigx2_playfield_base = 0x000;
 	atarigx2_motion_object_base = 0x400;

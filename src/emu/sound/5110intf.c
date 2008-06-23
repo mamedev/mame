@@ -13,6 +13,7 @@
 #include <math.h>
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "tms5110.h"
 #include "5110intf.h"
@@ -37,7 +38,7 @@ static void tms5110_update(void *param, stream_sample_t **inputs, stream_sample_
 static int speech_rom_read_bit(void)
 {
 	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
-	const UINT8 *table = memory_region(info->intf->rom_region);
+	const UINT8 *table = memory_region(Machine, info->intf->rom_region);
 
 	int r;
 

@@ -539,7 +539,7 @@ INPUT_PORTS_END
 static DRIVER_INIT( skyrobo )
 {
 	//RAM TESTS
-	UINT16 *RAM = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *RAM = (UINT16 *)memory_region(machine, REGION_CPU1);
 	RAM[0x2e822/2] = 0x4ef9;
 	RAM[0x2e824/2] = 0x0002;
 	RAM[0x2e826/2] = 0xe9ae;
@@ -550,7 +550,7 @@ static DRIVER_INIT( skyrobo )
 static DRIVER_INIT( bigfghtr )
 {
 	//RAM TESTS
-	UINT16 *RAM = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *RAM = (UINT16 *)memory_region(machine, REGION_CPU1);
 	RAM[0x2e8cc/2] = 0x4ef9;
 	RAM[0x2e8ce/2] = 0x0002;
 	RAM[0x2e8d0/2] = 0xea58;

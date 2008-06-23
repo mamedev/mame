@@ -1755,7 +1755,7 @@ static void *ymf271_start(int sndindex, int clock, const void *config)
 
 	intf = config;
 
-	ymf271_init(chip, memory_region(intf->region), intf->irq_callback, intf->ext_read, intf->ext_write);
+	ymf271_init(chip, memory_region(Machine, intf->region), intf->irq_callback, intf->ext_read, intf->ext_write);
 	chip->stream = stream_create(0, 2, clock/384, chip, ymf271_update);
 
 	for (i = 0; i < 256; i++)

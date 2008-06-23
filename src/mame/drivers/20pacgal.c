@@ -168,7 +168,7 @@ static WRITE8_HANDLER( rom_bank_select_w )
 
 	if (state->game_selected == 0)
 	{
-		UINT8 *rom = memory_region(REGION_CPU1);
+		UINT8 *rom = memory_region(machine, REGION_CPU1);
 		memcpy(rom+0x48000, rom+0x8000, 0x2000);
 	}
 }
@@ -183,7 +183,7 @@ static WRITE8_HANDLER( rom_48000_w )
 		if (offset < 0x0800)
 			state->video_ram[offset & 0x07ff] = data;
 
-		memory_region(REGION_CPU1)[0x48000 + offset] = data;
+		memory_region(machine, REGION_CPU1)[0x48000 + offset] = data;
 	}
 }
 

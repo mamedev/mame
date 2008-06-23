@@ -347,7 +347,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bankptr(5, memory_region(REGION_CPU2) + ((data - 1) & 3) * 0x4000 + 0x10000);
+	memory_set_bankptr(5, memory_region(machine, REGION_CPU2) + ((data - 1) & 3) * 0x4000 + 0x10000);
 }
 
 static READ8_HANDLER( jumping_latch_r )
@@ -803,8 +803,8 @@ static DRIVER_INIT( rainbowe )
 
 static DRIVER_INIT( jumping )
 {
-	int i, len = memory_region_length(REGION_GFX2);
-	UINT8 *rom = memory_region(REGION_GFX2);
+	int i, len = memory_region_length(machine, REGION_GFX2);
+	UINT8 *rom = memory_region(machine, REGION_GFX2);
 
 	/* Sprite colour map is reversed - switch to normal */
 

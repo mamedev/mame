@@ -1104,7 +1104,7 @@ ROM_END
 
 static DRIVER_INIT( decocass )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int A;
 
 	/* allocate memory and mark all RAM regions with their decrypted pointers */
@@ -1125,8 +1125,8 @@ static DRIVER_INIT( decocass )
 
 static DRIVER_INIT( decocrom )
 {
-	int romlength = memory_region_length(REGION_USER3);
-	UINT8 *rom = memory_region(REGION_USER3);
+	int romlength = memory_region_length(machine, REGION_USER3);
+	UINT8 *rom = memory_region(machine, REGION_USER3);
 	UINT8 *decrypted2 = auto_malloc(romlength);
 	int i;
 
@@ -1140,7 +1140,7 @@ static DRIVER_INIT( decocrom )
 	/* convert charram to a banked ROM */
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0xafff, 0, 0, SMH_BANK1, decocass_de0091_w);
 	memory_configure_bank(1, 0, 1, decocass_charram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(REGION_USER3), 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, REGION_USER3), 0);
 	memory_configure_bank_decrypted(1, 0, 1, &decrypted[0x6000], 0);
 	memory_configure_bank_decrypted(1, 1, 1, decrypted2, 0);
 	memory_set_bank(1, 0);

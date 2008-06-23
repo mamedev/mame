@@ -268,13 +268,13 @@ static WRITE8_HANDLER( hanamai_keyboard_w )
 
 static WRITE8_HANDLER( dynax_rombank_w )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(1,&ROM[0x08000+0x8000*(data & 0x0f)]);
 }
 
 static WRITE8_HANDLER( jantouki_sound_rombank_w )
 {
-	UINT8 *ROM = memory_region(REGION_CPU2);
+	UINT8 *ROM = memory_region(machine, REGION_CPU2);
 	memory_set_bankptr(2,&ROM[0x08000+0x8000*data]);
 }
 
@@ -283,7 +283,7 @@ static int hnoridur_bank;
 
 static WRITE8_HANDLER( hnoridur_rombank_w )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1) + 0x10000 + 0x8000*data;
+	UINT8 *ROM = memory_region(machine, REGION_CPU1) + 0x10000 + 0x8000*data;
 //logerror("%04x: rom bank = %02x\n",activecpu_get_pc(),data);
 	memory_set_bankptr(1,ROM);
 	hnoridur_bank = data;
@@ -315,7 +315,7 @@ static WRITE8_HANDLER( hnoridur_palette_w )
 		// hnoridur: R/W RAM
 		case 0x18:
 		{
-			UINT8 *RAM = memory_region(REGION_CPU1) + 0x10000 + hnoridur_bank * 0x8000;
+			UINT8 *RAM = memory_region(machine, REGION_CPU1) + 0x10000 + hnoridur_bank * 0x8000;
 			RAM[offset] = data;
 			return;
 		}
@@ -654,7 +654,7 @@ static READ8_HANDLER( yarunara_input_r )
 
 static WRITE8_HANDLER( yarunara_rombank_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU1) + 0x10000 + 0x8000 * data;
+	UINT8 *rom = memory_region(machine, REGION_CPU1) + 0x10000 + 0x8000 * data;
 	memory_set_bankptr(1, rom);
 
 	hnoridur_bank = data;
@@ -876,7 +876,7 @@ static READ8_HANDLER( jantouki_blitter_busy_r )
 
 static WRITE8_HANDLER( jantouki_rombank_w )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(1,&ROM[0x8000 + 0x8000*(data&0x0f)]);
 	set_led_status(0,data & 0x10);	// maybe
 }
@@ -1097,7 +1097,7 @@ static READ8_HANDLER( htengoku_coin_r )
 
 static WRITE8_HANDLER( htengoku_rombank_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU1) + 0x10000 + 0x8000 * (data & 0x7);
+	UINT8 *rom = memory_region(machine, REGION_CPU1) + 0x10000 + 0x8000 * (data & 0x7);
 	memory_set_bankptr(1, rom);
 
 	hnoridur_bank = data;
@@ -1282,7 +1282,7 @@ static WRITE8_HANDLER( tenkai_palette_w )
 
 static void tenkai_update_rombank(void)
 {
-	romptr = memory_region(REGION_CPU1) + 0x10000 + 0x8000 * rombank;
+	romptr = memory_region(Machine, REGION_CPU1) + 0x10000 + 0x8000 * rombank;
 //  logerror("rombank = %02x\n",rombank);
 }
 
@@ -4516,7 +4516,7 @@ ROM_END
 static DRIVER_INIT( blktouch )
 {
 	// fearsome encryption ;-)
-	UINT8	*src = (UINT8 *)memory_region(REGION_CPU1);
+	UINT8	*src = (UINT8 *)memory_region(machine, REGION_CPU1);
 	int i;
 
 	for (i=0;i<0x90000;i++)
@@ -4525,7 +4525,7 @@ static DRIVER_INIT( blktouch )
 
 	}
 
-	src = (UINT8 *)memory_region(REGION_GFX1);
+	src = (UINT8 *)memory_region(machine, REGION_GFX1);
 
 	for (i=0;i<0xc0000;i++)
 	{
@@ -4538,8 +4538,8 @@ static DRIVER_INIT( maya )
 {
 	/* Address lines scrambling on 1 z80 rom */
 	int i;
-	UINT8	*gfx = (UINT8 *)memory_region(REGION_GFX1);
-	UINT8	*rom = memory_region(REGION_CPU1) + 0x28000,
+	UINT8	*gfx = (UINT8 *)memory_region(machine, REGION_GFX1);
+	UINT8	*rom = memory_region(machine, REGION_CPU1) + 0x28000,
 			*end = rom + 0x10000;
 	for (;rom < end; rom+=8)
 	{
@@ -5203,8 +5203,8 @@ ROM_END
 static DRIVER_INIT( mjelct3 )
 {
 	int i;
-	UINT8	*rom = memory_region(REGION_CPU1);
-	size_t  size = memory_region_length(REGION_CPU1);
+	UINT8	*rom = memory_region(machine, REGION_CPU1);
+	size_t  size = memory_region_length(machine, REGION_CPU1);
 	UINT8	*rom1 = malloc_or_die(size);
 
 		memcpy(rom1,rom,size);
@@ -5216,8 +5216,8 @@ static DRIVER_INIT( mjelct3 )
 static DRIVER_INIT( mjelct3a )
 {
 	int i,j;
-	UINT8	*rom = memory_region(REGION_CPU1);
-	size_t  size = memory_region_length(REGION_CPU1);
+	UINT8	*rom = memory_region(machine, REGION_CPU1);
+	size_t  size = memory_region_length(machine, REGION_CPU1);
 	UINT8	*rom1 = malloc_or_die(size);
 
 		memcpy(rom1,rom,size);

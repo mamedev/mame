@@ -278,9 +278,9 @@ static WRITE8_HANDLER( master_nmi_trigger_w )
 	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void airbustr_bankswitch(int cpunum, int data)
+static void airbustr_bankswitch(running_machine *machine, int cpunum, int data)
 {
-	UINT8 *ROM = memory_region(REGION_CPU1 + cpunum);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1 + cpunum);
 
 	if ((data & 0x07) <  3)
 		ROM = &ROM[0x4000 * (data & 0x07)];
@@ -292,12 +292,12 @@ static void airbustr_bankswitch(int cpunum, int data)
 
 static WRITE8_HANDLER( master_bankswitch_w )
 {
-	airbustr_bankswitch(0, data);
+	airbustr_bankswitch(machine, 0, data);
 }
 
 static WRITE8_HANDLER( slave_bankswitch_w )
 {
-	airbustr_bankswitch(1, data);
+	airbustr_bankswitch(machine, 1, data);
 
 	flip_screen_set(data & 0x10);
 
@@ -307,7 +307,7 @@ static WRITE8_HANDLER( slave_bankswitch_w )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	airbustr_bankswitch(2, data);
+	airbustr_bankswitch(machine, 2, data);
 }
 
 static READ8_HANDLER( soundcommand_status_r )

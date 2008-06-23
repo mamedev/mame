@@ -11,7 +11,7 @@ UINT16 *sys16_extraram3;
 
 static void patch_codeX( int offset, int data, int cpu ){
 	int aligned_offset = offset&0xfffffe;
-	UINT16 *mem = (UINT16 *)memory_region(REGION_CPU1+cpu);
+	UINT16 *mem = (UINT16 *)memory_region(Machine, REGION_CPU1+cpu);
 	int old_word = mem[aligned_offset/2];
 
 	if( offset&1 )

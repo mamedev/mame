@@ -1712,13 +1712,13 @@ static DRIVER_INIT( sharrier )
 static DRIVER_INIT( enduror )
 {
 	hangon_generic_init();
-	fd1089_decrypt_0013A();
+	fd1089_decrypt_0013A(machine);
 }
 
 
 static DRIVER_INIT( endurobl )
 {
-	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
 	UINT16 *decrypt = (UINT16 *)auto_malloc(0x40000);
 
 	hangon_generic_init();
@@ -1731,7 +1731,7 @@ static DRIVER_INIT( endurobl )
 
 static DRIVER_INIT( endurob2 )
 {
-	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
 	UINT16 *decrypt = (UINT16 *)auto_malloc(0x40000);
 
 	hangon_generic_init();

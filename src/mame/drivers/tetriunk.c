@@ -86,7 +86,7 @@ static VIDEO_UPDATE(tetriunk)
 {
 	int x,y,z;
 	int count = 0;
-	UINT8 *region = memory_region(REGION_USER1);
+	UINT8 *region = memory_region(screen->machine, REGION_USER1);
 
 	if(input_code_pressed_once(KEYCODE_Z))
 	{
@@ -220,8 +220,8 @@ static DRIVER_INIT (tetriunk)
 {
 	int i,j,k;
 	int index=0;
-	UINT8 *region = memory_region(REGION_USER1);
-	UINT8 *gfx = memory_region(REGION_GFX2);
+	UINT8 *region = memory_region(machine, REGION_USER1);
+	UINT8 *gfx = memory_region(machine, REGION_GFX2);
 
 	for(i=0;i<0x20000;i++)
 	{

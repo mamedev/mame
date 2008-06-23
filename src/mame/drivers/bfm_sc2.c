@@ -304,7 +304,7 @@ static int get_scorpion2_uart_status(void)
 // called if board is reset ///////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-static void on_scorpion2_reset(void)
+static void on_scorpion2_reset(running_machine *machine)
 {
 	vfd1_latch        = 0;
 	vfd2_latch        = 0;
@@ -372,7 +372,7 @@ send data to them, although obviously there's no response. */
 	// init rom bank ////////////////////////////////////////////////////////
 
 	{
-		UINT8 *rom = memory_region(REGION_CPU1);
+		UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 		memory_configure_bank(1, 0, 1, &rom[0x10000], 0);
 		memory_configure_bank(1, 1, 3, &rom[0x02000], 0x02000);
@@ -512,7 +512,7 @@ static INTERRUPT_GEN( timer_irq )
 		if ( watchdog_cnt > 2 )	// this is a hack, i don't know what the watchdog timeout is, 3 IRQ's works fine
 		{  // reset board
 			mame_schedule_soft_reset(machine);		// reset entire machine. CPU 0 should be enough, but that doesn't seem to work !!
-			on_scorpion2_reset();
+			on_scorpion2_reset(machine);
 			return;
 		}
 	}
@@ -1429,11 +1429,11 @@ static const UINT8 DataDecode[]=
 static UINT8 codec_data[256];
 
 ///////////////////////////////////////////////////////////////////////////
-static void decode_mainrom(int rom_region)
+static void decode_mainrom(running_machine *machine, int rom_region)
 {
 	UINT8 *tmp, *rom;
 
-	rom = memory_region(rom_region);
+	rom = memory_region(machine, rom_region);
 
 	tmp = malloc_or_die(0x10000);
 	{
@@ -1489,7 +1489,7 @@ static MACHINE_RESET( init )
 
 	// reset the board //////////////////////////////////////////////////////
 
-	on_scorpion2_reset();
+	on_scorpion2_reset(machine);
 	BFM_BD1_init(0);
 	BFM_BD1_init(1);
 	//BFM_dm01_reset(); No known video based game has a Matrix board
@@ -2260,13 +2260,13 @@ static MACHINE_DRIVER_START( scorpion2_vid )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-static void sc2_common_init(void)
+static void sc2_common_init(running_machine *machine)
 {
 	UINT8 *rom;
 
-	decode_mainrom(REGION_CPU1);		  // decode main rom
+	decode_mainrom(machine, REGION_CPU1);		  // decode main rom
 
-	rom = memory_region(REGION_CPU1);
+	rom = memory_region(machine, REGION_CPU1);
 	if ( rom )
 	{
 		memcpy(&rom[0x10000], &rom[0x00000], 0x2000);
@@ -2275,11 +2275,11 @@ static void sc2_common_init(void)
 	memset(sc2_Inputs, 0, sizeof(sc2_Inputs));  // clear all inputs
 }
 
-static void adder2_common_init(void)
+static void adder2_common_init(running_machine *machine)
 {
 	UINT8 *pal;
 
-	pal = memory_region(REGION_PROMS);
+	pal = memory_region(machine, REGION_PROMS);
 	if ( pal )
 	{
 		memcpy(key, pal, 8);
@@ -2290,8 +2290,8 @@ static void adder2_common_init(void)
 
 static DRIVER_INIT (quintoon)
 {
-	sc2_common_init();
-	adder2_decode_char_roms();
+	sc2_common_init(machine);
+	adder2_decode_char_roms(machine);
 	Mechmtr_init(8);					// setup mech meters
 
 	has_hopper = 0;
@@ -2311,9 +2311,9 @@ static DRIVER_INIT (quintoon)
 
 static DRIVER_INIT( pyramid )
 {
-	sc2_common_init();
-	adder2_decode_char_roms();			// decode GFX roms
-	adder2_common_init();
+	sc2_common_init(machine);
+	adder2_decode_char_roms(machine);			// decode GFX roms
+	adder2_common_init(machine);
 
 	has_hopper = 1;
 
@@ -2328,9 +2328,9 @@ static DRIVER_INIT( pyramid )
 
 static DRIVER_INIT( sltsbelg )
 {
-	sc2_common_init();
-	adder2_decode_char_roms();			// decode GFX roms
-	adder2_common_init();
+	sc2_common_init(machine);
+	adder2_decode_char_roms(machine);			// decode GFX roms
+	adder2_common_init(machine);
 
 	has_hopper = 1;
 
@@ -2342,9 +2342,9 @@ static DRIVER_INIT( sltsbelg )
 
 static DRIVER_INIT( adder_dutch )
 {
-	sc2_common_init();
-	adder2_decode_char_roms();			// decode GFX roms
-	adder2_common_init();
+	sc2_common_init(machine);
+	adder2_decode_char_roms(machine);			// decode GFX roms
+	adder2_common_init(machine);
 
 	has_hopper = 0;
 
@@ -2360,9 +2360,9 @@ static DRIVER_INIT( adder_dutch )
 
 static DRIVER_INIT( gldncrwn )
 {
-	sc2_common_init();
-	adder2_decode_char_roms();			// decode GFX roms
-	adder2_common_init();
+	sc2_common_init(machine);
+	adder2_decode_char_roms(machine);			// decode GFX roms
+	adder2_common_init(machine);
 
 	has_hopper = 0;
 

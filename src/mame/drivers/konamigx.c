@@ -928,14 +928,14 @@ static READ32_HANDLER( gx6bppspr_r )
 
 static READ32_HANDLER( type1_roz_r1 )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(REGION_GFX3);
+	UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_GFX3);
 
 	return ROM[offset];
 }
 
 static READ32_HANDLER( type1_roz_r2 )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(REGION_GFX3);
+	UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_GFX3);
 
 	ROM += (0x600000/2);
 
@@ -3200,7 +3200,7 @@ static DRIVER_INIT(konamigx)
 
 				case 2:	// tkmmpzdm hack
 	{
-		UINT32 *rom = (UINT32*)memory_region(REGION_CPU1);
+		UINT32 *rom = (UINT32*)memory_region(machine, REGION_CPU1);
 
 		// The display is initialized after POST but the copyright screen disabled
 		// planes B,C,D and didn't bother restoring them. I've spent a good

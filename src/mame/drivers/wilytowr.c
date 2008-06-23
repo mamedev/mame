@@ -283,7 +283,7 @@ static READ8_HANDLER( snddata_r )
 	switch(p2&0xf0)
 	{
 		case 0x60:	return soundlatch_r(machine,0); ;
-		case 0x70:	return memory_region(REGION_USER1)[((p1&0x1f)<<8)|offset];
+		case 0x70:	return memory_region(machine, REGION_USER1)[((p1&0x1f)<<8)|offset];
 	}
 	return 0xff;
 }

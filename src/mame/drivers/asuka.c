@@ -253,7 +253,7 @@ static INTERRUPT_GEN( cadash_interrupt )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bankptr( 1, memory_region(REGION_CPU2) + ((data-1) & 0x03) * 0x4000 + 0x10000 );
+	memory_set_bankptr( 1, memory_region(machine, REGION_CPU2) + ((data-1) & 0x03) * 0x4000 + 0x10000 );
 }
 
 
@@ -271,7 +271,7 @@ static void asuka_msm5205_vck(running_machine *machine, int chip)
 	}
 	else
 	{
-		adpcm_data = memory_region(REGION_SOUND1)[adpcm_pos];
+		adpcm_data = memory_region(machine, REGION_SOUND1)[adpcm_pos];
 		adpcm_pos = (adpcm_pos + 1) & 0xffff;
 		MSM5205_data_w(0, adpcm_data >> 4);
 	}
@@ -298,8 +298,8 @@ static WRITE8_HANDLER( asuka_msm5205_stop_w )
 static MACHINE_START( asuka )
 {
 	/* configure the banks */
-    memory_configure_bank(1, 0, 1, memory_region(REGION_CPU2), 0);
-	memory_configure_bank(1, 1, 3, memory_region(REGION_CPU2) + 0x10000, 0x04000);
+    memory_configure_bank(1, 0, 1, memory_region(machine, REGION_CPU2), 0);
+	memory_configure_bank(1, 1, 3, memory_region(machine, REGION_CPU2) + 0x10000, 0x04000);
 
 	state_save_register_global(adpcm_pos);
 }

@@ -241,7 +241,7 @@ static READ8_HANDLER( showdown_bank0_r );
 
 static NVRAM_HANDLER( exidy440 )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	if (read_or_write)
 		/* the EEROM lives in the uppermost 8k of the top bank */
 		mame_fwrite(file, &rom[0x10000 + 15 * 0x4000 + 0x2000], 0x2000);
@@ -316,7 +316,7 @@ void exidy440_bank_select(running_machine *machine, UINT8 bank)
 
 	/* select the bank and update the bank pointer */
 	exidy440_bank = bank;
-	memory_set_bankptr(1, &memory_region(REGION_CPU1)[0x10000 + exidy440_bank * 0x4000]);
+	memory_set_bankptr(1, &memory_region(machine, REGION_CPU1)[0x10000 + exidy440_bank * 0x4000]);
 }
 
 
@@ -325,7 +325,7 @@ static WRITE8_HANDLER( bankram_w )
 	/* EEROM lives in the upper 8k of bank 15 */
 	if (exidy440_bank == 15 && offset >= 0x2000)
 	{
-		memory_region(REGION_CPU1)[0x10000 + 15 * 0x4000 + offset] = data;
+		memory_region(machine, REGION_CPU1)[0x10000 + 15 * 0x4000 + offset] = data;
 		logerror("W EEROM[%04X] = %02X\n", offset - 0x2000, data);
 	}
 

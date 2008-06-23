@@ -2194,16 +2194,16 @@ ROM_START( blockbl )
 ROM_END
 
 
-static void bootleg_decode(void)
+static void bootleg_decode(running_machine *machine)
 {
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(REGION_CPU1) + 0x50000);
-	memory_configure_bank_decrypted(1, 0, 16, memory_region(REGION_CPU1) + 0x60000, 0x4000);
+	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, REGION_CPU1) + 0x50000);
+	memory_configure_bank_decrypted(1, 0, 16, memory_region(machine, REGION_CPU1) + 0x60000, 0x4000);
 }
 
 
-static void configure_banks(void)
+static void configure_banks(running_machine *machine)
 {
-	memory_configure_bank(1, 0, 16, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 16, memory_region(machine, REGION_CPU1) + 0x10000, 0x4000);
 	pang_port5_kludge = 0;
 }
 
@@ -2212,66 +2212,66 @@ static DRIVER_INIT( dokaben )
 {
 	input_type = 0;
 	nvram_size = 0;
-	mgakuen2_decode();
-	configure_banks();
+	mgakuen2_decode(machine);
+	configure_banks(machine);
 }
 static DRIVER_INIT( pang )
 {
 	input_type = 0;
 	nvram_size = 0;
-	pang_decode();
-	configure_banks();
+	pang_decode(machine);
+	configure_banks(machine);
 }
 static DRIVER_INIT( pangb )
 {
 	input_type = 0;
 	nvram_size = 0;
-	bootleg_decode();
-	configure_banks();
+	bootleg_decode(machine);
+	configure_banks(machine);
 }
 static DRIVER_INIT( cworld )
 {
 	input_type = 0;
 	nvram_size = 0;
-	cworld_decode();
-	configure_banks();
+	cworld_decode(machine);
+	configure_banks(machine);
 }
 static DRIVER_INIT( hatena )
 {
 	input_type = 0;
 	nvram_size = 0;
-	hatena_decode();
-	configure_banks();
+	hatena_decode(machine);
+	configure_banks(machine);
 }
 static DRIVER_INIT( spang )
 {
 	input_type = 3;
 	nvram_size = 0x80;
-	nvram = &memory_region(REGION_CPU1)[0xe000];	/* NVRAM */
-	spang_decode();
-	configure_banks();
+	nvram = &memory_region(machine, REGION_CPU1)[0xe000];	/* NVRAM */
+	spang_decode(machine);
+	configure_banks(machine);
 }
 
 static DRIVER_INIT( spangbl )
 {
 	input_type = 3;
 	nvram_size = 0x80;
-	nvram = &memory_region(REGION_CPU1)[0xe000];	/* NVRAM */
-	bootleg_decode();
-	configure_banks();
+	nvram = &memory_region(machine, REGION_CPU1)[0xe000];	/* NVRAM */
+	bootleg_decode(machine);
+	configure_banks(machine);
 }
 
 static DRIVER_INIT( spangj )
 {
 	input_type = 3;
 	nvram_size = 0x80;
-	nvram = &memory_region(REGION_CPU1)[0xe000];	/* NVRAM */
-	spangj_decode();
-	configure_banks();
+	nvram = &memory_region(machine, REGION_CPU1)[0xe000];	/* NVRAM */
+	spangj_decode(machine);
+	configure_banks(machine);
 
 	/* fix data that will be written to nvram */
 	{
-		UINT8 *rom = memory_region(REGION_CPU1) + 0x10000;
+		UINT8 *rom = memory_region(machine, REGION_CPU1) + 0x10000;
 		rom[0x0183] = 0xcd;
 		rom[0x0184] = 0x81;
 		rom[0x0185] = 0x0e;
@@ -2281,74 +2281,74 @@ static DRIVER_INIT( sbbros )
 {
 	input_type = 3;
 	nvram_size = 0x80;
-	nvram = &memory_region(REGION_CPU1)[0xe000];	/* NVRAM */
-	sbbros_decode();
-	configure_banks();
+	nvram = &memory_region(machine, REGION_CPU1)[0xe000];	/* NVRAM */
+	sbbros_decode(machine);
+	configure_banks(machine);
 }
 static DRIVER_INIT( qtono1 )
 {
 	input_type = 0;
 	nvram_size = 0;
-	qtono1_decode();
-	configure_banks();
+	qtono1_decode(machine);
+	configure_banks(machine);
 }
 static DRIVER_INIT( qsangoku )
 {
 	input_type = 0;
 	nvram_size = 0;
-	qsangoku_decode();
-	configure_banks();
+	qsangoku_decode(machine);
+	configure_banks(machine);
 }
 static DRIVER_INIT( mgakuen )
 {
 	input_type = 1;
-	configure_banks();
+	configure_banks(machine);
 }
 static DRIVER_INIT( mgakuen2 )
 {
 	input_type = 1;
 	nvram_size = 0;
-	mgakuen2_decode();
-	configure_banks();
+	mgakuen2_decode(machine);
+	configure_banks(machine);
 	pang_port5_kludge = 1;
 }
 static DRIVER_INIT( pkladies )
 {
 	input_type = 1;
 	nvram_size = 0;
-	mgakuen2_decode();
-	configure_banks();
+	mgakuen2_decode(machine);
+	configure_banks(machine);
 }
 static DRIVER_INIT( marukin )
 {
 	input_type = 1;
 	nvram_size = 0;
-	marukin_decode();
-	configure_banks();
+	marukin_decode(machine);
+	configure_banks(machine);
 }
 static DRIVER_INIT( block )
 {
 	input_type = 2;
 	nvram_size = 0x80;
-	nvram = &memory_region(REGION_CPU1)[0xff80];	/* NVRAM */
-	block_decode();
-	configure_banks();
+	nvram = &memory_region(machine, REGION_CPU1)[0xff80];	/* NVRAM */
+	block_decode(machine);
+	configure_banks(machine);
 }
 static DRIVER_INIT( blockbl )
 {
 	input_type = 2;
 	nvram_size = 0x80;
-	nvram = &memory_region(REGION_CPU1)[0xff80];	/* NVRAM */
-	bootleg_decode();
-	configure_banks();
+	nvram = &memory_region(machine, REGION_CPU1)[0xff80];	/* NVRAM */
+	bootleg_decode(machine);
+	configure_banks(machine);
 }
 
 static DRIVER_INIT( mstworld )
 {
 	/* descramble the program rom .. */
-	int len = memory_region_length(REGION_CPU1);
+	int len = memory_region_length(machine, REGION_CPU1);
 	UINT8* source = malloc_or_die(len);
-	UINT8* dst    = memory_region(REGION_CPU1) ;
+	UINT8* dst    = memory_region(machine, REGION_CPU1) ;
 	int x;
 
 	static const int tablebank[]=
@@ -2386,8 +2386,8 @@ static DRIVER_INIT( mstworld )
 	}
 	free(source);
 
-	bootleg_decode();
-	configure_banks();
+	bootleg_decode(machine);
+	configure_banks(machine);
 }
 
 

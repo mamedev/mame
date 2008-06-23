@@ -507,9 +507,9 @@ ROM_END
 static DRIVER_INIT( redclash )
 {
 	int i,j;
-	const UINT8 *src = memory_region(REGION_GFX2);
-	UINT8 *dst = memory_region(REGION_GFX3);
-	int len = memory_region_length(REGION_GFX3);
+	const UINT8 *src = memory_region(machine, REGION_GFX2);
+	UINT8 *dst = memory_region(machine, REGION_GFX3);
+	int len = memory_region_length(machine, REGION_GFX3);
 
 	/* rearrange the sprite graphics */
 	for (i = 0;i < len;i++)

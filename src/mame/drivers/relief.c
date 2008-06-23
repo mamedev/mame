@@ -451,9 +451,9 @@ ROM_END
  *
  *************************************/
 
-static void init_common(const UINT16 *def_eeprom)
+static void init_common(running_machine *machine, const UINT16 *def_eeprom)
 {
-	UINT8 *sound_base = memory_region(REGION_SOUND1);
+	UINT8 *sound_base = memory_region(machine, REGION_SOUND1);
 
 	atarigen_eeprom_default = def_eeprom;
 
@@ -490,7 +490,7 @@ static DRIVER_INIT( relief )
 		0x0188,0x0120,0x0600,0x0196,0x013C,0x0192,0x0150,0xFF00,
 		0x9500,0x0000
 	};
-	init_common(default_eeprom);
+	init_common(machine, default_eeprom);
 }
 
 
@@ -513,7 +513,7 @@ static DRIVER_INIT( relief2 )
 		0x0100,0x0145,0x0100,0x0109,0x0184,0x012C,0x0200,0x0107,
 		0x01AA,0x0149,0x60FF,0x3300,0x0000
 	};
-	init_common(default_eeprom);
+	init_common(machine, default_eeprom);
 }
 
 

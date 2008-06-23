@@ -203,7 +203,7 @@ static READ8_HANDLER( shdancbl_soundbank_r )
 
 static WRITE8_HANDLER( shdancbl_bankctrl_w )
 {
-	UINT8 *mem = memory_region(REGION_CPU2);
+	UINT8 *mem = memory_region(machine, REGION_CPU2);
 
 	switch(data)
 	{
@@ -300,7 +300,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sys18_soundbank_w )
 {
-	UINT8 *mem = memory_region(REGION_CPU2);
+	UINT8 *mem = memory_region(machine, REGION_CPU2);
 	int rom = (data >> 6) & 3;
 	int bank = (data & 0x3f);
 	int mask = sys18_sound_info[rom*2+0];
@@ -768,7 +768,7 @@ static DRIVER_INIT( shdancbl )
 	UINT8 *mem;
 
 	/* Invert tile ROM data*/
-	mem = memory_region(REGION_GFX1);
+	mem = memory_region(machine, REGION_GFX1);
 	for(i = 0; i < 0xc0000; i++)
 		mem[i] ^= 0xFF;
 
@@ -780,7 +780,7 @@ static DRIVER_INIT( shdancbl )
 	sys16_MaxShadowColors=0;
 
 	/* Copy first 32K of IC45 to Z80 address space */
-	mem = memory_region(REGION_CPU2);
+	mem = memory_region(machine, REGION_CPU2);
 	memcpy(mem, mem+0x10000, 0x8000);
 }
 
@@ -906,7 +906,7 @@ static MACHINE_RESET( mwalkbl ){
 }
 
 static DRIVER_INIT( mwalkbl ){
-	UINT8 *RAM= memory_region(REGION_CPU2);
+	UINT8 *RAM= memory_region(machine, REGION_CPU2);
 	static const int mwalk_sound_info[] =
 	{
 		0x0f, 0x00000, // ROM #1 = 128K
@@ -1087,7 +1087,7 @@ static MACHINE_RESET( astormbl ){
 
 
 static DRIVER_INIT( astormbl ){
-	UINT8 *RAM= memory_region(REGION_CPU2);
+	UINT8 *RAM= memory_region(machine, REGION_CPU2);
 	static const int astormbl_sound_info[] =
 	{
 		0x0f, 0x00000, // ROM #1 = 128K

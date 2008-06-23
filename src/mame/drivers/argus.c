@@ -202,7 +202,7 @@ static READ8_HANDLER( argus_bankselect_r )
 
 static WRITE8_HANDLER( argus_bankselect_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	int bankaddress;
 
 	argus_bank_latch = data;

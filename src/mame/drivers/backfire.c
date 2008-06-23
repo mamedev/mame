@@ -642,9 +642,9 @@ ROM_START( backfira )
 	ROM_LOAD( "mbz-06.19l",    0x200000, 0x080000,  CRC(4a38c635) SHA1(7f0fb6a7a4aa6774c04fa38e53ceff8744fe1e9f) )
 ROM_END
 
-static void descramble_sound( void )
+static void descramble_sound( running_machine *machine )
 {
-	UINT8 *rom = memory_region(REGION_SOUND1);
+	UINT8 *rom = memory_region(machine, REGION_SOUND1);
 	int length = 0x200000; // only the first rom is swapped on backfire!
 	UINT8 *buf1 = malloc_or_die(length);
 	UINT32 x;
@@ -681,11 +681,11 @@ static READ32_HANDLER( backfire_speedup_r )
 
 static DRIVER_INIT( backfire )
 {
-	deco56_decrypt(REGION_GFX1); /* 141 */
-	deco56_decrypt(REGION_GFX2); /* 141 */
-	deco156_decrypt();
+	deco56_decrypt(machine, REGION_GFX1); /* 141 */
+	deco56_decrypt(machine, REGION_GFX2); /* 141 */
+	deco156_decrypt(machine);
 	cpunum_set_clockscale(machine, 0, 4.0f); /* core timings aren't accurate */
-	descramble_sound();
+	descramble_sound(machine);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0170018, 0x017001b, 0, 0, backfire_speedup_r );
 }
 

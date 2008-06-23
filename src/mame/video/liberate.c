@@ -42,7 +42,7 @@ static TILEMAP_MAPPER( fix_scan )
 
 static TILE_GET_INFO( get_back_tile_info )
 {
-	const UINT8 *RAM = memory_region(REGION_USER1);
+	const UINT8 *RAM = memory_region(machine, REGION_USER1);
 	int tile,bank;
 
 	/* Convert tile index of 512x512 to paged format */

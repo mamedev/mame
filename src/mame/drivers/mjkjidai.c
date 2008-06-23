@@ -22,6 +22,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "sound/sn76496.h"
 #include "sound/okim6295.h"
@@ -78,7 +79,7 @@ static void *mjkjidai_adpcm_start (int clock, const struct CustomSound_interface
 	struct mjkjidai_adpcm_state *state = &mjkjidai_adpcm;
 	state->playing = 0;
 	state->stream = stream_create(0, 1, clock, state, mjkjidai_adpcm_callback);
-	state->base = memory_region(REGION_SOUND1);
+	state->base = memory_region(Machine, REGION_SOUND1);
 	reset_adpcm(&state->adpcm);
 	return state;
 }

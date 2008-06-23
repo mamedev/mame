@@ -843,8 +843,8 @@ ROM_END
 
 static DRIVER_INIT( cabal )
 {
-	seibu_sound_decrypt(REGION_CPU2,0x2000);
-	seibu_adpcm_decrypt(REGION_SOUND1);
+	seibu_sound_decrypt(machine,REGION_CPU2,0x2000);
+	seibu_adpcm_decrypt(machine,REGION_SOUND1);
 }
 
 

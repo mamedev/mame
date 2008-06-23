@@ -280,7 +280,7 @@ static WRITE8_HANDLER( esd16_sound_rombank_w )
 	int bank = data & 0xf;
 	if (data != bank)	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n",activecpu_get_pc(),data);
 	if (bank >= 3)	bank += 1;
-	memory_set_bankptr(1, memory_region(REGION_CPU2) + 0x4000 * bank);
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU2) + 0x4000 * bank);
 }
 
 static ADDRESS_MAP_START( multchmp_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )

@@ -51,7 +51,7 @@ static INTERRUPT_GEN( ddrible_interrupt_1 )
 static WRITE8_HANDLER( ddrible_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	bankaddress = 0x10000 + (data & 0x0f)*0x2000;
 	memory_set_bankptr(1,&RAM[bankaddress]);
@@ -100,7 +100,7 @@ static READ8_HANDLER( ddrible_vlm5030_busy_r )
 
 static WRITE8_HANDLER( ddrible_vlm5030_ctrl_w )
 {
-	UINT8 *SPEECH_ROM = memory_region(REGION_SOUND1);
+	UINT8 *SPEECH_ROM = memory_region(machine, REGION_SOUND1);
 	/* b7 : vlm data bus OE   */
 	/* b6 : VLM5030-RST       */
 	/* b5 : VLM5030-ST        */

@@ -419,7 +419,7 @@ static DRIVER_INIT( silkroad )
        verified as correct... problem with the original which the gfx
        hardware didn't care about? */
 
-	UINT8 *src = memory_region(REGION_GFX1)+0x1000000;
+	UINT8 *src = memory_region(machine, REGION_GFX1)+0x1000000;
 	int len = 0x0200000;
 	UINT8 *buffer;
 

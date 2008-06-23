@@ -61,7 +61,7 @@ static WRITE16_HANDLER( powerins_okibank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *RAM = memory_region(REGION_SOUND1);
+		UINT8 *RAM = memory_region(machine, REGION_SOUND1);
 		int new_bank = data & 0x7;
 
 		if (new_bank != oki_bank)

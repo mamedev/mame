@@ -1754,22 +1754,22 @@ static DRIVER_INIT( outrunb )
 	custom_io_w = outrun_custom_io_w;
 
 	/* main CPU: swap bits 11,12 and 6,7 */
-	word = (UINT16 *)memory_region(REGION_CPU1);
-	length = memory_region_length(REGION_CPU1) / 2;
+	word = (UINT16 *)memory_region(machine, REGION_CPU1);
+	length = memory_region_length(machine, REGION_CPU1) / 2;
 	for (i = 0; i < length; i++)
 		word[i] = BITSWAP16(word[i], 15,14,11,12,13,10,9,8,6,7,5,4,3,2,1,0);
 
 	/* sub CPU: swap bits 14,15 and 2,3 */
-	word = (UINT16 *)memory_region(REGION_CPU2);
-	length = memory_region_length(REGION_CPU2) / 2;
+	word = (UINT16 *)memory_region(machine, REGION_CPU2);
+	length = memory_region_length(machine, REGION_CPU2) / 2;
 	for (i = 0; i < length; i++)
 		word[i] = BITSWAP16(word[i], 14,15,13,12,11,10,9,8,7,6,5,4,2,3,1,0);
 
 	/* road gfx */
 	/* rom a-2.bin: swap bits 6,7 */
 	/* rom a-3.bin: swap bits 5,6 */
-	byte = memory_region(REGION_GFX3);
-	length = memory_region_length(REGION_GFX3) / 2;
+	byte = memory_region(machine, REGION_GFX3);
+	length = memory_region_length(machine, REGION_GFX3) / 2;
 	for (i = 0; i < length; i++)
 	{
 		byte[i]        = BITSWAP8(byte[i],        6,7,5,4,3,2,1,0);
@@ -1777,8 +1777,8 @@ static DRIVER_INIT( outrunb )
 	}
 
 	/* Z80 code: swap bits 5,6 */
-	byte = memory_region(REGION_CPU3);
-	length = memory_region_length(REGION_CPU3);
+	byte = memory_region(machine, REGION_CPU3);
+	length = memory_region_length(machine, REGION_CPU3);
 	for (i = 0; i < length; i++)
 		byte[i] = BITSWAP8(byte[i], 7,5,6,4,3,2,1,0);
 }
@@ -1795,7 +1795,7 @@ static DRIVER_INIT( shangon )
 static DRIVER_INIT( shangon3 )
 {
 	outrun_generic_init(machine);
-	fd1089_decrypt_0034();
+	fd1089_decrypt_0034(machine);
 	custom_io_r = shangon_custom_io_r;
 	custom_io_w = shangon_custom_io_w;
 }

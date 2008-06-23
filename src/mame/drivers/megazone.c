@@ -587,7 +587,7 @@ ROM_END
 
 static DRIVER_INIT( megazone )
 {
-	konami1_decode(0);
+	konami1_decode(machine, 0);
 }
 
 /* these just display a Konami copyright, no logo */

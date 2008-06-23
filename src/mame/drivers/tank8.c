@@ -466,10 +466,10 @@ ROM_END
 
 static DRIVER_INIT( decode )
 {
-	const UINT8* DECODE = memory_region(REGION_USER1);
+	const UINT8* DECODE = memory_region(machine, REGION_USER1);
 
-	UINT8* p1 = memory_region(REGION_CPU1) + 0x00000;
-	UINT8* p2 = memory_region(REGION_CPU1) + 0x10000;
+	UINT8* p1 = memory_region(machine, REGION_CPU1) + 0x00000;
+	UINT8* p2 = memory_region(machine, REGION_CPU1) + 0x10000;
 
 	int i;
 

@@ -53,7 +53,7 @@ static WRITE16_HANDLER( fcrash_soundlatch_w )
 
 static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 	int bankaddr;
 
 	sndti_set_output_gain(SOUND_MSM5205, 0, 0, (data & 0x08) ? 0.0 : 1.0);

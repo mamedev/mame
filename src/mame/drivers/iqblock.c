@@ -94,7 +94,7 @@ static READ8_HANDLER( iqblock_irqack_r )
 
 static READ8_HANDLER( extrarom_r )
 {
-	return memory_region(REGION_USER1)[offset];
+	return memory_region(machine, REGION_USER1)[offset];
 }
 
 
@@ -503,7 +503,7 @@ ROM_END
 
 static DRIVER_INIT( iqblock )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int i;
 
 	/* decrypt the program ROM */
@@ -525,7 +525,7 @@ static DRIVER_INIT( iqblock )
 
 static DRIVER_INIT( grndtour )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int i;
 
 	/* decrypt the program ROM */
@@ -548,7 +548,7 @@ static DRIVER_INIT( grndtour )
 
 static DRIVER_INIT( cabaret )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int i;
 
 	/* decrypt the program ROM */
@@ -567,7 +567,7 @@ static DRIVER_INIT( cabaret )
 
 static DRIVER_INIT( pokerigs )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int i;
 
 	/* decrypt the program ROM */

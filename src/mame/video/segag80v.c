@@ -110,9 +110,9 @@ INLINE int adjust_xy(int rawx, int rawy, int *outx, int *outy)
 }
 
 
-static void sega_generate_vector_list(void)
+static void sega_generate_vector_list(running_machine *machine)
 {
-	UINT8 *sintable = memory_region(REGION_PROMS);
+	UINT8 *sintable = memory_region(machine, REGION_PROMS);
 	double total_time = 1.0 / (double)IRQ_CLOCK;
 	UINT16 symaddr = 0;
 
@@ -337,7 +337,7 @@ VIDEO_START( sega )
 
 VIDEO_UPDATE( sega )
 {
-	sega_generate_vector_list();
+	sega_generate_vector_list(screen->machine);
 	VIDEO_UPDATE_CALL(vector);
 	return 0;
 }

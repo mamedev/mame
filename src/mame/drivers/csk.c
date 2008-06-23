@@ -887,7 +887,7 @@ ROM_END
 static DRIVER_INIT( cpoker )
 {
 	int A;
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -902,7 +902,7 @@ static DRIVER_INIT( cpoker )
 static DRIVER_INIT( cska )
 {
 	int A;
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 
 	for (A = 0;A < 0x10000;A++)

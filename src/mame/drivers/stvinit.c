@@ -17,9 +17,9 @@ ODD (in every sense) bytes.This gets the IC-13 rom status to good and ends a emu
 weird issue once and for all...
 We need to remove this and add the whole thing into the ROM loading structure...
 */
-static void ic13_shifter(void)
+static void ic13_shifter(running_machine *machine)
 {
-	UINT32 *rom = (UINT32 *)memory_region(REGION_USER1);
+	UINT32 *rom = (UINT32 *)memory_region(machine, REGION_USER1);
 	UINT32 i;
 	UINT32 *tmp = malloc_or_die(0x80000*2);
 
@@ -67,7 +67,7 @@ static void ic13_shifter(void)
 
 DRIVER_INIT ( ic13 )
 {
-	ic13_shifter();
+	ic13_shifter(machine);
 	DRIVER_INIT_CALL(stv);
 }
 /*

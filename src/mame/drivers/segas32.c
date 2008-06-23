@@ -1103,14 +1103,14 @@ static void ym3438_irq_handler(running_machine *machine, int state)
 static WRITE8_HANDLER( sound_bank_lo_w )
 {
 	sound_bank = (sound_bank & ~0x3f) | (data & 0x3f);
-	memory_set_bankptr(1, memory_region(REGION_CPU2) + 0x100000 + 0x2000 * sound_bank);
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU2) + 0x100000 + 0x2000 * sound_bank);
 }
 
 
 static WRITE8_HANDLER( sound_bank_hi_w )
 {
 	sound_bank = (sound_bank & 0x3f) | ((data & 0x04) << 4) | ((data & 0x03) << 7);
-	memory_set_bankptr(1, memory_region(REGION_CPU2) + 0x100000 + 0x2000 * sound_bank);
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU2) + 0x100000 + 0x2000 * sound_bank);
 }
 
 
@@ -3894,7 +3894,7 @@ static DRIVER_INIT( ga2 )
 {
 	segas32_common_init(extra_custom_io_r, NULL, NULL);
 
-	decrypt_ga2_protrom();
+	decrypt_ga2_protrom(machine);
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa00000, 0xa00fff, 0, 0, ga2_dpram_r, ga2_dpram_w);
 }
 
@@ -3914,7 +3914,7 @@ static DRIVER_INIT( holo )
 static DRIVER_INIT( jpark )
 {
 	/* Temp. Patch until we emulate the 'Drive Board', thanks to Malice */
-	UINT16 *pROM = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *pROM = (UINT16 *)memory_region(machine, REGION_CPU1);
 
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w, NULL);
 

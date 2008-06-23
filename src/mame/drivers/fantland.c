@@ -343,8 +343,8 @@ static void borntofi_adpcm_int(running_machine *machine, int voice)
 	if (!borntofi_adpcm[voice].playing)
 		return;
 
-	rom = memory_region( REGION_SOUND1 );
-	len = memory_region_length( REGION_SOUND1 ) * 2;
+	rom = memory_region( machine, REGION_SOUND1 );
+	len = memory_region_length( machine, REGION_SOUND1 ) * 2;
 
 	start = borntofi_adpcm[voice].addr[0] + borntofi_adpcm[voice].nibble;
 	stop  = borntofi_adpcm[voice].addr[1];

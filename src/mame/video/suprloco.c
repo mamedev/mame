@@ -176,7 +176,7 @@ INLINE void draw_pixel(bitmap_t *bitmap,const rectangle *cliprect,int x,int y,in
 }
 
 
-static void draw_sprite(bitmap_t *bitmap,const rectangle *cliprect,int spr_number)
+static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int spr_number)
 {
 	int sx,sy,col,row,height,src,adjy,dy;
 	UINT8 *spr_reg;
@@ -206,7 +206,7 @@ static void draw_sprite(bitmap_t *bitmap,const rectangle *cliprect,int spr_numbe
 		dy = -1;
 	}
 
-	gfx2 = memory_region(REGION_GFX2);
+	gfx2 = memory_region(machine, REGION_GFX2);
 	for (row = 0;row < height;row++,adjy+=dy)
 	{
 		int color1,color2,flipx;
@@ -249,7 +249,7 @@ static void draw_sprite(bitmap_t *bitmap,const rectangle *cliprect,int spr_numbe
 	}
 }
 
-static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int spr_number;
 	UINT8 *spr_reg;
@@ -259,14 +259,14 @@ static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect)
 	{
 		spr_reg = spriteram + 0x10 * spr_number;
 		if (spr_reg[SPR_X] != 0xff)
-			draw_sprite(bitmap, cliprect, spr_number);
+			draw_sprite(machine, bitmap, cliprect, spr_number);
 	}
 }
 
 VIDEO_UPDATE( suprloco )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);
 	return 0;
 }

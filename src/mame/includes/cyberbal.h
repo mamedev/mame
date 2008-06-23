@@ -7,7 +7,7 @@
 
 /*----------- defined in audio/cyberbal.c -----------*/
 
-void cyberbal_sound_reset(void);
+void cyberbal_sound_reset(running_machine *machine);
 
 INTERRUPT_GEN( cyberbal_sound_68k_irq_gen );
 

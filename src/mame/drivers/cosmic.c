@@ -1463,8 +1463,8 @@ static DRIVER_INIT( cosmicg )
 	offs_t offs, len;
 	UINT8 *rom;
 
-    len = memory_region_length(REGION_CPU1);
-    rom = memory_region(REGION_CPU1);
+    len = memory_region_length(machine, REGION_CPU1);
+    rom = memory_region(machine, REGION_CPU1);
     for (offs =0; offs < len; offs++)
     {
         UINT8 scrambled = rom[offs];

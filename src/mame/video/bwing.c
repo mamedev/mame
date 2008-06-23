@@ -123,7 +123,7 @@ WRITE8_HANDLER( bwing_scrollreg_w )
 	}
 
 	#if BW_DEBUG
-		(memory_region(REGION_CPU1))[0x1b10 + offset] = data;
+		(memory_region(machine, REGION_CPU1))[0x1b10 + offset] = data;
 	#endif
 }
 
@@ -208,7 +208,7 @@ VIDEO_START( bwing )
 
 	fill_srxlat(srxlat);
 
-	fgdata = memory_region(REGION_USER1);
+	fgdata = memory_region(machine, REGION_USER1);
 	bgdata = fgdata + 0x1000;
 
 	for (i=0; i<4; i++) srbase[i] = fgdata + i * 0x2000;

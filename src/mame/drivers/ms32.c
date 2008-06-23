@@ -1388,7 +1388,7 @@ static const struct YMF271interface ymf271_interface =
 
 static MACHINE_RESET( ms32 )
 {
-	memory_set_bankptr(1, memory_region(REGION_CPU1));
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU1));
 	memory_set_bank(4, 0);
 	memory_set_bank(5, 1);
 	irq_init(machine);
@@ -2158,7 +2158,7 @@ ROM_END
 
 /* SS92048-01: p47aces, 47pie2, 47pie2o */
 
-void ms32_rearrange_sprites(int region)
+void ms32_rearrange_sprites(running_machine *machine, int region)
 {
 	/* sprites are not encrypted, but we need to move the data around to handle them as 256x256 tiles */
 	int i;
@@ -2167,8 +2167,8 @@ void ms32_rearrange_sprites(int region)
 
 	UINT8 *result_data;
 
-	source_data = memory_region       ( region );
-	source_size = memory_region_length( region );
+	source_data = memory_region       ( machine, region );
+	source_size = memory_region_length( machine, region );
 
 	result_data = malloc_or_die(source_size);
 
@@ -2184,7 +2184,7 @@ void ms32_rearrange_sprites(int region)
 }
 
 
-void decrypt_ms32_tx(int addr_xor,int data_xor, int region)
+void decrypt_ms32_tx(running_machine *machine, int addr_xor,int data_xor, int region)
 {
 	int i;
 	UINT8 *source_data;
@@ -2192,8 +2192,8 @@ void decrypt_ms32_tx(int addr_xor,int data_xor, int region)
 
 	UINT8 *result_data;
 
-	source_data = memory_region       ( region );
-	source_size = memory_region_length( region );
+	source_data = memory_region       ( machine, region );
+	source_size = memory_region_length( machine, region );
 
 	result_data = malloc_or_die(source_size);
 
@@ -2238,7 +2238,7 @@ void decrypt_ms32_tx(int addr_xor,int data_xor, int region)
 	free (result_data);
 }
 
-void decrypt_ms32_bg(int addr_xor,int data_xor, int region)
+void decrypt_ms32_bg(running_machine *machine, int addr_xor,int data_xor, int region)
 {
 	int i;
 	UINT8 *source_data;
@@ -2246,8 +2246,8 @@ void decrypt_ms32_bg(int addr_xor,int data_xor, int region)
 
 	UINT8 *result_data;
 
-	source_data = memory_region       ( region );
-	source_size = memory_region_length( region );
+	source_data = memory_region       ( machine, region );
+	source_size = memory_region_length( machine, region );
 
 	result_data = malloc_or_die(source_size);
 
@@ -2295,47 +2295,47 @@ void decrypt_ms32_bg(int addr_xor,int data_xor, int region)
 
 
 
-static void configure_banks(void)
+static void configure_banks(running_machine *machine)
 {
 	state_save_register_global(to_main);
-	memory_configure_bank(4, 0, 16, memory_region(REGION_CPU2) + 0x14000, 0x4000);
-	memory_configure_bank(5, 0, 16, memory_region(REGION_CPU2) + 0x14000, 0x4000);
+	memory_configure_bank(4, 0, 16, memory_region(machine, REGION_CPU2) + 0x14000, 0x4000);
+	memory_configure_bank(5, 0, 16, memory_region(machine, REGION_CPU2) + 0x14000, 0x4000);
 }
 
 /* SS91022-10: desertwr, gratiaa, tp2m32, gametngk */
 static DRIVER_INIT (ss91022_10)
 {
-	configure_banks();
-	ms32_rearrange_sprites(REGION_GFX1);
-	decrypt_ms32_tx(0x00000,0x35, REGION_GFX4);
-	decrypt_ms32_bg(0x00000,0xa3, REGION_GFX3);
+	configure_banks(machine);
+	ms32_rearrange_sprites(machine, REGION_GFX1);
+	decrypt_ms32_tx(machine, 0x00000,0x35, REGION_GFX4);
+	decrypt_ms32_bg(machine, 0x00000,0xa3, REGION_GFX3);
 }
 
 /* SS92046_01: bbbxing, f1superb, tetrisp, hayaosi2 */
 static DRIVER_INIT (ss92046_01)
 {
-	configure_banks();
-	ms32_rearrange_sprites(REGION_GFX1);
-	decrypt_ms32_tx(0x00020,0x7e, REGION_GFX4);
-	decrypt_ms32_bg(0x00001,0x9b, REGION_GFX3);
+	configure_banks(machine);
+	ms32_rearrange_sprites(machine, REGION_GFX1);
+	decrypt_ms32_tx(machine, 0x00020,0x7e, REGION_GFX4);
+	decrypt_ms32_bg(machine, 0x00001,0x9b, REGION_GFX3);
 }
 
 /* SS92047-01: gratia, kirarast */
 static DRIVER_INIT (ss92047_01)
 {
-	configure_banks();
-	ms32_rearrange_sprites(REGION_GFX1);
-	decrypt_ms32_tx(0x24000,0x18, REGION_GFX4);
-	decrypt_ms32_bg(0x24000,0x55, REGION_GFX3);
+	configure_banks(machine);
+	ms32_rearrange_sprites(machine, REGION_GFX1);
+	decrypt_ms32_tx(machine, 0x24000,0x18, REGION_GFX4);
+	decrypt_ms32_bg(machine, 0x24000,0x55, REGION_GFX3);
 }
 
 /* SS92048-01: p47aces, 47pie2, 47pie2o */
 static DRIVER_INIT (ss92048_01)
 {
-	configure_banks();
-	ms32_rearrange_sprites(REGION_GFX1);
-	decrypt_ms32_tx(0x20400,0xd6, REGION_GFX4);
-	decrypt_ms32_bg(0x20400,0xd4, REGION_GFX3);
+	configure_banks(machine);
+	ms32_rearrange_sprites(machine, REGION_GFX1);
+	decrypt_ms32_tx(machine, 0x20400,0xd6, REGION_GFX4);
+	decrypt_ms32_bg(machine, 0x20400,0xd4, REGION_GFX3);
 }
 
 static DRIVER_INIT (kirarast)
@@ -2357,7 +2357,7 @@ static DRIVER_INIT (47pie2)
 static DRIVER_INIT (f1superb)
 {
 #if 0 // we shouldn't need this hack, something else is wrong, and the x offsets are never copied either, v70 problems??
-	UINT32 *pROM = (UINT32 *)memory_region(REGION_CPU1);
+	UINT32 *pROM = (UINT32 *)memory_region(machine, REGION_CPU1);
 	pROM[0x19d04/4]=0x167a021a; // bne->br  : sprite Y offset table is always copied to RAM
 #endif
 	DRIVER_INIT_CALL(ss92046_01);

@@ -619,7 +619,7 @@ static DRIVER_INIT( skullxbo )
 {
 	atarigen_eeprom_default = NULL;
 	atarijsa_init(machine, "FF5802", 0x0080);
-	memset(memory_region(REGION_GFX1) + 0x170000, 0, 0x20000);
+	memset(memory_region(machine, REGION_GFX1) + 0x170000, 0, 0x20000);
 }
 
 

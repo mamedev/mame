@@ -431,11 +431,11 @@ static TIMER_CALLBACK( sprite_timer_callback )
 }
 
 
-static void draw_sprite(void)
+static void draw_sprite(running_machine *machine)
 {
 	UINT32	XDOT;
 	UINT32	YDOT;
-	UINT8 * romCxx  = memory_region(REGION_USER2)+0x00000;
+	UINT8 * romCxx  = memory_region(machine, REGION_USER2)+0x00000;
 	UINT8 * romD10  = romCxx+0x10000;
 	UINT8 * romEF13 = romCxx+0x12000;
 	UINT8 * romHI2  = romCxx+0x14000;
@@ -562,7 +562,7 @@ WRITE8_HANDLER( tubep_sprite_control_w )
 			timer_set( attotime_mul(ATTOTIME_IN_HZ(19968000/8), (XSize+1)*(YSize+1)), NULL, 0, sprite_timer_callback);
 
 			/* 3.clear of /SINT starts sprite drawing circuit */
-			draw_sprite();
+			draw_sprite(machine);
 			break;
 		}
 	}
@@ -584,8 +584,8 @@ VIDEO_UPDATE( tubep )
 	pen_t pen_base = 32; //change it later
 
 	UINT32 v;
-	UINT8 *text_gfx_base = memory_region(REGION_GFX1);
-	UINT8 *romBxx = memory_region(REGION_USER1) + 0x2000*background_romsel;
+	UINT8 *text_gfx_base = memory_region(screen->machine, REGION_GFX1);
+	UINT8 *romBxx = memory_region(screen->machine, REGION_USER1) + 0x2000*background_romsel;
 
 	/* logerror(" update: from DISP=%i y_min=%3i y_max=%3i\n", DISP_, cliprect->min_y, cliprect->max_y+1); */
 
@@ -737,8 +737,8 @@ VIDEO_UPDATE( rjammer )
 	int DISP_ = DISP^1;
 
 	UINT32 v;
-	UINT8 *text_gfx_base = memory_region(REGION_GFX1);
-	UINT8 *rom13D  = memory_region(REGION_USER1);
+	UINT8 *text_gfx_base = memory_region(screen->machine, REGION_GFX1);
+	UINT8 *rom13D  = memory_region(screen->machine, REGION_USER1);
 	UINT8 *rom11BD = rom13D+0x1000;
 	UINT8 *rom19C  = rom13D+0x5000;
 

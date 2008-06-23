@@ -566,7 +566,7 @@ static MACHINE_START( draco )
 
 	// COP402 memory banking
 
-	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU2), 0x400);
+	memory_configure_bank(1, 0, 2, memory_region(machine, REGION_CPU2), 0x400);
 	memory_set_bank(1, 0);
 
 	// register save states

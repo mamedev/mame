@@ -568,8 +568,8 @@ ROM_END
 
 static DRIVER_INIT( omegrace )
 {
-	int i, len = memory_region_length(REGION_USER1);
-	UINT8 *prom = memory_region(REGION_USER1);
+	int i, len = memory_region_length(machine, REGION_USER1);
+	UINT8 *prom = memory_region(machine, REGION_USER1);
 
 	/* Omega Race has two pairs of the state PROM output
      * lines swapped before going into the decoder.

@@ -44,7 +44,7 @@ static int decryption_key;
 
 static READ8_HANDLER( questions_r )
 {
-	UINT8 *questions = memory_region(REGION_USER1);
+	UINT8 *questions = memory_region(machine, REGION_USER1);
 	int address;
 
 	switch(question_address >> 16)

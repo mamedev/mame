@@ -382,7 +382,7 @@ static WRITE8_HANDLER( garyoret_i8751_w )
 static WRITE8_HANDLER( dec8_bank_w )
 {
  	int bankaddress;
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	bankaddress = 0x10000 + (data & 0x0f) * 0x4000;
 	memory_set_bankptr(1,&RAM[bankaddress]);
@@ -392,7 +392,7 @@ static WRITE8_HANDLER( dec8_bank_w )
 static WRITE8_HANDLER( ghostb_bank_w )
 {
  	int bankaddress;
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	/* Bit 0: Interrupt enable/disable (I think..)
        Bit 1: NMI enable/disable
@@ -411,7 +411,7 @@ static WRITE8_HANDLER( ghostb_bank_w )
 
 static WRITE8_HANDLER( csilver_control_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	/*
         Bit 0x0f - ROM bank switch.
@@ -460,7 +460,7 @@ static WRITE8_HANDLER( csilver_adpcm_data_w )
 
 static WRITE8_HANDLER( csilver_sound_bank_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU3);
+	UINT8 *RAM = memory_region(machine, REGION_CPU3);
 
 	if (data&8) { memory_set_bankptr(3,&RAM[0x14000]); }
 	else { memory_set_bankptr(3,&RAM[0x10000]); }
@@ -3416,7 +3416,7 @@ static DRIVER_INIT( deco222 )
 	if (machine->config->cpu[2].type != CPU_DUMMY) sound_cpu = 2;
 
 	/* bits 5 and 6 of the opcodes are swapped */
-	rom = memory_region(REGION_CPU1+sound_cpu);
+	rom = memory_region(machine, REGION_CPU1+sound_cpu);
 	decrypt = auto_malloc(0x8000);
 
 	memory_set_decrypted_region(sound_cpu, 0x8000, 0xffff, decrypt);
@@ -3428,7 +3428,7 @@ static DRIVER_INIT( deco222 )
 static DRIVER_INIT( meikyuh )
 {
 	/* Blank out unused garbage in colour prom to avoid colour overflow */
-	UINT8 *RAM = memory_region(REGION_PROMS);
+	UINT8 *RAM = memory_region(machine, REGION_PROMS);
 	memset(RAM+0x20,0,0xe0);
 }
 

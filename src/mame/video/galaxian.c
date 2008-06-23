@@ -343,7 +343,7 @@ PALETTE_INIT( galaxian )
 			2, &rgb_resistances[1], bweights, 470, 0);
 
 	/* decode the palette first */
-	len = memory_region_length(REGION_PROMS);
+	len = memory_region_length(machine, REGION_PROMS);
 	for (i = 0; i < len; i++)
 	{
 		UINT8 bit0, bit1, bit2, r, g, b;
@@ -1011,7 +1011,7 @@ void frogger_draw_background(running_machine *machine, bitmap_t *bitmap, const r
 
 void amidar_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	const UINT8 *prom = memory_region(REGION_USER1);
+	const UINT8 *prom = memory_region(machine, REGION_USER1);
 	rectangle draw;
 	int x;
 

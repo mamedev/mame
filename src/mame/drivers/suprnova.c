@@ -471,7 +471,7 @@ static MACHINE_RESET(skns)
 	timer_pulse(ATTOTIME_IN_MSEC(8), NULL, 11, interrupt_callback);
 	timer_pulse(ATTOTIME_IN_CYCLES(1824, 0), NULL, 9, interrupt_callback);
 
-	memory_set_bankptr(1,memory_region(REGION_USER1));
+	memory_set_bankptr(1,memory_region(machine, REGION_USER1));
 }
 
 
@@ -833,7 +833,7 @@ static READ32_HANDLER( skns_msm6242_r )
 
 static WRITE32_HANDLER( skns_v3t_w )
 {
-	UINT8 *btiles = memory_region(REGION_GFX3);
+	UINT8 *btiles = memory_region(machine, REGION_GFX3);
 
 	COMBINE_DATA(&skns_v3t_ram[offset]);
 

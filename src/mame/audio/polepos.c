@@ -3,6 +3,7 @@
     Sound handler
 ****************************************************************************/
 #include "driver.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "sound/filter.h"
 #include "rescap.h"
@@ -69,7 +70,7 @@ static void engine_sound_update(void *param, stream_sample_t **inputs, stream_sa
 	/* determine the volume */
 	slot = (sample_msb >> 3) & 7;
 	volume = volume_table[slot];
-	base = &memory_region(REGION_SOUND2)[slot * 0x800];
+	base = &memory_region(Machine, REGION_SOUND2)[slot * 0x800];
 
 	/* fill in the sample */
 	while (length--)

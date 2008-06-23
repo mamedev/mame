@@ -275,7 +275,7 @@ static UINT32 *spriteram_32bit;
 static TILE_GET_INFO( get_tile_info );
 static void sprite_erase_buffer(void);
 static void sprite_swap_buffers(void);
-static void sprite_render_list(void);
+static void sprite_render_list(running_machine *machine);
 
 
 
@@ -368,7 +368,7 @@ static TIMER_CALLBACK( update_sprites )
 	if (sprite_control[0] & 1)
 	{
 		sprite_swap_buffers();
-		sprite_render_list();
+		sprite_render_list(machine);
 	}
 	sprite_control[0] = 0;
 }
@@ -1696,7 +1696,7 @@ static void sprite_swap_buffers(void)
 		}																	\
 	}
 
-static int draw_one_sprite(UINT16 *data, int xoffs, int yoffs, const rectangle *clipin, const rectangle *clipout)
+static int draw_one_sprite(running_machine *machine, UINT16 *data, int xoffs, int yoffs, const rectangle *clipin, const rectangle *clipout)
 {
 	static const int transparency_masks[4][4] =
 	{
@@ -1707,8 +1707,8 @@ static int draw_one_sprite(UINT16 *data, int xoffs, int yoffs, const rectangle *
 	};
 
 	bitmap_t *bitmap = layer_data[(!is_multi32 || !(data[3] & 0x0800)) ? MIXER_LAYER_SPRITES_2 : MIXER_LAYER_MULTISPR_2].bitmap;
-	UINT8 numbanks = memory_region_length(REGION_GFX2) / 0x400000;
-	const UINT32 *spritebase = (const UINT32 *)memory_region(REGION_GFX2);
+	UINT8 numbanks = memory_region_length(machine, REGION_GFX2) / 0x400000;
+	const UINT32 *spritebase = (const UINT32 *)memory_region(machine, REGION_GFX2);
 
 	int indirect = data[0] & 0x2000;
 	int indlocal = data[0] & 0x1000;
@@ -1897,7 +1897,7 @@ bail:
 
 
 
-static void sprite_render_list(void)
+static void sprite_render_list(running_machine *machine)
 {
 	rectangle outerclip, clipin, clipout;
 	int xoffs = 0, yoffs = 0;
@@ -1928,7 +1928,7 @@ static void sprite_render_list(void)
 		{
 			/* command 0 = draw sprite */
 			case 0:
-				spritenum += 1 + draw_one_sprite(sprite, xoffs, yoffs, &clipin, &clipout);
+				spritenum += 1 + draw_one_sprite(machine, sprite, xoffs, yoffs, &clipin, &clipout);
 				break;
 
 			/* command 1 = set clipping */

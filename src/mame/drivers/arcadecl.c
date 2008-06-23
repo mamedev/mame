@@ -423,7 +423,7 @@ static DRIVER_INIT( arcadecl )
 static DRIVER_INIT( sparkz )
 {
 	atarigen_eeprom_default = NULL;
-	memset(memory_region(REGION_GFX1), 0, memory_region_length(REGION_GFX1));
+	memset(memory_region(machine, REGION_GFX1), 0, memory_region_length(machine, REGION_GFX1));
 }
 
 

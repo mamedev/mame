@@ -234,7 +234,7 @@ MACHINE_DRIVER_END
 static DRIVER_INIT(kinstb)
 {
 	INT32 i;
-	UINT8 *rom = memory_region(REGION_USER3);
+	UINT8 *rom = memory_region(machine, REGION_USER3);
 
 	for(i=0;i<0x400000;i++)
 	{

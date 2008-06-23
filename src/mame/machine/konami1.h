@@ -1,1 +1,1 @@
-UINT8 *konami1_decode(int cpu);
+UINT8 *konami1_decode(running_machine *machine, int cpu);

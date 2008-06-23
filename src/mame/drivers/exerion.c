@@ -64,7 +64,7 @@ static READ8_HANDLER( exerion_porta_r )
 static WRITE8_HANDLER( exerion_portb_w )
 {
 	/* pull the expected value from the ROM */
-	porta = memory_region(REGION_CPU1)[0x5f76];
+	porta = memory_region(machine, REGION_CPU1)[0x5f76];
 	portb = data;
 
 	logerror("Port B = %02X\n", data);
@@ -74,7 +74,7 @@ static WRITE8_HANDLER( exerion_portb_w )
 static READ8_HANDLER( exerion_protection_r )
 {
 	if (activecpu_get_pc() == 0x4143)
-		return memory_region(REGION_CPU1)[0x33c0 + (exerion_ram[0xd] << 2) + offset];
+		return memory_region(machine, REGION_CPU1)[0x33c0 + (exerion_ram[0xd] << 2) + offset];
 	else
 		return exerion_ram[0x8 + offset];
 }
@@ -422,8 +422,8 @@ static DRIVER_INIT( exerion )
 
 	/* make a temporary copy of the character data */
 	src = temp;
-	dst = memory_region(REGION_GFX1);
-	length = memory_region_length(REGION_GFX1);
+	dst = memory_region(machine, REGION_GFX1);
+	length = memory_region_length(machine, REGION_GFX1);
 	memcpy(src, dst, length);
 
 	/* decode the characters */
@@ -440,8 +440,8 @@ static DRIVER_INIT( exerion )
 
 	/* make a temporary copy of the sprite data */
 	src = temp;
-	dst = memory_region(REGION_GFX2);
-	length = memory_region_length(REGION_GFX2);
+	dst = memory_region(machine, REGION_GFX2);
+	length = memory_region_length(machine, REGION_GFX2);
 	memcpy(src, dst, length);
 
 	/* decode the sprites */
@@ -463,7 +463,7 @@ static DRIVER_INIT( exerion )
 
 static DRIVER_INIT( exerionb )
 {
-	UINT8 *ram = memory_region(REGION_CPU1);
+	UINT8 *ram = memory_region(machine, REGION_CPU1);
 	int addr;
 
 	/* the program ROMs have data lines D1 and D2 swapped. Decode them. */

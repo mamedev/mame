@@ -103,7 +103,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( playch10 )
 {
-	const UINT8 *bios = memory_region(REGION_CPU1);
+	const UINT8 *bios = memory_region(machine, REGION_CPU1);
 	pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
 
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
@@ -114,7 +114,7 @@ VIDEO_START( playch10 )
 
 VIDEO_START( playch10_hboard )
 {
-	const UINT8 *bios = memory_region(REGION_CPU1);
+	const UINT8 *bios = memory_region(machine, REGION_CPU1);
 	pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
 
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,

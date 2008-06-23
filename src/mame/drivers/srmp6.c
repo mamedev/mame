@@ -341,7 +341,7 @@ static WRITE16_HANDLER( video_regs_w )
 		case 0x5e/2: // bank switch, used by ROM check
 			LOG(("%x\n",data));
 
-			memory_set_bankptr(1,(UINT16 *)(memory_region(REGION_USER2) + (data & 0x0f)*0x200000));
+			memory_set_bankptr(1,(UINT16 *)(memory_region(machine, REGION_USER2) + (data & 0x0f)*0x200000));
 			break;
 
 		// set by IT4
@@ -424,7 +424,7 @@ static WRITE16_HANDLER(srmp6_dma_w)
 	COMBINE_DATA(&dmaram[offset]);
 	if(offset==13 && dmaram[offset]==0x40)
 	{
-		const UINT8 *rom = memory_region(REGION_USER2);
+		const UINT8 *rom = memory_region(machine, REGION_USER2);
 		UINT32 srctab=2*((((UINT32)dmaram[5])<<16)|dmaram[4]);
 		UINT32 srcdata=2*((((UINT32)dmaram[11])<<16)|dmaram[10]);
 		UINT32 len=4*(((((UINT32)dmaram[7]&3)<<16)|dmaram[6])+1); //??? WRONG!

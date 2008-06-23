@@ -633,7 +633,7 @@ ROM_END
 
 INLINE void generic_decode(int region, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0)
 {
-	UINT16 *rom = (UINT16 *)memory_region(region);
+	UINT16 *rom = (UINT16 *)memory_region(Machine, region);
 	int i;
 
 	/* only the low byte of ROMs are encrypted in these games */
@@ -671,10 +671,10 @@ static void arcadia_init(void)
 
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(REGION_USER1), 0);
+	memory_configure_bank(1, 1, 1, memory_region(Machine, REGION_USER1), 0);
 
 	/* OnePlay bios is encrypted, TenPlay is not */
-	biosrom = (UINT16 *)memory_region(REGION_USER2);
+	biosrom = (UINT16 *)memory_region(Machine, REGION_USER2);
 	if (biosrom[0] != 0x4afc)
 		generic_decode(REGION_USER2, 6, 1, 0, 2, 3, 4, 5, 7);
 }

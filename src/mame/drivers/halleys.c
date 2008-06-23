@@ -1099,7 +1099,7 @@ static PALETTE_INIT( halleys )
 	}
 }
 
-static void halleys_decode_rgb(UINT32 *r, UINT32 *g, UINT32 *b, int addr, int data)
+static void halleys_decode_rgb(running_machine *machine, UINT32 *r, UINT32 *g, UINT32 *b, int addr, int data)
 {
 /*
     proms contain:
@@ -1116,7 +1116,7 @@ static void halleys_decode_rgb(UINT32 *r, UINT32 *g, UINT32 *b, int addr, int da
 	sram_189 = paletteram;
 
 	// each of the three 32-byte 6330 PROM is wired to an RGB component output
-	prom_6330 = memory_region(REGION_PROMS);
+	prom_6330 = memory_region(machine, REGION_PROMS);
 
 	// latch1 holds 8 bits from the selected palette RAM address
 	latch1_273 = sram_189[addr];
@@ -1168,7 +1168,7 @@ static WRITE8_HANDLER( halleys_paletteram_IIRRGGBB_w )
 	palette_set_color(machine, offset+SP_ALPHA, MAKE_RGB(r, g, b));
 	palette_set_color(machine, offset+SP_COLLD, MAKE_RGB(r, g, b));
 
-	halleys_decode_rgb(&r, &g, &b, offset, 0);
+	halleys_decode_rgb(machine, &r, &g, &b, offset, 0);
 	palette_set_color(machine, offset+0x20, MAKE_RGB(r, g, b));
 }
 
@@ -2146,7 +2146,7 @@ ROM_END
 //**************************************************************************
 // Driver Initializations
 
-static void init_common(void)
+static void init_common(running_machine *machine)
 {
 	UINT8 *buf, *rom;
 	int addr, i;
@@ -2181,7 +2181,7 @@ static void init_common(void)
 
 
 	// decrypt main program ROM
-	rom = cpu1_base = memory_region(REGION_CPU1);
+	rom = cpu1_base = memory_region(machine, REGION_CPU1);
 	buf = gfx1_base;
 
 	for (i=0; i<0x10000; i++)
@@ -2194,7 +2194,7 @@ static void init_common(void)
 
 
 	// swap graphics ROM addresses and unpack each pixel
-	rom = memory_region(REGION_GFX1);
+	rom = memory_region(machine, REGION_GFX1);
 	buf = gfx_plane02;
 
 	for (i=0xffff; i>=0; i--)
@@ -2230,7 +2230,7 @@ static DRIVER_INIT( benberob )
 {
 	game_id = GAME_BENBEROB;
 
-	init_common();
+	init_common(machine);
 
 	blitter_reset_timer = timer_alloc(blitter_reset, NULL);
 }
@@ -2241,7 +2241,7 @@ static DRIVER_INIT( halleys )
 	game_id = GAME_HALLEYS;
 	halleys_collision_detection = 0xb114;
 
-	init_common();
+	init_common(machine);
 }
 
 static DRIVER_INIT( halley87 )
@@ -2249,7 +2249,7 @@ static DRIVER_INIT( halley87 )
 	game_id = GAME_HALLEYS;
 	halleys_collision_detection = 0xb10d;
 
-	init_common();
+	init_common(machine);
 }
 
 

@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/konami/konami.h"
 #include "cpu/z80/z80.h"
 #include "video/konamiic.h"
@@ -484,7 +485,7 @@ ROM_END
 
 static void k88games_banking( int lines )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(Machine, REGION_CPU1);
 	int offs;
 
 logerror("%04x: bank select %02x\n",activecpu_get_pc(),lines);
@@ -525,7 +526,7 @@ logerror("%04x: bank select %02x\n",activecpu_get_pc(),lines);
 static MACHINE_RESET( 88games )
 {
 	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)k88games_banking);
-	paletteram = &memory_region(REGION_CPU1)[0x20000];
+	paletteram = &memory_region(machine, REGION_CPU1)[0x20000];
 }
 
 

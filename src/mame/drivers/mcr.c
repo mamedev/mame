@@ -2427,7 +2427,7 @@ static void mcr_init(int cpuboard, int vidboard, int ssioboard)
 static DRIVER_INIT( solarfox )
 {
 	mcr_init(90009, 91399, 90908);
-	mcr_sound_init(MCR_SSIO);
+	mcr_sound_init(machine, MCR_SSIO);
 
 	ssio_set_custom_input(0, 0x1c, solarfox_ip0_r);
 	ssio_set_custom_input(1, 0xff, solarfox_ip1_r);
@@ -2439,7 +2439,7 @@ static DRIVER_INIT( solarfox )
 static DRIVER_INIT( kick )
 {
 	mcr_init(90009, 91399, 90908);
-	mcr_sound_init(MCR_SSIO);
+	mcr_sound_init(machine, MCR_SSIO);
 
 	ssio_set_custom_input(1, 0xf0, kick_ip1_r);
 
@@ -2450,14 +2450,14 @@ static DRIVER_INIT( kick )
 static DRIVER_INIT( mcr_90010 )
 {
 	mcr_init(90010, 91399, 90913);
-	mcr_sound_init(MCR_SSIO);
+	mcr_sound_init(machine, MCR_SSIO);
 }
 
 
 static DRIVER_INIT( wacko )
 {
 	mcr_init(90010, 91399, 90913);
-	mcr_sound_init(MCR_SSIO);
+	mcr_sound_init(machine, MCR_SSIO);
 
 	ssio_set_custom_input(1, 0xff, wacko_ip1_r);
 	ssio_set_custom_input(2, 0xff, wacko_ip2_r);
@@ -2468,7 +2468,7 @@ static DRIVER_INIT( wacko )
 static DRIVER_INIT( twotiger )
 {
 	mcr_init(90010, 91399, 90913);
-	mcr_sound_init(MCR_SSIO);
+	mcr_sound_init(machine, MCR_SSIO);
 
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xefff, 0, 0x1000, twotiger_videoram_r, twotiger_videoram_w);
 }
@@ -2477,7 +2477,7 @@ static DRIVER_INIT( twotiger )
 static DRIVER_INIT( kroozr )
 {
 	mcr_init(90010, 91399, 91483);
-	mcr_sound_init(MCR_SSIO);
+	mcr_sound_init(machine, MCR_SSIO);
 
 	ssio_set_custom_input(1, 0x47, kroozr_ip1_r);
 	ssio_set_custom_output(4, 0x34, kroozr_op4_w);
@@ -2487,7 +2487,7 @@ static DRIVER_INIT( kroozr )
 static DRIVER_INIT( journey )
 {
 	mcr_init(91475, 91464, 90913);
-	mcr_sound_init(MCR_SSIO);
+	mcr_sound_init(machine, MCR_SSIO);
 
 	ssio_set_custom_output(4, 0x01, journey_op4_w);
 }
@@ -2496,14 +2496,14 @@ static DRIVER_INIT( journey )
 static DRIVER_INIT( mcr_91490 )
 {
 	mcr_init(91490, 91464, 90913);
-	mcr_sound_init(MCR_SSIO);
+	mcr_sound_init(machine, MCR_SSIO);
 }
 
 
 static DRIVER_INIT( dotrone )
 {
 	mcr_init(91490, 91464, 91657);
-	mcr_sound_init(MCR_SSIO | MCR_SQUAWK_N_TALK);
+	mcr_sound_init(machine, MCR_SSIO | MCR_SQUAWK_N_TALK);
 
 	ssio_set_custom_output(4, 0xff, dotron_op4_w);
 }
@@ -2512,7 +2512,7 @@ static DRIVER_INIT( dotrone )
 static DRIVER_INIT( nflfoot )
 {
 	mcr_init(91490, 91464, 91657);
-	mcr_sound_init(MCR_SSIO | MCR_SQUAWK_N_TALK);
+	mcr_sound_init(machine, MCR_SSIO | MCR_SQUAWK_N_TALK);
 
 	ssio_set_custom_input(2, 0x80, nflfoot_ip2_r);
 	ssio_set_custom_output(4, 0xff, nflfoot_op4_w);
@@ -2532,7 +2532,7 @@ static DRIVER_INIT( nflfoot )
 static DRIVER_INIT( demoderb )
 {
 	mcr_init(91490, 91464, 90913);
-	mcr_sound_init(MCR_SSIO | MCR_TURBO_CHIP_SQUEAK);
+	mcr_sound_init(machine, MCR_SSIO | MCR_TURBO_CHIP_SQUEAK);
 
 	ssio_set_custom_input(1, 0xfc, demoderb_ip1_r);
 	ssio_set_custom_input(2, 0xfc, demoderb_ip2_r);

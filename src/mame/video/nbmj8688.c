@@ -33,7 +33,7 @@ static int HD61830B_addr[2];
 
 
 static void mjsikaku_vramflip(void);
-static void mbmj8688_gfxdraw(int gfxtype);
+static void mbmj8688_gfxdraw(running_machine *machine, int gfxtype);
 
 
 /* the blitter can copy data both in "direct" mode, where every byte of the source
@@ -145,7 +145,7 @@ WRITE8_HANDLER( nbmj8688_blitter_w )
 		case 0x04:	blitter_sizex = data; break;
 		case 0x05:	blitter_sizey = data;
 					/* writing here also starts the blit */
-					mbmj8688_gfxdraw(mjsikaku_gfxmode);
+					mbmj8688_gfxdraw(machine, mjsikaku_gfxmode);
 					break;
 		case 0x06:	blitter_direction_x = (data & 0x01) ? 1 : 0;
 					blitter_direction_y = (data & 0x02) ? 1 : 0;
@@ -184,7 +184,7 @@ WRITE8_HANDLER( mjsikaku_scrolly_w )
 
 WRITE8_HANDLER( mjsikaku_romsel_w )
 {
-	int gfxlen = memory_region_length(REGION_GFX1);
+	int gfxlen = memory_region_length(machine, REGION_GFX1);
 	mjsikaku_gfxrom = (data & 0x0f);
 
 	if ((mjsikaku_gfxrom << 17) > (gfxlen - 1))
@@ -198,7 +198,7 @@ WRITE8_HANDLER( mjsikaku_romsel_w )
 
 WRITE8_HANDLER( secolove_romsel_w )
 {
-	int gfxlen = memory_region_length(REGION_GFX1);
+	int gfxlen = memory_region_length(machine, REGION_GFX1);
 	mjsikaku_gfxrom = ((data & 0xc0) >> 4) + (data & 0x03);
 	mjsikaku_gfxflag2_w(machine, 0, data);
 
@@ -213,7 +213,7 @@ WRITE8_HANDLER( secolove_romsel_w )
 
 WRITE8_HANDLER( crystalg_romsel_w )
 {
-	int gfxlen = memory_region_length(REGION_GFX1);
+	int gfxlen = memory_region_length(machine, REGION_GFX1);
 	mjsikaku_gfxrom = (data & 0x03);
 	mjsikaku_gfxflag2_w(machine, 0, data);
 
@@ -228,7 +228,7 @@ WRITE8_HANDLER( crystalg_romsel_w )
 
 WRITE8_HANDLER( seiha_romsel_w )
 {
-	int gfxlen = memory_region_length(REGION_GFX1);
+	int gfxlen = memory_region_length(machine, REGION_GFX1);
 	mjsikaku_gfxrom = (data & 0x1f);
 	mjsikaku_gfxflag3_w(machine, 0, data);
 
@@ -294,9 +294,9 @@ static TIMER_CALLBACK( blitter_timer_callback )
 	nb1413m3_busyflag = 1;
 }
 
-static void mbmj8688_gfxdraw(int gfxtype)
+static void mbmj8688_gfxdraw(running_machine *machine, int gfxtype)
 {
-	UINT8 *GFX = memory_region(REGION_GFX1);
+	UINT8 *GFX = memory_region(machine, REGION_GFX1);
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -339,7 +339,7 @@ static void mbmj8688_gfxdraw(int gfxtype)
 		skipy = -1;
 	}
 
-	gfxlen = memory_region_length(REGION_GFX1);
+	gfxlen = memory_region_length(machine, REGION_GFX1);
 	gfxaddr = (mjsikaku_gfxrom << 17) + (blitter_src_addr << 1);
 //popmessage("ADDR:%08X DX:%03d DY:%03d SX:%03d SY:%03d", gfxaddr, startx, starty, sizex, sizey);
 //if (blitter_direction_x|blitter_direction_y) popmessage("ADDR:%08X FX:%01d FY:%01d", gfxaddr, blitter_direction_x, blitter_direction_y);

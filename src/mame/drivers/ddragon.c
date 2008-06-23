@@ -173,7 +173,7 @@ static TIMER_CALLBACK( ddragon_scanline_callback )
 static MACHINE_START( ddragon )
 {
 	/* configure banks */
-	memory_configure_bank(1, 0, 8, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 8, memory_region(machine, REGION_CPU1) + 0x10000, 0x4000);
 
 	/* allocate timer for scanlines */
 	scanline_timer = timer_alloc(ddragon_scanline_callback, NULL);
@@ -473,7 +473,7 @@ static void dd_adpcm_int(running_machine *machine, int chip)
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(REGION_SOUND1) + 0x10000 * chip;
+		UINT8 *ROM = memory_region(machine, REGION_SOUND1) + 0x10000 * chip;
 
 		adpcm_data[chip] = ROM[adpcm_pos[chip]++];
 		MSM5205_data_w(chip,adpcm_data[chip] >> 4);
@@ -1903,26 +1903,26 @@ static DRIVER_INIT( toffy )
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3808, 0x3808, 0, 0, toffy_bankswitch_w);
 
 	/* the program rom has a simple bitswap encryption */
-	rom = memory_region(REGION_CPU1);
-	length = memory_region_length(REGION_CPU1);
+	rom = memory_region(machine, REGION_CPU1);
+	length = memory_region_length(machine, REGION_CPU1);
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 6,7,5,4,3,2,1,0);
 
 	/* and the fg gfx ... */
-	rom = memory_region(REGION_GFX1);
-	length = memory_region_length(REGION_GFX1);
+	rom = memory_region(machine, REGION_GFX1);
+	length = memory_region_length(machine, REGION_GFX1);
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0);
 
 	/* and the sprites gfx */
-	rom = memory_region(REGION_GFX2);
-	length = memory_region_length(REGION_GFX2);
+	rom = memory_region(machine, REGION_GFX2);
+	length = memory_region_length(machine, REGION_GFX2);
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 7,6,5,4,3,2,0,1);
 
 	/* and the bg gfx */
-	rom = memory_region(REGION_GFX3);
-	length = memory_region_length(REGION_GFX3);
+	rom = memory_region(machine, REGION_GFX3);
+	length = memory_region_length(machine, REGION_GFX3);
 	for (i = 0; i < length / 2; i++)
 	{
 		rom[i + 0*length/2] = BITSWAP8(rom[i + 0*length/2], 7,6,1,4,3,2,5,0);

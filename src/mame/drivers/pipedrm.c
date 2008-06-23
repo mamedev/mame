@@ -124,11 +124,11 @@ static UINT8 sound_command;
 static MACHINE_RESET( pipedrm )
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(1, 0, 8, memory_region(REGION_CPU1) + 0x10000, 0x2000);
+	memory_configure_bank(1, 0, 8, memory_region(machine, REGION_CPU1) + 0x10000, 0x2000);
 	memory_set_bank(1, 0);
 
 	/* initialize sound bank */
-	memory_configure_bank(2, 0, 2, memory_region(REGION_CPU2) + 0x10000, 0x8000);
+	memory_configure_bank(2, 0, 2, memory_region(machine, REGION_CPU2) + 0x10000, 0x8000);
 	memory_set_bank(2, 0);
 	/* state save */
 	state_save_register_global(pending_command);

@@ -715,7 +715,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( undrfire )
 {
-	taito_f3_soundsystem_reset();
+	taito_f3_soundsystem_reset(machine);
 
 	f3_68681_reset();
 }
@@ -964,8 +964,8 @@ ROM_END
 static DRIVER_INIT( undrfire )
 {
 	UINT32 offset,i;
-	UINT8 *gfx = memory_region(REGION_GFX3);
-	int size=memory_region_length(REGION_GFX3);
+	UINT8 *gfx = memory_region(machine, REGION_GFX3);
+	int size=memory_region_length(machine, REGION_GFX3);
 	int data;
 
 	/* make piv tile GFX format suitable for gfxdecode */
@@ -993,8 +993,8 @@ static DRIVER_INIT( undrfire )
 static DRIVER_INIT( cbombers )
 {
 	UINT32 offset,i;
-	UINT8 *gfx = memory_region(REGION_GFX3);
-	int size=memory_region_length(REGION_GFX3);
+	UINT8 *gfx = memory_region(machine, REGION_GFX3);
+	int size=memory_region_length(machine, REGION_GFX3);
 	int data;
 
 

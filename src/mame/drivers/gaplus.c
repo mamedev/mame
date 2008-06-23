@@ -201,25 +201,25 @@ static const struct namcoio_interface intf1 =
 };
 /* TODO: chip #2: test/cocktail, optional buttons */
 
-static void unpack_gfx(void);
+static void unpack_gfx(running_machine *machine);
 
 static DRIVER_INIT( 56_58 )
 {
-	unpack_gfx();
+	unpack_gfx(machine);
 	namcoio_init(0, NAMCOIO_56XX, &intf0);
 	namcoio_init(1, NAMCOIO_58XX, &intf1);
 }
 
 static DRIVER_INIT( 56_58l )
 {
-	unpack_gfx();
+	unpack_gfx(machine);
 	namcoio_init(0, NAMCOIO_56XX, &intf0_lamps);
 	namcoio_init(1, NAMCOIO_58XX, &intf1);
 }
 
 static DRIVER_INIT( 58_56 )
 {
-	unpack_gfx();
+	unpack_gfx(machine);
 	namcoio_init(0, NAMCOIO_58XX, &intf0);
 	namcoio_init(1, NAMCOIO_56XX, &intf1);
 }
@@ -823,16 +823,16 @@ ROM_START( galaga3m )
 ROM_END
 
 
-static void unpack_gfx(void)
+static void unpack_gfx(running_machine *machine)
 {
 	UINT8 *rom;
 	int i;
 
-	rom = memory_region(REGION_GFX1);
+	rom = memory_region(machine, REGION_GFX1);
 	for (i = 0;i < 0x2000;i++)
 		rom[i + 0x2000] = rom[i] >> 4;
 
-	rom = memory_region(REGION_GFX2) + 0x6000;
+	rom = memory_region(machine, REGION_GFX2) + 0x6000;
 	for (i = 0;i < 0x2000;i++)
 		rom[i + 0x2000] = rom[i] << 4;
 }

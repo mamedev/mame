@@ -70,7 +70,7 @@ PALETTE_INIT( magmax )
 VIDEO_START( magmax )
 {
 	int i,v;
-	UINT8 * prom14D = memory_region(REGION_USER2);
+	UINT8 * prom14D = memory_region(machine, REGION_USER2);
 
 	/* Set up save state */
 	state_save_register_global(flipscreen);
@@ -102,7 +102,7 @@ VIDEO_UPDATE( magmax )
 	else
 	{
 		int v;
-		UINT8 * rom18B = memory_region(REGION_USER1);
+		UINT8 * rom18B = memory_region(screen->machine, REGION_USER1);
 		UINT32 scroll_h = (*magmax_scroll_x) & 0x3fff;
 		UINT32 scroll_v = (*magmax_scroll_y) & 0xff;
 

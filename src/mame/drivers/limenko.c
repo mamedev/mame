@@ -193,8 +193,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	int i;
 	int sprites_on_screen = (limenko_videoreg[0] & 0x1ff0000) >> 16;
 
-	UINT8 *base_gfx	= memory_region(REGION_GFX1);
-	UINT8 *gfx_max	= base_gfx + memory_region_length(REGION_GFX1);
+	UINT8 *base_gfx	= memory_region(machine, REGION_GFX1);
+	UINT8 *gfx_max	= base_gfx + memory_region_length(machine, REGION_GFX1);
 
 	UINT8 *gfxdata;
 	gfx_element gfx;
@@ -859,8 +859,8 @@ static DRIVER_INIT( sb2003 )
 
 static DRIVER_INIT( spotty )
 {
-	UINT8 *dst    = memory_region(REGION_GFX1);
-	UINT8 *src    = memory_region(REGION_USER2);
+	UINT8 *dst    = memory_region(machine, REGION_GFX1);
+	UINT8 *src    = memory_region(machine, REGION_USER2);
 	int x;
 
 	/* expand 4bpp roms to 8bpp space */

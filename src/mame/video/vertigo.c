@@ -210,13 +210,13 @@ static microcode mc[MC_LENGTH];
  *
  *************************************/
 
-void vertigo_vproc_init(void)
+void vertigo_vproc_init(running_machine *machine)
 {
 	int i;
 	UINT64 *mcode;
 
-	vertigo_vectorrom = (UINT16 *)memory_region(REGION_USER1);
-	mcode = (UINT64 *)memory_region(REGION_PROMS);
+	vertigo_vectorrom = (UINT16 *)memory_region(machine, REGION_USER1);
+	mcode = (UINT64 *)memory_region(machine, REGION_PROMS);
 
 	/* Decode microcode */
 	for (i = 0; i < MC_LENGTH; i++)

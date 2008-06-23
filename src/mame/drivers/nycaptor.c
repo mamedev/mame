@@ -287,7 +287,7 @@ static READ8_HANDLER ( nycaptor_generic_control_r )
 static WRITE8_HANDLER( nycaptor_generic_control_w )
 {
 	generic_control_reg = data;
-	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x10000 + ((data&0x08)>>3)*0x4000 );
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x10000 + ((data&0x08)>>3)*0x4000 );
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -432,7 +432,7 @@ static WRITE8_HANDLER( cyclshtg_generic_control_w )
 {
 	int bank=(data>>2)&3;
 	generic_control_reg = data;
-	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x10000 + bank*0x4000 );
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x10000 + bank*0x4000 );
 }
 
 
@@ -1285,7 +1285,7 @@ ROM_END
 static DRIVER_INIT(bronx)
 {
 	int i;
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	for(i=0;i<0x20000;i++)
 		rom[i]=BITSWAP8(rom[i],0,1,2,3,4,5,6,7);
 	nyc_gametype=1;
@@ -1294,7 +1294,7 @@ static DRIVER_INIT(bronx)
 static DRIVER_INIT(colt)
 {
 	int i;
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	for(i=0;i<0x20000;i++)
 		rom[i]=BITSWAP8(rom[i],0,1,2,3,4,5,6,7);
 	nyc_gametype=2;

@@ -353,12 +353,12 @@ INLINE void blitter_plot_pixel(int layer,int mask, int x, int y, int pen, int wr
 }
 
 
-static int blitter_drawgfx( int layer, int mask, int gfx, int src, int pen, int x, int y, int wrap, int flags )
+static int blitter_drawgfx( running_machine *machine, int layer, int mask, int gfx, int src, int pen, int x, int y, int wrap, int flags )
 {
 	UINT8 cmd;
 
-	UINT8 *ROM		=	memory_region( gfx );
-	size_t ROM_size	=	memory_region_length( gfx );
+	UINT8 *ROM		=	memory_region( machine, gfx );
+	size_t ROM_size	=	memory_region_length( machine, gfx );
 
 	int sx;
 
@@ -511,6 +511,7 @@ static void dynax_blitter_start(running_machine *machine, int flags)
 
 	blit_newsrc =
 		blitter_drawgfx(
+			machine,
 			0,						// layer
 			dynax_blit_dest,		// layer mask
 			dynax_blit_romregion,	// rom region
@@ -540,6 +541,7 @@ static void jantouki_blitter_start(running_machine *machine, int flags)
 
 	blit_newsrc =
 		blitter_drawgfx(
+			machine,
 			0,						// layer
 			dynax_blit_dest,		// layer mask
 			dynax_blit_romregion,	// rom region
@@ -569,6 +571,7 @@ static void jantouki_blitter2_start(running_machine *machine, int flags)
 
 	blit2_newsrc =
 		blitter_drawgfx(
+			machine,
 			4,							// layer
 			dynax_blit2_dest,			// layer mask
 			dynax_blit2_romregion,		// rom region
@@ -1072,14 +1075,14 @@ static int debug_mask(void)
     I,O        -  Change palette (-,+)
     J,K & N,M  -  Change "tile"  (-,+, slow & fast)
     R          -  move "tile" to the next 1/8th of the gfx  */
-static int debug_viewer(bitmap_t *bitmap,const rectangle *cliprect)
+static int debug_viewer(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 #ifdef MAME_DEBUG
 	static int toggle;
 	if (input_code_pressed_once(KEYCODE_T))	toggle = 1-toggle;
 	if (toggle)	{
-		UINT8 *RAM	=	memory_region( REGION_GFX1 );
-		size_t size		=	memory_region_length( REGION_GFX1 );
+		UINT8 *RAM	=	memory_region( machine, REGION_GFX1 );
+		size_t size		=	memory_region_length( machine, REGION_GFX1 );
 		static int i = 0, c = 0, r = 0;
 
 		if (input_code_pressed_once(KEYCODE_I))	c = (c-1) & 0x1f;
@@ -1098,7 +1101,7 @@ static int debug_viewer(bitmap_t *bitmap,const rectangle *cliprect)
 		if (layer_layout != LAYOUT_MJDIALQ2)
 			memset(dynax_pixmap[0][1],0,sizeof(UINT8)*0x100*0x100);
 		for (hanamai_layer_half = 0; hanamai_layer_half < 2; hanamai_layer_half++)
-			blitter_drawgfx(0,1,REGION_GFX1,i,0,cliprect->min_x,cliprect->min_y,3,0);
+			blitter_drawgfx(machine,0,1,REGION_GFX1,i,0,cliprect->min_x,cliprect->min_y,3,0);
 		if (layer_layout != LAYOUT_MJDIALQ2)	hanamai_copylayer(bitmap, cliprect, 0);
 		else									mjdialq2_copylayer(bitmap,cliprect, 0);
 		popmessage("%06X C%02X",i,c);
@@ -1116,7 +1119,7 @@ VIDEO_UPDATE( hanamai )
 	int layers_ctrl = ~dynax_layer_enable;
 	int lay[4];
 
-	if (debug_viewer(bitmap,cliprect))	return 0;
+	if (debug_viewer(screen->machine,bitmap,cliprect))	return 0;
 	layers_ctrl &= debug_mask();
 
 	fillbitmap(
@@ -1152,7 +1155,7 @@ VIDEO_UPDATE( hnoridur )
 	int lay[4];
 	int pri;
 
-	if (debug_viewer(bitmap,cliprect))	return 0;
+	if (debug_viewer(screen->machine,bitmap,cliprect))	return 0;
 	layers_ctrl &= debug_mask();
 
 	fillbitmap(
@@ -1187,7 +1190,7 @@ VIDEO_UPDATE( sprtmtch )
 {
 	int layers_ctrl = ~dynax_layer_enable;
 
-	if (debug_viewer(bitmap,cliprect))	return 0;
+	if (debug_viewer(screen->machine,bitmap,cliprect))	return 0;
 	layers_ctrl &= debug_mask();
 
 	fillbitmap(
@@ -1208,7 +1211,7 @@ VIDEO_UPDATE( jantouki )
 	const device_config *top_screen    = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "top");
 	const device_config *bottom_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "bottom");
 
-	if (debug_viewer(bitmap,cliprect))	return 0;
+	if (debug_viewer(screen->machine,bitmap,cliprect))	return 0;
 	layers_ctrl &= debug_mask();
 
 	fillbitmap(
@@ -1239,7 +1242,7 @@ VIDEO_UPDATE( mjdialq2 )
 {
 	int layers_ctrl = ~dynax_layer_enable;
 
-	if (debug_viewer(bitmap,cliprect))	return 0;
+	if (debug_viewer(screen->machine,bitmap,cliprect))	return 0;
 	layers_ctrl &= debug_mask();
 
 	fillbitmap(

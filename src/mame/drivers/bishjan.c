@@ -481,7 +481,7 @@ ROM_END
 
 static DRIVER_INIT(bishjan)
 {
-	UINT16 *rom = (UINT16*)memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16*)memory_region(machine, REGION_CPU1);
 
 	// check
 	rom[0x042EA/2] = 0x4008;

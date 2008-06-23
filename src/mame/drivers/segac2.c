@@ -148,8 +148,8 @@ static MACHINE_RESET( segac2 )
 
 	/* determine how many sound banks */
 	sound_banks = 0;
-	if (memory_region(REGION_SOUND1))
-		sound_banks = memory_region_length(REGION_SOUND1) / 0x20000;
+	if (memory_region(machine, REGION_SOUND1))
+		sound_banks = memory_region_length(machine, REGION_SOUND1) / 0x20000;
 
 	/* reset the protection */
 	prot_write_buf = 0;
@@ -2160,7 +2160,7 @@ static DRIVER_INIT( ichirj )
 static DRIVER_INIT( ichirjbl )
 {
 	/* when did this actually work? - the protection is patched but the new check fails? */
-	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
 	rom[0x390/2] = 0x6600;
 }
 

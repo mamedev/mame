@@ -59,7 +59,7 @@ static WRITE8_HANDLER( rom_bank_select_w )
 static MACHINE_START( crgolf )
 {
 	/* configure the banking */
-	memory_configure_bank(1, 0, 16, memory_region(REGION_CPU1) + 0x10000, 0x2000);
+	memory_configure_bank(1, 0, 16, memory_region(machine, REGION_CPU1) + 0x10000, 0x2000);
 	memory_set_bank(1, 0);
 
 	/* register for save states */
@@ -176,7 +176,7 @@ static void vck_callback(running_machine *machine, int data)
 	/* only play back if we have data remaining */
 	if (sample_count != 0xff)
 	{
-		UINT8 data = memory_region(REGION_SOUND1)[sample_offset >> 1];
+		UINT8 data = memory_region(machine, REGION_SOUND1)[sample_offset >> 1];
 
 		/* write the next nibble and advance */
 		MSM5205_data_w(0, (data >> (4 * (~sample_offset & 1))) & 0x0f);

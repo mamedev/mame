@@ -262,7 +262,7 @@ static WRITE8_HANDLER( z80ctrl_w )
 {
 	rng_z80_control = data;
 
-	memory_set_bankptr(2, memory_region(REGION_CPU2) + 0x10000 + (data & 0x07) * 0x4000);
+	memory_set_bankptr(2, memory_region(machine, REGION_CPU2) + 0x10000 + (data & 0x07) * 0x4000);
 
 	if (data & 0x10)
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);

@@ -810,15 +810,15 @@ static INTERRUPT_GEN( taitof2_interrupt )
                             SOUND
 ****************************************************************/
 
-static void reset_sound_region(void)
+static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr( 2, memory_region(REGION_CPU2) + (banknum * 0x4000) + 0x10000 );
+	memory_set_bankptr( 2, memory_region(machine, REGION_CPU2) + (banknum * 0x4000) + 0x10000 );
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	banknum = (data - 1) & 7;
-	reset_sound_region();
+	reset_sound_region(machine);
 
 #ifdef MAME_DEBUG
 	if (banknum>2) logerror("CPU #1 switch to ROM bank %06x: should only happen if Z80 prg rom is 128K!\n",banknum);
@@ -3857,7 +3857,7 @@ static const struct YM2203interface ym2203_interface =
 
 static STATE_POSTLOAD( f2_postload )
 {
-	reset_sound_region();
+	reset_sound_region(machine);
 }
 
 static MACHINE_START( f2 )
@@ -3869,7 +3869,7 @@ static MACHINE_START( f2 )
 static MACHINE_RESET( qcrayon )
 {
 	/* point to the extra ROM */
-	memory_set_bankptr(1,memory_region(REGION_USER1));
+	memory_set_bankptr(1,memory_region(machine, REGION_USER1));
 }
 
 
@@ -5865,7 +5865,7 @@ static DRIVER_INIT( finalb )
 	int i;
 	UINT8 data;
 	UINT32 offset;
-	UINT8 *gfx = memory_region(REGION_GFX2);
+	UINT8 *gfx = memory_region(machine, REGION_GFX2);
 
 	offset = 0x100000;
 	for (i = 0x180000; i<0x200000; i++)
@@ -5889,8 +5889,8 @@ static DRIVER_INIT( finalb )
 
 static DRIVER_INIT( mjnquest )
 {
-	int i, len = memory_region_length(REGION_GFX2);
-	UINT8 *gfx = memory_region(REGION_GFX2);
+	int i, len = memory_region_length(machine, REGION_GFX2);
+	UINT8 *gfx = memory_region(machine, REGION_GFX2);
 
 	/* the bytes in each longword are in reversed order, put them in the
        order used by the other games. */

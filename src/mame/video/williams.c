@@ -191,7 +191,7 @@ VIDEO_START( williams )
 
 VIDEO_START( blaster )
 {
-	blitter_init(williams_blitter_config, memory_region(REGION_PROMS));
+	blitter_init(williams_blitter_config, memory_region(machine, REGION_PROMS));
 	create_palette_lookup();
 	state_save_register();
 }

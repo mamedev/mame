@@ -27,6 +27,7 @@ Revisions:
 *********************************************************/
 #include <math.h>
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "iremga20.h"
 
@@ -236,8 +237,8 @@ static void *iremga20_start(int sndindex, int clock, const void *config)
 
 	/* Initialize our chip structure */
 	chip->intf = config;
-	chip->rom = memory_region(chip->intf->region);
-	chip->rom_size = memory_region_length(chip->intf->region);
+	chip->rom = memory_region(Machine, chip->intf->region);
+	chip->rom_size = memory_region_length(Machine, chip->intf->region);
 
 	iremga20_reset(chip);
 

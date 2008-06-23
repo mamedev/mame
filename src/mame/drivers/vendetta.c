@@ -87,6 +87,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/konamiic.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "machine/eeprom.h"
@@ -828,7 +829,7 @@ ROM_END
 
 static void vendetta_banking( int lines )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(Machine, REGION_CPU1);
 
 	if ( lines >= 0x1c )
 	{
@@ -842,11 +843,11 @@ static MACHINE_RESET( vendetta )
 {
 	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)vendetta_banking);
 
-	paletteram = &memory_region(REGION_CPU1)[0x48000];
+	paletteram = &memory_region(machine, REGION_CPU1)[0x48000];
 	irq_enabled = 0;
 
 	/* init banks */
-	memory_set_bankptr( 1, &memory_region(REGION_CPU1)[0x10000] );
+	memory_set_bankptr( 1, &memory_region(machine, REGION_CPU1)[0x10000] );
 	vendetta_video_banking( machine, 0 );
 }
 

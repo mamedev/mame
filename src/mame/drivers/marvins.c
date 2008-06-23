@@ -758,7 +758,7 @@ static DRIVER_INIT( madcrash )
     because of bit rot, so the rest of the test mode (what little there
     is) can be explored.
 
-    UINT8 *mem = memory_region(REGION_CPU1);
+    UINT8 *mem = memory_region(machine, REGION_CPU1);
     mem[0x3a5d] = 0; mem[0x3a5e] = 0; mem[0x3a5f] = 0;
 */
 	init_sound( 0x20 );

@@ -87,7 +87,7 @@ static void toki_adpcm_int (running_machine *machine, int data)
 static WRITE8_HANDLER( toki_adpcm_control_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 
 
 	/* the code writes either 2 or 3 in the bottom two bits */
@@ -731,7 +731,7 @@ ROM_END
 
 static DRIVER_INIT( toki )
 {
-	UINT8 *ROM = memory_region(REGION_SOUND1);
+	UINT8 *ROM = memory_region(machine, REGION_SOUND1);
 	UINT8 *buffer = malloc_or_die(0x20000);
 	int i;
 
@@ -743,7 +743,7 @@ static DRIVER_INIT( toki )
 
 	free(buffer);
 
-	seibu_sound_decrypt(REGION_CPU2,0x2000);
+	seibu_sound_decrypt(machine,REGION_CPU2,0x2000);
 }
 
 
@@ -754,14 +754,14 @@ static DRIVER_INIT( tokib )
 	UINT8 *rom;
 
 	/* invert the sprite data in the ROMs */
-	len = memory_region_length(REGION_GFX2);
-	rom = memory_region(REGION_GFX2);
+	len = memory_region_length(machine, REGION_GFX2);
+	rom = memory_region(machine, REGION_GFX2);
 	for (i = 0; i < len; i++)
 		rom[i] ^= 0xff;
 
 	/* merge background tile graphics together */
-		len = memory_region_length(REGION_GFX3);
-		rom = memory_region(REGION_GFX3);
+		len = memory_region_length(machine, REGION_GFX3);
+		rom = memory_region(machine, REGION_GFX3);
 		for (offs = 0; offs < len; offs += 0x20000)
 		{
 			UINT8 *base = &rom[offs];
@@ -774,8 +774,8 @@ static DRIVER_INIT( tokib )
 				memcpy (&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
 			}
 		}
-		len = memory_region_length(REGION_GFX4);
-		rom = memory_region(REGION_GFX4);
+		len = memory_region_length(machine, REGION_GFX4);
+		rom = memory_region(machine, REGION_GFX4);
 		for (offs = 0; offs < len; offs += 0x20000)
 		{
 			UINT8 *base = &rom[offs];
@@ -797,7 +797,7 @@ static DRIVER_INIT(jujub)
 	/* Program ROMs are bitswapped */
 	{
 		int i;
-		UINT16 *prgrom = (UINT16*)memory_region(REGION_CPU1);
+		UINT16 *prgrom = (UINT16*)memory_region(machine, REGION_CPU1);
 
 		for (i = 0; i < 0x60000/2; i++)
 		{
@@ -811,7 +811,7 @@ static DRIVER_INIT(jujub)
 	/* Decrypt data for z80 program */
 	{
 		UINT8 *decrypt = auto_malloc(0x20000);
-		UINT8 *rom = memory_region(REGION_CPU2);
+		UINT8 *rom = memory_region(machine, REGION_CPU2);
 		int i;
 
 		memcpy(decrypt,rom,0x20000);
@@ -826,7 +826,7 @@ static DRIVER_INIT(jujub)
 	}
 
 	{
-		UINT8 *ROM = memory_region(REGION_SOUND1);
+		UINT8 *ROM = memory_region(machine, REGION_SOUND1);
 		UINT8 *buffer = malloc_or_die(0x20000);
 		int i;
 

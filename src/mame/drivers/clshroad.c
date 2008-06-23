@@ -491,7 +491,7 @@ without this the death sequence never ends so the game is unplayable after you
 die once, it would be nice to avoid the hack however
 
 */
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	ROM[0x05C6] = 0xc3;
 	ROM[0x05C7] = 0x8d;

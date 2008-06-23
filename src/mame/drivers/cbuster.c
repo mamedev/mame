@@ -544,7 +544,7 @@ ROM_END
 
 static DRIVER_INIT( twocrude )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	UINT8 *PTR;
 	int i,j;
 
@@ -566,8 +566,8 @@ static DRIVER_INIT( twocrude )
 	}
 
 	/* Rearrange the 'extra' sprite bank to be in the same format as main sprites */
-	RAM = memory_region(REGION_GFX3) + 0x080000;
-	PTR = memory_region(REGION_GFX3) + 0x140000;
+	RAM = memory_region(machine, REGION_GFX3) + 0x080000;
+	PTR = memory_region(machine, REGION_GFX3) + 0x140000;
 	for (i=0; i<0x20000; i+=64) {
 		for (j=0; j<16; j+=1) { /* Copy 16 lines down */
 			RAM[i+      0+j*2]=PTR[i/2+      0+j]; /* Pixels 0-7 for each plane */

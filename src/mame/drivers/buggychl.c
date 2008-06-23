@@ -88,7 +88,7 @@ dcxx = /SPOSI (S36)
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bankptr(1,&memory_region(REGION_CPU1)[0x10000 + (data & 7) * 0x2000]);
+	memory_set_bankptr(1,&memory_region(machine, REGION_CPU1)[0x10000 + (data & 7) * 0x2000]);
 }
 
 

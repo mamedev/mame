@@ -44,7 +44,7 @@ WRITE8_HANDLER( bombjack_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *tilerom = memory_region(REGION_GFX4);
+	UINT8 *tilerom = memory_region(machine, REGION_GFX4);
 
 	int offs = (background_image & 0x07) * 0x200 + tile_index;
 	int code = (background_image & 0x10) ? tilerom[offs] : 0;

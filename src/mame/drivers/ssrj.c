@@ -49,7 +49,7 @@ static int oldport=0x80;
 
 static MACHINE_RESET(ssrj)
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	memset(&rom[0xc000],0,0x3fff); /* req for some control types */
 	oldport=0x80;
 }

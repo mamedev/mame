@@ -387,7 +387,7 @@ static DRIVER_INIT( rockduck )
 {
 	// rd2.rdh and rd1.rdj are bitswapped, but not rd3.rdg .. are they really from the same board?
 	int x;
-	UINT8 *src = memory_region( REGION_GFX1 );
+	UINT8 *src = memory_region( machine, REGION_GFX1 );
 
 	for (x=0x2000;x<0x6000;x++)
 	{

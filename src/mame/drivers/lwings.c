@@ -83,7 +83,7 @@ static WRITE8_HANDLER( lwings_bankswitch_w )
 	flip_screen_set(~data & 0x01);
 
 	/* bits 1 and 2 select ROM bank */
-	RAM = memory_region(REGION_CPU1);
+	RAM = memory_region(machine, REGION_CPU1);
 	bank = (data & 0x06) >> 1;
 	memory_set_bankptr(1,&RAM[0x10000 + bank*0x4000]);
 

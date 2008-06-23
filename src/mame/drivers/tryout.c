@@ -46,7 +46,7 @@ static WRITE8_HANDLER( tryout_sound_irq_ack_w )
 
 static WRITE8_HANDLER( tryout_bankswitch_w )
 {
- 	UINT8 *RAM = memory_region(REGION_CPU1);
+ 	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x01) * 0x2000;

@@ -425,8 +425,8 @@ static WRITE16_HANDLER( seta2_sound_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *ROM = memory_region( REGION_SOUND1 );
-		int banks = (memory_region_length( REGION_SOUND1 ) - 0x100000) / 0x20000;
+		UINT8 *ROM = memory_region( machine, REGION_SOUND1 );
+		int banks = (memory_region_length( machine, REGION_SOUND1 ) - 0x100000) / 0x20000;
 		if (data >= banks)
 		{
 			logerror("CPU #0 PC %06X: invalid sound bank %04X\n",activecpu_get_pc(),data);
@@ -681,7 +681,7 @@ ADDRESS_MAP_END
 static READ16_HANDLER( pzlbowl_protection_r )
 {
 	UINT32 address = (program_read_word(0x20ba16) << 16) | program_read_word(0x20ba18);
-	return memory_region(REGION_CPU1)[address - 2];
+	return memory_region(machine, REGION_CPU1)[address - 2];
 }
 
 static READ16_HANDLER( pzlbowl_coins_r )

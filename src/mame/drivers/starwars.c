@@ -556,17 +556,17 @@ static DRIVER_INIT( starwars )
 
 	/* prepare the mathbox */
 	starwars_is_esb = 0;
-	starwars_mproc_init();
+	starwars_mproc_init(machine);
 
 	/* initialize banking */
-	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1) + 0x6000, 0x10000 - 0x6000);
+	memory_configure_bank(1, 0, 2, memory_region(machine, REGION_CPU1) + 0x6000, 0x10000 - 0x6000);
 	memory_set_bank(1, 0);
 }
 
 
 static DRIVER_INIT( esb )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	/* X2212 nvram */
 	generic_nvram = auto_malloc(generic_nvram_size);
@@ -587,7 +587,7 @@ static DRIVER_INIT( esb )
 
 	/* prepare the matrix processor */
 	starwars_is_esb = 1;
-	starwars_mproc_init();
+	starwars_mproc_init(machine);
 
 	/* initialize banking */
 	memory_configure_bank(1, 0, 2, rom + 0x6000, 0x10000 - 0x6000);

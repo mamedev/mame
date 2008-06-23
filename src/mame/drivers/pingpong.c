@@ -53,7 +53,7 @@ static WRITE8_HANDLER( cashquiz_question_bank_low_w )
 	{
 		int bank = data & 7;
 		int bankaddr = question_addr_high | ((data - 0x60) * 0x100);
-		UINT8 *questions = memory_region(REGION_USER1) + bankaddr;
+		UINT8 *questions = memory_region(machine, REGION_USER1) + bankaddr;
 		memory_set_bankptr(bank + 1,questions);
 
 	}
@@ -569,7 +569,7 @@ ROM_END
 
 static DRIVER_INIT( merlinmm )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	int i;
 
 	/* decrypt program code */
@@ -583,12 +583,12 @@ static DRIVER_INIT( cashquiz )
 	int i;
 
 	/* decrypt program code */
-	ROM = memory_region(REGION_CPU1);
+	ROM = memory_region(machine, REGION_CPU1);
 	for( i = 0; i < 0x4000; i++ )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* decrypt questions */
-	ROM = memory_region(REGION_USER1);
+	ROM = memory_region(machine, REGION_USER1);
 	for( i = 0; i < 0x40000; i++ )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
@@ -608,7 +608,7 @@ static DRIVER_INIT( cashquiz )
 
 	// setup default banks
 	for(i = 0; i < 8; i++)
-		memory_set_bankptr( i+1, memory_region(REGION_USER1) + 0x100*i );
+		memory_set_bankptr( i+1, memory_region(machine, REGION_USER1) + 0x100*i );
 }
 
 

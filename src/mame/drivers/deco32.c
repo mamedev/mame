@@ -3189,19 +3189,19 @@ ROM_END
 
 static DRIVER_INIT( captaven )
 {
-	deco56_decrypt(REGION_GFX1);
-	deco56_decrypt(REGION_GFX2);
+	deco56_decrypt(machine, REGION_GFX1);
+	deco56_decrypt(machine, REGION_GFX2);
 }
 
 static DRIVER_INIT( dragngun )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
-	const UINT8 *SRC_RAM = memory_region(REGION_GFX1);
-	UINT8 *DST_RAM = memory_region(REGION_GFX2);
+	UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_CPU1);
+	const UINT8 *SRC_RAM = memory_region(machine, REGION_GFX1);
+	UINT8 *DST_RAM = memory_region(machine, REGION_GFX2);
 
-	deco74_decrypt(REGION_GFX1);
-	deco74_decrypt(REGION_GFX2);
-	deco74_decrypt(REGION_GFX3);
+	deco74_decrypt(machine, REGION_GFX1);
+	deco74_decrypt(machine, REGION_GFX2);
+	deco74_decrypt(machine, REGION_GFX3);
 
 	memcpy(DST_RAM+0x80000,SRC_RAM,0x10000);
 	memcpy(DST_RAM+0x110000,SRC_RAM+0x10000,0x10000);
@@ -3211,20 +3211,20 @@ static DRIVER_INIT( dragngun )
 
 static DRIVER_INIT( fghthist )
 {
-	deco56_decrypt(REGION_GFX1);
-	deco74_decrypt(REGION_GFX2);
+	deco56_decrypt(machine, REGION_GFX1);
+	deco74_decrypt(machine, REGION_GFX2);
 
 	decoprot_reset();
 }
 
 static DRIVER_INIT( lockload )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
-//  UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+//  UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_CPU1);
 
-	deco74_decrypt(REGION_GFX1);
-	deco74_decrypt(REGION_GFX2);
-	deco74_decrypt(REGION_GFX3);
+	deco74_decrypt(machine, REGION_GFX1);
+	deco74_decrypt(machine, REGION_GFX2);
+	deco74_decrypt(machine, REGION_GFX3);
 
 	memcpy(RAM+0x300000,RAM+0x100000,0x100000);
 	memset(RAM+0x100000,0,0x100000);
@@ -3236,7 +3236,7 @@ static DRIVER_INIT( lockload )
 
 static DRIVER_INIT( tattass )
 {
-	UINT8 *RAM = memory_region(REGION_GFX1);
+	UINT8 *RAM = memory_region(machine, REGION_GFX1);
 	UINT8 *tmp = malloc_or_die(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
@@ -3244,20 +3244,20 @@ static DRIVER_INIT( tattass )
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
 
-	RAM = memory_region(REGION_GFX2);
+	RAM = memory_region(machine, REGION_GFX2);
 	memcpy(tmp,RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
 
 	free(tmp);
 
-	deco56_decrypt(REGION_GFX1); /* 141 */
-	deco56_decrypt(REGION_GFX2); /* 141 */
+	deco56_decrypt(machine, REGION_GFX1); /* 141 */
+	deco56_decrypt(machine, REGION_GFX2); /* 141 */
 }
 
 static DRIVER_INIT( nslasher )
 {
-	UINT8 *RAM = memory_region(REGION_GFX1);
+	UINT8 *RAM = memory_region(machine, REGION_GFX1);
 	UINT8 *tmp = malloc_or_die(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
@@ -3265,17 +3265,17 @@ static DRIVER_INIT( nslasher )
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
 
-	RAM = memory_region(REGION_GFX2);
+	RAM = memory_region(machine, REGION_GFX2);
 	memcpy(tmp,RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
 
 	free(tmp);
 
-	deco56_decrypt(REGION_GFX1); /* 141 */
-	deco74_decrypt(REGION_GFX2);
+	deco56_decrypt(machine, REGION_GFX1); /* 141 */
+	deco74_decrypt(machine, REGION_GFX2);
 
-	deco156_decrypt();
+	deco156_decrypt(machine);
 
 	soundlatch_setclearedvalue(machine, 0xff);
 

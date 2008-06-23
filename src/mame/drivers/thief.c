@@ -662,8 +662,8 @@ ROM_END
 
 static DRIVER_INIT( thief )
 {
-	UINT8 *dest = memory_region( REGION_CPU1 );
-	const UINT8 *source = memory_region( REGION_CPU2 );
+	UINT8 *dest = memory_region( machine, REGION_CPU1 );
+	const UINT8 *source = memory_region( machine, REGION_CPU2 );
 
 	/* C8 is mapped (banked) in CPU1's address space; it contains Z80 code */
 	memcpy( &dest[0xe010], &source[0x290], 0x20 );

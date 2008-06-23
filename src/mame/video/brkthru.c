@@ -133,7 +133,7 @@ WRITE8_HANDLER( brkthru_1800_w )
 	else if (offset == 1)
 	{
 		int bankaddress;
-		UINT8 *RAM = memory_region(REGION_CPU1);
+		UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 
 		/* bit 0-2 = ROM bank select */

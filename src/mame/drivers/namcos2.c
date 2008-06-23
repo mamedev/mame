@@ -4602,7 +4602,7 @@ static DRIVER_INIT( metlhawk )
 {
 	/* unscramble sprites */
 	int i, j, k, l;
-	UINT8 *data = memory_region(REGION_GFX1);
+	UINT8 *data = memory_region(machine, REGION_GFX1);
 	for(i=0; i<0x200000; i+=32*32)
 	{
 		for(j=0; j<32*32; j+=32*4)
@@ -4719,7 +4719,7 @@ static DRIVER_INIT( bubbletr ){
 
 
 static DRIVER_INIT( luckywld ){
-	UINT8 *pData = (UINT8 *)memory_region( REGION_GFX5 );
+	UINT8 *pData = (UINT8 *)memory_region( machine, REGION_GFX5 );
 	int i;
 	for( i=0; i<32*0x4000; i++ )
 	{ /* unscramble gfx mask */

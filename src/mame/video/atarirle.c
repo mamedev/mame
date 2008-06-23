@@ -271,7 +271,7 @@ INLINE int convert_mask(const atarirle_entry *input, atarirle_mask *result)
 
 void atarirle_init(running_machine *machine, int map, const atarirle_desc *desc)
 {
-	const UINT16 *base = (const UINT16 *)memory_region(desc->region);
+	const UINT16 *base = (const UINT16 *)memory_region(machine, desc->region);
 	atarirle_data *mo = &atarirle[map];
 	int i, width, height;
 
@@ -305,7 +305,7 @@ void atarirle_init(running_machine *machine, int map, const atarirle_desc *desc)
 	mo->maxcolors     = desc->maxcolors / 16;
 
 	mo->rombase       = base;
-	mo->romlength     = memory_region_length(desc->region);
+	mo->romlength     = memory_region_length(machine, desc->region);
 	mo->objectcount   = count_objects(base, mo->romlength);
 
 	mo->cliprect      = *video_screen_get_visible_area(machine->primary_screen);

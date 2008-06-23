@@ -441,13 +441,13 @@ ROM_END
 
 static DRIVER_INIT( ertictac )
 {
-	((UINT32 *)memory_region(REGION_USER1))[0x55]=0;// patched TSTS r11,r15,lsl #32  @ $3800154
+	((UINT32 *)memory_region(machine, REGION_USER1))[0x55]=0;// patched TSTS r11,r15,lsl #32  @ $3800154
 }
 
 
 static DRIVER_INIT( poizone )
 {
-	((UINT32 *)memory_region(REGION_USER1))[0x21C/4]=0;// patched TSTS r11,r15,lsl #32  @ $380021C
+	((UINT32 *)memory_region(machine, REGION_USER1))[0x21C/4]=0;// patched TSTS r11,r15,lsl #32  @ $380021C
 }
 
 

@@ -147,9 +147,9 @@ static READ32_HANDLER( flash_reg_r )
 
 static READ32_HANDLER( flash_r )
 {
-	UINT8 *flash = (UINT8 *)memory_region(REGION_USER1);
+	UINT8 *flash = (UINT8 *)memory_region(machine, REGION_USER1);
 	UINT8 value = flash[flash_addr];
-	flash_addr = (flash_addr + 1) % memory_region_length(REGION_USER1);
+	flash_addr = (flash_addr + 1) % memory_region_length(machine, REGION_USER1);
 	return value;
 }
 
@@ -554,7 +554,7 @@ ROM_END
 
 static DRIVER_INIT( bballoon )
 {
-	UINT8 *flash = (UINT8 *)memory_region(REGION_USER1);
+	UINT8 *flash = (UINT8 *)memory_region(machine, REGION_USER1);
 
 	// nop flash ECC checks
 

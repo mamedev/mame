@@ -98,7 +98,7 @@ static READ8_HANDLER( spinner_r )
 
 static MACHINE_RESET( pbillrd )
 {
-	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 2, memory_region(machine, REGION_CPU1) + 0x10000, 0x4000);
 }
 
 static WRITE8_HANDLER( pbillrd_bankswitch_w )
@@ -589,7 +589,7 @@ static WRITE8_HANDLER( snd_rom_addr_h_w )
 
 static READ8_HANDLER( snd_rom_r )
 {
-	return memory_region(REGION_USER1)[romaddr & 0x7fff];
+	return memory_region(machine, REGION_USER1)[romaddr & 0x7fff];
 }
 
 static const ppi8255_interface ppi8255_intf[2] =
@@ -1031,13 +1031,13 @@ ROM_END
 
 static DRIVER_INIT(gigas)
 {
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(REGION_CPU1) + 0x10000);
+	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, REGION_CPU1) + 0x10000);
 }
 
 
 static DRIVER_INIT( pbillrds )
 {
-	mc8123_decrypt_rom(0, memory_region(REGION_USER1), 1, 2);
+	mc8123_decrypt_rom(machine, 0, memory_region(machine, REGION_USER1), 1, 2);
 }
 
 

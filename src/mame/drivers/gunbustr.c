@@ -329,7 +329,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( gunbustr )
 {
-	taito_f3_soundsystem_reset();
+	taito_f3_soundsystem_reset(machine);
 
 	f3_68681_reset();
 }

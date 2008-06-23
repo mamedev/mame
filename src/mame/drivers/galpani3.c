@@ -424,7 +424,7 @@ ROM_END
 
 static DRIVER_INIT( galpani3 )
 {
-	UINT16 *patchrom = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *patchrom = (UINT16 *)memory_region(machine, REGION_CPU1);
 
 	// weird checks of supposed tilemap registers
 	patchrom[0x3a0c6/2] = 0x4e71;

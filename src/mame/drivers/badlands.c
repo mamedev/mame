@@ -520,8 +520,8 @@ static DRIVER_INIT( badlands )
 	atarigen_eeprom_default = NULL;
 
 	/* initialize the audio system */
-	bank_base = &memory_region(REGION_CPU2)[0x03000];
-	bank_source_data = &memory_region(REGION_CPU2)[0x10000];
+	bank_base = &memory_region(machine, REGION_CPU2)[0x03000];
+	bank_source_data = &memory_region(machine, REGION_CPU2)[0x10000];
 }
 
 

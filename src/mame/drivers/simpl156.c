@@ -550,8 +550,8 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT(simpl156)
 {
-	UINT8 *rom = memory_region(REGION_SOUND2);
-	int length = memory_region_length(REGION_SOUND2);
+	UINT8 *rom = memory_region(machine, REGION_SOUND2);
+	int length = memory_region_length(machine, REGION_SOUND2);
 	UINT8 *buf1 = malloc_or_die(length);
 
 	UINT32 x;
@@ -575,8 +575,8 @@ static DRIVER_INIT(simpl156)
 
 	free (buf1);
 
-	deco56_decrypt(REGION_GFX1);
-	deco156_decrypt();
+	deco56_decrypt(machine, REGION_GFX1);
+	deco156_decrypt(machine);
 
 	simpl156_default_eeprom = NULL;
 }

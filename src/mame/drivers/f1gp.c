@@ -40,7 +40,7 @@ static WRITE16_HANDLER( sharedram_w )
 
 static READ16_HANDLER( extrarom_r )
 {
-	UINT8 *rom = memory_region(REGION_USER1);
+	UINT8 *rom = memory_region(machine, REGION_USER1);
 
 	offset *= 2;
 
@@ -49,7 +49,7 @@ static READ16_HANDLER( extrarom_r )
 
 static READ16_HANDLER( extrarom2_r )
 {
-	UINT8 *rom = memory_region(REGION_USER2);
+	UINT8 *rom = memory_region(machine, REGION_USER2);
 
 	offset *= 2;
 
@@ -58,7 +58,7 @@ static READ16_HANDLER( extrarom2_r )
 
 static WRITE8_HANDLER( f1gp_sh_bankswitch_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU3) + 0x10000;
+	UINT8 *rom = memory_region(machine, REGION_CPU3) + 0x10000;
 
 	memory_set_bankptr(1,rom + (data & 0x01) * 0x8000);
 }
@@ -219,8 +219,8 @@ static WRITE16_HANDLER( f1gpb_misc_w )
     if(old_bank != new_bank && new_bank < 5)
     {
         // oki banking
-        UINT8 *src = memory_region(REGION_SOUND1) + 0x40000 + 0x10000 * new_bank;
-        UINT8 *dst = memory_region(REGION_SOUND1) + 0x30000;
+        UINT8 *src = memory_region(machine, REGION_SOUND1) + 0x40000 + 0x10000 * new_bank;
+        UINT8 *dst = memory_region(machine, REGION_SOUND1) + 0x30000;
         memcpy(dst, src, 0x10000);
 
         old_bank = new_bank;

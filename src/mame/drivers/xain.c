@@ -181,7 +181,7 @@ static WRITE8_HANDLER( xain_sharedram_w )
 
 static WRITE8_HANDLER( xainCPUA_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	xain_pri=data&0x7;
 
@@ -191,7 +191,7 @@ static WRITE8_HANDLER( xainCPUA_bankswitch_w )
 
 static WRITE8_HANDLER( xainCPUB_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 
 	if (data & 0x01) {memory_set_bankptr(2,&RAM[0x10000]);}
 	else {memory_set_bankptr(2,&RAM[0x4000]);}
@@ -679,7 +679,7 @@ ROM_END
 
 static DRIVER_INIT( xsleena )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	/* do the same patch as the bootleg xsleena */
 	RAM[0xd488] = 0x12;
@@ -692,7 +692,7 @@ static DRIVER_INIT( xsleena )
 
 static DRIVER_INIT( solarwar )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	/* do the same patch as the bootleg xsleena */
 	RAM[0xd47e] = 0x12;

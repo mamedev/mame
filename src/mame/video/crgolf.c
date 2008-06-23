@@ -61,10 +61,10 @@ READ8_HANDLER( crgolf_videoram_r )
  *
  *************************************/
 
-static void get_pens(pen_t *pens)
+static void get_pens(running_machine *machine, pen_t *pens)
 {
 	offs_t offs;
-	const UINT8 *prom = memory_region(REGION_PROMS);
+	const UINT8 *prom = memory_region(machine, REGION_PROMS);
 
 	for (offs = 0; offs < NUM_PENS; offs++)
 	{
@@ -127,7 +127,7 @@ static VIDEO_UPDATE( crgolf )
 	offs_t offs;
 	pen_t pens[NUM_PENS];
 
-	get_pens(pens);
+	get_pens(screen->machine, pens);
 
 	/* for each byte in the video RAM */
 	for (offs = 0; offs < VIDEORAM_SIZE / 3; offs++)

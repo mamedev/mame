@@ -958,7 +958,7 @@ static DRIVER_INIT(gticlub)
 	init_konami_cgboard(1, CGBOARD_TYPE_GTICLUB);
 	sharc_dataram_0 = auto_malloc(0x100000);
 
-	K001005_preprocess_texture_data(memory_region(REGION_GFX1), memory_region_length(REGION_GFX1), 1);
+	K001005_preprocess_texture_data(memory_region(machine, REGION_GFX1), memory_region_length(machine, REGION_GFX1), 1);
 
 	K056800_init(sound_irq_callback);
 
@@ -973,8 +973,8 @@ static DRIVER_INIT(gticlub)
 static DRIVER_INIT(hangplt)
 {
 	init_konami_cgboard(2, CGBOARD_TYPE_HANGPLT);
-	set_cgboard_texture_bank(0, 5, memory_region(REGION_USER5));
-	set_cgboard_texture_bank(1, 6, memory_region(REGION_USER5));
+	set_cgboard_texture_bank(0, 5, memory_region(machine, REGION_USER5));
+	set_cgboard_texture_bank(1, 6, memory_region(machine, REGION_USER5));
 
 	sharc_dataram_0 = auto_malloc(0x100000);
 	sharc_dataram_1 = auto_malloc(0x100000);

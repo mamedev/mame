@@ -66,7 +66,7 @@ VIDEO_START( f1gp )
 	dirtychar = auto_malloc(TOTAL_CHARS);
 	memset(dirtychar,1,TOTAL_CHARS);
 
-	zoomdata = (UINT16 *)memory_region(REGION_GFX4);
+	zoomdata = (UINT16 *)memory_region(machine, REGION_GFX4);
 }
 
 VIDEO_START( f1gpb )
@@ -79,7 +79,7 @@ VIDEO_START( f1gpb )
 	dirtychar = auto_malloc(TOTAL_CHARS);
 	memset(dirtychar,1,TOTAL_CHARS);
 
-	zoomdata = (UINT16 *)memory_region(REGION_GFX4);
+	zoomdata = (UINT16 *)memory_region(machine, REGION_GFX4);
 }
 
 VIDEO_START( f1gp2 )
@@ -99,7 +99,7 @@ VIDEO_START( f1gp2 )
 	dirtychar = auto_malloc(TOTAL_CHARS);
 	memset(dirtychar,1,TOTAL_CHARS);
 
-	zoomdata = (UINT16 *)memory_region(REGION_GFX4);
+	zoomdata = (UINT16 *)memory_region(machine, REGION_GFX4);
 }
 
 

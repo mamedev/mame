@@ -358,8 +358,8 @@ INLINE void log_draw_error(int src, int cmd)
 
 static int blit_draw(int src,int sx)
 {
-	UINT8 *src_data = memory_region(REGION_GFX1);
-	int src_len = memory_region_length(REGION_GFX1);
+	UINT8 *src_data = memory_region(Machine, REGION_GFX1);
+	int src_len = memory_region_length(Machine, REGION_GFX1);
 	int bit_addr = (src & 0xffffff) * ddenlovr_blit_rom_bits;	/* convert to bit address */
 	int pen_size, arg_size, cmd;
 	int x;
@@ -1145,8 +1145,8 @@ static WRITE16_HANDLER( ddenlovr_blitter_irq_ack_w )
 
 static READ8_HANDLER( rongrong_gfxrom_r )
 {
-	UINT8 *rom	=	memory_region( REGION_GFX1 );
-	size_t size	=	memory_region_length( REGION_GFX1 );
+	UINT8 *rom	=	memory_region( machine, REGION_GFX1 );
+	size_t size	=	memory_region_length( machine, REGION_GFX1 );
 	int address	=	ddenlovr_blit_address;
 
 	if (address >= size)
@@ -1217,7 +1217,7 @@ VIDEO_UPDATE(ddenlovr)
 
 #if 0
 	static int base = 0x0;
-	const UINT8 *gfx = memory_region(REGION_GFX1);
+	const UINT8 *gfx = memory_region(screen->machine, REGION_GFX1);
 	int next;
 	memset(ddenlovr_pixmap[0],0,512*512);
 	memset(ddenlovr_pixmap[1],0,512*512);
@@ -1822,7 +1822,7 @@ static READ8_HANDLER( rongrong_input_r )
 
 static WRITE8_HANDLER( rongrong_select_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 //logerror("%04x: rongrong_select_w %02x\n",activecpu_get_pc(),data);
 	/* bits 0-4 = **both** ROM bank **AND** input select */
@@ -1941,7 +1941,7 @@ static READ8_HANDLER( magic_r )
 
 static WRITE8_HANDLER( mmpanic_rombank_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0x7)]);
 	/* Bit 4? */
 }
@@ -2124,7 +2124,7 @@ static WRITE8_HANDLER( funkyfig_blitter_w )
 
 static WRITE8_HANDLER( funkyfig_rombank_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	ddenlovr_select = data;
 
@@ -2237,7 +2237,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( hanakanz_rombank_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0x0f)]);
 
@@ -2297,8 +2297,8 @@ static READ8_HANDLER( hanakanz_busy_r )
 
 static READ8_HANDLER( hanakanz_gfxrom_r )
 {
-	UINT8 *rom	=	memory_region( REGION_GFX1 );
-	size_t size		=	memory_region_length( REGION_GFX1 );
+	UINT8 *rom	=	memory_region( machine, REGION_GFX1 );
+	size_t size		=	memory_region_length( machine, REGION_GFX1 );
 	int address		=	(ddenlovr_blit_address & 0xffffff) * 2;
 
 	static UINT8 romdata[2];
@@ -2496,8 +2496,8 @@ static UINT8 mjchuuka_romdata[2];
 
 static void mjchuuka_get_romdata(void)
 {
-	UINT8 *rom	=	memory_region( REGION_GFX1 );
-	size_t size		=	memory_region_length( REGION_GFX1 );
+	UINT8 *rom	=	memory_region( Machine, REGION_GFX1 );
+	size_t size		=	memory_region_length( Machine, REGION_GFX1 );
 	int address		=	(ddenlovr_blit_address & 0xffffff) * 2;
 
 	if (address >= size)
@@ -2621,7 +2621,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( mjmyster_rambank_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(2, &rom[0x90000 + 0x1000 * (data & 0x07)]);
 //  logerror("%04x: rambank = %02x\n", activecpu_get_pc(), data);
 }
@@ -2738,7 +2738,7 @@ ADDRESS_MAP_END
 static UINT8 hginga_rombank;
 static WRITE8_HANDLER( hginga_rombank_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0x7)]);
 	hginga_rombank = data;
 }
@@ -2746,7 +2746,7 @@ static WRITE8_HANDLER( hginga_rombank_w )
 // similar to rongrong
 static READ8_HANDLER( hginga_protection_r )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	if (hginga_rombank & 0x10)
 		return hanakanz_rand_r(machine,0);
 	return rom[0x10000 + 0x8000 * (hginga_rombank & 0x7) + 0xf601 - 0x8000];
@@ -2971,7 +2971,7 @@ static WRITE8_HANDLER( hgokou_input_w )
 // similar to rongrong
 static READ8_HANDLER( hgokou_protection_r )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	if (hginga_rombank == 0)
 		return hanakanz_rand_r(machine,0);
 	return rom[0x10000 + 0x8000 * (hginga_rombank & 0x7) + 0xe601 - 0x8000];
@@ -3030,7 +3030,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( hparadis_select_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	ddenlovr_select = data;
 	hginga_ip = 0;
@@ -3271,7 +3271,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( mjflove_rombank_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0xf)]);
 }
 

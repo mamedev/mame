@@ -392,7 +392,7 @@ ROM_END
 
 static void parodius_banking(int lines)
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(Machine, REGION_CPU1);
 	int offs = 0;
 
 	if (lines & 0xf0) logerror("%04x: setlines %02x\n",activecpu_get_pc(),lines);
@@ -404,11 +404,11 @@ static void parodius_banking(int lines)
 
 static MACHINE_RESET( parodius )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)parodius_banking);
 
-	paletteram = &memory_region(REGION_CPU1)[0x48000];
+	paletteram = &memory_region(machine, REGION_CPU1)[0x48000];
 
 	videobank = 0;
 

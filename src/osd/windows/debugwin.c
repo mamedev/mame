@@ -1754,7 +1754,7 @@ static void memory_determine_combo_items(running_machine *machine)
 	for (rgnnum = 0; rgnnum < MAX_MEMORY_REGIONS; rgnnum++)
 	{
 		TCHAR* t_memory_region_name;
-		UINT8 *base = memory_region(rgnnum);
+		UINT8 *base = memory_region(machine, rgnnum);
 		UINT32 type = memory_region_type(machine, rgnnum);
 		if (base != NULL && type > REGION_INVALID && (type - REGION_INVALID) < ARRAY_LENGTH(memory_region_names))
 		{
@@ -1763,7 +1763,7 @@ static void memory_determine_combo_items(running_machine *machine)
 			UINT8 width, little_endian;
 			memset(ci, 0, sizeof(*ci));
 			ci->base = base;
-			ci->length = memory_region_length(rgnnum);
+			ci->length = memory_region_length(machine, rgnnum);
 			width = 1 << (flags & ROMREGION_WIDTHMASK);
 			little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
 			if (type >= REGION_CPU1 && type <= REGION_CPU8)

@@ -777,7 +777,7 @@ static int question_offset = 0;
 
 static READ8_HANDLER( trvmstr_questions_r )
 {
-	return memory_region(REGION_USER1)[question_offset];
+	return memory_region(machine, REGION_USER1)[question_offset];
 }
 
 static WRITE8_HANDLER( trvmstr_questions_w )

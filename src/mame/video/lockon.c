@@ -212,12 +212,12 @@ WRITE16_HANDLER( lockon_scene_v_scr_w )
 	scroll_v = data & 0x81ff;
 }
 
-static void scene_draw(void)
+static void scene_draw(running_machine *machine)
 {
 	UINT32 y;
 
 	/* 3bpp characters */
-	const UINT8 *const gfx1 = memory_region(REGION_GFX2);
+	const UINT8 *const gfx1 = memory_region(machine, REGION_GFX2);
 	const UINT8 *const gfx2 = gfx1 + 0x10000;
 	const UINT8 *const gfx3 = gfx1 + 0x20000;
 	const UINT8 *const clut = gfx1 + 0x30000;
@@ -347,10 +347,10 @@ static TIMER_CALLBACK( bufend_callback )
 	rom_data3 = gfx_rom[gfx_addr + 0x20000];                                             \
 }
 
-static void ground_draw(void)
+static void ground_draw(running_machine *machine)
 {
 	/* ROM pointers */
-	const UINT8 *const gfx_rom  = memory_region(REGION_GFX4);
+	const UINT8 *const gfx_rom  = memory_region(machine, REGION_GFX4);
 	const UINT8 *const lut_rom  = gfx_rom + 0x30000 + ((ground_ctrl >> 2) & 0x3 ? 0x10000 : 0);
 	const UINT8 *const clut_rom = gfx_rom + 0x50000;
 
@@ -472,14 +472,14 @@ do {                                                     \
 	px = (px + 1) & 0x7ff;                               \
 } while(0)
 
-static void objects_draw(void)
+static void objects_draw(running_machine *machine)
 {
 	UINT32 offs;
 
-	const UINT8  *const romlut = memory_region(REGION_USER1);
-	const UINT16 *const chklut = (UINT16*)memory_region(REGION_USER2);
-	const UINT8  *const gfxrom = memory_region(REGION_GFX5);
-	const UINT8  *const sproms = memory_region(REGION_PROMS) + 0x800;
+	const UINT8  *const romlut = memory_region(machine, REGION_USER1);
+	const UINT16 *const chklut = (UINT16*)memory_region(machine, REGION_USER2);
+	const UINT8  *const gfxrom = memory_region(machine, REGION_GFX5);
+	const UINT8  *const sproms = memory_region(machine, REGION_PROMS) + 0x800;
 
 	for (offs = 0; offs < lockon_objectram_size; offs += 4)
 	{
@@ -652,7 +652,7 @@ WRITE16_HANDLER( lockon_tza112_w )
 	{
 		obj_pal_latch = data & 0xff;
 		obj_pal_addr = offset & 0xf;
-		objects_draw();
+		objects_draw(machine);
 	}
 }
 
@@ -833,9 +833,9 @@ static void rotate_draw(bitmap_t *bitmap, const rectangle *cliprect)
 
 *******************************************************************************************/
 
-static void hud_draw(bitmap_t *bitmap, const rectangle *cliprect)
+static void hud_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8	*tile_rom = memory_region(REGION_GFX3);
+	UINT8	*tile_rom = memory_region(machine, REGION_GFX3);
 	UINT32	offs;
 
 	for (offs = 0x0; offs <= lockon_hudram_size; offs += 2)
@@ -968,7 +968,7 @@ VIDEO_UPDATE( lockon )
 	tilemap_draw(bitmap, cliprect, lockon_tilemap, 0, 0);
 
 	/* Draw the HUD */
-	hud_draw(bitmap, cliprect);
+	hud_draw(screen->machine, bitmap, cliprect);
 
 	return 0;
 }
@@ -981,8 +981,8 @@ VIDEO_EOF( lockon )
 	back_buffer = tmp;
 
 	/* Draw the frame buffer layers */
-	scene_draw();
-	ground_draw();
-	objects_draw();
+	scene_draw(machine);
+	ground_draw(machine);
+	objects_draw(machine);
 
 }

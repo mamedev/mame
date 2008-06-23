@@ -682,11 +682,11 @@ ROM_END
 
 /***************************************************************************/
 
-static void descramble_sound( void )
+static void descramble_sound( running_machine *machine )
 {
 	/* the same as simpl156 / heavy smash? */
-	UINT8 *rom = memory_region(REGION_SOUND1);
-	int length = memory_region_length(REGION_SOUND1);
+	UINT8 *rom = memory_region(machine, REGION_SOUND1);
+	int length = memory_region_length(machine, REGION_SOUND1);
 	UINT8 *buf1 = malloc_or_die(length);
 
 	UINT32 x;
@@ -724,7 +724,7 @@ static DRIVER_INIT( avengrgs )
 {
 	mainCpuIsArm=0;
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );
-	descramble_sound();
+	descramble_sound(machine);
 }
 
 static DRIVER_INIT( mlc )
@@ -734,8 +734,8 @@ static DRIVER_INIT( mlc )
         Skull Fung where there probably shouldn't be. */
 	cpunum_set_clockscale(machine, 0, 2.0f);
 	mainCpuIsArm=1;
-	deco156_decrypt();
-	descramble_sound();
+	deco156_decrypt(machine);
+	descramble_sound(machine);
 }
 
 /***************************************************************************/

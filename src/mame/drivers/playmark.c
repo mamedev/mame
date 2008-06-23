@@ -228,7 +228,7 @@ static WRITE8_HANDLER( playmark_oki_banking_w )
 	{
 		old_bank = data & 7;
 
-		if(((old_bank - 1) * 0x40000) < memory_region_length(REGION_SOUND1))
+		if(((old_bank - 1) * 0x40000) < memory_region_length(machine, REGION_SOUND1))
 		{
 			OKIM6295_set_bank_base(0, 0x40000 * (old_bank - 1));
 		}
@@ -1452,8 +1452,8 @@ static UINT8 playmark_asciitohex(UINT8 data)
 
 static DRIVER_INIT( bigtwin )
 {
-	UINT8 *playmark_PICROM_HEX = memory_region(REGION_USER1);
-	UINT16 *playmark_PICROM = (UINT16 *)memory_region(REGION_CPU2);
+	UINT8 *playmark_PICROM_HEX = memory_region(machine, REGION_USER1);
+	UINT16 *playmark_PICROM = (UINT16 *)memory_region(machine, REGION_CPU2);
 	INT32   offs, data;
 	UINT16  src_pos = 0;
 	UINT16  dst_pos = 0;

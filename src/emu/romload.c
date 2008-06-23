@@ -708,12 +708,12 @@ static void copy_rom_data(rom_load_data *romdata, const rom_entry *romp)
 		fatalerror("Error in RomModule definition: COPY has an invalid length\n");
 
 	/* make sure the source was valid */
-	srcbase = memory_region(srcregion);
+	srcbase = memory_region(Machine, srcregion);
 	if (!srcbase)
 		fatalerror("Error in RomModule definition: COPY from an invalid region\n");
 
 	/* make sure we find within the region space */
-	if (srcoffs + numbytes > memory_region_length(srcregion))
+	if (srcoffs + numbytes > memory_region_length(Machine, srcregion))
 		fatalerror("Error in RomModule definition: COPY out of source memory region space\n");
 
 	/* fill the data */
@@ -1131,8 +1131,8 @@ void rom_init(running_machine *machine, const rom_entry *romp)
 		if (regionlist[regnum])
 		{
 			debugload("Post-processing region %02X\n", regnum);
-			romdata.regionlength = memory_region_length(regnum);
-			romdata.regionbase = memory_region(regnum);
+			romdata.regionlength = memory_region_length(machine, regnum);
+			romdata.regionbase = memory_region(machine, regnum);
 			region_post_process(&romdata, regionlist[regnum]);
 		}
 

@@ -460,7 +460,7 @@ static WRITE8_HANDLER(equites_c0f8_w)
 		case 4: // c0fc: increment PROM address (written by NMI handler)
 			equites_sound_prom_address = (equites_sound_prom_address + 1) & 0x1f;
 //       at this point, the 5-bit value
-//       memory_region(REGION_SOUND1)[equites_sound_prom_address] & 0x1f
+//       memory_region(machine, REGION_SOUND1)[equites_sound_prom_address] & 0x1f
 //       goes to an op-amp and to the base of a transistor. The transistor is part
 //       of a resonator that is used to generate the M5232 clock. The PROM doesn't
 //       actually seem to be important, since even removing it the M5232 clock
@@ -1787,7 +1787,7 @@ ROM_END
 
 static void unpack_block(int region, int offset, int size)
 {
-	UINT8 *rom = memory_region(region);
+	UINT8 *rom = memory_region(Machine, region);
 	int i;
 
 	for (i = 0; i < size; ++i)

@@ -165,7 +165,7 @@ static WRITE8_HANDLER(bg2_w)
 {
 	bgadr=(bgadr&0xfb)|((data&1)<<2);
 	if(bgadr>2)	bgadr=0;
-	memory_set_bankptr( 1, memory_region(REGION_USER1)+bgadr*0x4000 );
+	memory_set_bankptr( 1, memory_region(machine, REGION_USER1)+bgadr*0x4000 );
 }
 
 static WRITE8_HANDLER( sound_w )
@@ -559,8 +559,8 @@ static DRIVER_INIT( ddayjlc )
 		UINT8 *src, *dst, *temp;
 		temp = malloc_or_die(0x10000);
 		src = temp;
-		dst = memory_region(REGION_GFX1);
-		length = memory_region_length(REGION_GFX1);
+		dst = memory_region(machine, REGION_GFX1);
+		length = memory_region_length(machine, REGION_GFX1);
 		memcpy(src, dst, length);
 		newadr=0;
 		oldaddr=0;
@@ -574,7 +574,7 @@ static DRIVER_INIT( ddayjlc )
 		free(temp);
 	}
 
-	memory_set_bankptr( 1, memory_region(REGION_USER1) );
+	memory_set_bankptr( 1, memory_region(machine, REGION_USER1) );
 
 }
 

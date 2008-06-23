@@ -262,7 +262,7 @@ static WRITE8_HANDLER( dunhuang_block_h_w )
 
 	dunhuang_block_h = data;
 
-	tile_addr = memory_region(REGION_GFX2) + ((dunhuang_block_addr_hi << 8) + dunhuang_block_addr_lo)*4;
+	tile_addr = memory_region(machine, REGION_GFX2) + ((dunhuang_block_addr_hi << 8) + dunhuang_block_addr_lo)*4;
 
 	switch (dunhuang_block_dest)
 	{
@@ -373,7 +373,7 @@ static READ8_HANDLER( dunhuang_input_r )
 
 static WRITE8_HANDLER( dunhuang_rombank_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr( 1, rom + 0x10000 + 0x8000 * ((data >> 2) & 0x7) );
 
 	// ?                data & 0x01

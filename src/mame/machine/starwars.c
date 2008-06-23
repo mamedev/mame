@@ -182,9 +182,9 @@ WRITE8_HANDLER( starwars_adc_select_w )
  *
  *************************************/
 
-void starwars_mproc_init(void)
+void starwars_mproc_init(running_machine *machine)
 {
-	UINT8 *src = memory_region(REGION_USER2);
+	UINT8 *src = memory_region(machine, REGION_USER2);
 	int cnt, val;
 
 	PROM_STR = auto_malloc(1024 * sizeof(PROM_STR[0]));

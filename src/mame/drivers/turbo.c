@@ -1518,7 +1518,7 @@ ROM_END
  *
  *************************************/
 
-static void turbo_rom_decode(void)
+static void turbo_rom_decode(running_machine *machine)
 {
 	/*
      * The table is arranged this way (second half is mirror image of first)
@@ -1604,7 +1604,7 @@ static void turbo_rom_decode(void)
 		2,1,2,1	 /* 0x5000-0x5fff */
 	};
 
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	int offs, i, j;
 	UINT8 src;
 
@@ -1628,13 +1628,13 @@ static void turbo_rom_decode(void)
 
 static DRIVER_INIT( turbo_enc )
 {
-	turbo_rom_decode();
+	turbo_rom_decode(machine);
 }
 
 
 static DRIVER_INIT( buckrog_enc )
 {
-	buckrog_decode();
+	buckrog_decode(machine);
 }
 
 

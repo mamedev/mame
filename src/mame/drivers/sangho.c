@@ -70,8 +70,8 @@ ADDRESS_MAP_END
 /* Wrong ! */
 static WRITE8_HANDLER(pzlestar_bank_w)
 {
-	memory_set_bankptr(2,&memory_region(REGION_USER1)[0x20000+ ( ((0x8000*data)^0x10000))  ]);
-	memory_set_bankptr(3,&memory_region(REGION_USER1)[  0x18000  ]);
+	memory_set_bankptr(2,&memory_region(machine, REGION_USER1)[0x20000+ ( ((0x8000*data)^0x10000))  ]);
+	memory_set_bankptr(3,&memory_region(machine, REGION_USER1)[  0x18000  ]);
 }
 
 /* Puzzle Star Ports */
@@ -192,7 +192,7 @@ static void sangho_common_machine_reset(void)
 static MACHINE_RESET(pzlestar)
 {
 	/* give it some code to run, note this isn't at 0 in the rom! */
-	memcpy(sangho_ram,&memory_region(REGION_USER1)[0x10000],0x8000);
+	memcpy(sangho_ram,&memory_region(machine, REGION_USER1)[0x10000],0x8000);
 
 	/* patch out rom check (it fails, due to bad banking) */
 	sangho_ram[0x25c1]=0xaf;
@@ -204,7 +204,7 @@ static MACHINE_RESET(pzlestar)
 static MACHINE_RESET(sexyboom)
 {
 	/* give it some code to run */
-	memcpy(sangho_ram,memory_region(REGION_USER1),0x8000);
+	memcpy(sangho_ram,memory_region(machine, REGION_USER1),0x8000);
 	/* patch out rom check */
 	sangho_ram[0x022e]=0xc9;
 	sangho_ram[0x4604]=0xc9;

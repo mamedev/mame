@@ -842,7 +842,7 @@ ADDRESS_MAP_END
 #if 0
 static WRITE8_HANDLER( blazeon_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	int bank = data & 7;
 	memory_set_bankptr(15, &RAM[bank * 0x10000 + 0x1000]);
 }
@@ -2043,10 +2043,10 @@ MACHINE_DRIVER_END
  have the even and odd pixels swapped. So we use this function to untangle
  them and have one single gfxlayout for both tiles and sprites.
 */
-static void kaneko16_unscramble_tiles(int region)
+static void kaneko16_unscramble_tiles(running_machine *machine, int region)
 {
-	UINT8 *RAM	=	memory_region(region);
-	int size			=	memory_region_length(region);
+	UINT8 *RAM	=	memory_region(machine, region);
+	int size			=	memory_region_length(machine, region);
 	int i;
 
 	if (RAM == NULL)	return;
@@ -2057,7 +2057,7 @@ static void kaneko16_unscramble_tiles(int region)
 	}
 }
 
-static void kaneko16_expand_sample_banks(int region)
+static void kaneko16_expand_sample_banks(running_machine *machine, int region)
 {
 	/* The sample data for the first OKI has an address translator/
        banking register in it that munges the addresses as follows:
@@ -2071,11 +2071,11 @@ static void kaneko16_expand_sample_banks(int region)
 	int bank;
 	UINT8 *src0;
 
-	if (memory_region_length(region) < 0x40000 * 16)
+	if (memory_region_length(machine, region) < 0x40000 * 16)
 		fatalerror("gtmr SOUND1 region too small");
 
 	/* bank 0 maps to itself, so we just leave it alone */
-	src0 = memory_region(region);
+	src0 = memory_region(machine, region);
 	for (bank = 15; bank > 0; bank--)
 	{
 		UINT8 *srcn = src0 + 0x10000 * (bank < 3 ? 3 : bank);
@@ -2088,20 +2088,20 @@ static void kaneko16_expand_sample_banks(int region)
 
 static DRIVER_INIT( kaneko16 )
 {
-	kaneko16_unscramble_tiles(REGION_GFX2);
-	kaneko16_unscramble_tiles(REGION_GFX3);
+	kaneko16_unscramble_tiles(machine, REGION_GFX2);
+	kaneko16_unscramble_tiles(machine, REGION_GFX3);
 }
 
 static DRIVER_INIT( berlwall )
 {
-	kaneko16_unscramble_tiles(REGION_GFX2);
+	kaneko16_unscramble_tiles(machine, REGION_GFX2);
 }
 
 static DRIVER_INIT( samplebank )
 {
-	kaneko16_unscramble_tiles(REGION_GFX2);
-	kaneko16_unscramble_tiles(REGION_GFX3);
-	kaneko16_expand_sample_banks(REGION_SOUND1);
+	kaneko16_unscramble_tiles(machine, REGION_GFX2);
+	kaneko16_unscramble_tiles(machine, REGION_GFX3);
+	kaneko16_expand_sample_banks(machine, REGION_SOUND1);
 }
 
 

@@ -494,7 +494,7 @@ static void matrix_rotz(void)
 
 static void track_read_quad(void)
 {
-	const UINT32 *tgp_data = (const UINT32 *)memory_region(REGION_USER2);
+	const UINT32 *tgp_data = (const UINT32 *)memory_region(Machine, REGION_USER2);
 	UINT32 a = fifoin_pop();
 	int offd;
 
@@ -859,7 +859,7 @@ static void f47(void)
 
 static void track_read_info(void)
 {
-	const UINT32 *tgp_data = (const UINT32 *)memory_region(REGION_USER2);
+	const UINT32 *tgp_data = (const UINT32 *)memory_region(Machine, REGION_USER2);
     UINT16 a = fifoin_pop();
 	int offd;
 
@@ -1006,7 +1006,7 @@ static void tri_calc_pq(float ax, float ay, float bx, float by, float cx, float 
 
 static void track_lookup(void)
 {
-	const UINT32 *tgp_data = (const UINT32 *)memory_region(REGION_USER2);
+	const UINT32 *tgp_data = (const UINT32 *)memory_region(Machine, REGION_USER2);
 	float a = fifoin_pop_f();
 	UINT32 b = fifoin_pop();
 	float c = fifoin_pop_f();

@@ -427,7 +427,7 @@ static WRITE8_HANDLER(meritm_crt250_questions_bank_w)
 		return;
 	}
 
-	dst = memory_region(REGION_CPU1) + 0x70000 + 2;
+	dst = memory_region(machine, REGION_CPU1) + 0x70000 + 2;
 
 	if (data == 0)
 	{
@@ -456,7 +456,7 @@ static WRITE8_HANDLER(meritm_crt250_questions_bank_w)
 			default: logerror( "meritm_crt250_questions_bank_w: unknown data = %02x\n", data ); return;
 		}
 		logerror( "Reading question byte at %06X\n", questions_address | questions_loword_address);
-		*dst = memory_region(REGION_USER1)[questions_address | questions_loword_address];
+		*dst = memory_region(machine, REGION_USER1)[questions_address | questions_loword_address];
 	}
 };
 
@@ -828,7 +828,7 @@ static MACHINE_START(merit_common)
 
 static MACHINE_START(meritm_crt250)
 {
-	memory_configure_bank(1, 0, 8, memory_region(REGION_CPU1), 0x10000);
+	memory_configure_bank(1, 0, 8, memory_region(machine, REGION_CPU1), 0x10000);
 	meritm_bank = 0xff;
 	meritm_crt250_switch_banks();
 	machine_start_merit_common(machine);
@@ -846,8 +846,8 @@ static MACHINE_START(meritm_crt260)
 {
 	meritm_ram = auto_malloc( 0x8000 );
 	memset( meritm_ram, 0x8000, 0x00 );
-	memory_configure_bank(1, 0, 128, memory_region(REGION_CPU1), 0x8000);
-	memory_configure_bank(2, 0, 128, memory_region(REGION_CPU1), 0x8000);
+	memory_configure_bank(1, 0, 128, memory_region(machine, REGION_CPU1), 0x8000);
+	memory_configure_bank(2, 0, 128, memory_region(machine, REGION_CPU1), 0x8000);
 	memory_configure_bank(3, 0, 4, meritm_ram, 0x2000);
 	meritm_bank = 0xff;
 	meritm_psd_a15 = 0;
@@ -868,8 +868,8 @@ static NVRAM_HANDLER(meritm_crt260)
 		if (file)
 			mame_fread(file, meritm_ram, 0x8000);
 		else
-			if ( memory_region(REGION_USER1) )
-				memcpy(meritm_ram, memory_region(REGION_USER1), 0x8000);
+			if ( memory_region(machine, REGION_USER1) )
+				memcpy(meritm_ram, memory_region(machine, REGION_USER1), 0x8000);
 };
 
 // from MSX2 driver, may be not accurate for merit games

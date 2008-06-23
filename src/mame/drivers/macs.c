@@ -544,11 +544,11 @@ static MACHINE_RESET(macs)
         730E: ED B0         ldir
         ...
 */
-		memcpy(macs_ram1 + 0x0e9f, memory_region(REGION_USER1)+0x7327, 0xc7);
-		memcpy(macs_ram1 + 0x1e9f, memory_region(REGION_USER1)+0x7327, 0xc7);
+		memcpy(macs_ram1 + 0x0e9f, memory_region(machine, REGION_USER1)+0x7327, 0xc7);
+		memcpy(macs_ram1 + 0x1e9f, memory_region(machine, REGION_USER1)+0x7327, 0xc7);
 
-		memcpy(macs_ram1 + 0x0800, memory_region(REGION_USER1)+0x73fa, 0x507);
-		memcpy(macs_ram1 + 0x1800, memory_region(REGION_USER1)+0x73fa, 0x507);
+		memcpy(macs_ram1 + 0x0800, memory_region(machine, REGION_USER1)+0x73fa, 0x507);
+		memcpy(macs_ram1 + 0x1800, memory_region(machine, REGION_USER1)+0x73fa, 0x507);
 
 #define MAKEJMP(n,m) 	macs_ram2[(n) - 0xe800 + 0]=0xc3;\
 						macs_ram2[(n) - 0xe800 + 1]=(m)&0xff;\
@@ -583,7 +583,7 @@ static MACHINE_RESET(macs)
 		macs_ram1[0x0ff9]=0x07;
 		macs_ram1[0x1ff9]=0x07;
 
-		memory_set_bankptr( 1, memory_region(REGION_CPU1) + 0x10000 );
+		memory_set_bankptr( 1, memory_region(machine, REGION_CPU1) + 0x10000 );
 		memory_set_bankptr( 2, macs_ram1+0x800);
 		memory_set_bankptr( 3, macs_ram1+0x10000);
 }

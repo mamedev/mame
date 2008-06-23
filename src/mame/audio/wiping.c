@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "sound/custom.h"
 
@@ -180,8 +181,8 @@ void *wiping_sh_start(int clock, const struct CustomSound_interface *config)
 	num_voices = 8;
 	last_channel = channel_list + num_voices;
 
-	sound_rom = memory_region(REGION_SOUND1);
-	sound_prom = memory_region(REGION_SOUND2);
+	sound_rom = memory_region(Machine, REGION_SOUND1);
+	sound_prom = memory_region(Machine, REGION_SOUND2);
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	sound_enable = 1;

@@ -94,7 +94,7 @@ static UINT32 decrypta2(UINT32 e)
 
 
 
-static void mspacman_decode(void)
+static void mspacman_decode(running_machine *machine)
 {
 	int i;
 	UINT8 *RAM;
@@ -103,7 +103,7 @@ static void mspacman_decode(void)
 
 	/* CPU ROMs */
 
-	RAM = memory_region(REGION_CPU1);
+	RAM = memory_region(machine, REGION_CPU1);
 	for (i = 0; i < 0x1000; i++)
 	{
 	RAM[0x10000+i] = RAM[0x0000+i];
@@ -179,8 +179,8 @@ static void mspacman_decode(void)
 
 MACHINE_RESET( mspacman )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
-	mspacman_decode();
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	mspacman_decode(machine);
 
 	memory_configure_bank(1, 0, 2, &RAM[0x00000], 0x10000);
 	memory_set_bank(1, 0);

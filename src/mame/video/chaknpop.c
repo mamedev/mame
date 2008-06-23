@@ -74,9 +74,9 @@ PALETTE_INIT( chaknpop )
   Memory handlers
 ***************************************************************************/
 
-static void set_vram_bank(void)
+static void set_vram_bank(running_machine *machine)
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	int bankaddress;
 
 	if (gfxmode & GFX_VRAM_BANK)
@@ -106,7 +106,7 @@ WRITE8_HANDLER( chaknpop_gfxmode_w )
 		int all_dirty = 0;
 
 		gfxmode = data;
-		set_vram_bank();
+		set_vram_bank(machine);
 
 		if (flip_x != (gfxmode & GFX_FLIP_X))
 		{
@@ -174,14 +174,14 @@ static TILE_GET_INFO( chaknpop_get_tx_tile_info )
 
 static STATE_POSTLOAD( chaknpop_postload )
 {
-	set_vram_bank();
+	set_vram_bank(machine);
 	tx_tilemap_mark_all_dirty();
 }
 
 
 VIDEO_START( chaknpop )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	/*                          info                       offset             type             w   h  col row */
 	tx_tilemap = tilemap_create(chaknpop_get_tx_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
@@ -191,7 +191,7 @@ VIDEO_START( chaknpop )
 	vram3 = &RAM[0x14000];
 	vram4 = &RAM[0x16000];
 
-	set_vram_bank();
+	set_vram_bank(machine);
 	tx_tilemap_mark_all_dirty();
 
 	state_save_register_global(gfxmode);

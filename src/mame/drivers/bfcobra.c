@@ -387,14 +387,14 @@ INLINE UINT8* blitter_get_addr(UINT32 addr)
 	if (addr < 0x10000)
 	{
 		/* Is this region fixed? */
-		return (UINT8*)(memory_region(REGION_USER1) + addr);
+		return (UINT8*)(memory_region(Machine, REGION_USER1) + addr);
 	}
 	else if(addr < 0x20000)
 	{
 		addr &= 0xffff;
 		addr += (bank[0] & 1) ? 0x10000 : 0;
 
-		return (UINT8*)(memory_region(REGION_USER1) + addr + ((bank[0] >> 1) * 0x20000));
+		return (UINT8*)(memory_region(Machine, REGION_USER1) + addr + ((bank[0] >> 1) * 0x20000));
 	}
 	else if (addr >= 0x20000 && addr < 0x40000)
 	{
@@ -978,7 +978,7 @@ INLINE void z80_bank(int num, int data)
 
 		UINT32 offset = ((bank[0] >> 1) * 0x20000) + offs_table[bank[0] & 0x1][data];
 
-		memory_set_bankptr(num, memory_region(REGION_USER1) + offset);
+		memory_set_bankptr(num, memory_region(Machine, REGION_USER1) + offset);
 	}
 	else if (data < 0x10)
 	{
@@ -1116,7 +1116,7 @@ static READ8_HANDLER( fddata_r )
 				}
 
 				fdc.offset = (BPT * fdc.track*2) + (fdc.side ? BPT : 0) + (BPS * (fdc.sector-1)) + fdc.byte_pos++;
-				val = *(memory_region(REGION_USER2) + fdc.offset);
+				val = *(memory_region(machine, REGION_USER2) + fdc.offset);
 
 				/* Move on to next sector? */
 				if (fdc.byte_pos == 1024)
@@ -1645,7 +1645,7 @@ static DRIVER_INIT( bfcobra )
 	UINT8 *tmp;
 
 	tmp = malloc_or_die(0x8000);
-	rom = memory_region(REGION_CPU2) + 0x8000;
+	rom = memory_region(machine, REGION_CPU2) + 0x8000;
 	memcpy(tmp, rom, 0x8000);
 
 	for (i = 0; i < 0x8000; i++)
@@ -1674,7 +1674,7 @@ static DRIVER_INIT( bfcobra )
 	bank[3] = 0;
 
 	/* Fixed 16kB ROM region */
-	memory_set_bankptr(4, memory_region(REGION_USER1));
+	memory_set_bankptr(4, memory_region(machine, REGION_USER1));
 
 	/* Configure the ACIAs */
 	acia6850_config(0, &z80_acia_if);

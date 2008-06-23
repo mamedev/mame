@@ -621,15 +621,15 @@ static WRITE16_HANDLER( wgp_adinput_w )
 
 static INT32 banknum = -1;
 
-static void reset_sound_region(void)	/* assumes Z80 sandwiched between the 68Ks */
+static void reset_sound_region(running_machine *machine)	/* assumes Z80 sandwiched between the 68Ks */
 {
-	memory_set_bankptr( 10, memory_region(REGION_CPU2) + (banknum * 0x4000) + 0x10000 );
+	memory_set_bankptr( 10, memory_region(machine, REGION_CPU2) + (banknum * 0x4000) + 0x10000 );
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	banknum = (data - 1) & 7;
-	reset_sound_region();
+	reset_sound_region(machine);
 }
 
 static WRITE16_HANDLER( wgp_sound_w )
@@ -937,7 +937,7 @@ graphics glitches.
 static STATE_POSTLOAD( wgp_postload )
 {
 	parse_control(machine);
-	reset_sound_region();
+	reset_sound_region(machine);
 }
 
 static MACHINE_START( wgp )
@@ -1211,7 +1211,7 @@ static DRIVER_INIT( wgp )
 #if 0
 	/* Patch for coding error that causes corrupt data in
        sprite tilemapping area from $4083c0-847f */
-	UINT16 *ROM = (UINT16 *)memory_region(REGION_CPU1);
+	UINT16 *ROM = (UINT16 *)memory_region(machine, REGION_CPU1);
 	ROM[0x25dc / 2] = 0x0602;	// faulty value is 0x0206
 #endif
 
@@ -1222,7 +1222,7 @@ static DRIVER_INIT( wgp )
 static DRIVER_INIT( wgp2 )
 {
 	/* Code patches to prevent failure in memory checks */
-	UINT16 *ROM = (UINT16 *)memory_region(REGION_CPU3);
+	UINT16 *ROM = (UINT16 *)memory_region(machine, REGION_CPU3);
 	ROM[0x8008 / 2] = 0x0;
 	ROM[0x8010 / 2] = 0x0;
 

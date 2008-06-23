@@ -237,7 +237,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER ( mcatadv_sound_bw_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU2) + 0x10000;
+	UINT8 *rom = memory_region(machine, REGION_CPU2) + 0x10000;
 
 	memory_set_bankptr(1,rom + data * 0x4000);
 }
@@ -539,7 +539,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( mcatadv )
 {
-	UINT8 *z80rom = memory_region(REGION_CPU2) + 0x10000;
+	UINT8 *z80rom = memory_region(machine, REGION_CPU2) + 0x10000;
 
 	memory_set_bankptr(1, z80rom + 0x4000);
 }

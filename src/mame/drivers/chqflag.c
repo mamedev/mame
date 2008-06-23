@@ -42,7 +42,7 @@ static INTERRUPT_GEN( chqflag_interrupt )
 static WRITE8_HANDLER( chqflag_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	/* bits 0-4 = ROM bank # (0x00-0x11) */
 	bankaddress = 0x10000 + (data & 0x1f)*0x4000;
@@ -470,7 +470,7 @@ ROM_END
 
 static DRIVER_INIT( chqflag )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 	konami_rom_deinterleave_2(REGION_GFX1);
 	paletteram = &RAM[0x58000];

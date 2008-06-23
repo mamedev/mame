@@ -53,6 +53,7 @@ Hardcoded Values:
 ***************************************************************************/
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "cpuintrf.h"
 #include "streams.h"
 #include "x1_010.h"
@@ -113,7 +114,7 @@ static void seta_update( void *param, stream_sample_t **inputs, stream_sample_t 
 	register INT8	*start, *end, data;
 	register UINT8	*env;
 	register UINT32	smp_offs, smp_step, env_offs, env_step, delta;
-	UINT8 *snd1 = memory_region(REGION_SOUND1);
+	UINT8 *snd1 = memory_region(Machine, REGION_SOUND1);
 
 	// mixer buffer zero clear
 	memset( buffer[0], 0, length*sizeof(*buffer[0]) );

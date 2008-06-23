@@ -353,7 +353,7 @@ static WRITE16_HANDLER( bankselect_w )
 	COMBINE_DATA(&newword);
 	bankselect[offset] = newword;
 
-	base = &memory_region(REGION_CPU1)[bankoffset[(newword >> 10) & 0x3f]];
+	base = &memory_region(machine, REGION_CPU1)[bankoffset[(newword >> 10) & 0x3f]];
 	memcpy(offset ? rombank2 : rombank1, base, 0x2000);
 }
 
@@ -3030,7 +3030,7 @@ static DRIVER_INIT( paperboy )
 		0x0000
 	};
 	int i;
-	UINT8 *cpu1 = memory_region(REGION_CPU1);
+	UINT8 *cpu1 = memory_region(machine, REGION_CPU1);
 
 	atarigen_eeprom_default = compressed_default_eeprom;
 	slapstic_init(machine, 105);
@@ -3090,7 +3090,7 @@ static DRIVER_INIT( 720 )
 static void ssprint_init_common(running_machine *machine, const UINT16 *default_eeprom)
 {
 	int i;
-	UINT8 *cpu1 = memory_region(REGION_CPU1);
+	UINT8 *cpu1 = memory_region(machine, REGION_CPU1);
 
 	atarigen_eeprom_default = default_eeprom;
 	slapstic_init(machine, 108);
@@ -3214,7 +3214,7 @@ static DRIVER_INIT( csprint )
 		0x0186,0x0100,0x011B,0x01BC,0x011D,0x011F,0x0000
 	};
 	int i;
-	UINT8 *cpu1 = memory_region(REGION_CPU1);
+	UINT8 *cpu1 = memory_region(machine, REGION_CPU1);
 
 	atarigen_eeprom_default = compressed_default_eeprom;
 	slapstic_init(machine, 109);

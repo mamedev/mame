@@ -132,7 +132,7 @@ VIDEO_START( spinlbrk )
 	/* sprite maps are hardcoded in this game */
 
 	/* enemy sprites use ROM instead of RAM */
-	aerofgt_spriteram2 = (UINT16 *)memory_region(REGION_GFX5);
+	aerofgt_spriteram2 = (UINT16 *)memory_region(machine, REGION_GFX5);
 	aerofgt_spriteram2_size = 0x20000;
 
 	/* front sprites are direct maps */
@@ -562,7 +562,7 @@ static void spikes91_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 {
 	int i;
 	UINT8 *lookup;
-	lookup = memory_region(REGION_USER1);
+	lookup = memory_region(machine, REGION_USER1);
 	spritepalettebank = 1;
 
 	for (i = aerofgt_spriteram3_size/2 - 4 ; i >= 4 ; i -= 4)

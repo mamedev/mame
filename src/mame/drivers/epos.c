@@ -38,7 +38,7 @@ static MACHINE_RESET( dealer );
 
 static WRITE8_HANDLER( dealer_decrypt_rom )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 
 	if (offset & 0x04)
 		counter = (counter + 1) & 0x03;
@@ -128,7 +128,7 @@ ADDRESS_MAP_END
 */
 static WRITE8_HANDLER( write_prtc )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	memory_set_bankptr(2, rom + 0x6000 + (0x1000 * (data & 1)));
 }
 
@@ -571,7 +571,7 @@ ROM_END
 
 static MACHINE_RESET( dealer )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	counter = 0;
 	memory_set_bankptr(1, rom);
 	memory_set_bankptr(2, rom + 0x6000);
@@ -579,7 +579,7 @@ static MACHINE_RESET( dealer )
 
 static DRIVER_INIT( dealer )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
 	int A;
 
 	/* Key 0 */

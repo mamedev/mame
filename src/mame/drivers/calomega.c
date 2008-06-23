@@ -2904,7 +2904,7 @@ static DRIVER_INIT( standard )
 {
 	/* background color is adjusted through RGB pots */
 	int x;
-	UINT8 *BPR = memory_region( REGION_PROMS );
+	UINT8 *BPR = memory_region( machine, REGION_PROMS );
 
 	for (x = 0x0000; x < 0x0400; x++)
 	{
@@ -2916,7 +2916,7 @@ static DRIVER_INIT( standard )
 static DRIVER_INIT( elgrande )
 {
 	int x;
-	UINT8 *BPR = memory_region( REGION_PROMS );
+	UINT8 *BPR = memory_region( machine, REGION_PROMS );
 
 	/* background color is adjusted through RGB pots */
 	for (x = 0x0000; x < 0x0400; x++)
@@ -2930,7 +2930,7 @@ static DRIVER_INIT( jjpoker )
 {
 	/* background color is adjusted through RGB pots */
 	int x;
-	UINT8 *BPR = memory_region( REGION_PROMS );
+	UINT8 *BPR = memory_region( machine, REGION_PROMS );
 
 	for (x = 0x0000; x < 0x0400; x++)
 	{

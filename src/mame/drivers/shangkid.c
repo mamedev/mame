@@ -172,8 +172,8 @@ static DRIVER_INIT( shangkid )
 	shangkid_gfx_type = 1;
 
 	/* set up banking */
-	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1) + 0x8000, 0x8000);
-	memory_configure_bank(2, 0, 2, memory_region(REGION_CPU3) + 0x0000, 0x10000);
+	memory_configure_bank(1, 0, 2, memory_region(machine, REGION_CPU1) + 0x8000, 0x8000);
+	memory_configure_bank(2, 0, 2, memory_region(machine, REGION_CPU3) + 0x0000, 0x10000);
 }
 
 /***************************************************************************************/

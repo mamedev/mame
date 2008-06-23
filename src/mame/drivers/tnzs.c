@@ -246,6 +246,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/i8x41/i8x41.h"
 #include "sound/2203intf.h"
 #include "sound/dac.h"
@@ -270,7 +271,7 @@ static void kageki_init_samples(void)
 	int start, size;
 	int i, n;
 
-	src = memory_region(REGION_SOUND1) + 0x0090;
+	src = memory_region(Machine, REGION_SOUND1) + 0x0090;
 	for (i = 0; i < MAX_SAMPLES; i++)
 	{
 		start = (src[(i * 2) + 1] * 256) + src[(i * 2)];
@@ -362,7 +363,7 @@ static WRITE8_HANDLER( kabukiz_sound_bank_w )
 	// to avoid the write when the sound chip is initialized
 	if(data != 0xff)
 	{
-		UINT8 *ROM = memory_region(REGION_CPU3);
+		UINT8 *ROM = memory_region(machine, REGION_CPU3);
 		memory_set_bankptr(3, &ROM[0x10000 + 0x4000 * (data & 0x07)]);
 	}
 }
@@ -589,7 +590,7 @@ READ8_HANDLER( bbb_r )
 
 static WRITE8_HANDLER( jpopnics_subbankswitch_w )
 {
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 
 	/* bits 0-1 select ROM bank */
 	memory_set_bankptr (2, &RAM[0x10000 + 0x2000 * (data & 3)]);

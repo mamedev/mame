@@ -702,7 +702,7 @@ static WRITE32_HANDLER( comm1_w )
 static WRITE32_HANDLER( comm_rombank_w )
 {
 	int bank = data >> 24;
-	UINT8 *usr3 = memory_region(REGION_USER3);
+	UINT8 *usr3 = memory_region(machine, REGION_USER3);
 	if (usr3)
 		if( bank != comm_rombank ) {
 			printf("rombank %02X\n", bank);
@@ -933,8 +933,8 @@ static MACHINE_START( hornet )
 
 static MACHINE_RESET( hornet )
 {
-	UINT8 *usr3 = memory_region(REGION_USER3);
-	UINT8 *usr5 = memory_region(REGION_USER5);
+	UINT8 *usr3 = memory_region(machine, REGION_USER3);
+	UINT8 *usr5 = memory_region(machine, REGION_USER5);
 	if (usr3)
 		memory_set_bankptr(1, usr3);
 	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
@@ -990,8 +990,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_RESET( hornet_2board )
 {
-	UINT8 *usr3 = memory_region(REGION_USER3);
-	UINT8 *usr5 = memory_region(REGION_USER5);
+	UINT8 *usr3 = memory_region(machine, REGION_USER3);
+	UINT8 *usr5 = memory_region(machine, REGION_USER5);
 
 	if (usr3)
 		memory_set_bankptr(1, usr3);
@@ -1212,7 +1212,7 @@ static UINT8 backup_ram[0x2000];
 static void init_hornet(running_machine *machine)
 {
 	init_konami_cgboard(1, CGBOARD_TYPE_HORNET);
-	set_cgboard_texture_bank(0, 5, memory_region(REGION_USER5));
+	set_cgboard_texture_bank(0, 5, memory_region(machine, REGION_USER5));
 
 	sharc_dataram[0] = auto_malloc(0x100000);
 
@@ -1227,8 +1227,8 @@ static void init_hornet(running_machine *machine)
 static void init_hornet_2board(running_machine *machine)
 {
 	init_konami_cgboard(2, CGBOARD_TYPE_HORNET);
-	set_cgboard_texture_bank(0, 5, memory_region(REGION_USER5));
-	set_cgboard_texture_bank(1, 6, memory_region(REGION_USER5));
+	set_cgboard_texture_bank(0, 5, memory_region(machine, REGION_USER5));
+	set_cgboard_texture_bank(1, 6, memory_region(machine, REGION_USER5));
 
 	sharc_dataram[0] = auto_malloc(0x100000);
 	sharc_dataram[1] = auto_malloc(0x100000);

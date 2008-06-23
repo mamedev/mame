@@ -279,7 +279,7 @@ static WRITE16_HANDLER( prmrsocr_sound_irq_w )
 
 static WRITE8_HANDLER( prmrsocr_audio_bankswitch_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU2) + 0x10000;
+	UINT8 *rom = memory_region(machine, REGION_CPU2) + 0x10000;
 
 	memory_set_bankptr(1,rom + (data & 7) * 0x4000);
 }
@@ -313,7 +313,7 @@ static WRITE8_HANDLER( tmnt_sres_w )
 static void tmnt_decode_sample(void)
 {
 	int i;
-	UINT8 *source = memory_region(REGION_SOUND3);
+	UINT8 *source = memory_region(Machine, REGION_SOUND3);
 
 	sampledata = auto_malloc(0x40000*sizeof(sampledata[0]));
 
@@ -1054,7 +1054,7 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 		CellSrc = tmnt2_1c0800[0x00] | (tmnt2_1c0800[0x01] << 16 );
 //        if ( CellDest >= 0x180000 && CellDest < 0x183fe0 ) {
         CellVar -= 0x104000;
-		src = (UINT16 *)(memory_region(REGION_CPU1) + CellSrc);
+		src = (UINT16 *)(memory_region(machine, REGION_CPU1) + CellSrc);
 
 		CellVar >>= 1;
 
@@ -3955,8 +3955,8 @@ static DRIVER_INIT( mia )
         be shuffled around because the ROMs are connected differently to the
         051962 custom IC.
     */
-	gfxdata = memory_region(REGION_GFX1);
-	len = memory_region_length(REGION_GFX1);
+	gfxdata = memory_region(machine, REGION_GFX1);
+	len = memory_region_length(machine, REGION_GFX1);
 	for (i = 0;i < len;i += 4)
 	{
 		for (j = 0;j < 4;j++)
@@ -3976,8 +3976,8 @@ static DRIVER_INIT( mia )
         be shuffled around because the ROMs are connected differently to the
         051937 custom IC.
     */
-	gfxdata = memory_region(REGION_GFX2);
-	len = memory_region_length(REGION_GFX2);
+	gfxdata = memory_region(machine, REGION_GFX2);
+	len = memory_region_length(machine, REGION_GFX2);
 	for (i = 0;i < len;i += 4)
 	{
 		for (j = 0;j < 4;j++)
@@ -4051,8 +4051,8 @@ static DRIVER_INIT( tmnt )
         be shuffled around because the ROMs are connected differently to the
         051962 custom IC.
     */
-	gfxdata = memory_region(REGION_GFX1);
-	len = memory_region_length(REGION_GFX1);
+	gfxdata = memory_region(machine, REGION_GFX1);
+	len = memory_region_length(machine, REGION_GFX1);
 	for (i = 0;i < len;i += 4)
 	{
 		for (j = 0;j < 4;j++)
@@ -4072,8 +4072,8 @@ static DRIVER_INIT( tmnt )
         be shuffled around because the ROMs are connected differently to the
         051937 custom IC.
     */
-	gfxdata = memory_region(REGION_GFX2);
-	len = memory_region_length(REGION_GFX2);
+	gfxdata = memory_region(machine, REGION_GFX2);
+	len = memory_region_length(machine, REGION_GFX2);
 	for (i = 0;i < len;i += 4)
 	{
 		for (j = 0;j < 4;j++)
@@ -4090,7 +4090,7 @@ static DRIVER_INIT( tmnt )
 
 	temp = malloc_or_die(len);
 	memcpy(temp,gfxdata,len);
-	code_conv_table = &memory_region(REGION_PROMS)[0x0000];
+	code_conv_table = &memory_region(machine, REGION_PROMS)[0x0000];
 	for (A = 0;A < len/4;A++)
 	{
 #define CA0 0
@@ -4168,8 +4168,8 @@ static void shuffle(UINT8 *buf,int len)
 static DRIVER_INIT( glfgreat )
 {
 	/* ROMs are interleaved at byte level */
-	shuffle(memory_region(REGION_GFX1),memory_region_length(REGION_GFX1));
-	shuffle(memory_region(REGION_GFX2),memory_region_length(REGION_GFX2));
+	shuffle(memory_region(machine, REGION_GFX1),memory_region_length(machine, REGION_GFX1));
+	shuffle(memory_region(machine, REGION_GFX2),memory_region_length(machine, REGION_GFX2));
 }
 
 static DRIVER_INIT( cuebrick )
@@ -4178,8 +4178,8 @@ static DRIVER_INIT( cuebrick )
 	generic_nvram_size = 0x400*0x20;
 
 	/* ROMs are interleaved at byte level */
-	shuffle(memory_region(REGION_GFX1),memory_region_length(REGION_GFX1));
-	shuffle(memory_region(REGION_GFX2),memory_region_length(REGION_GFX2));
+	shuffle(memory_region(machine, REGION_GFX1),memory_region_length(machine, REGION_GFX1));
+	shuffle(memory_region(machine, REGION_GFX2),memory_region_length(machine, REGION_GFX2));
 }
 
 GAME( 1989, cuebrick, 0,        cuebrick, cuebrick, cuebrick, ROT0,  "Konami", "Cue Brick (World version D)", 0 )

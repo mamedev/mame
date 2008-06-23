@@ -22,10 +22,10 @@
  *
  *************************************/
 
-static void get_pens(const _20pacgal_state *state, pen_t *pens)
+static void get_pens(running_machine *machine, const _20pacgal_state *state, pen_t *pens)
 {
 	offs_t offs;
-	UINT8 *color_prom = memory_region(REGION_PROMS) + (NUM_PENS * state->game_selected);
+	UINT8 *color_prom = memory_region(machine, REGION_PROMS) + (NUM_PENS * state->game_selected);
 
 	for (offs = 0; offs < NUM_PENS ;offs++)
 	{
@@ -56,12 +56,12 @@ static void get_pens(const _20pacgal_state *state, pen_t *pens)
 }
 
 
- static void do_pen_lookup(const _20pacgal_state *state, bitmap_t *bitmap, const rectangle *cliprect)
+static void do_pen_lookup(running_machine *machine, const _20pacgal_state *state, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int y, x;
 	pen_t pens[NUM_PENS];
 
-	get_pens(state, pens);
+	get_pens(machine, state, pens);
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		for(x = cliprect->min_x; x <= cliprect->max_x; x++)
@@ -296,7 +296,7 @@ static VIDEO_UPDATE( 20pacgal )
 
 	draw_chars(state, bitmap);
 	draw_sprites(state, bitmap);
-	do_pen_lookup(state, bitmap, cliprect);
+	do_pen_lookup(screen->machine, state, bitmap, cliprect);
 
 	return 0;
 }

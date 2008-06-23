@@ -90,7 +90,7 @@ static WRITE8_HANDLER( wc90_shared_w )
 static WRITE8_HANDLER( wc90_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 
 	bankaddress = 0x10000 + ( ( data & 0xf8 ) << 8 );
@@ -100,7 +100,7 @@ static WRITE8_HANDLER( wc90_bankswitch_w )
 static WRITE8_HANDLER( wc90_bankswitch1_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 
 
 	bankaddress = 0x10000 + ( ( data & 0xf8 ) << 8 );

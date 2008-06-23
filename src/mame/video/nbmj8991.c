@@ -93,7 +93,7 @@ WRITE8_HANDLER( nbmj8991_palette_type3_w )
 ******************************************************************************/
 WRITE8_HANDLER( nbmj8991_blitter_w )
 {
-	int gfxlen = memory_region_length(REGION_GFX1);
+	int gfxlen = memory_region_length(machine, REGION_GFX1);
 
 	switch (offset)
 	{
@@ -193,7 +193,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 
 static void nbmj8991_gfxdraw(running_machine *machine)
 {
-	UINT8 *GFX = memory_region(REGION_GFX1);
+	UINT8 *GFX = memory_region(machine, REGION_GFX1);
 	int width = video_screen_get_width(machine->primary_screen);
 
 	int x, y;
@@ -233,7 +233,7 @@ static void nbmj8991_gfxdraw(running_machine *machine)
 		skipy = -1;
 	}
 
-	gfxlen = memory_region_length(REGION_GFX1);
+	gfxlen = memory_region_length(machine, REGION_GFX1);
 	gfxaddr = (nbmj8991_gfxrom << 17) + (blitter_src_addr << 1);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)

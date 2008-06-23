@@ -33,6 +33,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
@@ -102,10 +103,10 @@ static UINT8 decrypt_opcode(int a,int src)
 	return src;
 }
 
-void seibu_sound_decrypt(int cpu_region,int length)
+void seibu_sound_decrypt(running_machine *machine,int cpu_region,int length)
 {
 	UINT8 *decrypt = auto_malloc(length);
-	UINT8 *rom = memory_region(cpu_region);
+	UINT8 *rom = memory_region(machine, cpu_region);
 	int i;
 
 	memory_set_decrypted_region(cpu_region - REGION_CPU1, 0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
@@ -178,7 +179,7 @@ static void *seibu_adpcm_start(int clock, const struct CustomSound_interface *co
 			state->allocated = 1;
 			state->playing = 0;
 			state->stream = stream_create(0, 1, clock, state, seibu_adpcm_callback);
-			state->base = memory_region(REGION_SOUND1);
+			state->base = memory_region(Machine, REGION_SOUND1);
 			reset_adpcm(&state->adpcm);
 			return state;
 		}
@@ -195,10 +196,10 @@ static void seibu_adpcm_stop(void *token)
 // simplify PCB layout/routing rather than intentional protection, but it
 // still fits, especially since the Z80s for all these games are truly encrypted.
 
-void seibu_adpcm_decrypt(int region)
+void seibu_adpcm_decrypt(running_machine *machine, int region)
 {
-	UINT8 *ROM = memory_region(region);
-	int len = memory_region_length(region);
+	UINT8 *ROM = memory_region(machine, region);
+	int len = memory_region_length(machine, region);
 	int i;
 
 	for (i = 0; i < len; i++)
@@ -356,8 +357,8 @@ void seibu_ym2203_irqhandler(running_machine *machine, int linestate)
 /* Use this if the sound cpu is cpu 1 */
 MACHINE_RESET( seibu_sound_1 )
 {
-	int romlength = memory_region_length(REGION_CPU2);
-	UINT8 *rom = memory_region(REGION_CPU2);
+	int romlength = memory_region_length(machine, REGION_CPU2);
+	UINT8 *rom = memory_region(machine, REGION_CPU2);
 
 	sound_cpu=1;
 	update_irq_lines(machine, VECTOR_INIT);
@@ -368,8 +369,8 @@ MACHINE_RESET( seibu_sound_1 )
 /* Use this if the sound cpu is cpu 2 */
 MACHINE_RESET( seibu_sound_2 )
 {
-	int romlength = memory_region_length(REGION_CPU3);
-	UINT8 *rom = memory_region(REGION_CPU3);
+	int romlength = memory_region_length(machine, REGION_CPU3);
+	UINT8 *rom = memory_region(machine, REGION_CPU3);
 
 	sound_cpu=2;
 	update_irq_lines(machine, VECTOR_INIT);

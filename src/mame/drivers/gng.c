@@ -60,7 +60,7 @@ static WRITE8_HANDLER( gng_coin_counter_w )
 static MACHINE_START( gng )
 {
 	/* configure ROM banking */
-	UINT8 *rombase = memory_region(REGION_CPU1);
+	UINT8 *rombase = memory_region(machine, REGION_CPU1);
 	memory_configure_bank(1,0,4,&rombase[0x10000],0x2000);
 	memory_configure_bank(1,4,1,&rombase[0x4000],0x2000);
 }

@@ -60,6 +60,7 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/5110intf.h"
 #include "sound/tms5110.h"
@@ -115,7 +116,7 @@ static void reset_talking (running_machine *machine)
 
 static int bagman_speech_rom_read_bit(void)
 {
-	UINT8 *ROM = memory_region(REGION_SOUND1);
+	UINT8 *ROM = memory_region(Machine, REGION_SOUND1);
 	int bit_no = (ls259_buf[0]<<2) | (ls259_buf[1]<<1) | (ls259_buf[2]<<0);
 	int byte = 0;
 

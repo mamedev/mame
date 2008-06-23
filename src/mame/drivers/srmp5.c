@@ -157,7 +157,7 @@ static WRITE32_HANDLER(spr_w)
 static READ32_HANDLER(data_r)
 {
 	UINT32 data;
-	const UINT8 *usr = memory_region(REGION_USER2);
+	const UINT8 *usr = memory_region(machine, REGION_USER2);
 	data=((databank>>4)&0xf)*0x100000; //guess
 	data=usr[data+offset*2]+usr[data+offset*2+1]*256;
 	return data|(data<<16);

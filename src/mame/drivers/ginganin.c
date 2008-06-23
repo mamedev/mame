@@ -467,7 +467,7 @@ static DRIVER_INIT( ginganin )
 	UINT16 *rom;
 
 	/* main cpu patches */
-	rom = (UINT16 *)memory_region(REGION_CPU1);
+	rom = (UINT16 *)memory_region(machine, REGION_CPU1);
 	/* avoid writes to rom getting to the log */
 	rom[0x408/2] = 0x6000;
 	rom[0x40a/2] = 0x001c;
@@ -475,7 +475,7 @@ static DRIVER_INIT( ginganin )
 
 	/* sound cpu patches */
 	/* let's clear the RAM: ROM starts at 0x4000 */
-	memset(memory_region(REGION_CPU2),0,0x800);
+	memset(memory_region(machine, REGION_CPU2),0,0x800);
 }
 
 

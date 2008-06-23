@@ -462,7 +462,7 @@ ROM_END
 
 static DRIVER_INIT( funkyjet )
 {
-	deco74_decrypt(REGION_GFX1);
+	deco74_decrypt(machine, REGION_GFX1);
 }
 
 /******************************************************************************/

@@ -1445,14 +1445,14 @@ ROM_END
 /* SS92046_01: bbbxing, f1superb, tetrisp, hayaosi1 */
 static DRIVER_INIT (bnstars)
 {
-	ms32_rearrange_sprites(REGION_GFX1);
+	ms32_rearrange_sprites(machine, REGION_GFX1);
 
-	decrypt_ms32_tx(0x00020,0x7e, REGION_GFX5);
-	decrypt_ms32_bg(0x00001,0x9b, REGION_GFX4);
-	decrypt_ms32_tx(0x00020,0x7e, REGION_GFX7);
-	decrypt_ms32_bg(0x00001,0x9b, REGION_GFX6);
+	decrypt_ms32_tx(machine, 0x00020,0x7e, REGION_GFX5);
+	decrypt_ms32_bg(machine, 0x00001,0x9b, REGION_GFX4);
+	decrypt_ms32_tx(machine, 0x00020,0x7e, REGION_GFX7);
+	decrypt_ms32_bg(machine, 0x00001,0x9b, REGION_GFX6);
 
-	memory_set_bankptr(1, memory_region(REGION_CPU1));
+	memory_set_bankptr(1, memory_region(machine, REGION_CPU1));
 }
 
 GAME( 1997, bnstars1, 0,        bnstars, bnstars, bnstars, ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars", GAME_NO_SOUND )

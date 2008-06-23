@@ -300,7 +300,7 @@ static READ8_HANDLER( mrokumei_sound_io_r )
 	if (sndbank & 4)
 		return(soundlatch_r(machine,0));
 	else
-		return memory_region(REGION_CPU2)[0x10000 + offset + (sndbank & 1) * 0x10000];
+		return memory_region(machine, REGION_CPU2)[0x10000 + offset + (sndbank & 1) * 0x10000];
 }
 
 static WRITE8_HANDLER( mrokumei_sound_bank_w )
@@ -366,7 +366,7 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
 //  logerror("%04x: port C wr %02x (STATUS %d DATA %d)\n",activecpu_get_pc(),data,BIT(data,2),BIT(data,6));
 
 
-	memory_set_bankptr(2,memory_region(REGION_CPU2) + 0x10000 * (data & 0x03));
+	memory_set_bankptr(2,memory_region(machine, REGION_CPU2) + 0x10000 * (data & 0x03));
 
 	coin_counter_w(0,~data & 0x80);
 
@@ -525,7 +525,7 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
 
 //  logerror("%04x: port C wr %02x\n",activecpu_get_pc(),data);
 
-	memory_set_bankptr(2,memory_region(REGION_CPU2) + 0x10000 * ((data & 0x0c) >> 2));
+	memory_set_bankptr(2,memory_region(machine, REGION_CPU2) + 0x10000 * ((data & 0x0c) >> 2));
 
 	coin_counter_w(0,~data & 0x80);
 
@@ -547,8 +547,8 @@ static MACHINE_RESET( pteacher_upd7807 )
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU1);
-	int len = memory_region_length(REGION_CPU1) - 0x10000+0x4000;
+	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	int len = memory_region_length(machine, REGION_CPU1) - 0x10000+0x4000;
 	int offs = (data * 0x4000) & (len-1);
 
 	/* last bank is fixed */

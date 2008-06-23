@@ -244,8 +244,8 @@ static READ16_HANDLER( hyprduel_bankedrom_r )
 {
 	const int region = REGION_GFX1;
 
-	UINT8 *ROM = memory_region( region );
-	size_t  len  = memory_region_length( region );
+	UINT8 *ROM = memory_region( machine, region );
+	size_t  len  = memory_region_length( machine, region );
 
 	offset = offset * 2 + 0x10000 * (*hyprduel_rombank);
 
@@ -330,8 +330,8 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 	{
 		const int region = REGION_GFX1;
 
-		UINT8 *src	=	memory_region(region);
-		size_t  src_len	=	memory_region_length(region);
+		UINT8 *src	=	memory_region(machine, region);
+		size_t  src_len	=	memory_region_length(machine, region);
 
 		UINT32 tmap		=	(hyprduel_blitter_regs[ 0x00 / 2 ] << 16 ) +
 							 hyprduel_blitter_regs[ 0x02 / 2 ];
@@ -802,8 +802,8 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( hyprduel )
 {
-	int i, len = memory_region_length(REGION_GFX1);
-	UINT8 *ROM = memory_region(REGION_GFX1);
+	int i, len = memory_region_length(machine, REGION_GFX1);
+	UINT8 *ROM = memory_region(machine, REGION_GFX1);
 
 	/*
       Tiles can be either 4-bit or 8-bit, and both depths can be used at the same

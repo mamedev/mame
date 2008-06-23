@@ -366,11 +366,11 @@ static MACHINE_RESET(model2o)
 
 static MACHINE_RESET(model2_scsp)
 {
-	memory_set_bankptr(4, memory_region(REGION_SOUND1) + 0x200000);
-	memory_set_bankptr(5, memory_region(REGION_SOUND1) + 0x600000);
+	memory_set_bankptr(4, memory_region(machine, REGION_SOUND1) + 0x200000);
+	memory_set_bankptr(5, memory_region(machine, REGION_SOUND1) + 0x600000);
 
 	// copy the 68k vector table into RAM
-	memcpy(model2_soundram, memory_region(REGION_CPU2)+0x80000, 16);
+	memcpy(model2_soundram, memory_region(machine, REGION_CPU2)+0x80000, 16);
 }
 
 static MACHINE_RESET(model2)
@@ -1080,7 +1080,7 @@ static int model2_maxxstate = 0;
 
 static READ32_HANDLER( maxx_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
+	UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_CPU1);
 
 	if (offset <= 0x1f/4)
 	{
@@ -1660,9 +1660,9 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( model2snd_ctrl )
 {
 	// handle sample banking
-	if (memory_region_length(REGION_SOUND1) > 0x800000)
+	if (memory_region_length(machine, REGION_SOUND1) > 0x800000)
 	{
-		UINT8 *snd = memory_region(REGION_SOUND1);
+		UINT8 *snd = memory_region(machine, REGION_SOUND1);
 		if (data & 0x20)
 		{
 	  		memory_set_bankptr(4, snd + 0x200000);
@@ -4028,7 +4028,7 @@ static DRIVER_INIT( genprot )
 
 static DRIVER_INIT( pltkids )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
+	UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_CPU1);
 
 	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
@@ -4039,7 +4039,7 @@ static DRIVER_INIT( pltkids )
 
 static DRIVER_INIT( zerogun )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
+	UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_CPU1);
 
 	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
@@ -4055,7 +4055,7 @@ static DRIVER_INIT( daytonam )
 
 static DRIVER_INIT( sgt24h )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
+	UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_CPU1);
 
 	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
@@ -4066,7 +4066,7 @@ static DRIVER_INIT( sgt24h )
 
 static DRIVER_INIT( doa )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
+	UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_CPU1);
 
 	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;

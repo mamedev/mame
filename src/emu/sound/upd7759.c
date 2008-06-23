@@ -642,7 +642,7 @@ static void *upd7759_start(int sndindex, int clock, const void *config)
 
 	/* compute the ROM base or allocate a timer */
 	if (intf->region != 0)
-		chip->rom = chip->rombase = memory_region(intf->region);
+		chip->rom = chip->rombase = memory_region(Machine, intf->region);
 	else
 		chip->timer = timer_alloc(upd7759_slave_update, chip);
 

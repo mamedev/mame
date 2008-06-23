@@ -44,7 +44,7 @@ WRITE8_HANDLER( liberate_videoram_w );
 
 static READ8_HANDLER( deco16_bank_r )
 {
-	const UINT8 *ROM = memory_region(REGION_USER1);
+	const UINT8 *ROM = memory_region(machine, REGION_USER1);
 
 	/* The tilemap bank can be swapped into main memory */
 	if (deco16_bank)
@@ -67,7 +67,7 @@ static WRITE8_HANDLER( deco16_bank_w )
 
 static READ8_HANDLER( deco16_io_r )
 {
-	const UINT8 *ROM = memory_region(REGION_CPU1);
+	const UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	if (deco16_bank) {
 		if (offset==0) return input_port_read(machine, "IN1"); /* Player 1 controls */
@@ -902,10 +902,10 @@ ROM_END
  *
  *************************************/
 
-static void sound_cpu_decrypt(void)
+static void sound_cpu_decrypt(running_machine *machine)
 {
 	UINT8 *decrypted = auto_malloc(0x4000);
-	UINT8 *rom = memory_region(REGION_CPU2);
+	UINT8 *rom = memory_region(machine, REGION_CPU2);
 	int i;
 
 	/* Bit swapping on sound cpu - Opcodes only */
@@ -917,14 +917,14 @@ static void sound_cpu_decrypt(void)
 
 static DRIVER_INIT( prosport )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 	int i;
 
 	/* Main cpu has the nibbles swapped */
 	for (i=0; i<0x10000; i++)
 		RAM[i]=((RAM[i] & 0x0f) << 4) | ((RAM[i] & 0xf0) >> 4);
 
-	sound_cpu_decrypt();
+	sound_cpu_decrypt(machine);
 }
 
 static DRIVER_INIT( yellowcb )
@@ -938,7 +938,7 @@ static DRIVER_INIT( liberate )
 {
 	int A;
 	UINT8 *decrypted = auto_malloc(0x10000);
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	memory_set_decrypted_region(0, 0x0000, 0xffff, decrypted);
 
@@ -949,7 +949,7 @@ static DRIVER_INIT( liberate )
 		decrypted[A] = (decrypted[A] & 0x7d) | ((decrypted[A] & 0x02) << 6) | ((decrypted[A] & 0x80) >> 6);
 	}
 
-	sound_cpu_decrypt();
+	sound_cpu_decrypt(machine);
 }
 
 /*************************************

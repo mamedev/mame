@@ -961,7 +961,7 @@ static void sound_irq_callback(running_machine *machine, int irq)
 static DRIVER_INIT( nwktr )
 {
 	init_konami_cgboard(1, CGBOARD_TYPE_NWKTR);
-	set_cgboard_texture_bank(0, 5, memory_region(REGION_USER5));
+	set_cgboard_texture_bank(0, 5, memory_region(machine, REGION_USER5));
 
 	sharc_dataram = auto_malloc(0x100000);
 	timekeeper_init(0, TIMEKEEPER_M48T58, backup_ram);

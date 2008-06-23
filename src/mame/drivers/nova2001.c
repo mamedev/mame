@@ -1002,11 +1002,11 @@ This code is overly generic because it is used for several games in ninjakd2.c
 
 ******************************************************************************/
 
-static void lineswap_gfx_roms(const int region, const int bit)
+static void lineswap_gfx_roms(running_machine *machine, const int region, const int bit)
 {
-	const int length = memory_region_length(region);
+	const int length = memory_region_length(machine, region);
 
-	UINT8* const src = memory_region(region);
+	UINT8* const src = memory_region(machine, region);
 
 	UINT8* const temp = malloc_or_die(length);
 
@@ -1036,13 +1036,13 @@ static void lineswap_gfx_roms(const int region, const int bit)
 
 static DRIVER_INIT( pkunwar )
 {
-	lineswap_gfx_roms(REGION_GFX1, 13);
+	lineswap_gfx_roms(machine, REGION_GFX1, 13);
 }
 
 static DRIVER_INIT( raiders5 )
 {
-	lineswap_gfx_roms(REGION_GFX1, 13);
-	lineswap_gfx_roms(REGION_GFX2, 13);
+	lineswap_gfx_roms(machine, REGION_GFX1, 13);
+	lineswap_gfx_roms(machine, REGION_GFX2, 13);
 }
 
 

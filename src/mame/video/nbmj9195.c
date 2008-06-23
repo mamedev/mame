@@ -98,10 +98,10 @@ WRITE8_HANDLER( nbmj9195_nb22090_palette_w )
 
 
 ******************************************************************************/
-static int nbmj9195_blitter_r(int vram, int offset)
+static int nbmj9195_blitter_r(running_machine *machine, int vram, int offset)
 {
 	int ret;
-	UINT8 *GFXROM = memory_region(REGION_GFX1);
+	UINT8 *GFXROM = memory_region(machine, REGION_GFX1);
 
 	switch (offset)
 	{
@@ -231,7 +231,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 
 static void nbmj9195_gfxdraw(running_machine *machine, int vram)
 {
-	UINT8 *GFX = memory_region(REGION_GFX1);
+	UINT8 *GFX = memory_region(machine, REGION_GFX1);
 	int width = video_screen_get_width(machine->primary_screen);
 
 	int x, y;
@@ -278,7 +278,7 @@ static void nbmj9195_gfxdraw(running_machine *machine, int vram)
 		skipy = -1;
 	}
 
-	gfxlen = memory_region_length(REGION_GFX1);
+	gfxlen = memory_region_length(machine, REGION_GFX1);
 	gfxaddr = ((blitter_src_addr[vram] + 2) & 0x00ffffff);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)
@@ -396,8 +396,8 @@ static void nbmj9195_gfxdraw(running_machine *machine, int vram)
 WRITE8_HANDLER( nbmj9195_blitter_0_w )	{ nbmj9195_blitter_w(machine, 0, offset, data); }
 WRITE8_HANDLER( nbmj9195_blitter_1_w )	{ nbmj9195_blitter_w(machine, 1, offset, data); }
 
-READ8_HANDLER( nbmj9195_blitter_0_r )	{ return nbmj9195_blitter_r(0, offset); }
-READ8_HANDLER( nbmj9195_blitter_1_r )	{ return nbmj9195_blitter_r(1, offset); }
+READ8_HANDLER( nbmj9195_blitter_0_r )	{ return nbmj9195_blitter_r(machine, 0, offset); }
+READ8_HANDLER( nbmj9195_blitter_1_r )	{ return nbmj9195_blitter_r(machine, 1, offset); }
 
 WRITE8_HANDLER( nbmj9195_clut_0_w )		{ nbmj9195_clut_w(0, offset, data); }
 WRITE8_HANDLER( nbmj9195_clut_1_w )		{ nbmj9195_clut_w(1, offset, data); }

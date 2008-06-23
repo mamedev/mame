@@ -124,7 +124,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( mg_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
 	memory_set_bankptr(3,&RAM[bankaddress]);

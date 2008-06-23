@@ -538,9 +538,9 @@ static void AICA_Init(struct _AICA *AICA, const struct AICAinterface *intf, int 
 
 		if (intf->region)
 		{
-			AICA->AICARAM = memory_region(intf->region);
+			AICA->AICARAM = memory_region(Machine, intf->region);
 			AICA->AICARAM += intf->roffset;
-			AICA->AICARAM_LENGTH = memory_region_length(intf->region);
+			AICA->AICARAM_LENGTH = memory_region_length(Machine, intf->region);
 			AICA->RAM_MASK = AICA->AICARAM_LENGTH-1;
 			AICA->RAM_MASK16 = AICA->RAM_MASK & 0x7ffffe;
 			AICA->DSP.AICARAM = (UINT16 *)AICA->AICARAM;

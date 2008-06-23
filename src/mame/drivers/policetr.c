@@ -225,7 +225,7 @@ static WRITE32_HANDLER( bsmt2000_data_w )
 
 static READ32_HANDLER( bsmt2000_data_r )
 {
-	return memory_region(REGION_SOUND1)[bsmt_data_bank * 0x10000 + bsmt_data_offset] << 8;
+	return memory_region(machine, REGION_SOUND1)[bsmt_data_bank * 0x10000 + bsmt_data_offset] << 8;
 }
 
 

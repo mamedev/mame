@@ -54,7 +54,7 @@ static VIDEO_UPDATE( missb2 )
 
 	sx = 0;
 
-	prom = memory_region(REGION_PROMS);
+	prom = memory_region(screen->machine, REGION_PROMS);
 	for (offs = 0;offs < bublbobl_objectram_size;offs += 4)
 	{
 		/* skip empty sprites */
@@ -132,7 +132,7 @@ static WRITE8_HANDLER( bg_paletteram_RRRRGGGGBBBBxxxx_be_w )
 static WRITE8_HANDLER( missb2_bg_bank_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, REGION_CPU2);
 
 	// I don't know how this is really connected,bit 1 is always high afaik...
 	bankaddress = ((data & 2) ? 0x1000 : 0x0000) | ((data & 1) ? 0x4000 : 0x0000) | (0x8000);
@@ -435,7 +435,7 @@ ROM_END
 
 static DRIVER_INIT( missb2 )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 
 	/* in Bubble Bobble, bank 0 has code falling from 7fff to 8000,
        so I have to copy it there because bank switching wouldn't catch it */

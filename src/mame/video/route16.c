@@ -82,8 +82,8 @@ VIDEO_UPDATE( route16 )
 {
 	offs_t offs;
 
-	UINT8 *color_prom1 = &memory_region(REGION_PROMS)[0x000];
-	UINT8 *color_prom2 = &memory_region(REGION_PROMS)[0x100];
+	UINT8 *color_prom1 = &memory_region(screen->machine, REGION_PROMS)[0x000];
+	UINT8 *color_prom2 = &memory_region(screen->machine, REGION_PROMS)[0x100];
 
 	for (offs = 0; offs < route16_videoram_size; offs++)
 	{
@@ -132,14 +132,14 @@ VIDEO_UPDATE( route16 )
  *  The Stratovox video connections have been verified from the schematics
  */
 
-static int video_update_stratvox_ttmahjng(bitmap_t *bitmap,
+static int video_update_stratvox_ttmahjng(running_machine *machine, bitmap_t *bitmap,
 										  const rectangle *cliprect,
 										  pen_t (*make_pen)(UINT8))
 {
 	offs_t offs;
 
-	UINT8 *color_prom1 = &memory_region(REGION_PROMS)[0x000];
-	UINT8 *color_prom2 = &memory_region(REGION_PROMS)[0x100];
+	UINT8 *color_prom1 = &memory_region(machine, REGION_PROMS)[0x000];
+	UINT8 *color_prom2 = &memory_region(machine, REGION_PROMS)[0x100];
 
 	for (offs = 0; offs < route16_videoram_size; offs++)
 	{
@@ -185,11 +185,11 @@ static int video_update_stratvox_ttmahjng(bitmap_t *bitmap,
 
 VIDEO_UPDATE( stratvox )
 {
-	return video_update_stratvox_ttmahjng(bitmap, cliprect, route16_make_pen);
+	return video_update_stratvox_ttmahjng(screen->machine, bitmap, cliprect, route16_make_pen);
 }
 
 
 VIDEO_UPDATE( ttmahjng )
 {
-	return video_update_stratvox_ttmahjng(bitmap, cliprect, ttmajng_make_pen);
+	return video_update_stratvox_ttmahjng(screen->machine, bitmap, cliprect, ttmajng_make_pen);
 }

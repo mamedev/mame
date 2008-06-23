@@ -132,15 +132,15 @@ WRITE8_HANDLER( jedi_hscroll_w )
  *
  *************************************/
 
-static void draw_background_and_text(jedi_state *state, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_background_and_text(running_machine *machine, jedi_state *state, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int y;
 	int background_line_buffer[0x200];	/* RAM chip at 2A */
 
-	UINT8 *tx_gfx = memory_region(REGION_GFX1);
-	UINT8 *bg_gfx = memory_region(REGION_GFX2);
-	UINT8 *prom1 = &memory_region(REGION_PROMS)[0x0000 | ((*state->smoothing_table & 0x03) << 8)];
-	UINT8 *prom2 = &memory_region(REGION_PROMS)[0x0800 | ((*state->smoothing_table & 0x03) << 8)];
+	UINT8 *tx_gfx = memory_region(machine, REGION_GFX1);
+	UINT8 *bg_gfx = memory_region(machine, REGION_GFX2);
+	UINT8 *prom1 = &memory_region(machine, REGION_PROMS)[0x0000 | ((*state->smoothing_table & 0x03) << 8)];
+	UINT8 *prom2 = &memory_region(machine, REGION_PROMS)[0x0800 | ((*state->smoothing_table & 0x03) << 8)];
 	int vscroll = state->vscroll;
 	int hscroll = state->hscroll;
 	int tx_bank = *state->foreground_bank;
@@ -232,11 +232,11 @@ static void draw_background_and_text(jedi_state *state, bitmap_t *bitmap, const 
  *
  *************************************/
 
-static void draw_sprites(jedi_state *state, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, jedi_state *state, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	offs_t offs;
 	UINT8 *spriteram = state->spriteram;
-	UINT8 *gfx3 = memory_region(REGION_GFX3);
+	UINT8 *gfx3 = memory_region(machine, REGION_GFX3);
 
 	for (offs = 0x00; offs < 0x30; offs++)
 	{
@@ -338,8 +338,8 @@ static VIDEO_UPDATE( jedi )
 	{
 		/* draw the background/text layers, followed by the sprites
            - it needs to be done in this order*/
-		draw_background_and_text(state, bitmap, cliprect);
-		draw_sprites(state, bitmap, cliprect);
+		draw_background_and_text(screen->machine, state, bitmap, cliprect);
+		draw_sprites(screen->machine, state, bitmap, cliprect);
 		do_pen_lookup(state, bitmap, cliprect);
 	}
 

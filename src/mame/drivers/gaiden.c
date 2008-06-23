@@ -1503,8 +1503,8 @@ static DRIVER_INIT( raiga )
 static DRIVER_INIT( drgnbowl )
 {
 	int i;
-	UINT8 *ROM = memory_region(REGION_CPU1);
-	size_t  size = memory_region_length(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
+	size_t  size = memory_region_length(machine, REGION_CPU1);
 	UINT8 *buffer = malloc_or_die(size);
 
 	memcpy(buffer,ROM,size);
@@ -1520,8 +1520,8 @@ static DRIVER_INIT( drgnbowl )
 
 	free(buffer);
 
-	ROM = memory_region(REGION_GFX2);
-	size = memory_region_length(REGION_GFX2);
+	ROM = memory_region(machine, REGION_GFX2);
+	size = memory_region_length(machine, REGION_GFX2);
 	buffer = malloc_or_die(size);
 
 	memcpy(buffer,ROM,size);

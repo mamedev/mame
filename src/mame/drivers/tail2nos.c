@@ -28,11 +28,11 @@ VIDEO_UPDATE( tail2nos );
 static MACHINE_RESET( tail2nos )
 {
 	/* point to the extra ROMs */
-	memory_set_bankptr(1,memory_region(REGION_USER1));
-	memory_set_bankptr(2,memory_region(REGION_USER2));
+	memory_set_bankptr(1,memory_region(machine, REGION_USER1));
+	memory_set_bankptr(2,memory_region(machine, REGION_USER2));
 
 	/* initialize sound bank */
-	memory_set_bankptr(3,memory_region(REGION_CPU2) + 0x10000);
+	memory_set_bankptr(3,memory_region(machine, REGION_CPU2) + 0x10000);
 }
 
 
@@ -64,7 +64,7 @@ static WRITE16_HANDLER( tail2nos_K051316_ctrl_0_w )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bankptr(3,memory_region(REGION_CPU2) + 0x10000 + (data & 0x01) * 0x8000);
+	memory_set_bankptr(3,memory_region(machine, REGION_CPU2) + 0x10000 + (data & 0x01) * 0x8000);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )

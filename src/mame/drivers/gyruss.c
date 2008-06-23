@@ -701,7 +701,7 @@ ROM_END
 
 static DRIVER_INIT( gyruss )
 {
-	konami1_decode(1);
+	konami1_decode(machine, 1);
 }
 
 

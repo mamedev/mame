@@ -121,7 +121,7 @@ static READ8_HANDLER( striv_question_r )
 	// Read the actual byte from question roms
 	else
 	{
-		UINT8 *ROM = memory_region(REGION_USER1);
+		UINT8 *ROM = memory_region(machine, REGION_USER1);
 		int real_address;
 
 		real_address = question_address | (offset & 0x3f0) | remap_address[offset & 0x0f];
@@ -1356,7 +1356,7 @@ ROM_END
 static void treahunt_decode(void)
 {
 	int A;
-	UINT8 *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(Machine, REGION_CPU1);
 	UINT8 *decrypt = auto_malloc(0x4000);
 	int data;
 
@@ -1420,7 +1420,7 @@ static DRIVER_INIT( loverboy )
        the start of the game code.
 
        ToDo: Figure out what's really going on */
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	ROM[0x13] = 0x01;
 	ROM[0x12] = 0x9d;
 
@@ -1430,7 +1430,7 @@ static DRIVER_INIT( loverboy )
 
 static DRIVER_INIT( striv )
 {
-	UINT8 *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, REGION_CPU1);
 	UINT8 data;
 	int A;
 

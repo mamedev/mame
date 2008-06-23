@@ -20,6 +20,6 @@ void cheat_init(running_machine *machine);
 
 int cheat_menu(running_machine *machine, int selection);
 
-void cheat_display_watches(void);
+void cheat_display_watches(running_machine *machine);
 
 #endif	/* __CHEAT_H__ */

@@ -226,7 +226,7 @@ static NVRAM_HANDLER( darkhors )
 		else
 		{
 			// Set the EEPROM to Factory Defaults
-			eeprom_set_data(memory_region(REGION_USER1),(1<<7));
+			eeprom_set_data(memory_region(machine, REGION_USER1),(1<<7));
 		}
 	}
 }
@@ -662,8 +662,8 @@ ROM_END
 
 static DRIVER_INIT( darkhors )
 {
-	UINT32 *rom    = (UINT32 *) memory_region(REGION_CPU1);
-	UINT8  *eeprom = (UINT8 *)  memory_region(REGION_USER1);
+	UINT32 *rom    = (UINT32 *) memory_region(machine, REGION_CPU1);
+	UINT8  *eeprom = (UINT8 *)  memory_region(machine, REGION_USER1);
 	int i;
 
 #if 1

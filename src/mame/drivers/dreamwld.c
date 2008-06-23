@@ -55,7 +55,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	const gfx_element *gfx = machine->gfx[0];
 	UINT32 *source = spriteram32;
 	UINT32 *finish = spriteram32 + 0x1000/4;
-	UINT16 *redirect = (UINT16 *)memory_region(REGION_GFX3);
+	UINT16 *redirect = (UINT16 *)memory_region(machine, REGION_GFX3);
 
 	while( source<finish )
 	{
@@ -183,8 +183,8 @@ static VIDEO_UPDATE(dreamwld)
 static READ32_HANDLER( dreamwld_protdata_r )
 {
 	static int protindex = 0;
-	UINT8 *protdata    = memory_region( REGION_USER1 );
-	size_t  protsize = memory_region_length( REGION_USER1 );
+	UINT8 *protdata    = memory_region( machine, REGION_USER1 );
+	size_t  protsize = memory_region_length( machine, REGION_USER1 );
 	UINT8 dat = protdata[(protindex++)%protsize];
 	return dat<<24;
 }
@@ -235,11 +235,11 @@ static WRITE32_HANDLER(dreamwld_6295_0_w)
 	}
 }
 
-static void dreamwld_oki_setbank( UINT8 chip, UINT8 bank )
+static void dreamwld_oki_setbank( running_machine *machine, UINT8 chip, UINT8 bank )
 {
 	/* 0x30000-0x3ffff is banked.
         banks are at 0x30000,0x40000,0x50000 and 0x60000 in rom */
-	UINT8 *sound = memory_region(chip ? REGION_SOUND1 : REGION_SOUND2);
+	UINT8 *sound = memory_region(machine, chip ? REGION_SOUND1 : REGION_SOUND2);
 	logerror("OKI%d: set bank %02x\n",chip,bank);
 	memcpy(sound+0x30000, sound+0xb0000+0x10000*bank, 0x10000);
 }
@@ -249,7 +249,7 @@ static WRITE32_HANDLER( dreamwld_6295_0_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		dreamwld_oki_setbank(0,data&0x3);
+		dreamwld_oki_setbank(machine,0,data&0x3);
 	}
 	else
 	{
@@ -278,7 +278,7 @@ static WRITE32_HANDLER( dreamwld_6295_1_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		dreamwld_oki_setbank(1,data&0x3);
+		dreamwld_oki_setbank(machine,1,data&0x3);
 	}
 	else
 	{

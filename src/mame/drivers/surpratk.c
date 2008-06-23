@@ -9,6 +9,7 @@ driver by Nicola Salmoria
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "video/konamiic.h"
 #include "sound/2151intf.h"
@@ -326,7 +327,7 @@ ROM_END
 
 static void surpratk_banking(int lines)
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(Machine, REGION_CPU1);
 	int offs = 0;
 
 logerror("%04x: setlines %02x\n",activecpu_get_pc(),lines);
@@ -340,7 +341,7 @@ static MACHINE_RESET( surpratk )
 {
 	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)surpratk_banking);
 
-	paletteram = &memory_region(REGION_CPU1)[0x48000];
+	paletteram = &memory_region(machine, REGION_CPU1)[0x48000];
 }
 
 static DRIVER_INIT( surpratk )

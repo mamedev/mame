@@ -393,7 +393,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( groundfx )
 {
-	taito_f3_soundsystem_reset();
+	taito_f3_soundsystem_reset(machine);
 	f3_68681_reset();
 }
 
@@ -491,8 +491,8 @@ static READ32_HANDLER( irq_speedup_r_groundfx )
 static DRIVER_INIT( groundfx )
 {
 	UINT32 offset,i;
-	UINT8 *gfx = memory_region(REGION_GFX3);
-	int size=memory_region_length(REGION_GFX3);
+	UINT8 *gfx = memory_region(machine, REGION_GFX3);
+	int size=memory_region_length(machine, REGION_GFX3);
 	int data;
 
 	/* Speedup handlers */

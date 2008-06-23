@@ -2996,7 +2996,7 @@ static WRITE16_HANDLER( protection_peekaboo_w )
 
 	if ((protection_val & 0x90) == 0x90)
 	{
-		UINT8 *RAM = memory_region(okim6295_interface_region_1_pin7high.region);
+		UINT8 *RAM = memory_region(machine, okim6295_interface_region_1_pin7high.region);
 		int new_bank = (protection_val & 0x7) % 7;
 
 		if (bank != new_bank)
@@ -3639,8 +3639,8 @@ INPUT_PORTS_END
 
 void phantasm_rom_decode(int cpu)
 {
-	UINT16	*RAM	=	(UINT16 *) memory_region(REGION_CPU1+cpu);
-	int i,		size	=	memory_region_length(REGION_CPU1+cpu);
+	UINT16	*RAM	=	(UINT16 *) memory_region(Machine, REGION_CPU1+cpu);
+	int i,		size	=	memory_region_length(Machine, REGION_CPU1+cpu);
 	if (size > 0x40000)	size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
@@ -3673,8 +3673,8 @@ void phantasm_rom_decode(int cpu)
 
 void astyanax_rom_decode(int cpu)
 {
-	UINT16	*RAM	=	(UINT16 *) memory_region(REGION_CPU1+cpu);
-	int i,		size	=	memory_region_length(REGION_CPU1+cpu);
+	UINT16	*RAM	=	(UINT16 *) memory_region(Machine, REGION_CPU1+cpu);
+	int i,		size	=	memory_region_length(Machine, REGION_CPU1+cpu);
 	if (size > 0x40000)	size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
@@ -3707,8 +3707,8 @@ void astyanax_rom_decode(int cpu)
 
 void rodland_rom_decode(int cpu)
 {
-	UINT16	*RAM	=	(UINT16 *) memory_region(REGION_CPU1+cpu);
-	int i,		size	=	memory_region_length(REGION_CPU1+cpu);
+	UINT16	*RAM	=	(UINT16 *) memory_region(Machine, REGION_CPU1+cpu);
+	int i,		size	=	memory_region_length(Machine, REGION_CPU1+cpu);
 	if (size > 0x40000)	size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
@@ -3742,8 +3742,8 @@ void rodland_rom_decode(int cpu)
 
 static void rodlandj_gfx_unmangle(int region)
 {
-	UINT8 *rom = memory_region(REGION_GFX1+region);
-	int size = memory_region_length(REGION_GFX1+region);
+	UINT8 *rom = memory_region(Machine, REGION_GFX1+region);
+	int size = memory_region_length(Machine, REGION_GFX1+region);
 	UINT8 *buffer;
 	int i;
 
@@ -3774,8 +3774,8 @@ static void rodlandj_gfx_unmangle(int region)
 
 static void jitsupro_gfx_unmangle(int region)
 {
-	UINT8 *rom = memory_region(REGION_GFX1+region);
-	int size = memory_region_length(REGION_GFX1+region);
+	UINT8 *rom = memory_region(Machine, REGION_GFX1+region);
+	int size = memory_region_length(Machine, REGION_GFX1+region);
 	UINT8 *buffer;
 	int i;
 
@@ -3804,7 +3804,7 @@ static void jitsupro_gfx_unmangle(int region)
 
 static DRIVER_INIT( 64street )
 {
-//  UINT16 *RAM = (UINT16 *) memory_region(REGION_CPU1);
+//  UINT16 *RAM = (UINT16 *) memory_region(machine, REGION_CPU1);
 //  RAM[0x006b8/2] = 0x6004;        // d8001 test
 //  RAM[0x10EDE/2] = 0x6012;        // watchdog
 
@@ -3821,7 +3821,7 @@ static DRIVER_INIT( astyanax )
 
 	astyanax_rom_decode(0);
 
-	RAM = (UINT16 *) memory_region(REGION_CPU1);
+	RAM = (UINT16 *) memory_region(machine, REGION_CPU1);
 	RAM[0x0004e6/2] = 0x6040;	// protection
 }
 
@@ -3882,7 +3882,7 @@ static DRIVER_INIT( hachoo )
 
 	astyanax_rom_decode(0);
 
-	RAM  = (UINT16 *) memory_region(REGION_CPU1);
+	RAM  = (UINT16 *) memory_region(machine, REGION_CPU1);
 	RAM[0x0006da/2] = 0x6000;	// protection
 }
 
@@ -3901,7 +3901,7 @@ static DRIVER_INIT( iganinju )
 
 	phantasm_rom_decode(0);
 
-	RAM  = (UINT16 *) memory_region(REGION_CPU1);
+	RAM  = (UINT16 *) memory_region(machine, REGION_CPU1);
 	RAM[0x02f000/2] = 0x835d;	// protection
 
 	RAM[0x00006e/2] = 0x0420;	// the only game that does
@@ -3921,7 +3921,7 @@ static WRITE16_HANDLER( OKIM6295_data_1_both_w )
 
 static DRIVER_INIT( jitsupro )
 {
-	UINT16 *RAM  = (UINT16 *) memory_region(REGION_CPU1);
+	UINT16 *RAM  = (UINT16 *) memory_region(machine, REGION_CPU1);
 
 	astyanax_rom_decode(0);		// Code
 
@@ -3952,7 +3952,7 @@ static DRIVER_INIT( plusalph )
 
 	astyanax_rom_decode(0);
 
-	RAM  = (UINT16 *) memory_region(REGION_CPU1);
+	RAM  = (UINT16 *) memory_region(machine, REGION_CPU1);
 	RAM[0x0012b6/2] = 0x0000;	// protection
 }
 
@@ -3984,7 +3984,7 @@ static DRIVER_INIT( stdragon )
 
 	phantasm_rom_decode(0);
 
-	RAM  = (UINT16 *) memory_region(REGION_CPU1);
+	RAM  = (UINT16 *) memory_region(machine, REGION_CPU1);
 	RAM[0x00045e/2] = 0x0098;	// protection
 }
 
@@ -3995,7 +3995,7 @@ static READ16_HANDLER( monkelf_input_r )
 
 static DRIVER_INIT( monkelf )
 {
-	UINT16 *ROM = (UINT16*)memory_region(REGION_CPU1);
+	UINT16 *ROM = (UINT16*)memory_region(machine, REGION_CPU1);
 	ROM[0x00744/2] = 0x4e71;
 
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe0000, 0xe000f, 0, 0, monkelf_input_r);

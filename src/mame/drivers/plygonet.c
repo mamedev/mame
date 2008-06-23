@@ -135,7 +135,7 @@ static WRITE32_HANDLER( polygonet_eeprom_w )
 static READ32_HANDLER( ttl_rom_r )
 {
 	UINT32 *ROM;
-	ROM = (UINT32 *)memory_region(REGION_GFX1);
+	ROM = (UINT32 *)memory_region(machine, REGION_GFX1);
 
 	return ROM[offset];
 }
@@ -144,7 +144,7 @@ static READ32_HANDLER( ttl_rom_r )
 static READ32_HANDLER( psac_rom_r )
 {
 	UINT32 *ROM;
-	ROM = (UINT32 *)memory_region(REGION_GFX2);
+	ROM = (UINT32 *)memory_region(machine, REGION_GFX2);
 
 	return ROM[offset];
 }
@@ -628,16 +628,16 @@ ADDRESS_MAP_END
 
 static int cur_sound_region;
 
-static void reset_sound_region(void)
+static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(2, memory_region(REGION_CPU3) + 0x10000 + cur_sound_region*0x4000);
+	memory_set_bankptr(2, memory_region(machine, REGION_CPU3) + 0x10000 + cur_sound_region*0x4000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	cur_sound_region = (data & 0x1f);
 
-	reset_sound_region();
+	reset_sound_region(machine);
 }
 
 static INTERRUPT_GEN(audio_interrupt)
@@ -787,7 +787,7 @@ static DRIVER_INIT(polygonet)
 {
 	/* set default bankswitch */
 	cur_sound_region = 2;
-	reset_sound_region();
+	reset_sound_region(machine);
 
 	/* allocate space for all the fun dsp56k banking */
 	dsp56k_bank00_ram    = auto_malloc( (     0x1000  + (0x8*0x1000)) * 2) ;

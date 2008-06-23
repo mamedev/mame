@@ -39,7 +39,7 @@ VIDEO_START( contra );
 static WRITE8_HANDLER( contra_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, REGION_CPU1);
 
 
 	bankaddress = 0x10000 + (data & 0x0f) * 0x2000;

@@ -27,7 +27,7 @@ MACHINE_START( namcond1 )
 MACHINE_RESET( namcond1 )
 {
 #ifdef MAME_DEBUG
-    /*UINT8   *ROM = memory_region(REGION_CPU1);*/
+    /*UINT8   *ROM = memory_region(machine, REGION_CPU1);*/
     /*UINT32 debug_trigger_addr;*/
     /*int             i;*/
 

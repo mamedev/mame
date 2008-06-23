@@ -118,7 +118,7 @@ WRITE8_HANDLER( bowlrama_blitter_w )
 
 READ8_HANDLER( bowlrama_blitter_r )
 {
-	UINT8 data = memory_region(REGION_GFX1)[blitter_addr];
+	UINT8 data = memory_region(machine, REGION_GFX1)[blitter_addr];
 	UINT8 result = 0;
 
 	switch (offset)
