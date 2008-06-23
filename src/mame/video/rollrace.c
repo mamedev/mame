@@ -64,6 +64,7 @@ VIDEO_UPDATE( rollrace )
 	int sx, sy;
 	int scroll;
 	int col;
+	const UINT8 *mem = memory_region(REGION_USER1);
 
 	/* fill in background colour*/
 	fillbitmap(bitmap,ra_bkgpen,cliprect);
@@ -88,8 +89,8 @@ VIDEO_UPDATE( rollrace )
 
 			drawgfx(bitmap,
 				screen->machine->gfx[RA_BGCHAR_BASE],
-				memory_region(REGION_USER1)[offs + ( ra_bkgpage * 1024 )] \
-				+ ((( memory_region(REGION_USER1)[offs + 0x4000 + ( ra_bkgpage * 1024 )] & 0xc0 ) >> 6 ) * 256 ) ,
+				mem[offs + ( ra_bkgpage * 1024 )] \
+				+ ((( mem[offs + 0x4000 + ( ra_bkgpage * 1024 )] & 0xc0 ) >> 6 ) * 256 ) ,
 				ra_bkgcol,
 				ra_flipx,(ra_bkgflip^ra_flipy),
 				sx*8,sy*8,

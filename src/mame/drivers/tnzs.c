@@ -270,9 +270,9 @@ static void kageki_init_samples(void)
 	int start, size;
 	int i, n;
 
+	src = memory_region(REGION_SOUND1) + 0x0090;
 	for (i = 0; i < MAX_SAMPLES; i++)
 	{
-		src = memory_region(REGION_SOUND1) + 0x0090;
 		start = (src[(i * 2) + 1] * 256) + src[(i * 2)];
 		scan = &src[start];
 		size = 0;

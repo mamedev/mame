@@ -167,9 +167,11 @@ static void draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
+	const UINT8 *gfx;
 
 	profiler_mark(PROFILER_USER1);
 
+	gfx = memory_region(REGION_GFX2);
 	for (offs = 0;offs < spriteram_size;offs += 4)
 	{
 		int sx,sy,flipy,zoom,ch,x,px,y;
@@ -181,8 +183,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		sy = 256-64 - spriteram[offs] + ((spriteram[offs+1] & 0x80) << 1);
 		flipy = spriteram[offs+1] & 0x40;
 		zoom = spriteram[offs+1] & 0x3f;
-		zoomy_rom = memory_region(REGION_GFX2) + (zoom << 6);
-		zoomx_rom = memory_region(REGION_GFX2) + 0x2000 + (zoom << 3);
+		zoomy_rom = gfx + (zoom << 6);
+		zoomx_rom = gfx + 0x2000 + (zoom << 3);
 
 		lookup = buggychl_sprite_lookup + ((spriteram[offs+2] & 0x7f) << 6);
 

@@ -180,6 +180,7 @@ static void draw_sprite(bitmap_t *bitmap,const rectangle *cliprect,int spr_numbe
 {
 	int sx,sy,col,row,height,src,adjy,dy;
 	UINT8 *spr_reg;
+	UINT8 *gfx2;
 	pen_t pen_base;
 	short skip;	/* bytes to skip before drawing each row (can be negative) */
 
@@ -205,6 +206,7 @@ static void draw_sprite(bitmap_t *bitmap,const rectangle *cliprect,int spr_numbe
 		dy = -1;
 	}
 
+	gfx2 = memory_region(REGION_GFX2);
 	for (row = 0;row < height;row++,adjy+=dy)
 	{
 		int color1,color2,flipx;
@@ -216,7 +218,7 @@ static void draw_sprite(bitmap_t *bitmap,const rectangle *cliprect,int spr_numbe
 		col = 0;
 
 		/* get pointer to packed sprite data */
-		gfx = &(memory_region(REGION_GFX2)[src & 0x7fff]);
+		gfx = &(gfx2[src & 0x7fff]);
 		flipx = src & 0x8000;   /* flip x */
 
 		while (1)

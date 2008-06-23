@@ -129,6 +129,7 @@ WRITE8_HANDLER( gridlee_palette_select_w )
 VIDEO_UPDATE( gridlee )
 {
 	const pen_t *pens = &screen->machine->pens[palettebank_vis * 32];
+	UINT8 *gfx;
 	int x, y, i;
 
 	/* draw scanlines from the VRAM directly */
@@ -152,6 +153,7 @@ VIDEO_UPDATE( gridlee )
 	}
 
 	/* draw the sprite images */
+	gfx = memory_region(REGION_GFX1);
 	for (i = 0; i < 32; i++)
 	{
 		UINT8 *sprite = spriteram + i * 4;
@@ -161,7 +163,7 @@ VIDEO_UPDATE( gridlee )
 		int xpos = sprite[3];
 
 		/* get a pointer to the source image */
-		src = &memory_region(REGION_GFX1)[64 * image];
+		src = &gfx[64 * image];
 
 		/* loop over y */
 		for (y = 0; y < 16; y++, ypos = (ypos + 1) & 255)

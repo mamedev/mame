@@ -355,8 +355,8 @@ WRITE8_HANDLER( polepos_alpha_w )
 static void draw_road(bitmap_t *bitmap)
 {
 	const UINT8 *road_control = memory_region(REGION_GFX5);
-	const UINT8 *road_bits1 = memory_region(REGION_GFX5) + 0x2000;
-	const UINT8 *road_bits2 = memory_region(REGION_GFX5) + 0x4000;
+	const UINT8 *road_bits1 = road_control + 0x2000;
+	const UINT8 *road_bits2 = road_control + 0x4000;
 	int x, y, i;
 
 	/* loop over the lower half of the screen */

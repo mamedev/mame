@@ -2069,14 +2069,15 @@ static void kaneko16_expand_sample_banks(int region)
        possible combinations of these and swap between them.
     */
 	int bank;
+	UINT8 *src0;
 
 	if (memory_region_length(region) < 0x40000 * 16)
 		fatalerror("gtmr SOUND1 region too small");
 
 	/* bank 0 maps to itself, so we just leave it alone */
+	src0 = memory_region(region);
 	for (bank = 15; bank > 0; bank--)
 	{
-		UINT8 *src0 = memory_region(region);
 		UINT8 *srcn = src0 + 0x10000 * (bank < 3 ? 3 : bank);
 		UINT8 *dst = src0 + 0x40000 * bank;
 

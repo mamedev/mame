@@ -767,6 +767,7 @@ static void audio_cpu_banking_init(running_machine *machine)
 {
 	int region;
 	int bank;
+	UINT8 *rgn;
 	UINT32 address_mask;
 
 	/* audio bios/cartridge selection */
@@ -777,12 +778,13 @@ static void audio_cpu_banking_init(running_machine *machine)
 	/* audio banking */
 	address_mask = memory_region_length(NEOGEO_REGION_AUDIO_CPU_CARTRIDGE) - 0x10000 - 1;
 
+	rgn = memory_region(NEOGEO_REGION_AUDIO_CPU_CARTRIDGE);
 	for (region = 0; region < 4; region++)
 	{
 		for (bank = 0; bank < 0x100; bank++)
 		{
 			UINT32 bank_address = 0x10000 + (((bank << (11 + region)) & 0x3ffff) & address_mask);
-			memory_configure_bank(NEOGEO_BANK_AUDIO_CPU_CART_BANK + region, bank, 1, &memory_region(NEOGEO_REGION_AUDIO_CPU_CARTRIDGE)[bank_address], 0);
+			memory_configure_bank(NEOGEO_BANK_AUDIO_CPU_CART_BANK + region, bank, 1, &rgn[bank_address], 0);
 		}
 	}
 

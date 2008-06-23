@@ -1217,7 +1217,7 @@ VIDEO_UPDATE(ddenlovr)
 
 #if 0
 	static int base = 0x0;
-
+	const UINT8 *gfx = memory_region(REGION_GFX1);
 	int next;
 	memset(ddenlovr_pixmap[0],0,512*512);
 	memset(ddenlovr_pixmap[1],0,512*512);
@@ -1232,10 +1232,10 @@ VIDEO_UPDATE(ddenlovr)
 	popmessage("GFX %06x",base);
 	if (input_code_pressed(KEYCODE_S)) base = next;
 	if (input_code_pressed_once(KEYCODE_X)) base = next;
-	if (input_code_pressed(KEYCODE_C)) { base--; while ((memory_region(REGION_GFX1)[base] & 0xf0) != 0x30) base--; }
-	if (input_code_pressed(KEYCODE_V)) { base++; while ((memory_region(REGION_GFX1)[base] & 0xf0) != 0x30) base++; }
-	if (input_code_pressed_once(KEYCODE_D)) { base--; while ((memory_region(REGION_GFX1)[base] & 0xf0) != 0x30) base--; }
-	if (input_code_pressed_once(KEYCODE_F)) { base++; while ((memory_region(REGION_GFX1)[base] & 0xf0) != 0x30) base++; }
+	if (input_code_pressed(KEYCODE_C)) { base--; while ((gfx[base] & 0xf0) != 0x30) base--; }
+	if (input_code_pressed(KEYCODE_V)) { base++; while ((gfx[base] & 0xf0) != 0x30) base++; }
+	if (input_code_pressed_once(KEYCODE_D)) { base--; while ((gfx[base] & 0xf0) != 0x30) base--; }
+	if (input_code_pressed_once(KEYCODE_F)) { base++; while ((gfx[base] & 0xf0) != 0x30) base++; }
 #endif
 
 	fillbitmap(bitmap,ddenlovr_bgcolor,cliprect);

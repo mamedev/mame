@@ -57,9 +57,6 @@ static const UINT8 *custom_map;
  *
  *************************************/
 
-extern void fd1094_machine_init(void);
-extern void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(UINT8 *));
-
 static READ16_HANDLER( misc_io_r );
 static WRITE16_HANDLER( misc_io_w );
 

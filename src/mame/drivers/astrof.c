@@ -201,10 +201,11 @@ static rgb_t make_pen(UINT8 data)
 static void astrof_get_pens(pen_t *pens)
 {
 	offs_t i;
+	UINT8 *prom = memory_region(REGION_PROMS);
 
 	for (i = 0; i < ASTROF_NUM_PENS; i++)
 	{
-		UINT8 data = memory_region(REGION_PROMS)[(astrof_palette_bank ? 0x10 : 0x00) | i];
+		UINT8 data = prom[(astrof_palette_bank ? 0x10 : 0x00) | i];
 
 		pens[i] = make_pen(data);
 	}
@@ -214,10 +215,11 @@ static void astrof_get_pens(pen_t *pens)
 static void tomahawk_get_pens(pen_t *pens)
 {
 	offs_t i;
+	UINT8 *prom = memory_region(REGION_PROMS);
 
 	for (i = 0; i < TOMAHAWK_NUM_PENS; i++)
 	{
-		UINT8 data = memory_region(REGION_PROMS)[i];
+		UINT8 data = prom[i];
 
 		pens[i] = make_pen(data);
 	}

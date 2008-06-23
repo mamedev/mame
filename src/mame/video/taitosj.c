@@ -172,6 +172,7 @@ static STATE_POSTLOAD( taitosj_postload )
 static void compute_draw_order(void)
 {
 	int i;
+	UINT8 *color_prom = memory_region(REGION_PROMS);
 
 	/* do a simple conversion of the PROM into layer priority order. Note that */
 	/* this is a simplification, which assumes the PROM encodes a sensible priority */
@@ -183,8 +184,6 @@ static void compute_draw_order(void)
 						/* priority one in the first loop */
 		for (j = 3; j >= 0; j--)
 		{
-			UINT8 *color_prom = memory_region(REGION_PROMS);
-
 			int data = color_prom[0x10 * (i & 0x0f) + mask] & 0x0f;
 
 			if (i & 0x10)

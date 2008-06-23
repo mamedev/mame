@@ -7,10 +7,8 @@
 #include "driver.h"
 #include "segaic16.h"
 #include "video/resnet.h"
-
-extern void *fd1089_get_decrypted_base(void);
-extern void fd1094_machine_init(void);
-extern void *fd1094_get_decrypted_base(void);
+#include "machine/fd1089.h"
+#include "includes/system16.h"
 
 
 /*************************************

@@ -702,9 +702,10 @@ static void optimize_sprite_data(void)
        power of 2 */
 	sprite_gfx_address_mask = 0xffffffff;
 
+	len = memory_region_length(NEOGEO_REGION_SPRITES);
 	for (bit = 0x80000000; bit != 0; bit >>= 1)
 	{
-		if (((memory_region_length(NEOGEO_REGION_SPRITES) * 2) - 1) & bit)
+		if (((len * 2) - 1) & bit)
 			break;
 
 		sprite_gfx_address_mask >>= 1;
@@ -714,7 +715,6 @@ static void optimize_sprite_data(void)
 	memset(sprite_gfx, 0, sprite_gfx_address_mask + 1);
 
 	src = memory_region(NEOGEO_REGION_SPRITES);
-	len = memory_region_length(NEOGEO_REGION_SPRITES);
 	dest = sprite_gfx;
 
 	for (i = 0; i < len; i += 0x80, src += 0x80)

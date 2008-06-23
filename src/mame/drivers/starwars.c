@@ -566,13 +566,15 @@ static DRIVER_INIT( starwars )
 
 static DRIVER_INIT( esb )
 {
+	UINT8 *rom = memory_region(REGION_CPU1);
+
 	/* X2212 nvram */
 	generic_nvram = auto_malloc(generic_nvram_size);
 
 	/* init the slapstic */
 	slapstic_init(machine, 101);
-	slapstic_source = &memory_region(REGION_CPU1)[0x14000];
-	slapstic_base = &memory_region(REGION_CPU1)[0x08000];
+	slapstic_source = &rom[0x14000];
+	slapstic_base = &rom[0x08000];
 
 	/* install an opcode base handler */
 	memory_set_opbase_handler(0, esb_setopbase);
@@ -588,9 +590,9 @@ static DRIVER_INIT( esb )
 	starwars_mproc_init();
 
 	/* initialize banking */
-	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1) + 0x6000, 0x10000 - 0x6000);
+	memory_configure_bank(1, 0, 2, rom + 0x6000, 0x10000 - 0x6000);
 	memory_set_bank(1, 0);
-	memory_configure_bank(2, 0, 2, memory_region(REGION_CPU1) + 0xa000, 0x1c000 - 0xa000);
+	memory_configure_bank(2, 0, 2, rom + 0xa000, 0x1c000 - 0xa000);
 	memory_set_bank(2, 0);
 
 	/* additional globals for state saving */

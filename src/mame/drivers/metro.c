@@ -4784,7 +4784,7 @@ static DRIVER_INIT( balcube )
 
 	const size_t len	=	memory_region_length(region);
 	UINT8 *src		=	memory_region(region);
-	UINT8 *end		=	memory_region(region) + len;
+	UINT8 *end		=	src + len;
 
 	while(src < end)
 	{

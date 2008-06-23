@@ -2603,8 +2603,9 @@ static void unpack_sprites(void)
 	const int region		=	REGION_GFX1;	// sprites
 
 	const UINT32 len	=	memory_region_length(region);
-	UINT8 *src		=	memory_region(region) + len / 2 - 1;
-	UINT8 *dst		=	memory_region(region) + len - 1;
+	UINT8 *rgn		=	memory_region(region);
+	UINT8 *src		=	rgn + len / 2 - 1;
+	UINT8 *dst		=	rgn + len - 1;
 
 	while(dst > src)
 	{

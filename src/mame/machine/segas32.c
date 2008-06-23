@@ -133,8 +133,9 @@ WRITE16_HANDLER(sonic_level_load_protection)
 		}
 		else
 		{
-			level =  *((memory_region(REGION_CPU1) + LEVEL_ORDER_ARRAY) + (system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
-			level |= *((memory_region(REGION_CPU1) + LEVEL_ORDER_ARRAY) + (system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
+			const UINT8 *ROM = memory_region(REGION_CPU1);
+			level =  *((ROM + LEVEL_ORDER_ARRAY) + (system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
+			level |= *((ROM + LEVEL_ORDER_ARRAY) + (system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
 		}
 		system32_workram[CURRENT_LEVEL / 2] = level;
 

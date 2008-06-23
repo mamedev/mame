@@ -218,12 +218,12 @@ static void draw_starfield(const device_config *screen, bitmap_t *bitmap, const 
 static void get_sprite_pens(pen_t *pens)
 {
 	static const double fade_weights[] = { 1.0, 1.5, 2.5, 4.0 };
-
+	const UINT8 *prom = memory_region(REGION_PROMS);
 	int i;
 
 	for (i = 0; i < NUM_SPRITE_PENS; i++)
 	{
-		UINT8 data = memory_region(REGION_PROMS)[((port_0 & 0x40) >> 2) | (i & 0x0f)];
+		UINT8 data = prom[((port_0 & 0x40) >> 2) | (i & 0x0f)];
 
 		UINT8 r0 = (data >> 0) & 0x01;
 		UINT8 r1 = (data >> 1) & 0x01;

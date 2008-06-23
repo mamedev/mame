@@ -81,6 +81,12 @@ extern int sys16_sprite_quartet2( struct sys16_sprite_attributes *sprite, const 
 #define NumOfShadowColors 32
 #define ShadowColorsMultiplier 2
 
+/*----------- defined in machine/s16fd.c -----------*/
+
+void *fd1094_get_decrypted_base(void);
+void fd1094_machine_init(void);
+void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(UINT8 *));
+
 /*----------- defined in machine/system16.c -----------*/
 
 extern UINT16 *sys16_workingram;

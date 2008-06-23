@@ -1951,11 +1951,11 @@ static WRITE32_HANDLER( cps3_palettedma_w )
 			if (data & 0x0002)
 			{
 				int i;
+				UINT16* src = (UINT16*)memory_region(REGION_USER5);
 			//  if(DEBUG_PRINTF) printf("CPS3 pal dma start %08x (real: %08x) dest %08x fade %08x other2 %08x (length %04x)\n", paldma_source, paldma_realsource, paldma_dest, paldma_fade, paldma_other2, paldma_length);
 
 				for (i=0;i<paldma_length;i++)
 				{
-					UINT16* src = (UINT16*)memory_region(REGION_USER5);
 					UINT16 coldata = src[BYTE_XOR_BE(((paldma_realsource>>1)+i))];
 
 					//if (paldma_fade!=0) printf("%08x\n",paldma_fade);
@@ -2477,11 +2477,11 @@ static MACHINE_RESET( cps3 )
 
 static void precopy_to_flash(void)
 {
+	UINT32* romdata = (UINT32*)memory_region(REGION_USER4);
 	int i;
 	/* precopy program roms, ok, sfiii2 tests pass, others fail because of how the decryption affects testing */
 	for (i=0;i<0x800000;i+=4)
 	{
-		UINT32* romdata = (UINT32*)memory_region(REGION_USER4);
 		UINT32 data;
 		UINT8* ptr1 = intelflash_getmemptr(0);
 		UINT8* ptr2 = intelflash_getmemptr(1);
@@ -2498,7 +2498,6 @@ static void precopy_to_flash(void)
 
 	for (i=0;i<0x800000;i+=4)
 	{
-		UINT32* romdata = (UINT32*)memory_region(REGION_USER4);
 		UINT32 data;
 		UINT8* ptr1 = intelflash_getmemptr(4);
 		UINT8* ptr2 = intelflash_getmemptr(5);
@@ -2517,8 +2516,8 @@ static void precopy_to_flash(void)
 	{
 		UINT32 thebase, len = memory_region_length(REGION_USER5);
 		int flashnum = 8;
-		UINT32* romdata = (UINT32*)memory_region(REGION_USER5);
 
+		romdata = (UINT32*)memory_region(REGION_USER5);
 		for (thebase = 0;thebase < len/2; thebase+=0x200000)
 		{
 		//  printf("flashnums %d. %d\n",flashnum, flashnum+1);
@@ -2544,13 +2543,12 @@ static void precopy_to_flash(void)
 // make a copy in the regions we execute code / draw gfx from
 static void copy_from_nvram(void)
 {
-
+	UINT32* romdata = (UINT32*)memory_region(REGION_USER4);
+	UINT32* romdata2 = (UINT32*)decrypted_gamerom;
 	int i;
 	/* copy + decrypt program roms which have been loaded from flashroms/nvram */
 	for (i=0;i<0x800000;i+=4)
 	{
-		UINT32* romdata = (UINT32*)memory_region(REGION_USER4);
-		UINT32* romdata2 = (UINT32*)decrypted_gamerom;
 		UINT32 data;
 		UINT8* ptr1 = intelflash_getmemptr(0);
 		UINT8* ptr2 = intelflash_getmemptr(1);
@@ -2567,8 +2565,6 @@ static void copy_from_nvram(void)
 
 	for (i=0;i<0x800000;i+=4)
 	{
-		UINT32* romdata = (UINT32*)memory_region(REGION_USER4);
-		UINT32* romdata2 = (UINT32*)decrypted_gamerom;
 		UINT32 data;
 		UINT8* ptr1 = intelflash_getmemptr(4);
 		UINT8* ptr2 = intelflash_getmemptr(5);
@@ -2589,9 +2585,9 @@ static void copy_from_nvram(void)
 	{
 		UINT32 thebase, len = memory_region_length(REGION_USER5);
 		int flashnum = 8;
-		UINT32* romdata = (UINT32*)memory_region(REGION_USER5);
 		int countoffset = 0;
 
+		romdata = (UINT32*)memory_region(REGION_USER5);
 		for (thebase = 0;thebase < len/2; thebase+=0x200000)
 		{
 		//  printf("flashnums %d. %d\n",flashnum, flashnum+1);

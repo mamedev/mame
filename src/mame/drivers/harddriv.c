@@ -3420,11 +3420,15 @@ static void init_ds3(running_machine *machine)
 
 	/* if we have a sound DSP, boot it */
 	if (hdcpu_sound != -1 && machine->config->cpu[hdcpu_sound].type == CPU_ADSP2105)
-		adsp2105_load_boot_data((UINT8 *)(memory_region(REGION_CPU1 + hdcpu_sound) + 0x10000),
-								(UINT32 *)(memory_region(REGION_CPU1 + hdcpu_sound)));
+	{
+		UINT8 *snd = memory_region(REGION_CPU1 + hdcpu_sound);
+		adsp2105_load_boot_data((UINT8 *)(snd + 0x10000), (UINT32 *)(snd));
+	}
 	if (hdcpu_sounddsp != -1 && machine->config->cpu[hdcpu_sounddsp].type == CPU_ADSP2105)
-		adsp2105_load_boot_data((UINT8 *)(memory_region(REGION_CPU1 + hdcpu_sounddsp) + 0x10000),
-								(UINT32 *)(memory_region(REGION_CPU1 + hdcpu_sounddsp)));
+	{
+		UINT8 *dsp = memory_region(REGION_CPU1 + hdcpu_sounddsp);
+		adsp2105_load_boot_data((UINT8 *)(dsp + 0x10000), (UINT32 *)(dsp));
+	}
 
 /*
 
@@ -3498,6 +3502,8 @@ static void init_ds3(running_machine *machine)
 /* COMMON INIT: initialize the DSK add-on board */
 static void init_dsk(running_machine *machine)
 {
+	UINT8 *usr3 = memory_region(REGION_USER3);
+
 	/* install ASIC61 */
 	memory_install_readwrite16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x85c000, 0x85c7ff, 0, 0, hd68k_dsk_dsp32_r, hd68k_dsk_dsp32_w);
 
@@ -3506,11 +3512,11 @@ static void init_dsk(running_machine *machine)
 
 	/* install extra RAM */
 	memory_install_readwrite16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x900000, 0x90ffff, 0, 0, hd68k_dsk_ram_r, hd68k_dsk_ram_w);
-	hddsk_ram = (UINT16 *)(memory_region(REGION_USER3) + 0x40000);
+	hddsk_ram = (UINT16 *)(usr3 + 0x40000);
 
 	/* install extra ZRAM */
 	memory_install_readwrite16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x910000, 0x910fff, 0, 0, hd68k_dsk_zram_r, hd68k_dsk_zram_w);
-	hddsk_zram = (UINT16 *)(memory_region(REGION_USER3) + 0x50000);
+	hddsk_zram = (UINT16 *)(usr3 + 0x50000);
 
 	/* install ASIC65 */
 	memory_install_write16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x914000, 0x917fff, 0, 0, asic65_data_w);
@@ -3519,7 +3525,7 @@ static void init_dsk(running_machine *machine)
 
 	/* install extra ROM */
 	memory_install_read16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x940000, 0x9fffff, 0, 0, hd68k_dsk_small_rom_r);
-	hddsk_rom = (UINT16 *)(memory_region(REGION_USER3) + 0x00000);
+	hddsk_rom = (UINT16 *)(usr3 + 0x00000);
 
 	/* set up the ASIC65 */
 	asic65_config(machine, ASIC65_STANDARD);
@@ -3529,6 +3535,8 @@ static void init_dsk(running_machine *machine)
 /* COMMON INIT: initialize the DSK II add-on board */
 static void init_dsk2(running_machine *machine)
 {
+	UINT8 *usr3 = memory_region(REGION_USER3);
+
 	/* install ASIC65 */
 	memory_install_write16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x824000, 0x824003, 0, 0, asic65_data_w);
 	memory_install_read16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x824000, 0x824003, 0, 0, asic65_r);
@@ -3542,11 +3550,11 @@ static void init_dsk2(running_machine *machine)
 
 	/* install extra RAM */
 	memory_install_readwrite16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x880000, 0x8bffff, 0, 0, hd68k_dsk_ram_r, hd68k_dsk_ram_w);
-	hddsk_ram = (UINT16 *)(memory_region(REGION_USER3) + 0x100000);
+	hddsk_ram = (UINT16 *)(usr3 + 0x100000);
 
 	/* install extra ROM */
 	memory_install_read16_handler(machine, hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x900000, 0x9fffff, 0, 0, hd68k_dsk_rom_r);
-	hddsk_rom = (UINT16 *)(memory_region(REGION_USER3) + 0x000000);
+	hddsk_rom = (UINT16 *)(usr3 + 0x000000);
 
 	/* set up the ASIC65 */
 	asic65_config(machine, ASIC65_STANDARD);

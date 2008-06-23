@@ -113,6 +113,7 @@ static void seta_update( void *param, stream_sample_t **inputs, stream_sample_t 
 	register INT8	*start, *end, data;
 	register UINT8	*env;
 	register UINT32	smp_offs, smp_step, env_offs, env_step, delta;
+	UINT8 *snd1 = memory_region(REGION_SOUND1);
 
 	// mixer buffer zero clear
 	memset( buffer[0], 0, length*sizeof(*buffer[0]) );
@@ -126,8 +127,8 @@ static void seta_update( void *param, stream_sample_t **inputs, stream_sample_t 
 			stream_sample_t *bufL = buffer[0];
 			stream_sample_t *bufR = buffer[1];
 			if( (reg->status&2) == 0 ) {						// PCM sampling
-				start    = (INT8 *)(reg->start      *0x1000+memory_region(REGION_SOUND1));
-				end      = (INT8 *)((0x100-reg->end)*0x1000+memory_region(REGION_SOUND1));
+				start    = (INT8 *)(reg->start      *0x1000+snd1);
+				end      = (INT8 *)((0x100-reg->end)*0x1000+snd1);
 				volL     = ((reg->volume>>4)&0xf)*VOL_BASE;
 				volR     = ((reg->volume>>0)&0xf)*VOL_BASE;
 				smp_offs = info->smp_offset[ch];

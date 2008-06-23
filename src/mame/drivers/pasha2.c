@@ -93,12 +93,13 @@ static WRITE16_HANDLER( pasha2_misc_w )
 
 				switch(bank)
 				{
-					case 0x8000: memory_set_bankptr(1, memory_region(REGION_USER2) + 0x400000 * 0); break;
-					case 0x9000: memory_set_bankptr(1, memory_region(REGION_USER2) + 0x400000 * 1); break;
-					case 0xa000: memory_set_bankptr(1, memory_region(REGION_USER2) + 0x400000 * 2); break;
-					case 0xb000: memory_set_bankptr(1, memory_region(REGION_USER2) + 0x400000 * 3); break;
-					case 0xc000: memory_set_bankptr(1, memory_region(REGION_USER2) + 0x400000 * 4); break;
-					case 0xd000: memory_set_bankptr(1, memory_region(REGION_USER2) + 0x400000 * 5); break;
+					case 0x8000:
+					case 0x9000:
+					case 0xa000:
+					case 0xb000:
+					case 0xc000:
+					case 0xd000:
+						memory_set_bankptr(1, memory_region(REGION_USER2) + 0x400 * (bank - 0x8000)); break;
 				}
 			}
 		}

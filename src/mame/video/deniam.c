@@ -204,12 +204,12 @@ WRITE16_HANDLER( deniam_coinctrl_w )
 static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
+	UINT8 *gfx = memory_region(REGION_GFX2);
 
 	for (offs = spriteram_size/2-8;offs >= 0;offs -= 8)
 	{
 		int sx,starty,endy,x,y,start,color,width,flipx,primask;
-		UINT8 *rom = memory_region(REGION_GFX2);
-
+		UINT8 *rom = gfx;
 
 		sx = (spriteram16[offs+1] & 0x01ff) + 16*8 - 1;
 		if (sx >= 512) sx -= 512;

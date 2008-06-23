@@ -117,6 +117,7 @@ PALETTE_INIT( exerion )
 VIDEO_START( exerion )
 {
 	int i;
+	UINT8 *gfx;
 
 	/* get pointers to the mixing and lookup PROMs */
 	background_mixer = memory_region(REGION_PROMS) + 0x320;
@@ -142,11 +143,12 @@ VIDEO_START( exerion )
      * Where AA,BB,CC,DD are the 2bpp data for the pixel,and a,b,c,d are the OR
      * of these two bits together.
      */
+	gfx = memory_region(REGION_GFX3);
 	for (i = 0; i < 4; i++)
 	{
 		int y;
 
-		UINT8 *src = memory_region(REGION_GFX3) + i * 0x2000;
+		UINT8 *src = gfx + i * 0x2000;
 		UINT16 *dst = background_gfx[i];
 
 		for (y = 0; y < 0x100; y++)

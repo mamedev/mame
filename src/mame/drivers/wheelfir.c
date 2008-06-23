@@ -290,7 +290,7 @@ static int wheelfir_palpos = 0;
 /* Press R to show a page of gfx, Q / E to move between pages, and W to clear the framebuffer */
 static VIDEO_UPDATE(wheelfir)
 {
-	/*
+#if 0
     int x,y;
     static int base = 0;
 
@@ -310,6 +310,7 @@ static VIDEO_UPDATE(wheelfir)
 
     if ( input_code_pressed(KEYCODE_R) )
     {
+        const UINT8 *gfx = memory_region(REGION_GFX1);
         for (y=0;y<128;y++)
         {
             for (x=0;x<512;x++)
@@ -319,13 +320,13 @@ static VIDEO_UPDATE(wheelfir)
 
                 romoffs = base+y*512+x;
 
-                romdata = memory_region(REGION_GFX1)[romoffs];
+                romdata = gfx[romoffs];
 
                 *BITMAP_ADDR16(bitmap, y, x) = romdata;
             }
         }
     }
-    */
+#endif
 
 	copybitmap(bitmap, render_bitmap, 0, 0, 0, 0, cliprect);
 	copybitmap_trans(bitmap, wheelfir_tmp_bitmap[0], 0, 0, 0, 0, cliprect, 0);
@@ -343,7 +344,7 @@ static VIDEO_UPDATE(wheelfir)
 			palette_set_color(screen->machine,x/3,MAKE_RGB(r,g,b));
 		}
 	}
-/*
+#if 0
     {
         FILE* fp;
         fp=fopen("wheelfir_pal.dmp", "w+b");
@@ -353,7 +354,7 @@ static VIDEO_UPDATE(wheelfir)
             fclose(fp);
         }
     }
-*/
+#endif
 
 	return 0;
 }

@@ -52,6 +52,7 @@ static MC6845_UPDATE_ROW( update_row )
 	UINT32 tile_address;
 	UINT16 cell,palette;
 	UINT8 b0,b1;
+	const UINT8 *gfx = memory_region(REGION_GFX1);
 
 	for(cx=0;cx<x_count;++cx)
 	{
@@ -64,13 +65,13 @@ static MC6845_UPDATE_ROW( update_row )
 
 		if(cx&1)
 		{
-			b0=memory_region(REGION_GFX1)[tile_address+0x0000]; /*  9.bin */
-			b1=memory_region(REGION_GFX1)[tile_address+0x8000]; /* 11.bin */
+			b0=gfx[tile_address+0x0000]; /*  9.bin */
+			b1=gfx[tile_address+0x8000]; /* 11.bin */
 		}
 		else
 		{
-			b0=memory_region(REGION_GFX1)[tile_address+0x4000]; /* 10.bin */
-			b1=memory_region(REGION_GFX1)[tile_address+0xc000]; /* 12.bin */
+			b0=gfx[tile_address+0x4000]; /* 10.bin */
+			b1=gfx[tile_address+0xc000]; /* 12.bin */
 		}
 
 		for(x=7;x>=0;--x)

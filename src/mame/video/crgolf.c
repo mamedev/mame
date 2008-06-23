@@ -64,12 +64,13 @@ READ8_HANDLER( crgolf_videoram_r )
 static void get_pens(pen_t *pens)
 {
 	offs_t offs;
+	const UINT8 *prom = memory_region(REGION_PROMS);
 
 	for (offs = 0; offs < NUM_PENS; offs++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
-		UINT8 data = memory_region(REGION_PROMS)[offs];
+		UINT8 data = prom[offs];
 
 		/* red component */
 		bit0 = (data >> 0) & 0x01;

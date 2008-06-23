@@ -571,9 +571,10 @@ ROM_END
 
 static MACHINE_RESET( dealer )
 {
+	UINT8 *rom = memory_region(REGION_CPU1);
 	counter = 0;
-	memory_set_bankptr(1, memory_region(REGION_CPU1));
-	memory_set_bankptr(2, ((UINT8*)memory_region(REGION_CPU1)) + 0x6000);
+	memory_set_bankptr(1, rom);
+	memory_set_bankptr(2, rom + 0x6000);
 }
 
 static DRIVER_INIT( dealer )

@@ -27,6 +27,7 @@ static VIDEO_UPDATE( missb2 )
 	int offs;
 	int sx,sy,xc,yc;
 	int gfx_num,gfx_attr,gfx_offs;
+	const UINT8 *prom;
 	const UINT8 *prom_line;
 	UINT16 bg_offs;
 
@@ -53,8 +54,9 @@ static VIDEO_UPDATE( missb2 )
 
 	sx = 0;
 
+	prom = memory_region(REGION_PROMS);
 	for (offs = 0;offs < bublbobl_objectram_size;offs += 4)
-    {
+	{
 		/* skip empty sprites */
 		/* this is dword aligned so the UINT32 * cast shouldn't give problems */
 		/* on any architecture */
@@ -63,7 +65,7 @@ static VIDEO_UPDATE( missb2 )
 
 		gfx_num = bublbobl_objectram[offs + 1];
 		gfx_attr = bublbobl_objectram[offs + 3];
-		prom_line = memory_region(REGION_PROMS) + 0x80 + ((gfx_num & 0xe0) >> 1);
+		prom_line = prom + 0x80 + ((gfx_num & 0xe0) >> 1);
 
 		gfx_offs = ((gfx_num & 0x1f) * 0x80);
 		if ((gfx_num & 0xa0) == 0xa0)

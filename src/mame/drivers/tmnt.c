@@ -4037,6 +4037,7 @@ static DRIVER_INIT( mia )
 static DRIVER_INIT( tmnt )
 {
 	UINT8 *gfxdata;
+	const UINT8 *code_conv_table;
 	int len;
 	int i,j,k,A,B,entry;
 	int bits[32];
@@ -4089,9 +4090,9 @@ static DRIVER_INIT( tmnt )
 
 	temp = malloc_or_die(len);
 	memcpy(temp,gfxdata,len);
+	code_conv_table = &memory_region(REGION_PROMS)[0x0000];
 	for (A = 0;A < len/4;A++)
 	{
-		UINT8 *code_conv_table = &memory_region(REGION_PROMS)[0x0000];
 #define CA0 0
 #define CA1 1
 #define CA2 2

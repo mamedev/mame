@@ -56,17 +56,6 @@ static UINT16 *backupram1, *backupram2;
 
 /*************************************
  *
- *  Prototypes
- *
- *************************************/
-
-extern void fd1094_machine_init(void);
-extern void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(UINT8 *));
-
-
-
-/*************************************
- *
  *  Configuration
  *
  *************************************/

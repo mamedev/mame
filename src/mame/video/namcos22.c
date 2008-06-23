@@ -636,8 +636,8 @@ ApplyGamma( bitmap_t *bitmap )
 	else
 	{ /* system 22 */
 		const UINT8 *rlut = 0x000+(const UINT8 *)memory_region(REGION_USER1);
-		const UINT8 *glut = 0x100+(const UINT8 *)memory_region(REGION_USER1);
-		const UINT8 *blut = 0x200+(const UINT8 *)memory_region(REGION_USER1);
+		const UINT8 *glut = 0x100+rlut;
+		const UINT8 *blut = 0x200+rlut;
 		for( y=0; y<bitmap->height; y++ )
 		{
 			UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);

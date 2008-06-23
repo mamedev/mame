@@ -1458,6 +1458,7 @@ static INTERRUPT_GEN( irq_start )
 static MACHINE_RESET(hyperneo)
 {
 	int i ;
+	const UINT8 *rom = memory_region(REGION_USER2);
 
 	/* Sound CPU */
 	UINT8 *RAM = (UINT8*)hng64_soundram;
@@ -1476,7 +1477,7 @@ static MACHINE_RESET(hyperneo)
 
 	/* Fill up virtual memory with ROM */
 	for (i = 0x0; i < 0x100000; i++)
-		hng64_com_virtual_mem[i] = memory_region(REGION_USER2)[i] ;
+		hng64_com_virtual_mem[i] = rom[i] ;
 
 	KL5C80_virtual_mem_sync();
 	memory_set_opbase_handler(2, KL5C80_opbase_handler);

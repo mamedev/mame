@@ -124,12 +124,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 VIDEO_UPDATE( strnskil )
 {
 	int row;
+	const UINT8 *usr1 = memory_region(REGION_USER1);
 
 	for (row = 0; row < 32; row++)
 	{
 		if (strnskil_scrl_ctrl != 0x07)
 		{
-			switch (memory_region(REGION_USER1)[strnskil_scrl_ctrl * 32 + row])
+			switch (usr1[strnskil_scrl_ctrl * 32 + row])
 			{
 			case 2:
 				tilemap_set_scrollx(bg_tilemap, row, -~strnskil_xscroll[1]);

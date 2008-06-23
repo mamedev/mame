@@ -1935,9 +1935,9 @@ static WRITE16_HANDLER( killbld_prot_w )
 						/* for now, cheat -- the scramble isn't understood, it might
                            be state based */
 						int x;
+						UINT16 *RAMDUMP = (UINT16*)memory_region(REGION_USER2);
 						for (x=0;x<size;x++)
 						{
-							UINT16 *RAMDUMP = (UINT16*)memory_region(REGION_USER2);
 							UINT16 dat;
 
 							dat = RAMDUMP[dst+x];
@@ -1948,10 +1948,10 @@ static WRITE16_HANDLER( killbld_prot_w )
 					{
 						/* mode 5 seems to be a straight copy */
 						int x;
+						UINT16 *RAMDUMP = (UINT16*)memory_region(REGION_USER2);
+						UINT16 *PROTROM = (UINT16*)memory_region(REGION_USER1);
 						for (x=0;x<size;x++)
 						{
-							UINT16 *RAMDUMP = (UINT16*)memory_region(REGION_USER2);
-							UINT16 *PROTROM = (UINT16*)memory_region(REGION_USER1);
 							UINT16 dat;
 							dat = PROTROM[src+x];
 
@@ -1965,10 +1965,10 @@ static WRITE16_HANDLER( killbld_prot_w )
 					{
 						/* mode 6 seems to swap bytes and nibbles */
 						int x;
+						UINT16 *RAMDUMP = (UINT16*)memory_region(REGION_USER2);
+						UINT16 *PROTROM = (UINT16*)memory_region(REGION_USER1);
 						for (x=0;x<size;x++)
 						{
-							UINT16 *RAMDUMP = (UINT16*)memory_region(REGION_USER2);
-							UINT16 *PROTROM = (UINT16*)memory_region(REGION_USER1);
 							UINT16 dat;
 							dat = PROTROM[src+x];
 

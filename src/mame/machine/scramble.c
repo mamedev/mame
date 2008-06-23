@@ -695,6 +695,7 @@ DRIVER_INIT( losttomb )
 DRIVER_INIT( hustler )
 {
 	offs_t A;
+	UINT8 *rom = memory_region(REGION_CPU1);
 
 
 	for (A = 0;A < 0x4000;A++)
@@ -702,7 +703,6 @@ DRIVER_INIT( hustler )
 		UINT8 xormask;
 		int bits[8];
 		int i;
-		UINT8 *rom = memory_region(REGION_CPU1);
 
 
 		for (i = 0;i < 8;i++)
@@ -723,7 +723,7 @@ DRIVER_INIT( hustler )
 
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
 	{
-		UINT8 *rom = memory_region(REGION_CPU2);
+		rom = memory_region(REGION_CPU2);
 
 
 		for (A = 0;A < 0x0800;A++)
@@ -734,6 +734,7 @@ DRIVER_INIT( hustler )
 DRIVER_INIT( billiard )
 {
 	offs_t A;
+	UINT8 *rom = memory_region(REGION_CPU1);
 
 
 	for (A = 0;A < 0x4000;A++)
@@ -741,7 +742,6 @@ DRIVER_INIT( billiard )
 		UINT8 xormask;
 		int bits[8];
 		int i;
-		UINT8 *rom = memory_region(REGION_CPU1);
 
 
 		for (i = 0;i < 8;i++)
@@ -764,7 +764,7 @@ DRIVER_INIT( billiard )
 
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
 	{
-		UINT8 *rom = memory_region(REGION_CPU2);
+		rom = memory_region(REGION_CPU2);
 
 
 		for (A = 0;A < 0x0800;A++)

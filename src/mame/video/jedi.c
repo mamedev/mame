@@ -236,6 +236,7 @@ static void draw_sprites(jedi_state *state, bitmap_t *bitmap, const rectangle *c
 {
 	offs_t offs;
 	UINT8 *spriteram = state->spriteram;
+	UINT8 *gfx3 = memory_region(REGION_GFX3);
 
 	for (offs = 0x00; offs < 0x30; offs++)
 	{
@@ -265,7 +266,7 @@ static void draw_sprites(jedi_state *state, bitmap_t *bitmap, const rectangle *c
 		else
 			y_size = 0x10;
 
-		gfx = &memory_region(REGION_GFX3)[code << 5];
+		gfx = &gfx3[code << 5];
 
 		if (flip_y)
 			y = y + y_size - 1;

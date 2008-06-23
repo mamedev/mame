@@ -5142,10 +5142,11 @@ static void megadriv_init_common(running_machine *machine)
           some games specify a single address, (start 200001, end 200001)
           this usually means there is serial eeprom instead */
 		int i;
+		UINT16 *rom = (UINT16*)memory_region(REGION_CPU1);
+
 		mame_printf_debug("DEBUG:: Header: Backup RAM string (ignore for games without)\n");
 		for (i=0;i<12;i++)
 		{
-			UINT16 *rom = (UINT16*)memory_region(REGION_CPU1);
 			if (i==2) mame_printf_debug("\nstart: ");
 			if (i==4) mame_printf_debug("\nend  : ");
 			if (i==6) mame_printf_debug("\n");

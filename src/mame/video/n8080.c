@@ -157,6 +157,7 @@ VIDEO_UPDATE( spacefev )
 	int y;
 
 	const UINT8* pRAM = videoram;
+	const UINT8* pPROM = memory_region(REGION_PROMS);
 
 	for (y = 0; y < 256; y++)
 	{
@@ -174,7 +175,7 @@ VIDEO_UPDATE( spacefev )
 			}
 			else
 			{
-				UINT8 val = memory_region(REGION_PROMS)[x >> 3];
+				UINT8 val = pPROM[x >> 3];
 
 				if ((x >> 3) == 0x06)
 				{

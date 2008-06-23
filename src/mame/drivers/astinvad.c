@@ -156,6 +156,7 @@ static VIDEO_UPDATE( astinvad )
 
 static VIDEO_UPDATE( spaceint )
 {
+	const UINT8 *color_prom = memory_region(REGION_PROMS);
 	int offs;
 
 	for (offs = 0; offs < videoram_size; offs++)
@@ -168,7 +169,7 @@ static VIDEO_UPDATE( spaceint )
 
 		/* this is almost certainly wrong */
 		offs_t n = ((offs >> 5) & 0xf0) | color;
-		color = memory_region(REGION_PROMS)[n] & 0x07;
+		color = color_prom[n] & 0x07;
 
 		plot_byte(bitmap, y, x, data, color);
 	}

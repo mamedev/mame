@@ -767,6 +767,7 @@ ROM_END
 static DRIVER_INIT( lazercmd )
 {
 int i, y;
+UINT8 *gfx = memory_region(REGION_GFX1);
 
 /******************************************************************
  * To show the maze bit #6 and #7 of the video ram are used.
@@ -778,8 +779,8 @@ int i, y;
  ******************************************************************/
 	for (i = 0; i < 0x40; i++)
 	{
-UINT8 *d = &memory_region(REGION_GFX1)[0 * 64 * 10 + i * VERT_CHR];
-UINT8 *s = &memory_region(REGION_GFX1)[4 * 64 * 10 + i * VERT_FNT];
+		UINT8 *d = &gfx[0 * 64 * 10 + i * VERT_CHR];
+		UINT8 *s = &gfx[4 * 64 * 10 + i * VERT_FNT];
 
 		for (y = 0; y < VERT_CHR; y++)
 		{
@@ -795,6 +796,7 @@ UINT8 *s = &memory_region(REGION_GFX1)[4 * 64 * 10 + i * VERT_FNT];
 static DRIVER_INIT( medlanes )
 {
 int i, y;
+UINT8 *gfx = memory_region(REGION_GFX1);
 
 /******************************************************************
  * To show the maze bit #6 and #7 of the video ram are used.
@@ -806,8 +808,8 @@ int i, y;
  ******************************************************************/
 	for (i = 0; i < 0x40; i++)
 	{
-UINT8 *d = &memory_region(REGION_GFX1)[0 * 64 * 10 + i * VERT_CHR];
-UINT8 *s = &memory_region(REGION_GFX1)[4 * 64 * 10 + i * VERT_FNT];
+		UINT8 *d = &gfx[0 * 64 * 10 + i * VERT_CHR];
+		UINT8 *s = &gfx[4 * 64 * 10 + i * VERT_FNT];
 
 		for (y = 0; y < VERT_CHR; y++)
 		{
@@ -823,6 +825,7 @@ UINT8 *s = &memory_region(REGION_GFX1)[4 * 64 * 10 + i * VERT_FNT];
 static DRIVER_INIT( bbonk )
 {
 int i, y;
+UINT8 *gfx = memory_region(REGION_GFX1);
 
 /******************************************************************
  * To show the maze bit #6 and #7 of the video ram are used.
@@ -834,8 +837,8 @@ int i, y;
  ******************************************************************/
 	for (i = 0; i < 0x40; i++)
 	{
-UINT8 *d = &memory_region(REGION_GFX1)[0 * 64 * 10 + i * VERT_CHR];
-UINT8 *s = &memory_region(REGION_GFX1)[4 * 64 * 10 + i * VERT_FNT];
+		UINT8 *d = &gfx[0 * 64 * 10 + i * VERT_CHR];
+		UINT8 *s = &gfx[4 * 64 * 10 + i * VERT_FNT];
 
 		for (y = 0; y < VERT_CHR; y++)
 		{

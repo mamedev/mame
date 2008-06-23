@@ -156,6 +156,7 @@ VIDEO_START( m107 )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
 {
 	int offs;
+	UINT8 *rom = memory_region(REGION_USER1);
 
 	for (offs = 0x800-4;offs >= 0;offs -= 4)
 	{
@@ -201,7 +202,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		}
 		else
 		{
-			UINT8 *rom = memory_region(REGION_USER1);
 			int rom_offs = sprite*8;
 
 			if (rom[rom_offs+1] || rom[rom_offs+3] || rom[rom_offs+5] || rom[rom_offs+7])
