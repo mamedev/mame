@@ -3933,7 +3933,7 @@ void rm7000le_get_info(UINT32 state, cpuinfo *info)
     DISASSEMBLERS
 ***************************************************************************/
 
-#if !defined(MAME_DEBUG) && (LOG_UML || LOG_NATIVE)
+#if !defined(ENABLE_DEBUGGER) && (LOG_UML || LOG_NATIVE)
 #include "mips3dsm.c"
 #endif
 
