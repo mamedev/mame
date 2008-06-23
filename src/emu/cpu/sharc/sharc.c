@@ -120,13 +120,12 @@ typedef struct
 		UINT32 mode1;
 		UINT32 astat;
 	} status_stack[5];
-	int status_stkp;
+	INT32 status_stkp;
 
 	UINT64 px;
 
 	UINT16 *internal_ram;
 	UINT16 *internal_ram_block0, *internal_ram_block1;
-	int internal_ram_size;
 
 	int (*irq_callback)(int irqline);
 	void (*opcode_handler)(void);
@@ -136,34 +135,34 @@ typedef struct
 
 	UINT32 nfaddr;
 
-	int idle;
-	int irq_active;
-	int active_irq_num;
+	INT32 idle;
+	INT32 irq_active;
+	INT32 active_irq_num;
 
 	SHARC_BOOT_MODE boot_mode;
 
 	UINT32 dmaop_src;
 	UINT32 dmaop_dst;
 	UINT32 dmaop_chain_ptr;
-	int dmaop_src_modifier;
-	int dmaop_dst_modifier;
-	int dmaop_src_count;
-	int dmaop_dst_count;
-	int dmaop_pmode;
-	int dmaop_cycles;
-	int dmaop_channel;
-	int dmaop_chained_direction;
+	INT32 dmaop_src_modifier;
+	INT32 dmaop_dst_modifier;
+	INT32 dmaop_src_count;
+	INT32 dmaop_dst_count;
+	INT32 dmaop_pmode;
+	INT32 dmaop_cycles;
+	INT32 dmaop_channel;
+	INT32 dmaop_chained_direction;
 
-	int interrupt_active;
+	INT32 interrupt_active;
 
-	int iop_latency_cycles;
-	int iop_latency_reg;
+	INT32 iop_latency_cycles;
+	INT32 iop_latency_reg;
 	UINT32 iop_latency_data;
 
 	UINT32 delay_slot1, delay_slot2;
 
-	int systemreg_latency_cycles;
-	int systemreg_latency_reg;
+	INT32 systemreg_latency_cycles;
+	INT32 systemreg_latency_reg;
 	UINT32 systemreg_latency_data;
 	UINT32 systemreg_previous_data;
 
@@ -425,6 +424,8 @@ static offs_t sharc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT
 static void sharc_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	const sharc_config *cfg = config;
+	int saveindex;
+	
 	sharc.boot_mode = cfg->boot_mode;
 
 	sharc.irq_callback = irqcallback;
@@ -434,6 +435,121 @@ static void sharc_init(int index, int clock, const void *config, int (*irqcallba
 	sharc.internal_ram = auto_malloc(2 * 0x10000 * sizeof(UINT16));		// 2x 128KB
 	sharc.internal_ram_block0 = &sharc.internal_ram[0];
 	sharc.internal_ram_block1 = &sharc.internal_ram[0x20000/2];
+	
+	state_save_register_item("sharc", index, sharc.pc);
+	state_save_register_item_pointer("sharc", index, (&sharc.r[0].r), ARRAY_LENGTH(sharc.r));
+	state_save_register_item_pointer("sharc", index, (&sharc.reg_alt[0].r), ARRAY_LENGTH(sharc.reg_alt));
+	state_save_register_item("sharc", index, sharc.mrf);
+	state_save_register_item("sharc", index, sharc.mrb);
+
+	state_save_register_item_array("sharc", index, sharc.pcstack);
+	state_save_register_item_array("sharc", index, sharc.lcstack);
+	state_save_register_item_array("sharc", index, sharc.lastack);
+	state_save_register_item("sharc", index, sharc.lstkp);
+
+	state_save_register_item("sharc", index, sharc.faddr);
+	state_save_register_item("sharc", index, sharc.daddr);
+	state_save_register_item("sharc", index, sharc.pcstk);
+	state_save_register_item("sharc", index, sharc.pcstkp);
+	state_save_register_item("sharc", index, sharc.laddr);
+	state_save_register_item("sharc", index, sharc.curlcntr);
+	state_save_register_item("sharc", index, sharc.lcntr);
+
+	state_save_register_item_array("sharc", index, sharc.dag1.i);
+	state_save_register_item_array("sharc", index, sharc.dag1.m);
+	state_save_register_item_array("sharc", index, sharc.dag1.b);
+	state_save_register_item_array("sharc", index, sharc.dag1.l);
+	state_save_register_item_array("sharc", index, sharc.dag2.i);
+	state_save_register_item_array("sharc", index, sharc.dag2.m);
+	state_save_register_item_array("sharc", index, sharc.dag2.b);
+	state_save_register_item_array("sharc", index, sharc.dag2.l);
+	state_save_register_item_array("sharc", index, sharc.dag1_alt.i);
+	state_save_register_item_array("sharc", index, sharc.dag1_alt.m);
+	state_save_register_item_array("sharc", index, sharc.dag1_alt.b);
+	state_save_register_item_array("sharc", index, sharc.dag1_alt.l);
+	state_save_register_item_array("sharc", index, sharc.dag2_alt.i);
+	state_save_register_item_array("sharc", index, sharc.dag2_alt.m);
+	state_save_register_item_array("sharc", index, sharc.dag2_alt.b);
+	state_save_register_item_array("sharc", index, sharc.dag2_alt.l);
+	
+	for (saveindex = 0; saveindex < ARRAY_LENGTH(sharc.dma); saveindex++)
+	{
+		state_save_register_item("sharc", index * ARRAY_LENGTH(sharc.dma) + saveindex, sharc.dma[saveindex].control);
+		state_save_register_item("sharc", index * ARRAY_LENGTH(sharc.dma) + saveindex, sharc.dma[saveindex].int_index);
+		state_save_register_item("sharc", index * ARRAY_LENGTH(sharc.dma) + saveindex, sharc.dma[saveindex].int_modifier);
+		state_save_register_item("sharc", index * ARRAY_LENGTH(sharc.dma) + saveindex, sharc.dma[saveindex].int_count);
+		state_save_register_item("sharc", index * ARRAY_LENGTH(sharc.dma) + saveindex, sharc.dma[saveindex].chain_ptr);
+		state_save_register_item("sharc", index * ARRAY_LENGTH(sharc.dma) + saveindex, sharc.dma[saveindex].gen_purpose);
+		state_save_register_item("sharc", index * ARRAY_LENGTH(sharc.dma) + saveindex, sharc.dma[saveindex].ext_index);
+		state_save_register_item("sharc", index * ARRAY_LENGTH(sharc.dma) + saveindex, sharc.dma[saveindex].ext_modifier);
+		state_save_register_item("sharc", index * ARRAY_LENGTH(sharc.dma) + saveindex, sharc.dma[saveindex].ext_count);
+	}
+
+	state_save_register_item("sharc", index, sharc.mode1);
+	state_save_register_item("sharc", index, sharc.mode2);
+	state_save_register_item("sharc", index, sharc.astat);
+	state_save_register_item("sharc", index, sharc.stky);
+	state_save_register_item("sharc", index, sharc.irptl);
+	state_save_register_item("sharc", index, sharc.imask);
+	state_save_register_item("sharc", index, sharc.imaskp);
+	state_save_register_item("sharc", index, sharc.ustat1);
+	state_save_register_item("sharc", index, sharc.ustat2);
+
+	state_save_register_item_array("sharc", index, sharc.flag);
+
+	state_save_register_item("sharc", index, sharc.syscon);
+	state_save_register_item("sharc", index, sharc.sysstat);
+
+	for (saveindex = 0; saveindex < ARRAY_LENGTH(sharc.status_stack); saveindex++)
+	{
+		state_save_register_item("sharc", index * ARRAY_LENGTH(sharc.status_stack) + saveindex, sharc.status_stack[saveindex].mode1);
+		state_save_register_item("sharc", index * ARRAY_LENGTH(sharc.status_stack) + saveindex, sharc.status_stack[saveindex].astat);
+	}
+	state_save_register_item("sharc", index, sharc.status_stkp);
+
+	state_save_register_item("sharc", index, sharc.px);
+
+	state_save_register_item_pointer("sharc", index, sharc.internal_ram, 2 * 0x10000);
+	
+	state_save_register_item("sharc", index, sharc.opcode);
+	state_save_register_item("sharc", index, sharc.fetch_opcode);
+	state_save_register_item("sharc", index, sharc.decode_opcode);
+
+	state_save_register_item("sharc", index, sharc.nfaddr);
+
+	state_save_register_item("sharc", index, sharc.idle);
+	state_save_register_item("sharc", index, sharc.irq_active);
+	state_save_register_item("sharc", index, sharc.active_irq_num);
+
+	state_save_register_item("sharc", index, sharc.dmaop_src);
+	state_save_register_item("sharc", index, sharc.dmaop_dst);
+	state_save_register_item("sharc", index, sharc.dmaop_chain_ptr);
+	state_save_register_item("sharc", index, sharc.dmaop_src_modifier);
+	state_save_register_item("sharc", index, sharc.dmaop_dst_modifier);
+	state_save_register_item("sharc", index, sharc.dmaop_src_count);
+	state_save_register_item("sharc", index, sharc.dmaop_dst_count);
+	state_save_register_item("sharc", index, sharc.dmaop_pmode);
+	state_save_register_item("sharc", index, sharc.dmaop_cycles);
+	state_save_register_item("sharc", index, sharc.dmaop_channel);
+	state_save_register_item("sharc", index, sharc.dmaop_chained_direction);
+
+	state_save_register_item("sharc", index, sharc.interrupt_active);
+
+	state_save_register_item("sharc", index, sharc.iop_latency_cycles);
+	state_save_register_item("sharc", index, sharc.iop_latency_reg);
+	state_save_register_item("sharc", index, sharc.iop_latency_data);
+
+	state_save_register_item("sharc", index, sharc.delay_slot1);
+	state_save_register_item("sharc", index, sharc.delay_slot2);
+
+	state_save_register_item("sharc", index, sharc.systemreg_latency_cycles);
+	state_save_register_item("sharc", index, sharc.systemreg_latency_reg);
+	state_save_register_item("sharc", index, sharc.systemreg_latency_data);
+	state_save_register_item("sharc", index, sharc.systemreg_previous_data);
+
+	state_save_register_item("sharc", index, sharc.astat_old);
+	state_save_register_item("sharc", index, sharc.astat_old_old);
+	state_save_register_item("sharc", index, sharc.astat_old_old_old);
 }
 
 static void sharc_reset(void)

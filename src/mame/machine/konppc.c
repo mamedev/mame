@@ -9,11 +9,11 @@
 
 static UINT32 dsp_comm_ppc[MAX_CG_BOARDS][2];
 static UINT32 dsp_comm_sharc[MAX_CG_BOARDS][2];
-static int dsp_shared_ram_bank[MAX_CG_BOARDS];
+static UINT8 dsp_shared_ram_bank[MAX_CG_BOARDS];
 
-static int cgboard_id;
-static int cgboard_type;
-static int num_cgboards;
+static INT32 cgboard_id;
+static INT32 cgboard_type;
+static INT32 num_cgboards;
 
 static UINT32 *dsp_shared_ram[MAX_CG_BOARDS];
 
@@ -23,7 +23,7 @@ static UINT32 *dsp_shared_ram[MAX_CG_BOARDS];
 static UINT32 dsp_state[MAX_CG_BOARDS];
 static UINT32 pci_bridge_enable[MAX_CG_BOARDS];
 static UINT32 nwk_device_sel[MAX_CG_BOARDS];
-static int texture_bank[MAX_CG_BOARDS];
+static INT32 texture_bank[MAX_CG_BOARDS];
 
 static int nwk_fifo_half_full_r;
 static int nwk_fifo_half_full_w;
@@ -32,8 +32,8 @@ static int nwk_fifo_mask;
 
 
 static UINT32 *nwk_fifo[MAX_CG_BOARDS];
-static int nwk_fifo_read_ptr[MAX_CG_BOARDS];
-static int nwk_fifo_write_ptr[MAX_CG_BOARDS];
+static INT32 nwk_fifo_read_ptr[MAX_CG_BOARDS];
+static INT32 nwk_fifo_write_ptr[MAX_CG_BOARDS];
 
 static UINT32 *nwk_ram[MAX_CG_BOARDS];
 
@@ -60,7 +60,21 @@ void init_konami_cgboard(int num_boards, int type)
 
 		nwk_fifo[i] = auto_malloc(sizeof(UINT32) * 0x800);
 		nwk_ram[i] = auto_malloc(sizeof(UINT32) * 0x2000);
+		
+		state_save_register_item_array("konppc", i, dsp_comm_ppc[i]);
+		state_save_register_item_array("konppc", i, dsp_comm_sharc[i]);
+		state_save_register_item("konppc", i, dsp_shared_ram_bank[i]);
+		state_save_register_item_pointer("konppc", i, dsp_shared_ram[i], DSP_BANK_SIZE * 2 / sizeof(dsp_shared_ram[i][0]));
+		state_save_register_item("konppc", i, dsp_state[i]);
+		state_save_register_item("konppc", i, texture_bank[i]);
+		state_save_register_item("konppc", i, pci_bridge_enable[i]);
+		state_save_register_item("konppc", i, nwk_device_sel[i]);
+		state_save_register_item("konppc", i, nwk_fifo_read_ptr[i]);
+		state_save_register_item("konppc", i, nwk_fifo_write_ptr[i]);
+		state_save_register_item_pointer("konppc", i, nwk_fifo[i], 0x800);
+		state_save_register_item_pointer("konppc", i, nwk_ram[i], 0x2000);
 	}
+	state_save_register_item("konppc", 0, cgboard_id);
 	cgboard_type = type;
 
 	if (type == CGBOARD_TYPE_NWKTR)
@@ -417,6 +431,8 @@ void K033906_init(void)
 	{
 		K033906_reg[i] = auto_malloc(sizeof(UINT32) * 256);
 		K033906_ram[i] = auto_malloc(sizeof(UINT32) * 32768);
+		state_save_register_item_pointer("K033906", i, K033906_reg[i], 256);
+		state_save_register_item_pointer("K033906", i, K033906_ram[i], 32768);
 	}
 }
 

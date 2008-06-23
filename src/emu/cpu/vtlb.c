@@ -38,6 +38,7 @@ struct _vtlb_state
 	offs_t *			live;				/* array of live entries by table index */
 	int *				fixedpages;			/* number of pages each fixed entry covers */
 	vtlb_entry *		table;				/* table of entries by address */
+	vtlb_entry *		save;				/* cache of live table entries for saving */
 	cpu_translate_func	translate;			/* translate function */
 };
 
@@ -76,18 +77,20 @@ vtlb_state *vtlb_alloc(int cpunum, int space, int fixed_entries, int dynamic_ent
 	/* allocate the entry array */
 	vtlb->live = malloc_or_die(sizeof(vtlb->live[0]) * (fixed_entries + dynamic_entries));
 	memset(vtlb->live, 0, sizeof(vtlb->live[0]) * (fixed_entries + dynamic_entries));
+	state_save_register_item_pointer("vtlb", cpunum * ADDRESS_SPACES + space, vtlb->live, fixed_entries + dynamic_entries);
 
 	/* allocate the lookup table */
 	vtlb->table = malloc_or_die(sizeof(vtlb->table[0]) << (vtlb->addrwidth - vtlb->pageshift));
 	memset(vtlb->table, 0, sizeof(vtlb->table[0]) << (vtlb->addrwidth - vtlb->pageshift));
+	state_save_register_item_pointer("vtlb", cpunum * ADDRESS_SPACES + space, vtlb->table, 1 << (vtlb->addrwidth - vtlb->pageshift));
 
 	/* allocate the fixed page count array */
 	if (fixed_entries > 0)
 	{
 		vtlb->fixedpages = malloc_or_die(sizeof(vtlb->fixedpages[0]) * fixed_entries);
 		memset(vtlb->fixedpages, 0, sizeof(vtlb->fixedpages[0]) * fixed_entries);
+		state_save_register_item_pointer("vtlb", cpunum * ADDRESS_SPACES + space, vtlb->fixedpages, fixed_entries);
 	}
-
 	return vtlb;
 }
 

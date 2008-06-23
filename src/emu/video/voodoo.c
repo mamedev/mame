@@ -472,15 +472,17 @@ static void init_fbi(voodoo_state *v, fbi_state *f, void *memory, int fbmem)
 	f->height = 384;
 
 	/* init the pens */
-	for (pen = 0; pen < 65536; pen++)
+	f->clut_dirty = TRUE;
+	if (v->type <= VOODOO_2)
 	{
-		int r = (pen >> 11) & 0x1f;
-		int g = (pen >> 5) & 0x3f;
-		int b = pen & 0x1f;
-		r = (r << 3) | (r >> 2);
-		g = (g << 2) | (g >> 4);
-		b = (b << 3) | (b >> 2);
-		f->pen[pen] = MAKE_RGB(r, g, b);
+		for (pen = 0; pen < 32; pen++)
+			v->fbi.clut[pen] = MAKE_ARGB(pen, pal5bit(pen), pal5bit(pen), pal5bit(pen));
+		v->fbi.clut[32] = MAKE_ARGB(32,0xff,0xff,0xff);
+	}
+	else
+	{
+		for (pen = 0; pen < 512; pen++)
+			v->fbi.clut[pen] = MAKE_RGB(pen,pen,pen);
 	}
 
 	/* allocate a VBLANK timer */

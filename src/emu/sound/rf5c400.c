@@ -29,9 +29,6 @@ struct rf5c400_info
 
 	sound_stream *stream;
 
-	int current_channel;
-	int keyon_channel;
-
 	double env_ar_table[0x9f];
 	double env_dr_table[0x9f];
 	double env_rr_table[0x9f];
@@ -314,6 +311,30 @@ static void rf5c400_init_chip(struct rf5c400_info *info, int sndindex, int clock
 		info->channels[i].env_level = 0.0;
 		info->channels[i].env_step  = 0.0;
 		info->channels[i].env_scale  = 1.0;
+	}
+	
+	for (i = 0; i < ARRAY_LENGTH(info->channels); i++)
+	{
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].startH); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].startL); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].freq); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].endL); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].endHloopH); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].loopL); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].pan); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].effect); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].volume); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].attack); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].decay); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].release); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].cutoff); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].pos); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].step); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].keyon); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].env_phase); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].env_level); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].env_step); 
+		state_save_register_item("rf5c400", sndindex * ARRAY_LENGTH(info->channels) + i, info->channels[i].env_scale); 
 	}
 
 	info->stream = stream_create(0, 2, clock/384, info, rf5c400_update);

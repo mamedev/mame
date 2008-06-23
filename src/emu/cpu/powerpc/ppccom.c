@@ -183,7 +183,7 @@ INLINE void set_decrementer(powerpc_state *ppc, UINT32 newdec)
     structure based on the configured type
 -------------------------------------------------*/
 
-void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, int clock, const powerpc_config *config, int (*irqcallback)(int))
+void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, int index, int clock, const powerpc_config *config, int (*irqcallback)(int))
 {
 	/* initialize based on the config */
 	memset(ppc, 0, sizeof(*ppc));
@@ -214,6 +214,38 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 
 	/* reset the state */
 	ppccom_reset(ppc);
+	
+	/* register for save states */
+	state_save_register_item("ppc", index, ppc->pc);
+	state_save_register_item_array("ppc", index, ppc->r);
+	state_save_register_item_array("ppc", index, ppc->f);
+	state_save_register_item_array("ppc", index, ppc->cr);
+	state_save_register_item("ppc", index, ppc->xerso);
+	state_save_register_item("ppc", index, ppc->fpscr);
+	state_save_register_item("ppc", index, ppc->msr);
+	state_save_register_item_array("ppc", index, ppc->sr);
+	state_save_register_item_array("ppc", index, ppc->spr);
+	state_save_register_item_array("ppc", index, ppc->dcr);
+	if (cap & PPCCAP_4XX)
+	{
+		state_save_register_item_array("ppc", index, ppc->spu.regs);
+		state_save_register_item("ppc", index, ppc->spu.txbuf);
+		state_save_register_item("ppc", index, ppc->spu.rxbuf);
+		state_save_register_item_array("ppc", index, ppc->spu.rxbuffer);
+		state_save_register_item("ppc", index, ppc->spu.rxin);
+		state_save_register_item("ppc", index, ppc->spu.rxout);
+		state_save_register_item("ppc", index, ppc->pit_reload);
+		state_save_register_item("ppc", index, ppc->irqstate);
+	}
+	if (cap & PPCCAP_603_MMU)
+	{
+		state_save_register_item("ppc", index, ppc->mmu603_cmp);
+		state_save_register_item_array("ppc", index, ppc->mmu603_hash);
+		state_save_register_item_array("ppc", index, ppc->mmu603_r);
+	}
+	state_save_register_item("ppc", index, ppc->irq_pending);
+	state_save_register_item("ppc", index, ppc->tb_zero_cycles);
+	state_save_register_item("ppc", index, ppc->dec_zero_cycles);
 }
 
 

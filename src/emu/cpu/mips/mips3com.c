@@ -22,7 +22,6 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static STATE_POSTLOAD( mips3_postload );
 static TIMER_CALLBACK( compare_int_callback );
 
 static UINT32 compute_config_register(const mips3_state *mips);
@@ -109,29 +108,6 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int in
 		state_save_register_item("mips3", index * ARRAY_LENGTH(mips->tlb) + tlbindex, mips->tlb[tlbindex].entry_hi);
 		state_save_register_item_array("mips3", index * ARRAY_LENGTH(mips->tlb) + tlbindex, mips->tlb[tlbindex].entry_lo);
 	}
-	state_save_register_postload(Machine, mips3_postload, mips);
-}
-
-
-/*-------------------------------------------------
-    mips3_postload - post state load callback
--------------------------------------------------*/
-
-static STATE_POSTLOAD( mips3_postload )
-{
-	mips3_state *mips = param;
-	int tlbindex;
-
-	/* first clear out the existing TLB */	
-	for (tlbindex = 0; tlbindex < ARRAY_LENGTH(mips->tlb); tlbindex++)
-	{
-		vtlb_load(mips->vtlb, 2 * tlbindex + 0, 0, 0, 0);
-		vtlb_load(mips->vtlb, 2 * tlbindex + 1, 0, 0, 0);
-	}
-	
-	/* then remap the TLB */
-	for (tlbindex = 0; tlbindex < ARRAY_LENGTH(mips->tlb); tlbindex++)
-		tlb_map_entry(mips, tlbindex);
 }
 
 

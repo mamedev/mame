@@ -568,7 +568,7 @@ struct _powerpc_state
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, int clock, const powerpc_config *config, int (*irqcallback)(int));
+void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, int index, int clock, const powerpc_config *config, int (*irqcallback)(int));
 void ppccom_exit(powerpc_state *ppc);
 
 void ppccom_reset(powerpc_state *ppc);

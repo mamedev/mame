@@ -534,7 +534,7 @@ INLINE UINT32 compute_spr(UINT32 spr)
     ppcdrc_init - initialize the processor
 -------------------------------------------------*/
 
-static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, int clock, const powerpc_config *config, int (*irqcallback)(int))
+static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, int index, int clock, const powerpc_config *config, int (*irqcallback)(int))
 {
 	drcfe_config feconfig =
 	{
@@ -558,7 +558,7 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, int cl
 	memset(ppc, 0, sizeof(*ppc));
 
 	/* initialize the core */
-	ppccom_init(ppc, flavor, cap, tb_divisor, clock, config, irqcallback);
+	ppccom_init(ppc, flavor, cap, tb_divisor, index, clock, config, irqcallback);
 
 	/* allocate the implementation-specific state from the full cache */
 	ppc->impstate = drccache_memory_alloc_near(cache, sizeof(*ppc->impstate));
@@ -4220,7 +4220,7 @@ static void ppcdrc4xx_set_info(UINT32 state, cpuinfo *info)
 
 static void ppc403ga_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_403GA, PPCCAP_4XX, 1, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_403GA, PPCCAP_4XX, 1, index, clock, config, irqcallback);
 }
 
 
@@ -4259,7 +4259,7 @@ void ppc403ga_get_info(UINT32 state, cpuinfo *info)
 
 static void ppc403gcx_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_403GCX, PPCCAP_4XX, 1, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_403GCX, PPCCAP_4XX, 1, index, clock, config, irqcallback);
 }
 
 
@@ -4303,7 +4303,7 @@ void ppc403gcx_get_info(UINT32 state, cpuinfo *info)
 
 static void ppc601_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 0/* no TB */, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_601, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 0/* no TB */, index, clock, config, irqcallback);
 }
 
 
@@ -4341,7 +4341,7 @@ void ppc601_get_info(UINT32 state, cpuinfo *info)
 
 static void ppc602_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 1/* unknown */, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 1/* unknown */, index, clock, config, irqcallback);
 }
 
 
@@ -4379,7 +4379,7 @@ void ppc602_get_info(UINT32 state, cpuinfo *info)
 
 static void ppc603_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_603, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, index, clock, config, irqcallback);
 }
 
 
@@ -4417,7 +4417,7 @@ void ppc603_get_info(UINT32 state, cpuinfo *info)
 
 static void ppc603e_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_603E, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, index, clock, config, irqcallback);
 }
 
 
@@ -4455,7 +4455,7 @@ void ppc603e_get_info(UINT32 state, cpuinfo *info)
 
 static void ppc603r_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_603R, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, index, clock, config, irqcallback);
 }
 
 
@@ -4493,7 +4493,7 @@ void ppc603r_get_info(UINT32 state, cpuinfo *info)
 
 static void ppc604_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4, index, clock, config, irqcallback);
 }
 
 
@@ -4536,7 +4536,7 @@ void ppc604_get_info(UINT32 state, cpuinfo *info)
 
 static void mpc8240_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4/* unknown */, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_MPC8240, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4/* unknown */, index, clock, config, irqcallback);
 }
 
 

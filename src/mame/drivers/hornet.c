@@ -318,6 +318,12 @@
 #include "rendlay.h"
 
 static UINT8 led_reg0 = 0x7f, led_reg1 = 0x7f;
+static UINT32 *workram;
+static UINT32 *sharc_dataram[2];
+static UINT8 jvs_sdata[1024];
+static UINT32 jvs_sdata_ptr = 0;
+static UINT8 *backup_ram;
+
 
 /* K037122 Tilemap chip (move to konamiic.c ?) */
 
@@ -403,6 +409,13 @@ static TILE_GET_INFO( K037122_1_tile_info_layer1 )
 	SET_TILE_INFO(K037122_gfx_index[1], tile, color, flags);
 }
 
+static STATE_POSTLOAD( K037122_postload )
+{
+	int chip = (FPTR)param;
+	K037122_char_dirty[chip] = 1;
+	memset(K037122_dirty_map[chip], 1, K037122_NUM_TILES);
+}
+
 static int K037122_vh_start(running_machine *machine, int chip)
 {
 	for(K037122_gfx_index[chip] = 0; K037122_gfx_index[chip] < MAX_GFX_ELEMENTS; K037122_gfx_index[chip]++)
@@ -439,6 +452,11 @@ static int K037122_vh_start(running_machine *machine, int chip)
 	decodegfx(machine->gfx[K037122_gfx_index[chip]], (UINT8*)K037122_char_ram[chip], 0, machine->gfx[K037122_gfx_index[chip]]->total_elements);
 
 	machine->gfx[K037122_gfx_index[chip]]->total_colors = machine->config->total_colors / 16;
+
+	state_save_register_item_array("K037122", chip, K037122_reg[chip]);
+	state_save_register_item_pointer("K037122", chip, K037122_char_ram[chip], 0x200000/sizeof(K037122_char_ram[chip][0]));
+	state_save_register_item_pointer("K037122", chip, K037122_tile_ram[chip], 0x20000/sizeof(K037122_tile_ram[chip][0]));
+	state_save_register_postload(machine, K037122_postload, (void *)chip);
 
 	return 0;
 }
@@ -642,8 +660,6 @@ static VIDEO_UPDATE( hornet_2board )
 }
 
 /*****************************************************************************/
-static UINT32 *workram;
-
 static READ8_HANDLER( sysreg_r )
 {
 	UINT8 r = 0;
@@ -692,8 +708,6 @@ static WRITE8_HANDLER( sysreg_w )
 	}
 }
 
-static int comm_rombank = 0;
-
 static WRITE32_HANDLER( comm1_w )
 {
 	printf("comm1_w: %08X, %08X, %08X\n", offset, data, mem_mask);
@@ -703,12 +717,8 @@ static WRITE32_HANDLER( comm_rombank_w )
 {
 	int bank = data >> 24;
 	UINT8 *usr3 = memory_region(machine, REGION_USER3);
-	if (usr3)
-		if( bank != comm_rombank ) {
-			printf("rombank %02X\n", bank);
-			comm_rombank = bank & 0x7f;
-			memory_set_bankptr(1, usr3 + (comm_rombank * 0x10000));
-		}
+	if (usr3 != NULL)
+		memory_set_bank(1, bank & 0x7f);
 }
 
 static READ32_HANDLER( comm0_unk_r )
@@ -728,7 +738,7 @@ static ADDRESS_MAP_START( hornet_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7d000000, 0x7d00ffff) AM_READ8(sysreg_r, 0xffffffff)
 	AM_RANGE(0x7d010000, 0x7d01ffff) AM_WRITE8(sysreg_w, 0xffffffff)
-	AM_RANGE(0x7d020000, 0x7d021fff) AM_READWRITE(timekeeper_0_32be_r, timekeeper_0_32be_w)	/* M48T58Y RTC/NVRAM */
+	AM_RANGE(0x7d020000, 0x7d021fff) AM_READWRITE8(timekeeper_0_r, timekeeper_0_w, 0xffffffff)	/* M48T58Y RTC/NVRAM */
 	AM_RANGE(0x7d030000, 0x7d030007) AM_READWRITE(K056800_host_r, K056800_host_w)
 	AM_RANGE(0x7d042000, 0x7d043fff) AM_RAM				/* COMM BOARD 0 */
 	AM_RANGE(0x7d044000, 0x7d044007) AM_READ(comm0_unk_r)
@@ -752,8 +762,6 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static UINT32 *sharc_dataram[2];
-
 static READ32_HANDLER( dsp_dataram0_r )
 {
 	return sharc_dataram[0][offset] & 0xffff;
@@ -776,7 +784,7 @@ static WRITE32_HANDLER( dsp_dataram1_w )
 
 static ADDRESS_MAP_START( sharc0_map, ADDRESS_SPACE_DATA, 32 )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
-	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w)
+	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w) AM_BASE(&sharc_dataram[0])
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
 	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE(VOODOO_GRAPHICS, "voodoo0", voodoo_r, voodoo_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
@@ -786,7 +794,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sharc1_map, ADDRESS_SPACE_DATA, 32 )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
-	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w)
+	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w) AM_BASE(&sharc_dataram[1])
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
 	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE(VOODOO_GRAPHICS, "voodoo1", voodoo_r, voodoo_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_1_comm_sharc_r, cgboard_1_comm_sharc_w)
@@ -929,14 +937,23 @@ static MACHINE_START( hornet )
 	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x003fffff);
 	cpunum_set_info_ptr(0, CPUINFO_PTR_PPC_FASTRAM_BASE, workram);
 	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+
+	state_save_register_global(led_reg0);
+	state_save_register_global(led_reg1);
+	state_save_register_global_array(jvs_sdata);
+	state_save_register_global(jvs_sdata_ptr);
 }
 
 static MACHINE_RESET( hornet )
 {
 	UINT8 *usr3 = memory_region(machine, REGION_USER3);
 	UINT8 *usr5 = memory_region(machine, REGION_USER5);
-	if (usr3)
-		memory_set_bankptr(1, usr3);
+	if (usr3 != NULL)
+	{
+		memory_configure_bank(1, 0, memory_region_length(machine, REGION_USER3) / 0x40000, usr3, 0x40000);
+		memory_set_bank(1, 0);
+	}
+
 	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
@@ -993,8 +1010,11 @@ static MACHINE_RESET( hornet_2board )
 	UINT8 *usr3 = memory_region(machine, REGION_USER3);
 	UINT8 *usr5 = memory_region(machine, REGION_USER5);
 
-	if (usr3)
-		memory_set_bankptr(1, usr3);
+	if (usr3 != NULL)
+	{
+		memory_configure_bank(1, 0, memory_region_length(machine, REGION_USER3) / 0x40000, usr3, 0x40000);
+		memory_set_bank(1, 0);
+	}
 	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
 	cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, ASSERT_LINE);
 
@@ -1060,10 +1080,6 @@ MACHINE_DRIVER_END
 /*****************************************************************************/
 
 static void jamma_jvs_cmd_exec(void);
-
-static UINT8 jvs_sdata[1024];
-
-static int jvs_sdata_ptr = 0;
 
 static void jamma_jvs_w(UINT8 data)
 {
@@ -1208,34 +1224,32 @@ static void sound_irq_callback(running_machine *machine, int irq)
 		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ2, PULSE_LINE);
 }
 
-static UINT8 backup_ram[0x2000];
-static void init_hornet(running_machine *machine)
+static void init_hornet(running_machine *machine, const UINT8 *backupdef)
 {
 	init_konami_cgboard(1, CGBOARD_TYPE_HORNET);
 	set_cgboard_texture_bank(0, 5, memory_region(machine, REGION_USER5));
 
-	sharc_dataram[0] = auto_malloc(0x100000);
-
 	K056800_init(sound_irq_callback);
 	K033906_init();
 
+	backup_ram = auto_malloc(0x2000);
+	memcpy(backup_ram, backupdef, 0x2000);
 	timekeeper_init(0, TIMEKEEPER_M48T58, backup_ram);
 
 	ppc4xx_spu_set_tx_handler(0, jamma_jvs_w);
 }
 
-static void init_hornet_2board(running_machine *machine)
+static void init_hornet_2board(running_machine *machine, const UINT8 *backupdef)
 {
 	init_konami_cgboard(2, CGBOARD_TYPE_HORNET);
 	set_cgboard_texture_bank(0, 5, memory_region(machine, REGION_USER5));
 	set_cgboard_texture_bank(1, 6, memory_region(machine, REGION_USER5));
 
-	sharc_dataram[0] = auto_malloc(0x100000);
-	sharc_dataram[1] = auto_malloc(0x100000);
-
 	K056800_init(sound_irq_callback);
 	K033906_init();
 
+	backup_ram = auto_malloc(0x2000);
+	memcpy(backup_ram, backupdef, 0x2000);
 	timekeeper_init(0, TIMEKEEPER_M48T58, backup_ram);
 
 	ppc4xx_spu_set_tx_handler(0, jamma_jvs_w);
@@ -1243,185 +1257,191 @@ static void init_hornet_2board(running_machine *machine)
 
 static DRIVER_INIT(gradius4)
 {
+	UINT8 backupdef[0x2000] = { 0 };
+	
 	/* RTC data */
-	backup_ram[0x00] = 0x47;	// 'G'
-	backup_ram[0x01] = 0x58;	// 'X'
-	backup_ram[0x02] = 0x38;	// '8'
-	backup_ram[0x03] = 0x33;	// '3'
-	backup_ram[0x04] = 0x37;	// '7'
-	backup_ram[0x05] = 0x00;	//
-	backup_ram[0x06] = 0x11;	//
-	backup_ram[0x07] = 0x06;	// 06 / 11
-	backup_ram[0x08] = 0x19;	//
-	backup_ram[0x09] = 0x98;	// 1998
-	backup_ram[0x0a] = 0x4a;	// 'J'
-	backup_ram[0x0b] = 0x41;	// 'A'
-	backup_ram[0x0c] = 0x43;	// 'C'
-	backup_ram[0x0d] = 0x00;	//
-	backup_ram[0x0e] = 0x02;	// checksum
-	backup_ram[0x0f] = 0xd7;	// checksum
+	backupdef[0x00] = 0x47;	// 'G'
+	backupdef[0x01] = 0x58;	// 'X'
+	backupdef[0x02] = 0x38;	// '8'
+	backupdef[0x03] = 0x33;	// '3'
+	backupdef[0x04] = 0x37;	// '7'
+	backupdef[0x05] = 0x00;	//
+	backupdef[0x06] = 0x11;	//
+	backupdef[0x07] = 0x06;	// 06 / 11
+	backupdef[0x08] = 0x19;	//
+	backupdef[0x09] = 0x98;	// 1998
+	backupdef[0x0a] = 0x4a;	// 'J'
+	backupdef[0x0b] = 0x41;	// 'A'
+	backupdef[0x0c] = 0x43;	// 'C'
+	backupdef[0x0d] = 0x00;	//
+	backupdef[0x0e] = 0x02;	// checksum
+	backupdef[0x0f] = 0xd7;	// checksum
 
-	init_hornet(machine);
+	init_hornet(machine, backupdef);
 }
 
 static DRIVER_INIT(nbapbp)
 {
+	UINT8 backupdef[0x2000] = { 0 };
 	int i;
 	UINT16 checksum;
 
 	/* RTC data */
-	backup_ram[0x00] = 0x47;	// 'G'
-	backup_ram[0x01] = 0x58;	// 'X'
-	backup_ram[0x02] = 0x37;	// '7'
-	backup_ram[0x03] = 0x37;	// '7'
-	backup_ram[0x04] = 0x38;	// '8'
-	backup_ram[0x05] = 0x00;	//
-	backup_ram[0x06] = 0x00;	//
-	backup_ram[0x07] = 0x00;	//
-	backup_ram[0x08] = 0x19;	//
-	backup_ram[0x09] = 0x98;	// 1998
-	backup_ram[0x0a] = 0x4a;	// 'J'
-	backup_ram[0x0b] = 0x41;	// 'A'
-	backup_ram[0x0c] = 0x41;	// 'A'
-	backup_ram[0x0d] = 0x00;	//
+	backupdef[0x00] = 0x47;	// 'G'
+	backupdef[0x01] = 0x58;	// 'X'
+	backupdef[0x02] = 0x37;	// '7'
+	backupdef[0x03] = 0x37;	// '7'
+	backupdef[0x04] = 0x38;	// '8'
+	backupdef[0x05] = 0x00;	//
+	backupdef[0x06] = 0x00;	//
+	backupdef[0x07] = 0x00;	//
+	backupdef[0x08] = 0x19;	//
+	backupdef[0x09] = 0x98;	// 1998
+	backupdef[0x0a] = 0x4a;	// 'J'
+	backupdef[0x0b] = 0x41;	// 'A'
+	backupdef[0x0c] = 0x41;	// 'A'
+	backupdef[0x0d] = 0x00;	//
 
 	checksum = 0;
 	for (i=0; i < 14; i++)
 	{
-		checksum += backup_ram[i];
+		checksum += backupdef[i];
 		checksum &= 0xffff;
 	}
-	backup_ram[0x0e] = (checksum >> 8) & 0xff;	// checksum
-	backup_ram[0x0f] = (checksum >> 0) & 0xff;	// checksum
+	backupdef[0x0e] = (checksum >> 8) & 0xff;	// checksum
+	backupdef[0x0f] = (checksum >> 0) & 0xff;	// checksum
 
-	init_hornet(machine);
+	init_hornet(machine, backupdef);
 }
 
 static DRIVER_INIT(terabrst)
 {
+	UINT8 backupdef[0x2000] = { 0 };
 	int i;
 	UINT16 checksum;
 
 	/* RTC data */
-	backup_ram[0x00] = 0x47;	// 'G'
-	backup_ram[0x01] = 0x4e;	// 'N'
-	backup_ram[0x02] = 0x37;	// '7'
-	backup_ram[0x03] = 0x31;	// '1'
-	backup_ram[0x04] = 0x35;	// '5'
-	backup_ram[0x05] = 0x00;	//
-	backup_ram[0x06] = 0x00;	//
-	backup_ram[0x07] = 0x00;	//
-	backup_ram[0x08] = 0x19;	//
-	backup_ram[0x09] = 0x98;	// 1998
-	backup_ram[0x0a] = 0x41;	// 'J'
-	backup_ram[0x0b] = 0x41;	// 'A'
-	backup_ram[0x0c] = 0x45;	// 'E'
-	backup_ram[0x0d] = 0x00;	//
+	backupdef[0x00] = 0x47;	// 'G'
+	backupdef[0x01] = 0x4e;	// 'N'
+	backupdef[0x02] = 0x37;	// '7'
+	backupdef[0x03] = 0x31;	// '1'
+	backupdef[0x04] = 0x35;	// '5'
+	backupdef[0x05] = 0x00;	//
+	backupdef[0x06] = 0x00;	//
+	backupdef[0x07] = 0x00;	//
+	backupdef[0x08] = 0x19;	//
+	backupdef[0x09] = 0x98;	// 1998
+	backupdef[0x0a] = 0x41;	// 'J'
+	backupdef[0x0b] = 0x41;	// 'A'
+	backupdef[0x0c] = 0x45;	// 'E'
+	backupdef[0x0d] = 0x00;	//
 
 	checksum = 0;
 	for (i=0; i < 14; i+=2)
 	{
-		checksum += (backup_ram[i] << 8) | (backup_ram[i+1]);
+		checksum += (backupdef[i] << 8) | (backupdef[i+1]);
 	}
 	checksum = ~checksum - 0;
-	backup_ram[0x0e] = (checksum >> 8) & 0xff;	// checksum
-	backup_ram[0x0f] = (checksum >> 0) & 0xff;	// checksum
+	backupdef[0x0e] = (checksum >> 8) & 0xff;	// checksum
+	backupdef[0x0f] = (checksum >> 0) & 0xff;	// checksum
 
-	init_hornet_2board(machine);
+	init_hornet_2board(machine, backupdef);
 }
 
 static DRIVER_INIT(sscope)
 {
+	UINT8 backupdef[0x2000] = { 0 };
 	int i;
 	UINT16 checksum;
 
 	/* RTC data */
-	backup_ram[0x00] = 0x47;	// 'G'
-	backup_ram[0x01] = 0x51;	// 'Q'
-	backup_ram[0x02] = 0x38;	// '8'
-	backup_ram[0x03] = 0x33;	// '3'
-	backup_ram[0x04] = 0x30;	// '0'
-	backup_ram[0x05] = 0x00;	//
-	backup_ram[0x06] = 0x00;	//
-	backup_ram[0x07] = 0x00;	//
-	backup_ram[0x08] = 0x20;	//
-	backup_ram[0x09] = 0x00;	// 2000
-	backup_ram[0x0a] = 0x55;	// 'U'
-	backup_ram[0x0b] = 0x41;	// 'A'
-	backup_ram[0x0c] = 0x41;	// 'A'
-	backup_ram[0x0d] = 0x00;	//
+	backupdef[0x00] = 0x47;	// 'G'
+	backupdef[0x01] = 0x51;	// 'Q'
+	backupdef[0x02] = 0x38;	// '8'
+	backupdef[0x03] = 0x33;	// '3'
+	backupdef[0x04] = 0x30;	// '0'
+	backupdef[0x05] = 0x00;	//
+	backupdef[0x06] = 0x00;	//
+	backupdef[0x07] = 0x00;	//
+	backupdef[0x08] = 0x20;	//
+	backupdef[0x09] = 0x00;	// 2000
+	backupdef[0x0a] = 0x55;	// 'U'
+	backupdef[0x0b] = 0x41;	// 'A'
+	backupdef[0x0c] = 0x41;	// 'A'
+	backupdef[0x0d] = 0x00;	//
 
 	checksum = 0;
 	for (i=0; i < 14; i+=2)
 	{
-		checksum += (backup_ram[i] << 8) | (backup_ram[i+1]);
+		checksum += (backupdef[i] << 8) | (backupdef[i+1]);
 	}
 	checksum = ~checksum - 1;
-	backup_ram[0x0e] = (checksum >> 8) & 0xff;	// checksum
-	backup_ram[0x0f] = (checksum >> 0) & 0xff;	// checksum
+	backupdef[0x0e] = (checksum >> 8) & 0xff;	// checksum
+	backupdef[0x0f] = (checksum >> 0) & 0xff;	// checksum
 
-	init_hornet_2board(machine);
+	init_hornet_2board(machine, backupdef);
 }
 
 static DRIVER_INIT(sscope2)
 {
+	UINT8 backupdef[0x2000] = { 0 };
 	int i;
 	int checksum;
 
 	/* RTC data */
-	backup_ram[0x00] = 0x47;	// 'G'
-	backup_ram[0x01] = 0x4b;	// 'K'
-	backup_ram[0x02] = 0x39;	// '9'
-	backup_ram[0x03] = 0x33;	// '3'
-	backup_ram[0x04] = 0x31;	// '1'
-	backup_ram[0x05] = 0x00;	//
-	backup_ram[0x06] = 0x00;	//
-	backup_ram[0x07] = 0x00;	//
-	backup_ram[0x08] = 0x20;	//
-	backup_ram[0x09] = 0x00;	// 2000
-	backup_ram[0x0a] = 0x55;	// 'U'
-	backup_ram[0x0b] = 0x41;	// 'A'
-	backup_ram[0x0c] = 0x41;	// 'A'
-	backup_ram[0x0d] = 0x00;	//
+	backupdef[0x00] = 0x47;	// 'G'
+	backupdef[0x01] = 0x4b;	// 'K'
+	backupdef[0x02] = 0x39;	// '9'
+	backupdef[0x03] = 0x33;	// '3'
+	backupdef[0x04] = 0x31;	// '1'
+	backupdef[0x05] = 0x00;	//
+	backupdef[0x06] = 0x00;	//
+	backupdef[0x07] = 0x00;	//
+	backupdef[0x08] = 0x20;	//
+	backupdef[0x09] = 0x00;	// 2000
+	backupdef[0x0a] = 0x55;	// 'U'
+	backupdef[0x0b] = 0x41;	// 'A'
+	backupdef[0x0c] = 0x41;	// 'A'
+	backupdef[0x0d] = 0x00;	//
 
 	checksum = 0;
 	for (i=0; i < 14; i+=2)
 	{
-		checksum += (backup_ram[i] << 8) | (backup_ram[i+1]);
+		checksum += (backupdef[i] << 8) | (backupdef[i+1]);
 		checksum &= 0xffff;
 	}
 	checksum = (-1 - checksum) - 1;
-	backup_ram[0x0e] = (checksum >> 8) & 0xff;	// checksum
-	backup_ram[0x0f] = (checksum >> 0) & 0xff;	// checksum
+	backupdef[0x0e] = (checksum >> 8) & 0xff;	// checksum
+	backupdef[0x0f] = (checksum >> 0) & 0xff;	// checksum
 
 
 	/* Silent Scope data */
-	backup_ram[0x1f40] = 0x47;	// 'G'
-	backup_ram[0x1f41] = 0x4b;	// 'Q'
-	backup_ram[0x1f42] = 0x38;	// '8'
-	backup_ram[0x1f43] = 0x33;	// '3'
-	backup_ram[0x1f44] = 0x30;	// '0'
-	backup_ram[0x1f45] = 0x00;	//
-	backup_ram[0x1f46] = 0x00;	//
-	backup_ram[0x1f47] = 0x00;	//
-	backup_ram[0x1f48] = 0x20;	//
-	backup_ram[0x1f49] = 0x00;	// 2000
-	backup_ram[0x1f4a] = 0x55;	// 'U'
-	backup_ram[0x1f4b] = 0x41;	// 'A'
-	backup_ram[0x1f4c] = 0x41;	// 'A'
-	backup_ram[0x1f4d] = 0x00;	//
+	backupdef[0x1f40] = 0x47;	// 'G'
+	backupdef[0x1f41] = 0x4b;	// 'Q'
+	backupdef[0x1f42] = 0x38;	// '8'
+	backupdef[0x1f43] = 0x33;	// '3'
+	backupdef[0x1f44] = 0x30;	// '0'
+	backupdef[0x1f45] = 0x00;	//
+	backupdef[0x1f46] = 0x00;	//
+	backupdef[0x1f47] = 0x00;	//
+	backupdef[0x1f48] = 0x20;	//
+	backupdef[0x1f49] = 0x00;	// 2000
+	backupdef[0x1f4a] = 0x55;	// 'U'
+	backupdef[0x1f4b] = 0x41;	// 'A'
+	backupdef[0x1f4c] = 0x41;	// 'A'
+	backupdef[0x1f4d] = 0x00;	//
 
 	checksum = 0;
 	for (i=0x1f40; i < 0x1f4e; i+=2)
 	{
-		checksum += (backup_ram[i] << 8) | (backup_ram[i+1]);
+		checksum += (backupdef[i] << 8) | (backupdef[i+1]);
 		checksum &= 0xffff;
 	}
 	checksum = (-1 - checksum) - 1;
-	backup_ram[0x1f4e] = (checksum >> 8) & 0xff;	// checksum
-	backup_ram[0x1f4f] = (checksum >> 0) & 0xff;	// checksum
+	backupdef[0x1f4e] = (checksum >> 8) & 0xff;	// checksum
+	backupdef[0x1f4f] = (checksum >> 0) & 0xff;	// checksum
 
-	init_hornet_2board(machine);
+	init_hornet_2board(machine, backupdef);
 }
 
 /*****************************************************************************/
@@ -1561,9 +1581,9 @@ ROM_END
 
 /*************************************************************************/
 
-GAME( 1998, gradius4,	0,		hornet,			  hornet,	gradius4,	ROT0,	"Konami",	"Gradius 4: Fukkatsu", GAME_IMPERFECT_SOUND )
-GAME( 1998, nbapbp,		0,		hornet,			  hornet,	nbapbp,		ROT0,	"Konami",	"NBA Play By Play", GAME_IMPERFECT_SOUND )
-GAMEL( 1998, terabrst,   0,     hornet_2board,    hornet, terabrst,   ROT0,   "Konami",   "Teraburst", GAME_IMPERFECT_SOUND, layout_dualhsxs )
-GAMEL( 2000, sscope,	0,		hornet_2board,	  sscope,	sscope,		ROT0,	"Konami",	"Silent Scope (ver UAB)", GAME_IMPERFECT_SOUND|GAME_NOT_WORKING, layout_dualhsxs )
-GAMEL( 2000, sscopea,	sscope, hornet_2board,	  sscope,	sscope,		ROT0,	"Konami",	"Silent Scope (ver UAA)", GAME_IMPERFECT_SOUND|GAME_NOT_WORKING, layout_dualhsxs )
-GAMEL( 2000, sscope2,	0,		hornet_2board_v2, sscope,	sscope2,	ROT0,	"Konami",	"Silent Scope 2", GAME_IMPERFECT_SOUND|GAME_NOT_WORKING, layout_dualhsxs )
+GAME( 1998, gradius4,	0,		hornet,			  hornet,	gradius4,	ROT0,	"Konami",	"Gradius 4: Fukkatsu", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1998, nbapbp,		0,		hornet,			  hornet,	nbapbp,		ROT0,	"Konami",	"NBA Play By Play", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAMEL( 1998, terabrst,  0,      hornet_2board,    hornet,   terabrst,   ROT0,   "Konami",   "Teraburst", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope,	0,		hornet_2board,	  sscope,	sscope,		ROT0,	"Konami",	"Silent Scope (ver UAB)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscopea,	sscope, hornet_2board,	  sscope,	sscope,		ROT0,	"Konami",	"Silent Scope (ver UAA)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope2,	0,		hornet_2board_v2, sscope,	sscope2,	ROT0,	"Konami",	"Silent Scope 2", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
