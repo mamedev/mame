@@ -46,6 +46,12 @@
  *
  *
  *  **** Change Log ****
+ *  Wilbert Pol (23-Jun-2008) changed version to 0.5
+ *   - Added configurable i8x41/i8x42 subtype support.
+ *   - Fixed disassembly for opcode 0x67.
+ *   - Fixed carry flag handling in ADDC A,#N instruction.
+ *   - Fixed carry flag handling in RLC A instruction.
+ *
  *  Wilbert Pol (22-Jun-2008) changed version to 0.4
  *   - Removed i8x41.ram hack.
  *
@@ -90,7 +96,6 @@
  *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "i8x41.h"
 
 typedef struct {
@@ -109,8 +114,8 @@ typedef struct {
 	UINT8	p1;
 	UINT8	p2;
 	UINT8	p2_hs;
-	UINT8	*ram;
 	int 	(*irq_callback)(int irqline);
+	i8x41_config	*config;
 }	I8X41;
 
 static int i8x41_ICount;
@@ -287,9 +292,9 @@ INLINE void addc_rm(int r)
  ***********************************/
 INLINE void addc_i(void)
 {
-	UINT8 res = A + ROP_ARG(PC);
+	UINT8 res = A + ROP_ARG(PC) + (PSW >> 7);
 	PC++;
-	if( res < A ) PSW |= FC;
+	if( res <= A ) PSW |= FC;
 	if( (res & 0x0f) < (A & 0x0f) ) PSW |= FA;
 	A = res;
 }
@@ -1135,7 +1140,7 @@ INLINE void rl_a(void)
 INLINE void rlc_a(void)
 {
 	UINT8 c = PSW >> 7;
-	PSW = (PSW & ~FC) | (A >> 7);
+	PSW = (PSW & ~FC) | (A & FC);
 	A = (A << 1) | c;
 }
 
@@ -1311,6 +1316,7 @@ static const UINT8 i8x41_cycles[] = {
 static void i8x41_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	i8x41.irq_callback = irqcallback;
+	i8x41.config = (i8x41_config *)config;
 
 	state_save_register_item("i8x41", index, i8x41.ppc);
 	state_save_register_item("i8x41", index, i8x41.pc);
@@ -1337,11 +1343,17 @@ static void i8x41_init(int index, int clock, const void *config, int (*irqcallba
 static void i8x41_reset(void)
 {
 	int (*save_irqcallback)(int) = i8x41.irq_callback;
+	i8x41_config	*save_config = i8x41.config;
 	memset(&i8x41, 0, sizeof(I8X41));
 	i8x41.irq_callback = save_irqcallback;
+	i8x41.config = save_config;
 
 	/* default to 8041 behaviour for DBBI/DBBO and extended commands */
 	i8x41.subtype = 8041;
+	if ( i8x41.config != NULL && i8x41.config->type == TYPE_I8X42 )
+	{
+		i8x41.subtype = 8042;
+	}
 
 	ENABLE = IBFI | TCNTI;
 	DBBI = 0xff;
@@ -2268,7 +2280,7 @@ void i8x41_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "I8X41");				break;
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Intel 8x41");			break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.4");					break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.5");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 
