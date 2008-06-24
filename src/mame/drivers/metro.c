@@ -3524,9 +3524,9 @@ static INPUT_PORTS_START( 3kokushi )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )		// Timer speed
 	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )				//   Slow
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )				//   Normal
