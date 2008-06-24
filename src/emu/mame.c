@@ -743,6 +743,20 @@ void mame_schedule_load(running_machine *machine, const char *filename)
 
 
 /*-------------------------------------------------
+    mame_is_save_or_load_pending - is a save or 
+    load pending?
+-------------------------------------------------*/
+
+int mame_is_save_or_load_pending(running_machine *machine)
+{
+	/* we can't check for saveload_pending_file here because it will bypass */
+	/* required UI screens if a state is queued from the command line */
+	mame_private *mame = machine->mame_data;
+	return (mame->saveload_pending_file != NULL);
+}
+
+
+/*-------------------------------------------------
     mame_is_scheduled_event_pending - is a
     scheduled event pending?
 -------------------------------------------------*/

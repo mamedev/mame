@@ -302,6 +302,9 @@ void mame_schedule_save(running_machine *machine, const char *filename);
 /* schedule a load */
 void mame_schedule_load(running_machine *machine, const char *filename);
 
+/* is a save or load pending? */
+int mame_is_save_or_load_pending(running_machine *machine);
+
 /* is a scheduled event pending? */
 int mame_is_scheduled_event_pending(running_machine *machine);
 

@@ -844,7 +844,7 @@ void mame_debug_hook(offs_t curpc)
 	}
 
 	/* if we are supposed to halt, do it now */
-	if (execution_state == EXECUTION_STATE_STOPPED)
+	if (execution_state == EXECUTION_STATE_STOPPED && !mame_is_scheduled_event_pending(Machine) && !mame_is_save_or_load_pending(Machine))
 	{
 		/* reset the state */
 		steps_until_stop = 0;
