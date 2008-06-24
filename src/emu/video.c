@@ -351,19 +351,23 @@ void video_init(running_machine *machine)
 	/* create a render target for snapshots */
 	viewname = options_get_string(mame_options(), OPTION_SNAPVIEW);
 	global.snap_native = (machine->primary_screen != NULL && (viewname[0] == 0 || strcmp(viewname, "native") == 0));
+	
+	/* the native target is hard-coded to our internal layout and has all options disabled */
 	if (global.snap_native)
+	{
 		global.snap_target = render_target_alloc(layout_snap, RENDER_CREATE_SINGLE_FILE | RENDER_CREATE_HIDDEN);
-	else
-		global.snap_target = render_target_alloc(NULL, RENDER_CREATE_HIDDEN);
-	assert(global.snap_target != NULL);
-
-	/* if we are using the native layout, turn off all accoutrements */
-	if (global.snap_native)
+		assert(global.snap_target != NULL);
 		render_target_set_layer_config(global.snap_target, 0);
-
-	/* otherwise, find the requested view and select it */
+	}
+	
+	/* other targets select the specified view and turn off effects */
 	else
+	{
+		global.snap_target = render_target_alloc(NULL, RENDER_CREATE_HIDDEN);
+		assert(global.snap_target != NULL);
 		render_target_set_view(global.snap_target, video_get_view_for_target(machine, global.snap_target, viewname, 0, 1));
+		render_target_set_layer_config(global.snap_target, render_target_get_layer_config(global.snap_target) & ~LAYER_CONFIG_ENABLE_SCREEN_OVERLAY);
+	}
 
 	/* extract snap resolution if present */
 	if (sscanf(options_get_string(mame_options(), OPTION_SNAPSIZE), "%dx%d", &global.snap_width, &global.snap_height) != 2)
