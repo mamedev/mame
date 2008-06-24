@@ -4230,13 +4230,13 @@ static x86code *op_writem(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 		emit_mov_r64_p64(drcbe, &dst, REG_PARAM3, &maskp);								// mov    param3,maskp
 	}
 	if ((spacesizep.value & 3) == DRCUML_SIZE_WORD)
-		emit_call(&dst, (x86code *)drcbe->accessors[spacesizep.value / 16].write_word_masked);
+		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].write_word_masked);
 																						// call   write_word_masked
 	else if ((spacesizep.value & 3) == DRCUML_SIZE_DWORD)
-		emit_call(&dst, (x86code *)drcbe->accessors[spacesizep.value / 16].write_dword_masked);
+		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].write_dword_masked);
 																						// call   write_dword_masked
 	else if ((spacesizep.value & 3) == DRCUML_SIZE_QWORD)
-		emit_call(&dst, (x86code *)drcbe->accessors[spacesizep.value / 16].write_qword_masked);
+		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].write_qword_masked);
 																						// call   write_qword_masked
 	return dst;
 }
