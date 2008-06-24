@@ -436,7 +436,7 @@ offs_t i8085_dasm(char *buff, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 		case 0x73: sprintf (buff,"mov  m,e");                        break;
 		case 0x74: sprintf (buff,"mov  m,h");                        break;
 		case 0x75: sprintf (buff,"mov  m,l");                        break;
-		case 0x76: sprintf (buff,"mov  m,m");                        break;
+		case 0x76: sprintf (buff,"hlt");                             break;
 		case 0x77: sprintf (buff,"mov  m,a");                        break;
 		case 0x78: sprintf (buff,"mov  a,b");                        break;
 		case 0x79: sprintf (buff,"mov  a,c");                        break;

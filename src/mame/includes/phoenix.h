@@ -68,3 +68,5 @@ CUSTOM_INPUT( pleiads_protection_r );
 READ8_HANDLER( survival_input_port_0_r );
 READ8_HANDLER( survival_protection_r );
 
+UINT8 survival_sid_callback( void );
+

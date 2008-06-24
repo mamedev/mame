@@ -15,8 +15,10 @@ static UINT8 videoram_pg_index;
 static UINT8 palette_bank;
 static UINT8 cocktail_mode;
 static int pleiads_protection_question;
-static int survival_protection_value;
+static UINT8 survival_protection_value;
+static UINT8 survival_sid_value;
 static tilemap *fg_tilemap, *bg_tilemap;
+static UINT8 survival_input_latches[2];
 
 
 /***************************************************************************
@@ -319,27 +321,92 @@ CUSTOM_INPUT( pleiads_protection_r )
 	}
 }
 
+/*
+    Inputs are demangled at 0x1ae6-0x1b04 using the table at 0x1b26
+    and bit 0 of the data from the AY8910 port B. The equation is:
+    input = map[input] + ay_data + b@437c
+    (b@437c is set and cleared elsewhere in the code, but is
+    always 0 during the demangling.)
+
+    A routine at 0x2f31 checks for incorrect AY 8910 port B data.
+    Incorrect values increment an error counter at 0x4396 which
+    causes bad sprites and will kill the game after a specified
+    number of errors. For input & 0xf0 == 0 or 2 or 4, AY 8910
+    must return 0. For all other joystick bits, it must return 1.
+
+    Another  routine at 0x02bc checks for bad SID data, and
+    increments the same error counter.
+*/
+
+#define REMAP_JS(js) ((ret & 0xf) | ( (js & 0xf)  << 4))
 READ8_HANDLER( survival_input_port_0_r )
 {
-	int ret = input_port_read(machine, "IN0");
+	UINT8 ret = ~input_port_read(machine, "IN0");
 
-	if (survival_protection_value)
+	// Any value that remaps the joystick input to 0,2,4 must return + 0 through AY8910;
+	// All other remaps must return 1 through AY8910.
+
+	survival_protection_value = 1;
+	survival_sid_value = 0;
+
+	switch( ( ret >> 4) & 0xf )
 	{
-		ret ^= 0xf0;
+		case 0: // js_nop = 7 + 1
+			ret = REMAP_JS( 7 );
+			break;
+		case 1: // js_w = 4 + 0
+			survival_sid_value = 0x80;
+			survival_protection_value = 0;
+			ret = REMAP_JS( 4 );
+			break;
+		case 2: // js_e = 0 + 0
+			survival_sid_value = 0x80;
+			survival_protection_value = 0;
+			ret = REMAP_JS( 2 );
+			break;
+		case 4: // js_n = 1 + 1
+			ret = REMAP_JS( 8 );
+			break;
+		case 5: // js_nw = 2 + 1
+			survival_sid_value = 0x80;
+			ret = REMAP_JS( 0xc );
+			break;
+		case 6: // js_ne = 0 + 1;
+			survival_sid_value = 0x80;
+			ret = REMAP_JS( 0xa );
+			break;
+		case 8: // js_s = 5 + 1
+			ret = REMAP_JS( 1 );
+			break;
+		case 9: // js_sw = 4 + 1
+			survival_sid_value = 0x80;
+			ret = REMAP_JS( 5 );
+			break;
+		case 0xa: // js_se = 6 + 1
+			survival_sid_value = 0x80;
+			ret = REMAP_JS( 3 );
+			break;
+
+		default:
+			break;
 	}
 
-	return ret;
+	survival_input_latches[0] = survival_input_latches[1];
+	survival_input_latches[1] = ~ret;
+
+	return survival_input_latches[0];
 }
 
 READ8_HANDLER( survival_protection_r )
 {
-	if (activecpu_get_pc() == 0x2017)
-	{
-		survival_protection_value ^= 1;
-	}
-
 	return survival_protection_value;
 }
+
+UINT8 survival_sid_callback( void )
+{
+	return survival_sid_value;
+}
+
 
 /***************************************************************************
 

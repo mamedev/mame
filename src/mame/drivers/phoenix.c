@@ -39,6 +39,7 @@ Pleiads:
 
 #include "driver.h"
 #include "sound/tms36xx.h"
+#include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
 #include "sound/custom.h"
 #include "phoenix.h"
@@ -1027,10 +1028,7 @@ static DRIVER_INIT( condor )
 
 static DRIVER_INIT( survival )
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
-
-	rom[0x0157] = 0x21;	/* ROM check */
-	rom[0x02e8] = 0x21; /* crash due to protection, it still locks up somewhere else */
+	cpunum_set_info_fct(0, CPUINFO_PTR_I8085_SID_CALLBACK, (void*)survival_sid_callback);
 }
 
 
@@ -1058,4 +1056,4 @@ GAME( 1981, pleiadbl, pleiads,  pleiads,  pleiads,  0,        ROT90, "bootleg", 
 GAME( 1981, pleiadce, pleiads,  pleiads,  pleiadce, 0,        ROT90, "Tehkan (Centuri license)", "Pleiads (Centuri)", GAME_IMPERFECT_COLORS )
 GAME( 1981, capitol,  pleiads,  phoenix,  capitol,  0,        ROT90, "Universal Video Spiel", "Capitol", GAME_IMPERFECT_COLORS )
 
-GAME( 1982, survival, 0,        survival, survival, survival, ROT90, "Rock-ola", "Survival", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1982, survival, 0,        survival, survival, survival, ROT90, "Rock-ola", "Survival", GAME_IMPERFECT_COLORS )
