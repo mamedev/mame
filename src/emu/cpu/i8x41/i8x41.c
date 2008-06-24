@@ -46,6 +46,13 @@
  *
  *
  *  **** Change Log ****
+ *  Wilbert Pol (24-Jun-2008) changed version to 0.6
+ *   - Updated the ram sizes. 8041 uses 128 bytes, 8042
+ *     8042 uses 256 bytes.
+ *   - Added support for re-enabling interrupts inside
+ *     an interrupt handler.
+ *   - Fixed cycle count for DJNZ instruction.
+ *
  *  Wilbert Pol (23-Jun-2008) changed version to 0.5
  *   - Added configurable i8x41/i8x42 subtype support.
  *   - Fixed disassembly for opcode 0x67.
@@ -114,6 +121,7 @@ typedef struct {
 	UINT8	p1;
 	UINT8	p2;
 	UINT8	p2_hs;
+	UINT8	ram_mask;
 	int 	(*irq_callback)(int irqline);
 	i8x41_config	*config;
 }	I8X41;
@@ -170,14 +178,14 @@ static I8X41 i8x41;
 #define CNT 	0x20	/* counter */
 
 /* CONTROL flag bits */
-#define IBFI_EXEC	0x01	/* IBFI is currently being serviced */
+#define IBFI_IGNR	0x01	/* IBFI interrupt should be ignored */
 #define IBFI_PEND	0x02	/* IBFI is pending */
-#define TIRQ_EXEC	0x04	/* Timer interrupt is currently being serviced */
+#define TIRQ_IGNR	0x04	/* Timer interrupt should be ignored */
 #define TIRQ_PEND	0x08	/* Timer interrupt is pending */
 #define TEST1		0x10	/* Test1 line mode */
 #define TOVF		0x20	/* Timer Overflow Flag */
 
-#define IRQ_EXEC	0x05	/* Mask for IRQs being serviced */
+#define IRQ_IGNR	0x05	/* Mask for IRQs being serviced */
 #define IRQ_PEND	0x0a	/* Mask for IRQs pending */
 
 
@@ -243,7 +251,7 @@ INLINE void add_r(int r)
  ***********************************/
 INLINE void add_rm(int r)
 {
-	UINT8 res = A + RM( M_IRAM + (GETR(r) & I8X42_intRAM_MASK) );
+	UINT8 res = A + RM( M_IRAM + (GETR(r) & i8x41.ram_mask) );
 	if( res < A ) PSW |= FC;
 	if( (res & 0x0f) < (A & 0x0f) ) PSW |= FA;
 	A = res;
@@ -280,7 +288,7 @@ INLINE void addc_r(int r)
  ***********************************/
 INLINE void addc_rm(int r)
 {
-	UINT8 res = A + RM( M_IRAM + (GETR(r) & I8X42_intRAM_MASK) ) + (PSW >> 7);
+	UINT8 res = A + RM( M_IRAM + (GETR(r) & i8x41.ram_mask) ) + (PSW >> 7);
 	if( res <= A ) PSW |= FC;
 	if( (res & 0x0f) <= (A & 0x0f) ) PSW |= FA;
 	A = res;
@@ -314,7 +322,7 @@ INLINE void anl_r(int r)
  ***********************************/
 INLINE void anl_rm(int r)
 {
-	A = A & RM( M_IRAM + (GETR(r) & I8X42_intRAM_MASK) );
+	A = A & RM( M_IRAM + (GETR(r) & i8x41.ram_mask) );
 }
 
 /***********************************
@@ -549,6 +557,7 @@ INLINE void en_i(void)
 	if( 0 == (ENABLE & IBFI) )
 	{
 		ENABLE |= IBFI;		/* enable input buffer full interrupt */
+		CONTROL &= ~IBFI_IGNR;
 		if( STATE & IBF )	/* already got data in the buffer? */
 			set_irq_line(I8X41_INT_IBF, HOLD_LINE);
 	}
@@ -561,6 +570,7 @@ INLINE void en_i(void)
 INLINE void en_tcnti(void)
 {
 	ENABLE |= TCNTI;	/* enable timer/counter interrupt */
+	CONTROL &= ~TIRQ_IGNR;
 }
 
 /***********************************
@@ -624,7 +634,7 @@ INLINE void inc_r(int r)
  ***********************************/
 INLINE void inc_rm(int r)
 {
-	UINT16 addr = M_IRAM + (GETR(r) & I8X42_intRAM_MASK);
+	UINT16 addr = M_IRAM + (GETR(r) & i8x41.ram_mask);
 	WM( addr, RM(addr) + 1 );
 }
 
@@ -867,7 +877,7 @@ INLINE void mov_a_r(int r)
  ***********************************/
 INLINE void mov_a_rm(int r)
 {
-	A = RM( M_IRAM + (GETR(r) & I8X42_intRAM_MASK) );
+	A = RM( M_IRAM + (GETR(r) & i8x41.ram_mask) );
 }
 
 /***********************************
@@ -914,7 +924,7 @@ INLINE void mov_r_i(int r)
  ***********************************/
 INLINE void mov_rm_a(int r)
 {
-	WM( M_IRAM + (GETR(r) & I8X42_intRAM_MASK), A );
+	WM( M_IRAM + (GETR(r) & i8x41.ram_mask), A );
 }
 
 /***********************************
@@ -925,7 +935,7 @@ INLINE void mov_rm_i(int r)
 {
 	UINT8 val = ROP_ARG(PC);
 	PC += 1;
-	WM( M_IRAM + (GETR(r) & I8X42_intRAM_MASK), val );
+	WM( M_IRAM + (GETR(r) & i8x41.ram_mask), val );
 }
 
 /***********************************
@@ -1015,7 +1025,7 @@ INLINE void orl_r(int r)
  ***********************************/
 INLINE void orl_rm(int r)
 {
-	A = A | RM( M_IRAM + (GETR(r) & I8X42_intRAM_MASK) );
+	A = A | RM( M_IRAM + (GETR(r) & i8x41.ram_mask) );
 }
 
 /***********************************
@@ -1120,8 +1130,7 @@ INLINE void retr(void)
 	PC = RM(M_STACK + (PSW&SP) * 2 + 0);
 	PC |= (msb << 8) & 0x700;
 	PSW = (PSW & 0x0f) | (msb & 0xf0);
-	CONTROL &= ~IBFI_EXEC;
-	CONTROL &= ~TIRQ_EXEC;
+	CONTROL &= ~IRQ_IGNR;
 }
 
 /***********************************
@@ -1237,7 +1246,7 @@ INLINE void xch_a_r(int r)
  ***********************************/
 INLINE void xch_a_rm(int r)
 {
-	UINT16 addr = M_IRAM + (GETR(r) & I8X42_intRAM_MASK);
+	UINT16 addr = M_IRAM + (GETR(r) & i8x41.ram_mask);
 	UINT8 tmp = RM(addr);
 	WM( addr, A );
 	A = tmp;
@@ -1249,7 +1258,7 @@ INLINE void xch_a_rm(int r)
  ***********************************/
 INLINE void xchd_a_rm(int r)
 {
-	UINT16 addr = M_IRAM + (GETR(r) & I8X42_intRAM_MASK);
+	UINT16 addr = M_IRAM + (GETR(r) & i8x41.ram_mask);
 	UINT8 tmp = RM(addr);
 	WM( addr, (tmp & 0xf0) | (A & 0x0f) );
 	A = (A & 0xf0) | (tmp & 0x0f);
@@ -1270,7 +1279,7 @@ INLINE void xrl_r(int r)
  ***********************************/
 INLINE void xrl_rm(int r)
 {
-	A = A ^ RM( M_IRAM + (GETR(r) & I8X42_intRAM_MASK) );
+	A = A ^ RM( M_IRAM + (GETR(r) & i8x41.ram_mask) );
 }
 
 /***********************************
@@ -1304,7 +1313,7 @@ static const UINT8 i8x41_cycles[] = {
 	2,2,2,2,2,1,2,1,2,2,2,2,2,2,2,2,
 	1,1,1,1,2,1,2,1,1,1,1,1,1,1,1,1,
 	1,1,2,1,2,1,2,1,1,1,1,1,1,1,1,1,
-	1,1,1,2,2,1,2,1,1,1,1,1,1,1,1,1,
+	1,1,1,2,2,1,2,1,2,2,2,2,2,2,2,2,
 	1,1,2,1,2,1,2,1,2,2,2,2,2,2,2,2
 };
 
@@ -1350,9 +1359,11 @@ static void i8x41_reset(void)
 
 	/* default to 8041 behaviour for DBBI/DBBO and extended commands */
 	i8x41.subtype = 8041;
+	i8x41.ram_mask = I8X41_intRAM_MASK;
 	if ( i8x41.config != NULL && i8x41.config->type == TYPE_I8X42 )
 	{
 		i8x41.subtype = 8042;
+		i8x41.ram_mask = I8X42_intRAM_MASK;
 	}
 
 	ENABLE = IBFI | TCNTI;
@@ -1993,25 +2004,25 @@ static int i8x41_execute(int cycles)
 
 		if( CONTROL & IRQ_PEND )	/* Are any Interrupts Pending ? */
 		{
-			if( 0 == (CONTROL & IRQ_EXEC) )	/* Are any Interrupts being serviced ? */
+			if( 0 == (CONTROL & IBFI_IGNR) )	/* Should we ignore IBFI interrupts ? */
 			{
 				if( (ENABLE & IBFI) && (CONTROL & IBFI_PEND) )
 				{
 					PUSH_PC_TO_STACK();
 					PC = V_IBF;
 					CONTROL &= ~IBFI_PEND;
-					CONTROL |= IBFI_EXEC;
+					CONTROL |= IBFI_IGNR;
 					i8x41_ICount -= 2;
 				}
 			}
-			if( 0 == (CONTROL & IRQ_EXEC) )	/* Are any Interrupts being serviced ? */
+			if( 0 == (CONTROL & TIRQ_IGNR) )	/* Should we ignore Timer interrupts ? */
 			{
 				if( (ENABLE & TCNTI) && (CONTROL & TIRQ_PEND) )
 				{
 					PUSH_PC_TO_STACK();
 					PC = V_TIMER;
 					CONTROL &= ~TIRQ_PEND;
-					CONTROL |= TIRQ_EXEC;
+					CONTROL |= IRQ_IGNR;
 					if( ENABLE & T ) PRESCALER += 2;	/* 2 states */
 					i8x41_ICount -= 2;		/* 2 states to take interrupt */
 				}
@@ -2280,7 +2291,7 @@ void i8x41_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "I8X41");				break;
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Intel 8x41");			break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.5");					break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.6");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 
