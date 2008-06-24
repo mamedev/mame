@@ -48,7 +48,7 @@
  *  **** Change Log ****
  *  Wilbert Pol (24-Jun-2008) changed version to 0.6
  *   - Updated the ram sizes. 8041 uses 128 bytes, 8042
- *     8042 uses 256 bytes.
+ *     uses 256 bytes.
  *   - Added support for re-enabling interrupts inside
  *     an interrupt handler.
  *   - Fixed cycle count for DJNZ instruction.
