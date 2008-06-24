@@ -5635,7 +5635,7 @@ static x86code *op_lzcnt(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert_no_condition(inst);
-	assert_flags(inst, /*DRCUML_FLAG_Z | DRCUML_FLAG_S*/0);
+	assert_flags(inst, DRCUML_FLAG_Z | DRCUML_FLAG_S);
 
 	/* normalize parameters */
 	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI);
@@ -5647,9 +5647,10 @@ static x86code *op_lzcnt(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	if (inst->size == 4)
 	{
 		emit_mov_r32_p32(drcbe, &dst, dstreg, &srcp);									// mov   dstreg,src1p
-		emit_mov_r32_imm(&dst, REG_ECX, 32);											// mov   ecx,32
+		emit_mov_r32_imm(&dst, REG_ECX, 32 ^ 31);										// mov   ecx,32 ^ 31
 		emit_bsr_r32_r32(&dst, dstreg, dstreg);											// bsr   dstreg,dstreg
 		emit_cmovcc_r32_r32(&dst, COND_Z, dstreg, REG_ECX);								// cmovz dstreg,ecx
+		emit_xor_r32_imm(&dst, dstreg, 31);												// xor   dstreg,31
 		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 	}
 
@@ -5661,12 +5662,13 @@ static x86code *op_lzcnt(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 		emit_mov_r64_p64(drcbe, &dst, REG_EDX, dstreg, &srcp);							// mov   dstreg:edx,srcp
 		emit_bsr_r32_r32(&dst, dstreg, dstreg);											// bsr   dstreg,dstreg
 		emit_jcc_short_link(&dst, COND_NZ, &skip);										// jnz   skip
-		emit_mov_r32_imm(&dst, REG_ECX, 32);											// mov   ecx,32
+		emit_mov_r32_imm(&dst, REG_ECX, 32 ^ 31);										// mov   ecx,32 ^ 31
 		emit_bsr_r32_r32(&dst, dstreg, REG_EDX);										// bsr   dstreg,edx
 		emit_cmovcc_r32_r32(&dst, COND_Z, dstreg, REG_ECX);								// cmovz dstreg,ecx
 		emit_add_r32_imm(&dst, REG_ECX, 32);											// add   ecx,32
 		resolve_link(&dst, &skip);													// skip:
-		emit_xor_r32_r32(&dst, REG_EDX, REG_EDX);								// xor   edx,edx
+		emit_xor_r32_r32(&dst, REG_EDX, REG_EDX);										// xor   edx,edx
+		emit_xor_r32_imm(&dst, dstreg, 31);												// xor   dstreg,31
 		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg, REG_EDX);							// mov   dstp,edx:dstreg
 	}
 	return dst;
@@ -5685,7 +5687,7 @@ static x86code *op_bswap(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert_no_condition(inst);
-	assert_flags(inst, /*DRCUML_FLAG_Z | DRCUML_FLAG_S*/0);
+	assert_flags(inst, DRCUML_FLAG_Z | DRCUML_FLAG_S);
 
 	/* normalize parameters */
 	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI);
@@ -5698,6 +5700,8 @@ static x86code *op_bswap(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	{
 		emit_mov_r32_p32(drcbe, &dst, dstreg, &srcp);									// mov   dstreg,src1p
 		emit_bswap_r32(&dst, dstreg);													// bswap dstreg
+		if (inst->flags != 0)
+			emit_test_r32_r32(&dst, dstreg, dstreg);									// test  dstreg,dstreg
 		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 	}
 
@@ -5707,7 +5711,19 @@ static x86code *op_bswap(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 		emit_mov_r64_p64(drcbe, &dst, REG_EDX, dstreg, &srcp);							// mov   dstreg:edx,srcp
 		emit_bswap_r32(&dst, dstreg);													// bswap dstreg
 		emit_bswap_r32(&dst, REG_EDX);													// bswap edx
-		emit_mov_p64_r64(drcbe, &dst, &dstp, REG_EDX, dstreg);							// mov   dstp,dstreg:edx
+		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg, REG_EDX);							// mov   dstp,edx:dstreg
+		if (inst->flags == DRCUML_FLAG_Z)
+			emit_or_r32_r32(&dst, REG_EDX, dstreg);										// or    edx,eax
+		else if (inst->flags == DRCUML_FLAG_S)
+			emit_test_r32_r32(&dst, REG_EDX, REG_EDX);									// test  edx,edx
+		else
+		{
+			emit_movzx_r32_r16(&dst, REG_ECX, dstreg);									// movzx ecx,dstreg
+			emit_or_r32_r32(&dst, REG_EDX, REG_ECX);									// or    edx,ecx
+			emit_mov_r32_r32(&dst, REG_ECX, dstreg);									// mov   ecx,dstreg
+			emit_shr_r32_imm(&dst, REG_ECX, 16);										// shr   ecx,16
+			emit_or_r32_r32(&dst, REG_EDX, REG_ECX);									// or    edx,ecx
+		}
 	}
 	return dst;
 }

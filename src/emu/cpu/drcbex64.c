@@ -5620,7 +5620,7 @@ static x86code *op_lzcnt(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert_no_condition(inst);
-	assert_flags(inst, /*DRCUML_FLAG_Z | DRCUML_FLAG_S*/0);
+	assert_flags(inst, DRCUML_FLAG_Z | DRCUML_FLAG_S);
 
 	/* normalize parameters */
 	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI);
@@ -5632,9 +5632,10 @@ static x86code *op_lzcnt(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	if (inst->size == 4)
 	{
 		emit_mov_r32_p32(drcbe, &dst, dstreg, &srcp);									// mov   dstreg,src1p
-		emit_mov_r32_imm(&dst, REG_ECX, 32);											// mov   ecx,32
+		emit_mov_r32_imm(&dst, REG_ECX, 32 ^ 31);										// mov   ecx,32 ^ 31
 		emit_bsr_r32_r32(&dst, dstreg, dstreg);											// bsr   dstreg,dstreg
 		emit_cmovcc_r32_r32(&dst, COND_Z, dstreg, REG_ECX);								// cmovz dstreg,ecx
+		emit_xor_r32_imm(&dst, dstreg, 31);												// xor   dstreg,31
 		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 	}
 
@@ -5642,9 +5643,10 @@ static x86code *op_lzcnt(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	else if (inst->size == 8)
 	{
 		emit_mov_r64_p64(drcbe, &dst, dstreg, &srcp);									// mov   dstreg,src1p
-		emit_mov_r64_imm(&dst, REG_RCX, 64);											// mov   rcx,64
+		emit_mov_r64_imm(&dst, REG_RCX, 64 ^ 63);										// mov   rcx,64 ^ 63
 		emit_bsr_r64_r64(&dst, dstreg, dstreg);											// bsr   dstreg,dstreg
 		emit_cmovcc_r64_r64(&dst, COND_Z, dstreg, REG_RCX);								// cmovz dstreg,rcx
+		emit_xor_r32_imm(&dst, dstreg, 63);												// xor   dstreg,63
 		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 	}
 	return dst;
@@ -5663,7 +5665,7 @@ static x86code *op_bswap(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert_no_condition(inst);
-	assert_flags(inst, /*DRCUML_FLAG_Z | DRCUML_FLAG_S*/0);
+	assert_flags(inst, DRCUML_FLAG_Z | DRCUML_FLAG_S);
 
 	/* normalize parameters */
 	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI);
@@ -5676,6 +5678,8 @@ static x86code *op_bswap(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	{
 		emit_mov_r32_p32(drcbe, &dst, dstreg, &srcp);									// mov   dstreg,src1p
 		emit_bswap_r32(&dst, dstreg);													// bswap dstreg
+		if (inst->flags != 0)
+			emit_test_r32_r32(&dst, dstreg, dstreg);									// test  dstreg,dstreg
 		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 	}
 
@@ -5684,6 +5688,8 @@ static x86code *op_bswap(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	{
 		emit_mov_r64_p64(drcbe, &dst, dstreg, &srcp);									// mov   dstreg,src1p
 		emit_bswap_r64(&dst, dstreg);													// bswap dstreg
+		if (inst->flags != 0)
+			emit_test_r64_r64(&dst, dstreg, dstreg);									// test  dstreg,dstreg
 		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 	}
 	return dst;
