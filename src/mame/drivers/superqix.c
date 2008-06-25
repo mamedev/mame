@@ -1056,7 +1056,7 @@ static MACHINE_DRIVER_START( sqix )
 	MDRV_CPU_ADD(Z80, 12000000/2)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(sqix_port_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(sqix_interrupt,3)	/* ??? */
+	MDRV_CPU_VBLANK_INT_HACK(sqix_interrupt,6)	/* ??? */
 
 	MDRV_CPU_ADD(I8751, 12000000/3)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
