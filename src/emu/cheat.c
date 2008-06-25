@@ -14,6 +14,7 @@
 #include "uimenu.h"
 #include "machine/eeprom.h"
 #include "cheat.h"
+#include "deprecat.h"
 #include <ctype.h>
 #include <math.h>
 
@@ -21,7 +22,7 @@
 #include "cheatms.h"
 #endif
 
-#define OSD_READKEY_KLUDGE	1
+#define OSD_READKEY_KLUDGE 1
 
 /***************************************************************************
     MACROS
@@ -42,12 +43,9 @@
 #define REGION_LIST_LENGTH						(REGION_MAX - REGION_INVALID)
 #define VALID_CPU(cpu)							(cpu < cpu_gettotalcpu())
 
-#define ADD_MENU_2_ITEMS(name, sub_name)		do { menu_item[total] = name; menu_sub_item[total] = sub_name; total++; } while(0)
-#define TERMINATE_MENU_2_ITEMS					do { menu_item[total] = NULL; menu_sub_item[total] = NULL; } while(0)
+#define TERMINATE_MENU_ITEMS(name)				do { menu_item[total] = NULL; menu_sub_item[total] = NULL; menu_item_info[total].field_type = name; } while(0)
 
-#define ADD_MENU_3_ITEMS(name, sub_name, enum)	do { menu_item[total] = name; menu_sub_item[total] = sub_name; menu_index[total] = enum; total++; } while(0)
-
-#define ADJUST_CURSOR(sel, total)				do { if(sel < 0) sel = 0; else if(sel > (total - 1)) sel = (total - 1); } while(0);
+#define ADJUST_CURSOR(sel, total)				do { if(sel < 0) sel = 0; else if(sel > (total - 1)) sel = (total - 1); } while(0)
 #define CURSOR_TO_NEXT(sel, total)				do { if(++sel > (total - 1)) sel = 0; } while(0)
 #define CURSOR_TO_PREVIOUS(sel, total)			do { if(--sel < 0) sel = (total - 1); } while(0)
 #define CURSOR_PAGE_UP(sel)						do { sel -= visible_items; if(sel < 0) sel = 0; } while (0)
@@ -61,14 +59,14 @@
 #define CHEAT_FILENAME_MAX_LEN					(255)
 #define CHEAT_MENU_DEPTH						(8)
 #ifdef MESS
-#define DEFAULT_CHEAT_OPTIONS					(0x4F)
+#define DEFAULT_CHEAT_OPTIONS					(0xFF78)
 #else
-#define DEFAULT_CHEAT_OPTIONS					(0xF)
+#define DEFAULT_CHEAT_OPTIONS					(0xFF38)
 #endif
 #define DEFAULT_MESSAGE_TIME					(50)
-#define VARIABLE_MAX_ARRAY						(0x0F)		/* NOTE : Destination in Move code can only accept variable[0]-[3] only */
+#define VARIABLE_MAX_ARRAY						(8)			/* NOTE : Destination in Move code can only accept variable[0]-[3] only */
 #define CHEAT_RETURN_VALUE						(0xFF)
-#define SAFE_SEARCH_REGION_RANGE				(0xFFFF)
+#define SAFE_SEARCH_REGION_RANGE				(65536)
 
 /********** BIT FIELD **********/
 
@@ -88,7 +86,6 @@ enum
 	DEFINE_BITFIELD_ENUM(PopupParameter,			13,	14),
 	DEFINE_BITFIELD_ENUM(DataRead,					15,	15),	/* 0 = field, 1 = variable */
 	DEFINE_BITFIELD_ENUM(Link,						16,	17),	/* 0 = master, 1 = link, 2 = sub link, 3 = EOL */
-	DEFINE_BITFIELD_ENUM(Endianness,				18,	18),
 	DEFINE_BITFIELD_ENUM(AddressSize,				20,	21),
 	DEFINE_BITFIELD_ENUM(AddressRead,				22,	23),	/* 0 = field, 1 = indirect address from variable, 2 = variable */
 	DEFINE_BITFIELD_ENUM(CodeParameter,				24,	27),
@@ -127,31 +124,28 @@ enum
 	DEFINE_BITFIELD_ENUM(UserSelectMinimum,			10,	10),
 	DEFINE_BITFIELD_ENUM(UserSelectBCD,				11,	11),
 	DEFINE_BITFIELD_ENUM(Prefill,					12,	13),
-	DEFINE_BITFIELD_ENUM(RemoveFromList,			14, 14),
-	DEFINE_BITFIELD_ENUM(LinkExtension,				15,	15),
+	DEFINE_BITFIELD_ENUM(IndexBytesUsed,			14,	15),
 	DEFINE_BITFIELD_ENUM(LinkEnable,				16,	16),
 	DEFINE_BITFIELD_ENUM(LinkCopyPreviousValue,		17,	17),
-	DEFINE_BITFIELD_ENUM(OperationParameter,		18,	18),
-	DEFINE_BITFIELD_ENUM(OperationExtend,			19,	19),
+	DEFINE_BITFIELD_ENUM(OperationParameter,		18,	19),
 	DEFINE_BITFIELD_ENUM(BytesUsed,					20,	21),
-	DEFINE_BITFIELD_ENUM(EndiannessOld,				22,	22),
+	DEFINE_BITFIELD_ENUM(RemoveFromList,			22, 22),
 	DEFINE_BITFIELD_ENUM(RestorePreviousValue,		23, 23),
 	DEFINE_BITFIELD_ENUM(LocationParameter,			24,	28),
 	DEFINE_BITFIELD_ENUM(LocationType,				29,	31),
-
-	/* location parameter extention (relative address, memory accessor) */
-	DEFINE_BITFIELD_ENUM(LocationParameterOption,	24,	25),
-	DEFINE_BITFIELD_ENUM(LocationParameterCPU,		26,	28),
+	DEFINE_BITFIELD_ENUM(LocationParameterCPU,		24,	26),
 
 	/* command */
 	DEFINE_BITFIELD_ENUM(SearchBox,					0,	1),
-	DEFINE_BITFIELD_ENUM(DontPrintNewLabels,		2,	2),		/* in options menu, it is reversed display */
+	DEFINE_BITFIELD_ENUM(DontPrintNewLabels,		2,	2),		/* advanced mode only. in options menu, it is reversed display */
 	DEFINE_BITFIELD_ENUM(AutoSaveEnabled,			3,	3),
 	DEFINE_BITFIELD_ENUM(ActivationKeyMessage,		4,	4),
 	DEFINE_BITFIELD_ENUM(LoadOldFormat,				5,	5),
 #ifdef MESS
 	DEFINE_BITFIELD_ENUM(SharedCode,				6,	6)
 #endif
+	DEFINE_BITFIELD_ENUM(VerticalKeyRepeatSpeed,	8,	11),
+	DEFINE_BITFIELD_ENUM(HorizontalKeyRepeatSpeed,	12,	15),
 };
 
 /********** OPERATION **********/
@@ -381,31 +375,34 @@ enum		// entry flags
 	/* true if the cheat is a select cheat */
 	kCheatFlag_Select =					1 << 6,
 
+	/* true if use label-selector */
+	kCheatFlag_UseLabelSelector =		1 << 7,
+
 	/* true if the cheat is layer index cheat */
-	kCheatFlag_LayerIndex =				1 << 7,
+	kCheatFlag_LayerIndex =				1 << 8,
 
 	/* true if selected code is layer index cheat */
-	kCheatFlag_LayerSelected =			1 << 8,
+	kCheatFlag_LayerSelected =			1 << 9,
 
 	/* true if selected code requests left/right arrow for sub item */
-	kCheatFlag_RequestArrow =			1 << 9,
+	kCheatFlag_RequestArrow =			1 << 10,
 
 	/* true if the cheat has been assigned an 1st activation key */
-	kCheatFlag_HasActivationKey1 =		1 << 10,
+	kCheatFlag_HasActivationKey1 =		1 << 11,
 
 	/* true if the cheat has been assigned an 2nd activation key */
-	kCheatFlag_HasActivationKey2 =		1 << 11,
+	kCheatFlag_HasActivationKey2 =		1 << 12,
 
 	/* true if the cheat is not the newest format */
-	kCheatFlag_OldFormat =				1 << 12,
+	kCheatFlag_OldFormat =				1 << 13,
 
 	/* true if wrong cheat code */
-	kCheatFlag_HasWrongCode =			1 << 13,
+	kCheatFlag_HasWrongCode =			1 << 14,
 
 	/* true if the cheat has been edited or is a new cheat
        checked at auto-save then save the code if true */
 
-	kCheatFlag_Dirty =					1 << 14,
+	kCheatFlag_Dirty =					1 << 15,
 
 	/* masks */
 	kCheatFlag_StateMask =			kCheatFlag_Active,					// used in reset_action() and deactivate_cheat() to clear specified flag
@@ -415,6 +412,7 @@ enum		// entry flags
 									kCheatFlag_Separator |
 									kCheatFlag_UserSelect |
 									kCheatFlag_Select |
+									kCheatFlag_UseLabelSelector |
 									kCheatFlag_LayerIndex |
 									kCheatFlag_OldFormat,
 	kCheatFlag_PersistentMask =		kCheatFlag_Active |					// used in update_cheat_info() to extract specified flags
@@ -485,7 +483,7 @@ enum		// operands
 	kSearchOperand_First,
 	kSearchOperand_Value,
 
-	kSearchOperand_Max = kSearchOperand_Value
+	kSearchOperand_Max
 };
 
 enum		// length
@@ -510,28 +508,34 @@ enum		// comparisons
 	kSearchComparison_IncreasedBy,
 	kSearchComparison_NearTo,
 
-	kSearchComparison_Max = kSearchComparison_NearTo
+	kSearchComparison_Max
+};
+
+enum		/* comparisons for minimum mode */
+{
+	MINIMUM_ITEM_EQUAL = 0,
+	MINIMUM_ITEM_NOT_EQUAL,
+	MINIMUM_ITEM_LESS,
+	MINIMUM_ITEM_GREATER,
+	MINIMUM_ITEM_INCREMENT,
+	MINIMUM_ITEM_DECREMENT,
+
+	MINIMUM_ITEM_MAX
 };
 
 /********** OTHERS **********/
 
-enum
+enum		/* search menu */
 {
-	kVerticalKeyRepeatRate =		8,
-	kHorizontalFastKeyRepeatRate =	5,
-	kHorizontalSlowKeyRepeatRate =	8
-};
-
-enum		// search menu
-{
-	kSearchBox_Minimum = 0,
-	kSearchBox_Standard,
-	kSearchBox_Advanced
+	SEARCH_BOX_MINIMUM = 0,
+	SEARCH_BOX_STANDARD,
+	SEARCH_BOX_ADVANCED
 };
 
 enum		/* format level */
 {
-	FORMAT_NEW = 1,
+	FORMAT_OTHERS = 0,
+	FORMAT_NEW,
 	FORMAT_STANDARD,
 	FORMAT_OLD
 };
@@ -561,6 +565,7 @@ enum		/* message type */
 	CHEAT_MESSAGE_RELOAD_CHEAT_OPTION,
 	CHEAT_MESSAGE_RELOAD_CHEAT_CODE,
 	CHEAT_MESSAGE_RELOAD_USER_REGION,
+	CHEAT_MESSAGE_RESET_OPTIONS,
 	CHEAT_MESSAGE_FAILED_TO_LOAD_DATABASE,
 	CHEAT_MESSAGE_CHEAT_FOUND,
 	CHEAT_MESSAGE_ONE_CHEAT_FOUND,
@@ -623,23 +628,23 @@ enum{		// error flags
 typedef struct _cheat_action cheat_action;
 struct _cheat_action
 {
-	UINT32	type;					/* packed several information (cpu/region, address size, operation and parameters and so on) */
-	UINT8	region;					/* the number of cpu or region. in case of cpu, it has a kind of an address space together */
-	UINT32	address;				/* address. it is changeable by RWrite in the cheat core */
-	UINT32	original_address;		/* address. it is for edit/view/save */
-	UINT32	data;					/* data. it is changeable by valuse selector in the cheat core */
-	UINT32	original_data;			/* data. it is for edit/view/save */
-	UINT32	extend_data;			/* extend parameter. it is different using by each operations */
+	char			*optional_name;		/* label for label selection or popup */
 
-	INT32	frame_timer;			/* timer for delay/keep */
-	UINT32	*last_value;			/* back up value before cheating to restore value. PDWWrite uses 2 and RWrite uses about a counter */
+	UINT32			type;				/* packed several information (cpu/region, address size, operation and parameters and so on) */
+	UINT32			region;				/* the number of cpu or region. in case of cpu, it has a kind of an address space together */
+	UINT32			address;			/* address. it is changeable by RWrite in the cheat core */
+	UINT32			original_address;	/* address. it is for edit/view/save */
+	UINT32			data;				/* data. it is changeable by valuse selector in the cheat core */
+	UINT32			original_data;		/* data. it is for edit/view/save */
+	UINT32			extend_data;		/* extend parameter. it is different using by each operations */
 
-	UINT32	flags;					/* internal flags */
+	UINT32			flags;				/* internal flags */
 
-	UINT8	**cached_pointer;		/* pointer to specified address space or mapped memory */
-	UINT32	cached_offset;			/* offset for mapped memory */
+	INT32			frame_timer;		/* timer for delay/keep */
+	UINT32			*last_value;		/* back up value before cheating to restore value. PDWWrite uses 2 and RWrite uses about a counter */
 
-	char	*optional_name;			/* label for label selection or popup */
+	UINT8			**cached_pointer;	/* pointer to specified address space or mapped memory */
+	UINT32			cached_offset;		/* offset for mapped memory */
 };
 
 /********** ENTRY **********/
@@ -650,18 +655,19 @@ struct _cheat_entry
 	char			*name;					/* name to display in list menu */
 	char			*comment;				/* simple comment */
 
+	UINT32			flags;					/* internal flags */
+
 	INT32			action_list_length;		/* total codes of cheat action. NOTE : minimum length is 1 and 0 is ERROR */
 	cheat_action	*action_list;			/* pointer to cheat action */
 
 	int				activation_key_1;		/* activation key index for 1st key */
-	int				activation_key_2;		/* activation key index for 2nd key */
+	int				activation_key_2;		/* activation key index for 2nd key (only used in new format) */
 
 	int				selection;				/* for label-select to set selected label number */
 	int				label_index_length;		/* total tables of index table. NOTE : minimum length is 1 and 0 is ERROR */
 	int				*label_index;			/* pointer of label index table */
 
 	int				layer_index;			/* layer index for enable/disable menu */
-	UINT32			flags;					/* internal flags */
 };
 
 /********** WATCH **********/
@@ -697,8 +703,8 @@ struct _search_region
 	UINT32	address;			/* address */
 	UINT32	length;				/* total length */
 
-	UINT8	target_type;		/* flag for cpu or region */
-	UINT8	target_idx;			/* target cpu/region */
+	INT8	target_type;		/* flag for cpu or region */
+	INT8	target_idx;			/* target cpu/region */
 
 	UINT8	flags;				/* internal flags */
 
@@ -721,47 +727,36 @@ struct _search_region
 };
 
 /********** SEARCH **********/
-
-typedef struct _old_search_options old_search_options;
-struct _old_search_options
-{
-	INT8	comparison;
-	UINT32	value;
-	INT8	sign;
-	UINT32	delta;
-};
-
 typedef struct _search_info search_info;
 struct _search_info
 {
-	INT32				region_list_length;
-	search_region		*region_list;
+	INT32			region_list_length;
+	search_region	*region_list;
 
-	char				*name;			/* search info name used in select_region() */
+	char			*name;			/* advanced. search info name used in select_region() */
 
-	INT8				bytes;			/* 0 = 1, 1 = 2, 2 = 3, 3 = 4, 4 = bit */
-	UINT8				swap;
-	UINT8				sign;
-	INT8				lhs;
-	INT8				rhs;
-	INT8				comparison;
+	INT8			bytes;			/* 0 = 1, 1 = 2, 2 = 3, 3 = 4, 4 = bit */
+	INT8			swap;			/* advanced */
+	INT8			sign;			/* advanced */
+	INT8			lhs;
+	INT8			rhs;
+	INT8			comparison;
+	INT8			parameter;		/* minimum and standard */
 
-	UINT8				target_type;		/* is cpu or region? */
-	UINT8				target_idx;			/* index for cpu or region */
+	INT8			target_type;	/* is cpu or region? */
+	INT8			target_idx;		/* index for cpu or region */
 
-	UINT32				value;
+	UINT32			value;			/* advanced and standard */
 
-	INT8				search_speed;
+	INT8			search_speed;
 
-	UINT32				num_results;
-	UINT32				old_num_results;
+	UINT32			num_results;
+	UINT32			old_num_results;
 
-	INT32				current_region_idx;
-	INT32				current_results_page;
+	INT32			current_region_idx;
+	INT32			current_results_page;
 
-	UINT8				backup_valid;
-
-	old_search_options	old_options;
+	UINT8			backup_valid;
 };
 
 /********** CPU **********/
@@ -800,12 +795,11 @@ struct _menu_string_list
 
 /********** MENUS **********/
 
-/* NOTE : _cheat_menu_item_info is used in the edit menu right now */
 typedef struct _cheat_menu_item_info cheat_menu_item_info;
 struct _cheat_menu_item_info
 {
 	UINT32	sub_cheat;		/* index of an item */
-	UINT32	field_type;		/* field type of an item */
+	UINT32	field_type;		/* type of an item */
 	UINT32	extra_data;		/* it stores an extra data but NOT read (so I don't know how to use)*/
 };
 
@@ -813,11 +807,11 @@ typedef struct _cheat_menu_stack cheat_menu_stack;
 typedef int (*cheat_menu_handler)(running_machine *machine, cheat_menu_stack *menu);
 struct _cheat_menu_stack
 {
-	cheat_menu_handler	handler;		/* menu handler for cheat */
-	cheat_menu_handler	return_handler;	/* menu handler to return menu */
-	int					sel;			/* current cursor position */
-	int					pre_sel;		/* selected item in previous menu */
-	UINT8				first_time;		/* flags to first setting (1 = first, 0 = not first) */
+	cheat_menu_handler		handler;		/* menu handler for cheat */
+	cheat_menu_handler		return_handler;	/* menu handler to return */
+	int						sel;			/* current cursor position */
+	int						pre_sel;		/* selected item in previous menu */
+	UINT8					first_time;		/* flags to first setting (1 = first, 0 = not first) */
 };
 
 /********** FORMAT **********/
@@ -829,33 +823,6 @@ struct _cheat_format
 	UINT8			type_matched;			/* valid length of a type field */
 	UINT8			data_matched;			/* valid length of a data/extend data field */
 	UINT8			comment_matched;		/* valid arguments to add comment */
-};
-
-static const struct _cheat_format cheat_format_table[] =
-{
-		/* option - :_command:TYPE */
-	{	":_command:%[^:\n\r]",																1,	8,	0,	0	},
-#ifdef MESS
-		/* code (new) - :MACHINE_NAME::CRC::TYPE::ADDRESS::DATA::EXTEND_DATA:(DESCRIPTION:COMMENT) */
-	{	":%8[^:\n\r]::%8X::%10[^:\n\r]::%X::%8[^:\n\r]::%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",	6,	10,	8,	8	},
-		/* code (old) - :MACHINE_NAME:CRC:TYPE:ADDRESS:DATA:EXTEND_DATA:(DESCRIPTION:COMMENT) */
-	{	":%8s:8X:%8[^:\n\r]:%X:%8[^:\n\r]:%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",					6,	8,	8,	0	},
-		/* code (older) - :MACHINE_NAME:CRC:CPU:ADDRESS:DATA:TYPE:(DESCRIPTION:COMMENT) */
-	{	"%8[^:\n\r]:%8X:%d:%X:%X:%d:%[^:\n\r]:%[^:\n\r]",									5,	0,	0,	8	},
-		/* user region - :MACHINE_NAME:CRC:CPU:ADDRESS_SPACE:START_ADDRESS:END_ADDRESS:STATUS:(DESCRIPTION) */
-	{	":%8[^:\n\r]:%8X:%2X:%2X:%X:%X:%1X:%[^:\n\r]",										7,	0,	0,	0	},
-#else
-		/* code (new) - :GAME_NAME::TYPE::ADDRESS::DATA::EXTEND_DATA:(DESCRIPTION:COMMENT) */
-	{	":%8[^:\n\r]::%10[^:\n\r]::%X::%8[^:\n\r]::%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",			5,	10,	8,	7	},
-		/* code (old) - :GAME_NAME:TYPE:ADDRESS:DATA:EXTEND_DATA:(DESCRIPTION:COMMENT) */
-	{	":%8s:%8[^:\n\r]:%X:%8[^:\n\r]:%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",						5,	8,	8,	0	},
-		/* code (older) - :GAME_NAME:CPU:ADDRESS:DATA:TYPE:(DESCRIPTION:COMMENT) */
-	{	"%8[^:\n\r]:%d:%X:%X:%d:%[^:\n\r]:%[^:\n\r]",										4,	0,	0,	7	},
-		/* user region - :GAME_NAME:CPU:ADDRESS_SPACE:START_ADDRESS:END_ADDRESS:STATUS:(DESCRIPTION) */
-	{	":%8[^:\n\r]:%2X:%2X:%X:%X:%1X:%[^:\n\r]",											6,	0,	0,	0	},
-#endif	/* MESS */
-	/* end of table */
-	{	0	}
 };
 
 /***************************************************************************
@@ -887,18 +854,18 @@ static int					found_database;
 static int					cheats_disabled;
 static int					watches_disabled;
 
-static int					fullMenuPageHeight;
+static int					full_menu_page_height;
 static int					visible_items;
 
 static char					main_database_name[CHEAT_FILENAME_MAX_LEN + 1];
 
 static menu_string_list		menu_strings;
 
-static cheat_menu_item_info	* menu_item_info;
-static INT32				menuItemInfoLength = 0;
+static cheat_menu_item_info	*menu_item_info;
+static INT32				menu_item_info_length;
 
-static UINT8				editActive;
-static INT8					editCursor;
+static UINT8				edit_active;
+static INT8					edit_cursor;
 
 static INT8					stack_index;
 static cheat_menu_stack		menu_stack[CHEAT_MENU_DEPTH];
@@ -907,6 +874,8 @@ static int					cheat_variable[VARIABLE_MAX_ARRAY] = { 0 };
 
 static UINT32				cheat_options;
 static UINT32				driverSpecifiedFlag;
+static UINT8				vertical_key_repeat_speed;
+static UINT8				horizontal_key_repeat_speed;
 static UINT8				message_type;
 static UINT8				message_timer;
 
@@ -920,153 +889,111 @@ static cpu_region_info raw_cpu_info =
 	0,			/* address_shift */
 };
 
-static const int kSearchByteIncrementTable[] =
+static const int BYTE_DIGITS_TABLE[] =
 {
-	1,
-	2,
-	3,
-	4,
-	1
+	2,		/* 8-bit (1 byte) */
+	4,		/* 16-bit (2 bytes) */
+	6,		/* 24-bit (3 bytes) */
+	8,		/* 32-bit (4 bytes) */
+	1		/* 1-bit <SEARCH MODE ONLY> */
 };
 
-static const int kSearchByteStep[] =
+static const int BYTE_DEC_DIGITS_TABLE[] =
 {
-	1,
-	2,
-	1,
-	4,
-	1
+	3,		/* 8-bit (1 byte) */
+	5,		/* 16-bit (2 bytes) */
+	8,		/* 24-bit (3 bytes) */
+	10,		/* 32-bit (4 bytes) */
+	1,		/* 1-bit */
 };
 
-static const int	kSearchByteDigitsTable[] =
+static const int BYTE_INCREMENT_TABLE[] =
 {
-	2,
-	4,
-	6,
-	8,
-	1
+	1,		/* 8-bit (1 byte) */
+	2,		/* 16-bit (2 bytes) */
+	3,		/* 24-bit (3 bytes) */
+	4,		/* 32-bit (4 bytes) */
+	1		/* 1-bit <SEARCH MODE ONLY> */
 };
 
-static const int	kSearchByteDecDigitsTable[] =
+static const int SEARCH_BYTE_STEP[] =
 {
-	3,
-	5,
-	8,
-	10,
-	1
+	1,		/* 8-bit (1 byte) */
+	2,		/* 16-bit (2 bytes) */
+	1,		/* 24-bit (3 bytes) */
+	4,		/* 32-bit (4 bytes) */
+	1		/* 1-bit */
 };
 
-static const UINT32 kSearchByteMaskTable[] =
+static const UINT32 BYTE_LOOP_TABLE[] = 
 {
-	0x000000FF,
-	0x0000FFFF,
-	0x00FFFFFF,
-	0xFFFFFFFF,
-	0x00000001
+	1,		/* 8-bit (1 byte) */
+	3,		/* 16-bit (2 bytes) */
+	5,		/* 24-bit (3 bytes) */
+	7,		/* 32-bit (4 bytes) */
+	1		/* 1-bit <SEARCH MODE ONLY> */
 };
 
-static const UINT32	kSearchByteSignBitTable[] =
+static const UINT32 BYTE_MASK_TABLE[] =
 {
-	0x00000080,
-	0x00008000,
-	0x00800000,
-	0x80000000,
-	0x00000000
+	0x000000FF,		/* 8-bit (1 byte) */
+	0x0000FFFF,		/* 16-bit (2 bytes) */
+	0x00FFFFFF,		/* 24-bit (3 bytes) */
+	0xFFFFFFFF,		/* 32-bit (4 bytes) */
+	0x00000001		/* 1-bit <SEARCH MODE ONLY> */
 };
 
-static const UINT32 kSearchByteUnsignedMaskTable[] =
+static const UINT32 SEARCH_BYTE_SIGN_BIT_TABLE[] =
 {
-	0x0000007F,
-	0x00007FFF,
-	0x007FFFFF,
-	0x7FFFFFFF,
-	0x00000001
+	0x00000080,		/* 8-bit (1 byte) */
+	0x00008000,		/* 16-bit (2 bytes) */
+	0x00800000,		/* 24-bit (3 bytes) */
+	0x80000000,		/* 32-bit (4 bytes) */
+	0x00000001		/* 1-bit  */
 };
 
-static const UINT32	kCheatSizeMaskTable[] =
+static const UINT32 SEARCH_BYTE_UNSIGNED_MASK_TABLE[] =
 {
-	0x000000FF,
-	0x0000FFFF,
-	0x00FFFFFF,
-	0xFFFFFFFF
+	0x0000007F,		/* 8-bit (1 byte) */
+	0x00007FFF,		/* 16-bit (2 bytes) */
+	0x007FFFFF,		/* 24-bit (3 bytes) */
+	0x7FFFFFFF,		/* 32-bit (4 bytes) */
+	0x00000001		/* 1-bit */
 };
 
-static const UINT32	kCheatSizeDigitsTable[] =
+static const int kByteConversionTable[] =
 {
-	2,
-	4,
-	6,
-	8
+	kSearchSize_8Bit, kSearchSize_16Bit, kSearchSize_24Bit, kSearchSize_32Bit, kSearchSize_32Bit
 };
 
-static const int	kByteConversionTable[] =
+static const int kWatchSizeConversionTable[] =
 {
-	kSearchSize_8Bit,
-	kSearchSize_16Bit,
-	kSearchSize_24Bit,
-	kSearchSize_32Bit,
-	kSearchSize_32Bit
+	kSearchSize_8Bit, kSearchSize_16Bit, kSearchSize_24Bit, kSearchSize_32Bit, kSearchSize_8Bit
 };
 
-static const int	kWatchSizeConversionTable[] =
+static const int kSearchOperandNeedsInit[] =
 {
-	kSearchSize_8Bit,
-	kSearchSize_16Bit,
-	kSearchSize_24Bit,
-	kSearchSize_32Bit,
-	kSearchSize_8Bit
-};
-
-static const int	kSearchOperandNeedsInit[] =
-{
-	0,
-	1,
-	1,
-	0
+	0, 1, 1, 0
 };
 
 static const UINT32 kPrefillValueTable[] =
 {
-	0x00,
-	0xFF,
-	0x00,
-	0x01
+	0x00, 0xFF, 0x00, 0x01
 };
 
 static const UINT32 kIncrementValueTable[] =
 {
-	0x00000001,
-	0x00000010,
-	0x00000100,
-	0x00001000,
-	0x00010000,
-	0x00100000,
-	0x01000000,
-	0x10000000
+	0x00000001, 0x00000010, 0x00000100, 0x00001000, 0x00010000, 0x00100000, 0x01000000, 0x10000000
 };
 
 static const UINT32 kIncrementMaskTable[] =
 {
-	0x0000000F,
-	0x000000F0,
-	0x00000F00,
-	0x0000F000,
-	0x000F0000,
-	0x00F00000,
-	0x0F000000,
-	0xF0000000
+	0x0000000F, 0x000000F0, 0x00000F00, 0x0000F000, 0x000F0000, 0x00F00000, 0x0F000000, 0xF0000000
 };
 
 static const UINT32 kIncrementDecTable[] =
 {
-	0x00000009,
-	0x00000090,
-	0x00000900,
-	0x00009000,
-	0x00090000,
-	0x00900000,
-	0x09000000,
-	0x90000000
+	0x00000009, 0x00000090, 0x00000900, 0x00009000, 0x00090000, 0x00900000, 0x09000000, 0x90000000
 };
 
 static const char *const kRegionNames[] = {
@@ -1090,10 +1017,12 @@ static const char *const kNumbersTable[] = {
 
 static const char *const kByteSizeStringList[] =
 {
-	"8 Bit",
-	"16 Bit",
-	"24 Bit",
-	"32 Bit"
+	"8 Bit", "16 Bit", "24 Bit", "32 Bit"
+};
+
+static const char *const BIT_SET_CLEAR_NAMES[] =
+{
+	"Bit Set", "Bit Clear"
 };
 
 static const char *const kWatchLabelStringList[] =
@@ -1117,6 +1046,7 @@ static const char *const CHEAT_MESSAGE_TABLE[] =
 	"cheat option reloaded",					/* RELOAD_CHEAT_OPTION */
 	"cheat code reloaded",						/* RELOAD_CHEAT_CODE */
 	"user defined search region reloaded",		/* RELOAD_USER_REGION */
+	"reset cheat options as default",			/* RESET_OPTIONS */
 	"failed to load database!",					/* FAILED_TO_LOAD_DATABASE */
 	"cheats found",								/* CHEAT_FOUND */
 	"1 result found, added to list",			/* ONE_CHEAT_FOUND */
@@ -1140,6 +1070,33 @@ static const char *const CHEAT_MESSAGE_TABLE[] =
 	"found wrong code!"							/* WRONG_CODE */
 };
 
+static const struct _cheat_format cheat_format_table[] =
+{
+		/* option - :_command:TYPE */
+	{	":_command:%[^:\n\r]",																	1,	8,	0,	0	},
+#ifdef MESS
+		/* code (new) - :MACHINE_NAME::CRC::TYPE::ADDRESS::DATA::EXTEND_DATA:(DESCRIPTION:COMMENT) */
+	{	":%8[^:\n\r]::%8X::%10[^:\n\r]::%X::%8[^:\n\r]::%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",	6,	10,	8,	8	},
+		/* code (old) - :MACHINE_NAME:CRC:TYPE:ADDRESS:DATA:EXTEND_DATA:(DESCRIPTION:COMMENT) */
+	{	":%8[^:\n\r]:8X:%8[^:\n\r]:%X:%8[^:\n\r]:%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",		6,	8,	8,	0	},
+		/* code (older) - :MACHINE_NAME:CRC:CPU:ADDRESS:DATA:TYPE:(DESCRIPTION:COMMENT) */
+	{	"%8[^:\n\r]:%8X:%d:%X:%X:%d:%[^:\n\r]:%[^:\n\r]",										5,	0,	0,	8	},
+		/* user region - :MACHINE_NAME:CRC:CPU:ADDRESS_SPACE:START_ADDRESS:END_ADDRESS:STATUS:(DESCRIPTION) */
+	{	":%8[^:\n\r]:%8X:%2X:%2X:%X:%X:%1X:%[^:\n\r]",											7,	0,	0,	0	},
+#else
+		/* code (new) - :GAME_NAME::TYPE::ADDRESS::DATA::EXTEND_DATA:(DESCRIPTION:COMMENT) */
+	{	":%8[^:\n\r]::%10[^:\n\r]::%X::%8[^:\n\r]::%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",		5,	10,	8,	7	},
+		/* code (old) - :GAME_NAME:TYPE:ADDRESS:DATA:EXTEND_DATA:(DESCRIPTION:COMMENT) */
+	{	":%8[^:\n\r]:%8[^:\n\r]:%X:%8[^:\n\r]:%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",			5,	8,	8,	0	},
+		/* code (older) - :GAME_NAME:CPU:ADDRESS:DATA:TYPE:(DESCRIPTION:COMMENT) */
+	{	"%8[^:\n\r]:%d:%X:%X:%d:%[^:\n\r]:%[^:\n\r]",											4,	0,	0,	7	},
+		/* user region - :GAME_NAME:CPU:ADDRESS_SPACE:START_ADDRESS:END_ADDRESS:STATUS:(DESCRIPTION) */
+	{	":%8[^:\n\r]:%2X:%2X:%X:%X:%1X:%[^:\n\r]",												6,	0,	0,	0	},
+#endif	/* MESS */
+	/* end of table */
+	{	0	}
+};
+
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
@@ -1148,31 +1105,32 @@ static TIMER_CALLBACK( cheat_periodic );
 static void 	cheat_exit(running_machine *machine);
 
 /********** SPECIAL KEY HANDLING **********/
-static int		ShiftKeyPressed(void);
-static int		ControlKeyPressed(void);
-static int		AltKeyPressed(void);
+static int		shift_key_pressed(void);
+static int		control_key_pressed(void);
+static int		alt_key_pressed(void);
 
 static int		ui_pressed_repeat_throttle(running_machine *machine, int code, int base_speed);
 
 /********** KEY INPUT **********/
 static int		read_hex_input(void);
-#if 0
-static char		*DoDynamicEditTextField(char * buf);
-#endif
-static void		DoStaticEditTextField(char * buf, int size);
+
+static char		*do_dynamic_edit_text_field(char *buf);
+static void		do_static_edit_text_field(char *buf, int size);
+
 static UINT32	do_edit_hex_field(running_machine *machine, UINT32 data);
-static UINT32	DoEditHexFieldSigned(UINT32 data, UINT32 mask);
-static INT32	DoEditDecField(INT32 data, INT32 min, INT32 max);
-static UINT32	DoIncrementHexField(UINT32 data, UINT8 digits);
-static UINT32	DoDecrementHexField(UINT32 data, UINT8 digits);
-static UINT32	DoIncrementHexFieldSigned(UINT32 data, UINT8 digits, UINT8 bytes);
-static UINT32	DoDecrementHexFieldSigned(UINT32 data, UINT8 digits, UINT8 bytes);
-static UINT32	DoIncrementDecField(UINT32 data, UINT8 digits);
-static UINT32	DoDecrementDecField(UINT32 data, UINT8 digits);
+static UINT32	do_edit_hex_field_signed(UINT32 data, UINT32 mask);
+static INT32	do_edit_dec_field(INT32 data, INT32 min, INT32 max);
+
+static UINT32	do_increment_hex_field(UINT32 data, UINT8 digits);
+static UINT32	do_decrement_hex_field(UINT32 data, UINT8 digits);
+static UINT32	do_increment_hex_field_signed(UINT32 data, UINT8 digits, UINT8 bytes);
+static UINT32	do_decrement_hex_field_signed(UINT32 data, UINT8 digits, UINT8 bytes);
+static UINT32	do_increment_dec_field(UINT32 data, UINT8 digits);
+static UINT32	do_decrement_dec_field(UINT32 data, UINT8 digits);
 
 /********** VALUE CONVERTER **********/
-static UINT32	BCDToDecimal(UINT32 value);
-static UINT32	DecimalToBCD(UINT32 value);
+static UINT32	bcd_to_decimal(UINT32 value);
+static UINT32	decimal_to_bcd(UINT32 value);
 
 /********** STRINGS **********/
 static void		rebuild_string_tables(void);
@@ -1181,9 +1139,11 @@ static void		init_string_table(void);
 static void		free_string_table(void);
 
 static char		*create_string_copy(char *buf);
+static char		*create_strings_with_edit_cursor(char *buf, int data, int total_digits, INT8 current_cursor);
 
-/********** MENU EXPORTER **********/
+/********** MENU **********/
 static void		old_style_menu(const char **items, const char **sub_items, char *flag, int selected, int arrowize_subitem);
+static void		resize_menu_item_info(UINT32 new_length);
 
 /********** MENU STACK **********/
 static void		init_cheat_menu_stack(void);
@@ -1206,9 +1166,7 @@ static int		edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu);
 static int		view_cheat_menu(running_machine *machine, cheat_menu_stack *menu);
 static int		analyse_cheat_menu(running_machine *machine, cheat_menu_stack *menu);
 
-static int		search_minimum_menu(running_machine *machine, cheat_menu_stack *menu);
-static int		search_standard_menu(running_machine *machine, cheat_menu_stack *menu);
-static int		search_advanced_menu(running_machine *machine, cheat_menu_stack *menu);
+static int		search_main_menu(running_machine *machine, cheat_menu_stack *menu);
 static int		select_search_region_menu(running_machine *machine, cheat_menu_stack *menu);
 static int		view_search_result_menu(running_machine *machine, cheat_menu_stack *menu);
 
@@ -1227,6 +1185,10 @@ static int		view_cpu_region_info_list_menu(running_machine *machine, cheat_menu_
 static int		debug_cheat_menu(running_machine *machine, cheat_menu_stack *menu);
 #endif
 
+/********** PRINTER **********/
+static UINT32	print_binary(char *buf, UINT32 data, UINT32 mask);
+static UINT32	print_ascii(char *buf, UINT32 data, UINT8 size);
+
 /********** ENTRY LIST **********/
 static void		resize_cheat_list(UINT32 new_length, UINT8 dispose);
 
@@ -1239,18 +1201,20 @@ static cheat_entry
 
 /********** ACTION LIST **********/
 static void		resize_cheat_action_list(cheat_entry *entry, UINT32 new_length, UINT8 dispose);
-#if 0
-static void		AddActionBefore(CheatEntry * entry, UINT32 idx);
-static void		DeleteActionAt(CheatEntry * entry, UINT32 idx);
-#endif
+
+static void		add_action_before(cheat_entry *entry, UINT32 idx);
+static void		delete_action_at(cheat_entry *entry, UINT32 idx);
+
 static void		dispose_action(cheat_action *action);
 
 /********** WATCH LIST **********/
 static void		init_watch(watch_info *info, UINT32 idx);
+
 static void		resize_watch_list(UINT32 new_length, UINT8 dispose);
 
 static void		add_watch_before(UINT32 idx);
 static void		delete_watch_at(UINT32 idx);
+
 static void		dispose_watch(watch_info *watch);
 
 static watch_info
@@ -1262,13 +1226,13 @@ static void		add_cheat_from_watch_as_watch(running_machine *machine, cheat_entry
 static void		reset_watch(watch_info *watch);
 
 /********** SEARCH LIST **********/
-static void		resize_search_list(UINT32 newLength);
-#if 0
-static void		resize_search_list_no_dispose(UINT32 new_length);
+static void		resize_search_list(UINT32 new_length, UINT8 dispose);
+
 static void		add_search_before(UINT32 idx);
 static void		delete_search_at(UINT32 idx);
-#endif
+
 static void		init_search(search_info *info);
+static void		init_search_box(search_info *info, UINT8 mode);
 
 static void		dispose_search_reigons(search_info *info);
 static void		dispose_search(search_info *info);
@@ -1291,7 +1255,8 @@ static void		build_search_regions(running_machine *machine, search_info *info);
 /********** LOADER **********/
 static int		convert_older_code(int code, int cpu, int *data, int *extend_data);
 static int		convert_to_new_code(cheat_action *action);
-static void		handle_local_command_cheat(running_machine *machine, int cpu, int type, int address, int data, int extend_data, UINT8 format);
+static int		handle_local_command_tag(char *tag);
+static void		handle_local_command_cheat(running_machine *machine, int cpu, int type, int address, int data, int extend_data, char *tag);
 
 static UINT8	open_cheat_database(mame_file **the_file, char *file_name, UINT8 flag);
 
@@ -1324,7 +1289,7 @@ static UINT32	read_search_operand_bit(UINT8 type, search_info *search, search_re
 static UINT8	do_search_comparison(search_info *search, UINT32 lhs, UINT32 rhs);
 static UINT32	do_search_comparison_bit(search_info *search, UINT32 lhs, UINT32 rhs);
 #if 0
-static UINT8  is_region_offset_valid(search_info *search, search_region *region, UINT32 offset);
+static UINT8	is_region_offset_valid(search_info *search, search_region *region, UINT32 offset);
 #else
 #define is_region_offset_valid is_region_offset_valid_bit /* ????? */
 #endif
@@ -1363,10 +1328,10 @@ static void		deactivate_cheat(running_machine *machine, cheat_entry *entry);
 static void		temp_deactivate_cheat(running_machine *machine, cheat_entry *entry);
 
 /********** OPERATION CORE **********/
-static void		cheat_periodicOperation(running_machine *machine, cheat_action *action);
-static UINT8	cheat_periodicCondition(running_machine *machine, cheat_action *action);
-static int		cheat_periodicAction(running_machine *machine, cheat_action *action, int selection);
-static void		cheat_periodicEntry(running_machine *machine, cheat_entry *entry);
+static void		cheat_periodic_operation(running_machine *machine, cheat_action *action);
+static UINT8	cheat_periodic_condition(running_machine *machine, cheat_action *action);
+static int		cheat_periodic_action(running_machine *machine, cheat_action *action, int selection);
+static void		cheat_periodic_entry(running_machine *machine, cheat_entry *entry);
 
 /********** CONFIGURE ENTRY **********/
 static void		update_all_cheat_info(running_machine *machine);
@@ -1377,6 +1342,7 @@ static void		build_label_index_table(cheat_entry *entry);
 static void		set_layer_index(void);
 
 /********** OTHER STUFF **********/
+static void		reset_cheat_options(void);
 static void		display_cheat_message(void);
 static UINT8	get_address_length(UINT8 region);
 static char		*get_region_name(UINT8 region);
@@ -1445,11 +1411,11 @@ INLINE UINT8 region_needs_swap(UINT8 region)
 	return 0;
 }
 
-/*--------------
-  SwapAddress
---------------*/
+/*---------------
+  swap_address
+---------------*/
 
-INLINE UINT32 SwapAddress(UINT32 address, UINT8 dataSize, cpu_region_info *info)
+INLINE UINT32 swap_address(UINT32 address, UINT8 dataSize, cpu_region_info *info)
 {
 	switch(info->data_bits)
 	{
@@ -1478,16 +1444,14 @@ INLINE int is_address_in_range(cheat_action *action, UINT32 length)
 	return ((action->address + EXTRACT_FIELD(action->type, AddressSize) + 1) <= length);
 }
 
-/*----------
-  DoShift
-----------*/
+/*-----------
+  do_shift
+-----------*/
 
-INLINE UINT32 DoShift(UINT32 input, INT8 shift)
+INLINE UINT32 do_shift(UINT32 input, INT8 shift)
 {
-	if(shift > 0)
-		return input >> shift;
-	else
-		return input << -shift;
+	if(shift > 0)	return input >> shift;
+	else			return input << -shift;
 }
 
 /***************************************************************************
@@ -1498,30 +1462,30 @@ INLINE UINT32 DoShift(UINT32 input, INT8 shift)
   special key handler - check pressing shift, ctrl or alt key
 --------------------------------------------------------------*/
 
-static int ShiftKeyPressed(void)
+static int shift_key_pressed(void)
 {
 	return (input_code_pressed(KEYCODE_LSHIFT) || input_code_pressed(KEYCODE_RSHIFT));
 }
 
-static int ControlKeyPressed(void)
+static int control_key_pressed(void)
 {
 	return (input_code_pressed(KEYCODE_LCONTROL) || input_code_pressed(KEYCODE_RCONTROL));
 }
 
-static int AltKeyPressed(void)
+static int alt_key_pressed(void)
 {
 	return (input_code_pressed(KEYCODE_LALT) || input_code_pressed(KEYCODE_RALT));
 }
 
-/*---------------------------------------------------------------------------------------------------------------------
-  ReadKeyAsync - dirty hack until osd_readkey_unicode is supported in MAMEW re-implementation of osd_readkey_unicode
----------------------------------------------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------------------------------------------
+  read_key_async - dirty hack until osd_readkey_unicode is supported in MAMEW re-implementation of osd_readkey_unicode
+-----------------------------------------------------------------------------------------------------------------------*/
 
 #if OSD_READKEY_KLUDGE
 
-static int ReadKeyAsync(int flush)
+static int read_key_async(int flush)
 {
-	int	code;
+	int code;
 
 	if(flush)
 	{
@@ -1542,12 +1506,12 @@ static int ReadKeyAsync(int flush)
 		}
 		else if(code >= KEYCODE_A && code <= KEYCODE_Z)
 		{
-			if(ShiftKeyPressed())		return 'A' + (code - KEYCODE_A);
+			if(shift_key_pressed())		return 'A' + (code - KEYCODE_A);
 			else						return 'a' + (code - KEYCODE_A);
 		}
 		else if(code >= KEYCODE_0 && code <= KEYCODE_9)
 		{
-			if(ShiftKeyPressed())		return ")!@#$%^&*("[code - KEYCODE_0];
+			if(shift_key_pressed())		return ")!@#$%^&*("[code - KEYCODE_0];
 			else						return '0' + (code - KEYCODE_0);
 		}
 		else if(code >= KEYCODE_0_PAD && code <= KEYCODE_9_PAD)
@@ -1556,17 +1520,17 @@ static int ReadKeyAsync(int flush)
 		}
 		else if(code == KEYCODE_TILDE)
 		{
-			if(ShiftKeyPressed())		return '~';
+			if(shift_key_pressed())		return '~';
 			else						return '`';
 		}
 		else if(code == KEYCODE_MINUS)
 		{
-			if(ShiftKeyPressed())		return '_';
+			if(shift_key_pressed())		return '_';
 			else						return '-';
 		}
 		else if(code == KEYCODE_EQUALS)
 		{
-			if(ShiftKeyPressed())		return '+';
+			if(shift_key_pressed())		return '+';
 			else						return '=';
 		}
 		else if(code == KEYCODE_BACKSPACE)
@@ -1575,42 +1539,42 @@ static int ReadKeyAsync(int flush)
 		}
 		else if(code == KEYCODE_OPENBRACE)
 		{
-			if(ShiftKeyPressed())		return '{';
+			if(shift_key_pressed())		return '{';
 			else						return '[';
 		}
 		else if(code == KEYCODE_CLOSEBRACE)
 		{
-			if(ShiftKeyPressed())		return '}';
+			if(shift_key_pressed())		return '}';
 			else						return ']';
 		}
 		else if(code == KEYCODE_COLON)
 		{
-			if(ShiftKeyPressed())		return ':';
+			if(shift_key_pressed())		return ':';
 			else						return ';';
 		}
 		else if(code == KEYCODE_QUOTE)
 		{
-			if(ShiftKeyPressed())		return '\"';
+			if(shift_key_pressed())		return '\"';
 			else						return '\'';
 		}
 		else if(code == KEYCODE_BACKSLASH)
 		{
-			if(ShiftKeyPressed())		return '|';
+			if(shift_key_pressed())		return '|';
 			else						return '\\';
 		}
 		else if(code == KEYCODE_COMMA)
 		{
-			if(ShiftKeyPressed())		return '<';
+			if(shift_key_pressed())		return '<';
 			else						return ',';
 		}
 		else if(code == KEYCODE_STOP)
 		{
-			if(ShiftKeyPressed())		return '>';
+			if(shift_key_pressed())		return '>';
 			else						return '.';
 		}
 		else if(code == KEYCODE_SLASH)
 		{
-			if(ShiftKeyPressed())		return '?';
+			if(shift_key_pressed())		return '?';
 			else						return '/';
 		}
 		else if(code == KEYCODE_SLASH_PAD)
@@ -1636,7 +1600,7 @@ static int ReadKeyAsync(int flush)
 	}
 }
 
-#define osd_readkey_unicode ReadKeyAsync
+#define osd_readkey_unicode read_key_async
 
 #endif /* OSD_READKEY_KLUDGE */
 
@@ -1697,31 +1661,22 @@ static int read_hex_input(void)
 	int i;
 
 	for(i = 0; i < 10; i++)
-	{
-		if(input_code_pressed_once(KEYCODE_0 + i))
-			return i;
-	}
+		if(input_code_pressed_once(KEYCODE_0 + i))			return i;
 
 	for(i = 0; i < 10; i++)
-	{
-		if(input_code_pressed_once(KEYCODE_0_PAD + i))
-			return i;
-	}
+		if(input_code_pressed_once(KEYCODE_0_PAD + i))		return i;
 
 	for(i = 0; i < 6; i++)
-	{
-		if(input_code_pressed_once(KEYCODE_A + i))
-			return i + 10;
-	}
+		if(input_code_pressed_once(KEYCODE_A + i))			return i + 10;
 
 	return -1;
 }
 
-/*-----------------------------------------------------------------
-  DoDynamicEditTextField - edit text field with direct key input
------------------------------------------------------------------*/
-#if 0
-static char * DoDynamicEditTextField(char * buf)
+/*---------------------------------------------------------------------
+  do_dynamic_edit_text_field - edit text field with direct key input
+---------------------------------------------------------------------*/
+
+static char *do_dynamic_edit_text_field(char *buf)
 {
 	char code = osd_readkey_unicode(0) & 0xFF;
 
@@ -1730,7 +1685,7 @@ static char * DoDynamicEditTextField(char * buf)
 		/* backspace */
 		if(buf)
 		{
-			size_t	length = strlen(buf);
+			size_t length = strlen(buf);
 
 			if(length > 0)
 			{
@@ -1741,7 +1696,6 @@ static char * DoDynamicEditTextField(char * buf)
 				else
 				{
 					free(buf);
-
 					buf = NULL;
 				}
 			}
@@ -1772,18 +1726,17 @@ static char * DoDynamicEditTextField(char * buf)
 
 	return buf;
 }
-#endif
-/*------------------------
-  DoStaticEditTextField
-------------------------*/
 
-static void DoStaticEditTextField(char * buf, int size)
+/*--------------------------------------------------------------------
+  do_static_edit_text_field - edit text field with direct key input
+--------------------------------------------------------------------*/
+
+static void do_static_edit_text_field(char *buf, int size)
 {
 	char	code = osd_readkey_unicode(0) & 0xFF;
 	size_t	length;
 
-	if(!buf)
-		return;
+	if(!buf)	return;
 
 	length = strlen(buf);
 
@@ -1835,30 +1788,28 @@ static UINT32 do_edit_hex_field(running_machine *machine, UINT32 data)
 	return data;
 }
 
-/*-----------------------------------------------------------------------
-  DoEditHexFieldSigned - edit hex field with direct key input (signed)
------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------
+  do_edit_hex_field_signed - edit hex field with direct key input (signed)
+---------------------------------------------------------------------------*/
 
-static UINT32 DoEditHexFieldSigned(UINT32 data, UINT32 mask)
+static UINT32 do_edit_hex_field_signed(UINT32 data, UINT32 mask)
 {
 	INT8	key;
-	UINT32	isNegative = data & mask;
+	UINT32	is_negative = data & mask;
 
-	if(isNegative)
+	if(is_negative)
 		data |= mask;
 
 	key = read_hex_input();
 
 	if(key != -1)
 	{
-		if(isNegative)
-			data = (~data) + 1;
+		if(is_negative)		data = (~data) + 1;
 
 		data <<= 4;
 		data |= key;
 
-		if(isNegative)
-			data = (~data) + 1;
+		if(is_negative)		data = (~data) + 1;
 	}
 	else
 	{
@@ -1869,11 +1820,11 @@ static UINT32 DoEditHexFieldSigned(UINT32 data, UINT32 mask)
 	return data;
 }
 
-/*--------------------------------------------------------
-  DoEditDecField - edit dec field with direct key input
---------------------------------------------------------*/
+/*-----------------------------------------------------------
+  do_edit_dec_field - edit dec field with direct key input
+-----------------------------------------------------------*/
 
-static INT32 DoEditDecField(INT32 data, INT32 min, INT32 max)
+static INT32 do_edit_dec_field(INT32 data, INT32 min, INT32 max)
 {
 	char code = osd_readkey_unicode(0) & 0xFF;
 
@@ -1895,19 +1846,17 @@ static INT32 DoEditDecField(INT32 data, INT32 min, INT32 max)
 	}
 
 	/* adjust value */
-	if(data < min)
-		data = min;
-	if(data > max)
-		data = max;
+	if(data < min)	data = min;
+	if(data > max)	data = max;
 
 	return data;
 }
 
 /*--------------------------------------------------------------------------------
-  DoIncrementHexField - increment a specified value in hex field with arrow key
+  do_increment_hex_field - increment a specified value in hex field with arrow key
 --------------------------------------------------------------------------------*/
 
-static UINT32 DoIncrementHexField(UINT32 data, UINT8 digits)
+static UINT32 do_increment_hex_field(UINT32 data, UINT8 digits)
 {
 	data =	((data & ~kIncrementMaskTable[digits]) |
 			(((data & kIncrementMaskTable[digits]) + kIncrementValueTable[digits]) &
@@ -1916,11 +1865,11 @@ static UINT32 DoIncrementHexField(UINT32 data, UINT8 digits)
 	return data;
 }
 
-/*--------------------------------------------------------------------------------
-  DoDecrementHexField - decrement a specified value in hex field with arrow key
---------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------
+  do_decrement_hex_field - decrement a specified value in hex field with arrow key
+-----------------------------------------------------------------------------------*/
 
-static UINT32 DoDecrementHexField(UINT32 data, UINT8 digits)
+static UINT32 do_decrement_hex_field(UINT32 data, UINT8 digits)
 {
 	data =	((data & ~kIncrementMaskTable[digits]) |
 			(((data & kIncrementMaskTable[digits]) - kIncrementValueTable[digits]) &
@@ -1929,98 +1878,94 @@ static UINT32 DoDecrementHexField(UINT32 data, UINT8 digits)
 	return data;
 }
 
-/*--------------------------------------------------------------------------------------
-  DoIncrementHexFieldSigned - increment a specified value in hex field with arrow key
---------------------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------------------------
+  do_increment_hex_field_signed - increment a specified value in hex field with arrow key
+------------------------------------------------------------------------------------------*/
 
-static UINT32 DoIncrementHexFieldSigned(UINT32 data, UINT8 digits, UINT8 bytes)
+static UINT32 do_increment_hex_field_signed(UINT32 data, UINT8 digits, UINT8 bytes)
 {
-	UINT32 newData = data;
+	UINT32 new_data = data;
 
-	if(data & kSearchByteSignBitTable[bytes])
+	if(data & SEARCH_BYTE_SIGN_BIT_TABLE[bytes])
 	{
 		/* MINUS */
-		newData =	((newData & ~kIncrementMaskTable[digits]) |
-					(((newData & kIncrementMaskTable[digits]) - kIncrementValueTable[digits]) &
+		new_data =	((new_data & ~kIncrementMaskTable[digits]) |
+					(((new_data & kIncrementMaskTable[digits]) - kIncrementValueTable[digits]) &
 					kIncrementMaskTable[digits]));
 
-		if(newData & kSearchByteSignBitTable[bytes])
-			newData = ((data & ~kIncrementMaskTable[digits]) | (newData & kIncrementMaskTable[digits]));
+		if(new_data & SEARCH_BYTE_SIGN_BIT_TABLE[bytes])
+			new_data = ((data & ~kIncrementMaskTable[digits]) | (new_data & kIncrementMaskTable[digits]));
 	}
 	else
 	{
 		/* PLUS */
-		newData =	((newData & ~kIncrementMaskTable[digits]) |
-					(((newData & kIncrementMaskTable[digits]) + kIncrementValueTable[digits]) &
+		new_data =	((new_data & ~kIncrementMaskTable[digits]) |
+					(((new_data & kIncrementMaskTable[digits]) + kIncrementValueTable[digits]) &
 					kIncrementMaskTable[digits]));
 
-		if(!(newData & kSearchByteSignBitTable[bytes]))
-			newData = ((data & ~kIncrementMaskTable[digits]) | (newData & kIncrementMaskTable[digits]));
+		if((new_data & SEARCH_BYTE_SIGN_BIT_TABLE[bytes]) == 0)
+			new_data = ((data & ~kIncrementMaskTable[digits]) | (new_data & kIncrementMaskTable[digits]));
 	}
 
-	return newData;
+	return new_data;
 }
 
-/*--------------------------------------------------------------------------------------
-  DoDecrementHexFieldSigned - decrement a specified value in hex field with arrow key
---------------------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------------------------
+  do_decrement_hex_field_signed - decrement a specified value in hex field with arrow key
+------------------------------------------------------------------------------------------*/
 
-static UINT32 DoDecrementHexFieldSigned(UINT32 data, UINT8 digits, UINT8 bytes)
+static UINT32 do_decrement_hex_field_signed(UINT32 data, UINT8 digits, UINT8 bytes)
 {
-	UINT32 newData = data;
+	UINT32 new_data = data;
 
-	if(data & kSearchByteSignBitTable[bytes])
+	if(data & SEARCH_BYTE_SIGN_BIT_TABLE[bytes])
 	{
 		/* MINUS */
-		newData =	((newData & ~kIncrementMaskTable[digits]) |
-					(((newData & kIncrementMaskTable[digits]) + kIncrementValueTable[digits]) &
+		new_data =	((new_data & ~kIncrementMaskTable[digits]) |
+					(((new_data & kIncrementMaskTable[digits]) + kIncrementValueTable[digits]) &
 					kIncrementMaskTable[digits]));
 
-		if(newData & kSearchByteSignBitTable[bytes])
-			newData = ((data & ~kIncrementMaskTable[digits]) | (newData & kIncrementMaskTable[digits]));
+		if(new_data & SEARCH_BYTE_SIGN_BIT_TABLE[bytes])
+			new_data = ((data & ~kIncrementMaskTable[digits]) | (new_data & kIncrementMaskTable[digits]));
 	}
 	else
 	{
 		/* PLUS */
-		newData =	((newData & ~kIncrementMaskTable[digits]) |
-					(((newData & kIncrementMaskTable[digits]) - kIncrementValueTable[digits]) &
+		new_data =	((new_data & ~kIncrementMaskTable[digits]) |
+					(((new_data & kIncrementMaskTable[digits]) - kIncrementValueTable[digits]) &
 					kIncrementMaskTable[digits]));
 
-		if(!(newData & kSearchByteSignBitTable[bytes]))
-			newData = ((data & ~kIncrementMaskTable[digits]) | (newData & kIncrementMaskTable[digits]));
+		if((new_data & SEARCH_BYTE_SIGN_BIT_TABLE[bytes]) == 0)
+			new_data = ((data & ~kIncrementMaskTable[digits]) | (new_data & kIncrementMaskTable[digits]));
 	}
 
-	return newData;
+	return new_data;
 }
 
-/*--------------------------------------------------------------------------------
-  DoIncrementDecField - increment a specified value in dec field with arrow key
---------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------
+  do_increment_dec_field - increment a specified value in dec field with arrow key
+-----------------------------------------------------------------------------------*/
 
-static UINT32 DoIncrementDecField(UINT32 data, UINT8 digits)
+static UINT32 do_increment_dec_field(UINT32 data, UINT8 digits)
 {
 	UINT32 value = data & kIncrementMaskTable[digits];
 
-	if(value >= kIncrementDecTable[digits])
-		value = 0;
-	else
-		value += kIncrementValueTable[digits];
+	if(value >= kIncrementDecTable[digits])		value = 0;
+	else										value += kIncrementValueTable[digits];
 
 	return ((data & ~kIncrementMaskTable[digits]) | value);
 }
 
-/*--------------------------------------------------------------------------------
-  DoDecrementDecField - increment a specified value in dec field with arrow key
---------------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------------
+  do_decrement_dec_field - decrement a specified value in dec field with arrow key
+-----------------------------------------------------------------------------------*/
 
-static UINT32 DoDecrementDecField(UINT32 data, UINT8 digits)
+static UINT32 do_decrement_dec_field(UINT32 data, UINT8 digits)
 {
 	UINT32 value = data & kIncrementMaskTable[digits];
 
-	if(!value)
-		value = kIncrementDecTable[digits];
-	else
-		value -= kIncrementValueTable[digits];
+	if(value == 0)	value = kIncrementDecTable[digits];
+	else			value -= kIncrementValueTable[digits];
 
 	return ((data & ~kIncrementMaskTable[digits]) | value);
 }
@@ -2042,8 +1987,11 @@ void cheat_init(running_machine *machine)
 	watch_list			= NULL;
 	watch_list_length	= 0;
 
-	search_list = NULL;
-	search_list_length = 0;
+	search_list			= NULL;
+	search_list_length	= 0;
+
+	menu_item_info			= NULL;
+	menu_item_info_length	= 0;
 
 #ifdef MESS
 	InitMessCheats(machine);
@@ -2054,12 +2002,12 @@ void cheat_init(running_machine *machine)
 	found_database		= 0;
 	cheats_disabled		= 0;
 	watches_disabled	= 0;
-	editActive			= 0;
-	editCursor			= 0;
+	edit_active			= 0;
+	edit_cursor			= 0;
 	cheat_options		= DEFAULT_CHEAT_OPTIONS;
 	driverSpecifiedFlag	= 0;
 
-	fullMenuPageHeight = visible_items = floor(1.0f / ui_get_line_height()) - 1;
+	full_menu_page_height = visible_items = floor(1.0f / ui_get_line_height()) - 1;
 
 	/* initialize CPU/Region info for cheat system */
 	build_cpu_region_info_list(machine);
@@ -2068,8 +2016,8 @@ void cheat_init(running_machine *machine)
 	load_cheat_database(machine, LOAD_CHEAT_OPTION | LOAD_CHEAT_CODE);
 
 	/* set default search and watch lists */
-	resize_search_list(1);
-	resize_watch_list(fullMenuPageHeight - 1, 0);
+	resize_search_list(1, REQUEST_DISPOSE);
+	resize_watch_list(full_menu_page_height - 1, 0);
 
 	/* build search region */
 	{
@@ -2089,6 +2037,9 @@ void cheat_init(running_machine *machine)
 
 		/* memory allocation for search region */
 		allocate_search_regions(info);
+
+		/* set default parameters for each search box */
+		init_search_box(info, EXTRACT_FIELD(cheat_options, SearchBox));
 	}
 
 	/* initialize string table */
@@ -2180,7 +2131,7 @@ static void cheat_exit(running_machine *machine)
 	cheats_disabled			= 0;
 	watches_disabled		= 0;
 	main_database_name[0]	= 0;
-	menuItemInfoLength		= 0;
+	menu_item_info_length	= 0;
 	cheat_variable[0]		= 0;
 	cheat_options			= 0;
 	driverSpecifiedFlag		= 0;
@@ -2195,12 +2146,12 @@ int cheat_menu(running_machine *machine, int selection)
 {
 	cheat_menu_stack *menu = &menu_stack[stack_index];
 
+	/* handle cheat menu */
+	selection = (*menu->handler)(machine, menu);
+
 	/* handle cheat message */
 	if(message_type)
 		display_cheat_message();
-
-	/* handle cheat menu */
-	selection = (*menu->handler)(machine, menu);
 
 	if(selection == 0)
 	{
@@ -2216,10 +2167,10 @@ int cheat_menu(running_machine *machine, int selection)
 }
 
 /*----------------------------------------
-  BCDToDecimal - convert a value to hex
+  bcd_to_decimal - convert a value to hex
 ----------------------------------------*/
 
-static UINT32 BCDToDecimal(UINT32 value)
+static UINT32 bcd_to_decimal(UINT32 value)
 {
 	int		i;
 	UINT32	accumulator	= 0;
@@ -2237,10 +2188,10 @@ static UINT32 BCDToDecimal(UINT32 value)
 }
 
 /*----------------------------------------
-  DecimalToBCD - convert a value to dec
+  decimal_to_bcd - convert a value to dec
 ----------------------------------------*/
 
-static UINT32 DecimalToBCD(UINT32 value)
+static UINT32 decimal_to_bcd(UINT32 value)
 {
 	int		i;
 	UINT32	accumulator	= 0;
@@ -2407,6 +2358,24 @@ static char *create_string_copy(char *buf)
 
 	return temp;
 }
+/*-------------------------------------------------------------
+  create_strings_with_edit_cursor - strings with edit cursor
+-------------------------------------------------------------*/
+
+static char *create_strings_with_edit_cursor(char *buf, int data, int total_digits, INT8 current_cursor)
+{
+	int i;
+
+	for(i = total_digits; i >= 0; i--)
+	{
+		if(i == current_cursor)
+			buf += sprintf(buf, "[%X]", (data & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
+		else
+			buf += sprintf(buf, "%X", (data & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
+	}
+
+	return buf;
+}
 
 /*--------------------------------------------------
   old_style_menu - export menu items to draw menu
@@ -2440,6 +2409,29 @@ static void old_style_menu(const char **items, const char **sub_items, char *fla
 	visible_items = ui_menu_draw(item_list, menu_items, selected, NULL);
 }
 
+/*---------------------------------------------------------------------
+  resize_menu_item_info - memory allocation for cheat menu item info
+---------------------------------------------------------------------*/
+
+static void resize_menu_item_info(UINT32 new_length)
+{
+	if(new_length != menu_item_info_length)
+	{
+		/* reallocate cheat menu item info */
+		menu_item_info = realloc(menu_item_info, new_length * sizeof(cheat_menu_item_info));
+
+		if(menu_item_info == NULL && new_length != 0)
+			fatalerror(	"cheat: [menu item info] memory allocation error\n"
+						"	length =			%.8X"
+						"	menu_item_info =	%p",
+						menu_item_info_length, menu_item_info);
+
+		memset(menu_item_info, 0, new_length * sizeof(cheat_menu_item_info));
+
+		menu_item_info_length = new_length;
+	}
+}
+
 /*-------------------------------------------------------
   init_cheat_menu_stack - initilalize cheat menu stack
 -------------------------------------------------------*/
@@ -2448,10 +2440,11 @@ static void init_cheat_menu_stack(void)
 {
 	cheat_menu_stack *menu = &menu_stack[stack_index = 0];
 
-	menu->handler = cheat_main_menu;
-	menu->sel = 0;
-	menu->pre_sel = 0;
-	menu->first_time = 1;
+	menu->handler				= cheat_main_menu;
+	menu->return_handler		= NULL;
+	menu->sel					= 0;
+	menu->pre_sel				= 0;
+	menu->first_time			= 1;
 }
 
 /*-----------------------------------------------------
@@ -2464,12 +2457,12 @@ static void cheat_menu_stack_push(cheat_menu_handler new_handler, cheat_menu_han
 
 	assert(stack_index < CHEAT_MENU_DEPTH);
 
-	menu->handler = new_handler;
-	menu->return_handler = ret_handler;
-	menu->sel = 0;
-	menu->pre_sel = selection;
-	menu->first_time = 1;
-	editActive = 0;
+	menu->handler			= new_handler;
+	menu->return_handler	= ret_handler;
+	menu->sel				= 0;
+	menu->pre_sel			= selection;
+	menu->first_time		= 1;
+	edit_active				= 0;
 }
 
 /*---------------------------------------------------
@@ -2558,7 +2551,7 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 	/* first setting 2 : save the value */
 	if(menu->first_time)
 	{
-		display_value = is_bcd ? DecimalToBCD(BCDToDecimal(read_data(machine, action))) : read_data(machine, action);
+		display_value = is_bcd ? decimal_to_bcd(bcd_to_decimal(read_data(machine, action))) : read_data(machine, action);
 
 		if(display_value < min)
 			display_value = min;
@@ -2573,23 +2566,23 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 	/* ##### MENU CONSTRACTION ##### */
 	strings_buf += sprintf(strings_buf, "\t%s\n\t", entry->name);
 
-	if(editActive)
+	if(edit_active)
 	{
-		for(i = kSearchByteDigitsTable[EXTRACT_FIELD(action->type, AddressSize)] - 1; i >= 0; i--)
+		for(i = BYTE_DIGITS_TABLE[EXTRACT_FIELD(action->type, AddressSize)] - 1; i >= 0; i--)
 		{
-			if(i == editCursor)
+			if(i == edit_cursor)
 				strings_buf += sprintf(strings_buf, "[%X]", (display_value & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
 			else
 				strings_buf += sprintf(strings_buf, "%X", (display_value & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
 		}
 	}
 	else
-		strings_buf += sprintf(strings_buf, "%.*X", kSearchByteDigitsTable[EXTRACT_FIELD(action->type, AddressSize)], display_value);
+		strings_buf += sprintf(strings_buf, "%.*X", BYTE_DIGITS_TABLE[EXTRACT_FIELD(action->type, AddressSize)], display_value);
 
 	if(TEST_FIELD(action->type, ValueSelectNegative))
 		strings_buf += sprintf(	strings_buf, " <%.*X>",
-								kSearchByteDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
-								(~display_value + 1) & kSearchByteMaskTable[EXTRACT_FIELD(action->type, AddressSize)]);
+								BYTE_DIGITS_TABLE[EXTRACT_FIELD(action->type, AddressSize)],
+								(~display_value + 1) & BYTE_MASK_TABLE[EXTRACT_FIELD(action->type, AddressSize)]);
 
 	if(is_bcd == 0)
 		strings_buf += sprintf(strings_buf, " (%d)", display_value);
@@ -2600,43 +2593,43 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 	ui_draw_message_window(buf);
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kHorizontalFastKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, horizontal_key_repeat_speed))
 	{
-		if(editActive)
+		if(edit_active)
 		{
 			if(display_value == max)
 				display_value = min;
 			else
 			{
-				display_value = is_bcd ? DoIncrementDecField(display_value, editCursor) : DoIncrementHexField(display_value, editCursor);
+				display_value = is_bcd ? do_increment_dec_field(display_value, edit_cursor) : do_increment_hex_field(display_value, edit_cursor);
 
 				if(display_value > max)
 					display_value = max;
 			}
 		}
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kHorizontalFastKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, horizontal_key_repeat_speed))
 	{
-		if(editActive)
+		if(edit_active)
 		{
 			if(display_value == min)
 				display_value = max;
 
 			else
 			{
-				display_value = is_bcd ? DoDecrementDecField(display_value, editCursor) : DoDecrementHexField(display_value, editCursor);
+				display_value = is_bcd ? do_decrement_dec_field(display_value, edit_cursor) : do_decrement_hex_field(display_value, edit_cursor);
 
 				if(display_value > max)
 					display_value = max;
 			}
 		}
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kHorizontalFastKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, horizontal_key_repeat_speed))
 	{
-		if(editActive)
+		if(edit_active)
 		{
-			if(++editCursor > kSearchByteDigitsTable[EXTRACT_FIELD(action->type, AddressSize)] - 1)
-				editCursor = 0;
+			if(++edit_cursor > BYTE_DIGITS_TABLE[EXTRACT_FIELD(action->type, AddressSize)] - 1)
+				edit_cursor = 0;
 		}
 		else
 		{
@@ -2644,15 +2637,15 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 				display_value = max;
 
 			if(is_bcd)
-				display_value = DecimalToBCD(BCDToDecimal(display_value));
+				display_value = decimal_to_bcd(bcd_to_decimal(display_value));
 		}
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, kHorizontalFastKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, horizontal_key_repeat_speed))
 	{
-		if(editActive)
+		if(edit_active)
 		{
-			if(--editCursor < 0)
-				editCursor = kSearchByteDigitsTable[EXTRACT_FIELD(action->type, AddressSize)] - 1;
+			if(--edit_cursor < 0)
+				edit_cursor = BYTE_DIGITS_TABLE[EXTRACT_FIELD(action->type, AddressSize)] - 1;
 		}
 		else
 		{
@@ -2660,15 +2653,15 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 				display_value = min;
 
 			if(is_bcd)
-				display_value = DecimalToBCD(BCDToDecimal(display_value));
+				display_value = decimal_to_bcd(bcd_to_decimal(display_value));
 		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		int i;
 
-		if(editActive)
-			editActive = 0;
+		if(edit_active)
+			edit_active = 0;
 
 		/* adjust a value */
 		if(TEST_FIELD(action->type, ValueSelectMinimumDisplay))
@@ -2678,7 +2671,7 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 			display_value = 1;
 
 		if(TEST_FIELD(action->type, ValueSelectNegative) && display_value)
-			display_value = (~display_value + 1) & kSearchByteMaskTable[EXTRACT_FIELD(action->type, AddressSize)];
+			display_value = (~display_value + 1) & BYTE_MASK_TABLE[EXTRACT_FIELD(action->type, AddressSize)];
 
 		/* set/copy value */
 		for(i = 0; i < entry->action_list_length; i++)
@@ -2699,17 +2692,17 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 
 				if(TEST_FIELD(destination->type, ValueSelectBCD))
 				{
-					copy_value	= BCDToDecimal(DecimalToBCD(copy_value));
-					new_data	= BCDToDecimal(DecimalToBCD(new_data));
+					copy_value	= bcd_to_decimal(decimal_to_bcd(copy_value));
+					new_data	= bcd_to_decimal(decimal_to_bcd(new_data));
 				}
 
 				copy_value += new_data;
 
 				if(TEST_FIELD(destination->type, ValueSelectBCD))
-					copy_value = DecimalToBCD(BCDToDecimal(copy_value));
+					copy_value = decimal_to_bcd(bcd_to_decimal(copy_value));
 
 				if(TEST_FIELD(destination->type, ValueSelectNegative))
-					copy_value = (~copy_value + 1) & kSearchByteMaskTable[EXTRACT_FIELD(destination->type, AddressSize)];
+					copy_value = (~copy_value + 1) & BYTE_MASK_TABLE[EXTRACT_FIELD(destination->type, AddressSize)];
 
 				destination->data = copy_value;
 			}
@@ -2721,27 +2714,27 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 	}
 	else if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))
 	{
-		editActive ^= 1;
-		editCursor = 0;
+		edit_active ^= 1;
+		edit_cursor = 0;
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
-		if(editActive)		editActive = 0;
+		if(edit_active)		edit_active = 0;
 		else				menu->sel = -1;
 	}
 
 	/* ##### EDIT ##### */
-	if(editActive == 0)
+	if(edit_active == 0)
 	{
 		UINT32 temp;
 
 		temp			= display_value;
-		display_value	= do_edit_hex_field(machine, display_value) & kCheatSizeMaskTable[EXTRACT_FIELD(action->type, AddressSize)];
+		display_value	= do_edit_hex_field(machine, display_value) & BYTE_MASK_TABLE[EXTRACT_FIELD(action->type, AddressSize)];
 
 		if(display_value != temp)
 		{
 			if(is_bcd)
-				display_value = DecimalToBCD(BCDToDecimal(display_value));
+				display_value = decimal_to_bcd(bcd_to_decimal(display_value));
 
 			if(display_value < min)	display_value = max;
 			if(display_value > max)	display_value = min;
@@ -2816,19 +2809,19 @@ static int user_select_label_menu(running_machine *machine, cheat_menu_stack *me
 	old_style_menu(menu_item, NULL, NULL, menu->sel, 0);
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_NEXT(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_UP(menu->sel);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
@@ -2901,7 +2894,7 @@ static int extend_comment_menu(running_machine *machine, cheat_menu_stack *menu)
 	if(menu->first_time)
 		menu->first_time = 0;
 
-	/* required items = (display comment lines + return + terminator) & (strings buf * display comment lines [max char = 100]) */
+	/* required items = (display comment lines + return + terminator) + (strings buf * display comment lines) + 100 characters */
 	request_strings(entry->action_list_length + 1, entry->action_list_length - 1, 100, 0);
 	menu_item 	= menu_strings.main_list;
 	buf			= menu_strings.main_strings;
@@ -2933,19 +2926,19 @@ static int extend_comment_menu(running_machine *machine, cheat_menu_stack *menu)
 	old_style_menu(menu_item, NULL, NULL, menu->sel, 0);
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_NEXT(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_UP(menu->sel);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
@@ -2991,15 +2984,15 @@ static int cheat_main_menu(running_machine *machine, cheat_menu_stack *menu)
 	menu_item[total++].text = "Add/Edit a Cheat";
 	switch(EXTRACT_FIELD(cheat_options, SearchBox))
 	{
-		case kSearchBox_Minimum:
+		case SEARCH_BOX_MINIMUM:
 			menu_item[total++].text = "Search a Cheat (Minimum Mode)";
 			break;
 
-		case kSearchBox_Standard:
+		case SEARCH_BOX_STANDARD:
 			menu_item[total++].text = "Search a Cheat (Standard Mode)";
 			break;
 
-		case kSearchBox_Advanced:
+		case SEARCH_BOX_ADVANCED:
 			menu_item[total++].text = "Search a Cheat (Advanced Mode)";
 			break;
 
@@ -3024,19 +3017,19 @@ static int cheat_main_menu(running_machine *machine, cheat_menu_stack *menu)
 	ui_menu_draw(menu_item, total, menu->sel, NULL);
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_NEXT(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_UP(menu->sel);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
@@ -3053,19 +3046,7 @@ static int cheat_main_menu(running_machine *machine, cheat_menu_stack *menu)
 				break;
 
 			case MENU_SEARCH:
-				switch(EXTRACT_FIELD(cheat_options, SearchBox))
-				{
-					case kSearchBox_Minimum:
-						cheat_menu_stack_push(search_minimum_menu, menu->handler, menu->sel);
-						break;
-
-					case kSearchBox_Standard:
-						cheat_menu_stack_push(search_standard_menu, menu->handler, menu->sel);
-						break;
-
-					case kSearchBox_Advanced:
-						cheat_menu_stack_push(search_advanced_menu, menu->handler, menu->sel);
-				}
+				cheat_menu_stack_push(search_main_menu, menu->handler, menu->sel);
 				break;
 
 			case MENU_VIEW_RESULT:
@@ -3095,7 +3076,12 @@ static int cheat_main_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 	else if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
 	{
-		reload_cheat_database(machine);
+		if(shift_key_pressed())
+			reset_cheat_options();
+		else if(control_key_pressed())
+			load_cheat_database(machine, LOAD_CHEAT_OPTION);
+		else
+			reload_cheat_database(machine);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
@@ -3145,7 +3131,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 	{
 		cheat_entry *traverse = &cheat_list[i];
 
-		if(total >= fullMenuPageHeight) break;
+		if(total >= full_menu_page_height) break;
 
 		/* when return to previous layer, set cursor position to previous layer label code */
 		if(traverse->flags & kCheatFlag_LayerSelected)
@@ -3175,8 +3161,8 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 				/* ##### SUB ITEM ##### */
 				if(traverse->flags & kCheatFlag_HasWrongCode)
 				{
-					/* "LOCKED" if wrong code */
-					menu_sub_item[total] = "Locked";
+					/* "ERROR" if wrong code */
+					menu_sub_item[total] = "ERROR";
 					traverse->selection = 0;
 					traverse->flags &= ~kCheatFlag_RequestArrow;
 				}
@@ -3335,7 +3321,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 			entry = NULL;
 
 		if(entry->flags & kCheatFlag_RequestArrow)
-			request_arrow = 3;
+			request_arrow = MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
 	}
 	else
 		entry = NULL;
@@ -3344,7 +3330,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 	old_style_menu(menu_item, menu_sub_item, flag_buf, menu->sel, request_arrow);
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
 		switch(is_empty)
 		{
@@ -3354,7 +3340,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 				if(cheat_list_length)
 				{
 					/* if cursor is on comment code, skip it */
-					for(i = 0; (i < fullMenuPageHeight / 2) && menu->sel != total - 1 && (cheat_list[menu_index[menu->sel]].flags & kCheatFlag_Null); i++)
+					for(i = 0; (i < full_menu_page_height / 2) && menu->sel != total - 1 && (cheat_list[menu_index[menu->sel]].flags & kCheatFlag_Null); i++)
 					{
 						if(--menu->sel < 0)
 							menu->sel = total - 1;
@@ -3372,7 +3358,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 					menu->sel = 2;
 		}
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
 		switch(is_empty)
 		{
@@ -3382,7 +3368,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 				if(cheat_list_length)
 				{
 					/* if cursor is on comment code, skip it */
-					for(i = 0; (i < fullMenuPageHeight / 2) && menu->sel < total - 1 && (cheat_list[menu_index[menu->sel]].flags & kCheatFlag_Null); i++)
+					for(i = 0; (i < full_menu_page_height / 2) && menu->sel < total - 1 && (cheat_list[menu_index[menu->sel]].flags & kCheatFlag_Null); i++)
 						menu->sel++;
 				}
 
@@ -3390,17 +3376,15 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 				break;
 
 			case 2:
-				if(menu->sel)
-					menu->sel = 0;
-				else
-					menu->sel = 2;
+				if(menu->sel)		menu->sel = 0;
+			else					menu->sel = 2;
 		}
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
-		CURSOR_PAGE_UP(menu->sel);
+	CURSOR_PAGE_UP(menu->sel);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
@@ -3409,11 +3393,11 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 	{
 		UINT8 toggle = 0;
 
-		if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
+		if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, horizontal_key_repeat_speed))
 		{
 			if(entry->flags & kCheatFlag_Select)
 			{
-				if(TEST_FIELD(entry->action_list[entry->label_index[0]].type, LabelSelectUseSelector))
+				if(entry->flags & kCheatFlag_UseLabelSelector)
 				{
 					/* activate label selector */
 					cheat_menu_stack_push(user_select_label_menu, menu->handler, menu->sel);
@@ -3442,7 +3426,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 				toggle = 1;
 			}
 		}
-		else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
+		else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, horizontal_key_repeat_speed))
 		{
 			if(entry->flags & kCheatFlag_Select)
 			{
@@ -3493,7 +3477,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 						if(active)
 							activate_cheat(machine, entry);
 						else
-							deactivate_cheat(machine, entry);
+								deactivate_cheat(machine, entry);
 					}
 				}
 				break;
@@ -3506,7 +3490,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 					else
 						current_layer = entry->action_list[0].data;
 
-					entry->flags |= kCheatFlag_LayerSelected;
+						entry->flags |= kCheatFlag_LayerSelected;
 				}
 				break;
 
@@ -3526,7 +3510,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 		}
 		else if((entry->flags & kCheatFlag_Null) == 0)
 		{
-			if(ShiftKeyPressed() && (entry->comment && entry->comment[0]))
+			if(shift_key_pressed() && (entry->comment && entry->comment[0]))
 			{
 				/* display comment */
 				cheat_menu_stack_push(comment_menu, menu->handler, menu->sel);
@@ -3570,7 +3554,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
 	{
-		if(ShiftKeyPressed())
+		if(shift_key_pressed())
 		{
 			/* shift + save : save all codes */
 			for(i = 0; i < cheat_list_length; i++)
@@ -3578,12 +3562,12 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 
 			SET_MESSAGE(CHEAT_MESSAGE_ALL_CHEATS_SAVED);
 		}
-		else if(ControlKeyPressed())
+		else if(control_key_pressed())
 		{
 			/* ctrl + save : save activation key */
 			save_activation_key(machine, entry, menu_index[menu->sel]);
 		}
-		else if(AltKeyPressed())
+		else if(alt_key_pressed())
 		{
 			/* alt + save : save pre-enable */
 			save_pre_enable(machine, entry, menu_index[menu->sel]);
@@ -3603,9 +3587,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 	else if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))
 	{
 		if(entry)
-		{
 			cheat_menu_stack_push(command_add_edit_menu, menu->handler, menu->sel);
-		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_WATCH_VALUE))
 	{
@@ -3676,19 +3658,19 @@ static int add_edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		entry = NULL;
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_NEXT(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_UP(menu->sel);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
@@ -3732,7 +3714,7 @@ static int add_edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
 	{
-		if(ShiftKeyPressed())
+		if(shift_key_pressed())
 		{
 			/* shift + save = save all codes */
 			for(i = 0; i < cheat_list_length; i++)
@@ -3740,13 +3722,13 @@ static int add_edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 			SET_MESSAGE(CHEAT_MESSAGE_ALL_CHEATS_SAVED);
 		}
-		else if(ControlKeyPressed())
+		else if(control_key_pressed())
 		{
 			if((entry->flags & kCheatFlag_HasActivationKey1) || (entry->flags & kCheatFlag_HasActivationKey2))
 				/* ctrl + save = save activation key */
 				save_activation_key(machine, entry, menu->sel);
 		}
-		else if(AltKeyPressed())
+		else if(alt_key_pressed())
 		{
 			/* alt + save = save pre-enable code */
 			save_pre_enable(machine, entry, menu->sel);
@@ -3832,19 +3814,19 @@ static int command_add_edit_menu(running_machine *machine, cheat_menu_stack *men
 	ui_menu_draw(menu_item, total, menu->sel, NULL);
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_NEXT(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_UP(menu->sel);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
@@ -3948,788 +3930,403 @@ static int command_add_edit_menu(running_machine *machine, cheat_menu_stack *men
 
 static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 {
-#if 0
-	static const char *const kTypeNames[] =
+	#define ADD_EDIT_MENU_ITEMS(name, sub_name, type) \
+				do { menu_item[total] = name; menu_sub_item[total] = sub_name; menu_item_info[total].sub_cheat = i; menu_item_info[total].field_type = type; total++; } while(0)
+
+	static const char *const PREFILL_NAMES[] =
 	{
-		"Normal/Delay",
-		"Wait",
-		"Ignore Decrement",
-		"Watch",
-		"Comment",
-		"Select"
+		"None", "FF", "00", "01"
 	};
 
-	static const char *const kOperationNames[] =
+	static const char *const LOCATION_NAMES[] =
 	{
-		"Write",
-		"Add/Subtract",
-		"Force Range",
-		"Set/Clear Bits",
-		"Unused (4)",
-		"Unused (5)",
-		"Unused (6)",
-		"Null"
-	};
-
-	static const char *const kAddSubtractNames[] =
-	{
-		"Add",
-		"Subtract"
-	};
-
-	static const char *const kSetClearNames[] =
-	{
-		"Set",
-		"Clear"
-	};
-
-	static const char *const kPrefillNames[] =
-	{
-		"None",
-		"FF",
-		"00",
-		"01"
-	};
-
-	static const char *const kEndiannessNames[] =
-	{
-		"Normal",
-		"Swap"
-	};
-
-	static const char *const kLocationNames[] =
-	{
-		"Normal",
-		"Region",
-		"Mapped Memory",
-		"Custom",
-		"Relative Address",
-		"Unused (5)", "Unused (6)", "Unused (7)"
-	};
-
-	static const char *const kCustomLocationNames[] =
-	{
-		"Comment",
-		"EEPROM",
-		"Select",
-		"Unused (3)",	"Unused (4)",	"Unused (5)",	"Unused (6)",	"Unused (7)",
-		"Unused (8)",	"Unused (9)",	"Unused (10)",	"Unused (11)",	"Unused (12)",
-		"Unused (13)",	"Unused (14)",	"Unused (15)",	"Unused (16)",	"Unused (17)",
-		"Unused (18)",	"Unused (19)",	"Unused (20)",	"Unused (21)",	"Unused (22)",
-		"Unused (23)",	"Unused (24)",	"Unused (25)",	"Unused (26)",	"Unused (27)",
-		"Unused (28)",	"Unused (29)",	"Unused (30)",	"Unused (31)"
+		"CPU Region", "Non CPU Region", "Mapped Memory", "EEPROM", "Relative Address"
 	};
 
 	enum
 	{
-		kType_Name = 0,					//  text        name
-										//  NOTE:   read from base cheat (for idx == 0)
-		kType_ExtendName,				//  text        extraName
-										//  NOTE:   read from subcheat for (idx > 0) && (cheat[0].type == Select)
-		kType_Comment,					//  text        comment
-										//  NOTE:   read from base cheat (for idx == 0)
-		kType_ActivationKey1,			//  key         1st activationKey
-										//  NOTE:   read from base cheat (for idx == 0)
-		kType_ActivationKey2,			//  key         2nd activationKey
-										//  NOTE:   read from base cheat (for idx == 0)
-		kType_Code,						//  value       Type Field
-										//  NOTE:   it's debug display so that must not modify directly
-		kType_Link,						//  select      Link                  Off - On
-		kType_LinkExtension,			//  select      Link Extension        Off - On
-		kType_Type,						//  select      Type                  Normal/Delay - Watch - Comment - (label) Select
-		kType_OneShot,					//  select      OneShot               Off - On
-		kType_RestorePreviousValue,		//  select      RestorePreviousValue  Off - On
-			// if(Type != Ignore Decrement)
-			kType_Delay,				//  value       TypeParameter         0 - 7
-			// else
-			kType_IgnoreDecrementBy,	//  value       TypeParameter         0 - 7
-			// if(Type == Watch)
-			kType_WatchSize,			//  value       Data                  0x01 - 0xFF (stored as 0x00 - 0xFE)
-										//  NOTE: value is packed in to 0x000000FF
-			kType_WatchSkip,			//  value       Data                  0x00 - 0xFF
-										//  NOTE: value is packed in to 0x0000FF00
-			kType_WatchPerLine,			//  value       Data                  0x00 - 0xFF
-										//  NOTE: value is packed in to 0x00FF0000
-			kType_WatchAddValue,		//  value       Data                  -0x80 - 0x7F
-										//  NOTE: value is packed in to 0xFF000000
-			kType_WatchFormat,			//  select      TypeParameter         Hex - Decimal - Binary - ASCII
-										//  NOTE: value is packed in to 0x03
-			kType_WatchLabel,			//  select      TypeParameter         Off - On
-										//  NOTE: value is packed in to 0x04
-		kType_Operation,				//  select      Operation             Write - Add/Subtract - Force Range - Set/Clear Bits
-		kType_OperationExtend,			//  select      Operation Extend      Off - On
-										//  NOTE: Operation Extend is unused right now
-			// if(LocationType != Relative Address && Operation == Write)
-			kType_WriteMask,			//  value       extendData            0x00000000 - 0xFFFFFFFF
-			// if(LocationType != Relative Address && Operation == Add/Subtract)
-			kType_AddSubtract,			//  select      OperationParameter    Add - Subtract
-				// if(OperationParameter == Add)
-				kType_AddMaximum,		//  value       extendData            0x00000000 - 0xFFFFFFFF
-				// else
-				kType_SubtractMinimum,	//  value       extendData            0x00000000 - 0xFFFFFFFF
-			// if(LocationType != Relative Address && Operation == Force Range)
-			kType_RangeMinimum,			//  value       extendData            0x00 - 0xFF / 0xFFFF
-										//  NOTE: value is packed in to upper byte of extendData (as a word)
-			kType_RangeMaximum,			//  value       extendData            0x00 - 0xFF / 0xFFFF
-										//  NOTE: value is packed in to lower byte of extendData (as a word)
-			// if(Operation == Set/Clear)
-			kType_SetClear,				//  select      OperationParameter    Set - Clear
-		kType_Data,
-		kType_UserSelect,				//  select      UserSelectEnable      Off - On
-		kType_UserSelectMinimumDisp,	//  value       UserSelectMinimumDisplay  Off - On
-		kType_UserSelectMinimum,		//  value       UserSelectMinimum     0 - 1
-		kType_UserSelectBCD,			//  select      UserSelectBCD         Off - On
-		kType_CopyPrevious,				//  select      LinkCopyPreviousValue Off - On
-		kType_Prefill,					//  select      UserSelectPrefill     None - FF - 00 - 01
-		kType_ByteLength,				//  value       BytesUsed             1 - 4
-		kType_Endianness,				//  select      Endianness            Normal - Swap
-		kType_LocationType,				//  select      LocationType          Normal - Region - Mapped Memory - EEPROM - Relative Address
-			// if(LocationType != Region && LocationType != Relative Address)
-			kType_CPU,					//  value       LocationParameter     0 - 31
-			// if(LocationType == Region)
-			kType_Region,				//  select      LocationParameter     CPU1 - CPU2 - CPU3 - CPU4 - CPU5 - CPU6 - CPU7 -
-										//                                    CPU8 - GFX1 - GFX2 - GFX3 - GFX4 - GFX5 - GFX6 -
-										//                                    GFX7 - GFX8 - PROMS - SOUND1 - SOUND2 - SOUND3 -
-										//                                    SOUND4 - SOUND5 - SOUND6 - SOUND7 - SOUND8 -
-										//                                    USER1 - USER2 - USER3 - USER4 - USER5 - USER6 -
-										//                                    USER7
-										//  NOTE: old format doesn't support USER8 - PLDS
-			// if(LocationType == Relative Address)
-			kType_PackedCPU,			//  value       LocationParameter     0 - 7
-										//  NOTE: packed in to upper three bits of LocationParameter
-			kType_PackedSize,			//  value       LocationParameter     1 - 4
-										//  NOTE: packed in to lower two bits of LocationParameter
-			kType_AddressIndex,			//  value       extendData            -0x80000000 - 0x7FFFFFFF
-		kType_Address,
+		/* if code index == 0 (master code) */
+			EDIT_MENU_ENTRY_NAME = 0,		/*  text        name from name field in cheat entry */
+			EDIT_MENU_COMMENT,				/*  text        name from comment field in cheat entry */
+			EDIT_MENU_ACTIVATION_KEY,		/*  text        name from activation key */
+		EDIT_MENU_INDEX,					/*  value       current index of cheat action. UNSELECTABLE */
+		EDIT_MENU_NAME,						/*  text        name from optinal name field in cheat action */
+		/* type infomation */
+		EDIT_MENU_ONE_SHOT,					/*  select      OneShot              Off - On */
+		EDIT_MENU_RESTORE_VALUE,				/*  select      RestorePreviousValue Off - On */
+		EDIT_MENU_TYPE,						/*  select      Type & Location      Normal - Watch - Comment - Label-Select */
+		/* if Type == Watch */
+			EDIT_MENU_WATCH_SIZE,			/*  value       Data Field           0x01 - 0xFF (stored as 0x00 - 0xFE)
+                                              NOTE: value is packed in to 0x000000FF */
+			EDIT_MENU_WATCH_SKIP,			/*  value       Data Field           0x00 - 0xFF
+                                              NOTE: value is packed in to 0x0000FF00 */
+			EDIT_MENU_WATCH_PER_LINE,		/*  value       Data Field           0x00 - 0xFF
+                                              NOTE: value is packed in to 0x00FF0000 */
+			EDIT_MENU_WATCH_ADD_VALUE,		/*  value       Data Field          -0x80 - 0x7F
+                                              NOTE: value is packed in to 0xFF000000 */
+			EDIT_MENU_WATCH_FORMAT,			/*  select      Parameter            Hex - Decimal - Binary - ASCII */
+			EDIT_MENU_WATCH_LABEL,			/*  select      Parameter            Off - On */
+		/* if Type != Watch */
+			EDIT_MENU_DELAY,				/*  select      Parameter            0x00 - 0x07 */
+			EDIT_MENU_OPERATION,			/*  select      Operation            Write - Add - Subtract - Force Range - Set Bit - Clear Bit */
+			/* if Location != Relative Address */
+			/* if Operation == Write && Location */
+				EDIT_MENU_WRITE_MASK,		/*  value       Extend Data Field    0x00000000 - 0xFFFFFFFF */
+			/* if Operation == Add || Subtract */
+				EDIT_MENU_ADD_SUBTRACT,		/*  value       Extend Data Field    0x00000000 - 0xFFFFFFFF */
+			/* if Operation == Force Range && Bytes <= 2 Bytes */
+				EDIT_MENU_RANGE_MINIMUM,	/*  value       Extend Data Field    0x0000 - 0xFFFF
+                                              NOTE : value is paccked into upper 2 bytes */
+				EDIT_MENU_RANGE_MAXIMUM,	/*  value       Extend Data Field    0x0000 - 0xFFFF
+                                              NOTE : value is paccked into lower 2 bytes */
+			EDIT_MENU_DATA,
+		EDIT_MENU_USER_SELECT,				/*  select      UserSelectEnable         Off - On */
+		EDIT_MENU_USER_SELECT_MINIMUM_DISP,	/*  select      UserSelectMinimumDisplay 0 - 1 */
+		EDIT_MENU_USER_SELECT_MINIMUM,		/*  select      UserSelectMinimum        0 - 1 */
+		EDIT_MENU_USER_SELECT_BCD,			/*  select      UserSelectBCD            Off - On */
+		EDIT_MENU_PREFILL,					/*  select      Prefill                  None - FF - 00 - 01 */
+		EDIT_MENU_BYTES_LENGTH,				/*  select      BytesUsed                1 - 4 */
+		EDIT_MENU_LOCATION,					/*  select      Location                 CPU Region - Non-CPU Region - Mapped Memory - EEPROM - Relative Address */
+		EDIT_MENU_REGION,					/*  select      LocationParameter        CPU1 - CPU2 - CPU3 - CPU4 - CPU5 - CPU6 - CPU7 - CPU8 -
+                                                                                 GFX1 - GFX2 - GFX3 - GFX4 - GFX5 - GFX6 - GFX7 - GFX8 -
+                                                                                 PROMS -
+                                                                                 SOUND1 - SOUND2 - SOUND3 - SOUND4 - SOUND5 - SOUND6 - SOUND7 - SOUND8 -
+                                                                                 USER1 - USER2 - USER3 - USER4 - USER5 - USER6 - USER7
+                                              NOTE : unsupported USER8 - PLDS in old/older format */
+			/* if Location == Relative Address */
+			EDIT_MENU_PACKED_SIZE,			/*  select      IndexBytesUsed   1 - 4 */
+			EDIT_MENU_ADDRESS_INDEX,		/*  value       Extend Data Field        -0x7FFFFFFF - 0x7FFFFFFF */
+		EDIT_MENU_ADDRESS,
 
-		kType_Return,
-		kType_Divider,
+		EDIT_MENU_SEPARATOR,
+		EDIT_MENU_RETURN,
 
-		kType_Max
+		EDIT_MENU_MAX = 48
 	};
 
-	int					i;
-	int					sel				= selection - 1;
-	int					total			= 0;
-	UINT8				dirty			= 0;
-	static UINT8		editActive		= 0;
-	const char			** menuItem;
-	const char			** menuSubItem;
-	char				* flagBuf;
-	char				** extendDataBuf;		// FFFFFFFF (-80000000)
-	char				** addressBuf;			// FFFFFFFF
-	char				** dataBuf;				// 80000000 (-2147483648)
-	char				** typeBuf;				// FFFFFFFF
-	char				** watchSizeBuf;		// FF
-	char				** watchSkipBuf;		// FF
-	char				** watchPerLineBuf;		// FF
-	char				** watchAddValueBuf;	// FF
+	int						i;
+	int						total = 0;
+	const char				**menu_item;
+	const char				**menu_sub_item;
+	char					*flag_buf;
+	char					**buf_index;
+	char					**buf_extend_data;		/* FFFFFFFF (-7FFFFFFF) */
+	char					**buf_address;			/* FFFFFFFF */
+	char					**buf_data;				/* 7FFFFFFF (-2147483647) */
+	char					**buf_watch_size;		/* FF */
+	char					**buf_watch_skip;		/* FF */
+	char					**buf_watch_per_line;	/* FF */
+	char					**buf_watch_add_value;	/* FF */
+	cheat_menu_item_info	*info = NULL;
+	cheat_entry				*entry = &cheat_list[menu->pre_sel];
+	cheat_action			*action = NULL;
+	astring					*key_strings = astring_alloc();
 
-	menu_item_info		* info = NULL;
-	CheatAction			* action		= NULL;
-	astring				* tempString1	= astring_alloc();		// activation key 1
-	astring				* tempString2	= astring_alloc();		// activation key 2
+	/* first setting : NONE */
+	if(menu->first_time)
+		menu->first_time = 0;
 
-	if(!entry)
-		return 0;
+	/* required items = (total menu items * total codes + return + terminator) + (8 strings buffers * total codes) + 32 characters */
+	request_strings(EDIT_MENU_MAX * entry->action_list_length + 2, 8 * entry->action_list_length, 32, 0);
 
-	if(menuItemInfoLength < (kType_Max * entry->actionListLength) + 2)
-	{
-		menuItemInfoLength = (kType_Max * entry->actionListLength) + 2;
+	/* allocate memory for menu item info */
+	resize_menu_item_info(EDIT_MENU_MAX * entry->action_list_length + 2);
 
-		menuItemInfo = realloc(menuItemInfo, menuItemInfoLength * sizeof(menu_item_info));
-	}
+	menu_item			= menu_strings.main_list;
+	menu_sub_item		= menu_strings.sub_list;
+	flag_buf			= menu_strings.flag_list;
+	buf_index			= &menu_strings.main_strings[entry->action_list_length * 0];
+	buf_extend_data		= &menu_strings.main_strings[entry->action_list_length * 1];
+	buf_address			= &menu_strings.main_strings[entry->action_list_length * 2];
+	buf_data			= &menu_strings.main_strings[entry->action_list_length * 3];
+	buf_watch_size		= &menu_strings.main_strings[entry->action_list_length * 4]; /* these field */
+	buf_watch_skip		= &menu_strings.main_strings[entry->action_list_length * 5]; /* are wasteful */
+	buf_watch_per_line	= &menu_strings.main_strings[entry->action_list_length * 6]; /* but the alternative */
+	buf_watch_add_value = &menu_strings.main_strings[entry->action_list_length * 7]; /* is even more ugly */
 
-	request_strings((kType_Max * entry->actionListLength) + 2, 8 * entry->actionListLength, 32, 0);
-
-	menuItem			= menu_strings.main_list;
-	menuSubItem			= menu_strings.sub_list;
-	flagBuf				= menu_strings.flag_list;
-	extendDataBuf		= &menu_strings.main_strings[entry->actionListLength * 0];
-	addressBuf			= &menu_strings.main_strings[entry->actionListLength * 1];
-	dataBuf				= &menu_strings.main_strings[entry->actionListLength * 2];
-	typeBuf				= &menu_strings.main_strings[entry->actionListLength * 3];
-	watchSizeBuf		= &menu_strings.main_strings[entry->actionListLength * 4];	// these fields are wasteful
-	watchSkipBuf		= &menu_strings.main_strings[entry->actionListLength * 5];	// but the alternative is even more ugly
-	watchPerLineBuf		= &menu_strings.main_strings[entry->actionListLength * 6];	//
-	watchAddValueBuf	= &menu_strings.main_strings[entry->actionListLength * 7];	//
-
-	memset(flagBuf, 0, (kType_Max * entry->actionListLength) + 2);
+	memset(flag_buf, 0, EDIT_MENU_MAX * entry->action_list_length + 2);
 
 	/********** MENU CONSTRUCTION **********/
-	/* create menu items */
-	for(i = 0; i < entry->actionListLength; i++)
+	for(i = 0; i < entry->action_list_length; i++)
 	{
-		CheatAction	* traverse = &entry->actionList[i];
+		cheat_action *traverse = &entry->action_list[i];
 
-		UINT32	type					= EXTRACT_FIELD(traverse->type, Type);
-		UINT32	typeParameter			= EXTRACT_FIELD(traverse->type, TypeParameter);
-		UINT32	operation				= EXTRACT_FIELD(traverse->type, Operation) | EXTRACT_FIELD(traverse->type, OperationExtend) << 2;
-		UINT32	operationParameter		= EXTRACT_FIELD(traverse->type, OperationParameter);
-		UINT32	locationType			= EXTRACT_FIELD(traverse->type, LocationType);
-		UINT32	locationParameter		= EXTRACT_FIELD(traverse->type, LocationParameter);
-
-		/* create item if label-select, extend comment or condition */
-		if(!i)
+		if(i == 0)
 		{
-			/* do name field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_Name;
-			menuItem[total] = "Name";
+			/* ##### ENTRY NAME ##### */
+			ADD_EDIT_MENU_ITEMS("Entry Name", entry->name && entry->name[0] ? entry->name : "(none)", EDIT_MENU_ENTRY_NAME);
 
-			if(entry->name)
-				menuSubItem[total++] = entry->name;
+			/* ##### COMMENT ##### */
+			ADD_EDIT_MENU_ITEMS("Comment", entry->comment && entry->comment[0] ? entry->comment : "(none)", EDIT_MENU_COMMENT);
+
+			/* ##### ACTIVATION KEY ##### */
+			ADD_EDIT_MENU_ITEMS(	"Activation Key",
+							entry->flags & kCheatFlag_HasActivationKey1 ? astring_c(input_code_name(key_strings, entry->activation_key_1)) : "(none)",
+							EDIT_MENU_ACTIVATION_KEY);
+
+			/* ##### SEPARATOR ##### */
+			ADD_EDIT_MENU_ITEMS(MENU_SEPARATOR_ITEM, NULL, EDIT_MENU_SEPARATOR);
+		}
+
+		/* ##### ENTRY NAME ##### */
+		ADD_EDIT_MENU_ITEMS("Name", traverse->optional_name && traverse->optional_name[0] ? traverse->optional_name : "(none)", EDIT_MENU_NAME);
+
+		/* ##### INDEX ##### */
+		sprintf(buf_index[i], "%2.2d/%2.2d", i + 1, entry->action_list_length);
+		ADD_EDIT_MENU_ITEMS("Code Index", buf_index[i], EDIT_MENU_INDEX);
+
+		/* ##### ONE SHOT ##### */
+		ADD_EDIT_MENU_ITEMS("One Shot", TEST_FIELD(traverse->type, OneShot) ? "On" : "Off", EDIT_MENU_ONE_SHOT);
+
+		/* ##### RESTORE VALUE ##### */
+		ADD_EDIT_MENU_ITEMS("Restore Previous Value", TEST_FIELD(traverse->type, RestorePreviousValue) ? "On" : "Off", EDIT_MENU_RESTORE_VALUE);
+
+		/* ##### TYPE ##### */
+		if(EXTRACT_FIELD(traverse->type, LocationType) != kLocation_Custom)
+		{
+			if(EXTRACT_FIELD(traverse->type, Type) == kType_Watch)
+				ADD_EDIT_MENU_ITEMS("Type", "Watch", EDIT_MENU_TYPE);
 			else
-				menuSubItem[total++] = "(none)";
+				ADD_EDIT_MENU_ITEMS("Type", "Write", EDIT_MENU_TYPE);
 		}
 		else
 		{
-			/* do label name field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_ExtendName;
-			menuItem[total] = "Name";
-
-			if(traverse->optionalName)
-				menuSubItem[total++] = traverse->optionalName;
+			if(EXTRACT_FIELD(traverse->type, LocationParameter) == kCustomLocation_Comment)
+				ADD_EDIT_MENU_ITEMS("Type", "Comment", EDIT_MENU_TYPE);
+			else if(EXTRACT_FIELD(traverse->type, LocationParameter) == kCustomLocation_Select)
+				ADD_EDIT_MENU_ITEMS("Type", "Select", EDIT_MENU_TYPE);
 			else
-				menuSubItem[total++] = "(none)";
+				ADD_EDIT_MENU_ITEMS("Type", "Write", EDIT_MENU_TYPE);
 		}
 
-		if(!i)
+		if(EXTRACT_FIELD(traverse->type, Type) == kType_Watch)
 		{
-			/* do comment field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_Comment;
-			menuItem[total] = "Comment";
+			/* ##### WATCH SIZE ##### */
+			sprintf(buf_watch_size[i], "%d", EXTRACT_FIELD(traverse->original_data, WatchNumElements) + 1);
+			ADD_EDIT_MENU_ITEMS("Watch Size", buf_watch_size[i], EDIT_MENU_WATCH_SIZE);
 
-			if(entry->comment)
-				menuSubItem[total++] = entry->comment;
+			/* ##### WATCH SKIP ##### */
+			sprintf(buf_watch_skip[i], "%d", EXTRACT_FIELD(traverse->original_data, WatchSkip));
+			ADD_EDIT_MENU_ITEMS("Watch Skip", buf_watch_skip[i], EDIT_MENU_WATCH_SKIP);
+
+			/* ##### WATCH PER LINE ##### */
+			sprintf(buf_watch_per_line[i], "%d", EXTRACT_FIELD(traverse->original_data, WatchElementsPerLine));
+			ADD_EDIT_MENU_ITEMS("Watch Per Line", buf_watch_per_line[i], EDIT_MENU_WATCH_PER_LINE);
+
+			/* ##### WATCH ADD VALUE ##### */
+			if(EXTRACT_FIELD(traverse->original_data, WatchAddValue) < 0)
+				sprintf(buf_watch_add_value[i], "-%.2X", -EXTRACT_FIELD(traverse->original_data, WatchAddValue));
 			else
-				menuSubItem[total++] = "(none)";
+				sprintf(buf_watch_add_value[i], "%.2X", EXTRACT_FIELD(traverse->original_data, WatchAddValue));
+			ADD_EDIT_MENU_ITEMS("Watch Add Value", buf_watch_add_value[i], EDIT_MENU_WATCH_ADD_VALUE);
+
+			/* ##### WATCH FORMAT ##### */
+			ADD_EDIT_MENU_ITEMS("Watch Format", kWatchDisplayTypeStringList[(EXTRACT_FIELD(traverse->type, TypeParameter) >> 0) & 0x03], EDIT_MENU_WATCH_FORMAT);
+
+			/* ##### WATCH LABEL ##### */
+			ADD_EDIT_MENU_ITEMS("Watch Label", EXTRACT_FIELD(traverse->type, TypeParameter) >> 2 & 0x01 ? "On" : "Off", EDIT_MENU_WATCH_LABEL);
 		}
-
+		else
 		{
-			/* do 1st (previous-selection) activation key field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_ActivationKey1;
+			/* ##### DELAY ##### */
+			ADD_EDIT_MENU_ITEMS("Delay", kNumbersTable[EXTRACT_FIELD(traverse->type, TypeParameter)], EDIT_MENU_DELAY);
 
-			if(locationType == kLocation_Custom && locationParameter == kCustomLocation_Select)
-				menuItem[total] = "Activation Key - Prev";
-			else
-				menuItem[total] = "Activation Key - 1st";
-
-			if(entry->flags & kCheatFlag_HasActivationKey1)
-				menuSubItem[total++] = astring_c(input_code_name(tempString1, entry->activationKey1));
-			else
-				menuSubItem[total++] = "(none)";
-		}
-
-		{
-			/* do 2nd (next-selection) activation key field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_ActivationKey2;
-
-			if(locationType == kLocation_Custom && locationParameter == kCustomLocation_Select)
-				menuItem[total] = "Activation Key - Next";
-			else
-				menuItem[total] = "Activation Key - 2nd";
-
-			if(entry->flags & kCheatFlag_HasActivationKey2)
-				menuSubItem[total++] = astring_c(input_code_name(tempString2, entry->activationKey2));
-			else
-				menuSubItem[total++] = "(none)";
-		}
-
-		{
-			/* do type code field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_Code;
-			menuItem[total] = "Code";
-
-			sprintf(typeBuf[i], "%8.8X", traverse->type);
-			menuSubItem[total++] = typeBuf[i];
-		}
-
-		{
-			/* do link field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_Link;
-			menuItem[total] = "Link";
-			menuSubItem[total++] = TEST_FIELD(traverse->type, LinkEnable) ? "On" : "Off";
-		}
-
-		{
-			/* do link extension field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_LinkExtension;
-			menuItem[total] = "Link Extension";
-			menuSubItem[total++] = TEST_FIELD(traverse->type, LinkExtension) ? "On" : "Off";
-		}
-
-		{
-			/* do type field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_Type;
-			menuItem[total] = "Type";
-
-			if(locationType == kLocation_Custom && locationParameter == kCustomLocation_Comment)
-				menuSubItem[total++] = kTypeNames[4];
-			else if(locationType == kLocation_Custom && locationParameter == kCustomLocation_Select)
-				menuSubItem[total++] = kTypeNames[5];
-			else
-				menuSubItem[total++] = kTypeNames[type & 3];
-		}
-
-		{
-			/* do one shot field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_OneShot;
-			menuItem[total] = "One Shot";
-			menuSubItem[total++] = TEST_FIELD(traverse->type, OneShot) ? "On" : "Off";
-		}
-
-		{
-			/* do restore previous value field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_RestorePreviousValue;
-			menuItem[total] = "Restore Previous Value";
-			menuSubItem[total++] = TEST_FIELD(traverse->type, RestorePreviousValue) ? "On" : "Off";
-		}
-
-		switch(type)
-		{
-			default:
+			/* ##### OPERATION ##### */
+			menu_item_info[total].sub_cheat = i;
+			menu_item_info[total].field_type = EDIT_MENU_OPERATION;
+			menu_item[total] = "Operation";
+			switch(EXTRACT_FIELD(traverse->type, Operation))
 			{
-				/* do delay field */
-				menuItemInfo[total].sub_cheat = i;
-				menuItemInfo[total].field_type = kType_Delay;
-
-				if(TEST_FIELD(traverse->type, OneShot) && TEST_FIELD(traverse->type, RestorePreviousValue) && EXTRACT_FIELD(traverse->type, TypeParameter))
-					menuItem[total] = "Keep";
-				else
-					menuItem[total] = "Delay";
-
-				menuSubItem[total++] = kNumbersTable[typeParameter];
-			}
-			break;
-
-			case kType_IgnoreIfDecrementing:
-			{
-				/* do ignore decrement by field */
-				menuItemInfo[total].sub_cheat = i;
-				menuItemInfo[total].field_type = kType_IgnoreDecrementBy;
-				menuItem[total] = "Ignore Decrement By";
-				menuSubItem[total++] = kNumbersTable[typeParameter];
-			}
-			break;
-
-			case kType_Watch:
-			{
-				/* do watch size field */
-				sprintf(watchSizeBuf[i], "%d", (traverse->originalDataField & 0xFF) + 1);
-
-				menuItemInfo[total].sub_cheat = i;
-				menuItemInfo[total].field_type = kType_WatchSize;
-				menuItem[total] = "Watch Size";
-				menuSubItem[total++] = watchSizeBuf[i];
-			}
-
-			{
-				/* do watch skip field */
-				sprintf(watchSkipBuf[i], "%d", (traverse->data >> 8) & 0xFF);
-
-				menuItemInfo[total].sub_cheat = i;
-				menuItemInfo[total].field_type = kType_WatchSkip;
-				menuItem[total] = "Watch Skip";
-				menuSubItem[total++] = watchSkipBuf[i];
-			}
-
-			{
-				/* do watch per line field */
-				sprintf(watchPerLineBuf[i], "%d", (traverse->data >> 16) & 0xFF);
-
-				menuItemInfo[total].sub_cheat = i;
-				menuItemInfo[total].field_type = kType_WatchPerLine;
-				menuItem[total] = "Watch Per Line";
-				menuSubItem[total++] = watchPerLineBuf[i];
-			}
-
-			{
-				/* do watch add value field */
-				INT8 temp = (traverse->data >> 24) & 0xFF;
-
-				if(temp < 0)
-					sprintf(watchAddValueBuf[i], "-%.2X", -temp);
-				else
-					sprintf(watchAddValueBuf[i], "%.2X", temp);
-
-				menuItemInfo[total].sub_cheat = i;
-				menuItemInfo[total].field_type = kType_WatchAddValue;
-				menuItem[total] = "Watch Add Value";
-				menuSubItem[total++] = watchAddValueBuf[i];
-			}
-
-			{
-				/* do watch format field */
-				menuItemInfo[total].sub_cheat = i;
-				menuItemInfo[total].field_type = kType_WatchFormat;
-				menuItem[total] = "Watch Format";
-				menuSubItem[total++] = kWatchDisplayTypeStringList[(typeParameter >> 0) & 0x03];
-			}
-
-			{
-				/* do watch label field */
-				menuItemInfo[total].sub_cheat = i;
-				menuItemInfo[total].field_type = kType_WatchLabel;
-				menuItem[total] = "Watch Label";
-				menuSubItem[total++] = typeParameter >> 2 & 0x01 ? "On" : "Off";
-			}
-			break;
-		}
-
-		{
-			/* do operation field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_Operation;
-			menuItem[total] = "Operation";
-
-			menuSubItem[total++] = kOperationNames[operation];
-		}
-
-		{
-			/* do operation extend field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_OperationExtend;
-			menuItem[total] = "Operation Extend";
-			menuSubItem[total++] = TEST_FIELD(traverse->type, OperationExtend) ? "On" : "Off";
-		}
-
-		if(locationType != kLocation_IndirectIndexed)
-		{
-			switch(operation)
-			{
-				default:
-				{
-					/* do mask field */
-					int numChars;
-
-					if(traverse->flags & kActionFlag_IndexAddress)
-					{
-						menuItemInfo[total].extra_data = 0xFFFFFFFF;
-						numChars = 8;
-					}
-					else
-					{
-						menuItemInfo[total].extra_data = kCheatSizeMaskTable[EXTRACT_FIELD(traverse->type, BytesUsed)];
-						numChars = kCheatSizeDigitsTable[EXTRACT_FIELD(traverse->type, BytesUsed)];
-					}
-
-					sprintf(extendDataBuf[i], "%.*X", numChars, traverse->extendData & kCheatSizeMaskTable[EXTRACT_FIELD(traverse->type, BytesUsed)]);
-
-					menuItemInfo[total].sub_cheat = i;
-					menuItemInfo[total].field_type = kType_WriteMask;
-					menuItem[total] = "Mask";
-					menuSubItem[total++] = extendDataBuf[i];
-				}
-				break;
+				case kOperation_WriteMask:
+					ADD_EDIT_MENU_ITEMS("Operation", "Write", EDIT_MENU_OPERATION);
+					break;
 
 				case kOperation_AddSubtract:
-				{
-					{
-						/* do add/subtract field */
-						menuItemInfo[total].sub_cheat = i;
-						menuItemInfo[total].field_type = kType_AddSubtract;
-						menuItem[total] = "Add/Subtract";
-						menuSubItem[total++] = kAddSubtractNames[operationParameter];
-					}
-
-					if(operationParameter)
-					{
-						/* do subtract minimum field */
-						sprintf(extendDataBuf[i], "%.8X", traverse->extendData);
-
-						menuItemInfo[total].sub_cheat = i;
-						menuItemInfo[total].field_type = kType_SubtractMinimum;
-						menuItem[total] = "Minimum Boundary";
-						menuSubItem[total++] = extendDataBuf[i];
-					}
+					if(TEST_FIELD(traverse->type, OperationParameter))
+						ADD_EDIT_MENU_ITEMS("Operation", "Subtract", EDIT_MENU_OPERATION);
 					else
-					{
-						/* do add maximum field */
-						sprintf(extendDataBuf[i], "%.8X", traverse->extendData);
-
-						menuItemInfo[total].sub_cheat = i;
-						menuItemInfo[total].field_type = kType_AddMaximum;
-						menuItem[total] = "Maximum Boundary";
-						menuSubItem[total++] = extendDataBuf[i];
-					}
-				}
-				break;
+						ADD_EDIT_MENU_ITEMS("Operation", "Add", EDIT_MENU_OPERATION);
+					break;
 
 				case kOperation_ForceRange:
-				{
-					{
-						/* do range minimum field */
-						if(!EXTRACT_FIELD(traverse->type, BytesUsed))
-							sprintf(extendDataBuf[i], "%.2X", (traverse->extendData >> 8) & 0xFF);
-						else
-							sprintf(extendDataBuf[i], "%.4X", (traverse->extendData >> 16) & 0xFFFF);
-
-						menuItemInfo[total].sub_cheat = i;
-						menuItemInfo[total].field_type = kType_RangeMinimum;
-						menuItem[total] = "Range Minimum";
-						menuSubItem[total++] = extendDataBuf[i];
-					}
-
-					{
-						/* do range maximum field */
-						if(!EXTRACT_FIELD(traverse->type, BytesUsed))
-						{
-							sprintf(extendDataBuf[i] + 3, "%.2X", (traverse->extendData >> 0) & 0xFF);
-							menuSubItem[total] = extendDataBuf[i] + 3;
-						}
-						else
-						{
-							sprintf(extendDataBuf[i] + 7, "%.4X", (traverse->extendData >> 0) & 0xFFFF);
-							menuSubItem[total] = extendDataBuf[i] + 7;
-						}
-
-						menuItemInfo[total].sub_cheat = i;
-						menuItemInfo[total].field_type = kType_RangeMaximum;
-						menuItem[total++] = "Range Maximum";
-					}
-				}
-				break;
+					ADD_EDIT_MENU_ITEMS("Operation", "Force Range", EDIT_MENU_OPERATION);
+					break;
 
 				case kOperation_SetOrClearBits:
-				{
-					/* do set/clear field */
-					menuItemInfo[total].sub_cheat = i;
-					menuItemInfo[total].field_type = kType_SetClear;
-					menuItem[total] = "Set/Clear";
-					menuSubItem[total++] = kSetClearNames[operationParameter];
-				}
-				break;
-			}
-		}
-
-		{
-			/* do data field */
-			sprintf(dataBuf[i], "%.*X (%d)",
-					(int)kCheatSizeDigitsTable[EXTRACT_FIELD(traverse->type, BytesUsed)],
-					traverse->originalDataField,
-					traverse->originalDataField);
-
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_Data;
-			menuItemInfo[total].extra_data = kCheatSizeMaskTable[EXTRACT_FIELD(traverse->type, BytesUsed)];
-			menuItem[total] = "Data";
-			menuSubItem[total++] = dataBuf[i];
-		}
-
-		{
-			/* do user select field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_UserSelect;
-			menuItem[total] = "User Select";
-			menuSubItem[total++] = EXTRACT_FIELD(traverse->type, UserSelectEnable) ? "On" : "Off";
-		}
-
-		{
-			/* do user select minimum displayed value field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_UserSelectMinimumDisp;
-			menuItem[total] = "Minimum Displayed Value";
-			menuSubItem[total++] = kNumbersTable[EXTRACT_FIELD(traverse->type, UserSelectMinimumDisplay)];
-		}
-
-		{
-			/* do user select minimum value field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_UserSelectMinimum;
-			menuItem[total] = "Minimum Value";
-			menuSubItem[total++] = kNumbersTable[EXTRACT_FIELD(traverse->type, UserSelectMinimum)];
-		}
-
-		{
-			/* do user select BCD field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_UserSelectBCD;
-			menuItem[total] = "BCD";
-			menuSubItem[total++] = TEST_FIELD(traverse->type, UserSelectBCD) ? "On" : "Off";
-		}
-
-		{
-			/* do copy previous value field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_CopyPrevious;
-			menuItem[total] = "Copy Previous Value";
-			menuSubItem[total++] = TEST_FIELD(traverse->type, LinkCopyPreviousValue) ? "On" : "Off";
-		}
-
-		{
-			/* do prefill field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_Prefill;
-			menuItem[total] = "Prefill";
-			menuSubItem[total++] = kPrefillNames[EXTRACT_FIELD(traverse->type, Prefill)];
-		}
-
-		{
-			/* do byte length field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_ByteLength;
-			menuItem[total] = "Byte Length";
-			menuSubItem[total++] = kByteSizeStringList[EXTRACT_FIELD(traverse->type, BytesUsed)];
-		}
-
-		{
-			/* do endianness field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_Endianness;
-			menuItem[total] = "Endianness";
-			menuSubItem[total++] = kEndiannessNames[EXTRACT_FIELD(traverse->type, Endianness)];
-		}
-
-		{
-			/* do location type field */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_LocationType;
-			menuItem[total] = "Location";
-
-			if(locationType == kLocation_Custom)
-				/* "Comment", "EEPROM", "Select" */
-				menuSubItem[total++] = kCustomLocationNames[locationParameter];
-			else
-				/* "Normal", "Region", "Mapped Memory", "Relative Address" */
-				menuSubItem[total++] = kLocationNames[locationType];
-		}
-
-		if(locationType != kLocation_IndirectIndexed)
-		{
-			if(locationType != kLocation_MemoryRegion)
-			{
-				/* do cpu field */
-				menuItemInfo[total].sub_cheat = i;
-				menuItemInfo[total].field_type = kType_CPU;
-				menuItem[total] = "CPU";
-				menuSubItem[total++] = kNumbersTable[locationParameter];
-			}
-			else
-			{
-				/* do region field */
-				menuItemInfo[total].sub_cheat = i;
-				menuItemInfo[total].field_type = kType_Region;
-				menuItem[total] = "Region";
-				menuSubItem[total++] = kRegionNames[locationParameter];
-			}
-		}
-		else
-		{
-			{
-				/* do packed CPU field */
-				menuItemInfo[total].sub_cheat = i;
-				menuItemInfo[total].field_type = kType_PackedCPU;
-				menuItem[total] = "CPU";
-				menuSubItem[total++] = kNumbersTable[EXTRACT_FIELD(traverse->type, LocationParameterCPU)];
-			}
-
-			{
-				/* do packed size field */
-				menuItemInfo[total].sub_cheat = i;
-				menuItemInfo[total].field_type = kType_PackedSize;
-				menuItem[total] = "Address Size";
-				menuSubItem[total++] = kNumbersTable[(locationParameter & 3) + 1];
-			}
-
-			{
-				/* do address index field */
-				if(traverse->extendData & 0x80000000)
-				{
-					/* swap if negative */
-					int temp = traverse->extendData;
-
-					temp = -temp;
-
-					sprintf(extendDataBuf[i], "-%.8X", temp);
-				}
-				else
-					sprintf(extendDataBuf[i], "%.8X", traverse->extendData);
-
-				menuItemInfo[total].sub_cheat = i;
-				menuItemInfo[total].field_type = kType_AddressIndex;
-				menuItem[total] = "Address Index";
-				menuSubItem[total++] = extendDataBuf[i];
-			}
-		}
-
-		{
-			/* do address field */
-			cpu_region_info *info = get_cpu_info(0);
-
-			switch(EXTRACT_FIELD(traverse->type, LocationType))
-			{
-				case kLocation_Standard:
-				case kLocation_HandlerMemory:
-				case kLocation_MemoryRegion:
-				case kLocation_IndirectIndexed:
-					menuItemInfo[total].extra_data = info->addressMask;
+					ADD_EDIT_MENU_ITEMS("Operation", BIT_SET_CLEAR_NAMES[EXTRACT_FIELD(traverse->type, OperationParameter)], EDIT_MENU_OPERATION);
 					break;
 
 				default:
-					menuItemInfo[total].extra_data = 0xFFFFFFFF;
+					ADD_EDIT_MENU_ITEMS("Operation", "Unknown", EDIT_MENU_OPERATION);
+					break;
 			}
 
-			sprintf(addressBuf[i], "%.*X", get_address_length(EXTRACT_FIELD(traverse->type, LocationParameter)), traverse->address);
+			switch(EXTRACT_FIELD(traverse->type, Operation))
+			{
+				case kOperation_WriteMask:
+					{
+						/* ##### MASK ##### */
+						int num_chars;
 
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_Address;
-			menuItem[total] = "Address";
-			menuSubItem[total++] = addressBuf[i];
+						if(traverse->flags & kActionFlag_IndexAddress)
+						{
+							menu_item_info[total].extra_data = 0xFFFFFFFF;
+							num_chars = 8;
+						}
+						else
+						{
+							menu_item_info[total].extra_data = BYTE_MASK_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)];
+							num_chars = BYTE_DIGITS_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)];
+						}
+						sprintf(buf_extend_data[i], "%.*X", num_chars, traverse->extend_data & BYTE_MASK_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)]);
+						ADD_EDIT_MENU_ITEMS("Mask", buf_extend_data[i], EDIT_MENU_WRITE_MASK);
+					}
+					break;
+
+				case kOperation_AddSubtract:
+					/* ##### ADD/SUBTRACT ##### */
+					sprintf(buf_extend_data[i], "%.8X", traverse->extend_data);
+					ADD_EDIT_MENU_ITEMS(TEST_FIELD(traverse->type, OperationParameter) ? "Minimum Boundary" : "Maximum Boundary", buf_extend_data[i], EDIT_MENU_ADD_SUBTRACT);
+					break;
+
+				case kOperation_ForceRange:
+					/* ##### RANGE MINIMUM ##### */
+					sprintf(buf_extend_data[i], "%.4X", EXTRACT_FIELD(traverse->extend_data, LSB16));
+					ADD_EDIT_MENU_ITEMS("Range Minimum", buf_extend_data[i], EDIT_MENU_RANGE_MINIMUM);
+
+					/* ##### RANGE MAXIMUM ##### */
+					/* NOTE : "+7" */
+					sprintf(buf_extend_data[i] + 7, "%.4X", EXTRACT_FIELD(traverse->extend_data, MSB16));
+					ADD_EDIT_MENU_ITEMS("Range Maximum", buf_extend_data[i] + 7, EDIT_MENU_RANGE_MAXIMUM);
+					break;
+			}
+
+			/* ##### DATA ##### */
+			menu_item_info[total].extra_data = BYTE_MASK_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)];
+			sprintf(buf_data[i], "%.*X (%d)", (int)BYTE_DIGITS_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)], traverse->original_data, traverse->original_data);
+			ADD_EDIT_MENU_ITEMS("Data", buf_data[i], EDIT_MENU_DATA);
 		}
 
-		if(i < entry->actionListLength - 1)
+		/* ##### USER SELECT ##### */
+		ADD_EDIT_MENU_ITEMS("User Select", TEST_FIELD(traverse->type, UserSelectEnable) ? "On" : "Off", EDIT_MENU_USER_SELECT);
+
+		/* ##### USER SELECT MINIMUM DISPLAY ##### */
+		ADD_EDIT_MENU_ITEMS("Minimum Display", TEST_FIELD(traverse->type, UserSelectMinimumDisplay) ? "1" : "0", EDIT_MENU_USER_SELECT_MINIMUM_DISP);
+
+		/* ##### USER SELECT MINIMUM ##### */
+		ADD_EDIT_MENU_ITEMS("Minimum Value", TEST_FIELD(traverse->type, UserSelectMinimum) ? "1" : "0", EDIT_MENU_USER_SELECT_MINIMUM);
+
+		/* ##### USER SELECT BCD ##### */
+		ADD_EDIT_MENU_ITEMS("BCD", TEST_FIELD(traverse->type, UserSelectBCD) ? "On" : "Off", EDIT_MENU_USER_SELECT_BCD);
+
+		/* ##### PREFILL ##### */
+		ADD_EDIT_MENU_ITEMS("Prefill", PREFILL_NAMES[EXTRACT_FIELD(traverse->type, Prefill)], EDIT_MENU_PREFILL);
+
+		/* ##### BYTE LENGTH ##### */
+		ADD_EDIT_MENU_ITEMS("Byte Length", kByteSizeStringList[EXTRACT_FIELD(traverse->type, BytesUsed)], EDIT_MENU_BYTES_LENGTH);
+
+		/* ##### LOCATION ##### */
+		if(EXTRACT_FIELD(traverse->type, LocationType) == kLocation_Custom)
+			ADD_EDIT_MENU_ITEMS("Location", "EEPROM", EDIT_MENU_LOCATION);
+		else if(EXTRACT_FIELD(traverse->type, LocationType) == kLocation_HandlerMemory)
+			ADD_EDIT_MENU_ITEMS("Location", "Mapped Memory", EDIT_MENU_LOCATION);
+		else
+			ADD_EDIT_MENU_ITEMS("Location", LOCATION_NAMES[EXTRACT_FIELD(traverse->type, LocationType)], EDIT_MENU_LOCATION);
+
+		/* ##### CPU/REGION ##### */
+		ADD_EDIT_MENU_ITEMS(	EXTRACT_FIELD(traverse->type, LocationType) != kLocation_MemoryRegion ?
+						"CPU" : "Region",
+						EXTRACT_FIELD(traverse->type, LocationType) != kLocation_MemoryRegion ?
+						kNumbersTable[EXTRACT_FIELD(traverse->type, LocationParameterCPU)] : kRegionNames[EXTRACT_FIELD(traverse->type, LocationParameter) + 1],
+						EDIT_MENU_REGION);
+
+		if(EXTRACT_FIELD(traverse->type, LocationType) == kLocation_IndirectIndexed)
 		{
-			/* do divider */
-			menuItemInfo[total].sub_cheat = i;
-			menuItemInfo[total].field_type = kType_Divider;
-			menuItem[total] = MENU_SEPARATOR_ITEM;
-			menuSubItem[total++] = NULL;
+			/* ##### PACKED SIZE ##### */
+			ADD_EDIT_MENU_ITEMS("Packed Size", kByteSizeStringList[EXTRACT_FIELD(traverse->type, IndexBytesUsed)], EDIT_MENU_PACKED_SIZE);
+
+			/* ##### ADDRESS INDEX ##### */
+			if(traverse->extend_data > SEARCH_BYTE_SIGN_BIT_TABLE[EXTRACT_FIELD(traverse->type, IndexBytesUsed)])
+				sprintf(buf_extend_data[i], "-%.8X", -traverse->extend_data);
+			else
+				sprintf(buf_extend_data[i], "%.8X", traverse->extend_data);
+			ADD_EDIT_MENU_ITEMS("Index", buf_extend_data[i], EDIT_MENU_ADDRESS_INDEX);
 		}
+
+		/* ##### ADDRESS ##### */
+		switch(EXTRACT_FIELD(traverse->type, LocationType))
+		{
+			case kLocation_Standard:
+			case kLocation_HandlerMemory:
+			case kLocation_MemoryRegion:
+			case kLocation_IndirectIndexed:
+				{
+					cpu_region_info *info = get_cpu_info(0);
+					menu_item_info[total].extra_data = info->address_mask;
+				}
+				break;
+
+			default:
+				menu_item_info[total].extra_data = 0xFFFFFFFF;
+				break;
+		}
+		sprintf(buf_address[i], "%.*X", get_address_length(EXTRACT_FIELD(traverse->type, LocationParameterCPU)), traverse->address);
+		ADD_EDIT_MENU_ITEMS("Address", buf_address[i], EDIT_MENU_ADDRESS);
+
+		/* NOTE : ignore final sepeartor between final and return items */
+		if(i < entry->action_list_length - 1)
+			ADD_EDIT_MENU_ITEMS(MENU_SEPARATOR_ITEM, NULL, EDIT_MENU_SEPARATOR);
 	}
 
 	/* ##### RETURN ##### */
-	menuItemInfo[total].sub_cheat = 0;
-	menuItemInfo[total].field_type = kType_Return;
-	menuItem[total] = "Return to Prior Menu";
-	menuSubItem[total++] = NULL;
+	ADD_EDIT_MENU_ITEMS("Return to Prior Menu", NULL, EDIT_MENU_RETURN);
 
-	/* ##### TERMINATE ARREY ##### */
-	menuItemInfo[total].sub_cheat = 0;
-	menuItemInfo[total].field_type = kType_Return;
-	menuItem[total] = NULL;
-	menuSubItem[total] = NULL;
+	/* ##### TERMINATOR ##### */
+	TERMINATE_MENU_ITEMS(EDIT_MENU_MAX);
+	#undef ADD_EDIT_MENU_ITEMS
 
 	/* adjust cursor position */
-	if(sel < 0)
-		sel = 0;
-	if(sel >= total)
-		sel = total - 1;
+	ADJUST_CURSOR(menu->sel, total);
+	if(menu_item_info[menu->sel].field_type == EDIT_MENU_SEPARATOR)
+		menu->sel++;
 
-	info = &menuItemInfo[sel];
-	action = &entry->actionList[info->sub_cheat];
+	info = &menu_item_info[menu->sel];
+	action = &entry->action_list[info->sub_cheat];
 
 	/* higlighted sub-item if edit mode */
-	if(editActive)
-		flagBuf[sel] = 1;
+	if(edit_active)
+		flag_buf[menu->sel] = 1;
 
 	/* draw it */
-	old_style_menu(menuItem, menuSubItem, flagBuf, sel, 0);
+	old_style_menu(menu_item, menu_sub_item, flag_buf, menu->sel, 0);
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
-		editActive = 0;
+		CURSOR_TO_PREVIOUS(menu->sel, total);
+
+		if(menu_item_info[menu->sel].field_type == EDIT_MENU_SEPARATOR)
+			menu->sel--;
+	}
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
+	{
+		CURSOR_TO_NEXT(menu->sel, total);
+
+		if(menu_item_info[menu->sel].field_type == EDIT_MENU_SEPARATOR)
+			menu->sel++;
+	}
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
+	{
+		CURSOR_PAGE_UP(menu->sel);
+	}
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
+	{
+		CURSOR_PAGE_DOWN(menu->sel, total);
+	}
+#if 0
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, horizontal_key_repeat_speed))
+	{
+		edit_active = 0;
 		dirty = 1;
 
 		switch(info->fieldType)
@@ -5009,11 +4606,11 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 			case kType_PackedSize:
 			{
-				UINT32 locationParameter = EXTRACT_FIELD(action->type, LocationParameterOption);
+				UINT32 locationParameter = EXTRACT_FIELD(action->type, IndexBytesUsed);
 
 				locationParameter = (locationParameter - 1) & 3;
 
-				SET_FIELD(action->type, LocationParameterOption, locationParameter);
+				SET_FIELD(action->type, IndexBytesUsed, locationParameter);
 			}
 			break;
 
@@ -5027,9 +4624,9 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 				break;
 		}
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, horizontal_key_repeat_speed))
 	{
-		editActive = 0;
+		edit_active = 0;
 		dirty = 1;
 
 		switch(info->fieldType)
@@ -5315,11 +4912,11 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 			case kType_PackedSize:
 			{
-				UINT32 locationParameter = EXTRACT_FIELD(action->type, LocationParameterOption);
+				UINT32 locationParameter = EXTRACT_FIELD(action->type, IndexBytesUsed);
 
 				locationParameter = (locationParameter + 1) & 3;
 
-				SET_FIELD(action->type, LocationParameterOption, locationParameter);
+				SET_FIELD(action->type, IndexBytesUsed, locationParameter);
 			}
 			break;
 
@@ -5333,46 +4930,16 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 				break;
 		}
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
-	{
-		if(--sel < 0)
-			sel = total - 1;
-
-		editActive = 0;
-	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
-	{
-		if(++sel >= total)
-			sel = 0;
-
-		editActive = 0;
-	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
-	{
-		sel -= fullMenuPageHeight;
-
-		if(sel < 0)
-			sel = 0;
-
-		editActive = 0;
-	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
-	{
-		sel += fullMenuPageHeight;
-
-		if(sel >= total)
-			sel = total - 1;
-
-		editActive = 0;
-	}
+#endif
 	else if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
-		if(editActive)
-			editActive = 0;
+		if(edit_active)
+			edit_active = 0;
 		else
 		{
-			switch(info->fieldType)
+			switch(info->field_type)
 			{
+#if 0
 				case kType_Name:
 				case kType_ExtendName:
 				case kType_Comment:
@@ -5391,25 +4958,23 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 				case kType_Address:
 					osd_readkey_unicode(1);
 					dirty = 1;
-					editActive = 1;
+					edit_active = 1;
 					break;
-
-				case kType_Return:
-					sel = -1;
+#endif
+				case EDIT_MENU_RETURN:
+					menu->sel = -1;
 					break;
 			}
 		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
-		if(editActive)
-			editActive = 0;
-		else
-			sel = -1;
+		if(edit_active)		edit_active = 0;
+		else				menu->sel = -1;
 	}
-
+#if 0
 	/********** EDIT MODE **********/
-	if(editActive)
+	if(edit_active)
 	{
 		/* do edit text */
 		dirty = 1;
@@ -5444,7 +5009,7 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 						entry->flags &= ~kCheatFlag_HasActivationKey2;
 					}
 
-					editActive = 0;
+					edit_active = 0;
 				}
 				else
 				{
@@ -5463,7 +5028,7 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 							entry->flags &= ~kCheatFlag_HasActivationKey2;
 						}
 
-						editActive = 0;
+						edit_active = 0;
 					}
 					else
 					{
@@ -5480,7 +5045,7 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 								entry->flags |= kCheatFlag_HasActivationKey2;
 							}
 
-							editActive = 0;
+							edit_active = 0;
 						}
 					}
 				}
@@ -5526,7 +5091,7 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 			{
 				UINT32 temp = (action->originalData >> 24) & 0xFF;
 
-				temp = DoEditHexFieldSigned(temp, 0xFFFFFF80) & 0xFF;
+				temp = do_edit_hex_field_signed(temp, 0xFFFFFF80) & 0xFF;
 
 				action->originalData = (action->originalData & 0x00FFFFFF) | ((temp << 24) & 0xFF000000);
 				action->data = action->originalData;
@@ -5607,32 +5172,6 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		{
 			watch_cheat_entry(entry, 0);
 		}
-		else if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
-		{
-			AddActionBefore(entry, info->sub_cheat);
-
-			entry->actionList[info->sub_cheat].extendData = ~0;
-
-			for(i = 0; i < entry->action_list_length; i++)
-			{
-				cheat_action *action = &entry->action_list[i];
-
-				if(i)
-					SET_MASK_FIELD(action->type, LinkEnable);
-				else
-					CLEAR_MASK_FIELD(action->type, LinkEnable);
-			}
-		}
-		else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
-		{
-			if(!info->sub_cheat)
-			{
-				/* don't delete MASTER Action due to crash */
-				SET_MESSAGE(CHEAT_MESSAGE_FAILED_TO_DELETE);
-			}
-			else
-				DeleteActionAt(entry, info->sub_cheat);
-		}
 	}
 
 	if(dirty)
@@ -5650,15 +5189,34 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 		check_code_format(entry);
 
-		editActive = 0;
+		edit_active = 0;
 		dirty = 1;
 	}
-
-	/* free astrings used by displaying the name of activation key */
-	astring_free(tempString1);
-	astring_free(tempString2);
 #endif
-	return menu->sel;
+	else if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
+	{
+		add_action_before(entry, info->sub_cheat);
+
+		entry->action_list[info->sub_cheat].extend_data = 0xFFFFFFFF;
+
+		for(i = 0; i < entry->action_list_length; i++)
+		{
+			/* set link option */
+			cheat_action *action = &entry->action_list[i];
+
+			if(i == 0)	CLEAR_MASK_FIELD(action->type, LinkEnable);
+			else		SET_MASK_FIELD(action->type, LinkEnable);
+		}
+	}
+	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
+	{
+		delete_action_at(entry, info->sub_cheat);
+	}
+
+	/* free astring for activation key */
+	astring_free(key_strings);
+
+	return menu->sel + 1;
 }
 
 /*--------------------------------------------------------------
@@ -5667,6 +5225,9 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 {
+	#define ADD_VIEW_MENU_ITEMS(name, sub_name, type) \
+				do { menu_item[total] = name; menu_sub_item[total] = sub_name; menu_item_info[total].field_type = type; total++; }while(0)
+
 	static const char *const kAddressSpaceNames[] = {
 		"Program", "Data Space", "I/O Space", "Opcode RAM", "Mapped Memory", "Direct Memory", "EEPROM" };
 
@@ -5690,9 +5251,6 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		"Unused 1", "Unused 2", "Unused 3", "Unused 4",
 		"Previous Value", "Key Pressed", "Key Hold", "TRUE" };
 
-	static const char *const kCBitConditionNames[] = {
-		"Bis Set", "Bit Clear" };
-
 	static const char *const kDataNames[] = {
 		"Data", "Data", "Data", "Data", "Bit", "1st Data", "Add Value", "Jump Index", "-----", "-----", "-----" };
 
@@ -5700,8 +5258,8 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		"Label", "Value", "Label + Value", "Value + Label" };
 
 	enum{
-		kViewMenu_Header = 1,						/* format : [total index / current index] */
-		kViewMenu_Layer,							/* internal value of code and layer index */
+		kViewMenu_Header = 1,						/* format : [index / total] */
+		kViewMenu_InternalIndex,					/* layer index and link level (UNEDITABLE) */
 		kViewMenu_Name,								/* master code = entry->name, linked code = action->optionalName */
 			kViewMenu_Comment,
 			kViewMenu_ActivationKey1,
@@ -5743,16 +5301,21 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 				kViewMenu_LayerDisplayLevel,
 				kViewMenu_LayerSetLevel,
 				kViewMenu_LayerSetLength,
+			/* if(LabelSelect) */
+				kViewMenu_LabelSelector,
+				kViewMenu_LabelSelectorQuickClose,
 		kViewMenu_Return,
 		kViewMenu_Max };
 
 	int				total = 0;
-	int				menu_index[kViewMenu_Max] = { 0 };
 	static int		page_index = 0;
 	INT8			code_type = 0;
 	INT8			address_length = 0;
 	INT8			address_size = 0;
 	INT8			request_arrow = 0;
+	INT8			do_edit = 0;
+	INT8			do_increment = 0;
+	INT8			do_update = 0;
 	const char		**menu_item;
 	const char		**menu_sub_item;
 	char			*flag_buf;
@@ -5768,6 +5331,9 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	char			*buf_limited_mask;
 	char			*buf_options;
 	char			*buf_code_type_options;
+	cheat_menu_item_info
+					*menu_info = NULL;
+	cpu_region_info	*cpu_info = NULL;
 	cheat_entry		*entry = &cheat_list[menu->pre_sel];
 	cheat_action	*action = NULL;
 	astring			*activation_key_string1 = NULL;
@@ -5781,11 +5347,12 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 
 	action			= &entry->action_list[page_index];
+	cpu_info		= get_cpu_or_region_info(action->region);
 	code_type		= EXTRACT_FIELD(action->type, CodeType);
 	address_length	= get_address_length(action->region);
 	address_size	= EXTRACT_FIELD(action->type, AddressSize);
 
-	/* required items = (total items + return + terminator) + (strings buf * 12) */
+	/* required items = (total items + return + terminator) + (strings buf * 12) + 32 characters */
 	request_strings(kViewMenu_Max + 2, 12, 32, 0);
 	menu_item				= menu_strings.main_list;
 	menu_sub_item			= menu_strings.sub_list;
@@ -5805,27 +5372,30 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 	memset(flag_buf, 0, kViewMenu_Max + 2);
 
+	/* allocate memory for menu item info */
+	resize_menu_item_info(kViewMenu_Max + 2);
+
 	/********** MENU CONSTRUCTION **********/
 	/* ##### HEADER ##### */
 	sprintf(header, "%2.2d/%2.2d", page_index + 1, entry->action_list_length);
-	ADD_MENU_3_ITEMS("Page", header, kViewMenu_Header);
+	ADD_VIEW_MENU_ITEMS("Page", header, kViewMenu_Header);
 
 	/* ##### LAYER INDEX ##### */
 	sprintf(buf_code, "%2.2X", entry->layer_index);
-	ADD_MENU_3_ITEMS("Layer Index", buf_code, kViewMenu_Layer);
+	ADD_VIEW_MENU_ITEMS("Layer Index", buf_code, kViewMenu_InternalIndex);
 
 	/* ##### NAME ##### */
 	if(entry->name)
 	{
 		/* NOTE : master code is from cheat entry and others are from cheat action */
-		ADD_MENU_3_ITEMS("Name", page_index ? action->optional_name : entry->name, kViewMenu_Name);
+		ADD_VIEW_MENU_ITEMS("Name", page_index ? action->optional_name : entry->name, kViewMenu_Name);
 	}
 	else
-		ADD_MENU_3_ITEMS("Name", "< none >", kViewMenu_Name);
+		ADD_VIEW_MENU_ITEMS("Name", "< none >", kViewMenu_Name);
 
 	/* ##### COMMENT ##### */
 	if(page_index == 0 && entry->comment)
-		ADD_MENU_3_ITEMS("Comment", entry->comment, kViewMenu_Comment);
+		ADD_VIEW_MENU_ITEMS("Comment", entry->comment, kViewMenu_Comment);
 
 	/* ##### ACTIVATION KEY ##### */
 	if(entry->flags & kCheatFlag_Select)
@@ -5833,13 +5403,13 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		if(entry->flags & kCheatFlag_HasActivationKey1)
 		{
 			activation_key_string1 = astring_alloc();
-			ADD_MENU_3_ITEMS("Activation Key - Prev", astring_c(input_code_name(activation_key_string1, entry->activation_key_1)), kViewMenu_ActivationKey1);
+			ADD_VIEW_MENU_ITEMS("Activation Key - Prev", astring_c(input_code_name(activation_key_string1, entry->activation_key_1)), kViewMenu_ActivationKey1);
 		}
 
 		if(entry->flags & kCheatFlag_HasActivationKey2)
 		{
 			activation_key_string2 = astring_alloc();
-			ADD_MENU_3_ITEMS("Activation Key - Next", astring_c(input_code_name(activation_key_string2, entry->activation_key_2)), kViewMenu_ActivationKey2);
+			ADD_VIEW_MENU_ITEMS("Activation Key - Next", astring_c(input_code_name(activation_key_string2, entry->activation_key_2)), kViewMenu_ActivationKey2);
 		}
 	}
 	else
@@ -5847,7 +5417,7 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		if(entry->flags & kCheatFlag_HasActivationKey1)
 		{
 			activation_key_string1 = astring_alloc();
-			ADD_MENU_3_ITEMS("Activation Key", astring_c(input_code_name(activation_key_string1, entry->activation_key_1)), kViewMenu_ActivationKey1);
+			ADD_VIEW_MENU_ITEMS("Activation Key", astring_c(input_code_name(activation_key_string1, entry->activation_key_1)), kViewMenu_ActivationKey1);
 		}
 	}
 
@@ -5858,22 +5428,18 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		{
 			/* cpu region */
 			sprintf(buf_cpu, "%s (%s)", kRegionNames[EXTRACT_FIELD(action->region, CPUIndex) + 1], kAddressSpaceNames[EXTRACT_FIELD(action->region, AddressSpace)]);
-			ADD_MENU_3_ITEMS("CPU", buf_cpu, kViewMenu_CPURegion);
+			ADD_VIEW_MENU_ITEMS("CPU", buf_cpu, kViewMenu_CPURegion);
 		}
 		else
 			/* non-cpu region */
-			ADD_MENU_3_ITEMS("Region", kRegionNames[action->region - REGION_INVALID], kViewMenu_CPURegion);
+			ADD_VIEW_MENU_ITEMS("Region", kRegionNames[action->region - REGION_INVALID], kViewMenu_CPURegion);
 	}
 
 	/* ##### CODE TYPE ##### */
 	if(action->flags & kActionFlag_Custom)
-	{
-		ADD_MENU_3_ITEMS("Custom Type", kCustomCodeTypeNames[action->region - CUSTOM_CODE], kViewMenu_CodeType);
-	}
+		ADD_VIEW_MENU_ITEMS("Custom Type", kCustomCodeTypeNames[action->region - CUSTOM_CODE], kViewMenu_CodeType);
 	else
-	{
-		ADD_MENU_3_ITEMS("Code Type", kCodeTypeNames[code_type], kViewMenu_CodeType);
-	}
+		ADD_VIEW_MENU_ITEMS("Code Type", kCodeTypeNames[code_type], kViewMenu_CodeType);
 
 	if((action->flags & kActionFlag_Custom) == 0)
 	{
@@ -5881,7 +5447,7 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		if(code_type == kCodeType_IWrite)
 		{
 			/* writing parameter */
-			ADD_MENU_3_ITEMS("Parameter", kIWriteParameterNames[EXTRACT_FIELD(action->type, CodeParameterUpper)], kViewMenu_IWriteParameter);
+			ADD_VIEW_MENU_ITEMS("Parameter", kIWriteParameterNames[EXTRACT_FIELD(action->type, CodeParameterUpper)], kViewMenu_IWriteParameter);
 		}
 
 		if(code_type == kCodeType_RWrite)
@@ -5890,7 +5456,7 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 			sprintf(buf_extend, "%4.4X / %4.4X",
 						EXTRACT_FIELD(action->extend_data, LSB16),
 						EXTRACT_FIELD(action->extend_data, MSB16));
-			ADD_MENU_3_ITEMS("Count / Skip", buf_extend, kViewMenu_Extend);
+			ADD_VIEW_MENU_ITEMS("Count / Skip", buf_extend, kViewMenu_Extend);
 		}
 
 		if(action->flags & kActionFlag_CheckCondition)
@@ -5898,36 +5464,43 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 			if(code_type == kCodeType_CBit)
 			{
 				/* bit parameter for CBit */
-				ADD_MENU_3_ITEMS("Parameter", kCBitParameterNames[EXTRACT_FIELD(action->type, CodeParameterUpper)], kViewMenu_CBitParameter);
+				ADD_VIEW_MENU_ITEMS("Parameter", kCBitParameterNames[EXTRACT_FIELD(action->type, CodeParameterUpper)], kViewMenu_CBitParameter);
 
 				/* bit condition for CBit */
-				ADD_MENU_3_ITEMS("Condition", kCBitConditionNames[EXTRACT_FIELD(action->type, CodeParameterLower)], kViewMenu_CBitCondition);
+				ADD_VIEW_MENU_ITEMS("Condition", BIT_SET_CLEAR_NAMES[EXTRACT_FIELD(action->type, CodeParameterLower)], kViewMenu_CBitCondition);
 
 			}
 			else
 			{
 				/* condition for CWrite, Branch, Popup */
-				ADD_MENU_3_ITEMS("Condition", kConditionNames[EXTRACT_FIELD(action->type, CodeParameter)], kViewMenu_Condition);
+				ADD_VIEW_MENU_ITEMS("Condition", kConditionNames[EXTRACT_FIELD(action->type, CodeParameter)], kViewMenu_Condition);
 			}
 
 			if(EXTRACT_FIELD(action->type, CodeParameter) != kCondition_PreviousValue)
 			{
-				sprintf(buf_extend, "%*.*X", kCheatSizeDigitsTable[address_size], kCheatSizeDigitsTable[address_size], action->extend_data);
-				ADD_MENU_3_ITEMS("Comparison", buf_extend, kViewMenu_Extend);
+				sprintf(buf_extend, "%*.*X", BYTE_DIGITS_TABLE[address_size], BYTE_DIGITS_TABLE[address_size], action->extend_data);
+				ADD_VIEW_MENU_ITEMS("Comparison", buf_extend, kViewMenu_Extend);
 			}
 		}
 
 		if(code_type == kCodeType_Popup)
 		{
 			/* popup parameter */
-			ADD_MENU_3_ITEMS("Parameter", kPopupOptionNames[EXTRACT_FIELD(action->type, PopupParameter)], kViewMenu_PopupParameter);
+			ADD_VIEW_MENU_ITEMS("Parameter", kPopupOptionNames[EXTRACT_FIELD(action->type, PopupParameter)], kViewMenu_PopupParameter);
 		}
 
 		/* ##### ADDRESS ##### */
 		switch(EXTRACT_FIELD(action->type, AddressRead))
 		{
 			case kReadFrom_Address:
-				sprintf(buf_address, "%*.*X", address_length, address_length, action->original_address);
+				{
+					char *buf_strings = buf_address;
+
+					if(edit_active && menu->sel == total)
+						buf_strings = create_strings_with_edit_cursor(buf_strings, action->original_address, address_length - 1, edit_cursor);
+					else
+						buf_strings += sprintf(buf_strings, "%*.*X", address_length, address_length, action->original_address);
+				}
 				break;
 
 			case kReadFrom_Index:
@@ -5938,64 +5511,69 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 				sprintf(buf_address, "V%s", kNumbersTable[action->original_address]);
 		}
 
-		ADD_MENU_3_ITEMS("Address", buf_address, kViewMenu_Address);
+		ADD_VIEW_MENU_ITEMS("Address", buf_address, kViewMenu_Address);
 
 		/* ##### SIZE ##### */
 		sprintf(buf_size, "%s", kByteSizeStringList[address_size]);
-		ADD_MENU_3_ITEMS("Size", buf_size, kViewMenu_AddressSize);
+		ADD_VIEW_MENU_ITEMS("Size", buf_size, kViewMenu_AddressSize);
 
 		/* ##### INDEX ##### */
 		if(action->flags & kActionFlag_IndexAddress)
 		{
 			/* index offset for IWrite, Move */
 			sprintf(buf_extend, "%*.*X", address_length, address_length, action->extend_data);
-			ADD_MENU_3_ITEMS("Index Offset", buf_extend, kViewMenu_IndexOffset);
+			ADD_VIEW_MENU_ITEMS("Index Offset", buf_extend, kViewMenu_IndexOffset);
 
 			/* index size for IWrite, Move */
 			sprintf(buf_sub_size, "%s", kByteSizeStringList[EXTRACT_FIELD(action->type, CodeParameterLower)]);
-			ADD_MENU_3_ITEMS("Index Size", buf_sub_size, kViewMenu_IndexAddressSize);
+			ADD_VIEW_MENU_ITEMS("Index Size", buf_sub_size, kViewMenu_IndexAddressSize);
 		}
 
 		/* ##### DESTINATION ##### */
 		if(code_type == kCodeType_Move)
 		{
 			sprintf(buf_type, "%s", kNumbersTable[EXTRACT_FIELD(action->type, CodeParameterUpper)]);
-			ADD_MENU_3_ITEMS("Destination", buf_type, kViewMenu_MoveParameter);
+			ADD_VIEW_MENU_ITEMS("Destination", buf_type, kViewMenu_MoveParameter);
 		}
 
 		/* ##### DATA ##### */
 		if(action->flags & kActionFlag_MemoryWrite)
 		{
+			int		count = BYTE_LOOP_TABLE[address_size];
+			int		display_data = action->original_data;
+			char	*buf_strings = buf_data;
+
 			if(action->flags & kActionFlag_LimitedMask)
 			{
-				/* NOTE : data is upper 2 bytes from data field in case of limited mask */
 				if(TEST_FIELD(action->type, DataRead))
-					sprintf(buf_data, "V%s", kNumbersTable[EXTRACT_FIELD(action->original_data, MSB16)]);
-				else
-					sprintf(buf_data, "%*.*X", kCheatSizeDigitsTable[address_size], kCheatSizeDigitsTable[address_size], EXTRACT_FIELD(action->original_data, MSB16));
-			}
-			else
-			{
-				if(TEST_FIELD(action->type, DataRead))
-					sprintf(buf_data, "V%s", kNumbersTable[action->original_data]);
-				else
-					sprintf(buf_data, "%*.*X", kCheatSizeDigitsTable[address_size], kCheatSizeDigitsTable[address_size], action->original_data);
+					display_data = EXTRACT_FIELD(action->original_data, MSB16);
 			}
 
-			ADD_MENU_3_ITEMS(kDataNames[EXTRACT_FIELD(action->type, CodeType)], buf_data, kViewMenu_Data);
+			if(TEST_FIELD(action->type, DataRead))
+			{
+				count = 0;
+				buf_strings += sprintf(buf_strings, "V");
+			}
+
+			if(edit_active && menu->sel == total)
+				buf_strings = create_strings_with_edit_cursor(buf_strings, display_data, count, edit_cursor);
+			else
+				buf_strings += sprintf(buf_strings, "%*.*X", BYTE_DIGITS_TABLE[address_size], BYTE_DIGITS_TABLE[address_size], display_data);
+
+			ADD_VIEW_MENU_ITEMS(kDataNames[EXTRACT_FIELD(action->type, CodeType)], buf_data, kViewMenu_Data);
 		}
 
 		/* ##### MASK ##### */
 		if(code_type == kCodeType_Write)
 		{
 			sprintf(buf_extend, "%*.*X", address_size, address_size, action->extend_data);
-			ADD_MENU_3_ITEMS("Mask", buf_extend, kViewMenu_Extend);
+			ADD_VIEW_MENU_ITEMS("Mask", buf_extend, kViewMenu_Extend);
 		}
 		else if(action->flags & kActionFlag_LimitedMask)
 		{
 			/* NOTE : mask is lower 2 bytes from data field in case of limited mask */
 			sprintf(buf_limited_mask, "%*.*X", address_size, address_size, EXTRACT_FIELD(action->original_data, LSB16));
-			ADD_MENU_3_ITEMS("Mask", buf_limited_mask, kViewMenu_LimitedMask);
+			ADD_VIEW_MENU_ITEMS("Mask", buf_limited_mask, kViewMenu_LimitedMask);
 		}
 
 		/* ##### SUB DATA ##### */
@@ -6003,14 +5581,14 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		{
 			/* 2nd data */
 			sprintf(buf_extend, "%*.*X",
-				kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, CodeParameterLower)],
-				kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, CodeParameterLower)],
+				BYTE_DIGITS_TABLE[EXTRACT_FIELD(action->type, CodeParameterLower)],
+				BYTE_DIGITS_TABLE[EXTRACT_FIELD(action->type, CodeParameterLower)],
 				action->extend_data);
-			ADD_MENU_3_ITEMS("2nd Data", buf_extend, kViewMenu_Extend);
+			ADD_VIEW_MENU_ITEMS("2nd Data", buf_extend, kViewMenu_Extend);
 
 			/* 2nd data size */
 			sprintf(buf_sub_size, "%s", kByteSizeStringList[EXTRACT_FIELD(action->type, CodeParameterLower)]);
-			ADD_MENU_3_ITEMS("2nd Data Size", buf_sub_size, kViewMenu_SubDataSize);
+			ADD_VIEW_MENU_ITEMS("2nd Data Size", buf_sub_size, kViewMenu_SubDataSize);
 		}
 
 		/* ##### JUMP INDEX ##### */
@@ -6018,7 +5596,7 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		{
 			/* jump index for branch */
 			sprintf(buf_extend, "%2.2d", action->original_data + 1);
-			ADD_MENU_3_ITEMS("Jump Index", buf_extend, kViewMenu_Extend);
+			ADD_VIEW_MENU_ITEMS("Jump Index", buf_extend, kViewMenu_Extend);
 		}
 
 		/* ##### OPTIONS ##### */
@@ -6028,7 +5606,7 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 					TEST_FIELD(action->type, PrefillEnable) ? "Pre" : "-",
 					TEST_FIELD(action->type, Return) ? "Ret" : "-",
 					TEST_FIELD(action->type, RestoreValue) ? "Rst" : "-");
-		ADD_MENU_3_ITEMS("Options", buf_options, kViewMenu_Options);
+		ADD_VIEW_MENU_ITEMS("Options", buf_options, kViewMenu_Options);
 
 		/* ##### CODE TYPE OPTIONS ##### */
 		if(TEST_FIELD(action->type, ValueSelectEnable))
@@ -6038,7 +5616,7 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 						TEST_FIELD(action->type, ValueSelectMinimum) ? "Min" : "-",
 						TEST_FIELD(action->type, ValueSelectBCD) ? "BCD" : "-",
 						TEST_FIELD(action->type, ValueSelectNegative) ? "Neg" : "-");
-			ADD_MENU_3_ITEMS("Value Select Options", buf_code_type_options, kViewMenu_ValueSelectOptions);
+			ADD_VIEW_MENU_ITEMS("Value Select Options", buf_code_type_options, kViewMenu_ValueSelectOptions);
 		}
 	}
 	else
@@ -6048,74 +5626,196 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		{
 			/* ##### LAYER TAG ##### */
 			sprintf(buf_address, "%2.2X", action->original_address);
-			ADD_MENU_3_ITEMS("Display Level", buf_address, kViewMenu_LayerDisplayLevel);
+			ADD_VIEW_MENU_ITEMS("Display Level", buf_address, kViewMenu_LayerDisplayLevel);
 
 			sprintf(buf_data, "%2.2X", action->original_data);
-			ADD_MENU_3_ITEMS("Set Level", buf_data, kViewMenu_LayerSetLevel);
+			ADD_VIEW_MENU_ITEMS("Set Level", buf_data, kViewMenu_LayerSetLevel);
 
 			sprintf(buf_extend, "%2.2X", action->extend_data);
-			ADD_MENU_3_ITEMS("Set Length", buf_extend, kViewMenu_LayerSetLength);
+			ADD_VIEW_MENU_ITEMS("Set Length", buf_extend, kViewMenu_LayerSetLength);
+		}
+
+		if(action->region == CUSTOM_CODE_LABEL_SELECT)
+		{
+			/* ##### LABEL SELECTOR ##### */
+			ADD_VIEW_MENU_ITEMS("Label Selector", TEST_FIELD(action->type, LabelSelectUseSelector) ? "On" : "Off", kViewMenu_LabelSelector);
+
+			/* ##### QUICK MENU CLOSE ##### */
+			ADD_VIEW_MENU_ITEMS("Quick Selector Close", TEST_FIELD(action->type, LabelSelectQuickClose) ? "On" : "Off", kViewMenu_LabelSelectorQuickClose);
 		}
 	}
 
 	/* ##### RETURN ##### */
-	ADD_MENU_3_ITEMS("Return to Prior Menu", NULL, kViewMenu_Return);
+	ADD_VIEW_MENU_ITEMS("Return to Prior Menu", NULL, kViewMenu_Return);
 
-	/* ##### TERMINATE ARRAY ##### */
-	TERMINATE_MENU_2_ITEMS;
+	/* ##### TERMINATOR ##### */
+	TERMINATE_MENU_ITEMS(kViewMenu_Max);
+	#undef ADD_VIEW_MENU_ITEMS
 
 	/* adjust current cursor position */
 	ADJUST_CURSOR(menu->sel, total);
 
-	if(menu_index[menu->sel] == kViewMenu_Header)
+	menu_info = &menu_item_info[menu->sel];
+
+	switch(menu_info->field_type)
 	{
-		if(entry->action_list_length > 1)
-			request_arrow = 3;
+		case kViewMenu_Header:
+			if(entry->action_list_length > 1)
+				request_arrow = MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
+			break;
+
+		case kViewMenu_Address:
+		case kViewMenu_Data:
+			request_arrow = MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
+			break;
+
+		default:
+			request_arrow = 0;
+			break;
 	}
+
+	if(edit_active)
+		flag_buf[menu->sel] = 1;
 
 	/* draw it */
 	old_style_menu(menu_item, menu_sub_item, flag_buf, menu->sel, request_arrow);
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
-		CURSOR_TO_PREVIOUS(menu->sel, total);
+		if(edit_active)
+			do_increment = 1;
+		else
+			CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
-		CURSOR_TO_NEXT(menu->sel, total);
+		if(edit_active)
+			do_increment = -1;
+		else
+			CURSOR_TO_NEXT(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, horizontal_key_repeat_speed))
 	{
-		if(--page_index < 0)
-			page_index = entry->action_list_length - 1;
+		do_edit = edit_active ? 1 : -1;
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, horizontal_key_repeat_speed))
 	{
-		if(++page_index > entry->action_list_length - 1)
-			page_index = 0;
+		do_edit = edit_active ? -1 : 1;
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
-		CURSOR_PAGE_UP(menu->sel);
+		if(edit_active == 0)
+			CURSOR_PAGE_UP(menu->sel);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
-		CURSOR_PAGE_DOWN(menu->sel, total);
+		if(edit_active == 0)
+			CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT) || input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
-		menu->sel = -1;
+		if(edit_active)
+			edit_active = 0;
+		else
+		{
+			switch(menu_info->field_type)
+			{
+				case kViewMenu_Address:
+				case kViewMenu_Data:
+					edit_active = 1;
+					edit_cursor = 0;
+					break;
+
+				case kViewMenu_Return:
+					menu->sel = -1;
+					break;
+			}
+		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
 	{
 		save_cheat_code(machine, entry);
 	}
+	else if(input_ui_pressed(machine, IPT_UI_WATCH_VALUE))
+	{
+		watch_cheat_entry(entry, 0);
+	}
+	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	{
+		if(edit_active)			edit_active = 0;
+		else					menu->sel = -1;
+	}
 
-	if(activation_key_string1)
-		astring_free(activation_key_string1);
-	if(activation_key_string2)
-		astring_free(activation_key_string2);
+	if(do_edit)
+	{
+		if(edit_active)
+		{
+			edit_cursor += do_edit;
+
+			switch(menu_info->field_type)
+			{
+				case kViewMenu_Address:
+					if(edit_cursor < 0)							edit_cursor = address_length - 1;
+					else if(edit_cursor > address_length - 1)	edit_cursor = 0;
+					break;
+
+				case kViewMenu_Data:
+					if(edit_cursor < 0)											edit_cursor = BYTE_DIGITS_TABLE[address_size];
+					else if(edit_cursor >= BYTE_DIGITS_TABLE[address_size])		edit_cursor = 0;
+					break;
+			}
+		}
+		else
+		{
+			switch(menu_info->field_type)
+			{
+				case kViewMenu_Header:
+					page_index += do_edit;
+					if(page_index < 0)										page_index = entry->action_list_length - 1;
+					else if(page_index > entry->action_list_length - 1)		page_index = 0;
+					break;
+
+				case kViewMenu_Address:
+					action->original_address += do_edit;
+					action->original_address &= cpu_info->address_mask;
+					do_update = 1;
+					break;
+
+				case kViewMenu_Data:
+					action->original_data += do_edit;
+					action->original_data &= BYTE_MASK_TABLE[address_size];
+					do_update = 1;
+					break;
+			}
+		}
+	}
+
+	if(do_increment)
+	{
+		switch(menu_info->field_type)
+		{
+			case kViewMenu_Address:
+				action->original_address = do_increment == 1 ?	do_increment_hex_field(action->original_address, edit_cursor) :
+																do_decrement_hex_field(action->original_address, edit_cursor);
+				action->original_address &= cpu_info->address_mask;
+				action->address = action->original_address;
+				do_update = 1;
+				break;
+
+			case kViewMenu_Data:
+				action->original_data = do_increment == 1 ?	do_increment_hex_field(action->original_data, edit_cursor) :
+															do_decrement_hex_field(action->original_data, edit_cursor);
+				action->data &= BYTE_MASK_TABLE[address_size];
+				action->data = action->original_data;
+				do_update = 1;
+				break;
+		}
+	}
+
+	if(do_update)					update_cheat_info(machine, entry, 0);
+	if(activation_key_string1)		astring_free(activation_key_string1);
+	if(activation_key_string2)		astring_free(activation_key_string2);
 
 	return menu->sel + 1;
 }
@@ -6199,19 +5899,19 @@ static int analyse_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 	old_style_menu(menu_item, NULL, NULL, menu->sel, 0);
 
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_NEXT(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_UP(menu->sel);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
@@ -6242,1580 +5942,620 @@ static int analyse_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	return menu->sel + 1;
 }
 
-/*-----------------------------------------------------------
-  search_minimum_menu - management for minimum search menu
-                        limited size, operand, comparison
------------------------------------------------------------*/
+/*------------------------------------------------
+  search_main_menu - management for search menu
+------------------------------------------------*/
 
-static int search_minimum_menu(running_machine *machine, cheat_menu_stack *menu)
+static int search_main_menu(running_machine *machine, cheat_menu_stack *menu)
 {
-	enum{
-		kMenu_CPU = 0,
-		kMenu_Memory,
-		kMenu_Divider1,
-		kMenu_Value,
-		kMenu_Timer,
-		kMenu_Greater,
-		kMenu_Less,
-		kMenu_Equal,
-		kMenu_NotEqual,
-		kMenu_Divider2,
-		kMenu_Result,
-		kMenu_RestoreSearch,
-		kMenu_Return,
-		kMenu_Max };
+	#define ADD_SEARCH_MENU_ITEMS(name, sub_name, type) \
+				do { menu_item[total] = name; menu_sub_item[total] = sub_name; menu_item_info[total].field_type = type; }while(0)
 
-	INT8			i;
-	UINT8			total			= 0;
-	UINT8			doSearch		= 0;
-	static UINT8	doneSaveMemory	= 0;
-	const char		* menuItem[kMenu_Max + 1]		= { 0 };
-	const char		* menuSubItem[kMenu_Max + 1]	= { 0 };
-	char			flagBuf[kMenu_Max + 1]			= { 0 };
-	char			cpuBuf[4];
-	char			valueBuf[32];		/* "FFFFFFF[F] (4294967295)"   23 chars */
-	char			timerBuf[32];		/* "-FFFFFFF[F] (4294967295)"  24 chars */
-	char			numResultsBuf[16];
-	char			* stringsBuf;
+	enum{
+		/* separator */
+		SEARCH_MENU_NULL = 0,
+		/* for standard and advanced */
+		SEARCH_MENU_COMPARISON, SEARCH_MENU_VALUE,
+		/* for minimum mode */
+		SEARCH_MENU_MINIMUM_ITEMS,
+		/* for standard mode */
+		SEARCH_MENU_STANDARD_MODE,
+		/* for advanced mode */
+		SEARCH_MENU_ADVANCED_LHS, SEARCH_MENU_ADVANCED_RHS, SEARCH_MENU_ADVANCED_SIZE, SEARCH_MENU_ADVANCED_SWAP,
+		SEARCH_MENU_ADVANCED_SIGN, SEARCH_MENU_ADVANCED_NAME, SEARCH_MENU_ADVANCED_DO_SEARCH,
+		/* common items */
+		SEARCH_MENU_CPU, SEARCH_MENU_SAVE_MEMORY, SEARCH_MENU_VIEW_RESULT, SEARCH_MENU_RESTORE_SEARCH,
+		SEARCH_MENU_RETURN,
+
+		SEARCH_MENU_MAX = 20 };
+
+	static const char *const MINIMUM_ITEMS[] = {
+		"[ == ] != < > + -", "== [ != ] < > + -", "== != [ < ] > + -", "== != < [ > ] + -", "== != < > [ + ] -", "== != < > + [ - ]" };
+
+	static const char *const MINIMUM_SUB_ITEMS[] = {
+		"Equal", "Not Equal", "Less", "Greater", "Inc.", "Dec." };
+
+	static const char *const STANDARD_MODE_ITEMS[] = {
+		"Current", "Comparison", "Comparison (Slow)", "Value Extraction" };
+
+	static const char *const OPERAND_NAME_TABLE[] = {
+		"Current", "Previous", "First", "Value" };
+
+	static const char *const COMPARISON_NAME_TABLE[] = {
+		"Less", "Greater", "Equal", "Less or Equal", "Greater or Equal", "Not Equal", "Increased by", "Near To" };
+
+	static const char *const SEARCH_BYTE_NAME_TABLE[] = {
+		"1", "2", "3", "4", "Bit" };
+
+	static const UINT8 SEARCH_MENU_ITEM_TABLE[][SEARCH_MENU_MAX] =
+	{
+		{	/* minimum mode */
+			SEARCH_MENU_CPU, SEARCH_MENU_NULL, SEARCH_MENU_MINIMUM_ITEMS, SEARCH_MENU_NULL,
+			SEARCH_MENU_SAVE_MEMORY, SEARCH_MENU_VIEW_RESULT, SEARCH_MENU_RESTORE_SEARCH,
+			SEARCH_MENU_RETURN, SEARCH_MENU_MAX
+		},
+		{	/* standard mode */
+			SEARCH_MENU_STANDARD_MODE, SEARCH_MENU_COMPARISON, SEARCH_MENU_VALUE, SEARCH_MENU_NULL,
+			SEARCH_MENU_CPU, SEARCH_MENU_VIEW_RESULT, SEARCH_MENU_RESTORE_SEARCH, SEARCH_MENU_SAVE_MEMORY,
+			SEARCH_MENU_RETURN, SEARCH_MENU_MAX
+		},
+		{	/* advanced mode */
+			SEARCH_MENU_CPU, SEARCH_MENU_NULL,
+			SEARCH_MENU_ADVANCED_LHS, SEARCH_MENU_COMPARISON, SEARCH_MENU_ADVANCED_RHS, SEARCH_MENU_NULL, SEARCH_MENU_VALUE,
+			SEARCH_MENU_ADVANCED_SIZE, SEARCH_MENU_ADVANCED_SWAP, SEARCH_MENU_ADVANCED_SIGN, SEARCH_MENU_ADVANCED_NAME, SEARCH_MENU_NULL,
+			SEARCH_MENU_ADVANCED_DO_SEARCH, SEARCH_MENU_SAVE_MEMORY, SEARCH_MENU_VIEW_RESULT, SEARCH_MENU_RESTORE_SEARCH,
+			SEARCH_MENU_RETURN, SEARCH_MENU_MAX
+		}
+	};
+
+	static const UINT8 SEARCH_MINIMUM_CONVERSION_TABLE[] =
+	{	kSearchComparison_EqualTo, kSearchComparison_NotEqual, kSearchComparison_LessThan, kSearchComparison_GreaterThan,
+		kSearchComparison_IncreasedBy, kSearchComparison_IncreasedBy };
+
+	UINT8			total = 0;
+	UINT8			mode = EXTRACT_FIELD(cheat_options, SearchBox);
+	UINT8			is_signed = 0;
+	UINT8			is_minus = 0;
+	UINT8			request_arrow = MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
+	INT8			do_increment = 0;
+	UINT8			do_rebuild = 0;
+	UINT8			request_search = 0;
+	UINT32			display_value;
+	static UINT8	done_memory_save = 0;
+	const char		*menu_item[SEARCH_MENU_MAX] = { 0 };
+	const char		*menu_sub_item[SEARCH_MENU_MAX] = { 0 };
+	char			buf_value[32] = { 0 };						/* advanced and standard only */
+	char			buf_cpu[32] = { 0 };
+	char			buf_num_results[32] = { 0 };
+	char			*buf_strings;								/* edit mode only */
 	search_info		*search = get_current_search();
+	cheat_menu_item_info
+					*info = NULL;
 
-	/* first setting : NONE */
-	if(menu->first_time)
-		menu->first_time = 0;
-
-	/* NOTE : in this mode, search bytes is always fixed with 1 byte right now */
-	search->old_options.value &= kSearchByteMaskTable[search->bytes];
-	search->old_options.delta &= kSearchByteMaskTable[search->bytes];
-
-	/********** MENU CONSTRUCTION **********/
-	/* ##### CPU ##### */
-	menuItem[total] = "CPU";
-	sprintf(cpuBuf, "%d", search->target_idx);
-	menuSubItem[total++] = cpuBuf;
-
-	/* ##### MEMORY ##### */
-	if(doneSaveMemory)
-		menuItem[total] = "Initialize Memory";
-	else
-		menuItem[total] = "Save Memory";
-	menuSubItem[total++] = NULL;
-
-	/* ##### DIVIDER ##### */
-	menuItem[total] = MENU_SEPARATOR_ITEM;
-	menuSubItem[total++] = NULL;
-
-	/* ##### VALUE ##### */
-	menuItem[total] = "Value";
-
-	if(editActive && menu->sel == kMenu_Value)
-	{
-		stringsBuf = valueBuf;
-
-		for(i = 1; i >= 0; i--)
-		{
-			if(i == editCursor)
-				stringsBuf += sprintf(stringsBuf, "[%X]", (search->old_options.value & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
-			else
-				stringsBuf += sprintf(stringsBuf, "%X", (search->old_options.value & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
-		}
-
-		stringsBuf += sprintf(stringsBuf, " (%d)", search->old_options.value);
-	}
-	else
-		sprintf(valueBuf, "%.*X (%d)",
-			kSearchByteDigitsTable[search->bytes], search->old_options.value, search->old_options.value);
-
-	menuSubItem[total++] = valueBuf;
-
-	/* ##### TIMER ##### */
-	menuItem[total] = "Timer";
-
-	if(!(search->old_options.delta & kSearchByteSignBitTable[search->bytes]))
-	{
-		/* PLUS */
-		if(editActive && menu->sel == kMenu_Timer)
-		{
-			stringsBuf = timerBuf;
-
-			for(i = 2; i >= 0; i--)
-			{
-				if(i == editCursor)
-				{
-					if(i == 2)
-						stringsBuf += sprintf(stringsBuf, "[+]");
-					else
-						stringsBuf += sprintf(stringsBuf, "[%X]", (search->old_options.delta & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
-				}
-				else
-				{
-					if(i == 2)
-						stringsBuf += sprintf(stringsBuf, "+");
-					else
-						stringsBuf += sprintf(stringsBuf, "%X", (search->old_options.delta & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
-				}
-			}
-
-			stringsBuf += sprintf(stringsBuf, " (+%d)", search->old_options.delta);
-		}
-		else
-			sprintf(timerBuf, "+%.2X (+%d)", search->old_options.delta, search->old_options.delta);
-	}
-	else
-	{
-		UINT32 deltaDisp = (~search->old_options.delta + 1) & 0x7F;
-
-		/* MINUS */
-		if(editActive && menu->sel == kMenu_Timer)
-		{
-			stringsBuf = timerBuf;
-
-			for(i = 2; i >= 0; i--)
-			{
-				if(i == editCursor)
-				{
-					if(i == 2)
-						stringsBuf += sprintf(stringsBuf, "[-]");
-					else
-						stringsBuf += sprintf(stringsBuf, "[%X]", (deltaDisp & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
-				}
-				else
-				{
-					if(i == 2)
-						stringsBuf += sprintf(stringsBuf, "-");
-					else
-						stringsBuf += sprintf(stringsBuf, "%X", (deltaDisp & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
-				}
-			}
-
-#ifdef MAME_DEBUG
-			stringsBuf += sprintf(stringsBuf, " = %.2X (-%d)", search->old_options.delta, deltaDisp);
-#else
-			stringsBuf += sprintf(stringsBuf, " (-%d)", deltaDisp);
-#endif
-		}
-		else
-
-#ifdef MAME_DEBUG
-		sprintf(timerBuf, "-%.2X = %.2X (-%d)", deltaDisp, search->old_options.delta, deltaDisp);
-#else
-		sprintf(timerBuf, "-%.2X (-%d)", deltaDisp, deltaDisp);
-#endif
-	}
-	menuSubItem[total++] = timerBuf;
-
-	/* ##### GREATER ##### */
-	menuItem[total] = "Greater";
-	menuSubItem[total++] = "A > B";
-
-	/* ##### LESS ##### */
-	menuItem[total] = "Less";
-	menuSubItem[total++] = "A < B";
-
-	/* ##### EQUAL ##### */
-	menuItem[total] = "Equal";
-	menuSubItem[total++] = "A = B";
-
-	/* ##### NOT EQUAL ##### */
-	menuItem[total] = "Not Equal";
-	menuSubItem[total++] = "A != B";
-
-	/* ##### DIVIDER ##### */
-	menuItem[total] = MENU_SEPARATOR_ITEM;
-	menuSubItem[total++] = NULL;
-
-	/* ##### RESULT ##### */
-	menuItem[total] = "Results";
-	if(search->num_results)
-	{
-		sprintf(numResultsBuf, "%d", search->num_results);
-	}
-	else
-	{
-		if(!doneSaveMemory)
-			sprintf(numResultsBuf, "No Memory Save");
-		else
-			sprintf(numResultsBuf, "No Result");
-	}
-	menuSubItem[total++] = numResultsBuf;
-
-	/* ##### RESULT RESTORE ##### */
-	menuItem[total] = "Restore Previous Results";
-	menuSubItem[total++] = NULL;
-
-	/* ##### RETURN ##### */
-	menuItem[total] = "Return to Prior Menu";
-	menuSubItem[total++] = NULL;
-
-	/* ##### TERMINATE ARRAY ##### */
-	menuItem[total] = NULL;
-	menuSubItem[total] = NULL;
-
-	/* adjust current cursor position */
-	if(menu->sel < 0 || menu->sel >= total)
-		menu->sel = kMenu_Memory;
-	if(!doneSaveMemory)
-	{
-		if(menu->sel >= kMenu_Timer && menu->sel <= kMenu_NotEqual)
-			menu->sel = kMenu_Memory;
-	}
-
-	if(editActive)
-		flagBuf[menu->sel] = 1;
-
-	/* draw it */
-	old_style_menu(menuItem, menuSubItem, flagBuf, menu->sel, 0);
-
-	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
-	{
-		if(editActive)
-		{
-			switch(menu->sel)
-			{
-				case kMenu_Value:
-					search->old_options.value = DoIncrementHexField(search->old_options.value, editCursor);
-					break;
-
-				case kMenu_Timer:
-					switch(editCursor)
-					{
-						default:
-							search->old_options.delta = DoIncrementHexFieldSigned(search->old_options.delta, editCursor, search->bytes);
-							break;
-
-						case 2:
-							if(!search->old_options.delta || search->old_options.delta == 0x80)
-								search->old_options.delta ^= 0x80;
-							else
-								search->old_options.delta = ~search->old_options.delta + 1;
-							break;
-					}
-					break;
-			}
-		}
-		else
-		{
-			CURSOR_TO_PREVIOUS(menu->sel, total);
-
-			if(menu->sel == kMenu_Divider1 || menu->sel == kMenu_Divider2)
-			{
-				if(--menu->sel == kMenu_NotEqual && !doneSaveMemory)
-					menu->sel = kMenu_Value;
-			}
-		}
-	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
-	{
-		if(editActive)
-		{
-			switch(menu->sel)
-			{
-				case kMenu_Value:
-					search->old_options.value = DoDecrementHexField(search->old_options.value, editCursor);
-					break;
-
-				case kMenu_Timer:
-					switch(editCursor)
-					{
-						default:
-							search->old_options.delta = DoDecrementHexFieldSigned(search->old_options.delta, editCursor, search->bytes);
-							break;
-
-						case 2:
-							if(!search->old_options.delta || search->old_options.delta == 0x80)
-								search->old_options.delta ^= 0x80;
-							else
-								search->old_options.delta = ~search->old_options.delta + 1;
-							break;
-					}
-					break;
-			}
-		}
-		else
-		{
-			CURSOR_TO_NEXT(menu->sel, total);
-
-			if(menu->sel == kMenu_Divider1 || menu->sel == kMenu_Divider2)
-				menu->sel++;
-			if(!doneSaveMemory && menu->sel == kMenu_Timer)
-				menu->sel = kMenu_Result;
-		}
-	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kHorizontalFastKeyRepeatRate))
-	{
-		if(editActive)
-		{
-			switch(menu->sel)
-			{
-				case kMenu_Value:
-					editCursor ^= 1;
-					break;
-
-				case kMenu_Timer:
-					if(++editCursor > 2)
-						editCursor = 0;
-					break;
-			}
-		}
-		else
-		{
-			switch(menu->sel)
-			{
-				case kMenu_CPU:
-					if(search->target_idx > 0)
-					{
-						search->target_idx--;
-
-						build_search_regions(machine, search);
-						allocate_search_regions(search);
-
-						doneSaveMemory = 0;
-					}
-					break;
-
-				case kMenu_Value:
-					search->old_options.value = (search->old_options.value - 1) & 0xFF;
-					break;
-
-				case kMenu_Timer:
-					search->old_options.delta = (search->old_options.delta - 1) & 0xFF;
-					break;
-
-				default:
-					menu->sel = kMenu_Memory;
-			}
-		}
-	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, kHorizontalFastKeyRepeatRate))
-	{
-		if(editActive)
-		{
-			switch(menu->sel)
-			{
-				case kMenu_Value:
-					editCursor ^= 1;
-					break;
-
-				case kMenu_Timer:
-					if(--editCursor < 0)
-						editCursor = 2;
-					break;
-			}
-		}
-		else
-		{
-			switch(menu->sel)
-			{
-				case kMenu_CPU:
-					if(search->target_idx < cpu_gettotalcpu() - 1)
-					{
-						search->target_idx++;
-
-						build_search_regions(machine, search);
-						allocate_search_regions(search);
-
-						doneSaveMemory = 0;
-					}
-					break;
-
-				case kMenu_Value:
-					search->old_options.value = (search->old_options.value + 1) & 0xFF;
-					break;
-
-				case kMenu_Timer:
-					search->old_options.delta = (search->old_options.delta + 1) & 0xFF;
-					break;
-
-				default:
-					menu->sel = kMenu_Result;
-			}
-		}
-	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
-	{
-		CURSOR_PAGE_UP(menu->sel);
-	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
-	{
-		CURSOR_PAGE_DOWN(menu->sel, total);
-	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT))
-	{
-		if(editActive)
-		{
-			switch(menu->sel)
-			{
-				case kMenu_Value:
-					search->bytes =			kSearchSize_8Bit;
-					search->lhs =			kSearchOperand_Current;
-					search->rhs =			kSearchOperand_Value;
-					search->comparison =	kSearchComparison_EqualTo;
-					search->value =			search->old_options.value;
-					doSearch = 1;
-					break;
-
-				case kMenu_Timer:
-					search->bytes =			kSearchSize_8Bit;
-					search->lhs =			kSearchOperand_Current;
-					search->rhs =			kSearchOperand_Previous;
-					search->comparison =	kSearchComparison_IncreasedBy;
-					search->value =			search->old_options.delta;
-					doSearch = 1;
-					break;
-			}
-			editActive = 0;
-		}
-		else
-		{
-			switch(menu->sel)
-			{
-				case kMenu_CPU:
-					cheat_menu_stack_push(select_search_region_menu, menu->handler, menu->sel);
-					break;
-
-				case kMenu_Memory:
-					doneSaveMemory = 0;
-					doSearch = 1;
-					break;
-
-				case kMenu_Value:
-					search->bytes =			kSearchSize_8Bit;
-					search->lhs =			kSearchOperand_Current;
-					search->rhs =			kSearchOperand_Value;
-					search->comparison =	kSearchComparison_EqualTo;
-					search->value =			search->old_options.value;
-					doSearch = 1;
-					break;
-
-				case kMenu_Timer:
-					search->bytes =			kSearchSize_8Bit;
-					search->lhs =			kSearchOperand_Current;
-					search->rhs =			kSearchOperand_Previous;
-					search->comparison =	kSearchComparison_IncreasedBy;
-					search->value =			search->old_options.delta;
-					doSearch = 1;
-					break;
-
-				case kMenu_Equal:
-					search->bytes =			kSearchSize_8Bit;
-					search->lhs =			kSearchOperand_Current;
-					search->rhs =			kSearchOperand_Previous;
-					search->comparison =	kSearchComparison_EqualTo;
-					doSearch = 1;
-					break;
-
-				case kMenu_NotEqual:
-					search->bytes =			kSearchSize_8Bit;
-					search->lhs =			kSearchOperand_Current;
-					search->rhs =			kSearchOperand_Previous;
-					search->comparison =	kSearchComparison_NotEqual;
-					doSearch = 1;
-					break;
-
-				case kMenu_Less:
-					search->bytes =			kSearchSize_8Bit;
-					search->lhs =			kSearchOperand_Current;
-					search->rhs =			kSearchOperand_Previous;
-					search->comparison =	kSearchComparison_LessThan;
-					doSearch = 1;
-					break;
-
-				case kMenu_Greater:
-					search->bytes =			kSearchSize_8Bit;
-					search->lhs =			kSearchOperand_Current;
-					search->rhs =			kSearchOperand_Previous;
-					search->comparison =	kSearchComparison_GreaterThan;
-					doSearch = 1;
-					break;
-
-				case kMenu_Result:
-					if(search->region_list_length)
-						cheat_menu_stack_push(view_search_result_menu, menu->handler, menu->sel);
-					else
-					{
-						/* if no search region (eg, sms.c in HazeMD), don't open result viewer to avoid the crash */
-						SET_MESSAGE(CHEAT_MESSAGE_NO_SEARCH_REGION);
-					}
-					break;
-
-				case kMenu_RestoreSearch:
-					restore_search_backup(search);
-					break;
-
-				case kMenu_Return:
-					menu->sel = -1;
-					break;
-			}
-		}
-	}
-	else if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))
-	{
-		if(editActive)
-			editActive = 0;
-		else
-		{
-			if(menu->sel == kMenu_Value || menu->sel == kMenu_Timer)
-			{
-				editActive = 1;
-				editCursor = 0;
-			}
-		}
-	}
-	else if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
-	{
-		restore_search_backup(search);
-	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
-	{
-		if(editActive)
-			editActive = 0;
-		else
-			menu->sel = -1;
-	}
-
-	/********** SEARCH **********/
-	if(doSearch)
-	{
-		if(!doneSaveMemory)
-			init_new_search(search);
-
-		if(doneSaveMemory || menu->sel == kMenu_Value)
-		{
-			backup_search(search);
-			do_search(search);
-		}
-
-		update_search(search);
-
-		if(doneSaveMemory || menu->sel == kMenu_Value)
-			SET_MESSAGE(CHEAT_MESSAGE_CHEAT_FOUND);
-		else
-			SET_MESSAGE(CHEAT_MESSAGE_INITIALIZE_MEMORY);
-
-		doneSaveMemory = 1;
-
-		if(search->num_results == 1)
-		{
-			add_cheat_from_first_result(machine, search);
-
-			SET_MESSAGE(CHEAT_MESSAGE_ONE_CHEAT_FOUND);
-		}
-	}
-
-	/********** EDIT **********/
-	if(editActive)
-	{
-		switch(menu->sel)
-		{
-			case kMenu_Value:
-				search->old_options.value = do_edit_hex_field(machine, search->old_options.value);
-				search->old_options.value &= 0xFF;
-				break;
-
-			case kMenu_Timer:
-				search->old_options.delta = do_edit_hex_field(machine, search->old_options.delta);
-				search->old_options.delta &= 0xFF;
-				break;
-		}
-	}
-
-	return menu->sel + 1;
-}
-
-/*-------------------------------------------------------------
-  search_standard_menu - management for standard search menu
-                         fixed bit and operand
--------------------------------------------------------------*/
-
-static int search_standard_menu(running_machine *machine, cheat_menu_stack *menu)
-{
-	static const char *const kComparisonNameTable[] = {
-		"Equal",
-		"Not Equal",
-		"Less",
-		"Less or Equal",
-		"Greater",
-		"Greater or Equal" };
-
-	static const char *const kIncrementNameTable[] = {
-		"Increment",
-		"Decrement" };
-
-	static const int kComparisonConversionTable[] = {
-		kSearchComparison_EqualTo,
-		kSearchComparison_NotEqual,
-		kSearchComparison_LessThan,
-		kSearchComparison_LessThanOrEqualTo,
-		kSearchComparison_GreaterThan,
-		kSearchComparison_GreaterThanOrEqualTo };
-
-	enum{
-		kMenu_Comparison,
-		kMenu_Value,
-		kMenu_NearTo,
-		kMenu_Increment,
-		kMenu_Bit,
-		kMenu_Separator,
-		kMenu_CPU,
-		kMenu_Memory,
-		kMenu_ViewResult,
-		kMenu_RestoreResult,
-		kMenu_Return,
-
-		kMenu_Max };
-
-	enum{
-		kComparison_Equal = 0,
-		kComparison_NotEqual,
-		kComparison_Less,
-		kComparison_LessOrEqual,
-		kComparison_Greater,
-		kComparison_GreaterOrEqual,
-		kComparison_Max = kComparison_GreaterOrEqual };
-
-	INT8			total			= 0;
-	INT8			doSearch		= 0;
-	static INT8		doneSaveMemory	= 0;
-	const char		* menuItem[kMenu_Max + 1]		= { 0 };
-	const char		* menuSubItem[kMenu_Max + 1]	= { 0 };
-	char			valueBuf[32];
-	char			incrementBuf[16];
-	search_info		*search = get_current_search();
-
-	/* first setting : adjust search items */
+	/* first setting : adjust cursor */
 	if(menu->first_time)
 	{
-		search->lhs = kSearchOperand_Current;
-
-		if(!search->old_options.delta)
-			search->old_options.delta = 1;
+		if(done_memory_save)
+		{
+			/* if memory is saved, set cursor to search item */
+			switch(mode)
+			{
+				case SEARCH_BOX_MINIMUM:	menu->sel = 2;	break;
+				case SEARCH_BOX_STANDARD:	menu->sel = 0;	break;
+				case SEARCH_BOX_ADVANCED:	menu->sel = 3;	break;
+			}
+		}
+		else
+		{
+			/* if memory is unsaved, set cursor to initialize item */
+			switch(mode)
+			{
+				case SEARCH_BOX_MINIMUM:	menu->sel = 4;	break;
+				case SEARCH_BOX_STANDARD:	menu->sel = 7;	break;
+				case SEARCH_BOX_ADVANCED:	menu->sel = 13;	break;
+			}
+		}
 
 		menu->first_time = 0;
 	}
 
+	/* check status of value */
+	if(search->sign || (search->comparison == kSearchComparison_IncreasedBy))
+	{
+		is_signed = 1;
+
+		if(search->value & SEARCH_BYTE_SIGN_BIT_TABLE[search->bytes])
+			is_minus = 1;
+	}
+
+	/* allocate memory for menu item info */
+	resize_menu_item_info(SEARCH_MENU_MAX + 2);
+
 	/********** MENU CONSTRUCTION **********/
-	/* ##### COMPARISON ##### */
-	menuItem[total] = "Comparison";
-	if(menu->sel == kMenu_Comparison || menu->sel == kMenu_Value)
-		menuSubItem[total++] = kComparisonNameTable[search->old_options.comparison];
-	else
-		menuSubItem[total++] = " ";
-
-	/* ##### VALUE ##### */
-	menuItem[total] = "Value";
-	if(menu->sel == kMenu_Value)
+	for(total = 0; SEARCH_MENU_ITEM_TABLE[mode][total] != SEARCH_MENU_MAX; total++)
 	{
-		if(editActive)
+		switch(SEARCH_MENU_ITEM_TABLE[mode][total])
 		{
-			INT8	i;
-			char	* stringsBuf = valueBuf;
+			case SEARCH_MENU_NULL:
+				ADD_SEARCH_MENU_ITEMS(MENU_SEPARATOR_ITEM, NULL, SEARCH_MENU_NULL);
+				break;
 
-			for(i = 1; i >= 0; i--)
-			{
-				if(i == editCursor)
-					stringsBuf += sprintf(stringsBuf, "[%X]", (search->old_options.value & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
+			case SEARCH_MENU_COMPARISON:
+				if(mode == SEARCH_BOX_STANDARD)
+					ADD_SEARCH_MENU_ITEMS("Comaprison", COMPARISON_NAME_TABLE[search->comparison], SEARCH_MENU_COMPARISON);
 				else
-					stringsBuf += sprintf(stringsBuf, "%X", (search->old_options.value & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
-			}
-			stringsBuf += sprintf(stringsBuf, " (%d)", search->old_options.value);
-		}
-		else
-			sprintf(valueBuf,	"%2.2X (%2.2d)", search->old_options.value, search->old_options.value);
+					ADD_SEARCH_MENU_ITEMS(	TEST_FIELD(cheat_options, DontPrintNewLabels) ? COMPARISON_NAME_TABLE[search->comparison] : "Comparison",
+									TEST_FIELD(cheat_options, DontPrintNewLabels) ? NULL : COMPARISON_NAME_TABLE[search->comparison],
+									SEARCH_MENU_COMPARISON);
+				break;
 
-		menuSubItem[total++] = valueBuf;
-	}
-	else
-		menuSubItem[total++] = " ";
+			case SEARCH_MENU_VALUE:
+				display_value = search->value;
+				buf_strings = buf_value;
 
-	/* ##### VALUE - NEAR TO ##### */
-	menuItem[total] = "Near To";
-	if(menu->sel == kMenu_NearTo)
-	{
-		if(editActive)
-		{
-			INT8	i;
-			char	* stringsBuf = valueBuf;
-
-			for(i = 1; i >=0; i--)
-			{
-				if(i == editCursor)
-					stringsBuf += sprintf(stringsBuf, "[%X]", (search->old_options.value & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
-				else
-					stringsBuf += sprintf(stringsBuf, "%X", (search->old_options.value & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
-			}
-			stringsBuf += sprintf(stringsBuf,	" or %2.2X (%2.2d or %2.2d)",
-												(search->old_options.value - 1) & kSearchByteMaskTable[search->bytes],
-												search->old_options.value,
-												search->old_options.value - 1);
-		}
-		else
-			sprintf(valueBuf,	"%2.2X or %2.2X (%2.2d or %2.2d)",
-								search->old_options.value, (search->old_options.value - 1) & kSearchByteMaskTable[search->bytes],
-								search->old_options.value, search->old_options.value - 1);
-		menuSubItem[total++] = valueBuf;
-	}
-	else
-		menuSubItem[total++] = " ";
-
-	/* ##### INCREMENT/DECREMENT ##### */
-	menuItem[total] = kIncrementNameTable[search->old_options.sign];
-	if(menu->sel == kMenu_Increment)
-	{
-		if(editActive)
-		{
-			INT8	i;
-			char	* stringsBuf = incrementBuf;
-
-			for(i = 2; i >=0; i--)
-			{
-				if(i == editCursor)
+				if(is_signed)
 				{
-					if(i == 2)
-						stringsBuf += sprintf(stringsBuf, "[%s]", search->old_options.sign ? "-" : "+");
+					if(edit_active && edit_cursor == BYTE_DIGITS_TABLE[search->bytes])
+					{
+						if(is_minus)
+						{
+							buf_strings += sprintf(buf_strings, "[-]");
+							display_value = ~display_value + 1;
+							display_value &= SEARCH_BYTE_UNSIGNED_MASK_TABLE[search->bytes];
+						}
+						else
+							buf_strings += sprintf(buf_strings, "[+]");
+					}
 					else
-						stringsBuf += sprintf(stringsBuf, "[%X]", (search->old_options.delta & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
+					{
+						if(is_minus)
+						{
+							buf_strings += sprintf(buf_strings, "-");
+							display_value = ~display_value + 1;
+							display_value &= SEARCH_BYTE_UNSIGNED_MASK_TABLE[search->bytes];
+						}
+						else
+							buf_strings += sprintf(buf_strings, "+");
+					}
+				}
+
+				if(edit_active)
+					buf_strings = create_strings_with_edit_cursor(buf_strings, display_value, BYTE_LOOP_TABLE[search->bytes], edit_cursor);
+				else
+					buf_strings += sprintf(buf_strings, "%.*X", BYTE_DIGITS_TABLE[search->bytes], display_value);
+
+				if(is_signed)
+				{
+					if(is_minus)
+						buf_strings += sprintf(buf_strings, " (-");
+					else
+						buf_strings += sprintf(buf_strings, " (+");
+				}
+				else
+					buf_strings += sprintf(buf_strings, " (");
+
+				buf_strings += sprintf(buf_strings, "%.*d)", BYTE_DEC_DIGITS_TABLE[search->bytes], display_value);
+
+				if(mode == SEARCH_BOX_STANDARD)
+				{
+					char buf[10];
+
+					if(is_signed)
+						sprintf(buf, is_minus ? "Decrement" : "Increment");
+					else if(search->comparison == kSearchComparison_NearTo)
+						sprintf(buf, "== or +1");
+					else
+						sprintf(buf, "Value");
+
+					ADD_SEARCH_MENU_ITEMS(buf, buf_value, SEARCH_MENU_VALUE);
 				}
 				else
 				{
-					if(i == 2)
-						stringsBuf += sprintf(stringsBuf, "%s", search->old_options.sign ? "-" : "+");
-					else
-						stringsBuf += sprintf(stringsBuf, "%X", (search->old_options.delta & kIncrementMaskTable[i]) / kIncrementValueTable[i]);
+					ADD_SEARCH_MENU_ITEMS(	TEST_FIELD(cheat_options, DontPrintNewLabels) ? buf_value : "Value",
+									TEST_FIELD(cheat_options, DontPrintNewLabels) ? NULL : buf_value,
+									SEARCH_MENU_VALUE);
 				}
-			}
-			stringsBuf += sprintf(stringsBuf, " (%s%2.2d)", search->old_options.sign ? "-" : "+", search->old_options.delta);
+				break;
+
+			case SEARCH_MENU_MINIMUM_ITEMS:
+				ADD_SEARCH_MENU_ITEMS(MINIMUM_ITEMS[search->parameter], MINIMUM_SUB_ITEMS[search->parameter], SEARCH_MENU_MINIMUM_ITEMS);
+				break;
+
+			case SEARCH_MENU_STANDARD_MODE:
+				ADD_SEARCH_MENU_ITEMS("Mode", STANDARD_MODE_ITEMS[search->rhs], SEARCH_MENU_STANDARD_MODE);
+				break;
+
+			case SEARCH_MENU_ADVANCED_LHS:
+				ADD_SEARCH_MENU_ITEMS(	TEST_FIELD(cheat_options, DontPrintNewLabels) ? OPERAND_NAME_TABLE[search->lhs] : "LHS",
+								TEST_FIELD(cheat_options, DontPrintNewLabels) ? NULL : OPERAND_NAME_TABLE[search->lhs],
+								SEARCH_MENU_ADVANCED_LHS);
+				break;
+
+			case SEARCH_MENU_ADVANCED_RHS:
+				ADD_SEARCH_MENU_ITEMS(	TEST_FIELD(cheat_options, DontPrintNewLabels) ? OPERAND_NAME_TABLE[search->rhs] : "RHS",
+								TEST_FIELD(cheat_options, DontPrintNewLabels) ? NULL : OPERAND_NAME_TABLE[search->rhs],
+								SEARCH_MENU_ADVANCED_RHS);
+				break;
+
+			case SEARCH_MENU_ADVANCED_SIZE:
+				ADD_SEARCH_MENU_ITEMS("Size", SEARCH_BYTE_NAME_TABLE[search->bytes], SEARCH_MENU_ADVANCED_SIZE);
+				break;
+
+			case SEARCH_MENU_ADVANCED_SWAP:
+				ADD_SEARCH_MENU_ITEMS("Swap", search->swap ? "On" : "Off", SEARCH_MENU_ADVANCED_SWAP);
+				break;
+
+			case SEARCH_MENU_ADVANCED_SIGN:
+				ADD_SEARCH_MENU_ITEMS("Signed", search->sign ? "On" : "Off", SEARCH_MENU_ADVANCED_SIGN);
+				break;
+
+			case SEARCH_MENU_ADVANCED_NAME:
+				ADD_SEARCH_MENU_ITEMS("Name", (search->name && search->name[0] != 0) ? search->name : "(none)", SEARCH_MENU_ADVANCED_NAME);
+				break;
+
+			case SEARCH_MENU_ADVANCED_DO_SEARCH:
+				ADD_SEARCH_MENU_ITEMS("Do Search", NULL, SEARCH_MENU_ADVANCED_DO_SEARCH);
+				break;
+
+			case  SEARCH_MENU_CPU:
+				sprintf(buf_cpu, "%d", search->target_idx);
+				ADD_SEARCH_MENU_ITEMS("CPU", buf_cpu, SEARCH_MENU_CPU);
+				break;
+
+			case SEARCH_MENU_SAVE_MEMORY:
+				ADD_SEARCH_MENU_ITEMS(done_memory_save ? "Save Memory" : "Initialize Memory", NULL, SEARCH_MENU_SAVE_MEMORY);
+				break;
+
+			case SEARCH_MENU_VIEW_RESULT:
+				if(search->num_results)
+				{
+					sprintf(buf_num_results, "%d", search->num_results);
+					ADD_SEARCH_MENU_ITEMS("Results", buf_num_results, SEARCH_MENU_VIEW_RESULT);
+				}
+				else
+					ADD_SEARCH_MENU_ITEMS("No Result", NULL, SEARCH_MENU_VIEW_RESULT);
+				break;
+
+			case SEARCH_MENU_RESTORE_SEARCH:
+				ADD_SEARCH_MENU_ITEMS("Restore Previous Value", NULL, SEARCH_MENU_RESTORE_SEARCH);
+				break;
+
+			case SEARCH_MENU_RETURN:
+				ADD_SEARCH_MENU_ITEMS("Return to Prior Menu", NULL, SEARCH_MENU_RETURN);
+				break;
+
+			default:
+				ADD_SEARCH_MENU_ITEMS("UNKNOWN", NULL, SEARCH_MENU_MAX);
+				break;
 		}
-		else
-		{
-			sprintf(incrementBuf,	"%s%2.2X (%s%2.2d)",
-									search->old_options.sign ? "-" : "+",
-									search->old_options.delta,
-									search->old_options.sign ? "-" : "+",
-									search->old_options.delta);
-		}
-		menuSubItem[total++] = incrementBuf;
 	}
-	else
-		menuSubItem[total++] = " ";
 
-	/* ##### BIT ##### */
-	menuItem[total] = "Bit";
-	if(menu->sel == kMenu_Bit)
-		menuSubItem[total++] = kComparisonNameTable[search->old_options.comparison];
-	else
-		menuSubItem[total++] = " ";
-
-	/* ##### SEPARATOR ##### */
-	menuItem[total] = MENU_SEPARATOR_ITEM;
-	menuSubItem[total++] = NULL;
-
-	/* ##### CPU ##### */
-	menuItem[total] = "CPU";
-	menuSubItem[total++] = kNumbersTable[search->target_idx];
-
-	/* ##### MEMORY ##### */
-	if(doneSaveMemory)
-		menuItem[total] = "Initialize Memory";
-	else
-		menuItem[total] = "Save Memory";
-	menuSubItem[total++] = NULL;
-
-	/* ##### RESULT VIEWER ##### */
-	menuItem[total] = "View Last Results";
-	menuSubItem[total++] = NULL;
-
-	/* ##### RESULT RESTORE ##### */
-	menuItem[total] = "Restore Previous Results";
-	menuSubItem[total++] = NULL;
-
-	/* ##### RETURN ##### */
-	menuItem[total] = "Return to Prior Menu";
-	menuSubItem[total++] = NULL;
-
-	/* ##### TERMINATE ARRAY ##### */
-	menuItem[total] = NULL;
-	menuSubItem[total] = NULL;
+	/* ##### TERMINATOR ##### */
+	TERMINATE_MENU_ITEMS(SEARCH_MENU_MAX);
+	#undef ADD_SEARCH_MENU_ITEMS
 
 	/* adjust current cursor position */
 	ADJUST_CURSOR(menu->sel, total);
 
+	/* set current menu item info */
+	info = &menu_item_info[menu->sel];
+
+	/* skip separator */
+	if(info->field_type == SEARCH_MENU_NULL)
+		menu->sel++;
+
+	/* set left/right arrow for sub-item */
+	if(edit_active == 0)
+	{
+		switch(info->field_type)
+		{
+			case SEARCH_MENU_ADVANCED_NAME:
+			case SEARCH_MENU_ADVANCED_DO_SEARCH:
+			case SEARCH_MENU_SAVE_MEMORY:
+			case SEARCH_MENU_VIEW_RESULT:
+			case SEARCH_MENU_RESTORE_SEARCH:
+			case SEARCH_MENU_RETURN:
+				request_arrow = 0;
+		}
+	}
+	else
+		request_arrow = 0;
+
 	/* draw it */
-	old_style_menu(menuItem, menuSubItem, 0, menu->sel, 0);
+	old_style_menu(menu_item, menu_sub_item, NULL, menu->sel, request_arrow);
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
-		if(editActive)
+		if(edit_active)
 		{
-			switch(menu->sel)
+			if(is_signed == 0)
+				search->value = do_increment_hex_field(search->value, edit_cursor);
+			else
 			{
-				case kMenu_Value:
-				case kMenu_NearTo:
-					search->old_options.value = DoIncrementHexField(search->old_options.value, editCursor);
-					break;
-
-				case kMenu_Increment:
-					if(editCursor == 2)
-						search->old_options.sign ^= 1;
-					else
-						search->old_options.delta = DoIncrementHexField(search->old_options.delta, editCursor);
-					break;
+				if(edit_cursor == BYTE_DIGITS_TABLE[search->bytes])
+					search->value = ~search->value + 1;
+				else
+					search->value = do_increment_hex_field_signed(search->value, edit_cursor, search->bytes);
 			}
 		}
 		else
 		{
 			CURSOR_TO_PREVIOUS(menu->sel, total);
 
-			if(menu->sel == kMenu_Separator) menu->sel--;
+			if(menu_item_info[menu->sel].field_type == SEARCH_MENU_NULL)
+				menu->sel--;
 		}
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
-		if(editActive)
+		if(edit_active)
 		{
-			switch(menu->sel)
+			if(is_signed == 0)
+				search->value = do_decrement_hex_field(search->value, edit_cursor);
+			else
 			{
-				case kMenu_Value:
-				case kMenu_NearTo:
-					search->old_options.value = DoDecrementHexField(search->old_options.value, editCursor);
-					break;
-
-				case kMenu_Increment:
-					if(editCursor == 2)
-						search->old_options.sign ^= 1;
-					else
-						search->old_options.delta = DoDecrementHexField(search->old_options.delta, editCursor);
-					break;
+				if(edit_cursor == BYTE_DIGITS_TABLE[search->bytes])
+					search->value = ~search->value + 1;
+				else
+					search->value = do_decrement_hex_field_signed(search->value, edit_cursor, search->bytes);
 			}
 		}
 		else
 		{
 			CURSOR_TO_NEXT(menu->sel, total);
 
-			if(menu->sel == kMenu_Separator) menu->sel++;
+			if(menu_item_info[menu->sel].field_type == SEARCH_MENU_NULL)
+				menu->sel++;
 		}
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
-		if(!editActive)
-			CURSOR_PAGE_UP(menu->sel);
+		CURSOR_PAGE_UP(menu->sel);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
-		if(!editActive)
-			CURSOR_PAGE_DOWN(menu->sel, total);
+		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kHorizontalFastKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, horizontal_key_repeat_speed))
 	{
-		if(editActive)
+		if(edit_active)
 		{
-			switch(menu->sel)
+			if(is_signed == 0)
 			{
-				case kMenu_Value:
-				case kMenu_NearTo:
-					if(++editCursor > 1) editCursor = 0;
-					break;
-
-				case kMenu_Increment:
-					if(++editCursor > 2) editCursor = 0;
-					break;
+				if(++edit_cursor >= BYTE_DIGITS_TABLE[search->bytes])
+					edit_cursor = 0;
+			}
+			else
+			{
+				if(++edit_cursor > BYTE_DIGITS_TABLE[search->bytes])
+					edit_cursor = 0;
 			}
 		}
 		else
-		{
-			switch(menu->sel)
-			{
-				case kMenu_Comparison:
-				case kMenu_Bit:
-					if(--search->old_options.comparison < kComparison_Equal)
-						search->old_options.comparison = kComparison_Max;
-					break;
-
-				case kMenu_Value:
-				case kMenu_NearTo:
-					search->old_options.value = (search->old_options.value - 1) & kCheatSizeMaskTable[search->bytes];
-					break;
-
-				case kMenu_Increment:
-					if(search->old_options.sign)
-					{
-						if(++search->old_options.delta > kSearchByteUnsignedMaskTable[search->bytes])
-							search->old_options.delta = kSearchByteUnsignedMaskTable[search->bytes];
-					}
-					else if(--search->old_options.delta <= 0)
-					{
-						search->old_options.delta = 1;
-						search->old_options.sign ^= 0x01;
-					}
-					break;
-			}
-		}
+			do_increment = -1;
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, kHorizontalFastKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, horizontal_key_repeat_speed))
 	{
-		if(editActive)
+		if(edit_active)
 		{
-			switch(menu->sel)
+			if(is_signed == 0)
 			{
-				case kMenu_Value:
-				case kMenu_NearTo:
-					if(--editCursor < 0) editCursor = 1;
-					break;
-
-				case kMenu_Increment:
-					if(--editCursor < 0) editCursor = 2;
-					break;
+				if(--edit_cursor < 0)
+					edit_cursor = BYTE_DIGITS_TABLE[search->bytes] - 1;
+			}
+			else
+			{
+				if(--edit_cursor < 0)
+					edit_cursor = BYTE_DIGITS_TABLE[search->bytes];
 			}
 		}
 		else
-		{
-			switch(menu->sel)
-			{
-				case kMenu_Comparison:
-				case kMenu_Bit:
-					if(++search->old_options.comparison > kComparison_GreaterOrEqual)
-						search->old_options.comparison = 0;
-					break;
-
-				case kMenu_Value:
-				case kMenu_NearTo:
-					search->old_options.value = (search->old_options.value + 1) & kCheatSizeMaskTable[search->bytes];
-					break;
-
-				case kMenu_Increment:
-					if(search->old_options.sign)
-					{
-						if(--search->old_options.delta <= 0)
-						{
-							search->old_options.delta = 1;
-							search->old_options.sign ^= 0x01;
-						}
-					}
-					else if(++search->old_options.delta > kSearchByteUnsignedMaskTable[search->bytes])
-					{
-						search->old_options.delta = kSearchByteUnsignedMaskTable[search->bytes];
-					}
-					break;
-			}
-		}
+			do_increment = 1;
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
-		if(editActive)
-			editActive = 0;
+		if(edit_active)
+		{
+			edit_active = 0;
+
+			if(mode == SEARCH_BOX_STANDARD)
+				request_search = 1;
+		}
 		else
 		{
-			switch(menu->sel)
+			switch(info->field_type)
 			{
-				case kMenu_Comparison:
-					search->bytes		= kSearchSize_8Bit;
-					search->rhs			= kSearchOperand_First;
-					search->comparison	= kComparisonConversionTable[search->old_options.comparison];
-					doSearch			= 1;
+				case SEARCH_MENU_MINIMUM_ITEMS:
+					if(search->parameter == MINIMUM_ITEM_INCREMENT)			search->value = 0x01;
+					else if(search->parameter == MINIMUM_ITEM_DECREMENT)	search->value = 0xFF;
+
+					search->comparison = SEARCH_MINIMUM_CONVERSION_TABLE[search->parameter];
+					request_search = 1;
 					break;
 
-				case kMenu_Value:
-					search->bytes		= kSearchSize_8Bit;
-					search->rhs			= kSearchOperand_Value;
-					search->comparison	= kComparisonConversionTable[search->old_options.comparison];
-					search->value		= search->old_options.value;
-					doSearch			= 1;
+				case SEARCH_MENU_COMPARISON:
+					if(mode == SEARCH_BOX_STANDARD)
+						request_search = 1;
 					break;
 
-				case kMenu_NearTo:
-					search->bytes		= kSearchSize_8Bit;
-					search->rhs			= kSearchOperand_Value;
-					search->comparison	= kSearchComparison_NearTo;
-					search->value		= search->old_options.value;
-					doSearch			= 1;
+				case SEARCH_MENU_VALUE:
+					edit_active = 1;
+					edit_cursor = 0;
 					break;
 
-				case kMenu_Increment:
-					if(search->old_options.delta)
-					{
-						search->bytes		= kSearchSize_8Bit;
-						search->rhs			= kSearchOperand_First;
-						search->comparison	= kSearchComparison_IncreasedBy;
-
-						if(search->old_options.sign)
-							search->value	= ~search->old_options.delta + 1;
-						else
-							search->value	= search->old_options.delta;
-
-						doSearch			= 1;
-					}
+				case SEARCH_MENU_ADVANCED_DO_SEARCH:
+					request_search = 1;
 					break;
 
-				case kMenu_Bit:
-					search->bytes		= kSearchSize_1Bit;
-					search->rhs			= kSearchOperand_First;
-					search->comparison	= kComparisonConversionTable[search->old_options.comparison];
-					doSearch			= 1;
+				case SEARCH_MENU_CPU:
+					cheat_menu_stack_push(select_search_region_menu, menu->handler, menu->sel);
 					break;
 
-				case kMenu_Memory:
-					doneSaveMemory	= 0;
-					doSearch		= 1;
+				case SEARCH_MENU_SAVE_MEMORY:
+					done_memory_save = 0;
+					request_search = 1;
 					break;
 
-				case kMenu_CPU:
-					cheat_menu_stack_pop();
-					break;
-
-				case kMenu_ViewResult:
+				case SEARCH_MENU_VIEW_RESULT:
 					if(search->region_list_length)
 						cheat_menu_stack_push(view_search_result_menu, menu->handler, menu->sel);
+					else
+						/* if no search region (eg, sms.c in HazeMD), don't open result viewer to avoid the crash */
+						SET_MESSAGE(CHEAT_MESSAGE_NO_SEARCH_REGION);
 					break;
 
-				case kMenu_RestoreResult:
+				case SEARCH_MENU_RESTORE_SEARCH:
 					restore_search_backup(search);
 					break;
 
-				case kMenu_Return:
+				case SEARCH_MENU_RETURN:
 					menu->sel = -1;
 					break;
 			}
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))
-	{
-		if(menu->sel == kMenu_Value || menu->sel == kMenu_NearTo || menu->sel == kMenu_Increment)
-		{
-			editActive ^= 1;
-			editCursor = 0;
-		}
-	}
 	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
-		if(editActive)	editActive = 0;
+		if(edit_active)	edit_active = 0;
 		else			menu->sel = -1;
 	}
 
-	/***** SEARCH *****/
-	if(doSearch)
+	if(do_increment)
 	{
-		if(!doneSaveMemory)
+		switch(info->field_type)
+		{
+			case SEARCH_MENU_COMPARISON:
+				search->comparison += do_increment;
+
+				if(search->rhs == kSearchOperand_Value)
+				{
+					if(search->comparison < 0)								search->comparison = kSearchComparison_NotEqual;
+					if(search->comparison > kSearchComparison_NotEqual)		search->comparison = 0;
+				}
+				else
+				{
+					if(search->comparison < 0)								search->comparison = kSearchComparison_Max - 1;
+					if(search->comparison >= kSearchComparison_Max)			search->comparison = 0;
+				}
+				break;
+
+			case SEARCH_MENU_VALUE:
+				search->value = (search->value + do_increment) & BYTE_MASK_TABLE[search->bytes];
+
+				if(search->comparison == kSearchComparison_IncreasedBy)
+				{
+					if(search->value == SEARCH_BYTE_SIGN_BIT_TABLE[search->bytes] || search->value == 0)
+						search->value = (search->value + do_increment) & BYTE_MASK_TABLE[search->bytes];
+				}
+				break;
+
+			case SEARCH_MENU_MINIMUM_ITEMS:
+				search->parameter += do_increment;
+
+				if(search->parameter < 0)					search->parameter = MINIMUM_ITEM_MAX - 1;
+				if(search->parameter >= MINIMUM_ITEM_MAX)	search->parameter = 0;
+				break;
+
+			case SEARCH_MENU_STANDARD_MODE:
+				search->rhs += do_increment;
+
+				if(search->rhs < 1)							search->rhs = kSearchOperand_Max - 1;
+				if(search->rhs >= kSearchOperand_Max)		search->rhs = 1;
+
+				if(search->rhs == kSearchOperand_Value)
+				{
+					if(search->comparison > kSearchComparison_NotEqual)
+						search->comparison = kSearchComparison_EqualTo;
+				}
+				break;
+
+			case SEARCH_MENU_ADVANCED_LHS:
+				search->lhs += do_increment;
+
+				if(search->lhs < 0)							search->lhs = kSearchOperand_Max - 1;
+				if(search->lhs >= kSearchOperand_Max)		search->lhs = 0;
+				break;
+
+			case SEARCH_MENU_ADVANCED_RHS:
+				search->rhs += do_increment;
+
+				if(search->rhs < 0)							search->rhs = kSearchOperand_Max - 1;
+				if(search->rhs >= kSearchOperand_Max)		search->rhs = 0;
+				break;
+
+			case SEARCH_MENU_ADVANCED_SIZE:
+				search->bytes += do_increment;
+
+				if(search->bytes < 0)						search->bytes = kSearchSize_Max - 1;
+				if(search->bytes >= kSearchSize_Max)		search->bytes = 0;
+				break;
+
+			case SEARCH_MENU_ADVANCED_SWAP:
+				search->swap ^= 1;
+				break;
+
+			case SEARCH_MENU_ADVANCED_SIGN:
+				search->sign ^= 1;
+				break;
+
+			case SEARCH_MENU_CPU:
+				search->target_idx += do_increment;
+
+				if(search->target_idx < 0)						search->target_idx = cpu_gettotalcpu() - 1;
+				if(search->target_idx >= cpu_gettotalcpu())		search->target_idx = 0;
+				do_rebuild = 1;
+				break;
+		}
+	}
+
+	if(do_rebuild)
+	{
+		if(search->search_speed != SEARCH_SPEED_USER_DEFINED)	build_search_regions(machine, search);
+		else													load_cheat_database(machine, LOAD_USER_REGION);
+
+		allocate_search_regions(search);
+
+		done_memory_save = 0;
+	}
+
+	if(request_search)
+	{
+		if(done_memory_save == 0)
 			init_new_search(search);
 
-		if(search->rhs == kSearchOperand_Value || doneSaveMemory)
+		if(done_memory_save || (mode == SEARCH_BOX_STANDARD && search->rhs == kSearchOperand_Value))
 		{
 			backup_search(search);
 			do_search(search);
 		}
 
 		update_search(search);
-		doneSaveMemory = 1;
+
+		if(done_memory_save || (mode == SEARCH_BOX_STANDARD && search->rhs == kSearchOperand_Value))
+			SET_MESSAGE(CHEAT_MESSAGE_CHEAT_FOUND);
+		else
+			SET_MESSAGE(CHEAT_MESSAGE_INITIALIZE_MEMORY);
 
 		if(search->num_results == 1)
+		{
 			add_cheat_from_first_result(machine, search);
+			SET_MESSAGE(CHEAT_MESSAGE_ONE_CHEAT_FOUND);
+		}
+
+		done_memory_save = 1;
 	}
 
-	/********** EDIT **********/
-	switch(menu->sel)
+	if(edit_active != 0 && info->field_type == SEARCH_MENU_VALUE)
 	{
-		case kMenu_Value:
-			search->old_options.value = do_edit_hex_field(machine, search->old_options.value);
-			search->old_options.value &= 0xFF;
-			break;
-
-		case kMenu_Increment:
-			search->old_options.delta = do_edit_hex_field(machine, search->old_options.delta);
-			search->old_options.delta &= 0x7F;
-			break;
+		search->value = do_edit_hex_field(machine, search->value);
+		search->value &= BYTE_MASK_TABLE[search->bytes];
 	}
+
+	if(info->field_type == SEARCH_MENU_ADVANCED_NAME)
+		search->name = do_dynamic_edit_text_field(search->name);
 
 	return menu->sel + 1;
-}
-
-/*-------------------------------------------------------------
-  search_advanced_menu - management for advanced search menu
--------------------------------------------------------------*/
-
-static int search_advanced_menu(running_machine *machine, cheat_menu_stack *menu)
-{
-#if 0
-	/* menu stirngs */
-	static const char *const kOperandNameTable[] =
-	{
-		"Current Data",
-		"Previous Data",
-		"First Data",
-		"Value"
-	};
-
-	static const char *const kComparisonNameTable[] =
-	{
-		"Less",
-		"Greater",
-		"Equal",
-		"Less Or Equal",
-		"Greater Or Equal",
-		"Not Equal",
-		"Increased By Value",
-		"Near To"
-	};
-
-	static const char *const kSearchByteNameTable[] =
-	{
-		"1",
-		"2",
-		"3",
-		"4",
-		"Bit"
-	};
-
-	enum
-	{
-		kMenu_LHS,
-		kMenu_Comparison,
-		kMenu_RHS,
-		kMenu_Value,
-
-		kMenu_Divider,
-
-		kMenu_Size,
-		kMenu_Swap,
-		kMenu_Sign,
-		kMenu_CPU,
-		kMenu_Name,
-
-		kMenu_Divider2,
-
-		kMenu_DoSearch,
-		kMenu_SaveMemory,
-
-		kMenu_Divider3,
-
-		kMenu_ViewResult,
-		kMenu_RestoreSearch,
-
-		kMenu_Return,
-
-		kMenu_Max
-	};
-
-	const char		* menu_item[kMenu_Max + 2] =	{ 0 };
-	const char		* menu_subitem[kMenu_Max + 2] =	{ 0 };
-
-	char			valueBuffer[20];
-	char			cpuBuffer[20];
-	char			flagBuf[kMenu_Max + 2] = { 0 };
-
-	search_info		*search = get_current_search();
-
-	INT32			sel = selection - 1;
-	INT32			total = 0;
-	UINT32			increment = 1;
-
-	static int		submenuChoice = 0;
-	static UINT8	doneMemorySave = 0;
-	static UINT8	editActive = 0;
-	static UINT8	firstEntry = 0;
-	static int		lastSel = 0;
-
-	sel = lastSel;
-
-	/********** SUB MENU **********/
-	if(submenuChoice)
-	{
-		switch(sel)
-		{
-			case kMenu_CPU:
-				submenuChoice = SelectSearchRegions(machine, submenuChoice, get_current_search());
-				break;
-
-			case kMenu_ViewResult:
-				submenuChoice = ViewSearchResults(submenuChoice, firstEntry);
-				break;
-		}
-
-		firstEntry = 0;
-
-		/* meaningless ? because no longer return with sel = -1 (pressed UI_CONFIG in submenu) */
-//      if(submenuChoice == -1)
-//          submenuChoice = 0;
-
-		return sel + 1;
-	}
-
-	/********** MENU CONSTRUCION **********/
-	if((search->sign || search->comparison == kSearchComparison_IncreasedBy) && (search->value & kSearchByteSignBitTable[search->bytes]))
-	{
-		UINT32	tempValue;
-
-		tempValue = ~search->value + 1;
-		tempValue &= kSearchByteUnsignedMaskTable[search->bytes];
-
-		sprintf(valueBuffer, "-%.*X", kSearchByteDigitsTable[search->bytes], tempValue);
-	}
-	else
-		sprintf(valueBuffer, "%.*X", kSearchByteDigitsTable[search->bytes], search->value & kSearchByteMaskTable[search->bytes]);
-
-	if(TEST_FIELD(cheat_options, DontPrintNewLabels))
-	{
-		menu_item[total] = kOperandNameTable[search->lhs];
-		menu_subitem[total++] = NULL;
-
-		menu_item[total] = kComparisonNameTable[search->comparison];
-		menu_subitem[total++] = NULL;
-
-		menu_item[total] = kOperandNameTable[search->rhs];
-		menu_subitem[total++] = NULL;
-
-		menu_item[total] = valueBuffer;
-		menu_subitem[total++] = NULL;
-	}
-	else
-	{
-		menu_item[total] = "LHS";
-		menu_subitem[total++] = kOperandNameTable[search->lhs];
-
-		menu_item[total] = "Comparison";
-		menu_subitem[total++] = kComparisonNameTable[search->comparison];
-
-		menu_item[total] = "RHS";
-		menu_subitem[total++] = kOperandNameTable[search->rhs];
-
-		menu_item[total] = "Value";
-		menu_subitem[total++] = valueBuffer;
-	}
-
-	menu_item[total] = "---";
-	menu_subitem[total++] = NULL;
-
-	menu_item[total] = "Size";
-	menu_subitem[total++] = kSearchByteNameTable[search->bytes];
-
-	menu_item[total] = "Swap";
-	menu_subitem[total++] = search->swap ? "On" : "Off";
-
-	menu_item[total] = "Signed";
-	menu_subitem[total++] = search->sign ? "On" : "Off";
-
-	sprintf(cpuBuffer, "%d", search->targetIdx);
-	menu_item[total] = "CPU";
-	menu_subitem[total++] = cpuBuffer;
-
-	menu_item[total] = "Name";
-	if(search->name)
-		menu_subitem[total++] = search->name;
-	else
-		menu_subitem[total++] = "(none)";
-
-	menu_item[total] = "---";
-	menu_subitem[total++] = NULL;
-
-	menu_item[total] = "Do Search";
-	menu_subitem[total++] = NULL;
-
-	menu_item[total] = "Save Memory";
-	menu_subitem[total++] = NULL;
-
-	menu_item[total] = "---";
-	menu_subitem[total++] = NULL;
-
-	menu_item[total] = "View Last Results";		// view result
-	menu_subitem[total++] = NULL;
-
-	menu_item[total] = "Restore Previous Results";		// restore result
-	menu_subitem[total++] = NULL;
-
-	menu_item[total] = "Return to Prior Menu";		// return
-	menu_subitem[total++] = NULL;
-
-	menu_item[total] = NULL;								// terminate array
-	menu_subitem[total] = NULL;
-
-	/* adjust current cursor position */
-	if(sel < 0)
-		sel = 0;
-	if(sel >= total)
-		sel = total - 1;
-
-	/* higlighted sub-item if edit mode */
-	if(editActive)
-		flagBuf[sel] = 1;
-
-	/* draw it */
-	old_style_menu(menu_item, menu_subitem, flagBuf, sel, 0);
-
-	/********** KEY HANDLING **********/
-	if(AltKeyPressed())
-		increment <<= 4;
-	if(ControlKeyPressed())
-		increment <<= 8;
-	if(ShiftKeyPressed())
-		increment <<= 16;
-
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
-	{
-		sel++;
-
-		/* if divider, skip it */
-		if((sel == kMenu_Divider) || (sel == kMenu_Divider2) || (sel == kMenu_Divider3))
-			sel++;
-
-		if(sel >= total)
-			sel = 0;
-	}
-
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
-	{
-		sel--;
-
-		/* if divider, skip it */
-		if((sel == kMenu_Divider) || (sel == kMenu_Divider2) || (sel == kMenu_Divider3))
-			sel--;
-
-		if(sel < 0)
-			sel = total - 1;
-	}
-
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
-	{
-		sel -= fullMenuPageHeight;
-
-		if(sel < 0)
-			sel = 0;
-	}
-
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
-	{
-		sel += fullMenuPageHeight;
-
-		if(sel >= total)
-			sel = total - 1;
-	}
-
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kHorizontalFastKeyRepeatRate))
-	{
-		switch(sel)
-		{
-			case kMenu_Value:
-				search->value -= increment;
-
-				search->value &= kSearchByteMaskTable[search->bytes];
-				break;
-
-			case kMenu_LHS:
-				search->lhs--;
-
-				if(search->lhs < kSearchOperand_Current)
-					search->lhs = kSearchOperand_Max;
-				break;
-
-			case kMenu_RHS:
-				search->rhs--;
-
-				if(search->rhs < kSearchOperand_Current)
-					search->rhs = kSearchOperand_Max;
-				break;
-
-			case kMenu_Comparison:
-				search->comparison--;
-
-				if(search->comparison < kSearchComparison_LessThan)
-					search->comparison = kSearchComparison_Max;
-				break;
-
-			case kMenu_Size:
-				search->bytes--;
-
-				if(search->bytes < kSearchSize_8Bit)
-					search->bytes = kSearchSize_Max;
-				break;
-
-			case kMenu_Swap:
-				search->swap ^= 1;
-				break;
-
-			case kMenu_Sign:
-				search->sign ^= 1;
-				break;
-
-			case kMenu_CPU:
-				if(search->targetIdx > 0)
-				{
-					search->targetIdx--;
-
-					BuildSearchRegions(machine, search);
-					AllocateSearchRegions(search);
-
-					doneMemorySave = 0;
-				}
-				break;
-		}
-	}
-
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, kHorizontalFastKeyRepeatRate))
-	{
-		switch(sel)
-		{
-			case kMenu_Value:
-				search->value += increment;
-
-				search->value &= kSearchByteMaskTable[search->bytes];
-				break;
-
-			case kMenu_Size:
-				search->bytes++;
-
-				if(search->bytes > kSearchSize_Max)
-					search->bytes = kSearchSize_8Bit;
-				break;
-
-			case kMenu_LHS:
-				search->lhs++;
-
-				if(search->lhs > kSearchOperand_Max)
-					search->lhs = kSearchOperand_Current;
-				break;
-
-			case kMenu_RHS:
-				search->rhs++;
-
-				if(search->rhs > kSearchOperand_Max)
-					search->rhs = kSearchOperand_Current;
-				break;
-
-			case kMenu_Comparison:
-				search->comparison++;
-
-				if(search->comparison > kSearchComparison_Max)
-					search->comparison = kSearchComparison_LessThan;
-				break;
-
-			case kMenu_Swap:
-				search->swap ^= 1;
-				break;
-
-			case kMenu_Sign:
-				search->sign ^= 1;
-				break;
-
-			case kMenu_CPU:
-				if(search->targetIdx < cpu_gettotalcpu() - 1)
-				{
-					search->targetIdx++;
-
-					BuildSearchRegions(machine, search);
-					AllocateSearchRegions(search);
-
-					doneMemorySave = 0;
-				}
-				break;
-		}
-	}
-
-	if(input_ui_pressed(machine, IPT_UI_SELECT))
-	{
-		if(editActive)
-			editActive = 0;
-		else
-		{
-			switch(sel)
-			{
-				case kMenu_Value:		// edit selected field
-				case kMenu_Name:
-					editActive = 1;
-					break;
-
-				case kMenu_CPU:			// go to region selection menu
-					submenuChoice = 1;
-					break;
-
-				case kMenu_DoSearch:
-					if(!doneMemorySave)
-						/* initialize search */
-						init_new_search(search);
-
-					if((!kSearchOperandNeedsInit[search->lhs] && !kSearchOperandNeedsInit[search->rhs]) || doneMemorySave)
-					{
-						backup_search(search);
-
-						DoSearch(search);
-					}
-
-					update_search(search);
-
-					if((!kSearchOperandNeedsInit[search->lhs] && !kSearchOperandNeedsInit[search->rhs]) || doneMemorySave)
-						popmessage("%d results found", search->num_results);
-					else
-						popmessage("saved all memory regions");
-
-					doneMemorySave = 1;
-
-					if(search->num_results == 1)
-					{
-						add_cheat_from_first_result(machine, search);
-
-						popmessage("1 result found, added to list");
-					}
-					break;
-
-				case kMenu_SaveMemory:
-					init_new_search(search);
-
-					update_search(search);
-
-					popmessage("saved all memory regions");
-
-					doneMemorySave = 1;
-					break;
-
-				case kMenu_ViewResult:
-					if(search->regionListLength)
-					{
-						/* go to result viewer */
-						firstEntry = 1;
-						submenuChoice = 1;
-					}
-					else
-						/* if no search region (eg, sms.c in HazeMD), don't open result viewer to avoid the crash */
-						ui_popup_time(1, "no search regions");
-					break;
-
-				case kMenu_RestoreSearch:
-					/* restore previous results */
-					restore_search_backup(search);
-					break;
-
-				case kMenu_Return:
-					submenuChoice = 0;
-					sel = -1;
-					break;
-
-				default:
-					break;
-			}
-		}
-	}
-
-	/* edit selected field  */
-	if(editActive)
-	{
-		switch(sel)
-		{
-			case kMenu_Value:
-				search->value = do_edit_hex_field(machine, search->value);
-
-				search->value &= kSearchByteMaskTable[search->bytes];
-				break;
-
-			case kMenu_Name:
-				search->name = DoDynamicEditTextField(search->name);
-				break;
-		}
-	}
-
-	if(input_ui_pressed(machine, IPT_UI_CANCEL))
-		sel = -1;
-
-	/* keep current cursor position */
-	if(!(sel == -1))
-		lastSel = sel;
-#endif
-	return menu->sel;
 }
 
 /*---------------------------------------------------------------------------
@@ -7906,23 +6646,23 @@ static int select_search_region_menu(running_machine *machine, cheat_menu_stack 
 		region = NULL;
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_NEXT(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_UP(menu->sel);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, horizontal_key_repeat_speed))
 	{
 		if(region)
 		{
@@ -7941,7 +6681,7 @@ static int select_search_region_menu(running_machine *machine, cheat_menu_stack 
 			do_reallocate = 1;
 		}
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, horizontal_key_repeat_speed))
 	{
 		if(region)
 		{
@@ -7962,7 +6702,7 @@ static int select_search_region_menu(running_machine *machine, cheat_menu_stack 
 	}
 	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
-		if(ShiftKeyPressed() && region && search)
+		if(shift_key_pressed() && region && search)
 		{
 			/* SHIFT + CHEAT DELETE = invalidate selected region */
 			invalidate_entire_region(search, region);
@@ -8062,7 +6802,7 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 		menu->first_time = 0;
 	}
 
-	/* required items = (header + defined max items + return + terminator) & (strings buf * (header + defined max items) [max chars = 32]) */
+	/* required items = (header + defined max items + return + terminator) + (strings buf * (header + defined max items)) + 32 characters */
 	request_strings(kMaxResultsPerPage + 3, kMaxResultsPerPage, 32, 0);
 	menu_item	= menu_strings.main_list;
 	header		= menu_strings.main_strings[0];
@@ -8077,7 +6817,7 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 	region = &search->region_list[search->current_region_idx];
 
 	/* set the number of items per PAGE */
-	resultsPerPage = fullMenuPageHeight - 3;
+	resultsPerPage = full_menu_page_height - 3;
 
 	/* adjust total items per PAGE */
 	if(resultsPerPage <= 0)
@@ -8087,12 +6827,12 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 
 	/* get the number of total PAGEs */
 	if(region->flags & kRegionFlag_Enabled)
-		numPages = (region->num_results / kSearchByteStep[search->bytes] + resultsPerPage - 1) / resultsPerPage;
+		numPages = (region->num_results / SEARCH_BYTE_STEP[search->bytes] + resultsPerPage - 1) / resultsPerPage;
 	else
 		numPages = 0;
 
-	if(numPages > fullMenuPageHeight)
-		numPages = fullMenuPageHeight;
+	if(numPages > full_menu_page_height)
+		numPages = full_menu_page_height;
 
 	/* adjust current PAGE */
 	if(search->current_results_page >= numPages)
@@ -8111,7 +6851,7 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 
 	traverse = 0;
 
-	if((region->length < kSearchByteIncrementTable[search->bytes]) || !(region->flags & kRegionFlag_Enabled))
+	if((region->length < BYTE_INCREMENT_TABLE[search->bytes]) || !(region->flags & kRegionFlag_Enabled))
 	{
 		; // no results...
 	}
@@ -8121,7 +6861,7 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 		for(i = 0; i < resultsPerPage && traverse < region->length && resultsFound < region->num_results;)
 		{
 			while(is_region_offset_valid(search, region, traverse) == 0 && traverse < region->length)
-				traverse += kSearchByteStep[search->bytes];
+				traverse += SEARCH_BYTE_STEP[search->bytes];
 
 			if(traverse < region->length)
 			{
@@ -8139,11 +6879,11 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 					sprintf(	buf[total],
 								"%.8X (%.*X %.*X %.*X)",
 								region->address + traverse,
-								kSearchByteDigitsTable[search->bytes],
+								BYTE_DIGITS_TABLE[search->bytes],
 								read_search_operand(kSearchOperand_First, search, region, region->address + traverse),
-								kSearchByteDigitsTable[search->bytes],
+								BYTE_DIGITS_TABLE[search->bytes],
 								read_search_operand(kSearchOperand_Previous, search, region, region->address + traverse),
-								kSearchByteDigitsTable[search->bytes],
+								BYTE_DIGITS_TABLE[search->bytes],
 								read_search_operand(kSearchOperand_Current, search, region, region->address + traverse));
 
 					menu_item[total] = buf[total];
@@ -8152,7 +6892,7 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 					i++;
 				}
 
-				traverse += kSearchByteStep[search->bytes];
+				traverse += SEARCH_BYTE_STEP[search->bytes];
 				resultsFound++;
 				hadResults = 1;
 			}
@@ -8184,24 +6924,24 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 	old_style_menu(menu_item, NULL, NULL, menu->sel, 0);
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
 		if(--menu->sel < 1)
 			menu->sel = total - 1;
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
 		if(++menu->sel >= total)
 			menu->sel = kMenu_FirstResult;
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, kHorizontalFastKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, horizontal_key_repeat_speed))
 	{
-		if(ShiftKeyPressed())
+		if(shift_key_pressed())
 		{
 			/* shift + right = go to last PAGE */
 			search->current_results_page = numPages - 1;
 		}
-		else if(ControlKeyPressed())
+		else if(control_key_pressed())
 		{
 			/* ctrl + right = go to next REGION */
 			search->current_region_idx++;
@@ -8217,14 +6957,14 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 
 		menu->sel = kMenu_FirstResult;
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kHorizontalFastKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, horizontal_key_repeat_speed))
 	{
-		if(ShiftKeyPressed())
+		if(shift_key_pressed())
 		{
 			/* shift + left = go to first PAGE */
 			search->current_results_page = 0;
 		}
-		else if(ControlKeyPressed())
+		else if(control_key_pressed())
 		{
 			/* ctrl + left = go to previous REGION */
 			search->current_region_idx--;
@@ -8240,16 +6980,16 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 
 		menu->sel = kMenu_FirstResult;
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kHorizontalFastKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, horizontal_key_repeat_speed))
 	{
-		menu->sel -=fullMenuPageHeight;
+		menu->sel -=full_menu_page_height;
 
 		if(menu->sel <= kMenu_Header)
 			menu->sel = kMenu_FirstResult;
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kHorizontalFastKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, horizontal_key_repeat_speed))
 	{
-		menu->sel +=fullMenuPageHeight;
+		menu->sel +=full_menu_page_height;
 
 		if(menu->sel >= total)
 			menu->sel = total - 1;
@@ -8264,7 +7004,7 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 		/* go to last PAGE */
 		search->current_results_page = numPages - 1;
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PREV_GROUP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PREV_GROUP, vertical_key_repeat_speed))
 	{
 		/* go to previous REGION */
 		search->current_region_idx--;
@@ -8274,7 +7014,7 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 
 		menu->sel = kMenu_FirstResult;
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_NEXT_GROUP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_NEXT_GROUP, vertical_key_repeat_speed))
 	{
 		/* go to next REGION */
 		search->current_region_idx++;
@@ -8291,7 +7031,7 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 	}
 	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
-		if(ShiftKeyPressed())
+		if(shift_key_pressed())
 		{
 			if(region && search)
 				/* shift + delete = invalidate all results in current REGION */
@@ -8371,7 +7111,7 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 				{
 					/* get the number of total PAGEs for previous REGION */
 					search_region	*new_region		= &search->region_list[search->current_region_idx];
-					UINT32			nextNumPages	= (new_region->num_results / kSearchByteStep[search->bytes] + resultsPerPage - 1) / resultsPerPage;
+					UINT32			nextNumPages	= (new_region->num_results / SEARCH_BYTE_STEP[search->bytes] + resultsPerPage - 1) / resultsPerPage;
 
 					if(nextNumPages <= 0)
 						nextNumPages = 1;
@@ -8394,19 +7134,19 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 {
 	int				i;
-	UINT8			total			= 0;
-	const char		** menuItem;
-	char			** buf;
-	char			*stringsBuf;	/* "USER20 FFFFFFFF (99:32 Bit)" 27 chars */
+	UINT8			total = 0;
+	const char		**menu_item;
+	char			**buf;
+	char			*buf_strings;	/* "USER20 FFFFFFFF (99:32 Bit)" 27 chars */
 	watch_info		*watch;
 
 	/* first setting : NONE */
 	if(menu->first_time)
 		menu->first_time = 0;
 
-	/* required items = (total watchpoints + return + terminator) & (strings buf * total watchpoints [max chars = 32]) */
+	/* required items = (total watchpoints + return + terminator) + (strings buf * total watchpoints) + 32 characters */
 	request_strings(watch_list_length + 2, watch_list_length, 32, 0);
-	menuItem	= menu_strings.main_list;
+	menu_item	= menu_strings.main_list;
 	buf			= menu_strings.main_strings;
 
 	/********** MENU CONSTRUCTION **********/
@@ -8415,40 +7155,18 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 		watch_info		*traverse	= &watch_list[i];
 		cpu_region_info	*info		= get_cpu_or_region_info(traverse->cpu);
 
-		/* FORMAT : "CPU/Region : Address (Length : Bytes)" */
-		if(!editActive || menu->sel != i)
-		{
-			sprintf(buf[i], "%s:%.*X (%d:%s)",
-				get_region_name(traverse->cpu),
-				info->address_chars_needed,
-				traverse->address,
-				traverse->num_elements,
-				kByteSizeStringList[traverse->element_bytes]);
-		}
-		else
+		if(edit_active && menu->sel == i)
 		{
 			/* insert edit cursor in quick edit mode */
-			switch(editCursor)
+			switch(edit_cursor)
 			{
 				default:
 				{
-					INT8 j;
+					buf_strings = buf[i];
 
-					stringsBuf = buf[i];
-
-					stringsBuf += sprintf(stringsBuf, "%s ", get_region_name(traverse->cpu));
-
-					for(j = info->address_chars_needed + 1; j > 1; j--)
-					{
-						INT8 digits = j - 2;
-
-						if(j == editCursor)
-							stringsBuf += sprintf(stringsBuf, "[%X]", (traverse->address & kIncrementMaskTable[digits]) / kIncrementValueTable[digits]);
-						else
-							stringsBuf += sprintf(stringsBuf, "%X", (traverse->address & kIncrementMaskTable[digits]) / kIncrementValueTable[digits]);
-					}
-
-					stringsBuf += sprintf(stringsBuf, " (%d:%s)", traverse->num_elements, kByteSizeStringList[traverse->element_bytes]);
+					buf_strings += sprintf(buf_strings, "%s ", get_region_name(traverse->cpu));
+					buf_strings = create_strings_with_edit_cursor(buf_strings, traverse->address, info->address_chars_needed - 1, edit_cursor - 2);
+					buf_strings += sprintf(buf_strings, " (%d:%s)", traverse->num_elements, kByteSizeStringList[traverse->element_bytes]);
 				}
 				break;
 
@@ -8471,41 +7189,44 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 					break;
 			}
 		}
-
-		menuItem[total] = buf[i];
+		else
+		{
+			/* FORMAT : "CPU/Region : Address (Length : Bytes)" */
+			sprintf(buf[i], "%s:%.*X (%d:%s)",
+				get_region_name(traverse->cpu),
+				info->address_chars_needed,
+				traverse->address,
+				traverse->num_elements,
+				kByteSizeStringList[traverse->element_bytes]);
+		}
+		menu_item[total] = buf[i];
 		total++;
 	}
 
 	/* ##### RETURN ##### */
-	menuItem[total++] = "Return to Prior Menu";
+	menu_item[total++] = "Return to Prior Menu";
 
 	/* ##### TERMINATE ARRAY ##### */
-	menuItem[total] = NULL;
+	menu_item[total] = NULL;
 
 	/* adjust current cursor position */
 	ADJUST_CURSOR(menu->sel, total);
 
 	/* draw it */
-	old_style_menu(menuItem, NULL, NULL, menu->sel, 0);
+	old_style_menu(menu_item, NULL, NULL, menu->sel, 0);
 
-	if(menu->sel < watch_list_length)
-		watch = &watch_list[menu->sel];
-	else
-		watch = NULL;
+	if(menu->sel < watch_list_length)	watch = &watch_list[menu->sel];
+	else								watch = NULL;
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
-		if(!editActive)
+		if(edit_active)
 		{
-			CURSOR_TO_PREVIOUS(menu->sel, total);
-		}
-		else
-		{
-			switch(editCursor)
+			switch(edit_cursor)
 			{
 				default:
-					watch->address = DoIncrementHexField(watch->address, editCursor - 2);
+					watch->address = do_increment_hex_field(watch->address, edit_cursor - 2);
 					break;
 
 				case 1:
@@ -8518,19 +7239,18 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 					break;
 			}
 		}
-	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
-	{
-		if(!editActive)
-		{
-			CURSOR_TO_NEXT(menu->sel, total);
-		}
 		else
+			CURSOR_TO_PREVIOUS(menu->sel, total);
+
+	}
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
+	{
+		if(edit_active)
 		{
-			switch(editCursor)
+			switch(edit_cursor)
 			{
 				default:
-					watch->address = DoDecrementHexField(watch->address, editCursor - 2);
+					watch->address = do_decrement_hex_field(watch->address, edit_cursor - 2);
 					break;
 
 				case 1:
@@ -8543,41 +7263,43 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 					break;
 			}
 		}
+		else
+			CURSOR_TO_NEXT(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
-		if(!editActive)
+		if(edit_active == 0)
 			CURSOR_PAGE_UP(menu->sel);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
-		if(!editActive)
+		if(edit_active == 0)
 			CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, vertical_key_repeat_speed))
 	{
-		if(editActive)
+		if(edit_active)
 		{
 			cpu_region_info *info = get_cpu_or_region_info(watch->cpu);
 
-			if(++editCursor > info->address_chars_needed + 1)
-				editCursor = 0;
+			if(++edit_cursor > info->address_chars_needed + 1)
+				edit_cursor = 0;
 		}
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, vertical_key_repeat_speed))
 	{
-		if(editActive)
+		if(edit_active)
 		{
 			cpu_region_info *info = get_cpu_or_region_info(watch->cpu);
 
-			if(--editCursor < 0)
-				editCursor = info->address_chars_needed + 1;
+			if(--edit_cursor < 0)
+				edit_cursor = info->address_chars_needed + 1;
 		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
-		if(editActive)
-			editActive = 0;
+		if(edit_active)
+			edit_active = 0;
 		else
 		{
 			if(watch)
@@ -8588,11 +7310,11 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 	else if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
 	{
-		if(!editActive && watch)
+		if(!edit_active && watch)
 		{
-			if(ShiftKeyPressed())
+			if(shift_key_pressed())
 				add_cheat_from_watch(machine, watch);
-			else if(ControlKeyPressed())
+			else if(control_key_pressed())
 			{
 				cheat_entry *entry = get_new_cheat();
 
@@ -8611,13 +7333,13 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
-		if(!editActive && watch)
+		if(!edit_active && watch)
 		{
-			if(ShiftKeyPressed())
+			if(shift_key_pressed())
 			{
 				delete_watch_at(menu->sel);
 			}
-			else if(ControlKeyPressed())
+			else if(control_key_pressed())
 			{
 				for(i = 0; i < watch_list_length; i++)
 					watch_list[i].num_elements = 0;
@@ -8628,9 +7350,9 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 					watch->num_elements = 0;
 			}
 		}
-		else if(editActive)
+		else if(edit_active)
 		{
-			switch(editCursor)
+			switch(edit_cursor)
 			{
 				default:
 					watch->address = 0;
@@ -8647,7 +7369,7 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
 	{
-		if(!editActive && watch)
+		if(!edit_active && watch)
 		{
 			cheat_entry entry;
 
@@ -8662,15 +7384,15 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	{
 		if(watch)
 		{
-			editCursor = 2;
-			editActive ^= 1;
+			edit_cursor = 2;
+			edit_active ^= 1;
 		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CLEAR))
 	{
-		if(!editActive)
+		if(!edit_active)
 		{
-			if(ShiftKeyPressed())
+			if(shift_key_pressed())
 			{
 				reset_watch(watch);
 			}
@@ -8689,8 +7411,8 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
-		if(editActive)
-			editActive = 0;
+		if(edit_active)
+			edit_active = 0;
 		else
 			menu->sel = -1;
 	}
@@ -8752,19 +7474,19 @@ static int command_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	ui_menu_draw(menuItem, total, menu->sel, NULL);
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_NEXT(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_UP(menu->sel);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
@@ -8976,7 +7698,7 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	total++;
 
 	/* ##### XOR ##### */
-	sprintf(buf[total], "%.*X", kSearchByteDigitsTable[kWatchSizeConversionTable[entry->element_bytes]], entry->xor);
+	sprintf(buf[total], "%.*X", BYTE_DIGITS_TABLE[kWatchSizeConversionTable[entry->element_bytes]], entry->xor);
 	menuItem[total] = "XOR";
 	menuSubItem[total] = buf[total];
 	total++;
@@ -8993,32 +7715,32 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	ADJUST_CURSOR(menu->sel, total);
 
 	/* higlighted sub-item if edit mode */
-	if(editActive)
+	if(edit_active)
 		flagBuf[menu->sel] = 1;
 
 	/* draw it */
 	old_style_menu(menuItem, menuSubItem, flagBuf, menu->sel, 0);
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_NEXT(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_UP(menu->sel);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, horizontal_key_repeat_speed))
 	{
-		if(editActive)
+		if(edit_active)
 		{
 			// underconstruction...
 		}
@@ -9027,9 +7749,9 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 			switch(menu->sel)
 			{
 				case kMenu_Address:
-					entry->address = DoShift(entry->address, entry->address_shift);
+					entry->address = do_shift(entry->address, entry->address_shift);
 					entry->address -= increment;
-					entry->address = DoShift(entry->address, -entry->address_shift);
+					entry->address = do_shift(entry->address, -entry->address_shift);
 
 					if(entry->cpu < REGION_INVALID)
 						entry->address &= info->address_mask;
@@ -9057,7 +7779,7 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 					else
 						entry->element_bytes = 0;
 
-					entry->xor &= kSearchByteMaskTable[kWatchSizeConversionTable[entry->element_bytes]];
+					entry->xor &= BYTE_MASK_TABLE[kWatchSizeConversionTable[entry->element_bytes]];
 					break;
 
 				case kMenu_LabelType:
@@ -9115,13 +7837,13 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 
 				case kMenu_XOR:
 					entry->xor -= increment;
-					entry->xor &= kSearchByteMaskTable[kWatchSizeConversionTable[entry->element_bytes]];
+					entry->xor &= BYTE_MASK_TABLE[kWatchSizeConversionTable[entry->element_bytes]];
 			}
 		}
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, horizontal_key_repeat_speed))
 	{
-		if(editActive)
+		if(edit_active)
 		{
 			// underconstruction...
 		}
@@ -9130,9 +7852,9 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 			switch(menu->sel)
 			{
 				case kMenu_Address:
-					entry->address = DoShift(entry->address, entry->address_shift);
+					entry->address = do_shift(entry->address, entry->address_shift);
 					entry->address += increment;
-					entry->address = DoShift(entry->address, -entry->address_shift);
+					entry->address = do_shift(entry->address, -entry->address_shift);
 
 					if(entry->cpu < REGION_INVALID)
 						entry->address &= info->address_mask;
@@ -9157,7 +7879,7 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 					else
 						entry->element_bytes = kSearchSize_32Bit;
 
-					entry->xor &= kSearchByteMaskTable[kWatchSizeConversionTable[entry->element_bytes]];
+					entry->xor &= BYTE_MASK_TABLE[kWatchSizeConversionTable[entry->element_bytes]];
 					break;
 
 				case kMenu_LabelType:
@@ -9213,14 +7935,14 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 
 				case kMenu_XOR:
 					entry->xor += increment;
-					entry->xor &= kSearchByteMaskTable[kWatchSizeConversionTable[entry->element_bytes]];
+					entry->xor &= BYTE_MASK_TABLE[kWatchSizeConversionTable[entry->element_bytes]];
 			}
 		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
-		if(editActive)
-			editActive = 0;
+		if(edit_active)
+			edit_active = 0;
 		else
 		{
 			switch(menu->sel)
@@ -9236,7 +7958,7 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 				case kMenu_DataShift:
 				case kMenu_XOR:
 					osd_readkey_unicode(1);
-					editActive = 1;
+					edit_active = 1;
 					break;
 
 				case kMenu_Return:
@@ -9250,59 +7972,59 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
-		if(editActive)
-			editActive = 0;
+		if(edit_active)
+			edit_active = 0;
 		else
 			menu->sel = -1;
 	}
 
-	if(editActive)
+	if(edit_active)
 	{
 		switch(menu->sel)
 		{
 			case kMenu_Address:
-				entry->address = DoShift(entry->address, entry->address_shift);
+				entry->address = do_shift(entry->address, entry->address_shift);
 				entry->address = do_edit_hex_field(machine, entry->address);
-				entry->address = DoShift(entry->address, -entry->address_shift);
+				entry->address = do_shift(entry->address, -entry->address_shift);
 				entry->address &= info->address_mask;
 				break;
 
 			case kMenu_CPU:
-				entry->cpu = DoEditDecField(entry->cpu, 0, cpu_gettotalcpu() - 1);
+				entry->cpu = do_edit_dec_field(entry->cpu, 0, cpu_gettotalcpu() - 1);
 				entry->address &= info->address_mask;
 				break;
 
 			case kMenu_NumElements:
-				entry->num_elements = DoEditDecField(entry->num_elements, 0, 99);
+				entry->num_elements = do_edit_dec_field(entry->num_elements, 0, 99);
 				break;
 
 			case kMenu_TextLabel:
-				DoStaticEditTextField(entry->label, 255);
+				do_static_edit_text_field(entry->label, 255);
 				break;
 
 			case kMenu_XPosition:
-				entry->x = DoEditDecField(entry->x, -1000, 1000);
+				entry->x = do_edit_dec_field(entry->x, -1000, 1000);
 				break;
 
 			case kMenu_YPosition:
-				entry->y = DoEditDecField(entry->y, -1000, 1000);
+				entry->y = do_edit_dec_field(entry->y, -1000, 1000);
 				break;
 
 			case kMenu_AddValue:
-				entry->add_value = DoEditHexFieldSigned(entry->add_value, 0xFFFFFF80) & 0xFF;
+				entry->add_value = do_edit_hex_field_signed(entry->add_value, 0xFFFFFF80) & 0xFF;
 				break;
 
 			case kMenu_AddressShift:
-				entry->address_shift = DoEditDecField(entry->address_shift, -31, 31);
+				entry->address_shift = do_edit_dec_field(entry->address_shift, -31, 31);
 				break;
 
 			case kMenu_DataShift:
-				entry->data_shift = DoEditDecField(entry->data_shift, -31, 31);
+				entry->data_shift = do_edit_dec_field(entry->data_shift, -31, 31);
 				break;
 
 			case kMenu_XOR:
 				entry->xor = do_edit_hex_field(machine, entry->xor);
-				entry->xor &= kSearchByteMaskTable[kWatchSizeConversionTable[entry->element_bytes]];
+				entry->xor &= BYTE_MASK_TABLE[kWatchSizeConversionTable[entry->element_bytes]];
 				break;
 		}
 	}
@@ -9335,27 +8057,35 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 
 static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 {
+	#define ADD_OPTION_MENU_ITEMS(name, sub_name) \
+				do { menu_item[total] = name; menu_sub_item[total] = sub_name; total++; } while(0)
+
 	enum{
-		kMenu_SelectSearch = 0,
-		kMenu_Loadcheat_options,
-		kMenu_save_cheat_options,
-		kMenu_Resetcheat_options,
-		kMenu_Separator,
-		kMenu_SearchDialogStyle,
-		kMenu_ShowSearchLabels,
-		kMenu_AutoSaveCheats,
-		kMenu_ShowActivationKeyMessage,
-		kMenu_LoadOldFormat,
+		SELECT_OPTION_MENU_SELECT_SEARCH = 0,
+		SELECT_OPTION_MENU_LOAD_CHEAT_OPTIONS,
+		SELECT_OPTION_MENU_SAVE_CHEAT_OPTIONS,
+		SELECT_OPTION_MENU_RESET_CHEAT_OPTIONS,
+		SELECT_OPTION_MENU_SEPARATOR,
+		SELECT_OPTION_MENU_SEARCH_DIALOG_STYLE,
+		SELECT_OPTION_MENU_SHOW_SEARCH_LABELS,
+		SELECT_OPTION_MENU_AUTO_SAVE_CHEATS,
+		SELECT_OPTION_MENU_SHOW_ACTIVATION_KEY,
+		SELECT_OPTION_MENU_LOAD_OLD_FORMAT,
 #ifdef MESS
-		kMenu_SharedCode,
+		SELECT_OPTION_MENU_SHARED_CODE,
 #endif
-		kMenu_Return,
+		SELECT_OPTION_MENU_VERTICAL_KEY_SPEED,
+		SELECT_OPTION_MENU_HORIZONTAL_KEY_SPEED,
 
-		kMenu_Max };
+		SELECT_OPTION_MENU_RETURN,
 
-	UINT8			total		= 0;
-	const char		* menu_item[kMenu_Max + 1];
-	const char		* menu_sub_item[kMenu_Max + 1];
+		SELECT_OPTION_MENU_MAX };
+
+	INT8		total = 0;
+	INT8		request_arrow = 0;
+	INT8		do_select = 0;
+	const char	*menu_item[SELECT_OPTION_MENU_MAX + 1];
+	const char	*menu_sub_item[SELECT_OPTION_MENU_MAX + 1];
 
 	/* first setting : NONE */
 	if(menu->first_time)
@@ -9363,33 +8093,33 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 
 	/********** MENU CONSTRUCTION **********/
 	/* ##### SEARCH REGION ##### */
-	ADD_MENU_2_ITEMS("Select Search", NULL);
+	ADD_OPTION_MENU_ITEMS("Select Search", NULL);
 
 	/* ##### LOAD CHEAT OPTIONS ##### */
-	ADD_MENU_2_ITEMS("Load Cheat Options", NULL);
+	ADD_OPTION_MENU_ITEMS("Load Cheat Options", NULL);
 
 	/* ##### SAVE CHEAT OPTIONS ##### */
-	ADD_MENU_2_ITEMS("Save Cheat Options", NULL);
+	ADD_OPTION_MENU_ITEMS("Save Cheat Options", NULL);
 
 	/* ##### RESET CHEAT OPTIONS ##### */
-	ADD_MENU_2_ITEMS("Reset Cheat Options", NULL);
+	ADD_OPTION_MENU_ITEMS("Reset Cheat Options", NULL);
 
 	/* ##### SEPARATOR ##### */
-	ADD_MENU_2_ITEMS(MENU_SEPARATOR_ITEM, NULL);
+	ADD_OPTION_MENU_ITEMS(MENU_SEPARATOR_ITEM, NULL);
 
 	/* ##### SEARCH MENU ##### */
 	menu_item[total] = "Search Dialog Style";
 	switch(EXTRACT_FIELD(cheat_options, SearchBox))
 	{
-		case kSearchBox_Minimum:
+		case SEARCH_BOX_MINIMUM:
 			menu_sub_item[total++] = "Minimum";
 			break;
 
-		case kSearchBox_Standard:
+		case SEARCH_BOX_STANDARD:
 			menu_sub_item[total++] = "Standard";
 			break;
 
-		case kSearchBox_Advanced:
+		case SEARCH_BOX_ADVANCED:
 			menu_sub_item[total++] = "Advanced";
 			break;
 
@@ -9399,148 +8129,100 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 
 	/* ##### SEARCH LABEL ##### */
-	ADD_MENU_2_ITEMS("Show Search Labels", TEST_FIELD(cheat_options, DontPrintNewLabels) ? "Off" : "On");
+	/* NOTE : reversed display */
+	ADD_OPTION_MENU_ITEMS("Show Search Labels", TEST_FIELD(cheat_options, DontPrintNewLabels) ? "Off" : "On");
 
 	/* ##### AUTO SAVE ##### */
-	ADD_MENU_2_ITEMS("Auto Save Cheats", TEST_FIELD(cheat_options, AutoSaveEnabled) ? "On" : "Off");
+	ADD_OPTION_MENU_ITEMS("Auto Save Cheats", TEST_FIELD(cheat_options, AutoSaveEnabled) ? "On" : "Off");
 
 	/* ##### ACTIVATION KEY MESSAGE ##### */
-	ADD_MENU_2_ITEMS("Show Activation Key Message", TEST_FIELD(cheat_options, ActivationKeyMessage) ? "On" : "Off");
+	ADD_OPTION_MENU_ITEMS("Show Activation Key Message", TEST_FIELD(cheat_options, ActivationKeyMessage) ? "On" : "Off");
 
 	/* ##### OLD FORMAT LOADING ##### */
-	ADD_MENU_2_ITEMS("Load Old Format Code", TEST_FIELD(cheat_options, LoadOldFormat) ? "On" : "Off");
+	ADD_OPTION_MENU_ITEMS("Load Old Format Code", TEST_FIELD(cheat_options, LoadOldFormat) ? "On" : "Off");
+
+	/* ##### VERTICAL KEY REPEAT SPEED ##### */
+	ADD_OPTION_MENU_ITEMS("Vertical Key Repeat Speed", kNumbersTable[EXTRACT_FIELD(cheat_options, VerticalKeyRepeatSpeed)]);
+
+	/* ##### HORIZONTAL KEY REPEAT SPEED ##### */
+	ADD_OPTION_MENU_ITEMS("Horizontal Key Repeat Speed", kNumbersTable[EXTRACT_FIELD(cheat_options, HorizontalKeyRepeatSpeed)]);
 
 #ifdef MESS
 	/* ##### SHARED CODE ##### */
-	ADD_MENU_2_ITEMS("Shared Code", TEST_FIELD(cheat_options, SharedCode) ? "On" : "Off");
+	ADD_OPTION_MENU_ITEMS("Shared Code", TEST_FIELD(cheat_options, SharedCode) ? "On" : "Off");
 #endif
 
 	/* ##### RETURN ##### */
-	ADD_MENU_2_ITEMS("Return to Prior Menu", NULL);
+	ADD_OPTION_MENU_ITEMS("Return to Prior Menu", NULL);
 
-	/* ##### TERMINATE ALLAY ##### */
-	TERMINATE_MENU_2_ITEMS;
+	/* ##### TERMINATOR ##### */
+	menu_item[total] = menu_sub_item[total] = NULL;
+	#undef ADD_OPTION_MENU_ITEMS
+
+	/* set left/right arrow for sub item */
+	if(menu->sel > SELECT_OPTION_MENU_SEPARATOR && menu->sel < SELECT_OPTION_MENU_RETURN)
+		request_arrow = MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
 
 	/* draw it */
-	old_style_menu(menu_item, menu_sub_item, NULL, menu->sel, 0);
+	old_style_menu(menu_item, menu_sub_item, NULL, menu->sel, request_arrow);
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_PREVIOUS(menu->sel, total);
 
-		if(menu->sel == kMenu_Separator)
+		if(menu->sel == SELECT_OPTION_MENU_SEPARATOR)
 			menu->sel--;
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_NEXT(menu->sel, total);
 
-		if(menu->sel == kMenu_Separator)
+		if(menu->sel == SELECT_OPTION_MENU_SEPARATOR)
 			menu->sel++;
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_UP(menu->sel);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, horizontal_key_repeat_speed))
 	{
-		switch(menu->sel)
-		{
-			case kMenu_SearchDialogStyle:
-			{
-				UINT8 length = (EXTRACT_FIELD(cheat_options, SearchBox) - 1) & 3;
-
-				if(length > kSearchBox_Advanced)
-					length = kSearchBox_Advanced;
-
-				SET_FIELD(cheat_options, SearchBox, length);
-			}
-			break;
-
-			case kMenu_ShowSearchLabels:
-				TOGGLE_MASK_FIELD(cheat_options, DontPrintNewLabels);
-				break;
-
-			case kMenu_AutoSaveCheats:
-				TOGGLE_MASK_FIELD(cheat_options, AutoSaveEnabled);
-				break;
-
-			case kMenu_ShowActivationKeyMessage:
-				TOGGLE_MASK_FIELD(cheat_options, ActivationKeyMessage);
-				break;
-
-			case kMenu_LoadOldFormat:
-				TOGGLE_MASK_FIELD(cheat_options, LoadOldFormat);
-				break;
-#ifdef MESS
-			case kMenu_SharedCode:
-				TOGGLE_MASK_FIELD(cheat_options, SharedCode);
-#endif
-		}
+		do_select = -1;
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, horizontal_key_repeat_speed))
 	{
-		switch(menu->sel)
-		{
-			case kMenu_SearchDialogStyle:
-			{
-				UINT8 length = (EXTRACT_FIELD(cheat_options, SearchBox) + 1) & 3;
-
-				if(length > kSearchBox_Advanced)
-					length = kSearchBox_Minimum;
-
-				SET_FIELD(cheat_options, SearchBox, length);
-			}
-			break;
-
-			case kMenu_ShowSearchLabels:
-				TOGGLE_MASK_FIELD(cheat_options, DontPrintNewLabels);
-				break;
-
-			case kMenu_AutoSaveCheats:
-				TOGGLE_MASK_FIELD(cheat_options, AutoSaveEnabled);
-				break;
-
-			case kMenu_ShowActivationKeyMessage:
-				TOGGLE_MASK_FIELD(cheat_options, ActivationKeyMessage);
-				break;
-
-			case kMenu_LoadOldFormat:
-				TOGGLE_MASK_FIELD(cheat_options, LoadOldFormat);
-
-#ifdef MESS
-			case kMenu_SharedCode:
-				TOGGLE_MASK_FIELD(cheat_options, SharedCode);
-#endif
-		}
+		do_select = 1;
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		switch(menu->sel)
 		{
-			case kMenu_SelectSearch:
+			case SELECT_OPTION_MENU_SELECT_SEARCH:
 				cheat_menu_stack_push(select_search_menu, menu->handler, menu->sel);
 				break;
 
-			case kMenu_Loadcheat_options:
+			case SELECT_OPTION_MENU_LOAD_CHEAT_OPTIONS:
 				load_cheat_database(machine, LOAD_CHEAT_OPTION);
 				break;
 
-			case kMenu_save_cheat_options:
+			case SELECT_OPTION_MENU_SAVE_CHEAT_OPTIONS:
 				save_cheat_options();
 				break;
 
-			case kMenu_Resetcheat_options:
-				cheat_options = DEFAULT_CHEAT_OPTIONS;
+			case SELECT_OPTION_MENU_RESET_CHEAT_OPTIONS:
+				reset_cheat_options();
 				break;
 
-			case kMenu_Return:
+			case SELECT_OPTION_MENU_RETURN:
 				menu->sel = -1;
+
+			default:
+				do_select = 1;
+				break;
 		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
@@ -9549,11 +8231,71 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 	else if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
 	{
-		load_cheat_database(machine, LOAD_CHEAT_OPTION);
+		if(shift_key_pressed())
+			reset_cheat_options();
+		else
+			load_cheat_database(machine, LOAD_CHEAT_OPTION);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
 		menu->sel = -1;
+	}
+
+	if(do_select)
+	{
+		switch(menu->sel)
+		{
+			case SELECT_OPTION_MENU_SEARCH_DIALOG_STYLE:
+			{
+				INT8 search_box = EXTRACT_FIELD(cheat_options, SearchBox) + do_select;
+
+				if(search_box < 0)						search_box = SEARCH_BOX_ADVANCED;
+				if(search_box > SEARCH_BOX_ADVANCED)	search_box = 0;
+
+				SET_FIELD(cheat_options, SearchBox, search_box);
+				init_search_box(get_current_search(), EXTRACT_FIELD(cheat_options, SearchBox));
+			}
+			break;
+
+			case SELECT_OPTION_MENU_SHOW_SEARCH_LABELS:
+				TOGGLE_MASK_FIELD(cheat_options, DontPrintNewLabels);
+				break;
+
+			case SELECT_OPTION_MENU_AUTO_SAVE_CHEATS:
+				TOGGLE_MASK_FIELD(cheat_options, AutoSaveEnabled);
+				break;
+
+			case SELECT_OPTION_MENU_SHOW_ACTIVATION_KEY:
+				TOGGLE_MASK_FIELD(cheat_options, ActivationKeyMessage);
+				break;
+
+			case SELECT_OPTION_MENU_LOAD_OLD_FORMAT:
+				TOGGLE_MASK_FIELD(cheat_options, LoadOldFormat);
+				break;
+
+			case SELECT_OPTION_MENU_VERTICAL_KEY_SPEED:
+				{
+					INT8 vertical_speed = (EXTRACT_FIELD(cheat_options, VerticalKeyRepeatSpeed) + do_select) & 0xF;
+
+					SET_FIELD(cheat_options, VerticalKeyRepeatSpeed, vertical_speed);
+					vertical_key_repeat_speed = vertical_speed;
+				}
+				break;
+
+			case SELECT_OPTION_MENU_HORIZONTAL_KEY_SPEED:
+				{
+					INT8 horizontal_speed = (EXTRACT_FIELD(cheat_options, HorizontalKeyRepeatSpeed) + do_select) & 0xF;
+
+					SET_FIELD(cheat_options, HorizontalKeyRepeatSpeed, horizontal_speed);
+					horizontal_key_repeat_speed = horizontal_speed;
+				}
+				break;
+#ifdef MESS
+			case SELECT_OPTION_MENU_SHARED_CODE:
+				TOGGLE_MASK_FIELD(cheat_options, SharedCode);
+				break;
+#endif
+		}
 	}
 
 	return menu->sel + 1;
@@ -9565,19 +8307,16 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 
 static int select_search_menu(running_machine *machine, cheat_menu_stack *menu)
 {
-#if 0
-	INT32			sel;
-	const char		** menuItem;
-	char			** buf;
-	INT32			i;
-	INT32			total = 0;
+	int			i;
+	int			total = 0;
+	const char	**menu_item;
+	char		**buf;
 
-	sel = selection - 1;
-
+	/* required items = (total items + return + terminator) + (strings buf * total items) + 300 characters */
 	request_strings(search_list_length + 2, search_list_length, 300, 0);
 
-	menuItem =	menu_strings.main_list;
-	buf =		menu_strings.main_strings;
+	menu_item	= menu_strings.main_list;
+	buf			= menu_strings.main_strings;
 
 	/********** MENU CONSTRUCTION **********/
 	for(i = 0; i < search_list_length; i++)
@@ -9586,101 +8325,69 @@ static int select_search_menu(running_machine *machine, cheat_menu_stack *menu)
 
 		if(i == current_search_idx)
 		{
-			if(info->name)
-				sprintf(buf[total], "[#%d: %s]", i, info->name);
-			else
-				sprintf(buf[total], "[#%d]", i);
+			if(info->name)		sprintf(buf[total], "[ #%d: %s ]", i, info->name);
+			else				sprintf(buf[total], "[ #%d ]", i);
 		}
 		else
 		{
-			if(info->name)
-				sprintf(buf[total], "#%d: %s", i, info->name);
-			else
-				sprintf(buf[total], "#%d", i);
+			if(info->name)		sprintf(buf[total], "#%d: %s", i, info->name);
+			else				sprintf(buf[total], "#%d", i);
 		}
 
-		menuItem[total] = buf[total];
+		menu_item[total] = buf[total];
 		total++;
 	}
 
-	menuItem[total++] = "Return to Prior Menu";		// return
+	/* ##### RETURN ##### */
+	menu_item[total++] = "Return to Prior Menu";
 
-	menuItem[total] = NULL;									// terminate array
+	/* ##### TERMINATOR ##### */
+	menu_item[total] = NULL;
 
 	/* adjust current cursor position */
-	if(sel < 0)
-		sel = 0;
-	if(sel > (total - 1))
-		sel = total - 1;
+	ADJUST_CURSOR(menu->sel, total);
 
 	/* draw it */
-	old_style_menu(menuItem, NULL, NULL, sel, 0);
+	old_style_menu(menu_item, NULL, NULL, menu->sel, 0);
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
-		sel++;
-
-		if(sel >= total)
-			sel = 0;
+		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
-
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
-		sel--;
-
-		if(sel < 0)
-			sel = total - 1;
+		CURSOR_TO_NEXT(menu->sel, total);
 	}
-
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
-		sel -= fullMenuPageHeight;
-
-		if(sel < 0)
-			sel = 0;
+		CURSOR_PAGE_UP(menu->sel);
 	}
-
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
-		sel += fullMenuPageHeight;
-
-		if(sel >= total)
-			sel = total - 1;
+		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-
-	if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
+	else if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
 	{
-		AddSearchBefore(sel);
-
-		BuildSearchRegions(machine, &searchList[sel]);
-		AllocateSearchRegions(&searchList[sel]);
+		add_search_before(menu->sel);
+		build_search_regions(machine, &search_list[menu->sel]);
+		allocate_search_regions(&search_list[menu->sel]);
 	}
-
-	if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
+	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
-		if(search_list_length > 1)
-			DeleteSearchAt(sel);
+		delete_search_at(menu->sel);
 	}
-
-	if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))
-	{
-		if(sel < total - 1)
-			current_search_idx = sel;
-	}
-
 	if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
-		if(sel >= total - 1)
-			sel = -1;
-		else
-			current_search_idx = sel;
+		if(menu->sel < total - 1)	current_search_idx = menu->sel;
+		else						menu->sel = -1;
+	}
+	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	{
+		menu->sel = -1;
 	}
 
-	if(input_ui_pressed(machine, IPT_UI_CANCEL))
-		sel = -1;
-#endif
-	return menu->sel;
+	return menu->sel + 1;
 }
 
 /*-----------------------------------------------------------------
@@ -9714,10 +8421,10 @@ static int command_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	/********** MENU CONSTRUCION **********/
 	menu_item[total++].text = "Reload Cheat Codes";
 	menu_item[total++].text = MENU_SEPARATOR_ITEM;
-	if(cheats_disabled)	menu_item[total++].text = "Cheat OFF";
-	else				menu_item[total++].text = "Cheat ON";
-	if(watches_disabled)	menu_item[total++].text = "Watchpoints OFF";
-	else					menu_item[total++].text = "Watchpoints ON";
+	menu_item[total].text = "Cheat";
+	menu_item[total++].subtext = cheats_disabled ? "Off" : "On";
+	menu_item[total].text = "Watchpoints";
+	menu_item[total++].subtext = watches_disabled ? "Off" : "On";
 	menu_item[total++].text = MENU_SEPARATOR_ITEM;
 	menu_item[total++].text = "Save Description";
 	menu_item[total++].text = "Save Raw Code";
@@ -9732,33 +8439,33 @@ static int command_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	ui_menu_draw(menu_item, total, menu->sel, NULL);
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_PREVIOUS(menu->sel, total);
 
 		if(menu->sel == MENU_SEPARATOR_1 || menu->sel == MENU_SEPARATOR_2 || menu->sel == MENU_SEPARATOR_3)
 			menu->sel--;
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_NEXT(menu->sel, total);
 
 		if(menu->sel == MENU_SEPARATOR_1 || menu->sel == MENU_SEPARATOR_2 || menu->sel == MENU_SEPARATOR_3)
 			menu->sel++;
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_UP(menu->sel);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, horizontal_key_repeat_speed))
 	{
 		toggle = 1;
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, horizontal_key_repeat_speed))
 	{
 		toggle = 1;
 	}
@@ -9841,7 +8548,7 @@ static int check_activation_key_code_menu(running_machine *machine, cheat_menu_s
 	ui_draw_message_window(stringsBuf);
 
 	/* NOTE : shift + cancel is only key to return because normal cancel prevents from diplaying this key */
-	if(ShiftKeyPressed() && input_ui_pressed(machine, IPT_UI_CANCEL))
+	if(shift_key_pressed() && input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
 		index = INPUT_CODE_INVALID;
 		menu->sel = -1;
@@ -9881,7 +8588,7 @@ static int view_cpu_region_info_list_menu(running_machine *machine, cheat_menu_s
 	char		* addressShiftBuf;
 	cpu_region_info *info;
 
-	/* required items = total items + (strings buf * 6 [max chars : 32]) */
+	/* required items = total items + (strings buf * 6) + 32 characters */
 	request_strings(kMenu_Max, kMenu_Max - 2, 32, 0);
 	menuItem 		= menu_strings.main_list;
 	menuSubItem		= menu_strings.sub_list;
@@ -9955,23 +8662,23 @@ static int view_cpu_region_info_list_menu(running_machine *machine, cheat_menu_s
 	ADJUST_CURSOR(menu->sel, total);
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_PREVIOUS(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_NEXT(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_UP(menu->sel);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, horizontal_key_repeat_speed))
 	{
 		int i = index + 1;
 
@@ -9993,7 +8700,7 @@ static int view_cpu_region_info_list_menu(running_machine *machine, cheat_menu_s
 				i++;
 		}
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, horizontal_key_repeat_speed))
 	{
 		int i = index - 1;
 
@@ -10034,127 +8741,117 @@ static int view_cpu_region_info_list_menu(running_machine *machine, cheat_menu_s
 
 static int debug_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 {
-	enum{
-		kMenu_DriverName = 0,
-		kMenu_GameName,
-#ifdef MESS
-		kMenu_CRC,
-#endif
-		kMenu_FullMenuPageHeight,
-		kMenu_cheat_list_length,
-		kMenu_Separator,
-		kMenu_CPURegionInfo,
-		kMenu_KeyCodeChecker,
-		kMenu_Return,
-		kMenu_Max };
+	#define ADD_DEBUG_MENU_ITEMS(name, sub_name) \
+				do { menu_item[total] = name; menu_sub_item[total] = sub_name; total++; } while(0)
 
-	UINT8		total		= 0;
-	const char	** menuItem;
-	const char	** menuSubItem;
-	char		* driverNameBuf;
+	enum{
+		DEBUG_MENU_SOURCE = 0,
+		DEBUG_MENU_GAME_NAME,
 #ifdef MESS
-	char		* crcBuf;
+		DEBUG_MENU_CRC,
 #endif
-	char		* heightBuf;
-	char		* numCodeBuf;
+		DEBUG_MENU_DEFAULT_HEIGHT,
+		DEBUG_MENU_TOTAL_CODES,
+		DEBUG_MENU_SEPARATOR,
+		DEBUG_MENU_VIEW_CPU_REGION_INFO,
+		DEBUG_MENU_CHECK_KEY,
+		DEBUG_MENU_RETURN,
+
+		DEBUG_MENU_MAX };
+
+	int			total = 0;
+	const char	**menu_item;
+	const char	**menu_sub_item;
+	char		*buf_source;
+#ifdef MESS
+	char		*buf_crc;
+#endif
+	char		*buf_height;
+	char		*buf_num_codes;
+	astring		*source_name = astring_alloc();
 
 	/* first setting : NONE */
 	if(menu->first_time)
 		menu->first_time = 0;
 
-	/* required items = (total items + return + terminator) & (strings buf * 3 [MAME]/4 [MESS]) */
-	request_strings(kMenu_Max + 2, kMenu_Max, 64, 0);
-	menuItem = menu_strings.main_list;
-	menuSubItem = menu_strings.sub_list;
-	driverNameBuf = menu_strings.main_strings[0];
-	heightBuf = menu_strings.main_strings[1];
-	numCodeBuf = menu_strings.main_strings[2];
+	/* required items = (total items + return + terminator) + (strings buf * total items) + 64 characters */
+	request_strings(DEBUG_MENU_MAX + 2, DEBUG_MENU_MAX, 64, 0);
+	menu_item		= menu_strings.main_list;
+	menu_sub_item	= menu_strings.sub_list;
+	buf_source		= menu_strings.main_strings[0];
+	buf_height		= menu_strings.main_strings[1];
+	buf_num_codes	= menu_strings.main_strings[2];
 #ifdef MESS
-	crcBuf = menu_strings.main_strings[3];
+	buf_crc			= menu_strings.main_strings[3];
 #endif
 
 	/********** MENU CONSTRUCTION **********/
-	/* ##### DRIVER NAME ##### */
-	menuItem[total] = "Driver";
-	{
-		astring * driverName = astring_alloc();
+	/* ##### SOURCE ##### */
+	sprintf(buf_source, "%s", astring_c(core_filename_extract_base(source_name, machine->gamedrv->source_file, TRUE)));
+	ADD_DEBUG_MENU_ITEMS("Source", buf_source);
 
-		sprintf(driverNameBuf, "%s", astring_c(core_filename_extract_base(driverName, machine->gamedrv->source_file, TRUE)));
-		menuSubItem[total++] = driverNameBuf;
-		astring_free(driverName);
-	}
-
-	/* ##### GAME / MACHINE NAME ##### */
+	/* ##### MACHINE ##### */
 #ifdef MESS
-	menuItem[total]			= "Machine";
+	ADD_DEBUG_MENU_ITEMS("machine", machine->gamedrv->name);
+
+	/* ##### CRC ##### */
+	sprintf(buf_crc, "%.8X", thisGameCRC);
+	ADD_DEBUG_MENU_ITEMS("CRC", buf_crc);
 #else
-	menuItem[total] 		= "Game";
-#endif
-	menuSubItem[total++]	= machine->gamedrv->name;
-
-#ifdef MESS
-	/* ##### CRC (MESS ONLY) ##### */
-	menuItem[total] = "CRC";
-	sprintf(crcBuf, "%X", thisGameCRC);
-	menuSubItem[total++] = crcBuf;
+	/* ##### GAME ##### */
+	ADD_DEBUG_MENU_ITEMS("Game", machine->gamedrv->name);
 #endif
 
-	/* ##### FULL PAGE MENU HEIGHT ##### */
-	menuItem[total] = "Default Menu Height";
-	sprintf(heightBuf, "%d", fullMenuPageHeight);
-	menuSubItem[total++] = heightBuf;
+	/* ##### DEFAULT MENU HEIGHT ##### */
+	sprintf(buf_height, "%d", full_menu_page_height);
+	ADD_DEBUG_MENU_ITEMS("Default Menu Height", buf_height);
 
 	/* ##### CHEAT LIST LENGTH ##### */
-	menuItem[total] = "Total Code Entries";
-	sprintf(numCodeBuf, "%d", cheat_list_length);
-	menuSubItem[total++] = numCodeBuf;
+	sprintf(buf_num_codes, "%d", cheat_list_length);
+	ADD_DEBUG_MENU_ITEMS("Total Entry Codes", buf_num_codes);
 
 	/* ##### SEPARATOR ##### */
-	menuItem[total] = MENU_SEPARATOR_ITEM;
-	menuSubItem[total++] = NULL;
+	ADD_DEBUG_MENU_ITEMS(MENU_SEPARATOR_ITEM, NULL);
 
 	/* ##### CPU/REGION INFO ##### */
-	menuItem[total] = "View CPU/Region Info";
-	menuSubItem[total++] = NULL;
+	ADD_DEBUG_MENU_ITEMS("View CPU/Region Info", NULL);
 
 	/* ##### ACTIVATION KEY CODE CHEAKCER ##### */
-	menuItem[total] = "Check Activation Key Code";
-	menuSubItem[total++] = NULL;
+	ADD_DEBUG_MENU_ITEMS("Check Activation Key Index", NULL);
 
 	/* ##### RETURN ##### */
-	menuItem[total] = "Return to Prior Menu";
-	menuSubItem[total++] = NULL;
+	ADD_DEBUG_MENU_ITEMS("Return to Prior Menu", NULL);
 
 	/* ##### TERMINATE ARRAY ##### */
-	menuItem[total] = NULL;
-	menuSubItem[total] = NULL;
+	menu_item[total] = menu_sub_item[total] = NULL;
+	#undef ADD_DEBUG_MENU_ITEMS
 
 	/* adjust cursor position */
 	ADJUST_CURSOR(menu->sel, total);
 
 	/* draw it */
-	old_style_menu(menuItem, menuSubItem, NULL, menu->sel, 0);
+	old_style_menu(menu_item, menu_sub_item, NULL, menu->sel, 0);
 
 	/********** KEY HANDLING **********/
-	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_PREVIOUS(menu->sel, total);
 
-		if(menu->sel == kMenu_Separator)
+		if(menu->sel == DEBUG_MENU_SEPARATOR)
 			menu->sel--;
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_NEXT(menu->sel, total);
 
-		if(menu->sel == kMenu_Separator)
+		if(menu->sel == DEBUG_MENU_SEPARATOR)
 			menu->sel++;
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_UP(menu->sel);
 	}
-	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
@@ -10162,21 +8859,25 @@ static int debug_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	{
 		switch(menu->sel)
 		{
-			case kMenu_CPURegionInfo:
+			case DEBUG_MENU_VIEW_CPU_REGION_INFO:
 				cheat_menu_stack_push(view_cpu_region_info_list_menu, menu->handler, menu->sel);
 				break;
 
-			case kMenu_KeyCodeChecker:
+			case DEBUG_MENU_CHECK_KEY:
 				cheat_menu_stack_push(check_activation_key_code_menu, menu->handler, menu->sel);
 				break;
 
-			case kMenu_Return:
+			case DEBUG_MENU_RETURN:
 				menu->sel = -1;
 				break;
 		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	{
 		menu->sel = -1;
+	}
+
+	astring_free(source_name);
 
 	return menu->sel + 1;
 }
@@ -10191,7 +8892,7 @@ static TIMER_CALLBACK( cheat_periodic )
 
 	if(input_ui_pressed(machine, IPT_UI_TOGGLE_CHEAT))
 	{
-		if(ShiftKeyPressed())
+		if(shift_key_pressed())
 		{
 			/* ##### WATCHPOINT ##### */
 			watches_disabled ^= 1;
@@ -10217,20 +8918,17 @@ static TIMER_CALLBACK( cheat_periodic )
 		return;
 
 	for(i = 0; i < cheat_list_length; i++)
-		cheat_periodicEntry(machine, &cheat_list[i]);
-
-	if(EXTRACT_FIELD(cheat_options, SearchBox) == kSearchBox_Minimum)
-		SET_FIELD(cheat_options, SearchBox, kSearchBox_Standard);
+		cheat_periodic_entry(machine, &cheat_list[i]);
 }
 
-/*--------------
-  PrintBinary
---------------*/
+/*---------------
+  print_binary
+---------------*/
 
-static UINT32 PrintBinary(char * buf, UINT32 data, UINT32 mask)
+static UINT32 print_binary(char *buf, UINT32 data, UINT32 mask)
 {
-	UINT32	traverse = 0x80000000;
-	UINT32	written = 0;
+	UINT32	traverse	= 0x80000000;
+	UINT32	written		= 0;
 
 	while(traverse)
 	{
@@ -10248,11 +8946,11 @@ static UINT32 PrintBinary(char * buf, UINT32 data, UINT32 mask)
 	return written;
 }
 
-/*-------------
-  PrintASCII
--------------*/
+/*--------------
+  print_ascii
+--------------*/
 
-static UINT32 PrintASCII(char * buf, UINT32 data, UINT8 size)
+static UINT32 print_ascii(char *buf, UINT32 data, UINT8 size)
 {
 	switch(size)
 	{
@@ -10304,15 +9002,15 @@ void cheat_display_watches(running_machine *machine)
 	for(i = 0; i < watch_list_length; i++)
 	{
 		watch_info *info = &watch_list[i];
-
 		int			j;
-		int			numChars;
-		int			xOffset			= 0;
-		int			yOffset			= 0;
-		int			lineElements	= 0;
+		int			num_chars;
+		int			x_offset		= 0;
+		int			y_offset		= 0;
+		int			line_elements	= 0;
+		UINT8		*buf			= NULL;
 		UINT32		address			= info->address;
-
-		char		buf[1024];
+		UINT32		data			= 0;
+		char		display_buf[1024] = { 0 };
 
 		if(info->num_elements)
 		{
@@ -10320,107 +9018,92 @@ void cheat_display_watches(running_machine *machine)
 			switch(info->label_type)
 			{
 				case kWatchLabel_Address:
-					numChars = sprintf(buf, "%.8X: ", info->address);
+					num_chars = sprintf(display_buf, "%.8X: ", info->address);
 
-					ui_draw_text(buf, xOffset * ui_get_char_width('0') + info->x, yOffset * ui_get_line_height() + info->y);
-					xOffset += numChars;
+					ui_draw_text(display_buf, x_offset * ui_get_char_width('0') + info->x, y_offset * ui_get_line_height() + info->y);
+					x_offset += num_chars;
 					break;
 
 				case kWatchLabel_String:
-					numChars = sprintf(buf, "%s: ", info->label);
+					num_chars = sprintf(display_buf, "%s: ", info->label);
 
-					ui_draw_text(buf, xOffset * ui_get_char_width('0') + info->x, yOffset * ui_get_line_height() + info->y);
-					xOffset += numChars;
+					ui_draw_text(display_buf, x_offset * ui_get_char_width('0') + info->x, y_offset * ui_get_line_height() + info->y);
+					x_offset += num_chars;
 					break;
 			}
 
 			/* ##### VALUE ##### */
 			for(j = 0; j < info->num_elements; j++)
 			{
-				UINT32 data = 0;
-
 				if(info->cpu < REGION_INVALID)
 				{
+					/* NOTE : do_cpu_read() conflicts with a watchpoint for debugger */
 					UINT8 cpu = EXTRACT_FIELD(info->cpu, CPUIndex);
 
-					switch(EXTRACT_FIELD(info->cpu, AddressSpace))
-					{
-						case kAddressSpace_Program:
-							data = (do_cpu_read(cpu, address, kSearchByteIncrementTable[info->element_bytes], cpu_needs_swap(cpu)) + info->add_value) & kSearchByteMaskTable[info->element_bytes];
-							break;
-
-						case kAddressSpace_DataSpace:
-						case kAddressSpace_IOSpace:
-						case kAddressSpace_OpcodeRAM:
-						{
-							UINT8 *buf = (UINT8 *)get_memory_region_base_pointer(cpu, EXTRACT_FIELD(info->cpu, AddressSpace), address);
-
-							if(buf)
-								data =	do_memory_read(buf, address, kSearchByteIncrementTable[info->element_bytes], cpu_needs_swap(cpu) + info->add_value, get_cpu_info(cpu)) &
-										kSearchByteMaskTable[info->element_bytes];
-						}
-						break;
-
-						default:
-							return;
-					}
+					buf = (UINT8 *)get_memory_region_base_pointer(cpu, EXTRACT_FIELD(info->cpu, AddressSpace), address);
+					if(buf)
+						data = do_memory_read(buf, address, BYTE_INCREMENT_TABLE[info->element_bytes], cpu_needs_swap(cpu) + info->add_value, get_cpu_info(cpu));
 				}
 				else
 				{
-					UINT8 * buf = memory_region(machine, info->cpu);
-
+					buf = memory_region(machine, info->cpu);
 					if(buf)
-						data =	do_memory_read(buf, address, kSearchByteIncrementTable[info->element_bytes],
-								region_needs_swap(info->cpu) + info->add_value,
-								get_region_info(info->cpu)) & kSearchByteMaskTable[info->element_bytes];
+						data = do_memory_read(buf, address, BYTE_INCREMENT_TABLE[info->element_bytes], region_needs_swap(info->cpu) + info->add_value, get_region_info(info->cpu));
 				}
 
-				data = DoShift(data, info->data_shift);
+				if(buf == NULL)
+				{
+					ui_popup_time(1, "watchpoints (%d) memory read error", i);
+					return;
+				}
+
+				data &= BYTE_MASK_TABLE[info->element_bytes];
+				data = do_shift(data, info->data_shift);
 				data ^= info->xor;
 
-				if(	(lineElements >= info->elements_per_line) && info->elements_per_line)
+				if(line_elements >= info->elements_per_line && info->elements_per_line)
 				{
-					lineElements = 0;
-					xOffset = 0;
-					yOffset++;
+					line_elements = 0;
+					x_offset = 0;
+					y_offset++;
 				}
 
 				switch(info->display_type)
 				{
 					case kWatchDisplayType_Hex:
-						numChars = sprintf(buf, "%.*X", kSearchByteDigitsTable[info->element_bytes], data);
+						num_chars = sprintf(display_buf, "%.*X", BYTE_DIGITS_TABLE[info->element_bytes], data);
 
-						ui_draw_text(buf, xOffset * ui_get_char_width('0') + info->x, yOffset * ui_get_line_height() + info->y);
-						xOffset += numChars;
-						xOffset++;
+						ui_draw_text(display_buf, x_offset * ui_get_char_width('0') + info->x, y_offset * ui_get_line_height() + info->y);
+						x_offset += num_chars;
+						x_offset++;
 						break;
 
 					case kWatchDisplayType_Decimal:
-						numChars = sprintf(buf, "%.*d", kSearchByteDecDigitsTable[info->element_bytes], data);
+						num_chars = sprintf(display_buf, "%.*d", BYTE_DEC_DIGITS_TABLE[info->element_bytes], data);
 
-						ui_draw_text(buf, xOffset * ui_get_char_width('0') + info->x, yOffset * ui_get_line_height() + info->y);
-						xOffset += numChars;
-						xOffset++;
+						ui_draw_text(display_buf, x_offset * ui_get_char_width('0') + info->x, y_offset * ui_get_line_height() + info->y);
+						x_offset += num_chars;
+						x_offset++;
 						break;
 
 					case kWatchDisplayType_Binary:
-						numChars = PrintBinary(buf, data, kSearchByteMaskTable[info->element_bytes]);
+						num_chars = print_binary(display_buf, data, BYTE_MASK_TABLE[info->element_bytes]);
 
-						ui_draw_text(buf, xOffset * ui_get_char_width('0') + info->x, yOffset * ui_get_line_height() + info->y);
-						xOffset += numChars;
-						xOffset++;
+						ui_draw_text(display_buf, x_offset * ui_get_char_width('0') + info->x, y_offset * ui_get_line_height() + info->y);
+						x_offset += num_chars;
+						x_offset++;
 						break;
 
 					case kWatchDisplayType_ASCII:
-						numChars = PrintASCII(buf, data, info->element_bytes);
+						num_chars = print_ascii(display_buf, data, info->element_bytes);
 
-						ui_draw_text(buf, xOffset * ui_get_char_width('0') + info->x, yOffset * ui_get_line_height() + info->y);
-						xOffset += numChars;
+						ui_draw_text(display_buf, x_offset * ui_get_char_width('0') + info->x, y_offset * ui_get_line_height() + info->y);
+						x_offset += num_chars;
 						break;
 				}
 
-				address += kSearchByteIncrementTable[info->element_bytes] + info->skip;
-				lineElements++;
+				address += BYTE_INCREMENT_TABLE[info->element_bytes] + info->skip;
+				line_elements++;
 			}
 		}
 	}
@@ -10494,14 +9177,16 @@ static void add_cheat_before(UINT32 idx)
 	/* initialize inserted entry */
 	memset(&cheat_list[idx], 0, sizeof(cheat_entry));
 
-	/* set dirty flag (meaningelss?) */
+	/* set entry flags */
 	cheat_list[idx].flags |= kCheatFlag_Dirty;
 
 	/* insert new cheat action together */
 	resize_cheat_action_list(&cheat_list[idx], 1, REQUEST_DISPOSE);
 
+	/* set action parameters/flags */
 	cheat_list[idx].action_list[0].extend_data = ~0;
 	cheat_list[idx].action_list[0].last_value = NULL;
+	cheat_list[idx].action_list[0].flags |= kActionFlag_MemoryWrite;
 
 	SET_MESSAGE(CHEAT_MESSAGE_SUCCEEDED_TO_ADD);
 }
@@ -10612,50 +9297,49 @@ static void resize_cheat_action_list(cheat_entry *entry, UINT32 new_length, UINT
 	}
 }
 
-#if 0
-/*----------------------------------------------------------------
-  AddActionBefore - Insert empty Action
-                    This function is only called in EditCheat()
-----------------------------------------------------------------*/
+/*---------------------------------------------
+  add_action_before - insert new cheat action
+---------------------------------------------*/
 
-static void AddActionBefore(CheatEntry * entry, UINT32 idx)
+static void add_action_before(cheat_entry *entry, UINT32 idx)
 {
-	ResizeCheatActionList(entry, entry->actionListLength + 1);
+	resize_cheat_action_list(entry, entry->action_list_length + 1, REQUEST_DISPOSE);
 
-	if(idx < (entry->actionListLength - 1))
-		memmove(&entry->actionList[idx + 1], &entry->actionList[idx], sizeof(CheatAction) * (entry->actionListLength - 1 - idx));
+	if(idx < (entry->action_list_length - 1))
+		memmove(&entry->action_list[idx + 1], &entry->action_list[idx], sizeof(cheat_action) * (entry->action_list_length - 1 - idx));
 
-	if(idx >= entry->actionListLength)
-		idx = entry->actionListLength - 1;
+	if(idx >= entry->action_list_length)
+		idx = entry->action_list_length - 1;
 
-	memset(&entry->actionList[idx], 0, sizeof(CheatAction));
+	memset(&entry->action_list[idx], 0, sizeof(cheat_action));
 
-	cheat_list[idx].actionList[0].extendData = ~0;
-	cheat_list[idx].actionList[0].lastValue = NULL;
+	cheat_list[idx].action_list[0].extend_data = ~0;
+	cheat_list[idx].action_list[0].last_value = NULL;
+	cheat_list[idx].action_list[0].flags |= kActionFlag_OldFormat;
 }
 
-/*-----------------
-  DeleteActionAt
------------------*/
+/*--------------------------------------------------
+  delete_action_at - delete selected cheat action
+--------------------------------------------------*/
 
-static void DeleteActionAt(CheatEntry * entry, UINT32 idx)
+static void delete_action_at(cheat_entry *entry, UINT32 idx)
 {
-	if(idx >= entry->actionListLength)
+	if(idx == 0 || idx >= entry->action_list_length)
 	{
+		/* NOTE : don't delete 1st cheat action due to crash */
 		SET_MESSAGE(CHEAT_MESSAGE_FAILED_TO_DELETE);
 		return;
 	}
 
-	DisposeAction(&entry->actionList[idx]);
+	dispose_action(&entry->action_list[idx]);
 
-	if(idx < (entry->actionListLength - 1))
-		memmove(&entry->actionList[idx], &entry->actionList[idx + 1], sizeof(CheatAction) * (entry->actionListLength - 1 - idx));
+	if(idx < (entry->action_list_length - 1))
+		memmove(&entry->action_list[idx], &entry->action_list[idx + 1], sizeof(cheat_action) * (entry->action_list_length - 1 - idx));
 
-	ResizeCheatActionListNoDispose(entry, entry->actionListLength - 1);
+	resize_cheat_action_list(entry, entry->action_list_length - 1, NO_DISPOSE);
 
 	SET_MESSAGE(CHEAT_MESSAGE_SUCCEEDED_TO_DELETE);
 }
-#endif
 /*----------------------------------------------
   dispose_action - free selected cheat action
 ----------------------------------------------*/
@@ -10665,9 +9349,7 @@ static void dispose_action(cheat_action *action)
 	if(action != NULL)
 	{
 		free(action->optional_name);
-
-		if(action->last_value)
-			free(action->last_value);
+		free(action->last_value);
 
 		memset(action, 0, sizeof(cheat_action));
 	}
@@ -10679,6 +9361,7 @@ static void dispose_action(cheat_action *action)
 
 static void init_watch(watch_info *info, UINT32 idx)
 {
+
 	/* NOTE : 1st watchpoint should be always Y = 0 */
 	if(idx > 0)
 		info->y = watch_list[idx - 1].y + ui_get_line_height();
@@ -10845,7 +9528,7 @@ static void add_cheat_from_watch(running_machine *machine, watch_info *watch)
 		SET_FIELD(action->type, AddressSize, watch->element_bytes);
 
 		/* set name */
-		temp_string_length = sprintf(temp_string, "%.8X (%d) = %.*X", watch->address, watch->cpu, kSearchByteDigitsTable[watch->element_bytes], action->data);
+		temp_string_length = sprintf(temp_string, "%.8X (%d) = %.*X", watch->address, watch->cpu, BYTE_DIGITS_TABLE[watch->element_bytes], action->data);
 		entry->name = create_string_copy(temp_string);
 
 		update_cheat_info(machine, entry, 0);
@@ -10887,7 +9570,7 @@ static void add_cheat_from_watch_as_watch(running_machine *machine, cheat_entry 
 		action->extend_data			= ~0;
 
 		SET_FIELD(action->type, CodeType, kCodeType_Watch);
-		SET_FIELD(action->type, AddressSize, kSearchByteIncrementTable[watch->element_bytes] - 1);
+		SET_FIELD(action->type, AddressSize, BYTE_INCREMENT_TABLE[watch->element_bytes] - 1);
 		SET_FIELD(action->data, WatchNumElements, watch->num_elements - 1);
 		SET_FIELD(action->data, WatchSkip, watch->skip);
 		SET_FIELD(action->data, WatchElementsPerLine, watch->elements_per_line);
@@ -10932,17 +9615,20 @@ static void reset_watch(watch_info *watch)
   resize_search_list - reallocate search list if different length
 ------------------------------------------------------------------*/
 
-static void resize_search_list(UINT32 new_length)
+static void resize_search_list(UINT32 new_length, UINT8 dispose)
 {
 	if(new_length != search_list_length)
 	{
 		/* free search list if delete */
-		if(new_length < search_list_length)
+		if(dispose == REQUEST_DISPOSE)
 		{
-			int i;
+			if(new_length < search_list_length)
+			{
+				int i;
 
-			for(i = new_length; i < search_list_length; i++)
-				dispose_search(&search_list[i]);
+				for(i = new_length; i < search_list_length; i++)
+					dispose_search(&search_list[i]);
+			}
 		}
 
 		/* reallocate search list */
@@ -10959,43 +9645,9 @@ static void resize_search_list(UINT32 new_length)
 
 		/* add new search list if insert */
 		if(new_length > search_list_length)
-		{
-			int i;
-
 			memset(&search_list[search_list_length], 0, (new_length - search_list_length) * sizeof(search_info));
 
-			for(i = search_list_length; i < new_length; i++)
-				init_search(&search_list[i]);
-		}
-
 		search_list_length = new_length;
-	}
-}
-
-/*--------------------------------
-  resize_search_list_no_dispose
---------------------------------*/
-#if 0
-static void ResizeSearchListNoDispose(UINT32 newLength)
-{
-	if(newLength != search_list_length)
-	{
-		searchList = realloc(searchList, newLength * sizeof(search_info));
-
-		if(!searchList && (newLength != 0))
-		{
-			logerror("ResizeSearchList: out of memory resizing search list\n");
-			ui_popup_time(2, "out of memory while adding search");
-
-			search_list_length = 0;
-
-			return;
-		}
-
-		if(newLength > search_list_length)
-			memset(&searchList[search_list_length], 0, (newLength - search_list_length) * sizeof(search_info));
-
-		search_list_length = newLength;
 	}
 }
 
@@ -11003,38 +9655,46 @@ static void ResizeSearchListNoDispose(UINT32 newLength)
   add_search_before
 --------------------*/
 
-static void AddSearchBefore(UINT32 idx)
+static void add_search_before(UINT32 idx)
 {
-	ResizeSearchListNoDispose(search_list_length + 1);
+	resize_search_list(search_list_length + 1, NO_DISPOSE);
 
-	if(idx < (search_list_length - 1))
+	if(idx < search_list_length - 1)
 		memmove(&search_list[idx + 1], &search_list[idx], sizeof(search_info) * (search_list_length - 1 - idx));
 
 	if(idx >= search_list_length)
 		idx = search_list_length - 1;
 
 	memset(&search_list[idx], 0, sizeof(search_info));
-
 	init_search(&search_list[idx]);
+
+	SET_MESSAGE(CHEAT_MESSAGE_SUCCEEDED_TO_ADD);
 }
 
 /*-------------------
   delete_search_at
 -------------------*/
 
-static void DeleteSearchAt(UINT32 idx)
+static void delete_search_at(UINT32 idx)
 {
-	if(idx >= search_list_length)
-		return;
+	if(idx < search_list_length && search_list_length > 1)
+	{
+		dispose_search(&search_list[idx]);
 
-	DisposeSearch(idx);
+		if(idx < (search_list_length - 1))
+			memmove(&search_list[idx], &search_list[idx + 1], sizeof(search_info) * (search_list_length - 1 - idx));
 
-	if(idx < (search_list_length - 1))
-		memmove(&search_list[idx], &search_list[idx + 1], sizeof(search_info) * (search_list_length - 1 - idx));
+		resize_search_list(search_list_length - 1, NO_DISPOSE);
 
-	ResizeSearchListNoDispose(search_list_length - 1);
+		if(current_search_idx > search_list_length - 1)
+			current_search_idx = search_list_length - 1;
+
+		SET_MESSAGE(CHEAT_MESSAGE_SUCCEEDED_TO_DELETE);
+	}
+	else
+		SET_MESSAGE(CHEAT_MESSAGE_FAILED_TO_DELETE);
 }
-#endif
+
 /*---------------------------------------
   init_search - initialize search info
 ---------------------------------------*/
@@ -11043,6 +9703,42 @@ static void init_search(search_info *info)
 {
 	if(info)
 		info->search_speed = SEARCH_SPEED_MEDIUM;
+
+}
+
+/*---------------------------------------------------
+  init_search_box - initialize info of search menu
+---------------------------------------------------*/
+
+static void init_search_box(search_info *info, UINT8 mode)
+{
+	if(info)
+	{
+		switch(mode)
+		{
+			case SEARCH_BOX_MINIMUM:
+				info->lhs = kSearchOperand_Current;
+				info->rhs = kSearchOperand_Previous;
+				info->parameter = MINIMUM_ITEM_EQUAL;
+				break;
+
+			case SEARCH_BOX_STANDARD:
+				info->lhs = kSearchOperand_Current;
+				info->rhs = kSearchOperand_Previous;
+				info->comparison = kSearchComparison_EqualTo;
+				info->value = 0;
+				info->parameter = 0;
+				break;
+
+			case SEARCH_BOX_ADVANCED:
+				info->lhs = kSearchOperand_Current;
+				info->rhs = kSearchOperand_Previous;
+				info->comparison = kSearchComparison_EqualTo;
+				info->value = 0;
+				info->parameter = 0;
+				break;
+		}
+	}
 }
 
 /*---------------------------------------------------------------------------
@@ -11400,7 +10096,10 @@ static void allocate_search_regions(search_info *info)
 
 static void build_search_regions(running_machine *machine, search_info *info)
 {
-	info->comparison = kSearchComparison_EqualTo;
+	if(EXTRACT_FIELD(cheat_options, SearchBox) == SEARCH_BOX_MINIMUM)
+		info->comparison = MINIMUM_ITEM_EQUAL;
+	else
+		info->comparison = kSearchComparison_EqualTo;
 
 	/* 1st, free all search regions in current search_info */
 	dispose_search_reigons(info);
@@ -11659,9 +10358,8 @@ static int convert_to_new_code(cheat_action *action)
 
 	if(EXTRACT_FIELD(action->type, LocationType) == kLocation_IndirectIndexed) {
 		SET_FIELD(new_type, CodeType, kCodeType_IWrite);
-		SET_FIELD(new_type, CodeParameter, EXTRACT_FIELD(action->type, LocationParameterOption)); }
-	SET_FIELD(new_type, AddressSize, EXTRACT_FIELD(action->type, BytesUsed));
-	SET_MASK_FIELD(new_type, Endianness);
+		SET_FIELD(new_type, CodeParameter, EXTRACT_FIELD(action->type, IndexBytesUsed)); }
+	SET_FIELD(new_type, AddressSize, kSearchSize_8Bit);
 	if(TEST_FIELD(action->type, RestorePreviousValue))
 		SET_MASK_FIELD(new_type, RestoreValue);
 	if(EXTRACT_FIELD(action->type, Prefill))
@@ -11672,16 +10370,35 @@ static int convert_to_new_code(cheat_action *action)
 	return new_type;
 }
 
+/*----------------------------------------------------------
+  handle_local_command_tag - tag checker for command code
+----------------------------------------------------------*/
+
+static int handle_local_command_tag(char *tag)
+{
+	int i;
+
+	for(i = 0; i < cheat_list_length; i++)
+	{
+		if(strcmp(tag, cheat_list[i].name) == 0)
+			return i;
+	}
+
+	return -1;
+}
+
 /*-------------------------------------------------------------------
   handle_local_command_cheat - handle specified cheat command code
 -------------------------------------------------------------------*/
 
-static void handle_local_command_cheat(running_machine *machine, int cpu, int type, int address, int data, int extend_data, UINT8 format)
+static void handle_local_command_cheat(running_machine *machine, int cpu, int type, int address, int data, int extend_data, char *tag)
 {
 	int command = 0;
+	int format = cpu ? FORMAT_NEW : FORMAT_STANDARD;
 
 	if(format != FORMAT_NEW)
 	{
+		/* convert old format to new */
 		switch(EXTRACT_FIELD(type, LocationParameter))
 		{
 			case kCustomLocation_AssignActivationKey:
@@ -11710,21 +10427,33 @@ static void handle_local_command_cheat(running_machine *machine, int cpu, int ty
 	switch(command)
 	{
 		case CUSTOM_CODE_ACTIVATION_KEY:
+			if(format == FORMAT_NEW)
+				address = handle_local_command_tag(tag);
+
 			if(address < cheat_list_length)
 			{
 				cheat_entry *entry = &cheat_list[address];
 
-				if(entry->flags & kCheatFlag_Select)
+				if(cpu)
 				{
-					if(data)
+					if(entry->flags & kCheatFlag_Select)
+					{
+						if(data)
+						{
+							entry->activation_key_1 = data;
+							entry->flags |= kCheatFlag_HasActivationKey1;
+						}
+
+						if(extend_data)
+						{
+							entry->activation_key_2 = extend_data;
+							entry->flags |= kCheatFlag_HasActivationKey2;
+						}
+					}
+					else
 					{
 						entry->activation_key_1 = data;
 						entry->flags |= kCheatFlag_HasActivationKey1;
-					}
-					else if(extend_data)
-					{
-						entry->activation_key_2 = extend_data;
-						entry->flags |= kCheatFlag_HasActivationKey2;
 					}
 				}
 				else
@@ -11736,14 +10465,20 @@ static void handle_local_command_cheat(running_machine *machine, int cpu, int ty
 			break;
 
 		case CUSTOM_CODE_PRE_ENABLE:
+			if(format == FORMAT_NEW)
+				address = handle_local_command_tag(tag);
+
 			if(address < cheat_list_length)
 			{
 				cheat_entry *entry = &cheat_list[address];
 
 				activate_cheat(machine, entry);
 
-				if(data && data < entry->action_list_length)
-					entry->selection = data;
+				if(format == FORMAT_NEW)
+				{
+					if(data && data < entry->action_list_length)
+						entry->selection = data;
+				}
 			}
 			break;
 
@@ -11827,18 +10562,25 @@ static void load_cheat_option(char *file_name)
 
 	while(mame_fgets(buf, 2048, the_file))
 	{
-		char pre_command[9];
+		char pre_command[16];
 
 		if(sscanf(buf, format->format_string, pre_command) == format->arguments_matched)
 		{
 			if(strlen(pre_command) == format->type_matched)
 			{
-				sscanf(pre_command, "%X", &cheat_options);
-				SET_MESSAGE(CHEAT_MESSAGE_RELOAD_CHEAT_OPTION);
+				if(sscanf(pre_command, "%X", &cheat_options));
+				{
+					vertical_key_repeat_speed = EXTRACT_FIELD(cheat_options, VerticalKeyRepeatSpeed);
+					horizontal_key_repeat_speed = EXTRACT_FIELD(cheat_options, HorizontalKeyRepeatSpeed);
+					horizontal_key_repeat_speed = (horizontal_key_repeat_speed ? horizontal_key_repeat_speed : 10);
+					vertical_key_repeat_speed = (vertical_key_repeat_speed ? vertical_key_repeat_speed : 10);
+					SET_MESSAGE(CHEAT_MESSAGE_RELOAD_CHEAT_OPTION);
+				}
 			}
 		}
 	}
 
+	/* close the database */
 	mame_fclose(the_file);
 }
 
@@ -11872,17 +10614,17 @@ static void load_cheat_code(running_machine *machine, char *file_name)
 		int		format_level =			0;
 		int		cpu =					0;
 		int		code =					0;
-		char	name[16] =				{ 0 };
-		char	pre_type[16] =			{ 0 };
-		char	pre_data[16] =			{ 0 };
-		char	pre_extend_data[16] =	{ 0 };
-		char	description[256] =		{ 0 };
-		char	comment[256] =			{ 0 };
+		char	name[31] =				{ 0 };
+		char	pre_type[31] =			{ 0 };
+		char	pre_data[31] =			{ 0 };
+		char	pre_extend_data[255] =	{ 0 };
+		char	description[255] =		{ 0 };
+		char	comment[255] =			{ 0 };
 		cheat_entry		*entry;
 		cheat_action	*action;
 
 		/* scan and check format */
-		for(i = 1; i < 4; i++)
+		for(i = FORMAT_NEW; i <= FORMAT_OLD; i++)
 		{
 			cheat_format *format = &cheat_format_table[i];
 
@@ -11920,6 +10662,7 @@ static void load_cheat_code(running_machine *machine, char *file_name)
 			/* check name */
 			if(TEST_FIELD(cheat_options, SharedCode) && strcmp(machine->gamedrv->parent, "0"))
 			{
+				/* shared code (MESS specified) */
 				if(strcmp(name, machine->gamedrv->parent))
 					break;
 			}
@@ -11932,11 +10675,11 @@ static void load_cheat_code(running_machine *machine, char *file_name)
 			if(MatchesCRCTable(crc) == 0)
 				break;
 #endif
+			/* check length */
 			if(i != FORMAT_OLD)
 			{
 				UINT8 is_error = 0;
 
-				/* check length */
 				if(strlen(pre_type) != format->type_matched)
 				{
 					logerror("cheat: [load code] %s has invalid type field length (%X)\n", description, (int)strlen(pre_type));
@@ -11967,7 +10710,7 @@ static void load_cheat_code(running_machine *machine, char *file_name)
 					else
 					{
 						sscanf(pre_type, "%X", &type);
-						cpu = EXTRACT_FIELD(type, LocationParameter) & 0x0F;
+						cpu = EXTRACT_FIELD(type, LocationParameter) & 3;
 					}
 
 					sscanf(pre_data, "%X", &data);
@@ -11983,16 +10726,23 @@ static void load_cheat_code(running_machine *machine, char *file_name)
 		}
 
 		/* attemp to get next line if unmatched */
-		if(format_level == 0 || format_level >= 4)
+		if(format_level == FORMAT_OTHERS)
 			continue;
 
 		/* logerror("cheat: processing %s\n", buf); */
 
 		/* handle command code */
-		if(cpu >= CUSTOM_CODE_ACTIVATION_KEY)
+		if(format_level == FORMAT_NEW)
 		{
-			/* logerror("cheat: cheat line removed\n", buf); */
-			handle_local_command_cheat(machine, cpu, type, address, data, extend_data, format_level);
+			if(cpu >= CUSTOM_CODE_ACTIVATION_KEY)
+			{
+				handle_local_command_cheat(machine, cpu, type, address, data, extend_data, comment);
+				continue;
+			}
+		}
+		else if(TEST_FIELD(type, RemoveFromList))
+		{
+			handle_local_command_cheat(machine, 0, type, address, data, 0, NULL);
 			continue;
 		}
 
@@ -12465,6 +11215,7 @@ static void save_activation_key(running_machine *machine, cheat_entry *entry, in
 							address_length, entry_index,	/* address */
 							key_1,							/* data */
 							key_2);							/* extend data */
+
 #else /* MAME */
 	buf_strings += sprintf(	buf_strings, ":%s::%.2X%.8X::%.*X::%.8X::%.8X:Activation Key",
 							machine->gamedrv->name,			/* name */
@@ -12473,10 +11224,6 @@ static void save_activation_key(running_machine *machine, cheat_entry *entry, in
 							key_1,							/* data */
 							key_2);							/* extend data */
 #endif
-
-	/* set description */
-	if(entry->name && entry->name[0] != 0)
-		buf_strings += sprintf(buf_strings, " for %s", entry->name);
 
 	/* set label of key */
 	if(entry->flags & kCheatFlag_Select)
@@ -12487,15 +11234,20 @@ static void save_activation_key(running_machine *machine, cheat_entry *entry, in
 		if(entry->flags & kCheatFlag_HasActivationKey2)
 			name_2 = input_code_name(astring_alloc(), entry->activation_key_2);
 
-		buf_strings += sprintf(buf_strings, " (prev = %s / next = %s)\n", astring_c(name_1), astring_c(name_2));
+		buf_strings += sprintf(buf_strings, " (prev = %s / next = %s)", astring_c(name_1), astring_c(name_2));
 	}
 	else
 	{
 		name_1 = input_code_name(astring_alloc(), entry->activation_key_1);
 
-		buf_strings += sprintf(buf_strings, " (%s)\n", astring_c(name_1));
+		buf_strings += sprintf(buf_strings, " (%s)", astring_c(name_1));
 	}
 
+	/* set tag */
+	if(entry->name && entry->name[0] != 0)
+		buf_strings += sprintf(buf_strings, ":%s\n", entry->name);
+	else
+		buf_strings += sprintf(buf_strings, ":(none)\n");
 
 	/* write the activation key code */
 	mame_fwrite(the_file, buf, (UINT32)strlen(buf));
@@ -12542,31 +11294,29 @@ static void save_pre_enable(running_machine *machine, cheat_entry *entry, int en
 	address_length = get_address_length(entry->action_list[0].region);
 
 #ifdef MESS
-	buf_strings += sprintf(	buf_strings, ":%s::%.8X::%.2X%.8X::%.*X::%.8X:00000000",
+	buf_strings += sprintf(	buf_strings, ":%s::%.8X::%.2X%.8X::%.*X::%.8X:00000000:Pre-enable",
 							machine->gamedrv->name,			/* name */
 							thisGameCRC,					/* CRC */
 							region, type,					/* type */
 							address_length, entry_index,	/* address */
 							entry->selection);				/* data */
 #else /* MAME */
-	buf_strings += sprintf(	buf_strings, ":%s::%.2X%.8X::%.*X::%.8X::00000000",
+	buf_strings += sprintf(	buf_strings, ":%s::%.2X%.8X::%.*X::%.8X::00000000:Pre-enable",
 							machine->gamedrv->name,			/* name */
 							region ,type,					/* type */
 							address_length, entry_index,	/* address */
 							entry->selection);				/* data */
 #endif
 
-	/* set description */
-	buf_strings += sprintf(buf_strings, ":Pre-enable");
-
-	if(entry->name)
-		buf_strings += sprintf(buf_strings, " for %s", entry->name);
-
 	/* set label name */
 	if(entry->selection)
 		buf_strings += sprintf(buf_strings, " Label - %s", entry->action_list[entry->label_index[entry->selection]].optional_name);
 
-	buf_strings += sprintf(buf_strings, "\n");
+	/* set tag */
+	if(entry->name && entry->name[0] != 0)
+		buf_strings += sprintf(buf_strings, ":%s\n", entry->name);
+	else
+		buf_strings += sprintf(buf_strings, ":(none)\n");
 
 	/* write the pre-enable code */
 	mame_fwrite(the_file, buf, (UINT32)strlen(buf));
@@ -12583,7 +11333,8 @@ static void save_pre_enable(running_machine *machine, cheat_entry *entry, int en
 
 static void save_cheat_options(void)
 {
-	char		buf[32];
+	char		buf[256];
+	char		*buf_strings = buf;
 	mame_file	*the_file;
 
 	/* open the database */
@@ -12595,7 +11346,45 @@ static void save_cheat_options(void)
 
 	mame_fseek(the_file, 0, SEEK_END);
 
-	sprintf(buf, ":_command:%.8X\n", cheat_options);
+	/* set command code */
+	buf_strings += sprintf(buf_strings, ":_command:%.8X:", cheat_options);
+
+	/* set descriptions */
+	switch(EXTRACT_FIELD(cheat_options, SearchBox))
+	{
+		case SEARCH_BOX_MINIMUM:
+			buf_strings += sprintf(buf_strings, "Search Box = Minimum, ");
+			break;
+
+		case SEARCH_BOX_STANDARD:
+			buf_strings += sprintf(buf_strings, "Search Box = Standard, ");
+			break;
+
+		case SEARCH_BOX_ADVANCED:
+			buf_strings += sprintf(buf_strings, "Search Box = Minimum, ");
+
+			/* NOTE : new label option is only for advanced mode */
+			if(TEST_FIELD(cheat_options, DontPrintNewLabels))
+				buf_strings += sprintf(buf_strings, "Search Box Label = OFF, ");
+			else
+				buf_strings += sprintf(buf_strings, "Search Box Label = ON, ");
+			break;
+	}
+
+	if(TEST_FIELD(cheat_options, AutoSaveEnabled))
+		buf_strings += sprintf(buf_strings, "Auto Cheat Code Save, ");
+
+	if(TEST_FIELD(cheat_options, ActivationKeyMessage))
+		buf_strings += sprintf(buf_strings, "Activation Key Message, ");
+
+	if(TEST_FIELD(cheat_options, LoadOldFormat))
+		buf_strings += sprintf(buf_strings, "Load Old/Older Format, ");
+#ifdef MESS
+	if(TEST_FIELD(cheat_options, SharedCode))
+		buf_strings += sprintf(buf_strings, "Shared Code, ");
+#endif
+	buf_strings += sprintf(buf_strings, "Vertical Key Speed = %d, ", EXTRACT_FIELD(cheat_options, VerticalKeyRepeatSpeed));
+	buf_strings += sprintf(buf_strings, "Horizontal Key Speed = %d\n", EXTRACT_FIELD(cheat_options, HorizontalKeyRepeatSpeed));
 
 	/* write the cheat option */
 	mame_fwrite(the_file, buf, (UINT32)strlen(buf));
@@ -12679,16 +11468,26 @@ static void save_raw_code(running_machine *machine)
 static void do_auto_save_cheats(running_machine *machine)
 {
 	int i;
+	int do_save = 0;
 
-	save_description(machine);
-
-	for(i = 0; i < cheat_list_length; i++)
+	/* if the entry is not edited/added newly or has not been already saved, save it */
+	for(i = 0; i< cheat_list_length; i++)
 	{
-		cheat_entry *entry = &cheat_list[i];
+		if(cheat_list[i].flags & kCheatFlag_Dirty)
+			do_save = 1;
+	}
 
-		/* if the entry is not edited/added newly or has not been already saved, save it */
-		if(entry->flags & kCheatFlag_Dirty)
-			save_cheat_code(machine, entry);
+	if(do_save)
+	{
+		save_description(machine);
+
+		for(i = 0; i < cheat_list_length; i++)
+		{
+			cheat_entry *entry = &cheat_list[i];
+
+			if(entry->flags & kCheatFlag_Dirty)
+				save_cheat_code(machine, entry);
+		}
 	}
 }
 
@@ -12706,7 +11505,7 @@ static void add_cheat_from_result(running_machine *machine, search_info *search,
 		cheat_entry		*entry		= get_new_cheat();
 		cheat_action	*action		= &entry->action_list[0];
 
-		temp_string_length = sprintf(temp_string, "%.8X (%d) = %.*X", address, region->target_idx, kSearchByteDigitsTable[search->bytes], data);
+		temp_string_length = sprintf(temp_string, "%.8X (%d) = %.*X", address, region->target_idx, BYTE_DIGITS_TABLE[search->bytes], data);
 
 		entry->name = realloc(entry->name, temp_string_length + 1);
 		if(entry->name == NULL)
@@ -12716,13 +11515,14 @@ static void add_cheat_from_result(running_machine *machine, search_info *search,
 						temp_string_length, entry->name);
 
 		memcpy(entry->name, temp_string, temp_string_length + 1);
-		action->region			= region->target_idx;
-		action->address			= address;
-		action->data			= data;
-		action->original_data	= data;
-		action->extend_data		= ~0;
-		action->last_value		= NULL;
-		SET_FIELD(action->type, AddressSize, kSearchByteIncrementTable[search->bytes] - 1);
+		action->region				= region->target_idx;
+		action->address				= address;
+		action->original_address	= address;
+		action->data				= data;
+		action->original_data		= data;
+		action->extend_data			= ~0;
+		action->last_value			= NULL;
+		SET_FIELD(action->type, AddressSize, BYTE_INCREMENT_TABLE[search->bytes] - 1);
 
 		update_cheat_info(machine, entry, 0);
 	}
@@ -12793,8 +11593,8 @@ static void add_watch_from_result(search_info *search, search_region *region, UI
 static UINT32 search_sign_extend(search_info *search, UINT32 value)
 {
 	if(search->sign)
-		if(value & kSearchByteSignBitTable[search->bytes])
-			value |= ~kSearchByteUnsignedMaskTable[search->bytes];
+		if(value & SEARCH_BYTE_SIGN_BIT_TABLE[search->bytes])
+			value |= ~SEARCH_BYTE_UNSIGNED_MASK_TABLE[search->bytes];
 
 	return value;
 }
@@ -12810,15 +11610,15 @@ static UINT32 read_search_operand(UINT8 type, search_info *search, search_region
 	switch(type)
 	{
 		case kSearchOperand_Current:
-			value = read_region_data(region, address - region->address, kSearchByteIncrementTable[search->bytes], search->swap);
+			value = read_region_data(region, address - region->address, BYTE_INCREMENT_TABLE[search->bytes], search->swap);
 			break;
 
 		case kSearchOperand_Previous:
-			value = do_memory_read(region->last, address - region->address, kSearchByteIncrementTable[search->bytes], search->swap, NULL);
+			value = do_memory_read(region->last, address - region->address, BYTE_INCREMENT_TABLE[search->bytes], search->swap, NULL);
 			break;
 
 		case kSearchOperand_First:
-			value = do_memory_read(region->first, address - region->address, kSearchByteIncrementTable[search->bytes], search->swap, NULL);
+			value = do_memory_read(region->first, address - region->address, BYTE_INCREMENT_TABLE[search->bytes], search->swap, NULL);
 			break;
 
 		case kSearchOperand_Value:
@@ -12841,15 +11641,15 @@ static UINT32 read_search_operand_bit(UINT8 type, search_info *search, search_re
 	switch(type)
 	{
 		case kSearchOperand_Current:
-			value = read_region_data(region, address - region->address, kSearchByteIncrementTable[search->bytes], search->swap);
+			value = read_region_data(region, address - region->address, BYTE_INCREMENT_TABLE[search->bytes], search->swap);
 			break;
 
 		case kSearchOperand_Previous:
-			value = do_memory_read(region->last, address - region->address, kSearchByteIncrementTable[search->bytes], search->swap, NULL);
+			value = do_memory_read(region->last, address - region->address, BYTE_INCREMENT_TABLE[search->bytes], search->swap, NULL);
 			break;
 
 		case kSearchOperand_First:
-			value = do_memory_read(region->first, address - region->address, kSearchByteIncrementTable[search->bytes], search->swap, NULL);
+			value = do_memory_read(region->first, address - region->address, BYTE_INCREMENT_TABLE[search->bytes], search->swap, NULL);
 			break;
 
 		case kSearchOperand_Value:
@@ -12901,8 +11701,8 @@ static UINT8 do_search_comparison(search_info *search, UINT32 lhs, UINT32 rhs)
 			case kSearchComparison_IncreasedBy:
 				svalue = search->value;
 
-				if(search->value & kSearchByteSignBitTable[search->bytes])
-					svalue |= ~kSearchByteUnsignedMaskTable[search->bytes];
+				if(search->value & SEARCH_BYTE_SIGN_BIT_TABLE[search->bytes])
+					svalue |= ~SEARCH_BYTE_UNSIGNED_MASK_TABLE[search->bytes];
 
 				return slhs == (srhs + svalue);
 
@@ -12936,8 +11736,8 @@ static UINT8 do_search_comparison(search_info *search, UINT32 lhs, UINT32 rhs)
 			case kSearchComparison_IncreasedBy:
 				svalue = search->value;
 
-				if(search->value & kSearchByteSignBitTable[search->bytes])
-					svalue |= ~kSearchByteUnsignedMaskTable[search->bytes];
+				if(search->value & SEARCH_BYTE_SIGN_BIT_TABLE[search->bytes])
+					svalue |= ~SEARCH_BYTE_UNSIGNED_MASK_TABLE[search->bytes];
 
 				return lhs == (rhs + svalue);
 
@@ -12980,7 +11780,7 @@ static UINT32 do_search_comparison_bit(search_info *search, UINT32 lhs, UINT32 r
 #if 0
 static UINT8 is_region_offset_valid(search_info *search, search_region *region, UINT32 offset)
 {
-    switch(kSearchByteIncrementTable[search->bytes])
+    switch(BYTE_INCREMENT_TABLE[search->bytes])
     {
         case 1:
             return *((UINT8  *)&region->status[offset]) == 0xFF;
@@ -13005,7 +11805,7 @@ static UINT8 is_region_offset_valid(search_info *search, search_region *region, 
 
 static UINT8 is_region_offset_valid_bit(search_info *search, search_region *region, UINT32 offset)
 {
-	switch(kSearchByteStep[search->bytes])
+	switch(SEARCH_BYTE_STEP[search->bytes])
 	{
 		case 1:
 			return *((UINT8  *)&region->status[offset]) != 0;
@@ -13033,7 +11833,7 @@ static UINT8 is_region_offset_valid_bit(search_info *search, search_region *regi
 
 static void invalidate_region_offset(search_info *search, search_region *region, UINT32 offset)
 {
-	switch(kSearchByteStep[search->bytes])
+	switch(SEARCH_BYTE_STEP[search->bytes])
 	{
 		case 1:
 			*((UINT8  *)&region->status[offset]) = 0;
@@ -13060,7 +11860,7 @@ static void invalidate_region_offset(search_info *search, search_region *region,
 
 static void invalidate_region_offset_bit(search_info *search, search_region *region, UINT32 offset, UINT32 invalidate)
 {
-	switch(kSearchByteStep[search->bytes])
+	switch(SEARCH_BYTE_STEP[search->bytes])
 	{
 		case 1:
 			*((UINT8  *)&region->status[offset]) &= ~invalidate;
@@ -13153,12 +11953,12 @@ static void do_search(search_info *search)
 		for(i = 0; i < search->region_list_length; i++)
 		{
 			search_region	*region		= &search->region_list[i];
-			UINT32			lastAddress	= region->length - kSearchByteIncrementTable[search->bytes] + 1;
-			UINT32			increment	= kSearchByteStep[search->bytes];
+			UINT32			lastAddress	= region->length - BYTE_INCREMENT_TABLE[search->bytes] + 1;
+			UINT32			increment	= SEARCH_BYTE_STEP[search->bytes];
 
 			region->num_results = 0;
 
-			if(region->length < kSearchByteIncrementTable[search->bytes] || (region->flags & kRegionFlag_Enabled) == 0)
+			if(region->length < BYTE_INCREMENT_TABLE[search->bytes] || (region->flags & kRegionFlag_Enabled) == 0)
 				continue;
 
 			for(j = 0; j < lastAddress; j += increment)
@@ -13195,12 +11995,12 @@ static void do_search(search_info *search)
 		for(i = 0; i < search->region_list_length; i++)
 		{
 			search_region	*region		= &search->region_list[i];
-			UINT32			lastAddress	= region->length - kSearchByteIncrementTable[search->bytes] + 1;
-			UINT32			increment	= kSearchByteStep[search->bytes];
+			UINT32			lastAddress	= region->length - BYTE_INCREMENT_TABLE[search->bytes] + 1;
+			UINT32			increment	= SEARCH_BYTE_STEP[search->bytes];
 
 			region->num_results = 0;
 
-			if(region->length < kSearchByteIncrementTable[search->bytes] || (region->flags & kRegionFlag_Enabled) == 0)
+			if(region->length < BYTE_INCREMENT_TABLE[search->bytes] || (region->flags & kRegionFlag_Enabled) == 0)
 				continue;
 
 			for(j = 0; j < lastAddress; j += increment)
@@ -13267,6 +12067,11 @@ static UINT8 **get_memory_region_base_pointer(UINT8 cpu, UINT8 space, UINT32 add
 
 	switch(space)
 	{
+		case kAddressSpace_Program:
+		case kAddressSpace_DirectMemory:
+			buf = memory_get_read_ptr(cpu, ADDRESS_SPACE_PROGRAM, address);
+			break;
+
 		case kAddressSpace_DataSpace:
 			buf = memory_get_read_ptr(cpu, ADDRESS_SPACE_DATA, address);
 			break;
@@ -13277,10 +12082,6 @@ static UINT8 **get_memory_region_base_pointer(UINT8 cpu, UINT8 space, UINT32 add
 
 		case kAddressSpace_OpcodeRAM:
 			buf = memory_get_op_ptr(cpu, address, 0);
-			break;
-
-		case kAddressSpace_DirectMemory:
-			buf = memory_get_read_ptr(cpu, ADDRESS_SPACE_PROGRAM, address);
 			break;
 
 		default:
@@ -13304,7 +12105,7 @@ static UINT32 do_cpu_read(UINT8 cpu, UINT32 address, UINT8 bytes, UINT8 swap)
 {
 	cpu_region_info *info = get_cpu_info(cpu);
 
-	address = DoShift(address, info->address_shift);
+	address = do_shift(address, info->address_shift);
 
 	switch(bytes)
 	{
@@ -13350,7 +12151,7 @@ static UINT32 do_memory_read(UINT8 *buf, UINT32 address, UINT8 bytes, UINT8 swap
 	int data = 0;
 
 	if(info)
-		address = DoShift(address, info->address_shift);
+		address = do_shift(address, info->address_shift);
 
 	if(info == NULL)
 	{
@@ -13386,8 +12187,8 @@ static UINT32 do_memory_read(UINT8 *buf, UINT32 address, UINT8 bytes, UINT8 swap
 	generic:
 
 	for(i = 0; i < bytes; i++)
-		data |= swap ?	buf[SwapAddress(address + i, bytes, info)] << (i * 8) :
-						buf[SwapAddress(address + i, bytes, info)] << ((bytes - i - 1) * 8);
+		data |= swap ?	buf[swap_address(address + i, bytes, info)] << (i * 8) :
+						buf[swap_address(address + i, bytes, info)] << ((bytes - i - 1) * 8);
 
 	return data;
 }
@@ -13400,7 +12201,7 @@ static void do_cpu_write(UINT32 data, UINT8 cpu, UINT32 address, UINT8 bytes, UI
 {
 	cpu_region_info *info = get_cpu_info(cpu);
 
-	address = DoShift(address, info->address_shift);
+	address = do_shift(address, info->address_shift);
 
 	switch(bytes)
 	{
@@ -13468,7 +12269,7 @@ static void do_memory_write(UINT32 data, UINT8 *buf, UINT32 address, UINT8 bytes
 	UINT32 i;
 
 	if(info)
-		address = DoShift(address, info->address_shift);
+		address = do_shift(address, info->address_shift);
 
 	if(info == NULL)
 	{
@@ -13505,8 +12306,8 @@ static void do_memory_write(UINT32 data, UINT8 *buf, UINT32 address, UINT8 bytes
 
 	for(i = 0; i < bytes; i++)
 	{
-		if(swap)	buf[SwapAddress(address + i, bytes, info)] = data >> (i * 8);
-		else		buf[SwapAddress(address + i, bytes, info)] = data >> ((bytes - i - 1) * 8);
+		if(swap)	buf[swap_address(address + i, bytes, info)] = data >> (i * 8);
+		else		buf[swap_address(address + i, bytes, info)] = data >> ((bytes - i - 1) * 8);
 	}
 }
 
@@ -13538,11 +12339,10 @@ static UINT32 read_data(running_machine *machine, cheat_action *action)
 			int					index_address	= 0;
 			cpu_region_info		*info			= get_cpu_info(region);
 
-			index_address = do_cpu_read(region, address, EXTRACT_FIELD(action->type, CodeParameterLower) + 1,
-										cpu_needs_swap(region) ^ EXTRACT_FIELD(action->type, Endianness));
+			index_address = do_cpu_read(region, address, EXTRACT_FIELD(action->type, CodeParameterLower) + 1, cpu_needs_swap(region));
 
 			if(info)
-				index_address = DoShift(index_address, info->address_shift);
+				index_address = do_shift(index_address, info->address_shift);
 
 			if(index_address)
 				address = index_address + action->extend_data;
@@ -13566,7 +12366,7 @@ static UINT32 read_data(running_machine *machine, cheat_action *action)
 			switch(EXTRACT_FIELD(action->region, AddressSpace))
 			{
 				case kAddressSpace_Program:
-					return do_cpu_read(region, address, bytes, cpu_needs_swap(region) ^ EXTRACT_FIELD(action->type, Endianness));
+					return do_cpu_read(region, address, bytes, cpu_needs_swap(region));
 
 				case kAddressSpace_DataSpace:
 				case kAddressSpace_IOSpace:
@@ -13579,9 +12379,7 @@ static UINT32 read_data(running_machine *machine, cheat_action *action)
 						buf = (UINT8 *)action->cached_pointer;
 
 						if(buf)
-							return do_memory_read(	buf, address, bytes,
-													cpu_needs_swap(region) ^ EXTRACT_FIELD(action->type, Endianness),
-													get_cpu_info(region));
+							return do_memory_read(buf, address, bytes, cpu_needs_swap(region), get_cpu_info(region));
 					}
 					break;
 
@@ -13595,9 +12393,7 @@ static UINT32 read_data(running_machine *machine, cheat_action *action)
 						relative_address = action->cached_offset;
 
 						if(buf && *buf)
-							return do_memory_read(	*buf, relative_address, bytes,
-													cpu_needs_swap(region) ^ EXTRACT_FIELD(action->type, Endianness),
-													get_cpu_info(region));
+							return do_memory_read(*buf, relative_address, bytes, cpu_needs_swap(region), get_cpu_info(region));
 					}
 					break;
 
@@ -13622,16 +12418,14 @@ static UINT32 read_data(running_machine *machine, cheat_action *action)
 			if(buf)
 			{
 				if(is_address_in_range(action, memory_region_length(machine, region)))
-					return	do_memory_read(	buf, address, bytes,
-											region_needs_swap(region) ^ EXTRACT_FIELD(action->type, Endianness),
-											get_region_info(region));
+					return	do_memory_read(buf, address, bytes, region_needs_swap(region), get_region_info(region));
 			}
 		}
 	}
 	else
 	{
 		/* read a data from variable */
-		return (cheat_variable[action->address] & kCheatSizeMaskTable[bytes]);
+		return (cheat_variable[action->address] & BYTE_MASK_TABLE[bytes]);
 	}
 
 	return 0;
@@ -13665,11 +12459,10 @@ static void write_data(running_machine *machine, cheat_action *action, UINT32 da
 			int					index_address	= 0;
 			cpu_region_info		*info			= get_cpu_info(region);
 
-			index_address = do_cpu_read(region, address, EXTRACT_FIELD(action->type, CodeParameterLower) + 1,
-										cpu_needs_swap(region) ^ EXTRACT_FIELD(action->type, Endianness));
+			index_address = do_cpu_read(region, address, EXTRACT_FIELD(action->type, CodeParameterLower) + 1, cpu_needs_swap(region));
 
 			if(info)
-				index_address = DoShift(index_address, info->address_shift);
+				index_address = do_shift(index_address, info->address_shift);
 
 			if(index_address)
 				address = index_address + action->extend_data;
@@ -13693,7 +12486,7 @@ static void write_data(running_machine *machine, cheat_action *action, UINT32 da
 			switch(EXTRACT_FIELD(action->region, AddressSpace))
 			{
 				case kAddressSpace_Program:
-					do_cpu_write(data, region, address, bytes, cpu_needs_swap(region) ^ EXTRACT_FIELD(action->type, Endianness));
+					do_cpu_write(data, region, address, bytes, cpu_needs_swap(region));
 					break;
 
 				case kAddressSpace_DataSpace:
@@ -13707,9 +12500,7 @@ static void write_data(running_machine *machine, cheat_action *action, UINT32 da
 						buf = (UINT8 *)action->cached_pointer;
 
 						if(buf)
-							do_memory_write(data, buf, address, bytes,
-											cpu_needs_swap(region) ^ EXTRACT_FIELD(action->type, Endianness),
-											get_cpu_info(region));
+							do_memory_write(data, buf, address, bytes, cpu_needs_swap(region), get_cpu_info(region));
 					}
 					break;
 
@@ -13723,9 +12514,7 @@ static void write_data(running_machine *machine, cheat_action *action, UINT32 da
 						relative_address = action->cached_offset;
 
 						if(buf && *buf)
-							do_memory_write(data, *buf, relative_address, bytes,
-											cpu_needs_swap(region) ^ EXTRACT_FIELD(action->type, Endianness),
-											get_cpu_info(region));
+							do_memory_write(data, *buf, relative_address, bytes, cpu_needs_swap(region), get_cpu_info(region));
 					}
 					break;
 
@@ -13750,16 +12539,14 @@ static void write_data(running_machine *machine, cheat_action *action, UINT32 da
 			if(buf)
 			{
 				if(is_address_in_range(action, memory_region_length(machine, region)))
-					do_memory_write(data, buf, address, bytes,
-									region_needs_swap(region) ^ EXTRACT_FIELD(action->type, Endianness),
-									get_region_info(action->region));
+					do_memory_write(data, buf, address, bytes, region_needs_swap(region), get_region_info(action->region));
 			}
 		}
 	}
 	else
 	{
 		/* write a data to variable */
-		cheat_variable[action->address] = data & kCheatSizeMaskTable[bytes];
+		cheat_variable[action->address] = data & BYTE_MASK_TABLE[bytes];
 	}
 }
 
@@ -13772,7 +12559,7 @@ static void watch_cheat_entry(cheat_entry *entry, UINT8 associate)
 	int			i, j;
 	cheat_entry	*associate_entry = NULL;
 
-	/* NOTE : calling with associate = 1 doesn't exist right now */
+	/* NOTE : calling with associate doesn't exist right now */
 	if(associate)
 		associate_entry = entry;
 
@@ -13841,15 +12628,15 @@ static void add_action_watch(cheat_action *action, cheat_entry *entry)
 			{
 				watch_info *info = get_unused_watch();
 
-				info->address		= action->address;
-				info->cpu			= action->region;
-				info->display_type	= kWatchDisplayType_Hex;
-				info->element_bytes	= kSearchSize_8Bit;
-				info->label[0]		= 0;
-				info->label_type	= kWatchLabel_None;
-				info->num_elements	= EXTRACT_FIELD(action->type, AddressSize) + 1;
-				info->linked_cheat	= entry;
-				info->skip			= 0;
+				info->address			= action->address;
+				info->cpu				= action->region;
+				info->num_elements		= EXTRACT_FIELD(action->type, AddressSize) + 1;
+				info->element_bytes		= kSearchSize_8Bit;
+				info->label_type		= kWatchLabel_None;
+				info->display_type		= kWatchDisplayType_Hex;
+				info->skip				= 0;
+				info->linked_cheat		= entry;
+				info->label[0]			= 0;
 
 				if(action->flags & kActionFlag_PDWWrite)
 				{
@@ -13869,14 +12656,14 @@ static void add_action_watch(cheat_action *action, cheat_entry *entry)
 
 				info->address			= action->address;
 				info->cpu				= action->region;
-				info->display_type		= EXTRACT_FIELD(action->type, WatchDisplayFormat);
-				info->element_bytes		= kByteConversionTable[EXTRACT_FIELD(action->type, AddressSize)];
-				info->label[0]			= 0;
-				info->linked_cheat		= entry;
 				info->num_elements		= EXTRACT_FIELD(action->data, WatchNumElements) + 1;
+				info->element_bytes		= kByteConversionTable[EXTRACT_FIELD(action->type, AddressSize)];
+				info->display_type		= EXTRACT_FIELD(action->type, WatchDisplayFormat);
 				info->skip				= EXTRACT_FIELD(action->data, WatchSkip);
 				info->elements_per_line	= EXTRACT_FIELD(action->data, WatchElementsPerLine);
 				info->add_value			= EXTRACT_FIELD(action->data, WatchAddValue);
+				info->linked_cheat		= entry;
+				info->label[0]			= 0;
 
 				if(info->add_value & 0x80)
 					info->add_value |= ~0xFF;
@@ -13969,7 +12756,7 @@ static void reset_action(running_machine *machine, cheat_action *action)
 								action->last_value[i] = read_data(machine, action);
 								action->address +=	EXTRACT_FIELD(action->extend_data, MSB16) ?
 													EXTRACT_FIELD(action->extend_data, MSB16) :
-													kSearchByteIncrementTable[EXTRACT_FIELD(action->type, AddressSize)];
+													BYTE_INCREMENT_TABLE[EXTRACT_FIELD(action->type, AddressSize)];
 							}
 
 							action->address = action->original_address;
@@ -14058,7 +12845,7 @@ static void restore_last_value(running_machine *machine, cheat_action *action)
 							write_data(machine, action, (UINT32)action->last_value[j]);
 							action->address +=	EXTRACT_FIELD(action->extend_data, MSB16) ?
 												EXTRACT_FIELD(action->extend_data, MSB16) :
-												kSearchByteIncrementTable[EXTRACT_FIELD(action->type, AddressSize)];
+												BYTE_INCREMENT_TABLE[EXTRACT_FIELD(action->type, AddressSize)];
 						}
 						action->address = action->original_address;
 					}
@@ -14126,10 +12913,10 @@ static void temp_deactivate_cheat(running_machine *machine, cheat_entry *entry)
 }
 
 /*------------------------------------------------------------
-  cheat_periodicOperation - management for cheat operations
-------------------------------------------------------------*/
+  cheat_periodic_operation - management for cheat operations
+-------------------------------------------------------------*/
 
-static void cheat_periodicOperation(running_machine *machine, cheat_action *action)
+static void cheat_periodic_operation(running_machine *machine, cheat_action *action)
 {
 	int data = TEST_FIELD(action->type, DataRead) ? cheat_variable[action->data] : action->data;
 
@@ -14148,7 +12935,7 @@ static void cheat_periodicOperation(running_machine *machine, cheat_action *acti
 			write_data(machine, action, data);
 			action->address +=	EXTRACT_FIELD(action->extend_data, MSB16) ?
 								EXTRACT_FIELD(action->extend_data, MSB16) :
-								kSearchByteIncrementTable[EXTRACT_FIELD(action->type, AddressSize)];
+								BYTE_INCREMENT_TABLE[EXTRACT_FIELD(action->type, AddressSize)];
 		}
 		action->address = action->original_address;
 	}
@@ -14215,23 +13002,23 @@ static void cheat_periodicOperation(running_machine *machine, cheat_action *acti
 
 					case kPopup_Value:
 						ui_popup_time(1, "%*.*X",
-										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
-										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
+										BYTE_DIGITS_TABLE[EXTRACT_FIELD(action->type, AddressSize)],
+										BYTE_DIGITS_TABLE[EXTRACT_FIELD(action->type, AddressSize)],
 										read_data(machine, action));
 						break;
 
 					case kPopup_LabelValue:
 						ui_popup_time(1, "%s %*.*X",
 										action->optional_name,
-										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
-										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
+										BYTE_DIGITS_TABLE[EXTRACT_FIELD(action->type, AddressSize)],
+										BYTE_DIGITS_TABLE[EXTRACT_FIELD(action->type, AddressSize)],
 										read_data(machine, action));
 						break;
 
 					case kPopup_ValueLabel:
 						ui_popup_time(1, "%*.*X %s",
-										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
-										kCheatSizeDigitsTable[EXTRACT_FIELD(action->type, AddressSize)],
+										BYTE_DIGITS_TABLE[EXTRACT_FIELD(action->type, AddressSize)],
+										BYTE_DIGITS_TABLE[EXTRACT_FIELD(action->type, AddressSize)],
 										read_data(machine, action),
 										action->optional_name);
 						break;
@@ -14245,11 +13032,11 @@ static void cheat_periodicOperation(running_machine *machine, cheat_action *acti
 	}
 }
 
-/*------------------------------------------------------------
-  cheat_periodicCondition - management for cheat conditions
-------------------------------------------------------------*/
+/*-------------------------------------------------------------
+  cheat_periodic_condition - management for cheat conditions
+-------------------------------------------------------------*/
 
-static UINT8 cheat_periodicCondition(running_machine *machine, cheat_action *action)
+static UINT8 cheat_periodic_condition(running_machine *machine, cheat_action *action)
 {
 	int	data	= read_data(machine, action);
 	int	value	= action->extend_data;
@@ -14317,11 +13104,11 @@ static UINT8 cheat_periodicCondition(running_machine *machine, cheat_action *act
 	return 0;
 }
 
-/*------------------------------------------------------
-  cheat_periodicAction - management for cheat actions
-------------------------------------------------------*/
+/*-------------------------------------------------------
+  cheat_periodic_action - management for cheat actions
+-------------------------------------------------------*/
 
-static int cheat_periodicAction(running_machine *machine, cheat_action *action, int selection)
+static int cheat_periodic_action(running_machine *machine, cheat_action *action, int selection)
 {
 	UINT8 execute_operation = 0;
 
@@ -14387,7 +13174,7 @@ static int cheat_periodicAction(running_machine *machine, cheat_action *action, 
 
 	if(action->flags & kActionFlag_CheckCondition)
 	{
-		if(cheat_periodicCondition(machine, action))
+		if(cheat_periodic_condition(machine, action))
 			execute_operation = 1;
 		else
 			execute_operation = 0;
@@ -14406,7 +13193,7 @@ static int cheat_periodicAction(running_machine *machine, cheat_action *action, 
 			case kCodeType_PDWWrite:
 			case kCodeType_Move:
 			case kCodeType_Popup:
-				cheat_periodicOperation(machine, action);
+				cheat_periodic_operation(machine, action);
 				break;
 
 			case kCodeType_Branch:
@@ -14429,11 +13216,11 @@ static int cheat_periodicAction(running_machine *machine, cheat_action *action, 
 	return (TEST_FIELD(action->type, Return) ? CHEAT_RETURN_VALUE : selection + 1);
 }
 
-/*-----------------------------------------------------
-  cheat_periodicEntry - management for cheat entries
------------------------------------------------------*/
+/*------------------------------------------------------
+  cheat_periodic_entry - management for cheat entries
+------------------------------------------------------*/
 
-static void cheat_periodicEntry(running_machine *machine, cheat_entry *entry)
+static void cheat_periodic_entry(running_machine *machine, cheat_entry *entry)
 {
 	int		i			= 0;
 	UINT8	pressedKey	= 0;
@@ -14538,11 +13325,11 @@ static void cheat_periodicEntry(running_machine *machine, cheat_entry *entry)
 			int	j			= i;
 
 			entry->action_list[i].type = convert_to_new_code(&entry->action_list[i]);
-			i = cheat_periodicAction(machine, &entry->action_list[i], i);
+			i = cheat_periodic_action(machine, &entry->action_list[i], i);
 			entry->action_list[j].type = tempType;
 		}
 		else
-			i = cheat_periodicAction(machine, &entry->action_list[i], i);
+			i = cheat_periodic_action(machine, &entry->action_list[i], i);
 
 		if(i >= entry->action_list_length)
 			break;
@@ -14601,12 +13388,7 @@ static void update_all_cheat_info(running_machine *machine)
 
 	/* update flags for all cheat entry */
 	for(i = 0; i < cheat_list_length; i++)
-	{
 		update_cheat_info(machine, &cheat_list[i], 1);
-
-		if(cheat_list[i].flags & kCheatFlag_Select)
-			build_label_index_table(&cheat_list[i]);
-	}
 
 	set_layer_index();
 }
@@ -14654,7 +13436,7 @@ static void update_cheat_info(running_machine *machine, cheat_entry *entry, UINT
 
 			if(	(EXTRACT_FIELD(action->type, LocationType) == kLocation_IndirectIndexed) ||
 				((EXTRACT_FIELD(action->type, LocationType) != kLocation_Custom) &&
-				((EXTRACT_FIELD(action->type, Operation) | EXTRACT_FIELD(action->type, OperationExtend) << 2) == 1)))
+				((EXTRACT_FIELD(action->type, Operation) == 1))))
 					action_flags |= kActionFlag_IndexAddress;
 
 			if(i && entry->action_list[i-1].type == entry->action_list[i].type)
@@ -14736,7 +13518,13 @@ static void update_cheat_info(running_machine *machine, cheat_entry *entry, UINT
 			{
 				/* is label-select? */
 				if(action->region == CUSTOM_CODE_LABEL_SELECT)
+				{
 					flags |= kCheatFlag_Select;
+
+					/* use label-selector? */
+					if(TEST_FIELD(action->type, LabelSelectUseSelector))
+						flags |= kCheatFlag_UseLabelSelector;
+				}
 
 				/* is comment? */
 				if(is_null && action->region != CUSTOM_CODE_COMMENT)
@@ -14793,6 +13581,12 @@ static void update_cheat_info(running_machine *machine, cheat_entry *entry, UINT
 		entry->flags &= ~kCheatFlag_Dirty;
 
 	check_code_format(machine, entry);
+
+	if((entry->flags & kCheatFlag_HasWrongCode) == 0)
+	{
+		if(entry->flags & kCheatFlag_Select)
+			build_label_index_table(entry);
+	}
 }
 
 /*----------------------
@@ -14812,9 +13606,6 @@ static UINT32 analyse_code_format(running_machine *machine, cheat_entry *entry, 
 
 		if(type >= kLocation_Unused5)
 			errorFlag |= kErrorFlag_InvalidLocationType;
-
-		if(TEST_FIELD(action->type, OperationExtend))
-			errorFlag |= kErrorFlag_InvalidOperation;
 
 		if(type == kLocation_IndirectIndexed)
 		{
@@ -14859,8 +13650,16 @@ static UINT32 analyse_code_format(running_machine *machine, cheat_entry *entry, 
 		{
 			if(type == kLocation_Standard)
 			{
-				if(!action->extend_data || action->extend_data == 0xFF || action->extend_data == 0xFFFF || action->extend_data == 0xFFFFFF)
-					errorFlag |= kErrorFlag_InvalidExtendDataField;
+				int i;
+
+				for(i = 0; i < 3; i++)
+				{
+					if(action->extend_data == 0 || action->extend_data == BYTE_MASK_TABLE[i])
+					{
+						errorFlag |= kErrorFlag_InvalidExtendDataField;
+						break;
+					}
+				}
 			}
 			else if(type == kLocation_MemoryRegion)
 			{
@@ -14905,7 +13704,7 @@ static UINT32 analyse_code_format(running_machine *machine, cheat_entry *entry, 
 
 			if(action->flags & kActionFlag_Repeat)
 			{
-				if(!EXTRACT_FIELD(action->extend_data, LSB16))
+				if(EXTRACT_FIELD(action->extend_data, LSB16) < 1)
 					errorFlag |= kErrorFlag_NoRepeatCount;
 			}
 
@@ -14926,8 +13725,16 @@ static UINT32 analyse_code_format(running_machine *machine, cheat_entry *entry, 
 
 			if(codeType == kCodeType_Write)
 			{
-				if(!action->extend_data || action->extend_data == 0xFF || action->extend_data == 0xFFFF || action->extend_data == 0xFFFFFF)
-					errorFlag |= kErrorFlag_InvalidExtendDataField;
+				int i;
+
+				for(i = 0; i < 3; i++)
+				{
+					if(action->extend_data == 0 || action->extend_data == BYTE_MASK_TABLE[i])
+					{
+						errorFlag |= kErrorFlag_InvalidExtendDataField;
+						break;
+					}
+				}
 			}
 
 			if((action->flags & kActionFlag_Custom) == 0)
@@ -15086,6 +13893,19 @@ static void set_layer_index(void)
 			}
 		}
 	}
+}
+
+/*----------------------------------------------------------------------------
+  reset_cheat_options - reset cheat options as default and key repeat speed
+----------------------------------------------------------------------------*/
+
+static void reset_cheat_options(void)
+{
+	cheat_options = DEFAULT_CHEAT_OPTIONS;
+	vertical_key_repeat_speed = EXTRACT_FIELD(cheat_options, VerticalKeyRepeatSpeed);
+	horizontal_key_repeat_speed = EXTRACT_FIELD(cheat_options, HorizontalKeyRepeatSpeed);
+
+	SET_MESSAGE(CHEAT_MESSAGE_RESET_OPTIONS);
 }
 
 /*-------------------------------------------------------------------------------------------
