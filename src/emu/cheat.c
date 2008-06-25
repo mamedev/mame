@@ -2006,6 +2006,9 @@ void cheat_init(running_machine *machine)
 	edit_cursor			= 0;
 	cheat_options		= DEFAULT_CHEAT_OPTIONS;
 	driverSpecifiedFlag	= 0;
+	
+	horizontal_key_repeat_speed = 10;
+	vertical_key_repeat_speed = 10;
 
 	full_menu_page_height = visible_items = floor(1.0f / ui_get_line_height()) - 1;
 
