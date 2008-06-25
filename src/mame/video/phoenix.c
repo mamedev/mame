@@ -322,31 +322,50 @@ CUSTOM_INPUT( pleiads_protection_r )
 }
 
 /*
+	Protection.  There is a 14 pin part connected to the 8910 Port B D0 labeled DL57S22
+
     Inputs are demangled at 0x1ae6-0x1b04 using the table at 0x1b26
     and bit 0 of the data from the AY8910 port B. The equation is:
     input = map[input] + ay_data + b@437c
     (b@437c is set and cleared elsewhere in the code, but is
     always 0 during the demangling.)
 
-    A routine at 0x2f31 checks for incorrect AY 8910 port B data.
+    A routine at 0x2f31 checks for incorrect AY8910 port B data.
     Incorrect values increment an error counter at 0x4396 which
     causes bad sprites and will kill the game after a specified
-    number of errors. For input & 0xf0 == 0 or 2 or 4, AY 8910
-    must return 0. For all other joystick bits, it must return 1.
+    number of errors. For input & 0xf0 == 0 or 2 or 4, AY8910
+    port B must have bit 0 cleared. For all other joystick bits,
+    it must be set.
 
     Another  routine at 0x02bc checks for bad SID data, and
-    increments the same error counter.
+    increments the same error counter and cancels certain joystick input.
+
+    The hiscore data entry routine at 0x2fd8 requires unmangled inputs
+    at 0x3094. This could explain the significance of the loop where
+    the joystick inputs are read for gameplay at 0x2006-0x202a. The
+    code waits here for two consecutive identical reads from the AY8910.
+    This probably means there's a third read of raw data with some or all
+    of the otherwise unused bits 1-7 on the AY8910 port B set to
+    distinguish it from a gameplay read.
 */
 
 #define REMAP_JS(js) ((ret & 0xf) | ( (js & 0xf)  << 4))
+static int survival_input_readc = 0;
 READ8_HANDLER( survival_input_port_0_r )
 {
 	UINT8 ret = ~input_port_read(machine, "IN0");
 
-	// Any value that remaps the joystick input to 0,2,4 must return + 0 through AY8910;
-	// All other remaps must return 1 through AY8910.
+	if( survival_input_readc++ == 2 )
+	{
+		survival_input_readc = 0;
+		survival_protection_value = 0;
+		return ~ret;
+	}
 
-	survival_protection_value = 1;
+	// Any value that remaps the joystick input to 0,2,4 must clear bit 0
+	// on the AY8910 port B. All other remaps must set bit 0.
+
+	survival_protection_value = 0xff;
 	survival_sid_value = 0;
 
 	switch( ( ret >> 4) & 0xf )
@@ -354,39 +373,38 @@ READ8_HANDLER( survival_input_port_0_r )
 		case 0: // js_nop = 7 + 1
 			ret = REMAP_JS( 7 );
 			break;
-		case 1: // js_w = 4 + 0
-			survival_sid_value = 0x80;
-			survival_protection_value = 0;
-			ret = REMAP_JS( 4 );
+		case 1: // js_n = 1 + 1
+			ret = REMAP_JS( 8 );
 			break;
 		case 2: // js_e = 0 + 0
 			survival_sid_value = 0x80;
-			survival_protection_value = 0;
+			survival_protection_value = 0xfe;
 			ret = REMAP_JS( 2 );
 			break;
-		case 4: // js_n = 1 + 1
-			ret = REMAP_JS( 8 );
+		case 3: // js_ne = 0 + 1;
+			survival_sid_value = 0x80;
+			ret = REMAP_JS( 0xa );
+			break;
+		case 4: // js_w = 4 + 0
+			survival_sid_value = 0x80;
+			survival_protection_value = 0xfe;
+			ret = REMAP_JS( 4 );
 			break;
 		case 5: // js_nw = 2 + 1
 			survival_sid_value = 0x80;
 			ret = REMAP_JS( 0xc );
 			break;
-		case 6: // js_ne = 0 + 1;
-			survival_sid_value = 0x80;
-			ret = REMAP_JS( 0xa );
-			break;
 		case 8: // js_s = 5 + 1
 			ret = REMAP_JS( 1 );
-			break;
-		case 9: // js_sw = 4 + 1
-			survival_sid_value = 0x80;
-			ret = REMAP_JS( 5 );
 			break;
 		case 0xa: // js_se = 6 + 1
 			survival_sid_value = 0x80;
 			ret = REMAP_JS( 3 );
 			break;
-
+		case 0xc: // js_sw = 4 + 1
+			survival_sid_value = 0x80;
+			ret = REMAP_JS( 5 );
+			break;
 		default:
 			break;
 	}

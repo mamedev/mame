@@ -18,14 +18,6 @@ To Do:
 
 Survival:
 
-- Protection.  There is a 14 pin part connected to the 8910 Port B D0 labeled DL57S22.
-  There is a loop at $2002 that reads the player controls -- the game sits in this
-  loop as long as Port B changes.  Also, Port B seems to invert the input bits, and
-  the game checks for this at $2f32.  The game also uses the RIM instruction a lot,
-  that's purpose is unclear, as the result doesn't seem to be used (even when it's
-  stored, the result is never read again.)  I would think that this advances the
-  protection chip somehow, but isn't RIM a read only operation?
-
 - Check background visibile area.  When the background scrolls up, it
   currently shows below the top and bottom of the border of the play area.
 
@@ -334,18 +326,18 @@ static INPUT_PORTS_START( survival )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT    )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
 
 	PORT_START_TAG("IN1")		/* IN1 */
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL )	/* comes from IN0 0-2 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN     ) PORT_COCKTAIL
 
     PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
