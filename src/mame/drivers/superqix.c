@@ -1099,7 +1099,7 @@ static MACHINE_DRIVER_START( sqixbl )
 	MDRV_CPU_ADD(Z80, 12000000/2)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(bootleg_port_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(bootleg_interrupt,3)	/* ??? */
+	MDRV_CPU_VBLANK_INT_HACK(bootleg_interrupt,6)	/* ??? */
 
 	MDRV_MACHINE_START(superqix)
 
