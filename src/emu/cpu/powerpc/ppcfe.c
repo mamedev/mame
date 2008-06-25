@@ -55,10 +55,10 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static int describe_instruction_13(powerpc_state *ppc, UINT32 op, opcode_desc *desc);
-static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *desc);
-static int describe_instruction_3b(powerpc_state *ppc, UINT32 op, opcode_desc *desc);
-static int describe_instruction_3f(powerpc_state *ppc, UINT32 op, opcode_desc *desc);
+static int describe_instruction_13(powerpc_state *ppc, UINT32 op, opcode_desc *desc, const opcode_desc *prev);
+static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *desc, const opcode_desc *prev);
+static int describe_instruction_3b(powerpc_state *ppc, UINT32 op, opcode_desc *desc, const opcode_desc *prev);
+static int describe_instruction_3f(powerpc_state *ppc, UINT32 op, opcode_desc *desc, const opcode_desc *prev);
 
 
 
@@ -117,7 +117,7 @@ INLINE int is_603_class(const powerpc_state *ppc)
     of a single instruction
 -------------------------------------------------*/
 
-int ppcfe_describe(void *param, opcode_desc *desc)
+int ppcfe_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 {
 	powerpc_state *ppc = param;
 	UINT32 op = *desc->opptr.l;
@@ -187,7 +187,12 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 
 		case 0x10:	/* BCx */
 			if (!(G_BO(op) & 0x10))
+			{
 				CR_BIT_USED(desc, G_BI(op));
+				/* branch folding */
+				if (prev == NULL || prev->regout[2] == 0)
+					desc->cycles = 0;
+			}
 			if (!(G_BO(op) & 0x04))
 			{
 				CTR_USED(desc);
@@ -219,10 +224,12 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 				LR_MODIFIED(desc);
 			desc->flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			desc->targetpc = ((INT32)(G_LI(op) << 8) >> 6) + ((op & M_AA) ? 0 : desc->pc);
+			/* branch folding */
+			desc->cycles = 0;
 			return TRUE;
 
 		case 0x13:	/* 0x13 group */
-			return describe_instruction_13(ppc, op, desc);
+			return describe_instruction_13(ppc, op, desc, prev);
 
 		case 0x14:	/* RLWIMIx */
 			GPR_USED(desc, G_RS(op));
@@ -273,7 +280,7 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 			return TRUE;
 
 		case 0x1f:	/* 0x1f group */
-			return describe_instruction_1f(ppc, op, desc);
+			return describe_instruction_1f(ppc, op, desc, prev);
 
 		case 0x20:	/* LWZ */
 		case 0x22:	/* LBZ */
@@ -374,10 +381,10 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 			return TRUE;
 
 		case 0x3b:	/* 0x3b group */
-			return describe_instruction_3b(ppc, op, desc);
+			return describe_instruction_3b(ppc, op, desc, prev);
 
 		case 0x3f:	/* 0x3f group */
-			return describe_instruction_3f(ppc, op, desc);
+			return describe_instruction_3f(ppc, op, desc, prev);
 	}
 
 	return FALSE;
@@ -390,7 +397,7 @@ int ppcfe_describe(void *param, opcode_desc *desc)
     0x13 group
 -------------------------------------------------*/
 
-static int describe_instruction_13(powerpc_state *ppc, UINT32 op, opcode_desc *desc)
+static int describe_instruction_13(powerpc_state *ppc, UINT32 op, opcode_desc *desc, const opcode_desc *prev)
 {
 	UINT32 opswitch = (op >> 1) & 0x3ff;
 
@@ -399,6 +406,9 @@ static int describe_instruction_13(powerpc_state *ppc, UINT32 op, opcode_desc *d
 		case 0x000:	/* MTCRF */
 			CR_USED(desc, G_CRFS(op));
 			CR_MODIFIED(desc, G_CRFD(op));
+			/* CR logical folding */
+			if (prev == NULL || prev->regout[2] == 0)
+				desc->cycles = 0;
 			return TRUE;
 
 		case 0x010:	/* BCLRx */
@@ -430,6 +440,9 @@ static int describe_instruction_13(powerpc_state *ppc, UINT32 op, opcode_desc *d
 			CR_BIT_USED(desc, G_CRBA(op));
 			CR_BIT_USED(desc, G_CRBB(op));
 			CR_BIT_MODIFIED(desc, G_CRBD(op));
+			/* CR logical folding */
+			if (prev == NULL || prev->regout[2] == 0)
+				desc->cycles = 0;
 			return TRUE;
 
 		case 0x032:	/* RFI */
@@ -485,7 +498,7 @@ static int describe_instruction_13(powerpc_state *ppc, UINT32 op, opcode_desc *d
     0x1f group
 -------------------------------------------------*/
 
-static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *desc)
+static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *desc, const opcode_desc *prev)
 {
 	UINT32 opswitch = (op >> 1) & 0x3ff;
 	int spr, regnum;
@@ -1177,7 +1190,7 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
     0x3b group
 -------------------------------------------------*/
 
-static int describe_instruction_3b(powerpc_state *ppc, UINT32 op, opcode_desc *desc)
+static int describe_instruction_3b(powerpc_state *ppc, UINT32 op, opcode_desc *desc, const opcode_desc *prev)
 {
 	UINT32 opswitch = (op >> 1) & 0x1f;
 
@@ -1241,7 +1254,7 @@ static int describe_instruction_3b(powerpc_state *ppc, UINT32 op, opcode_desc *d
     0x3f group
 -------------------------------------------------*/
 
-static int describe_instruction_3f(powerpc_state *ppc, UINT32 op, opcode_desc *desc)
+static int describe_instruction_3f(powerpc_state *ppc, UINT32 op, opcode_desc *desc, const opcode_desc *prev)
 {
 	UINT32 opswitch = (op >> 1) & 0x3ff;
 

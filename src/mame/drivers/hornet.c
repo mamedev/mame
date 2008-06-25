@@ -310,6 +310,7 @@
 #include "driver.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
+#include "machine/eeprom.h"
 #include "machine/konppc.h"
 #include "machine/konamiic.h"
 #include "video/voodoo.h"
@@ -660,6 +661,7 @@ static VIDEO_UPDATE( hornet_2board )
 }
 
 /*****************************************************************************/
+
 static READ8_HANDLER( sysreg_r )
 {
 	UINT8 r = 0;
@@ -667,17 +669,26 @@ static READ8_HANDLER( sysreg_r )
 
 	switch (offset)
 	{
-		case 0:
-		case 1:
-		case 2:
+		case 0:	/* I/O port 0 */
+		case 1:	/* I/O port 1 */
+		case 2:	/* I/O port 2 */
 			r = input_port_read(machine, portnames[offset]);
 			break;
 
-		case 3:
-			r = 0xf7;
+		case 3:	/* I/O port 3 */
+			/* 
+				0x80 = JVSINIT (JAMMA I/F SENSE)
+				0x40 = COMMST
+				0x20 = GSENSE
+				0x08 = EEPDO (EEPROM DO)
+				0x04 = ADEOC (ADC EOC)
+				0x02 = ADDOR (ADC DOR)
+				0x01 = ADDO (ADC DO)
+			*/
+			r = 0xf7 | (eeprom_read_bit() << 3);
 			break;
 
-		case 4:
+		case 4:	/* I/O port 4 - DIP switches */
 			r = input_port_read(machine, "DSW");
 			break;
 	}
@@ -688,25 +699,90 @@ static WRITE8_HANDLER( sysreg_w )
 {
 	switch (offset)
 	{
-		case 0:
+		case 0:	/* LED Register 0 */
 			led_reg0 = data;
 			break;
 
-		case 1:
+		case 1:	/* LED Register 1 */
 			led_reg1 = data;
 			break;
+		
+		case 2: /* Parallel data register */
+			mame_printf_debug("Parallel data = %02X\n", data);
+			break;
+		
+		case 3:	/* System Register 0 */
+			/* 
+				0x80 = EEPWEN (EEPROM write enable)
+				0x40 = EEPCS (EEPROM CS)
+				0x20 = EEPSCL (EEPROM SCL?)
+				0x10 = EEPDT (EEPROM data)
+				0x08 = JVSTXEN / LAMP3 (something about JAMMA interface)
+				0x04 = LAMP2
+				0x02 = LAMP1
+				0x01 = LAMP0
+			*/
+			eeprom_write_bit((data & 0x10) ? 1 : 0);
+			eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+			eeprom_set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+			mame_printf_debug("System register 0 = %02X\n", data);
+			break;
 
-		case 7:
-			if (data & 0x80)	/* CG Board 1 IRQ Ack */
+		case 4:	/* System Register 1 */
+			/* 
+				0x80 = SNDRES (sound reset)
+				0x40 = COMRES (COM reset)
+				0x20 = COINRQ2 (EEPROM SCL?)
+				0x10 = COINRQ1 (EEPROM data)
+				0x08 = ADCS (ADC CS)
+				0x04 = ADCONV (ADC CONV)
+				0x02 = ADDI (ADC DI)
+				0x01 = ADDSCLK (ADC SCLK)
+			*/
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+			mame_printf_debug("System register 1 = %02X\n", data);
+			break;
+		
+		case 5:	/* Sound Control Register */
+			/*
+				0x80 = MODE1
+				0x40 = MUTE1
+				0x20 = DEEN1
+				0x10 = ATCK1
+				0x08 = MODE0
+				0x04 = MUTE0
+				0x02 = DEEN0
+				0x01 = ATCK0
+			*/
+			mame_printf_debug("Sound control register = %02X\n", data);
+			break;
+
+		case 6:	/* WDT Register */
+			/*
+				0x80 = WDTCLK
+			*/
+			if (data & 0x80)
+				watchdog_reset(machine);
+			break;
+
+		case 7:	/* CG Control Register */
+			/*
+				0x80 = EXRES1
+				0x40 = EXRES0
+				0x20 = EXID1
+				0x10 = EXID0
+				0x01 = EXRGB
+			*/
+			if (data & 0x80)
 				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
-
-			if (data & 0x40)	/* CG Board 0 IRQ Ack */
+			if (data & 0x40)
 				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
-
-			set_cgboard_id((data >> 4) & 0x3);
+			set_cgboard_id((data >> 4) & 3);
 			break;
 	}
 }
+
+/*****************************************************************************/
 
 static WRITE32_HANDLER( comm1_w )
 {
@@ -960,6 +1036,12 @@ static MACHINE_RESET( hornet )
 		memory_set_bankptr(5, usr5);
 }
 
+static NVRAM_HANDLER( hornet )
+{
+	NVRAM_HANDLER_CALL(timekeeper_0);
+	NVRAM_HANDLER_CALL(93C46);
+}
+
 static MACHINE_DRIVER_START( hornet )
 
 	/* basic machine hardware */
@@ -978,7 +1060,7 @@ static MACHINE_DRIVER_START( hornet )
 	MDRV_MACHINE_START( hornet )
 	MDRV_MACHINE_RESET( hornet )
 
-	MDRV_NVRAM_HANDLER( timekeeper_0 )
+	MDRV_NVRAM_HANDLER( hornet )
 
 	MDRV_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "main")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)

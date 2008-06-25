@@ -39,7 +39,7 @@ static int describe_instruction_cop2(mips3_state *mips, UINT32 op, opcode_desc *
     of a single instruction
 -------------------------------------------------*/
 
-int mips3fe_describe(void *param, opcode_desc *desc)
+int mips3fe_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 {
 	mips3_state *mips = param;
 	UINT32 op = *desc->opptr.l;

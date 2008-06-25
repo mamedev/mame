@@ -37,6 +37,146 @@
     Winding Heat                   | GX677     | ZR107        | ZR107
     Jetwave / Waveshark            | GX678     | ZR107        | GN678
 
+
+Winding Heat
+Konami, 1996
+
+This game runs on Konami PPC hardware, and is similar to GTI Club hardware.
+
+PCB Layout
+----------
+
+Top Board
+
+ZR107  PWB(A)300769A
+|------------------------------------------------------------|
+|                                         677A09.3R          |
+|                              677A10.5N  677A08.5R          |
+|        056800      058141    68EC000FN8     *1      *2     |
+| RESET_SW                                    *1      *2     |
+|                                                            |
+|      001535  001536   8464  8464             677UBC04.13U  |
+|                                                            |
+|                                       *4     677UBC03.15U  |
+|                                                            |
+|                          *3           *4     677UBC02.17U  |
+|                       677A07.19L  18.432MHz                |
+|        93C46.20E                             677UBC01.20U  |
+|               LED                  814260-70               |
+|                            001534                          |
+|     ADC0838                                                |
+|                            001533  814260-70               |
+| TEST_SW                                                    |
+|                            001532                          |
+|     056787A                                                |
+|                                                            |
+|     8464                                                   |
+|                                               PPC403GA     |
+|                          64MHz                             |
+|     056230    *5                                           |
+|                                                            |
+| DSW4P                                                      |
+|------------------------------------------------------------|
+
+Notes:
+      *1: Unpopulated position for 16MBit TSOP56 Flash ROM.
+      *2: Unpopulated position for 16MBit DIP42 MASK ROM.
+      *3: Unpopulated position for 4MBit EPROM
+      *4: Unpopulated position for DRAM 814260-70
+      *5: Unpopulated position for MB89371FL
+      001532-001536, 056787A = PALCE16V8H
+      056230 also marked KS40011
+      8464: 64k SRAM
+      814260: 4Mx16 DRAM
+      LED has 2 digit numerical output
+      DSW4P: 4 position DIP SWITCH
+      677A07.19L - AM27C1024 EPROM
+      677A08.5R  - 42 PIN 16M MASK ROM
+      677A09.3R  - 42 PIN 16M MASK ROM
+      677A10.5N  - 42 PIN 16M MASK ROM
+      677UBC0*   - AM27C040 EPROM
+
+
+Bottom Board
+
+ZR107  PWB(B)300816D
+|------------------------------------------------------------|
+|   *6       677A16.2H       001006   81141622  81141622     |
+|                                                            |
+|   *6       677A15.5H                          81141622     |
+|                                 001005                     |
+|   *6       677A14.7H                          81141622     |
+|                                                            |
+|   *6       677A13.9H                    81141622           |
+|                                                            |
+|                           MC88916                          |
+|     001785                   AM7203  AM7203  AM7203 AM7203 |
+|                                                            |
+|                                                            |
+|                                             001782  001781 |
+|                                                            |
+|                                                            |
+|                                                            |
+| MC44200   CY7C128  CY7C128  CY7C199  CY7C199               |
+|                             CY7C199  CY7C199  36MHz        |
+|                                                            |
+| 001779     056832                            ADSP21062     |
+|                                                            |
+|       001784  058143                      CY7C109  CY7C109 |
+| 677A12.35A                                                 |
+|            62256  62256  001780           CY7C109  CY7C109 |
+|     677A11.35B  62256                                      |
+|                         DSW4P                              |
+|------------------------------------------------------------|
+
+Notes:
+      001006 also marked KS10081
+      81141622: 4Mx16Bit SDRAM
+      001005 also marked KS10071, chip is heatsinked.
+      AM7203: PLCC32 PLD, marked FIFO 2Kx9
+      001779,001780: MACH110 PLD
+      DSW4P: 4 position DIP SWITCH
+      001781,001782,001784,001785: PALCE16V8H
+      CY7C128: 16k SRAM
+      CY7C199: 256k SRAM
+      CY7C109: 1M SRAM
+      62256: 256k SRAM
+      ADSP21062 also marked SHARC and KS-160
+      *6: Unpopulated position for 8MBit x 8bit DIP42 MASK ROM
+      677A13.9H  - 42 PIN 16M MASK ROM
+      677A14.7H  - 42 PIN 16M MASK ROM
+      677A15.5H  - 42 PIN 16M MASK ROM
+      677A16.2H  - 42 PIN 16M MASK ROM
+      677A12.35A - 40 PIN 4M MASK ROM
+      677A11.35B - 40 PIN 4M MASK ROM
+
+
+
+Jet Wave / Wave Shark
+Konami, 1996
+
+This game uses the same video PCB as GTI Club (board number GN678 PWB(B)302009A)
+The top board is the same PCB used on Winding Heat & Midnight Run (board number ZR107 PWB(A)300769A)
+
+Main parts on the top board include....
+IBM PowerPC403GA @32MHz [64/2]
+HM514260-7 (x2)
+MC68EC000-8 @8MHz [64/8]
+058141
+056800
+MB8464 (8kx8, x3)
+KS40011-PF 056230
+93C46 EEPROM
+DSW (4-position)
+64MHz OSC
+18.432 XTAL
+Test SW
+Reset SW
+2-position numeric LED display
+LA4705 AMP
+5 EPROMs
+5 MASKROMs
+
 */
 
 #include "driver.h"
@@ -164,84 +304,105 @@ static VIDEO_UPDATE( zr107 )
 
 /******************************************************************/
 
-static READ32_HANDLER( sysreg_r )
+static CUSTOM_INPUT( adcdo_r )
+{
+	return adc083x_do_read(0);
+}
+
+static READ8_HANDLER( sysreg_r )
 {
 	UINT32 r = 0;
-	if (offset == 0)
+	
+	switch (offset)
 	{
-		if (ACCESSING_BITS_24_31)
-		{
-			r |= input_port_read_indexed(machine, 0) << 24;
-		}
-		if (ACCESSING_BITS_16_23)
-		{
-			r |= input_port_read_indexed(machine, 1) << 16;
-		}
-		if (ACCESSING_BITS_8_15)
-		{
-			int adc_bit = adc083x_do_read(0);
-			r |= ((input_port_read_indexed(machine, 2) & 0x7f) | (adc_bit << 7)) << 8;
-		}
-		if (ACCESSING_BITS_0_7)
-		{
-			r |= input_port_read_indexed(machine, 3) << 0;
-		}
+		case 0:	/* I/O port 0 */
+		case 1:	/* I/O port 1 */
+		case 2:	/* I/O port 2 */
+		case 3:	/* System Port 0 */
+			r = input_port_read_indexed(machine, offset);
+			break;
+		
+		case 4:	/* System Port 1 */
+			/* 
+				0x80 = PARAACK
+				0x40 = unused
+				0x20 = SARS (A/D busy flag)
+				0x10 = EEPDO (EEPROM DO)
+			*/
+			r = (adc083x_sars_read(0) << 5) | (eeprom_read_bit() << 4);
+			break;
+		
+		case 5:	/* Parallel data port */
+			break;
 	}
-	else if (offset == 1)
-	{
-		if (ACCESSING_BITS_24_31)
-		{
-			r |= ((adc083x_sars_read(0) << 5) | (eeprom_read_bit() << 4)) << 24;
-		}
-	}
-	//mame_printf_debug("sysreg_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
 	return r;
 }
 
-static WRITE32_HANDLER( sysreg_w )
+static WRITE8_HANDLER( sysreg_w )
 {
-	if( offset == 0 )
+	switch (offset)
 	{
-		if (ACCESSING_BITS_24_31)
-		{
-			led_reg0 = (data >> 24) & 0xff;
-		}
-		if (ACCESSING_BITS_16_23)
-		{
-			led_reg1 = (data >> 16) & 0xff;
-		}
-		if (ACCESSING_BITS_0_7)
-		{
-			eeprom_write_bit((data & 0x1) ? 1 : 0);
-			eeprom_set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-			eeprom_set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
-
-			if (data & 0x10)
-				cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
-			else
-				cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
-		}
-		return;
-	}
-	else if( offset == 1 )
-	{
-		if (ACCESSING_BITS_24_31)
-		{
-			if (data & 0x80000000)	/* CG Board 1 IRQ Ack */
+		case 0:	/* LED Register 0 */
+			led_reg0 = data;
+			break;
+		
+		case 1:	/* LED Register 1 */
+			led_reg1 = data;
+			break;
+		
+		case 2: /* Parallel data register */
+			mame_printf_debug("Parallel data = %02X\n", data);
+			break;
+		
+		case 3:	/* System Register 0 */
+			/* 
+				0x80 = unused
+				0x40 = COINREQ1
+				0x20 = COINREQ2
+				0x10 = SNDRES
+				0x08 = unused
+				0x04 = EEPCS
+				0x02 = EEPCLK
+				0x01 = EEPDI
+			*/
+			eeprom_write_bit((data & 0x01) ? 1 : 0);
+			eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+			eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			mame_printf_debug("System register 0 = %02X\n", data);
+			break;
+		
+		case 4:	/* System Register 1 */
+			/*
+				0x80 = EXRES1
+				0x40 = EXRES0
+				0x20 = EXID1
+				0x10 = EXID0
+				0x08 = unused
+				0x04 = ADCS (ADC CS)
+				0x02 = ADDI (ADC DI)
+				0x01 = ADDSCLK (ADC SCLK)
+			*/
+			if (data & 0x80)	/* CG Board 1 IRQ Ack */
 				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
-
-			if (data & 0x40000000)	/* CG Board 0 IRQ Ack */
+			if (data & 0x40)	/* CG Board 0 IRQ Ack */
 				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+			set_cgboard_id((data >> 4) & 3);
+			adc083x_cs_write(0, (data >> 2) & 1);
+			adc083x_di_write(0, (data >> 1) & 1);
+			adc083x_clk_write(0, (data >> 0) & 1);
+			mame_printf_debug("System register 1 = %02X\n", data);
+			break;
 
-			set_cgboard_id((data >> 28) & 0x3);
+		case 5:	/* System Register 2 */
+			/*
+				0x01 = AFE
+			*/
+			if (data & 0x01)
+				watchdog_reset(machine);
+			break;
 
-			adc083x_cs_write(0, (data >> 26) & 1);
-			adc083x_di_write(0, (data >> 25) & 1);
-			adc083x_clk_write(0, (data >> 24) & 1);
-		}
-		return;
 	}
-	mame_printf_debug("sysreg_w: %08X, %08X, %08X\n", offset, data, mem_mask);
 }
 
 static double adc0838_callback(int input)
@@ -325,7 +486,7 @@ static ADDRESS_MAP_START( zr107_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x78010000, 0x7801ffff) AM_WRITE(cgboard_dsp_shared_w_ppc)
 	AM_RANGE(0x78040000, 0x7804000f) AM_READWRITE(K001006_0_r, K001006_0_w)
 	AM_RANGE(0x780c0000, 0x780c0007) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
-	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE(sysreg_r, sysreg_w)
+	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_READWRITE8(K056230_r, K056230_w, 0xffffffff)				/* LANC registers */
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_READWRITE(lanc_ram_r, lanc_ram_w)		/* LANC Buffer RAM (27E) */
 	AM_RANGE(0x7e00c000, 0x7e00c007) AM_WRITE(K056800_host_w)
@@ -353,7 +514,7 @@ static ADDRESS_MAP_START( jetwave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x78040000, 0x7804000f) AM_MIRROR(0x80000000) AM_READWRITE(K001006_0_r, K001006_0_w)
 	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE(K001006_1_r, K001006_1_w)
 	AM_RANGE(0x780c0000, 0x780c0007) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
-	AM_RANGE(0x7e000000, 0x7e003fff) AM_MIRROR(0x80000000) AM_READWRITE(sysreg_r, sysreg_w)
+	AM_RANGE(0x7e000000, 0x7e003fff) AM_MIRROR(0x80000000) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_READWRITE8(K056230_r, K056230_w, 0xffffffff)				/* LANC registers */
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_MIRROR(0x80000000) AM_READWRITE(lanc_ram_r, lanc_ram_w)		/* LANC Buffer RAM (27E) */
 	AM_RANGE(0x7e00c000, 0x7e00c007) AM_MIRROR(0x80000000) AM_WRITE(K056800_host_w)
@@ -438,7 +599,8 @@ static INPUT_PORTS_START( midnrun )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(adcdo_r, 0)
 
 	PORT_START
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
@@ -481,7 +643,8 @@ static INPUT_PORTS_START( windheat )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(adcdo_r, 0)
 
 	PORT_START
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
@@ -524,7 +687,8 @@ static INPUT_PORTS_START( jetwave )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(adcdo_r, 0)
 
 	PORT_START
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )

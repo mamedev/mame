@@ -46,6 +46,6 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-int ppcfe_describe(void *param, opcode_desc *desc);
+int ppcfe_describe(void *param, opcode_desc *desc, const opcode_desc *prev);
 
 #endif

@@ -72,7 +72,7 @@ struct _drcfe_state
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static opcode_desc *describe_one(drcfe_state *drcfe, offs_t curpc);
+static opcode_desc *describe_one(drcfe_state *drcfe, offs_t curpc, const opcode_desc *prevdesc);
 static opcode_desc **build_sequence(drcfe_state *drcfe, opcode_desc **tailptr, int start, int end, UINT32 endflag);
 static void accumulate_required_backwards(opcode_desc *desc, UINT32 *reqmask);
 static void release_descriptions(drcfe_state *drcfe, opcode_desc *desc);
@@ -228,7 +228,7 @@ const opcode_desc *drcfe_describe_code(drcfe_state *drcfe, offs_t startpc)
 		for (curpc = curstack->targetpc; curpc >= minpc && curpc < maxpc && drcfe->desc_array[curpc - minpc] == NULL; curpc += drcfe->desc_array[curpc - minpc]->length)
 		{
 			/* allocate a new description and describe this instruction */
-			drcfe->desc_array[curpc - minpc] = curdesc = describe_one(drcfe, curpc);
+			drcfe->desc_array[curpc - minpc] = curdesc = describe_one(drcfe, curpc, curdesc);
 
 			/* first instruction in a sequence is always a branch target */
 			if (curpc == curstack->targetpc)
@@ -276,7 +276,7 @@ const opcode_desc *drcfe_describe_code(drcfe_state *drcfe, offs_t startpc)
     slots of branches as well
 -------------------------------------------------*/
 
-static opcode_desc *describe_one(drcfe_state *drcfe, offs_t curpc)
+static opcode_desc *describe_one(drcfe_state *drcfe, offs_t curpc, const opcode_desc *prevdesc)
 {
 	opcode_desc *desc = desc_alloc(drcfe);
 
@@ -307,7 +307,7 @@ static opcode_desc *describe_one(drcfe_state *drcfe, offs_t curpc)
 	}
 
 	/* call the callback to describe an instruction */
-	if (!(*drcfe->describe)(drcfe->param, desc))
+	if (!(*drcfe->describe)(drcfe->param, desc, prevdesc))
 	{
 		desc->flags |= OPFLAG_WILL_CAUSE_EXCEPTION | OPFLAG_INVALID_OPCODE;
 		return desc;
@@ -332,7 +332,7 @@ static opcode_desc *describe_one(drcfe_state *drcfe, offs_t curpc)
 		for (slotnum = 0; slotnum < desc->delayslots; slotnum++)
 		{
 			/* recursively describe the next instruction */
-			*tailptr = describe_one(drcfe, delaypc);
+			*tailptr = describe_one(drcfe, delaypc, prev);
 			if (*tailptr == NULL)
 				break;
 

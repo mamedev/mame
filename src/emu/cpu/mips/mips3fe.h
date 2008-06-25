@@ -37,6 +37,6 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-int mips3fe_describe(void *param, opcode_desc *desc);
+int mips3fe_describe(void *param, opcode_desc *desc, const opcode_desc *prev);
 
 #endif

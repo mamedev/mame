@@ -128,7 +128,7 @@ struct _opcode_desc
 
 
 /* callback function that is used to describe a single opcode */
-typedef int (*drcfe_describe_func)(void *param, opcode_desc *desc);
+typedef int (*drcfe_describe_func)(void *param, opcode_desc *desc, const opcode_desc *prev);
 
 
 /* description of a given opcode */

@@ -32,6 +32,190 @@
     Solar Assault                  | GX680     | GN672(A)     | GN678(B)       |
 
     Hang Pilot                     | GN685     | ??           | 2x ??          | 3dfx-based CG boards
+
+
+Konami 'GTI Club' Hardware
+Konami, 1996-1998
+
+Known games on this hardware include....
+
+Game                        (C)      Year
+-----------------------------------------
+GTI Club                    Konami   1996
+Jet Wave / Wave Shark       Konami   1996 (video board only)
+Operation Thunder Hurricane Konami   1997
+Solar Assault               Konami   1997
+Solar Assault : Revised     Konami   1998
+
+
+PCB Layouts
+-----------
+
+Top Board
+
+GN672 PWB(A)3020088
+Konami 1996
+|--------------------------------------------------------------|
+|                                    DRAM1M   MASKROM.2S       |
+|CN13            NJM5532    PAL(002616)                        |
+|                    SM5877                   MASKROM.5S       |
+|       AN7395S  NJM5532                                       |
+|                                   RF5C400   MASKROM.7S       |
+|                                                              |
+|             056800            SRAM256K      MASKROM.9S       |
+|   058232                      SRAM256K                       |
+|       RESET_SW        EPROM.13K                   MASKROM.12U|
+|5                                                             |
+|6                                                  MASKROM.14U|
+|W  TEST_SW              68EC000FN16                           |
+|A                                         EPROM.19R  EPROM.19U|
+|Y                                         EPROM.19R  EPROM.19U|
+|              33.868MHz                                       |
+|                     PAL(002248)                  |---------| |
+|                     PAL(002249)                  |PPC403GA | |
+|             93C56                                |         | |
+|LED        PAL(002247)      DRAM4MX16             |         | |
+|                                                  |---------| |
+|           056230           DRAM4MX16                         |
+|SRAM64K                                                       |
+|                   64MHz            MACH111                   |
+|CN4                                                           |
+|        PAL(056787A)                                          |
+|CN5                                                           |
+|DSW(4)                        CN12                            |
+|--------------------------------------------------------------|
+Notes:
+         DRAM1M - OKI M514256 1Mx4 DRAM (SOJ26/20)
+        SRAM64K - 8kx8 SRAM (DIP28)
+       SRAM256K - Fujitsu 84256 32kx8 SRAM (DIP28)
+      DRAM4MX16 - Hitachi HM514260 4Mx16 DRAM (SOJ42)
+        RF5C400 - Ricoh RF5C400 PCM 32Ch, 44.1 kHz Stereo, 3D Effect Spatializer, clock input 16.934MHz (33.868/2)
+         056800 - Konami Custom (QFP80)
+         056230 - Konami Custom (QFP80)
+         058232 - Konami Custom Ceramic Package (SIL14, D/A filter?)
+        MACH111 - AMD MACH111 PLCC44 CPLD (stamped '002246')
+        68EC000 - Motorola MC68EC000, running at 16.0MHz (64/4)
+          93C56 - EEPROM (DIP8)
+       PPC403GA - IBM PowerPC 403GA CPU, clock input 32.0MHz (64/2) (QFP160)
+       SM5877AM - Nippon Precision Circuits 3rd Order 2-Channel D/A Converter (SOIC24)
+      NJM5532AN - Dual Low-Noise High-Speed Audio OP Amp (DIP8)
+        AN7395S - Panasonic AN7395S Spatializer Audio Processor IC for 3D surround (SOIC20)
+          CN4/5 - Network connectors
+           CN12 - DIN96 connector joining to lower PCB
+           CN13 - Audio OUT connector
+            LED - Alpha-numeric 7-segment LED
+
+ROM Usage
+---------
+                            |--------------------------------------- ROM Locations --------------------------------------|
+Game                        13K     2S      5S      7S      9S      12U     14U     19R       19U       21R       21U
+--------------------------------------------------------------------------------------------------------------------------
+GTI Club                    688A07  688A12  688A11  688A10  688A09  688A06  688A05  688AAA04  688AAA02  688AAA03  688AAA01
+Jet Wave                    - see note -
+Hang Pilot                  685A07  -       -       685A10  685A09  685A06  685A05  685JAB04  685JAB02  685JAB03  685JAB01
+Operation Thunder Hurricane 680A07  680A12  680A11  680A10  680A09  680A06  680A05  680UAA04  680UAA02  680UAA03  680UAA01
+Solar Assault               792A07  792A12  792A11  792A10  792A09  792A06  792A05  792UAA04  792UAA02  792UAA03  792UAA01
+Solar Assault : Revised     - N/A -
+
+Note : Jet Wave uses the lower board (GN678) from GTI Club, but it uses a different top board (ZR107 PWB(A)300769A)
+Check zr107.c for details on the top board.
+
+Operation Thunder Hurricane uses an additional top board for sound, network and analog
+control functions...
+
+GN680 PWB(E)403381B
+|------------------------------------------|
+|CN11  CN12    CN8      CN9    CN10  DSW(4)|
+|                 NRPS11     NRPS11        |
+|                                          |
+|                        LM1881   LM1881   |
+|                                          |
+|LED(x4)                                   |
+|                                          |
+|           68EC000FN16  8464              |
+|    RESET_SW            8464              |
+|32MHz                           680C22.20K|
+|8464                 PAL(002962)          |
+|CN4   056230         PAL(002961)          |
+|   PAL(056787A)      PAL(002960)          |
+|CN5                                       |
+|------------------------------------------|
+Notes:
+      68000 @ 16MHz (32/2)
+      CN11/12 - Power connectors
+      CN8/9   - 6-pin analog control connectors
+      CN10    - 4-pin sound output connector
+      NRPS11  - Idec NRPS11 PC Board circuit protector
+      LM1881  - Video sync separator (DIP8)
+
+
+Bottom Board
+
+GN678 PWB(B)302009A
+Konami 1996
+|-------------------------------------------------------------------------------------------|
+|CN4      MASKROM.2D      |--------|  SDR4M16  SDR4M16      |--------|  SDR4M16  SDR4M16    |
+|                         |KS10081 |                        |KS10081 |                      |
+|         MASKROM.4D      |        |                        |        |               SDR4M16|
+|                         |--------|     |----------|       |--------|    |----------|      |
+|CN2      MASKROM.6D                     | KS10071  | SDR4M16             | KS10071  |      |
+|                                        |          |                     |          |      |
+|         MASKROM.9D                     |          | SDR4M16             |          |      |
+|                                        |----------|                     |----------|      |
+|         MASKROM.11D                                                                SDR4M16|
+|                                          SDR4M16                          SDR4M16         |
+|         MASKROM.13D                                                                       |
+|                                                      MC88916                              |
+|         MASKROM.16D                                         PAL(002304)                   |
+| MC44200                                                                 PAL(002303)       |
+|         MASKROM.18D                                                                       |
+|                                                                                           |
+|                                                                         36MHz             |
+|                                AM7203  AM7203  AM7203  AM7203         |-------------|     |
+|                                                  256KSRAM  256KSRAM   |ANALOG       |     |
+|                                                                       |DEVICES      |     |
+|              PAL(002305)  64KSRAM   64KSRAM      256KSRAM  256KSRAM   |ADSP-21062   |     |
+|                                                                       |SHARC        |     |
+|         |--------|     MACH110                                        |KS-160X      |     |
+|1MSRAM   |KONAMI  |                                                    |-------------|     |
+|1MSRAM   |001604  |                                                                        |
+|1MSRAM   |        |                                                        1MSRAM  1MSRAM  |
+|1MSRAM   |--------|                                                                        |
+|1MSRAM       256KSRAM                                                      1MSRAM  1MSRAM  |
+|1MSRAM   256KSRAM 256KSRAM                    CN1                                          |
+|-------------------------------------------------------------------------------------------|
+Notes:
+     SDR4M16 - Fujitsu 81141622-015 4M SDRAM (TSOP50)
+      1MSRAM - Sharp LH521007 128kx8 SRAM (SOJ32)
+    256KSRAM - Cypress CY7C199 32kx8 SRAM (SOJ28)
+     64KSRAM - Cypress CY7C185 8kx8 SRAM (DIP28)
+     KS10071 - Konami Custom video chip
+     KS10081 - Konami Custom video chip
+      001604 - Konami Custom (QFP208)
+   MC44200FT - Motorola MC44200FT 3 Channel Video D/A Converter (QFP44)
+     MACH110 - AMD MACH110 or MACH111 PLCC44 CPLD (Jet Wave stamped '002302')
+                                                  (GTI Club stamped '003161')
+                                                  (Thund.Hurr. stamped '003161')
+      AM7203 - AMD AM7203 FIFO (PLCC32)
+     MC88916 - Motorola MC88916 Low Skew CMOS PLL Clock Driver
+         CN1 - 96 Pin joining connector to upper PCB
+         CN2 - 8-Pin 24kHz RGB OUT
+         CN4 - 6-Pin Power Connector
+
+ROM Usage
+---------
+                            |---------------------- ROM Locations -----------------------|
+Game                        2D      4D      6D      9D      11D     13D     16D     18D
+------------------------------------------------------------------------------------------
+GTI Club                    -       688A16  -       688A15  -       688A14  -       688A13
+Jet Wave                    -       678A16  -       678A15  -       678A14  -       678A13
+Operation Thunder Hurricane -       680A16  -       680A15  -       680A14  -       680A13
+Solar Assault               -       792A16  -       792A15  -       792A14  -       792A13
+Solar Assault : Revised     - N/A -
+
+Hang Pilot (uses an unknown but similar video board)                12W             4W
+                            -       -       -       -       -       678A14  -       678A13
+
 */
 
 #include "driver.h"
@@ -368,7 +552,7 @@ WRITE8_HANDLER( K056230_w )
 				if (mame_stricmp(machine->gamedrv->name, "thunderh") != 0)
 				{
 					cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ2, ASSERT_LINE);
-					timer_set(ATTOTIME_IN_USEC(1), NULL, 0, network_irq_clear);
+					timer_set(ATTOTIME_IN_USEC(10), NULL, 0, network_irq_clear);
 				}
 			}
 //          else
@@ -591,6 +775,11 @@ static INPUT_PORTS_START( slrasslt )
 	PORT_START_TAG("AN1")
 	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
 
+	PORT_START_TAG("AN2")
+	PORT_BIT( 0x3ff, 0x000, IPT_UNUSED )
+
+	PORT_START_TAG("AN3")
+	PORT_BIT( 0x3ff, 0x000, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( thunderh )
@@ -672,6 +861,17 @@ static INPUT_PORTS_START( hangplt )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
+	PORT_START_TAG("AN0")
+	PORT_BIT( 0x3ff, 0x000, IPT_UNKNOWN )
+
+	PORT_START_TAG("AN1")
+	PORT_BIT( 0x3ff, 0x000, IPT_UNKNOWN )
+
+	PORT_START_TAG("AN2")
+	PORT_BIT( 0x3ff, 0x000, IPT_UNKNOWN )
+
+	PORT_START_TAG("AN3")
+	PORT_BIT( 0x3ff, 0x000, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 /* PowerPC interrupts
