@@ -38,144 +38,138 @@
     Jetwave / Waveshark            | GX678     | ZR107        | GN678
 
 
-Winding Heat
-Konami, 1996
+Konami 'ZR107' Hardware
+Konami, 1995-1996
 
-This game runs on Konami PPC hardware, and is similar to GTI Club hardware.
+Known games on this hardware include....
 
-PCB Layout
-----------
+Game                   (C)      Year
+-------------------------------------
+Midnight Run           Konami   1995
+Jet Wave / Wave Shark  Konami   1996 (top board only)
+Winding Heat           Konami   1996
+
+PCB Layouts
+-----------
 
 Top Board
 
-ZR107  PWB(A)300769A
+ZR107 PWB(A)300769A
 |------------------------------------------------------------|
-|                                         677A09.3R          |
-|                              677A10.5N  677A08.5R          |
-|        056800      058141    68EC000FN8     *1      *2     |
-| RESET_SW                                    *1      *2     |
+|                                         MASKROM.3R         |
+|                             MASKROM.5N  MASKROM.5R         |
+|056602  056800      058141    68EC000FN8   TSOP56   DIP42   |
+| RESET_SW                                  TSOP56   DIP42   |
+|058232                                                      |
+|   PAL(001535) PAL(001536)  8464  8464           EPROM.13U  |
 |                                                            |
-|      001535  001536   8464  8464             677UBC04.13U  |
+|                                      SOJ40      EPROM.15U  |
 |                                                            |
-|                                       *4     677UBC03.15U  |
-|                                                            |
-|                          *3           *4     677UBC02.17U  |
-|                       677A07.19L  18.432MHz                |
-|        93C46.20E                             677UBC01.20U  |
-|               LED                  814260-70               |
-|                            001534                          |
+|                         DIP32        SOJ40      EPROM.17U  |
+|                        EPROM.19L  18.432MHz                |
+|        93C46.20E                                EPROM.20U  |
+|               LED                   814260-70              |
+|                         PAL(001534)                        |
 |     ADC0838                                                |
-|                            001533  814260-70               |
+|                         PAL(001533) 814260-70              |
 | TEST_SW                                                    |
-|                            001532                          |
-|     056787A                                                |
+|                         PAL(001532)                        |
+| PAL(056787A)                                               |
 |                                                            |
-|     8464                                                   |
-|                                               PPC403GA     |
-|                          64MHz                             |
-|     056230    *5                                           |
-|                                                            |
-| DSW4P                                                      |
+|     8464                                     |--------|    |
+|                                              |IBM     |    |
+|                          64MHz               |POWERPC |    |
+|     056230   QFP44                           |403GA   |    |
+|                                              |--------|    |
+| DSW(4)                                                     |
 |------------------------------------------------------------|
-
 Notes:
-      *1: Unpopulated position for 16MBit TSOP56 Flash ROM.
-      *2: Unpopulated position for 16MBit DIP42 MASK ROM.
-      *3: Unpopulated position for 4MBit EPROM
-      *4: Unpopulated position for DRAM 814260-70
-      *5: Unpopulated position for MB89371FL
-      001532-001536, 056787A = PALCE16V8H
-      056230 also marked KS40011
-      8464: 64k SRAM
-      814260: 4Mx16 DRAM
-      LED has 2 digit numerical output
-      DSW4P: 4 position DIP SWITCH
-      677A07.19L - AM27C1024 EPROM
-      677A08.5R  - 42 PIN 16M MASK ROM
-      677A09.3R  - 42 PIN 16M MASK ROM
-      677A10.5N  - 42 PIN 16M MASK ROM
-      677UBC0*   - AM27C040 EPROM
+     403GA: clock 32.000MHz (64/2)
+     68000: clock 8.000MHz (64/8)
+    TSOP56: Unpopulated position for 2Mx8 TSOP56 FlashROM
+     DIP42: Unpopulated position for 2Mx8 DIP42 MASKROM
+     DIP32: Unpopulated position for 512kx8 EPROM
+     SOJ40: Unpopulated position for DRAM 814260-70
+     QFP44: Unpopulated position for MB89371FL
+    056230: Konami custom, also marked KS40011, used for network functions
+    058141: Konami custom
+    056800: Konami custom
+    058232: Konami custom filter/DAC?
+    056602: Konami custom sound ceramic module (contains a small IC, some OP amps, resistors, caps etc)
+      8464: 8kx8 SRAM (NDIP28)
+    814260: 256kx16 DRAM (SOJ40)
+       LED: 2 digit alpha-numeric 7-segment LED
+
+ROM Usage
+---------
+                            |-------------------------- ROM Locations ---------------------------|
+Game                        5R      3R      5N      13U       15U       17U       20U       19L
+--------------------------------------------------------------------------------------------------
+Midnight Run (code# unknown)xxxA08  xxxA09  xxxA10  xxxExx04  xxxExx03  xxxExx02  xxxExx01  xxxA07
+Jet Wave                    678A08  678A09  678A10  678UAB04  678UAB03  678UAB02  678UAB01  678A07
+Winding Heat                677A08  677A09  677A10  677UBC04  677UBC03  677UBC02  677UBC01  677A07
 
 
 Bottom Board
 
 ZR107  PWB(B)300816D
 |------------------------------------------------------------|
-|   *6       677A16.2H       001006   81141622  81141622     |
-|                                                            |
-|   *6       677A15.5H                          81141622     |
-|                                 001005                     |
-|   *6       677A14.7H                          81141622     |
-|                                                            |
-|   *6       677A13.9H                    81141622           |
+|                          |-------|                         |
+| DIP42     MASKROM.2H     |KS10081| 81141622  81141622      |
+|                          |-------|                         |
+| DIP42     MASKROM.5H              |---------|   81141622   |
+|                                   | KS10071 |              |
+| DIP42     MASKROM.7H              |         |   81141622   |
+|                                   |---------|              |
+| DIP42     MASKROM.9H               81141622                |
 |                                                            |
 |                           MC88916                          |
-|     001785                   AM7203  AM7203  AM7203 AM7203 |
+| PAL(001785)                  AM7203  AM7203  AM7203 AM7203 |
 |                                                            |
 |                                                            |
-|                                             001782  001781 |
-|                                                            |
+|                                         PAL(001782)        |
+|                                                 PAL(001781)|
 |                                                            |
 |                                                            |
 | MC44200   CY7C128  CY7C128  CY7C199  CY7C199               |
 |                             CY7C199  CY7C199  36MHz        |
-|                                                            |
-| 001779     056832                            ADSP21062     |
-|                                                            |
-|       001784  058143                      CY7C109  CY7C109 |
-| 677A12.35A                                                 |
-|            62256  62256  001780           CY7C109  CY7C109 |
-|     677A11.35B  62256                                      |
-|                         DSW4P                              |
+| MACH110                                                    |
+|(001779)    056832                           |---------|    |
+|                                             |ADSP21062|    |
+|   PAL(001784) 058143                        |SHARC    |    |
+|MASKROM.35A                MACH110           |KS-160   |    |
+|            62256  62256  (001780)           |---------|    |
+|MASKROM.35B      62256                     CY7C109  CY7C109 |
+|                         DSW(4)            CY7C109  CY7C109 |
 |------------------------------------------------------------|
-
 Notes:
-      001006 also marked KS10081
-      81141622: 4Mx16Bit SDRAM
-      001005 also marked KS10071, chip is heatsinked.
-      AM7203: PLCC32 PLD, marked FIFO 2Kx9
-      001779,001780: MACH110 PLD
-      DSW4P: 4 position DIP SWITCH
-      001781,001782,001784,001785: PALCE16V8H
-      CY7C128: 16k SRAM
-      CY7C199: 256k SRAM
-      CY7C109: 1M SRAM
-      62256: 256k SRAM
-      ADSP21062 also marked SHARC and KS-160
-      *6: Unpopulated position for 8MBit x 8bit DIP42 MASK ROM
-      677A13.9H  - 42 PIN 16M MASK ROM
-      677A14.7H  - 42 PIN 16M MASK ROM
-      677A15.5H  - 42 PIN 16M MASK ROM
-      677A16.2H  - 42 PIN 16M MASK ROM
-      677A12.35A - 40 PIN 4M MASK ROM
-      677A11.35B - 40 PIN 4M MASK ROM
+      KS10081 : Konami custom video chip, also marked 001006
+      KS10071 : Konami custom video chip, also marked 001005. Chip is heatsinked
+      056832  : Konami custom
+      058143  : Konami custom
+      AM7203  : AMD AM7203 2kx9 FIFO (PLCC32)
+      MACH110 : MACH110 CPLD stamped 001779 & 001780
+      DSW(4)  : 4 position DIP SWITCH
+      PAL     : PALCE16V8H stamped 001781, 001782, 001784, 001785
+      81141622: 256kx16 SDRAM
+      CY7C128 : 2kx8 SRAM
+      CY7C199 : 32kx8 SRAM
+      CY7C109 : 128kx8 SRAM
+      62256   : 32kx8 SRAM
+      DIP42   : Unpopulated position for 1Mx8 DIP42 MASKROM
+      MC88916 : Motorola MC88916 Low Skew CMOS PLL Clock Driver
 
+ROM Usage
+---------
+                 |--------------- ROM Locations ---------------|
+Game             35A     35B     2H      5H      7H      9H
+---------------------------------------------------------------
+Midnight Run     xxxA12  xxxA11  xxxA16  xxxA15  xxxA14  xxxA13 (xxx= code unknown)
+Jet Wave         - see note -
+Winding Heat     677A12  677A11  677A16  677A15  677A14  677A13
 
-
-Jet Wave / Wave Shark
-Konami, 1996
-
-This game uses the same video PCB as GTI Club (board number GN678 PWB(B)302009A)
-The top board is the same PCB used on Winding Heat & Midnight Run (board number ZR107 PWB(A)300769A)
-
-Main parts on the top board include....
-IBM PowerPC403GA @32MHz [64/2]
-HM514260-7 (x2)
-MC68EC000-8 @8MHz [64/8]
-058141
-056800
-MB8464 (8kx8, x3)
-KS40011-PF 056230
-93C46 EEPROM
-DSW (4-position)
-64MHz OSC
-18.432 XTAL
-Test SW
-Reset SW
-2-position numeric LED display
-LA4705 AMP
-5 EPROMs
-5 MASKROMs
+Note: Jet Wave uses the lower board from GTI Club (GN678), and a ZR107(PWB(A)300769A top board.
+Check gticlub.c for details on the bottom board.
 
 */
 
