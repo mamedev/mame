@@ -104,7 +104,7 @@ static MACHINE_RESET( relief )
 
 static READ16_HANDLER( special_port2_r )
 {
-	int result = input_port_read_indexed(machine, 2);
+	int result = input_port_read(machine, "260010");
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0020;
 	if (!(result & 0x0080) || atarigen_get_hblank(machine->primary_screen)) result ^= 0x0001;
 	return result;
@@ -200,10 +200,10 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140030, 0x140031) AM_WRITE(audio_control_w)
 	AM_RANGE(0x180000, 0x180fff) AM_READWRITE(atarigen_eeprom_upper_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
 	AM_RANGE(0x1c0030, 0x1c0031) AM_WRITE(atarigen_eeprom_enable_w)
-	AM_RANGE(0x260000, 0x260001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x260002, 0x260003) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("260000")
+	AM_RANGE(0x260002, 0x260003) AM_READ_PORT("260002")
 	AM_RANGE(0x260010, 0x260011) AM_READ(special_port2_r)
-	AM_RANGE(0x260012, 0x260013) AM_READ(input_port_3_word_r)
+	AM_RANGE(0x260012, 0x260013) AM_READ_PORT("260012")
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(relief_atarivc_r, relief_atarivc_w) AM_BASE(&atarivc_data)
@@ -226,7 +226,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( relief )
-	PORT_START	/* 260000 */
+	PORT_START_TAG("260000")	/* 260000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Button D0") PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Button D1") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Button D2") PORT_CODE(KEYCODE_C)
@@ -253,7 +253,7 @@ static INPUT_PORTS_START( relief )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
-	PORT_START	/* 260002 */
+	PORT_START_TAG("260002")	/* 260002 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("White") PORT_CODE(KEYCODE_COMMA)
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
@@ -278,14 +278,14 @@ static INPUT_PORTS_START( relief )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 
-	PORT_START	/* 260010 */
+	PORT_START_TAG("260010")	/* 260010 */
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )	/* tested before writing to 260040 */
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* 260012 */
+	PORT_START_TAG("260012")	/* 260012 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_UNUSED )

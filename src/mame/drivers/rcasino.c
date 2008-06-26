@@ -165,7 +165,7 @@ static READ8_HANDLER( rcasino_port_11_r )
        pulse = 0;
        else pulse = 0x04;
    }
-   return input_port_read_indexed(machine, 1) + pulse;
+   return input_port_read(machine, "IN1") + pulse;
 }
 
 static ADDRESS_MAP_START( rcasino_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -180,8 +180,8 @@ static ADDRESS_MAP_START( rcasino_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(input_port_0_r, rcasino_port_10_w)
-//  AM_RANGE(0x11, 0x11) AM_READWRITE(input_port_1_r, rcasino_port_11_w)
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0") AM_WRITE(rcasino_port_10_w)
+//  AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1") AM_WRITE(rcasino_port_11_w)
 	AM_RANGE(0x11, 0x11) AM_READWRITE(rcasino_port_11_r, rcasino_port_11_w)
 	AM_RANGE(0x12, 0x12) AM_WRITE(rcasino_lamp_w)
 	AM_RANGE(0x13, 0x13) AM_WRITE(rcasino_coin_counter_w)

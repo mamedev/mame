@@ -53,15 +53,15 @@ static UINT16 *realbrk_dsw_select;
 static READ16_HANDLER( realbrk_dsw_r )
 {
 	UINT16 sel = ~realbrk_dsw_select[0];
-	if (sel & 0x01)	return	(input_port_read_indexed(machine, 2) & 0x00ff) << 8;		// DSW1 low bits
-	if (sel & 0x02)	return	(input_port_read_indexed(machine, 3) & 0x00ff) << 8;		// DSW2 low bits
-	if (sel & 0x04)	return	(input_port_read_indexed(machine, 4) & 0x00ff) << 8;		// DSW3 low bits
-	if (sel & 0x08)	return	(input_port_read_indexed(machine, 5) & 0x00ff) << 8;		// DSW4 low bits
+	if (sel & 0x01)	return	(input_port_read(machine, "SW1") & 0x00ff) << 8;		// DSW1 low bits
+	if (sel & 0x02)	return	(input_port_read(machine, "SW2") & 0x00ff) << 8;		// DSW2 low bits
+	if (sel & 0x04)	return	(input_port_read(machine, "SW3") & 0x00ff) << 8;		// DSW3 low bits
+	if (sel & 0x08)	return	(input_port_read(machine, "SW4") & 0x00ff) << 8;		// DSW4 low bits
 
-	if (sel & 0x10)	return	((input_port_read_indexed(machine, 2) & 0x0300) << 0) |	// DSWs high 2 bits
-							((input_port_read_indexed(machine, 3) & 0x0300) << 2) |
-							((input_port_read_indexed(machine, 4) & 0x0300) << 4) |
-							((input_port_read_indexed(machine, 5) & 0x0300) << 6) ;
+	if (sel & 0x10)	return	((input_port_read(machine, "SW1") & 0x0300) << 0) |	// DSWs high 2 bits
+							((input_port_read(machine, "SW2") & 0x0300) << 2) |
+							((input_port_read(machine, "SW3") & 0x0300) << 4) |
+							((input_port_read(machine, "SW4") & 0x0300) << 6) ;
 
 	logerror("CPU #0 PC %06X: read with unknown dsw_select = %02x\n",activecpu_get_pc(),realbrk_dsw_select[0]);
 	return 0xffff;
@@ -73,14 +73,14 @@ static READ16_HANDLER( pkgnsh_input_r )
 	{
 		case 0x00/2: return 0xffff;
 		case 0x02/2: return 0xffff;
-		case 0x04/2: return input_port_read_indexed(machine,0);/*Service buttons*/
-		case 0x06/2: return input_port_read_indexed(machine,1);/*DIP 2*/
-		case 0x08/2: return input_port_read_indexed(machine,2);/*DIP 1*/
-		case 0x0a/2: return input_port_read_indexed(machine,3);/*DIP 1+2 Hi-Bits*/
-		case 0x0c/2: return input_port_read_indexed(machine,4);/*Handle 1p*/
-		case 0x0e/2: return input_port_read_indexed(machine,5);/*Buttons 1p*/
-		case 0x10/2: return input_port_read_indexed(machine,6);/*Handle 2p*/
-		case 0x12/2: return input_port_read_indexed(machine,7);/*Buttons 2p*/
+		case 0x04/2: return input_port_read(machine, "IN0");		/*Service buttons*/
+		case 0x06/2: return input_port_read(machine, "SW1");		/*DIP 2*/
+		case 0x08/2: return input_port_read(machine, "SW2");		/*DIP 1*/
+		case 0x0a/2: return input_port_read(machine, "SW3");		/*DIP 1+2 Hi-Bits*/
+		case 0x0c/2: return input_port_read(machine, "PADDLE1");	/*Handle 1p*/
+		case 0x0e/2: return input_port_read(machine, "P1");			/*Buttons 1p*/
+		case 0x10/2: return input_port_read(machine, "PADDLE2");	/*Handle 2p*/
+		case 0x12/2: return input_port_read(machine, "P2");			/*Buttons 2p*/
 	}
 	return 0xffff;
 }
@@ -92,22 +92,22 @@ static READ16_HANDLER( pkgnshdx_input_r )
 	switch(offset)
 	{
 		case 0x00/2: return 0xffff;
-		case 0x02/2: return input_port_read_indexed(machine,0);/*Service buttons*/
+		case 0x02/2: return input_port_read(machine, "IN0");	/*Service buttons*/
 		/*DSW,same handling as realbrk*/
 		case 0x04/2:
-			if (sel & 0x01)	return	(input_port_read_indexed(machine,1) & 0x00ff) << 8;		// DSW1 low bits
-			if (sel & 0x02)	return	(input_port_read_indexed(machine,2) & 0x00ff) << 8;		// DSW2 low bits
-			if (sel & 0x04)	return	(input_port_read_indexed(machine,3) & 0x00ff) << 8;		// DSW3 low bits
-			if (sel & 0x08)	return	(input_port_read_indexed(machine,4) & 0x00ff) << 8;		// DSW4 low bits
+			if (sel & 0x01)	return	(input_port_read(machine, "SW1") & 0x00ff) << 8;		// DSW1 low bits
+			if (sel & 0x02)	return	(input_port_read(machine, "SW2") & 0x00ff) << 8;		// DSW2 low bits
+			if (sel & 0x04)	return	(input_port_read(machine, "SW3") & 0x00ff) << 8;		// DSW3 low bits
+			if (sel & 0x08)	return	(input_port_read(machine, "SW4") & 0x00ff) << 8;		// DSW4 low bits
 
-			if (sel & 0x10)	return	((input_port_read_indexed(machine,1) & 0x0300) << 0) |	// DSWs high 2 bits
-									((input_port_read_indexed(machine,2) & 0x0300) << 2) |
-									((input_port_read_indexed(machine,3) & 0x0300) << 4) |
-									((input_port_read_indexed(machine,4) & 0x0300) << 6) ;
+			if (sel & 0x10)	return	((input_port_read(machine, "SW1") & 0x0300) << 0) |	// DSWs high 2 bits
+									((input_port_read(machine, "SW2") & 0x0300) << 2) |
+									((input_port_read(machine, "SW3") & 0x0300) << 4) |
+									((input_port_read(machine, "SW4") & 0x0300) << 6) ;
 
 			return 0xffff;
-		case 0x06/2: return input_port_read_indexed(machine,6);/*Buttons+Handle 2p*/
-		case 0x08/2: return input_port_read_indexed(machine,5);/*Buttons+Handle 1p*/
+		case 0x06/2: return input_port_read(machine, "P2");/*Buttons+Handle 2p*/
+		case 0x08/2: return input_port_read(machine, "P1");/*Buttons+Handle 1p*/
 		case 0x0a/2: return 0xffff;
 		case 0x0c/2: return 0xffff;
 		case 0x0e/2: return 0xffff;
@@ -172,9 +172,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( realbrk_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800008, 0x800009) AM_WRITE(YM2413_register_port_0_lsb_w		)	// YM2413
 	AM_RANGE(0x80000a, 0x80000b) AM_WRITE(YM2413_data_port_0_lsb_w			)	//
-	AM_RANGE(0xc00000, 0xc00001) AM_READ(input_port_0_word_r		)	// P1 & P2 (Inputs)
-	AM_RANGE(0xc00002, 0xc00003) AM_READ(input_port_1_word_r		)	// Coins
-	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(realbrk_dsw_r,SMH_RAM) AM_BASE(&realbrk_dsw_select	)	// DSW select
+	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")							// P1 & P2 (Inputs)
+	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")							// Coins
+	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(realbrk_dsw_r,SMH_RAM) AM_BASE(&realbrk_dsw_select)	// DSW select
 	AM_RANGE(0xff0000, 0xfffbff) AM_RAM											// RAM
 	AM_RANGE(0xfffd0a, 0xfffd0b) AM_WRITE(realbrk_flipscreen_w				)	// Hack! Parallel port data register
 ADDRESS_MAP_END
@@ -198,13 +198,13 @@ ADDRESS_MAP_END
 
 /*dai2kaku specific memory map*/
 static ADDRESS_MAP_START( dai2kaku_mem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x605000, 0x6053ff) AM_READWRITE(SMH_RAM,SMH_RAM) AM_BASE(&realbrk_vram_0ras	)	// rasterinfo   (0)
-	AM_RANGE(0x605400, 0x6057ff) AM_READWRITE(SMH_RAM,SMH_RAM) AM_BASE(&realbrk_vram_1ras	)	// rasterinfo   (1)
+	AM_RANGE(0x605000, 0x6053ff) AM_READWRITE(SMH_RAM,SMH_RAM) AM_BASE(&realbrk_vram_0ras)	// rasterinfo   (0)
+	AM_RANGE(0x605400, 0x6057ff) AM_READWRITE(SMH_RAM,SMH_RAM) AM_BASE(&realbrk_vram_1ras)	// rasterinfo   (1)
 	AM_RANGE(0x800008, 0x800009) AM_WRITE(YM2413_register_port_0_lsb_w		)	// YM2413
 	AM_RANGE(0x80000a, 0x80000b) AM_WRITE(YM2413_data_port_0_lsb_w			)	//
-	AM_RANGE(0xc00000, 0xc00001) AM_READ(input_port_0_word_r		)	// P1 & P2 (Inputs)
-	AM_RANGE(0xc00002, 0xc00003) AM_READ(input_port_1_word_r		)	// Coins
-	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(realbrk_dsw_r,SMH_RAM) AM_BASE(&realbrk_dsw_select	)	// DSW select
+	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")							// P1 & P2 (Inputs)
+	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")							// Coins
+	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(realbrk_dsw_r,SMH_RAM) AM_BASE(&realbrk_dsw_select)	// DSW select
 	AM_RANGE(0xff0000, 0xfffbff) AM_RAM											// RAM
 	AM_RANGE(0xfffd0a, 0xfffd0b) AM_WRITE(dai2kaku_flipscreen_w				)	// Hack! Parallel port data register
 ADDRESS_MAP_END
@@ -220,36 +220,36 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( realbrk )
-	PORT_START	// IN0 - $c00000.w
-	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNUSED )	// BUTTON3 in test mode
-	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_UNUSED )	// BUTTON3 in test mode
-	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START_TAG("IN0")	// IN0 - $c00000.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )	// BUTTON3 in test mode
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )	// BUTTON3 in test mode
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START	// IN1 - $c00002.w
-	PORT_BIT(  0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x0100, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT(  0x0200, IP_ACTIVE_LOW,  IPT_COIN2 )
-	PORT_BIT(  0x0400, IP_ACTIVE_LOW,  IPT_SERVICE1 )
+	PORT_START_TAG("IN1")	// IN1 - $c00002.w
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_COIN2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
-	PORT_BIT(  0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT(  0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT(  0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// the vblank routine wants these 2 bits high
-	PORT_BIT(  0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// the vblank routine wants these 2 bits high
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START	// IN2 - $c00004.w (DSW1)
+	PORT_START_TAG("SW1")	// IN2 - $c00004.w (DSW1)
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
@@ -279,7 +279,7 @@ static INPUT_PORTS_START( realbrk )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x0200, IP_ACTIVE_LOW, "SW1:10" )
 
-	PORT_START	// IN3 - $c00004.w (DSW2)
+	PORT_START_TAG("SW2")	// IN3 - $c00004.w (DSW2)
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0000, "4" )
 	PORT_DIPSETTING(      0x0001, "5" )
@@ -304,28 +304,28 @@ static INPUT_PORTS_START( realbrk )
 	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "SW2:9" ) /* Manual doesn't even show switches 9 & 10 */
 	PORT_DIPUNUSED_DIPLOC( 0x0200, 0x0200, "SW2:10" )
 
-	PORT_START	// IN4 - $c00004.w (DSW3) - Unused
-	PORT_BIT(  0xffff, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_START_TAG("SW3")	// IN4 - $c00004.w (DSW3) - Unused
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START	// IN5 - $c00004.w (DSW4) - Unused
-	PORT_BIT(  0xffff, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_START_TAG("SW4")	// IN5 - $c00004.w (DSW4) - Unused
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pkgnsh )
-	PORT_START	// IN0 - $c00002.w
-	PORT_BIT(  0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x0100, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT(  0x0200, IP_ACTIVE_LOW,  IPT_COIN2 )
-	PORT_BIT(  0x0400, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT(  0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
-	PORT_BIT(  0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT(  0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT(  0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// the vblank routine wants these 2 bits high
-	PORT_BIT(  0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START_TAG("IN0")	// IN0 - $c00002.w
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_COIN2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SERVICE1 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// the vblank routine wants these 2 bits high
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START
-	PORT_BIT(     0x003f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(     0x00c0, IP_ACTIVE_HIGH, IPT_UNUSED )/*pkgnsh wants these two bits to be 0*/
+	PORT_START_TAG("SW1")
+	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_UNUSED )/*pkgnsh wants these two bits to be 0*/
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -351,8 +351,8 @@ static INPUT_PORTS_START( pkgnsh )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	// IN3 - $c00004.w (DSW2)
-	PORT_BIT(     0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START_TAG("SW2")	// IN3 - $c00004.w (DSW2)
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -383,8 +383,8 @@ static INPUT_PORTS_START( pkgnsh )
 //  PORT_DIPSETTING(      0xa000, "100 Balls" ) /* Duplicate Setting for 100 balls */
 //  PORT_DIPSETTING(      0xb000, "100 Balls" ) /* Duplicate Setting for 100 balls */
 
-	PORT_START
-	PORT_BIT(     0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START_TAG("SW3")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( On ) )
@@ -397,46 +397,46 @@ static INPUT_PORTS_START( pkgnsh )
 	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT(     0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
-	PORT_BIT(     0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(     0xff00, 0x0000, IPT_PADDLE ) PORT_PLAYER(1) PORT_MINMAX(0,0x6400) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) //PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
+	PORT_START_TAG("PADDLE1")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff00, 0x0000, IPT_PADDLE ) PORT_PLAYER(1) PORT_MINMAX(0,0x6400) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) //PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
 
-	PORT_START
-	PORT_BIT(     0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(     0x0100, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT(     0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(     0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) //F/F
-	PORT_BIT(     0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) //Stop
-	PORT_BIT(     0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START_TAG("P1")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) //F/F
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) //Stop
+	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
-	PORT_BIT(     0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(     0xff00, 0x0000, IPT_PADDLE ) PORT_PLAYER(2) PORT_MINMAX(0,0x6400) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
+	PORT_START_TAG("PADDLE2")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff00, 0x0000, IPT_PADDLE ) PORT_PLAYER(2) PORT_MINMAX(0,0x6400) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
 
-	PORT_START
-	PORT_BIT(     0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )/*There's the Pay Out SW here IIRC*/
-	PORT_BIT(     0x0100, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT(     0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(     0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) //F/F
-	PORT_BIT(     0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) //Stop
-	PORT_BIT(     0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START_TAG("P2")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )/*There's the Pay Out SW here IIRC*/
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) //F/F
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) //Stop
+	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pkgnshdx )
-	PORT_START	// IN0 - $c00002.w
-	PORT_BIT(  0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x0100, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT(  0x0200, IP_ACTIVE_LOW,  IPT_COIN2 )
-	PORT_BIT(  0x0400, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT(  0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
-	PORT_BIT(  0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT(  0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT(  0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// the vblank routine wants these 2 bits high
-	PORT_BIT(  0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START_TAG("IN0")	// IN0 - $c00002.w
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_COIN2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SERVICE1 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// the vblank routine wants these 2 bits high
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START // IN1
+	PORT_START_TAG("SW1") // IN1
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -473,7 +473,7 @@ static INPUT_PORTS_START( pkgnshdx )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START //IN2
+	PORT_START_TAG("SW2") //IN2
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -505,7 +505,7 @@ static INPUT_PORTS_START( pkgnshdx )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START //IN3
+	PORT_START_TAG("SW3") //IN3
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -537,7 +537,7 @@ static INPUT_PORTS_START( pkgnshdx )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START //IN4
+	PORT_START_TAG("SW4") //IN4
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -569,33 +569,33 @@ static INPUT_PORTS_START( pkgnshdx )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START //IN5
-	PORT_BIT(     0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START_TAG("P1") //IN5
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_DIPNAME( 0x0002, 0x0002, "Pay-Out SW" )//Not a real DIP-Switch
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT(     0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) //F/F
-	PORT_BIT(     0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) //Stop
-	PORT_BIT(     0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(     0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) //F/F
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) //Stop
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0040, 0x0040, "Analize SW" )//Not a real DIP-Switch
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT(     0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(     0xff00, 0x0000, IPT_PADDLE ) PORT_PLAYER(1) PORT_MINMAX(0,0x6400) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff00, 0x0000, IPT_PADDLE ) PORT_PLAYER(1) PORT_MINMAX(0,0x6400) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
 
-	PORT_START //IN6
-	PORT_BIT(     0x0001, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT(	  0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) //Again Pay-Out SW in test mode,but it doesn't work,maybe it is for Player-2?
-	PORT_BIT(     0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) //F/F
-	PORT_BIT(     0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) //Stop
-	PORT_BIT(     0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(     0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START_TAG("P2") //IN6
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) //Again Pay-Out SW in test mode,but it doesn't work,maybe it is for Player-2?
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) //F/F
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) //Stop
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0040, 0x0040, "Mem Clear SW" )//Not a real DIP-Switch
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT(     0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(     0xff00, 0x0000, IPT_PADDLE ) PORT_PLAYER(2) PORT_MINMAX(0,0x6400) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff00, 0x0000, IPT_PADDLE ) PORT_PLAYER(2) PORT_MINMAX(0,0x6400) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
 INPUT_PORTS_END
 
 /***************************************************************************

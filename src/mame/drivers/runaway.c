@@ -53,11 +53,11 @@ static READ8_HANDLER( runaway_input_r )
 {
 	UINT8 val = 0;
 
-	if (input_port_read_indexed(machine, 0) & (1 << offset))
+	if (input_port_read(machine, "3000D7") & (1 << offset))
 	{
 		val |= 0x80;
 	}
-	if (input_port_read_indexed(machine, 1) & (1 << offset))
+	if (input_port_read(machine, "3000D6") & (1 << offset))
 	{
 		val |= 0x40;
 	}
@@ -68,7 +68,7 @@ static READ8_HANDLER( runaway_input_r )
 
 static READ8_HANDLER( runaway_pot_r )
 {
-	return (input_port_read_indexed(machine, 4) << (7 - offset)) & 0x80;
+	return (input_port_read(machine, "7000") << (7 - offset)) & 0x80;
 }
 
 
@@ -88,7 +88,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0400, 0x07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x3000, 0x3007) AM_READ(runaway_input_r)
-	AM_RANGE(0x4000, 0x4000) AM_READ(input_port_2_r)
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("4000")
 	AM_RANGE(0x5000, 0x5000) AM_READ(atari_vg_earom_r)
 	AM_RANGE(0x6000, 0x600f) AM_READ(pokey1_r)
 	AM_RANGE(0x7000, 0x700f) AM_READ(pokey2_r)
@@ -116,7 +116,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( qwak )
-	PORT_START	/* 3000 D7 */
+	PORT_START_TAG("3000D7")	/* 3000 D7 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VBLANK )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -126,7 +126,7 @@ static INPUT_PORTS_START( qwak )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
-	PORT_START	/* 3000 D6 */
+	PORT_START_TAG("3000D6")	/* 3000 D6 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
@@ -136,7 +136,7 @@ static INPUT_PORTS_START( qwak )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* 4000 */
+	PORT_START_TAG("4000")	/* 4000 */
 	PORT_DIPNAME( 0x01, 0x00, "DIP 1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
@@ -162,13 +162,13 @@ static INPUT_PORTS_START( qwak )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 
-	PORT_START /* 6008 not used */
-	PORT_START /* 7000 not used */
+	PORT_START_TAG("6008") /* 6008 not used */
+	PORT_START_TAG("7000") /* 7000 not used */
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( runaway )
-	PORT_START /* 3000 D7 */
+	PORT_START_TAG("3000D7") /* 3000 D7 */
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_VBLANK )
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_TILT )
@@ -178,7 +178,7 @@ static INPUT_PORTS_START( runaway )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
-	PORT_START /* 3000 D6 */
+	PORT_START_TAG("3000D6") /* 3000 D6 */
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -188,7 +188,7 @@ static INPUT_PORTS_START( runaway )
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START /* 4000 */
+	PORT_START_TAG("4000") /* 4000 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ))
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ))
@@ -212,7 +212,7 @@ static INPUT_PORTS_START( runaway )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 
-	PORT_START /* 6008 */
+	PORT_START_TAG("6008") /* 6008 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ))
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
@@ -236,7 +236,7 @@ static INPUT_PORTS_START( runaway )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x80, DEF_STR( On ))
 
-	PORT_START /* 7000 */
+	PORT_START_TAG("7000") /* 7000 */
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_TOGGLE
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )

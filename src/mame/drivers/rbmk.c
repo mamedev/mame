@@ -87,7 +87,7 @@ static WRITE16_HANDLER( gms_write3 )
 
 static READ16_HANDLER( eeprom_r )
 {
-	return (eeprom_read_bit() << 15)|(input_port_read_indexed(machine,3)&0x7fff);
+	return (eeprom_read_bit() << 15)|(input_port_read(machine, "IN3") & 0x7fff);
 }
 
 static WRITE16_HANDLER( eeprom_w )
@@ -112,18 +112,18 @@ static ADDRESS_MAP_START( rbmk_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x900fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_BASE(&gms_vidram)
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(eeprom_w)
-	AM_RANGE(0xC00000, 0xC00001) AM_READ(input_port_0_word_r) AM_WRITE(gms_write1)
-	AM_RANGE(0xC08000, 0xC08001) AM_READ(input_port_1_word_r) AM_WRITE(gms_write2)
+	AM_RANGE(0xC00000, 0xC00001) AM_READ_PORT("IN0") AM_WRITE(gms_write1)
+	AM_RANGE(0xC08000, 0xC08001) AM_READ_PORT("IN1") AM_WRITE(gms_write2)
 	AM_RANGE(0xC10000, 0xC10001) AM_READ(eeprom_r)
 	AM_RANGE(0xC18080, 0xC18081) AM_READ(gms_read)
-	AM_RANGE(0xC20000, 0xC20001) AM_READ(input_port_2_word_r)
+	AM_RANGE(0xC20000, 0xC20001) AM_READ_PORT("IN2")
 	AM_RANGE(0xC28000, 0xC28001) AM_WRITE(gms_write3)
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( rbmk )
 
-	PORT_START	/* 16bit */
+	PORT_START_TAG("IN0")	/* 16bit */
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Controls ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(      0x0000, "Keyboard" )
@@ -177,7 +177,7 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	/* 16bit */
+	PORT_START_TAG("IN1")	/* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -211,7 +211,7 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	/* 16bit */
+	PORT_START_TAG("IN2")	/* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -262,7 +262,7 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 
-	PORT_START	/* 16bit */
+	PORT_START_TAG("IN3")	/* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -312,7 +312,7 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	/* 16bit */
+	PORT_START_TAG("IN4")	/* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -362,7 +362,7 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	/* 16bit */
+	PORT_START_TAG("IN5")	/* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

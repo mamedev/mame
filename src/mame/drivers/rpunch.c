@@ -165,7 +165,7 @@ static MACHINE_RESET( rpunch )
 
 static READ16_HANDLER( common_port_r )
 {
-	return input_port_read_indexed(machine, offset) | input_port_read_indexed(machine, 2);
+	return input_port_read(machine, offset ? "P2" : "P1") | input_port_read(machine, "SERVICE");
 }
 
 
@@ -246,7 +246,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x060fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x080000, 0x083fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0c0018, 0x0c001b) AM_READ(common_port_r)
-	AM_RANGE(0x0c001c, 0x0c001d) AM_READ(input_port_3_word_r)
+	AM_RANGE(0x0c001c, 0x0c001d) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c001e, 0x0c001f) AM_READ(sound_busy_r)
 	AM_RANGE(0x0a0000, 0x0a07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0fc000, 0x0fffff) AM_READ(SMH_RAM)

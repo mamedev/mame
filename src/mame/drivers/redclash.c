@@ -44,9 +44,9 @@ extern VIDEO_EOF( redclash );
 */
 static INTERRUPT_GEN( redclash_interrupt )
 {
-	if (input_port_read_indexed(machine, 4) & 1)	/* Left Coin */
+	if (input_port_read(machine, "FAKE") & 1)	/* Left Coin */
 		cpunum_set_input_line(machine, 0,0,ASSERT_LINE);
-	else if (input_port_read_indexed(machine, 4) & 2)	/* Right Coin */
+	else if (input_port_read(machine, "FAKE") & 2)	/* Right Coin */
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -60,11 +60,11 @@ static WRITE8_HANDLER( irqack_w )
 static ADDRESS_MAP_START( zero_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4800, 0x4800) AM_READ(input_port_0_r) /* IN0 */
-	AM_RANGE(0x4801, 0x4801) AM_READ(input_port_1_r) /* IN1 */
-	AM_RANGE(0x4802, 0x4802) AM_READ(input_port_2_r) /* DSW0 */
-	AM_RANGE(0x4803, 0x4803) AM_READ(input_port_3_r) /* DSW1 */
-	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)  /* video RAM */
+	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")	/* IN0 */
+	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")	/* IN1 */
+	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")	/* DSW0 */
+	AM_RANGE(0x4803, 0x4803) AM_READ_PORT("DSW2")	/* DSW1 */
+	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)		/* video RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zero_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -84,11 +84,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4800, 0x4800) AM_READ(input_port_0_r) /* IN0 */
-	AM_RANGE(0x4801, 0x4801) AM_READ(input_port_1_r) /* IN1 */
-	AM_RANGE(0x4802, 0x4802) AM_READ(input_port_2_r) /* DSW0 */
-	AM_RANGE(0x4803, 0x4803) AM_READ(input_port_3_r) /* DSW1 */
-	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)  /* video RAM */
+	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")	/* IN0 */
+	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")	/* IN1 */
+	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")	/* DSW0 */
+	AM_RANGE(0x4803, 0x4803) AM_READ_PORT("DSW2")	/* DSW1 */
+	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)		/* video RAM */
 	AM_RANGE(0x6000, 0x67ff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -112,7 +112,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( redclash )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -122,7 +122,7 @@ static INPUT_PORTS_START( redclash )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -134,7 +134,7 @@ static INPUT_PORTS_START( redclash )
 	/* them this way is enough to get the game running. */
 	PORT_BIT( 0xc0, 0x40, IPT_VBLANK )
 
-	PORT_START	/* DSW0 */
+	PORT_START_TAG("DSW1")	/* DSW0 */
 	PORT_DIPNAME( 0x03, 0x03, "Difficulty?" )
 	PORT_DIPSETTING(    0x03, "Easy?" )
 	PORT_DIPSETTING(    0x02, "Medium?" )
@@ -158,7 +158,7 @@ static INPUT_PORTS_START( redclash )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "7" )
 
-	PORT_START	/* DSW1 */
+	PORT_START_TAG("DSW2")	/* DSW1 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 5C_1C ) )
@@ -194,7 +194,7 @@ static INPUT_PORTS_START( redclash )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_8C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_9C ) )
 
-	PORT_START	/* FAKE */
+	PORT_START_TAG("FAKE")	/* FAKE */
 	/* The coin slots are not memory mapped. Coin Left causes a NMI, */
 	/* Coin Right an IRQ. This fake input port is used by the interrupt */
 	/* handler to be notified of coin insertions. We use IMPULSE to */
@@ -205,7 +205,7 @@ static INPUT_PORTS_START( redclash )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( zerohour )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -215,7 +215,7 @@ static INPUT_PORTS_START( zerohour )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -227,7 +227,7 @@ static INPUT_PORTS_START( zerohour )
 	/* them this way is enough to get the game running. */
 	PORT_BIT( 0xc0, 0x40, IPT_VBLANK )
 
-	PORT_START	/* DSW0 */
+	PORT_START_TAG("DSW1")	/* DSW0 */
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" ) 	/* Switches 6-8 are not used */
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:6" )
@@ -245,7 +245,7 @@ static INPUT_PORTS_START( zerohour )
 	PORT_DIPSETTING(    0x80, "4" )
 	PORT_DIPSETTING(    0x40, "5" )
 
-	PORT_START	/* DSW1 */
+	PORT_START_TAG("DSW2")	/* DSW1 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:4,3,2,1")
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
@@ -269,7 +269,7 @@ static INPUT_PORTS_START( zerohour )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 
-	PORT_START	/* FAKE */
+	PORT_START_TAG("FAKE")	/* FAKE */
 	/* The coin slots are not memory mapped. Coin Left causes a NMI, */
 	/* Coin Right an IRQ. This fake input port is used by the interrupt */
 	/* handler to be notified of coin insertions. We use IMPULSE to */

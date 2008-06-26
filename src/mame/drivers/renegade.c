@@ -494,7 +494,7 @@ static INTERRUPT_GEN( renegade_interrupt )
 {
 /*
     static int coin;
-    int port = input_port_read_indexed(machine, 1) & 0xc0;
+    int port = input_port_read(machine, "IN1") & 0xc0;
     if (port != 0xc0)
     {
         if (coin == 0)
@@ -524,10 +524,10 @@ static WRITE8_HANDLER( renegade_coin_counter_w )
 
 static ADDRESS_MAP_START( main_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x37ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3800, 0x3800) AM_READ(input_port_0_r) /* Player#1 controls, P1,P2 start */
-	AM_RANGE(0x3801, 0x3801) AM_READ(input_port_1_r) /* Player#2 controls, coin triggers */
-	AM_RANGE(0x3802, 0x3802) AM_READ(input_port_2_r) /* DIP2  various IO ports */
-	AM_RANGE(0x3803, 0x3803) AM_READ(input_port_3_r) /* DIP1 */
+	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")		/* Player#1 controls, P1,P2 start */
+	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")		/* Player#2 controls, coin triggers */
+	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW2")	/* DIP2  various IO ports */
+	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1")	/* DIP1 */
 	AM_RANGE(0x3804, 0x3804) AM_READ(mcu_r)
 	AM_RANGE(0x3805, 0x3805) AM_READ(mcu_reset_r)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
@@ -573,7 +573,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( renegade )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
@@ -583,7 +583,7 @@ static INPUT_PORTS_START( renegade )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
@@ -593,7 +593,7 @@ static INPUT_PORTS_START( renegade )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START /* DIP2 */
+	PORT_START_TAG("DSW2")	/* DIP2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(	0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(	0x03, DEF_STR( Normal ) )
@@ -607,7 +607,7 @@ static INPUT_PORTS_START( renegade )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_START /* DIP1 */
+	PORT_START_TAG("DSW1")	/* DIP1 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )

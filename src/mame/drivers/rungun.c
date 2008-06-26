@@ -93,21 +93,21 @@ static READ16_HANDLER( rng_sysregs_r )
 	switch (offset)
 	{
 		case 0x00/2:
-			if (input_port_read_indexed(machine, 1) & 0x20)
-				return(input_port_read_indexed(machine, 2) | input_port_read_indexed(machine, 4)<<8);
+			if (input_port_read(machine, "DSW") & 0x20)
+				return(input_port_read(machine, "P1") | input_port_read(machine, "P3")<<8);
 			else
 			{
-				data = input_port_read_indexed(machine, 2) & input_port_read_indexed(machine, 4);
+				data = input_port_read(machine, "P1") & input_port_read(machine, "P3");
 				return(data<<8 | data);
 			}
 		break;
 
 		case 0x02/2:
-			if (input_port_read_indexed(machine, 1) & 0x20)
-				return(input_port_read_indexed(machine, 3) | input_port_read_indexed(machine, 5)<<8);
+			if (input_port_read(machine, "DSW") & 0x20)
+				return(input_port_read(machine, "P2") | input_port_read(machine, "P4")<<8);
 			else
 			{
-				data = input_port_read_indexed(machine, 3) & input_port_read_indexed(machine, 5);
+				data = input_port_read(machine, "P2") & input_port_read(machine, "P4");
 				return(data<<8 | data);
 			}
 		break;
@@ -118,13 +118,13 @@ static READ16_HANDLER( rng_sysregs_r )
                 bit8 : freeze
                 bit9 : joysticks layout(auto detect???)
             */
-			return input_port_read_indexed(machine, 0);
+			return input_port_read(machine, "SYSTEM");
 		break;
 
 		case 0x06/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				data = input_port_read_indexed(machine, 1) | eeprom_read_bit();
+				data = input_port_read(machine, "DSW") | eeprom_read_bit();
 
 				if (init_eeprom_count)
 				{
@@ -374,7 +374,7 @@ static MACHINE_DRIVER_START( rng )
 MACHINE_DRIVER_END
 
 static INPUT_PORTS_START( rng )
-	PORT_START
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -390,7 +390,7 @@ static INPUT_PORTS_START( rng )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* EEPROM data */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
@@ -410,7 +410,7 @@ static INPUT_PORTS_START( rng )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -420,7 +420,7 @@ static INPUT_PORTS_START( rng )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
@@ -430,7 +430,7 @@ static INPUT_PORTS_START( rng )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("P3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
@@ -440,7 +440,7 @@ static INPUT_PORTS_START( rng )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
 
-	PORT_START
+	PORT_START_TAG("P4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)

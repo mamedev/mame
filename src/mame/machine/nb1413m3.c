@@ -380,15 +380,12 @@ READ8_HANDLER( nb1413m3_inputport0_r )
 {
 	switch (nb1413m3_type)
 	{
-		case NB1413M3_PASTELG:
-			return ((input_port_read_indexed(machine, 3) & 0xfe) | (nb1413m3_busyflag & 0x01));
-		case NB1413M3_TAIWANMB:
-			return ((input_port_read_indexed(machine, 3) & 0xfc) | ((nb1413m3_outcoin_flag & 0x01) << 1) | (nb1413m3_busyflag & 0x01));
 		case NB1413M3_HYHOO:
 		case NB1413M3_HYHOO2:
-			return ((input_port_read_indexed(machine, 2) & 0xfe) | (nb1413m3_busyflag & 0x01));
+		case NB1413M3_PASTELG:
+			return ((input_port_read(machine, "SYSTEM") & 0xfe) | (nb1413m3_busyflag & 0x01));
 		default:
-			return ((input_port_read_indexed(machine, 2) & 0xfc) | ((nb1413m3_outcoin_flag & 0x01) << 1) | (nb1413m3_busyflag & 0x01));
+			return ((input_port_read(machine, "SYSTEM") & 0xfc) | ((nb1413m3_outcoin_flag & 0x01) << 1) | (nb1413m3_busyflag & 0x01)); 
 	}
 }
 
@@ -396,58 +393,47 @@ READ8_HANDLER( nb1413m3_inputport1_r )
 {
 	switch (nb1413m3_type)
 	{
-		case NB1413M3_PASTELG:
-		case NB1413M3_THREEDS:
-		case NB1413M3_TAIWANMB:
-			switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
-			{
-				case 0x01:	return input_port_read_indexed(machine, 4);
-				case 0x02:	return input_port_read_indexed(machine, 5);
-				case 0x04:	return input_port_read_indexed(machine, 6);
-				case 0x08:	return input_port_read_indexed(machine, 7);
-				case 0x10:	return input_port_read_indexed(machine, 8);
-				default:	return (input_port_read_indexed(machine, 4) & input_port_read_indexed(machine, 5) & input_port_read_indexed(machine, 6) & input_port_read_indexed(machine, 7) & input_port_read_indexed(machine, 8));
-			}
-			break;
 		case NB1413M3_HYHOO:
 		case NB1413M3_HYHOO2:
 			switch ((nb1413m3_inputport ^ 0xff) & 0x07)
 			{
-				case 0x01:	return input_port_read_indexed(machine, 3);
-				case 0x02:	return input_port_read_indexed(machine, 4);
+				case 0x01:	return input_port_read(machine, "IN0");
+				case 0x02:	return input_port_read(machine, "IN1");
 				case 0x04:	return 0xff;
 				default:	return 0xff;
 			}
 			break;
 		case NB1413M3_MSJIKEN:
 		case NB1413M3_TELMAHJN:
-			if (input_port_read_indexed(machine, 0) & 0x80)
+			if (input_port_read(machine, "DSWA") & 0x80)
 			{
 				switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
 				{
-					case 0x01:	return input_port_read_indexed(machine, 3);
-					case 0x02:	return input_port_read_indexed(machine, 4);
-					case 0x04:	return input_port_read_indexed(machine, 5);
-					case 0x08:	return input_port_read_indexed(machine, 6);
-					case 0x10:	return input_port_read_indexed(machine, 7);
-					default:	return (input_port_read_indexed(machine, 3) & input_port_read_indexed(machine, 4) & input_port_read_indexed(machine, 5) & input_port_read_indexed(machine, 6) & input_port_read_indexed(machine, 7));
+					case 0x01:	return input_port_read(machine, "KEY0");
+					case 0x02:	return input_port_read(machine, "KEY1");
+					case 0x04:	return input_port_read(machine, "KEY2");
+					case 0x08:	return input_port_read(machine, "KEY3");
+					case 0x10:	return input_port_read(machine, "KEY4");
+					default:	return (input_port_read(machine, "KEY0") & input_port_read(machine, "KEY1") & input_port_read(machine, "KEY2") 
+										& input_port_read(machine, "KEY3") & input_port_read(machine, "KEY4"));
 				}
 			}
-			else return input_port_read_indexed(machine, 14);
+			else return input_port_read(machine, "JAMMA2");
 			break;
 		case NB1413M3_PAIRSNB:
 		case NB1413M3_PAIRSTEN:
-			return input_port_read_indexed(machine, 3);
+			return input_port_read(machine, "P1");
 			break;
 		default:
 			switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
 			{
-				case 0x01:	return input_port_read_indexed(machine, 3);
-				case 0x02:	return input_port_read_indexed(machine, 4);
-				case 0x04:	return input_port_read_indexed(machine, 5);
-				case 0x08:	return input_port_read_indexed(machine, 6);
-				case 0x10:	return input_port_read_indexed(machine, 7);
-				default:	return (input_port_read_indexed(machine, 3) & input_port_read_indexed(machine, 4) & input_port_read_indexed(machine, 5) & input_port_read_indexed(machine, 6) & input_port_read_indexed(machine, 7));
+				case 0x01:	return input_port_read(machine, "KEY0");
+				case 0x02:	return input_port_read(machine, "KEY1");
+				case 0x04:	return input_port_read(machine, "KEY2");
+				case 0x08:	return input_port_read(machine, "KEY3");
+				case 0x10:	return input_port_read(machine, "KEY4");
+				default:	return (input_port_read(machine, "KEY0") & input_port_read(machine, "KEY1") & input_port_read(machine, "KEY2") 
+									& input_port_read(machine, "KEY3") & input_port_read(machine, "KEY4"));
 			}
 			break;
 	}
@@ -457,58 +443,47 @@ READ8_HANDLER( nb1413m3_inputport2_r )
 {
 	switch (nb1413m3_type)
 	{
-		case NB1413M3_PASTELG:
-		case NB1413M3_THREEDS:
-		case NB1413M3_TAIWANMB:
-			switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
-			{
-				case 0x01:	return input_port_read_indexed(machine, 9);
-				case 0x02:	return input_port_read_indexed(machine, 10);
-				case 0x04:	return input_port_read_indexed(machine, 11);
-				case 0x08:	return input_port_read_indexed(machine, 12);
-				case 0x10:	return input_port_read_indexed(machine, 13);
-				default:	return (input_port_read_indexed(machine, 9) & input_port_read_indexed(machine, 10) & input_port_read_indexed(machine, 11) & input_port_read_indexed(machine, 12) & input_port_read_indexed(machine, 13));
-			}
-			break;
 		case NB1413M3_HYHOO:
 		case NB1413M3_HYHOO2:
 			switch ((nb1413m3_inputport ^ 0xff) & 0x07)
 			{
 				case 0x01:	return 0xff;
 				case 0x02:	return 0xff;
-				case 0x04:	return input_port_read_indexed(machine, 5);
+				case 0x04:	return input_port_read(machine, "IN2");
 				default:	return 0xff;
 			}
 			break;
 		case NB1413M3_MSJIKEN:
 		case NB1413M3_TELMAHJN:
-			if (input_port_read_indexed(machine, 0) & 0x80)
+			if (input_port_read(machine, "DSWA") & 0x80)
 			{
 				switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
 				{
-					case 0x01:	return input_port_read_indexed(machine, 8);
-					case 0x02:	return input_port_read_indexed(machine, 9);
-					case 0x04:	return input_port_read_indexed(machine, 10);
-					case 0x08:	return input_port_read_indexed(machine, 11);
-					case 0x10:	return input_port_read_indexed(machine, 12);
-					default:	return (input_port_read_indexed(machine, 8) & input_port_read_indexed(machine, 9) & input_port_read_indexed(machine, 10) & input_port_read_indexed(machine, 11) & input_port_read_indexed(machine, 12));
+					case 0x01:	return input_port_read(machine, "KEY5");
+					case 0x02:	return input_port_read(machine, "KEY6");
+					case 0x04:	return input_port_read(machine, "KEY7");
+					case 0x08:	return input_port_read(machine, "KEY8");
+					case 0x10:	return input_port_read(machine, "KEY9");
+					default:	return (input_port_read(machine, "KEY5") & input_port_read(machine, "KEY6") & input_port_read(machine, "KEY7") 
+										& input_port_read(machine, "KEY8") & input_port_read(machine, "KEY9"));
 				}
 			}
-			else return input_port_read_indexed(machine, 13);
+			else return input_port_read(machine, "JAMMA1");
 			break;
 		case NB1413M3_PAIRSNB:
 		case NB1413M3_PAIRSTEN:
-			return input_port_read_indexed(machine, 4);
+			return input_port_read(machine, "P2");
 			break;
 		default:
 			switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
 			{
-				case 0x01:	return input_port_read_indexed(machine, 8);
-				case 0x02:	return input_port_read_indexed(machine, 9);
-				case 0x04:	return input_port_read_indexed(machine, 10);
-				case 0x08:	return input_port_read_indexed(machine, 11);
-				case 0x10:	return input_port_read_indexed(machine, 12);
-				default:	return (input_port_read_indexed(machine, 8) & input_port_read_indexed(machine, 9) & input_port_read_indexed(machine, 10) & input_port_read_indexed(machine, 11) & input_port_read_indexed(machine, 12));
+				case 0x01:	return input_port_read(machine, "KEY5");
+				case 0x02:	return input_port_read(machine, "KEY6");
+				case 0x04:	return input_port_read(machine, "KEY7");
+				case 0x08:	return input_port_read(machine, "KEY8");
+				case 0x10:	return input_port_read(machine, "KEY9");
+				default:	return (input_port_read(machine, "KEY5") & input_port_read(machine, "KEY6") & input_port_read(machine, "KEY7") 
+									& input_port_read(machine, "KEY8") & input_port_read(machine, "KEY9"));
 			}
 			break;
 	}
@@ -537,7 +512,7 @@ READ8_HANDLER( nb1413m3_inputport3_r )
 		case NB1413M3_MAIKO:
 		case NB1413M3_MMAIKO:
 		case NB1413M3_HANAOJI:
-			return ((input_port_read_indexed(machine, 13) & 0xfd) | ((nb1413m3_outcoin_flag & 0x01) << 1));
+			return ((input_port_read(machine, "PORT0-2") & 0xfd) | ((nb1413m3_outcoin_flag & 0x01) << 1));
 			break;
 		default:
 			return 0xff;
@@ -551,16 +526,16 @@ READ8_HANDLER( nb1413m3_dipsw1_r )
 	{
 		case NB1413M3_KANATUEN:
 		case NB1413M3_KYUHITO:
-			return input_port_read_indexed(machine, 1);
+			return input_port_read(machine, "DSWB");
 			break;
 		case NB1413M3_TAIWANMB:
-			return ((input_port_read_indexed(machine, 0) & 0xf0) | ((input_port_read_indexed(machine, 1) & 0xf0) >> 4));
+			return ((input_port_read(machine, "DSWA") & 0xf0) | ((input_port_read(machine, "DSWB") & 0xf0) >> 4));
 			break;
 		case NB1413M3_OTONANO:
 		case NB1413M3_MJCAMERA:
 		case NB1413M3_IDHIMITU:
 		case NB1413M3_KAGUYA2:
-			return (((input_port_read_indexed(machine, 0) & 0x0f) << 4) | (input_port_read_indexed(machine, 1) & 0x0f));
+			return (((input_port_read(machine, "DSWA") & 0x0f) << 4) | (input_port_read(machine, "DSWB") & 0x0f));
 			break;
 		case NB1413M3_SCANDAL:
 		case NB1413M3_SCANDALM:
@@ -572,7 +547,7 @@ READ8_HANDLER( nb1413m3_dipsw1_r )
 		case NB1413M3_UCHUUAI:
 		case NB1413M3_TOKIMBSJ:
 		case NB1413M3_TOKYOGAL:
-			return ((input_port_read_indexed(machine, 0) & 0x0f) | ((input_port_read_indexed(machine, 1) & 0x0f) << 4));
+			return ((input_port_read(machine, "DSWA") & 0x0f) | ((input_port_read(machine, "DSWB") & 0x0f) << 4));
 			break;
 		case NB1413M3_TRIPLEW1:
 		case NB1413M3_NTOPSTAR:
@@ -583,13 +558,13 @@ READ8_HANDLER( nb1413m3_dipsw1_r )
 		case NB1413M3_MJLSTORY:
 		case NB1413M3_QMHAYAKU:
 		case NB1413M3_MJGOTTUB:
-			return (((input_port_read_indexed(machine, 1) & 0x01) >> 0) | ((input_port_read_indexed(machine, 1) & 0x04) >> 1) |
-			        ((input_port_read_indexed(machine, 1) & 0x10) >> 2) | ((input_port_read_indexed(machine, 1) & 0x40) >> 3) |
-			        ((input_port_read_indexed(machine, 0) & 0x01) << 4) | ((input_port_read_indexed(machine, 0) & 0x04) << 3) |
-			        ((input_port_read_indexed(machine, 0) & 0x10) << 2) | ((input_port_read_indexed(machine, 0) & 0x40) << 1));
+			return (((input_port_read(machine, "DSWB") & 0x01) >> 0) | ((input_port_read(machine, "DSWB") & 0x04) >> 1) |
+			        ((input_port_read(machine, "DSWB") & 0x10) >> 2) | ((input_port_read(machine, "DSWB") & 0x40) >> 3) |
+			        ((input_port_read(machine, "DSWA") & 0x01) << 4) | ((input_port_read(machine, "DSWA") & 0x04) << 3) |
+			        ((input_port_read(machine, "DSWA") & 0x10) << 2) | ((input_port_read(machine, "DSWA") & 0x40) << 1));
 			break;
 		default:
-			return input_port_read_indexed(machine, 0);
+			return input_port_read(machine, "DSWA");
 			break;
 	}
 }
@@ -600,16 +575,16 @@ READ8_HANDLER( nb1413m3_dipsw2_r )
 	{
 		case NB1413M3_KANATUEN:
 		case NB1413M3_KYUHITO:
-			return input_port_read_indexed(machine, 0);
+			return input_port_read(machine, "DSWA");
 			break;
 		case NB1413M3_TAIWANMB:
-			return (((input_port_read_indexed(machine, 0) & 0x0f) << 4) | (input_port_read_indexed(machine, 1) & 0x0f));
+			return (((input_port_read(machine, "DSWA") & 0x0f) << 4) | (input_port_read(machine, "DSWB") & 0x0f));
 			break;
 		case NB1413M3_OTONANO:
 		case NB1413M3_MJCAMERA:
 		case NB1413M3_IDHIMITU:
 		case NB1413M3_KAGUYA2:
-			return ((input_port_read_indexed(machine, 0) & 0xf0) | ((input_port_read_indexed(machine, 1) & 0xf0) >> 4));
+			return ((input_port_read(machine, "DSWA") & 0xf0) | ((input_port_read(machine, "DSWB") & 0xf0) >> 4));
 			break;
 		case NB1413M3_SCANDAL:
 		case NB1413M3_SCANDALM:
@@ -621,7 +596,7 @@ READ8_HANDLER( nb1413m3_dipsw2_r )
 		case NB1413M3_UCHUUAI:
 		case NB1413M3_TOKIMBSJ:
 		case NB1413M3_TOKYOGAL:
-			return (((input_port_read_indexed(machine, 0) & 0xf0) >> 4) | (input_port_read_indexed(machine, 1) & 0xf0));
+			return (((input_port_read(machine, "DSWA") & 0xf0) >> 4) | (input_port_read(machine, "DSWB") & 0xf0));
 			break;
 		case NB1413M3_TRIPLEW1:
 		case NB1413M3_NTOPSTAR:
@@ -632,25 +607,25 @@ READ8_HANDLER( nb1413m3_dipsw2_r )
 		case NB1413M3_MJLSTORY:
 		case NB1413M3_QMHAYAKU:
 		case NB1413M3_MJGOTTUB:
-			return (((input_port_read_indexed(machine, 1) & 0x02) >> 1) | ((input_port_read_indexed(machine, 1) & 0x08) >> 2) |
-			        ((input_port_read_indexed(machine, 1) & 0x20) >> 3) | ((input_port_read_indexed(machine, 1) & 0x80) >> 4) |
-			        ((input_port_read_indexed(machine, 0) & 0x02) << 3) | ((input_port_read_indexed(machine, 0) & 0x08) << 2) |
-			        ((input_port_read_indexed(machine, 0) & 0x20) << 1) | ((input_port_read_indexed(machine, 0) & 0x80) << 0));
+			return (((input_port_read(machine, "DSWB") & 0x02) >> 1) | ((input_port_read(machine, "DSWB") & 0x08) >> 2) |
+			        ((input_port_read(machine, "DSWB") & 0x20) >> 3) | ((input_port_read(machine, "DSWB") & 0x80) >> 4) |
+			        ((input_port_read(machine, "DSWA") & 0x02) << 3) | ((input_port_read(machine, "DSWA") & 0x08) << 2) |
+			        ((input_port_read(machine, "DSWA") & 0x20) << 1) | ((input_port_read(machine, "DSWA") & 0x80) << 0));
 			break;
 		default:
-			return input_port_read_indexed(machine, 1);
+			return input_port_read(machine, "DSWB");
 			break;
 	}
 }
 
 READ8_HANDLER( nb1413m3_dipsw3_l_r )
 {
-	return ((input_port_read_indexed(machine, 2) & 0xf0) >> 4);
+	return ((input_port_read(machine, "DSWC") & 0xf0) >> 4);
 }
 
 READ8_HANDLER( nb1413m3_dipsw3_h_r )
 {
-	return ((input_port_read_indexed(machine, 2) & 0x0f) >> 0);
+	return ((input_port_read(machine, "DSWC") & 0x0f) >> 0);
 }
 
 WRITE8_HANDLER( nb1413m3_outcoin_w )
@@ -706,3 +681,106 @@ WRITE8_HANDLER( nb1413m3_vcrctrl_w )
 		set_led_status(2, 0);
 	}
 }
+
+/* Nichibutsu Mahjong games share a common control panel */
+INPUT_PORTS_START( nbmjcontrols )
+	PORT_START_TAG("KEY0")		/* (3) PORT 1-1 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_I )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_E )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_A )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("KEY1")			/* (4) PORT 1-2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_J )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("KEY2")			/* (5) PORT 1-3 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_K )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_G )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("KEY3")			/* (6) PORT 1-4 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_H )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("KEY4")			/* (7) PORT 1-5 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("KEY5")			/* (6) PORT 2-1 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("KEY6")			/* (7) PORT 2-2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("KEY7")			/* (8) PORT 2-3 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("KEY8")			/* (9) PORT 2-4 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("KEY9")			/* (10) PORT 2-5 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END

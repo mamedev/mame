@@ -448,7 +448,7 @@ static READ32_HANDLER( rabbit_input_r )
 {
 	int rv;
 
-	rv = (input_port_read_indexed(machine, 1)<<16)|(input_port_read_indexed(machine, 0));
+	rv = (input_port_read(machine, "IN1")<<16)|(input_port_read(machine, "IN0"));
 	rv &= ~1;
 	rv |= eeprom_read_bit();	// as per code at 4d932
 	return rv;
@@ -458,7 +458,7 @@ static READ32_HANDLER( tmmjprd_input_r )
 {
 	int rv;
 
-	rv = (input_port_read_indexed(machine, 1)<<16)|(input_port_read_indexed(machine, 0));
+	rv = (input_port_read(machine, "IN1")<<16)|(input_port_read(machine, "IN0"));
 	rv &= ~0x80;
 	rv |= (eeprom_read_bit()<<7);	// as per code at 778
 	return rv;
@@ -826,7 +826,7 @@ static ADDRESS_MAP_START( tmmjprd_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( rabbit )
-	PORT_START	/* 16bit */
+	PORT_START_TAG("IN0")	/* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL ) // Eeprom
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unlabeled in input test
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
@@ -844,7 +844,7 @@ static INPUT_PORTS_START( rabbit )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 
-	PORT_START	/* 16bit */
+	PORT_START_TAG("IN1")	/* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -880,7 +880,7 @@ static INPUT_PORTS_START( rabbit )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tmmjprd )
-	PORT_START	/* 16bit */
+	PORT_START_TAG("IN0")	/* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unlabeled in input test
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
@@ -898,7 +898,7 @@ static INPUT_PORTS_START( tmmjprd )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 
-	PORT_START	/* 16bit */
+	PORT_START_TAG("IN1")	/* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
