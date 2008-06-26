@@ -73,7 +73,7 @@ static void *tms5220_start(int sndindex, int clock, const void *config)
 }
 
 
-#if (HAS_TMC0285) && (HAS_TMS5200)
+#if (HAS_TMC0285 || HAS_TMS5200)
 static void *tms5200_start(int sndindex, int clock, const void *config)
 {
 	struct tms5220_info *info = tms5220_start(sndindex, clock, config);

@@ -305,6 +305,7 @@ INLINE void M_UNDEFINED2(void)
 static void undefined(void)	{ M_UNDEFINED(); }
 static void undefined2(void)	{ M_UNDEFINED2(); }
 
+#if (HAS_ALPHA8301)
 static void need_verify(const char *s)
 {
 	UINT8 op  = M_RDOP(PC-1);
@@ -316,6 +317,7 @@ static void need_verify(const char *s)
 	debugger_break(Machine);
 #endif
 }
+#endif
 
 #if 0
 static void need_verify2(const char *s)

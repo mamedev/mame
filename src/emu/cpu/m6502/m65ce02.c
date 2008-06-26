@@ -88,10 +88,13 @@ static m65ce02_Regs m65ce02;
 
 #include "t65ce02.c"
 
+static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8le(offset); }
+static WRITE8_HANDLER( default_wdmem_id ) { program_write_byte_8le(offset, data); }
+
 static void m65ce02_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	m65ce02.rdmem_id = program_read_byte_8le;
-	m65ce02.wrmem_id = program_write_byte_8le;
+	m65ce02.rdmem_id = default_rdmem_id;
+	m65ce02.wrmem_id = default_wdmem_id;
 	m65ce02.irq_callback = irqcallback;
 }
 
