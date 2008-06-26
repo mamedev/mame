@@ -306,7 +306,7 @@ static MACHINE_DRIVER_START( gotcha )
 	MDRV_SOUND_ROUTE(1, "mono", 0.80)
 
 	MDRV_SOUND_ADD(OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 
