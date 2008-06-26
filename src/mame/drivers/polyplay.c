@@ -147,7 +147,7 @@ static INTERRUPT_GEN( coin_interrupt )
 {
 	static int last = 0;
 
-	if (input_port_read_indexed(machine, 0) & 0x80)
+	if (input_port_read(machine, "INPUT") & 0x80)
 		last = 0;
 	else
 	{
@@ -176,19 +176,19 @@ static ADDRESS_MAP_START( polyplay_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x81) AM_WRITE(polyplay_sound_channel)
 	AM_RANGE(0x82, 0x82) AM_WRITE(polyplay_start_timer2)
 	AM_RANGE(0x83, 0x83) AM_READ(polyplay_random_read)
-	AM_RANGE(0x84, 0x84) AM_READ(input_port_0_r)
+	AM_RANGE(0x84, 0x84) AM_READ_PORT("INPUT")
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( polyplay )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("INPUT")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Bookkeeping Info") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Bookkeeping Info") PORT_CODE(KEYCODE_F2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
 

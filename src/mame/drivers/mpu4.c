@@ -949,15 +949,14 @@ static const pia6821_interface pia_ic7_intf =
 /* IC8, Inputs, TRIACS, alpha clock */
 static READ8_HANDLER( pia_ic8_porta_r )
 {
-	static const UINT8 ports[8] = { 0, 1, 2, 3, 0, 1, 4, 5 };
-	int input_read = ports[input_strobe];
+	static const char *portnames[] = { "ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2" };
 
-	LOG_IC8(("%04x IC8 PIA Read of Port A (MUX input data)\n",activecpu_get_previouspc()));
+	LOG_IC8(("%04x IC8 PIA Read of Port A (MUX input data)\n", activecpu_get_previouspc()));
 /* The orange inputs are polled twice as often as the black ones, for reasons of efficiency.
    This is achieved via connecting every input line to an AND gate, thus allowing two strobes
    to represent each orange input bank (strobes are active low). */
 	pia_set_input_cb1(2, (input_port_read(machine, "AUX2") & 0x80));
-	return input_port_read_indexed(machine, input_read);
+	return input_port_read(machine, portnames[input_strobe]);
 }
 
 

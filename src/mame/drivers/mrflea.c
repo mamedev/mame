@@ -204,23 +204,27 @@ static WRITE8_HANDLER( mrflea_select3_w ){
 
 /*******************************************************/
 
-static READ8_HANDLER( mrflea_input0_r ){
-	if( mrflea_select0 == 0x0f ) return input_port_read_indexed(machine, 0);
-	if( mrflea_select0 == 0x0e ) return input_port_read_indexed(machine, 1);
+static READ8_HANDLER( mrflea_input0_r )
+{
+	if( mrflea_select0 == 0x0f ) return input_port_read(machine, "IN0");
+	if( mrflea_select0 == 0x0e ) return input_port_read(machine, "IN1");
 	return 0x00;
 }
 
-static READ8_HANDLER( mrflea_input1_r ){
+static READ8_HANDLER( mrflea_input1_r )
+{
 	return 0x00;
 }
 
-static READ8_HANDLER( mrflea_input2_r ){
-	if( mrflea_select2 == 0x0f ) return input_port_read_indexed(machine, 2);
-	if( mrflea_select2 == 0x0e ) return input_port_read_indexed(machine, 3);
+static READ8_HANDLER( mrflea_input2_r )
+{
+	if( mrflea_select2 == 0x0f ) return input_port_read(machine, "DSW1");
+	if( mrflea_select2 == 0x0e ) return input_port_read(machine, "DSW2");
 	return 0x00;
 }
 
-static READ8_HANDLER( mrflea_input3_r ){
+static READ8_HANDLER( mrflea_input3_r )
+{
 	return 0x00;
 }
 
@@ -350,7 +354,7 @@ ROM_START( mrflea )
 ROM_END
 
 static INPUT_PORTS_START( mrflea )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -360,12 +364,12 @@ static INPUT_PORTS_START( mrflea )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START /* DSW1 */
+	PORT_START_TAG("DSW1")		/* DSW1 */
 /*
     ------xx
     -----x--
@@ -395,7 +399,7 @@ static INPUT_PORTS_START( mrflea )
 	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START /* DSW2 */
+	PORT_START_TAG("DSW2")		/* DSW2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING( 0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING( 0x03, DEF_STR( 1C_1C ) )

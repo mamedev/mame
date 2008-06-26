@@ -138,7 +138,7 @@ DRIVER_INIT( armwrest );
 
 static READ8_HANDLER( punchout_input_3_r )
 {
-	int data = input_port_read_indexed(machine,3);
+	int data = input_port_read(machine, "DSW1");
 	/* bit 4 is busy pin level */
 	if( VLM5030_BSY() ) data &= ~0x10;
 	else data |= 0x10;
@@ -426,9 +426,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW2")
 	AM_RANGE(0x03, 0x03) AM_READ(punchout_input_3_r)
 
 	/* protection ports - Super Punchout only (move to install handler?) */

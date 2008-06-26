@@ -917,7 +917,7 @@ static INPUT_PORTS_START( orld105k )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sango )
-	PORT_START	/* DSW */
+	PORT_START_TAG("P1P2")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -935,7 +935,7 @@ static INPUT_PORTS_START( sango )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("P3P4")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START3                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
@@ -952,7 +952,8 @@ static INPUT_PORTS_START( sango )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
-	PORT_START	/* DSW */
+
+	PORT_START_TAG("Service")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -972,7 +973,7 @@ static INPUT_PORTS_START( sango )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("DSW")	/* DSW */
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0002, 0x0002, "Music" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -996,7 +997,7 @@ static INPUT_PORTS_START( sango )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	/* Region - supplied by protection device */
+	PORT_START_TAG("Region")	/* Region - supplied by protection device */
 	PORT_DIPNAME( 0x000f, 0x0005, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0000, "China" )
 	PORT_DIPSETTING(      0x0001, "Taiwan" )
@@ -1007,7 +1008,7 @@ static INPUT_PORTS_START( sango )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( olds )
-	PORT_START	/* DSW */
+	PORT_START_TAG("P1P2")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -1025,7 +1026,7 @@ static INPUT_PORTS_START( olds )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("P3P4")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START3                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
@@ -1042,7 +1043,8 @@ static INPUT_PORTS_START( olds )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
-	PORT_START	/* DSW */
+
+	PORT_START_TAG("Service")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1062,7 +1064,7 @@ static INPUT_PORTS_START( olds )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("DSW")	/* DSW */
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0002, 0x0002, "Music" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -1086,7 +1088,7 @@ static INPUT_PORTS_START( olds )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	/* Region - supplied by protection device */
+	PORT_START_TAG("Region")	/* Region - supplied by protection device */
 	PORT_DIPNAME( 0x000f, 0x0006, DEF_STR( Region ) )
 	// includes region 1 = taiwan , 2 = china, 3 = japan (title = orlegend special), 4 = korea, 5 = hongkong, 6 = world
 	PORT_DIPSETTING(      0x0001, "Taiwan" )
@@ -1098,7 +1100,7 @@ static INPUT_PORTS_START( olds )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( killbld )
-	PORT_START	/* DSW */
+	PORT_START_TAG("P1P2")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -1116,7 +1118,7 @@ static INPUT_PORTS_START( killbld )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("P3P4")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START3                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
@@ -1134,7 +1136,7 @@ static INPUT_PORTS_START( killbld )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("Service")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1154,7 +1156,7 @@ static INPUT_PORTS_START( killbld )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("DSW")	/* DSW */
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0002, 0x0002, "Music" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -1178,7 +1180,7 @@ static INPUT_PORTS_START( killbld )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	/* Region - supplied by protection device */
+	PORT_START_TAG("Region")	/* Region - supplied by protection device */
 	PORT_DIPNAME( 0x00ff, 0x0021, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0016, "Taiwan" )
 	PORT_DIPSETTING(      0x0017, "China" )
@@ -1195,7 +1197,7 @@ static INPUT_PORTS_START( killbld )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( photoy2k )
-	PORT_START	/* DSW */
+	PORT_START_TAG("P1P2")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -1213,7 +1215,7 @@ static INPUT_PORTS_START( photoy2k )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("P3P4")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START3                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
@@ -1230,7 +1232,8 @@ static INPUT_PORTS_START( photoy2k )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
-	PORT_START	/* DSW */
+
+	PORT_START_TAG("Service")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1250,7 +1253,7 @@ static INPUT_PORTS_START( photoy2k )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("DSW")	/* DSW */
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0002, 0x0002, "Music" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -1274,7 +1277,7 @@ static INPUT_PORTS_START( photoy2k )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	/* Region - supplied by protection device */
+	PORT_START_TAG("Region")	/* Region - supplied by protection device */
 	PORT_DIPNAME( 0x000f, 0x0003, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0000, "Taiwan" )
 	PORT_DIPSETTING(      0x0001, "China" )
@@ -1285,7 +1288,7 @@ static INPUT_PORTS_START( photoy2k )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ddp2 )
-	PORT_START	/* P1 */
+	PORT_START_TAG("P1P2")	/* P1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -1303,7 +1306,7 @@ static INPUT_PORTS_START( ddp2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
-	PORT_START	/* P2 */
+	PORT_START_TAG("P3P4")	/* P2 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START3                       )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
@@ -1321,7 +1324,7 @@ static INPUT_PORTS_START( ddp2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("Service")	/* DSW */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1341,7 +1344,7 @@ static INPUT_PORTS_START( ddp2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // uused?
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("DSW")	/* DSW */
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0002, 0x0002, "Music" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -1366,7 +1369,7 @@ static INPUT_PORTS_START( ddp2 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 /* probably not dsw related anyway
-    PORT_START
+    PORT_START_TAG("UNK0")
     PORT_DIPNAME( 0x0001, 0x0001, "4" )
     PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1416,7 +1419,7 @@ static INPUT_PORTS_START( ddp2 )
     PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-    PORT_START
+    PORT_START_TAG("UNK1")
     PORT_DIPNAME( 0x0001, 0x0001, "5" )
     PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1466,7 +1469,7 @@ static INPUT_PORTS_START( ddp2 )
     PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 */
-	PORT_START	/* Region - supplied by protection device */
+	PORT_START_TAG("Region")	/* Region - supplied by protection device */
 	PORT_DIPNAME( 0x000f, 0x0005, DEF_STR( Region ) )
 	PORT_DIPSETTING(      0x0000, "China" )
 	PORT_DIPSETTING(      0x0001, "Taiwan" )
@@ -2028,7 +2031,7 @@ static READ16_HANDLER( killbld_prot_r )
 		else if(kb_cmd==5)
 		{
 			UINT32 protvalue;
-			protvalue = 0x89911400|input_port_read_indexed(machine, 4); // region
+			protvalue = 0x89911400|input_port_read(machine, "Region");
 			res=(protvalue>>(8*(ptr-1)))&0xff;
 
 		}
@@ -2106,7 +2109,7 @@ static READ16_HANDLER(ddp2_protram_r)
 {
 	if (PGMLOGERROR) logerror("prot_r %04x, %04x\n", offset,ddp2_protram[offset]);
 
-	if (offset == 0x02/2) return input_port_read_indexed(machine, 4);
+	if (offset == 0x02/2) return input_port_read(machine, "Region");
 
 	if (offset == 0x1f00/2) return 0;
 
@@ -2201,22 +2204,22 @@ static UINT16 olds_bs,olds_cmd3;
 //UINT16 olds_r16(UINT32 addr)
 static READ16_HANDLER( olds_r16 )
 {
-//  int offset=addr&0xf;
+//  int offset = addr&0xf;
 	UINT16 res ;
-	res=0;
+	res = 0;
 
-	if(offset==1)
+	if(offset == 1)
 	{
-		if(kb_cmd==1)
-			res=reg&0x7f;
-		if(kb_cmd==2)
-			res=olds_bs|0x80;
-		if(kb_cmd==3)
-			res=olds_cmd3;
-		else if(kb_cmd==5)
+		if(kb_cmd == 1)
+			res = reg&0x7f;
+		if(kb_cmd == 2)
+			res = olds_bs|0x80;
+		if(kb_cmd == 3)
+			res = olds_cmd3;
+		else if(kb_cmd == 5)
 		{
-			UINT32 protvalue = 0x900000|input_port_read_indexed(machine, 4); // region from protection device.
-			res=(protvalue>>(8*(ptr-1)))&0xff; // includes region 1 = taiwan , 2 = china, 3 = japan (title = orlegend special), 4 = korea, 5 = hongkong, 6 = world
+			UINT32 protvalue = 0x900000 | input_port_read(machine, "Region"); // region from protection device.
+			res = (protvalue>>(8 * (ptr-1))) & 0xff; // includes region 1 = taiwan , 2 = china, 3 = japan (title = orlegend special), 4 = korea, 5 = hongkong, 6 = world
 
 		}
 	}

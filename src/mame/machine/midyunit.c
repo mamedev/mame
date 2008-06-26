@@ -141,7 +141,9 @@ READ16_HANDLER( midyunit_protection_r )
 
 READ16_HANDLER( midyunit_input_r )
 {
-	return input_port_read_indexed(machine, offset);
+	static const char *portnames[] = { "IN0", "IN1", "IN2", "DSW", "UNK0", "UNK1" };
+
+	return input_port_read(machine, portnames[offset]);
 }
 
 
@@ -154,16 +156,18 @@ READ16_HANDLER( midyunit_input_r )
 
 static READ16_HANDLER( term2_input_r )
 {
+	static const char *portnames[] = { "IN0", "IN1", NULL, "DSW", "UNK0", "UNK1" };
+
 	if (offset != 2)
-		return input_port_read_indexed(machine, offset);
+		return input_port_read(machine, portnames[offset]);
 
 	switch (term2_analog_select)
 	{
 		default:
-		case 0:  return input_port_read_indexed(machine, 2);  break;
-		case 1:  return input_port_read_indexed(machine, 6);  break;
-		case 2:  return input_port_read_indexed(machine, 7);  break;
-		case 3:  return input_port_read_indexed(machine, 8);  break;
+		case 0:  return input_port_read(machine, "STICK0_X");  break;
+		case 1:  return input_port_read(machine, "STICK0_Y");  break;
+		case 2:  return input_port_read(machine, "STICK1_X");  break;
+		case 3:  return input_port_read(machine, "STICK1_Y");  break;
 	}
 }
 

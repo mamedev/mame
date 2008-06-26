@@ -100,11 +100,11 @@ static WRITE8_HANDLER( multigam_IN0_w )
 	in_0_shift = 0;
 	in_1_shift = 0;
 
-	in_0 = input_port_read_indexed(machine, 0);
-	in_1 = input_port_read_indexed(machine, 1);
+	in_0 = input_port_read(machine, "P1");
+	in_1 = input_port_read(machine, "P2");
 
 	multigam_in_dsw_shift = 0;
-	multigam_in_dsw = input_port_read_indexed(machine, 3);
+	multigam_in_dsw = input_port_read(machine, "DSW");
 }
 
 static READ8_HANDLER( multigam_IN1_r )
@@ -117,7 +117,7 @@ static READ8_HANDLER( multigam_inputs_r )
 	/* bit 0: serial input (dsw)
        bit 1: coin */
 	return ((multigam_in_dsw >> multigam_in_dsw_shift++) & 0x01) |
-			input_port_read_indexed(machine, 2);
+			input_port_read(machine, "IN0");
 }
 
 
@@ -450,7 +450,7 @@ ADDRESS_MAP_END
 *******************************************************/
 
 static INPUT_PORTS_START( multigam_common )
-	PORT_START /* IN0 */
+	PORT_START_TAG("P1")		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)	/* Select */
@@ -460,7 +460,7 @@ static INPUT_PORTS_START( multigam_common )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 
-	PORT_START /* IN1 */
+	PORT_START_TAG("P2")		/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)	/* Select */
@@ -470,14 +470,14 @@ static INPUT_PORTS_START( multigam_common )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 
-	PORT_START /* IN2 */
+	PORT_START_TAG("IN0")		/* IN2 */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( multigam )
 	PORT_INCLUDE( multigam_common )
 
-	PORT_START /* IN3 */
+	PORT_START_TAG("DSW")		/* IN3 */
 	PORT_DIPNAME( 0x06, 0x00, "Coin/Time" )
 	PORT_DIPSETTING( 0x00, "3 min" )
 	PORT_DIPSETTING( 0x04, "5 min" )
@@ -488,7 +488,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( multigm3 )
 	PORT_INCLUDE( multigam_common )
 
-	PORT_START /* IN3 */
+	PORT_START_TAG("DSW")		/* IN3 */
 	PORT_DIPNAME( 0x06, 0x00, "Coin/Time" )
 	PORT_DIPSETTING( 0x00, "15 min" )
 	PORT_DIPSETTING( 0x04, "8 min" )

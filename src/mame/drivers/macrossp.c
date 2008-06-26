@@ -235,12 +235,12 @@ VIDEO_EOF(macrossp);
 
 static READ32_HANDLER ( macrossp_ports1_r )
 {
-	return ((input_port_read_indexed(machine, 0) << 16) |  (input_port_read_indexed(machine, 1) << 0));
+	return ((input_port_read(machine, "IN0") << 16) |  (input_port_read(machine, "KEYS") << 0));
 }
 
 static READ32_HANDLER ( macrossp_ports2_r )
 {
-	return ((input_port_read_indexed(machine, 2) << 16) |  (input_port_read_indexed(machine, 3) << 0));
+	return ((input_port_read(machine, "DSW") << 16) |  (input_port_read(machine, "UNK") << 0));
 }
 
 static WRITE32_HANDLER( paletteram32_macrossp_w )
@@ -369,7 +369,7 @@ ADDRESS_MAP_END
 /*** INPUT PORTS *************************************************************/
 
 static INPUT_PORTS_START( macrossp )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -452,7 +452,7 @@ static INPUT_PORTS_START( macrossp )
 	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
 	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW2:8" )
 
-	PORT_START
+	PORT_START_TAG("UNK")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) /* Unknown use, but not dipswitches */
 
 INPUT_PORTS_END

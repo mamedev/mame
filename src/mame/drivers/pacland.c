@@ -209,8 +209,10 @@ static READ8_HANDLER( pacland_input_r )
 {
 	int shift = 4 * (offset & 1);
 	int port = offset & 2;
-	int r = ( input_port_read_indexed(machine,  port+0 ) << shift ) & 0xf0;
-	r |= ( input_port_read_indexed(machine,  port+1 ) >> (4-shift) ) & 0x0f;
+	static const char *portnames[] = { "DSWA", "DSWB", "IN0", "IN1" };
+	int r = (input_port_read(machine, portnames[port]) << shift) & 0xf0;
+	r |= (input_port_read(machine, portnames[port+1]) >> (4-shift)) & 0x0f;
+
 	return r;
 }
 
@@ -280,7 +282,7 @@ static READ8_HANDLER( readFF )
 }
 
 static ADDRESS_MAP_START( mcu_port_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(HD63701_PORT1, HD63701_PORT1) AM_READ(input_port_4_r)
+	AM_RANGE(HD63701_PORT1, HD63701_PORT1) AM_READ_PORT("IN2")
 	AM_RANGE(HD63701_PORT1, HD63701_PORT1) AM_WRITE(pacland_coin_w)
 	AM_RANGE(HD63701_PORT2, HD63701_PORT2) AM_READ(readFF)	/* leds won't work otherwise */
 	AM_RANGE(HD63701_PORT2, HD63701_PORT2) AM_WRITE(pacland_led_w)
@@ -289,7 +291,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( pacland )
-	PORT_START      /* DSWA */
+	PORT_START_TAG("DSWA")	/* DSWA */
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x40, "2" )
@@ -310,7 +312,7 @@ static INPUT_PORTS_START( pacland )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 
-	PORT_START      /* DSWB */
+	PORT_START_TAG("DSWB")	/* DSWB */
 	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0xe0, "30K 80K 130K 300K 500K 1M" )
 	PORT_DIPSETTING(    0x80, "30K 80K every 100K" )
@@ -335,7 +337,7 @@ static INPUT_PORTS_START( pacland )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
-	PORT_START	/* Memory Mapped Port */
+	PORT_START_TAG("IN0")	/* Memory Mapped Port */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -347,7 +349,7 @@ static INPUT_PORTS_START( pacland )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
-	PORT_START	/* Memory Mapped Port */
+	PORT_START_TAG("IN1")	/* Memory Mapped Port */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -357,7 +359,7 @@ static INPUT_PORTS_START( pacland )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )	// IPT_JOYSTICK_DOWN according to schematics
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_COCKTAIL	// IPT_JOYSTICK_UP according to schematics
 
-	PORT_START	/* MCU Input Port */
+	PORT_START_TAG("IN2")	/* MCU Input Port */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_COCKTAIL	/* OUT:coin lockout */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* OUT:coin counter 1 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )	/* OUT:coin counter 2 */

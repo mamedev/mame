@@ -614,7 +614,7 @@ static READ8_HANDLER( dipB_mux )	{ return input_port_read(machine, "DSW2") >> (4
 static READ8_HANDLER( dipB_muxi )	// dips B
 {
 	// bits are interleaved in Phozon
-	return BITSWAP8(input_port_read_indexed(machine, 4),6,4,2,0,7,5,3,1) >> (4*mux);
+	return BITSWAP8(input_port_read(machine, "DSW2"),6,4,2,0,7,5,3,1) >> (4*mux);
 }
 static WRITE8_HANDLER( out_mux )	{ mux = data & 1; }
 static WRITE8_HANDLER( out_lamps )

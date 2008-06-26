@@ -111,14 +111,14 @@ TODO:
 
 static READ8_HANDLER( in0_port_r )
 {
-	int in0 = input_port_read_indexed(machine, 0);
+	int in0 = input_port_read(machine, "IN0");
 
 	if ( naughtyb_cocktail )
 	{
 		// cabinet == cocktail -AND- handling player 2
 
 		in0 = ( in0 & 0x03 ) |				// start buttons
-			  ( input_port_read_indexed(machine, 1) & 0xFC );	// cocktail inputs
+			  ( input_port_read(machine, "IN0_COCKTAIL") & 0xFC );	// cocktail inputs
 	}
 
 	return in0;
@@ -128,8 +128,8 @@ static READ8_HANDLER( dsw0_port_r )
 {
 	// vblank replaces the cabinet dip
 
-	return ( ( input_port_read_indexed(machine, 2) & 0x7F ) |		// dsw0
-   			 ( input_port_read_indexed(machine, 3) & 0x80 ) );	// vblank
+	return ( ( input_port_read(machine, "DSW0") & 0x7F ) |		// dsw0
+   			 ( input_port_read(machine, "FAKE") & 0x80 ) );		// vblank
 }
 
 /* Pop Flamer
@@ -217,7 +217,7 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( naughtyb_interrupt )
 {
-	if (input_port_read_indexed(machine, 3) & 1)
+	if (input_port_read(machine, "FAKE") & 1)
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 

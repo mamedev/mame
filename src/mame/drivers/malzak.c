@@ -75,7 +75,7 @@ static READ8_HANDLER( s2636_portA_r )
 	// POT switch position, read from port A of the first S2636
 	// Not sure of the correct values to return, but these should
 	// do based on the game code.
-	switch(input_port_read_indexed(machine, 1))
+	switch(input_port_read(machine, "POT"))
 	{
 		case 0:  // Normal play
 			return 0xf0;
@@ -179,11 +179,11 @@ static ADDRESS_MAP_START( malzak_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ(collision_r) // returns where a collision can occur.
 	AM_RANGE(0x40, 0x40) AM_WRITE(port40_w)  // possibly sound codes for dual SN76477s
 	AM_RANGE(0x60, 0x60) AM_WRITE(port60_w)  // possibly playfield scroll X offset
-    AM_RANGE(0x80, 0x80) AM_READ(input_port_0_r)  //controls
+    AM_RANGE(0x80, 0x80) AM_READ_PORT("IN0")  //controls
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(SMH_NOP)  // echoes I/O port read from port 0x80
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(portc0_w)  // possibly playfield row selection for writing and/or collisions
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(s2650_data_r)  // read upon death
-    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_2_r)
+    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 
@@ -192,7 +192,7 @@ static INPUT_PORTS_START( malzak )
 	/* Malzak has an 8-way stick
        and only one button (firing and bomb dropping on the same button) */
 
-	PORT_START /* I/O port 0x80 */
+	PORT_START_TAG("IN0")		/* I/O port 0x80 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
@@ -202,10 +202,10 @@ static INPUT_PORTS_START( malzak )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    )
 
-    PORT_START
-    // No POT switch on Malzak as far as I know
+    PORT_START_TAG("POT")
+    /* No POT switch on Malzak as far as I know */
 
-	PORT_START	/* SENSE */
+	PORT_START_TAG("SENSE")		/* SENSE */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
 INPUT_PORTS_END
@@ -215,7 +215,7 @@ static INPUT_PORTS_START( malzak2 )
 	/* Same as Malzak, but with additional POT switch, and
        possibly a reset button too. */
 
-	PORT_START /* I/O port 0x80 */
+	PORT_START_TAG("IN0")		/* I/O port 0x80 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
@@ -225,14 +225,14 @@ static INPUT_PORTS_START( malzak2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    )
 
-    PORT_START  // Fake DIP switch to handle the POT switch.
+    PORT_START_TAG("POT")		/* Fake DIP switch to handle the POT switch */
 	PORT_DIPNAME( 0x03, 0x00, "POT switch position" )
 	PORT_DIPSETTING( 0x00, "1" )  // Normal play
 	PORT_DIPSETTING( 0x01, "2" )
 	PORT_DIPSETTING( 0x02, "3" )
 	PORT_DIPSETTING( 0x03, "4" )  // Change settings
 
-	PORT_START	/* SENSE */
+	PORT_START_TAG("SENSE")		/* SENSE */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
 INPUT_PORTS_END

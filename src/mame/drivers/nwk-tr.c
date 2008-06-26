@@ -738,11 +738,11 @@ static double adc12138_input_callback(int input)
 	int value = 0;
 	switch (input)
 	{
-		case 0:		value = input_port_read_indexed(Machine, 4) - 0x800; break;
-		case 1:		value = input_port_read_indexed(Machine, 5); break;
-		case 2:		value = input_port_read_indexed(Machine, 6); break;
-		case 3:		value = input_port_read_indexed(Machine, 7); break;
-		case 4:		value = input_port_read_indexed(Machine, 8); break;
+		case 0:		value = input_port_read(Machine, "ANALOG1") - 0x800; break;
+		case 1:		value = input_port_read(Machine, "ANALOG2"); break;
+		case 2:		value = input_port_read(Machine, "ANALOG3"); break;
+		case 3:		value = input_port_read(Machine, "ANALOG4"); break;
+		case 4:		value = input_port_read(Machine, "ANALOG5"); break;
 	}
 
 	return (double)(value) / 2047.0;
@@ -755,15 +755,15 @@ static READ32_HANDLER( sysreg_r )
 	{
 		if (ACCESSING_BITS_24_31)
 		{
-			r |= input_port_read_indexed(machine, 0) << 24;
+			r |= input_port_read(machine, "IN0") << 24;
 		}
 		if (ACCESSING_BITS_16_23)
 		{
-			r |= input_port_read_indexed(machine, 1) << 16;
+			r |= input_port_read(machine, "IN1") << 16;
 		}
 		if (ACCESSING_BITS_8_15)
 		{
-			r |= input_port_read_indexed(machine, 2) << 8;
+			r |= input_port_read(machine, "IN2") << 8;
 		}
 		if (ACCESSING_BITS_0_7)
 		{
@@ -774,7 +774,7 @@ static READ32_HANDLER( sysreg_r )
 	{
 		if (ACCESSING_BITS_24_31)
 		{
-			r |= input_port_read_indexed(machine, 3) << 24;
+			r |= input_port_read(machine, "DSW") << 24;
 		}
 	}
 	return r;
@@ -1008,7 +1008,7 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 static INPUT_PORTS_START( nwktr )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -1018,17 +1018,17 @@ static INPUT_PORTS_START( nwktr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_7)
 	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x80, 0x00, "Test Mode" )
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x80, DEF_STR( On ) )

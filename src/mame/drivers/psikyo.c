@@ -102,7 +102,7 @@ static MACHINE_RESET( psikyo )
 
 static int psikyo_readcoinport(running_machine *machine, int has_mcu)
 {
-	int ret = input_port_read_indexed(machine, 1) & ~0x84;
+	int ret = input_port_read(machine, "COIN") & ~0x84;
 
 	if (has_mcu)
 	{
@@ -141,10 +141,10 @@ static READ32_HANDLER( sngkace_input_r )
 {
 	switch(offset)
 	{
-		case 0x0:	return (input_port_read_indexed(machine, 0) << 16) | 0xffff;
-		case 0x1:	return (input_port_read_indexed(machine, 2) << 16) | input_port_read_indexed(machine, 4);
-		case 0x2:	return (psikyo_readcoinport(machine, 0) << 16) | input_port_read_indexed(machine, 3);
-		default:	logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
+		case 0x0:	return (input_port_read(machine, "IN0") << 16) | 0xffff;
+		case 0x1:	return (input_port_read(machine, "DSW1") << 16) | input_port_read(machine, "DSW3");
+		case 0x2:	return (psikyo_readcoinport(machine, 0) << 16) | input_port_read(machine, "DSW2");
+		default:	logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset * 2);
 					return 0;
 	}
 }
@@ -153,8 +153,8 @@ static READ32_HANDLER( gunbird_input_r )
 {
 	switch(offset)
 	{
-		case 0x0:	return (input_port_read_indexed(machine, 0) << 16) | psikyo_readcoinport(machine, 0);
-		case 0x1:	return (input_port_read_indexed(machine, 2) << 16) | input_port_read_indexed(machine, 3);
+		case 0x0:	return (input_port_read(machine, "IN0") << 16) | psikyo_readcoinport(machine, 0);
+		case 0x1:	return (input_port_read(machine, "DSW1") << 16) | input_port_read(machine, "DSW2");
 		default:	logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
 					return 0;
 	}
@@ -309,8 +309,8 @@ static READ32_HANDLER( s1945_input_r )
 {
 	switch(offset)
 	{
-		case 0x0:	return (input_port_read_indexed(machine, 0) << 16) | psikyo_readcoinport(machine, 1);
-		case 0x1:	return (((input_port_read_indexed(machine, 2) << 16) | input_port_read_indexed(machine, 3)) & 0xffff000f) | s1945_mcu_r(machine, offset-1, mem_mask);
+		case 0x0:	return (input_port_read(machine, "IN0") << 16) | psikyo_readcoinport(machine, 1);
+		case 0x1:	return (((input_port_read(machine, "DSW1") << 16) | input_port_read(machine, "DSW2")) & 0xffff000f) | s1945_mcu_r(machine, offset-1, mem_mask);
 		case 0x2:	return s1945_mcu_r(machine, offset-1, mem_mask);
 		default:	logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
 					return 0;
@@ -542,12 +542,12 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( samuraia )
 
-	PORT_START	// IN0 - c00000&1
+	PORT_START_TAG("IN0")		// IN0 - c00000&1
 	PSIKYO_PORT_PLAYER2
 
 	PSIKYO_PORT_PLAYER1
 
-	PORT_START	// IN1 - c00008&9
+	PORT_START_TAG("COIN")		// IN1 - c00008&9
 	PSIKYO_PORT_COIN
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )	// unused?
@@ -559,7 +559,7 @@ static INPUT_PORTS_START( samuraia )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN2 - c00004&5
+	PORT_START_TAG("DSW1")		// IN2 - c00004&5
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -606,7 +606,7 @@ static INPUT_PORTS_START( samuraia )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, "On [Free Play]" ) // Forces 1C_1C
 
-	PORT_START	// IN3 - c00002&3
+	PORT_START_TAG("DSW2")		// IN3 - c00002&3
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_VBLANK  )	// vblank
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )	// unused?
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -625,7 +625,7 @@ static INPUT_PORTS_START( samuraia )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN4 - c00006&7
+	PORT_START_TAG("DSW3")		// IN4 - c00006&7
 
 	/***********************************************
 
@@ -661,12 +661,12 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sngkace )
 
-	PORT_START	// IN0 - c00000&1
+	PORT_START_TAG("IN0")		// IN0 - c00000&1
 	PSIKYO_PORT_PLAYER2
 
 	PSIKYO_PORT_PLAYER1
 
-	PORT_START	// IN1 - c00008&9
+	PORT_START_TAG("COIN")		// IN1 - c00008&9
 	PSIKYO_PORT_COIN
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )	// unused?
@@ -678,7 +678,7 @@ static INPUT_PORTS_START( sngkace )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN2 - c00004&5
+	PORT_START_TAG("DSW1")		// IN2 - c00004&5
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -725,7 +725,7 @@ static INPUT_PORTS_START( sngkace )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, "On [Free Play]" ) // Forces 1C_1C
 
-	PORT_START	// IN3 - c00002&3
+	PORT_START_TAG("DSW2")		// IN3 - c00002&3
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_VBLANK  )	// vblank
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )	// unused?
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -744,7 +744,7 @@ static INPUT_PORTS_START( sngkace )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN4 - c00006&7
+	PORT_START_TAG("DSW3")		// IN4 - c00006&7
 
 	/***********************************************
 
@@ -786,12 +786,12 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( btlkroad )
 
-	PORT_START	// IN0 - c00000&1
+	PORT_START_TAG("IN0")		// IN0 - c00000&1
 	PSIKYO_PORT_PLAYER2
 
 	PSIKYO_PORT_PLAYER1
 
-	PORT_START	// IN1 - c00002&3
+	PORT_START_TAG("COIN")		// IN1 - c00002&3
 	PSIKYO_PORT_COIN
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN               )
@@ -803,7 +803,7 @@ static INPUT_PORTS_START( btlkroad )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 
-	PORT_START	// IN2 - c00004&5
+	PORT_START_TAG("DSW1")		// IN2 - c00004&5
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -864,7 +864,7 @@ static INPUT_PORTS_START( btlkroad )
 
     ************************************************/
 
-	PORT_START	// IN3 - c00006&7
+	PORT_START_TAG("DSW2")		// IN3 - c00006&7
 	PORT_DIPNAME( 0x000f, 0x0000, "Copyright (Country)" )
 	PORT_DIPSETTING(      0x000f, "Psikyo (Japan)" )
 	PORT_DIPSETTING(      0x000e, "Jaleco+Psikyo (USA & Canada)" )
@@ -913,12 +913,12 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gunbird )
 
-	PORT_START	// IN0 - c00000&1
+	PORT_START_TAG("IN0")		// IN0 - c00000&1
 	PSIKYO_PORT_PLAYER2
 
 	PSIKYO_PORT_PLAYER1
 
-	PORT_START	// IN1 - c00002&3
+	PORT_START_TAG("COIN")		// IN1 - c00002&3
 	PSIKYO_PORT_COIN
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -930,7 +930,7 @@ static INPUT_PORTS_START( gunbird )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN2 - c00004&5
+	PORT_START_TAG("DSW1")		// IN2 - c00004&5
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -977,7 +977,7 @@ static INPUT_PORTS_START( gunbird )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, "On [Free Play]" ) // Forces 1C_1C
 
-	PORT_START	// IN3 - c00006&7
+	PORT_START_TAG("DSW2")		// IN3 - c00006&7
 
 	/***********************************************
 
@@ -1023,12 +1023,12 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gunbirdj )
 
-	PORT_START	// IN0 - c00000&1
+	PORT_START_TAG("IN0")		// IN0 - c00000&1
 	PSIKYO_PORT_PLAYER2
 
 	PSIKYO_PORT_PLAYER1
 
-	PORT_START	// IN1 - c00002&3
+	PORT_START_TAG("COIN")		// IN1 - c00002&3
 	PSIKYO_PORT_COIN
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1040,7 +1040,7 @@ static INPUT_PORTS_START( gunbirdj )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN2 - c00004&5
+	PORT_START_TAG("DSW1")		// IN2 - c00004&5
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1087,7 +1087,7 @@ static INPUT_PORTS_START( gunbirdj )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, "On [Free Play]" ) // Forces 1C_1C
 
-	PORT_START	// IN3 - c00006&7
+	PORT_START_TAG("DSW2")		// IN3 - c00006&7
 
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1116,12 +1116,12 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( s1945 )
 
-	PORT_START	// IN0 - c00000&1
+	PORT_START_TAG("IN0")		// IN0 - c00000&1
 	PSIKYO_PORT_PLAYER2
 
 	PSIKYO_PORT_PLAYER1
 
-	PORT_START	// IN1 - c00002&3
+	PORT_START_TAG("COIN")		// IN1 - c00002&3
 	PSIKYO_PORT_COIN
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1133,7 +1133,7 @@ static INPUT_PORTS_START( s1945 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN2 - c00004&5
+	PORT_START_TAG("DSW1")		// IN2 - c00004&5
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1180,7 +1180,7 @@ static INPUT_PORTS_START( s1945 )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) // Forces 1C_1C
 
-	PORT_START	// IN3 - c00006&7
+	PORT_START_TAG("DSW2")		// IN3 - c00006&7
 
 	/***********************************************
 
@@ -1227,12 +1227,12 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( s1945a )
 
-	PORT_START	// IN0 - c00000&1
+	PORT_START_TAG("IN0")		// IN0 - c00000&1
 	PSIKYO_PORT_PLAYER2
 
 	PSIKYO_PORT_PLAYER1
 
-	PORT_START	// IN1 - c00002&3
+	PORT_START_TAG("COIN")		// IN1 - c00002&3
 	PSIKYO_PORT_COIN
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1244,7 +1244,7 @@ static INPUT_PORTS_START( s1945a )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN2 - c00004&5
+	PORT_START_TAG("DSW1")		// IN2 - c00004&5
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1291,7 +1291,7 @@ static INPUT_PORTS_START( s1945a )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) // Forces 1C_1C
 
-	PORT_START	// IN3 - c00006&7
+	PORT_START_TAG("DSW2")		// IN3 - c00006&7
 
 	/***********************************************
 
@@ -1322,12 +1322,12 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( s1945j )
 
-	PORT_START	// IN0 - c00000&1
+	PORT_START_TAG("IN0")		// IN0 - c00000&1
 	PSIKYO_PORT_PLAYER2
 
 	PSIKYO_PORT_PLAYER1
 
-	PORT_START	// IN1 - c00002&3
+	PORT_START_TAG("COIN")		// IN1 - c00002&3
 	PSIKYO_PORT_COIN
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1339,7 +1339,7 @@ static INPUT_PORTS_START( s1945j )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN2 - c00004&5
+	PORT_START_TAG("DSW1")		// IN2 - c00004&5
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1386,7 +1386,7 @@ static INPUT_PORTS_START( s1945j )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) // Forces 1C_1C
 
-	PORT_START	// IN3 - c00006&7
+	PORT_START_TAG("DSW2")		// IN3 - c00006&7
 
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1415,12 +1415,12 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( tengai )
 
-	PORT_START	// IN0 - c00000&1
+	PORT_START_TAG("IN0")		// IN0 - c00000&1
 	PSIKYO_PORT_PLAYER2
 
 	PSIKYO_PORT_PLAYER1
 
-	PORT_START	// IN1 - c00002&3
+	PORT_START_TAG("COIN")		// IN1PORT_START_TAG("DSW1")		// IN2 - c00002&3
 	PSIKYO_PORT_COIN
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1432,7 +1432,7 @@ static INPUT_PORTS_START( tengai )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	// IN2 - c00004&5
+	PORT_START_TAG("DSW1")		// IN2 - c00004&5
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1479,7 +1479,7 @@ static INPUT_PORTS_START( tengai )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, "On [Free Play]" ) // Forces 1C_1C
 
-	PORT_START	// IN3 - c00006&7
+	PORT_START_TAG("DSW2")		// IN3 - c00006&7
 
 	/***********************************************
 

@@ -179,6 +179,8 @@ WRITE16_HANDLER( midxunit_unknown_w )
 
 READ16_HANDLER( midwunit_io_r )
 {
+	static const char *portnames[] = { "IN0", "IN1", "DSW", "IN2" };
+	
 	/* apply I/O shuffling */
 	offset = ioshuffle[offset % 16];
 
@@ -188,7 +190,7 @@ READ16_HANDLER( midwunit_io_r )
 		case 1:
 		case 2:
 		case 3:
-			return input_port_read_indexed(machine, offset);
+			return input_port_read(machine, portnames[offset]);
 
 		case 4:
 			return (midway_serial_pic_status_r() << 12) | midwunit_sound_state_r(machine,0,0xffff);
@@ -203,6 +205,8 @@ READ16_HANDLER( midwunit_io_r )
 
 READ16_HANDLER( midxunit_io_r )
 {
+	static const char *portnames[] = { "IN0", "IN1", "IN2", "DSW" };
+
 	offset = (offset / 2) % 8;
 
 	switch (offset)
@@ -211,7 +215,7 @@ READ16_HANDLER( midxunit_io_r )
 		case 1:
 		case 2:
 		case 3:
-			return input_port_read_indexed(machine, offset);
+			return input_port_read(machine, portnames[offset]);
 
 		default:
 			logerror("%08X:Unknown I/O read from %d\n", activecpu_get_pc(), offset);
@@ -223,14 +227,16 @@ READ16_HANDLER( midxunit_io_r )
 
 READ16_HANDLER( midxunit_analog_r )
 {
-	return input_port_read_indexed(machine, midxunit_analog_port);
+	static const char *portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5" };
+
+	return input_port_read(machine, portnames[midxunit_analog_port]);
 }
 
 
 WRITE16_HANDLER( midxunit_analog_select_w )
 {
 	if (offset == 0 && ACCESSING_BITS_0_7)
-		midxunit_analog_port = data - 8 + 4;
+		midxunit_analog_port = data - 8;
 }
 
 

@@ -100,11 +100,11 @@ static UINT8 jamma_if_read_joystick( void )
 {
 	if ( jamma_if_control_latch & 0x10 )
 	{
-		return input_port_read(Machine,  "IN" );
+		return input_port_read(Machine,  "JOY" );
 	}
 	else
 	{
-		return input_port_read(Machine,  "IN" ) | 0x08;
+		return input_port_read(Machine,  "JOY" ) | 0x08;
 	}
 }
 
@@ -125,7 +125,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( uapce )
-    PORT_START_TAG( "IN" )
+    PORT_START_TAG( "JOY" )
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* button I */
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* button II */
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* select */

@@ -144,7 +144,7 @@ MCU simulation TODO:
  			//6-down
  			//7-leftdwn
 
- 			UINT8 val= (input_port_read_indexed(machine, 4)>>2) & 0x0f;
+ 			UINT8 val= (input_port_read(machine, "IN1")>>2) & 0x0f;
  			/* bit0 = left
                bit1 = right
                bit2 = down
@@ -209,12 +209,12 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf0e0, 0xf0e0) AM_READ(msisaac_mcu_r)
 	AM_RANGE(0xf0e1, 0xf0e1) AM_READ(msisaac_mcu_status_r)
 
-	AM_RANGE(0xf080, 0xf080) AM_READ(input_port_0_r)
-	AM_RANGE(0xf081, 0xf081) AM_READ(input_port_1_r)
-	AM_RANGE(0xf082, 0xf082) AM_READ(input_port_2_r)
-	AM_RANGE(0xf083, 0xf083) AM_READ(input_port_3_r)
-	AM_RANGE(0xf084, 0xf084) AM_READ(input_port_4_r)
-//AM_RANGE(0xf086, 0xf086) AM_READ(input_port_5_r)
+	AM_RANGE(0xf080, 0xf080) AM_READ_PORT("DSW1")
+	AM_RANGE(0xf081, 0xf081) AM_READ_PORT("DSW2")
+	AM_RANGE(0xf082, 0xf082) AM_READ_PORT("DSW3")
+	AM_RANGE(0xf083, 0xf083) AM_READ_PORT("IN0")
+	AM_RANGE(0xf084, 0xf084) AM_READ_PORT("IN1")
+//AM_RANGE(0xf086, 0xf086) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )

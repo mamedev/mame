@@ -297,7 +297,7 @@ static void register_savestate(void)
 WRITE8_HANDLER( m62_flipscreen_w )
 {
 	/* screen flip is handled both by software and hardware */
-	data ^= ~input_port_read_indexed(machine, 4) & 1;
+	data ^= ~input_port_read(machine, "DSW2") & 1;
 
 	flipscreen = data & 0x01;
 	if (flipscreen)

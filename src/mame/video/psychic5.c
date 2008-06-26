@@ -170,19 +170,19 @@ READ8_HANDLER( psychic5_paged_ram_r )
 			switch(offset)
 			{
 				case 0x00:
-					val = input_port_read_indexed(machine, 0);
+					val = input_port_read(machine, "IN0");
 					break;
 				case 0x01:
-					val = input_port_read_indexed(machine, 1);
+					val = input_port_read(machine, "P1");
 					break;
 				case 0x02:
-					val = input_port_read_indexed(machine, 2);
+					val = input_port_read(machine, "P2");
 					break;
 				case 0x03:
-					val = input_port_read_indexed(machine, 3);
+					val = input_port_read(machine, "DSW0");
 					break;
 				case 0x04:
-					val = input_port_read_indexed(machine, 4);
+					val = input_port_read(machine, "DSW1");
 					break;
 				default:
 					val = ps5_io_ram[offset];

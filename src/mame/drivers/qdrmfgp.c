@@ -47,15 +47,15 @@ static INT32 gp2_irq_control;
 static READ16_HANDLER( i_port1_r )
 {
 	if (control & 0x0080)
-		return input_port_read_indexed(machine,0);
+		return input_port_read(machine, "IN0");
 	else
-		return input_port_read_indexed(machine,1);
+		return input_port_read(machine, "DSW");
 }
 
 static READ16_HANDLER( i_port2_r )
 {
 	/* bit 0-1  battery power sensor: 3=good, 2=low, other=bad */
-	return (input_port_read_indexed(machine,2) & 0xfffc) | 0x0003;
+	return (input_port_read(machine, "SENSOR") & 0xfffc) | 0x0003;
 }
 
 
@@ -420,7 +420,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( qdrmfgp )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)	/* 1P STOP */
@@ -441,7 +441,7 @@ static INPUT_PORTS_START( qdrmfgp )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0004, 0x0004, "Extended Service Menu" )		/* and skipped initial checks. */
 	PORT_DIPSETTING(    0x0004, DEF_STR( Off ) )
@@ -492,7 +492,7 @@ static INPUT_PORTS_START( qdrmfgp )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
 
-	PORT_START
+	PORT_START_TAG("SENSOR")
 	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_SPECIAL )		/* battery power sensor */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE3 )
@@ -500,7 +500,7 @@ static INPUT_PORTS_START( qdrmfgp )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( qdrmfgp2 )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)	/* 1P STOP */
@@ -521,7 +521,7 @@ static INPUT_PORTS_START( qdrmfgp2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0004, 0x0004, "Extended Service Menu & None Sounds Mode" )		/* and skipped initial checks. */
 	PORT_DIPSETTING(    0x0004, DEF_STR( Off ) )
@@ -572,7 +572,7 @@ static INPUT_PORTS_START( qdrmfgp2 )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
 
-	PORT_START
+	PORT_START_TAG("SENSOR")
 	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_SPECIAL )		/* battery power sensor */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE3 )

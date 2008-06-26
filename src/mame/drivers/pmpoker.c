@@ -536,7 +536,7 @@ static INPUT_PORTS_START( pmpoker )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("DSW0")
+	PORT_START_TAG("SW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -737,7 +737,7 @@ static INPUT_PORTS_START( jokerpkr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("DSW0")
+	PORT_START_TAG("SW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -806,7 +806,7 @@ static INPUT_PORTS_START( pottnpkr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("DSW0")
+	PORT_START_TAG("SW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -885,10 +885,10 @@ static READ8_HANDLER( mux_port_r )
 {
 	switch( mux_data&0xf0 )	/* bits 4-7 */
 	{
-		case 0x10: return input_port_read_indexed(machine, 0);
-		case 0x20: return input_port_read_indexed(machine, 1);
-		case 0x40: return input_port_read_indexed(machine, 2);
-		case 0x80: return input_port_read_indexed(machine, 3);
+		case 0x10: return input_port_read(machine, "IN0-0");
+		case 0x20: return input_port_read(machine, "IN0-1");
+		case 0x40: return input_port_read(machine, "IN0-2");
+		case 0x80: return input_port_read(machine, "IN0-3");
 	}
 	return 0xff;
 }

@@ -224,9 +224,9 @@ READ8_HANDLER( mhavoc_port_0_r )
 	/* Bits 7-6 = selected based on Player 1 */
 	/* Bits 5-4 = common */
 	if (player_1)
-		res = (input_port_read_indexed(machine, 0) & 0x30) | (input_port_read_indexed(machine, 5) & 0xc0);
+		res = (input_port_read(machine, "IN0") & 0x30) | (input_port_read(machine, "IN2") & 0xc0);
 	else
-		res = input_port_read_indexed(machine, 0) & 0xf0;
+		res = input_port_read(machine, "IN0") & 0xf0;
 
 	/* Bit 3 = Gamma rcvd flag */
 	if (gamma_rcvd)
@@ -251,7 +251,7 @@ READ8_HANDLER( mhavoc_port_0_r )
 READ8_HANDLER( alphaone_port_0_r )
 {
 	/* Bits 7-2 = common */
-	UINT8 res = input_port_read_indexed(machine, 0) & 0xfc;
+	UINT8 res = input_port_read(machine, "IN0") & 0xfc;
 
 	/* Bit 1 = 2.4kHz (divide 2.5MHz by 1024) */
 	if (!(activecpu_gettotalcycles() & 0x400))
@@ -268,7 +268,7 @@ READ8_HANDLER( alphaone_port_0_r )
 READ8_HANDLER( mhavoc_port_1_r )
 {
 	/* Bits 7-2 = input switches */
-	UINT8 res = input_port_read_indexed(machine, 1) & 0xfc;
+	UINT8 res = input_port_read(machine, "IN1") & 0xfc;
 
 	/* Bit 1 = Alpha rcvd flag */
 	if (has_gamma_cpu && alpha_rcvd)
@@ -284,7 +284,7 @@ READ8_HANDLER( mhavoc_port_1_r )
 READ8_HANDLER( mhavoc_port_1_sp_r )
 {
 	/* Bits 7-3 = input switches */
-	UINT8 res = input_port_read_indexed(machine, 1) & 0xf8;
+	UINT8 res = input_port_read(machine, "IN1") & 0xf8;
 
 	/* Bit 2 = TMS5220 ready flag */
 	if (!tms5220_ready_r())

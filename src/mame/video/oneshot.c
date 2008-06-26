@@ -80,8 +80,8 @@ static void draw_crosshairs( running_machine *machine, bitmap_t *bitmap, const r
 {
     int xpos,ypos;
     /* get gun raw coordonates (player 1) */
-    gun_x_p1 = (input_port_read_indexed(machine, 5) & 0xff) * 320 / 256;
-    gun_y_p1 = (input_port_read_indexed(machine, 6) & 0xff) * 240 / 256;
+    gun_x_p1 = (input_port_read(machine, "LIGHT0_X") & 0xff) * 320 / 256;
+    gun_y_p1 = (input_port_read(machine, "LIGHT0_Y") & 0xff) * 240 / 256;
 
     /* compute the coordonates for drawing (from routine at 0x009ab0) */
     xpos = gun_x_p1;
@@ -95,8 +95,8 @@ static void draw_crosshairs( running_machine *machine, bitmap_t *bitmap, const r
 
 
     /* get gun raw coordonates (player 2) */
-    gun_x_p2 = (input_port_read_indexed(machine, 7) & 0xff) * 320 / 256;
-    gun_y_p2 = (input_port_read_indexed(machine, 8) & 0xff) * 240 / 256;
+    gun_x_p2 = (input_port_read(machine, "LIGHT1_X") & 0xff) * 320 / 256;
+    gun_y_p2 = (input_port_read(machine, "LIGHT1_Y") & 0xff) * 240 / 256;
     /* compute the coordonates for drawing (from routine at 0x009b6e) */
     xpos = gun_x_p2;
     ypos = gun_y_p2;

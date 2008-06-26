@@ -111,12 +111,12 @@ static const int ControllerTable[32] = {
 
 static READ8_HANDLER( gray5bit_controller0_r )
 {
-    return (input_port_read_indexed(machine, 2) & 0xe0) | (~ControllerTable[input_port_read_indexed(machine, 2) & 0x1f] & 0x1f);
+    return (input_port_read(machine, "8004") & 0xe0) | (~ControllerTable[input_port_read(machine, "8004") & 0x1f] & 0x1f);
 }
 
 static READ8_HANDLER( gray5bit_controller1_r )
 {
-    return (input_port_read_indexed(machine, 3) & 0xe0) | (~ControllerTable[input_port_read_indexed(machine, 3) & 0x1f] & 0x1f);
+    return (input_port_read(machine, "8005") & 0xe0) | (~ControllerTable[input_port_read(machine, "8005") & 0x1f] & 0x1f);
 }
 
 static WRITE8_HANDLER( sound_w )
@@ -140,7 +140,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( m79amb )
-	PORT_START      /* 8000 */
+	PORT_START_TAG("8000")		/* 8000 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* dip switch */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -150,7 +150,7 @@ static INPUT_PORTS_START( m79amb )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START      /* 8002 */
+	PORT_START_TAG("8002")		/* 8002 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_VBLANK )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN1  )
@@ -160,18 +160,17 @@ static INPUT_PORTS_START( m79amb )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 
-	PORT_START		/* 8004 */
+	PORT_START_TAG("8004")		/* 8004 */
 	PORT_BIT( 0x1f, 0x10, IPT_PADDLE ) PORT_MINMAX(0,0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START      /* 8005 */
+	PORT_START_TAG("8005")		/* 8005 */
 	PORT_BIT( 0x1f, 0x10, IPT_PADDLE ) PORT_MINMAX(0,0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-
 INPUT_PORTS_END
 
 

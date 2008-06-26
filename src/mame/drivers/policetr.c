@@ -141,19 +141,19 @@ static INTERRUPT_GEN( irq4_gen )
 
 static READ32_HANDLER( port0_r )
 {
-	return input_port_read_indexed(machine, 0) << 16;
+	return input_port_read(machine, "IN0") << 16;
 }
 
 
 static READ32_HANDLER( port1_r )
 {
-	return (input_port_read_indexed(machine, 1) << 16) | (eeprom_read_bit() << 29);
+	return (input_port_read(machine, "IN1") << 16) | (eeprom_read_bit() << 29);
 }
 
 
 static READ32_HANDLER( port2_r )
 {
-	return input_port_read_indexed(machine, 2) << 16;
+	return input_port_read(machine, "DSW1") << 16;
 }
 
 
@@ -346,7 +346,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( policetr )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -364,7 +364,7 @@ static INPUT_PORTS_START( policetr )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -382,7 +382,7 @@ static INPUT_PORTS_START( policetr )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:3" )

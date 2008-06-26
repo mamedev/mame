@@ -570,7 +570,7 @@ MACHINE_DRIVER_END
 void maze_write_discrete(running_machine *machine, UINT8 maze_tone_timing_state)
 {
 	/* controls need to be active low */
-	int controls = ~input_port_read_indexed(machine, 0) & 0xff;
+	int controls = ~input_port_read(machine, "IN0") & 0xff;
 
 	discrete_sound_w(machine, MAZE_TONE_TIMING, maze_tone_timing_state);
 	discrete_sound_w(machine, MAZE_P1_DATA, controls & 0x0f);
@@ -582,7 +582,7 @@ void maze_write_discrete(running_machine *machine, UINT8 maze_tone_timing_state)
 	/* A better option might be to update it at vblank or set a timer to do it. */
 	/* The only noticeable difference doing it here, is that the controls don't */
 	/* imediately start making tones if pressed right after the coin is inserted. */
-	discrete_sound_w(machine, MAZE_COIN, (~input_port_read_indexed(machine, 1) >> 3) & 0x01);
+	discrete_sound_w(machine, MAZE_COIN, (~input_port_read(machine, "IN1") >> 3) & 0x01);
 }
 
 

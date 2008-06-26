@@ -217,7 +217,7 @@ static DRIVER_INIT( f15se21 )
 
 static INPUT_PORTS_START( stankatk )
 	/* Ports A and B */
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unused ) )
 	PORT_DIPSETTING(	0x0001, DEF_STR(Off) )
 	PORT_DIPSETTING(	0x0000, DEF_STR(On) )
@@ -257,7 +257,7 @@ static INPUT_PORTS_START( stankatk )
 
 
 	/* C and D ports */
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -279,7 +279,7 @@ static INPUT_PORTS_START( stankatk )
 //  PORT_BITX( 0x8000, IP_ACTIVE_LOW, 0, "Yellow Trigger", KEYCODE_G, IP_JOY_NONE )
 
 
-	PORT_START
+	PORT_START_TAG("VGB")
 	PORT_DIPNAME( 0x0008, 0x0008, "VGB Monitor Mode")
 	PORT_DIPSETTING(	0x0008, DEF_STR(Off) )
 	PORT_DIPSETTING(	0x0000, DEF_STR(On) )
@@ -287,7 +287,7 @@ static INPUT_PORTS_START( stankatk )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( botss )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unused ) )
 	PORT_DIPSETTING(	0x0001, DEF_STR(Off) )
 	PORT_DIPSETTING(	0x0000, DEF_STR(On) )
@@ -321,7 +321,7 @@ static INPUT_PORTS_START( botss )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 
 	/* C and D ports */
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -330,7 +330,7 @@ static INPUT_PORTS_START( botss )
 //  PORT_BITX(0x0002, IP_ACTIVE_LOW, 0, "Throttle Up", KEYCODE_D, IP_JOY_NONE )
 //  PORT_BITX(0x0008, IP_ACTIVE_LOW, 0, "Throttle Down", KEYCODE_F, IP_JOY_NONE )
 
-	PORT_START
+	PORT_START_TAG("VGB")
 	PORT_DIPNAME( 0x0008, 0x0008, "VGB Monitor Mode")
 	PORT_DIPSETTING(	0x0008, DEF_STR(Off) )
 	PORT_DIPSETTING(	0x0000, DEF_STR(On) )
@@ -339,7 +339,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( f15se )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unused ) )
 	PORT_DIPSETTING(	0x0001, DEF_STR(Off) )
 	PORT_DIPSETTING(	0x0000, DEF_STR(On) )
@@ -369,7 +369,7 @@ static INPUT_PORTS_START( f15se )
 	PORT_SERVICE(0x0400, IP_ACTIVE_LOW)
 
 	/* C and D ports */
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -379,13 +379,13 @@ static INPUT_PORTS_START( f15se )
 
 	/* Analogue Inputs? */
 
-	PORT_START
+	PORT_START_TAG("VGB")
 	PORT_DIPNAME( 0x0008, 0x0008, "VGB Monitor Mode")
 	PORT_DIPSETTING(	0x0008, DEF_STR(Off) )
 	PORT_DIPSETTING(	0x0000, DEF_STR(On) )
 
 	/* Sound PCB test button */
-	PORT_START
+	PORT_START_TAG("SOUND")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Sound PCB Test") PORT_CODE(KEYCODE_F1)
 INPUT_PORTS_END
 
@@ -739,37 +739,37 @@ static WRITE16_HANDLER( reset_slave )
 /* Reset peripherals flip-flop MIGHT be 900000 */
 
 static ADDRESS_MAP_START( hostmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x13ffff) AM_ROM                           /* 68000 Code ROM and Dr. Math object data */
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM                           /* Battery-backed SRAM (64kB) & DS1215 */
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM                          /* 68000/AM29000 shared RAM (256kB) */
-	AM_RANGE(0x900000, 0x900001) AM_NOP //WRITE(mystery_w)        /* ??????? 16-bit write here. rset? */
-	AM_RANGE(0x920000, 0x920001) AM_READ(input_port_1_word_r)     /* User inputs C and D */
-	AM_RANGE(0x940000, 0x940001) AM_READ(input_port_0_word_r)     /* User inputs A and B */
-	AM_RANGE(0x960000, 0x960001) AM_NOP                           /* Lamps */
-	AM_RANGE(0x980000, 0x980001) AM_RAM                           /* ADC0844 */
-	AM_RANGE(0x9a0000, 0x9a0007) AM_READWRITE(tms_host_r, tms_host_w)  /* TMS34010 Interface */
-	AM_RANGE(0x9c0000, 0x9c0001) AM_RAM                            /* ????? Write: 80, A0 and 00 (8-bit high byte) */
-	AM_RANGE(0x9e0000, 0x9e00cf) AM_RAM_WRITE(m68901_w) AM_BASE(&m68901_base)  /* 68901 Multifunction Peripheral */
-	AM_RANGE(0xa00000, 0xa000cf) AM_READWRITE(m68681_r, m68681_w) AM_BASE(&m68681_base)   /* 68681 UART */
-	AM_RANGE(0xa20000, 0xa20001) AM_RAM                           /* XY joystick input - sign? */
-	AM_RANGE(0xa40002, 0xa40003) AM_RAM                           /* XY joystick input - actual values */
+	AM_RANGE(0x000000, 0x13ffff) AM_ROM					/* 68000 Code ROM and Dr. Math object data */
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM					/* Battery-backed SRAM (64kB) & DS1215 */
+	AM_RANGE(0x800000, 0x83ffff) AM_RAM					/* 68000/AM29000 shared RAM (256kB) */
+	AM_RANGE(0x900000, 0x900001) AM_NOP //WRITE(mystery_w)	/* ??????? 16-bit write here. rset? */
+	AM_RANGE(0x920000, 0x920001) AM_READ_PORT("IN1")	/* User inputs C and D */
+	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("IN0")	/* User inputs A and B */
+	AM_RANGE(0x960000, 0x960001) AM_NOP					/* Lamps */
+	AM_RANGE(0x980000, 0x980001) AM_RAM					/* ADC0844 */
+	AM_RANGE(0x9a0000, 0x9a0007) AM_READWRITE(tms_host_r, tms_host_w)	/* TMS34010 Interface */
+	AM_RANGE(0x9c0000, 0x9c0001) AM_RAM					/* ????? Write: 80, A0 and 00 (8-bit high byte) */
+	AM_RANGE(0x9e0000, 0x9e00cf) AM_RAM_WRITE(m68901_w) AM_BASE(&m68901_base)	/* 68901 Multifunction Peripheral */
+	AM_RANGE(0xa00000, 0xa000cf) AM_READWRITE(m68681_r, m68681_w) AM_BASE(&m68681_base)	/* 68681 UART */
+	AM_RANGE(0xa20000, 0xa20001) AM_RAM					/* XY joystick input - sign? */
+	AM_RANGE(0xa40002, 0xa40003) AM_RAM					/* XY joystick input - actual values */
 ADDRESS_MAP_END
 
 
 // 2600000: Write 1E and 9E?
 static ADDRESS_MAP_START( vgbmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(&micro3d_sprite_vram)  // 2 Banks
-	AM_RANGE(0x00800000, 0x00bfffff) AM_RAM                         /* 512kB Main DRAM */
-	AM_RANGE(0x00c00000, 0x00c0000f) AM_READ(input_port_2_word_r)   /* TI Monitor Mode switch */
-	AM_RANGE(0x00e00000, 0x00e0000f) AM_RAM //WRITE(mystery2_w)                        /* CREGCLK ??? byte write here. */
-	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM_WRITE(paletteram16_BBBBBRRRRRGGGGGG_word_w) AM_BASE(&paletteram16) //      AM_RANGE(0x02010000, 0x027fffff) AM_RAM                         // ??????????? Mirror of VRAM???
-	AM_RANGE(0x02600000, 0x0260000f) AM_RAM                         // XFER3dk???? 16-bit write
-	AM_RANGE(0x02c00000, 0x02c0003f) AM_READ(ti_uart_r)            /* SCN UART */
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(&micro3d_sprite_vram)	/* 2 Banks */
+	AM_RANGE(0x00800000, 0x00bfffff) AM_RAM							/* 512kB Main DRAM */
+	AM_RANGE(0x00c00000, 0x00c0000f) AM_READ_PORT("VGB")			/* TI Monitor Mode switch */
+	AM_RANGE(0x00e00000, 0x00e0000f) AM_RAM //WRITE(mystery2_w)		/* CREGCLK ??? byte write here. */
+	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM_WRITE(paletteram16_BBBBBRRRRRGGGGGG_word_w) AM_BASE(&paletteram16) // AM_RANGE(0x02010000, 0x027fffff) AM_RAM		/* ??????????? Mirror of VRAM??? */
+	AM_RANGE(0x02600000, 0x0260000f) AM_RAM							/* XFER3dk???? 16-bit write */
+	AM_RANGE(0x02c00000, 0x02c0003f) AM_READ(ti_uart_r)				/* SCN UART */
 	AM_RANGE(0x02e00000, 0x02e0003f) AM_WRITE(ti_uart_w)
-	AM_RANGE(0x03800000, 0x03dfffff) AM_ROM AM_REGION(REGION_GFX1, 0)                          /* 2D Graphics ROMs */
-	AM_RANGE(0x03e00000, 0x03ffffff) AM_ROM AM_REGION(REGION_USER1, 0)                         /* 128kB Program ROM */
+	AM_RANGE(0x03800000, 0x03dfffff) AM_ROM AM_REGION(REGION_GFX1, 0)		/* 2D Graphics ROMs */
+	AM_RANGE(0x03e00000, 0x03ffffff) AM_ROM AM_REGION(REGION_USER1, 0)		/* 128kB Program ROM */
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1, 0)                         /* 128kB Program ROM (Mirror - for interrupt vectors) */
+	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1, 0)		/* 128kB Program ROM (Mirror - for interrupt vectors) */
 ADDRESS_MAP_END
 
 
@@ -811,7 +811,7 @@ static READ8_HANDLER(sound_io_r)
 
 switch(offset)
 {
-        case 0x01:  return input_port_read_indexed(machine, 3);                           /* Test push switch */
+        case 0x01:  return input_port_read_safe(machine, "SOUND", 0);		/* Test push switch */
         case 0x03:  return (int)(upd7759_0_busy_r(machine,0))<<3;
         default:    return 0;
 }

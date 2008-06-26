@@ -57,7 +57,7 @@ READ8_HANDLER ( pce_joystick_r )
 	}
 	else
 	{
-		data = input_port_read_indexed(machine, 0);
+		data = input_port_read(machine, "JOY");
 	}
 	if(joystick_data_select) data >>= 4;
 	ret = (data & 0x0F) | pce.io_port_options;

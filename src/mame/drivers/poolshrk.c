@@ -71,10 +71,11 @@ static WRITE8_HANDLER( poolshrk_watchdog_w )
 
 static READ8_HANDLER( poolshrk_input_r )
 {
-	UINT8 val = input_port_read_indexed(machine, offset & 3);
+	static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3" };
+	UINT8 val = input_port_read(machine, portnames[offset & 3]);
 
-	int x = input_port_read_indexed(machine, 4 + (offset & 1));
-	int y = input_port_read_indexed(machine, 6 + (offset & 1));
+	int x = input_port_read(machine, (offset & 1) ? "AN1" : "AN0");
+	int y = input_port_read(machine, (offset & 1) ? "AN3" : "AN2");
 
 	if (x >= poolshrk_da_latch) val |= 8;
 	if (y >= poolshrk_da_latch) val |= 4;
@@ -116,16 +117,16 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( poolshrk )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0C, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0C, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x80, 0x00, "Extended Play" )
 	PORT_DIPSETTING( 0x80, DEF_STR( Off ))
 	PORT_DIPSETTING( 0x00, DEF_STR( On ))
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_DIPNAME( 0x03, 0x02, "Racks Per Game" )
 	PORT_DIPSETTING( 0x03, "2" )
 	PORT_DIPSETTING( 0x02, "3" )
@@ -135,7 +136,7 @@ static INPUT_PORTS_START( poolshrk )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ))
 	PORT_DIPSETTING( 0x00, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING( 0x03, DEF_STR( 1C_1C ))
@@ -146,16 +147,16 @@ static INPUT_PORTS_START( poolshrk )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START
+	PORT_START_TAG("AN0")
 	PORT_BIT( 15, 8, IPT_AD_STICK_X ) PORT_MINMAX(0,15) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("AN1")
 	PORT_BIT( 15, 8, IPT_AD_STICK_X ) PORT_MINMAX(0,15) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("AN2")
 	PORT_BIT( 15, 8, IPT_AD_STICK_Y ) PORT_MINMAX(0,15) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("AN3")
 	PORT_BIT( 15, 8, IPT_AD_STICK_Y ) PORT_MINMAX(0,15) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_REVERSE PORT_PLAYER(2)
 
 INPUT_PORTS_END

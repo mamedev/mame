@@ -259,7 +259,7 @@ static WRITE16_HANDLER( namcona1_nvram_w )
 /***************************************************************************/
 
 static INPUT_PORTS_START( namcona1_joy )
-	PORT_START
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -269,7 +269,7 @@ static INPUT_PORTS_START( namcona1_joy )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -279,7 +279,7 @@ static INPUT_PORTS_START( namcona1_joy )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("P3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
@@ -289,7 +289,7 @@ static INPUT_PORTS_START( namcona1_joy )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
 
-	PORT_START
+	PORT_START_TAG("P4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
@@ -299,7 +299,7 @@ static INPUT_PORTS_START( namcona1_joy )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "DIP2 (Freeze)" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -315,7 +315,7 @@ static INPUT_PORTS_START( namcona1_joy )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( namcona1_quiz )
-	PORT_START
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -325,7 +325,7 @@ static INPUT_PORTS_START( namcona1_quiz )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -335,7 +335,7 @@ static INPUT_PORTS_START( namcona1_quiz )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("P3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
@@ -345,7 +345,7 @@ static INPUT_PORTS_START( namcona1_quiz )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
 
-	PORT_START
+	PORT_START_TAG("P4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
@@ -355,7 +355,7 @@ static INPUT_PORTS_START( namcona1_quiz )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "DIP2 (Freeze)" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -371,7 +371,7 @@ static INPUT_PORTS_START( namcona1_quiz )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( namcona2_joy )
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "DIP2 (Freeze)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -386,7 +386,7 @@ static INPUT_PORTS_START( namcona2_joy )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE )
 
-	PORT_START
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -396,7 +396,7 @@ static INPUT_PORTS_START( namcona2_joy )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -406,7 +406,7 @@ static INPUT_PORTS_START( namcona2_joy )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("P3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
@@ -416,7 +416,7 @@ static INPUT_PORTS_START( namcona2_joy )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START3 )
 
-	PORT_START
+	PORT_START_TAG("P4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
@@ -426,7 +426,7 @@ static INPUT_PORTS_START( namcona2_joy )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START4 )
 
-	PORT_START
+	PORT_START_TAG("COIN")
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -435,7 +435,7 @@ static INPUT_PORTS_START( namcona2_joy )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( namcona2_quiz )
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "DIP2 (Freeze)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -450,7 +450,7 @@ static INPUT_PORTS_START( namcona2_quiz )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE )
 
-	PORT_START
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )
@@ -460,7 +460,7 @@ static INPUT_PORTS_START( namcona2_quiz )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -470,7 +470,7 @@ static INPUT_PORTS_START( namcona2_quiz )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("P3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
@@ -480,7 +480,7 @@ static INPUT_PORTS_START( namcona2_quiz )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START3 )
 
-	PORT_START
+	PORT_START_TAG("P4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4)
@@ -490,7 +490,7 @@ static INPUT_PORTS_START( namcona2_quiz )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START4 )
 
-	PORT_START
+	PORT_START_TAG("COIN")
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -506,16 +506,17 @@ simulate_mcu( running_machine *machine )
 	int i;
 	UINT16 data;
 	UINT8 poll_coins;
+	static const char *portnames[] = { "P1", "P2", "P3", "P4" };
 
 	namcona1_workram[0xf60/2] = 0x0000; /* mcu ready */
 
 	if (is_na2)
 	{
-		mcu_ram[0xfc0/2] = input_port_read_indexed(machine, 0x0); /* dipswitch */
+		mcu_ram[0xfc0/2] = input_port_read(machine, "DSW"); /* dipswitch */
 
 		for( i=1; i<=4; i++ )
 		{
-			data = input_port_read_indexed(machine, i)<<8;
+			data = input_port_read(machine, portnames[i-1])<<8;
 			switch( namcona1_gametype )
 			{
 			case NAMCO_KNCKHEAD:
@@ -534,11 +535,11 @@ simulate_mcu( running_machine *machine )
 				if( data&0x4000 ) data |= 0x10; /* jump */
 				if( i==1 )
 				{
-					if( input_port_read_indexed(machine, 1)&0x80 ) data |= 0x80; /* P1 start */
+					if( input_port_read(machine, "P1") & 0x80 ) data |= 0x80; /* P1 start */
 				}
 				if( i==2 )
 				{
-					if( input_port_read_indexed(machine, 2)&0x80 ) data |= 0x80; /* P2 start */
+					if( input_port_read(machine, "P2") & 0x80 ) data |= 0x80; /* P2 start */
 				}
 				break;
 
@@ -557,7 +558,7 @@ simulate_mcu( running_machine *machine )
 		mcu_ram[0xfc0/2+0x08] = 0xffff; /* analog6,7 */
 		mcu_ram[0xfc0/2+0x09] = 0xffff; /* encoder0,1 */
 
-		poll_coins = input_port_read_indexed(machine, 5); /* coin input */
+		poll_coins = input_port_read(machine, "COIN"); /* coin input */
 		if( (poll_coins&0x8)&~(mCoinState&0x8) ) mCoinCount[0]++;
 		if( (poll_coins&0x4)&~(mCoinState&0x4) ) mCoinCount[1]++;
 		if( (poll_coins&0x2)&~(mCoinState&0x2) ) mCoinCount[2]++;
@@ -568,14 +569,14 @@ simulate_mcu( running_machine *machine )
 		mcu_ram[0xfc0/2+0xb] = (mCoinCount[2]<<8)|mCoinCount[3];
 
 		/* special handling for F/A */
-		data = ~((input_port_read_indexed(machine, 1)<<8)|input_port_read_indexed(machine, 2));
+		data = ~((input_port_read(machine, "P1")<<8)|input_port_read(machine, "P2"));
 		mcu_ram[0xffc/2] = data;
 		mcu_ram[0xffe/2] = data;
 
 		if( namcona1_gametype == NAMCO_XDAY2 )
 		{
-			int p1 = input_port_read_indexed(machine, 1);
-			int p2 = input_port_read_indexed(machine, 2);
+			int p1 = input_port_read(machine, "P1");
+			int p2 = input_port_read(machine, "P2");
 			UINT32 code = 0;
 			if( p2&0x40 ) code |= 0x2000; // enter (top-level of self-test)
 			if( p2&0x20 ) code |= 0x1000; // exit  (top-level of self-test)
@@ -1155,19 +1156,19 @@ static READ8_HANDLER( port7_r )
 	switch (mcu_port6 & 0xe0)
 	{
 		case 0x40:
-			return input_port_read_indexed(machine, 0);
+			return input_port_read(machine, "P1");
 			break;
 
   		case 0x60:
-			return input_port_read_indexed(machine, 1);
+			return input_port_read(machine, "P2");
 			break;
 
 		case 0x20:
-			return input_port_read_indexed(machine, 4);
+			return input_port_read(machine, "DSW");
 			break;
 
 		case 0x00:
-			return input_port_read_indexed(machine, 3);
+			return input_port_read(machine, "P4");
 			break;
 	}
 
@@ -1216,7 +1217,7 @@ static MACHINE_RESET( namcona1_mcu )
 static READ8_HANDLER( portana_r )
 {
 	static const UINT8 bitnum[8] = { 0x40, 0x20, 0x10, 0x01, 0x02, 0x04, 0x08, 0x80 };
-	UINT8 port = input_port_read_indexed(machine, 2);
+	UINT8 port = input_port_read(machine, "P3");
 
 	return (port & bitnum[offset>>1]) ? 0xff : 0x00;
 }

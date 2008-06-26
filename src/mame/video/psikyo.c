@@ -434,7 +434,7 @@ VIDEO_UPDATE( psikyo )
 
 	tilemap *tmptilemap0, *tmptilemap1;
 
-	flip_screen_set(~input_port_read_indexed(screen->machine, 2) & 1);	// hardwired to a DSW bit
+	flip_screen_set(~input_port_read(screen->machine, "DSW1") & 1);		// hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 

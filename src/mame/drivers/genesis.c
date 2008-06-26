@@ -318,8 +318,8 @@ READ16_HANDLER ( megaplay_68k_to_z80_r )
 	if ((offset >= 0x2000) && (offset <= 0x3fff))
 	{
 		offset &=0x1fff;
-//      if(offset == 0)
-//          return (input_port_read_indexed(machine, 8) << 8) ^ 0xff00;
+//      if(offset == 0)		/* this read handler was used around MAME0.82 to read DSWB. Now it's (DSW0 & 0xff) */
+//          return (input_port_read(machine, "DSW0") << 8) ^ 0xff00;
 		return (ic36_ram[offset] << 8) + ic36_ram[offset+1];
 	}
 

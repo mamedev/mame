@@ -136,14 +136,14 @@ static READ8_HANDLER( popper_input_ports_r )
 	switch (offset)
 	{
 		//           player inputs        dsw1                           dsw2
-		case 0: data=input_port_read_indexed(machine, 0) | ((input_port_read_indexed(machine, 4)&0x02)<<5) | ((input_port_read_indexed(machine, 5)&0x01)<<4); break;
-		case 1: data=input_port_read_indexed(machine, 1) | ((input_port_read_indexed(machine, 4)&0x01)<<6) | ((input_port_read_indexed(machine, 5)&0x02)<<3); break;
-		case 2: data=input_port_read_indexed(machine, 2) | ((input_port_read_indexed(machine, 4)&0x08)<<3) | ((input_port_read_indexed(machine, 5)&0x04)<<2); break;
-		case 3: data=input_port_read_indexed(machine, 3) | ((input_port_read_indexed(machine, 4)&0x04)<<4) | ((input_port_read_indexed(machine, 5)&0x08)<<1); break;
-		case 4: data=                   ((input_port_read_indexed(machine, 4)&0x20)<<2) | ((input_port_read_indexed(machine, 5)&0x10)<<1); break;
-		case 5: data=                   ((input_port_read_indexed(machine, 4)&0x10)<<3) | ((input_port_read_indexed(machine, 5)&0x20)<<0); break;
-		case 6: data=                   ((input_port_read_indexed(machine, 4)&0x80)<<0) | ((input_port_read_indexed(machine, 5)&0x40)>>1); break;
-		case 7: data=                   ((input_port_read_indexed(machine, 4)&0x40)<<1) | ((input_port_read_indexed(machine, 5)&0x80)>>2); break;
+		case 0: data=input_port_read(machine, "IN0") | ((input_port_read(machine, "DSW1") & 0x02)<<5) | ((input_port_read(machine, "DSW2") & 0x01)<<4); break;
+		case 1: data=input_port_read(machine, "IN1") | ((input_port_read(machine, "DSW1") & 0x01)<<6) | ((input_port_read(machine, "DSW2") & 0x02)<<3); break;
+		case 2: data=input_port_read(machine, "IN2") | ((input_port_read(machine, "DSW1") & 0x08)<<3) | ((input_port_read(machine, "DSW2") & 0x04)<<2); break;
+		case 3: data=input_port_read(machine, "IN3") | ((input_port_read(machine, "DSW1") & 0x04)<<4) | ((input_port_read(machine, "DSW2") & 0x08)<<1); break;
+		case 4: data=                   ((input_port_read(machine, "DSW1") & 0x20)<<2) | ((input_port_read(machine, "DSW2") & 0x10)<<1); break;
+		case 5: data=                   ((input_port_read(machine, "DSW1") & 0x10)<<3) | ((input_port_read(machine, "DSW2") & 0x20)<<0); break;
+		case 6: data=                   ((input_port_read(machine, "DSW1") & 0x80)<<0) | ((input_port_read(machine, "DSW2") & 0x40)>>1); break;
+		case 7: data=                   ((input_port_read(machine, "DSW1") & 0x40)<<1) | ((input_port_read(machine, "DSW2") & 0x80)>>2); break;
 	}
 	return data;
 }
@@ -231,7 +231,7 @@ static INPUT_PORTS_START( popper )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 
-	PORT_START_TAG("IN4")	/* FAKE DSW1 */
+	PORT_START_TAG("DSW1")	/* FAKE DSW1 */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )		//SW1:1-2
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -253,7 +253,7 @@ static INPUT_PORTS_START( popper )
 	PORT_DIPSETTING(    0x80, "40k, then every 70k" )
 	PORT_DIPSETTING(    0xc0, "50k, then every 70k" )
 
-	PORT_START_TAG("IN5")	/* FAKE DSW2 */
+	PORT_START_TAG("DSW2")	/* FAKE DSW2 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )	//SW2:1
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )

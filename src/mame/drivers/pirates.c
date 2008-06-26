@@ -170,7 +170,7 @@ static READ16_HANDLER( pirates_in1_r )
 		bit = 1;
 
 	/* bit 4 is EEPROM data, bit 7 is protection */
-	return input_port_read_indexed(machine,1) | (eeprom_read_bit() << 4) | (bit << 7);
+	return input_port_read(machine, "IN1") | (eeprom_read_bit() << 4) | (bit << 7);
 }
 
 
@@ -180,7 +180,7 @@ static READ16_HANDLER( pirates_in1_r )
 static ADDRESS_MAP_START( pirates_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x300000, 0x300001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")
 	AM_RANGE(0x400000, 0x400001) AM_READ(pirates_in1_r)
 //  AM_RANGE(0x500000, 0x5007ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x800000, 0x803fff) AM_READ(SMH_RAM)
@@ -210,7 +210,7 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( pirates )
-	PORT_START	// IN0 - 0x300000.w
+	PORT_START_TAG("IN0")	/* IN0 - 0x300000.w */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
@@ -228,7 +228,7 @@ static INPUT_PORTS_START( pirates )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START	// IN1 - 0x400000.w
+	PORT_START_TAG("IN1")	/* IN1 - 0x400000.w */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )

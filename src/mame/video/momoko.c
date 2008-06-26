@@ -111,7 +111,7 @@ VIDEO_UPDATE( momoko )
 	UINT8 *TEXT_COLOR = memory_region( screen->machine, REGION_PROMS );
 
 
-	flip = momoko_flipscreen ^ (input_port_read_indexed(screen->machine, 4) & 0x01);
+	flip = momoko_flipscreen ^ (input_port_read(screen->machine, "FAKE") & 0x01);
 
 /* draw BG layer */
 

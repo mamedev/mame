@@ -1708,20 +1708,23 @@ INPUT_PORTS_START( aladbl )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)     /* needed to avoid credits getting mad */
 INPUT_PORTS_END
 
-#define MODE_BUTTON(player)	( (input_port_read_indexed(Machine, player) & 0x800) >> 11 )
-#define Z_BUTTON(player)	( (input_port_read_indexed(Machine, player) & 0x400) >> 10 )
-#define Y_BUTTON(player)	( (input_port_read_indexed(Machine, player) & 0x200) >> 9 )
-#define X_BUTTON(player)	( (input_port_read_indexed(Machine, player) & 0x100) >> 8 )
+/* xxx_BUTTONs are used with player = 0, 1, 2, 3 so we need to return 0 for the missing 4th I/O port  */
+static const char *padnames[] = { "PAD1", "PAD2", "IN0", "UNK" };
 
-#define START_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x80) >> 7 )
-#define C_BUTTON(player)	 ( (input_port_read_indexed(Machine, player) & 0x40) >> 6 )
-#define B_BUTTON(player)	 ( (input_port_read_indexed(Machine, player) & 0x20) >> 5 )
-#define A_BUTTON(player)	 ( (input_port_read_indexed(Machine, player) & 0x10) >> 4 )
-#define RIGHT_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x08) >> 3 )
-#define LEFT_BUTTON(player)	 ( (input_port_read_indexed(Machine, player) & 0x04) >> 2 )
-#define DOWN_BUTTON(player)	 ( (input_port_read_indexed(Machine, player) & 0x02) >> 1 )
-#define UP_BUTTON(player)	 ( (input_port_read_indexed(Machine, player) & 0x01) >> 0 )
-#define MD_RESET_BUTTON		 ( (input_port_read_safe(Machine, "RESET", 0x00) & 0x01) >> 0 )
+#define MODE_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0800) >> 11)
+#define Z_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0400) >> 10)
+#define Y_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0200) >> 9 )
+#define X_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0100) >> 8 )
+
+#define START_BUTTON(player) ((input_port_read_safe(Machine, padnames[player], 0) & 0x0080) >> 7 )
+#define C_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0040) >> 6 )
+#define B_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0020) >> 5 )
+#define A_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0010) >> 4 )
+#define RIGHT_BUTTON(player) ((input_port_read_safe(Machine, padnames[player], 0) & 0x0008) >> 3 )
+#define LEFT_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0004) >> 2 )
+#define DOWN_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0002) >> 1 )
+#define UP_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0001) >> 0 )
+#define MD_RESET_BUTTON		 ((input_port_read_safe(Machine, "RESET", 0x00) & 0x01) >> 0 )
 
 static UINT8 megadrive_io_data_regs[3];
 static UINT8 megadrive_io_ctrl_regs[3];
@@ -1750,7 +1753,6 @@ static void megadrive_init_io(running_machine *machine)
 static UINT8 megadrive_io_read_data_port_6button(int portnum)
 {
 	UINT8 retdata;
-
 
 	if (megadrive_io_data_regs[portnum]&0x40)
 	{

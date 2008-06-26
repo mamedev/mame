@@ -183,10 +183,10 @@ static UINT32 to_main;
 static READ32_HANDLER ( ms32_read_inputs1 )
 {
 	int a,b,c,d;
-	a = input_port_read_indexed(machine, 0);	// unknown
-	b = input_port_read_indexed(machine, 1);	// System inputs
-	c = input_port_read_indexed(machine, 2);	// Player 1 inputs
-	d = input_port_read_indexed(machine, 3);	// Player 2 inputs
+	a = input_port_read(machine, "IN0");	// unknown
+	b = input_port_read(machine, "IN1");	// System inputs
+	c = input_port_read(machine, "IN2");	// Player 1 inputs
+	d = input_port_read(machine, "IN3");	// Player 2 inputs
 	return a << 24 | b << 16 | c << 0 | d << 8;
 }
 
@@ -194,31 +194,31 @@ static READ32_HANDLER ( ms32_read_inputs1 )
 static READ32_HANDLER ( ms32_mahjong_read_inputs1 )
 {
 	int a,b,c,d;
-	a = input_port_read_indexed(machine, 0);	// unknown
-	b = input_port_read_indexed(machine, 1);	// System inputs
+	a = input_port_read(machine, "IN0");	// unknown
+	b = input_port_read(machine, "IN1");	// System inputs
 
 	switch (ms32_mahjong_input_select[0])
 	{
 		case 0x01:
-			c = input_port_read_indexed(machine, 8);	// Player 1 inputs
+			c = input_port_read(machine, "MJ0");	// Player 1 inputs
 			break;
 		case 0x02:
-			c = input_port_read_indexed(machine, 9);	// Player 1 inputs
+			c = input_port_read(machine, "MJ1");	// Player 1 inputs
 			break;
 		case 0x04:
-			c = input_port_read_indexed(machine, 10);	// Player 1 inputs
+			c = input_port_read(machine, "MJ2");	// Player 1 inputs
 			break;
 		case 0x08:
-			c = input_port_read_indexed(machine, 11);	// Player 1 inputs
+			c = input_port_read(machine, "MJ3");	// Player 1 inputs
 			break;
 		case 0x10:
-			c = input_port_read_indexed(machine, 12);	// Player 1 inputs
+			c = input_port_read(machine, "MJ4");	// Player 1 inputs
 			break;
 		default:
 			c = 0;
 
 	}
-	d = input_port_read_indexed(machine, 3);	// Player 2 inputs
+	d = input_port_read(machine, "IN3");	// Player 2 inputs
 	return a << 24 | b << 16 | c << 0 | d << 8;
 }
 
@@ -226,20 +226,20 @@ static READ32_HANDLER ( ms32_mahjong_read_inputs1 )
 static READ32_HANDLER ( ms32_read_inputs2 )
 {
 	int a,b,c,d;
-	a = input_port_read_indexed(machine, 4);	// Dip 1
-	b = input_port_read_indexed(machine, 5);	// Dip 2
-	c = input_port_read_indexed(machine, 6);	// Dip 3
-	d = input_port_read_indexed(machine, 7);	// unused ?
+	a = input_port_read(machine, "DSW1");	// Dip 1
+	b = input_port_read(machine, "DSW2");	// Dip 2
+	c = input_port_read(machine, "DSW3");	// Dip 3
+	d = input_port_read(machine, "UNUSED");	// unused ?
 	return a << 8 | b << 0 | c << 16 | d << 24;
 }
 
 static READ32_HANDLER ( ms32_read_inputs3 )
 {
 	int a,b,c,d;
-	a = input_port_read_indexed(machine, 10); // unused?
-	b = input_port_read_indexed(machine, 10); // unused?
-	c = input_port_read_indexed(machine, 9);
-	d = (input_port_read_indexed(machine, 8) - 0xb0) & 0xff;
+	a = input_port_read(machine, "AN2?"); // unused?
+	b = input_port_read(machine, "AN2?"); // unused?
+	c = input_port_read(machine, "AN1");
+	d = (input_port_read(machine, "AN0") - 0xb0) & 0xff;
 	return a << 24 | b << 16 | c << 8 | d << 0;
 }
 

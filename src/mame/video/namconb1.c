@@ -115,18 +115,18 @@ handle_mcu( running_machine *machine )
 	static int old_p2;
 	static int old_p3;
 	static int old_p4;
-	int new_coin_state = input_port_read_indexed(machine, 0)&0x3; /* coin1,2 */
-	unsigned dsw = input_port_read_indexed(machine, 1)<<16;
-	unsigned p1 = input_port_read_indexed(machine, 2);
-	unsigned p2 = input_port_read_indexed(machine, 3);
+	int new_coin_state = input_port_read(machine, "COIN") & 0x3;	/* coin1,2 */
+	unsigned dsw = input_port_read(machine, "DSW")<<16;
+	unsigned p1 = input_port_read(machine, "P1");
+	unsigned p2 = input_port_read(machine, "P2");
 	unsigned p3;
 	unsigned p4;
 	toggle = !toggle;
 	if( toggle ) dsw &= ~(0x80<<16);
 	if( namcos2_gametype == NAMCONB2_MACH_BREAKERS )
 	{
-		p3 = input_port_read_indexed(machine, 4);
-		p4 = input_port_read_indexed(machine, 5);
+		p3 = input_port_read_safe(machine, "P3", 0);
+		p4 = input_port_read_safe(machine, "P4", 0);
 	}
 	else
 	{

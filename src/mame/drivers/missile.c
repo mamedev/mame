@@ -656,21 +656,21 @@ static READ8_HANDLER( missile_r )
 		if (ctrld)	/* trackball */
 		{
 			if (!flipscreen)
-		  	    result = ((input_port_read_indexed(machine, 5) << 4) & 0xf0) | (input_port_read_indexed(machine, 4) & 0x0f);
+		  	    result = ((input_port_read(machine, "TRACK0_Y") << 4) & 0xf0) | (input_port_read(machine, "TRACK0_X") & 0x0f);
 			else
-		  	    result = ((input_port_read_indexed(machine, 7) << 4) & 0xf0) | (input_port_read_indexed(machine, 6) & 0x0f);
+		  	    result = ((input_port_read(machine, "TRACK1_Y") << 4) & 0xf0) | (input_port_read(machine, "TRACK1_X") & 0x0f);
 		}
 		else	/* buttons */
-			result = input_port_read_indexed(machine, 0);
+			result = input_port_read(machine, "IN0");
 	}
 
 	/* IN1 */
 	else if (offset < 0x4a00)
-		result = input_port_read_indexed(machine, 1);
+		result = input_port_read(machine, "IN1");
 
 	/* IN2 */
 	else if (offset < 0x4b00)
-		result = input_port_read_indexed(machine, 2);
+		result = input_port_read(machine, "R10");
 
 	/* anything else */
 	else
@@ -700,7 +700,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( missile )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -710,7 +710,7 @@ static INPUT_PORTS_START( missile )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -719,7 +719,7 @@ static INPUT_PORTS_START( missile )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_vblank, 0)
 
-	PORT_START	/* IN2 */
+	PORT_START_TAG("R10")	/* IN2 */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("R10:1,2")
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -742,7 +742,7 @@ static INPUT_PORTS_START( missile )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	/* IN3 */
+	PORT_START_TAG("R8")	/* IN3 */
 	PORT_DIPNAME( 0x03, 0x00, "Cities" ) PORT_DIPLOCATION("R8:1,2")
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
@@ -767,22 +767,22 @@ static INPUT_PORTS_START( missile )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START	/* FAKE */
+	PORT_START_TAG("TRACK0_X")	/* FAKE */
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10)
 
-	PORT_START	/* FAKE */
+	PORT_START_TAG("TRACK0_Y")	/* FAKE */
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START	/* FAKE */
+	PORT_START_TAG("TRACK1_X")	/* FAKE */
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 
-	PORT_START	/* FAKE */
+	PORT_START_TAG("TRACK1_Y")	/* FAKE */
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( suprmatk )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -792,7 +792,7 @@ static INPUT_PORTS_START( suprmatk )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -801,7 +801,7 @@ static INPUT_PORTS_START( suprmatk )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_vblank, 0)
 
-	PORT_START	/* IN2 */
+	PORT_START_TAG("R10")	/* IN2 */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("R10:1,2")
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -824,7 +824,7 @@ static INPUT_PORTS_START( suprmatk )
 	PORT_DIPSETTING(    0x80, "Reg. Super Missile Attack" )
 	PORT_DIPSETTING(    0xc0, "Hard Super Missile Attack" )
 
-	PORT_START	/* IN3 */
+	PORT_START_TAG("R8")	/* IN3 */
 	PORT_DIPNAME( 0x03, 0x00, "Cities" ) PORT_DIPLOCATION("R8:1,2")
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
@@ -849,16 +849,16 @@ static INPUT_PORTS_START( suprmatk )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START	/* FAKE */
+	PORT_START_TAG("TRACK0_X")	/* FAKE */
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10)
 
-	PORT_START	/* FAKE */
+	PORT_START_TAG("TRACK0_Y")	/* FAKE */
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START	/* FAKE */
+	PORT_START_TAG("TRACK1_X")	/* FAKE */
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 
-	PORT_START	/* FAKE */
+	PORT_START_TAG("TRACK1_Y")	/* FAKE */
 	PORT_BIT( 0x0f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 INPUT_PORTS_END
 

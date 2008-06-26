@@ -160,16 +160,16 @@ static READ16_HANDLER ( mugsmash_input_ports_r )
 	switch (offset)
 	{
 		case 0 :
-			data = (input_port_read_indexed(machine, 0) & 0xff) | ((input_port_read_indexed(machine, 3) & 0xc0) << 6) | ((input_port_read_indexed(machine, 2) & 0x03) << 8);
+			data = (input_port_read(machine, "P1") & 0xff) | ((input_port_read(machine, "DSW1") & 0xc0) << 6) | ((input_port_read(machine, "IN0") & 0x03) << 8);
 			break;
 		case 1 :
-			data = (input_port_read_indexed(machine, 1) & 0xff) | ((input_port_read_indexed(machine, 3) & 0x3f) << 8);
+			data = (input_port_read(machine, "P2") & 0xff) | ((input_port_read(machine, "DSW1") & 0x3f) << 8);
 			break;
 		case 2 :
-			data = ((input_port_read_indexed(machine, 4) & 0x3f) << 8);
+			data = ((input_port_read(machine, "DSW2") & 0x3f) << 8);
 			break;
 		case 3 :
-			data = ((input_port_read_indexed(machine, 4) & 0xc0) << 2);
+			data = ((input_port_read(machine, "DSW2") & 0xc0) << 2);
 			break;
 	}
 
@@ -190,10 +190,10 @@ static ADDRESS_MAP_START( mugsmash_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 #if USE_FAKE_INPUT_PORTS
 	AM_RANGE(0x180000, 0x180007) AM_READ(mugsmash_input_ports_r)
 #else
-	AM_RANGE(0x180000, 0x180001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x180002, 0x180003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x180004, 0x180005) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x180006, 0x180007) AM_READ(input_port_3_word_r)
+	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN0")
+	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("IN1")
+	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("IN2")
+	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("IN3")
 #endif
 ADDRESS_MAP_END
 
@@ -239,19 +239,19 @@ ADDRESS_MAP_END
 
 #if USE_FAKE_INPUT_PORTS
 static INPUT_PORTS_START( mugsmash )
-	PORT_START	/* Fake IN0 (player 1 inputs) */
+	PORT_START_TAG("P1")	/* Fake IN0 (player 1 inputs) */
 	MUGSMASH_PLAYER_INPUT( 1, IPT_START1 )
 
-	PORT_START	/* Fake IN1 (player 2 inputs) */
+	PORT_START_TAG("P2")	/* Fake IN1 (player 2 inputs) */
 	MUGSMASH_PLAYER_INPUT( 2, IPT_START2 )
 
-	PORT_START	/* Fake IN2 (system inputs) */
+	PORT_START_TAG("IN0")	/* Fake IN2 (system inputs) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* Fake IN3 (SW1) */
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )					// SW1-1
+	PORT_START_TAG("DSW1")	/* Fake IN3 (SW1) */
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )						// SW1-1
 	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) )			// SW1-2 to SW1-4
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 3C_1C ) )
@@ -261,7 +261,7 @@ static INPUT_PORTS_START( mugsmash )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Allow_Continue ) )			// SW1-5
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Allow_Continue ) )	// SW1-5
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x20, 0x20, "Sound Test" )				// SW1-6 (in "test mode" only)
@@ -270,11 +270,11 @@ static INPUT_PORTS_START( mugsmash )
 	PORT_DIPNAME( 0x40, 0x40, "Color Test" )				// SW1-7 (in "test mode" only)
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Draw SF." )				// SW1-8 (in "test mode" only)
+	PORT_DIPNAME( 0x80, 0x80, "Draw SF." )					// SW1-8 (in "test mode" only)
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	/* Fake IN4 (SW2) */
+	PORT_START_TAG("DSW2")	/* Fake IN4 (SW2) */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )		// SW2-1
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -283,7 +283,7 @@ static INPUT_PORTS_START( mugsmash )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x06, "4" )
-	PORT_DIPNAME( 0x08, 0x08, "Unused SW 2-4" )			// SW2-4
+	PORT_DIPNAME( 0x08, 0x08, "Unused SW 2-4" )				// SW2-4
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) )		// SW2-5 and SW2-6
@@ -291,16 +291,16 @@ static INPUT_PORTS_START( mugsmash )
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x40, 0x40, "Draw Objects" )			// SW2-7 (in "test mode" only)
+	PORT_DIPNAME( 0x40, 0x40, "Draw Objects" )				// SW2-7 (in "test mode" only)
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )				// SW2-8 (= "Screen Pause" in "test mode")
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )					// SW2-8 (= "Screen Pause" in "test mode")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 #else
 static INPUT_PORTS_START( mugsmash )
-	PORT_START	/* IN0 - $180000.w */
+	PORT_START_TAG("IN0")	/* IN0 - $180000.w */
 	MUGSMASH_PLAYER_INPUT( 1, IPT_START1 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -309,15 +309,15 @@ static INPUT_PORTS_START( mugsmash )
 	PORT_DIPNAME( 0x1000, 0x1000, "Color Test" )			// SW1-7 (in "test mode" only)
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, "Draw SF." )			// SW1-8 (in "test mode" only)
+	PORT_DIPNAME( 0x2000, 0x2000, "Draw SF." )				// SW1-8 (in "test mode" only)
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN1 - $180002.w */
+	PORT_START_TAG("IN1")	/* IN1 - $180002.w */
 	MUGSMASH_PLAYER_INPUT( 2, IPT_START2 )
-	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )				// SW1-1
+	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )					// SW1-1
 	PORT_DIPNAME( 0x0e00, 0x0000, DEF_STR( Coinage ) )		// SW1-2 to SW1-4
 	PORT_DIPSETTING(      0x0c00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0a00, DEF_STR( 3C_1C ) )
@@ -327,7 +327,7 @@ static INPUT_PORTS_START( mugsmash )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0e00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Allow_Continue ) )		// SW1-5
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Allow_Continue ) )	// SW1-5
 	PORT_DIPSETTING(      0x1000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x2000, 0x2000, "Sound Test" )			// SW1-6 (in "test mode" only)
@@ -336,7 +336,7 @@ static INPUT_PORTS_START( mugsmash )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN2 - $180004.w */
+	PORT_START_TAG("IN2")	/* IN2 - $180004.w */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -356,7 +356,7 @@ static INPUT_PORTS_START( mugsmash )
 	PORT_DIPNAME( 0x0800, 0x0800, "Unused SW 2-4" )			// SW2-4
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x3000, 0x1000, DEF_STR( Difficulty ) )		// SW2-5 and SW2-6
+	PORT_DIPNAME( 0x3000, 0x1000, DEF_STR( Difficulty ) )	// SW2-5 and SW2-6
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Easy) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Hard ) )
@@ -364,7 +364,7 @@ static INPUT_PORTS_START( mugsmash )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN3 - $180006.w */
+	PORT_START_TAG("IN3")	/* IN3 - $180006.w */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )

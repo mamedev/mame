@@ -133,7 +133,7 @@ static READ8_HANDLER( marinedt_port1_r )
 //might need to be reversed for cocktail stuff
 
 	/* x/y multiplexed */
-	return input_port_read_indexed(machine, 3 + ((marinedt_pf&0x08)>>3));
+	return input_port_read(machine, ((marinedt_pf & 0x08)>>3) ? "TRACKY" : "TRACKX");
 }
 
 static READ8_HANDLER( marinedt_coll_r )
@@ -188,11 +188,11 @@ static READ8_HANDLER( marinedt_obj1_yq_r )
 
 static ADDRESS_MAP_START( marinedt_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)		//dips coinage
-	AM_RANGE(0x01, 0x01) AM_READ(marinedt_port1_r)		//trackball xy muxed
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW0")		//dips coinage
+	AM_RANGE(0x01, 0x01) AM_READ(marinedt_port1_r)	//trackball xy muxed
 	AM_RANGE(0x02, 0x02) AM_READ(marinedt_obj1_x_r)
-	AM_RANGE(0x03, 0x03) AM_READ(input_port_1_r)		//buttons
-	AM_RANGE(0x04, 0x04) AM_READ(input_port_2_r)		//dips
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN0")		//buttons
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")		//dips
 	AM_RANGE(0x06, 0x06) AM_READ(marinedt_obj1_yr_r)
 	AM_RANGE(0x0a, 0x0a) AM_READ(marinedt_obj1_yq_r)
 	AM_RANGE(0x0e, 0x0e) AM_READ(marinedt_coll_r)
@@ -298,7 +298,7 @@ static ADDRESS_MAP_START( marinedt_writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( marinedt )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("DSW0")		/* IN0 */
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 8C_1C ) )
@@ -334,7 +334,7 @@ static INPUT_PORTS_START( marinedt )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN0")		/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
@@ -344,7 +344,7 @@ static INPUT_PORTS_START( marinedt )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 
-	PORT_START	/* IN2 */
+	PORT_START_TAG("DSW1")		/* IN2 */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x01, "5000" )
 	PORT_DIPSETTING(    0x00, "10000" )
@@ -370,11 +370,11 @@ static INPUT_PORTS_START( marinedt )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0xc0, "6" )
 
-	PORT_START  /* IN3 - FAKE MUXED */
+	PORT_START_TAG("TRACKX")	/* IN3 - FAKE MUXED */
 //check all bits are used
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START  /* IN4 - FAKE MUXED */
+	PORT_START_TAG("TRACKY")	/* IN4 - FAKE MUXED */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 

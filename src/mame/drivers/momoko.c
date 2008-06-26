@@ -50,10 +50,10 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xd064, 0xd0ff) AM_READ(SMH_RAM) /* sprite ram */
 
-	AM_RANGE(0xd400, 0xd400) AM_READ(input_port_0_r)
-	AM_RANGE(0xd402, 0xd402) AM_READ(input_port_1_r)
-	AM_RANGE(0xd406, 0xd406) AM_READ(input_port_2_r)
-	AM_RANGE(0xd407, 0xd407) AM_READ(input_port_3_r)
+	AM_RANGE(0xd400, 0xd400) AM_READ_PORT("IN0")
+	AM_RANGE(0xd402, 0xd402) AM_READ_PORT("IN1")
+	AM_RANGE(0xd406, 0xd406) AM_READ_PORT("DSW0")
+	AM_RANGE(0xd407, 0xd407) AM_READ_PORT("DSW1")
 
 	AM_RANGE(0xd800, 0xdbff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe3ff) AM_READ(SMH_RAM) /* text */

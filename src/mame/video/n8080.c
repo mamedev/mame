@@ -270,8 +270,8 @@ VIDEO_UPDATE( sheriff )
 
 VIDEO_UPDATE( helifire )
 {
-	int SUN_BRIGHTNESS = input_port_read_indexed(screen->machine, 4);
-	int SEA_BRIGHTNESS = input_port_read_indexed(screen->machine, 5);
+	int SUN_BRIGHTNESS = input_port_read(screen->machine, "POT0");
+	int SEA_BRIGHTNESS = input_port_read(screen->machine, "POT1");
 
 	static const int wave[8] = { 0, 1, 2, 2, 2, 1, 0, 0 };
 

@@ -263,7 +263,7 @@ static int auto_start_mask;
 
 static READ8_HANDLER( polepos_adc_r )
 {
-	return input_port_read_indexed(machine, 3 + adc_input);
+	return input_port_read(machine, adc_input ? "ACCEL" : "BRAKE");
 }
 
 static READ8_HANDLER( polepos_ready_r )
@@ -338,14 +338,14 @@ static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 }
 
 
-static READ8_HANDLER( in0_l )	{ return input_port_read_indexed(machine, 0) & auto_start_mask; }	// fire and start buttons
-static READ8_HANDLER( in0_h )	{ return input_port_read_indexed(machine, 0) >> 4; }	// coins
-static READ8_HANDLER( dipA_l )	{ return input_port_read_indexed(machine, 1); }		// dips A
-static READ8_HANDLER( dipA_h )	{ return input_port_read_indexed(machine, 1) >> 4; }	// dips A
-static READ8_HANDLER( dipB_l )	{ return input_port_read_indexed(machine, 2); }		// dips B
-static READ8_HANDLER( dipB_h )	{ return input_port_read_indexed(machine, 2) >> 4; }	// dips B
-static READ8_HANDLER( in1_l )	{ return input_port_read_indexed(machine, 5); }		// wheel
-static READ8_HANDLER( in1_h )	{ return input_port_read_indexed(machine, 5) >> 4; }	// wheel
+static READ8_HANDLER( in0_l )	{ return input_port_read(machine, "IN0") & auto_start_mask; }	// fire and start buttons
+static READ8_HANDLER( in0_h )	{ return input_port_read(machine, "IN0") >> 4; }				// coins
+static READ8_HANDLER( dipA_l )	{ return input_port_read(machine, "DSWA"); }					// dips A
+static READ8_HANDLER( dipA_h )	{ return input_port_read(machine, "DSWA") >> 4; }				// dips A
+static READ8_HANDLER( dipB_l )	{ return input_port_read(machine, "DSWB"); }					// dips B
+static READ8_HANDLER( dipB_h )	{ return input_port_read(machine, "DSWB") >> 4; }				// dips B
+static READ8_HANDLER( in1_l )	{ return input_port_read(machine, "STEER"); }					// wheel
+static READ8_HANDLER( in1_h )	{ return input_port_read(machine, "STEER") >> 4; }				// wheel
 static WRITE8_HANDLER( out_0 )
 {
 // no start lamps in pole position
@@ -443,9 +443,9 @@ ADDRESS_MAP_END
  *********************************************************************/
 
 static INPUT_PORTS_START( polepos )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )	// start 1, program controlled
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -453,7 +453,7 @@ static INPUT_PORTS_START( polepos )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	/* DSW A */
+	PORT_START_TAG("DSWA")	/* DSW A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(	0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(	0x03, DEF_STR( 2C_1C ) )
@@ -477,7 +477,7 @@ static INPUT_PORTS_START( polepos )
 	PORT_DIPSETTING(	0x80, "3" )
 	PORT_DIPSETTING(	0x00, "4" )
 
-	PORT_START	/* DSW B */
+	PORT_START_TAG("DSWB")	/* DSW B */
 	PORT_DIPNAME( 0x07, 0x07, "Extended Rank" )
 	PORT_DIPSETTING(	0x07, "A" )
 	PORT_DIPSETTING(	0x03, "B" )
@@ -503,21 +503,21 @@ static INPUT_PORTS_START( polepos )
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ))
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-	PORT_START /* IN1 - Brake */
+	PORT_START_TAG("BRAKE") /* IN1 - Brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START /* IN2 - Accel */
+	PORT_START_TAG("ACCEL") /* IN2 - Accel */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START /* IN3 - Steering */
-	PORT_BIT ( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
+	PORT_START_TAG("STEER") /* IN3 - Steering */
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( poleposa )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )	// start 1, program controlled
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -525,7 +525,7 @@ static INPUT_PORTS_START( poleposa )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	/* DSW A */
+	PORT_START_TAG("DSWA")	/* DSW A */
 	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(	0xc0, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(	0x20, DEF_STR( 2C_1C ) )
@@ -549,7 +549,7 @@ static INPUT_PORTS_START( poleposa )
 	PORT_DIPSETTING(	0x01, "3" )
 	PORT_DIPSETTING(	0x00, "4" )
 
-	PORT_START	/* DSW B */
+	PORT_START_TAG("DSWB")	/* DSW B */
 	PORT_DIPNAME( 0xe0, 0xe0, "Practice Rank" )
 	PORT_DIPSETTING(	0xe0, "A" )
 	PORT_DIPSETTING(	0x60, "B" )
@@ -575,20 +575,20 @@ static INPUT_PORTS_START( poleposa )
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-	PORT_START /* IN1 - Brake */
+	PORT_START_TAG("BRAKE") /* IN1 - Brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START /* IN2 - Accel */
+	PORT_START_TAG("ACCEL") /* IN2 - Accel */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START /* IN3 - Steering */
-	PORT_BIT ( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
+	PORT_START_TAG("STEER") /* IN3 - Steering */
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( topracra )
 	// no coins ?!
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )	// start 1, program controlled
@@ -597,7 +597,7 @@ static INPUT_PORTS_START( topracra )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	/* DSW A */
+	PORT_START_TAG("DSWA")	/* DSW A */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(	0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(	0x03, DEF_STR( 2C_1C ) )
@@ -621,7 +621,7 @@ static INPUT_PORTS_START( topracra )
 	PORT_DIPSETTING(	0x80, "3" )
 	PORT_DIPSETTING(	0x00, "4" )
 
-	PORT_START	/* DSW B */
+	PORT_START_TAG("DSWB")	/* DSW B */
 	PORT_DIPNAME( 0x07, 0x07, "Extended Rank" )
 	PORT_DIPSETTING(	0x07, "A" )
 	PORT_DIPSETTING(	0x03, "B" )
@@ -647,21 +647,21 @@ static INPUT_PORTS_START( topracra )
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ))
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-	PORT_START /* IN1 - Brake */
+	PORT_START_TAG("BRAKE") /* IN1 - Brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START /* IN2 - Accel */
+	PORT_START_TAG("ACCEL") /* IN2 - Accel */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START /* IN3 - Steering */
-	PORT_BIT ( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
+	PORT_START_TAG("STEER") /* IN3 - Steering */
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( polepos2 )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )	// start 1, program controlled
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -669,7 +669,7 @@ static INPUT_PORTS_START( polepos2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	/* DSW A */
+	PORT_START_TAG("DSWA")	/* DSW A */
 	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(	0xc0, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(	0x20, DEF_STR( 2C_1C ) )
@@ -694,7 +694,7 @@ static INPUT_PORTS_START( polepos2 )
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-	PORT_START	/* DSW B */
+	PORT_START_TAG("DSWB")	/* DSW B */
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Game_Time ) )
 	PORT_DIPSETTING(	0x80, "90 secs." )
 	PORT_DIPSETTING(	0x00, "120 secs." )
@@ -717,13 +717,13 @@ static INPUT_PORTS_START( polepos2 )
 	PORT_DIPSETTING(	0x01, "Average" )
 	PORT_DIPSETTING(	0x00, DEF_STR( High ) )
 
-	PORT_START /* IN1 - Brake */
+	PORT_START_TAG("BRAKE") /* IN1 - Brake */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START /* IN2 - Accel */
+	PORT_START_TAG("ACCEL") /* IN2 - Accel */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START /* IN3 - Steering */
+	PORT_START_TAG("STEER") /* IN3 - Steering */
 	PORT_BIT ( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(4)
 INPUT_PORTS_END
 

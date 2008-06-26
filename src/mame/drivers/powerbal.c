@@ -63,7 +63,7 @@ static NVRAM_HANDLER( magicstk )
 
 static READ16_HANDLER( magicstk_port2_r )
 {
-	return (input_port_read_indexed(machine, 2) & 0xfe) | eeprom_read_bit();
+	return (input_port_read(machine, "IN2") & 0xfe) | eeprom_read_bit();
 }
 
 static WRITE16_HANDLER( magicstk_coin_eeprom_w )
@@ -111,11 +111,11 @@ static ADDRESS_MAP_START( magicstk_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP
 	AM_RANGE(0x094004, 0x094005) AM_WRITE(tile_banking_w)
 	AM_RANGE(0x098180, 0x09917f) AM_RAM_WRITE(magicstk_bgvideoram_w) AM_BASE(&magicstk_videoram)
-	AM_RANGE(0x0c2010, 0x0c2011) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x0c2012, 0x0c2013) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x0c2010, 0x0c2011) AM_READ_PORT("IN0")
+	AM_RANGE(0x0c2012, 0x0c2013) AM_READ_PORT("IN1")
 	AM_RANGE(0x0c2014, 0x0c2015) AM_READWRITE(magicstk_port2_r, magicstk_coin_eeprom_w)
-	AM_RANGE(0x0c2016, 0x0c2017) AM_READ(input_port_3_word_r)
-	AM_RANGE(0x0c2018, 0x0c2019) AM_READ(input_port_4_word_r)
+	AM_RANGE(0x0c2016, 0x0c2017) AM_READ_PORT("DSW1")
+	AM_RANGE(0x0c2018, 0x0c2019) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0c201c, 0x0c201d) AM_WRITE(oki_banking)
 	AM_RANGE(0x0c201e, 0x0c201f) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
 	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITENOP
@@ -131,11 +131,11 @@ static ADDRESS_MAP_START( powerbal_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x094004, 0x094005) AM_WRITE(tile_banking_w)
 	AM_RANGE(0x098000, 0x098fff) AM_RAM_WRITE(magicstk_bgvideoram_w) AM_BASE(&magicstk_videoram)
 	AM_RANGE(0x099000, 0x09bfff) AM_RAM // not used
-	AM_RANGE(0x0c2010, 0x0c2011) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x0c2012, 0x0c2013) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x0c2014, 0x0c2015) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x0c2016, 0x0c2017) AM_READ(input_port_3_word_r)
-	AM_RANGE(0x0c2018, 0x0c2019) AM_READ(input_port_4_word_r)
+	AM_RANGE(0x0c2010, 0x0c2011) AM_READ_PORT("IN0")
+	AM_RANGE(0x0c2012, 0x0c2013) AM_READ_PORT("IN1")
+	AM_RANGE(0x0c2014, 0x0c2015) AM_READ_PORT("IN2")
+	AM_RANGE(0x0c2016, 0x0c2017) AM_READ_PORT("DSW1")
+	AM_RANGE(0x0c2018, 0x0c2019) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0c201c, 0x0c201d) AM_WRITE(oki_banking)
 	AM_RANGE(0x0c201e, 0x0c201f) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
 	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITENOP

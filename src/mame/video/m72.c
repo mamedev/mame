@@ -347,7 +347,7 @@ WRITE16_HANDLER( m72_port02_w )
 		coin_counter_w(1,data & 0x02);
 
 		/* bit 2 is flip screen (handled both by software and hardware) */
-		flip_screen_set(((data & 0x04) >> 2) ^ ((~input_port_read_indexed(machine, 2) >> 8) & 1));
+		flip_screen_set(((data & 0x04) >> 2) ^ ((~input_port_read(machine, "DSW1") >> 8) & 1));
 
 		/* bit 3 is display disable */
 		video_off = data & 0x08;
@@ -373,7 +373,7 @@ WRITE16_HANDLER( rtype2_port02_w )
 		coin_counter_w(1,data & 0x02);
 
 		/* bit 2 is flip screen (handled both by software and hardware) */
-		flip_screen_set(((data & 0x04) >> 2) ^ ((~input_port_read_indexed(machine, 2) >> 8) & 1));
+		flip_screen_set(((data & 0x04) >> 2) ^ ((~input_port_read(machine, "DSW1") >> 8) & 1));
 
 		/* bit 3 is display disable */
 		video_off = data & 0x08;

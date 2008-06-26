@@ -103,7 +103,7 @@ static MACHINE_RESET( midvplus )
 
 static READ32_HANDLER( port0_r )
 {
-	UINT16 val = input_port_read_indexed(machine, 0);
+	UINT16 val = input_port_read(machine, "IN0");
 	UINT16 diff = val ^ last_port0;
 
 	/* make sure the shift controls are mutually exclusive */
@@ -125,13 +125,13 @@ static READ32_HANDLER( port0_r )
 
 static READ32_HANDLER( port1_r )
 {
-	return (input_port_read_indexed(machine, 1) << 16) | input_port_read_indexed(machine, 1);
+	return (input_port_read(machine, "IN1") << 16) | input_port_read(machine, "IN1");
 }
 
 
 static READ32_HANDLER( port2_r )
 {
-	return (input_port_read_indexed(machine, 2) << 16) | input_port_read_indexed(machine, 2);
+	return (input_port_read(machine, "DSW") << 16) | input_port_read(machine, "DSW");
 }
 
 
@@ -163,12 +163,14 @@ static TIMER_CALLBACK( adc_ready )
 
 static WRITE32_HANDLER( midvunit_adc_w )
 {
+	static const char *adcnames[] = { "WHEEL", "ACCEL", "BRAKE" };
+	
 	if (!(control_data & 0x20))
 	{
 		int which = (data >> adc_shift) - 4;
 		if (which < 0 || which > 2)
 			logerror("adc_w: unexpected which = %02X\n", which + 4);
-		adc_data = input_port_read_indexed(machine, 3 + which);
+		adc_data = input_port_read_safe(machine, adcnames[which], 0);
 		timer_set(ATTOTIME_IN_MSEC(1), NULL, 0, adc_ready);
 	}
 	else
@@ -552,7 +554,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( crusnusa )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
@@ -570,7 +572,7 @@ static INPUT_PORTS_START( crusnusa )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 )	/* radio */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -581,7 +583,7 @@ static INPUT_PORTS_START( crusnusa )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)	/* view 4 */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x0001, 0x0000, "Link Status" )
 	PORT_DIPSETTING(      0x0000, "Master" )
 	PORT_DIPSETTING(      0x0001, "Slave" )
@@ -664,19 +666,19 @@ static INPUT_PORTS_START( crusnusa )
 	PORT_DIPSETTING(      0x1800, "Spain-4" )
 	PORT_DIPSETTING(      0x0e00, "Netherland-1" )
 
-	PORT_START		/* wheel */
+	PORT_START_TAG("WHEEL")		/* wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START		/* gas pedal */
+	PORT_START_TAG("ACCEL")		/* gas pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START		/* brake pedal */
+	PORT_START_TAG("BRAKE")		/* brake pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( crusnwld )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
@@ -694,7 +696,7 @@ static INPUT_PORTS_START( crusnwld )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 )	/* radio */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -705,7 +707,7 @@ static INPUT_PORTS_START( crusnwld )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)	/* view 4 */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x0003, 0x0000, "Link Number" )
 	PORT_DIPSETTING(      0x0000, "1" )
 	PORT_DIPSETTING(      0x0001, "2" )
@@ -785,19 +787,19 @@ static INPUT_PORTS_START( crusnwld )
 	PORT_DIPSETTING(      0x1800, "Spain-4" )
 	PORT_DIPSETTING(      0x0e00, "Netherland-1" )
 
-	PORT_START		/* wheel */
+	PORT_START_TAG("WHEEL")		/* wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START		/* gas pedal */
+	PORT_START_TAG("ACCEL")		/* gas pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START		/* brake pedal */
+	PORT_START_TAG("BRAKE")		/* brake pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( offroadc )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
@@ -815,7 +817,7 @@ static INPUT_PORTS_START( offroadc )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 )	/* radio */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -826,7 +828,7 @@ static INPUT_PORTS_START( offroadc )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)	/* view 4 */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ))
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
@@ -880,19 +882,19 @@ static INPUT_PORTS_START( offroadc )
 	PORT_DIPSETTING(      0x7000, "Denmark 1" )
 	PORT_DIPSETTING(      0x6800, "Hungary 1" )
 
-	PORT_START		/* wheel */
+	PORT_START_TAG("WHEEL")		/* wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START		/* gas pedal */
+	PORT_START_TAG("ACCEL")		/* gas pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START		/* brake pedal */
+	PORT_START_TAG("BRAKE")		/* brake pedal */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( wargods )
-	PORT_START	    /* DS1 */
+	PORT_START_TAG("DIPS")		/* DS1 */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ))
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
@@ -949,7 +951,7 @@ static INPUT_PORTS_START( wargods )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
 
-	PORT_START
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
@@ -966,7 +968,7 @@ static INPUT_PORTS_START( wargods )
 	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )	/* Bill */
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -984,7 +986,7 @@ static INPUT_PORTS_START( wargods )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)

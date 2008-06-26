@@ -730,53 +730,53 @@ static int namcos2_mcu_analog_complete=0;
 
 WRITE8_HANDLER( namcos2_mcu_analog_ctrl_w )
 {
-	namcos2_mcu_analog_ctrl=data&0xff;
+	namcos2_mcu_analog_ctrl = data & 0xff;
 
 	/* Check if this is a start of conversion */
 	/* Input ports 2 thru 9 are the analog channels */
-	if(data&0x40)
+	if(data & 0x40)
 	{
 		/* Set the conversion complete flag */
-		namcos2_mcu_analog_complete=2;
+		namcos2_mcu_analog_complete = 2;
 		/* We convert instantly, good eh! */
-		switch((data>>2)&0x07)
+		switch((data>>2) & 0x07)
 		{
 		case 0:
-			namcos2_mcu_analog_data=input_port_read_indexed(machine, 2);
+			namcos2_mcu_analog_data=input_port_read(machine, "AN0");
 			break;
 		case 1:
-			namcos2_mcu_analog_data=input_port_read_indexed(machine, 3);
+			namcos2_mcu_analog_data=input_port_read(machine, "AN1");
 			break;
 		case 2:
-			namcos2_mcu_analog_data=input_port_read_indexed(machine, 4);
+			namcos2_mcu_analog_data=input_port_read(machine, "AN2");
 			break;
 		case 3:
-			namcos2_mcu_analog_data=input_port_read_indexed(machine, 5);
+			namcos2_mcu_analog_data=input_port_read(machine, "AN3");
 			break;
 		case 4:
-			namcos2_mcu_analog_data=input_port_read_indexed(machine, 6);
+			namcos2_mcu_analog_data=input_port_read(machine, "AN4");
 			break;
 		case 5:
-			namcos2_mcu_analog_data=input_port_read_indexed(machine, 7);
+			namcos2_mcu_analog_data=input_port_read(machine, "AN5");
 			break;
 		case 6:
-			namcos2_mcu_analog_data=input_port_read_indexed(machine, 8);
+			namcos2_mcu_analog_data=input_port_read(machine, "AN6");
 			break;
 		case 7:
-			namcos2_mcu_analog_data=input_port_read_indexed(machine, 9);
+			namcos2_mcu_analog_data=input_port_read(machine, "AN7");
 			break;
 		}
 #if 0
 		/* Perform the offset handling on the input port */
 		/* this converts it to a twos complement number */
-		if( namcos2_gametype==NAMCOS2_DIRT_FOX ||
-			namcos2_gametype==NAMCOS2_DIRT_FOX_JP )
+		if( namcos2_gametype == NAMCOS2_DIRT_FOX ||
+			namcos2_gametype == NAMCOS2_DIRT_FOX_JP )
 		{
-			namcos2_mcu_analog_data^=0x80;
+			namcos2_mcu_analog_data ^= 0x80;
 		}
 #endif
 		/* If the interrupt enable bit is set trigger an A/D IRQ */
-		if(data&0x20)
+		if(data & 0x20)
 		{
 			cpunum_set_input_line(machine, CPU_MCU, HD63705_INT_ADCONV , PULSE_LINE);
 		}
@@ -815,18 +815,18 @@ WRITE8_HANDLER( namcos2_mcu_port_d_w )
 READ8_HANDLER( namcos2_mcu_port_d_r )
 {
 	/* Provides a digital version of the analog ports */
-	int threshold=0x7f;
-	int data=0;
+	int threshold = 0x7f;
+	int data = 0;
 
 	/* Read/convert the bits one at a time */
-	if(input_port_read_indexed(machine, 2)>threshold) data|=0x01;
-	if(input_port_read_indexed(machine, 3)>threshold) data|=0x02;
-	if(input_port_read_indexed(machine, 4)>threshold) data|=0x04;
-	if(input_port_read_indexed(machine, 5)>threshold) data|=0x08;
-	if(input_port_read_indexed(machine, 6)>threshold) data|=0x10;
-	if(input_port_read_indexed(machine, 7)>threshold) data|=0x20;
-	if(input_port_read_indexed(machine, 8)>threshold) data|=0x40;
-	if(input_port_read_indexed(machine, 9)>threshold) data|=0x80;
+	if(input_port_read(machine, "AN0") > threshold) data |= 0x01;
+	if(input_port_read(machine, "AN1") > threshold) data |= 0x02;
+	if(input_port_read(machine, "AN2") > threshold) data |= 0x04;
+	if(input_port_read(machine, "AN3") > threshold) data |= 0x08;
+	if(input_port_read(machine, "AN4") > threshold) data |= 0x10;
+	if(input_port_read(machine, "AN5") > threshold) data |= 0x20;
+	if(input_port_read(machine, "AN6") > threshold) data |= 0x40;
+	if(input_port_read(machine, "AN7") > threshold) data |= 0x80;
 
 	/* Return the result */
 	return data;
@@ -834,18 +834,18 @@ READ8_HANDLER( namcos2_mcu_port_d_r )
 
 READ8_HANDLER( namcos2_input_port_0_r )
 {
-	int data=input_port_read_indexed(machine, 0);
+	int data = input_port_read(machine, "MCUB");
 	return data;
 }
 
 READ8_HANDLER( namcos2_input_port_10_r )
 {
-	int data=input_port_read_indexed(machine, 10);
+	int data = input_port_read(machine, "MCUH");
 	return data;
 }
 
 READ8_HANDLER( namcos2_input_port_12_r )
 {
-	int data=input_port_read_indexed(machine, 12);
+	int data = input_port_read(machine, "MCUDI0");
 	return data;
 }

@@ -32,7 +32,7 @@ static int nitedrvr_steering(running_machine *machine)
 	int this_val;
 	int delta;
 
-	this_val = input_port_read_indexed(machine, 5);
+	this_val = input_port_read(machine, "STEER");
 
 	delta=this_val-last_steering_val;
 	last_steering_val=this_val;
@@ -106,7 +106,7 @@ READ8_HANDLER( nitedrvr_in0_r )
 {
 	int gear;
 
-	gear = input_port_read_indexed(machine, 2);
+	gear = input_port_read(machine, "GEARS");
 	if (gear & 0x10)				nitedrvr_gear=1;
 	else if (gear & 0x20)			nitedrvr_gear=2;
 	else if (gear & 0x40)			nitedrvr_gear=3;
@@ -115,16 +115,16 @@ READ8_HANDLER( nitedrvr_in0_r )
 	switch (offset & 0x03)
 	{
 		case 0x00:						/* No remapping necessary */
-			return input_port_read_indexed(machine, 0);
+			return input_port_read(machine, "DSW0");
 		case 0x01:						/* No remapping necessary */
-			return input_port_read_indexed(machine, 1);
+			return input_port_read(machine, "DSW1");
 		case 0x02:						/* Remap our gear shift */
 			if (nitedrvr_gear==1)		return 0xE0;
 			else if (nitedrvr_gear==2)	return 0xD0;
 			else if (nitedrvr_gear==3)	return 0xB0;
 			else						return 0x70;
 		case 0x03:						/* Remap our steering */
-			return (input_port_read_indexed(machine, 3) | nitedrvr_steering(machine));
+			return (input_port_read(machine, "DSW2") | nitedrvr_steering(machine));
 		default:
 			return 0xFF;
 	}
@@ -168,7 +168,7 @@ READ8_HANDLER( nitedrvr_in1_r )
 
 	ac_line=(ac_line+1) % 3;
 
-	port = input_port_read_indexed(machine, 4);
+	port = input_port_read(machine, "IN0");
 	if (port & 0x10)				nitedrvr_track=0;
 	else if (port & 0x20)			nitedrvr_track=1;
 	else if (port & 0x40)			nitedrvr_track=2;

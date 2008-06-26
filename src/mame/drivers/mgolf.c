@@ -72,7 +72,7 @@ static VIDEO_UPDATE( mgolf )
 
 static void update_plunger(running_machine *machine)
 {
-	UINT8 val = input_port_read_indexed(machine, 5);
+	UINT8 val = input_port_read(machine, "BUTTON");
 
 	if (prev != val)
 	{
@@ -137,13 +137,13 @@ static READ8_HANDLER( mgolf_wram_r )
 
 static READ8_HANDLER( mgolf_dial_r )
 {
-	UINT8 val = input_port_read_indexed(machine, 1);
+	UINT8 val = input_port_read(machine, "41");
 
-	if ((input_port_read_indexed(machine, 4) + 0x00) & 0x20)
+	if ((input_port_read(machine, "DIAL") + 0x00) & 0x20)
 	{
 		val |= 0x01;
 	}
-	if ((input_port_read_indexed(machine, 4) + 0x10) & 0x20)
+	if ((input_port_read(machine, "DIAL") + 0x10) & 0x20)
 	{
 		val |= 0x02;
 	}
@@ -156,7 +156,7 @@ static READ8_HANDLER( mgolf_misc_r )
 {
 	double plunger = calc_plunger_pos(); /* see Video Pinball */
 
-	UINT8 val = input_port_read_indexed(machine, 3);
+	UINT8 val = input_port_read(machine, "61");
 
 	if (plunger >= 0.000 && plunger <= 0.001)
 	{
@@ -181,9 +181,9 @@ static WRITE8_HANDLER( mgolf_wram_w )
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 
-	AM_RANGE(0x0040, 0x0040) AM_READ(input_port_0_r)
+	AM_RANGE(0x0040, 0x0040) AM_READ_PORT("40")
 	AM_RANGE(0x0041, 0x0041) AM_READ(mgolf_dial_r)
-	AM_RANGE(0x0060, 0x0060) AM_READ(input_port_2_r)
+	AM_RANGE(0x0060, 0x0060) AM_READ_PORT("60")
 	AM_RANGE(0x0061, 0x0061) AM_READ(mgolf_misc_r)
 	AM_RANGE(0x0080, 0x00ff) AM_READ(mgolf_wram_r)
 	AM_RANGE(0x0180, 0x01ff) AM_READ(mgolf_wram_r)
@@ -210,40 +210,40 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mgolf )
 
-	PORT_START /* 40 */
+	PORT_START_TAG("40")	/* 40 */
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Language ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( French ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Spanish ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( German ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( French ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( Spanish ) )
+	PORT_DIPSETTING(	0x30, DEF_STR( German ) )
 	PORT_DIPNAME( 0xc0, 0x40, "Shots per Coin" )
-	PORT_DIPSETTING(    0x00, "25" )
-	PORT_DIPSETTING(    0x40, "30" )
-	PORT_DIPSETTING(    0x80, "35" )
-	PORT_DIPSETTING(    0xc0, "40" )
+	PORT_DIPSETTING(	0x00, "25" )
+	PORT_DIPSETTING(	0x40, "30" )
+	PORT_DIPSETTING(	0x80, "35" )
+	PORT_DIPSETTING(	0xc0, "40" )
 
-	PORT_START /* 41 */
+	PORT_START_TAG("41")	/* 41 */
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* DIAL A */
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* DIAL B */
 	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START /* 60 */
+	PORT_START_TAG("60")	/* 60 */
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
 
-	PORT_START /* 61 */
+	PORT_START_TAG("61")	/* 61 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Course Select") PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) /* PLUNGER 1 */
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) /* PLUNGER 2 */
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("DIAL")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(25)
 
-	PORT_START
+	PORT_START_TAG("BUTTON")
 	PORT_BIT ( 0xff, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
 INPUT_PORTS_END

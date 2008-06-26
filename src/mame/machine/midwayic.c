@@ -863,7 +863,7 @@ READ32_HANDLER( midway_ioasic_r )
 	switch (offset)
 	{
 		case IOASIC_PORT0:
-			result = input_port_read_indexed(machine, 0);
+			result = input_port_read(machine, "DIPS");
 			/* bit 0 seems to be a ready flag before shuffling happens */
 			if (!ioasic.shuffle_active)
 			{
@@ -875,15 +875,15 @@ READ32_HANDLER( midway_ioasic_r )
 			break;
 
 		case IOASIC_PORT1:
-			result = input_port_read_indexed(machine, 1);
+			result = input_port_read(machine, "SYSTEM");
 			break;
 
 		case IOASIC_PORT2:
-			result = input_port_read_indexed(machine, 2);
+			result = input_port_read(machine, "IN1");
 			break;
 
 		case IOASIC_PORT3:
-			result = input_port_read_indexed(machine, 3);
+			result = input_port_read(machine, "IN2");
 			break;
 
 		case IOASIC_UARTIN:

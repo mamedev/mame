@@ -46,7 +46,7 @@ static emu_timer *mcu_timer;
 
 static READ8_HANDLER( mcu_portA_r )
 {
-	portA_in = input_port_read_indexed(machine, 5) | (input_port_read_indexed(machine, 4) << 4) | (input_port_read_indexed(machine, 0) << 5);
+	portA_in = input_port_read(machine, "dsw") | (input_port_read(machine, "coin") << 4) | (input_port_read(machine, "console") << 5);
 	return (portA_in & ~ddrA) | (portA_out & ddrA);
 }
 
@@ -305,10 +305,10 @@ static INPUT_PORTS_START( a600xl )
 	PORT_BIT(0x80, 0x80, IPT_BUTTON2) PORT_PLAYER(4)
 
 	/* Max-A-Flex specific ports */
-	PORT_START	/* IN4 coin */
+	PORT_START_TAG("coin")	/* IN4 coin */
 	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 
-	PORT_START	/* IN5 DSW */
+	PORT_START_TAG("dsw")	/* IN5 DSW */
 	PORT_DIPNAME(0xf, 0x9, "Coin/Time" )
 	PORT_DIPSETTING( 0x0, "30 sec" )
 	PORT_DIPSETTING( 0x1, "60 sec" )

@@ -76,10 +76,10 @@ static ADDRESS_MAP_START( metlclsh_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM					)
 	AM_RANGE(0x8000, 0x9fff) AM_READ(sharedram_r				)
 	AM_RANGE(0xa000, 0xbfff) AM_READ(SMH_ROM					)
-	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_0_r			)
-	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_1_r			)
-	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_2_r			)
-	AM_RANGE(0xc003, 0xc003) AM_READ(input_port_3_r			)
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
+	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
+	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
+	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW")
 //  AM_RANGE(0xc800, 0xc82f) AM_READ(SMH_RAM                   )   // not actually read
 //  AM_RANGE(0xcc00, 0xcc2f) AM_READ(SMH_RAM                   )   // ""
 	AM_RANGE(0xd000, 0xd000) AM_READ(YM2203_status_port_0_r	)
@@ -136,10 +136,10 @@ static WRITE8_HANDLER( metlclsh_flipscreen_w )
 static ADDRESS_MAP_START( metlclsh_readmem2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM			)
 	AM_RANGE(0x8000, 0x9fff) AM_READ(sharedram_r		)
-	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_0_r	)
-	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_1_r	)
-	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_2_r	)
-	AM_RANGE(0xc003, 0xc003) AM_READ(input_port_3_r	)
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
+	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
+	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
+	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW")
 	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_BANK1			)
 	AM_RANGE(0xfff0, 0xffff) AM_READ(SMH_ROM			)	// Reset/IRQ vectors
 ADDRESS_MAP_END
@@ -168,7 +168,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( metlclsh )
-	PORT_START_TAG("IN0")	/* c000 */
+	PORT_START_TAG("IN0")		/* c000 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
@@ -193,7 +193,7 @@ static INPUT_PORTS_START( metlclsh )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN1")	/* c001 */
+	PORT_START_TAG("IN1")		/* c001 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP		)
@@ -203,7 +203,7 @@ static INPUT_PORTS_START( metlclsh )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1			)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2			)
 
-	PORT_START_TAG("IN2")	/* c002 */
+	PORT_START_TAG("IN2")		/* c002 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP		) PORT_COCKTAIL
@@ -213,7 +213,7 @@ static INPUT_PORTS_START( metlclsh )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
 
-	PORT_START_TAG("IN3")      /* c003 */
+	PORT_START_TAG("DSW")		/* c003 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
@@ -302,7 +302,7 @@ static INTERRUPT_GEN( metlclsh_interrupt2 )
 	if (cpu_getiloops() == 0)
 		return;
 	/* generate NMI on coin insertion */
-	if ((~input_port_read_indexed(machine, 2) & 0xc0) || (~input_port_read_indexed(machine, 3) & 0x40))
+	if ((~input_port_read(machine, "IN2") & 0xc0) || (~input_port_read(machine, "DSW") & 0x40))
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
 }
 

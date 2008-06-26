@@ -382,7 +382,7 @@ static UINT8 namcoio_51XX_read(running_machine *machine, int chip)
 					}
 				}
 
-				if (~input_port_read_indexed(machine, 0) & 0x80)	/* check test mode switch */
+				if (~input_port_read(machine, "IN0") & 0x80)	/* check test mode switch */
 					return 0xbb;
 
 				return (io[chip].credits / 10) * 16 + io[chip].credits % 10;

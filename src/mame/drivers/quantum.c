@@ -60,25 +60,25 @@
 
 static READ16_HANDLER( switches_r )
 {
-	return (input_port_read_indexed(machine, 0) | (avgdvg_done() ? 1 : 0));
+	return (input_port_read(machine, "IN0") | (avgdvg_done() ? 1 : 0));
 }
 
 
 static READ16_HANDLER( trackball_r )
 {
-	return (input_port_read_indexed(machine, 4) << 4) | input_port_read_indexed(machine, 3);
+	return (input_port_read(machine, "TRACKY") << 4) | input_port_read(machine, "TRACKX");
 }
 
 
 static READ8_HANDLER( input_1_r )
 {
-	return (input_port_read_indexed(machine, 1) << (7 - (offset - POT0_C))) & 0x80;
+	return (input_port_read(machine, "DSW0") << (7 - (offset - POT0_C))) & 0x80;
 }
 
 
 static READ8_HANDLER( input_2_r )
 {
-	return (input_port_read_indexed(machine, 2) << (7 - (offset - POT0_C))) & 0x80;
+	return (input_port_read(machine, "DSW1") << (7 - (offset - POT0_C))) & 0x80;
 }
 
 
@@ -165,7 +165,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( quantum )
-	PORT_START		/* IN0 */
+	PORT_START_TAG("IN0")		/* IN0 */
 	/* YHALT here MUST BE ALWAYS 0  */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_SPECIAL )	/* vg YHALT */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -177,7 +177,7 @@ static INPUT_PORTS_START( quantum )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 /* first POKEY is SW2, second is SW1 -- more confusion! */
-	PORT_START 		/* DSW0 */
+	PORT_START_TAG("DSW0") 		/* DSW0 */
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -198,13 +198,13 @@ static INPUT_PORTS_START( quantum )
 	PORT_DIPSETTING(    0x05, "1 each 3" )
 	PORT_DIPSETTING(    0x06, "2 each 4" )
 
-	PORT_START		/* DSW1 */
+	PORT_START_TAG("DSW1")		/* DSW1 */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START      /* IN2 */
+	PORT_START_TAG("TRACKX")      /* IN2 */
 	PORT_BIT( 0x0f, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START      /* IN3 */
+	PORT_START_TAG("TRACKY")      /* IN3 */
 	PORT_BIT( 0x0f, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 

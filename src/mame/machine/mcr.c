@@ -141,7 +141,7 @@ READ8_HANDLER( zwackery_port_2_r );
 
 static READ8_HANDLER( zwackery_port_1_r )
 {
-	UINT8 ret = input_port_read_indexed(machine, 1);
+	UINT8 ret = input_port_read(machine, "IN1");
 
 	pia_set_port_a_z_mask(3, ret);
 
@@ -151,7 +151,7 @@ static READ8_HANDLER( zwackery_port_1_r )
 
 static READ8_HANDLER( zwackery_port_3_r )
 {
-	UINT8 ret = input_port_read_indexed(machine, 3);
+	UINT8 ret = input_port_read(machine, "IN3");
 
 	pia_set_port_a_z_mask(4, ret);
 

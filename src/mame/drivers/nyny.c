@@ -138,13 +138,13 @@ static INTERRUPT_GEN( update_pia_1 )
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA0 (COIN1) */
-	pia_1_ca1_w(machine, 0, input_port_read_indexed(machine, 0) & 0x01);
+	pia_1_ca1_w(machine, 0, input_port_read(machine, "IN0") & 0x01);
 
 	/* CA2 - copy of PA1 (SERVICE1) */
-	pia_1_ca2_w(machine, 0, input_port_read_indexed(machine, 0) & 0x02);
+	pia_1_ca2_w(machine, 0, input_port_read(machine, "IN0") & 0x02);
 
 	/* CB1 - (crosshatch) */
-	pia_1_cb1_w(machine, 0, input_port_read_indexed(machine, 5));
+	pia_1_cb1_w(machine, 0, input_port_read(machine, "CROSS"));
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -545,7 +545,7 @@ static ADDRESS_MAP_START( nyny_audio_1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READWRITE(soundlatch_r, audio_1_answer_w)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0fff) AM_READ(input_port_4_r)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0fff) AM_READ_PORT("SW3")
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffc) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
 	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffc) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x3002, 0x3002) AM_MIRROR(0x0ffc) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
@@ -649,7 +649,7 @@ static INPUT_PORTS_START( nyny )
 	PORT_DIPSETTING(	0x40, "+2" )
 	PORT_DIPSETTING(	0x20, "+3" )
 
-    PORT_START      /* connected to PIA1 CB1 input */
+    PORT_START_TAG("CROSS")		/* connected to PIA1 CB1 input */
     PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PS1 (Crosshatch)") PORT_CODE(KEYCODE_F1)
 
 INPUT_PORTS_END

@@ -1146,16 +1146,16 @@ static READ32_HANDLER( system11gun_r )
 	switch( offset )
 	{
 	case 0:
-		data = input_port_read_indexed(machine,  3 );
+		data = input_port_read(machine, "LIGHT0_X");
 		break;
 	case 1:
-		data = ( input_port_read_indexed(machine,  4 ) ) | ( ( input_port_read_indexed(machine,  4 ) + 1 ) << 16 );
+		data = ( input_port_read(machine, "LIGHT0_Y") ) | ( ( input_port_read(machine, "LIGHT0_Y") + 1 ) << 16 );
 		break;
 	case 2:
-		data = input_port_read_indexed(machine,  5 );
+		data = input_port_read(machine, "LIGHT1_X");
 		break;
 	case 3:
-		data = ( input_port_read_indexed(machine,  6 ) ) | ( ( input_port_read_indexed(machine,  6 ) + 1 ) << 16 );
+		data = ( input_port_read(machine, "LIGHT1_Y") ) | ( ( input_port_read(machine, "LIGHT1_Y") + 1 ) << 16 );
 		break;
 	}
 	verboselog( 2, "system11gun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
@@ -1383,7 +1383,7 @@ static WRITE8_HANDLER( s12_mcu_settings_w )
 
 static READ8_HANDLER( s12_mcu_gun_h_r )
 {
-	const input_port_config *port = input_port_by_tag(machine->portconfig, "IN3");
+	const input_port_config *port = input_port_by_tag(machine->portconfig, "LIGHT0_X");
 	if( port != NULL )
 	{
 		int rv = input_port_read_direct( port ) << 6;
@@ -1402,7 +1402,7 @@ static READ8_HANDLER( s12_mcu_gun_h_r )
 
 static READ8_HANDLER( s12_mcu_gun_v_r )
 {
-	const input_port_config *port = input_port_by_tag(machine->portconfig, "IN4");
+	const input_port_config *port = input_port_by_tag(machine->portconfig, "LIGHT0_Y");
 	if( port != NULL )
 	{
 		int rv = input_port_read_direct( port ) << 6;
@@ -1420,7 +1420,7 @@ static READ8_HANDLER( s12_mcu_gun_v_r )
 }
 
 static ADDRESS_MAP_START( s12h8iomap, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(H8_PORT7, H8_PORT7) AM_READ( input_port_0_r )
+	AM_RANGE(H8_PORT7, H8_PORT7) AM_READ_PORT("DSW")
 	AM_RANGE(H8_PORT8, H8_PORT8) AM_READ( s12_mcu_p8_r ) AM_WRITENOP
 	AM_RANGE(H8_PORTA, H8_PORTA) AM_READWRITE( s12_mcu_pa_r, s12_mcu_pa_w )
 	AM_RANGE(H8_PORTB, H8_PORTB) AM_READWRITE( s12_mcu_portB_r, s12_mcu_portB_w )
@@ -1510,7 +1510,7 @@ static MACHINE_DRIVER_START( coh700 )
 MACHINE_DRIVER_END
 
 static INPUT_PORTS_START( namcos12 )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR(Service_Mode) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1519,7 +1519,7 @@ static INPUT_PORTS_START( namcos12 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xff3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -1537,7 +1537,7 @@ static INPUT_PORTS_START( namcos12 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("IN2")
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
@@ -1559,63 +1559,63 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ptblank2 )
 	PORT_INCLUDE( namcos12 )
 
-	PORT_MODIFY("IN1")
+	PORT_MODIFY("IN0")
 	PORT_BIT( 0x6f6f, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("IN2")
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x00ee, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN3")
+	PORT_START_TAG("LIGHT0_X")
 	PORT_BIT( 0xffff, 0x022f, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0xd8,0x387) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	PORT_START_TAG("IN4")
+	PORT_START_TAG("LIGHT0_Y")
 	PORT_BIT( 0xffff, 0x00a8, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x2c,0x11b) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	PORT_START_TAG("IN5")
+	PORT_START_TAG("LIGHT1_X")
 	PORT_BIT( 0xffff, 0x022f, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0xd8,0x387) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(2)
 
-	PORT_START_TAG("IN6")
+	PORT_START_TAG("LIGHT1_Y")
 	PORT_BIT( 0xffff, 0x00a8, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x2c,0x11b) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ghlpanic )
 	PORT_INCLUDE( namcos12 )
 
-	PORT_MODIFY("IN1")
+	PORT_MODIFY("IN0")
 	PORT_BIT( 0x6f6f, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("IN2")
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x00ee, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN3")
+	PORT_START_TAG("LIGHT0_X")
 	PORT_BIT( 0xffff, 0x0210, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0xc0,0x35f) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	PORT_START_TAG("IN4")
+	PORT_START_TAG("LIGHT0_Y")
 	PORT_BIT( 0xffff, 0x0091, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x1a,0x109) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	PORT_START_TAG("IN5")
+	PORT_START_TAG("LIGHT1_X")
 	PORT_BIT( 0xffff, 0x0210, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0xc0,0x35f) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(2)
 
-	PORT_START_TAG("IN6")
+	PORT_START_TAG("LIGHT1_Y")
 	PORT_BIT( 0xffff, 0x0091, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x1a,0x109) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( golgo13 )
 	PORT_INCLUDE( namcos12 )
 
-	PORT_MODIFY("IN1")
+	PORT_MODIFY("IN0")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xff43, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_MODIFY("IN2")
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x10ee, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN3")
+	PORT_START_TAG("LIGHT0_X")
 	PORT_BIT( 0xffff, 0x019b, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x9c,0x29b) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	PORT_START_TAG("IN4")
+	PORT_START_TAG("LIGHT0_Y")
 	PORT_BIT( 0xffff, 0x00fe, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_MINMAX(0x1f,0x1de) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_REVERSE
 INPUT_PORTS_END
 
