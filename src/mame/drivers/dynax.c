@@ -5150,6 +5150,60 @@ ROM_START( mjelct3a )
 	ROM_LOAD( "eb-02.rom", 0x00000, 0x80000, CRC(e1f1b431) SHA1(04a612aff4c30cb8ea741f228bfa7e4289acfee8) )
 ROM_END
 
+/***************************************************************************
+Mahjong Electron Base (bootleg)
+
+PCB works (see s/shot in archive), but I couldn't get it
+to do anything other than show a diagnostic screen??
+
+PCB Layout
+----------
+
+5G009B
+|--------------------------------------------|
+|    VOL  E5.U2        ALS9106               |
+|uPC1242H                   TMS4461   TMS4461|
+|         SANYA-01.U8                        |
+|                           TMS4461   TMS4461|
+|                                            |
+|        3.579545MHz        6116      TMS4461|
+|                                            |
+|                           6116      TMS4461|
+|  YM2149                                    |
+|                                            |
+|                          |-------|         |
+|  6845                    |TAICOM |         |
+|                          |AL9301 |     DSW2|
+|           Z84C015        |       |         |
+|                          |-------|     DSW3|
+|                             DSW(2)         |
+|  PRG.U27        21.25MHz               DSW4|
+|    6264                                    |
+|    10-WAY            18-WAY            DSW5|
+|--------------------------------------------|
+Notes:
+PCB uses standard 10-way/18-way Mahjong pinout
+ALS9106 - sound related?, tied to U2 & U8
+AL9301  - TAICOM AL9301 graphics generator (QFP160)
+Z84C015 - Toshiba TMPZ84C015BF-6 Z80 compatible CPU
+***************************************************************************/
+
+ROM_START( mjelctrb )
+	ROM_REGION( 0x30000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_LOAD( "prog.u27", 0x00000, 0x20000, CRC(688990ca) SHA1(34825cee8f76de93f12ccf2a1021f9c5369da46a) )
+	ROM_RELOAD(          0x28000, 0x08000 )
+	ROM_CONTINUE(        0x20000, 0x08000 )
+	ROM_CONTINUE(        0x18000, 0x08000 )
+	ROM_CONTINUE(        0x10000, 0x08000 )
+
+	ROM_REGION( 0x100000, REGION_GFX1, 0 )	// blitter data
+	ROM_LOAD( "eb-01.rom", 0x000000, 0x100000, CRC(e5c41448) SHA1(b8322e32b0cb3d771316c9c4f7be91de6e422a24) )
+
+	ROM_REGION( 0x80000, REGION_GFX2, 0 )	// blitter data
+	ROM_LOAD( "eb-02.rom", 0x00000, 0x80000, CRC(e1f1b431) SHA1(04a612aff4c30cb8ea741f228bfa7e4289acfee8) )
+ROM_END
+
+
 /*
 
 Sea Hunter Penguin
@@ -6181,6 +6235,7 @@ GAME( 1990, jantouki, 0,        jantouki, jantouki, 0,        ROT0,   "Dynax",  
 GAME( 1993, mjelctrn, 0,        mjelctrn, mjelctrn, mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 4, Japan)",                   0 )
 GAME( 1990, mjelct3,  mjelctrn, mjelctrn, mjelct3,  mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, Japan)",                   0 )
 GAME( 1990, mjelct3a, mjelctrn, mjelctrn, mjelct3,  mjelct3a, ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, alt., Japan)",             0 )
+GAME( 1993, mjelctrb, mjelctrn, mjelctrn, mjelct3,  mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 4, Japan, BOOTLEG)",          0 )
 GAME( 1990, hjingi,   0,        majxtal7, majxtal7, 0,        ROT0,   "Dynax",                    "Hanajingi",                                                    GAME_NOT_WORKING )
 GAME( 1990, majxtal7, 0,        majxtal7, majxtal7, mjelct3,  ROT180, "Dynax",                    "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)",GAME_IMPERFECT_GRAPHICS )
 GAME( 1990, neruton,  0,        neruton,  neruton,  mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan)",                         GAME_IMPERFECT_GRAPHICS )

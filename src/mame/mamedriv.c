@@ -7205,6 +7205,7 @@ Other Sun games
 	DRIVER( mjelctrn )	/* "???" Mahjong Electron Base parts 2 & 4 */
 	DRIVER( mjelct3 )	/* "???" Mahjong Electron Base parts 2 & 3 */
 	DRIVER( mjelct3a )	/* "???" Mahjong Electron Base parts 2 & 3 */
+	DRIVER( mjelctrb )	/* (c) 1993 Dynax Mahjong Electron Base parts  4 */
 	DRIVER( majxtal7 )	/* "???" */
 
 	/* Sigma games */
