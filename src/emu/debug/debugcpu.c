@@ -545,7 +545,7 @@ void debug_cpu_instruction_hook(running_machine *machine, offs_t curpc)
 		/* check the temp running breakpoint and break if we hit it */
 		else if ((info->flags & DEBUG_FLAG_STOP_PC) != 0 && info->stopaddr == curpc)
 		{
-			debug_console_printf("Stopped at temporary breakpoint %X on CPU %d\n", info->stopaddr, info - global.cpuinfo);
+			debug_console_printf("Stopped at temporary breakpoint %X on CPU %d\n", info->stopaddr, (int)(info - global.cpuinfo));
 			global.execution_state = EXECUTION_STATE_STOPPED;
 		}
 
