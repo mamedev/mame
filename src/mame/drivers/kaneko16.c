@@ -604,7 +604,7 @@ static READ16_HANDLER( gtmr_wheel_r )
 		case 0x0000:	// 'Both Sides' = 270deg Wheel
 			return	(input_port_read(machine, "WHEEL0"));
 			break;
-	
+
 		case 0x1000:	// '1P Side' = 360' Wheel
 			return	(input_port_read(machine, "WHEEL1"));
 			break;
@@ -1417,7 +1417,7 @@ static INPUT_PORTS_START( gtmr2 )
 	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(      0x1800, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(      0x0800, "Wheel (360)" )			// Not working correctly in race }
-	PORT_DIPSETTING(      0x1000, "Wheel (270D)" )			// Not working correctly !	 } seems to work ok to me! (minwah)
+	PORT_DIPSETTING(      0x1000, "Wheel (270D)" )			// Not working correctly !   } seems to work ok to me! (minwah)
 	PORT_DIPSETTING(      0x0000, "Wheel (270A)" )			// Not working correctly in race }
 	PORT_DIPNAME( 0x2000, 0x2000, "Optional Mode Of Pedal Function" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x2000, "Microswitch" )			// "This mode also corresponds to the two buttons used with joystick."

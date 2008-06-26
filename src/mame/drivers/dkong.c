@@ -2867,7 +2867,7 @@ static void drakton_decrypt_rom(running_machine *machine, UINT8 mod, int offs, i
 
 		newbyte = (oldbyte & mod) | (~oldbyte & ~mod);
 		newbyte = BITSWAP8(newbyte, bs[0], bs[1], bs[2], bs[3], bs[4], bs[5], bs[6], bs[7]);
-		
+
 		ROM[mem + offs] = newbyte;
 	}
 }
@@ -2899,13 +2899,13 @@ static DRIVER_INIT( herodk )
 
 static DRIVER_INIT( drakton )
 {
-	int bs[4][8] = { 
+	int bs[4][8] = {
 			{7,6,1,3,0,4,2,5},
 			{7,1,4,3,0,6,2,5},
 			{7,6,1,0,3,4,2,5},
 			{7,1,4,0,3,6,2,5},
 	};
-	
+
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1 );
 
 	/* While the PAL supports up to 16 decryption methods, only four
@@ -2921,7 +2921,7 @@ static DRIVER_INIT( drakton )
 
 static DRIVER_INIT( strtheat )
 {
-	int bs[4][8] = { 
+	int bs[4][8] = {
 			{0,6,1,7,3,4,2,5},
 			{0,6,4,1,3,7,2,5},
 			{6,3,1,7,0,4,2,5},

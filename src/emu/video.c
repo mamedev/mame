@@ -351,7 +351,7 @@ void video_init(running_machine *machine)
 	/* create a render target for snapshots */
 	viewname = options_get_string(mame_options(), OPTION_SNAPVIEW);
 	global.snap_native = (machine->primary_screen != NULL && (viewname[0] == 0 || strcmp(viewname, "native") == 0));
-	
+
 	/* the native target is hard-coded to our internal layout and has all options disabled */
 	if (global.snap_native)
 	{
@@ -359,7 +359,7 @@ void video_init(running_machine *machine)
 		assert(global.snap_target != NULL);
 		render_target_set_layer_config(global.snap_target, 0);
 	}
-	
+
 	/* other targets select the specified view and turn off effects */
 	else
 	{

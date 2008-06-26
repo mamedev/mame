@@ -9,9 +9,9 @@
 
 **********************************************************************
 
-	Future work:
-	
-	- enable history to be enabled/disabled to improve performance
+    Future work:
+
+    - enable history to be enabled/disabled to improve performance
 
 *********************************************************************/
 
@@ -60,7 +60,7 @@ struct _debugger_private
 
 	int				execution_state;
 	int 			memory_hook_cpunum;
-	
+
 	UINT32			bpindex;
 	UINT32			wpindex;
 
@@ -119,7 +119,7 @@ static void set_cpu_reg(UINT32 ref, UINT64 value);
 ***************************************************************************/
 
 /*-------------------------------------------------
-    debug_cpu_within_instruction_hook - true if 
+    debug_cpu_within_instruction_hook - true if
     the debugger is currently live
 -------------------------------------------------*/
 
@@ -293,7 +293,7 @@ static void debug_cpu_exit(running_machine *machine)
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 	{
 		debug_cpu_info *info = &global.cpuinfo[cpunum];
-	
+
 		/* close any tracefiles */
 		if (info->trace.file)
 			fclose(info->trace.file);
@@ -345,14 +345,14 @@ static void compute_debug_flags(running_machine *machine, const debug_cpu_info *
 	/* many of our states require us to be called on each instruction */
 	if (global.execution_state == EXECUTION_STATE_STOPPED)
 		machine->debug_flags |= DEBUG_FLAG_CALL_HOOK;
-	if ((info->flags & (DEBUG_FLAG_HISTORY | DEBUG_FLAG_TRACING_ANY | DEBUG_FLAG_HOOKED | 
+	if ((info->flags & (DEBUG_FLAG_HISTORY | DEBUG_FLAG_TRACING_ANY | DEBUG_FLAG_HOOKED |
 						DEBUG_FLAG_STEPPING_ANY | DEBUG_FLAG_STOP_PC | DEBUG_FLAG_LIVE_BP)) != 0)
 		machine->debug_flags |= DEBUG_FLAG_CALL_HOOK;
-	
+
 	/* if we are stopping at a particular time and that time is within the current timeslice, we need to be called */
 	if ((info->flags & DEBUG_FLAG_STOP_TIME) && attotime_compare(info->endexectime, info->stoptime) <= 0)
 		machine->debug_flags |= DEBUG_FLAG_CALL_HOOK;
-	
+
 	/* add in the watchpoint flags */
 	machine->debug_flags |= (info->flags & DEBUG_FLAG_WATCHPOINT) >> (24 - 4);
 }
@@ -366,7 +366,7 @@ static void compute_debug_flags(running_machine *machine, const debug_cpu_info *
 static void reset_transient_flags(running_machine *machine)
 {
 	int cpunum;
-	
+
 	/* loop over CPUs and reset the transient flags */
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(global.cpuinfo); cpunum++)
 		global.cpuinfo[cpunum].flags &= ~DEBUG_FLAG_TRANSIENT;
@@ -374,8 +374,8 @@ static void reset_transient_flags(running_machine *machine)
 
 
 /*-------------------------------------------------
-    debug_cpu_start_hook - the CPU execution 
-    system calls this hook before beginning 
+    debug_cpu_start_hook - the CPU execution
+    system calls this hook before beginning
     execution for the given CPU
 -------------------------------------------------*/
 
@@ -391,7 +391,7 @@ void debug_cpu_start_hook(running_machine *machine, int cpunum, attotime endtime
 
 	/* update the target execution end time */
 	info->endexectime = endtime;
-	
+
 	/* if a VBLANK occurred, check on things */
 	if (global.vblank_occurred && global.execution_state != EXECUTION_STATE_STOPPED)
 	{
@@ -403,7 +403,7 @@ void debug_cpu_start_hook(running_machine *machine, int cpunum, attotime endtime
 			global.execution_state = EXECUTION_STATE_STOPPED;
 			debug_console_printf("Stopped at VBLANK\n");
 		}
-		
+
 		/* check for debug keypresses */
 		else if (input_ui_pressed(machine, IPT_UI_DEBUG_BREAK))
 		{
@@ -425,15 +425,15 @@ void debug_cpu_start_hook(running_machine *machine, int cpunum, attotime endtime
 
 
 /*-------------------------------------------------
-    debug_cpu_stop_hook - the CPU execution 
-    system calls this hook when ending execution 
+    debug_cpu_stop_hook - the CPU execution
+    system calls this hook when ending execution
     for the given CPU
 -------------------------------------------------*/
 
 void debug_cpu_stop_hook(running_machine *machine, int cpunum)
 {
 	debug_cpu_info *info = &global.cpuinfo[cpunum];
-	
+
 	assert(global.livecpu == info);
 
 	/* if we're stopping on a context switch, handle it now */
@@ -449,14 +449,14 @@ void debug_cpu_stop_hook(running_machine *machine, int cpunum)
 
 
 /*-------------------------------------------------
-    debug_cpu_interrupt_hook - called when an 
+    debug_cpu_interrupt_hook - called when an
     interrupt is acknowledged
 -------------------------------------------------*/
 
 void debug_cpu_interrupt_hook(running_machine *machine, int cpunum, int irqline)
 {
 	debug_cpu_info *info = &global.cpuinfo[cpunum];
-	
+
 	/* see if this matches a pending interrupt request */
 	if ((info->flags & DEBUG_FLAG_STOP_INTERRUPT) != 0 && (info->stopirq == -1 || info->stopirq == irqline))
 	{
@@ -468,14 +468,14 @@ void debug_cpu_interrupt_hook(running_machine *machine, int cpunum, int irqline)
 
 
 /*-------------------------------------------------
-    debug_cpu_exception_hook - called when an 
+    debug_cpu_exception_hook - called when an
     exception is generated
 -------------------------------------------------*/
 
 void debug_cpu_exception_hook(running_machine *machine, int cpunum, int exception)
 {
 	debug_cpu_info *info = &global.cpuinfo[cpunum];
-	
+
 	/* see if this matches a pending interrupt request */
 	if ((info->flags & DEBUG_FLAG_STOP_EXCEPTION) != 0 && (info->stopexception == -1 || info->stopexception == exception))
 	{
@@ -487,7 +487,7 @@ void debug_cpu_exception_hook(running_machine *machine, int cpunum, int exceptio
 
 
 /*-------------------------------------------------
-    debug_cpu_instruction_hook - called by the 
+    debug_cpu_instruction_hook - called by the
     CPU cores before executing each instruction
 -------------------------------------------------*/
 
@@ -522,7 +522,7 @@ void debug_cpu_instruction_hook(running_machine *machine, offs_t curpc)
 			/* if we hit 0, stop */
 			if (info->stepsleft == 0)
 				global.execution_state = EXECUTION_STATE_STOPPED;
-			
+
 			/* update every 100 steps until we are within 200 of the end */
 			else if ((info->flags & DEBUG_FLAG_STEPPING_OUT) == 0 && (info->stepsleft < 200 || info->stepsleft % 100 == 0))
 			{
@@ -791,7 +791,7 @@ void debug_cpu_ignore_cpu(int cpunum, int ignore)
 		info->flags &= ~DEBUG_FLAG_OBSERVING;
 	else
 		info->flags |= DEBUG_FLAG_OBSERVING;
-	
+
 	if (info == global.livecpu && ignore)
 		debug_cpu_next_cpu();
 }
@@ -1108,7 +1108,7 @@ void debug_cpu_get_memory_hooks(int cpunum, debug_hook_read_func *read, debug_ho
 void debug_cpu_set_instruction_hook(int cpunum, int (*hook)(offs_t pc))
 {
 	debug_cpu_info *info = &global.cpuinfo[cpunum];
-	
+
 	/* set the hook and also the CPU's flag for fast knowledge of the hook */
 	info->instrhook = hook;
 	if (hook != NULL)
@@ -1144,7 +1144,7 @@ static void breakpoint_update_flags(debug_cpu_info *info)
 
 
 /*-------------------------------------------------
-    breakpoint_check - check the breakpoints for 
+    breakpoint_check - check the breakpoints for
     a given CPU
 -------------------------------------------------*/
 
@@ -1202,7 +1202,7 @@ int debug_cpu_breakpoint_set(int cpunum, offs_t address, parsed_expression *cond
 	/* hook us in */
 	bp->next = info->bplist;
 	info->bplist = bp;
-	
+
 	/* ensure the live breakpoint flag is set */
 	breakpoint_update_flags(info);
 	return bp->index;
@@ -1237,7 +1237,7 @@ int debug_cpu_breakpoint_clear(int bpnum)
 				if (bp->action != NULL)
 					free(bp->action);
 				free(bp);
-				
+
 				/* update the flags */
 				breakpoint_update_flags(info);
 				return 1;
@@ -1453,7 +1453,7 @@ int debug_cpu_watchpoint_clear(int wpnum)
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 	{
 		debug_cpu_info *info = &global.cpuinfo[cpunum];
-		
+
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 			for (pwp = NULL, wp = info->space[spacenum].wplist; wp != NULL; pwp = wp, wp = wp->next)
 				if (wp->index == wpnum)
@@ -1500,7 +1500,7 @@ int debug_cpu_watchpoint_enable(int wpnum, int enable)
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 	{
 		debug_cpu_info *info = &global.cpuinfo[cpunum];
-		
+
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 			for (wp = info->space[spacenum].wplist; wp; wp = wp->next)
 				if (wp->index == wpnum)

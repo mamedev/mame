@@ -38,7 +38,7 @@ void debugger_refresh_display(running_machine *machine);
 ***************************************************************************/
 
 /*-------------------------------------------------
-    debugger_instruction_hook - CPU cores call 
+    debugger_instruction_hook - CPU cores call
     this once per instruction from CPU cores
 -------------------------------------------------*/
 
@@ -50,8 +50,8 @@ INLINE void debugger_instruction_hook(running_machine *machine, offs_t curpc)
 
 
 /*-------------------------------------------------
-    debugger_start_cpu_hook - the CPU execution 
-    system calls this hook before beginning 
+    debugger_start_cpu_hook - the CPU execution
+    system calls this hook before beginning
     execution for the given CPU
 -------------------------------------------------*/
 
@@ -63,8 +63,8 @@ INLINE void debugger_start_cpu_hook(running_machine *machine, int cpunum, attoti
 
 
 /*-------------------------------------------------
-    debugger_stop_cpu_hook - the CPU execution 
-    system calls this hook when ending execution 
+    debugger_stop_cpu_hook - the CPU execution
+    system calls this hook when ending execution
     for the given CPU
 -------------------------------------------------*/
 
@@ -88,8 +88,8 @@ INLINE void debugger_break(running_machine *machine)
 
 
 /*-------------------------------------------------
-    debugger_within_instruction_hook - call this 
-    to determine if the debugger is currently 
+    debugger_within_instruction_hook - call this
+    to determine if the debugger is currently
     halted within the instruction hook
 -------------------------------------------------*/
 

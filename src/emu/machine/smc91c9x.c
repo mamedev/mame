@@ -549,7 +549,7 @@ static DEVICE_START( smc91c9x )
 static DEVICE_RESET( smc91c9x )
 {
 	smc91c9x_state *smc = get_safe_token(device);
-	
+
 	memset(smc->reg, 0, sizeof(smc->reg));
 	memset(smc->regmask, 0, sizeof(smc->regmask));
 	smc->irq_state = 0;

@@ -204,7 +204,7 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 						portdata = input_port_read(machine, "KEY4");
 						break;
 					default:
-						portdata = (input_port_read(machine, "KEY0") & input_port_read(machine, "KEY1") & input_port_read(machine, "KEY2") 
+						portdata = (input_port_read(machine, "KEY0") & input_port_read(machine, "KEY1") & input_port_read(machine, "KEY2")
 									& input_port_read(machine, "KEY3") & input_port_read(machine, "KEY4"));
 						break;
 				}
@@ -229,7 +229,7 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 						portdata = input_port_read(machine, "KEY9");
 						break;
 					default:
-						portdata = (input_port_read(machine, "KEY5") & input_port_read(machine, "KEY6") & input_port_read(machine, "KEY7") 
+						portdata = (input_port_read(machine, "KEY5") & input_port_read(machine, "KEY6") & input_port_read(machine, "KEY7")
 									& input_port_read(machine, "KEY8") & input_port_read(machine, "KEY9"));
 						break;
 				}
@@ -1756,13 +1756,13 @@ ADDRESS_MAP_END
 
 /********************************************************************************
 These Nichibutsu Mahjong games use two different but very similar control ports:
-	- the 1st type is the common control panel used by many other nbmj* drivers
-	- the 2nd type also include coins and service bits
+    - the 1st type is the common control panel used by many other nbmj* drivers
+    - the 2nd type also include coins and service bits
 ********************************************************************************/
 
 static INPUT_PORTS_START( nbmjtype2 )
 	PORT_INCLUDE( nbmjcontrols )
-	
+
 	PORT_MODIFY("KEY4")
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )

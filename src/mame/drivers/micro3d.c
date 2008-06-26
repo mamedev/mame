@@ -742,7 +742,7 @@ static ADDRESS_MAP_START( hostmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x13ffff) AM_ROM					/* 68000 Code ROM and Dr. Math object data */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM					/* Battery-backed SRAM (64kB) & DS1215 */
 	AM_RANGE(0x800000, 0x83ffff) AM_RAM					/* 68000/AM29000 shared RAM (256kB) */
-	AM_RANGE(0x900000, 0x900001) AM_NOP //WRITE(mystery_w)	/* ??????? 16-bit write here. rset? */
+	AM_RANGE(0x900000, 0x900001) AM_NOP //WRITE(mystery_w)  /* ??????? 16-bit write here. rset? */
 	AM_RANGE(0x920000, 0x920001) AM_READ_PORT("IN1")	/* User inputs C and D */
 	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("IN0")	/* User inputs A and B */
 	AM_RANGE(0x960000, 0x960001) AM_NOP					/* Lamps */
@@ -761,8 +761,8 @@ static ADDRESS_MAP_START( vgbmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(&micro3d_sprite_vram)	/* 2 Banks */
 	AM_RANGE(0x00800000, 0x00bfffff) AM_RAM							/* 512kB Main DRAM */
 	AM_RANGE(0x00c00000, 0x00c0000f) AM_READ_PORT("VGB")			/* TI Monitor Mode switch */
-	AM_RANGE(0x00e00000, 0x00e0000f) AM_RAM //WRITE(mystery2_w)		/* CREGCLK ??? byte write here. */
-	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM_WRITE(paletteram16_BBBBBRRRRRGGGGGG_word_w) AM_BASE(&paletteram16) // AM_RANGE(0x02010000, 0x027fffff) AM_RAM		/* ??????????? Mirror of VRAM??? */
+	AM_RANGE(0x00e00000, 0x00e0000f) AM_RAM //WRITE(mystery2_w)     /* CREGCLK ??? byte write here. */
+	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM_WRITE(paletteram16_BBBBBRRRRRGGGGGG_word_w) AM_BASE(&paletteram16) // AM_RANGE(0x02010000, 0x027fffff) AM_RAM       /* ??????????? Mirror of VRAM??? */
 	AM_RANGE(0x02600000, 0x0260000f) AM_RAM							/* XFER3dk???? 16-bit write */
 	AM_RANGE(0x02c00000, 0x02c0003f) AM_READ(ti_uart_r)				/* SCN UART */
 	AM_RANGE(0x02e00000, 0x02e0003f) AM_WRITE(ti_uart_w)

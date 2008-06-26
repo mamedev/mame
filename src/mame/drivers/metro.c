@@ -2980,13 +2980,13 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( lastfort )
 	PORT_START_TAG("IN0")	/*$c00004*/
 	COINS
-	
+
 	PORT_START_TAG("IN1")	/*$c00006*/
 	JOY_LSB(1, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)		/* BUTTON2 and BUTTON3 in "test mode" only*/
-	
+
 	PORT_START_TAG("IN2")	/*$c00008*/
 	JOY_LSB(2, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)		/*BUTTON2 and BUTTON3 in "test mode" only*/
-	
+
 	PORT_START_TAG("DSW0")	/*$c0000a*/
 	COINAGE_DSW
 
@@ -3027,7 +3027,7 @@ INPUT_PORTS_END
 /* Same as 'lastfort' but WORKING "Tiles" Dip Switch */
 static INPUT_PORTS_START( lastfero )
 	PORT_INCLUDE( lastfort )
-	
+
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )		// Timer speed
 	PORT_DIPSETTING(      0x0000, DEF_STR( Easiest ) )			//   Slowest

@@ -60,7 +60,7 @@ void init_konami_cgboard(int num_boards, int type)
 
 		nwk_fifo[i] = auto_malloc(sizeof(UINT32) * 0x800);
 		nwk_ram[i] = auto_malloc(sizeof(UINT32) * 0x2000);
-		
+
 		state_save_register_item_array("konppc", i, dsp_comm_ppc[i]);
 		state_save_register_item_array("konppc", i, dsp_comm_sharc[i]);
 		state_save_register_item("konppc", i, dsp_shared_ram_bank[i]);

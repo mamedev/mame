@@ -180,7 +180,7 @@ WRITE16_HANDLER( midxunit_unknown_w )
 READ16_HANDLER( midwunit_io_r )
 {
 	static const char *portnames[] = { "IN0", "IN1", "DSW", "IN2" };
-	
+
 	/* apply I/O shuffling */
 	offset = ioshuffle[offset % 16];
 

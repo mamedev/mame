@@ -740,7 +740,7 @@ void mame_schedule_load(running_machine *machine, const char *filename)
 
 
 /*-------------------------------------------------
-    mame_is_save_or_load_pending - is a save or 
+    mame_is_save_or_load_pending - is a save or
     load pending?
 -------------------------------------------------*/
 

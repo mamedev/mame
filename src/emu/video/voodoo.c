@@ -599,7 +599,7 @@ static STATE_POSTLOAD( voodoo_postload )
 {
 	voodoo_state *v = param;
 	int index, subindex;
-	
+
 	v->fbi.clut_dirty = TRUE;
 	for (index = 0; index < ARRAY_LENGTH(v->tmu); index++)
 	{
@@ -607,7 +607,7 @@ static STATE_POSTLOAD( voodoo_postload )
 		for (subindex = 0; subindex < ARRAY_LENGTH(v->tmu[index].ncc); subindex++)
 			v->tmu[index].ncc[subindex].dirty = TRUE;
 	}
-	
+
 	/* recompute video memory to get the FBI FIFO base recomputed */
 	if (v->type <= VOODOO_2)
 		recompute_video_memory(v);
@@ -630,7 +630,7 @@ static void init_save_state(const device_config *device)
 	state_save_register_item(unique_tag, 0, v->extra_cycles);
 	state_save_register_item_pointer(unique_tag, 0, (&v->reg[0].u), ARRAY_LENGTH(v->reg));
 	state_save_register_item(unique_tag, 0, v->alt_regmap);
-	
+
 	/* register states: pci */
 	state_save_register_item(unique_tag, 0, v->pci.fifo.in);
 	state_save_register_item(unique_tag, 0, v->pci.fifo.out);
@@ -4239,7 +4239,7 @@ static WRITE32_DEVICE_HANDLER( banshee_agp_w )
 WRITE32_DEVICE_HANDLER( banshee_w )
 {
 	voodoo_state *v = get_safe_token(device);
-	
+
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (v->pci.op_pending)
 		flush_fifos(v, timer_get_time());
@@ -4464,10 +4464,10 @@ static DEVICE_START( voodoo )
 	assert(config->type >= VOODOO_1 && config->type < MAX_VOODOO_TYPES);
 	assert(config->fbmem > 0);
 	assert(config->type >= VOODOO_BANSHEE || config->tmumem0 > 0);
-	
+
 	/* store a pointer back to the device */
 	v->device = device;
-	
+
 	/* copy config data */
 	v->freq = config->clock;
 	v->fbi.vblank_client = config->vblank;
@@ -4613,7 +4613,7 @@ static DEVICE_START( voodoo )
 
 	/* do a soft reset to reset everything else */
 	soft_reset(v);
-	
+
 	/* register for save states */
 	init_save_state(device);
 }

@@ -325,7 +325,7 @@ WRITE8_DEVICE_HANDLER( dma8257_drq_w )
 {
 	dma8257_t *dma8257 = get_safe_token(device);
 	int param = (offset << 1) | (data ? 1 : 0);
-	
+
 	timer_call_after_resynch(dma8257, param, dma8257_drq_write_callback);
 }
 

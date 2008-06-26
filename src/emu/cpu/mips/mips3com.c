@@ -72,7 +72,7 @@ INLINE int tlb_entry_is_global(const mips3_tlb_entry *entry)
 void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index, int clock, const mips3_config *config, int (*irqcallback)(int))
 {
 	int tlbindex;
-	
+
 	/* initialize based on the config */
 	memset(mips, 0, sizeof(*mips));
 	mips->flavor = flavor;
@@ -94,7 +94,7 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int in
 
 	/* reset the state */
 	mips3com_reset(mips);
-	
+
 	/* register for save states */
 	state_save_register_item("mips3", index, mips->pc);
 	state_save_register_item_array("mips3", index, mips->r);

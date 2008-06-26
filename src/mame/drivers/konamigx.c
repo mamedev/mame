@@ -1331,9 +1331,9 @@ static MACHINE_DRIVER_START( konamigx )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
 	/* These parameters are actual value written to the CCU.
-	tbyahhoo attract mode desync is caused by another matter. */
+    tbyahhoo attract mode desync is caused by another matter. */
 
-//	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
+//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)

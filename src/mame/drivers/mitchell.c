@@ -214,7 +214,7 @@ static READ8_HANDLER( block_input_r )
 	static int dir[2];
 	static const char *dialnames[] = { "DIAL1", "DIAL2" };
 	static const char *portnames[] = { "IN1", "IN2" };
-	
+
 	if (dial_selected)
 	{
 		int delta;
@@ -632,7 +632,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mgakuen )
 	PORT_INCLUDE( mj_common )
-	
+
 	PORT_START_TAG("DSW1")	/* DSW1 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )

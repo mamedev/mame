@@ -502,7 +502,7 @@ static WRITE32_HANDLER( io20_w )
 static READ32_HANDLER( parallel_port_r )
 {
 	UINT32 r = 0;
-//	static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
+//  static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
 	if (ACCESSING_BITS_8_15)
 	{

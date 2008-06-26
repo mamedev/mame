@@ -3097,14 +3097,14 @@ static x86code *op_debug(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 
 		/* test and branch */
 		emit_mov_r64_imm(&dst, REG_PARAM1, (FPTR)Machine);							// mov   param1,pcp
-		emit_test_m32_imm(&dst, MBD(REG_PARAM1, offsetof(running_machine, debug_flags)), DEBUG_FLAG_CALL_HOOK);		
+		emit_test_m32_imm(&dst, MBD(REG_PARAM1, offsetof(running_machine, debug_flags)), DEBUG_FLAG_CALL_HOOK);
 																						// test  [Machine->debug_flags],DEBUG_FLAG_CALL_HOOK
 		emit_jcc_short_link(&dst, COND_Z, &skip);										// jz    skip
 
 		/* push the parameter */
 		emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &pcp);								// mov   param1,pcp
 		emit_smart_call_m64(drcbe, &dst, &drcbe->debug_cpu_instruction_hook);			// call  debug_cpu_instruction_hook
-		
+
 		resolve_link(&dst, &skip);													// skip:
 	}
 

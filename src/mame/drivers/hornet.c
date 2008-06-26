@@ -676,15 +676,15 @@ static READ8_HANDLER( sysreg_r )
 			break;
 
 		case 3:	/* I/O port 3 */
-			/* 
-				0x80 = JVSINIT (JAMMA I/F SENSE)
-				0x40 = COMMST
-				0x20 = GSENSE
-				0x08 = EEPDO (EEPROM DO)
-				0x04 = ADEOC (ADC EOC)
-				0x02 = ADDOR (ADC DOR)
-				0x01 = ADDO (ADC DO)
-			*/
+			/*
+                0x80 = JVSINIT (JAMMA I/F SENSE)
+                0x40 = COMMST
+                0x20 = GSENSE
+                0x08 = EEPDO (EEPROM DO)
+                0x04 = ADEOC (ADC EOC)
+                0x02 = ADDOR (ADC DOR)
+                0x01 = ADDO (ADC DO)
+            */
 			r = 0xf7 | (eeprom_read_bit() << 3);
 			break;
 
@@ -706,22 +706,22 @@ static WRITE8_HANDLER( sysreg_w )
 		case 1:	/* LED Register 1 */
 			led_reg1 = data;
 			break;
-		
+
 		case 2: /* Parallel data register */
 			mame_printf_debug("Parallel data = %02X\n", data);
 			break;
-		
+
 		case 3:	/* System Register 0 */
-			/* 
-				0x80 = EEPWEN (EEPROM write enable)
-				0x40 = EEPCS (EEPROM CS)
-				0x20 = EEPSCL (EEPROM SCL?)
-				0x10 = EEPDT (EEPROM data)
-				0x08 = JVSTXEN / LAMP3 (something about JAMMA interface)
-				0x04 = LAMP2
-				0x02 = LAMP1
-				0x01 = LAMP0
-			*/
+			/*
+                0x80 = EEPWEN (EEPROM write enable)
+                0x40 = EEPCS (EEPROM CS)
+                0x20 = EEPSCL (EEPROM SCL?)
+                0x10 = EEPDT (EEPROM data)
+                0x08 = JVSTXEN / LAMP3 (something about JAMMA interface)
+                0x04 = LAMP2
+                0x02 = LAMP1
+                0x01 = LAMP0
+            */
 			eeprom_write_bit((data & 0x10) ? 1 : 0);
 			eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 			eeprom_set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
@@ -729,50 +729,50 @@ static WRITE8_HANDLER( sysreg_w )
 			break;
 
 		case 4:	/* System Register 1 */
-			/* 
-				0x80 = SNDRES (sound reset)
-				0x40 = COMRES (COM reset)
-				0x20 = COINRQ2 (EEPROM SCL?)
-				0x10 = COINRQ1 (EEPROM data)
-				0x08 = ADCS (ADC CS)
-				0x04 = ADCONV (ADC CONV)
-				0x02 = ADDI (ADC DI)
-				0x01 = ADDSCLK (ADC SCLK)
-			*/
+			/*
+                0x80 = SNDRES (sound reset)
+                0x40 = COMRES (COM reset)
+                0x20 = COINRQ2 (EEPROM SCL?)
+                0x10 = COINRQ1 (EEPROM data)
+                0x08 = ADCS (ADC CS)
+                0x04 = ADCONV (ADC CONV)
+                0x02 = ADDI (ADC DI)
+                0x01 = ADDSCLK (ADC SCLK)
+            */
 			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 1 = %02X\n", data);
 			break;
-		
+
 		case 5:	/* Sound Control Register */
 			/*
-				0x80 = MODE1
-				0x40 = MUTE1
-				0x20 = DEEN1
-				0x10 = ATCK1
-				0x08 = MODE0
-				0x04 = MUTE0
-				0x02 = DEEN0
-				0x01 = ATCK0
-			*/
+                0x80 = MODE1
+                0x40 = MUTE1
+                0x20 = DEEN1
+                0x10 = ATCK1
+                0x08 = MODE0
+                0x04 = MUTE0
+                0x02 = DEEN0
+                0x01 = ATCK0
+            */
 			mame_printf_debug("Sound control register = %02X\n", data);
 			break;
 
 		case 6:	/* WDT Register */
 			/*
-				0x80 = WDTCLK
-			*/
+                0x80 = WDTCLK
+            */
 			if (data & 0x80)
 				watchdog_reset(machine);
 			break;
 
 		case 7:	/* CG Control Register */
 			/*
-				0x80 = EXRES1
-				0x40 = EXRES0
-				0x20 = EXID1
-				0x10 = EXID0
-				0x01 = EXRGB
-			*/
+                0x80 = EXRES1
+                0x40 = EXRES0
+                0x20 = EXID1
+                0x10 = EXID0
+                0x01 = EXRGB
+            */
 			if (data & 0x80)
 				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)
@@ -1146,7 +1146,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( hornet_2board_v2 )
 	MDRV_IMPORT_FROM(hornet_2board)
-	
+
 	MDRV_3DFX_VOODOO_REMOVE("voodoo0")
 	MDRV_3DFX_VOODOO_2_ADD("voodoo0", STD_VOODOO_2_CLOCK, 2, "left")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
@@ -1340,7 +1340,7 @@ static void init_hornet_2board(running_machine *machine, const UINT8 *backupdef)
 static DRIVER_INIT(gradius4)
 {
 	UINT8 backupdef[0x2000] = { 0 };
-	
+
 	/* RTC data */
 	backupdef[0x00] = 0x47;	// 'G'
 	backupdef[0x01] = 0x58;	// 'X'

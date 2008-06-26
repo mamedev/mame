@@ -385,7 +385,7 @@ READ8_HANDLER( nb1413m3_inputport0_r )
 		case NB1413M3_PASTELG:
 			return ((input_port_read(machine, "SYSTEM") & 0xfe) | (nb1413m3_busyflag & 0x01));
 		default:
-			return ((input_port_read(machine, "SYSTEM") & 0xfc) | ((nb1413m3_outcoin_flag & 0x01) << 1) | (nb1413m3_busyflag & 0x01)); 
+			return ((input_port_read(machine, "SYSTEM") & 0xfc) | ((nb1413m3_outcoin_flag & 0x01) << 1) | (nb1413m3_busyflag & 0x01));
 	}
 }
 
@@ -414,7 +414,7 @@ READ8_HANDLER( nb1413m3_inputport1_r )
 					case 0x04:	return input_port_read(machine, "KEY2");
 					case 0x08:	return input_port_read(machine, "KEY3");
 					case 0x10:	return input_port_read(machine, "KEY4");
-					default:	return (input_port_read(machine, "KEY0") & input_port_read(machine, "KEY1") & input_port_read(machine, "KEY2") 
+					default:	return (input_port_read(machine, "KEY0") & input_port_read(machine, "KEY1") & input_port_read(machine, "KEY2")
 										& input_port_read(machine, "KEY3") & input_port_read(machine, "KEY4"));
 				}
 			}
@@ -432,7 +432,7 @@ READ8_HANDLER( nb1413m3_inputport1_r )
 				case 0x04:	return input_port_read(machine, "KEY2");
 				case 0x08:	return input_port_read(machine, "KEY3");
 				case 0x10:	return input_port_read(machine, "KEY4");
-				default:	return (input_port_read(machine, "KEY0") & input_port_read(machine, "KEY1") & input_port_read(machine, "KEY2") 
+				default:	return (input_port_read(machine, "KEY0") & input_port_read(machine, "KEY1") & input_port_read(machine, "KEY2")
 									& input_port_read(machine, "KEY3") & input_port_read(machine, "KEY4"));
 			}
 			break;
@@ -464,7 +464,7 @@ READ8_HANDLER( nb1413m3_inputport2_r )
 					case 0x04:	return input_port_read(machine, "KEY7");
 					case 0x08:	return input_port_read(machine, "KEY8");
 					case 0x10:	return input_port_read(machine, "KEY9");
-					default:	return (input_port_read(machine, "KEY5") & input_port_read(machine, "KEY6") & input_port_read(machine, "KEY7") 
+					default:	return (input_port_read(machine, "KEY5") & input_port_read(machine, "KEY6") & input_port_read(machine, "KEY7")
 										& input_port_read(machine, "KEY8") & input_port_read(machine, "KEY9"));
 				}
 			}
@@ -482,7 +482,7 @@ READ8_HANDLER( nb1413m3_inputport2_r )
 				case 0x04:	return input_port_read(machine, "KEY7");
 				case 0x08:	return input_port_read(machine, "KEY8");
 				case 0x10:	return input_port_read(machine, "KEY9");
-				default:	return (input_port_read(machine, "KEY5") & input_port_read(machine, "KEY6") & input_port_read(machine, "KEY7") 
+				default:	return (input_port_read(machine, "KEY5") & input_port_read(machine, "KEY6") & input_port_read(machine, "KEY7")
 									& input_port_read(machine, "KEY8") & input_port_read(machine, "KEY9"));
 			}
 			break;

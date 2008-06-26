@@ -214,7 +214,7 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 
 	/* reset the state */
 	ppccom_reset(ppc);
-	
+
 	/* register for save states */
 	state_save_register_item("ppc", index, ppc->pc);
 	state_save_register_item_array("ppc", index, ppc->r);

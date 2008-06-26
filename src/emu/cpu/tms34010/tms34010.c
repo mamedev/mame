@@ -855,7 +855,7 @@ static int tms34010_execute(int cycles)
 		{
 			if ((state.screen->machine->debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
 			{
-				state.st = GET_ST(); 
+				state.st = GET_ST();
 				debugger_instruction_hook(Machine, PC);
 			}
 			state.op = ROPCODE();

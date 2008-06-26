@@ -37,7 +37,7 @@
 #include "streams.h"
 #include "multipcm.h"
 
-//¿?¿?
+//????
 #define MULTIPCM_CLOCKDIV    	(180.0)
 
 struct _Sample
@@ -113,7 +113,7 @@ static signed int LPANTABLE[0x800],RPANTABLE[0x800];
 #define FIX(v)	((UINT32) ((float) (1<<SHIFT)*(v)))
 
 static const int val2chan[] =
-{	 
+{
 	0, 1, 2, 3, 4, 5, 6 , -1,
 	7, 8, 9, 10,11,12,13, -1,
 	14,15,16,17,18,19,20, -1,
@@ -127,7 +127,7 @@ static const int val2chan[] =
 #define MULTIPCM_RATE	44100.0
 
 /*******************************
-		ENVELOPE SECTION
+        ENVELOPE SECTION
 *******************************/
 
 //Times are based on a 44100Hz timebase. It's adjusted to the actual sampling rate on startup
@@ -202,7 +202,7 @@ static void EG_Calc(struct _MultiPCM *ptChip,struct _SLOT *slot)
 	if(slot->Sample->KRS!=0xf)
 		rate=(octave+slot->Sample->KRS)*2+((slot->Regs[3]>>3)&1);
 	else
-		rate=0; 
+		rate=0;
 
 	slot->EG.AR=Get_RATE(ptChip->ARStep,rate,slot->Sample->AR);
 	slot->EG.D1R=Get_RATE(ptChip->DRStep,rate,slot->Sample->DR1);
@@ -213,7 +213,7 @@ static void EG_Calc(struct _MultiPCM *ptChip,struct _SLOT *slot)
 }
 
 /*****************************
-		LFO  SECTION
+        LFO  SECTION
 *****************************/
 
 #define LFO_SHIFT 	8
@@ -279,7 +279,7 @@ static void LFO_Init(void)
 INLINE signed int PLFO_Step(struct _LFO *LFO)
 {
 	int p;
-	LFO->phase+=LFO->phase_step;    
+	LFO->phase+=LFO->phase_step;
 	p=LFO->table[(LFO->phase>>LFO_SHIFT)&0xff];
 	p=LFO->scale[p+128];
 	return p<<(SHIFT-LFO_SHIFT);
@@ -288,7 +288,7 @@ INLINE signed int PLFO_Step(struct _LFO *LFO)
 INLINE signed int ALFO_Step(struct _LFO *LFO)
 {
 	int p;
-	LFO->phase+=LFO->phase_step;    
+	LFO->phase+=LFO->phase_step;
 	p=LFO->table[(LFO->phase>>LFO_SHIFT)&0xff];
 	p=LFO->scale[p];
 	return p<<(SHIFT-LFO_SHIFT);
@@ -357,7 +357,7 @@ void WriteSlot(struct _MultiPCM *ptChip,struct _SLOT *slot,int reg,unsigned char
 					EG_Calc(ptChip,slot);
 					slot->EG.state=ATTACK;
 					slot->EG.volume=0;
-					
+
 					if(slot->Base>=0x100000)
 					{
 						if(slot->Pan&8)
@@ -391,7 +391,7 @@ void WriteSlot(struct _MultiPCM *ptChip,struct _SLOT *slot,int reg,unsigned char
 				}
 				else
 					slot->TL=slot->DstTL<<SHIFT;
-			}	
+			}
 			break;
 		case 6:	//LFO freq+PLFO
 			{
@@ -431,7 +431,7 @@ static void MultiPCM_update(void *param, stream_sample_t **inputs, stream_sample
 	{
 		signed int smpl=0;
 		signed int smpr=0;
-		for(sl=0;sl<28;++sl)	
+		for(sl=0;sl<28;++sl)
 		{
 			struct _SLOT *slot=ptChip->Slots+sl;
 			if(slot->Playing)
@@ -483,7 +483,7 @@ static void MultiPCM_update(void *param, stream_sample_t **inputs, stream_sample
 
 unsigned char MultiPCM_reg_r(int chip, int offset)
 {
-//	struct _MultiPCM *ptChip = sndti_token(SOUND_MULTIPCM, chip);
+//  struct _MultiPCM *ptChip = sndti_token(SOUND_MULTIPCM, chip);
 	return 0;
 }
 
@@ -514,7 +514,7 @@ static void *multipcm_start(int sndindex, int clock, const void *config)
 		SegaDB=(float) iTL*(-24.0)/(float) 0x40;
 
 		TL=pow(10.0,SegaDB/20.0);
-		
+
 
 		if(iPAN==0x8)
 		{
@@ -527,7 +527,7 @@ static void *multipcm_start(int sndindex, int clock, const void *config)
 		else if(iPAN&0x8)
 		{
 			LPAN=1.0;
-			
+
 			iPAN=0x10-iPAN;
 
 			SegaDB=(float) iPAN*(-12.0)/(float) 0x4;

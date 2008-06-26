@@ -281,8 +281,8 @@ static READ16_HANDLER( musobana_inputport_0_r )
 		case 0x04:	portdata = ((input_port_read(machine, "KEY2") << 8) | (input_port_read(machine, "KEY7"))); break;
 		case 0x08:	portdata = ((input_port_read(machine, "KEY3") << 8) | (input_port_read(machine, "KEY8"))); break;
 		case 0x10:	portdata = ((input_port_read(machine, "KEY4") << 8) | (input_port_read(machine, "KEY9"))); break;
-		default:	portdata = (((input_port_read(machine, "KEY0") << 8) | (input_port_read(machine, "KEY5")))) & (((input_port_read(machine, "KEY1") << 8) | (input_port_read(machine, "KEY6")))) 
-								& (((input_port_read(machine, "KEY2") << 8) | (input_port_read(machine, "KEY7")))) & (((input_port_read(machine, "KEY3") << 8) | (input_port_read(machine, "KEY8")))) 
+		default:	portdata = (((input_port_read(machine, "KEY0") << 8) | (input_port_read(machine, "KEY5")))) & (((input_port_read(machine, "KEY1") << 8) | (input_port_read(machine, "KEY6"))))
+								& (((input_port_read(machine, "KEY2") << 8) | (input_port_read(machine, "KEY7")))) & (((input_port_read(machine, "KEY3") << 8) | (input_port_read(machine, "KEY8"))))
 								& (((input_port_read(machine, "KEY4") << 8) | (input_port_read(machine, "KEY9")))); break;
 	}
 

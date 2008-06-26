@@ -322,7 +322,7 @@ CUSTOM_INPUT( pleiads_protection_r )
 }
 
 /*
-	Protection.  There is a 14 pin part connected to the 8910 Port B D0 labeled DL57S22
+    Protection.  There is a 14 pin part connected to the 8910 Port B D0 labeled DL57S22
 
     Inputs are demangled at 0x1ae6-0x1b04 using the table at 0x1b26
     and bit 0 of the data from the AY8910 port B. The equation is:

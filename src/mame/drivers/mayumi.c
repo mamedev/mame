@@ -57,7 +57,7 @@ static READ8_HANDLER( key_matrix_r )
 				{ "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" },
 				{ "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" }
 			};
-	
+
 	ret = 0xff;
 
 	p = ~input_sel & 0x1f;

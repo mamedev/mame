@@ -643,11 +643,11 @@ static READ16_HANDLER( io_r )
 {
 	static const char *analognames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
 	static const char *inputnames[] = { "IN0", "IN1", "IN2" };
-	
+
 	if(offset < 0x8)
 		return input_port_read(machine, analognames[offset]);
-	
-	if(offset < 0x10) 
+
+	if(offset < 0x10)
 	{
 		offset -= 0x8;
 		if(offset < 3)

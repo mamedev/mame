@@ -559,10 +559,10 @@ CUSTOM_INPUT( williams_mux_r )
 {
 	const char *tag = param;
 
-	if (port_select != 0) 
+	if (port_select != 0)
 		tag += strlen(tag) + 1;
-	
-	return input_port_read(field->port->machine, tag);	
+
+	return input_port_read(field->port->machine, tag);
 }
 
 /*

@@ -925,7 +925,7 @@ static const int SEARCH_BYTE_STEP[] =
 	1		/* 1-bit */
 };
 
-static const UINT32 BYTE_LOOP_TABLE[] = 
+static const UINT32 BYTE_LOOP_TABLE[] =
 {
 	1,		/* 8-bit (1 byte) */
 	3,		/* 16-bit (2 bytes) */
@@ -2006,7 +2006,7 @@ void cheat_init(running_machine *machine)
 	edit_cursor			= 0;
 	cheat_options		= DEFAULT_CHEAT_OPTIONS;
 	driverSpecifiedFlag	= 0;
-	
+
 	horizontal_key_repeat_speed = 10;
 	vertical_key_repeat_speed = 10;
 

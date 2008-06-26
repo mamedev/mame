@@ -139,7 +139,7 @@ static READ16_HANDLER( spyhunt2_port_0_r )
 	int result = input_port_read(machine, "IN0");
 	int which = (control_word >> 3) & 3;
 	int analog = input_port_read(machine, portnames[which]);
-	
+
 	return result | ((soundsgood_status_r(machine, 0) & 1) << 5) | (analog << 8);
 }
 

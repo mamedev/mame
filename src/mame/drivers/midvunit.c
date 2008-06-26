@@ -164,7 +164,7 @@ static TIMER_CALLBACK( adc_ready )
 static WRITE32_HANDLER( midvunit_adc_w )
 {
 	static const char *adcnames[] = { "WHEEL", "ACCEL", "BRAKE" };
-	
+
 	if (!(control_data & 0x20))
 	{
 		int which = (data >> adc_shift) - 4;

@@ -7,7 +7,7 @@
 
    00
    01 - sptr  ?? (always 0)
-   02 - sptr  LO 
+   02 - sptr  LO
    03 - sptr  HI
    04
    05 - flags? 00000000 0000?L0?   - bit 0 loops, other bits appear to be not used by the chip
@@ -74,8 +74,8 @@ WRITE16_HANDLER(nile_sndctrl_w)
 
 	COMBINE_DATA(&info->ctrl);
 
-//	printf("CTRL: %04x -> %04x (PC=%x)\n", ctrl, info->ctrl, activecpu_get_pc());
-	
+//  printf("CTRL: %04x -> %04x (PC=%x)\n", ctrl, info->ctrl, activecpu_get_pc());
+
 	ctrl^=info->ctrl;
 }
 
@@ -99,7 +99,7 @@ READ16_HANDLER(nile_snd_r)
 	{
 		int slot=offset/16;
 		int sptr = ((nile_sound_regs[slot*16+3]<<16)|nile_sound_regs[slot*16+2])+info->vpos[slot];
-		
+
 		if(reg==2)
 		{
 			return sptr&0xffff;
@@ -129,7 +129,7 @@ WRITE16_HANDLER(nile_snd_w)
 		info->vpos[v] = info->frac[v] = info->lponce[v] = 0;
 	}
 
-//	printf("v%02d: %04x to reg %02d (PC=%x)\n", v, nile_sound_regs[offset], r, activecpu_get_pc());
+//  printf("v%02d: %04x to reg %02d (PC=%x)\n", v, nile_sound_regs[offset], r, activecpu_get_pc());
 }
 
 static void nile_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
@@ -142,7 +142,7 @@ static void nile_update(void *param, stream_sample_t **inputs, stream_sample_t *
 	INT32 *mixp;
 	INT16 sample;
 	int sptr, eptr, freq, lsptr, leptr;
-	
+
 	lsptr=leptr=0;
 
 	memset(mix, 0, sizeof(mix[0])*length*2);
@@ -157,7 +157,7 @@ static void nile_update(void *param, stream_sample_t **inputs, stream_sample_t *
 
 			sptr = slot[NILE_REG_SPTR_HI]<<16 | slot[NILE_REG_SPTR_LO];
 			eptr = slot[NILE_REG_EPTR_HI]<<16 | slot[NILE_REG_EPTR_LO];
-			
+
 			freq=slot[NILE_REG_FREQ]<<4;
 			lsptr = slot[NILE_REG_LSPTR_HI]<<16 | slot[NILE_REG_LSPTR_LO];
 			leptr = slot[NILE_REG_LEPTR_HI]<<16 | slot[NILE_REG_LEPTR_LO];
@@ -168,7 +168,7 @@ static void nile_update(void *param, stream_sample_t **inputs, stream_sample_t *
 
 				*mixp++ += (sample * (INT32)slot[NILE_REG_VOL_R]) >> 16;
 				*mixp++ += (sample * (INT32)slot[NILE_REG_VOL_L]) >> 16;
-				
+
 				info->frac[v] += freq;
 				info->vpos[v] += info->frac[v]>>16;
 				info->frac[v] &= 0xffff;
@@ -187,7 +187,7 @@ static void nile_update(void *param, stream_sample_t **inputs, stream_sample_t *
 					// not looped yet, check sample end
 					if ((info->vpos[v] + sptr) >= eptr)
 					{
-						// code at 11d8c: 
+						// code at 11d8c:
 						// if bit 2 (0x4) is set, check if loop start = loop end.
 						// if they are equal, clear bit 0 and don't set the loop start/end
 						// registers in the NiLe.  if they aren't, set bit 0 and set
@@ -203,7 +203,7 @@ static void nile_update(void *param, stream_sample_t **inputs, stream_sample_t *
 							info->vpos[v] = (eptr - sptr);
 							info->frac[v] = 0;
 						}
-						
+
 					}
 				}
 			}

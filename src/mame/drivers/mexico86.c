@@ -167,7 +167,7 @@ static INPUT_PORTS_START( mexico86 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("DSW0")	
+	PORT_START_TAG("DSW0")
 	/* When Bit 1 is On, the machine waits a signal from another one */
 	/* Seems like if you can join two cabinets, one as master */
 	/* and the other as slave, probably to play four players */

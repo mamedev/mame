@@ -525,7 +525,7 @@ static MACHINE_START( seattle )
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
 	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
-	
+
 	/* register for save states */
 	state_save_register_global_array(galileo.reg);
 	state_save_register_global(galileo.dma_active);

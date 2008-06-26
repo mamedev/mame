@@ -559,7 +559,7 @@ static MACHINE_START( vegas )
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
 	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
-	
+
 	/* register for save states */
 	state_save_register_global(nile_irq_state);
 	state_save_register_global(ide_irq_state);

@@ -3217,7 +3217,7 @@ static x86code *op_debug(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		drcuml_parameter pcp;
-		
+
 		/* normalize parameters */
 		param_normalize_1(drcbe, inst, &pcp, PTYPE_MRI);
 
@@ -3229,7 +3229,7 @@ static x86code *op_debug(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 		emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 4), &pcp);							// mov   [esp+4],pcp
 		emit_mov_m32_imm(&dst, MBD(REG_ESP, 0), (FPTR)Machine);							// mov   [esp],Machine
 		emit_call(&dst, (x86code *)debug_cpu_instruction_hook);							// call  debug_cpu_instruction_hook
-		
+
 		resolve_link(&dst, &skip);													// skip:
 	}
 

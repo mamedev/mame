@@ -402,7 +402,7 @@ WRITE8_DEVICE_HANDLER( z80dma_rdy_w)
 	int param;
 
 	assert( offset == 0);
-	
+
 	param = (data ? 1 : 0);
 	LOG(("RDY: %d Active High: %d\n", data, READY_ACTIVE_HIGH(z80dma)));
 	timer_call_after_resynch(z80dma, param, z80dma_rdy_write_callback);

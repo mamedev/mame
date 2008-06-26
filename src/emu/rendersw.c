@@ -189,7 +189,7 @@ INLINE UINT32 get_texel_palette16_bilinear(const render_texinfo *texture, INT32 
 	const UINT16 *texbase = texture->base;
 	rgb_t pix00, pix01, pix10, pix11;
 	INT32 u0, u1, v0, v1;
-	
+
 	u0 = curu >> 16;
 	u1 = 1;
 	if (u0 < 0) u0 = u1 = 0;
@@ -198,7 +198,7 @@ INLINE UINT32 get_texel_palette16_bilinear(const render_texinfo *texture, INT32 
 	v1 = texture->rowpixels;
 	if (v0 < 0) v0 = v1 = 0;
 	else if (v0 + 1 >= texture->height) v0 = texture->height - 1, v1 = 0;
-	
+
 	texbase += v0 * texture->rowpixels + u0;
 
 	pix00 = texture->palette[texbase[0]];
@@ -232,7 +232,7 @@ INLINE UINT32 get_texel_rgb15_bilinear(const render_texinfo *texture, INT32 curu
 	const UINT16 *texbase = texture->base;
 	rgb_t pix00, pix01, pix10, pix11, filtered;
 	INT32 u0, u1, v0, v1;
-	
+
 	u0 = curu >> 16;
 	u1 = 1;
 	if (u0 < 0) u0 = u1 = 0;
@@ -241,7 +241,7 @@ INLINE UINT32 get_texel_rgb15_bilinear(const render_texinfo *texture, INT32 curu
 	v1 = texture->rowpixels;
 	if (v0 < 0) v0 = v1 = 0;
 	else if (v0 + 1 >= texture->height) v0 = texture->height - 1, v1 = 0;
-	
+
 	texbase += v0 * texture->rowpixels + u0;
 
 	pix00 = texbase[0];
@@ -281,7 +281,7 @@ INLINE UINT32 get_texel_yuy16_bilinear(const render_texinfo *texture, INT32 curu
 	const UINT16 *texbase = texture->base;
 	rgb_t pix00, pix01, pix10, pix11;
 	INT32 u0, u1, v0, v1;
-	
+
 	u0 = curu >> 16;
 	u1 = 1;
 	if (u0 < 0) u0 = u1 = 0;
@@ -290,7 +290,7 @@ INLINE UINT32 get_texel_yuy16_bilinear(const render_texinfo *texture, INT32 curu
 	v1 = texture->rowpixels;
 	if (v0 < 0) v0 = v1 = 0;
 	else if (v0 + 1 >= texture->height) v0 = texture->height - 1, v1 = 0;
-	
+
 	texbase += v0 * texture->rowpixels + u0;
 
 	if ((curu & 0x10000) == 0)
@@ -350,7 +350,7 @@ INLINE UINT32 get_texel_rgb32_bilinear(const render_texinfo *texture, INT32 curu
 	const UINT32 *texbase = texture->base;
 	rgb_t pix00, pix01, pix10, pix11;
 	INT32 u0, u1, v0, v1;
-	
+
 	u0 = curu >> 16;
 	u1 = 1;
 	if (u0 < 0) u0 = u1 = 0;
@@ -359,7 +359,7 @@ INLINE UINT32 get_texel_rgb32_bilinear(const render_texinfo *texture, INT32 curu
 	v1 = texture->rowpixels;
 	if (v0 < 0) v0 = v1 = 0;
 	else if (v0 + 1 >= texture->height) v0 = texture->height - 1, v1 = 0;
-	
+
 	texbase += v0 * texture->rowpixels + u0;
 
 	pix00 = texbase[0];
@@ -394,7 +394,7 @@ INLINE UINT32 get_texel_argb32_bilinear(const render_texinfo *texture, INT32 cur
 	const UINT32 *texbase = texture->base;
 	rgb_t pix00, pix01, pix10, pix11;
 	INT32 u0, u1, v0, v1;
-	
+
 	u0 = curu >> 16;
 	u1 = 1;
 	if (u0 < 0) u0 = u1 = 0;
@@ -403,7 +403,7 @@ INLINE UINT32 get_texel_argb32_bilinear(const render_texinfo *texture, INT32 cur
 	v1 = texture->rowpixels;
 	if (v0 < 0) v0 = v1 = 0;
 	else if (v0 + 1 >= texture->height) v0 = texture->height - 1, v1 = 0;
-	
+
 	texbase += v0 * texture->rowpixels + u0;
 
 	pix00 = texbase[0];
@@ -2069,7 +2069,7 @@ static void FUNC_PREFIX(setup_and_draw_textured_quad)(const render_primitive *pr
 	/* advance U/V to the middle of the first texel */
 	setup.startu += (setup.dudx + setup.dudy) / 2;
 	setup.startv += (setup.dvdx + setup.dvdy) / 2;
-	
+
 	/* if we're bilinear filtering, we need to offset u/v by half a texel */
 	if (BILINEAR_FILTER)
 	{

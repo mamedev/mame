@@ -306,7 +306,7 @@ static CUSTOM_INPUT( adcdo_r )
 static READ8_HANDLER( sysreg_r )
 {
 	UINT32 r = 0;
-	
+
 	switch (offset)
 	{
 		case 0:	/* I/O port 0 */
@@ -315,17 +315,17 @@ static READ8_HANDLER( sysreg_r )
 		case 3:	/* System Port 0 */
 			r = input_port_read_indexed(machine, offset);
 			break;
-		
+
 		case 4:	/* System Port 1 */
-			/* 
-				0x80 = PARAACK
-				0x40 = unused
-				0x20 = SARS (A/D busy flag)
-				0x10 = EEPDO (EEPROM DO)
-			*/
+			/*
+                0x80 = PARAACK
+                0x40 = unused
+                0x20 = SARS (A/D busy flag)
+                0x10 = EEPDO (EEPROM DO)
+            */
 			r = (adc083x_sars_read(0) << 5) | (eeprom_read_bit() << 4);
 			break;
-		
+
 		case 5:	/* Parallel data port */
 			break;
 	}
@@ -339,44 +339,44 @@ static WRITE8_HANDLER( sysreg_w )
 		case 0:	/* LED Register 0 */
 			led_reg0 = data;
 			break;
-		
+
 		case 1:	/* LED Register 1 */
 			led_reg1 = data;
 			break;
-		
+
 		case 2: /* Parallel data register */
 			mame_printf_debug("Parallel data = %02X\n", data);
 			break;
-		
+
 		case 3:	/* System Register 0 */
-			/* 
-				0x80 = unused
-				0x40 = COINREQ1
-				0x20 = COINREQ2
-				0x10 = SNDRES
-				0x08 = unused
-				0x04 = EEPCS
-				0x02 = EEPCLK
-				0x01 = EEPDI
-			*/
+			/*
+                0x80 = unused
+                0x40 = COINREQ1
+                0x20 = COINREQ2
+                0x10 = SNDRES
+                0x08 = unused
+                0x04 = EEPCS
+                0x02 = EEPCLK
+                0x01 = EEPDI
+            */
 			eeprom_write_bit((data & 0x01) ? 1 : 0);
 			eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 			eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 0 = %02X\n", data);
 			break;
-		
+
 		case 4:	/* System Register 1 */
 			/*
-				0x80 = EXRES1
-				0x40 = EXRES0
-				0x20 = EXID1
-				0x10 = EXID0
-				0x08 = unused
-				0x04 = ADCS (ADC CS)
-				0x02 = ADDI (ADC DI)
-				0x01 = ADDSCLK (ADC SCLK)
-			*/
+                0x80 = EXRES1
+                0x40 = EXRES0
+                0x20 = EXID1
+                0x10 = EXID0
+                0x08 = unused
+                0x04 = ADCS (ADC CS)
+                0x02 = ADDI (ADC DI)
+                0x01 = ADDSCLK (ADC SCLK)
+            */
 			if (data & 0x80)	/* CG Board 1 IRQ Ack */
 				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
@@ -390,8 +390,8 @@ static WRITE8_HANDLER( sysreg_w )
 
 		case 5:	/* System Register 2 */
 			/*
-				0x01 = AFE
-			*/
+                0x01 = AFE
+            */
 			if (data & 0x01)
 				watchdog_reset(machine);
 			break;

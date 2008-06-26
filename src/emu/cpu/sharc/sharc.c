@@ -421,7 +421,7 @@ static void sharc_init(int index, int clock, const void *config, int (*irqcallba
 {
 	const sharc_config *cfg = config;
 	int saveindex;
-	
+
 	sharc.boot_mode = cfg->boot_mode;
 
 	sharc.irq_callback = irqcallback;
@@ -431,7 +431,7 @@ static void sharc_init(int index, int clock, const void *config, int (*irqcallba
 	sharc.internal_ram = auto_malloc(2 * 0x10000 * sizeof(UINT16));		// 2x 128KB
 	sharc.internal_ram_block0 = &sharc.internal_ram[0];
 	sharc.internal_ram_block1 = &sharc.internal_ram[0x20000/2];
-	
+
 	state_save_register_item("sharc", index, sharc.pc);
 	state_save_register_item_pointer("sharc", index, (&sharc.r[0].r), ARRAY_LENGTH(sharc.r));
 	state_save_register_item_pointer("sharc", index, (&sharc.reg_alt[0].r), ARRAY_LENGTH(sharc.reg_alt));
@@ -467,7 +467,7 @@ static void sharc_init(int index, int clock, const void *config, int (*irqcallba
 	state_save_register_item_array("sharc", index, sharc.dag2_alt.m);
 	state_save_register_item_array("sharc", index, sharc.dag2_alt.b);
 	state_save_register_item_array("sharc", index, sharc.dag2_alt.l);
-	
+
 	for (saveindex = 0; saveindex < ARRAY_LENGTH(sharc.dma); saveindex++)
 	{
 		state_save_register_item("sharc", index * ARRAY_LENGTH(sharc.dma) + saveindex, sharc.dma[saveindex].control);
@@ -506,7 +506,7 @@ static void sharc_init(int index, int clock, const void *config, int (*irqcallba
 	state_save_register_item("sharc", index, sharc.px);
 
 	state_save_register_item_pointer("sharc", index, sharc.internal_ram, 2 * 0x10000);
-	
+
 	state_save_register_item("sharc", index, sharc.opcode);
 	state_save_register_item("sharc", index, sharc.fetch_opcode);
 	state_save_register_item("sharc", index, sharc.decode_opcode);
