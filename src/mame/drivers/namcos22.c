@@ -5077,7 +5077,7 @@ static DRIVER_INIT( ridgeraj )
 
 	install_c74_speedup(machine);
 
-	old_coin_state = input_port_read_indexed(machine, 1) & 0x1200;
+	old_coin_state = 0;
 	credits1 = credits2 = 0;
 }
 
@@ -5087,7 +5087,7 @@ static DRIVER_INIT( ridger2j )
 
 	install_c74_speedup(machine);
 
-	old_coin_state = input_port_read_indexed(machine, 1) & 0x1200;
+	old_coin_state = 0;
 	credits1 = credits2 = 0;
 }
 
@@ -5097,7 +5097,7 @@ static DRIVER_INIT( acedrvr )
 
 	install_c74_speedup(machine);
 
-	old_coin_state = input_port_read_indexed(machine, 1) & 0x1200;
+	old_coin_state = 0;
 	credits1 = credits2 = 0;
 }
 
@@ -5107,7 +5107,7 @@ static DRIVER_INIT( victlap )
 
 	install_c74_speedup(machine);
 
-	old_coin_state = input_port_read_indexed(machine, 1) & 0x1200;
+	old_coin_state = 0;
 	credits1 = credits2 = 0;
 }
 
@@ -5117,7 +5117,7 @@ static DRIVER_INIT( raveracw )
 
 	install_c74_speedup(machine);
 
-	old_coin_state = input_port_read_indexed(machine, 1) & 0x1200;
+	old_coin_state = 0;
 	credits1 = credits2 = 0;
 }
 
@@ -5134,7 +5134,7 @@ static DRIVER_INIT( cybrcomm )
 
 	install_c74_speedup(machine);
 
-	old_coin_state = input_port_read_indexed(machine, 1) & 0x1200;
+	old_coin_state = 0;
 	credits1 = credits2 = 0;
 }
 
