@@ -598,10 +598,20 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( gtmr_wheel_r )
 {
-	if ( (input_port_read(machine, "DSW1") & 0x1800) == 0x10)	// DSW setting
-		return	input_port_read(machine, "WHEEL0")<<8;			// 360' Wheel
-	else
-		return	input_port_read(machine, "WHEEL0");				// 270' Wheel
+	// check 'Controls' dip switch
+	switch (input_port_read(machine, "DSW1") & 0x1000)
+	{
+		case 0x0000:	// 'Both Sides' = 270deg Wheel
+			return	(input_port_read(machine, "WHEEL0"));
+			break;
+	
+		case 0x1000:	// '1P Side' = 360' Wheel
+			return	(input_port_read(machine, "WHEEL1"));
+			break;
+		default:
+			return	(0);
+			break;
+		}
 }
 
 static WRITE16_HANDLER( gtmr_oki_0_bank_w )
@@ -1339,8 +1349,11 @@ static INPUT_PORTS_START( gtmr )
 	PORT_DIPSETTING(      0x4000, "Flag Only" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( None ) )
 
-	PORT_START_TAG("WHEEL0")	// IN5 - Wheel - 100015.b <- ffffe.b
-	PORT_BIT ( 0x00ff, 0x0080, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(1)
+	PORT_START_TAG("WHEEL0")	// IN5 - Wheel (270deg) - 100015.b <- ffffe.b
+	PORT_BIT ( 0x00ff, 0x0080, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(25)
+
+	PORT_START_TAG("WHEEL1")	// IN6 - Wheel (360deg)
+	PORT_BIT ( 0x00ff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(25) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -1403,12 +1416,12 @@ static INPUT_PORTS_START( gtmr2 )
     */
 	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(      0x1800, DEF_STR( Joystick ) )
-	PORT_DIPSETTING(      0x0800, "Wheel (360)" )			// Not working correctly in race
-	PORT_DIPSETTING(      0x1000, "Wheel (270D)" )			// Not working correctly !
-	PORT_DIPSETTING(      0x0000, "Wheel (270A)" )			// Not working correctly in race
+	PORT_DIPSETTING(      0x0800, "Wheel (360)" )			// Not working correctly in race }
+	PORT_DIPSETTING(      0x1000, "Wheel (270D)" )			// Not working correctly !	 } seems to work ok to me! (minwah)
+	PORT_DIPSETTING(      0x0000, "Wheel (270A)" )			// Not working correctly in race }
 	PORT_DIPNAME( 0x2000, 0x2000, "Optional Mode Of Pedal Function" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x2000, "Microswitch" )			// "This mode also corresponds to the two buttons used with joystick."
-	PORT_DIPSETTING(      0x0000, "Potentiometer" )         // Not implemented yet
+	PORT_DIPSETTING(      0x0000, "Potentiometer" )         	// Not implemented yet
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On )  )
