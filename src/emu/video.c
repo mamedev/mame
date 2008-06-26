@@ -1517,7 +1517,7 @@ void video_frame_update(running_machine *machine, int debug)
 	if (phase == MAME_PHASE_RUNNING)
 	{
 		/* reset partial updates if we're paused or if the debugger is active */
-		if (machine->primary_screen != NULL && (mame_is_paused(machine) || debug || mame_debug_is_active()))
+		if (machine->primary_screen != NULL && (mame_is_paused(machine) || debug || debugger_within_instruction_hook(machine)))
 		{
 			void *param = (void *)machine->primary_screen;
 			scanline0_callback(machine, param, 0);

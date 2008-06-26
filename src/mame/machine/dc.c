@@ -144,9 +144,7 @@ INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
 		mame_printf_verbose("Wrong mask! (PC=%x)\n", activecpu_get_pc());
-		#ifdef ENABLE_DEBUGGER
-//      mame_debug_break();
-		#endif
+//      debugger_break(Machine);
 	}
 
 	if (mem_mask == U64(0xffffffff00000000))

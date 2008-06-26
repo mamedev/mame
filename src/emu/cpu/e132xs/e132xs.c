@@ -1774,12 +1774,10 @@ static void hyperstone_set_context(void *regs)
 		hyperstone = *(hyperstone_regs *)regs;
 }
 
-#ifdef ENABLE_DEBUGGER
 static offs_t hyperstone_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return dasm_hyperstone( buffer, pc, oprom, GET_H, GET_FP );
 }
-#endif /* ENABLE_DEBUGGER */
 
 /* Opcodes */
 
@@ -4762,7 +4760,7 @@ static int hyperstone_execute(int cycles)
 		UINT16 opcode;
 
 		PPC = PC;	/* copy PC to previous PC */
-		CALL_DEBUGGER(PC);
+		debugger_instruction_hook(Machine, PC);
 
 		opcode = READ_OP(PC);
 		PC += 2;
@@ -5084,9 +5082,7 @@ static void hyperstone_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = hyperstone_exit;			break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = hyperstone_execute;		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = hyperstone_dasm;	break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &hyperstone_ICount;		break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map16 = NULL;	break;

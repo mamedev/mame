@@ -97,9 +97,7 @@ extern void cop426_get_info(UINT32 state, cpuinfo *info);
 extern void cop444_get_info(UINT32 state, cpuinfo *info);
 extern void cop445_get_info(UINT32 state, cpuinfo *info);
 
-#ifdef ENABLE_DEBUGGER
 offs_t cop410_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 offs_t cop420_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif /* ENABLE_DEBUGGER */
 
 #endif  /* __COP400__ */

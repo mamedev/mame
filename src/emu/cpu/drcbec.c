@@ -596,7 +596,7 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_DEBUG, 4, 0):		/* DEBUG   pc                     */
-				CALL_DEBUGGER(PARAM0);
+				debugger_instruction_hook(Machine, PARAM0);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_HASHJMP, 4, 0):	/* HASHJMP mode,pc,handle         */

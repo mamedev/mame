@@ -107,10 +107,8 @@ void winvideo_init(running_machine *machine)
 		SetForegroundWindow(win_window_list->hwnd);
 
 	// possibly create the debug window, but don't show it yet
-#ifdef ENABLE_DEBUGGER
 	if (options_get_bool(mame_options(), OPTION_DEBUG))
 		debugwin_init_windows();
-#endif
 }
 
 
@@ -126,10 +124,8 @@ static void video_exit(running_machine *machine)
 	effect_bitmap = NULL;
 
 	// possibly kill the debug window
-#ifdef ENABLE_DEBUGGER
 	if (options_get_bool(mame_options(), OPTION_DEBUG))
 		debugwin_destroy_windows();
-#endif
 
 	// free all of our monitor information
 	while (win_monitor_list != NULL)
@@ -380,11 +376,10 @@ static void extract_video_config(running_machine *machine)
 	video_config.prescale      = options_get_int(mame_options(), WINOPTION_PRESCALE);
 	video_config.keepaspect    = options_get_bool(mame_options(), WINOPTION_KEEPASPECT);
 	video_config.numscreens    = options_get_int(mame_options(), WINOPTION_NUMSCREENS);
-#ifdef ENABLE_DEBUGGER
+
 	// if we are in debug mode, never go full screen
 	if (options_get_bool(mame_options(), OPTION_DEBUG))
 		video_config.windowed = TRUE;
-#endif
 	stemp                      = options_get_string(mame_options(), WINOPTION_EFFECT);
 	if (strcmp(stemp, "none") != 0)
 		load_effect_overlay(machine, stemp);

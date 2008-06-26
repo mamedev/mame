@@ -26,23 +26,12 @@
 #include <string.h>
 #include <ctype.h>
 
-#ifdef ENABLE_DEBUGGER					/* Compile interface to MAME */
 #include "cpuintrf.h"
 static const UINT8 *rombase;
 static const UINT8 *rambase;
 static offs_t pcbase;
 #define READOP16(A)  (rombase[(A) - pcbase] | (rombase[(A) + 1 - pcbase] << 8))
 #define READARG16(A) (rambase[(A) - pcbase] | (rambase[(A) + 1 - pcbase] << 8))
-#else                               /* Compile interface for standalone */
-extern unsigned char *Buffer;
-#ifdef MSB_FIRST
-#define READOP16(A)  ( ((Buffer[A]<<8) | Buffer[A+1]) )
-#define READARG16(A) ( ((Buffer[A]<<8) | Buffer[A+1]) )
-#else
-#define READOP16(A)  ( ((Buffer[A+1]<<8) | Buffer[A]) )
-#define READARG16(A) ( ((Buffer[A+1]<<8) | Buffer[A]) )
-#endif
-#endif
 
 
 

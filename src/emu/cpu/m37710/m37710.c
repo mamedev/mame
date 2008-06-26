@@ -1033,14 +1033,12 @@ void m37710_set_irq_callback(int (*callback)(int))
 #endif
 
 /* Disassemble an instruction */
-#ifdef ENABLE_DEBUGGER
 #include "m7700ds.h"
 
 static offs_t m37710_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return m7700_disassemble(buffer, (pc&0xffff), pc>>16, oprom, FLAG_M, FLAG_X);
 }
-#endif /* ENABLE_DEBUGGER */
 
 static STATE_POSTLOAD( m37710_restore_state )
 {
@@ -1225,9 +1223,7 @@ void m37710_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = m37710_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = m37710_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m37710_dasm;		break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m37710_ICount;			break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = address_map_m37710_internal_map; break;

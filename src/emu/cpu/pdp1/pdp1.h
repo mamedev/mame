@@ -74,8 +74,6 @@ void pdp1_get_info(UINT32 state, cpuinfo *info);
 #define IOT 035
 #define OPR 037
 
-#ifdef ENABLE_DEBUGGER
 unsigned pdp1_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif /* ENABLE_DEBUGGER */
 
 #endif /* _PDP1_H */

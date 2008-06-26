@@ -82,9 +82,7 @@ enum {
 #define SATURN_NMI_LINE 1
 #define SATURN_WAKEUP_LINE 2
 
-#ifdef ENABLE_DEBUGGER
 unsigned saturn_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif /* ENABLE_DEBUGGER */
 
 void saturn_get_info(UINT32 state, cpuinfo *info);
 

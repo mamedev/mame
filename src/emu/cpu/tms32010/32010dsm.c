@@ -29,20 +29,9 @@
 #include <string.h>
 #include <ctype.h>
 
-#ifdef ENABLE_DEBUGGER					/* Compile interface to MAME */
 #include "cpuintrf.h"
 #include "tms32010.h"
 #include "debugger.h"
-#else								/* Compile interface for standalone */
-extern unsigned char *Buffer;
-#ifdef MSB_FIRST
-#define READOP16(A)  ( ((Buffer[A+1]<<8) | Buffer[A]) )
-#define READARG16(A) ( ((Buffer[A+1]<<8) | Buffer[A]) )
-#else
-#define READOP16(A)  ( ((Buffer[A]<<8) | Buffer[A+1]) )
-#define READARG16(A) ( ((Buffer[A]<<8) | Buffer[A+1]) )
-#endif
-#endif
 
 
 

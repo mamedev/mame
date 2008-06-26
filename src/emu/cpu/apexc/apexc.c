@@ -802,7 +802,7 @@ static int apexc_execute(int cycles)
 
 	do
 	{
-		CALL_DEBUGGER(effective_address(apexc.ml));
+		debugger_instruction_hook(Machine, effective_address(apexc.ml));
 
 		if (apexc.running)
 			execute();
@@ -898,10 +898,7 @@ void apexc_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_PTR_RESET:							info->reset = apexc_reset;				break;
 	case CPUINFO_PTR_EXECUTE:						info->execute = apexc_execute;			break;
 	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-
-#ifdef ENABLE_DEBUGGER
-	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = apexc_dasm;		break;
-#endif /* ENABLE_DEBUGGER */
+	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = apexc_dasm;			break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &apexc_ICount;			break;
 
 	case CPUINFO_STR_NAME:							strcpy(info->s = cpuintrf_temp_str(), "APEXC"); break;

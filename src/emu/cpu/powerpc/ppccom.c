@@ -312,7 +312,6 @@ void ppccom_reset(powerpc_state *ppc)
     CPU
 -------------------------------------------------*/
 
-#ifdef ENABLE_DEBUGGER
 offs_t ppccom_dasm(powerpc_state *ppc, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	extern offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op);
@@ -320,7 +319,6 @@ offs_t ppccom_dasm(powerpc_state *ppc, char *buffer, offs_t pc, const UINT8 *opr
 	op = BIG_ENDIANIZE_INT32(op);
 	return ppc_dasm_one(buffer, pc, op);
 }
-#endif /* ENABLE_DEBUGGER */
 
 
 

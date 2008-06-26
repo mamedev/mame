@@ -2342,7 +2342,7 @@ static int sh2_execute(int cycles)
 		else
 			opcode = cpu_readop16(WORD_XOR_BE((UINT32)(sh2.pc & AM)));
 
-		CALL_DEBUGGER(sh2.pc);
+		debugger_instruction_hook(Machine, sh2.pc);
 
 		sh2.delay = 0;
 		sh2.pc += 2;
@@ -2921,12 +2921,10 @@ static void set_irq_line(int irqline, int state)
 	}
 }
 
-#ifdef ENABLE_DEBUGGER
 static offs_t sh2_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return DasmSH2( buffer, pc, (oprom[0] << 8) | oprom[1] );
 }
-#endif /* ENABLE_DEBUGGER */
 
 static void sh2_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
@@ -3129,9 +3127,7 @@ void sh2_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_RESET:							info->reset = sh2_reset;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = sh2_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sh2_dasm;			break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sh2_icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

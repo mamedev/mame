@@ -51,8 +51,6 @@ void i8085_get_info(UINT32 state, cpuinfo *info);
 void i8080_get_info(UINT32 state, cpuinfo *info);
 #endif
 
-#ifdef	ENABLE_DEBUGGER
 offs_t i8085_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif
 
 #endif

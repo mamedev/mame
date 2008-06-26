@@ -103,9 +103,7 @@ extern void sh4_get_info(UINT32 state, cpuinfo *info);
 WRITE32_HANDLER( sh4_internal_w );
 READ32_HANDLER( sh4_internal_r );
 
-#ifdef ENABLE_DEBUGGER
 extern unsigned DasmSH4( char *dst, unsigned pc, UINT16 opcode );
-#endif
 
 #endif /* _SH4_H */
 

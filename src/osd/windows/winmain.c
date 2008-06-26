@@ -34,6 +34,7 @@
 #include "strconv.h"
 #include "winutf8.h"
 #include "winutil.h"
+#include "debug/debugcpu.h"
 
 #define ENABLE_PROFILER		0
 #define DEBUG_SLOW_LOCKS	0
@@ -453,12 +454,8 @@ static LONG CALLBACK exception_filter(struct _EXCEPTION_POINTERS *info)
 		ExitProcess(100);
 	already_hit = 1;
 
-#ifdef ENABLE_DEBUGGER
-{
-extern void debug_flush_traces(void);
-debug_flush_traces();
-}
-#endif
+	// flush any debugging traces that were live
+	debug_cpu_flush_traces();
 
 	// find our man
 	for (i = 0; exception_table[i].code != 0; i++)

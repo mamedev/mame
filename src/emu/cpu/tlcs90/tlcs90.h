@@ -8,9 +8,7 @@ void tmp90841_get_info(UINT32, cpuinfo*);
 void tmp91640_get_info(UINT32, cpuinfo*);
 void tmp91641_get_info(UINT32, cpuinfo*);
 
-#ifdef ENABLE_DEBUGGER
 unsigned t90_dasm(char *buffer, UINT32 oldpc, const UINT8 *oprom, const UINT8 *opram);
-#endif
 
 #define T90_IOBASE	0xffc0
 

@@ -626,7 +626,7 @@ static int pdp1_execute(int cycles)
 
 	do
 	{
-		CALL_DEBUGGER(PC);
+		debugger_instruction_hook(Machine, PC);
 
 
 		/* ioh should be cleared at the end of the instruction cycle, and ios at the
@@ -1025,9 +1025,7 @@ void pdp1_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_PTR_EXECUTE:						info->execute = pdp1_execute;			break;
 	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 
-#ifdef ENABLE_DEBUGGER
 	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = pdp1_dasm;			break;
-#endif /* ENABLE_DEBUGGER */
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &pdp1_ICount;			break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */

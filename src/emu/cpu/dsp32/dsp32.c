@@ -436,13 +436,11 @@ static int dsp32c_execute(int cycles)
     DISASSEMBLY HOOK
 ***************************************************************************/
 
-#ifdef ENABLE_DEBUGGER
 static offs_t dsp32c_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	extern unsigned dasm_dsp32(char *, unsigned, UINT32);
 	return dasm_dsp32(buffer, pc, oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24));
 }
-#endif /* ENABLE_DEBUGGER */
 
 
 
@@ -876,9 +874,7 @@ void dsp32c_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = dsp32c_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = dsp32c_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = dsp32c_dasm;		break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &dsp32_icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

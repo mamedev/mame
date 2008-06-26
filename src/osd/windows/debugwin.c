@@ -21,6 +21,7 @@
 #include "debug/debugvw.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
+#include "debugger.h"
 #include "deprecat.h"
 
 // MAMEOS headers
@@ -420,10 +421,8 @@ void debugwin_show(int type)
 
 void debugwin_update_during_game(void)
 {
-	int execution_state = debug_get_execution_state();
-
 	// if we're running live, do some checks
-	if (execution_state != EXECUTION_STATE_STOPPED)
+	if (!debug_cpu_is_stopped(Machine))
 	{
 		// see if the interrupt key is pressed and break if it is
 		temporarily_fake_that_we_are_not_visible = TRUE;
@@ -432,7 +431,7 @@ void debugwin_update_during_game(void)
 			debugwin_info *info;
 			HWND focuswnd = GetFocus();
 
-			debug_halt_on_next_instruction();
+			debugger_break(Machine);
 			debug_console_printf("User-initiated break\n");
 
 			// if we were focused on some window's edit box, reset it to default
@@ -2449,7 +2448,7 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 						cpu_num = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM);
 						cpuinfo = (debug_cpu_info*)debug_get_cpu_info(cpu_num);
 
-						for (bp = cpuinfo->first_bp; bp; bp = bp->next)
+						for (bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
 						{
 							if (BYTE2ADDR(active_address, cpuinfo, ADDRESS_SPACE_PROGRAM) == bp->address)
 							{

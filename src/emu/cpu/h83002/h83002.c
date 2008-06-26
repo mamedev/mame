@@ -181,9 +181,7 @@ static UINT32 h8_divxs16(INT16 src, INT32 dst);
 
 /* implementation */
 
-#ifdef ENABLE_DEBUGGER
 extern offs_t h8_disasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif /* ENABLE_DEBUGGER */
 
 void h8_3002_InterruptRequest(UINT8 source)
 {
@@ -479,7 +477,7 @@ static int h8_execute(int cycles)
 	{
 		h8.ppc = h8.pc;
 
-		CALL_DEBUGGER(h8.pc);
+		debugger_instruction_hook(Machine, h8.pc);
 
 		opcode = cpu_readop16(h8.pc);
 //      mame_printf_debug("[%06x]: %04x => %x\n", h8.pc, opcode, (opcode>>12)&0xf);
@@ -4081,9 +4079,7 @@ void h8_3002_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_PTR_EXIT:						info->exit        = 0;							break;
 	case CPUINFO_PTR_EXECUTE:					info->execute     = h8_execute;					break;
 	case CPUINFO_PTR_BURN:						info->burn        = 0;							break;
-#ifdef ENABLE_DEBUGGER
 	case CPUINFO_PTR_DISASSEMBLE:				info->disassemble = h8_disasm;					break;
-#endif /* ENABLE_DEBUGGER */
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:		info->icount      = &h8_cyccnt;					break;
 	case CPUINFO_INT_CONTEXT_SIZE:				info->i           = sizeof(h83002_state);		break;
 	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:		info->i           = 2;							break;

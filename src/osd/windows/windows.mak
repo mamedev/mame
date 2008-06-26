@@ -254,10 +254,8 @@ $(WINOBJ)/drawdd.o : 	$(SRC)/emu/rendersw.c
 $(WINOBJ)/drawgdi.o :	$(SRC)/emu/rendersw.c
 
 # add debug-specific files
-ifdef DEBUGGER
 OSDOBJS += \
 	$(WINOBJ)/debugwin.o
-endif
 
 # add a stub resource file
 RESFILE = $(WINOBJ)/mame.res

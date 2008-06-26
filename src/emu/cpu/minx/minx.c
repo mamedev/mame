@@ -165,7 +165,7 @@ static int minx_execute( int cycles )
 
 	do
 	{
-		CALL_DEBUGGER(GET_MINX_PC);
+		debugger_instruction_hook(Machine, GET_MINX_PC);
 		oldpc = GET_MINX_PC;
 
 		if ( regs.interrupt_pending )
@@ -354,9 +354,7 @@ void minx_get_info( UINT32 state, cpuinfo *info )
 	case CPUINFO_PTR_EXIT:										info->exit = minx_exit; break;
 	case CPUINFO_PTR_EXECUTE:									info->execute = minx_execute; break;
 	case CPUINFO_PTR_BURN:										info->burn = minx_burn; break;
-#ifdef ENABLE_DEBUGGER
 	case CPUINFO_PTR_DISASSEMBLE:								info->disassemble = minx_dasm; break;
-#endif
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:						info->icount = &minx_icount; break;
 	case CPUINFO_STR_NAME:										strcpy( info->s = cpuintrf_temp_str(), "Minx" ); break;
 	case CPUINFO_STR_CORE_FAMILY:								strcpy( info->s = cpuintrf_temp_str(), "Nintendo Minx" ); break;

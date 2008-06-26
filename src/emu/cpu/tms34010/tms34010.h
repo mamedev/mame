@@ -122,9 +122,7 @@ READ16_HANDLER( tms34020_io_register_r );
 #define TOWORD(bitaddr) ((offs_t)(bitaddr) >> 4)
 
 
-#ifdef ENABLE_DEBUGGER
 offs_t tms34010_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 offs_t tms34020_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif
 
 #endif /* _TMS34010_H */

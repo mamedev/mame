@@ -182,7 +182,7 @@ static int tx0_execute_64kw(int cycles)
 
 	do
 	{
-		CALL_DEBUGGER(PC);
+		debugger_instruction_hook(Machine, PC);
 
 
 		if (tx0.ioh && tx0.ios)
@@ -290,7 +290,7 @@ static int tx0_execute_8kw(int cycles)
 
 	do
 	{
-		CALL_DEBUGGER(PC);
+		debugger_instruction_hook(Machine, PC);
 
 
 		if (tx0.ioh && tx0.ios)
@@ -516,10 +516,7 @@ void tx0_64kw_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_PTR_RESET:							info->reset = tx0_reset;				break;
 	case CPUINFO_PTR_EXECUTE:						info->execute = tx0_execute_64kw;		break;
 	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-
-#ifdef ENABLE_DEBUGGER
 	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tx0_dasm_64kw;		break;
-#endif /* ENABLE_DEBUGGER */
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tx0_ICount;				break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -645,10 +642,7 @@ void tx0_8kw_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_PTR_RESET:							info->reset = tx0_reset;				break;
 	case CPUINFO_PTR_EXECUTE:						info->execute = tx0_execute_8kw;		break;
 	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-
-#ifdef ENABLE_DEBUGGER
 	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tx0_dasm_8kw;	break;
-#endif /* ENABLE_DEBUGGER */
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tx0_ICount;				break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */

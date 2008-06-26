@@ -31,24 +31,41 @@
 ***************************************************************************/
 
 /* return values from run_game */
-#define MAMERR_NONE				0		/* no error */
-#define MAMERR_FAILED_VALIDITY	1		/* failed validity checks */
-#define MAMERR_MISSING_FILES	2		/* missing files */
-#define MAMERR_FATALERROR		3		/* some other fatal error */
-#define MAMERR_DEVICE			4		/* device initialization error (MESS-specific) */
-#define MAMERR_NO_SUCH_GAME		5		/* game was specified but doesn't exist */
-#define MAMERR_INVALID_CONFIG	6		/* some sort of error in configuration */
-#define MAMERR_IDENT_NONROMS	7		/* identified all non-ROM files */
-#define MAMERR_IDENT_PARTIAL	8		/* identified some files but not all */
-#define MAMERR_IDENT_NONE		9		/* identified no files */
+enum
+{
+	MAMERR_NONE				= 0,	/* no error */
+	MAMERR_FAILED_VALIDITY	= 1,	/* failed validity checks */
+	MAMERR_MISSING_FILES	= 2,	/* missing files */
+	MAMERR_FATALERROR		= 3,	/* some other fatal error */
+	MAMERR_DEVICE			= 4,	/* device initialization error (MESS-specific) */
+	MAMERR_NO_SUCH_GAME		= 5,	/* game was specified but doesn't exist */
+	MAMERR_INVALID_CONFIG	= 6,	/* some sort of error in configuration */
+	MAMERR_IDENT_NONROMS	= 7,	/* identified all non-ROM files */
+	MAMERR_IDENT_PARTIAL	= 8,	/* identified some files but not all */
+	MAMERR_IDENT_NONE		= 9		/* identified no files */
+};
 
 
 /* program phases */
-#define MAME_PHASE_PREINIT		0
-#define MAME_PHASE_INIT			1
-#define MAME_PHASE_RESET		2
-#define MAME_PHASE_RUNNING		3
-#define MAME_PHASE_EXIT			4
+enum
+{
+	MAME_PHASE_PREINIT,
+	MAME_PHASE_INIT,
+	MAME_PHASE_RESET,
+	MAME_PHASE_RUNNING,
+	MAME_PHASE_EXIT
+};
+
+
+/* debug flags */
+#define DEBUG_FLAG_ENABLED		0x00000001		/* debugging is enabled */
+#define DEBUG_FLAG_CALL_HOOK	0x00000002		/* CPU cores must call instruction hook */
+#define DEBUG_FLAG_WPR_PROGRAM	0x00000010		/* watchpoints are enabled for PROGRAM memory reads */
+#define DEBUG_FLAG_WPR_DATA		0x00000020		/* watchpoints are enabled for DATA memory reads */
+#define DEBUG_FLAG_WPR_IO		0x00000040		/* watchpoints are enabled for IO memory reads */
+#define DEBUG_FLAG_WPW_PROGRAM	0x00000100		/* watchpoints are enabled for PROGRAM memory writes */
+#define DEBUG_FLAG_WPW_DATA		0x00000200		/* watchpoints are enabled for DATA memory writes */
+#define DEBUG_FLAG_WPW_IO		0x00000400		/* watchpoints are enabled for IO memory writes */
 
 
 /* maxima */
@@ -196,7 +213,7 @@ struct _running_machine
 	int						sample_rate;		/* the digital audio sample rate */
 
 	/* debugger-related information */
-	int						debug_mode;			/* was debug mode enabled? */
+	UINT32					debug_flags;		/* the current debug flags */
 
 	/* internal core information */
 	mame_private *			mame_data;			/* internal data from mame.c */

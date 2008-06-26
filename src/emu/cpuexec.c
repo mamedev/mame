@@ -11,6 +11,7 @@
 
 #include "driver.h"
 #include "profiler.h"
+#include "debugger.h"
 
 
 
@@ -278,7 +279,9 @@ void cpuexec_timeslice(running_machine *machine)
 				/* note that this global variable cycles_stolen can be modified */
 				/* via the call to the cpunum_execute */
 				cycles_stolen = 0;
+				debugger_start_cpu_hook(machine, cpunum, target);
 				ran = cpunum_execute(cpunum, cycles_running);
+				debugger_stop_cpu_hook(machine, cpunum);
 
 #ifdef MAME_DEBUG
 				if (ran < cycles_stolen)

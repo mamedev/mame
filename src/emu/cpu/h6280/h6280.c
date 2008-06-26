@@ -244,7 +244,7 @@ static int h6280_execute(int cycles)
     		CHANGE_PC;
 		h6280.ppc = h6280.pc;
 
-		CALL_DEBUGGER(PCW);
+		debugger_instruction_hook(Machine, PCW);
 
 		/* Execute 1 instruction */
 		in=RDOP();
@@ -426,7 +426,6 @@ static void h6280_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + H6280_IRQ1_STATE: set_irq_line( 0, info->i ); 				break;
 		case CPUINFO_INT_REGISTER + H6280_IRQ2_STATE: set_irq_line( 1, info->i ); 				break;
 		case CPUINFO_INT_REGISTER + H6280_IRQT_STATE: set_irq_line( 2, info->i ); 				break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_INT_REGISTER + H6280_M1:		h6280.mmr[0] = info->i;						break;
 		case CPUINFO_INT_REGISTER + H6280_M2:		h6280.mmr[1] = info->i;						break;
 		case CPUINFO_INT_REGISTER + H6280_M3:		h6280.mmr[2] = info->i;						break;
@@ -435,7 +434,6 @@ static void h6280_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + H6280_M6:		h6280.mmr[5] = info->i;						break;
 		case CPUINFO_INT_REGISTER + H6280_M7:		h6280.mmr[6] = info->i;						break;
 		case CPUINFO_INT_REGISTER + H6280_M8:		h6280.mmr[7] = info->i;						break;
-#endif
 	}
 }
 
@@ -493,7 +491,6 @@ void h6280_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + H6280_IRQ1_STATE:	info->i = h6280.irq_state[0];			break;
 		case CPUINFO_INT_REGISTER + H6280_IRQ2_STATE:	info->i = h6280.irq_state[1];			break;
 		case CPUINFO_INT_REGISTER + H6280_IRQT_STATE:	info->i = h6280.irq_state[2];			break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_INT_REGISTER + H6280_M1:			info->i = h6280.mmr[0];					break;
 		case CPUINFO_INT_REGISTER + H6280_M2:			info->i = h6280.mmr[1];					break;
 		case CPUINFO_INT_REGISTER + H6280_M3:			info->i = h6280.mmr[2];					break;
@@ -502,7 +499,6 @@ void h6280_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + H6280_M6:			info->i = h6280.mmr[5];					break;
 		case CPUINFO_INT_REGISTER + H6280_M7:			info->i = h6280.mmr[6];					break;
 		case CPUINFO_INT_REGISTER + H6280_M8:			info->i = h6280.mmr[7];					break;
-#endif
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = h6280_set_info;			break;
@@ -513,9 +509,7 @@ void h6280_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = h6280_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = h6280_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = h6280_dasm;			break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &h6280_ICount;			break;
 		case CPUINFO_PTR_TRANSLATE:						info->translate = h6280_translate;		break;
 
@@ -550,7 +544,6 @@ void h6280_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + H6280_IRQ1_STATE:	sprintf(info->s, "IRQ1:%X", h6280.irq_state[0]); break;
 		case CPUINFO_STR_REGISTER + H6280_IRQ2_STATE:	sprintf(info->s, "IRQ2:%X", h6280.irq_state[1]); break;
 		case CPUINFO_STR_REGISTER + H6280_IRQT_STATE:	sprintf(info->s, "IRQT:%X", h6280.irq_state[2]); break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_STR_REGISTER + H6280_M1:			sprintf(info->s, "M1:%02X", h6280.mmr[0]); break;
 		case CPUINFO_STR_REGISTER + H6280_M2:			sprintf(info->s, "M2:%02X", h6280.mmr[1]); break;
 		case CPUINFO_STR_REGISTER + H6280_M3:			sprintf(info->s, "M3:%02X", h6280.mmr[2]); break;
@@ -559,6 +552,5 @@ void h6280_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + H6280_M6:			sprintf(info->s, "M6:%02X", h6280.mmr[5]); break;
 		case CPUINFO_STR_REGISTER + H6280_M7:			sprintf(info->s, "M7:%02X", h6280.mmr[6]); break;
 		case CPUINFO_STR_REGISTER + H6280_M8:			sprintf(info->s, "M8:%02X", h6280.mmr[7]); break;
-#endif
 	}
 }

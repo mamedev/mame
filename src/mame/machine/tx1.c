@@ -1288,13 +1288,13 @@ WRITE16_HANDLER( buggyboy_math_w )
 		else
 		{
 			mame_printf_debug("BB_DSEL was not 3 for P->S load!\n");
-			DEBUGGER_BREAK;
+			debugger_break(machine);
 		}
 	}
 	else
 	{
 		mame_printf_debug("Buggy Boy unknown math state!\n");
-		DEBUGGER_BREAK;
+		debugger_break(machine);
 	}
 
 	if ( offset & BB_INSLD )

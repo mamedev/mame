@@ -306,7 +306,7 @@ static int lr35902_execute (int cycles)
 		} else {
 			/* Fetch and count cycles */
 			lr35902_ProcessInterrupts ();
-			CALL_DEBUGGER(Regs.w.PC);
+			debugger_instruction_hook(Machine, Regs.w.PC);
 			if ( Regs.w.enable & HALTED ) {
 				CYCLES_PASSED( Cycles[0x76] );
 				Regs.w.execution_state = 1;
@@ -464,10 +464,7 @@ void lr35902_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_PTR_RESET:							info->reset = lr35902_reset;			break;
 	case CPUINFO_PTR_EXECUTE:						info->execute = lr35902_execute;		break;
 	case CPUINFO_PTR_BURN:							info->burn = lr35902_burn;				break;
-
-#ifdef ENABLE_DEBUGGER
 	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = lr35902_dasm;		break;
-#endif
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &lr35902_ICount;			break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */

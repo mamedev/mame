@@ -392,7 +392,6 @@ UINT32 z;
 }
 #endif
 
-#ifdef ENABLE_DEBUGGER
 static void sh4_syncronize_register_bank(int to)
 {
 int s;
@@ -402,7 +401,6 @@ int s;
 		sh4.rbnk[to][s] = sh4.r[s];
 	}
 }
-#endif
 
 static void sh4_default_exception_priorities(void) // setup default priorities for exceptions
 {
@@ -504,9 +502,8 @@ INLINE void sh4_exception(const char *message, int exception) // handle exceptio
 	sh4.sgr = sh4.r[15];
 
 	sh4.sr |= MD;
-#ifdef ENABLE_DEBUGGER
-	sh4_syncronize_register_bank((sh4.sr & sRB) >> 29);
-#endif
+	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		sh4_syncronize_register_bank((sh4.sr & sRB) >> 29);
 	if (!(sh4.sr & sRB))
 		sh4_change_register_bank(1);
 	sh4.sr |= sRB;
@@ -1171,9 +1168,8 @@ INLINE void JSR(UINT32 m)
 /*  LDC     Rm,SR */
 INLINE void LDCSR(UINT32 m)
 {
-#ifdef ENABLE_DEBUGGER
-	sh4_syncronize_register_bank((sh4.sr & sRB) >> 29);
-#endif
+	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		sh4_syncronize_register_bank((sh4.sr & sRB) >> 29);
 	if ((sh4.r[m] & sRB) != (sh4.sr & sRB))
 		sh4_change_register_bank(sh4.r[m] & sRB ? 1 : 0);
 	sh4.sr = sh4.r[m] & FLAGS;
@@ -1200,9 +1196,8 @@ UINT32 old;
 	old = sh4.sr;
 	sh4.ea = sh4.r[m];
 	sh4.sr = RL( sh4.ea ) & FLAGS;
-#ifdef ENABLE_DEBUGGER
-	sh4_syncronize_register_bank((old & sRB) >> 29);
-#endif
+	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		sh4_syncronize_register_bank((old & sRB) >> 29);
 	if ((old & sRB) != (sh4.sr & sRB))
 		sh4_change_register_bank(sh4.sr & sRB ? 1 : 0);
 	sh4.r[m] += 4;
@@ -1787,9 +1782,8 @@ INLINE void RTE(void)
 {
 	sh4.delay = sh4.pc;
 	sh4.pc = sh4.ea = sh4.spc;
-#ifdef ENABLE_DEBUGGER
-	sh4_syncronize_register_bank((sh4.sr & sRB) >> 29);
-#endif
+	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		sh4_syncronize_register_bank((sh4.sr & sRB) >> 29);
 	if ((sh4.ssr & sRB) != (sh4.sr & sRB))
 		sh4_change_register_bank(sh4.ssr & sRB ? 1 : 0);
 	sh4.sr = sh4.ssr;
@@ -3514,11 +3508,9 @@ INLINE void op1111(UINT16 opcode)
 								case 0x800:
 									FRCHG();
 									break;
-#ifdef ENABLE_DEBUGGER
 								default:
-									mame_debug_break();
+									debugger_break(Machine);
 									break;
-#endif
 							}
 						} else {
 							FTRV(Rn);
@@ -3527,21 +3519,17 @@ INLINE void op1111(UINT16 opcode)
 						FSSCA(Rn);
 					}
 					break;
-#ifdef ENABLE_DEBUGGER
 				default:
-					mame_debug_break();
+					debugger_break(Machine);
 					break;
-#endif
 			}
 			break;
 		case 14:
 			FMAC(Rm,Rn);
 			break;
-#ifdef ENABLE_DEBUGGER
 		default:
-			mame_debug_break();
+			debugger_break(Machine);
 			break;
-#endif
 	}
 }
 
@@ -3646,7 +3634,7 @@ static int sh4_execute(int cycles)
 		else
 			opcode = cpu_readop16(WORD2_XOR_LE((UINT32)(sh4.pc & AM)));
 
-		CALL_DEBUGGER(sh4.pc);
+		debugger_instruction_hook(Machine, sh4.pc);
 
 		sh4.delay = 0;
 		sh4.pc += 2;
@@ -4658,12 +4646,10 @@ static void sh4_parse_configuration(const struct sh4_config *conf)
 	}
 }
 
-#ifdef ENABLE_DEBUGGER
 static offs_t sh4_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return DasmSH4( buffer, pc, (oprom[1] << 8) | oprom[0] );
 }
-#endif /* ENABLE_DEBUGGER */
 
 static void sh4_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
@@ -5142,9 +5128,7 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_RESET:							info->reset = sh4_reset;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = sh4_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sh4_dasm;			break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sh4_icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

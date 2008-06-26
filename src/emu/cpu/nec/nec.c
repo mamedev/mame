@@ -1039,12 +1039,10 @@ static void set_poll_line(int state)
 	I.poll_state = state;
 }
 
-#ifdef ENABLE_DEBUGGER
 static offs_t nec_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return necv_dasm_one(buffer, pc, oprom, I.config);
 }
-#endif /* ENABLE_DEBUGGER */
 
 static void nec_init(int index, int clock, const void *_config, int (*irqcallback)(int), int type)
 {
@@ -1194,7 +1192,7 @@ static int v20_execute(int cycles)
 		if (I.no_interrupt)
 			I.no_interrupt--;
 
-		CALL_DEBUGGER((I.sregs[PS]<<4) + I.ip);
+		debugger_instruction_hook(Machine, (I.sregs[PS]<<4) + I.ip);
 		nec_instruction[fetchop()]();
     }
 	return cycles - nec_ICount;
@@ -1225,7 +1223,7 @@ static int v30_execute(int cycles) {
 		if (I.no_interrupt)
 			I.no_interrupt--;
 
-		CALL_DEBUGGER((I.sregs[PS]<<4) + I.ip);
+		debugger_instruction_hook(Machine, (I.sregs[PS]<<4) + I.ip);
 		nec_instruction[fetchop()]();
     }
 	return cycles - nec_ICount;
@@ -1257,7 +1255,7 @@ static int v33_execute(int cycles)
 		if (I.no_interrupt)
 			I.no_interrupt--;
 
-		CALL_DEBUGGER((I.sregs[PS]<<4) + I.ip);
+		debugger_instruction_hook(Machine, (I.sregs[PS]<<4) + I.ip);
 		nec_instruction[fetchop()]();
     }
 
@@ -1390,9 +1388,7 @@ static void nec_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = nec_exit;					break;
 		case CPUINFO_PTR_EXECUTE:						/* set per-CPU */						break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = nec_dasm;			break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &nec_ICount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

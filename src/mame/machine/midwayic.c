@@ -369,7 +369,7 @@ void midway_serial_pic2_w(running_machine *machine, UINT8 data)
 					memcpy(pic.buffer, serial.data, 16);
 					pic.total = 16;
 					pic.index = 0;
-					DEBUGGER_BREAK;
+					debugger_break(machine);
 				}
 				break;
 

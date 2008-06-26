@@ -539,7 +539,7 @@ static int ssp1601_execute(int cycles)
 
 		PPC = rPC;
 
-		CALL_DEBUGGER(rPC);
+		debugger_instruction_hook(Machine, rPC);
 
 		op = FETCH();
 
@@ -756,12 +756,10 @@ static void ssp1601_set_context(void *regs)
 		ssp1601 = *(ssp1601_regs *)regs;
 }
 
-#ifdef ENABLE_DEBUGGER
 static offs_t ssp1601_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return dasm_ssp1601(buffer, pc, oprom);
 }
-#endif /* ENABLE_DEBUGGER */
 
 #if (HAS_SSP1601)
 
@@ -867,9 +865,7 @@ void ssp1601_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = ssp1601_exit;			break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = ssp1601_execute;		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = ssp1601_dasm;	break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &g_cycles;			break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map16 = NULL;	break;

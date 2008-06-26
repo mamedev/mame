@@ -104,7 +104,7 @@ void m37710_state_load(void *file);
 
 #undef M37710_CALL_DEBUGGER
 
-#define M37710_CALL_DEBUGGER 			CALL_DEBUGGER
+#define M37710_CALL_DEBUGGER(x) 		debugger_instruction_hook(Machine, x)
 #define m37710_read_8(addr) 			program_read_byte_16le(addr)
 #define m37710_write_8(addr,data)		program_write_byte_16le(addr,data)
 #define m37710_read_8_immediate(A)		program_read_byte_16le(A)

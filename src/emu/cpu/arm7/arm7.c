@@ -48,11 +48,9 @@ static READ32_HANDLER(test_rt_r_callback);
 static WRITE32_HANDLER(test_rt_w_callback);
 static void test_dt_r_callback(UINT32 insn, UINT32 *prn, UINT32 (*read32)(UINT32 addr));
 static void test_dt_w_callback(UINT32 insn, UINT32 *prn, void (*write32)(UINT32 addr, UINT32 data));
-#ifdef ENABLE_DEBUGGER
 static char *Spec_RT(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
 static char *Spec_DT(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
 static char *Spec_DO(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
-#endif
 #endif
 
 /* Macros that can be re-defined for custom cpu implementations - The core expects these to be defined */
@@ -101,12 +99,10 @@ static void arm7_init(int index, int clock, const void *config, int (*irqcallbac
     arm7_coproc_rt_w_callback = test_rt_w_callback;
     arm7_coproc_dt_r_callback = test_dt_r_callback;
     arm7_coproc_dt_w_callback = test_dt_w_callback;
-#ifdef ENABLE_DEBUGGER
     // setup dasm callbacks - direct method example
     arm7_dasm_cop_dt_callback = Spec_DT;
     arm7_dasm_cop_rt_callback = Spec_RT;
     arm7_dasm_cop_do_callback = Spec_DO;
-#endif
 #endif
 }
 
@@ -150,7 +146,6 @@ static void arm7_set_context(void *src)
     }
 }
 
-#ifdef ENABLE_DEBUGGER
 static offs_t arm7_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
     if (T_IS_SET(GET_CPSR))
@@ -162,7 +157,6 @@ static offs_t arm7_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8
         return arm7_disasm(buffer, pc, oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24)) | 4;
     }
 }
-#endif /* ENABLE_DEBUGGER */
 
 
 /**************************************************************************
@@ -340,9 +334,7 @@ void arm7_get_info(UINT32 state, cpuinfo *info)
         case CPUINFO_PTR_EXIT:                  info->exit = arm7_exit;                         break;
         case CPUINFO_PTR_EXECUTE:               info->execute = arm7_execute;                   break;
         case CPUINFO_PTR_BURN:                  info->burn = NULL;                              break;
-#ifdef ENABLE_DEBUGGER
         case CPUINFO_PTR_DISASSEMBLE:           info->disassemble = arm7_dasm;                  break;
-#endif /* ENABLE_DEBUGGER */
         case CPUINFO_PTR_INSTRUCTION_COUNTER:   info->icount = &ARM7_ICOUNT;                    break;
 
         /* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -442,7 +434,6 @@ static void test_dt_w_callback(UINT32 insn, UINT32 *prn, void (*write32)(UINT32 
 }
 
 /* Custom Co-proc DASM handlers */
-#ifdef ENABLE_DEBUGGER
 static char *Spec_RT(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0)
 {
     pBuf += sprintf(pBuf, "SPECRT");
@@ -458,5 +449,4 @@ static char *Spec_DO(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf
     pBuf += sprintf(pBuf, "SPECDO");
     return pBuf;
 }
-#endif
 #endif

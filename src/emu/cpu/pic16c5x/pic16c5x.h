@@ -126,9 +126,7 @@ void pic16C58_get_info(UINT32 state, cpuinfo *info);
 
 
 #if (HAS_PIC16C54) || (HAS_PIC16C55) || (HAS_PIC16C56) || (HAS_PIC16C57) || (HAS_PIC16C58)
-#ifdef ENABLE_DEBUGGER
 offs_t pic16C5x_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif
 #endif
 
 

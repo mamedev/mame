@@ -116,9 +116,7 @@
 #include "driver.h"
 #include "profiler.h"
 #include "deprecat.h"
-#ifdef ENABLE_DEBUGGER
 #include "debug/debugcpu.h"
-#endif
 
 
 /***************************************************************************
@@ -195,13 +193,8 @@ typedef enum _read_or_write read_or_write;
 
 #define SUBTABLE_PTR(tabledata, entry) (&(tabledata)->table[(1 << LEVEL1_BITS) + (((entry) - SUBTABLE_BASE) << LEVEL2_BITS)])
 
-#ifdef ENABLE_DEBUGGER
 #define DEBUG_HOOK_READ(spacenum,address,mem_mask) if (debug_hook_read) (*debug_hook_read)(spacenum,address,mem_mask)
 #define DEBUG_HOOK_WRITE(spacenum,address,data,mem_mask) if (debug_hook_write) (*debug_hook_write)(spacenum,address,data,mem_mask)
-#else
-#define DEBUG_HOOK_READ(spacenum,address,mem_mask)
-#define DEBUG_HOOK_WRITE(spacenum,address,data,mem_mask)
-#endif
 
 
 
@@ -326,10 +319,8 @@ static UINT8				log_unmap[ADDRESS_SPACES];		/* log unmapped memory accesses */
 static cpu_data				cpudata[MAX_CPU];				/* data gathered for each CPU */
 static bank_info 			bankdata[STATIC_COUNT];			/* data gathered for each bank */
 
-#ifdef ENABLE_DEBUGGER
 static debug_hook_read_func	debug_hook_read;				/* pointer to debugger callback for memory reads */
 static debug_hook_write_func debug_hook_write;				/* pointer to debugger callback for memory writes */
-#endif
 
 #define ACCESSOR_GROUP(type, width) \
 { \
@@ -579,15 +570,13 @@ void memory_set_context(int activecpu)
 
 	opbase_handler = cpudata[activecpu].opbase_handler;
 
-#ifdef ENABLE_DEBUGGER
-	if (activecpu != -1 && Machine->debug_mode)
-		debug_get_memory_hooks(activecpu, &debug_hook_read, &debug_hook_write);
+	if (activecpu != -1 && (Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debug_cpu_get_memory_hooks(activecpu, &debug_hook_read, &debug_hook_write);
 	else
 	{
 		debug_hook_read = NULL;
 		debug_hook_write = NULL;
 	}
-#endif
 }
 
 

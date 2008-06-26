@@ -706,7 +706,7 @@ int ds5002fp_execute(int cycles)
 		PPC = PC;
 
 		//Call Debugger
-		CALL_DEBUGGER(PC);
+		debugger_instruction_hook(Machine, PC);
 
 		//remove after testing
 		if(PC != PPC)	op = cpu_readop(PC);
@@ -2184,9 +2184,7 @@ INLINE void do_add_flags(UINT8 a, UINT8 data, UINT8 c)
 	SET_AC(ac);
 	SET_OV(ov);
 
-#ifdef ENABLE_DEBUGGER
 //  mame_printf_debug("add: result=%x, c=%x, ac=%x, ov=%x\n",a+data+c,cy,ac,ov);
-#endif
 }
 
 INLINE void do_sub_flags(UINT8 a, UINT8 data, UINT8 c)
@@ -2202,9 +2200,7 @@ INLINE void do_sub_flags(UINT8 a, UINT8 data, UINT8 c)
 	SET_AC(ac);
 	SET_OV(ov);
 
-#ifdef ENABLE_DEBUGGER
 //  mame_printf_debug("sub: a=%x, d=%x, c=%x, result=%x, cy=%x, ac=%x, ov=%x\n",a,data,c,a-data-c,cy,ac,ov);
-#endif
 }
 
 INLINE void update_timer(int cyc)
@@ -2539,14 +2535,12 @@ void ds5002fp_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = ds5002fp_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = ds5002fp_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = ds5002fp_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = ds5002fp_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = ds5002fp_init;					break;
 		case CPUINFO_PTR_RESET:							info->reset = ds5002fp_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = ds5002fp_exit;				break;
+		case CPUINFO_PTR_EXIT:							info->exit = ds5002fp_exit;					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = ds5002fp_execute;			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
+		case CPUINFO_PTR_BURN:							info->burn = NULL;							break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = ds5002fp_dasm;			break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ds5002fp_icount;			break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = NULL;	break;

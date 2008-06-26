@@ -45,6 +45,7 @@ EMUOBJS = \
 	$(EMUOBJ)/cpuint.o \
 	$(EMUOBJ)/cpuintrf.o \
 	$(EMUOBJ)/crsshair.o \
+	$(EMUOBJ)/debugger.o \
 	$(EMUOBJ)/devintrf.o \
 	$(EMUOBJ)/drawgfx.o \
 	$(EMUOBJ)/driver.o \
@@ -78,15 +79,7 @@ EMUOBJS = \
 	$(EMUOBJ)/uimenu.o \
 	$(EMUOBJ)/validity.o \
 	$(EMUOBJ)/video.o \
-	$(EMUOBJ)/watchdog.o
-
-ifdef PROFILER
-EMUOBJS += \
-	$(EMUOBJ)/profiler.o
-endif
-
-ifdef DEBUGGER
-EMUOBJS += \
+	$(EMUOBJ)/watchdog.o \
 	$(EMUOBJ)/debug/debugcmd.o \
 	$(EMUOBJ)/debug/debugcmt.o \
 	$(EMUOBJ)/debug/debugcon.o \
@@ -95,6 +88,10 @@ EMUOBJS += \
 	$(EMUOBJ)/debug/debugvw.o \
 	$(EMUOBJ)/debug/express.o \
 	$(EMUOBJ)/debug/textbuf.o
+
+ifdef PROFILER
+EMUOBJS += \
+	$(EMUOBJ)/profiler.o
 endif
 
 EMUSOUNDOBJS = \
@@ -195,11 +192,7 @@ $(LIBEMU): $(EMUOBJS) $(EMUSOUNDOBJS) $(EMUAUDIOOBJS) $(EMUDRIVEROBJS) $(EMUMACH
 
 include $(EMUSRC)/cpu/cpu.mak
 
-$(LIBCPU): $(CPUOBJS)
-
-ifdef DEBUGGER
-$(LIBCPU): $(DBGOBJS)
-endif
+$(LIBCPU): $(CPUOBJS) $(DBGOBJS)
 
 
 

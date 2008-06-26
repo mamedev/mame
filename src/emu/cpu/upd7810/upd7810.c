@@ -1702,7 +1702,7 @@ static int upd7810_execute (int cycles)
 	{
 		int cc = 0;
 
-		CALL_DEBUGGER(PC);
+		debugger_instruction_hook(Machine, PC);
 
 		PPC = PC;
 		RDOP(OP);
@@ -2000,9 +2000,7 @@ void upd7810_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = upd7810_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = upd7810_execute;		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = upd7810_dasm;		break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &upd7810_icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2088,9 +2086,7 @@ void upd7807_get_info(UINT32 state, cpuinfo *info)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_RESET:							info->reset = upd7807_reset;			break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = upd7807_dasm;		break;
-#endif /* ENABLE_DEBUGGER */
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD7807");				break;
@@ -2102,9 +2098,7 @@ void upd7807_get_info(UINT32 state, cpuinfo *info)
 void upd7801_get_info(UINT32 state, cpuinfo *info) {
 	switch( state ) {
 		case CPUINFO_PTR_RESET:							info->reset = upd7801_reset;			break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = upd7801_dasm;		break;
-#endif /* ENABLE_DEBUGGER */
 
 		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD7801");				break;
 
@@ -2117,9 +2111,7 @@ void upd78c05_get_info(UINT32 state, cpuinfo *info ) {
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
 
 		case CPUINFO_PTR_RESET:							info->reset = upd78c05_reset;			break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = upd78c05_dasm;		break;
-#endif /* ENABLE_DEBUGGER */
 
 		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD78C05");			break;
 

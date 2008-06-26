@@ -116,7 +116,7 @@ static int sc61860_execute(int cycles)
 	{
 		sc61860.oldpc = sc61860.pc;
 
-		CALL_DEBUGGER(sc61860.pc);
+		debugger_instruction_hook(Machine, sc61860.pc);
 
 		sc61860_instruction();
 
@@ -202,21 +202,19 @@ void sc61860_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + SC61860_DP:				info->i =  sc61860.dp;						break;
 		case CPUINFO_INT_REGISTER + SC61860_P:				info->i =  sc61860.p;						break;
 		case CPUINFO_INT_REGISTER + SC61860_Q:				info->i =  sc61860.q;						break;
-		case CPUINFO_INT_REGISTER + SC61860_CARRY:			info->i =  sc61860.carry;						break;
-		case CPUINFO_INT_REGISTER + SC61860_ZERO:			info->i =  sc61860.zero;						break;
+		case CPUINFO_INT_REGISTER + SC61860_CARRY:			info->i =  sc61860.carry;					break;
+		case CPUINFO_INT_REGISTER + SC61860_ZERO:			info->i =  sc61860.zero;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = sc61860_set_info;				break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = sc61860_get_context;			break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = sc61860_set_context;			break;
-		case CPUINFO_PTR_INIT:							info->init = sc61860_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = sc61860_init;						break;
 		case CPUINFO_PTR_RESET:							info->reset = sc61860_reset;					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = sc61860_execute;				break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sc61860_dasm;					break;
-#endif /* ENABLE_DEBUGGER */
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sc61860_ICount;				break;
+		case CPUINFO_PTR_BURN:							info->burn = NULL;								break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sc61860_dasm;				break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sc61860_ICount;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s = cpuintrf_temp_str(), "SC61860"); break;

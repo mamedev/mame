@@ -114,9 +114,7 @@ extern void i8051_set_serial_tx_callback(void (*callback)(int data));
 extern void i8051_set_serial_rx_callback(int (*callback)(void));
 extern void i8051_set_eram_iaddr_callback(READ32_HANDLER((*callback)));
 
-#ifdef ENABLE_DEBUGGER
 extern offs_t i8051_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif /* ENABLE_DEBUGGER */
 
 /****************************************************************************
  * 8752 Section

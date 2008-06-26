@@ -71,9 +71,7 @@ enum
 
 extern void m6502_get_info(UINT32 state, cpuinfo *info);
 
-#ifdef ENABLE_DEBUGGER
 extern unsigned m6502_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif
 
 /****************************************************************************
  * The 6510
@@ -94,9 +92,7 @@ extern unsigned m6502_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UI
 
 extern void m6510_get_info(UINT32 state, cpuinfo *info);
 
-#ifdef ENABLE_DEBUGGER
 extern unsigned m6510_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif
 
 #endif
 
@@ -201,9 +197,7 @@ extern void n2a03_irq(void);
 
 extern void m65c02_get_info(UINT32 state, cpuinfo *info);
 
-#ifdef ENABLE_DEBUGGER
 extern unsigned m65c02_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif
 
 #endif
 
@@ -226,9 +220,7 @@ extern unsigned m65c02_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const U
 
 extern void m65sc02_get_info(UINT32 state, cpuinfo *info);
 
-#ifdef ENABLE_DEBUGGER
 extern unsigned m65sc02_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif
 #endif
 
 /****************************************************************************
@@ -251,9 +243,7 @@ extern unsigned m65sc02_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const 
 extern void deco16_get_info(UINT32 state, cpuinfo *info);
 #endif
 
-#ifdef ENABLE_DEBUGGER
 extern unsigned deco16_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif
 
 #endif /* _M6502_H */
 

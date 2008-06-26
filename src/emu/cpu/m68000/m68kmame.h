@@ -40,7 +40,7 @@
 #define M68K_SET_PC_CALLBACK(A)     change_pc(A)
 
 #define M68K_INSTRUCTION_HOOK       OPT_SPECIFY_HANDLER
-#define M68K_INSTRUCTION_CALLBACK(A) CALL_DEBUGGER(A)
+#define M68K_INSTRUCTION_CALLBACK(A) debugger_instruction_hook(Machine, A)
 
 #define M68K_EMULATE_PREFETCH       OPT_ON
 

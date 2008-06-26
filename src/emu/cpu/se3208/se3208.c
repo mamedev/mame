@@ -1769,7 +1769,7 @@ static int SE3208_Run(int cycles)
 	{
 		UINT16 Opcode=cpu_readop16(WORD_XOR_LE(Context.PC));
 
-		CALL_DEBUGGER(Context.PC);
+		debugger_instruction_hook(Machine, Context.PC);
 
 		OpTable[Opcode](Opcode);
 		Context.PPC=Context.PC;
@@ -1906,9 +1906,7 @@ void SE3208_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = SE3208_Exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = SE3208_Run;				break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = SE3208_Dasm;		break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &SE3208_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

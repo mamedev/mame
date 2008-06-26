@@ -696,7 +696,7 @@ static void reset_reset(running_machine *machine)
 			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
 			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 //          mame_printf_debug("enable 2nd cpu!\n");
-//          DEBUGGER_BREAK;
+//          debugger_break(machine);
 			s24_fd1094_machine_init();
 
 		} else

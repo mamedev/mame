@@ -371,14 +371,12 @@ static UINT32 ppc_readop_translated(offs_t address)
 /***********************************************************************/
 
 
-#ifdef ENABLE_DEBUGGER
 static offs_t ppc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	UINT32 op;
 	op = BIG_ENDIANIZE_INT32(*((UINT32 *) oprom));
 	return ppc_dasm_one(buffer, pc, op);
 }
-#endif /* ENABLE_DEBUGGER */
 
 /***********************************************************************/
 

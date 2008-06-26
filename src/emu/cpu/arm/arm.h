@@ -16,9 +16,7 @@
 
 extern void arm_get_info(UINT32 state, cpuinfo *info);
 
-#ifdef ENABLE_DEBUGGER
-extern UINT32 arm_disasm( char *pBuf, UINT32 pc, UINT32 opcode );
-#endif
+extern UINT32 arm_disasm(char *pBuf, UINT32 pc, UINT32 opcode);
 
 enum
 {

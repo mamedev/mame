@@ -65,8 +65,6 @@ extern void alpha8301_get_info(UINT32 state, cpuinfo *info);
  */
 #define ALPHA8201_RDOP_ARG(A) ((unsigned)cpu_readop_arg(A))
 
-#ifdef  ENABLE_DEBUGGER
 offs_t ALPHA8201_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif
 
 #endif  /* _ALPHA8201_H */

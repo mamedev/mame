@@ -573,13 +573,10 @@ static int mips3_translate(int space, int intention, offs_t *address)
     mips3_dasm - disassemble an instruction
 -------------------------------------------------*/
 
-#ifdef ENABLE_DEBUGGER
 static offs_t mips3_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return mips3com_dasm(mips3, buffer, pc, oprom, opram);
 }
-#endif /* ENABLE_DEBUGGER */
-
 
 
 /*-------------------------------------------------
@@ -634,9 +631,7 @@ static void mips3_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_RESET:							info->reset = mips3_reset;				break;
 		case CPUINFO_PTR_EXIT:							info->exit = mips3_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = mips3_execute;			break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = mips3_dasm;			break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_TRANSLATE:						info->translate = mips3_translate;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1229,99 +1224,100 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 	UML_JMPc(block, IF_Z, tlbmiss = label++);										// jmp     tlbmiss,z
 	UML_ROLINS(block, IREG(0), IREG(3), IMM(0), IMM(0xfffff000));					// rolins  i0,i3,0,0xfffff000
 
-	for (ramnum = 0; ramnum < MIPS3_MAX_FASTRAM; ramnum++)
-		if (!Machine->debug_mode && mips3->impstate->fastram[ramnum].base != NULL && (!iswrite || !mips3->impstate->fastram[ramnum].readonly))
-		{
-			void *fastbase = (UINT8 *)mips3->impstate->fastram[ramnum].base - mips3->impstate->fastram[ramnum].start;
-			UINT32 skip = label++;
-			if (mips3->impstate->fastram[ramnum].end != 0xffffffff)
+	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
+		for (ramnum = 0; ramnum < MIPS3_MAX_FASTRAM; ramnum++)
+			if (mips3->impstate->fastram[ramnum].base != NULL && (!iswrite || !mips3->impstate->fastram[ramnum].readonly))
 			{
-				UML_CMP(block, IREG(0), IMM(mips3->impstate->fastram[ramnum].end));	// cmp     i0,end
-				UML_JMPc(block, IF_A, skip);										// ja      skip
-			}
-			if (mips3->impstate->fastram[ramnum].start != 0x00000000)
-			{
-				UML_CMP(block, IREG(0), IMM(mips3->impstate->fastram[ramnum].start));// cmp     i0,fastram_start
-				UML_JMPc(block, IF_B, skip);										// jb      skip
-			}
+				void *fastbase = (UINT8 *)mips3->impstate->fastram[ramnum].base - mips3->impstate->fastram[ramnum].start;
+				UINT32 skip = label++;
+				if (mips3->impstate->fastram[ramnum].end != 0xffffffff)
+				{
+					UML_CMP(block, IREG(0), IMM(mips3->impstate->fastram[ramnum].end));	// cmp     i0,end
+					UML_JMPc(block, IF_A, skip);										// ja      skip
+				}
+				if (mips3->impstate->fastram[ramnum].start != 0x00000000)
+				{
+					UML_CMP(block, IREG(0), IMM(mips3->impstate->fastram[ramnum].start));// cmp     i0,fastram_start
+					UML_JMPc(block, IF_B, skip);										// jb      skip
+				}
 
-			if (!iswrite)
-			{
-				if (size == 1)
+				if (!iswrite)
 				{
-					UML_XOR(block, IREG(0), IREG(0), IMM(mips3->bigendian ? BYTE4_XOR_BE(0) : BYTE4_XOR_LE(0)));
-																					// xor     i0,i0,bytexor
-					UML_LOAD(block, IREG(0), fastbase, IREG(0), BYTE);				// load    i0,fastbase,i0,byte
-				}
-				else if (size == 2)
-				{
-					UML_SHR(block, IREG(0), IREG(0), IMM(1));						// shr     i0,i0,1
-					UML_XOR(block, IREG(0), IREG(0), IMM(mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0)));
-																					// xor     i0,i0,bytexor
-					UML_LOAD(block, IREG(0), fastbase, IREG(0), WORD);				// load    i0,fastbase,i0,word
-				}
-				else if (size == 4)
-				{
-					UML_SHR(block, IREG(0), IREG(0), IMM(2));						// shr     i0,i0,2
-					UML_LOAD(block, IREG(0), fastbase, IREG(0), DWORD);				// load    i0,fastbase,i0,dword
-				}
-				else if (size == 8)
-				{
-					UML_SHR(block, IREG(0), IREG(0), IMM(3));						// shr     i0,i0,3
-					UML_DLOAD(block, IREG(0), fastbase, IREG(0), QWORD);			// dload   i0,fastbase,i0,qword
-					UML_DROR(block, IREG(0), IREG(0), IMM(32 * (mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0))));
-																					// dror    i0,i0,32*bytexor
-				}
-				UML_RET(block);														// ret
-			}
-			else
-			{
-				if (size == 1)
-				{
-					UML_XOR(block, IREG(0), IREG(0), IMM(mips3->bigendian ? BYTE4_XOR_BE(0) : BYTE4_XOR_LE(0)));
-																					// xor     i0,i0,bytexor
-					UML_STORE(block, fastbase, IREG(0), IREG(1), BYTE);				// store   fastbase,i0,i1,byte
-				}
-				else if (size == 2)
-				{
-					UML_SHR(block, IREG(0), IREG(0), IMM(1));						// shr     i0,i0,1
-					UML_XOR(block, IREG(0), IREG(0), IMM(mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0)));
-																					// xor     i0,i0,bytexor
-					UML_STORE(block, fastbase, IREG(0), IREG(1), WORD);				// store   fastbase,i0,i1,word
-				}
-				else if (size == 4)
-				{
-					UML_SHR(block, IREG(0), IREG(0), IMM(2));						// shr     i0,i0,2
-					if (ismasked)
+					if (size == 1)
 					{
-						UML_LOAD(block, IREG(3), fastbase, IREG(0), DWORD);			// load    i3,fastbase,i0,dword
-						UML_ROLINS(block, IREG(3), IREG(1), IMM(0), IREG(2));		// rolins  i3,i1,0,i2
-						UML_STORE(block, fastbase, IREG(0), IREG(3), DWORD);		// store   fastbase,i0,i3,dword
+						UML_XOR(block, IREG(0), IREG(0), IMM(mips3->bigendian ? BYTE4_XOR_BE(0) : BYTE4_XOR_LE(0)));
+																						// xor     i0,i0,bytexor
+						UML_LOAD(block, IREG(0), fastbase, IREG(0), BYTE);				// load    i0,fastbase,i0,byte
 					}
-					else
-						UML_STORE(block, fastbase, IREG(0), IREG(1), DWORD);		// store   fastbase,i0,i1,dword
-				}
-				else if (size == 8)
-				{
-					UML_SHR(block, IREG(0), IREG(0), IMM(3));						// shr     i0,i0,3
-					UML_DROR(block, IREG(1), IREG(1), IMM(32 * (mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0))));
-																					// dror    i1,i1,32*bytexor
-					if (ismasked)
+					else if (size == 2)
 					{
-						UML_DROR(block, IREG(2), IREG(2), IMM(32 * (mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0))));
-																					// dror    i2,i2,32*bytexor
-						UML_DLOAD(block, IREG(3), fastbase, IREG(0), QWORD);		// dload   i3,fastbase,i0,qword
-						UML_DROLINS(block, IREG(3), IREG(1), IMM(0), IREG(2));		// drolins i3,i1,0,i2
-						UML_DSTORE(block, fastbase, IREG(0), IREG(3), QWORD);		// dstore  fastbase,i0,i3,qword
+						UML_SHR(block, IREG(0), IREG(0), IMM(1));						// shr     i0,i0,1
+						UML_XOR(block, IREG(0), IREG(0), IMM(mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0)));
+																						// xor     i0,i0,bytexor
+						UML_LOAD(block, IREG(0), fastbase, IREG(0), WORD);				// load    i0,fastbase,i0,word
 					}
-					else
-						UML_DSTORE(block, fastbase, IREG(0), IREG(1), QWORD);		// dstore  fastbase,i0,i1,qword
+					else if (size == 4)
+					{
+						UML_SHR(block, IREG(0), IREG(0), IMM(2));						// shr     i0,i0,2
+						UML_LOAD(block, IREG(0), fastbase, IREG(0), DWORD);				// load    i0,fastbase,i0,dword
+					}
+					else if (size == 8)
+					{
+						UML_SHR(block, IREG(0), IREG(0), IMM(3));						// shr     i0,i0,3
+						UML_DLOAD(block, IREG(0), fastbase, IREG(0), QWORD);			// dload   i0,fastbase,i0,qword
+						UML_DROR(block, IREG(0), IREG(0), IMM(32 * (mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0))));
+																						// dror    i0,i0,32*bytexor
+					}
+					UML_RET(block);														// ret
 				}
-				UML_RET(block);														// ret
-			}
+				else
+				{
+					if (size == 1)
+					{
+						UML_XOR(block, IREG(0), IREG(0), IMM(mips3->bigendian ? BYTE4_XOR_BE(0) : BYTE4_XOR_LE(0)));
+																						// xor     i0,i0,bytexor
+						UML_STORE(block, fastbase, IREG(0), IREG(1), BYTE);				// store   fastbase,i0,i1,byte
+					}
+					else if (size == 2)
+					{
+						UML_SHR(block, IREG(0), IREG(0), IMM(1));						// shr     i0,i0,1
+						UML_XOR(block, IREG(0), IREG(0), IMM(mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0)));
+																						// xor     i0,i0,bytexor
+						UML_STORE(block, fastbase, IREG(0), IREG(1), WORD);				// store   fastbase,i0,i1,word
+					}
+					else if (size == 4)
+					{
+						UML_SHR(block, IREG(0), IREG(0), IMM(2));						// shr     i0,i0,2
+						if (ismasked)
+						{
+							UML_LOAD(block, IREG(3), fastbase, IREG(0), DWORD);			// load    i3,fastbase,i0,dword
+							UML_ROLINS(block, IREG(3), IREG(1), IMM(0), IREG(2));		// rolins  i3,i1,0,i2
+							UML_STORE(block, fastbase, IREG(0), IREG(3), DWORD);		// store   fastbase,i0,i3,dword
+						}
+						else
+							UML_STORE(block, fastbase, IREG(0), IREG(1), DWORD);		// store   fastbase,i0,i1,dword
+					}
+					else if (size == 8)
+					{
+						UML_SHR(block, IREG(0), IREG(0), IMM(3));						// shr     i0,i0,3
+						UML_DROR(block, IREG(1), IREG(1), IMM(32 * (mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0))));
+																						// dror    i1,i1,32*bytexor
+						if (ismasked)
+						{
+							UML_DROR(block, IREG(2), IREG(2), IMM(32 * (mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0))));
+																						// dror    i2,i2,32*bytexor
+							UML_DLOAD(block, IREG(3), fastbase, IREG(0), QWORD);		// dload   i3,fastbase,i0,qword
+							UML_DROLINS(block, IREG(3), IREG(1), IMM(0), IREG(2));		// drolins i3,i1,0,i2
+							UML_DSTORE(block, fastbase, IREG(0), IREG(3), QWORD);		// dstore  fastbase,i0,i3,qword
+						}
+						else
+							UML_DSTORE(block, fastbase, IREG(0), IREG(1), QWORD);		// dstore  fastbase,i0,i1,qword
+					}
+					UML_RET(block);														// ret
+				}
 
-			UML_LABEL(block, skip);												// skip:
-		}
+				UML_LABEL(block, skip);												// skip:
+			}
 
 	switch (size)
 	{
@@ -1556,7 +1552,7 @@ static void generate_sequence_instruction(drcuml_block *block, compiler_state *c
 		UML_CALLC(block, cfunc_printf_probe, desc->pc);								// callc   cfunc_printf_probe,desc->pc
 
 	/* if we are debugging, call the debugger */
-	if (Machine->debug_mode)
+	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		UML_MOV(block, MEM(&mips3->pc), IMM(desc->pc));								// mov     [pc],desc->pc
 		save_fast_iregs(block);
@@ -3926,14 +3922,3 @@ void rm7000le_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 #endif
-
-
-
-/***************************************************************************
-    DISASSEMBLERS
-***************************************************************************/
-
-#if !defined(ENABLE_DEBUGGER) && (LOG_UML || LOG_NATIVE)
-#include "mips3dsm.c"
-#endif
-

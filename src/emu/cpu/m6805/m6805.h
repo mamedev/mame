@@ -82,8 +82,6 @@ extern void hd63705_get_info(UINT32 state, cpuinfo *info);
 /****************************************************************************/
 #define M6805_RDOP_ARG(Addr) ((unsigned)cpu_readop_arg(Addr))
 
-#ifdef ENABLE_DEBUGGER
 offs_t m6805_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif
 
 #endif /* _M6805_H */

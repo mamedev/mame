@@ -10,9 +10,7 @@
 
 #define INPUT_LINE_A20		1
 
-#ifdef ENABLE_DEBUGGER
 extern int i386_dasm_one(char *buffer, UINT32 pc, const UINT8 *oprom, int mode);
-#endif
 
 typedef enum { ES, CS, SS, DS, FS, GS } SREGS;
 

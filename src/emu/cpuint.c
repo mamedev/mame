@@ -11,10 +11,8 @@
 
 #include "driver.h"
 #include "deprecat.h"
-
-#ifdef ENABLE_DEBUGGER
 #include "debug/debugcpu.h"
-#endif
+
 
 
 /*************************************
@@ -350,10 +348,8 @@ INLINE int cpu_irq_callback(running_machine *machine, int cpunum, int line)
 	if (drv_irq_callbacks[cpunum])
 		vector = (*drv_irq_callbacks[cpunum])(machine, line);
 
-#ifdef ENABLE_DEBUGGER
 	/* notify the debugger */
-	debug_interrupt_hook(cpunum, line);
-#endif
+	debug_cpu_interrupt_hook(machine, cpunum, line);
 
 	/* otherwise, just return the current vector */
 	return vector;

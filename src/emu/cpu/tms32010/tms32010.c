@@ -789,7 +789,7 @@ static int tms32010_execute(int cycles)
 
 		R.PREVPC = R.PC;
 
-		CALL_DEBUGGER(R.PC);
+		debugger_instruction_hook(Machine, R.PC);
 
 		R.opcode.d = M_RDOP(R.PC);
 		R.PC++;
@@ -929,9 +929,7 @@ void tms32010_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = tms32010_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = tms32010_execute;		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tms32010_dasm;		break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tms32010_icount;		break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:	info->internal_map16 = address_map_tms32010_ram; break;
 

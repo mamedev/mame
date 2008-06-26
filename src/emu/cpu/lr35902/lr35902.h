@@ -25,8 +25,6 @@ enum {
 /****************************************************************************/
 extern void lr35902_get_info(UINT32 state, cpuinfo *info);
 
-#ifdef ENABLE_DEBUGGER
 extern unsigned lr35902_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram );
-#endif /* ENABLE_DEBUGGER */
 
 #endif

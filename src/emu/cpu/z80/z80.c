@@ -3565,7 +3565,7 @@ static int z80_execute(int cycles)
 		Z80.after_ei = FALSE;
 
 		PRVPC = PCD;
-		CALL_DEBUGGER(PCD);
+		debugger_instruction_hook(Machine, PCD);
 		R++;
 		EXEC_INLINE(op,ROP());
 	} while( z80_ICount > 0 );
@@ -3755,9 +3755,7 @@ void z80_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:						info->exit = z80_exit;						break;
 		case CPUINFO_PTR_EXECUTE:					info->execute = z80_execute;				break;
 		case CPUINFO_PTR_BURN:						info->burn = NULL;							break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:				info->disassemble = z80_dasm;				break;
-#endif
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:				info->icount = &z80_ICount;			break;
 		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_op:	info->p = (void *)cc[Z80_TABLE_op];	break;
 		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_cb:	info->p = (void *)cc[Z80_TABLE_cb];	break;

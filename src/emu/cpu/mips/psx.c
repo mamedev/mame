@@ -256,8 +256,8 @@ static void mips_load_bad_address( UINT32 address );
 
 static void mips_stop( void )
 {
-	DEBUGGER_BREAK;
-	CALL_DEBUGGER( mipscpu.pc );
+	debugger_break(Machine);
+	debugger_instruction_hook(Machine,  mipscpu.pc );
 }
 
 #if LOG_BIOSCALL
@@ -1803,7 +1803,7 @@ static int mips_execute( int cycles )
 		log_bioscall();
 #endif
 
-		CALL_DEBUGGER( mipscpu.pc );
+		debugger_instruction_hook(Machine,  mipscpu.pc );
 
 		mipscpu.op = cpu_readop32( mipscpu.pc );
 		switch( INS_OP( mipscpu.op ) )
@@ -2913,12 +2913,10 @@ ADDRESS_MAP_END
  * Return a formatted string for a register
  ****************************************************************************/
 
-#ifdef ENABLE_DEBUGGER
 static offs_t mips_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return DasmMIPS( buffer, pc, opram );
 }
-#endif /* ENABLE_DEBUGGER */
 
 
 static UINT32 getcp1dr( int reg )
@@ -4178,9 +4176,7 @@ static void mips_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = mips_exit;					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = mips_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = mips_dasm;			break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &mips_ICount;			break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = address_map_psxcpu_internal_map; break;

@@ -123,8 +123,6 @@ void tms32010_get_info(UINT32 state, cpuinfo *info);
 
 
 
-#ifdef	ENABLE_DEBUGGER
 offs_t tms32010_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif
 
 #endif	/* _TMS32010_H */

@@ -209,7 +209,7 @@ WRITE16_HANDLER( namcos2_68k_roz_ram_w )
 	tilemap_mark_tile_dirty(tilemap_roz,offset);
 //      if( input_code_pressed(KEYCODE_Q) )
 //      {
-//          DEBUGGER_BREAK;
+//          debugger_break(machine);
 //      }
 }
 

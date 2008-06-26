@@ -518,33 +518,61 @@ static int tms32031_execute(int cycles)
 	if (tms32031.is_idling)
 		return tms32031_icount;
 
-	while (tms32031_icount > 0)
+	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
 	{
-#ifdef ENABLE_DEBUGGER
-	if (IREG(TMR_SP) & 0xff000000)
-		DEBUGGER_BREAK;
-#endif
-		if ((IREG(TMR_ST) & RMFLAG) && tms32031.pc == IREG(TMR_RE) + 1)
+		while (tms32031_icount > 0)
 		{
-			if ((INT32)--IREG(TMR_RC) >= 0)
-				tms32031.pc = IREG(TMR_RS);
-			else
+			if ((IREG(TMR_ST) & RMFLAG) && tms32031.pc == IREG(TMR_RE) + 1)
 			{
-				IREG(TMR_ST) &= ~RMFLAG;
-				if (tms32031.delayed)
+				if ((INT32)--IREG(TMR_RC) >= 0)
+					tms32031.pc = IREG(TMR_RS);
+				else
 				{
-					tms32031.delayed = FALSE;
-					if (tms32031.irq_pending)
+					IREG(TMR_ST) &= ~RMFLAG;
+					if (tms32031.delayed)
 					{
-						tms32031.irq_pending = FALSE;
-						check_irqs();
+						tms32031.delayed = FALSE;
+						if (tms32031.irq_pending)
+						{
+							tms32031.irq_pending = FALSE;
+							check_irqs();
+						}
 					}
 				}
+				continue;
 			}
-			continue;
-		}
 
-		execute_one();
+			execute_one();
+		}
+	}
+	else
+	{
+		while (tms32031_icount > 0)
+		{
+			if (IREG(TMR_SP) & 0xff000000)
+				debugger_break(Machine);
+			if ((IREG(TMR_ST) & RMFLAG) && tms32031.pc == IREG(TMR_RE) + 1)
+			{
+				if ((INT32)--IREG(TMR_RC) >= 0)
+					tms32031.pc = IREG(TMR_RS);
+				else
+				{
+					IREG(TMR_ST) &= ~RMFLAG;
+					if (tms32031.delayed)
+					{
+						tms32031.delayed = FALSE;
+						if (tms32031.irq_pending)
+						{
+							tms32031.irq_pending = FALSE;
+							check_irqs();
+						}
+					}
+				}
+				continue;
+			}
+
+			execute_one();
+		}
 	}
 
 	tms32031_icount -= tms32031.interrupt_cycles;
@@ -559,14 +587,12 @@ static int tms32031_execute(int cycles)
     DISASSEMBLY HOOK
 ***************************************************************************/
 
-#ifdef ENABLE_DEBUGGER
 static offs_t tms32031_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	UINT32 op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
 	extern unsigned dasm_tms32031(char *, unsigned, UINT32);
     return dasm_tms32031(buffer, pc, op);
 }
-#endif /* ENABLE_DEBUGGER */
 
 
 
@@ -813,9 +839,7 @@ void tms32031_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = tms32031_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = tms32031_execute;		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tms32031_dasm;		break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tms32031_icount;		break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = address_map_internal_32031; break;
 

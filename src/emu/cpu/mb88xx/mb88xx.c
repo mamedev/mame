@@ -236,7 +236,7 @@ static int mb88_execute(int cycles)
 		UINT8 opcode, arg, oc;
 
 		/* fetch the opcode */
-		CALL_DEBUGGER(GETPC());
+		debugger_instruction_hook(Machine, GETPC());
 		opcode = READOP(GETPC());
 
 		/* increment the PC */
@@ -850,9 +850,7 @@ void mb88_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = NULL;						break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = mb88_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = mb88_dasm;			break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &mb88_icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

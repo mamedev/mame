@@ -508,7 +508,17 @@ INLINE void fetch_instruction(void)
 {
 	/* debugging */
 	asap.ppc = asap.pc;
-	CALL_DEBUGGER(asap.pc);
+
+	/* instruction fetch */
+	asap.op.d = ROPCODE(asap.pc);
+	asap.pc += 4;
+}
+
+INLINE void fetch_instruction_debug(void)
+{
+	/* debugging */
+	asap.ppc = asap.pc;
+	debugger_instruction_hook(Machine, asap.pc);
 
 	/* instruction fetch */
 	asap.op.d = ROPCODE(asap.pc);
@@ -530,27 +540,54 @@ static int asap_execute(int cycles)
 	UPDATEPC();
 
 	/* core execution loop */
-	do
+	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
 	{
-		/* fetch and execute the next instruction */
-		fetch_instruction();
-		execute_instruction();
+		do
+		{
+			/* fetch and execute the next instruction */
+			fetch_instruction();
+			execute_instruction();
 
-		/* fetch and execute the next instruction */
-		fetch_instruction();
-		execute_instruction();
+			/* fetch and execute the next instruction */
+			fetch_instruction();
+			execute_instruction();
 
-		/* fetch and execute the next instruction */
-		fetch_instruction();
-		execute_instruction();
+			/* fetch and execute the next instruction */
+			fetch_instruction();
+			execute_instruction();
 
-		/* fetch and execute the next instruction */
-		fetch_instruction();
-		execute_instruction();
+			/* fetch and execute the next instruction */
+			fetch_instruction();
+			execute_instruction();
 
-		asap_icount -= 4;
+			asap_icount -= 4;
 
-	} while (asap_icount > 0);
+		} while (asap_icount > 0);
+	}
+	else
+	{
+		do
+		{
+			/* fetch and execute the next instruction */
+			fetch_instruction_debug();
+			execute_instruction();
+
+			/* fetch and execute the next instruction */
+			fetch_instruction_debug();
+			execute_instruction();
+
+			/* fetch and execute the next instruction */
+			fetch_instruction_debug();
+			execute_instruction();
+
+			/* fetch and execute the next instruction */
+			fetch_instruction_debug();
+			execute_instruction();
+
+			asap_icount -= 4;
+
+		} while (asap_icount > 0);
+	}
 
 	/* eat any new interrupt cycles */
 	asap_icount -= asap.interrupt_cycles;
@@ -564,9 +601,7 @@ static int asap_execute(int cycles)
     DISASSEMBLY HOOK
 ***************************************************************************/
 
-#ifdef ENABLE_DEBUGGER
 extern offs_t asap_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif /* ENABLE_DEBUGGER */
 
 
 
@@ -1806,9 +1841,7 @@ void asap_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = asap_exit;					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = asap_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = asap_dasm;			break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &asap_icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

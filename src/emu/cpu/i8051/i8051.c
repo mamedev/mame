@@ -600,7 +600,7 @@ int i8051_execute(int cycles)
 		PPC = PC;
 
 		//Call Debugger
-		CALL_DEBUGGER(PC);
+		debugger_instruction_hook(Machine, PC);
 
 		//remove after testing
 		if(PC != PPC)	op = cpu_readop(PC);
@@ -1948,9 +1948,7 @@ INLINE void do_add_flags(UINT8 a, UINT8 data, UINT8 c)
 	SET_AC(ac);
 	SET_OV(ov);
 
-#ifdef ENABLE_DEBUGGER
 //  mame_printf_debug("add: result=%x, c=%x, ac=%x, ov=%x\n",a+data+c,cy,ac,ov);
-#endif
 }
 
 INLINE void do_sub_flags(UINT8 a, UINT8 data, UINT8 c)
@@ -1966,9 +1964,7 @@ INLINE void do_sub_flags(UINT8 a, UINT8 data, UINT8 c)
 	SET_AC(ac);
 	SET_OV(ov);
 
-#ifdef ENABLE_DEBUGGER
 //  mame_printf_debug("sub: a=%x, d=%x, c=%x, result=%x, cy=%x, ac=%x, ov=%x\n",a,data,c,a-data-c,cy,ac,ov);
-#endif
 }
 
 INLINE void update_timer(int cyc)
@@ -2477,9 +2473,7 @@ void i8051_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = i8051_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = i8051_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i8051_dasm;			break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &i8051_icount;			break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = NULL;	break;

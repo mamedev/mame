@@ -352,10 +352,8 @@ void winwindow_process_events(running_machine *machine, int ingame)
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// if we're running, disable some parts of the debugger
-#ifdef ENABLE_DEBUGGER
-	if (ingame)
+	if (ingame && (machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		debugwin_update_during_game();
-#endif
 
 	// remember the last time we did this
 	last_event_check = GetTickCount();
@@ -494,11 +492,9 @@ void winwindow_toggle_full_screen(void)
 
 	assert(GetCurrentThreadId() == main_threadid);
 
-#ifdef ENABLE_DEBUGGER
 	// if we are in debug mode, never go full screen
 	if (options_get_bool(mame_options(), OPTION_DEBUG))
 		return;
-#endif
 
 	// toggle the window mode
 	video_config.windowed = !video_config.windowed;

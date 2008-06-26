@@ -1473,39 +1473,35 @@ static int tms99xx_execute(int cycles)
 			}
 		}
 
-		#ifdef ENABLE_DEBUGGER
+		if ((Machine->debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
 		{
-			if (Machine->debug_mode)
-			{
-				#if 0		/* Trace */
-				logerror("> PC %4.4x :%4.4x %4.4x : R=%4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x%4.4x %4.4x %4.4x %4.4x %4.4x %4.4x :T=%d\n",I.PC,I.STATUS,I.WP,I.FR[0],I.FR[1],I.FR[2],I.FR[3],I.FR[4],I.FR[5],I.FR[6],I.FR[7],I.FR[8],I.FR[9],I.FR[10],I.FR[11],I.FR[12],I.FR[13],I.FR[14],I.FR[15],TMS99XX_ICOUNT);
-					#if 0	/* useful with TI99/4a driver */
-					#ifdef MESS
-					if (I.PC == 0x0078)
+			#if 0		/* Trace */
+			logerror("> PC %4.4x :%4.4x %4.4x : R=%4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x%4.4x %4.4x %4.4x %4.4x %4.4x %4.4x :T=%d\n",I.PC,I.STATUS,I.WP,I.FR[0],I.FR[1],I.FR[2],I.FR[3],I.FR[4],I.FR[5],I.FR[6],I.FR[7],I.FR[8],I.FR[9],I.FR[10],I.FR[11],I.FR[12],I.FR[13],I.FR[14],I.FR[15],TMS99XX_ICOUNT);
+				#if 0	/* useful with TI99/4a driver */
+				#ifdef MESS
+				if (I.PC == 0x0078)
+				{
+					extern struct
 					{
-						extern struct
-						{
-							/* pointer to GROM data */
-							UINT8 *data_ptr;
-							/* current address pointer for the active GROM in port (16 bits) */
-							unsigned int addr;
-							/* GROM data buffer */
-							UINT8 buf;
-							/* internal flip-flops that are set after the first access to the GROM
-                            address so that next access is mapped to the LSB, and cleared after each
-                            data access */
-							char raddr_LSB, waddr_LSB;
-						} console_GROMs;
-						logerror("> GPL pointer %4.4X\n", console_GROMs.addr);
-					}
-					#endif
-					#endif
+						/* pointer to GROM data */
+						UINT8 *data_ptr;
+						/* current address pointer for the active GROM in port (16 bits) */
+						unsigned int addr;
+						/* GROM data buffer */
+						UINT8 buf;
+						/* internal flip-flops that are set after the first access to the GROM
+                       address so that next access is mapped to the LSB, and cleared after each
+                       data access */
+						char raddr_LSB, waddr_LSB;
+					} console_GROMs;
+					logerror("> GPL pointer %4.4X\n", console_GROMs.addr);
+				}
 				#endif
+				#endif
+			#endif
 
-				mame_debug_hook(I.IR);
-			}
+			debugger_instruction_hook(Machine, I.IR);
 		}
-		#endif
 
 		if (I.IDLE)
 		{	/* IDLE instruction has halted execution */
@@ -1966,12 +1962,10 @@ static void field_interrupt(void)
 
 #endif
 
-#ifdef ENABLE_DEBUGGER
 static unsigned tms99xx_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return Dasm9900(buffer, pc, TMS99XX_MODEL, oprom, opram);
 }
-#endif /* ENABLE_DEBUGGER */
 
 
 /*****************************************************************************/
@@ -4811,9 +4805,7 @@ void TMS99XX_GET_INFO(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = tms99xx_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = tms99xx_execute;		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tms99xx_dasm;		break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &TMS99XX_ICOUNT;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

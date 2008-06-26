@@ -250,7 +250,7 @@ void debug_command_init(running_machine *machine)
 	/* set up the initial debugscript if specified */
 	name = options_get_string(mame_options(), OPTION_DEBUGSCRIPT);
 	if (name[0] != 0)
-		debug_source_script(name);
+		debug_cpu_source_script(name);
 }
 
 
@@ -798,7 +798,7 @@ static void execute_ignore(int ref, int params, const char *param[])
 			const debug_cpu_info *info = debug_get_cpu_info(cpunum);
 
 			/* build up a comma-separated list */
-			if (info && info->valid && info->ignoring)
+			if (info && info->valid && (info->flags & DEBUG_FLAG_OBSERVING) == 0)
 			{
 				if (buflen == 0) buflen += sprintf(&buffer[buflen], "Currently ignoring CPU %d", cpunum);
 				else buflen += sprintf(&buffer[buflen], ",%d", cpunum);
@@ -833,7 +833,7 @@ static void execute_ignore(int ref, int params, const char *param[])
 			for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 			{
 				const debug_cpu_info *info = debug_get_cpu_info(cpunum);
-				if (cpunum != cpuwhich[paramnum] && info && info->valid && !info->ignoring)
+				if (cpunum != cpuwhich[paramnum] && info && info->valid && (info->flags & DEBUG_FLAG_OBSERVING) != 0)
 					break;
 			}
 			if (cpunum == MAX_CPU)
@@ -869,7 +869,7 @@ static void execute_observe(int ref, int params, const char *param[])
 			const debug_cpu_info *info = debug_get_cpu_info(cpunum);
 
 			/* build up a comma-separated list */
-			if (info && info->valid && !info->ignoring)
+			if (info && info->valid && (info->flags & DEBUG_FLAG_OBSERVING) != 0)
 			{
 				if (buflen == 0) buflen += sprintf(&buffer[buflen], "Currently observing CPU %d", cpunum);
 				else buflen += sprintf(&buffer[buflen], ",%d", cpunum);
@@ -994,7 +994,7 @@ static void execute_bpset(int ref, int params, const char *param[])
 		return;
 
 	/* set the breakpoint */
-	bpnum = debug_breakpoint_set(cpu_getactivecpu(), address, condition, action);
+	bpnum = debug_cpu_breakpoint_set(cpu_getactivecpu(), address, condition, action);
 	debug_console_printf("Breakpoint %X set\n", bpnum);
 }
 
@@ -1019,8 +1019,8 @@ static void execute_bpclear(int ref, int params, const char *param[])
 			if (cpuinfo->valid)
 			{
 				debug_cpu_breakpoint *bp;
-				while ((bp = cpuinfo->first_bp) != NULL)
-					debug_breakpoint_clear(bp->index);
+				while ((bp = cpuinfo->bplist) != NULL)
+					debug_cpu_breakpoint_clear(bp->index);
 			}
 		}
 		debug_console_printf("Cleared all breakpoints\n");
@@ -1031,7 +1031,7 @@ static void execute_bpclear(int ref, int params, const char *param[])
 		return;
 	else
 	{
-		int found = debug_breakpoint_clear(bpindex);
+		int found = debug_cpu_breakpoint_clear(bpindex);
 		if (found)
 			debug_console_printf("Breakpoint %X cleared\n", (UINT32)bpindex);
 		else
@@ -1060,8 +1060,8 @@ static void execute_bpdisenable(int ref, int params, const char *param[])
 			if (cpuinfo->valid)
 			{
 				debug_cpu_breakpoint *bp;
-				for (bp = cpuinfo->first_bp; bp; bp = bp->next)
-					debug_breakpoint_enable(bp->index, ref);
+				for (bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
+					debug_cpu_breakpoint_enable(bp->index, ref);
 			}
 		}
 		if (ref == 0)
@@ -1075,7 +1075,7 @@ static void execute_bpdisenable(int ref, int params, const char *param[])
 		return;
 	else
 	{
-		int found = debug_breakpoint_enable(bpindex, ref);
+		int found = debug_cpu_breakpoint_enable(bpindex, ref);
 		if (found)
 			debug_console_printf("Breakpoint %X %s\n", (UINT32)bpindex, ref ? "enabled" : "disabled");
 		else
@@ -1099,14 +1099,14 @@ static void execute_bplist(int ref, int params, const char *param[])
 	{
 		const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
 
-		if (cpuinfo->valid && cpuinfo->first_bp)
+		if (cpuinfo->valid && cpuinfo->bplist != NULL)
 		{
 			debug_cpu_breakpoint *bp;
 
 			debug_console_printf("CPU %d breakpoints:\n", cpunum);
 
 			/* loop over the breakpoints */
-			for (bp = cpuinfo->first_bp; bp; bp = bp->next)
+			for (bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
 			{
 				int buflen;
 				buflen = sprintf(buffer, "%c%4X @ %08X", bp->enabled ? ' ' : 'D', bp->index, bp->address);
@@ -1168,7 +1168,7 @@ static void execute_wpset(int ref, int params, const char *param[])
 		return;
 
 	/* set the watchpoint */
-	wpnum = debug_watchpoint_set(cpu_getactivecpu(), ref, type, address, length, condition, action);
+	wpnum = debug_cpu_watchpoint_set(cpu_getactivecpu(), ref, type, address, length, condition, action);
 	debug_console_printf("Watchpoint %X set\n", wpnum);
 }
 
@@ -1197,8 +1197,8 @@ static void execute_wpclear(int ref, int params, const char *param[])
 				for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 				{
 					debug_cpu_watchpoint *wp;
-					while ((wp = cpuinfo->space[spacenum].first_wp) != NULL)
-						debug_watchpoint_clear(wp->index);
+					while ((wp = cpuinfo->space[spacenum].wplist) != NULL)
+						debug_cpu_watchpoint_clear(wp->index);
 				}
 			}
 		}
@@ -1210,7 +1210,7 @@ static void execute_wpclear(int ref, int params, const char *param[])
 		return;
 	else
 	{
-		int found = debug_watchpoint_clear(wpindex);
+		int found = debug_cpu_watchpoint_clear(wpindex);
 		if (found)
 			debug_console_printf("Watchpoint %X cleared\n", (UINT32)wpindex);
 		else
@@ -1243,8 +1243,8 @@ static void execute_wpdisenable(int ref, int params, const char *param[])
 				for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 				{
 					debug_cpu_watchpoint *wp;
-					for (wp = cpuinfo->space[spacenum].first_wp; wp; wp = wp->next)
-						debug_watchpoint_enable(wp->index, ref);
+					for (wp = cpuinfo->space[spacenum].wplist; wp != NULL; wp = wp->next)
+						debug_cpu_watchpoint_enable(wp->index, ref);
 				}
 			}
 		}
@@ -1259,7 +1259,7 @@ static void execute_wpdisenable(int ref, int params, const char *param[])
 		return;
 	else
 	{
-		int found = debug_watchpoint_enable(wpindex, ref);
+		int found = debug_cpu_watchpoint_enable(wpindex, ref);
 		if (found)
 			debug_console_printf("Watchpoint %X %s\n", (UINT32)wpindex, ref ? "enabled" : "disabled");
 		else
@@ -1289,7 +1289,7 @@ static void execute_wplist(int ref, int params, const char *param[])
 
 			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 			{
-				if (cpuinfo->space[spacenum].first_wp)
+				if (cpuinfo->space[spacenum].wplist != NULL)
 				{
 					static const char *const types[] = { "unkn ", "read ", "write", "r/w  " };
 					debug_cpu_watchpoint *wp;
@@ -1297,7 +1297,7 @@ static void execute_wplist(int ref, int params, const char *param[])
 					debug_console_printf("CPU %d %s space watchpoints:\n", cpunum, address_space_names[spacenum]);
 
 					/* loop over the watchpoints */
-					for (wp = cpuinfo->space[spacenum].first_wp; wp; wp = wp->next)
+					for (wp = cpuinfo->space[spacenum].wplist; wp != NULL; wp = wp->next)
 					{
 						int buflen;
 						buflen = sprintf(buffer, "%c%4X @ %08X-%08X %s", wp->enabled ? ' ' : 'D',
@@ -1342,7 +1342,7 @@ static void execute_hotspot(int ref, int params, const char *param[])
 
 			if (cpuinfo->valid && cpuinfo->hotspots)
 			{
-				debug_hotspot_track(cpunum, 0, 0);
+				debug_cpu_hotspot_track(cpunum, 0, 0);
 				debug_console_printf("Cleared hotspot tracking on CPU %d\n", (int)cpunum);
 				cleared = TRUE;
 			}
@@ -1365,7 +1365,7 @@ static void execute_hotspot(int ref, int params, const char *param[])
 		return;
 
 	/* attempt to install */
-	if (debug_hotspot_track(cpunum, count, threshhold))
+	if (debug_cpu_hotspot_track(cpunum, count, threshhold))
 		debug_console_printf("Now tracking hotspots on CPU %d using %d slots with a threshhold of %d\n", (int)cpunum, (int)count, (int)threshhold);
 	else
 		debug_console_printf("Error setting up the hotspot tracking\n");
@@ -1925,7 +1925,7 @@ static void execute_traceover(int ref, int params, const char *param[])
 
 static void execute_traceflush(int ref, int params, const char *param[])
 {
-	debug_flush_traces();
+	debug_cpu_flush_traces();
 }
 
 
@@ -2041,7 +2041,7 @@ static void execute_snap(int ref, int params, const char *param[])
 
 static void execute_source(int ref, int params, const char *param[])
 {
-	debug_source_script(param[0]);
+	debug_cpu_source_script(param[0]);
 }
 
 

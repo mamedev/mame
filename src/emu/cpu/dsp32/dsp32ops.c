@@ -130,7 +130,7 @@ static void unimplemented(void)
 INLINE void execute_one(void)
 {
 	PROCESS_DEFERRED_MEMORY();
-	CALL_DEBUGGER(dsp32.PC);
+	debugger_instruction_hook(Machine, dsp32.PC);
 	OP = ROPCODE(dsp32.PC);
 	dsp32_icount -= 4;	/* 4 clocks per cycle */
 	dsp32.PC += 4;
@@ -363,7 +363,7 @@ INLINE void dau_set_val_flags(int aidx, double res)
 	else if (absres > 3.40282e38)
 	{
 		dsp32.VUflags = VFLAGBIT;
-//      DEBUGGER_BREAK;
+//      debugger_break(Machine);
 //      fprintf(stderr, "Result = %g\n", absres);
 		res = (res < 0) ? -3.40282e38 : 3.40282e38;
 	}
@@ -408,7 +408,7 @@ INLINE UINT32 double_to_dsp(double val)
 		return 0x00000000;
 	else if (exponent > 255)
 	{
-//      DEBUGGER_BREAK;
+//      debugger_break(Machine);
 //      fprintf(stderr, "Exponent = %d\n", exponent);
 		return ((INT32)id.i[BYTE_XOR_BE(0)] >= 0) ? 0x7fffffff : 0x800000ff;
 	}

@@ -1402,7 +1402,7 @@ static int i8x41_execute(int cycles)
 
 		PPC = PC;
 
-		CALL_DEBUGGER(PC);
+		debugger_instruction_hook(Machine, PC);
 
 		PC += 1;
 		i8x41_ICount -= i8x41_cycles[op];
@@ -2283,9 +2283,7 @@ void i8x41_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = i8x41_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = i8x41_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i8x41_dasm;			break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &i8x41_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

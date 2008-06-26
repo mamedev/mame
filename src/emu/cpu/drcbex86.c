@@ -3207,24 +3207,31 @@ static x86code *op_nop(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 static x86code *op_debug(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
+	emit_link skip = { 0 };
+
 	/* validate instruction */
 	assert(inst->size == 4);
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
-#ifdef ENABLE_DEBUGGER
-	if (Machine->debug_mode)
+	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		drcuml_parameter pcp;
-
+		
 		/* normalize parameters */
 		param_normalize_1(drcbe, inst, &pcp, PTYPE_MRI);
 
+		/* test and branch */
+		emit_test_m32_imm(&dst, MABS(&Machine->debug_flags), DEBUG_FLAG_CALL_HOOK);		// test  [Machine->debug_flags],DEBUG_FLAG_CALL_HOOK
+		emit_jcc_short_link(&dst, COND_Z, &skip);										// jz    skip
+
 		/* push the parameter */
-		emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 0), &pcp);							// mov   [esp],pcp
-		emit_call(&dst, (x86code *)mame_debug_hook);									// call  mame_debug_hook
+		emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 4), &pcp);							// mov   [esp+4],pcp
+		emit_mov_m32_imm(&dst, MBD(REG_ESP, 0), (FPTR)Machine);							// mov   [esp],Machine
+		emit_call(&dst, (x86code *)debug_cpu_instruction_hook);							// call  debug_cpu_instruction_hook
+		
+		resolve_link(&dst, &skip);													// skip:
 	}
-#endif
 
 	return dst;
 }

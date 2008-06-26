@@ -54,7 +54,7 @@
                 - calls tilemap_init() [tilemap.c] to start the tilemap system
                 - calls crosshair_init() [crsshair.c] to configure the crosshairs
                 - calls sound_init() [sound.c] to start the audio system
-                - calls mame_debug_init() [debugcpu.c] to set up the debugger
+                - calls debugger_init() [debugger.c] to set up the debugger
                 - calls the driver's MACHINE_START, SOUND_START, and VIDEO_START callbacks
                 - disposes of regions marked as disposable
                 - calls saveload_init() [mame.c] to set up for save/load
@@ -89,10 +89,7 @@
 #include "ui.h"
 #include "uimenu.h"
 #include "deprecat.h"
-
-#ifdef ENABLE_DEBUGGER
 #include "debug/debugcon.h"
-#endif
 
 #include <stdarg.h>
 #include <setjmp.h>
@@ -1335,10 +1332,9 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 	parse_ini_file(options, CONFIGNAME);
 	parse_ini_file(options, CONFIGNAME);
 
-	/* debug builds: parse "debug.ini" as well */
-#ifdef ENABLE_DEBUGGER
-	parse_ini_file(options, "debug");
-#endif
+	/* debug mode: parse "debug.ini" as well */
+	if (options_get_bool(mame_options(), OPTION_DEBUG))
+		parse_ini_file(options, "debug");
 
 	/* if we have a valid game driver, parse game-specific INI files */
 	if (driver != NULL)
@@ -1482,11 +1478,7 @@ static void prepare_machine(running_machine *machine)
 	machine->portconfig = NULL;
 
 	/* debugger-related information */
-#ifdef ENABLE_DEBUGGER
-	machine->debug_mode = options_get_bool(mame_options(), OPTION_DEBUG);
-#else
-	machine->debug_mode = 0;
-#endif
+	machine->debug_flags = options_get_bool(mame_options(), OPTION_DEBUG) ? (DEBUG_FLAG_ENABLED | DEBUG_FLAG_CALL_HOOK) : 0;
 
 	/* reset the global MAME data and clear the other privates */
 	memset(machine->mame_data, 0, sizeof(*machine->mame_data));
@@ -1601,11 +1593,9 @@ static void init_machine(running_machine *machine)
 
 	sound_init(machine);
 
-#ifdef ENABLE_DEBUGGER
 	/* initialize the debugger */
-	if (machine->debug_mode)
-		mame_debug_init(machine);
-#endif
+	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debugger_init(machine);
 
 	/* call the driver's _START callbacks */
 	if (machine->config->machine_start != NULL)

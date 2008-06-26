@@ -82,9 +82,7 @@
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-#ifdef ENABLE_DEBUGGER
 extern offs_t m6809_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif
 
 
 INLINE void fetch_effective_address( void );
@@ -517,7 +515,7 @@ static int m6809_execute(int cycles)	/* NS 970908 */
 
 	if (m6809.int_state & (M6809_CWAI | M6809_SYNC))
 	{
-		CALL_DEBUGGER(PCD);
+		debugger_instruction_hook(Machine, PCD);
 		m6809_ICount = 0;
 	}
 	else
@@ -526,7 +524,7 @@ static int m6809_execute(int cycles)	/* NS 970908 */
 		{
 			pPPC = pPC;
 
-			CALL_DEBUGGER(PCD);
+			debugger_instruction_hook(Machine, PCD);
 
 			m6809.ireg = ROP(PCD);
 			PC++;
@@ -1173,9 +1171,7 @@ void m6809_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = m6809_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = m6809_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6809_dasm;			break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6809_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

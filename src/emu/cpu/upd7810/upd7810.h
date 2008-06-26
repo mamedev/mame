@@ -160,12 +160,10 @@ typedef struct {
 	int (*irq_callback)(int irqline);
 }	UPD7810;
 
-#ifdef ENABLE_DEBUGGER
 offs_t upd7810_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 offs_t upd7807_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 offs_t upd7801_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 offs_t upd78c05_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif
 
 #endif
 

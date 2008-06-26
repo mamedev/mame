@@ -750,7 +750,7 @@ static int r3000_execute(int cycles)
 
 		/* debugging */
 		r3000.ppc = r3000.pc;
-		CALL_DEBUGGER(r3000.pc);
+		debugger_instruction_hook(Machine, r3000.pc);
 
 		/* instruction fetch */
 		op = ROPCODE(r3000.pc);
@@ -932,7 +932,6 @@ static int r3000_execute(int cycles)
     DISASSEMBLY HOOK
 ***************************************************************************/
 
-#ifdef ENABLE_DEBUGGER
 static offs_t r3000_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	extern unsigned dasmr3k(char *, unsigned, UINT32);
@@ -944,7 +943,6 @@ static offs_t r3000_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT
 
 	return dasmr3k(buffer, pc, op);
 }
-#endif /* ENABLE_DEBUGGER */
 
 
 
@@ -1287,9 +1285,7 @@ static void r3000_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = r3000_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = r3000_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = r3000_dasm;			break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &r3000_icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

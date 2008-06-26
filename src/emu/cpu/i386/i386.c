@@ -15,9 +15,7 @@
 #include "i386.h"
 #include "i386intf.h"
 
-#ifdef ENABLE_DEBUGGER
 #include "debug/debugcpu.h"
-#endif
 
 int i386_parity_table[256];
 MODRM_TABLE i386_MODRM_table[256];
@@ -443,8 +441,6 @@ static void I386OP(decode_two_byte)(void)
 
 /*************************************************************************/
 
-#ifdef ENABLE_DEBUGGER
-
 static UINT64 i386_debug_segbase(UINT32 ref, UINT32 params, UINT64 *param)
 {
 	UINT32 result;
@@ -484,8 +480,6 @@ static void i386_debug_setup(void)
 	symtable_add_function(global_symtable, "segbase", 0, 1, 1, i386_debug_segbase);
 	symtable_add_function(global_symtable, "seglimit", 0, 1, 1, i386_debug_seglimit);
 }
-
-#endif /* defined(ENABLE_DEBUGGER) */
 
 /*************************************************************************/
 
@@ -717,7 +711,7 @@ static int i386_execute(int num_cycles)
 		I.segment_prefix = 0;
 		I.prev_eip = I.eip;
 
-		CALL_DEBUGGER(I.pc);
+		debugger_instruction_hook(Machine, I.pc);
 
 		i386_check_irq_line();
 		I386OP(decode_opcode)();
@@ -741,12 +735,10 @@ static int translate_address_cb(int space, int intention, offs_t *addr)
 	return result;
 }
 
-#ifdef ENABLE_DEBUGGER
 static offs_t i386_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return i386_dasm_one(buffer, pc, oprom, I.sreg[CS].d ? 32 : 16);
 }
-#endif /* ENABLE_DEBUGGER */
 
 static void i386_set_info(UINT32 state, cpuinfo *info)
 {
@@ -969,10 +961,8 @@ void i386_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_BURN:		      				info->burn = NULL;						break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER: 			info->icount = &I.cycles;				break;
 		case CPUINFO_PTR_TRANSLATE:						info->translate = translate_address_cb;	break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i386_dasm;			break;
 		case CPUINFO_PTR_DEBUG_SETUP_COMMANDS:			info->setup_commands = i386_debug_setup; break;
-#endif
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "I386");				break;

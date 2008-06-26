@@ -397,7 +397,7 @@ static int t11_execute(int cycles)
 	{
 		t11.ppc = t11.reg[7];	/* copy PC to previous PC */
 
-		CALL_DEBUGGER(PCD);
+		debugger_instruction_hook(Machine, PCD);
 
 		t11.op = ROPCODE();
 		(*opcode_table[t11.op >> 3])();
@@ -502,9 +502,7 @@ void t11_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = t11_exit;					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = t11_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = t11_dasm;			break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &t11_ICount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

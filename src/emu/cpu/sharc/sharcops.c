@@ -2747,12 +2747,8 @@ static void sharcop_idle(void)
 
 static void sharcop_unimplemented(void)
 {
-#ifdef ENABLE_DEBUGGER
 	char dasm[1000];
 	sharc_dasm(dasm, sharc.pc, NULL, NULL);
 	mame_printf_debug("SHARC: %08X: %s\n", sharc.pc, dasm);
 	fatalerror("SHARC: Unimplemented opcode %04X%08X at %08X", (UINT16)(sharc.opcode >> 32), (UINT32)(sharc.opcode), sharc.pc);
-#else
-	fatalerror("SHARC: Unimplemented opcode %04X%08X at %08X", (UINT16)(sharc.opcode >> 32), (UINT32)(sharc.opcode), sharc.pc);
-#endif
 }

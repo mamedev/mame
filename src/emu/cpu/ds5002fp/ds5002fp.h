@@ -132,9 +132,7 @@ extern void ds5002fp_set_serial_tx_callback(void (*callback)(int data));
 extern void ds5002fp_set_serial_rx_callback(int (*callback)(void));
 extern void ds5002fp_set_ebram_iaddr_callback(READ32_HANDLER((*callback)));
 
-#ifdef ENABLE_DEBUGGER
 extern offs_t ds5002fp_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif /* ENABLE_DEBUGGER */
 
 void ds5002fp_get_info(UINT32 state, cpuinfo *info);
 

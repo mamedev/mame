@@ -17,8 +17,6 @@ enum {
 void ssp1601_get_info(UINT32 state, cpuinfo *info);
 #endif
 
-#ifdef ENABLE_DEBUGGER
 extern unsigned dasm_ssp1601(char *buffer, unsigned pc, const UINT8 *oprom);
-#endif
 
 #endif /* SSP1601_H */

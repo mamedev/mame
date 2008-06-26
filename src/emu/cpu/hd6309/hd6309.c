@@ -118,9 +118,7 @@
 #define false 0
 #endif
 
-#ifdef ENABLE_DEBUGGER
 extern offs_t hd6309_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif
 
 /*#define BIG_SWITCH*/
 
@@ -629,7 +627,7 @@ static int hd6309_execute(int cycles)	/* NS 970908 */
 
 	if (hd6309.int_state & (HD6309_CWAI | HD6309_SYNC))
 	{
-		CALL_DEBUGGER(PCD);
+		debugger_instruction_hook(Machine, PCD);
 		hd6309_ICount = 0;
 	}
 	else
@@ -638,7 +636,7 @@ static int hd6309_execute(int cycles)	/* NS 970908 */
 		{
 			pPPC = pPC;
 
-			CALL_DEBUGGER(PCD);
+			debugger_instruction_hook(Machine, PCD);
 
 			hd6309.ireg = ROP(PCD);
 			PC++;
@@ -1296,9 +1294,7 @@ void hd6309_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = hd6309_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = hd6309_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = hd6309_dasm;		break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &hd6309_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

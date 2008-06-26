@@ -313,7 +313,7 @@ static int cop410_execute(int cycles)
 	{
 		prevPC = PC;
 
-		CALL_DEBUGGER(PC);
+		debugger_instruction_hook(Machine, PC);
 
 		if (R.intf->cko == COP400_CKO_HALT_IO_PORT)
 		{
@@ -469,9 +469,7 @@ void cop410_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_RESET:							info->reset = cop410_reset;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = cop410_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = cop410_dasm;		break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cop410_ICount;			break;
 
 /*      case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:

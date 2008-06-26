@@ -99,7 +99,7 @@ struct _debug_view_registers
 	UINT8			recompute;					/* do we need to recompute the layout the next change? */
 	UINT8			cpunum;						/* target CPU number */
 	int				divider;					/* dividing column */
-	UINT32			last_update;				/* execution counter at last update */
+	UINT64			last_update;				/* execution counter at last update */
 	debug_view_register reg[MAX_REGS];			/* register data */
 };
 
@@ -1072,15 +1072,16 @@ static void registers_recompute(debug_view *view)
 
 static void registers_update(debug_view *view)
 {
-	UINT32 execution_counter = debug_get_execution_counter();
 	debug_view_registers *regdata = view->extra_data;
 	debug_view_char *dest = view->viewdata;
+	UINT64 total_cycles;
 	UINT32 row, i;
 	const device_config *screen = Machine->primary_screen;
 
 	/* cannot update if no active CPU */
 	if (cpu_getactivecpu() < 0)
 		return;
+	total_cycles = activecpu_gettotalcycles();
 
 	/* if our assumptions changed, revisit them */
 	if (regdata->recompute)
@@ -1140,7 +1141,7 @@ static void registers_update(debug_view *view)
 			else
 			{
 				data = (char *)cpunum_reg_string(regdata->cpunum, reg->regnum);
-				if (regdata->last_update != execution_counter)
+				if (regdata->last_update != total_cycles)
 					reg->lastval = reg->currval;
 				reg->currval = cpunum_get_reg(regdata->cpunum, reg->regnum);
 			}
@@ -1189,7 +1190,7 @@ static void registers_update(debug_view *view)
 	}
 
 	/* remember the last update */
-	regdata->last_update = execution_counter;
+	regdata->last_update = total_cycles;
 }
 
 
@@ -1761,7 +1762,7 @@ recompute:
 			/* if we're on a line with a breakpoint, tag it changed */
 			else
 			{
-				for (bp = cpuinfo->first_bp; bp; bp = bp->next)
+				for (bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
 					if (dasmdata->address[effrow] == ADDR2BYTE_MASKED(bp->address, cpuinfo, ADDRESS_SPACE_PROGRAM))
 						attrib = DCA_CHANGED;
 			}

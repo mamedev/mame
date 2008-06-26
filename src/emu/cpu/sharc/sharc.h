@@ -28,8 +28,6 @@ extern void sharc_external_dma_write(UINT32 address, UINT64 data);
 void adsp21062_get_info(UINT32 state, cpuinfo *info);
 #endif
 
-#ifdef ENABLE_DEBUGGER
 extern UINT32 sharc_dasm_one(char *buffer, offs_t pc, UINT64 opcode);
-#endif
 
 #endif /* _SHARC_H */

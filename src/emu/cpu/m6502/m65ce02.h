@@ -34,9 +34,7 @@ enum {
 
 void m65ce02_get_info(UINT32 state, cpuinfo *info);
 
-#ifdef ENABLE_DEBUGGER
 extern unsigned m65ce02_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif
 
 #endif /* _M65CE02_H */
 

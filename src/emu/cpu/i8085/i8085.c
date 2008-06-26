@@ -1298,7 +1298,7 @@ static int i8085_execute(int cycles)
 	i8085_ICount = cycles;
 	do
 	{
-		CALL_DEBUGGER(I.PC.d);
+		debugger_instruction_hook(Machine, I.PC.d);
 		/* interrupts enabled or TRAP pending ? */
 		if ( (I.IM & IM_IEN) || (I.IREQ & IM_TRAP) )
 		{
@@ -1728,9 +1728,7 @@ void i8085_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = i8085_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = i8085_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i8085_dasm;			break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &i8085_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

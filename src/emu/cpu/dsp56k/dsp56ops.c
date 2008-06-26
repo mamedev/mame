@@ -117,7 +117,7 @@ static void execute_one(void)
 {
 	unsigned size = 666 ;
 
-	CALL_DEBUGGER(PC);
+	debugger_instruction_hook(Machine, PC);
 	OP = ROPCODE(PC<<1);
 
 	if (BITS(OP,0x8000))											// First, the parallel data move instructions

@@ -244,7 +244,7 @@ static int i8086_execute(int num_cycles)
 		LOG(("[%04x:%04x]=%02x\tF:%04x\tAX=%04x\tBX=%04x\tCX=%04x\tDX=%04x %d%d%d%d%d%d%d%d%d\n",
 				I.sregs[CS], I.pc - I.base[CS], ReadByte(I.pc), I.flags, I.regs.w[AX], I.regs.w[BX], I.regs.w[CX], I.regs.w[DX], I.AuxVal ? 1 : 0, I.OverVal ? 1 : 0,
 				I.SignVal ? 1 : 0, I.ZeroVal ? 1 : 0, I.CarryVal ? 1 : 0, I.ParityVal ? 1 : 0, I.TF, I.IF, I.DirVal < 0 ? 1 : 0));
-		CALL_DEBUGGER(I.pc);
+		debugger_instruction_hook(Machine, I.pc);
 
 		seg_prefix = FALSE;
 		I.prevpc = I.pc;
@@ -259,12 +259,10 @@ static int i8086_execute(int num_cycles)
 }
 
 
-#ifdef ENABLE_DEBUGGER
 static offs_t i8086_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return i386_dasm_one(buffer, pc, oprom, 16);
 }
-#endif /* ENABLE_DEBUGGER */
 
 
 #if (HAS_I80186 || HAS_I80188)
@@ -299,7 +297,7 @@ static int i80186_execute(int num_cycles)
 	{
 		LOG(("[%04x:%04x]=%02x\tAX=%04x\tBX=%04x\tCX=%04x\tDX=%04x\n", I.sregs[CS], I.pc, ReadByte(I.pc), I.regs.w[AX],
 			   I.regs.w[BX], I.regs.w[CX], I.regs.w[DX]));
-		CALL_DEBUGGER(I.pc);
+		debugger_instruction_hook(Machine, I.pc);
 
 		seg_prefix = FALSE;
 		I.prevpc = I.pc;
@@ -436,9 +434,7 @@ void i8086_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = i8086_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = i8086_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i8086_dasm;			break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &i8086_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

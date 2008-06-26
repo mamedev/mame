@@ -98,7 +98,7 @@ static void unimpl(void)
 	if (PC == 0 || opcode_table[cpu_readop16(TOBYTE(PC)) >> 4] == unimpl)
 	{
 		cpunum_set_input_line(state.screen->machine, cpu_getactivecpu(), INPUT_LINE_HALT, ASSERT_LINE);
-		DEBUGGER_BREAK;
+		debugger_break(state.screen->machine);
 	}
 }
 

@@ -1329,7 +1329,7 @@ static int t90_execute(int cycles)
 	do
 	{
 		T90.prvpc.d = T90.pc.d;
-		CALL_DEBUGGER(T90.pc.d);
+		debugger_instruction_hook(Machine, T90.pc.d);
 
 		check_interrupts();
 
@@ -2783,9 +2783,7 @@ void tmp90840_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:										info->exit = t90_exit;				break;
 		case CPUINFO_PTR_EXECUTE:									info->execute = t90_execute;		break;
 		case CPUINFO_PTR_BURN:										info->burn = t90_burn;				break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:								info->disassemble = t90_dasm;		break;
-#endif
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:						info->icount = &t90_ICount;			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = address_map_tmp90840_mem; break;
 

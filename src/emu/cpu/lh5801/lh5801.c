@@ -131,7 +131,7 @@ static int lh5801_execute(int cycles)
 		{
 			lh5801.oldpc = P;
 
-			CALL_DEBUGGER(P);
+			debugger_instruction_hook(Machine, P);
 			lh5801_instruction();
 
 		} while (lh5801_icount > 0);
@@ -234,9 +234,7 @@ void lh5801_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = NULL;						break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = lh5801_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = lh5801_dasm;		break;
-#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &lh5801_icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

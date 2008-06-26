@@ -33,7 +33,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#ifdef ENABLE_DEBUGGER					/* Compile interface to MAME */
 #include "tms32025.h"
 #include "debugger.h"
 extern UINT16 *tms32025_pgmmap[0x200];
@@ -41,16 +40,6 @@ extern UINT16 *tms32025_pgmmap[0x200];
 //#define READARG16(A) (cpu_readop_arg16((A) | (TMS32025_PGM_OFFSET << 1)))
 #define READOP16(A)		((tms32025_pgmmap[(A) >> 7]) ? (tms32025_pgmmap[(A) >> 7][(A) & 0x7f]) : cpu_readop16((A)<<1))
 #define READARG16(A)	((tms32025_pgmmap[(A) >> 7]) ? (tms32025_pgmmap[(A) >> 7][(A) & 0x7f]) : cpu_readop16((A)<<1))
-#else								/* Compile interface for standalone */
-extern unsigned char *Buffer;
-#ifdef MSB_FIRST
-#define READOP16(A)  ( ((Buffer[A+1]<<8) | Buffer[A]) )
-#define READARG16(A) ( ((Buffer[A+1]<<8) | Buffer[A]) )
-#else
-#define READOP16(A)  ( ((Buffer[A]<<8) | Buffer[A+1]) )
-#define READARG16(A) ( ((Buffer[A]<<8) | Buffer[A+1]) )
-#endif
-#endif
 
 
 

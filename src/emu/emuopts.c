@@ -149,13 +149,8 @@ const options_entry mame_core_options[] =
 	{ "log",                         "0",         OPTION_BOOLEAN,    "generate an error.log file" },
 	{ "verbose;v",                   "0",         OPTION_BOOLEAN,    "display additional diagnostic information" },
 	{ "update_in_pause",             "0",         OPTION_BOOLEAN,    "keep calling video updates while in pause" },
-#ifdef ENABLE_DEBUGGER
 	{ "debug;d",                     "1",         OPTION_BOOLEAN,    "enable/disable debugger" },
 	{ "debugscript",                 NULL,        0,                 "script for debugger" },
-#else
-	{ "debug;d",                     "1",         OPTION_DEPRECATED, "(debugger-only command)" },
-	{ "debugscript",                 NULL,        OPTION_DEPRECATED, "(debugger-only command)" },
-#endif
 
 	/* misc options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE MISC OPTIONS" },

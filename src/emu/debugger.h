@@ -15,61 +15,90 @@
 #define __DEBUGGER_H__
 
 #include "mame.h"
-#include "memory.h"
-#ifdef ENABLE_DEBUGGER
 #include "deprecat.h"
-#endif
-
-
-/***************************************************************************
-    MACROS
-***************************************************************************/
-
-/* handy macro for hard-coding debugger breaks */
-#ifdef ENABLE_DEBUGGER
-#define DEBUGGER_BREAK			if (Machine->debug_mode) mame_debug_break();
-#else
-#define DEBUGGER_BREAK
-#endif
-
-
-/* handy macro for CPU cores */
-#ifdef ENABLE_DEBUGGER
-#define CALL_DEBUGGER(p)		if (Machine->debug_mode) mame_debug_hook(p);
-#else
-#define CALL_DEBUGGER(p)
-#endif
-
+#include "debug/debugcpu.h"
 
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
+/* ----- core debugger functions ----- */
+
 /* initialize the debugger */
-void mame_debug_init(running_machine *machine);
+void debugger_init(running_machine *machine);
 
-/* call this once per instruction from CPU cores */
-void mame_debug_hook(offs_t curpc);
-
-/* call this to break into the debugger as soon as possible */
-void mame_debug_break(void);
-
-/* call this to determine if the debugger is currently active (broken) */
-int mame_debug_is_active(void);
+/* redraw the current video display */
+void debugger_refresh_display(running_machine *machine);
 
 
 
 /***************************************************************************
-    STUBS
+    INLINE FUNCTIONS
 ***************************************************************************/
 
-#ifndef ENABLE_DEBUGGER
-#define mame_debug_init(m) do { } while (0)
-#define mame_debug_hook() do { } while (0)
-#define mame_debug_break() do { } while (0)
-#define mame_debug_is_active() FALSE
-#endif
+/*-------------------------------------------------
+    debugger_instruction_hook - CPU cores call 
+    this once per instruction from CPU cores
+-------------------------------------------------*/
+
+INLINE void debugger_instruction_hook(running_machine *machine, offs_t curpc)
+{
+	if ((machine->debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
+		debug_cpu_instruction_hook(machine, curpc);
+}
+
+
+/*-------------------------------------------------
+    debugger_start_cpu_hook - the CPU execution 
+    system calls this hook before beginning 
+    execution for the given CPU
+-------------------------------------------------*/
+
+INLINE void debugger_start_cpu_hook(running_machine *machine, int cpunum, attotime endtime)
+{
+	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debug_cpu_start_hook(machine, cpunum, endtime);
+}
+
+
+/*-------------------------------------------------
+    debugger_stop_cpu_hook - the CPU execution 
+    system calls this hook when ending execution 
+    for the given CPU
+-------------------------------------------------*/
+
+INLINE void debugger_stop_cpu_hook(running_machine *machine, int cpunum)
+{
+	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debug_cpu_stop_hook(machine, cpunum);
+}
+
+
+/*-------------------------------------------------
+    debugger_break - stop in the debugger at the
+    next opportunity
+-------------------------------------------------*/
+
+INLINE void debugger_break(running_machine *machine)
+{
+	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debug_cpu_halt_on_next_instruction(machine);
+}
+
+
+/*-------------------------------------------------
+    debugger_within_instruction_hook - call this 
+    to determine if the debugger is currently 
+    halted within the instruction hook
+-------------------------------------------------*/
+
+INLINE int debugger_within_instruction_hook(running_machine *machine)
+{
+	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		return debug_cpu_within_instruction_hook(machine);
+	return FALSE;
+}
 
 
 #endif	/* __DEBUGGER_H__ */
