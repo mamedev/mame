@@ -133,7 +133,7 @@ endif
 DEFS += -D_CRT_SECURE_NO_DEPRECATE -DXML_STATIC -D__inline__=__inline -Dsnprintf=_snprintf
 
 # make msvcprep into a pre-build step
-# OSPREBUILD = $(VCONV)
+OSPREBUILD = $(VCONV)
 
 ifneq ($(CROSS_BUILD),1)
 # add VCONV to the build tools

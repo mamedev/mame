@@ -1066,12 +1066,12 @@ M68KMAKE = $(BUILDOUT)/m68kmake$(BUILD_EXE)
 endif
 
 # when we compile source files we need to include generated files from the OBJ directory
-$(CPUOBJ)/m68000/%.o: $(CPUSRC)/m68000/%.c
+$(CPUOBJ)/m68000/%.o: $(CPUSRC)/m68000/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -I$(CPUOBJ)/m68000 -c $< -o $@
 
 # when we compile generated files we need to include stuff from the src directory
-$(CPUOBJ)/m68000/%.o: $(CPUOBJ)/m68000/%.c
+$(CPUOBJ)/m68000/%.o: $(CPUOBJ)/m68000/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -I$(CPUSRC)/m68000 -c $< -o $@
 

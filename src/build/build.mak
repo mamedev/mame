@@ -22,8 +22,6 @@ FILE2STR = $(BUILDOUT)/file2str$(BUILD_EXE)
 PNG2BDC = $(BUILDOUT)/png2bdc$(BUILD_EXE)
 VERINFO = $(BUILDOUT)/verinfo$(BUILD_EXE)
 
-VERINFO = $(BUILDOUT)/verinfo$(EXE)
-
 ifneq ($(CROSS_BUILD),1)
 BUILD += \
 	$(FILE2STR) \
