@@ -257,7 +257,7 @@ static READ8_HANDLER( cosmicg_port_0_r )
 
 static READ8_HANDLER( magspot_coinage_dip_r )
 {
-	return (input_port_read(machine, "DSW") & (1 << (7 - offset))) ? 0 : 1;
+	return (input_port_read_safe(machine, "DSW", 0) & (1 << (7 - offset))) ? 0 : 1;
 }
 
 
