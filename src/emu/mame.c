@@ -1333,7 +1333,7 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 	parse_ini_file(options, CONFIGNAME);
 
 	/* debug mode: parse "debug.ini" as well */
-	if (options_get_bool(mame_options(), OPTION_DEBUG))
+	if (options_get_bool(options, OPTION_DEBUG))
 		parse_ini_file(options, "debug");
 
 	/* if we have a valid game driver, parse game-specific INI files */
