@@ -274,7 +274,7 @@ Configuration options
 		- mame.ini
 		- <mymame>.ini (i.e. if MAME was renamed mame060.exe, MAME
 				parses mame060.ini here)
-		- mamed.ini  (if this is a debug build, i.e. mamed.exe)
+		- debug.ini (if the debugger is enabled)
 		- vector.ini (for vector games only)
 		- <driver>.ini (based on the source filename of the driver)
 		- <parent>.ini (for clones only, may be called recursively)
@@ -940,10 +940,9 @@ Debugging options
 
 -[no]debug
 
-	Activates the integrated debugger. This is available only if the
-	program is compiled with MAME_DEBUG defined. By default, the debugger
-	is entered by pressing the tilde (~) key during emulation. It is also
-	entered immediately at startup. The default is ON (-debug).
+	Activates the integrated debugger. By default, the debugger is entered 
+	by pressing the tilde (~) key during emulation. It is also entered 
+	immediately at startup. The default is OFF (-nodebug).
 
 -debugscript <filename>
 
