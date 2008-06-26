@@ -727,7 +727,7 @@ static DRIVER_INIT( gamecstl )
 	bios_ram = auto_malloc(0x10000);
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, gamecstl_set_keyb_int);
-	mc146818_init(MC146818_STANDARD);
+	mc146818_init(machine, MC146818_STANDARD);
 
 	intel82439tx_init();
 

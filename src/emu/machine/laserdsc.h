@@ -68,7 +68,7 @@ extern const struct CustomSound_interface laserdisc_custom_interface;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-laserdisc_info *laserdisc_init(int type, chd_file *chd, int custom_index);
+laserdisc_info *laserdisc_init(running_machine *machine, int type, chd_file *chd, int custom_index);
 void laserdisc_reset(laserdisc_info *info, int type);
 void laserdisc_exit(laserdisc_info *info);
 void laserdisc_vsync(laserdisc_info *info);

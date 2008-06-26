@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "ds1302.h"
 
 /********************
@@ -49,7 +48,7 @@ static UINT8 bcd(UINT8 v)
 	return ((v/10)<<4)|(v%10);
 }
 
-void DS1302_CLK(UINT8 val)
+void DS1302_CLK(running_machine *machine, UINT8 val)
 {
 	if(val!=LastClk)
 	{
@@ -59,7 +58,7 @@ void DS1302_CLK(UINT8 val)
 			if(ICount==8)	//Command start
 			{
 				mame_system_time systime;
-				mame_get_base_datetime(Machine, &systime);
+				mame_get_base_datetime(machine, &systime);
 
 				switch(ShiftIn)
 				{

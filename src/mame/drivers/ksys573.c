@@ -1501,7 +1501,7 @@ static DRIVER_INIT( konami573 )
 		m_p_timer_root[i] = timer_alloc(root_finished, NULL);
 	}
 
-	timekeeper_init( 0, TIMEKEEPER_M48T58, memory_region( machine, REGION_USER11 ) );
+	timekeeper_init( machine, 0, TIMEKEEPER_M48T58, memory_region( machine, REGION_USER11 ) );
 
 	state_save_register_global( m_n_security_control );
 

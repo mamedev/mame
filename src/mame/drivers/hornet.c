@@ -1316,7 +1316,7 @@ static void init_hornet(running_machine *machine, const UINT8 *backupdef)
 
 	backup_ram = auto_malloc(0x2000);
 	memcpy(backup_ram, backupdef, 0x2000);
-	timekeeper_init(0, TIMEKEEPER_M48T58, backup_ram);
+	timekeeper_init(machine, 0, TIMEKEEPER_M48T58, backup_ram);
 
 	ppc4xx_spu_set_tx_handler(0, jamma_jvs_w);
 }
@@ -1332,7 +1332,7 @@ static void init_hornet_2board(running_machine *machine, const UINT8 *backupdef)
 
 	backup_ram = auto_malloc(0x2000);
 	memcpy(backup_ram, backupdef, 0x2000);
-	timekeeper_init(0, TIMEKEEPER_M48T58, backup_ram);
+	timekeeper_init(machine, 0, TIMEKEEPER_M48T58, backup_ram);
 
 	ppc4xx_spu_set_tx_handler(0, jamma_jvs_w);
 }

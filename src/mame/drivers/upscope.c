@@ -375,7 +375,7 @@ static DRIVER_INIT( upscope )
 		NULL,
 		0
 	};
-	amiga_machine_config(&upscope_intf);
+	amiga_machine_config(machine, &upscope_intf);
 
 	/* allocate NVRAM */
 	generic_nvram_size = 0x100;

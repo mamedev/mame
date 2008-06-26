@@ -97,17 +97,17 @@ static void	set_rdy(z80pio *pio, int ch, int state)
 }
 
 
-static void interrupt_check(int which)
+static void interrupt_check(running_machine *machine, int which)
 {
 	z80pio *pio = pios + which;
 
 	/* if we have a callback, update it with the current state */
 	if (pio->intr)
-		(*pio->intr)(Machine, (z80pio_irq_state(which) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
+		(*pio->intr)(machine, (z80pio_irq_state(which) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void update_irq_state(z80pio *pio, int ch)
+static void update_irq_state(running_machine *machine, z80pio *pio, int ch)
 {
 	int old_state = pio->int_state[ch];
 	int irq = 0;
@@ -157,7 +157,7 @@ static void update_irq_state(z80pio *pio, int ch)
 		pio->int_state[ch] &= ~Z80_DAISY_INT;
 
 	if (old_state != pio->int_state[ch])
-		interrupt_check(pio - pios);
+		interrupt_check(machine, pio - pios);
 }
 
 
@@ -212,7 +212,7 @@ void z80pio_reset(int which)
 		pio->int_state[i] = 0;
 		pio->strobe[i] = 0;
 	}
-	interrupt_check(which);
+	interrupt_check(Machine, which);
 }
 
 
@@ -278,7 +278,7 @@ void z80pio_c_w(int which, int ch, UINT8 data)
 	}
 
 	/* interrupt check */
-	update_irq_state(pio, ch);
+	update_irq_state(Machine, pio, ch);
 }
 
 
@@ -307,7 +307,7 @@ void z80pio_d_w(int which, int ch, UINT8 data)
 		case PIO_MODE0:			/* mode 0 output */
 		case PIO_MODE2:			/* mode 2 i/o */
 			set_rdy(pio, ch, 1); /* ready = H */
-			update_irq_state(pio, ch);
+			update_irq_state(Machine, pio, ch);
 			return;
 
 		case PIO_MODE1:			/* mode 1 input */
@@ -333,7 +333,7 @@ UINT8 z80pio_d_r(int which, int ch)
 			set_rdy(pio, ch, 1);	/* ready = H */
 			if(pio->port_read[ch])
 				pio->in[ch] = pio->port_read[ch](Machine, 0);
-			update_irq_state(pio, ch);
+			update_irq_state(Machine, pio, ch);
 			return pio->in[ch];
 
 		case PIO_MODE2:			/* mode 2 i/o */
@@ -341,7 +341,7 @@ UINT8 z80pio_d_r(int which, int ch)
 			set_rdy(pio, 1, 1); /* brdy = H */
 			if(pio->port_read[ch])
 				pio->in[ch] = pio->port_read[ch](Machine, 0);
-			update_irq_state(pio, ch);
+			update_irq_state(Machine, pio, ch);
 			return pio->in[ch];
 
 		case PIO_MODE3:			/* mode 3 bit */
@@ -375,12 +375,12 @@ void z80pio_p_w(int which, UINT8 ch, UINT8 data)
 
 		case PIO_MODE1:
 			set_rdy(pio, ch, 0);
-			update_irq_state(pio, ch);
+			update_irq_state(Machine, pio, ch);
 			break;
 
 		case PIO_MODE3:
 			/* irq check */
-			update_irq_state(pio, ch);
+			update_irq_state(Machine, pio, ch);
 			break;
 	}
 }
@@ -395,7 +395,7 @@ int z80pio_p_r(int which, UINT8 ch)
 		case PIO_MODE2:		/* port A only */
 		case PIO_MODE0:
 			set_rdy(pio, ch, 0);
-			update_irq_state(pio, ch);
+			update_irq_state(Machine, pio, ch);
 			break;
 
 		case PIO_MODE1:
@@ -463,7 +463,7 @@ static void z80pio_update_strobe(int which, int ch, int state)
 			pio->strobe[ch] = state;
 
 			/* check interrupt */
-			interrupt_check(which);
+			interrupt_check(Machine, which);
 		}
 		break;
 
@@ -519,7 +519,7 @@ int z80pio_irq_ack(int which)
 		{
 			/* clear interrupt, switch to the IEO state, and update the IRQs */
 			pio->int_state[ch] = Z80_DAISY_IEO;
-			interrupt_check(which);
+			interrupt_check(Machine, which);
 			return pio->vector[ch];
 		}
 
@@ -541,7 +541,7 @@ void z80pio_irq_reti(int which)
 		{
 			/* clear the IEO state and update the IRQs */
 			pio->int_state[ch] &= ~Z80_DAISY_IEO;
-			interrupt_check(which);
+			interrupt_check(Machine, which);
 			return;
 		}
 

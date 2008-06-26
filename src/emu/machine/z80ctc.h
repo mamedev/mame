@@ -70,7 +70,7 @@ READ8_HANDLER( z80ctc_1_r );
     EXTERNAL TRIGGERS
 ***************************************************************************/
 
-void z80ctc_trg_w(int which, int trg, UINT8 data);
+void z80ctc_trg_w(running_machine *machine, int which, int trg, UINT8 data);
 WRITE8_HANDLER( z80ctc_0_trg0_w );
 WRITE8_HANDLER( z80ctc_0_trg1_w );
 WRITE8_HANDLER( z80ctc_0_trg2_w );

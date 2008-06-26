@@ -32,16 +32,16 @@ struct _cia6526_interface
 };
 
 /* configuration and reset */
-void cia_config(int which, const cia6526_interface *intf);
+void cia_config(running_machine *machine, int which, const cia6526_interface *intf);
 void cia_reset(void);
 void cia_set_port_mask_value(int which, int port, int data);
 
 /* reading and writing */
-UINT8 cia_read(int which, offs_t offset);
-void cia_write(int which, offs_t offset, UINT8 data);
-void cia_clock_tod(int which);
-void cia_issue_index(int which);
-void cia_set_input_cnt(int which, int data);
+UINT8 cia_read(running_machine *machine, int which, offs_t offset);
+void cia_write(running_machine *machine, int which, offs_t offset, UINT8 data);
+void cia_clock_tod(running_machine *machine, int which);
+void cia_issue_index(running_machine *machine, int which);
+void cia_set_input_cnt(running_machine *machine, int which, int data);
 void cia_set_input_sp(int which, int data);
 
 /* accessors */

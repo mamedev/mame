@@ -8,7 +8,7 @@
 #if !defined( TIMEKPR_H )
 #define TIMEKPR_H ( 1 )
 
-extern void timekeeper_init( int chip, int type, UINT8 *data );
+extern void timekeeper_init( running_machine *machine, int chip, int type, UINT8 *data );
 
 #define MAX_TIMEKEEPER_CHIPS ( 1 )
 

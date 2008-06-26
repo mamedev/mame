@@ -197,9 +197,9 @@ static MACHINE_START( gameplan )
 	via_config(1, &via_1_interface);
 	via_config(2, &via_2_interface);
 
-	r6532_config(0, &r6532_interface);
+	r6532_config(machine, 0, &r6532_interface);
 	r6532_set_clock(0, GAMEPLAN_AUDIO_CPU_CLOCK);
-	r6532_reset(0);
+	r6532_reset(machine, 0);
 
 	/* register for save states */
 	state_save_register_global(state->current_port);

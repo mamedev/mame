@@ -6,7 +6,6 @@
  */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/timekpr.h"
 
 struct timekeeper_chip
@@ -212,7 +211,7 @@ static TIMER_CALLBACK( timekeeper_tick )
 	}
 }
 
-void timekeeper_init( int chip, int type, UINT8 *data )
+void timekeeper_init( running_machine *machine, int chip, int type, UINT8 *data )
 {
 	emu_timer *timer;
 	attotime duration;
@@ -291,7 +290,7 @@ void timekeeper_init( int chip, int type, UINT8 *data )
 	}
 	c->data = data;
 
-	mame_get_base_datetime(Machine, &systime);
+	mame_get_base_datetime(machine, &systime);
 
 	c->control = 0;
 	c->seconds = make_bcd( systime.local_time.second );

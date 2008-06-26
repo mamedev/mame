@@ -481,7 +481,7 @@ READ8_HANDLER( lsi53c810_reg_r )
 			// clear the interrupt on service
 			if(intf->irq_callback != NULL)
 			{
-				intf->irq_callback(Machine, 0);
+				intf->irq_callback(machine, 0);
 			}
 
 			return lsi810.istat;

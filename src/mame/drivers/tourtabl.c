@@ -119,10 +119,10 @@ static const struct tia_interface tourtabl_tia_interface =
 
 static MACHINE_START( tourtabl )
 {
-	r6532_config(0, &r6532_interface_0);
-	r6532_config(1, &r6532_interface_1);
-	r6532_reset(0);
-	r6532_reset(1);
+	r6532_config(machine, 0, &r6532_interface_0);
+	r6532_config(machine, 1, &r6532_interface_1);
+	r6532_reset(machine, 0);
+	r6532_reset(machine, 1);
 
 	tia_init( machine, &tourtabl_tia_interface );
 }

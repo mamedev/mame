@@ -731,7 +731,7 @@ static DRIVER_INIT( slapshot )
 	int size=memory_region_length(machine, REGION_GFX2);
 	int data;
 
-	timekeeper_init( 0, TIMEKEEPER_MK48T08, NULL );
+	timekeeper_init( machine, 0, TIMEKEEPER_MK48T08, NULL );
 
 	offset = size/2;
 	for (i = size/2+size/4; i<size; i++)

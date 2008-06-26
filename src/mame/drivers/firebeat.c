@@ -1848,7 +1848,7 @@ static NVRAM_HANDLER(firebeat)
 
 		if (file != NULL)
 		{
-			rtc65271_file_load(file);
+			rtc65271_file_load(machine, file);
 		}
 	}
 }

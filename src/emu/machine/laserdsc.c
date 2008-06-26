@@ -14,7 +14,6 @@
 #include "avcomp.h"
 #include "profiler.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "sound/custom.h"
 
 
@@ -671,7 +670,7 @@ INLINE void fillbitmap_yuy16(bitmap_t *bitmap, UINT8 yval, UINT8 cr, UINT8 cb)
     laserdisc playback
 -------------------------------------------------*/
 
-laserdisc_info *laserdisc_init(int type, chd_file *chd, int custom_index)
+laserdisc_info *laserdisc_init(running_machine *machine, int type, chd_file *chd, int custom_index)
 {
 	int fps = 30, fpsfrac = 0, width = 720, height = 240, interlaced = 1, channels = 2, rate = 44100, metabytes = 0;
 	UINT32 fps_times_1million, max_samples_per_track;
@@ -679,7 +678,7 @@ laserdisc_info *laserdisc_init(int type, chd_file *chd, int custom_index)
 	char metadata[256];
 	chd_error err;
 
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call laserdisc_init at init time!");
+	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call laserdisc_init at init time!");
 
 	/* initialize the info */
 	info = auto_malloc(sizeof(*info));

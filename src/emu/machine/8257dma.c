@@ -30,7 +30,6 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "memconv.h"
 #include "8257dma.h"
 
@@ -196,7 +195,7 @@ static void dma8257_update_status(running_machine *machine, dma8257_t *dma8257)
 	/* set the halt line */
 	if (dma8257->intf && dma8257->intf->cpunum >= 0)
 	{
-		cpunum_set_input_line(Machine, dma8257->intf->cpunum, INPUT_LINE_HALT,
+		cpunum_set_input_line(machine, dma8257->intf->cpunum, INPUT_LINE_HALT,
 			pending_transfer ? ASSERT_LINE : CLEAR_LINE);
 	}
 

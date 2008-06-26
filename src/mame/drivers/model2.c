@@ -49,7 +49,7 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
+//#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "video/segaic24.h"
 #include "cpu/i960/i960.h"

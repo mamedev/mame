@@ -272,7 +272,7 @@ static VIDEO_UPDATE( dleuro )
 
 static MACHINE_START( dlair )
 {
-	discinfo = laserdisc_init(laserdisc_type & LASERDISC_TYPE_MASK, get_disk_handle(0), 0);
+	discinfo = laserdisc_init(machine, laserdisc_type & LASERDISC_TYPE_MASK, get_disk_handle(0), 0);
 }
 
 
@@ -284,7 +284,7 @@ static MACHINE_START( dleuro )
 	z80ctc_init(0, &ctc_intf);
 	z80sio_init(0, &sio_intf);
 
-	discinfo = laserdisc_init(laserdisc_type & LASERDISC_TYPE_MASK, get_disk_handle(0), 0);
+	discinfo = laserdisc_init(machine, laserdisc_type & LASERDISC_TYPE_MASK, get_disk_handle(0), 0);
 }
 
 

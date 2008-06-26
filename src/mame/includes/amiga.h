@@ -374,7 +374,7 @@ extern const char *const amiga_custom_names[0x100];
 extern UINT16 (*amiga_chip_ram_r)(offs_t offset);
 extern void (*amiga_chip_ram_w)(offs_t offset, UINT16 data);
 
-void amiga_machine_config(const amiga_machine_interface *intf);
+void amiga_machine_config(running_machine *machine, const amiga_machine_interface *intf);
 
 MACHINE_RESET( amiga );
 

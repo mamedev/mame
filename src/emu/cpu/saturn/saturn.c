@@ -24,7 +24,6 @@
 #include "debugger.h"
 
 #include "saturn.h"
-#include "deprecat.h" /* for Machine */
 
 #define R0 0
 #define R1 1

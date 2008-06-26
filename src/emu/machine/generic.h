@@ -78,10 +78,10 @@ void coin_lockout_global_w(int on);
 mame_file *nvram_fopen(running_machine *machine, UINT32 openflags);
 
 /* load NVRAM from a file */
-void nvram_load(void);
+void nvram_load(running_machine *machine);
 
 /* save NVRAM to a file */
-void nvram_save(void);
+void nvram_save(running_machine *machine);
 
 /* generic NVRAM handler that defaults to a 0 fill */
 NVRAM_HANDLER( generic_0fill );
@@ -97,10 +97,10 @@ NVRAM_HANDLER( generic_randfill );
 /* ----- memory card management ----- */
 
 /* create a new memory card with the given index */
-int memcard_create(int index, int overwrite);
+int memcard_create(running_machine *machine, int index, int overwrite);
 
 /* "insert" a memory card with the given index and load its data */
-int memcard_insert(int index);
+int memcard_insert(running_machine *machine, int index);
 
 /* "eject" a memory card and save its data */
 void memcard_eject(running_machine *machine);

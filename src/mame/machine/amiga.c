@@ -258,7 +258,7 @@ static void amiga_chip_ram32_w(offs_t offset, UINT16 data)
  *
  *************************************/
 
-void amiga_machine_config(const amiga_machine_interface *intf)
+void amiga_machine_config(running_machine *machine, const amiga_machine_interface *intf)
 {
 	cia6526_interface cia_intf[2];
 
@@ -286,7 +286,7 @@ void amiga_machine_config(const amiga_machine_interface *intf)
 	cia_intf[0].port[0].write = intf->cia_0_portA_w;
 	cia_intf[0].port[1].read = intf->cia_0_portB_r;
 	cia_intf[0].port[1].write = intf->cia_0_portB_w;
-	cia_config(0, &cia_intf[0]);
+	cia_config(machine, 0, &cia_intf[0]);
 
 	cia_intf[1].type = CIA8520;
 	cia_intf[1].clock = O2_CLOCK;
@@ -296,7 +296,7 @@ void amiga_machine_config(const amiga_machine_interface *intf)
 	cia_intf[1].port[0].write = intf->cia_1_portA_w;
 	cia_intf[1].port[1].read = intf->cia_1_portB_r;
 	cia_intf[1].port[1].write = intf->cia_1_portB_w;
-	cia_config(1, &cia_intf[1]);
+	cia_config(machine, 1, &cia_intf[1]);
 
 	/* setup the timers */
 	amiga_irq_timer = timer_alloc(amiga_irq_proc, NULL);
@@ -375,7 +375,7 @@ static TIMER_CALLBACK( scanline_callback )
 		amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_VERTB, 0xffff);
 
 		/* clock the first CIA TOD */
-		cia_clock_tod(0);
+		cia_clock_tod(machine, 0);
 
 		/* call the system-specific callback */
 		if (amiga_intf->scanline0_callback != NULL)
@@ -383,7 +383,7 @@ static TIMER_CALLBACK( scanline_callback )
 	}
 
 	/* on every scanline, clock the second CIA TOD */
-	cia_clock_tod(1);
+	cia_clock_tod(machine, 1);
 
 	/* render up to this scanline */
 	if (!video_screen_update_partial(machine->primary_screen, scanline))
@@ -1080,7 +1080,7 @@ READ16_HANDLER( amiga_cia_r )
 	}
 
 	/* handle the reads */
-	data = cia_read(which, offset >> 7);
+	data = cia_read(machine, which, offset >> 7);
 
 	if (LOG_CIA)
 		logerror("%06x:cia_%c_read(%03x) = %04x & %04x\n", safe_activecpu_get_pc(), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data << shift, mem_mask);
@@ -1122,7 +1122,7 @@ WRITE16_HANDLER( amiga_cia_w )
 	}
 
 	/* handle the writes */
-	cia_write(which, offset >> 7, (UINT8) data);
+	cia_write(machine, which, offset >> 7, (UINT8) data);
 }
 
 

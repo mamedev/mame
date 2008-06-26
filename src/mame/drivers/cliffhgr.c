@@ -265,7 +265,7 @@ static void vdp_interrupt (running_machine *machine, int state)
 
 static MACHINE_START( cliffhgr )
 {
-	discinfo = laserdisc_init(LASERDISC_TYPE_PR8210, get_disk_handle(0), 0);
+	discinfo = laserdisc_init(machine, LASERDISC_TYPE_PR8210, get_disk_handle(0), 0);
 	irq_timer = timer_alloc(cliff_irq_callback, NULL);
 }
 

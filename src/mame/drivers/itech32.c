@@ -211,7 +211,6 @@ Notes:
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
@@ -3786,7 +3785,7 @@ static DRIVER_INIT( wcbowlt )	/* PIC 16C54 labeled as ITBWL-3 */
 	/* Tournament Version, Same protection memory address as WCB Deluxe, but uses the standard WCB pic ITBWL-3 */
 	init_shuffle_bowl_common(machine, 0x111a);
 
-	timekeeper_init( 0, TIMEKEEPER_M48T02, NULL );
+	timekeeper_init( machine, 0, TIMEKEEPER_M48T02, NULL );
 	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x681000, 0x6817ff, 0, 0, timekeeper_0_32be_r, timekeeper_0_32be_w);
 }
 
@@ -3835,7 +3834,7 @@ static DRIVER_INIT( aamat )
         Tournament Version - So install needed handler for the TimeKeeper ram
     */
 	DRIVER_INIT_CALL(aama);
-	timekeeper_init( 0, TIMEKEEPER_M48T02, NULL );
+	timekeeper_init( machine, 0, TIMEKEEPER_M48T02, NULL );
 	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x681000, 0x6817ff, 0, 0, timekeeper_0_32be_r, timekeeper_0_32be_w);
 }
 

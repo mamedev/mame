@@ -24,16 +24,16 @@ typedef enum
 
 
 /* initialize mc146818 emulation, call only once at beginning */
-void mc146818_init(MC146818_TYPE type);
+void mc146818_init(running_machine *machine, MC146818_TYPE type);
 
 /* loads data from standard nvram file */
-void mc146818_load(void);
+void mc146818_load(running_machine *machine);
 
 /* loads data from file stream */
 void mc146818_load_stream(mame_file *file);
 
 /* saves data into standard nvram file */
-void mc146818_save(void);
+void mc146818_save(running_machine *machine);
 
 /* saves data into file stream */
 void mc146818_save_stream(mame_file *file);

@@ -673,7 +673,7 @@ static DRIVER_INIT(viper)
 	pci_add_device(0, 0, &mpc8240);
 	pci_add_device(0, 12, &voodoo3);
 
-	timekeeper_init(0, TIMEKEEPER_M48T58, backup_ram);
+	timekeeper_init(machine, 0, TIMEKEEPER_M48T58, backup_ram);
 
 	nvram = memory_region(machine, REGION_USER2);
 	memcpy(backup_ram, nvram, 0x2000);

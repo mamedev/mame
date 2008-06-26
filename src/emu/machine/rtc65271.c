@@ -16,7 +16,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "rtc65271.h"
 
 static void field_interrupts(void);
@@ -184,7 +183,7 @@ static UINT8 BCD_to_binary(UINT8 data)
 /*
     load the SRAM and register contents from file
 */
-int rtc65271_file_load(mame_file *file)
+int rtc65271_file_load(running_machine *machine, mame_file *file)
 {
 	UINT8 buf;
 
@@ -226,7 +225,7 @@ int rtc65271_file_load(mame_file *file)
 		mame_system_time systime;
 
 		/* get the current date/time from the core */
-		mame_get_current_datetime(Machine, &systime);
+		mame_get_current_datetime(machine, &systime);
 
 		/* set clock registers */
 		rtc.regs[reg_second] = systime.local_time.second;

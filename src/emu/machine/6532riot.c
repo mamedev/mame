@@ -12,7 +12,6 @@ The timer seems to follow these rules:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/6532riot.h"
 
 struct riot6532
@@ -65,7 +64,7 @@ static TIMER_CALLBACK( r6532_irq_timer_callback )
 }
 
 
-static void r6532_pa7_check(int which){
+static void r6532_pa7_check(running_machine *machine, int which){
 	UINT8 data = ( ( r6532[which].ddr_a & r6532[which].out_a ) | ( ~r6532[which].ddr_a & r6532[which].in_a ) ) & 0x80;
 	if ((r6532[which].pa7 ^ data) && (r6532[which].pa7_direction ^ data))
 	{
@@ -73,7 +72,7 @@ static void r6532_pa7_check(int which){
 		if (r6532[which].pa7_enable)
 		{
 			if (r6532[which].intf->irq_func)
-				(*r6532[which].intf->irq_func)(Machine, ASSERT_LINE);
+				(*r6532[which].intf->irq_func)(machine, ASSERT_LINE);
 			else
 				logerror("6532RIOT chip #%d: Interrupt is asserted but there is no callback function.  PC: %08X\n", which, safe_activecpu_get_pc());
 		}
@@ -82,7 +81,7 @@ static void r6532_pa7_check(int which){
 }
 
 
-void r6532_write(int which, offs_t offset, UINT8 data)
+void r6532_write(running_machine *machine, int which, offs_t offset, UINT8 data)
 {
 	if (offset & 4)
 	{
@@ -124,16 +123,16 @@ void r6532_write(int which, offs_t offset, UINT8 data)
 			{
 				UINT8 write_data = ( r6532[which].ddr_a & r6532[which].out_a ) | ( ~r6532[which].ddr_a & 0xFF );
 				if (r6532[which].intf->out_a_func)
-					r6532[which].intf->out_a_func(Machine, 0, write_data);
+					r6532[which].intf->out_a_func(machine, 0, write_data);
 				else
 					logerror("6532RIOT chip #%d: Port A is being written to but has no handler.  PC: %08X - %02X\n", which, safe_activecpu_get_pc(), write_data);
 				/* Check for PA7 change */
-				r6532_pa7_check(which);
+				r6532_pa7_check(machine, which);
 			}
 			break;
 		case 1:
 			r6532[which].ddr_a = data;
-			r6532_pa7_check(which);
+			r6532_pa7_check(machine, which);
 			break;
 		case 2:
 			r6532[which].out_b = data;
@@ -141,7 +140,7 @@ void r6532_write(int which, offs_t offset, UINT8 data)
 			{
 				UINT8 write_data = ( r6532[which].ddr_b & r6532[which].out_b ) | ( ~r6532[which].ddr_b & 0xFF );
 				if (r6532[which].intf->out_b_func)
-					r6532[which].intf->out_b_func(Machine, 0, write_data);
+					r6532[which].intf->out_b_func(machine, 0, write_data);
 				else
 					logerror("6532RIOT chip #%d: Port B is being written to but has no handler.  PC: %08X - %02X\n", which, safe_activecpu_get_pc(), write_data);
 			}
@@ -154,7 +153,7 @@ void r6532_write(int which, offs_t offset, UINT8 data)
 }
 
 
-INLINE UINT8 r6532_read_timer(int which)
+INLINE UINT8 r6532_read_timer(running_machine *machine, int which)
 {
 	int timer_cycles_left = ( attotime_to_double(timer_timeleft( r6532[which].counter_timer )) * r6532[which].clock ) - 1;
 	if ( timer_cycles_left >= 0)
@@ -166,7 +165,7 @@ INLINE UINT8 r6532_read_timer(int which)
 		if (timer_cycles_left != -1)
 		{
 			if (r6532[which].intf->irq_func && r6532[which].timer_irq)
-				(*r6532[which].intf->irq_func)(Machine, CLEAR_LINE);
+				(*r6532[which].intf->irq_func)(machine, CLEAR_LINE);
 			else
 				logerror("6532RIOT chip #%d: Interrupt is cleared but there is no callback function.  PC: %08X\n", which, safe_activecpu_get_pc());
 
@@ -179,11 +178,11 @@ INLINE UINT8 r6532_read_timer(int which)
 }
 
 
-void r6532_set_input_a(int which, UINT8 data)
+void r6532_set_input_a(running_machine *machine, int which, UINT8 data)
 {
 	r6532[which].in_a = data;
 	/* Check for PA7 change */
-	r6532_pa7_check(which);
+	r6532_pa7_check(machine, which);
 }
 
 
@@ -193,7 +192,7 @@ void r6532_set_input_b(int which, UINT8 data)
 }
 
 
-INLINE UINT8 r6532_read_irq_flags(int which)
+INLINE UINT8 r6532_read_irq_flags(running_machine *machine, int which)
 {
 	int timer_cycles_left = ( attotime_to_double(timer_timeleft( r6532[which].counter_timer )) * r6532[which].clock ) - 1;
 	int res = 0;
@@ -204,7 +203,7 @@ INLINE UINT8 r6532_read_irq_flags(int which)
 		if ( timer_cycles_left < -1 )
 		{
 			if ( r6532[which].intf->irq_func)
-				(*r6532[which].intf->irq_func)(Machine, CLEAR_LINE);
+				(*r6532[which].intf->irq_func)(machine, CLEAR_LINE);
 			else
 				logerror("6532RIOT chip #%d: Interrupt is cleared but there is no callback function.  PC: %08X\n", which, safe_activecpu_get_pc());
 
@@ -219,7 +218,7 @@ INLINE UINT8 r6532_read_irq_flags(int which)
 		r6532[which].pa7_flag = 0;
 
 		if (r6532[which].intf->irq_func && timer_cycles_left != -1)
-			(*r6532[which].intf->irq_func)(Machine, CLEAR_LINE);
+			(*r6532[which].intf->irq_func)(machine, CLEAR_LINE);
 		else
 			logerror("6532RIOT chip #%d: Interrupt is cleared but there is no callback function.  PC: %08X\n", which, safe_activecpu_get_pc());
 	}
@@ -228,7 +227,7 @@ INLINE UINT8 r6532_read_irq_flags(int which)
 }
 
 
-UINT8 r6532_read(int which, offs_t offset)
+UINT8 r6532_read(running_machine *machine, int which, offs_t offset)
 {
 	UINT8 val = 0;
 
@@ -236,19 +235,19 @@ UINT8 r6532_read(int which, offs_t offset)
 	{
 	case 0:
 		if (r6532[which].intf->in_a_func)
-			r6532[which].in_a = r6532[which].intf->in_a_func(Machine, 0);
+			r6532[which].in_a = r6532[which].intf->in_a_func(machine, 0);
 		else
 			logerror("6532RIOT chip #%d: Port A is being read but has no handler.  PC: %08X\n", which, safe_activecpu_get_pc());
 		val = ( r6532[which].ddr_a & r6532[which].out_a ) | ( ~r6532[which].ddr_a & r6532[which].in_a );
 		/* Check for PA7 change */
-		r6532_pa7_check(which);
+		r6532_pa7_check(machine, which);
 		break;
 	case 1:
 		val = r6532[which].ddr_a;
 		break;
 	case 2:
 		if (r6532[which].intf->in_b_func)
-			r6532[which].in_b = r6532[which].intf->in_b_func(Machine, 0);
+			r6532[which].in_b = r6532[which].intf->in_b_func(machine, 0);
 		else
 			logerror("6532RIOT chip #%d: Port B is being read but has no handler.  PC: %08X\n", which, safe_activecpu_get_pc());
 
@@ -260,11 +259,11 @@ UINT8 r6532_read(int which, offs_t offset)
 	case 4:
 	case 6:
 		r6532[which].timer_irq_enable = offset & 8;
-		val = r6532_read_timer(which);
+		val = r6532_read_timer(machine, which);
 		break;
 	case 5:
 	case 7:
-		val = r6532_read_irq_flags(which);
+		val = r6532_read_irq_flags(machine, which);
 		break;
 	}
 
@@ -278,7 +277,7 @@ void r6532_set_clock(int which, int clock)
 }
 
 
-void r6532_reset(int which)
+void r6532_reset(running_machine *machine, int which)
 {
 	r6532[which].out_a = 0;
 	r6532[which].out_b = 0;
@@ -300,15 +299,15 @@ void r6532_reset(int which)
 	r6532[which].timer_irq = 0;
 
 	if (r6532[which].intf->irq_func)
-		(*r6532[which].intf->irq_func)(Machine, CLEAR_LINE);
+		(*r6532[which].intf->irq_func)(machine, CLEAR_LINE);
 	else
 		logerror("6532RIOT chip #%d: Interrupt is cleared but there is no callback function.  PC: %08X\n", which, safe_activecpu_get_pc());
 }
 
 
-void r6532_config(int which, const struct riot6532_interface* intf)
+void r6532_config(running_machine *machine, int which, const struct riot6532_interface* intf)
 {
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call r6532_init at init time!");
+	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call r6532_init at init time!");
 	assert_always( which < MAX_R6532, "which exceeds maximum number of configured r6532s!" );
 
 	r6532[which].intf = intf;
@@ -318,32 +317,32 @@ void r6532_config(int which, const struct riot6532_interface* intf)
 }
 
 
-WRITE8_HANDLER( r6532_0_w ) { r6532_write(0, offset, data); }
-WRITE8_HANDLER( r6532_1_w ) { r6532_write(1, offset, data); }
-WRITE8_HANDLER( r6532_2_w ) { r6532_write(2, offset, data); }
-WRITE8_HANDLER( r6532_3_w ) { r6532_write(3, offset, data); }
-WRITE8_HANDLER( r6532_4_w ) { r6532_write(4, offset, data); }
-WRITE8_HANDLER( r6532_5_w ) { r6532_write(5, offset, data); }
-WRITE8_HANDLER( r6532_6_w ) { r6532_write(6, offset, data); }
-WRITE8_HANDLER( r6532_7_w ) { r6532_write(7, offset, data); }
+WRITE8_HANDLER( r6532_0_w ) { r6532_write(machine, 0, offset, data); }
+WRITE8_HANDLER( r6532_1_w ) { r6532_write(machine, 1, offset, data); }
+WRITE8_HANDLER( r6532_2_w ) { r6532_write(machine, 2, offset, data); }
+WRITE8_HANDLER( r6532_3_w ) { r6532_write(machine, 3, offset, data); }
+WRITE8_HANDLER( r6532_4_w ) { r6532_write(machine, 4, offset, data); }
+WRITE8_HANDLER( r6532_5_w ) { r6532_write(machine, 5, offset, data); }
+WRITE8_HANDLER( r6532_6_w ) { r6532_write(machine, 6, offset, data); }
+WRITE8_HANDLER( r6532_7_w ) { r6532_write(machine, 7, offset, data); }
 
-READ8_HANDLER( r6532_0_r ) { return r6532_read(0, offset); }
-READ8_HANDLER( r6532_1_r ) { return r6532_read(1, offset); }
-READ8_HANDLER( r6532_2_r ) { return r6532_read(2, offset); }
-READ8_HANDLER( r6532_3_r ) { return r6532_read(3, offset); }
-READ8_HANDLER( r6532_4_r ) { return r6532_read(4, offset); }
-READ8_HANDLER( r6532_5_r ) { return r6532_read(5, offset); }
-READ8_HANDLER( r6532_6_r ) { return r6532_read(6, offset); }
-READ8_HANDLER( r6532_7_r ) { return r6532_read(7, offset); }
+READ8_HANDLER( r6532_0_r ) { return r6532_read(machine, 0, offset); }
+READ8_HANDLER( r6532_1_r ) { return r6532_read(machine, 1, offset); }
+READ8_HANDLER( r6532_2_r ) { return r6532_read(machine, 2, offset); }
+READ8_HANDLER( r6532_3_r ) { return r6532_read(machine, 3, offset); }
+READ8_HANDLER( r6532_4_r ) { return r6532_read(machine, 4, offset); }
+READ8_HANDLER( r6532_5_r ) { return r6532_read(machine, 5, offset); }
+READ8_HANDLER( r6532_6_r ) { return r6532_read(machine, 6, offset); }
+READ8_HANDLER( r6532_7_r ) { return r6532_read(machine, 7, offset); }
 
-WRITE8_HANDLER( r6532_0_porta_w) { r6532_set_input_a(0, data); }
-WRITE8_HANDLER( r6532_1_porta_w) { r6532_set_input_a(1, data); }
-WRITE8_HANDLER( r6532_2_porta_w) { r6532_set_input_a(2, data); }
-WRITE8_HANDLER( r6532_3_porta_w) { r6532_set_input_a(3, data); }
-WRITE8_HANDLER( r6532_4_porta_w) { r6532_set_input_a(4, data); }
-WRITE8_HANDLER( r6532_5_porta_w) { r6532_set_input_a(5, data); }
-WRITE8_HANDLER( r6532_6_porta_w) { r6532_set_input_a(6, data); }
-WRITE8_HANDLER( r6532_7_porta_w) { r6532_set_input_a(7, data); }
+WRITE8_HANDLER( r6532_0_porta_w) { r6532_set_input_a(machine, 0, data); }
+WRITE8_HANDLER( r6532_1_porta_w) { r6532_set_input_a(machine, 1, data); }
+WRITE8_HANDLER( r6532_2_porta_w) { r6532_set_input_a(machine, 2, data); }
+WRITE8_HANDLER( r6532_3_porta_w) { r6532_set_input_a(machine, 3, data); }
+WRITE8_HANDLER( r6532_4_porta_w) { r6532_set_input_a(machine, 4, data); }
+WRITE8_HANDLER( r6532_5_porta_w) { r6532_set_input_a(machine, 5, data); }
+WRITE8_HANDLER( r6532_6_porta_w) { r6532_set_input_a(machine, 6, data); }
+WRITE8_HANDLER( r6532_7_porta_w) { r6532_set_input_a(machine, 7, data); }
 
 WRITE8_HANDLER( r6532_0_portb_w) { r6532_set_input_b(0, data); }
 WRITE8_HANDLER( r6532_1_portb_w) { r6532_set_input_b(1, data); }

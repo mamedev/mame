@@ -1147,7 +1147,7 @@ static DRIVER_INIT( nwktr )
 	set_cgboard_texture_bank(0, 5, memory_region(machine, REGION_USER5));
 
 	sharc_dataram = auto_malloc(0x100000);
-	timekeeper_init(0, TIMEKEEPER_M48T58, backup_ram);
+	timekeeper_init(machine, 0, TIMEKEEPER_M48T58, backup_ram);
 
 	K056800_init(sound_irq_callback);
 	K033906_init();

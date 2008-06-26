@@ -105,13 +105,13 @@ static z80ctc ctcs[MAX_CTC];
     INTERNAL STATE MANAGEMENT
 ***************************************************************************/
 
-static void interrupt_check(int which)
+static void interrupt_check(running_machine *machine, int which)
 {
 	z80ctc *ctc = ctcs + which;
 
 	/* if we have a callback, update it with the current state */
 	if (ctc->intr)
-		(*ctc->intr)(Machine, (z80ctc_irq_state(which) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
+		(*ctc->intr)(machine, (z80ctc_irq_state(which) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -126,7 +126,7 @@ static TIMER_CALLBACK( timercallback )
 	{
 		ctc->int_state[ch] |= Z80_DAISY_INT;
 		VPRINTF(("CTC timer ch%d\n", ch));
-		interrupt_check(which);
+		interrupt_check(machine, which);
 	}
 
 	/* generate the clock pulse */
@@ -191,7 +191,7 @@ void z80ctc_reset(int which)
 		timer_adjust_oneshot(ctc->timer[i], attotime_never, 0);
 		ctc->int_state[i] = 0;
 	}
-	interrupt_check(which);
+	interrupt_check(Machine, which);
 	VPRINTF(("CTC Reset\n"));
 }
 
@@ -347,7 +347,7 @@ READ8_HANDLER( z80ctc_1_r ) { return z80ctc_r(1, offset); }
     EXTERNAL TRIGGERS
 ***************************************************************************/
 
-void z80ctc_trg_w(int which, int ch, UINT8 data)
+void z80ctc_trg_w(running_machine *machine, int which, int ch, UINT8 data)
 {
 	z80ctc *ctc = ctcs + which;
 
@@ -391,20 +391,20 @@ void z80ctc_trg_w(int which, int ch, UINT8 data)
 
 				/* if we hit zero, do the same thing as for a timer interrupt */
 				if (!ctc->down[ch])
-					timercallback(Machine, NULL, (which << 2) + ch);
+					timercallback(machine, NULL, (which << 2) + ch);
 			}
 		}
 	}
 }
 
-WRITE8_HANDLER( z80ctc_0_trg0_w ) { z80ctc_trg_w(0, 0, data); }
-WRITE8_HANDLER( z80ctc_0_trg1_w ) { z80ctc_trg_w(0, 1, data); }
-WRITE8_HANDLER( z80ctc_0_trg2_w ) { z80ctc_trg_w(0, 2, data); }
-WRITE8_HANDLER( z80ctc_0_trg3_w ) { z80ctc_trg_w(0, 3, data); }
-WRITE8_HANDLER( z80ctc_1_trg0_w ) { z80ctc_trg_w(1, 0, data); }
-WRITE8_HANDLER( z80ctc_1_trg1_w ) { z80ctc_trg_w(1, 1, data); }
-WRITE8_HANDLER( z80ctc_1_trg2_w ) { z80ctc_trg_w(1, 2, data); }
-WRITE8_HANDLER( z80ctc_1_trg3_w ) { z80ctc_trg_w(1, 3, data); }
+WRITE8_HANDLER( z80ctc_0_trg0_w ) { z80ctc_trg_w(machine, 0, 0, data); }
+WRITE8_HANDLER( z80ctc_0_trg1_w ) { z80ctc_trg_w(machine, 0, 1, data); }
+WRITE8_HANDLER( z80ctc_0_trg2_w ) { z80ctc_trg_w(machine, 0, 2, data); }
+WRITE8_HANDLER( z80ctc_0_trg3_w ) { z80ctc_trg_w(machine, 0, 3, data); }
+WRITE8_HANDLER( z80ctc_1_trg0_w ) { z80ctc_trg_w(machine, 1, 0, data); }
+WRITE8_HANDLER( z80ctc_1_trg1_w ) { z80ctc_trg_w(machine, 1, 1, data); }
+WRITE8_HANDLER( z80ctc_1_trg2_w ) { z80ctc_trg_w(machine, 1, 2, data); }
+WRITE8_HANDLER( z80ctc_1_trg3_w ) { z80ctc_trg_w(machine, 1, 3, data); }
 
 
 
@@ -451,7 +451,7 @@ int z80ctc_irq_ack(int which)
 
 			/* clear interrupt, switch to the IEO state, and update the IRQs */
 			ctc->int_state[ch] = Z80_DAISY_IEO;
-			interrupt_check(which);
+			interrupt_check(Machine, which);
 			return ctc->vector + ch * 2;
 		}
 
@@ -475,7 +475,7 @@ void z80ctc_irq_reti(int which)
 
 			/* clear the IEO state and update the IRQs */
 			ctc->int_state[ch] &= ~Z80_DAISY_IEO;
-			interrupt_check(which);
+			interrupt_check(Machine, which);
 			return;
 		}
 

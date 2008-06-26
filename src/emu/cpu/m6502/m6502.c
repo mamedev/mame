@@ -29,7 +29,6 @@
 #define HAS_M65C02 1
 #endif
 
-#include "deprecat.h"
 #include "debugger.h"
 #include "m6502.h"
 #include "ops02.h"

@@ -738,7 +738,7 @@ static MACHINE_START( thayers )
 {
 	laserdisc_type = LASERDISC_TYPE_LDV1000;
 
-	discinfo = laserdisc_init(laserdisc_type, get_disk_handle(0), 0);
+	discinfo = laserdisc_init(machine, laserdisc_type, get_disk_handle(0), 0);
 
 	memset(&ssi263, 0, sizeof(ssi263));
 }

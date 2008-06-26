@@ -98,7 +98,6 @@
 #include "profiler.h"
 #include "inputseq.h"
 #include "ui.h"
-#include "deprecat.h"
 #include <ctype.h>
 #include <time.h>
 #include <stdarg.h>

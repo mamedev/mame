@@ -157,7 +157,7 @@ static VIDEO_UPDATE( alg )
 
 static MACHINE_START( alg )
 {
-	discinfo = laserdisc_init(LASERDISC_TYPE_LDP1450, get_disk_handle(0), 1);
+	discinfo = laserdisc_init(machine, LASERDISC_TYPE_LDP1450, get_disk_handle(0), 1);
 	serial_timer = timer_alloc(response_timer, NULL);
 	serial_timer_active = FALSE;
 }
@@ -714,7 +714,7 @@ ROM_END
  *
  *************************************/
 
-static void alg_init(void)
+static void alg_init(running_machine *machine)
 {
 	static const amiga_machine_interface alg_intf =
 	{
@@ -731,7 +731,7 @@ static void alg_init(void)
 		NULL,
 		0
 	};
-	amiga_machine_config(&alg_intf);
+	amiga_machine_config(machine, &alg_intf);
 
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
@@ -763,7 +763,7 @@ static DRIVER_INIT( palr1 )
 	}
 	free(original);
 
-	alg_init();
+	alg_init(machine);
 }
 
 static DRIVER_INIT( palr3 )
@@ -782,7 +782,7 @@ static DRIVER_INIT( palr3 )
 	}
 	free(original);
 
-	alg_init();
+	alg_init(machine);
 }
 
 static DRIVER_INIT( palr6 )
@@ -803,7 +803,7 @@ static DRIVER_INIT( palr6 )
 	}
 	free(original);
 
-	alg_init();
+	alg_init(machine);
 }
 
 static DRIVER_INIT( aplatoon )
@@ -823,12 +823,12 @@ static DRIVER_INIT( aplatoon )
 		memcpy(decrypted + i * 0x1000, rom + shuffle[i] * 0x1000, 0x1000);
 	memcpy(rom, decrypted, 0x40000);
 	logerror("decrypt done\n ");
-	alg_init();
+	alg_init(machine);
 }
 
 static DRIVER_INIT( none )
 {
-	alg_init();
+	alg_init(machine);
 }
 
 

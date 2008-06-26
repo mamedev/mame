@@ -448,7 +448,7 @@ static DRIVER_INIT(mquake)
 		NULL,
 		0
 	};
-	amiga_machine_config(&mquake_intf);
+	amiga_machine_config(machine, &mquake_intf);
 
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);

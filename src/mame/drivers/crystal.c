@@ -387,7 +387,7 @@ static WRITE32_HANDLER(PIO_w)
 
 	DS1302_RST(RST?1:0);
 	DS1302_DAT(DAT?1:0);
-	DS1302_CLK(CLK?1:0);
+	DS1302_CLK(machine, CLK?1:0);
 
 	if(DS1302_RD())
 		program_write_dword_32le(0x01802008,program_read_dword_32le(0x01802008)|0x10000000);

@@ -9,7 +9,6 @@
 
 #include "driver.h"
 #include "6526cia.h"
-#include "deprecat.h"
 
 
 
@@ -120,7 +119,7 @@ static cia_state cia_array[2];
  *************************************/
 
 static TIMER_CALLBACK( cia_timer_proc );
-static void cia_timer_underflow(cia_state *cia, int timer);
+static void cia_timer_underflow(running_machine *machine, cia_state *cia, int timer);
 static TIMER_CALLBACK( cia_clock_tod_callback );
 
 
@@ -145,13 +144,13 @@ static void cia_exit(running_machine *machine)
 
 
 
-void cia_config(int which, const cia6526_interface *intf)
+void cia_config(running_machine *machine, int which, const cia6526_interface *intf)
 {
 	int t, p;
 	cia_state *cia = &cia_array[which];
 
 	/* sanity checks */
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call cia_config at init time!");
+	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call cia_config at init time!");
 	assert_always((which >= 0) && (which < (sizeof(cia_array) / sizeof(cia_array[0]))),
 		"cia_config called on an invalid CIA!");
 
@@ -185,7 +184,7 @@ void cia_config(int which, const cia6526_interface *intf)
 
 	/* special case; for the first CIA, set up an exit handler to clear things out */
 	if (which == 0)
-		add_exit_callback(Machine, cia_exit);
+		add_exit_callback(machine, cia_exit);
 
 	/* state save support */
 	state_save_register_item("6526cia", which, cia->port[0].ddr);
@@ -282,7 +281,7 @@ void cia_reset(void)
 
 ***************************************************************************/
 
-static void cia_update_interrupts(cia_state *cia)
+static void cia_update_interrupts(running_machine *machine, cia_state *cia)
 {
 	UINT8 new_irq;
 
@@ -298,7 +297,7 @@ static void cia_update_interrupts(cia_state *cia)
 	{
 		cia->irq = new_irq;
 		if (cia->irq_func)
-			cia->irq_func(Machine, cia->irq);
+			cia->irq_func(machine, cia->irq);
 	}
 }
 
@@ -344,24 +343,24 @@ static void cia_timer_update(cia_timer *timer, INT32 new_count)
 }
 
 
-static void cia_timer_bump(cia_state *cia, int timer)
+static void cia_timer_bump(running_machine *machine, cia_state *cia, int timer)
 {
 	cia_timer_update(&cia->timer[timer], -1);
 
 	if (cia->timer[timer].count == 0x00)
-		cia_timer_underflow(cia, timer);
+		cia_timer_underflow(machine, cia, timer);
 	else
 		cia_timer_update(&cia->timer[timer], cia->timer[timer].count - 1);
 }
 
 
-static void cia_timer_underflow(cia_state *cia, int timer)
+static void cia_timer_underflow(running_machine *machine, cia_state *cia, int timer)
 {
 	assert((timer == 0) || (timer == 1));
 
 	/* set the status and update interrupts */
 	cia->ics |= cia->timer[timer].irq;
-	cia_update_interrupts(cia);
+	cia_update_interrupts(machine, cia);
 
 	/* if one-shot mode, turn it off */
 	if (cia->timer[timer].mode & 0x08)
@@ -377,7 +376,7 @@ static void cia_timer_underflow(cia_state *cia, int timer)
 		if ((cia->timer[1].mode & 0x41) == 0x41)
 		{
 			if (cia->cnt || !(cia->timer[1].mode & 0x20))
-				cia_timer_bump(cia, 1);
+				cia_timer_bump(machine, cia, 1);
 		}
 
 		/* also the serial line */
@@ -403,7 +402,7 @@ static void cia_timer_underflow(cia_state *cia, int timer)
 					if (cia->shift == 8)
 					{
 						cia->ics |= 0x08;
-						cia_update_interrupts(cia);
+						cia_update_interrupts(machine, cia);
 					}
 				}
 			}
@@ -417,7 +416,7 @@ static TIMER_CALLBACK( cia_timer_proc )
 	cia_timer *timer = ptr;
 	cia_state *cia = timer->cia;
 
-	cia_timer_underflow(cia, timer - cia->timer);
+	cia_timer_underflow(machine, cia, timer - cia->timer);
 }
 
 
@@ -473,7 +472,7 @@ static void cia6526_increment(cia_state *cia)
 
 
 /* Update TOD on CIA A */
-void cia_clock_tod(int which)
+void cia_clock_tod(running_machine *machine, int which)
 {
 	cia_state *cia;
 
@@ -499,7 +498,7 @@ void cia_clock_tod(int which)
 		if (cia->tod == cia->alarm)
 		{
 			cia->ics |= 0x04;
-			cia_update_interrupts(cia);
+			cia_update_interrupts(machine, cia);
 		}
 	}
 }
@@ -507,15 +506,15 @@ void cia_clock_tod(int which)
 
 static TIMER_CALLBACK( cia_clock_tod_callback )
 {
-	cia_clock_tod(param);
+	cia_clock_tod(machine, param);
 }
 
 
-void cia_issue_index(int which)
+void cia_issue_index(running_machine *machine, int which)
 {
 	cia_state *cia = &cia_array[which];
 	cia->ics |= 0x10;
-	cia_update_interrupts(cia);
+	cia_update_interrupts(machine, cia);
 }
 
 
@@ -526,7 +525,7 @@ void cia_set_input_sp(int which, int data)
 }
 
 
-void cia_set_input_cnt(int which, int data)
+void cia_set_input_cnt(running_machine *machine, int which, int data)
 {
 	cia_state *cia = &cia_array[which];
 
@@ -535,11 +534,11 @@ void cia_set_input_cnt(int which, int data)
 	{
 		/* does timer #0 bump on CNT? */
 		if ((cia->timer[0].mode & 0x21) == 0x21)
-			cia_timer_bump(cia, 0);
+			cia_timer_bump(machine, cia, 0);
 
 		/* does timer #1 bump on CNT? */
 		if ((cia->timer[1].mode & 0x61) == 0x21)
-			cia_timer_bump(cia, 1);
+			cia_timer_bump(machine, cia, 1);
 
 		/* if the serial port is set to output, the CNT will shift the port */
 		if (!(cia->timer[0].mode & 0x40))
@@ -554,7 +553,7 @@ void cia_set_input_cnt(int which, int data)
 				cia->serial = 0;
 				cia->shift = 0;
 				cia->ics |= 0x08;
-				cia_update_interrupts(cia);
+				cia_update_interrupts(machine, cia);
 			}
 		}
 	}
@@ -562,7 +561,7 @@ void cia_set_input_cnt(int which, int data)
 }
 
 
-UINT8 cia_read(int which, offs_t offset)
+UINT8 cia_read(running_machine *machine, int which, offs_t offset)
 {
 	cia_timer *timer;
 	cia_state *cia;
@@ -657,7 +656,7 @@ UINT8 cia_read(int which, offs_t offset)
 		case CIA_ICR:
 			data = cia->ics;
 			cia->ics = 0; /* clear on read */
-			cia_update_interrupts(cia);
+			cia_update_interrupts(machine, cia);
 			break;
 
 		/* timer A/B mode */
@@ -672,7 +671,7 @@ UINT8 cia_read(int which, offs_t offset)
 
 
 
-void cia_write(int which, offs_t offset, UINT8 data)
+void cia_write(running_machine *machine, int which, offs_t offset, UINT8 data)
 {
 	cia_timer *timer;
 	cia_state *cia;
@@ -761,7 +760,7 @@ void cia_write(int which, offs_t offset, UINT8 data)
 				cia->icr |= data & 0x7f;
 			else
 				cia->icr &= ~(data & 0x7f);
-			cia_update_interrupts(cia);
+			cia_update_interrupts(machine, cia);
 			break;
 
 		/* timer A/B modes */
@@ -785,8 +784,8 @@ UINT8 cia_get_output_a(int which)	{ return cia_array[which].port[0].out; }
 UINT8 cia_get_output_b(int which)	{ return cia_array[which].port[1].out; }
 int cia_get_irq(int which)			{ return cia_array[which].irq; }
 
-READ8_HANDLER( cia_0_r )	{ return cia_read(0, offset); }
-READ8_HANDLER( cia_1_r )	{ return cia_read(1, offset); }
+READ8_HANDLER( cia_0_r )	{ return cia_read(machine, 0, offset); }
+READ8_HANDLER( cia_1_r )	{ return cia_read(machine, 1, offset); }
 
-WRITE8_HANDLER( cia_0_w )	{ cia_write(0, offset, data); }
-WRITE8_HANDLER( cia_1_w )	{ cia_write(1, offset, data); }
+WRITE8_HANDLER( cia_0_w )	{ cia_write(machine, 0, offset, data); }
+WRITE8_HANDLER( cia_1_w )	{ cia_write(machine, 1, offset, data); }

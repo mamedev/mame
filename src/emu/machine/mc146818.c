@@ -73,7 +73,6 @@
 
 #include "driver.h"
 #include "memconv.h"
-#include "deprecat.h"
 #include "machine/mc146818.h"
 
 
@@ -108,7 +107,7 @@ static struct mc146818_chip *mc146818;
 
 
 
-static void mc146818_set_base_datetime(void);
+static void mc146818_set_base_datetime(running_machine *machine);
 
 static TIMER_CALLBACK( mc146818_timer )
 {
@@ -196,23 +195,23 @@ static TIMER_CALLBACK( mc146818_timer )
 
 
 
-void mc146818_init(MC146818_TYPE type)
+void mc146818_init(running_machine *machine, MC146818_TYPE type)
 {
 	mc146818 = auto_malloc(sizeof(*mc146818));
 	memset(mc146818, 0, sizeof(*mc146818));
 	mc146818->type = type;
 	mc146818->last_refresh = timer_get_time();
     timer_pulse(ATTOTIME_IN_HZ(1), NULL, 0, mc146818_timer);
-	mc146818_set_base_datetime();
+	mc146818_set_base_datetime(machine);
 }
 
 
 
-void mc146818_load(void)
+void mc146818_load(running_machine *machine)
 {
 	mame_file *file;
 
-	file = nvram_fopen(Machine, OPEN_FLAG_READ);
+	file = nvram_fopen(machine, OPEN_FLAG_READ);
 	if (file)
 	{
 		mc146818_load_stream(file);
@@ -236,11 +235,11 @@ static int dec_2_local(int a)
 
 
 
-static void mc146818_set_base_datetime(void)
+static void mc146818_set_base_datetime(running_machine *machine)
 {
 	mame_system_time systime;
 
-	mame_get_base_datetime(Machine, &systime);
+	mame_get_base_datetime(machine, &systime);
 
 	if (HOURS_24 || (systime.local_time.hour < 12))
 		mc146818->data[4] = dec_2_local(systime.local_time.hour);
@@ -265,11 +264,11 @@ static void mc146818_set_base_datetime(void)
 
 
 
-void mc146818_save(void)
+void mc146818_save(running_machine *machine)
 {
 	mame_file *file;
 
-	file = nvram_fopen(Machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	file = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (file)
 	{
 		mame_fwrite(file, mc146818->data, sizeof(mc146818->data));
@@ -290,7 +289,7 @@ NVRAM_HANDLER( mc146818 )
 {
 	if (file == NULL)
 	{
-		mc146818_set_base_datetime();
+		mc146818_set_base_datetime(machine);
 		// init only
 	}
 	else if (read_or_write)

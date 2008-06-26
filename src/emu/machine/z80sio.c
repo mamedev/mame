@@ -261,11 +261,11 @@ static z80sio sios[MAX_SIO];
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE void interrupt_check(z80sio *sio)
+INLINE void interrupt_check(running_machine *machine, z80sio *sio)
 {
 	/* if we have a callback, update it with the current state */
 	if (sio->irq_cb != NULL)
-		(*sio->irq_cb)(Machine, (z80sio_irq_state(sio - sios) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
+		(*sio->irq_cb)(machine, (z80sio_irq_state(sio - sios) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -311,7 +311,7 @@ void z80sio_init(int which, z80sio_interface *intf)
     reset_channel - reset a single SIO channel
 -------------------------------------------------*/
 
-static void reset_channel(z80sio *sio, int ch)
+static void reset_channel(running_machine *machine, z80sio *sio, int ch)
 {
 	attotime tpc = compute_time_per_character(sio, ch);
 	sio_channel *chan = &sio->chan[ch];
@@ -327,7 +327,7 @@ static void reset_channel(z80sio *sio, int ch)
 	sio->int_state[2 + 4*ch] = 0;
 	sio->int_state[3 + 4*ch] = 0;
 
-	interrupt_check(sio);
+	interrupt_check(machine, sio);
 
 	/* start the receive timer running */
 	timer_adjust_periodic(chan->receive_timer, tpc, ((sio - sios) << 1) | ch, tpc);
@@ -347,7 +347,7 @@ void z80sio_reset(int which)
 
 	/* loop over channels */
 	for (ch = 0; ch < 2; ch++)
-		reset_channel(sio, ch);
+		reset_channel(Machine, sio, ch);
 }
 
 
@@ -386,34 +386,34 @@ void z80sio_c_w(int which, int ch, UINT8 data)
 			{
 				case SIO_WR0_COMMAND_CH_RESET:
 					VPRINTF(("%04X:SIO reset channel %c\n", activecpu_get_pc(), 'A' + ch));
-					reset_channel(sio, ch);
+					reset_channel(Machine, sio, ch);
 					break;
 
 				case SIO_WR0_COMMAND_RES_STATUS_INT:
 					sio->int_state[INT_CHA_STATUS - 4*ch] &= ~Z80_DAISY_INT;
-					interrupt_check(sio);
+					interrupt_check(Machine, sio);
 					break;
 
 				case SIO_WR0_COMMAND_ENA_RX_INT:
 					chan->int_on_next_rx = TRUE;
-					interrupt_check(sio);
+					interrupt_check(Machine, sio);
 					break;
 
 				case SIO_WR0_COMMAND_RES_TX_INT:
 					sio->int_state[INT_CHA_TRANSMIT - 4*ch] &= ~Z80_DAISY_INT;
-					interrupt_check(sio);
+					interrupt_check(Machine, sio);
 					break;
 
 				case SIO_WR0_COMMAND_RES_ERROR:
 					sio->int_state[INT_CHA_ERROR - 4*ch] &= ~Z80_DAISY_INT;
-					interrupt_check(sio);
+					interrupt_check(Machine, sio);
 					break;
 			}
 			break;
 
 		/* SIO write register 1 */
 		case 1:
-			interrupt_check(sio);
+			interrupt_check(Machine, sio);
 			break;
 
 		/* SIO write register 5 */
@@ -483,7 +483,7 @@ void z80sio_d_w(int which, int ch, UINT8 data)
 
 	/* reset the transmit interrupt */
 	sio->int_state[INT_CHA_TRANSMIT - 4*ch] &= ~Z80_DAISY_INT;
-	interrupt_check(sio);
+	interrupt_check(Machine, sio);
 
 	/* stash the character */
 	chan->outbuf = data;
@@ -504,7 +504,7 @@ UINT8 z80sio_d_r(int which, int ch)
 
 	/* reset the receive interrupt */
 	sio->int_state[INT_CHA_RECEIVE - 4*ch] &= ~Z80_DAISY_INT;
-	interrupt_check(sio);
+	interrupt_check(Machine, sio);
 
 	VPRINTF(("%04X:sio_data_r(%c) = %02X\n", activecpu_get_pc(), 'A' + ch, chan->inbuf));
 
@@ -571,7 +571,7 @@ static TIMER_CALLBACK( change_input_line )
 	if (((old ^ chan->status[0]) & line) && (chan->regs[1] & SIO_WR1_STATUSINT_ENABLE))
 	{
 		sio->int_state[INT_CHA_STATUS - 4*ch] |= Z80_DAISY_INT;
-		interrupt_check(sio);
+		interrupt_check(machine, sio);
 	}
 }
 
@@ -651,7 +651,7 @@ static TIMER_CALLBACK( serial_callback )
 		if (chan->regs[1] & SIO_WR1_TXINT_ENABLE)
 		{
 			sio->int_state[INT_CHA_TRANSMIT - 4*ch] |= Z80_DAISY_INT;
-			interrupt_check(sio);
+			interrupt_check(machine, sio);
 		}
 
 		/* reset the output buffer */
@@ -695,7 +695,7 @@ static TIMER_CALLBACK( serial_callback )
 			case SIO_WR1_RXINT_ALL_NOPARITY:
 			case SIO_WR1_RXINT_ALL_PARITY:
 				sio->int_state[INT_CHA_RECEIVE - 4*ch] |= Z80_DAISY_INT;
-				interrupt_check(sio);
+				interrupt_check(machine, sio);
 				break;
 		}
 		chan->int_on_next_rx = FALSE;
@@ -766,7 +766,7 @@ int z80sio_irq_ack(int which)
 
 			/* clear interrupt, switch to the IEO state, and update the IRQs */
 			sio->int_state[inum] = Z80_DAISY_IEO;
-			interrupt_check(sio);
+			interrupt_check(Machine, sio);
 			return sio->chan[1].regs[2] + inum * 2;
 		}
 	}
@@ -793,7 +793,7 @@ void z80sio_irq_reti(int which)
 
 			/* clear the IEO state and update the IRQs */
 			sio->int_state[inum] &= ~Z80_DAISY_IEO;
-			interrupt_check(sio);
+			interrupt_check(Machine, sio);
 			return;
 		}
 	}

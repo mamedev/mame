@@ -317,8 +317,7 @@ GFXDECODE_END
 
 static MACHINE_START( lgp )
 {
-	discinfo = laserdisc_init(LASERDISC_TYPE_LDV1000, get_disk_handle(0), 0);
-	return;
+	discinfo = laserdisc_init(machine, LASERDISC_TYPE_LDV1000, get_disk_handle(0), 0);
 }
 
 static TIMER_CALLBACK( irq_stop )

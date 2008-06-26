@@ -308,8 +308,7 @@ GFXDECODE_END
 
 static MACHINE_START( istellar )
 {
-	discinfo = laserdisc_init(LASERDISC_TYPE_LDV1000, get_disk_handle(0), 0);
-	return;
+	discinfo = laserdisc_init(machine, LASERDISC_TYPE_LDV1000, get_disk_handle(0), 0);
 }
 
 static INTERRUPT_GEN( vblank_callback_istellar )
