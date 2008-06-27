@@ -158,7 +158,7 @@ static void nile_update(void *param, stream_sample_t **inputs, stream_sample_t *
 			sptr = slot[NILE_REG_SPTR_HI]<<16 | slot[NILE_REG_SPTR_LO];
 			eptr = slot[NILE_REG_EPTR_HI]<<16 | slot[NILE_REG_EPTR_LO];
 
-			freq=slot[NILE_REG_FREQ]<<4;
+			freq=slot[NILE_REG_FREQ]*14;
 			lsptr = slot[NILE_REG_LSPTR_HI]<<16 | slot[NILE_REG_LSPTR_LO];
 			leptr = slot[NILE_REG_LEPTR_HI]<<16 | slot[NILE_REG_LEPTR_LO];
 
