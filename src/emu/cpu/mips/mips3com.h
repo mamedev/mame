@@ -195,6 +195,7 @@ struct _mips3_state
 	UINT32			system_clock;
 	UINT32			cpu_clock;
 	UINT64			count_zero_time;
+	UINT32			compare_armed;
 	emu_timer *		compare_int_timer;
 
 	/* memory accesses */

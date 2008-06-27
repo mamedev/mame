@@ -184,7 +184,7 @@ offs_t mips3com_dasm(mips3_state *mips, char *buffer, offs_t pc, const UINT8 *op
 void mips3com_update_cycle_counting(mips3_state *mips)
 {
 	/* modify the timer to go off */
-	if (mips->cpr[0][COP0_Status] & SR_IMEX5)
+	if (mips->compare_armed && (mips->cpr[0][COP0_Status] & SR_IMEX5))
 	{
 		UINT32 count = (activecpu_gettotalcycles() - mips->count_zero_time) / 2;
 		UINT32 compare = mips->cpr[0][COP0_Compare];
