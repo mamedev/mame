@@ -38,23 +38,23 @@ enum {
 #define CHECK_PENDING_IRQ(message)				\
 do {											\
 	int irq = -1;								\
-	if (sh2.pending_irq & (1 <<  0)) irq =	0;	\
-	if (sh2.pending_irq & (1 <<  1)) irq =	1;	\
-	if (sh2.pending_irq & (1 <<  2)) irq =	2;	\
-	if (sh2.pending_irq & (1 <<  3)) irq =	3;	\
-	if (sh2.pending_irq & (1 <<  4)) irq =	4;	\
-	if (sh2.pending_irq & (1 <<  5)) irq =	5;	\
-	if (sh2.pending_irq & (1 <<  6)) irq =	6;	\
-	if (sh2.pending_irq & (1 <<  7)) irq =	7;	\
-	if (sh2.pending_irq & (1 <<  8)) irq =	8;	\
-	if (sh2.pending_irq & (1 <<  9)) irq =	9;	\
-	if (sh2.pending_irq & (1 << 10)) irq = 10;	\
-	if (sh2.pending_irq & (1 << 11)) irq = 11;	\
-	if (sh2.pending_irq & (1 << 12)) irq = 12;	\
-	if (sh2.pending_irq & (1 << 13)) irq = 13;	\
-	if (sh2.pending_irq & (1 << 14)) irq = 14;	\
-	if (sh2.pending_irq & (1 << 15)) irq = 15;	\
-	if ((sh2.internal_irq_level != -1) && (sh2.internal_irq_level > irq)) irq = sh2.internal_irq_level; \
+	if (sh2->pending_irq & (1 <<  0)) irq =	0;	\
+	if (sh2->pending_irq & (1 <<  1)) irq =	1;	\
+	if (sh2->pending_irq & (1 <<  2)) irq =	2;	\
+	if (sh2->pending_irq & (1 <<  3)) irq =	3;	\
+	if (sh2->pending_irq & (1 <<  4)) irq =	4;	\
+	if (sh2->pending_irq & (1 <<  5)) irq =	5;	\
+	if (sh2->pending_irq & (1 <<  6)) irq =	6;	\
+	if (sh2->pending_irq & (1 <<  7)) irq =	7;	\
+	if (sh2->pending_irq & (1 <<  8)) irq =	8;	\
+	if (sh2->pending_irq & (1 <<  9)) irq =	9;	\
+	if (sh2->pending_irq & (1 << 10)) irq = 10;	\
+	if (sh2->pending_irq & (1 << 11)) irq = 11;	\
+	if (sh2->pending_irq & (1 << 12)) irq = 12;	\
+	if (sh2->pending_irq & (1 << 13)) irq = 13;	\
+	if (sh2->pending_irq & (1 << 14)) irq = 14;	\
+	if (sh2->pending_irq & (1 << 15)) irq = 15;	\
+	if ((sh2->internal_irq_level != -1) && (sh2->internal_irq_level > irq)) irq = sh2->internal_irq_level; \
 	if (irq >= 0)								\
 		sh2_exception(message,irq); 			\
 } while(0)
