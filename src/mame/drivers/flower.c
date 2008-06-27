@@ -42,8 +42,6 @@ CHIP #  POSITION   TYPE
 #include "deprecat.h"
 #include "sound/custom.h"
 
-extern UINT8 *flower_textram, *flower_bg0ram, *flower_bg1ram, *flower_bg0_scroll, *flower_bg1_scroll;
-
 WRITE8_HANDLER( flower_textram_w );
 WRITE8_HANDLER( flower_bg0ram_w );
 WRITE8_HANDLER( flower_bg1ram_w );
@@ -52,42 +50,38 @@ VIDEO_UPDATE( flower );
 VIDEO_START( flower );
 PALETTE_INIT( flower );
 
-extern UINT8 *flower_soundregs1,*flower_soundregs2;
-void *flower_sh_start(int clock, const struct CustomSound_interface *config);
 WRITE8_HANDLER( flower_sound1_w );
 WRITE8_HANDLER( flower_sound2_w );
 
+extern UINT8 *flower_textram, *flower_bg0ram, *flower_bg1ram, *flower_bg0_scroll, *flower_bg1_scroll;
+extern UINT8 *flower_soundregs1,*flower_soundregs2;
+void *flower_sh_start(int clock, const struct CustomSound_interface *config);
+
+static UINT8 *sn_irq_enable;
+static UINT8 *sn_nmi_enable;
 
 static WRITE8_HANDLER( flower_irq_ack )
 {
 	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
-
-static int sn_irq_enable,sn_nmi_enable;
-
 static WRITE8_HANDLER( sn_irq_enable_w )
 {
-	sn_irq_enable = data & 1;
+	*sn_irq_enable = data;
 
 	cpunum_set_input_line(machine, 2, 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( sn_irq )
 {
-	if (sn_irq_enable)
+	if ((*sn_irq_enable & 1) == 1)
 		cpunum_set_input_line(machine, 2, 0, ASSERT_LINE);
-}
-
-static WRITE8_HANDLER( sn_nmi_enable_w )
-{
-	sn_nmi_enable = data & 1;
 }
 
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(machine,0,data);
-	if (sn_nmi_enable)
+	if ((*sn_nmi_enable & 1) == 1)
 		cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -127,8 +121,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( flower_sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(sn_irq_enable_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(sn_nmi_enable_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(sn_irq_enable_w) AM_BASE(&sn_irq_enable)
+	AM_RANGE(0x4001, 0x4001) AM_WRITEONLY AM_BASE(&sn_nmi_enable)
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
 	AM_RANGE(0x8000, 0x803f) AM_WRITE(flower_sound1_w) AM_BASE(&flower_soundregs1)
 	AM_RANGE(0xa000, 0xa03f) AM_WRITE(flower_sound2_w) AM_BASE(&flower_soundregs2)
@@ -366,5 +360,5 @@ ROM_START( flowerk ) /* Komax version */
 ROM_END
 
 
-GAME( 1986, flower,  0,      flower, flower, 0, ROT0, "Sega/Alpha", "Flower (Sega/Alpha)", GAME_IMPERFECT_SOUND )
-GAME( 1986, flowerk, flower, flower, flower, 0, ROT0, "Komax",      "Flower (Komax)", GAME_IMPERFECT_SOUND )
+GAME( 1986, flower,  0,      flower, flower, 0, ROT0, "Sega/Alpha", "Flower (Sega/Alpha)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1986, flowerk, flower, flower, flower, 0, ROT0, "Komax",      "Flower (Komax)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

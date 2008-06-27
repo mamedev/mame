@@ -21,12 +21,13 @@ static const int defgain = 48;
 /* this structure defines the parameters for a channel */
 typedef struct
 {
-	int frequency;
-	int counter;
-	int volume;
-	const UINT8 *wave;
-	int oneshot;
-	int oneshotplaying;
+	UINT32 frequency;
+	UINT32 counter;
+	UINT16 volume;
+	UINT8 oneshot;
+	UINT8 oneshotplaying;
+	UINT16 rom_offset;
+	
 } sound_channel;
 
 
@@ -38,9 +39,9 @@ static sound_channel channel_list[MAX_VOICES];
 static sound_channel *last_channel;
 
 /* global sound parameters */
-static const UINT8 *sound_rom1,*sound_rom2;
-static int num_voices;
-static int sound_enable;
+static const UINT8 *sound_rom1, *sound_rom2;
+static UINT8 num_voices;
+static UINT8 sound_enable;
 static sound_stream * stream;
 
 /* mixer tables and internal buffers */
@@ -103,7 +104,7 @@ static void flower_update_mono(void *param, stream_sample_t **inputs, stream_sam
 		/* only update if we have non-zero volume and frequency */
 		if (v && f)
 		{
-			const UINT8 *w = voice->wave;
+			const UINT8 *w = &sound_rom1[voice->rom_offset];
 			int c = voice->counter;
 
 			mix = mixer_buffer;
@@ -128,7 +129,7 @@ static void flower_update_mono(void *param, stream_sample_t **inputs, stream_sam
 						if (voice->oneshotplaying)
 						{
 //                          *mix++ += ((w[offs] - 0x80) * v) / 16;
-*mix++ += sound_rom2[v*256 + w[offs]] - 0x80;
+							*mix++ += sound_rom2[v*256 + w[offs]] - 0x80;
 						}
 					}
 				}
@@ -137,7 +138,7 @@ static void flower_update_mono(void *param, stream_sample_t **inputs, stream_sam
 					offs = (c >> 15) & 0x1ff;
 
 //                  *mix++ += ((w[offs] - 0x80) * v) / 16;
-*mix++ += sound_rom2[v*256 + w[offs]] - 0x80;
+					*mix++ += sound_rom2[v*256 + w[offs]] - 0x80;
 				}
 			}
 
@@ -157,6 +158,7 @@ static void flower_update_mono(void *param, stream_sample_t **inputs, stream_sam
 void * flower_sh_start(int clock, const struct CustomSound_interface *config)
 {
 	sound_channel *voice;
+	int i;
 
 	/* get stream channels */
 	stream = stream_create(0, 1, samplerate, 0, flower_update_mono);
@@ -179,13 +181,26 @@ void * flower_sh_start(int clock, const struct CustomSound_interface *config)
 	/* start with sound enabled, many games don't have a sound enable register */
 	sound_enable = 1;
 
+	/* save globals */
+	state_save_register_item("flower_custom", 0, num_voices);
+	state_save_register_item("flower_custom", 0, sound_enable);
+
 	/* reset all the voices */
-	for (voice = channel_list; voice < last_channel; voice++)
+	for (i = 0; i < num_voices; i++)
 	{
+		voice = &channel_list[i];
+		
 		voice->frequency = 0;
 		voice->volume = 0;
-		voice->wave = &sound_rom1[0];
 		voice->counter = 0;
+		voice->rom_offset = 0;
+		
+		state_save_register_item("flower_custom", i+1, voice->frequency);
+		state_save_register_item("flower_custom", i+1, voice->counter);
+		state_save_register_item("flower_custom", i+1, voice->volume);
+		state_save_register_item("flower_custom", i+1, voice->oneshot);
+		state_save_register_item("flower_custom", i+1, voice->oneshotplaying);
+		state_save_register_item("flower_custom", i+1, voice->rom_offset);
 	}
 
 	return auto_malloc(1);
@@ -267,7 +282,7 @@ popmessage("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%
 		start = start * 16 + ((flower_soundregs2[1 + base]) & 0x0f);
 		start = start * 16 + ((flower_soundregs2[0 + base]) & 0x0f);
 
-		voice->wave = &sound_rom1[(start >> 7) & 0x7fff];
+		voice->rom_offset = (start >> 7) & 0x7fff;
 
 		voice->counter = 0;
 		voice->oneshotplaying = 1;
@@ -279,7 +294,7 @@ popmessage("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%
 		start = flower_soundregs2[5 + base] & 0x0f;
 		start = start * 16 + ((flower_soundregs2[4 + base]) & 0x0f);
 
-		voice->wave = &sound_rom1[(start << 9) & 0x7fff];	// ???
+		voice->rom_offset = (start << 9) & 0x7fff;	// ???
 		voice->oneshot = 0;
 		voice->oneshotplaying = 0;
 	}
