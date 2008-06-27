@@ -142,7 +142,7 @@ enum
 	DEFINE_BITFIELD_ENUM(ActivationKeyMessage,		4,	4),
 	DEFINE_BITFIELD_ENUM(LoadOldFormat,				5,	5),
 #ifdef MESS
-	DEFINE_BITFIELD_ENUM(SharedCode,				6,	6)
+	DEFINE_BITFIELD_ENUM(SharedCode,				6,	6),
 #endif
 	DEFINE_BITFIELD_ENUM(VerticalKeyRepeatSpeed,	8,	11),
 	DEFINE_BITFIELD_ENUM(HorizontalKeyRepeatSpeed,	12,	15),
