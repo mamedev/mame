@@ -1,9 +1,91 @@
 /***************************************************************************
 
+	Irem M63 hardware
+	
+****************************************************************************
+
 Wily Tower              (c) 1984 Irem
 Fighting Basketball     (c) 1984 Paradise Co. Ltd.
 
 driver by Nicola Salmoria
+
+
+PCB Layout (based on Atomic Boy PCB)
+------------------------------------
+
+Both boards has etched NANAO logo. 
+They (Eizo Nanao Corporation) own Irem Software Engineering.
+
+
+M63-A-A (TOP)
+
+       1         2       3       4       5       6       7
+|---------------------------------------------------------------|
+|              DSW8    74373                                    |   A
+|                                                               |
+|-|   74368    DSW8    74373    AY-3-8910     MSM80C39R6       |-|  B
+  |                                                            | |
+  |   74368            74373    AY-3-8910   74373              | |  C
+  |                                                            | |
+  |   74368    7408    74373   wt_a-4d         wt_a-6d        C| |  D
+  |                                                           N| |
+  |   74368    7400    7404    wt_a-4e 7404    7474    74???  1| |  E
+  |2                                                           | |
+  |2                   74138           74367   7474    74367   | |  F
+  |W                                                           | |
+  |A           7432    7427    wt_a-4h D780C                   | |  H
+  |Y                                                           |-|
+  |   74368    74299   wt_a-3j wt_a-4j 74367   74245            |   J
+  |                                                            |-|
+  |            74367   wt_a-3k wt_a-4k 74138   7432            | |  K
+  |                                                            | |
+  |            74299                   74139   7432            | |  L
+  |                                                            | |
+|-|   74368    74299   wt_a-3m wt_a-4m 74139   M53202  7474   C| |  M
+|                                                             N| |
+|     7400     74299   wt_a-3n wt_a-4n 74273   74283   7420   2| |  N
+|                                                              | |
+|              74157   wt_a-3p M58725 WT_A-5P  74283   74273   | |  P
+|                                                              | |
+|              74299                  WT_A-5R  7432    74157   |-|  R
+|     AMP                                                       |
+|              74299   wt_a-3s M58725 WT_A-5S  74273   74157    |   S
+|---------------------------------------------------------------|
+
+M63-B-A (BOTTOM)
+
+      1        2       3       4       5       6       7       8       9
+|------------------------------------------------------------------------------|
+|   74244     74244      74244    wt_b-5a     2128   74244   74244   74245     |   A
+|                                                                              -
+|   74373     74273      74299    wt_b-5b     2128   74161   74161   74161    | |  B
+|                                                                             | |
+|   74244     74273      74299                       74157   74157   74157    | |  C
+|                                                                             | |
+|   74273     74244      74299    wt_b-5d     2128   74157   74157   74157   C| |  D
+|                                                                            N| |
+|   2148      74283      74299    wt_b-5e     2128   74157   74157   74157   1| |  E
+|                                                                             | |
+|   2148      74283      74299    wt_b-5f     2128   74157   74157   74157    | |  F
+|                                                                             | |
+|   74157     7420       74157                2128   2148    7486    7486     |-|  H
+|                                                                              |
+|   74157     7430   74367   7474    74273           2148    74367   74367    |-|  J
+|                                                                             | |
+|   74161     74139  7420    74161   7486    74139   7474    74161   74161    | |  K
+|                                                                             | |
+|   74157     7432   7474    74161   7486    7404    7474    74175   wt_b-9l  | |  L
+|                                                                            C| |
+|   74161     7432   74368   74???   74175   7408    7400    7432            N| |  M
+|                                                                            2| |
+|             7400   7404    7420    74175   7474    74273   74377   74175    | |  N
+|                                                                             | |
+|                    7414    M53202  74163   7486    2148    74241   7427     | |  P
+|                                                                             |-|
+|             12MHz  7404            74163   7486    2148    74241   74373     |   R
+|------------------------------------------------------------------------------|
+
+
 
 
 Notes:
@@ -11,7 +93,7 @@ Notes:
   rely on vblank for timing. It all seems to be controlled by the CPU clock.
   The NMI handler just handles the "Stop Mode" dip switch.
 
-Tomasz Slanina 2008.06.14:
+TS 2008.06.14:
 - Addedd sound emulation - atomboy and fghtbskt req different interrupt (T1)
   timing than wilytowr, otherwise music/fx tempo is too fast. Maybe both
   tmings are wrong - must be verified on real pcb.
@@ -31,7 +113,6 @@ TODO:
 Dip locations verified for:
 - atomboy (manual)
 
-
 ***************************************************************************/
 
 #include "driver.h"
@@ -42,7 +123,7 @@ Dip locations verified for:
 extern void fghtbskt_sh_start(void);
 extern WRITE8_HANDLER( fghtbskt_samples_w );
 
-static UINT8 *wilytowr_videoram2, *wilytowr_scrollram;
+static UINT8 *m63_videoram2, *m63_scrollram;
 static int pal_bank, fg_flag, sy_offset;
 static tilemap *bg_tilemap, *fg_tilemap;
 static UINT8 sound_irq;
@@ -50,7 +131,7 @@ static int sound_status;
 static int p1,p2;
 
 
-static PALETTE_INIT( wilytowr )
+static PALETTE_INIT( m63 )
 {
 	int i;
 
@@ -105,25 +186,25 @@ static PALETTE_INIT( wilytowr )
 	}
 }
 
-static WRITE8_HANDLER( wilytowr_videoram_w )
+static WRITE8_HANDLER( m63_videoram_w )
 {
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-static WRITE8_HANDLER( wilytowr_colorram_w )
+static WRITE8_HANDLER( m63_colorram_w )
 {
 	colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-static WRITE8_HANDLER( wilytowr_videoram2_w )
+static WRITE8_HANDLER( m63_videoram2_w )
 {
-	wilytowr_videoram2[offset] = data;
+	m63_videoram2[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
-static WRITE8_HANDLER( wilytwr_palbank_w )
+static WRITE8_HANDLER( m63_palbank_w )
 {
 	if (pal_bank != (data & 0x01))
 	{
@@ -132,7 +213,7 @@ static WRITE8_HANDLER( wilytwr_palbank_w )
 	}
 }
 
-static WRITE8_HANDLER( wilytwr_flipscreen_w )
+static WRITE8_HANDLER( m63_flipscreen_w )
 {
 	if (flip_screen_get() != (~data & 0x01))
 	{
@@ -159,12 +240,12 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code = wilytowr_videoram2[tile_index];
+	int code = m63_videoram2[tile_index];
 
 	SET_TILE_INFO(0, code, 0, fg_flag);
 }
 
-static VIDEO_START( wilytowr )
+static VIDEO_START( m63 )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		8, 8, 32, 32);
@@ -208,12 +289,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-static VIDEO_UPDATE( wilytowr )
+static VIDEO_UPDATE( m63 )
 {
 	int col;
 
 	for (col = 0; col < 32; col++)
-		tilemap_set_scrolly(bg_tilemap, col, wilytowr_scrollram[col * 8]);
+		tilemap_set_scrolly(bg_tilemap, col, m63_scrollram[col * 8]);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
@@ -288,18 +369,18 @@ static READ8_HANDLER( snddata_r )
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( wilytowr_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( m63_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM
 	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xe300, 0xe3ff) AM_RAM AM_BASE(&wilytowr_scrollram)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(wilytowr_videoram2_w) AM_BASE(&wilytowr_videoram2)
-	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(wilytowr_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xec00, 0xefff) AM_RAM_WRITE(wilytowr_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xe300, 0xe3ff) AM_RAM AM_BASE(&m63_scrollram)
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(m63_videoram2_w) AM_BASE(&m63_videoram2)
+	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(m63_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xec00, 0xefff) AM_RAM_WRITE(m63_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(interrupt_enable_w)	/* NMI enable */
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(wilytwr_flipscreen_w)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(wilytwr_palbank_w)
+	AM_RANGE(0xf002, 0xf002) AM_WRITE(m63_flipscreen_w)
+	AM_RANGE(0xf003, 0xf003) AM_WRITE(m63_palbank_w)
 	AM_RANGE(0xf006, 0xf007) AM_WRITE(coin_w)
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(input_port_0_r, soundlatch_w)
 	AM_RANGE(0xf801, 0xf801) AM_READWRITE(input_port_1_r, SMH_NOP)	/* continues game when in stop mode (cleared by NMI handler) */
@@ -314,10 +395,10 @@ static ADDRESS_MAP_START( fghtbskt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM
 	AM_RANGE(0xd200, 0xd2ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd300, 0xd3ff) AM_RAM AM_BASE(&wilytowr_scrollram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(wilytowr_videoram2_w) AM_BASE(&wilytowr_videoram2)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(wilytowr_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(wilytowr_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xd300, 0xd3ff) AM_RAM AM_BASE(&m63_scrollram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(m63_videoram2_w) AM_BASE(&m63_videoram2)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(m63_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(m63_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xf000, 0xf000) AM_READ(snd_status_r)
 	AM_RANGE(0xf001, 0xf001) AM_READ(input_port_0_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ(input_port_1_r)
@@ -516,7 +597,7 @@ static const gfx_layout spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( wilytowr )
+static GFXDECODE_START( m63 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   256, 1 )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,     0, 32 )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,   0, 32 )
@@ -541,15 +622,15 @@ static void snd_irq(running_machine *machine, int num)
 	sound_irq = 1;
 }
 
-static MACHINE_DRIVER_START( wilytowr )
+static MACHINE_DRIVER_START( m63 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("maincpu",Z80,12000000/4)     /* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(wilytowr_map,0)
+	MDRV_CPU_ADD_TAG("maincpu",Z80,XTAL_12MHz/4)     /* 3 MHz */
+	MDRV_CPU_PROGRAM_MAP(m63_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* audio CPU */
-	MDRV_CPU_ADD_TAG("soundcpu",I8039,12000000/4)	/* ????? */
+	MDRV_CPU_ADD_TAG("soundcpu",I8039,XTAL_12MHz/4)	/* ????? */
 	MDRV_CPU_PROGRAM_MAP(i8039_map,0)
 	MDRV_CPU_IO_MAP(i8039_port_map,0)
 	MDRV_CPU_PERIODIC_INT(snd_irq, 60)
@@ -563,25 +644,25 @@ static MACHINE_DRIVER_START( wilytowr )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(wilytowr)
+	MDRV_GFXDECODE(m63)
 	MDRV_PALETTE_LENGTH(256+4)
 
-	MDRV_PALETTE_INIT(wilytowr)
-	MDRV_VIDEO_START(wilytowr)
-	MDRV_VIDEO_UPDATE(wilytowr)
+	MDRV_PALETTE_INIT(m63)
+	MDRV_VIDEO_START(m63)
+	MDRV_VIDEO_UPDATE(m63)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SPEAKER_STANDARD_MONO("mono") /* ????? */
 
 	MDRV_SOUND_ADD(AY8910, 3579545/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD(AY8910, 3579545/4)
+	MDRV_SOUND_ADD(AY8910, 3579545/4) /* ????? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( atomboy )
-	MDRV_IMPORT_FROM(wilytowr)
+	MDRV_IMPORT_FROM(m63)
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PERIODIC_INT(snd_irq, 60/2)
 MACHINE_DRIVER_END
@@ -589,12 +670,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fghtbskt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 12000000/4)     /* 3 MHz */
+	MDRV_CPU_ADD(Z80, XTAL_12MHz/4)     /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(fghtbskt_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(I8039,12000000/4)	/* ????? */
+	MDRV_CPU_ADD(I8039,XTAL_12MHz/4)	/* ????? */
 	MDRV_CPU_PROGRAM_MAP(i8039_map,0)
 	MDRV_CPU_IO_MAP(i8039_port_map,0)
 	MDRV_CPU_PERIODIC_INT(snd_irq, 60/2)
@@ -611,8 +692,8 @@ static MACHINE_DRIVER_START( fghtbskt )
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_START(wilytowr)
-	MDRV_VIDEO_UPDATE(wilytowr)
+	MDRV_VIDEO_START(m63)
+	MDRV_VIDEO_UPDATE(m63)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -811,7 +892,7 @@ static DRIVER_INIT( fghtbskt )
 	sy_offset = 240;
 }
 
-GAME( 1984, wilytowr, 0,        wilytowr, wilytowr, wilytowr, ROT180, "Irem",                    "Wily Tower", 0 )
+GAME( 1984, wilytowr, 0,        m63,      wilytowr, wilytowr, ROT180, "Irem",                    "Wily Tower", 0 )
 GAME( 1985, atomboy,  wilytowr, atomboy,  wilytowr, wilytowr, ROT180, "Irem (Memetron license)", "Atomic Boy (revision B)", 0 )
 GAME( 1985, atomboya, wilytowr, atomboy,  wilytowr, wilytowr, ROT180, "Irem (Memetron license)", "Atomic Boy (revision A)", 0 )
 GAME( 1984, fghtbskt, 0,        fghtbskt, fghtbskt, fghtbskt, ROT0,   "Paradise Co. Ltd.",       "Fighting Basketball", 0 )
