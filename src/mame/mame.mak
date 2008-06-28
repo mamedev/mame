@@ -1517,6 +1517,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/beaminv.o \
 	$(DRIVERS)/blackt96.o \
 	$(DRIVERS)/bmcbowl.o \
+	$(DRIVERS)/koftball.o \
 	$(DRIVERS)/calomega.o $(VIDEO)/calomega.o \
 	$(DRIVERS)/carrera.o \
 	$(DRIVERS)/cave.o $(VIDEO)/cave.o \
