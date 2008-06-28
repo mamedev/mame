@@ -2988,9 +2988,9 @@ INLINE UINT8 watchpoint_read8(int spacenum, offs_t address)
 INLINE UINT16 watchpoint_read16(int spacenum, offs_t address, UINT16 mem_mask)
 {
 	UINT16 result;
-	debug_cpu_memory_read_hook(Machine, cur_context, spacenum, address, mem_mask);
+	debug_cpu_memory_read_hook(Machine, cur_context, spacenum, address << 1, mem_mask);
 	active_address_space[spacenum].readlookup = cpudata[cur_context].space[spacenum].read.table;
-	result = read_word_generic(spacenum, address, mem_mask);
+	result = read_word_generic(spacenum, address << 1, mem_mask);
 	active_address_space[spacenum].readlookup = wptable;
 	return result;
 }
@@ -2998,9 +2998,9 @@ INLINE UINT16 watchpoint_read16(int spacenum, offs_t address, UINT16 mem_mask)
 INLINE UINT32 watchpoint_read32(int spacenum, offs_t address, UINT32 mem_mask)
 {
 	UINT32 result;
-	debug_cpu_memory_read_hook(Machine, cur_context, spacenum, address, mem_mask);
+	debug_cpu_memory_read_hook(Machine, cur_context, spacenum, address << 2, mem_mask);
 	active_address_space[spacenum].readlookup = cpudata[cur_context].space[spacenum].read.table;
-	result = read_dword_generic(spacenum, address, mem_mask);
+	result = read_dword_generic(spacenum, address << 2, mem_mask);
 	active_address_space[spacenum].readlookup = wptable;
 	return result;
 }
@@ -3008,9 +3008,9 @@ INLINE UINT32 watchpoint_read32(int spacenum, offs_t address, UINT32 mem_mask)
 INLINE UINT64 watchpoint_read64(int spacenum, offs_t address, UINT64 mem_mask)
 {
 	UINT64 result;
-	debug_cpu_memory_read_hook(Machine, cur_context, spacenum, address, mem_mask);
+	debug_cpu_memory_read_hook(Machine, cur_context, spacenum, address << 3, mem_mask);
 	active_address_space[spacenum].readlookup = cpudata[cur_context].space[spacenum].read.table;
-	result = read_qword_generic(spacenum, address, mem_mask);
+	result = read_qword_generic(spacenum, address << 3, mem_mask);
 	active_address_space[spacenum].readlookup = wptable;
 	return result;
 }
@@ -3025,25 +3025,25 @@ INLINE void watchpoint_write8(int spacenum, offs_t address, UINT8 data)
 
 INLINE void watchpoint_write16(int spacenum, offs_t address, UINT16 data, UINT16 mem_mask)
 {
-	debug_cpu_memory_write_hook(Machine, cur_context, spacenum, address, data, mem_mask);
+	debug_cpu_memory_write_hook(Machine, cur_context, spacenum, address << 1, data, mem_mask);
 	active_address_space[spacenum].writelookup = cpudata[cur_context].space[spacenum].write.table;
-	write_word_generic(spacenum, address, data, mem_mask);
+	write_word_generic(spacenum, address << 1, data, mem_mask);
 	active_address_space[spacenum].writelookup = wptable;
 }
 
 INLINE void watchpoint_write32(int spacenum, offs_t address, UINT32 data, UINT32 mem_mask)
 {
-	debug_cpu_memory_write_hook(Machine, cur_context, spacenum, address, data, mem_mask);
+	debug_cpu_memory_write_hook(Machine, cur_context, spacenum, address << 2, data, mem_mask);
 	active_address_space[spacenum].writelookup = cpudata[cur_context].space[spacenum].write.table;
-	write_dword_generic(spacenum, address, data, mem_mask);
+	write_dword_generic(spacenum, address << 2, data, mem_mask);
 	active_address_space[spacenum].writelookup = wptable;
 }
 
 INLINE void watchpoint_write64(int spacenum, offs_t address, UINT64 data, UINT64 mem_mask)
 {
-	debug_cpu_memory_write_hook(Machine, cur_context, spacenum, address, data, mem_mask);
+	debug_cpu_memory_write_hook(Machine, cur_context, spacenum, address << 3, data, mem_mask);
 	active_address_space[spacenum].writelookup = cpudata[cur_context].space[spacenum].write.table;
-	write_qword_generic(spacenum, address, data, mem_mask);
+	write_qword_generic(spacenum, address << 3, data, mem_mask);
 	active_address_space[spacenum].writelookup = wptable;
 }
 
