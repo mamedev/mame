@@ -661,8 +661,8 @@ void video_screen_configure(const device_config *screen, int width, int height, 
 	assert(visarea != NULL);
 	assert(visarea->min_x >= 0);
 	assert(visarea->min_y >= 0);
-	assert(visarea->min_x < width);
-	assert(visarea->min_y < height);
+	assert(config->type == SCREEN_TYPE_VECTOR || visarea->min_x < width);
+	assert(config->type == SCREEN_TYPE_VECTOR || visarea->min_y < height);
 	assert(frame_period > 0);
 
 	/* fill in the new parameters */
