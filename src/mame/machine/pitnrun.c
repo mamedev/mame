@@ -120,15 +120,15 @@ WRITE8_HANDLER( pitnrun_68705_portB_w )
 	}
 	if (~data & 0x10)
 	{
-    memory_set_context(0);
+    cpuintrf_push_context(0);
 		program_write_byte(address, portA_out);
-    memory_set_context(2);
+    cpuintrf_pop_context();
 	}
 	if (~data & 0x20)
 	{
-        memory_set_context(0);
+        cpuintrf_push_context(0);
 				portA_in = program_read_byte(address);
-        memory_set_context(2);
+        cpuintrf_pop_context();
 	}
 	if (~data & 0x40)
 	{

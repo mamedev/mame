@@ -59,7 +59,6 @@ struct _debugger_private
 	UINT8			memory_modified;
 
 	int				execution_state;
-	int 			memory_hook_cpunum;
 
 	UINT32			bpindex;
 	UINT32			wpindex;
@@ -355,6 +354,10 @@ static void compute_debug_flags(running_machine *machine, const debug_cpu_info *
 
 	/* add in the watchpoint flags */
 	machine->debug_flags |= (info->flags & DEBUG_FLAG_WATCHPOINT) >> (24 - 4);
+	
+	/* if any of the watchpoint flags are set and we're live, tell the memory system */
+	if (global.livecpu != NULL && ((info->flags & DEBUG_FLAG_WATCHPOINT) != 0))
+		memory_set_context(-1);
 }
 
 
@@ -595,6 +598,42 @@ void debug_cpu_instruction_hook(running_machine *machine, offs_t curpc)
 
 	/* no longer in debugger code */
 	global.within_instruction_hook = FALSE;
+}
+
+
+/*-------------------------------------------------
+    debug_cpu_memory_read_hook - the memory system 
+    calls this hook when watchpoints are enabled 
+    and a memory read happens
+-------------------------------------------------*/
+
+void debug_cpu_memory_read_hook(running_machine *machine, int cpunum, int spacenum, offs_t address, UINT64 mem_mask)
+{
+	debug_cpu_info *info = &global.cpuinfo[cpunum];
+
+	/* check watchpoints */
+	if ((info->flags & (DEBUG_FLAG_LIVE_WPR_PROGRAM << spacenum)) != 0)
+		watchpoint_check(cpunum, spacenum, WATCHPOINT_READ, address, 0, mem_mask);
+
+	/* check hotspots */
+	if (info->hotspots != NULL)
+		check_hotspots(cpunum, spacenum, address);
+}
+
+
+/*-------------------------------------------------
+    debug_cpu_memory_write_hook - the memory 
+    system calls this hook when watchpoints are 
+    enabled and a memory write happens
+-------------------------------------------------*/
+
+void debug_cpu_memory_write_hook(running_machine *machine, int cpunum, int spacenum, offs_t address, UINT64 data, UINT64 mem_mask)
+{
+	debug_cpu_info *info = &global.cpuinfo[cpunum];
+
+	/* check watchpoints */
+	if ((info->flags & (DEBUG_FLAG_LIVE_WPW_PROGRAM << spacenum)) != 0)
+		watchpoint_check(cpunum, spacenum, WATCHPOINT_WRITE, address, data, mem_mask);
 }
 
 
@@ -1046,61 +1085,6 @@ static void process_source_file(void)
 
 
 /*-------------------------------------------------
-    standard_debug_hook_read - standard read hook
--------------------------------------------------*/
-
-static void standard_debug_hook_read(int spacenum, offs_t address, UINT64 mem_mask)
-{
-	debug_cpu_info *info = &global.cpuinfo[global.memory_hook_cpunum];
-
-	/* check watchpoints */
-	if ((info->flags & (DEBUG_FLAG_LIVE_WPR_PROGRAM << spacenum)) != 0)
-		watchpoint_check(global.memory_hook_cpunum, spacenum, WATCHPOINT_READ, address, 0, mem_mask);
-
-	/* check hotspots */
-	if (info->hotspots != NULL)
-		check_hotspots(global.memory_hook_cpunum, spacenum, address);
-}
-
-
-/*-------------------------------------------------
-    standard_debug_hook_write - standard write hook
--------------------------------------------------*/
-
-static void standard_debug_hook_write(int spacenum, offs_t address, UINT64 data, UINT64 mem_mask)
-{
-	debug_cpu_info *info = &global.cpuinfo[global.memory_hook_cpunum];
-
-	/* check watchpoints */
-	if ((info->flags & (DEBUG_FLAG_LIVE_WPW_PROGRAM << spacenum)) != 0)
-		watchpoint_check(global.memory_hook_cpunum, spacenum, WATCHPOINT_WRITE, address, data, mem_mask);
-}
-
-
-/*-------------------------------------------------
-    debug_cpu_get_memory_hooks - get memory hooks
-    for the specified CPU
--------------------------------------------------*/
-
-void debug_cpu_get_memory_hooks(int cpunum, debug_hook_read_func *read, debug_hook_write_func *write)
-{
-	debug_cpu_info *info = &global.cpuinfo[cpunum];
-
-	global.memory_hook_cpunum = cpunum;
-
-	if ((info->flags & DEBUG_FLAG_READ_WATCHPOINT) != 0 || info->hotspots != NULL)
-		*read = standard_debug_hook_read;
-	else
-		*read = NULL;
-
-	if ((info->flags & DEBUG_FLAG_WRITE_WATCHPOINT) != 0)
-		*write = standard_debug_hook_write;
-	else
-		*write = NULL;
-}
-
-
-/*-------------------------------------------------
     debug_cpu_set_instruction_hook - set a hook to
     be called on each instruction for a given CPU
 -------------------------------------------------*/
@@ -1140,6 +1124,10 @@ static void breakpoint_update_flags(debug_cpu_info *info)
 			info->flags |= DEBUG_FLAG_LIVE_BP;
 			break;
 		}
+	
+	/* push the flags out globally */
+	if (global.livecpu != NULL)
+		compute_debug_flags(Machine, global.livecpu);
 }
 
 
@@ -1291,6 +1279,13 @@ static void watchpoint_update_flags(debug_cpu_info *info, int spacenum)
 	UINT32 writeflag = DEBUG_FLAG_LIVE_WPW_PROGRAM << spacenum;
 	UINT32 readflag = DEBUG_FLAG_LIVE_WPR_PROGRAM << spacenum;
 	debug_cpu_watchpoint *wp;
+	
+	/* if hotspots are enabled, turn on all reads */
+	if (info->hotspots != NULL)
+	{
+		info->flags |= DEBUG_FLAG_READ_WATCHPOINT;
+		readflag = 0;
+	}
 
 	/* see if there are any enabled breakpoints */
 	info->flags &= ~(readflag | writeflag);
@@ -1310,6 +1305,10 @@ static void watchpoint_update_flags(debug_cpu_info *info, int spacenum)
 			if ((readflag | writeflag) == 0)
 				break;
 		}
+	
+	/* push the flags out globally */
+	if (global.livecpu != NULL)
+		compute_debug_flags(Machine, global.livecpu);
 }
 
 
@@ -1395,6 +1394,7 @@ static void watchpoint_check(int cpunum, int spacenum, int type, offs_t address,
 					else
 						sprintf(buffer, "Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->index, sizes[size], BYTE2ADDR(address, &global.cpuinfo[cpunum], spacenum), activecpu_get_pc());
 					debug_console_printf("%s\n", buffer);
+					compute_debug_flags(Machine, info);
 				}
 				break;
 			}
@@ -1432,10 +1432,6 @@ int debug_cpu_watchpoint_set(int cpunum, int spacenum, int type, offs_t address,
 
 	watchpoint_update_flags(info, spacenum);
 
-	/* force debug_cpu_get_memory_hooks() to be called */
-	cpuintrf_push_context(-1);
-	cpuintrf_pop_context();
-
 	return wp->index;
 }
 
@@ -1472,11 +1468,6 @@ int debug_cpu_watchpoint_clear(int wpnum)
 					free(wp);
 
 					watchpoint_update_flags(info, spacenum);
-
-					/* force debug_cpu_get_memory_hooks() to be called */
-					cpuintrf_push_context(-1);
-					cpuintrf_pop_context();
-
 					return 1;
 				}
 	}
@@ -1510,7 +1501,6 @@ int debug_cpu_watchpoint_enable(int wpnum, int enable)
 					return 1;
 				}
 	}
-
 	return 0;
 }
 
@@ -1546,10 +1536,7 @@ int debug_cpu_hotspot_track(int cpunum, int numspots, int threshhold)
 		info->hotspot_threshhold = threshhold;
 	}
 
-	/* force debug_cpu_get_memory_hooks() to be called */
-	cpuintrf_push_context(-1);
-	cpuintrf_pop_context();
-
+	watchpoint_update_flags(info, ADDRESS_SPACE_PROGRAM);
 	return 1;
 }
 

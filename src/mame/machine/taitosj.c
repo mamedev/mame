@@ -221,18 +221,18 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 	{
 		LOG(("%04x: 68705 write %02x to address %04x\n",activecpu_get_pc(),portA_out,address));
 
-		memory_set_context(0);
+		cpuintrf_push_context(0);
 		program_write_byte(address, portA_out);
-		memory_set_context(2);
+		cpuintrf_pop_context();
 
 		/* increase low 8 bits of latched address for burst writes */
 		address = (address & 0xff00) | ((address + 1) & 0xff);
 	}
 	if (~data & 0x20)
 	{
-		memory_set_context(0);
+		cpuintrf_push_context(0);
 		portA_in = program_read_byte(address);
-		memory_set_context(2);
+		cpuintrf_pop_context();
 		LOG(("%04x: 68705 read %02x from address %04x\n",activecpu_get_pc(),portA_in,address));
 	}
 	if (~data & 0x40)

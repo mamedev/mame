@@ -193,9 +193,6 @@ typedef enum _read_or_write read_or_write;
 
 #define SUBTABLE_PTR(tabledata, entry) (&(tabledata)->table[(1 << LEVEL1_BITS) + (((entry) - SUBTABLE_BASE) << LEVEL2_BITS)])
 
-#define DEBUG_HOOK_READ(spacenum,address,mem_mask) if (debug_hook_read) (*debug_hook_read)(spacenum,address,mem_mask)
-#define DEBUG_HOOK_WRITE(spacenum,address,data,mem_mask) if (debug_hook_write) (*debug_hook_write)(spacenum,address,data,mem_mask)
-
 
 
 /***************************************************************************
@@ -319,8 +316,7 @@ static UINT8				log_unmap[ADDRESS_SPACES];		/* log unmapped memory accesses */
 static cpu_data				cpudata[MAX_CPU];				/* data gathered for each CPU */
 static bank_info 			bankdata[STATIC_COUNT];			/* data gathered for each bank */
 
-static debug_hook_read_func	debug_hook_read;				/* pointer to debugger callback for memory reads */
-static debug_hook_write_func debug_hook_write;				/* pointer to debugger callback for memory writes */
+static UINT8 *				wptable;						/* watchpoint-fill table */
 
 #define ACCESSOR_GROUP(type, width) \
 { \
@@ -378,7 +374,7 @@ const char *const address_space_names[ADDRESS_SPACES] = { "program", "data", "I/
 
 static void address_map_detokenize(address_map *map, const addrmap_token *tokens);
 
-static void memory_init_cpudata(const machine_config *config);
+static void memory_init_cpudata(running_machine *machine);
 static void memory_init_preflight(const machine_config *config);
 static void memory_init_populate(running_machine *machine);
 static void space_map_range_private(addrspace_data *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name);
@@ -447,6 +443,263 @@ INLINE void adjust_addresses(addrspace_data *space, offs_t *start, offs_t *end, 
 }
 
 
+/*-------------------------------------------------
+    read_byte_generic - read a byte from an
+    arbitrary address space
+-------------------------------------------------*/
+
+INLINE UINT8 read_byte_generic(UINT8 spacenum, offs_t address)
+{
+	const address_space *space = &active_address_space[spacenum];
+	const handler_data *handler;
+	offs_t offset;
+	UINT32 entry;
+	UINT8 result;
+
+	profiler_mark(PROFILER_MEMREAD);
+
+	address &= space->bytemask;
+	entry = space->readlookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = space->readlookup[LEVEL2_INDEX(entry, address)];
+	handler = &space->readhandlers[entry];
+
+	offset = (address - handler->bytestart) & handler->bytemask;
+	if (entry < STATIC_RAM)
+		result = bank_ptr[entry][offset];
+	else
+		result = (*handler->handler.read.mhandler8)(handler->object, offset);
+
+	profiler_mark(PROFILER_END);
+	return result;
+}
+
+
+/*-------------------------------------------------
+    write_byte_generic - write a byte to an
+    arbitrary address space
+-------------------------------------------------*/
+
+INLINE void write_byte_generic(UINT8 spacenum, offs_t address, UINT8 data)
+{
+	const address_space *space = &active_address_space[spacenum];
+	const handler_data *handler;
+	offs_t offset;
+	UINT32 entry;
+
+	profiler_mark(PROFILER_MEMWRITE);
+
+	address &= space->bytemask;
+	entry = space->writelookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = space->writelookup[LEVEL2_INDEX(entry, address)];
+	handler = &space->writehandlers[entry];
+
+	offset = (address - handler->bytestart) & handler->bytemask;
+	if (entry < STATIC_RAM)
+		bank_ptr[entry][offset] = data;
+	else
+		(*handler->handler.write.mhandler8)(handler->object, offset, data);
+
+	profiler_mark(PROFILER_END);
+}
+
+
+/*-------------------------------------------------
+    read_word_generic - read a word from an
+    arbitrary address space
+-------------------------------------------------*/
+
+INLINE UINT16 read_word_generic(UINT8 spacenum, offs_t address, UINT16 mem_mask)
+{
+	const address_space *space = &active_address_space[spacenum];
+	const handler_data *handler;
+	offs_t offset;
+	UINT32 entry;
+	UINT16 result;
+
+	profiler_mark(PROFILER_MEMREAD);
+
+	address &= space->bytemask;
+	entry = space->readlookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = space->readlookup[LEVEL2_INDEX(entry, address)];
+	handler = &space->readhandlers[entry];
+
+	offset = (address - handler->bytestart) & handler->bytemask;
+	if (entry < STATIC_RAM)
+		result = *(UINT16 *)&bank_ptr[entry][offset & ~1];
+	else
+		result = (*handler->handler.read.mhandler16)(handler->object, offset >> 1, mem_mask);
+
+	profiler_mark(PROFILER_END);
+	return result;
+}
+
+
+/*-------------------------------------------------
+    write_word_generic - write a word to an
+    arbitrary address space
+-------------------------------------------------*/
+
+INLINE void write_word_generic(UINT8 spacenum, offs_t address, UINT16 data, UINT16 mem_mask)
+{
+	const address_space *space = &active_address_space[spacenum];
+	const handler_data *handler;
+	offs_t offset;
+	UINT32 entry;
+
+	profiler_mark(PROFILER_MEMWRITE);
+
+	address &= space->bytemask;
+	entry = space->writelookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = space->writelookup[LEVEL2_INDEX(entry, address)];
+	handler = &space->writehandlers[entry];
+
+	offset = (address - handler->bytestart) & handler->bytemask;
+	if (entry < STATIC_RAM)
+	{
+		UINT16 *dest = (UINT16 *)&bank_ptr[entry][offset & ~1];
+		*dest = (*dest & ~mem_mask) | (data & mem_mask);
+	}
+	else
+		(*handler->handler.write.mhandler16)(handler->object, offset >> 1, data, mem_mask);
+
+	profiler_mark(PROFILER_END);
+}
+
+
+/*-------------------------------------------------
+    read_dword_generic - read a dword from an
+    arbitrary address space
+-------------------------------------------------*/
+
+INLINE UINT32 read_dword_generic(UINT8 spacenum, offs_t address, UINT32 mem_mask)
+{
+	const address_space *space = &active_address_space[spacenum];
+	const handler_data *handler;
+	offs_t offset;
+	UINT32 entry;
+	UINT32 result;
+
+	profiler_mark(PROFILER_MEMREAD);
+
+	address &= space->bytemask;
+	entry = space->readlookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = space->readlookup[LEVEL2_INDEX(entry, address)];
+	handler = &space->readhandlers[entry];
+
+	offset = (address - handler->bytestart) & handler->bytemask;
+	if (entry < STATIC_RAM)
+		result = *(UINT32 *)&bank_ptr[entry][offset & ~3];
+	else
+		result = (*handler->handler.read.mhandler32)(handler->object, offset >> 2, mem_mask);
+
+	profiler_mark(PROFILER_END);
+	return result;
+}
+
+
+/*-------------------------------------------------
+    write_dword_generic - write a dword to an
+    arbitrary address space
+-------------------------------------------------*/
+
+INLINE void write_dword_generic(UINT8 spacenum, offs_t address, UINT32 data, UINT32 mem_mask)
+{
+	const address_space *space = &active_address_space[spacenum];
+	const handler_data *handler;
+	offs_t offset;
+	UINT32 entry;
+
+	profiler_mark(PROFILER_MEMWRITE);
+
+	address &= space->bytemask;
+	entry = space->writelookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = space->writelookup[LEVEL2_INDEX(entry, address)];
+	handler = &space->writehandlers[entry];
+
+	offset = (address - handler->bytestart) & handler->bytemask;
+	if (entry < STATIC_RAM)
+	{
+		UINT32 *dest = (UINT32 *)&bank_ptr[entry][offset & ~3];
+		*dest = (*dest & ~mem_mask) | (data & mem_mask);
+	}
+	else
+		(*handler->handler.write.mhandler32)(handler->object, offset >> 2, data, mem_mask);
+
+	profiler_mark(PROFILER_END);
+}
+
+
+/*-------------------------------------------------
+    read_qword_generic - read a qword from an
+    arbitrary address space
+-------------------------------------------------*/
+
+INLINE UINT64 read_qword_generic(UINT8 spacenum, offs_t address, UINT64 mem_mask)
+{
+	const address_space *space = &active_address_space[spacenum];
+	const handler_data *handler;
+	offs_t offset;
+	UINT32 entry;
+	UINT64 result;
+
+	profiler_mark(PROFILER_MEMREAD);
+
+	address &= space->bytemask;
+	entry = space->readlookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = space->readlookup[LEVEL2_INDEX(entry, address)];
+	handler = &space->readhandlers[entry];
+
+	offset = (address - handler->bytestart) & handler->bytemask;
+	if (entry < STATIC_RAM)
+		result = *(UINT64 *)&bank_ptr[entry][offset & ~7];
+	else
+		result = (*handler->handler.read.mhandler64)(handler->object, offset >> 3, mem_mask);
+
+	profiler_mark(PROFILER_END);
+	return result;
+}
+
+
+/*-------------------------------------------------
+    write_qword_generic - write a qword to an
+    arbitrary address space
+-------------------------------------------------*/
+
+INLINE void write_qword_generic(UINT8 spacenum, offs_t address, UINT64 data, UINT64 mem_mask)
+{
+	const address_space *space = &active_address_space[spacenum];
+	const handler_data *handler;
+	offs_t offset;
+	UINT32 entry;
+
+	profiler_mark(PROFILER_MEMWRITE);
+
+	address &= space->bytemask;
+	entry = space->writelookup[LEVEL1_INDEX(address)];
+	if (entry >= SUBTABLE_BASE)
+		entry = space->writelookup[LEVEL2_INDEX(entry, address)];
+	handler = &space->writehandlers[entry];
+
+	offset = (address - handler->bytestart) & handler->bytemask;
+	if (entry < STATIC_RAM)
+	{
+		UINT64 *dest = (UINT64 *)&bank_ptr[entry][offset & ~7];
+		*dest = (*dest & ~mem_mask) | (data & mem_mask);
+	}
+	else
+		(*handler->handler.write.mhandler64)(handler->object, offset >> 3, data, mem_mask);
+
+	profiler_mark(PROFILER_END);
+}
+
+
 
 /***************************************************************************
     CORE SYSTEM OPERATIONS
@@ -473,7 +726,7 @@ void memory_init(running_machine *machine)
 	memset(bankd_ptr, 0, sizeof(bankd_ptr));
 
 	/* build up the cpudata array with info about all CPUs and address spaces */
-	memory_init_cpudata(machine->config);
+	memory_init_cpudata(machine);
 
 	/* preflight the memory handlers and check banks */
 	memory_init_preflight(machine->config);
@@ -520,6 +773,10 @@ static void memory_exit(running_machine *machine)
 			if (space->write.table != NULL)
 				free(space->write.table);
 		}
+
+	/* free the global watchpoint table */
+	if (wptable != NULL)
+		free(wptable);
 }
 
 
@@ -529,53 +786,49 @@ static void memory_exit(running_machine *machine)
 
 void memory_set_context(int activecpu)
 {
+	addrspace_data *space;
+	
 	/* remember dynamic RAM/ROM */
-	if (cur_context != -1)
-	{
+	if (activecpu == -1)
+		activecpu = cur_context;
+	else if (cur_context != -1)
 		cpudata[cur_context].opbase = opbase;
-	}
 	cur_context = activecpu;
 
 	opbase = cpudata[activecpu].opbase;
+	opbase_handler = cpudata[activecpu].opbase_handler;
 
 	/* program address space */
-	active_address_space[ADDRESS_SPACE_PROGRAM].bytemask = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].bytemask;
-	active_address_space[ADDRESS_SPACE_PROGRAM].readlookup = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].read.table;
-	active_address_space[ADDRESS_SPACE_PROGRAM].writelookup = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].write.table;
-	active_address_space[ADDRESS_SPACE_PROGRAM].readhandlers = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].read.handlers;
-	active_address_space[ADDRESS_SPACE_PROGRAM].writehandlers = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].write.handlers;
-	active_address_space[ADDRESS_SPACE_PROGRAM].accessors = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].accessors;
+	space = &cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM];
+	active_address_space[ADDRESS_SPACE_PROGRAM].bytemask = space->bytemask;
+	active_address_space[ADDRESS_SPACE_PROGRAM].readlookup = ((Machine->debug_flags & DEBUG_FLAG_WPR_PROGRAM) != 0) ? wptable : space->read.table;
+	active_address_space[ADDRESS_SPACE_PROGRAM].writelookup = ((Machine->debug_flags & DEBUG_FLAG_WPW_PROGRAM) != 0) ? wptable : space->write.table;
+	active_address_space[ADDRESS_SPACE_PROGRAM].readhandlers = space->read.handlers;
+	active_address_space[ADDRESS_SPACE_PROGRAM].writehandlers = space->write.handlers;
+	active_address_space[ADDRESS_SPACE_PROGRAM].accessors = space->accessors;
 
 	/* data address space */
 	if (cpudata[activecpu].spacemask & (1 << ADDRESS_SPACE_DATA))
 	{
-		active_address_space[ADDRESS_SPACE_DATA].bytemask = cpudata[activecpu].space[ADDRESS_SPACE_DATA].bytemask;
-		active_address_space[ADDRESS_SPACE_DATA].readlookup = cpudata[activecpu].space[ADDRESS_SPACE_DATA].read.table;
-		active_address_space[ADDRESS_SPACE_DATA].writelookup = cpudata[activecpu].space[ADDRESS_SPACE_DATA].write.table;
-		active_address_space[ADDRESS_SPACE_DATA].readhandlers = cpudata[activecpu].space[ADDRESS_SPACE_DATA].read.handlers;
-		active_address_space[ADDRESS_SPACE_DATA].writehandlers = cpudata[activecpu].space[ADDRESS_SPACE_DATA].write.handlers;
-		active_address_space[ADDRESS_SPACE_DATA].accessors = cpudata[activecpu].space[ADDRESS_SPACE_DATA].accessors;
+		space = &cpudata[activecpu].space[ADDRESS_SPACE_DATA];
+		active_address_space[ADDRESS_SPACE_DATA].bytemask = space->bytemask;
+		active_address_space[ADDRESS_SPACE_DATA].readlookup = ((Machine->debug_flags & DEBUG_FLAG_WPR_DATA) != 0) ? wptable : space->read.table;
+		active_address_space[ADDRESS_SPACE_DATA].writelookup = ((Machine->debug_flags & DEBUG_FLAG_WPW_DATA) != 0) ? wptable : space->write.table;
+		active_address_space[ADDRESS_SPACE_DATA].readhandlers = space->read.handlers;
+		active_address_space[ADDRESS_SPACE_DATA].writehandlers = space->write.handlers;
+		active_address_space[ADDRESS_SPACE_DATA].accessors = space->accessors;
 	}
 
 	/* I/O address space */
 	if (cpudata[activecpu].spacemask & (1 << ADDRESS_SPACE_IO))
 	{
-		active_address_space[ADDRESS_SPACE_IO].bytemask = cpudata[activecpu].space[ADDRESS_SPACE_IO].bytemask;
-		active_address_space[ADDRESS_SPACE_IO].readlookup = cpudata[activecpu].space[ADDRESS_SPACE_IO].read.table;
-		active_address_space[ADDRESS_SPACE_IO].writelookup = cpudata[activecpu].space[ADDRESS_SPACE_IO].write.table;
-		active_address_space[ADDRESS_SPACE_IO].readhandlers = cpudata[activecpu].space[ADDRESS_SPACE_IO].read.handlers;
-		active_address_space[ADDRESS_SPACE_IO].writehandlers = cpudata[activecpu].space[ADDRESS_SPACE_IO].write.handlers;
-		active_address_space[ADDRESS_SPACE_IO].accessors = cpudata[activecpu].space[ADDRESS_SPACE_IO].accessors;
-	}
-
-	opbase_handler = cpudata[activecpu].opbase_handler;
-
-	if (activecpu != -1 && (Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debug_cpu_get_memory_hooks(activecpu, &debug_hook_read, &debug_hook_write);
-	else
-	{
-		debug_hook_read = NULL;
-		debug_hook_write = NULL;
+		space = &cpudata[activecpu].space[ADDRESS_SPACE_IO];
+		active_address_space[ADDRESS_SPACE_IO].bytemask = space->bytemask;
+		active_address_space[ADDRESS_SPACE_IO].readlookup = ((Machine->debug_flags & DEBUG_FLAG_WPR_DATA) != 0) ? wptable : space->read.table;
+		active_address_space[ADDRESS_SPACE_IO].writelookup = ((Machine->debug_flags & DEBUG_FLAG_WPW_DATA) != 0) ? wptable : space->write.table;
+		active_address_space[ADDRESS_SPACE_IO].readhandlers = space->read.handlers;
+		active_address_space[ADDRESS_SPACE_IO].writehandlers = space->write.handlers;
+		active_address_space[ADDRESS_SPACE_IO].accessors = space->accessors;
 	}
 }
 
@@ -1343,12 +1596,17 @@ UINT64 *_memory_install_device_handler64(const device_config *device, int cpunum
     structure for each CPU
 -------------------------------------------------*/
 
-static void memory_init_cpudata(const machine_config *config)
+static void memory_init_cpudata(running_machine *machine)
 {
+	const machine_config *config = machine->config;
 	int cpunum, spacenum;
 
 	/* zap the cpudata structure */
 	memset(&cpudata, 0, sizeof(cpudata));
+
+	/* create a global watchpoint-filled table */
+	wptable = malloc_or_die(1 << LEVEL1_BITS);
+	memset(wptable, STATIC_WATCHPOINT, 1 << LEVEL1_BITS);
 
 	/* loop over CPUs */
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(cpudata); cpunum++)
@@ -1392,9 +1650,11 @@ static void memory_init_cpudata(const machine_config *config)
 				space->write.handlers[entrynum].handler.generic = get_static_handler(space->dbits, 1, spacenum, entrynum);
 			}
 
-			/* make sure we fix up the mask for the unmap handler */
+			/* make sure we fix up the mask for the unmap and watchpoint handlers */
 			space->read.handlers[STATIC_UNMAP].bytemask = ~0;
 			space->write.handlers[STATIC_UNMAP].bytemask = ~0;
+			space->read.handlers[STATIC_WATCHPOINT].bytemask = ~0;
+			space->write.handlers[STATIC_WATCHPOINT].bytemask = ~0;
 
 			/* allocate memory */
 			space->read.table = malloc_or_die(1 << LEVEL1_BITS);
@@ -2712,6 +2972,113 @@ static WRITE64_HANDLER( mwh64_nop )        {  }
 
 
 /*-------------------------------------------------
+    watchpoint memory handlers
+-------------------------------------------------*/
+
+INLINE UINT8 watchpoint_read8(int spacenum, offs_t address)
+{
+	UINT8 result;
+	debug_cpu_memory_read_hook(Machine, cur_context, spacenum, address, 0xff);
+	active_address_space[spacenum].readlookup = cpudata[cur_context].space[spacenum].read.table;
+	result = read_byte_generic(spacenum, address);
+	active_address_space[spacenum].readlookup = wptable;
+	return result;
+}
+
+INLINE UINT16 watchpoint_read16(int spacenum, offs_t address, UINT16 mem_mask)
+{
+	UINT16 result;
+	debug_cpu_memory_read_hook(Machine, cur_context, spacenum, address, mem_mask);
+	active_address_space[spacenum].readlookup = cpudata[cur_context].space[spacenum].read.table;
+	result = read_word_generic(spacenum, address, mem_mask);
+	active_address_space[spacenum].readlookup = wptable;
+	return result;
+}
+
+INLINE UINT32 watchpoint_read32(int spacenum, offs_t address, UINT32 mem_mask)
+{
+	UINT32 result;
+	debug_cpu_memory_read_hook(Machine, cur_context, spacenum, address, mem_mask);
+	active_address_space[spacenum].readlookup = cpudata[cur_context].space[spacenum].read.table;
+	result = read_dword_generic(spacenum, address, mem_mask);
+	active_address_space[spacenum].readlookup = wptable;
+	return result;
+}
+
+INLINE UINT64 watchpoint_read64(int spacenum, offs_t address, UINT64 mem_mask)
+{
+	UINT64 result;
+	debug_cpu_memory_read_hook(Machine, cur_context, spacenum, address, mem_mask);
+	active_address_space[spacenum].readlookup = cpudata[cur_context].space[spacenum].read.table;
+	result = read_qword_generic(spacenum, address, mem_mask);
+	active_address_space[spacenum].readlookup = wptable;
+	return result;
+}
+
+INLINE void watchpoint_write8(int spacenum, offs_t address, UINT8 data)
+{
+	debug_cpu_memory_write_hook(Machine, cur_context, spacenum, address, data, 0xff);
+	active_address_space[spacenum].writelookup = cpudata[cur_context].space[spacenum].write.table;
+	write_byte_generic(spacenum, address, data);
+	active_address_space[spacenum].writelookup = wptable;
+}
+
+INLINE void watchpoint_write16(int spacenum, offs_t address, UINT16 data, UINT16 mem_mask)
+{
+	debug_cpu_memory_write_hook(Machine, cur_context, spacenum, address, data, mem_mask);
+	active_address_space[spacenum].writelookup = cpudata[cur_context].space[spacenum].write.table;
+	write_word_generic(spacenum, address, data, mem_mask);
+	active_address_space[spacenum].writelookup = wptable;
+}
+
+INLINE void watchpoint_write32(int spacenum, offs_t address, UINT32 data, UINT32 mem_mask)
+{
+	debug_cpu_memory_write_hook(Machine, cur_context, spacenum, address, data, mem_mask);
+	active_address_space[spacenum].writelookup = cpudata[cur_context].space[spacenum].write.table;
+	write_dword_generic(spacenum, address, data, mem_mask);
+	active_address_space[spacenum].writelookup = wptable;
+}
+
+INLINE void watchpoint_write64(int spacenum, offs_t address, UINT64 data, UINT64 mem_mask)
+{
+	debug_cpu_memory_write_hook(Machine, cur_context, spacenum, address, data, mem_mask);
+	active_address_space[spacenum].writelookup = cpudata[cur_context].space[spacenum].write.table;
+	write_qword_generic(spacenum, address, data, mem_mask);
+	active_address_space[spacenum].writelookup = wptable;
+}
+
+static READ8_HANDLER( mrh8_watchpoint_program )    { return watchpoint_read8 (ADDRESS_SPACE_PROGRAM, offset);           }
+static READ16_HANDLER( mrh16_watchpoint_program )  { return watchpoint_read16(ADDRESS_SPACE_PROGRAM, offset, mem_mask); }
+static READ32_HANDLER( mrh32_watchpoint_program )  { return watchpoint_read32(ADDRESS_SPACE_PROGRAM, offset, mem_mask); }
+static READ64_HANDLER( mrh64_watchpoint_program )  { return watchpoint_read64(ADDRESS_SPACE_PROGRAM, offset, mem_mask); }
+
+static WRITE8_HANDLER( mwh8_watchpoint_program )   { watchpoint_write8 (ADDRESS_SPACE_PROGRAM, offset, data);           }
+static WRITE16_HANDLER( mwh16_watchpoint_program ) { watchpoint_write16(ADDRESS_SPACE_PROGRAM, offset, data, mem_mask); }
+static WRITE32_HANDLER( mwh32_watchpoint_program ) { watchpoint_write32(ADDRESS_SPACE_PROGRAM, offset, data, mem_mask); }
+static WRITE64_HANDLER( mwh64_watchpoint_program ) { watchpoint_write64(ADDRESS_SPACE_PROGRAM, offset, data, mem_mask); }
+
+static READ8_HANDLER( mrh8_watchpoint_data )       { return watchpoint_read8 (ADDRESS_SPACE_DATA, offset);           }
+static READ16_HANDLER( mrh16_watchpoint_data )     { return watchpoint_read16(ADDRESS_SPACE_DATA, offset, mem_mask); }
+static READ32_HANDLER( mrh32_watchpoint_data )     { return watchpoint_read32(ADDRESS_SPACE_DATA, offset, mem_mask); }
+static READ64_HANDLER( mrh64_watchpoint_data )     { return watchpoint_read64(ADDRESS_SPACE_DATA, offset, mem_mask); }
+
+static WRITE8_HANDLER( mwh8_watchpoint_data )      { watchpoint_write8 (ADDRESS_SPACE_DATA, offset, data);           }
+static WRITE16_HANDLER( mwh16_watchpoint_data )    { watchpoint_write16(ADDRESS_SPACE_DATA, offset, data, mem_mask); }
+static WRITE32_HANDLER( mwh32_watchpoint_data )    { watchpoint_write32(ADDRESS_SPACE_DATA, offset, data, mem_mask); }
+static WRITE64_HANDLER( mwh64_watchpoint_data )    { watchpoint_write64(ADDRESS_SPACE_DATA, offset, data, mem_mask); }
+
+static READ8_HANDLER( mrh8_watchpoint_io )         { return watchpoint_read8 (ADDRESS_SPACE_IO, offset);           }
+static READ16_HANDLER( mrh16_watchpoint_io )       { return watchpoint_read16(ADDRESS_SPACE_IO, offset, mem_mask); }
+static READ32_HANDLER( mrh32_watchpoint_io )       { return watchpoint_read32(ADDRESS_SPACE_IO, offset, mem_mask); }
+static READ64_HANDLER( mrh64_watchpoint_io )       { return watchpoint_read64(ADDRESS_SPACE_IO, offset, mem_mask); }
+
+static WRITE8_HANDLER( mwh8_watchpoint_io )        { watchpoint_write8 (ADDRESS_SPACE_IO, offset, data);           }
+static WRITE16_HANDLER( mwh16_watchpoint_io )      { watchpoint_write16(ADDRESS_SPACE_IO, offset, data, mem_mask); }
+static WRITE32_HANDLER( mwh32_watchpoint_io )      { watchpoint_write32(ADDRESS_SPACE_IO, offset, data, mem_mask); }
+static WRITE64_HANDLER( mwh64_watchpoint_io )      { watchpoint_write64(ADDRESS_SPACE_IO, offset, data, mem_mask); }
+
+
+/*-------------------------------------------------
     get_static_handler - returns points to static
     memory handlers
 -------------------------------------------------*/
@@ -2727,33 +3094,45 @@ static genf *get_static_handler(int handlerbits, int readorwrite, int spacenum, 
 		genf *		write;
 	} static_handler_list[] =
 	{
-		{  8, STATIC_UNMAP,  ADDRESS_SPACE_PROGRAM, (genf *)mrh8_unmap_program, (genf *)mwh8_unmap_program },
-		{  8, STATIC_UNMAP,  ADDRESS_SPACE_DATA,    (genf *)mrh8_unmap_data,    (genf *)mwh8_unmap_data },
-		{  8, STATIC_UNMAP,  ADDRESS_SPACE_IO,      (genf *)mrh8_unmap_io,      (genf *)mwh8_unmap_io },
-		{  8, STATIC_NOP,    ADDRESS_SPACE_PROGRAM, (genf *)mrh8_nop_program,   (genf *)mwh8_nop },
-		{  8, STATIC_NOP,    ADDRESS_SPACE_DATA,    (genf *)mrh8_nop_data,      (genf *)mwh8_nop },
-		{  8, STATIC_NOP,    ADDRESS_SPACE_IO,      (genf *)mrh8_nop_io,        (genf *)mwh8_nop },
+		{  8, STATIC_UNMAP,      ADDRESS_SPACE_PROGRAM, (genf *)mrh8_unmap_program,       (genf *)mwh8_unmap_program },
+		{  8, STATIC_UNMAP,      ADDRESS_SPACE_DATA,    (genf *)mrh8_unmap_data,          (genf *)mwh8_unmap_data },
+		{  8, STATIC_UNMAP,      ADDRESS_SPACE_IO,      (genf *)mrh8_unmap_io,            (genf *)mwh8_unmap_io },
+		{  8, STATIC_NOP,        ADDRESS_SPACE_PROGRAM, (genf *)mrh8_nop_program,         (genf *)mwh8_nop },
+		{  8, STATIC_NOP,        ADDRESS_SPACE_DATA,    (genf *)mrh8_nop_data,            (genf *)mwh8_nop },
+		{  8, STATIC_NOP,        ADDRESS_SPACE_IO,      (genf *)mrh8_nop_io,              (genf *)mwh8_nop },
+		{  8, STATIC_WATCHPOINT, ADDRESS_SPACE_PROGRAM, (genf *)mrh8_watchpoint_program,  (genf *)mwh8_watchpoint_program },
+		{  8, STATIC_WATCHPOINT, ADDRESS_SPACE_DATA,    (genf *)mrh8_watchpoint_data,     (genf *)mwh8_watchpoint_data },
+		{  8, STATIC_WATCHPOINT, ADDRESS_SPACE_IO,      (genf *)mrh8_watchpoint_io,       (genf *)mwh8_watchpoint_io },
 
-		{ 16, STATIC_UNMAP,  ADDRESS_SPACE_PROGRAM, (genf *)mrh16_unmap_program,(genf *)mwh16_unmap_program },
-		{ 16, STATIC_UNMAP,  ADDRESS_SPACE_DATA,    (genf *)mrh16_unmap_data,   (genf *)mwh16_unmap_data },
-		{ 16, STATIC_UNMAP,  ADDRESS_SPACE_IO,      (genf *)mrh16_unmap_io,     (genf *)mwh16_unmap_io },
-		{ 16, STATIC_NOP,    ADDRESS_SPACE_PROGRAM, (genf *)mrh16_nop_program,  (genf *)mwh16_nop },
-		{ 16, STATIC_NOP,    ADDRESS_SPACE_DATA,    (genf *)mrh16_nop_data,     (genf *)mwh16_nop },
-		{ 16, STATIC_NOP,    ADDRESS_SPACE_IO,      (genf *)mrh16_nop_io,       (genf *)mwh16_nop },
+		{ 16, STATIC_UNMAP,      ADDRESS_SPACE_PROGRAM, (genf *)mrh16_unmap_program,      (genf *)mwh16_unmap_program },
+		{ 16, STATIC_UNMAP,      ADDRESS_SPACE_DATA,    (genf *)mrh16_unmap_data,         (genf *)mwh16_unmap_data },
+		{ 16, STATIC_UNMAP,      ADDRESS_SPACE_IO,      (genf *)mrh16_unmap_io,           (genf *)mwh16_unmap_io },
+		{ 16, STATIC_NOP,        ADDRESS_SPACE_PROGRAM, (genf *)mrh16_nop_program,        (genf *)mwh16_nop },
+		{ 16, STATIC_NOP,        ADDRESS_SPACE_DATA,    (genf *)mrh16_nop_data,           (genf *)mwh16_nop },
+		{ 16, STATIC_NOP,        ADDRESS_SPACE_IO,      (genf *)mrh16_nop_io,             (genf *)mwh16_nop },
+		{ 16, STATIC_WATCHPOINT, ADDRESS_SPACE_PROGRAM, (genf *)mrh16_watchpoint_program, (genf *)mwh16_watchpoint_program },
+		{ 16, STATIC_WATCHPOINT, ADDRESS_SPACE_DATA,    (genf *)mrh16_watchpoint_data,    (genf *)mwh16_watchpoint_data },
+		{ 16, STATIC_WATCHPOINT, ADDRESS_SPACE_IO,      (genf *)mrh16_watchpoint_io,      (genf *)mwh16_watchpoint_io },
 
-		{ 32, STATIC_UNMAP,  ADDRESS_SPACE_PROGRAM, (genf *)mrh32_unmap_program,(genf *)mwh32_unmap_program },
-		{ 32, STATIC_UNMAP,  ADDRESS_SPACE_DATA,    (genf *)mrh32_unmap_data,   (genf *)mwh32_unmap_data },
-		{ 32, STATIC_UNMAP,  ADDRESS_SPACE_IO,      (genf *)mrh32_unmap_io,     (genf *)mwh32_unmap_io },
-		{ 32, STATIC_NOP,    ADDRESS_SPACE_PROGRAM, (genf *)mrh32_nop_program,  (genf *)mwh32_nop },
-		{ 32, STATIC_NOP,    ADDRESS_SPACE_DATA,    (genf *)mrh32_nop_data,     (genf *)mwh32_nop },
-		{ 32, STATIC_NOP,    ADDRESS_SPACE_IO,      (genf *)mrh32_nop_io,       (genf *)mwh32_nop },
+		{ 32, STATIC_UNMAP,      ADDRESS_SPACE_PROGRAM, (genf *)mrh32_unmap_program,      (genf *)mwh32_unmap_program },
+		{ 32, STATIC_UNMAP,      ADDRESS_SPACE_DATA,    (genf *)mrh32_unmap_data,         (genf *)mwh32_unmap_data },
+		{ 32, STATIC_UNMAP,      ADDRESS_SPACE_IO,      (genf *)mrh32_unmap_io,           (genf *)mwh32_unmap_io },
+		{ 32, STATIC_NOP,        ADDRESS_SPACE_PROGRAM, (genf *)mrh32_nop_program,        (genf *)mwh32_nop },
+		{ 32, STATIC_NOP,        ADDRESS_SPACE_DATA,    (genf *)mrh32_nop_data,           (genf *)mwh32_nop },
+		{ 32, STATIC_NOP,        ADDRESS_SPACE_IO,      (genf *)mrh32_nop_io,             (genf *)mwh32_nop },
+		{ 32, STATIC_WATCHPOINT, ADDRESS_SPACE_PROGRAM, (genf *)mrh32_watchpoint_program, (genf *)mwh32_watchpoint_program },
+		{ 32, STATIC_WATCHPOINT, ADDRESS_SPACE_DATA,    (genf *)mrh32_watchpoint_data,    (genf *)mwh32_watchpoint_data },
+		{ 32, STATIC_WATCHPOINT, ADDRESS_SPACE_IO,      (genf *)mrh32_watchpoint_io,      (genf *)mwh32_watchpoint_io },
 
-		{ 64, STATIC_UNMAP,  ADDRESS_SPACE_PROGRAM, (genf *)mrh64_unmap_program,(genf *)mwh64_unmap_program },
-		{ 64, STATIC_UNMAP,  ADDRESS_SPACE_DATA,    (genf *)mrh64_unmap_data,   (genf *)mwh64_unmap_data },
-		{ 64, STATIC_UNMAP,  ADDRESS_SPACE_IO,      (genf *)mrh64_unmap_io,     (genf *)mwh64_unmap_io },
-		{ 64, STATIC_NOP,    ADDRESS_SPACE_PROGRAM, (genf *)mrh64_nop_program,  (genf *)mwh64_nop },
-		{ 64, STATIC_NOP,    ADDRESS_SPACE_DATA,    (genf *)mrh64_nop_data,     (genf *)mwh64_nop },
-		{ 64, STATIC_NOP,    ADDRESS_SPACE_IO,      (genf *)mrh64_nop_io,       (genf *)mwh64_nop },
+		{ 64, STATIC_UNMAP,      ADDRESS_SPACE_PROGRAM, (genf *)mrh64_unmap_program,      (genf *)mwh64_unmap_program },
+		{ 64, STATIC_UNMAP,      ADDRESS_SPACE_DATA,    (genf *)mrh64_unmap_data,         (genf *)mwh64_unmap_data },
+		{ 64, STATIC_UNMAP,      ADDRESS_SPACE_IO,      (genf *)mrh64_unmap_io,           (genf *)mwh64_unmap_io },
+		{ 64, STATIC_NOP,        ADDRESS_SPACE_PROGRAM, (genf *)mrh64_nop_program,        (genf *)mwh64_nop },
+		{ 64, STATIC_NOP,        ADDRESS_SPACE_DATA,    (genf *)mrh64_nop_data,           (genf *)mwh64_nop },
+		{ 64, STATIC_NOP,        ADDRESS_SPACE_IO,      (genf *)mrh64_nop_io,             (genf *)mwh64_nop },
+		{ 64, STATIC_WATCHPOINT, ADDRESS_SPACE_PROGRAM, (genf *)mrh64_watchpoint_program, (genf *)mwh64_watchpoint_program },
+		{ 64, STATIC_WATCHPOINT, ADDRESS_SPACE_DATA,    (genf *)mrh64_watchpoint_data,    (genf *)mwh64_watchpoint_data },
+		{ 64, STATIC_WATCHPOINT, ADDRESS_SPACE_IO,      (genf *)mrh64_watchpoint_io,      (genf *)mwh64_watchpoint_io }
 	};
 	int tablenum;
 
@@ -3331,68 +3710,8 @@ static memory_handler get_stub_handler(read_or_write readorwrite, int spacedbits
 
 
 /***************************************************************************
-    MEMORY HANDLER LOOKUP HELPERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    Program memory handlers
--------------------------------------------------*/
-
-INLINE UINT32 lookup_read_entry(const address_space *space, offs_t address)
-{
-	UINT32 entry = space->readlookup[LEVEL1_INDEX(address)];
-	if (entry >= SUBTABLE_BASE)
-		entry = space->readlookup[LEVEL2_INDEX(entry, address)];
-	return entry;
-}
-
-
-INLINE UINT32 lookup_write_entry(const address_space *space, offs_t address)
-{
-	UINT32 entry = space->writelookup[LEVEL1_INDEX(address)];
-	if (entry >= SUBTABLE_BASE)
-		entry = space->writelookup[LEVEL2_INDEX(entry, address)];
-	return entry;
-}
-
-
-
-/***************************************************************************
     8-BIT READ HANDLERS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    read_byte_generic - read a byte from an
-    arbitrary address space
--------------------------------------------------*/
-
-INLINE UINT8 read_byte_generic(UINT8 spacenum, offs_t address)
-{
-	const address_space *space = &active_address_space[spacenum];
-	const handler_data *handler;
-	offs_t offset;
-	UINT32 entry;
-	UINT8 result;
-
-	profiler_mark(PROFILER_MEMREAD);
-
-	address &= space->bytemask;
-	entry = lookup_read_entry(space, address);
-	handler = &space->readhandlers[entry];
-
-	DEBUG_HOOK_READ(spacenum, address, 0xff);
-
-	offset = (address - handler->bytestart) & handler->bytemask;
-	if (entry < STATIC_RAM)
-		result = bank_ptr[entry][offset];
-	else
-		result = (*handler->handler.read.mhandler8)(handler->object, offset);
-
-	profiler_mark(PROFILER_END);
-
-	return result;
-}
-
 
 /*-------------------------------------------------
     ADDRESS_SPACE_PROGRAM
@@ -3697,36 +4016,6 @@ UINT64 io_read_qword_masked_8be(offs_t address, UINT64 mask)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    stub_write_byte_generic - write a byte to an
-    arbitrary address space
--------------------------------------------------*/
-
-INLINE void write_byte_generic(UINT8 spacenum, offs_t address, UINT8 data)
-{
-	const address_space *space = &active_address_space[spacenum];
-	const handler_data *handler;
-	offs_t offset;
-	UINT32 entry;
-
-	profiler_mark(PROFILER_MEMWRITE);
-
-	address &= space->bytemask;
-	entry = lookup_write_entry(space, address);
-	handler = &space->writehandlers[entry];
-
-	DEBUG_HOOK_WRITE(spacenum, address, data, 0xff);
-
-	offset = (address - handler->bytestart) & handler->bytemask;
-	if (entry < STATIC_RAM)
-		bank_ptr[entry][offset] = data;
-	else
-		(*handler->handler.write.mhandler8)(handler->object, offset, data);
-
-	profiler_mark(PROFILER_END);
-}
-
-
-/*-------------------------------------------------
     ADDRESS_SPACE_PROGRAM
 -------------------------------------------------*/
 
@@ -3993,72 +4282,39 @@ void io_write_qword_masked_8be(offs_t address, UINT64 data, UINT64 mask)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    read_word_masked_generic - read a word from
-    an arbitrary address space
--------------------------------------------------*/
-
-INLINE UINT16 read_word_masked_generic(UINT8 spacenum, offs_t address, UINT16 mem_mask)
-{
-	const address_space *space = &active_address_space[spacenum];
-	const handler_data *handler;
-	offs_t offset;
-	UINT32 entry;
-	UINT16 result;
-
-	profiler_mark(PROFILER_MEMREAD);
-
-	address &= space->bytemask;
-	entry = lookup_read_entry(space, address);
-	handler = &space->readhandlers[entry];
-
-	DEBUG_HOOK_READ(spacenum, address & ~1, mem_mask);
-
-	offset = (address - handler->bytestart) & handler->bytemask;
-	if (entry < STATIC_RAM)
-		result = *(UINT16 *)&bank_ptr[entry][offset & ~1];
-	else
-		result = (*handler->handler.read.mhandler16)(handler->object, offset >> 1, mem_mask);
-
-	profiler_mark(PROFILER_END);
-
-	return result;
-}
-
-
-/*-------------------------------------------------
     ADDRESS_SPACE_PROGRAM
 -------------------------------------------------*/
 
 UINT8 program_read_byte_16le(offs_t address)
 {
 	UINT32 shift = (address & 1) * 8;
-	return read_word_masked_generic(ADDRESS_SPACE_PROGRAM, address, 0xff << shift) >> shift;
+	return read_word_generic(ADDRESS_SPACE_PROGRAM, address, 0xff << shift) >> shift;
 }
 
 UINT8 program_read_byte_16be(offs_t address)
 {
 	UINT32 shift = (~address & 1) * 8;
-	return read_word_masked_generic(ADDRESS_SPACE_PROGRAM, address, 0xff << shift) >> shift;
+	return read_word_generic(ADDRESS_SPACE_PROGRAM, address, 0xff << shift) >> shift;
 }
 
 UINT16 program_read_word_16le(offs_t address)
 {
-	return read_word_masked_generic(ADDRESS_SPACE_PROGRAM, address, 0xffff);
+	return read_word_generic(ADDRESS_SPACE_PROGRAM, address, 0xffff);
 }
 
 UINT16 program_read_word_masked_16le(offs_t address, UINT16 mask)
 {
-	return read_word_masked_generic(ADDRESS_SPACE_PROGRAM, address, mask);
+	return read_word_generic(ADDRESS_SPACE_PROGRAM, address, mask);
 }
 
 UINT16 program_read_word_16be(offs_t address)
 {
-	return read_word_masked_generic(ADDRESS_SPACE_PROGRAM, address, 0xffff);
+	return read_word_generic(ADDRESS_SPACE_PROGRAM, address, 0xffff);
 }
 
 UINT16 program_read_word_masked_16be(offs_t address, UINT16 mask)
 {
-	return read_word_masked_generic(ADDRESS_SPACE_PROGRAM, address, mask);
+	return read_word_generic(ADDRESS_SPACE_PROGRAM, address, mask);
 }
 
 UINT32 program_read_dword_16le(offs_t address)
@@ -4125,33 +4381,33 @@ UINT64 program_read_qword_masked_16be(offs_t address, UINT64 mask)
 UINT8 data_read_byte_16le(offs_t address)
 {
 	UINT32 shift = (address & 1) * 8;
-	return read_word_masked_generic(ADDRESS_SPACE_DATA, address, 0xff << shift) >> shift;
+	return read_word_generic(ADDRESS_SPACE_DATA, address, 0xff << shift) >> shift;
 }
 
 UINT8 data_read_byte_16be(offs_t address)
 {
 	UINT32 shift = (~address & 1) * 8;
-	return read_word_masked_generic(ADDRESS_SPACE_DATA, address, 0xff << shift) >> shift;
+	return read_word_generic(ADDRESS_SPACE_DATA, address, 0xff << shift) >> shift;
 }
 
 UINT16 data_read_word_16le(offs_t address)
 {
-	return read_word_masked_generic(ADDRESS_SPACE_DATA, address, 0xffff);
+	return read_word_generic(ADDRESS_SPACE_DATA, address, 0xffff);
 }
 
 UINT16 data_read_word_masked_16le(offs_t address, UINT16 mask)
 {
-	return read_word_masked_generic(ADDRESS_SPACE_DATA, address, mask);
+	return read_word_generic(ADDRESS_SPACE_DATA, address, mask);
 }
 
 UINT16 data_read_word_16be(offs_t address)
 {
-	return read_word_masked_generic(ADDRESS_SPACE_DATA, address, 0xffff);
+	return read_word_generic(ADDRESS_SPACE_DATA, address, 0xffff);
 }
 
 UINT16 data_read_word_masked_16be(offs_t address, UINT16 mask)
 {
-	return read_word_masked_generic(ADDRESS_SPACE_DATA, address, mask);
+	return read_word_generic(ADDRESS_SPACE_DATA, address, mask);
 }
 
 UINT32 data_read_dword_16le(offs_t address)
@@ -4218,33 +4474,33 @@ UINT64 data_read_qword_masked_16be(offs_t address, UINT64 mask)
 UINT8 io_read_byte_16le(offs_t address)
 {
 	UINT32 shift = (address & 1) * 8;
-	return read_word_masked_generic(ADDRESS_SPACE_IO, address, 0xff << shift) >> shift;
+	return read_word_generic(ADDRESS_SPACE_IO, address, 0xff << shift) >> shift;
 }
 
 UINT8 io_read_byte_16be(offs_t address)
 {
 	UINT32 shift = (~address & 1) * 8;
-	return read_word_masked_generic(ADDRESS_SPACE_IO, address, 0xff << shift) >> shift;
+	return read_word_generic(ADDRESS_SPACE_IO, address, 0xff << shift) >> shift;
 }
 
 UINT16 io_read_word_16le(offs_t address)
 {
-	return read_word_masked_generic(ADDRESS_SPACE_IO, address, 0xffff);
+	return read_word_generic(ADDRESS_SPACE_IO, address, 0xffff);
 }
 
 UINT16 io_read_word_masked_16le(offs_t address, UINT16 mask)
 {
-	return read_word_masked_generic(ADDRESS_SPACE_IO, address, mask);
+	return read_word_generic(ADDRESS_SPACE_IO, address, mask);
 }
 
 UINT16 io_read_word_16be(offs_t address)
 {
-	return read_word_masked_generic(ADDRESS_SPACE_IO, address, 0xffff);
+	return read_word_generic(ADDRESS_SPACE_IO, address, 0xffff);
 }
 
 UINT16 io_read_word_masked_16be(offs_t address, UINT16 mask)
 {
-	return read_word_masked_generic(ADDRESS_SPACE_IO, address, mask);
+	return read_word_generic(ADDRESS_SPACE_IO, address, mask);
 }
 
 UINT32 io_read_dword_16le(offs_t address)
@@ -4310,72 +4566,39 @@ UINT64 io_read_qword_masked_16be(offs_t address, UINT64 mask)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    write_word_masked_generic - write a masked
-    word to an arbitrary address space
--------------------------------------------------*/
-
-INLINE void write_word_masked_generic(UINT8 spacenum, offs_t address, UINT16 data, UINT16 mem_mask)
-{
-	const address_space *space = &active_address_space[spacenum];
-	const handler_data *handler;
-	offs_t offset;
-	UINT32 entry;
-
-	profiler_mark(PROFILER_MEMWRITE);
-
-	address &= space->bytemask;
-	entry = lookup_write_entry(space, address);
-	handler = &space->writehandlers[entry];
-
-	DEBUG_HOOK_WRITE(spacenum, address & ~1, data, mem_mask);
-
-	offset = (address - handler->bytestart) & handler->bytemask;
-	if (entry < STATIC_RAM)
-	{
-		UINT16 *dest = (UINT16 *)&bank_ptr[entry][offset & ~1];
-		*dest = (*dest & ~mem_mask) | (data & mem_mask);
-	}
-	else
-		(*handler->handler.write.mhandler16)(handler->object, offset >> 1, data, mem_mask);
-
-	profiler_mark(PROFILER_END);
-}
-
-
-/*-------------------------------------------------
     ADDRESS_SPACE_PROGRAM
 -------------------------------------------------*/
 
 void program_write_byte_16le(offs_t address, UINT8 data)
 {
 	UINT32 shift = (address & 1) * 8;
-	write_word_masked_generic(ADDRESS_SPACE_PROGRAM, address, data << shift, 0xff << shift);
+	write_word_generic(ADDRESS_SPACE_PROGRAM, address, data << shift, 0xff << shift);
 }
 
 void program_write_byte_16be(offs_t address, UINT8 data)
 {
 	UINT32 shift = (~address & 1) * 8;
-	write_word_masked_generic(ADDRESS_SPACE_PROGRAM, address, data << shift, 0xff << shift);
+	write_word_generic(ADDRESS_SPACE_PROGRAM, address, data << shift, 0xff << shift);
 }
 
 void program_write_word_16le(offs_t address, UINT16 data)
 {
-	write_word_masked_generic(ADDRESS_SPACE_PROGRAM, address, data, 0xffff);
+	write_word_generic(ADDRESS_SPACE_PROGRAM, address, data, 0xffff);
 }
 
 void program_write_word_masked_16le(offs_t address, UINT16 data, UINT16 mask)
 {
-	write_word_masked_generic(ADDRESS_SPACE_PROGRAM, address, data, mask);
+	write_word_generic(ADDRESS_SPACE_PROGRAM, address, data, mask);
 }
 
 void program_write_word_16be(offs_t address, UINT16 data)
 {
-	write_word_masked_generic(ADDRESS_SPACE_PROGRAM, address, data, 0xffff);
+	write_word_generic(ADDRESS_SPACE_PROGRAM, address, data, 0xffff);
 }
 
 void program_write_word_masked_16be(offs_t address, UINT16 data, UINT16 mask)
 {
-	write_word_masked_generic(ADDRESS_SPACE_PROGRAM, address, data, mask);
+	write_word_generic(ADDRESS_SPACE_PROGRAM, address, data, mask);
 }
 
 void program_write_dword_16le(offs_t address, UINT32 data)
@@ -4434,33 +4657,33 @@ void program_write_qword_masked_16be(offs_t address, UINT64 data, UINT64 mask)
 void data_write_byte_16le(offs_t address, UINT8 data)
 {
 	UINT32 shift = (address & 1) * 8;
-	write_word_masked_generic(ADDRESS_SPACE_DATA, address, data << shift, 0xff << shift);
+	write_word_generic(ADDRESS_SPACE_DATA, address, data << shift, 0xff << shift);
 }
 
 void data_write_byte_16be(offs_t address, UINT8 data)
 {
 	UINT32 shift = (~address & 1) * 8;
-	write_word_masked_generic(ADDRESS_SPACE_DATA, address, data << shift, 0xff << shift);
+	write_word_generic(ADDRESS_SPACE_DATA, address, data << shift, 0xff << shift);
 }
 
 void data_write_word_16le(offs_t address, UINT16 data)
 {
-	write_word_masked_generic(ADDRESS_SPACE_DATA, address, data, 0xffff);
+	write_word_generic(ADDRESS_SPACE_DATA, address, data, 0xffff);
 }
 
 void data_write_word_masked_16le(offs_t address, UINT16 data, UINT16 mask)
 {
-	write_word_masked_generic(ADDRESS_SPACE_DATA, address, data, mask);
+	write_word_generic(ADDRESS_SPACE_DATA, address, data, mask);
 }
 
 void data_write_word_16be(offs_t address, UINT16 data)
 {
-	write_word_masked_generic(ADDRESS_SPACE_DATA, address, data, 0xffff);
+	write_word_generic(ADDRESS_SPACE_DATA, address, data, 0xffff);
 }
 
 void data_write_word_masked_16be(offs_t address, UINT16 data, UINT16 mask)
 {
-	write_word_masked_generic(ADDRESS_SPACE_DATA, address, data, mask);
+	write_word_generic(ADDRESS_SPACE_DATA, address, data, mask);
 }
 
 void data_write_dword_16le(offs_t address, UINT32 data)
@@ -4519,33 +4742,33 @@ void data_write_qword_masked_16be(offs_t address, UINT64 data, UINT64 mask)
 void io_write_byte_16le(offs_t address, UINT8 data)
 {
 	UINT32 shift = (address & 1) * 8;
-	write_word_masked_generic(ADDRESS_SPACE_IO, address, data << shift, 0xff << shift);
+	write_word_generic(ADDRESS_SPACE_IO, address, data << shift, 0xff << shift);
 }
 
 void io_write_byte_16be(offs_t address, UINT8 data)
 {
 	UINT32 shift = (~address & 1) * 8;
-	write_word_masked_generic(ADDRESS_SPACE_IO, address, data << shift, 0xff << shift);
+	write_word_generic(ADDRESS_SPACE_IO, address, data << shift, 0xff << shift);
 }
 
 void io_write_word_16le(offs_t address, UINT16 data)
 {
-	write_word_masked_generic(ADDRESS_SPACE_IO, address, data, 0xffff);
+	write_word_generic(ADDRESS_SPACE_IO, address, data, 0xffff);
 }
 
 void io_write_word_masked_16le(offs_t address, UINT16 data, UINT16 mask)
 {
-	write_word_masked_generic(ADDRESS_SPACE_IO, address, data, mask);
+	write_word_generic(ADDRESS_SPACE_IO, address, data, mask);
 }
 
 void io_write_word_16be(offs_t address, UINT16 data)
 {
-	write_word_masked_generic(ADDRESS_SPACE_IO, address, data, 0xffff);
+	write_word_generic(ADDRESS_SPACE_IO, address, data, 0xffff);
 }
 
 void io_write_word_masked_16be(offs_t address, UINT16 data, UINT16 mask)
 {
-	write_word_masked_generic(ADDRESS_SPACE_IO, address, data, mask);
+	write_word_generic(ADDRESS_SPACE_IO, address, data, mask);
 }
 
 void io_write_dword_16le(offs_t address, UINT32 data)
@@ -4603,96 +4826,63 @@ void io_write_qword_masked_16be(offs_t address, UINT64 data, UINT64 mask)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    read_dword_masked_generic - read a dword from
-    an arbitrary address space
--------------------------------------------------*/
-
-INLINE UINT32 read_dword_masked_generic(UINT8 spacenum, offs_t address, UINT32 mem_mask)
-{
-	const address_space *space = &active_address_space[spacenum];
-	const handler_data *handler;
-	offs_t offset;
-	UINT32 entry;
-	UINT32 result;
-
-	profiler_mark(PROFILER_MEMREAD);
-
-	address &= space->bytemask;
-	entry = lookup_read_entry(space, address);
-	handler = &space->readhandlers[entry];
-
-	DEBUG_HOOK_READ(spacenum, address & ~3, mem_mask);
-
-	offset = (address - handler->bytestart) & handler->bytemask;
-	if (entry < STATIC_RAM)
-		result = *(UINT32 *)&bank_ptr[entry][offset & ~3];
-	else
-		result = (*handler->handler.read.mhandler32)(handler->object, offset >> 2, mem_mask);
-
-	profiler_mark(PROFILER_END);
-
-	return result;
-}
-
-
-/*-------------------------------------------------
     ADDRESS_SPACE_PROGRAM
 -------------------------------------------------*/
 
 UINT8 program_read_byte_32le(offs_t address)
 {
 	UINT32 shift = (address & 3) * 8;
-	return read_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, 0xff << shift) >> shift;
+	return read_dword_generic(ADDRESS_SPACE_PROGRAM, address, 0xff << shift) >> shift;
 }
 
 UINT8 program_read_byte_32be(offs_t address)
 {
 	UINT32 shift = (~address & 3) * 8;
-	return read_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, 0xff << shift) >> shift;
+	return read_dword_generic(ADDRESS_SPACE_PROGRAM, address, 0xff << shift) >> shift;
 }
 
 UINT16 program_read_word_32le(offs_t address)
 {
 	UINT32 shift = (address & 2) * 8;
-	return read_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, 0xffff << shift) >> shift;
+	return read_dword_generic(ADDRESS_SPACE_PROGRAM, address, 0xffff << shift) >> shift;
 }
 
 UINT16 program_read_word_masked_32le(offs_t address, UINT16 mask)
 {
 	UINT32 shift = (address & 2) * 8;
-	return read_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, mask << shift) >> shift;
+	return read_dword_generic(ADDRESS_SPACE_PROGRAM, address, mask << shift) >> shift;
 }
 
 UINT16 program_read_word_32be(offs_t address)
 {
 	UINT32 shift = (~address & 2) * 8;
-	return read_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, 0xffff << shift) >> shift;
+	return read_dword_generic(ADDRESS_SPACE_PROGRAM, address, 0xffff << shift) >> shift;
 }
 
 UINT16 program_read_word_masked_32be(offs_t address, UINT16 mask)
 {
 	UINT32 shift = (~address & 2) * 8;
-	return read_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, mask << shift) >> shift;
+	return read_dword_generic(ADDRESS_SPACE_PROGRAM, address, mask << shift) >> shift;
 }
 
 UINT32 program_read_dword_32le(offs_t address)
 {
-	return read_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, 0xffffffff);
+	return read_dword_generic(ADDRESS_SPACE_PROGRAM, address, 0xffffffff);
 }
 
 UINT32 program_read_dword_masked_32le(offs_t address, UINT32 mask)
 {
-	return read_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, mask);
+	return read_dword_generic(ADDRESS_SPACE_PROGRAM, address, mask);
 }
 
 UINT32 program_read_dword_32be(offs_t address)
 {
-	return read_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, 0xffffffff);
+	return read_dword_generic(ADDRESS_SPACE_PROGRAM, address, 0xffffffff);
 }
 
 UINT32 program_read_dword_masked_32be(offs_t address, UINT32 mask)
 {
-	return read_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, mask);
+	return read_dword_generic(ADDRESS_SPACE_PROGRAM, address, mask);
 }
 
 UINT64 program_read_qword_32le(offs_t address)
@@ -4731,57 +4921,57 @@ UINT64 program_read_qword_masked_32be(offs_t address, UINT64 mask)
 UINT8 data_read_byte_32le(offs_t address)
 {
 	UINT32 shift = (address & 3) * 8;
-	return read_dword_masked_generic(ADDRESS_SPACE_DATA, address, 0xff << shift) >> shift;
+	return read_dword_generic(ADDRESS_SPACE_DATA, address, 0xff << shift) >> shift;
 }
 
 UINT8 data_read_byte_32be(offs_t address)
 {
 	UINT32 shift = (~address & 3) * 8;
-	return read_dword_masked_generic(ADDRESS_SPACE_DATA, address, 0xff << shift) >> shift;
+	return read_dword_generic(ADDRESS_SPACE_DATA, address, 0xff << shift) >> shift;
 }
 
 UINT16 data_read_word_32le(offs_t address)
 {
 	UINT32 shift = (address & 2) * 8;
-	return read_dword_masked_generic(ADDRESS_SPACE_DATA, address, 0xffff << shift) >> shift;
+	return read_dword_generic(ADDRESS_SPACE_DATA, address, 0xffff << shift) >> shift;
 }
 
 UINT16 data_read_word_masked_32le(offs_t address, UINT16 mask)
 {
 	UINT32 shift = (address & 2) * 8;
-	return read_dword_masked_generic(ADDRESS_SPACE_DATA, address, mask << shift) >> shift;
+	return read_dword_generic(ADDRESS_SPACE_DATA, address, mask << shift) >> shift;
 }
 
 UINT16 data_read_word_32be(offs_t address)
 {
 	UINT32 shift = (~address & 2) * 8;
-	return read_dword_masked_generic(ADDRESS_SPACE_DATA, address, 0xffff << shift) >> shift;
+	return read_dword_generic(ADDRESS_SPACE_DATA, address, 0xffff << shift) >> shift;
 }
 
 UINT16 data_read_word_masked_32be(offs_t address, UINT16 mask)
 {
 	UINT32 shift = (~address & 2) * 8;
-	return read_dword_masked_generic(ADDRESS_SPACE_DATA, address, mask << shift) >> shift;
+	return read_dword_generic(ADDRESS_SPACE_DATA, address, mask << shift) >> shift;
 }
 
 UINT32 data_read_dword_32le(offs_t address)
 {
-	return read_dword_masked_generic(ADDRESS_SPACE_DATA, address, 0xffffffff);
+	return read_dword_generic(ADDRESS_SPACE_DATA, address, 0xffffffff);
 }
 
 UINT32 data_read_dword_masked_32le(offs_t address, UINT32 mask)
 {
-	return read_dword_masked_generic(ADDRESS_SPACE_DATA, address, mask);
+	return read_dword_generic(ADDRESS_SPACE_DATA, address, mask);
 }
 
 UINT32 data_read_dword_32be(offs_t address)
 {
-	return read_dword_masked_generic(ADDRESS_SPACE_DATA, address, 0xffffffff);
+	return read_dword_generic(ADDRESS_SPACE_DATA, address, 0xffffffff);
 }
 
 UINT32 data_read_dword_masked_32be(offs_t address, UINT32 mask)
 {
-	return read_dword_masked_generic(ADDRESS_SPACE_DATA, address, mask);
+	return read_dword_generic(ADDRESS_SPACE_DATA, address, mask);
 }
 
 UINT64 data_read_qword_32le(offs_t address)
@@ -4820,57 +5010,57 @@ UINT64 data_read_qword_masked_32be(offs_t address, UINT64 mask)
 UINT8 io_read_byte_32le(offs_t address)
 {
 	UINT32 shift = (address & 3) * 8;
-	return read_dword_masked_generic(ADDRESS_SPACE_IO, address, 0xff << shift) >> shift;
+	return read_dword_generic(ADDRESS_SPACE_IO, address, 0xff << shift) >> shift;
 }
 
 UINT8 io_read_byte_32be(offs_t address)
 {
 	UINT32 shift = (~address & 3) * 8;
-	return read_dword_masked_generic(ADDRESS_SPACE_IO, address, 0xff << shift) >> shift;
+	return read_dword_generic(ADDRESS_SPACE_IO, address, 0xff << shift) >> shift;
 }
 
 UINT16 io_read_word_32le(offs_t address)
 {
 	UINT32 shift = (address & 2) * 8;
-	return read_dword_masked_generic(ADDRESS_SPACE_IO, address, 0xffff << shift) >> shift;
+	return read_dword_generic(ADDRESS_SPACE_IO, address, 0xffff << shift) >> shift;
 }
 
 UINT16 io_read_word_masked_32le(offs_t address, UINT16 mask)
 {
 	UINT32 shift = (address & 2) * 8;
-	return read_dword_masked_generic(ADDRESS_SPACE_IO, address, mask << shift) >> shift;
+	return read_dword_generic(ADDRESS_SPACE_IO, address, mask << shift) >> shift;
 }
 
 UINT16 io_read_word_32be(offs_t address)
 {
 	UINT32 shift = (~address & 2) * 8;
-	return read_dword_masked_generic(ADDRESS_SPACE_IO, address, 0xffff << shift) >> shift;
+	return read_dword_generic(ADDRESS_SPACE_IO, address, 0xffff << shift) >> shift;
 }
 
 UINT16 io_read_word_masked_32be(offs_t address, UINT16 mask)
 {
 	UINT32 shift = (~address & 2) * 8;
-	return read_dword_masked_generic(ADDRESS_SPACE_IO, address, mask << shift) >> shift;
+	return read_dword_generic(ADDRESS_SPACE_IO, address, mask << shift) >> shift;
 }
 
 UINT32 io_read_dword_32le(offs_t address)
 {
-	return read_dword_masked_generic(ADDRESS_SPACE_IO, address, 0xffffffff);
+	return read_dword_generic(ADDRESS_SPACE_IO, address, 0xffffffff);
 }
 
 UINT32 io_read_dword_masked_32le(offs_t address, UINT32 mask)
 {
-	return read_dword_masked_generic(ADDRESS_SPACE_IO, address, mask);
+	return read_dword_generic(ADDRESS_SPACE_IO, address, mask);
 }
 
 UINT32 io_read_dword_32be(offs_t address)
 {
-	return read_dword_masked_generic(ADDRESS_SPACE_IO, address, 0xffffffff);
+	return read_dword_generic(ADDRESS_SPACE_IO, address, 0xffffffff);
 }
 
 UINT32 io_read_dword_masked_32be(offs_t address, UINT32 mask)
 {
-	return read_dword_masked_generic(ADDRESS_SPACE_IO, address, mask);
+	return read_dword_generic(ADDRESS_SPACE_IO, address, mask);
 }
 
 UINT64 io_read_qword_32le(offs_t address)
@@ -4908,96 +5098,63 @@ UINT64 io_read_qword_masked_32be(offs_t address, UINT64 mask)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    write_dword_masked_generic - write a masked
-    dword to an arbitrary address space
--------------------------------------------------*/
-
-INLINE void write_dword_masked_generic(UINT8 spacenum, offs_t address, UINT32 data, UINT32 mem_mask)
-{
-	const address_space *space = &active_address_space[spacenum];
-	const handler_data *handler;
-	offs_t offset;
-	UINT32 entry;
-
-	profiler_mark(PROFILER_MEMWRITE);
-
-	address &= space->bytemask;
-	entry = lookup_write_entry(space, address);
-	handler = &space->writehandlers[entry];
-
-	DEBUG_HOOK_WRITE(spacenum, address & ~3, data, mem_mask);
-
-	offset = (address - handler->bytestart) & handler->bytemask;
-	if (entry < STATIC_RAM)
-	{
-		UINT32 *dest = (UINT32 *)&bank_ptr[entry][offset & ~3];
-		*dest = (*dest & ~mem_mask) | (data & mem_mask);
-	}
-	else
-		(*handler->handler.write.mhandler32)(handler->object, offset >> 2, data, mem_mask);
-
-	profiler_mark(PROFILER_END);
-}
-
-
-/*-------------------------------------------------
     ADDRESS_SPACE_PROGRAM
 -------------------------------------------------*/
 
 void program_write_byte_32le(offs_t address, UINT8 data)
 {
 	UINT32 shift = (address & 3) * 8;
-	write_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, data << shift, 0xff << shift);
+	write_dword_generic(ADDRESS_SPACE_PROGRAM, address, data << shift, 0xff << shift);
 }
 
 void program_write_byte_32be(offs_t address, UINT8 data)
 {
 	UINT32 shift = (~address & 3) * 8;
-	write_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, data << shift, 0xff << shift);
+	write_dword_generic(ADDRESS_SPACE_PROGRAM, address, data << shift, 0xff << shift);
 }
 
 void program_write_word_32le(offs_t address, UINT16 data)
 {
 	UINT32 shift = (address & 2) * 8;
-	write_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, data << shift, 0xffff << shift);
+	write_dword_generic(ADDRESS_SPACE_PROGRAM, address, data << shift, 0xffff << shift);
 }
 
 void program_write_word_masked_32le(offs_t address, UINT16 data, UINT16 mask)
 {
 	UINT32 shift = (address & 2) * 8;
-	write_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, data << shift, mask << shift);
+	write_dword_generic(ADDRESS_SPACE_PROGRAM, address, data << shift, mask << shift);
 }
 
 void program_write_word_32be(offs_t address, UINT16 data)
 {
 	UINT32 shift = (~address & 2) * 8;
-	write_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, data << shift, 0xffff << shift);
+	write_dword_generic(ADDRESS_SPACE_PROGRAM, address, data << shift, 0xffff << shift);
 }
 
 void program_write_word_masked_32be(offs_t address, UINT16 data, UINT16 mask)
 {
 	UINT32 shift = (~address & 2) * 8;
-	write_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, data << shift, mask << shift);
+	write_dword_generic(ADDRESS_SPACE_PROGRAM, address, data << shift, mask << shift);
 }
 
 void program_write_dword_32le(offs_t address, UINT32 data)
 {
-	write_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, data, 0xffffffff);
+	write_dword_generic(ADDRESS_SPACE_PROGRAM, address, data, 0xffffffff);
 }
 
 void program_write_dword_masked_32le(offs_t address, UINT32 data, UINT32 mask)
 {
-	write_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, data, mask);
+	write_dword_generic(ADDRESS_SPACE_PROGRAM, address, data, mask);
 }
 
 void program_write_dword_32be(offs_t address, UINT32 data)
 {
-	write_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, data, 0xffffffff);
+	write_dword_generic(ADDRESS_SPACE_PROGRAM, address, data, 0xffffffff);
 }
 
 void program_write_dword_masked_32be(offs_t address, UINT32 data, UINT32 mask)
 {
-	write_dword_masked_generic(ADDRESS_SPACE_PROGRAM, address, data, mask);
+	write_dword_generic(ADDRESS_SPACE_PROGRAM, address, data, mask);
 }
 
 void program_write_qword_32le(offs_t address, UINT64 data)
@@ -5032,57 +5189,57 @@ void program_write_qword_masked_32be(offs_t address, UINT64 data, UINT64 mask)
 void data_write_byte_32le(offs_t address, UINT8 data)
 {
 	UINT32 shift = (address & 3) * 8;
-	write_dword_masked_generic(ADDRESS_SPACE_DATA, address, data << shift, 0xff << shift);
+	write_dword_generic(ADDRESS_SPACE_DATA, address, data << shift, 0xff << shift);
 }
 
 void data_write_byte_32be(offs_t address, UINT8 data)
 {
 	UINT32 shift = (~address & 3) * 8;
-	write_dword_masked_generic(ADDRESS_SPACE_DATA, address, data << shift, 0xff << shift);
+	write_dword_generic(ADDRESS_SPACE_DATA, address, data << shift, 0xff << shift);
 }
 
 void data_write_word_32le(offs_t address, UINT16 data)
 {
 	UINT32 shift = (address & 2) * 8;
-	write_dword_masked_generic(ADDRESS_SPACE_DATA, address, data << shift, 0xffff << shift);
+	write_dword_generic(ADDRESS_SPACE_DATA, address, data << shift, 0xffff << shift);
 }
 
 void data_write_word_masked_32le(offs_t address, UINT16 data, UINT16 mask)
 {
 	UINT32 shift = (address & 2) * 8;
-	write_dword_masked_generic(ADDRESS_SPACE_DATA, address, data << shift, mask << shift);
+	write_dword_generic(ADDRESS_SPACE_DATA, address, data << shift, mask << shift);
 }
 
 void data_write_word_32be(offs_t address, UINT16 data)
 {
 	UINT32 shift = (~address & 2) * 8;
-	write_dword_masked_generic(ADDRESS_SPACE_DATA, address, data << shift, 0xffff << shift);
+	write_dword_generic(ADDRESS_SPACE_DATA, address, data << shift, 0xffff << shift);
 }
 
 void data_write_word_masked_32be(offs_t address, UINT16 data, UINT16 mask)
 {
 	UINT32 shift = (~address & 2) * 8;
-	write_dword_masked_generic(ADDRESS_SPACE_DATA, address, data << shift, mask << shift);
+	write_dword_generic(ADDRESS_SPACE_DATA, address, data << shift, mask << shift);
 }
 
 void data_write_dword_32le(offs_t address, UINT32 data)
 {
-	write_dword_masked_generic(ADDRESS_SPACE_DATA, address, data, 0xffffffff);
+	write_dword_generic(ADDRESS_SPACE_DATA, address, data, 0xffffffff);
 }
 
 void data_write_dword_masked_32le(offs_t address, UINT32 data, UINT32 mask)
 {
-	write_dword_masked_generic(ADDRESS_SPACE_DATA, address, data, mask);
+	write_dword_generic(ADDRESS_SPACE_DATA, address, data, mask);
 }
 
 void data_write_dword_32be(offs_t address, UINT32 data)
 {
-	write_dword_masked_generic(ADDRESS_SPACE_DATA, address, data, 0xffffffff);
+	write_dword_generic(ADDRESS_SPACE_DATA, address, data, 0xffffffff);
 }
 
 void data_write_dword_masked_32be(offs_t address, UINT32 data, UINT32 mask)
 {
-	write_dword_masked_generic(ADDRESS_SPACE_DATA, address, data, mask);
+	write_dword_generic(ADDRESS_SPACE_DATA, address, data, mask);
 }
 
 void data_write_qword_32le(offs_t address, UINT64 data)
@@ -5117,57 +5274,57 @@ void data_write_qword_masked_32be(offs_t address, UINT64 data, UINT64 mask)
 void io_write_byte_32le(offs_t address, UINT8 data)
 {
 	UINT32 shift = (address & 3) * 8;
-	write_dword_masked_generic(ADDRESS_SPACE_IO, address, data << shift, 0xff << shift);
+	write_dword_generic(ADDRESS_SPACE_IO, address, data << shift, 0xff << shift);
 }
 
 void io_write_byte_32be(offs_t address, UINT8 data)
 {
 	UINT32 shift = (~address & 3) * 8;
-	write_dword_masked_generic(ADDRESS_SPACE_IO, address, data << shift, 0xff << shift);
+	write_dword_generic(ADDRESS_SPACE_IO, address, data << shift, 0xff << shift);
 }
 
 void io_write_word_32le(offs_t address, UINT16 data)
 {
 	UINT32 shift = (address & 2) * 8;
-	write_dword_masked_generic(ADDRESS_SPACE_IO, address, data << shift, 0xffff << shift);
+	write_dword_generic(ADDRESS_SPACE_IO, address, data << shift, 0xffff << shift);
 }
 
 void io_write_word_masked_32le(offs_t address, UINT16 data, UINT16 mask)
 {
 	UINT32 shift = (address & 2) * 8;
-	write_dword_masked_generic(ADDRESS_SPACE_IO, address, data << shift, mask << shift);
+	write_dword_generic(ADDRESS_SPACE_IO, address, data << shift, mask << shift);
 }
 
 void io_write_word_32be(offs_t address, UINT16 data)
 {
 	UINT32 shift = (~address & 2) * 8;
-	write_dword_masked_generic(ADDRESS_SPACE_IO, address, data << shift, 0xffff << shift);
+	write_dword_generic(ADDRESS_SPACE_IO, address, data << shift, 0xffff << shift);
 }
 
 void io_write_word_masked_32be(offs_t address, UINT16 data, UINT16 mask)
 {
 	UINT32 shift = (~address & 2) * 8;
-	write_dword_masked_generic(ADDRESS_SPACE_IO, address, data << shift, mask << shift);
+	write_dword_generic(ADDRESS_SPACE_IO, address, data << shift, mask << shift);
 }
 
 void io_write_dword_32le(offs_t address, UINT32 data)
 {
-	write_dword_masked_generic(ADDRESS_SPACE_IO, address, data, 0xffffffff);
+	write_dword_generic(ADDRESS_SPACE_IO, address, data, 0xffffffff);
 }
 
 void io_write_dword_masked_32le(offs_t address, UINT32 data, UINT32 mask)
 {
-	write_dword_masked_generic(ADDRESS_SPACE_IO, address, data, mask);
+	write_dword_generic(ADDRESS_SPACE_IO, address, data, mask);
 }
 
 void io_write_dword_32be(offs_t address, UINT32 data)
 {
-	write_dword_masked_generic(ADDRESS_SPACE_IO, address, data, 0xffffffff);
+	write_dword_generic(ADDRESS_SPACE_IO, address, data, 0xffffffff);
 }
 
 void io_write_dword_masked_32be(offs_t address, UINT32 data, UINT32 mask)
 {
-	write_dword_masked_generic(ADDRESS_SPACE_IO, address, data, mask);
+	write_dword_generic(ADDRESS_SPACE_IO, address, data, mask);
 }
 
 void io_write_qword_32le(offs_t address, UINT64 data)
@@ -5201,120 +5358,87 @@ void io_write_qword_masked_32be(offs_t address, UINT64 data, UINT64 mask)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    read_qword_masked_generic - read a qword from
-    an arbitrary address space
--------------------------------------------------*/
-
-INLINE UINT64 read_qword_masked_generic(UINT8 spacenum, offs_t address, UINT64 mem_mask)
-{
-	const address_space *space = &active_address_space[spacenum];
-	const handler_data *handler;
-	offs_t offset;
-	UINT32 entry;
-	UINT64 result;
-
-	profiler_mark(PROFILER_MEMREAD);
-
-	address &= space->bytemask;
-	entry = lookup_read_entry(space, address);
-	handler = &space->readhandlers[entry];
-
-	DEBUG_HOOK_READ(spacenum, address & ~7, mem_mask);
-
-	offset = (address - handler->bytestart) & handler->bytemask;
-	if (entry < STATIC_RAM)
-		result = *(UINT64 *)&bank_ptr[entry][offset & ~7];
-	else
-		result = (*handler->handler.read.mhandler64)(handler->object, offset >> 3, mem_mask);
-
-	profiler_mark(PROFILER_END);
-
-	return result;
-}
-
-
-/*-------------------------------------------------
     ADDRESS_SPACE_PROGRAM
 -------------------------------------------------*/
 
 UINT8 program_read_byte_64le(offs_t address)
 {
 	UINT32 shift = (address & 7) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)0xff << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)0xff << shift) >> shift;
 }
 
 UINT8 program_read_byte_64be(offs_t address)
 {
 	UINT32 shift = (~address & 7) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)0xff << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)0xff << shift) >> shift;
 }
 
 UINT16 program_read_word_64le(offs_t address)
 {
 	UINT32 shift = (address & 6) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)0xffff << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)0xffff << shift) >> shift;
 }
 
 UINT16 program_read_word_masked_64le(offs_t address, UINT16 mask)
 {
 	UINT32 shift = (address & 6) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)mask << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)mask << shift) >> shift;
 }
 
 UINT16 program_read_word_64be(offs_t address)
 {
 	UINT32 shift = (~address & 6) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)0xffff << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)0xffff << shift) >> shift;
 }
 
 UINT16 program_read_word_masked_64be(offs_t address, UINT16 mask)
 {
 	UINT32 shift = (~address & 6) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)mask << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)mask << shift) >> shift;
 }
 
 UINT32 program_read_dword_64le(offs_t address)
 {
 	UINT32 shift = (address & 4) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)0xffffffff << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)0xffffffff << shift) >> shift;
 }
 
 UINT32 program_read_dword_masked_64le(offs_t address, UINT32 mask)
 {
 	UINT32 shift = (address & 4) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)mask << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)mask << shift) >> shift;
 }
 
 UINT32 program_read_dword_64be(offs_t address)
 {
 	UINT32 shift = (~address & 4) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)0xffffffff << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)0xffffffff << shift) >> shift;
 }
 
 UINT32 program_read_dword_masked_64be(offs_t address, UINT32 mask)
 {
 	UINT32 shift = (~address & 4) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)mask << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)mask << shift) >> shift;
 }
 
 UINT64 program_read_qword_64le(offs_t address)
 {
-	return read_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, U64(0xffffffffffffffff));
+	return read_qword_generic(ADDRESS_SPACE_PROGRAM, address, U64(0xffffffffffffffff));
 }
 
 UINT64 program_read_qword_masked_64le(offs_t address, UINT64 mask)
 {
-	return read_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, mask);
+	return read_qword_generic(ADDRESS_SPACE_PROGRAM, address, mask);
 }
 
 UINT64 program_read_qword_64be(offs_t address)
 {
-	return read_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, U64(0xffffffffffffffff));
+	return read_qword_generic(ADDRESS_SPACE_PROGRAM, address, U64(0xffffffffffffffff));
 }
 
 UINT64 program_read_qword_masked_64be(offs_t address, UINT64 mask)
 {
-	return read_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, mask);
+	return read_qword_generic(ADDRESS_SPACE_PROGRAM, address, mask);
 }
 
 
@@ -5325,81 +5449,81 @@ UINT64 program_read_qword_masked_64be(offs_t address, UINT64 mask)
 UINT8 data_read_byte_64le(offs_t address)
 {
 	UINT32 shift = (address & 7) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)0xff << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)0xff << shift) >> shift;
 }
 
 UINT8 data_read_byte_64be(offs_t address)
 {
 	UINT32 shift = (~address & 7) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)0xff << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)0xff << shift) >> shift;
 }
 
 UINT16 data_read_word_64le(offs_t address)
 {
 	UINT32 shift = (address & 6) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)0xffff << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)0xffff << shift) >> shift;
 }
 
 UINT16 data_read_word_masked_64le(offs_t address, UINT16 mask)
 {
 	UINT32 shift = (address & 6) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)mask << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)mask << shift) >> shift;
 }
 
 UINT16 data_read_word_64be(offs_t address)
 {
 	UINT32 shift = (~address & 6) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)0xffff << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)0xffff << shift) >> shift;
 }
 
 UINT16 data_read_word_masked_64be(offs_t address, UINT16 mask)
 {
 	UINT32 shift = (~address & 6) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)mask << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)mask << shift) >> shift;
 }
 
 UINT32 data_read_dword_64le(offs_t address)
 {
 	UINT32 shift = (address & 4) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)0xffffffff << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)0xffffffff << shift) >> shift;
 }
 
 UINT32 data_read_dword_masked_64le(offs_t address, UINT32 mask)
 {
 	UINT32 shift = (address & 4) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)mask << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)mask << shift) >> shift;
 }
 
 UINT32 data_read_dword_64be(offs_t address)
 {
 	UINT32 shift = (~address & 4) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)0xffffffff << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)0xffffffff << shift) >> shift;
 }
 
 UINT32 data_read_dword_masked_64be(offs_t address, UINT32 mask)
 {
 	UINT32 shift = (~address & 4) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)mask << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)mask << shift) >> shift;
 }
 
 UINT64 data_read_qword_64le(offs_t address)
 {
-	return read_qword_masked_generic(ADDRESS_SPACE_DATA, address, U64(0xffffffffffffffff));
+	return read_qword_generic(ADDRESS_SPACE_DATA, address, U64(0xffffffffffffffff));
 }
 
 UINT64 data_read_qword_masked_64le(offs_t address, UINT64 mask)
 {
-	return read_qword_masked_generic(ADDRESS_SPACE_DATA, address, mask);
+	return read_qword_generic(ADDRESS_SPACE_DATA, address, mask);
 }
 
 UINT64 data_read_qword_64be(offs_t address)
 {
-	return read_qword_masked_generic(ADDRESS_SPACE_DATA, address, U64(0xffffffffffffffff));
+	return read_qword_generic(ADDRESS_SPACE_DATA, address, U64(0xffffffffffffffff));
 }
 
 UINT64 data_read_qword_masked_64be(offs_t address, UINT64 mask)
 {
-	return read_qword_masked_generic(ADDRESS_SPACE_DATA, address, mask);
+	return read_qword_generic(ADDRESS_SPACE_DATA, address, mask);
 }
 
 
@@ -5410,81 +5534,81 @@ UINT64 data_read_qword_masked_64be(offs_t address, UINT64 mask)
 UINT8 io_read_byte_64le(offs_t address)
 {
 	UINT32 shift = (address & 7) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)0xff << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)0xff << shift) >> shift;
 }
 
 UINT8 io_read_byte_64be(offs_t address)
 {
 	UINT32 shift = (~address & 7) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)0xff << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)0xff << shift) >> shift;
 }
 
 UINT16 io_read_word_64le(offs_t address)
 {
 	UINT32 shift = (address & 6) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)0xffff << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)0xffff << shift) >> shift;
 }
 
 UINT16 io_read_word_masked_64le(offs_t address, UINT16 mask)
 {
 	UINT32 shift = (address & 6) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)mask << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)mask << shift) >> shift;
 }
 
 UINT16 io_read_word_64be(offs_t address)
 {
 	UINT32 shift = (~address & 6) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)0xffff << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)0xffff << shift) >> shift;
 }
 
 UINT16 io_read_word_masked_64be(offs_t address, UINT16 mask)
 {
 	UINT32 shift = (~address & 6) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)mask << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)mask << shift) >> shift;
 }
 
 UINT32 io_read_dword_64le(offs_t address)
 {
 	UINT32 shift = (address & 4) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)0xffffffff << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)0xffffffff << shift) >> shift;
 }
 
 UINT32 io_read_dword_masked_64le(offs_t address, UINT32 mask)
 {
 	UINT32 shift = (address & 4) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)mask << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)mask << shift) >> shift;
 }
 
 UINT32 io_read_dword_64be(offs_t address)
 {
 	UINT32 shift = (~address & 4) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)0xffffffff << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)0xffffffff << shift) >> shift;
 }
 
 UINT32 io_read_dword_masked_64be(offs_t address, UINT32 mask)
 {
 	UINT32 shift = (~address & 4) * 8;
-	return read_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)mask << shift) >> shift;
+	return read_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)mask << shift) >> shift;
 }
 
 UINT64 io_read_qword_64le(offs_t address)
 {
-	return read_qword_masked_generic(ADDRESS_SPACE_IO, address, U64(0xffffffffffffffff));
+	return read_qword_generic(ADDRESS_SPACE_IO, address, U64(0xffffffffffffffff));
 }
 
 UINT64 io_read_qword_masked_64le(offs_t address, UINT64 mask)
 {
-	return read_qword_masked_generic(ADDRESS_SPACE_IO, address, mask);
+	return read_qword_generic(ADDRESS_SPACE_IO, address, mask);
 }
 
 UINT64 io_read_qword_64be(offs_t address)
 {
-	return read_qword_masked_generic(ADDRESS_SPACE_IO, address, U64(0xffffffffffffffff));
+	return read_qword_generic(ADDRESS_SPACE_IO, address, U64(0xffffffffffffffff));
 }
 
 UINT64 io_read_qword_masked_64be(offs_t address, UINT64 mask)
 {
-	return read_qword_masked_generic(ADDRESS_SPACE_IO, address, mask);
+	return read_qword_generic(ADDRESS_SPACE_IO, address, mask);
 }
 
 
@@ -5494,120 +5618,87 @@ UINT64 io_read_qword_masked_64be(offs_t address, UINT64 mask)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    write_qword_masked_generic - write a masked
-    dword to an arbitrary address space
--------------------------------------------------*/
-
-INLINE void write_qword_masked_generic(UINT8 spacenum, offs_t address, UINT64 data, UINT64 mem_mask)
-{
-	const address_space *space = &active_address_space[spacenum];
-	const handler_data *handler;
-	offs_t offset;
-	UINT32 entry;
-
-	profiler_mark(PROFILER_MEMWRITE);
-
-	address &= space->bytemask;
-	entry = lookup_write_entry(space, address);
-	handler = &space->writehandlers[entry];
-
-	DEBUG_HOOK_WRITE(spacenum, address & ~7, data, mem_mask);
-
-	offset = (address - handler->bytestart) & handler->bytemask;
-	if (entry < STATIC_RAM)
-	{
-		UINT64 *dest = (UINT64 *)&bank_ptr[entry][offset & ~7];
-		*dest = (*dest & ~mem_mask) | (data & mem_mask);
-	}
-	else
-		(*handler->handler.write.mhandler64)(handler->object, offset >> 3, data, mem_mask);
-
-	profiler_mark(PROFILER_END);
-}
-
-
-/*-------------------------------------------------
     ADDRESS_SPACE_PROGRAM
 -------------------------------------------------*/
 
 void program_write_byte_64le(offs_t address, UINT8 data)
 {
 	UINT32 shift = (address & 7) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)0xff << shift);
+	write_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)0xff << shift);
 }
 
 void program_write_byte_64be(offs_t address, UINT8 data)
 {
 	UINT32 shift = (~address & 7) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)0xff << shift);
+	write_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)0xff << shift);
 }
 
 void program_write_word_64le(offs_t address, UINT16 data)
 {
 	UINT32 shift = (address & 6) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)0xffff << shift);
+	write_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)0xffff << shift);
 }
 
 void program_write_word_masked_64le(offs_t address, UINT16 data, UINT16 mask)
 {
 	UINT32 shift = (address & 6) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)mask << shift);
+	write_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)mask << shift);
 }
 
 void program_write_word_64be(offs_t address, UINT16 data)
 {
 	UINT32 shift = (~address & 6) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)0xffff << shift);
+	write_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)0xffff << shift);
 }
 
 void program_write_word_masked_64be(offs_t address, UINT16 data, UINT16 mask)
 {
 	UINT32 shift = (~address & 6) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)mask << shift);
+	write_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)mask << shift);
 }
 
 void program_write_dword_64le(offs_t address, UINT32 data)
 {
 	UINT32 shift = (address & 4) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)0xffffffff << shift);
+	write_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)0xffffffff << shift);
 }
 
 void program_write_dword_masked_64le(offs_t address, UINT32 data, UINT32 mask)
 {
 	UINT32 shift = (address & 4) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)mask << shift);
+	write_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)mask << shift);
 }
 
 void program_write_dword_64be(offs_t address, UINT32 data)
 {
 	UINT32 shift = (~address & 4) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)0xffffffff << shift);
+	write_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)0xffffffff << shift);
 }
 
 void program_write_dword_masked_64be(offs_t address, UINT32 data, UINT32 mask)
 {
 	UINT32 shift = (~address & 4) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)mask << shift);
+	write_qword_generic(ADDRESS_SPACE_PROGRAM, address, (UINT64)data << shift, (UINT64)mask << shift);
 }
 
 void program_write_qword_64le(offs_t address, UINT64 data)
 {
-	write_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, data, U64(0xffffffffffffffff));
+	write_qword_generic(ADDRESS_SPACE_PROGRAM, address, data, U64(0xffffffffffffffff));
 }
 
 void program_write_qword_masked_64le(offs_t address, UINT64 data, UINT64 mask)
 {
-	write_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, data, mask);
+	write_qword_generic(ADDRESS_SPACE_PROGRAM, address, data, mask);
 }
 
 void program_write_qword_64be(offs_t address, UINT64 data)
 {
-	write_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, data, U64(0xffffffffffffffff));
+	write_qword_generic(ADDRESS_SPACE_PROGRAM, address, data, U64(0xffffffffffffffff));
 }
 
 void program_write_qword_masked_64be(offs_t address, UINT64 data, UINT64 mask)
 {
-	write_qword_masked_generic(ADDRESS_SPACE_PROGRAM, address, data, mask);
+	write_qword_generic(ADDRESS_SPACE_PROGRAM, address, data, mask);
 }
 
 
@@ -5618,81 +5709,81 @@ void program_write_qword_masked_64be(offs_t address, UINT64 data, UINT64 mask)
 void data_write_byte_64le(offs_t address, UINT8 data)
 {
 	UINT32 shift = (address & 7) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)0xff << shift);
+	write_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)0xff << shift);
 }
 
 void data_write_byte_64be(offs_t address, UINT8 data)
 {
 	UINT32 shift = (~address & 7) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)0xff << shift);
+	write_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)0xff << shift);
 }
 
 void data_write_word_64le(offs_t address, UINT16 data)
 {
 	UINT32 shift = (address & 6) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)0xffff << shift);
+	write_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)0xffff << shift);
 }
 
 void data_write_word_masked_64le(offs_t address, UINT16 data, UINT16 mask)
 {
 	UINT32 shift = (address & 6) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)mask << shift);
+	write_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)mask << shift);
 }
 
 void data_write_word_64be(offs_t address, UINT16 data)
 {
 	UINT32 shift = (~address & 6) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)0xffff << shift);
+	write_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)0xffff << shift);
 }
 
 void data_write_word_masked_64be(offs_t address, UINT16 data, UINT16 mask)
 {
 	UINT32 shift = (~address & 6) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)mask << shift);
+	write_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)mask << shift);
 }
 
 void data_write_dword_64le(offs_t address, UINT32 data)
 {
 	UINT32 shift = (address & 4) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)0xffffffff << shift);
+	write_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)0xffffffff << shift);
 }
 
 void data_write_dword_masked_64le(offs_t address, UINT32 data, UINT32 mask)
 {
 	UINT32 shift = (address & 4) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)mask << shift);
+	write_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)mask << shift);
 }
 
 void data_write_dword_64be(offs_t address, UINT32 data)
 {
 	UINT32 shift = (~address & 4) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)0xffffffff << shift);
+	write_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)0xffffffff << shift);
 }
 
 void data_write_dword_masked_64be(offs_t address, UINT32 data, UINT32 mask)
 {
 	UINT32 shift = (~address & 4) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)mask << shift);
+	write_qword_generic(ADDRESS_SPACE_DATA, address, (UINT64)data << shift, (UINT64)mask << shift);
 }
 
 void data_write_qword_64le(offs_t address, UINT64 data)
 {
-	write_qword_masked_generic(ADDRESS_SPACE_DATA, address, data, U64(0xffffffffffffffff));
+	write_qword_generic(ADDRESS_SPACE_DATA, address, data, U64(0xffffffffffffffff));
 }
 
 void data_write_qword_masked_64le(offs_t address, UINT64 data, UINT64 mask)
 {
-	write_qword_masked_generic(ADDRESS_SPACE_DATA, address, data, mask);
+	write_qword_generic(ADDRESS_SPACE_DATA, address, data, mask);
 }
 
 void data_write_qword_64be(offs_t address, UINT64 data)
 {
-	write_qword_masked_generic(ADDRESS_SPACE_DATA, address, data, U64(0xffffffffffffffff));
+	write_qword_generic(ADDRESS_SPACE_DATA, address, data, U64(0xffffffffffffffff));
 }
 
 void data_write_qword_masked_64be(offs_t address, UINT64 data, UINT64 mask)
 {
-	write_qword_masked_generic(ADDRESS_SPACE_DATA, address, data, mask);
+	write_qword_generic(ADDRESS_SPACE_DATA, address, data, mask);
 }
 
 
@@ -5703,79 +5794,79 @@ void data_write_qword_masked_64be(offs_t address, UINT64 data, UINT64 mask)
 void io_write_byte_64le(offs_t address, UINT8 data)
 {
 	UINT32 shift = (address & 7) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)0xff << shift);
+	write_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)0xff << shift);
 }
 
 void io_write_byte_64be(offs_t address, UINT8 data)
 {
 	UINT32 shift = (~address & 7) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)0xff << shift);
+	write_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)0xff << shift);
 }
 
 void io_write_word_64le(offs_t address, UINT16 data)
 {
 	UINT32 shift = (address & 6) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)0xffff << shift);
+	write_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)0xffff << shift);
 }
 
 void io_write_word_masked_64le(offs_t address, UINT16 data, UINT16 mask)
 {
 	UINT32 shift = (address & 6) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)mask << shift);
+	write_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)mask << shift);
 }
 
 void io_write_word_64be(offs_t address, UINT16 data)
 {
 	UINT32 shift = (~address & 6) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)0xffff << shift);
+	write_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)0xffff << shift);
 }
 
 void io_write_word_masked_64be(offs_t address, UINT16 data, UINT16 mask)
 {
 	UINT32 shift = (~address & 6) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)mask << shift);
+	write_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)mask << shift);
 }
 
 void io_write_dword_64le(offs_t address, UINT32 data)
 {
 	UINT32 shift = (address & 4) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)0xffffffff << shift);
+	write_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)0xffffffff << shift);
 }
 
 void io_write_dword_masked_64le(offs_t address, UINT32 data, UINT32 mask)
 {
 	UINT32 shift = (address & 4) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)mask << shift);
+	write_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)mask << shift);
 }
 
 void io_write_dword_64be(offs_t address, UINT32 data)
 {
 	UINT32 shift = (~address & 4) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)0xffffffff << shift);
+	write_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)0xffffffff << shift);
 }
 
 void io_write_dword_masked_64be(offs_t address, UINT32 data, UINT32 mask)
 {
 	UINT32 shift = (~address & 4) * 8;
-	write_qword_masked_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)mask << shift);
+	write_qword_generic(ADDRESS_SPACE_IO, address, (UINT64)data << shift, (UINT64)mask << shift);
 }
 
 void io_write_qword_64le(offs_t address, UINT64 data)
 {
-	write_qword_masked_generic(ADDRESS_SPACE_IO, address, data, U64(0xffffffffffffffff));
+	write_qword_generic(ADDRESS_SPACE_IO, address, data, U64(0xffffffffffffffff));
 }
 
 void io_write_qword_masked_64le(offs_t address, UINT64 data, UINT64 mask)
 {
-	write_qword_masked_generic(ADDRESS_SPACE_IO, address, data, mask);
+	write_qword_generic(ADDRESS_SPACE_IO, address, data, mask);
 }
 
 void io_write_qword_64be(offs_t address, UINT64 data)
 {
-	write_qword_masked_generic(ADDRESS_SPACE_IO, address, data, U64(0xffffffffffffffff));
+	write_qword_generic(ADDRESS_SPACE_IO, address, data, U64(0xffffffffffffffff));
 }
 
 void io_write_qword_masked_64be(offs_t address, UINT64 data, UINT64 mask)
 {
-	write_qword_masked_generic(ADDRESS_SPACE_IO, address, data, mask);
+	write_qword_generic(ADDRESS_SPACE_IO, address, data, mask);
 }

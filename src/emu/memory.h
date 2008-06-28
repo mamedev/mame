@@ -39,12 +39,13 @@ enum
 	STATIC_INVALID = 0,									/* invalid - should never be used */
 	STATIC_BANK1 = 1,									/* first memory bank */
 	/* entries 1-32 are for fixed banks 1-32 specified by the driver */
-	/* entries 33-67 are for dynamically allocated internal banks */
-	STATIC_BANKMAX = 67,								/* last memory bank */
+	/* entries 33-66 are for dynamically allocated internal banks */
+	STATIC_BANKMAX = 66,								/* last memory bank */
 	STATIC_RAM,											/* RAM - reads/writes map to dynamic banks */
 	STATIC_ROM,											/* ROM - reads = RAM; writes = UNMAP */
 	STATIC_NOP,											/* NOP - reads = unmapped value; writes = no-op */
 	STATIC_UNMAP,										/* unmapped - same as NOP except we log errors */
+	STATIC_WATCHPOINT,									/* watchpoint - used internally */
 	STATIC_COUNT										/* total number of static handlers */
 };
 

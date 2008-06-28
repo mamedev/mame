@@ -228,11 +228,17 @@ void debug_cpu_stop_hook(running_machine *machine, int cpunum);
 /* the CPU execution system calls this hook when an interrupt is acknowledged */
 void debug_cpu_interrupt_hook(running_machine *machine, int cpunum, int irqline);
 
-/* the CPU execution system calls this hook when an exception is generated */
+/* called by the CPU cores when an exception is generated */
 void debug_cpu_exception_hook(running_machine *machine, int cpunum, int exception);
 
 /* called by the CPU cores before executing each instruction */
 void debug_cpu_instruction_hook(running_machine *machine, offs_t curpc);
+
+/* the memory system calls this hook when watchpoints are enabled and a memory read happens */
+void debug_cpu_memory_read_hook(running_machine *machine, int cpunum, int spacenum, offs_t address, UINT64 mem_mask);
+
+/* the memory system calls this hook when watchpoints are enabled and a memory write happens */
+void debug_cpu_memory_write_hook(running_machine *machine, int cpunum, int spacenum, offs_t address, UINT64 data, UINT64 mem_mask);
 
 
 
