@@ -571,6 +571,7 @@ static int tms32031_execute(int cycles)
 				continue;
 			}
 
+			debugger_instruction_hook(Machine, tms32031.pc);
 			execute_one();
 		}
 	}

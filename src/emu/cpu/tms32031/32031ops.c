@@ -101,7 +101,6 @@ static void unimplemented(void)
 
 INLINE void execute_one(void)
 {
-	debugger_instruction_hook(Machine, tms32031.pc);
 	OP = ROPCODE(tms32031.pc);
 	tms32031_icount -= 2;	/* 2 clocks per cycle */
 	tms32031.pc++;
@@ -5310,9 +5309,21 @@ INLINE void execute_delayed(UINT32 newpc)
 {
 	tms32031.delayed = TRUE;
 
-	execute_one();
-	execute_one();
-	execute_one();
+	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	{
+		execute_one();
+		execute_one();
+		execute_one();
+	}
+	else
+	{
+		debugger_instruction_hook(Machine, tms32031.pc);
+		execute_one();
+		debugger_instruction_hook(Machine, tms32031.pc);
+		execute_one();
+		debugger_instruction_hook(Machine, tms32031.pc);
+		execute_one();
+	}
 
 	tms32031.pc = newpc;
 	UPDATEPC(tms32031.pc);
