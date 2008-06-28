@@ -868,6 +868,7 @@ static UINT32 menu_input_groups(running_machine *machine, UINT32 state)
 
 	/* reset the menu */
 	memset(item_list, 0, sizeof(item_list));
+	menu_string_pool_offset = 0;
 
 	/* build up the menu */
 	item_list[menu_items++].text = "User Interface";
