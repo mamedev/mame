@@ -557,8 +557,8 @@ static void mcu_run(running_machine *machine, UINT8 dsw_setting)
 	}
 	else
 	{
-		dsw_a = (input_port_read(machine, "DSW") & 0x0700) >> 8;
-		dsw_b = (input_port_read(machine, "DSW") & 0x3800) >> 11;
+		dsw_a = (input_port_read(machine, "DSW1") & 0x0700) >> 8;
+		dsw_b = (input_port_read(machine, "DSW1") & 0x3800) >> 11;
 	}
 
 	read_coin = old_value;
