@@ -643,11 +643,11 @@ astring *astring_trimspace(astring *str)
 	char *ptr;
 
 	/* first remove stuff from the end */
-	for (ptr = str->text + strlen(str->text) - 1; ptr >= str->text && isspace(*ptr); ptr--)
+	for (ptr = str->text + strlen(str->text) - 1; ptr >= str->text && (!(*ptr & 0x80) && isspace(*ptr)); ptr--)
 		*ptr = 0;
 
 	/* then count how much to remove from the beginning */
-	for (ptr = str->text; *ptr != 0 && isspace(*ptr); ptr++) ;
+	for (ptr = str->text; *ptr != 0 && (!(*ptr & 0x80) && isspace(*ptr)); ptr++) ;
 	if (ptr > str->text)
 		astring_substr(str, ptr - str->text, -1);
 
