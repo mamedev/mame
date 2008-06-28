@@ -14,11 +14,12 @@ static UINT8 *videoram_pg[2];
 static UINT8 videoram_pg_index;
 static UINT8 palette_bank;
 static UINT8 cocktail_mode;
-static int pleiads_protection_question;
+static UINT8 pleiads_protection_question;
 static UINT8 survival_protection_value;
 static UINT8 survival_sid_value;
 static tilemap *fg_tilemap, *bg_tilemap;
 static UINT8 survival_input_latches[2];
+static UINT8 survival_input_readc;
 
 
 /***************************************************************************
@@ -185,6 +186,8 @@ VIDEO_START( phoenix )
 	memory_set_bank(1, 0);
 
     videoram_pg_index = 0;
+	palette_bank = 0;
+	cocktail_mode = 0;
 
 	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,8,8,32,32);
 	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,     8,8,32,32);
@@ -201,6 +204,21 @@ VIDEO_START( phoenix )
 	state_save_register_global(videoram_pg_index);
 	state_save_register_global(palette_bank);
 	state_save_register_global(cocktail_mode);
+	
+	/* some more candidates */
+	pleiads_protection_question = 0;
+	survival_protection_value = 0;
+	survival_sid_value = 0;
+	survival_input_readc = 0;
+	survival_input_latches[0] = 0;
+	survival_input_latches[1] = 0;
+
+	state_save_register_global(pleiads_protection_question);
+	state_save_register_global(survival_protection_value);
+	state_save_register_global(survival_sid_value);
+	state_save_register_global(survival_input_readc);
+	state_save_register_global_array(survival_input_latches);
+
 }
 
 /***************************************************************************
@@ -316,7 +334,7 @@ CUSTOM_INPUT( pleiads_protection_r )
 		return 1;
 		break;
 	default:
-		logerror("Unknown protection question %02X at %04X\n", pleiads_protection_question, activecpu_get_pc());
+		logerror("Unknown protection question %02X at %04X\n", pleiads_protection_question, safe_activecpu_get_pc());
 		return 0;
 	}
 }
@@ -350,7 +368,6 @@ CUSTOM_INPUT( pleiads_protection_r )
 */
 
 #define REMAP_JS(js) ((ret & 0xf) | ( (js & 0xf)  << 4))
-static int survival_input_readc = 0;
 READ8_HANDLER( survival_input_port_0_r )
 {
 	UINT8 ret = ~input_port_read(machine, "IN0");
