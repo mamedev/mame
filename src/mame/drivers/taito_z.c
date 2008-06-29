@@ -2190,43 +2190,43 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0xff, "+7F" )
 
 #define TAITO_Z_COINAGE_JAPAN_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW A:5,6") \
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) \
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) \
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) \
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW A:7,8") \
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) \
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) \
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
 #define TAITO_Z_COINAGE_WORLD_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW A:5,6") \
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) \
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW A:7,8") \
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) ) \
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) ) \
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
 
 #define TAITO_Z_COINAGE_US_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) ) \
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW A:5,6") \
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, "Price to Continue" ) \
+	PORT_DIPNAME( 0xc0, 0xc0, "Price to Continue" ) PORT_DIPLOCATION("SW A:7,8") \
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) ) \
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) \
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) ) \
 	PORT_DIPSETTING(    0xc0, "Same as Start" )
 
 #define TAITO_Z_DIFFICULTY_8 \
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) \
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW B:1,2")\
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) ) \
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) ) \
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) ) \
@@ -2235,41 +2235,37 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( contcirc )
 	PORT_START_TAG("DSW1") /* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1") 
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, "Cockpit" )	// analogue accelerator pedal
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_Z_COINAGE_WORLD_8
 
 	PORT_START_TAG("DSW2") /* DSW B */
-	PORT_DIPNAME( 0x03, 0x03, "Difficulty 1 (time/speed)" )
+	PORT_DIPNAME( 0x03, 0x03, "Difficulty 1 (time/speed)" ) PORT_DIPLOCATION("SW B:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Difficulty 2 (other cars)" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Difficulty 2 (other cars)" ) PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x10, 0x10, "Steering wheel" )	//not sure what effect this has
+	PORT_DIPNAME( 0x10, 0x10, "Steering wheel" ) PORT_DIPLOCATION("SW B:5")	//not sure what effect this has
 	PORT_DIPSETTING(    0x10, "Free" )
 	PORT_DIPSETTING(    0x00, "Locked" )
-	PORT_DIPNAME( 0x20, 0x00, "Enable 3d alternate frames" )
+	PORT_DIPNAME( 0x20, 0x00, "Enable 3d alternate frames" ) PORT_DIPLOCATION("SW B:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW B:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW B:8" )
 
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2313,34 +2309,34 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( chasehq )	// IN3-6 perhaps used with cockpit setup? //
 	PORT_START_TAG("DSW1") /* DSW A */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )	/* US Manual states DIPS 1 & 2 "MUST REMAIN OFF" */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1,2")	/* US Manual states DIPS 1 & 2 "MUST REMAIN OFF" */
 	PORT_DIPSETTING(    0x03, "Upright / Steering Lock" )
 	PORT_DIPSETTING(    0x02, "Upright / No Steering Lock" )
 	PORT_DIPSETTING(    0x01, "Full Throttle Convert, Cockpit" )
 	PORT_DIPSETTING(    0x00, "Full Throttle Convert, Deluxe" )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_Z_COINAGE_WORLD_8
 
 	PORT_START_TAG("DSW2") /* DSW B */
 	TAITO_Z_DIFFICULTY_8
-	PORT_DIPNAME( 0x0c, 0x0c, "Timer Setting" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Timer Setting" ) PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x08, "70 Seconds" )
 	PORT_DIPSETTING(    0x04, "65 Seconds" )
 	PORT_DIPSETTING(    0x0c, "60 Seconds" )
 	PORT_DIPSETTING(    0x00, "55 Seconds" )
-	PORT_DIPNAME( 0x10, 0x10, "Turbos Stocked" )
+	PORT_DIPNAME( 0x10, 0x10, "Turbos Stocked" ) PORT_DIPLOCATION("SW B:5")
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x20, 0x20, "Discounted Continue Play" )	/* Full coin price to start, 1 coin to continue */
+	PORT_DIPNAME( 0x20, 0x20, "Discounted Continue Play" ) PORT_DIPLOCATION("SW B:6")	/* Full coin price to start, 1 coin to continue */
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Damage Cleared at Continue" )
+	PORT_DIPNAME( 0x40, 0x40, "Damage Cleared at Continue" ) PORT_DIPLOCATION("SW B:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -2426,38 +2422,24 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( enforce )
 	PORT_START /* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW A:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW A:2" )
+	PORT_SERVICE_DIPLOC( 0x04, 0x04, "SW A:3" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )	// Says SHIFT HI in test mode !?
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )		// Says SHIFT LO in test mode !?
 	TAITO_Z_COINAGE_JAPAN_8
 
 	PORT_START /* DSW B */
 	TAITO_Z_DIFFICULTY_8
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Background scenery" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW B:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW B:4" )
+	PORT_DIPNAME( 0x10, 0x00, "Background scenery" ) PORT_DIPLOCATION("SW B:5")
 	PORT_DIPSETTING(    0x10, "Crazy scrolling" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW B:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW B:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW B:8" )
 
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2482,37 +2464,27 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( bshark )
 	PORT_START_TAG("DSW1") /* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, "Mirror screen" )	// manual says first two must be off
+	PORT_DIPNAME( 0x01, 0x01, "Mirror screen" ) PORT_DIPLOCATION("SW A:1")	// manual says it must be off
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW A:2" )	// manual says it must be off
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_Z_COINAGE_US_8
 
 	PORT_START_TAG("DSW2") /* DSW B */
 	TAITO_Z_DIFFICULTY_8
-	PORT_DIPNAME( 0x0c, 0x04, "Speed of Sight" )
+	PORT_DIPNAME( 0x0c, 0x04, "Speed of Sight" ) PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x0c, "Slow" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x04, "Fast" )
 	PORT_DIPSETTING(    0x00, "Fastest" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	// manual says all these must be off
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW B:5" )	// manual says all these must be off
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW B:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW B:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW B:8" )
 
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -2558,35 +2530,33 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sci )
 	PORT_START_TAG("DSW1") /* DSW A */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1")
 	PORT_DIPSETTING(    0x01, "Cockpit" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) /* Manual states "MUST REMAIN OFF" */
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW A:2" ) /* Manual states "MUST REMAIN OFF" */
+	PORT_SERVICE_DIPLOC( 0x04, 0x04, "SW A:3" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_Z_COINAGE_WORLD_8
 
 	PORT_START_TAG("DSW2") /* DSW B */
 	TAITO_Z_DIFFICULTY_8
-	PORT_DIPNAME( 0x0c, 0x0c, "Timer Setting" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Timer Setting" ) PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x08, "70 Seconds" )
 	PORT_DIPSETTING(    0x04, "65 Seconds" )
 	PORT_DIPSETTING(    0x0c, "60 Seconds" )
 	PORT_DIPSETTING(    0x00, "55 Seconds" )
-	PORT_DIPNAME( 0x10, 0x10, "Turbos Stocked" )
+	PORT_DIPNAME( 0x10, 0x10, "Turbos Stocked" ) PORT_DIPLOCATION("SW B:5")
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x20, 0x20, "Steering Radius" )
+	PORT_DIPNAME( 0x20, 0x20, "Steering Radius" ) PORT_DIPLOCATION("SW B:6")
 	PORT_DIPSETTING(    0x00, "270 Degree" )
 	PORT_DIPSETTING(    0x20, "360 Degree" )
-	PORT_DIPNAME( 0x40, 0x40, "Damage Cleared at Continue" )
+	PORT_DIPNAME( 0x40, 0x40, "Damage Cleared at Continue" ) PORT_DIPLOCATION("SW B:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Siren Volume" )
+	PORT_DIPNAME( 0x80, 0x80, "Siren Volume" ) PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Low ) )
 
@@ -2639,34 +2609,32 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( nightstr )
 	PORT_START_TAG("DSW1") /* DSW A */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1")
 	PORT_DIPSETTING(    0x01, "Cockpit" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) /* Shown only as "OFF" in the manual */
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW A:2" )	// manual says it must be off
+	PORT_SERVICE_DIPLOC( 0x04, 0x04, "SW A:3" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_Z_COINAGE_WORLD_8
 
 	PORT_START_TAG("DSW2") /* DSW B */
 	TAITO_Z_DIFFICULTY_8
-	PORT_DIPNAME( 0x0c, 0x0c, "Bonus Shields" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Bonus Shields" ) PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x30, "Shields" )
+	PORT_DIPNAME( 0x30, 0x30, "Shields" ) PORT_DIPLOCATION("SW B:5,6")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x30, "5" )
 	PORT_DIPSETTING(    0x20, "6" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW B:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Trigger Turbo" )
+	PORT_DIPNAME( 0x80, 0x80, "Trigger Turbo" ) PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(    0x80, "7 Shots / Second" )
 	PORT_DIPSETTING(    0x00, "10 Shots / Second" )
 
@@ -2721,49 +2689,50 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( aquajack )
 	PORT_START_TAG("DSW1") /* DSW A */
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1")
 	PORT_DIPSETTING(    0x80, "Cockpit" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) /* Dip 2 shown as "Must Remain in "Off" Position" in manual */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW A:2" ) /* Dip 2 shown as "Must Remain in "Off" Position" in manual */
+	PORT_SERVICE_DIPLOC( 0x20, 0x20, "SW A:3" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW A:6,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )	/* The Romstar (US version) manual list this as "Continue Pricing" */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW A:8,7")	/* The Romstar (US version) manual list this as "Continue Pricing" */
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )	/* Same pricing as Coin A */
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )	/* 1 Coin to Continue  */
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_4C ) )	/* 2 Coins to Continue */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )	/* 3 Coins to Continue */
 
 	PORT_START_TAG("DSW2") /* DSW B */
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW B:2,1")
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW B:4,3")
 	PORT_DIPSETTING(    0x00, "30k" )
 	PORT_DIPSETTING(    0x30, "50k" )
 	PORT_DIPSETTING(    0x10, "80k" )
 	PORT_DIPSETTING(    0x20, "100k" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW B:6,5")
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) /* Dips 7 & 8 shown as "Do Not Touch" in non US manuals */
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) ) /* The Romstar (US version) manual list this as "Endless Game" - Has no effect on "World" version */
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )    /* Normal Game  */
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )     /* Endless Game */
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW B:7" ) /* Dip 7 shown as "Do Not Touch" in manuals */
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW B:8" ) /* Dip 8 */
+	/* The previous taito_z.c said ---
+		The Romstar (US version) manual list this as "Endless Game" - Has no effect on "World" version
+	   --- , and declared it as unused switch.
+	*/
+	/* PORT_DIPNAME( 0x01, 0x01, "Endless Game" ) PORT_DIPLOCATION("SW B:8") */
+	/* PORT_DIPSETTING(    0x01, "Normal Game" ) */
+	/* PORT_DIPSETTING(    0x00, "Endless Game" ) */
 
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2793,12 +2762,12 @@ static INPUT_PORTS_START( aquajckj )
 	PORT_INCLUDE(aquajack)
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW A:6,5")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW A:8,7")
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
@@ -2807,36 +2776,26 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( spacegun )
 	PORT_START /* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )	// Manual says Always Off
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Always have gunsight power up" )
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW A:1" )	// Manual says Always Off
+	PORT_DIPNAME( 0x02, 0x02, "Always have gunsight power up" ) PORT_DIPLOCATION("SW A:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_SERVICE_DIPLOC( 0x04, 0x04, "SW A:3" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_Z_COINAGE_WORLD_8
 
 	PORT_START /* DSW B */
 	TAITO_Z_DIFFICULTY_8
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )	// Manual lists dips 3 through 6 and 8 as Always off
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW B:3" )	// Manual lists dips 3 through 6 and 8 as Always off
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW B:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW B:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW B:6" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW B:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Disable Pedal (?)" )
+	PORT_DIPNAME( 0x80, 0x80, "Disable Pedal (?)" ) PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -2877,38 +2836,30 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dblaxle )
 	PORT_START_TAG("DSW1") /* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Gear shift" )
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW A:1" )
+	PORT_DIPNAME( 0x02, 0x02, "Gear shift" ) PORT_DIPLOCATION("SW A:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Inverted" )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_SERVICE_DIPLOC( 0x04, 0x04, "SW A:3" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW A:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	TAITO_Z_COINAGE_US_8
 
 	PORT_START_TAG("DSW2") /* DSW B */
 	TAITO_Z_DIFFICULTY_8
-	PORT_DIPNAME( 0x04, 0x00, "Multi-machine hookup ?" )	// doesn't boot if on
+	PORT_DIPNAME( 0x04, 0x00, "Multi-machine hookup ?" ) PORT_DIPLOCATION("SW B:3")	// doesn't boot if on
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Player Truck" )
+	PORT_DIPNAME( 0x08, 0x08, "Player Truck" ) PORT_DIPLOCATION("SW B:4")
 	PORT_DIPSETTING(    0x08, "Red" )
 	PORT_DIPSETTING(    0x00, "Blue" )
-	PORT_DIPNAME( 0x10, 0x10, "Back button" )
+	PORT_DIPNAME( 0x10, 0x10, "Back button" ) PORT_DIPLOCATION("SW B:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Inverted" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	// causes "Root CPU Error" on "Icy Road" (Tourniquet)
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW B:6" )	// causes "Root CPU Error" on "Icy Road" (Tourniquet)
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW B:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW B:8" )
 
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
