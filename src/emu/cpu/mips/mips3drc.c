@@ -169,6 +169,7 @@ struct _mips3imp_state
 
 	/* internal stuff */
 	UINT8				cache_dirty;				/* true if we need to flush the cache */
+	UINT32				jmpdest;					/* destination jump target */
 
 	/* parameters for subroutines */
 	UINT64				numcycles;					/* return value from gettotalcycles */
@@ -1633,14 +1634,18 @@ static void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *
 {
 	compiler_state compiler_temp = *compiler;
 	UINT32 op = *desc->opptr.l;
-
-	/* set the link if needed */
-	if (linkreg != 0)
-		UML_DMOV(block, R64(linkreg), IMM((INT32)(desc->pc + 8)));					// dmov    <linkreg>,desc->pc + 8
+	
+	/* fetch the target register if dynamic, in case it is modified by the delay slot */
+	if (desc->targetpc == BRANCH_TARGET_DYNAMIC)
+		UML_MOV(block, MEM(&mips3->impstate->jmpdest), R32(RSREG));					// mov     [jmpdest],<rsreg>
 
 	/* compile the delay slot using temporary compiler state */
 	assert(desc->delay != NULL);
 	generate_sequence_instruction(block, &compiler_temp, desc->delay);				// <next instruction>
+
+	/* set the link if needed -- after the delay slot */
+	if (linkreg != 0)
+		UML_DMOV(block, R64(linkreg), IMM((INT32)(desc->pc + 8)));					// dmov    <linkreg>,desc->pc + 8
 
 	/* update the cycles and jump through the hash table to the target */
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
@@ -1654,9 +1659,9 @@ static void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *
 	}
 	else
 	{
-		generate_update_cycles(block, &compiler_temp, R32(RSREG), TRUE);
+		generate_update_cycles(block, &compiler_temp, MEM(&mips3->impstate->jmpdest), TRUE);
 																					// <subtract cycles>
-		UML_HASHJMP(block, IMM(mips3->impstate->mode), R32(RSREG), mips3->impstate->nocode);
+		UML_HASHJMP(block, IMM(mips3->impstate->mode), MEM(&mips3->impstate->jmpdest), mips3->impstate->nocode);
 																					// hashjmp <mode>,<rsreg>,nocode
 	}
 
