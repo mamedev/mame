@@ -1835,7 +1835,9 @@ const game_driver * const drivers[] =
 	DRIVER( chasehq )	/* B52 (c) 1988 Taito Corporation Japan (World) */
 	DRIVER( chasehqj )	/* B52 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( enforce )	/* B58 (c) 1988 Taito Corporation (Japan) */
-	DRIVER( nightstr )	/* B91 (c) 1989 Taito America Corporation (US) */
+	DRIVER( nightstr )	/* B91 (c) 1989 Taito Corporation Japan (World) */
+	DRIVER( nghtstrj )	/* B91 (c) 1989 Taito Corporation (Japan) */
+	DRIVER( nghtstru )	/* B91 (c) 1989 Taito America Corporation (US) */
 	DRIVER( sci )		/* C09 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( scia )		/* C09 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( scij )		/* C09 (c) 1989 Taito Corporation Japan (World) */
