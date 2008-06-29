@@ -89,7 +89,7 @@ static READ16_HANDLER( bmc_RAMDAC_color_r )
 		return colorram[clr_offset];
 }
 
-static READ16_HANDLER(random_r)
+static READ16_HANDLER(random_number_r)
 {
 	return mame_rand(machine);
 }
@@ -137,9 +137,9 @@ static ADDRESS_MAP_START( koftball_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	
 	AM_RANGE(0x280000, 0x28ffff) AM_RAM /* unused ? */
 	AM_RANGE(0x2a0000, 0x2a001f) AM_WRITENOP
-	AM_RANGE(0x2a0000, 0x2a001f) AM_READ(random_r) 
-	AM_RANGE(0x2b0000, 0x2b0003) AM_READ(random_r)
-	AM_RANGE(0x2d8000, 0x2d8001) AM_READ(random_r)
+	AM_RANGE(0x2a0000, 0x2a001f) AM_READ(random_number_r) 
+	AM_RANGE(0x2b0000, 0x2b0003) AM_READ(random_number_r)
+	AM_RANGE(0x2d8000, 0x2d8001) AM_READ(random_number_r)
 	/*sound chip or mcu comm ? maybe just i/o (offset 0xe=lamps?)*/
 	AM_RANGE(0x2da000, 0x2da001) AM_WRITENOP /* offset ? */
 	AM_RANGE(0x2da002, 0x2da003) AM_WRITENOP /* data ? */
