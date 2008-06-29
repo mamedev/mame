@@ -278,7 +278,7 @@ Notes:
 
 #define PGMLOGERROR 0
 #define PGMARM7LOGERROR 1
-#define PGMARM7SPEEDHACK 0
+#define PGMARM7SPEEDHACK 1
 
 #include "driver.h"
 #include "deprecat.h"
