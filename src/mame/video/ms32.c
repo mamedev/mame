@@ -286,17 +286,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	gfx_element mygfx = *gfx;
 
 	UINT32		*source	= sprram_top;
-	const UINT32	*finish	= sprram_top + (sprram_size - 0x10) / 4;
+	const UINT32	*finish	= sprram_top + (sprram_size - 0x20) / 4;
 
 
 	if (ms32_reverse_sprite_order == 1)
 	{
-		source	= sprram_top + (sprram_size - 0x10) / 4;
+		source	= sprram_top + (sprram_size - 0x20) / 4;
 		finish	= sprram_top;
 	}
 
 
-	for (;ms32_reverse_sprite_order ? (source>=finish) : (source<finish); ms32_reverse_sprite_order ? (source-=4) : (source+=4))
+	for (;ms32_reverse_sprite_order ? (source>=finish) : (source<finish); ms32_reverse_sprite_order ? (source-=8) : (source+=8))
 	{
 		attr	=	source[ 0 ];
 
