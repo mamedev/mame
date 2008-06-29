@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "includes/gaelco2.h"
 
@@ -157,6 +158,104 @@ WRITE16_HANDLER( wrally2_coin_w )
 {
 	/* coin counters */
 	coin_counter_w((offset >> 3) & 0x01,  data & 0x01);
+}
+
+WRITE16_HANDLER( touchgo_coin_w )
+{
+	if ((offset >> 2) == 0){
+		coin_counter_w(0, data & 0x01);
+		coin_counter_w(1, data & 0x02);
+		coin_counter_w(2, data & 0x04);
+		coin_counter_w(3, data & 0x08);
+	}
+}
+
+/***************************************************************************
+
+    Bang
+
+***************************************************************************/
+
+static int clr_gun_int;
+
+DRIVER_INIT( bang )
+{
+	clr_gun_int = 0;
+}
+
+WRITE16_HANDLER( bang_clr_gun_int_w )
+{
+	clr_gun_int = 1;
+}
+
+INTERRUPT_GEN( bang_interrupt )
+{
+	if (cpu_getiloops() == 0){
+		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+
+		clr_gun_int = 0;
+	}
+	else if (cpu_getiloops() % 2){
+		if (clr_gun_int){
+			cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+		}
+	}
+}
+
+/***************************************************************************
+
+    World Rally 2 analog controls          
+    - added by Mirko Mattioli <els@fastwebnet.it>
+    ---------------------------------------------------------------
+    WR2 pcb has two ADC, one for each player. The ADCs have in common
+    the clock signal line (adc_clk) and the chip enable signal line 
+    (adc_cs) and, of course,  two different data out signal lines.
+    When "Pot Wheel" option is selected via dip-switch, then the gear
+    is enabled (low/high shifter); the gear is disabled in joy mode by
+    the CPU program code. No brakes are present in this game.
+    Analog controls routines come from modified code wrote by Aaron
+    Giles for gaelco3d driver.
+
+***************************************************************************/
+
+static UINT8 analog_ports[2];
+
+CUSTOM_INPUT( wrally2_analog_bit_r )
+{
+	int which = (FPTR)param;
+	return (analog_ports[which] >> 7) & 0x01;
+}
+
+
+WRITE16_HANDLER( wrally2_adc_clk )
+{
+	/* a zero/one combo is written here to clock the next analog port bit */
+	if (ACCESSING_BITS_0_7)
+	{
+		if (!(data & 0xff))
+		{
+			analog_ports[0] <<= 1;
+			analog_ports[1] <<= 1;
+		}
+	}
+	else
+		logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
+}
+
+
+WRITE16_HANDLER( wrally2_adc_cs )
+{
+	/* a zero is written here to read the analog ports, and a one is written when finished */
+	if (ACCESSING_BITS_0_7)
+	{
+		if (!(data & 0xff))
+		{
+			analog_ports[0] = input_port_read_safe(machine, "ANALOG0", 0);
+			analog_ports[1] = input_port_read_safe(machine, "ANALOG1", 0);
+		}
+	}
+	else
+		logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
 }
 
 /***************************************************************************

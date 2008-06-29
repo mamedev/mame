@@ -217,32 +217,6 @@ ROM_END
                                 BANG
   ============================================================================*/
 
-static int clr_gun_int;
-
-static DRIVER_INIT( bang )
-{
-	clr_gun_int = 0;
-}
-
-static WRITE16_HANDLER( clr_gun_int_w )
-{
-	clr_gun_int = 1;
-}
-
-static INTERRUPT_GEN( bang_interrupt )
-{
-	if (cpu_getiloops() == 0){
-		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
-
-		clr_gun_int = 0;
-	}
-	else if (cpu_getiloops() % 2){
-		if (clr_gun_int){
-			cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
-		}
-	}
-}
-
 static READ16_HANDLER(p1_gun_x) {return (input_port_read(machine, "LIGHT0_X") * 320 / 0x100) + 1;}
 static READ16_HANDLER(p1_gun_y) {return (input_port_read(machine, "LIGHT0_Y") * 240 / 0x100) - 4;}
 static READ16_HANDLER(p2_gun_x) {return (input_port_read(machine, "LIGHT1_X") * 320 / 0x100) + 1;}
@@ -270,13 +244,13 @@ static ADDRESS_MAP_START( bang_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x202890, 0x2028ff) AM_WRITE(gaelcosnd_w) AM_BASE(&gaelco_sndregs)		/* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(gaelco2_vram_w) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	/* Video RAM */
 	AM_RANGE(0x210000, 0x211fff) AM_WRITE(gaelco2_palette_w) AM_BASE(&paletteram16)	/* Palette */
-	AM_RANGE(0x218004, 0x218007) AM_WRITE(SMH_RAM) AM_BASE(&gaelco2_vregs)			/* Video Registers */
+	AM_RANGE(0x218004, 0x218007) AM_WRITE(SMH_RAM) AM_BASE(&gaelco2_vregs)	/* Video Registers */
 	AM_RANGE(0x218008, 0x218009) AM_WRITE(SMH_NOP)							/* CLR INT Video */
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(gaelco2_coin2_w)					/* Coin Counters */
-	AM_RANGE(0x300008, 0x300009) AM_WRITE(gaelco2_eeprom_data_w)				/* EEPROM data */
+	AM_RANGE(0x300008, 0x300009) AM_WRITE(gaelco2_eeprom_data_w)			/* EEPROM data */
 	AM_RANGE(0x30000a, 0x30000b) AM_WRITE(gaelco2_eeprom_sk_w)				/* EEPROM serial clock */
 	AM_RANGE(0x30000c, 0x30000d) AM_WRITE(gaelco2_eeprom_cs_w)				/* EEPROM chip select */
-	AM_RANGE(0x310000, 0x310001) AM_WRITE(clr_gun_int_w)						/* CLR INT Gun */
+	AM_RANGE(0x310000, 0x310001) AM_WRITE(bang_clr_gun_int_w)				/* CLR INT Gun */
 	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(SMH_RAM)							/* Work RAM */
 ADDRESS_MAP_END
 
@@ -628,16 +602,6 @@ ROM_END
 /*============================================================================
                             TOUCH & GO
   ============================================================================*/
-
-static WRITE16_HANDLER( touchgo_coin_w )
-{
-	if ((offset >> 2) == 0){
-		coin_counter_w(0, data & 0x01);
-		coin_counter_w(1, data & 0x02);
-		coin_counter_w(2, data & 0x04);
-		coin_counter_w(3, data & 0x08);
-	}
-}
 
 /* the game expects this value each frame to know that the DS5002FP is alive */
 static READ16_HANDLER ( dallas_kludge_r )
@@ -1131,15 +1095,16 @@ static ADDRESS_MAP_START( wrally2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wrally2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)							/* ROM */
+	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)									/* ROM */
 	AM_RANGE(0x202890, 0x2028ff) AM_WRITE(gaelcosnd_w) AM_BASE(&gaelco_sndregs)		/* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(gaelco2_vram_w) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	/* Video RAM */
 	AM_RANGE(0x210000, 0x211fff) AM_WRITE(gaelco2_palette_w) AM_BASE(&paletteram16)	/* Palette */
-	AM_RANGE(0x212000, 0x213fff) AM_WRITE(SMH_RAM)							/* Extra RAM */
+	AM_RANGE(0x212000, 0x213fff) AM_WRITE(SMH_RAM)									/* Extra RAM */
 	AM_RANGE(0x218004, 0x218009) AM_WRITE(SMH_RAM) AM_BASE(&gaelco2_vregs)			/* Video Registers */
-	AM_RANGE(0x400000, 0x400011) AM_WRITE(wrally2_coin_w)						/* Coin Counters */
-	AM_RANGE(0x400028, 0x400031) AM_WRITE(SMH_NOP)							/* Pot Wheel input bit select */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(SMH_RAM)							/* Work RAM */
+	AM_RANGE(0x400000, 0x400011) AM_WRITE(wrally2_coin_w)							/* Coin Counters */
+	AM_RANGE(0x400028, 0x400029) AM_WRITE(wrally2_adc_clk)									/* ADCs clock-in line */
+	AM_RANGE(0x400030, 0x400031) AM_WRITE(wrally2_adc_cs)									/* ADCs chip select line */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(SMH_RAM)									/* Work RAM */
 ADDRESS_MAP_END
 
 
@@ -1149,9 +1114,9 @@ PORT_START_TAG("IN0")	/* DIPSW #2 + 1P INPUTS */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
-	/* 0x0040 - Pot Wheel 1P (16 bit serial input) */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Acc.")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Gear") PORT_TOGGLE
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM(wrally2_analog_bit_r, (void *)0)	/* ADC_1 serial input */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0200, 0x0000, "Coin mechanism" )
@@ -1161,10 +1126,10 @@ PORT_START_TAG("IN0")	/* DIPSW #2 + 1P INPUTS */
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0800, 0x0800, "Cabinet 1 Control Configuration" )
-	PORT_DIPSETTING(      0x0000, "Pot Wheel" )		/* TO-DO */
+	PORT_DIPSETTING(      0x0000, "Pot Wheel" )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Joystick ) )
 	PORT_DIPNAME( 0x1000, 0x1000, "Cabinet 2 Control Configuration" )
-	PORT_DIPSETTING(      0x0000, "Pot Wheel" )		/* TO-DO */
+	PORT_DIPSETTING(      0x0000, "Pot Wheel" )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Joystick ) )
 	PORT_DIPNAME( 0x2000, 0x2000, "Monitors" )
 	PORT_DIPSETTING(      0x0000, "One" )
@@ -1207,9 +1172,9 @@ PORT_START_TAG("IN2")	/* 2P INPUTS */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	/* 0x0040 - Pot Wheel 2P (16 bit serial input) */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Acc.")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Gear") PORT_TOGGLE
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM(wrally2_analog_bit_r, (void *)1)	/* ADC_2 serial input */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1224,6 +1189,12 @@ PORT_START_TAG("IN3")	/* SERVICESW */
 
 PORT_START_TAG("FAKE")	/* Fake: To switch between monitors at run time */
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_TOGGLE
+	
+PORT_START_TAG("ANALOG0")	/* steering wheel player 1 */
+	PORT_BIT( 0xff, 0x8A, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("P1 Wheel")
+
+PORT_START_TAG("ANALOG1")	/* steering wheel player 2 */
+	PORT_BIT( 0xff, 0x8A, IPT_PADDLE_V ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("P2 Wheel")
 INPUT_PORTS_END
 
 static const struct gaelcosnd_interface wrally2_snd_interface =
@@ -1369,8 +1340,8 @@ REF: 950510-1
 
 Notes
 -----
-Gaelco's PROMs IC70 and IC69 has DIP42 package (many wires are routed to GAE1 506, so I guess that they are a gfx rom)
-Gaelco's PROM IC68 has DIP32 package (may be a sound rom)
+Gaelco's PROMs IC70 and IC69 has DIP42 package (gfx rom)
+Gaelco's PROM IC68 has DIP32 package (sound rom)
 TI F20L8 is a Texas Ins. DIP24 (may be a PAL). Is marked as F 406 XF 21869 F20L8-25CNT
 TLC569 (IC2 and IC7) is a 8-bit serial ADC
 
