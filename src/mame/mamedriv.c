@@ -6215,6 +6215,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kungfuta )	/* (c) 1984 Seibu Kaihatsu */
 	DRIVER( wiz )		/* (c) 1985 Seibu Kaihatsu */
 	DRIVER( wizt )		/* (c) 1985 Taito Corporation */
+	DRIVER( wizta )		/* (c) 1985 Taito Corporation */
 	DRIVER( kncljoe )	/* (c) 1985 Taito Corporation */
 	DRIVER( kncljoea )	/* (c) 1985 Taito Corporation */
 	DRIVER( bcrusher )	/* bootleg */
