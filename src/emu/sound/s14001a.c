@@ -22,7 +22,6 @@
  TODO:
  * increase accuracy of internal S14001A 'filter' for both driven and undriven cycles (its not terribly inaccurate for undriven cycles, but the dc sliding of driven cycles is not emulated)
  * add option for and attach Frank P.'s emulation of the Analog external filter from the vsu-1000 using the discrete core.
- * figure out why berzerk needs SILENCE+1 but wolfpack needs SILENCE on one line. Encoding error?
 */
 
 /* state map:
