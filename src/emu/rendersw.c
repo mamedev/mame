@@ -291,7 +291,7 @@ INLINE UINT32 get_texel_yuy16_bilinear(const render_texinfo *texture, INT32 curu
 	if (v0 < 0) v0 = v1 = 0;
 	else if (v0 + 1 >= texture->height) v0 = texture->height - 1, v1 = 0;
 
-	texbase += v0 * texture->rowpixels + u0;
+	texbase += v0 * texture->rowpixels + (u0 & ~1);
 
 	if ((curu & 0x10000) == 0)
 	{
