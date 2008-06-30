@@ -17,7 +17,8 @@
  1.20 supports setting the clock freq directly - reset is done by external hardware,
       the chip has no reset line ZV (0.122)
  1.30 move main dac to 4 bits only with no extension (4->16 bit range extension is now done by output).
- Added a somewhat better, but still not perfect, filtering system. LN (0.125u9)
+ Added a somewhat better, but still not perfect, filtering system - LN
+ 1.31 fix a minor bug with the dac range. wolfpack clips again, and I'm almost sure its an encoding error on the original speech - LN (0.125u9)
 
  TODO:
  * increase accuracy of internal S14001A 'filter' for both driven and undriven cycles (its not terribly inaccurate for undriven cycles, but the dc sliding of driven cycles is not emulated)
@@ -424,6 +425,9 @@ static void s14001a_clock(S14001AChip *chip) /* called once per clock */
 #endif
 		chip->laststate = chip->machineState;
 		chip->machineState = chip->nextstate;
+
+	        /* the dac is 4 bits wide. if a delta step forced it outside of 4 bits, mask it back over here */
+	        chip->DACOutput &= 0xF;
 	}
 }
 
@@ -543,7 +547,7 @@ void s14001a_get_info(void *token, UINT32 state, sndinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:						info->s = "S14001A";		break;
 		case SNDINFO_STR_CORE_FAMILY:				info->s = "TSI S14001A";	break;
-		case SNDINFO_STR_CORE_VERSION:				info->s = "1.30";			break;
+		case SNDINFO_STR_CORE_VERSION:				info->s = "1.31";			break;
 		case SNDINFO_STR_CORE_FILE:					info->s = __FILE__;			break;
 		case SNDINFO_STR_CORE_CREDITS:				info->s = "Copyright Jonathan Gevaryahu"; break;
 	}
