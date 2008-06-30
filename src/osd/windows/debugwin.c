@@ -422,7 +422,7 @@ void debugwin_show(int type)
 void debugwin_update_during_game(void)
 {
 	// if we're running live, do some checks
-	if (!debug_cpu_is_stopped(Machine))
+	if (!debug_cpu_is_stopped(Machine) && mame_get_phase(Machine) == MAME_PHASE_RUNNING)
 	{
 		// see if the interrupt key is pressed and break if it is
 		temporarily_fake_that_we_are_not_visible = TRUE;
