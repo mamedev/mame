@@ -1971,6 +1971,89 @@ ROM_START( lrescue )
 	ROM_RELOAD(  			  0x0400, 0x0400 )
 ROM_END
 
+/*
+
+MOON LANDER
+Manufacturer: Leisure Time Electronics
+Year: 1980
+Orientation: Vertical B/W
+Cabinet: Cocktail
+
+
+Leisure Time Electronics produced three games: Astro Laser, Moon Lander, and Space Ranger.
+The games were designed to be interchangeable with a universal cocktail cabinet which they designed and named "Star Series". The cocktail cabinets share the same artwork with all three games and has a different instruction card for each game.
+There were no upright or cabaret cabinets. The game ROMs operate on Taito pc boards.
+
+Moon Lander is a clone/ripoff of Lunar Rescue/Destination Earth. I do not have a manual or schematics for this pcb although
+I was able to confirm 5 out of 8 dipswitch settings. I was surprised to hear the sounds effects are almost exactly like when Lunar Rescue used the "invaders" external samples in MAME. The pcb does not play the invader "hit" sound for some reason.
+I couldn't find anything obviously wrong in the sound section so it must be that it's just not hooked up as-is from the factory. There does not appear to be a sound-in-attract option.
+
+
+
+CPU - Mitsubishi M5L8080AP
+X-tal - 19968 mhz (decimal not shown, device stamped very lightly)
+Sound - discrete, SN76477N
+I/O board - Taito # CV070001A/CVN00001A label= serial# 172190
+CPU board - Taito # AA017757   label= CVN00004 serial# 802868
+ROM board - Taito # AA017756A  label= CVN00006 serial# 046120
+
+
+
+EPROMs - 6x 2716
+ML1.u36 checksum 0002CA52
+ML2.u35 checksum 0002C999
+ML3.u34 checksum 0002BD5C
+ML4.u33 checksum 000252EE
+ML5.u32 checksum 00029365
+ML6.u31 checksum 0002C624
+
+
+
+Dipswitch sw1, 8-bank
+
+
+sw1 - # ships
+sw2 - # ships
+sw3 - not used/unknown
+sw4 - not used/unknown
+sw5 - ON= enable player2 move right  OFF= disabled
+sw6 - ON= enable player2 move left   OFF= disabled
+sw7 - ON= enable player2 fire/shoot  OFF= disabled
+sw8 - not used/unknown
+--------------------------------------------------------------------------
+		1	2	3	4	5	6	7	8
+--------------------------------------------------------------------------
+# of player ships
+- 3 ships	on	on
+- 4 ships	off	on
+- 5 ships	on	off
+- 6 ships	off	off
+
+
+Maximum Credits= 9
+
+Sound Pots:
+VR1 = engine sound
+VR2 = beam gun
+VR3 = ship explosion sound
+VR4 = enemy explosion sound (not connected?)
+VR5 = bonus ship sound
+VR6 = bonus music, footsteps, and docking sound
+VR7 = shooting star/ship descending sound
+VR8 = pot for adjusting total sounds
+
+*/
+
+ROM_START( mlander )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "ml1.u36",    0x0000, 0x0800, CRC(69df529a) SHA1(ded3b4a04e28dc341b1fc5a8880bc48aa332bdb5) )
+	ROM_LOAD( "ml2.u35",    0x0800, 0x0800, CRC(3b503337) SHA1(d1056c0161d481202996811503e9970d0a0c9147) )
+	ROM_LOAD( "ml3.u34",    0x1000, 0x0800, CRC(64e53458) SHA1(629f2434eea4d31dc9db0ee7bc8364cd2bf08a04) )
+	ROM_LOAD( "ml4.u33",    0x1800, 0x0800, CRC(c9a74571) SHA1(b1671d19eff17f7adb274013c8f11eb044ebdd28) )
+	ROM_LOAD( "ml5.u32",    0x4000, 0x0800, CRC(88291fa2) SHA1(40c4eb51f75b5ca81a62121231d22b9f48d0f628) )
+	ROM_LOAD( "ml6.u31",    0x4800, 0x0800, CRC(bfb0f65d) SHA1(ea0943d764a16094b6e2289f62ef117c9f838c98) )
+ROM_END
+
 ROM_START( grescue )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "lrescue.1",    0x0000, 0x0800, CRC(2bbc4778) SHA1(0167f1ac1501ab0b4c4e555023fa5efed59d56ae) )
@@ -2325,6 +2408,7 @@ GAMEL(1979, galxwar2, galxwars, invaders, galxwars, 0, ROT270, "Universal", "Gal
 GAMEL(1979, galxwart, galxwars, invaders, galxwars, 0, ROT270, "Taito?", "Galaxy Wars (Taito?)" , 0, layout_invaders) /* Copyright Not Displayed */
 GAMEL(1979, starw,    galxwars, invaders, galxwars, 0, ROT270, "bootleg", "Star Wars", 0, layout_invaders )
 GAME( 1979, lrescue,  0,        lrescue,  lrescue,  0, ROT270, "Taito", "Lunar Rescue", 0 )
+GAME( 1980, mlander,  lrescue,  invaders, lrescue,  0, ROT270, "[Taito] (Leisure Time Electronics bootleg)", "Moon Lander (bootleg of Lunar Rescue)", 0 )
 GAME( 1978, lrescuem, lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Model Racing bootleg)", "Lunar Rescue (Model Racing bootleg)", 0 )
 GAME( 1979, grescue,  lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Universal license?)", "Galaxy Rescue", 0 )
 GAME( 1979, desterth, lrescue,  lrescue,  invrvnge, 0, ROT270, "bootleg", "Destination Earth", 0 )

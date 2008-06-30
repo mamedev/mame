@@ -1156,6 +1156,7 @@ const game_driver * const drivers[] =
 	DRIVER( galxwart )	/* (c) 1979 Taito? */
 	DRIVER( starw )		/* bootleg */
 	DRIVER( lrescue )	/* LR  (c) 1979 Taito */
+	DRIVER( mlander )	/* (c) 1980 Leisure Time Electronics */
 	DRIVER( lrescuem )	/* Model Racing bootleg */
 	DRIVER( grescue )	/* bootleg? */
 	DRIVER( desterth )	/* bootleg */
