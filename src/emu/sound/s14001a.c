@@ -16,10 +16,13 @@
  1.11 fix signedness of output, pre-multiply, fixes clicking on VSU-1000 volume change - LN (0.111u7)
  1.20 supports setting the clock freq directly - reset is done by external hardware,
       the chip has no reset line ZV (0.122)
+ 1.30 move main dac to 4 bits only with no extension (4->16 bit range extension is now done by output).
+ Added a somewhat better, but still not perfect, filtering system. LN (0.125u9)
 
  TODO:
  * increase accuracy of internal S14001A 'filter' for both driven and undriven cycles (its not terribly inaccurate for undriven cycles, but the dc sliding of driven cycles is not emulated)
  * add option for and attach Frank P.'s emulation of the Analog external filter from the vsu-1000 using the discrete core.
+ * figure out why berzerk needs SILENCE+1 but wolfpack needs SILENCE on one line. Encoding error?
 */
 
 /* state map:
@@ -158,13 +161,14 @@ typedef struct
 	UINT8 DACOutput; // 4-bit DAC Accumulator/output
 	UINT8 audioout; // filtered audio output
 	UINT8 *SpeechRom; // array to hold rom contents, mame will not need this, will use a pointer
-	UINT8 filtervals[8];
+	INT16 filtervals[8];
 	UINT8 VSU1000_amp; // amplitude setting on VSU-1000 board
 } S14001AChip;
 
 //#define DEBUGSTATE
 
-#define SILENCE 0x77 // value output when silent
+#define SILENCE 0x7 // value output when silent
+#define ALTFLAG 0xFF // value to tell renderer that this frame's output is the average of the 8 prior frames and not directly used.
 
 #define LASTSYLLABLE ((chip->PlayParams & 0x80)>>7)
 #define MIRRORMODE ((chip->PlayParams & 0x40)>>6)
@@ -175,22 +179,23 @@ typedef struct
 
 static const INT8 DeltaTable[4][4] =
 {
-	{ 0xCD, 0xCD, 0xEF, 0xEF, },
-	{ 0xEF, 0xEF, 0x00, 0x00, },
-	{ 0x00, 0x00, 0x11, 0x11, },
-	{ 0x11, 0x11, 0x33, 0x33  },
+	{ -3, -3, -1, -1, },
+	{ -1, -1,  0,  0, },
+	{  0,  0,  1,  1, },
+	{  1,  1,  3,  3  },
 };
 
-static UINT8 audiofilter(S14001AChip *chip) /* rewrite me to better match the real filter! */
+static INT16 audiofilter(S14001AChip *chip) /* rewrite me to better match the real filter! */
 {
-	UINT16 temp1, temp2 = 0;
-	/* crappy averaging filter! */
+	UINT8 temp1;
+        INT16 temp2 = 0;
+	/* mean averaging filter! 1/n exponential *would* be somewhat better, but I'm lazy... */
 	for (temp1 = 0; temp1 < 8; temp1++) { temp2 += chip->filtervals[temp1]; }
 	temp2 >>= 3;
 	return temp2;
 }
 
-static void shiftIntoFilter(S14001AChip *chip, UINT8 inputvalue)
+static void shiftIntoFilter(S14001AChip *chip, INT16 inputvalue)
 {
 	UINT8 temp1;
 	for (temp1 = 7; temp1 > 0; temp1--)
@@ -300,8 +305,8 @@ static void s14001a_clock(S14001AChip *chip) /* called once per clock */
 	chip->oddeven = !(chip->oddeven); // invert the clock
 	if (chip->oddeven == 0) // even clock
         {
-		chip->audioout = audiofilter(chip); // function to handle output filtering by internal capacitance based on clock speed and such
-		shiftIntoFilter(chip, chip->audioout); // shift over all the filter outputs and stick in audioout
+		chip->audioout = ALTFLAG; // flag to the renderer that this output should be the average of the last 8
+		// DIGITAL INPUT on the test pins occurs on this cycle used for output
 	}
 	else // odd clock
 	{
@@ -312,7 +317,7 @@ static void s14001a_clock(S14001AChip *chip) /* called once per clock */
 			chip->OldDelta = 2;
 		}
 		chip->audioout = (chip->GlobalSilenceState || LOCALSILENCESTATE) ? SILENCE : chip->DACOutput; // when either silence state is 1, output silence.
-		shiftIntoFilter(chip, chip->audioout); // shift over all the filter outputs and stick in audioout
+		// DIGITAL OUTPUT is driven onto the test pins on this cycle
 		switch(chip->machineState) // HUUUUUGE switch statement
 		{
 		case 0: // idle state
@@ -339,7 +344,7 @@ static void s14001a_clock(S14001AChip *chip) /* called once per clock */
 			chip->OutputCounter = 0; // clear output counter and disable mirrored phoneme silence indirectly via LOCALSILENCESTATE
 			chip->PhoneOffset = 0; // set offset within phone to zero
 			chip->OldDelta = 0x2; // set old delta to 2 <- is this right?
-			chip->DACOutput = 0x88; // set DAC output to center/silence position (0x88)
+			chip->DACOutput = SILENCE ; // set DAC output to center/silence position
 			chip->nextstate = 5;
 			break;
 		case 5: // Play phone forward, shift = 0 (also load)
@@ -440,7 +445,16 @@ static void s14001a_pcm_update(void *param, stream_sample_t **inputs, stream_sam
 	for (i = 0; i < length; i++)
 	{
 		s14001a_clock(chip);
-		outputs[0][i] = ((((INT16)chip->audioout)-128)<<6)*chip->VSU1000_amp;
+		if (chip->audioout == ALTFLAG) // input from test pins -> output
+		{
+			shiftIntoFilter(chip, audiofilter(chip)); // shift over the previous outputs and stick in audioout.
+			outputs[0][i] = audiofilter(chip)*chip->VSU1000_amp;
+		}
+		else // normal, dac-driven output
+		{
+			shiftIntoFilter(chip, ((((INT16)chip->audioout)-8)<<9)); // shift over the previous outputs and stick in audioout 4 times. note <<9 instead of <<10, to prevent clipping, and to simulate that the filtered output normally has a somewhat lower amplitude than the driven one.
+			outputs[0][i] = ((((INT16)chip->audioout)-8)<<10)*chip->VSU1000_amp;
+		}
 	}
 }
 
@@ -530,7 +544,7 @@ void s14001a_get_info(void *token, UINT32 state, sndinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:						info->s = "S14001A";		break;
 		case SNDINFO_STR_CORE_FAMILY:				info->s = "TSI S14001A";	break;
-		case SNDINFO_STR_CORE_VERSION:				info->s = "1.20";			break;
+		case SNDINFO_STR_CORE_VERSION:				info->s = "1.30";			break;
 		case SNDINFO_STR_CORE_FILE:					info->s = __FILE__;			break;
 		case SNDINFO_STR_CORE_CREDITS:				info->s = "Copyright Jonathan Gevaryahu"; break;
 	}
