@@ -101,9 +101,7 @@ VIDEO_START( warlords )
 {
 	bg_tilemap = tilemap_create(warlords_get_tile_info, tilemap_scan_rows,  8,8, 32,32);
 
-	/* we overload centiped_flipscreen here to track the cocktail/upright state */
-	centiped_flipscreen = input_port_read(machine, "IN0") & 0x80;
-	tilemap_set_flip(bg_tilemap, centiped_flipscreen ? TILEMAP_FLIPX : 0);
+	centiped_flipscreen = 0;
 }
 
 

@@ -2563,6 +2563,9 @@ static void copy_from_nvram(running_machine *machine)
 
 	}
 
+	romdata  += 0x800000/4;
+	romdata2 += 0x800000/4;
+
 	for (i=0;i<0x800000;i+=4)
 	{
 		UINT32 data;
@@ -2570,9 +2573,6 @@ static void copy_from_nvram(running_machine *machine)
 		UINT8* ptr2 = intelflash_getmemptr(5);
 		UINT8* ptr3 = intelflash_getmemptr(6);
 		UINT8* ptr4 = intelflash_getmemptr(7);
-
-		romdata  += 0x800000/4;
-		romdata2 += 0x800000/4;
 
 		data = ((ptr1[i/4]<<24) | (ptr2[i/4]<<16) | (ptr3[i/4]<<8) | (ptr4[i/4]<<0));
 
