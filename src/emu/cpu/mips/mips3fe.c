@@ -436,6 +436,10 @@ static int describe_instruction_regimm(mips3_state *mips, UINT32 op, opcode_desc
 
 static int describe_instruction_idt(mips3_state *mips, UINT32 op, opcode_desc *desc)
 {
+	/* only on the R4650 */
+	if (mips->flavor != MIPS3_TYPE_R4650)
+		return FALSE;
+
 	switch (op & 0x1f)
 	{
 		case 0: /* MAD */

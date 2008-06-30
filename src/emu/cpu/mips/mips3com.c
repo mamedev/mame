@@ -591,7 +591,7 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + MIPS3_HI:			sprintf(info->s, "HI: %08X%08X", (UINT32)(mips->r[REG_HI] >> 32), (UINT32)mips->r[REG_HI]); break;
 		case CPUINFO_STR_REGISTER + MIPS3_LO:			sprintf(info->s, "LO: %08X%08X", (UINT32)(mips->r[REG_LO] >> 32), (UINT32)mips->r[REG_LO]); break;
 
-		case CPUINFO_STR_REGISTER + MIPS3_CCR1_31:		sprintf(info->s, "CCR31:%08X", (UINT32)mips->ccr[1][0]); break;
+		case CPUINFO_STR_REGISTER + MIPS3_CCR1_31:		sprintf(info->s, "CCR31:%08X", (UINT32)mips->ccr[1][31]); break;
 
 		case CPUINFO_STR_REGISTER + MIPS3_FPR0:			sprintf(info->s, "FPR0: %08X%08X", (UINT32)(mips->cpr[1][0] >> 32), (UINT32)mips->cpr[1][0]); break;
 		case CPUINFO_STR_REGISTER + MIPS3_FPS0:			sprintf(info->s, "FPS0: !%16g", *(float *)&mips->cpr[1][0]); break;
