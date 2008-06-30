@@ -278,6 +278,7 @@ struct _dsio_denver_state
 {
 	UINT16		reg[4];
 	UINT8		start_on_next_write;
+	UINT16		channelbits;
 };
 
 
@@ -303,6 +304,7 @@ struct _dcs_state
 	UINT32		bootrom_words;
 	UINT16 *	sounddata;
 	UINT32		sounddata_words;
+	UINT32		sounddata_banks;
 	UINT16		sounddata_bank;
 
 	/* I/O with the host */
@@ -314,6 +316,7 @@ struct _dcs_state
 	UINT64		output_control_cycles;
 	UINT8		last_output_full;
 	UINT8		last_input_empty;
+	UINT16 		progflags;
 	void		(*output_full_cb)(int);
 	void		(*input_empty_cb)(int);
 	UINT16		(*fifo_data_r)(void);
@@ -382,6 +385,7 @@ static WRITE16_HANDLER( dcs_data_bank_select_w );
 static void sdrc_reset(running_machine *machine);
 static READ16_HANDLER( sdrc_r );
 static WRITE16_HANDLER( sdrc_w );
+static STATE_POSTLOAD( sdrc_postload );
 
 static void dsio_reset(void);
 static READ16_HANDLER( dsio_r );
@@ -782,7 +786,7 @@ static TIMER_CALLBACK( dcs_reset )
 		/* rev 1: just reset the bank to 0 */
 		case 1:
 			dcs.sounddata_bank = 0;
-			memory_set_bankptr(20, dcs.sounddata);
+			memory_set_bank(20, 0);
 			break;
 
 		/* rev 2: reset the SDRC ASIC */
@@ -805,10 +809,6 @@ static TIMER_CALLBACK( dcs_reset )
 	dcs.size = 0;
 	dcs.incs = 0;
 	dcs.ireg = 0;
-
-	/* initialize the ADSP Tx and timer callbacks */
-	cpunum_set_info_fct(dcs.cpunum, CPUINFO_PTR_ADSP2100_TX_HANDLER, (genf *)sound_tx_callback);
-	cpunum_set_info_fct(dcs.cpunum, CPUINFO_PTR_ADSP2100_TIMER_HANDLER, (genf *)timer_enable_callback);
 
 	/* initialize the ADSP control regs */
 	memset(dcs.control_regs, 0, sizeof(dcs.control_regs));
@@ -857,6 +857,7 @@ static void dcs_register_state(void)
 
 	state_save_register_global_array(dsio.reg);
 	state_save_register_global(dsio.start_on_next_write);
+	state_save_register_global(dsio.channelbits);
 
 	state_save_register_global(dcs.channels);
 	state_save_register_global(dcs.size);
@@ -875,6 +876,7 @@ static void dcs_register_state(void)
 	state_save_register_global(dcs.output_control_cycles);
 	state_save_register_global(dcs.last_output_full);
 	state_save_register_global(dcs.last_input_empty);
+	state_save_register_global(dcs.progflags);
 
 	state_save_register_global(dcs.timer_enable);
 	state_save_register_global(dcs.timer_ignore);
@@ -896,6 +898,9 @@ static void dcs_register_state(void)
 
 	if (dcs_sram != NULL)
 		state_save_register_global_pointer(dcs_sram, 0x8000*4 / sizeof(dcs_sram[0]));
+	
+	if (dcs.rev == 2)
+		state_save_register_postload(Machine, sdrc_postload, NULL);
 }
 
 
@@ -909,11 +914,17 @@ void dcs_init(void)
 	dcs.rev = 1;
 	dcs.channels = 1;
 
+	/* initialize the ADSP Tx and timer callbacks */
+	cpunum_set_info_fct(dcs.cpunum, CPUINFO_PTR_ADSP2100_TX_HANDLER, (genf *)sound_tx_callback);
+	cpunum_set_info_fct(dcs.cpunum, CPUINFO_PTR_ADSP2100_TIMER_HANDLER, (genf *)timer_enable_callback);
+
 	/* configure boot and sound ROMs */
 	dcs.bootrom = (UINT16 *)memory_region(Machine, REGION_SOUND1);
 	dcs.bootrom_words = memory_region_length(Machine, REGION_SOUND1) / 2;
 	dcs.sounddata = dcs.bootrom;
 	dcs.sounddata_words = dcs.bootrom_words;
+	dcs.sounddata_banks = dcs.sounddata_words / 0x1000;
+	memory_configure_bank(20, 0, dcs.sounddata_banks, dcs.sounddata, 0x1000*2);
 
 	/* create the timers */
 	dcs.internal_timer = timer_alloc(internal_timer_callback, NULL);
@@ -932,22 +943,31 @@ void dcs_init(void)
 
 void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 {
+	int soundbank_words;
+
 	memset(&dcs, 0, sizeof(dcs));
 
 	/* find the DCS CPU and the sound ROMs */
 	dcs.cpunum = mame_find_cpu_index(machine, "dcs2");
 	dcs.rev = 2;
+	soundbank_words = 0x1000;
 	if ((INT8)dcs.cpunum == -1)
 	{
 		dcs.cpunum = mame_find_cpu_index(machine, "dsio");
 		dcs.rev = 3;
+		soundbank_words = 0x400;
 	}
 	if ((INT8)dcs.cpunum == -1)
 	{
 		dcs.cpunum = mame_find_cpu_index(machine, "denver");
 		dcs.rev = 4;
+		soundbank_words = 0x800;
 	}
 	dcs.channels = 2;
+
+	/* initialize the ADSP Tx and timer callbacks */
+	cpunum_set_info_fct(dcs.cpunum, CPUINFO_PTR_ADSP2100_TX_HANDLER, (genf *)sound_tx_callback);
+	cpunum_set_info_fct(dcs.cpunum, CPUINFO_PTR_ADSP2100_TIMER_HANDLER, (genf *)timer_enable_callback);
 
 	/* always boot from the base of REGION_SOUND1 */
 	dcs.bootrom = (UINT16 *)memory_region(machine, REGION_SOUND1);
@@ -964,6 +984,9 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 		dcs.sounddata = dcs.bootrom;
 		dcs.sounddata_words = dcs.bootrom_words;
 	}
+	dcs.sounddata_banks = dcs.sounddata_words / soundbank_words;
+	if (dcs.rev != 2)
+		memory_configure_bank(20, 0, dcs.sounddata_banks, dcs.sounddata, soundbank_words*2);
 
 	/* allocate memory for the SRAM */
 	dcs_sram = auto_malloc(0x8000*4);
@@ -991,14 +1014,6 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	/* reset the system */
 	dcs_reset(machine, NULL, 0);
 }
-
-
-#ifdef UNUSED_FUNCTION
-void dsio_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
-{
-	dcs2_init(machine, dram_in_mb, polling_offset);
-}
-#endif
 
 
 void dcs_set_auto_ack(int state)
@@ -1031,7 +1046,7 @@ static WRITE16_HANDLER( dcs_dataram_w )
 static WRITE16_HANDLER( dcs_data_bank_select_w )
 {
 	dcs.sounddata_bank = data & 0x7ff;
-	memory_set_bankptr(20, &dcs.sounddata[(dcs.sounddata_bank * 0x1000) % dcs.sounddata_words]);
+	memory_set_bank(20, dcs.sounddata_bank % dcs.sounddata_banks);
 
 	/* bit 11 = sound board led */
 #if 0
@@ -1128,6 +1143,12 @@ static void sdrc_remap_memory(running_machine *machine)
 
 	/* update the bank pointers */
 	sdrc_update_bank_pointers();
+}
+
+
+static STATE_POSTLOAD( sdrc_postload )
+{
+	sdrc_remap_memory(machine);
 }
 
 
@@ -1279,11 +1300,9 @@ static READ16_HANDLER( dsio_r )
 
 	if (offset == 1)
 	{
-		static UINT16 bits;
-
 		/* bit 4 specifies which channel is being output */
-		bits ^= 0x0010;
-		result = (result & ~0x0010) | bits;
+		dsio.channelbits ^= 0x0010;
+		result = (result & ~0x0010) | dsio.channelbits;
 	}
 	return result;
 }
@@ -1307,7 +1326,7 @@ static WRITE16_HANDLER( dsio_w )
 		/* offset 2 controls RAM pages */
 		case 2:
 			dsio.reg[2] = data;
-			memory_set_bankptr(20, &dcs.sounddata[(DSIO_DM_PG * 1024) % dcs.sounddata_words]);
+			memory_set_bank(20, DSIO_DM_PG % dcs.sounddata_banks);
 			break;
 	}
 }
@@ -1367,7 +1386,7 @@ static WRITE16_HANDLER( denver_w )
 		/* offset 2 controls RAM pages */
 		case 2:
 			dsio.reg[2] = data;
-			memory_set_bankptr(20, &dcs.sounddata[(DENV_DM_PG * 2048) % dcs.sounddata_words]);
+			memory_set_bank(20, DENV_DM_PG % dcs.sounddata_bank);
 			break;
 
 		/* offset 3 controls FIFO reset */
@@ -1788,7 +1807,6 @@ static void timer_enable_callback(int enable)
 
 static READ16_HANDLER( adsp_control_r )
 {
-	static UINT16 progflags = 0;
 	UINT16 result = 0xffff;
 
 	switch (offset)
@@ -1796,7 +1814,7 @@ static READ16_HANDLER( adsp_control_r )
 		case PROG_FLAG_DATA_REG:
 			/* Denver waits for this & 0x000e == 0x0000 */
 			/* Denver waits for this & 0x000e == 0x0006 */
-			result = progflags ^= 0x0006;
+			result = dcs.progflags ^= 0x0006;
 			break;
 
 		case IDMA_CONTROL_REG:
