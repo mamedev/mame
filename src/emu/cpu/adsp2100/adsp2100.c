@@ -941,7 +941,7 @@ static int adsp2100_execute(int cycles)
 	CHANGEPC();
 
 	/* no debugger */
-	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
 	{
 		do
 		{
