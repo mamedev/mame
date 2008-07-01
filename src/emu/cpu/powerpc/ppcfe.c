@@ -205,6 +205,8 @@ int ppcfe_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 			else
 				desc->flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			desc->targetpc = (INT16)(G_BD(op) << 2) + ((op & M_AA) ? 0 : desc->pc);
+			if (desc->targetpc == desc->pc && desc->cycles == 0)
+				desc->cycles = 1;
 			return TRUE;
 
 		case 0x11:	/* SC */
@@ -225,7 +227,8 @@ int ppcfe_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 			desc->flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			desc->targetpc = ((INT32)(G_LI(op) << 8) >> 6) + ((op & M_AA) ? 0 : desc->pc);
 			/* branch folding */
-			desc->cycles = 0;
+			if (desc->targetpc != desc->pc)
+				desc->cycles = 0;
 			return TRUE;
 
 		case 0x13:	/* 0x13 group */

@@ -4338,7 +4338,7 @@ void ppc601_get_info(UINT32 state, cpuinfo *info)
 
 static void ppc602_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	ppcdrc_init(PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 1/* unknown */, index, clock, config, irqcallback);
+	ppcdrc_init(PPC_MODEL_602, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_603_MMU, 4, index, clock, config, irqcallback);
 }
 
 
@@ -4559,14 +4559,4 @@ void mpc8240_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-#endif
-
-
-
-/***************************************************************************
-    DISASSEMBLERS
-***************************************************************************/
-
-#if !defined(MAME_DEBUG) && (LOG_UML || LOG_NATIVE)
-#include "ppc_dasm.c"
 #endif

@@ -292,6 +292,10 @@ void ppccom_reset(powerpc_state *ppc)
 		ppc->spr[SPR4XX_TCR] &= ~PPC4XX_TCR_WRC_MASK;
 		ppc->spu.regs[SPU4XX_LINE_STATUS] = 0x06;
 	}
+	
+	/* initialize the 602 HID0 register */
+	if (ppc->flavor == PPC_MODEL_602)
+		ppc->spr[SPR603_HID0] = 1;
 
 	/* time base starts here */
 	ppc->tb_zero_cycles = cpunum_gettotalcycles(ppc->cpunum);
