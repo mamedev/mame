@@ -38,8 +38,6 @@
 #define UBIT			(0x1000 << (DRCUML_COND_U & 15))
 #define NUBIT			(0x1000 << (DRCUML_COND_NU & 15))
 #define ABIT			(0x1000 << (DRCUML_COND_A & 15))
-#define AEBIT			(0x1000 << (DRCUML_COND_AE & 15))
-#define BBIT			(0x1000 << (DRCUML_COND_B & 15))
 #define BEBIT			(0x1000 << (DRCUML_COND_BE & 15))
 #define GBIT			(0x1000 << (DRCUML_COND_G & 15))
 #define GEBIT			(0x1000 << (DRCUML_COND_GE & 15))
@@ -241,38 +239,38 @@ static int dmuls(UINT64 *dstlo, UINT64 *dsthi, INT64 src1, INT64 src2, int flags
 
 static const UINT32 condition_map[] =
 {
-	/* ..... */		NCBIT | NVBIT | NZBIT | NSBIT | NUBIT | ABIT  | AEBIT | GBIT  | GEBIT,
-	/* ....C */		CBIT  | NVBIT | NZBIT | NSBIT | NUBIT | BEBIT | BBIT  | GBIT  | GEBIT,
-	/* ...V. */		NCBIT | VBIT  | NZBIT | NSBIT | NUBIT | ABIT  | AEBIT | LEBIT | LBIT,
-	/* ...VC */		CBIT  | VBIT  | NZBIT | NSBIT | NUBIT | BEBIT | BBIT  | LEBIT | LBIT,
-	/* ..Z.. */		NCBIT | NVBIT | ZBIT  | NSBIT | NUBIT | BEBIT | AEBIT | LEBIT | GEBIT,
-	/* ..Z.C */		CBIT  | NVBIT | ZBIT  | NSBIT | NUBIT | BEBIT | BBIT  | LEBIT | GEBIT,
-	/* ..ZV. */		NCBIT | VBIT  | ZBIT  | NSBIT | NUBIT | BEBIT | AEBIT | LEBIT | LBIT,
-	/* ..ZVC */		CBIT  | VBIT  | ZBIT  | NSBIT | NUBIT | BEBIT | BBIT  | LEBIT | LBIT,
-	/* .S... */		NCBIT | NVBIT | NZBIT | SBIT  | NUBIT | ABIT  | AEBIT | LEBIT | LBIT,
-	/* .S..C */		CBIT  | NVBIT | NZBIT | SBIT  | NUBIT | BEBIT | BBIT  | LEBIT | LBIT,
-	/* .S.V. */		NCBIT | VBIT  | NZBIT | SBIT  | NUBIT | ABIT  | AEBIT | GBIT  | GEBIT,
-	/* .S.VC */		CBIT  | VBIT  | NZBIT | SBIT  | NUBIT | BEBIT | BBIT  | GBIT  | GEBIT,
-	/* .SZ.. */		NCBIT | NVBIT | ZBIT  | SBIT  | NUBIT | BEBIT | AEBIT | LEBIT | LBIT,
-	/* .SZ.C */		CBIT  | NVBIT | ZBIT  | SBIT  | NUBIT | BEBIT | BBIT  | LEBIT | LBIT,
-	/* .SZV. */		NCBIT | VBIT  | ZBIT  | SBIT  | NUBIT | BEBIT | AEBIT | LEBIT | GEBIT,
-	/* .SZVC */		CBIT  | VBIT  | ZBIT  | SBIT  | NUBIT | BEBIT | BBIT  | LEBIT | GEBIT,
-	/* U.... */		NCBIT | NVBIT | NZBIT | NSBIT | UBIT  | ABIT  | AEBIT | GBIT  | GEBIT,
-	/* U...C */		CBIT  | NVBIT | NZBIT | NSBIT | UBIT  | BEBIT | BBIT  | GBIT  | GEBIT,
-	/* U..V. */		NCBIT | VBIT  | NZBIT | NSBIT | UBIT  | ABIT  | AEBIT | LEBIT | LBIT,
-	/* U..VC */		CBIT  | VBIT  | NZBIT | NSBIT | UBIT  | BEBIT | BBIT  | LEBIT | LBIT,
-	/* U.Z.. */		NCBIT | NVBIT | ZBIT  | NSBIT | UBIT  | BEBIT | AEBIT | LEBIT | GEBIT,
-	/* U.Z.C */		CBIT  | NVBIT | ZBIT  | NSBIT | UBIT  | BEBIT | BBIT  | LEBIT | GEBIT,
-	/* U.ZV. */		NCBIT | VBIT  | ZBIT  | NSBIT | UBIT  | BEBIT | AEBIT | LEBIT | LBIT,
-	/* U.ZVC */		CBIT  | VBIT  | ZBIT  | NSBIT | UBIT  | BEBIT | BBIT  | LEBIT | LBIT,
-	/* US... */		NCBIT | NVBIT | NZBIT | SBIT  | UBIT  | ABIT  | AEBIT | LEBIT | LBIT,
-	/* US..C */		CBIT  | NVBIT | NZBIT | SBIT  | UBIT  | BEBIT | BBIT  | LEBIT | LBIT,
-	/* US.V. */		NCBIT | VBIT  | NZBIT | SBIT  | UBIT  | ABIT  | AEBIT | GBIT  | GEBIT,
-	/* US.VC */		CBIT  | VBIT  | NZBIT | SBIT  | UBIT  | BEBIT | BBIT  | GBIT  | GEBIT,
-	/* USZ.. */		NCBIT | NVBIT | ZBIT  | SBIT  | UBIT  | BEBIT | AEBIT | LEBIT | LBIT,
-	/* USZ.C */		CBIT  | NVBIT | ZBIT  | SBIT  | UBIT  | BEBIT | BBIT  | LEBIT | LBIT,
-	/* USZV. */		NCBIT | VBIT  | ZBIT  | SBIT  | UBIT  | BEBIT | AEBIT | LEBIT | GEBIT,
-	/* USZVC */		CBIT  | VBIT  | ZBIT  | SBIT  | UBIT  | BEBIT | BBIT  | LEBIT | GEBIT
+	/* ..... */		NCBIT | NVBIT | NZBIT | NSBIT | NUBIT | ABIT  | GBIT  | GEBIT,
+	/* ....C */		CBIT  | NVBIT | NZBIT | NSBIT | NUBIT | BEBIT | GBIT  | GEBIT,
+	/* ...V. */		NCBIT | VBIT  | NZBIT | NSBIT | NUBIT | ABIT  | LEBIT | LBIT,
+	/* ...VC */		CBIT  | VBIT  | NZBIT | NSBIT | NUBIT | BEBIT | LEBIT | LBIT,
+	/* ..Z.. */		NCBIT | NVBIT | ZBIT  | NSBIT | NUBIT | BEBIT | LEBIT | GEBIT,
+	/* ..Z.C */		CBIT  | NVBIT | ZBIT  | NSBIT | NUBIT | BEBIT | LEBIT | GEBIT,
+	/* ..ZV. */		NCBIT | VBIT  | ZBIT  | NSBIT | NUBIT | BEBIT | LEBIT | LBIT,
+	/* ..ZVC */		CBIT  | VBIT  | ZBIT  | NSBIT | NUBIT | BEBIT | LEBIT | LBIT,
+	/* .S... */		NCBIT | NVBIT | NZBIT | SBIT  | NUBIT | ABIT  | LEBIT | LBIT,
+	/* .S..C */		CBIT  | NVBIT | NZBIT | SBIT  | NUBIT | BEBIT | LEBIT | LBIT,
+	/* .S.V. */		NCBIT | VBIT  | NZBIT | SBIT  | NUBIT | ABIT  | GBIT  | GEBIT,
+	/* .S.VC */		CBIT  | VBIT  | NZBIT | SBIT  | NUBIT | BEBIT | GBIT  | GEBIT,
+	/* .SZ.. */		NCBIT | NVBIT | ZBIT  | SBIT  | NUBIT | BEBIT | LEBIT | LBIT,
+	/* .SZ.C */		CBIT  | NVBIT | ZBIT  | SBIT  | NUBIT | BEBIT | LEBIT | LBIT,
+	/* .SZV. */		NCBIT | VBIT  | ZBIT  | SBIT  | NUBIT | BEBIT | LEBIT | GEBIT,
+	/* .SZVC */		CBIT  | VBIT  | ZBIT  | SBIT  | NUBIT | BEBIT | LEBIT | GEBIT,
+	/* U.... */		NCBIT | NVBIT | NZBIT | NSBIT | UBIT  | ABIT  | GBIT  | GEBIT,
+	/* U...C */		CBIT  | NVBIT | NZBIT | NSBIT | UBIT  | BEBIT | GBIT  | GEBIT,
+	/* U..V. */		NCBIT | VBIT  | NZBIT | NSBIT | UBIT  | ABIT  | LEBIT | LBIT,
+	/* U..VC */		CBIT  | VBIT  | NZBIT | NSBIT | UBIT  | BEBIT | LEBIT | LBIT,
+	/* U.Z.. */		NCBIT | NVBIT | ZBIT  | NSBIT | UBIT  | BEBIT | LEBIT | GEBIT,
+	/* U.Z.C */		CBIT  | NVBIT | ZBIT  | NSBIT | UBIT  | BEBIT | LEBIT | GEBIT,
+	/* U.ZV. */		NCBIT | VBIT  | ZBIT  | NSBIT | UBIT  | BEBIT | LEBIT | LBIT,
+	/* U.ZVC */		CBIT  | VBIT  | ZBIT  | NSBIT | UBIT  | BEBIT | LEBIT | LBIT,
+	/* US... */		NCBIT | NVBIT | NZBIT | SBIT  | UBIT  | ABIT  | LEBIT | LBIT,
+	/* US..C */		CBIT  | NVBIT | NZBIT | SBIT  | UBIT  | BEBIT | LEBIT | LBIT,
+	/* US.V. */		NCBIT | VBIT  | NZBIT | SBIT  | UBIT  | ABIT  | GBIT  | GEBIT,
+	/* US.VC */		CBIT  | VBIT  | NZBIT | SBIT  | UBIT  | BEBIT | GBIT  | GEBIT,
+	/* USZ.. */		NCBIT | NVBIT | ZBIT  | SBIT  | UBIT  | BEBIT | LEBIT | LBIT,
+	/* USZ.C */		CBIT  | NVBIT | ZBIT  | SBIT  | UBIT  | BEBIT | LEBIT | LBIT,
+	/* USZV. */		NCBIT | VBIT  | ZBIT  | SBIT  | UBIT  | BEBIT | LEBIT | GEBIT,
+	/* USZVC */		CBIT  | VBIT  | ZBIT  | SBIT  | UBIT  | BEBIT | LEBIT | GEBIT
 };
 
 
@@ -1226,7 +1224,7 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE8, 8, 0):		/* DWRITE  dst,src1,space_QWORD   */
-				(*active_address_space[PARAM2 / 16].accessors->write_qword)(PARAM0, PARAM1);
+				(*active_address_space[PARAM2 / 16].accessors->write_qword)(PARAM0, DPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITEM2, 8, 0):	/* DWRITEM dst,src1,mask,space_WORD */
