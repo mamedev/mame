@@ -59,9 +59,9 @@
 #define CHEAT_FILENAME_MAX_LEN					(255)
 #define CHEAT_MENU_DEPTH						(8)
 #ifdef MESS
-#define DEFAULT_CHEAT_OPTIONS					(0xFF78)
+#define DEFAULT_CHEAT_OPTIONS					(0x1FFF8)
 #else
-#define DEFAULT_CHEAT_OPTIONS					(0xFF38)
+#define DEFAULT_CHEAT_OPTIONS					(0x1FEF8)
 #endif
 #define DEFAULT_MESSAGE_TIME					(50)
 #define VARIABLE_MAX_ARRAY						(8)			/* NOTE : Destination in Move code can only accept variable[0]-[3] only */
@@ -85,7 +85,7 @@ enum
 	DEFINE_BITFIELD_ENUM(ValueSelectNegative,		12,	12),	/* = CopyValueNegative */
 	DEFINE_BITFIELD_ENUM(PopupParameter,			13,	14),
 	DEFINE_BITFIELD_ENUM(DataRead,					15,	15),	/* 0 = field, 1 = variable */
-	DEFINE_BITFIELD_ENUM(Link,						16,	17),	/* 0 = master, 1 = link, 2 = sub link, 3 = EOL */
+	DEFINE_BITFIELD_ENUM(Link,						16,	17),	/* 0 = master, 1 = link, 2 = label link, 3 = label sub link */
 	DEFINE_BITFIELD_ENUM(AddressSize,				20,	21),
 	DEFINE_BITFIELD_ENUM(AddressRead,				22,	23),	/* 0 = field, 1 = indirect address from variable, 2 = variable */
 	DEFINE_BITFIELD_ENUM(CodeParameter,				24,	27),
@@ -140,12 +140,14 @@ enum
 	DEFINE_BITFIELD_ENUM(DontPrintNewLabels,		2,	2),		/* advanced mode only. in options menu, it is reversed display */
 	DEFINE_BITFIELD_ENUM(AutoSaveEnabled,			3,	3),
 	DEFINE_BITFIELD_ENUM(ActivationKeyMessage,		4,	4),
-	DEFINE_BITFIELD_ENUM(LoadOldFormat,				5,	5),
+	DEFINE_BITFIELD_ENUM(LoadNewCode,				5,	5),
+	DEFINE_BITFIELD_ENUM(LoadStandardCode,			6,	6),
+	DEFINE_BITFIELD_ENUM(LoadOldCode,				7,	7),
 #ifdef MESS
-	DEFINE_BITFIELD_ENUM(SharedCode,				6,	6),
+	DEFINE_BITFIELD_ENUM(SharedCode,				8,	8),
 #endif
-	DEFINE_BITFIELD_ENUM(VerticalKeyRepeatSpeed,	8,	11),
-	DEFINE_BITFIELD_ENUM(HorizontalKeyRepeatSpeed,	12,	15),
+	DEFINE_BITFIELD_ENUM(VerticalKeyRepeatSpeed,	9,	12),
+	DEFINE_BITFIELD_ENUM(HorizontalKeyRepeatSpeed,	13,	16),
 };
 
 /********** OPERATION **********/
@@ -226,10 +228,12 @@ enum{		/* custom code */
 	CUSTOM_CODE_OVER_CLOCK,
 	CUSTOM_CODE_REFRESH_RATE };
 
-enum{		// link level
-	kLink_Master = 0,
-	kLink_Link,
-	kLink_SubLink };
+enum{		/* link */
+	LINK_MASTER = 0,
+	LINK_STANDARD_LINK,
+	LINK_LABEL_LINK,
+	LINK_LABEL_SUB_LINK
+};
 
 enum{		// address read from
 	kReadFrom_Address = 0,			// $xxxx
@@ -339,16 +343,24 @@ enum		// action flags
 	/* set if the code is a label for label-selection code */
 	kActionFlag_IsLabel =			1 << 13,
 
+	/* set if the code is a sub-label for label-selection code */
+	kActionFlag_IsSubLabel =		1 << 14,
+
 	/* set when read/write a data after 1st read/write and clear after 2nd read/write (PDWWrite) */
-	kActionFlag_IsFirst =			1 << 14,
+	kActionFlag_IsFirst =			1 << 16,
+
+	/* set for wait for modification or ignore if decrementing cheats when the targeted value has changed */
+	/* cleared after the operation is performed */
+	kActionFlag_WasModified =		1 << 17,
 
 	/* masks */
 	kActionFlag_StateMask =			kActionFlag_OperationDone |		/* used in reset_action() to clear specified flags */
 									kActionFlag_LastValueGood |
 									kActionFlag_PrefillDone |
 									kActionFlag_PrefillWritten,
-	kActionFlag_InfoMask =			kActionFlag_IndexAddress,		/* ??? unused ??? */
-	kActionFlag_PersistentMask =	kActionFlag_OldFormat |			/* used in update_cheat_info() to clear other flags */
+	kActionFlag_InfoMask =			kActionFlag_IndexAddress |		/* ??? unused ??? */
+									kActionFlag_WasModified,
+	kActionFlag_PersistentMask =	kActionFlag_OldFormat |			/* used in update_cheat_info(machine, ) to clear other flags */
 									kActionFlag_LastValueGood
 };
 
@@ -387,17 +399,11 @@ enum		// entry flags
 	/* true if selected code requests left/right arrow for sub item */
 	kCheatFlag_RequestArrow =			1 << 10,
 
-	/* true if the cheat has been assigned an 1st activation key */
-	kCheatFlag_HasActivationKey1 =		1 << 11,
-
-	/* true if the cheat has been assigned an 2nd activation key */
-	kCheatFlag_HasActivationKey2 =		1 << 12,
-
 	/* true if the cheat is not the newest format */
-	kCheatFlag_OldFormat =				1 << 13,
+	kCheatFlag_OldFormat =				1 << 11,
 
 	/* true if wrong cheat code */
-	kCheatFlag_HasWrongCode =			1 << 14,
+	kCheatFlag_HasWrongCode =			1 << 12,
 
 	/* true if the cheat has been edited or is a new cheat
        checked at auto-save then save the code if true */
@@ -405,8 +411,8 @@ enum		// entry flags
 	kCheatFlag_Dirty =					1 << 15,
 
 	/* masks */
-	kCheatFlag_StateMask =			kCheatFlag_Active,					// used in reset_action() and deactivate_cheat() to clear specified flag
-	kCheatFlag_InfoMask =			kCheatFlag_OneShot |				// used in update_cheat_info() to detect specified flags
+	kCheatFlag_StateMask =			kCheatFlag_Active,					// used in reset_action() and deactivate_cheat(machine, ) to clear specified flag
+	kCheatFlag_InfoMask =			kCheatFlag_OneShot |				// used in update_cheat_info(machine, ) to detect specified flags
 									kCheatFlag_Null |
 									kCheatFlag_ExtendComment |
 									kCheatFlag_Separator |
@@ -415,9 +421,7 @@ enum		// entry flags
 									kCheatFlag_UseLabelSelector |
 									kCheatFlag_LayerIndex |
 									kCheatFlag_OldFormat,
-	kCheatFlag_PersistentMask =		kCheatFlag_Active |					// used in update_cheat_info() to extract specified flags
-									kCheatFlag_HasActivationKey1 |
-									kCheatFlag_HasActivationKey2 |
+	kCheatFlag_PersistentMask =		kCheatFlag_Active |					// used in update_cheat_info(machine, ) to extract specified flags
 									kCheatFlag_Dirty
 };
 
@@ -532,12 +536,13 @@ enum		/* search menu */
 	SEARCH_BOX_ADVANCED
 };
 
-enum		/* format level */
+enum		/* load code */
 {
-	FORMAT_OTHERS = 0,
-	FORMAT_NEW,
-	FORMAT_STANDARD,
-	FORMAT_OLD
+	LOAD_CHEAT_OPTIONS = 0,
+	LOAD_CHEAT_CODE_NEW,
+	LOAD_CHEAT_CODE_STANDARD,
+	LOAD_CHEAT_CODE_OLD,
+	LOAD_USER_REGION
 };
 
 enum		/* disposition for resizing a list */
@@ -550,13 +555,6 @@ enum		/* database open flags */
 {
 	DATABASE_LOAD = 0,
 	DATABASE_SAVE
-};
-
-enum		/* database load flags */
-{
-	LOAD_CHEAT_OPTION	= 1,
-	LOAD_CHEAT_CODE		= 1 << 1,
-	LOAD_USER_REGION	= 1 << 2
 };
 
 enum		/* message type */
@@ -640,11 +638,12 @@ struct _cheat_action
 
 	UINT32			flags;				/* internal flags */
 
-	INT32			frame_timer;		/* timer for delay/keep */
+	INT8			frame_timer;		/* internal timer */
 	UINT32			*last_value;		/* back up value before cheating to restore value. PDWWrite uses 2 and RWrite uses about a counter */
 
 	UINT8			**cached_pointer;	/* pointer to specified address space or mapped memory */
 	UINT32			cached_offset;		/* offset for mapped memory */
+
 };
 
 /********** ENTRY **********/
@@ -652,7 +651,7 @@ struct _cheat_action
 typedef struct _cheat_entry cheat_entry;
 struct _cheat_entry
 {
-	char			*name;					/* name to display in list menu */
+	char			*name;					/* entry name */
 	char			*comment;				/* simple comment */
 
 	UINT32			flags;					/* internal flags */
@@ -660,12 +659,12 @@ struct _cheat_entry
 	INT32			action_list_length;		/* total codes of cheat action. NOTE : minimum length is 1 and 0 is ERROR */
 	cheat_action	*action_list;			/* pointer to cheat action */
 
-	int				activation_key_1;		/* activation key index for 1st key */
-	int				activation_key_2;		/* activation key index for 2nd key (only used in new format) */
+	int				activation_key;			/* main activation key index (or previous select key in label-select) */
+	int				activation_sub_key;		/* sub activation key index for next select key in label-select) */
 
-	int				selection;				/* for label-select to set selected label number */
-	int				label_index_length;		/* total tables of index table. NOTE : minimum length is 1 and 0 is ERROR */
-	int				*label_index;			/* pointer of label index table */
+	int				selection;				/* for label-select to set selected label number (OLD) */
+	int				label_index_length;		/* total tables of index table. NOTE : minimum length is 1 and 0 is ERROR (new) */
+	int				*label_index;			/* pointer of label index table (new) */
 
 	int				layer_index;			/* layer index for enable/disable menu */
 };
@@ -825,15 +824,22 @@ struct _cheat_format
 	UINT8			comment_matched;		/* valid arguments to add comment */
 };
 
-/***************************************************************************
-    EXPORTED VARIABLES
-***************************************************************************/
-
-static const char			*cheat_file = NULL;
+typedef struct _cheat_format_strings cheat_format_strings;
+struct _cheat_format_strings
+{
+	char	name[255];
+	char	type[255];
+	char	data[255];
+	char	extend_data[255];
+	char	description[255];
+	char	comment[255];
+};
 
 /***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
+
+static const char			*cheat_file;
 
 static emu_timer			*periodic_timer;
 
@@ -869,6 +875,8 @@ static INT8					edit_cursor;
 
 static INT8					stack_index;
 static cheat_menu_stack		menu_stack[CHEAT_MENU_DEPTH];
+
+static cheat_format_strings	*format_strings;
 
 static int					cheat_variable[VARIABLE_MAX_ARRAY] = { 0 };
 
@@ -1076,18 +1084,18 @@ static const struct _cheat_format cheat_format_table[] =
 	{	":_command:%[^:\n\r]",																	1,	8,	0,	0	},
 #ifdef MESS
 		/* code (new) - :MACHINE_NAME::CRC::TYPE::ADDRESS::DATA::EXTEND_DATA:(DESCRIPTION:COMMENT) */
-	{	":%8[^:\n\r]::%8X::%10[^:\n\r]::%X::%8[^:\n\r]::%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",	6,	10,	8,	8	},
+	{	":%8[^:\n\r]::%8X::%10[^:\n\r]::%X::%8[^:\n\r]::%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",		6,	10,	8,	8	},
 		/* code (old) - :MACHINE_NAME:CRC:TYPE:ADDRESS:DATA:EXTEND_DATA:(DESCRIPTION:COMMENT) */
-	{	":%8[^:\n\r]:8X:%8[^:\n\r]:%X:%8[^:\n\r]:%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",		6,	8,	8,	0	},
+	{	":%8[^:\n\r]:8X:%8[^:\n\r]:%X:%8[^:\n\r]:%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",				6,	8,	8,	0	},
 		/* code (older) - :MACHINE_NAME:CRC:CPU:ADDRESS:DATA:TYPE:(DESCRIPTION:COMMENT) */
 	{	"%8[^:\n\r]:%8X:%d:%X:%X:%d:%[^:\n\r]:%[^:\n\r]",										5,	0,	0,	8	},
 		/* user region - :MACHINE_NAME:CRC:CPU:ADDRESS_SPACE:START_ADDRESS:END_ADDRESS:STATUS:(DESCRIPTION) */
 	{	":%8[^:\n\r]:%8X:%2X:%2X:%X:%X:%1X:%[^:\n\r]",											7,	0,	0,	0	},
 #else
 		/* code (new) - :GAME_NAME::TYPE::ADDRESS::DATA::EXTEND_DATA:(DESCRIPTION:COMMENT) */
-	{	":%8[^:\n\r]::%10[^:\n\r]::%X::%8[^:\n\r]::%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",		5,	10,	8,	7	},
+	{	":%8[^:\n\r]::%10[^:\n\r]::%X::%8[^:\n\r]::%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",				5,	10,	8,	7	},
 		/* code (old) - :GAME_NAME:TYPE:ADDRESS:DATA:EXTEND_DATA:(DESCRIPTION:COMMENT) */
-	{	":%8[^:\n\r]:%8[^:\n\r]:%X:%8[^:\n\r]:%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",			5,	8,	8,	0	},
+	{	":%8[^:\n\r]:%8[^:\n\r]:%X:%8[^:\n\r]:%8[^:\n\r]:%[^:\n\r]:%[^:\n\r]",					5,	8,	8,	0	},
 		/* code (older) - :GAME_NAME:CPU:ADDRESS:DATA:TYPE:(DESCRIPTION:COMMENT) */
 	{	"%8[^:\n\r]:%d:%X:%X:%d:%[^:\n\r]:%[^:\n\r]",											4,	0,	0,	7	},
 		/* user region - :GAME_NAME:CPU:ADDRESS_SPACE:START_ADDRESS:END_ADDRESS:STATUS:(DESCRIPTION) */
@@ -1253,17 +1261,17 @@ static void		allocate_search_regions(search_info *info);
 static void		build_search_regions(running_machine *machine, search_info *info);
 
 /********** LOADER **********/
-static int		convert_older_code(int code, int cpu, int *data, int *extend_data);
-static int		convert_to_new_code(cheat_action *action);
 static int		handle_local_command_tag(char *tag);
 static void		handle_local_command_cheat(running_machine *machine, int cpu, int type, int address, int data, int extend_data, char *tag);
 
 static UINT8	open_cheat_database(mame_file **the_file, char *file_name, UINT8 flag);
 
-static void		load_cheat_option(char *file_name);
-static void		load_cheat_code(running_machine *machine, char *file_name);
+static void		load_cheat_options(char *file_name);
+static void		load_cheat_code_new(running_machine *machine, char *file_name);
+static void		load_cheat_code_standard(running_machine *machine, char *file_name);
+static void		load_cheat_code_old(running_machine *machine, char *file_name);
 static void		load_user_defined_search_region(running_machine *machine, char *file_name);
-static void		load_cheat_database(running_machine *machine, UINT8 flags);
+static void		load_cheat_database(running_machine *machine, UINT8 load_code);
 static void		reload_cheat_database(running_machine *machine);
 
 static void		dispose_cheat_database(running_machine *machine);
@@ -1314,6 +1322,7 @@ static void		do_memory_write(UINT32 data, UINT8 *buf, UINT32 address, UINT8 byte
 
 static UINT32	read_data(running_machine *machine, cheat_action *action);
 static void		write_data(running_machine *machine, cheat_action *action, UINT32 data);
+static UINT32	read_or_write_data(running_machine *machine, cheat_action *action, UINT32 data, int read_or_write);
 
 /********** WATCH **********/
 static void		watch_cheat_entry(cheat_entry *entry, UINT8 associate);
@@ -1332,13 +1341,17 @@ static void		cheat_periodic_operation(running_machine *machine, cheat_action *ac
 static UINT8	cheat_periodic_condition(running_machine *machine, cheat_action *action);
 static int		cheat_periodic_action(running_machine *machine, cheat_action *action, int selection);
 static void		cheat_periodic_entry(running_machine *machine, cheat_entry *entry);
+static void		cheat_periodic_old_entry(running_machine *machine, cheat_entry *entry);
+
+/********** LABEL UTILITY **********/
+static void		choose_label_index(running_machine *machine, cheat_entry *entry, int next_or_previous);
+static void		build_label_index_table(cheat_entry *entry);
 
 /********** CONFIGURE ENTRY **********/
 static void		update_all_cheat_info(running_machine *machine);
 static void		update_cheat_info(running_machine *machine, cheat_entry *entry, UINT8 is_load_time);
 static UINT32	analyse_code_format(running_machine *machine, cheat_entry *entry, cheat_action *action);
 static void		check_code_format(running_machine *machine, cheat_entry *entry);
-static void		build_label_index_table(cheat_entry *entry);
 static void		set_layer_index(void);
 
 /********** OTHER STUFF **********/
@@ -2004,19 +2017,29 @@ void cheat_init(running_machine *machine)
 	watches_disabled	= 0;
 	edit_active			= 0;
 	edit_cursor			= 0;
-	cheat_options		= DEFAULT_CHEAT_OPTIONS;
 	driverSpecifiedFlag	= 0;
+	full_menu_page_height		= visible_items = floor(1.0f / ui_get_line_height()) - 1;
 
-	horizontal_key_repeat_speed = 10;
-	vertical_key_repeat_speed = 10;
+	/* allocate huge strings buffer for format */
+	format_strings = malloc(sizeof(cheat_format_strings));
+	if(format_strings == NULL)
+		fatalerror(	"cheat: [format strings] memory allocation error"
+					"	format_strings = %p\n",
+					format_strings);
 
-	full_menu_page_height = visible_items = floor(1.0f / ui_get_line_height()) - 1;
+	/* set cheat options */
+	cheat_options				= DEFAULT_CHEAT_OPTIONS;
+ 	horizontal_key_repeat_speed	= EXTRACT_FIELD(cheat_options, VerticalKeyRepeatSpeed);
+	vertical_key_repeat_speed	= EXTRACT_FIELD(cheat_options, HorizontalKeyRepeatSpeed);
+	load_cheat_database(machine, LOAD_CHEAT_OPTIONS);
 
 	/* initialize CPU/Region info for cheat system */
 	build_cpu_region_info_list(machine);
 
 	/* set cheat list from database */
-	load_cheat_database(machine, LOAD_CHEAT_OPTION | LOAD_CHEAT_CODE);
+	if(TEST_FIELD(cheat_options, LoadNewCode))		load_cheat_database(machine, LOAD_CHEAT_CODE_NEW);
+	if(TEST_FIELD(cheat_options, LoadStandardCode))	load_cheat_database(machine, LOAD_CHEAT_CODE_STANDARD);
+	if(TEST_FIELD(cheat_options, LoadOldCode))		load_cheat_database(machine, LOAD_CHEAT_CODE_OLD);
 
 	/* set default search and watch lists */
 	resize_search_list(1, REQUEST_DISPOSE);
@@ -2120,6 +2143,9 @@ static void cheat_exit(running_machine *machine)
 
 	free(menu_item_info);
 	menu_item_info = NULL;
+
+	free(format_strings);
+	format_strings = NULL;
 
 #ifdef MESS
 	StopMessCheats();
@@ -2263,10 +2289,8 @@ static void rebuild_string_tables(void)
 					menu_strings.buf);
 	}
 
-	traverse = menu_strings.buf;
-
 	/* allocate string buffer to list */
-	for(i = 0; i < menu_strings.num_strings; i++)
+	for(i = 0, traverse = menu_strings.buf; i < menu_strings.num_strings; i++)
 	{
 		menu_strings.main_strings[i] = traverse;
 		traverse += menu_strings.main_string_length;
@@ -3082,7 +3106,7 @@ static int cheat_main_menu(running_machine *machine, cheat_menu_stack *menu)
 		if(shift_key_pressed())
 			reset_cheat_options();
 		else if(control_key_pressed())
-			load_cheat_database(machine, LOAD_CHEAT_OPTION);
+			load_cheat_database(machine, LOAD_CHEAT_OPTIONS);
 		else
 			reload_cheat_database(machine);
 	}
@@ -3100,17 +3124,23 @@ static int cheat_main_menu(running_machine *machine, cheat_menu_stack *menu)
 
 static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 {
+	#define ADD_CHEAT_SELECT_MENU_ITEMS(sub_name, request_arrow) \
+				do {	menu_sub_item[total] = sub_name; menu_item_info[total].sub_cheat = i; menu_item_info[total].field_type = request_arrow; \
+						flag_buf[total] = traverse->comment && traverse->comment[0] ? 1 : 0; total++; } while(0)
+
 	int				i;
+	int				do_select		= 0;
 	UINT8			total			= 0;
 	UINT8			length			= cheat_list_length ? cheat_list_length : 2;
 	UINT8			is_empty		= 0;
 	UINT8			request_arrow	= 0;
-	UINT8			*menu_index;
 	static INT8		current_layer;
 	const char		**menu_item;
 	const char		**menu_sub_item;
 	char			*flag_buf;
-	cheat_entry		*entry;
+	cheat_entry		*entry = NULL;
+	cheat_menu_item_info
+					*info = NULL;
 
 	/* first setting : always starts with root layer level */
 	if(menu->first_time)
@@ -3121,20 +3151,17 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 
 	/* required items = total codes + return + terminator */
 	request_strings(length + 2, 0, 0, 0);
-
 	menu_item		= menu_strings.main_list;
 	menu_sub_item	= menu_strings.sub_list;
 	flag_buf		= menu_strings.flag_list;
 
-	menu_index = malloc_or_die(sizeof(INT8) * (length + 1));
-	memset(menu_index, 0, sizeof(INT8) * (length + 1));
+	/* allocate memory for menu item info */
+	resize_menu_item_info(length + 2);
 
 	/********** MENU CONSTRUCTION **********/
-	for(i = 0; i < cheat_list_length; i++)
+	for(i = 0; i < cheat_list_length && total < visible_items; i++)
 	{
 		cheat_entry *traverse = &cheat_list[i];
-
-		if(total >= full_menu_page_height) break;
 
 		/* when return to previous layer, set cursor position to previous layer label code */
 		if(traverse->flags & kCheatFlag_LayerSelected)
@@ -3145,99 +3172,68 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 
 		if(traverse->layer_index == current_layer)
 		{
-			/* ##### SEPARAOTR ##### */
 			if(traverse->flags & kCheatFlag_Separator)
 			{
+				/* ##### SEPARAOTR ##### */
 				menu_item[total] = MENU_SEPARATOR_ITEM;
-				menu_sub_item[total] = NULL;
-				menu_index[total++] = i;
-				traverse->flags &= ~kCheatFlag_RequestArrow;
+				ADD_CHEAT_SELECT_MENU_ITEMS(NULL, 0);
 			}
 			else
 			{
-				/* ##### NAME ##### */
-				if(traverse->name)
-					menu_item[total] = traverse->name;
-				else
-					menu_item[total] = "null name";
+				/* ##### CODE NAME ##### */
+				menu_item[total] = traverse->name && traverse->name[0] ? traverse->name : "(null)";
 
-				/* ##### SUB ITEM ##### */
 				if(traverse->flags & kCheatFlag_HasWrongCode)
 				{
-					/* "ERROR" if wrong code */
-					menu_sub_item[total] = "ERROR";
+					/* ##### ERROR ##### */
+					ADD_CHEAT_SELECT_MENU_ITEMS("ERROR", 0);
 					traverse->selection = 0;
-					traverse->flags &= ~kCheatFlag_RequestArrow;
 				}
 				else if(traverse->flags & kCheatFlag_Select)
 				{
-					/* label or "OFF" if label-selection though one-shot should ignore "OFF" */
-					if(traverse->selection)
-						menu_sub_item[total] = traverse->action_list[traverse->label_index[traverse->selection]].optional_name;
+					/* ##### LABEL ##### */
+					if(traverse->flags & kCheatFlag_OldFormat)
+						ADD_CHEAT_SELECT_MENU_ITEMS(traverse->selection ? traverse->action_list[traverse->selection].optional_name : "Off", 1);
 					else
-						menu_sub_item[total] = "Off";
-
-					traverse->flags |= kCheatFlag_RequestArrow;
+						ADD_CHEAT_SELECT_MENU_ITEMS(traverse->selection ? traverse->action_list[traverse->label_index[traverse->selection]].optional_name : "Off", 1);
 				}
 				else if(traverse->flags & kCheatFlag_ExtendComment)
 				{
-					/* "READ" if extend comment code */
-					menu_sub_item[total] = "Read";
-					traverse->flags &= ~kCheatFlag_RequestArrow;
+					/* ##### READ ##### */
+					ADD_CHEAT_SELECT_MENU_ITEMS("Read", 0);
 				}
 				else if(traverse->flags & kCheatFlag_LayerIndex)
 				{
-					/* ">>>" (next layer) if layer label code */
-					menu_sub_item[total] = ">>>";
-					traverse->flags &= ~kCheatFlag_RequestArrow;
+					/* ##### NEXT LAYER ##### */
+					ADD_CHEAT_SELECT_MENU_ITEMS(">>>", 0);
 				}
-				else if((traverse->flags & kCheatFlag_Null) == 0)
+				else if(traverse->flags & kCheatFlag_Null)
 				{
-					/* otherwise, add sub-items */
-					if(traverse->flags & kCheatFlag_OneShot)
-					{
-						menu_sub_item[total] = "Set";
-						traverse->flags &= ~kCheatFlag_RequestArrow;
-					}
-					else
-					{
-						if(traverse->flags & kCheatFlag_Active)
-							menu_sub_item[total] = "On";
-						else
-							menu_sub_item[total] = "Off";
-
-						traverse->flags |= kCheatFlag_RequestArrow;
-					}
+					/* ##### COMMENT ##### */
+					ADD_CHEAT_SELECT_MENU_ITEMS(NULL, 0);
 				}
-
-				if(traverse->flags & kCheatFlag_OldFormat)
-					traverse->flags &= ~kCheatFlag_RequestArrow;
-
-				/* set highlight flag if comment is set */
-				if(traverse->comment && traverse->comment[0])
-					flag_buf[total] = 1;
 				else
-					flag_buf[total] = 0;
-
-				menu_index[total++] = i;
+				{
+					/* ##### ON/OFF ##### */
+					if(traverse->flags & kCheatFlag_OneShot)
+						ADD_CHEAT_SELECT_MENU_ITEMS("Set", 0);
+					else
+						ADD_CHEAT_SELECT_MENU_ITEMS(traverse->flags & kCheatFlag_Active ? "On" : "Off", 1);
+				}
 			}
 		}
 		else if(traverse->flags & kCheatFlag_LayerIndex)
 		{
+			/* specified handling for previous layer select item */
 			if(current_layer == traverse->action_list[0].data)
 			{
-				/* specified handling previous layer label code with "<<<" (previous layer) */
-				if(traverse->comment)
-					menu_item[total] = traverse->comment;
-				else
-					menu_item[total] = "Return to Prior Layer";
-				menu_sub_item[total] = "<<<";
-				flag_buf[total] = 0;
-				menu_index[total++] = i;
-				traverse->flags &= ~kCheatFlag_RequestArrow;
+				/* ##### PREVIOUS LAYER ##### */
+				menu_item[total] = traverse->comment && traverse->comment[0] ? traverse->comment : "Return to Prior Layer";
+				ADD_CHEAT_SELECT_MENU_ITEMS("<<<", 0);
 			}
 		}
 	}
+	#undef ADD_CHEAT_SELECT_MENU_ITEMS
 
 	/* if no code, set special message */
 	if(cheat_list_length == 0)
@@ -3245,49 +3241,50 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 		if(found_database)
 		{
 			/* the database is found but no code */
-			menu_item[total]		= "there are no cheats for this game";
-			menu_sub_item[total]	= NULL;
-			menu_index[total]		= total;
-			flag_buf[total++]		= 0;
-			is_empty				= 1;
+			menu_item[total]					= "there are no cheats for this game";
+			menu_sub_item[total] 				= NULL;
+			menu_item_info[total].sub_cheat		= total;
+			menu_item_info[total].field_type	= 0;
+			flag_buf[total++] 					= 0;
+			is_empty							= 1;
 		}
 		else
 		{
 			/* the database itself is not found */
-			menu_item[total]		= "cheat database not found";
-			menu_sub_item[total]	= NULL;
-			menu_index[total]		= total;
-			flag_buf[total++]		= 0;
+			menu_item[total]					= "cheat database not found";
+			menu_sub_item[total]				= NULL;
+			menu_item_info[total].sub_cheat		= total;
+			menu_item_info[total].field_type	= 0;
+			flag_buf[total++]					= 0;
 
-			menu_item[total]		= "unzip it and place it in the MAME directory";
-			menu_sub_item[total]	= NULL;
-			menu_index[total]		= total;
-			flag_buf[total++]		= 0;
-			is_empty				= 2;
+			menu_item[total]					= "unzip it and place it in the MAME directory";
+			menu_sub_item[total]				= NULL;
+			menu_item_info[total].sub_cheat		= total;
+			menu_item_info[total].field_type	= 0;
+			flag_buf[total++]					= 0;
+			is_empty							= 2;
 		}
 	}
 	else if(current_layer && total == 1)
 	{
 		/* selected layer doesn't have code */
-		menu_item[total]		= "selected layer doesn't have sub code";
-		menu_sub_item[total]	= NULL;
-		menu_index[total]		= menu_index[total - 1];
-		flag_buf[total++]		= 0;
-		is_empty				= 3;
+		menu_item[total]					= "selected layer doesn't have sub code";
+		menu_sub_item[total]				= NULL;
+		menu_item_info[total].sub_cheat		= menu_item_info[total - 1].sub_cheat;
+		menu_item_info[total].field_type	= 0;
+		flag_buf[total++]					= 0;
+		is_empty							= 3;
 	}
 
 	/* ##### RETURN ##### */
-	if(current_layer)
-		menu_item[total]	= "Return to Root Layer";
-	else
-		menu_item[total]	= "Return to Prior Menu";
-	menu_sub_item[total]	= NULL;
-	flag_buf[total++]		= 0;
+	menu_item[total] 					= current_layer ? "Return to Root Layer" : "Return to Prior Menu";
+	menu_sub_item[total]				= NULL;
+	menu_item_info[total].sub_cheat		= total - 1;
+	menu_item_info[total].field_type	= 0;
+	flag_buf[total++]					= 0;
 
 	/* ##### TERMINATE ARRAY ##### */
-	menu_item[total]		= NULL;
-	menu_sub_item[total]	= NULL;
-	flag_buf[total]			= 0;
+	menu_item[total] = menu_sub_item[total] = NULL;
 
 	/* adjust cursor position */
 	switch(is_empty)
@@ -3296,7 +3293,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 			ADJUST_CURSOR(menu->sel, total);
 
 			/* if cursor is on comment code, skip it */
-			while(menu->sel < total - 1 && (cheat_list[menu_index[menu->sel]].flags & kCheatFlag_Null))
+			while(menu->sel < total - 1 && (cheat_list[menu_item_info[menu->sel].sub_cheat].flags & kCheatFlag_Null))
 				menu->sel++;
 			break;
 
@@ -3308,26 +3305,26 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 
 		case 3:
 			/* no code in sub layer, unselectable message line */
-			if(menu->sel == 1)
-				menu->sel = 0;
+			if(menu->sel == 1) menu->sel = 0;
+			break;
 	}
 
-	/* set selected item's cheat entry */
+	/* set selected menu info */
+	if(menu->sel < total) info = &menu_item_info[menu->sel];
+
+	/* set selected entry */
 	if(is_empty == 0 && menu->sel < total - 1)
 	{
-		entry = &cheat_list[menu_index[menu->sel]];
+		entry = &cheat_list[info->sub_cheat];
 
-		if(entry->flags & kCheatFlag_Null)
-			entry = NULL;
-
-		if(entry->flags & kCheatFlag_Separator)
-			entry = NULL;
-
-		if(entry->flags & kCheatFlag_RequestArrow)
-			request_arrow = MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
+		/* ignore separator and comment */
+		if(entry->flags & kCheatFlag_Null) entry = NULL;
 	}
 	else
 		entry = NULL;
+
+	/* set left/right arrow for sub item */
+	if(info->field_type && (entry->flags & kCheatFlag_OldFormat) == 0) request_arrow = MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW;
 
 	/* draw it */
 	old_style_menu(menu_item, menu_sub_item, flag_buf, menu->sel, request_arrow);
@@ -3335,224 +3332,75 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 	/********** KEY HANDLING **********/
 	if(ui_pressed_repeat_throttle(machine, IPT_UI_UP, vertical_key_repeat_speed))
 	{
-		switch(is_empty)
+		if(is_empty == 0)
 		{
-			default:
-				CURSOR_TO_PREVIOUS(menu->sel, total);
+			CURSOR_TO_PREVIOUS(menu->sel, total);
 
-				if(cheat_list_length)
-				{
-					/* if cursor is on comment code, skip it */
-					for(i = 0; (i < full_menu_page_height / 2) && menu->sel != total - 1 && (cheat_list[menu_index[menu->sel]].flags & kCheatFlag_Null); i++)
-					{
-						if(--menu->sel < 0)
-							menu->sel = total - 1;
-					}
-				}
-				break;
-
-			case 1:
-				break;
-
-			case 2:
-				if(menu->sel)
-					menu->sel = 0;
-				else
-					menu->sel = 2;
+			/* if cursor is on comment code, skip it */
+			for(i = 0; (i < visible_items / 2) && menu->sel != total - 1 && (cheat_list[menu_item_info[menu->sel].sub_cheat].flags & kCheatFlag_Null); i++)
+			{
+				if(--menu->sel < 0) menu->sel = total - 1;
+			}
+		}
+		else if(is_empty == 2)
+		{
+			if(menu->sel)	menu->sel = 0;
+			else			menu->sel = 2;
 		}
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
-		switch(is_empty)
+		if(is_empty == 0)
 		{
-			default:
-				CURSOR_TO_NEXT(menu->sel, total);
+			CURSOR_TO_NEXT(menu->sel, total);
 
-				if(cheat_list_length)
-				{
-					/* if cursor is on comment code, skip it */
-					for(i = 0; (i < full_menu_page_height / 2) && menu->sel < total - 1 && (cheat_list[menu_index[menu->sel]].flags & kCheatFlag_Null); i++)
-						menu->sel++;
-				}
-
-			case 1:
-				break;
-
-			case 2:
-				if(menu->sel)		menu->sel = 0;
-			else					menu->sel = 2;
+			/* if cursor is on comment code, skip it */
+			for(i = 0; (i < visible_items / 2) && menu->sel < total - 1 && (cheat_list[menu_item_info[menu->sel].sub_cheat].flags & kCheatFlag_Null); i++)
+				menu->sel++;
+		}
+		else if(is_empty == 2)
+		{
+			if(menu->sel)	menu->sel = 0;
+			else			menu->sel = 2;
 		}
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
-	CURSOR_PAGE_UP(menu->sel);
+		CURSOR_PAGE_UP(menu->sel);
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-
-	if(entry && (entry->flags & kCheatFlag_Null) == 0 && (entry->flags & kCheatFlag_ExtendComment) == 0&& (entry->flags & kCheatFlag_HasWrongCode) == 0)
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, horizontal_key_repeat_speed))
 	{
-		UINT8 toggle = 0;
-
-		if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, horizontal_key_repeat_speed))
-		{
-			if(entry->flags & kCheatFlag_Select)
-			{
-				if(entry->flags & kCheatFlag_UseLabelSelector)
-				{
-					/* activate label selector */
-					cheat_menu_stack_push(user_select_label_menu, menu->handler, menu->sel);
-				}
-				else
-				{
-					/* select previous label */
-					if(--entry->selection < 0)
-						entry->selection = entry->label_index_length - 1;
-
-					/* NOTE : one shot cheat should not be activated by changing label */
-					if(entry->label_index[entry->selection] == 0)
-						deactivate_cheat(machine, entry);
-					else if((entry->flags & kCheatFlag_OneShot) == 0 && (entry->flags & kCheatFlag_Active) == 0)
-						activate_cheat(machine, entry);
-				}
-			}
-			else if(entry->flags & kCheatFlag_LayerIndex)
-			{
-				/* change layer level */
-				toggle = 2;
-			}
-			else if(!(entry->flags & kCheatFlag_OneShot))
-			{
-				/* toggle ON/OFF */
-				toggle = 1;
-			}
-		}
-		else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, horizontal_key_repeat_speed))
-		{
-			if(entry->flags & kCheatFlag_Select)
-			{
-				/* label-selection special handling */
-				if(TEST_FIELD(entry->action_list[entry->label_index[0]].type, LabelSelectUseSelector))
-				{
-					/* activate label selector */
-					cheat_menu_stack_push(user_select_label_menu, menu->handler, menu->sel);
-				}
-				else
-				{
-					/* select next label index */
-					if(++entry->selection >= entry->label_index_length)
-						entry->selection = 0;
-
-					/* NOTE : one shot cheat should not be activated by changing label */
-					if(entry->label_index[entry->selection] == 0)
-						deactivate_cheat(machine, entry);
-					else if((entry->flags & kCheatFlag_OneShot) == 0 && (entry->flags & kCheatFlag_Active) == 0)
-						activate_cheat(machine, entry);
-				}
-			}
-			else if(entry->flags & kCheatFlag_LayerIndex)
-			{
-				/* change layer level */
-				toggle = 2;
-			}
-			else if(!(entry->flags & kCheatFlag_OneShot))
-			{
-				/* toggle ON/OFF */
-				toggle = 1;
-			}
-		}
-
-		switch(toggle)
-		{
-			case 1:
-				{
-					int active = (entry->flags & kCheatFlag_Active) ^ 1;
-
-					if((entry->flags & kCheatFlag_UserSelect) && active)
-					{
-						/* activate value-selection menu */
-						cheat_menu_stack_push(user_select_value_menu, menu->handler, menu->sel);
-					}
-					else
-					{
-						if(active)
-							activate_cheat(machine, entry);
-						else
-								deactivate_cheat(machine, entry);
-					}
-				}
-				break;
-
-			case 2:
-				{
-					/* go to next/previous layer level */
-					if(entry->action_list[0].data == current_layer)
-						current_layer = entry->action_list[0].address;
-					else
-						current_layer = entry->action_list[0].data;
-
-						entry->flags |= kCheatFlag_LayerSelected;
-				}
-				break;
-
-			default:
-				break;
-		}
+		do_select = -1;
 	}
-
+	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, horizontal_key_repeat_speed))
+	{
+		do_select = 1;
+	}
 	if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		if(entry == NULL)
 		{
-			if(current_layer)
-				current_layer = menu->sel = 0;
-			else
-				menu->sel = -1;
+			if(current_layer)	current_layer = menu->sel = 0;
+			else				menu->sel = -1;
 		}
 		else if((entry->flags & kCheatFlag_Null) == 0)
 		{
 			if(shift_key_pressed() && (entry->comment && entry->comment[0]))
 			{
 				/* display comment */
-				cheat_menu_stack_push(comment_menu, menu->handler, menu->sel);
+				cheat_menu_stack_push(comment_menu, menu->handler, info->sub_cheat);
 			}
 			else if(entry->flags & kCheatFlag_ExtendComment)
 			{
 				/* display extend comment */
-				cheat_menu_stack_push(extend_comment_menu, menu->handler, menu->sel);
-			}
-			else if(entry->flags & kCheatFlag_UserSelect)
-			{
-				/* activate value-selection menu */
-				cheat_menu_stack_push(user_select_value_menu, menu->handler, menu->sel);
-			}
-			else if((entry->flags & kCheatFlag_Select) && TEST_FIELD(entry->action_list[entry->label_index[0]].type, LabelSelectUseSelector))
-			{
-				/* activate label selector */
-				cheat_menu_stack_push(user_select_label_menu, menu->handler, menu->sel);
-			}
-			else if(entry->flags & kCheatFlag_LayerIndex)
-			{
-				/* go to next/previous layer level */
-				if(entry->action_list[0].data == current_layer)
-					current_layer = entry->action_list[0].address;
-				else
-					current_layer = entry->action_list[0].data;
-
-				entry->flags |= kCheatFlag_LayerSelected;
-			}
-			else if(entry->flags & kCheatFlag_HasWrongCode)
-			{
-				/* analyse wrong format code */
-				cheat_menu_stack_push(analyse_cheat_menu, menu->handler, menu->sel);
+				cheat_menu_stack_push(extend_comment_menu, menu->handler, info->sub_cheat);
 			}
 			else
-			{
-				/* activate selected code */
-				activate_cheat(machine, entry);
-			}
+				do_select = 1;
 		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
@@ -3568,29 +3416,26 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 		else if(control_key_pressed())
 		{
 			/* ctrl + save : save activation key */
-			save_activation_key(machine, entry, menu_index[menu->sel]);
+			save_activation_key(machine, entry, info->sub_cheat);
 		}
 		else if(alt_key_pressed())
 		{
 			/* alt + save : save pre-enable */
-			save_pre_enable(machine, entry, menu_index[menu->sel]);
+			save_pre_enable(machine, entry, info->sub_cheat);
 		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
 	{
-		add_cheat_before(menu_index[menu->sel]);
+		add_cheat_before(info->sub_cheat);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
-		if(entry)
-			delete_cheat_at(menu_index[menu->sel]);
-		else
-			SET_MESSAGE(CHEAT_MESSAGE_FAILED_TO_DELETE);
+		if(entry)	delete_cheat_at(info->sub_cheat);
+		else		SET_MESSAGE(CHEAT_MESSAGE_FAILED_TO_DELETE);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))
 	{
-		if(entry)
-			cheat_menu_stack_push(command_add_edit_menu, menu->handler, menu->sel);
+		if(entry) cheat_menu_stack_push(command_add_edit_menu, menu->handler, info->sub_cheat);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_WATCH_VALUE))
 	{
@@ -3606,7 +3451,49 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 		menu->sel = -1;
 	}
 
-	free(menu_index);
+	if(do_select && entry)
+	{
+		if(entry->flags & kCheatFlag_HasWrongCode)
+		{
+			/* activate code analyser */
+			cheat_menu_stack_push(analyse_cheat_menu, menu->handler, info->sub_cheat);
+		}
+		else if(entry->flags & kCheatFlag_UserSelect)
+		{
+			/* activate value-selection menu */
+			cheat_menu_stack_push(user_select_value_menu, menu->handler, info->sub_cheat);
+		}
+		else if(entry->flags & kCheatFlag_Select)
+		{
+			if(entry->flags & kCheatFlag_UseLabelSelector)
+			{
+				/* activate label selector */
+				cheat_menu_stack_push(user_select_label_menu, menu->handler, info->sub_cheat);
+			}
+			else
+				/* select next/previous label */
+				choose_label_index(machine, entry, do_select);
+		}
+		else if(entry->flags & kCheatFlag_LayerIndex)
+		{
+			/* go to next/previous layer */
+			current_layer = entry->action_list[0].data == current_layer ? entry->action_list[0].address : entry->action_list[0].data;
+			entry->flags |= kCheatFlag_LayerSelected;
+		}
+		else if(entry->flags & kCheatFlag_OneShot)
+		{
+			/* activate set code */
+			activate_cheat(machine, entry);
+		}
+		else
+		{
+			/* toggle on/off */
+			int active = (entry->flags & kCheatFlag_Active) ^ 1;
+
+			if(active)		activate_cheat(machine, entry);
+			else			deactivate_cheat(machine, entry);
+		}
+	}
 
 	return menu->sel + 1;
 }
@@ -3727,7 +3614,7 @@ static int add_edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		}
 		else if(control_key_pressed())
 		{
-			if((entry->flags & kCheatFlag_HasActivationKey1) || (entry->flags & kCheatFlag_HasActivationKey2))
+			if(entry->activation_key)
 				/* ctrl + save = save activation key */
 				save_activation_key(machine, entry, menu->sel);
 		}
@@ -3936,6 +3823,16 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	#define ADD_EDIT_MENU_ITEMS(name, sub_name, type) \
 				do { menu_item[total] = name; menu_sub_item[total] = sub_name; menu_item_info[total].sub_cheat = i; menu_item_info[total].field_type = type; total++; } while(0)
 
+	static const char *const TYPE_NAMES[] =
+	{
+		"Normal", "Wait", "Ignore Decrement", "Watch"
+	};
+
+	static const char *const LOCATION_TYPE_NAMES[] =
+	{
+		"Comment", "EEPROM", "Select", "Activation Key", "Pre-enable", "Overclock", "Refresh Rate"
+	};
+
 	static const char *const PREFILL_NAMES[] =
 	{
 		"None", "FF", "00", "01"
@@ -3956,33 +3853,32 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		EDIT_MENU_NAME,						/*  text        name from optinal name field in cheat action */
 		/* type infomation */
 		EDIT_MENU_ONE_SHOT,					/*  select      OneShot              Off - On */
-		EDIT_MENU_RESTORE_VALUE,				/*  select      RestorePreviousValue Off - On */
-		EDIT_MENU_TYPE,						/*  select      Type & Location      Normal - Watch - Comment - Label-Select */
-		/* if Type == Watch */
-			EDIT_MENU_WATCH_SIZE,			/*  value       Data Field           0x01 - 0xFF (stored as 0x00 - 0xFE)
-                                              NOTE: value is packed in to 0x000000FF */
-			EDIT_MENU_WATCH_SKIP,			/*  value       Data Field           0x00 - 0xFF
-                                              NOTE: value is packed in to 0x0000FF00 */
-			EDIT_MENU_WATCH_PER_LINE,		/*  value       Data Field           0x00 - 0xFF
-                                              NOTE: value is packed in to 0x00FF0000 */
-			EDIT_MENU_WATCH_ADD_VALUE,		/*  value       Data Field          -0x80 - 0x7F
-                                              NOTE: value is packed in to 0xFF000000 */
-			EDIT_MENU_WATCH_FORMAT,			/*  select      Parameter            Hex - Decimal - Binary - ASCII */
-			EDIT_MENU_WATCH_LABEL,			/*  select      Parameter            Off - On */
-		/* if Type != Watch */
-			EDIT_MENU_DELAY,				/*  select      Parameter            0x00 - 0x07 */
-			EDIT_MENU_OPERATION,			/*  select      Operation            Write - Add - Subtract - Force Range - Set Bit - Clear Bit */
-			/* if Location != Relative Address */
-			/* if Operation == Write && Location */
-				EDIT_MENU_WRITE_MASK,		/*  value       Extend Data Field    0x00000000 - 0xFFFFFFFF */
-			/* if Operation == Add || Subtract */
-				EDIT_MENU_ADD_SUBTRACT,		/*  value       Extend Data Field    0x00000000 - 0xFFFFFFFF */
-			/* if Operation == Force Range && Bytes <= 2 Bytes */
-				EDIT_MENU_RANGE_MINIMUM,	/*  value       Extend Data Field    0x0000 - 0xFFFF
+		EDIT_MENU_RESTORE_VALUE,			/*  select      RestorePreviousValue Off - On */
+		EDIT_MENU_TYPE,						/*  select      Type                 Normal - Wait - Ignore Decrement - Watch */
+		EDIT_MENU_TIMER,					/*  select      Parameter            0x00 - 0x07 */
+		EDIT_MENU_LOCATION_TYPE,			/*  select      LocationType         Normal - Comment - Select */
+		EDIT_MENU_OPERATION,				/*  select      Operation            Write - Add - Subtract - Force Range - Set Bit - Clear Bit */
+		/* if Location != Relative Address */
+		/* if Operation == Write && Location */
+			EDIT_MENU_WRITE_MASK,			/*  value       Extend Data Field    0x00000000 - 0xFFFFFFFF */
+		/* if Operation == Add || Subtract */
+			EDIT_MENU_ADD_SUBTRACT,			/*  value       Extend Data Field    0x00000000 - 0xFFFFFFFF */
+		/* if Operation == Force Range && Bytes <= 2 Bytes */
+			EDIT_MENU_RANGE_MINIMUM,		/*  value       Extend Data Field    0x0000 - 0xFFFF
                                               NOTE : value is paccked into upper 2 bytes */
-				EDIT_MENU_RANGE_MAXIMUM,	/*  value       Extend Data Field    0x0000 - 0xFFFF
+			EDIT_MENU_RANGE_MAXIMUM,		/*  value       Extend Data Field    0x0000 - 0xFFFF
                                               NOTE : value is paccked into lower 2 bytes */
-			EDIT_MENU_DATA,
+		EDIT_MENU_DATA,
+		EDIT_MENU_WATCH_SIZE,				/*  value       Data Field           0x01 - 0xFF (stored as 0x00 - 0xFE)
+                                              NOTE: value is packed in to 0x000000FF */
+		EDIT_MENU_WATCH_SKIP,				/*  value       Data Field           0x00 - 0xFF
+                                              NOTE: value is packed in to 0x0000FF00 */
+		EDIT_MENU_WATCH_PER_LINE,			/*  value       Data Field           0x00 - 0xFF
+                                              NOTE: value is packed in to 0x00FF0000 */
+		EDIT_MENU_WATCH_ADD_VALUE,			/*  value       Data Field          -0x80 - 0x7F
+                                              NOTE: value is packed in to 0xFF000000 */
+		EDIT_MENU_WATCH_FORMAT,				/*  select      Parameter            Hex - Decimal - Binary - ASCII */
+		EDIT_MENU_WATCH_LABEL,				/*  select      Parameter            Off - On */
 		EDIT_MENU_USER_SELECT,				/*  select      UserSelectEnable         Off - On */
 		EDIT_MENU_USER_SELECT_MINIMUM_DISP,	/*  select      UserSelectMinimumDisplay 0 - 1 */
 		EDIT_MENU_USER_SELECT_MINIMUM,		/*  select      UserSelectMinimum        0 - 1 */
@@ -3991,14 +3887,13 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		EDIT_MENU_BYTES_LENGTH,				/*  select      BytesUsed                1 - 4 */
 		EDIT_MENU_LOCATION,					/*  select      Location                 CPU Region - Non-CPU Region - Mapped Memory - EEPROM - Relative Address */
 		EDIT_MENU_REGION,					/*  select      LocationParameter        CPU1 - CPU2 - CPU3 - CPU4 - CPU5 - CPU6 - CPU7 - CPU8 -
-                                                                                 GFX1 - GFX2 - GFX3 - GFX4 - GFX5 - GFX6 - GFX7 - GFX8 -
-                                                                                 PROMS -
-                                                                                 SOUND1 - SOUND2 - SOUND3 - SOUND4 - SOUND5 - SOUND6 - SOUND7 - SOUND8 -
-                                                                                 USER1 - USER2 - USER3 - USER4 - USER5 - USER6 - USER7
+                                                                                     GFX1 - GFX2 - GFX3 - GFX4 - GFX5 - GFX6 - GFX7 - GFX8 -
+                                                                                     PROMS -
+                                                                                     SOUND1 - SOUND2 - SOUND3 - SOUND4 - SOUND5 - SOUND6 - SOUND7 - SOUND8 -
+                                                                                     USER1 - USER2 - USER3 - USER4 - USER5 - USER6 - USER7
                                               NOTE : unsupported USER8 - PLDS in old/older format */
-			/* if Location == Relative Address */
-			EDIT_MENU_PACKED_SIZE,			/*  select      IndexBytesUsed   1 - 4 */
-			EDIT_MENU_ADDRESS_INDEX,		/*  value       Extend Data Field        -0x7FFFFFFF - 0x7FFFFFFF */
+		EDIT_MENU_PACKED_SIZE,				/*  select      IndexBytesUsed   1 - 4 */
+		EDIT_MENU_ADDRESS_INDEX,			/*  value       Extend Data Field        -0x7FFFFFFF - 0x7FFFFFFF */
 		EDIT_MENU_ADDRESS,
 
 		EDIT_MENU_SEPARATOR,
@@ -4009,17 +3904,15 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 	int						i;
 	int						total = 0;
+	int						do_select = 0;
+	int						dirty = 0;
 	const char				**menu_item;
 	const char				**menu_sub_item;
 	char					*flag_buf;
 	char					**buf_index;
 	char					**buf_extend_data;		/* FFFFFFFF (-7FFFFFFF) */
 	char					**buf_address;			/* FFFFFFFF */
-	char					**buf_data;				/* 7FFFFFFF (-2147483647) */
-	char					**buf_watch_size;		/* FF */
-	char					**buf_watch_skip;		/* FF */
-	char					**buf_watch_per_line;	/* FF */
-	char					**buf_watch_add_value;	/* FF */
+	char					**buf_data;				/* 7FFFFFFF (-2147483647) 999 999 999 999 */
 	cheat_menu_item_info	*info = NULL;
 	cheat_entry				*entry = &cheat_list[menu->pre_sel];
 	cheat_action			*action = NULL;
@@ -4029,8 +3922,8 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	if(menu->first_time)
 		menu->first_time = 0;
 
-	/* required items = (total menu items * total codes + return + terminator) + (8 strings buffers * total codes) + 32 characters */
-	request_strings(EDIT_MENU_MAX * entry->action_list_length + 2, 8 * entry->action_list_length, 32, 0);
+	/* required items = (total menu items * total codes + return + terminator) + (4 strings buffers * total codes) + 2048 characters */
+	request_strings(EDIT_MENU_MAX * entry->action_list_length + 2, 4 * entry->action_list_length, 2048, 0);
 
 	/* allocate memory for menu item info */
 	resize_menu_item_info(EDIT_MENU_MAX * entry->action_list_length + 2);
@@ -4042,10 +3935,6 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	buf_extend_data		= &menu_strings.main_strings[entry->action_list_length * 1];
 	buf_address			= &menu_strings.main_strings[entry->action_list_length * 2];
 	buf_data			= &menu_strings.main_strings[entry->action_list_length * 3];
-	buf_watch_size		= &menu_strings.main_strings[entry->action_list_length * 4]; /* these field */
-	buf_watch_skip		= &menu_strings.main_strings[entry->action_list_length * 5]; /* are wasteful */
-	buf_watch_per_line	= &menu_strings.main_strings[entry->action_list_length * 6]; /* but the alternative */
-	buf_watch_add_value = &menu_strings.main_strings[entry->action_list_length * 7]; /* is even more ugly */
 
 	memset(flag_buf, 0, EDIT_MENU_MAX * entry->action_list_length + 2);
 
@@ -4064,7 +3953,7 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 			/* ##### ACTIVATION KEY ##### */
 			ADD_EDIT_MENU_ITEMS(	"Activation Key",
-							entry->flags & kCheatFlag_HasActivationKey1 ? astring_c(input_code_name(key_strings, entry->activation_key_1)) : "(none)",
+							entry->activation_key ? astring_c(input_code_name(key_strings, entry->activation_key)) : "(none)",
 							EDIT_MENU_ACTIVATION_KEY);
 
 			/* ##### SEPARATOR ##### */
@@ -4085,130 +3974,94 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		ADD_EDIT_MENU_ITEMS("Restore Previous Value", TEST_FIELD(traverse->type, RestorePreviousValue) ? "On" : "Off", EDIT_MENU_RESTORE_VALUE);
 
 		/* ##### TYPE ##### */
-		if(EXTRACT_FIELD(traverse->type, LocationType) != kLocation_Custom)
-		{
-			if(EXTRACT_FIELD(traverse->type, Type) == kType_Watch)
-				ADD_EDIT_MENU_ITEMS("Type", "Watch", EDIT_MENU_TYPE);
-			else
-				ADD_EDIT_MENU_ITEMS("Type", "Write", EDIT_MENU_TYPE);
-		}
+		ADD_EDIT_MENU_ITEMS("Type", TYPE_NAMES[EXTRACT_FIELD(traverse->type, Type)], EDIT_MENU_TYPE);
+
+		/* ##### TIMER ##### */
+		ADD_EDIT_MENU_ITEMS("Timer", kNumbersTable[EXTRACT_FIELD(traverse->type, TypeParameter)], EDIT_MENU_TIMER);
+
+		/* ##### LOCATION TYPE ##### */
+		if(EXTRACT_FIELD(traverse->type, LocationType) == kLocation_Custom)
+			ADD_EDIT_MENU_ITEMS("Loction Type", LOCATION_TYPE_NAMES[EXTRACT_FIELD(traverse->type, LocationParameter)], EDIT_MENU_LOCATION_TYPE);
 		else
+			ADD_EDIT_MENU_ITEMS("Location Type", "Normal", EDIT_MENU_LOCATION_TYPE);
+
+		/* ##### OPERATION ##### */
+		switch(EXTRACT_FIELD(traverse->type, Operation))
 		{
-			if(EXTRACT_FIELD(traverse->type, LocationParameter) == kCustomLocation_Comment)
-				ADD_EDIT_MENU_ITEMS("Type", "Comment", EDIT_MENU_TYPE);
-			else if(EXTRACT_FIELD(traverse->type, LocationParameter) == kCustomLocation_Select)
-				ADD_EDIT_MENU_ITEMS("Type", "Select", EDIT_MENU_TYPE);
-			else
-				ADD_EDIT_MENU_ITEMS("Type", "Write", EDIT_MENU_TYPE);
+			case kOperation_WriteMask:			ADD_EDIT_MENU_ITEMS("Operation", "Write", EDIT_MENU_OPERATION);			break;
+			case kOperation_AddSubtract:		ADD_EDIT_MENU_ITEMS("Operation", TEST_FIELD(traverse->type, OperationParameter) ?
+																	"Subtract" : "Add", EDIT_MENU_OPERATION);			break;
+			case kOperation_ForceRange:			ADD_EDIT_MENU_ITEMS("Operation", "Force Range", EDIT_MENU_OPERATION);	break;
+			case kOperation_SetOrClearBits:		ADD_EDIT_MENU_ITEMS("Operation", BIT_SET_CLEAR_NAMES[EXTRACT_FIELD(traverse->type, OperationParameter)],
+																	 EDIT_MENU_OPERATION);								break;
+			default:							ADD_EDIT_MENU_ITEMS("Operation", "Unknown", EDIT_MENU_OPERATION);		break;
 		}
 
-		if(EXTRACT_FIELD(traverse->type, Type) == kType_Watch)
+		/* ##### MASK ##### */
 		{
-			/* ##### WATCH SIZE ##### */
-			sprintf(buf_watch_size[i], "%d", EXTRACT_FIELD(traverse->original_data, WatchNumElements) + 1);
-			ADD_EDIT_MENU_ITEMS("Watch Size", buf_watch_size[i], EDIT_MENU_WATCH_SIZE);
+			int num_chars;
 
-			/* ##### WATCH SKIP ##### */
-			sprintf(buf_watch_skip[i], "%d", EXTRACT_FIELD(traverse->original_data, WatchSkip));
-			ADD_EDIT_MENU_ITEMS("Watch Skip", buf_watch_skip[i], EDIT_MENU_WATCH_SKIP);
-
-			/* ##### WATCH PER LINE ##### */
-			sprintf(buf_watch_per_line[i], "%d", EXTRACT_FIELD(traverse->original_data, WatchElementsPerLine));
-			ADD_EDIT_MENU_ITEMS("Watch Per Line", buf_watch_per_line[i], EDIT_MENU_WATCH_PER_LINE);
-
-			/* ##### WATCH ADD VALUE ##### */
-			if(EXTRACT_FIELD(traverse->original_data, WatchAddValue) < 0)
-				sprintf(buf_watch_add_value[i], "-%.2X", -EXTRACT_FIELD(traverse->original_data, WatchAddValue));
+			if(traverse->flags & kActionFlag_IndexAddress)
+			{
+				menu_item_info[total].extra_data = ~0; num_chars = 8;
+			}
 			else
-				sprintf(buf_watch_add_value[i], "%.2X", EXTRACT_FIELD(traverse->original_data, WatchAddValue));
-			ADD_EDIT_MENU_ITEMS("Watch Add Value", buf_watch_add_value[i], EDIT_MENU_WATCH_ADD_VALUE);
-
-			/* ##### WATCH FORMAT ##### */
-			ADD_EDIT_MENU_ITEMS("Watch Format", kWatchDisplayTypeStringList[(EXTRACT_FIELD(traverse->type, TypeParameter) >> 0) & 0x03], EDIT_MENU_WATCH_FORMAT);
-
-			/* ##### WATCH LABEL ##### */
-			ADD_EDIT_MENU_ITEMS("Watch Label", EXTRACT_FIELD(traverse->type, TypeParameter) >> 2 & 0x01 ? "On" : "Off", EDIT_MENU_WATCH_LABEL);
+			{
+				menu_item_info[total].extra_data = BYTE_MASK_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)];
+				num_chars = BYTE_DIGITS_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)];
+			}
+				sprintf(buf_extend_data[i], "%.*X", num_chars, traverse->extend_data & BYTE_MASK_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)]);
+				ADD_EDIT_MENU_ITEMS("Mask", buf_extend_data[i], EDIT_MENU_WRITE_MASK);
 		}
+
+		/* ##### ADD/SUBTRACT ##### */
+		sprintf(buf_extend_data[i] + 16, "%*.*X",	(int)BYTE_DIGITS_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)],
+													(int)BYTE_DIGITS_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)],
+													traverse->extend_data & BYTE_MASK_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)]);
+		ADD_EDIT_MENU_ITEMS(TEST_FIELD(traverse->type, OperationParameter) ? "Minimum Boundary" : "Maximum Boundary", buf_extend_data[i] + 16, EDIT_MENU_ADD_SUBTRACT);
+
+		/* ##### RANGE MINIMUM ##### */
+		sprintf(buf_extend_data[i] + 32, "%4.4X", EXTRACT_FIELD(traverse->extend_data, LSB16));
+		ADD_EDIT_MENU_ITEMS("Range Minimum", buf_extend_data[i] + 32, EDIT_MENU_RANGE_MINIMUM);
+
+		/* ##### RANGE MAXIMUM ##### */
+		sprintf(buf_extend_data[i] + 48, "%4.4X", EXTRACT_FIELD(traverse->extend_data, MSB16));
+		ADD_EDIT_MENU_ITEMS("Range Maximum", buf_extend_data[i] + 48, EDIT_MENU_RANGE_MAXIMUM);
+
+		/* ##### DATA ##### */
+		menu_item_info[total].extra_data = BYTE_MASK_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)];
+		sprintf(buf_data[i], "%*.*X (%*.*d)",	(int)BYTE_DIGITS_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)],
+												(int)BYTE_DIGITS_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)],
+												traverse->original_data & BYTE_MASK_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)],
+												(int)BYTE_DEC_DIGITS_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)],
+												(int)BYTE_DEC_DIGITS_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)],
+												traverse->original_data);
+		ADD_EDIT_MENU_ITEMS("Data", buf_data[i], EDIT_MENU_DATA);
+
+		/* ##### WATCH SIZE ##### */
+		sprintf(buf_data[i] + 32, "%.3d", EXTRACT_FIELD(traverse->original_data, WatchNumElements) + 1);
+		ADD_EDIT_MENU_ITEMS("Watch Size", buf_data[i] + 32, EDIT_MENU_WATCH_SIZE);
+
+		/* ##### WATCH SKIP ##### */
+		sprintf(buf_data[i] + 48, "%.3d", EXTRACT_FIELD(traverse->original_data, WatchSkip));
+		ADD_EDIT_MENU_ITEMS("Watch Skip", buf_data[i] + 48, EDIT_MENU_WATCH_SKIP);
+
+		/* ##### WATCH PER LINE ##### */
+		sprintf(buf_data[i] + 64, "%.3d", EXTRACT_FIELD(traverse->original_data, WatchElementsPerLine));
+		ADD_EDIT_MENU_ITEMS("Watch Per Line", buf_data[i] + 64, EDIT_MENU_WATCH_PER_LINE);
+
+		/* ##### WATCH ADD VALUE ##### */
+		if(EXTRACT_FIELD(traverse->original_data, WatchAddValue) < 0)
+			sprintf(buf_data[i] + 80, "-%.3d", EXTRACT_FIELD(traverse->original_data, WatchAddValue));
 		else
-		{
-			/* ##### DELAY ##### */
-			ADD_EDIT_MENU_ITEMS("Delay", kNumbersTable[EXTRACT_FIELD(traverse->type, TypeParameter)], EDIT_MENU_DELAY);
+			sprintf(buf_data[i] + 80, "%.3d", EXTRACT_FIELD(traverse->original_data, WatchAddValue));
+		ADD_EDIT_MENU_ITEMS("Watch Add Value", buf_data[i] + 80, EDIT_MENU_WATCH_ADD_VALUE);
 
-			/* ##### OPERATION ##### */
-			menu_item_info[total].sub_cheat = i;
-			menu_item_info[total].field_type = EDIT_MENU_OPERATION;
-			menu_item[total] = "Operation";
-			switch(EXTRACT_FIELD(traverse->type, Operation))
-			{
-				case kOperation_WriteMask:
-					ADD_EDIT_MENU_ITEMS("Operation", "Write", EDIT_MENU_OPERATION);
-					break;
+		/* ##### WATCH FORMAT ##### */
+		ADD_EDIT_MENU_ITEMS("Watch Format", kWatchDisplayTypeStringList[(EXTRACT_FIELD(traverse->type, TypeParameter) >> 0) & 0x03], EDIT_MENU_WATCH_FORMAT);
 
-				case kOperation_AddSubtract:
-					if(TEST_FIELD(traverse->type, OperationParameter))
-						ADD_EDIT_MENU_ITEMS("Operation", "Subtract", EDIT_MENU_OPERATION);
-					else
-						ADD_EDIT_MENU_ITEMS("Operation", "Add", EDIT_MENU_OPERATION);
-					break;
-
-				case kOperation_ForceRange:
-					ADD_EDIT_MENU_ITEMS("Operation", "Force Range", EDIT_MENU_OPERATION);
-					break;
-
-				case kOperation_SetOrClearBits:
-					ADD_EDIT_MENU_ITEMS("Operation", BIT_SET_CLEAR_NAMES[EXTRACT_FIELD(traverse->type, OperationParameter)], EDIT_MENU_OPERATION);
-					break;
-
-				default:
-					ADD_EDIT_MENU_ITEMS("Operation", "Unknown", EDIT_MENU_OPERATION);
-					break;
-			}
-
-			switch(EXTRACT_FIELD(traverse->type, Operation))
-			{
-				case kOperation_WriteMask:
-					{
-						/* ##### MASK ##### */
-						int num_chars;
-
-						if(traverse->flags & kActionFlag_IndexAddress)
-						{
-							menu_item_info[total].extra_data = 0xFFFFFFFF;
-							num_chars = 8;
-						}
-						else
-						{
-							menu_item_info[total].extra_data = BYTE_MASK_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)];
-							num_chars = BYTE_DIGITS_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)];
-						}
-						sprintf(buf_extend_data[i], "%.*X", num_chars, traverse->extend_data & BYTE_MASK_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)]);
-						ADD_EDIT_MENU_ITEMS("Mask", buf_extend_data[i], EDIT_MENU_WRITE_MASK);
-					}
-					break;
-
-				case kOperation_AddSubtract:
-					/* ##### ADD/SUBTRACT ##### */
-					sprintf(buf_extend_data[i], "%.8X", traverse->extend_data);
-					ADD_EDIT_MENU_ITEMS(TEST_FIELD(traverse->type, OperationParameter) ? "Minimum Boundary" : "Maximum Boundary", buf_extend_data[i], EDIT_MENU_ADD_SUBTRACT);
-					break;
-
-				case kOperation_ForceRange:
-					/* ##### RANGE MINIMUM ##### */
-					sprintf(buf_extend_data[i], "%.4X", EXTRACT_FIELD(traverse->extend_data, LSB16));
-					ADD_EDIT_MENU_ITEMS("Range Minimum", buf_extend_data[i], EDIT_MENU_RANGE_MINIMUM);
-
-					/* ##### RANGE MAXIMUM ##### */
-					/* NOTE : "+7" */
-					sprintf(buf_extend_data[i] + 7, "%.4X", EXTRACT_FIELD(traverse->extend_data, MSB16));
-					ADD_EDIT_MENU_ITEMS("Range Maximum", buf_extend_data[i] + 7, EDIT_MENU_RANGE_MAXIMUM);
-					break;
-			}
-
-			/* ##### DATA ##### */
-			menu_item_info[total].extra_data = BYTE_MASK_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)];
-			sprintf(buf_data[i], "%.*X (%d)", (int)BYTE_DIGITS_TABLE[EXTRACT_FIELD(traverse->type, BytesUsed)], traverse->original_data, traverse->original_data);
-			ADD_EDIT_MENU_ITEMS("Data", buf_data[i], EDIT_MENU_DATA);
-		}
+		/* ##### WATCH LABEL ##### */
+		ADD_EDIT_MENU_ITEMS("Watch Label", EXTRACT_FIELD(traverse->type, TypeParameter) >> 2 & 0x01 ? "On" : "Off", EDIT_MENU_WATCH_LABEL);
 
 		/* ##### USER SELECT ##### */
 		ADD_EDIT_MENU_ITEMS("User Select", TEST_FIELD(traverse->type, UserSelectEnable) ? "On" : "Off", EDIT_MENU_USER_SELECT);
@@ -4243,18 +4096,15 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 						kNumbersTable[EXTRACT_FIELD(traverse->type, LocationParameterCPU)] : kRegionNames[EXTRACT_FIELD(traverse->type, LocationParameter) + 1],
 						EDIT_MENU_REGION);
 
-		if(EXTRACT_FIELD(traverse->type, LocationType) == kLocation_IndirectIndexed)
-		{
-			/* ##### PACKED SIZE ##### */
-			ADD_EDIT_MENU_ITEMS("Packed Size", kByteSizeStringList[EXTRACT_FIELD(traverse->type, IndexBytesUsed)], EDIT_MENU_PACKED_SIZE);
+		/* ##### PACKED SIZE ##### */
+		ADD_EDIT_MENU_ITEMS("Packed Size", kByteSizeStringList[EXTRACT_FIELD(traverse->type, IndexBytesUsed)], EDIT_MENU_PACKED_SIZE);
 
-			/* ##### ADDRESS INDEX ##### */
-			if(traverse->extend_data > SEARCH_BYTE_SIGN_BIT_TABLE[EXTRACT_FIELD(traverse->type, IndexBytesUsed)])
-				sprintf(buf_extend_data[i], "-%.8X", -traverse->extend_data);
-			else
-				sprintf(buf_extend_data[i], "%.8X", traverse->extend_data);
-			ADD_EDIT_MENU_ITEMS("Index", buf_extend_data[i], EDIT_MENU_ADDRESS_INDEX);
-		}
+		/* ##### ADDRESS INDEX ##### */
+		if(traverse->extend_data > SEARCH_BYTE_SIGN_BIT_TABLE[EXTRACT_FIELD(traverse->type, IndexBytesUsed)])
+			sprintf(buf_extend_data[i] + 64, "-%.8X", -traverse->extend_data);
+		else
+			sprintf(buf_extend_data[i] + 64, "%.8X", traverse->extend_data);
+		ADD_EDIT_MENU_ITEMS("Index", buf_extend_data[i] + 64, EDIT_MENU_ADDRESS_INDEX);
 
 		/* ##### ADDRESS ##### */
 		switch(EXTRACT_FIELD(traverse->type, LocationType))
@@ -4270,7 +4120,7 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 				break;
 
 			default:
-				menu_item_info[total].extra_data = 0xFFFFFFFF;
+				menu_item_info[total].extra_data = ~0;
 				break;
 		}
 		sprintf(buf_address[i], "%.*X", get_address_length(EXTRACT_FIELD(traverse->type, LocationParameterCPU)), traverse->address);
@@ -4290,15 +4140,13 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 	/* adjust cursor position */
 	ADJUST_CURSOR(menu->sel, total);
-	if(menu_item_info[menu->sel].field_type == EDIT_MENU_SEPARATOR)
-		menu->sel++;
+	if(menu_item_info[menu->sel].field_type == EDIT_MENU_SEPARATOR) menu->sel++;
 
 	info = &menu_item_info[menu->sel];
 	action = &entry->action_list[info->sub_cheat];
 
 	/* higlighted sub-item if edit mode */
-	if(edit_active)
-		flag_buf[menu->sel] = 1;
+	if(edit_active) flag_buf[menu->sel] = 1;
 
 	/* draw it */
 	old_style_menu(menu_item, menu_sub_item, flag_buf, menu->sel, 0);
@@ -4308,632 +4156,34 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	{
 		CURSOR_TO_PREVIOUS(menu->sel, total);
 
-		if(menu_item_info[menu->sel].field_type == EDIT_MENU_SEPARATOR)
-			menu->sel--;
+		if(menu_item_info[menu->sel].field_type == EDIT_MENU_SEPARATOR) menu->sel--;
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_TO_NEXT(menu->sel, total);
 
-		if(menu_item_info[menu->sel].field_type == EDIT_MENU_SEPARATOR)
-			menu->sel++;
+		if(menu_item_info[menu->sel].field_type == EDIT_MENU_SEPARATOR) menu->sel++;
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_UP, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_UP(menu->sel);
+
+		if(menu_item_info[menu->sel].field_type == EDIT_MENU_SEPARATOR) menu->sel++;
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_PAGE_DOWN, vertical_key_repeat_speed))
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
+
+		if(menu_item_info[menu->sel].field_type == EDIT_MENU_SEPARATOR) menu->sel--;
 	}
-#if 0
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_LEFT, horizontal_key_repeat_speed))
 	{
-		edit_active = 0;
-		dirty = 1;
-
-		switch(info->fieldType)
-		{
-/*          case kType_ActivationKey1:
-            case kType_ActivationKey2:
-                if(info->fieldType == kType_ActivationKey1)
-                {
-                    entry->activationKey1--;
-
-                if(entry->activationKey1 < 0)
-                        entry->activationKey1 = __code_max - 1;
-                    if(entry->activationKey1 >= __code_max)
-                        entry->activationKey1 = 0;
-
-                    entry->flags |= kCheatFlag_HasActivationKey1;
-                }
-                else
-                {
-                    entry->activationKey2--;
-
-                    if(entry->activationKey2 < 0)
-                        entry->activationKey2 = __code_max - 1;
-                    if(entry->activationKey2 >= __code_max)
-                        entry->activationKey2 = 0;
-
-                    entry->flags |= kCheatFlag_HasActivationKey2;
-                }
-                break;
-*/
-			case kType_Link:
-				TOGGLE_MASK_FIELD(action->type, LinkEnable);
-				break;
-
-			case kType_LinkExtension:
-				TOGGLE_MASK_FIELD(action->type, LinkExtension);
-				break;
-
-			case kType_Type:
-			{
-				UINT8 handled = 0;
-
-				if(EXTRACT_FIELD(action->type, LocationType) == kLocation_Custom)
-				{
-					UINT32 locationParameter = EXTRACT_FIELD(action->type, LocationParameter);
-
-					if(locationParameter == kCustomLocation_Comment)
-					{
-						/* "Comment" -> "Watch" */
-						SET_FIELD(action->type, LocationParameter, 0);
-						SET_FIELD(action->type, LocationType, kLocation_Standard);
-						SET_FIELD(action->type, Type, kType_Watch);
-						SET_FIELD(action->type, Operation, kOperation_None);
-
-						handled = 1;
-					}
-					else if(locationParameter == kCustomLocation_Select)
-					{
-						/* "Select" -> "Comment" */
-						SET_FIELD(action->type, LocationParameter, kCustomLocation_Comment);
-						SET_FIELD(action->type, LocationType, kLocation_Custom);
-						SET_FIELD(action->type, Type, 0);
-
-						handled = 1;
-					}
-				}
-
-				if(!handled)
-				{
-					UINT32 type = EXTRACT_FIELD(action->type, Type);
-
-					if(type == kType_NormalOrDelay)
-					{
-						/* "Normal/Delay" -> "Select" */
-						SET_FIELD(action->type, LocationType, kLocation_Custom);
-						SET_FIELD(action->type, LocationParameter, kCustomLocation_Select);
-						SET_FIELD(action->type, Type, 0);
-					}
-					else
-						SET_FIELD(action->type, Type, type - 1);
-				}
-			}
-			break;
-
-			case kType_OneShot:
-				TOGGLE_MASK_FIELD(action->type, OneShot);
-				break;
-
-			case kType_RestorePreviousValue:
-				TOGGLE_MASK_FIELD(action->type, RestorePreviousValue);
-				break;
-
-			case kType_Delay:
-			{
-				UINT32 delay = (EXTRACT_FIELD(action->type, TypeParameter) - 1) & 7;
-
-				SET_FIELD(action->type, TypeParameter, delay);
-			}
-			break;
-
-			case kType_WatchSize:
-				action->originalData = (action->originalData & 0xFFFFFF00) | ((action->originalData - 0x00000001) & 0x000000FF);
-				action->data = action->originalData;
-				break;
-
-			case kType_WatchSkip:
-				action->original_data = (action->originalData & 0xFFFF00FF) | ((action->originalData - 0x00000100) & 0x0000FF00);
-				action->data = action->originalData;
-				break;
-
-			case kType_WatchPerLine:
-				action->originalData = (action->originalData & 0xFF00FFFF) | ((action->originalData - 0x00010000) & 0x00FF0000);
-				action->data = action->originalData;
-				break;
-
-			case kType_WatchAddValue:
-				action->original_data = (action->originalData & 0x00FFFFFF) | ((action->originalData - 0x01000000) & 0xFF000000);
-				action->data = action->originalData;
-				break;
-
-			case kType_WatchFormat:
-			{
-				UINT32 typeParameter = EXTRACT_FIELD(action->type, TypeParameter);
-
-				typeParameter = (typeParameter & 0xFFFFFFFC) | ((typeParameter - 0x00000001) & 0x0000003);
-				SET_FIELD(action->type, TypeParameter, typeParameter);
-			}
-			break;
-
-			case kType_WatchLabel:
-				SET_FIELD(action->type, TypeParameter, EXTRACT_FIELD(action->type, TypeParameter) ^ 0x00000004);
-				break;
-
-			case kType_Operation:
-				if(EXTRACT_FIELD(action->type, Operation) == kOperation_WriteMask)
-				{
-					if(EXTRACT_FIELD(action->type, LocationType) == kLocation_IndirectIndexed)
-						SET_FIELD(action->type, Operation, kOperation_SetOrClearBits);
-					else
-						SET_FIELD(action->type, Operation, kOperation_ForceRange);
-				}
-				else
-					SET_FIELD(action->type, Operation, EXTRACT_FIELD(action->type, Operation) - 1);
-				break;
-
-			case kType_OperationExtend:
-				TOGGLE_MASK_FIELD(action->type, OperationExtend);
-				break;
-
-			case kType_WriteMask:
-				action->extendData -= 1;
-				action->extendData &= info->extraData;
-				break;
-
-			case kType_RangeMinimum:
-				if(!EXTRACT_FIELD(action->type, BytesUsed))
-					action->extendData = (action->extendData & 0xFFFF00FF) | ((action->extendData - 0x00000100) & 0x0000FF00);
-				else
-					action->extendData = (action->extendData & 0x0000FFFF) | ((action->extendData - 0x00010000) & 0xFFFF0000);
-				break;
-
-			case kType_RangeMaximum:
-				if(!EXTRACT_FIELD(action->type, BytesUsed))
-					action->extendData = (action->extendData & 0xFFFFFF00) | ((action->extendData - 0x00000001) & 0x000000FF);
-				else
-					action->extendData = (action->extendData & 0xFFFF0000) | ((action->extendData - 0x00000001) & 0x0000FFFF);
-				break;
-
-			case kType_SubtractMinimum:
-			case kType_AddMaximum:
-			case kType_AddressIndex:
-				action->extendData -= 1;
-				break;
-
-			case kType_AddSubtract:
-			case kType_SetClear:
-				TOGGLE_MASK_FIELD(action->type, OperationParameter);
-				break;
-
-			case kType_Data:
-				action->originalData -= 1;
-				action->originalData &= info->extraData;
-				action->data = action->originalData;
-				break;
-
-			case kType_UserSelect:
-				TOGGLE_MASK_FIELD(action->type, UserSelectEnable);
-				break;
-
-			case kType_UserSelectMinimumDisp:
-				TOGGLE_MASK_FIELD(action->type, UserSelectMinimumDisplay);
-				break;
-
-			case kType_UserSelectMinimum:
-				TOGGLE_MASK_FIELD(action->type, UserSelectMinimum);
-				break;
-
-			case kType_UserSelectBCD:
-				TOGGLE_MASK_FIELD(action->type, UserSelectBCD);
-				break;
-
-			case kType_CopyPrevious:
-				TOGGLE_MASK_FIELD(action->type, LinkCopyPreviousValue);
-				break;
-
-			case kType_Prefill:
-			{
-				UINT32 prefill = (EXTRACT_FIELD(action->type, Prefill) - 1) & 3;
-
-				SET_FIELD(action->type, Prefill, prefill);
-			}
-			break;
-
-			case kType_ByteLength:
-			{
-				UINT32 length = (EXTRACT_FIELD(action->type, BytesUsed) - 1) & 3;
-
-				SET_FIELD(action->type, BytesUsed, length);
-			}
-			break;
-
-			case kType_Endianness:
-				TOGGLE_MASK_FIELD(action->type, Endianness);
-				break;
-
-			case kType_LocationType:
-			{
-				UINT32 locationType = EXTRACT_FIELD(action->type, LocationType);
-
-				switch(locationType)
-				{
-					case kLocation_Standard:
-						/* "Normal" -> "Relative Address" */
-						SET_FIELD(action->type, LocationType, kLocation_IndirectIndexed);
-						SET_FIELD(action->type, LocationParameter, 0);
-						break;
-
-					case kLocation_Custom:
-						/* "EEPROM" -> "Mapped Memory" */
-						SET_FIELD(action->type, LocationType, kLocation_HandlerMemory);
-						SET_FIELD(action->type, LocationParameter, 0);
-						break;
-
-					case kLocation_IndirectIndexed:
-						/* "Relative Address" -> "EEPROM" */
-						SET_FIELD(action->type, LocationType, kLocation_Custom);
-						SET_FIELD(action->type, LocationParameter, kCustomLocation_EEPROM);
-						break;
-
-					default:
-						locationType--;
-						SET_FIELD(action->type, LocationType, locationType);
-				}
-			}
-			break;
-
-			case kType_CPU:
-			case kType_Region:
-			{
-				UINT32 locationParameter = EXTRACT_FIELD(action->type, LocationParameter);
-
-				locationParameter = (locationParameter - 1) & 31;
-
-				SET_FIELD(action->type, LocationParameter, locationParameter);
-			}
-			break;
-
-			case kType_PackedCPU:
-			{
-				UINT32 locationParameter = EXTRACT_FIELD(action->type, LocationParameterCPU);
-
-				locationParameter = (locationParameter - 1) & 7;
-
-				SET_FIELD(action->type, LocationParameterCPU, locationParameter);
-			}
-			break;
-
-			case kType_PackedSize:
-			{
-				UINT32 locationParameter = EXTRACT_FIELD(action->type, IndexBytesUsed);
-
-				locationParameter = (locationParameter - 1) & 3;
-
-				SET_FIELD(action->type, IndexBytesUsed, locationParameter);
-			}
-			break;
-
-			case kType_Address:
-				action->address -= 1;
-				action->address &= info->extraData;
-				break;
-
-			case kType_Return:
-			case kType_Divider:
-				break;
-		}
+		do_select = 1;
 	}
 	else if(ui_pressed_repeat_throttle(machine, IPT_UI_RIGHT, horizontal_key_repeat_speed))
 	{
-		edit_active = 0;
-		dirty = 1;
-
-		switch(info->fieldType)
-		{
-/*          case kType_ActivationKey1:
-            case kType_ActivationKey2:
-                if(info->fieldType == kType_ActivationKey1)
-                {
-                    entry->activationKey1++;
-
-                    if(entry->activationKey1 < 0)
-                        entry->activationKey1 = __code_max - 1;
-                    if(entry->activationKey1 >= __code_max)
-                        entry->activationKey1 = 0;
-
-                    entry->flags |= kCheatFlag_HasActivationKey1;
-                }
-                else
-                {
-                    entry->activationKey2++;
-
-                    if(entry->activationKey2 < 0)
-                        entry->activationKey2 = __code_max - 1;
-                    if(entry->activationKey2 >= __code_max)
-                        entry->activationKey2 = 0;
-
-                    entry->flags |= kCheatFlag_HasActivationKey2;
-                }
-                break;
-*/
-			case kType_Link:
-				TOGGLE_MASK_FIELD(action->type, LinkEnable);
-				break;
-
-			case kType_LinkExtension:
-				TOGGLE_MASK_FIELD(action->type, LinkExtension);
-				break;
-
-			case kType_Type:
-			{
-				UINT8 handled = 0;
-
-				if(EXTRACT_FIELD(action->type, LocationType) == kLocation_Custom)
-				{
-					UINT32 locationParameter = EXTRACT_FIELD(action->type, LocationParameter);
-
-					if(locationParameter == kCustomLocation_Comment)
-					{
-						/* "Comment" -> "Select" */
-						SET_FIELD(action->type, LocationParameter, kCustomLocation_Select);
-						SET_FIELD(action->type, LocationType, kLocation_Custom);
-						SET_FIELD(action->type, Type, 0);
-
-						handled = 1;
-					}
-				}
-				else if((EXTRACT_FIELD(action->type, LocationType) == kLocation_Custom) &&
-						(EXTRACT_FIELD(action->type, LocationParameter) == kCustomLocation_Select))
-				{
-					/* "Select" -> "Normal/Delay" */
-					SET_FIELD(action->type, LocationParameter, 0);
-					SET_FIELD(action->type, LocationType, kLocation_Standard);
-					SET_FIELD(action->type, Type, 0);
-
-					handled = 1;
-				}
-
-				if(!handled)
-				{
-					UINT32 type = EXTRACT_FIELD(action->type, Type);
-
-					if(type == kType_Watch)
-					{
-						/* "Watch" -> "Comment" */
-						SET_FIELD(action->type, LocationParameter, kCustomLocation_Comment);
-						SET_FIELD(action->type, LocationType, kLocation_Custom);
-						SET_FIELD(action->type, Type, 0);
-					}
-					else
-						SET_FIELD(action->type, Type, type + 1);
-				}
-			}
-			break;
-
-			case kType_OneShot:
-				TOGGLE_MASK_FIELD(action->type, OneShot);
-				break;
-
-			case kType_RestorePreviousValue:
-				TOGGLE_MASK_FIELD(action->type, RestorePreviousValue);
-				break;
-
-			case kType_Delay:
-			{
-				UINT32 delay = (EXTRACT_FIELD(action->type, TypeParameter) + 1) & 7;
-
-				SET_FIELD(action->type, TypeParameter, delay);
-			}
-			break;
-
-			case kType_WatchSize:
-				action->originalData = (action->originalData & 0xFFFFFF00) | ((action->originalData + 0x00000001) & 0x000000FF);
-				action->data = action->originalData;
-				break;
-
-			case kType_WatchSkip:
-				action->originalData = (action->originalData & 0xFFFF00FF) | ((action->originalData + 0x00000100) & 0x0000FF00);
-				action->data = action->originalData;
-				break;
-
-			case kType_WatchPerLine:
-				action->originalData = (action->originalData & 0xFF00FFFF) | ((action->originalData + 0x00010000) & 0x00FF0000);
-				action->data = action->originalData;
-				break;
-
-			case kType_WatchAddValue:
-				action->originalData = (action->originalData & 0x00FFFFFF) | ((action->originalData + 0x01000000) & 0xFF000000);
-				action->data = action->originalData;
-				break;
-
-			case kType_WatchFormat:
-			{
-				UINT32 typeParameter = EXTRACT_FIELD(action->type, TypeParameter);
-
-				typeParameter = (typeParameter & 0xFFFFFFFC) | ((typeParameter + 0x00000001) & 0x0000003);
-				SET_FIELD(action->type, TypeParameter, typeParameter);
-			}
-			break;
-
-			case kType_WatchLabel:
-				SET_FIELD(action->type, TypeParameter, EXTRACT_FIELD(action->type, TypeParameter) ^ 0x00000004);
-				break;
-
-			case kType_Operation:
-			{
-				CLEAR_MASK_FIELD(action->type, OperationExtend);
-
-				if(EXTRACT_FIELD(action->type, LocationType) == kLocation_IndirectIndexed)
-				{
-					if(EXTRACT_FIELD(action->type, Type) >= kOperation_SetOrClearBits)
-						SET_FIELD(action->type, Operation, 0);
-					else
-						SET_FIELD(action->type, Operation, EXTRACT_FIELD(action->type, Operation) + 1);
-				}
-				else if(EXTRACT_FIELD(action->type, Operation) >= kOperation_ForceRange)
-					SET_FIELD(action->type, Operation, 0);
-				else
-					SET_FIELD(action->type, Operation, EXTRACT_FIELD(action->type, Operation) + 1);
-			}
-			break;
-
-			case kType_OperationExtend:
-				TOGGLE_MASK_FIELD(action->type, OperationExtend);
-				break;
-
-			case kType_WriteMask:
-				action->extendData += 1;
-				action->extendData &= info->extraData;
-				break;
-
-			case kType_RangeMinimum:
-				if(!EXTRACT_FIELD(action->type, BytesUsed))
-					action->extendData = (action->extendData & 0xFFFF00FF) | ((action->extendData + 0x00000100) & 0x0000FF00);
-				else
-					action->extendData = (action->extendData & 0x0000FFFF) | ((action->extendData + 0x00010000) & 0xFFFF0000);
-				break;
-
-			case kType_RangeMaximum:
-				if(!EXTRACT_FIELD(action->type, BytesUsed))
-					action->extendData = (action->extendData & 0xFFFFFF00) | ((action->extendData + 0x00000001) & 0x000000FF);
-				else
-					action->extendData = (action->extendData & 0xFFFF0000) | ((action->extendData + 0x00000001) & 0x0000FFFF);
-				break;
-
-			case kType_AddressIndex:
-			case kType_SubtractMinimum:
-			case kType_AddMaximum:
-				action->extendData += 1;
-				break;
-
-			case kType_AddSubtract:
-			case kType_SetClear:
-				TOGGLE_MASK_FIELD(action->type, OperationParameter);
-				break;
-
-			case kType_Data:
-				action->originalData += 1;
-				action->originalData &= info->extraData;
-				action->data = action->originalData;
-				break;
-
-			case kType_UserSelect:
-				TOGGLE_MASK_FIELD(action->type, UserSelectEnable);
-				break;
-
-			case kType_UserSelectMinimumDisp:
-				TOGGLE_MASK_FIELD(action->type, UserSelectMinimumDisplay);
-				break;
-
-			case kType_UserSelectMinimum:
-				TOGGLE_MASK_FIELD(action->type, UserSelectMinimum);
-				break;
-
-			case kType_UserSelectBCD:
-				TOGGLE_MASK_FIELD(action->type, UserSelectBCD);
-				break;
-
-			case kType_CopyPrevious:
-				TOGGLE_MASK_FIELD(action->type, LinkCopyPreviousValue);
-				break;
-
-			case kType_Prefill:
-			{
-				UINT32 prefill = (EXTRACT_FIELD(action->type, Prefill) + 1) & 3;
-
-				SET_FIELD(action->type, Prefill, prefill);
-			}
-				break;
-
-			case kType_ByteLength:
-			{
-				UINT32 length = (EXTRACT_FIELD(action->type, BytesUsed) + 1) & 3;
-
-				SET_FIELD(action->type, BytesUsed, length);
-			}
-			break;
-
-			case kType_Endianness:
-				TOGGLE_MASK_FIELD(action->type, Endianness);
-				break;
-
-			case kType_LocationType:
-			{
-				UINT32 locationType = EXTRACT_FIELD(action->type, LocationType);
-
-				switch(locationType)
-				{
-					case kLocation_HandlerMemory:
-						/* "Mapped Memory" -> "EEPROM" */
-						SET_FIELD(action->type, LocationType, kLocation_Custom);
-						SET_FIELD(action->type, LocationParameter, kCustomLocation_EEPROM);
-						break;
-
-					case kLocation_Custom:
-						/* "EEPROM" -> "Relative Address" */
-						SET_FIELD(action->type, LocationType, kLocation_IndirectIndexed);
-						SET_FIELD(action->type, LocationParameter, 0);
-						break;
-
-					case kLocation_IndirectIndexed:
-						/* "Relative Address" -> "Normal" */
-						SET_FIELD(action->type, LocationType, kLocation_Standard);
-						SET_FIELD(action->type, LocationParameter, 0);
-						break;
-
-					default:
-						locationType++;
-						SET_FIELD(action->type, LocationType, locationType);
-				}
-			}
-			break;
-
-			case kType_CPU:
-			case kType_Region:
-			{
-				UINT32 locationParameter = EXTRACT_FIELD(action->type, LocationParameter);
-
-				locationParameter = (locationParameter + 1) & 31;
-
-				SET_FIELD(action->type, LocationParameter, locationParameter);
-			}
-			break;
-
-			case kType_PackedCPU:
-			{
-				UINT32 locationParameter = EXTRACT_FIELD(action->type, LocationParameterCPU);
-
-				locationParameter = (locationParameter + 1) & 7;
-
-				SET_FIELD(action->type, LocationParameterCPU, locationParameter);
-			}
-			break;
-
-			case kType_PackedSize:
-			{
-				UINT32 locationParameter = EXTRACT_FIELD(action->type, IndexBytesUsed);
-
-				locationParameter = (locationParameter + 1) & 3;
-
-				SET_FIELD(action->type, IndexBytesUsed, locationParameter);
-			}
-			break;
-
-			case kType_Address:
-				action->address += 1;
-				action->address &= info->extraData;
-				break;
-
-			case kType_Return:
-			case kType_Divider:
-				break;
-		}
+		do_select = -1;
 	}
-#endif
 	else if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		if(edit_active)
@@ -4942,265 +4192,22 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		{
 			switch(info->field_type)
 			{
-#if 0
-				case kType_Name:
-				case kType_ExtendName:
-				case kType_Comment:
-				case kType_ActivationKey1:
-				case kType_ActivationKey2:
-				case kType_WatchSize:
-				case kType_WatchSkip:
-				case kType_WatchPerLine:
-				case kType_WatchAddValue:
-				case kType_WriteMask:
-				case kType_AddMaximum:
-				case kType_SubtractMinimum:
-				case kType_RangeMinimum:
-				case kType_RangeMaximum:
-				case kType_Data:
-				case kType_Address:
-					osd_readkey_unicode(1);
-					dirty = 1;
-					edit_active = 1;
-					break;
-#endif
-				case EDIT_MENU_RETURN:
-					menu->sel = -1;
-					break;
+				case EDIT_MENU_ONE_SHOT:					TOGGLE_MASK_FIELD(action->type, OneShot);					dirty = 1;	break;
+				case EDIT_MENU_RESTORE_VALUE:				TOGGLE_MASK_FIELD(action->type, RestorePreviousValue);		dirty = 1;	break;
+				case EDIT_MENU_USER_SELECT:					TOGGLE_MASK_FIELD(action->type, UserSelectEnable);			dirty = 1;	break;
+				case EDIT_MENU_USER_SELECT_MINIMUM_DISP:	TOGGLE_MASK_FIELD(action->type, UserSelectMinimumDisplay);	dirty = 1;	break;
+				case EDIT_MENU_USER_SELECT_MINIMUM:			TOGGLE_MASK_FIELD(action->type, UserSelectMinimum);			dirty = 1;	break;
+				case EDIT_MENU_USER_SELECT_BCD:				TOGGLE_MASK_FIELD(action->type, UserSelectBCD);				dirty = 1;	break;
+				case EDIT_MENU_RETURN:						menu->sel = -1;															break;
+				default:									edit_active = 1;														break;
 			}
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
-	{
-		if(edit_active)		edit_active = 0;
-		else				menu->sel = -1;
-	}
-#if 0
-	/********** EDIT MODE **********/
-	if(edit_active)
-	{
-		/* do edit text */
-		dirty = 1;
-
-		switch(info->fieldType)
-		{
-			case kType_Name:
-				entry->name = DoDynamicEditTextField(entry->name);
-				break;
-
-			case kType_ExtendName:
-				action->optionalName = DoDynamicEditTextField(action->optionalName);
-				break;
-
-			case kType_Comment:
-				entry->comment = DoDynamicEditTextField(entry->comment);
-				break;
-
-			case kType_ActivationKey1:
-			case kType_ActivationKey2:
-			{
-				if(input_ui_pressed(machine, IPT_UI_CANCEL))
-				{
-					if(info->fieldType == kType_ActivationKey1)
-					{
-						entry->activationKey1 = 0;
-						entry->flags &= ~kCheatFlag_HasActivationKey1;
-					}
-					else
-					{
-						entry->activationKey2 = 0;
-						entry->flags &= ~kCheatFlag_HasActivationKey2;
-					}
-
-					edit_active = 0;
-				}
-				else
-				{
-					int code = input_code_poll_switches(FALSE);
-
-					if(code == KEYCODE_ESC)
-					{
-						if(info->fieldType == kType_ActivationKey1)
-						{
-							entry->activationKey1 = 0;
-							entry->flags &= ~kCheatFlag_HasActivationKey1;
-						}
-						else
-						{
-							entry->activationKey2 = 0;
-							entry->flags &= ~kCheatFlag_HasActivationKey2;
-						}
-
-						edit_active = 0;
-					}
-					else
-					{
-						if((code != INPUT_CODE_INVALID) && !input_ui_pressed(machine, IPT_UI_SELECT))
-						{
-							if(info->fieldType == kType_ActivationKey1)
-							{
-								entry->activationKey1 = code;
-								entry->flags |= kCheatFlag_HasActivationKey1;
-							}
-							else
-							{
-								entry->activationKey2 = code;
-								entry->flags |= kCheatFlag_HasActivationKey2;
-							}
-
-							edit_active = 0;
-						}
-					}
-				}
-			}
-			break;
-
-			case kType_WatchSize:
-			{
-				UINT32 temp = (action->originalData >> 0) & 0xFF;
-
-				temp++;
-				temp = do_edit_hex_field(machine, temp) & 0xFF;
-				temp--;
-
-				action->originalData = (action->originalData & 0xFFFFFF00) | ((temp << 0) & 0x000000FF);
-				action->data = action->originalData;
-			}
-			break;
-
-			case kType_WatchSkip:
-			{
-				UINT32 temp = (action->originalData >> 8) & 0xFF;
-
-				temp = do_edit_hex_field(machine, temp) & 0xFF;
-
-				action->originalData = (action->originalData & 0xFFFF00FF) | ((temp << 8) & 0x0000FF00);
-				action->data = action->originalData;
-			}
-			break;
-
-			case kType_WatchPerLine:
-			{
-				UINT32 temp = (action->originalData >> 16) & 0xFF;
-
-				temp = do_edit_hex_field(machine, temp) & 0xFF;
-
-				action->originalData = (action->originalData & 0xFF00FFFF) | ((temp << 16) & 0x00FF0000);
-				action->data = action->originalData;
-			}
-			break;
-
-			case kType_WatchAddValue:
-			{
-				UINT32 temp = (action->originalData >> 24) & 0xFF;
-
-				temp = do_edit_hex_field_signed(temp, 0xFFFFFF80) & 0xFF;
-
-				action->originalData = (action->originalData & 0x00FFFFFF) | ((temp << 24) & 0xFF000000);
-				action->data = action->originalData;
-			}
-			break;
-
-			case kType_WriteMask:
-				action->extendData = do_edit_hex_field(machine, action->extendData);
-				action->extendData &= info->extraData;
-				break;
-
-			case kType_AddMaximum:
-			case kType_SubtractMinimum:
-				action->extendData = do_edit_hex_field(machine, action->extendData);
-				break;
-
-			case kType_RangeMinimum:
-			{
-				UINT32 temp;
-
-				if(!TEST_FIELD(action->type, BytesUsed))
-				{
-					temp = (action->extendData >> 8) & 0xFF;
-					temp = do_edit_hex_field(machine, temp) & 0xFF;
-
-					action->extendData = (action->extendData & 0xFF) | ((temp << 8) & 0xFF00);
-				}
-				else
-				{
-					temp = (action->extendData >> 16) & 0xFFFF;
-					temp = do_edit_hex_field(machine, temp) & 0xFFFF;
-
-					action->extendData = (action->extendData & 0x0000FFFF) | ((temp << 16) & 0xFFFF0000);
-				}
-			}
-			break;
-
-			case kType_RangeMaximum:
-			{
-				UINT32 temp;
-
-				if(!TEST_FIELD(action->type, BytesUsed))
-				{
-					temp = action->extendData & 0xFF;
-					temp = do_edit_hex_field(machine, temp) & 0xFF;
-
-					action->extendData = (action->extendData & 0xFF00) | (temp & 0x00FF);
-				}
-				else
-				{
-					temp = action->extendData & 0xFFFF;
-					temp = do_edit_hex_field(machine, temp) & 0xFFFF;
-
-					action->extendData = (action->extendData & 0xFFFF0000) | (temp & 0x0000FFFF);
-				}
-			}
-			break;
-
-			case kType_Data:
-				action->originalData = do_edit_hex_field(machine, action->originalData);
-				action->originalData &= info->extraData;
-				action->data = action->originalData;
-				break;
-
-			case kType_Address:
-				action->address = do_edit_hex_field(machine, action->address);
-				action->address &= info->extraData;
-				break;
-		}
-	}
-	else
-	{
-		if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
-		{
-			save_cheat_code(machine, entry);
-		}
-		else if(input_ui_pressed(machine, IPT_UI_WATCH_VALUE))
-		{
-			watch_cheat_entry(entry, 0);
-		}
-	}
-
-	if(dirty)
-	{
-		UpdateCheatInfo(entry, 0);
-
-		entry->flags |= kCheatFlag_Dirty;
-	}
-
-	if(sel == -1)
-	{
-		/* NOTE : building label index table should be done when exit the edit menu */
-		if(entry->flags & kCheatFlag_Select)
-			build_label_index_table(entry);
-
-		check_code_format(entry);
-
-		edit_active = 0;
-		dirty = 1;
-	}
-#endif
 	else if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
 	{
 		add_action_before(entry, info->sub_cheat);
 
-		entry->action_list[info->sub_cheat].extend_data = 0xFFFFFFFF;
+		entry->action_list[info->sub_cheat].extend_data = ~0;
 
 		for(i = 0; i < entry->action_list_length; i++)
 		{
@@ -5214,6 +4221,41 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
 		delete_action_at(entry, info->sub_cheat);
+	}
+	else if(input_ui_pressed(machine, IPT_UI_WATCH_VALUE))
+	{
+		watch_cheat_entry(entry, 0);
+	}
+	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	{
+		if(edit_active)		edit_active = 0;
+		else				menu->sel = -1;
+	}
+
+	if(do_select)
+	{
+		switch(info->field_type)
+		{
+			case EDIT_MENU_ONE_SHOT:					TOGGLE_MASK_FIELD(action->type, OneShot);						break;
+			case EDIT_MENU_RESTORE_VALUE:				TOGGLE_MASK_FIELD(action->type, RestorePreviousValue);			break;
+			case EDIT_MENU_USER_SELECT:					TOGGLE_MASK_FIELD(action->type, UserSelectEnable);				break;
+			case EDIT_MENU_USER_SELECT_MINIMUM_DISP:	TOGGLE_MASK_FIELD(action->type, UserSelectMinimumDisplay);		break;
+			case EDIT_MENU_USER_SELECT_MINIMUM:			TOGGLE_MASK_FIELD(action->type, UserSelectMinimum);				break;
+			case EDIT_MENU_USER_SELECT_BCD:				TOGGLE_MASK_FIELD(action->type, UserSelectBCD);					break;
+			case EDIT_MENU_WRITE_MASK:					action->extend_data = action->extend_data + do_select;			break;
+			case EDIT_MENU_DATA:						action->original_data = (action->original_data + do_select) &
+														BYTE_MASK_TABLE[EXTRACT_FIELD(action->type, BytesUsed)];		break;
+			case EDIT_MENU_ADDRESS:						action->address = (action->address + do_select) &
+														BYTE_MASK_TABLE[EXTRACT_FIELD(action->type, BytesUsed)];		break;
+		}
+
+		dirty = 1;
+	}
+
+	if(dirty)
+	{
+		update_cheat_info(machine, entry, 0);
+		entry->flags |= kCheatFlag_Dirty;
 	}
 
 	/* free astring for activation key */
@@ -5339,8 +4381,8 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	cpu_region_info	*cpu_info = NULL;
 	cheat_entry		*entry = &cheat_list[menu->pre_sel];
 	cheat_action	*action = NULL;
-	astring			*activation_key_string1 = NULL;
-	astring			*activation_key_string2 = NULL;
+	astring			*activation_key_string = NULL;
+	astring			*activation_sub_key_string = NULL;
 
 	/* first setting : forced set page as 0 when first open */
 	if(menu->first_time)
@@ -5403,24 +4445,24 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	/* ##### ACTIVATION KEY ##### */
 	if(entry->flags & kCheatFlag_Select)
 	{
-		if(entry->flags & kCheatFlag_HasActivationKey1)
+		if(entry->activation_key)
 		{
-			activation_key_string1 = astring_alloc();
-			ADD_VIEW_MENU_ITEMS("Activation Key - Prev", astring_c(input_code_name(activation_key_string1, entry->activation_key_1)), kViewMenu_ActivationKey1);
+			activation_key_string = astring_alloc();
+			ADD_VIEW_MENU_ITEMS("Activation Key - Prev", astring_c(input_code_name(activation_key_string, entry->activation_key)), kViewMenu_ActivationKey1);
 		}
 
-		if(entry->flags & kCheatFlag_HasActivationKey2)
+		if(entry->activation_sub_key)
 		{
-			activation_key_string2 = astring_alloc();
-			ADD_VIEW_MENU_ITEMS("Activation Key - Next", astring_c(input_code_name(activation_key_string2, entry->activation_key_2)), kViewMenu_ActivationKey2);
+			activation_sub_key_string = astring_alloc();
+			ADD_VIEW_MENU_ITEMS("Activation Key - Next", astring_c(input_code_name(activation_sub_key_string, entry->activation_sub_key)), kViewMenu_ActivationKey2);
 		}
 	}
 	else
 	{
-		if(entry->flags & kCheatFlag_HasActivationKey1)
+		if(entry->activation_key)
 		{
-			activation_key_string1 = astring_alloc();
-			ADD_VIEW_MENU_ITEMS("Activation Key", astring_c(input_code_name(activation_key_string1, entry->activation_key_1)), kViewMenu_ActivationKey1);
+			activation_key_string = astring_alloc();
+			ADD_VIEW_MENU_ITEMS("Activation Key", astring_c(input_code_name(activation_key_string, entry->activation_key)), kViewMenu_ActivationKey1);
 		}
 	}
 
@@ -5817,8 +4859,8 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 
 	if(do_update)					update_cheat_info(machine, entry, 0);
-	if(activation_key_string1)		astring_free(activation_key_string1);
-	if(activation_key_string2)		astring_free(activation_key_string2);
+	if(activation_key_string)		astring_free(activation_key_string);
+	if(activation_sub_key_string)	astring_free(activation_sub_key_string);
 
 	return menu->sel + 1;
 }
@@ -8073,7 +7115,9 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 		SELECT_OPTION_MENU_SHOW_SEARCH_LABELS,
 		SELECT_OPTION_MENU_AUTO_SAVE_CHEATS,
 		SELECT_OPTION_MENU_SHOW_ACTIVATION_KEY,
-		SELECT_OPTION_MENU_LOAD_OLD_FORMAT,
+		SELECT_OPTION_MENU_LOAD_NEW_CODE,
+		SELECT_OPTION_MENU_LOAD_STANDARD_CODE,
+		SELECT_OPTION_MENU_LOAD_OLD_CODE,
 #ifdef MESS
 		SELECT_OPTION_MENU_SHARED_CODE,
 #endif
@@ -8142,7 +7186,13 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 	ADD_OPTION_MENU_ITEMS("Show Activation Key Message", TEST_FIELD(cheat_options, ActivationKeyMessage) ? "On" : "Off");
 
 	/* ##### OLD FORMAT LOADING ##### */
-	ADD_OPTION_MENU_ITEMS("Load Old Format Code", TEST_FIELD(cheat_options, LoadOldFormat) ? "On" : "Off");
+	ADD_OPTION_MENU_ITEMS("Load New Format Code", TEST_FIELD(cheat_options, LoadNewCode) ? "On" : "Off");
+
+	/* ##### OLD FORMAT LOADING ##### */
+	ADD_OPTION_MENU_ITEMS("Load Standard Format Code", TEST_FIELD(cheat_options, LoadStandardCode) ? "On" : "Off");
+
+	/* ##### OLD FORMAT LOADING ##### */
+	ADD_OPTION_MENU_ITEMS("Load Old Format Code", TEST_FIELD(cheat_options, LoadOldCode) ? "On" : "Off");
 
 	/* ##### VERTICAL KEY REPEAT SPEED ##### */
 	ADD_OPTION_MENU_ITEMS("Vertical Key Repeat Speed", kNumbersTable[EXTRACT_FIELD(cheat_options, VerticalKeyRepeatSpeed)]);
@@ -8209,7 +7259,7 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 				break;
 
 			case SELECT_OPTION_MENU_LOAD_CHEAT_OPTIONS:
-				load_cheat_database(machine, LOAD_CHEAT_OPTION);
+				load_cheat_database(machine, LOAD_CHEAT_OPTIONS);
 				break;
 
 			case SELECT_OPTION_MENU_SAVE_CHEAT_OPTIONS:
@@ -8237,7 +7287,7 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 		if(shift_key_pressed())
 			reset_cheat_options();
 		else
-			load_cheat_database(machine, LOAD_CHEAT_OPTION);
+			load_cheat_database(machine, LOAD_CHEAT_OPTIONS);
 	}
 	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
@@ -8260,22 +7310,12 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 			}
 			break;
 
-			case SELECT_OPTION_MENU_SHOW_SEARCH_LABELS:
-				TOGGLE_MASK_FIELD(cheat_options, DontPrintNewLabels);
-				break;
-
-			case SELECT_OPTION_MENU_AUTO_SAVE_CHEATS:
-				TOGGLE_MASK_FIELD(cheat_options, AutoSaveEnabled);
-				break;
-
-			case SELECT_OPTION_MENU_SHOW_ACTIVATION_KEY:
-				TOGGLE_MASK_FIELD(cheat_options, ActivationKeyMessage);
-				break;
-
-			case SELECT_OPTION_MENU_LOAD_OLD_FORMAT:
-				TOGGLE_MASK_FIELD(cheat_options, LoadOldFormat);
-				break;
-
+			case SELECT_OPTION_MENU_SHOW_SEARCH_LABELS:		TOGGLE_MASK_FIELD(cheat_options, DontPrintNewLabels);		break;
+			case SELECT_OPTION_MENU_AUTO_SAVE_CHEATS:		TOGGLE_MASK_FIELD(cheat_options, AutoSaveEnabled);			break;
+			case SELECT_OPTION_MENU_SHOW_ACTIVATION_KEY:	TOGGLE_MASK_FIELD(cheat_options, ActivationKeyMessage);		break;
+			case SELECT_OPTION_MENU_LOAD_NEW_CODE:			TOGGLE_MASK_FIELD(cheat_options, LoadNewCode);				break;
+			case SELECT_OPTION_MENU_LOAD_STANDARD_CODE:		TOGGLE_MASK_FIELD(cheat_options, LoadStandardCode);			break;
+			case SELECT_OPTION_MENU_LOAD_OLD_CODE:			TOGGLE_MASK_FIELD(cheat_options, LoadOldCode);				break;
 			case SELECT_OPTION_MENU_VERTICAL_KEY_SPEED:
 				{
 					INT8 vertical_speed = (EXTRACT_FIELD(cheat_options, VerticalKeyRepeatSpeed) + do_select) & 0xF;
@@ -8284,7 +7324,6 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 					vertical_key_repeat_speed = vertical_speed;
 				}
 				break;
-
 			case SELECT_OPTION_MENU_HORIZONTAL_KEY_SPEED:
 				{
 					INT8 horizontal_speed = (EXTRACT_FIELD(cheat_options, HorizontalKeyRepeatSpeed) + do_select) & 0xF;
@@ -8294,9 +7333,7 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 				}
 				break;
 #ifdef MESS
-			case SELECT_OPTION_MENU_SHARED_CODE:
-				TOGGLE_MASK_FIELD(cheat_options, SharedCode);
-				break;
+			case SELECT_OPTION_MENU_SHARED_CODE:			TOGGLE_MASK_FIELD(cheat_options, SharedCode);				break;
 #endif
 		}
 	}
@@ -8795,7 +7832,7 @@ static int debug_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 	/* ##### MACHINE ##### */
 #ifdef MESS
-	ADD_DEBUG_MENU_ITEMS("machine", machine->gamedrv->name);
+	ADD_DEBUG_MENU_ITEMS("Machine", machine->gamedrv->name);
 
 	/* ##### CRC ##### */
 	sprintf(buf_crc, "%.8X", thisGameCRC);
@@ -8921,7 +7958,14 @@ static TIMER_CALLBACK( cheat_periodic )
 		return;
 
 	for(i = 0; i < cheat_list_length; i++)
-		cheat_periodic_entry(machine, &cheat_list[i]);
+	{
+		cheat_entry *entry = &cheat_list[i];
+
+		if(entry->flags & kCheatFlag_OldFormat)
+			cheat_periodic_old_entry(machine, entry);
+		else
+			cheat_periodic_entry(machine, entry);
+	}
 }
 
 /*---------------
@@ -10204,175 +9248,6 @@ static void build_search_regions(running_machine *machine, search_info *info)
 	}
 }
 
-/*-------------------------------------------------------------------------
-  convert_older_code - convert old format code to new when load database
--------------------------------------------------------------------------*/
-
-static int convert_older_code(int code, int cpu, int *data, int *extend_data)
-{
-	enum
-	{
-		CUSTOM_FIELD_NONE =					0,
-		CUSTOM_FIELD_DONT_APPLY_CPU_FIELD =	1 << 0,
-		CUSTOM_FIELD_SET_BIT =				1 << 1,
-		CUSTOM_FIELD_CLEAR_BIT =			1 << 2,
-		CUSTOM_FIELD_SUBTRACT_ONE =			1 << 3,
-		CUSTOM_FIELD_BIT_MASK =				CUSTOM_FIELD_SET_BIT | CUSTOM_FIELD_CLEAR_BIT,
-
-		CUSTOM_FIELD_END =					0xFF
-	};
-
-	struct _conversion_table
-	{
-		int		old_code;
-		UINT32	new_code;
-		UINT8	custom_field;
-	};
-
-	static const struct _conversion_table conversion_table[] =
-	{
-		{	0,		0x00000000,	CUSTOM_FIELD_NONE },
-		{	1,		0x00000001,	CUSTOM_FIELD_NONE },
-		{	2,		0x00000020,	CUSTOM_FIELD_NONE },
-		{	3,		0x00000040,	CUSTOM_FIELD_NONE },
-		{	4,		0x000000A0,	CUSTOM_FIELD_NONE },
-		{	5,		0x00000022,	CUSTOM_FIELD_NONE },
-		{	6,		0x00000042,	CUSTOM_FIELD_NONE },
-		{	7,		0x000000A2,	CUSTOM_FIELD_NONE },
-		{	8,		0x00000024,	CUSTOM_FIELD_NONE },
-		{	9,		0x00000044,	CUSTOM_FIELD_NONE },
-		{	10,		0x00000064,	CUSTOM_FIELD_NONE },
-		{	11,		0x00000084,	CUSTOM_FIELD_NONE },
-		{	15,		0x00000023,	CUSTOM_FIELD_NONE },
-		{	16,		0x00000043,	CUSTOM_FIELD_NONE },
-		{	17,		0x000000A3,	CUSTOM_FIELD_NONE },
-		{	20,		0x00000000,	CUSTOM_FIELD_SET_BIT },
-		{	21,		0x00000001,	CUSTOM_FIELD_SET_BIT },
-		{	22,		0x00000020,	CUSTOM_FIELD_SET_BIT },
-		{	23,		0x00000040,	CUSTOM_FIELD_SET_BIT },
-		{	24,		0x000000A0,	CUSTOM_FIELD_SET_BIT },
-		{	40,		0x00000000,	CUSTOM_FIELD_CLEAR_BIT },
-		{	41,		0x00000001,	CUSTOM_FIELD_CLEAR_BIT },
-		{	42,		0x00000020,	CUSTOM_FIELD_CLEAR_BIT },
-		{	43,		0x00000040,	CUSTOM_FIELD_CLEAR_BIT },
-		{	44,		0x000000A0,	CUSTOM_FIELD_CLEAR_BIT },
-		{	60,		0x00000103,	CUSTOM_FIELD_NONE },
-		{	61,		0x00000303,	CUSTOM_FIELD_NONE },
-		{	62,		0x00000503,	CUSTOM_FIELD_SUBTRACT_ONE },
-		{	63,		0x00000903,	CUSTOM_FIELD_NONE },
-		{	64,		0x00000B03,	CUSTOM_FIELD_NONE },
-		{	65,		0x00000D03,	CUSTOM_FIELD_SUBTRACT_ONE },
-		{	70,		0x00000101,	CUSTOM_FIELD_NONE },
-		{	71,		0x00000301,	CUSTOM_FIELD_NONE },
-		{	72,		0x00000501,	CUSTOM_FIELD_SUBTRACT_ONE },
-		{	73,		0x00000901,	CUSTOM_FIELD_NONE },
-		{	74,		0x00000B01,	CUSTOM_FIELD_NONE },
-		{	75,		0x00000D01,	CUSTOM_FIELD_SUBTRACT_ONE },
-		{	80,		0x00000102,	CUSTOM_FIELD_NONE },
-		{	81,		0x00000302,	CUSTOM_FIELD_NONE },
-		{	82,		0x00000502,	CUSTOM_FIELD_SUBTRACT_ONE },
-		{	83,		0x00000902,	CUSTOM_FIELD_NONE },
-		{	84,		0x00000B02,	CUSTOM_FIELD_NONE },
-		{	85,		0x00000D02,	CUSTOM_FIELD_SUBTRACT_ONE },
-		{	90,		0x00000100,	CUSTOM_FIELD_NONE },
-		{	91,		0x00000300,	CUSTOM_FIELD_NONE },
-		{	92,		0x00000500,	CUSTOM_FIELD_SUBTRACT_ONE },
-		{	93,		0x00000900,	CUSTOM_FIELD_NONE },
-		{	94,		0x00000B00,	CUSTOM_FIELD_NONE },
-		{	95,		0x00000D00,	CUSTOM_FIELD_SUBTRACT_ONE },
-		{	100,	0x20800000,	CUSTOM_FIELD_NONE },
-		{	101,	0x20800001,	CUSTOM_FIELD_NONE },
-		{	102,	0x20800000,	CUSTOM_FIELD_NONE },
-		{	103,	0x20800001,	CUSTOM_FIELD_NONE },
-		{	110,	0x40800000,	CUSTOM_FIELD_NONE },
-		{	111,	0x40800001,	CUSTOM_FIELD_NONE },
-		{	112,	0x40800000,	CUSTOM_FIELD_NONE },
-		{	113,	0x40800001,	CUSTOM_FIELD_NONE },
-		{	120,	0x63000001,	CUSTOM_FIELD_NONE },
-		{	121,	0x63000001,	CUSTOM_FIELD_DONT_APPLY_CPU_FIELD | CUSTOM_FIELD_SET_BIT },
-		{	122,	0x63000001,	CUSTOM_FIELD_DONT_APPLY_CPU_FIELD | CUSTOM_FIELD_CLEAR_BIT },
-		{	998,	0x00000006,	CUSTOM_FIELD_NONE },
-		{	999,	0x60000000,	CUSTOM_FIELD_DONT_APPLY_CPU_FIELD },
-		{	-1,		0x00000000,	CUSTOM_FIELD_END }
-	};
-
-	const struct _conversion_table *traverse = conversion_table;
-
-	UINT8	link_cheat = 0;
-	UINT32	new_code;
-
-	/* convert link cheats */
-	if((code >= 500) && (code <= 699))
-	{
-		link_cheat = 1;
-		code -= 500;
-	}
-
-	/* look up code */
-	while(traverse->old_code >= 0)
-	{
-		if(code == traverse->old_code)
-			goto found_code;
-		traverse++;
-	}
-
-	logerror("cheat: [older code conversion] %d not found\n", code);
-
-	/* not found */
-	*extend_data = 0;
-	return 0;
-
-	/* found */
-	found_code:
-
-	new_code = traverse->new_code;
-
-	/* add in the CPU field */
-	if((traverse->custom_field & CUSTOM_FIELD_DONT_APPLY_CPU_FIELD) == 0)
-		new_code = (new_code & ~0x1F000000) | ((cpu << 24) & 0x1F000000);
-
-	/* hack-ish, subtract one from data field for x5 user select */
-	if(traverse->custom_field & CUSTOM_FIELD_SUBTRACT_ONE)
-		/* yaay for C operator precedence */
-		(*data)--;
-
-	/* set up the extend data */
-	if(traverse->custom_field & CUSTOM_FIELD_BIT_MASK)
-		*extend_data = *data;
-	else
-		*extend_data = 0xFFFFFFFF;
-
-	if(traverse->custom_field & CUSTOM_FIELD_CLEAR_BIT)
-		*data = 0;
-
-	if(link_cheat)
-		SET_MASK_FIELD(new_code, LinkEnable);
-
-	return new_code;
-}
-
-/*----------------------
-  convert_to_new_code
-----------------------*/
-
-static int convert_to_new_code(cheat_action *action)
-{
-	int new_type = 0;
-
-	if(EXTRACT_FIELD(action->type, LocationType) == kLocation_IndirectIndexed) {
-		SET_FIELD(new_type, CodeType, kCodeType_IWrite);
-		SET_FIELD(new_type, CodeParameter, EXTRACT_FIELD(action->type, IndexBytesUsed)); }
-	SET_FIELD(new_type, AddressSize, kSearchSize_8Bit);
-	if(TEST_FIELD(action->type, RestorePreviousValue))
-		SET_MASK_FIELD(new_type, RestoreValue);
-	if(EXTRACT_FIELD(action->type, Prefill))
-		SET_FIELD(new_type, PrefillEnable, 0);
-	if(EXTRACT_FIELD(action->type, Type) == kLocation_Standard && EXTRACT_FIELD(action->type, TypeParameter))
-		SET_MASK_FIELD(new_type, DelayEnable);
-
-	return new_type;
-}
-
 /*----------------------------------------------------------
   handle_local_command_tag - tag checker for command code
 ----------------------------------------------------------*/
@@ -10397,9 +9272,9 @@ static int handle_local_command_tag(char *tag)
 static void handle_local_command_cheat(running_machine *machine, int cpu, int type, int address, int data, int extend_data, char *tag)
 {
 	int command = 0;
-	int format = cpu ? FORMAT_NEW : FORMAT_STANDARD;
+	int format = cpu ? LOAD_CHEAT_CODE_NEW : LOAD_CHEAT_CODE_OLD;
 
-	if(format != FORMAT_NEW)
+	if(format != LOAD_CHEAT_CODE_NEW)
 	{
 		/* convert old format to new */
 		switch(EXTRACT_FIELD(type, LocationParameter))
@@ -10430,7 +9305,7 @@ static void handle_local_command_cheat(running_machine *machine, int cpu, int ty
 	switch(command)
 	{
 		case CUSTOM_CODE_ACTIVATION_KEY:
-			if(format == FORMAT_NEW)
+			if(format == LOAD_CHEAT_CODE_NEW)
 				address = handle_local_command_tag(tag);
 
 			if(address < cheat_list_length)
@@ -10442,33 +9317,21 @@ static void handle_local_command_cheat(running_machine *machine, int cpu, int ty
 					if(entry->flags & kCheatFlag_Select)
 					{
 						if(data)
-						{
-							entry->activation_key_1 = data;
-							entry->flags |= kCheatFlag_HasActivationKey1;
-						}
+							entry->activation_key = data;
 
 						if(extend_data)
-						{
-							entry->activation_key_2 = extend_data;
-							entry->flags |= kCheatFlag_HasActivationKey2;
-						}
+							entry->activation_sub_key = extend_data;
 					}
 					else
-					{
-						entry->activation_key_1 = data;
-						entry->flags |= kCheatFlag_HasActivationKey1;
-					}
+						entry->activation_key = data;
 				}
 				else
-				{
-					entry->activation_key_1 = data;
-					entry->flags |= kCheatFlag_HasActivationKey1;
-				}
+					entry->activation_key = data;
 			}
 			break;
 
 		case CUSTOM_CODE_PRE_ENABLE:
-			if(format == FORMAT_NEW)
+			if(format == LOAD_CHEAT_CODE_NEW)
 				address = handle_local_command_tag(tag);
 
 			if(address < cheat_list_length)
@@ -10477,7 +9340,7 @@ static void handle_local_command_cheat(running_machine *machine, int cpu, int ty
 
 				activate_cheat(machine, entry);
 
-				if(format == FORMAT_NEW)
+				if(format == LOAD_CHEAT_CODE_NEW)
 				{
 					if(data && data < entry->action_list_length)
 						entry->selection = data;
@@ -10546,15 +9409,17 @@ static UINT8 open_cheat_database(mame_file **the_file, char *file_name, UINT8 fl
 	return 1;
 }
 
-/*------------------------------------------------------
-  load_cheat_option - load cheat option from database
-------------------------------------------------------*/
+/*-------------------------------------------------------
+  load_cheat_options - load cheat option from database
+-------------------------------------------------------*/
 
-static void load_cheat_option(char *file_name)
+static void load_cheat_options(char *file_name)
 {
 	static char		buf[2048];
 	mame_file		*the_file;
 	cheat_format	*format = &cheat_format_table[0];
+	cheat_format_strings
+					*buffer = format_strings;
 
 	/* open the database */
 	if(open_cheat_database(&the_file, file_name, DATABASE_LOAD) == 0)
@@ -10565,18 +9430,14 @@ static void load_cheat_option(char *file_name)
 
 	while(mame_fgets(buf, 2048, the_file))
 	{
-		char pre_command[16];
-
-		if(sscanf(buf, format->format_string, pre_command) == format->arguments_matched)
+		if(sscanf(buf, format->format_string, buffer->name) == format->arguments_matched)
 		{
-			if(strlen(pre_command) == format->type_matched)
+			if(strlen(buffer->name) == format->type_matched)
 			{
-				if(sscanf(pre_command, "%X", &cheat_options));
+				if(sscanf(buffer->name, "%X", &cheat_options));
 				{
 					vertical_key_repeat_speed = EXTRACT_FIELD(cheat_options, VerticalKeyRepeatSpeed);
 					horizontal_key_repeat_speed = EXTRACT_FIELD(cheat_options, HorizontalKeyRepeatSpeed);
-					horizontal_key_repeat_speed = (horizontal_key_repeat_speed ? horizontal_key_repeat_speed : 10);
-					vertical_key_repeat_speed = (vertical_key_repeat_speed ? vertical_key_repeat_speed : 10);
 					SET_MESSAGE(CHEAT_MESSAGE_RELOAD_CHEAT_OPTION);
 				}
 			}
@@ -10587,208 +9448,123 @@ static void load_cheat_option(char *file_name)
 	mame_fclose(the_file);
 }
 
-/*--------------------------------------------------
-  load_cheat_code - load cheat code from database
---------------------------------------------------*/
+/*-------------------------------------------------------------
+  load_cheat_code_new - load newest cheat code from database
+-------------------------------------------------------------*/
 
-static void load_cheat_code(running_machine *machine, char *file_name)
+static void load_cheat_code_new(running_machine *machine, char *file_name)
 {
-	char		buf[2048];
-	mame_file	*the_file;
+	char			buf[255];
+	mame_file		*the_file;
+	cheat_format_strings
+					*buffer = format_strings;
 
 	/* open the database */
-	if(open_cheat_database(&the_file, file_name, DATABASE_LOAD) == 0)
-		return;
-
+	if(open_cheat_database(&the_file, file_name, DATABASE_LOAD) == 0) return;
 	found_database = 1;
-
 	/* get a line from database */
-	while(mame_fgets(buf, 2048, the_file))
+	while(mame_fgets(buf, 255, the_file))
 	{
-		int		i;
 #ifdef MESS
 		int		crc =					0;
 #endif
+		int		cpu =					0;
 		int		type =					0;
 		int		address =				0;
 		int		data =					0;
 		int		extend_data =			0;
 		int		arguments_matched =		0;
-		int		format_level =			0;
-		int		cpu =					0;
-		int		code =					0;
-		char	name[31] =				{ 0 };
-		char	pre_type[31] =			{ 0 };
-		char	pre_data[31] =			{ 0 };
-		char	pre_extend_data[255] =	{ 0 };
-		char	description[255] =		{ 0 };
-		char	comment[255] =			{ 0 };
+		int		is_error =				0;
 		cheat_entry		*entry;
 		cheat_action	*action;
+		cheat_format	*format = &cheat_format_table[LOAD_CHEAT_CODE_NEW];
 
 		/* scan and check format */
-		for(i = FORMAT_NEW; i <= FORMAT_OLD; i++)
+#ifdef MESS
+		arguments_matched = sscanf(buf, format->format_string, buffer->name, &crc, buffer->type, &address, buffer->data, buffer->extend_data, buffer->description, buffer->comment);
+#else
+		arguments_matched = sscanf(buf, format->format_string, buffer->name, buffer->type, &address, buffer->data, buffer->extend_data, buffer->description, buffer->comment);
+#endif
+		/* NOTE : description and comment are not always needed */
+		if(arguments_matched < format->arguments_matched) continue;
+
+#ifdef MESS
+		/* check crc (MESS specified) */
+		if(MatchesCRCTable(crc) == 0) continue;
+
+		if(TEST_FIELD(cheat_options, SharedCode) && strcmp(machine->gamedrv->parent, "0"))
 		{
-			cheat_format *format = &cheat_format_table[i];
-
-			if(TEST_FIELD(cheat_options, LoadOldFormat) == 0)
-			{
-				if(i != 1)
-					break;
-			}
-
-			/* scan a parameter */
-			switch(i)
-			{
-				case FORMAT_NEW:
-				case FORMAT_STANDARD:
-#ifdef MESS
-					arguments_matched = sscanf(buf, format->format_string, name, &crc, pre_type, &address, pre_data, pre_extend_data, description, comment);
-#else
-					arguments_matched = sscanf(buf, format->format_string, name, pre_type, &address, pre_data, pre_extend_data, description, comment);
-#endif
-					break;
-
-				case FORMAT_OLD:
-#ifdef MESS
-					arguments_matched = sscanf(buf, format->format_string, &crc, name, &cpu, &address, &data, &code, description, comment);
-#else
-					arguments_matched = sscanf(buf, format->format_string, name, &cpu, &address, &data, &code, description, comment);
-#endif
-			}
-
-			/* NOTE : description and comment are not always needed */
-			if(arguments_matched < format->arguments_matched)
-				continue;
-
-#ifdef MESS
-			/* check name */
-			if(TEST_FIELD(cheat_options, SharedCode) && strcmp(machine->gamedrv->parent, "0"))
-			{
-				/* shared code (MESS specified) */
-				if(strcmp(name, machine->gamedrv->parent))
-					break;
-			}
+			/* shared code (MESS specified) */
+			if(strcmp(buffer->name, machine->gamedrv->parent)) break;
 			else
 #endif
-			if(strcmp(name, machine->gamedrv->name))
-				break;
+			/* check short game/machine name */
+			if(strcmp(buffer->name, machine->gamedrv->name)) break;
 #ifdef MESS
-			/* check crc */
-			if(MatchesCRCTable(crc) == 0)
-				break;
-#endif
-			/* check length */
-			if(i != FORMAT_OLD)
-			{
-				UINT8 is_error = 0;
-
-				if(strlen(pre_type) != format->type_matched)
-				{
-					logerror("cheat: [load code] %s has invalid type field length (%X)\n", description, (int)strlen(pre_type));
-					is_error++;
-				}
-
-				if(strlen(pre_data) != format->data_matched)
-				{
-					logerror("cheat: [load code] %s has invalid data field length (%X)\n", description, (int)strlen(pre_type));
-					is_error++;
-				}
-
-				if(strlen(pre_extend_data) != format->data_matched)
-				{
-					logerror("cheat: [load code] %s has invalid extend data field length (%X)\n", description, (int)strlen(pre_extend_data));
-					is_error++;
-				}
-
-				if(is_error)
-				{
-					SET_MESSAGE(CHEAT_MESSAGE_WRONG_CODE);
-					continue;
-				}
-				else
-				{
-					if(i == FORMAT_NEW)
-						sscanf(pre_type, "%2X%8X", &cpu, &type);
-					else
-					{
-						sscanf(pre_type, "%X", &type);
-						cpu = EXTRACT_FIELD(type, LocationParameter) & 3;
-					}
-
-					sscanf(pre_data, "%X", &data);
-					sscanf(pre_extend_data, "%X", &extend_data);
-				}
-			}
-			else
-				type = convert_older_code(code, cpu, &data, &extend_data);
-
-			/* matched! */
-			format_level = i;
-			break;
 		}
-
-		/* attemp to get next line if unmatched */
-		if(format_level == FORMAT_OTHERS)
+#endif
+		/* check length */
+		if(strlen(buffer->type) != format->type_matched)
+		{
+			logerror("cheat: [load code] %s has invalid type field length (%X)\n", buffer->description, (int)strlen(buffer->type)); is_error++;
+		}
+		if(strlen(buffer->data) != format->data_matched)
+		{
+			logerror("cheat: [load code] %s has invalid data field length (%X)\n", buffer->description, (int)strlen(buffer->data)); is_error++;
+		}
+		if(strlen(buffer->extend_data) != format->data_matched)
+		{
+			logerror("cheat: [load code] %s has invalid extend data field length (%X)\n", buffer->description, (int)strlen(buffer->extend_data)); is_error++;
+		}
+		if(is_error)
+		{
+			SET_MESSAGE(CHEAT_MESSAGE_WRONG_CODE);
 			continue;
+		}
+		else
+		{
+			/* matched! */
+			sscanf(buffer->type, "%2X%8X", &cpu, &type);
+			sscanf(buffer->data, "%X", &data);
+			sscanf(buffer->extend_data, "%X", &extend_data);
+		}
 
 		/* logerror("cheat: processing %s\n", buf); */
 
 		/* handle command code */
-		if(format_level == FORMAT_NEW)
+		if(cpu >= CUSTOM_CODE_ACTIVATION_KEY)
 		{
-			if(cpu >= CUSTOM_CODE_ACTIVATION_KEY)
-			{
-				handle_local_command_cheat(machine, cpu, type, address, data, extend_data, comment);
-				continue;
-			}
-		}
-		else if(TEST_FIELD(type, RemoveFromList))
-		{
-			handle_local_command_cheat(machine, 0, type, address, data, 0, NULL);
+			handle_local_command_cheat(machine, cpu, type, address, data, extend_data, buffer->comment);
 			continue;
 		}
-
-		/***** ENTRY *****/
-		if(EXTRACT_FIELD(type, Link) == kLink_Master)
+		/* set entry */
+		if(EXTRACT_FIELD(type, Link) == LINK_MASTER)
 		{
 			/* 1st (master) code in an entry */
 			resize_cheat_list(cheat_list_length + 1, REQUEST_DISPOSE);
-
 			if(cheat_list_length == 0)
 			{
-				logerror("cheat: [load code] cheat list resize failed. bailing\n");
-				goto bail;
+				logerror("cheat: [load code] cheat list resize failed. bailing\n"); goto bail_new;
 			}
-
 			entry = &cheat_list[cheat_list_length - 1];
-
-			entry->name = create_string_copy(description);
-
-			if(arguments_matched == cheat_format_table[format_level].comment_matched)
-				entry->comment = create_string_copy(comment);
+			entry->name = create_string_copy(buffer->description);
+			if(arguments_matched == cheat_format_table[LOAD_CHEAT_CODE_NEW].comment_matched) entry->comment = create_string_copy(buffer->comment);
 		}
 		else
 		{
 			/* 2nd or later (link) code in an entry */
 			if(cheat_list_length == 0)
 			{
-				logerror("cheat: [load code] first cheat found was link cheat. bailing\n");
-				goto bail;
+				logerror("cheat: [load code] first cheat found was link cheat. bailing\n"); goto bail_new;
 			}
-
 			entry = &cheat_list[cheat_list_length - 1];
 		}
-
-		/***** ACTION *****/
+		/* set action */
 		resize_cheat_action_list(&cheat_list[cheat_list_length - 1], entry->action_list_length + 1, REQUEST_DISPOSE);
-
 		if(entry->action_list_length == 0)
 		{
-			logerror("cheat: [load code] action list resize failed. bailing\n");
-			goto bail;
+			logerror("cheat: [load code] action list resize failed. bailing\n"); goto bail_new;
 		}
-
 		action						= &entry->action_list[entry->action_list_length - 1];
 		action->flags				= 0;
 		action->type				= type;
@@ -10798,15 +9574,334 @@ static void load_cheat_code(running_machine *machine, char *file_name)
 		action->data				= data;
 		action->original_data		= data;
 		action->extend_data			= extend_data;
-		action->optional_name		= create_string_copy(description);
+		action->optional_name		= create_string_copy(buffer->description);
 		action->last_value			= NULL;
-
-		if(format_level != FORMAT_NEW)
-			action->flags |= kActionFlag_OldFormat;
 	}
+	bail_new:
+	mame_fclose(the_file);
+}
 
-	bail:
+/*--------------------------------------------------------------------
+  load_cheat_code_standard - load standard cheat code from database
+--------------------------------------------------------------------*/
 
+static void load_cheat_code_standard(running_machine *machine, char *file_name)
+{
+	char		buf[256];
+	mame_file	*the_file;
+	cheat_format_strings
+				*buffer = format_strings;
+
+	/* open the database */
+	if(open_cheat_database(&the_file, file_name, DATABASE_LOAD) == 0) return;
+	found_database = 1;
+	/* get a line from database */
+	while(mame_fgets(buf, 2048, the_file))
+	{
+#ifdef MESS
+		int		crc =					0;
+#endif
+		int		type =					0;
+		int		address =				0;
+		int		data =					0;
+		int		extend_data =			0;
+		int		is_error =				0;
+		cheat_entry		*entry;
+		cheat_action	*action;
+		cheat_format	*format = &cheat_format_table[LOAD_CHEAT_CODE_STANDARD];
+
+		/* scan and check format */
+#ifdef MESS
+		if(sscanf(	buf,
+					format->format_string, buffer->name, &crc, buffer->type, &address, buffer->data, buffer->extend_data, buffer->description, buffer->comment)
+					< format->arguments_matched) continue;
+#else
+		if(sscanf(	buf,
+					format->format_string, buffer->name, buffer->type, &address, buffer->data, buffer->extend_data, buffer->description, buffer->comment)
+					< format->arguments_matched) continue;
+#endif
+		/* check short game nama */
+		if(strcmp(buffer->name, machine->gamedrv->name)) continue;
+#ifdef MESS
+		/* check crc */
+		if(MatchesCRCTable(crc) == 0) continue;
+#endif
+		/* check length */
+		if(strlen(buffer->type) != format->type_matched)
+		{
+			logerror("cheat: [load code] %s has invalid type field length (%X)\n", buffer->description, (int)strlen(buffer->type));
+			is_error++;
+		}
+		if(strlen(buffer->data) != format->data_matched)
+		{
+			logerror("cheat: [load code] %s has invalid data field length (%X)\n", buffer->description, (int)strlen(buffer->data));
+			is_error++;
+		}
+		if(strlen(buffer->extend_data) != format->data_matched)
+		{
+			logerror("cheat: [load code] %s has invalid extend data field length (%X)\n", buffer->description, (int)strlen(buffer->extend_data));
+			is_error++;
+		}
+		if(is_error)
+		{
+			SET_MESSAGE(CHEAT_MESSAGE_WRONG_CODE);
+			continue;
+		}
+		else
+		{
+			/* scan type, data and extend data */
+			sscanf(buffer->type, "%X", &type); sscanf(buffer->data, "%X", &data); sscanf(buffer->extend_data, "%X", &extend_data);
+		}
+		/* check command code */
+		if(TEST_FIELD(type, RemoveFromList))
+		{
+			handle_local_command_cheat(machine, 0, type, address, data, 0, NULL); continue;
+		}
+
+		/* set entry */
+		if(TEST_FIELD(type, LinkEnable) == 0)
+		{
+			/* 1st (master) code in an entry */
+			resize_cheat_list(cheat_list_length + 1, REQUEST_DISPOSE);
+			if(cheat_list_length == 0)
+			{
+				logerror("cheat: [load code] cheat list resize failed. bailing\n"); goto bail_standard;
+			}
+			/* allocate entry and set code name */
+			entry		= &cheat_list[cheat_list_length - 1];
+			entry->name	= create_string_copy(buffer->description);
+		}
+		else
+		{
+			/* 2nd or later (link) code in an entry */
+			if(cheat_list_length == 0)
+			{
+				logerror("cheat: [load code] first cheat found was link cheat. bailing\n"); goto bail_standard;
+			}
+			/* set action to entry */
+			entry = &cheat_list[cheat_list_length - 1];
+		}
+		/* set action */
+		resize_cheat_action_list(&cheat_list[cheat_list_length - 1], entry->action_list_length + 1, REQUEST_DISPOSE);
+		if(entry->action_list_length == 0)
+		{
+			logerror("cheat: [load code] action list resize failed. bailing\n"); goto bail_standard;
+		}
+		action						= &entry->action_list[entry->action_list_length - 1];
+		action->flags				= 0;
+		action->flags				|= kActionFlag_OldFormat;
+		action->type				= type;
+		action->address				= address;
+		action->data				= data;
+		action->original_data		= data;
+		action->extend_data			= extend_data;
+		action->optional_name		= create_string_copy(buffer->description);
+		action->last_value			= NULL;
+	}
+	bail_standard:
+	mame_fclose(the_file);
+}
+
+/*----------------------------------------------------------
+  load_cheat_code_old - load old cheat code from database
+----------------------------------------------------------*/
+
+static void load_cheat_code_old(running_machine *machine, char *file_name)
+{
+	enum
+	{
+		CUSTOM_FIELD_NONE =					0,
+		CUSTOM_FIELD_DONT_APPLY_CPU_FIELD =	1 << 0,
+		CUSTOM_FIELD_SET_BIT =				1 << 1,
+		CUSTOM_FIELD_CLEAR_BIT =			1 << 2,
+		CUSTOM_FIELD_SUBTRACT_ONE =			1 << 3,
+		CUSTOM_FIELD_BIT_MASK =				CUSTOM_FIELD_SET_BIT | CUSTOM_FIELD_CLEAR_BIT,
+
+		CUSTOM_FIELD_END =					0xFF
+	};
+	struct _conversion_table
+	{
+		int		old_code;
+		UINT32	new_code;
+		UINT8	custom_field;
+	};
+	static const struct _conversion_table conversion_table[] =
+	{	/* old_code*/	/* new_code*/	/* custom_field */
+		{	0,			0x00000000,		CUSTOM_FIELD_NONE },
+		{	1,			0x00000001,		CUSTOM_FIELD_NONE },
+		{	2,			0x00000020,		CUSTOM_FIELD_NONE },
+		{	3,			0x00000040,		CUSTOM_FIELD_NONE },
+		{	4,			0x000000A0,		CUSTOM_FIELD_NONE },
+		{	5,			0x00000022,		CUSTOM_FIELD_NONE },
+		{	6,			0x00000042,		CUSTOM_FIELD_NONE },
+		{	7,			0x000000A2,		CUSTOM_FIELD_NONE },
+		{	8,			0x00000024,		CUSTOM_FIELD_NONE },
+		{	9,			0x00000044,		CUSTOM_FIELD_NONE },
+		{	10,			0x00000064,		CUSTOM_FIELD_NONE },
+		{	11,			0x00000084,		CUSTOM_FIELD_NONE },
+		{	15,			0x00000023,		CUSTOM_FIELD_NONE },
+		{	16,			0x00000043,		CUSTOM_FIELD_NONE },
+		{	17,			0x000000A3,		CUSTOM_FIELD_NONE },
+		{	20,			0x00000000,		CUSTOM_FIELD_SET_BIT },
+		{	21,			0x00000001,		CUSTOM_FIELD_SET_BIT },
+		{	22,			0x00000020,		CUSTOM_FIELD_SET_BIT },
+		{	23,			0x00000040,		CUSTOM_FIELD_SET_BIT },
+		{	24,			0x000000A0,		CUSTOM_FIELD_SET_BIT },
+		{	40,			0x00000000,		CUSTOM_FIELD_CLEAR_BIT },
+		{	41,			0x00000001,		CUSTOM_FIELD_CLEAR_BIT },
+		{	42,			0x00000020,		CUSTOM_FIELD_CLEAR_BIT },
+		{	43,			0x00000040,		CUSTOM_FIELD_CLEAR_BIT },
+		{	44,			0x000000A0,		CUSTOM_FIELD_CLEAR_BIT },
+		{	60,			0x00000103,		CUSTOM_FIELD_NONE },
+		{	61,			0x00000303,		CUSTOM_FIELD_NONE },
+		{	62,			0x00000503,		CUSTOM_FIELD_SUBTRACT_ONE },
+		{	63,			0x00000903,		CUSTOM_FIELD_NONE },
+		{	64,			0x00000B03,		CUSTOM_FIELD_NONE },
+		{	65,			0x00000D03,		CUSTOM_FIELD_SUBTRACT_ONE },
+		{	70,			0x00000101,		CUSTOM_FIELD_NONE },
+		{	71,			0x00000301,		CUSTOM_FIELD_NONE },
+		{	72,			0x00000501,		CUSTOM_FIELD_SUBTRACT_ONE },
+		{	73,			0x00000901,		CUSTOM_FIELD_NONE },
+		{	74,			0x00000B01,		CUSTOM_FIELD_NONE },
+		{	75,			0x00000D01,		CUSTOM_FIELD_SUBTRACT_ONE },
+		{	80,			0x00000102,		CUSTOM_FIELD_NONE },
+		{	81,			0x00000302,		CUSTOM_FIELD_NONE },
+		{	82,			0x00000502,		CUSTOM_FIELD_SUBTRACT_ONE },
+		{	83,			0x00000902,		CUSTOM_FIELD_NONE },
+		{	84,			0x00000B02,		CUSTOM_FIELD_NONE },
+		{	85,			0x00000D02,		CUSTOM_FIELD_SUBTRACT_ONE },
+		{	90,			0x00000100,		CUSTOM_FIELD_NONE },
+		{	91,			0x00000300,		CUSTOM_FIELD_NONE },
+		{	92,			0x00000500,		CUSTOM_FIELD_SUBTRACT_ONE },
+		{	93,			0x00000900,		CUSTOM_FIELD_NONE },
+		{	94,			0x00000B00,		CUSTOM_FIELD_NONE },
+		{	95,			0x00000D00,		CUSTOM_FIELD_SUBTRACT_ONE },
+		{	100,		0x20800000,		CUSTOM_FIELD_NONE },
+		{	101,		0x20800001,		CUSTOM_FIELD_NONE },
+		{	102,		0x20800000,		CUSTOM_FIELD_NONE },
+		{	103,		0x20800001,		CUSTOM_FIELD_NONE },
+		{	110,		0x40800000,		CUSTOM_FIELD_NONE },
+		{	111,		0x40800001,		CUSTOM_FIELD_NONE },
+		{	112,		0x40800000,		CUSTOM_FIELD_NONE },
+		{	113,		0x40800001,		CUSTOM_FIELD_NONE },
+		{	120,		0x63000001,		CUSTOM_FIELD_NONE },
+		{	121,		0x63000001,		CUSTOM_FIELD_DONT_APPLY_CPU_FIELD | CUSTOM_FIELD_SET_BIT },
+		{	122,		0x63000001,		CUSTOM_FIELD_DONT_APPLY_CPU_FIELD | CUSTOM_FIELD_CLEAR_BIT },
+		{	998,		0x00000006,		CUSTOM_FIELD_NONE },
+		{	999,		0x60000000,		CUSTOM_FIELD_DONT_APPLY_CPU_FIELD },
+		/* end */
+		{	-1,			0x00000000,		CUSTOM_FIELD_END }
+	};
+	const struct _conversion_table *traverse = conversion_table;
+
+	char		buf[255];
+	mame_file	*the_file;
+	cheat_format_strings
+				*buffer = format_strings;
+
+	/* open the database */
+	if(open_cheat_database(&the_file, file_name, DATABASE_LOAD) == 0) return;
+	found_database = 1;
+	/* get a line from database */
+	while(mame_fgets(buf, 255, the_file))
+	{
+#ifdef MESS
+		int		crc =					0;
+#endif
+		int		cpu =					0;
+		int		address =				0;
+		int		data =					0;
+		int		code =					0;
+		int		link_cheat =			0;
+		int		type =					0;
+		int		extend_data =			0;
+		cheat_entry		*entry;
+		cheat_action	*action;
+		cheat_format	*format = &cheat_format_table[LOAD_CHEAT_CODE_OLD];
+
+#ifdef MESS
+		if(sscanf(buf, format->format_string, &crc, buffer->name, &cpu, &address, &data, &code, buffer->description, buffer->comment) < format->aruguments_matched) continue;
+#else
+		if(sscanf(buf, format->format_string, buffer->name, &cpu, &address, &data, &code, buffer->description, buffer->comment) < format->arguments_matched) continue;
+#endif
+		/* check short game name */
+		if(strcmp(buffer->name, machine->gamedrv->name)) continue;
+#ifdef MESS
+		/* check crc */
+		if(MatchesCRCTable(crc) == 0) continue;
+#endif
+		/* convert link cheats */
+		if(code >= 500 && code <= 699)
+		{
+			link_cheat = 1;
+			type -= 500;
+		}
+		/* loop over old format table */
+		while(traverse->old_code >= 0)
+		{
+			if(type == traverse->old_code)	goto found_code;
+			else								traverse++;
+		}
+		/* not found */
+		logerror("cheat: [load_old_code] %d not found\n", code);
+		continue;
+
+		/* found */
+		found_code:
+		type = traverse->new_code;
+		/* add in the CPU field */
+		if((traverse->custom_field & CUSTOM_FIELD_DONT_APPLY_CPU_FIELD) == 0)
+			type = (type & ~0x1F000000) | ((cpu << 24) & 0x1F000000);
+		/* hack-ish, subtract one from data field for x5 user select */
+		if(traverse->custom_field & CUSTOM_FIELD_SUBTRACT_ONE)		data--;
+		/* set up the extend data */
+		if(traverse->custom_field & CUSTOM_FIELD_BIT_MASK)			extend_data = data;
+		else														extend_data = ~0;
+		if(traverse->custom_field & CUSTOM_FIELD_CLEAR_BIT)			data = 0;
+		if(link_cheat)												SET_MASK_FIELD(type, LinkEnable);
+
+		/* set entry */
+		if(TEST_FIELD(type, LinkEnable))
+		{
+			/* 1st (master) code in an entry */
+			resize_cheat_list(cheat_list_length + 1, REQUEST_DISPOSE);
+			if(cheat_list_length == 0)
+			{
+				logerror("cheat: [load code] cheat list resize failed. bailing\n"); goto bail_old;
+			}
+			entry = &cheat_list[cheat_list_length - 1];
+			entry->name = create_string_copy(buffer->description);
+		}
+		else
+		{
+			/* 2nd or later (link) code in an entry */
+			if(cheat_list_length == 0)
+			{
+				logerror("cheat: [load code] first cheat found was link cheat. bailing\n"); goto bail_old;
+			}
+			entry = &cheat_list[cheat_list_length - 1];
+		}
+
+		/* set action */
+		resize_cheat_action_list(&cheat_list[cheat_list_length - 1], entry->action_list_length + 1, REQUEST_DISPOSE);
+		if(entry->action_list_length == 0)
+		{
+			logerror("cheat: [load code] action list resize failed. bailing\n"); goto bail_old;
+		}
+		action						= &entry->action_list[entry->action_list_length - 1];
+		action->flags				= 0;
+		action->flags				|= kActionFlag_OldFormat;
+		action->type				= type;
+		action->region				= cpu;
+		action->address				= address;
+		action->original_address	= address;
+		action->data				= data;
+		action->original_data		= data;
+		action->extend_data			= extend_data;
+		action->optional_name		= create_string_copy(buffer->description);
+		action->last_value			= NULL;
+	}
+	bail_old:
 	mame_fclose(the_file);
 }
 
@@ -10822,6 +9917,8 @@ static void load_user_defined_search_region(running_machine *machine, char *file
 	search_info 	*info	= get_current_search();
 	mame_file 		*the_file;
 	cheat_format 	*format	= &cheat_format_table[4];
+	cheat_format_strings
+					*buffer	= format_strings;
 
 	/* 1st, free all search regions in current search_info */
 	dispose_search_reigons(info);
@@ -10845,25 +9942,23 @@ static void load_user_defined_search_region(running_machine *machine, char *file
 		int				start;
 		int				end;
 		int				status;
-		char			name[16]		= { 0 };
-		char			description[64]	= { 0 };
 		cpu_region_info	*cpu_info;
 		search_region	*region;
 
 #ifdef MESS
-		if(sscanf(buf, format->format_string, name, &crc, &cpu, &space, &start, &end, &status, description) < format->arguments_matched)
+		if(sscanf(buf, format->format_string, buffer->name, &crc, &cpu, &space, &start, &end, &status, buffer->description) < format->arguments_matched)
 #else
-		if(sscanf(buf, format->format_string, name, &cpu, &space, &start, &end, &status, description) < format->arguments_matched)
+		if(sscanf(buf, format->format_string, buffer->name, &cpu, &space, &start, &end, &status, buffer->description) < format->arguments_matched)
 #endif
 			continue;
 		else
 		{
+			if(strcmp(buffer->name, machine->gamedrv->name)) continue;
 #ifdef MESS
-			if(MatchesCRCTable(crc) == 0)
-				continue;
+			if(MatchesCRCTable(crc) == 0)	continue;
 #endif
-			if(cpu != info->target_idx)
-				continue;
+			if(cpu != info->target_idx)		continue;
+
 		}
 
 		cpu_info = get_cpu_info(cpu);
@@ -10948,7 +10043,7 @@ static void load_user_defined_search_region(running_machine *machine, char *file
 		sprintf(region->name,	"%.*X-%.*X %s",
 								cpu_info->address_chars_needed, region->address,
 								cpu_info->address_chars_needed, region->address + region->length - 1,
-								description);
+								buffer->description);
 
 		if(is_search_region_in_range(cpu, region->length) == 0)
 		{
@@ -10973,7 +10068,7 @@ static void load_user_defined_search_region(running_machine *machine, char *file
   load_cheat_database - get the database name then load it
 -----------------------------------------------------------*/
 
-static void load_cheat_database(running_machine *machine, UINT8 flags)
+static void load_cheat_database(running_machine *machine, UINT8 load_code)
 {
 	UINT8		first = 1;
 	char		buf[256] = { 0 };
@@ -10984,55 +10079,51 @@ static void load_cheat_database(running_machine *machine, UINT8 flags)
 
 	cheat_file = options_get_string(mame_options(), OPTION_CHEAT_FILE);
 
-	if(cheat_file[0] == 0)
-		cheat_file = "cheat.dat";
+	if(cheat_file[0] == 0) cheat_file = "cheat.dat";
 
-	in_traverse		= cheat_file;
-	out_traverse	= buf;
-	main_traverse	= main_database_name;
+	in_traverse = cheat_file;
+	out_traverse = buf;
+	main_traverse = main_database_name;
 
 	do
 	{
 		data = *in_traverse;
 
-		/* check separator or end */
+		/* check separator or line-end */
 		if(data == ';' || data == 0)
 		{
 			*out_traverse++ = 0;
 
-			if(first)
-				*main_traverse++ = 0;
+			if(first) *main_traverse++ = 0;
 
 			if(buf[0])
 			{
 				/* load database based on the name we gotten */
-				if(flags & LOAD_CHEAT_OPTION)
-					load_cheat_option(buf);
-				if(flags & LOAD_CHEAT_CODE)
-					load_cheat_code(machine, buf);
-				if(flags & LOAD_USER_REGION)
-					load_user_defined_search_region(machine, buf);
-
-				out_traverse	= buf;
-				buf[0]			= 0;
-				first			= 0;
-				break;
+				switch(load_code)
+				{
+					case LOAD_CHEAT_OPTIONS:		load_cheat_options(buf);						break;
+					case LOAD_CHEAT_CODE_NEW:		load_cheat_code_new(machine, buf);				break;
+					case LOAD_CHEAT_CODE_STANDARD:	load_cheat_code_standard(machine, buf);			break;
+					case LOAD_CHEAT_CODE_OLD:		load_cheat_code_old(machine, buf);				break;
+					case LOAD_USER_REGION:			load_user_defined_search_region(machine, buf);	break;
+				}
+				/* reset character buffers */
+				out_traverse = buf;
+				buf[0] = 0;
+				first = 0;
 			}
 		}
 		else
 		{
 			*out_traverse++ = data;
 
-			if(first)
-				*main_traverse++ = data;
+			if(first) *main_traverse++ = data;
 		}
-
 		in_traverse++;
 	}
 	while(data);
 
-	if(flags & LOAD_CHEAT_CODE)
-		update_all_cheat_info(machine);
+	if(load_code >= LOAD_CHEAT_CODE_NEW && load_code <= LOAD_CHEAT_CODE_OLD) update_all_cheat_info(machine);
 }
 
 /*---------------------------------------------------------------------------
@@ -11042,8 +10133,9 @@ static void load_cheat_database(running_machine *machine, UINT8 flags)
 static void reload_cheat_database(running_machine *machine)
 {
 	dispose_cheat_database(machine);
-	load_cheat_database(machine, LOAD_CHEAT_CODE);
-
+	if(TEST_FIELD(cheat_options, LoadNewCode))		load_cheat_database(machine, LOAD_CHEAT_CODE_NEW);
+	if(TEST_FIELD(cheat_options, LoadStandardCode))	load_cheat_database(machine, LOAD_CHEAT_CODE_STANDARD);
+	if(TEST_FIELD(cheat_options, LoadOldCode))		load_cheat_database(machine, LOAD_CHEAT_CODE_OLD);
 	SET_MESSAGE(found_database ? CHEAT_MESSAGE_RELOAD_CHEAT_CODE : CHEAT_MESSAGE_FAILED_TO_LOAD_DATABASE);
 }
 
@@ -11180,7 +10272,7 @@ static void save_activation_key(running_machine *machine, cheat_entry *entry, in
 	astring		*name_2			= NULL;
 
 	/* check activation keys */
-	if((entry->flags & kCheatFlag_HasActivationKey1) == 0 && (entry->flags & kCheatFlag_HasActivationKey2) == 0)
+	if((entry->activation_key == 0 && entry->activation_sub_key == 0))
 	{
 		SET_MESSAGE(CHEAT_MESSAGE_NO_ACTIVATION_KEY);
 		return;
@@ -11206,8 +10298,8 @@ static void save_activation_key(running_machine *machine, cheat_entry *entry, in
 	address_length = get_address_length(entry->action_list[0].region);
 
 	/* detect activation key */
-	key_1 = entry->activation_key_1;
-	key_2 = entry->activation_key_2;
+	key_1 = entry->activation_key;
+	key_2 = entry->activation_sub_key;
 
 	/* set code */
 #ifdef MESS
@@ -11231,18 +10323,17 @@ static void save_activation_key(running_machine *machine, cheat_entry *entry, in
 	/* set label of key */
 	if(entry->flags & kCheatFlag_Select)
 	{
-		if(entry->flags & kCheatFlag_HasActivationKey1)
-			name_1 = input_code_name(astring_alloc(), entry->activation_key_1);
+		if(entry->activation_key)
+			name_1 = input_code_name(astring_alloc(), entry->activation_key);
 
-		if(entry->flags & kCheatFlag_HasActivationKey2)
-			name_2 = input_code_name(astring_alloc(), entry->activation_key_2);
+		if(entry->activation_sub_key)
+			name_2 = input_code_name(astring_alloc(), entry->activation_sub_key);
 
 		buf_strings += sprintf(buf_strings, " (prev = %s / next = %s)", astring_c(name_1), astring_c(name_2));
 	}
 	else
 	{
-		name_1 = input_code_name(astring_alloc(), entry->activation_key_1);
-
+		name_1 = input_code_name(astring_alloc(), entry->activation_key);
 		buf_strings += sprintf(buf_strings, " (%s)", astring_c(name_1));
 	}
 
@@ -11373,15 +10464,12 @@ static void save_cheat_options(void)
 				buf_strings += sprintf(buf_strings, "Search Box Label = ON, ");
 			break;
 	}
+	if(TEST_FIELD(cheat_options, AutoSaveEnabled))			buf_strings += sprintf(buf_strings, "Auto Cheat Code Save, ");
+	if(TEST_FIELD(cheat_options, ActivationKeyMessage))		buf_strings += sprintf(buf_strings, "Activation Key Message, ");
+	if(TEST_FIELD(cheat_options, LoadNewCode))				buf_strings += sprintf(buf_strings, "Load New Format Code, ");
+	if(TEST_FIELD(cheat_options, LoadStandardCode))			buf_strings += sprintf(buf_strings, "Load Standard Format Code, ");
+	if(TEST_FIELD(cheat_options, LoadOldCode))				buf_strings += sprintf(buf_strings, "Load Old Format Code, ");
 
-	if(TEST_FIELD(cheat_options, AutoSaveEnabled))
-		buf_strings += sprintf(buf_strings, "Auto Cheat Code Save, ");
-
-	if(TEST_FIELD(cheat_options, ActivationKeyMessage))
-		buf_strings += sprintf(buf_strings, "Activation Key Message, ");
-
-	if(TEST_FIELD(cheat_options, LoadOldFormat))
-		buf_strings += sprintf(buf_strings, "Load Old/Older Format, ");
 #ifdef MESS
 	if(TEST_FIELD(cheat_options, SharedCode))
 		buf_strings += sprintf(buf_strings, "Shared Code, ");
@@ -12553,6 +11641,87 @@ static void write_data(running_machine *machine, cheat_action *action, UINT32 da
 	}
 }
 
+/*---------------------
+  read_or_write_data
+---------------------*/
+
+static UINT32 read_or_write_data(running_machine *machine, cheat_action *action, UINT32 data, int read_or_write)
+{
+	switch(EXTRACT_FIELD(action->type, LocationType))
+	{
+		case kLocation_Standard:
+			if(read_or_write)
+				do_cpu_write(	data, EXTRACT_FIELD(action->type, LocationParameterCPU), action->address, 1,
+								cpu_needs_swap(EXTRACT_FIELD(action->type, LocationParameterCPU)));
+			else
+				return do_cpu_read(	EXTRACT_FIELD(action->type, LocationParameterCPU), action->address, 1,
+									cpu_needs_swap(EXTRACT_FIELD(action->type, LocationParameterCPU)));
+			break;
+		case kLocation_MemoryRegion:
+			{
+				UINT8 *buf = memory_region(machine, EXTRACT_FIELD(action->type, LocationParameterCPU));
+				if(buf && is_address_in_range(action, memory_region_length(machine, EXTRACT_FIELD(action->type, LocationParameterCPU))));
+				{
+					if(read_or_write)
+						do_memory_write(	data, buf, action->address, 1, region_needs_swap(EXTRACT_FIELD(action->type, LocationParameterCPU)),
+											get_region_info(EXTRACT_FIELD(action->type, LocationParameterCPU)));
+					else
+						return do_memory_read(	buf, action->address, 1, region_needs_swap(EXTRACT_FIELD(action->type, LocationParameterCPU)),
+												get_region_info(EXTRACT_FIELD(action->type, LocationParameterCPU)));
+			}
+			break;
+		case kLocation_HandlerMemory:
+			{
+				UINT8 **buf;
+				action->cached_pointer = look_up_handler_memory(EXTRACT_FIELD(action->type, LocationParameterCPU), action->address, &action->cached_offset);
+				buf = action->cached_pointer;
+				if(buf && *buf)
+				{
+					if(read_or_write)
+						do_memory_write(	data, *buf, action->cached_offset, 1, cpu_needs_swap(EXTRACT_FIELD(action->type, LocationParameterCPU)),
+											get_region_info(EXTRACT_FIELD(action->type, LocationParameterCPU)));
+					else
+						return do_memory_read(	*buf, action->cached_offset, 1, cpu_needs_swap(EXTRACT_FIELD(action->type, LocationParameterCPU)),
+												get_cpu_info(EXTRACT_FIELD(action->type, LocationParameterCPU)));
+				}
+			}
+			break;
+		case kLocation_IndirectIndexed:
+			{
+				UINT32	address = do_cpu_read(	EXTRACT_FIELD(action->type, LocationParameterCPU), action->address,
+												EXTRACT_FIELD(action->type, IndexBytesUsed), cpu_needs_swap(EXTRACT_FIELD(action->type, LocationParameterCPU))) +
+												action->extend_data;
+				if(read_or_write)
+					do_cpu_write(	data, EXTRACT_FIELD(action->type, LocationParameterCPU), address, 1,
+									cpu_needs_swap(EXTRACT_FIELD(action->type, LocationParameterCPU)));
+				else
+					return do_cpu_read(	EXTRACT_FIELD(action->type, LocationParameterCPU), address, 1,
+										cpu_needs_swap(EXTRACT_FIELD(action->type, LocationParameterCPU)));
+			}
+			break;
+		case kLocation_Custom:
+			if(EXTRACT_FIELD(action->type, LocationParameter) == kCustomLocation_EEPROM)
+			{
+				int length;
+				UINT8 *buf = eeprom_get_data_pointer(&length);
+				if(is_address_in_range(action, length))
+				{
+					if(read_or_write)
+						do_memory_write(data, buf, action->address, 1, cpu_needs_swap(EXTRACT_FIELD(action->type, LocationParameterCPU)), &raw_cpu_info);
+					else
+						return do_memory_read(buf, action->address, 1, cpu_needs_swap(EXTRACT_FIELD(action->type, LocationParameterCPU)), &raw_cpu_info);
+				}
+				break;
+			}
+		}
+		break;
+
+		default:
+			break;
+	}
+	return 0;
+}
+
 /*--------------------------------------------------------------------------------------
   watch_cheat_entry - set watchpoint when watch value key is pressed in several menus
 --------------------------------------------------------------------------------------*/
@@ -12692,7 +11861,7 @@ static void add_action_watch(cheat_action *action, cheat_entry *entry)
 
 /*-------------------------------------------------------------------------------
   remove_associated_watches - delete watchpoints when watchpoint CODE is "OFF"
-                              called from deactivate_cheat().
+                              called from deactivate_cheat(machine, ).
 -------------------------------------------------------------------------------*/
 
 static void remove_associated_watches(cheat_entry *entry)
@@ -12717,59 +11886,61 @@ static void reset_action(running_machine *machine, cheat_action *action)
 	/* back up a value */
 	if(action->flags & kActionFlag_OldFormat)
 	{
-		UINT32 type = action->type;
-
-		action->last_value = malloc(sizeof(action->last_value));
-		if(action->last_value == NULL) goto reset_action_error;
-		action->type = convert_to_new_code(action);
-		action->last_value[0] = read_data(machine, action);
-		action->type = type;
+		if(action->last_value == NULL)
+		{
+			action->last_value = malloc(sizeof(action->last_value));
+			if(action->last_value == NULL) goto reset_action_error;
+			action->last_value[0] = read_or_write_data(machine, action, 0, 0);
+		}
 	}
 	else
 	{
-		if(action->flags & kActionFlag_MemoryWrite)
+		if(action->last_value == NULL)
 		{
-			if((action->flags & kActionFlag_LastValueGood) == 0)
+			if(action->flags & kActionFlag_MemoryWrite)
 			{
-				switch(EXTRACT_FIELD(action->type, CodeType))
+				if((action->flags & kActionFlag_LastValueGood) == 0)
 				{
-					default:
-						/* Write, IWrite, CWrite, CBit */
-						action->last_value = malloc(sizeof(action->last_value));
-						if(action->last_value == NULL) goto reset_action_error;
-						action->last_value[0] = read_data(machine, action);
-						break;
+					switch(EXTRACT_FIELD(action->type, CodeType))
+					{
+						default:
+							/* Write, IWrite, CWrite, CBit */
+							action->last_value = malloc(sizeof(action->last_value));
+							if(action->last_value == NULL) goto reset_action_error;
+							action->last_value[0] = read_data(machine, action);
+							break;
 
-					case kCodeType_PDWWrite:
-						action->last_value = malloc(sizeof(action->last_value) * 2);
-						if(action->last_value == NULL) goto reset_action_error;
-						action->flags &= ~kActionFlag_IsFirst;
-						action->last_value[0] = read_data(machine, action);
-						action->last_value[1] = read_data(machine, action);
-						break;
+						case kCodeType_PDWWrite:
+							action->last_value = malloc(sizeof(action->last_value) * 2);
+							if(action->last_value == NULL) goto reset_action_error;
+							action->flags &= ~kActionFlag_IsFirst;
+							action->last_value[0] = read_data(machine, action);
+							action->last_value[1] = read_data(machine, action);
+							break;
 
-					case kCodeType_RWrite:
-						{
-							int i;
-
-							for(i = 0; i < EXTRACT_FIELD(action->extend_data, LSB16); i++)
+						case kCodeType_RWrite:
 							{
-								action->last_value = realloc(action->last_value, sizeof(action->last_value) * EXTRACT_FIELD(action->extend_data, LSB16));
-								if(action->last_value == NULL) goto reset_action_error;
-								action->last_value[i] = read_data(machine, action);
-								action->address +=	EXTRACT_FIELD(action->extend_data, MSB16) ?
-													EXTRACT_FIELD(action->extend_data, MSB16) :
-													BYTE_INCREMENT_TABLE[EXTRACT_FIELD(action->type, AddressSize)];
-							}
+								int i;
 
-							action->address = action->original_address;
-						}
-						break;
+								action->last_value = malloc(sizeof(action->last_value) * EXTRACT_FIELD(action->extend_data, LSB16));
+								if(action->last_value == NULL) goto reset_action_error;
+								for(i = 0; i < EXTRACT_FIELD(action->extend_data, LSB16); i++)
+								{
+									action->last_value[i] = read_data(machine, action);
+									action->address +=	EXTRACT_FIELD(action->extend_data, MSB16) ?
+														EXTRACT_FIELD(action->extend_data, MSB16) :
+														BYTE_INCREMENT_TABLE[EXTRACT_FIELD(action->type, AddressSize)];
+								}
+
+								action->address = action->original_address;
+							}
+							break;
+					}
 				}
 			}
+			else
+				action->last_value = NULL;
 		}
-		else
-			action->last_value = NULL;
 	}
 
 	action->frame_timer = 0;
@@ -12880,7 +12051,6 @@ static void deactivate_cheat(running_machine *machine, cheat_entry *entry)
 			action->flags &= ~kActionFlag_LastValueGood;
 			free(action->last_value);
 		}
-
 		action->last_value = NULL;
 	}
 
@@ -13115,6 +12285,9 @@ static int cheat_periodic_action(running_machine *machine, cheat_action *action,
 {
 	UINT8 execute_operation = 0;
 
+	if(action->flags & kActionFlag_NoAction)		return selection + 1;
+	if(action->flags & kActionFlag_OperationDone)	return (TEST_FIELD(action->type, Return) ? CHEAT_RETURN_VALUE : selection + 1);
+
 	if(TEST_FIELD(action->type, PrefillEnable))
 	{
 		if((action->flags & kActionFlag_PrefillDone) == 0)
@@ -13164,15 +12337,13 @@ static int cheat_periodic_action(running_machine *machine, cheat_action *action,
 	}
 	else
 	{
-		if(action->frame_timer++)
-		{
-			if(action->frame_timer >= EXTRACT_FIELD(action->type, DelayEnable) + ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds))
-				action->frame_timer = 0;
-
+		if(action->frame_timer++ >= EXTRACT_FIELD(action->type, DelayEnable) + ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds))
 			return (TEST_FIELD(action->type, Return) ? CHEAT_RETURN_VALUE : selection + 1);
-		}
-		else
-			execute_operation = 1;
+
+		execute_operation = 1;
+
+		if(TEST_FIELD(action->type, OneShot))
+			action->flags |= kActionFlag_OperationDone;
 	}
 
 	if(action->flags & kActionFlag_CheckCondition)
@@ -13231,13 +12402,19 @@ static void cheat_periodic_entry(running_machine *machine, cheat_entry *entry)
 
 	/* ***** 1st, handle activation key ***** */
 
-	if(!ui_is_menu_active())
+	if(ui_is_menu_active() == 0)
 	{
 		/* NOTE : activation key should be not checked in activating UI menu because it conflicts activation key checker */
-		if((entry->flags & kCheatFlag_HasActivationKey1) && input_code_pressed_once(entry->activation_key_1))
-			pressedKey = 1;
-		else if((entry->flags & kCheatFlag_HasActivationKey2) && input_code_pressed_once(entry->activation_key_2))
-			pressedKey = 2;
+		if(entry->activation_key)
+		{
+			if(input_code_pressed_once(entry->activation_key))
+				pressedKey = 1;
+		}
+		else if(entry->activation_sub_key)
+		{
+			if(input_code_pressed_once(entry->activation_sub_key))
+				pressedKey = 2;
+		}
 	}
 
 	if(entry->flags & kCheatFlag_Select)
@@ -13318,26 +12495,13 @@ static void cheat_periodic_entry(running_machine *machine, cheat_entry *entry)
 			else
 				i++;
 		}
-		else if((entry->action_list[i].flags & kActionFlag_OperationDone) || (entry->action_list[i].flags & kActionFlag_NoAction))
-		{
-			i++;
-		}
-		else if(entry->action_list[i].flags & kActionFlag_OldFormat)
-		{
-			int	tempType	= entry->action_list[i].type;
-			int	j			= i;
-
-			entry->action_list[i].type = convert_to_new_code(&entry->action_list[i]);
-			i = cheat_periodic_action(machine, &entry->action_list[i], i);
-			entry->action_list[j].type = tempType;
-		}
 		else
 			i = cheat_periodic_action(machine, &entry->action_list[i], i);
 
 		if(i >= entry->action_list_length)
 			break;
 
-		if(isSelect && EXTRACT_FIELD(entry->action_list[i].type, Link) != kLink_SubLink)
+		if(isSelect && EXTRACT_FIELD(entry->action_list[i].type, Link) == LINK_LABEL_LINK)
 			break;
 	}
 
@@ -13361,24 +12525,300 @@ static void cheat_periodic_entry(running_machine *machine, cheat_entry *entry)
 					continue;
 				}
 			}
-			else if((entry->action_list[i].flags & kActionFlag_OperationDone) == 0)
-			{
-				done = 0;
-				i++;
-			}
-			else
-				i++;
+			else if(entry->action_list[i].flags & kActionFlag_MemoryWrite)
+				if((entry->action_list[i].flags & kActionFlag_OperationDone) == 0)
+					done = 0;
+
+			i++;
 
 			if(i >= entry->action_list_length)
 				break;
 
-			if(isSelect && EXTRACT_FIELD(entry->action_list[i].type, Link) != kLink_SubLink)
+			if(isSelect && EXTRACT_FIELD(entry->action_list[i].type, Link) != LINK_LABEL_LINK)
 				break;
 		}
 
 		if(done)
 			deactivate_cheat(machine, entry);
 	}
+}
+
+/*--------------------------------------------------------------
+  cheat_periodic_old_entry - management for old cheat entries
+--------------------------------------------------------------*/
+
+static void cheat_periodic_old_entry(running_machine *machine, cheat_entry *entry)
+{
+	int i, do_action = 0, done = 1;
+
+	/* special handling for select cheats */
+	if(entry->flags & kCheatFlag_Select)
+	{
+		if(entry->activation_key)
+		{
+			if(input_code_pressed_once(entry->activation_key))
+			{
+				entry->selection++;
+				if(entry->flags & kCheatFlag_OneShot)
+				{
+					if(entry->selection >= entry->action_list_length)
+					{
+						entry->selection = 1;
+						if(entry->selection >= entry->action_list_length) entry->selection = 0;
+					}
+				}
+				else
+				{
+					if(entry->selection >= entry->action_list_length)	{ entry->selection = 0; deactivate_cheat(machine, entry); }
+					else												{ activate_cheat(machine, entry); }
+				}
+			}
+		}
+		/* if a subcheat is selected and it's a legal index, handle it */
+		if(entry->selection && (entry->selection < entry->action_list_length)) do_action = 1;
+	}
+	else
+	{
+		if((entry->flags & kCheatFlag_UserSelect) != 0)
+		{
+			if(input_code_pressed_once(entry->activation_key))	activate_cheat(machine, entry);
+			else
+			{
+				if(entry->flags & kCheatFlag_Active)	deactivate_cheat(machine, entry);
+				else									activate_cheat(machine, entry);
+			}
+		}
+
+		if((entry->flags & kCheatFlag_Active) == 0) return;
+		do_action = 1;
+	}
+	if(do_action)
+	{
+
+		for(i = entry->flags & kCheatFlag_Select ? entry->selection : 0; i < entry->action_list_length; i++)
+		{
+			int do_operation = 0;
+			cheat_action *action = &entry->action_list[i];
+
+			if(action->flags & kActionFlag_OperationDone) break;
+			if(TEST_FIELD(action->type, Prefill) && ((action->flags & kActionFlag_PrefillDone) == 0))
+			{
+				if((action->flags & kActionFlag_PrefillWritten) == 0)
+				{
+					write_data(machine, action, kPrefillValueTable[EXTRACT_FIELD(action->type, Prefill)]);
+					action->flags |= kActionFlag_PrefillWritten;
+					return;
+				}
+				else
+				{
+					if(read_or_write_data(machine, action, 0, 0) == kPrefillValueTable[EXTRACT_FIELD(action->type, Prefill)])	return;
+					action->flags |= kActionFlag_PrefillDone;
+				}
+			}
+			switch(EXTRACT_FIELD(action->type, Type))
+			{
+				case kType_NormalOrDelay:
+					if(action->frame_timer++ >= EXTRACT_FIELD(action->type, TypeParameter) * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds))
+						do_operation = 1;
+					break;
+				case kType_WaitForModification:
+					if(action->flags & kActionFlag_WasModified)
+					{
+						if(action->frame_timer-- <= 0)
+						{
+							do_operation = 1;
+							action->flags &= ~kActionFlag_WasModified;
+							if(TEST_FIELD(action->type, OneShot))
+								action->flags |= kActionFlag_OperationDone;
+						}
+						action->last_value[0] = read_or_write_data(machine, action, 0, 0);
+					}
+					else
+					{
+						if(read_or_write_data(machine, action, 0, 0) != action->last_value[0])
+						{
+							action->frame_timer = EXTRACT_FIELD(action->type, TypeParameter) * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds);
+							action->flags |= kActionFlag_WasModified;
+						}
+						action->last_value[0] = read_or_write_data(machine, action, 0, 0);
+					}
+					break;
+				case kType_IgnoreIfDecrementing:
+					if(read_or_write_data(machine, action, 0, 0) != (action->last_value[0] - EXTRACT_FIELD(action->type, TypeParameter)))
+						do_operation = 1;
+					if(TEST_FIELD(action->type, OneShot))
+						action->flags |= kActionFlag_OperationDone;
+					action->last_value[0] = read_or_write_data(machine, action, 0, 0);
+					break;
+				case kType_Watch:
+				default:
+					break;
+			}
+			if(do_operation)
+			{
+				switch(EXTRACT_FIELD(action->type, Operation))
+				{
+					case kOperation_WriteMask:
+						read_or_write_data(machine, action, action->extend_data != ~0 ? ~action->data : action->data, 1);
+						break;
+					case kOperation_AddSubtract:
+						/* OperationParameter field stores add/subtract */
+						if(TEST_FIELD(action->type, OperationParameter))
+						{	/* subtract */
+							read_or_write_data(machine, 	action,
+												read_or_write_data(machine, action, 0, 0) > action->extend_data + action->data ?
+												read_or_write_data(machine, action, 0, 0) - (action->extend_data + action->data) :
+												read_or_write_data(machine, action, 0, 0),
+												1);
+						}
+						else
+						{	/* add */
+							read_or_write_data(machine, 	action,
+												read_or_write_data(machine, action, 0, 0) < action->extend_data + action->data ?
+												read_or_write_data(machine, action, 0, 0) + (action->extend_data + action->data) :
+												read_or_write_data(machine, action, 0, 0),
+												1);
+						}
+						break;
+					case kOperation_ForceRange:
+						if(	read_or_write_data(machine, action, 0, 0) < EXTRACT_FIELD(action->extend_data, MSB16) ||
+							read_or_write_data(machine, action, 0, 0) > EXTRACT_FIELD(action->extend_data, LSB16))
+								read_or_write_data(machine, action, action->data, 0);
+						break;
+					case kOperation_SetOrClearBits:
+						read_or_write_data(machine, 	action,
+											EXTRACT_FIELD(action->type, OperationParameter) ?
+											read_or_write_data(machine, action, 0, 0) & ~action->data :
+											read_or_write_data(machine, action, 0, 0) | action->data,
+											1);
+						break;
+					default:
+						break;
+				}
+			}
+			if(entry->flags & kCheatFlag_Select) break;
+		}
+		/* if all actions are done, deactivate the cheat */
+		for(i = entry->flags & kCheatFlag_Select ? entry->selection : 0; i < entry->action_list_length && done; i++)
+			if((entry->action_list[i].flags & kActionFlag_OperationDone) == 0)	done = 0;
+		if(done) deactivate_cheat(machine, entry);
+	}
+}
+
+/*-------------------------------------------------------------------------------------
+  choose_label_index - select next or prevous label then activate/deactivate a cheat
+-------------------------------------------------------------------------------------*/
+
+static void choose_label_index(running_machine *machine, cheat_entry *entry, int next_or_previous)
+{
+	cheat_action *action = NULL;
+
+	entry->selection += next_or_previous;
+
+	if(entry->flags & kCheatFlag_OldFormat)
+	{
+		if(entry->flags & kCheatFlag_OneShot)
+		{
+			if(entry->selection <= 0)								entry->selection = entry->action_list_length - 1;
+			else if(entry->selection >= entry->action_list_length)	entry->selection = 1;
+		}
+		else
+		{
+			if(entry->selection < 0)								entry->selection = entry->action_list_length - 1;
+			else if(entry->selection >= entry->action_list_length)	entry->selection = 0;
+
+			action = &entry->action_list[entry->selection];
+		}
+	}
+	else
+	{
+		if(entry->flags & kCheatFlag_OneShot)
+		{
+			if(entry->selection <= 0)								entry->selection = entry->label_index_length - 1;
+			else if(entry->selection >= entry->label_index_length)	entry->selection = 1;
+		}
+		else
+		{
+			if(entry->selection < 0)								entry->selection = entry->label_index_length - 1;
+			else if(entry->selection >= entry->label_index_length)	entry->selection = 0;
+
+			action = &entry->action_list[entry->label_index[entry->selection]];
+		}
+	}
+
+	/* NOTE : one shot should not activate cheat if only selection */
+	if(action != NULL)
+	{
+		if(entry->selection)		activate_cheat(machine, entry);
+		else						deactivate_cheat(machine, entry);
+	}
+}
+
+/*----------------------------------------------------------------------------------------------------
+  build_label_index_table - create index table for label-selection and calculate index table length
+----------------------------------------------------------------------------------------------------*/
+
+static void build_label_index_table(cheat_entry *entry)
+{
+	int i, j, length = 0;
+
+	if(entry->flags & kCheatFlag_OldFormat)	return;
+	if(entry->label_index != NULL)			return;
+
+	entry->label_index_length = 0;
+
+	for(i = 0, j = 0; i < entry->action_list_length; i++)
+	{
+		cheat_action *action = &entry->action_list[i];
+
+		if(action->region == CUSTOM_CODE_LABEL_SELECT)
+		{
+			/* label selection master code */
+			entry->label_index = malloc(sizeof(entry->label_index) * (++entry->label_index_length + 1));
+
+			if(entry->label_index == NULL) goto label_index_error;
+
+			entry->label_index[j++] = i;
+			length = action->data ? action->data + i : entry->action_list_length;
+		}
+		else if(EXTRACT_FIELD(action->type, Link) == LINK_LABEL_LINK)
+		{
+			/* link or sub-link code */
+			if(length)
+			{
+				entry->label_index = realloc(entry->label_index, sizeof(entry->label_index) * (++entry->label_index_length + 1));
+
+				if(entry->label_index == NULL) goto label_index_error;
+
+				entry->label_index[j++] = i;
+			}
+		}
+	}
+
+	if(entry->label_index_length <= 1)
+	{
+		logerror("cheat: [label index table] %s fails to build due to invalid or no link\n", entry->name); return;
+	}
+	else
+		/* set terminator */
+		entry->label_index[entry->label_index_length] = ~0;
+
+	if(entry->flags & kCheatFlag_OneShot)
+		entry->selection = 1;
+
+	/* logerror("Cheat - Finish building index table for %s (length = %x)\n", entry->name, entry->label_index_length); */
+	/* for(i = 0; i < entry->label_index_length; i++) */
+	/*  logerror("IndexTable[%x] = %x\n",i,entry->label_index[i]); */
+
+	return;
+
+	label_index_error:
+
+	fatalerror("cheat:[label index table] memory allocation error\n"
+				"	name =					%s\n"
+				"	label_index_length =	%.8X\n"
+				"	label_index_length =	%p\n",
+				entry->name, entry->label_index_length, entry->label_index);
 }
 
 /*---------------------------------------------------------------------
@@ -13514,6 +12954,11 @@ static void update_cheat_info(running_machine *machine, cheat_entry *entry, UINT
 				if(TEST_FIELD(action->type, ValueSelectEnable))
 					flags |= kCheatFlag_UserSelect;
 
+				if(EXTRACT_FIELD(action->type, Link) == LINK_LABEL_LINK)
+					action_flags |= kActionFlag_IsLabel;
+				else if(EXTRACT_FIELD(action->type, Link) == LINK_LABEL_SUB_LINK)
+					action_flags |= kActionFlag_IsSubLabel;
+
 				is_null = 0;
 				is_separator = 0;
 			}
@@ -13556,20 +13001,16 @@ static void update_cheat_info(running_machine *machine, cheat_entry *entry, UINT
 	{
 		flags |= kCheatFlag_OldFormat;
 
-		if(is_null)
-			flags |= kCheatFlag_Null;
+		if(is_null) flags |= kCheatFlag_Null;
 	}
 	else
 	{
 		if(is_null)
 		{
 			/* NOTE : auto detection if multi-comment code */
-			if(entry->action_list_length > 1)
-				flags |= kCheatFlag_ExtendComment;
-			else
-				flags |= kCheatFlag_Null;
+			if(entry->action_list_length > 1)	flags |= kCheatFlag_ExtendComment;
+			else								flags |= kCheatFlag_Null;
 		}
-
 		if(is_separator)
 		{
 			flags |= kCheatFlag_Null;
@@ -13585,11 +13026,9 @@ static void update_cheat_info(running_machine *machine, cheat_entry *entry, UINT
 
 	check_code_format(machine, entry);
 
-	if((entry->flags & kCheatFlag_HasWrongCode) == 0)
-	{
-		if(entry->flags & kCheatFlag_Select)
-			build_label_index_table(entry);
-	}
+	/* build label index table if new format */
+	if((entry->flags & kCheatFlag_OldFormat) == 0 && (entry->flags & kCheatFlag_HasWrongCode) == 0 && entry->flags & kCheatFlag_Select)
+		build_label_index_table(entry);
 }
 
 /*----------------------
@@ -13797,73 +13236,6 @@ static void check_code_format(running_machine *machine, cheat_entry *entry)
 		entry->flags |= kCheatFlag_HasWrongCode;
 		SET_MESSAGE(CHEAT_MESSAGE_WRONG_CODE);
 	}
-}
-
-/*----------------------------------------------------------------------------------------------------
-  build_label_index_table - create index table for label-selection and calculate index table length
-----------------------------------------------------------------------------------------------------*/
-
-static void build_label_index_table(cheat_entry *entry)
-{
-	int i, j, length = 0;
-
-	entry->label_index_length = 0;
-
-	for(i = 0, j = 0; i < entry->action_list_length; i++)
-	{
-		cheat_action *action = &entry->action_list[i];
-
-		if((action->flags & kActionFlag_Custom) && action->region == CUSTOM_CODE_LABEL_SELECT)
-		{
-			/* label selection master code */
-			entry->label_index = malloc(sizeof(entry->label_index) * (++entry->label_index_length + 1));
-
-			if(entry->label_index == NULL)
-				goto label_index_error;
-
-			entry->label_index[j++] = i;
-			length = action->data ? action->data + i : entry->action_list_length;
-		}
-		else if(EXTRACT_FIELD(action->type, Link) == kLink_Link)
-		{
-			/* link or sub-link code */
-			if(length)
-			{
-				entry->label_index = realloc(entry->label_index, sizeof(entry->label_index) * (++entry->label_index_length + 1));
-
-				if(entry->label_index == NULL)
-					goto label_index_error;
-
-				entry->label_index[j++] = i;
-			}
-		}
-	}
-
-	if(entry->label_index_length <= 1)
-	{
-		logerror("cheat: [label index table] %s fails to build due to invalid or no link\n", entry->name);
-		return;
-	}
-	else
-		/* set terminator */
-		entry->label_index[entry->label_index_length] = ~0;
-
-	if(entry->flags & kCheatFlag_OneShot)
-		entry->selection = 1;
-
-	/* logerror("Cheat - Finish building index table for %s (length = %x)\n", entry->name, entry->label_index_length); */
-	/* for(i = 0; i < entry->label_index_length; i++) */
-	/*  logerror("IndexTable[%x] = %x\n",i,entry->label_index[i]); */
-
-	return;
-
-	label_index_error:
-
-	fatalerror("cheat:[label index table] memory allocation error\n"
-				"	name =					%s\n"
-				"	label_index_length =	%.8X\n"
-				"	label_index_length =	%p\n",
-				entry->name, entry->label_index_length, entry->label_index);
 }
 
 /*------------------
