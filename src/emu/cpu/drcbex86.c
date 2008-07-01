@@ -3290,7 +3290,7 @@ static x86code *op_hashjmp(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 	emit_mov_r32_m32(&dst, REG_ESP, MABS(&drcbe->hashstacksave));						// mov   esp,[hashstacksave]
 
 	/* fixed mode cases */
-	if (modep.type == DRCUML_PTYPE_IMMEDIATE)
+	if (modep.type == DRCUML_PTYPE_IMMEDIATE && drcbe->hash->base[modep.value] != drcbe->hash->emptyl1)
 	{
 		/* a straight immediate jump is direct, though we need the PC in EAX in case of failure */
 		if (pcp.type == DRCUML_PTYPE_IMMEDIATE)
