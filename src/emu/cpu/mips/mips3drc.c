@@ -3359,7 +3359,7 @@ static int generate_cop1x(drcuml_block *block, compiler_state *compiler, const o
 		case 0x00:		/* LWXC1 - MIPS IV */
 			UML_ADD(block, IREG(0), R32(RSREG), R32(RTREG));						// add     i0,<rsreg>,<rtreg>
 			UML_CALLH(block, mips3->impstate->read32[mips3->impstate->mode >> 1]);	// callh   read32
-			UML_MOV(block, FPR32(RDREG), IREG(0));									// mov     <cpr1_rd>,i0
+			UML_MOV(block, FPR32(FDREG), IREG(0));									// mov     <cpr1_fd>,i0
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
 			return TRUE;
@@ -3367,14 +3367,14 @@ static int generate_cop1x(drcuml_block *block, compiler_state *compiler, const o
 		case 0x01:		/* LDXC1 - MIPS IV */
 			UML_ADD(block, IREG(0), R32(RSREG), R32(RTREG));						// add     i0,<rsreg>,<rtreg>
 			UML_CALLH(block, mips3->impstate->read64[mips3->impstate->mode >> 1]);	// callh   read64
-			UML_DMOV(block, FPR64(RDREG), IREG(0));									// dmov    <cpr1_rd>,i0
+			UML_DMOV(block, FPR64(FDREG), IREG(0));									// dmov    <cpr1_fd>,i0
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
 			return TRUE;
 
 		case 0x08:		/* SWXC1 - MIPS IV */
 			UML_ADD(block, IREG(0), R32(RSREG), R32(RTREG));						// add     i0,<rsreg>,<rtreg>
-			UML_MOV(block, IREG(1), FPR32(RDREG));									// mov     i1,<cpr1_rd>
+			UML_MOV(block, IREG(1), FPR32(FSREG));									// mov     i1,<cpr1_fs>
 			UML_CALLH(block, mips3->impstate->write32[mips3->impstate->mode >> 1]);	// callh   write32
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -3382,7 +3382,7 @@ static int generate_cop1x(drcuml_block *block, compiler_state *compiler, const o
 
 		case 0x09:		/* SDXC1 - MIPS IV */
 			UML_ADD(block, IREG(0), R32(RSREG), R32(RTREG));						// add     i0,<rsreg>,<rtreg>
-			UML_DMOV(block, IREG(1), FPR64(RDREG));									// dmov    i1,<cpr1_rd>
+			UML_DMOV(block, IREG(1), FPR64(FSREG));									// dmov    i1,<cpr1_fs>
 			UML_CALLH(block, mips3->impstate->write64[mips3->impstate->mode >> 1]);	// callh   write64
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
