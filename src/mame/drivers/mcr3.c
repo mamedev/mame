@@ -1366,6 +1366,49 @@ ROM_START( spyhunt )
 ROM_END
 
 
+ROM_START( spyhuntp )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "sh_mb_2.bin",  0x0000, 0x2000, CRC(df6cd642) SHA1(e695aa3e3dc3b9df87bf2c1bcb75edbdf03fde98) )
+	ROM_LOAD( "cpu_pg1.7d",   0x2000, 0x2000, CRC(909d044f) SHA1(67237c3efde568d52e9f8b0d36df726d05a9d9e4) )
+	ROM_LOAD( "cpu_pg2.8d",   0x4000, 0x2000, CRC(afeeb8bd) SHA1(fde32863d08a745dfe19f1c1382810eab6aebcec) )
+	ROM_LOAD( "cpu_pg3.9d",   0x6000, 0x2000, CRC(5e744381) SHA1(5b75e4f44dfd63d6e35294c606b84231c216e57d) )
+	ROM_LOAD( "sh_mb_6.bin",  0x8000, 0x2000, CRC(8cbf04d8) SHA1(e45cb36935367e46ea41de0177b3453cd8bdce85) )
+	ROM_LOAD( "cpu_pg5.11d",  0xa000, 0x4000, CRC(53a4f7cd) SHA1(051b07ae993e14b329507710c0f7cadaa952f9ae) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "snd_0sd.a8",   0x0000, 0x1000, CRC(c95cf31e) SHA1(d1b0e299a27e306ddbc0654fd3a9d981c92afe8c) )
+	ROM_LOAD( "snd_1sd.a7",   0x1000, 0x1000, CRC(12aaa48e) SHA1(c6b835fc45e4484a4d52b682ce015caa242c8b4f) )
+
+	ROM_REGION( 0x8000, REGION_CPU3, 0 )  /* 32k for the Chip Squeak Deluxe */
+	ROM_LOAD16_BYTE( "csd_u7a.u7",   0x00000, 0x2000, CRC(6e689fe7) SHA1(38ad2e9f12b9d389fb2568ebcb32c8bd1ac6879e) )
+	ROM_LOAD16_BYTE( "csd_u17b.u17", 0x00001, 0x2000, CRC(0d9ddce6) SHA1(d955c0e67fc78b517cc229601ab4023cc5a644c2) )
+	ROM_LOAD16_BYTE( "csd_u8c.u8",   0x04000, 0x2000, CRC(35563cd0) SHA1(5708d374dd56758194c95118f096ea51bf12bf64) )
+	ROM_LOAD16_BYTE( "csd_u18d.u18", 0x04001, 0x2000, CRC(63d3f5b1) SHA1(5864a7e9b6bc3d2df6891d40965a7a0efbba6837) )
+
+	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "cpu_bg0.3a",   0x00000, 0x2000, CRC(dea34fed) SHA1(cbbb2ba75e087eebdce79a0016118c327c8f0a96) )
+	ROM_LOAD( "cpu_bg1.4a",   0x02000, 0x2000, CRC(8f64525f) SHA1(d457d12f31a30deb3b4e5b8189c9414aac1ad701) )
+	ROM_LOAD( "cpu_bg2.5a",   0x04000, 0x2000, CRC(ba0fd626) SHA1(f39281feb3fbbbd4234fbb70ee77bab3e1a33e3b) )
+	ROM_LOAD( "cpu_bg3.6a",   0x06000, 0x2000, CRC(7b482d61) SHA1(f6a46690f69a7513a7fbacd0199946f600d796dd) )
+
+	ROM_REGION( 0x20000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "vid_1fg.a7",   0x00000, 0x4000, CRC(9fe286ec) SHA1(d72cd7e69ef78e25cf5bc599fb0a7da11bf4657f) )
+	ROM_LOAD( "vid_0fg.a8",   0x04000, 0x4000, CRC(292c5466) SHA1(5abb9e2cc592adf81f12bf8ebeaf3e2931a7fa6d) )
+	ROM_LOAD( "vid_3fg.a5",   0x08000, 0x4000, CRC(b894934d) SHA1(e7d6db1635d244d002054dd223a2d0713316ef77) )
+	ROM_LOAD( "vid_2fg.a6",   0x0c000, 0x4000, CRC(62c8bfa5) SHA1(f245e49c178f846b647d09c32aa97d61333bdd83) )
+	ROM_LOAD( "vid_5fg.a3",   0x10000, 0x4000, CRC(2d9fbcec) SHA1(d73862b974726fe50bf011ea7977f8229b8a1e24) )
+	ROM_LOAD( "vid_4fg.a4",   0x14000, 0x4000, CRC(7ca4941b) SHA1(068ecd1e91ecfedba2ae542062f8f51f1329725d) )
+	ROM_LOAD( "vid_7fg.a1",   0x18000, 0x4000, CRC(940fe17e) SHA1(60d07c10ef5867875d47a4edaa68934e37e2a0aa) )
+	ROM_LOAD( "vid_6fg.a2",   0x1c000, 0x4000, CRC(8cb8a066) SHA1(5fa88d471ed8fd18244dd21b976c86530f57c8ac) )
+
+	ROM_REGION( 0x01000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "sh_mb_1.bin",  0x00000, 0x0800, CRC(5c74c9f0) SHA1(e42789d14e5510d1dcf4a30f6bd40a40ab46f7f3) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_LOAD( "82s123.12d",   0x0000, 0x0020, CRC(e1281ee9) SHA1(9ac9b01d24affc0ee9227a4364c4fd8f8290343a) )	/* from shollow, assuming it's the same */
+ROM_END
+
+
 ROM_START( crater )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "crcpu.6d",     0x0000, 0x2000, CRC(ad31f127) SHA1(d03506570cd08bcdb39d7c6b9de4f9628c7373e9) )
@@ -1578,5 +1621,6 @@ GAME( 1987, stargrds, 0,        mono_sg,   stargrds, stargrds, ROT0,  "Bally Mid
 
 /* MCR scrolling games */
 GAME( 1983, spyhunt,  0,        mcrsc_csd, spyhunt,  spyhunt,  ROT90, "Bally Midway", "Spy Hunter", GAME_SUPPORTS_SAVE )
+GAME( 1983, spyhuntp, spyhunt,  mcrsc_csd, spyhunt,  spyhunt,  ROT90, "Bally Midway", "Spy Hunter (Playtronic license)", GAME_SUPPORTS_SAVE )
 GAME( 1984, crater,   0,        mcrscroll, crater,   crater,   ORIENTATION_FLIP_X, "Bally Midway", "Crater Raider", GAME_SUPPORTS_SAVE )
 GAME( 1985, turbotag, 0,        mcrsc_csd, turbotag, turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", GAME_SUPPORTS_SAVE )
