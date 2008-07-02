@@ -1004,10 +1004,10 @@ DRIVER_INIT( starfore )
 DRIVER_INIT( starfora )
 {
 	/* encrypted CPU */
-	//suprloco_decode(machine); // wrong
+	yamato_decode(machine);
 
 	is_senjyo = 0;
-	senjyo_scrollhack = 0;
+	senjyo_scrollhack = 1;
 }
 
 DRIVER_INIT( senjyo )
@@ -1021,6 +1021,6 @@ GAME( 1983, senjyo,   0,        senjyo,  senjyo,   senjyo,   ROT90, "Tehkan", "S
 GAME( 1984, starforc, 0,        senjyo,  starforc, starforc, ROT90, "Tehkan", "Star Force", 0 )
 GAME( 1984, starfore, starforc, senjyo,  starforc, starfore, ROT90, "Tehkan", "Star Force (encrypted)", 0 )
 GAME( 1984, starforb, starforc, starforb,starforc, starfore, ROT90, "[Tehkan] (bootleg)", "Star Force (encrypted, bootleg)", 0 )
-GAME( 1984, starfora, starforc, starforb,starforc, starfora, ROT90, "Tehkan", "Star Force (encrypted, set 2)", GAME_NOT_WORKING ) // another bootleg?
+GAME( 1984, starfora, starforc, senjyo,  starforc, starfora, ROT90, "Tehkan", "Star Force (encrypted, set 2)", GAME_NOT_WORKING ) // another bootleg?
 GAME( 1985, megaforc, starforc, senjyo,  starforc, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", 0 )
 GAME( 1986, baluba,   0,        senjyo,  baluba,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu", GAME_IMPERFECT_COLORS )
