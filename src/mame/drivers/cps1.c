@@ -7491,6 +7491,80 @@ ROM_START( punipic )
 	ROM_LOAD( "sound.bin",      0x000000, 0x80000, CRC(aeec9dc6) SHA1(56fd62e8db8aa96cdd242d8c705849a413567780) )
 ROM_END
 
+/* alt bootleg with PIC, same program roms as above, bigger GFX roms
+
+Punisher
+1993, Capcom
+
+This is a bootleg version running on a single PCB.
+
+PCB Layout
+----------
+
+|-----------------------------------------|
+|    93C46  SOUND   30MHz  PAL            |
+|    M6295  PIC16C57                      |
+|           6116     PAL   6116           |
+|           6116           6116  ACTEL    |
+|                          6116  A1020B   |
+|J                         6116           |
+|A   TEST                  6116           |
+|M                         6116           |
+|M                                        |
+|A                                        |
+|    62256  62256        62256  PU13478   |
+|     PRG1   PRG2                         |
+|     PRG3   PRG4        62256  PU11256   |
+|                                      PAL|
+|       68000      24MHz        PAL   PAL |
+|-----------------------------------------|
+
+Notes:
+      Measured clocks
+      ---------------
+      68000 clock: 12.000MHz (24 / 2)
+      M6295 clock: 937.5kHz  (30 / 32), sample rate = 30000000 / 32 / 132
+      16C57 clock: 3.75MHz   (30 / 8)   NOTE! 4096 bytes internal ROM is protected and can't be read out.
+      VSYNC      : 60Hz
+
+      ROMs
+      ----
+      PRG*  - 4M  MASK ROM (read as 27C040)
+      SOUND - 4M  MASK ROM (read as 27C040)
+      PU*   - 16M MASK ROM (read as 27C160)
+
+*/
+
+ROM_START( punipic2 )
+	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "prg4.bin",       0x000000, 0x80000, CRC(c3151563) SHA1(61d3a20c25fea8a94ae6e473a87c21968867cba0) )
+	ROM_LOAD16_BYTE( "prg3.bin",       0x000001, 0x80000, CRC(8c2593ac) SHA1(4261bc72b96c3a5690df35c5d8b71524765693d9) )
+	ROM_LOAD16_BYTE( "prg2.bin",       0x100000, 0x80000, CRC(665a5485) SHA1(c07920d110ca9c35f6cbff94a6a889c17300f994) )
+	ROM_LOAD16_BYTE( "prg1.bin",       0x100001, 0x80000, CRC(d7b13f39) SHA1(eb7cd92b44fdef3b72672b0be6786c526421b627) )
+
+	ROM_REGION( 0x400000, REGION_GFX1, 0 )
+	ROMX_LOAD( "pu11256.bin",   0x000000, 0x80000, CRC(6581faea) SHA1(2b0e96998002a1df96c7869ec965257d2ecfb531), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(               0x200000, 0x80000 )
+	ROM_CONTINUE(               0x000004, 0x80000 )
+	ROM_CONTINUE(               0x200004, 0x80000 )
+	ROMX_LOAD( "pu13478.bin",   0x000002, 0x80000, CRC(61613de4) SHA1(8f8c46ce907be2b4c4715ad88bfd1456818bdd2c), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(               0x200002, 0x80000 )
+	ROM_CONTINUE(               0x000006, 0x80000 )
+	ROM_CONTINUE(               0x200006, 0x80000 )
+
+	ROM_REGION( 0x8000, REGION_GFX2, 0 )
+	ROM_COPY( REGION_GFX1, 0x000000, 0x000000, 0x8000 )	/* stars */
+
+	ROM_REGION( 0x28000, REGION_CPU2, 0 ) /* PIC16c57 - protected */
+	ROM_LOAD( "pic16c57", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x200000, REGION_SOUND1, 0 ) /* OKI6295 */
+	ROM_LOAD( "sound.bin",      0x000000, 0x80000, CRC(aeec9dc6) SHA1(56fd62e8db8aa96cdd242d8c705849a413567780) )
+
+	ROM_REGION( 0x200000, REGION_USER1, 0 ) /* other */
+	ROM_LOAD( "93c46.bin",      0x00, 0x80, CRC(36ab4e7d) SHA1(60bea43051d86d9aefcbb7a390cf0c7d8b905a4b) )
+ROM_END
+
 /* FIXME B-Board uncertain but should be 91634B/91635B from the program ROM names */
 ROM_START( slammast )
 	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
@@ -8158,7 +8232,9 @@ GAME( 1993, dinopic2, dino,     cpspicb,    dino,     dino ,    ROT0,   "bootleg
 GAME( 1993, punisher, 0,        qsound,     punisher, punisher, ROT0,   "Capcom", "The Punisher (World 930422)" , 0)					// "ETC"
 GAME( 1993, punishru, punisher, qsound,     punisher, punisher, ROT0,   "Capcom", "The Punisher (US 930422)", 0 )
 GAME( 1993, punishrj, punisher, qsound,     punisher, punisher, ROT0,   "Capcom", "The Punisher (Japan 930422)", 0 )
-GAME( 1993, punipic,  punisher, cpspicb,    punisher, punisher, ROT0,   "Capcom", "The Punisher (bootleg with PIC16c57, set 1)" , GAME_NOT_WORKING)					// "ETC"
+GAME( 1993, punipic,  punisher, cpspicb,    punisher, punisher, ROT0,   "Capcom", "The Punisher (bootleg with PIC16c57, set 1)" , GAME_NOT_WORKING)
+GAME( 1993, punipic2, punisher, cpspicb,    punisher, punisher, ROT0,   "Capcom", "The Punisher (bootleg with PIC16c57, set 2)" , GAME_NOT_WORKING)
+
 GAME( 1993, slammast, 0,        qsound,     slammast, slammast, ROT0,   "Capcom", "Saturday Night Slam Masters (World 930713)" , 0)		// "ETC"
 GAME( 1993, slammasu, slammast, qsound,     slammast, slammast, ROT0,   "Capcom", "Saturday Night Slam Masters (US 930713)", 0 )
 GAME( 1993, mbomberj, slammast, qsound,     slammast, slammast, ROT0,   "Capcom", "Muscle Bomber - The Body Explosion (Japan 930713)", 0 )
