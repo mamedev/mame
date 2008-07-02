@@ -62,6 +62,8 @@ J1100072A
 #include "cpu/m6805/m6805.h"
 #include "includes/bigevglf.h"
 
+static UINT8 port_select;     /* for muxed controls */
+
 static UINT32 beg_bank=0;
 static UINT8 *beg_sharedram;
 
@@ -199,13 +201,33 @@ static WRITE8_HANDLER( beg_sharedram_w )
 	beg_sharedram[offset] = data;
 }
 
-static INPUT_PORTS_START( bigevglf )
 
+static READ8_HANDLER( beg_trackball_x_r )
+{
+	static const char *const portx_name[2] = { "P1X", "P2X" };
+
+	return input_port_read(machine, portx_name[port_select]);
+}
+
+static READ8_HANDLER( beg_trackball_y_r )
+{
+	static const char *const porty_name[2] = { "P1Y", "P2Y" };
+
+	return input_port_read(machine, porty_name[port_select]);
+}
+
+static WRITE8_HANDLER( beg_port08_w )
+{
+	port_select = (data & 0x04) >> 2;
+}
+
+
+static INPUT_PORTS_START( bigevglf )
 	PORT_START_TAG("PORT00")		/* port 00 on sub cpu */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
@@ -226,7 +248,7 @@ static INPUT_PORTS_START( bigevglf )
  	PORT_DIPNAME( 0x08,   0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:4")
  	PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0xf0,   0xf0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPNAME( 0xf0,   0xf0, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(      0x50, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0xf0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( 2C_3C ) )
@@ -239,9 +261,9 @@ static INPUT_PORTS_START( bigevglf )
 	PORT_DIPSETTING(      0x02, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x0c,   0x0c, "Holes" ) PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(      0x0c, "3" )
- 	PORT_DIPSETTING(      0x08, "2" )
  	PORT_DIPSETTING(      0x04, "1" )
+ 	PORT_DIPSETTING(      0x08, "2" )
+	PORT_DIPSETTING(      0x0c, "3" )
  	PORT_DIPSETTING(      0x00, "4" )
 	PORT_DIPNAME( 0x10,   0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:5") /* Also changes the copyright on the title screen */
 	PORT_DIPSETTING(      0x00, DEF_STR( English ) )                            /* (c) 1986 Taito America Corp. */
@@ -256,11 +278,17 @@ static INPUT_PORTS_START( bigevglf )
 	PORT_DIPSETTING(      0x20, "9" )
 	PORT_DIPSETTING(      0x00, "10" )
 
-	PORT_START_TAG("TRACKX")	/* TRACKBALL X - port 02 on sub cpu */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X  ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
+	PORT_START_TAG("P1X")	/* port 02 on sub cpu - muxed port 0 */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START_TAG("TRACKY")	/* TRACKBALL Y - port 03 on sub cpu */
+	PORT_START_TAG("P1Y")	/* port 03 on sub cpu - muxed port 0 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_REVERSE
+
+	PORT_START_TAG("P2X")	/* port 02 on sub cpu - muxed port 1 */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_COCKTAIL
+
+	PORT_START_TAG("P2Y")	/* port 03 on sub cpu - muxed port 1 */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bigevglj )
@@ -270,7 +298,6 @@ static INPUT_PORTS_START( bigevglj )
 	PORT_DIPNAME( 0x10,   0x10, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:5") /* Doesn't change the title screen copyright like the US set */
 	PORT_DIPSETTING(      0x00, DEF_STR( English ) )
  	PORT_DIPSETTING(      0x10, DEF_STR( Japanese ) )
-
 INPUT_PORTS_END
 
 
@@ -330,7 +357,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigevglf_sub_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x08) AM_WRITE(SMH_NOP) /*coinlockout_w ???? watchdog ???? */
+	AM_RANGE(0x08, 0x08) AM_WRITE(beg_port08_w) /* muxed port select + other unknown stuff */
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(bigevglf_mcu_w)
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(SMH_NOP) /* 0-enable MCU, 1-keep reset line ASSERTED; D0 goes to the input of ls74 and the /Q of this ls74 goes to reset line on 68705 */
 	AM_RANGE(0x10, 0x17) AM_WRITE(beg13A_clr_w)
@@ -357,8 +384,8 @@ static ADDRESS_MAP_START( bigevglf_sub_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("PORT00")
 	AM_RANGE(0x01, 0x01) AM_READ(SMH_NOP)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("TRACKX")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("TRACKY")
+	AM_RANGE(0x02, 0x02) AM_READ(beg_trackball_x_r)
+	AM_RANGE(0x03, 0x03) AM_READ(beg_trackball_y_r)
 	AM_RANGE(0x04, 0x04) AM_READ(sub_cpu_mcu_coin_port_r)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW1")
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")
@@ -573,5 +600,5 @@ ROM_START( bigevglj )
 	ROM_LOAD( "a67-15",   0x18000, 0x8000, CRC(1d261428) SHA1(0f3e6d83a8a462436fa414de4e1e4306db869d3e))
 ROM_END
 
-GAME( 1986, bigevglf, 0,        bigevglf, bigevglf, 0, ROT270, "Taito America Corporation", "Big Event Golf (US)", 0)
-GAME( 1986, bigevglj, bigevglf, bigevglf, bigevglj, 0, ROT270, "Taito Corporation", "Big Event Golf (Japan)", 0)
+GAME( 1986, bigevglf, 0,        bigevglf, bigevglf, 0, ROT270, "Taito America Corporation", "Big Event Golf (US)", GAME_NO_COCKTAIL)
+GAME( 1986, bigevglj, bigevglf, bigevglf, bigevglj, 0, ROT270, "Taito Corporation", "Big Event Golf (Japan)", GAME_NO_COCKTAIL)
