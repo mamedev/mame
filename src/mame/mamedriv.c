@@ -2442,6 +2442,7 @@ V-V                           TP-027
 	DRIVER( captcomm )	/* 14/10/1991 (c) 1991 (World) */
 	DRIVER( captcomu )	/* 28/ 9/1991 (c) 1991 (US)    */
 	DRIVER( captcomj )	/* 02/12/1991 (c) 1991 (Japan) */
+	DRIVER( captcomb )	/* bootleg */
 	DRIVER( knights )	/* 27/11/1991 (c) 1991 (World) */
 	DRIVER( knightsu )	/* 27/11/1991 (c) 1991 (US)    */
 	DRIVER( knightsj )	/* 27/11/1991 (c) 1991 (Japan) */

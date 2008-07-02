@@ -1228,6 +1228,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"captcomm", CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"captcomu", CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"captcomj", CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
+	{"captcomb", CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"knights",  CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsu", CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsj", CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },

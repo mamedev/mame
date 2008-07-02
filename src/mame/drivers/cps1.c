@@ -6062,6 +6062,68 @@ ROM_START( captcomj )
 	ROM_LOAD( "cc_19.rom",     0x20000, 0x20000, CRC(b99091ae) SHA1(b19197c7ad3aeaf5f41c26bf853b0c9b502ecfca) )
 ROM_END
 
+/* Captain Commando bootleg
+ - there are 2 dumps of this, one has bad (half size) gfx roms tho, otherwise identical
+
+ROMs from a Captain Commando bootleg PCB
+
+Large single PCB containing.....
+68000 @ 10MHz
+Z80 @ 3.579545MHz
+YM2151 @ 3.579545MHz
+M6295 @ 1MHz (16/16), pin 7 HIGH
+xtals 10MHz, 3.579545MHz, 16MHz
+8-position DSWs x3
+6116 (2kx8) SRAM x6
+62256 (32kx8) SRAM x6
+681000 (128kx8) SRAM x2
+a few PALs
+LOTS of logic
+no special chips
+no custom chips
+no PLD/CPLD/FPGA
+no PROMs
+
+
+*/
+
+ROM_START( captcomb )
+	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "25.bin",        0x000000, 0x80000, CRC(cb71ed7a) SHA1(84f76b4861a3c7a59e67f38777f2d68749f19337) )
+	ROM_LOAD16_BYTE( "27.bin",        0x000001, 0x80000, CRC(47cb2e87) SHA1(8a990a3a122045b50dd73d2e7b02fe60ab9af0a3) )
+	ROM_LOAD16_BYTE( "24.bin",        0x100000, 0x40000, CRC(79794279) SHA1(5a43a4cef6653454ba9a81f2dd7f3f91c8a3354c) )
+	ROM_LOAD16_BYTE( "26.bin",        0x100001, 0x40000, CRC(b01077ba) SHA1(0698fbfca7beea8e6a676aa19fcbf5ddea3defb1) )
+
+	ROM_REGION( 0x400000, REGION_GFX1, 0 )
+	ROMX_LOAD( "c91e-01.bin", 0x000000, 0x40000, CRC(f863071c) SHA1(c5154c4001f8e447623f9d71bf3e68a16f039e8f), ROM_SKIP(7) )
+	ROM_CONTINUE(             0x000004, 0x40000)
+	ROM_CONTINUE(             0x200000, 0x40000)
+	ROM_CONTINUE(             0x200004, 0x40000)
+	ROMX_LOAD( "c91e-02.bin", 0x000001, 0x40000, CRC(4b03c308) SHA1(d28d3ebba2571bea56b057cb3e09315a17d78b42), ROM_SKIP(7) )
+	ROM_CONTINUE(             0x000005, 0x40000)
+	ROM_CONTINUE(             0x200001, 0x40000)
+	ROM_CONTINUE(             0x200005, 0x40000)
+	ROMX_LOAD( "c91e-03.bin", 0x000002, 0x40000, CRC(3383ea96) SHA1(2a583d87c6d80919c97640f6f2e756cecc3e38ec), ROM_SKIP(7) )
+	ROM_CONTINUE(             0x000006, 0x40000)
+	ROM_CONTINUE(             0x200002, 0x40000)
+	ROM_CONTINUE(             0x200006, 0x40000)
+	ROMX_LOAD( "c91e-04.bin", 0x000003, 0x40000, CRC(b8e1f4cf) SHA1(6686df700c7ce49fe4ac7007aa4d622645e0e348), ROM_SKIP(7) )
+	ROM_CONTINUE(             0x000007, 0x40000)
+	ROM_CONTINUE(             0x200003, 0x40000)
+	ROM_CONTINUE(             0x200007, 0x40000)
+
+	ROM_REGION( 0x8000, REGION_GFX2, 0 )
+	ROM_COPY( REGION_GFX1, 0x000000, 0x000000, 0x8000 )	/* stars */
+
+	ROM_REGION( 0x18000, REGION_CPU2, 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "l.bin",     0x00000, 0x08000, CRC(698e8b58) SHA1(b7a3d905a7ed2c430426ca2e185e3d7e75e752a1) )
+	ROM_CONTINUE(              0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_LOAD( "c91e-05.bin",     0x00000, 0x40000, CRC(096115fb) SHA1(b496550f61b3d4b54ba43522d31efd0b09057493))
+ROM_END
+
+
 /* B-Board 91635B */
 ROM_START( knights )
 	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
@@ -8212,6 +8274,7 @@ GAME( 1991, kodb,     kod,      cps1_10MHz, kod,      cps1,     ROT0,   "Capcom"
 GAME( 1991, captcomm, 0,        cps1_10MHz, captcomm, cps1,     ROT0,   "Capcom", "Captain Commando (World 911014)" , 0)				// "OTHER COUNTRY"
 GAME( 1991, captcomu, captcomm, cps1_10MHz, captcomm, cps1,     ROT0,   "Capcom", "Captain Commando (US 910928)", 0 )
 GAME( 1991, captcomj, captcomm, cps1_10MHz, captcomm, cps1,     ROT0,   "Capcom", "Captain Commando (Japan 911202)", 0 )
+GAME( 1991, captcomb, captcomm, cps1_10MHz, captcomm, cps1,     ROT0,   "bootleg","Captain Commando (bootleg)", GAME_NOT_WORKING )
 GAME( 1991, knights,  0,        cps1_10MHz, knights,  cps1,     ROT0,   "Capcom", "Knights of the Round (World 911127)" , 0)			// "ETC"
 GAME( 1991, knightsu, knights,  cps1_10MHz, knights,  cps1,     ROT0,   "Capcom", "Knights of the Round (US 911127)", 0 )
 GAME( 1991, knightsj, knights,  cps1_10MHz, knights,  cps1,     ROT0,   "Capcom", "Knights of the Round (Japan 911127)", 0 )
