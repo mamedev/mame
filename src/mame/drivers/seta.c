@@ -1301,6 +1301,8 @@ Note: on screen copyright is (c)1998 Coinmaster.
 
 /* Variables and functions only used here */
 
+static UINT8 port_select;     /* for muxed controls in 'usclssic' */
+
 static UINT8 *sharedram;
 
 
@@ -1729,30 +1731,32 @@ static READ16_HANDLER( usclssic_dsw_r )
 {
 	switch (offset)
 	{
-		case 0/2:	return (input_port_read_indexed(machine, 3) >>  8) & 0xf;
-		case 2/2:	return (input_port_read_indexed(machine, 3) >> 12) & 0xf;
-		case 4/2:	return (input_port_read_indexed(machine, 3) >>  0) & 0xf;
-		case 6/2:	return (input_port_read_indexed(machine, 3) >>  4) & 0xf;
+		case 0/2:	return (input_port_read(machine, "DSW") >>  8) & 0xf;
+		case 2/2:	return (input_port_read(machine, "DSW") >> 12) & 0xf;
+		case 4/2:	return (input_port_read(machine, "DSW") >>  0) & 0xf;
+		case 6/2:	return (input_port_read(machine, "DSW") >>  4) & 0xf;
 	}
 	return 0;
 }
 
 static READ16_HANDLER( usclssic_trackball_x_r )
 {
+	static const char *const portx_name[2] = { "P1X", "P2X" };
 	switch (offset)
 	{
-		case 0/2:	return (input_port_read_indexed(machine, 0) >> 0) & 0xff;
-		case 2/2:	return (input_port_read_indexed(machine, 0) >> 8) & 0xff;
+		case 0/2:	return (input_port_read(machine, portx_name[port_select]) >> 0) & 0xff;
+		case 2/2:	return (input_port_read(machine, portx_name[port_select]) >> 8) & 0xff;
 	}
 	return 0;
 }
 
 static READ16_HANDLER( usclssic_trackball_y_r )
 {
+	static const char *const porty_name[2] = { "P1Y", "P2Y" };
 	switch (offset)
 	{
-		case 0/2:	return (input_port_read_indexed(machine, 1) >> 0) & 0xff;
-		case 2/2:	return (input_port_read_indexed(machine, 1) >> 8) & 0xff;
+		case 0/2:	return (input_port_read(machine, porty_name[port_select]) >> 0) & 0xff;
+		case 2/2:	return (input_port_read(machine, porty_name[port_select]) >> 8) & 0xff;
 	}
 	return 0;
 }
@@ -1764,6 +1768,8 @@ static WRITE16_HANDLER( usclssic_lockout_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
+		port_select = (data & 0x40) >> 6;
+
 		seta_tiles_offset = (data & 0x10) ? 0x4000: 0;
 		if (old_tiles_offset != seta_tiles_offset)	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 		old_tiles_offset = seta_tiles_offset;
@@ -1780,10 +1786,10 @@ static ADDRESS_MAP_START( usclssic_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0x900000, 0x900001) AM_READ(SMH_RAM					)	// ?
 	AM_RANGE(0xa00000, 0xa00005) AM_READ(SMH_RAM					)	// VRAM Ctrl
 /**/AM_RANGE(0xb00000, 0xb003ff) AM_READ(SMH_RAM					)	// Palette
-	AM_RANGE(0xb40000, 0xb40003) AM_READ(usclssic_trackball_x_r	)	// TrackBall X
-	AM_RANGE(0xb40004, 0xb40007) AM_READ(usclssic_trackball_y_r	)	// TrackBall Y + Buttons
-	AM_RANGE(0xb40010, 0xb40011) AM_READ(input_port_2_word_r		)	// Coins
-	AM_RANGE(0xb40018, 0xb4001f) AM_READ(usclssic_dsw_r			)	// 2 DSWs
+	AM_RANGE(0xb40000, 0xb40003) AM_READ(usclssic_trackball_x_r		)	// TrackBall X
+	AM_RANGE(0xb40004, 0xb40007) AM_READ(usclssic_trackball_y_r		)	// TrackBall Y + Buttons
+	AM_RANGE(0xb40010, 0xb40011) AM_READ_PORT("COINS")					// Coins
+	AM_RANGE(0xb40018, 0xb4001f) AM_READ(usclssic_dsw_r				)	// 2 DSWs
 	AM_RANGE(0xb80000, 0xb80001) AM_READ(SMH_NOP					)	// watchdog (value is discarded)?
 	AM_RANGE(0xc00000, 0xc03fff) AM_READ(SMH_RAM					)	// Sprites Code + X + Attr
 	AM_RANGE(0xd00000, 0xd01fff) AM_READ(SMH_RAM					)	// VRAM
@@ -5662,35 +5668,46 @@ INPUT_PORTS_END
                                 U.S. Classic
 ***************************************************************************/
 
-#define TRACKBALL(_dir_) \
-	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_##_dir_ ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET
-
 static INPUT_PORTS_START( usclssic )
-	PORT_START_TAG("IN0")
-	TRACKBALL(X)
-	PORT_BIT   ( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT   ( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT   ( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT   ( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START_TAG("P1X")     /* muxed port 0 */
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")
-	TRACKBALL(Y)
-	PORT_BIT   ( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT   ( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT   ( 0x4000, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT   ( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_START_TAG("P1Y")     /* muxed port 0 */
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")
-	PORT_BIT(  0x0001, IP_ACTIVE_LOW,  IPT_UNKNOWN  )	// tested (sound related?)
-	PORT_BIT(  0x0002, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT(  0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT(  0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_START_TAG("P2X")     /* muxed port 1 */
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("P2Y")     /* muxed port 1 */
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+	PORT_START_TAG("COINS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_UNKNOWN  )	// tested (sound related?)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(5)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(5)
-	PORT_BIT(  0x0040, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_TILT     )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_TILT     )
 
-	PORT_START_TAG("IN3") //2 DSWs - $600001 & 3.b
+	PORT_START_TAG("DSW") //2 DSWs - $600001 & 3.b
 	PORT_DIPNAME( 0x0001, 0x0001, "Credits For 9-Hole" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0001, "2" )
 	PORT_DIPSETTING(      0x0000, "3" )
