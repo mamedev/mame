@@ -20,28 +20,10 @@ UINT8 *senjyo_bgstripesram;
 
 static tilemap *fg_tilemap,*bg1_tilemap,*bg2_tilemap,*bg3_tilemap;
 
-static int senjyo, scrollhack;
+int is_senjyo, senjyo_scrollhack;
 static int senjyo_bgstripes;
 
 
-DRIVER_INIT( starforc )
-{
-	senjyo = 0;
-	scrollhack = 1;
-}
-DRIVER_INIT( starfore )
-{
-	/* encrypted CPU */
-	suprloco_decode(machine);
-
-	senjyo = 0;
-	scrollhack = 0;
-}
-DRIVER_INIT( senjyo )
-{
-	senjyo = 1;
-	scrollhack = 0;
-}
 
 
 /***************************************************************************
@@ -55,7 +37,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 	UINT8 attr = senjyo_fgcolorram[tile_index];
 	int flags = (attr & 0x80) ? TILE_FLIPY : 0;
 
-	if (senjyo && (tile_index & 0x1f) >= 32-8)
+	if (is_senjyo && (tile_index & 0x1f) >= 32-8)
 		flags |= TILE_FORCE_LAYER0;
 
 	SET_TILE_INFO(
@@ -120,7 +102,7 @@ VIDEO_START( senjyo )
 {
 	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,8,8,32,32);
 
-	if (senjyo)
+	if (is_senjyo)
 	{
 		bg1_tilemap = tilemap_create(senjyo_bg1_tile_info,tilemap_scan_rows,16,16,16,32);
 		bg2_tilemap = tilemap_create(get_bg2_tile_info,   tilemap_scan_rows,16,16,16,48);	/* only 16x32 used by Star Force */
@@ -255,7 +237,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		if (((spriteram[offs+1] & 0x30) >> 4) == priority)
 		{
-			if (senjyo)	/* Senjyo */
+			if (is_senjyo)	/* Senjyo */
 				big = (spriteram[offs] & 0x80);
 			else	/* Star Force */
 				big = ((spriteram[offs] & 0xc0) == 0xc0);
@@ -319,7 +301,7 @@ VIDEO_UPDATE( senjyo )
 
 		scrollx = senjyo_scrollx2[0];
 		scrolly = senjyo_scrolly2[0] + 256 * senjyo_scrolly2[1];
-		if (scrollhack)	/* Star Force, but NOT the encrypted version */
+		if (senjyo_scrollhack)	/* Star Force, but NOT the encrypted version */
 		{
 			scrollx = senjyo_scrollx1[0];
 			scrolly = senjyo_scrolly1[0] + 256 * senjyo_scrolly1[1];

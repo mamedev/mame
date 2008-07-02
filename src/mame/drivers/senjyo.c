@@ -74,6 +74,7 @@ I/O read/write
 #include "sound/sn76496.h"
 #include "sound/samples.h"
 #include "cpu/z80/z80daisy.h"
+#include "machine/segacrpt.h"
 
 
 
@@ -92,12 +93,9 @@ WRITE8_HANDLER( senjyo_bg2videoram_w );
 WRITE8_HANDLER( senjyo_bg3videoram_w );
 WRITE8_HANDLER( senjyo_bgstripes_w );
 
-DRIVER_INIT( starforc );
-DRIVER_INIT( starfore );
-DRIVER_INIT( senjyo );
-
 VIDEO_START( senjyo );
 VIDEO_UPDATE( senjyo );
+extern int is_senjyo, senjyo_scrollhack;
 
 void senjyo_sh_start(void);
 
@@ -108,9 +106,8 @@ WRITE8_HANDLER( senjyo_sh_2_w );
 WRITE8_HANDLER( starforc_pio_w );
 READ8_HANDLER( starforc_pio_r );
 
-#if 1
 WRITE8_HANDLER( senjyo_volume_w );
-#endif
+
 
 
 
@@ -568,43 +565,32 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,	/* 8*8 characters */
-	512,	/* 512 characters */
+	RGN_FRAC(1,3),	/* 512 characters */
 	3,	/* 3 bits per pixel */
-	{ 0, 512*8*8, 2*512*8*8 },	/* the bitplanes are separated */
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },	/* the bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8	/* every char takes 8 consecutive bytes */
 };
-static const gfx_layout tilelayout_256 =
+static const gfx_layout tilelayout =
 {
 	16,16,	/* 16*16 characters */
-	256,	/* 256 characters */
+	RGN_FRAC(1,3),	/* 256 characters */
 	3,	/* 3 bits per pixel */
-	{ 0, 256*16*16, 2*256*16*16 },	/* the bitplanes are separated */
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },	/* the bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
 	32*8	/* every character takes 32 consecutive bytes */
 };
-static const gfx_layout tilelayout_128 =
-{
-	16,16,	/* 16*16 characters */
-	128,	/* 128 characters */
-	3,	/* 3 bits per pixel */
-	{ 0, 128*16*16, 2*128*16*16 },	/* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	32*8	/* every character takes 32 consecutive bytes */
-};
+
 static const gfx_layout spritelayout1 =
 {
 	16,16,	/* 16*16 sprites */
-	512,	/* 512 sprites */
+	RGN_FRAC(1,3),
 	3,	/* 3 bits per pixel */
-	{ 0, 512*16*16, 2*512*16*16 },	/* the bitplanes are separated */
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },	/* the bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
@@ -614,9 +600,9 @@ static const gfx_layout spritelayout1 =
 static const gfx_layout spritelayout2 =
 {
 	32,32,	/* 32*32 sprites */
-	128,	/* 128 sprites */
+	RGN_FRAC(1,3),	/* 128 sprites */
 	3,	/* 3 bits per pixel */
-	{ 0, 128*32*32, 2*128*32*32 },	/* the bitplanes are separated */
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },	/* the bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7,
 			32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
@@ -630,9 +616,9 @@ static const gfx_layout spritelayout2 =
 
 static GFXDECODE_START( senjyo )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,       0, 8 )	/*   0- 63 characters */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout_256,  64, 8 )	/*  64-127 background #1 */
-	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout_256, 128, 8 )	/* 128-191 background #2 */
-	GFXDECODE_ENTRY( REGION_GFX4, 0, tilelayout_128, 192, 8 )	/* 192-255 background #3 */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,  64, 8 )	/*  64-127 background #1 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout, 128, 8 )	/* 128-191 background #2 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tilelayout, 192, 8 )	/* 192-255 background #3 */
 	GFXDECODE_ENTRY( REGION_GFX5, 0, spritelayout1,  320, 8 )	/* 320-383 normal sprites */
 	GFXDECODE_ENTRY( REGION_GFX5, 0, spritelayout2,  320, 8 )	/* 320-383 large sprites */
 													/* 384-399 is background */
@@ -844,6 +830,49 @@ ROM_START( starforb )
 ROM_END
 
 
+ROM_START( starfora )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "5.bin",   0x0000, 0x2000, CRC(7691bbd4) SHA1(efcab11ea0ed58b6a47c9d7a994c921dfaa1b47e) )
+	ROM_LOAD( "4.bin",   0x2000, 0x2000, CRC(32f3c34e) SHA1(9ecaa46fe296c2f2e9c8faf3d40085c0f10acbe1) )
+	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(5e99cfa0) SHA1(d16d5247f4afb7abb5b8331ad7ae9d4d1f6d6554) )
+	ROM_LOAD( "2.bin",   0x6000, 0x2000, CRC(311c6e59) SHA1(ff3ba96ffade7602d3b150dae4bdc1c02a148576) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for sound board */
+	ROM_LOAD( "0.bin", 0x0000, 0x2000, CRC(a277c268) SHA1(99ed8439119fa4b850ad8aadb7ff3e54d4cd40be) )
+
+	ROM_REGION( 0x03000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "8.bin",   0x00000, 0x1000, CRC(f4803339) SHA1(a119d68c2dd1c0e191231ce77353b31f30f7aa76) )	/* fg */
+	ROM_LOAD( "7.bin",   0x01000, 0x1000, CRC(96979684) SHA1(bb4f7d3afc8dfaa723dfb5374996cc4bfd76fa3c) )
+	ROM_LOAD( "6.bin",   0x02000, 0x1000, CRC(eead1d5c) SHA1(7c9165ed227c5228122b494a265cbfd6e843ba61) )
+
+	ROM_REGION( 0x06000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "17.bin",  0x00000, 0x2000, CRC(c3bda12f) SHA1(3748ea8e34222a31a365a02ec77430f268b0b397) )	/* bg1 */
+	ROM_LOAD( "16.bin",  0x02000, 0x2000, CRC(9e9384fe) SHA1(3aaa9cc64ef3775325f64733da4f6c328abf6514) )
+	ROM_LOAD( "15.bin",  0x04000, 0x2000, CRC(84603285) SHA1(f4d6dfa3968fbd8ebf1a6451d5ea1821d65d9b49) )
+
+	ROM_REGION( 0x06000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "20.bin",  0x00000, 0x2000, CRC(fdd9e38b) SHA1(3766835d9e9fc7e5dd99521e7303562029b78a65) )	/* bg2 */
+	ROM_LOAD( "19.bin",  0x02000, 0x2000, CRC(668aea14) SHA1(62eb0df48f2f0c5778bb230cc3bf0b8eb3b4e3f8) )
+	ROM_LOAD( "18.bin",  0x04000, 0x2000, CRC(c62a19c1) SHA1(9ce0e29630d3c8cba4db4cff333b250481348968) )
+
+	ROM_REGION( 0x06000, REGION_GFX4, ROMREGION_DISPOSE ) // twice the size of other sets, but 2nd half is just blank
+	ROM_LOAD( "sw5.bin",  0x00000, 0x2000, CRC(ce6bbc11) SHA1(c8f4b22f5ac1c95fff7758c67bf8c39452f5945b) )	/* bg3 */
+	ROM_LOAD( "sw4.bin",  0x02000, 0x2000, CRC(f5b4b629) SHA1(d777a144e6dea63f2c3dcd25e32525aa185367ee) )
+	ROM_LOAD( "sw3.bin",  0x04000, 0x2000, CRC(0965346d) SHA1(20b223a6aef8dc9c37ab45c575864bce1e9e50db) )
+
+	ROM_REGION( 0x0c000, REGION_GFX5, ROMREGION_DISPOSE )
+	ROM_LOAD( "13.bin",       0x00000, 0x2000, CRC(1cfc88a8) SHA1(2948864ed88ba3b1d500047e2ef594b67274710c) )	/* sprites */
+	ROM_LOAD( "14.bin",       0x02000, 0x2000, CRC(902060b4) SHA1(f371aa12ba3f554918e8a482114df166cd007b0e) )	/* sprites */
+	ROM_LOAD( "11.bin",       0x04000, 0x2000, CRC(7676b970) SHA1(f5fcee4ca555e7c880c6bf5d5ea01ff8d619a837) )
+	ROM_LOAD( "12.bin",       0x06000, 0x2000, CRC(6f4a5d67) SHA1(182be475dfee4d272f57c030e3acd4e8cfa4fc53) )
+	ROM_LOAD( "9.bin",        0x08000, 0x2000, CRC(e7d51959) SHA1(34d9afb0f31dc1d02e7b85aa69345fc66cf0f554) )
+	ROM_LOAD( "10.bin",       0x0a000, 0x2000, CRC(6ea27bec) SHA1(30da81a99d5920107751afda359576e426c497c4) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )	/* PROMs */
+    ROM_LOAD( "prom.bin",    0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )	/* unknown - timing? */
+ROM_END
+
+
 ROM_START( starfore )
 	ROM_REGION( 2*0x10000, REGION_CPU1, 0 )     /* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "starfore.005", 0x0000, 0x2000, CRC(825f7ebe) SHA1(d63fd516e075bcc28d42189216b95bbf491a4cd1) )
@@ -958,10 +987,40 @@ ROM_START( baluba )
 ROM_END
 
 
+DRIVER_INIT( starforc )
+{
+	is_senjyo = 0;
+	senjyo_scrollhack = 1;
+}
+DRIVER_INIT( starfore )
+{
+	/* encrypted CPU */
+	suprloco_decode(machine);
+
+	is_senjyo = 0;
+	senjyo_scrollhack = 0;
+}
+
+DRIVER_INIT( starfora )
+{
+	/* encrypted CPU */
+	//suprloco_decode(machine); // wrong
+
+	is_senjyo = 0;
+	senjyo_scrollhack = 0;
+}
+
+DRIVER_INIT( senjyo )
+{
+	is_senjyo = 1;
+	senjyo_scrollhack = 0;
+}
+
 
 GAME( 1983, senjyo,   0,        senjyo,  senjyo,   senjyo,   ROT90, "Tehkan", "Senjyo", 0 )
 GAME( 1984, starforc, 0,        senjyo,  starforc, starforc, ROT90, "Tehkan", "Star Force", 0 )
 GAME( 1984, starfore, starforc, senjyo,  starforc, starfore, ROT90, "Tehkan", "Star Force (encrypted)", 0 )
 GAME( 1984, starforb, starforc, starforb,starforc, starfore, ROT90, "[Tehkan] (bootleg)", "Star Force (encrypted, bootleg)", 0 )
+GAME( 1984, starfora, starforc, starforb,starforc, starfora, ROT90, "Tehkan", "Star Force (encrypted, set 2)", GAME_NOT_WORKING ) // another bootleg?
 GAME( 1985, megaforc, starforc, senjyo,  starforc, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", 0 )
 GAME( 1986, baluba,   0,        senjyo,  baluba,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu", GAME_IMPERFECT_COLORS )

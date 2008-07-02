@@ -4398,6 +4398,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( starforc )	/* (c) 1984 Tehkan */
 	DRIVER( starfore )	/* (c) 1984 Tehkan */
 	DRIVER( starforb )	/* (c) 1984 Tehkan */
+	DRIVER( starfora )	/* (c) 1984 Tehkan */
 	DRIVER( megaforc )	/* (c) 1985 Tehkan + Video Ware license */
 	DRIVER( baluba )	/* (c) 1986 Able Corp. */
 	DRIVER( bombjack )	/* (c) 1984 Tehkan */
