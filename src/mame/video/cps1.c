@@ -1267,6 +1267,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"punisher", CPS_B_21_QS3, mapper_PS63B },
 	{"punishru", CPS_B_21_QS3, mapper_PS63B },
 	{"punishrj", CPS_B_21_QS3, mapper_PS63B },
+	{"punipic",  CPS_B_21_QS3, mapper_PS63B },
 	{"slammast", CPS_B_21_QS4, mapper_MB63B },
 	{"slammasu", CPS_B_21_QS4, mapper_MB63B },
 	{"mbomberj", CPS_B_21_QS4, mapper_MB63B },
