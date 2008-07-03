@@ -413,6 +413,7 @@ static void reset_id_to_outname_cache(void)
 	{
 		id_map_entry *temp = idmaplist;
 		idmaplist = temp->next;
+		free((void*)temp->name);
 		free(temp);
 	}
 }
