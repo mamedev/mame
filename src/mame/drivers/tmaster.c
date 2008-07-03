@@ -13,12 +13,12 @@ Sound:  OKI6295
 
 Input:  Microtouch touch screen
 Other:  Dallas NVRAM + optional RTC
-To Do:
 
-- Coin optics
-- Correct sound banking
-- Proper protection emulation in tm4k and later games (where is DS1204 mapped?)
-- Find cause and fix hang in Solitaire Erotic (all Touchmaster version hang in this game)
+To Do:
+ - Coin optics
+ - Correct sound banking
+ - Proper protection emulation in tm4k and later games (where is DS1204 mapped?)
+ - Find cause and fix hang in Solitaire Erotic (all Touchmaster version hang in this game)
 
 To be dumped and added:
 
@@ -34,7 +34,7 @@ Touch Master 8000 *
    IE: Touch Master 8000 chips can update any Touch Master mainboard 2000 through 7000
   Each version (IE: 2000, 3000, 7000 ect) has different girls for Strip Poker ;-)
 
-Touch Master 8000 part lists:
+Touch Master 8000 part lists (from service bulletin):
 
 A-5343-60194-3  U8  Sound
 A-5343-60194-2  U51 Program code
@@ -47,8 +47,7 @@ A-5343-60194-8  U40 Graphics
 A-5343-60194-9  U41 Graphics
 A-21657-007     Security Key
 
-Known Versions not dumped:
-  Touch Master 8000 V9.04 (from service bulletin)
+The above set is an undumped alternate set, maybe a Euro or special version.
 
 +---------------------------------------------------------------+
 |  W24257AK                          GRAPHICS.U37  GRAPHICS.U39 |
@@ -61,7 +60,7 @@ Known Versions not dumped:
 |                                                               |
 |  DS1225AB.U62                      XC3042A     W241024AJ (x2) |
 |                                                               |
-|   8.664MHZ  24MHz                              W241024AJ (x2) |
+|   3.664MHZ  24MHz                              W241024AJ (x2) |
 | SCN68681       CY7C128A       SOUND.U8    32MHz               |
 |     LED2 LED1  CY7C128A                                       |
 |    U62                              M6295                     |
@@ -1046,6 +1045,7 @@ tm5k_sound.u8              7.0  Audio Program & sounds          F474
 J12 DALLAS DS1204V         N/A  Security Key (required for this Version) - Labeled A-21657-004
 -----------------------------------------------------------------------------------
 
+* EPROM versions are labeled with white labels
 
 ***************************************************************************/
 
@@ -1129,6 +1129,51 @@ ROM_START( tm7ka )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) // Samples
 	ROM_LOAD( "tm7k_sound.u8", 0x00000, 0x100000, CRC(c6070a60) SHA1(2dc20bf2217a36374b5a691133ad43f53dbe29ca) ) /* Labeled SOUND U8  8.0 (orange label) */
+ROM_END
+
+/***************************************************************************
+
+Touchmaster 8000
+by Midway (c) 2000
+touchscreen game
+
+All chips are ST M27C801 (some kits/upgrades used mask roms)
+---------------------------
+
+Name Board Location        Version               Use                      Checksum
+-----------------------------------------------------------------------------------
+tm8k_v904.u51              9.04 Game Program & Cpu instructions D40F
+tm8k_v904.u52              9.04 Game Program & Cpu instructions 53B2
+
+tm8k_graphic.u36           9.0  Video Images & Graphics         AD8D
+tm8k_graphic.u37           9.0  Video Images & Graphics         AF83
+tm8k_graphic.u38           9.0  Video Images & Graphics         6BCF
+tm8k_graphic.u39           9.0  Video Images & Graphics         C8A6
+tm8k_graphic.u40           9.0  Video Images & Graphics         B8C7
+tm8k_graphic.u41           9.0  Video Images & Graphics         EF93
+tm8k_sound.u8              9.0  Audio Program & sounds          F474 (same as TM5K & TM7K)
+
+J12 DALLAS DS1204V         N/A  Security Key (required for this Version) - Labeled A-21657-007
+-----------------------------------------------------------------------------------
+
+
+***************************************************************************/
+
+ROM_START( tm8k )
+	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "tm8k_v904.u51", 0x000000, 0x100000, CRC(28864ec8) SHA1(e703f9ee350dd915102e784bbd04445a95b7d0a5) ) /* TOUCHMASTER 8000 U51 DOMESTIC 9.04 (Standard 04/25/00) */
+	ROM_LOAD16_BYTE( "tm8k_v904.u52", 0x000001, 0x100000, CRC(c123eec2) SHA1(3e9c84755b18a4fd900068f385ee47107771391d) ) /* TOUCHMASTER 8000 U52 DOMESTIC 9.04 (Standard 04/25/00) */
+
+	ROM_REGION( 0x600000, REGION_GFX1, 0 )	// Blitter gfx
+	ROM_LOAD16_BYTE( "tm8k_graphic.u38", 0x000000, 0x100000, CRC(2a971d46) SHA1(6ca4067e9fa40053df415e670b2e853915319dbb) ) /* Mask rom labeled 5341-16513-07 U38 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm8k_graphic.u36", 0x000001, 0x100000, CRC(3bde285e) SHA1(87bf60034665542fb0240b7479adfffb7ba9fad7) ) /* Mask rom labeled 5341-16513-06 U36 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm8k_graphic.u39", 0x200000, 0x100000, CRC(58c6c1d8) SHA1(cc11863c4ea46bde7ea4775075f4328be6d6c6d1) ) /* Mask rom labeled 5341-16513-05 U39 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm8k_graphic.u37", 0x200001, 0x100000, CRC(c0992f7a) SHA1(e4e1ef2414f2f0a784c775f39123122c08950403) ) /* Mask rom labeled 5341-16513-04 U37 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm8k_graphic.u41", 0x400000, 0x100000, CRC(d8bdb82e) SHA1(9bdee261591ccff8a57c5454644f84f8992f614f) ) /* Mask rom labeled 5341-16513-09 U41 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm8k_graphic.u40", 0x400001, 0x100000, CRC(0c3d6347) SHA1(7ef19018c180abf412a8ff9f278b00c2b4321cc2) ) /* Mask rom labeled 5341-16513-08 U40 VIDEO IMAGE */
+
+	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) // Samples
+	ROM_LOAD( "tm8k_sound.u8", 0x00000, 0x100000, CRC(c6070a60) SHA1(2dc20bf2217a36374b5a691133ad43f53dbe29ca) ) /* Mask rom labeled 5341-16513-03 U8 SOUND */
 ROM_END
 
 /***************************************************************************
@@ -1278,6 +1323,29 @@ Protection starts:
 
 }
 
+static DRIVER_INIT( tm8k )
+{
+	UINT16 *ROM = (UINT16 *)memory_region( machine, REGION_CPU1 );
+
+	// protection
+	ROM[0x78b70/2] = 0x4e75;
+
+	ROM[0x78b40/2] = 0x6004;
+	ROM[0x78b68/2] = 0x6002;
+/*
+Protection starts:
+
+ 78B2E: addi.w  #$76c, D0       0640 076C
+ 78B32: move.w  D0, $206FC2.l   33C0 0020 6FC2
+ 78B38: moveq   #$f, D0         700F
+ 78B3A: and.w   (A4), D0        C054
+ 78B3C: cmpi.w  #$3, D0         0C40 0003
+ 78B40: bcs     $78B46          6504          <-- First patch goes here
+
+*/
+
+}
+
 static DRIVER_INIT( galgames )
 {
 	UINT8 *ROM = memory_region(machine, REGION_CPU1);
@@ -1296,4 +1364,5 @@ GAME( 1998, tm4k,     0,    tm3k,     tmaster,  tm4k,     ROT0, "Midway",       
 GAME( 1998, tm5k,     0,    tm3k,     tmaster,  tm5k,     ROT0, "Midway",                         "Touchmaster 5000 (v7.10 Standard)",  0 )
 GAME( 1999, tm7k,     0,    tm3k,     tmaster,  tm7k,     ROT0, "Midway",                         "Touchmaster 7000 (v8.04 Standard)",  0 )
 GAME( 1999, tm7ka,    tm7k, tm3k,     tmaster,  tm7ka,    ROT0, "Midway",                         "Touchmaster 7000 (v8.00 Standard)",  0 )
+GAME( 1999, tm8k,     0,    tm3k,     tmaster,  tm8k,     ROT0, "Midway",                         "Touchmaster 8000 (v9.04 Standard)",  0 )
 GAME( 1998, galgbios, 0,    galgames, galgames, galgames, ROT0, "Creative Electonics & Software", "Galaxy Games (BIOS v1.90)", GAME_IS_BIOS_ROOT )
