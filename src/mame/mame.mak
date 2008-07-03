@@ -1309,6 +1309,7 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/exzisus.o $(VIDEO)/exzisus.o \
 	$(DRIVERS)/fgoal.o $(VIDEO)/fgoal.o \
 	$(DRIVERS)/flstory.o $(MACHINE)/flstory.o $(VIDEO)/flstory.o \
+	$(DRIVERS)/galastrm.o $(VIDEO)/galastrm.o \
 	$(DRIVERS)/gladiatr.o $(VIDEO)/gladiatr.o \
 	$(DRIVERS)/grchamp.o $(AUDIO)/grchamp.o $(VIDEO)/grchamp.o \
 	$(DRIVERS)/groundfx.o $(VIDEO)/groundfx.o \

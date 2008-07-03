@@ -1714,6 +1714,7 @@ const game_driver * const drivers[] =
 	DRIVER( wgpjoy )	/* C32 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( wgpjoya )	/* C32 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( wgp2 )		/* C73 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( galastrm )	/* C99 (c) 1992 Taito Corporation */
 	DRIVER( slapshot )	/* D71 (c) 1994 Taito Corporation (Japan) */
 	DRIVER( opwolf3 )	/* D74 (c) 1994 Taito */
 	DRIVER( opwolf3u )	/* D74 (c) 1994 Taito */
