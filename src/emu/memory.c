@@ -787,7 +787,7 @@ static void memory_exit(running_machine *machine)
 void memory_set_context(int activecpu)
 {
 	addrspace_data *space;
-	
+
 	/* remember dynamic RAM/ROM */
 	if (activecpu == -1)
 		activecpu = cur_context;

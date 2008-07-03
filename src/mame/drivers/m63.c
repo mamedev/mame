@@ -1,7 +1,7 @@
 /***************************************************************************
 
-	Irem M63 hardware
-	
+    Irem M63 hardware
+
 ****************************************************************************
 
 Wily Tower              (c) 1984 Irem
@@ -13,7 +13,7 @@ driver by Nicola Salmoria
 PCB Layout (based on Atomic Boy PCB)
 ------------------------------------
 
-Both boards has etched NANAO logo. 
+Both boards has etched NANAO logo.
 They (Eizo Nanao Corporation) own Irem Software Engineering.
 
 

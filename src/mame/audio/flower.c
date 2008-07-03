@@ -27,7 +27,7 @@ typedef struct
 	UINT8 oneshot;
 	UINT8 oneshotplaying;
 	UINT16 rom_offset;
-	
+
 } sound_channel;
 
 
@@ -189,12 +189,12 @@ void * flower_sh_start(int clock, const struct CustomSound_interface *config)
 	for (i = 0; i < num_voices; i++)
 	{
 		voice = &channel_list[i];
-		
+
 		voice->frequency = 0;
 		voice->volume = 0;
 		voice->counter = 0;
 		voice->rom_offset = 0;
-		
+
 		state_save_register_item("flower_custom", i+1, voice->frequency);
 		state_save_register_item("flower_custom", i+1, voice->counter);
 		state_save_register_item("flower_custom", i+1, voice->volume);

@@ -234,7 +234,7 @@ static INPUT_PORTS_START( hasamu )
 	/* Coin Mode 1 */
 	IREM_COIN_MODE_1_NEW_HIGH
 	/* Coin Mode 2, not supported yet */
-//	IREM_COIN_MODE_2
+//  IREM_COIN_MODE_2
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dynablst )
@@ -278,7 +278,7 @@ static INPUT_PORTS_START( dynablst )
 	/* Coin Mode 1 */
 	IREM_COIN_MODE_1_NEW_HIGH
 	/* Coin Mode 2, not supported yet */
-//	IREM_COIN_MODE_2
+//  IREM_COIN_MODE_2
 
 	IREM_JOYSTICKS_3_4
 INPUT_PORTS_END
@@ -340,7 +340,7 @@ static INPUT_PORTS_START( dynablsb )
 	/* Coin Mode 1 */
 	IREM_COIN_MODE_1_NEW_HIGH
 	/* Coin Mode 2, not supported yet */
-//	IREM_COIN_MODE_2
+//  IREM_COIN_MODE_2
 
 	IREM_JOYSTICKS_3_4
 INPUT_PORTS_END
@@ -397,7 +397,7 @@ static INPUT_PORTS_START( bombrman ) /* Does not appear to support 4 players or 
 	/* Coin Mode 1 */
 	IREM_COIN_MODE_1_NEW_HIGH
 	/* Coin Mode 2, not supported yet */
-//	IREM_COIN_MODE_2
+//  IREM_COIN_MODE_2
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bbmanw )
@@ -441,7 +441,7 @@ static INPUT_PORTS_START( bbmanw )
 	/* Coin Mode 1 */
 	IREM_COIN_MODE_1_NEW_HIGH
 	/* Coin Mode 2, not supported yet */
-//	IREM_COIN_MODE_2
+//  IREM_COIN_MODE_2
 
 	IREM_JOYSTICKS_3_4
 INPUT_PORTS_END
@@ -514,7 +514,7 @@ static INPUT_PORTS_START( quizf1 )
 	/* Coin Mode 1 */
 	IREM_COIN_MODE_1_NEW_HIGH
 	/* Coin Mode 2, not supported yet */
-//	IREM_COIN_MODE_2
+//  IREM_COIN_MODE_2
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( matchit2 )
@@ -581,7 +581,7 @@ static INPUT_PORTS_START( matchit2 )
 	/* Coin Mode 1 */
 	IREM_COIN_MODE_1_NEW_HIGH
 	/* Coin Mode 2, not supported yet */
-//	IREM_COIN_MODE_2
+//  IREM_COIN_MODE_2
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( shisen2 )
@@ -650,7 +650,7 @@ static INPUT_PORTS_START( shisen2 )
 	/* Coin Mode 1 */
 	IREM_COIN_MODE_1_NEW_HIGH
 	/* Coin Mode 2, not supported yet */
-//	IREM_COIN_MODE_2
+//  IREM_COIN_MODE_2
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( riskchal )
@@ -695,7 +695,7 @@ static INPUT_PORTS_START( riskchal )
 	/* Coin Mode 1 */
 	IREM_COIN_MODE_1_NEW_HIGH
 	/* Coin Mode 2, not supported yet */
-//	IREM_COIN_MODE_2
+//  IREM_COIN_MODE_2
 INPUT_PORTS_END
 
 /*****************************************************************************/

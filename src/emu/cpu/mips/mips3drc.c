@@ -1634,7 +1634,7 @@ static void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *
 {
 	compiler_state compiler_temp = *compiler;
 	UINT32 op = *desc->opptr.l;
-	
+
 	/* fetch the target register if dynamic, in case it is modified by the delay slot */
 	if (desc->targetpc == BRANCH_TARGET_DYNAMIC)
 		UML_MOV(block, MEM(&mips3->impstate->jmpdest), R32(RSREG));					// mov     [jmpdest],<rsreg>

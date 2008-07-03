@@ -898,7 +898,7 @@ static void dcs_register_state(void)
 
 	if (dcs_sram != NULL)
 		state_save_register_global_pointer(dcs_sram, 0x8000*4 / sizeof(dcs_sram[0]));
-	
+
 	if (dcs.rev == 2)
 		state_save_register_postload(Machine, sdrc_postload, NULL);
 }

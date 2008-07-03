@@ -3,7 +3,7 @@ King Of Football (c)1995 BMC
 
 preliminary driver by Tomasz Slanina
 
--- 
+--
 
 MC68000P10
 M28 (OKI 6295, next to rom C9)
@@ -102,10 +102,10 @@ static READ16_HANDLER(prot_r)
 	{
 		case 0x0000: return 0x0d00;
 		case 0xff00: return 0x8d00;
-			
+
 		case 0x8000: return 0x0f0f;
 	}
-	
+
 	logerror("unk prot r %x %x\n",prot_data, 	activecpu_get_previouspc());
 	return mame_rand(machine);
 }
@@ -130,20 +130,20 @@ static WRITE16_HANDLER(bmc_2_videoram_w)
 static ADDRESS_MAP_START( koftball_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x220000, 0x22ffff) AM_RAM AM_BASE(&main_ram)
-	
+
 	AM_RANGE(0x260000, 0x260fff) AM_WRITE(bmc_1_videoram_w) AM_BASE(&bmc_1_videoram)
 	AM_RANGE(0x261000, 0x261fff) AM_WRITE(bmc_2_videoram_w) AM_BASE(&bmc_2_videoram)
 	AM_RANGE(0x262000, 0x26ffff) AM_RAM
-	
+
 	AM_RANGE(0x280000, 0x28ffff) AM_RAM /* unused ? */
 	AM_RANGE(0x2a0000, 0x2a001f) AM_WRITENOP
-	AM_RANGE(0x2a0000, 0x2a001f) AM_READ(random_number_r) 
+	AM_RANGE(0x2a0000, 0x2a001f) AM_READ(random_number_r)
 	AM_RANGE(0x2b0000, 0x2b0003) AM_READ(random_number_r)
 	AM_RANGE(0x2d8000, 0x2d8001) AM_READ(random_number_r)
 	/*sound chip or mcu comm ? maybe just i/o (offset 0xe=lamps?)*/
 	AM_RANGE(0x2da000, 0x2da001) AM_WRITENOP /* offset ? */
 	AM_RANGE(0x2da002, 0x2da003) AM_WRITENOP /* data ? */
-	
+
 	AM_RANGE(0x2db000, 0x2db001) AM_WRITE(bmc_RAMDAC_offset_w)
 	AM_RANGE(0x2db002, 0x2db003) AM_READWRITE(bmc_RAMDAC_color_r, bmc_RAMDAC_color_w)
 	AM_RANGE(0x2db004, 0x2db005) AM_WRITENOP
@@ -157,7 +157,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( koftball )
-	PORT_START	
+	PORT_START
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER )	PORT_NAME("info") PORT_CODE(KEYCODE_Z)//info page
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER )	PORT_NAME("test2") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER )	PORT_NAME("dec") PORT_CODE(KEYCODE_C)//dec sound test
@@ -166,7 +166,7 @@ static INPUT_PORTS_START( koftball )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER )	PORT_NAME("test6") PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER )	PORT_NAME("test7") PORT_CODE(KEYCODE_M)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER )	PORT_NAME("test8") PORT_CODE(KEYCODE_A) //test mode exit
-	
+
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER )	PORT_NAME("BET") PORT_CODE(KEYCODE_S) //bet ?
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER )	PORT_NAME("test12") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER )	PORT_NAME("test13") PORT_CODE(KEYCODE_F)
@@ -268,7 +268,7 @@ static const UINT16 nvram[]=
 	0xffff
 };
 
-#endif	
+#endif
 static DRIVER_INIT(koftball)
 {
 	colorram=auto_malloc(768);
@@ -282,7 +282,7 @@ static DRIVER_INIT(koftball)
 			++offset;
 		}
 	}
-#endif	
+#endif
 }
 
 GAME( 1995, koftball,    0, koftball,    koftball,    koftball, ROT0,  "BMC", "King of Football", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

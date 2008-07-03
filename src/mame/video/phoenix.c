@@ -204,7 +204,7 @@ VIDEO_START( phoenix )
 	state_save_register_global(videoram_pg_index);
 	state_save_register_global(palette_bank);
 	state_save_register_global(cocktail_mode);
-	
+
 	/* some more candidates */
 	pleiads_protection_question = 0;
 	survival_protection_value = 0;

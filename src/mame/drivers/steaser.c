@@ -28,7 +28,7 @@ ROMs
 1x M27C4001 (u18.7)(sound)
 
 
-2008.07.01 - Tomasz Slanina - preliminary gfx blitter emulation 
+2008.07.01 - Tomasz Slanina - preliminary gfx blitter emulation
 
 TODO:
 - fix blitter writes (missing fill ?)
@@ -57,13 +57,13 @@ static WRITE16_HANDLER(blitter_9b8000_w)
 	int h = video_screen_get_height(machine->primary_screen);
 	int x,y;
 	UINT16 pix;
-	
+
 	int x0=(data_9a8000&0xff)<<1;
 	int y0=data_9a8000>>8;
 	int dx=data_9b0000&0xff;
 	int dy=((data_9b0000>>8)^0xff)+1;
 	UINT32 of=data_998000|(data_9a0000<<8);
-	
+
 	if(of==0)
 	{
 		fillbitmap(tmpbitmap,get_black_pen(machine),0);
@@ -74,10 +74,10 @@ static WRITE16_HANDLER(blitter_9b8000_w)
 	{
 		dx=0x100;
 	}
-	
+
 	dx<<=1;
 
-#if 0	
+#if 0
 	printf("[%x] %x blit %x -> %x,%x  (%x*%x ) [%x] %x - %.4x %.4x - %.4x - %.4x\n",data,activecpu_get_pc(),of,x0,y0,dx,dy,data_9b0000,data_9a8000,data_9a0000,data_998000,data_990000,data_988000);
 #endif
 
@@ -88,20 +88,20 @@ static WRITE16_HANDLER(blitter_9b8000_w)
 			if(of<len && y+y0<h && x+x0<w)
 			{
 				pix=*(rom+of);
-				
+
 				if(pix==0)
 				{
-					pix=0x100; //dirty hack 
+					pix=0x100; //dirty hack
 				}
-				
-		
+
+
 				{
 					*BITMAP_ADDR16(tmpbitmap, y+y0, x+x0) = pix;
 				}
 			}
 			++of;
 		}
-	}	
+	}
 }
 
 
@@ -137,12 +137,12 @@ static WRITE16_HANDLER(unk_w)
 	switch(activecpu_get_pc())
 	{
 		case 0x1348: mainram[0x00932/2]=0xffff; break; //dirt way to exit loop
-/*		case 0x16ce:
-		{
-			int addr=(activecpu_get_reg(M68K_D2)+0x089c)>>1;
-			mainram[addr&0x7fff]=0xffff;//mame_rand(machine);
-		}
-		break;*/
+/*      case 0x16ce:
+        {
+            int addr=(activecpu_get_reg(M68K_D2)+0x089c)>>1;
+            mainram[addr&0x7fff]=0xffff;//mame_rand(machine);
+        }
+        break;*/
 	}
 }
 
@@ -198,8 +198,8 @@ static ADDRESS_MAP_START( steaser_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_READ( steaser_bd0000_r )
 	AM_RANGE(0x880000, 0x880001) AM_READ( steaser_bd0000_r )
 	AM_RANGE(0x840000, 0x840001) AM_WRITE(mcu_w)
-//	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITENOP
-//	AM_RANGE(0x900000, 0x900003) AM_RAM
+//  AM_RANGE(0x8c0000, 0x8c0001) AM_WRITENOP
+//  AM_RANGE(0x900000, 0x900003) AM_RAM
 
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(color_offset_w)
 	AM_RANGE(0x900002, 0x900003) AM_WRITE(color_data_w)
@@ -225,13 +225,13 @@ INPUT_PORTS_END
 static INTERRUPT_GEN( steaser_irq )
 {
 	int num=cpu_getiloops()+3;
-	cpunum_set_input_line(machine, 0, num, HOLD_LINE); 
+	cpunum_set_input_line(machine, 0, num, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( steaser )
 	MDRV_CPU_ADD_TAG("main", M68000, 11059200 )
 	MDRV_CPU_PROGRAM_MAP(steaser_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(steaser_irq,4)  
+	MDRV_CPU_VBLANK_INT_HACK(steaser_irq,4)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

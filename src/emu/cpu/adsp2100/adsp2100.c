@@ -977,7 +977,7 @@ static int adsp2100_execute(int cycles)
 				adsp2100.pc++;
 			}
 		}
-		
+
 		/* parse the instruction */
 		switch (op >> 16)
 		{

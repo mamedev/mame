@@ -2021,13 +2021,13 @@ sw6 - ON= enable player2 move left   OFF= disabled
 sw7 - ON= enable player2 fire/shoot  OFF= disabled
 sw8 - not used/unknown
 --------------------------------------------------------------------------
-		1	2	3	4	5	6	7	8
+        1   2   3   4   5   6   7   8
 --------------------------------------------------------------------------
 # of player ships
-- 3 ships	on	on
-- 4 ships	off	on
-- 5 ships	on	off
-- 6 ships	off	off
+- 3 ships   on  on
+- 4 ships   off on
+- 5 ships   on  off
+- 6 ships   off off
 
 
 Maximum Credits= 9

@@ -273,7 +273,7 @@
 
     This is the most famous game from Cal Omega 903 System. In the test mode you can see
     the name "Gaming Draw Poker", but in the manual figure as "Casino Poker". Also in some
-    game lists you can see it with another name: "Arcade Poker". 
+    game lists you can see it with another name: "Arcade Poker".
 
     The game uses the same GFX set that Jack Potten's Poker for cards and has similar
     layout, but the game is different and the old discrete pitched sounds were replaced
@@ -621,7 +621,7 @@
 #include "machine/6850acia.h"
 #include "sound/ay8910.h"
 
-#include "deprecat.h" 
+#include "deprecat.h"
 
 
 /* UART */
@@ -1610,12 +1610,12 @@ GFXDECODE_END
    Pin |  Description   | Wired to
   -----+----------------+--------------------------
    01  |      VSS       | GND
-   02  | Port A - bit 0 | U43 (4N23, multiplexer) 
-   03  | Port A - bit 1 | U44 (4N23, multiplexer) 
-   04  | Port A - bit 2 | U45 (4N23, multiplexer) 
-   05  | Port A - bit 3 | U46 (4N23, multiplexer) 
-   06  | Port A - bit 4 | U47 (4N23, multiplexer) 
-   07  | Port A - bit 5 | U48 (4N23, multiplexer) 
+   02  | Port A - bit 0 | U43 (4N23, multiplexer)
+   03  | Port A - bit 1 | U44 (4N23, multiplexer)
+   04  | Port A - bit 2 | U45 (4N23, multiplexer)
+   05  | Port A - bit 3 | U46 (4N23, multiplexer)
+   06  | Port A - bit 4 | U47 (4N23, multiplexer)
+   07  | Port A - bit 5 | U48 (4N23, multiplexer)
    08  | Port A - bit 6 | SW1-5 (settings)
    09  | Port A - bit 7 | U80 (4023B)
    10  | Port B - bit 0 | U55 (MCT6) ---> L1
@@ -1634,14 +1634,14 @@ GFXDECODE_END
    23  |      CS2       | I/O
    24  |      CS1       | +5V
    25  |       E        | 02 (= CPU clock)
-   26  |  Data Bus D7   | D7 
-   27  |  Data Bus D6   | D6 
-   28  |  Data Bus D5   | D5 
-   29  |  Data Bus D4   | D4 
-   30  |  Data Bus D3   | D3 
-   31  |  Data Bus D2   | D2 
-   32  |  Data Bus D1   | D1 
-   33  |  Data Bus D0   | D0 
+   26  |  Data Bus D7   | D7
+   27  |  Data Bus D6   | D6
+   28  |  Data Bus D5   | D5
+   29  |  Data Bus D4   | D4
+   30  |  Data Bus D3   | D3
+   31  |  Data Bus D2   | D2
+   32  |  Data Bus D1   | D1
+   33  |  Data Bus D0   | D0
    34  |      RES       | RES
    35  |      RS1       | A1
    36  |      RS0       | A0
@@ -1692,14 +1692,14 @@ static const pia6821_interface sys903_pia0_intf =
    23  |      CS2       | I/O
    24  |      CS1       | +5V
    25  |       E        | 02 (= CPU clock)
-   26  |  Data Bus D7   | D7 
-   27  |  Data Bus D6   | D6 
-   28  |  Data Bus D5   | D5 
-   29  |  Data Bus D4   | D4 
-   30  |  Data Bus D3   | D3 
-   31  |  Data Bus D2   | D2 
-   32  |  Data Bus D1   | D1 
-   33  |  Data Bus D0   | D0 
+   26  |  Data Bus D7   | D7
+   27  |  Data Bus D6   | D6
+   28  |  Data Bus D5   | D5
+   29  |  Data Bus D4   | D4
+   30  |  Data Bus D3   | D3
+   31  |  Data Bus D2   | D2
+   32  |  Data Bus D1   | D1
+   33  |  Data Bus D0   | D0
    34  |      RES       | RES
    35  |      RS1       | A1
    36  |      RS0       | A0
@@ -1726,12 +1726,12 @@ static const pia6821_interface sys903_pia1_intf =
    Pin |  Description   | Wired to
   -----+----------------+--------------------------
    01  |      VSS       | GND
-   02  | Port A - bit 0 | U45 (4N23, multiplexer) 
-   03  | Port A - bit 1 | U45 (4N23, multiplexer) 
-   04  | Port A - bit 2 | U46 (4N23, multiplexer) 
-   05  | Port A - bit 3 | U46 (4N23, multiplexer) 
-   06  | Port A - bit 4 | U47 (4N23, multiplexer) 
-   07  | Port A - bit 5 | U47 (4N23, multiplexer) 
+   02  | Port A - bit 0 | U45 (4N23, multiplexer)
+   03  | Port A - bit 1 | U45 (4N23, multiplexer)
+   04  | Port A - bit 2 | U46 (4N23, multiplexer)
+   05  | Port A - bit 3 | U46 (4N23, multiplexer)
+   06  | Port A - bit 4 | U47 (4N23, multiplexer)
+   07  | Port A - bit 5 | U47 (4N23, multiplexer)
    08  | Port A - bit 6 | U61 (4023B) --> U57 (556, pin 5) [50/60]
    09  | Port A - bit 7 | U57 (556, pin 2) --> SW to GND   [50/60]
    10  | Port B - bit 0 | U49 (MCT6) ---> L1
@@ -1750,14 +1750,14 @@ static const pia6821_interface sys903_pia1_intf =
    23  |      CS2       | I/O
    24  |      CS1       | +5V
    25  |       E        | 02 (= CPU clock)
-   26  |  Data Bus D7   | D7 
-   27  |  Data Bus D6   | D6 
-   28  |  Data Bus D5   | D5 
-   29  |  Data Bus D4   | D4 
-   30  |  Data Bus D3   | D3 
-   31  |  Data Bus D2   | D2 
-   32  |  Data Bus D1   | D1 
-   33  |  Data Bus D0   | D0 
+   26  |  Data Bus D7   | D7
+   27  |  Data Bus D6   | D6
+   28  |  Data Bus D5   | D5
+   29  |  Data Bus D4   | D4
+   30  |  Data Bus D3   | D3
+   31  |  Data Bus D2   | D2
+   32  |  Data Bus D1   | D1
+   33  |  Data Bus D0   | D0
    34  |      RES       | RES
    35  |      RS1       | A1
    36  |      RS0       | A0
@@ -1808,14 +1808,14 @@ static const pia6821_interface sys905_pia0_intf =
    23  |      CS2       | I/O
    24  |      CS1       | +5V
    25  |       E        | 02 (= CPU clock)
-   26  |  Data Bus D7   | D7 
-   27  |  Data Bus D6   | D6 
-   28  |  Data Bus D5   | D5 
-   29  |  Data Bus D4   | D4 
-   30  |  Data Bus D3   | D3 
-   31  |  Data Bus D2   | D2 
-   32  |  Data Bus D1   | D1 
-   33  |  Data Bus D0   | D0 
+   26  |  Data Bus D7   | D7
+   27  |  Data Bus D6   | D6
+   28  |  Data Bus D5   | D5
+   29  |  Data Bus D4   | D4
+   30  |  Data Bus D3   | D3
+   31  |  Data Bus D2   | D2
+   32  |  Data Bus D1   | D1
+   33  |  Data Bus D0   | D0
    34  |      RES       | RES
    35  |      RS1       | A1
    36  |      RS0       | A0
@@ -2011,8 +2011,8 @@ ROM_START( comg079 )	/* Cal Omega v7.9 (Arcade Poker) */
 	ROM_LOAD( "07-91.u5",	0x1800, 0x0800, CRC(da415c27) SHA1(be42f1d36579ff8fafd6df4e30a64a6141a7a2ae) )
 	ROM_LOAD( "07-92.u6",	0x2000, 0x0800, CRC(31211ed3) SHA1(799bc4ca77ee01a4d45320263e4cc2d066ec26e5) )
 
- /* code jumps to $2e64 where there's an inexistent mnemonic 0x32! (kill). 
-    also writes to $axxx (inexistent) and $08fx-$09xx (supposed to be $0880-$0881).  
+ /* code jumps to $2e64 where there's an inexistent mnemonic 0x32! (kill).
+    also writes to $axxx (inexistent) and $08fx-$09xx (supposed to be $0880-$0881).
  */
 	ROM_LOAD( "07-93.u7",	0x2800, 0x0800, BAD_DUMP CRC(52c84b9c) SHA1(569d6384b9084a11fe84e291f1c165bc0df3ab49) )
 	ROM_LOAD( "07-94.u8",	0x3000, 0x0800, CRC(ed0e7d4a) SHA1(72f512ca2da573e4571ca6f164fb055daa26dd3c) )

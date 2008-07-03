@@ -2235,7 +2235,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( contcirc )
 	PORT_START_TAG("DSW1") /* DSW A */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1") 
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW A:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, "Cockpit" )	// analogue accelerator pedal
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -2727,9 +2727,9 @@ static INPUT_PORTS_START( aquajack )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW B:7" ) /* Dip 7 shown as "Do Not Touch" in manuals */
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW B:8" ) /* Dip 8 */
 	/* The previous taito_z.c said ---
-		The Romstar (US version) manual list this as "Endless Game" - Has no effect on "World" version
-	   --- , and declared it as unused switch.
-	*/
+        The Romstar (US version) manual list this as "Endless Game" - Has no effect on "World" version
+       --- , and declared it as unused switch.
+    */
 	/* PORT_DIPNAME( 0x01, 0x01, "Endless Game" ) PORT_DIPLOCATION("SW B:8") */
 	/* PORT_DIPSETTING(    0x01, "Normal Game" ) */
 	/* PORT_DIPSETTING(    0x00, "Endless Game" ) */

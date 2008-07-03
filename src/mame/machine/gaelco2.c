@@ -204,11 +204,11 @@ INTERRUPT_GEN( bang_interrupt )
 
 /***************************************************************************
 
-    World Rally 2 analog controls          
+    World Rally 2 analog controls
     - added by Mirko Mattioli <els@fastwebnet.it>
     ---------------------------------------------------------------
     WR2 pcb has two ADC, one for each player. The ADCs have in common
-    the clock signal line (adc_clk) and the chip enable signal line 
+    the clock signal line (adc_clk) and the chip enable signal line
     (adc_cs) and, of course,  two different data out signal lines.
     When "Pot Wheel" option is selected via dip-switch, then the gear
     is enabled (low/high shifter); the gear is disabled in joy mode by

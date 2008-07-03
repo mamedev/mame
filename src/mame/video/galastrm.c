@@ -183,8 +183,8 @@ static void draw_sprites_pre(running_machine *machine, int x_offs, int y_offs)
 			if (sprites_flipscreen)
 			{
 				/* -zx/y is there to fix zoomed sprite coords in screenflip.
-					drawgfxzoom does not know to draw from flip-side of sprites when
-					screen is flipped; so we must correct the coords ourselves. */
+                    drawgfxzoom does not know to draw from flip-side of sprites when
+                    screen is flipped; so we must correct the coords ourselves. */
 
 				curx = 320 - curx - zx;
 				cury = 256 - cury - zy;

@@ -354,7 +354,7 @@ static void compute_debug_flags(running_machine *machine, const debug_cpu_info *
 
 	/* add in the watchpoint flags */
 	machine->debug_flags |= (info->flags & DEBUG_FLAG_WATCHPOINT) >> (24 - 4);
-	
+
 	/* if any of the watchpoint flags are set and we're live, tell the memory system */
 	if (global.livecpu != NULL && ((info->flags & DEBUG_FLAG_WATCHPOINT) != 0))
 		memory_set_context(-1);
@@ -602,8 +602,8 @@ void debug_cpu_instruction_hook(running_machine *machine, offs_t curpc)
 
 
 /*-------------------------------------------------
-    debug_cpu_memory_read_hook - the memory system 
-    calls this hook when watchpoints are enabled 
+    debug_cpu_memory_read_hook - the memory system
+    calls this hook when watchpoints are enabled
     and a memory read happens
 -------------------------------------------------*/
 
@@ -622,8 +622,8 @@ void debug_cpu_memory_read_hook(running_machine *machine, int cpunum, int spacen
 
 
 /*-------------------------------------------------
-    debug_cpu_memory_write_hook - the memory 
-    system calls this hook when watchpoints are 
+    debug_cpu_memory_write_hook - the memory
+    system calls this hook when watchpoints are
     enabled and a memory write happens
 -------------------------------------------------*/
 
@@ -1124,7 +1124,7 @@ static void breakpoint_update_flags(debug_cpu_info *info)
 			info->flags |= DEBUG_FLAG_LIVE_BP;
 			break;
 		}
-	
+
 	/* push the flags out globally */
 	if (global.livecpu != NULL)
 		compute_debug_flags(Machine, global.livecpu);
@@ -1279,7 +1279,7 @@ static void watchpoint_update_flags(debug_cpu_info *info, int spacenum)
 	UINT32 writeflag = DEBUG_FLAG_LIVE_WPW_PROGRAM << spacenum;
 	UINT32 readflag = DEBUG_FLAG_LIVE_WPR_PROGRAM << spacenum;
 	debug_cpu_watchpoint *wp;
-	
+
 	/* if hotspots are enabled, turn on all reads */
 	if (info->hotspots != NULL)
 	{
@@ -1305,7 +1305,7 @@ static void watchpoint_update_flags(debug_cpu_info *info, int spacenum)
 			if ((readflag | writeflag) == 0)
 				break;
 		}
-	
+
 	/* push the flags out globally */
 	if (global.livecpu != NULL)
 		compute_debug_flags(Machine, global.livecpu);
