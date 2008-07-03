@@ -1364,5 +1364,5 @@ GAME( 1998, tm4k,     0,    tm3k,     tmaster,  tm4k,     ROT0, "Midway",       
 GAME( 1998, tm5k,     0,    tm3k,     tmaster,  tm5k,     ROT0, "Midway",                         "Touchmaster 5000 (v7.10 Standard)",  0 )
 GAME( 1999, tm7k,     0,    tm3k,     tmaster,  tm7k,     ROT0, "Midway",                         "Touchmaster 7000 (v8.04 Standard)",  0 )
 GAME( 1999, tm7ka,    tm7k, tm3k,     tmaster,  tm7ka,    ROT0, "Midway",                         "Touchmaster 7000 (v8.00 Standard)",  0 )
-GAME( 1999, tm8k,     0,    tm3k,     tmaster,  tm8k,     ROT0, "Midway",                         "Touchmaster 8000 (v9.04 Standard)",  0 )
+GAME( 2000, tm8k,     0,    tm3k,     tmaster,  tm8k,     ROT0, "Midway",                         "Touchmaster 8000 (v9.04 Standard)",  0 )
 GAME( 1998, galgbios, 0,    galgames, galgames, galgames, ROT0, "Creative Electonics & Software", "Galaxy Games (BIOS v1.90)", GAME_IS_BIOS_ROOT )
