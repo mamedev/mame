@@ -4884,6 +4884,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( btltryst )	/* GX636 (c)1998 */
 	DRIVER( heatof11 )	/* GX703 (c)1998 */
 	DRIVER( evilngt )	/* GX810 (c)1998 */
+	DRIVER( hellngt )	/* GX810 (c)1998 */
 
 	/* Exidy games */
 	DRIVER( carpolo )	/* (c) 1977 */

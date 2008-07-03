@@ -1199,6 +1199,17 @@ ROM_START(evilngt)
 	ROM_LOAD( "m48t58y.u1",  0x000000, 0x001000, CRC(169bb8f4) SHA1(55c0bafab5d309fe69156489186e232aa87ca0dd) )
 ROM_END
 
+ROM_START(hellngt)
+	ROM_REGION64_BE(0x200000, REGION_USER1, 0)	/* boot rom */
+	ROM_LOAD16_WORD("636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b))
+
+	ROM_REGION( 0x1000, REGION_USER2, 0 ) /* timekeeper eeprom */
+	ROM_LOAD( "m48t58y.u1",  0x000000, 0x001000, CRC(169bb8f4) SHA1(55c0bafab5d309fe69156489186e232aa87ca0dd) )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE( "810eaa02", 0, MD5(250a1b9cc2a25aed6c27321dd8f4f8a2) SHA1(d2f48a389f8091e03ada81c255231c7957d1aee3))
+ROM_END
+
 ROM_START(totlvice)
 	ROM_REGION64_BE(0x200000, REGION_USER1, 0)	/* boot rom */
 	ROM_LOAD16_WORD("636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b))
@@ -1215,8 +1226,9 @@ static DRIVER_INIT( m2 )
 	cde_init();
 }
 
-GAME( 1997, polystar, 0, m2, m2, m2, ROT0, "Konami", "Tobe! Polystars (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1997, totlvice, 0, m2, m2, m2, ROT0, "Konami", "Total Vice (ver JAD)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1998, btltryst, 0, m2, m2, m2, ROT0, "Konami", "Battle Tryst (ver JAC)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1998, heatof11, 0, m2, m2, m2, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1998, evilngt,  0, m2, m2, m2, ROT0, "Konami", "Evil Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, polystar, 0,       m2, m2, m2, ROT0, "Konami", "Tobe! Polystars (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, totlvice, 0,       m2, m2, m2, ROT0, "Konami", "Total Vice (ver JAD)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1998, btltryst, 0,       m2, m2, m2, ROT0, "Konami", "Battle Tryst (ver JAC)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1998, heatof11, 0,       m2, m2, m2, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1998, evilngt,  0,       m2, m2, m2, ROT0, "Konami", "Evil Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1998, hellngt,  evilngt, m2, m2, m2, ROT0, "Konami", "Hell Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
