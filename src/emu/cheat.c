@@ -9820,7 +9820,7 @@ static void load_cheat_code_old(running_machine *machine, char *file_name)
 		cheat_format	*format = &cheat_format_table[LOAD_CHEAT_CODE_OLD];
 
 #ifdef MESS
-		if(sscanf(buf, format->format_string, &crc, buffer->name, &cpu, &address, &data, &code, buffer->description, buffer->comment) < format->aruguments_matched) continue;
+		if(sscanf(buf, format->format_string, &crc, buffer->name, &cpu, &address, &data, &code, buffer->description, buffer->comment) < format->arguments_matched) continue;
 #else
 		if(sscanf(buf, format->format_string, buffer->name, &cpu, &address, &data, &code, buffer->description, buffer->comment) < format->arguments_matched) continue;
 #endif
