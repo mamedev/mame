@@ -16,7 +16,7 @@ static UINT8 palette_bank;
 static UINT8 cocktail_mode;
 static UINT8 pleiads_protection_question;
 static UINT8 survival_protection_value;
-static UINT8 survival_sid_value;
+static int survival_sid_value;
 static tilemap *fg_tilemap, *bg_tilemap;
 static UINT8 survival_input_latches[2];
 static UINT8 survival_input_readc;
@@ -437,7 +437,7 @@ READ8_HANDLER( survival_protection_r )
 	return survival_protection_value;
 }
 
-UINT8 survival_sid_callback( void )
+int survival_sid_callback( void )
 {
 	return survival_sid_value;
 }
