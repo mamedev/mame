@@ -4059,6 +4059,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( hikaru ) 	/* BIOS (c)2000 */
 	DRIVER( airtrix )	/* (c) 2000 */
 	DRIVER( pharrier )	/* (c) 2001 */
+	DRIVER( podrace )	/* (c) 2001 */
 
 	DRIVER( hshavoc )	/* (c) 1993 Data East */
 
