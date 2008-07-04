@@ -51,12 +51,14 @@
 #define CURSOR_PAGE_UP(sel)						do { sel -= visible_items; if(sel < 0) sel = 0; } while (0)
 #define CURSOR_PAGE_DOWN(sel, total)			do { sel += visible_items; if(sel >= total) sel = (total - 1); } while (0)
 #define SET_MESSAGE(type)						do { message_timer = DEFAULT_MESSAGE_TIME; message_type = type; } while(0)
+#define CHARACTER_TO_ASTRING(char, astring)		do { astring = astring_alloc(); astring_cpyc(astring, char); } while(0)
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
 #define CHEAT_FILENAME_MAX_LEN					(255)
+#define CHEAT_CODE_MAX_STRINGS_PER_LINE			(255)
 #define CHEAT_MENU_DEPTH						(8)
 #ifdef MESS
 #define DEFAULT_CHEAT_OPTIONS					(0x1FFF8)
@@ -626,7 +628,7 @@ enum{		// error flags
 typedef struct _cheat_action cheat_action;
 struct _cheat_action
 {
-	char			*optional_name;		/* label for label selection or popup */
+	astring			*optional_name;		/* label for label selection or popup */
 
 	UINT32			type;				/* packed several information (cpu/region, address size, operation and parameters and so on) */
 	UINT32			region;				/* the number of cpu or region. in case of cpu, it has a kind of an address space together */
@@ -651,8 +653,8 @@ struct _cheat_action
 typedef struct _cheat_entry cheat_entry;
 struct _cheat_entry
 {
-	char			*name;					/* entry name */
-	char			*comment;				/* simple comment */
+	astring			*name;					/* entry name */
+	astring			*comment;				/* simple comment */
 
 	UINT32			flags;					/* internal flags */
 
@@ -881,7 +883,7 @@ static cheat_format_strings	*format_strings;
 static int					cheat_variable[VARIABLE_MAX_ARRAY] = { 0 };
 
 static UINT32				cheat_options;
-static UINT32				driverSpecifiedFlag;
+static UINT32				cheat_flags;
 static UINT8				vertical_key_repeat_speed;
 static UINT8				horizontal_key_repeat_speed;
 static UINT8				message_type;
@@ -1146,7 +1148,6 @@ static void		request_strings(UINT32 length, UINT32 num_strings, UINT32 main_stri
 static void		init_string_table(void);
 static void		free_string_table(void);
 
-static char		*create_string_copy(char *buf);
 static char		*create_strings_with_edit_cursor(char *buf, int data, int total_digits, INT8 current_cursor);
 
 /********** MENU **********/
@@ -2017,8 +2018,10 @@ void cheat_init(running_machine *machine)
 	watches_disabled	= 0;
 	edit_active			= 0;
 	edit_cursor			= 0;
-	driverSpecifiedFlag	= 0;
 	full_menu_page_height		= visible_items = floor(1.0f / ui_get_line_height()) - 1;
+
+	/* initialize CPU/Region info for cheat system */
+	build_cpu_region_info_list(machine);
 
 	/* allocate huge strings buffer for format */
 	format_strings = malloc(sizeof(cheat_format_strings));
@@ -2032,9 +2035,6 @@ void cheat_init(running_machine *machine)
  	horizontal_key_repeat_speed	= EXTRACT_FIELD(cheat_options, VerticalKeyRepeatSpeed);
 	vertical_key_repeat_speed	= EXTRACT_FIELD(cheat_options, HorizontalKeyRepeatSpeed);
 	load_cheat_database(machine, LOAD_CHEAT_OPTIONS);
-
-	/* initialize CPU/Region info for cheat system */
-	build_cpu_region_info_list(machine);
 
 	/* set cheat list from database */
 	if(TEST_FIELD(cheat_options, LoadNewCode))		load_cheat_database(machine, LOAD_CHEAT_CODE_NEW);
@@ -2075,18 +2075,13 @@ void cheat_init(running_machine *machine)
 	init_cheat_menu_stack();
 
 	{
-		astring * sourceName;
+		astring *source_name = core_filename_extract_base(astring_alloc(), machine->gamedrv->source_file, TRUE);
 
-		sourceName = core_filename_extract_base(astring_alloc(), machine->gamedrv->source_file, TRUE);
+		if(astring_cmpc(source_name, "neodrvr") == 0)	cheat_flags |= 1;
+		if(astring_cmpc(source_name, "cps2") == 0)		cheat_flags |= 2;
+		if(astring_cmpc(source_name, "cps3") == 0)		cheat_flags |= 3;
 
-		if(!strcmp(astring_c(sourceName), "neodrvr"))
-			driverSpecifiedFlag |= 1;
-		else if(!strcmp(astring_c(sourceName), "cps2"))
-			driverSpecifiedFlag |= 2;
-		else if(!strcmp(astring_c(sourceName), "cps3"))
-			driverSpecifiedFlag |= 4;
-
-		astring_free(sourceName);
+		astring_free(source_name);
 	}
 
 	/* NOTE : disable all cheat messages in initializing so that message parameters should be initialized here */
@@ -2163,7 +2158,7 @@ static void cheat_exit(running_machine *machine)
 	menu_item_info_length	= 0;
 	cheat_variable[0]		= 0;
 	cheat_options			= 0;
-	driverSpecifiedFlag		= 0;
+	cheat_flags				= 0;
 	SET_MESSAGE(0);
 }
 
@@ -2364,27 +2359,6 @@ static void free_string_table(void)
 	memset(&menu_strings, 0, sizeof(menu_string_list));
 }
 
-/*-----------------------------------
-  create_string_copy - copy stirng
------------------------------------*/
-
-static char *create_string_copy(char *buf)
-{
-	char *temp = NULL;
-
-	if(buf && buf[0] != 0)
-	{
-		/* allocate memory */
-		size_t length = strlen(buf) + 1;
-		temp = malloc_or_die(length);
-
-		/* copy memory for string */
-		if(temp)
-			memcpy(temp, buf, length);
-	}
-
-	return temp;
-}
 /*-------------------------------------------------------------
   create_strings_with_edit_cursor - strings with edit cursor
 -------------------------------------------------------------*/
@@ -2591,7 +2565,7 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 	}
 
 	/* ##### MENU CONSTRACTION ##### */
-	strings_buf += sprintf(strings_buf, "\t%s\n\t", entry->name);
+	strings_buf += sprintf(strings_buf, "\t%s\n\t", astring_c(entry->name));
 
 	if(edit_active)
 	{
@@ -2814,11 +2788,7 @@ static int user_select_label_menu(running_machine *machine, cheat_menu_stack *me
 
 			continue;
 		}
-		else if(i == entry->selection)
-			sprintf(buf[total], "[ %s ]", entry->action_list[entry->label_index[i]].optional_name);
-		else
-			sprintf(buf[total], "%s", entry->action_list[entry->label_index[i]].optional_name);
-
+		sprintf(buf[total], i == entry->selection ? "[ %s ]" : "%s", astring_c(entry->action_list[entry->label_index[i]].optional_name));
 		menu_item[total] = buf[total];
 		total++;
 	}
@@ -2892,7 +2862,7 @@ static int comment_menu(running_machine *machine, cheat_menu_stack *menu)
 		menu->first_time = 0;
 
 	/********** MENU CONSTRUCTION **********/
-	comment = entry->comment;
+	comment = astring_c(entry->comment);
 	sprintf(buf, "%s\n\t OK ", comment);
 
 	/* print it */
@@ -2934,7 +2904,7 @@ static int extend_comment_menu(running_machine *machine, cheat_menu_stack *menu)
 		/* NOTE : don't display the comment in master code */
 		if(i != 0)
 		{
-			sprintf(buf[total], "%s", action->optional_name);
+			sprintf(buf[total], "%s", astring_c(action->optional_name));
 			menu_item[total] = buf[total];
 			total++;
 		}
@@ -3126,7 +3096,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 {
 	#define ADD_CHEAT_SELECT_MENU_ITEMS(sub_name, request_arrow) \
 				do {	menu_sub_item[total] = sub_name; menu_item_info[total].sub_cheat = i; menu_item_info[total].field_type = request_arrow; \
-						flag_buf[total] = traverse->comment && traverse->comment[0] ? 1 : 0; total++; } while(0)
+						flag_buf[total] = traverse->comment && astring_len(traverse->comment) ? 1 : 0; total++; } while(0)
 
 	int				i;
 	int				do_select		= 0;
@@ -3181,7 +3151,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 			else
 			{
 				/* ##### CODE NAME ##### */
-				menu_item[total] = traverse->name && traverse->name[0] ? traverse->name : "(null)";
+				menu_item[total] = traverse->name && astring_len(traverse->name) ? astring_c(traverse->name) : "(null)";
 
 				if(traverse->flags & kCheatFlag_HasWrongCode)
 				{
@@ -3193,9 +3163,11 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 				{
 					/* ##### LABEL ##### */
 					if(traverse->flags & kCheatFlag_OldFormat)
-						ADD_CHEAT_SELECT_MENU_ITEMS(traverse->selection ? traverse->action_list[traverse->selection].optional_name : "Off", 1);
+						ADD_CHEAT_SELECT_MENU_ITEMS(traverse->selection ?
+													astring_c(traverse->action_list[traverse->selection].optional_name) : "Off", 1);
 					else
-						ADD_CHEAT_SELECT_MENU_ITEMS(traverse->selection ? traverse->action_list[traverse->label_index[traverse->selection]].optional_name : "Off", 1);
+						ADD_CHEAT_SELECT_MENU_ITEMS(traverse->selection ?
+													astring_c(traverse->action_list[traverse->label_index[traverse->selection]].optional_name) : "Off", 1);
 				}
 				else if(traverse->flags & kCheatFlag_ExtendComment)
 				{
@@ -3228,7 +3200,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 			if(current_layer == traverse->action_list[0].data)
 			{
 				/* ##### PREVIOUS LAYER ##### */
-				menu_item[total] = traverse->comment && traverse->comment[0] ? traverse->comment : "Return to Prior Layer";
+				menu_item[total] = traverse->comment && astring_len(traverse->comment) ? astring_c(traverse->comment) : "Return to Prior Layer";
 				ADD_CHEAT_SELECT_MENU_ITEMS("<<<", 0);
 			}
 		}
@@ -3389,10 +3361,11 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 		}
 		else if((entry->flags & kCheatFlag_Null) == 0)
 		{
-			if(shift_key_pressed() && (entry->comment && entry->comment[0]))
+			if(shift_key_pressed())
 			{
-				/* display comment */
-				cheat_menu_stack_push(comment_menu, menu->handler, info->sub_cheat);
+				if(entry->comment && astring_len(entry->comment))
+					/* display comment */
+					cheat_menu_stack_push(comment_menu, menu->handler, info->sub_cheat);
 			}
 			else if(entry->flags & kCheatFlag_ExtendComment)
 			{
@@ -3523,10 +3496,7 @@ static int add_edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		cheat_entry *traverse = &cheat_list[i];
 
 		/* ##### NAME ##### */
-		if(traverse->name)
-			menu_item[total++] = traverse->name;
-		else
-			menu_item[total++] = "(none)";
+		menu_item[total++] = traverse->name && astring_len(traverse->name) ? astring_c(traverse->name) : "(none)";
 	}
 
 	/* ##### RETURN ##### */
@@ -3946,10 +3916,10 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		if(i == 0)
 		{
 			/* ##### ENTRY NAME ##### */
-			ADD_EDIT_MENU_ITEMS("Entry Name", entry->name && entry->name[0] ? entry->name : "(none)", EDIT_MENU_ENTRY_NAME);
+			ADD_EDIT_MENU_ITEMS("Entry Name", entry->name && astring_len(entry->name) ? astring_c(entry->name) : "(none)", EDIT_MENU_ENTRY_NAME);
 
 			/* ##### COMMENT ##### */
-			ADD_EDIT_MENU_ITEMS("Comment", entry->comment && entry->comment[0] ? entry->comment : "(none)", EDIT_MENU_COMMENT);
+			ADD_EDIT_MENU_ITEMS("Comment", entry->comment && astring_len(entry->comment) ? astring_c(entry->comment) : "(none)", EDIT_MENU_COMMENT);
 
 			/* ##### ACTIVATION KEY ##### */
 			ADD_EDIT_MENU_ITEMS(	"Activation Key",
@@ -3961,7 +3931,7 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		}
 
 		/* ##### ENTRY NAME ##### */
-		ADD_EDIT_MENU_ITEMS("Name", traverse->optional_name && traverse->optional_name[0] ? traverse->optional_name : "(none)", EDIT_MENU_NAME);
+		ADD_EDIT_MENU_ITEMS("Name", traverse->optional_name && astring_len(traverse->optional_name) ? astring_c(traverse->optional_name) : "(none)", EDIT_MENU_NAME);
 
 		/* ##### INDEX ##### */
 		sprintf(buf_index[i], "%2.2d/%2.2d", i + 1, entry->action_list_length);
@@ -4433,14 +4403,14 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	if(entry->name)
 	{
 		/* NOTE : master code is from cheat entry and others are from cheat action */
-		ADD_VIEW_MENU_ITEMS("Name", page_index ? action->optional_name : entry->name, kViewMenu_Name);
+		ADD_VIEW_MENU_ITEMS("Name", page_index ? astring_c(action->optional_name) : astring_c(entry->name), kViewMenu_Name);
 	}
 	else
 		ADD_VIEW_MENU_ITEMS("Name", "< none >", kViewMenu_Name);
 
 	/* ##### COMMENT ##### */
-	if(page_index == 0 && entry->comment)
-		ADD_VIEW_MENU_ITEMS("Comment", entry->comment, kViewMenu_Comment);
+	if(page_index == 0 && entry->comment && astring_len(entry->comment))
+		ADD_VIEW_MENU_ITEMS("Comment", astring_c(entry->comment), kViewMenu_Comment);
 
 	/* ##### ACTIVATION KEY ##### */
 	if(entry->flags & kCheatFlag_Select)
@@ -4918,7 +4888,7 @@ static int analyse_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 		UINT32 flags = analyse_code_format(machine, entry, action);
 
-		menu_item[total++] = action->optional_name ? action->optional_name : "(Null)";
+		menu_item[total++] = action->optional_name && astring_len(action->optional_name) ? astring_c(action->optional_name) : "(Null)";
 		menu_item[total++] = MENU_SEPARATOR_ITEM;
 
 		if(flags)
@@ -8276,8 +8246,8 @@ static void dispose_cheat(cheat_entry *entry)
 	{
 		int i;
 
-		free(entry->name);
-		free(entry->comment);
+		if(entry->name)		astring_free(entry->name);
+		if(entry->comment)	astring_free(entry->comment);
 		free(entry->label_index);
 
 		/* free all cheat actions in selected entry */
@@ -8395,7 +8365,7 @@ static void dispose_action(cheat_action *action)
 {
 	if(action != NULL)
 	{
-		free(action->optional_name);
+		if(action->optional_name) astring_free(action->optional_name);
 		free(action->last_value);
 
 		memset(action, 0, sizeof(cheat_action));
@@ -8576,7 +8546,7 @@ static void add_cheat_from_watch(running_machine *machine, watch_info *watch)
 
 		/* set name */
 		temp_string_length = sprintf(temp_string, "%.8X (%d) = %.*X", watch->address, watch->cpu, BYTE_DIGITS_TABLE[watch->element_bytes], action->data);
-		entry->name = create_string_copy(temp_string);
+		CHARACTER_TO_ASTRING(temp_string, entry->name);
 
 		update_cheat_info(machine, entry, 0);
 
@@ -8606,8 +8576,8 @@ static void add_cheat_from_watch_as_watch(running_machine *machine, cheat_entry 
 		/* set name and comments */
 		sprintf(temp_string, "Watch %.8X (%d)", watch->address, watch->cpu);
 
-		entry->name		= create_string_copy(temp_string);
-		entry->comment	= create_string_copy(watch->label);
+		CHARACTER_TO_ASTRING(temp_string, entry->name);
+		CHARACTER_TO_ASTRING(watch->label, entry->comment);
 
 		/* set parameters */
 		action->region				= watch->cpu;
@@ -9258,7 +9228,7 @@ static int handle_local_command_tag(char *tag)
 
 	for(i = 0; i < cheat_list_length; i++)
 	{
-		if(strcmp(tag, cheat_list[i].name) == 0)
+		if(astring_cmpc(cheat_list[i].name, tag) == 0)
 			return i;
 	}
 
@@ -9415,7 +9385,7 @@ static UINT8 open_cheat_database(mame_file **the_file, char *file_name, UINT8 fl
 
 static void load_cheat_options(char *file_name)
 {
-	static char		buf[2048];
+	static char		buf[CHEAT_CODE_MAX_STRINGS_PER_LINE];
 	mame_file		*the_file;
 	cheat_format	*format = &cheat_format_table[0];
 	cheat_format_strings
@@ -9428,7 +9398,7 @@ static void load_cheat_options(char *file_name)
 		return;
 	}
 
-	while(mame_fgets(buf, 2048, the_file))
+	while(mame_fgets(buf, CHEAT_CODE_MAX_STRINGS_PER_LINE, the_file))
 	{
 		if(sscanf(buf, format->format_string, buffer->name) == format->arguments_matched)
 		{
@@ -9454,7 +9424,7 @@ static void load_cheat_options(char *file_name)
 
 static void load_cheat_code_new(running_machine *machine, char *file_name)
 {
-	char			buf[255];
+	char			buf[CHEAT_CODE_MAX_STRINGS_PER_LINE];
 	mame_file		*the_file;
 	cheat_format_strings
 					*buffer = format_strings;
@@ -9463,7 +9433,7 @@ static void load_cheat_code_new(running_machine *machine, char *file_name)
 	if(open_cheat_database(&the_file, file_name, DATABASE_LOAD) == 0) return;
 	found_database = 1;
 	/* get a line from database */
-	while(mame_fgets(buf, 255, the_file))
+	while(mame_fgets(buf, CHEAT_CODE_MAX_STRINGS_PER_LINE, the_file))
 	{
 #ifdef MESS
 		int		crc =					0;
@@ -9478,6 +9448,9 @@ static void load_cheat_code_new(running_machine *machine, char *file_name)
 		cheat_entry		*entry;
 		cheat_action	*action;
 		cheat_format	*format = &cheat_format_table[LOAD_CHEAT_CODE_NEW];
+
+		/* clear buffer */
+		buffer->name[0] = buffer->type[0] = buffer->data[0] = buffer->extend_data[0] = buffer->description[0] = buffer->comment[0] = 0;
 
 		/* scan and check format */
 #ifdef MESS
@@ -9495,11 +9468,11 @@ static void load_cheat_code_new(running_machine *machine, char *file_name)
 		if(TEST_FIELD(cheat_options, SharedCode) && strcmp(machine->gamedrv->parent, "0"))
 		{
 			/* shared code (MESS specified) */
-			if(strcmp(buffer->name, machine->gamedrv->parent)) break;
+			if(strcmp(buffer->name, machine->gamedrv->parent)) continue;
 			else
 #endif
 			/* check short game/machine name */
-			if(strcmp(buffer->name, machine->gamedrv->name)) break;
+			if(strcmp(buffer->name, machine->gamedrv->name)) continue;
 #ifdef MESS
 		}
 #endif
@@ -9547,8 +9520,8 @@ static void load_cheat_code_new(running_machine *machine, char *file_name)
 				logerror("cheat: [load code] cheat list resize failed. bailing\n"); goto bail_new;
 			}
 			entry = &cheat_list[cheat_list_length - 1];
-			entry->name = create_string_copy(buffer->description);
-			if(arguments_matched == cheat_format_table[LOAD_CHEAT_CODE_NEW].comment_matched) entry->comment = create_string_copy(buffer->comment);
+			CHARACTER_TO_ASTRING(buffer->description, entry->name);
+			if(arguments_matched == cheat_format_table[LOAD_CHEAT_CODE_NEW].comment_matched) CHARACTER_TO_ASTRING(buffer->comment, entry->comment);
 		}
 		else
 		{
@@ -9574,7 +9547,7 @@ static void load_cheat_code_new(running_machine *machine, char *file_name)
 		action->data				= data;
 		action->original_data		= data;
 		action->extend_data			= extend_data;
-		action->optional_name		= create_string_copy(buffer->description);
+		CHARACTER_TO_ASTRING(buffer->description, action->optional_name);
 		action->last_value			= NULL;
 	}
 	bail_new:
@@ -9587,7 +9560,7 @@ static void load_cheat_code_new(running_machine *machine, char *file_name)
 
 static void load_cheat_code_standard(running_machine *machine, char *file_name)
 {
-	char		buf[256];
+	char		buf[CHEAT_CODE_MAX_STRINGS_PER_LINE];
 	mame_file	*the_file;
 	cheat_format_strings
 				*buffer = format_strings;
@@ -9596,7 +9569,7 @@ static void load_cheat_code_standard(running_machine *machine, char *file_name)
 	if(open_cheat_database(&the_file, file_name, DATABASE_LOAD) == 0) return;
 	found_database = 1;
 	/* get a line from database */
-	while(mame_fgets(buf, 2048, the_file))
+	while(mame_fgets(buf, CHEAT_CODE_MAX_STRINGS_PER_LINE, the_file))
 	{
 #ifdef MESS
 		int		crc =					0;
@@ -9609,6 +9582,9 @@ static void load_cheat_code_standard(running_machine *machine, char *file_name)
 		cheat_entry		*entry;
 		cheat_action	*action;
 		cheat_format	*format = &cheat_format_table[LOAD_CHEAT_CODE_STANDARD];
+
+		/* clear buffer */
+		buffer->name[0] = buffer->type[0] = buffer->data[0] = buffer->extend_data[0] = buffer->description[0] = buffer->comment[0] = 0;
 
 		/* scan and check format */
 #ifdef MESS
@@ -9669,7 +9645,7 @@ static void load_cheat_code_standard(running_machine *machine, char *file_name)
 			}
 			/* allocate entry and set code name */
 			entry		= &cheat_list[cheat_list_length - 1];
-			entry->name	= create_string_copy(buffer->description);
+			CHARACTER_TO_ASTRING(buffer->description, entry->name);
 		}
 		else
 		{
@@ -9695,7 +9671,7 @@ static void load_cheat_code_standard(running_machine *machine, char *file_name)
 		action->data				= data;
 		action->original_data		= data;
 		action->extend_data			= extend_data;
-		action->optional_name		= create_string_copy(buffer->description);
+		CHARACTER_TO_ASTRING(buffer->description, action->optional_name);
 		action->last_value			= NULL;
 	}
 	bail_standard:
@@ -9794,7 +9770,7 @@ static void load_cheat_code_old(running_machine *machine, char *file_name)
 	};
 	const struct _conversion_table *traverse = conversion_table;
 
-	char		buf[255];
+	char		buf[CHEAT_CODE_MAX_STRINGS_PER_LINE];
 	mame_file	*the_file;
 	cheat_format_strings
 				*buffer = format_strings;
@@ -9803,7 +9779,7 @@ static void load_cheat_code_old(running_machine *machine, char *file_name)
 	if(open_cheat_database(&the_file, file_name, DATABASE_LOAD) == 0) return;
 	found_database = 1;
 	/* get a line from database */
-	while(mame_fgets(buf, 255, the_file))
+	while(mame_fgets(buf, CHEAT_CODE_MAX_STRINGS_PER_LINE, the_file))
 	{
 #ifdef MESS
 		int		crc =					0;
@@ -9819,8 +9795,11 @@ static void load_cheat_code_old(running_machine *machine, char *file_name)
 		cheat_action	*action;
 		cheat_format	*format = &cheat_format_table[LOAD_CHEAT_CODE_OLD];
 
+		/* clear buffer */
+		buffer->name[0] = buffer->type[0] = buffer->data[0] = buffer->extend_data[0] = buffer->description[0] = buffer->comment[0] = 0;
+
 #ifdef MESS
-		if(sscanf(buf, format->format_string, &crc, buffer->name, &cpu, &address, &data, &code, buffer->description, buffer->comment) < format->arguments_matched) continue;
+		if(sscanf(buf, format->format_string, &crc, buffer->name, &cpu, &address, &data, &code, buffer->description, buffer->comment) < format->aruguments_matched) continue;
 #else
 		if(sscanf(buf, format->format_string, buffer->name, &cpu, &address, &data, &code, buffer->description, buffer->comment) < format->arguments_matched) continue;
 #endif
@@ -9870,7 +9849,7 @@ static void load_cheat_code_old(running_machine *machine, char *file_name)
 				logerror("cheat: [load code] cheat list resize failed. bailing\n"); goto bail_old;
 			}
 			entry = &cheat_list[cheat_list_length - 1];
-			entry->name = create_string_copy(buffer->description);
+			CHARACTER_TO_ASTRING(buffer->description, entry->name);
 		}
 		else
 		{
@@ -9898,7 +9877,7 @@ static void load_cheat_code_old(running_machine *machine, char *file_name)
 		action->data				= data;
 		action->original_data		= data;
 		action->extend_data			= extend_data;
-		action->optional_name		= create_string_copy(buffer->description);
+		CHARACTER_TO_ASTRING(buffer->description, action->optional_name);
 		action->last_value			= NULL;
 	}
 	bail_old:
@@ -10201,12 +10180,8 @@ static void save_cheat_code(running_machine *machine, cheat_entry *entry)
 	for(i = 0; i < entry->action_list_length; i++)
 	{
 		UINT8			address_length	= 8;
-		char			*name;
 		char			*buf_strings	= buf;
 		cheat_action	*action			= &entry->action_list[i];
-
-		/* get name */
-		name = action->optional_name;
 
 		/* get address length of CPU/Region */
 		address_length = get_address_length(action->region);
@@ -10230,14 +10205,14 @@ static void save_cheat_code(running_machine *machine, cheat_entry *entry)
 #endif
 
 		/* set description */
-		if(name)
-			buf_strings += sprintf(buf_strings, ":%s", name);
+		if(action->optional_name && astring_len(action->optional_name))
+			buf_strings += sprintf(buf_strings, ":%s", astring_c(action->optional_name));
 		else
 			buf_strings += sprintf(buf_strings, ":(none)");
 
 		/* set comment */
-		if(i == 0 && entry->comment)
-			buf_strings += sprintf(buf_strings, ":%s", entry->comment);
+		if(i == 0 && entry->comment && astring_len(entry->comment))
+			buf_strings += sprintf(buf_strings, ":%s", astring_c(entry->comment));
 
 		buf_strings += sprintf(buf_strings, "\n");
 
@@ -10338,10 +10313,8 @@ static void save_activation_key(running_machine *machine, cheat_entry *entry, in
 	}
 
 	/* set tag */
-	if(entry->name && entry->name[0] != 0)
-		buf_strings += sprintf(buf_strings, ":%s\n", entry->name);
-	else
-		buf_strings += sprintf(buf_strings, ":(none)\n");
+	if(entry->name && astring_len(entry->name))		buf_strings += sprintf(buf_strings, ":%s\n", astring_c(entry->name));
+	else											buf_strings += sprintf(buf_strings, ":(none)\n");
 
 	/* write the activation key code */
 	mame_fwrite(the_file, buf, (UINT32)strlen(buf));
@@ -10404,11 +10377,11 @@ static void save_pre_enable(running_machine *machine, cheat_entry *entry, int en
 
 	/* set label name */
 	if(entry->selection)
-		buf_strings += sprintf(buf_strings, " Label - %s", entry->action_list[entry->label_index[entry->selection]].optional_name);
+		buf_strings += sprintf(buf_strings, " Label - %s", astring_c(entry->action_list[entry->label_index[entry->selection]].optional_name));
 
 	/* set tag */
-	if(entry->name && entry->name[0] != 0)
-		buf_strings += sprintf(buf_strings, ":%s\n", entry->name);
+	if(entry->name && astring_len(entry->name))
+		buf_strings += sprintf(buf_strings, ":%s\n", astring_c(entry->name));
 	else
 		buf_strings += sprintf(buf_strings, ":(none)\n");
 
@@ -10590,22 +10563,14 @@ static void add_cheat_from_result(running_machine *machine, search_info *search,
 {
 	if(region->target_type == kRegionType_CPU || region->target_type == kRegionType_Memory)
 	{
-		int				temp_string_length;
 		UINT32			data		= read_search_operand(kSearchOperand_First, search, region, address);
 		char			temp_string[1024];
 		cheat_entry		*entry		= get_new_cheat();
 		cheat_action	*action		= &entry->action_list[0];
 
-		temp_string_length = sprintf(temp_string, "%.8X (%d) = %.*X", address, region->target_idx, BYTE_DIGITS_TABLE[search->bytes], data);
+		sprintf(temp_string, "%.8X (%d) = %.*X", address, region->target_idx, BYTE_DIGITS_TABLE[search->bytes], data);
+		CHARACTER_TO_ASTRING(temp_string, entry->name);
 
-		entry->name = realloc(entry->name, temp_string_length + 1);
-		if(entry->name == NULL)
-			fatalerror(	"cheat: [cheat entry] memory allocation error"
-						"	temp_length	=		%.8X"
-						"	entry->name =		%p",
-						temp_string_length, entry->name);
-
-		memcpy(entry->name, temp_string, temp_string_length + 1);
 		action->region				= region->target_idx;
 		action->address				= address;
 		action->original_address	= address;
@@ -11847,10 +11812,10 @@ static void add_action_watch(cheat_action *action, cheat_entry *entry)
 					info->y = (float)(EXTRACT_FIELD(action->extend_data, MSB16)) / 100;
 				}
 
-				if(TEST_FIELD(action->type, WatchShowLabel) && entry->comment && strlen(entry->comment) < 256)
+				if(TEST_FIELD(action->type, WatchShowLabel) && entry->comment && astring_len(entry->comment) < 256)
 				{
 					info->label_type = kWatchLabel_String;
-					strcpy(info->label, entry->comment);
+					strcpy(info->label, astring_c(entry->comment));
 				}
 				else
 					info->label_type = kWatchLabel_None;
@@ -11961,7 +11926,7 @@ static void reset_action(running_machine *machine, cheat_action *action)
 				"	----- %s -----\n"
 				"	type =			%.8X\n"
 				"	last_value =	%p\n",
-				action->optional_name, action->type, action->last_value);
+				astring_c(action->optional_name), action->type, action->last_value);
 }
 
 /*--------------------------------------------------------------------------------------
@@ -12170,7 +12135,7 @@ static void cheat_periodic_operation(running_machine *machine, cheat_action *act
 				switch(EXTRACT_FIELD(action->type, PopupParameter))
 				{
 					case kPopup_Label:
-						ui_popup_time(1, "%s", action->optional_name);
+						ui_popup_time(1, "%s", astring_c(action->optional_name));
 						break;
 
 					case kPopup_Value:
@@ -12182,7 +12147,7 @@ static void cheat_periodic_operation(running_machine *machine, cheat_action *act
 
 					case kPopup_LabelValue:
 						ui_popup_time(1, "%s %*.*X",
-										action->optional_name,
+										astring_c(action->optional_name),
 										BYTE_DIGITS_TABLE[EXTRACT_FIELD(action->type, AddressSize)],
 										BYTE_DIGITS_TABLE[EXTRACT_FIELD(action->type, AddressSize)],
 										read_data(machine, action));
@@ -12193,7 +12158,7 @@ static void cheat_periodic_operation(running_machine *machine, cheat_action *act
 										BYTE_DIGITS_TABLE[EXTRACT_FIELD(action->type, AddressSize)],
 										BYTE_DIGITS_TABLE[EXTRACT_FIELD(action->type, AddressSize)],
 										read_data(machine, action),
-										action->optional_name);
+										astring_c(action->optional_name));
 						break;
 				}
 				break;
@@ -12440,10 +12405,10 @@ static void cheat_periodic_entry(running_machine *machine, cheat_entry *entry)
 
 			if(TEST_FIELD(cheat_options, ActivationKeyMessage))
 			{
-				if(!entry->selection)
-					ui_popup_time(1,"%s disabled", entry->name);
+				if(entry->selection == 0)
+					ui_popup_time(1,"%s disabled", astring_c(entry->name));
 				else
-					ui_popup_time(1,"%s : %s selected", entry->name, entry->action_list[entry->label_index[entry->selection]].optional_name);
+					ui_popup_time(1,"%s : %s selected", astring_c(entry->name), astring_c(entry->action_list[entry->label_index[entry->selection]].optional_name));
 			}
 		}
 	}
@@ -12457,21 +12422,21 @@ static void cheat_periodic_entry(running_machine *machine, cheat_entry *entry)
 				activate_cheat(machine, entry);
 
 				if(TEST_FIELD(cheat_options, ActivationKeyMessage))
-					ui_popup_time(1,"set %s", entry->name);
+					ui_popup_time(1,"set %s", astring_c(entry->name));
 			}
 			else if(entry->flags & kCheatFlag_Active)
 			{
 				deactivate_cheat(machine, entry);
 
 				if(TEST_FIELD(cheat_options, ActivationKeyMessage))
-					ui_popup_time(1,"%s disabled", entry->name);
+					ui_popup_time(1,"%s disabled", astring_c(entry->name));
 			}
 			else
 			{
 				activate_cheat(machine, entry);
 
 				if(TEST_FIELD(cheat_options, ActivationKeyMessage))
-					ui_popup_time(1,"%s enabled", entry->name);
+					ui_popup_time(1,"%s enabled", astring_c(entry->name));
 			}
 		}
 	}
@@ -12479,8 +12444,7 @@ static void cheat_periodic_entry(running_machine *machine, cheat_entry *entry)
 	/* ***** 2nd, do cheat actions ***** */
 
 	/* if "OFF", no action */
-	if(driverSpecifiedFlag != 0 || (entry->flags & kCheatFlag_Active) == 0)
-		return;
+	if(cheat_flags || (entry->flags & kCheatFlag_Active) == 0) return;
 
 	while(1)
 	{
@@ -12579,22 +12543,19 @@ static void cheat_periodic_old_entry(running_machine *machine, cheat_entry *entr
 	}
 	else
 	{
-		if((entry->flags & kCheatFlag_UserSelect) != 0)
+		if((entry->flags & kCheatFlag_UserSelect) == 0)
 		{
-			if(input_code_pressed_once(entry->activation_key))	activate_cheat(machine, entry);
-			else
+			if(input_code_pressed_once(entry->activation_key))
 			{
 				if(entry->flags & kCheatFlag_Active)	deactivate_cheat(machine, entry);
 				else									activate_cheat(machine, entry);
 			}
 		}
-
-		if((entry->flags & kCheatFlag_Active) == 0) return;
+		if(cheat_flags || (entry->flags & kCheatFlag_Active) == 0) return;
 		do_action = 1;
 	}
 	if(do_action)
 	{
-
 		for(i = entry->flags & kCheatFlag_Select ? entry->selection : 0; i < entry->action_list_length; i++)
 		{
 			int do_operation = 0;
@@ -12797,7 +12758,7 @@ static void build_label_index_table(cheat_entry *entry)
 
 	if(entry->label_index_length <= 1)
 	{
-		logerror("cheat: [label index table] %s fails to build due to invalid or no link\n", entry->name); return;
+		logerror("cheat: [label index table] %s fails to build due to invalid or no link\n", astring_c(entry->name)); return;
 	}
 	else
 		/* set terminator */
@@ -12806,7 +12767,7 @@ static void build_label_index_table(cheat_entry *entry)
 	if(entry->flags & kCheatFlag_OneShot)
 		entry->selection = 1;
 
-	/* logerror("Cheat - Finish building index table for %s (length = %x)\n", entry->name, entry->label_index_length); */
+	/* logerror("Cheat - Finish building index table for %s (length = %x)\n", astring_c(entry->name), entry->label_index_length); */
 	/* for(i = 0; i < entry->label_index_length; i++) */
 	/*  logerror("IndexTable[%x] = %x\n",i,entry->label_index[i]); */
 
@@ -12818,7 +12779,7 @@ static void build_label_index_table(cheat_entry *entry)
 				"	name =					%s\n"
 				"	label_index_length =	%.8X\n"
 				"	label_index_length =	%p\n",
-				entry->name, entry->label_index_length, entry->label_index);
+				astring_c(entry->name), entry->label_index_length, entry->label_index);
 }
 
 /*---------------------------------------------------------------------
