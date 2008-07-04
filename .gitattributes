@@ -1529,6 +1529,7 @@ src/mame/drivers/hcastle.c svneol=native#text/plain
 src/mame/drivers/hexa.c svneol=native#text/plain
 src/mame/drivers/hexion.c svneol=native#text/plain
 src/mame/drivers/higemaru.c svneol=native#text/plain
+src/mame/drivers/hikaru.c svneol=native#text/plain
 src/mame/drivers/hitme.c svneol=native#text/plain
 src/mame/drivers/hnayayoi.c svneol=native#text/plain
 src/mame/drivers/hng64.c svneol=native#text/plain
