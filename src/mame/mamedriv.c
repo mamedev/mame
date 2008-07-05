@@ -3830,6 +3830,7 @@ Sep.1994 Quiz Ghost Hunter
 
 	/* Step 1.0 */
 	DRIVER( vf3 )		/* 1996 */
+	DRIVER( vf3a )		/* 1996 */
 	DRIVER( vf3tb )		/* 1996 */
 	DRIVER( bass )		/* 1997 */
 	DRIVER( getbass )	/* 1997 */
