@@ -3467,6 +3467,77 @@ static INPUT_PORTS_START( rockmanj )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW(B):7" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( wofhfh )
+	PORT_INCLUDE( wof )
+
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW(A):1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x07, 0x04, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW(B):1,2,3")
+	PORT_DIPSETTING(    0x07, "Extra Easy" )
+	PORT_DIPSETTING(    0x06, DEF_STR( Very_Easy) )
+	PORT_DIPSETTING(    0x05, DEF_STR( Easy) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hard) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Very_Hard) )
+	PORT_DIPSETTING(    0x01, "Extra Hard" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest) )
+	PORT_DIPNAME( 0x70, 0x60, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW(B):4,5,6")
+	PORT_DIPSETTING(    0x00, "Start 4 Continue 5" )
+	PORT_DIPSETTING(    0x10, "Start 3 Continue 4" )
+	PORT_DIPSETTING(    0x20, "Start 2 Continue 3" )
+	PORT_DIPSETTING(    0x30, "Start 1 Continue 2" )
+	PORT_DIPSETTING(    0x40, "Start 4 Continue 4" )
+	PORT_DIPSETTING(    0x50, "Start 3 Continue 3" )
+	PORT_DIPSETTING(    0x60, "Start 2 Continue 2" )
+	PORT_DIPSETTING(    0x70, "Start 1 Continue 1" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("DSWC")
+	PORT_DIPNAME( 0x03, 0x03, "Coin Slots" )			PORT_DIPLOCATION("SW(C):1,2")
+//	PORT_DIPSETTING(    0x00, "2 Players 1 Shooter" )
+	PORT_DIPSETTING(    0x01, "2 Players 1 Shooter" )
+	PORT_DIPSETTING(    0x02, "3 Players 1 Shooter" )
+	PORT_DIPSETTING(    0x03, "3 Players 3 Shooters" )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN2")      /* Player 3 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+//	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
+INPUT_PORTS_END
+
+
 /*
 A Final Fight board with mismatched USA and Japan GFX proves that the columns
 of the 8x8 tilemap alternate between sides of the 16x16 tile resulting
@@ -3644,6 +3715,14 @@ static MACHINE_DRIVER_START( cpspicb )
 	MDRV_SOUND_ADD_TAG("okim", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( wofhfh )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(cps1_12MHz)
+
+	MDRV_NVRAM_HANDLER(qsound)
 MACHINE_DRIVER_END
 
 #endif
@@ -7143,6 +7222,36 @@ ROM_START( wofj )
 	ROM_LOAD( "tk2_q4.rom",     0x180000, 0x80000, CRC(36642e88) SHA1(8ab25b19e2b67215a5cb1f3aa81b9d26009cfeb8) )
 ROM_END
 
+/* Chinese bootleg board without QSound */
+ROM_START( wofhfh )
+	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "23",       0x000000, 0x80000, CRC(6ae4b312) SHA1(fa39f69385d180d90bccd8c5dc9262edd04a6457) )
+	ROM_LOAD16_WORD_SWAP( "22",       0x080000, 0x80000, CRC(94e8d01a) SHA1(875763f6b22734c1a5a890e6c8063515c134045b) )
+
+	ROM_REGION( 0x400000, REGION_GFX1, 0 )
+	ROMX_LOAD( "1",   0x000000, 0x80000, CRC(0d9cb9bf) SHA1(cc7140e9a01a14b252cb1090bcea32b0de461928) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "2",   0x000002, 0x80000, CRC(45227027) SHA1(b21afc593f0d4d8909dfa621d659cbb40507d1b2) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "3",   0x000004, 0x80000, CRC(c5ca2460) SHA1(cbe14867f7b94b638ca80db7c8e0c60881183469) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "4",   0x000006, 0x80000, CRC(e349551c) SHA1(1d977bdf256accf750ad9930ec4a0a19bbf86964) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "5",   0x200000, 0x80000, CRC(34949d7b) SHA1(90925a77b08c97cfdbf0dbfbdaa359d1b33b6ae4) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "6",   0x200002, 0x80000, CRC(dfa70971) SHA1(477b99687de38220f0aec9fbba44db03f72cb62a) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "7",   0x200004, 0x80000, CRC(073686a6) SHA1(b774a8d4c6cdbedb123ac01455f718305f23b619) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "8",   0x200006, 0x80000, CRC(5300f8db) SHA1(b23a19910f680d60ff8afcbc15c471e74ee3569a) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( 0x8000, REGION_GFX2, 0 )
+	ROM_COPY( REGION_GFX1, 0x000000, 0x000000, 0x8000 )	/* stars */
+
+	ROM_REGION( 0x28000, REGION_CPU2, 0 ) /* 128k for the audio CPU (+banks) */
+	ROM_LOAD( "9",              0x00000, 0x08000, CRC(86fe8a97) SHA1(cab82bcd0f49bcb40201b439cfdd10266f46752a) )
+	ROM_CONTINUE(               0x10000, 0x18000 )
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 ) /* samples */
+	ROM_LOAD( "18",             0x00000, 0x20000, CRC(c04be720) SHA1(2e544e0a0358b6afbdf826d35d9c4c59e4787a93) )
+	ROM_LOAD( "19",             0x20000, 0x20000, CRC(fbb8d8c1) SHA1(8a7689bb7ed56243333133cbacf01a0ae825201e) )
+ROM_END
+
+
+
 ROM_START( sf2hf )
 	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "s92e_23a.bin",  0x000000, 0x80000, CRC(2DD72514) SHA1(4411353c389669299c27ac183c7e1caa3d4cec90) )
@@ -8343,11 +8452,11 @@ GAME( 1994, qadj,     qad,      cps1_12MHz, qadj,     cps1,     ROT0,   "Capcom"
 GAME( 1995, qtono2,   0,        cps1_12MHz, qtono2,   cps1,     ROT0,   "Capcom", "Quiz Tonosama no Yabou 2 Zenkoku-ban (Japan 950123)", 0 )
 GAME( 1995, megaman,  0,        cps1_12MHz, megaman,  cps1,     ROT0,   "Capcom", "Mega Man - The Power Battle (CPS1 Asia 951006)", 0 )
 GAME( 1995, rockmanj, megaman,  cps1_12MHz, rockmanj, cps1,     ROT0,   "Capcom", "Rockman - The Power Battle (CPS1 Japan 950922)", 0 )
-
 GAME( 1992, wof,      0,        qsound,     wof,      wof,      ROT0,   "Capcom", "Warriors of Fate (World 921002)" , 0)				// "ETC"
 GAME( 1992, wofa,     wof,      qsound,     wof,      wof,      ROT0,   "Capcom", "Sangokushi II (Asia 921005)" , 0)					// World "warning"
 GAME( 1992, wofu,     wof,      qsound,     wof,      wof,      ROT0,   "Capcom", "Warriors of Fate (US 921031)" , 0)					// World "warning"
 GAME( 1992, wofj,     wof,      qsound,     wof,      wof,      ROT0,   "Capcom", "Tenchi wo Kurau II - Sekiheki no Tatakai (Japan 921031)", 0 )
+GAME( 1999, wofhfh,   wof,      wofhfh,     wofhfh,   cps1,     ROT0,   "bootleg","Sangokushi II: Huo Fenghuang (Chinese bootleg)", 0 )
 GAME( 1993, dino,     0,        qsound,     dino,     dino,     ROT0,   "Capcom", "Cadillacs and Dinosaurs (World 930201)" , 0)			// "ETC"
 GAME( 1993, dinou,    dino,     qsound,     dino,     dino ,    ROT0,   "Capcom", "Cadillacs and Dinosaurs (US 930201)", 0 )
 GAME( 1993, dinoj,    dino,     qsound,     dino,     dino ,    ROT0,   "Capcom", "Cadillacs Kyouryuu-Shinseiki (Japan 930201)", 0 )

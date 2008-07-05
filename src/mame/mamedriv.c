@@ -2475,6 +2475,7 @@ V-V                           TP-027
 	DRIVER( wofa )		/* 05/10/1992 (c) 1992 (Asia)  (CPS1 + QSound) */
 	DRIVER( wofu )		/* 31/10/1992 (c) 1992 (US) (CPS1 + QSound) */
 	DRIVER( wofj )		/* 31/10/1992 (c) 1992 (Japan) (CPS1 + QSound) */
+	DRIVER( wofhfh )	/* bootleg */
 	DRIVER( sf2hf )		/* 09/12/1992 (c) 1992 (World) */
 	DRIVER( sf2t )		/* 09/12/1992 (c) 1992 (US)    */
 	DRIVER( sf2tj )		/* 09/12/1992 (c) 1992 (Japan) */
