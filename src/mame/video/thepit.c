@@ -186,19 +186,33 @@ WRITE8_HANDLER( thepit_colorram_w )
 
 WRITE8_HANDLER( thepit_flip_screen_x_w )
 {
+	int flip;
+	
 	thepit_flip_screen_x = data & 0x01;
 
-	tilemap_set_flip(thepit_tilemap, thepit_flip_screen_x ? TILEMAP_FLIPX : 0);
-	tilemap_set_flip(thepit_solid_tilemap, thepit_flip_screen_x ? TILEMAP_FLIPX : 0);
+	flip = thepit_flip_screen_x ? TILEMAP_FLIPX : 0;
+	if (thepit_flip_screen_y)
+		flip |= TILEMAP_FLIPY ;
+
+	tilemap_set_flip(thepit_tilemap, flip);
+	tilemap_set_flip(thepit_solid_tilemap, flip);
+
 }
 
 
 WRITE8_HANDLER( thepit_flip_screen_y_w )
 {
+	int flip;
+	
 	thepit_flip_screen_y = data & 0x01;
 
-	tilemap_set_flip(thepit_tilemap, thepit_flip_screen_y ? TILEMAP_FLIPY : 0);
-	tilemap_set_flip(thepit_solid_tilemap, thepit_flip_screen_y ? TILEMAP_FLIPY : 0);
+	flip = thepit_flip_screen_x ? TILEMAP_FLIPX : 0;
+	if (thepit_flip_screen_y)
+		flip |= TILEMAP_FLIPY ;
+
+	tilemap_set_flip(thepit_tilemap, flip);
+	tilemap_set_flip(thepit_solid_tilemap, flip);
+
 }
 
 
@@ -291,8 +305,14 @@ VIDEO_UPDATE( thepit )
 
 	for (offs = 0; offs < 32; offs++)
 	{
-		tilemap_set_scrolly(thepit_tilemap, offs, thepit_attributesram[offs << 1]);
-		tilemap_set_scrolly(thepit_solid_tilemap, offs, thepit_attributesram[offs << 1]);
+		int xshift = thepit_flip_screen_x ? 128 : 0;
+		int yshift = thepit_flip_screen_y ? -8 : 0;
+		
+		tilemap_set_scrollx(thepit_tilemap, offs, xshift);
+		tilemap_set_scrollx(thepit_solid_tilemap, offs, xshift);
+
+		tilemap_set_scrolly(thepit_tilemap, offs, yshift + thepit_attributesram[offs << 1]);
+		tilemap_set_scrolly(thepit_solid_tilemap, offs, yshift + thepit_attributesram[offs << 1]);
 	}
 
 	/* low priority tiles */
