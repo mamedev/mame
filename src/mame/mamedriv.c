@@ -2466,6 +2466,7 @@ V-V                           TP-027
 	DRIVER( sf2m7 )		/* hack */
 	DRIVER( sf2yyc )	/* hack */
 	DRIVER( sf2koryu )	/* hack */
+	DRIVER( sf2mdt )	/* bootleg */
 	DRIVER( varth )		/* 14/07/1992 (c) 1992 (World) */
 	DRIVER( varthr1 )	/* 12/06/1992 (c) 1992 (World) */
 	DRIVER( varthu )	/* 12/06/1992 (c) 1992 (US) */
