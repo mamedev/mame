@@ -1030,8 +1030,11 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 /* ?? */ GAME( 1993, mp_col3,  megaplay, mpnew, megaplay, megaplay, ROT0, "Sega",                  "Columns III (Mega Play)" , 0 )
 
 
-/* Also known to exist:
+/* Also confirmed to exist:
 Gunstar Heroes
-+ at least 2 others?
+Shinobi III
+
+system16.com lists 'Streets of Rage' but this seems unlikely, there are no gaps in
+the numbering prior to 'Streets of Rage 2'
 
 */
