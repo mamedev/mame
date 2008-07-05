@@ -3816,6 +3816,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( dynmcopb )	/* 1998 */
 	DRIVER( dyndek2b )	/* 1998 */
 	DRIVER( pltkids )	/* 1998 */
+	DRIVER( waverunr )	/* 199? */
 
 	/* Model 2C-CRX (TGPx4, SCSP sound board) */
 	DRIVER( skisuprg )	/* 1996 */
