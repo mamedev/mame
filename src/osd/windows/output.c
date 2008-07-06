@@ -251,6 +251,7 @@ static LRESULT unregister_client(HWND hwnd, LPARAM id)
 			*client = (*client)->next;
 			free(temp);
 			found = TRUE;
+			break;
 		}
 
 	// return an error if not found
