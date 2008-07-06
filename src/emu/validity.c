@@ -1391,7 +1391,7 @@ static int validate_sound(int drivnum, const machine_config *config)
 
 /*-------------------------------------------------
     validate_devices - run per-device validity
-	checks
+    checks
 -------------------------------------------------*/
 
 static int validate_devices(int drivnum, const machine_config *config)

@@ -187,7 +187,7 @@ WRITE8_HANDLER( thepit_colorram_w )
 WRITE8_HANDLER( thepit_flip_screen_x_w )
 {
 	int flip;
-	
+
 	thepit_flip_screen_x = data & 0x01;
 
 	flip = thepit_flip_screen_x ? TILEMAP_FLIPX : 0;
@@ -203,7 +203,7 @@ WRITE8_HANDLER( thepit_flip_screen_x_w )
 WRITE8_HANDLER( thepit_flip_screen_y_w )
 {
 	int flip;
-	
+
 	thepit_flip_screen_y = data & 0x01;
 
 	flip = thepit_flip_screen_x ? TILEMAP_FLIPX : 0;
@@ -307,7 +307,7 @@ VIDEO_UPDATE( thepit )
 	{
 		int xshift = thepit_flip_screen_x ? 128 : 0;
 		int yshift = thepit_flip_screen_y ? -8 : 0;
-		
+
 		tilemap_set_scrollx(thepit_tilemap, offs, xshift);
 		tilemap_set_scrollx(thepit_solid_tilemap, offs, xshift);
 

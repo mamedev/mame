@@ -3506,7 +3506,7 @@ static INPUT_PORTS_START( wofhfh )
 
 	PORT_MODIFY("DSWC")
 	PORT_DIPNAME( 0x03, 0x03, "Coin Slots" )			PORT_DIPLOCATION("SW(C):1,2")
-//	PORT_DIPSETTING(    0x00, "2 Players 1 Shooter" )
+//  PORT_DIPSETTING(    0x00, "2 Players 1 Shooter" )
 	PORT_DIPSETTING(    0x01, "2 Players 1 Shooter" )
 	PORT_DIPSETTING(    0x02, "3 Players 1 Shooter" )
 	PORT_DIPSETTING(    0x03, "3 Players 3 Shooters" )
@@ -3537,7 +3537,7 @@ static INPUT_PORTS_START( wofhfh )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-//	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
+//  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
 INPUT_PORTS_END
@@ -3738,18 +3738,18 @@ ADDRESS_MAP_END
 
 static void m5205_int1(running_machine *machine, int data)
 {
-//	MSM5205_data_w(0, sample_buffer1 & 0x0F);
-//	sample_buffer1 >>= 4;
-//	sample_select1 ^= 1;
-//	if (sample_select1 == 0)
-//		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+//  MSM5205_data_w(0, sample_buffer1 & 0x0F);
+//  sample_buffer1 >>= 4;
+//  sample_select1 ^= 1;
+//  if (sample_select1 == 0)
+//      cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void m5205_int2(running_machine *machine, int data)
 {
-//	MSM5205_data_w(1, sample_buffer2 & 0x0F);
-//	sample_buffer2 >>= 4;
-//	sample_select2 ^= 1;
+//  MSM5205_data_w(1, sample_buffer2 & 0x0F);
+//  sample_buffer2 >>= 4;
+//  sample_select2 ^= 1;
 }
 
 static const struct MSM5205interface msm5205_interface1 =

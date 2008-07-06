@@ -51,10 +51,10 @@
 
     There are 2 extra marks on the black CPU box:
 
-    Silkscreened: 'B 0L2' 
+    Silkscreened: 'B 0L2'
 
     Sticker:      'WE8703 1992.10'
-	                'LUCKY 74-7'
+                    'LUCKY 74-7'
 
 
     PCB is original from WING Co.Ltd.
@@ -75,7 +75,7 @@
     and therefore to a resistor network that derives to the RGB connector.
 
 
-                                  220		
+                                  220
     (E6)24s10-12 -+- 74174-02 ---/\/\/\----+
     (E7)24s10-12 _|                        |
                                   470      |
@@ -93,7 +93,7 @@
                                            |
                                            _
 
-                                  220		
+                                  220
     (D6)24s10-12 -+- 74174-02 ---/\/\/\----+
     (D7)24s10-12 _|                        |
                                   470      |
@@ -111,7 +111,7 @@
                                            |
                                            _
 
-                                  220		
+                                  220
     (C6)24s10-12 -+- 74174-02 ---/\/\/\----+
     (C7)24s10-12 _|                        |
                                   470      |
@@ -135,7 +135,7 @@
 
     As we can see here, same pin of different PROMs are connected together in parallel.
     We need to check the pin 13 (/G1) and pin 14 (/G2) from each PROM to see if they are
-    connected to the same signal, and futhermore check if one or the other is tied to GND.    
+    connected to the same signal, and futhermore check if one or the other is tied to GND.
 
     To reproduce the states, we need to create a double-sized palette and fill the first
     half with the values created through state 1, then fill the second half with proper
@@ -162,9 +162,9 @@
 
 
     This game was one of the 'classics'.
-    
+
     Lucky 74 is a strip poker game with anime theme. It has a nice double-up feature, and
-	the objective is obviously to win hands till you can see the girl naked, like other
+    the objective is obviously to win hands till you can see the girl naked, like other
     strip poker games.
 
 
@@ -477,8 +477,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( lucky74_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(testport_rw)
-//	AM_RANGE(0x00, 0x05) AM_WRITE(???)
-//	AM_RANGE(0xff, 0xff) AM_READWRITE(???)
+//  AM_RANGE(0x00, 0x05) AM_WRITE(???)
+//  AM_RANGE(0xff, 0xff) AM_READWRITE(???)
 ADDRESS_MAP_END
 
 /* I/O byte R/W
@@ -511,7 +511,7 @@ ADDRESS_MAP_END
 
 
 *** log ***
- 
+
 cpu #0 (PC=00000105): unmapped I/O byte write to 000000FF = 04
 cpu #0 (PC=00000107): unmapped I/O byte read from 000000FF
 cpu #0 (PC=00000111): unmapped I/O byte write to 000000FF = FB
@@ -572,7 +572,7 @@ static INPUT_PORTS_START( lucky74 )
 
 /*  Player buttons are the same for players 1 & 2.
     Test mode shows them as dupes. Maybe are multiplexed?
-*/	
+*/
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)	/* 'A' in test mode */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)	/* 'B' in test mode */
@@ -860,7 +860,7 @@ static MACHINE_DRIVER_START( lucky74 )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 30*8-1)	/* allow to show the top of bg gfx */ 
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 30*8-1)	/* allow to show the top of bg gfx */
 
 	MDRV_GFXDECODE(lucky74)
 
@@ -869,10 +869,10 @@ static MACHINE_DRIVER_START( lucky74 )
 
 	MDRV_VIDEO_START(lucky74)
 	MDRV_VIDEO_UPDATE(lucky74)
-	
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MDRV_SOUND_ADD(AY8910, MASTER_CLOCK/8)	/* YM2149F */
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

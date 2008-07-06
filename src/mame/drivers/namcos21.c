@@ -1,21 +1,21 @@
 /**
 2008/06/11, by Naibo(translated to English by Mameplus team):
-Driver's Eyes works, 
-	-the communication work between CPU and 3D DSP should be limited to the master M68000, 
-	if the address mapping is done in the shared memory, master CPU would be disturbed by the slave one.
+Driver's Eyes works,
+    -the communication work between CPU and 3D DSP should be limited to the master M68000,
+    if the address mapping is done in the shared memory, master CPU would be disturbed by the slave one.
 
-	-DIP Switches
-	DIP3 ON for Screen on the left
-	DIP4 ON for Screen on the right
-	should not toggle on both
+    -DIP Switches
+    DIP3 ON for Screen on the left
+    DIP4 ON for Screen on the right
+    should not toggle on both
 
-	-The left, center and right screens have separate programs and boards, each would work independantly. 
-	About projection angles of left and right screen, the angle is correct on "DRIVER'S EYES" title screen, however in the tracks of demo mode it doesn't seem correct.
+    -The left, center and right screens have separate programs and boards, each would work independantly.
+    About projection angles of left and right screen, the angle is correct on "DRIVER'S EYES" title screen, however in the tracks of demo mode it doesn't seem correct.
 
-	-On demo screen, should fog effects be turned off?
+    -On demo screen, should fog effects be turned off?
 
-	-The game also features a pretty nice 2D sprite layer, which still doesn't show up yet.
-	it is known that the CPU does constantly feed the 2D video memory some meaningful and logical data.
+    -The game also features a pretty nice 2D sprite layer, which still doesn't show up yet.
+    it is known that the CPU does constantly feed the 2D video memory some meaningful and logical data.
 
 Namco System 21
 
