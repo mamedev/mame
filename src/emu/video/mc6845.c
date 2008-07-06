@@ -804,6 +804,29 @@ static DEVICE_RESET( mc6845 )
 	mc6845->light_pen_latched = FALSE;
 }
 
+static DEVICE_VALIDITY_CHECK( mc6845 )
+{
+	int error = FALSE;
+	const mc6845_interface *intf = (const mc6845_interface *) device->static_config;
+
+	if (intf != NULL)
+	{
+		if (intf->clock <= 0)
+		{
+			mame_printf_error("%s: %s has an mc6845 with an invalid clock\n", driver->source_file, driver->name);
+			error = TRUE;
+		}
+
+		if (intf->hpixels_per_column <= 0)
+		{
+			mame_printf_error("%s: %s has an mc6845 with an invalid hpixels_per_column\n", driver->source_file, driver->name);
+			error = TRUE;
+		}
+	}
+
+	return error;
+}
+
 
 static DEVICE_SET_INFO( mc6845 )
 {
@@ -828,6 +851,7 @@ DEVICE_GET_INFO( mc6845 )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mc6845);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(mc6845);	break;
+		case DEVINFO_FCT_VALIDITY_CHECK:				info->validity_check = DEVICE_VALIDITY_CHECK_NAME(mc6845); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							info->s = "Motorola 6845";					break;

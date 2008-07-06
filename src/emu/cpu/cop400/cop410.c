@@ -20,6 +20,7 @@
 
 */
 
+#include "driver.h"
 #include "cpuintrf.h"
 #include "debugger.h"
 #include "cop400.h"
@@ -390,6 +391,23 @@ static void cop410_set_context (void *src)
 }
 
 /**************************************************************************
+ * Validity check
+ **************************************************************************/
+static int cop410_validity_check(const game_driver *driver, const void *config)
+{
+	int error = FALSE;
+	const cop400_interface *intf = (const cop400_interface *) config;
+
+	if ((intf == NULL) || (intf->cki <= 0))
+	{
+		mame_printf_error("%s: %s has an invalid CPU configuration\n", driver->source_file, driver->name);
+		error = TRUE;
+	}
+
+	return error;
+}
+
+/**************************************************************************
  * Generic set_info
  **************************************************************************/
 
@@ -471,6 +489,7 @@ void cop410_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = cop410_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cop410_ICount;			break;
+		case CPUINFO_PTR_VALIDITY_CHECK:				info->validity_check = cop410_validity_check;	break;
 
 /*      case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
             info->internal_map8 = address_map_cop410_internal_rom;                              break;*/

@@ -133,6 +133,7 @@ enum
 	CPUINFO_PTR_INTERNAL_MEMORY_MAP,					/* R/O: const addrmap_token *map */
 	CPUINFO_PTR_INTERNAL_MEMORY_MAP_LAST = CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACES - 1,
 	CPUINFO_PTR_DEBUG_REGISTER_LIST,					/* R/O: int *list: list of registers for the debugger */
+	CPUINFO_PTR_VALIDITY_CHECK,							/* R/O: int (*validity_check)(const void *config) */
 
 	CPUINFO_PTR_CPU_SPECIFIC = 0x18000,					/* R/W: CPU-specific values start here */
 
@@ -229,6 +230,7 @@ typedef int	(*cpu_read_func)(int space, UINT32 offset, int size, UINT64 *value);
 typedef int	(*cpu_write_func)(int space, UINT32 offset, int size, UINT64 value);
 typedef int	(*cpu_readop_func)(UINT32 offset, int size, UINT64 *value);
 typedef void (*cpu_setup_commands_func)(void);
+typedef int (*cpu_validity_check_func)(const game_driver *driver, const void *config);
 
 
 /* cpuinfo union used to pass data to/from the get_info/set_info functions */
@@ -258,6 +260,7 @@ union _cpuinfo
 	const addrmap16_token *	internal_map16;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
 	const addrmap32_token *	internal_map32;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
 	const addrmap64_token *	internal_map64;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
+	cpu_validity_check_func	validity_check;				/* CPUINFO_PTR_VALIDITY_CHECK */
 };
 
 

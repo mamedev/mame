@@ -621,6 +621,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 	const game_driver *driver = drivers[drivnum];
 	int error = FALSE;
 	int cpunum;
+	cpu_validity_check_func cpu_validity_check;
 
 	/* loop over all the CPUs */
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
@@ -650,6 +651,14 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 			mame_printf_error("%s: %s uses an incomplete CPU\n", driver->source_file, driver->name);
 			error = TRUE;
 			continue;
+		}
+
+		/* check for CPU-specific validity check */
+		cpu_validity_check = (cpu_validity_check_func) cputype_get_info_fct(cpu->type, CPUINFO_PTR_VALIDITY_CHECK);
+		if (cpu_validity_check != NULL)
+		{
+			if ((*cpu_validity_check)(driver, config->cpu[cpunum].reset_param))
+				error = TRUE;
 		}
 
 		/* loop over all address spaces */
@@ -1381,6 +1390,30 @@ static int validate_sound(int drivnum, const machine_config *config)
 
 
 /*-------------------------------------------------
+    validate_devices - run per-device validity
+	checks
+-------------------------------------------------*/
+
+static int validate_devices(int drivnum, const machine_config *config)
+{
+	int error = FALSE;
+	const game_driver *driver = drivers[drivnum];
+	const device_config *device;
+
+	for (device = device_list_first(config->devicelist, DEVICE_TYPE_WILDCARD); device != NULL; device = device_list_next(device, DEVICE_TYPE_WILDCARD))
+	{
+		device_validity_check_func validity_check = (device_validity_check_func) device_get_info_fct(device, DEVINFO_FCT_VALIDITY_CHECK);
+		if (validity_check != NULL)
+		{
+			if ((*validity_check)(driver, device))
+				error = TRUE;
+		}
+	}
+	return error;
+}
+
+
+/*-------------------------------------------------
     mame_validitychecks - master validity checker
 -------------------------------------------------*/
 
@@ -1395,6 +1428,7 @@ int mame_validitychecks(const game_driver *curdriver)
 	osd_ticks_t display_checks = 0;
 	osd_ticks_t input_checks = 0;
 	osd_ticks_t sound_checks = 0;
+	osd_ticks_t device_checks = 0;
 #ifdef MESS
 	osd_ticks_t mess_checks = 0;
 #endif
@@ -1499,6 +1533,11 @@ int mame_validitychecks(const game_driver *curdriver)
 		sound_checks -= osd_profiling_ticks();
 		error = validate_sound(drivnum, config) || error;
 		sound_checks += osd_profiling_ticks();
+
+		/* validate devices */
+		device_checks -= osd_profiling_ticks();
+		error = validate_devices(drivnum, config) || error;
+		device_checks += osd_profiling_ticks();
 
 		machine_config_free(config);
 	}

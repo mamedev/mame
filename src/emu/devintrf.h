@@ -68,6 +68,7 @@ enum
 	DEVINFO_FCT_START,									/* R/O: device_start_func */
 	DEVINFO_FCT_STOP,									/* R/O: device_stop_func */
 	DEVINFO_FCT_RESET,									/* R/O: device_reset_func */
+	DEVINFO_FCT_VALIDITY_CHECK,							/* R/O: device_validity_check_func */
 
 	DEVINFO_FCT_DEVICE_SPECIFIC = 0x28000,				/* R/W: device-specific values start here */
 
@@ -113,6 +114,10 @@ enum
 #define DEVICE_RESET(name)			void DEVICE_RESET_NAME(name)(const device_config *device)
 #define DEVICE_RESET_CALL(name)		DEVICE_RESET_NAME(name)(device)
 
+#define DEVICE_VALIDITY_CHECK_NAME(name)	device_validity_check_##name
+#define DEVICE_VALIDITY_CHECK(name)			int DEVICE_VALIDITY_CHECK_NAME(name)(const game_driver *driver, const device_config *device)
+#define DEVICE_VALIDITY_CHECK_CALL(name)	DEVICE_VALIDITY_CHECK(name)(driver, device)
+
 
 
 /***************************************************************************
@@ -130,6 +135,7 @@ typedef void (*device_set_info_func)(const device_config *device, UINT32 state, 
 typedef void (*device_start_func)(const device_config *device);
 typedef void (*device_stop_func)(const device_config *device);
 typedef void (*device_reset_func)(const device_config *device);
+typedef int (*device_validity_check_func)(const game_driver *driver, const device_config *device);
 
 
 /* a device_type is simply a pointer to its get_info function */
@@ -148,6 +154,7 @@ union _deviceinfo
 	device_start_func		start;					/* DEVINFO_FCT_START */
 	device_stop_func		stop;					/* DEVINFO_FCT_STOP */
 	device_reset_func		reset;					/* DEVINFO_FCT_RESET */
+	device_validity_check_func validity_check;		/* DEVINFO_FCT_VALIDITY_CHECK */
 };
 
 
