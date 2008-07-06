@@ -1,4 +1,22 @@
 /**
+2008/06/11, by Naibo(translated to English by Mameplus team):
+Driver's Eyes works, 
+	-the communication work between CPU and 3D DSP should be limited to the master M68000, 
+	if the address mapping is done in the shared memory, master CPU would be disturbed by the slave one.
+
+	-DIP Switches
+	DIP3 ON for Screen on the left
+	DIP4 ON for Screen on the right
+	should not toggle on both
+
+	-The left, center and right screens have separate programs and boards, each would work independantly. 
+	About projection angles of left and right screen, the angle is correct on "DRIVER'S EYES" title screen, however in the tracks of demo mode it doesn't seem correct.
+
+	-On demo screen, should fog effects be turned off?
+
+	-The game also features a pretty nice 2D sprite layer, which still doesn't show up yet.
+	it is known that the CPU does constantly feed the 2D video memory some meaningful and logical data.
+
 Namco System 21
 
 Winning Run
@@ -1450,6 +1468,13 @@ static ADDRESS_MAP_START( driveyes_68k_master, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* private work RAM */
 	AM_RANGE(0x180000, 0x183fff) AM_READ(NAMCOS2_68K_eeprom_R) AM_WRITE(NAMCOS2_68K_eeprom_W)// AM_BASE(&namcos2_eeprom) AM_SIZE(&namcos2_eeprom_size)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_READ(namcos2_68k_master_C148_r) AM_WRITE(namcos2_68k_master_C148_w)
+
+	AM_RANGE(0x250000, 0x25ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE( &winrun_polydata )
+	AM_RANGE(0x280000, 0x281fff) AM_WRITE(winrun_dspbios_w) AM_BASE(&winrun_dspbios)
+	AM_RANGE(0x380000, 0x38000f) AM_READ(winrun_dspcomram_control_r) AM_WRITE(winrun_dspcomram_control_w)
+	AM_RANGE(0x3c0000, 0x3c1fff) AM_READ(winrun_68k_dspcomram_r) AM_WRITE(winrun_68k_dspcomram_w)
+	AM_RANGE(0x400000, 0x400001) AM_WRITE(pointram_control_w)
+	AM_RANGE(0x440000, 0x440001) AM_READ(pointram_data_r) AM_WRITE(pointram_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( driveyes_68k_slave, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1459,12 +1484,6 @@ static ADDRESS_MAP_START( driveyes_68k_slave, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( driveyes_68k_common, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x250000, 0x25ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE( &winrun_polydata )
-	AM_RANGE(0x280000, 0x281fff) AM_WRITE(winrun_dspbios_w) AM_BASE(&winrun_dspbios)
-	AM_RANGE(0x380000, 0x38000f) AM_READ(winrun_dspcomram_control_r) AM_WRITE(winrun_dspcomram_control_w)
-	AM_RANGE(0x3c0000, 0x3c1fff) AM_READ(winrun_68k_dspcomram_r) AM_WRITE(winrun_68k_dspcomram_w)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(pointram_control_w)
-	AM_RANGE(0x440000, 0x440001) AM_READ(pointram_data_r) AM_WRITE(pointram_data_w)
 	AM_RANGE(0x700000, 0x71ffff) AM_READ(namco_obj16_r) AM_WRITE(namco_obj16_w)
 	AM_RANGE(0x720000, 0x720007) AM_READ(namco_spritepos16_r) AM_WRITE(namco_spritepos16_w)
 	AM_RANGE(0x740000, 0x75ffff) AM_READ(paletteram16_r ) AM_WRITE(paletteram16_w) AM_BASE(&paletteram16)
