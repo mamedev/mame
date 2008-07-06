@@ -2808,6 +2808,25 @@ ROM_START( drgwrld3 )
 	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
 ROM_END
 
+ROM_START( chindrac )
+	ROM_REGION( 0x80000, REGION_CPU1, 0 )
+	ROM_LOAD16_WORD_SWAP( "igs-d0303.u3", 0x00000, 0x80000, CRC(3b3c29bb) SHA1(77b7e58104314303985c283cce3aec40bd7b9334) )
+
+	ROM_REGION( 0x420000, REGION_GFX1, 0 )
+	//ROM_LOAD( "igs-0301.u39", 0x000000, 0x400000, CRC(655ab941) SHA1(4bbefb27e8971446998508969661042c5111bc72) ) // bad dump
+	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
+	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
+
+	ROM_REGION( 0x40000, REGION_USER1, 0 )
+	ROM_LOAD( "ccdu15.u15", 0x000, 0x2e5, CRC(a15fce69) SHA1(3e38d75c7263bfb36aebdbbd55ebbdd7ca601633) )
+	//ROM_LOAD( "ccdu17.u17.bad.dump", 0x000, 0x104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	//ROM_LOAD( "ccdu18.u18.bad.dump", 0x000, 0x104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "ccdu45.u45", 0x000, 0x2e5, CRC(a15fce69) SHA1(3e38d75c7263bfb36aebdbbd55ebbdd7ca601633) )
+ROM_END
+
+
 ROM_START( chugokur )
 	ROM_REGION( 0x80000, REGION_CPU1, 0 )
 	ROM_LOAD16_WORD_SWAP( "china_jp.v20", 0x00000, 0x80000, CRC(9e018d1a) SHA1(fe14e6344434cabf43685e50fd49c90f05f565be) )
@@ -3020,3 +3039,4 @@ GAME( 1996, vbowl,    0,        vbowl,    vbowl,    vbowl,    ROT0, "Alta / IGS"
 GAME( 1996, vbowlj,   vbowl,    vbowl,    vbowlj,   vbowlj,   ROT0, "Alta / IGS", "Virtua Bowling (Japan, V100JCM)", GAME_IMPERFECT_SOUND )
 GAME( 1997, drgnwrld, 0,        chindrag, drgnwrld, drgnwrld, ROT0, "IGS",        "Dragon World (World, V0400)",     0 )
 GAME( 1995, drgwrld3, drgnwrld, chindrag, drgnwrld, drgnwrld, ROT0, "IGS",        "Dragon World (World, V0300)",     0 )
+GAME( 1995, chindrac, drgnwrld, chindrag, drgnwrld, drgnwrld, ROT0, "IGS",        "Zhong Guo Long (China, V0303)",   GAME_NOT_WORKING ) // protection
