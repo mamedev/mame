@@ -2020,6 +2020,9 @@ void cheat_init(running_machine *machine)
 	edit_cursor			= 0;
 	full_menu_page_height		= visible_items = floor(1.0f / ui_get_line_height()) - 1;
 
+	horizontal_key_repeat_speed = 10;
+	vertical_key_repeat_speed = 10;
+
 	/* initialize CPU/Region info for cheat system */
 	build_cpu_region_info_list(machine);
 
@@ -9415,6 +9418,8 @@ static void load_cheat_options(char *file_name)
 				{
 					vertical_key_repeat_speed = EXTRACT_FIELD(cheat_options, VerticalKeyRepeatSpeed);
 					horizontal_key_repeat_speed = EXTRACT_FIELD(cheat_options, HorizontalKeyRepeatSpeed);
+					horizontal_key_repeat_speed = (horizontal_key_repeat_speed ? horizontal_key_repeat_speed : 10);
+					vertical_key_repeat_speed = (vertical_key_repeat_speed ? vertical_key_repeat_speed : 10);
 					SET_MESSAGE(CHEAT_MESSAGE_RELOAD_CHEAT_OPTION);
 				}
 			}
