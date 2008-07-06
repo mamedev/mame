@@ -852,7 +852,7 @@ EPR-21330 & EPR-21331 differ by 7 bytes:
 Ferrari F355 specific Naomi BIOS roms:
 
 EPR-22850 - NAOMI BOOT ROM 1999 08/30  1.35 (USA)
-EPR-22850 - NAOMI BOOT ROM 1999 08/30  1.35 (Export)
+EPR-22851 - NAOMI BOOT ROM 1999 08/30  1.35 (Export)
 
 EPR-22850 & EPR-22851 differ by 7 bytes:
 
