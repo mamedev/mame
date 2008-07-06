@@ -849,6 +849,17 @@ EPR-21330 & EPR-21331 differ by 7 bytes:
 0x1ffffa-0x1fffff is the BIOS checksum
 
 
+Ferrari F355 specific Naomi BIOS roms:
+
+EPR-22850 - NAOMI BOOT ROM 1999 08/30  1.35 (USA)
+EPR-22850 - NAOMI BOOT ROM 1999 08/30  1.35 (Export)
+
+EPR-22850 & EPR-22851 differ by 7 bytes:
+
+0x52F08 is the region byte (only one region byte)
+0x1ffffa-0x1fffff is the BIOS checksum
+
+
 Region byte encoding is as follows:
 
 0x00 = Japan
@@ -883,14 +894,16 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
 	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-21576b.bin",  0x000000, 0x200000, CRC(755a6e07) SHA1(7e8b8ccfc063144d89668e7224dcd8a36c54f3b3) ) \
 	ROM_SYSTEM_BIOS( 9, "bios9", "epr-21576 (Japan)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-21576.bin",   0x000000, 0x200000, CRC(9dad3495) SHA1(5fb66f9a2b68d120f059c72758e65d34f461044a) ) \
-	ROM_SYSTEM_BIOS( 10, "bios10", "Ferrari F355" ) \
+	ROM_SYSTEM_BIOS( 10, "bios10", "Ferrari F355 (Export)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 10,  "epr-22851.bin", 0x000000, 0x200000, CRC(62483677) SHA1(3e3bcacf5f972c376b569f45307ee7fd0b5031b7) ) \
-	ROM_SYSTEM_BIOS( 11, "bios11", "HOTD2 (US)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 11,  "epr-21330.bin", 0x000000, 0x200000, CRC(9e3bfa1b) SHA1(b539d38c767b0551b8e7956c1ff795de8bbe2fbc) ) \
-	ROM_SYSTEM_BIOS( 12, "bios12", "HOTD2 (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 12,  "epr-21331.bin", 0x000000, 0x200000, CRC(065f8500) SHA1(49a3881e8d76f952ef5e887200d77b4a415d47fe) ) \
-	ROM_SYSTEM_BIOS( 13, "bios13", "Naomi Dev BIOS" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 13,  "dcnaodev.bios", 0x000000, 0x080000, CRC(7a50fab9) SHA1(ef79f448e0bf735d1264ad4f051d24178822110f) ) /* This one comes from a dev / beta board. The eprom was a 27C4096 */
+	ROM_SYSTEM_BIOS( 11, "bios11", "Ferrari F355 (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 11,  "epr-22850.bin", 0x000000, 0x200000, CRC(28aa539d) SHA1(14485368656af80504b212da620179c49f84c1a2) ) \
+	ROM_SYSTEM_BIOS( 12, "bios12", "HOTD2 (US)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 12,  "epr-21330.bin", 0x000000, 0x200000, CRC(9e3bfa1b) SHA1(b539d38c767b0551b8e7956c1ff795de8bbe2fbc) ) \
+	ROM_SYSTEM_BIOS( 13, "bios13", "HOTD2 (Export)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 13,  "epr-21331.bin", 0x000000, 0x200000, CRC(065f8500) SHA1(49a3881e8d76f952ef5e887200d77b4a415d47fe) ) \
+	ROM_SYSTEM_BIOS( 14, "bios14", "Naomi Dev BIOS" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 14,  "dcnaodev.bios", 0x000000, 0x080000, CRC(7a50fab9) SHA1(ef79f448e0bf735d1264ad4f051d24178822110f) ) /* This one comes from a dev / beta board. The eprom was a 27C4096 */
 
 /* only revisions d and higher support the GDROM, and there is an additional bios (and SH4!) on the DIMM board for the CD Controller */
 #define NAOMIGD_BIOS \
