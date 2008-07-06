@@ -1263,10 +1263,10 @@ static DRIVER_INIT( cyclwarr )
 	memory_set_bankptr(2, dst);
 
 	// Copy sprite & palette data out of GFX rom area
-	tatsumi_rom_sprite_lookup1 = src1;
-	tatsumi_rom_sprite_lookup2 = src2;
-	tatsumi_rom_clut0 = src1 + len1 - 0x1000;
-	tatsumi_rom_clut1 = src2 + len2 - 0x1000;
+	tatsumi_rom_sprite_lookup1 = memory_region(machine, REGION_GFX2);
+	tatsumi_rom_sprite_lookup2 = memory_region(machine, REGION_GFX3);
+	tatsumi_rom_clut0 = memory_region(machine, REGION_GFX2) + len1 - 0x1000;
+	tatsumi_rom_clut1 = memory_region(machine, REGION_GFX3) + len2 - 0x1000;
 
 	tatsumi_reset();
 }
