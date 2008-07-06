@@ -3129,7 +3129,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 	resize_menu_item_info(length + 2);
 
 	/********** MENU CONSTRUCTION **********/
-	for(i = 0; i < cheat_list_length && total < visible_items; i++)
+	for(i = 0; i < cheat_list_length; i++)
 	{
 		cheat_entry *traverse = &cheat_list[i];
 
@@ -3151,8 +3151,11 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 			else
 			{
 				/* ##### CODE NAME ##### */
+#ifdef MAME_DEBUG
 				menu_item[total] = traverse->name && astring_len(traverse->name) ? astring_c(traverse->name) : "(null)";
-
+#else
+				menu_item[total] = traverse->name && astring_len(traverse->name) ? astring_c(traverse->name) : "";
+#endif
 				if(traverse->flags & kCheatFlag_HasWrongCode)
 				{
 					/* ##### ERROR ##### */
@@ -4888,7 +4891,11 @@ static int analyse_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 		UINT32 flags = analyse_code_format(machine, entry, action);
 
+#ifdef MAME_DEBUG
 		menu_item[total++] = action->optional_name && astring_len(action->optional_name) ? astring_c(action->optional_name) : "(Null)";
+#else
+		menu_item[total++] = action->optional_name && astring_len(action->optional_name) ? astring_c(action->optional_name) : "";
+#endif
 		menu_item[total++] = MENU_SEPARATOR_ITEM;
 
 		if(flags)
