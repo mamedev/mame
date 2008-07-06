@@ -3997,11 +3997,11 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		ADD_EDIT_MENU_ITEMS(TEST_FIELD(traverse->type, OperationParameter) ? "Minimum Boundary" : "Maximum Boundary", buf_extend_data[i] + 16, EDIT_MENU_ADD_SUBTRACT);
 
 		/* ##### RANGE MINIMUM ##### */
-		sprintf(buf_extend_data[i] + 32, "%4.4X", EXTRACT_FIELD(traverse->extend_data, LSB16));
+		sprintf(buf_extend_data[i] + 32, "%4.4X", EXTRACT_FIELD(traverse->extend_data, MSB16));
 		ADD_EDIT_MENU_ITEMS("Range Minimum", buf_extend_data[i] + 32, EDIT_MENU_RANGE_MINIMUM);
 
 		/* ##### RANGE MAXIMUM ##### */
-		sprintf(buf_extend_data[i] + 48, "%4.4X", EXTRACT_FIELD(traverse->extend_data, MSB16));
+		sprintf(buf_extend_data[i] + 48, "%4.4X", EXTRACT_FIELD(traverse->extend_data, LSB16));
 		ADD_EDIT_MENU_ITEMS("Range Maximum", buf_extend_data[i] + 48, EDIT_MENU_RANGE_MAXIMUM);
 
 		/* ##### DATA ##### */
@@ -12526,6 +12526,7 @@ static void cheat_periodic_entry(running_machine *machine, cheat_entry *entry)
 static void cheat_periodic_old_entry(running_machine *machine, cheat_entry *entry)
 {
 	int i, do_action = 0, done = 1;
+	UINT32 temp;
 
 	/* special handling for select cheats */
 	if(entry->flags & kCheatFlag_Select)
@@ -12654,9 +12655,10 @@ static void cheat_periodic_old_entry(running_machine *machine, cheat_entry *entr
 						}
 						break;
 					case kOperation_ForceRange:
-						if(	read_or_write_data(machine, action, 0, 0) < EXTRACT_FIELD(action->extend_data, MSB16) ||
-							read_or_write_data(machine, action, 0, 0) > EXTRACT_FIELD(action->extend_data, LSB16))
-								read_or_write_data(machine, action, action->data, 0);
+						temp = read_or_write_data(machine, action, 0, 0);
+						if(	temp < EXTRACT_FIELD(action->extend_data, MSB16) ||
+							temp > EXTRACT_FIELD(action->extend_data, LSB16))
+								read_or_write_data(machine, action, action->data, 1);
 						break;
 					case kOperation_SetOrClearBits:
 						read_or_write_data(machine, 	action,
@@ -13030,7 +13032,7 @@ static UINT32 analyse_code_format(running_machine *machine, cheat_entry *entry, 
 
 		if(operation == kOperation_ForceRange)
 		{
-			if(EXTRACT_FIELD(action->type, MSB16) <= EXTRACT_FIELD(action->type, LSB16))
+			if(EXTRACT_FIELD(action->type, MSB16) > EXTRACT_FIELD(action->type, LSB16))
 				errorFlag |= kErrorFlag_InvalidRange;
 		}
 
