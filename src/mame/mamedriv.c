@@ -3869,6 +3869,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( spikeout )	/* 1998 */
 	DRIVER( spikeofe )	/* 1998 */
 	DRIVER( eca )		/* 1999 */
+	DRIVER( ecax )		/* 1999 */
 
 
 	/* Deniam games */
