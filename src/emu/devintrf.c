@@ -708,7 +708,6 @@ genf *device_get_info_fct(const device_config *device, UINT32 state)
 	deviceinfo info;
 
 	assert(device != NULL);
-	assert(device->token != NULL);
 	assert(device->type != NULL);
 	assert(state >= DEVINFO_FCT_FIRST && state <= DEVINFO_FCT_LAST);
 
