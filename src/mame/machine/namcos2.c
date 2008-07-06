@@ -14,7 +14,7 @@ Namco System II
 #include "cpu/m6805/m6805.h"
 #include "namcos2.h"
 
-extern void namcos21_kickstart(int);
+extern void namcos21_kickstart(running_machine *, int);
 
 int namcos2_gametype;
 
@@ -587,7 +587,7 @@ ReadWriteC148( running_machine *machine, int cpu, offs_t offset, UINT16 data, in
 				//printf( "dspkick=0x%x\n", data );
 				if( data&4 )
 				{
-					namcos21_kickstart(1);
+					namcos21_kickstart(machine, 1);
 				}
 			}
 		}

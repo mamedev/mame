@@ -175,10 +175,13 @@ static void register_w(offs_t offset, UINT8 data)
 		video_screen_update_partial(tms34061.screen, video_screen_get_vpos(tms34061.screen));
 
 	/* store the hi/lo half */
-	if (offset & 0x02)
-		tms34061.regs[regnum] = (tms34061.regs[regnum] & 0x00ff) | (data << 8);
-	else
-		tms34061.regs[regnum] = (tms34061.regs[regnum] & 0xff00) | data;
+	if (regnum < ARRAY_LENGTH(tms34061.regs))
+	{
+		if (offset & 0x02)
+			tms34061.regs[regnum] = (tms34061.regs[regnum] & 0x00ff) | (data << 8);
+		else
+			tms34061.regs[regnum] = (tms34061.regs[regnum] & 0xff00) | data;
+	}
 
 	/* log it */
 	if (VERBOSE) logerror("%04X:tms34061 %s = %04x\n", activecpu_get_pc(), regnames[regnum], tms34061.regs[regnum]);
@@ -238,7 +241,10 @@ static UINT8 register_r(offs_t offset)
 	UINT16 result;
 
 	/* extract the correct portion of the register */
-	result = tms34061.regs[regnum];
+	if (regnum < ARRAY_LENGTH(tms34061.regs))
+		result = tms34061.regs[regnum];
+	else
+		result = 0xffff;
 
 	/* special cases: */
 	switch (regnum)

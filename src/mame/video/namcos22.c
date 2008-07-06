@@ -387,7 +387,7 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 static void poly3d_DrawQuad(running_machine *machine, bitmap_t *bitmap, int textureBank, int color, Poly3dVertex pv[4], UINT16 flags, int direct, int cmode )
 {
 	poly_extra_data *extra;
-	poly_vertex v[4], clipv[5];
+	poly_vertex v[4], clipv[6];
 	int clipverts;
 	int vertnum;
 
@@ -406,6 +406,7 @@ static void poly3d_DrawQuad(running_machine *machine, bitmap_t *bitmap, int text
 		clipverts = poly_zclip_if_less(4, v, clipv, 4, MIN_Z);
 		if (clipverts < 3)
 			return;
+		assert(clipverts <= ARRAY_LENGTH(clipv));
 		for (vertnum = 0; vertnum < clipverts; vertnum++)
 		{
 			float ooz = 1.0f / clipv[vertnum].p[0];
