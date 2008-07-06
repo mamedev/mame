@@ -40,6 +40,7 @@
 #include "taito_f3.h"
 #include "sound/es5506.h"
 #include "audio/taito_en.h"
+#include "sound/okim6295.h"
 
 static UINT32 coin_word[2], *f3_ram;
 UINT32 *f3_shared_ram;
@@ -492,6 +493,70 @@ static MACHINE_DRIVER_START( f3_224c )
 	MDRV_IMPORT_FROM(f3)
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+224-1)
+MACHINE_DRIVER_END
+
+
+static const gfx_layout bubsympb_sprite_layout =
+{
+	16,16,
+	RGN_FRAC(1,6),
+	6,
+	{ RGN_FRAC(0,6), RGN_FRAC(1,6), RGN_FRAC(2,6), RGN_FRAC(3,6), RGN_FRAC(4,6), RGN_FRAC(5,6) },
+	{ 7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16, 8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	16*16
+};
+
+static const gfx_layout bubsympb_tile_layout =
+{
+	16,16,
+	RGN_FRAC(1,2),
+	5,
+	{ RGN_FRAC(1,2)+0, 0,1,2,3 },
+	{ 20,16,12,8,4,0,28,24,52,48,44,40,36,32,60,56 },
+	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	16*64
+};
+
+
+static GFXDECODE_START( bubsympb )
+	GFXDECODE_ENTRY( 0,           0x000000, charlayout,          0,  64 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x000000, bubsympb_tile_layout, 0, 512 ) /* Tiles area */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, bubsympb_sprite_layout, 4096, 256 ) /* Sprites area */
+	GFXDECODE_ENTRY( 0,           0x000000, pivotlayout,         0,  64 ) /* Dynamically modified */
+GFXDECODE_END
+
+static MACHINE_DRIVER_START( bubsympb )
+	/* basic machine hardware */
+	MDRV_CPU_ADD(M68EC020, 16000000)
+	MDRV_CPU_PROGRAM_MAP(f3_readmem,f3_writemem)
+	MDRV_CPU_VBLANK_INT("main", f3_interrupt2)
+
+	MDRV_MACHINE_START(f3)
+	//MDRV_MACHINE_RESET(f3)
+	MDRV_NVRAM_HANDLER(taito_f3)
+
+ 	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(58.97)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(624) /* 58.97 Hz, 624us vblank time */)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(40*8+48*2, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 31, 31+224-1)
+
+	MDRV_GFXDECODE(bubsympb)
+	MDRV_PALETTE_LENGTH(8192)
+
+	MDRV_VIDEO_START(f3)
+	MDRV_VIDEO_EOF(f3)
+	MDRV_VIDEO_UPDATE(f3)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(OKIM6295, 1000000 ) // not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // not verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 /******************************************************************************/
@@ -1831,6 +1896,60 @@ ROM_START( bubsymph )
 	ROM_LOAD( "palce16v8q-d77-11.bin", 0x0400, 0x0117, CRC(eacc294e) SHA1(90679d523d90c1f8d2ecbd7b6fac2861f94cf107) )
 	ROM_LOAD( "palce16v8q-d77-12.bin", 0x0600, 0x0117, CRC(e9920cfe) SHA1(58b73fe65f118d57fdce56d781593fc70c797f1b) )
 	ROM_LOAD( "palce16v8q-d77-14.bin", 0x0800, 0x0117, CRC(7427e777) SHA1(e692cedb13e5bc02edc4b25e9dcea51e6715de85) )
+ROM_END
+
+/* bootleg without ensoniq sound system */
+/* the bootleg has some graphical problems because the actual bootleg hardware
+   doesn't replicate the f3 system perfectly */
+
+/*
+
+Bubble Symphony hack
+This romset comes from a bootleg single board modified Taito F3 System,the only know bootleg/hacked game of this system.Differences are:Date in copyright string removed,part of background layer corrupted or missing (as i have seen in arcade).
+Hardware info:
+Main cpu 68020
+Sound chip OKI6295
+Other chips 2x A1020B PLC
+OSC 32 and 26Mhz.
+The audio section was totally modified.It lacks 68000 and Ensoniq chips,these surely due to availability problems and to hold low production costs.
+Some musics are missing,too.
+Sound volume regulation output is gained via common analog operational and power ic amplification (LM324 and 1241).In test mode,digital regulation hasn't effect,due to obvious reason.
+Rom definition:
+D11->ADPCM sound data
+D12 to D15->main program
+D11b to D15b and D16 to D20->graphics
+All eprom are 8bit (27C020,27C208 and 27C040,27C4001).
+
+Dumped by tirino73
+
+*/
+
+
+ROM_START( bubsympb )
+	ROM_REGION(0x200000, REGION_CPU1, 0) /* 68020 code */
+ 	ROM_LOAD32_BYTE("bsb_d12.bin", 0x000000, 0x40000, CRC(d05160fc) SHA1(62eb47827d4089711af1187455faeb62a8d9e369) )
+	ROM_LOAD32_BYTE("bsb_d13.bin", 0x000001, 0x40000, CRC(83fc0d2c) SHA1(275a923e6e6b6763cb7036d94943609eb9ce866b) )
+	ROM_LOAD32_BYTE("bsb_d14.bin", 0x000002, 0x40000, CRC(e6d49bb7) SHA1(9ca509ffd3f46160f3bbb0ceee9abcd09f9f9ad1) )
+	ROM_LOAD32_BYTE("bsb_d15.bin", 0x000003, 0x40000, CRC(014cf8e0) SHA1(5e91fc6665c1d472d0651c06108ea6a8eb5ae8b4) )
+
+	ROM_REGION(0x300000, REGION_GFX1 , ROMREGION_DISPOSE) /* Sprites (5bpp) */
+	ROM_FILL       (        0x000000, 0x080000, 0 )
+	ROM_LOAD("bsb_d18.bin", 0x080000, 0x080000, CRC(22d7eeb5) SHA1(30aa4493c5bc98d9256817b9e3341b20d2b76f1f) )
+	ROM_LOAD("bsb_d19.bin", 0x100000, 0x080000, BAD_DUMP CRC(34185806) SHA1(dcb61f07aa3c0c274243797312c04b0f8dbfd9ea) ) // some bad bits (could probably be fixed using original set)
+	ROM_LOAD("bsb_d20.bin", 0x180000, 0x080000, CRC(20222e15) SHA1(41f2f94afd65d0c106752f254f20b593906cba28) )
+	ROM_LOAD("bsb_d17.bin", 0x200000, 0x080000, CRC(ea2eadfc) SHA1(2c4176e89f816166f410888cd2e837891a4289a3) )
+	ROM_LOAD("bsb_d16.bin", 0x280000, 0x080000, CRC(edccd4e0) SHA1(e00d3c1a91f9a96e1ae7d45842315d839c9cd440) )
+
+	ROM_REGION(0x400000, REGION_GFX2 , ROMREGION_DISPOSE) /* Tiles */
+	ROM_LOAD32_BYTE("bsb_d13b.bin", 0x000000, 0x080000, CRC(430af2aa) SHA1(e935f9f4e0558a25bd4010b44dbb4f38a9d359e0) )
+	ROM_LOAD32_BYTE("bsb_d14b.bin", 0x000001, 0x080000, CRC(c006e832) SHA1(4aebbac188af1ef9176581ac68ac12ce397f2f08) )
+	ROM_LOAD32_BYTE("bsb_d15b.bin", 0x000002, 0x080000, CRC(74644ad4) SHA1(c7610e413c965eb4e40b548d13efdcbc3dde23be) )
+	ROM_LOAD32_BYTE("bsb_d12b.bin", 0x000003, 0x080000, BAD_DUMP CRC(6760ac05) SHA1(65725bcc9aa94a1d800b8d569fef30df542f3c4d) ) // bad lines in places
+	ROM_LOAD32_BYTE("bsb_d11b.bin", 0x200000, 0x080000, BAD_DUMP CRC(d854a38b) SHA1(79fa66b72d526c8270ba2a356d2b44447f4c0a5c) ) // bad lines in places
+
+	ROM_REGION(0x100000, REGION_SOUND1 , ROMREGION_ERASE00 ) // OKI6295 samples
+	ROM_LOAD("bsb_d11.bin", 0x000000, 0x080000, CRC(26bdc617) SHA1(993e7a52128fdd58f22d95521a629beb71ca7b91) ) // I haven't verified this dump.. but given how bad the rest is I'm not confident
+	ROM_RELOAD(0x80000,0x80000)
 ROM_END
 
 ROM_START( bubsympu )
@@ -3376,6 +3495,60 @@ static DRIVER_INIT( bubsymph )
 	tile_decode(machine, 1);
 }
 
+
+static READ32_HANDLER( bubsympb_oki_r )
+{
+	return OKIM6295_status_0_r(machine,0);
+}
+static WRITE32_HANDLER( bubsympb_oki_w )
+{
+	//printf("write %08x %08x\n",data,mem_mask);
+	if (ACCESSING_BITS_0_7) OKIM6295_data_0_w(machine,0,data&0xff);
+	//if (mem_mask==0x000000ff) OKIM6295_data_0_w(machine,0,data&0xff);
+	if (ACCESSING_BITS_16_23)
+	{
+		UINT8 *snd = memory_region(machine, REGION_SOUND1);
+		int bank = (data & 0x000f0000) >> 16;
+		// almost certainly wrong
+		memcpy(snd+0x30000, snd+0x80000+0x30000+bank*0x10000, 0x10000);
+
+		//printf("oki bank w %08x\n",data);
+	}
+
+
+}
+
+
+static DRIVER_INIT( bubsympb )
+{
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_bubsymph );
+	f3_game=BUBSYMPH;
+	//tile_decode(machine, 1);
+
+	/* expand gfx rom */
+	{
+		int i;
+		UINT8 *gfx = memory_region(machine, REGION_GFX2);
+
+		for (i=0x200000;i<0x400000; i+=4)
+		{
+			UINT8 byte = gfx[i];
+			gfx[i+0] = (byte & 0x80)? 1<<4 : 0<<4;
+			gfx[i+0]|= (byte & 0x40)? 1<<0 : 0<<0;
+			gfx[i+1] = (byte & 0x20)? 1<<4 : 0<<4;
+			gfx[i+1]|= (byte & 0x10)? 1<<0 : 0<<0;
+			gfx[i+2] = (byte & 0x08)? 1<<4 : 0<<4;
+			gfx[i+2]|= (byte & 0x04)? 1<<0 : 0<<0;
+			gfx[i+3] = (byte & 0x02)? 1<<4 : 0<<4;
+			gfx[i+3]|= (byte & 0x01)? 1<<0 : 0<<0;
+		}
+	}
+
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_r );
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_w );
+}
+
+
 static DRIVER_INIT( bubblem )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_bubblem );
@@ -3552,6 +3725,7 @@ GAME( 1994, bublbob2, 0,        f3_224a, f3, bubsymph, ROT0,   "Taito Corporatio
 GAME( 1994, bubsympe, bublbob2, f3_224a, f3, bubsymph, ROT0,   "Taito Corporation Japan",   "Bubble Symphony (Ver 2.5O 1994/10/05)", 0 )
 GAME( 1994, bubsympu, bublbob2, f3_224a, f3, bubsymph, ROT0,   "Taito America Corporation", "Bubble Symphony (Ver 2.5A 1994/10/05)", 0 )
 GAME( 1994, bubsymph, bublbob2, f3_224a, f3, bubsymph, ROT0,   "Taito Corporation",         "Bubble Symphony (Ver 2.5J 1994/10/05)", 0 )
+GAME( 1994, bubsympb, bublbob2, bubsympb,f3, bubsympb, ROT0,   "bootleg",                   "Bubble Symphony (bootleg with OKI6295)", GAME_NOT_WORKING ) // backgrounds don't display
 GAME( 1994, spcinvdj, spacedx,  f3,      f3, spcinvdj, ROT0,   "Taito Corporation",         "Space Invaders DX (Ver 2.6J 1994/09/14) (F3 Version)", 0 )
 GAME( 1994, pwrgoal,  0,        f3_224a, f3, hthero95, ROT0,   "Taito Corporation Japan",   "Taito Power Goal (Ver 2.5O 1994/11/03)", 0 )
 GAME( 1994, hthero95, pwrgoal,  f3_224a, f3, hthero95, ROT0,   "Taito Corporation",         "Hat Trick Hero '95 (Ver 2.5J 1994/11/03)", 0 )
