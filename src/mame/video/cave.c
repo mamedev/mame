@@ -58,7 +58,9 @@ UINT16 *cave_vram_0, *cave_vctrl_0;
 UINT16 *cave_vram_1, *cave_vctrl_1;
 UINT16 *cave_vram_2, *cave_vctrl_2;
 UINT16 *cave_vram_3, *cave_vctrl_3;
+UINT16 *cave_spriteram16_2;
 size_t cave_paletteram_size;
+
 
 /* Variables only used here: */
 
@@ -564,8 +566,10 @@ static void get_sprite_info_cave(running_machine *machine)
 	const UINT8  *base_gfx	=	memory_region(machine, region);
 	int                   code_max	=	memory_region_length(machine, region) / (16*16);
 
-	UINT16      *source			=	spriteram16 + ((spriteram_size/2) / 2) * spriteram_bank;
-	UINT16      *finish			=	source + ((spriteram_size/2) / 2);
+
+
+	UINT16      *source;
+	UINT16      *finish;
 
 	struct sprite_cave *sprite			=	sprite_cave;
 
@@ -574,6 +578,14 @@ static void get_sprite_info_cave(running_machine *machine)
 
 	int max_x		=	video_screen_get_width(machine->primary_screen);
 	int max_y		=	video_screen_get_height(machine->primary_screen);
+
+	source = spriteram16 + ((spriteram_size/2) / 2) * spriteram_bank;
+
+	if (cave_videoregs[ 4 ] & 0x02)
+		if (cave_spriteram16_2) source = cave_spriteram16_2 + ((spriteram_size/2) / 2) * spriteram_bank;
+
+	finish = source + ((spriteram_size/2) / 2);
+
 
 	for (; source < finish; source+=8 )
 	{
@@ -685,8 +697,8 @@ static void get_sprite_info_donpachi(running_machine *machine)
 	const UINT8  *base_gfx	=	memory_region(machine, region);
 	int                   code_max	=	memory_region_length(machine, region) / (16*16);
 
-	UINT16      *source			=	spriteram16 + ((spriteram_size/2) / 2) * spriteram_bank;
-	UINT16      *finish			=	source + ((spriteram_size/2) / 2);
+	UINT16      *source;
+	UINT16      *finish;
 
 	struct sprite_cave *sprite			=	sprite_cave;
 
@@ -695,6 +707,13 @@ static void get_sprite_info_donpachi(running_machine *machine)
 
 	int max_x		=	video_screen_get_width(machine->primary_screen);
 	int max_y		=	video_screen_get_height(machine->primary_screen);
+
+	source = spriteram16 + ((spriteram_size/2) / 2) * spriteram_bank;
+
+	if (cave_videoregs[ 4 ] & 0x02)
+		if (cave_spriteram16_2) source = cave_spriteram16_2 + ((spriteram_size/2) / 2) * spriteram_bank;
+
+	finish = source + ((spriteram_size/2) / 2);
 
 	for (; source < finish; source+=8 )
 	{

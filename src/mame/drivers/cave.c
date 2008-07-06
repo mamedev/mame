@@ -78,6 +78,8 @@ Versions known to exist but not dumped:
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 
+extern UINT16 *cave_spriteram16_2;
+
 /***************************************************************************
 
 
@@ -92,6 +94,7 @@ static UINT8 vblank_irq;
 static UINT8 sound_irq;
 static UINT8 unknown_irq;
 static UINT8 agallet_vblank_irq;
+
 
 /* Update the IRQ state based on all possible causes */
 static void update_irq_state(running_machine *machine)
@@ -504,7 +507,7 @@ static ADDRESS_MAP_START( dfeveron_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM						)	// RAM
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(cave_sound_w					)	// YMZ280
 	AM_RANGE(0x400000, 0x407fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0x408000, 0x40ffff) AM_WRITE(SMH_RAM						)	// Sprites?
+	AM_RANGE(0x408000, 0x40ffff) AM_WRITE(SMH_RAM) AM_BASE(&cave_spriteram16_2)
 	AM_RANGE(0x500000, 0x507fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0	)	// Layer 0
 	AM_RANGE(0x600000, 0x607fff) AM_WRITE(cave_vram_1_w) AM_BASE(&cave_vram_1	)	// Layer 1
 	AM_RANGE(0x708000, 0x708fff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
@@ -543,7 +546,7 @@ static ADDRESS_MAP_START( ddonpach_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM							)	// RAM
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(cave_sound_w						)	// YMZ280
 	AM_RANGE(0x400000, 0x407fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0x408000, 0x40ffff) AM_WRITE(SMH_RAM							)	// Sprites?
+	AM_RANGE(0x408000, 0x40ffff) AM_WRITE(SMH_RAM) AM_BASE(&cave_spriteram16_2)
 	AM_RANGE(0x500000, 0x507fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0	)	// Layer 0
 	AM_RANGE(0x600000, 0x607fff) AM_WRITE(cave_vram_1_w) AM_BASE(&cave_vram_1	)	// Layer 1
 	AM_RANGE(0x700000, 0x70ffff) AM_WRITE(cave_vram_2_8x8_w) AM_BASE(&cave_vram_2	)	// Layer 2
@@ -611,7 +614,7 @@ static ADDRESS_MAP_START( donpachi_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x307fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0	)	// Layer 0
 	AM_RANGE(0x400000, 0x407fff) AM_WRITE(cave_vram_2_8x8_w) AM_BASE(&cave_vram_2	)	// Layer 2
 	AM_RANGE(0x500000, 0x507fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0x508000, 0x50ffff) AM_WRITE(SMH_RAM							)	// Sprites?
+	AM_RANGE(0x508000, 0x50ffff) AM_WRITE(SMH_RAM) AM_BASE(&cave_spriteram16_2)
 	AM_RANGE(0x600000, 0x600005) AM_WRITE(SMH_RAM) AM_BASE(&cave_vctrl_1			)	// Layer 1 Control
 	AM_RANGE(0x700000, 0x700005) AM_WRITE(SMH_RAM) AM_BASE(&cave_vctrl_0			)	// Layer 0 Control
 	AM_RANGE(0x800000, 0x800005) AM_WRITE(SMH_RAM) AM_BASE(&cave_vctrl_2			)	// Layer 2 Control
@@ -651,7 +654,7 @@ static ADDRESS_MAP_START( esprade_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM						)	// RAM
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(cave_sound_w					)	// YMZ280
 	AM_RANGE(0x400000, 0x407fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0x408000, 0x40ffff) AM_WRITE(SMH_RAM						)	// Sprites?
+	AM_RANGE(0x408000, 0x40ffff) AM_WRITE(SMH_RAM) AM_BASE(&cave_spriteram16_2)	// Sprites?
 	AM_RANGE(0x500000, 0x507fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0	)	// Layer 0
 	AM_RANGE(0x600000, 0x607fff) AM_WRITE(cave_vram_1_w) AM_BASE(&cave_vram_1	)	// Layer 1
 	AM_RANGE(0x700000, 0x707fff) AM_WRITE(cave_vram_2_w) AM_BASE(&cave_vram_2	)	// Layer 2
@@ -695,7 +698,7 @@ static ADDRESS_MAP_START( gaia_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM						)	// RAM
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(cave_sound_w					)	// YMZ280
 	AM_RANGE(0x400000, 0x407fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprite bank 1
-	AM_RANGE(0x408000, 0x40ffff) AM_WRITE(SMH_RAM						)	// Sprite bank 2
+	AM_RANGE(0x408000, 0x40ffff) AM_WRITE(SMH_RAM) AM_BASE(&cave_spriteram16_2) // Sprite bank 2
 	AM_RANGE(0x500000, 0x507fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0	)	// Layer 0
 	AM_RANGE(0x508000, 0x50ffff) AM_WRITE(SMH_RAM						)	// More Layer 0, Tested but not used?
 	AM_RANGE(0x600000, 0x607fff) AM_WRITE(cave_vram_1_w) AM_BASE(&cave_vram_1	)	// Layer 1
@@ -739,7 +742,7 @@ static ADDRESS_MAP_START( guwange_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM						)	// RAM
 	AM_RANGE(0x300000, 0x30007f) AM_WRITE(SMH_RAM) AM_BASE(&cave_videoregs	)	// Video Regs
 	AM_RANGE(0x400000, 0x407fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0x408000, 0x40ffff) AM_WRITE(SMH_RAM						)	// Sprites?
+	AM_RANGE(0x408000, 0x40ffff) AM_WRITE(SMH_RAM) AM_BASE(&cave_spriteram16_2)
 	AM_RANGE(0x500000, 0x507fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0	)	// Layer 0
 	AM_RANGE(0x600000, 0x607fff) AM_WRITE(cave_vram_1_w) AM_BASE(&cave_vram_1	)	// Layer 1
 	AM_RANGE(0x700000, 0x707fff) AM_WRITE(cave_vram_2_w) AM_BASE(&cave_vram_2	)	// Layer 2
@@ -791,7 +794,7 @@ static ADDRESS_MAP_START( hotdogst_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(hotdogst_eeprom_msb_w			)	// EEPROM
 	AM_RANGE(0xd00002, 0xd00003) AM_WRITE(SMH_NOP						)	// ???
 	AM_RANGE(0xf00000, 0xf07fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0xf08000, 0xf0ffff) AM_WRITE(SMH_RAM						)	// Sprites?
+	AM_RANGE(0xf08000, 0xf0ffff) AM_WRITE(SMH_RAM) AM_BASE(&cave_spriteram16_2)
 ADDRESS_MAP_END
 
 
@@ -915,7 +918,7 @@ static ADDRESS_MAP_START( mazinger_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM							)	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM							)	// RAM
 	AM_RANGE(0x200000, 0x207fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0x208000, 0x20ffff) AM_WRITE(SMH_RAM							)	// Sprites?
+	AM_RANGE(0x208000, 0x20ffff) AM_WRITE(SMH_RAM) AM_BASE(&cave_spriteram16_2)
 	AM_RANGE(0x300068, 0x300069) AM_WRITE(watchdog_reset16_w				)	// Watchdog
 	AM_RANGE(0x30006e, 0x30006f) AM_WRITE(sound_cmd_w						)	// To Sound CPU
 	AM_RANGE(0x300000, 0x30007f) AM_WRITE(SMH_RAM) AM_BASE(&cave_videoregs		)	// Video Regs
@@ -977,7 +980,7 @@ static ADDRESS_MAP_START( metmqstr_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc00005) AM_WRITE(SMH_RAM) AM_BASE(&cave_vctrl_0		)	// Layer 0 Control
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(metmqstr_eeprom_msb_w			)	// EEPROM
 	AM_RANGE(0xf00000, 0xf07fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0xf08000, 0xf0ffff) AM_WRITE(SMH_RAM						)	// RAM
+	AM_RANGE(0xf08000, 0xf0ffff) AM_WRITE(SMH_RAM) AM_BASE(&cave_spriteram16_2)
 ADDRESS_MAP_END
 
 
@@ -1042,7 +1045,7 @@ static ADDRESS_MAP_START( pwrinst2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x907fff) AM_WRITE(cave_vram_1_w) AM_BASE(&cave_vram_1	)	// Layer 1
 	AM_RANGE(0x980000, 0x987fff) AM_WRITE(cave_vram_3_8x8_w) AM_BASE(&cave_vram_3	)	// Layer 3
 	AM_RANGE(0xa00000, 0xa07fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0xa08000, 0xa0ffff) AM_WRITE(SMH_RAM							)	// Sprites?
+	AM_RANGE(0xa08000, 0xa0ffff) AM_WRITE(SMH_RAM) AM_BASE(&cave_spriteram16_2)
 	AM_RANGE(0xa10000, 0xa1ffff) AM_WRITE(SMH_RAM							)	// Sprites?
 	AM_RANGE(0xa80000, 0xa8007f) AM_WRITE(SMH_RAM) AM_BASE(&cave_videoregs		)	// Video Regs
 	AM_RANGE(0xb00000, 0xb00005) AM_WRITE(pwrinst2_vctrl_2_w) AM_BASE(&cave_vctrl_2			)	// Layer 2 Control
@@ -1114,7 +1117,7 @@ static ADDRESS_MAP_START( sailormn_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x40c000, 0x40ffff) AM_WRITE(SMH_RAM							)	// (agallet)
 	AM_RANGE(0x410000, 0x410001) AM_WRITE(SMH_RAM							)	// (agallet)
 	AM_RANGE(0x500000, 0x507fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0x508000, 0x50ffff) AM_WRITE(SMH_RAM							)	// Sprites?
+	AM_RANGE(0x508000, 0x50ffff) AM_WRITE(SMH_RAM) AM_BASE(&cave_spriteram16_2)
 	AM_RANGE(0x510000, 0x510001) AM_WRITE(SMH_RAM							)	// (agallet)
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(sailormn_eeprom_msb_w				)	// EEPROM
 	AM_RANGE(0x800000, 0x807fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0		)	// Layer 0
@@ -1152,7 +1155,7 @@ static ADDRESS_MAP_START( uopoko_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM						)	// RAM
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(cave_sound_w					)	// YMZ280
 	AM_RANGE(0x400000, 0x407fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0x408000, 0x40ffff) AM_WRITE(SMH_RAM						)	// Sprites?
+	AM_RANGE(0x408000, 0x40ffff) AM_WRITE(SMH_RAM) AM_BASE(&cave_spriteram16_2)
 	AM_RANGE(0x500000, 0x507fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0	)	// Layer 0
 	AM_RANGE(0x600000, 0x60007f) AM_WRITE(SMH_RAM) AM_BASE(&cave_videoregs	)	// Video Regs
 	AM_RANGE(0x700000, 0x700005) AM_WRITE(SMH_RAM) AM_BASE(&cave_vctrl_0		)	// Layer 0 Control
