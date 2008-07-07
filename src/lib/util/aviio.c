@@ -2579,7 +2579,7 @@ static avi_error huffyuv_decompress_to_yuy16(avi_stream *stream, const UINT8 *da
 	/* compressed video */
 	for (y = 0; y < stream->height; y++)
 	{
-		UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
+		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
 
 		/* handle the first four bytes independently */
 		x = 0;
@@ -2664,19 +2664,26 @@ static avi_error huffyuv_decompress_to_yuy16(avi_stream *stream, const UINT8 *da
 	}
 
 	/* apply deltas */
-	lasty = lastcb = lastcr = 0;
 	lastprevy = lastprevcb = lastprevcr = 0;
 	for (y = 0; y < stream->height; y++)
 	{
-		UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
-		UINT16 *prevrow = dest - prevlines * bitmap->rowpixels;
+		UINT16 *prevrow = BITMAP_ADDR16(bitmap, y - prevlines, 0);
+		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		
+		/* handle the first four bytes independently */
+		x = 0;
+		if (y == 0)
+		{
+			/* lasty, lastcr, lastcb are set up previously */
+			x = 2;
+		}
 
 		/* left predict or gradient predict */
 		if ((huffyuv->predictor & ~HUFFYUV_PREDICT_DECORR) == HUFFYUV_PREDICT_LEFT ||
 			((huffyuv->predictor & ~HUFFYUV_PREDICT_DECORR) == HUFFYUV_PREDICT_GRADIENT))
 		{
 			/* first do left deltas */
-			for (x = 0; x < stream->width; x += 2)
+			for ( ; x < stream->width; x += 2)
 			{
 				UINT16 pixel0 = dest[x + 0];
 				UINT16 pixel1 = dest[x + 1];
@@ -2705,7 +2712,7 @@ static avi_error huffyuv_decompress_to_yuy16(avi_stream *stream, const UINT8 *da
 		/* median predict on rows > 0 */
 		else if ((huffyuv->predictor & ~HUFFYUV_PREDICT_DECORR) == HUFFYUV_PREDICT_MEDIAN && y >= prevlines)
 		{
-			for (x = 0; x < stream->width; x += 2)
+			for ( ; x < stream->width; x += 2)
 			{
 				UINT16 prevpixel0 = prevrow[x + 0];
 				UINT16 prevpixel1 = prevrow[x + 1];
