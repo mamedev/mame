@@ -9,10 +9,7 @@
 
 ***************************************************************************/
 
-#include <stdio.h>
-#include <ctype.h>
-#include "aviio.h"
-#include "bitmap.h"
+#include "osdcore.h"
 
 
 
@@ -40,6 +37,10 @@ int vbi_parse_line(const UINT16 *source, int sourcewidth, int sourceshift, int e
 	double clock, bestclock;
 	int x, firstedge;
 	int besterr;
+	
+	/* fail if the width is too large */
+	if (sourcewidth > MAX_SOURCE_WIDTH)
+		return 0;
 
 	/* find highs and lows in the line */
 	min = 0xff;
