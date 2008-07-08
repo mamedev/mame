@@ -28,6 +28,7 @@
 #include <ctype.h>
 #include "aviio.h"
 #include "bitmap.h"
+#include "vbiparse.h"
 
 
 
@@ -58,85 +59,6 @@ struct _pattern_data
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
-
-/*-------------------------------------------------
-    parse_line - parse a Philips code from a
-    line of video data
--------------------------------------------------*/
-
-static int parse_line(bitmap_t *bitmap, int line, int expected_bits, UINT8 *result)
-{
-	const UINT16 *source = BITMAP_ADDR16(bitmap, line, 0);
-	int x, edges = 0, bits = 0;
-	int minwidth = 1000;
-	UINT8 bit[720];
-	int edge[720];
-	int error = 0;
-
-	/* clamp expected bits */
-	expected_bits *= 2;
-	if (expected_bits > ARRAY_LENGTH(edge) - 1)
-		expected_bits = ARRAY_LENGTH(edge) - 1;
-
-	/* find the edges in the line */
-	for (x = 1; x < bitmap->width && edges < ARRAY_LENGTH(edge); x++)
-		if (source[x] >= 0xc000 && source[x - 1] < 0xc000)
-			edge[edges++] = x;
-		else if (source[x] <= 0x4000 && source[x - 1] > 0x4000)
-			edge[edges++] = x;
-
-	/* find the minimum width */
-	for (x = 1; x < edges; x++)
-	{
-		int width = edge[x] - edge[x - 1];
-		if (width > 3 && width < minwidth)
-			minwidth = edge[x] - edge[x - 1];
-	}
-
-	/* now generate the bits */
-	for (x = 1; x < edges; x++)
-	{
-		int width = edge[x] - edge[x - 1];
-		if (width > 3)
-		{
-			int count = (width > 3 * minwidth / 2) ? 2 : 1;
-			while (count--)
-				bit[bits++] = (source[edge[x - 1]] >= 0x8000) ? 1 : 0;
-		}
-	}
-
-	/* look for improperly paired bits in the sequence */
-	if (bits < expected_bits)
-	{
-		/* look for two bits in a row of the same type on an even boundary */
-		for (x = 0; x < bits; x += 2)
-			if (bit[x] == bit[x + 1])
-				break;
-
-		/* if we got something wrong, assume we're missing an opening 0 bit */
-		if (x < bits)
-		{
-			memmove(&bit[1], &bit[0], bits);
-			bit[0] = 0;
-			bits++;
-		}
-	}
-
-	/* trailing bits are 0 */
-	while (bits < expected_bits)
-		bit[bits++] = 0;
-
-	/* output */
-	for (x = 0; x < MIN(bits, expected_bits); x += 2)
-	{
-		static const UINT8 trans[4] = { 0x80, 1, 0, 0xff };
-		result[x/2] = trans[(bit[x] << 1) | bit[x + 1]];
-		if (result[x/2] > 1)
-			error++;
-	}
-	return error ? -(bits / 2) : (bits / 2);
-}
-
 
 /*-------------------------------------------------
     output_meta - output a line of metadata
@@ -227,23 +149,6 @@ static int generate_from_avi(const char *aviname)
 			int prevwhite = white;
 			int i;
 
-{
-	static FILE *f;
-	int line;
-	if (!f) f = fopen("temp.log", "w");
-	fprintf(f, "\n\nFrame %d, field %d\n", frame, field);
-	for (line = 0; line < 22; line++)
-	{
-		UINT16 *src = BITMAP_ADDR16(bitmap, line*2 + field, 0);
-		int x;
-		for (x = 0; x < bitmap->width; x++)
-			fprintf(f, "%04X ", *src++);
-		fprintf(f, "\n");
-	}
-	fflush(f);
-	
-}
-
 			/* line 11 contains the white flag */
 			white = 0;
 			if (*BITMAP_ADDR16(bitmap, 11*2 + field, bitmap->width / 2) > 0x8000)
@@ -261,18 +166,18 @@ static int generate_from_avi(const char *aviname)
 
 			/* line 16 contains stop code and other interesting bits */
 			line16 = 0;
-			if (parse_line(bitmap, 16*2 + field, 24, bits) == 24)
+			if (vbi_parse_line(BITMAP_ADDR16(bitmap, 16*2 + field, 0), bitmap->width, 8, 24, bits) == 24)
 				for (i = 0; i < 24; i++)
 					line16 = (line16 << 1) | bits[i];
 
 			/* line 17 and 18 contain frame/chapter/lead in/out encodings */
 			line17 = 0;
-			if (parse_line(bitmap, 17*2 + field, 24, bits) == 24)
+			if (vbi_parse_line(BITMAP_ADDR16(bitmap, 17*2 + field, 0), bitmap->width, 8, 24, bits) == 24)
 				for (i = 0; i < 24; i++)
 					line17 = (line17 << 1) | bits[i];
 
 			line18 = 0;
-			if (parse_line(bitmap, 18*2 + field, 24, bits) == 24)
+			if (vbi_parse_line(BITMAP_ADDR16(bitmap, 18*2 + field, 0), bitmap->width, 8, 24, bits) == 24)
 				for (i = 0; i < 24; i++)
 					line18 = (line18 << 1) | bits[i];
 

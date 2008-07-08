@@ -44,6 +44,7 @@ UTILOBJS = \
 	$(LIBOBJ)/util/sha1.o \
 	$(LIBOBJ)/util/unicode.o \
 	$(LIBOBJ)/util/unzip.o \
+	$(LIBOBJ)/util/vbiparse.o \
 	$(LIBOBJ)/util/xmlfile.o \
 
 $(OBJ)/libutil.a: $(UTILOBJS)
