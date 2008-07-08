@@ -2650,7 +2650,7 @@ ROM_START( vaportrp )
 	ROM_REGION32_LE( 0x80000, REGION_USER1, 0 )
 	ROM_LOAD( "vtrxboot.bin", 0x000000, 0x80000, CRC(ee487a6c) SHA1(fb9efda85047cf615f24f7276a9af9fd542f3354) )
 
-	DISK_REGION( REGION_DISKS )
+	DISK_REGION( REGION_DISKS ) /* Guts: Apr 10 1998 11:03:14  Main: Apr 10 1998 11:27:44 */
 	DISK_IMAGE( "vaportrp", 0, MD5(fac4d37e049bc649696f4834044860e6) SHA1(75e2eaf81c69d2a337736dbead804ac339fd0675) )
 
 	ROM_REGION16_LE( 0x10000, REGION_SOUND1, 0 )	/* ADSP-2115 data Version 1.02 */
@@ -2662,10 +2662,10 @@ ROM_START( biofreak )
 	ROM_REGION16_LE( 0x10000, REGION_SOUND1, 0 )	/* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x80000, REGION_USER1, 0 )
+	ROM_REGION32_LE( 0x80000, REGION_USER1, 0 ) /* Seattle System Boot ROM Version 0.1i Apr 14 1997  14:52:53 */
 	ROM_LOAD( "biofreak.u32", 0x000000, 0x80000, CRC(cefa00bb) SHA1(7e171610ede1e8a448fb8d175f9cb9e7d549de28) )
 
-	DISK_REGION( REGION_DISKS )
+	DISK_REGION( REGION_DISKS ) /* Build Date 12/11/97 */
 	DISK_IMAGE( "biofreak", 0, MD5(f4663a3fd0ceed436756710b97d283e4) SHA1(88b87cb651b97eac117c9342127938e30dc8c138) )
 ROM_END
 
@@ -2722,10 +2722,10 @@ ROM_START( carnevil )
 	ROM_REGION16_LE( 0x10000, REGION_SOUND1, 0 )	/* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x80000, REGION_USER1, 0 )
-	ROM_LOAD( "boot.u32", 0x000000, 0x80000, CRC(82c07f2e) SHA1(fa51c58022ce251c53bad12fc6ffadb35adb8162) )
+	ROM_REGION32_LE( 0x80000, REGION_USER1, 0 ) /* Boot Rom Version 1.9 */
+	ROM_LOAD( "carnevil1_9.u32", 0x000000, 0x80000, CRC(82c07f2e) SHA1(fa51c58022ce251c53bad12fc6ffadb35adb8162) )
 
-	DISK_REGION( REGION_DISKS )
+	DISK_REGION( REGION_DISKS )	/* Hard Drive v1.0.1  12/11/99 */
 	DISK_IMAGE( "carnevil", 0, BAD_DUMP MD5(6eafae86091c0a915cf8cfdc3d73adc2) SHA1(5e6524d4b97de141c38e301a17e8af15661cb5d6) )
 ROM_END
 
@@ -2734,10 +2734,10 @@ ROM_START( hyprdriv )
 	ROM_REGION16_LE( 0x10000, REGION_SOUND1, 0 )	/* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "seattle.snd", 0x000000, 0x8000, BAD_DUMP CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x80000, REGION_USER1, 0 )
+	ROM_REGION32_LE( 0x80000, REGION_USER1, 0 ) /* Boot Rom Version 9. */
 	ROM_LOAD( "hyprdrve.u32", 0x000000, 0x80000, CRC(3e18cb80) SHA1(b18cc4253090ee1d65d72a7ec0c426ed08c4f238) )
 
-	DISK_REGION( REGION_DISKS )
+	DISK_REGION( REGION_DISKS )	/* Version 1.40  Oct 23 1998  15:16:00 */
 	DISK_IMAGE( "hyprdriv", 0, MD5(480c43735b0b83eb10c0223283d4226c) SHA1(2e42fecbb8722c736cccdca7ed3b21fbc75e345a) )
 ROM_END
 
@@ -2946,7 +2946,7 @@ static DRIVER_INIT( hyprdriv )
 /* Atari */
 GAME( 1996, wg3dh,    0,        phoenixsa,         wg3dh,    wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey", GAME_SUPPORTS_SAVE )
 GAME( 1996, mace,     0,        seattle150,        mace,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (boot ROM 1.0ce, HDD 1.0b)", GAME_SUPPORTS_SAVE )
-GAME( 1997, macea,    mace,     seattle150,        mace,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a", GAME_SUPPORTS_SAVE )
+GAME( 1997, macea,    mace,     seattle150,        mace,     mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a)", GAME_SUPPORTS_SAVE )
 GAME( 1996, sfrush,   0,        flagstaff,         sfrush,   sfrush,   ROT0, "Atari Games",  "San Francisco Rush", GAME_SUPPORTS_SAVE )
 GAME( 1996, sfrushrk, 0,        flagstaff,         sfrushrk, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1998, calspeed, 0,        seattle150_widget, calspeed, calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a, 4/17/98)", GAME_SUPPORTS_SAVE )
