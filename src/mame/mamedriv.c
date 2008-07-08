@@ -3109,6 +3109,7 @@ V-V                           TP-027
 	DRIVER( wcbowl )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbwl165 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbwl161 )	/* (c) 1995 Incredible Technologies */
+	DRIVER( wcbwl16 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbwl140 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbwl15 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbwl13 )	/* (c) 1995 Incredible Technologies */
