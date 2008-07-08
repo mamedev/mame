@@ -9811,7 +9811,7 @@ static void load_cheat_code_old(running_machine *machine, char *file_name)
 		buffer->name[0] = buffer->type[0] = buffer->data[0] = buffer->extend_data[0] = buffer->description[0] = buffer->comment[0] = 0;
 
 #ifdef MESS
-		if(sscanf(buf, format->format_string, &crc, buffer->name, &cpu, &address, &data, &code, buffer->description, buffer->comment) < format->aruguments_matched) continue;
+		if(sscanf(buf, format->format_string, &crc, buffer->name, &cpu, &address, &data, &code, buffer->description, buffer->comment) < format->arguments_matched) continue;
 #else
 		if(sscanf(buf, format->format_string, buffer->name, &cpu, &address, &data, &code, buffer->description, buffer->comment) < format->arguments_matched) continue;
 #endif
