@@ -105,9 +105,13 @@ static CUSTOM_INPUT( champbas_watchdog_bit2 )
 }
 
 
-static WRITE8_HANDLER( irq_ack_w )
+static WRITE8_HANDLER( irq_enable_w )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	int bit = data & 1;
+
+	cpu_interrupt_enable(0,bit);
+	if (!bit)
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 
@@ -179,7 +183,7 @@ static ADDRESS_MAP_START( talbot_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_ack_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	// !WORK board output (no use?)
 	AM_RANGE(0xa002, 0xa002) AM_WRITENOP
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(champbas_flipscreen_w)
@@ -207,7 +211,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_ack_w) AM_READ(input_port_0_r)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w) AM_READ(input_port_0_r)
 	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	// !WORK board output (no use?)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(champbas_gfxbank_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(champbas_flipscreen_w)
