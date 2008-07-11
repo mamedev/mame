@@ -428,11 +428,6 @@ static WRITE32_HANDLER(at_page32_w)
 }
 
 
-DEV_READWRITE8TO32LE( taitowlf_pit8254_32le, pit8253_r, pit8253_w )
-DEV_READWRITE8TO32LE( taitowlf_dma8237_32le, dma8237_r, dma8237_w )
-DEV_READWRITE8TO32LE( taitowlf_pic8259_32le, pic8259_r, pic8259_w )
-
-
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( taitowlf_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -447,13 +442,13 @@ static ADDRESS_MAP_START( taitowlf_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(taitowlf_io, ADDRESS_SPACE_IO, 32)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(DMA8237, "dma8237_1", taitowlf_dma8237_32le_r, taitowlf_dma8237_32le_w)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE(PIC8259, "pic8259_1", taitowlf_pic8259_32le_r, taitowlf_pic8259_32le_w)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE(PIT8254, "pit8254", taitowlf_pit8254_32le_r, taitowlf_pit8254_32le_w)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8(DMA8237, "dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8(PIC8259, "pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8(PIT8254, "pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,				at_page32_w)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE(PIC8259, "pic8259_2", taitowlf_pic8259_32le_r, taitowlf_pic8259_32le_w)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8(PIC8259, "pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE(DMA8237, "dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_r, ide_w)
@@ -590,15 +585,12 @@ static const struct pit8253_config taitowlf_pit8254_config =
 	{
 		{
 			4772720/4,				/* heartbeat IRQ */
-			pc_timer0_w,
-			NULL
+			pc_timer0_w
 		}, {
 			4772720/4,				/* dram refresh */
-			NULL,
 			NULL
 		}, {
 			4772720/4,				/* pio port c pin 4, and speaker polling enough */
-			NULL,
 			NULL
 		}
 	}

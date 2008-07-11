@@ -14,9 +14,6 @@
 typedef void (*pit8253_output_changed_func)(const device_config *device, int state);
 #define PIT8253_OUTPUT_CHANGED(name)	void name(const device_config *device, int state )
 
-typedef void (*pit8253_frequency_changed_func)(const device_config *device, double frequency);
-#define PIT8253_FREQUENCY_CHANGED(name)	void name(const device_config *device, double frequency)
-
 
 struct pit8253_config
 {
@@ -28,9 +25,6 @@ struct pit8253_config
 		/* If specified, this gets called whenever the output for this timer changes */
 		pit8253_output_changed_func			output_changed;
 
-		/* If specified, this gets called whenever the frequency of the output for this
-           timer changes. */
-		pit8253_frequency_changed_func		frequency_changed;
 	} timer[3];
 };
 
@@ -45,9 +39,19 @@ WRITE8_DEVICE_HANDLER( pit8253_w );
 WRITE8_DEVICE_HANDLER( pit8253_gate_w );
 
 
-int pit8253_get_frequency(const device_config *device, int timer);
+/* In the 8253/8254 the CLKx input lines can be attached to a regular clock
+   signal. Another option is to use the output from one timer as the input
+   clock to another timer.
+
+   The functions below should supply both functionalities. If the signal is
+   a regular clock signal, use the pit8253_set_clockin function. If the
+   CLKx input signal is the output of the different source, set the new_clockin
+   to 0 with pit8253_set_clockin and call pit8253_set_clock_signal to change
+   the state of the input CLKx signal.
+ */
 int pit8253_get_output(const device_config *device, int timer);
 void pit8253_set_clockin(const device_config *device, int timer, double new_clockin);
+void pit8253_set_clock_signal(const device_config *device, int timer, int state);
 
 
 #endif	/* __PIT8253_H_ */

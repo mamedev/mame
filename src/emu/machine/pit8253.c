@@ -18,9 +18,7 @@
  *
  *****************************************************************************/
 
-#include <math.h>
 #include "driver.h"
-#include "devconv.h"
 #include "machine/pit8253.h"
 
 
@@ -36,9 +34,6 @@
 
 #define	LOG1(msg)		do { if (VERBOSE >= 1) logerror msg; } while (0)
 #define	LOG2(msg)		do { if (VERBOSE >= 2) logerror msg; } while (0)
-
-
-#define	TIMER_TIME_NEVER ((UINT64) -1)
 
 #define	CYCLES_NEVER ((UINT32) -1)
 
@@ -57,16 +52,17 @@ static const char * const device_tags[NUM_TYPES] = { "pit8253", "pit8254" };
 
 struct pit8253_timer
 {
+	int index;						/* index number of the timer */
 	double clockin;					/* input clock frequency in Hz */
+	int clock;						/* clock signal when clockin is 0 */
 
 	pit8253_output_changed_func		output_changed;	/* callback function for when output changes */
-	pit8253_frequency_changed_func	frequency_changed;	/* callback function for when output frequency changes */
 
 	attotime last_updated;			/* time when last updated */
 
-	emu_timer *outputtimer;		/* MAME timer for output change callback */
-	emu_timer *freqtimer;			/* MAME timer for output frequency change callback */
+	emu_timer *updatetimer;			/* MAME timer to process updates */
 
+	UINT8 programmed;				/* Has this counter been programmed by writing to the control word */
 	UINT16 value;					/* current counter value ("CE" in Intel docs) */
 	UINT16 latch;					/* latched counter value ("OL" in Intel docs) */
 	UINT16 count;					/* new counter value ("CR" in Intel docs) */
@@ -84,8 +80,6 @@ struct pit8253_timer
 	INT32 phase;						/* see phase definition tables in simulate2(), below */
 
 	UINT32 cycles_to_output;		/* cycles until output callback called */
-	UINT32 cycles_to_freq;			/* cycles until frequency callback called */
-	UINT32 freq_count;				/* counter period for periodic modes, 0 if counter non-periodic */
 };
 
 typedef struct _pit8253_t	pit8253_t;
@@ -211,74 +205,13 @@ static void	decrease_counter_value(struct pit8253_timer	*timer,UINT64 cycles)
 }
 
 
-static double get_frequency(struct pit8253_timer *timer)
+/* Counter loading: transfer of a count from the CR to the CE */
+static void load_counter_value(const device_config *device, struct pit8253_timer *timer)
 {
-	LOG2(("pit8253: get_frequency() : %lf\n",(double)(timer->freq_count == 0 ? 0 : timer->clockin / timer->freq_count)));
-	return timer->freq_count ==	0 ?	0 :	timer->clockin / timer->freq_count;
-}
-
-
-/* Call the frequency callback in "cycles" cycles */
-static void	freq_callback_in(struct	pit8253_timer *timer,UINT32	cycles)
-{
-	LOG2(("pit8253: freq_callback_in(): %d cycles\n",cycles));
-
-	if (timer->frequency_changed == NULL)
-	{
-		return;
-	}
-
-	if (timer->clockin == 0	|| cycles == CYCLES_NEVER)
-	{
-		timer_reset(timer->freqtimer,attotime_never);
-	}
-	else
-	{
-		timer_reset(timer->freqtimer,double_to_attotime(cycles / timer->clockin));
-	}
-	timer->cycles_to_freq =	cycles;
-}
-
-
-static void	set_freq_count(const device_config *device, struct pit8253_timer *timer)
-{
-	int	mode = CTRL_MODE(timer->control);
-	UINT32 freq_count;
-
-	if ((mode == 2 || mode == 3) &&	timer->gate	!= 0 &&	timer->phase !=	0)
-	{
-		freq_count = adjusted_count(CTRL_BCD(timer->control),timer->count);
-	}
-	else
-	{
-		freq_count = 0;
-	}
-
-	if (freq_count != timer->freq_count)
-	{
-		timer->freq_count =	freq_count;
-		if (timer->frequency_changed != NULL)
-		{
-			timer->frequency_changed(device, get_frequency(timer));
-			freq_callback_in(timer,CYCLES_NEVER);
-		}
-	}
-
-	LOG2(("pit8253: set_freq_count() : %d\n",freq_count));
-}
-
-
-/* Call the output callback in "cycles" cycles */
-static void	trigger_countdown(const device_config *device, struct pit8253_timer *timer)
-{
-	LOG2(("pit8253: trigger_countdown()\n"));
-
-	timer->phase = 1;
 	timer->value = timer->count;
-	if (CTRL_MODE(timer->control) == 3 && timer->output	== 0)
-		timer->value &=	0xfffe;
-
-	set_freq_count(device, timer);
+	timer->null_count = 1;
+	if ( CTRL_MODE(timer->control) == 3 && timer->output == 0)
+		timer->value &= 0xfffe;
 }
 
 
@@ -297,20 +230,15 @@ static void	set_output(const device_config *device, struct pit8253_timer *timer,
 
 /* This emulates timer "timer" for "elapsed_cycles" cycles and assumes no
    callbacks occur during that time. */
-static void	simulate2(const device_config *device, struct pit8253_timer *timer,UINT64 elapsed_cycles)
+static void	simulate2(const device_config *device, struct pit8253_timer *timer, INT64 elapsed_cycles)
 {
 	UINT32 adjusted_value;
 	int	bcd	= CTRL_BCD(timer->control);
 	int	mode = CTRL_MODE(timer->control);
 	int	cycles_to_output = 0;
 
-	if (timer->cycles_to_freq != CYCLES_NEVER)
-	{
-		timer->cycles_to_freq -= elapsed_cycles;
-	}
-
-	LOG2(("pit8253: simulate2(): simulating %d cycles in mode %d, bcd = %d, phase = %d, gate = %d, value = 0x%04x\n",
-		  (int)elapsed_cycles,mode,bcd,timer->phase,timer->gate,timer->value));
+	LOG2(("pit8253: simulate2(): simulating %d cycles for %d in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x\n",
+		  (int)elapsed_cycles,timer->index,mode,bcd,timer->phase,timer->gate,timer->output,timer->value));
 
 	switch (mode) {
 	case 0:
@@ -333,7 +261,7 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer,U
 
         Gate level sensitive only. Low disables counting, high enables it. */
 
-		if (timer->gate	== 0 ||	timer->phase ==	0)
+		if (timer->phase ==	0)
 		{
 			cycles_to_output = CYCLES_NEVER;
 		}
@@ -341,78 +269,93 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer,U
 		{
 			if (elapsed_cycles > 0 && timer->phase == 1)
 			{
+				/* Counter load cycle */
 				--elapsed_cycles;
 				timer->phase = 2;
+				load_counter_value( device, timer );
 			}
 
-			if (timer->phase ==	2)
+			if ( timer->gate == 0 )
 			{
-				adjusted_value = adjusted_count(bcd,timer->value);
-				if (elapsed_cycles < adjusted_value)
-				{
-					/* Counter didn't wrap */
-					decrease_counter_value(timer,elapsed_cycles);
-				}
-				else
-				{
-					/* Counter wrapped, output goes high */
-					elapsed_cycles -= adjusted_value;
-					timer->phase = 3;
-					timer->value = 0;
-				}
-			}
-
-			if (timer->phase ==	3)
-			{
-				decrease_counter_value(timer,elapsed_cycles);
 				cycles_to_output = CYCLES_NEVER;
 			}
 			else
 			{
-				cycles_to_output = adjusted_count(bcd,timer->value)	+ (timer->phase	== 1 ? 1 : 0);
+				if (timer->phase ==	2)
+				{
+					adjusted_value = adjusted_count(bcd,timer->value);
+					if (elapsed_cycles >= adjusted_value)
+					{
+						/* Counter wrapped, output goes high */
+						elapsed_cycles -= adjusted_value;
+						timer->phase = 3;
+						timer->value = 0;
+						set_output( device, timer, 1 );
+					}
+				}
+
+				decrease_counter_value(timer,elapsed_cycles);
+
+				switch( timer->phase )
+				{
+				case 1:		cycles_to_output = 1; break;
+				case 2:		cycles_to_output = adjusted_count( bcd, timer->value ); break;
+				case 3:		cycles_to_output = adjusted_count( bcd, timer->value ); break;
+				}
 			}
 		}
-
-		set_output(device, timer, timer->phase == 3 ? 1 : 0);
 		break;
 
 
 	case 1:
 		/* Mode 1: (Hardware Retriggerable One-Shot a.k.a. Programmable One-Shot)
 
-        --+       +------------------
-          |       |
-          +-------+
-          <-  n  ->
+        -----+       +------------------
+             |       |
+             +-------+
+             <-  n  ->
 
           ^
           +- trigger
 
         phase|output|length  |value|next|comment
         -----+------+--------+-----+----+----------------------------------
-            0|high  |infinity|0..1 |1   |counting down
-            1|low   |n       |n..1 |0   |counting down
+            0|high  |infinity|     |1   |counting down
+            1|high  |1       |     |2   |internal delay to load counter
+            2|low   |n       |n..1 |3   |counting down
+            3|high  |infinity|0..1 |3   |counting down
 
         Gate rising-edge sensitive only.
         Rising edge initiates counting and resets output after next clock. */
 
-		adjusted_value = adjusted_count(bcd,timer->value);
-		if (elapsed_cycles < adjusted_value)
+		if ( elapsed_cycles > 0 && timer->phase == 1 )
 		{
-			/* Counter didn't wrap */
-			decrease_counter_value(timer,elapsed_cycles);
-			cycles_to_output = (timer->phase ==	0 ?	CYCLES_NEVER : adjusted_count(bcd,timer->value));
+			/* Counter load cycle, output goes low */
+			--elapsed_cycles;
+			timer->phase = 2;
+			load_counter_value( device, timer );
+			set_output( device, timer, 0 );
 		}
-		else
+
+		if ( timer->phase == 2 )
 		{
-			/* Counter wrapped, output goes high */
-			elapsed_cycles -= adjusted_value;
-			timer->phase = 0;
-			timer->value = 0;
-			decrease_counter_value(timer,elapsed_cycles);
-			cycles_to_output = CYCLES_NEVER;
+			adjusted_value = adjusted_count( bcd, timer->value );
+			if ( elapsed_cycles >= adjusted_value )
+			{
+				/* Counter wrapped, output goes high */
+				timer->phase = 3;
+				set_output( device, timer, 1 );
+			}
 		}
-		set_output(device, timer, timer->phase == 0 ? 1 : 0);
+
+		decrease_counter_value( timer, elapsed_cycles );
+
+		switch( timer->phase )
+		{
+		case 1:		cycles_to_output = 1; break;
+		case 2:		cycles_to_output = adjusted_count( bcd, timer->value ); break;
+		default:	cycles_to_output = CYCLES_NEVER; break;
+		}
 		break;
 
 
@@ -422,15 +365,17 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer,U
         --------------+ +---------+ +----
                       | |         | |
                       +-+         +-+
-            <-    n    -X-    n    ->
+           <-    n    -X-    n    ->
                       <1>
-            ^
-            +- counter load or trigger
+        ^
+        +- counter load or trigger
 
         phase|output|length  |value|next|comment
         -----+------+--------+-----+----+----------------------------------
             0|high  |infinity|     |1   |waiting for count
-            1|v!=1  |n       |n..1 |1   |counting down
+		    1|high  |1       |     |2   |internal delay to load counter
+            2|high  |n       |n..2 |3   |counting down
+		    3|low   |1       |1    |2   |reload counter
 
         Counter rewrite has no effect until repeated
 
@@ -447,22 +392,47 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer,U
 		}
 		else
 		{
-			adjusted_value = adjusted_count(bcd,timer->value);
-			if (elapsed_cycles < adjusted_value)
+			if ( elapsed_cycles > 0 && timer->phase == 1 )
 			{
-				/* Counter didn't wrap */
-				decrease_counter_value(timer,elapsed_cycles);
+				--elapsed_cycles;
+				timer->phase = 2;
+				load_counter_value( device, timer );
 			}
-			else
-			{
-				/* Counter wrapped around one or more times */
-				elapsed_cycles -= adjusted_value;
-				trigger_countdown(device, timer);
-				decrease_counter_value(timer,elapsed_cycles	% adjusted_count(bcd,timer->count));
-			}
-			cycles_to_output = (timer->value ==	1 ?	1 :	(adjusted_count(bcd,timer->value) -	1));
 
-			set_output(device, timer, timer->value != 1 ? 1 : 0);
+			adjusted_value = adjusted_count( bcd, timer->value );
+
+			do
+			{
+				if ( timer->phase == 2 )
+				{
+					if ( elapsed_cycles + 1 >= adjusted_value )
+					{
+						/* Coounter hits 1, output goes low */
+						timer->phase = 3;
+						set_output( device, timer, 0 );
+					}
+				}
+
+				if ( elapsed_cycles > 0 && timer->phase == 3 )
+				{
+					/* Reload counter, output goes high */
+					--elapsed_cycles;
+					timer->phase = 2;
+					load_counter_value( device, timer );
+					adjusted_value = adjusted_count( bcd, timer->value );
+					set_output( device, timer, 1 );
+				}
+			}
+			while( elapsed_cycles >= adjusted_value );
+
+			/* Calculate counter value */
+			decrease_counter_value(timer,elapsed_cycles);
+
+			switch( timer->phase )
+			{
+			case 1:		cycles_to_output = 1; break;
+			default:	cycles_to_output = (timer->value ==	1 ?	1 :	(adjusted_count(bcd,timer->value) -	1));
+			}
 		}
 		break;
 
@@ -470,24 +440,26 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer,U
 	case 3:
 		/* Mode 3: (Square Wave Generator)
 
-        ----------------+           +-----------+           +----
-                        |           |           |           |
-                        +-----------+           +-----------+
-            <- (n+1)/2 -X-   n/2   ->
-            ^
-            +- counter load or trigger
+		----------------+           +-----------+           +----
+		                |           |           |           |
+		                +-----------+           +-----------+
+		    <- (n+1)/2 -X-   n/2   ->
+		 ^
+		 +- counter load or trigger
 
         phase|output|length  |value|next|comment
-        -----+------+--------+-----+----+----------------------------------
-            0|high  |infinity|     |1   |waiting for count
-            1|      |infinity|n..0 |1   |counting down double speed
+		-----+------+--------+-----+----+----------------------------------
+		    0|high  |infinity|     |1   |waiting for count
+		    1|high  |1       |     |2   |internal delay to load counter
+		    2|high  |n/2(+1) |n..0 |3   |counting down double speed, reload counter
+		    3|low   |n/2     |n..0 |2   |counting down double speed, reload counter
 
-        Counter rewrite has no effect until repeated (output falling or rising)
+		Counter rewrite has no effect until repeated (output falling or rising)
 
-        Gate rising-edge and level sensitive.
-        Gate low disables counting and sets output immediately high.
-        Rising-edge reloads count and initiates counting
-        Gate high enables counting. */
+		Gate rising-edge and level sensitive.
+		Gate low disables counting and sets output immediately high.
+		Rising-edge reloads count and initiates counting
+		Gate high enables counting. */
 
 		if (timer->gate	== 0 ||	timer->phase ==	0)
 		{
@@ -497,33 +469,48 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer,U
 		}
 		else
 		{
-			adjusted_value = adjusted_count(bcd,timer->value);
-			if ((elapsed_cycles<<1)	< adjusted_value)
+			if ( elapsed_cycles > 0 && timer->phase == 1 )
 			{
-				/* Counter didn't wrap around */
-				decrease_counter_value(timer,elapsed_cycles<<1);
+				--elapsed_cycles;
+				timer->phase = 2;
+				load_counter_value( device, timer );
 			}
-			else
+
+			adjusted_value = adjusted_count( bcd, timer->value );
+
+			do
 			{
-				/* Counter wrapped around one or more times */
-				elapsed_cycles -= ((adjusted_value+1)>>1);
-
-				set_output(device, timer, 1 - timer->output);
-				trigger_countdown(device, timer);
-
-				elapsed_cycles %= adjusted_count(bcd,timer->count);
-				adjusted_value = adjusted_count(bcd,timer->value);
-				if ((elapsed_cycles<<1)	>= adjusted_value)
+				if ( timer->phase == 2 && elapsed_cycles >= ( ( adjusted_value + 1 ) >> 1 ) )
 				{
-					/* Counter wrapped around an even number of times */
-					elapsed_cycles -= ((adjusted_value+1)>>1);
-
-					set_output(device, timer, 1 - timer->output);
-					trigger_countdown(device, timer);
+					/* High phase expired, output goes low */
+					elapsed_cycles -= ( ( adjusted_value + 1 ) >> 1 );
+					timer->phase = 3;
+					load_counter_value( device, timer );
+					adjusted_value = adjusted_count( bcd, timer->value );
+					set_output( device, timer, 0 );
 				}
-				decrease_counter_value(timer,elapsed_cycles<<1);
+
+				if ( timer->phase == 3 && elapsed_cycles >= ( adjusted_value >> 1 ) )
+				{
+					/* Low phase expired, output goes high */
+					elapsed_cycles -= ( adjusted_value >> 1 );
+					timer->phase = 2;
+					load_counter_value( device, timer );
+					adjusted_value = adjusted_count( bcd, timer->value );
+					set_output( device, timer, 1 );
+				}
 			}
-			cycles_to_output = (adjusted_count(bcd,timer->value) + 1) >> 1;
+			while( ( timer->phase == 2 && elapsed_cycles >= ( ( adjusted_value + 1 ) >> 1 ) ) ||
+			       ( timer->phase == 3 && elapsed_cycles >= ( adjusted_value >> 1 ) ) );
+
+			decrease_counter_value(timer,elapsed_cycles<<1);
+
+			switch( timer->phase )
+			{
+			case 1:		cycles_to_output = 1; break;
+			case 2:		cycles_to_output = ( adjusted_count( bcd, timer->value ) + 1 ) >> 1; break;
+			case 3:		cycles_to_output = adjusted_count( bcd, timer->value ) >> 1; break;
+			}
 		}
 		break;
 
@@ -531,28 +518,28 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer,U
 	case 4:
 	case 5:
 		/* Mode 4: (Software Trigger Strobe)
-           Mode 5: (Hardware Trigger Strobe)
+		   Mode 5: (Hardware Trigger Strobe)
 
-        --------------+ +--------------------
-                      | |
-                      +-+
-            <-  n+1  ->
-            ^         <1>
-            +- counter load (mode 4) or trigger (mode 5)
+		--------------+ +--------------------
+		              | |
+		              +-+
+		    <-  n+1  ->
+		    ^         <1>
+		    +- counter load (mode 4) or trigger (mode 5)
 
-        phase|output|length  |value|next|comment
-        -----+------+--------+-----+----+----------------------------------
-            0|high  |infinity|0..1 |0   |waiting for count
-            1|high  |1       |     |2   |internal delay when counter loaded
-            2|high  |n       |n..1 |3   |counting down
-            3|low   |1       |0    |0   |strobe
+		phase|output|length  |value|next|comment
+		-----+------+--------+-----+----+----------------------------------
+		    0|high  |infinity|0..1 |0   |waiting for count/counting down
+		    1|high  |1       |     |2   |internal delay when counter loaded
+		    2|high  |n       |n..1 |3   |counting down
+		    3|low   |1       |0    |0   |strobe
 
-        Mode 4 only: counter rewrite loads new counter
-        Mode 5 only: count not reloaded immediately.
-        Mode control write doesn't stop count but sets output high
+		Mode 4 only: counter rewrite loads new counter
+		Mode 5 only: count not reloaded immediately.
+		Mode control write doesn't stop count but sets output high
 
-        Mode 4 only: Gate level sensitive only. Low disables counting, high enables it.
-        Mode 5 only: Gate rising-edge sensitive only. Rising edge initiates counting */
+		Mode 4 only: Gate level sensitive only. Low disables counting, high enables it.
+		Mode 5 only: Gate rising-edge sensitive only. Rising edge initiates counting */
 
 		if (timer->gate	== 0 &&	mode ==	4)
 		{
@@ -564,6 +551,21 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer,U
 			{
 				--elapsed_cycles;
 				timer->phase = 2;
+				load_counter_value( device, timer );
+			}
+
+			if ( timer->value == 0 && timer->phase == 2 )
+				adjusted_value = 0;
+			else
+				adjusted_value = adjusted_count( bcd, timer->value );
+
+			if ( timer->phase == 2 && elapsed_cycles >= adjusted_value )
+			{
+				/* Counter has hit zero, set output to low */
+				elapsed_cycles -= adjusted_value;
+				timer->phase = 3;
+				timer->value = 0;
+				set_output( device, timer, 0 );
 			}
 
 			if (elapsed_cycles > 0 && timer->phase == 3)
@@ -571,68 +573,35 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer,U
 				--elapsed_cycles;
 				timer->phase = 0;
 				decrease_counter_value(timer,1);
+				set_output( device, timer, 1 );
 			}
 
-			if (timer->value ==	0 && timer->phase == 2)
-				adjusted_value = 0;
-			else
-				adjusted_value = adjusted_count(bcd,timer->value);
+			decrease_counter_value(timer,elapsed_cycles);
 
-			if (elapsed_cycles < adjusted_value)
+			switch( timer->phase )
 			{
-				/* Counter didn't wrap */
-				decrease_counter_value(timer,elapsed_cycles);
-			}
-			else
-			{
-				elapsed_cycles -= adjusted_value;
-				timer->value = 0;
-				if (elapsed_cycles == 0)
-				{
-					/* We hit the strobe cycle */
-					timer->phase = 3;
-				}
-				else
-				{
-					decrease_counter_value(timer,elapsed_cycles);
-					timer->phase = 0;
-				}
-			}
-			switch(timer->phase) {
-			case 0:
-				cycles_to_output = CYCLES_NEVER;
-				break;
-			case 1:
-				cycles_to_output = adjusted_count(bcd,timer->value)	+ 1;
-				break;
-			case 2:
-				cycles_to_output = adjusted_count(bcd,timer->value);
-				break;
-			case 3:
-				cycles_to_output = 1;
-				break;
+			case 1:		cycles_to_output = 1; break;
+			case 2:		cycles_to_output = adjusted_count( bcd, timer->value ); break;
+			case 3:		cycles_to_output = 1; break;
 			}
 		}
-		set_output(device, timer, timer->phase != 3 ? 1 : 0);
 		break;
 	}
 
-	if (timer->output_changed != NULL)
+	timer->cycles_to_output	= cycles_to_output;
+	if (cycles_to_output ==	CYCLES_NEVER ||	timer->clockin == 0)
 	{
-		timer->cycles_to_output	= cycles_to_output;
-		if (cycles_to_output ==	CYCLES_NEVER ||	timer->clockin == 0)
-		{
-			timer_reset(timer->outputtimer,attotime_never);
-		}
-		else
-		{
-			timer_reset(timer->outputtimer,
-				double_to_attotime(cycles_to_output / timer->clockin));
-		}
+		timer_adjust_oneshot(timer->updatetimer, attotime_never, timer->index);
+	}
+	else
+	{
+		attotime next_fire_time = attotime_add( timer->last_updated, double_to_attotime( cycles_to_output / timer->clockin ) );
+
+		timer_adjust_oneshot(timer->updatetimer, attotime_sub( next_fire_time, timer_get_time() ), timer->index );
 	}
 
-	if (timer->cycles_to_freq == 0)
-		timer->cycles_to_freq =	CYCLES_NEVER;
+    LOG2(("pit8253: simulate2(): simulating %d cycles for %d in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x, cycles_to_output = %04x\n",
+          (int)elapsed_cycles,timer->index,mode,bcd,timer->phase,timer->gate,timer->output,timer->value,cycles_to_output));
 }
 
 
@@ -653,29 +622,13 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer,U
    inaccurate by more than one cycle, and the output changed multiple
    times during the discrepancy. In practice updates should still be O(1).
 */
-static void	simulate(const device_config *device, struct pit8253_timer *timer,UINT64 elapsed_cycles)
+static void	simulate(const device_config *device, struct pit8253_timer *timer, INT64 elapsed_cycles)
 {
-	while ((timer->cycles_to_output	!= CYCLES_NEVER	&&
-			timer->cycles_to_output	<= elapsed_cycles) ||
-		   (timer->cycles_to_freq != CYCLES_NEVER &&
-			timer->cycles_to_freq <= elapsed_cycles))
-	{
-		UINT32 cycles_to_callback;
-
-		if (timer->cycles_to_output	< timer->cycles_to_freq	&&
-			timer->cycles_to_output	!= CYCLES_NEVER)
-		{
-			cycles_to_callback = timer->cycles_to_output;
-		}
-		else
-		{
-			cycles_to_callback = timer->cycles_to_freq;
-		}
-
-		simulate2(device, timer, cycles_to_callback);
-		elapsed_cycles -= cycles_to_callback;
-	}
-	simulate2(device, timer, elapsed_cycles);
+	if ( elapsed_cycles > 0 )
+		simulate2(device, timer, elapsed_cycles);
+	else
+		if ( timer->clockin )
+			timer_adjust_oneshot(timer->updatetimer, double_to_attotime( 1 / timer->clockin ), timer->index );
 }
 
 
@@ -686,47 +639,33 @@ static void	update(const device_config *device, struct pit8253_timer *timer)
        years of time. Should be enough for now. */
 	attotime now =	timer_get_time();
 	attotime elapsed_time = attotime_sub(now,timer->last_updated);
-	INT64 elapsed_cycles =	attotime_to_double(elapsed_time) *	timer->clockin;
+	INT64 elapsed_cycles =	attotime_to_double(elapsed_time) * timer->clockin;
 
-	timer->last_updated	= attotime_add(timer->last_updated,double_to_attotime(elapsed_cycles/timer->clockin));
+	LOG1(("pit8253: update(): timer %d, %lld elapsed_cycles\n", timer->index, elapsed_cycles));
 
-	simulate(device, timer,elapsed_cycles);
+	if ( timer->clockin )
+	{
+		timer->last_updated	= attotime_add(timer->last_updated,double_to_attotime(elapsed_cycles/timer->clockin));
+	}
+	else
+	{
+		timer->last_updated = now;
+	}
+
+	if ( timer->programmed )
+		simulate(device, timer, elapsed_cycles);
 }
 
 
-static TIMER_CALLBACK( frequency_changed )
+static TIMER_CALLBACK( update_timer_cb )
 {
 	const device_config *device = ptr;
 	pit8253_t	*pit8253 = get_safe_token(device);
 	struct pit8253_timer *timer = get_timer(pit8253,param);
-	INT64 cycles =	timer->cycles_to_freq;
-	double t;
 
-	LOG2(("pit8253: frequency_changed(): timer %d, %d cycles\n",param,(UINT32)cycles));
+	LOG2(("pit8253: output_changed(): timer %d\n",param));
 
-	simulate(device, timer,cycles);
-
-	t = cycles / timer->clockin;
-
-	timer->last_updated	= attotime_add(timer->last_updated, double_to_attotime(t));
-}
-
-
-static TIMER_CALLBACK( output_changed )
-{
-	const device_config *device = ptr;
-	pit8253_t	*pit8253 = get_safe_token(device);
-	struct pit8253_timer *timer = get_timer(pit8253,param);
-	INT64 cycles =	timer->cycles_to_output;
-	double t;
-
-	LOG2(("pit8253: output_changed(): timer %d, %d cycles\n",param,(UINT32)cycles));
-
-	simulate(device, timer,cycles);
-
-	t = cycles / timer->clockin;
-
-	timer->last_updated	= attotime_add(timer->last_updated, double_to_attotime(t));
+	update( device, timer );
 }
 
 
@@ -834,31 +773,18 @@ static void	load_count(const device_config *device, struct pit8253_timer *timer,
 			newcount = 0;
 	}
 	timer->count = newcount;
-	timer->null_count =	1;
 	if (mode ==	2 || mode == 3)
 	{
 		if (timer->phase ==	0)
 		{
-			trigger_countdown(device, timer);
-		}
-		else
-		{
-			int	bcd	= CTRL_BCD(timer->control);
-			if (mode ==	2)
-			{
-				freq_callback_in(timer,adjusted_count(bcd,timer->value));
-			}
-			else
-			{
-				freq_callback_in(timer,(adjusted_count(bcd,timer->value) + 1) >> 1);
-			}
+			timer->phase = 1;
 		}
 	}
 	else
 	{
 		if (mode ==	0 || mode == 4)
 		{
-			trigger_countdown(device, timer);
+			timer->phase = 1;
 		}
 	}
 }
@@ -960,18 +886,28 @@ WRITE8_DEVICE_HANDLER( pit8253_w )
 		else {
 			LOG1(("pit8253_write(): timer=%d bytes=%d mode=%d bcd=%d\n", (data >> 6) & 3, (data >> 4) & 3, (data >> 1) & 7,data & 1));
 
-			timer->control = (data & 0x3f);
-			timer->null_count =	1;
-			timer->wmsb	= timer->rmsb =	0;
-			/* Phase 0 is always the phase after a mode control write */
-			timer->phase = 0;
-			set_output(device, timer, 1);
-			set_freq_count(device, timer);
+			if ( ( CTRL_MODE(timer->control) != CTRL_MODE(data) ) || ! timer->programmed )
+			{
+				timer->control = (data & 0x3f);
+				timer->null_count =	1;
+				timer->wmsb	= timer->rmsb =	0;
+				/* Phase 0 is always the phase after a mode control write */
+				timer->phase = 0;
+				set_output(device, timer, CTRL_MODE(timer->control) ? 1 : 0);
+				timer->programmed = 1;
+			}
 		}
 	}
 	else
 	{
+		int	middle_of_a_cycle = 0;
+
 		update(device, timer);
+
+		if ( attotime_compare( timer_get_time(), timer->last_updated ) > 0 && timer->clockin != 0 )
+		{
+			middle_of_a_cycle = 1;
+		}
 
 		switch(CTRL_ACCESS(timer->control))	{
 		case 0:
@@ -980,19 +916,40 @@ WRITE8_DEVICE_HANDLER( pit8253_w )
 
 		case 1:
 			/* read/write counter bits 0-7 only */
+
+			/* check if we should compensate for not being on a cycle boundary */
+			if ( middle_of_a_cycle )
+				timer->last_updated = attotime_add(timer->last_updated,double_to_attotime(1/timer->clockin));
+
 			load_count(device, timer, data);
+			simulate2(device, timer, 0 );
+			if ( CTRL_MODE(timer->control) == 0 )
+			{
+				set_output( device, timer, 0 );
+			}
 			break;
 
 		case 2:
 			/* read/write counter bits 8-15 only */
+
+			/* check if we should compensate for not being on a cycle boundary */
+			if ( middle_of_a_cycle )
+				timer->last_updated = attotime_add(timer->last_updated,double_to_attotime(1/timer->clockin));
+
 			load_count(device, timer, data << 8);
+			simulate2(device, timer, 0 );
 			break;
 
 		case 3:
 			/* read/write bits 0-7 first, then 8-15 */
 			if (timer->wmsb	!= 0)
 			{
+				/* check if we should compensate for not being on a cycle boundary */
+				if ( middle_of_a_cycle )
+					timer->last_updated = attotime_add(timer->last_updated,double_to_attotime(1/timer->clockin));
+
 				load_count(device, timer,timer->lowcount | (data << 8));
+				simulate2(device, timer, 0 );
 			}
 			else
 			{
@@ -1003,13 +960,13 @@ WRITE8_DEVICE_HANDLER( pit8253_w )
                        2 won't stop the count, but this was experimentally
                        determined to be false. */
 					timer->phase = 0;
+					set_output( device, timer, 0 );
 				}
 			}
 			timer->wmsb	= 1	- timer->wmsb;
 			break;
 		}
 	}
-	update(device, timer);
 }
 
 
@@ -1031,12 +988,9 @@ WRITE8_DEVICE_HANDLER( pit8253_gate_w )
 	{
 		update(device, timer);
 		timer->gate	= gate;
-		set_freq_count(device, timer);
-		if (gate !=	0 &&
-			(mode == 1 || mode == 5	||
-			 (timer->phase == 1	&& (mode ==	2 || mode == 3))))
+		if (gate !=	0 && ( mode == 1 || mode == 2 || mode == 5 ))
 		{
-			trigger_countdown(device, timer);
+			timer->phase = 1;
 		}
 		update(device, timer);
 	}
@@ -1045,17 +999,6 @@ WRITE8_DEVICE_HANDLER( pit8253_gate_w )
 
 
 /* ----------------------------------------------------------------------- */
-
-int	pit8253_get_frequency(const device_config *device, int timerno)
-{
-	pit8253_t	*pit8253 = get_safe_token(device);
-	struct pit8253_timer *timer	= get_timer(pit8253,timerno);
-
-	update(device, timer);
-	return get_frequency(timer);
-}
-
-
 
 int	pit8253_get_output(const device_config *device, int timerno)
 {
@@ -1081,15 +1024,23 @@ void pit8253_set_clockin(const device_config *device, int timerno, double new_cl
 	update(device, timer);
 	timer->clockin = new_clockin;
 	update(device, timer);
+}
 
-	if (timer->frequency_changed != NULL)
+
+void pit8253_set_clock_signal(const device_config *device, int timerno, int state)
+{
+	pit8253_t	*pit8253 = get_safe_token(device);
+	struct pit8253_timer *timer = get_timer(pit8253,timerno);
+
+	LOG2(("pit8253_set_clock_signal(): PIT timer=%d, state = %d\n", timerno, state));
+
+	/* Trigger on low to high transition */
+	if ( !timer->clock && state )
 	{
-		timer->frequency_changed(device, get_frequency(timer));
-		if (timer->cycles_to_freq != CYCLES_NEVER)
-		{
-			freq_callback_in(timer,timer->cycles_to_freq);
-		}
+		/* Advance a cycle */
+		simulate2(device, timer, 1);
 	}
+	timer->clock = state;
 }
 
 
@@ -1110,22 +1061,9 @@ static void common_start( const device_config *device, int device_type ) {
 
 		timer->clockin = pit8253->config->timer[timerno].clockin;
 		timer->output_changed = pit8253->config->timer[timerno].output_changed;
-		timer->frequency_changed = pit8253->config->timer[timerno].frequency_changed;
 
-		if (timer->output_changed == NULL)
-			timer->outputtimer = NULL;
-		else
-		{
-			timer->outputtimer = timer_alloc(output_changed, (void *)device);
-			timer_adjust_oneshot(timer->outputtimer, attotime_never, timerno);
-		}
-		if (timer->frequency_changed == NULL)
-			timer->freqtimer = NULL;
-		else
-		{
-			timer->freqtimer = timer_alloc(frequency_changed, (void *)device);
-			timer_adjust_oneshot(timer->freqtimer,  attotime_never, timerno);
-		}
+		timer->updatetimer = timer_alloc(update_timer_cb, (void *)device);
+		timer_adjust_oneshot(timer->updatetimer, attotime_never, timerno);
 
 		/* set up state save values */
 		state_save_register_item(unique_tag, timerno, timer->clockin);
@@ -1144,10 +1082,10 @@ static void common_start( const device_config *device, int device_type ) {
 		state_save_register_item(unique_tag, timerno, timer->null_count);
 		state_save_register_item(unique_tag, timerno, timer->phase);
 		state_save_register_item(unique_tag, timerno, timer->cycles_to_output);
-		state_save_register_item(unique_tag, timerno, timer->cycles_to_freq);
-		state_save_register_item(unique_tag, timerno, timer->freq_count);
 		state_save_register_item(unique_tag, timerno, timer->last_updated.seconds);
 		state_save_register_item(unique_tag, timerno, timer->last_updated.attoseconds);
+		state_save_register_item(unique_tag, timerno, timer->programmed);
+		state_save_register_item(unique_tag, timerno, timer->clock);
 	}
 }
 
@@ -1172,6 +1110,7 @@ static DEVICE_RESET( pit8253 ) {
 		/* According to Intel's 8254 docs, the state of a timer is undefined
            until the first mode control word is written. Here we define this
            undefined behaviour */
+		timer->index = i;
 		timer->control = timer->status = 0x30;
 		timer->rmsb = timer->wmsb = 0;
 		timer->count = timer->value = timer->latch = 0;
@@ -1181,7 +1120,7 @@ static DEVICE_RESET( pit8253 ) {
 		timer->latched_count = 0;
 		timer->latched_status = 0;
 		timer->null_count = 1;
-		timer->cycles_to_output = timer->cycles_to_freq = CYCLES_NEVER;
+		timer->cycles_to_output = CYCLES_NEVER;
 
 		timer->last_updated = timer_get_time();
 

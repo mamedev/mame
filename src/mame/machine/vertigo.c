@@ -48,15 +48,12 @@ const struct pit8253_config vertigo_pit8254_config =
 	{
 		{
 			240000,
-			v_irq4_w,
-			NULL
+			v_irq4_w
 		}, {
 			240000,
-			v_irq3_w,
-			NULL
+			v_irq3_w
 		}, {
 			240000,
-			NULL,
 			NULL
 		}
 	}
