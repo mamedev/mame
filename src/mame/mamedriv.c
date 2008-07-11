@@ -2029,10 +2029,10 @@ const game_driver * const drivers[] =
 	DRIVER( perfrman )	/* (c) 1985 Data East Corporation (Japan) */
 	DRIVER( perfrmau )	/* (c) 1985 Data East USA (US) */
 	DRIVER( tigerh )	/* A47 (c) 1985 Taito America  Corporation   GX-551 [not a Konami board!] */
-	DRIVER( tigerh2 )	/* A47 (c) 1985 Taito Corporation   GX-551 [not a Konami board!] */
 	DRIVER( tigerhj )	/* A47 (c) 1985 Taito Corporation   GX-551 [not a Konami board!] */
 	DRIVER( tigerhb1 )	/* bootleg but (c) 1985 Taito Corporation */
 	DRIVER( tigerhb2 )	/* bootleg but (c) 1985 Taito Corporation */
+	DRIVER( tigerhb3 )	/* bootleg but (c) 1985 Taito Corporation */
 	DRIVER( slapfigh )	/* A76 / TP-??? */
 	DRIVER( slapfiga )	/* A76 / TP-??? */
 	DRIVER( slapbtjp )	/* bootleg but (c) 1986 Taito Corporation */
@@ -2041,8 +2041,8 @@ const game_driver * const drivers[] =
 	DRIVER( alcon )		/* A76 / TP-??? */
 	DRIVER( getstar )	/* A68 (c) 1986 Taito Corporation */
 	DRIVER( getstarj )	/* A68 (c) 1986 Taito Corporation */
-	DRIVER( getstarb )	/* GX-006 bootleg but (c) 1986 Taito Corporation */
-	DRIVER( gtstarba )	/* GX-006 bootleg but (c) 1986 Taito Corporation */
+	DRIVER( gtstarb1 )	/* GX-006 bootleg but (c) 1986 Taito Corporation */
+	DRIVER( gtstarb2 )	/* GX-006 bootleg but (c) 1986 Taito Corporation */
 	DRIVER( mjsister )	/* (c) 1986 Toaplan */
 
 	DRIVER( fshark )	/* B02 / TP-007 (c) 1987 Taito Corporation (World) */

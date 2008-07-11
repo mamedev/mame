@@ -1,3 +1,35 @@
+#include "cpu/z80/z80.h"
+
+
+/* This it the best way to allow game specific kludges until the system is fully understood */
+enum {
+	GETSTUNK=0,  /* unknown for inclusion of possible new sets */
+	GETSTAR,
+	GETSTARJ,
+	GTSTARB1,    /* "good" bootleg with same behaviour as 'getstarj' */
+	GTSTARB2,    /* "lame" bootleg with lots of ingame bugs */
+};
+
+
+/*----------- defines -----------*/
+
+/* due to code at 0x108d (GUARDIAN) or 0x1152 (GETSTARJ),
+   register C is a unaltered copy of register A */
+
+# define GS_SAVE_REGS  gs_a = activecpu_get_reg(Z80_BC) >> 0; \
+                       gs_d = activecpu_get_reg(Z80_DE) >> 8; \
+                       gs_e = activecpu_get_reg(Z80_DE) >> 0;
+
+# define GS_RESET_REGS gs_a = 0; \
+                       gs_d = 0; \
+                       gs_e = 0;
+
+
+/*----------- defined in drivers/slapfght.c -----------*/
+
+extern int getstar_id;
+
+
 /*----------- defined in machine/slapfght.c -----------*/
 
 MACHINE_RESET( slapfight );
@@ -15,7 +47,10 @@ WRITE8_HANDLER( slapfight_port_07_w );
 WRITE8_HANDLER( slapfight_port_08_w );
 WRITE8_HANDLER( slapfight_port_09_w );
 
+
 READ8_HANDLER( getstar_e803_r );
+WRITE8_HANDLER( getstar_e803_w );
+
 
 READ8_HANDLER ( tigerh_68705_portA_r );
 WRITE8_HANDLER( tigerh_68705_portA_w );
@@ -29,6 +64,10 @@ WRITE8_HANDLER( tigerh_68705_ddrC_w );
 WRITE8_HANDLER( tigerh_mcu_w );
 READ8_HANDLER ( tigerh_mcu_r );
 READ8_HANDLER ( tigerh_mcu_status_r );
+
+READ8_HANDLER( tigerhb_e803_r );
+WRITE8_HANDLER( tigerhb_e803_w );
+
 
 WRITE8_HANDLER( getstar_sh_intenable_w );
 INTERRUPT_GEN( getstar_interrupt );
