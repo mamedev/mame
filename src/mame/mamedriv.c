@@ -4059,7 +4059,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	DRIVER( naomigd )
 	DRIVER( sfz3ugd )
-
+	DRIVER( cvs2gd )
 	DRIVER( naomi2 )
 
 	/* Atomiswave (Dreamcast-based) games */

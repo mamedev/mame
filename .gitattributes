@@ -2525,6 +2525,7 @@ src/mame/machine/gaelco2.c svneol=native#text/plain
 src/mame/machine/gaelcrpt.c svneol=native#text/plain
 src/mame/machine/galaxold.c svneol=native#text/plain
 src/mame/machine/gaplus.c svneol=native#text/plain
+src/mame/machine/gdcrypt.c svneol=native#text/plain
 src/mame/machine/harddriv.c svneol=native#text/plain
 src/mame/machine/irem_cpu.c svneol=native#text/plain
 src/mame/machine/irem_cpu.h svneol=native#text/plain
