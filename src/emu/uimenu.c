@@ -1466,9 +1466,9 @@ static void menu_input_groups_populate(running_machine *machine, ui_menu *menu, 
 	{
 		char buffer[40];
 		sprintf(buffer, "Player %d Controls", player + 1);
-		ui_menu_item_append(menu, buffer, NULL, 0, (void *)(IPG_PLAYER1 + player + 1));
+		ui_menu_item_append(menu, buffer, NULL, 0, (void *)(FPTR)(IPG_PLAYER1 + player + 1));
 	}
-	ui_menu_item_append(menu, "Other Controls", NULL, 0, (void *)(IPG_OTHER + 1));
+	ui_menu_item_append(menu, "Other Controls", NULL, 0, (void *)(FPTR)(IPG_OTHER + 1));
 }
 
 
@@ -2608,7 +2608,7 @@ static void menu_video_options_populate(running_machine *machine, ui_menu *menu,
 
 		/* create a string for the item, replacing underscores with spaces */
 		astring_replacec(astring_cpyc(tempstring, name), 0, "_", " ");
-		ui_menu_item_append(menu, astring_c(tempstring), NULL, 0, (void *)(VIDEO_ITEM_VIEW + viewnum));
+		ui_menu_item_append(menu, astring_c(tempstring), NULL, 0, (void *)(FPTR)(VIDEO_ITEM_VIEW + viewnum));
 	}
 	
 	/* add a separator */
