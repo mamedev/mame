@@ -1165,7 +1165,7 @@ ROM_START( tigerhb1 )
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "a47_03.bin",   0x0000,  0x2000, CRC(d105260f) SHA1(f6a0e393e29354bb37fb723828f3267d030a45ea) )
 
-	ROM_REGION( 0x0800, REGION_CPU3, 0 )
+	ROM_REGION( 0x0800, REGION_CPU3, ROMREGION_ERASEFF ) // probably doesn't have an MCU
 	/* is this the right mcu for this set? the mcu handling code in the roms seems patched and it doesn't work correctly */
 //	ROM_LOAD( "a47_14.6a",   0x0000, 0x0800, CRC(4042489f) SHA1(b977e0821b6b1aa5a0a0f349cd78150af1a231df) )
 
