@@ -38,6 +38,16 @@ static UINT16 latch,new_latch=0;
 
 /******************************************************************************/
 
+static WRITE16_HANDLER( pushman_flipscreen_w )
+{
+	if (ACCESSING_BITS_8_15)
+	{
+		flip_screen_set(data & 0x0200);
+		coin_counter_w(0, data & 0x4000);
+		coin_counter_w(1, data & 0x8000);
+	}
+}
+
 static WRITE16_HANDLER( pushman_control_w )
 {
 	if (ACCESSING_BITS_8_15)
@@ -150,6 +160,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x060000, 0x060007) AM_WRITE(pushman_68705_w)
 	AM_RANGE(0xfe0800, 0xfe17ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)
+	AM_RANGE(0xfe4000, 0xfe4001) AM_WRITE(pushman_flipscreen_w)
 	AM_RANGE(0xfe4002, 0xfe4003) AM_WRITE(pushman_control_w)
 	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE(pushman_scroll_w)
 	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITE(SMH_NOP) /* ? */
@@ -207,6 +218,7 @@ static ADDRESS_MAP_START( bballs_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x1ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x60000, 0x60007) AM_WRITE(bballs_68705_w)
 	AM_RANGE(0xe0800, 0xe17ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)
+	AM_RANGE(0xe4000, 0xe4001) AM_WRITE(pushman_flipscreen_w)
 	AM_RANGE(0xe4002, 0xe4003) AM_WRITE(pushman_control_w)
 	AM_RANGE(0xe8000, 0xe8003) AM_WRITE(pushman_scroll_w)
 	AM_RANGE(0xe800e, 0xe800f) AM_WRITE(SMH_NOP) /* ? */
@@ -257,9 +269,9 @@ static INPUT_PORTS_START( pushman )
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Level_Select ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Upright ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
