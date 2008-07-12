@@ -103,7 +103,7 @@ static int show_profiler;
 static osd_ticks_t popup_text_end;
 
 /* messagebox buffer */
-static char messagebox_text[4096];
+static astring *messagebox_text;
 static rgb_t messagebox_backcolor;
 
 /* slider info */
@@ -124,8 +124,8 @@ static void ui_exit(running_machine *machine);
 static int rescale_notifier(running_machine *machine, int width, int height);
 
 /* text generators */
-static int sprintf_disclaimer(running_machine *machine, char *buffer);
-static int sprintf_warnings(running_machine *machine, char *buffer);
+static astring *disclaimer_string(running_machine *machine, astring *buffer);
+static astring *warnings_string(running_machine *machine, astring *buffer);
 
 /* UI handlers */
 static UINT32 handler_messagebox(running_machine *machine, UINT32 state);
@@ -247,8 +247,9 @@ int ui_init(running_machine *machine)
 	/* make sure we clean up after ourselves */
 	add_exit_callback(machine, ui_exit);
 
-	/* allocate the font */
+	/* allocate the font and messagebox string */
 	ui_font = render_font_alloc("ui.bdf");
+	messagebox_text = astring_alloc();
 
 	/* initialize the other UI bits */
 	ui_menu_init(machine);
@@ -276,6 +277,11 @@ static void ui_exit(running_machine *machine)
 	if (ui_font != NULL)
 		render_font_free(ui_font);
 	ui_font = NULL;
+	
+	/* free the messagebox string */
+	if (messagebox_text != NULL)
+		astring_free(messagebox_text);
+	messagebox_text = NULL;
 }
 
 
@@ -335,12 +341,12 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 		switch (state)
 		{
 			case 0:
-				if (show_disclaimer && sprintf_disclaimer(machine, messagebox_text))
+				if (show_disclaimer && astring_len(disclaimer_string(machine, messagebox_text)) > 0)
 					ui_set_handler(handler_messagebox_ok, 0);
 				break;
 
 			case 1:
-				if (show_warnings && sprintf_warnings(machine, messagebox_text))
+				if (show_warnings && astring_len(warnings_string(machine, messagebox_text)) > 0)
 				{
 					ui_set_handler(handler_messagebox_ok, 0);
 					if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION))
@@ -349,16 +355,8 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 				break;
 
 			case 2:
-				if (show_gameinfo)
-				{
-					astring *tempstring = game_info_astring(machine, astring_alloc());
-					if (astring_len(tempstring) > 0)
-					{
-						strcpy(messagebox_text, astring_c(tempstring));
-						ui_set_handler(handler_messagebox_anykey, 0);
-					}
-					astring_free(tempstring);
-				}
+				if (show_gameinfo && astring_len(game_info_astring(machine, messagebox_text)) > 0)
+					ui_set_handler(handler_messagebox_anykey, 0);
 				break;
 #ifdef MESS
 			case 3:
@@ -398,7 +396,7 @@ void ui_set_startup_text(running_machine *machine, const char *text, int force)
 	osd_ticks_t curtime = osd_ticks();
 
 	/* copy in the new text */
-	strncpy(messagebox_text, text, sizeof(messagebox_text));
+	astring_cpyc(messagebox_text, text);
 	messagebox_backcolor = UI_FILLCOLOR;
 
 	/* don't update more than 4 times/second */
@@ -823,7 +821,7 @@ void CLIB_DECL ui_popup_time(int seconds, const char *text, ...)
 
 	/* extract the text */
 	va_start(arg,text);
-	vsprintf(messagebox_text, text, arg);
+	astring_printf(messagebox_text, text, arg);
 	messagebox_backcolor = UI_FILLCOLOR;
 	va_end(arg);
 
@@ -938,26 +936,25 @@ int ui_is_slider_active(void)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    sprintf_disclaimer - print the disclaimer
+    disclaimer_string - print the disclaimer
     text to the given buffer
 -------------------------------------------------*/
 
-static int sprintf_disclaimer(running_machine *machine, char *buffer)
+static astring *disclaimer_string(running_machine *machine, astring *string)
 {
-	char *bufptr = buffer;
-	bufptr += sprintf(bufptr, "Usage of emulators in conjunction with ROMs you don't own is forbidden by copyright law.\n\n");
-	bufptr += sprintf(bufptr, "IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%s\" ON THIS EMULATOR, PRESS ESC.\n\n", machine->gamedrv->description);
-	bufptr += sprintf(bufptr, "Otherwise, type OK or move the joystick left then right to continue");
-	return bufptr - buffer;
+	astring_cpyc(string, "Usage of emulators in conjunction with ROMs you don't own is forbidden by copyright law.\n\n");
+	astring_catprintf(string, "IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%s\" ON THIS EMULATOR, PRESS ESC.\n\n", machine->gamedrv->description);
+	astring_catc(string, "Otherwise, type OK or move the joystick left then right to continue");
+	return string;
 }
 
 
 /*-------------------------------------------------
-    sprintf_warnings - print the warning flags
+    warnings_string - print the warning flags
     text to the given buffer
 -------------------------------------------------*/
 
-static int sprintf_warnings(running_machine *machine, char *buffer)
+static astring *warnings_string(running_machine *machine, astring *string)
 {
 #define WARNING_FLAGS (	GAME_NOT_WORKING | \
 						GAME_UNEMULATED_PROTECTION | \
@@ -967,43 +964,44 @@ static int sprintf_warnings(running_machine *machine, char *buffer)
 						GAME_IMPERFECT_SOUND |  \
 						GAME_IMPERFECT_GRAPHICS | \
 						GAME_NO_COCKTAIL)
-	char *bufptr = buffer;
 	int i;
+	
+	astring_reset(string);
 
 	/* if no warnings, nothing to return */
 	if (rom_load_warnings() == 0 && !(machine->gamedrv->flags & WARNING_FLAGS))
-		return 0;
+		return string;
 
 	/* add a warning if any ROMs were loaded with warnings */
 	if (rom_load_warnings() > 0)
 	{
-		bufptr += sprintf(bufptr, "One or more ROMs/CHDs for this game are incorrect. The " GAMENOUN " may not run correctly.\n");
+		astring_catc(string, "One or more ROMs/CHDs for this game are incorrect. The " GAMENOUN " may not run correctly.\n");
 		if (machine->gamedrv->flags & WARNING_FLAGS)
-			*bufptr++ = '\n';
+			astring_catc(string, "\n");
 	}
 
 	/* if we have at least one warning flag, print the general header */
 	if (machine->gamedrv->flags & WARNING_FLAGS)
 	{
-		bufptr += sprintf(bufptr, "There are known problems with this " GAMENOUN "\n\n");
+		astring_catc(string, "There are known problems with this " GAMENOUN "\n\n");
 
 		/* add one line per warning flag */
 #ifdef MESS
 		if (machine->gamedrv->flags & GAME_COMPUTER)
-			bufptr += sprintf(bufptr, "%s\n\n%s\n", "The emulated system is a computer: ", "The keyboard emulation may not be 100% accurate.");
+			astring_catc(string, "The emulated system is a computer:\n\nThe keyboard emulation may not be 100% accurate.\n");
 #endif
 		if (machine->gamedrv->flags & GAME_IMPERFECT_COLORS)
-			bufptr += sprintf(bufptr, "The colors aren't 100%% accurate.\n");
+			astring_catc(string, "The colors aren't 100% accurate.\n");
 		if (machine->gamedrv->flags & GAME_WRONG_COLORS)
-			bufptr += sprintf(bufptr, "The colors are completely wrong.\n");
+			astring_catc(string, "The colors are completely wrong.\n");
 		if (machine->gamedrv->flags & GAME_IMPERFECT_GRAPHICS)
-			bufptr += sprintf(bufptr, "The video emulation isn't 100%% accurate.\n");
+			astring_catc(string, "The video emulation isn't 100% accurate.\n");
 		if (machine->gamedrv->flags & GAME_IMPERFECT_SOUND)
-			bufptr += sprintf(bufptr, "The sound emulation isn't 100%% accurate.\n");
+			astring_catc(string, "The sound emulation isn't 100% accurate.\n");
 		if (machine->gamedrv->flags & GAME_NO_SOUND)
-			bufptr += sprintf(bufptr, "The game lacks sound.\n");
+			astring_catc(string, "The game lacks sound.\n");
 		if (machine->gamedrv->flags & GAME_NO_COCKTAIL)
-			bufptr += sprintf(bufptr, "Screen flipping in cocktail mode is not supported.\n");
+			astring_catc(string, "Screen flipping in cocktail mode is not supported.\n");
 
 		/* if there's a NOT WORKING or UNEMULATED PROTECTION warning, make it stronger */
 		if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION))
@@ -1014,9 +1012,9 @@ static int sprintf_warnings(running_machine *machine, char *buffer)
 
 			/* add the strings for these warnings */
 			if (machine->gamedrv->flags & GAME_NOT_WORKING)
-				bufptr += sprintf(bufptr, "THIS " CAPGAMENOUN " DOESN'T WORK. You won't be able to make it work correctly.  Don't bother.\n");
+				astring_catc(string, "THIS " CAPGAMENOUN " DOESN'T WORK. You won't be able to make it work correctly.  Don't bother.\n");
 			if (machine->gamedrv->flags & GAME_UNEMULATED_PROTECTION)
-				bufptr += sprintf(bufptr, "The game has protection which isn't fully emulated.\n");
+				astring_catc(string, "The game has protection which isn't fully emulated.\n");
 
 			/* find the parent of this driver */
 			clone_of = driver_get_clone(machine->gamedrv);
@@ -1033,16 +1031,17 @@ static int sprintf_warnings(running_machine *machine, char *buffer)
 					{
 						/* this one works, add a header and display the name of the clone */
 						if (foundworking == 0)
-							bufptr += sprintf(bufptr, "\n\nThere are working clones of this game. They are:\n\n");
-						bufptr += sprintf(bufptr, "%s\n", drivers[i]->name);
+							astring_catc(string, "\n\nThere are working clones of this game. They are:\n\n");
+						astring_catc(string, drivers[i]->name);
+						astring_catc(string, "\n");
 						foundworking = 1;
 					}
 		}
 	}
 
 	/* add the 'press OK' string */
-	bufptr += sprintf(bufptr, "\n\nType OK or move the joystick left then right to continue");
-	return bufptr - buffer;
+	astring_catc(string, "\n\nType OK or move the joystick left then right to continue");
+	return string;
 }
 
 
@@ -1160,7 +1159,7 @@ astring *game_info_astring(running_machine *machine, astring *string)
 
 static UINT32 handler_messagebox(running_machine *machine, UINT32 state)
 {
-	ui_draw_text_box(messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
+	ui_draw_text_box(astring_c(messagebox_text), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 	return 0;
 }
 
@@ -1173,7 +1172,7 @@ static UINT32 handler_messagebox(running_machine *machine, UINT32 state)
 static UINT32 handler_messagebox_ok(running_machine *machine, UINT32 state)
 {
 	/* draw a standard message window */
-	ui_draw_text_box(messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
+	ui_draw_text_box(astring_c(messagebox_text), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
 	/* an 'O' or left joystick kicks us to the next state */
 	if (state == 0 && (input_code_pressed_once(KEYCODE_O) || ui_input_pressed(machine, IPT_UI_LEFT)))
@@ -1203,7 +1202,7 @@ static UINT32 handler_messagebox_ok(running_machine *machine, UINT32 state)
 static UINT32 handler_messagebox_anykey(running_machine *machine, UINT32 state)
 {
 	/* draw a standard message window */
-	ui_draw_text_box(messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
+	ui_draw_text_box(astring_c(messagebox_text), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
 	/* if the user cancels, exit out completely */
 	if (ui_input_pressed(machine, IPT_UI_CANCEL))
@@ -1248,7 +1247,7 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 
 	/* display any popup messages */
 	if (osd_ticks() < popup_text_end)
-		ui_draw_text_box(messagebox_text, JUSTIFY_CENTER, 0.5f, 0.9f, messagebox_backcolor);
+		ui_draw_text_box(astring_c(messagebox_text), JUSTIFY_CENTER, 0.5f, 0.9f, messagebox_backcolor);
 	else
 		popup_text_end = 0;
 
