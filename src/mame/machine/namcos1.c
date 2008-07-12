@@ -1454,13 +1454,21 @@ static READ8_HANDLER( faceoff_inputs_r )
 				case 0:
 					stored_input[0] = input_port_read(machine, "IN0") & 0x1f;
 					stored_input[1] = (input_port_read(machine, "IN3") & 0x07) << 3;
+					break;
 
 				case 3:
 					stored_input[0] = input_port_read(machine, "IN2") & 0x1f;
+					break;
 
 				case 4:
 					stored_input[0] = input_port_read(machine, "IN1") & 0x1f;
 					stored_input[1] = input_port_read(machine, "IN3") & 0x18;
+					break;
+
+				default:
+					stored_input[0] = 0x1f;
+					stored_input[1] = 0x1f;
+					break;
 			}
 
 			input_count = (input_count + 1) & 7;
