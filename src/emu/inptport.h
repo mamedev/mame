@@ -988,21 +988,20 @@ void input_field_get_user_settings(const input_field_config *field, input_field_
 /* modify the current settings for the given input field */
 void input_field_set_user_settings(const input_field_config *field, const input_field_user_settings *settings);
 
+/* return the expanded setting name for a field */
+const char *input_field_setting_name(const input_field_config *field);
+
+/* return TRUE if the given field has a "previous" setting */
+int input_field_has_previous_setting(const input_field_config *field);
+
 /* select the previous item for a DIP switch or configuration field */
 void input_field_select_previous_setting(const input_field_config *field);
 
+/* return TRUE if the given field has a "next" setting */
+int input_field_has_next_setting(const input_field_config *field);
+
 /* select the next item for a DIP switch or configuration field */
 void input_field_select_next_setting(const input_field_config *field);
-
-
-/* ----- user interface sequence reading ----- */
-
-/* return TRUE if a key down for the given user interface sequence is detected */
-int input_ui_pressed(running_machine *machine, int code);
-
-/* return TRUE if a key down for the given user interface sequence is detected, or if
-   autorepeat at the given speed is triggered */
-int input_ui_pressed_repeat(running_machine *machine, int code, int speed);
 
 
 

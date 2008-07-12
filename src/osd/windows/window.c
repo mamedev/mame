@@ -27,6 +27,7 @@
 #include "osdepend.h"
 #include "driver.h"
 #include "deprecat.h"
+#include "uiinput.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -376,54 +377,41 @@ void winwindow_process_events(running_machine *machine, int ingame)
 					// ignore keyboard messages
 					case WM_SYSKEYUP:
 					case WM_SYSKEYDOWN:
-#ifndef MESS
-					case WM_KEYUP:
-					case WM_KEYDOWN:
-					case WM_CHAR:
-#endif
 						dispatch = FALSE;
 						break;
 
 					// forward mouse button downs to the input system
 					case WM_LBUTTONDOWN:
-						wininput_handle_mouse_button(0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-						dispatch = FALSE;
+						dispatch = !wininput_handle_mouse_button(0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_RBUTTONDOWN:
-						wininput_handle_mouse_button(1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-						dispatch = FALSE;
+						dispatch = !wininput_handle_mouse_button(1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_MBUTTONDOWN:
-						wininput_handle_mouse_button(2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-						dispatch = FALSE;
+						dispatch = !wininput_handle_mouse_button(2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_XBUTTONDOWN:
-						wininput_handle_mouse_button(3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-						dispatch = FALSE;
+						dispatch = !wininput_handle_mouse_button(3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					// forward mouse button ups to the input system
 					case WM_LBUTTONUP:
-						wininput_handle_mouse_button(0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-						dispatch = FALSE;
+						dispatch = !wininput_handle_mouse_button(0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_RBUTTONUP:
-						wininput_handle_mouse_button(1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-						dispatch = FALSE;
+						dispatch = !wininput_handle_mouse_button(1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_MBUTTONUP:
-						wininput_handle_mouse_button(2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-						dispatch = FALSE;
+						dispatch = !wininput_handle_mouse_button(2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_XBUTTONUP:
-						wininput_handle_mouse_button(3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-						dispatch = FALSE;
+						dispatch = !wininput_handle_mouse_button(3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 				}
 			}
@@ -1025,54 +1013,41 @@ static unsigned __stdcall thread_entry(void *param)
 				// ignore input messages here
 				case WM_SYSKEYUP:
 				case WM_SYSKEYDOWN:
-#ifndef MESS
-				case WM_KEYUP:
-				case WM_KEYDOWN:
-				case WM_CHAR:
-#endif // MESS
 					dispatch = FALSE;
 					break;
 
 				// forward mouse button downs to the input system
 				case WM_LBUTTONDOWN:
-					wininput_handle_mouse_button(0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					dispatch = FALSE;
+					dispatch = !wininput_handle_mouse_button(0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				case WM_RBUTTONDOWN:
-					wininput_handle_mouse_button(1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					dispatch = FALSE;
+					dispatch = !wininput_handle_mouse_button(1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				case WM_MBUTTONDOWN:
-					wininput_handle_mouse_button(2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					dispatch = FALSE;
+					dispatch = !wininput_handle_mouse_button(2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				case WM_XBUTTONDOWN:
-					wininput_handle_mouse_button(3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					dispatch = FALSE;
+					dispatch = !wininput_handle_mouse_button(3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				// forward mouse button ups to the input system
 				case WM_LBUTTONUP:
-					wininput_handle_mouse_button(0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					dispatch = FALSE;
+					dispatch = !wininput_handle_mouse_button(0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				case WM_RBUTTONUP:
-					wininput_handle_mouse_button(1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					dispatch = FALSE;
+					dispatch = !wininput_handle_mouse_button(1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				case WM_MBUTTONUP:
-					wininput_handle_mouse_button(2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					dispatch = FALSE;
+					dispatch = !wininput_handle_mouse_button(2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				case WM_XBUTTONUP:
-					wininput_handle_mouse_button(3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
-					dispatch = FALSE;
+					dispatch = !wininput_handle_mouse_button(3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 					break;
 
 				// a terminate message to the thread posts a quit
@@ -1229,6 +1204,41 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 		// syskeys - ignore
 		case WM_SYSKEYUP:
 		case WM_SYSKEYDOWN:
+			break;
+
+		// input events
+		case WM_MOUSEMOVE:
+			ui_input_push_mouse_move_event(Machine, window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			break;
+
+		case WM_MOUSELEAVE:
+			ui_input_push_mouse_leave_event(Machine, window->target);
+			break;
+
+		case WM_LBUTTONDOWN:
+		{
+			DWORD ticks = GetTickCount();
+			ui_input_push_mouse_click_event(Machine, window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			
+			// check for a double-click
+			if (ticks - window->lastclicktime < GetDoubleClickTime() && 
+				GET_X_LPARAM(lparam) >= window->lastclickx - 4 && GET_X_LPARAM(lparam) <= window->lastclickx + 4 &&
+				GET_Y_LPARAM(lparam) >= window->lastclicky - 4 && GET_Y_LPARAM(lparam) <= window->lastclicky + 4)
+			{
+				window->lastclicktime = 0;
+				ui_input_push_mouse_double_click_event(Machine, window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			}
+			else
+			{
+				window->lastclicktime = ticks;
+				window->lastclickx = GET_X_LPARAM(lparam);
+				window->lastclicky = GET_Y_LPARAM(lparam);
+			}
+			break;
+		}
+
+		case WM_CHAR:
+			ui_input_push_char_event(Machine, window->target, (unicode_char) wparam);
 			break;
 
 		// pause the system when we start a menu or resize

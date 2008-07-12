@@ -609,6 +609,9 @@ INT32 input_code_pressed(input_code code);
 /* same as above, but returns TRUE only on the first call after an off->on transition */
 INT32 input_code_pressed_once(input_code code);
 
+/* translates an input_item_id to an input_code */
+input_code input_code_from_input_item_id(input_item_id itemid);
+
 /* poll for any switch input, optionally resetting internal memory */
 input_code input_code_poll_switches(int reset);
 

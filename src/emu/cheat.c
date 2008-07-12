@@ -11,6 +11,7 @@
 
 #include "driver.h"
 #include "ui.h"
+#include "uiinput.h"
 #include "uimenu.h"
 #include "machine/eeprom.h"
 #include "cheat.h"
@@ -1663,7 +1664,7 @@ static int ui_pressed_repeat_throttle(running_machine *machine, int code, int ba
 			last_code = -1;
 	}
 
-	return input_ui_pressed_repeat(machine, code, last_speed);
+	return ui_input_pressed_repeat(machine, code, last_speed);
 }
 
 /*-----------------------------------
@@ -1784,7 +1785,7 @@ static UINT32 do_edit_hex_field(running_machine *machine, UINT32 data)
 		data >>= 4;
 		return data;
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CLEAR))
+	else if(ui_input_pressed(machine, IPT_UI_CLEAR))
 	{
 		/* data clear */
 		data = 0;
@@ -2660,7 +2661,7 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 				display_value = decimal_to_bcd(bcd_to_decimal(display_value));
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		int i;
 
@@ -2716,12 +2717,12 @@ static int user_select_value_menu(running_machine *machine, cheat_menu_stack *me
 
 		menu->sel = -1;
 	}
-	else if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_EDIT_CHEAT))
 	{
 		edit_active ^= 1;
 		edit_cursor = 0;
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		if(edit_active)		edit_active = 0;
 		else				menu->sel = -1;
@@ -2825,7 +2826,7 @@ static int user_select_label_menu(running_machine *machine, cheat_menu_stack *me
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		if(menu->sel != total - 1)
 		{
@@ -2844,7 +2845,7 @@ static int user_select_label_menu(running_machine *machine, cheat_menu_stack *me
 		else
 			menu->sel = -1;
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL))
 		menu->sel = -1;
 
 	return menu->sel + 1;
@@ -2872,7 +2873,7 @@ static int comment_menu(running_machine *machine, cheat_menu_stack *menu)
 	ui_draw_message_window(buf);
 
 	/********** KEY HANDLING **********/
-	if(input_ui_pressed(machine, IPT_UI_SELECT) || input_ui_pressed(machine, IPT_UI_CANCEL))
+	if(ui_input_pressed(machine, IPT_UI_SELECT) || ui_input_pressed(machine, IPT_UI_CANCEL))
 		menu->sel = -1;
 
 	return menu->sel + 1;
@@ -2942,7 +2943,7 @@ static int extend_comment_menu(running_machine *machine, cheat_menu_stack *menu)
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT) || input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT) || ui_input_pressed(machine, IPT_UI_CANCEL))
 		menu->sel = -1;
 
 	return menu->sel + 1;
@@ -3033,7 +3034,7 @@ static int cheat_main_menu(running_machine *machine, cheat_menu_stack *menu)
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		switch(menu->sel)
 		{
@@ -3074,7 +3075,7 @@ static int cheat_main_menu(running_machine *machine, cheat_menu_stack *menu)
 				menu->sel = -1;
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_RELOAD_CHEAT))
 	{
 		if(shift_key_pressed())
 			reset_cheat_options();
@@ -3083,7 +3084,7 @@ static int cheat_main_menu(running_machine *machine, cheat_menu_stack *menu)
 		else
 			reload_cheat_database(machine);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		menu->sel = -1;
 	}
@@ -3358,7 +3359,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 	{
 		do_select = 1;
 	}
-	if(input_ui_pressed(machine, IPT_UI_SELECT))
+	if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		if(entry == NULL)
 		{
@@ -3382,7 +3383,7 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 				do_select = 1;
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_SAVE_CHEAT))
 	{
 		if(shift_key_pressed())
 		{
@@ -3403,28 +3404,28 @@ static int enable_disable_cheat_menu(running_machine *machine, cheat_menu_stack 
 			save_pre_enable(machine, entry, info->sub_cheat);
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_ADD_CHEAT))
 	{
 		add_cheat_before(info->sub_cheat);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
 		if(entry)	delete_cheat_at(info->sub_cheat);
 		else		SET_MESSAGE(CHEAT_MESSAGE_FAILED_TO_DELETE);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_EDIT_CHEAT))
 	{
 		if(entry) cheat_menu_stack_push(command_add_edit_menu, menu->handler, info->sub_cheat);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_WATCH_VALUE))
+	else if(ui_input_pressed(machine, IPT_UI_WATCH_VALUE))
 	{
 		watch_cheat_entry(entry, 0);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_RELOAD_CHEAT))
 	{
 		reload_cheat_database(machine);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		/* NOTE : cancel button return cheat main menu directly */
 		menu->sel = -1;
@@ -3540,7 +3541,7 @@ static int add_edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		if(entry)
 		{
@@ -3554,11 +3555,11 @@ static int add_edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		else
 			menu->sel = -1;
 	}
-	else if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_RELOAD_CHEAT))
 	{
 		reload_cheat_database(machine);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_EDIT_CHEAT))
 	{
 		if(entry)
 		{
@@ -3570,15 +3571,15 @@ static int add_edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 				cheat_menu_stack_push(command_add_edit_menu, menu->handler, menu->sel);
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_ADD_CHEAT))
 	{
 		add_cheat_before(menu->sel);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
 		delete_cheat_at(menu->sel);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_SAVE_CHEAT))
 	{
 		if(shift_key_pressed())
 		{
@@ -3604,11 +3605,11 @@ static int add_edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 			save_cheat_code(machine, entry);
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_WATCH_VALUE))
+	else if(ui_input_pressed(machine, IPT_UI_WATCH_VALUE))
 	{
 		watch_cheat_entry(entry, 0);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		menu->sel = -1;
 	}
@@ -3696,7 +3697,7 @@ static int command_add_edit_menu(running_machine *machine, cheat_menu_stack *men
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		switch(menu->sel)
 		{
@@ -3778,11 +3779,11 @@ static int command_add_edit_menu(running_machine *machine, cheat_menu_stack *men
 				break;
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_RELOAD_CHEAT))
 	{
 		reload_cheat_database(machine);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL) || input_ui_pressed(machine, IPT_UI_LEFT) || input_ui_pressed(machine, IPT_UI_RIGHT))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL) || ui_input_pressed(machine, IPT_UI_LEFT) || ui_input_pressed(machine, IPT_UI_RIGHT))
 	{
 		menu->sel = -1;
 	}
@@ -4160,7 +4161,7 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	{
 		do_select = -1;
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		if(edit_active)
 			edit_active = 0;
@@ -4179,7 +4180,7 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 			}
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_ADD_CHEAT))
 	{
 		add_action_before(entry, info->sub_cheat);
 
@@ -4194,15 +4195,15 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 			else		SET_MASK_FIELD(action->type, LinkEnable);
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
 		delete_action_at(entry, info->sub_cheat);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_WATCH_VALUE))
+	else if(ui_input_pressed(machine, IPT_UI_WATCH_VALUE))
 	{
 		watch_cheat_entry(entry, 0);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		if(edit_active)		edit_active = 0;
 		else				menu->sel = -1;
@@ -4734,7 +4735,7 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 		if(edit_active == 0)
 			CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		if(edit_active)
 			edit_active = 0;
@@ -4754,15 +4755,15 @@ static int view_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 			}
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_SAVE_CHEAT))
 	{
 		save_cheat_code(machine, entry);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_WATCH_VALUE))
+	else if(ui_input_pressed(machine, IPT_UI_WATCH_VALUE))
 	{
 		watch_cheat_entry(entry, 0);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		if(edit_active)			edit_active = 0;
 		else					menu->sel = -1;
@@ -4940,18 +4941,18 @@ static int analyse_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_EDIT_CHEAT))
 	{
 		is_edit = 1;
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		if(menu->sel == total - 2)
 			is_edit = 1;
 		else
 			menu->sel = -1;
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		menu->sel = -1;
 	}
@@ -5378,7 +5379,7 @@ static int search_main_menu(running_machine *machine, cheat_menu_stack *menu)
 		else
 			do_increment = 1;
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		if(edit_active)
 		{
@@ -5440,7 +5441,7 @@ static int search_main_menu(running_machine *machine, cheat_menu_stack *menu)
 			}
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		if(edit_active)	edit_active = 0;
 		else			menu->sel = -1;
@@ -5725,7 +5726,7 @@ static int select_search_region_menu(running_machine *machine, cheat_menu_stack 
 			do_reallocate = 1;
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
 		if(shift_key_pressed() && region && search)
 		{
@@ -5733,14 +5734,14 @@ static int select_search_region_menu(running_machine *machine, cheat_menu_stack 
 			invalidate_entire_region(search, region);
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_RELOAD_CHEAT))
 	{
 		if(search->search_speed == SEARCH_SPEED_USER_DEFINED)
 		/* reload user region */
 			do_rebuild = 1;
 			do_reallocate = 1;
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		if(region)
 		{
@@ -5755,7 +5756,7 @@ static int select_search_region_menu(running_machine *machine, cheat_menu_stack 
 		else if(menu->sel == total - 1)
 			menu->sel = -1;
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL))
 		menu->sel = -1;
 
 	/********** REBUILD SEARCH REGION **********/
@@ -6049,12 +6050,12 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 
 		menu->sel = kMenu_FirstResult;
 	}
-	else if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_ADD_CHEAT))
 	{
 		if(selectedAddressGood)
 			add_cheat_from_result(machine, search, region, selectedAddress);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
 		if(shift_key_pressed())
 		{
@@ -6072,12 +6073,12 @@ static int view_search_result_menu(running_machine *machine, cheat_menu_stack *m
 			SET_MESSAGE(CHEAT_MESSAGE_SUCCEEDED_TO_DELETE);
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_WATCH_VALUE))
+	else if(ui_input_pressed(machine, IPT_UI_WATCH_VALUE))
 	{
 		if(selectedAddressGood)
 			add_watch_from_result(search, region, selectedAddress);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT) || input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT) || ui_input_pressed(machine, IPT_UI_CANCEL))
 		menu->sel = -1;
 
 	switch(pageSwitch)
@@ -6321,7 +6322,7 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 				edit_cursor = info->address_chars_needed + 1;
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		if(edit_active)
 			edit_active = 0;
@@ -6333,7 +6334,7 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 				menu->sel = -1;
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_ADD_CHEAT))
 	{
 		if(!edit_active && watch)
 		{
@@ -6356,7 +6357,7 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 				add_watch_before(menu->sel);
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
 		if(!edit_active && watch)
 		{
@@ -6392,7 +6393,7 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 			}
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_SAVE_CHEAT))
 	{
 		if(!edit_active && watch)
 		{
@@ -6405,7 +6406,7 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 			dispose_cheat(&entry);
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_EDIT_CHEAT))
 	{
 		if(watch)
 		{
@@ -6413,7 +6414,7 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 			edit_active ^= 1;
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CLEAR))
+	else if(ui_input_pressed(machine, IPT_UI_CLEAR))
 	{
 		if(!edit_active)
 		{
@@ -6434,7 +6435,7 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 			watch->element_bytes = 0;
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		if(edit_active)
 			edit_active = 0;
@@ -6515,7 +6516,7 @@ static int command_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		switch(menu->sel)
 		{
@@ -6580,11 +6581,11 @@ static int command_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 				menu->sel = -1;
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_RELOAD_CHEAT))
 	{
 		reload_cheat_database(machine);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL) || input_ui_pressed(machine, IPT_UI_LEFT) || input_ui_pressed(machine, IPT_UI_RIGHT))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL) || ui_input_pressed(machine, IPT_UI_LEFT) || ui_input_pressed(machine, IPT_UI_RIGHT))
 	{
 		menu->sel = -1;
 	}
@@ -6964,7 +6965,7 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 			}
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		if(edit_active)
 			edit_active = 0;
@@ -6991,11 +6992,11 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 			}
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CLEAR))
+	else if(ui_input_pressed(machine, IPT_UI_CLEAR))
 	{
 		reset_watch(entry);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		if(edit_active)
 			edit_active = 0;
@@ -7055,13 +7056,13 @@ static int edit_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	}
 	else
 	{
-		if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
+		if(ui_input_pressed(machine, IPT_UI_ADD_CHEAT))
 			add_cheat_from_watch(machine, entry);
 
-		if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
+		if(ui_input_pressed(machine, IPT_UI_DELETE_CHEAT))
 			entry->num_elements = 0;
 
-		if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
+		if(ui_input_pressed(machine, IPT_UI_SAVE_CHEAT))
 		{
 			cheat_entry temp_entry;
 
@@ -7230,7 +7231,7 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 	{
 		do_select = 1;
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		switch(menu->sel)
 		{
@@ -7258,18 +7259,18 @@ static int select_option_menu(running_machine *machine, cheat_menu_stack *menu)
 				break;
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_SAVE_CHEAT))
 	{
 		save_cheat_options();
 	}
-	else if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_RELOAD_CHEAT))
 	{
 		if(shift_key_pressed())
 			reset_cheat_options();
 		else
 			load_cheat_database(machine, LOAD_CHEAT_OPTIONS);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		menu->sel = -1;
 	}
@@ -7387,22 +7388,22 @@ static int select_search_menu(running_machine *machine, cheat_menu_stack *menu)
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_ADD_CHEAT))
 	{
 		add_search_before(menu->sel);
 		build_search_regions(machine, &search_list[menu->sel]);
 		allocate_search_regions(&search_list[menu->sel]);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
+	else if(ui_input_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
 		delete_search_at(menu->sel);
 	}
-	if(input_ui_pressed(machine, IPT_UI_SELECT))
+	if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		if(menu->sel < total - 1)	current_search_idx = menu->sel;
 		else						menu->sel = -1;
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		menu->sel = -1;
 	}
@@ -7489,7 +7490,7 @@ static int command_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	{
 		toggle = 1;
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		switch(menu->sel)
 		{
@@ -7515,7 +7516,7 @@ static int command_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 				break;
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		menu->sel = -1;
 	}
@@ -7568,7 +7569,7 @@ static int check_activation_key_code_menu(running_machine *machine, cheat_menu_s
 	ui_draw_message_window(stringsBuf);
 
 	/* NOTE : shift + cancel is only key to return because normal cancel prevents from diplaying this key */
-	if(shift_key_pressed() && input_ui_pressed(machine, IPT_UI_CANCEL))
+	if(shift_key_pressed() && ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		index = INPUT_CODE_INVALID;
 		menu->sel = -1;
@@ -7742,12 +7743,12 @@ static int view_cpu_region_info_list_menu(running_machine *machine, cheat_menu_s
 				i--;
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		if(menu->sel == kMenu_Return)
 			menu->sel = -1;
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		menu->sel = -1;
 	}
@@ -7875,7 +7876,7 @@ static int debug_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 	{
 		CURSOR_PAGE_DOWN(menu->sel, total);
 	}
-	else if(input_ui_pressed(machine, IPT_UI_SELECT))
+	else if(ui_input_pressed(machine, IPT_UI_SELECT))
 	{
 		switch(menu->sel)
 		{
@@ -7892,7 +7893,7 @@ static int debug_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 				break;
 		}
 	}
-	else if(input_ui_pressed(machine, IPT_UI_CANCEL))
+	else if(ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		menu->sel = -1;
 	}
@@ -7910,7 +7911,7 @@ static TIMER_CALLBACK( cheat_periodic )
 {
 	int i;
 
-	if(input_ui_pressed(machine, IPT_UI_TOGGLE_CHEAT))
+	if(ui_input_pressed(machine, IPT_UI_TOGGLE_CHEAT))
 	{
 		if(shift_key_pressed())
 		{

@@ -593,17 +593,17 @@ int wininput_should_hide_mouse(void)
 //  wininput_handle_mouse_button
 //============================================================
 
-void wininput_handle_mouse_button(int button, int down, int x, int y)
+BOOL wininput_handle_mouse_button(int button, int down, int x, int y)
 {
 	device_info *devinfo;
 
 	// ignore if not enabled
 	if (!input_enabled)
-		return;
+		return FALSE;
 
 	// only need this for shared axis hack
 	if (!lightgun_shared_axis_mode || button >= 4)
-		return;
+		return FALSE;
 
 	// choose a device based on the button
 	devinfo = lightgun_list;
@@ -636,6 +636,7 @@ void wininput_handle_mouse_button(int button, int down, int x, int y)
 
 	// release the lock
 	osd_lock_release(input_lock);
+	return TRUE;
 }
 
 

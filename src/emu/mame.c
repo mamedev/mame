@@ -88,6 +88,7 @@
 #include "render.h"
 #include "ui.h"
 #include "uimenu.h"
+#include "uiinput.h"
 #include "deprecat.h"
 #include "debug/debugcon.h"
 
@@ -1558,6 +1559,9 @@ static void init_machine(running_machine *machine)
 	if (newbase != 0)
 		mame->base_time = newbase;
 
+	/* intialize UI input */
+	ui_input_init(machine);
+
 	/* first load ROMs, then populate memory, and finally initialize CPUs */
 	/* these operations must proceed in this order */
 	rom_init(machine, machine->gamedrv->rom);
@@ -1612,8 +1616,8 @@ static void init_machine(running_machine *machine)
 
 	/* initialize miscellaneous systems */
 	saveload_init(machine);
-	if (options_get_bool(mame_options(), OPTION_CHEAT))
-		cheat_init(machine);
+//	if (options_get_bool(mame_options(), OPTION_CHEAT))
+//		cheat_init(machine);
 }
 
 

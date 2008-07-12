@@ -937,6 +937,33 @@ int input_code_pressed_once(input_code code)
 
 
 /*-------------------------------------------------
+    input_code_from_input_item_id - translates
+	an input_item_id to an input_code
+-------------------------------------------------*/
+
+input_code input_code_from_input_item_id(input_item_id itemid)
+{
+	input_device_class devclass;
+
+	/* iterate over device classes and devices */
+	for (devclass = DEVICE_CLASS_INVALID + 1; devclass < DEVICE_CLASS_MAXIMUM; devclass++)
+	{
+		input_device_list *devlist = &device_list[devclass];
+		int devnum;
+
+		/* iterate over devices within each class */
+		for (devnum = 0; devnum < devlist->count; devnum++)
+		{
+			input_device *device = &devlist->list[devnum];
+			if (device->item[itemid] != NULL)
+				return device_item_to_code(device, itemid);
+		}
+	}
+	return 0;
+}
+
+
+/*-------------------------------------------------
     input_code_poll_switches - poll for any input
 -------------------------------------------------*/
 

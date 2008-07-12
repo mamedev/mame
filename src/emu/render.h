@@ -322,6 +322,9 @@ render_target *render_get_ui_target(void);
 /* return the aspect ratio for UI fonts */
 float render_get_ui_aspect(void);
 
+/* performs an input hit test */
+int render_input_hit_test(render_target *target, INT32 target_x, INT32 target_y, const char *input_tag, UINT32 input_mask);
+
 
 
 /* ----- render target management ----- */
@@ -383,6 +386,9 @@ void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT3
 
 /* return a list of primitives for a given render target */
 const render_primitive_list *render_target_get_primitives(render_target *target);
+
+/* attempts to map a point on the specified render_target to the specified container, if possible */
+int render_target_map_point_container(render_target *target, INT32 target_x, INT32 target_y, render_container *container, float *container_x, float *container_y);
 
 
 
@@ -478,6 +484,7 @@ void render_container_add_quad(render_container *container, float x0, float y0, 
 
 /* add a char item to the specified container */
 void render_container_add_char(render_container *container, float x0, float y0, float height, float aspect, rgb_t argb, render_font *font, UINT16 ch);
+
 
 
 #endif	/* __RENDER_H__ */

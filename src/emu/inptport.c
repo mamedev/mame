@@ -248,7 +248,6 @@ struct _input_port_private
 
 	/* specific special global input states */
 	digital_joystick_state 		joystick_info[MAX_PLAYERS][DIGITAL_JOYSTICKS_PER_PLAYER]; /* joystick states */
-	osd_ticks_t					ui_memory[__ipt_max];/* keypress timing for UI */
 
 	/* frame time tracking */
 	attotime					last_frame_time;	/* time of the last frame callback */
@@ -906,6 +905,49 @@ void input_field_set_user_settings(const input_field_config *field, const input_
 
 
 /*-------------------------------------------------
+    input_field_setting_name - return the expanded 
+    setting name for a field
+-------------------------------------------------*/
+
+const char *input_field_setting_name(const input_field_config *field)
+{
+	const input_setting_config *setting;
+
+	/* only makes sense if we have settings */
+	assert(field->settinglist != NULL);
+
+	/* scan the list of settings looking for a match on the current value */
+	for (setting = field->settinglist; setting != NULL; setting = setting->next)
+		if (input_condition_true(field->port->machine, &setting->condition))
+			if (setting->value == field->state->value)
+				return setting->name;
+	
+	return "INVALID";
+}
+
+
+/*-------------------------------------------------
+    input_field_has_previous_setting - return TRUE 
+    if the given field has a "previous" setting
+-------------------------------------------------*/
+
+int input_field_has_previous_setting(const input_field_config *field)
+{
+	const input_setting_config *setting;
+
+	/* only makes sense if we have settings */
+	assert(field->settinglist != NULL);
+
+	/* scan the list of settings looking for a match on the current value */
+	for (setting = field->settinglist; setting != NULL; setting = setting->next)
+		if (input_condition_true(field->port->machine, &setting->condition))
+			return (setting->value != field->state->value);
+	
+	return FALSE;
+}
+
+
+/*-------------------------------------------------
     input_field_select_previous_setting - select
     the previous item for a DIP switch or
     configuration field
@@ -944,6 +986,33 @@ void input_field_select_previous_setting(const input_field_config *field)
 	/* update the value to the previous one */
 	if (prevsetting != NULL)
 		field->state->value = prevsetting->value;
+}
+
+
+/*-------------------------------------------------
+    input_field_has_next_setting - return TRUE 
+    if the given field has a "next" setting
+-------------------------------------------------*/
+
+int input_field_has_next_setting(const input_field_config *field)
+{
+	const input_setting_config *setting;
+	int found = FALSE;
+
+	/* only makes sense if we have settings */
+	assert(field->settinglist != NULL);
+
+	/* scan the list of settings looking for a match on the current value */
+	for (setting = field->settinglist; setting != NULL; setting = setting->next)
+		if (input_condition_true(field->port->machine, &setting->condition))
+		{
+			if (found)
+				return TRUE;
+			if (setting->value == field->state->value)
+				found = TRUE;
+		}
+	
+	return FALSE;
 }
 
 
@@ -1127,69 +1196,6 @@ const input_type_desc *input_type_list(running_machine *machine)
 {
 	input_port_private *portdata = machine->input_port_data;
 	return &portdata->typestatelist->typedesc;
-}
-
-
-
-/***************************************************************************
-    USER INTERFACE SEQUENCE READING
-***************************************************************************/
-
-/*-------------------------------------------------
-    input_ui_pressed - return TRUE if a key down
-    for the given user interface sequence is
-    detected
--------------------------------------------------*/
-
-int input_ui_pressed(running_machine *machine, int code)
-{
-	return input_ui_pressed_repeat(machine, code, 0);
-}
-
-
-/*-------------------------------------------------
-    input_ui_pressed_r - return TRUE if a key down
-    for the given user interface sequence is
-    detected, or if autorepeat at the given speed
-    is triggered
--------------------------------------------------*/
-
-int input_ui_pressed_repeat(running_machine *machine, int code, int speed)
-{
-	input_port_private *portdata = machine->input_port_data;
-	int pressed;
-
-profiler_mark(PROFILER_INPUT);
-
-	/* get the status of this key (assumed to be only in the defaults) */
-	assert(code >= IPT_UI_CONFIGURE && code <= IPT_OSD_16);
-	pressed = input_seq_pressed(input_type_seq(machine, code, 0, SEQ_TYPE_STANDARD));
-
-	/* if down, handle it specially */
-	if (pressed)
-	{
-		osd_ticks_t tps = osd_ticks_per_second();
-
-		/* if this is the first press, set a 3x delay and leave pressed = 1 */
-		if (portdata->ui_memory[code] == 0)
-			portdata->ui_memory[code] = osd_ticks() + 3 * speed * tps / 60;
-
-		/* if this is an autorepeat case, set a 1x delay and leave pressed = 1 */
-		else if (speed > 0 && (osd_ticks() + tps - portdata->ui_memory[code]) >= tps)
-			portdata->ui_memory[code] += 1 * speed * tps / 60;
-
-		/* otherwise, reset pressed = 0 */
-		else
-			pressed = 0;
-	}
-
-	/* if we're not pressed, reset the memory field */
-	else
-		portdata->ui_memory[code] = 0;
-
-profiler_mark(PROFILER_END);
-
-	return pressed;
 }
 
 
@@ -1988,7 +1994,7 @@ profiler_mark(PROFILER_INPUT);
 	/* track the duration of the previous frame */
 	portdata->last_delta_nsec = attotime_to_attoseconds(attotime_sub(curtime, portdata->last_frame_time)) / ATTOSECONDS_PER_NANOSECOND;
 	portdata->last_frame_time = curtime;
-
+	
 	/* update the digital joysticks */
 	frame_update_digital_joysticks(machine);
 

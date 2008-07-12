@@ -38,7 +38,6 @@ OBJDIRS += \
 EMUOBJS = \
 	$(EMUOBJ)/attotime.o \
 	$(EMUOBJ)/audit.o \
-	$(EMUOBJ)/cheat.o \
 	$(EMUOBJ)/clifront.o \
 	$(EMUOBJ)/config.o \
 	$(EMUOBJ)/cpuexec.o \
@@ -76,6 +75,7 @@ EMUOBJS = \
 	$(EMUOBJ)/timer.o \
 	$(EMUOBJ)/ui.o \
 	$(EMUOBJ)/uigfx.o \
+	$(EMUOBJ)/uiinput.o \
 	$(EMUOBJ)/uimenu.o \
 	$(EMUOBJ)/validity.o \
 	$(EMUOBJ)/video.o \

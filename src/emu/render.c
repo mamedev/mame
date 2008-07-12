@@ -244,6 +244,10 @@ static const render_quad_texuv oriented_texcoords[8] =
 	{ { 1,1 }, { 1,0 }, { 0,1 }, { 0,0 } }		/* ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y */
 };
 
+/* layer orders */
+static const int layer_order_standard[] = { ITEM_LAYER_SCREEN, ITEM_LAYER_OVERLAY, ITEM_LAYER_BACKDROP, ITEM_LAYER_BEZEL };
+static const int layer_order_alternate[] = { ITEM_LAYER_BACKDROP, ITEM_LAYER_SCREEN, ITEM_LAYER_OVERLAY, ITEM_LAYER_BEZEL };
+
 
 
 /***************************************************************************
@@ -457,6 +461,45 @@ INLINE void free_render_ref(render_ref *ref)
 {
 	ref->next = render_ref_free_list;
 	render_ref_free_list = ref;
+}
+
+
+/*-------------------------------------------------
+    get_layer_and_blendmode - return the 
+    appropriate layer index and blendmode
+-------------------------------------------------*/
+
+INLINE int get_layer_and_blendmode(const layout_view *view, int index, int *blendmode)
+{
+    const int *layer_order = layer_order_standard;
+    int layer;
+    
+	/*
+        if we have multiple backdrop pieces and no overlays, render:
+            backdrop (add) + screens (add) + bezels (alpha)
+        else render:
+            screens (add) + overlays (RGB multiply) + backdrop (add) + bezels (alpha)
+    */
+	if (view->itemlist[ITEM_LAYER_BACKDROP] != NULL && view->itemlist[ITEM_LAYER_BACKDROP]->next != NULL && view->itemlist[ITEM_LAYER_OVERLAY] == NULL)
+		layer_order = layer_order_alternate;
+	
+	/* select the layer */
+	layer = layer_order[index];
+	
+	/* if we want the blendmode as well, compute it */
+	if (blendmode != NULL)
+	{
+		/* pick a blendmode */
+		if (layer == ITEM_LAYER_SCREEN && layer_order == layer_order_standard)
+			*blendmode = -1;
+		else if (layer == ITEM_LAYER_SCREEN || (layer == ITEM_LAYER_BACKDROP && layer_order == layer_order_standard))
+			*blendmode = BLENDMODE_ADD;
+		else if (layer == ITEM_LAYER_OVERLAY)
+			*blendmode = BLENDMODE_RGB_MULTIPLY;
+		else
+			*blendmode = BLENDMODE_ALPHA;
+	}
+	return layer;
 }
 
 
@@ -1479,11 +1522,8 @@ void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT3
 
 const render_primitive_list *render_target_get_primitives(render_target *target)
 {
-	static const int standard_order[] = { ITEM_LAYER_SCREEN, ITEM_LAYER_OVERLAY, ITEM_LAYER_BACKDROP, ITEM_LAYER_BEZEL };
-	static const int alternate_order[] = { ITEM_LAYER_BACKDROP, ITEM_LAYER_SCREEN, ITEM_LAYER_OVERLAY, ITEM_LAYER_BEZEL };
 	object_transform root_xform, ui_xform;
 	int itemcount[ITEM_LAYER_MAX];
-	const int *layer_order;
 	INT32 viswidth, visheight;
 	int layernum, listnum;
 
@@ -1510,35 +1550,16 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 	root_xform.color.r = root_xform.color.g = root_xform.color.b = root_xform.color.a = 1.0f;
 	root_xform.orientation = target->orientation;
 
-	/*
-        if we have multiple backdrop pieces and no overlays, render:
-            backdrop (add) + screens (add) + bezels (alpha)
-        else render:
-            screens (add) + overlays (RGB multiply) + backdrop (add) + bezels (alpha)
-    */
-	layer_order = standard_order;
-	if (target->curview->itemlist[ITEM_LAYER_BACKDROP] != NULL &&
-		target->curview->itemlist[ITEM_LAYER_BACKDROP]->next != NULL &&
-		target->curview->itemlist[ITEM_LAYER_OVERLAY] == NULL)
-		layer_order = alternate_order;
-
 	/* iterate over layers back-to-front, but only if we're running */
 	if (mame_get_phase(Machine) >= MAME_PHASE_RESET)
 		for (layernum = 0; layernum < ITEM_LAYER_MAX; layernum++)
 		{
-			int layer = layer_order[layernum];
+			int blendmode;
+			int layer = get_layer_and_blendmode(target->curview, layernum, &blendmode);
+
 			if (target->curview->layenabled[layer])
 			{
-				int blendmode = BLENDMODE_ALPHA;
 				view_item *item;
-
-				/* pick a blendmode */
-				if (layer == ITEM_LAYER_SCREEN && layer_order == standard_order)
-					blendmode = -1;
-				else if (layer == ITEM_LAYER_SCREEN || (layer == ITEM_LAYER_BACKDROP && layer_order == standard_order))
-					blendmode = BLENDMODE_ADD;
-				else if (layer == ITEM_LAYER_OVERLAY)
-					blendmode = BLENDMODE_RGB_MULTIPLY;
 
 				/* iterate over items in the layer */
 				itemcount[layer] = 0;
@@ -1566,7 +1587,10 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 					/* if there is no associated element, it must be a screen element */
 					if (item->element != NULL)
 					{
-						int state = (item->name[0] == 0) ? 0 : output_get_value(item->name);
+						int state = 0;
+						if (item->name[0] != '\0')
+							state = output_get_value(item->name);
+
 						add_element_primitives(target, &target->primlist[listnum], &item_xform, item->element, state, blendmode);
 					}
 					else
@@ -1623,6 +1647,94 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 	add_clear_and_optimize_primitive_list(target, &target->primlist[listnum]);
 	osd_lock_release(target->primlist[listnum].lock);
 	return &target->primlist[listnum];
+}
+
+
+/*-------------------------------------------------
+    render_target_map_point_internal - internal
+	logic for mapping points
+-------------------------------------------------*/
+
+static int render_target_map_point_internal(render_target *target, INT32 target_x, INT32 target_y,
+	render_container *container, const char *input_tag, UINT32 input_mask, float *mapped_x, float *mapped_y)
+{
+	int layernum;
+	view_item *item;
+	float target_fx, target_fy;
+	float dummy;
+	int hit;
+
+	/* sanity check */
+	if (mapped_x == NULL)
+		mapped_x = &dummy;
+	if (mapped_y == NULL)
+		mapped_y = &dummy;
+
+	/* convert target coordinates to float */
+	target_fx = (float)target_x / target->width;
+	target_fy = (float)target_y / target->height;
+
+	if (container != NULL && container == ui_container)
+	{
+		/* this hit test went against the UI container */
+		if (target_fx >= 0.0 && target_fx < 1.0 && target_fy >= 0.0 && target_fy < 1.0)
+		{
+			/* this point was successfully mapped */
+			*mapped_x = target_fx;
+			*mapped_y = target_fy;
+			return TRUE;
+		}
+	}
+	else
+	{
+		/* loop through each layer */
+		for (layernum = 0; layernum < ITEM_LAYER_MAX; layernum++)
+		{
+			int layer = get_layer_and_blendmode(target->curview, layernum, NULL);
+			if (target->curview->layenabled[layer])
+			{
+				/* iterate over items in the layer */
+				for (item = target->curview->itemlist[layer]; item != NULL; item = item->next)
+				{
+					/* perform the hit test */
+					if (item->element == NULL && container != NULL)
+						hit = (container == get_screen_container_by_index(item->index));
+					else
+						hit = FALSE;
+
+					/* is this item the container in which we are interested? */
+					if (hit)
+					{
+						/* this target contains the specified container; now check the point */
+						if (target_fx >= item->bounds.x0 && target_fx < item->bounds.x1 && target_fy >= item->bounds.y0 && target_fy < item->bounds.y1)
+						{
+							/* point successfully mapped */
+							*mapped_x = (target_fx - item->bounds.x0) / (item->bounds.x1 - item->bounds.x0);
+							*mapped_y = (target_fy - item->bounds.y0) / (item->bounds.y1 - item->bounds.y0);
+							return TRUE;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/* point not mapped */
+	*mapped_x = -1.0;
+	*mapped_y = -1.0;
+	return FALSE;
+}
+
+
+/*-------------------------------------------------
+    render_target_map_point_container - attempts to
+	map a point on the specified render_target to
+	the specified container, if possible
+-------------------------------------------------*/
+
+int render_target_map_point_container(render_target *target, INT32 target_x, INT32 target_y, render_container *container, float *container_x, float *container_y)
+{
+	return render_target_map_point_internal(target, target_x, target_y, container, NULL, 0, container_x, container_y);
 }
 
 

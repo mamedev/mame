@@ -335,6 +335,28 @@ int astring_printf(astring *dst, const char *format, ...)
 }
 
 
+/*-------------------------------------------------
+    astring_catprintf - formatted printf to 
+    the end of an astring
+-------------------------------------------------*/
+
+int astring_catprintf(astring *dst, const char *format, ...)
+{
+	char tempbuf[4096];
+	va_list args;
+	int result;
+
+	/* sprintf into the temporary buffer */
+	va_start(args, format);
+	result = vsprintf(tempbuf, format, args);
+	va_end(args);
+
+	/* append the result */
+	astring_catc(dst, tempbuf);
+	return result;
+}
+
+
 
 /***************************************************************************
     ASTRING QUERIES

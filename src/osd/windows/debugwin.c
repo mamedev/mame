@@ -18,6 +18,7 @@
 
 // MAME headers
 #include "driver.h"
+#include "uiinput.h"
 #include "debug/debugvw.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
@@ -426,7 +427,7 @@ void debugwin_update_during_game(void)
 	{
 		// see if the interrupt key is pressed and break if it is
 		temporarily_fake_that_we_are_not_visible = TRUE;
-		if (input_ui_pressed(Machine, IPT_UI_DEBUG_BREAK))
+		if (ui_input_pressed(Machine, IPT_UI_DEBUG_BREAK))
 		{
 			debugwin_info *info;
 			HWND focuswnd = GetFocus();
@@ -2890,7 +2891,7 @@ static int global_handle_key(debugwin_info *info, WPARAM wparam, LPARAM lparam)
 	int ignoreme;
 
 	/* ignore any keys that are received while the debug key is down */
-	ignoreme = input_ui_pressed(Machine, IPT_UI_DEBUG_BREAK);
+	ignoreme = ui_input_pressed(Machine, IPT_UI_DEBUG_BREAK);
 	if (ignoreme)
 		return 1;
 

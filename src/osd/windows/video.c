@@ -27,6 +27,7 @@
 #include "render.h"
 #include "rendutil.h"
 #include "ui.h"
+#include "uiinput.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -351,12 +352,12 @@ finishit:
 static void check_osd_inputs(running_machine *machine)
 {
 	// check for toggling fullscreen mode
-	if (input_ui_pressed(machine, IPT_OSD_1))
+	if (ui_input_pressed(machine, IPT_OSD_1))
 		winwindow_toggle_full_screen();
 
 #ifdef MESS
 	// check for toggling menu bar
-	if (input_ui_pressed(machine, IPT_OSD_2))
+	if (ui_input_pressed(machine, IPT_OSD_2))
 		win_toggle_menubar();
 #endif
 }

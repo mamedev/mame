@@ -25,6 +25,7 @@
 #include "debugvw.h"
 #include "debugger.h"
 #include "deprecat.h"
+#include "uiinput.h"
 #include <ctype.h>
 
 
@@ -408,7 +409,7 @@ void debug_cpu_start_hook(running_machine *machine, int cpunum, attotime endtime
 		}
 
 		/* check for debug keypresses */
-		else if (input_ui_pressed(machine, IPT_UI_DEBUG_BREAK))
+		else if (ui_input_pressed(machine, IPT_UI_DEBUG_BREAK))
 		{
 			global.execution_state = EXECUTION_STATE_STOPPED;
 			debug_console_printf("User-initiated break\n");
