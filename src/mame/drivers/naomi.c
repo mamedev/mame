@@ -902,13 +902,16 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
 	ROM_LOAD16_WORD_SWAP_BIOS( 11,  "epr-22851.bin", 0x000000, 0x200000, CRC(62483677) SHA1(3e3bcacf5f972c376b569f45307ee7fd0b5031b7) ) \
 	ROM_SYSTEM_BIOS( 12, "bios12", "Ferrari F355 (USA)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 12,  "epr-22850.bin", 0x000000, 0x200000, CRC(28aa539d) SHA1(14485368656af80504b212da620179c49f84c1a2) ) \
-	ROM_SYSTEM_BIOS( 13, "bios13", "HOTD2 (US)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 13,  "epr-21330.bin", 0x000000, 0x200000, CRC(9e3bfa1b) SHA1(b539d38c767b0551b8e7956c1ff795de8bbe2fbc) ) \
-	ROM_SYSTEM_BIOS( 14, "bios14", "HOTD2 (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 14,  "epr-21331.bin", 0x000000, 0x200000, CRC(065f8500) SHA1(49a3881e8d76f952ef5e887200d77b4a415d47fe) ) \
+	ROM_SYSTEM_BIOS( 13, "bios13", "Naomi Dev BIOS" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 13,  "dcnaodev.bios", 0x000000, 0x080000, CRC(7a50fab9) SHA1(ef79f448e0bf735d1264ad4f051d24178822110f) ) /* This one comes from a dev / beta board. The eprom was a 27C4096 */
 
-//	ROM_SYSTEM_BIOS( 15, "bios15", "Naomi Dev BIOS" )
-//	ROM_LOAD16_WORD_SWAP_BIOS( 15,  "dcnaodev.bios", 0x000000, 0x080000, CRC(7a50fab9) SHA1(ef79f448e0bf735d1264ad4f051d24178822110f) ) /* This one comes from a dev / beta board. The eprom was a 27C4096 */
+// bios for House of the Dead 2
+#define HOTD2_BIOS \
+	ROM_SYSTEM_BIOS( 0, "bios0", "HOTD2 (Export)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "epr-21331.bin", 0x000000, 0x200000, CRC(065f8500) SHA1(49a3881e8d76f952ef5e887200d77b4a415d47fe) ) \
+	ROM_SYSTEM_BIOS( 1, "bios1", "HOTD2 (US)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1,  "epr-21330.bin", 0x000000, 0x200000, CRC(9e3bfa1b) SHA1(b539d38c767b0551b8e7956c1ff795de8bbe2fbc) ) \
+
 
 /* only revisions d and higher support the GDROM, and there is an additional bios (and SH4!) on the DIMM board for the CD Controller */
 #define NAOMIGD_BIOS \
@@ -994,6 +997,12 @@ ROM_START( naomigd )
 	ROM_REGION( 0x8400000, REGION_USER1, ROMREGION_ERASE)
 ROM_END
 
+ROM_START( hod2bios )
+	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	HOTD2_BIOS
+
+	ROM_REGION( 0x8400000, REGION_USER1, ROMREGION_ERASE)
+ROM_END
 
 ROM_START( naomi2 )
 	ROM_REGION( 0x200000, REGION_CPU1, 0)
@@ -2419,6 +2428,9 @@ GAME( 1999, doa2,     naomi,    naomi,    naomi,    0, ROT0, "Tecmo",           
 GAME( 2000, doa2m,    doa2,     naomi,    naomi,    0, ROT0, "Tecmo",           "Dead or Alive 2 Millennium (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1998, dybbnao,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Dynamite Baseball NAOMI (JPN)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
+/* Games with game specific bios sets */
+GAME( 2001, hod2bios, 0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi House of the Dead 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+/* HOTD2 isn't dumped */
 
 
 /* No GD-Rom Sets Supported */
