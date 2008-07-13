@@ -1805,12 +1805,16 @@ static INT32 slider_brightness(running_machine *machine, INT32 newval, char *buf
 {
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
+	render_container_user_settings settings;
+	
+	render_container_get_user_settings(container, &settings);
 	if (buffer != NULL)
 	{
-		render_container_set_brightness(container, (float)newval * 0.001f);
-		sprintf(buffer, "%s Brightness %.3f", slider_get_screen_desc(screen), render_container_get_brightness(container));
+		settings.brightness = (float)newval * 0.001f;
+		render_container_set_user_settings(container, &settings);
+		sprintf(buffer, "%s Brightness %.3f", slider_get_screen_desc(screen), settings.brightness);
 	}
-	return floor(render_container_get_brightness(container) * 1000.0f + 0.5f);
+	return floor(settings.brightness * 1000.0f + 0.5f);
 }
 
 
@@ -1823,12 +1827,16 @@ static INT32 slider_contrast(running_machine *machine, INT32 newval, char *buffe
 {
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
+	render_container_user_settings settings;
+	
+	render_container_get_user_settings(container, &settings);
 	if (buffer != NULL)
 	{
-		render_container_set_contrast(container, (float)newval * 0.001f);
-		sprintf(buffer, "%s Contrast %.3f", slider_get_screen_desc(screen), render_container_get_contrast(container));
+		settings.contrast = (float)newval * 0.001f;
+		render_container_set_user_settings(container, &settings);
+		sprintf(buffer, "%s Contrast %.3f", slider_get_screen_desc(screen), settings.contrast);
 	}
-	return floor(render_container_get_contrast(container) * 1000.0f + 0.5f);
+	return floor(settings.contrast * 1000.0f + 0.5f);
 }
 
 
@@ -1840,12 +1848,16 @@ static INT32 slider_gamma(running_machine *machine, INT32 newval, char *buffer, 
 {
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
+	render_container_user_settings settings;
+	
+	render_container_get_user_settings(container, &settings);
 	if (buffer != NULL)
 	{
-		render_container_set_gamma(container, (float)newval * 0.001f);
-		sprintf(buffer, "%s Gamma %.3f", slider_get_screen_desc(screen), render_container_get_gamma(container));
+		settings.gamma = (float)newval * 0.001f;
+		render_container_set_user_settings(container, &settings);
+		sprintf(buffer, "%s Gamma %.3f", slider_get_screen_desc(screen), settings.gamma);
 	}
-	return floor(render_container_get_gamma(container) * 1000.0f + 0.5f);
+	return floor(settings.gamma * 1000.0f + 0.5f);
 }
 
 
@@ -1858,12 +1870,16 @@ static INT32 slider_xscale(running_machine *machine, INT32 newval, char *buffer,
 {
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
+	render_container_user_settings settings;
+	
+	render_container_get_user_settings(container, &settings);
 	if (buffer != NULL)
 	{
-		render_container_set_xscale(container, (float)newval * 0.001f);
-		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(screen), "Horiz Stretch", render_container_get_xscale(container));
+		settings.xscale = (float)newval * 0.001f;
+		render_container_set_user_settings(container, &settings);
+		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(screen), "Horiz Stretch", settings.xscale);
 	}
-	return floor(render_container_get_xscale(container) * 1000.0f + 0.5f);
+	return floor(settings.xscale * 1000.0f + 0.5f);
 }
 
 
@@ -1876,12 +1892,16 @@ static INT32 slider_yscale(running_machine *machine, INT32 newval, char *buffer,
 {
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
+	render_container_user_settings settings;
+	
+	render_container_get_user_settings(container, &settings);
 	if (buffer != NULL)
 	{
-		render_container_set_yscale(container, (float)newval * 0.001f);
-		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(screen), "Vert Stretch", render_container_get_yscale(container));
+		settings.yscale = (float)newval * 0.001f;
+		render_container_set_user_settings(container, &settings);
+		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(screen), "Vert Stretch", settings.yscale);
 	}
-	return floor(render_container_get_yscale(container) * 1000.0f + 0.5f);
+	return floor(settings.yscale * 1000.0f + 0.5f);
 }
 
 
@@ -1894,12 +1914,16 @@ static INT32 slider_xoffset(running_machine *machine, INT32 newval, char *buffer
 {
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
+	render_container_user_settings settings;
+	
+	render_container_get_user_settings(container, &settings);
 	if (buffer != NULL)
 	{
-		render_container_set_xoffset(container, (float)newval * 0.001f);
-		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(screen), "Horiz Position", render_container_get_xoffset(container));
+		settings.xoffset = (float)newval * 0.001f;
+		render_container_set_user_settings(container, &settings);
+		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(screen), "Horiz Position", settings.xoffset);
 	}
-	return floor(render_container_get_xoffset(container) * 1000.0f + 0.5f);
+	return floor(settings.xoffset * 1000.0f + 0.5f);
 }
 
 
@@ -1912,12 +1936,16 @@ static INT32 slider_yoffset(running_machine *machine, INT32 newval, char *buffer
 {
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
+	render_container_user_settings settings;
+	
+	render_container_get_user_settings(container, &settings);
 	if (buffer != NULL)
 	{
-		render_container_set_yoffset(container, (float)newval * 0.001f);
-		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(screen), "Vert Position", render_container_get_yoffset(container));
+		settings.yoffset = (float)newval * 0.001f;
+		render_container_set_user_settings(container, &settings);
+		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(screen), "Vert Position", settings.yoffset);
 	}
-	return floor(render_container_get_yoffset(container) * 1000.0f + 0.5f);
+	return floor(settings.yoffset * 1000.0f + 0.5f);
 }
 
 

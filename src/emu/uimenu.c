@@ -2552,7 +2552,12 @@ static void menu_video_options(running_machine *machine, ui_menu *menu, void *pa
 					int delta = (event->iptkey == IPT_UI_LEFT) ? ROT270 : ROT90;
 					render_target_set_orientation(target, orientation_add(delta, render_target_get_orientation(target)));
 					if (target == render_get_ui_target())
-						render_container_set_orientation(render_container_get_ui(), orientation_add(delta ^ ROT180, render_container_get_orientation(render_container_get_ui())));
+					{
+						render_container_user_settings settings;
+						render_container_get_user_settings(render_container_get_ui(), &settings);
+						settings.orientation = orientation_add(delta ^ ROT180, settings.orientation);
+						render_container_set_user_settings(render_container_get_ui(), &settings);
+					}
 					changed = TRUE;
 				}
 				break;

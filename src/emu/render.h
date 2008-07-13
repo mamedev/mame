@@ -293,6 +293,26 @@ struct _render_primitive_list
 };
 
 
+/*-------------------------------------------------
+    render_container_user_settings - an object 
+    containing user-controllable settings for
+    a container
+-------------------------------------------------*/
+
+typedef struct _render_container_user_settings render_container_user_settings;
+struct _render_container_user_settings
+{
+	int					orientation;		/* orientation */
+	float				brightness;			/* brightness */
+	float				contrast;			/* contrast */
+	float				gamma;				/* gamma */
+	float				xscale;				/* horizontal scale factor */
+	float				yscale;				/* vertical scale factor */
+	float				xoffset;			/* horizontal offset */
+	float				yoffset;			/* vertical offset */
+};
+
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -416,53 +436,11 @@ void render_container_empty(render_container *container);
 /* return true if a container has nothing in it */
 int render_container_is_empty(render_container *container);
 
-/* return the orientation of a container */
-int render_container_get_orientation(render_container *container);
+/* get the current user settings for a container */
+void render_container_get_user_settings(render_container *container, render_container_user_settings *settings);
 
-/* set the orientation of a container */
-void render_container_set_orientation(render_container *container, int orientation);
-
-/* return the brightness of a container */
-float render_container_get_brightness(render_container *container);
-
-/* set the brightness of a container */
-void render_container_set_brightness(render_container *container, float brightness);
-
-/* return the contrast of a container */
-float render_container_get_contrast(render_container *container);
-
-/* set the contrast of a container */
-void render_container_set_contrast(render_container *container, float contrast);
-
-/* return the gamma of a container */
-float render_container_get_gamma(render_container *container);
-
-/* set the gamma of a container */
-void render_container_set_gamma(render_container *container, float gamma);
-
-/* return the X scale of a container */
-float render_container_get_xscale(render_container *container);
-
-/* set the X scale of a container */
-void render_container_set_xscale(render_container *container, float xscale);
-
-/* return the Y scale of a container */
-float render_container_get_yscale(render_container *container);
-
-/* set the Y scale of a container */
-void render_container_set_yscale(render_container *container, float yscale);
-
-/* return the X offset of a container */
-float render_container_get_xoffset(render_container *container);
-
-/* set the X offset of a container */
-void render_container_set_xoffset(render_container *container, float xoffset);
-
-/* return the Y offset of a container */
-float render_container_get_yoffset(render_container *container);
-
-/* set the Y offset of a container */
-void render_container_set_yoffset(render_container *container, float yoffset);
+/* set the current user settings for a container */
+void render_container_set_user_settings(render_container *container, const render_container_user_settings *settings);
 
 /* set the overlay bitmap for the container */
 void render_container_set_overlay(render_container *container, bitmap_t *bitmap);

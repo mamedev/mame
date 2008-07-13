@@ -1182,6 +1182,7 @@ static DEVICE_START( video_screen )
 	const device_config *screen = device;
 	char unique_tag[40];
 	screen_state *state = get_safe_token(screen);
+	render_container_user_settings settings;
 	render_container *container;
 	screen_config *config;
 
@@ -1216,14 +1217,16 @@ static DEVICE_START( video_screen )
 	state->scanline0_timer = timer_alloc(scanline0_callback, (void *)screen);
 
 	/* configure the default cliparea */
+	render_container_get_user_settings(container, &settings);
 	if (config->xoffset != 0)
-		render_container_set_xoffset(container, config->xoffset);
+		settings.xoffset = config->xoffset;
 	if (config->yoffset != 0)
-		render_container_set_yoffset(container, config->yoffset);
+		settings.yoffset = config->yoffset;
 	if (config->xscale != 0)
-		render_container_set_xscale(container, config->xscale);
+		settings.xscale = config->xscale;
 	if (config->yscale != 0)
-		render_container_set_yscale(container, config->yscale);
+		settings.yscale = config->yscale;
+	render_container_set_user_settings(container, &settings);
 
 	/* allocate a timer to generate per-scanline updates */
 	if (screen->machine->config->video_attributes & VIDEO_UPDATE_SCANLINE)

@@ -564,11 +564,16 @@ void render_init(running_machine *machine)
 	{
 		render_container *screen_container = render_container_alloc();
 		render_container **temp = &screen_container->next;
+		render_container_user_settings settings;
 
-		render_container_set_orientation(screen_container, machine->gamedrv->flags & ORIENTATION_MASK);
-		render_container_set_brightness(screen_container, options_get_float(mame_options(), OPTION_BRIGHTNESS));
-		render_container_set_contrast(screen_container, options_get_float(mame_options(), OPTION_CONTRAST));
-		render_container_set_gamma(screen_container, options_get_float(mame_options(), OPTION_GAMMA));
+		/* set the initial orientation and brightness/contrast/gamma */
+		render_container_get_user_settings(screen_container, &settings);
+		settings.orientation = machine->gamedrv->flags & ORIENTATION_MASK;
+		settings.brightness = options_get_float(mame_options(), OPTION_BRIGHTNESS);
+		settings.contrast = options_get_float(mame_options(), OPTION_CONTRAST);
+		settings.gamma = options_get_float(mame_options(), OPTION_GAMMA);
+		render_container_set_user_settings(screen_container, &settings);
+
 		screen_container->screen = screen;
 
 		/* link it up */
@@ -746,7 +751,13 @@ static void render_load(running_machine *machine, int config_type, xml_data_node
 
 				/* apply the opposite orientation to the UI */
 				if (target == render_get_ui_target())
-					render_container_set_orientation(ui_container, orientation_add(orientation_reverse(tmpint), ui_container->orientation));
+				{
+					render_container_user_settings settings;
+					
+					render_container_get_user_settings(ui_container, &settings);
+					settings.orientation = orientation_add(orientation_reverse(tmpint), settings.orientation);
+					render_container_set_user_settings(ui_container, &settings);
+				}
 			}
 		}
 	}
@@ -756,17 +767,24 @@ static void render_load(running_machine *machine, int config_type, xml_data_node
 	{
 		int index = xml_get_attribute_int(screennode, "index", -1);
 		render_container *container = get_screen_container_by_index(index);
+		render_container_user_settings settings;
+		
+		/* fetch current settings */
+		render_container_get_user_settings(container, &settings);
 
 		/* fetch color controls */
-		render_container_set_brightness(container, xml_get_attribute_float(screennode, "brightness", container->brightness));
-		render_container_set_contrast(container, xml_get_attribute_float(screennode, "contrast", container->contrast));
-		render_container_set_gamma(container, xml_get_attribute_float(screennode, "gamma", container->gamma));
+		settings.brightness = xml_get_attribute_float(screennode, "brightness", settings.brightness);
+		settings.contrast = xml_get_attribute_float(screennode, "contrast", settings.contrast);
+		settings.gamma = xml_get_attribute_float(screennode, "gamma", settings.gamma);
 
 		/* fetch positioning controls */
-		render_container_set_xoffset(container, xml_get_attribute_float(screennode, "hoffset", container->xoffset));
-		render_container_set_xscale(container, xml_get_attribute_float(screennode, "hstretch", container->xscale));
-		render_container_set_yoffset(container, xml_get_attribute_float(screennode, "voffset", container->yoffset));
-		render_container_set_yscale(container, xml_get_attribute_float(screennode, "vstretch", container->yscale));
+		settings.xoffset = xml_get_attribute_float(screennode, "hoffset", settings.xoffset);
+		settings.xscale = xml_get_attribute_float(screennode, "hstretch", settings.xscale);
+		settings.yoffset = xml_get_attribute_float(screennode, "voffset", settings.yoffset);
+		settings.yscale = xml_get_attribute_float(screennode, "vstretch", settings.yscale);
+		
+		/* set the new values */
+		render_container_set_user_settings(container, &settings);
 	}
 }
 
@@ -2691,181 +2709,39 @@ int render_container_is_empty(render_container *container)
 
 
 /*-------------------------------------------------
-    render_container_get_orientation - return the
-    orientation of a container
+    render_container_get_user_settings - get the 
+    current user settings for a container
 -------------------------------------------------*/
 
-int render_container_get_orientation(render_container *container)
+void render_container_get_user_settings(render_container *container, render_container_user_settings *settings)
 {
-	return container->orientation;
+	settings->orientation = container->orientation;
+	settings->brightness = container->brightness;
+	settings->contrast = container->contrast;
+	settings->gamma = container->gamma;
+	settings->xscale = container->xscale;
+	settings->yscale = container->yscale;
+	settings->xoffset = container->xoffset;
+	settings->yoffset = container->yoffset;
 }
 
 
 /*-------------------------------------------------
-    render_container_set_orientation - set the
-    orientation of a container
+    render_container_set_user_settings - set the 
+    current user settings for a container
 -------------------------------------------------*/
 
-void render_container_set_orientation(render_container *container, int orientation)
+void render_container_set_user_settings(render_container *container, const render_container_user_settings *settings)
 {
-	container->orientation = orientation;
-}
-
-
-/*-------------------------------------------------
-    render_container_get_brightness - return the
-    brightness of a container
--------------------------------------------------*/
-
-float render_container_get_brightness(render_container *container)
-{
-	return container->brightness;
-}
-
-
-/*-------------------------------------------------
-    render_container_set_brightness - set the
-    brightness of a container
--------------------------------------------------*/
-
-void render_container_set_brightness(render_container *container, float brightness)
-{
-	container->brightness = brightness;
+	container->orientation = settings->orientation;
+	container->brightness = settings->brightness;
+	container->contrast = settings->contrast;
+	container->gamma = settings->gamma;
+	container->xscale = settings->xscale;
+	container->yscale = settings->yscale;
+	container->xoffset = settings->xoffset;
+	container->yoffset = settings->yoffset;
 	render_container_recompute_lookups(container);
-}
-
-
-/*-------------------------------------------------
-    render_container_get_contrast - return the
-    contrast of a container
--------------------------------------------------*/
-
-float render_container_get_contrast(render_container *container)
-{
-	return container->contrast;
-}
-
-
-/*-------------------------------------------------
-    render_container_set_contrast - set the
-    contrast of a container
--------------------------------------------------*/
-
-void render_container_set_contrast(render_container *container, float contrast)
-{
-	container->contrast = contrast;
-	render_container_recompute_lookups(container);
-}
-
-
-/*-------------------------------------------------
-    render_container_get_gamma - return the
-    gamma of a container
--------------------------------------------------*/
-
-float render_container_get_gamma(render_container *container)
-{
-	return container->gamma;
-}
-
-
-/*-------------------------------------------------
-    render_container_set_gamma - set the
-    gamma of a container
--------------------------------------------------*/
-
-void render_container_set_gamma(render_container *container, float gamma)
-{
-	container->gamma = gamma;
-	render_container_recompute_lookups(container);
-}
-
-
-/*-------------------------------------------------
-    render_container_get_xscale - return the
-    X scale of a container
--------------------------------------------------*/
-
-float render_container_get_xscale(render_container *container)
-{
-	return container->xscale;
-}
-
-
-/*-------------------------------------------------
-    render_container_set_xscale - set the
-    X scale of a container
--------------------------------------------------*/
-
-void render_container_set_xscale(render_container *container, float xscale)
-{
-	container->xscale = xscale;
-}
-
-
-/*-------------------------------------------------
-    render_container_get_yscale - return the
-    X scale of a container
--------------------------------------------------*/
-
-float render_container_get_yscale(render_container *container)
-{
-	return container->yscale;
-}
-
-
-/*-------------------------------------------------
-    render_container_set_yscale - set the
-    X scale of a container
--------------------------------------------------*/
-
-void render_container_set_yscale(render_container *container, float yscale)
-{
-	container->yscale = yscale;
-}
-
-
-/*-------------------------------------------------
-    render_container_get_xoffset - return the
-    X offset of a container
--------------------------------------------------*/
-
-float render_container_get_xoffset(render_container *container)
-{
-	return container->xoffset;
-}
-
-
-/*-------------------------------------------------
-    render_container_set_xoffset - set the
-    X offset of a container
--------------------------------------------------*/
-
-void render_container_set_xoffset(render_container *container, float xoffset)
-{
-	container->xoffset = xoffset;
-}
-
-
-/*-------------------------------------------------
-    render_container_get_yoffset - return the
-    X offset of a container
--------------------------------------------------*/
-
-float render_container_get_yoffset(render_container *container)
-{
-	return container->yoffset;
-}
-
-
-/*-------------------------------------------------
-    render_container_set_yoffset - set the
-    X offset of a container
--------------------------------------------------*/
-
-void render_container_set_yoffset(render_container *container, float yoffset)
-{
-	container->yoffset = yoffset;
 }
 
 
