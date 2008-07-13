@@ -113,24 +113,24 @@ struct _ui_menu_item
 
 struct _ui_menu
 {
-	running_machine *	machine;		/* machine we are attached to */
-	ui_menu_handler_func handler;		/* handler callback */
-	void *				parameter;		/* parameter */
-	ui_menu_event		event;			/* the UI event that occurred */
-	ui_menu *			parent;			/* pointer to parent menu */
-	void *				state;			/* menu-specific state */
-	int					resetpos;		/* reset position */
-	void *				resetref;		/* reset reference */
-	int					selected;		/* which item is selected */
-	int					hover;			/* which item is being hovered over */
-	int					visitems;		/* number of visible items */
-	int					numitems;		/* number of items in the menu */
-	int					allocitems;		/* allocated size of array */
-	ui_menu_item *		item;			/* pointer to array of items */
-	ui_menu_custom_func custom;			/* callback for custom rendering */
-	float				customtop;		/* amount of extra height to add at the top */
-	float				custombottom;	/* amount of extra height to add at the bottom */
-	ui_menu_pool *		pool;			/* list of memory pools */
+	running_machine *	machine;			/* machine we are attached to */
+	ui_menu_handler_func handler;			/* handler callback */
+	void *				parameter;			/* parameter */
+	ui_menu_event		event;				/* the UI event that occurred */
+	ui_menu *			parent;				/* pointer to parent menu */
+	void *				state;				/* menu-specific state */
+	int					resetpos;			/* reset position */
+	void *				resetref;			/* reset reference */
+	int					selected;			/* which item is selected */
+	int					hover;				/* which item is being hovered over */
+	int					visitems;			/* number of visible items */
+	int					numitems;			/* number of items in the menu */
+	int					allocitems;			/* allocated size of array */
+	ui_menu_item *		item;				/* pointer to array of items */
+	ui_menu_custom_func custom;				/* callback for custom rendering */
+	float				customtop;			/* amount of extra height to add at the top */
+	float				custombottom;		/* amount of extra height to add at the bottom */
+	ui_menu_pool *		pool;				/* list of memory pools */
 };
 
 
@@ -199,7 +199,7 @@ struct _select_game_state
 	UINT8				rerandomize;
 	char				search[40];
 	const game_driver *	matchlist[VISIBLE_GAMES_IN_LIST];
-	const game_driver **driverlist;
+	const game_driver *	driverlist[1];
 };
 	
 
@@ -2673,7 +2673,7 @@ static void menu_select_game(running_machine *machine, ui_menu *menu, void *para
 	/* if no state, allocate some */
 	if (state == NULL)
 	{
-		state = ui_menu_alloc_state(menu, sizeof(*menustate));
+		state = ui_menu_alloc_state(menu, sizeof(*menustate) + sizeof(menustate->driverlist) * driver_list_get_count(drivers));
 		if (parameter != NULL)
 			strcpy(((select_game_state *)state)->search, parameter);
 	}
@@ -2785,7 +2785,8 @@ static void menu_select_game_populate(running_machine *machine, ui_menu *menu, s
 	int curitem;
 
 	/* update our driver list if necessary */
-	menu_select_game_build_driver_list(menu, menustate);
+	if (menustate->driverlist[0] == NULL)
+		menu_select_game_build_driver_list(menu, menustate);
 	for (curitem = matchcount = 0; menustate->driverlist[curitem] != NULL && matchcount < VISIBLE_GAMES_IN_LIST; curitem++)
 		if (!(menustate->driverlist[curitem]->flags & GAME_NO_STANDALONE))
 			matchcount++;
@@ -2857,12 +2858,9 @@ static void menu_select_game_build_driver_list(ui_menu *menu, select_game_state 
 	mame_path *path;
 	UINT8 *found;
 
-	/* first allocate a copy of the full driver list */
-	menustate->driverlist = ui_menu_pool_alloc(menu, driver_count * sizeof(*menustate->driverlist));
-	memcpy((void *)menustate->driverlist, drivers, driver_count * sizeof(*menustate->driverlist));
-
-	/* sort it */
-	qsort((void *)menustate->driverlist, driver_count, sizeof(*menustate->driverlist), menu_select_game_driver_compare);
+	/* create a sorted copy of the main driver list */
+	memcpy((void *)menustate->driverlist, drivers, driver_count * sizeof(menustate->driverlist[0]));
+	qsort((void *)menustate->driverlist, driver_count, sizeof(menustate->driverlist[0]), menu_select_game_driver_compare);
 
 	/* allocate a temporary array to track which ones we found */
 	found = ui_menu_pool_alloc(menu, (driver_count + 7) / 8);
@@ -2905,7 +2903,7 @@ static void menu_select_game_build_driver_list(ui_menu *menu, select_game_state 
 	}
 
 	/* now build the final list */
-	for (drivnum = listnum = 0; drivnum < driver_count; drivnum += 8)
+	for (drivnum = listnum = 0; drivnum < driver_count; drivnum++)
 		if (found[drivnum / 8] & (1 << (drivnum % 8)))
 			menustate->driverlist[listnum++] = menustate->driverlist[drivnum];
 
