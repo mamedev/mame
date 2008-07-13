@@ -726,14 +726,14 @@ static void cps3_decrypt_bios(running_machine *machine)
 #endif
 }
 
-
-
-
 static DRIVER_INIT( cps3crpt )
 {
 	const char *gamename = machine->gamedrv->name;
 	const struct game_keys2 *k = &keys_table2[0];
 	int i;
+
+	// set strict verify
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY);
 
 	cps3_key1 = -1;
 	cps3_key2 = -1;
@@ -1578,25 +1578,25 @@ struct cps3_test_hacks
 static const struct cps3_test_hacks testhack_table[] =
 {
 	// name        mainram address  code address
-	{ "jojo",      0x0011c2c,         0x6172568  },
-	{ "jojon",     0x0011c2c,         0x6172568  },
-	{ "jojoalt",   0x0011c2c,         0x6172798  },
-	{ "jojoaltn",  0x0011c2c,         0x6172798  },
-	{ "jojoba",    0x0011c90,         0x61c45bc  },
-	{ "jojoban",   0x0011c90,         0x61c45bc  },
-	{ "jojobane",  0x0011c90,         0x61c45bc  },
-	{ "sfiii",     0x00166b4,         0x63cdff4  },
-	{ "sfiiiu",    0x00166b4,         0x63cdff4  },
-	{ "sfiiin",    0x00166b4,         0x63cdff4  },
+	{ "jojo",      0x0011c2a,         0x6172566  },
+	{ "jojon",     0x0011c2a,         0x6172566  },
+	{ "jojoalt",   0x0011c2a,         0x6172796  },
+	{ "jojoaltn",  0x0011c2a,         0x6172796  },
+	{ "jojoba",    0x0011c8e,         0x61c45ba  },
+	{ "jojoban",   0x0011c8e,         0x61c45ba  },
+	{ "jojobane",  0x0011c8e,         0x61c45ba  },
+	{ "sfiii",     0x00166b2,         0x63cdff2  },
+	{ "sfiiiu",    0x00166b2,         0x63cdff2  },
+	{ "sfiiin",    0x00166b2,         0x63cdff2  },
 	{ "sfiii2",    0,                 0          },
 	{ "sfiii2u",   0,                 0          },
 	{ "sfiii2n",   0,                 0          },
-	{ "sfiii3",    0x0011c44,         0x613a9fc  },
-	{ "sfiii3n",   0x0011c44,         0x613a9fc  },
-	{ "sfiii3a",   0x0011c44,         0x613ab48  },
-	{ "sfiii3an",  0x0011c44,         0x613ab48  },
-	{ "warzard",   0x0016530,         0x60105f0  },
-	{ "redearth",  0x0016530,         0x60105f0  },
+	{ "sfiii3",    0x0011c42,         0x613a9fa  },
+	{ "sfiii3n",   0x0011c42,         0x613a9fa  },
+	{ "sfiii3a",   0x0011c42,         0x613ab46  },
+	{ "sfiii3an",  0x0011c42,         0x613ab46  },
+	{ "warzard",   0x001652e,         0x60105ee  },
+	{ "redearth",  0x001652e,         0x60105ee  },
 	{ 0 }	// end of table
 };
 
@@ -1614,6 +1614,12 @@ static DRIVER_INIT( cps3_testhacks )
 		{
 			cps3_bios_test_hack = k->bios_test_hack;
 			cps3_game_test_hack = k->game_test_hack;
+
+			cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
+			cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, cps3_bios_test_hack);
+			cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 2);
+			cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, cps3_game_test_hack);
+
 			break;
 		}
 		++k;
@@ -2980,25 +2986,25 @@ struct cps3_speedups
 static const struct cps3_speedups speedup_table[] =
 {
 	// name        mainram address  code address
-	{ "jojo",      0x223c0,         0x600065c  },
-	{ "jojon",     0x223c0,         0x600065c  },
-	{ "jojoalt",   0x223d8,         0x600065c  },
-	{ "jojoaltn",  0x223d8,         0x600065c  },
-	{ "jojoba",    0x267dc,         0x600065c  },
-	{ "jojoban",   0x267dc,         0x600065c  },
-	{ "jojobane",  0x267dc,         0x600065c  },
-	{ "sfiii",     0x0cc6c,         0x6000884  },
-	{ "sfiiiu",    0x0cc6c,         0x6000884  },
-	{ "sfiiin",    0x0cc6c,         0x6000884  },
-	{ "sfiii2",    0x0dfe4,         0x6000884  },
-	{ "sfiii2u",   0x0dfe4,         0x6000884  },
-	{ "sfiii2n",   0x0dfe4,         0x6000884  },
-	{ "sfiii3",    0x0d794,         0x6000884  },
-	{ "sfiii3n",   0x0d794,         0x6000884  },
-	{ "sfiii3a",   0x0d794,         0x6000884  },
-	{ "sfiii3an",  0x0d794,         0x6000884  },
-	{ "warzard",   0x2136c,         0x600194e  },
-	{ "redearth",  0x2136c,         0x600194e  },
+	{ "jojo",      0x223c0,         0x600065a  },
+	{ "jojon",     0x223c0,         0x600065a  },
+	{ "jojoalt",   0x223d8,         0x600065a  },
+	{ "jojoaltn",  0x223d8,         0x600065a  },
+	{ "jojoba",    0x267dc,         0x600065a  },
+	{ "jojoban",   0x267dc,         0x600065a  },
+	{ "jojobane",  0x267dc,         0x600065a  },
+	{ "sfiii",     0x0cc6c,         0x6000882  },
+	{ "sfiiiu",    0x0cc6c,         0x6000882  },
+	{ "sfiiin",    0x0cc6c,         0x6000882  },
+	{ "sfiii2",    0x0dfe4,         0x6000882  },
+	{ "sfiii2u",   0x0dfe4,         0x6000882  },
+	{ "sfiii2n",   0x0dfe4,         0x6000882  },
+	{ "sfiii3",    0x0d794,         0x6000882  },
+	{ "sfiii3n",   0x0d794,         0x6000882  },
+	{ "sfiii3a",   0x0d794,         0x6000882  },
+	{ "sfiii3an",  0x0d794,         0x6000882  },
+	{ "warzard",   0x2136c,         0x600194c  },
+	{ "redearth",  0x2136c,         0x600194c  },
 	{ 0 }	// end of table
 };
 
@@ -3032,7 +3038,13 @@ static DRIVER_INIT( cps3_speedups )
 
 	//printf("speedup %08x %08x\n",cps3_speedup_ram_address,cps3_speedup_code_address);
 
-	if (cps3_speedup_code_address!=0) memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, cps3_speedup_ram_address+0x02000000, cps3_speedup_ram_address+0x02000003, 0, 0, cps3_speedup_r );
+	if (cps3_speedup_code_address!=0) 
+	{
+		cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
+		cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, cps3_speedup_code_address);
+
+		memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, cps3_speedup_ram_address+0x02000000, cps3_speedup_ram_address+0x02000003, 0, 0, cps3_speedup_r );
+	}
 }
 
 

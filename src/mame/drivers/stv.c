@@ -2019,7 +2019,7 @@ static READ32_HANDLER( stv_sh2_random_r )
 #endif
 
 static ADDRESS_MAP_START( stv_mem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM   // bios
+	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE(6)  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE(stv_SMPC_r32, stv_SMPC_w32)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_RAM AM_SHARE(1) AM_BASE(&stv_backupram)
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x100000) AM_SHARE(2) AM_BASE(&stv_workram_l)
@@ -2028,7 +2028,7 @@ static ADDRESS_MAP_START( stv_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x01406f40, 0x01406f43) AM_WRITE(minit_w) // prikura seems to write here ..
 //  AM_RANGE(0x01000000, 0x01000003) AM_WRITE(minit_w) AM_MIRROR(0x00080000)
 	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(sinit_w)
-	AM_RANGE(0x02000000, 0x04ffffff) AM_ROM AM_ROMBANK(1) AM_REGION(REGION_USER1, 0) // cartridge
+	AM_RANGE(0x02000000, 0x04ffffff) AM_ROM AM_ROMBANK(1) AM_SHARE(7) AM_REGION(REGION_USER1, 0) // cartridge
 	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
 	/* Sound */
 	AM_RANGE(0x05a00000, 0x05a7ffff) AM_READWRITE(stv_sh2_soundram_r, stv_sh2_soundram_w)
@@ -2047,6 +2047,8 @@ static ADDRESS_MAP_START( stv_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE(stv_vdp2_regs_r, stv_vdp2_regs_w)
 	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE(stv_scu_r32, stv_scu_w32)
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x01f00000) AM_SHARE(3) AM_BASE(&stv_workram_h)
+	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE(6)  // bios mirror
+	AM_RANGE(0x22000000, 0x24ffffff) AM_ROM AM_SHARE(7)  // cart mirror
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2433,6 +2435,11 @@ DRIVER_INIT ( stv )
 	scsp_regs = auto_malloc (0x1000);
 
 	install_stvbios_speedups(machine);
+
+	// do strict overwrite verification - maruchan and rsgun crash after coinup without this.
+	// todo: test what games need this and don't turn it on for them...
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY);
+	cpunum_set_info_int(1, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY);
 
 	/* debug .. watch the command buffer rsgun, cottonbm etc. appear to use to communicate between cpus */
 	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc44, 0x60ffc47, 0, 0, w60ffc44_write );

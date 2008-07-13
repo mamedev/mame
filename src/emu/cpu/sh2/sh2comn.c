@@ -259,11 +259,20 @@ static void sh2_dmac_check(int dma)
 
 WRITE32_HANDLER( sh2_internal_w )
 {
-	UINT32 old = sh2->m[offset];
+	UINT32 old;
+
+#ifdef USE_SH2DRC
+	offset &= 0x7f;
+#endif
+
+	old = sh2->m[offset]; 
 	COMBINE_DATA(sh2->m+offset);
 
 	//  if(offset != 0x20)
 	//      logerror("sh2_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfffffe00+offset*4, offset, data, mem_mask);
+
+//	  if(offset != 0x20)
+//	      printf("sh2_internal_w:  Write %08x (%x), %08x @ %08x (PC %x)\n", 0xfffffe00+offset*4, offset, data, mem_mask, activecpu_get_pc());
 
 	switch( offset )
 	{
@@ -271,7 +280,7 @@ WRITE32_HANDLER( sh2_internal_w )
 	case 0x04: // TIER, FTCSR, FRC
 		if((mem_mask & 0x00ffffff) != 0)
 			sh2_timer_resync();
-		logerror("SH2.%d: TIER write %04x @ %04x\n", sh2->cpu_number, data >> 16, mem_mask>>16);
+//		printf("SH2.%d: TIER write %04x @ %04x\n", sh2->cpu_number, data >> 16, mem_mask>>16);
 		sh2->m[4] = (sh2->m[4] & ~(ICF|OCFA|OCFB|OVF)) | (old & sh2->m[4] & (ICF|OCFA|OCFB|OVF));
 		COMBINE_DATA(&sh2->frc);
 		if((mem_mask & 0x00ffffff) != 0)
@@ -279,7 +288,7 @@ WRITE32_HANDLER( sh2_internal_w )
 		sh2_recalc_irq();
 		break;
 	case 0x05: // OCRx, TCR, TOCR
-		logerror("SH2.%d: TCR write %08x @ %08x\n", sh2->cpu_number, data, mem_mask);
+//		printf("SH2.%d: TCR write %08x @ %08x\n", sh2->cpu_number, data, mem_mask);
 		sh2_timer_resync();
 		if(sh2->m[5] & 0x10)
 			sh2->ocrb = (sh2->ocrb & (~mem_mask >> 16)) | ((data & mem_mask) >> 16);
@@ -427,6 +436,9 @@ WRITE32_HANDLER( sh2_internal_w )
 
 READ32_HANDLER( sh2_internal_r )
 {
+#ifdef USE_SH2DRC
+	offset &= 0x7f;
+#endif
 	//  logerror("sh2_internal_r:  Read %08x (%x) @ %08x\n", 0xfffffe00+offset*4, offset, mem_mask);
 	switch( offset )
 	{
@@ -513,7 +525,12 @@ void sh2_set_irq_line(int irqline, int state)
 		else
 		{
 			LOG(("SH-2 #%d assert nmi\n", cpu_getactivecpu()));
-			sh2_exception("sh2_set_irq_line/nmi", 16);
+
+			sh2_exception("Set IRQ line", 16);
+
+			#ifdef USE_SH2DRC
+			sh2->pending_nmi = 1;
+			#endif
 		}
 	}
 	else
@@ -531,10 +548,14 @@ void sh2_set_irq_line(int irqline, int state)
 		{
 			LOG(("SH-2 #%d assert irq #%d\n", cpu_getactivecpu(), irqline));
 			sh2->pending_irq |= 1 << irqline;
+			#ifdef USE_SH2DRC
+			sh2->test_irq = 1;
+			#else
 			if(sh2->delay)
 				sh2->test_irq = 1;
 			else
 				CHECK_PENDING_IRQ("sh2_set_irq_line");
+			#endif
 		}
 	}
 }
@@ -578,7 +599,6 @@ void sh2_recalc_irq(void)
 		}
 	}
 
-
 	sh2->internal_irq_level = irq;
 	sh2->internal_irq_vector = vector;
 	sh2->test_irq = 1;
@@ -620,6 +640,19 @@ void sh2_exception(const char *message, int irqline)
 		LOG(("SH-2 #%d nmi exception (autovector: $%x) after [%s]\n", cpu_getactivecpu(), vector, message));
 	}
 
+	#ifdef USE_SH2DRC
+	sh2->evec = RL( sh2->vbr + vector * 4 );
+	sh2->evec &= AM;
+	sh2->irqsr = sh2->sr;
+
+	/* set I flags in SR */
+	if (irqline > SH2_INT_15)
+		sh2->sr = sh2->sr | I;
+	else
+		sh2->sr = (sh2->sr & ~I) | (irqline << 4);
+
+//	printf("sh2_exception [%s] irqline %x evec %x save SR %x new SR %x\n", message, irqline, sh2->evec, sh2->irqsr, sh2->sr);
+	#else
 	sh2->r[15] -= 4;
 	WL( sh2->r[15], sh2->sr );		/* push SR onto stack */
 	sh2->r[15] -= 4;
@@ -634,14 +667,18 @@ void sh2_exception(const char *message, int irqline)
 	/* fetch PC */
 	sh2->pc = RL( sh2->vbr + vector * 4 );
 	change_pc(sh2->pc & AM);
+	#endif
 }
 
-void sh2_common_init(int index, int clock, const void *config, int (*irqcallback)(int))
+void sh2_common_init(int alloc, int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	const struct sh2_config *conf = config;
 
-	sh2 = (SH2 *)auto_malloc(sizeof(SH2));
-	memset(sh2, 0, sizeof(SH2));
+	if (alloc)
+	{
+		sh2 = (SH2 *)auto_malloc(sizeof(SH2));
+		memset(sh2, 0, sizeof(SH2));
+	}
 
 	sh2->timer = timer_alloc(sh2_timer_callback, NULL);
 	timer_adjust_oneshot(sh2->timer, attotime_never, 0);

@@ -105,6 +105,8 @@
 #include "sh2.h"
 #include "sh2comn.h"
 
+#ifndef USE_SH2DRC
+
 /* speed up delay loops, bail out of tight loops */
 #define BUSY_LOOP_HACKS 	1
 
@@ -2251,6 +2253,16 @@ static offs_t sh2_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 
 	return DasmSH2( buffer, pc, (oprom[0] << 8) | oprom[1] );
 }
 
+static void sh2_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	/* allocate the core memory */
+	sh2 = auto_malloc(sizeof(SH2));
+	memset(sh2, 0, sizeof(SH2));
+
+	/* initialize the common core parts */
+	sh2_common_init(0, index, clock, config, irqcallback);
+}
+
 /**************************************************************************
  * Generic set_info
  **************************************************************************/
@@ -2397,7 +2409,7 @@ void sh2_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = sh2_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = sh2_get_context;		break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = sh2_set_context;		break;
-		case CPUINFO_PTR_INIT:							info->init = sh2_common_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = sh2_init;					break;
 		case CPUINFO_PTR_RESET:							info->reset = sh2_reset;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = sh2_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
@@ -2449,3 +2461,5 @@ void sh2_get_info(UINT32 state, cpuinfo *info)
 
 	}
 }
+
+#endif

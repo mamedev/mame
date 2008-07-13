@@ -1095,8 +1095,8 @@ PC  : 0001AE7C: MOV.L   @R3,R0
 PC  : 0001AE7E: TST     R0,R0
 PC  : 0001AE80: BT      $0001AE74
 */
-	if (activecpu_get_pc()==0x0001AFAC) cpu_spinuntil_int(); // Character Select + InGame
-	if (activecpu_get_pc()==0x0001AE76) cpu_spinuntil_int(); // Everything Else?
+	if (activecpu_get_pc()==0x0001AFAA) cpu_spinuntil_int(); // Character Select + InGame
+	if (activecpu_get_pc()==0x0001AE74) cpu_spinuntil_int(); // Everything Else?
 
 	return psh_ram[0x00000C/4];
 }
@@ -1112,9 +1112,9 @@ PC  : 0609FC70: MOV.L   @R3,R0  // whats there into r0
 PC  : 0609FC72: TST     R0,R0 // test
 PC  : 0609FC74: BT      $0609FC68
 */
-	if (activecpu_get_pc()==0x609FC6A) cpu_spinuntil_int(); // Title Screens
-	if (activecpu_get_pc()==0x609FED4) cpu_spinuntil_int(); // In Game
-	if (activecpu_get_pc()==0x60A0172) cpu_spinuntil_int(); // Attract Demo
+	if (activecpu_get_pc()==0x609FC68) cpu_spinuntil_int(); // Title Screens
+	if (activecpu_get_pc()==0x609FED2) cpu_spinuntil_int(); // In Game
+	if (activecpu_get_pc()==0x60A0170) cpu_spinuntil_int(); // Attract Demo
 
 	return psh_ram[0x00000C/4];
 }
@@ -1131,8 +1131,8 @@ PC  : 00047622: MOV.L   @R3,R0
 PC  : 00047624: TST     R0,R0
 PC  : 00047626: BT      $00047618
 */
-	if (activecpu_get_pc()==0x0004761C) cpu_spinuntil_int(); // title
-	if (activecpu_get_pc()==0x00047978) cpu_spinuntil_int(); // ingame
+	if (activecpu_get_pc()==0x0004761a) cpu_spinuntil_int(); // title
+	if (activecpu_get_pc()==0x00047976) cpu_spinuntil_int(); // ingame
 
 	return psh_ram[0x00000C/4];
 }
@@ -1148,9 +1148,9 @@ PC  : 060A10F4: MOV.L   @R1,R2
 PC  : 060A10F6: TST     R2,R2
 PC  : 060A10F8: BT      $060A10EC
 */
-	if (activecpu_get_pc()==0x060A10EE) cpu_spinuntil_int(); // title
-	if (activecpu_get_pc()==0x060A165A) cpu_spinuntil_int(); // attract
-	if (activecpu_get_pc()==0x060A1382) cpu_spinuntil_int(); // game
+	if (activecpu_get_pc()==0x060A10EC) cpu_spinuntil_int(); // title
+	if (activecpu_get_pc()==0x060A1658) cpu_spinuntil_int(); // attract
+	if (activecpu_get_pc()==0x060A1380) cpu_spinuntil_int(); // game
 
 	return psh_ram[0x00000C/4];
 }
@@ -1166,19 +1166,19 @@ PC  : 0602897A: MOV.L   @R1,R2
 PC  : 0602897C: TST     R2,R2
 PC  : 0602897E: BT      $06028972
 */
-	if (activecpu_get_pc()==0x06028974) cpu_spinuntil_int();
-	if (activecpu_get_pc()==0x06028E64) cpu_spinuntil_int();
-	if (activecpu_get_pc()==0x06028BE6) cpu_spinuntil_int();
+	if (activecpu_get_pc()==0x06028972) cpu_spinuntil_int();
+	if (activecpu_get_pc()==0x06028E62) cpu_spinuntil_int();
+	if (activecpu_get_pc()==0x06028BE4) cpu_spinuntil_int();
 
 	return psh_ram[0x04000C/4];
 }
 
 static READ32_HANDLER( s1945iii_speedup_r )
 {
-	if (activecpu_get_pc()==0x0602B464) cpu_spinuntil_int(); // start up text
-	if (activecpu_get_pc()==0x0602B6E2) cpu_spinuntil_int(); // intro attract
-	if (activecpu_get_pc()==0x0602BC1E) cpu_spinuntil_int(); // game attract
-	if (activecpu_get_pc()==0x0602B97C) cpu_spinuntil_int(); // game
+	if (activecpu_get_pc()==0x0602B462) cpu_spinuntil_int(); // start up text
+	if (activecpu_get_pc()==0x0602B6E0) cpu_spinuntil_int(); // intro attract
+	if (activecpu_get_pc()==0x0602BC1C) cpu_spinuntil_int(); // game attract
+	if (activecpu_get_pc()==0x0602B97A) cpu_spinuntil_int(); // game
 
 	return psh_ram[0x06000C/4];
 }
@@ -1186,10 +1186,10 @@ static READ32_HANDLER( s1945iii_speedup_r )
 
 static READ32_HANDLER( dragnblz_speedup_r )
 {
-	if (activecpu_get_pc()==0x06027440) cpu_spinuntil_int(); // startup texts
-	if (activecpu_get_pc()==0x060276E6) cpu_spinuntil_int(); // attract intro
-	if (activecpu_get_pc()==0x06027C74) cpu_spinuntil_int(); // attract game
-	if (activecpu_get_pc()==0x060279A8) cpu_spinuntil_int(); // game
+	if (activecpu_get_pc()==0x0602743e) cpu_spinuntil_int(); // startup texts
+	if (activecpu_get_pc()==0x060276e4) cpu_spinuntil_int(); // attract intro
+	if (activecpu_get_pc()==0x06027C72) cpu_spinuntil_int(); // attract game
+	if (activecpu_get_pc()==0x060279A6) cpu_spinuntil_int(); // game
 
 	return psh_ram[0x006000C/4];
 }
@@ -1206,10 +1206,10 @@ PC  :0602CAF0: TST     R2,R2
 PC  :0602CAF2: BT      $0602CAE6
 */
 
-	if (activecpu_get_pc()==0x0602CAE8) cpu_spinuntil_int(); // title logos
-	if (activecpu_get_pc()==0x0602CD88) cpu_spinuntil_int(); // attract intro
-	if (activecpu_get_pc()==0x0602D2F0) cpu_spinuntil_int(); // game attract
-	if (activecpu_get_pc()==0x0602D042) cpu_spinuntil_int(); // game play
+	if (activecpu_get_pc()==0x0602CAE6) cpu_spinuntil_int(); // title logos
+	if (activecpu_get_pc()==0x0602CD86) cpu_spinuntil_int(); // attract intro
+	if (activecpu_get_pc()==0x0602D2ee) cpu_spinuntil_int(); // game attract
+	if (activecpu_get_pc()==0x0602D040) cpu_spinuntil_int(); // game play
 
 	return psh_ram[0x006000C/4];
 }
@@ -1217,24 +1217,34 @@ PC  :0602CAF2: BT      $0602CAE6
 static READ32_HANDLER( mjgtaste_speedup_r )
 {
 
-	if (activecpu_get_pc()==0x6031f04) {cpu_spinuntil_int();return psh_ram[0x006000C/4];} // title logos
-	if (activecpu_get_pc()==0x603214c) {cpu_spinuntil_int();return psh_ram[0x006000C/4];} // attract game
+	if (activecpu_get_pc()==0x6031f02) {cpu_spinuntil_int();return psh_ram[0x006000C/4];} // title logos
+	if (activecpu_get_pc()==0x603214a) {cpu_spinuntil_int();return psh_ram[0x006000C/4];} // attract game
 
 //  mame_printf_debug("at %08x\n",activecpu_get_pc());
 
 	return psh_ram[0x006000C/4];
 }
 
-
-
 static DRIVER_INIT( soldivid )
 {
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x1afaa);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x1ae74);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, soldivid_speedup_r );
 	use_factory_eeprom=eeprom_0;
 }
 
 static DRIVER_INIT( s1945ii )
 {
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x609fc68);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x609fed2);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 2);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60a0170);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, s1945ii_speedup_r );
 	use_factory_eeprom=eeprom_DEFAULT;
 }
@@ -1242,6 +1252,11 @@ static DRIVER_INIT( s1945ii )
 static DRIVER_INIT( daraku )
 {
 	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x4761a);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x47976);
 	memory_set_bankptr(1,&RAM[0x100000]);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, daraku_speedup_r );
 	use_factory_eeprom=eeprom_DARAKU;
@@ -1249,6 +1264,13 @@ static DRIVER_INIT( daraku )
 
 static DRIVER_INIT( sbomberb )
 {
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60a10ec);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60a1658);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 2);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60a1380);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, sbomberb_speedup_r );
 	use_factory_eeprom=eeprom_DEFAULT;
 }
@@ -1256,6 +1278,13 @@ static DRIVER_INIT( sbomberb )
 static DRIVER_INIT( gunbird2 )
 {
 	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6028972);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6028e62);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 2);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6028be4);
 	memory_set_bankptr(1,&RAM[0x100000]);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x604000c, 0x604000f, 0, 0, gunbird2_speedup_r );
 	use_factory_eeprom=eeprom_DEFAULT;
@@ -1264,6 +1293,15 @@ static DRIVER_INIT( gunbird2 )
 static DRIVER_INIT( s1945iii )
 {
 	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602b462);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602b6e0);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 2);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602bc1c);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 3);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602b97a);
 	memory_set_bankptr(1,&RAM[0x100000]);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, s1945iii_speedup_r );
 	use_factory_eeprom=eeprom_S1945III;
@@ -1271,18 +1309,41 @@ static DRIVER_INIT( s1945iii )
 
 static DRIVER_INIT( dragnblz )
 {
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602743e);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60276e4);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 2);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6027c72);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 3);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60279a6);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, dragnblz_speedup_r );
 	use_factory_eeprom=eeprom_DRAGNBLZ;
 }
 
 static DRIVER_INIT( gnbarich )
 {
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602cae6);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602cd86);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 2);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602d2ee);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 3);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602d040);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, gnbarich_speedup_r );
 	use_factory_eeprom=eeprom_GNBARICH;
 }
 
 static DRIVER_INIT( mjgtaste )
 {
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6031f02);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x603214a);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, mjgtaste_speedup_r );
 	use_factory_eeprom=eeprom_MJGTASTE;
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */

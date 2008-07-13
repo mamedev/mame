@@ -465,7 +465,7 @@ CPUDEFS += -DHAS_SH2=$(if $(filter SH2,$(CPUS)),1,0)
 
 ifneq ($(filter SH2,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/sh2
-CPUOBJS += $(CPUOBJ)/sh2/sh2.o $(CPUOBJ)/sh2/sh2comn.o
+CPUOBJS += $(CPUOBJ)/sh2/sh2.o $(CPUOBJ)/sh2/sh2comn.o $(CPUOBJ)/sh2/sh2drc.o $(CPUOBJ)/sh2/sh2fe.o
 DBGOBJS += $(CPUOBJ)/sh2/sh2dasm.o
 endif
 
@@ -476,6 +476,14 @@ $(CPUOBJ)/sh2/sh2.o:	$(CPUSRC)/sh2/sh2.c \
 $(CPUOBJ)/sh2/sh2comn.o:  $(CPUSRC)/sh2/sh2comn.c \
 			$(CPUSRC)/sh2/sh2comn.h \
 			$(CPUSRC)/sh2/sh2.h
+
+$(CPUOBJ)/sh2/sh2drc.o:	$(CPUSRC)/sh2/sh2drc.c \
+			$(CPUSRC)/sh2/sh2.h \
+			$(CPUSRC)/sh2/sh2comn.h
+
+$(CPUOBJ)/sh2/sh2fe.o:	$(CPUSRC)/sh2/sh2fe.c \
+			$(CPUSRC)/sh2/sh2.h \
+			$(CPUSRC)/sh2/sh2comn.h
 
 #-------------------------------------------------
 # Hitachi SH4
