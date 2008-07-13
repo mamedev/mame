@@ -397,7 +397,11 @@ static opcode_desc **build_sequence(drcfe_state *drcfe, opcode_desc **tailptr, i
 
 			/* if we are the last instruction, indicate end-of-sequence and redispatch */
 			if (nextdesc == NULL)
-				curdesc->flags |= OPFLAG_END_SEQUENCE | endflag;
+			{
+				curdesc->flags |= OPFLAG_END_SEQUENCE;
+				if (endflag != OPFLAG_RETURN_TO_START || nextdescnum == end)
+					curdesc->flags |= endflag;
+			}
 
 			/* otherwise, do some analysis based on the next instruction */
 			else
