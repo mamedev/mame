@@ -15,6 +15,7 @@
 #define __ASTRING_H__
 
 #include "pool.h"
+#include <stdarg.h>
 
 
 /***************************************************************************
@@ -75,8 +76,14 @@ astring *astring_del(astring *str, int start, int count);
 /* formatted printf to an astring */
 int astring_printf(astring *dst, const char *format, ...) ATTR_PRINTF(2,3);
 
+/* formatted vprintf to an astring */
+int astring_vprintf(astring *dst, const char *format, va_list args);
+
 /* formatted printf to the end of an astring */
 int astring_catprintf(astring *dst, const char *format, ...) ATTR_PRINTF(2,3);
+
+/* formatted vprintf to the end of an astring */
+int astring_catvprintf(astring *dst, const char *format, va_list args);
 
 
 

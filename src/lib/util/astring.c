@@ -336,6 +336,24 @@ int astring_printf(astring *dst, const char *format, ...)
 
 
 /*-------------------------------------------------
+    astring_vprintf - vprintf text into an astring
+-------------------------------------------------*/
+
+int astring_vprintf(astring *dst, const char *format, va_list args)
+{
+	char tempbuf[4096];
+	int result;
+
+	/* sprintf into the temporary buffer */
+	result = vsprintf(tempbuf, format, args);
+
+	/* set the result */
+	astring_cpyc(dst, tempbuf);
+	return result;
+}
+
+
+/*-------------------------------------------------
     astring_catprintf - formatted printf to 
     the end of an astring
 -------------------------------------------------*/
@@ -350,6 +368,25 @@ int astring_catprintf(astring *dst, const char *format, ...)
 	va_start(args, format);
 	result = vsprintf(tempbuf, format, args);
 	va_end(args);
+
+	/* append the result */
+	astring_catc(dst, tempbuf);
+	return result;
+}
+
+
+/*-------------------------------------------------
+    astring_catprintf - formatted vprintf to 
+    the end of an astring
+-------------------------------------------------*/
+
+int astring_catvprintf(astring *dst, const char *format, va_list args)
+{
+	char tempbuf[4096];
+	int result;
+
+	/* sprintf into the temporary buffer */
+	result = vsprintf(tempbuf, format, args);
 
 	/* append the result */
 	astring_catc(dst, tempbuf);

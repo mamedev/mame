@@ -821,7 +821,7 @@ void CLIB_DECL ui_popup_time(int seconds, const char *text, ...)
 
 	/* extract the text */
 	va_start(arg,text);
-	astring_printf(messagebox_text, text, arg);
+	astring_vprintf(messagebox_text, text, arg);
 	messagebox_backcolor = UI_FILLCOLOR;
 	va_end(arg);
 
