@@ -638,6 +638,19 @@ static void sh2_init(int index, int clock, const void *config, int (*irqcallback
 }
 
 /*-------------------------------------------------
+    sh2_exit - cleanup from execution
+-------------------------------------------------*/
+
+static void sh2_exit(void)
+{
+	/* clean up the DRC */
+	drcfe_exit(sh2->drcfe);
+	drcuml_free(sh2->drcuml);
+	drccache_free(sh2->cache);
+}
+
+
+/*-------------------------------------------------
     sh2_reset - reset the processor
 -------------------------------------------------*/
 
@@ -3266,6 +3279,7 @@ void sh2_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = sh2_set_context;		break;
 		case CPUINFO_PTR_INIT:							info->init = sh2_init;					break;
 		case CPUINFO_PTR_RESET:							info->reset = sh2_reset;				break;
+		case CPUINFO_PTR_EXIT:							info->exit = sh2_exit;					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = sh2_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sh2_dasm;			break;
