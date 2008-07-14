@@ -2708,28 +2708,56 @@ MACHINE_DRIVER_END
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
 
+/* BIOS rev info found at 0x800 (byte swapped):
+
+erp-17740  - Japan   STVB1.10J0950131  95/01/31 v1.10  - Found on a early board dated 02/1995
+epr-17951a - Japan   STVB1.13J0950425  95/04/25 v1.13
+epr-17952a - USA     STVB1.13U0950425  95/04/25 v1.13
+epr-17953a - Taiwan  STVB1.13T0950425  95/04/25 v1.13
+epr-17954a - Europe  STVB1.13E0950425  95/04/25 v1.13
+
+epr-18343  - ?????   STVB1.30S0950727  95/07/27 v1.30 - Special version used on Sports Fishing 2 (CD based)
+epr-19730  - Japan   PCD11.13J0970217  97/02/17 v1.13 - Enhanced version for CD based units?
+epr-20091  - Japan   PCS11.13J0970821  97/08/21 v1.13 - Enhanced version for ???
+
+stv110.bin  - Debug  STVB1.10D0950113  95/01/13 v1.10
+stv1061.bin - ST-V Dev Bios (1.061) - Sega 1994, Noted "ST-V Ver 1.061 94/11/25" on EPROM sticker, Coming from a S-TV SG5001A dev board
+
+Regions found listed in the BIOS:
+	Japan
+	Taiwan and Philipines
+	USA and Canada
+	Brazil
+	Korea
+	Asia PAL area
+	Europe
+	Latin America
+
+ROM_SYSTEM_BIOS( x, "saturn",      "Saturn bios" ) \
+ROM_LOAD16_WORD_SWAP_BIOS( x, "saturn.bin", 0x000000, 0x080000, CRC(653ff2d8) SHA1(20994ae7ee177ddaf3a430b010c7620dca000fb4) ) - Saturn Eu Bios
+
+*/
+
 #define STV_BIOS \
 	ROM_REGION( 0x080000, REGION_CPU1, 0 ) /* SH2 code */ \
-	ROM_SYSTEM_BIOS( 0, "japan",       "Japan (bios epr19730)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr19730.ic8",   0x000000, 0x080000, CRC(d0e0889d) SHA1(fae53107c894e0c41c49e191dbe706c9cd6e50bd) ) /* jp */ \
-	ROM_SYSTEM_BIOS( 1, "japana",      "Japan (bios mp17951a)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "mp17951a.s",     0x000000, 0x080000, CRC(2672f9d8) SHA1(63cf4a6432f6c87952f9cf3ab0f977aed2367303) ) /* jp alt */ \
-	ROM_SYSTEM_BIOS( 2, "us",          "USA (bios mp17952a)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "mp17952a.s",     0x000000, 0x080000, CRC(d1be2adf) SHA1(eaf1c3e5d602e1139d2090a78d7e19f04f916794) ) /* us */ \
-	ROM_SYSTEM_BIOS( 3, "japanb",      "Japan (bios 20091)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 3, "20091.bin",      0x000000, 0x080000, CRC(59ed40f4) SHA1(eff0f54c70bce05ff3a289bf30b1027e1c8cd117) ) /* jp alt 2 */ \
-	ROM_SYSTEM_BIOS( 4, "taiwan",      "Taiwan (bios mp17953a)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 4, "mp17953a.ic8",   0x000000, 0x080000, CRC(a4c47570) SHA1(9efc73717ec8a13417e65c54344ded9fc25bf5ef) ) /* taiwan */ \
-	ROM_SYSTEM_BIOS( 5, "europe",      "Europe (bios mp17954a)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 5, "mp17954a.s",     0x000000, 0x080000, CRC(f7722da3) SHA1(af79cff317e5b57d49e463af16a9f616ed1eee08) ) /* Europe */ \
-	ROM_SYSTEM_BIOS( 6, "unknown",     "Unknown (debug?)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 6, "stv110.bin",     0x000000, 0x080000, CRC(3dfeda92) SHA1(8eb33192a57df5f3a1dfb57263054867c6b2db6d) ) /* ?? */ \
-	ROM_SYSTEM_BIOS( 7, "dev1061",     "Development (bios 1.061)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 7, "stv1061.bin",    0x000000, 0x080000, CRC(728dbca3) SHA1(0ed2030177f0aa8285645c395ae9ad9f568ab1d6) ) /* ST-V Dev Bios (1.061) - Sega 1994, Noted "ST-V Ver 1.061 94/11/25" on EPROM sticker, Coming from a S-TV SG5001A dev board */ \
-	ROM_SYSTEM_BIOS( 8, "japanc",      "Japan (bios epr17740)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-17740.bin",  0x000000, 0x080000, CRC(5c5aa63d) SHA1(06860d96923b81afbc21e0ad32ee19487d8ff6e7) ) /* ST-V Bios (Japan early) - Sega 1995, Found on a early board dated 02/1995 */ \
-	/*ROM_SYSTEM_BIOS( 9, "saturn",      "Saturn bios :)" ) */ \
-	/*ROM_LOAD16_WORD_SWAP_BIOS( 9, "saturn.bin",       0x000000, 0x080000, CRC(653ff2d8) SHA1(20994ae7ee177ddaf3a430b010c7620dca000fb4) )*/ /* Saturn Eu Bios */ \
+	ROM_SYSTEM_BIOS( 0, "Japan (97/08/21)",  "Japan (bios epr-20091)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-20091.ic8",   0x000000, 0x080000, CRC(59ed40f4) SHA1(eff0f54c70bce05ff3a289bf30b1027e1c8cd117) ) \
+	ROM_SYSTEM_BIOS( 1, "Japan (97/02/17)",  "Japan (bios epr-19730)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-19730.ic8",   0x000000, 0x080000, CRC(d0e0889d) SHA1(fae53107c894e0c41c49e191dbe706c9cd6e50bd) ) \
+	ROM_SYSTEM_BIOS( 2, "Japan (95/04/25)",  "Japan (bios epr-17951a)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-17951a.ic8",  0x000000, 0x080000, CRC(2672f9d8) SHA1(63cf4a6432f6c87952f9cf3ab0f977aed2367303) ) \
+	ROM_SYSTEM_BIOS( 3, "Japan (95/01/31)",  "Japan (bios epr-17740)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-17740.ic8",   0x000000, 0x080000, CRC(5c5aa63d) SHA1(06860d96923b81afbc21e0ad32ee19487d8ff6e7) ) \
+	ROM_SYSTEM_BIOS( 4, "Europe (95/04/25)", "Europe (bios epr-17954a)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-17954a.ic8",  0x000000, 0x080000, CRC(f7722da3) SHA1(af79cff317e5b57d49e463af16a9f616ed1eee08) ) \
+	ROM_SYSTEM_BIOS( 5, "USA (95/04/25)",    "USA (bios epr-17952a)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-17952a.ic8",  0x000000, 0x080000, CRC(d1be2adf) SHA1(eaf1c3e5d602e1139d2090a78d7e19f04f916794) ) \
+	ROM_SYSTEM_BIOS( 6, "Taiwan (95/04/25)", "Taiwan (bios epr-17953a)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-17953a.ic8",  0x000000, 0x080000, CRC(a4c47570) SHA1(9efc73717ec8a13417e65c54344ded9fc25bf5ef) ) \
+	ROM_SYSTEM_BIOS( 7, "Debug (95/01/13)",   "Debug" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 7, "stv110.bin",      0x000000, 0x080000, CRC(3dfeda92) SHA1(8eb33192a57df5f3a1dfb57263054867c6b2db6d) ) \
+	ROM_SYSTEM_BIOS( 8, "Dev1061","Development (bios 1.061)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 8, "stv1061.bin",     0x000000, 0x080000, CRC(728dbca3) SHA1(0ed2030177f0aa8285645c395ae9ad9f568ab1d6) ) \
 	ROM_REGION( 0x080000, REGION_CPU2, 0 ) /* SH2 code */ \
 	ROM_COPY( REGION_CPU1,0,0,0x080000) \
 
@@ -2861,8 +2889,9 @@ ROM_START( decathlt )
 	ROM_LOAD16_WORD_SWAP( "mpr18972.6",    0x1400000, 0x0400000, CRC(45c64fca) SHA1(ae2f678b9885426ce99b615b7f62a451f9ef83f9) ) // good (was .5)
 ROM_END
 
-ROM_START( diehard )
- 	STV_BIOS // must use USA
+ROM_START( diehard ) /* must use USA, Europe or Tiwain BIOS */
+	STV_BIOS
+
 	ROM_REGION32_BE( 0x3000000, REGION_USER1, 0 ) /* SH2 code */
 	ROM_LOAD( "fpr19119.13",               0x0000000, 0x0100000, CRC(de5c4f7c) SHA1(35f670a15e9c86edbe2fe718470f5a75b5b096ac) )
 	ROM_RELOAD ( 0x0100000, 0x0100000 )
@@ -3231,7 +3260,7 @@ ROM_START( thunt )
 	STV_BIOS
 
 	ROM_REGION32_BE( 0x3000000, REGION_USER1, 0 ) /* SH2 code */
-	ROM_FILL(                             0x0000000, 0x0200000, 0x00 )
+	ROM_FILL(                           0x0000000, 0x0200000, 0x00 )
 	ROM_LOAD16_BYTE( "th-ic7_2.stv",    0x0200000, 0x0080000, CRC(c4e993de) SHA1(7aa433bc2623cb19a09d4ef4c8233a2d29901020) )
 	ROM_LOAD16_BYTE( "th-ic7_1.stv",    0x0200001, 0x0080000, CRC(1355cc18) SHA1(a9b731228a807b2b01f933fe0f7dcdbadaf89b7e) )
 
@@ -3245,18 +3274,18 @@ ROM_START( thuntk )
 	STV_BIOS
 
 	ROM_REGION32_BE( 0x3000000, REGION_USER1, 0 ) /* SH2 code */
-	ROM_FILL(                             0x0000000, 0x0400000, 0x00 )
-	ROM_LOAD16_BYTE( "2.ic13_2",               0x0200000, 0x0080000, CRC(6cae2926) SHA1(e8d5745b4228de24672da5017cb3dab58344f59f) )
+	ROM_FILL(                       0x0000000, 0x0400000, 0x00 )
+	ROM_LOAD16_BYTE( "2.ic13_2",    0x0200000, 0x0080000, CRC(6cae2926) SHA1(e8d5745b4228de24672da5017cb3dab58344f59f) )
 	ROM_LOAD16_BYTE( "1.ic13_1",    0x0200001, 0x0080000, CRC(460727c8) SHA1(da7171b65734264e10692e3408ac93beb374c65e) )
 
 	ROM_LOAD( "bom210-10.ic2",   0x1c00000, 0x0400000, CRC(f59d0827) SHA1(2bed4b2c78e9b4e9332f576e1b264a6343f4cfff) )
-	ROM_RELOAD(                           0x0400000, 0x0400000 )
+	ROM_RELOAD(                  0x0400000, 0x0400000 )
 	ROM_LOAD( "bom210-11.ic3",   0x2000000, 0x0400000, CRC(44e5a13e) SHA1(aee3c06662a1d083f3bd01292cf2694132f63533) )
-	ROM_RELOAD(                           0x0800000, 0x0400000 )
+	ROM_RELOAD(                  0x0800000, 0x0400000 )
 	ROM_LOAD( "bom210-12.ic4",   0x2400000, 0x0400000, CRC(deabc701) SHA1(cb313ae9bf6f115682fc76647a999e12c98f6120) )
-	ROM_RELOAD(                           0x0c00000, 0x0400000 )
+	ROM_RELOAD(                  0x0c00000, 0x0400000 )
 	ROM_LOAD( "bom210-13.ic5",   0x2800000, 0x0400000, CRC(5ece1d5c) SHA1(6d88f71b485bf2b3c164fa22f1c7ecaba4b3f5b1) )
-	ROM_RELOAD(                           0x1000000, 0x0400000 )
+	ROM_RELOAD(                  0x1000000, 0x0400000 )
 ROM_END
 
 
@@ -3337,8 +3366,13 @@ ROM_START( shienryu )
 	ROM_LOAD16_WORD_SWAP( "mpr19633.3",    0x0800000, 0x0400000, CRC(e2f0b037) SHA1(97861d09e10ce5d2b10bf5559574b3f489e28077) ) // good
 ROM_END
 
-ROM_START( smleague )
-	STV_BIOS // must use USA
+ROM_START( smleague ) /* must use USA BIOS so we include it in this set */
+
+	ROM_REGION( 0x080000, REGION_CPU1, 0 ) /* SH2 code */
+	ROM_LOAD16_WORD_SWAP( "epr-17952a.ic8",  0x000000, 0x080000, CRC(d1be2adf) SHA1(eaf1c3e5d602e1139d2090a78d7e19f04f916794) )
+	ROM_REGION( 0x080000, REGION_CPU2, 0 ) /* SH2 code */
+	ROM_COPY( REGION_CPU1,0,0,0x080000)
+
 	ROM_REGION32_BE( 0x3000000, REGION_USER1, 0 ) /* SH2 code */
 	ROM_LOAD( "epr18777.13",               0x0000000, 0x0080000, CRC(8d180866) SHA1(d47ebabab6e06400312d39f68cd818852e496b96) )
 	ROM_RELOAD ( 0x0080000, 0x0080000 )
@@ -3584,7 +3618,7 @@ On the other side of the PCB are 2 more maskROMs, MPR-18788 @ IC9 and MPR-18789 
 
 */
 
-ROM_START( critcrsh )
+ROM_START( critcrsh ) /* Must use Europe or Asia BIOS */
 	STV_BIOS
 
 	ROM_REGION32_BE( 0x3000000, REGION_USER1, 0 ) /* SH2 code */
