@@ -236,7 +236,10 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( aliens )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(KONAMI, 5000000)		/* ? 3MHz is too low, sprites flicker in the pseudo-3D levels */
+
+	/* external clock should be 12MHz probably, CPU internal divider and precise cycle timings */
+	/* are unknown though. 3MHz is too low, sprites flicker in the pseudo-3D levels */
+	MDRV_CPU_ADD(KONAMI, 6000000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(aliens_map,0)
 	MDRV_CPU_VBLANK_INT("main", aliens_interrupt)
 
