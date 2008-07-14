@@ -387,6 +387,19 @@ static void konami_set_context(void *src)
 static void konami_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	konami.irq_callback = irqcallback;
+
+	state_save_register_item("KONAMI", index, PC);
+	state_save_register_item("KONAMI", index, U);
+	state_save_register_item("KONAMI", index, S);
+	state_save_register_item("KONAMI", index, X);
+	state_save_register_item("KONAMI", index, Y);
+	state_save_register_item("KONAMI", index, D);
+	state_save_register_item("KONAMI", index, DP);
+	state_save_register_item("KONAMI", index, CC);
+	state_save_register_item("KONAMI", index, konami.int_state);
+	state_save_register_item("KONAMI", index, konami.nmi_state);
+	state_save_register_item("KONAMI", index, konami.irq_state[0]);
+	state_save_register_item("KONAMI", index, konami.irq_state[1]);
 }
 
 static void konami_reset(void)
@@ -457,27 +470,6 @@ static void set_irq_line(int irqline, int state)
 		CHECK_IRQ_LINES;
 	}
 }
-
-#if 0
-/****************************************************************************
- * Save CPU state
- ****************************************************************************/
-static void state_save(void *file, const char *module)
-{
-	int cpu = cpu_getactivecpu();
-	state_save_register_item(file, cpu, module, PC);
-	state_save_register_item(file, cpu, module, U);
-	state_save_register_item(file, cpu, module, S);
-	state_save_register_item(file, cpu, module, X);
-	state_save_register_item(file, cpu, module, Y);
-	state_save_register_item(file, cpu, module, DP);
-	state_save_register_item(file, cpu, module, CC);
-	state_save_register_item(file, cpu, module, konami.int_state);
-	state_save_register_item(file, cpu, module, konami.nmi_state);
-	state_save_register_item(file, cpu, module, konami.irq_state[0]);
-	state_save_register_item(file, cpu, module, konami.irq_state[1]);
-}
-#endif
 
 /* includes the static function prototypes and the master opcode table */
 #include "konamtbl.c"
