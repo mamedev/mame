@@ -1,4 +1,4 @@
-/* Final Crash */
+/* Final Crash & other CPS1 bootlegs */
 
 /*
 
@@ -123,7 +123,12 @@ static void fcrash_update_transmasks(void)
 static void fcrash_render_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int pos;
-	int base=0x50c8/2; // and 10c8/2 for the buffer?
+	int base=0x50c8/2;
+
+	// sprite base registers need hooking up properly.. on fcrash it is NOT cps1_cps_a_regs[0]
+	//  on kodb, it might still be, unless that's just a leftover and it writes somewhere else too
+//	if (cps1_cps_a_regs[0] & 0x00ff) base=0x10c8/2;
+//	printf("cps1_cps_a_regs %04x\n", cps1_cps_a_regs[0]);
 
 	for (pos=0x1ffc;pos>=0x0000;pos-=4)
 	{
@@ -269,6 +274,76 @@ static VIDEO_UPDATE( fcrash )
 	return 0;
 }
 
+// doesn't have the scroll offsets like fcrash
+static VIDEO_UPDATE( kodb )
+{
+	int layercontrol,l0,l1,l2,l3;
+	int videocontrol=cps1_cps_a_regs[0x22/2];
+
+
+	flip_screen_set(videocontrol & 0x8000);
+
+ 	layercontrol = cps1_cps_b_regs[0x20/2];
+
+	/* Get video memory base registers */
+	cps1_get_video_base();
+
+	/* Build palette */
+	fcrash_build_palette(screen->machine);
+
+	fcrash_update_transmasks();
+
+	tilemap_set_scrollx(cps1_bg_tilemap[0],0,cps1_scroll1x);
+	tilemap_set_scrolly(cps1_bg_tilemap[0],0,cps1_scroll1y);
+	if (videocontrol & 0x01)	/* linescroll enable */
+	{
+		int scrly=-cps1_scroll2y;
+		int i;
+		int otheroffs;
+
+		tilemap_set_scroll_rows(cps1_bg_tilemap[1],1024);
+
+		otheroffs = cps1_cps_a_regs[CPS1_ROWSCROLL_OFFS];
+
+		for (i = 0;i < 256;i++)
+			tilemap_set_scrollx(cps1_bg_tilemap[1],(i - scrly) & 0x3ff,cps1_scroll2x + cps1_other[(i + otheroffs) & 0x3ff]);
+	}
+	else
+	{
+		tilemap_set_scroll_rows(cps1_bg_tilemap[1],1);
+		tilemap_set_scrollx(cps1_bg_tilemap[1],0,cps1_scroll2x);
+	}
+	tilemap_set_scrolly(cps1_bg_tilemap[1],0,cps1_scroll2y);
+	tilemap_set_scrollx(cps1_bg_tilemap[2],0,cps1_scroll3x);
+	tilemap_set_scrolly(cps1_bg_tilemap[2],0,cps1_scroll3y);
+
+
+	/* turn all tilemaps on regardless of settings in get_video_base() */
+	/* write a custom get_video_base for this bootleg hardware? */
+	tilemap_set_enable(cps1_bg_tilemap[0],1);
+	tilemap_set_enable(cps1_bg_tilemap[1],1);
+	tilemap_set_enable(cps1_bg_tilemap[2],1);
+
+	/* Blank screen */
+	fillbitmap(bitmap,0xbff,cliprect);
+
+	fillbitmap(priority_bitmap,0,cliprect);
+	l0 = (layercontrol >> 0x06) & 03;
+	l1 = (layercontrol >> 0x08) & 03;
+	l2 = (layercontrol >> 0x0a) & 03;
+	l3 = (layercontrol >> 0x0c) & 03;
+
+	fcrash_render_layer(screen->machine,bitmap,cliprect,l0,0);
+	if (l1 == 0) fcrash_render_high_layer(bitmap,cliprect,l0);
+	fcrash_render_layer(screen->machine,bitmap,cliprect,l1,0);
+	if (l2 == 0) fcrash_render_high_layer(bitmap,cliprect,l1);
+	fcrash_render_layer(screen->machine,bitmap,cliprect,l2,0);
+	if (l3 == 0) fcrash_render_high_layer(bitmap,cliprect,l2);
+	fcrash_render_layer(screen->machine,bitmap,cliprect,l3,0);
+
+
+	return 0;
+}
 
 
 static ADDRESS_MAP_START( fcrash_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -299,6 +374,24 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( kodb_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM
+	AM_RANGE(0x800000, 0x800007) AM_READ(cps1_in1_r)            /* Player input ports */
+	/* forgottn, willow, cawing, nemo, varth read from 800010. Probably debug input leftover from development */
+	AM_RANGE(0x800018, 0x80001f) AM_READ(cps1_dsw_r)            /* System input ports / Dip Switches */
+	AM_RANGE(0x800020, 0x800021) AM_READNOP                     /* ? Used by Rockman ? not mapped according to PAL */
+	AM_RANGE(0x800030, 0x800037) AM_WRITE(cps1_coinctrl_w)
+	/* Forgotten Worlds has dial controls on B-board mapped at 800040-80005f. See DRIVER_INIT */
+	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE(&cps1_cps_a_regs)	/* CPS-A custom */
+	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE(&cps1_cps_b_regs)	/* CPS-B custom */
+//	AM_RANGE(0x800180, 0x800187) AM_WRITE(cps1_soundlatch_w) 	/* Sound command */
+//	AM_RANGE(0x800188, 0x80018f) AM_WRITE(cps1_soundlatch2_w)	/* Sound timer fade */
+	AM_RANGE(0x8001c0, 0x8001ff) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w)	/* mirror (SF2 revision "E" US 910228) */
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE(&cps1_gfxram) AM_SIZE(&cps1_gfxram_size)	/* SF2CE executes code from here */
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM
+ADDRESS_MAP_END
+
+
 #define CPS1_COINAGE_1 \
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
@@ -318,6 +411,61 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) ) \
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) ) \
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
+
+
+#define CPS1_COINAGE_2(diploc) \
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) ) PORT_DIPLOCATION(diploc ":1,2,3") \
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
+	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) ) \
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) ) \
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) ) \
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) ) \
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) ) \
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) ) \
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
+
+#define CPS1_COINAGE_3(diploc) \
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION(diploc ":1,2,3") \
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) ) \
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) ) \
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) ) \
+	PORT_DIPSETTING(    0x00, "2 Coins/1 Credit (1 to continue)" ) \
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) ) \
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) ) \
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) ) \
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) ) \
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) ) PORT_DIPLOCATION(diploc ":4,5,6") \
+	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) ) \
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
+	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) ) \
+	PORT_DIPSETTING(    0x00, "2 Coins/1 Credit (1 to continue)" ) \
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) ) \
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) ) \
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) ) \
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
+
+#define CPS1_DIFFICULTY_1(diploc) \
+	PORT_DIPNAME( 0x07, 0x04, DEF_STR( Difficulty ) ) PORT_DIPLOCATION(diploc ":1,2,3") \
+	PORT_DIPSETTING(    0x07, "1 (Easiest)" ) \
+	PORT_DIPSETTING(    0x06, "2" ) \
+	PORT_DIPSETTING(    0x05, "3" ) \
+	PORT_DIPSETTING(    0x04, "4 (Normal)" ) \
+	PORT_DIPSETTING(    0x03, "5" ) \
+	PORT_DIPSETTING(    0x02, "6" ) \
+	PORT_DIPSETTING(    0x01, "7" ) \
+	PORT_DIPSETTING(    0x00, "8 (Hardest)" )
+
+#define CPS1_DIFFICULTY_2(diploc) \
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) ) PORT_DIPLOCATION(diploc ":1,2,3") \
+	PORT_DIPSETTING(    0x04, "1 (Easiest)" ) \
+	PORT_DIPSETTING(    0x05, "2" ) \
+	PORT_DIPSETTING(    0x06, "3" ) \
+	PORT_DIPSETTING(    0x07, "4 (Normal)" ) \
+	PORT_DIPSETTING(    0x03, "5" ) \
+	PORT_DIPSETTING(    0x02, "6" ) \
+	PORT_DIPSETTING(    0x01, "7" ) \
+	PORT_DIPSETTING(    0x00, "8 (Hardest)" )
+
 
 static INPUT_PORTS_START( fcrash )
 	PORT_START_TAG("IN0")
@@ -404,6 +552,99 @@ static INPUT_PORTS_START( fcrash )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( kodb )
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("DSWA")
+	CPS1_COINAGE_2( "SW(A)" )
+	PORT_DIPNAME( 0x08, 0x08, "Coin Slots" )						PORT_DIPLOCATION("SW(A):4")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPNAME( 0x10, 0x10, "Play Mode" )							PORT_DIPLOCATION("SW(A):5")
+	PORT_DIPSETTING(    0x00, "2 Players" )
+	PORT_DIPSETTING(    0x10, "3 Players" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW(A):6" )
+	PORT_DIPNAME( 0x40, 0x40, "2 Coins to Start, 1 to Continue" )	PORT_DIPLOCATION("SW(A):7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW(A):8" )
+
+	PORT_START_TAG("DSWB")
+	CPS1_DIFFICULTY_1( "SW(B)" )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Lives ) )					PORT_DIPLOCATION("SW(B):4,5,6")
+	PORT_DIPSETTING(    0x30, "1" )
+	PORT_DIPSETTING(    0x38, "2" )
+	PORT_DIPSETTING(    0x28, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPSETTING(    0x18, "5" )
+	PORT_DIPSETTING(    0x10, "6" )
+	PORT_DIPSETTING(    0x08, "7" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Bonus_Life ) )				PORT_DIPLOCATION("SW(B):7,8")
+	PORT_DIPSETTING(    0x80, "80k and every 400k" )
+	PORT_DIPSETTING(    0xc0, "100k and every 450k" )
+	PORT_DIPSETTING(    0x40, "160k and every 450k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+
+	PORT_START_TAG("DSWC")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW(C):1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW(C):2" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )				PORT_DIPLOCATION("SW(C):3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Freeze" )							PORT_DIPLOCATION("SW(C):4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )				PORT_DIPLOCATION("SW(C):5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )				PORT_DIPLOCATION("SW(C):6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )			PORT_DIPLOCATION("SW(C):7")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, "Game Mode")							PORT_DIPLOCATION("SW(C):8")
+	PORT_DIPSETTING(    0x80, "Game" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
+
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN2")      /* Player 3 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
+INPUT_PORTS_END
+
 
 static const struct MSM5205interface msm5205_interface1 =
 {
@@ -467,6 +708,46 @@ static MACHINE_DRIVER_START( fcrash )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( kodb )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_PROGRAM_MAP(kodb_map,0)
+	MDRV_CPU_VBLANK_INT("main", cps1_interrupt)
+
+//	MDRV_CPU_ADD_TAG("sound", Z80, 3579545)
+	/* audio CPU */
+//	MDRV_CPU_PROGRAM_MAP(sub_map,0)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
+
+	MDRV_GFXDECODE(cps1)
+	MDRV_PALETTE_LENGTH(0xc00)
+
+	MDRV_VIDEO_START(cps1)
+	MDRV_VIDEO_EOF(cps1)
+	MDRV_VIDEO_UPDATE(kodb)
+
+	/* sound hardware */
+//	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+//	MDRV_SOUND_ADD_TAG("2151", YM2151, 3579545)
+//	MDRV_SOUND_CONFIG(ym2151_interface)
+//	MDRV_SOUND_ROUTE(0, "mono", 0.35)
+//	MDRV_SOUND_ROUTE(1, "mono", 0.35)
+
+//	MDRV_SOUND_ADD_TAG("okim", OKIM6295, 1000000)
+//	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // pin 7 can be changed by the game code, see f006 on z80
+//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+MACHINE_DRIVER_END
+
+
 
 ROM_START( fcrash )
 	ROM_REGION( 0x200000, REGION_CPU1, 0 )      /* 68000 code */
@@ -505,4 +786,65 @@ ROM_START( fcrash )
 	ROM_RELOAD(          0x10000, 0x20000 )
 ROM_END
 
-GAME( 1990, fcrash,   ffight,  fcrash,     fcrash,   cps1,     ROT0,   "Playmark, bootleg [Capcom]", "Final Crash (World, bootleg)", 0 )
+/*
+CPU
+
+1x TS68000CP12 (main)
+1x TPC1020AFN-084C
+1x Z8400BB1-Z80CPU (sound)
+1x YM2151 (sound)
+1x YM3012A (sound)
+1x OKI-M6295 (sound)
+2x LM324N (sound)
+1x TDA2003 (sound)
+1x oscillator 10.0 MHz
+1x oscillator 22.1184 MHz
+
+ROMs
+
+1x AM27C512 (1)(sound)
+1x AM27C020 (2)(sound)
+2x AM27C040 (3,4)(main)
+1x Am27C040 (bp)(gfx)
+7x maskrom (ai,bi,ci,di,ap,cp,dp)(gfx)
+1x GAL20V8A (not dumped)
+3x GAL16V8A (not dumped)
+1x PALCE20V8H (not dumped)
+1x GAL20V8S (not dumped)
+
+Note
+
+1x JAMMA edge connector
+1x trimmer (volume)
+3x 8 switches dip
+
+*/
+
+ROM_START( kodb )
+	ROM_REGION( 0x400000, REGION_CPU1, 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "3.ic172",    0x00000, 0x080000, CRC(036dd74c) SHA1(489344e56863429e86b4c362b82d89819c1d6afb) )
+	ROM_LOAD16_BYTE( "4.ic171",    0x00001, 0x080000, CRC(3e4b7295) SHA1(3245640bae7d141238051dfe5c7683d05c6d3848) )
+
+	ROM_REGION( 0x400000, REGION_GFX1, 0 )
+	ROMX_LOAD( "cp.ic90",   0x000000, 0x80000, CRC(e3b8589e) SHA1(775f97e43cb995b93da40063a1f1e4d73b34437c), ROM_SKIP(7) )
+	ROMX_LOAD( "dp.ic89",   0x000001, 0x80000, CRC(3eec9580) SHA1(3d8d0cfbeae077544e514a5eb96cc83f716e494f), ROM_SKIP(7) )
+	ROMX_LOAD( "ap.ic88",   0x000002, 0x80000, CRC(fdf5f163) SHA1(271ee96886c958accaca9a82484ab80fe32bd38e), ROM_SKIP(7) )
+	ROMX_LOAD( "bp.ic87",   0x000003, 0x80000, CRC(4e1c52b7) SHA1(74570e7d577c999c62203c97b3d449e3b61a678a), ROM_SKIP(7) )
+	ROMX_LOAD( "ci.ic91",   0x000004, 0x80000, CRC(22228bc5) SHA1(d48a09ee284d9e4b986f5c3c1c865930f76986e2), ROM_SKIP(7) )
+	ROMX_LOAD( "di.ic92",   0x000005, 0x80000, CRC(ab031763) SHA1(5bcd89b1debf029b779aa1bb73b3a572d27154ec), ROM_SKIP(7) )
+	ROMX_LOAD( "ai.ic93",   0x000006, 0x80000, CRC(cffbf4be) SHA1(f805bafc855d4a656c055a76eaeb26e36835541e), ROM_SKIP(7) )
+	ROMX_LOAD( "bi.ic94",   0x000007, 0x80000, CRC(4a1b43fe) SHA1(7957f45b2862825c9509043c63c7da7108bd251b), ROM_SKIP(7) )
+
+	ROM_REGION( 0x8000, REGION_GFX2, 0 )
+	ROM_COPY( REGION_GFX1, 0x000000, 0x000000, 0x8000 )	/* stars */
+
+	ROM_REGION( 0x18000, REGION_CPU2, 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "1.ic28",        0x00000, 0x08000, CRC(01cae60c) SHA1(b2cdd883fd859f0b701230831aca1f1a74ad6087) )
+	ROM_CONTINUE(              0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_LOAD( "2.ic19",      0x00000, 0x40000, CRC(a2db1575) SHA1(1a4a29e4b045af50700adf1665697feab12cc234) )
+ROM_END
+
+GAME( 1990, fcrash,   ffight,  fcrash,     fcrash,   cps1,     ROT0,   "[Capcom] (Playmark bootleg)", "Final Crash (bootleg of Final Fight)", 0 )
+GAME( 1991, kodb,     kod,     kodb,       kodb,     cps1,     ROT0,   "[Capcom] (Playmark bootleg)", "The King of Dragons (bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND )	// 910731  "ETC"
