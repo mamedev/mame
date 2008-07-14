@@ -2058,15 +2058,23 @@ INLINE void TAS(UINT32 n)
 INLINE void TRAPA(UINT32 i)
 {
 	UINT32 imm = i & 0xff;
+	
+	sh4.m[TRA] = imm;
+	sh4.ssr = sh4.sr;
+	sh4.spc = sh4.pc;
+	sh4.sgr = sh4.r[15];
 
-	sh4.ea = sh4.vbr + imm * 4;
+	sh4.sr |= MD;
+	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		sh4_syncronize_register_bank((sh4.sr & sRB) >> 29);
+	if (!(sh4.sr & sRB))
+		sh4_change_register_bank(1);
+	sh4.sr |= sRB;
+	sh4.sr |= BL;
+	sh4_exception_recompute();
 
-	sh4.r[15] -= 4;
-	WL( sh4.r[15], sh4.sr );
-	sh4.r[15] -= 4;
-	WL( sh4.r[15], sh4.pc );
-
-	sh4.pc = RL( sh4.ea );
+	sh4.m[EXPEVT] = 0x00000160;
+	sh4.pc = sh4.vbr + 0x00000100;
 	change_pc(sh4.pc & AM);
 
 	sh4_icount -= 7;
@@ -2891,6 +2899,7 @@ INLINE void op1110(UINT16 opcode)
 
 /*  FMOV.S  @Rm+,FRn PR=0 SZ=0 1111nnnnmmmm1001 */
 /*  FMOV    @Rm+,DRn PR=0 SZ=1 1111nnn0mmmm1001 */
+/*  FMOV    @Rm+,XDn PR=0 SZ=1 1111nnn1mmmm1001 */
 /*  FMOV    @Rm+,XDn PR=1      1111nnn1mmmm1001 */
 INLINE void FMOVMRIFR(UINT32 m,UINT32 n)
 {
@@ -2931,6 +2940,7 @@ INLINE void FMOVMRIFR(UINT32 m,UINT32 n)
 
 /*  FMOV.S  FRm,@Rn PR=0 SZ=0 1111nnnnmmmm1010 */
 /*  FMOV    DRm,@Rn PR=0 SZ=1 1111nnnnmmm01010 */
+/*  FMOV    XDm,@Rn PR=0 SZ=1 1111nnnnmmm11010 */
 /*  FMOV    XDm,@Rn PR=1      1111nnnnmmm11010 */
 INLINE void FMOVFRMR(UINT32 m,UINT32 n)
 {
@@ -2946,10 +2956,16 @@ INLINE void FMOVFRMR(UINT32 m,UINT32 n)
 #endif
 	} else {              /* PR = 0 */
 		if (sh4.fpu_sz) { /* SZ = 1 */
-			m= m & 14;
-			sh4.ea = sh4.r[n];
-			WL( sh4.ea,sh4.fr[m] );
-			WL( sh4.ea+4,sh4.fr[m+1] );
+			if (m & 1) {
+				m= m & 14;
+				sh4.ea = sh4.r[n];
+				WL( sh4.ea,sh4.xf[m] );
+				WL( sh4.ea+4,sh4.xf[m+1] );
+			} else {
+				sh4.ea = sh4.r[n];
+				WL( sh4.ea,sh4.fr[m] );
+				WL( sh4.ea+4,sh4.fr[m+1] );
+			}
 		} else {              /* SZ = 0 */
 			sh4.ea = sh4.r[n];
 			WL( sh4.ea,sh4.fr[m] );
@@ -2959,6 +2975,7 @@ INLINE void FMOVFRMR(UINT32 m,UINT32 n)
 
 /*  FMOV.S  FRm,@-Rn PR=0 SZ=0 1111nnnnmmmm1011 */
 /*  FMOV    DRm,@-Rn PR=0 SZ=1 1111nnnnmmm01011 */
+/*  FMOV    XDm,@-Rn PR=0 SZ=1 1111nnnnmmm11011 */
 /*  FMOV    XDm,@-Rn PR=1      1111nnnnmmm11011 */
 INLINE void FMOVFRMDR(UINT32 m,UINT32 n)
 {
@@ -2997,6 +3014,7 @@ INLINE void FMOVFRMDR(UINT32 m,UINT32 n)
 
 /*  FMOV.S  FRm,@(R0,Rn) PR=0 SZ=0 1111nnnnmmmm0111 */
 /*  FMOV    DRm,@(R0,Rn) PR=0 SZ=1 1111nnnnmmm00111 */
+/*  FMOV    XDm,@(R0,Rn) PR=0 SZ=1 1111nnnnmmm10111 */
 /*  FMOV    XDm,@(R0,Rn) PR=1      1111nnnnmmm10111 */
 INLINE void FMOVFRS0(UINT32 m,UINT32 n)
 {
@@ -3012,10 +3030,16 @@ INLINE void FMOVFRS0(UINT32 m,UINT32 n)
 #endif
 	} else {              /* PR = 0 */
 		if (sh4.fpu_sz) { /* SZ = 1 */
-			m= m & 14;
-			sh4.ea = sh4.r[0] + sh4.r[n];
-			WL( sh4.ea,sh4.fr[m] );
-			WL( sh4.ea+4,sh4.fr[m+1] );
+			if (m & 1) {
+				m= m & 14;
+				sh4.ea = sh4.r[0] + sh4.r[n];
+				WL( sh4.ea,sh4.xf[m] );
+				WL( sh4.ea+4,sh4.xf[m+1] );
+			} else {
+				sh4.ea = sh4.r[0] + sh4.r[n];
+				WL( sh4.ea,sh4.fr[m] );
+				WL( sh4.ea+4,sh4.fr[m+1] );
+			}
 		} else {              /* SZ = 0 */
 			sh4.ea = sh4.r[0] + sh4.r[n];
 			WL( sh4.ea,sh4.fr[m] );
@@ -3025,6 +3049,7 @@ INLINE void FMOVFRS0(UINT32 m,UINT32 n)
 
 /*  FMOV.S  @(R0,Rm),FRn PR=0 SZ=0 1111nnnnmmmm0110 */
 /*  FMOV    @(R0,Rm),DRn PR=0 SZ=1 1111nnn0mmmm0110 */
+/*  FMOV    @(R0,Rm),XDn PR=0 SZ=1 1111nnn1mmmm0110 */
 /*  FMOV    @(R0,Rm),XDn PR=1      1111nnn1mmmm0110 */
 INLINE void FMOVS0FR(UINT32 m,UINT32 n)
 {
@@ -3040,10 +3065,16 @@ INLINE void FMOVS0FR(UINT32 m,UINT32 n)
 #endif
 	} else {              /* PR = 0 */
 		if (sh4.fpu_sz) { /* SZ = 1 */
-			n= n & 14;
-			sh4.ea = sh4.r[0] + sh4.r[m];
-			sh4.fr[n] = RL( sh4.ea );
-			sh4.fr[n+1] = RL( sh4.ea+4 );
+			if (n & 1) {
+				n= n & 14;
+				sh4.ea = sh4.r[0] + sh4.r[m];
+				sh4.xf[n] = RL( sh4.ea );
+				sh4.xf[n+1] = RL( sh4.ea+4 );
+			} else {
+				sh4.ea = sh4.r[0] + sh4.r[m];
+				sh4.fr[n] = RL( sh4.ea );
+				sh4.fr[n+1] = RL( sh4.ea+4 );
+			}
 		} else {              /* SZ = 0 */
 			sh4.ea = sh4.r[0] + sh4.r[m];
 			sh4.fr[n] = RL( sh4.ea );
@@ -3357,7 +3388,7 @@ INLINE void FSQRT(UINT32 n)
 		n = n & 14;
 		if (FP_RFD(n) < 0)
 			return;
-		FP_RFD(n) = sqrt(FP_RFD(n));
+		FP_RFD(n) = sqrtf(FP_RFD(n));
 	} else {              /* PR = 0 */
 		if (FP_RFS(n) < 0)
 			return;
@@ -3408,8 +3439,9 @@ float sum[4];
 		sum[i] = 0;
 		for (j=0;j < 4;j++)
 			sum[i] += FP_XFS((j << 2) + i)*FP_RFS(n + j);
-		FP_RFS(n + i) = sum[i];
 	}
+	for (i = 0;i < 4;i++)
+		FP_RFS(n + i) = sum[i];
 }
 
 INLINE void op1111(UINT16 opcode)
@@ -3634,7 +3666,7 @@ static int sh4_execute(int cycles)
 		else
 			opcode = cpu_readop16(WORD2_XOR_LE((UINT32)(sh4.pc & AM)));
 
-		debugger_instruction_hook(Machine, sh4.pc);
+		debugger_instruction_hook(Machine, sh4.pc & AM);
 
 		sh4.delay = 0;
 		sh4.pc += 2;
@@ -5198,71 +5230,71 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + SH4_FPSCR:			sprintf(info->s, "FPSCR :%08X", sh4.fpscr); break;
 		case CPUINFO_STR_REGISTER + SH4_FPUL:			sprintf(info->s, "FPUL :%08X", sh4.fpul); break;
 #ifdef LSB_FIRST
-		case CPUINFO_STR_REGISTER + SH4_FR0:			sprintf(info->s, "FR0  :%08X %01.2e", FP_RS2( 0),(double)FP_RFS2( 0)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR1:			sprintf(info->s, "FR1  :%08X %01.2e", FP_RS2( 1),(double)FP_RFS2( 1)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR2:			sprintf(info->s, "FR2  :%08X %01.2e", FP_RS2( 2),(double)FP_RFS2( 2)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR3:			sprintf(info->s, "FR3  :%08X %01.2e", FP_RS2( 3),(double)FP_RFS2( 3)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR4:			sprintf(info->s, "FR4  :%08X %01.2e", FP_RS2( 4),(double)FP_RFS2( 4)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR5:			sprintf(info->s, "FR5  :%08X %01.2e", FP_RS2( 5),(double)FP_RFS2( 5)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR6:			sprintf(info->s, "FR6  :%08X %01.2e", FP_RS2( 6),(double)FP_RFS2( 6)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR7:			sprintf(info->s, "FR7  :%08X %01.2e", FP_RS2( 7),(double)FP_RFS2( 7)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR8:			sprintf(info->s, "FR8  :%08X %01.2e", FP_RS2( 8),(double)FP_RFS2( 8)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR9:			sprintf(info->s, "FR9  :%08X %01.2e", FP_RS2( 9),(double)FP_RFS2( 9)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR10:			sprintf(info->s, "FR10 :%08X %01.2e", FP_RS2(10),(double)FP_RFS2(10)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR11:			sprintf(info->s, "FR11 :%08X %01.2e", FP_RS2(11),(double)FP_RFS2(11)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR12:			sprintf(info->s, "FR12 :%08X %01.2e", FP_RS2(12),(double)FP_RFS2(12)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR13:			sprintf(info->s, "FR13 :%08X %01.2e", FP_RS2(13),(double)FP_RFS2(13)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR14:			sprintf(info->s, "FR14 :%08X %01.2e", FP_RS2(14),(double)FP_RFS2(14)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR15:			sprintf(info->s, "FR15 :%08X %01.2e", FP_RS2(15),(double)FP_RFS2(15)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF0:			sprintf(info->s, "XF0  :%08X %01.2e", FP_XS2( 0),(double)FP_XFS2( 0)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF1:			sprintf(info->s, "XF1  :%08X %01.2e", FP_XS2( 1),(double)FP_XFS2( 1)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF2:			sprintf(info->s, "XF2  :%08X %01.2e", FP_XS2( 2),(double)FP_XFS2( 2)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF3:			sprintf(info->s, "XF3  :%08X %01.2e", FP_XS2( 3),(double)FP_XFS2( 3)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF4:			sprintf(info->s, "XF4  :%08X %01.2e", FP_XS2( 4),(double)FP_XFS2( 4)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF5:			sprintf(info->s, "XF5  :%08X %01.2e", FP_XS2( 5),(double)FP_XFS2( 5)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF6:			sprintf(info->s, "XF6  :%08X %01.2e", FP_XS2( 6),(double)FP_XFS2( 6)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF7:			sprintf(info->s, "XF7  :%08X %01.2e", FP_XS2( 7),(double)FP_XFS2( 7)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF8:			sprintf(info->s, "XF8  :%08X %01.2e", FP_XS2( 8),(double)FP_XFS2( 8)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF9:			sprintf(info->s, "XF9  :%08X %01.2e", FP_XS2( 9),(double)FP_XFS2( 9)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF10:			sprintf(info->s, "XF10 :%08X %01.2e", FP_XS2(10),(double)FP_XFS2(10)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF11:			sprintf(info->s, "XF11 :%08X %01.2e", FP_XS2(11),(double)FP_XFS2(11)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF12:			sprintf(info->s, "XF12 :%08X %01.2e", FP_XS2(12),(double)FP_XFS2(12)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF13:			sprintf(info->s, "XF13 :%08X %01.2e", FP_XS2(13),(double)FP_XFS2(13)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF14:			sprintf(info->s, "XF14 :%08X %01.2e", FP_XS2(14),(double)FP_XFS2(14)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF15:			sprintf(info->s, "XF15 :%08X %01.2e", FP_XS2(15),(double)FP_XFS2(15)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR0:			sprintf(info->s, "FR0  :%08X %f", FP_RS2( 0),(double)FP_RFS2( 0)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR1:			sprintf(info->s, "FR1  :%08X %f", FP_RS2( 1),(double)FP_RFS2( 1)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR2:			sprintf(info->s, "FR2  :%08X %f", FP_RS2( 2),(double)FP_RFS2( 2)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR3:			sprintf(info->s, "FR3  :%08X %f", FP_RS2( 3),(double)FP_RFS2( 3)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR4:			sprintf(info->s, "FR4  :%08X %f", FP_RS2( 4),(double)FP_RFS2( 4)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR5:			sprintf(info->s, "FR5  :%08X %f", FP_RS2( 5),(double)FP_RFS2( 5)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR6:			sprintf(info->s, "FR6  :%08X %f", FP_RS2( 6),(double)FP_RFS2( 6)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR7:			sprintf(info->s, "FR7  :%08X %f", FP_RS2( 7),(double)FP_RFS2( 7)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR8:			sprintf(info->s, "FR8  :%08X %f", FP_RS2( 8),(double)FP_RFS2( 8)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR9:			sprintf(info->s, "FR9  :%08X %f", FP_RS2( 9),(double)FP_RFS2( 9)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR10:			sprintf(info->s, "FR10 :%08X %f", FP_RS2(10),(double)FP_RFS2(10)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR11:			sprintf(info->s, "FR11 :%08X %f", FP_RS2(11),(double)FP_RFS2(11)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR12:			sprintf(info->s, "FR12 :%08X %f", FP_RS2(12),(double)FP_RFS2(12)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR13:			sprintf(info->s, "FR13 :%08X %f", FP_RS2(13),(double)FP_RFS2(13)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR14:			sprintf(info->s, "FR14 :%08X %f", FP_RS2(14),(double)FP_RFS2(14)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR15:			sprintf(info->s, "FR15 :%08X %f", FP_RS2(15),(double)FP_RFS2(15)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF0:			sprintf(info->s, "XF0  :%08X %f", FP_XS2( 0),(double)FP_XFS2( 0)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF1:			sprintf(info->s, "XF1  :%08X %f", FP_XS2( 1),(double)FP_XFS2( 1)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF2:			sprintf(info->s, "XF2  :%08X %f", FP_XS2( 2),(double)FP_XFS2( 2)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF3:			sprintf(info->s, "XF3  :%08X %f", FP_XS2( 3),(double)FP_XFS2( 3)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF4:			sprintf(info->s, "XF4  :%08X %f", FP_XS2( 4),(double)FP_XFS2( 4)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF5:			sprintf(info->s, "XF5  :%08X %f", FP_XS2( 5),(double)FP_XFS2( 5)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF6:			sprintf(info->s, "XF6  :%08X %f", FP_XS2( 6),(double)FP_XFS2( 6)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF7:			sprintf(info->s, "XF7  :%08X %f", FP_XS2( 7),(double)FP_XFS2( 7)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF8:			sprintf(info->s, "XF8  :%08X %f", FP_XS2( 8),(double)FP_XFS2( 8)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF9:			sprintf(info->s, "XF9  :%08X %f", FP_XS2( 9),(double)FP_XFS2( 9)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF10:			sprintf(info->s, "XF10 :%08X %f", FP_XS2(10),(double)FP_XFS2(10)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF11:			sprintf(info->s, "XF11 :%08X %f", FP_XS2(11),(double)FP_XFS2(11)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF12:			sprintf(info->s, "XF12 :%08X %f", FP_XS2(12),(double)FP_XFS2(12)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF13:			sprintf(info->s, "XF13 :%08X %f", FP_XS2(13),(double)FP_XFS2(13)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF14:			sprintf(info->s, "XF14 :%08X %f", FP_XS2(14),(double)FP_XFS2(14)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF15:			sprintf(info->s, "XF15 :%08X %f", FP_XS2(15),(double)FP_XFS2(15)); break;
 #else
-		case CPUINFO_STR_REGISTER + SH4_FR0:			sprintf(info->s, "FR0  :%08X %01.2e", FP_RS( 0),(double)FP_RFS( 0)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR1:			sprintf(info->s, "FR1  :%08X %01.2e", FP_RS( 1),(double)FP_RFS( 1)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR2:			sprintf(info->s, "FR2  :%08X %01.2e", FP_RS( 2),(double)FP_RFS( 2)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR3:			sprintf(info->s, "FR3  :%08X %01.2e", FP_RS( 3),(double)FP_RFS( 3)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR4:			sprintf(info->s, "FR4  :%08X %01.2e", FP_RS( 4),(double)FP_RFS( 4)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR5:			sprintf(info->s, "FR5  :%08X %01.2e", FP_RS( 5),(double)FP_RFS( 5)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR6:			sprintf(info->s, "FR6  :%08X %01.2e", FP_RS( 6),(double)FP_RFS( 6)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR7:			sprintf(info->s, "FR7  :%08X %01.2e", FP_RS( 7),(double)FP_RFS( 7)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR8:			sprintf(info->s, "FR8  :%08X %01.2e", FP_RS( 8),(double)FP_RFS( 8)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR9:			sprintf(info->s, "FR9  :%08X %01.2e", FP_RS( 9),(double)FP_RFS( 9)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR10:			sprintf(info->s, "FR10 :%08X %01.2e", FP_RS(10),(double)FP_RFS(10)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR11:			sprintf(info->s, "FR11 :%08X %01.2e", FP_RS(11),(double)FP_RFS(11)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR12:			sprintf(info->s, "FR12 :%08X %01.2e", FP_RS(12),(double)FP_RFS(12)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR13:			sprintf(info->s, "FR13 :%08X %01.2e", FP_RS(13),(double)FP_RFS(13)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR14:			sprintf(info->s, "FR14 :%08X %01.2e", FP_RS(14),(double)FP_RFS(14)); break;
-		case CPUINFO_STR_REGISTER + SH4_FR15:			sprintf(info->s, "FR15 :%08X %01.2e", FP_RS(15),(double)FP_RFS(15)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF0:			sprintf(info->s, "XF0  :%08X %01.2e", FP_XS( 0),(double)FP_XFS( 0)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF1:			sprintf(info->s, "XF1  :%08X %01.2e", FP_XS( 1),(double)FP_XFS( 1)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF2:			sprintf(info->s, "XF2  :%08X %01.2e", FP_XS( 2),(double)FP_XFS( 2)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF3:			sprintf(info->s, "XF3  :%08X %01.2e", FP_XS( 3),(double)FP_XFS( 3)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF4:			sprintf(info->s, "XF4  :%08X %01.2e", FP_XS( 4),(double)FP_XFS( 4)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF5:			sprintf(info->s, "XF5  :%08X %01.2e", FP_XS( 5),(double)FP_XFS( 5)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF6:			sprintf(info->s, "XF6  :%08X %01.2e", FP_XS( 6),(double)FP_XFS( 6)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF7:			sprintf(info->s, "XF7  :%08X %01.2e", FP_XS( 7),(double)FP_XFS( 7)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF8:			sprintf(info->s, "XF8  :%08X %01.2e", FP_XS( 8),(double)FP_XFS( 8)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF9:			sprintf(info->s, "XF9  :%08X %01.2e", FP_XS( 9),(double)FP_XFS( 9)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF10:			sprintf(info->s, "XF10 :%08X %01.2e", FP_XS(10),(double)FP_XFS(10)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF11:			sprintf(info->s, "XF11 :%08X %01.2e", FP_XS(11),(double)FP_XFS(11)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF12:			sprintf(info->s, "XF12 :%08X %01.2e", FP_XS(12),(double)FP_XFS(12)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF13:			sprintf(info->s, "XF13 :%08X %01.2e", FP_XS(13),(double)FP_XFS(13)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF14:			sprintf(info->s, "XF14 :%08X %01.2e", FP_XS(14),(double)FP_XFS(14)); break;
-		case CPUINFO_STR_REGISTER + SH4_XF15:			sprintf(info->s, "XF15 :%08X %01.2e", FP_XS(15),(double)FP_XFS(15)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR0:			sprintf(info->s, "FR0  :%08X %f", FP_RS( 0),(double)FP_RFS( 0)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR1:			sprintf(info->s, "FR1  :%08X %f", FP_RS( 1),(double)FP_RFS( 1)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR2:			sprintf(info->s, "FR2  :%08X %f", FP_RS( 2),(double)FP_RFS( 2)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR3:			sprintf(info->s, "FR3  :%08X %f", FP_RS( 3),(double)FP_RFS( 3)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR4:			sprintf(info->s, "FR4  :%08X %f", FP_RS( 4),(double)FP_RFS( 4)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR5:			sprintf(info->s, "FR5  :%08X %f", FP_RS( 5),(double)FP_RFS( 5)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR6:			sprintf(info->s, "FR6  :%08X %f", FP_RS( 6),(double)FP_RFS( 6)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR7:			sprintf(info->s, "FR7  :%08X %f", FP_RS( 7),(double)FP_RFS( 7)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR8:			sprintf(info->s, "FR8  :%08X %f", FP_RS( 8),(double)FP_RFS( 8)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR9:			sprintf(info->s, "FR9  :%08X %f", FP_RS( 9),(double)FP_RFS( 9)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR10:			sprintf(info->s, "FR10 :%08X %f", FP_RS(10),(double)FP_RFS(10)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR11:			sprintf(info->s, "FR11 :%08X %f", FP_RS(11),(double)FP_RFS(11)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR12:			sprintf(info->s, "FR12 :%08X %f", FP_RS(12),(double)FP_RFS(12)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR13:			sprintf(info->s, "FR13 :%08X %f", FP_RS(13),(double)FP_RFS(13)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR14:			sprintf(info->s, "FR14 :%08X %f", FP_RS(14),(double)FP_RFS(14)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR15:			sprintf(info->s, "FR15 :%08X %f", FP_RS(15),(double)FP_RFS(15)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF0:			sprintf(info->s, "XF0  :%08X %f", FP_XS( 0),(double)FP_XFS( 0)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF1:			sprintf(info->s, "XF1  :%08X %f", FP_XS( 1),(double)FP_XFS( 1)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF2:			sprintf(info->s, "XF2  :%08X %f", FP_XS( 2),(double)FP_XFS( 2)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF3:			sprintf(info->s, "XF3  :%08X %f", FP_XS( 3),(double)FP_XFS( 3)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF4:			sprintf(info->s, "XF4  :%08X %f", FP_XS( 4),(double)FP_XFS( 4)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF5:			sprintf(info->s, "XF5  :%08X %f", FP_XS( 5),(double)FP_XFS( 5)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF6:			sprintf(info->s, "XF6  :%08X %f", FP_XS( 6),(double)FP_XFS( 6)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF7:			sprintf(info->s, "XF7  :%08X %f", FP_XS( 7),(double)FP_XFS( 7)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF8:			sprintf(info->s, "XF8  :%08X %f", FP_XS( 8),(double)FP_XFS( 8)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF9:			sprintf(info->s, "XF9  :%08X %f", FP_XS( 9),(double)FP_XFS( 9)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF10:			sprintf(info->s, "XF10 :%08X %f", FP_XS(10),(double)FP_XFS(10)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF11:			sprintf(info->s, "XF11 :%08X %f", FP_XS(11),(double)FP_XFS(11)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF12:			sprintf(info->s, "XF12 :%08X %f", FP_XS(12),(double)FP_XFS(12)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF13:			sprintf(info->s, "XF13 :%08X %f", FP_XS(13),(double)FP_XFS(13)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF14:			sprintf(info->s, "XF14 :%08X %f", FP_XS(14),(double)FP_XFS(14)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF15:			sprintf(info->s, "XF15 :%08X %f", FP_XS(15),(double)FP_XFS(15)); break; //%01.2e
 #endif
 		case CPUINFO_PTR_SH4_FTCSR_READ_CALLBACK:		info->f = (genf*)sh4.ftcsr_read_callback; break;
 

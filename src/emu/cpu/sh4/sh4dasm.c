@@ -568,7 +568,9 @@ static UINT32 op1000(char *buffer, UINT32 pc, UINT16 opcode)
 
 static UINT32 op1001(char *buffer, UINT32 pc, UINT16 opcode)
 {
-	sprintf(buffer, "MOV.W   @($%04X,PC),%s", (opcode & 0xff) * 2, regname[Rn]);
+UINT32 ea=(pc+((opcode & 0xff) * 2)+2);
+
+	sprintf(buffer, "MOV.W   @($%04X,PC),%s [%08X]", (opcode & 0xff) * 2, regname[Rn], ea);
 	return 0;
 }
 
@@ -612,7 +614,7 @@ static UINT32 op1100(char *buffer, UINT32 pc, UINT16 opcode)
 		sprintf(buffer, "MOV.L   @($%04X,GBR),R0", (opcode & 0xff) * 4);
 		break;
 	case  7:
-		sprintf(buffer, "MOVA    @($%04X,PC),R0", (opcode & 0xff) * 4);
+		sprintf(buffer, "MOVA    @($%04X,PC),R0 [%08X]", (opcode & 0xff) * 4, ((pc + 2) & ~3) + (opcode & 0xff) * 4);
 		break;
 	case  8:
 		sprintf(buffer, "TST     #$%02X,R0", opcode & 0xff);
@@ -644,7 +646,9 @@ static UINT32 op1100(char *buffer, UINT32 pc, UINT16 opcode)
 
 static UINT32 op1101(char *buffer, UINT32 pc, UINT16 opcode)
 {
-	sprintf(buffer, "MOV.L   @($%02X,PC),%s", (opcode * 4) & 0xff, regname[Rn]);
+UINT32 ea=((pc + 2) & ~3) + (opcode & 0xff) * 4;
+
+	sprintf(buffer, "MOV.L   @($%04X,PC),%s [%08X]", (opcode & 0xff) * 4, regname[Rn], ea);
 	return 0;
 }
 
@@ -737,7 +741,7 @@ static UINT32 op1111(char *buffer, UINT32 pc, UINT16 opcode)
 					sprintf(buffer, "FCNVDS  D%s, FPUL", regname[Rn]);
 					break;
 				case 0xE0:
-					sprintf(buffer, "FIPR    FV%d, FV%d", Rn << 2, Rn & 12);
+					sprintf(buffer, "FIPR    FV%d, FV%d", (Rn & 3) << 2, Rn & 12);
 					break;
 				case 0xF0:
 					if (opcode & 0x100) {
@@ -758,7 +762,7 @@ static UINT32 op1111(char *buffer, UINT32 pc, UINT16 opcode)
 							sprintf(buffer, "FTRV    XMTRX, FV%d", Rn & 12);
 						}
 					} else {
-						sprintf(buffer, "FSSCA    FPUL, F%d", Rn & 14);
+						sprintf(buffer, "FSCA   FPUL, F%s", regname[Rn & 14]);
 					}
 					break;
 				default:
