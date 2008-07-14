@@ -3119,3 +3119,31 @@ static void menu_render_triangle(bitmap_t *dest, const bitmap_t *source, const r
 		}
 	}
 }
+
+
+
+/***************************************************************************
+    ACCESSORS
+***************************************************************************/
+
+/*-------------------------------------------------
+    ui_menu_get_selection - retrieves the index
+	of the currently selected menu item
+-------------------------------------------------*/
+
+int ui_menu_get_selection(ui_menu *menu)
+{
+	return menu->selected;
+}
+
+
+
+/*-------------------------------------------------
+    ui_menu_set_selection - changes the index
+	of the currently selected menu item
+-------------------------------------------------*/
+
+void ui_menu_set_selection(ui_menu *menu, int selected)
+{
+	menu->selected = selected;
+}

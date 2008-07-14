@@ -139,4 +139,15 @@ void ui_menu_force_game_select(void);
 int ui_menu_is_force_game_select(void);
 
 
+
+/* ----- accessors ----- */
+
+/* retrieves the index of the currently selected menu item */
+int ui_menu_get_selection(ui_menu *menu);
+
+/* changes the index of the currently selected menu item */
+void ui_menu_set_selection(ui_menu *menu, int selected);
+
+
+
 #endif	/* __UIMENU_H__ */
