@@ -3146,7 +3146,7 @@ static void sh2_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_PC:							sh2->pc = info->i; sh2->delay = 0;		break;
 		case CPUINFO_INT_SP:							sh2->r[15] = info->i;    				break;
 		case CPUINFO_INT_REGISTER + SH2_PR:   			sh2->pr = info->i;	   					break;
-		case CPUINFO_INT_REGISTER + SH2_SR:				sh2->sr = info->i; cfunc_checkirqs((void *)"sh2_set_reg"); break;
+		case CPUINFO_INT_REGISTER + SH2_SR:				sh2->sr = info->i; 					break;
 		case CPUINFO_INT_REGISTER + SH2_GBR:			sh2->gbr = info->i;						break;
 		case CPUINFO_INT_REGISTER + SH2_VBR:			sh2->vbr = info->i;						break;
 		case CPUINFO_INT_REGISTER + SH2_MACH: 			sh2->mach = info->i;						break;
