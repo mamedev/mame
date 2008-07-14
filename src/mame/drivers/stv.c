@@ -2889,7 +2889,7 @@ ROM_START( decathlt )
 	ROM_LOAD16_WORD_SWAP( "mpr18972.6",    0x1400000, 0x0400000, CRC(45c64fca) SHA1(ae2f678b9885426ce99b615b7f62a451f9ef83f9) ) // good (was .5)
 ROM_END
 
-ROM_START( diehard ) /* must use USA, Europe or Tiwain BIOS */
+ROM_START( diehard ) /* must use USA, Europe or Taiwan BIOS */
 	STV_BIOS
 
 	ROM_REGION32_BE( 0x3000000, REGION_USER1, 0 ) /* SH2 code */
