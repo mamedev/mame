@@ -118,64 +118,41 @@ static WRITE16_HANDLER( cabalbl_sound_irq_trigger_word_w )
 
 
 
-static ADDRESS_MAP_START( readmem_cpu, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x3ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x40000, 0x437ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x43800, 0x43fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x44000, 0x4ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x60000, 0x607ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x80000, 0x801ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x80200, 0x803ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x3ffff) AM_ROM
+	AM_RANGE(0x40000, 0x437ff) AM_RAM
+	AM_RANGE(0x43800, 0x43fff) AM_RAM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x44000, 0x4ffff) AM_RAM
+	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE(cabal_text_videoram16_w) AM_BASE(&colorram16)
+	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(cabal_background_videoram16_w) AM_BASE(&videoram16) AM_SIZE(&videoram_size)
+	AM_RANGE(0x80200, 0x803ff) AM_RAM_WRITE(SMH_RAM)
 	AM_RANGE(0xa0000, 0xa0001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0xa0008, 0xa000f) AM_READ(track_r)
 	AM_RANGE(0xa0010, 0xa0011) AM_READ(input_port_1_word_r)
-	AM_RANGE(0xe0000, 0xe07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe8000, 0xe800d) AM_READ(seibu_main_word_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_cpu, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x3ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x40000, 0x437ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x43800, 0x43fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x44000, 0x4ffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x60000, 0x607ff) AM_WRITE(cabal_text_videoram16_w) AM_BASE(&colorram16)
-	AM_RANGE(0x80000, 0x801ff) AM_WRITE(cabal_background_videoram16_w) AM_BASE(&videoram16) AM_SIZE(&videoram_size)
-	AM_RANGE(0x80200, 0x803ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xc0000, 0xc0001) AM_WRITE(track_reset_w)
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITE(SMH_NOP) /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(cabal_flipscreen_w)
-	AM_RANGE(0xe0000, 0xe07ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(cabal_sound_irq_trigger_word_w)	// fix coin insertion
-	AM_RANGE(0xe8000, 0xe800d) AM_WRITE(seibu_main_word_w)
+	AM_RANGE(0xe8000, 0xe800d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl_readmem_cpu, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x3ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x40000, 0x437ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x43800, 0x43fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x44000, 0x4ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x60000, 0x607ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x80000, 0x801ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x80200, 0x803ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( cabalbl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x3ffff) AM_ROM
+	AM_RANGE(0x40000, 0x437ff) AM_RAM
+	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x44000, 0x4ffff) AM_RAM
+	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE(cabal_text_videoram16_w) AM_BASE(&colorram16)
+	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(cabal_background_videoram16_w) AM_BASE(&videoram16) AM_SIZE(&videoram_size)
+	AM_RANGE(0x80200, 0x803ff) AM_RAM
 	AM_RANGE(0xa0000, 0xa0001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0xa0008, 0xa0009) AM_READ(input_port_1_word_r)
 	AM_RANGE(0xa0010, 0xa0011) AM_READ(input_port_2_word_r)
-	AM_RANGE(0xe0000, 0xe07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe8004, 0xe8005) AM_READ(soundlatch2_word_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( cabalbl_writemem_cpu, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x3ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x40000, 0x437ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x43800, 0x43fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x44000, 0x4ffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x60000, 0x607ff) AM_WRITE(cabal_text_videoram16_w) AM_BASE(&colorram16)
-	AM_RANGE(0x80000, 0x801ff) AM_WRITE(cabal_background_videoram16_w) AM_BASE(&videoram16) AM_SIZE(&videoram_size)
-	AM_RANGE(0x80200, 0x803ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITE(SMH_NOP) /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(cabal_flipscreen_w)
-	AM_RANGE(0xe0000, 0xe07ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xe8000, 0xe8003) AM_WRITE(cabalbl_sndcmd_w)
+	AM_RANGE(0xe8004, 0xe8005) AM_READ(soundlatch2_word_r)
 	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(cabalbl_sound_irq_trigger_word_w)
 ADDRESS_MAP_END
 
@@ -184,12 +161,12 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( cabalbl_snd2_r )
 {
-	return cabal_sound_command2;
+	return BITSWAP8(cabal_sound_command2, 7,2,4,5,3,6,1,0);
 }
 
 static READ8_HANDLER( cabalbl_snd1_r )
 {
-	return cabal_sound_command1;
+	return BITSWAP8(cabal_sound_command1, 7,2,4,5,3,6,1,0);
 }
 
 static WRITE8_HANDLER( cabalbl_coin_w )
@@ -200,54 +177,40 @@ static WRITE8_HANDLER( cabalbl_coin_w )
 	//data & 0x40? video enable?
 }
 
-static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4009, 0x4009) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0x4010, 0x4011) AM_READ(seibu_soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_READ(seibu_main_data_pending_r)
-	AM_RANGE(0x4013, 0x4013) AM_READ(input_port_2_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4001, 0x4001) AM_WRITE(seibu_irq_clear_w)
 	AM_RANGE(0x4002, 0x4002) AM_WRITE(seibu_rst10_ack_w)
 	AM_RANGE(0x4003, 0x4003) AM_WRITE(seibu_rst18_ack_w)
 	AM_RANGE(0x4005, 0x4006) AM_WRITE(seibu_adpcm_adr_1_w)
-	AM_RANGE(0x401a, 0x401a) AM_WRITE(seibu_adpcm_ctl_1_w)
 	AM_RANGE(0x4008, 0x4008) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x4009, 0x4009) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0x4009, 0x4009) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0x4010, 0x4011) AM_READ(seibu_soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_READ(seibu_main_data_pending_r)
+	AM_RANGE(0x4013, 0x4013) AM_READ(input_port_2_r)
 	AM_RANGE(0x4018, 0x4019) AM_WRITE(seibu_main_data_w)
+	AM_RANGE(0x401a, 0x401a) AM_WRITE(seibu_adpcm_ctl_1_w)
 	AM_RANGE(0x401b, 0x401b) AM_WRITE(seibu_coin_w)
 	AM_RANGE(0x6005, 0x6006) AM_WRITE(seibu_adpcm_adr_2_w)
 	AM_RANGE(0x601a, 0x601a) AM_WRITE(seibu_adpcm_ctl_2_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x2000, 0x2fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4008, 0x4008) AM_READ(cabalbl_snd2_r)
-	AM_RANGE(0x400a, 0x400a) AM_READ(cabalbl_snd1_r)
-	AM_RANGE(0x4006, 0x4006) AM_READ(input_port_3_r)
-	AM_RANGE(0x400f, 0x400f) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( cabalbl_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( cabalbl_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(soundlatch3_w)
 	AM_RANGE(0x4002, 0x4002) AM_WRITE(soundlatch4_w)
 	AM_RANGE(0x4004, 0x4004) AM_WRITE(cabalbl_coin_w)
+	AM_RANGE(0x4006, 0x4006) AM_READ(input_port_3_r)
+	AM_RANGE(0x4008, 0x4008) AM_READ(cabalbl_snd2_r)
+	AM_RANGE(0x400a, 0x400a) AM_READ(cabalbl_snd1_r)
 	AM_RANGE(0x400c, 0x400c) AM_WRITE(soundlatch2_w)
 	AM_RANGE(0x400e, 0x400e) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x400f, 0x400f) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0x400f, 0x400f) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(SMH_NOP)  /* ??? */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /* the bootleg has 2x z80 sample players */
@@ -539,12 +502,12 @@ static MACHINE_DRIVER_START( cabal )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_20MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(readmem_cpu,writemem_cpu)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_RESET(seibu_sound_1)
 
@@ -584,11 +547,11 @@ static MACHINE_DRIVER_START( cabalbl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_20MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cabalbl_readmem_cpu,cabalbl_writemem_cpu)
+	MDRV_CPU_PROGRAM_MAP(cabalbl_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cabalbl_readmem_sound,cabalbl_writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(cabalbl_sound_map,0)
 
 	/* there are 2x z80s for the ADPCM */
 	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
