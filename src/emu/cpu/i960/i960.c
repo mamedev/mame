@@ -1566,7 +1566,17 @@ static int i960_execute(int cycles)
 			case 0x0: // cvtri
 				i960_icount -= 33;
 				t1f = get_1_rif(opcode);
-				set_ri(opcode, (INT32)t1f);
+				// apply rounding mode
+				// we do this a little indirectly to avoid some odd GCC warnings
+				t2f = 0.0;
+				switch((i960.AC>>30)&3)
+				{
+					case 0: t2f = floor(t1f+0.5); break;
+					case 1: t2f = floor(t1f); break;
+					case 2: t2f = ceil(t1f); break;
+					case 3: t2f = t1f; break;
+				}
+				set_rif(opcode, (INT32)t2f);
 				break;
 
 			case 0x2: // cvtzri
