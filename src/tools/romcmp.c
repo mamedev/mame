@@ -726,13 +726,21 @@ int CLIB_DECL main(int argc,char **argv)
 			for (i = 0;i < found[0];i++)
 			{
 				if (files[0][i].listed == 0) printname(&files[0][i],0,0.0,0,0);
-				freefile(&files[0][i]);
 			}
 			for (i = 0;i < found[1];i++)
 			{
 				if (files[1][i].listed == 0) printname(0,&files[1][i],0.0,0,0);
-				freefile(&files[1][i]);
 			}
+		}
+
+
+		for (i = 0;i < found[0];i++)
+		{
+			freefile(&files[0][i]);
+		}
+		for (i = 0;i < found[1];i++)
+		{
+			freefile(&files[1][i]);
 		}
 	}
 
