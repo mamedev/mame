@@ -596,12 +596,13 @@ static void sprites_draw(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	rectangle clip = *cliprect;
 	int sprnum;
-
+	int clip_ofs = (flipscreen_x ? 16 : 0);
+	
 	/* 16 of the 256 pixels of the sprites are hard-clipped at the line buffer */
 	/* according to the schematics, it should be the first 16 pixels; however, */
 	/* some bootlegs demonstrate that this can be shifted to other positions. */
-	clip.min_x = MAX(clip.min_x, galaxian_sprite_clip_start * GALAXIAN_XSCALE);
-	clip.max_x = MIN(clip.max_x, (galaxian_sprite_clip_end + 1) * GALAXIAN_XSCALE - 1);
+	clip.min_x = MAX(clip.min_x, (galaxian_sprite_clip_start - clip_ofs) * GALAXIAN_XSCALE);
+	clip.max_x = MIN(clip.max_x, (galaxian_sprite_clip_end - clip_ofs + 1) * GALAXIAN_XSCALE - 1);
 
 	/* The line buffer is only written if it contains a '0' currently; */
 	/* it is cleared during the visible area, and populated during HBLANK */
@@ -627,7 +628,7 @@ static void sprites_draw(running_machine *machine, bitmap_t *bitmap, const recta
 		/* apply flipscreen in X direction */
 		if (flipscreen_x)
 		{
-			sx = 240 - sx;
+			sx = 242 - sx; // + 8 - HOFS
 			flipx = !flipx;
 		}
 
@@ -995,17 +996,35 @@ void frogger_draw_background(running_machine *machine, bitmap_t *bitmap, const r
 {
 	rectangle draw;
 
-	/* color split point verified on real machine */
-	/* hmmm, according to schematics it is at 128+8; which is right? */
-	draw = *cliprect;
-	draw.max_x = MIN(draw.max_x, (128+8) * GALAXIAN_XSCALE - 1);
-	if (draw.min_x <= draw.max_x)
-		fillbitmap(bitmap, MAKE_RGB(0,0,0x47), &draw);
+	if (flipscreen_x)
+	{
+		/* color split point verified on real machine */
+		/* hmmm, according to schematics it is at 128+8; which is right? */
+		draw = *cliprect;
+		draw.max_x = MIN(draw.max_x, (128-8) * GALAXIAN_XSCALE - 1);
+		if (draw.min_x <= draw.max_x)
+			fillbitmap(bitmap, RGB_BLACK, &draw);
 
-	draw = *cliprect;
-	draw.min_x = MAX(draw.min_x, (128+8) * GALAXIAN_XSCALE);
-	if (draw.min_x <= draw.max_x)
-		fillbitmap(bitmap, RGB_BLACK, &draw);
+		draw = *cliprect;
+		draw.min_x = MAX(draw.min_x, (128-8) * GALAXIAN_XSCALE);
+		if (draw.min_x <= draw.max_x)
+			fillbitmap(bitmap, MAKE_RGB(0,0,0x47), &draw);
+	}
+	else
+	{
+		/* color split point verified on real machine */
+		/* hmmm, according to schematics it is at 128+8; which is right? */
+		draw = *cliprect;
+		draw.max_x = MIN(draw.max_x, (128+8) * GALAXIAN_XSCALE - 1);
+		if (draw.min_x <= draw.max_x)
+			fillbitmap(bitmap, MAKE_RGB(0,0,0x47), &draw);
+
+		draw = *cliprect;
+		draw.min_x = MAX(draw.min_x, (128+8) * GALAXIAN_XSCALE);
+		if (draw.min_x <= draw.max_x)
+			fillbitmap(bitmap, RGB_BLACK, &draw);
+	}
+	
 }
 
 
