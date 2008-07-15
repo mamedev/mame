@@ -3131,9 +3131,11 @@ static void menu_render_triangle(bitmap_t *dest, const bitmap_t *source, const r
 	of the currently selected menu item
 -------------------------------------------------*/
 
-int ui_menu_get_selection(ui_menu *menu)
+void *ui_menu_get_selection(ui_menu *menu)
 {
-	return menu->selected;
+	return (menu->selected >= 0) && (menu->selected < menu->numitems)
+		? menu->item[menu->selected].ref
+		: NULL;
 }
 
 
@@ -3143,7 +3145,16 @@ int ui_menu_get_selection(ui_menu *menu)
 	of the currently selected menu item
 -------------------------------------------------*/
 
-void ui_menu_set_selection(ui_menu *menu, int selected)
+void ui_menu_set_selection(ui_menu *menu, void *selected_itemref)
 {
-	menu->selected = selected;
+	int i;
+	for (i = 0; i < menu->numitems; i++)
+	{
+		if (menu->item[i].ref == selected_itemref)
+		{
+			menu->selected = i;
+			return;
+		}
+	}
+	menu->selected = -1;
 }
