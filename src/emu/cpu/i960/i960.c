@@ -1576,7 +1576,7 @@ static int i960_execute(int cycles)
 					case 2: t2f = ceil(t1f); break;
 					case 3: t2f = t1f; break;
 				}
-				set_rif(opcode, (INT32)t2f);
+				set_ri(opcode, (INT32)t2f);
 				break;
 
 			case 0x2: // cvtzri
