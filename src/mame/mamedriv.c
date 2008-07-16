@@ -3778,6 +3778,7 @@ Sep.1994 Quiz Ghost Hunter
 
 	/* Model 2 (TGPs, Model 1 sound board) */
 	DRIVER( daytona )	/* 1993 */
+	DRIVER( dayton93 )	/* 1993 */
 	DRIVER( daytonas )	/* 1993 */
 	DRIVER( daytonat )	/* 1993, hack */
 	DRIVER( daytonam )	/* 1993, hack */
@@ -3790,6 +3791,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( srallyc )	/* 1995 */
 	DRIVER( vf2 )		/* 1995 */
 	DRIVER( vf2b )		/* 1995 */
+	DRIVER( vf2a )		/* 1995 */
 	DRIVER( vf2o )		/* 1995 */
 	DRIVER( vcop2 )		/* 1995 */
 	DRIVER( doaa )		/* 1996 */
