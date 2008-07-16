@@ -26,11 +26,11 @@
 ***************************************************************************/
 
 /*-------------------------------------------------
-    vbi_parse_line - parse a Philips code from a
-    line of video data
+    vbi_parse_manchester_code - parse a Manchester 
+    code from a line of video data
 -------------------------------------------------*/
 
-int vbi_parse_line(const UINT16 *source, int sourcewidth, int sourceshift, int expectedbits, UINT8 *result)
+int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sourceshift, int expectedbits, UINT8 *result)
 {
 	UINT8 srcabs[MAX_SOURCE_WIDTH];
 	UINT8 min, max, mid, srcabsval;
@@ -135,4 +135,33 @@ int vbi_parse_line(const UINT16 *source, int sourcewidth, int sourceshift, int e
 		result[x] = (left < right);
 	}
 	return expectedbits;
+}
+
+
+/*-------------------------------------------------
+    vbi_parse_white_flag - compute the "white 
+    flag" from a line of video data
+-------------------------------------------------*/
+
+int vbi_parse_white_flag(const UINT16 *source, int sourcewidth, int sourceshift)
+{
+	int minval = 0xff;
+	int maxval = 0x00;
+	int avgval = 0x00;
+	int diff;
+	int x;
+
+	/* compute minimum, maximum, and average values across the line */
+	for (x = 0; x < sourcewidth; x++)
+	{
+		UINT8 yval = source[x] >> sourceshift;
+		minval = MIN(yval, minval);
+		maxval = MAX(yval, maxval);
+		avgval += yval;
+	}
+	avgval /= sourcewidth;
+	diff = maxval - minval;
+
+	/* if there's a spread of at least 0x20, and the average is above 3/4 of the center, call it good */
+	return (diff >= 0x20) && (avgval >= minval + 3 * diff / 4);
 }

@@ -150,9 +150,7 @@ static int generate_from_avi(const char *aviname)
 			int i;
 
 			/* line 11 contains the white flag */
-			white = 0;
-			if (*BITMAP_ADDR16(bitmap, 11*2 + field, bitmap->width / 2) > 0x8000)
-				white = 1;
+			white = vbi_parse_white_flag(BITMAP_ADDR16(bitmap, 11*2 + field, 0), bitmap->width, 8);
 
 			/* output metadata for *previous* field */
 			if (frame > 0 || field > 0)
@@ -166,18 +164,18 @@ static int generate_from_avi(const char *aviname)
 
 			/* line 16 contains stop code and other interesting bits */
 			line16 = 0;
-			if (vbi_parse_line(BITMAP_ADDR16(bitmap, 16*2 + field, 0), bitmap->width, 8, 24, bits) == 24)
+			if (vbi_parse_manchester_code(BITMAP_ADDR16(bitmap, 16*2 + field, 0), bitmap->width, 8, 24, bits) == 24)
 				for (i = 0; i < 24; i++)
 					line16 = (line16 << 1) | bits[i];
 
 			/* line 17 and 18 contain frame/chapter/lead in/out encodings */
 			line17 = 0;
-			if (vbi_parse_line(BITMAP_ADDR16(bitmap, 17*2 + field, 0), bitmap->width, 8, 24, bits) == 24)
+			if (vbi_parse_manchester_code(BITMAP_ADDR16(bitmap, 17*2 + field, 0), bitmap->width, 8, 24, bits) == 24)
 				for (i = 0; i < 24; i++)
 					line17 = (line17 << 1) | bits[i];
 
 			line18 = 0;
-			if (vbi_parse_line(BITMAP_ADDR16(bitmap, 18*2 + field, 0), bitmap->width, 8, 24, bits) == 24)
+			if (vbi_parse_manchester_code(BITMAP_ADDR16(bitmap, 18*2 + field, 0), bitmap->width, 8, 24, bits) == 24)
 				for (i = 0; i < 24; i++)
 					line18 = (line18 << 1) | bits[i];
 
