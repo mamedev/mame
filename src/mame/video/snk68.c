@@ -14,8 +14,12 @@ Notes:
 
 #include "driver.h"
 
-static int sprite_flip, pow_charbase=0; //*
-static tilemap *fix_tilemap;
+UINT16* pow_fg_videoram;
+
+static int pow_charbank;
+static int sprite_flip_axis;
+static tilemap *fg_tilemap;
+static int flipscreen;
 
 /***************************************************************************
 
@@ -25,50 +29,22 @@ static tilemap *fix_tilemap;
 
 static TILE_GET_INFO( get_pow_tile_info )
 {
-	int tile=videoram16[2*tile_index]&0xff;
-	int color=videoram16[2*tile_index+1];
+	int tile = (pow_fg_videoram[2*tile_index] & 0xff) | (pow_charbank << 8);
+	int color = pow_fg_videoram[2*tile_index+1] & 0x07;
 
-	tile += pow_charbase; //AT: (powj36rc2gre)
-	color&=0xf;
-
-	SET_TILE_INFO(
-			0,
-			tile,
-			color,
-			0);
+	SET_TILE_INFO(0, tile, color, 0);
 }
 
-static TILE_GET_INFO( get_sar_tile_info )
+static TILE_GET_INFO( get_searchar_tile_info )
 {
-	int tile=videoram16[2*tile_index];
-	int color=tile >> 12;
+	int data = pow_fg_videoram[2*tile_index];
+	int tile = data & 0x7ff;
+	int color = (data & 0x7000) >> 12;
 
-	tile=tile&0xfff;
+	// used in the ikari3 intro
+	int flags = (data & 0x8000) ? TILE_FORCE_LAYER0 : 0;
 
-	SET_TILE_INFO(
-			0,
-			tile,
-			color,
-			0);
-}
-
-static TILE_GET_INFO( get_ikari3_tile_info )
-{
-	int tile=videoram16[2*tile_index];
-	int color=tile >> 12;
-
-	/* Kludge - Tile 0x80ff is meant to be opaque black, but isn't.  This fixes it */
-	if (tile==0x80ff) {
-		tile=0x2ca;
-		color=7;
-	} else
-		tile=tile&0xfff;
-
-	SET_TILE_INFO(
-			0,
-			tile,
-			color,
-			0);
+	SET_TILE_INFO(0, tile, color, flags);
 }
 
 /***************************************************************************
@@ -77,25 +53,26 @@ static TILE_GET_INFO( get_ikari3_tile_info )
 
 ***************************************************************************/
 
+static void common_video_start(running_machine *machine)
+{
+	tilemap_set_transparent_pen(fg_tilemap,0);
+
+	tilemap_set_scrolldx(fg_tilemap, 0, video_screen_get_width(machine->primary_screen) - 256);
+	tilemap_set_scrolldy(fg_tilemap, 0, video_screen_get_height(machine->primary_screen) - 256);
+}
+
 VIDEO_START( pow )
 {
-	fix_tilemap = tilemap_create(get_pow_tile_info,tilemap_scan_cols,8,8,32,32);
+	fg_tilemap = tilemap_create(get_pow_tile_info,tilemap_scan_cols,8,8,32,32);
 
-	tilemap_set_transparent_pen(fix_tilemap,0);
+	common_video_start(machine);
 }
 
 VIDEO_START( searchar )
 {
-	fix_tilemap = tilemap_create(get_sar_tile_info,tilemap_scan_cols,8,8,32,32);
+	fg_tilemap = tilemap_create(get_searchar_tile_info,tilemap_scan_cols,8,8,32,32);
 
-	tilemap_set_transparent_pen(fix_tilemap,0);
-}
-
-VIDEO_START( ikari3 )
-{
-	fix_tilemap = tilemap_create(get_ikari3_tile_info,tilemap_scan_cols,8,8,32,32);
-
-	tilemap_set_transparent_pen(fix_tilemap,0);
+	common_video_start(machine);
 }
 
 /***************************************************************************
@@ -104,13 +81,85 @@ VIDEO_START( ikari3 )
 
 ***************************************************************************/
 
+READ16_HANDLER( pow_spriteram_r )
+{
+	// streetsj expects the MSB of every 32-bit word to be FF. Presumably RAM
+	// exists only for 3 bytes out of 4 and the fourth is unmapped.
+	if (!(offset & 1))
+		return spriteram16[offset] | 0xff00;
+	else
+		return spriteram16[offset];
+}
+
+WRITE16_HANDLER( pow_spriteram_w )
+{
+	/*
+	This kludge fixes bug 00871: pow: At 3/4 of the 1st level, there is a large pillar, which pops up too late.
+
+	The problem: the sprite list is built by the IRQ handler, however there is
+	code in the main loop that clears some portions of sprite RAM under certain
+	conditions. Usually, this isn't a problem, but in that specific point the
+	sprites added by the IRQ handler are erased before the screen is drawn.
+
+	We could force a partial update every time the sprite RAM is modified, however
+	that would hardly be more accurate since the sprite hardware most likely draws
+	to a frame buffer one frame behind, so the exact timing is unknown.
+	Instead, we just force a partial update before changing the RAM location that
+	causes the problem.
+	*/
+	if (offset == 0x10c/2)
+		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+
+	if (!(offset & 1))
+		data |= 0xff00;
+	COMBINE_DATA(&spriteram16[offset]);
+}
+
+READ16_HANDLER( pow_fg_videoram_r )
+{
+	// RAM is only 8-bit
+	return pow_fg_videoram[offset] | 0xff00;
+}
+
+WRITE16_HANDLER( pow_fg_videoram_w )
+{
+	data |= 0xff00;
+	COMBINE_DATA(&pow_fg_videoram[offset]);
+	tilemap_mark_tile_dirty(fg_tilemap, offset >> 1);
+}
+
+WRITE16_HANDLER( searchar_fg_videoram_w )
+{
+	// RAM is full 16-bit, though only half of it is used by the hardware
+	COMBINE_DATA(&pow_fg_videoram[offset]);
+	tilemap_mark_tile_dirty(fg_tilemap, offset >> 1);
+}
+
 WRITE16_HANDLER( pow_flipscreen16_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-	    flip_screen_set(data & 0x08);
-	    sprite_flip=data&0x4;
-	    pow_charbase = (data & 0x70) << 4;
+		flipscreen = data & 0x08;
+		tilemap_set_flip(ALL_TILEMAPS, flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+
+		sprite_flip_axis = data & 0x04;	// for streetsm? though might not be present on this board
+
+		if (pow_charbank != ((data & 0x70) >> 4))
+		{
+			pow_charbank = (data & 0x70) >> 4;
+			tilemap_mark_all_tiles_dirty(fg_tilemap);
+		}
+	}
+}
+
+WRITE16_HANDLER( searchar_flipscreen16_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		flipscreen = data & 0x08;
+		tilemap_set_flip(ALL_TILEMAPS, flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+
+		sprite_flip_axis = data & 0x04;
 	}
 }
 
@@ -129,12 +178,6 @@ WRITE16_HANDLER( pow_paletteram16_word_w )
 	palette_set_color_rgb(machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
-WRITE16_HANDLER( pow_video16_w )
-{
-	COMBINE_DATA(&videoram16[offset]);
-	tilemap_mark_tile_dirty(fix_tilemap,offset>>1);
-}
-
 
 /***************************************************************************
 
@@ -142,58 +185,78 @@ WRITE16_HANDLER( pow_video16_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int j,int pos)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int group)
 {
-	int offs,mx,my,color,tile,fx,fy,i;
+	const UINT16* tiledata = &spriteram16[0x800*group];
 
-	for (offs = pos; offs < pos+0x800; offs += 0x80 )
+	// pow has 0x4000 tiles and independent x/y flipping
+	// the other games have > 0x4000 tiles and flipping in only one direction
+	// (globally selected)
+	int const is_pow = (machine->gfx[1]->total_elements <= 0x4000);
+	int offs;
+
+	for (offs = 0; offs < 0x800; offs += 0x40)
 	{
-		mx=(spriteram16[(offs+4+(4*j))>>1]&0xff)<<4;
-		my=spriteram16[(offs+6+(4*j))>>1];
-		mx=mx+(my>>12);
-		mx=((mx+16)&0x1ff)-16;
+		int mx = (spriteram16[offs + 2*group] & 0xff) << 4;
+		int my = spriteram16[offs + 2*group + 1];
+		int i;
 
-		mx=((mx+0x100)&0x1ff)-0x100;
-		my=((my+0x100)&0x1ff)-0x100;
+		mx = mx | (my >> 12);
 
-		my=0x200 - my;
-		my-=0x200;
+		mx = ((mx + 16) & 0x1ff) - 16;
+		my = -my;
 
-		if (flip_screen_get()) {
-			mx=240-mx;
-			my=240-my;
+		if (flipscreen)
+		{
+			mx = 240 - mx;
+			my = 240 - my;
 		}
 
-		for (i=0; i<0x80; i+=4) {
-			color=spriteram16[(offs+i+(0x1000*j)+0x1000)>>1]&0x7f;
+		// every sprite is a column 32 tiles tall
+		for (i = 0; i < 0x20; ++i)
+		{
+			int color = *(tiledata++) & 0x7f;
+			int tile = *(tiledata++);
+			int fx,fy;
 
-			if (color) {
-				tile=spriteram16[(offs+2+i+(0x1000*j)+0x1000)>>1];
-				fy=tile&0x8000;
-				fx=tile&0x4000;
-				tile&=0x3fff;
-
-				if (flip_screen_get()) {
-					if (fx) fx=0; else fx=1;
-					if (fy) fy=0; else fy=1;
+			if (is_pow)
+			{
+				fx = tile & 0x4000;
+				fy = tile & 0x8000;
+				tile &= 0x3fff;
+			}
+			else
+			{
+				if (sprite_flip_axis)
+				{
+					fx = 0;
+					fy = tile & 0x8000;
 				}
+				else
+				{
+					fx = tile & 0x8000;
+					fy = 0;
+				}
+				tile &= 0x7fff;
+			}
 
-				drawgfx(bitmap,machine->gfx[1],
+			if (flipscreen)
+			{
+				fx = !fx;
+				fy = !fy;
+			}
+
+			drawgfx(bitmap,machine->gfx[1],
 					tile,
 					color,
-					fx,fy,
-					mx,my,
-					cliprect,TRANSPARENCY_PEN,0);
-			}
+					fx, fy,
+					mx, my & 0x1ff,
+					cliprect, TRANSPARENCY_PEN, 0);
 
-			if (flip_screen_get()) {
-				my-=16;
-				if (my < -0x100) my+=0x200;
-			}
-			else {
-				my+=16;
-				if (my > 0x100) my-=0x200;
-			}
+			if (flipscreen)
+				my -= 16;
+			else
+				my += 16;
 		}
 	}
 }
@@ -201,99 +264,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( pow )
 {
-	fillbitmap(bitmap,2047,cliprect);
+	fillbitmap(bitmap, 0x7ff, cliprect);
 
-	/* This appears to be correct priority */
-	draw_sprites(screen->machine, bitmap,cliprect,1,0x000);
-	draw_sprites(screen->machine, bitmap,cliprect,1,0x800);
-	draw_sprites(screen->machine, bitmap,cliprect,2,0x000);
-	draw_sprites(screen->machine, bitmap,cliprect,2,0x800);
-	draw_sprites(screen->machine, bitmap,cliprect,0,0x000); //AT: (pow37b5yel)
-	draw_sprites(screen->machine, bitmap,cliprect,0,0x800);
+	/* This appears to be the correct priority order */
+	draw_sprites(screen->machine, bitmap, cliprect, 2);
+	draw_sprites(screen->machine, bitmap, cliprect, 3);
+	draw_sprites(screen->machine, bitmap, cliprect, 1);
 
-	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }
-
-
-static void draw_sprites2(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int j, int z, int pos)
-{
-	int offs,mx,my,color,tile,fx,fy,i;
-
-	for (offs = pos; offs < pos+0x800 ; offs += 0x80 )
-	{
-		mx=spriteram16[(offs+j)>>1];
-		my=spriteram16[(offs+j+2)>>1];
-
-		mx=mx<<4;
-		mx=mx|((my>>12)&0xf);
-		my=my&0x1ff;
-
-		mx=(mx+0x100)&0x1ff;
-		my=(my+0x100)&0x1ff;
-		mx-=0x100;
-		my-=0x100;
-		my=0x200 - my;
-		my-=0x200;
-
-		if (flip_screen_get()) {
-			mx=240-mx;
-			my=240-my;
-		}
-
-		for (i=0; i<0x80; i+=4) {
-			color=spriteram16[(offs+i+z)>>1]&0x7f;
-			if (color) {
-				tile=spriteram16[(offs+2+i+z)>>1];
-				if (sprite_flip) {
-					fx=0;
-					fy=tile&0x8000;
-				} else {
-					fy=0;
-					fx=tile&0x8000;
-				}
-
-				if (flip_screen_get()) {
-					if (fx) fx=0; else fx=1;
-					if (fy) fy=0; else fy=1;
-				}
-
-				tile&=0x7fff;
-				if (tile>0x5fff) break;
-
-				drawgfx(bitmap,machine->gfx[1],
-					tile,
-					color,
-					fx,fy,
-					mx,my,
-					cliprect,TRANSPARENCY_PEN,0);
-			}
-			if (flip_screen_get()) {
-				my-=16;
-				if (my < -0x100) my+=0x200;
-			}
-			else {
-				my+=16;
-				if (my > 0x100) my-=0x200;
-			}
-		}
-	}
-}
-
-
-VIDEO_UPDATE( searchar )
-{
-	fillbitmap(bitmap,2047,cliprect);
-
-	/* This appears to be correct priority */
-	draw_sprites2(screen->machine, bitmap,cliprect,8,0x2000,0x000);
-	draw_sprites2(screen->machine, bitmap,cliprect,8,0x2000,0x800);
-	draw_sprites2(screen->machine, bitmap,cliprect,12,0x3000,0x000);
-	draw_sprites2(screen->machine, bitmap,cliprect,12,0x3000,0x800);
-	draw_sprites2(screen->machine, bitmap,cliprect,4,0x1000,0x000);
-	draw_sprites2(screen->machine, bitmap,cliprect,4,0x1000,0x800);
-
-	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
-	return 0;
-}
-
