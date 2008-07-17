@@ -93,7 +93,7 @@ int ui_input_pressed_repeat(running_machine *machine, int code, int speed);
 
 /*-------------------------------------------------
     ui_input_push_mouse_move_event - pushes a mouse
-	move event to the specified render_target
+    move event to the specified render_target
 -------------------------------------------------*/
 
 INLINE void ui_input_push_mouse_move_event(running_machine *machine, render_target *target, INT32 x, INT32 y)
@@ -109,7 +109,7 @@ INLINE void ui_input_push_mouse_move_event(running_machine *machine, render_targ
 
 /*-------------------------------------------------
     ui_input_push_mouse_leave_event - pushes a
-	mouse leave event to the specified render_target
+    mouse leave event to the specified render_target
 -------------------------------------------------*/
 
 INLINE void ui_input_push_mouse_leave_event(running_machine *machine, render_target *target)
@@ -123,7 +123,7 @@ INLINE void ui_input_push_mouse_leave_event(running_machine *machine, render_tar
 
 /*-------------------------------------------------
     ui_input_push_mouse_click_event - pushes a mouse
-	click event to the specified render_target
+    click event to the specified render_target
 -------------------------------------------------*/
 
 INLINE void ui_input_push_mouse_click_event(running_machine *machine, render_target *target, INT32 x, INT32 y)
@@ -138,8 +138,8 @@ INLINE void ui_input_push_mouse_click_event(running_machine *machine, render_tar
 
 
 /*-------------------------------------------------
-    ui_input_push_mouse_double_click_event - pushes 
-    a mouse double-click event to the specified 
+    ui_input_push_mouse_double_click_event - pushes
+    a mouse double-click event to the specified
     render_target
 -------------------------------------------------*/
 
@@ -156,7 +156,7 @@ INLINE void ui_input_push_mouse_double_click_event(running_machine *machine, ren
 
 /*-------------------------------------------------
     ui_input_push_char_event - pushes a char event
-	to the specified render_target
+    to the specified render_target
 -------------------------------------------------*/
 
 INLINE void ui_input_push_char_event(running_machine *machine, render_target *target, unicode_char ch)

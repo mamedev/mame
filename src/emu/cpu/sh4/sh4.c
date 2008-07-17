@@ -2058,7 +2058,7 @@ INLINE void TAS(UINT32 n)
 INLINE void TRAPA(UINT32 i)
 {
 	UINT32 imm = i & 0xff;
-	
+
 	sh4.m[TRA] = imm;
 	sh4.ssr = sh4.sr;
 	sh4.spc = sh4.pc;

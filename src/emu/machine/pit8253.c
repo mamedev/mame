@@ -373,9 +373,9 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
         phase|output|length  |value|next|comment
         -----+------+--------+-----+----+----------------------------------
             0|high  |infinity|     |1   |waiting for count
-		    1|high  |1       |     |2   |internal delay to load counter
+            1|high  |1       |     |2   |internal delay to load counter
             2|high  |n       |n..2 |3   |counting down
-		    3|low   |1       |1    |2   |reload counter
+            3|low   |1       |1    |2   |reload counter
 
         Counter rewrite has no effect until repeated
 
@@ -440,26 +440,26 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
 	case 3:
 		/* Mode 3: (Square Wave Generator)
 
-		----------------+           +-----------+           +----
-		                |           |           |           |
-		                +-----------+           +-----------+
-		    <- (n+1)/2 -X-   n/2   ->
-		 ^
-		 +- counter load or trigger
+        ----------------+           +-----------+           +----
+                        |           |           |           |
+                        +-----------+           +-----------+
+            <- (n+1)/2 -X-   n/2   ->
+         ^
+         +- counter load or trigger
 
         phase|output|length  |value|next|comment
-		-----+------+--------+-----+----+----------------------------------
-		    0|high  |infinity|     |1   |waiting for count
-		    1|high  |1       |     |2   |internal delay to load counter
-		    2|high  |n/2(+1) |n..0 |3   |counting down double speed, reload counter
-		    3|low   |n/2     |n..0 |2   |counting down double speed, reload counter
+        -----+------+--------+-----+----+----------------------------------
+            0|high  |infinity|     |1   |waiting for count
+            1|high  |1       |     |2   |internal delay to load counter
+            2|high  |n/2(+1) |n..0 |3   |counting down double speed, reload counter
+            3|low   |n/2     |n..0 |2   |counting down double speed, reload counter
 
-		Counter rewrite has no effect until repeated (output falling or rising)
+        Counter rewrite has no effect until repeated (output falling or rising)
 
-		Gate rising-edge and level sensitive.
-		Gate low disables counting and sets output immediately high.
-		Rising-edge reloads count and initiates counting
-		Gate high enables counting. */
+        Gate rising-edge and level sensitive.
+        Gate low disables counting and sets output immediately high.
+        Rising-edge reloads count and initiates counting
+        Gate high enables counting. */
 
 		if (timer->gate	== 0 ||	timer->phase ==	0)
 		{
@@ -518,28 +518,28 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
 	case 4:
 	case 5:
 		/* Mode 4: (Software Trigger Strobe)
-		   Mode 5: (Hardware Trigger Strobe)
+           Mode 5: (Hardware Trigger Strobe)
 
-		--------------+ +--------------------
-		              | |
-		              +-+
-		    <-  n+1  ->
-		    ^         <1>
-		    +- counter load (mode 4) or trigger (mode 5)
+        --------------+ +--------------------
+                      | |
+                      +-+
+            <-  n+1  ->
+            ^         <1>
+            +- counter load (mode 4) or trigger (mode 5)
 
-		phase|output|length  |value|next|comment
-		-----+------+--------+-----+----+----------------------------------
-		    0|high  |infinity|0..1 |0   |waiting for count/counting down
-		    1|high  |1       |     |2   |internal delay when counter loaded
-		    2|high  |n       |n..1 |3   |counting down
-		    3|low   |1       |0    |0   |strobe
+        phase|output|length  |value|next|comment
+        -----+------+--------+-----+----+----------------------------------
+            0|high  |infinity|0..1 |0   |waiting for count/counting down
+            1|high  |1       |     |2   |internal delay when counter loaded
+            2|high  |n       |n..1 |3   |counting down
+            3|low   |1       |0    |0   |strobe
 
-		Mode 4 only: counter rewrite loads new counter
-		Mode 5 only: count not reloaded immediately.
-		Mode control write doesn't stop count but sets output high
+        Mode 4 only: counter rewrite loads new counter
+        Mode 5 only: count not reloaded immediately.
+        Mode control write doesn't stop count but sets output high
 
-		Mode 4 only: Gate level sensitive only. Low disables counting, high enables it.
-		Mode 5 only: Gate rising-edge sensitive only. Rising edge initiates counting */
+        Mode 4 only: Gate level sensitive only. Low disables counting, high enables it.
+        Mode 5 only: Gate rising-edge sensitive only. Rising edge initiates counting */
 
 		if (timer->gate	== 0 &&	mode ==	4)
 		{

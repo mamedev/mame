@@ -844,7 +844,7 @@ UINT8 *new_memory_region(running_machine *machine, int type, UINT32 length, UINT
 			break;
 	if (num < 0)
 		fatalerror("Out of memory regions!");
-	
+
     /* allocate the region */
 	mame->mem_region[num].length = length;
 	mame->mem_region[num].type = type;
@@ -1616,8 +1616,8 @@ static void init_machine(running_machine *machine)
 
 	/* initialize miscellaneous systems */
 	saveload_init(machine);
-//	if (options_get_bool(mame_options(), OPTION_CHEAT))
-//		cheat_init(machine);
+//  if (options_get_bool(mame_options(), OPTION_CHEAT))
+//      cheat_init(machine);
 }
 
 

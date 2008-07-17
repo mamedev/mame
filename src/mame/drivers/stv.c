@@ -2724,14 +2724,14 @@ stv110.bin  - Debug  STVB1.10D0950113  95/01/13 v1.10
 stv1061.bin - ST-V Dev Bios (1.061) - Sega 1994, Noted "ST-V Ver 1.061 94/11/25" on EPROM sticker, Coming from a S-TV SG5001A dev board
 
 Regions found listed in the BIOS:
-	Japan
-	Taiwan and Philipines
-	USA and Canada
-	Brazil
-	Korea
-	Asia PAL area
-	Europe
-	Latin America
+    Japan
+    Taiwan and Philipines
+    USA and Canada
+    Brazil
+    Korea
+    Asia PAL area
+    Europe
+    Latin America
 
 ROM_SYSTEM_BIOS( x, "saturn",      "Saturn bios" ) \
 ROM_LOAD16_WORD_SWAP_BIOS( x, "saturn.bin", 0x000000, 0x080000, CRC(653ff2d8) SHA1(20994ae7ee177ddaf3a430b010c7620dca000fb4) ) - Saturn Eu Bios

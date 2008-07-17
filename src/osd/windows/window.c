@@ -1219,9 +1219,9 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 		{
 			DWORD ticks = GetTickCount();
 			ui_input_push_mouse_click_event(Machine, window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
-			
+
 			// check for a double-click
-			if (ticks - window->lastclicktime < GetDoubleClickTime() && 
+			if (ticks - window->lastclicktime < GetDoubleClickTime() &&
 				GET_X_LPARAM(lparam) >= window->lastclickx - 4 && GET_X_LPARAM(lparam) <= window->lastclickx + 4 &&
 				GET_Y_LPARAM(lparam) >= window->lastclicky - 4 && GET_Y_LPARAM(lparam) <= window->lastclicky + 4)
 			{

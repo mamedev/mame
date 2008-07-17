@@ -938,7 +938,7 @@ int input_code_pressed_once(input_code code)
 
 /*-------------------------------------------------
     input_code_from_input_item_id - translates
-	an input_item_id to an input_code
+    an input_item_id to an input_code
 -------------------------------------------------*/
 
 input_code input_code_from_input_item_id(input_item_id itemid)

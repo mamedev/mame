@@ -294,7 +294,7 @@ struct _render_primitive_list
 
 
 /*-------------------------------------------------
-    render_container_user_settings - an object 
+    render_container_user_settings - an object
     containing user-controllable settings for
     a container
 -------------------------------------------------*/

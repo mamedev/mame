@@ -277,7 +277,7 @@ static void ui_exit(running_machine *machine)
 	if (ui_font != NULL)
 		render_font_free(ui_font);
 	ui_font = NULL;
-	
+
 	/* free the messagebox string */
 	if (messagebox_text != NULL)
 		astring_free(messagebox_text);
@@ -965,7 +965,7 @@ static astring *warnings_string(running_machine *machine, astring *string)
 						GAME_IMPERFECT_GRAPHICS | \
 						GAME_NO_COCKTAIL)
 	int i;
-	
+
 	astring_reset(string);
 
 	/* if no warnings, nothing to return */
@@ -1142,7 +1142,7 @@ astring *game_info_astring(running_machine *machine, astring *string)
 			}
 		}
 	}
-	
+
 	return string;
 }
 
@@ -1242,8 +1242,8 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 		ui_draw_text_full(profiler_get_text(), 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 
 	/* let the cheat engine display its stuff */
-//	if (options_get_bool(mame_options(), OPTION_CHEAT))
-//		cheat_display_watches(machine);
+//  if (options_get_bool(mame_options(), OPTION_CHEAT))
+//      cheat_display_watches(machine);
 
 	/* display any popup messages */
 	if (osd_ticks() < popup_text_end)
@@ -1806,7 +1806,7 @@ static INT32 slider_brightness(running_machine *machine, INT32 newval, char *buf
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
-	
+
 	render_container_get_user_settings(container, &settings);
 	if (buffer != NULL)
 	{
@@ -1828,7 +1828,7 @@ static INT32 slider_contrast(running_machine *machine, INT32 newval, char *buffe
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
-	
+
 	render_container_get_user_settings(container, &settings);
 	if (buffer != NULL)
 	{
@@ -1849,7 +1849,7 @@ static INT32 slider_gamma(running_machine *machine, INT32 newval, char *buffer, 
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
-	
+
 	render_container_get_user_settings(container, &settings);
 	if (buffer != NULL)
 	{
@@ -1871,7 +1871,7 @@ static INT32 slider_xscale(running_machine *machine, INT32 newval, char *buffer,
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
-	
+
 	render_container_get_user_settings(container, &settings);
 	if (buffer != NULL)
 	{
@@ -1893,7 +1893,7 @@ static INT32 slider_yscale(running_machine *machine, INT32 newval, char *buffer,
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
-	
+
 	render_container_get_user_settings(container, &settings);
 	if (buffer != NULL)
 	{
@@ -1915,7 +1915,7 @@ static INT32 slider_xoffset(running_machine *machine, INT32 newval, char *buffer
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
-	
+
 	render_container_get_user_settings(container, &settings);
 	if (buffer != NULL)
 	{
@@ -1937,7 +1937,7 @@ static INT32 slider_yoffset(running_machine *machine, INT32 newval, char *buffer
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
-	
+
 	render_container_get_user_settings(container, &settings);
 	if (buffer != NULL)
 	{

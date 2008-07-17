@@ -465,7 +465,7 @@ INLINE void free_render_ref(render_ref *ref)
 
 
 /*-------------------------------------------------
-    get_layer_and_blendmode - return the 
+    get_layer_and_blendmode - return the
     appropriate layer index and blendmode
 -------------------------------------------------*/
 
@@ -473,7 +473,7 @@ INLINE int get_layer_and_blendmode(const layout_view *view, int index, int *blen
 {
     const int *layer_order = layer_order_standard;
     int layer;
-    
+
 	/*
         if we have multiple backdrop pieces and no overlays, render:
             backdrop (add) + screens (add) + bezels (alpha)
@@ -482,10 +482,10 @@ INLINE int get_layer_and_blendmode(const layout_view *view, int index, int *blen
     */
 	if (view->itemlist[ITEM_LAYER_BACKDROP] != NULL && view->itemlist[ITEM_LAYER_BACKDROP]->next != NULL && view->itemlist[ITEM_LAYER_OVERLAY] == NULL)
 		layer_order = layer_order_alternate;
-	
+
 	/* select the layer */
 	layer = layer_order[index];
-	
+
 	/* if we want the blendmode as well, compute it */
 	if (blendmode != NULL)
 	{
@@ -753,7 +753,7 @@ static void render_load(running_machine *machine, int config_type, xml_data_node
 				if (target == render_get_ui_target())
 				{
 					render_container_user_settings settings;
-					
+
 					render_container_get_user_settings(ui_container, &settings);
 					settings.orientation = orientation_add(orientation_reverse(tmpint), settings.orientation);
 					render_container_set_user_settings(ui_container, &settings);
@@ -768,7 +768,7 @@ static void render_load(running_machine *machine, int config_type, xml_data_node
 		int index = xml_get_attribute_int(screennode, "index", -1);
 		render_container *container = get_screen_container_by_index(index);
 		render_container_user_settings settings;
-		
+
 		/* fetch current settings */
 		render_container_get_user_settings(container, &settings);
 
@@ -782,7 +782,7 @@ static void render_load(running_machine *machine, int config_type, xml_data_node
 		settings.xscale = xml_get_attribute_float(screennode, "hstretch", settings.xscale);
 		settings.yoffset = xml_get_attribute_float(screennode, "voffset", settings.yoffset);
 		settings.yscale = xml_get_attribute_float(screennode, "vstretch", settings.yscale);
-		
+
 		/* set the new values */
 		render_container_set_user_settings(container, &settings);
 	}
@@ -1670,7 +1670,7 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 
 /*-------------------------------------------------
     render_target_map_point_internal - internal
-	logic for mapping points
+    logic for mapping points
 -------------------------------------------------*/
 
 static int render_target_map_point_internal(render_target *target, INT32 target_x, INT32 target_y,
@@ -1746,8 +1746,8 @@ static int render_target_map_point_internal(render_target *target, INT32 target_
 
 /*-------------------------------------------------
     render_target_map_point_container - attempts to
-	map a point on the specified render_target to
-	the specified container, if possible
+    map a point on the specified render_target to
+    the specified container, if possible
 -------------------------------------------------*/
 
 int render_target_map_point_container(render_target *target, INT32 target_x, INT32 target_y, render_container *container, float *container_x, float *container_y)
@@ -2709,7 +2709,7 @@ int render_container_is_empty(render_container *container)
 
 
 /*-------------------------------------------------
-    render_container_get_user_settings - get the 
+    render_container_get_user_settings - get the
     current user settings for a container
 -------------------------------------------------*/
 
@@ -2727,7 +2727,7 @@ void render_container_get_user_settings(render_container *container, render_cont
 
 
 /*-------------------------------------------------
-    render_container_set_user_settings - set the 
+    render_container_set_user_settings - set the
     current user settings for a container
 -------------------------------------------------*/
 

@@ -70,7 +70,7 @@ struct _win_window_info
 	int					targetorient;
 	int					targetlayerconfig;
 	const render_primitive_list *primlist;
-	
+
 	// input info
 	DWORD				lastclicktime;
 	int					lastclickx;

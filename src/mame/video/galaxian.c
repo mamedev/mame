@@ -597,7 +597,7 @@ static void sprites_draw(running_machine *machine, bitmap_t *bitmap, const recta
 	rectangle clip = *cliprect;
 	int sprnum;
 	int clip_ofs = (flipscreen_x ? 16 : 0);
-	
+
 	/* 16 of the 256 pixels of the sprites are hard-clipped at the line buffer */
 	/* according to the schematics, it should be the first 16 pixels; however, */
 	/* some bootlegs demonstrate that this can be shifted to other positions. */
@@ -1024,7 +1024,7 @@ void frogger_draw_background(running_machine *machine, bitmap_t *bitmap, const r
 		if (draw.min_x <= draw.max_x)
 			fillbitmap(bitmap, RGB_BLACK, &draw);
 	}
-	
+
 }
 
 

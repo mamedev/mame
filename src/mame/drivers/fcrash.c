@@ -127,8 +127,8 @@ static void fcrash_render_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 	// sprite base registers need hooking up properly.. on fcrash it is NOT cps1_cps_a_regs[0]
 	//  on kodb, it might still be, unless that's just a leftover and it writes somewhere else too
-//	if (cps1_cps_a_regs[0] & 0x00ff) base=0x10c8/2;
-//	printf("cps1_cps_a_regs %04x\n", cps1_cps_a_regs[0]);
+//  if (cps1_cps_a_regs[0] & 0x00ff) base=0x10c8/2;
+//  printf("cps1_cps_a_regs %04x\n", cps1_cps_a_regs[0]);
 
 	for (pos=0x1ffc;pos>=0x0000;pos-=4)
 	{
@@ -384,8 +384,8 @@ static ADDRESS_MAP_START( kodb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	/* Forgotten Worlds has dial controls on B-board mapped at 800040-80005f. See DRIVER_INIT */
 	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE(&cps1_cps_a_regs)	/* CPS-A custom */
 	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE(&cps1_cps_b_regs)	/* CPS-B custom */
-//	AM_RANGE(0x800180, 0x800187) AM_WRITE(cps1_soundlatch_w) 	/* Sound command */
-//	AM_RANGE(0x800188, 0x80018f) AM_WRITE(cps1_soundlatch2_w)	/* Sound timer fade */
+//  AM_RANGE(0x800180, 0x800187) AM_WRITE(cps1_soundlatch_w)    /* Sound command */
+//  AM_RANGE(0x800188, 0x80018f) AM_WRITE(cps1_soundlatch2_w)   /* Sound timer fade */
 	AM_RANGE(0x8001c0, 0x8001ff) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w)	/* mirror (SF2 revision "E" US 910228) */
 	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE(&cps1_gfxram) AM_SIZE(&cps1_gfxram_size)	/* SF2CE executes code from here */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
@@ -715,9 +715,9 @@ static MACHINE_DRIVER_START( kodb )
 	MDRV_CPU_PROGRAM_MAP(kodb_map,0)
 	MDRV_CPU_VBLANK_INT("main", cps1_interrupt)
 
-//	MDRV_CPU_ADD_TAG("sound", Z80, 3579545)
+//  MDRV_CPU_ADD_TAG("sound", Z80, 3579545)
 	/* audio CPU */
-//	MDRV_CPU_PROGRAM_MAP(sub_map,0)
+//  MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -735,16 +735,16 @@ static MACHINE_DRIVER_START( kodb )
 	MDRV_VIDEO_UPDATE(kodb)
 
 	/* sound hardware */
-//	MDRV_SPEAKER_STANDARD_MONO("mono")
+//  MDRV_SPEAKER_STANDARD_MONO("mono")
 
-//	MDRV_SOUND_ADD_TAG("2151", YM2151, 3579545)
-//	MDRV_SOUND_CONFIG(ym2151_interface)
-//	MDRV_SOUND_ROUTE(0, "mono", 0.35)
-//	MDRV_SOUND_ROUTE(1, "mono", 0.35)
+//  MDRV_SOUND_ADD_TAG("2151", YM2151, 3579545)
+//  MDRV_SOUND_CONFIG(ym2151_interface)
+//  MDRV_SOUND_ROUTE(0, "mono", 0.35)
+//  MDRV_SOUND_ROUTE(1, "mono", 0.35)
 
-//	MDRV_SOUND_ADD_TAG("okim", OKIM6295, 1000000)
-//	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // pin 7 can be changed by the game code, see f006 on z80
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+//  MDRV_SOUND_ADD_TAG("okim", OKIM6295, 1000000)
+//  MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // pin 7 can be changed by the game code, see f006 on z80
+//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
 

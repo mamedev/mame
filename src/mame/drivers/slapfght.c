@@ -529,7 +529,7 @@ static INPUT_PORTS_START( slapfght_generic )
 
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:8,7,6")
-//	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
+//  PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
@@ -1167,7 +1167,7 @@ ROM_START( tigerhb1 )
 
 	ROM_REGION( 0x0800, REGION_CPU3, ROMREGION_ERASEFF ) // probably doesn't have an MCU
 	/* is this the right mcu for this set? the mcu handling code in the roms seems patched and it doesn't work correctly */
-//	ROM_LOAD( "a47_14.6a",   0x0000, 0x0800, CRC(4042489f) SHA1(b977e0821b6b1aa5a0a0f349cd78150af1a231df) )
+//  ROM_LOAD( "a47_14.6a",   0x0000, 0x0800, CRC(4042489f) SHA1(b977e0821b6b1aa5a0a0f349cd78150af1a231df) )
 
 	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "a47_05.bin",   0x00000, 0x2000, CRC(c5325b49) SHA1(6df9051e7545dcac4995340f80957510457aaf64) )  /* Chars */
@@ -1598,48 +1598,48 @@ static DRIVER_INIT( tigerhb )
 static READ8_HANDLER( gtstarb1_port_0_read )
 {
 	/* The bootleg has it's own 'protection' on startup ?
-		6D1A: 06 04         ld   b,$04
-		6D1C: DB 00         in   a,($00)
-		6D1E: E6 06         and  $06
-		6D20: 20 FA         jr   nz,$6D1C
-		6D22: DB 00         in   a,($00)
-		6D24: E6 06         and  $06
-		6D26: FE 06         cp   $06
-		6D28: 20 F8         jr   nz,$6D22
-		6D2A: DB 00         in   a,($00)
-		6D2C: E6 06         and  $06
-		6D2E: FE 02         cp   $02
-		6D30: 20 F8         jr   nz,$6D2A
-		6D32: DB 00         in   a,($00)
-		6D34: E6 06         and  $06
-		6D36: FE 04         cp   $04
-		6D38: 20 F8         jr   nz,$6D32
-		6D3A: 10 E0         djnz $6D1C
-	*/
+        6D1A: 06 04         ld   b,$04
+        6D1C: DB 00         in   a,($00)
+        6D1E: E6 06         and  $06
+        6D20: 20 FA         jr   nz,$6D1C
+        6D22: DB 00         in   a,($00)
+        6D24: E6 06         and  $06
+        6D26: FE 06         cp   $06
+        6D28: 20 F8         jr   nz,$6D22
+        6D2A: DB 00         in   a,($00)
+        6D2C: E6 06         and  $06
+        6D2E: FE 02         cp   $02
+        6D30: 20 F8         jr   nz,$6D2A
+        6D32: DB 00         in   a,($00)
+        6D34: E6 06         and  $06
+        6D36: FE 04         cp   $04
+        6D38: 20 F8         jr   nz,$6D32
+        6D3A: 10 E0         djnz $6D1C
+    */
 	if (activecpu_get_pc() == 0x6d1e) return 0;
 	if (activecpu_get_pc() == 0x6d24) return 6;
 	if (activecpu_get_pc() == 0x6d2c) return 2;
 	if (activecpu_get_pc() == 0x6d34) return 4;
 
 	/* The bootleg hangs in the "test mode" before diplaying (wrong) lives settings :
-		6AD4: DB 00         in   a,($00)
-		6AD6: CB 4F         bit  1,a
-		6AD8: 28 FA         jr   z,$6AD4
-		6ADA: 3E 23         ld   a,$23
-		6ADC: CD 52 11      call $1152
-		6ADF: 32 03 E8      ld   ($E803),a
-		6AE2: DB 00         in   a,($00)
-		6AE4: CB 4F         bit  1,a
-		6AE6: 28 FA         jr   z,$6AE2
-		6AE8: 3A 0A C8      ld   a,($C80A)
-		6AEB: E6 03         and  $03
-		6AED: CD 52 11      call $1152
-		6AF0: 32 03 E8      ld   ($E803),a
-		6AF3: DB 00         in   a,($00)
-		6AF5: CB 57         bit  2,a
-		6AF7: 20 FA         jr   nz,$6AF3
-	   This seems to be what used to be the MCU status.
-	*/
+        6AD4: DB 00         in   a,($00)
+        6AD6: CB 4F         bit  1,a
+        6AD8: 28 FA         jr   z,$6AD4
+        6ADA: 3E 23         ld   a,$23
+        6ADC: CD 52 11      call $1152
+        6ADF: 32 03 E8      ld   ($E803),a
+        6AE2: DB 00         in   a,($00)
+        6AE4: CB 4F         bit  1,a
+        6AE6: 28 FA         jr   z,$6AE2
+        6AE8: 3A 0A C8      ld   a,($C80A)
+        6AEB: E6 03         and  $03
+        6AED: CD 52 11      call $1152
+        6AF0: 32 03 E8      ld   ($E803),a
+        6AF3: DB 00         in   a,($00)
+        6AF5: CB 57         bit  2,a
+        6AF7: 20 FA         jr   nz,$6AF3
+       This seems to be what used to be the MCU status.
+    */
 	if (activecpu_get_pc() == 0x6ad6) return 2; /* bit 1 must be ON */
 	if (activecpu_get_pc() == 0x6ae4) return 2; /* bit 1 must be ON */
 	if (activecpu_get_pc() == 0x6af5) return 0; /* bit 2 must be OFF */

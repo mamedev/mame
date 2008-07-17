@@ -94,19 +94,19 @@ READ16_HANDLER( pow_spriteram_r )
 WRITE16_HANDLER( pow_spriteram_w )
 {
 	/*
-	This kludge fixes bug 00871: pow: At 3/4 of the 1st level, there is a large pillar, which pops up too late.
+    This kludge fixes bug 00871: pow: At 3/4 of the 1st level, there is a large pillar, which pops up too late.
 
-	The problem: the sprite list is built by the IRQ handler, however there is
-	code in the main loop that clears some portions of sprite RAM under certain
-	conditions. Usually, this isn't a problem, but in that specific point the
-	sprites added by the IRQ handler are erased before the screen is drawn.
+    The problem: the sprite list is built by the IRQ handler, however there is
+    code in the main loop that clears some portions of sprite RAM under certain
+    conditions. Usually, this isn't a problem, but in that specific point the
+    sprites added by the IRQ handler are erased before the screen is drawn.
 
-	We could force a partial update every time the sprite RAM is modified, however
-	that would hardly be more accurate since the sprite hardware most likely draws
-	to a frame buffer one frame behind, so the exact timing is unknown.
-	Instead, we just force a partial update before changing the RAM location that
-	causes the problem.
-	*/
+    We could force a partial update every time the sprite RAM is modified, however
+    that would hardly be more accurate since the sprite hardware most likely draws
+    to a frame buffer one frame behind, so the exact timing is unknown.
+    Instead, we just force a partial update before changing the RAM location that
+    causes the problem.
+    */
 	if (offset == 0x10c/2)
 		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 

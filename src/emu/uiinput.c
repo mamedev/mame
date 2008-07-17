@@ -70,7 +70,7 @@ static void ui_input_frame_update(running_machine *machine);
 
 /*-------------------------------------------------
     ui_input_init - initializes the UI input
-	system
+    system
 -------------------------------------------------*/
 
 void ui_input_init(running_machine *machine)
@@ -93,8 +93,8 @@ void ui_input_init(running_machine *machine)
 
 /*-------------------------------------------------
     ui_input_frame_update - looks through pressed
-	input as per events pushed our way and posts
-	corresponding IPT_UI_* events
+    input as per events pushed our way and posts
+    corresponding IPT_UI_* events
 -------------------------------------------------*/
 
 static void ui_input_frame_update(running_machine *machine)
@@ -114,7 +114,7 @@ static void ui_input_frame_update(running_machine *machine)
 
 /*-------------------------------------------------
     ui_input_push_event - pushes a single event
-	onto the queue
+    onto the queue
 -------------------------------------------------*/
 
 int ui_input_push_event(running_machine *machine, ui_event evt)
@@ -203,7 +203,7 @@ void ui_input_reset(running_machine *machine)
 
 
 /*-------------------------------------------------
-    ui_input_find_mouse - retrieves the current 
+    ui_input_find_mouse - retrieves the current
     location of the mouse
 -------------------------------------------------*/
 

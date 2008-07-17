@@ -2124,8 +2124,8 @@ UINT64 debug_read_opcode(offs_t address, int size, int arg)
 
 
 /*-------------------------------------------------
-    expression_read_memory - read 1,2,4 or 8 bytes 
-    at the given offset in the given address 
+    expression_read_memory - read 1,2,4 or 8 bytes
+    at the given offset in the given address
     space
 -------------------------------------------------*/
 
@@ -2141,15 +2141,15 @@ static UINT64 expression_read_memory(int space, int index, UINT32 address, int s
 			cpuindex = (index == -1) ? cpu_getactivecpu() : index;
 			space = ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM);
 			return expression_read_address_space(cpuindex, space, address, size);
-		
+
 		case EXPSPACE_OPCODE:
 		case EXPSPACE_RAMWRITE:
 			cpuindex = (index == -1) ? cpu_getactivecpu() : index;
 			return expression_read_program_direct(cpuindex, (space == EXPSPACE_OPCODE), address, size);
-		
+
 		case EXPSPACE_EEPROM:
 			return expression_read_eeprom(address, size);
-		
+
 		case EXPSPACE_CPU:
 		case EXPSPACE_USER:
 		case EXPSPACE_GFX:
@@ -2178,7 +2178,7 @@ static UINT64 expression_read_address_space(int cpuindex, int space, offs_t addr
 	{
 		/* adjust the address into a byte address */
 		address = ADDR2BYTE(address, info, space);
-		
+
 		/* switch contexts and do the read */
 		cpuintrf_push_context(cpuindex);
 		switch (size)
@@ -2211,13 +2211,13 @@ static UINT64 expression_read_program_direct(int cpuindex, int opcode, offs_t ad
 		/* adjust the address into a byte address, but not if being called recursively */
 		if ((opcode & 2) == 0)
 			address = ADDR2BYTE(address, info, ADDRESS_SPACE_PROGRAM);
-		
+
 		/* call ourself recursively until we are byte-sized */
 		if (size > 1)
-		{	
+		{
 			int halfsize = size / 2;
 			UINT64 r0, r1;
-			
+
 			/* read each half, from lower address to upper address */
 			r0 = expression_read_program_direct(cpuindex, opcode | 2, address + 0, halfsize);
 			r1 = expression_read_program_direct(cpuindex, opcode | 2, address + halfsize, halfsize);
@@ -2228,7 +2228,7 @@ static UINT64 expression_read_program_direct(int cpuindex, int opcode, offs_t ad
 			else
 				result = r1 | (r0 << (8 * halfsize));
 		}
-		
+
 		/* handle the byte-sized final requests */
 		else
 		{
@@ -2240,7 +2240,7 @@ static UINT64 expression_read_program_direct(int cpuindex, int opcode, offs_t ad
 				base = memory_get_op_ptr(cpuindex, address & ~lowmask, FALSE);
 			else
 				base = memory_get_read_ptr(cpuindex, ADDRESS_SPACE_PROGRAM, address & ~lowmask);
-			
+
 			/* if we have a valid base, return the appropriate byte */
 			if (base != NULL)
 			{
@@ -2264,7 +2264,7 @@ static UINT64 expression_read_memory_region(int rgnindex, int rgntype, offs_t ad
 {
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
 	int rgnnum = -1;
-	
+
 	/* convert to a region number */
 	switch (rgntype)
 	{
@@ -2273,24 +2273,24 @@ static UINT64 expression_read_memory_region(int rgnindex, int rgntype, offs_t ad
 		case EXPSPACE_GFX:		rgnnum = REGION_GFX1 + (rgnindex - 1);		break;
 		case EXPSPACE_SOUND:	rgnnum = REGION_SOUND1 + (rgnindex - 1);	break;
 	}
-	
+
 	/* process if it exists */
 	if (rgnnum != -1)
 	{
 		UINT8 *base = memory_region(Machine, rgnnum);
-		
+
 		/* make sure we get a valid base before proceeding */
 		if (base != NULL)
 		{
 			UINT32 length = memory_region_length(Machine, rgnnum);
 			UINT32 flags = memory_region_flags(Machine, rgnnum);
-			
+
 			/* call ourself recursively until we are byte-sized */
 			if (size > 1)
 			{
 				int halfsize = size / 2;
 				UINT64 r0, r1;
-				
+
 				/* read each half, from lower address to upper address */
 				r0 = expression_read_memory_region(rgnindex, rgntype, address + 0, halfsize);
 				r1 = expression_read_memory_region(rgnindex, rgntype, address + halfsize, halfsize);
@@ -2301,7 +2301,7 @@ static UINT64 expression_read_memory_region(int rgnindex, int rgntype, offs_t ad
 				else
 					result = r1 | (r0 << (8 * halfsize));
 			}
-			
+
 			/* only process if we're within range */
 			else if (address < length)
 			{
@@ -2330,7 +2330,7 @@ static UINT64 expression_read_eeprom(offs_t address, int size)
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
 	UINT32 eelength, eesize;
 	void *base;
-	
+
 	/* make sure we get a valid base before proceeding */
 	base = eeprom_get_data_pointer(&eelength, &eesize);
 	if (base != NULL && address < eelength)
@@ -2347,8 +2347,8 @@ static UINT64 expression_read_eeprom(offs_t address, int size)
 
 
 /*-------------------------------------------------
-    expression_write_memory - write 1,2,4 or 8 
-    bytes at the given offset in the given address 
+    expression_write_memory - write 1,2,4 or 8
+    bytes at the given offset in the given address
     space
 -------------------------------------------------*/
 
@@ -2365,17 +2365,17 @@ static void expression_write_memory(int space, int index, UINT32 address, int si
 			space = ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM);
 			expression_write_address_space(cpuindex, space, address, size, data);
 			break;
-		
+
 		case EXPSPACE_OPCODE:
 		case EXPSPACE_RAMWRITE:
 			cpuindex = (index == -1) ? cpu_getactivecpu() : index;
 			expression_write_program_direct(cpuindex, (space == EXPSPACE_OPCODE), address, size, data);
 			break;
-		
+
 		case EXPSPACE_EEPROM:
 			expression_write_eeprom(address, size, data);
 			break;
-		
+
 		case EXPSPACE_CPU:
 		case EXPSPACE_USER:
 		case EXPSPACE_GFX:
@@ -2397,13 +2397,13 @@ static void expression_write_memory(int space, int index, UINT32 address, int si
 static void expression_write_address_space(int cpuindex, int space, offs_t address, int size, UINT64 data)
 {
 	const debug_cpu_info *info = &global.cpuinfo[cpuindex];
-	
+
 	/* only process if in of range and we have a bus */
 	if (cpuindex < ARRAY_LENGTH(global.cpuinfo) && info->space[space].databytes != 0)
 	{
 		/* adjust the address into a byte address */
 		address = ADDR2BYTE(address, info, space);
-		
+
 		/* switch contexts and do the write */
 		cpuintrf_push_context(cpuindex);
 		switch (size)
@@ -2434,7 +2434,7 @@ static void expression_write_program_direct(int cpuindex, int opcode, offs_t add
 		/* adjust the address into a byte address, but not if being called recursively */
 		if ((opcode & 2) == 0)
 			address = ADDR2BYTE(address, info, ADDRESS_SPACE_PROGRAM);
-		
+
 		/* call ourself recursively until we are byte-sized */
 		if (size > 1)
 		{
@@ -2453,12 +2453,12 @@ static void expression_write_program_direct(int cpuindex, int opcode, offs_t add
 				r0 = (data >> (8 * halfsize)) & halfmask;
 				r1 = data & halfmask;
 			}
-			
+
 			/* write each half, from lower address to upper address */
 			expression_write_program_direct(cpuindex, opcode | 2, address + 0, halfsize, r0);
 			expression_write_program_direct(cpuindex, opcode | 2, address + halfsize, halfsize, r1);
 		}
-		
+
 		/* handle the byte-sized final case */
 		else
 		{
@@ -2470,7 +2470,7 @@ static void expression_write_program_direct(int cpuindex, int opcode, offs_t add
 				base = memory_get_op_ptr(cpuindex, address & ~lowmask, FALSE);
 			else
 				base = memory_get_read_ptr(cpuindex, ADDRESS_SPACE_PROGRAM, address & ~lowmask);
-			
+
 			/* if we have a valid base, write the appropriate byte */
 			if (base != NULL)
 			{
@@ -2493,7 +2493,7 @@ static void expression_write_program_direct(int cpuindex, int opcode, offs_t add
 static void expression_write_memory_region(int rgnindex, int rgntype, offs_t address, int size, UINT64 data)
 {
 	int rgnnum = -1;
-	
+
 	/* convert to a region number */
 	switch (rgntype)
 	{
@@ -2502,12 +2502,12 @@ static void expression_write_memory_region(int rgnindex, int rgntype, offs_t add
 		case EXPSPACE_GFX:		rgnnum = REGION_GFX1 + (rgnindex - 1);		break;
 		case EXPSPACE_SOUND:	rgnnum = REGION_SOUND1 + (rgnindex - 1);	break;
 	}
-	
+
 	/* process if it exists */
 	if (rgnnum != -1)
 	{
 		UINT8 *base = memory_region(Machine, rgnnum);
-		
+
 		/* make sure we get a valid base before proceeding */
 		if (base != NULL)
 		{
@@ -2519,7 +2519,7 @@ static void expression_write_memory_region(int rgnindex, int rgntype, offs_t add
 			{
 				int halfsize = size / 2;
 				UINT64 r0, r1, halfmask;
-				
+
 				/* break apart based on the target endianness */
 				halfmask = ~(UINT64)0 >> (64 - 8 * halfsize);
 				if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
@@ -2532,12 +2532,12 @@ static void expression_write_memory_region(int rgnindex, int rgntype, offs_t add
 					r0 = (data >> (8 * halfsize)) & halfmask;
 					r1 = data & halfmask;
 				}
-				
+
 				/* write each half, from lower address to upper address */
 				expression_write_memory_region(rgnindex, rgntype, address + 0, halfsize, r0);
 				expression_write_memory_region(rgnindex, rgntype, address + halfsize, halfsize, r1);
 			}
-			
+
 			/* only process if we're within range */
 			else if (address < length)
 			{
@@ -2565,12 +2565,12 @@ static void expression_write_eeprom(offs_t address, int size, UINT64 data)
 {
 	UINT32 eelength, eesize;
 	void *vbase = eeprom_get_data_pointer(&eelength, &eesize);
-	
+
 	/* make sure we get a valid base before proceeding */
 	if (vbase != NULL && address < eelength)
 	{
 		UINT64 mask = ~(UINT64)0 >> (64 - 8*size);
-		
+
 		/* switch off the size */
 		switch (eesize)
 		{
@@ -2580,7 +2580,7 @@ static void expression_write_eeprom(offs_t address, int size, UINT64 data)
 				*base = (*base & ~mask) | (data & mask);
 				break;
 			}
-			
+
 			case 2:
 			{
 				UINT16 *base = (UINT16 *)vbase + address;

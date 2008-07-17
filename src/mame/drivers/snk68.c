@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( pow_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0e8000, 0x0e8001) AM_READNOP /* Watchdog or IRQ ack */
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
-//	AM_RANGE(0x0f0008, 0x0f0009) AM_WRITENOP	/* ?? */
+//  AM_RANGE(0x0f0008, 0x0f0009) AM_WRITENOP    /* ?? */
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(pow_fg_videoram_r, pow_fg_videoram_w) AM_MIRROR(0x1000) AM_BASE(&pow_fg_videoram)	// 8-bit
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(pow_spriteram_r, pow_spriteram_w) AM_BASE(&spriteram16)	// only partially populated
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(pow_paletteram16_word_w) AM_BASE(&paletteram16)
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( searchar_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0d0000, 0x0d0001) AM_READ(rotary_lsb_r) /* Extra rotary bits */
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READNOP	/* Watchdog or IRQ ack */
 	AM_RANGE(0x0e8000, 0x0e8001) AM_READNOP	/* Watchdog or IRQ ack */
-//	AM_RANGE(0x0f0000, 0x0f0001) AM_WRITENOP	/* ?? */
+//  AM_RANGE(0x0f0000, 0x0f0001) AM_WRITENOP    /* ?? */
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0f8000, 0x0f8001) AM_READ(sound_status_r)

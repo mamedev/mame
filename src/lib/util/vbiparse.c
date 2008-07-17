@@ -26,7 +26,7 @@
 ***************************************************************************/
 
 /*-------------------------------------------------
-    vbi_parse_manchester_code - parse a Manchester 
+    vbi_parse_manchester_code - parse a Manchester
     code from a line of video data
 -------------------------------------------------*/
 
@@ -37,7 +37,7 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 	double clock, bestclock;
 	int x, firstedge;
 	int besterr;
-	
+
 	/* fail if the width is too large */
 	if (sourcewidth > MAX_SOURCE_WIDTH)
 		return 0;
@@ -55,12 +55,12 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 	/* bail if the line is all black or all white */
 	if (max < 0x80 || min > 0x80)
 		return 0;
-	
+
 	/* determine the midpoint and then set the thresholds to be halfway */
 	mid = (min + max) / 2;
 	min = mid - (mid - min) / 2;
 	max = mid + (max - mid) / 2;
-	
+
 	/* convert the source into absolute high/low  */
 	srcabsval = (source[0] > mid);
 	for (x = 0; x < sourcewidth; x++)
@@ -72,7 +72,7 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 			srcabsval = 0;
 		srcabs[x] = srcabsval;
 	}
-	
+
 	/* find the first transition; this is assumed to be the middle of the first bit */
 	for (x = 0; x < sourcewidth - 1; x++)
 		if (srcabs[x] != srcabs[x + 1])
@@ -80,7 +80,7 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 	if (x == sourcewidth - 1)
 		return 0;
 	firstedge = x;
-	
+
 	/* now scan to find a clock that has a nearby transition on each beat */
 	bestclock = 0;
 	besterr = 1000;
@@ -92,11 +92,11 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 		for (x = 1; x < expectedbits; x++)
 		{
 			int curbit = firstedge + (double)x * clock;
-			
+
 			/* exact match? */
 			if (srcabs[curbit + 0] != srcabs[curbit + 1])
 				continue;
-			
+
 			/* off-by-one? */
 			if (srcabs[curbit + 1 + 0] != srcabs[curbit + 1 + 1] || srcabs[curbit - 1 + 0] != srcabs[curbit - 1 + 1])
 			{
@@ -104,11 +104,11 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 				if (++error < besterr)
 					continue;
 			}
-			
+
 			/* anything else fails immediately */
 			break;
 		}
-		
+
 		/* if we got to the end, this is the best candidate so far */
 		if (x == expectedbits)
 		{
@@ -116,19 +116,19 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 			bestclock = clock;
 		}
 	}
-	
+
 	/* if nobody matched, fail */
 	if (bestclock == 0)
 		return 0;
 
-	/* now extract the bits */	
+	/* now extract the bits */
 	for (x = 0; x < expectedbits; x++)
 	{
 		int leftbit = firstedge + ((double)x - 0.25) * bestclock;
 		int rightbit = firstedge + ((double)x + 0.25) * bestclock;
 		int left = srcabs[leftbit];
 		int right = srcabs[rightbit];
-		
+
 		/* all bits should be marked by transitions; fail if we don't get one */
 		if (left == right)
 			return 0;
@@ -139,7 +139,7 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 
 
 /*-------------------------------------------------
-    vbi_parse_white_flag - compute the "white 
+    vbi_parse_white_flag - compute the "white
     flag" from a line of video data
 -------------------------------------------------*/
 

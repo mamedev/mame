@@ -3038,7 +3038,7 @@ static DRIVER_INIT( cps3_speedups )
 
 	//printf("speedup %08x %08x\n",cps3_speedup_ram_address,cps3_speedup_code_address);
 
-	if (cps3_speedup_code_address!=0) 
+	if (cps3_speedup_code_address!=0)
 	{
 		cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
 		cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, cps3_speedup_code_address);

@@ -905,7 +905,7 @@ void input_field_set_user_settings(const input_field_config *field, const input_
 
 
 /*-------------------------------------------------
-    input_field_setting_name - return the expanded 
+    input_field_setting_name - return the expanded
     setting name for a field
 -------------------------------------------------*/
 
@@ -921,13 +921,13 @@ const char *input_field_setting_name(const input_field_config *field)
 		if (input_condition_true(field->port->machine, &setting->condition))
 			if (setting->value == field->state->value)
 				return setting->name;
-	
+
 	return "INVALID";
 }
 
 
 /*-------------------------------------------------
-    input_field_has_previous_setting - return TRUE 
+    input_field_has_previous_setting - return TRUE
     if the given field has a "previous" setting
 -------------------------------------------------*/
 
@@ -942,7 +942,7 @@ int input_field_has_previous_setting(const input_field_config *field)
 	for (setting = field->settinglist; setting != NULL; setting = setting->next)
 		if (input_condition_true(field->port->machine, &setting->condition))
 			return (setting->value != field->state->value);
-	
+
 	return FALSE;
 }
 
@@ -990,7 +990,7 @@ void input_field_select_previous_setting(const input_field_config *field)
 
 
 /*-------------------------------------------------
-    input_field_has_next_setting - return TRUE 
+    input_field_has_next_setting - return TRUE
     if the given field has a "next" setting
 -------------------------------------------------*/
 
@@ -1011,7 +1011,7 @@ int input_field_has_next_setting(const input_field_config *field)
 			if (setting->value == field->state->value)
 				found = TRUE;
 		}
-	
+
 	return FALSE;
 }
 
@@ -1994,7 +1994,7 @@ profiler_mark(PROFILER_INPUT);
 	/* track the duration of the previous frame */
 	portdata->last_delta_nsec = attotime_to_attoseconds(attotime_sub(curtime, portdata->last_frame_time)) / ATTOSECONDS_PER_NANOSECOND;
 	portdata->last_frame_time = curtime;
-	
+
 	/* update the digital joysticks */
 	frame_update_digital_joysticks(machine);
 

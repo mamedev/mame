@@ -354,7 +354,7 @@ int astring_vprintf(astring *dst, const char *format, va_list args)
 
 
 /*-------------------------------------------------
-    astring_catprintf - formatted printf to 
+    astring_catprintf - formatted printf to
     the end of an astring
 -------------------------------------------------*/
 
@@ -376,7 +376,7 @@ int astring_catprintf(astring *dst, const char *format, ...)
 
 
 /*-------------------------------------------------
-    astring_catprintf - formatted vprintf to 
+    astring_catprintf - formatted vprintf to
     the end of an astring
 -------------------------------------------------*/
 

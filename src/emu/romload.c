@@ -1051,7 +1051,7 @@ static UINT32 normalize_flags_for_cpu(running_machine *machine, UINT32 startflag
 {
 	int cputype = machine->config->cpu[cpunum].type;
 	int buswidth;
-	
+
 	/* set the endianness */
 	startflags &= ~ROMREGION_ENDIANMASK;
 	if (cputype_endianness(cputype) == CPU_IS_LE)
@@ -1070,7 +1070,7 @@ static UINT32 normalize_flags_for_cpu(running_machine *machine, UINT32 startflag
 		startflags |= ROMREGION_32BIT;
 	else
 		startflags |= ROMREGION_64BIT;
-	
+
 	return startflags;
 }
 

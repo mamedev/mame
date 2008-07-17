@@ -559,10 +559,10 @@ static int parse_memory_operator(const char *buffer, token_info *flags)
 		case 'q':	*flags |= TIN_MEMORY_QWORD;		break;
 		default:	return 0;
 	}
-	
+
 	/* add the index to flags */
 	*flags |= index << TIN_MEMORY_INDEX_SHIFT;
-	
+
 	return 1;
 }
 
@@ -1675,7 +1675,7 @@ EXPRERR expression_parse(const char *expression, const symbol_table *table, cons
 {
 	parsed_expression temp_expression;
 	EXPRERR exprerr;
-	
+
 	/* first parse the tokens into the token array in order */
 	exprerr = parse_string_into_tokens(expression, &temp_expression, table);
 	if (exprerr != EXPRERR_NONE)

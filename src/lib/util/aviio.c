@@ -2669,7 +2669,7 @@ static avi_error huffyuv_decompress_to_yuy16(avi_stream *stream, const UINT8 *da
 	{
 		UINT16 *prevrow = BITMAP_ADDR16(bitmap, y - prevlines, 0);
 		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-		
+
 		/* handle the first four bytes independently */
 		x = 0;
 		if (y == 0)
