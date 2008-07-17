@@ -28,6 +28,7 @@ SX008-14.BIN ; /
 
 */
 
+
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/mips/r3000.h"
@@ -215,13 +216,6 @@ static ADDRESS_MAP_START( st0016_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
 ADDRESS_MAP_END
 
-
-static const struct r3000_config config =
-{
-	1,	/* 1 if we have an FPU, 0 otherwise */
-	4096,	/* code cache size */
-	4096	/* data cache size */
-};
 
 static INPUT_PORTS_START( srmp5 )
 	PORT_START
@@ -623,24 +617,39 @@ static const struct ST0016interface st0016_interface =
 	&st0016_charram
 };
 
+ static INTERRUPT_GEN( irq4_gen )
+{
+	cpunum_set_input_line(machine, 1, R3000_IRQ4, ASSERT_LINE);
+}
+
+static const struct r3000_config config =
+{
+	1,	/* 1 if we have an FPU, 0 otherwise */
+	4096,	/* code cache size */
+	4096	/* data cache size */
+};
+
 static MACHINE_DRIVER_START( srmp5 )
+	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main",Z80,8000000)
 	MDRV_CPU_PROGRAM_MAP(st0016_mem,0)
 	MDRV_CPU_IO_MAP(st0016_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(R3000LE, 40000000)
+	MDRV_CPU_ADD(R3000LE, 25000000)
 	MDRV_CPU_CONFIG(config)
-	MDRV_CPU_VBLANK_INT_HACK(irq4_line_hold,2)
 	MDRV_CPU_PROGRAM_MAP(srmp5_mem,0)
+	MDRV_CPU_VBLANK_INT("main", irq4_gen)
 
+	MDRV_INTERLEAVE(100)
 
+	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 350, 30, 280)
+	MDRV_SCREEN_SIZE(512, 512)
+	MDRV_SCREEN_VISIBLE_AREA(4, 339, 32, 271)
 
 	MDRV_PALETTE_LENGTH(16*16*4+1)
 
@@ -658,7 +667,7 @@ MACHINE_DRIVER_END
 ROM_START( srmp5 )
 	ROM_REGION( 0x410000, REGION_CPU1, 0 )
 	ROM_LOAD( "sx008-08.bin",   0x010000, 0x200000,   CRC(d4ac54f4) SHA1(c3dc76cd71485796a0b6a960294ea96eae8c946e) )
-	ROM_LOAD( "sx008-09.bin",   0x200000, 0x200000,   CRC(5a3e6560) SHA1(92ea398f3c5e3035869f0ca5dfe7b05c90095318) )
+	ROM_LOAD( "sx008-09.bin",   0x210000, 0x200000,   CRC(5a3e6560) SHA1(92ea398f3c5e3035869f0ca5dfe7b05c90095318) )
 	ROM_COPY( REGION_CPU1,  0x10000, 0x00000, 0x08000 )
 
 	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 )
@@ -667,7 +676,7 @@ ROM_START( srmp5 )
 	ROM_LOAD32_BYTE( "sx008-12.bin",   0x00002, 0x80000,   CRC(43e9bb98) SHA1(e46dd98d2e1babfa12ddf2fa9b31377e8691d3a1) )
 	ROM_LOAD32_BYTE( "sx008-11.bin",   0x00003, 0x80000,   CRC(ca15ff45) SHA1(5ee610e0bb835568c36898210a6f8394902d5b54) )
 
-	ROM_REGION( 0x200000*8, REGION_USER2,0) /* gfx ? */
+	ROM_REGION( 0xf00000, REGION_USER2,0) /* gfx ? */
 	ROM_LOAD( "sx008-01.bin",   0x000000, 0x200000,   CRC(82dabf48) SHA1(c53e9ed0056c431eab13ab362936c25d3cc5abba) )
 	ROM_LOAD( "sx008-02.bin",   0x200000, 0x200000,   CRC(cfd2be0f) SHA1(a21f2928e08047c97443123aceba7ff4e95c6d3d) )
 	ROM_LOAD( "sx008-03.bin",   0x400000, 0x200000,   CRC(d7323b10) SHA1(94ecc17b6b8b071cf2c61bbef4aec2c6c7693c62) )
