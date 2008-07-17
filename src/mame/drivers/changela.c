@@ -319,49 +319,56 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( changela )
 	PORT_START_TAG("DSWA")	/* DSWA */
-	PORT_DIPNAME( 0x07, 0x01, "Steering Wheel Ratio" )
-	PORT_DIPSETTING(    0x01, "Recommended" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x07, 0x01, "Steering Wheel Ratio" )		PORT_DIPLOCATION("SWA:1,2,3")
+	//PORT_DIPSETTING(    0x00, "?" ) /* Not documented */
+	PORT_DIPSETTING(    0x01, "Recommended Setting" )
+	//PORT_DIPSETTING(    0x02, "?" ) /* Not documented */
+	//PORT_DIPSETTING(    0x03, "?" ) /* Not documented */
+	//PORT_DIPSETTING(    0x04, "?" ) /* Not documented */
+	//PORT_DIPSETTING(    0x05, "?" ) /* Not documented */
+	//PORT_DIPSETTING(    0x06, "?" ) /* Not documented */
+	//PORT_DIPSETTING(    0x07, "?" ) /* Not documented */
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SWA:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Ignore Memory Failures" )
+	PORT_DIPNAME( 0x10, 0x00, "Ignore Memory Failures" )	PORT_DIPLOCATION("SWA:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Controls ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Controls ) )			PORT_DIPLOCATION("SWA:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(    0x00, "Steering Wheel" )
-	PORT_DIPNAME( 0x40, 0x40, "Diagnostic" )
+	PORT_DIPNAME( 0x40, 0x40, "Diagnostic" )				PORT_DIPLOCATION("SWA:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Players ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Players ) )			PORT_DIPLOCATION("SWA:8")
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 
 	PORT_START_TAG("DSWB")	/* DSWB */
-	PORT_DIPNAME( 0x03, 0x00, "Max Bonus Fuels" )
+	PORT_DIPNAME( 0x03, 0x00, "Max Bonus Fuels" )			PORT_DIPLOCATION("SWB:1,2")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x00, "99" )
-	PORT_DIPNAME( 0x0c, 0x08, "Game Difficulty" )
+	PORT_DIPNAME( 0x0c, 0x08, "Game Difficulty" )			PORT_DIPLOCATION("SWB:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Easy) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x30, 0x20, "Traffic Difficulty" )
+	PORT_DIPNAME( 0x30, 0x20, "Traffic Difficulty" )		PORT_DIPLOCATION("SWB:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Easy) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x40, 0x00, "Land Collisions Enabled" )
+	PORT_DIPNAME( 0x40, 0x00, "Land Collisions Enabled" )	PORT_DIPLOCATION("SWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Car Collisions Enabled" )
+	PORT_DIPNAME( 0x80, 0x00, "Car Collision Enabled" )		PORT_DIPLOCATION("SWB:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START_TAG("DSWC")	/* DSWC - coinage */
-	PORT_DIPNAME( 0xf0, 0x10, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0xf0, 0x10, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SWC:5,6,7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(	0x90, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0xa0, DEF_STR( 2C_2C ) )
@@ -377,7 +384,7 @@ static INPUT_PORTS_START( changela )
 	PORT_DIPSETTING(	0x50, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(	0x60, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(	0x70, DEF_STR( 1C_7C ) )
-	PORT_DIPNAME( 0x0f, 0x01, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0f, 0x01, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SWC:1,2,3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(	0x09, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x0a, DEF_STR( 2C_2C ) )
@@ -395,13 +402,13 @@ static INPUT_PORTS_START( changela )
 	PORT_DIPSETTING(	0x07, DEF_STR( 1C_7C ) )
 
 	PORT_START_TAG("DSWD")	/* DSWD - bonus */
-	PORT_DIPNAME( 0x01, 0x01, "Right Coin Counter" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Left Coin Counter" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1c, 0x00, "Credits for Bonus" )
+	PORT_DIPNAME( 0x01, 0x01, "Right Slot" )				PORT_DIPLOCATION("SWD:1")
+	PORT_DIPSETTING(    0x01, "On Right (Bottom) Counter" )
+	PORT_DIPSETTING(    0x00, "On Left (Top) Counter" )
+	PORT_DIPNAME( 0x02, 0x02, "Left Slot" )					PORT_DIPLOCATION("SWD:2")
+	PORT_DIPSETTING(    0x02, "On Right (Bottom) Counter" )
+	PORT_DIPSETTING(    0x00, "On Left (Top) Counter" )
+	PORT_DIPNAME( 0x1c, 0x00, "Credits For Bonus" )			PORT_DIPLOCATION("SWD:3,4,5")
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x04, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
@@ -410,26 +417,29 @@ static INPUT_PORTS_START( changela )
 	PORT_DIPSETTING(    0x14, "5" )
 	PORT_DIPSETTING(    0x18, "6" )
 	PORT_DIPSETTING(    0x1c, "7" )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0xc0, 0x00, "King of the World" )
-	PORT_DIPSETTING(    0x80, "No Name" )
-	PORT_DIPSETTING(    0x40, "Short Name" )
-	PORT_DIPSETTING(    0x00, "Long Name" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SWD:6" )	/* Listed as "Unused" */
+	PORT_DIPNAME( 0x40, 0x00, "'King Of The World' Name Length" )PORT_DIPLOCATION("SWD:7")
+	PORT_DIPSETTING(    0x40, "3 Letters" )
+	PORT_DIPSETTING(    0x00, "Long" )
+	PORT_DIPNAME( 0x80, 0x00, "'King Of The World' Name" )	PORT_DIPLOCATION("SWD:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START_TAG("MCU") /* MCU */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR(Free_Play) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )	/* NC */
+	PORT_DIPNAME( 0x30, 0x30, "Self Test Switch" )			PORT_DIPLOCATION("SWT:1,2")
+	//PORT_DIPSETTING(    0x00, "?" )						/* Not possible, 3-state switch */
+	PORT_DIPSETTING(    0x20, "Free Game" )					/* "Puts a credit on the game without increasing the coin counter." */
+	PORT_DIPSETTING(    0x10, DEF_STR( Test ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Off ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START_TAG("IN0") /* 0xDx2C */
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Shift") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE /* Gear shift */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Shift") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE /* Gear shift */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* FWD - negated bit 7 */
@@ -444,8 +454,6 @@ static INPUT_PORTS_START( changela )
 
 	PORT_START_TAG("WHEEL") /* 0xDx30 DRIVING_WHEEL */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(8)
-
-
 INPUT_PORTS_END
 
 
