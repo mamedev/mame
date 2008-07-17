@@ -1963,7 +1963,7 @@ static MACHINE_RESET( cave )
 	/* modify the eeprom on a reset with the desired region for the games that have the
        region factory set in eeprom */
 	if (cave_region_byte >= 0)
-		eeprom_get_data_pointer(0)[cave_region_byte] =  input_port_read(machine, "EEPROM");
+		((UINT8 *)eeprom_get_data_pointer(NULL,NULL))[cave_region_byte] =  input_port_read(machine, "EEPROM");
 }
 
 static const struct YMZ280Binterface ymz280b_intf =

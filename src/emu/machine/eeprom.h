@@ -29,7 +29,7 @@ void eeprom_load(mame_file *file);
 void eeprom_save(mame_file *file);
 
 void eeprom_set_data(const UINT8 *data, int length);
-UINT8 * eeprom_get_data_pointer(int * length);
+void *eeprom_get_data_pointer(UINT32 *length, UINT32 *size);
 
 /* 93C46 */
 extern const eeprom_interface eeprom_interface_93C46;

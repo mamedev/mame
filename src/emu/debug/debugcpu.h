@@ -204,6 +204,7 @@ struct _debug_cpu_watchpoint
 
 extern FILE *debug_source_file;
 extern symbol_table *global_symtable;
+extern const express_callbacks debug_expression_callbacks;
 
 
 

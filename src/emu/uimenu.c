@@ -665,6 +665,36 @@ const char *ui_menu_pool_strdup(ui_menu *menu, const char *string)
 }
 
 
+/*-------------------------------------------------
+    ui_menu_get_selection - retrieves the index
+	of the currently selected menu item
+-------------------------------------------------*/
+
+void *ui_menu_get_selection(ui_menu *menu)
+{
+	return (menu->selected >= 0 && menu->selected < menu->numitems) ? menu->item[menu->selected].ref : NULL;
+}
+
+
+/*-------------------------------------------------
+    ui_menu_set_selection - changes the index
+	of the currently selected menu item
+-------------------------------------------------*/
+
+void ui_menu_set_selection(ui_menu *menu, void *selected_itemref)
+{
+	int itemnum;
+	
+	menu->selected = -1;
+	for (itemnum = 0; itemnum < menu->numitems; itemnum++)
+		if (menu->item[itemnum].ref == selected_itemref)
+		{
+			menu->selected = itemnum;
+			break;
+		}
+}
+
+
 
 /***************************************************************************
     INTERNAL MENU PROCESSING
@@ -3126,35 +3156,3 @@ static void menu_render_triangle(bitmap_t *dest, const bitmap_t *source, const r
     ACCESSORS
 ***************************************************************************/
 
-/*-------------------------------------------------
-    ui_menu_get_selection - retrieves the index
-	of the currently selected menu item
--------------------------------------------------*/
-
-void *ui_menu_get_selection(ui_menu *menu)
-{
-	return (menu->selected >= 0) && (menu->selected < menu->numitems)
-		? menu->item[menu->selected].ref
-		: NULL;
-}
-
-
-
-/*-------------------------------------------------
-    ui_menu_set_selection - changes the index
-	of the currently selected menu item
--------------------------------------------------*/
-
-void ui_menu_set_selection(ui_menu *menu, void *selected_itemref)
-{
-	int i;
-	for (i = 0; i < menu->numitems; i++)
-	{
-		if (menu->item[i].ref == selected_itemref)
-		{
-			menu->selected = i;
-			return;
-		}
-	}
-	menu->selected = -1;
-}

@@ -1635,7 +1635,7 @@ static void disasm_update(debug_view *view)
 		parsed_expression *expr;
 
 		/* parse the new expression */
-		exprerr = expression_parse(dasmdata->expression_string, debug_get_cpu_info(dasmdata->cpunum)->symtable, &expr);
+		exprerr = expression_parse(dasmdata->expression_string, debug_get_cpu_info(dasmdata->cpunum)->symtable, &debug_expression_callbacks, &expr);
 
 		/* if it worked, update the expression */
 		if (exprerr == EXPRERR_NONE)
@@ -2706,7 +2706,7 @@ static void memory_update(debug_view *view)
 		parsed_expression *expr;
 
 		/* parse the new expression */
-		exprerr = expression_parse(memdata->expression_string, debug_get_cpu_info(memdata->cpunum)->symtable, &expr);
+		exprerr = expression_parse(memdata->expression_string, debug_get_cpu_info(memdata->cpunum)->symtable, &debug_expression_callbacks, &expr);
 
 		/* if it worked, update the expression */
 		if (exprerr == EXPRERR_NONE)

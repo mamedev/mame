@@ -114,6 +114,12 @@ void *ui_menu_pool_alloc(ui_menu *menu, size_t size);
 /* make a temporary string copy in the menu's memory pool */
 const char *ui_menu_pool_strdup(ui_menu *menu, const char *string);
 
+/* retrieves the index of the currently selected menu item */
+void *ui_menu_get_selection(ui_menu *menu);
+
+/* changes the index of the currently selected menu item */
+void ui_menu_set_selection(ui_menu *menu, void *selected_itemref);
+
 
 
 /* ----- menu stack management ----- */
@@ -137,17 +143,6 @@ UINT32 ui_menu_ui_handler(running_machine *machine, UINT32 state);
 /* force game select menu */
 void ui_menu_force_game_select(void);
 int ui_menu_is_force_game_select(void);
-
-
-
-/* ----- accessors ----- */
-
-/* retrieves the index of the currently selected menu item */
-void *ui_menu_get_selection(ui_menu *menu);
-
-/* changes the index of the currently selected menu item */
-void ui_menu_set_selection(ui_menu *menu, void *selected_itemref);
-
 
 
 #endif	/* __UIMENU_H__ */

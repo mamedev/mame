@@ -26,6 +26,7 @@
 #include "debugger.h"
 #include "deprecat.h"
 #include "uiinput.h"
+#include "machine/eeprom.h"
 #include <ctype.h>
 
 
@@ -84,7 +85,6 @@ static debugger_private global;
 
 
 
-
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
@@ -96,6 +96,18 @@ static void process_source_file(void);
 static void breakpoint_check(debug_cpu_info *info, offs_t pc);
 static void watchpoint_check(int cpunum, int spacenum, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask);
 static void check_hotspots(int cpunum, int spacenum, offs_t address);
+
+/* expression handlers */
+static UINT64 expression_read_memory(int space, int index, UINT32 address, int size);
+static UINT64 expression_read_address_space(int cpuindex, int space, offs_t address, int size);
+static UINT64 expression_read_program_direct(int cpuindex, int opcode, offs_t address, int size);
+static UINT64 expression_read_memory_region(int rgnindex, int rgntype, offs_t address, int size);
+static UINT64 expression_read_eeprom(offs_t address, int size);
+static void expression_write_memory(int space, int index, UINT32 address, int size, UINT64 data);
+static void expression_write_address_space(int cpuindex, int space, offs_t address, int size, UINT64 data);
+static void expression_write_program_direct(int cpuindex, int opcode, offs_t address, int size, UINT64 data);
+static void expression_write_memory_region(int rgnindex, int rgntype, offs_t address, int size, UINT64 data);
+static void expression_write_eeprom(offs_t address, int size, UINT64 data);
 
 /* variable getters/setters */
 static UINT64 get_wpaddr(UINT32 ref);
@@ -111,6 +123,17 @@ static void set_logunmap(UINT32 ref, UINT64 value);
 static UINT64 get_current_pc(UINT32 ref);
 static UINT64 get_cpu_reg(UINT32 ref);
 static void set_cpu_reg(UINT32 ref, UINT64 value);
+
+
+/***************************************************************************
+    GLOBAL CONSTANTS
+***************************************************************************/
+
+const express_callbacks debug_expression_callbacks =
+{
+	expression_read_memory,
+	expression_write_memory
+};
 
 
 
@@ -573,12 +596,15 @@ void debug_cpu_instruction_hook(running_machine *machine, offs_t curpc)
 		while (global.execution_state == EXECUTION_STATE_STOPPED)
 		{
 			/* clear the memory modified flag and wait */
-			global.memory_modified = 0;
+			global.memory_modified = FALSE;
 			osd_wait_for_debugger();
 
 			/* if something modified memory, update the screen */
 			if (global.memory_modified)
+			{
+				debug_disasm_update_all();
 				debugger_refresh_display(machine);
+			}
 
 			/* check for commands in the source file */
 			process_source_file();
@@ -2098,48 +2124,473 @@ UINT64 debug_read_opcode(offs_t address, int size, int arg)
 
 
 /*-------------------------------------------------
-    external_read_memory - read 1,2,4 or 8 bytes at
-    the given offset in the given address space
+    expression_read_memory - read 1,2,4 or 8 bytes 
+    at the given offset in the given address 
+    space
 -------------------------------------------------*/
 
-UINT64 external_read_memory(int space, UINT32 offset, int size)
+static UINT64 expression_read_memory(int space, int index, UINT32 address, int size)
 {
-	const debug_cpu_info *info = &global.cpuinfo[cpu_getactivecpu()];
-	if (info->space[space].databytes == 0)
-		return ~0;
+	int cpuindex;
 
-	/* adjust the address into a byte address */
-	offset = ADDR2BYTE(offset, info, space);
-	switch (size)
+	switch (space)
 	{
-		case 1:		return debug_read_byte(space, offset, TRUE);
-		case 2:		return debug_read_word(space, offset, TRUE);
-		case 4:		return debug_read_dword(space, offset, TRUE);
-		case 8:		return debug_read_qword(space, offset, TRUE);
+		case EXPSPACE_PROGRAM:
+		case EXPSPACE_DATA:
+		case EXPSPACE_IO:
+			cpuindex = (index == -1) ? cpu_getactivecpu() : index;
+			space = ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM);
+			return expression_read_address_space(cpuindex, space, address, size);
+		
+		case EXPSPACE_OPCODE:
+		case EXPSPACE_RAMWRITE:
+			cpuindex = (index == -1) ? cpu_getactivecpu() : index;
+			return expression_read_program_direct(cpuindex, (space == EXPSPACE_OPCODE), address, size);
+		
+		case EXPSPACE_EEPROM:
+			return expression_read_eeprom(address, size);
+		
+		case EXPSPACE_CPU:
+		case EXPSPACE_USER:
+		case EXPSPACE_GFX:
+		case EXPSPACE_SOUND:
+			if (index < 1)
+				break;
+			space = ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM);
+			return expression_read_memory_region(index, space, address, size);
 	}
-	return ~0;
+	return ~(UINT64)0 >> (64 - 8*size);
 }
 
 
 /*-------------------------------------------------
-    external_write_memory - write 1,2,4 or 8 bytes to
-    the given offset in the given address space
+    expression_read_address_space - read memory
+    from a specific CPU's address space
 -------------------------------------------------*/
 
-void external_write_memory(int space, UINT32 offset, int size, UINT64 value)
+static UINT64 expression_read_address_space(int cpuindex, int space, offs_t address, int size)
 {
-	const debug_cpu_info *info = &global.cpuinfo[cpu_getactivecpu()];
-	if (info->space[space].databytes == 0)
-		return;
+	const debug_cpu_info *info = &global.cpuinfo[cpuindex];
+	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
 
-	/* adjust the address into a byte address */
-	offset = ADDR2BYTE(offset, info, space);
-	switch (size)
+	/* only process if in of range and we have a bus */
+	if (cpuindex < ARRAY_LENGTH(global.cpuinfo) && info->space[space].databytes != 0)
 	{
-		case 1:		debug_write_byte(space, offset, value, TRUE); break;
-		case 2:		debug_write_word(space, offset, value, TRUE); break;
-		case 4:		debug_write_dword(space, offset, value, TRUE); break;
-		case 8:		debug_write_qword(space, offset, value, TRUE); break;
+		/* adjust the address into a byte address */
+		address = ADDR2BYTE(address, info, space);
+		
+		/* switch contexts and do the read */
+		cpuintrf_push_context(cpuindex);
+		switch (size)
+		{
+			case 1:		result = debug_read_byte(space, address, TRUE);		break;
+			case 2:		result = debug_read_word(space, address, TRUE);		break;
+			case 4:		result = debug_read_dword(space, address, TRUE);	break;
+			case 8:		result = debug_read_qword(space, address, TRUE);	break;
+		}
+		cpuintrf_pop_context();
+	}
+	return result;
+}
+
+
+/*-------------------------------------------------
+    expression_read_program_direct - read memory
+    directly from an opcode or RAM pointer
+-------------------------------------------------*/
+
+static UINT64 expression_read_program_direct(int cpuindex, int opcode, offs_t address, int size)
+{
+	const debug_cpu_info *info = &global.cpuinfo[cpuindex];
+	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
+	UINT8 *base;
+
+	/* only process if in of range and we have a bus */
+	if (cpuindex < ARRAY_LENGTH(global.cpuinfo) && info->space[ADDRESS_SPACE_PROGRAM].databytes != 0)
+	{
+		/* adjust the address into a byte address, but not if being called recursively */
+		if ((opcode & 2) == 0)
+			address = ADDR2BYTE(address, info, ADDRESS_SPACE_PROGRAM);
+		
+		/* call ourself recursively until we are byte-sized */
+		if (size > 1)
+		{	
+			int halfsize = size / 2;
+			UINT64 r0, r1;
+			
+			/* read each half, from lower address to upper address */
+			r0 = expression_read_program_direct(cpuindex, opcode | 2, address + 0, halfsize);
+			r1 = expression_read_program_direct(cpuindex, opcode | 2, address + halfsize, halfsize);
+
+			/* assemble based on the target endianness */
+			if (info->endianness == CPU_IS_LE)
+				result = r0 | (r1 << (8 * halfsize));
+			else
+				result = r1 | (r0 << (8 * halfsize));
+		}
+		
+		/* handle the byte-sized final requests */
+		else
+		{
+			/* lowmask specified which address bits are within the databus width */
+			offs_t lowmask = info->space[ADDRESS_SPACE_PROGRAM].databytes - 1;
+
+			/* get the base of memory, aligned to the address minus the lowbits */
+			if (opcode & 1)
+				base = memory_get_op_ptr(cpuindex, address & ~lowmask, FALSE);
+			else
+				base = memory_get_read_ptr(cpuindex, ADDRESS_SPACE_PROGRAM, address & ~lowmask);
+			
+			/* if we have a valid base, return the appropriate byte */
+			if (base != NULL)
+			{
+				if (info->endianness == CPU_IS_LE)
+					result = base[BYTE8_XOR_LE(address) & lowmask];
+				else
+					result = base[BYTE8_XOR_BE(address) & lowmask];
+			}
+		}
+	}
+	return result;
+}
+
+
+/*-------------------------------------------------
+    expression_read_memory_region - read memory
+    from a memory region
+-------------------------------------------------*/
+
+static UINT64 expression_read_memory_region(int rgnindex, int rgntype, offs_t address, int size)
+{
+	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
+	int rgnnum = -1;
+	
+	/* convert to a region number */
+	switch (rgntype)
+	{
+		case EXPSPACE_CPU:		rgnnum = REGION_CPU1 + (rgnindex - 1);		break;
+		case EXPSPACE_USER:		rgnnum = REGION_USER1 + (rgnindex - 1);		break;
+		case EXPSPACE_GFX:		rgnnum = REGION_GFX1 + (rgnindex - 1);		break;
+		case EXPSPACE_SOUND:	rgnnum = REGION_SOUND1 + (rgnindex - 1);	break;
+	}
+	
+	/* process if it exists */
+	if (rgnnum != -1)
+	{
+		UINT8 *base = memory_region(Machine, rgnnum);
+		
+		/* make sure we get a valid base before proceeding */
+		if (base != NULL)
+		{
+			UINT32 length = memory_region_length(Machine, rgnnum);
+			UINT32 flags = memory_region_flags(Machine, rgnnum);
+			
+			/* call ourself recursively until we are byte-sized */
+			if (size > 1)
+			{
+				int halfsize = size / 2;
+				UINT64 r0, r1;
+				
+				/* read each half, from lower address to upper address */
+				r0 = expression_read_memory_region(rgnindex, rgntype, address + 0, halfsize);
+				r1 = expression_read_memory_region(rgnindex, rgntype, address + halfsize, halfsize);
+
+				/* assemble based on the target endianness */
+				if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
+					result = r0 | (r1 << (8 * halfsize));
+				else
+					result = r1 | (r0 << (8 * halfsize));
+			}
+			
+			/* only process if we're within range */
+			else if (address < length)
+			{
+				/* lowmask specified which address bits are within the databus width */
+				UINT32 lowmask = (1 << (flags & ROMREGION_WIDTHMASK)) - 1;
+				base += address & ~lowmask;
+
+				/* if we have a valid base, return the appropriate byte */
+				if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
+					result = base[BYTE8_XOR_LE(address) & lowmask];
+				else
+					result = base[BYTE8_XOR_BE(address) & lowmask];
+			}
+		}
+	}
+	return result;
+}
+
+
+/*-------------------------------------------------
+    expression_read_eeprom - read EEPROM data
+-------------------------------------------------*/
+
+static UINT64 expression_read_eeprom(offs_t address, int size)
+{
+	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
+	UINT32 eelength, eesize;
+	void *base;
+	
+	/* make sure we get a valid base before proceeding */
+	base = eeprom_get_data_pointer(&eelength, &eesize);
+	if (base != NULL && address < eelength)
+	{
+		/* switch off the size */
+		switch (eesize)
+		{
+			case 1:		result &= ((UINT8 *)base)[address];							break;
+			case 2:		result &= BIG_ENDIANIZE_INT16(((UINT16 *)base)[address]);	break;
+		}
+	}
+	return result;
+}
+
+
+/*-------------------------------------------------
+    expression_write_memory - write 1,2,4 or 8 
+    bytes at the given offset in the given address 
+    space
+-------------------------------------------------*/
+
+static void expression_write_memory(int space, int index, UINT32 address, int size, UINT64 data)
+{
+	int cpuindex;
+
+	switch (space)
+	{
+		case EXPSPACE_PROGRAM:
+		case EXPSPACE_DATA:
+		case EXPSPACE_IO:
+			cpuindex = (index == -1) ? cpu_getactivecpu() : index;
+			space = ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM);
+			expression_write_address_space(cpuindex, space, address, size, data);
+			break;
+		
+		case EXPSPACE_OPCODE:
+		case EXPSPACE_RAMWRITE:
+			cpuindex = (index == -1) ? cpu_getactivecpu() : index;
+			expression_write_program_direct(cpuindex, (space == EXPSPACE_OPCODE), address, size, data);
+			break;
+		
+		case EXPSPACE_EEPROM:
+			expression_write_eeprom(address, size, data);
+			break;
+		
+		case EXPSPACE_CPU:
+		case EXPSPACE_USER:
+		case EXPSPACE_GFX:
+		case EXPSPACE_SOUND:
+			if (index < 1)
+				break;
+			space = ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM);
+			expression_write_memory_region(index, space, address, size, data);
+			break;
+	}
+}
+
+
+/*-------------------------------------------------
+    expression_write_address_space - write memory
+    to a specific CPU's address space
+-------------------------------------------------*/
+
+static void expression_write_address_space(int cpuindex, int space, offs_t address, int size, UINT64 data)
+{
+	const debug_cpu_info *info = &global.cpuinfo[cpuindex];
+	
+	/* only process if in of range and we have a bus */
+	if (cpuindex < ARRAY_LENGTH(global.cpuinfo) && info->space[space].databytes != 0)
+	{
+		/* adjust the address into a byte address */
+		address = ADDR2BYTE(address, info, space);
+		
+		/* switch contexts and do the write */
+		cpuintrf_push_context(cpuindex);
+		switch (size)
+		{
+			case 1:		debug_write_byte(space, address, data, TRUE);	break;
+			case 2:		debug_write_word(space, address, data, TRUE);	break;
+			case 4:		debug_write_dword(space, address, data, TRUE);	break;
+			case 8:		debug_write_qword(space, address, data, TRUE);	break;
+		}
+		cpuintrf_pop_context();
+	}
+}
+
+
+/*-------------------------------------------------
+    expression_write_program_direct - write memory
+    directly to an opcode or RAM pointer
+-------------------------------------------------*/
+
+static void expression_write_program_direct(int cpuindex, int opcode, offs_t address, int size, UINT64 data)
+{
+	const debug_cpu_info *info = &global.cpuinfo[cpuindex];
+	UINT8 *base;
+
+	/* only process if in of range and we have a bus */
+	if (cpuindex < ARRAY_LENGTH(global.cpuinfo) && info->space[ADDRESS_SPACE_PROGRAM].databytes != 0)
+	{
+		/* adjust the address into a byte address, but not if being called recursively */
+		if ((opcode & 2) == 0)
+			address = ADDR2BYTE(address, info, ADDRESS_SPACE_PROGRAM);
+		
+		/* call ourself recursively until we are byte-sized */
+		if (size > 1)
+		{
+			int halfsize = size / 2;
+			UINT64 r0, r1, halfmask;
+
+			/* break apart based on the target endianness */
+			halfmask = ~(UINT64)0 >> (64 - 8 * halfsize);
+			if (info->endianness == CPU_IS_LE)
+			{
+				r0 = data & halfmask;
+				r1 = (data >> (8 * halfsize)) & halfmask;
+			}
+			else
+			{
+				r0 = (data >> (8 * halfsize)) & halfmask;
+				r1 = data & halfmask;
+			}
+			
+			/* write each half, from lower address to upper address */
+			expression_write_program_direct(cpuindex, opcode | 2, address + 0, halfsize, r0);
+			expression_write_program_direct(cpuindex, opcode | 2, address + halfsize, halfsize, r1);
+		}
+		
+		/* handle the byte-sized final case */
+		else
+		{
+			/* lowmask specified which address bits are within the databus width */
+			offs_t lowmask = info->space[ADDRESS_SPACE_PROGRAM].databytes - 1;
+
+			/* get the base of memory, aligned to the address minus the lowbits */
+			if (opcode & 1)
+				base = memory_get_op_ptr(cpuindex, address & ~lowmask, FALSE);
+			else
+				base = memory_get_read_ptr(cpuindex, ADDRESS_SPACE_PROGRAM, address & ~lowmask);
+			
+			/* if we have a valid base, write the appropriate byte */
+			if (base != NULL)
+			{
+				if (info->endianness == CPU_IS_LE)
+					base[BYTE8_XOR_LE(address) & lowmask] = data;
+				else
+					base[BYTE8_XOR_BE(address) & lowmask] = data;
+				global.memory_modified = TRUE;
+			}
+		}
+	}
+}
+
+
+/*-------------------------------------------------
+    expression_write_memory_region - write memory
+    from a memory region
+-------------------------------------------------*/
+
+static void expression_write_memory_region(int rgnindex, int rgntype, offs_t address, int size, UINT64 data)
+{
+	int rgnnum = -1;
+	
+	/* convert to a region number */
+	switch (rgntype)
+	{
+		case EXPSPACE_CPU:		rgnnum = REGION_CPU1 + (rgnindex - 1);		break;
+		case EXPSPACE_USER:		rgnnum = REGION_USER1 + (rgnindex - 1);		break;
+		case EXPSPACE_GFX:		rgnnum = REGION_GFX1 + (rgnindex - 1);		break;
+		case EXPSPACE_SOUND:	rgnnum = REGION_SOUND1 + (rgnindex - 1);	break;
+	}
+	
+	/* process if it exists */
+	if (rgnnum != -1)
+	{
+		UINT8 *base = memory_region(Machine, rgnnum);
+		
+		/* make sure we get a valid base before proceeding */
+		if (base != NULL)
+		{
+			UINT32 length = memory_region_length(Machine, rgnnum);
+			UINT32 flags = memory_region_flags(Machine, rgnnum);
+
+			/* call ourself recursively until we are byte-sized */
+			if (size > 1)
+			{
+				int halfsize = size / 2;
+				UINT64 r0, r1, halfmask;
+				
+				/* break apart based on the target endianness */
+				halfmask = ~(UINT64)0 >> (64 - 8 * halfsize);
+				if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
+				{
+					r0 = data & halfmask;
+					r1 = (data >> (8 * halfsize)) & halfmask;
+				}
+				else
+				{
+					r0 = (data >> (8 * halfsize)) & halfmask;
+					r1 = data & halfmask;
+				}
+				
+				/* write each half, from lower address to upper address */
+				expression_write_memory_region(rgnindex, rgntype, address + 0, halfsize, r0);
+				expression_write_memory_region(rgnindex, rgntype, address + halfsize, halfsize, r1);
+			}
+			
+			/* only process if we're within range */
+			else if (address < length)
+			{
+				/* lowmask specified which address bits are within the databus width */
+				UINT32 lowmask = (1 << (flags & ROMREGION_WIDTHMASK)) - 1;
+				base += address & ~lowmask;
+
+				/* if we have a valid base, set the appropriate byte */
+				if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
+					base[BYTE8_XOR_LE(address) & lowmask] = data;
+				else
+					base[BYTE8_XOR_BE(address) & lowmask] = data;
+				global.memory_modified = TRUE;
+			}
+		}
+	}
+}
+
+
+/*-------------------------------------------------
+    expression_write_eeprom - write EEPROM data
+-------------------------------------------------*/
+
+static void expression_write_eeprom(offs_t address, int size, UINT64 data)
+{
+	UINT32 eelength, eesize;
+	void *vbase = eeprom_get_data_pointer(&eelength, &eesize);
+	
+	/* make sure we get a valid base before proceeding */
+	if (vbase != NULL && address < eelength)
+	{
+		UINT64 mask = ~(UINT64)0 >> (64 - 8*size);
+		
+		/* switch off the size */
+		switch (eesize)
+		{
+			case 1:
+			{
+				UINT8 *base = (UINT8 *)vbase + address;
+				*base = (*base & ~mask) | (data & mask);
+				break;
+			}
+			
+			case 2:
+			{
+				UINT16 *base = (UINT16 *)vbase + address;
+				UINT16 value = BIG_ENDIANIZE_INT16(*base);
+				value = (value & ~mask) | (data & mask);
+				*base = BIG_ENDIANIZE_INT16(value);
+				break;
+			}
+		}
+		global.memory_modified = TRUE;
 	}
 }
 

@@ -80,11 +80,21 @@ enum
 	TIN_MEMORY_DWORD		= (2 << TIN_MEMORY_SIZE_SHIFT),
 	TIN_MEMORY_QWORD		= (3 << TIN_MEMORY_SIZE_SHIFT),
 
-	TIN_MEMORY_SPACE_SHIFT	= 10,
-	TIN_MEMORY_SPACE_MASK	= (3 << TIN_MEMORY_SPACE_SHIFT),
-	TIN_MEMORY_PROGRAM		= (EXPSPACE_PROGRAM << TIN_MEMORY_SPACE_SHIFT),
-	TIN_MEMORY_DATA			= (EXPSPACE_DATA    << TIN_MEMORY_SPACE_SHIFT),
-	TIN_MEMORY_IO			= (EXPSPACE_IO      << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_SPACE_SHIFT	= 12,
+	TIN_MEMORY_SPACE_MASK	= (0xf << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_PROGRAM		= (EXPSPACE_PROGRAM   << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_DATA			= (EXPSPACE_DATA      << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_IO			= (EXPSPACE_IO        << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_OPCODE		= (EXPSPACE_OPCODE    << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_RAMWRITE		= (EXPSPACE_RAMWRITE  << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_EEPROM		= (EXPSPACE_EEPROM	  << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_CPU			= (EXPSPACE_CPU       << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_USER			= (EXPSPACE_USER      << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_GFX			= (EXPSPACE_GFX       << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_SOUND		= (EXPSPACE_SOUND     << TIN_MEMORY_SPACE_SHIFT),
+
+	TIN_MEMORY_INDEX_SHIFT	= 16,
+	TIN_MEMORY_INDEX_MASK	= (0xf << TIN_MEMORY_INDEX_SHIFT)
 };
 
 
@@ -146,47 +156,52 @@ enum
 typedef union _int_ptr int_ptr;
 union _int_ptr
 {
-	void *			p;				/* pointer value */
-	UINT64			i;				/* integer value */
+	void *					p;								/* pointer value */
+	UINT64					i;								/* integer value */
 };
+
+
+typedef UINT32 token_type;
+typedef UINT32 token_info;
 
 
 typedef struct _parse_token parse_token;
 struct _parse_token
 {
-	UINT16			type;			/* type of token */
-	UINT16			info;			/* info for token */
-	UINT32			offset;			/* offset within the string */
-	int_ptr			value;			/* value of token */
+	token_type				type;							/* type of token */
+	token_info				info;							/* info for token */
+	UINT32					offset;							/* offset within the string */
+	int_ptr					value;							/* value of token */
 };
 
 
 typedef struct _internal_symbol_entry internal_symbol_entry;
 struct _internal_symbol_entry
 {
-	internal_symbol_entry *next;	/* pointer to the next entry */
-	const char *	name;			/* name of the symbol */
-	symbol_entry	entry;		/* actual entry data */
+	internal_symbol_entry *	next;							/* pointer to the next entry */
+	const char *			name;							/* name of the symbol */
+	symbol_entry			entry;							/* actual entry data */
 };
 
 
 /* typedef struct _symbol_table symbol_table -- defined in express.h */
 struct _symbol_table
 {
-	symbol_table *parent;	/* pointer to the parent symbol table */
-	internal_symbol_entry *hash[SYM_TABLE_HASH_SIZE]; /* hash table */
+	symbol_table *			parent;							/* pointer to the parent symbol table */
+	internal_symbol_entry *	hash[SYM_TABLE_HASH_SIZE]; 		/* hash table */
 };
 
 
 /* typedef struct _parsed_expression parsed_expression -- defined in express.h */
 struct _parsed_expression
 {
-	const symbol_table *table; /* symbol table */
-	char *			original_string;/* original string (prior to parsing) */
-	char *			string[MAX_EXPRESSION_STRINGS]; /* string table */
-	parse_token		token[MAX_TOKENS];/* array of tokens */
-	int				token_stack_ptr;/* stack poointer */
-	parse_token		token_stack[MAX_STACK_DEPTH];/* token stack */
+	const symbol_table *	table; 							/* symbol table */
+	char *					original_string;				/* original string (prior to parsing) */
+	express_callbacks 		callbacks;						/* callbacks */
+	char *					string[MAX_EXPRESSION_STRINGS]; /* string table */
+	parse_token				token[MAX_TOKENS];				/* array of tokens */
+	int						token_stack_ptr;				/* stack poointer */
+	parse_token				token_stack[MAX_STACK_DEPTH];	/* token stack */
 };
 
 
@@ -313,10 +328,16 @@ INLINE EXPRERR pop_token_rval(parsed_expression *expr, parse_token *token, const
 	/* memory tokens get resolved down to number tokens */
 	else if (token->type == TOK_MEMORY)
 	{
+		int index = (token->info & TIN_MEMORY_INDEX_MASK) >> TIN_MEMORY_INDEX_SHIFT;
 		int space = (token->info & TIN_MEMORY_SPACE_MASK) >> TIN_MEMORY_SPACE_SHIFT;
 		int size = (token->info & TIN_MEMORY_SIZE_MASK) >> TIN_MEMORY_SIZE_SHIFT;
+		if ((token->info & TIN_MEMORY_INDEX_MASK) == TIN_MEMORY_INDEX_MASK)
+			index = -1;
 		token->type = TOK_NUMBER;
-		token->value.i = external_read_memory(space, token->value.i, 1 << size);
+		if (expr->callbacks.read != NULL)
+			token->value.i = (*expr->callbacks.read)(space, index, token->value.i, 1 << size);
+		else
+			token->value.i = 0;
 	}
 
 	/* to be an rval, the token must be a number */
@@ -331,7 +352,7 @@ INLINE EXPRERR pop_token_rval(parsed_expression *expr, parse_token *token, const
     for a SYMBOL token
 -------------------------------------------------*/
 
-INLINE UINT64 get_lval_value(parse_token *token, const symbol_table *table)
+INLINE UINT64 get_lval_value(parsed_expression *expr, parse_token *token, const symbol_table *table)
 {
 	if (token->type == TOK_SYMBOL)
 	{
@@ -341,9 +362,13 @@ INLINE UINT64 get_lval_value(parse_token *token, const symbol_table *table)
 	}
 	else if (token->type == TOK_MEMORY)
 	{
+		int index = (token->info & TIN_MEMORY_INDEX_MASK) >> TIN_MEMORY_INDEX_SHIFT;
 		int space = (token->info & TIN_MEMORY_SPACE_MASK) >> TIN_MEMORY_SPACE_SHIFT;
 		int size = (token->info & TIN_MEMORY_SIZE_MASK) >> TIN_MEMORY_SIZE_SHIFT;
-		return external_read_memory(space, token->value.i, 1 << size);
+		if ((token->info & TIN_MEMORY_INDEX_MASK) == TIN_MEMORY_INDEX_MASK)
+			index = -1;
+		if (expr->callbacks.read != NULL)
+			return (*expr->callbacks.read)(space, index, token->value.i, 1 << size);
 	}
 	return 0;
 }
@@ -354,7 +379,7 @@ INLINE UINT64 get_lval_value(parse_token *token, const symbol_table *table)
     for a SYMBOL token
 -------------------------------------------------*/
 
-INLINE void set_lval_value(parse_token *token, const symbol_table *table, UINT64 value)
+INLINE void set_lval_value(parsed_expression *expr, parse_token *token, const symbol_table *table, UINT64 value)
 {
 	if (token->type == TOK_SYMBOL)
 	{
@@ -364,9 +389,13 @@ INLINE void set_lval_value(parse_token *token, const symbol_table *table, UINT64
 	}
 	else if (token->type == TOK_MEMORY)
 	{
+		int index = (token->info & TIN_MEMORY_INDEX_MASK) >> TIN_MEMORY_INDEX_SHIFT;
 		int space = (token->info & TIN_MEMORY_SPACE_MASK) >> TIN_MEMORY_SPACE_SHIFT;
 		int size = (token->info & TIN_MEMORY_SIZE_MASK) >> TIN_MEMORY_SIZE_SHIFT;
-		external_write_memory(space, token->value.i, 1 << size, value);
+		if ((token->info & TIN_MEMORY_INDEX_MASK) == TIN_MEMORY_INDEX_MASK)
+			index = -1;
+		if (expr->callbacks.write != NULL)
+			(*expr->callbacks.write)(space, index, token->value.i, 1 << size, value);
 	}
 }
 
@@ -480,18 +509,21 @@ static void print_tokens(FILE *out, parsed_expression *expr)
     forms of memory operators
 -------------------------------------------------*/
 
-static int parse_memory_operator(const char *buffer, UINT16 *flags)
+static int parse_memory_operator(const char *buffer, token_info *flags)
 {
 	int length = (int)strlen(buffer);
 	int space = 'p', size;
+	int index = -1;
 
 	*flags = 0;
 
-	/* length 2 means space, then size */
-	if (length == 2)
+	/* length 2 or more means space, optional index, then size */
+	if (length >= 2)
 	{
 		space = buffer[0];
-		size = buffer[1];
+		if (length >= 3)
+			sscanf(&buffer[1], "%d", &index);
+		size = buffer[length - 1];
 	}
 
 	/* length 1 means size */
@@ -508,6 +540,13 @@ static int parse_memory_operator(const char *buffer, UINT16 *flags)
 		case 'p':	*flags |= TIN_MEMORY_PROGRAM;	break;
 		case 'd':	*flags |= TIN_MEMORY_DATA;		break;
 		case 'i':	*flags |= TIN_MEMORY_IO;		break;
+		case 'o':	*flags |= TIN_MEMORY_OPCODE;	break;
+		case 'r':	*flags |= TIN_MEMORY_RAMWRITE;	break;
+		case 'e':	*flags |= TIN_MEMORY_EEPROM;	break;
+		case 'c':	*flags |= TIN_MEMORY_CPU;		break;
+		case 'u':	*flags |= TIN_MEMORY_USER;		break;
+		case 'g':	*flags |= TIN_MEMORY_GFX;		break;
+		case 's':	*flags |= TIN_MEMORY_SOUND;		break;
 		default:	return 0;
 	}
 
@@ -520,6 +559,10 @@ static int parse_memory_operator(const char *buffer, UINT16 *flags)
 		case 'q':	*flags |= TIN_MEMORY_QWORD;		break;
 		default:	return 0;
 	}
+	
+	/* add the index to flags */
+	*flags |= index << TIN_MEMORY_INDEX_SHIFT;
+	
 	return 1;
 }
 
@@ -781,7 +824,7 @@ static EXPRERR parse_string_into_tokens(const char *stringstart, parsed_expressi
 				/* check for memory @ operators */
 				if (string[0] == '@')
 				{
-					UINT16 info;
+					token_info info;
 					if (parse_memory_operator(buffer, &info))
 					{
 						SET_TOKEN_INFO(1, TOK_OPERATOR, TVL_MEMORYAT, TIN_PRECEDENCE_2 | info);
@@ -1196,34 +1239,34 @@ static EXPRERR execute_tokens(parsed_expression *expr, UINT64 *result)
 				{
 					case TVL_PREINCREMENT:
 						exprerr = pop_token_lval(expr, &t1, expr->table); if (exprerr != 0) return exprerr;
-						tempnum.value.i = get_lval_value(&t1, expr->table) + 1;
+						tempnum.value.i = get_lval_value(expr, &t1, expr->table) + 1;
 						tempnum.offset = t1.offset;
 						exprerr = push_token(expr, &tempnum); if (exprerr != 0) return exprerr;
-						set_lval_value(&t1, expr->table, tempnum.value.i);
+						set_lval_value(expr, &t1, expr->table, tempnum.value.i);
 						break;
 
 					case TVL_PREDECREMENT:
 						exprerr = pop_token_lval(expr, &t1, expr->table); if (exprerr != 0) return exprerr;
-						tempnum.value.i = get_lval_value(&t1, expr->table) - 1;
+						tempnum.value.i = get_lval_value(expr, &t1, expr->table) - 1;
 						tempnum.offset = t1.offset;
 						exprerr = push_token(expr, &tempnum); if (exprerr != 0) return exprerr;
-						set_lval_value(&t1, expr->table, tempnum.value.i);
+						set_lval_value(expr, &t1, expr->table, tempnum.value.i);
 						break;
 
 					case TVL_POSTINCREMENT:
 						exprerr = pop_token_lval(expr, &t1, expr->table); if (exprerr != 0) return exprerr;
-						tempnum.value.i = get_lval_value(&t1, expr->table);
+						tempnum.value.i = get_lval_value(expr, &t1, expr->table);
 						tempnum.offset = t1.offset;
 						exprerr = push_token(expr, &tempnum); if (exprerr != 0) return exprerr;
-						set_lval_value(&t1, expr->table, tempnum.value.i + 1);
+						set_lval_value(expr, &t1, expr->table, tempnum.value.i + 1);
 						break;
 
 					case TVL_POSTDECREMENT:
 						exprerr = pop_token_lval(expr, &t1, expr->table); if (exprerr != 0) return exprerr;
-						tempnum.value.i = get_lval_value(&t1, expr->table);
+						tempnum.value.i = get_lval_value(expr, &t1, expr->table);
 						tempnum.offset = t1.offset;
 						exprerr = push_token(expr, &tempnum); if (exprerr != 0) return exprerr;
-						set_lval_value(&t1, expr->table, tempnum.value.i - 1);
+						set_lval_value(expr, &t1, expr->table, tempnum.value.i - 1);
 						break;
 
 					case TVL_COMPLEMENT:
@@ -1404,109 +1447,109 @@ static EXPRERR execute_tokens(parsed_expression *expr, UINT64 *result)
 						exprerr = pop_token_rval(expr, &t2, expr->table); if (exprerr != 0) return exprerr;
 						exprerr = pop_token_lval(expr, &t1, expr->table); if (exprerr != 0) return exprerr;
 						push_token(expr, &t2);
-						set_lval_value(&t1, expr->table, t2.value.i);
+						set_lval_value(expr, &t1, expr->table, t2.value.i);
 						break;
 
 					case TVL_ASSIGNMULTIPLY:
 						exprerr = pop_token_rval(expr, &t2, expr->table); if (exprerr != 0) return exprerr;
 						exprerr = pop_token_lval(expr, &t1, expr->table); if (exprerr != 0) return exprerr;
-						tempnum.value.i = get_lval_value(&t1, expr->table);
+						tempnum.value.i = get_lval_value(expr, &t1, expr->table);
 						tempnum.value.i *= t2.value.i;
 						tempnum.offset = (t1.offset < t2.offset) ? t1.offset : t2.offset;
 						exprerr = push_token(expr, &tempnum); if (exprerr != 0) return exprerr;
-						set_lval_value(&t1, expr->table, tempnum.value.i);
+						set_lval_value(expr, &t1, expr->table, tempnum.value.i);
 						break;
 
 					case TVL_ASSIGNDIVIDE:
 						exprerr = pop_token_rval(expr, &t2, expr->table); if (exprerr != 0) return exprerr;
 						exprerr = pop_token_lval(expr, &t1, expr->table); if (exprerr != 0) return exprerr;
-						tempnum.value.i = get_lval_value(&t1, expr->table);
+						tempnum.value.i = get_lval_value(expr, &t1, expr->table);
 						if (t2.value.i == 0) return MAKE_EXPRERR_DIVIDE_BY_ZERO(t2.offset);
 						tempnum.value.i /= t2.value.i;
 						tempnum.offset = (t1.offset < t2.offset) ? t1.offset : t2.offset;
 						exprerr = push_token(expr, &tempnum); if (exprerr != 0) return exprerr;
-						set_lval_value(&t1, expr->table, tempnum.value.i);
+						set_lval_value(expr, &t1, expr->table, tempnum.value.i);
 						break;
 
 					case TVL_ASSIGNMODULO:
 						exprerr = pop_token_rval(expr, &t2, expr->table); if (exprerr != 0) return exprerr;
 						exprerr = pop_token_lval(expr, &t1, expr->table); if (exprerr != 0) return exprerr;
-						tempnum.value.i = get_lval_value(&t1, expr->table);
+						tempnum.value.i = get_lval_value(expr, &t1, expr->table);
 						if (t2.value.i == 0) return MAKE_EXPRERR_DIVIDE_BY_ZERO(t2.offset);
 						tempnum.value.i %= t2.value.i;
 						tempnum.offset = (t1.offset < t2.offset) ? t1.offset : t2.offset;
 						exprerr = push_token(expr, &tempnum); if (exprerr != 0) return exprerr;
-						set_lval_value(&t1, expr->table, tempnum.value.i);
+						set_lval_value(expr, &t1, expr->table, tempnum.value.i);
 						break;
 
 					case TVL_ASSIGNADD:
 						exprerr = pop_token_rval(expr, &t2, expr->table); if (exprerr != 0) return exprerr;
 						exprerr = pop_token_lval(expr, &t1, expr->table); if (exprerr != 0) return exprerr;
-						tempnum.value.i = get_lval_value(&t1, expr->table);
+						tempnum.value.i = get_lval_value(expr, &t1, expr->table);
 						tempnum.value.i += t2.value.i;
 						tempnum.offset = (t1.offset < t2.offset) ? t1.offset : t2.offset;
 						exprerr = push_token(expr, &tempnum); if (exprerr != 0) return exprerr;
-						set_lval_value(&t1, expr->table, tempnum.value.i);
+						set_lval_value(expr, &t1, expr->table, tempnum.value.i);
 						break;
 
 					case TVL_ASSIGNSUBTRACT:
 						exprerr = pop_token_rval(expr, &t2, expr->table); if (exprerr != 0) return exprerr;
 						exprerr = pop_token_lval(expr, &t1, expr->table); if (exprerr != 0) return exprerr;
-						tempnum.value.i = get_lval_value(&t1, expr->table);
+						tempnum.value.i = get_lval_value(expr, &t1, expr->table);
 						tempnum.value.i -= t2.value.i;
 						tempnum.offset = (t1.offset < t2.offset) ? t1.offset : t2.offset;
 						exprerr = push_token(expr, &tempnum); if (exprerr != 0) return exprerr;
-						set_lval_value(&t1, expr->table, tempnum.value.i);
+						set_lval_value(expr, &t1, expr->table, tempnum.value.i);
 						break;
 
 					case TVL_ASSIGNLSHIFT:
 						exprerr = pop_token_rval(expr, &t2, expr->table); if (exprerr != 0) return exprerr;
 						exprerr = pop_token_lval(expr, &t1, expr->table); if (exprerr != 0) return exprerr;
-						tempnum.value.i = get_lval_value(&t1, expr->table);
+						tempnum.value.i = get_lval_value(expr, &t1, expr->table);
 						tempnum.value.i <<= t2.value.i;
 						tempnum.offset = (t1.offset < t2.offset) ? t1.offset : t2.offset;
 						exprerr = push_token(expr, &tempnum); if (exprerr != 0) return exprerr;
-						set_lval_value(&t1, expr->table, tempnum.value.i);
+						set_lval_value(expr, &t1, expr->table, tempnum.value.i);
 						break;
 
 					case TVL_ASSIGNRSHIFT:
 						exprerr = pop_token_rval(expr, &t2, expr->table); if (exprerr != 0) return exprerr;
 						exprerr = pop_token_lval(expr, &t1, expr->table); if (exprerr != 0) return exprerr;
-						tempnum.value.i = get_lval_value(&t1, expr->table);
+						tempnum.value.i = get_lval_value(expr, &t1, expr->table);
 						tempnum.value.i >>= t2.value.i;
 						tempnum.offset = (t1.offset < t2.offset) ? t1.offset : t2.offset;
 						exprerr = push_token(expr, &tempnum); if (exprerr != 0) return exprerr;
-						set_lval_value(&t1, expr->table, tempnum.value.i);
+						set_lval_value(expr, &t1, expr->table, tempnum.value.i);
 						break;
 
 					case TVL_ASSIGNBAND:
 						exprerr = pop_token_rval(expr, &t2, expr->table); if (exprerr != 0) return exprerr;
 						exprerr = pop_token_lval(expr, &t1, expr->table); if (exprerr != 0) return exprerr;
-						tempnum.value.i = get_lval_value(&t1, expr->table);
+						tempnum.value.i = get_lval_value(expr, &t1, expr->table);
 						tempnum.value.i &= t2.value.i;
 						tempnum.offset = (t1.offset < t2.offset) ? t1.offset : t2.offset;
 						exprerr = push_token(expr, &tempnum); if (exprerr != 0) return exprerr;
-						set_lval_value(&t1, expr->table, tempnum.value.i);
+						set_lval_value(expr, &t1, expr->table, tempnum.value.i);
 						break;
 
 					case TVL_ASSIGNBXOR:
 						exprerr = pop_token_rval(expr, &t2, expr->table); if (exprerr != 0) return exprerr;
 						exprerr = pop_token_lval(expr, &t1, expr->table); if (exprerr != 0) return exprerr;
-						tempnum.value.i = get_lval_value(&t1, expr->table);
+						tempnum.value.i = get_lval_value(expr, &t1, expr->table);
 						tempnum.value.i ^= t2.value.i;
 						tempnum.offset = (t1.offset < t2.offset) ? t1.offset : t2.offset;
 						exprerr = push_token(expr, &tempnum); if (exprerr != 0) return exprerr;
-						set_lval_value(&t1, expr->table, tempnum.value.i);
+						set_lval_value(expr, &t1, expr->table, tempnum.value.i);
 						break;
 
 					case TVL_ASSIGNBOR:
 						exprerr = pop_token_rval(expr, &t2, expr->table); if (exprerr != 0) return exprerr;
 						exprerr = pop_token_lval(expr, &t1, expr->table); if (exprerr != 0) return exprerr;
-						tempnum.value.i = get_lval_value(&t1, expr->table);
+						tempnum.value.i = get_lval_value(expr, &t1, expr->table);
 						tempnum.value.i |= t2.value.i;
 						tempnum.offset = (t1.offset < t2.offset) ? t1.offset : t2.offset;
 						exprerr = push_token(expr, &tempnum); if (exprerr != 0) return exprerr;
-						set_lval_value(&t1, expr->table, tempnum.value.i);
+						set_lval_value(expr, &t1, expr->table, tempnum.value.i);
 						break;
 
 					case TVL_COMMA:
@@ -1589,7 +1632,7 @@ static void free_expression_strings(parsed_expression *expr)
     expression using the passed symbol table
 -------------------------------------------------*/
 
-EXPRERR expression_evaluate(const char *expression, const symbol_table *table, UINT64 *result)
+EXPRERR expression_evaluate(const char *expression, const symbol_table *table, const express_callbacks *callbacks, UINT64 *result)
 {
 	parsed_expression temp_expression;
 	EXPRERR exprerr;
@@ -1610,6 +1653,10 @@ EXPRERR expression_evaluate(const char *expression, const symbol_table *table, U
 	/* debugging */
 	print_tokens(stdout, &temp_expression);
 
+	/* copy the callbacks */
+	if (callbacks != NULL)
+		temp_expression.callbacks = *callbacks;
+
 	/* execute the expression to get the result */
 	exprerr = execute_tokens(&temp_expression, result);
 
@@ -1624,11 +1671,11 @@ cleanup:
     return an allocated token array
 -------------------------------------------------*/
 
-EXPRERR expression_parse(const char *expression, const symbol_table *table, parsed_expression **result)
+EXPRERR expression_parse(const char *expression, const symbol_table *table, const express_callbacks *callbacks, parsed_expression **result)
 {
 	parsed_expression temp_expression;
 	EXPRERR exprerr;
-
+	
 	/* first parse the tokens into the token array in order */
 	exprerr = parse_string_into_tokens(expression, &temp_expression, table);
 	if (exprerr != EXPRERR_NONE)
@@ -1646,6 +1693,10 @@ EXPRERR expression_parse(const char *expression, const symbol_table *table, pars
 		exprerr = MAKE_EXPRERR_OUT_OF_MEMORY(0);
 		goto cleanup;
 	}
+
+	/* copy the callbacks */
+	if (callbacks != NULL)
+		temp_expression.callbacks = *callbacks;
 
 	/* copy the final expression and return */
 	**result = temp_expression;
@@ -1853,7 +1904,7 @@ int	symtable_add_register(symbol_table *table, const char *name, UINT32 ref, UIN
     function symbol to a symbol table
 -------------------------------------------------*/
 
-int symtable_add_function(symbol_table *table, const char *name, UINT32 ref, UINT16 minparams, UINT16 maxparams, UINT64 (*execute)(UINT32, UINT32, UINT64 *))
+int symtable_add_function(symbol_table *table, const char *name, UINT32 ref, UINT16 minparams, UINT16 maxparams, function_execute_func execute)
 {
 	symbol_entry symbol;
 

@@ -447,33 +447,23 @@ static void display_rom_load_results(rom_load_data *romdata)
     byte swapping and inverting data as necessary
 -------------------------------------------------*/
 
-static void region_post_process(rom_load_data *romdata, const rom_entry *regiondata)
+static void region_post_process(running_machine *machine, rom_load_data *romdata, int regnum)
 {
-	int type = ROMREGION_GETTYPE(regiondata);
-	int datawidth = ROMREGION_GETWIDTH(regiondata) / 8;
-	int littleendian = ROMREGION_ISLITTLEENDIAN(regiondata);
+	UINT32 regionlength = memory_region_length(machine, regnum);
+	UINT32 regionflags = memory_region_flags(machine, regnum);
+	UINT8 *regionbase = memory_region(machine, regnum);
+	int littleendian = ((regionflags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
+	int datawidth = 1 << (regionflags & ROMREGION_WIDTHMASK);
 	UINT8 *base;
 	int i, j;
 
 	debugload("+ datawidth=%d little=%d\n", datawidth, littleendian);
 
-	/* if this is a CPU region, override with the CPU width and endianness */
-	if (type >= REGION_CPU1 && type < REGION_CPU1 + MAX_CPU)
-	{
-		cpu_type cputype = Machine->config->cpu[type - REGION_CPU1].type;
-		if (cputype != CPU_DUMMY)
-		{
-			datawidth = cputype_databus_width(cputype, ADDRESS_SPACE_PROGRAM) / 8;
-			littleendian = (cputype_endianness(cputype) == CPU_IS_LE);
-			debugload("+ CPU region #%d: datawidth=%d little=%d\n", type - REGION_CPU1, datawidth, littleendian);
-		}
-	}
-
 	/* if the region is inverted, do that now */
-	if (ROMREGION_ISINVERTED(regiondata))
+	if (regionflags & ROMREGION_INVERTMASK)
 	{
 		debugload("+ Inverting region\n");
-		for (i = 0, base = romdata->regionbase; i < romdata->regionlength; i++)
+		for (i = 0, base = regionbase; i < regionlength; i++)
 			*base++ ^= 0xff;
 	}
 
@@ -485,7 +475,7 @@ static void region_post_process(rom_load_data *romdata, const rom_entry *regiond
 #endif
 	{
 		debugload("+ Byte swapping region\n");
-		for (i = 0, base = romdata->regionbase; i < romdata->regionlength; i += datawidth)
+		for (i = 0, base = regionbase; i < regionlength; i += datawidth)
 		{
 			UINT8 temp[8];
 			memcpy(temp, base, datawidth);
@@ -1053,6 +1043,39 @@ next:
 
 
 /*-------------------------------------------------
+    normalize_flags_for_cpu - modify the region
+    flags for the given CPU index
+-------------------------------------------------*/
+
+static UINT32 normalize_flags_for_cpu(running_machine *machine, UINT32 startflags, int cpunum)
+{
+	int cputype = machine->config->cpu[cpunum].type;
+	int buswidth;
+	
+	/* set the endianness */
+	startflags &= ~ROMREGION_ENDIANMASK;
+	if (cputype_endianness(cputype) == CPU_IS_LE)
+		startflags |= ROMREGION_LE;
+	else
+		startflags |= ROMREGION_BE;
+
+	/* set the width */
+	startflags &= ~ROMREGION_WIDTHMASK;
+	buswidth = cputype_databus_width(cputype, ADDRESS_SPACE_PROGRAM);
+	if (buswidth <= 8)
+		startflags |= ROMREGION_8BIT;
+	else if (buswidth <= 16)
+		startflags |= ROMREGION_16BIT;
+	else if (buswidth <= 32)
+		startflags |= ROMREGION_32BIT;
+	else
+		startflags |= ROMREGION_64BIT;
+	
+	return startflags;
+}
+
+
+/*-------------------------------------------------
     rom_init - new, more flexible ROM
     loading system
 -------------------------------------------------*/
@@ -1089,16 +1112,22 @@ void rom_init(running_machine *machine, const rom_entry *romp)
 	/* loop until we hit the end */
 	for (region = romp, regnum = 0; region; region = rom_next_region(region), regnum++)
 	{
+		UINT32 regionlength = ROMREGION_GETLENGTH(region);
+		UINT32 regionflags = ROMREGION_GETFLAGS(region);
 		int regiontype = ROMREGION_GETTYPE(region);
 
-		debugload("Processing region %02X (length=%X)\n", regiontype, ROMREGION_GETLENGTH(region));
+		debugload("Processing region %02X (length=%X)\n", regiontype, regionlength);
 
 		/* the first entry must be a region */
 		assert(ROMENTRY_ISREGION(region));
 
+		/* if this is a CPU region, override with the CPU width and endianness */
+		if (regiontype >= REGION_CPU1 && regiontype < REGION_CPU1 + MAX_CPU)
+			regionflags = normalize_flags_for_cpu(machine, regionflags, regiontype - REGION_CPU1);
+
 		/* remember the base and length */
-		romdata.regionbase = new_memory_region(machine, regiontype, ROMREGION_GETLENGTH(region), ROMREGION_GETFLAGS(region));
-		romdata.regionlength = ROMREGION_GETLENGTH(region);
+		romdata.regionbase = new_memory_region(machine, regiontype, regionlength, regionflags);
+		romdata.regionlength = regionlength;
 		debugload("Allocated %X bytes @ %p\n", romdata.regionlength, romdata.regionbase);
 
 		/* clear the region if it's requested */
@@ -1131,9 +1160,7 @@ void rom_init(running_machine *machine, const rom_entry *romp)
 		if (regionlist[regnum])
 		{
 			debugload("Post-processing region %02X\n", regnum);
-			romdata.regionlength = memory_region_length(machine, regnum);
-			romdata.regionbase = memory_region(machine, regnum);
-			region_post_process(&romdata, regionlist[regnum]);
+			region_post_process(machine, &romdata, regnum);
 		}
 
 	/* display the results and exit */

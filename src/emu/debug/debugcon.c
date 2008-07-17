@@ -329,7 +329,7 @@ static CMDERR internal_parse_command(const char *original_command, int execute)
 		if (isexpr && paramcount == 1)
 		{
 			UINT64 expresult;
-			EXPRERR exprerr = expression_evaluate(command_start, debug_get_cpu_info(cpu_getactivecpu())->symtable, &expresult);
+			EXPRERR exprerr = expression_evaluate(command_start, debug_get_cpu_info(cpu_getactivecpu())->symtable, &debug_expression_callbacks, &expresult);
 			if (exprerr != EXPRERR_NONE)
 				return MAKE_CMDERR_EXPRESSION_ERROR(EXPRERR_ERROR_OFFSET(exprerr));
 		}

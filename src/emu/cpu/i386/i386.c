@@ -441,7 +441,7 @@ static void I386OP(decode_two_byte)(void)
 
 /*************************************************************************/
 
-static UINT64 i386_debug_segbase(UINT32 ref, UINT32 params, UINT64 *param)
+static UINT64 i386_debug_segbase(UINT32 ref, UINT32 params, const UINT64 *param)
 {
 	UINT32 result;
 	I386_SREG seg;
@@ -460,7 +460,7 @@ static UINT64 i386_debug_segbase(UINT32 ref, UINT32 params, UINT64 *param)
 	return result;
 }
 
-static UINT64 i386_debug_seglimit(UINT32 ref, UINT32 params, UINT64 *param)
+static UINT64 i386_debug_seglimit(UINT32 ref, UINT32 params, const UINT64 *param)
 {
 	UINT32 result = 0;
 	I386_SREG seg;

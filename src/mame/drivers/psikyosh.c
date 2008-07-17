@@ -346,11 +346,11 @@ static NVRAM_HANDLER(93C56)
 		}
 		else	// these games want the eeprom all zeros by default
 		{
-			int length;
+			UINT32 length, size;
 			UINT8 *dat;
 
-			dat = eeprom_get_data_pointer(&length);
-			memset(dat, 0, length);
+			dat = eeprom_get_data_pointer(&length, &size);
+			memset(dat, 0, length * size);
 
  			if (use_factory_eeprom!=eeprom_0) /* Set the EEPROM to Factory Defaults for games needing them*/
  			{

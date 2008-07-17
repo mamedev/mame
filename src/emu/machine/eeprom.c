@@ -365,10 +365,12 @@ void eeprom_set_data(const UINT8 *data, int length)
 	memcpy(eeprom_data, data, length);
 }
 
-UINT8 * eeprom_get_data_pointer(int * length)
+void *eeprom_get_data_pointer(UINT32 *length, UINT32 *size)
 {
-	if(length)
-		*length = MEMORY_SIZE;
+	if (length != NULL && intf != NULL)
+		*length = 1 << intf->address_bits;
+	if (size != NULL && intf != NULL)
+		*size = intf->data_bits / 8;
 
 	return eeprom_data;
 }

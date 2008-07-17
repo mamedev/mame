@@ -844,7 +844,7 @@ UINT8 *new_memory_region(running_machine *machine, int type, UINT32 length, UINT
 			break;
 	if (num < 0)
 		fatalerror("Out of memory regions!");
-
+	
     /* allocate the region */
 	mame->mem_region[num].length = length;
 	mame->mem_region[num].type = type;

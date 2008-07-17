@@ -27,7 +27,7 @@
 ***************************************************************************/
 
 #define FORCE_C_BACKEND					(0)	// use the C backend even when a native one is available
-#define LOG_UML						(0)	// log UML assembly
+#define LOG_UML						(1)	// log UML assembly
 #define LOG_NATIVE					(0)	// log native assembly
 
 #define SET_EA						(0)	// makes slower but "shows work" in the EA fake register like the interpreter

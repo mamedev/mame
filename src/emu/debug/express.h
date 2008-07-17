@@ -45,6 +45,13 @@
 #define EXPSPACE_PROGRAM					(0)
 #define EXPSPACE_DATA						(1)
 #define EXPSPACE_IO							(2)
+#define EXPSPACE_OPCODE						(3)
+#define EXPSPACE_RAMWRITE					(4)
+#define EXPSPACE_EEPROM						(5)
+#define EXPSPACE_CPU						(6)
+#define EXPSPACE_USER						(7)
+#define EXPSPACE_GFX						(8)
+#define EXPSPACE_SOUND						(9)
 
 
 
@@ -79,6 +86,27 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+/* callback functions for getting/setting a symbol value */
+typedef UINT64 (*symbol_getter_func)(UINT32 ref);
+typedef void (*symbol_setter_func)(UINT32 ref, UINT64 value);
+
+/* callback function for execution a function */
+typedef UINT64 (*function_execute_func)(UINT32 ref, UINT32 numparams, const UINT64 *paramlist);
+
+/* callback function for memory reads/writes */
+typedef UINT64 (*express_read_func)(int space, int index, UINT32 offset, int size);
+typedef void (*express_write_func)(int space, int index, UINT32 offset, int size, UINT64 value);
+
+
+/* callback parameter for executing expressions */
+typedef struct _express_callbacks express_callbacks;
+struct _express_callbacks
+{
+	express_read_func	read;					/* read callback */
+	express_write_func	write;					/* write callback */
+};
+
+
 /* symbol_entry describes a symbol in a symbol table */
 typedef struct _symbol_entry symbol_entry;
 struct _symbol_entry
@@ -90,23 +118,23 @@ struct _symbol_entry
 		/* register info */
 		struct
 		{
-			UINT64			(*getter)(UINT32);			/* value getter */
-			void			(*setter)(UINT32, UINT64);	/* value setter */
+			symbol_getter_func 		getter;		/* value getter */
+			symbol_setter_func 		setter;		/* value setter */
 		} reg;
 
 		/* function info */
 		struct
 		{
-			UINT16			minparams;					/* minimum expected parameters */
-			UINT16			maxparams;					/* maximum expected parameters */
-			UINT64			(*execute)(UINT32, UINT32, UINT64 *);/* execute */
+			UINT16					minparams;	/* minimum expected parameters */
+			UINT16					maxparams;	/* maximum expected parameters */
+			function_execute_func 	execute;	/* execute callback */
 		} func;
 
 		/* generic info */
 		struct generic_info
 		{
-			void *			ptr;						/* generic pointer */
-			UINT64			value;						/* generic value */
+			void *					ptr;		/* generic pointer */
+			UINT64					value;		/* generic value */
 		} gen;
 	} info;
 };
@@ -126,22 +154,12 @@ typedef UINT32 EXPRERR;
 
 
 /***************************************************************************
-    EXTERNAL DEPENDENCIES
-***************************************************************************/
-
-/* These must be provided by the caller */
-UINT64 	external_read_memory(int space, UINT32 offset, int size);
-void	external_write_memory(int space, UINT32 offset, int size, UINT64 value);
-
-
-
-/***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
 /* expression evaluation */
-EXPRERR 					expression_evaluate(const char *expression, const symbol_table *table, UINT64 *result);
-EXPRERR 					expression_parse(const char *expression, const symbol_table *table, parsed_expression **result);
+EXPRERR 					expression_evaluate(const char *expression, const symbol_table *table, const express_callbacks *callbacks, UINT64 *result);
+EXPRERR 					expression_parse(const char *expression, const symbol_table *table, const express_callbacks *callbacks, parsed_expression **result);
 EXPRERR 					expression_execute(parsed_expression *expr, UINT64 *result);
 void 						expression_free(parsed_expression *expr);
 const char *				expression_original_string(parsed_expression *expr);
@@ -150,8 +168,8 @@ const char *				exprerr_to_string(EXPRERR error);
 /* symbol table manipulation */
 symbol_table *				symtable_alloc(symbol_table *parent);
 int 						symtable_add(symbol_table *table, const char *name, const symbol_entry *entry);
-int 						symtable_add_register(symbol_table *table, const char *name, UINT32 ref, UINT64 (*getter)(UINT32), void (*setter)(UINT32, UINT64));
-int 						symtable_add_function(symbol_table *table, const char *name, UINT32 ref, UINT16 minparams, UINT16 maxparams, UINT64 (*execute)(UINT32, UINT32, UINT64 *));
+int 						symtable_add_register(symbol_table *table, const char *name, UINT32 ref, symbol_getter_func getter, symbol_setter_func setter);
+int 						symtable_add_function(symbol_table *table, const char *name, UINT32 ref, UINT16 minparams, UINT16 maxparams, function_execute_func execute);
 int							symtable_add_value(symbol_table *table, const char *name, UINT64 value);
 const symbol_entry *		symtable_find(const symbol_table *table, const char *name);
 const char *				symtable_find_indexed(const symbol_table *table, int index, const symbol_entry **entry);

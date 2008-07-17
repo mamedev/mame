@@ -487,7 +487,7 @@ static WRITE32_HANDLER( tattass_control_w )
 	static int pendingCommand=0; /* 1 = read, 2 = write */
 	static int readBitCount=0;
 	static int byteAddr=0;
-	UINT8 *eeprom=eeprom_get_data_pointer(0);
+	UINT8 *eeprom=eeprom_get_data_pointer(NULL,NULL);
 
 	/* Eprom in low byte */
 	if (mem_mask==0x000000ff) { /* Byte write to low byte only (different from word writing including low byte) */
@@ -1846,10 +1846,9 @@ static NVRAM_HANDLER(tattass)
 		eeprom_save(file);
 	else
 	{
-		int len;
 		eeprom_init(&eeprom_interface_tattass);
 		if (file) eeprom_load(file);
-		else memcpy(eeprom_get_data_pointer(&len),tattass_default_eprom,0x160);
+		else memcpy(eeprom_get_data_pointer(NULL,NULL),tattass_default_eprom,0x160);
 	}
 }
 

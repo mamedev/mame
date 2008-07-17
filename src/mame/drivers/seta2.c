@@ -501,12 +501,11 @@ static NVRAM_HANDLER(93C46_gundamex)
 		}
 		else
 		{
-			int length;
-			UINT8 *dat;
+			UINT32 length, size;
+			UINT16 *dat;
 
-			dat = eeprom_get_data_pointer(&length);
-			dat[0]=0x70;
-			dat[1]=0x08;
+			dat = eeprom_get_data_pointer(&length, &size);
+			dat[0] = 0x7008;
 		}
 	}
 }

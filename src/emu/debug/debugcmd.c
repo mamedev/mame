@@ -49,9 +49,9 @@ static struct
 
 static void debug_command_exit(running_machine *machine);
 
-static UINT64 execute_min(UINT32 ref, UINT32 params, UINT64 *param);
-static UINT64 execute_max(UINT32 ref, UINT32 params, UINT64 *param);
-static UINT64 execute_if(UINT32 ref, UINT32 params, UINT64 *param);
+static UINT64 execute_min(UINT32 ref, UINT32 params, const UINT64 *param);
+static UINT64 execute_max(UINT32 ref, UINT32 params, const UINT64 *param);
+static UINT64 execute_if(UINT32 ref, UINT32 params, const UINT64 *param);
 
 static UINT64 global_get(UINT32 ref);
 static void global_set(UINT32 ref, UINT64 value);
@@ -279,7 +279,7 @@ static void debug_command_exit(running_machine *machine)
     execute_min - return the minimum of two values
 -------------------------------------------------*/
 
-static UINT64 execute_min(UINT32 ref, UINT32 params, UINT64 *param)
+static UINT64 execute_min(UINT32 ref, UINT32 params, const UINT64 *param)
 {
 	return (param[0] < param[1]) ? param[0] : param[1];
 }
@@ -289,7 +289,7 @@ static UINT64 execute_min(UINT32 ref, UINT32 params, UINT64 *param)
     execute_max - return the maximum of two values
 -------------------------------------------------*/
 
-static UINT64 execute_max(UINT32 ref, UINT32 params, UINT64 *param)
+static UINT64 execute_max(UINT32 ref, UINT32 params, const UINT64 *param)
 {
 	return (param[0] > param[1]) ? param[0] : param[1];
 }
@@ -299,7 +299,7 @@ static UINT64 execute_max(UINT32 ref, UINT32 params, UINT64 *param)
     execute_if - if (a) return b; else return c;
 -------------------------------------------------*/
 
-static UINT64 execute_if(UINT32 ref, UINT32 params, UINT64 *param)
+static UINT64 execute_if(UINT32 ref, UINT32 params, const UINT64 *param)
 {
 	return param[0] ? param[1] : param[2];
 }
@@ -361,7 +361,7 @@ static void global_set(UINT32 ref, UINT64 value)
 
 int debug_command_parameter_number(const char *param, UINT64 *result)
 {
-	EXPRERR err = expression_evaluate(param, debug_get_cpu_info(cpu_getactivecpu())->symtable, result);
+	EXPRERR err = expression_evaluate(param, debug_get_cpu_info(cpu_getactivecpu())->symtable, &debug_expression_callbacks, result);
 	if (err == EXPRERR_NONE)
 		return 1;
 	debug_console_printf("Error in expression: %s\n", param);
@@ -378,7 +378,7 @@ int debug_command_parameter_number(const char *param, UINT64 *result)
 
 static int debug_command_parameter_expression(const char *param, parsed_expression **result)
 {
-	EXPRERR err = expression_parse(param, debug_get_cpu_info(cpu_getactivecpu())->symtable, result);
+	EXPRERR err = expression_parse(param, debug_get_cpu_info(cpu_getactivecpu())->symtable, &debug_expression_callbacks, result);
 	if (err == EXPRERR_NONE)
 		return 1;
 	debug_console_printf("Error in expression: %s\n", param);
