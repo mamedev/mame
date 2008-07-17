@@ -93,26 +93,22 @@ READ16_HANDLER( pow_spriteram_r )
 
 WRITE16_HANDLER( pow_spriteram_w )
 {
-	/*
-    This kludge fixes bug 00871: pow: At 3/4 of the 1st level, there is a large pillar, which pops up too late.
-
-    The problem: the sprite list is built by the IRQ handler, however there is
-    code in the main loop that clears some portions of sprite RAM under certain
-    conditions. Usually, this isn't a problem, but in that specific point the
-    sprites added by the IRQ handler are erased before the screen is drawn.
-
-    We could force a partial update every time the sprite RAM is modified, however
-    that would hardly be more accurate since the sprite hardware most likely draws
-    to a frame buffer one frame behind, so the exact timing is unknown.
-    Instead, we just force a partial update before changing the RAM location that
-    causes the problem.
-    */
-	if (offset == 0x10c/2)
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+	UINT16 newword = spriteram16[offset];
 
 	if (!(offset & 1))
 		data |= 0xff00;
-	COMBINE_DATA(&spriteram16[offset]);
+
+	COMBINE_DATA(&newword);
+
+	if (spriteram16[offset] != newword)
+	{
+		int vpos = video_screen_get_vpos(machine->primary_screen);
+
+		if (vpos > 0)
+			video_screen_update_partial(machine->primary_screen, vpos - 1);
+
+		spriteram16[offset] = newword;
+	}
 }
 
 READ16_HANDLER( pow_fg_videoram_r )
@@ -212,46 +208,55 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			my = 240 - my;
 		}
 
-		// every sprite is a column 32 tiles tall
+		// every sprite is a column 32 tiles (512 pixels) tall
 		for (i = 0; i < 0x20; ++i)
 		{
-			int color = *(tiledata++) & 0x7f;
-			int tile = *(tiledata++);
-			int fx,fy;
+			my &= 0x1ff;
 
-			if (is_pow)
+			if (my <= cliprect->max_y && my + 15 >= cliprect->min_y)
 			{
-				fx = tile & 0x4000;
-				fy = tile & 0x8000;
-				tile &= 0x3fff;
-			}
-			else
-			{
-				if (sprite_flip_axis)
+				int color = *(tiledata++) & 0x7f;
+				int tile = *(tiledata++);
+				int fx,fy;
+
+				if (is_pow)
 				{
-					fx = 0;
+					fx = tile & 0x4000;
 					fy = tile & 0x8000;
+					tile &= 0x3fff;
 				}
 				else
 				{
-					fx = tile & 0x8000;
-					fy = 0;
+					if (sprite_flip_axis)
+					{
+						fx = 0;
+						fy = tile & 0x8000;
+					}
+					else
+					{
+						fx = tile & 0x8000;
+						fy = 0;
+					}
+					tile &= 0x7fff;
 				}
-				tile &= 0x7fff;
-			}
 
-			if (flipscreen)
+				if (flipscreen)
+				{
+					fx = !fx;
+					fy = !fy;
+				}
+
+				drawgfx(bitmap,machine->gfx[1],
+						tile,
+						color,
+						fx, fy,
+						mx, my,
+						cliprect, TRANSPARENCY_PEN, 0);
+			}
+			else
 			{
-				fx = !fx;
-				fy = !fy;
+				tiledata += 2;
 			}
-
-			drawgfx(bitmap,machine->gfx[1],
-					tile,
-					color,
-					fx, fy,
-					mx, my & 0x1ff,
-					cliprect, TRANSPARENCY_PEN, 0);
 
 			if (flipscreen)
 				my -= 16;

@@ -13,23 +13,35 @@
 
     For some strange reason version 2 of Street Smart runs on Pow hardware!
 
-    Emulation by Bryan McPhail, mish@tendril.co.uk
+    Driver by Bryan McPhail, Acho A. Tang, Nicola Salmoria
 
-
-Change Log:
-
-FEB-2003 (AT)
-
-- bug fixes:
-
-    pow37b5yel: incorrect sprite priority
-  powj36rc2gre: scrambled Japanese text in cut scenes
 
 Notes:
+------
+- All evidence suggests that the sprite hardware doesn't have a frame buffer
+  but just a raster line buffer, like NeoGeo (unsurprisingly). The maths
+  confirm this:
+  384 pixels per raster line at 4 clocks per pixel = 1536 clocks per line
+  96 sprites * 16 pixels per sprite  = 1536 clocks to draw the sprites
 
-  Sprite flickerings and pop-up's not fixed. They look more like
-  sloppy programming than emulation issues. Also suggest redumping
-  sound ROM "dg7", it might be the cause of pow060gre.
+  While this board doesn't have a raster interrupt capability, the way how
+  sprites are drawn needs to be kept in consideration because at least in one
+  case the program modifies the sprite list in the middle of the frame:
+  bug 00871: pow: At 3/4 of the 1st level, there is a large pillar, which pops up too late.
+  The problem in this case is that the sprite list is built by the IRQ handler,
+  however there is code in the main loop that clears some portions of sprite
+  RAM under certain conditions. Usually, this isn't a problem, but in that
+  specific point the sprites added by the IRQ handler are erased during the
+  frame.
+  To avoid glitches in that case, we force a partial screen update every time
+  sprite RAM changes. It's possible that there are other unknown small glitches
+  fixed by this (earlier notes in this driver talked about "sprite flickerings
+  and pop-ups" but I don't know where they happened).
+
+TODO:
+-----
+- Number of raster lines unknown. Currently set to 264 which gives a 59.19Hz
+  refresh rate.
 
 ***************************************************************************/
 
