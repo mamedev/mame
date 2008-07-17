@@ -476,6 +476,22 @@ void CLIB_DECL debug_console_printf(const char *format, ...)
 
 
 /*-------------------------------------------------
+    debug_console_vprintf - printfs the given
+    arguments using the format to the debug
+    console
+-------------------------------------------------*/
+
+void CLIB_DECL debug_console_vprintf(const char *format, va_list args)
+{
+	vsprintf(giant_string_buffer, format, args);
+	text_buffer_print(console_textbuf, giant_string_buffer);
+
+	/* force an update of any console views */
+	debug_view_update_type(DVT_CONSOLE);
+}
+
+
+/*-------------------------------------------------
     debug_console_printf_wrap - printfs the given
     arguments using the format to the debug
     console

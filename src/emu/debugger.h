@@ -83,7 +83,7 @@ INLINE void debugger_stop_cpu_hook(running_machine *machine, int cpunum)
 INLINE void debugger_break(running_machine *machine)
 {
 	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debug_cpu_halt_on_next_instruction(machine);
+		debug_cpu_halt_on_next_instruction(machine, "Internal breakpoint");
 }
 
 

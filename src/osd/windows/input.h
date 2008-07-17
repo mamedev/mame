@@ -23,5 +23,7 @@ BOOL wininput_handle_raw(HANDLE device);
 
 int wininput_should_hide_mouse(void);
 
+int wininput_vkey_for_mame_code(input_code code);
+
 
 #endif /* __INPUT_H */

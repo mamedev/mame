@@ -186,7 +186,6 @@ static debugwin_info *main_console;
 
 static memorycombo_item *memorycombo;
 
-static UINT8 debugger_active_countdown;
 static UINT8 waiting_for_debugger;
 
 static HFONT debug_font;
@@ -198,9 +197,6 @@ static UINT32 hscroll_height;
 static UINT32 vscroll_width;
 
 static DWORD last_debugger_update;
-
-static UINT8 temporarily_fake_that_we_are_not_visible;
-
 
 
 //============================================================
@@ -255,24 +251,32 @@ static void smart_show_all(BOOL show);
 //  osd_wait_for_debugger
 //============================================================
 
-void osd_wait_for_debugger(void)
+void osd_wait_for_debugger(running_machine *machine, int firststop)
 {
 	MSG message;
 
 	// create a console window
 	if (main_console == NULL)
-		console_create_window(Machine);
+		console_create_window(machine);
 
 	// update the views in the console to reflect the current CPU
 	if (main_console != NULL)
-		console_set_cpunum(Machine, cpu_getactivecpu());
+		console_set_cpunum(machine, cpu_getactivecpu());
+
+	// when we are first stopped, adjust focus to us
+	if (firststop && main_console != NULL)
+	{
+		SetForegroundWindow(main_console->wnd);
+		if (winwindow_has_focus())
+			SetFocus(main_console->editwnd);
+	}
 
 	// make sure the debug windows are visible
 	waiting_for_debugger = TRUE;
 	smart_show_all(TRUE);
 
 	// run input polling to ensure that our status is in sync
-	wininput_poll(Machine);
+	wininput_poll(machine);
 
 	// get and process messages
 	GetMessage(&message, NULL, 0, 0);
@@ -291,13 +295,71 @@ void osd_wait_for_debugger(void)
 
 		// process everything else
 		default:
-			winwindow_dispatch_message(Machine, &message);
+			winwindow_dispatch_message(machine, &message);
 			break;
 	}
 
 	// mark the debugger as active
-	debugger_active_countdown = 2;
 	waiting_for_debugger = FALSE;
+}
+
+
+
+//============================================================
+//  debugwin_seq_pressed
+//============================================================
+
+int debugwin_seq_pressed(void)
+{
+	const input_seq *seq = input_type_seq(Machine, IPT_UI_DEBUG_BREAK, 0, SEQ_TYPE_STANDARD);
+	int result = FALSE;
+	int invert = FALSE;
+	int first = TRUE;
+	int codenum;
+
+	// iterate over all of the codes
+	for (codenum = 0; codenum < ARRAY_LENGTH(seq->code); codenum++)
+	{
+		input_code code = seq->code[codenum];
+
+		// handle NOT
+		if (code == SEQCODE_NOT)
+			invert = TRUE;
+
+		// handle OR and END
+		else if (code == SEQCODE_OR || code == SEQCODE_END)
+		{
+			// if we have a positive result from the previous set, we're done
+			if (result || code == SEQCODE_END)
+				break;
+
+			// otherwise, reset our state
+			result = FALSE;
+			invert = FALSE;
+			first = TRUE;
+		}
+
+		// handle everything else as a series of ANDs
+		else
+		{
+			int vkey = wininput_vkey_for_mame_code(code);
+			int pressed = (vkey != 0 && (GetAsyncKeyState(vkey) & 0x8000) != 0);
+			
+			// if this is the first in the sequence, result is set equal
+			if (first)
+				result = pressed ^ invert;
+
+			// further values are ANDed
+			else if (result)
+				result &= pressed ^ invert;
+
+			// no longer first, and clear the invert flag
+			first = invert = FALSE;
+		}
+	}
+
+	// return the result if we queried at least one switch
+	return result;
 }
 
 
@@ -420,20 +482,18 @@ void debugwin_show(int type)
 //  debugwin_update_during_game
 //============================================================
 
-void debugwin_update_during_game(void)
+void debugwin_update_during_game(running_machine *machine)
 {
 	// if we're running live, do some checks
-	if (!debug_cpu_is_stopped(Machine) && mame_get_phase(Machine) == MAME_PHASE_RUNNING)
+	if (!winwindow_has_focus() && !debug_cpu_is_stopped(machine) && mame_get_phase(machine) == MAME_PHASE_RUNNING)
 	{
 		// see if the interrupt key is pressed and break if it is
-		temporarily_fake_that_we_are_not_visible = TRUE;
-		if (ui_input_pressed(Machine, IPT_UI_DEBUG_BREAK))
+		if (debugwin_seq_pressed())
 		{
-			debugwin_info *info;
 			HWND focuswnd = GetFocus();
+			debugwin_info *info;
 
-			debugger_break(Machine);
-			debug_console_printf("User-initiated break\n");
+			debug_cpu_halt_on_next_instruction(machine, "User-initiated break\n");
 
 			// if we were focused on some window's edit box, reset it to default
 			for (info = window_list; info; info = info->next)
@@ -443,29 +503,7 @@ void debugwin_update_during_game(void)
 					SendMessage(focuswnd, EM_SETSEL, (WPARAM)0, (LPARAM)-1);
 				}
 		}
-		temporarily_fake_that_we_are_not_visible = FALSE;
 	}
-}
-
-
-
-//============================================================
-//  debugwin_is_debugger_visible
-//============================================================
-
-int debugwin_is_debugger_visible(void)
-{
-	debugwin_info *info;
-
-	// a bit of hackiness to allow us to check key sequences even if we are visible
-	if (temporarily_fake_that_we_are_not_visible)
-		return 0;
-
-	// if any one of our windows is visible, return true
-	for (info = window_list; info; info = info->next)
-		if (IsWindowVisible(info->wnd))
-			return 1;
-	return 0;
 }
 
 
@@ -648,10 +686,10 @@ static LRESULT CALLBACK debug_window_proc(HWND wnd, UINT message, WPARAM wparam,
 
 		// char: ignore chars associated with keys we've handled
 		case WM_CHAR:
-			if (info->ignore_char_lparam != (lparam >> 16))
-				return DefWindowProc(wnd, message, wparam, lparam);
-			else
+			if (info->ignore_char_lparam == (lparam >> 16))
 				info->ignore_char_lparam = 0;
+			else if (waiting_for_debugger || !debugwin_seq_pressed())
+				return DefWindowProc(wnd, message, wparam, lparam);
 			break;
 
 		// activate: set the focus
@@ -1403,15 +1441,15 @@ static LRESULT CALLBACK debug_view_proc(HWND wnd, UINT message, WPARAM wparam, L
 		// char: ignore chars associated with keys we've handled
 		case WM_CHAR:
 		{
-			if (info->owner->ignore_char_lparam != (lparam >> 16))
+			if (info->owner->ignore_char_lparam == (lparam >> 16))
+				info->owner->ignore_char_lparam = 0;
+			else if (waiting_for_debugger || !debugwin_seq_pressed())
 			{
 				if (wparam >= 32 && wparam < 127 && debug_view_get_property_UINT32(info->view, DVP_SUPPORTS_CURSOR))
 					debug_view_set_property_UINT32(info->view, DVP_CHARACTER, wparam);
 				else
 					return DefWindowProc(wnd, message, wparam, lparam);
 			}
-			else
-				info->owner->ignore_char_lparam = 0;
 			break;
 		}
 
@@ -1531,10 +1569,10 @@ static LRESULT CALLBACK debug_edit_proc(HWND wnd, UINT message, WPARAM wparam, L
 					break;
 
 				default:
-					if (!(*info->handle_key)(info, wparam, lparam))
-						return CallWindowProc(info->original_editproc, wnd, message, wparam, lparam);
-					else
+					if ((*info->handle_key)(info, wparam, lparam))
 						info->ignore_char_lparam = lparam >> 16;
+					else
+						return CallWindowProc(info->original_editproc, wnd, message, wparam, lparam);
 					break;
 			}
 			break;
@@ -1543,7 +1581,9 @@ static LRESULT CALLBACK debug_edit_proc(HWND wnd, UINT message, WPARAM wparam, L
 		case WM_CHAR:
 
 			// ignore chars associated with keys we've handled
-			if (info->ignore_char_lparam != (lparam >> 16))
+			if (info->ignore_char_lparam == (lparam >> 16))
+				info->ignore_char_lparam = 0;
+			else if (waiting_for_debugger || !debugwin_seq_pressed())
 			{
 				switch (wparam)
 				{
@@ -1593,8 +1633,6 @@ static LRESULT CALLBACK debug_edit_proc(HWND wnd, UINT message, WPARAM wparam, L
 						return CallWindowProc(info->original_editproc, wnd, message, wparam, lparam);
 				}
 			}
-			else
-				info->ignore_char_lparam = 0;
 			break;
 
 		// everything else: defaults
@@ -2888,11 +2926,8 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 
 static int global_handle_key(debugwin_info *info, WPARAM wparam, LPARAM lparam)
 {
-	int ignoreme;
-
 	/* ignore any keys that are received while the debug key is down */
-	ignoreme = ui_input_pressed(Machine, IPT_UI_DEBUG_BREAK);
-	if (ignoreme)
+	if (!waiting_for_debugger && debugwin_seq_pressed())
 		return 1;
 
 	switch (wparam)

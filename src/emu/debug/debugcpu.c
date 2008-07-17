@@ -584,6 +584,8 @@ void debug_cpu_instruction_hook(running_machine *machine, offs_t curpc)
 	/* if we are supposed to halt, do it now */
 	if (global.execution_state == EXECUTION_STATE_STOPPED)
 	{
+		int firststop = TRUE;
+		
 		/* reset any transient state */
 		reset_transient_flags(machine);
 
@@ -597,7 +599,8 @@ void debug_cpu_instruction_hook(running_machine *machine, offs_t curpc)
 		{
 			/* clear the memory modified flag and wait */
 			global.memory_modified = FALSE;
-			osd_wait_for_debugger();
+			osd_wait_for_debugger(machine, firststop);
+			firststop = FALSE;
 
 			/* if something modified memory, update the screen */
 			if (global.memory_modified)
@@ -921,9 +924,14 @@ const debug_cpu_info *debug_get_cpu_info(int cpunum)
     the debugger on the next instruction
 -------------------------------------------------*/
 
-void debug_cpu_halt_on_next_instruction(running_machine *machine)
+void debug_cpu_halt_on_next_instruction(running_machine *machine, const char *fmt, ...)
 {
-	debug_console_printf("Internal breakpoint\n");
+	va_list arg;
+
+	va_start(arg, fmt);
+	debug_console_vprintf(fmt, arg);
+	va_end(arg);
+
 	global.execution_state = EXECUTION_STATE_STOPPED;
 	if (global.livecpu != NULL)
 		compute_debug_flags(machine, global.livecpu);

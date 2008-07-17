@@ -13,6 +13,7 @@
 #define __DEBUGCON_H__
 
 #include "textbuf.h"
+#include <stdarg.h>
 
 
 /***************************************************************************
@@ -87,6 +88,7 @@ const char *		debug_cmderr_to_string(CMDERR error);
 
 /* console management */
 void CLIB_DECL		debug_console_printf(const char *format, ...) ATTR_PRINTF(1,2);
+void CLIB_DECL		debug_console_vprintf(const char *format, va_list args);
 void CLIB_DECL		debug_console_printf_wrap(int wrapcol, const char *format, ...) ATTR_PRINTF(2,3);
 text_buffer *		debug_console_get_textbuf(void);
 

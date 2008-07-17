@@ -56,14 +56,15 @@
 #define INTERNAL_CODE(x)				(INPUT_CODE_INTERNAL | ((x) & 0xfff))
 #define INPUT_CODE_INVALID				STANDARD_CODE(INVALID, 0, INVALID, NONE, INVALID)
 
-/* Maximum number of axis/buttons/hats with ITEM_IDs for use by osd layer*/
-
+/* maximum number of axis/buttons/hats with ITEM_IDs for use by osd layer */
 #define INPUT_MAX_AXIS					(8)
 #define INPUT_MAX_BUTTONS				(16)
 #define INPUT_MAX_HATS					(4)
 #define INPUT_MAX_ADD_SWITCH			(16)
 #define INPUT_MAX_ADD_ABSOLUTE			(16)
 #define INPUT_MAX_ADD_RELATIVE			(16)
+
+
 
 /***************************************************************************
     CONSTANTS

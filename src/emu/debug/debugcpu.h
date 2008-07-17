@@ -247,7 +247,7 @@ void debug_cpu_memory_write_hook(running_machine *machine, int cpunum, int space
 
 int debug_cpu_within_instruction_hook(running_machine *machine);
 const debug_cpu_info *debug_get_cpu_info(int cpunum);
-void debug_cpu_halt_on_next_instruction(running_machine *machine);
+void debug_cpu_halt_on_next_instruction(running_machine *machine, const char *fmt, ...) ATTR_PRINTF(2,3);
 int	debug_cpu_is_stopped(running_machine *machine);
 void debug_cpu_trace_printf(int cpunum, const char *fmt, ...) ATTR_PRINTF(2,3);
 void debug_cpu_source_script(const char *file);

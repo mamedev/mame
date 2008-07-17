@@ -26,7 +26,6 @@
 void debugwin_init_windows(void);
 void debugwin_destroy_windows(void);
 void debugwin_show(int type);
-void debugwin_update_during_game(void);
-int debugwin_is_debugger_visible(void);
+void debugwin_update_during_game(running_machine *machine);
 
 #endif

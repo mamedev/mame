@@ -418,7 +418,6 @@ static const int win_key_trans_table[][4] =
 };
 
 
-
 //============================================================
 //  INLINE FUNCTIONS
 //============================================================
@@ -696,6 +695,27 @@ BOOL wininput_handle_raw(HANDLE device)
 	if (data != small_buffer)
 		free(data);
 	return result;
+}
+
+
+//============================================================
+//  wininput_vkey_for_mame_code
+//============================================================
+
+int wininput_vkey_for_mame_code(input_code code)
+{
+	// only works for keyboard switches
+	if (INPUT_CODE_DEVCLASS(code) == DEVICE_CLASS_KEYBOARD && INPUT_CODE_ITEMCLASS(code) == ITEM_CLASS_SWITCH)
+	{
+		input_item_id id = INPUT_CODE_ITEMID(code);
+		int tablenum;
+	
+		// scan the table for a match
+		for (tablenum = 0; tablenum < ARRAY_LENGTH(win_key_trans_table); tablenum++)
+			if (win_key_trans_table[tablenum][MAME_KEY] == id)
+				return win_key_trans_table[tablenum][VIRTUAL_KEY];
+	}
+	return 0;
 }
 
 
