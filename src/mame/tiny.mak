@@ -37,6 +37,8 @@ CPUS += Z80
 CPUS += M6502
 CPUS += M6808
 CPUS += M6809
+CPUS += M68000
+CPUS += DS5002FP
 
 
 
@@ -55,6 +57,7 @@ SOUNDS += ASTROCADE
 SOUNDS += TMS5220
 SOUNDS += OKIM6295
 SOUNDS += HC55516
+SOUNDS += YM3812
 
 
 
@@ -78,6 +81,8 @@ DRVLIBS = \
 	$(DRIVERS)/williams.o $(MACHINE)/williams.o $(AUDIO)/williams.o $(VIDEO)/williams.o \
 	$(AUDIO)/gorf.o \
 	$(AUDIO)/wow.o \
+	$(DRIVERS)/gaelco.o $(VIDEO)/gaelco.o $(MACHINE)/gaelcrpt.o \
+	$(DRIVERS)/wrally.o $(MACHINE)/wrally.o $(VIDEO)/wrally.o \
 
 
 
