@@ -289,6 +289,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
@@ -359,13 +360,13 @@ static READ16_HANDLER( growl_dsw_r )
     switch (offset)
     {
          case 0x00:
-              return input_port_read_indexed(machine,3); /* DSW A */
+              return input_port_read(machine, "DSWA");
 
          case 0x01:
-              return input_port_read_indexed(machine,4); /* DSW B */
+              return input_port_read(machine, "DSWB");
     }
 
-logerror("CPU #0 PC %06x: warning - read unmapped dsw_r offset %06x\n",activecpu_get_pc(),offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped dsw_r offset %06x\n", activecpu_get_pc(), offset);
 
 	return 0xff;
 }
@@ -375,17 +376,17 @@ static READ16_HANDLER( growl_input_r )
     switch (offset)
     {
          case 0x00:
-              return input_port_read_indexed(machine,0); /* IN0 */
+              return input_port_read(machine, "IN0");
 
          case 0x01:
-              return input_port_read_indexed(machine,1); /* IN1 */
+              return input_port_read(machine, "IN1");
 
          case 0x02:
-              return input_port_read_indexed(machine,2); /* IN2 */
+              return input_port_read(machine, "IN2");
 
     }
 
-logerror("CPU #0 PC %06x: warning - read unmapped input_r offset %06x\n",activecpu_get_pc(),offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped input_r offset %06x\n", activecpu_get_pc(), offset);
 
 	return 0xff;
 }
@@ -395,31 +396,31 @@ static READ16_HANDLER( footchmp_input_r )
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_read_indexed(machine,3); /* DSW A */
+			return input_port_read(machine, "DSWA");
 
 		case 0x01:
-			return input_port_read_indexed(machine,4); /* DSW B */
+			return input_port_read(machine, "DSWB");
 
 		case 0x02:
-			return input_port_read_indexed(machine,2); /* IN2 */
+			return input_port_read(machine, "IN2");
 
-//      case 0x03:
-//          return (coin_word & mem_mask);
+//		case 0x03:
+//			return (coin_word & mem_mask);
 
 		case 0x05:
-			return input_port_read_indexed(machine,0); /* IN0 */
+			return input_port_read(machine, "IN0");
 
 		case 0x06:
-			return input_port_read_indexed(machine,1); /* IN1 */
+			return input_port_read(machine, "IN1");
 
 		case 0x07:
-			return input_port_read_indexed(machine,5); /* IN3 */
+			return input_port_read(machine, "IN3");
 
 		case 0x08:
-			return input_port_read_indexed(machine,6); /* IN4 */
+			return input_port_read(machine, "IN4");
     }
 
-logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n",activecpu_get_pc(),offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n", activecpu_get_pc(), offset);
 
 	return 0xff;
 }
@@ -429,31 +430,31 @@ static READ16_HANDLER( ninjak_input_r )
 	switch (offset)
 	{
 		case 0x00:
-			return (input_port_read_indexed(machine,3) << 8); /* DSW A */
+			return (input_port_read(machine, "DSWA") << 8);
 
 		case 0x01:
-			return (input_port_read_indexed(machine,4) << 8); /* DSW B */
+			return (input_port_read(machine, "DSWB") << 8);
 
 		case 0x02:
-			return (input_port_read_indexed(machine,0) << 8); /* IN 0 */
+			return (input_port_read(machine, "IN0") << 8);
 
 		case 0x03:
-			return (input_port_read_indexed(machine,1) << 8); /* IN 1 */
+			return (input_port_read(machine, "IN1") << 8);
 
 		case 0x04:
-			return (input_port_read_indexed(machine,5) << 8); /* IN 3 */
+			return (input_port_read(machine, "IN3") << 8);
 
 		case 0x05:
-			return (input_port_read_indexed(machine,6) << 8); /* IN 4 */
+			return (input_port_read(machine, "IN4") << 8);
 
 		case 0x06:
-			return (input_port_read_indexed(machine,2) << 8); /* IN 2 */
+			return (input_port_read(machine, "IN2") << 8);
 
-//      case 0x07:
-//          return (coin_word & mem_mask);
+//		case 0x07:
+//			return (coin_word & mem_mask);
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n",activecpu_get_pc(),offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n", activecpu_get_pc(), offset);
 
 	return 0xff;
 }
@@ -466,19 +467,19 @@ static READ16_HANDLER( cameltry_paddle_r )
 	switch (offset)
 	{
 		case 0x00:
-			curr = input_port_read_indexed(machine,5); /* Paddle A */
+			curr = input_port_read(machine, "PADDLE1");
 			res = curr - last[0];
 			last[0] = curr;
 			return res;
 
 		case 0x02:
-			curr = input_port_read_indexed(machine,6); /* Paddle B */
+			curr = input_port_read(machine, "PADDLE2");
 			res = curr - last[1];
 			last[1] = curr;
 			return res;
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped paddle offset %06x\n",activecpu_get_pc(),offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped paddle offset %06x\n", activecpu_get_pc(), offset);
 
 	return 0;
 }
@@ -488,13 +489,13 @@ static READ16_HANDLER( driftout_paddle_r )
     switch (offset)
     {
          case 0x00:
-              return input_port_read_indexed(machine,5); /* Paddle A */
+              return input_port_read(machine, "PADDLE1");
 
          case 0x01:
-              return input_port_read_indexed(machine,6); /* Paddle B */
+              return input_port_read(machine, "PADDLE2");
     }
 
-logerror("CPU #0 PC %06x: warning - read unmapped paddle offset %06x\n",activecpu_get_pc(),offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped paddle offset %06x\n", activecpu_get_pc(), offset);
 
         return 0xff;
 }
@@ -504,25 +505,25 @@ static READ16_HANDLER( deadconx_input_r )
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_read_indexed(machine,3); /* DSW A */
+			return input_port_read(machine, "DSWA");
 
 		case 0x01:
-			return input_port_read_indexed(machine,4); /* DSW B */
+			return input_port_read(machine, "DSWB");
 
 		case 0x02:
-			return input_port_read_indexed(machine,2); /* IN2 */
+			return input_port_read(machine, "IN2");
 
-//      case 0x03:
-//          return (coin_word & mem_mask);
+//		case 0x03:
+//			return (coin_word & mem_mask);
 
 		case 0x05:
-			return input_port_read_indexed(machine,0); /* IN0 */
+			return input_port_read(machine, "IN0");
 
 		case 0x06:
-			return input_port_read_indexed(machine,1); /* IN1 */
+			return input_port_read(machine, "IN1");
     }
 
-logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n",activecpu_get_pc(),offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n", activecpu_get_pc(), offset);
 
 	return 0xff;
 }
@@ -533,16 +534,16 @@ static READ16_HANDLER( mjnquest_dsw_r )
     {
         case 0x00:
         {
-			return (input_port_read_indexed(machine,5) << 8) + input_port_read_indexed(machine,7); /* DSW A + coin */
+			return (input_port_read(machine, "IN5") << 8) + input_port_read(machine, "DSWA");	/* DSW A + coin */
         }
 
         case 0x01:
         {
-			return (input_port_read_indexed(machine,6) << 8) + input_port_read_indexed(machine,8); /* DSW B + coin */
+			return (input_port_read(machine, "IN6") << 8) + input_port_read(machine, "DSWB");	/* DSW B + coin */
         }
     }
 
-    logerror("CPU #0 PC %06x: warning - read unmapped dsw_r offset %06x\n",activecpu_get_pc(),offset);
+    logerror("CPU #0 PC %06x: warning - read unmapped dsw_r offset %06x\n", activecpu_get_pc(), offset);
 
     return 0xff;
 }
@@ -552,23 +553,23 @@ static READ16_HANDLER( mjnquest_input_r )
     switch (mjnquest_input)
     {
          case 0x01:
-              return input_port_read_indexed(machine,0); /* IN0 */
+              return input_port_read(machine, "IN0");
 
          case 0x02:
-              return input_port_read_indexed(machine,1); /* IN1 */
+              return input_port_read(machine, "IN1");
 
          case 0x04:
-              return input_port_read_indexed(machine,2); /* IN2 */
+              return input_port_read(machine, "IN2");
 
          case 0x08:
-              return input_port_read_indexed(machine,3); /* IN3 */
+              return input_port_read(machine, "IN3");
 
          case 0x10:
-              return input_port_read_indexed(machine,4); /* IN4 */
+              return input_port_read(machine, "IN4");
 
     }
 
-logerror("CPU #0 mjnquest_input %06x: warning - read unknown input %06x\n",activecpu_get_pc(),mjnquest_input);
+	logerror("CPU #0 mjnquest_input %06x: warning - read unknown input %06x\n", activecpu_get_pc(), mjnquest_input);
 
 	return 0xff;
 }
@@ -583,13 +584,13 @@ static READ16_HANDLER( quizhq_input1_r )
     switch (offset)
     {
          case 0x00:
-              return input_port_read_indexed(machine,4); /* DSW B */
+              return input_port_read(machine, "DSWB");
 
          case 0x01:
-              return input_port_read_indexed(machine,0); /* IN0 */
+              return input_port_read(machine, "IN0");
     }
 
-logerror("CPU #0 PC %06x: warning - read unmapped input_r offset %06x\n",activecpu_get_pc(),offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped input_r offset %06x\n", activecpu_get_pc(), offset);
 
 	return 0xff;
 }
@@ -599,16 +600,16 @@ static READ16_HANDLER( quizhq_input2_r )
     switch (offset)
     {
          case 0x00:
-              return input_port_read_indexed(machine,3); /* DSW A */
+              return input_port_read(machine, "DSWA");
 
          case 0x01:
-              return input_port_read_indexed(machine,1); /* IN1 */
+              return input_port_read(machine, "IN1");
 
          case 0x02:
-              return input_port_read_indexed(machine,2); /* IN2 */
+              return input_port_read(machine, "IN2");
     }
 
-logerror("CPU #0 PC %06x: warning - read unmapped input_r offset %06x\n",activecpu_get_pc(),offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped input_r offset %06x\n", activecpu_get_pc(), offset);
 
 	return 0xff;
 }
@@ -618,16 +619,16 @@ static READ16_HANDLER( yesnoj_input_r )
     switch (offset)
     {
          case 0x00:
-              return input_port_read_indexed(machine,0);	/* IN0 */
+              return input_port_read(machine, "IN0");
 
 /* case 0x01 only used if "printer" DSW is on, and appears to
    be printer status byte */
 
          case 0x02:
-              return input_port_read_indexed(machine,1); /* IN1 */
+              return input_port_read(machine, "IN1");
     }
 
-logerror("CPU #0 PC %06x: warning - read unmapped input_r offset %06x\n",activecpu_get_pc(),offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped input_r offset %06x\n", activecpu_get_pc(), offset);
 
 	return 0x0;
 }
@@ -635,18 +636,18 @@ logerror("CPU #0 PC %06x: warning - read unmapped input_r offset %06x\n",activec
 static READ16_HANDLER( yesnoj_dsw_r )
 {
 #ifdef MAME_DEBUG
-	logerror("CPU #0 PC = %06x: read yesnoj DSW %01x\n",activecpu_get_pc(),yesnoj_dsw);
+	logerror("CPU #0 PC = %06x: read yesnoj DSW %01x\n", activecpu_get_pc(), yesnoj_dsw);
 #endif
 
 	yesnoj_dsw = 1 - yesnoj_dsw;   /* game reads same word twice to get DSW A then B so we toggle */
 
 	if (yesnoj_dsw)
 	{
-		return input_port_read_indexed(machine,2);
+		return input_port_read(machine, "DSWA");
 	}
 	else
 	{
-		return input_port_read_indexed(machine,3);
+		return input_port_read(machine, "DSWB");
 	}
 }
 
@@ -1166,8 +1167,8 @@ static ADDRESS_MAP_START( growl_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x30000f) AM_READ(growl_dsw_r)
 	AM_RANGE(0x320000, 0x32000f) AM_READ(growl_input_r)
 	AM_RANGE(0x400000, 0x400003) AM_READ(taitof2_msb_sound_r)
-	AM_RANGE(0x508000, 0x50800f) AM_READ(input_port_5_word_r)   /* IN3 */
-	AM_RANGE(0x50c000, 0x50c00f) AM_READ(input_port_6_word_r)   /* IN4 */
+	AM_RANGE(0x508000, 0x50800f) AM_READ_PORT("IN3")
+	AM_RANGE(0x50c000, 0x50c00f) AM_READ_PORT("IN4")
 	AM_RANGE(0x800000, 0x80ffff) AM_READ(TC0100SCN_word_0_r)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_READ(TC0100SCN_ctrl_word_0_r)
 	AM_RANGE(0x900000, 0x90ffff) AM_READ(SMH_RAM)
@@ -1741,74 +1742,7 @@ ADDRESS_MAP_END
                      INPUT PORTS, DIPs
 ***********************************************************/
 
-#define TAITO_COINAGE_WORLD_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-
-#define TAITO_COINAGE_JAPAN_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
-
-/* This is a new Japanese coinage used in later TAITO games */
-#define TAITO_COINAGE_JAPAN_NEW_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
-
-#define TAITO_COINAGE_US_8 \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0xc0, 0xc0, "Price to Continue" ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0xc0, "Same as Start" )
-
-#define TAITO_DIFFICULTY_8 \
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) \
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) ) \
-	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) ) \
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-
-#define TAITO_F2_PLAYERS_INPUT( player ) \
-	PORT_START \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(player) PORT_8WAY \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(player) PORT_8WAY \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(player) PORT_8WAY \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(player) PORT_8WAY \
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(player) \
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(player)
-/* 0x40 and 0x80 are not always the same in all games, so they are not included here */
-
 #define TAITO_F2_SYSTEM_INPUT \
-	PORT_START \
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT ) \
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) \
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) \
@@ -1829,10 +1763,10 @@ static INPUT_PORTS_START( finalb )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
+	TAITO_COINAGE_WORLD
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1852,17 +1786,13 @@ static INPUT_PORTS_START( finalb )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/* IN0 */
-	TAITO_F2_PLAYERS_INPUT( 1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START_TAG("IN0")
+	TAITO_JOY_UDLR_3_BUTTONS_START( 1 )
 
-	/* IN1 */
-	TAITO_F2_PLAYERS_INPUT( 2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START_TAG("IN1")
+	TAITO_JOY_UDLR_3_BUTTONS_START( 2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT	/* controls below are DIP selectable */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)	/* 1P sen.sw.? */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)	/* 1P ducking? */
@@ -1874,7 +1804,7 @@ static INPUT_PORTS_START( finalbj )
 	PORT_INCLUDE(finalb)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_JAPAN_8
+	TAITO_COINAGE_JAPAN_OLD
 INPUT_PORTS_END
 
 
@@ -1890,10 +1820,10 @@ static INPUT_PORTS_START( dondokod )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
+	TAITO_COINAGE_WORLD
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "10k and 100k" )
 	PORT_DIPSETTING(    0x08, "10k and 150k" )
@@ -1911,17 +1841,13 @@ static INPUT_PORTS_START( dondokod )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/* IN0 */
-	TAITO_F2_PLAYERS_INPUT( 1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START_TAG("IN0")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 1 )
 
-	/* IN1 */
-	TAITO_F2_PLAYERS_INPUT( 2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START_TAG("IN1")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1933,14 +1859,14 @@ static INPUT_PORTS_START( dondokdu )
 	PORT_INCLUDE(dondokod)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_US_8
+	TAITO_COINAGE_US
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dondokdj )
 	PORT_INCLUDE(dondokod)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_JAPAN_8
+	TAITO_COINAGE_JAPAN_OLD
 INPUT_PORTS_END
 
 
@@ -1956,10 +1882,10 @@ static INPUT_PORTS_START( megab )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
+	TAITO_COINAGE_WORLD
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "100k only" )
 	PORT_DIPSETTING(    0x04, "150k only" )
@@ -1977,17 +1903,13 @@ static INPUT_PORTS_START( megab )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/* IN0 */
-	TAITO_F2_PLAYERS_INPUT( 1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START_TAG("IN0")
+	TAITO_JOY_UDLR_2_BUTTONS( 1 )
 
-	/* IN1 */
-	TAITO_F2_PLAYERS_INPUT( 2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START_TAG("IN1")
+	TAITO_JOY_UDLR_2_BUTTONS( 2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
@@ -1999,7 +1921,7 @@ static INPUT_PORTS_START( megabj )
 	PORT_INCLUDE(megab)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_JAPAN_8
+	TAITO_COINAGE_JAPAN_OLD
 INPUT_PORTS_END
 
 
@@ -2015,10 +1937,10 @@ static INPUT_PORTS_START( thundfox )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
+	TAITO_COINAGE_WORLD
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x04, 0x04, "Timer" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
@@ -2037,17 +1959,13 @@ static INPUT_PORTS_START( thundfox )
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Dual ) )
 
-	/* IN0 */
-	TAITO_F2_PLAYERS_INPUT( 1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START_TAG("IN0")
+	TAITO_JOY_UDLR_3_BUTTONS_START( 1 )
 
-	/* IN0 */
-	TAITO_F2_PLAYERS_INPUT( 2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START_TAG("IN1")
+	TAITO_JOY_UDLR_3_BUTTONS_START( 2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2059,14 +1977,14 @@ static INPUT_PORTS_START( thndfoxu )
 	PORT_INCLUDE(thundfox)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_US_8
+	TAITO_COINAGE_US
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( thndfoxj )
 	PORT_INCLUDE(thundfox)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 INPUT_PORTS_END
 
 
@@ -2082,10 +2000,10 @@ static INPUT_PORTS_START( cameltry )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_US_8
+	TAITO_COINAGE_US
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, "Start remain time" )
 	PORT_DIPSETTING(    0x00, "35" )
 	PORT_DIPSETTING(    0x04, "40" )
@@ -2103,7 +2021,7 @@ static INPUT_PORTS_START( cameltry )
 	PORT_DIPSETTING(    0x80, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 
-	PORT_START      /* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2113,7 +2031,7 @@ static INPUT_PORTS_START( cameltry )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START      /* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2123,17 +2041,17 @@ static INPUT_PORTS_START( cameltry )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START  /* Paddle A */
+	PORT_START_TAG("PADDLE1")	/* Paddle A */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
-	PORT_START  /* Paddle B */
+	PORT_START_TAG("PADDLE2")	/* Paddle B */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -2141,7 +2059,7 @@ static INPUT_PORTS_START( cameltrj )
 	PORT_INCLUDE(cameltry)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_JAPAN_8
+	TAITO_COINAGE_JAPAN_OLD
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( qtorimon )
@@ -2156,10 +2074,10 @@ static INPUT_PORTS_START( qtorimon )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_8
+	TAITO_COINAGE_JAPAN_OLD
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2178,7 +2096,7 @@ static INPUT_PORTS_START( qtorimon )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START      /* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
@@ -2188,7 +2106,7 @@ static INPUT_PORTS_START( qtorimon )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START      /* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
@@ -2198,7 +2116,7 @@ static INPUT_PORTS_START( qtorimon )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2218,10 +2136,10 @@ static INPUT_PORTS_START( liquidk )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
+	TAITO_COINAGE_WORLD
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "30k and 100k" )
 	PORT_DIPSETTING(    0x08, "30k and 150k" )
@@ -2239,17 +2157,13 @@ static INPUT_PORTS_START( liquidk )
 	PORT_DIPSETTING(    0x80, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 
-	/* IN0 */
-	TAITO_F2_PLAYERS_INPUT( 1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START_TAG("IN0")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 1 )
 
-	/* IN1 */
-	TAITO_F2_PLAYERS_INPUT( 2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START_TAG("IN1")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2261,7 +2175,7 @@ static INPUT_PORTS_START( liquidku )
 	PORT_INCLUDE(liquidk)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_US_8
+	TAITO_COINAGE_US
 INPUT_PORTS_END
 
 
@@ -2277,10 +2191,10 @@ static INPUT_PORTS_START( mizubaku )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "30k and 100k" )
 	PORT_DIPSETTING(    0x08, "30k and 150k" )
@@ -2298,17 +2212,13 @@ static INPUT_PORTS_START( mizubaku )
 	PORT_DIPSETTING(    0x80, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 
-	/* IN0 */
-	TAITO_F2_PLAYERS_INPUT( 1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START_TAG("IN0")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 1 )
 
-	/* IN1 */
-	TAITO_F2_PLAYERS_INPUT( 2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START_TAG("IN1")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2328,10 +2238,10 @@ static INPUT_PORTS_START( ssi )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
+	TAITO_COINAGE_WORLD
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, "Shields" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ))
 	PORT_DIPSETTING(    0x0c, "1")
@@ -2349,17 +2259,13 @@ static INPUT_PORTS_START( ssi )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 
-	/* IN0 */
-	TAITO_F2_PLAYERS_INPUT( 1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START_TAG("IN0")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 1 )
 
-	/* IN1 */
-	TAITO_F2_PLAYERS_INPUT( 2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START_TAG("IN1")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2371,22 +2277,18 @@ static INPUT_PORTS_START( majest12 )
 	PORT_INCLUDE(ssi)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( growl )
-	/* IN0 */
-	TAITO_F2_PLAYERS_INPUT( 1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START_TAG("IN0")
+	TAITO_JOY_UDLR_3_BUTTONS_START( 1 )
 
-	/* IN1 */
-	TAITO_F2_PLAYERS_INPUT( 2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START_TAG("IN1")
+	TAITO_JOY_UDLR_3_BUTTONS_START( 2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2404,10 +2306,10 @@ static INPUT_PORTS_START( growl )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
+	TAITO_COINAGE_WORLD
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2426,7 +2328,7 @@ static INPUT_PORTS_START( growl )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START      /* IN3 */
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
@@ -2444,7 +2346,7 @@ static INPUT_PORTS_START( growl )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START4 )
 
-	PORT_START      /* IN4 */
+	PORT_START_TAG("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )
@@ -2459,14 +2361,14 @@ static INPUT_PORTS_START( growlu )
 	PORT_INCLUDE(growl)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_US_8
+	TAITO_COINAGE_US
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( runark )
 	PORT_INCLUDE(growl)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 INPUT_PORTS_END
 
 
@@ -2482,10 +2384,10 @@ static INPUT_PORTS_START( pulirula )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
+	TAITO_COINAGE_WORLD
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, "Magic" )
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
@@ -2503,17 +2405,13 @@ static INPUT_PORTS_START( pulirula )
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Dual ) )
 
-	/* IN0 */
-	TAITO_F2_PLAYERS_INPUT( 1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START_TAG("IN0")
+	TAITO_JOY_UDLR_3_BUTTONS_START( 1 )
 
-	/* IN1 */
-	TAITO_F2_PLAYERS_INPUT( 2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START_TAG("IN1")
+	TAITO_JOY_UDLR_3_BUTTONS_START( 2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2525,7 +2423,7 @@ static INPUT_PORTS_START( pulirulj )
 	PORT_INCLUDE(pulirula)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 INPUT_PORTS_END
 
 
@@ -2541,10 +2439,10 @@ static INPUT_PORTS_START( qzquest )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8  //??
+	TAITO_DIFFICULTY  //??
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2564,7 +2462,7 @@ static INPUT_PORTS_START( qzquest )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START      /* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
@@ -2574,7 +2472,7 @@ static INPUT_PORTS_START( qzquest )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START      /* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
@@ -2584,7 +2482,7 @@ static INPUT_PORTS_START( qzquest )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2604,10 +2502,10 @@ static INPUT_PORTS_START( qzchikyu )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8  //??
+	TAITO_DIFFICULTY  //??
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2627,7 +2525,7 @@ static INPUT_PORTS_START( qzchikyu )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START      /* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
@@ -2637,7 +2535,7 @@ static INPUT_PORTS_START( qzchikyu )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START      /* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
@@ -2647,7 +2545,7 @@ static INPUT_PORTS_START( qzchikyu )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2656,17 +2554,13 @@ static INPUT_PORTS_START( qzchikyu )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( footchmp )
-	/* IN0 */
-	TAITO_F2_PLAYERS_INPUT( 1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START_TAG("IN0")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 1 )
 
-	/* IN1 */
-	TAITO_F2_PLAYERS_INPUT( 2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START_TAG("IN1")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 2 )
 
-	PORT_START      /* IN2 */
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -2687,10 +2581,10 @@ static INPUT_PORTS_START( footchmp )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
+	TAITO_COINAGE_WORLD
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Game_Time ) )
 	PORT_DIPSETTING(    0x00, "1.5 Minutes" )
 	PORT_DIPSETTING(    0x0c, " 2  Minutes" )
@@ -2708,15 +2602,11 @@ static INPUT_PORTS_START( footchmp )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x80, "European" )
 
-	/* IN3 */
-	TAITO_F2_PLAYERS_INPUT( 3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_START_TAG("IN3")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 3 )
 
-	/* IN4 */
-	TAITO_F2_PLAYERS_INPUT( 4 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
+	PORT_START_TAG("IN4")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 4 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hthero )
@@ -2769,17 +2659,13 @@ static INPUT_PORTS_START( hthero )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ninjak )
-	/* IN0 */
-	TAITO_F2_PLAYERS_INPUT( 1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START_TAG("IN0")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 1 )
 
-	/* IN1 */
-	TAITO_F2_PLAYERS_INPUT( 2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START_TAG("IN1")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 2 )
 
-	PORT_START      /* IN2 */
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )
@@ -2800,10 +2686,10 @@ static INPUT_PORTS_START( ninjak )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
+	TAITO_COINAGE_WORLD
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, "Cabinet Type" )
 	PORT_DIPSETTING(    0x0c, "2 players" )
 	PORT_DIPSETTING(    0x08, "TROG (4 players / 2 coin slots)" )
@@ -2821,29 +2707,25 @@ static INPUT_PORTS_START( ninjak )
 	PORT_DIPSETTING(    0x00, "1 Player only" )
 	PORT_DIPSETTING(    0x80, "Multiplayer" )
 
-	/* IN3 */
-	TAITO_F2_PLAYERS_INPUT( 3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_START_TAG("IN3")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 3 )
 
-	/* IN4 */
-	TAITO_F2_PLAYERS_INPUT( 4 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
+	PORT_START_TAG("IN4")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 4 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ninjaku )
 	PORT_INCLUDE(ninjak)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_US_8
+	TAITO_COINAGE_US
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ninjakj )
 	PORT_INCLUDE(ninjak)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 INPUT_PORTS_END
 
 
@@ -2859,10 +2741,10 @@ static INPUT_PORTS_START( driftout )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_8
+	TAITO_COINAGE_JAPAN_OLD
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, "Control" )   /* correct acc. to service mode */
 	PORT_DIPSETTING(    0x0c, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(    0x08, "Paddle" )
@@ -2881,25 +2763,23 @@ static INPUT_PORTS_START( driftout )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/* IN0 */
-	TAITO_F2_PLAYERS_INPUT( 1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START_TAG("IN0")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 1 )
 
-	PORT_START      /* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* 2P not used? */
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START  /* Paddle A */
+	PORT_START_TAG("PADDLE1")	/* Paddle A */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START  /* Paddle B */
+	PORT_START_TAG("PADDLE2")	/* Paddle B */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -2915,10 +2795,10 @@ static INPUT_PORTS_START( gunfront )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
+	TAITO_COINAGE_WORLD
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x08, "10k and every 80k" )
 	PORT_DIPSETTING(    0x0c, "20k and every 80k" )
@@ -2936,17 +2816,13 @@ static INPUT_PORTS_START( gunfront )
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Dual ) )
 
-	/* IN0 */
-	TAITO_F2_PLAYERS_INPUT( 1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START_TAG("IN0")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 1 )
 
-	/* IN1 */
-	TAITO_F2_PLAYERS_INPUT( 2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START_TAG("IN1")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2958,7 +2834,7 @@ static INPUT_PORTS_START( gunfronj )
 	PORT_INCLUDE(gunfront)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 INPUT_PORTS_END
 
 
@@ -2974,10 +2850,10 @@ static INPUT_PORTS_START( metalb )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
+	TAITO_COINAGE_WORLD
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x04, "80k and every 160k" )
 	PORT_DIPSETTING(    0x0c, "70k and every 150k" )
@@ -2995,17 +2871,13 @@ static INPUT_PORTS_START( metalb )
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Dual ) )
 
-	/* IN0 */
-	TAITO_F2_PLAYERS_INPUT( 1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START_TAG("IN0")
+	TAITO_JOY_UDLR_3_BUTTONS_START( 1 )
 
-	/* IN1 */
-	TAITO_F2_PLAYERS_INPUT( 2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START_TAG("IN1")
+	TAITO_JOY_UDLR_3_BUTTONS_START( 2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3017,27 +2889,23 @@ static INPUT_PORTS_START( metalbj )
 	PORT_INCLUDE(metalb)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( deadconx )
-	/* IN0 */
-	TAITO_F2_PLAYERS_INPUT( 1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START_TAG("IN0")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 1 )
 
-	/* IN1 */
-	TAITO_F2_PLAYERS_INPUT( 2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START_TAG("IN1")
+	TAITO_JOY_UDLR_2_BUTTONS_START( 2 )
 
-	PORT_START      /* IN2 */
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service A") PORT_CODE(KEYCODE_9)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service B") PORT_CODE(KEYCODE_0)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service C") PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service A") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service B") PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service C") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START_TAG("DSWA")
@@ -3051,10 +2919,10 @@ static INPUT_PORTS_START( deadconx )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
+	TAITO_COINAGE_WORLD
 
 	PORT_START_TAG("DSWB") /* DSW B, missing a timer speed maybe? */
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On) )
@@ -3078,7 +2946,7 @@ static INPUT_PORTS_START( deadconj )
 	PORT_INCLUDE(deadconx)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 INPUT_PORTS_END
 
 
@@ -3094,10 +2962,10 @@ static INPUT_PORTS_START( dinorex )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
+	TAITO_COINAGE_WORLD
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, "Damage" )
 	PORT_DIPSETTING(    0x08, "Small" )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
@@ -3116,17 +2984,13 @@ static INPUT_PORTS_START( dinorex )
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Dual ) )
 
-	/* IN0 */
-	TAITO_F2_PLAYERS_INPUT( 1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START_TAG("IN0")
+	TAITO_JOY_UDLR_3_BUTTONS_START( 1 )
 
-	/* IN1 */
-	TAITO_F2_PLAYERS_INPUT( 2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START_TAG("IN1")
+	TAITO_JOY_UDLR_3_BUTTONS_START( 2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3138,22 +3002,18 @@ static INPUT_PORTS_START( dinorexj )
 	PORT_INCLUDE(dinorex)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( solfigtr )
-	/* IN0 */
-	TAITO_F2_PLAYERS_INPUT( 1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START_TAG("IN0")
+	TAITO_JOY_UDLR_3_BUTTONS_START( 1 )
 
-	/* IN1 */
-	TAITO_F2_PLAYERS_INPUT( 2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START_TAG("IN1")
+	TAITO_JOY_UDLR_3_BUTTONS_START( 2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3171,10 +3031,10 @@ static INPUT_PORTS_START( solfigtr )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_WORLD_8
+	TAITO_COINAGE_WORLD
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3196,7 +3056,7 @@ static INPUT_PORTS_START( solfigtr )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( koshien )
-	PORT_START /* DSW A, one lets you control fielders ? */
+	PORT_START_TAG("DSWA")	/* DSW A, one lets you control fielders ? */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3207,10 +3067,10 @@ static INPUT_PORTS_START( koshien )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x04, 0x04, "Timer" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
@@ -3229,7 +3089,7 @@ static INPUT_PORTS_START( koshien )
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Dual ) )
 
-	PORT_START      /* IN1 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
@@ -3239,14 +3099,14 @@ static INPUT_PORTS_START( koshien )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN1")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START      /* IN0 */
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -3258,7 +3118,7 @@ static INPUT_PORTS_START( koshien )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( quizhq )
-	PORT_START      /* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
@@ -3268,7 +3128,7 @@ static INPUT_PORTS_START( quizhq )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START      /* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
@@ -3278,7 +3138,7 @@ static INPUT_PORTS_START( quizhq )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3296,10 +3156,10 @@ static INPUT_PORTS_START( quizhq )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, "Time" )
 	PORT_DIPSETTING(    0x0c, "5 seconds" )
 	PORT_DIPSETTING(    0x08, "10 seconds" )
@@ -3330,10 +3190,10 @@ static INPUT_PORTS_START( qjinsei )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3353,7 +3213,7 @@ static INPUT_PORTS_START( qjinsei )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START      /* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
@@ -3363,7 +3223,7 @@ static INPUT_PORTS_START( qjinsei )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START      /* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
@@ -3373,7 +3233,7 @@ static INPUT_PORTS_START( qjinsei )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3391,10 +3251,10 @@ static INPUT_PORTS_START( qcrayon )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, "Default Time" )              /* Can be affected ingame by some items and/or player location */
 	PORT_DIPSETTING(    0x00, "6 seconds" )
 	PORT_DIPSETTING(    0x04, "7 seconds" )
@@ -3405,7 +3265,7 @@ static INPUT_PORTS_START( qcrayon )
 	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START      /* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
@@ -3415,7 +3275,7 @@ static INPUT_PORTS_START( qcrayon )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START      /* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
@@ -3425,7 +3285,7 @@ static INPUT_PORTS_START( qcrayon )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3443,10 +3303,10 @@ static INPUT_PORTS_START( qcrayon2 )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )         /* These 2 Dip Switches were designed to change the default timer */
 	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )         /* but the 10 seconds setting is duplicated 4 times in the tables */
 	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
@@ -3456,7 +3316,7 @@ static INPUT_PORTS_START( qcrayon2 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(    0x00, "4 Buttons" )
 
-	PORT_START      /* IN0 */
+	PORT_START_TAG("IN0")
 	/* Joystick Control */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
@@ -3476,7 +3336,7 @@ static INPUT_PORTS_START( qcrayon2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
 
-	PORT_START      /* IN1 */
+	PORT_START_TAG("IN1")
 	/* Joystick Control */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
@@ -3496,7 +3356,7 @@ static INPUT_PORTS_START( qcrayon2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )                                 PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3516,10 +3376,10 @@ static INPUT_PORTS_START( yuyugogo )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY_8
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3539,7 +3399,7 @@ static INPUT_PORTS_START( yuyugogo )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START      /* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
@@ -3549,7 +3409,7 @@ static INPUT_PORTS_START( yuyugogo )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START      /* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
@@ -3559,7 +3419,7 @@ static INPUT_PORTS_START( yuyugogo )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	/* IN2 */
+	PORT_START_TAG("IN2")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3568,52 +3428,52 @@ static INPUT_PORTS_START( yuyugogo )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjnquest )
-	PORT_START      /* IN0 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START      /* IN1 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START      /* IN2 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START      /* IN3 */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_START_TAG("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START      /* IN4 */
+	PORT_START_TAG("IN4")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START      /* IN5 */
+	PORT_START_TAG("IN5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )		// ?
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START      /* IN6 */
+	PORT_START_TAG("IN6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START      /* IN7:DSW A */
+	PORT_START_TAG("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3624,10 +3484,10 @@ static INPUT_PORTS_START( mjnquest )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_NEW_8
+	TAITO_COINAGE_JAPAN_NEW
 
-	PORT_START      /* IN8:DSW B */
-	TAITO_DIFFICULTY_8
+	PORT_START_TAG("DSWB")
+	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3649,18 +3509,18 @@ static INPUT_PORTS_START( mjnquest )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( yesnoj )   // apparently no test mode, though text in rom suggests printer test
-	PORT_START      /* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	/* IN1 */
+	PORT_START_TAG("IN1")
 	TAITO_F2_SYSTEM_INPUT
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START /* DSW A ??? */
+	PORT_START_TAG("DSWA")	/* DSW A ??? */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3686,7 +3546,7 @@ static INPUT_PORTS_START( yesnoj )   // apparently no test mode, though text in 
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START /* DSW B ? */
+	PORT_START_TAG("DSWB")	/* DSW B ? */
 	PORT_DIPNAME( 0x01, 0x00, "Results Printer" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )

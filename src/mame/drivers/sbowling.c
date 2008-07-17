@@ -176,10 +176,10 @@ static WRITE8_HANDLER(graph_control_w)
 
 static READ8_HANDLER (controls_r)
 {
-	if(sbw_system&2)
-		return input_port_read_indexed(machine, 2);
+	if(sbw_system & 2)
+		return input_port_read(machine, "TRACKY");
 	else
-		return input_port_read_indexed(machine, 3);
+		return input_port_read(machine, "TRACKX");
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -192,33 +192,33 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, watchdog_reset_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(controls_r, pix_data_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(pix_data_r, pix_shift_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(input_port_1_r, SMH_NOP)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(input_port_4_r, system_w)
-	AM_RANGE(0x05, 0x05) AM_READWRITE(input_port_5_r, graph_control_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN1") AM_WRITENOP
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW0") AM_WRITE(system_w)
+	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW1") AM_WRITE(graph_control_w)
 ADDRESS_MAP_END
 
 
 
 static INPUT_PORTS_START( sbowling )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1   )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH,	IPT_TILT )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("TRACKY")
 	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
 
-	PORT_START
+	PORT_START_TAG("TRACKX")
 	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_REVERSE
 
-	PORT_START	/* coin slots: A 4 LSB, B 4 MSB */
+	PORT_START_TAG("DSW0")	/* coin slots: A 4 LSB, B 4 MSB */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -244,7 +244,7 @@ static INPUT_PORTS_START( sbowling )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )

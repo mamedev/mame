@@ -274,7 +274,7 @@ WRITE8_HANDLER( travrusa_scroll_x_high_w )
 WRITE8_HANDLER( travrusa_flipscreen_w )
 {
 	/* screen flip is handled both by software and hardware */
-	data ^= ~input_port_read_indexed(machine, 4) & 1;
+	data ^= ~input_port_read(machine, "DSW2") & 1;
 
 	flip_screen_set(data & 1);
 

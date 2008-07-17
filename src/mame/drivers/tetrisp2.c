@@ -263,7 +263,7 @@ static WRITE16_HANDLER( nndmseal_sound_bank_w )
 
 static READ16_HANDLER( tetrisp2_ip_1_word_r )
 {
-	return	( input_port_read(machine, "IN1") &  0xfcff ) |
+	return	( input_port_read(machine, "SYSTEM") &  0xfcff ) |
 			(           mame_rand(machine) & ~0xfcff ) |
 			(      1 << (8 + (mame_rand(machine)&1)) );
 }
@@ -339,7 +339,7 @@ static WRITE16_HANDLER( rocknms_main2sub_w )
 
 static READ16_HANDLER( rocknms_port_0_r )
 {
-	return ((input_port_read_indexed(machine, 0) & 0xfffc ) | (rocknms_sub2main & 0x0003));
+	return ((input_port_read(machine, "PLAYERS") & 0xfffc ) | (rocknms_sub2main & 0x0003));
 }
 
 static WRITE16_HANDLER( rocknms_sub2main_w )
@@ -377,13 +377,13 @@ static ADDRESS_MAP_START( tetrisp2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x60ffff) AM_READ(SMH_RAM				)	// Rotation
 	AM_RANGE(0x650000, 0x651fff) AM_READ(SMH_RAM				)	// Rotation (mirror)
 	AM_RANGE(0x800002, 0x800003) AM_READ(tetrisp2_sound_r		)	// Sound
-	AM_RANGE(0x900000, 0x903fff) AM_READ(tetrisp2_nvram_r	)	// NVRAM
-	AM_RANGE(0x904000, 0x907fff) AM_READ(tetrisp2_nvram_r	)	// NVRAM (mirror)
+	AM_RANGE(0x900000, 0x903fff) AM_READ(tetrisp2_nvram_r		)	// NVRAM
+	AM_RANGE(0x904000, 0x907fff) AM_READ(tetrisp2_nvram_r		)	// NVRAM (mirror)
 	AM_RANGE(0xbe0000, 0xbe0001) AM_READ(SMH_NOP				)	// INT-level1 dummy read
-	AM_RANGE(0xbe0002, 0xbe0003) AM_READ(input_port_0_word_r	)	// Inputs
+	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")			// Inputs
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ(tetrisp2_ip_1_word_r	)	// Inputs & protection
-	AM_RANGE(0xbe0008, 0xbe0009) AM_READ(input_port_2_word_r	)	// Inputs
-	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r	)	// Watchdog
+	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW")				// Inputs
+	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r		)	// Watchdog
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tetrisp2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -494,15 +494,15 @@ static ADDRESS_MAP_START( rockn1_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x408000, 0x409fff) AM_READ(SMH_RAM				)	// ???
 	AM_RANGE(0x500000, 0x50ffff) AM_READ(SMH_RAM				)	// Line
 	AM_RANGE(0x600000, 0x60ffff) AM_READ(SMH_RAM				)	// Rotation
-	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r		)	// NVRAM
+	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r			)	// NVRAM
 	AM_RANGE(0xa30000, 0xa30001) AM_READ(rockn_soundvolume_r	)	// Sound Volume
 	AM_RANGE(0xa40002, 0xa40003) AM_READ(tetrisp2_sound_r		)	// Sound
 	AM_RANGE(0xa44000, 0xa44001) AM_READ(rockn_adpcmbank_r		)	// Sound Bank
 	AM_RANGE(0xbe0000, 0xbe0001) AM_READ(SMH_NOP				)	// INT-level1 dummy read
-	AM_RANGE(0xbe0002, 0xbe0003) AM_READ(input_port_0_word_r	)	// Inputs
-	AM_RANGE(0xbe0004, 0xbe0005) AM_READ(input_port_1_word_r	)	// Inputs
-	AM_RANGE(0xbe0008, 0xbe0009) AM_READ(input_port_2_word_r	)	// Inputs
-	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r	)	// Watchdog
+	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")			// Inputs
+	AM_RANGE(0xbe0004, 0xbe0005) AM_READ_PORT("SYSTEM")				// Inputs
+	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW")				// Inputs
+	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r)		// Watchdog
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rockn1_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -545,15 +545,15 @@ static ADDRESS_MAP_START( rockn2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x803fff) AM_READ(SMH_RAM				)	// Foreground
 	AM_RANGE(0x804000, 0x807fff) AM_READ(SMH_RAM				)	// Background
 	AM_RANGE(0x808000, 0x809fff) AM_READ(SMH_RAM				)	// ???
-	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r		)	// NVRAM
+	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r			)	// NVRAM
 	AM_RANGE(0xa30000, 0xa30001) AM_READ(rockn_soundvolume_r	)	// Sound Volume
 	AM_RANGE(0xa40002, 0xa40003) AM_READ(tetrisp2_sound_r		)	// Sound
 	AM_RANGE(0xa44000, 0xa44001) AM_READ(rockn_adpcmbank_r		)	// Sound Bank
 	AM_RANGE(0xbe0000, 0xbe0001) AM_READ(SMH_NOP				)	// INT-level1 dummy read
-	AM_RANGE(0xbe0002, 0xbe0003) AM_READ(input_port_0_word_r	)	// Inputs
-	AM_RANGE(0xbe0004, 0xbe0005) AM_READ(input_port_1_word_r	)	// Inputs
-	AM_RANGE(0xbe0008, 0xbe0009) AM_READ(input_port_2_word_r	)	// Inputs
-	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r	)	// Watchdog
+	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")			// Inputs
+	AM_RANGE(0xbe0004, 0xbe0005) AM_READ_PORT("SYSTEM")				// Inputs
+	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW")				// Inputs
+	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r)		// Watchdog
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rockn2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -591,20 +591,20 @@ static ADDRESS_MAP_START( rocknms_main_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x108000, 0x10ffff) AM_READ(SMH_RAM				)	// Work RAM
 	AM_RANGE(0x200000, 0x23ffff) AM_READ(tetrisp2_priority_r	)	// Priority
 	AM_RANGE(0x300000, 0x31ffff) AM_READ(SMH_RAM				)	// Palette
-//  AM_RANGE(0x500000, 0x50ffff) AM_READ(SMH_RAM              )   // Line
+//  AM_RANGE(0x500000, 0x50ffff) AM_READ(SMH_RAM				)   // Line
 	AM_RANGE(0x600000, 0x60ffff) AM_READ(SMH_RAM				)	// Rotation
 	AM_RANGE(0x800000, 0x803fff) AM_READ(SMH_RAM				)	// Foreground
 	AM_RANGE(0x804000, 0x807fff) AM_READ(SMH_RAM				)	// Background
-//  AM_RANGE(0x808000, 0x809fff) AM_READ(SMH_RAM              )   // ???
-	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r		)	// NVRAM
+//  AM_RANGE(0x808000, 0x809fff) AM_READ(SMH_RAM				)   // ???
+	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r			)	// NVRAM
 	AM_RANGE(0xa30000, 0xa30001) AM_READ(rockn_soundvolume_r	)	// Sound Volume
 	AM_RANGE(0xa40002, 0xa40003) AM_READ(tetrisp2_sound_r		)	// Sound
 	AM_RANGE(0xa44000, 0xa44001) AM_READ(rockn_adpcmbank_r		)	// Sound Bank
 	AM_RANGE(0xbe0000, 0xbe0001) AM_READ(SMH_NOP				)	// INT-level1 dummy read
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ(rocknms_port_0_r		)	// Inputs
-	AM_RANGE(0xbe0004, 0xbe0005) AM_READ(input_port_1_word_r	)	// Inputs
-	AM_RANGE(0xbe0008, 0xbe0009) AM_READ(input_port_2_word_r	)	// Inputs
-	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r	)	// Watchdog
+	AM_RANGE(0xbe0004, 0xbe0005) AM_READ_PORT("SYSTEM")				// Inputs
+	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW")				// Inputs
+	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r)		// Watchdog
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rocknms_main_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -699,7 +699,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( tetrisp2 )
 
-	PORT_START_TAG("IN0") /*$be0002.w*/
+	PORT_START_TAG("PLAYERS") /*$be0002.w*/
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
@@ -717,7 +717,7 @@ static INPUT_PORTS_START( tetrisp2 )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN1") /*$be0004.w*/
+	PORT_START_TAG("SYSTEM") /*$be0004.w*/
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_START1   )
@@ -735,7 +735,7 @@ static INPUT_PORTS_START( tetrisp2 )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
-	PORT_START_TAG("IN2") //$be0008.w
+	PORT_START_TAG("DSW") //$be0008.w
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
@@ -796,7 +796,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( teplus2j )
 	PORT_INCLUDE(tetrisp2)
 
-	PORT_MODIFY("IN2")	// $be0008.w
+	PORT_MODIFY("DSW")	// $be0008.w
 	PORT_DIPNAME( 0x0040, 0x0040, "Unknown 1-7" ) PORT_DIPLOCATION("SW1:7") /* Free Play in "World" set */
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -932,7 +932,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( rockn )
-	PORT_START_TAG("IN0")	//$be0002.w
+	PORT_START_TAG("PLAYERS")	//$be0002.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
@@ -950,7 +950,7 @@ static INPUT_PORTS_START( rockn )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")	//$be0004.w
+	PORT_START_TAG("SYSTEM")	//$be0004.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_START1   )
@@ -968,7 +968,7 @@ static INPUT_PORTS_START( rockn )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
-	PORT_START_TAG("IN2")	//$be0008.w
+	PORT_START_TAG("DSW")	//$be0008.w
 	PORT_DIPNAME( 0x0001, 0x0001, "DIPSW 1-1") // All these used to be marked 'Cheat', can't think why.
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1022,8 +1022,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( rocknms )
-	PORT_START	// IN0 - $be0002.w
-
+	PORT_START_TAG("PLAYERS")	// IN0 - $be0002.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )		// MAIN -> SUB Communication
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )		// MAIN -> SUB Communication
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
@@ -1032,7 +1031,6 @@ static INPUT_PORTS_START( rocknms )
 	PORT_BIT(  0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-
 	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
@@ -1042,7 +1040,7 @@ static INPUT_PORTS_START( rocknms )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 
-	PORT_START	// IN1 - $be0004.w
+	PORT_START_TAG("SYSTEM")	// IN1 - $be0004.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_START1   )
@@ -1051,7 +1049,6 @@ static INPUT_PORTS_START( rocknms )
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_COIN2    )
-
 	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -1061,7 +1058,7 @@ static INPUT_PORTS_START( rocknms )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
-	PORT_START_TAG("IN2")	//$be0008.w
+	PORT_START_TAG("DSW")	//$be0008.w
 	PORT_DIPNAME( 0x0001, 0x0001, "DIPSW 1-1") // All these used to be marked 'Cheat', can't think why.
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

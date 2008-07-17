@@ -159,14 +159,14 @@ READ16_HANDLER( samesame_port_6_word_r )
 {
 	/* Bit 0x80 is secondary CPU (HD647180) ready signal */
 	logerror("PC:%04x Warning !!! IO reading from $14000a\n",activecpu_get_previouspc());
-	return (0x80 | input_port_read_indexed(machine,6)) & 0xff;
+	return (0x80 | input_port_read(machine, "TJUMP")) & 0xff;
 }
 
 READ16_HANDLER( vimana_input_port_5_word_r )
 {
 	int data, p;
 
-	p = input_port_read_indexed(machine,5);
+	p = input_port_read(machine, "SYSTEM");
 	vimana_latch ^= p;
 	data = (vimana_latch & p );
 

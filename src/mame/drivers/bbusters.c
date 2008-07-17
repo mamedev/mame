@@ -260,50 +260,48 @@ static int gun_select;
 
 static READ16_HANDLER( control_3_r )
 {
-	/* gun_select seems to assume only values 5,6,7... is this correct? */
-	return input_port_read_indexed(machine, gun_select);
+	static const char *port[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2", "GUNX3", "GUNY3" };
+
+	return input_port_read(machine, port[gun_select]);
 }
 
 static WRITE16_HANDLER( gun_select_w )
 {
 	logerror("%08x: gun r\n",activecpu_get_pc());
 
-	gun_select=5 + (data&0xff);
+	gun_select = data & 0xff;
 }
 
 static READ16_HANDLER( kludge_r )
 {
-	bbuster_ram[0xa692/2]=input_port_read(machine, "IN5")<<1;
-	bbuster_ram[0xa694/2]=input_port_read(machine, "IN6")<<1;
-	bbuster_ram[0xa696/2]=input_port_read(machine, "IN7")<<1;
-	bbuster_ram[0xa698/2]=input_port_read(machine, "IN8")<<1;
-	bbuster_ram[0xa69a/2]=input_port_read(machine, "IN9")<<1;
-	bbuster_ram[0xa69c/2]=input_port_read(machine, "IN10")<<1;
+	bbuster_ram[0xa692/2] = input_port_read(machine, "GUNX1")<<1;
+	bbuster_ram[0xa694/2] = input_port_read(machine, "GUNY1")<<1;
+	bbuster_ram[0xa696/2] = input_port_read(machine, "GUNX2")<<1;
+	bbuster_ram[0xa698/2] = input_port_read(machine, "GUNY2")<<1;
+	bbuster_ram[0xa69a/2] = input_port_read(machine, "GUNX3")<<1;
+	bbuster_ram[0xa69c/2] = input_port_read(machine, "GUNY3")<<1;
 	return 0;
 }
 
 static WRITE16_HANDLER( sound_cpu_w )
 {
-	soundlatch_w(machine,0,data&0xff);
-	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(machine, 0, data&0xff);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ16_HANDLER( mechatt_gun_r )
 {
-	int baseport=0,x,y;
-	static const char *port[] = { "IN2", "IN3", "IN4", "IN5" };
+	int x, y;
 
-	if (offset) baseport=2; /* Player 2 */
-
-	x=input_port_read(machine, port[baseport]);
-	y=input_port_read(machine, port[baseport+1]);
+	x = input_port_read(machine, offset ? "GUNX2" : "GUNX1");
+	y = input_port_read(machine, offset ? "GUNY2" : "GUNY1");
 
 	/* Todo - does the hardware really clamp like this? */
-	x+=0x18;
-	if (x>0xff) x=0xff;
-	if (y>0xef) y=0xef;
+	x += 0x18;
+	if (x > 0xff) x = 0xff;
+	if (y > 0xef) y = 0xef;
 
-	return x|(y<<8);
+	return x | (y<<8);
 }
 
 /*******************************************************************************/
@@ -317,11 +315,11 @@ static ADDRESS_MAP_START( bbuster_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0b0000, 0x0b1fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0b2000, 0x0b3fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0d0000, 0x0d0fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READ(input_port_2_word_r) /* Coins */
-	AM_RANGE(0x0e0002, 0x0e0003) AM_READ(input_port_0_word_r) /* Player 1 & 2 */
-	AM_RANGE(0x0e0004, 0x0e0005) AM_READ(input_port_1_word_r) /* Player 3 */
-	AM_RANGE(0x0e0008, 0x0e0009) AM_READ(input_port_3_word_r) /* Dip 1 */
-	AM_RANGE(0x0e000a, 0x0e000b) AM_READ(input_port_4_word_r) /* Dip 2 */
+	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("COINS")	/* Coins */
+	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("IN0")	/* Player 1 & 2 */
+	AM_RANGE(0x0e0004, 0x0e0005) AM_READ_PORT("IN1")	/* Player 3 */
+	AM_RANGE(0x0e0008, 0x0e0009) AM_READ_PORT("DSW1")	/* Dip 1 */
+	AM_RANGE(0x0e000a, 0x0e000b) AM_READ_PORT("DSW2")	/* Dip 2 */
 	AM_RANGE(0x0e0018, 0x0e0019) AM_READ(sound_cpu_r)
 	AM_RANGE(0x0e8000, 0x0e8001) AM_READ(kludge_r)
 	AM_RANGE(0x0e8002, 0x0e8003) AM_READ(control_3_r)
@@ -355,8 +353,8 @@ static ADDRESS_MAP_START( mechatt_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x0e0002, 0x0e0003) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("IN0")
+	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0e0004, 0x0e0007) AM_READ(mechatt_gun_r)
 	AM_RANGE(0x0e8000, 0x0e8001) AM_READ(sound_cpu_r)
 ADDRESS_MAP_END
@@ -442,7 +440,7 @@ static INPUT_PORTS_START( bbusters )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")
+	PORT_START_TAG("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -504,19 +502,19 @@ static INPUT_PORTS_START( bbusters )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )			/* Listed as "Unused" */
 	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "SW2:8" )
 
-	PORT_START_TAG("IN5")
+	PORT_START_TAG("GUNX1")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
-	PORT_START_TAG("IN6")
+	PORT_START_TAG("GUNY1")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START_TAG("IN7")
+	PORT_START_TAG("GUNX2")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(2)
-	PORT_START_TAG("IN8")
+	PORT_START_TAG("GUNY2")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START_TAG("IN9")
+	PORT_START_TAG("GUNX3")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(3)
-	PORT_START_TAG("IN10")
+	PORT_START_TAG("GUNY3")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(3)
 
 #if BBUSTERS_HACK
@@ -585,14 +583,14 @@ static INPUT_PORTS_START( mechatt )
 	PORT_DIPUNUSED_DIPLOC(0x4000, 0x4000, "SW2:7" )			/* Listed as "Unused" */
 	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW2:8" )
 
-	PORT_START_TAG("IN2")
+	PORT_START_TAG("GUNX1")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
-	PORT_START_TAG("IN3")
+	PORT_START_TAG("GUNY1")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START_TAG("IN4")
+	PORT_START_TAG("GUNX2")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(2)
-	PORT_START_TAG("IN5")
+	PORT_START_TAG("GUNY2")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
 #if MECHATT_HACK

@@ -191,16 +191,16 @@ static READ16_HANDLER( shadfrce_input_ports_r )
 	switch (offset)
 	{
 		case 0 :
-			data = (input_port_read_indexed(machine, 0) & 0xff) | ((input_port_read_indexed(machine, 7) & 0xc0) << 6) | ((input_port_read_indexed(machine, 4) & 0x0f) << 8);
+			data = (input_port_read(machine, "P1") & 0xff) | ((input_port_read(machine, "DSW2") & 0xc0) << 6) | ((input_port_read(machine, "SYSTEM") & 0x0f) << 8);
 			break;
 		case 1 :
-			data = (input_port_read_indexed(machine, 1) & 0xff) | ((input_port_read_indexed(machine, 7) & 0x3f) << 8);
+			data = (input_port_read(machine, "P2") & 0xff) | ((input_port_read(machine, "DSW2") & 0x3f) << 8);
 			break;
 		case 2 :
-			data = (input_port_read_indexed(machine, 2) & 0xff) | ((input_port_read_indexed(machine, 6) & 0x3f) << 8);
+			data = (input_port_read(machine, "EXTRA") & 0xff) | ((input_port_read(machine, "DSW1") & 0x3f) << 8);
 			break;
 		case 3 :
-			data = (input_port_read_indexed(machine, 3) & 0xff) | ((input_port_read_indexed(machine, 6) & 0xc0) << 2) | ((input_port_read_indexed(machine, 5) & 0x3c) << 8);
+			data = (input_port_read(machine, "OTHER") & 0xff) | ((input_port_read(machine, "DSW1") & 0xc0) << 2) | ((input_port_read(machine, "MISC") & 0x3c) << 8);
 			break;
 	}
 
@@ -242,10 +242,10 @@ static ADDRESS_MAP_START( shadfrce_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 #if USE_SHADFRCE_FAKE_INPUT_PORTS
 	AM_RANGE(0x1d0020, 0x1d0027) AM_READ(shadfrce_input_ports_r)
 #else
-	AM_RANGE(0x1d0020, 0x1d0021) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x1d0022, 0x1d0023) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x1d0024, 0x1d0025) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x1d0026, 0x1d0027) AM_READ(input_port_3_word_r)
+	AM_RANGE(0x1d0020, 0x1d0021) AM_READ_PORT("IN0")
+	AM_RANGE(0x1d0022, 0x1d0023) AM_READ_PORT("IN1")
+	AM_RANGE(0x1d0024, 0x1d0025) AM_READ_PORT("IN2")
+	AM_RANGE(0x1d0026, 0x1d0027) AM_READ_PORT("IN3")
 #endif
 	AM_RANGE(0x1F0000, 0x1FFFFF) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
@@ -323,13 +323,13 @@ ADDRESS_MAP_END
 
 #if USE_SHADFRCE_FAKE_INPUT_PORTS
 static INPUT_PORTS_START( shadfrce )
-	PORT_START	/* Fake IN0 (player 1 inputs) */
+	PORT_START_TAG("P1")	/* Fake IN0 (player 1 inputs) */
 	SHADFRCE_PLAYER_INPUT( 1, IPT_START1 )
 
-	PORT_START	/* Fake IN1 (player 2 inputs) */
+	PORT_START_TAG("P2")	/* Fake IN1 (player 2 inputs) */
 	SHADFRCE_PLAYER_INPUT( 2, IPT_START2 )
 
-	PORT_START	/* Fake IN2 (players 1 & 2 extra inputs */
+	PORT_START_TAG("EXTRA")	/* Fake IN2 (players 1 & 2 extra inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
@@ -339,21 +339,21 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* Fake IN3 (other extra inputs ?) */
+	PORT_START_TAG("OTHER")	/* Fake IN3 (other extra inputs ?) */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* Fake IN4 (system inputs) */
+	PORT_START_TAG("SYSTEM")	/* Fake IN4 (system inputs) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )                   /* only in "test mode" ? */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )                /* only in "test mode" ? */
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* Fake IN5 (misc) */
+	PORT_START_TAG("MISC")	/* Fake IN5 (misc) */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_VBLANK )                  /* guess */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )                 /* must be ACTIVE_LOW or 'shadfrcj' jumps to the end (code at 0x04902e) */
 	PORT_BIT( 0xeb, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* Fake IN6 (DIP1) */
+	PORT_START_TAG("DSW1")	/* Fake IN6 (DIP1) */
 	PORT_DIPNAME( 0x01, 0x01, "Unused DIP 1-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -376,7 +376,7 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	/* Fake IN7 (DIP2) */
+	PORT_START_TAG("DSW2")	/* Fake IN7 (DIP2) */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -402,7 +402,7 @@ static INPUT_PORTS_START( shadfrce )
 INPUT_PORTS_END
 #else
 static INPUT_PORTS_START( shadfrce )
-	PORT_START	/* IN0 - $1d0020.w */
+	PORT_START_TAG("IN0")	/* IN0 - $1d0020.w */
 	SHADFRCE_PLAYER_INPUT( 1, IPT_START1 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )                 /* only in "test mode" ? */
@@ -417,7 +417,7 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN1 - $1d0022.w */
+	PORT_START_TAG("IN1")	/* IN1 - $1d0022.w */
 	SHADFRCE_PLAYER_INPUT( 2, IPT_START2 )
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Easy ) )
@@ -438,7 +438,7 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN2 - $1d0024.w */
+	PORT_START_TAG("IN2")	/* IN2 - $1d0024.w */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
@@ -467,7 +467,7 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN3 - $1d0026.w */
+	PORT_START_TAG("IN3")	/* IN3 - $1d0026.w */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )

@@ -38,7 +38,7 @@ static UINT8 clear_tv;
 static READ8_HANDLER( port_b_u3_r )
 {
 	logerror("%04x: read DIP\n",activecpu_get_pc());
-	return input_port_read_indexed(machine, 1);
+	return input_port_read(machine, "DSW");
 }
 
 
@@ -139,16 +139,16 @@ static UINT8 last = 0;
 	if (timer & 0x100) popmessage("watchdog!");
 
 
-	if (last != (input_port_read_indexed(machine, 0) & 0x0f))
+	if (last != (input_port_read(machine, "INPUT") & 0x0f))
 	{
-		last = input_port_read_indexed(machine, 0) & 0x0f;
+		last = input_port_read(machine, "INPUT") & 0x0f;
 		cpunum_set_input_line(machine, 0, 0, PULSE_LINE);
 	}
-	pia_set_input_a(0, input_port_read_indexed(machine, 0) & 0x0f, 0);
+	pia_set_input_a(0, input_port_read(machine, "INPUT") & 0x0f, 0);
 
-	pia_set_input_ca1(0, input_port_read_indexed(machine, 0) & 0x10);
+	pia_set_input_ca1(0, input_port_read(machine, "INPUT") & 0x10);
 
-	pia_set_input_ca2(0, input_port_read_indexed(machine, 0) & 0x20);
+	pia_set_input_ca2(0, input_port_read(machine, "INPUT") & 0x20);
 }
 
 static READ8_HANDLER( timer_r )
@@ -357,7 +357,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( toratora )
-	PORT_START
+	PORT_START_TAG("INPUT")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -367,7 +367,7 @@ static INPUT_PORTS_START( toratora )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "2" )

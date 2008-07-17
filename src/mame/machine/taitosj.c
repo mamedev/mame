@@ -316,5 +316,5 @@ WRITE8_HANDLER( alpinea_bankswitch_w )
 
 READ8_HANDLER( alpine_port_2_r )
 {
-	return input_port_read_indexed(machine,2) | protection_value;
+	return input_port_read(machine, "IN2") | protection_value;
 }

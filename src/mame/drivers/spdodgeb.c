@@ -111,13 +111,13 @@ static void mcu63705_update_inputs(running_machine *machine)
 	int p,j;
 
 	/* update running state */
-	for (p = 0;p <= 1;p++)
+	for (p = 0; p <= 1; p++)
 	{
 		static int prev[2][2],countup[2][2],countdown[2][2];
 		int curr[2][2];
 
-		curr[p][0] = input_port_read_indexed(machine, 2+p) & 0x01;
-		curr[p][1] = input_port_read_indexed(machine, 2+p) & 0x02;
+		curr[p][0] = input_port_read(machine, p ? "P2" : "P1") & 0x01;
+		curr[p][1] = input_port_read(machine, p ? "P2" : "P1") & 0x02;
 
 		for (j = 0;j <= 1;j++)
 		{
@@ -147,12 +147,12 @@ static void mcu63705_update_inputs(running_machine *machine)
 	}
 
 	/* update jumping and buttons state */
-	for (p = 0;p <= 1;p++)
+	for (p = 0; p <= 1; p++)
 	{
 		static int prev[2];
 		int curr[2];
 
-		curr[p] = input_port_read_indexed(machine, 2+p) & 0x30;
+		curr[p] = input_port_read(machine, p ? "P2" : "P1") & 0x30;
 
 		if (jumped[p]) buttons[p] = 0;	/* jump only momentarily flips the buttons */
 		else buttons[p] = curr[p];
@@ -163,8 +163,8 @@ static void mcu63705_update_inputs(running_machine *machine)
 		prev[p] = curr[p];
 	}
 
-	inputs[0] = input_port_read_indexed(machine, 2) & 0xcf;
-	inputs[1] = input_port_read_indexed(machine, 3) & 0x0f;
+	inputs[0] = input_port_read(machine, "P1") & 0xcf;
+	inputs[1] = input_port_read(machine, "P2") & 0x0f;
 	inputs[2] = running[0] | buttons[0];
 	inputs[3] = running[1] | buttons[1];
 }
@@ -187,7 +187,7 @@ static void mcu63705_update_inputs(running_machine *machine)
 
 	for (p=0; p<=1; p++)
 	{
-		curr_port[p] = input_port_read_indexed(machine, p+2);
+		curr_port[p] = input_port_read(machine, p ? "P2" : "P1");
 		curr_dash[p] = 0;
 
 		if (curr_port[p] & R)
@@ -242,7 +242,7 @@ static READ8_HANDLER( mcu63701_r )
 		case 1: return inputs[1];
 		case 2: return inputs[2];
 		case 3: return inputs[3];
-		case 4: return input_port_read_indexed(machine, 4);
+		case 4: return input_port_read(machine, "IN1");
 	}
 }
 
@@ -256,7 +256,7 @@ static WRITE8_HANDLER( mcu63701_w )
 
 static READ8_HANDLER( port_0_r )
 {
-	int port = input_port_read_indexed(machine, 0);
+	int port = input_port_read(machine, "IN0");
 
 	toggle^=0x02;	/* mcu63701_busy flag */
 
@@ -269,7 +269,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x2000, 0x2fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x3000, 0x3000) AM_READ(port_0_r)
-	AM_RANGE(0x3001, 0x3001) AM_READ(input_port_1_r)	/* DIPs */
+	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW")	/* DIPs */
 	AM_RANGE(0x3801, 0x3805) AM_READ(mcu63701_r)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
@@ -284,7 +284,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3002, 0x3002) AM_WRITE(sound_command_w)
 //  AM_RANGE(0x3003, 0x3003) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x3004, 0x3004) AM_WRITE(spdodgeb_scrollx_lo_w)
-//  AM_RANGE(0x3005, 0x3005) AM_WRITE(SMH_RAM) /* mcu63701_output_w */
+//  AM_RANGE(0x3005, 0x3005) AM_WRITE(SMH_RAM)			/* mcu63701_output_w */
 	AM_RANGE(0x3006, 0x3006) AM_WRITE(spdodgeb_ctrl_w)	/* scroll hi, flip screen, bank switch, palette select */
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(mcu63701_w)
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
@@ -306,7 +306,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( spdodgeb )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* mcu63701_busy flag */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -319,7 +319,7 @@ static INPUT_PORTS_START( spdodgeb )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ))
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
@@ -345,7 +345,7 @@ static INPUT_PORTS_START( spdodgeb )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -355,7 +355,7 @@ static INPUT_PORTS_START( spdodgeb )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
@@ -365,7 +365,7 @@ static INPUT_PORTS_START( spdodgeb )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )

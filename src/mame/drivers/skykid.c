@@ -52,19 +52,19 @@ static READ8_HANDLER( inputport_r )
 	switch (inputport_selected)
 	{
 		case 0x00:	/* DSW B (bits 0-4) */
-			return (input_port_read_indexed(machine, 1) & 0xf8) >> 3; break;
+			return (input_port_read(machine, "DSWB") & 0xf8) >> 3; break;
 		case 0x01:	/* DSW B (bits 5-7), DSW A (bits 0-1) */
-			return ((input_port_read_indexed(machine, 1) & 0x07) << 2) | ((input_port_read_indexed(machine, 0) & 0xc0) >> 6); break;
+			return ((input_port_read(machine, "DSWB") & 0x07) << 2) | ((input_port_read(machine, "DSWA") & 0xc0) >> 6); break;
 		case 0x02:	/* DSW A (bits 2-6) */
-			return (input_port_read_indexed(machine, 0) & 0x3e) >> 1; break;
+			return (input_port_read(machine, "DSWA") & 0x3e) >> 1; break;
 		case 0x03:	/* DSW A (bit 7), DSW C (bits 0-3) */
-			return ((input_port_read_indexed(machine, 0) & 0x01) << 4) | (input_port_read_indexed(machine, 2) & 0x0f); break;
+			return ((input_port_read(machine, "DSWA") & 0x01) << 4) | (input_port_read(machine, "BUTTON2") & 0x0f); break;
 		case 0x04:	/* coins, start */
-			return input_port_read_indexed(machine, 3); break;
+			return input_port_read(machine, "SYSTEM"); break;
 		case 0x05:	/* 2P controls */
-			return input_port_read_indexed(machine, 5); break;
+			return input_port_read(machine, "P2"); break;
 		case 0x06:	/* 1P controls */
-			return input_port_read_indexed(machine, 4); break;
+			return input_port_read(machine, "P1"); break;
 		default:
 			return 0xff;
 	}
@@ -156,7 +156,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( skykid )
-	PORT_START	/* DSW A */
+	PORT_START_TAG("DSWA")	/* DSW A */
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
@@ -178,7 +178,7 @@ static INPUT_PORTS_START( skykid )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 
-	PORT_START	/* DSW B */
+	PORT_START_TAG("DSWB")	/* DSW B */
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
@@ -202,14 +202,14 @@ static INPUT_PORTS_START( skykid )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("BUTTON2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN 0 */
+	PORT_START_TAG("SYSTEM")	/* IN 0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -217,7 +217,7 @@ static INPUT_PORTS_START( skykid )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN 1 */
+	PORT_START_TAG("P1")	/* IN 1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -225,7 +225,7 @@ static INPUT_PORTS_START( skykid )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN 2 */
+	PORT_START_TAG("P2")	/* IN 2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -235,7 +235,7 @@ static INPUT_PORTS_START( skykid )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( skykids )
-	PORT_START	/* DSW A */
+	PORT_START_TAG("DSWA")	/* DSW A */
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
@@ -257,7 +257,7 @@ static INPUT_PORTS_START( skykids )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 
-	PORT_START	/* DSW B */
+	PORT_START_TAG("DSWB")	/* DSW B */
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
@@ -281,14 +281,14 @@ static INPUT_PORTS_START( skykids )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("BUTTON2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN 0 */
+	PORT_START_TAG("SYSTEM")	/* IN 0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -296,7 +296,7 @@ static INPUT_PORTS_START( skykids )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN 1 */
+	PORT_START_TAG("P1")	/* IN 1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -304,7 +304,7 @@ static INPUT_PORTS_START( skykids )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN 2 */
+	PORT_START_TAG("P2")	/* IN 2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -314,7 +314,7 @@ static INPUT_PORTS_START( skykids )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( drgnbstr )
-	PORT_START	/* DSW A */
+	PORT_START_TAG("DSWA")	/* DSW A */
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
@@ -336,7 +336,7 @@ static INPUT_PORTS_START( drgnbstr )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 
-	PORT_START	/* DSW B */
+	PORT_START_TAG("DSWB")	/* DSW B */
 	PORT_DIPNAME( 0x80, 0x80, "Spurt Time" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Difficult" )
@@ -360,7 +360,7 @@ static INPUT_PORTS_START( drgnbstr )
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
-	PORT_START
+	PORT_START_TAG("BUTTON2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
@@ -369,7 +369,7 @@ static INPUT_PORTS_START( drgnbstr )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN 0 */
+	PORT_START_TAG("SYSTEM")	/* IN 0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -377,7 +377,7 @@ static INPUT_PORTS_START( drgnbstr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN 1 */
+	PORT_START_TAG("P1")	/* IN 1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
@@ -385,7 +385,7 @@ static INPUT_PORTS_START( drgnbstr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN 2 */
+	PORT_START_TAG("P2")	/* IN 2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL

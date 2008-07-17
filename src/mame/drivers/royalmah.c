@@ -316,7 +316,7 @@ static WRITE8_HANDLER( mjapinky_palbank_w )
 
 static READ8_HANDLER( mjapinky_dsw_r )
 {
-	if (rombank == 0x0e)	return input_port_read_indexed(machine, 13);
+	if (rombank == 0x0e)	return input_port_read(machine, "DSW3");
 	else					return *(memory_region(machine, REGION_CPU1) + 0x10000 + 0x8000 * rombank);
 }
 

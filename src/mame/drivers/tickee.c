@@ -43,8 +43,8 @@ INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *
 {
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	*x = (((input_port_read_indexed(machine, 4 + player * 2) & 0xff) * (visarea->max_x - visarea->min_x)) >> 8) + visarea->min_x;
-	*y = (((input_port_read_indexed(machine, 5 + player * 2) & 0xff) * (visarea->max_y - visarea->min_y)) >> 8) + visarea->min_y;
+	*x = (((input_port_read(machine, player ? "GUNX2" : "GUNX1") & 0xff) * (visarea->max_x - visarea->min_x)) >> 8) + visarea->min_x;
+	*y = (((input_port_read(machine, player ? "GUNY2" : "GUNY1") & 0xff) * (visarea->max_y - visarea->min_y)) >> 8) + visarea->min_y;
 }
 
 
@@ -161,12 +161,12 @@ static MACHINE_RESET( tickee )
 
 static READ8_HANDLER( port1_r )
 {
-	return input_port_read_indexed(machine,1) | (ticket_dispenser_0_r(machine, 0) >> 5) | (ticket_dispenser_1_r(machine, 0) >> 6);
+	return input_port_read(machine, "IN0") | (ticket_dispenser_0_r(machine, 0) >> 5) | (ticket_dispenser_1_r(machine, 0) >> 6);
 }
 
 static READ8_HANDLER( port2_r )
 {
-	return input_port_read_indexed(machine,3) | (ticket_dispenser_0_r(machine, 0) >> 5) | (ticket_dispenser_1_r(machine, 0) >> 6);
+	return input_port_read(machine, "IN2") | (ticket_dispenser_0_r(machine, 0) >> 5) | (ticket_dispenser_1_r(machine, 0) >> 6);
 }
 
 
@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( tickee_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x04200100, 0x0420010f) AM_READWRITE(AY8910_read_port_1_lsb_r, AY8910_control_port_1_lsb_w)
 	AM_RANGE(0x04200110, 0x0420011f) AM_WRITE(AY8910_write_port_1_lsb_w)
 	AM_RANGE(0x04400000, 0x0440007f) AM_WRITE(tickee_control_w) AM_BASE(&tickee_control)
-	AM_RANGE(0x04400040, 0x0440004f) AM_READ(input_port_3_word_r)
+	AM_RANGE(0x04400040, 0x0440004f) AM_READ_PORT("IN2")
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP		/* seems to be a bug in their code */
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1, 0)
@@ -250,7 +250,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( tickee )
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x03, 0x01, "Game Time/Diff" )
 	PORT_DIPSETTING(    0x03, "Very Fast/Very Easy" )
 	PORT_DIPSETTING(    0x02, "Fast/Easy" )
@@ -273,13 +273,13 @@ static INPUT_PORTS_START( tickee )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ))
 
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* right ticket status */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* left ticket status */
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -288,25 +288,25 @@ static INPUT_PORTS_START( tickee )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
 	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START				/* fake analog X */
+	PORT_START_TAG("GUNX1")			/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START				/* fake analog Y */
+	PORT_START_TAG("GUNY1")			/* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	PORT_START				/* fake analog X */
+	PORT_START_TAG("GUNX2")			/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START				/* fake analog Y */
+	PORT_START_TAG("GUNY2")			/* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ghoshunt )
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Messages in Play")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
@@ -330,14 +330,14 @@ static INPUT_PORTS_START( ghoshunt )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ))
 
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* right ticket status */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* left ticket status */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xd8, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -346,23 +346,23 @@ static INPUT_PORTS_START( ghoshunt )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* right ticket status */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* left ticket status */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xd8, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START				/* fake analog X */
+	PORT_START_TAG("GUNX1")			/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START				/* fake analog Y */
+	PORT_START_TAG("GUNY1")			/* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	PORT_START				/* fake analog X */
+	PORT_START_TAG("GUNX2")			/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START				/* fake analog Y */
+	PORT_START_TAG("GUNY2")			/* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 

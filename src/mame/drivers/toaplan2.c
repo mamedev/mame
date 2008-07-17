@@ -754,7 +754,7 @@ static READ16_HANDLER( c2map_port_6_r )
 	}
 	if (mcu_data == 0xff) mcu_data = 0x10;
 	else mcu_data = 0x00;
-	return ( mcu_data | input_port_read_indexed(machine, 6) );
+	return ( mcu_data | input_port_read(machine, "JMPR") );
 }
 
 static READ16_HANDLER( pipibibi_z80_status_r )
@@ -774,7 +774,7 @@ static READ16_HANDLER( ghox_p1_h_analog_r )
 {
 	INT8 value, new_value;
 
-	new_value = input_port_read_indexed(machine, 7);
+	new_value = input_port_read(machine, "PAD1");
 	if (new_value == old_p1_paddle_h) return 0;
 	value = new_value - old_p1_paddle_h;
 	old_p1_paddle_h = new_value;
@@ -785,7 +785,7 @@ static READ16_HANDLER( ghox_p2_h_analog_r )
 {
 	INT8 value, new_value;
 
-	new_value = input_port_read_indexed(machine, 8);
+	new_value = input_port_read(machine, "PAD2");
 	if (new_value == old_p2_paddle_h) return 0;
 	value = new_value - old_p2_paddle_h;
 	old_p2_paddle_h = new_value;

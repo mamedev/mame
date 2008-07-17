@@ -150,22 +150,22 @@ static UINT8 fix_input1(UINT8 in1, UINT8 in2)
 
 static READ8_HANDLER( dsw0_r )
 {
-	return fix_input0(input_port_read_indexed(machine, 0), input_port_read_indexed(machine, 1));
+	return fix_input0(input_port_read(machine, "DSW1"), input_port_read(machine, "DSW2"));
 }
 
 static READ8_HANDLER( dsw1_r )
 {
-	return fix_input1(input_port_read_indexed(machine, 0), input_port_read_indexed(machine, 1));
+	return fix_input1(input_port_read(machine, "DSW1"), input_port_read(machine, "DSW2"));
 }
 
 static READ8_HANDLER( input0_r )
 {
-	return fix_input0(input_port_read_indexed(machine, 2), input_port_read_indexed(machine, 3));
+	return fix_input0(input_port_read(machine, "BUTTONS"), input_port_read(machine, "SERVICE"));
 }
 
 static READ8_HANDLER( input1_r )
 {
-	return fix_input1(input_port_read_indexed(machine, 2), input_port_read_indexed(machine, 3));
+	return fix_input1(input_port_read(machine, "BUTTONS"), input_port_read(machine, "SERVICE"));
 }
 
 static READ8_HANDLER( readFF )
@@ -183,9 +183,9 @@ static ADDRESS_MAP_START( m6809_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(namcos1_cus30_r, namcos1_cus30_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(SMH_NOP)				// 3D scope left/right?
 	AM_RANGE(0x4f00, 0x4f00) AM_READ(SMH_NOP)				// unknown
-	AM_RANGE(0x4f01, 0x4f01) AM_READ(input_port_4_r)		// analog input (accel)
-	AM_RANGE(0x4f02, 0x4f02) AM_READ(input_port_5_r)		// analog input (left/right)
-	AM_RANGE(0x4f03, 0x4f03) AM_READ(input_port_6_r)		// analog input (up/down)
+	AM_RANGE(0x4f01, 0x4f01) AM_READ_PORT("PEDAL")			// analog input (accel)
+	AM_RANGE(0x4f02, 0x4f02) AM_READ_PORT("STICKX")			// analog input (left/right)
+	AM_RANGE(0x4f03, 0x4f03) AM_READ_PORT("STICKY")			// analog input (up/down)
 	AM_RANGE(0x4f00, 0x4f03) AM_WRITE(SMH_NOP)				// analog input control?
 	AM_RANGE(0x5000, 0x5006) AM_WRITE(tceptor_bg_scroll_w)	// bg scroll
 	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE(1) AM_BASE(&m68k_shared_ram) // COM RAM
@@ -259,7 +259,7 @@ ADDRESS_MAP_END
 /*******************************************************************/
 
 static INPUT_PORTS_START( tceptor )
-	PORT_START      /* DSW 1 */
+	PORT_START_TAG("DSW1")	/* DSW 1 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
@@ -282,7 +282,7 @@ static INPUT_PORTS_START( tceptor )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START      /* DSW 2 */
+	PORT_START_TAG("DSW2")	/* DSW 2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, "A" )
 	PORT_DIPSETTING(    0x03, "B" )
@@ -290,87 +290,38 @@ static INPUT_PORTS_START( tceptor )
 	PORT_DIPSETTING(    0x00, "D" )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START      /* Memory Mapped Port */
+	PORT_START_TAG("BUTTONS")	/* Memory Mapped Port */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	// shot
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	// bomb
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )	// shot
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )	// bomb
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START      /* Memory Mapped Port */
+	PORT_START_TAG("SERVICE")	/* Memory Mapped Port */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )		// TEST SW
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* ADC0809 - 8 CHANNEL ANALOG - CHANNEL 1 */
+	PORT_START_TAG("PEDAL")	/* ADC0809 - 8 CHANNEL ANALOG - CHANNEL 1 */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xd6) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_CODE_INC(KEYCODE_Z)
 
-	PORT_START	/* ADC0809 - 8 CHANNEL ANALOG - CHANNEL 2 */
+	PORT_START_TAG("STICKX")	/* ADC0809 - 8 CHANNEL ANALOG - CHANNEL 2 */
 	PORT_BIT(  0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START	/* ADC08090 - 8 CHANNEL ANALOG - CHANNEL 3 */
+	PORT_START_TAG("STICKY")	/* ADC08090 - 8 CHANNEL ANALOG - CHANNEL 3 */
 	PORT_BIT(  0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tceptor2 )
-	PORT_START      /* DSW 1 */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Freeze" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE( tceptor )
 
-	PORT_START      /* DSW 2 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, "A" )
-	PORT_DIPSETTING(    0x03, "B" )
-	PORT_DIPSETTING(    0x01, "C" )
-	PORT_DIPSETTING(    0x00, "D" )
+	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x04, 0x04, "MODE" )
 	PORT_DIPSETTING(    0x00, "2D" )
 	PORT_DIPSETTING(    0x04, "3D" )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START      /* Memory Mapped Port */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	// shot
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	// bomb
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )	// shot
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )	// bomb
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START      /* Memory Mapped Port */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )		// TEST SW
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START	/* ADC0809 - 8 CHANNEL ANALOG - CHANNEL 1 */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xd6) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_CODE_INC(KEYCODE_Z)
-
-	PORT_START	/* ADC0809 - 8 CHANNEL ANALOG - CHANNEL 2 */
-	PORT_BIT(  0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
-
-	PORT_START	/* ADC08090 - 8 CHANNEL ANALOG - CHANNEL 3 */
-	PORT_BIT(  0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 INPUT_PORTS_END
 
 

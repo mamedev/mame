@@ -453,19 +453,19 @@ static WRITE16_HANDLER( grdians_lockout_w )
 }
 
 static ADDRESS_MAP_START( grdians_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM					)	// ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0x304000, 0x30ffff) AM_READ(SMH_RAM					)	// ? seems tile data
-	AM_RANGE(0x600000, 0x600001) AM_READ(input_port_0_word_r		)	// DSW 1
-	AM_RANGE(0x600002, 0x600003) AM_READ(input_port_1_word_r		)	// DSW 2
-	AM_RANGE(0x700000, 0x700001) AM_READ(input_port_2_word_r		)	// P1
-	AM_RANGE(0x700002, 0x700003) AM_READ(input_port_3_word_r		)	// P2
-	AM_RANGE(0x700004, 0x700005) AM_READ(input_port_4_word_r		)	// Coins
+	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM				)	// ROM
+	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM				)	// RAM
+	AM_RANGE(0x304000, 0x30ffff) AM_READ(SMH_RAM				)	// ? seems tile data
+	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW1")				// DSW 1
+	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("DSW2")				// DSW 2
+	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")					// P1
+	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")					// P2
+	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")				// Coins
 	AM_RANGE(0x70000c, 0x70000d) AM_READ(watchdog_reset16_r		)	// Watchdog
 	AM_RANGE(0xb00000, 0xb03fff) AM_READ(seta_sound_word_r 		)	// Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_READ(SMH_RAM					)	// Sprites
-	AM_RANGE(0xc40000, 0xc4ffff) AM_READ(SMH_RAM					)	// Palette
-	AM_RANGE(0xfffc00, 0xffffff) AM_READ(SMH_RAM					)	// TMP68301 Registers
+	AM_RANGE(0xc00000, 0xc3ffff) AM_READ(SMH_RAM				)	// Sprites
+	AM_RANGE(0xc40000, 0xc4ffff) AM_READ(SMH_RAM				)	// Palette
+	AM_RANGE(0xfffc00, 0xffffff) AM_READ(SMH_RAM				)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( grdians_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -523,16 +523,16 @@ static WRITE16_HANDLER( gundamex_eeprom_w )
 }
 
 static ADDRESS_MAP_START( gundamex_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM					)	// ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0x500000, 0x57ffff) AM_READ(SMH_ROM					)	// ROM
-	AM_RANGE(0x600000, 0x600001) AM_READ(input_port_0_word_r		)	// DSW 1
-	AM_RANGE(0x600002, 0x600003) AM_READ(input_port_1_word_r		)	// DSW 2
-	AM_RANGE(0x700000, 0x700001) AM_READ(input_port_2_word_r		)	// P1
-	AM_RANGE(0x700002, 0x700003) AM_READ(input_port_3_word_r		)	// P2
-	AM_RANGE(0x700004, 0x700005) AM_READ(input_port_4_word_r		)	// Coins
-	AM_RANGE(0x700008, 0x700009) AM_READ(input_port_5_word_r		)	// P1
-	AM_RANGE(0x70000a, 0x70000b) AM_READ(input_port_6_word_r		)	// P2
+	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM				)	// ROM
+	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM				)	// RAM
+	AM_RANGE(0x500000, 0x57ffff) AM_READ(SMH_ROM				)	// ROM
+	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW1")				// DSW 1
+	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("DSW2")				// DSW 2
+	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")					// P1
+	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")					// P2
+	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")				// Coins
+	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("IN0")				// P1
+	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("IN1")				// P2
 	AM_RANGE(0xb00000, 0xb03fff) AM_READ(seta_sound_word_r 		)	// Sound
 	AM_RANGE(0xfffd0a, 0xfffd0b) AM_READ(gundamex_eeprom_r		)	// parallel data register
 ADDRESS_MAP_END
@@ -563,11 +563,11 @@ static READ16_HANDLER( mj4simai_p1_r )
 {
 	switch (keyboard_row)
 	{
-		case 0x01: return input_port_read_indexed(machine, 3);
-		case 0x02: return input_port_read_indexed(machine, 4);
-		case 0x04: return input_port_read_indexed(machine, 5);
-		case 0x08: return input_port_read_indexed(machine, 6);
-		case 0x10: return input_port_read_indexed(machine, 7);
+		case 0x01: return input_port_read(machine, "KEY0");
+		case 0x02: return input_port_read(machine, "KEY1");
+		case 0x04: return input_port_read(machine, "KEY2");
+		case 0x08: return input_port_read(machine, "KEY3");
+		case 0x10: return input_port_read(machine, "KEY4");
 		default:   logerror("p1_r with keyboard_row = %02x\n",keyboard_row); return 0xffff;
 	}
 }
@@ -579,18 +579,18 @@ static WRITE16_HANDLER( mj4simai_keyboard_w )
 }
 
 static ADDRESS_MAP_START( mj4simai_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM					)	// ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0x600000, 0x600001) AM_READ(mj4simai_p1_r				)	// P1
-	AM_RANGE(0x600002, 0x600003) AM_READ(mj4simai_p1_r				)	// P2, but I'm using P1 again
+	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM				)	// ROM
+	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM				)	// RAM
+	AM_RANGE(0x600000, 0x600001) AM_READ(mj4simai_p1_r			)	// P1
+	AM_RANGE(0x600002, 0x600003) AM_READ(mj4simai_p1_r			)	// P2, but I'm using P1 again
 	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r		)	// Watchdog
-	AM_RANGE(0x600100, 0x600101) AM_READ(input_port_2_word_r		)	//
-	AM_RANGE(0x600300, 0x600301) AM_READ(input_port_0_word_r		)	// DSW 1
-	AM_RANGE(0x600302, 0x600303) AM_READ(input_port_1_word_r		)	// DSW 2
+	AM_RANGE(0x600100, 0x600101) AM_READ_PORT("SYSTEM")				//
+	AM_RANGE(0x600300, 0x600301) AM_READ_PORT("DSW1")				// DSW 1
+	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW2")				// DSW 2
 	AM_RANGE(0xb00000, 0xb03fff) AM_READ(seta_sound_word_r 		)	// Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_READ(SMH_RAM					)	// Sprites
-	AM_RANGE(0xc40000, 0xc4ffff) AM_READ(SMH_RAM					)	// Palette
-	AM_RANGE(0xfffc00, 0xffffff) AM_READ(SMH_RAM					)	// TMP68301 Registers
+	AM_RANGE(0xc00000, 0xc3ffff) AM_READ(SMH_RAM				)	// Sprites
+	AM_RANGE(0xc40000, 0xc4ffff) AM_READ(SMH_RAM				)	// Palette
+	AM_RANGE(0xfffc00, 0xffffff) AM_READ(SMH_RAM				)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mj4simai_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -612,18 +612,18 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( myangel_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM					)	// ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0x700000, 0x700001) AM_READ(input_port_2_word_r		)	// P1
-	AM_RANGE(0x700002, 0x700003) AM_READ(input_port_3_word_r		)	// P2
-	AM_RANGE(0x700004, 0x700005) AM_READ(input_port_4_word_r		)	// Coins
+	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM				)	// ROM
+	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM				)	// RAM
+	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")					// P1
+	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")					// P2
+	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")				// Coins
 	AM_RANGE(0x700006, 0x700007) AM_READ(watchdog_reset16_r		)	// Watchdog
-	AM_RANGE(0x700300, 0x700301) AM_READ(input_port_0_word_r		)	// DSW 1
-	AM_RANGE(0x700302, 0x700303) AM_READ(input_port_1_word_r		)	// DSW 2
+	AM_RANGE(0x700300, 0x700301) AM_READ_PORT("DSW1")				// DSW 1
+	AM_RANGE(0x700302, 0x700303) AM_READ_PORT("DSW2")				// DSW 2
 	AM_RANGE(0xb00000, 0xb03fff) AM_READ(seta_sound_word_r 		)	// Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_READ(SMH_RAM					)	// Sprites
-	AM_RANGE(0xc40000, 0xc4ffff) AM_READ(SMH_RAM					)	// Palette
-	AM_RANGE(0xfffc00, 0xffffff) AM_READ(SMH_RAM					)	// TMP68301 Registers
+	AM_RANGE(0xc00000, 0xc3ffff) AM_READ(SMH_RAM				)	// Sprites
+	AM_RANGE(0xc40000, 0xc4ffff) AM_READ(SMH_RAM				)	// Palette
+	AM_RANGE(0xfffc00, 0xffffff) AM_READ(SMH_RAM				)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( myangel_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -644,18 +644,18 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( myangel2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM					)	// ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0x600000, 0x600001) AM_READ(input_port_2_word_r		)	// P1
-	AM_RANGE(0x600002, 0x600003) AM_READ(input_port_3_word_r		)	// P2
-	AM_RANGE(0x600004, 0x600005) AM_READ(input_port_4_word_r		)	// Coins
+	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM				)	// ROM
+	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM				)	// RAM
+	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1")					// P1
+	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")					// P2
+	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")				// Coins
 	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r		)	// Watchdog
-	AM_RANGE(0x600300, 0x600301) AM_READ(input_port_0_word_r		)	// DSW 1
-	AM_RANGE(0x600302, 0x600303) AM_READ(input_port_1_word_r		)	// DSW 2
+	AM_RANGE(0x600300, 0x600301) AM_READ_PORT("DSW1")				// DSW 1
+	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW0")				// DSW 2
 	AM_RANGE(0xb00000, 0xb03fff) AM_READ(seta_sound_word_r 		)	// Sound
-	AM_RANGE(0xd00000, 0xd3ffff) AM_READ(SMH_RAM					)	// Sprites
-	AM_RANGE(0xd40000, 0xd4ffff) AM_READ(SMH_RAM					)	// Palette
-	AM_RANGE(0xfffc00, 0xffffff) AM_READ(SMH_RAM					)	// TMP68301 Registers
+	AM_RANGE(0xd00000, 0xd3ffff) AM_READ(SMH_RAM				)	// Sprites
+	AM_RANGE(0xd40000, 0xd4ffff) AM_READ(SMH_RAM				)	// Palette
+	AM_RANGE(0xfffc00, 0xffffff) AM_READ(SMH_RAM				)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( myangel2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -685,7 +685,7 @@ static READ16_HANDLER( pzlbowl_protection_r )
 
 static READ16_HANDLER( pzlbowl_coins_r )
 {
-	return input_port_read_indexed(machine, 4) | (mame_rand(machine) & 0x80 );
+	return input_port_read(machine, "SYSTEM") | (mame_rand(machine) & 0x80 );
 }
 
 static WRITE16_HANDLER( pzlbowl_coin_counter_w )
@@ -700,10 +700,10 @@ static WRITE16_HANDLER( pzlbowl_coin_counter_w )
 static ADDRESS_MAP_START( pzlbowl_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM					)	// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0x400300, 0x400301) AM_READ(input_port_0_word_r		)	// DSW 1
-	AM_RANGE(0x400302, 0x400303) AM_READ(input_port_1_word_r		)	// DSW 2
-	AM_RANGE(0x500000, 0x500001) AM_READ(input_port_2_word_r		)	// P1
-	AM_RANGE(0x500002, 0x500003) AM_READ(input_port_3_word_r		)	// P2
+	AM_RANGE(0x400300, 0x400301) AM_READ_PORT("DSW1")				// DSW 1
+	AM_RANGE(0x400302, 0x400303) AM_READ_PORT("DSW2")				// DSW 2
+	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1")				// P1
+	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2")				// P2
 	AM_RANGE(0x500004, 0x500005) AM_READ(pzlbowl_coins_r			)	// Coins + Protection?
 	AM_RANGE(0x500006, 0x500007) AM_READ(watchdog_reset16_r		)	// Watchdog
 	AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r		)	// Protection
@@ -731,21 +731,21 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( penbros_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM					)	// ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0x210000, 0x23ffff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0x300000, 0x30ffff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0x500300, 0x500301) AM_READ(input_port_0_word_r		)	// DSW 1
-	AM_RANGE(0x500302, 0x500303) AM_READ(input_port_1_word_r		)	// DSW 2
-	AM_RANGE(0x600000, 0x600001) AM_READ(input_port_2_word_r		)	// P1
-	AM_RANGE(0x600002, 0x600003) AM_READ(input_port_3_word_r		)	// P2
-	AM_RANGE(0x600004, 0x600005) AM_READ(input_port_4_word_r		)	// Coins
+	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM				)	// ROM
+	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM				)	// RAM
+	AM_RANGE(0x210000, 0x23ffff) AM_READ(SMH_RAM				)	// RAM
+	AM_RANGE(0x300000, 0x30ffff) AM_READ(SMH_RAM				)	// RAM
+	AM_RANGE(0x500300, 0x500301) AM_READ_PORT("DSW1")				// DSW 1
+	AM_RANGE(0x500302, 0x500303) AM_READ_PORT("DSW2")				// DSW 2
+	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1")					// P1
+	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")					// P2
+	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")				// Coins
 	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r		)	// Watchdog
-//  AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r       )   // Protection
-	AM_RANGE(0xb00000, 0xb3ffff) AM_READ(SMH_RAM					)	// Sprites
-	AM_RANGE(0xb40000, 0xb4ffff) AM_READ(SMH_RAM					)	// Palette
+//  AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r	)   // Protection
+	AM_RANGE(0xb00000, 0xb3ffff) AM_READ(SMH_RAM				)	// Sprites
+	AM_RANGE(0xb40000, 0xb4ffff) AM_READ(SMH_RAM				)	// Palette
 	AM_RANGE(0xa00000, 0xa03fff) AM_READ(seta_sound_word_r 		)	// Sound
-	AM_RANGE(0xfffc00, 0xffffff) AM_READ(SMH_RAM					)	// TMP68301 Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_READ(SMH_RAM				)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( penbros_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -769,12 +769,12 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( samshoot_lightgun1_r )
 {
-//  popmessage("%02x %02x",input_port_read_indexed(machine, 3),input_port_read_indexed(machine, 2));
-	return (input_port_read_indexed(machine, 2) << 8) | input_port_read_indexed(machine, 3);
+//  popmessage("%02x %02x",input_port_read(machine, "GUN1X"),input_port_read(machine, "GUN1Y"));
+	return (input_port_read(machine, "GUN1Y") << 8) | input_port_read(machine, "GUN1X");
 }
 static READ16_HANDLER( samshoot_lightgun2_r )
 {
-	return (input_port_read_indexed(machine, 4) << 8) | input_port_read_indexed(machine, 5);
+	return (input_port_read(machine, "GUN2Y") << 8) | input_port_read(machine, "GUN2X");
 }
 
 static WRITE16_HANDLER( samshoot_coin_w )
@@ -795,17 +795,17 @@ static ADDRESS_MAP_START( samshoot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x200000, 0x20ffff ) AM_RAM
 	AM_RANGE( 0x300000, 0x30ffff ) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 
-	AM_RANGE( 0x400000, 0x400001 ) AM_READ( input_port_0_word_r )	// DSW 1
-	AM_RANGE( 0x400002, 0x400003 ) AM_READ( input_port_9_word_r )	// Buttons
+	AM_RANGE( 0x400000, 0x400001 ) AM_READ_PORT("DSW1")				// DSW 1
+	AM_RANGE( 0x400002, 0x400003 ) AM_READ_PORT("BUTTONS")			// Buttons
 
 	AM_RANGE( 0x400300, 0x40030f ) AM_WRITE( seta2_sound_bank_w )	// Samples Banks
 
 	AM_RANGE( 0x500000, 0x500001 ) AM_READ( samshoot_lightgun1_r )	// P1
 	AM_RANGE( 0x580000, 0x580001 ) AM_READ( samshoot_lightgun2_r )	// P2
 
-	AM_RANGE( 0x700000, 0x700001 ) AM_READ( input_port_6_word_r )	// Trigger
-	AM_RANGE( 0x700002, 0x700003 ) AM_READ( input_port_7_word_r )	// Pump
-	AM_RANGE( 0x700004, 0x700005 ) AM_READWRITE( input_port_8_word_r, samshoot_coin_w )	// Coins
+	AM_RANGE( 0x700000, 0x700001 ) AM_READ_PORT("TRIGGER")			// Trigger
+	AM_RANGE( 0x700002, 0x700003 ) AM_READ_PORT("PUMP")				// Pump
+	AM_RANGE( 0x700004, 0x700005 ) AM_READ_PORT("COIN")	AM_WRITE( samshoot_coin_w )	// Coins
 	AM_RANGE( 0x700006, 0x700007 ) AM_READ( watchdog_reset16_r )	// Watchdog?
 
 	AM_RANGE( 0x800000, 0x83ffff ) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
@@ -814,7 +814,7 @@ static ADDRESS_MAP_START( samshoot_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE( 0x900000, 0x903fff ) AM_READWRITE( seta_sound_word_r, seta_sound_word_w	)	// Sound
 
-	AM_RANGE( 0xfffd0a, 0xfffd0b ) AM_READ( input_port_1_word_r )	// parallel data register (DSW 2)
+	AM_RANGE( 0xfffd0a, 0xfffd0b ) AM_READ_PORT("DSW2")				// parallel data register (DSW 2)
 	AM_RANGE( 0xfffc00, 0xffffff ) AM_READWRITE( SMH_RAM, tmp68301_regs_w) AM_BASE(&tmp68301_regs )	// TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -831,7 +831,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( gundamex )
-	PORT_START_TAG("IN0")	// $600000.w
+	PORT_START_TAG("DSW1")	// $600000.w
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
@@ -853,7 +853,7 @@ static INPUT_PORTS_START( gundamex )
 	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW1:8" )
 	PORT_BIT(             0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")	// $600002.w
+	PORT_START_TAG("DSW2")	// $600002.w
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 3C_1C ) )
@@ -880,7 +880,7 @@ static INPUT_PORTS_START( gundamex )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT(             0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")	// $700000.w
+	PORT_START_TAG("P1")	// $700000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -891,7 +891,7 @@ static INPUT_PORTS_START( gundamex )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")	// $700002.w
+	PORT_START_TAG("P2")	// $700002.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
@@ -902,7 +902,7 @@ static INPUT_PORTS_START( gundamex )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN4")	// $700004.w
+	PORT_START_TAG("SYSTEM")	// $700004.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -915,7 +915,7 @@ static INPUT_PORTS_START( gundamex )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN5")	// $700008.w
+	PORT_START_TAG("IN0")	// $700008.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -926,7 +926,7 @@ static INPUT_PORTS_START( gundamex )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN6")	// $70000a.w
+	PORT_START_TAG("IN1")	// $70000a.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -943,7 +943,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( grdians )
-	PORT_START_TAG("IN0")	// $600000.w
+	PORT_START_TAG("DSW1")	// $600000.w
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy )    )	// 0
 	PORT_DIPSETTING(      0x0003, DEF_STR( Normal )  )	// 1
@@ -966,7 +966,7 @@ static INPUT_PORTS_START( grdians )
 	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
 	PORT_BIT(             0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")	// $600002.w
+	PORT_START_TAG("DSW2")	// $600002.w
 	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:1,2,3,4")
 	PORT_DIPSETTING(      0x0002, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ) )
@@ -1003,7 +1003,7 @@ static INPUT_PORTS_START( grdians )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 	PORT_BIT(             0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")	// $700000.w
+	PORT_START_TAG("P1")	// $700000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -1014,7 +1014,7 @@ static INPUT_PORTS_START( grdians )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")	// $700002.w
+	PORT_START_TAG("P2")	// $700002.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
@@ -1025,7 +1025,7 @@ static INPUT_PORTS_START( grdians )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN4")	// $700004.w
+	PORT_START_TAG("SYSTEM")	// $700004.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1043,7 +1043,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( mj4simai )
-	PORT_START_TAG("IN0")	// $600300.w
+	PORT_START_TAG("DSW1")	// $600300.w
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
@@ -1068,7 +1068,7 @@ static INPUT_PORTS_START( mj4simai )
 	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW1:8" )
 	PORT_BIT(             0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")	// $600302.w
+	PORT_START_TAG("DSW2")	// $600302.w
 	PORT_DIPNAME( 0x0007, 0x0004, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(      0x0004, "0" )
 	PORT_DIPSETTING(      0x0003, "1" )
@@ -1095,7 +1095,7 @@ static INPUT_PORTS_START( mj4simai )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT(             0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")	// $600100.w
+	PORT_START_TAG("SYSTEM")	// $600100.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1106,7 +1106,7 @@ static INPUT_PORTS_START( mj4simai )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")	// $600000(0)
+	PORT_START_TAG("KEY0")	// $600000(0)
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_I )
@@ -1115,7 +1115,7 @@ static INPUT_PORTS_START( mj4simai )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1  )
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN4")	// $600000(1)
+	PORT_START_TAG("KEY1")	// $600000(1)
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_J )
@@ -1124,7 +1124,7 @@ static INPUT_PORTS_START( mj4simai )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_START_TAG("IN5")	// $600000(2)
+	PORT_START_TAG("KEY2")	// $600000(2)
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_K )
@@ -1132,14 +1132,14 @@ static INPUT_PORTS_START( mj4simai )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
 	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN6")	// $600000(3)
+	PORT_START_TAG("KEY3")	// $600000(3)
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_L )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN7")	// $600000(4)
+	PORT_START_TAG("KEY4")	// $600000(4)
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
@@ -1156,7 +1156,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( myangel )
-	PORT_START_TAG("IN0")	// $700300.w
+	PORT_START_TAG("DSW1")	// $700300.w
 	PORT_SERVICE_DIPLOC(  0x0001, IP_ACTIVE_LOW, "SW1:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0002, "SW1:2" ) /* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0004, "SW1:3" ) /* Listed as "Unused" */
@@ -1176,7 +1176,7 @@ static INPUT_PORTS_START( myangel )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT(             0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")	// $700302.w
+	PORT_START_TAG("DSW2")	// $700302.w
 	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:1,2,3,4")
 	PORT_DIPSETTING(      0x0002, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ) )
@@ -1202,7 +1202,7 @@ static INPUT_PORTS_START( myangel )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
 	PORT_BIT(             0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2") //$700000.w
+	PORT_START_TAG("P1") //$700000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1213,7 +1213,7 @@ static INPUT_PORTS_START( myangel )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_START1  )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3") //$700002.w
+	PORT_START_TAG("P2") //$700002.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1224,7 +1224,7 @@ static INPUT_PORTS_START( myangel )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_START2  )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN4") //$700004.w
+	PORT_START_TAG("SYSTEM") //$700004.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1242,7 +1242,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( myangel2 )
-	PORT_START_TAG("IN0") //$600300.w
+	PORT_START_TAG("DSW1") //$600300.w
 	PORT_SERVICE_DIPLOC(  0x0001, IP_ACTIVE_LOW, "SW1:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0002, "SW1:2" ) /* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0004, "SW1:3" ) /* Listed as "Unused" */
@@ -1260,10 +1260,9 @@ static INPUT_PORTS_START( myangel2 )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
 	PORT_BIT(     0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1") //$600302.w
+	PORT_START_TAG("DSW2") //$600302.w
 	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:1,2,3,4")
 	PORT_DIPSETTING(      0x0002, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ) )
@@ -1287,7 +1286,7 @@ static INPUT_PORTS_START( myangel2 )
 	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW2:8" ) /* Listed as "Unused" */
 	PORT_BIT(             0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2") //$600000.w
+	PORT_START_TAG("P1") //$600000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1298,7 +1297,7 @@ static INPUT_PORTS_START( myangel2 )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_START1  )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3") //$600002.w
+	PORT_START_TAG("P2") //$600002.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1309,7 +1308,7 @@ static INPUT_PORTS_START( myangel2 )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_START2  )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN4") //$600004.w
+	PORT_START_TAG("SYSTEM") //$600004.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1327,7 +1326,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( pzlbowl )
-	PORT_START_TAG("IN0") //$400300.w
+	PORT_START_TAG("DSW1") //$400300.w
 	PORT_SERVICE_DIPLOC(  0x0001, IP_ACTIVE_LOW, "SW1:1" )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -1351,7 +1350,7 @@ static INPUT_PORTS_START( pzlbowl )
 	PORT_DIPSETTING(      0x0000, "5" )
 	PORT_BIT(             0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1") //$400302.w
+	PORT_START_TAG("DSW2") //$400302.w
 	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:1,2,3,4")
 	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_1C ) )
@@ -1381,7 +1380,7 @@ static INPUT_PORTS_START( pzlbowl )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Japanese ) )
 	PORT_BIT(             0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2") //$500000.w
+	PORT_START_TAG("P1") //$500000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -1392,7 +1391,7 @@ static INPUT_PORTS_START( pzlbowl )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3") //$500002.w
+	PORT_START_TAG("P2") //$500002.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
@@ -1403,7 +1402,7 @@ static INPUT_PORTS_START( pzlbowl )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN4") //$500004.w
+	PORT_START_TAG("SYSTEM") //$500004.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)	// unused, test mode shows it
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1421,7 +1420,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( penbros )
-	PORT_START_TAG("IN0") //$500300.w
+	PORT_START_TAG("DSW1") //$500300.w
 	PORT_SERVICE_DIPLOC(  0x0001, IP_ACTIVE_LOW, "SW1:1" )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
@@ -1442,7 +1441,7 @@ static INPUT_PORTS_START( penbros )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_2C ) )
 	PORT_BIT(             0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1") //$500302.w
+	PORT_START_TAG("DSW2") //$500302.w
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
@@ -1465,7 +1464,7 @@ static INPUT_PORTS_START( penbros )
 	PORT_DIPSETTING(      0x0000, "5" )
 	PORT_BIT(             0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2") //$600000.w
+	PORT_START_TAG("P1") //$600000.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -1476,7 +1475,7 @@ static INPUT_PORTS_START( penbros )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3") //$600002.w
+	PORT_START_TAG("P2") //$600002.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
@@ -1487,7 +1486,7 @@ static INPUT_PORTS_START( penbros )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN4") //$600004.w
+	PORT_START_TAG("SYSTEM") //$600004.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)	// unused, test mode shows it
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )

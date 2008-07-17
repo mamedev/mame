@@ -158,10 +158,10 @@ static OPBASE_HANDLER( esb_setopbase )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION(REGION_CPU1, 0)
 	AM_RANGE(0x3000, 0x3fff) AM_ROM								/* vector_rom */
-	AM_RANGE(0x4300, 0x431f) AM_READ(input_port_0_r)			/* Memory mapped input port 0 */
+	AM_RANGE(0x4300, 0x431f) AM_READ_PORT("IN0")				/* Memory mapped input port 0 */
 	AM_RANGE(0x4320, 0x433f) AM_READ(starwars_input_1_r)		/* Memory mapped input port 1 */
-	AM_RANGE(0x4340, 0x435f) AM_READ(input_port_2_r)			/* DIP switches bank 0 */
-	AM_RANGE(0x4360, 0x437f) AM_READ(input_port_3_r)			/* DIP switches bank 1 */
+	AM_RANGE(0x4340, 0x435f) AM_READ_PORT("DSW0")				/* DIP switches bank 0 */
+	AM_RANGE(0x4360, 0x437f) AM_READ_PORT("DSW1")				/* DIP switches bank 1 */
 	AM_RANGE(0x4380, 0x439f) AM_READ(starwars_adc_r)			/* a-d control result */
 	AM_RANGE(0x4400, 0x4400) AM_READWRITE(starwars_main_read_r, starwars_main_wr_w)
 	AM_RANGE(0x4401, 0x4401) AM_READ(starwars_main_ready_flag_r)
@@ -212,7 +212,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( starwars )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -222,7 +222,7 @@ static INPUT_PORTS_START( starwars )
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
@@ -234,7 +234,7 @@ static INPUT_PORTS_START( starwars )
 	/* Bit 7 is VG_HALT - see machine/starwars.c */
 	PORT_BIT ( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START	/* DSW0 */
+	PORT_START_TAG("DSW0")	/* DSW0 */
 	PORT_DIPNAME(0x03, 0x00, "Starting Shields" )
 	PORT_DIPSETTING (  0x00, "6" )
 	PORT_DIPSETTING (  0x01, "7" )
@@ -257,7 +257,7 @@ static INPUT_PORTS_START( starwars )
 	PORT_DIPSETTING (  0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING (  0x00, DEF_STR( On ) )
 
-	PORT_START	/* DSW1 */
+	PORT_START_TAG("DSW1")	/* DSW1 */
 	PORT_DIPNAME(0x03, 0x02, DEF_STR( Coinage ) )
 	PORT_DIPSETTING (  0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING (  0x02, DEF_STR( 1C_1C ) )
@@ -280,16 +280,16 @@ static INPUT_PORTS_START( starwars )
 	PORT_DIPSETTING (  0x00, DEF_STR( None ) )
 /* 0xc0 and 0xe0 None */
 
-	PORT_START	/* IN4 */
+	PORT_START_TAG("STICKY")	/* IN4 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30)
 
-	PORT_START	/* IN5 */
+	PORT_START_TAG("STICKX")	/* IN5 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( esb )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -299,7 +299,7 @@ static INPUT_PORTS_START( esb )
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
@@ -311,7 +311,7 @@ static INPUT_PORTS_START( esb )
 	/* Bit 7 is VG_HALT - see machine/starwars.c */
 	PORT_BIT ( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START	/* DSW0 */
+	PORT_START_TAG("DSW0")	/* DSW0 */
 	PORT_DIPNAME(0x03, 0x03, "Starting Shields" )
 	PORT_DIPSETTING (  0x01, "2" )
 	PORT_DIPSETTING (  0x00, "3" )
@@ -334,7 +334,7 @@ static INPUT_PORTS_START( esb )
 	PORT_DIPSETTING (  0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING (  0x00, DEF_STR( On ) )
 
-	PORT_START	/* DSW1 */
+	PORT_START_TAG("DSW1")	/* DSW1 */
 	PORT_DIPNAME(0x03, 0x02, DEF_STR( Coinage ) )
 	PORT_DIPSETTING (  0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING (  0x02, DEF_STR( 1C_1C ) )
@@ -357,10 +357,10 @@ static INPUT_PORTS_START( esb )
 	PORT_DIPSETTING (  0xe0, DEF_STR( None ) )
 /* 0xc0 and 0x00 None */
 
-	PORT_START	/* IN4 */
+	PORT_START_TAG("STICKY")	/* IN4 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30)
 
-	PORT_START	/* IN5 */
+	PORT_START_TAG("STICKX")	/* IN5 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
 INPUT_PORTS_END
 

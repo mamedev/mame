@@ -77,9 +77,9 @@ READ8_HANDLER( tnzs_port1_r )
 
 	switch (tnzs_input_select & 0x0f)
 	{
-		case 0x0a:	data = input_port_read_indexed(machine, 4); break;
-		case 0x0c:	data = input_port_read_indexed(machine, 2); break;
-		case 0x0d:	data = input_port_read_indexed(machine, 3); break;
+		case 0x0a:	data = input_port_read(machine, "IN2"); break;
+		case 0x0c:	data = input_port_read(machine, "IN0"); break;
+		case 0x0d:	data = input_port_read(machine, "IN1"); break;
 		default:	data = 0xff; break;
 	}
 
@@ -90,7 +90,7 @@ READ8_HANDLER( tnzs_port1_r )
 
 READ8_HANDLER( tnzs_port2_r )
 {
-	int data = input_port_read_indexed(machine, 4);
+	int data = input_port_read(machine, "IN2");
 
 //  logerror("I8742:%04x  Read %02x from port 2\n", activecpu_get_previouspc(), data);
 
@@ -117,7 +117,7 @@ READ8_HANDLER( arknoid2_sh_f000_r )
 
 //  logerror("PC %04x: read input %04x\n", activecpu_get_pc(), 0xf000 + offset);
 
-	val = input_port_read_indexed(machine, 7 + offset/2);
+	val = input_port_read_safe(machine, (offset/2) ? "AN2" : "AN1", 0);
 	if (offset & 1)
 	{
 		return ((val >> 8) & 0xff);
@@ -247,7 +247,7 @@ static READ8_HANDLER( mcu_arknoid2_r )
 					}
 					else return mcu_credits;
 				}
-				else return input_port_read_indexed(machine, 2);	/* buttons */
+				else return input_port_read(machine, "IN0");	/* buttons */
 
 			default:
 				logerror("error, unknown mcu command\n");
@@ -338,16 +338,16 @@ static READ8_HANDLER( mcu_extrmatn_r )
 		switch (mcu_command)
 		{
 			case 0x01:
-				return input_port_read_indexed(machine, 2) ^ 0xff;	/* player 1 joystick + buttons */
+				return input_port_read(machine, "IN0") ^ 0xff;	/* player 1 joystick + buttons */
 
 			case 0x02:
-				return input_port_read_indexed(machine, 3) ^ 0xff;	/* player 2 joystick + buttons */
+				return input_port_read(machine, "IN1") ^ 0xff;	/* player 2 joystick + buttons */
 
 			case 0x1a:
-				return (input_port_read_indexed(machine, 5) | (input_port_read_indexed(machine, 6) << 1));
+				return (input_port_read(machine, "COIN1") | (input_port_read(machine, "COIN2") << 1));
 
 			case 0x21:
-				return input_port_read_indexed(machine, 4) & 0x0f;
+				return input_port_read(machine, "IN2") & 0x0f;
 
 			case 0x41:
 				return mcu_credits;
@@ -375,7 +375,7 @@ static READ8_HANDLER( mcu_extrmatn_r )
 					else return mcu_credits;
 				}
 				/* buttons */
-				else return ((input_port_read_indexed(machine, 2) & 0xf0) | (input_port_read_indexed(machine, 3) >> 4)) ^ 0xff;
+				else return ((input_port_read(machine, "IN0") & 0xf0) | (input_port_read(machine, "IN1") >> 4)) ^ 0xff;
 
 			default:
 				logerror("error, unknown mcu command\n");
@@ -660,9 +660,9 @@ INTERRUPT_GEN( arknoid2_interrupt )
 		case MCU_DRTOPPEL:
 		case MCU_PLUMPOP:
 			coin  = 0;
-			coin |= ((input_port_read_indexed(machine, 5) & 1) << 0);
-			coin |= ((input_port_read_indexed(machine, 6) & 1) << 1);
-			coin |= ((input_port_read_indexed(machine, 4) & 3) << 2);
+			coin |= ((input_port_read(machine, "COIN1") & 1) << 0);
+			coin |= ((input_port_read(machine, "COIN2") & 1) << 1);
+			coin |= ((input_port_read(machine, "IN2") & 3) << 2);
 			coin ^= 0x0c;
 			mcu_handle_coins(coin);
 			break;

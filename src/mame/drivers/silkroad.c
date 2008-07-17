@@ -147,13 +147,13 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 /* player inputs */
 static READ32_HANDLER(io32_r)
 {
-	return ((input_port_read_indexed(machine, 0) << 16) |  (input_port_read_indexed(machine, 1) << 0));
+	return ((input_port_read(machine, "PLAYERS") << 16) |  (input_port_read(machine, "SYSTEM") << 0));
 }
 
 /* dipswitches */
 static READ32_HANDLER(io32_1_r)
 {
-	return input_port_read_indexed(machine, 2)<<16;
+	return input_port_read(machine, "DSW")<<16;
 }
 
 /* sound I/O */
@@ -217,7 +217,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x808000, 0x80bfff) AM_READ(SMH_RAM)
 
 	AM_RANGE(0xC00000, 0xC00003) AM_READ(io32_r)	// player inputs
-	AM_RANGE(0xC00004, 0xC00007) AM_READ(io32_1_r) // dip switches
+	AM_RANGE(0xC00004, 0xC00007) AM_READ(io32_1_r)	// dip switches
 	AM_RANGE(0xC00024, 0xC00027) AM_READ(silk_6295_0_r)
 	AM_RANGE(0xC0002C, 0xC0002f) AM_READ(silk_ym_r)
 	AM_RANGE(0xC00030, 0xC00033) AM_READ(silk_6295_1_r)
@@ -259,7 +259,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( silkroad )
-	PORT_START	/* Players inputs */
+	PORT_START_TAG("PLAYERS")	/* Players inputs */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -277,7 +277,7 @@ static INPUT_PORTS_START( silkroad )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 
-	PORT_START	/* System inputs */
+	PORT_START_TAG("SYSTEM")	/* System inputs */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
@@ -295,7 +295,7 @@ static INPUT_PORTS_START( silkroad )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* DSW */
+	PORT_START_TAG("DSW")	/* DSW */
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Lives ) )
 	PORT_DIPSETTING(      0x0001, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )
@@ -345,7 +345,7 @@ static INPUT_PORTS_START( silkroad )
 	PORT_DIPSETTING( 0xa000, DEF_STR(1C_3C))
 	PORT_DIPSETTING( 0x8000, DEF_STR(1C_4C))
 
-//  PORT_START  /* Misc inputs */
+//  PORT_START_TAG("MISC")  /* Misc inputs */
 //  PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* VBLANK ? */
 //  PORT_BIT( 0xff7f, IP_ACTIVE_LOW, IPT_UNUSED ) /* unknown / unused */
 INPUT_PORTS_END

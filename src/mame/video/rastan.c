@@ -129,9 +129,8 @@ VIDEO_UPDATE( opwolf )
 
 	PC090OJ_draw_sprites(screen->machine,bitmap,cliprect,1);
 
-//  if (input_port_read_indexed(machine,5))
-
-//  popmessage("%d %d",input_port_read_indexed(machine,5),input_port_read_indexed(machine,6));
+//  if (input_port_read(machine, "P1X"))
+//  popmessage("%d %d", input_port_read(machine, "P1X"), input_port_read(machine, "P1Y"));
 
 	return 0;
 }

@@ -105,11 +105,11 @@ static READ8_HANDLER( starfire_input_r )
 {
 	switch (offset & 15)
 	{
-		case 0:	return input_port_read_indexed(machine, 0);
-		case 1:	return input_port_read_indexed(machine, 1);	/* Note: need to loopback sounds lengths on that one */
-		case 5: return input_port_read_indexed(machine, 4);
-		case 6:	return input_port_read_indexed(machine, 2);
-		case 7:	return input_port_read_indexed(machine, 3);
+		case 0:	return input_port_read(machine, "DSW");
+		case 1:	return input_port_read(machine, "SYSTEM");	/* Note: need to loopback sounds lengths on that one */
+		case 5: return input_port_read(machine, "STICKZ");
+		case 6:	return input_port_read(machine, "STICKX");
+		case 7:	return input_port_read(machine, "STICKY");
 		default: return 0xff;
 	}
 }
@@ -132,10 +132,10 @@ static READ8_HANDLER( fireone_input_r )
 
 	switch (offset & 15)
 	{
-		case 0:	return input_port_read_indexed(machine, 0);
-		case 1: return input_port_read_indexed(machine, 1);
+		case 0:	return input_port_read(machine, "DSW");
+		case 1:	return input_port_read(machine, "SYSTEM");
 		case 2:
-			temp = fireone_select ? input_port_read_indexed(machine, 2) : input_port_read_indexed(machine, 3);
+			temp = fireone_select ? input_port_read(machine, "P1") : input_port_read(machine, "P2");
 			temp = (temp & 0xc0) | fireone_paddle_map[temp & 0x3f];
 			return temp;
 		default: return 0xff;
@@ -166,7 +166,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( starfire )
-	PORT_START      /* DSW0 */
+	PORT_START_TAG("DSW")	/* DSW0 */
 	PORT_DIPNAME( 0x03, 0x00, "Time" )
 	PORT_DIPSETTING(    0x00, "90 Sec" )
 	PORT_DIPSETTING(    0x01, "80 Sec" )
@@ -188,7 +188,7 @@ static INPUT_PORTS_START( starfire )
 	PORT_DIPSETTING(    0x40, "fixed length+fire" )
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
-	PORT_START      /* IN1 */
+	PORT_START_TAG("SYSTEM")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -198,19 +198,19 @@ static INPUT_PORTS_START( starfire )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START  /* IN2 */
+	PORT_START_TAG("STICKX")	/* IN2 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START  /* IN3 */
+	PORT_START_TAG("STICKY")	/* IN3 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START  /* IN4 */ /* throttle */
+	PORT_START_TAG("STICKZ")	/* IN4 */ /* throttle */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( fireone )
-	PORT_START      /* DSW0 */
+	PORT_START_TAG("DSW")	/* DSW0 */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, "2 Coins/1 Player" )
 	PORT_DIPSETTING(    0x02, "2 Coins/1 or 2 Players" )
@@ -231,7 +231,7 @@ static INPUT_PORTS_START( fireone )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
-	PORT_START      /* IN1 */
+	PORT_START_TAG("SYSTEM")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
@@ -241,12 +241,12 @@ static INPUT_PORTS_START( fireone )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START  /* IN2 */
+	PORT_START_TAG("P1")	/* IN2 */
 	PORT_BIT( 0x3f, 0x20, IPT_PADDLE ) PORT_MINMAX(0,63) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 
-	PORT_START  /* IN3 */
+	PORT_START_TAG("P2")	/* IN3 */
 	PORT_BIT( 0x3f, 0x20, IPT_PADDLE ) PORT_MINMAX(0,63) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)

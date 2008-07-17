@@ -20,18 +20,18 @@ extern VIDEO_UPDATE( sichuan2 );
 
 static READ8_HANDLER( sichuan2_dsw1_r )
 {
-	int ret = input_port_read_indexed(machine,3);
+	int ret = input_port_read(machine, "DSW1");
 
 	/* Based on the coin mode fill in the upper bits */
-	if (input_port_read_indexed(machine,4) & 0x04)
+	if (input_port_read(machine, "DSW2") & 0x04)
 	{
 		/* Mode 1 */
-		ret	|= (input_port_read_indexed(machine,5) << 4);
+		ret	|= (input_port_read(machine, "DSW1") << 4);
 	}
 	else
 	{
 		/* Mode 2 */
-		ret	|= (input_port_read_indexed(machine,5) & 0xf0);
+		ret	|= (input_port_read(machine, "DSW1") & 0xf0);
 	}
 
 	return ret;
@@ -64,10 +64,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sichuan2_dsw1_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_4_r)
-	AM_RANGE(0x02, 0x02) AM_READ(input_port_0_r)
-	AM_RANGE(0x03, 0x03) AM_READ(input_port_1_r)
-	AM_RANGE(0x04, 0x04) AM_READ(input_port_2_r)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("P1")
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2")
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("COIN")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
@@ -105,7 +105,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( shisen )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -115,7 +115,7 @@ static INPUT_PORTS_START( shisen )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL

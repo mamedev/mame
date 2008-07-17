@@ -157,13 +157,19 @@ static READ16_HANDLER( hangon_io_r )
 			return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 3);
 
 		case 0x1000/2: /* Input ports and DIP switches */
-			return input_port_read_indexed(machine, offset & 3);
+		{
+			static const char *sysports[] = { "SERVICE", "COINAGE", "DSW", "UNKNOWN" };
+			return input_port_read(machine, sysports[offset & 3]);
+		}
 
 		case 0x3000/2: /* PPI @ 4C */
 			return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3);
 
 		case 0x3020/2: /* ADC0804 data output */
-			return input_port_read_indexed(machine, 4 + adc_select);
+		{
+			static const char *adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
+			return input_port_read_safe(machine, adcports[adc_select], 0);
+		}
 	}
 
 	logerror("%06X:hangon_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
@@ -202,14 +208,20 @@ static READ16_HANDLER( sharrier_io_r )
 			return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 3);
 
 		case 0x0010/2: /* Input ports and DIP switches */
-			return input_port_read_indexed(machine, offset & 3);
+		{
+			static const char *sysports[] = { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
+			return input_port_read(machine, sysports[offset & 3]);
+		}
 
 		case 0x0020/2: /* PPI @ 4C */
 			if (offset == 2) return 0;
 			return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3);
 
 		case 0x0030/2: /* ADC0804 data output */
-			return input_port_read_indexed(machine, 4 + adc_select);
+		{
+			static const char *adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
+			return input_port_read_safe(machine, adcports[adc_select], 0);
+		}
 	}
 
 	logerror("%06X:sharrier_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
@@ -333,7 +345,7 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
 
 static void sharrier_i8751_sim(running_machine *machine)
 {
-	workram[0x492/2] = (input_port_read_indexed(machine, 4) << 8) | input_port_read_indexed(machine, 5);
+	workram[0x492/2] = (input_port_read(machine, "ADC0") << 8) | input_port_read(machine, "ADC1");
 }
 
 

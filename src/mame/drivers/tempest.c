@@ -348,7 +348,7 @@ static CUSTOM_INPUT( tempest_buttons_r )
 
 static READ8_HANDLER( tempest_IN0_r )
 {
-	int res = input_port_read_indexed(machine, 0);
+	int res = input_port_read(machine, "IN0");
 
 	if (avgdvg_done())
 		res |= 0x40;
@@ -363,13 +363,13 @@ static READ8_HANDLER( tempest_IN0_r )
 
 static READ8_HANDLER( input_port_1_bit_r )
 {
-	return (input_port_read_indexed(machine, 1) & (1 << offset)) ? 0 : 228;
+	return (input_port_read(machine, "IN1/DSW0") & (1 << offset)) ? 0 : 228;
 }
 
 
 static READ8_HANDLER( input_port_2_bit_r )
 {
-	return (input_port_read_indexed(machine, 2) & (1 << offset)) ? 0 : 228;
+	return (input_port_read(machine, "IN2") & (1 << offset)) ? 0 : 228;
 }
 
 
@@ -410,8 +410,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x080f) AM_WRITE(SMH_RAM) AM_BASE(&tempest_colorram)
 	AM_RANGE(0x0c00, 0x0c00) AM_READ(tempest_IN0_r)	/* IN0 */
-	AM_RANGE(0x0d00, 0x0d00) AM_READ(input_port_3_r)	/* DSW1 */
-	AM_RANGE(0x0e00, 0x0e00) AM_READ(input_port_4_r)	/* DSW2 */
+	AM_RANGE(0x0d00, 0x0d00) AM_READ_PORT("DSW1")	/* DSW1 */
+	AM_RANGE(0x0e00, 0x0e00) AM_READ_PORT("DSW2")	/* DSW2 */
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION(REGION_CPU1, 0x2000)
 	AM_RANGE(0x3000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(tempest_coin_w)

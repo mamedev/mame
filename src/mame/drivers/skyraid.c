@@ -52,11 +52,11 @@ static READ8_HANDLER( skyraid_alpha_num_r)
 
 static READ8_HANDLER( skyraid_port_0_r )
 {
-	UINT8 val = input_port_read_indexed(machine, 0);
+	UINT8 val = input_port_read(machine, "LANGUAGE");
 
-	if (input_port_read_indexed(machine, 4) > analog_range)
+	if (input_port_read(machine, "STICKY") > analog_range)
 		val |= 0x40;
-	if (input_port_read_indexed(machine, 5) > analog_range)
+	if (input_port_read(machine, "STICKX") > analog_range)
 		val |= 0x80;
 
 	return val;
@@ -105,9 +105,9 @@ static ADDRESS_MAP_START( skyraid_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x087f) AM_READ(SMH_RAM)
 	AM_RANGE(0x0880, 0x0bff) AM_READ(skyraid_alpha_num_r)
 	AM_RANGE(0x1000, 0x1000) AM_READ(skyraid_port_0_r)
-	AM_RANGE(0x1000, 0x1001) AM_READ(input_port_1_r)
-	AM_RANGE(0x1400, 0x1400) AM_READ(input_port_2_r)
-	AM_RANGE(0x1400, 0x1401) AM_READ(input_port_3_r)
+	AM_RANGE(0x1000, 0x1001) AM_READ_PORT("DSW")
+	AM_RANGE(0x1400, 0x1400) AM_READ_PORT("COIN")
+	AM_RANGE(0x1400, 0x1401) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x7000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
@@ -130,7 +130,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( skyraid )
-	PORT_START
+	PORT_START_TAG("LANGUAGE")
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Language ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( French ) )
@@ -139,7 +139,7 @@ static INPUT_PORTS_START( skyraid )
 	PORT_BIT (0x40, IP_ACTIVE_HIGH, IPT_UNUSED) /* POT1 */
 	PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_UNUSED) /* POT0 */
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x30, 0x10, "Play Time" )
 	PORT_DIPSETTING(    0x00, "60 Seconds" )
 	PORT_DIPSETTING(    0x10, "80 Seconds" )
@@ -154,7 +154,7 @@ static INPUT_PORTS_START( skyraid )
 
 	/* coinage settings are insane, refer to the manual */
 
-	PORT_START
+	PORT_START_TAG("COIN")
 	PORT_DIPNAME( 0x0F, 0x01, DEF_STR( Coinage )) /* dial */
 	PORT_DIPSETTING(    0x00, "Mode 0" )
 	PORT_DIPSETTING(    0x01, "Mode 1" )
@@ -179,16 +179,16 @@ static INPUT_PORTS_START( skyraid )
 	PORT_BIT (0x40, IP_ACTIVE_HIGH, IPT_COIN1)
 	PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_COIN2)
 
-	PORT_START
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_TILT)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Hiscore Reset") PORT_CODE(KEYCODE_H)
 	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_START1)
 	PORT_SERVICE(0x80, IP_ACTIVE_LOW)
 
-	PORT_START
+	PORT_START_TAG("STICKY")
 	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_Y ) PORT_MINMAX(0,63) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START
+	PORT_START_TAG("STICKX")
 	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_X ) PORT_MINMAX(0,63) PORT_SENSITIVITY(10) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 

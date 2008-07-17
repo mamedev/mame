@@ -119,7 +119,7 @@ INTERRUPT_GEN( stfight_vb_interrupt )
 // Perhaps define dipswitches as active low?
 READ8_HANDLER( stfight_dsw_r )
 {
-    return( ~input_port_read_indexed(machine,  3+offset ) );
+    return( ~input_port_read(machine, offset ? "DSW1" : "DSW0") );
 }
 
 static int stfight_coin_mech_query_active = 0;
@@ -146,7 +146,7 @@ READ8_HANDLER( stfight_coin_r )
      *        since it's read by the 30Hz interrupt ISR
      */
 
-    coin_mech_data = input_port_read_indexed(machine,  5 );
+    coin_mech_data = input_port_read(machine, "COIN");
 
     for( i=0; i<2; i++ )
     {

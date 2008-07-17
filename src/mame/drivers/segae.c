@@ -2273,10 +2273,10 @@ static READ8_HANDLER (segae_hangonjr_port_f8_r)
 	temp = 0;
 
 	if (port_fa_last == 0x08)  /* 0000 1000 */ /* Angle */
-		temp = input_port_read_indexed(machine, 4);
+		temp = input_port_read(machine, "IN2");
 
 	if (port_fa_last == 0x09)  /* 0000 1001 */ /* Accel */
-		temp = input_port_read_indexed(machine, 5);
+		temp = input_port_read(machine, "IN3");
 
 	return temp;
 }
@@ -2312,13 +2312,13 @@ static WRITE8_HANDLER (segae_ridleofp_port_fa_w)
 
 	if (data & 1)
 	{
-		int curr = input_port_read_indexed(machine, 4);
+		int curr = input_port_read(machine, "IN2");
 		diff1 = ((curr - last1) & 0x0fff) | (curr & 0xf000);
 		last1 = curr;
 	}
 	if (data & 2)
 	{
-		int curr = input_port_read_indexed(machine, 5) & 0x0fff;
+		int curr = input_port_read(machine, "IN3") & 0x0fff;
 		diff2 = ((curr - last2) & 0x0fff) | (curr & 0xf000);
 		last2 = curr;
 	}

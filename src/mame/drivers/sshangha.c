@@ -98,11 +98,11 @@ static READ16_HANDLER( sshangha_protection16_r )
 	switch (offset)
 	{
 		case 0x050 >> 1: /* Player 1 & Player 2 joysticks & fire buttons */
-			return (input_port_read_indexed(machine, 0) + (input_port_read_indexed(machine, 1) << 8));
+			return (input_port_read(machine, "P1") + (input_port_read(machine, "P2") << 8));
 		case 0x76a >> 1: /* Credits */
-			return input_port_read_indexed(machine, 2);
+			return input_port_read(machine, "SYSTEM");
 		case 0x0ac >> 1: /* DIPS */
-			return (input_port_read_indexed(machine, 3) + (input_port_read_indexed(machine, 4) << 8));
+			return (input_port_read(machine, "DSW1") + (input_port_read(machine, "DSW2") << 8));
 
 		// Protection TODO
 	}
@@ -116,11 +116,11 @@ static READ16_HANDLER( sshanghb_protection16_r )
 	switch (offset)
 	{
 		case 0x050 >> 1: /* Player 1 & Player 2 joysticks & fire buttons */
-			return (input_port_read_indexed(machine, 0) + (input_port_read_indexed(machine, 1) << 8));
+			return (input_port_read(machine, "P1") + (input_port_read(machine, "P2") << 8));
 		case 0x76a >> 1: /* Credits */
-			return input_port_read_indexed(machine, 2);
+			return input_port_read(machine, "SYSTEM");
 		case 0x0ac >> 1: /* DIPS */
-			return (input_port_read_indexed(machine, 3) + (input_port_read_indexed(machine, 4) << 8));
+			return (input_port_read(machine, "DSW1") + (input_port_read(machine, "DSW2") << 8));
 	}
 	return sshangha_prot_data[offset];
 }
@@ -202,7 +202,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( sshangha )
-	PORT_START_TAG("IN0")	/* Player 1 controls (0xfec047.b) */
+	PORT_START_TAG("P1")	/* Player 1 controls (0xfec047.b) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -212,7 +212,7 @@ static INPUT_PORTS_START( sshangha )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	PORT_NAME("P1 Help")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START_TAG("IN1")	/* Player 2 controls (0xfec046.b) */
+	PORT_START_TAG("P2")	/* Player 2 controls (0xfec046.b) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -222,7 +222,7 @@ static INPUT_PORTS_START( sshangha )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)	PORT_NAME("P2 Help")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("IN2")	/* Credits */
+	PORT_START_TAG("SYSTEM")	/* Credits */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )

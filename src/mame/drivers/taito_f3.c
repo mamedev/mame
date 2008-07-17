@@ -56,28 +56,28 @@ static READ32_HANDLER( f3_control_r )
 	switch (offset)
 	{
 		case 0x0: /* MSW: Test switch, coins, eeprom access, LSW: Player Buttons, Start, Tilt, Service */
-			e=eeprom_read_bit();
-			e=e|(e<<8);
-			return ((e | input_port_read_indexed(machine, 2) | (input_port_read_indexed(machine, 2)<<8))<<16) /* top byte may be mirror of bottom byte??  see bubblem */
-					| input_port_read_indexed(machine, 1);
+			e = eeprom_read_bit();
+			e = e | (e<<8);
+			return ((e | input_port_read(machine, "EEPROM") | (input_port_read(machine, "EEPROM")<<8))<<16)		/* top byte may be mirror of bottom byte??  see bubblem */
+					| input_port_read(machine, "IN1");
 
 		case 0x1: /* MSW: Coin counters/lockouts are readable, LSW: Joysticks (Player 1 & 2) */
-			return (coin_word[0]<<16) | input_port_read_indexed(machine, 0) | 0xff00;
+			return (coin_word[0]<<16) | input_port_read(machine, "IN0") | 0xff00;
 
 		case 0x2: /* Analog control 1 */
-			return ((input_port_read_indexed(machine, 3)&0xf)<<12) | ((input_port_read_indexed(machine, 3)&0xff0)>>4);
+			return ((input_port_read(machine, "DIAL1") & 0xf)<<12) | ((input_port_read(machine, "DIAL1") & 0xff0)>>4);
 
 		case 0x3: /* Analog control 2 */
-			return ((input_port_read_indexed(machine, 4)&0xf)<<12) | ((input_port_read_indexed(machine, 4)&0xff0)>>4);
+			return ((input_port_read(machine, "DIAL2") & 0xf)<<12) | ((input_port_read(machine, "DIAL2") & 0xff0)>>4);
 
 		case 0x4: /* Player 3 & 4 fire buttons (Player 2 top fire buttons in Kaiser Knuckle) */
-			return input_port_read_indexed(machine, 5)<<8;
+			return input_port_read(machine, "IN2")<<8;
 
 		case 0x5: /* Player 3 & 4 joysticks (Player 1 top fire buttons in Kaiser Knuckle) */
-			return (coin_word[1]<<16) | input_port_read_indexed(machine, 6);
+			return (coin_word[1]<<16) | input_port_read(machine, "IN3");
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",activecpu_get_pc(),offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", activecpu_get_pc(), offset);
 	return 0xffffffff;
 }
 
@@ -88,8 +88,10 @@ static WRITE32_HANDLER( f3_control_w )
 		case 0x00: /* Watchdog */
 			watchdog_reset(machine);
 			return;
+
 		case 0x01: /* Coin counters & lockouts */
-			if (ACCESSING_BITS_24_31) {
+			if (ACCESSING_BITS_24_31) 
+			{
 				coin_lockout_w(0,~data & 0x01000000);
 				coin_lockout_w(1,~data & 0x02000000);
 				coin_counter_w(0, data & 0x04000000);
@@ -97,15 +99,19 @@ static WRITE32_HANDLER( f3_control_w )
 				coin_word[0]=(data>>16)&0xffff;
 			}
 			return;
+
 		case 0x04: /* Eeprom */
-			if (ACCESSING_BITS_0_7) {
+			if (ACCESSING_BITS_0_7) 
+			{
 				eeprom_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 				eeprom_write_bit(data & 0x04);
 				eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			}
 			return;
+
 		case 0x05:	/* Player 3 & 4 coin counters */
-			if (ACCESSING_BITS_24_31) {
+			if (ACCESSING_BITS_24_31) 
+			{
 				coin_lockout_w(2,~data & 0x01000000);
 				coin_lockout_w(3,~data & 0x02000000);
 				coin_counter_w(2, data & 0x04000000);
@@ -189,7 +195,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( f3 )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -199,7 +205,7 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
@@ -217,7 +223,7 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START4 )
 
-	PORT_START
+	PORT_START_TAG("EEPROM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* Eprom data bit */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -227,13 +233,13 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4 )
 
-	PORT_START
+	PORT_START_TAG("DIAL1")
 	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("DIAL2")
 	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
@@ -243,7 +249,7 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
@@ -255,57 +261,15 @@ static INPUT_PORTS_START( f3 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kn )
-	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-
-	PORT_START
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 ) /* Service */
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE2 ) /* Only on some games */
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE3 )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START4 )
-
-	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* Eprom data bit */
-	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) /* Another service mode */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4 )
-
-	PORT_START
-	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
-
-	PORT_START
-	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
-
-	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START
+	PORT_INCLUDE( f3 )
+  
+	PORT_MODIFY("IN2")
+  	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+  	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
+  	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+  	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+  
+	PORT_MODIFY("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)

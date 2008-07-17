@@ -65,24 +65,24 @@ MACHINE_RESET( explorer )
 
 static READ8_HANDLER( ckongs_input_port_1_r )
 {
-	return (input_port_read_indexed(machine, 1) & 0xfc) | ((input_port_read_indexed(machine, 2) & 0x06) >> 1);
+	return (input_port_read(machine, "IN1") & 0xfc) | ((input_port_read(machine, "IN2") & 0x06) >> 1);
 }
 
 static READ8_HANDLER( ckongs_input_port_2_r )
 {
-	return (input_port_read_indexed(machine, 2) & 0xf9) | ((input_port_read_indexed(machine, 1) & 0x03) << 1);
+	return (input_port_read(machine, "IN2") & 0xf9) | ((input_port_read(machine, "IN1") & 0x03) << 1);
 }
 
 
 /* the coinage DIPs are spread accross two input ports */
 static READ8_HANDLER( stratgyx_input_port_2_r )
 {
-	return (input_port_read_indexed(machine, 2) & ~0x06) | ((input_port_read_indexed(machine, 4) << 1) & 0x06);
+	return (input_port_read(machine, "IN2") & ~0x06) | ((input_port_read(machine, "IN4") << 1) & 0x06);
 }
 
 static READ8_HANDLER( stratgyx_input_port_3_r )
 {
-	return (input_port_read_indexed(machine, 3) & ~0x03) | ((input_port_read_indexed(machine, 4) >> 2) & 0x03);
+	return (input_port_read(machine, "IN3") & ~0x03) | ((input_port_read(machine, "IN4") >> 2) & 0x03);
 }
 
 
@@ -98,7 +98,7 @@ static READ8_HANDLER( darkplnt_input_port_1_r )
 							  0x27, 0x26, 0x24, 0x25, 0x05, 0x04, 0x06, 0x07 };
 	UINT8 val;
 
-	val = input_port_read_indexed(machine, 1);
+	val = input_port_read(machine, "IN1");
 
 	return ((val & 0x03) | (remap[val >> 2] << 2));
 }

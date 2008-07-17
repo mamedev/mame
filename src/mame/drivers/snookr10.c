@@ -388,7 +388,7 @@ static READ8_HANDLER( dsw_port_1_r )
     BIT 7 = Complement of DS1, bit 7
 ------------------------------------*/
 {
-return input_port_read_indexed(machine,3);
+return input_port_read(machine, "SW1");
 }
 
 /**********************
@@ -431,7 +431,7 @@ static WRITE8_HANDLER( output_port_0_w )
 	bit1 = (data >> 3) & 1;
 	bit2 = (data >> 5) & 1;
 	bit3 = (data >> 7) & 1;
-	bit4 = (input_port_read_indexed(machine,5) & 1);
+	bit4 = (input_port_read_safe(machine, "IN5", 0) & 1); /* "IN5" has yet to be implemented! */
 
 	output_set_lamp_value(1, (bit1 & bit3));	/* Lamp 1 - START  */
 	output_set_lamp_value(2, (bit0 & bit3));	/* Lamp 2 - CANCEL */
@@ -456,8 +456,8 @@ static WRITE8_HANDLER( output_port_1_w )
 {
 	int bit0, bit1, bit4;
 
-	bit0 = (input_port_read_indexed(machine,4) >> 1) & 1;
-	bit1 = (input_port_read_indexed(machine,4) >> 3) & 1;
+	bit0 = (input_port_read_safe(machine, "IN4", 0) >> 1) & 1; /* "IN4" has yet to be implemented! */
+	bit1 = (input_port_read_safe(machine, "IN4", 0) >> 3) & 1; /* "IN4" has yet to be implemented! */
 	bit4 = (data & 1);
 
 	output_set_lamp_value(6, (bit1 & bit4));	/* Lamp 6 - STOP4  */
@@ -472,10 +472,10 @@ static WRITE8_HANDLER( output_port_1_w )
 static ADDRESS_MAP_START( snookr10_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x1000, 0x1000) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
-	AM_RANGE(0x3000, 0x3000) AM_READ(input_port_0_r)	/* IN0 */
-	AM_RANGE(0x3001, 0x3001) AM_READ(input_port_1_r)	/* IN1 */
-	AM_RANGE(0x3002, 0x3002) AM_READ(input_port_2_r)	/* IN2 */
-	AM_RANGE(0x3003, 0x3003) AM_READ(input_port_3_r)	/* DS1 */
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0")		/* IN0 */
+	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("IN1")		/* IN1 */
+	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("IN2")		/* IN2 */
+	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("SW1")		/* DS1 */
 	AM_RANGE(0x3004, 0x3004) AM_READ(dsw_port_1_r)		/* complement of DS1, bit 7 */
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(output_port_0_w)	/* OUT0 */
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(output_port_1_w)	/* OUT1 */
@@ -487,10 +487,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tenballs_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x1000, 0x1000) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ(input_port_0_r)	/* IN0 */
-	AM_RANGE(0x4001, 0x4001) AM_READ(input_port_1_r)	/* IN1 */
-	AM_RANGE(0x4002, 0x4002) AM_READ(input_port_2_r)	/* IN2 */
-	AM_RANGE(0x4003, 0x4003) AM_READ(input_port_3_r)	/* DS1 */
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("IN0")		/* IN0 */
+	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("IN1")		/* IN1 */
+	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("IN2")		/* IN2 */
+	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("SW1")		/* DS1 */
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(output_port_0_w)	/* OUT0 */
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(output_port_1_w)	/* OUT1 */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(snookr10_videoram_w) AM_BASE(&videoram)

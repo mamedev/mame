@@ -79,7 +79,7 @@ static ADDRESS_MAP_START( rallybik_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100002, 0x100003) AM_READWRITE(toaplan1_tileram_offs_r, toaplan1_tileram_offs_w)
 	AM_RANGE(0x100004, 0x100007) AM_READWRITE(rallybik_tileram16_r, toaplan1_tileram16_w)
 	AM_RANGE(0x100010, 0x10001f) AM_READWRITE(toaplan1_scroll_regs_r, toaplan1_scroll_regs_w)
-	AM_RANGE(0x140000, 0x140001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x140000, 0x140001) AM_READ_PORT("VBLANK")
 //  AM_RANGE(0x140000, 0x140001) AM_WRITE(?? video frame related ??)
 	AM_RANGE(0x140002, 0x140003) AM_WRITE(toaplan1_intenable_w)
 	AM_RANGE(0x140008, 0x14000f) AM_WRITE(toaplan1_bcu_control_w)
@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( truxton_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100002, 0x100003) AM_READWRITE(toaplan1_tileram_offs_r, toaplan1_tileram_offs_w)
 	AM_RANGE(0x100004, 0x100007) AM_READWRITE(toaplan1_tileram16_r, toaplan1_tileram16_w)
 	AM_RANGE(0x100010, 0x10001f) AM_READWRITE(toaplan1_scroll_regs_r, toaplan1_scroll_regs_w)
-	AM_RANGE(0x140000, 0x140001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x140000, 0x140001) AM_READ_PORT("VBLANK")
 //  AM_RANGE(0x140000, 0x140001) AM_WRITE(?? video frame related ??)
 	AM_RANGE(0x140002, 0x140003) AM_WRITE(toaplan1_intenable_w)
 	AM_RANGE(0x140008, 0x14000f) AM_WRITE(toaplan1_bcu_control_w)
@@ -116,7 +116,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hellfire_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x047fff) AM_RAM
-	AM_RANGE(0x080000, 0x080001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("VBLANK")
 //  AM_RANGE(0x080000, 0x080001) AM_WRITE(?? video frame related ??)
 	AM_RANGE(0x080002, 0x080003) AM_WRITE(toaplan1_intenable_w)
 	AM_RANGE(0x080008, 0x08000f) AM_WRITE(toaplan1_bcu_control_w)
@@ -142,7 +142,7 @@ static ADDRESS_MAP_START( zerowing_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(toaplan1_tile_offsets_w)
 	AM_RANGE(0x0c0006, 0x0c0007) AM_WRITE(toaplan1_fcu_flipscreen_w)
-	AM_RANGE(0x400000, 0x400001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("VBLANK")
 //  AM_RANGE(0x400000, 0x400001) AM_WRITE(?? video frame related ??)
 	AM_RANGE(0x400002, 0x400003) AM_WRITE(toaplan1_intenable_w)
 	AM_RANGE(0x400008, 0x40000f) AM_WRITE(toaplan1_bcu_control_w)
@@ -161,7 +161,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( demonwld_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x400000, 0x400001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("VBLANK")
 //  AM_RANGE(0x400000, 0x400001) AM_WRITE(?? video frame related ??)
 	AM_RANGE(0x400002, 0x400003) AM_WRITE(toaplan1_intenable_w)
 	AM_RANGE(0x400008, 0x40000f) AM_WRITE(toaplan1_bcu_control_w)
@@ -189,17 +189,17 @@ static ADDRESS_MAP_START( samesame_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x080003) AM_WRITE(toaplan1_tile_offsets_w)
 	AM_RANGE(0x080006, 0x080007) AM_WRITE(toaplan1_fcu_flipscreen_w)
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM			/* Frame done at $c1ada */
-	AM_RANGE(0x100000, 0x100001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("VBLANK")
 //  AM_RANGE(0x100000, 0x100001) AM_WRITE(?? video frame related ??)
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(toaplan1_intenable_w)
 	AM_RANGE(0x100008, 0x10000f) AM_WRITE(toaplan1_bcu_control_w)
 	AM_RANGE(0x104000, 0x1047ff) AM_READWRITE(toaplan1_colorram1_r, toaplan1_colorram1_w) AM_BASE(&toaplan1_colorram1) AM_SIZE(&toaplan1_colorram1_size)
 	AM_RANGE(0x106000, 0x1067ff) AM_READWRITE(toaplan1_colorram2_r, toaplan1_colorram2_w) AM_BASE(&toaplan1_colorram2) AM_SIZE(&toaplan1_colorram2_size)
-	AM_RANGE(0x140000, 0x140001) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x140002, 0x140003) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x140004, 0x140005) AM_READ(input_port_3_word_r)
-	AM_RANGE(0x140006, 0x140007) AM_READ(input_port_4_word_r)
-	AM_RANGE(0x140008, 0x140009) AM_READ(input_port_5_word_r)
+	AM_RANGE(0x140000, 0x140001) AM_READ_PORT("P1")
+	AM_RANGE(0x140002, 0x140003) AM_READ_PORT("P2")
+	AM_RANGE(0x140004, 0x140005) AM_READ_PORT("DSWA")
+	AM_RANGE(0x140006, 0x140007) AM_READ_PORT("DSWB")
+	AM_RANGE(0x140008, 0x140009) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x14000a, 0x14000b) AM_READ(samesame_port_6_word_r)	/* Territory, and MCU ready */
 	AM_RANGE(0x14000c, 0x14000d) AM_WRITE(samesame_coin_w)	/* Coin counter/lockout */
 //  AM_RANGE(0x14000e, 0x14000f) AM_WRITE(samesame_mcu_w)   /* Commands sent to HD647180 */
@@ -226,7 +226,7 @@ static ADDRESS_MAP_START( outzone_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200004, 0x200007) AM_READWRITE(toaplan1_tileram16_r, toaplan1_tileram16_w)
 	AM_RANGE(0x200010, 0x20001f) AM_READWRITE(toaplan1_scroll_regs_r, toaplan1_scroll_regs_w)
 	AM_RANGE(0x240000, 0x243fff) AM_RAM
-	AM_RANGE(0x300000, 0x300001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("VBLANK")
 //  AM_RANGE(0x300000, 0x300001) AM_WRITE(?? video frame related ??)
 	AM_RANGE(0x300002, 0x300003) AM_WRITE(toaplan1_intenable_w)
 	AM_RANGE(0x300008, 0x30000f) AM_WRITE(toaplan1_bcu_control_w)
@@ -244,19 +244,19 @@ static ADDRESS_MAP_START( vimana_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READWRITE(toaplan1_spriteram_offs_r, toaplan1_spriteram_offs_w)
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READWRITE(toaplan1_spriteram16_r, toaplan1_spriteram16_w)
 	AM_RANGE(0x0c0006, 0x0c0007) AM_READWRITE(toaplan1_spritesizeram16_r, toaplan1_spritesizeram16_w)
-	AM_RANGE(0x400000, 0x400001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("VBLANK")
 //  AM_RANGE(0x400000, 0x400001) AM_WRITE(?? video frame related ??)
 	AM_RANGE(0x400002, 0x400003) AM_WRITE(toaplan1_intenable_w)
 	AM_RANGE(0x400008, 0x40000f) AM_WRITE(toaplan1_bcu_control_w)
 	AM_RANGE(0x404000, 0x4047ff) AM_READWRITE(toaplan1_colorram1_r, toaplan1_colorram1_w) AM_BASE(&toaplan1_colorram1) AM_SIZE(&toaplan1_colorram1_size)
 	AM_RANGE(0x406000, 0x4067ff) AM_READWRITE(toaplan1_colorram2_r, toaplan1_colorram2_w) AM_BASE(&toaplan1_colorram2) AM_SIZE(&toaplan1_colorram2_size)
 	AM_RANGE(0x440000, 0x440005) AM_READWRITE(vimana_mcu_r, vimana_mcu_w)
-	AM_RANGE(0x440006, 0x440007) AM_READ(input_port_3_word_r)
+	AM_RANGE(0x440006, 0x440007) AM_READ_PORT("DSWA")
 	AM_RANGE(0x440008, 0x440009) AM_READ(vimana_input_port_5_word_r)
-	AM_RANGE(0x44000a, 0x44000b) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x44000c, 0x44000d) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x44000e, 0x44000f) AM_READ(input_port_4_word_r)
-	AM_RANGE(0x440010, 0x440011) AM_READ(input_port_6_word_r)
+	AM_RANGE(0x44000a, 0x44000b) AM_READ_PORT("P1")
+	AM_RANGE(0x44000c, 0x44000d) AM_READ_PORT("P2")
+	AM_RANGE(0x44000e, 0x44000f) AM_READ_PORT("DSWB")
+	AM_RANGE(0x440010, 0x440011) AM_READ_PORT("TJUMP")
 	AM_RANGE(0x480000, 0x487fff) AM_RAM
 	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITE(toaplan1_bcu_flipscreen_w)
 	AM_RANGE(0x4c0002, 0x4c0003) AM_READWRITE(toaplan1_tileram_offs_r, toaplan1_tileram_offs_w)
@@ -274,51 +274,51 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rallybik_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_1_r)	/* Player 1 */
-	AM_RANGE(0x10, 0x10) AM_READ(input_port_2_r)	/* Player 2 */
-	AM_RANGE(0x20, 0x20) AM_READ(input_port_5_r)	/* Coin/Start inputs */
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("P2")
+	AM_RANGE(0x20, 0x20) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x30, 0x30) AM_WRITE(rallybik_coin_w)	/* Coin counter/lockout */
-	AM_RANGE(0x40, 0x40) AM_READ(input_port_3_r)	/* DSW1 */
-	AM_RANGE(0x50, 0x50) AM_READ(input_port_4_r)	/* DSW2 */
+	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWA")
+	AM_RANGE(0x50, 0x50) AM_READ_PORT("DSWB")
 	AM_RANGE(0x60, 0x60) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w)
 	AM_RANGE(0x61, 0x61) AM_WRITE(YM3812_write_port_0_w)
-	AM_RANGE(0x70, 0x70) AM_READ(input_port_6_r)	/* Territory Jumper Block for Truxton */
+	AM_RANGE(0x70, 0x70) AM_READ_PORT("TJUMP")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( truxton_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_1_r)	/* Player 1 */
-	AM_RANGE(0x10, 0x10) AM_READ(input_port_2_r)	/* Player 2 */
-	AM_RANGE(0x20, 0x20) AM_READ(input_port_5_r)	/* Coin/Start inputs */
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("P2")
+	AM_RANGE(0x20, 0x20) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x30, 0x30) AM_WRITE(toaplan1_coin_w)	/* Coin counter/lockout */
-	AM_RANGE(0x40, 0x40) AM_READ(input_port_3_r)	/* DSW1 */
-	AM_RANGE(0x50, 0x50) AM_READ(input_port_4_r)	/* DSW2 */
+	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWA")
+	AM_RANGE(0x50, 0x50) AM_READ_PORT("DSWB")
 	AM_RANGE(0x60, 0x60) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w)
 	AM_RANGE(0x61, 0x61) AM_WRITE(YM3812_write_port_0_w)
-	AM_RANGE(0x70, 0x70) AM_READ(input_port_6_r)	/* Territory Jumper Block for Truxton */
+	AM_RANGE(0x70, 0x70) AM_READ_PORT("TJUMP")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hellfire_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_3_r)	/* DSW1 */
-	AM_RANGE(0x10, 0x10) AM_READ(input_port_4_r)	/* DSW2 */
-	AM_RANGE(0x20, 0x20) AM_READ(input_port_6_r)	/* Territory Jumper Block */
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA")
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSWB")
+	AM_RANGE(0x20, 0x20) AM_READ_PORT("TJUMP")
 	AM_RANGE(0x30, 0x30) AM_WRITE(toaplan1_coin_w)	/* Coin counter/lockout */
-	AM_RANGE(0x40, 0x40) AM_READ(input_port_1_r)	/* Player 1 */
-	AM_RANGE(0x50, 0x50) AM_READ(input_port_2_r)	/* Player 2 */
-	AM_RANGE(0x60, 0x60) AM_READ(input_port_5_r)	/* Coin/Start inputs */
+	AM_RANGE(0x40, 0x40) AM_READ_PORT("P1")
+	AM_RANGE(0x50, 0x50) AM_READ_PORT("P2")
+	AM_RANGE(0x60, 0x60) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x70, 0x70) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w)
 	AM_RANGE(0x71, 0x71) AM_WRITE(YM3812_write_port_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zerowing_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_1_r)	/* Player 1 */
-	AM_RANGE(0x08, 0x08) AM_READ(input_port_2_r)	/* Player 2 */
-	AM_RANGE(0x20, 0x20) AM_READ(input_port_3_r)	/* DSW1 */
-	AM_RANGE(0x28, 0x28) AM_READ(input_port_4_r)	/* DSW2 */
-	AM_RANGE(0x80, 0x80) AM_READ(input_port_5_r)	/* Coin/Start inputs */
-	AM_RANGE(0x88, 0x88) AM_READ(input_port_6_r)	/* Territory Jumper Block */
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
+	AM_RANGE(0x08, 0x08) AM_READ_PORT("P2")
+	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSWA")
+	AM_RANGE(0x28, 0x28) AM_READ_PORT("DSWB")
+	AM_RANGE(0x80, 0x80) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x88, 0x88) AM_READ_PORT("TJUMP")
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(toaplan1_coin_w)	/* Coin counter/lockout */
 	AM_RANGE(0xa8, 0xa8) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w)
 	AM_RANGE(0xa9, 0xa9) AM_WRITE(YM3812_write_port_0_w)
@@ -328,13 +328,13 @@ static ADDRESS_MAP_START( demonwld_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(YM3812_write_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_READ(input_port_6_r)
+	AM_RANGE(0x20, 0x20) AM_READ_PORT("TJUMP")
 	AM_RANGE(0x40, 0x40) AM_WRITE(toaplan1_coin_w)	/* Coin counter/lockout */
-	AM_RANGE(0x60, 0x60) AM_READ(input_port_5_r)
-	AM_RANGE(0x80, 0x80) AM_READ(input_port_1_r)
-	AM_RANGE(0xa0, 0xa0) AM_READ(input_port_4_r)
-	AM_RANGE(0xc0, 0xc0) AM_READ(input_port_2_r)
-	AM_RANGE(0xe0, 0xe0) AM_READ(input_port_3_r)
+	AM_RANGE(0x60, 0x60) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
+	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("DSWB")
+	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("P2")
+	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("DSWA")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( outzone_sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -342,12 +342,12 @@ static ADDRESS_MAP_START( outzone_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(YM3812_write_port_0_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(toaplan1_coin_w)	/* Coin counter/lockout */
-	AM_RANGE(0x08, 0x08) AM_READ(input_port_3_r)
-	AM_RANGE(0x0c, 0x0c) AM_READ(input_port_4_r)
-	AM_RANGE(0x10, 0x10) AM_READ(input_port_5_r)
-	AM_RANGE(0x14, 0x14) AM_READ(input_port_1_r)
-	AM_RANGE(0x18, 0x18) AM_READ(input_port_2_r)
-	AM_RANGE(0x1c, 0x1c) AM_READ(input_port_6_r)
+	AM_RANGE(0x08, 0x08) AM_READ_PORT("DSWA")
+	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("DSWB")
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x14, 0x14) AM_READ_PORT("P1")
+	AM_RANGE(0x18, 0x18) AM_READ_PORT("P2")
+	AM_RANGE(0x1c, 0x1c) AM_READ_PORT("TJUMP")
 ADDRESS_MAP_END
 
 
@@ -373,18 +373,17 @@ ADDRESS_MAP_END
 *****************************************************************************/
 
 #define  TOAPLAN1_PLAYER_INPUT( player, button3, options )										\
-	PORT_START																	\
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(player) options PORT_8WAY	\
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(player) options PORT_8WAY		\
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(player) options PORT_8WAY	\
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(player) options PORT_8WAY	\
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(player) options PORT_8WAY	\
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(player) options 						\
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(player) options 						\
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, button3 ) PORT_PLAYER(player) options 									\
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(player) options 					\
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(player) options 					\
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, button3 ) PORT_PLAYER(player) options 						\
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 #define  TOAPLAN1_SYSTEM_INPUTS						\
-	PORT_START										\
+	PORT_START_TAG("SYSTEM")						\
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) 	\
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )		\
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )	\
@@ -395,7 +394,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
 #define  TOAPLAN1_VBLANK_INPUT						\
-	PORT_START										\
+	PORT_START_TAG("VBLANK")						\
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_VBLANK )	\
 	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -403,11 +402,13 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( rallybik )
 	TOAPLAN1_VBLANK_INPUT
 
+	PORT_START_TAG("P1")	
 	TOAPLAN1_PLAYER_INPUT( 1, IPT_UNKNOWN, )
 
+	PORT_START_TAG("P2")	
 	TOAPLAN1_PLAYER_INPUT( 2, IPT_UNKNOWN, PORT_COCKTAIL )
 
-	PORT_START		/* DSW A */
+	PORT_START_TAG("DSWA")	/* DSW A */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -429,7 +430,7 @@ static INPUT_PORTS_START( rallybik )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
 
-	PORT_START		/* DSW B */
+	PORT_START_TAG("DSWB")	/* DSW B */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
@@ -454,17 +455,18 @@ static INPUT_PORTS_START( rallybik )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
 	TOAPLAN1_SYSTEM_INPUTS
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( truxton )
 	TOAPLAN1_VBLANK_INPUT
 
+	PORT_START_TAG("P1")	
 	TOAPLAN1_PLAYER_INPUT( 1, IPT_UNKNOWN, )
 
+	PORT_START_TAG("P2")	
 	TOAPLAN1_PLAYER_INPUT( 2, IPT_UNKNOWN, PORT_COCKTAIL )
 
-	PORT_START		/* DSW A */
+	PORT_START_TAG("DSWA")	/* DSW A */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -499,7 +501,7 @@ static INPUT_PORTS_START( truxton )
     PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 */
 
-	PORT_START		/* DSW B */
+	PORT_START_TAG("DSWB")	/* DSW B */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
@@ -524,7 +526,7 @@ static INPUT_PORTS_START( truxton )
 
 	TOAPLAN1_SYSTEM_INPUTS
 
-	PORT_START		/* Territory Jumper Block */
+	PORT_START_TAG("TJUMP")	/* Territory Jumper Block */
 	PORT_DIPNAME( 0x07, 0x02, "Territory/Copyright" )
 	PORT_DIPSETTING(    0x02, "World/Taito Corp" )
 	PORT_DIPSETTING(    0x06, "World/Taito America" )
@@ -543,8 +545,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( hellfire )
 	TOAPLAN1_VBLANK_INPUT
 
+	PORT_START_TAG("P1")	
 	TOAPLAN1_PLAYER_INPUT( 1, IPT_UNKNOWN, )
 
+	PORT_START_TAG("P2")	
 	TOAPLAN1_PLAYER_INPUT( 2, IPT_UNKNOWN, )
 
 	PORT_START_TAG("DSWA")		/* DSW A */
@@ -621,8 +625,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( zerowing )
 	TOAPLAN1_VBLANK_INPUT
 
+	PORT_START_TAG("P1")	
 	TOAPLAN1_PLAYER_INPUT( 1, IPT_UNKNOWN, )
 
+	PORT_START_TAG("P2")	
 	TOAPLAN1_PLAYER_INPUT( 2, IPT_UNKNOWN, PORT_COCKTAIL )
 
 	PORT_START_TAG("DSWA")		/* DSW A */
@@ -703,8 +709,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( demonwld )
 	TOAPLAN1_VBLANK_INPUT
 
+	PORT_START_TAG("P1")	
 	TOAPLAN1_PLAYER_INPUT( 1, IPT_BUTTON3, )
 
+	PORT_START_TAG("P2")	
 	TOAPLAN1_PLAYER_INPUT( 2, IPT_BUTTON3, )
 
 	PORT_START_TAG("DSWA")		/* DSW A */
@@ -784,8 +792,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( samesame )
 	TOAPLAN1_VBLANK_INPUT
 
+	PORT_START_TAG("P1")	
 	TOAPLAN1_PLAYER_INPUT( 1, IPT_UNKNOWN, )
 
+	PORT_START_TAG("P2")	
 	TOAPLAN1_PLAYER_INPUT( 2, IPT_UNKNOWN, PORT_COCKTAIL )
 
 	PORT_START_TAG("DSWA")		/* DSW A */
@@ -910,8 +920,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( outzone )
 	TOAPLAN1_VBLANK_INPUT
 
+	PORT_START_TAG("P1")	
 	TOAPLAN1_PLAYER_INPUT( 1, IPT_BUTTON3, )
 
+	PORT_START_TAG("P2")	
 	TOAPLAN1_PLAYER_INPUT( 2, IPT_BUTTON3, )
 
 	PORT_START_TAG("DSWA")		/* DSW A */
@@ -1027,8 +1039,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( vimana )
 	TOAPLAN1_VBLANK_INPUT
 
+	PORT_START_TAG("P1")	
 	TOAPLAN1_PLAYER_INPUT( 1, IPT_BUTTON3, )
 
+	PORT_START_TAG("P2")	
 	TOAPLAN1_PLAYER_INPUT( 2, IPT_BUTTON3, )
 
 	PORT_START_TAG("DSWA")		/* DSW A */

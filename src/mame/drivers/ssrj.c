@@ -50,15 +50,15 @@ static int oldport=0x80;
 static MACHINE_RESET(ssrj)
 {
 	UINT8 *rom = memory_region(machine, REGION_CPU1);
-	memset(&rom[0xc000],0,0x3fff); /* req for some control types */
-	oldport=0x80;
+	memset(&rom[0xc000], 0 ,0x3fff); /* req for some control types */
+	oldport = 0x80;
 }
 
 static READ8_HANDLER(ssrj_wheel_r)
 {
-	int port= input_port_read_indexed(machine, 1) -0x80;
-	int retval=port-oldport;
-	oldport=port;
+	int port = input_port_read(machine, "IN1") - 0x80;
+	int retval = port-oldport;
+	oldport = port;
 	return retval;
 }
 
@@ -70,9 +70,9 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xdfff) AM_READ(ssrj_vram4_r)
 	AM_RANGE(0xe000, 0xe7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe800, 0xefff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf000, 0xf000) AM_READ(input_port_0_r)
+	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN0")
 	AM_RANGE(0xf001, 0xf001) AM_READ(ssrj_wheel_r)
-	AM_RANGE(0xf002, 0xf002) AM_READ(input_port_2_r)
+	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN2")
 	AM_RANGE(0xf401, 0xf401) AM_READ(AY8910_read_port_0_r)
 ADDRESS_MAP_END
 
@@ -92,58 +92,47 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ssrj )
-
-PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0xe0, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0xe0) PORT_SENSITIVITY(50) PORT_KEYDELTA(0x20)
 
- PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL  ) PORT_SENSITIVITY(50) PORT_KEYDELTA(4) PORT_REVERSE
 
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0xf, IP_ACTIVE_LOW, IPT_BUTTON2  )  /* code @ $eef  , tested when controls = type4 */
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) ) /* ??? code @ $62c */
+	PORT_DIPSETTING(	0x10, DEF_STR( Easy ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(	0x20, "Difficult" )
+	PORT_DIPSETTING(	0x30, "Very Difficult" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "No Hit" )
+	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
- PORT_START
-
- PORT_BIT( 0xf, IP_ACTIVE_LOW, IPT_BUTTON2  )  /* code @ $eef  , tested when controls = type4 */
-
- PORT_DIPNAME(0x30, 0x00, DEF_STR( Difficulty ) ) /* ??? code @ $62c */
- PORT_DIPSETTING(   0x10, DEF_STR( Easy ) )
- PORT_DIPSETTING(   0x00, DEF_STR( Normal ) )
- PORT_DIPSETTING(   0x20, "Difficult" )
- PORT_DIPSETTING(   0x30, "Very Difficult" )
-
- PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
- PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
- PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
- PORT_DIPNAME( 0x80, 0x80, "No Hit" )
- PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
- PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
- PORT_START
-
+	PORT_START_TAG("IN3")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(	0x07, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(	0x06, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(	0x05, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(	0x03, DEF_STR( 1C_4C ) )
 	PORT_DIPNAME( 0x08, 0x08, "Freeze" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_DIPNAME( 0x030, 0x000, DEF_STR( Controls ) ) /* 'press button to start' message, and wait for button2 */
-	PORT_DIPSETTING(    0x00, "Type 1" )
-	PORT_DIPSETTING(    0x10, "Type 2" )
-	PORT_DIPSETTING(    0x20, "Type 3" )
-	PORT_DIPSETTING(    0x30, "Type 4" )
-
+	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Controls ) ) /* 'press button to start' message, and wait for button2 */
+	PORT_DIPSETTING(	0x00, "Type 1" )
+	PORT_DIPSETTING(	0x10, "Type 2" )
+	PORT_DIPSETTING(	0x20, "Type 3" )
+	PORT_DIPSETTING(	0x30, "Type 4" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* sometimes hangs after game over ($69b) */
-
-
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =

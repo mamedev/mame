@@ -83,8 +83,8 @@ static void move_motor(running_machine *machine, stactics_state *state)
 	 /* monitor motor under joystick control */
     if (*state->motor_on & 0x01)
     {
-		int ip3 = input_port_read_indexed(machine, 3);
-		int ip4 = input_port_read_indexed(machine, 4);
+		int ip3 = input_port_read(machine, "IN3");
+		int ip4 = input_port_read(machine, "FAKE");
 
 		/* up */
 		if (((ip4 & 0x01) == 0) && (state->vert_pos > -128))
@@ -173,8 +173,8 @@ static INTERRUPT_GEN( stactics_interrupt )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x2fff) AM_ROM
     AM_RANGE(0x4000, 0x47ff) AM_RAM
-    AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_READ(input_port_0_r)
-    AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READ(input_port_1_r)
+    AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_READ_PORT("IN0")
+    AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READ_PORT("IN1")
     AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0f08) AM_WRITE(stactics_coin_lockout_w)
     AM_RANGE(0x6002, 0x6005) AM_MIRROR(0x0f08) AM_WRITE(SMH_NOP)
     AM_RANGE(0x6006, 0x6007) AM_MIRROR(0x0f08) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(stactics_state, palette)
@@ -188,8 +188,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x6070, 0x609f) AM_MIRROR(0x0f00) AM_WRITE(SMH_NOP)
  /* AM_RANGE(0x60a0, 0x60ef) AM_MIRROR(0x0f00) AM_WRITE(stactics_sound2_w) */
     AM_RANGE(0x60f0, 0x60ff) AM_MIRROR(0x0f00) AM_WRITE(SMH_NOP)
-    AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_READ(input_port_2_r)
-    AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_READ(input_port_3_r)
+    AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_READ_PORT("IN2")
+    AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_READ_PORT("IN3")
     AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_WRITE(stactics_scroll_ram_w)
     AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0fff) AM_READ(vert_pos_r)
     AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0fff) AM_READ(horiz_pos_r)
@@ -209,8 +209,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( stactics )
-
-    PORT_START  /*  IN0 */
+    PORT_START_TAG("IN0")	/*  IN0 */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 )
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 )
@@ -218,9 +217,9 @@ static INPUT_PORTS_START( stactics )
     PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-    PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_motor_not_ready, 0)
+    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_motor_not_ready, 0)
 
-    PORT_START  /* IN1 */
+    PORT_START_TAG("IN1")	/* IN1 */
     PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_B ) )
     PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
     PORT_DIPSETTING(    0x05, DEF_STR( 2C_1C ) )
@@ -246,19 +245,19 @@ static INPUT_PORTS_START( stactics )
     PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-    PORT_START  /* IN2 */
-    PORT_BIT (0x07, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_rng, 0)
-    PORT_BIT (0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(stactics_get_frame_count_d3, 0)
+    PORT_START_TAG("IN2")	/* IN2 */
+    PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_rng, 0)
+    PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(stactics_get_frame_count_d3, 0)
     PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
     PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
-    PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
-    PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+    PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
+    PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-    PORT_START  /* IN3 */
+    PORT_START_TAG("IN3")	/* IN3 */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-    PORT_BIT (0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(stactics_get_shot_standby, 0)
+    PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(stactics_get_shot_standby, 0)
     PORT_DIPNAME( 0x04, 0x04, "Number of Barriers" )
     PORT_DIPSETTING(    0x04, "4" )
     PORT_DIPSETTING(    0x00, "6" )
@@ -270,9 +269,9 @@ static INPUT_PORTS_START( stactics )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-    PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(stactics_get_not_shot_arrive, 0)
+    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(stactics_get_not_shot_arrive, 0)
 
-	PORT_START	/* FAKE */
+	PORT_START_TAG("FAKE")	/* FAKE */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 INPUT_PORTS_END

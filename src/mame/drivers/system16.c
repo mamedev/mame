@@ -226,7 +226,6 @@ static INTERRUPT_GEN( sys16_interrupt )
 }
 
 
-
 /***************************************************************************/
 /*
     Tough Turf (Datsu bootleg) sound emulation
@@ -423,7 +422,6 @@ static WRITE16_HANDLER( sound_command_nmi_w )
 
 //static UINT16 coinctrl;
 
-
 static WRITE16_HANDLER( sys16_coinctrl_w )
 {
 	if( ACCESSING_BITS_0_7 )
@@ -492,8 +490,6 @@ static MACHINE_DRIVER_START( system16_7759 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.48)
 MACHINE_DRIVER_END
 
-
-
 /***************************************************************************/
 
 static WRITE16_HANDLER( sys16_tilebank_w )
@@ -542,43 +538,81 @@ static void set_bg_page( int data )
 	sys16_bg_page[3] = data&0xf;
 }
 
-
-
-
-
-/***************************************************************************/
-/***************************************************************************/
 /***************************************************************************/
 
+static INPUT_PORTS_START( sys16_common )
+	PORT_START_TAG("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 
+	PORT_START_TAG("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 
+	PORT_START_TAG("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-/***************************************************************************/
-
-
-/***************************************************************************/
-
-
-/***************************************************************************/
-
-/***************************************************************************/
-
-
-/***************************************************************************/
-
-
-/***************************************************************************/
-
-
+	PORT_START_TAG("DSW1")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x05, "2 Coins/1 Credit 5/3 6/4" )
+	PORT_DIPSETTING(    0x04, "2 Coins/1 Credit 4/3" )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, "1 Coin/1 Credit 2/3" )
+	PORT_DIPSETTING(    0x02, "1 Coin/1 Credit 4/5" )
+	PORT_DIPSETTING(    0x03, "1 Coin/1 Credit 5/6" )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin B too) or 1/1" )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x50, "2 Coins/1 Credit 5/3 6/4" )
+	PORT_DIPSETTING(    0x40, "2 Coins/1 Credit 4/3" )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, "1 Coin/1 Credit 2/3" )
+	PORT_DIPSETTING(    0x20, "1 Coin/1 Credit 4/5" )
+	PORT_DIPSETTING(    0x30, "1 Coin/1 Credit 5/6" )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too) or 1/1" )
+INPUT_PORTS_END
 
 /***************************************************************************/
 
 #ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( aliensyn )
-	SYS16_JOY1
-	SYS16_JOY2
-	SYS16_SERVICE
-	SYS16_COINAGE
+	PORT_INCLUDE( sys16_common )
 
 	PORT_START_TAG("DSW2")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" ) /* Listed as "Unused" */
@@ -604,10 +638,6 @@ INPUT_PORTS_END
 #endif
 /****************************************************************************/
 
-
-/***************************************************************************/
-
-
 static ADDRESS_MAP_START( bayroute_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x500000, 0x503fff) AM_READ(SYS16_MRA16_WORKINGRAM)
@@ -615,11 +645,11 @@ static ADDRESS_MAP_START( bayroute_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x70ffff) AM_READ(SYS16_MRA16_TILERAM)
 	AM_RANGE(0x710000, 0x710fff) AM_READ(SYS16_MRA16_TEXTRAM)
 	AM_RANGE(0x800000, 0x800fff) AM_READ(SYS16_MRA16_PALETTERAM)
-	AM_RANGE(0x901002, 0x901003) AM_READ(input_port_0_word_r) // player1
-	AM_RANGE(0x901006, 0x901007) AM_READ(input_port_1_word_r) // player2
-	AM_RANGE(0x901000, 0x901001) AM_READ(input_port_2_word_r) // service
-	AM_RANGE(0x902002, 0x902003) AM_READ(input_port_3_word_r) // dip1
-	AM_RANGE(0x902000, 0x902001) AM_READ(input_port_4_word_r) // dip2
+	AM_RANGE(0x901002, 0x901003) AM_READ_PORT("P1")
+	AM_RANGE(0x901006, 0x901007) AM_READ_PORT("P2")
+	AM_RANGE(0x901000, 0x901001) AM_READ_PORT("SERVICE")
+	AM_RANGE(0x902002, 0x902003) AM_READ_PORT("DSW1")
+	AM_RANGE(0x902000, 0x902001) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bayroute_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -664,13 +694,11 @@ static DRIVER_INIT( bayrtbl1 )
 {
 	MACHINE_RESET_CALL(sys16_onetime);
 }
+
 /***************************************************************************/
 
 static INPUT_PORTS_START( bayroute )
-	SYS16_JOY1
-	SYS16_JOY2
-	SYS16_SERVICE
-	SYS16_COINAGE
+	PORT_INCLUDE( sys16_common )
 
 	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:1")
@@ -708,22 +736,6 @@ static MACHINE_DRIVER_START( bayroute )
 	MDRV_MACHINE_RESET(bayroute)
 MACHINE_DRIVER_END
 
-/***************************************************************************
-
-   Body Slam
-
-***************************************************************************/
-
-
-/***************************************************************************/
-
-
-/***************************************************************************/
-
-
-/***************************************************************************/
-
-
 /***************************************************************************/
 
 static ADDRESS_MAP_START( dduxbl_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -732,11 +744,11 @@ static ADDRESS_MAP_START( dduxbl_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x410000, 0x410fff) AM_READ(SYS16_MRA16_TEXTRAM)
 	AM_RANGE(0x440000, 0x440fff) AM_READ(SYS16_MRA16_SPRITERAM)
 	AM_RANGE(0x840000, 0x840fff) AM_READ(SYS16_MRA16_PALETTERAM)
-	AM_RANGE(0xc41002, 0xc41003) AM_READ(input_port_0_word_r) // player1
-	AM_RANGE(0xc41004, 0xc41005) AM_READ(input_port_1_word_r) // player2
-	AM_RANGE(0xc41000, 0xc41001) AM_READ(input_port_2_word_r) // service
-	AM_RANGE(0xc42002, 0xc42003) AM_READ(input_port_3_word_r) // dip1
-	AM_RANGE(0xc42000, 0xc42001) AM_READ(input_port_4_word_r) // dip2
+	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
+	AM_RANGE(0xc41004, 0xc41005) AM_READ_PORT("P2")
+	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW2")
 	AM_RANGE(0xffc000, 0xffffff) AM_READ(SYS16_MRA16_WORKINGRAM)
 ADDRESS_MAP_END
 
@@ -823,13 +835,11 @@ static DRIVER_INIT( dduxbl )
 	MACHINE_RESET_CALL(sys16_onetime);
 	sys16_video_config(dduxbl_update_proc, -0x48, bank);
 }
+
 /***************************************************************************/
 
 static INPUT_PORTS_START( ddux )
-	SYS16_JOY1
-	SYS16_JOY2
-	SYS16_SERVICE
-	SYS16_COINAGE
+	PORT_INCLUDE( sys16_common )
 
 	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:1")
@@ -867,19 +877,17 @@ MACHINE_DRIVER_END
 
 /***************************************************************************/
 
-
-
 static ADDRESS_MAP_START( eswat_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x400000, 0x40ffff) AM_READ(SYS16_MRA16_TILERAM)
 	AM_RANGE(0x410000, 0x418fff) AM_READ(SYS16_MRA16_TEXTRAM) //*
 	AM_RANGE(0x440000, 0x440fff) AM_READ(SYS16_MRA16_SPRITERAM)
 	AM_RANGE(0x840000, 0x840fff) AM_READ(SYS16_MRA16_PALETTERAM)
-	AM_RANGE(0xc41002, 0xc41003) AM_READ(input_port_0_word_r) // player1
-	AM_RANGE(0xc41006, 0xc41007) AM_READ(input_port_1_word_r) // player2
-	AM_RANGE(0xc41000, 0xc41001) AM_READ(input_port_2_word_r) // service
-	AM_RANGE(0xc42002, 0xc42003) AM_READ(input_port_3_word_r) // dip1
-	AM_RANGE(0xc42000, 0xc42001) AM_READ(input_port_4_word_r) // dip2
+	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
+	AM_RANGE(0xc41006, 0xc41007) AM_READ_PORT("P2")
+	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW2")
 	AM_RANGE(0xffc000, 0xffffff) AM_READ(SYS16_MRA16_WORKINGRAM)
 ADDRESS_MAP_END
 
@@ -894,7 +902,6 @@ static WRITE16_HANDLER( eswat_tilebank0_w )
 }
 
 
-
 static ADDRESS_MAP_START( eswatbl_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x3e2000, 0x3e2001) AM_WRITE(eswat_tilebank0_w)
@@ -907,7 +914,6 @@ static ADDRESS_MAP_START( eswatbl_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc80000, 0xc80001) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xffc000, 0xffffff) AM_WRITE(SYS16_MWA16_WORKINGRAM) AM_BASE(&sys16_workingram)
 ADDRESS_MAP_END
-
 
 /***************************************************************************/
 
@@ -952,10 +958,7 @@ static DRIVER_INIT( eswatbl )
 /***************************************************************************/
 
 static INPUT_PORTS_START( eswat )
-	SYS16_JOY1
-	SYS16_JOY2
-	SYS16_SERVICE
-	SYS16_COINAGE
+	PORT_INCLUDE( sys16_common )
 
 	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Credits To Start" ) PORT_DIPLOCATION("SW2:1")
@@ -996,25 +999,15 @@ MACHINE_DRIVER_END
 
 /***************************************************************************/
 
-
-/***************************************************************************/
-
-
-/***************************************************************************/
-
-
-/***************************************************************************/
-
-
 static ADDRESS_MAP_START( fpointbl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 //  AM_RANGE(0x02002e, 0x020049) AM_READ(fp_io_service_dummy_r)
 	AM_RANGE(0x600006, 0x600007) AM_WRITE(sound_command_w)
-	AM_RANGE(0x601000, 0x601001) AM_READ(input_port_0_word_r) // service
-	AM_RANGE(0x601002, 0x601003) AM_READ(input_port_1_word_r) // player1
-	AM_RANGE(0x601004, 0x601005) AM_READ(input_port_2_word_r) // player2
-	AM_RANGE(0x600000, 0x600001) AM_READ(input_port_3_word_r) // dip1
-	AM_RANGE(0x600002, 0x600003) AM_READ(input_port_4_word_r) // dip2
+	AM_RANGE(0x601000, 0x601001) AM_READ_PORT("SERVICE")
+	AM_RANGE(0x601002, 0x601003) AM_READ_PORT("P1")
+	AM_RANGE(0x601004, 0x601005) AM_READ_PORT("P2")
+	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW2")
+	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(SYS16_MRA16_TILERAM, SYS16_MWA16_TILERAM) AM_BASE(&sys16_tileram)
 	AM_RANGE(0x410000, 0x410fff) AM_READWRITE(SYS16_MRA16_TEXTRAM, SYS16_MWA16_TEXTRAM) AM_BASE(&sys16_textram)
 	AM_RANGE(0x440000, 0x440fff) AM_READWRITE(SYS16_MRA16_SPRITERAM, SYS16_MWA16_SPRITERAM) AM_BASE(&sys16_spriteram)
@@ -1071,12 +1064,22 @@ static DRIVER_INIT( fpointbl )
 	MACHINE_RESET_CALL(sys16_onetime);
 	sys16_video_config(fpoint_update_proc, -0xb8, NULL);
 }
+
 /***************************************************************************/
 
-static INPUT_PORTS_START( fpoint )
-	SYS16_SERVICE
 
-	PORT_START_TAG("IN0")
+static INPUT_PORTS_START( fpointbl )
+	PORT_START_TAG("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -1086,57 +1089,7 @@ static INPUT_PORTS_START( fpoint )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 
-	PORT_START_TAG("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-
-	PORT_START_TAG("DSW2")
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" ) /* Listed as "Unused" */
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" ) /* Listed as "Unused" */
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" ) /* Listed as "Unused" */
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x40, 0x40, "Clear Round Allowed" ) PORT_DIPLOCATION("SW2:7") /* Use button 3 */
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x40, "2" )
-	/* The mode in which a block falls at twice [ usual ] speed as this when playing 25 minutes or more on one coin. */
-	PORT_DIPNAME( 0x80, 0x80, "2 Cell Move" ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
-
-	SYS16_COINAGE
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( fpointbj )
-	SYS16_SERVICE
-
-	PORT_START_TAG("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -1166,7 +1119,41 @@ static INPUT_PORTS_START( fpointbj )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	SYS16_COINAGE
+	PORT_START_TAG("DSW1")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x05, "2 Coins/1 Credit 5/3 6/4" )
+	PORT_DIPSETTING(    0x04, "2 Coins/1 Credit 4/3" )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, "1 Coin/1 Credit 2/3" )
+	PORT_DIPSETTING(    0x02, "1 Coin/1 Credit 4/5" )
+	PORT_DIPSETTING(    0x03, "1 Coin/1 Credit 5/6" )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin B too) or 1/1" )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x50, "2 Coins/1 Credit 5/3 6/4" )
+	PORT_DIPSETTING(    0x40, "2 Coins/1 Credit 4/3" )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, "1 Coin/1 Credit 2/3" )
+	PORT_DIPSETTING(    0x20, "1 Coin/1 Credit 4/5" )
+	PORT_DIPSETTING(    0x30, "1 Coin/1 Credit 5/6" )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too) or 1/1" )
 INPUT_PORTS_END
 
 /***************************************************************************/
@@ -1197,11 +1184,11 @@ MACHINE_DRIVER_END
 /***************************************************************************/
 
 static READ16_HANDLER( ga_io_players_r ) {
-	return (input_port_read_indexed(machine, 0) << 8) | input_port_read_indexed(machine, 1);
+	return (input_port_read(machine, "P1") << 8) | input_port_read(machine, "P2");
 }
 static READ16_HANDLER( ga_io_service_r )
 {
-	return (input_port_read_indexed(machine,2) << 8) | (sys16_workingram[0x2c96/2] & 0x00ff);
+	return (input_port_read(machine,"SERVICE") << 8) | (sys16_workingram[0x2c96/2] & 0x00ff);
 }
 
 static ADDRESS_MAP_START( goldnaxe_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1211,11 +1198,11 @@ static ADDRESS_MAP_START( goldnaxe_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x140fff) AM_READ(SYS16_MRA16_PALETTERAM)
 	AM_RANGE(0x1f0000, 0x1f0003) AM_READ(SYS16_MRA16_EXTRAM)
 	AM_RANGE(0x200000, 0x200fff) AM_READ(SYS16_MRA16_SPRITERAM)
-	AM_RANGE(0xc41002, 0xc41003) AM_READ(input_port_0_word_r) // player1
-	AM_RANGE(0xc41006, 0xc41007) AM_READ(input_port_1_word_r) // player2
-	AM_RANGE(0xc41000, 0xc41001) AM_READ(input_port_2_word_r) // service
-	AM_RANGE(0xc42002, 0xc42003) AM_READ(input_port_3_word_r) // dip1
-	AM_RANGE(0xc42000, 0xc42001) AM_READ(input_port_4_word_r) // dip2
+	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
+	AM_RANGE(0xc41006, 0xc41007) AM_READ_PORT("P2")
+	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW2")
 	AM_RANGE(0xffecd0, 0xffecd1) AM_READ(ga_io_players_r)
 	AM_RANGE(0xffec96, 0xffec97) AM_READ(ga_io_service_r)
 	AM_RANGE(0xffc000, 0xffffff) AM_READ(SYS16_MRA16_WORKINGRAM)
@@ -1288,8 +1275,6 @@ static MACHINE_RESET( goldnaxe )
 	sys16_update_proc = goldnaxe_update_proc;
 }
 
-
-
 static DRIVER_INIT( goldnabl )
 {
 	MACHINE_RESET_CALL(sys16_onetime);
@@ -1298,10 +1283,7 @@ static DRIVER_INIT( goldnabl )
 /***************************************************************************/
 
 static INPUT_PORTS_START( goldnaxe )
-	SYS16_JOY1
-	SYS16_JOY2
-	SYS16_SERVICE
-	SYS16_COINAGE
+	PORT_INCLUDE( sys16_common )
 
 	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Credits Needed" ) PORT_DIPLOCATION("SW2:1")
@@ -1349,33 +1331,17 @@ MACHINE_DRIVER_END
 
 /***************************************************************************/
 
-
-
-/***************************************************************************/
-
-
-/***************************************************************************/
-
-
-/***************************************************************************/
-
-
-/***************************************************************************/
-
-
-/***************************************************************************/
-
 static ADDRESS_MAP_START( passsht_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x400000, 0x40ffff) AM_READ(SYS16_MRA16_TILERAM)
 	AM_RANGE(0x410000, 0x410fff) AM_READ(SYS16_MRA16_TEXTRAM)
 	AM_RANGE(0x440000, 0x440fff) AM_READ(SYS16_MRA16_SPRITERAM)
 	AM_RANGE(0x840000, 0x840fff) AM_READ(SYS16_MRA16_PALETTERAM)
-	AM_RANGE(0xc41002, 0xc41003) AM_READ(input_port_0_word_r) // player1
-	AM_RANGE(0xc41004, 0xc41005) AM_READ(input_port_1_word_r) // player2
-	AM_RANGE(0xc41000, 0xc41001) AM_READ(input_port_2_word_r) // service
-	AM_RANGE(0xc42002, 0xc42003) AM_READ(input_port_3_word_r) // dip1
-	AM_RANGE(0xc42000, 0xc42001) AM_READ(input_port_4_word_r) // dip2
+	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
+	AM_RANGE(0xc41004, 0xc41005) AM_READ_PORT("P2")
+	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW2")
 	AM_RANGE(0xffc000, 0xffffff) AM_READ(SYS16_MRA16_WORKINGRAM)
 ADDRESS_MAP_END
 
@@ -1396,43 +1362,54 @@ static int passht4b_io3_val;
 
 static READ16_HANDLER( passht4b_service_r )
 {
-	UINT16 val=input_port_read_indexed(machine,2);
-	if(!(input_port_read_indexed(machine, 0) & 0x40)) val&=0xef;
-	if(!(input_port_read_indexed(machine, 1) & 0x40)) val&=0xdf;
-	if(!(input_port_read_indexed(machine, 5) & 0x40)) val&=0xbf;
-	if(!(input_port_read_indexed(machine, 6) & 0x40)) val&=0x7f;
+	UINT16 val=input_port_read(machine, "SERVICE");
+	if(!(input_port_read(machine, "P1") & 0x40)) val&=0xef;
+	if(!(input_port_read(machine, "P2") & 0x40)) val&=0xdf;
+	if(!(input_port_read(machine, "P3") & 0x40)) val&=0xbf;
+	if(!(input_port_read(machine, "P4") & 0x40)) val&=0x7f;
 
-	passht4b_io3_val=(input_port_read_indexed(machine, 0)<<4) | (input_port_read_indexed(machine, 5)&0xf);
-	passht4b_io2_val=(input_port_read_indexed(machine, 1)<<4) | (input_port_read_indexed(machine, 6)&0xf);
+	passht4b_io3_val=(input_port_read(machine, "P1") << 4) | (input_port_read(machine, "P3") & 0xf);
+	passht4b_io2_val=(input_port_read(machine, "P2") << 4) | (input_port_read(machine, "P4") & 0xf);
 
 	passht4b_io1_val=0xff;
 
 	// player 1 buttons
-	if(!(input_port_read_indexed(machine, 0) & 0x10)) passht4b_io1_val &=0xfe;
-	if(!(input_port_read_indexed(machine, 0) & 0x20)) passht4b_io1_val &=0xfd;
-	if(!(input_port_read_indexed(machine, 0) & 0x80)) passht4b_io1_val &=0xfc;
+	if(!(input_port_read(machine, "P1") & 0x10)) passht4b_io1_val &=0xfe;
+	if(!(input_port_read(machine, "P1") & 0x20)) passht4b_io1_val &=0xfd;
+	if(!(input_port_read(machine, "P1") & 0x80)) passht4b_io1_val &=0xfc;
 
 	// player 2 buttons
-	if(!(input_port_read_indexed(machine, 1) & 0x10)) passht4b_io1_val &=0xfb;
-	if(!(input_port_read_indexed(machine, 1) & 0x20)) passht4b_io1_val &=0xf7;
-	if(!(input_port_read_indexed(machine, 1) & 0x80)) passht4b_io1_val &=0xf3;
+	if(!(input_port_read(machine, "P2") & 0x10)) passht4b_io1_val &=0xfb;
+	if(!(input_port_read(machine, "P2") & 0x20)) passht4b_io1_val &=0xf7;
+	if(!(input_port_read(machine, "P2") & 0x80)) passht4b_io1_val &=0xf3;
 
 	// player 3 buttons
-	if(!(input_port_read_indexed(machine, 5) & 0x10)) passht4b_io1_val &=0xef;
-	if(!(input_port_read_indexed(machine, 5) & 0x20)) passht4b_io1_val &=0xdf;
-	if(!(input_port_read_indexed(machine, 5) & 0x80)) passht4b_io1_val &=0xcf;
+	if(!(input_port_read(machine, "P3") & 0x10)) passht4b_io1_val &=0xef;
+	if(!(input_port_read(machine, "P3") & 0x20)) passht4b_io1_val &=0xdf;
+	if(!(input_port_read(machine, "P3") & 0x80)) passht4b_io1_val &=0xcf;
 
 	// player 4 buttons
-	if(!(input_port_read_indexed(machine, 6) & 0x10)) passht4b_io1_val &=0xbf;
-	if(!(input_port_read_indexed(machine, 6) & 0x20)) passht4b_io1_val &=0x7f;
-	if(!(input_port_read_indexed(machine, 6) & 0x80)) passht4b_io1_val &=0x3f;
+	if(!(input_port_read(machine, "P4") & 0x10)) passht4b_io1_val &=0xbf;
+	if(!(input_port_read(machine, "P4") & 0x20)) passht4b_io1_val &=0x7f;
+	if(!(input_port_read(machine, "P4") & 0x80)) passht4b_io1_val &=0x3f;
 
 	return val;
 }
 
-static READ16_HANDLER( passht4b_io1_r ) {	return passht4b_io1_val;}
-static READ16_HANDLER( passht4b_io2_r ) {	return passht4b_io2_val;}
-static READ16_HANDLER( passht4b_io3_r ) {	return passht4b_io3_val;}
+static READ16_HANDLER( passht4b_io1_r ) 
+{	
+	return passht4b_io1_val;
+}
+
+static READ16_HANDLER( passht4b_io2_r ) 
+{	
+	return passht4b_io2_val;
+}
+
+static READ16_HANDLER( passht4b_io3_r ) 
+{	
+	return passht4b_io3_val;
+}
 
 static ADDRESS_MAP_START( passht4b_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_READ(SMH_ROM)
@@ -1444,12 +1421,12 @@ static ADDRESS_MAP_START( passht4b_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc41002, 0xc41003) AM_READ(passht4b_io1_r)
 	AM_RANGE(0xc41004, 0xc41005) AM_READ(passht4b_io2_r)
 	AM_RANGE(0xc41006, 0xc41007) AM_READ(passht4b_io3_r)
-	AM_RANGE(0xc42002, 0xc42003) AM_READ(input_port_3_word_r) // dip1
-	AM_RANGE(0xc42000, 0xc42001) AM_READ(input_port_4_word_r) // dip2
-	AM_RANGE(0xc43000, 0xc43001) AM_READ(input_port_0_word_r) // player1        // test mode only
-	AM_RANGE(0xc43002, 0xc43003) AM_READ(input_port_1_word_r) // player2
-	AM_RANGE(0xc43004, 0xc43005) AM_READ(input_port_5_word_r) // player3
-	AM_RANGE(0xc43006, 0xc43007) AM_READ(input_port_6_word_r) // player4
+	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW2")
+	AM_RANGE(0xc43000, 0xc43001) AM_READ_PORT("P1")		// test mode only
+	AM_RANGE(0xc43002, 0xc43003) AM_READ_PORT("P2")
+	AM_RANGE(0xc43004, 0xc43005) AM_READ_PORT("P3")
+	AM_RANGE(0xc43006, 0xc43007) AM_READ_PORT("P4")
 	AM_RANGE(0xffc000, 0xffffff) AM_READ(SYS16_MRA16_WORKINGRAM)
 ADDRESS_MAP_END
 
@@ -1523,28 +1500,13 @@ static DRIVER_INIT( passht4b )
 /***************************************************************************/
 
 static INPUT_PORTS_START( passsht )
-	PORT_START_TAG("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_INCLUDE( sys16_common )
+
+	PORT_MODIFY("P1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 
-	PORT_START_TAG("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_MODIFY("P2")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-
-	SYS16_SERVICE
-	SYS16_COINAGE
 
 	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:1")
@@ -1572,7 +1534,9 @@ static INPUT_PORTS_START( passsht )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( passht4b )
-	PORT_START_TAG("IN0")
+	PORT_INCLUDE( passsht )
+
+	PORT_MODIFY("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -1582,7 +1546,7 @@ static INPUT_PORTS_START( passht4b )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
 
-	PORT_START_TAG("IN1")
+	PORT_MODIFY("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -1592,43 +1556,11 @@ static INPUT_PORTS_START( passht4b )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
 
-	PORT_START_TAG("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_MODIFY("SERVICE")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
 
-	SYS16_COINAGE
-
-	PORT_START_TAG("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0e, 0x0e, "Initial Point" ) PORT_DIPLOCATION("SW2:2,3,4")
-	PORT_DIPSETTING(    0x06, "2000" )
-	PORT_DIPSETTING(    0x0a, "3000" )
-	PORT_DIPSETTING(    0x0c, "4000" )
-	PORT_DIPSETTING(    0x0e, "5000" )
-	PORT_DIPSETTING(    0x08, "6000" )
-	PORT_DIPSETTING(    0x04, "7000" )
-	PORT_DIPSETTING(    0x02, "8000" )
-	PORT_DIPSETTING(    0x00, "9000" )
-	PORT_DIPNAME( 0x30, 0x30, "Point Table" ) PORT_DIPLOCATION("SW2:5,6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-
-	PORT_START_TAG("IN5")
+	PORT_START_TAG("P3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
@@ -1638,7 +1570,7 @@ static INPUT_PORTS_START( passht4b )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
 
-	PORT_START_TAG("IN6")
+	PORT_START_TAG("P4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
@@ -1647,7 +1579,6 @@ static INPUT_PORTS_START( passht4b )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
-
 INPUT_PORTS_END
 
 /***************************************************************************/
@@ -1675,20 +1606,8 @@ MACHINE_DRIVER_END
 
 /***************************************************************************/
 
-
-/***************************************************************************/
-
-
-/***************************************************************************/
-
-
-/***************************************************************************/
-
 static INPUT_PORTS_START( shinobi )
-	SYS16_JOY1
-	SYS16_JOY2
-	SYS16_SERVICE
-	SYS16_COINAGE
+	PORT_INCLUDE( sys16_common )
 
 	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:1")
@@ -1717,20 +1636,17 @@ INPUT_PORTS_END
 
 /***************************************************************************/
 
-
-/***************************************************************************/
-
 static ADDRESS_MAP_START( shinobl_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x400000, 0x40ffff) AM_READ(SYS16_MRA16_TILERAM)
 	AM_RANGE(0x410000, 0x410fff) AM_READ(SYS16_MRA16_TEXTRAM)
 	AM_RANGE(0x440000, 0x440fff) AM_READ(SYS16_MRA16_SPRITERAM)
 	AM_RANGE(0x840000, 0x840fff) AM_READ(SYS16_MRA16_PALETTERAM)
-	AM_RANGE(0xc41002, 0xc41003) AM_READ(input_port_0_word_r) // player1
-	AM_RANGE(0xc41006, 0xc41007) AM_READ(input_port_1_word_r) // player2
-	AM_RANGE(0xc41000, 0xc41001) AM_READ(input_port_2_word_r) // service
-	AM_RANGE(0xc42000, 0xc42001) AM_READ(input_port_3_word_r) // dip1
-	AM_RANGE(0xc42002, 0xc42003) AM_READ(input_port_4_word_r) // dip2
+	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
+	AM_RANGE(0xc41006, 0xc41007) AM_READ_PORT("P2")
+	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW2")
 	AM_RANGE(0xffc000, 0xffffff) AM_READ(SYS16_MRA16_WORKINGRAM)
 ADDRESS_MAP_END
 
@@ -1778,10 +1694,7 @@ static DRIVER_INIT( shinobl )
 	MACHINE_RESET_CALL(sys16_onetime);
 }
 
-
 /***************************************************************************/
-
-
 
 static MACHINE_DRIVER_START( shinob2 )
 
@@ -1793,10 +1706,7 @@ static MACHINE_DRIVER_START( shinob2 )
 	MDRV_MACHINE_RESET(shinobl)
 MACHINE_DRIVER_END
 
-
 /***************************************************************************/
-
-
 
 /* bootleg has extra ram for regs? */
 
@@ -1807,11 +1717,11 @@ static ADDRESS_MAP_START( tetrisbl_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x418000, 0x41803f) AM_READ(SYS16_MRA16_EXTRAM2)
 	AM_RANGE(0x440000, 0x440fff) AM_READ(SYS16_MRA16_SPRITERAM)
 	AM_RANGE(0x840000, 0x840fff) AM_READ(SYS16_MRA16_PALETTERAM)
-	AM_RANGE(0xc41002, 0xc41003) AM_READ(input_port_0_word_r) // player1
-	AM_RANGE(0xc41006, 0xc41007) AM_READ(input_port_1_word_r) // player2
-	AM_RANGE(0xc41000, 0xc41001) AM_READ(input_port_2_word_r) // service
-	AM_RANGE(0xc42002, 0xc42003) AM_READ(input_port_3_word_r) // dip1
-	AM_RANGE(0xc42000, 0xc42001) AM_READ(input_port_4_word_r) // dip2
+	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
+	AM_RANGE(0xc41006, 0xc41007) AM_READ_PORT("P2")
+	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc80000, 0xc80001) AM_READ(SMH_NOP)
 	AM_RANGE(0xffc000, 0xffffff) AM_READ(SYS16_MRA16_WORKINGRAM)
 ADDRESS_MAP_END
@@ -1829,7 +1739,6 @@ static ADDRESS_MAP_START( tetrisbl_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc80000, 0xc80001) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xffc000, 0xffffff) AM_WRITE(SYS16_MWA16_WORKINGRAM) AM_BASE(&sys16_workingram)
 ADDRESS_MAP_END
-
 
 
 static READ16_HANDLER(beautyb_unk1_r)
@@ -1868,8 +1777,6 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-
-
 static void tetris_bootleg_update_proc( void )
 {
 	sys16_fg_scrolly = sys16_textram[0x748];
@@ -1901,10 +1808,7 @@ static DRIVER_INIT( tetrisbl )
 /***************************************************************************/
 
 static INPUT_PORTS_START( tetris )
-	SYS16_JOY1
-	SYS16_JOY2
-	SYS16_SERVICE
-	SYS16_COINAGE /* unconfirmed */
+	PORT_INCLUDE( sys16_common )	/* unconfirmed coinage dip */
 
 	PORT_START_TAG("DSW2")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" ) /* Listed as "Unused" */
@@ -1947,19 +1851,22 @@ static MACHINE_DRIVER_START( beautyb )
 	MDRV_MACHINE_RESET(tetrisbl)
 MACHINE_DRIVER_END
 
-
 /***************************************************************************/
 
 static READ16_HANDLER( tt_io_player1_r )
-{ return input_port_read_indexed(machine,0) << 8; }
+{ 
+	return input_port_read(machine, "P1") << 8; 
+}
+
 static READ16_HANDLER( tt_io_player2_r )
-{ return input_port_read_indexed(machine,1) << 8; }
+{ 
+	return input_port_read(machine, "P2") << 8; 
+}
+
 static READ16_HANDLER( tt_io_service_r )
-{ return input_port_read_indexed(machine,2) << 8; }
-
-
-
-/***************************************************************************/
+{ 
+	return input_port_read(machine, "SERVICE") << 8; 
+}
 
 /*
     This game has a MCU which does the following:
@@ -1988,14 +1895,8 @@ static READ16_HANDLER( tt_io_service_r )
     be tricky, tturfbl handles it correctly.
 */
 
-
-/***************************************************************************/
-
 static INPUT_PORTS_START( tturf )
-	SYS16_JOY1
-	SYS16_JOY2
-	SYS16_SERVICE
-	SYS16_COINAGE
+	PORT_INCLUDE( sys16_common )
 
 	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Continues ) ) PORT_DIPLOCATION("SW2:1,2")
@@ -2034,13 +1935,13 @@ static ADDRESS_MAP_START( tturfbl_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x40ffff) AM_READ(SYS16_MRA16_TILERAM)
 	AM_RANGE(0x410000, 0x410fff) AM_READ(SYS16_MRA16_TEXTRAM)
 	AM_RANGE(0x500000, 0x500fff) AM_READ(SYS16_MRA16_PALETTERAM)
-	AM_RANGE(0x600002, 0x600003) AM_READ(input_port_3_word_r) // dip1
-	AM_RANGE(0x600000, 0x600001) AM_READ(input_port_4_word_r) // dip2
-	AM_RANGE(0x601002, 0x601003) AM_READ(input_port_0_word_r) // player1
-	AM_RANGE(0x601004, 0x601005) AM_READ(input_port_1_word_r) // player2
-	AM_RANGE(0x601000, 0x601001) AM_READ(input_port_2_word_r) // service
-	AM_RANGE(0x602002, 0x602003) AM_READ(input_port_3_word_r) // dip1
-	AM_RANGE(0x602000, 0x602001) AM_READ(input_port_4_word_r) // dip2
+	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("DSW1")
+	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW2")
+	AM_RANGE(0x601002, 0x601003) AM_READ_PORT("P1")
+	AM_RANGE(0x601004, 0x601005) AM_READ_PORT("P2")
+	AM_RANGE(0x601000, 0x601001) AM_READ_PORT("SERVICE")
+	AM_RANGE(0x602002, 0x602003) AM_READ_PORT("DSW1")
+	AM_RANGE(0x602000, 0x602001) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc46000, 0xc4601f) AM_READ(SYS16_MRA16_EXTRAM3)
 ADDRESS_MAP_END
 
@@ -2108,8 +2009,8 @@ static DRIVER_INIT( tturfbl )
 
 	mem = memory_region(machine, REGION_CPU2);
 	memcpy(mem, mem+0x10000, 0x8000);
-
 }
+
 /***************************************************************************/
 // sound ??
 static MACHINE_DRIVER_START( tturfbl )
@@ -2136,20 +2037,8 @@ MACHINE_DRIVER_END
 
 /***************************************************************************/
 
-
-/***************************************************************************/
-
-
-
-
-
-/***************************************************************************/
-
 static INPUT_PORTS_START( wb3b )
-	SYS16_JOY1
-	SYS16_JOY2
-	SYS16_SERVICE
-	SYS16_COINAGE
+	PORT_INCLUDE( sys16_common )
 
 	PORT_START_TAG("DSW2")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" ) /* Listed as "Unused" */
@@ -2175,20 +2064,17 @@ INPUT_PORTS_END
 
 /***************************************************************************/
 
-
-/***************************************************************************/
-
 static ADDRESS_MAP_START( wb3bbl_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x400000, 0x40ffff) AM_READ(SYS16_MRA16_TILERAM)
 	AM_RANGE(0x410000, 0x410fff) AM_READ(SYS16_MRA16_TEXTRAM)
 	AM_RANGE(0x440000, 0x440fff) AM_READ(SYS16_MRA16_SPRITERAM)
 	AM_RANGE(0x840000, 0x840fff) AM_READ(SYS16_MRA16_PALETTERAM)
-	AM_RANGE(0xc41002, 0xc41003) AM_READ(input_port_0_word_r) // player1
-	AM_RANGE(0xc41004, 0xc41005) AM_READ(input_port_1_word_r) // player2
-	AM_RANGE(0xc41000, 0xc41001) AM_READ(input_port_2_word_r) // service
-	AM_RANGE(0xc42002, 0xc42003) AM_READ(input_port_3_word_r) // dip1
-	AM_RANGE(0xc42000, 0xc42001) AM_READ(input_port_4_word_r) // dip2
+	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
+	AM_RANGE(0xc41004, 0xc41005) AM_READ_PORT("P2")
+	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xc42002, 0xc42003) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc42000, 0xc42001) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc46000, 0xc4601f) AM_READ(SYS16_MRA16_EXTRAM3)
 	AM_RANGE(0xff0000, 0xffffff) AM_READ(SYS16_MRA16_WORKINGRAM)
 ADDRESS_MAP_END
@@ -2277,10 +2163,7 @@ static MACHINE_DRIVER_START( wb3bbl )
 	MDRV_MACHINE_RESET(wb3bbl)
 MACHINE_DRIVER_END
 
-
-
 /*****************************************************************************/
-
 
 ROM_START( bayrtbl1 )
 	ROM_REGION( 0xc0000, REGION_CPU1, 0 ) /* 68000 code */
@@ -2342,7 +2225,6 @@ ROM_START( bayrtbl2 )
 ROM_END
 
 // sys16B
-
 ROM_START( dduxbl )
 	ROM_REGION( 0x0c0000, REGION_CPU1, 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "dduxb03.bin", 0x000000, 0x20000, CRC(e7526012) SHA1(a1798008bfa1ce9b87dc330f3817b1978052fcfd) )
@@ -2373,8 +2255,6 @@ ROM_START( dduxbl )
 ROM_END
 
 // sys16B
-
-
 ROM_START( eswatbl )
 	ROM_REGION( 0x080000, REGION_CPU1, 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "eswat_c.rom", 0x000000, 0x10000, CRC(1028cc81) SHA1(24b4cd182419a44f3d6afa1c4273353024eb278f) )
@@ -2403,8 +2283,6 @@ ROM_START( eswatbl )
 ROM_END
 
 // sys16B
-
-
 ROM_START( fpointbl )
 	ROM_REGION( 0x020000, REGION_CPU1, 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "flpoint.003", 0x000000, 0x10000, CRC(4d6df514) SHA1(168aa1629ab7152ba1984605155406b236954a2c) )
@@ -2513,7 +2391,6 @@ ROM_END
 
 */
 
-
 ROM_START( goldnab2 )
 	ROM_REGION( 0x0c0000, REGION_CPU1, 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "ic39.1", 0x00000, 0x10000, CRC(71489c9a) SHA1(ec25463a2c63027d2635f0e27f5a971d68938fe3) )
@@ -2565,49 +2442,6 @@ ROM_START( goldnab2 )
 	ROM_LOAD( "ic46.9",  0x10000, 0x10000, CRC(634dd54e) SHA1(ac4ab0ad9c1ac634ff4dfb83232b0fa5cfb26fdd) )
 ROM_END
 
-
-// pre16
-#ifdef UNUSED_DEFINITION
-ROM_START( mjleague )
-	ROM_REGION( 0x030000, REGION_CPU1, 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "epr-7404.09b", 0x000000, 0x8000, CRC(ec1655b5) SHA1(5c1df364fa9733daa4478c5f88298089e4963c33) )
-	ROM_LOAD16_BYTE( "epr-7401.06b", 0x000001, 0x8000, CRC(2befa5e0) SHA1(0a1681a4c7d62a5754ba6f3845436b4d08324246) )
-	ROM_LOAD16_BYTE( "epr-7405.10b", 0x010000, 0x8000, CRC(7a4f4e38) SHA1(65a22097dd933e83f326bd64b3863915897780a6) )
-	ROM_LOAD16_BYTE( "epr-7402.07b", 0x010001, 0x8000, CRC(b7bef762) SHA1(214450e0b094f99ef38dec2a3e5cbdb0b30e917d) )
-	ROM_LOAD16_BYTE( "epra7406.11b", 0x020000, 0x8000, CRC(bb743639) SHA1(5d99638a79f02ce14374d3b1f3d9fbfc5c13c6e1) )
-	ROM_LOAD16_BYTE( "epra7403.08b", 0x020001, 0x8000, CRC(d86250cf) SHA1(fb5dabb7b9b9fe0bbe93e28c60311c7b3256107a) )	// Fails memory test. Bad rom?
-
-	ROM_REGION( 0x18000, REGION_GFX1, ROMREGION_DISPOSE ) /* tiles */
-	ROM_LOAD( "epr-7051.09a", 0x00000, 0x08000, CRC(10ca255a) SHA1(ccf58ffcac2f7fbdbfbdf32601a1b97f359cbd91) )
-	ROM_LOAD( "epr-7052.10a", 0x08000, 0x08000, CRC(2550db0e) SHA1(28f8d68f43d26f12793fe295c205cc86adc4e96a) )
-	ROM_LOAD( "epr-7053.11a", 0x10000, 0x08000, CRC(5bfea038) SHA1(01dc6e14cc7bba9f7930e68573c441fa2841f49a) )
-
-	ROM_REGION( 0x50000, REGION_GFX2, 0 ) /* sprites */
-	ROM_LOAD16_BYTE( "epr-7055.05a", 0x000001, 0x8000, CRC(1fb860bd) SHA1(4a4155d0352dfae9e402a2b2f1558ef17b1303b4) )
-	ROM_LOAD16_BYTE( "epr-7059.02b", 0x000000, 0x8000, CRC(3d14091d) SHA1(36208415b2012b6e948fefa15b0f7041748066be) )
-	ROM_LOAD16_BYTE( "epr-7056.06a", 0x010001, 0x8000, CRC(b35dd968) SHA1(e306b5e38acf583d7b2089302622ad25ae5564b0) )
-	ROM_LOAD16_BYTE( "epr-7060.03b", 0x010000, 0x8000, CRC(61bb3757) SHA1(5c87cf23be22b84e3dae746527ca057d870d6397) )
-	ROM_LOAD16_BYTE( "epr-7057.07a", 0x020001, 0x8000, CRC(3e5a2b6f) SHA1(d3dbafb4acb916e02c978a156008bd75ba122fb7) )
-	ROM_LOAD16_BYTE( "epr-7061.04b", 0x020000, 0x8000, CRC(c808dad5) SHA1(9b65acc8dc23b16e56327298188d1a6ab48b2b5d) )
-	ROM_LOAD16_BYTE( "epr-7058.08a", 0x030001, 0x8000, CRC(b543675f) SHA1(35ffc9295a8849a18fabe156fdbc9801ea2179cd) )
-	ROM_LOAD16_BYTE( "epr-7062.05b", 0x030000, 0x8000, CRC(9168eb47) SHA1(daaa7836e627a0679e65373d8f20a9383ba4c905) )
-//  ROM_LOAD16_BYTE( "epr-7055.05a", 0x040001, 0x8000, CRC(1fb860bd) SHA1(4a4155d0352dfae9e402a2b2f1558ef17b1303b4) ) loaded twice??
-//  ROM_LOAD16_BYTE( "epr-7059.02b", 0x040000, 0x8000, CRC(3d14091d) SHA1(36208415b2012b6e948fefa15b0f7041748066be) ) loaded twice??
-
-	ROM_REGION( 0x20000, REGION_CPU2, 0 ) /* sound CPU */
-	ROM_LOAD( "eprc7054.01b", 0x00000, 0x8000, CRC(4443b744) SHA1(73359a6e9d62b382dee47fea31b9e17eb26a0321) )
-
-	ROM_REGION( 0x1000, REGION_CPU3, 0 )      /* 4k for 7751 onboard ROM */
-	ROM_LOAD( "7751.bin",     0x0000, 0x0400, CRC(6a9534fc) SHA1(67ad94674db5c2aab75785668f610f6f4eccd158) ) /* 7751 - U34 */
-
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) /* 7751 sound data */
-	ROM_LOAD( "epr-7063.01a", 0x00000, 0x8000, CRC(45d8908a) SHA1(e61f81f953c1a744ded36fed3b55774e4747af29) )
-	ROM_LOAD( "epr-7065.02a", 0x08000, 0x8000, CRC(8c8f8cff) SHA1(fca5a916a8b25800ee5e8771e2ced0ed9bd737f4) )
-	ROM_LOAD( "epr-7064.03a", 0x10000, 0x8000, CRC(159f6636) SHA1(66fa3f3e95a6ef3d3ff4ded09c05ab1131d9fbbb) )
-	ROM_LOAD( "epr-7066.04a", 0x18000, 0x8000, CRC(f5cfa91f) SHA1(c85d68cbcd03fe1436bed12235c033610acc11ee) )
-ROM_END
-#endif
-
 ROM_START( passht4b )
 	ROM_REGION( 0x20000, REGION_CPU1, 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "pas4p.3", 0x000000, 0x10000, CRC(2d8bc946) SHA1(35d3e529d4815543d9876fd0545c3d686467abaa) )
@@ -2632,7 +2466,6 @@ ROM_START( passht4b )
 ROM_END
 
 /* Passing Shot Bootleg is a decrypted version of Passing Shot Japanese (passshtj). It has been heavily modified */
-
 ROM_START( passshtb )
 	ROM_REGION( 0x020000, REGION_CPU1, 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "pass3_2p.bin", 0x000000, 0x10000, CRC(26bb9299) SHA1(11bacf86dfdd8bcfbfb61f0ebc59890325c48adc) )
@@ -2733,16 +2566,6 @@ ROM_START( shinobld )
 	ROM_LOAD( "16.bin", 0x0000, 0x10000, CRC(52c8364e) SHA1(01d30b82f92498d155d2e31d43d58dff0285cce3) )
 ROM_END
 
-
-// sys16B
-
-// sys16A custom
-
-/*
-
-
-*/
-
 // sys16B
 ROM_START( tetrisbl )
 	ROM_REGION( 0x040000, REGION_CPU1, ROMREGION_ERASEFF ) /* 68000 code */
@@ -2790,7 +2613,6 @@ ROM_START( tturfbl )
 	ROM_LOAD( "tt0246ff.rom", 0x20000, 0x10000, CRC(bb4bba8f) SHA1(b182a7e1d0425e93c2c1b93472aafd30a6af6907) )
 ROM_END
 
-
 // sys16B
 ROM_START( wb3bbl )
 	ROM_REGION( 0x040000, REGION_CPU1, 0 ) /* 68000 code */
@@ -2830,13 +2652,12 @@ GAME( 1987, shinobld, shinobi,  shinob2,  shinobi,  shinobl,  ROT0,   "[Sega] (D
 
 /* System16B */
 /*          rom       parent    machine   inp       init */
-
 GAME( 1989, bayrtbl1, bayroute, bayroute, bayroute, bayrtbl1, ROT0,   "bootleg", "Bay Route (bootleg set 1)", GAME_NOT_WORKING )
 GAME( 1989, bayrtbl2, bayroute, bayroute, bayroute, bayrtbl1, ROT0,   "bootleg", "Bay Route (bootleg set 2)", GAME_NOT_WORKING )
 GAME( 1989, dduxbl,   ddux,     dduxbl,   ddux,     dduxbl,   ROT0,   "bootleg", "Dynamite Dux (bootleg)", 0 )
 GAME( 1989, eswatbl,  eswat,    eswatbl,  eswat,    eswatbl,  ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg)", GAME_IMPERFECT_SOUND )
-GAME( 1989, fpointbl, fpoint,   fpointbl, fpoint,   fpointbl, ROT0,   "bootleg", "Flash Point (World, bootleg)", 0 )
-GAME( 1989, fpointbj, fpoint,   fpointbl, fpointbj, fpointbl, ROT0,   "bootleg", "Flash Point (Japan, bootleg)", 0 )
+GAME( 1989, fpointbl, fpoint,   fpointbl, fpointbl, fpointbl, ROT0,   "bootleg", "Flash Point (World, bootleg)", 0 )
+GAME( 1989, fpointbj, fpoint,   fpointbl, fpointbl, fpointbl, ROT0,   "bootleg", "Flash Point (Japan, bootleg)", 0 )
 
 GAME( 1989, goldnabl, goldnaxe, goldnaxe, goldnaxe, goldnabl, ROT0,   "bootleg", "Golden Axe (bootleg, encrypted)", GAME_NOT_WORKING )
 GAME( 1989, goldnab2, goldnaxe, goldnaxe, goldnaxe, goldnabl, ROT0,   "bootleg", "Golden Axe (bootleg)", GAME_NOT_WORKING )
@@ -2901,4 +2722,3 @@ ROM_END
 
 
 GAME( 1991, beautyb,    0,        beautyb,    tetris,    beautyb, ROT0,  "AMT", "Beauty Block", GAME_NO_SOUND|GAME_NOT_WORKING )
-

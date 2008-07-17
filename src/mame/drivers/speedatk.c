@@ -96,7 +96,7 @@ static READ8_HANDLER( key_matrix_r )
 	{
 		case 0x02:
 		{
-			switch(input_port_read_indexed(machine, 1))
+			switch(input_port_read(machine, "P1"))
 			{
 				case 0x002: return 0x02;
 				case 0x001: return 0x01;
@@ -115,7 +115,7 @@ static READ8_HANDLER( key_matrix_r )
 		}
 		case 0x04:
 		{
-			switch(input_port_read_indexed(machine, 2))
+			switch(input_port_read(machine, "P2"))
 			{
 				case 0x002: return 0x02;
 				case 0x001: return 0x01;
@@ -171,7 +171,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_READ(input_port_0_r)
+	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSW")
 	/* are these not used? after they're read it sets bit 7 */
 	AM_RANGE(0x60, 0x60) AM_READ(SMH_NOP)
 	AM_RANGE(0x61, 0x61) AM_READ(SMH_NOP)
@@ -186,7 +186,7 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( speedatk )
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_SERVICE( 0x01, IP_ACTIVE_HIGH )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -209,7 +209,7 @@ static INPUT_PORTS_START( speedatk )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
 
-	PORT_START
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) //P1 A
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) //P1 B
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) //P1 C
@@ -223,7 +223,7 @@ static INPUT_PORTS_START( speedatk )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x800, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
 
-	PORT_START
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) //P2 A
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) //P2 B
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) //P2 C

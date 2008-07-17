@@ -132,32 +132,32 @@ static READ8_HANDLER( tehkanwc_track_0_r )
 {
 	int joy;
 
-	joy = input_port_read_indexed(machine, 10) >> (2*offset);
+	joy = input_port_read(machine, "FAKE") >> (2 * offset);
 	if (joy & 1) return -63;
 	if (joy & 2) return 63;
-	return input_port_read_indexed(machine, 3 + offset) - track0[offset];
+	return input_port_read(machine, offset ? "P1Y" : "P1X") - track0[offset];
 }
 
 static READ8_HANDLER( tehkanwc_track_1_r )
 {
 	int joy;
 
-	joy = input_port_read_indexed(machine, 10) >> (4+2*offset);
+	joy = input_port_read(machine, "FAKE") >> (4 + 2 * offset);
 	if (joy & 1) return -63;
 	if (joy & 2) return 63;
-	return input_port_read_indexed(machine, 6 + offset) - track1[offset];
+	return input_port_read(machine, offset ? "P2Y" : "P2X") - track1[offset];
 }
 
 static WRITE8_HANDLER( tehkanwc_track_0_reset_w )
 {
 	/* reset the trackball counters */
-	track0[offset] = input_port_read_indexed(machine, 3 + offset) + data;
+	track0[offset] = input_port_read(machine, offset ? "P1Y" : "P1X") + data;
 }
 
 static WRITE8_HANDLER( tehkanwc_track_1_reset_w )
 {
 	/* reset the trackball counters */
-	track1[offset] = input_port_read_indexed(machine, 6 + offset) + data;
+	track1[offset] = input_port_read(machine, offset ? "P2Y" : "P2X") + data;
 }
 
 
@@ -246,18 +246,18 @@ static ADDRESS_MAP_START( main_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE(7) AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprites */
 	AM_RANGE(0xec00, 0xec01) AM_RAM_WRITE(tehkanwc_scroll_x_w)
 	AM_RANGE(0xec02, 0xec02) AM_RAM_WRITE(tehkanwc_scroll_y_w)
-	AM_RANGE(0xf800, 0xf801) AM_READWRITE(tehkanwc_track_0_r, tehkanwc_track_0_reset_w) /* track 0 x/y */
-	AM_RANGE(0xf802, 0xf802) AM_READWRITE(input_port_9_r, gridiron_led0_w) /* Coin & Start */
-	AM_RANGE(0xf803, 0xf803) AM_READ(input_port_5_r) /* joy0 - button */
-	AM_RANGE(0xf806, 0xf806) AM_READ(input_port_9_r) /* Start */
-	AM_RANGE(0xf810, 0xf811) AM_READWRITE(tehkanwc_track_1_r, tehkanwc_track_1_reset_w) /* track 1 x/y */
+	AM_RANGE(0xf800, 0xf801) AM_READWRITE(tehkanwc_track_0_r, tehkanwc_track_0_reset_w)	/* track 0 x/y */
+	AM_RANGE(0xf802, 0xf802) AM_READWRITE(input_port_9_r, gridiron_led0_w)	/* Coin & Start */
+	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("P1BUT")							/* joy0 - button */
+	AM_RANGE(0xf806, 0xf806) AM_READ_PORT("SYSTEM")							/* Start */
+	AM_RANGE(0xf810, 0xf811) AM_READWRITE(tehkanwc_track_1_r, tehkanwc_track_1_reset_w)	/* track 1 x/y */
 	AM_RANGE(0xf812, 0xf812) AM_WRITE(gridiron_led1_w)
-	AM_RANGE(0xf813, 0xf813) AM_READ(input_port_8_r) /* joy1 - button */
+	AM_RANGE(0xf813, 0xf813) AM_READ_PORT("P2BUT")							/* joy1 - button */
 	AM_RANGE(0xf820, 0xf820) AM_READWRITE(soundlatch2_r, sound_command_w)	/* answer from the sound CPU */
-	AM_RANGE(0xf840, 0xf840) AM_READWRITE(input_port_0_r, sub_cpu_halt_w) /* DSW1 */
-	AM_RANGE(0xf850, 0xf850) AM_READWRITE(input_port_1_r, SMH_NOP)	/* DSW2, ?? writes 0x00 or 0xff */
+	AM_RANGE(0xf840, 0xf840) AM_READ_PORT("DSW1") AM_WRITE(sub_cpu_halt_w)	/* DSW1 */
+	AM_RANGE(0xf850, 0xf850) AM_READ_PORT("DSW2") AM_WRITE(SMH_NOP)			/* DSW2, ?? writes 0x00 or 0xff */
 	AM_RANGE(0xf860, 0xf860) AM_READWRITE(watchdog_reset_r, tehkanwc_flipscreen_x_w)
-	AM_RANGE(0xf870, 0xf870) AM_READWRITE(input_port_2_r, tehkanwc_flipscreen_y_w) /* DSW3 */
+	AM_RANGE(0xf870, 0xf870) AM_READ_PORT("DSW3") AM_WRITE(tehkanwc_flipscreen_y_w)	/* DSW3 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -295,7 +295,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( tehkanwc )
-	PORT_START /* DSW1 - Active LOW */
+	PORT_START_TAG("DSW1")	/* DSW1 - Active LOW */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING (   0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING (   0x07, DEF_STR( 1C_1C ) )
@@ -320,7 +320,7 @@ static INPUT_PORTS_START( tehkanwc )
 	PORT_DIPSETTING (   0x40, "2&2/100%" )
 	PORT_DIPSETTING (   0x00, "2&3/67%" )
 
-	PORT_START /* DSW2 - Active LOW */
+	PORT_START_TAG("DSW2")	/* DSW2 - Active LOW */
 	PORT_DIPNAME( 0x03, 0x03, "1P Game Time" )
 	PORT_DIPSETTING (   0x00, "2:30" )
 	PORT_DIPSETTING (   0x01, "2:00" )
@@ -363,7 +363,7 @@ static INPUT_PORTS_START( tehkanwc )
 	PORT_DIPSETTING (   0x80, "Timer In" )
 	PORT_DIPSETTING (   0x00, "Credit In" )
 
-	PORT_START /* DSW3 - Active LOW */
+	PORT_START_TAG("DSW3")	/* DSW3 - Active LOW */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING (   0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING (   0x03, DEF_STR( Normal ) )
@@ -376,31 +376,31 @@ static INPUT_PORTS_START( tehkanwc )
 	PORT_DIPSETTING (   0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING (   0x08, DEF_STR( On ) )
 
-	PORT_START /* IN0 - X AXIS */
+	PORT_START_TAG("P1X")	/* IN0 - X AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
-	PORT_START /* IN0 - Y AXIS */
+	PORT_START_TAG("P1Y")	/* IN0 - Y AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
-	PORT_START /* IN0 - BUTTON */
+	PORT_START_TAG("P1BUT")	/* IN0 - BUTTON */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 
-	PORT_START /* IN1 - X AXIS */
+	PORT_START_TAG("P2X")	 /* IN1 - X AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(2)
 
-	PORT_START /* IN1 - Y AXIS */
+	PORT_START_TAG("P2Y")	/* IN1 - Y AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(2)
 
-	PORT_START /* IN1 - BUTTON */
+	PORT_START_TAG("P2BUT")	/* IN1 - BUTTON */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
-	PORT_START /* IN2 - Active LOW */
+	PORT_START_TAG("SYSTEM")	/* IN2 - Active LOW */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START	/* fake port to emulate trackballs with keyboard */
+	PORT_START_TAG("FAKE")	/* fake port to emulate trackballs with keyboard */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -413,7 +413,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( gridiron )
-	PORT_START /* DSW1 - Active LOW */
+	PORT_START_TAG("DSW1")	/* DSW1 - Active LOW */
 	PORT_DIPNAME( 0x03, 0x03, "Start Credits (P1&P2)/Extra" )
 	PORT_DIPSETTING (   0x01, "1&1/200%" )
 	PORT_DIPSETTING (   0x03, "1&2/100%" )
@@ -439,7 +439,7 @@ static INPUT_PORTS_START( gridiron )
 	PORT_DIPSETTING (   0xc0, "15" )
 	PORT_DIPSETTING (   0x80, "10" )
 
-	PORT_START /* DSW2 - Active LOW */
+	PORT_START_TAG("DSW2")	/* DSW2 - Active LOW */
 	PORT_DIPNAME( 0x03, 0x03, "1P Game Time" )
 	PORT_DIPSETTING (   0x00, "2:30" )
 	PORT_DIPSETTING (   0x01, "2:00" )
@@ -482,40 +482,40 @@ static INPUT_PORTS_START( gridiron )
 	PORT_DIPSETTING (   0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING (   0x80, DEF_STR( On ) )
 
-	PORT_START /* no DSW3 */
+	PORT_START_TAG("DSW3")	/* no DSW3 */
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START /* IN0 - X AXIS */
+	PORT_START_TAG("P1X")	/* IN0 - X AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(1)
 
-	PORT_START /* IN0 - Y AXIS */
+	PORT_START_TAG("P1Y")	/* IN0 - Y AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(1)
 
-	PORT_START /* IN0 - BUTTON */
+	PORT_START_TAG("P1BUT")	/* IN0 - BUTTON */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 
-	PORT_START /* IN1 - X AXIS */
+	PORT_START_TAG("P2X")	/* IN1 - X AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(2)
 
-	PORT_START /* IN1 - Y AXIS */
+	PORT_START_TAG("P2Y")	/* IN1 - Y AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(2)
 
-	PORT_START /* IN1 - BUTTON */
+	PORT_START_TAG("P2BUT")	/* IN1 - BUTTON */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
-	PORT_START /* IN2 - Active LOW */
+	PORT_START_TAG("SYSTEM")	/* IN2 - Active LOW */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START	/* no fake port here */
+	PORT_START_TAG("FAKE")	/* no fake port here */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( teedoff )
-	PORT_START /* DSW1 - Active LOW */
+	PORT_START_TAG("DSW1")	/* DSW1 - Active LOW */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING (   0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING (   0x03, DEF_STR( 1C_1C ) )
@@ -538,7 +538,7 @@ static INPUT_PORTS_START( teedoff )
 	PORT_DIPSETTING (   0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING (   0x80, DEF_STR( On ) )
 
-	PORT_START /* DSW2 - Active LOW */
+	PORT_START_TAG("DSW2")	/* DSW2 - Active LOW */
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x18, 0x18, "Penalty (Over Par)" )		// Check table at 0x2d67
 	PORT_DIPSETTING (   0x10, "1/1/2/3/4" )				// +1 / +2 / +3 / +4 / +5 or +6
@@ -554,28 +554,28 @@ static INPUT_PORTS_START( teedoff )
 	PORT_DIPSETTING (   0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING (   0x00, DEF_STR( Hardest ) )
 
-	PORT_START /* no DSW3 */
+	PORT_START_TAG("DSW3")	/* no DSW3 */
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START /* IN0 - X AXIS */
+	PORT_START_TAG("P1X")	/* IN0 - X AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(1)
 
-	PORT_START /* IN0 - Y AXIS */
+	PORT_START_TAG("P1Y")	/* IN0 - Y AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(1)
 
-	PORT_START /* IN0 - BUTTON */
+	PORT_START_TAG("P1BUT")	/* IN0 - BUTTON */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 
-	PORT_START /* IN1 - X AXIS */
+	PORT_START_TAG("P2X")	/* IN1 - X AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(2)
 
-	PORT_START /* IN1 - Y AXIS */
+	PORT_START_TAG("P2Y")	/* IN1 - Y AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(2)
 
-	PORT_START /* IN1 - BUTTON */
+	PORT_START_TAG("P2BUT")	/* IN1 - BUTTON */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
-	PORT_START /* IN2 - Active LOW */
+	PORT_START_TAG("SYSTEM")	/* IN2 - Active LOW */
 	/* "Coin"  buttons are read from address 0xf802 */
 	/* "Start" buttons are read from address 0xf806 */
 	/* coin input must be active between 2 and 15 frames to be consistently recognized */
@@ -584,7 +584,7 @@ static INPUT_PORTS_START( teedoff )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START	/* no fake port here */
+	PORT_START_TAG("FAKE")	/* no fake port here */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 

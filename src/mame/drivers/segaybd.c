@@ -237,6 +237,7 @@ static READ8_HANDLER( sound_data_r )
 
 static READ16_HANDLER( io_chip_r )
 {
+	static const char *portnames[] = { "P1", "GENERAL", "PORTC", "PORTD", "PORTE", "DSW", "COINAGE", "PORTH" };
 	offset &= 0x1f/2;
 
 	switch (offset)
@@ -255,7 +256,7 @@ static READ16_HANDLER( io_chip_r )
 				return misc_io_data[offset];
 
 			/* otherwise, return an input port */
-			return input_port_read_indexed(machine, offset);
+			return input_port_read(machine, portnames[offset]);
 
 		/* 'SEGA' protection */
 		case 0x10/2:

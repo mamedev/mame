@@ -765,11 +765,11 @@ READ16_HANDLER( copdxbl_0_r )
 		//case (0x5b4/2):
 		//  return cop_mcu_ram[offset];
 
-		case (0x700/2): return input_port_read_indexed(machine,1);
-		case (0x704/2):	return input_port_read_indexed(machine,2);
-		case (0x708/2):	return input_port_read_indexed(machine,4);
-		case (0x70c/2):	return input_port_read_indexed(machine,3);
-		case (0x71c/2): return input_port_read_indexed(machine,5);
+		case (0x700/2): return input_port_read(machine, "DSW1");
+		case (0x704/2):	return input_port_read(machine, "PLAYERS12");
+		case (0x708/2):	return input_port_read(machine, "PLAYERS34");
+		case (0x70c/2):	return input_port_read(machine, "SYSTEM");
+		case (0x71c/2): return input_port_read(machine, "DSW2");
 	}
 }
 
@@ -1315,10 +1315,10 @@ READ16_HANDLER( heatbrl_mcu_r )
 		case (0x3d4/2): return seibu_main_word_r(machine,5,0xffff);
 
 		/* Inputs */
-		case (0x340/2): return input_port_read_indexed(machine,1);
-		case (0x344/2):	return input_port_read_indexed(machine,2);
-		case (0x348/2): return input_port_read_indexed(machine,4);
-		case (0x34c/2): return input_port_read_indexed(machine,3);
+		case (0x340/2): return input_port_read(machine, "DSW1");
+		case (0x344/2):	return input_port_read(machine, "PLAYERS12");
+		case (0x348/2): return input_port_read(machine, "PLAYERS34");
+		case (0x34c/2): return input_port_read(machine, "SYSTEM");
 
 	}
 }
@@ -1421,12 +1421,12 @@ READ16_HANDLER( cupsoc_mcu_r )
 
 		/* returning 0xffff for some inputs for now, breaks coinage but
            allows cupsoc to boot */
-		case (0x300/2): return input_port_read_indexed(machine,1);
-		case (0x304/2): return input_port_read_indexed(machine,2);
-		case (0x308/2): return input_port_read_indexed(machine,4);
-		case (0x30c/2): return input_port_read_indexed(machine,3);
+		case (0x300/2): return input_port_read(machine, "DSW1");
+		case (0x304/2): return input_port_read(machine, "PLAYERS12");
+		case (0x308/2): return input_port_read(machine, "PLAYERS34");
+		case (0x30c/2): return input_port_read(machine, "SYSTEM");
 		case (0x314/2): return 0xffff;
-		case (0x31c/2): return input_port_read_indexed(machine,5);
+		case (0x31c/2): return input_port_read(machine, "DSW2");
 
 		case (0x340/2): return 0xffff;
 		case (0x344/2): return 0xffff;
@@ -1573,10 +1573,10 @@ READ16_HANDLER( godzilla_mcu_r )
 		case (0x314/2):	return seibu_main_word_r(machine,5,0xffff);
 
 		/* Inputs */
-		case (0x340/2): return input_port_read_indexed(machine,1);
-		case (0x344/2): return input_port_read_indexed(machine,2);
-		case (0x348/2): return input_port_read_indexed(machine,4);
-		case (0x34c/2): return input_port_read_indexed(machine,3);
+		case (0x340/2): return input_port_read(machine, "DSW1");
+		case (0x344/2): return input_port_read(machine, "PLAYERS12");
+		case (0x348/2): return input_port_read(machine, "PLAYERS34");
+		case (0x34c/2): return input_port_read(machine, "SYSTEM");
 	}
 }
 
@@ -1624,11 +1624,11 @@ READ16_HANDLER( denjinmk_mcu_r )
 		case (0x314/2): return seibu_main_word_r(machine,5,0xffff);
 
 		/* Inputs */
-		case (0x340/2): return input_port_read_indexed(machine,1);
-		case (0x344/2):	return input_port_read_indexed(machine,2);
-		case (0x348/2): return input_port_read_indexed(machine,4);
-		case (0x34c/2): return input_port_read_indexed(machine,3);
-		case (0x35c/2): return input_port_read_indexed(machine,5);
+		case (0x340/2): return input_port_read(machine, "DSW1");
+		case (0x344/2):	return input_port_read(machine, "PLAYERS12");
+		case (0x348/2): return input_port_read(machine, "PLAYERS34");
+		case (0x34c/2): return input_port_read(machine, "SYSTEM");
+		case (0x35c/2): return input_port_read(machine, "DSW2");
 	}
 }
 
@@ -1696,11 +1696,11 @@ READ16_HANDLER( sdgndmrb_mcu_r )
 		case (0x314/2): return seibu_main_word_r(machine,5,0xffff);
 
 		/* Inputs */
-		case (0x340/2): return input_port_read_indexed(machine,1);
-		case (0x344/2):	return input_port_read_indexed(machine,2);
-		case (0x348/2): return input_port_read_indexed(machine,4);
-		case (0x34c/2): return input_port_read_indexed(machine,3);
-		case (0x35c/2): return input_port_read_indexed(machine,5);
+		case (0x340/2): return input_port_read(machine, "DSW1");
+		case (0x344/2):	return input_port_read(machine, "PLAYERS12");
+		case (0x348/2): return input_port_read(machine, "PLAYERS34");
+		case (0x34c/2): return input_port_read(machine, "SYSTEM");
+		case (0x35c/2): return input_port_read(machine, "DSW2");
 	}
 }
 
@@ -1907,10 +1907,10 @@ READ16_HANDLER( legionna_mcu_r )
 		case (0x314/2): return seibu_main_word_r(machine,5,0xffff);
 
 		/* Inputs */
-		case (0x340/2): return input_port_read_indexed(machine,1);
-		case (0x344/2):	return input_port_read_indexed(machine,2);
-		case (0x348/2):	return input_port_read_indexed(machine,0);
-		case (0x34c/2):	return input_port_read_indexed(machine,3);
+		case (0x340/2): return input_port_read(machine, "DSW1");
+		case (0x344/2):	return input_port_read(machine, "PLAYERS12");
+		case (0x348/2):	return input_port_read(machine, "COIN");
+		case (0x34c/2):	return input_port_read(machine, "SYSTEM");
 
 	}
 }
@@ -1986,9 +1986,9 @@ READ16_HANDLER( raiden2_mcu_r )
 			return generic_cop_r(machine, offset, mem_mask);
 			break;
 
-		case (0x340/2): return input_port_read_indexed(machine, 3) | (input_port_read_indexed(machine, 4) << 8);
-		case (0x344/2): return input_port_read_indexed(machine, 1) | (input_port_read_indexed(machine, 2) << 8);
-		case (0x34c/2): return input_port_read_indexed(machine, 5) | 0xff00;
+		case (0x340/2): return input_port_read(machine, "DSWA") | (input_port_read(machine, "DSWB") << 8);
+		case (0x344/2): return input_port_read(machine, "P1") | (input_port_read(machine, "P2") << 8);
+		case (0x34c/2): return input_port_read(machine, "SYSTEM") | 0xff00;
 
 		/* Inputs */
 		case (0x308/2):	return seibu_main_word_r(machine,2,0xffff);

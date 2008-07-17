@@ -201,8 +201,8 @@ static READ16_HANDLER( slapshot_service_input_r )
 	switch (offset)
 	{
 		case 0x03:
-			return ((input_port_read_indexed(machine,3) & 0xef) |
-				  (input_port_read_indexed(machine,5) & 0x10))  << 8;	/* IN3 + service switch */
+			return ((input_port_read(machine, "IN3") & 0xef) |
+				  (input_port_read(machine, "IN5") & 0x10))  << 8;	/* IN3 + service switch */
 
 		default:
 			return TC0640FIO_r(machine,offset) << 8;
@@ -211,7 +211,9 @@ static READ16_HANDLER( slapshot_service_input_r )
 
 static READ16_HANDLER( opwolf3_adc_r )
 {
-	return input_port_read_indexed(machine, 6 + offset)<<8;
+	static const char *adcnames[] = { "GUN1X", "GUN1Y", "GUN2X", "GUN2Y" };
+
+	return input_port_read(machine, adcnames[offset]) << 8;
 }
 
 static WRITE16_HANDLER( opwolf3_adc_req_w )
@@ -475,16 +477,16 @@ static INPUT_PORTS_START( opwolf3 )
 	PORT_START_TAG("IN5")      /* IN5, so we can OR in service switch */
 	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)
 
-	PORT_START_TAG("IN6")	/* IN 6, P1X */
+	PORT_START_TAG("GUN1X")	/* IN 6, P1X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START_TAG("IN7")	/* IN 7, P1Y */
+	PORT_START_TAG("GUN1Y")	/* IN 7, P1Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
-	PORT_START_TAG("IN8")	/* IN 8, P2X */
+	PORT_START_TAG("GUN2X")	/* IN 8, P2X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START_TAG("IN9")	/* IN 9, P2Y */
+	PORT_START_TAG("GUN2Y")	/* IN 9, P2Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(2)
 INPUT_PORTS_END
 

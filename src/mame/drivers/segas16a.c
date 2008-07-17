@@ -272,10 +272,13 @@ static READ16_HANDLER( standard_io_r )
 			return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3);
 
 		case 0x1000/2:
-			return input_port_read_indexed(machine, offset & 3);
+		{
+			static const char *const sysports[] = { "SERVICE", "P1", "UNUSED", "P2" };
+			return input_port_read(machine, sysports[offset & 3]);
+		}
 
 		case 0x2000/2:
-			return input_port_read_indexed(machine, 4 + (offset & 1));
+			return input_port_read(machine, (offset & 1) ? "DSW2" : "DSW1");
 	}
 	logerror("%06X:standard_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
 	return 0xffff;

@@ -382,7 +382,10 @@ static READ16_HANDLER( outrun_custom_io_r )
 			return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3);
 
 		case 0x10/2:
-			return input_port_read_indexed(machine, offset & 3);
+		{
+			static const char *const sysports[] = { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
+			return input_port_read(machine, sysports[offset & 3]);
+		}
 
 		case 0x30/2:
 		{
@@ -445,7 +448,10 @@ static READ16_HANDLER( shangon_custom_io_r )
 		case 0x1002/2:
 		case 0x1004/2:
 		case 0x1006/2:
-			return input_port_read_indexed(machine, offset & 3);
+		{
+			static const char *const sysports[] = { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
+			return input_port_read(machine, sysports[offset & 3]);
+		}
 
 		case 0x3020/2:
 		{

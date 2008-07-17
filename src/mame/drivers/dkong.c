@@ -726,29 +726,29 @@ static WRITE8_HANDLER( dkong3_2a03_reset_w )
 
 static READ8_HANDLER( strtheat_inputport_0_r )
 {
-	if(input_port_read_indexed(machine, 3) & 0x40)
+	if(input_port_read(machine, "DSW0") & 0x40)
 	{
 		/* Joystick inputs */
-		return input_port_read_indexed(machine, 0);
+		return input_port_read(machine, "IN0");
 	}
 	else
 	{
 		/* Steering Wheel inputs */
-		return (input_port_read_indexed(machine, 0) & ~3) | (input_port_read_indexed(machine, 4) & 3);
+		return (input_port_read(machine, "IN0") & ~3) | (input_port_read(machine, "IN4") & 3);
 	}
 }
 
 static READ8_HANDLER( strtheat_inputport_1_r )
 {
-	if(input_port_read_indexed(machine, 3) & 0x40)
+	if(input_port_read(machine, "DSW0") & 0x40)
 	{
 		/* Joystick inputs */
-		return input_port_read_indexed(machine, 1);
+		return input_port_read(machine, "IN1");
 	}
 	else
 	{
 		/* Steering Wheel inputs */
-		return (input_port_read_indexed(machine, 1) & ~3) | (input_port_read_indexed(machine, 5) & 3);
+		return (input_port_read(machine, "IN1") & ~3) | (input_port_read(machine, "IN5") & 3);
 	}
 }
 

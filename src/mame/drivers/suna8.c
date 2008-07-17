@@ -490,10 +490,10 @@ static READ8_HANDLER( hardhead_ip_r )
 {
 	switch (*hardhead_ip)
 	{
-		case 0:	return input_port_read_indexed(machine, 0);
-		case 1:	return input_port_read_indexed(machine, 1);
-		case 2:	return input_port_read_indexed(machine, 2);
-		case 3:	return input_port_read_indexed(machine, 3);
+		case 0:	return input_port_read(machine, "P1");
+		case 1:	return input_port_read(machine, "P2");
+		case 2:	return input_port_read(machine, "DSW1");
+		case 3:	return input_port_read(machine, "DSW2");
 		default:
 			logerror("CPU #0 - PC %04X: Unknown IP read: %02X\n",activecpu_get_pc(),*hardhead_ip);
 			return 0xff;
@@ -606,12 +606,12 @@ static ADDRESS_MAP_START( rranger_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM				)	// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1				)	// Banked ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(watchdog_reset_r		)	// Watchdog (Tested!)
-	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_0_r		)	// P1 (Inputs)
-	AM_RANGE(0xc003, 0xc003) AM_READ(input_port_1_r		)	// P2
+	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P1")					// P1 (Inputs)
+	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0xc004, 0xc004) AM_READ(rranger_soundstatus_r	)	// Latch Status?
 	AM_RANGE(0xc200, 0xc200) AM_READ(SMH_NOP				)	// Protection?
-	AM_RANGE(0xc280, 0xc280) AM_READ(input_port_2_r		)	// DSW 1
-	AM_RANGE(0xc2c0, 0xc2c0) AM_READ(input_port_3_r		)	// DSW 2
+	AM_RANGE(0xc280, 0xc280) AM_READ_PORT("DSW1")				// DSW 1
+	AM_RANGE(0xc2c0, 0xc2c0) AM_READ_PORT("DSW2")				// DSW 2
 	AM_RANGE(0xc600, 0xc7ff) AM_READ(SMH_RAM				)	// Palette
 	AM_RANGE(0xc800, 0xdfff) AM_READ(SMH_RAM				)	// RAM
 	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_RAM				)	// Sprites
@@ -696,13 +696,13 @@ static WRITE8_HANDLER( brickzn_rombank_w )
 static ADDRESS_MAP_START( brickzn_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM					)	// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1					)	// Banked ROM
-	AM_RANGE(0xc100, 0xc100) AM_READ(input_port_0_r			)	// P1 (Buttons)
-	AM_RANGE(0xc101, 0xc101) AM_READ(input_port_1_r			)	// P2
-	AM_RANGE(0xc102, 0xc102) AM_READ(input_port_2_r			)	// DSW 1
-	AM_RANGE(0xc103, 0xc103) AM_READ(input_port_3_r			)	// DSW 2
-	AM_RANGE(0xc108, 0xc108) AM_READ(input_port_4_r			)	// P1 (Analog)
-	AM_RANGE(0xc10c, 0xc10c) AM_READ(input_port_5_r			)	// P2
-	AM_RANGE(0xc140, 0xc140) AM_READ(brickzn_c140_r			)	// ???
+	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("P1")						// P1 (Buttons)
+	AM_RANGE(0xc101, 0xc101) AM_READ_PORT("P2")						// P2
+	AM_RANGE(0xc102, 0xc102) AM_READ_PORT("DSW1")					// DSW 1
+	AM_RANGE(0xc103, 0xc103) AM_READ_PORT("DSW2")					// DSW 2
+	AM_RANGE(0xc108, 0xc108) AM_READ_PORT("TRACK1")					// P1 (Analog)
+	AM_RANGE(0xc10c, 0xc10c) AM_READ_PORT("TRACK2")					// P2
+	AM_RANGE(0xc140, 0xc140) AM_READ(brickzn_c140_r				)	// ???
 	AM_RANGE(0xc600, 0xc7ff) AM_READ(suna8_banked_paletteram_r	)	// Palette (Banked)
 	AM_RANGE(0xc800, 0xdfff) AM_READ(SMH_RAM					)	// RAM
 	AM_RANGE(0xe000, 0xffff) AM_READ(suna8_banked_spriteram_r	)	// Sprites (Banked)
@@ -805,16 +805,16 @@ static WRITE8_HANDLER( hardhea2_rambank_1_w )
 
 
 static ADDRESS_MAP_START( hardhea2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM						)	// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1						)	// Banked ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_0_r					)	// P1 (Inputs)
-	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_1_r					)	// P2
-	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_2_r					)	// DSW 1
-	AM_RANGE(0xc003, 0xc003) AM_READ(input_port_3_r					)	// DSW 2
-	AM_RANGE(0xc080, 0xc080) AM_READ(input_port_4_r					)	// vblank?
-	AM_RANGE(0xc600, 0xc7ff) AM_READ(SMH_RAM						)	// Palette (Banked??)
-	AM_RANGE(0xc800, 0xdfff) AM_READ(SMH_BANK2						)	// RAM (Banked?)
-	AM_RANGE(0xe000, 0xffff) AM_READ(suna8_banked_spriteram_r		)	// Sprites (Banked)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM					)	// ROM
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1					)	// Banked ROM
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")						// P1 (Inputs)
+	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")						// P2
+	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("DSW1")					// DSW 1
+	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW2")					// DSW 2
+	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("BUTTONS")				// vblank?
+	AM_RANGE(0xc600, 0xc7ff) AM_READ(SMH_RAM					)	// Palette (Banked??)
+	AM_RANGE(0xc800, 0xdfff) AM_READ(SMH_BANK2					)	// RAM (Banked?)
+	AM_RANGE(0xe000, 0xffff) AM_READ(suna8_banked_spriteram_r	)	// Sprites (Banked)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hardhea2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -872,10 +872,10 @@ static WRITE8_HANDLER( starfigh_spritebank_w )
 static ADDRESS_MAP_START( starfigh_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM					)	// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1					)	// Banked ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_0_r			)	// P1 (Inputs)
-	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_1_r			)	// P2
-	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_2_r			)	// DSW 1
-	AM_RANGE(0xc003, 0xc003) AM_READ(input_port_3_r			)	// DSW 2
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")						// P1 (Inputs)
+	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")						// P2
+	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("DSW1")					// DSW 1
+	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW2")					// DSW 2
 	AM_RANGE(0xc600, 0xc7ff) AM_READ(suna8_banked_paletteram_r	)	// Palette (Banked??)
 	AM_RANGE(0xc800, 0xdfff) AM_READ(SMH_RAM					)	// RAM
 	AM_RANGE(0xe000, 0xffff) AM_READ(suna8_banked_spriteram_r	)	// Sprites (Banked)
@@ -966,11 +966,11 @@ static READ8_HANDLER( sparkman_c0a3_r )
 static ADDRESS_MAP_START( sparkman_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM					)	// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1					)	// Banked ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_0_r			)	// P1 (Inputs)
-	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_1_r			)	// P2
-	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_2_r			)	// DSW 1
-	AM_RANGE(0xc003, 0xc003) AM_READ(input_port_3_r			)	// DSW 2
-	AM_RANGE(0xc080, 0xc080) AM_READ(input_port_4_r			)	// Buttons
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")						// P1 (Inputs)
+	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")						// P2
+	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("DSW1")					// DSW 1
+	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW2")					// DSW 2
+	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("BUTTONS")				// Buttons
 	AM_RANGE(0xc0a3, 0xc0a3) AM_READ(sparkman_c0a3_r			)	// ???
 	AM_RANGE(0xc600, 0xc7ff) AM_READ(SMH_RAM					)	// Palette (Banked??)
 	AM_RANGE(0xc800, 0xdfff) AM_READ(SMH_RAM					)	// RAM
@@ -1140,13 +1140,13 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hardhead )
 
-	PORT_START_TAG("IN0")	// Player 1 - $da00 (ip = 0)
+	PORT_START_TAG("P1")	// Player 1 - $da00 (ip = 0)
 	JOY(1)
 
-	PORT_START_TAG("IN1")	// Player 2 - $da00 (ip = 1)
+	PORT_START_TAG("P2")	// Player 2 - $da00 (ip = 1)
 	JOY(2)
 
-	PORT_START_TAG("IN2")	// DSW 1 - $da00 (ip = 2)
+	PORT_START_TAG("DSW1")	// DSW 1 - $da00 (ip = 2)
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1172,7 +1172,7 @@ static INPUT_PORTS_START( hardhead )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN3") //DSW 2 - $da00 (ip = 3)
+	PORT_START_TAG("DSW2") //DSW 2 - $da00 (ip = 3)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1204,13 +1204,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( rranger )
 
-	PORT_START_TAG("IN0")	// Player 1 - $c002
+	PORT_START_TAG("P1")	// Player 1 - $c002
 	JOY(1)
 
-	PORT_START_TAG("IN1") // Player 2 - $c003
+	PORT_START_TAG("P2") // Player 2 - $c003
 	JOY(2)
 
-	PORT_START_TAG("IN2") //DSW 1 - $c280
+	PORT_START_TAG("DSW1") //DSW 1 - $c280
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
@@ -1235,7 +1235,7 @@ static INPUT_PORTS_START( rranger )
 	PORT_DIPSETTING(    0x40, DEF_STR( Harder ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START_TAG("IN3") // DSW 2 - $c2c0
+	PORT_START_TAG("DSW2") // DSW 2 - $c2c0
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1269,13 +1269,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( brickzn )
 
-	PORT_START_TAG("IN0") // Player 1 - $c100
+	PORT_START_TAG("P1") // Player 1 - $c100
 	JOY(1)
 
-	PORT_START_TAG("IN1") // Player 2 - $c101
+	PORT_START_TAG("P2") // Player 2 - $c101
 	JOY(2)
 
-	PORT_START_TAG("IN2") // DSW 1 - $c102
+	PORT_START_TAG("DSW1") // DSW 1 - $c102
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )	// rom 38:b840
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
@@ -1302,7 +1302,7 @@ static INPUT_PORTS_START( brickzn )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN3") // DSW 2 - $c103
+	PORT_START_TAG("DSW2") // DSW 2 - $c103
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1327,10 +1327,10 @@ static INPUT_PORTS_START( brickzn )
 	PORT_DIPSETTING(    0x40, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
 
-	PORT_START_TAG("IN4") // Player 1 - $c108
+	PORT_START_TAG("TRACK1") // Player 1 - $c108
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_REVERSE
 
-	PORT_START_TAG("IN5") // Player 2 - $c10c
+	PORT_START_TAG("TRACK2") // Player 2 - $c10c
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_REVERSE
 
 INPUT_PORTS_END
@@ -1342,13 +1342,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hardhea2 )
 
-	PORT_START_TAG("IN0") // Player 1 - $c000
+	PORT_START_TAG("P1") // Player 1 - $c000
 	JOY(1)
 
-	PORT_START_TAG("IN1") // Player 2 - $c001
+	PORT_START_TAG("P2") // Player 2 - $c001
 	JOY(2)
 
-	PORT_START_TAG("IN2") // DSW 1 - $c002
+	PORT_START_TAG("DSW1") // DSW 1 - $c002
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
@@ -1372,7 +1372,7 @@ static INPUT_PORTS_START( hardhea2 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN3") // DSW 2 - $c003
+	PORT_START_TAG("DSW2") // DSW 2 - $c003
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1397,7 +1397,7 @@ static INPUT_PORTS_START( hardhea2 )
 	PORT_DIPSETTING(    0x40, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
 
-	PORT_START_TAG("IN4") // Buttons - $c080
+	PORT_START_TAG("BUTTONS") // Buttons - $c080
 	PORT_BIT(  0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -1416,13 +1416,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sparkman )
 
-	PORT_START_TAG("IN0") // Player 1 - $c000
+	PORT_START_TAG("P1") // Player 1 - $c000
 	JOY(1)
 
-	PORT_START_TAG("IN1") // Player 2 - $c001
+	PORT_START_TAG("P2") // Player 2 - $c001
 	JOY(2)
 
-	PORT_START_TAG("IN2") // DSW 1 - $c002
+	PORT_START_TAG("DSW1") // DSW 1 - $c002
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
@@ -1446,7 +1446,7 @@ static INPUT_PORTS_START( sparkman )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN3") // DSW 2 - $c003
+	PORT_START_TAG("DSW2") // DSW 2 - $c003
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1471,7 +1471,7 @@ static INPUT_PORTS_START( sparkman )
 	PORT_DIPSETTING(    0x40, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
 
-	PORT_START_TAG("IN4") // Buttons - $c080
+	PORT_START_TAG("BUTTONS") // Buttons - $c080
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )

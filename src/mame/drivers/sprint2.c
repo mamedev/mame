@@ -49,7 +49,7 @@ static DRIVER_INIT( dominos )
 
 static int service_mode(running_machine *machine)
 {
-	UINT8 v = input_port_read_indexed(machine, 2);
+	UINT8 v = input_port_read(machine, "INB");
 
 	if (GAME_IS_SPRINT1)
 	{
@@ -80,7 +80,7 @@ static INTERRUPT_GEN( sprint2 )
 
 		for (i = 0; i < 2; i++)
 		{
-			signed char delta = input_port_read_indexed(machine, 6 + i) - dial[i];
+			signed char delta = input_port_read(machine, i ? "DIAL_P2" : "DIAL_P1") - dial[i];
 
 			if (delta < 0)
 			{
@@ -93,7 +93,7 @@ static INTERRUPT_GEN( sprint2 )
 
 			dial[i] += delta;
 
-			switch (input_port_read_indexed(machine, 4 + i) & 15)
+			switch (input_port_read(machine, i ? "GEAR_P2" : "GEAR_P1") & 15)
 			{
 			case 1: gear[i] = 1; break;
 			case 2: gear[i] = 2; break;
@@ -124,13 +124,13 @@ static READ8_HANDLER( sprint2_wram_r )
 
 static READ8_HANDLER( sprint2_dip_r )
 {
-	return (input_port_read_indexed(machine, 0) << (2 * ((offset & 3) ^ 3))) & 0xc0;
+	return (input_port_read(machine, "DSW") << (2 * ((offset & 3) ^ 3))) & 0xc0;
 }
 
 
 static READ8_HANDLER( sprint2_input_A_r )
 {
-	UINT8 val = input_port_read_indexed(machine, 1);
+	UINT8 val = input_port_read(machine, "INA");
 
 	if (GAME_IS_SPRINT2)
 	{
@@ -148,7 +148,7 @@ static READ8_HANDLER( sprint2_input_A_r )
 
 static READ8_HANDLER( sprint2_input_B_r )
 {
-	UINT8 val = input_port_read_indexed(machine, 2);
+	UINT8 val = input_port_read(machine, "INB");
 
 	if (GAME_IS_SPRINT1)
 	{
@@ -250,7 +250,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0818, 0x081f) AM_READ(sprint2_input_A_r)
 	AM_RANGE(0x0828, 0x082f) AM_READ(sprint2_input_B_r)
 	AM_RANGE(0x0830, 0x0837) AM_READ(sprint2_dip_r)
-	AM_RANGE(0x0840, 0x087f) AM_READ(input_port_3_r)
+	AM_RANGE(0x0840, 0x087f) AM_READ_PORT("COIN")
 	AM_RANGE(0x0880, 0x08bf) AM_READ(sprint2_steering1_r)
 	AM_RANGE(0x08c0, 0x08ff) AM_READ(sprint2_steering2_r)
 	AM_RANGE(0x0c00, 0x0fff) AM_READ(sprint2_sync_r)
@@ -283,7 +283,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( sprint2 )
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "Tracks on Demo" )
 	PORT_DIPSETTING(    0x00, "Easy Track Only" )
 	PORT_DIPSETTING(    0x01, "Cycle 12 Tracks" )
@@ -307,7 +307,7 @@ static INPUT_PORTS_START( sprint2 )
 	PORT_DIPSETTING(    0x40, "120 seconds" )
 	PORT_DIPSETTING(    0x00, "150 seconds" )
 
-	PORT_START /* input A */
+	PORT_START_TAG("INA")	/* input A */
 	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_UNUSED ) /* P1 1st gear */
 	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_UNUSED ) /* P2 1st gear */
 	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_UNUSED ) /* P1 2nd gear */
@@ -315,7 +315,7 @@ static INPUT_PORTS_START( sprint2 )
 	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_UNUSED ) /* P1 3rd gear */
 	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_UNUSED ) /* P2 3rd gear */
 
-	PORT_START /* input B */
+	PORT_START_TAG("INB")	/* input B */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Player 1 Gas") PORT_PLAYER(1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Player 2 Gas") PORT_PLAYER(2)
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
@@ -324,26 +324,26 @@ static INPUT_PORTS_START( sprint2 )
 	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Track Select") PORT_CODE(KEYCODE_SPACE)
 
-	PORT_START
+	PORT_START_TAG("COIN")
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START
+	PORT_START_TAG("GEAR_P1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Player 1 Gear 1") PORT_CODE(KEYCODE_Z) PORT_PLAYER(1)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Player 1 Gear 2") PORT_CODE(KEYCODE_X) PORT_PLAYER(1)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Player 1 Gear 3") PORT_CODE(KEYCODE_C) PORT_PLAYER(1)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Player 1 Gear 4") PORT_CODE(KEYCODE_V) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("GEAR_P2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Player 2 Gear 1") PORT_CODE(KEYCODE_Q) PORT_PLAYER(2)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Player 2 Gear 2") PORT_CODE(KEYCODE_W) PORT_PLAYER(2)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Player 2 Gear 3") PORT_CODE(KEYCODE_E) PORT_PLAYER(2)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Player 2 Gear 4") PORT_CODE(KEYCODE_R) PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("DIAL_P1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("DIAL_P2")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
 	PORT_START_TAG("MOTOR1")
@@ -355,7 +355,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( sprint1 )
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "Change Track" )
 	PORT_DIPSETTING(    0x01, "Every Lap" )
 	PORT_DIPSETTING(    0x00, "Every 2 Laps" )
@@ -379,9 +379,9 @@ static INPUT_PORTS_START( sprint1 )
 	PORT_DIPSETTING(    0x40, "120 seconds" )
 	PORT_DIPSETTING(    0x00, "150 seconds" )
 
-	PORT_START /* input A */
+	PORT_START_TAG("INA")	/* input A */
 
-	PORT_START /* input B */
+	PORT_START_TAG("INB")	/* input B */
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) /* 1st gear */
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) /* 2nd gear */
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) /* 3rd gear */
@@ -389,22 +389,22 @@ static INPUT_PORTS_START( sprint1 )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("COIN")
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START
+	PORT_START_TAG("GEAR_P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Gear 1") PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear 2") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Gear 3") PORT_CODE(KEYCODE_C)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Gear 4") PORT_CODE(KEYCODE_V)
 
-	PORT_START
+	PORT_START_TAG("GEAR_P2")
 
-	PORT_START
+	PORT_START_TAG("DIAL_P1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START
+	PORT_START_TAG("DIAL_P2")
 
 	PORT_START_TAG("MOTOR")
 	PORT_ADJUSTER( 30, "Motor RPM" )
@@ -412,7 +412,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( dominos )
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x03, 0x01, "Points to Win" )
 	PORT_DIPSETTING(	0x03, "6" )
 	PORT_DIPSETTING(	0x02, "5" )
@@ -435,13 +435,13 @@ static INPUT_PORTS_START( dominos )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START /* input A */
+	PORT_START_TAG("INA")	/* input A */
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
 
-	PORT_START /* input B */
+	PORT_START_TAG("INB")	/* input B */
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
@@ -450,7 +450,7 @@ static INPUT_PORTS_START( dominos )
 	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 
-	PORT_START
+	PORT_START_TAG("COIN")
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 

@@ -508,21 +508,22 @@ static WRITE16_HANDLER( fdc_ctrl_w )
 
 static UINT8 hotrod_io_r(running_machine *machine, int port)
 {
-	switch(port) {
+	switch(port) 
+	{
 	case 0:
-		return input_port_read_indexed(machine, 0);
+		return input_port_read(machine, "P1");
 	case 1:
-		return input_port_read_indexed(machine, 1);
+		return input_port_read(machine, "P2");
 	case 2:
-		return 0xff;
+		return input_port_read_safe(machine, "P3", 0xff);
 	case 3:
 		return 0xff;
 	case 4:
-		return input_port_read_indexed(machine, 2);
+		return input_port_read(machine, "SERVICE");
 	case 5: // Dip switches
-		return input_port_read_indexed(machine, 3);
+		return input_port_read(machine, "COINAGE");
 	case 6:
-		return input_port_read_indexed(machine, 4);
+		return input_port_read(machine, "DSW");
 	case 7: // DAC
 		return 0xff;
 	}
@@ -531,23 +532,25 @@ static UINT8 hotrod_io_r(running_machine *machine, int port)
 
 static UINT8 dcclub_io_r(running_machine *machine, int port)
 {
-	switch(port) {
-	case 0: {
+	switch(port) 
+	{
+	case 0: 
+	{
 		static const UINT8 pos[16] = { 0, 1, 3, 2, 6, 4, 12, 8, 9 };
-		return (input_port_read_indexed(machine, 0) & 0xf) | ((~pos[input_port_read_indexed(machine, 5)>>4]<<4) & 0xf0);
+		return (input_port_read(machine, "P1") & 0xf) | ((~pos[input_port_read(machine, "PADDLE")>>4]<<4) & 0xf0);
 	}
 	case 1:
-		return input_port_read_indexed(machine, 1);
+		return input_port_read(machine, "P2");
 	case 2:
 		return 0xff;
 	case 3:
 		return 0xff;
 	case 4:
-		return input_port_read_indexed(machine, 2);
+		return input_port_read(machine, "SERVICE");
 	case 5: // Dip switches
-		return input_port_read_indexed(machine, 3);
+		return input_port_read(machine, "COINAGE");
 	case 6:
-		return input_port_read_indexed(machine, 4);
+		return input_port_read(machine, "DSW");
 	case 7: // DAC
 		return 0xff;
 	}
@@ -558,44 +561,24 @@ static int cur_input_line;
 
 static UINT8 mahmajn_io_r(running_machine *machine, int port)
 {
-	switch(port) {
+	static const char *keynames[] = { "MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5", "P1", "P2" };
+
+	switch(port) 
+	{
 	case 0:
 		return ~(1 << cur_input_line);
 	case 1:
 		return 0xff;
 	case 2:
-		return input_port_read_indexed(machine, cur_input_line);
+		return input_port_read(machine, keynames[cur_input_line]);
 	case 3:
 		return 0xff;
 	case 4:
-		return input_port_read_indexed(machine, 8);
+		return input_port_read(machine, "SERVICE");
 	case 5: // Dip switches
-		return input_port_read_indexed(machine, 9);
+		return input_port_read(machine, "COINAGE");
 	case 6:
-		return input_port_read_indexed(machine, 10);
-	case 7: // DAC
-		return 0xff;
-	}
-	return 0x00;
-}
-
-static UINT8 gground_io_r(running_machine *machine, int port)
-{
-	switch(port) {
-	case 0:
-		return input_port_read_indexed(machine, 0);
-	case 1:
-		return input_port_read_indexed(machine, 1);
-	case 2: // P3 inputs
-		return input_port_read_indexed(machine, 2);
-	case 3:
-		return 0xff;
-	case 4:
-		return input_port_read_indexed(machine, 3);
-	case 5: // Dip switches
-		return input_port_read_indexed(machine, 4);
-	case 6:
-		return input_port_read_indexed(machine, 5);
+		return input_port_read(machine, "DSW");
 	case 7: // DAC
 		return 0xff;
 	}
@@ -604,7 +587,8 @@ static UINT8 gground_io_r(running_machine *machine, int port)
 
 static void mahmajn_io_w(running_machine *machine, int port, UINT8 data)
 {
-	switch(port) {
+	switch(port) 
+	{
 	case 3:
 		if(data & 4)
 			cur_input_line = (cur_input_line + 1) & 7;
@@ -619,7 +603,8 @@ static void mahmajn_io_w(running_machine *machine, int port, UINT8 data)
 
 static void hotrod_io_w(running_machine *machine, int port, UINT8 data)
 {
-	switch(port) {
+	switch(port) 
+	{
 	case 3: // Lamps
 		break;
 	case 7: // DAC
@@ -634,39 +619,46 @@ static UINT8 hotrod_ctrl_cur;
 
 static WRITE16_HANDLER( hotrod3_ctrl_w )
 {
-	if(ACCESSING_BITS_0_7) {
+	static const char *portnames[] = { "PEDAL1", "PEDAL2", "PEDAL3", "PEDAL4" };
+
+	if(ACCESSING_BITS_0_7) 
+	{
 		data &= 3;
-		hotrod_ctrl_cur = input_port_read_indexed(machine, 9+data);
+		hotrod_ctrl_cur = input_port_read_safe(machine, portnames[data], 0);
 	}
 }
 
 static READ16_HANDLER( hotrod3_ctrl_r )
 {
-	if(ACCESSING_BITS_0_7) {
-		switch(offset) {
+	if(ACCESSING_BITS_0_7) 
+	{
+		switch(offset) 
+		{
 			// Steering dials
-		case 0:
-			return input_port_read_indexed(machine, 5) & 0xff;
-		case 1:
-			return input_port_read_indexed(machine, 5) >> 8;
-		case 2:
-			return input_port_read_indexed(machine, 6) & 0xff;
-		case 3:
-			return input_port_read_indexed(machine, 6) >> 8;
-		case 4:
-			return input_port_read_indexed(machine, 7) & 0xff;
-		case 5:
-			return input_port_read_indexed(machine, 7) >> 8;
-		case 6:
-			return input_port_read_indexed(machine, 8) & 0xff;
-		case 7:
-			return input_port_read_indexed(machine, 8) >> 8;
+			case 0:
+				return input_port_read_safe(machine, "DIAL1", 0) & 0xff;
+			case 1:
+				return input_port_read_safe(machine, "DIAL1", 0) >> 8;
+			case 2:
+				return input_port_read_safe(machine, "DIAL2", 0) & 0xff;
+			case 3:
+				return input_port_read_safe(machine, "DIAL2", 0) >> 8;
+			case 4:
+				return input_port_read_safe(machine, "DIAL3", 0) & 0xff;
+			case 5:
+				return input_port_read_safe(machine, "DIAL3", 0) >> 8;
+			case 6:
+				return input_port_read_safe(machine, "DIAL4", 0) & 0xff;
+			case 7:
+				return input_port_read_safe(machine, "DIAL4", 0) >> 8;
 
-		case 8: { // Serial ADCs for the accel
-			int v = hotrod_ctrl_cur & 0x80;
-			hotrod_ctrl_cur <<= 1;
-			return v ? 0xff : 0;
-		}
+			case 8: 
+			{ 
+				// Serial ADCs for the accel
+				int v = hotrod_ctrl_cur & 0x80;
+				hotrod_ctrl_cur <<= 1;
+				return v ? 0xff : 0;
+			}
 		}
 	}
 	return 0;
@@ -1105,14 +1097,14 @@ static DRIVER_INIT(dcclub)
 
 static DRIVER_INIT(qrouka)
 {
-	system24temp_sys16_io_set_callbacks(gground_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
+	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = qrouka_mlt;
 	track_size = 0;
 }
 
 static DRIVER_INIT(quizmeku)
 {
-	system24temp_sys16_io_set_callbacks(gground_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
+	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = quizmeku_mlt;
 	track_size = 0;
 }
@@ -1196,8 +1188,6 @@ static DRIVER_INIT(dcclubfd)
 }
 
 
-
-
 static DRIVER_INIT(sgmast)
 {
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
@@ -1217,7 +1207,7 @@ static DRIVER_INIT(qsww)
 
 static DRIVER_INIT(gground)
 {
-	system24temp_sys16_io_set_callbacks(gground_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
+	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = 0;
 	track_size = 0x2d00;
 	s24_fd1094_driver_init(machine);
@@ -1426,28 +1416,28 @@ static INPUT_PORTS_START( hotrod )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("DIAL1")
 	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("DIAL2")
 	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("DIAL3")
 	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(3)
 
-	PORT_START
+	PORT_START_TAG("DIAL4")
 	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(4)
 
-	PORT_START
+	PORT_START_TAG("PEDAL1")
 	PORT_BIT( 0xff, 0x01, IPT_PEDAL ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("PEDAL2")
 	PORT_BIT( 0xff, 0x01, IPT_PEDAL ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("PEDAL3")
 	PORT_BIT( 0xff, 0x01, IPT_PEDAL ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(3)
 
-	PORT_START
+	PORT_START_TAG("PEDAL4")
 	PORT_BIT( 0xff, 0x01, IPT_PEDAL ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(4)
 INPUT_PORTS_END
 
@@ -1537,10 +1527,10 @@ static INPUT_PORTS_START( roughrac )
 	PORT_DIPSETTING(    0x80, "10" )
 	PORT_DIPSETTING(    0x00, "15" )
 
-	PORT_START
+	PORT_START_TAG("DIAL1")
 	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("DIAL2")
 	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -1652,7 +1642,7 @@ static INPUT_PORTS_START( dcclub ) /* In the Japan set missing angle input */
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START
+	PORT_START_TAG("PADDLE")
 	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0x00,0x8f) PORT_SENSITIVITY(64) PORT_KEYDELTA(64) PORT_PLAYER(1)
 INPUT_PORTS_END
 
@@ -1702,7 +1692,7 @@ static INPUT_PORTS_START( sgmastj )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("DIAL1")
 	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 

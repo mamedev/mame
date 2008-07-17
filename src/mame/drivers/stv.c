@@ -468,13 +468,13 @@ static UINT8 stv_SMPC_r8 (running_machine *machine, int offset)
 		return_data = 0x20 ^ 0xff;
 
 	if (offset == 0x75)//PDR1 read
-		return_data = input_port_read_indexed(machine, 0);
+		return_data = input_port_read(machine, "DSW1");
 
 	if (offset == 0x77)//PDR2 read
 		return_data=  (0xfe | eeprom_read_bit());
 
 //  if (offset == 0x33) //country code
-//      return_data = input_port_read_indexed(machine, 7);
+//      return_data = input_port_read(machine, "FAKE");
 
 	if (activecpu_get_pc()==0x060020E6) return_data = 0x10;//???
 
@@ -633,7 +633,7 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 
 				smpc_ram[0x31]=0x00;  //?
 
-				//smpc_ram[0x33]=input_port_read_indexed(machine, 7);
+				//smpc_ram[0x33]=input_port_read(machine, "FAKE");
 
 				smpc_ram[0x35]=0x00;
 				smpc_ram[0x37]=0x00;
@@ -902,21 +902,21 @@ static READ32_HANDLER ( stv_io_r32 )
 		case 0:
 		switch(port_sel)
 		{
-			case 0x77: return 0xff000000|(input_port_read_indexed(machine, 2) << 16) |0x0000ff00|(input_port_read_indexed(machine, 3));
+			case 0x77: return 0xff000000|(input_port_read(machine, "P1") << 16) |0x0000ff00|(input_port_read(machine, "P2"));
 			case 0x67:
 			{
 				switch(mux_data)
 				{
 					/*Mahjong panel interface,bit wise(ACTIVE LOW)*/
-					case 0xfe:	return 0xff000000 | (input_port_read_indexed(machine, 7)  << 16) | 0x0000ff00 | (input_port_read_indexed(machine, 12));
-					case 0xfd:  return 0xff000000 | (input_port_read_indexed(machine, 8)  << 16) | 0x0000ff00 | (input_port_read_indexed(machine, 13));
-					case 0xfb:	return 0xff000000 | (input_port_read_indexed(machine, 9)  << 16) | 0x0000ff00 | (input_port_read_indexed(machine, 14));
-					case 0xf7:	return 0xff000000 | (input_port_read_indexed(machine, 10) << 16) | 0x0000ff00 | (input_port_read_indexed(machine, 15));
-					case 0xef:  return 0xff000000 | (input_port_read_indexed(machine, 11) << 16) | 0x0000ff00 | (input_port_read_indexed(machine, 16));
+					case 0xfe:	return 0xff000000 | (input_port_read_safe(machine, "KEY0", 0)  << 16) | 0x0000ff00 | (input_port_read_safe(machine, "KEY5", 0));
+					case 0xfd:  return 0xff000000 | (input_port_read_safe(machine, "KEY1", 0)  << 16) | 0x0000ff00 | (input_port_read_safe(machine, "KEY6", 0));
+					case 0xfb:	return 0xff000000 | (input_port_read_safe(machine, "KEY2", 0)  << 16) | 0x0000ff00 | (input_port_read_safe(machine, "KEY7", 0));
+					case 0xf7:	return 0xff000000 | (input_port_read_safe(machine, "KEY3", 0) << 16) | 0x0000ff00 | (input_port_read_safe(machine, "KEY8", 0));
+					case 0xef:  return 0xff000000 | (input_port_read_safe(machine, "KEY4", 0) << 16) | 0x0000ff00 | (input_port_read_safe(machine, "KEY9", 0));
 					/*Joystick panel*/
 					default:
 					//popmessage("%02x MUX DATA",mux_data);
-				    return (input_port_read_indexed(machine, 2) << 16) | (input_port_read_indexed(machine, 3));
+				    return (input_port_read(machine, "P1") << 16) | (input_port_read(machine, "P2"));
 				}
 			}
 			case 0x47:
@@ -926,12 +926,12 @@ static READ32_HANDLER ( stv_io_r32 )
 					int data1 = 0, data2 = 0;
 
 					/* Critter Crusher */
-					data1 = input_port_read_indexed(machine, 7);
+					data1 = input_port_read(machine, "LIGHTX");
 					data1 = BITSWAP8(data1, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
-					data1 |= (input_port_read_indexed(machine, 2) & 1) ? 0x0 : 0x4;
-					data2 = input_port_read_indexed(machine, 8);
+					data1 |= (input_port_read(machine, "P1") & 1) ? 0x0 : 0x4;
+					data2 = input_port_read(machine, "LIGHTY");
 					data2 = BITSWAP8(data2, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
-					data2 |= (input_port_read_indexed(machine, 2) & 1) ? 0x0 : 0x4;
+					data2 |= (input_port_read(machine, "P1") & 1) ? 0x0 : 0x4;
 
 					return 0xff000000 | data1 << 16 | 0x0000ff00 | data2;
 				}
@@ -939,21 +939,21 @@ static READ32_HANDLER ( stv_io_r32 )
 			//default:
 			default:
 			//popmessage("%02x PORT SEL",port_sel);
-			return (input_port_read_indexed(machine, 2) << 16) | (input_port_read_indexed(machine, 3));
+			return (input_port_read(machine, "P1") << 16) | (input_port_read(machine, "P2"));
 		}
 		case 1:
 		if ( strcmp(machine->gamedrv->name,"critcrsh") == 0 )
 		{
-			return ((input_port_read_indexed(machine, 4) << 16) & ((input_port_read_indexed(machine, 2) & 1) ? 0xffef0000 : 0xffff0000)) | (ioga[1]);
+			return ((input_port_read(machine, "SYSTEM") << 16) & ((input_port_read(machine, "P1") & 1) ? 0xffef0000 : 0xffff0000)) | (ioga[1]);
 		}
 		else
 		{
-			return (input_port_read_indexed(machine, 4) << 16) | (ioga[1]);
+			return (input_port_read(machine, "SYSTEM") << 16) | (ioga[1]);
 		}
 		case 2:
 		switch(port_sel)
 		{
-			case 0x77:	return (input_port_read_indexed(machine, 5) << 16) | (input_port_read_indexed(machine, 6));
+			case 0x77:	return (input_port_read(machine, "UNUSED") << 16) | (input_port_read(machine, "EXTRA"));
 			case 0x67:	return 0xffffffff;/**/
 			case 0x20:  return 0xffff0000 | (ioga[2] & 0xffff);
 			case 0x10:  return ((ioga[2] & 0xffff) << 16) | 0xffff;
@@ -2067,7 +2067,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(_n_)
 
 static INPUT_PORTS_START( stv )
-	PORT_START
+	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "PDR1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2093,7 +2093,7 @@ static INPUT_PORTS_START( stv )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "PDR2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2119,20 +2119,20 @@ static INPUT_PORTS_START( stv )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("P1")
 	STV_PLAYER_INPUTS(1, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
 
-	PORT_START
+	PORT_START_TAG("P2")
 	STV_PLAYER_INPUTS(2, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
 /*
-    PORT_START
+    PORT_START_TAG("P3")
     STV_PLAYER_INPUTS(3, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
 
-    PORT_START
+    PORT_START_TAG("P4")
     STV_PLAYER_INPUTS(4, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
 */
 
-	PORT_START
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
@@ -2142,12 +2142,12 @@ static INPUT_PORTS_START( stv )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1P Push Switch") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2P Push Switch") PORT_CODE(KEYCODE_8)
 
-	/*This *might* be unused...*/
-	PORT_START
+	/* This *might* be unused... */
+	PORT_START_TAG("UNUSED")
 	PORT_BIT ( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	/*Extra button layout,used by Power Instinct 3 & Suikoenbu*/
-	PORT_START
+	/* Extra button layout,used by Power Instinct 3 & Suikoenbu */
+	PORT_START_TAG("EXTRA")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
@@ -2157,9 +2157,9 @@ static INPUT_PORTS_START( stv )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	/*We don't need these,AFAIK the country code doesn't work either...*/
+	/* We don't need these, AFAIK the country code doesn't work either... */
 	#if 0
-	PORT_START							//7
+	PORT_START_TAG("FAKE")	//7
 	PORT_DIPNAME( 0x0f, 0x01, "Country" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Japan ) )
 	PORT_DIPSETTING(    0x02, "Asia Ntsc" )
@@ -2170,7 +2170,7 @@ static INPUT_PORTS_START( stv )
 	PORT_DIPSETTING(    0x0c, "Europe/Other Pal" )
 	PORT_DIPSETTING(    0x0d, "Sud America Pal" )
 
-	PORT_START	/* Pad data 1a */
+	PORT_START_TAG("PAD1A")	/* Pad data 1a */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("B") PORT_CODE(KEYCODE_U)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("C") PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("A") PORT_CODE(KEYCODE_T)
@@ -2180,7 +2180,7 @@ static INPUT_PORTS_START( stv )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Left") PORT_CODE(KEYCODE_J)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right") PORT_CODE(KEYCODE_L)
 
-	PORT_START	/* Pad data 1b */
+	PORT_START_TAG("PAD1B")	/* Pad data 1b */
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L trig") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Z") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Y") PORT_CODE(KEYCODE_W)
@@ -2190,113 +2190,24 @@ static INPUT_PORTS_START( stv )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( critcrsh )
-
 	PORT_INCLUDE( stv )
 
 	/* IN 7 */
-	PORT_START /* mask default type                     sens delta min max */
+	PORT_START_TAG("LIGHTX") /* mask default type                     sens delta min max */
 	PORT_BIT( 0x3f, 0x00, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0,0x3f) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_PLAYER(1)
 
 	/* IN 8 */
-	PORT_START
+	PORT_START_TAG("LIGHTY")
 	PORT_BIT( 0x3f, 0x00, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x0,0x3f) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_PLAYER(1)
 
 INPUT_PORTS_END
 
-/*Same as the regular one,but with an additional & optional mahjong panel*/
+/* Same as the regular one,but with an additional & optional mahjong panel */
 static INPUT_PORTS_START( stvmp )
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, "PDR1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE( stv )
 
-	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, "PDR2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START
-	STV_PLAYER_INPUTS(1, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
-
-	PORT_START
-	STV_PLAYER_INPUTS(2, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
-/*
-    PORT_START
-    STV_PLAYER_INPUTS(3, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
-
-    PORT_START
-    STV_PLAYER_INPUTS(4, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
-*/
-
-	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1P Push Switch") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2P Push Switch") PORT_CODE(KEYCODE_8)
-
-	/*This *might* be unused...*/
-	PORT_START
-	PORT_BIT ( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	/*Extra button layout,used by Power Instinct 3*/
-	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	/*Mahjong panel/player 1 side*/
-	PORT_START/*7*/
+	/* Mahjong panel/player 1 side */
+	PORT_START_TAG("KEY0")	/*7*/
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2306,7 +2217,7 @@ static INPUT_PORTS_START( stvmp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_M )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_I )
 
-	PORT_START/*8*/
+	PORT_START_TAG("KEY1")	/*8*/
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2316,7 +2227,7 @@ static INPUT_PORTS_START( stvmp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_N )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_J )
 
-	PORT_START/*9*/
+	PORT_START_TAG("KEY2")	/*9*/
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2326,7 +2237,7 @@ static INPUT_PORTS_START( stvmp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_K )
 
-	PORT_START/*10*/
+	PORT_START_TAG("KEY3")	/*10*/
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2336,7 +2247,7 @@ static INPUT_PORTS_START( stvmp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_L )
 
-	PORT_START/*11*/
+	PORT_START_TAG("KEY4")	/*11*/
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2346,8 +2257,8 @@ static INPUT_PORTS_START( stvmp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	/*Mahjong panel/player 2 side*/
-	PORT_START/*12*/
+	/* Mahjong panel/player 2 side */
+	PORT_START_TAG("KEY5")	/*12*/
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2357,7 +2268,7 @@ static INPUT_PORTS_START( stvmp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
 
-	PORT_START/*13*/
+	PORT_START_TAG("KEY6")	/*13*/
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2367,7 +2278,7 @@ static INPUT_PORTS_START( stvmp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
 
-	PORT_START/*14*/
+	PORT_START_TAG("KEY7")	/*14*/
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2377,7 +2288,7 @@ static INPUT_PORTS_START( stvmp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
 
-	PORT_START/*15*/
+	PORT_START_TAG("KEY8")	/*15*/
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2387,7 +2298,7 @@ static INPUT_PORTS_START( stvmp )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
 
-	PORT_START/*16*/
+	PORT_START_TAG("KEY9")	/*16*/
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2455,7 +2366,7 @@ DRIVER_INIT ( stv )
     smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
     smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
     smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
-//  smpc_ram[0x33] = input_port_read_indexed(machine, 7);
+//  smpc_ram[0x33] = input_port_read(machine, "FAKE");
  	smpc_ram[0x5f] = 0x10;
 
  	#ifdef MAME_DEBUG

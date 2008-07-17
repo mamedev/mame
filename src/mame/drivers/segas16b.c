@@ -1135,10 +1135,13 @@ static READ16_HANDLER( standard_io_r )
 	switch (offset & (0x3000/2))
 	{
 		case 0x1000/2:
-			return input_port_read_indexed(machine, offset & 3);
+		{
+			static const char *const sysports[] = { "SERVICE", "P1", "UNUSED", "P2" };
+			return input_port_read(machine, sysports[offset & 3]);
+		}
 
 		case 0x2000/2:
-			return input_port_read_indexed(machine, 4 + (offset & 1));
+			return input_port_read(machine, (offset & 1) ? "DSW2" : "DSW1");
 	}
 	logerror("%06X:standard_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
 	return segaic16_open_bus_r(machine,0,mem_mask);
@@ -1394,7 +1397,7 @@ static void altbeast_common_i8751_sim(running_machine *machine, offs_t soundoffs
 	}
 
 	/* read inputs */
-	workram[inputoffs] = ~input_port_read_indexed(machine, 0) << 8;
+	workram[inputoffs] = ~input_port_read(machine, "SERVICE") << 8;
 }
 
 static void altbeasj_i8751_sim(running_machine *machine)
@@ -1473,8 +1476,8 @@ static void goldnaxe_i8751_sim(running_machine *machine)
 	}
 
 	/* read inputs */
-	workram[0x2cd0/2] = (input_port_read_indexed(machine, 1) << 8) | input_port_read_indexed(machine, 3);
-	workram[0x2c96/2] = input_port_read_indexed(machine, 0) << 8;
+	workram[0x2cd0/2] = (input_port_read(machine, "P1") << 8) | input_port_read(machine, "P2");
+	workram[0x2c96/2] = input_port_read(machine, "SERVICE") << 8;
 }
 
 
@@ -1494,9 +1497,9 @@ static void tturf_i8751_sim(running_machine *machine)
 	}
 
 	/* read inputs */
-	workram[0x01e6/2] = input_port_read_indexed(machine, 0) << 8;
-	workram[0x01e8/2] = input_port_read_indexed(machine, 1) << 8;
-	workram[0x01ea/2] = input_port_read_indexed(machine, 3) << 8;
+	workram[0x01e6/2] = input_port_read(machine, "SERVICE") << 8;
+	workram[0x01e8/2] = input_port_read(machine, "P1") << 8;
+	workram[0x01ea/2] = input_port_read(machine, "P2") << 8;
 }
 
 
@@ -1533,7 +1536,7 @@ static void wrestwar_i8751_sim(running_machine *machine)
 	}
 
 	/* read inputs */
-	workram[0x2082/2] = input_port_read_indexed(machine, 0);
+	workram[0x2082/2] = input_port_read(machine, "SERVICE");
 }
 
 

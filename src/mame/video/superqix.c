@@ -235,14 +235,14 @@ VIDEO_UPDATE( pbillian )
 	{
 		int curr_power;
 
-		curr_power = ((input_port_read_indexed(screen->machine, 4)&0x3f)*100)/0x3f;
+		curr_power = ((input_port_read(screen->machine, "PADDLE1") & 0x3f) * 100) / 0x3f;
 		if (last_power[0] != curr_power)
 		{
 			popmessage	("Power %d%%", curr_power);
 			last_power[0] = curr_power;
 		}
 
-		curr_power = ((input_port_read_indexed(screen->machine, 6)&0x3f)*100)/0x3f;
+		curr_power = ((input_port_read(screen->machine, "PADDLE2") & 0x3f) * 100) / 0x3f;
 		if (last_power[1] != curr_power)
 		{
 			popmessage	("Power %d%%", curr_power);

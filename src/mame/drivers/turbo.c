@@ -490,7 +490,7 @@ static READ8_HANDLER( turbo_8279_r )
 		{
 			/* read sensor RAM */
 			case 0x40:
-				result = ~input_port_read_indexed(machine, 1);  /* DSW 1 - inverted! */
+				result = ~input_port_read(machine, "DSW1");  /* DSW 1 - inverted! */
 				break;
 
 			/* read display RAM */
@@ -625,7 +625,7 @@ static READ8_HANDLER( turbo_collision_r )
 {
 	turbo_state *state = machine->driver_data;
 	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
-	return input_port_read_indexed(machine, 3) | (state->turbo_collision & 15);
+	return input_port_read(machine, "DSW3") | (state->turbo_collision & 15);
 }
 
 
@@ -640,14 +640,14 @@ static WRITE8_HANDLER( turbo_collision_clear_w )
 static READ8_HANDLER( turbo_analog_r )
 {
 	turbo_state *state = machine->driver_data;
-	return input_port_read_indexed(machine, 4) - state->turbo_last_analog;
+	return input_port_read(machine, "DIAL") - state->turbo_last_analog;
 }
 
 
 static WRITE8_HANDLER( turbo_analog_reset_w )
 {
 	turbo_state *state = machine->driver_data;
-	state->turbo_last_analog = input_port_read_indexed(machine, 4);
+	state->turbo_last_analog = input_port_read(machine, "DIAL");
 }
 
 
@@ -686,8 +686,8 @@ static READ8_HANDLER( buckrog_cpu2_command_r )
 
 static READ8_HANDLER( buckrog_port_2_r )
 {
-	int inp1 = input_port_read_indexed(machine, 2);
-	int inp2 = input_port_read_indexed(machine, 3);
+	int inp1 = input_port_read(machine, "DSW1");
+	int inp2 = input_port_read(machine, "DSW2");
 
 	return  (((inp2 >> 6) & 1) << 7) |
 			(((inp2 >> 4) & 1) << 6) |
@@ -702,8 +702,8 @@ static READ8_HANDLER( buckrog_port_2_r )
 
 static READ8_HANDLER( buckrog_port_3_r )
 {
-	int inp1 = input_port_read_indexed(machine, 2);
-	int inp2 = input_port_read_indexed(machine, 3);
+	int inp1 = input_port_read(machine, "DSW1");
+	int inp2 = input_port_read(machine, "DSW2");
 
 	return  (((inp2 >> 7) & 1) << 7) |
 			(((inp2 >> 5) & 1) << 6) |
@@ -751,7 +751,7 @@ static ADDRESS_MAP_START( turbo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfa00, 0xfa03) AM_MIRROR(0x00fc) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xfb00, 0xfb03) AM_MIRROR(0x00fc) AM_DEVREADWRITE(PPI8255, "ppi8255_3", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xfc00, 0xfc01) AM_MIRROR(0x00fe) AM_READWRITE(turbo_8279_r, turbo_8279_w)
-	AM_RANGE(0xfd00, 0xfdff) AM_READ(input_port_0_r)
+	AM_RANGE(0xfd00, 0xfdff) AM_READ_PORT("INPUT")
 	AM_RANGE(0xfe00, 0xfeff) AM_READ(turbo_collision_r)
 ADDRESS_MAP_END
 
@@ -767,10 +767,10 @@ static ADDRESS_MAP_START( subroc3d_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_BASE_MEMBER(turbo_state, sprite_position)	// CONT RAM
 	AM_RANGE(0xa400, 0xa7ff) AM_RAM AM_BASE_MEMBER(turbo_state, spriteram)			// CONT RAM
-	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x07fc) AM_READ(input_port_0_r)				// INPUT 253
-	AM_RANGE(0xa801, 0xa801) AM_MIRROR(0x07fc) AM_READ(input_port_1_r)				// INPUT 253
-	AM_RANGE(0xa802, 0xa802) AM_MIRROR(0x07fc) AM_READ(input_port_2_r)				// INPUT 253
-	AM_RANGE(0xa803, 0xa803) AM_MIRROR(0x07fc) AM_READ(input_port_3_r)				// INPUT 253
+	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x07fc) AM_READ_PORT("IN0")					// INPUT 253
+	AM_RANGE(0xa801, 0xa801) AM_MIRROR(0x07fc) AM_READ_PORT("IN1")					// INPUT 253
+	AM_RANGE(0xa802, 0xa802) AM_MIRROR(0x07fc) AM_READ_PORT("DSW2")					// INPUT 253
+	AM_RANGE(0xa803, 0xa803) AM_MIRROR(0x07fc) AM_READ_PORT("DSW3")					// INPUT 253
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM 												// SCRATCH
 	AM_RANGE(0xb800, 0xbfff) 														// HANDLE CL
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(turbo_videoram_w) AM_BASE_MEMBER(turbo_state, videoram)	// FIX PAGE
@@ -796,8 +796,8 @@ static ADDRESS_MAP_START( buckrog_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xd801) AM_MIRROR(0x07fe) AM_READWRITE(turbo_8279_r, turbo_8279_w)			// 8279
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(turbo_state, sprite_position)				// CONT RAM
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE_MEMBER(turbo_state, spriteram)						// CONT RAM
-	AM_RANGE(0xe800, 0xe800) AM_MIRROR(0x07fc) AM_READ(input_port_0_r)							// INPUT
-	AM_RANGE(0xe801, 0xe801) AM_MIRROR(0x07fc) AM_READ(input_port_1_r)
+	AM_RANGE(0xe800, 0xe800) AM_MIRROR(0x07fc) AM_READ_PORT("IN0")								// INPUT
+	AM_RANGE(0xe801, 0xe801) AM_MIRROR(0x07fc) AM_READ_PORT("IN1")
 	AM_RANGE(0xe802, 0xe802) AM_MIRROR(0x07fc) AM_READ(buckrog_port_2_r)
 	AM_RANGE(0xe803, 0xe803) AM_MIRROR(0x07fc) AM_READ(buckrog_port_3_r)
 	AM_RANGE(0xf000, 0xf000)
@@ -826,7 +826,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( turbo )
-	PORT_START		/* IN0 */
+	PORT_START_TAG("INPUT")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )				/* ACCEL B */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )				/* ACCEL A */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_TOGGLE	/* SHIFT */
@@ -836,7 +836,7 @@ static INPUT_PORTS_START( turbo )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START	/* DSW 1 */
+	PORT_START_TAG("DSW1")	/* DSW 1 */
 	PORT_DIPNAME( 0x03, 0x03, "Car On Extended Play" ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
@@ -861,7 +861,7 @@ static INPUT_PORTS_START( turbo )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	/* DSW 2 */
+	PORT_START_TAG("DSW2")	/* DSW 2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Game_Time ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x00, "60 seconds" )
 	PORT_DIPSETTING(    0x01, "70 seconds" )
@@ -886,7 +886,7 @@ static INPUT_PORTS_START( turbo )
 	PORT_DIPSETTING(	0x40, DEF_STR( 1C_3C ))
 	PORT_DIPSETTING(	0x60, DEF_STR( 1C_6C ))
 
-	PORT_START	/* Collision and DSW 3 */
+	PORT_START_TAG("DSW3")	/* Collision and DSW 3 */
 	PORT_BIT( 0x0f,     0x00, IPT_SPECIAL )	/* Merged with collision bits */
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
@@ -901,7 +901,7 @@ static INPUT_PORTS_START( turbo )
 	PORT_DIPSETTING(	0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(	0x00, "Cockpit")
 
-	PORT_START		/* IN0 */
+	PORT_START_TAG("DIAL")	/* IN0 */
 	PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(10) PORT_KEYDELTA(30)
 
 	/* this is actually a variable resistor */
@@ -915,11 +915,11 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( subroc3d )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -929,7 +929,7 @@ static INPUT_PORTS_START( subroc3d )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START  /* DSW 2 */
+	PORT_START_TAG("DSW2")  /* DSW 2 */
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A )) PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
@@ -954,7 +954,7 @@ static INPUT_PORTS_START( subroc3d )
 	PORT_DIPSETTING(    0x80, "4" )
 	PORT_DIPSETTING(    0xc0, "5" )
 
-	PORT_START  /* DSW 3 */
+	PORT_START_TAG("DSW3")  /* DSW 3 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(    0x00, "20000" )
 	PORT_DIPSETTING(    0x01, "40000" )
@@ -979,19 +979,19 @@ static INPUT_PORTS_START( subroc3d )
 	PORT_DIPSETTING(    0x00, "Endless" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
 
-	PORT_START  /* DSW 1 */					/* Unused */
+	PORT_START_TAG("DSW1")  /* DSW 1 */					/* Unused */
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( buckrog )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) // Accel Hi
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Accel Lo
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 
-	PORT_START /* Inputs */
+	PORT_START_TAG("IN1")	/* Inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -1001,7 +1001,7 @@ static INPUT_PORTS_START( buckrog )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START  /* DSW 1 */
+	PORT_START_TAG("DSW1")  /* DSW 1 */
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A )) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
@@ -1027,8 +1027,7 @@ static INPUT_PORTS_START( buckrog )
 	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-
-	PORT_START  /* DSW 2 */
+	PORT_START_TAG("DSW2")  /* DSW 2 */
 	PORT_DIPNAME( 0x01, 0x00, "Collisions" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

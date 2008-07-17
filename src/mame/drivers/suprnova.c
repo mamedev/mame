@@ -703,17 +703,17 @@ INPUT_PORTS_END
 
 static READ32_HANDLER( nova_input_port_0_r )
 {
-	return input_port_read_indexed(machine, 0)<<24 | input_port_read_indexed(machine, 1)<<16 | input_port_read_indexed(machine, 2)<<8 | input_port_read_indexed(machine, 3);
+	return input_port_read(machine, "IN0")<<24 | input_port_read(machine, "IN1")<<16 | input_port_read(machine, "IN2")<<8 | input_port_read(machine, "IN3");
 }
 
 static READ32_HANDLER( nova_input_port_3_r )
 {
-	return input_port_read_indexed(machine, 8) | 0xffffff00;
+	return input_port_read(machine, "Paddle D") | 0xffffff00;
 }
 
 static READ32_HANDLER( nova_input_port_dip_r )
 {
-	return input_port_read_indexed(machine, 4)<<24 | input_port_read_indexed(machine, 5)<<16 | input_port_read_indexed(machine, 6)<<8 | input_port_read_indexed(machine, 7);
+	return input_port_read(machine, "Paddle A")<<24 | input_port_read(machine, "Paddle B")<<16 | input_port_read(machine, "Paddle C")<<8 | input_port_read(machine, "DSW");
 }
 
 static UINT32 timer_0_temp[4];

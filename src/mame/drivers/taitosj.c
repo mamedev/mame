@@ -214,12 +214,12 @@ static ADDRESS_MAP_START( taitosj_main_nomcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd300, 0xd300) AM_MIRROR(0x00ff) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_video_priority)
 	AM_RANGE(0xd400, 0xd403) AM_MIRROR(0x00f0) AM_READ(SMH_RAM) AM_BASE(&taitosj_collision_reg)
 	AM_RANGE(0xd404, 0xd404) AM_MIRROR(0x00f3) AM_READ(taitosj_gfxrom_r)
-	AM_RANGE(0xd408, 0xd408) AM_MIRROR(0x00f0) AM_READ(input_port_0_r)     /* IN0 */
-	AM_RANGE(0xd409, 0xd409) AM_MIRROR(0x00f0) AM_READ(input_port_1_r)     /* IN1 */
-	AM_RANGE(0xd40a, 0xd40a) AM_MIRROR(0x00f0) AM_READ(input_port_5_r)     /* DSW1 */
-	AM_RANGE(0xd40b, 0xd40b) AM_MIRROR(0x00f0) AM_READ(input_port_2_r)     /* IN2 */
-	AM_RANGE(0xd40c, 0xd40c) AM_MIRROR(0x00f0) AM_READ(input_port_3_r)     /* Service */
-	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ(input_port_4_r)
+	AM_RANGE(0xd408, 0xd408) AM_MIRROR(0x00f0) AM_READ_PORT("IN0")
+	AM_RANGE(0xd409, 0xd409) AM_MIRROR(0x00f0) AM_READ_PORT("IN1")
+	AM_RANGE(0xd40a, 0xd40a) AM_MIRROR(0x00f0) AM_READ_PORT("DSW1")			/* DSW1 */
+	AM_RANGE(0xd40b, 0xd40b) AM_MIRROR(0x00f0) AM_READ_PORT("IN2")
+	AM_RANGE(0xd40c, 0xd40c) AM_MIRROR(0x00f0) AM_READ_PORT("IN3")			/* Service */
+	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ_PORT("IN4")
 	AM_RANGE(0xd40e, 0xd40e) AM_MIRROR(0x00f0) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)	/* DSW2 and DSW3 */
 	AM_RANGE(0xd500, 0xd505) AM_MIRROR(0x00f0) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_scroll)
@@ -254,12 +254,12 @@ static ADDRESS_MAP_START( taitosj_main_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd300, 0xd300) AM_MIRROR(0x00ff) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_video_priority)
 	AM_RANGE(0xd400, 0xd403) AM_MIRROR(0x00f0) AM_READ(SMH_RAM) AM_BASE(&taitosj_collision_reg)
 	AM_RANGE(0xd404, 0xd404) AM_MIRROR(0x00f3) AM_READ(taitosj_gfxrom_r)
-	AM_RANGE(0xd408, 0xd408) AM_MIRROR(0x00f0) AM_READ(input_port_0_r)     /* IN0 */
-	AM_RANGE(0xd409, 0xd409) AM_MIRROR(0x00f0) AM_READ(input_port_1_r)     /* IN1 */
-	AM_RANGE(0xd40a, 0xd40a) AM_MIRROR(0x00f0) AM_READ(input_port_5_r)     /* DSW1 */
-	AM_RANGE(0xd40b, 0xd40b) AM_MIRROR(0x00f0) AM_READ(input_port_2_r)     /* IN2 */
-	AM_RANGE(0xd40c, 0xd40c) AM_MIRROR(0x00f0) AM_READ(input_port_3_r)     /* Service */
-	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ(input_port_4_r)
+	AM_RANGE(0xd408, 0xd408) AM_MIRROR(0x00f0) AM_READ_PORT("IN0")
+	AM_RANGE(0xd409, 0xd409) AM_MIRROR(0x00f0) AM_READ_PORT("IN1")
+	AM_RANGE(0xd40a, 0xd40a) AM_MIRROR(0x00f0) AM_READ_PORT("DSW1")			/* DSW1 */
+	AM_RANGE(0xd40b, 0xd40b) AM_MIRROR(0x00f0) AM_READ_PORT("IN2")
+	AM_RANGE(0xd40c, 0xd40c) AM_MIRROR(0x00f0) AM_READ_PORT("IN3")			/* Service */
+	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ_PORT("IN4")
 	AM_RANGE(0xd40e, 0xd40e) AM_MIRROR(0x00f0) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)	/* DSW2 and DSW3 */
 	AM_RANGE(0xd500, 0xd505) AM_MIRROR(0x00f0) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_scroll)
@@ -320,12 +320,12 @@ static ADDRESS_MAP_START( kikstart_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd300, 0xd300) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_video_priority)
 	AM_RANGE(0xd400, 0xd403) AM_READ(SMH_RAM) AM_BASE(&taitosj_collision_reg)
 	AM_RANGE(0xd404, 0xd404) AM_READ(taitosj_gfxrom_r)
-	AM_RANGE(0xd408, 0xd408) AM_READ(input_port_0_r)	/* IN0 */
-	AM_RANGE(0xd409, 0xd409) AM_READ(input_port_1_r)	/* IN1 */
-	AM_RANGE(0xd40a, 0xd40a) AM_READ(input_port_5_r)	/* DSW1 */
-	AM_RANGE(0xd40b, 0xd40b) AM_READ(input_port_2_r)	/* IN2 */
-	AM_RANGE(0xd40c, 0xd40c) AM_READ(input_port_3_r)	/* IN3 */
-	AM_RANGE(0xd40d, 0xd40d) AM_READ(input_port_4_r)	/* IN4 */
+	AM_RANGE(0xd408, 0xd408) AM_MIRROR(0x00f0) AM_READ_PORT("IN0")
+	AM_RANGE(0xd409, 0xd409) AM_MIRROR(0x00f0) AM_READ_PORT("IN1")
+	AM_RANGE(0xd40a, 0xd40a) AM_MIRROR(0x00f0) AM_READ_PORT("DSW1")			/* DSW1 */
+	AM_RANGE(0xd40b, 0xd40b) AM_MIRROR(0x00f0) AM_READ_PORT("IN2")
+	AM_RANGE(0xd40c, 0xd40c) AM_MIRROR(0x00f0) AM_READ_PORT("IN3")			/* Service */
+	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ_PORT("IN4")
 	AM_RANGE(0xd40e, 0xd40e) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xd40f, 0xd40f) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)	/* DSW2 and DSW3 */
 	AM_RANGE(0xd508, 0xd508) AM_WRITE(taitosj_collision_reg_clear_w)
@@ -361,7 +361,6 @@ static ADDRESS_MAP_START( taitosj_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0003, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
-
 
 
 #define DSW2_PORT \
@@ -480,9 +479,6 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY PORT_COCKTAIL\
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY PORT_COCKTAIL\
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL )	// from sound CPU
-
-
-
 
 static INPUT_PORTS_START( spaceskr )
 	COMMON_IN0

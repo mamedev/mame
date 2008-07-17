@@ -67,12 +67,12 @@ static READ16_HANDLER( mahjong_panel_r )
 {
 	switch(sengokumj_mux_data)
 	{
-		case 1:    return input_port_read_indexed(machine, 2);
-		case 2:    return input_port_read_indexed(machine, 3);
-		case 4:    return input_port_read_indexed(machine, 4);
-		case 8:    return input_port_read_indexed(machine, 5);
-		case 0x10: return input_port_read_indexed(machine, 6);
-		case 0x20: return input_port_read_indexed(machine, 7);
+		case 1:    return input_port_read(machine, "KEY0");
+		case 2:    return input_port_read(machine, "KEY1");
+		case 4:    return input_port_read(machine, "KEY2");
+		case 8:    return input_port_read(machine, "KEY3");
+		case 0x10: return input_port_read(machine, "KEY4");
+		case 0x20: return input_port_read(machine, "UNUSED");
 	}
 
 	return 0xffff;
@@ -130,16 +130,16 @@ static ADDRESS_MAP_START( sengokmj_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x8080, 0x8081) AM_WRITENOP // ?
 	AM_RANGE(0x80c0, 0x80c1) AM_WRITENOP // ?
 	AM_RANGE(0x8140, 0x8141) AM_WRITE(mahjong_panel_w)
-	AM_RANGE(0xc000, 0xc001) AM_READ(input_port_1_word_r)
+	AM_RANGE(0xc000, 0xc001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc002, 0xc003) AM_READ(mahjong_panel_r)
-	AM_RANGE(0xc004, 0xc005) AM_READ(input_port_8_word_r)
+	AM_RANGE(0xc004, 0xc005) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( sengokmj )
 	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
-	PORT_START
+	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(	  0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
@@ -166,7 +166,7 @@ static INPUT_PORTS_START( sengokmj )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
@@ -176,7 +176,7 @@ static INPUT_PORTS_START( sengokmj )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
@@ -186,7 +186,7 @@ static INPUT_PORTS_START( sengokmj )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
@@ -196,7 +196,7 @@ static INPUT_PORTS_START( sengokmj )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
@@ -206,7 +206,7 @@ static INPUT_PORTS_START( sengokmj )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
@@ -216,10 +216,10 @@ static INPUT_PORTS_START( sengokmj )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("UNUSED")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x0001, 0x0001, "Door" )
 	PORT_DIPSETTING(	  0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )

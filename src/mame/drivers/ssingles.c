@@ -147,17 +147,17 @@ static WRITE8_HANDLER(c001_w)
 static READ8_HANDLER(controls_r)
 {
 	int data=7;
-	switch(input_port_read_indexed(machine, 1)) //multiplexed
+	switch(input_port_read(machine, "IN1"))		//multiplexed
 	{
-		case 0x01: data=1; break;
-		case 0x02: data=2; break;
-		case 0x04: data=3; break;
-		case 0x08: data=4; break;
-		case 0x10: data=5; break;
-		case 0x20: data=6; break;
-		case 0x40: data=0; break;
+		case 0x01: data = 1; break;
+		case 0x02: data = 2; break;
+		case 0x04: data = 3; break;
+		case 0x08: data = 4; break;
+		case 0x10: data = 5; break;
+		case 0x20: data = 6; break;
+		case 0x40: data = 0; break;
 	}
-	return (input_port_read_indexed(machine, 0)&(~0x1c))|(data<<2);
+	return (input_port_read(machine, "IN0") & (~0x1c)) | (data << 2);
 }
 
 static ADDRESS_MAP_START( ssingles_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -177,8 +177,8 @@ static ADDRESS_MAP_START( ssingles_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x06, 0x06) AM_WRITE(AY8910_control_port_1_w)
 	AM_RANGE(0x08, 0x08) AM_READNOP
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x16, 0x16) AM_READ(input_port_2_r)
-	AM_RANGE(0x18, 0x18) AM_READ(input_port_3_r)
+	AM_RANGE(0x16, 0x16) AM_READ_PORT("DSW0")
+	AM_RANGE(0x18, 0x18) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1c, 0x1c) AM_READ(controls_r)
 	AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
 	AM_RANGE(0xfe, 0xfe) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
@@ -187,15 +187,14 @@ static ADDRESS_MAP_START( ssingles_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ssingles )
-PORT_START_TAG("IN0")
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) //must be LOW
-
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 
-PORT_START_TAG("IN1")
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
@@ -204,57 +203,55 @@ PORT_START_TAG("IN1")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
-PORT_START_TAG("DSW0")
-PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) )
-PORT_DIPNAME( 0x20, 0x20, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	PORT_START_TAG("DSW0")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(	0x03, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( Easy ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x04, 0x04, "Unk1" )
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x08, "Unk2" )
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10, 0x10, "Unk3" )
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x40, "Unk4" ) //tested in game, every frame, could be difficulty related
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, "Unk5" )
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
 
-PORT_DIPNAME( 0x04, 0x04, "Unk1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-PORT_DIPNAME( 0x08, 0x08, "Unk2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
-PORT_DIPNAME( 0x10, 0x10, "Unk3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-
-PORT_DIPNAME( 0x40, 0x40, "Unk4" ) //tested in game, every frame, could be difficulty related
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-PORT_DIPNAME( 0x80, 0x80, "Unk5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
-
-PORT_START_TAG("DSW1")
-PORT_DIPNAME( 0x03, 0x03, "Unk 6" )
-	PORT_DIPSETTING(    0x01, "Pos 1" )
-	PORT_DIPSETTING(    0x03, "Pos 2" )
-	PORT_DIPSETTING(    0x00, "Pos 3" )
-	PORT_DIPSETTING(    0x02, "Pos 4" )
-PORT_DIPNAME( 0x04, 0x04, "Unk7" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-PORT_DIPNAME( 0x08, 0x08, "Unk8" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
-PORT_DIPNAME( 0x10, 0x10, "Unk9" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-PORT_DIPNAME( 0x20, 0x20, "UnkA" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-PORT_DIPNAME( 0x40, 0x40, "UnkB" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-PORT_DIPNAME( 0x80, 0x80, "UnkC" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
+	PORT_START_TAG("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, "Unk 6" )
+	PORT_DIPSETTING(	0x01, "Pos 1" )
+	PORT_DIPSETTING(	0x03, "Pos 2" )
+	PORT_DIPSETTING(	0x00, "Pos 3" )
+	PORT_DIPSETTING(	0x02, "Pos 4" )
+	PORT_DIPNAME( 0x04, 0x04, "Unk7" )
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x04, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x08, "Unk8" )
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10, 0x10, "Unk9" )
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, "UnkA" )
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x40, "UnkB" )
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, "UnkC" )
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( ssingles )

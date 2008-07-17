@@ -75,7 +75,7 @@ static void triplhnt_update_misc(running_machine *machine, int offset)
 	discrete_sound_w(machine, TRIPLHNT_LAMP_EN, triplhnt_misc_flags & 0x02);	// Lamp is used to reset noise
 	discrete_sound_w(machine, TRIPLHNT_BEAR_EN, triplhnt_misc_flags & 0x80);	// bear
 
-	is_witch_hunt = input_port_read_indexed(machine, 2) == 0x40;
+	is_witch_hunt = input_port_read(machine, "0C09") == 0x40;
 	bit = ~triplhnt_misc_flags & 0x40;
 
 	/* if we're not playing the sample yet, start it */
@@ -107,21 +107,21 @@ static READ8_HANDLER( triplhnt_cmos_r )
 static READ8_HANDLER( triplhnt_input_port_4_r )
 {
 	watchdog_reset_w(machine, 0, 0);
-	return input_port_read_indexed(machine, 4);
+	return input_port_read(machine, "0C0B");
 }
 
 
 static READ8_HANDLER( triplhnt_misc_r )
 {
 	triplhnt_update_misc(machine, offset);
-	return input_port_read_indexed(machine, 7) | triplhnt_hit_code;
+	return input_port_read(machine, "VBLANK") | triplhnt_hit_code;
 }
 
 
 static READ8_HANDLER( triplhnt_da_latch_r )
 {
-	int cross_x = input_port_read_indexed(machine, 8);
-	int cross_y = input_port_read_indexed(machine, 9);
+	int cross_x = input_port_read(machine, "STICKX");
+	int cross_y = input_port_read(machine, "STICKY");
 
 	triplhnt_da_latch = offset;
 
@@ -133,16 +133,16 @@ static READ8_HANDLER( triplhnt_da_latch_r )
 
 static ADDRESS_MAP_START( triplhnt_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_READ(SMH_RAM) AM_MIRROR(0x300)
-	AM_RANGE(0x0c00, 0x0c00) AM_READ(input_port_0_r)
-	AM_RANGE(0x0c08, 0x0c08) AM_READ(input_port_1_r)
-	AM_RANGE(0x0c09, 0x0c09) AM_READ(input_port_2_r)
-	AM_RANGE(0x0c0a, 0x0c0a) AM_READ(input_port_3_r)
+	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("0C00")
+	AM_RANGE(0x0c08, 0x0c08) AM_READ_PORT("0C08")
+	AM_RANGE(0x0c09, 0x0c09) AM_READ_PORT("0C09")
+	AM_RANGE(0x0c0a, 0x0c0a) AM_READ_PORT("0C0A")
 	AM_RANGE(0x0c0b, 0x0c0b) AM_READ(triplhnt_input_port_4_r)
 	AM_RANGE(0x0c10, 0x0c1f) AM_READ(triplhnt_da_latch_r)
 	AM_RANGE(0x0c20, 0x0c2f) AM_READ(triplhnt_cmos_r)
 	AM_RANGE(0x0c30, 0x0c3f) AM_READ(triplhnt_misc_r)
-	AM_RANGE(0x0c40, 0x0c40) AM_READ(input_port_5_r)
-	AM_RANGE(0x0c48, 0x0c48) AM_READ(input_port_6_r)
+	AM_RANGE(0x0c40, 0x0c40) AM_READ_PORT("0C40")
+	AM_RANGE(0x0c48, 0x0c48) AM_READ_PORT("0C48")
 	AM_RANGE(0x7000, 0x7fff) AM_READ(SMH_ROM) /* program */
 	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_ROM) /* program mirror */
 ADDRESS_MAP_END
@@ -161,39 +161,39 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( triplhnt )
-	PORT_START /* 0C00 */
+	PORT_START_TAG("0C00")	/* 0C00 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
-	PORT_START /* 0C08 */
+	PORT_START_TAG("0C08")	/* 0C08 */
 	PORT_DIPNAME( 0xc0, 0x00, "Play Time" )
 	PORT_DIPSETTING( 0x00, "32 seconds / 16 raccoons" )
 	PORT_DIPSETTING( 0x40, "64 seconds / 32 raccoons" )
 	PORT_DIPSETTING( 0x80, "96 seconds / 48 raccoons" )
 	PORT_DIPSETTING( 0xc0, "128 seconds / 64 raccoons" )
 
-	PORT_START /* 0C09 */
+	PORT_START_TAG("0C09")	/* 0C09 */
 	PORT_DIPNAME( 0xc0, 0x40, "Game Select" )
 	PORT_DIPSETTING( 0x00, "Hit the Bear" )
 	PORT_DIPSETTING( 0x40, "Witch Hunt" )
 	PORT_DIPSETTING( 0xc0, "Raccoon Hunt" )
 
-	PORT_START /* 0C0A */
+	PORT_START_TAG("0C0A")	/* 0C0A */
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ))
 	PORT_DIPSETTING( 0x40, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING( 0x00, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING( 0x80, DEF_STR( 1C_2C ))
 
-	PORT_START /* 0C0B */
+	PORT_START_TAG("0C0B")	/* 0C0B */
 	PORT_DIPNAME( 0x80, 0x00, "Extended Play" )
 	PORT_DIPSETTING( 0x80, DEF_STR( Off ))
 	PORT_DIPSETTING( 0x00, DEF_STR( On ))
 
-	PORT_START /* 0C40 */
+	PORT_START_TAG("0C40")	/* 0C40 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 )
 
-	PORT_START /* 0C48 */
+	PORT_START_TAG("0C48")	/* 0C48 */
 // default to service enabled to make users calibrate gun
 //  PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Service_Mode )) PORT_TOGGLE PORT_CODE(KEYCODE_F2)
@@ -201,13 +201,13 @@ static INPUT_PORTS_START( triplhnt )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START
+	PORT_START_TAG("VBLANK")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START
+	PORT_START_TAG("STICKX")
 	PORT_BIT( 0xfc, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xfc)  PORT_CROSSHAIR(X, 62.0/64, 1.0/64, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15)
 
-	PORT_START
+	PORT_START_TAG("STICKY")
 	PORT_BIT( 0xfc, 0x78, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xec)  PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15)
 
 	PORT_START_TAG("BEAR")	/* 10 */

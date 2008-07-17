@@ -93,7 +93,7 @@ static READ16_HANDLER ( sderby_input_r )
 	switch (offset)
 	{
 		case 0x00 >> 1:
-			return input_port_read_indexed(machine, 0);
+			return input_port_read(machine, "IN0");
 		case 0x02 >> 1:
 			return 0xffff;			// to avoid game to reset (needs more work)
 	}
@@ -108,11 +108,11 @@ static READ16_HANDLER( roulette_input_r )
 	switch (offset)
 	{
 	case 0x00 >>1:
-		return input_port_read_indexed(machine, 0);
+		return input_port_read(machine, "IN0");
 	case 0x02 >>1:
-		return input_port_read_indexed(machine, 1);
+		return input_port_read(machine, "IN1");
 	case 0x04 >>1:
-		return input_port_read_indexed(machine, 2);
+		return input_port_read(machine, "IN2");
 	}
 	return 0xffff;
 
@@ -165,7 +165,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( sderby )
-	PORT_START	/* 0x308000.w */
+	PORT_START_TAG("IN0")	/* 0x308000.w */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_4WAY
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_4WAY
@@ -185,7 +185,7 @@ static INPUT_PORTS_START( sderby )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pmroulet )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_VBLANK ) // it must be toggled to boot anyway
 	PORT_SERVICE_NO_TOGGLE(0x0020, IP_ACTIVE_LOW) // seems to be ..
@@ -193,14 +193,14 @@ static INPUT_PORTS_START( pmroulet )
 	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x000e, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
 	PORT_BIT( 0x00f0, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
 	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )

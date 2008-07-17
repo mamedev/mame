@@ -55,17 +55,17 @@ PALETTE_INIT( toypop );
 
 ***************************************************************************/
 
-static READ8_HANDLER( in0_l )	{ return input_port_read_indexed(machine, 0); }		// P1 joystick
-static READ8_HANDLER( in0_h )	{ return input_port_read_indexed(machine, 0) >> 4; }	// P2 joystick
-static READ8_HANDLER( in1_l )	{ return input_port_read_indexed(machine, 1); }		// fire and start buttons
-static READ8_HANDLER( in1_h )	{ return input_port_read_indexed(machine, 1) >> 4; }	// coins
-static READ8_HANDLER( dipA_l )	{ return input_port_read_indexed(machine, 2); }		// dips A
-static READ8_HANDLER( dipA_h )	{ return input_port_read_indexed(machine, 2) >> 4; }	// dips A
-static READ8_HANDLER( dipB_l )	{ return input_port_read_indexed(machine, 3); }		// dips B
-static READ8_HANDLER( dipB_h )	{ return input_port_read_indexed(machine, 3) >> 4; }	// dips B
-static READ8_HANDLER( in2_l )	{ return input_port_read_indexed(machine, 4); }		// P1 joystick left in liblrabl
-static READ8_HANDLER( in2_h )	{ return input_port_read_indexed(machine, 4) >> 4; }	// P2 joystick left in liblrabl
-static READ8_HANDLER( in3 )		{ return input_port_read_indexed(machine, 5); }		// test, cocktail, optional buttons
+static READ8_HANDLER( in0_l )	{ return input_port_read(machine, "INPUT_RIGHT"); }			// P1 joystick
+static READ8_HANDLER( in0_h )	{ return input_port_read(machine, "INPUT_RIGHT") >> 4; }	// P2 joystick
+static READ8_HANDLER( in1_l )	{ return input_port_read(machine, "SYSTEM"); }				// fire and start buttons
+static READ8_HANDLER( in1_h )	{ return input_port_read(machine, "SYSTEM") >> 4; }			// coins
+static READ8_HANDLER( dipA_l )	{ return input_port_read(machine, "DSW1"); }				// dips A
+static READ8_HANDLER( dipA_h )	{ return input_port_read(machine, "DSW1") >> 4; }			// dips A
+static READ8_HANDLER( dipB_l )	{ return input_port_read(machine, "DSW2"); }				// dips B
+static READ8_HANDLER( dipB_h )	{ return input_port_read(machine, "DSW2") >> 4; }			// dips B
+static READ8_HANDLER( in2_l )	{ return input_port_read(machine, "INPUT_LEFT"); }			// P1 joystick left in liblrabl
+static READ8_HANDLER( in2_h )	{ return input_port_read(machine, "INPUT_LEFT") >> 4; }		// P2 joystick left in liblrabl
+static READ8_HANDLER( in3 )		{ return input_port_read(machine, "SERVICE"); }				// test, cocktail, optional buttons
 static WRITE8_HANDLER( out_coin0 )
 {
 	coin_lockout_global_w(data & 4);
@@ -358,7 +358,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( liblrabl )
 	/* The inputs are not memory mapped, they are handled by three I/O chips. */
-	PORT_START	/* 58XX #0 pins 22-29 */
+	PORT_START_TAG("INPUT_RIGHT")	/* 58XX #0 pins 22-29 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY
@@ -368,7 +368,7 @@ static INPUT_PORTS_START( liblrabl )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY PORT_COCKTAIL
 
-	PORT_START	/* 58XX #0 pins 30-33 and 38-41 */
+	PORT_START_TAG("SYSTEM")	/* 58XX #0 pins 30-33 and 38-41 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -378,7 +378,7 @@ static INPUT_PORTS_START( liblrabl )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_START	/* 56XX #1 pins 22-29 */
+	PORT_START_TAG("DSW1")	/* 56XX #1 pins 22-29 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x02, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -404,7 +404,7 @@ static INPUT_PORTS_START( liblrabl )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_6C ) )
 
-	PORT_START	/* 56XX #1 pins 30-33 and 38-41 */
+	PORT_START_TAG("DSW2")	/* 56XX #1 pins 30-33 and 38-41 */
 	PORT_DIPNAME( 0x01, 0x01, "Freeze" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -428,7 +428,7 @@ static INPUT_PORTS_START( liblrabl )
 	PORT_DIPSETTING(    0x80, "C" )
 	PORT_DIPSETTING(    0x00, "D" )
 
-	PORT_START	/* 56XX #2 pins 22-29 */
+	PORT_START_TAG("INPUT_LEFT")	/* 56XX #2 pins 22-29 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY
@@ -438,7 +438,7 @@ static INPUT_PORTS_START( liblrabl )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY PORT_COCKTAIL
 
-	PORT_START	/* 56XX #2 pins 30-33 */
+	PORT_START_TAG("SERVICE")	/* 56XX #2 pins 30-33 */
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
@@ -448,7 +448,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( toypop )
 	/* The inputs are not memory mapped, they are handled by three I/O chips. */
-	PORT_START	/* 58XX #0 pins 22-29 */
+	PORT_START_TAG("INPUT_RIGHT")	/* 58XX #0 pins 22-29 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
@@ -458,7 +458,7 @@ static INPUT_PORTS_START( toypop )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
 
-	PORT_START	/* 58XX #0 pins 30-33 and 38-41 */
+	PORT_START_TAG("SYSTEM")	/* 58XX #0 pins 30-33 and 38-41 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -468,7 +468,7 @@ static INPUT_PORTS_START( toypop )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_START	/* 56XX #1 pins 22-29 */
+	PORT_START_TAG("DSW1")	/* 56XX #1 pins 22-29 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x02, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
@@ -489,7 +489,7 @@ static INPUT_PORTS_START( toypop )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START	/* 56XX #1 pins 30-33 and 38-41 */
+	PORT_START_TAG("DSW2")	/* 56XX #1 pins 30-33 and 38-41 */
 	PORT_DIPNAME( 0x01, 0x01, "Freeze" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -514,10 +514,10 @@ static INPUT_PORTS_START( toypop )
 	PORT_DIPSETTING(    0x80, "Every 15000 points" )
 	PORT_DIPSETTING(    0x00, "Every 20000 points" )
 
-	PORT_START	/* 56XX #2 pins 22-29 */
+	PORT_START_TAG("INPUT_LEFT")	/* 56XX #2 pins 22-29 */
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* 56XX #2 pins 30-33 */
+	PORT_START_TAG("SERVICE")	/* 56XX #2 pins 30-33 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )	// would be Cabinet, but this game has no cocktail mode

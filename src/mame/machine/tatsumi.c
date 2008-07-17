@@ -131,8 +131,8 @@ WRITE16_HANDLER(apache3_z80_w)
 READ8_HANDLER( apache3_adc_r )
 {
 	if (apache3_adc==0)
-		return input_port_read_indexed(machine, 1);
-	return input_port_read_indexed(machine, 2);
+		return input_port_read(machine, "STICKX");
+	return input_port_read(machine, "STICKY");
 }
 
 WRITE8_HANDLER( apache3_adc_w )

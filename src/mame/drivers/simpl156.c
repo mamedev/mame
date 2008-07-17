@@ -104,7 +104,7 @@ extern VIDEO_UPDATE( simpl156 );
 
 
 static INPUT_PORTS_START( simpl156 )
-	PORT_START	/* 16bit */
+	PORT_START_TAG("IN0")	/* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -113,7 +113,7 @@ static INPUT_PORTS_START( simpl156 )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) // eeprom?..
 
 
-	PORT_START	/* 16bit */
+	PORT_START_TAG("IN1")	/* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -138,7 +138,7 @@ static READ32_HANDLER( simpl156_inputs_read )
 	int eep = eeprom_read_bit();
 	UINT32 returndata;
 
-	returndata = input_port_read_indexed(machine, 0)^0xffff0000;
+	returndata = input_port_read(machine, "IN0") ^ 0xffff0000;
 
 	returndata^= ( (eep<<8)  );
 	return returndata;
@@ -169,7 +169,7 @@ static READ32_HANDLER(  simpl156_system_r )
 {
 	UINT32 returndata;
 
-	returndata = input_port_read_indexed(machine, 1);
+	returndata = input_port_read(machine, "IN1");
 
 	return returndata;
 }

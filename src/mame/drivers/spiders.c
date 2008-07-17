@@ -272,13 +272,13 @@ static INTERRUPT_GEN( update_pia_1 )
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA1 (COIN1) */
-	pia_1_ca1_w(machine, 0, input_port_read_indexed(machine,0) & 0x02);
+	pia_1_ca1_w(machine, 0, input_port_read(machine, "IN0") & 0x02);
 
 	/* CA2 - copy of PA0 (SERVICE1) */
-	pia_1_ca2_w(machine, 0, input_port_read_indexed(machine,0) & 0x01);
+	pia_1_ca2_w(machine, 0, input_port_read(machine, "IN0") & 0x01);
 
 	/* CB1 - (crosshatch) */
-	pia_1_cb1_w(machine, 0, input_port_read_indexed(machine,5));
+	pia_1_cb1_w(machine, 0, input_port_read(machine, "XHATCH"));
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -573,9 +573,9 @@ static ADDRESS_MAP_START( spiders_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc044, 0xc047) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xc048, 0xc04b) AM_READWRITE(pia_2_alt_r, pia_2_alt_w)
 	AM_RANGE(0xc050, 0xc053) AM_READWRITE(pia_3_r, pia_3_w)
-	AM_RANGE(0xc060, 0xc060) AM_READ(input_port_2_r)
-	AM_RANGE(0xc080, 0xc080) AM_READ(input_port_3_r)
-	AM_RANGE(0xc0a0, 0xc0a0) AM_READ(input_port_4_r)
+	AM_RANGE(0xc060, 0xc060) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("DSW2")
+	AM_RANGE(0xc0a0, 0xc0a0) AM_READ_PORT("DSW3")
 	AM_RANGE(0xc100, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -596,7 +596,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( spiders )
     /* PIA1 PA0 - PA7 */
-    PORT_START      /* IN0 */
+    PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_HIGH )
@@ -607,14 +607,14 @@ static INPUT_PORTS_START( spiders )
     PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE2 )
 
 	/* PIA1 PB0 - PB7 */
-    PORT_START      /* IN1 */
+    PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT  ) PORT_2WAY PORT_PLAYER(2)
     PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
     PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
     PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
     PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-    PORT_START  /* IN2, DSW1 */
+    PORT_START_TAG("DSW1")	/* IN2, DSW1 */
     PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:1,2,3")
     PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
     PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
@@ -624,7 +624,7 @@ static INPUT_PORTS_START( spiders )
     PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
     PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START  /* IN3, DSW2 */
+    PORT_START_TAG("DSW2")	/* IN3, DSW2 */
     PORT_DIPNAME( 0x03, 0x03, "Play Mode" ) PORT_DIPLOCATION("SW2:1,2")
     PORT_DIPSETTING(    0x00, "A A'" )
     PORT_DIPSETTING(    0x01, "A B'" )
@@ -647,7 +647,7 @@ static INPUT_PORTS_START( spiders )
     PORT_DIPSETTING(    0x00, "First Screen" )
     PORT_DIPSETTING(    0x80, "Every Screen" )
 
-    PORT_START  /* IN4, DSW3 */
+    PORT_START_TAG("DSW3")	/* IN4, DSW3 */
     PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
     PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -673,7 +673,7 @@ static INPUT_PORTS_START( spiders )
     PORT_DIPSETTING(    0xc0, "6" )
     PORT_DIPSETTING(    0xe0, "7" )
 
-    PORT_START      /* connected to PIA1 CB1 input */
+    PORT_START_TAG("XHATCH")	/* connected to PIA1 CB1 input */
     PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PS1 (Crosshatch)") PORT_CODE(KEYCODE_F1)
 
 INPUT_PORTS_END

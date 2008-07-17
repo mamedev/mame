@@ -77,9 +77,6 @@ extern WRITE16_HANDLER( segac2_vdp_w );
 
 /***************************************************************************/
 
-
-
-
 static WRITE16_HANDLER( sys18_refreshenable_w )
 {
 	if(ACCESSING_BITS_0_7)
@@ -486,14 +483,14 @@ static READ16_HANDLER( sys18_io_r )
 						if(io_reg[0x0F] & 0x01)
 							return io_reg[0x00];
 						else
-							return input_port_read_indexed(machine, 0);
+							return input_port_read(machine, "P1");
 						break;
 
 					case 0x01: /* Port B - 2P controls */
 						if(io_reg[0x0F] & 0x02)
 							return io_reg[0x01];
 						else
-							return input_port_read_indexed(machine, 1);
+							return input_port_read(machine, "P2");
 						break;
 
 					case 0x02: /* Port C - Bidirectional I/O port */
@@ -514,21 +511,21 @@ static READ16_HANDLER( sys18_io_r )
 						if(io_reg[0x0F] & 0x10)
 							return io_reg[0x04];
 						else
-							return input_port_read_indexed(machine, 2);
+							return input_port_read(machine, "SERVICE");
 						break;
 
 					case 0x05: /* Port F - DIP switch #1 */
 						if(io_reg[0x0F] & 0x20)
 							return io_reg[0x05];
 						else
-							return input_port_read_indexed(machine, 3);
+							return input_port_read(machine, "DSW1");
 						break;
 
 					case 0x06: /* Port G - DIP switch #2 */
 						if(io_reg[0x0F] & 0x40)
 							return io_reg[0x06];
 						else
-							return input_port_read_indexed(machine, 4);
+							return input_port_read(machine, "P3");
 						break;
 
 					case 0x07: /* Port H - Tile banking control */
@@ -641,13 +638,6 @@ static WRITE16_HANDLER( sys18_io_w )
 }
 
 
-
-/***************************************************************************/
-
-
-
-
-
 /***************************************************************************/
 /*
     Shadow Dancer (Bootleg)
@@ -698,11 +688,11 @@ static ADDRESS_MAP_START( shdancbl_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x840000, 0x840fff) AM_READ(SYS16_MRA16_PALETTERAM)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READ(vdp_r)
 	AM_RANGE(0xe40000, 0xe4ffff) AM_READ(sys18_io_r)
-	AM_RANGE(0xc40000, 0xc40001) AM_READ(input_port_3_word_r) // dip1
-	AM_RANGE(0xc40002, 0xc40003) AM_READ(input_port_4_word_r) // dip2
-	AM_RANGE(0xc41002, 0xc41003) AM_READ(input_port_0_word_r) // player1
-	AM_RANGE(0xc41004, 0xc41005) AM_READ(input_port_1_word_r) // player2
-	AM_RANGE(0xc41000, 0xc41001) AM_READ(input_port_2_word_r) // service
+	AM_RANGE(0xc40000, 0xc40001) AM_READ_PORT("COINAGE")
+	AM_RANGE(0xc40002, 0xc40003) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
+	AM_RANGE(0xc41004, 0xc41005) AM_READ_PORT("P2")
+	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xffc000, 0xffffff) AM_READ(SYS16_MRA16_WORKINGRAM)
 ADDRESS_MAP_END
 
@@ -803,13 +793,13 @@ static ADDRESS_MAP_START( mwalkbl_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x440000, 0x440fff) AM_READ(SYS16_MRA16_SPRITERAM)
 	AM_RANGE(0x840000, 0x840fff) AM_READ(SYS16_MRA16_PALETTERAM)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READ(vdp_r)
-	AM_RANGE(0xc40000, 0xc40001) AM_READ(input_port_3_word_r) // dip1
-	AM_RANGE(0xc40002, 0xc40003) AM_READ(input_port_4_word_r) // dip2
-	AM_RANGE(0xc41002, 0xc41003) AM_READ(input_port_0_word_r) // player1
-	AM_RANGE(0xc41004, 0xc41005) AM_READ(input_port_1_word_r) // player2
-	AM_RANGE(0xc41006, 0xc41007) AM_READ(input_port_5_word_r) // player3
+	AM_RANGE(0xc40000, 0xc40001) AM_READ_PORT("COINAGE")
+	AM_RANGE(0xc40002, 0xc40003) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
+	AM_RANGE(0xc41004, 0xc41005) AM_READ_PORT("P2")
+	AM_RANGE(0xc41006, 0xc41007) AM_READ_PORT("P3")
 	AM_RANGE(0xc41008, 0xc41009) AM_READ(SMH_NOP) // figure this out, extra input for 3p?
-	AM_RANGE(0xc41000, 0xc41001) AM_READ(input_port_2_word_r) // service
+	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xe40000, 0xe4ffff) AM_READ(SYS16_MRA16_EXTRAM2)
 	AM_RANGE(0xffe02c, 0xffe02d) AM_READ(mwalkbl_skip_r)
 	AM_RANGE(0xffc000, 0xffffff) AM_READ(SYS16_MRA16_WORKINGRAM)
@@ -925,8 +915,6 @@ static DRIVER_INIT( mwalkbl ){
 
 /***************************************************************************/
 
-
-
 /* bootleg doesn't have real vdp or i/o */
 
 static ADDRESS_MAP_START( astormbl_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -935,12 +923,12 @@ static ADDRESS_MAP_START( astormbl_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x110000, 0x110fff) AM_READ(SYS16_MRA16_TEXTRAM)
 	AM_RANGE(0x140000, 0x140fff) AM_READ(SYS16_MRA16_PALETTERAM)
 	AM_RANGE(0x200000, 0x200fff) AM_READ(SYS16_MRA16_SPRITERAM)
-	AM_RANGE(0xa00000, 0xa00001) AM_READ(input_port_3_word_r) // dip1
-	AM_RANGE(0xa00002, 0xa00003) AM_READ(input_port_4_word_r) // dip2
-	AM_RANGE(0xa01002, 0xa01003) AM_READ(input_port_0_word_r) // player1
-	AM_RANGE(0xa01004, 0xa01005) AM_READ(input_port_1_word_r) // player2
-	AM_RANGE(0xa01006, 0xa01007) AM_READ(input_port_5_word_r) // player3
-	AM_RANGE(0xa01000, 0xa01001) AM_READ(input_port_2_word_r) // service
+	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("COINAGE")
+	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW1")
+	AM_RANGE(0xa01002, 0xa01003) AM_READ_PORT("P1")
+	AM_RANGE(0xa01004, 0xa01005) AM_READ_PORT("P2")
+	AM_RANGE(0xa01006, 0xa01007) AM_READ_PORT("P3")
+	AM_RANGE(0xa01000, 0xa01001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READ(vdp_r)
 	AM_RANGE(0xffc000, 0xffffff) AM_READ(SYS16_MRA16_WORKINGRAM)
 ADDRESS_MAP_END
@@ -961,12 +949,7 @@ static ADDRESS_MAP_START( astormbl_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-
-
-
 /***************************************************************************/
-
-
 
 static void astormbl_update_proc( void ){
 	UINT16 data;
@@ -1082,10 +1065,6 @@ static MACHINE_RESET( astormbl ){
 }
 
 
-
-
-
-
 static DRIVER_INIT( astormbl ){
 	UINT8 *RAM= memory_region(machine, REGION_CPU2);
 	static const int astormbl_sound_info[] =
@@ -1104,8 +1083,6 @@ static DRIVER_INIT( astormbl ){
 	memcpy(sys18_sound_info, astormbl_sound_info, sizeof(sys18_sound_info));
 	memcpy(RAM,&RAM[0x10000],0xa000);
 }
-
-
 
 
 /*****************************************************************************/
@@ -1156,7 +1133,6 @@ static MACHINE_DRIVER_START( system18 )
 MACHINE_DRIVER_END
 
 
-
 static MACHINE_DRIVER_START( astormbl )
 
 	/* basic machine hardware */
@@ -1168,8 +1144,6 @@ static MACHINE_DRIVER_START( astormbl )
 MACHINE_DRIVER_END
 
 
-
-
 static MACHINE_DRIVER_START( mwalkbl )
 
 	/* basic machine hardware */
@@ -1179,8 +1153,6 @@ static MACHINE_DRIVER_START( mwalkbl )
 
 	MDRV_MACHINE_RESET(mwalkbl)
 MACHINE_DRIVER_END
-
-
 
 
 static MACHINE_DRIVER_START( shdancbl )
@@ -1207,10 +1179,8 @@ MACHINE_DRIVER_END
 
 /***************************************************************************/
 
-
-
 static INPUT_PORTS_START( astormbl )
-	PORT_START /* player 1 */
+	PORT_START_TAG("P1")	/* player 1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
@@ -1219,7 +1189,8 @@ static INPUT_PORTS_START( astormbl )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_START /* player 2 */
+
+	PORT_START_TAG("P2")	/* player 2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
@@ -1228,7 +1199,8 @@ static INPUT_PORTS_START( astormbl )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_START
+
+	PORT_START_TAG("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
@@ -1237,8 +1209,44 @@ static INPUT_PORTS_START( astormbl )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-	SYS16_COINAGE
-	PORT_START	/* DSW1 */
+
+	PORT_START_TAG("COINAGE")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x05, "2 Coins/1 Credit 5/3 6/4" )
+	PORT_DIPSETTING(    0x04, "2 Coins/1 Credit 4/3" )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, "1 Coin/1 Credit 2/3" )
+	PORT_DIPSETTING(    0x02, "1 Coin/1 Credit 4/5" )
+	PORT_DIPSETTING(    0x03, "1 Coin/1 Credit 5/6" )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin B too) or 1/1" )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x50, "2 Coins/1 Credit 5/3 6/4" )
+	PORT_DIPSETTING(    0x40, "2 Coins/1 Credit 4/3" )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, "1 Coin/1 Credit 2/3" )
+	PORT_DIPSETTING(    0x20, "1 Coin/1 Credit 4/5" )
+	PORT_DIPSETTING(    0x30, "1 Coin/1 Credit 5/6" )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too) or 1/1" )
+
+	PORT_START_TAG("DSW1")	/* DSW1 */
 	PORT_DIPNAME( 0x01, 0x01, "2 Credits to Start" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1263,7 +1271,8 @@ static INPUT_PORTS_START( astormbl )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START /* player 3 */
+
+	PORT_START_TAG("P3")	/* player 3 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
@@ -1275,41 +1284,14 @@ static INPUT_PORTS_START( astormbl )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mwalkbl )
-	PORT_START /* player 1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_START /* player 2 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_START /* service */
+	PORT_INCLUDE( astormbl )
+	
+	PORT_MODIFY("SERVICE")	/* service */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	SYS16_COINAGE
-	PORT_START	/* DSW1 */
-	PORT_DIPNAME( 0x01, 0x01, "2 Credits to Start" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW1")	/* DSW1 */
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
@@ -1327,22 +1309,12 @@ static INPUT_PORTS_START( mwalkbl )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_START /* player 3 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
-//  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("P3")	/* player 3 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 INPUT_PORTS_END
 
-
 /*****************************************************************************/
-
-
 
 ROM_START( astormbl )
 	ROM_REGION( 0x080000, REGION_CPU1, 0 ) /* 68000 code */
@@ -1574,5 +1546,4 @@ GAME( 1990, astormb2, astorm,   astormbl, astormbl, astormbl, ROT0, "bootleg", "
 
 GAME( 1990, mwalkbl,  mwalk,    mwalkbl,  mwalkbl,  mwalkbl,  ROT0, "bootleg", "Michael Jackson's Moonwalker (bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
-GAME( 1989, shdancbl, shdancer, shdancbl, mwalkbl, shdancbl, ROT0, "bootleg", "Shadow Dancer (bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-
+GAME( 1989, shdancbl, shdancer, shdancbl, mwalkbl,  shdancbl, ROT0, "bootleg", "Shadow Dancer (bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

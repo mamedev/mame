@@ -154,10 +154,10 @@ static ADDRESS_MAP_START( thedeep_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xdfff) AM_READ(SMH_RAM				)	// RAM (MCU data copied here)
 	AM_RANGE(0xe000, 0xe000) AM_READ(thedeep_protection_r	)	// From MCU
 	AM_RANGE(0xe004, 0xe004) AM_READ(thedeep_e004_r		)	// ?
-	AM_RANGE(0xe008, 0xe008) AM_READ(input_port_0_r		)	// P1 (Inputs)
-	AM_RANGE(0xe009, 0xe009) AM_READ(input_port_1_r		)	// P2
-	AM_RANGE(0xe00a, 0xe00a) AM_READ(input_port_2_r		)	// DSW1
-	AM_RANGE(0xe00b, 0xe00b) AM_READ(input_port_3_r		)	// DSW2
+	AM_RANGE(0xe008, 0xe008) AM_READ_PORT("e008")			// P1 (Inputs)
+	AM_RANGE(0xe009, 0xe009) AM_READ_PORT("e009")			// P2
+	AM_RANGE(0xe00a, 0xe00a) AM_READ_PORT("e00a")			// DSW1
+	AM_RANGE(0xe00b, 0xe00b) AM_READ_PORT("e00b")			// DSW2
 	AM_RANGE(0xe400, 0xe7ff) AM_READ(SMH_RAM				)	// Sprites
 	AM_RANGE(0xe800, 0xefff) AM_READ(SMH_RAM				)	// Text Layer
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM				)	// Background Layer
@@ -209,7 +209,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( thedeep )
-	PORT_START_TAG("IN0")	//  e008
+	PORT_START_TAG("e008")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )	// Up / down shown in service mode
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
@@ -219,7 +219,7 @@ static INPUT_PORTS_START( thedeep )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START1  )
 
-	PORT_START_TAG("IN1")	// e009
+	PORT_START_TAG("e009")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
@@ -229,7 +229,7 @@ static INPUT_PORTS_START( thedeep )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START2  )
 
-	PORT_START_TAG("IN2")	// e00a
+	PORT_START_TAG("e00a")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
@@ -253,7 +253,7 @@ static INPUT_PORTS_START( thedeep )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN3")	// e00b
+	PORT_START_TAG("e00b")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -274,7 +274,7 @@ static INPUT_PORTS_START( thedeep )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START_TAG("IN4")	// Read by the mcu
+	PORT_START_TAG("MCU")	// Read by the mcu
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
@@ -344,7 +344,7 @@ static INTERRUPT_GEN( thedeep_interrupt )
 	{
 		if (protection_command != 0x59)
 		{
-			int coins = input_port_read_indexed(machine, 4);
+			int coins = input_port_read(machine, "MCU");
 			if		(coins & 1)	protection_data = 1;
 			else if	(coins & 2)	protection_data = 2;
 			else if	(coins & 4)	protection_data = 3;
@@ -501,4 +501,3 @@ ROM_END
 
 GAME( 1987, thedeep, 0,      thedeep, thedeep, 0, ROT270, "Woodplace Inc.", "The Deep (Japan)", 0 )
 GAME( 1988, rundeep, thedeep,thedeep, thedeep, 0, ROT270, "Cream",     "Run Deep", 0 )
-

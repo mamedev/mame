@@ -195,7 +195,7 @@ static int from_mcu_pending, from_z80_pending, invert_coin_lockout;
 static READ8_HANDLER( in4_mcu_r )
 {
 //  logerror("%04x: in4_mcu_r\n",activecpu_get_pc());
-	return input_port_read_indexed(machine, 4) | (from_mcu_pending << 6) | (from_z80_pending << 7);
+	return input_port_read(machine, "P2") | (from_mcu_pending << 6) | (from_z80_pending << 7);
 }
 
 static READ8_HANDLER( sqix_from_mcu_r )
@@ -268,11 +268,11 @@ static READ8_HANDLER( mcu_p3_r )
 {
 	if ((port1 & 0x10) == 0)
 	{
-		return input_port_read_indexed(machine, 0);
+		return input_port_read(machine, "DSW1");
 	}
 	else if ((port1 & 0x20) == 0)
 	{
-		return input_port_read_indexed(machine, 2) | (from_mcu_pending << 6) | (from_z80_pending << 7);
+		return input_port_read(machine, "SYSTEM") | (from_mcu_pending << 6) | (from_z80_pending << 7);
 	}
 	else if ((port1 & 0x40) == 0)
 	{
@@ -297,7 +297,7 @@ static READ8_HANDLER( nmi_ack_r )
 
 static READ8_HANDLER( bootleg_in0_r )
 {
-	return BITSWAP8(input_port_read_indexed(machine, 0), 0,1,2,3,4,5,6,7);
+	return BITSWAP8(input_port_read(machine, "DSW1"), 0,1,2,3,4,5,6,7);
 }
 
 static WRITE8_HANDLER( bootleg_flipscreen_w )
@@ -325,7 +325,7 @@ static int read_dial(running_machine *machine, int player)
 	static int sign[2];
 
 	/* get the new position and adjust the result */
-	newpos = input_port_read_indexed(machine, 3 + player);
+	newpos = input_port_read(machine, player ? "DIAL2" : "DIAL1");
 	if (newpos != oldpos[player])
 	{
 		sign[player] = ((newpos - oldpos[player]) & 0x80) >> 7;
@@ -401,11 +401,11 @@ static WRITE8_HANDLER( hotsmash_68705_portC_w )
 		switch (data & 0x07)
 		{
 			case 0x0:	// dsw A
-				portA_in = input_port_read_indexed(machine, 0);
+				portA_in = input_port_read(machine, "DSW1");
 				break;
 
 			case 0x1:	// dsw B
-				portA_in = input_port_read_indexed(machine, 1);
+				portA_in = input_port_read(machine, "DSW2");
 				break;
 
 			case 0x2:
@@ -449,7 +449,7 @@ logerror("%04x: z80 reads answer %02x\n",activecpu_get_pc(),from_mcu);
 static READ8_HANDLER(hotsmash_ay_port_a_r)
 {
 //logerror("%04x: ay_port_a_r and mcu_pending is %d\n",activecpu_get_pc(),from_mcu_pending);
-	return input_port_read_indexed(machine, 2) | ((from_mcu_pending^1) << 7);
+	return input_port_read(machine, "SYSTEM") | ((from_mcu_pending^1) << 7);
 }
 
 /**************************************************************************
@@ -469,10 +469,10 @@ static READ8_HANDLER(pbillian_from_mcu_r)
 
 	switch (from_z80)
 	{
-		case 0x01: return input_port_read_indexed(machine, 4 + 2 * curr_player);
-		case 0x02: return input_port_read_indexed(machine, 5 + 2 * curr_player);
-		case 0x04: return input_port_read_indexed(machine, 0);
-		case 0x08: return input_port_read_indexed(machine, 1);
+		case 0x01: return input_port_read(machine, curr_player ? "PADDLE2" : "PADDLE1");
+		case 0x02: return input_port_read(machine, curr_player ? "DIAL2" : "DIAL1");
+		case 0x04: return input_port_read(machine, "DSW1");
+		case 0x08: return input_port_read(machine, "DSW2");
 		case 0x80: curr_player = 0; return 0;
 		case 0x81: curr_player = 1; return 0;
 	}
@@ -485,7 +485,7 @@ static READ8_HANDLER(pbillian_ay_port_a_r)
 {
 //  logerror("%04x: ay_port_a_r\n",activecpu_get_pc());
 	 /* bits 76------  MCU status bits */
-	return (mame_rand(machine)&0xc0)|input_port_read_indexed(machine, 3);
+	return (mame_rand(machine) & 0xc0) | input_port_read(machine, "BUTTONS");
 }
 
 
@@ -586,7 +586,7 @@ static ADDRESS_MAP_START( bootleg_port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0407, 0x0407) AM_WRITE(AY8910_control_port_1_w)
 	AM_RANGE(0x0408, 0x0408) AM_WRITE(bootleg_flipscreen_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(superqix_0410_w)	/* ROM bank, NMI enable, tile bank */
-	AM_RANGE(0x0418, 0x0418) AM_READ(input_port_2_r)
+	AM_RANGE(0x0418, 0x0418) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0800, 0x77ff) AM_RAM_WRITE(superqix_bitmapram_w) AM_BASE(&superqix_bitmapram)
 	AM_RANGE(0x8800, 0xf7ff) AM_RAM_WRITE(superqix_bitmapram2_w) AM_BASE(&superqix_bitmapram2)
 ADDRESS_MAP_END
@@ -615,56 +615,56 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( pbillian )
-	PORT_START
+	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(	0x03, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(	0x04, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(	0x05, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(	0x06, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(	0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( 1C_3C ) )
 	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x28, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(	0x18, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(	0x28, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(	0x30, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(	0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(	0x08, DEF_STR( 1C_3C ) )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
-	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(	0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Yes ) )
 
-	PORT_START
+	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x03, "2" )
-	PORT_DIPSETTING(    0x02, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(	0x03, "2" )
+	PORT_DIPSETTING(	0x02, "3" )
+	PORT_DIPSETTING(	0x01, "4" )
+	PORT_DIPSETTING(	0x00, "5" )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c, "10/20/300K Points" )
-	PORT_DIPSETTING(    0x00, "10/30/500K Points" )
-	PORT_DIPSETTING(    0x08, "20/30/400K Points" )
-	PORT_DIPSETTING(    0x04, "30/40/500K Points" )
+	PORT_DIPSETTING(	0x0c, "10/20/300K Points" )
+	PORT_DIPSETTING(	0x00, "10/30/500K Points" )
+	PORT_DIPSETTING(	0x08, "20/30/400K Points" )
+	PORT_DIPSETTING(	0x04, "30/40/500K Points" )
 	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Very_Hard ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( Hard ) )
+	PORT_DIPSETTING(	0x30, DEF_STR( Very_Hard ) )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -674,7 +674,7 @@ static INPUT_PORTS_START( pbillian )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )
 
-	PORT_START
+	PORT_START_TAG("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )	// high score initials
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	// fire (M powerup) + high score initials
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL	// high score initials
@@ -684,71 +684,71 @@ static INPUT_PORTS_START( pbillian )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )	// mcu status (pending mcu->z80)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	// mcu status (pending z80->mcu)
 
-	PORT_START
+	PORT_START_TAG("PADDLE1")
 	PORT_BIT( 0x3f, 0x00, IPT_PADDLE_V  ) PORT_MINMAX(0,0x3f) PORT_SENSITIVITY(30) PORT_KEYDELTA(3) PORT_CENTERDELTA(0) PORT_REVERSE
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
-	PORT_START
+	PORT_START_TAG("DIAL1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10)
 
-	PORT_START
+	PORT_START_TAG("PADDLE2")
 	PORT_BIT( 0x3f, 0x00, IPT_PADDLE_V  ) PORT_MINMAX(0,0x3f) PORT_SENSITIVITY(30) PORT_KEYDELTA(3) PORT_CENTERDELTA(0) PORT_REVERSE  PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 
-	PORT_START
+	PORT_START_TAG("DIAL2")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_COCKTAIL
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hotsmash )
-	PORT_START
+	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(	0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(	0xc0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(	0x80, DEF_STR( 1C_2C ) )
 
-	PORT_START
+	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, "Difficulty vs. CPU" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( Easy ) )
+	PORT_DIPSETTING(	0x03, DEF_STR( Normal ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x0c, 0x0c, "Difficulty vs. 2P" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(	0x08, DEF_STR( Easy ) )
+	PORT_DIPSETTING(	0x0c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(	0x04, DEF_STR( Hard ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x10, 0x10, "Points per game" )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(	0x00, "3" )
+	PORT_DIPSETTING(	0x10, "4" )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -758,63 +758,63 @@ static INPUT_PORTS_START( hotsmash )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	// mcu status (0 = pending mcu->z80)
 
-	PORT_START
+	PORT_START_TAG("DIAL1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(30) PORT_CENTERDELTA(0) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("DIAL2")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(30) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( superqix )
-	PORT_START	/* DSW1 */
+	PORT_START_TAG("DSW1")	/* DSW1 */
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "Freeze" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(	0x08, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ))
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(	0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( 2C_3C ))
+	PORT_DIPSETTING(	0x20, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ))
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(	0xc0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( 2C_3C ))
+	PORT_DIPSETTING(	0x80, DEF_STR( 1C_2C ) )
 
-	PORT_START	/* DSW2 */
+	PORT_START_TAG("DSW2")	/* DSW2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( Easy ) )
+	PORT_DIPSETTING(	0x03, DEF_STR( Normal ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x08, "20000 50000" )
-	PORT_DIPSETTING(    0x0c, "30000 100000" )
-	PORT_DIPSETTING(    0x04, "50000 100000" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(	0x08, "20000 50000" )
+	PORT_DIPSETTING(	0x0c, "30000 100000" )
+	PORT_DIPSETTING(	0x04, "50000 100000" )
+	PORT_DIPSETTING(	0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x30, "3" )
-	PORT_DIPSETTING(    0x10, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(	0x20, "2" )
+	PORT_DIPSETTING(	0x30, "3" )
+	PORT_DIPSETTING(	0x10, "4" )
+	PORT_DIPSETTING(	0x00, "5" )
 	PORT_DIPNAME( 0xc0, 0xc0, "Fill Area" )
-	PORT_DIPSETTING(    0x80, "70%" )
-	PORT_DIPSETTING(    0xc0, "75%" )
-	PORT_DIPSETTING(    0x40, "80%" )
-	PORT_DIPSETTING(    0x00, "85%" )
+	PORT_DIPSETTING(	0x80, "70%" )
+	PORT_DIPSETTING(	0xc0, "75%" )
+	PORT_DIPSETTING(	0x40, "80%" )
+	PORT_DIPSETTING(	0x00, "85%" )
 
-	PORT_START
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -824,7 +824,7 @@ static INPUT_PORTS_START( superqix )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	// Z80 status (pending z80->mcu)
 
-	PORT_START
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -834,7 +834,7 @@ static INPUT_PORTS_START( superqix )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_VBLANK )	/* ??? */
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL

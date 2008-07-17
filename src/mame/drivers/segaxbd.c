@@ -289,11 +289,11 @@ static READ16_HANDLER( iochip_0_r )
                 D6: /INTR of ADC0804
                 D5-D0: CN C pin 24-19 (switch state 0= open, 1= closed)
             */
-			return iochip_r(0, 0, input_port_read_indexed(machine, 0));
+			return iochip_r(0, 0, input_port_read(machine, "IO0PORTA"));
 
 		case 1:
 			/* I/O port: CN C pins 17,15,13,11,9,7,5,3 */
-			return iochip_r(0, 1, input_port_read_indexed(machine, 1));
+			return iochip_r(0, 1, input_port_read(machine, "IO0PORTB"));
 
 		case 2:
 			/* Output port */
@@ -364,19 +364,19 @@ static READ16_HANDLER( iochip_1_r )
 	{
 		case 0:
 			/* Input port: switches, CN D pin A1-8 (switch state 1= open, 0= closed) */
-			return iochip_r(1, 0, input_port_read_indexed(machine, 2));
+			return iochip_r(1, 0, input_port_read(machine, "IO1PORTA"));
 
 		case 1:
 			/* Input port: switches, CN D pin A9-16 (switch state 1= open, 0= closed) */
-			return iochip_r(1, 1, input_port_read_indexed(machine, 3));
+			return iochip_r(1, 1, input_port_read(machine, "IO1PORTB"));
 
 		case 2:
 			/* Input port: DIP switches (1= off, 0= on) */
-			return iochip_r(1, 2, input_port_read_indexed(machine, 4));
+			return iochip_r(1, 2, input_port_read(machine, "IO1PORTC"));
 
 		case 3:
 			/* Input port: DIP switches (1= off, 0= on) */
-			return iochip_r(1, 3, input_port_read_indexed(machine, 5));
+			return iochip_r(1, 3, input_port_read(machine, "IO1PORTD"));
 
 		case 4:
 			/* Unused */

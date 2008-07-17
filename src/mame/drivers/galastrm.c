@@ -103,13 +103,13 @@ static READ32_HANDLER( galastrm_input_r )
 	{
 		case 0x00:
 		{
-			return (input_port_read_indexed(machine,0) << 16) | input_port_read_indexed(machine,1) |
+			return (input_port_read(machine, "IN0") << 16) | input_port_read(machine, "IN1") |
 				  (eeprom_read_bit() << 7) | frame_counter << 9;
 		}
 
 		case 0x01:
 		{
-			return input_port_read_indexed(machine,2) | (coin_word << 16);
+			return input_port_read(machine, "IN2") | (coin_word << 16);
 		}
  	}
 //logerror("CPU #0 PC %06x: read input %06x\n",activecpu_get_pc(),offset);
@@ -170,9 +170,9 @@ static READ32_HANDLER( galastrm_adstick_ctrl_r )
 	if (offset == 0x00)
 	{
 		if (ACCESSING_BITS_24_31)
-			return input_port_read_indexed(machine, 3) << 24;
+			return input_port_read(machine, "STICKX") << 24;
 		if (ACCESSING_BITS_16_23)
-			return input_port_read_indexed(machine, 4) << 16;
+			return input_port_read(machine, "STICKY") << 16;
 	}
 	return 0;
 }
@@ -221,10 +221,10 @@ ADDRESS_MAP_END
 ***********************************************************/
 
 static INPUT_PORTS_START( galastrm )
-	PORT_START      /* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0xFFFF, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START      /* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)	/* Freeze input */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -242,7 +242,7 @@ static INPUT_PORTS_START( galastrm )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START      /* IN2 */
+	PORT_START_TAG("IN2")	/* IN2 */
 	PORT_SERVICE_NO_TOGGLE( 0x0001, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_SERVICE1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_COIN1   )
@@ -260,10 +260,10 @@ static INPUT_PORTS_START( galastrm )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("STICKX")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(60) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("STICKY")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(60) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
 INPUT_PORTS_END
 

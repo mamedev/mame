@@ -30,18 +30,18 @@ PALETTE_INIT( truco );
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_RAM									/* general purpose ram */
-	AM_RANGE(0x1800, 0x7bff) AM_RAM AM_BASE(&videoram)				/* video ram */
-	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_BASE(&battery_ram)			/* battery backed ram */
-	AM_RANGE(0x8000, 0x8000) AM_READWRITE(input_port_0_r, SMH_NOP)	/* controls (and irq ack?) */
-	AM_RANGE(0x8001, 0x8001) AM_READWRITE(SMH_NOP, SMH_NOP)			/* unknown */
-	AM_RANGE(0x8002, 0x8002) AM_READWRITE(input_port_1_r, DAC_0_data_w)	/* dipswitches */
-	AM_RANGE(0x8003, 0x8007) AM_READWRITE(SMH_NOP, SMH_NOP)			/* unknown */
+	AM_RANGE(0x0000, 0x17ff) AM_RAM										/* general purpose ram */
+	AM_RANGE(0x1800, 0x7bff) AM_RAM AM_BASE(&videoram)					/* video ram */
+	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_BASE(&battery_ram)				/* battery backed ram */
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("P1") AM_WRITENOP				/* controls (and irq ack?) */
+	AM_RANGE(0x8001, 0x8001) AM_READWRITE(SMH_NOP, SMH_NOP)				/* unknown */
+	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("DSW") AM_WRITE(DAC_0_data_w)	/* dipswitches */
+	AM_RANGE(0x8003, 0x8007) AM_READWRITE(SMH_NOP, SMH_NOP)				/* unknown */
 	AM_RANGE(0x8008, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( truco )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("P1")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -51,7 +51,7 @@ static INPUT_PORTS_START( truco )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 
-	PORT_START /* DSW1 */
+	PORT_START_TAG("DSW")	/* DSW1 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING (	0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING (	0x00, DEF_STR( On ) )
@@ -77,7 +77,7 @@ static INPUT_PORTS_START( truco )
 	PORT_DIPSETTING (	0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING (	0x00, DEF_STR( On ) )
 
-	PORT_START	/* IN1 - FAKE - Used for coinup */
+	PORT_START_TAG("COIN")	/* IN1 - FAKE - Used for coinup */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -123,7 +123,7 @@ static INTERRUPT_GEN( truco_interrupt )
 	/* coinup */
 	static int trigger = 0;
 
-	if ( input_port_read_indexed(machine,  2 ) & 1 )
+	if ( input_port_read(machine,  "COIN") & 1 )
 	{
 		if ( trigger == 0 )
 		{
