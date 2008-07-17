@@ -90,7 +90,7 @@ static WRITE32_HANDLER( f3_control_w )
 			return;
 
 		case 0x01: /* Coin counters & lockouts */
-			if (ACCESSING_BITS_24_31) 
+			if (ACCESSING_BITS_24_31)
 			{
 				coin_lockout_w(0,~data & 0x01000000);
 				coin_lockout_w(1,~data & 0x02000000);
@@ -101,7 +101,7 @@ static WRITE32_HANDLER( f3_control_w )
 			return;
 
 		case 0x04: /* Eeprom */
-			if (ACCESSING_BITS_0_7) 
+			if (ACCESSING_BITS_0_7)
 			{
 				eeprom_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 				eeprom_write_bit(data & 0x04);
@@ -110,7 +110,7 @@ static WRITE32_HANDLER( f3_control_w )
 			return;
 
 		case 0x05:	/* Player 3 & 4 coin counters */
-			if (ACCESSING_BITS_24_31) 
+			if (ACCESSING_BITS_24_31)
 			{
 				coin_lockout_w(2,~data & 0x01000000);
 				coin_lockout_w(3,~data & 0x02000000);
@@ -262,13 +262,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( kn )
 	PORT_INCLUDE( f3 )
-  
+
 	PORT_MODIFY("IN2")
   	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
   	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
   	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
   	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
-  
+
 	PORT_MODIFY("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)

@@ -508,7 +508,7 @@ static WRITE16_HANDLER( fdc_ctrl_w )
 
 static UINT8 hotrod_io_r(running_machine *machine, int port)
 {
-	switch(port) 
+	switch(port)
 	{
 	case 0:
 		return input_port_read(machine, "P1");
@@ -532,9 +532,9 @@ static UINT8 hotrod_io_r(running_machine *machine, int port)
 
 static UINT8 dcclub_io_r(running_machine *machine, int port)
 {
-	switch(port) 
+	switch(port)
 	{
-	case 0: 
+	case 0:
 	{
 		static const UINT8 pos[16] = { 0, 1, 3, 2, 6, 4, 12, 8, 9 };
 		return (input_port_read(machine, "P1") & 0xf) | ((~pos[input_port_read(machine, "PADDLE")>>4]<<4) & 0xf0);
@@ -563,7 +563,7 @@ static UINT8 mahmajn_io_r(running_machine *machine, int port)
 {
 	static const char *keynames[] = { "MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5", "P1", "P2" };
 
-	switch(port) 
+	switch(port)
 	{
 	case 0:
 		return ~(1 << cur_input_line);
@@ -587,7 +587,7 @@ static UINT8 mahmajn_io_r(running_machine *machine, int port)
 
 static void mahmajn_io_w(running_machine *machine, int port, UINT8 data)
 {
-	switch(port) 
+	switch(port)
 	{
 	case 3:
 		if(data & 4)
@@ -603,7 +603,7 @@ static void mahmajn_io_w(running_machine *machine, int port, UINT8 data)
 
 static void hotrod_io_w(running_machine *machine, int port, UINT8 data)
 {
-	switch(port) 
+	switch(port)
 	{
 	case 3: // Lamps
 		break;
@@ -621,7 +621,7 @@ static WRITE16_HANDLER( hotrod3_ctrl_w )
 {
 	static const char *portnames[] = { "PEDAL1", "PEDAL2", "PEDAL3", "PEDAL4" };
 
-	if(ACCESSING_BITS_0_7) 
+	if(ACCESSING_BITS_0_7)
 	{
 		data &= 3;
 		hotrod_ctrl_cur = input_port_read_safe(machine, portnames[data], 0);
@@ -630,9 +630,9 @@ static WRITE16_HANDLER( hotrod3_ctrl_w )
 
 static READ16_HANDLER( hotrod3_ctrl_r )
 {
-	if(ACCESSING_BITS_0_7) 
+	if(ACCESSING_BITS_0_7)
 	{
-		switch(offset) 
+		switch(offset)
 		{
 			// Steering dials
 			case 0:
@@ -652,8 +652,8 @@ static READ16_HANDLER( hotrod3_ctrl_r )
 			case 7:
 				return input_port_read_safe(machine, "DIAL4", 0) >> 8;
 
-			case 8: 
-			{ 
+			case 8:
+			{
 				// Serial ADCs for the accel
 				int v = hotrod_ctrl_cur & 0x80;
 				hotrod_ctrl_cur <<= 1;

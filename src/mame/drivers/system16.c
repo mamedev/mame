@@ -1396,18 +1396,18 @@ static READ16_HANDLER( passht4b_service_r )
 	return val;
 }
 
-static READ16_HANDLER( passht4b_io1_r ) 
-{	
+static READ16_HANDLER( passht4b_io1_r )
+{
 	return passht4b_io1_val;
 }
 
-static READ16_HANDLER( passht4b_io2_r ) 
-{	
+static READ16_HANDLER( passht4b_io2_r )
+{
 	return passht4b_io2_val;
 }
 
-static READ16_HANDLER( passht4b_io3_r ) 
-{	
+static READ16_HANDLER( passht4b_io3_r )
+{
 	return passht4b_io3_val;
 }
 
@@ -1854,18 +1854,18 @@ MACHINE_DRIVER_END
 /***************************************************************************/
 
 static READ16_HANDLER( tt_io_player1_r )
-{ 
-	return input_port_read(machine, "P1") << 8; 
+{
+	return input_port_read(machine, "P1") << 8;
 }
 
 static READ16_HANDLER( tt_io_player2_r )
-{ 
-	return input_port_read(machine, "P2") << 8; 
+{
+	return input_port_read(machine, "P2") << 8;
 }
 
 static READ16_HANDLER( tt_io_service_r )
-{ 
-	return input_port_read(machine, "SERVICE") << 8; 
+{
+	return input_port_read(machine, "SERVICE") << 8;
 }
 
 /*

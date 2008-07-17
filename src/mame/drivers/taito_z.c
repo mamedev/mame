@@ -1286,7 +1286,7 @@ static READ16_HANDLER( dblaxle_steer_input_r )
 	}
 
 	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %02x\n", activecpu_get_pc(), offset);
-	
+
 	return 0x00;
 }
 

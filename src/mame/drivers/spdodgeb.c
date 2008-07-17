@@ -284,7 +284,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3002, 0x3002) AM_WRITE(sound_command_w)
 //  AM_RANGE(0x3003, 0x3003) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x3004, 0x3004) AM_WRITE(spdodgeb_scrollx_lo_w)
-//  AM_RANGE(0x3005, 0x3005) AM_WRITE(SMH_RAM)			/* mcu63701_output_w */
+//  AM_RANGE(0x3005, 0x3005) AM_WRITE(SMH_RAM)          /* mcu63701_output_w */
 	AM_RANGE(0x3006, 0x3006) AM_WRITE(spdodgeb_ctrl_w)	/* scroll hi, flip screen, bank switch, palette select */
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(mcu63701_w)
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)

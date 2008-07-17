@@ -868,7 +868,7 @@ static WRITE8_HANDLER(hc11_data_w)
 
 static READ8_HANDLER(hc11_analog_r)
 {
-	static const char *portnames[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4", 
+	static const char *portnames[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4",
 										"ANALOG5", "ANALOG6", "ANALOG7", "ANALOG8" };
 
 	return input_port_read_safe(machine, portnames[offset], 0);

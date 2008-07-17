@@ -591,11 +591,11 @@ static ADDRESS_MAP_START( rocknms_main_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x108000, 0x10ffff) AM_READ(SMH_RAM				)	// Work RAM
 	AM_RANGE(0x200000, 0x23ffff) AM_READ(tetrisp2_priority_r	)	// Priority
 	AM_RANGE(0x300000, 0x31ffff) AM_READ(SMH_RAM				)	// Palette
-//  AM_RANGE(0x500000, 0x50ffff) AM_READ(SMH_RAM				)   // Line
+//  AM_RANGE(0x500000, 0x50ffff) AM_READ(SMH_RAM                )   // Line
 	AM_RANGE(0x600000, 0x60ffff) AM_READ(SMH_RAM				)	// Rotation
 	AM_RANGE(0x800000, 0x803fff) AM_READ(SMH_RAM				)	// Foreground
 	AM_RANGE(0x804000, 0x807fff) AM_READ(SMH_RAM				)	// Background
-//  AM_RANGE(0x808000, 0x809fff) AM_READ(SMH_RAM				)   // ???
+//  AM_RANGE(0x808000, 0x809fff) AM_READ(SMH_RAM                )   // ???
 	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r			)	// NVRAM
 	AM_RANGE(0xa30000, 0xa30001) AM_READ(rockn_soundvolume_r	)	// Sound Volume
 	AM_RANGE(0xa40002, 0xa40003) AM_READ(tetrisp2_sound_r		)	// Sound

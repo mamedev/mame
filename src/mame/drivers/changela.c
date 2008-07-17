@@ -431,7 +431,7 @@ static INPUT_PORTS_START( changela )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_DIPNAME( 0x30, 0x30, "Self Test Switch" )			PORT_DIPLOCATION("SWT:1,2")
-	//PORT_DIPSETTING(    0x00, "?" )						/* Not possible, 3-state switch */
+	//PORT_DIPSETTING(    0x00, "?" )                       /* Not possible, 3-state switch */
 	PORT_DIPSETTING(    0x20, "Free Game" )					/* "Puts a credit on the game without increasing the coin counter." */
 	PORT_DIPSETTING(    0x10, DEF_STR( Test ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Off ) )

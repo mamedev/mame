@@ -741,7 +741,7 @@ static ADDRESS_MAP_START( penbros_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")				// Coins
 	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r		)	// Watchdog
-//  AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r	)   // Protection
+//  AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r   )   // Protection
 	AM_RANGE(0xb00000, 0xb3ffff) AM_READ(SMH_RAM				)	// Sprites
 	AM_RANGE(0xb40000, 0xb4ffff) AM_READ(SMH_RAM				)	// Palette
 	AM_RANGE(0xa00000, 0xa03fff) AM_READ(seta_sound_word_r 		)	// Sound

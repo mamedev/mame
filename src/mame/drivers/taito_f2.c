@@ -404,8 +404,8 @@ static READ16_HANDLER( footchmp_input_r )
 		case 0x02:
 			return input_port_read(machine, "IN2");
 
-//		case 0x03:
-//			return (coin_word & mem_mask);
+//      case 0x03:
+//          return (coin_word & mem_mask);
 
 		case 0x05:
 			return input_port_read(machine, "IN0");
@@ -450,8 +450,8 @@ static READ16_HANDLER( ninjak_input_r )
 		case 0x06:
 			return (input_port_read(machine, "IN2") << 8);
 
-//		case 0x07:
-//			return (coin_word & mem_mask);
+//      case 0x07:
+//          return (coin_word & mem_mask);
 	}
 
 	logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n", activecpu_get_pc(), offset);
@@ -513,8 +513,8 @@ static READ16_HANDLER( deadconx_input_r )
 		case 0x02:
 			return input_port_read(machine, "IN2");
 
-//		case 0x03:
-//			return (coin_word & mem_mask);
+//      case 0x03:
+//          return (coin_word & mem_mask);
 
 		case 0x05:
 			return input_port_read(machine, "IN0");

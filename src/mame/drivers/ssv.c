@@ -876,8 +876,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( survarts_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r	)	// Watchdog
-//  AM_RANGE(0x290000, 0x290001) AM_READ(SMH_NOP              )	// ?
-//  AM_RANGE(0x2a0000, 0x2a0001) AM_READ(SMH_NOP              )	// ?
+//  AM_RANGE(0x290000, 0x290001) AM_READ(SMH_NOP              ) // ?
+//  AM_RANGE(0x2a0000, 0x2a0001) AM_READ(SMH_NOP              ) // ?
 
 	AM_RANGE(0x400000, 0x43ffff) AM_READ(SMH_RAM)				// dyna
 
@@ -885,7 +885,7 @@ static ADDRESS_MAP_START( survarts_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	SSV_READMEM( 0xf00000 )
 ADDRESS_MAP_END
 static ADDRESS_MAP_START( survarts_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP             )	// ? 0,4 at the start
+//  AM_RANGE(0x210002, 0x210003) AM_WRITE(SMH_NOP             ) // ? 0,4 at the start
 	AM_RANGE(0x400000, 0x43ffff) AM_WRITE(SMH_RAM)				// dyna
 
 	SSV_WRITEMEM
