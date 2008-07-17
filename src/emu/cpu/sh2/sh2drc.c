@@ -10,6 +10,9 @@
     ST-V status:
     colmns97 & stress crash due to SCSP stream->machine getting corrupted.
 
+    cottonbm w/US bios: run to 60323B4 on master, then MOV insn @ 602f5aa crashes?
+    actually crash on slave @ 6032b38 after above.  reading wrong addr for jump vector.
+
 ***************************************************************************/
 
 #include "debugger.h"
@@ -27,7 +30,7 @@
 #define LOG_UML						(0)	// log UML assembly
 #define LOG_NATIVE					(0)	// log native assembly
 
-#define SET_EA						(0)	// makes slower but "shows work" in the EA register like the interpreter
+#define SET_EA						(0)	// makes slower but "shows work" in the EA fake register like the interpreter
 
 #define DISABLE_FAST_REGISTERS				(0)	// set to 1 to turn off usage of register caching
 #define SINGLE_INSTRUCTION_MODE				(0)
@@ -226,9 +229,9 @@ static void cfunc_printf_probe(void *param)
 		(UINT32)sh2->macl,
 		(UINT32)sh2->mach,
 		(UINT32)sh2->gbr);
-	printf(" evec %x irqsr %x\n", 
+	printf(" evec %x irqsr %x pc=%08x\n", 
 		(UINT32)sh2->evec,
-		(UINT32)sh2->irqsr);
+		(UINT32)sh2->irqsr, (UINT32)sh2->pc);
 }
 
 /*-------------------------------------------------
@@ -579,7 +582,7 @@ static void sh2_init(int index, int clock, const void *config, int (*irqcallback
 		flags |= DRCUML_OPTION_LOG_UML;
 	if (LOG_NATIVE)
 		flags |= DRCUML_OPTION_LOG_NATIVE;
-	sh2->drcuml = drcuml_alloc(cache, flags, 1, 32, 0);
+	sh2->drcuml = drcuml_alloc(cache, flags, 1, 32, 1);
 	if (sh2->drcuml == NULL)
 		fatalerror("Error initializing the UML");
 
@@ -748,7 +751,7 @@ static int sh2_execute(int cycles)
 		execute_result = drcuml_execute(drcuml, sh2->entry);
 
 		/* if we need to recompile, do it */
-		if (execute_result == EXECUTE_MISSING_CODE)
+   		if (execute_result == EXECUTE_MISSING_CODE)
 		{
 			code_compile_block(drcuml, 0, sh2->pc);
 		}
@@ -901,8 +904,7 @@ static void static_generate_entry_point(drcuml_state *drcuml)
 	/* check for interrupts */
 	UML_CALLC(block, cfunc_checkirqs, NULL);
 
-	UML_MOV(block, IREG(0), MEM(&sh2->evec));			// mov r0, evec
-	UML_CMP(block, IREG(0), IMM(0xffffffff));			// cmp r0, 0xffffffff
+	UML_CMP(block, MEM(&sh2->evec), IMM(0xffffffff));		// cmp evec, 0xffffffff
 	UML_JMPc(block, IF_Z, skip);      				// jz skip
 
 	UML_SUB(block, R32(15), R32(15), IMM(4));   			// sub R15, R15, #4
@@ -1009,13 +1011,10 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int size, int 
 	// with internal handlers this becomes easier.
 	// if addr < 0x40000000 AND it with AM and do the read/write, else just do the read/write
 	UML_TEST(block, IREG(0), IMM(0x80000000));		// test r0, #0x80000000
-	UML_JMPc(block, IF_NZ, label+1);			// if high bit is set, don't mask
+	UML_JMPc(block, IF_NZ, label);				// if high bit is set, don't mask
 
 	UML_CMP(block, IREG(0), IMM(0x40000000));		// cmp #0x40000000, r0
-	UML_JMPc(block, IF_Z, label);
-	UML_JMPc(block, IF_GE, label+1);    			// bge label+1
-
-	UML_LABEL(block, label++);				// label:
+	UML_JMPc(block, IF_AE, label);    			// bae label
 
 	UML_AND(block, IREG(0), IREG(0), IMM(AM));		// and r0, r0, #AM (0xc7ffffff)
 
@@ -1259,8 +1258,7 @@ static void generate_update_cycles(drcuml_block *block, compiler_state *compiler
 		/* check for interrupts */
 		UML_CALLC(block, cfunc_checkirqs, NULL);
 
-		UML_MOV(block, IREG(0), MEM(&sh2->evec));			// mov r0, evec
-		UML_CMP(block, IREG(0), IMM(0xffffffff));			// cmp r0, 0xffffffff
+		UML_CMP(block, MEM(&sh2->evec), IMM(0xffffffff));		// cmp evec, 0xffffffff
 		UML_JMPc(block, IF_Z, skip);      				// jz skip
 
 		UML_SUB(block, R32(15), R32(15), IMM(4));   			// sub R15, R15, #4
@@ -2040,62 +2038,37 @@ static int generate_group_3(drcuml_block *block, compiler_state *compiler, const
 	switch (opcode & 15)
 	{
 	case  0: // CMPEQ(Rm, Rn); (equality)
-		UML_AND(block, IREG(0), MEM(&sh2->sr), IMM(~T));	// and r0, sr, ~T (clear the T bit)
-		UML_CMP(block, R32(Rm), R32(Rn));		// cmp Rm, Rn
-		UML_JMPc(block, IF_NE, compiler->labelnum);	// jne compiler->labelnum
-
-		UML_OR(block, IREG(0), IREG(0), IMM(T));	// or r0, r0, T
-		UML_LABEL(block, compiler->labelnum++);	     	// desc->pc:
-
-		UML_MOV(block, MEM(&sh2->sr), IREG(0));		// mov sh2->sr, r0
+		UML_CMP(block, R32(Rn), R32(Rm));		// cmp Rn, Rm
+		UML_SETc(block, IF_E, IREG(0));			// set E, r0
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(1));	// rolins sr, r0, 0, 1
 		return TRUE;
 		break;
 
 	case  2: // CMPHS(Rm, Rn); (unsigned greater than or equal)
-		UML_AND(block, IREG(0), MEM(&sh2->sr), IMM(~T));	// and r0, sr, ~T (clear the T bit)
-
-		UML_CMP(block, R32(Rm), R32(Rn));		// cmp Rm, Rn
-		UML_JMPc(block, IF_A, compiler->labelnum);	// ja labelnum
-
-		UML_OR(block, IREG(0), IREG(0), IMM(T));	// or r0, r0, T
-		UML_LABEL(block, compiler->labelnum++);	       	// labelnum+1:
-
-		UML_MOV(block, MEM(&sh2->sr), IREG(0));		// mov sh2->sr, r0
+		UML_CMP(block, R32(Rn), R32(Rm));		// cmp Rn, Rm
+		UML_SETc(block, IF_AE, IREG(0));		// set AE, r0
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(1));	// rolins sr, r0, 0, 1
 		return TRUE;
 		break;
 
 	case  3: // CMPGE(Rm, Rn); (signed greater than or equal)
-		UML_AND(block, IREG(0), MEM(&sh2->sr), IMM(~T));	// and r0, sr, ~T (clear the T bit)
-		UML_CMP(block, R32(Rm), R32(Rn));		// cmp Rm, Rn
-		UML_JMPc(block, IF_G, compiler->labelnum);	// jg compiler->labelnum
-
-		UML_OR(block, IREG(0), IREG(0), IMM(T));	// or r0, r0, T
-		UML_LABEL(block, compiler->labelnum++);	     	// labelnum:
-
-		UML_MOV(block, MEM(&sh2->sr), IREG(0));		// mov sh2->sr, r0
+		UML_CMP(block, R32(Rn), R32(Rm));		// cmp Rn, Rm
+		UML_SETc(block, IF_GE, IREG(0));		// set GE, r0
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(1));	// rolins sr, r0, 0, 1
 		return TRUE;
 		break;
 
 	case  6: // CMPHI(Rm, Rn); (unsigned greater than)
-		UML_AND(block, IREG(0), MEM(&sh2->sr), IMM(~T));	// and r0, sr, ~T (clear the T bit)
-		UML_CMP(block, R32(Rn), R32(Rm));		// cmp Rn, Rm (Rm - Rn)
-		UML_JMPc(block, IF_BE, compiler->labelnum);	// jbe compiler->labelnum
-
-		UML_OR(block, IREG(0), IREG(0), IMM(T));	// or r0, r0, T
-		UML_LABEL(block, compiler->labelnum++);	     	// desc->pc:
-
-		UML_MOV(block, MEM(&sh2->sr), IREG(0));		// mov sh2->sr, r0
+		UML_CMP(block, R32(Rn), R32(Rm));		// cmp Rn, Rm
+		UML_SETc(block, IF_A, IREG(0));			// set A, r0
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(1));	// rolins sr, r0, 0, 1
 		return TRUE;
 		break;
 
 	case  7: // CMPGT(Rm, Rn); (signed greater than)
-		UML_AND(block, IREG(0), MEM(&sh2->sr), IMM(~T));	// and r0, sr, ~T (clear the T bit)
-		UML_CMP(block, R32(Rm), R32(Rn));		// cmp Rm, Rn
-		UML_JMPc(block, IF_GE, compiler->labelnum);	// jle compiler->labelnum
-
-		UML_OR(block, IREG(0), IREG(0), IMM(T));	// or r0, r0, T
-		UML_LABEL(block, compiler->labelnum++);	     	// desc->pc:
-		UML_MOV(block, MEM(&sh2->sr), IREG(0));		// mov sh2->sr, r0
+		UML_CMP(block, R32(Rn), R32(Rm));		// cmp Rn, Rm
+		UML_SETc(block, IF_G, IREG(0));			// set G, r0
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(1));	// rolins sr, r0, 0, 1
 		return TRUE;
 		break;
 
