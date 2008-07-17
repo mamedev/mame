@@ -38,11 +38,6 @@ Notes:
   fixed by this (earlier notes in this driver talked about "sprite flickerings
   and pop-ups" but I don't know where they happened).
 
-TODO:
------
-- Number of raster lines unknown. Currently set to 264 which gives a 59.19Hz
-  refresh rate.
-
 ***************************************************************************/
 
 #include "driver.h"
@@ -615,7 +610,10 @@ static MACHINE_DRIVER_START( pow )
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 384, 0, 256, 264, 16, 240)	// inaccurate
+	// the screen parameters are guessed but should be accurate. They
+	// give a theoretical refresh rate of 59.1856Hz while the measured
+	// rate on a SAR board is 59.16Hz.
+	MDRV_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 384, 0, 256, 264, 16, 240)
 
 	MDRV_GFXDECODE(pow)
 	MDRV_PALETTE_LENGTH(0x800)
