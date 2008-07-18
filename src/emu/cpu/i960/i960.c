@@ -430,8 +430,8 @@ static void take_interrupt(int vector, int lvl)
 	do_call(IRQV, 7, SP);
 
 	// save the processor state
-	program_write_dword_32le(i960.r[I960_FP]-16, i960.AC);
-	program_write_dword_32le(i960.r[I960_FP]-12, i960.PC);
+	program_write_dword_32le(i960.r[I960_FP]-16, i960.PC);
+	program_write_dword_32le(i960.r[I960_FP]-12, i960.AC);
 	// store the vector
 	program_write_dword_32le(i960.r[I960_FP]-8, vector-8);
 
