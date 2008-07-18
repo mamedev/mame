@@ -4899,6 +4899,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( thrilld )	/* GX713 (c)1998 */
 	DRIVER( midnrun )	/* GX??? (c)1995 */
 	DRIVER( windheat )	/* GX677 (c)1996 */
+	DRIVER( windheau )	/* GX677 (c)1996 */
 	DRIVER( jetwave )	/* GX??? (c)1996 */
 
 	/* Konami M2 games */
