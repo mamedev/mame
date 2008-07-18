@@ -2651,23 +2651,23 @@ ROM_LOAD16_WORD_SWAP_BIOS( x, "saturn.bin", 0x000000, 0x080000, CRC(653ff2d8) SH
 
 #define STV_BIOS \
 	ROM_REGION( 0x080000, REGION_CPU1, 0 ) /* SH2 code */ \
-	ROM_SYSTEM_BIOS( 0, "Japan (97/08/21)",  "Japan (bios epr-20091)" ) \
+	ROM_SYSTEM_BIOS( 0, "jp",   "EPR-20091 (Japan 97/08/21)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-20091.ic8",   0x000000, 0x080000, CRC(59ed40f4) SHA1(eff0f54c70bce05ff3a289bf30b1027e1c8cd117) ) \
-	ROM_SYSTEM_BIOS( 1, "Japan (97/02/17)",  "Japan (bios epr-19730)" ) \
+	ROM_SYSTEM_BIOS( 1, "jp1",  "EPR-19730 (Japan 97/02/17)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-19730.ic8",   0x000000, 0x080000, CRC(d0e0889d) SHA1(fae53107c894e0c41c49e191dbe706c9cd6e50bd) ) \
-	ROM_SYSTEM_BIOS( 2, "Japan (95/04/25)",  "Japan (bios epr-17951a)" ) \
+	ROM_SYSTEM_BIOS( 2, "jp2",  "EPR-17951A (Japan 95/04/25)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-17951a.ic8",  0x000000, 0x080000, CRC(2672f9d8) SHA1(63cf4a6432f6c87952f9cf3ab0f977aed2367303) ) \
-	ROM_SYSTEM_BIOS( 3, "Japan (95/01/31)",  "Japan (bios epr-17740)" ) \
+	ROM_SYSTEM_BIOS( 3, "jp3",  "EPR-17740 (Japan 95/01/31)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-17740.ic8",   0x000000, 0x080000, CRC(5c5aa63d) SHA1(06860d96923b81afbc21e0ad32ee19487d8ff6e7) ) \
-	ROM_SYSTEM_BIOS( 4, "Europe (95/04/25)", "Europe (bios epr-17954a)" ) \
+	ROM_SYSTEM_BIOS( 4, "euro", "EPR-17954A (Europe 95/04/25)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-17954a.ic8",  0x000000, 0x080000, CRC(f7722da3) SHA1(af79cff317e5b57d49e463af16a9f616ed1eee08) ) \
-	ROM_SYSTEM_BIOS( 5, "USA (95/04/25)",    "USA (bios epr-17952a)" ) \
+	ROM_SYSTEM_BIOS( 5, "us",   "EPR-17952A (USA 95/04/25)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-17952a.ic8",  0x000000, 0x080000, CRC(d1be2adf) SHA1(eaf1c3e5d602e1139d2090a78d7e19f04f916794) ) \
-	ROM_SYSTEM_BIOS( 6, "Taiwan (95/04/25)", "Taiwan (bios epr-17953a)" ) \
+	ROM_SYSTEM_BIOS( 6, "tw",   "EPR-17953A (Taiwan 95/04/25)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-17953a.ic8",  0x000000, 0x080000, CRC(a4c47570) SHA1(9efc73717ec8a13417e65c54344ded9fc25bf5ef) ) \
-	ROM_SYSTEM_BIOS( 7, "Debug (95/01/13)",   "Debug" ) \
+	ROM_SYSTEM_BIOS( 7, "debug","Debug (95/01/13)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 7, "stv110.bin",      0x000000, 0x080000, CRC(3dfeda92) SHA1(8eb33192a57df5f3a1dfb57263054867c6b2db6d) ) \
-	ROM_SYSTEM_BIOS( 8, "Dev1061","Development (bios 1.061)" ) \
+	ROM_SYSTEM_BIOS( 8, "dev",  "Development (bios 1.061)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 8, "stv1061.bin",     0x000000, 0x080000, CRC(728dbca3) SHA1(0ed2030177f0aa8285645c395ae9ad9f568ab1d6) ) \
 	ROM_REGION( 0x080000, REGION_CPU2, 0 ) /* SH2 code */ \
 	ROM_COPY( REGION_CPU1,0,0,0x080000) \
