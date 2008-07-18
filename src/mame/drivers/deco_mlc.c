@@ -101,6 +101,7 @@
 #include "sound/ymz280b.h"
 #include "decoprot.h"
 #include "cpu/arm/arm.h"
+#include "cpu/sh2/sh2.h"
 
 VIDEO_START( mlc );
 VIDEO_UPDATE( mlc );
@@ -294,36 +295,34 @@ static READ32_HANDLER(stadhr96_prot_146_r)
 /******************************************************************************/
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x0000000, 0x00fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x0100000, 0x011ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0200000, 0x020000f) AM_READ(SMH_NOP) /* IRQ control? */
-	AM_RANGE(0x0200070, 0x0200073) AM_READ(decomlc_vbl_r)
-	AM_RANGE(0x0200074, 0x0200077) AM_READ(mlc_scanline_r)
-	AM_RANGE(0x0200078, 0x020007f) AM_READ(test2_r)
-	AM_RANGE(0x0200080, 0x02000ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0204000, 0x0206fff) AM_READ(mlc_spriteram_r)
-	AM_RANGE(0x0200080, 0x02000ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0280000, 0x029ffff) AM_READ(mlc_vram_r)
-	AM_RANGE(0x0300000, 0x0307fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0400000, 0x0400003) AM_READ(avengrs_control_r)
-	AM_RANGE(0x0440000, 0x044001f) AM_READ(test3_r)
-	AM_RANGE(0x0600004, 0x0600007) AM_READ(avengrs_sound_r)
-	AM_RANGE(0x070f000, 0x070ffff) AM_READ(stadhr96_prot_146_r)
+	AM_RANGE(0x0000000, 0x00fffff) AM_READ(SMH_ROM) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0100000, 0x011ffff) AM_READ(SMH_RAM) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200000, 0x020000f) AM_READ(SMH_NOP) AM_MIRROR(0xff000000)/* IRQ control? */
+	AM_RANGE(0x0200070, 0x0200073) AM_READ(decomlc_vbl_r) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200074, 0x0200077) AM_READ(mlc_scanline_r) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200078, 0x020007f) AM_READ(test2_r)	AM_MIRROR(0xff000000)       
+	AM_RANGE(0x0200080, 0x02000ff) AM_READ(SMH_RAM) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0204000, 0x0206fff) AM_READ(mlc_spriteram_r) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200080, 0x02000ff) AM_READ(SMH_RAM) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0280000, 0x029ffff) AM_READ(mlc_vram_r) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0300000, 0x0307fff) AM_READ(SMH_RAM) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0400000, 0x0400003) AM_READ(avengrs_control_r) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0440000, 0x044001f) AM_READ(test3_r)	AM_MIRROR(0xff000000)	  
+	AM_RANGE(0x0600004, 0x0600007) AM_READ(avengrs_sound_r) AM_MIRROR(0xff000000)
+	AM_RANGE(0x070f000, 0x070ffff) AM_READ(stadhr96_prot_146_r) AM_MIRROR(0xff000000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x0000000, 0x00fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x0100000, 0x011ffff) AM_WRITE(SMH_RAM) AM_BASE(&mlc_ram)
-	AM_RANGE(0x0200000, 0x020007f) AM_WRITE(mlc_irq_w) AM_BASE(&irq_ram)
-	AM_RANGE(0x0200080, 0x02000ff) AM_WRITE(SMH_RAM) AM_BASE(&mlc_clip_ram)
-	AM_RANGE(0x0204000, 0x0206fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x0280000, 0x029ffff) AM_WRITE(SMH_RAM) AM_BASE(&mlc_vram)
-	AM_RANGE(0x0300000, 0x0307fff) AM_WRITE(avengrs_palette_w) AM_BASE(&paletteram32)
-	AM_RANGE(0x044001c, 0x044001f) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(avengrs_eprom_w)
-	AM_RANGE(0x0600000, 0x0600007) AM_WRITE(avengrs_sound_w)
+	AM_RANGE(0x0000000, 0x00fffff) AM_WRITE(SMH_ROM) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0100000, 0x011ffff) AM_WRITE(SMH_RAM) AM_BASE(&mlc_ram) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200000, 0x020007f) AM_WRITE(mlc_irq_w) AM_BASE(&irq_ram) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200080, 0x02000ff) AM_WRITE(SMH_RAM) AM_BASE(&mlc_clip_ram) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0204000, 0x0206fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0280000, 0x029ffff) AM_WRITE(SMH_RAM) AM_BASE(&mlc_vram) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0300000, 0x0307fff) AM_WRITE(avengrs_palette_w) AM_BASE(&paletteram32) AM_MIRROR(0xff000000)
+	AM_RANGE(0x044001c, 0x044001f) AM_WRITE(SMH_NOP) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(avengrs_eprom_w) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0600000, 0x0600007) AM_WRITE(avengrs_sound_w) AM_MIRROR(0xff000000)
 //  AM_RANGE(0x070f000, 0x070ffff) AM_READ(stadhr96_prot_146_w) AM_BASE(&deco32_prot_ram)
 ADDRESS_MAP_END
 
@@ -715,13 +714,22 @@ static READ32_HANDLER( avengrgs_speedup_r )
 	UINT32 a=mlc_ram[0x89a0/4];
 	UINT32 p=activecpu_get_pc();
 
-	if ((p==0x3236 || p==0x32de) && (a&1)) cpu_spinuntil_int();
+	if ((p==0x3234 || p==0x32dc) && (a&1)) cpu_spinuntil_int();
 
 	return a;
 }
 
 static DRIVER_INIT( avengrgs )
 {
+	// init options
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+
+	// set up speed cheat
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x3234);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x32dc);
+
 	mainCpuIsArm=0;
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );
 	descramble_sound(machine);
