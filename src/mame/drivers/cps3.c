@@ -2695,7 +2695,7 @@ static MACHINE_DRIVER_START( cps3 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(CUSTOM, MASTER_CLOCK / 3)
+	MDRV_SOUND_ADD("cps3", CUSTOM, MASTER_CLOCK / 3)
 	MDRV_SOUND_CONFIG(custom_interface)
 	MDRV_SOUND_ROUTE(1, "left", 1.0)
 	MDRV_SOUND_ROUTE(0, "right", 1.0)

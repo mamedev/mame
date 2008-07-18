@@ -361,7 +361,7 @@ static MACHINE_DRIVER_START( btoads )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(BSMT2000, SOUND_CLOCK)
+	MDRV_SOUND_ADD("bsmt", BSMT2000, SOUND_CLOCK)
 	MDRV_SOUND_CONFIG(bsmt2000_interface_region_1)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

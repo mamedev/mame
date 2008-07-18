@@ -307,7 +307,7 @@ static MACHINE_DRIVER_START( arcadia )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(CUSTOM, 3579545)
+	MDRV_SOUND_ADD("amiga", CUSTOM, 3579545)
 	MDRV_SOUND_CONFIG(amiga_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)

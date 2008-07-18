@@ -396,12 +396,9 @@ union _machine_config_token
 
 
 /* add/remove/replace sounds */
-#define MDRV_SOUND_ADD_TAG(_tag, _type, _clock) \
+#define MDRV_SOUND_ADD(_tag, _type, _clock) \
 	TOKEN_UINT64_PACK3(MCONFIG_TOKEN_SOUND_ADD, 8, SOUND_##_type, 24, _clock, 32), \
 	TOKEN_STRING(_tag),
-
-#define MDRV_SOUND_ADD(_type, _clock) \
-	MDRV_SOUND_ADD_TAG(NULL, _type, _clock)
 
 #define MDRV_SOUND_REMOVE(_tag) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_SOUND_REMOVE, 8), \

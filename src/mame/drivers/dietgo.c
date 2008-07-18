@@ -218,11 +218,11 @@ static MACHINE_DRIVER_START( dietgo )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, XTAL_32_22MHz/9) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_32_22MHz/9) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
-	MDRV_SOUND_ADD(OKIM6295, XTAL_32_22MHz/32) /* verified on pcb */
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32_22MHz/32) /* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END

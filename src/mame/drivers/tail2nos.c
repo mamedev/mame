@@ -268,7 +268,7 @@ static MACHINE_DRIVER_START( tail2nos )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2608, XTAL_8MHz)	/* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2608, XTAL_8MHz)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2608_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)

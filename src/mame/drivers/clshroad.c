@@ -311,7 +311,7 @@ static MACHINE_DRIVER_START( firebatl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD("firebatl", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -348,7 +348,7 @@ static MACHINE_DRIVER_START( clshroad )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD("clshroad", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

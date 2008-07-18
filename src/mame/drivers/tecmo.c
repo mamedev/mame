@@ -590,11 +590,11 @@ static MACHINE_DRIVER_START( rygar )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, XTAL_4MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM3812, XTAL_4MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(MSM5205, XTAL_400kHz) /* verified on pcb, even if schematics shows a 384khz resonator */
+	MDRV_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb, even if schematics shows a 384khz resonator */
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

@@ -209,7 +209,7 @@ MACHINE_DRIVER_START( astrob_sound_board )
 	MDRV_SOUND_START(astrob)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(astrob_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
@@ -444,11 +444,11 @@ MACHINE_DRIVER_START( 005_sound_board )
 	/* sound hardware */
 	MDRV_SOUND_START(005)
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(sega005_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD("005", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(sega005_custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
@@ -665,7 +665,7 @@ MACHINE_DRIVER_START( spaceod_sound_board )
 	/* sound hardware */
 	MDRV_SOUND_START(spaceod)
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(spaceod_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
@@ -838,22 +838,22 @@ MACHINE_DRIVER_START( monsterb_sound_board )
 	MDRV_DEVICE_CONFIG( monsterb_ppi_intf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(N7751, 6000000)
+	MDRV_CPU_ADD_TAG("audio", N7751, 6000000)
 	MDRV_CPU_PROGRAM_MAP(monsterb_7751_map,0)
 	MDRV_CPU_IO_MAP(monsterb_7751_portmap,0)
 
 	/* sound hardware */
 	MDRV_SOUND_START(monsterb)
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(monsterb_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(TMS36XX, 247)
+	MDRV_SOUND_ADD("music", TMS36XX, 247)
 	MDRV_SOUND_CONFIG(monsterb_tms3617_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

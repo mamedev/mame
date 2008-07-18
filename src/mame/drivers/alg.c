@@ -490,14 +490,14 @@ static MACHINE_DRIVER_START( alg_r1 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(CUSTOM, 3579545)
+	MDRV_SOUND_ADD("amiga", CUSTOM, 3579545)
 	MDRV_SOUND_CONFIG(amiga_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.25)
 	MDRV_SOUND_ROUTE(1, "right", 0.25)
 	MDRV_SOUND_ROUTE(2, "right", 0.25)
 	MDRV_SOUND_ROUTE(3, "left", 0.25)
 
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

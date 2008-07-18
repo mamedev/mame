@@ -195,7 +195,7 @@ MACHINE_DRIVER_START( turbo_samples )
 	MDRV_SPEAKER_ADD("left", -0.2, 0.0, 1.0)
 	MDRV_SPEAKER_ADD("right", 0.2, 0.0, 1.0)
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(turbo_samples_interface)
 
 	/* channel 0 = CRASH.S -> CRASH.S/SM */
@@ -446,7 +446,7 @@ static const struct Samplesinterface subroc3d_samples_interface =
 MACHINE_DRIVER_START( subroc3d_samples )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(subroc3d_samples_interface)
 
 	/* MISSILE in channels 0 and 1 */
@@ -598,7 +598,7 @@ static const struct Samplesinterface buckrog_samples_interface =
 
 MACHINE_DRIVER_START( buckrog_samples )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(buckrog_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END

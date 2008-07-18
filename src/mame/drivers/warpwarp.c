@@ -825,7 +825,7 @@ static MACHINE_DRIVER_START( geebee )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD("geebee", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(geebee_custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -868,7 +868,7 @@ static MACHINE_DRIVER_START( bombbee )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD("warpwarp", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(warpwarp_custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

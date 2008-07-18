@@ -279,7 +279,7 @@ static MACHINE_DRIVER_START( amspdwy )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 3000000)
+	MDRV_SOUND_ADD("ym", YM2151, 3000000)
 	MDRV_SOUND_CONFIG(amspdwy_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

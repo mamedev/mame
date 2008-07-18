@@ -559,11 +559,11 @@ static MACHINE_DRIVER_START( paradise )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, XTAL_12MHz/12)	/* verified on pcb */
+	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_12MHz/12)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD_TAG("oki2", OKIM6295, XTAL_12MHz/12) /* verified on pcb */
+	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_12MHz/12) /* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

@@ -429,13 +429,13 @@ static MACHINE_DRIVER_START( hyperspt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD(SN76496, XTAL_14_31818MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("sn", SN76496, XTAL_14_31818MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(VLM5030, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(hyperspt_vlm5030_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

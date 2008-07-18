@@ -333,7 +333,7 @@ static MACHINE_DRIVER_START( bestleag )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000) /* Hand-tuned */
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000) /* Hand-tuned */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.00)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.00)

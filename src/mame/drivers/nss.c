@@ -435,7 +435,7 @@ static MACHINE_DRIVER_START( snes )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD("snes", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(snes_sound_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.00)
 	MDRV_SOUND_ROUTE(1, "right", 1.00)

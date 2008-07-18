@@ -482,14 +482,14 @@ static MACHINE_DRIVER_START( quizdna )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, MCLK/4)
+	MDRV_SOUND_ADD("ym", YM2203, MCLK/4)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.10)
 	MDRV_SOUND_ROUTE(1, "mono", 0.10)
 	MDRV_SOUND_ROUTE(2, "mono", 0.10)
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
 
-	MDRV_SOUND_ADD(OKIM6295, (MCLK/1024)*132)
+	MDRV_SOUND_ADD("oki", OKIM6295, (MCLK/1024)*132)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END

@@ -326,7 +326,7 @@ static MACHINE_DRIVER_START( namcond1 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(C352, 16384000)
+	MDRV_SOUND_ADD("namco", C352, 16384000)
 	MDRV_SOUND_CONFIG(c352_interface)
 	MDRV_SOUND_ROUTE(0, "right", 1.00)
 	MDRV_SOUND_ROUTE(1, "left", 1.00)

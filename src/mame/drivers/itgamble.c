@@ -201,7 +201,7 @@ static MACHINE_DRIVER_START( itgamble )
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("oki", OKIM6295, SND_CLOCK)	/* 1MHz resonator */
+	MDRV_SOUND_ADD("oki", OKIM6295, SND_CLOCK)	/* 1MHz resonator */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

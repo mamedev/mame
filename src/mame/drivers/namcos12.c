@@ -1501,7 +1501,7 @@ static MACHINE_DRIVER_START( coh700 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(C352, 14745600)
+	MDRV_SOUND_ADD("namco", C352, 14745600)
 	MDRV_SOUND_CONFIG(c352_interface)
 	MDRV_SOUND_ROUTE(0, "right", 1.00)
 	MDRV_SOUND_ROUTE(1, "left", 1.00)

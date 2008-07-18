@@ -608,7 +608,7 @@ static MACHINE_DRIVER_START( syvalion )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2610, 8000000)
+	MDRV_SOUND_ADD("ym", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(syvalion_ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
@@ -647,7 +647,7 @@ static MACHINE_DRIVER_START( recordbr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2610, 8000000)
+	MDRV_SOUND_ADD("ym", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(syvalion_ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
@@ -686,7 +686,7 @@ static MACHINE_DRIVER_START( dleague )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2610, 8000000)
+	MDRV_SOUND_ADD("ym", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(dleague_ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)

@@ -291,13 +291,13 @@ static MACHINE_DRIVER_START( simpsons )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "left", 1.0)	/* only left channel is connected */
 	MDRV_SOUND_ROUTE(0, "right", 1.0)
 	MDRV_SOUND_ROUTE(1, "left", 0.0)
 	MDRV_SOUND_ROUTE(1, "right", 0.0)
 
-	MDRV_SOUND_ADD(K053260, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("konami", K053260, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(k053260_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.75)
 	MDRV_SOUND_ROUTE(1, "right", 0.75)

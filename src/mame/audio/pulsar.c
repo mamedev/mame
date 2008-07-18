@@ -60,7 +60,7 @@ static const struct Samplesinterface pulsar_samples_interface =
 
 
 MACHINE_DRIVER_START( pulsar_audio )
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(pulsar_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END

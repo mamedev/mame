@@ -393,12 +393,12 @@ static MACHINE_DRIVER_START( crimfght )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)	/* verified with PCB */
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)	/* verified with PCB */
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
-	MDRV_SOUND_ADD(K007232, 3579545)
+	MDRV_SOUND_ADD("konami", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.20)
 	MDRV_SOUND_ROUTE(0, "right", 0.20)

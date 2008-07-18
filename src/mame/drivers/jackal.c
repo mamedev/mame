@@ -331,7 +331,7 @@ static MACHINE_DRIVER_START( jackal )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, SOUND_CLOCK) // verified on pcb
+	MDRV_SOUND_ADD("ym", YM2151, SOUND_CLOCK) // verified on pcb
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 MACHINE_DRIVER_END

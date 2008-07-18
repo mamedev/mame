@@ -469,7 +469,7 @@ static MACHINE_DRIVER_START( ironhors )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("ym2203", YM2203, 18432000/6)
+	MDRV_SOUND_ADD("ym2203", YM2203, 18432000/6)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 
 	MDRV_SOUND_ROUTE_EX(0, "disc_ih", 1.0, 0)
@@ -477,7 +477,7 @@ static MACHINE_DRIVER_START( ironhors )
 	MDRV_SOUND_ROUTE_EX(2, "disc_ih", 1.0, 2)
 	MDRV_SOUND_ROUTE_EX(3, "disc_ih", 1.0, 3)
 
-	MDRV_SOUND_ADD_TAG("disc_ih", DISCRETE, 0)
+	MDRV_SOUND_ADD("disc_ih", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(ironhors)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

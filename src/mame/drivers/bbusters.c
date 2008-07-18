@@ -760,7 +760,7 @@ static MACHINE_DRIVER_START( bbusters )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2610, 8000000)
+	MDRV_SOUND_ADD("ym", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  3.0)
 	MDRV_SOUND_ROUTE(0, "right", 3.0)
@@ -802,7 +802,7 @@ static MACHINE_DRIVER_START( mechatt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2608, 8000000)
+	MDRV_SOUND_ADD("ym", YM2608, 8000000)
 	MDRV_SOUND_CONFIG(ym2608_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.50)
 	MDRV_SOUND_ROUTE(0, "right", 0.50)

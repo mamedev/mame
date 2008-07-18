@@ -1702,7 +1702,7 @@ static MACHINE_DRIVER_START( funworld )
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
+	MDRV_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_SOUND_CONFIG(ay8910_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)	/* analyzed to avoid clips */
 MACHINE_DRIVER_END

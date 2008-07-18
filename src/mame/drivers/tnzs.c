@@ -1410,7 +1410,7 @@ static MACHINE_DRIVER_START( arknoid2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -1449,7 +1449,7 @@ static MACHINE_DRIVER_START( drtoppel )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/4)
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/4)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -1495,7 +1495,7 @@ static MACHINE_DRIVER_START( tnzs )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/4)
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/4)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -1533,7 +1533,7 @@ static MACHINE_DRIVER_START( insectx )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -1571,14 +1571,14 @@ static MACHINE_DRIVER_START( kageki )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(kageki_ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1620,7 +1620,7 @@ static MACHINE_DRIVER_START( tnzsb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("ym2203", YM2203, XTAL_12MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ym2203", YM2203, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203b_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
@@ -1647,7 +1647,7 @@ static MACHINE_DRIVER_START( kabukiz )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 	MDRV_SOUND_ROUTE(3, "mono", 2.0)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1682,7 +1682,7 @@ static MACHINE_DRIVER_START( jpopnics )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, XTAL_12MHz/4) /* Not verified - Main board Crystal is 12MHz */
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_12MHz/4) /* Not verified - Main board Crystal is 12MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

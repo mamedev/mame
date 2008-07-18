@@ -344,7 +344,7 @@ static MACHINE_DRIVER_START(wolfpack)
 	MDRV_VIDEO_EOF(wolfpack)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(S14001A, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
+	MDRV_SOUND_ADD("speech", S14001A, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
 	MDRV_SOUND_CONFIG(wolfpack_s14001a_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

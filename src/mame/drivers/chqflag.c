@@ -388,19 +388,19 @@ static MACHINE_DRIVER_START( chqflag )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 
-	MDRV_SOUND_ADD(K007232, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("konami1", K007232, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(k007232_interface_1)
 	MDRV_SOUND_ROUTE(0, "left", 0.20)
 	MDRV_SOUND_ROUTE(0, "right", 0.20)
 	MDRV_SOUND_ROUTE(1, "left", 0.20)
 	MDRV_SOUND_ROUTE(1, "right", 0.20)
 
-	MDRV_SOUND_ADD(K007232, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("konami2", K007232, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(k007232_interface_2)
 	MDRV_SOUND_ROUTE(0, "left", 0.20)
 	MDRV_SOUND_ROUTE(1, "right", 0.20)

@@ -883,11 +883,11 @@ static MACHINE_DRIVER_START( berzerk )
 
 	MDRV_SOUND_RESET(berzerk)
 
-	MDRV_SOUND_ADD(S14001A, 0)	/* placeholder - the clock is software controllable */
+	MDRV_SOUND_ADD("speech", S14001A, 0)	/* placeholder - the clock is software controllable */
 	MDRV_SOUND_CONFIG(berzerk_s14001a_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD("exidy", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(berzerk_custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

@@ -2204,7 +2204,7 @@ static MACHINE_DRIVER_START( fhawk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("2203", YM2203, 3000000) /* verified on pcb */
+	MDRV_SOUND_ADD("2203", YM2203, 3000000) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface_triple)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
@@ -2236,7 +2236,7 @@ static MACHINE_DRIVER_START( champwr )
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
@@ -2300,7 +2300,7 @@ static MACHINE_DRIVER_START( kurikint )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("2203", YM2203, 3000000) /* verified on pcb */
+	MDRV_SOUND_ADD("2203", YM2203, 3000000) /* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
@@ -2345,7 +2345,7 @@ static MACHINE_DRIVER_START( plotting )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("2203", YM2203, 3330000) /* verified on pcb */
+	MDRV_SOUND_ADD("2203", YM2203, 3330000) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface_single)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
@@ -2440,7 +2440,7 @@ static MACHINE_DRIVER_START( evilston )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("2203", YM2203, 12000000/4) /* not verified */
+	MDRV_SOUND_ADD("2203", YM2203, 12000000/4) /* not verified */
 	MDRV_SOUND_ROUTE(0, "mono", 0.00)
 	MDRV_SOUND_ROUTE(1, "mono", 0.00)
 	MDRV_SOUND_ROUTE(2, "mono", 0.00)

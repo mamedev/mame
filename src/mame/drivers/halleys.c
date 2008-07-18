@@ -1979,16 +1979,16 @@ static MACHINE_DRIVER_START( halleys )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, XTAL_6MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(AY8910, XTAL_6MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ay2", AY8910, XTAL_6MHz/4) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(AY8910, XTAL_6MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ay3", AY8910, XTAL_6MHz/4) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD(AY8910, XTAL_6MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ay4", AY8910, XTAL_6MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_DRIVER_END

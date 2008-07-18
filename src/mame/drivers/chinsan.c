@@ -485,7 +485,7 @@ static MACHINE_DRIVER_START( chinsan )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000) /* ? Mhz */
+	MDRV_SOUND_ADD("ym", YM2203, 1500000) /* ? Mhz */
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)

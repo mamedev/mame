@@ -33,7 +33,7 @@
  * Same as FLT_RC_HIGHPASS, but with standard frequency of 16 HZ
  * This filter may be setup just with
  *
- * MDRV_SOUND_ADD(FILTER_RC, 0)
+ * MDRV_SOUND_ADD("tag", FILTER_RC, 0)
  * MDRV_SOUND_CONFIG(&flt_rc_ac_default)
  *
  * Default behaviour:

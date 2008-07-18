@@ -376,14 +376,14 @@ static MACHINE_DRIVER_START( mquake )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(CUSTOM, 3579545)
+	MDRV_SOUND_ADD("amiga", CUSTOM, 3579545)
 	MDRV_SOUND_CONFIG(amiga_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	MDRV_SOUND_ROUTE(2, "right", 0.50)
 	MDRV_SOUND_ROUTE(3, "left", 0.50)
 
-	MDRV_SOUND_ADD(ES5503, 7159090)		/* ES5503 is likely mono due to channel strobe used as bank select */
+	MDRV_SOUND_ADD("es", ES5503, 7159090)		/* ES5503 is likely mono due to channel strobe used as bank select */
 	MDRV_SOUND_CONFIG(es5503_intf)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(0, "right", 0.50)

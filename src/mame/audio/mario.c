@@ -448,9 +448,9 @@ static const struct AY8910interface ay8910_interface =
 MACHINE_DRIVER_START( mario_audio )
 
 #if USE_8039
-	MDRV_CPU_ADD(I8039, I8035_CLOCK)  /* audio CPU */         /* 730 kHz */
+	MDRV_CPU_ADD_TAG("audio", I8039, I8035_CLOCK)  /* audio CPU */         /* 730 kHz */
 #else
-	MDRV_CPU_ADD(M58715, I8035_CLOCK)  /* audio CPU */         /* 730 kHz */
+	MDRV_CPU_ADD_TAG("audio", M58715, I8035_CLOCK)  /* audio CPU */         /* 730 kHz */
 #endif
 	MDRV_CPU_PROGRAM_MAP(mario_sound_map, 0)
 	MDRV_CPU_IO_MAP(mario_sound_io_map, 0)
@@ -459,7 +459,7 @@ MACHINE_DRIVER_START( mario_audio )
 	MDRV_SOUND_RESET(mario)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(mario)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.5)
 
@@ -467,7 +467,7 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( masao_audio )
 
-	MDRV_CPU_ADD(Z80,24576000/16) /* audio CPU */	/* ???? */
+	MDRV_CPU_ADD_TAG("audio", Z80,24576000/16) /* audio CPU */	/* ???? */
 	MDRV_CPU_PROGRAM_MAP(masao_sound_map,0)
 
 	MDRV_SOUND_START(mario)
@@ -475,7 +475,7 @@ MACHINE_DRIVER_START( masao_audio )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 14318000/6)
+	MDRV_SOUND_ADD("ay", AY8910, 14318000/6)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

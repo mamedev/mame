@@ -1153,11 +1153,11 @@ static MACHINE_DRIVER_START( mgakuen )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 990000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 990000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(YM2413, 4000000)
+	MDRV_SOUND_ADD("ym", YM2413, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1189,11 +1189,11 @@ static MACHINE_DRIVER_START( pang )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("oki", OKIM6295, 1000000) /* (verified on pcb) */
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000) /* (verified on pcb) */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD_TAG("ym2413",YM2413, 4000000) /* (verified on pcb) */
+	MDRV_SOUND_ADD("ym2413",YM2413, 4000000) /* (verified on pcb) */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1290,7 +1290,7 @@ static MACHINE_DRIVER_START( mstworld )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 990000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 990000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -1323,11 +1323,11 @@ static MACHINE_DRIVER_START( marukin )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 990000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 990000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(YM2413, 4000000)
+	MDRV_SOUND_ADD("ym", YM2413, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

@@ -1313,7 +1313,7 @@ static MACHINE_DRIVER_START( namcona1 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(C140, 44100)
+	MDRV_SOUND_ADD("namco", C140, 44100)
 	MDRV_SOUND_CONFIG(C140_interface_typeA)
 	MDRV_SOUND_ROUTE(0, "right", 1.00)
 	MDRV_SOUND_ROUTE(1, "left", 1.00)
@@ -1400,7 +1400,7 @@ static MACHINE_DRIVER_START( namcona2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(NAMCONA, 4*8000)
+	MDRV_SOUND_ADD("namco", NAMCONA, 4*8000)
 	MDRV_SOUND_CONFIG(NAMCONA_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

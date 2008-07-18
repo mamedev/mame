@@ -293,14 +293,14 @@ static MACHINE_DRIVER_START( kncljoe )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ay", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(SN76489, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("sn1", SN76489, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(SN76489, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("sn2", SN76489, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

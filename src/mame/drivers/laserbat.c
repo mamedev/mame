@@ -717,13 +717,13 @@ static MACHINE_DRIVER_START( laserbat )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SN76477, 0) // output not connected
+	MDRV_SOUND_ADD("sn", SN76477, 0) // output not connected
 	MDRV_SOUND_CONFIG(sn76477_interface)
 
-	MDRV_SOUND_ADD(TMS3615, 4000000/8/2) // 250 kHz, from second chip's clock out
+	MDRV_SOUND_ADD("tms1", TMS3615, 4000000/8/2) // 250 kHz, from second chip's clock out
 	MDRV_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)
 
-	MDRV_SOUND_ADD(TMS3615, 4000000/8) // 500 kHz
+	MDRV_SOUND_ADD("tms2", TMS3615, 4000000/8) // 500 kHz
 	MDRV_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -758,11 +758,11 @@ static MACHINE_DRIVER_START( catnmous )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 3580000/2) // ?
+	MDRV_SOUND_ADD("ay1", AY8910, 3580000/2) // ?
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(AY8910, 3580000/2) // ?
+	MDRV_SOUND_ADD("ay2", AY8910, 3580000/2) // ?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

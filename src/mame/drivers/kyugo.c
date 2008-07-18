@@ -529,11 +529,11 @@ static MACHINE_DRIVER_START( gyrodine )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, XTAL_18_432MHz/12)  /* verified on pcb */
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)  /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(AY8910, XTAL_18_432MHz/12)  /* verified on pcb */
+	MDRV_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/12)  /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

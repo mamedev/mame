@@ -280,12 +280,12 @@ static const struct sp0250_interface sp0250_interface =
 MACHINE_DRIVER_START( sega_speech_board )
 
 	/* CPU for the speech board */
-	MDRV_CPU_ADD(I8035, SPEECH_MASTER_CLOCK)		/* divide by 15 in CPU */
+	MDRV_CPU_ADD_TAG("audio", I8035, SPEECH_MASTER_CLOCK)		/* divide by 15 in CPU */
 	MDRV_CPU_PROGRAM_MAP(speech_map, 0)
 	MDRV_CPU_IO_MAP(speech_portmap, 0)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(SP0250, SPEECH_MASTER_CLOCK)
+	MDRV_SOUND_ADD("speech", SP0250, SPEECH_MASTER_CLOCK)
 	MDRV_SOUND_CONFIG(sp0250_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -923,7 +923,7 @@ MACHINE_DRIVER_START( sega_universal_sound_board )
 	MDRV_CPU_IO_MAP(usb_portmap, 0)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD("usb", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(usb_custom_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

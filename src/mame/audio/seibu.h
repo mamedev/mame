@@ -77,56 +77,56 @@ extern const struct YM2203interface seibu_ym2203_interface;
 
 
 #define SEIBU_SOUND_SYSTEM_CPU(freq)								\
-	MDRV_CPU_ADD(Z80, freq)											\
+	MDRV_CPU_ADD_TAG("audio", Z80, freq)							\
 	MDRV_CPU_PROGRAM_MAP(seibu_sound_map,0)							\
 
 #define SEIBU2_SOUND_SYSTEM_CPU(freq)								\
-	MDRV_CPU_ADD(Z80, freq)											\
+	MDRV_CPU_ADD_TAG("audio", Z80, freq)							\
 	MDRV_CPU_PROGRAM_MAP(seibu2_sound_map,0)						\
 
-#define SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(freq)								\
-	MDRV_CPU_ADD(Z80, freq)											\
-	MDRV_CPU_PROGRAM_MAP(seibu2_raiden2_sound_map,0)						\
+#define SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(freq)						\
+	MDRV_CPU_ADD_TAG("audio",  Z80, freq)							\
+	MDRV_CPU_PROGRAM_MAP(seibu2_raiden2_sound_map,0)				\
 
 #define SEIBU3_SOUND_SYSTEM_CPU(freq)								\
-	MDRV_CPU_ADD(Z80, freq)											\
+	MDRV_CPU_ADD_TAG("audio", Z80, freq)							\
 	MDRV_CPU_PROGRAM_MAP(seibu3_sound_map,0)						\
 
 #define SEIBU3A_SOUND_SYSTEM_CPU(freq)								\
-	MDRV_CPU_ADD(Z80, freq)											\
+	MDRV_CPU_ADD_TAG("audio", Z80, freq)							\
 	MDRV_CPU_PROGRAM_MAP(seibu3_adpcm_sound_map,0)					\
 
 #define SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(freq1,freq2,region)		\
 	MDRV_SPEAKER_STANDARD_MONO("mono")								\
 																	\
-	MDRV_SOUND_ADD(YM3812, freq1)									\
+	MDRV_SOUND_ADD("ym", YM3812, freq1)							\
 	MDRV_SOUND_CONFIG(seibu_ym3812_interface)						\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)						\
 																	\
-	MDRV_SOUND_ADD(OKIM6295, freq2)									\
+	MDRV_SOUND_ADD("oki", OKIM6295, freq2)						\
 	MDRV_SOUND_CONFIG(okim6295_interface_region_##region##_pin7low)	\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)						\
 
 #define SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(freq1,freq2,region) \
 	MDRV_SPEAKER_STANDARD_MONO("mono")								\
 																	\
-	MDRV_SOUND_ADD(YM3812, freq1)									\
+	MDRV_SOUND_ADD("ym", YM3812, freq1)							\
 	MDRV_SOUND_CONFIG(seibu_ym3812_interface)						\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)						\
 																	\
-	MDRV_SOUND_ADD(OKIM6295, freq2)									\
+	MDRV_SOUND_ADD("oki", OKIM6295, freq2)						\
 	MDRV_SOUND_CONFIG(okim6295_interface_region_##region##_pin7high)\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)						\
 
 #define SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(freq1,freq2,region)		\
 	MDRV_SPEAKER_STANDARD_MONO("mono")								\
 																	\
-	MDRV_SOUND_ADD(YM2151, freq1)									\
+	MDRV_SOUND_ADD("ym", YM2151, freq1)							\
 	MDRV_SOUND_CONFIG(seibu_ym2151_interface)						\
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)								\
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)								\
 																	\
-	MDRV_SOUND_ADD(OKIM6295, freq2)									\
+	MDRV_SOUND_ADD("oki", OKIM6295, freq2)						\
 	MDRV_SOUND_CONFIG(okim6295_interface_region_##region##_pin7low)	\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)						\
 
@@ -134,36 +134,36 @@ extern const struct YM2203interface seibu_ym2203_interface;
 #define SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(freq1,freq2,regiona, regionb)		\
 	MDRV_SPEAKER_STANDARD_MONO("mono")								\
 																	\
-	MDRV_SOUND_ADD(YM2151, freq1)									\
+	MDRV_SOUND_ADD("ym", YM2151, freq1)							\
 	MDRV_SOUND_CONFIG(seibu_ym2151_interface)						\
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)								\
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)								\
 																	\
-	MDRV_SOUND_ADD(OKIM6295, freq2)									\
-	MDRV_SOUND_CONFIG(okim6295_interface_region_##regiona##_pin7high)	\
+	MDRV_SOUND_ADD("oki1", OKIM6295, freq2)						\
+	MDRV_SOUND_CONFIG(okim6295_interface_region_##regiona##_pin7high)\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)						\
-	\
-	MDRV_SOUND_ADD(OKIM6295, freq2)									\
-	MDRV_SOUND_CONFIG(okim6295_interface_region_##regionb##_pin7high)	\
+																	\
+	MDRV_SOUND_ADD("oki2", OKIM6295, freq2)						\
+	MDRV_SOUND_CONFIG(okim6295_interface_region_##regionb##_pin7high)\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)						\
 
 
 #define SEIBU_SOUND_SYSTEM_YM2203_INTERFACE(freq)					\
 	MDRV_SPEAKER_STANDARD_MONO("mono")								\
 																	\
-	MDRV_SOUND_ADD(YM2203, freq)									\
+	MDRV_SOUND_ADD("ym1", YM2203, freq)							\
 	MDRV_SOUND_CONFIG(seibu_ym2203_interface)						\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)						\
 																	\
-	MDRV_SOUND_ADD(YM2203, freq)									\
+	MDRV_SOUND_ADD("ym2", YM2203, freq)							\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)						\
 
 #define SEIBU_SOUND_SYSTEM_ADPCM_INTERFACE							\
-	MDRV_SOUND_ADD(CUSTOM, 8000)	 								\
+	MDRV_SOUND_ADD("adpcm1", CUSTOM, 8000)						\
 	MDRV_SOUND_CONFIG(seibu_adpcm_interface)						\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40) 					\
 																	\
-	MDRV_SOUND_ADD(CUSTOM, 8000) 									\
+	MDRV_SOUND_ADD("adpcm2", CUSTOM, 8000)						\
 	MDRV_SOUND_CONFIG(seibu_adpcm_interface)						\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)						\
 

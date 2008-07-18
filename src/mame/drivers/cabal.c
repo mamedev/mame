@@ -528,15 +528,15 @@ static MACHINE_DRIVER_START( cabal )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(seibu_ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
-	MDRV_SOUND_ADD(CUSTOM, 8000) /* it should use the msm5205 */
+	MDRV_SOUND_ADD("adpcm1", CUSTOM, 8000) /* it should use the msm5205 */
 	MDRV_SOUND_CONFIG(seibu_adpcm_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
 
-	MDRV_SOUND_ADD(CUSTOM, 8000) /* it should use the msm5205 */
+	MDRV_SOUND_ADD("adpcm2", CUSTOM, 8000) /* it should use the msm5205 */
 	MDRV_SOUND_CONFIG(seibu_adpcm_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
 MACHINE_DRIVER_END
@@ -585,15 +585,15 @@ static MACHINE_DRIVER_START( cabalbl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(cabalbl_ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
-	MDRV_SOUND_ADD(MSM5205, XTAL_12MHz/32) /* verified on pcb (no resonator) */
+	MDRV_SOUND_ADD("msm1", MSM5205, XTAL_12MHz/32) /* verified on pcb (no resonator) */
 	MDRV_SOUND_CONFIG(msm5205_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MDRV_SOUND_ADD(MSM5205, XTAL_12MHz/32) /* verified on pcb (no resonator)*/
+	MDRV_SOUND_ADD("msm2", MSM5205, XTAL_12MHz/32) /* verified on pcb (no resonator)*/
 	MDRV_SOUND_CONFIG(msm5205_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END

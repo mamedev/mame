@@ -233,7 +233,7 @@ static MACHINE_DRIVER_START( xorworld )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SAA1099, 8000000 /* guess */)
+	MDRV_SOUND_ADD("saa", SAA1099, 8000000 /* guess */)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

@@ -719,14 +719,14 @@ static MACHINE_DRIVER_START( ppking )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ppking_ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 	MDRV_SOUND_ROUTE(2, "mono", 0.60)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD(MSM5205, XTAL_455kHz) /* verified on pcb */
+	MDRV_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
@@ -769,14 +769,14 @@ static MACHINE_DRIVER_START( gladiatr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_SOUND_CONFIG(gladiatr_ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 	MDRV_SOUND_ROUTE(2, "mono", 0.60)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD(MSM5205, XTAL_455kHz) /* verified on pcb */
+	MDRV_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END

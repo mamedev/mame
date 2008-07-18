@@ -402,11 +402,11 @@ static MACHINE_DRIVER_START( naughtyb )
 	/* uses the TMS3615NS for sound */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(TMS36XX, 350)
+	MDRV_SOUND_ADD("tms", TMS36XX, 350)
 	MDRV_SOUND_CONFIG(tms3615_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD("naughtyb", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(naughtyb_custom_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 MACHINE_DRIVER_END
@@ -438,11 +438,11 @@ static MACHINE_DRIVER_START( popflame )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(TMS36XX, 350)
+	MDRV_SOUND_ADD("tms", TMS36XX, 350)
 	MDRV_SOUND_CONFIG(tms3615_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 
-	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_ADD("popflame", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(popflame_custom_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 MACHINE_DRIVER_END

@@ -514,7 +514,7 @@ static MACHINE_DRIVER_START( backfire )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMZ280B, 28000000 / 2)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 28000000 / 2)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

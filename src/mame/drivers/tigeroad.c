@@ -580,11 +580,11 @@ static MACHINE_DRIVER_START( tigeroad )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(YM2203, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
@@ -602,7 +602,7 @@ static MACHINE_DRIVER_START( toramich )
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,4000)	/* ? */
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

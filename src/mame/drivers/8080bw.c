@@ -280,7 +280,7 @@ static MACHINE_DRIVER_START( spcewars )
 	MDRV_IMPORT_FROM(invaders_samples_audio)
 
 	/* extra audio channel */
-	MDRV_SOUND_ADD(SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_DRIVER_END
@@ -561,12 +561,12 @@ static MACHINE_DRIVER_START( lrescue )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(lrescue_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* extra audio channel */
-	MDRV_SOUND_ADD(SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_DRIVER_END
@@ -808,12 +808,12 @@ static MACHINE_DRIVER_START( schaser )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SN76477, 0)
+	MDRV_SOUND_ADD("sn", SN76477, 0)
 	MDRV_SOUND_CONFIG(schaser_sn76477_interface)
 	// This will be routed to the discrete system when that feature is working.
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(schaser)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -874,7 +874,7 @@ static MACHINE_DRIVER_START( schasrcv )
 	/* sound hardware */
 	MDRV_IMPORT_FROM(invaders_samples_audio)
 
-	MDRV_SOUND_ADD(SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_DRIVER_END
@@ -1143,7 +1143,7 @@ static MACHINE_DRIVER_START( polaris )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(polaris)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -1437,7 +1437,7 @@ static MACHINE_DRIVER_START( indianbt )
 	/* sound hardware */
 	MDRV_IMPORT_FROM(invaders_samples_audio)
 
-	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(indianbt)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

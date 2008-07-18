@@ -2025,7 +2025,7 @@ static MACHINE_DRIVER_START( dfeveron )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -2064,7 +2064,7 @@ static MACHINE_DRIVER_START( ddonpach )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -2103,12 +2103,12 @@ static MACHINE_DRIVER_START( donpachi )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki1", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.60)
 
-	MDRV_SOUND_ADD(OKIM6295, 2112000)
+	MDRV_SOUND_ADD("oki2", OKIM6295, 2112000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
@@ -2147,7 +2147,7 @@ static MACHINE_DRIVER_START( esprade )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -2185,7 +2185,7 @@ static MACHINE_DRIVER_START( gaia )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -2224,7 +2224,7 @@ static MACHINE_DRIVER_START( guwange )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -2267,7 +2267,7 @@ static MACHINE_DRIVER_START( hotdogst )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2203, 4000000)
+	MDRV_SOUND_ADD("ym", YM2203, 4000000)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.20)
 	MDRV_SOUND_ROUTE(0, "right", 0.20)
@@ -2278,7 +2278,7 @@ static MACHINE_DRIVER_START( hotdogst )
 	MDRV_SOUND_ROUTE(3, "left",  0.80)
 	MDRV_SOUND_ROUTE(3, "right", 0.80)
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
@@ -2317,7 +2317,7 @@ static MACHINE_DRIVER_START( korokoro )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -2363,7 +2363,7 @@ static MACHINE_DRIVER_START( mazinger )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2203, 4000000)
+	MDRV_SOUND_ADD("ym", YM2203, 4000000)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.20)
 	MDRV_SOUND_ROUTE(0, "right", 0.20)
@@ -2374,7 +2374,7 @@ static MACHINE_DRIVER_START( mazinger )
 	MDRV_SOUND_ROUTE(3, "left",  0.60)
 	MDRV_SOUND_ROUTE(3, "right", 0.60)
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 2.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 2.0)
@@ -2420,17 +2420,17 @@ static MACHINE_DRIVER_START( metmqstr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 16000000/4)
+	MDRV_SOUND_ADD("ym", YM2151, 16000000/4)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.20)
 	MDRV_SOUND_ROUTE(1, "right", 1.20)
 
-	MDRV_SOUND_ADD(OKIM6295, 32000000 / 16 )
+	MDRV_SOUND_ADD("oki1", OKIM6295, 32000000 / 16 )
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 32000000 / 16 )
+	MDRV_SOUND_ADD("oki2", OKIM6295, 32000000 / 16 )
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
@@ -2476,7 +2476,7 @@ static MACHINE_DRIVER_START( pwrinst2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2203, 16000000 / 4)
+	MDRV_SOUND_ADD("ym", YM2203, 16000000 / 4)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.40)
 	MDRV_SOUND_ROUTE(0, "right", 0.40)
@@ -2487,12 +2487,12 @@ static MACHINE_DRIVER_START( pwrinst2 )
 	MDRV_SOUND_ROUTE(3, "left",  0.80)
 	MDRV_SOUND_ROUTE(3, "right", 0.80)
 
-	MDRV_SOUND_ADD(OKIM6295, 3000000 )
+	MDRV_SOUND_ADD("oki1", OKIM6295, 3000000 )
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.80)
 
-	MDRV_SOUND_ADD(OKIM6295, 3000000 )
+	MDRV_SOUND_ADD("oki2", OKIM6295, 3000000 )
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.00)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.00)
@@ -2537,17 +2537,17 @@ static MACHINE_DRIVER_START( sailormn )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD(YM2151, 16000000/4)
+	MDRV_SOUND_ADD("ym", YM2151, 16000000/4)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.30)
 	MDRV_SOUND_ROUTE(1, "right", 0.30)
 
-	MDRV_SOUND_ADD(OKIM6295, 2112000)
+	MDRV_SOUND_ADD("oki1", OKIM6295, 2112000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 2112000)
+	MDRV_SOUND_ADD("oki2", OKIM6295, 2112000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
@@ -2585,7 +2585,7 @@ static MACHINE_DRIVER_START( uopoko )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

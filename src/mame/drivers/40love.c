@@ -1023,16 +1023,15 @@ static const struct MSM5232interface msm5232_interface =
 static MACHINE_DRIVER_START( 40love )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,8000000/2) /* OK */
+	MDRV_CPU_ADD_TAG("main",Z80,8000000/2) /* OK */
 	MDRV_CPU_PROGRAM_MAP(40love_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,8000000/2)
-	/* audio CPU */ /* OK */
+	MDRV_CPU_ADD_TAG("audio",Z80,8000000/2) /* OK */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* source/number of IRQs is unknown */
 
-	MDRV_CPU_ADD(M68705,18432000/6) /* OK */
+	MDRV_CPU_ADD_TAG("mcu",M68705,18432000/6) /* OK */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	MDRV_INTERLEAVE(100)	/* high interleave to ensure proper synchronization of CPUs */
@@ -1055,11 +1054,11 @@ static MACHINE_DRIVER_START( 40love )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 2000000)
+	MDRV_SOUND_ADD("ay", AY8910, 2000000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD(MSM5232, 8000000/4)
+	MDRV_SOUND_ADD("msm", MSM5232, 8000000/4)
 	MDRV_SOUND_CONFIG(msm5232_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
@@ -1073,23 +1072,22 @@ static MACHINE_DRIVER_START( 40love )
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( undoukai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,8000000/2)
+	MDRV_CPU_ADD_TAG("main",Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(undoukai_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,8000000/2)
-	/* audio CPU */
+	MDRV_CPU_ADD_TAG("audio",Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* source/number of IRQs is unknown */
 
-//  MDRV_CPU_ADD(M68705,18432000/6)
+//  MDRV_CPU_ADD_TAG("mcu",M68705,18432000/6)
 //  MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	MDRV_MACHINE_RESET(ta7630)	/* init machine */
@@ -1111,11 +1109,11 @@ static MACHINE_DRIVER_START( undoukai )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 2000000)
+	MDRV_SOUND_ADD("ay", AY8910, 2000000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD(MSM5232, 8000000/4)
+	MDRV_SOUND_ADD("msm", MSM5232, 8000000/4)
 	MDRV_SOUND_CONFIG(msm5232_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
@@ -1129,7 +1127,7 @@ static MACHINE_DRIVER_START( undoukai )
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
 

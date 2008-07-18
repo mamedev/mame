@@ -231,11 +231,11 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( formatz )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, XTAL_10MHz/8) /* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", M6809, XTAL_10MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", aeroboto_interrupt)
 
-	MDRV_CPU_ADD(M6809, XTAL_10MHz/16) /* verified on pcb */
+	MDRV_CPU_ADD_TAG("audio", M6809, XTAL_10MHz/16) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -258,11 +258,11 @@ static MACHINE_DRIVER_START( formatz )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, XTAL_10MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_10MHz/8) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, XTAL_10MHz/16) /* verified on pcb */
+	MDRV_SOUND_ADD("ay2", AY8910, XTAL_10MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 

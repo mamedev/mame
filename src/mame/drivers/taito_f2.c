@@ -3763,7 +3763,7 @@ static MACHINE_DRIVER_START( taito_f2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2610, 24000000/3) /* Was 16000000/2, but only a 24Mhz OSC */
+	MDRV_SOUND_ADD("ym", YM2610, 24000000/3) /* Was 16000000/2, but only a 24Mhz OSC */
 	MDRV_SOUND_CONFIG(ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
@@ -4215,14 +4215,14 @@ static MACHINE_DRIVER_START( camltrya )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 24000000/8) /* verified on pcb  */
+	MDRV_SOUND_ADD("ym", YM2203, 24000000/8) /* verified on pcb  */
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
 	MDRV_SOUND_ROUTE(3, "mono", 0.60)
 
-	MDRV_SOUND_ADD(OKIM6295, 4224000/4) /* verified on pcb */
+	MDRV_SOUND_ADD("oki", OKIM6295, 4224000/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
@@ -4257,7 +4257,7 @@ static MACHINE_DRIVER_START( driveout )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")   /* does it ? */
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)

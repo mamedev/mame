@@ -635,7 +635,7 @@ static MACHINE_DRIVER_START( rainbow )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, XTAL_16MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_16MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
@@ -672,10 +672,10 @@ static MACHINE_DRIVER_START( jumping )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, XTAL_18_432MHz/6)	/* not verified */
+	MDRV_SOUND_ADD("ym1", YM2203, XTAL_18_432MHz/6)	/* not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(YM2203, XTAL_18_432MHz/6)	/* not verified */
+	MDRV_SOUND_ADD("ym2", YM2203, XTAL_18_432MHz/6)	/* not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

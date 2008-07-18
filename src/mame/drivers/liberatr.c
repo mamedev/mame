@@ -402,11 +402,11 @@ static MACHINE_DRIVER_START( liberatr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(POKEY, MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
+	MDRV_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
 	MDRV_SOUND_CONFIG(pokey_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(POKEY, MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
+	MDRV_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
 	MDRV_SOUND_CONFIG(pokey_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

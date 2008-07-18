@@ -189,7 +189,7 @@ static MACHINE_DRIVER_START( maniacsq )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(GAELCO_GAE1, 0)
+	MDRV_SOUND_ADD("gaelco", GAELCO_GAE1, 0)
 	MDRV_SOUND_CONFIG(maniacsq_snd_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -318,7 +318,7 @@ static MACHINE_DRIVER_START( bang )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(GAELCO_CG1V, 0)
+	MDRV_SOUND_ADD("gaelco", GAELCO_CG1V, 0)
 	MDRV_SOUND_CONFIG(bang_snd_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -521,7 +521,7 @@ static MACHINE_DRIVER_START( alighunt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(GAELCO_GAE1, 0)
+	MDRV_SOUND_ADD("gaelco", GAELCO_GAE1, 0)
 	MDRV_SOUND_CONFIG(alighunt_snd_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -782,7 +782,7 @@ static MACHINE_DRIVER_START( touchgo )
 	/* the chip is stereo, but the game sound is mono because the right channel
        output is for cabinet 1 and the left channel output is for cabinet 2 */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD(GAELCO_GAE1, 0)
+	MDRV_SOUND_ADD("gaelco", GAELCO_GAE1, 0)
 	MDRV_SOUND_CONFIG(touchgo_snd_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -979,7 +979,7 @@ static MACHINE_DRIVER_START( snowboar )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(GAELCO_CG1V, 0)
+	MDRV_SOUND_ADD("gaelco", GAELCO_CG1V, 0)
 	MDRV_SOUND_CONFIG(snowboar_snd_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -1240,7 +1240,7 @@ static MACHINE_DRIVER_START( wrally2 )
 	/* the chip is stereo, but the game sound is mono because the right channel
        output is for cabinet 1 and the left channel output is for cabinet 2 */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD(GAELCO_GAE1, 0)
+	MDRV_SOUND_ADD("gaelco", GAELCO_GAE1, 0)
 	MDRV_SOUND_CONFIG(wrally2_snd_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

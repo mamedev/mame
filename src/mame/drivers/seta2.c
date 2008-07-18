@@ -1834,7 +1834,7 @@ static MACHINE_DRIVER_START( mj4simai )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 50000000/3)
+	MDRV_SOUND_ADD("x1", X1_010, 50000000/3)
 	MDRV_SOUND_CONFIG(x1_010_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

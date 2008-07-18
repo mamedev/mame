@@ -295,7 +295,7 @@ static MACHINE_DRIVER_START( 20pacgal )
 	MDRV_DRIVER_DATA(_20pacgal_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z180, MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD_TAG("main", Z180, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(20pacgal_map,0)
 	MDRV_CPU_IO_MAP(20pacgal_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
@@ -308,11 +308,11 @@ static MACHINE_DRIVER_START( 20pacgal )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(NAMCO, NAMCO_AUDIO_CLOCK)
+	MDRV_SOUND_ADD("namco", NAMCO, NAMCO_AUDIO_CLOCK)
 	MDRV_SOUND_CONFIG(namco_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

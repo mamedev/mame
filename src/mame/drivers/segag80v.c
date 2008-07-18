@@ -946,7 +946,7 @@ static MACHINE_DRIVER_START( elim2 )
 	MDRV_IMPORT_FROM(g80v_base)
 
 	/* custom sound board */
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(elim2_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -956,7 +956,7 @@ static MACHINE_DRIVER_START( spacfury )
 	MDRV_IMPORT_FROM(g80v_base)
 
 	/* custom sound board */
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(spacfury_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
@@ -969,11 +969,11 @@ static MACHINE_DRIVER_START( zektor )
 	MDRV_IMPORT_FROM(g80v_base)
 
 	/* custom sound board */
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(zektor_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD(AY8910, CPU_CLOCK/2/2)
+	MDRV_SOUND_ADD("ay", AY8910, CPU_CLOCK/2/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	/* speech board */

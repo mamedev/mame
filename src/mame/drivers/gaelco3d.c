@@ -950,16 +950,16 @@ static MACHINE_DRIVER_START( gaelco3d )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DMADAC, 0)
+	MDRV_SOUND_ADD("dac1", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: front mono */
 
-	MDRV_SOUND_ADD(DMADAC, 0)
+	MDRV_SOUND_ADD("dac2", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: left rear */
 
-	MDRV_SOUND_ADD(DMADAC, 0)
+	MDRV_SOUND_ADD("dac3", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: right rear */
 
-	MDRV_SOUND_ADD(DMADAC, 0)
+	MDRV_SOUND_ADD("dac4", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: seat speaker */
 MACHINE_DRIVER_END
 

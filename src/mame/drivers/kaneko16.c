@@ -1718,14 +1718,14 @@ static MACHINE_DRIVER_START( berlwall )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(AY8910, 1000000)
+	MDRV_SOUND_ADD("ay1", AY8910, 1000000)
 	MDRV_SOUND_CONFIG(ay8910_intf_dsw)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 
-	MDRV_SOUND_ADD(AY8910, 1000000)
+	MDRV_SOUND_ADD("ay2", AY8910, 1000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 12000000/6)
+	MDRV_SOUND_ADD("oki", OKIM6295, 12000000/6)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
@@ -1765,14 +1765,14 @@ static MACHINE_DRIVER_START( bakubrkr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(AY8910, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_ADD("ay2", AY8910, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_intf_eeprom)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1824,7 +1824,7 @@ static MACHINE_DRIVER_START( blazeon )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 4000000)
+	MDRV_SOUND_ADD("ym", YM2151, 4000000)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -1873,11 +1873,11 @@ static MACHINE_DRIVER_START( gtmr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, XTAL_16MHz/8)	/* verified on pcb */
+	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_16MHz/8)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MDRV_SOUND_ADD(OKIM6295, XTAL_16MHz/8)	/* verified on pcb */
+	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_16MHz/8)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
@@ -1966,14 +1966,14 @@ static MACHINE_DRIVER_START( mgcrystl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(AY8910, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_ADD("ay2", AY8910, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_intf_eeprom)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -2033,11 +2033,11 @@ static MACHINE_DRIVER_START( shogwarr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1980000)
+	MDRV_SOUND_ADD("oki1", OKIM6295, 1980000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 1980000)
+	MDRV_SOUND_ADD("oki2", OKIM6295, 1980000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

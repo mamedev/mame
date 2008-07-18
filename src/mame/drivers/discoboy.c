@@ -502,11 +502,11 @@ static MACHINE_DRIVER_START( discoboy )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 2500000)
+	MDRV_SOUND_ADD("ym", YM3812, 2500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 
-	MDRV_SOUND_ADD(MSM5205, 384000) // ???? unknown
+	MDRV_SOUND_ADD("msm", MSM5205, 384000) // ???? unknown
 	MDRV_SOUND_CONFIG(discoboy_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 

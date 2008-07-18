@@ -108,7 +108,7 @@ static const struct Samplesinterface zaxxon_samples_interface =
 
 
 MACHINE_DRIVER_START( zaxxon_samples )
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(zaxxon_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
@@ -214,7 +214,7 @@ static const struct Samplesinterface congo_samples_interface =
 
 
 MACHINE_DRIVER_START( congo_samples )
-	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(congo_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END

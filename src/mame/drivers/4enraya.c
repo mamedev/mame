@@ -159,7 +159,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( 4enraya )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,8000000/2)
+	MDRV_CPU_ADD_TAG("main",Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
@@ -179,7 +179,7 @@ static MACHINE_DRIVER_START( 4enraya )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8910, 8000000/4 /* guess */)
+	MDRV_SOUND_ADD("ay", AY8910, 8000000/4 /* guess */)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

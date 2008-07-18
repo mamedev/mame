@@ -312,7 +312,7 @@ static MACHINE_DRIVER_START( ultratnk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(ultratnk)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 

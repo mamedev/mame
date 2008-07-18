@@ -462,7 +462,7 @@ static MACHINE_DRIVER_START( livequiz )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD(YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_CONFIG(ymz280b_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)

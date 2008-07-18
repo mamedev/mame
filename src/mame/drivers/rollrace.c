@@ -263,13 +263,13 @@ static MACHINE_DRIVER_START( rollrace )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(AY8910,XTAL_24MHz/16) /* verified on pcb */
+	MDRV_SOUND_ADD("ay1", AY8910,XTAL_24MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.10)
 
-	MDRV_SOUND_ADD(AY8910,XTAL_24MHz/16) /* verified on pcb */
+	MDRV_SOUND_ADD("ay2", AY8910,XTAL_24MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.10)
 
-	MDRV_SOUND_ADD(AY8910,XTAL_24MHz/16) /* verified on pcb */
+	MDRV_SOUND_ADD("ay3", AY8910,XTAL_24MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.10)
 MACHINE_DRIVER_END
 

@@ -228,14 +228,14 @@ static const struct K007232_interface k007232_interface_2 =
 static MACHINE_DRIVER_START( ajax )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(KONAMI, 3000000)	/* 12/4 MHz*/
+	MDRV_CPU_ADD_TAG("main", KONAMI, 3000000)	/* 12/4 MHz*/
 	MDRV_CPU_PROGRAM_MAP(ajax_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", ajax_interrupt)	/* IRQs triggered by the 051960 */
 
-	MDRV_CPU_ADD(M6809, 3000000)	/* ? */
+	MDRV_CPU_ADD_TAG("sub", M6809, 3000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(ajax_sub_map,0)
 
-	MDRV_CPU_ADD(Z80, 3579545)	/* 3.58 MHz */
+	MDRV_CPU_ADD_TAG("audio", Z80, 3579545)	/* 3.58 MHz */
 	MDRV_CPU_PROGRAM_MAP(ajax_sound_map,0)
 
 	MDRV_INTERLEAVE(10)
@@ -259,18 +259,18 @@ static MACHINE_DRIVER_START( ajax )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
-	MDRV_SOUND_ADD(K007232, 3579545)
+	MDRV_SOUND_ADD("konami1", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_interface_1)
 	MDRV_SOUND_ROUTE(0, "left", 0.20)
 	MDRV_SOUND_ROUTE(0, "right", 0.20)
 	MDRV_SOUND_ROUTE(1, "left", 0.20)
 	MDRV_SOUND_ROUTE(1, "right", 0.20)
 
-	MDRV_SOUND_ADD(K007232, 3579545)
+	MDRV_SOUND_ADD("konami2", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_interface_2)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)

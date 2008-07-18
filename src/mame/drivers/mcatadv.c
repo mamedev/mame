@@ -520,7 +520,7 @@ static MACHINE_DRIVER_START( mcatadv )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2610, XTAL_16MHz/2) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2610, XTAL_16MHz/2) /* verified on pcb */
 	MDRV_SOUND_CONFIG(mcatadv_ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.32)
 	MDRV_SOUND_ROUTE(0, "right", 0.32)

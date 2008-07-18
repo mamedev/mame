@@ -6740,12 +6740,12 @@ static MACHINE_DRIVER_START( tndrcade )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2203, 16000000/4)	/* 4 MHz */
+	MDRV_SOUND_ADD("ym1", YM2203, 16000000/4)	/* 4 MHz */
 	MDRV_SOUND_CONFIG(tndrcade_ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.35)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.35)
 
-	MDRV_SOUND_ADD(YM3812, 16000000/4)	/* 4 MHz */
+	MDRV_SOUND_ADD("ym2", YM3812, 16000000/4)	/* 4 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END
@@ -6790,7 +6790,7 @@ static MACHINE_DRIVER_START( twineagl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -6832,7 +6832,7 @@ static MACHINE_DRIVER_START( downtown )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -6895,7 +6895,7 @@ static MACHINE_DRIVER_START( usclssic )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf2)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -6942,7 +6942,7 @@ static MACHINE_DRIVER_START( calibr50 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf2)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -6983,7 +6983,7 @@ static MACHINE_DRIVER_START( metafox )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7022,7 +7022,7 @@ static MACHINE_DRIVER_START( atehate )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7066,7 +7066,7 @@ static MACHINE_DRIVER_START( blandia )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7098,7 +7098,7 @@ static MACHINE_DRIVER_START( blandiap )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7133,7 +7133,7 @@ static MACHINE_DRIVER_START( blockcar )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7168,7 +7168,7 @@ static MACHINE_DRIVER_START( daioh )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7209,7 +7209,7 @@ static MACHINE_DRIVER_START( drgnunit )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7243,7 +7243,7 @@ static MACHINE_DRIVER_START( qzkklgy2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7278,7 +7278,7 @@ static MACHINE_DRIVER_START( eightfrc )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7319,7 +7319,7 @@ static MACHINE_DRIVER_START( extdwnhl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7380,7 +7380,7 @@ static MACHINE_DRIVER_START( gundhara )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7420,7 +7420,7 @@ static MACHINE_DRIVER_START( jjsquawk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7459,7 +7459,7 @@ static MACHINE_DRIVER_START( kamenrid )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7495,7 +7495,7 @@ static MACHINE_DRIVER_START( orbs )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 14318180)	/* 14.318180 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 14318180)	/* 14.318180 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7530,7 +7530,7 @@ static MACHINE_DRIVER_START( krzybowl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7572,7 +7572,7 @@ static MACHINE_DRIVER_START( madshark )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7617,7 +7617,7 @@ static MACHINE_DRIVER_START( msgundam )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7653,7 +7653,7 @@ static MACHINE_DRIVER_START( oisipuzl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7689,7 +7689,7 @@ static MACHINE_DRIVER_START( triplfun )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(OKIM6295, 792000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 792000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
@@ -7724,7 +7724,7 @@ static MACHINE_DRIVER_START( kiwame )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7762,7 +7762,7 @@ static MACHINE_DRIVER_START( rezon )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7800,7 +7800,7 @@ static MACHINE_DRIVER_START( thunderl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7834,7 +7834,7 @@ static MACHINE_DRIVER_START( wiggie )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -7864,7 +7864,7 @@ static MACHINE_DRIVER_START( wits )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7900,7 +7900,7 @@ static MACHINE_DRIVER_START( umanclub )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7940,12 +7940,12 @@ static MACHINE_DRIVER_START( utoukond )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
-	MDRV_SOUND_ADD(YM3438, 16000000/4)	/* 4 MHz */
+	MDRV_SOUND_ADD("ym", YM3438, 16000000/4)	/* 4 MHz */
 	MDRV_SOUND_CONFIG(utoukond_ym3438_intf)
 	MDRV_SOUND_ROUTE(0, "left", 0.30)
 	MDRV_SOUND_ROUTE(1, "right", 0.30)
@@ -7988,7 +7988,7 @@ static MACHINE_DRIVER_START( wrofaero )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -8031,7 +8031,7 @@ static MACHINE_DRIVER_START( zingzip )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -8065,7 +8065,7 @@ static MACHINE_DRIVER_START( pairlove )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -8110,10 +8110,10 @@ static MACHINE_DRIVER_START( crazyfgt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 16000000/4)	/* 4 MHz */
+	MDRV_SOUND_ADD("ym", YM3812, 16000000/4)	/* 4 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000)	// clock?
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)	// clock?
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -8169,7 +8169,7 @@ static MACHINE_DRIVER_START( inttoote )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

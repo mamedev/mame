@@ -1743,7 +1743,7 @@ static MACHINE_DRIVER_START( itech8_core_lo )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("oki", OKIM6295, CLOCK_8MHz/8) // was /128??
+	MDRV_SOUND_ADD("oki", OKIM6295, CLOCK_8MHz/8) // was /128??
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // was /128, not /132, so unsure so pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
@@ -1765,7 +1765,7 @@ static MACHINE_DRIVER_START( itech8_sound_ym2203 )
 	MDRV_CPU_PROGRAM_MAP(sound2203_map,0)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD_TAG("ym", YM2203, CLOCK_8MHz/2)
+	MDRV_SOUND_ADD("ym", YM2203, CLOCK_8MHz/2)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.07)
 	MDRV_SOUND_ROUTE(1, "mono", 0.07)
@@ -1781,7 +1781,7 @@ static MACHINE_DRIVER_START( itech8_sound_ym3812 )
 	MDRV_CPU_PROGRAM_MAP(sound3812_map,0)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD_TAG("ym", YM3812, CLOCK_8MHz/2)
+	MDRV_SOUND_ADD("ym", YM3812, CLOCK_8MHz/2)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
@@ -1794,7 +1794,7 @@ static MACHINE_DRIVER_START( itech8_sound_ym3812_external )
 	MDRV_CPU_PROGRAM_MAP(sound3812_external_map,0)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD_TAG("ym", YM3812, CLOCK_8MHz/2)
+	MDRV_SOUND_ADD("ym", YM3812, CLOCK_8MHz/2)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END

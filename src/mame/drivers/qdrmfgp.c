@@ -682,7 +682,7 @@ static MACHINE_DRIVER_START( qdrmfgp )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(K054539, 18432000/384)
+	MDRV_SOUND_ADD("konami", K054539, 18432000/384)
 	MDRV_SOUND_CONFIG(k054539_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -717,7 +717,7 @@ static MACHINE_DRIVER_START( qdrmfgp2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(K054539, 18432000/384)
+	MDRV_SOUND_ADD("konami", K054539, 18432000/384)
 	MDRV_SOUND_CONFIG(gp2_k054539_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

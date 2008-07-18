@@ -686,11 +686,11 @@ static MACHINE_DRIVER_START( flstory )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, XTAL_8MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ay", AY8910, XTAL_8MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD(MSM5232, XTAL_8MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("msm", MSM5232, XTAL_8MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(msm5232_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
@@ -704,7 +704,7 @@ static MACHINE_DRIVER_START( flstory )
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
 
@@ -744,11 +744,11 @@ static MACHINE_DRIVER_START( onna34ro )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 8000000/4)
+	MDRV_SOUND_ADD("ay", AY8910, 8000000/4)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD(MSM5232, 2000000)
+	MDRV_SOUND_ADD("msm", MSM5232, 2000000)
 	MDRV_SOUND_CONFIG(msm5232_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
@@ -762,7 +762,7 @@ static MACHINE_DRIVER_START( onna34ro )
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
 
@@ -802,11 +802,11 @@ static MACHINE_DRIVER_START( victnine )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 8000000/4)
+	MDRV_SOUND_ADD("ay", AY8910, 8000000/4)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(MSM5232, 2000000)
+	MDRV_SOUND_ADD("msm", MSM5232, 2000000)
 	MDRV_SOUND_CONFIG(msm5232_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
@@ -820,7 +820,7 @@ static MACHINE_DRIVER_START( victnine )
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
 
