@@ -10,6 +10,9 @@
         * To play Pac-Man instead of Ms. Pac-Man, insert coins then enter the following
           sequence: U U U D D D L R L R L. A sound will play and the ghost will change
           from red to pink.
+        * To toggle the built-in speedup, insert coins then enter the following sequence:
+          L R L R U U U Fire.  A sound will play if you did it correctly.  This will toggle
+          the speed in both Ms Pacman & Pacman as well as provide a "Fast Shot" in Galaga
         * Writes to the Z180 ASCI port:
           MS PAC-MAN/GALAGA
           arcade video system
@@ -321,7 +324,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-ROM_START( 20pacgal )
+ROM_START( 20pacgal ) /* Version 1.01 */
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )
 	ROM_LOAD( "20th_101.u13", 0x00000, 0x40000, CRC(77159582) SHA1(c05e005a941cbdc806dcd76b315069362c792a72) )
 
