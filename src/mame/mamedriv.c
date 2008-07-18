@@ -1412,7 +1412,8 @@ const game_driver * const drivers[] =
 	DRIVER( dbreed72 )	/* (c) 1989 */
 	DRIVER( rtype2 )	/* (c) 1989 */
 	DRIVER( rtype2j )	/* (c) 1989 (Japan) */
-	DRIVER( majtitle )	/* (c) 1990 (Japan) */
+	DRIVER( majtitle )	/* (c) 1990 (World) */
+	DRIVER( majtitlj )	/* (c) 1990 (Japan) */
 	DRIVER( hharry )	/* (c) 1990 (World) */
 	DRIVER( hharryu )	/* (c) 1990 Irem America (US) */
 	DRIVER( dkgensan )	/* (c) 1990 (Japan) */
