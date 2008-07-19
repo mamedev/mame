@@ -45,6 +45,7 @@ struct mb86233_config
 {
 	int			(*fifo_read_cb)( UINT32* data );
 	void		(*fifo_write_cb)( UINT32 data );
+	int 		Tables;
 };
 
 extern void mb86233_get_info(UINT32 state, cpuinfo *info);

@@ -54,6 +54,7 @@ typedef struct
 	/* internal RAM */
 	UINT32			*RAM;
 	UINT32			*ARAM, *BRAM;
+	UINT32			*Tables;
 } MB86233_REGS;
 
 /***************************************************************************
@@ -132,6 +133,7 @@ static void mb86233_init(int index, int clock, const void *config, int (*irqcall
 	memset( mb86233.RAM, 0, 2 * 0x200 * sizeof(UINT32) );
 	mb86233.ARAM = &mb86233.RAM[0];
 	mb86233.BRAM = &mb86233.RAM[0x200];
+	mb86233.Tables = (UINT32*) memory_region(Machine, _config->Tables);
 
 	state_save_register_global_pointer(mb86233.RAM,2 * 0x200 * sizeof(UINT32));
 }
@@ -155,6 +157,7 @@ static void mb86233_reset(void)
 
 #define ZERO_FLAG	(1 << 0)
 #define SIGN_FLAG	(1 << 1)
+#define EXTERNAL_FLAG	(1 << 2)		//This seems to be a flag coming from some external circuit¿?
 
 static void FLAGSF( float v )
 {
@@ -201,6 +204,10 @@ static int COND( UINT32 cond )
 		break;
 
 		case 0x06:	/* never */
+		break;
+
+		case 0x0a:
+			if(GETSR() & EXTERNAL_FLAG) return 1;
 		break;
 
 		case 0x10:	/* --r12 != 0 */
@@ -385,118 +392,166 @@ static void ALU( UINT32 alu)
     Memory Access
 ***************************************************************************/
 
+static UINT32 ScaleExp(unsigned int v,int scale)
+{
+	int exp=(v>>23)&0xff;
+	exp+=scale;
+	v&=~0x7f800000;
+	return v|(exp<<23);
+}
+
+
 static UINT32 GETEXTERNAL( UINT32 EB, UINT32 offset )
 {
 	UINT32		addr;
 
 	if ( EB == 0 && offset >= 0x20 && offset <= 0x2f )	/* TGP Tables in ROM - FIXME - */
 	{
-		if ( offset == 0x20 )	/* SIN from value at RAM(0x20) in 0x4000/PI steps */
+		if(offset>=0x20 && offset<=0x23)	//SIN from value at RAM(0x20) in 0x4000/PI steps
 		{
-			MB86233_REG		r;
-			INT32			a;
-
-			r.u = GETEXTPORT()[0x20];
-			a = r.i;
-			if ( a == 0 || a == -32768 )
-				r.f = 0;
-			else if ( a == 16384 )
-				r.f = 1.0;
-			else if ( a == -16384 )
-				r.f=-1.0;
+			UINT32 r;
+			UINT32 value=GETEXTPORT()[0x20];
+			UINT32 off;
+			value+=(offset-0x20)<<14;
+			off=value&0x3fff;
+			if((value&0x7fff)==0)
+				r=0;
+			else if((value&0x7fff)==0x4000)
+				r=0x3f800000;
 			else
-				r.f = (float)sin((float)a*(2.0*M_PI/65536.0));
-
-			return r.u;
-		}
-
-		if ( offset == 0x21 )	/* COS from value at RAM(0x20) in 0x4000/PI steps */
-		{
-			MB86233_REG		r;
-			INT32			a;
-
-			r.u = GETEXTPORT()[0x20];
-			a = r.i;
-			if ( a == 16384 || a == -16384 )
-				r.f = 0;
-			else if ( a == 0 )
-				r.f = 1.0;
-			else if ( a == -32768 )
-				r.f = -1.0;
-			else
-				r.f = (float)cos((float)a*(2.0*M_PI/65536.0));
-
-			return r.u;
-		}
-
-#if 0
-		if ( offset == 0x22 )	/* -SIN from value at RAM(0x20) in 0x4000/PI steps */
-		{
-			MB86233_REG		r;
-			INT32			a;
-
-			r.u = GETEXTPORT()[0x20];
-			a = r.i;
-			r.f = (float)-sin((float)a*(2.0*M_PI/65536.0));
-			return r.u;
-		}
-#endif
-
-		if ( offset == 0x27 )	/* atan */
-		{
-			MB86233_REG		r1, r2;
-
-			r1.u = GETEXTPORT()[0x24]; /* A */
-			r2.u = GETEXTPORT()[0x25]; /* B */
-
-			if ( r2.f == 0 )
 			{
-				if ( r1.f >= 0 )
-					GETEXTPORT()[0x27] = 0;
+				if(value&0x4000)
+					off=0x4000-off;
+				r=mb86233.Tables[off];
+			}
+			if(value&0x8000)
+				r|=1<<31;
+			return r;
+		}
+
+		if(offset==0x27)
+		{
+			unsigned int value=GETEXTPORT()[0x27];
+			int exp=(value>>23)&0xff;
+			unsigned int res=0;
+			unsigned int sign=0;
+			MB86233_REG a,b;
+			int index;
+
+			a.u=GETEXTPORT()[0x24];
+			b.u=GETEXTPORT()[0x25];
+
+
+			if(!exp)
+			{
+				if((a.u&0x7fffffff)<=(b.u&0x7fffffff))
+				{
+					if(b.u&0x80000000)
+						res=0xc000;
+					else
+						res=0x4000;
+				}
 				else
-					GETEXTPORT()[0x27] = 0xFFFF8000;
+				{
+					if(a.u&0x80000000)
+						res=0x8000;
+					else
+						res=0x0000;
+				}
+				return res;
 			}
-			else if ( r1.f == 0 )
-			{
-				if ( r2.f >= 0 )
-					GETEXTPORT()[0x27] = 0x4000;
-				else
-					GETEXTPORT()[0x27] = 0xFFFFC000;
-			}
+
+			if((a.u^b.u)&0x80000000)
+				sign=16;				//the negative values are in the high word
+
+			if((exp&0x70)!=0x70)
+				index=0;
+			else if(exp<0x70 || exp>0x7e)
+				index=0x3fff;
 			else
 			{
-				r1.i = (INT32)((atan2(r2.f,r1.f))*32768.0/M_PI);
-				GETEXTPORT()[0x27] = r1.u;
+				int expdif=exp-0x71;
+				int base;
+				int mask;
+				int shift;
+
+
+				if(expdif<0)
+					expdif=0;
+				base=1<<expdif;
+				mask=base-1;
+				shift=23-expdif;
+
+				index=base+((value>>shift)&mask);
+
 			}
 
-			return GETEXTPORT()[0x27];
+			res=(mb86233.Tables[index+0x10000/4]>>sign)&0xffff;
+
+			if((a.u&0x7fffffff)<=(b.u&0x7fffffff))
+				res=0x4000-res;
+
+
+			if((a.u&0x80000000) && (b.u&0x80000000))	//3rd quadrant
+			{
+				res=0x8000|res;
+			}
+			else if((a.u&0x80000000) && !(b.u&0x80000000))	//2nd quadrant
+			{
+				res=res&0x7fff;
+			}
+			else if(!(a.u&0x80000000) && (b.u&0x80000000))	//2nd quadrant
+			{
+				res=0x8000|res;
+			}
+
+			return res;
+
 		}
 
-		if ( offset == 0x28 )	/* 1/x - part 1 */
-			return 0;
-
-		if ( offset == 0x29 )	/* 1/x - part 2 */
+		if(offset==0x28)
 		{
-			MB86233_REG		r;
-			r.u = GETEXTPORT()[0x28];
-			if ( r.f==0 )
-					r.u = 0x80000000;
-			r.f = 1/r.f;
-			return r.u;
+			UINT32 offset=(GETEXTPORT()[0x28]>>10)&0x1fff;
+			UINT32 value=mb86233.Tables[offset*2+0x20000/4];
+			UINT32 srcexp=(GETEXTPORT()[0x28]>>23)&0xff;
+
+			value&=0x7FFFFFFF;
+
+			return ScaleExp(value,0x7f-srcexp);
 		}
-
-		if ( offset == 0x2a )	/* 1/sqrt(x) - part 1 */
-			return 0;
-
-		if ( offset == 0x2b)	/* 1/sqrt(x) - part 2 */
+		if(offset==0x29)
 		{
-			MB86233_REG		r;
-			r.u = GETEXTPORT()[0x2a];
-			if ( r.f == 0 )
-				r.u=0x80000000;
-			else
-				r.f = 1/sqrt(r.f);
-			return r.u;
+			UINT32 offset=(GETEXTPORT()[0x28]>>10)&0x1fff;
+			UINT32 value=mb86233.Tables[offset*2+(0x20000/4)+1];
+			UINT32 srcexp=(GETEXTPORT()[0x28]>>23)&0xff;
+
+			value&=0x7FFFFFFF;
+			if(GETEXTPORT()[0x28]&(1<<31))
+				value|=1<<31;
+
+			return ScaleExp(value,0x7f-srcexp);
+		}
+		if(offset==0x2a)
+		{
+			UINT32 offset=((GETEXTPORT()[0x2a]>>11)&0x1fff)^0x1000;
+			UINT32 value=mb86233.Tables[offset*2+0x30000/4];
+			UINT32 srcexp=(GETEXTPORT()[0x2a]>>24)&0x7f;
+
+			value&=0x7FFFFFFF;
+
+			return ScaleExp(value,0x3f-srcexp);
+		}
+		if(offset==0x2b)
+		{
+			UINT32 offset=((GETEXTPORT()[0x2a]>>11)&0x1fff)^0x1000;
+			UINT32 value=mb86233.Tables[offset*2+(0x30000/4)+1];
+			UINT32 srcexp=(GETEXTPORT()[0x2a]>>24)&0x7f;
+
+			value&=0x7FFFFFFF;
+			if(GETEXTPORT()[0x2a]&(1<<31))
+				value|=1<<31;
+
+			return ScaleExp(value,0x3f-srcexp);
 		}
 
 		return GETEXTPORT()[offset];
@@ -514,6 +569,18 @@ static void SETEXTERNAL( UINT32 EB, UINT32 offset, UINT32 value )
 	if ( EB == 0 && offset >= 0x20 && offset <= 0x2f )	/* TGP Tables in ROM - FIXME - */
 	{
 		GETEXTPORT()[offset] = value;
+
+		if(offset==0x25 || offset==0x24)
+		{
+			if((GETEXTPORT()[0x24]&0x7fffffff)<=(GETEXTPORT()[0x25]&0x7fffffff))
+			{
+				GETSR()|=EXTERNAL_FLAG;
+			}
+			else
+			{
+				GETSR()&=~EXTERNAL_FLAG;
+			}
+		}
 		return;
 	}
 
@@ -1240,10 +1307,12 @@ static int mb86233_execute(int cycles)
 				}
 				else if ( sub == 1 ) /* A.e */
 				{
-					GETA().u = (imm & 0xff) << 23;
+					GETA().u &= ~0x7f800000;
+					GETA().u |= (imm & 0xff) << 23;
 				}
 				else if ( sub == 2 ) /* A.m */
 				{
+					GETA().u &= 0x7f800000;
 					GETA().u |= (imm & 0x7fffff ) | ((imm & 0x800000) << 8);
 				}
 				else
@@ -1258,16 +1327,20 @@ static int mb86233_execute(int cycles)
 				UINT32	sub = (opcode>>24) & 0x03;
 				UINT32	imm = opcode & 0xffffff;
 
-				if ( sub == 0 ) /* B ? */
+				if ( sub == 0 ) /* B.e again? */
 				{
-					GETB().u = ((imm & 0x7f) << 23) | ((imm & 0xff) << 8) | ( imm & 0xff );
+					//GETB().u = ((imm & 0x7f) << 23) | ((imm & 0xff) << 8) | ( imm & 0xff );
+					GETB().u &= ~0x7f800000;
+					GETB().u |= (imm & 0xff) << 23;
 				}
 				else if ( sub == 1 ) /* B.e */
 				{
-					GETB().u = (imm & 0xff) << 23;
+					GETB().u &= ~0x7f800000;
+					GETB().u |= (imm & 0xff) << 23;
 				}
 				else if ( sub == 2 ) /* B.m */
 				{
+					GETB().u &= 0x7f800000;
 					GETB().u |= (imm & 0x7fffff ) | ((imm & 0x800000) << 8);
 				}
 				else
@@ -1288,10 +1361,12 @@ static int mb86233_execute(int cycles)
 				}
 				else if ( sub == 2 ) /* D.e */
 				{
-					GETD().u = (imm & 0xff) << 23;
+					GETD().u &= ~0x7f800000;
+					GETD().u |= (imm & 0xff) << 23;
 				}
 				else if ( sub == 3 ) /* D.m */
 				{
+					GETD().u &= 0x7f800000;
 					GETD().u |= (imm & 0x7fffff ) | ((imm & 0x800000) << 8);
 				}
 				else
