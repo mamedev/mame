@@ -1133,7 +1133,7 @@ static INTERRUPT_GEN(m2)
 static MACHINE_DRIVER_START( m2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC602, 33000000)	/* actually PPC602, 66MHz */
+	MDRV_CPU_ADD_TAG("main", PPC602, 33000000)	/* actually PPC602, 66MHz */
 	MDRV_CPU_CONFIG(ppc602_config)
 	MDRV_CPU_PROGRAM_MAP(m2_main, 0)
 	MDRV_CPU_VBLANK_INT("main", m2)

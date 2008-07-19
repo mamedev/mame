@@ -583,8 +583,7 @@ static MACHINE_DRIVER_START( vendetta )
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", vendetta_irq)
 
-	MDRV_CPU_ADD(Z80, 3579545)	/* verified with PCB */
-	/* audio CPU */
+	MDRV_CPU_ADD_TAG("audio", Z80, 3579545)	/* verified with PCB */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
                             /* interrupts are triggered by the main CPU */
 

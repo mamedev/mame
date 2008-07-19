@@ -1012,7 +1012,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( cvs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(S2650, 894886.25)
+	MDRV_CPU_ADD_TAG("main", S2650, 894886.25)
 	MDRV_CPU_PROGRAM_MAP(cvs_main_cpu_map,0)
 	MDRV_CPU_IO_MAP(cvs_main_cpu_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", cvs_main_cpu_interrupt)

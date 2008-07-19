@@ -1753,7 +1753,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bullsdrt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(S2650, 12096000/8)
+	MDRV_CPU_ADD_TAG("main", S2650, 12096000/8)
 	MDRV_CPU_PROGRAM_MAP(bullsdrt_map,0)
 	MDRV_CPU_IO_MAP(bullsdrt_port_map,0)
 

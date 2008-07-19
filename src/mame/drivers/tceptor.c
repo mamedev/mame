@@ -382,7 +382,7 @@ static MACHINE_RESET( tceptor )
 static MACHINE_DRIVER_START( tceptor )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 49152000/32)
+	MDRV_CPU_ADD_TAG("main", M6809, 49152000/32)
 	MDRV_CPU_PROGRAM_MAP(m6809_map,0)
 	MDRV_CPU_VBLANK_INT("2D", m6809_vb_interrupt)
 

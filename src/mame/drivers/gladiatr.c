@@ -684,7 +684,7 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( ppking )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL_12MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(ppking_cpu1_map,0)
 	MDRV_CPU_IO_MAP(ppking_cpu1_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -734,7 +734,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gladiatr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL_12MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(gladiatr_cpu1_map,0)
 	MDRV_CPU_IO_MAP(gladiatr_cpu1_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

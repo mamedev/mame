@@ -300,7 +300,7 @@ static MACHINE_DRIVER_START( starshp1 )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD(M6502, STARSHP1_CPU_CLOCK)
+	MDRV_CPU_ADD_TAG("main", M6502, STARSHP1_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
 	MDRV_CPU_VBLANK_INT("main", starshp1_interrupt)
 

@@ -1027,7 +1027,7 @@ static const struct C352interface c352_interface =
 static MACHINE_DRIVER_START( s23 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(R4650BE, 166000000)
+	MDRV_CPU_ADD_TAG("main", R4650BE, 166000000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(ss23_map, 0)
 
@@ -1065,7 +1065,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ss23 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(R4650BE, 166000000)
+	MDRV_CPU_ADD_TAG("main", R4650BE, 166000000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(ss23_map, 0)
 	MDRV_CPU_VBLANK_INT("main", namcos23_interrupt)

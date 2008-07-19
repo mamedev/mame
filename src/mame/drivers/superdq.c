@@ -332,7 +332,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( superdq )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MASTER_CLOCK/8)
+	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(superdq_map,0)
 	MDRV_CPU_IO_MAP(superdq_io,0)
 	MDRV_CPU_VBLANK_INT("main", superdq_vblank)

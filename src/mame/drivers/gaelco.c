@@ -217,7 +217,7 @@ GFXDECODEINFO(0x100000,64)
 static MACHINE_DRIVER_START( bigkarnk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)	/* MC68000P10, 10 MHz */
+	MDRV_CPU_ADD_TAG("main", M68000, 10000000)	/* MC68000P10, 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(bigkarnk_readmem,bigkarnk_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -472,7 +472,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( maniacsq )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000/2)			/* 12 MHz */
+	MDRV_CPU_ADD_TAG("main", M68000,24000000/2)			/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(maniacsq_readmem,maniacsq_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -725,7 +725,7 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( squash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* MC68000P12, 12 MHz */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* MC68000P12, 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(squash_readmem,squash_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -893,7 +893,7 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( thoop )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* MC68000P12, 12 MHz */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* MC68000P12, 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(squash_readmem,thoop_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 

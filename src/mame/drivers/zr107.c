@@ -737,7 +737,7 @@ static MACHINE_RESET( zr107 )
 static MACHINE_DRIVER_START( zr107 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
+	MDRV_CPU_ADD_TAG("main", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_PROGRAM_MAP(zr107_map, 0)
 	MDRV_CPU_VBLANK_INT("main", zr107_vblank)
 
@@ -782,7 +782,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( jetwave )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
+	MDRV_CPU_ADD_TAG("main", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_PROGRAM_MAP(jetwave_map, 0)
 	MDRV_CPU_VBLANK_INT("main", zr107_vblank)
 

@@ -389,7 +389,7 @@ static MACHINE_RESET( bwing )
 static MACHINE_DRIVER_START( bwing )
 
 	// basic machine hardware
-	MDRV_CPU_ADD(M6809, 2000000)
+	MDRV_CPU_ADD_TAG("main", M6809, 2000000)
 	MDRV_CPU_PROGRAM_MAP(bwp1_readmem, bwp1_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(bwp1_interrupt, 3)
 

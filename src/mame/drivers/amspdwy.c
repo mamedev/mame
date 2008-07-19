@@ -255,7 +255,7 @@ static const struct YM2151interface amspdwy_ym2151_interface =
 static MACHINE_DRIVER_START( amspdwy )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,3000000)
+	MDRV_CPU_ADD_TAG("main", Z80,3000000)
 	MDRV_CPU_PROGRAM_MAP(amspdwy_map,0)
 	MDRV_CPU_IO_MAP(amspdwy_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ: 60Hz, NMI: retn */

@@ -398,7 +398,7 @@ static const struct K053260_interface k053260_interface =
 static MACHINE_DRIVER_START( overdriv )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000/2)	/* 12 MHz */
+	MDRV_CPU_ADD_TAG("main", M68000,24000000/2)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(overdriv_readmem,overdriv_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(cpuA_interrupt,4)	/* ??? IRQ 4 is vblank, IRQ 5 of unknown origin */
 

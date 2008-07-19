@@ -698,7 +698,7 @@ static const struct CustomSound_interface bb_custom_interface =
  *************************************/
 
 static MACHINE_DRIVER_START( tx1 )
-	MDRV_CPU_ADD(I8086, 5000000)
+	MDRV_CPU_ADD_TAG("main", I8086, 5000000)
 	MDRV_CPU_PROGRAM_MAP(tx1_main, 0)
 //  MDRV_WATCHDOG_TIME_INIT(5)
 
@@ -756,7 +756,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( buggyboy )
-	MDRV_CPU_ADD(BUGGYBOY_CPU_TYPE, 5000000)
+	MDRV_CPU_ADD_TAG("main", I8086, 5000000)
 	MDRV_CPU_PROGRAM_MAP(buggyboy_main, 0)
 //  MDRV_WATCHDOG_TIME_INIT(5)
 
@@ -814,7 +814,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( buggybjr )
-	MDRV_CPU_ADD(BUGGYBOY_CPU_TYPE, 5000000)
+	MDRV_CPU_ADD_TAG("main", I8086, 5000000)
 	MDRV_CPU_PROGRAM_MAP(buggybjr_main, 0)
 //  MDRV_WATCHDOG_TIME_INIT(5)
 

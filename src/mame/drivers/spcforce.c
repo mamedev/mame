@@ -258,7 +258,7 @@ static MACHINE_DRIVER_START( spcforce )
 
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-	MDRV_CPU_ADD(8085A, 8000000 * 2)        /* 4.00 MHz??? */
+	MDRV_CPU_ADD_TAG("main", 8085A, 8000000 * 2)        /* 4.00 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq3_line_hold)
 

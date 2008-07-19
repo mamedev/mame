@@ -2468,7 +2468,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( drivfrcg )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(S2650, 18432000/6)
+	MDRV_CPU_ADD_TAG("main", S2650, 18432000/6)
 	MDRV_CPU_PROGRAM_MAP(drivfrcg,0)
 	MDRV_CPU_IO_MAP(drivfrcg_io,0)
 	MDRV_CPU_VBLANK_INT("main", hunchbks_vh_interrupt)
@@ -2514,7 +2514,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hunchbkg )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(S2650, PIXEL_CLOCK/2)
+	MDRV_CPU_ADD_TAG("main", S2650, PIXEL_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(hunchbkg,0)
 	MDRV_CPU_IO_MAP(hunchbkg_io,0)
 	MDRV_CPU_VBLANK_INT("main", hunchbks_vh_interrupt)
@@ -2577,7 +2577,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( racknrol )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(S2650, PIXEL_CLOCK/2)
+	MDRV_CPU_ADD_TAG("main", S2650, PIXEL_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(racknrol,0)
 	MDRV_CPU_IO_MAP(racknrol_io,0)
 	MDRV_CPU_VBLANK_INT("main", hunchbks_vh_interrupt)
@@ -2635,7 +2635,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hexpoola )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(S2650, PIXEL_CLOCK/2)
+	MDRV_CPU_ADD_TAG("main", S2650, PIXEL_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(racknrol,0)
 	MDRV_CPU_IO_MAP(hexpoola_io,0)
 	MDRV_CPU_VBLANK_INT("main", hunchbks_vh_interrupt)

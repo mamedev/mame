@@ -652,7 +652,7 @@ static const struct MSM5232interface msm5232_interface =
 static MACHINE_DRIVER_START( flstory )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,XTAL_10_733MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", Z80,XTAL_10_733MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(flstory_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -711,7 +711,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( onna34ro )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,10733000/2)		/* ??? */
+	MDRV_CPU_ADD_TAG("main", Z80,10733000/2)		/* ??? */
 	MDRV_CPU_PROGRAM_MAP(onna34ro_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -769,7 +769,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( victnine )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,8000000/2)		/* 4 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80,8000000/2)		/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(victnine_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

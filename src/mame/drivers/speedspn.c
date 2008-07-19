@@ -307,8 +307,7 @@ static MACHINE_DRIVER_START( speedspn )
 	MDRV_CPU_IO_MAP(readport, writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,6000000)		 /* 6 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD_TAG("audio", Z80,6000000)		 /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
 
 	/* video hardware */

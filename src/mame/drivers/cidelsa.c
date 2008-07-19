@@ -589,7 +589,7 @@ static MACHINE_DRIVER_START( destryer )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD(CDP1802, DESTRYER_CHR1)
+	MDRV_CPU_ADD_TAG("main", CDP1802, DESTRYER_CHR1)
 	MDRV_CPU_PROGRAM_MAP(destryer_map, 0)
 	MDRV_CPU_IO_MAP(destryer_io_map, 0)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
@@ -615,7 +615,7 @@ static MACHINE_DRIVER_START( destryea )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD(CDP1802, DESTRYER_CHR1)
+	MDRV_CPU_ADD_TAG("main", CDP1802, DESTRYER_CHR1)
 	MDRV_CPU_PROGRAM_MAP(destryea_map, 0)
 	MDRV_CPU_IO_MAP(destryer_io_map, 0)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
@@ -641,7 +641,7 @@ static MACHINE_DRIVER_START( altair )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD(CDP1802, ALTAIR_CHR1)
+	MDRV_CPU_ADD_TAG("main", CDP1802, ALTAIR_CHR1)
 	MDRV_CPU_PROGRAM_MAP(altair_map, 0)
 	MDRV_CPU_IO_MAP(altair_io_map, 0)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
@@ -680,7 +680,7 @@ static MACHINE_DRIVER_START( draco )
 
 	// basic system hardware
 
-	MDRV_CPU_ADD(CDP1802, DRACO_CHR1)
+	MDRV_CPU_ADD_TAG("main", CDP1802, DRACO_CHR1)
 	MDRV_CPU_PROGRAM_MAP(draco_map, 0)
 	MDRV_CPU_IO_MAP(draco_io_map, 0)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)

@@ -433,7 +433,7 @@ static const struct MSM5205interface splash_msm5205_interface =
 static MACHINE_DRIVER_START( splash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000/2)			/* 12 MHz (24/2) */
+	MDRV_CPU_ADD_TAG("main", M68000,24000000/2)			/* 12 MHz (24/2) */
 	MDRV_CPU_PROGRAM_MAP(splash_readmem,splash_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -485,7 +485,7 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( roldfrog )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000/2)			/* 12 MHz - verified */
+	MDRV_CPU_ADD_TAG("main", M68000,24000000/2)			/* 12 MHz - verified */
 	MDRV_CPU_PROGRAM_MAP(roldfrog_readmem,roldfrog_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -524,7 +524,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( funystrp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000/2)			/* 12 MHz (24/2) */
+	MDRV_CPU_ADD_TAG("main", M68000,24000000/2)			/* 12 MHz (24/2) */
 	MDRV_CPU_PROGRAM_MAP(funystrp_readmem,funystrp_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 

@@ -777,7 +777,7 @@ static INTERRUPT_GEN( witch_sub_interrupt )
 
 static MACHINE_DRIVER_START( witch )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,8000000)		 /* ? MHz */
+	MDRV_CPU_ADD_TAG("main", Z80,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(map_main, 0)
 	MDRV_CPU_VBLANK_INT("main", witch_main_interrupt)
 

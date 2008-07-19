@@ -587,7 +587,7 @@ static const struct Samplesinterface bowl3d_samples_interface =
 static MACHINE_DRIVER_START( meadows )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(S2650, 5000000/8) 	/* 5MHz / 8 = 625 kHz */
+	MDRV_CPU_ADD_TAG("main", S2650, 5000000/8) 	/* 5MHz / 8 = 625 kHz */
 	MDRV_CPU_PROGRAM_MAP(meadows_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", meadows_interrupt) 	/* one interrupt per frame!? */
 
@@ -627,7 +627,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( minferno )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(S2650, 5000000/8/3) 	/* 5MHz / 8 = 625 kHz */
+	MDRV_CPU_ADD_TAG("main", S2650, 5000000/8/3) 	/* 5MHz / 8 = 625 kHz */
 	MDRV_CPU_PROGRAM_MAP(minferno_main_map,0)
 	MDRV_CPU_IO_MAP(minferno_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", minferno_interrupt)
@@ -655,7 +655,7 @@ static MACHINE_DRIVER_START( bowl3d )
 	MDRV_IMPORT_FROM(meadows)
 
  	/* audio hardware */
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
+	MDRV_SOUND_ADD("samples2", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(bowl3d_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

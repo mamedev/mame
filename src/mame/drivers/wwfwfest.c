@@ -386,7 +386,7 @@ static VIDEO_EOF( wwfwfest )
 static MACHINE_DRIVER_START( wwfwfest )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 24000000/2)	/* 24 crystal, 12 rated chip */
+	MDRV_CPU_ADD_TAG("main", M68000, 24000000/2)	/* 24 crystal, 12 rated chip */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(wwfwfest_interrupt,2)
 

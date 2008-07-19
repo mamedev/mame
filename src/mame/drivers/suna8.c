@@ -1552,7 +1552,7 @@ static const struct Samplesinterface suna8_samples_interface =
 static MACHINE_DRIVER_START( hardhead )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 24000000 / 4)			/* ? */
+	MDRV_CPU_ADD_TAG("main", Z80, 24000000 / 4)			/* ? */
 	MDRV_CPU_PROGRAM_MAP(hardhead_readmem,hardhead_writemem)
 	MDRV_CPU_IO_MAP(hardhead_readport,hardhead_writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* No NMI */
@@ -1607,7 +1607,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rranger )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 24000000 / 4)					/* ? */
+	MDRV_CPU_ADD_TAG("main", Z80, 24000000 / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(rranger_readmem,rranger_writemem)
 	MDRV_CPU_IO_MAP(rranger_readport,rranger_writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ & NMI ! */
@@ -1770,7 +1770,7 @@ static const struct AY8910interface starfigh_ay8910_interface =
 static MACHINE_DRIVER_START( starfigh )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 24000000 / 4)					/* ? */
+	MDRV_CPU_ADD_TAG("main", Z80, 24000000 / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(starfigh_readmem,starfigh_writemem)
 	MDRV_CPU_IO_MAP(starfigh_readport,starfigh_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(brickzn_interrupt,2)	/* IRQ & NMI */
@@ -1831,7 +1831,7 @@ static INTERRUPT_GEN( sparkman_interrupt )
 static MACHINE_DRIVER_START( sparkman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 24000000 / 4)					/* ? */
+	MDRV_CPU_ADD_TAG("main", Z80, 24000000 / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(sparkman_readmem,sparkman_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(sparkman_interrupt,2)	/* IRQ & NMI */
 

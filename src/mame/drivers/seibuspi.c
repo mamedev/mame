@@ -2088,7 +2088,7 @@ static MACHINE_RESET( seibu386 )
 static MACHINE_DRIVER_START( seibu386 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I386, 40000000)	/* AMD 386DX, 40MHz */
+	MDRV_CPU_ADD_TAG("main", I386, 40000000)	/* AMD 386DX, 40MHz */
 	MDRV_CPU_PROGRAM_MAP(seibu386_map, 0)
 	MDRV_CPU_VBLANK_INT("main", spi_interrupt)
 

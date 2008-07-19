@@ -808,7 +808,7 @@ static INTERRUPT_GEN( fantland_sound_irq )
 
 static MACHINE_DRIVER_START( fantland )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8086, 8000000)        // ?
+	MDRV_CPU_ADD_TAG("main", I8086, 8000000)        // ?
 	MDRV_CPU_PROGRAM_MAP(fantland_map, 0)
 	MDRV_CPU_VBLANK_INT("main", fantland_irq)
 
@@ -860,7 +860,7 @@ static const struct YM2151interface galaxygn_ym2151_interface =
 
 static MACHINE_DRIVER_START( galaxygn )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8088, 8000000)        // ?
+	MDRV_CPU_ADD_TAG("main", I8088, 8000000)        // ?
 	MDRV_CPU_PROGRAM_MAP(galaxygn_map, 0)
 	MDRV_CPU_VBLANK_INT("main", fantland_irq)
 
@@ -914,7 +914,7 @@ static MACHINE_RESET( borntofi )
 
 static MACHINE_DRIVER_START( borntofi )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V20, 16000000/2)        // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
+	MDRV_CPU_ADD_TAG("main", V20, 16000000/2)        // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
 	MDRV_CPU_PROGRAM_MAP(borntofi_map, 0)
 	MDRV_CPU_VBLANK_INT("main", fantland_irq)
 
@@ -960,7 +960,7 @@ static const struct YM3526interface wheelrun_ym3526_interface =
 
 static MACHINE_DRIVER_START( wheelrun )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V20, XTAL_18MHz/2)		// D701080C-8 (V20)
+	MDRV_CPU_ADD_TAG("main", V20, XTAL_18MHz/2)		// D701080C-8 (V20)
 	MDRV_CPU_PROGRAM_MAP(wheelrun_map, 0)
 	MDRV_CPU_VBLANK_INT("main", fantland_irq)
 

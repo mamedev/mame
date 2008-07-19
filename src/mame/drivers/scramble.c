@@ -2209,7 +2209,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ad2083 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(ad2083_map,0)
 
 	MDRV_MACHINE_RESET(galaxold)

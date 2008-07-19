@@ -262,7 +262,7 @@ static INTERRUPT_GEN( simpsons_irq )
 static MACHINE_DRIVER_START( simpsons )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(KONAMI, XTAL_24MHz/2/4) /* pin 18 of konami cpu is 12Mhz, while pin 17 is 3mhz. Clock probably divided internally by 4  */
+	MDRV_CPU_ADD_TAG("main", KONAMI, XTAL_24MHz/2/4) /* pin 18 of konami cpu is 12Mhz, while pin 17 is 3mhz. Clock probably divided internally by 4  */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", simpsons_irq)	/* IRQ triggered by the 052109, FIRQ by the sprite hardware */
 

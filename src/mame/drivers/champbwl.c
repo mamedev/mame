@@ -331,7 +331,7 @@ static const struct x1_010_interface champbwl_sound_intf =
 static MACHINE_DRIVER_START( champbwl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 16000000/4) /* 4MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 16000000/4) /* 4MHz */
 	MDRV_CPU_PROGRAM_MAP(champbwl_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

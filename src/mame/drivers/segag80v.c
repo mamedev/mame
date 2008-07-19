@@ -920,7 +920,7 @@ static const struct Samplesinterface zektor_samples_interface =
 static MACHINE_DRIVER_START( g80v_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, CPU_CLOCK/2)
+	MDRV_CPU_ADD_TAG("main", Z80, CPU_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

@@ -563,7 +563,7 @@ static const struct Y8950interface y8950_interface = {
 };
 
 static MACHINE_DRIVER_START( cybertnk )
-	MDRV_CPU_ADD(M68000,20000000/2)
+	MDRV_CPU_ADD_TAG("main", M68000,20000000/2)
 	MDRV_CPU_PROGRAM_MAP(master_mem,0)
 	MDRV_CPU_VBLANK_INT_HACK(master_irq,2)
 

@@ -235,7 +235,7 @@ static VIDEO_EOF( raiden )
 static MACHINE_DRIVER_START( raiden )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
+	MDRV_CPU_ADD_TAG("main", V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", raiden_interrupt)
 
@@ -274,7 +274,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( raidena )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
+	MDRV_CPU_ADD_TAG("main", V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(alt_map,0)
 	MDRV_CPU_VBLANK_INT("main", raiden_interrupt)
 

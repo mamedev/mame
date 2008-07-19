@@ -464,7 +464,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( wardner )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,24000000/4)			/* 6MHz ??? - Real board crystal is 24MHz */
+	MDRV_CPU_ADD_TAG("main", Z80,24000000/4)			/* 6MHz ??? - Real board crystal is 24MHz */
 	MDRV_CPU_PROGRAM_MAP(main_program_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", wardner_interrupt)

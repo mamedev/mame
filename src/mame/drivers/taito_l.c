@@ -2270,7 +2270,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kurikint )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
+	MDRV_CPU_ADD_TAG("main", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
 	MDRV_CPU_PROGRAM_MAP(kurikint_readmem,kurikint_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
@@ -2410,7 +2410,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( evilston )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 13330560/2) 	/* not verfied */
+	MDRV_CPU_ADD_TAG("main", Z80, 13330560/2) 	/* not verfied */
 	MDRV_CPU_PROGRAM_MAP(evilston_readmem,evilston_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 

@@ -278,7 +278,7 @@ static VIDEO_UPDATE( trvmadns )
 }
 
 static MACHINE_DRIVER_START( trvmadns )
-	MDRV_CPU_ADD(Z80,10000000/2) // ?
+	MDRV_CPU_ADD_TAG("main", Z80,10000000/2) // ?
 	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)

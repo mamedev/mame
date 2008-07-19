@@ -688,7 +688,7 @@ static const struct YM2203interface ym2203_interface =
 
 static MACHINE_DRIVER_START( tokio )
 	// basic machine hardware
-	MDRV_CPU_ADD(Z80, MAIN_XTAL/4)	// 6 MHz
+	MDRV_CPU_ADD_TAG("main", Z80, MAIN_XTAL/4)	// 6 MHz
 	MDRV_CPU_PROGRAM_MAP(tokio_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

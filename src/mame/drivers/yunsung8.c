@@ -506,7 +506,7 @@ static const struct MSM5205interface yunsung8_msm5205_interface =
 static MACHINE_DRIVER_START( yunsung8 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 8000000)			/* Z80B */
+	MDRV_CPU_ADD_TAG("main", Z80, 8000000)			/* Z80B */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(port_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* No nmi routine */

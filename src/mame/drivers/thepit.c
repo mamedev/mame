@@ -651,7 +651,7 @@ static MACHINE_DRIVER_START( thepit )
 	MDRV_CPU_PROGRAM_MAP(thepit_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(Z80, SOUND_CLOCK/4)     /* 2.5 MHz */
+	MDRV_CPU_ADD_TAG("audio", Z80, SOUND_CLOCK/4)     /* 2.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 	MDRV_CPU_IO_MAP(audio_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

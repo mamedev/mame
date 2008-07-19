@@ -353,7 +353,7 @@ static const struct YM3812interface ym3812_interface =
 
 static MACHINE_DRIVER_START( spbactn )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(spbactn_readmem,spbactn_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq3_line_hold)
 

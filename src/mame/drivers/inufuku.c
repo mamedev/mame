@@ -398,7 +398,7 @@ static const struct YM2610interface ym2610_interface =
 static MACHINE_DRIVER_START( inufuku )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 32000000/2)	/* 16.00 MHz */
+	MDRV_CPU_ADD_TAG("main", M68000, 32000000/2)	/* 16.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(inufuku_readmem, inufuku_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 

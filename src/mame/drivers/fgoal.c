@@ -355,7 +355,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( fgoal )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6800, 10065000 / 10) /* ? */
+	MDRV_CPU_ADD_TAG("main", M6800, 10065000 / 10) /* ? */
 	MDRV_CPU_PROGRAM_MAP(cpu_map, 0)
 
 	MDRV_MACHINE_RESET(fgoal)

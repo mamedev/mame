@@ -314,7 +314,7 @@ static MACHINE_RESET( metlclsh )
 static MACHINE_DRIVER_START( metlclsh )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 1500000)        // ?
+	MDRV_CPU_ADD_TAG("main", M6809, 1500000)        // ?
 	MDRV_CPU_PROGRAM_MAP(metlclsh_readmem, metlclsh_writemem)
 	// IRQ by YM3526, NMI by cpu #2
 
@@ -342,13 +342,13 @@ static MACHINE_DRIVER_START( metlclsh )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, 1500000)
+	MDRV_SOUND_ADD("ym1", YM2203, 1500000)
 	MDRV_SOUND_ROUTE(0, "mono", 0.10)
 	MDRV_SOUND_ROUTE(1, "mono", 0.10)
 	MDRV_SOUND_ROUTE(2, "mono", 0.10)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD("ym", YM3526, 3000000)
+	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
 	MDRV_SOUND_CONFIG(ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

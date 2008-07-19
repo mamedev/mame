@@ -633,7 +633,7 @@ static const struct pit8253_config gamecstl_pit8254_config =
 static MACHINE_DRIVER_START(gamecstl)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PENTIUM, 200000000)
+	MDRV_CPU_ADD_TAG("main", PENTIUM, 200000000)
 	MDRV_CPU_PROGRAM_MAP(gamecstl_map, 0)
 	MDRV_CPU_IO_MAP(gamecstl_io, 0)
 

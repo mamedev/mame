@@ -331,7 +331,7 @@ static const struct YM2610interface ym2610_interface =
 };
 
 static MACHINE_DRIVER_START( taotaido )
-	MDRV_CPU_ADD(M68000, 32000000/2)
+	MDRV_CPU_ADD_TAG("main", M68000, 32000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 

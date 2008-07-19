@@ -358,7 +358,7 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( drgnmst )
-	MDRV_CPU_ADD(M68000, 12000000) /* Confirmed */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(drgnmst_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 

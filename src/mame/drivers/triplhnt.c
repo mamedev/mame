@@ -316,7 +316,7 @@ static PALETTE_INIT( triplhnt )
 static MACHINE_DRIVER_START( triplhnt )
 
 /* basic machine hardware */
-	MDRV_CPU_ADD(M6800, 800000)
+	MDRV_CPU_ADD_TAG("main", M6800, 800000)
 	MDRV_CPU_PROGRAM_MAP(triplhnt_readmem, triplhnt_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

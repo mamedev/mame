@@ -476,7 +476,7 @@ static const struct YM2203interface ym2203_interface =
  *************************************/
 
 static MACHINE_DRIVER_START( lockon )
-	MDRV_CPU_ADD(V30, XTAL_16MHz / 2)
+	MDRV_CPU_ADD_TAG("main", V30, XTAL_16MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(main_v30, 0)
 
 	MDRV_CPU_ADD(V30, XTAL_16MHz / 2)

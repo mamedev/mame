@@ -648,7 +648,7 @@ static const struct YM3812interface ym3812_interface =
 static MACHINE_DRIVER_START( twincobr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,28000000/4)			/* 7.0MHz - Main board Crystal is 28MHz */
+	MDRV_CPU_ADD_TAG("main", M68000,28000000/4)			/* 7.0MHz - Main board Crystal is 28MHz */
 	MDRV_CPU_PROGRAM_MAP(main_program_map, 0)
 	MDRV_CPU_VBLANK_INT("main", twincobr_interrupt)
 

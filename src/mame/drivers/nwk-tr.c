@@ -1089,7 +1089,7 @@ static MACHINE_RESET( nwktr )
 static MACHINE_DRIVER_START( nwktr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
+	MDRV_CPU_ADD_TAG("main", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_PROGRAM_MAP(nwktr_map, 0)
 
 	MDRV_CPU_ADD(M68000, 64000000/4)	/* 16MHz */

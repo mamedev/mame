@@ -346,7 +346,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mirage )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 28000000/2)
+	MDRV_CPU_ADD_TAG("main", M68000, 28000000/2)
 	MDRV_CPU_PROGRAM_MAP(mirage_readmem,mirage_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 

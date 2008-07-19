@@ -233,7 +233,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( ssozumo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, 1200000)	/* 1.2 MHz ???? */
+	MDRV_CPU_ADD_TAG("main", M6502, 1200000)	/* 1.2 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", ssozumo_interrupt)
 

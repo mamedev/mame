@@ -214,7 +214,7 @@ static PALETTE_INIT( poolshrk )
 static MACHINE_DRIVER_START( poolshrk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6800, 11055000 / 8) /* ? */
+	MDRV_CPU_ADD_TAG("main", M6800, 11055000 / 8) /* ? */
 	MDRV_CPU_PROGRAM_MAP(poolshrk_cpu_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 

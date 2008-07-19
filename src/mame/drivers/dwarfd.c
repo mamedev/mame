@@ -689,7 +689,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( dwarfd )
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-	MDRV_CPU_ADD(8085A, 10595000/3*2)        /* ? MHz */
+	MDRV_CPU_ADD_TAG("main", 8085A, 10595000/3*2)        /* ? MHz */
 
 	MDRV_CPU_PROGRAM_MAP(mem_map, 0)
 	MDRV_CPU_IO_MAP(io_map, 0)

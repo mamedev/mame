@@ -622,7 +622,7 @@ Darius2: arbitrary interleaving of 10 to keep cpus synced.
 static MACHINE_DRIVER_START( ninjaw )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,16000000/2)	/* 8 MHz ? */
+	MDRV_CPU_ADD_TAG("main", M68000,16000000/2)	/* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(ninjaw_readmem,ninjaw_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
@@ -696,7 +696,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( darius2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,16000000/2)	/* 8 MHz ? */
+	MDRV_CPU_ADD_TAG("main", M68000,16000000/2)	/* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(darius2_readmem,darius2_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 

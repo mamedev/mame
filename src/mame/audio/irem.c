@@ -402,7 +402,7 @@ MACHINE_DRIVER_START( m52_sound_c_audio )
 	MDRV_SOUND_CONFIG(irem_ay8910_interface_1)
 	MDRV_SOUND_ROUTE_EX(0, "filtermix", 1.0, 0)
 
-	MDRV_SOUND_ADD("ay8910.0", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ay8910.1", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_ay8910_interface_2)
 	MDRV_SOUND_ROUTE_EX(0, "filtermix", 1.0, 1)
 

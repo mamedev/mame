@@ -558,7 +558,7 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( opwolf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000 )	/* 12 MHz */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000 )	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(opwolf_readmem,opwolf_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
@@ -607,7 +607,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( opwolfb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(opwolfb_readmem,opwolfb_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 

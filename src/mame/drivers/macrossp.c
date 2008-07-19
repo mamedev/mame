@@ -531,7 +531,7 @@ static const struct ES5506interface es5506_interface =
 
 static MACHINE_DRIVER_START( macrossp )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, 50000000/2)	/* 25 MHz */
+	MDRV_CPU_ADD_TAG("main", M68EC020, 50000000/2)	/* 25 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq3_line_hold) // there are others ...
 

@@ -152,7 +152,7 @@ static MACHINE_DRIVER_START( cchasm )
 
 	MDRV_MACHINE_START(cchasm)
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,CCHASM_68K_CLOCK)	/* 8 MHz (from schematics) */
+	MDRV_CPU_ADD_TAG("main", M68000,CCHASM_68K_CLOCK)	/* 8 MHz (from schematics) */
 	MDRV_CPU_PROGRAM_MAP(memmap,0)
 
 	MDRV_CPU_ADD(Z80,3584229)		/* 3.58  MHz (from schematics) */

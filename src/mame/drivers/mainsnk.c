@@ -371,7 +371,7 @@ static GFXDECODE_START( mainsnk )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( mainsnk )
-	MDRV_CPU_ADD(Z80, 3360000)
+	MDRV_CPU_ADD_TAG("main", Z80, 3360000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

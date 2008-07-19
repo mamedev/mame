@@ -833,7 +833,7 @@ static INTERRUPT_GEN( roundup5_interrupt )
 static MACHINE_DRIVER_START( apache3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30,20000000 / 2) /* NEC V30 CPU, 20MHz / 2 */
+	MDRV_CPU_ADD_TAG("main", V30,20000000 / 2) /* NEC V30 CPU, 20MHz / 2 */
 	MDRV_CPU_PROGRAM_MAP(apache3_v30_map,0)
 	MDRV_CPU_VBLANK_INT("main", roundup5_interrupt)
 
@@ -879,7 +879,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( roundup5 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30,20000000 / 2) /* NEC V30 CPU, 20MHz / 2 */
+	MDRV_CPU_ADD_TAG("main", V30,20000000 / 2) /* NEC V30 CPU, 20MHz / 2 */
 	MDRV_CPU_PROGRAM_MAP(roundup5_v30_map,0)
 	MDRV_CPU_VBLANK_INT("main", roundup5_interrupt)
 
@@ -922,7 +922,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cyclwarr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 50000000 / 4) /* Confirmed */
+	MDRV_CPU_ADD_TAG("main", M68000, 50000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(cyclwarr_68000a_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
@@ -966,7 +966,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bigfight )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 50000000 / 4) /* Confirmed */
+	MDRV_CPU_ADD_TAG("main", M68000, 50000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(bigfight_68000a_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 

@@ -726,7 +726,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( system_D )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, SYS_D_CPU_CLOCK)	/* 8MHz */
+	MDRV_CPU_ADD_TAG("main", M68000, SYS_D_CPU_CLOCK)	/* 8MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_D,writemem_D)
 	MDRV_CPU_VBLANK_INT("main", interrupt_D)
 
@@ -788,7 +788,7 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( system_Z )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
+	MDRV_CPU_ADD_TAG("main", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
 	MDRV_CPU_PROGRAM_MAP(readmem_A,writemem_A)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_A,INTERRUPT_NUM_A)
 

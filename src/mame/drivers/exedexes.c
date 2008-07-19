@@ -223,7 +223,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( exedexes )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz (?) */
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000)	/* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(exedexes_interrupt,2)
 

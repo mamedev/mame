@@ -589,7 +589,7 @@ static MACHINE_DRIVER_START( looping )
 	MDRV_DRIVER_DATA(looping_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(TMS9995, MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD_TAG("main", TMS9995, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(looping_map,0)
 	MDRV_CPU_IO_MAP(looping_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", looping_interrupt)

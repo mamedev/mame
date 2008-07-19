@@ -1281,7 +1281,7 @@ static const struct C140interface C140_interface_typeA =
 /* cropped at sides */
 static MACHINE_DRIVER_START( namcona1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 50113000/4)
+	MDRV_CPU_ADD_TAG("main", M68000, 50113000/4)
 	MDRV_CPU_PROGRAM_MAP(namcona1_main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(namcona1_interrupt,5)
 
@@ -1375,7 +1375,7 @@ static struct NAMCONAinterface NAMCONA_interface =
 
 static MACHINE_DRIVER_START( namcona2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 50113000/4)
+	MDRV_CPU_ADD_TAG("main", M68000, 50113000/4)
 	MDRV_CPU_PROGRAM_MAP(namcona2_readmem,namcona2_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(namcona1_interrupt,5)
 

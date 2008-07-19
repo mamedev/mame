@@ -1570,7 +1570,7 @@ static const struct namco_interface namco_interface =
 static MACHINE_DRIVER_START( superpac )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
+	MDRV_CPU_ADD_TAG("main", M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(superpac_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", mappy_interrupt_1)	// also update the custom I/O chips
 
@@ -1617,7 +1617,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( phozon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809,	PIXEL_CLOCK/4)	/* MAIN CPU */
+	MDRV_CPU_ADD_TAG("main", M6809,	PIXEL_CLOCK/4)	/* MAIN CPU */
 	MDRV_CPU_PROGRAM_MAP(phozon_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", mappy_interrupt_1)	// also update the custom I/O chips
 
@@ -1658,7 +1658,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mappy )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
+	MDRV_CPU_ADD_TAG("main", M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(mappy_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", mappy_interrupt_1)	// also update the custom I/O chips
 

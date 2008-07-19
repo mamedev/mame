@@ -257,7 +257,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( copsnrob )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502,14318180/16)		/* 894886.25 kHz */
+	MDRV_CPU_ADD_TAG("main", M6502,14318180/16)		/* 894886.25 kHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	/* video hardware */

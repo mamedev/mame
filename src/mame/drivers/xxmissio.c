@@ -302,7 +302,7 @@ static const struct YM2203interface ym2203_interface_2 =
 static MACHINE_DRIVER_START( xxmissio )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,12000000/4)	/* 3.0MHz */
+	MDRV_CPU_ADD_TAG("main", Z80,12000000/4)	/* 3.0MHz */
 	MDRV_CPU_PROGRAM_MAP(map1,0)
 	MDRV_CPU_VBLANK_INT("main", xxmissio_interrupt_m)
 

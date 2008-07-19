@@ -119,7 +119,7 @@ static MACHINE_DRIVER_START( rcorsair )
 	/* Main CPU is probably inside Custom Block with
        program code, unknown type */
 
-	MDRV_CPU_ADD(8085A,8000000)		 /* Sound CPU? */
+	MDRV_CPU_ADD_TAG("main", 8085A,8000000)		 /* Sound CPU? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 //  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

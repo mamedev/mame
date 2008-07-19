@@ -643,7 +643,7 @@ static const mips3_config config =
 static MACHINE_DRIVER_START( kinst )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(R4600LE, MASTER_CLOCK*2)
+	MDRV_CPU_ADD_TAG("main", R4600LE, MASTER_CLOCK*2)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_start)

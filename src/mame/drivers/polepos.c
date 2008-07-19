@@ -840,7 +840,7 @@ static const struct CustomSound_interface custom_interface =
 static MACHINE_DRIVER_START( polepos )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 24576000/8)	/* 3.072 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 24576000/8)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_map,0)
 	MDRV_CPU_IO_MAP(z80_io,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_assert,2)	/* 64V */

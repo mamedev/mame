@@ -291,7 +291,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mgolf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, 12096000 / 16) /* ? */
+	MDRV_CPU_ADD_TAG("main", M6502, 12096000 / 16) /* ? */
 	MDRV_CPU_PROGRAM_MAP(cpu_map, 0)
 
 	MDRV_MACHINE_RESET(mgolf)

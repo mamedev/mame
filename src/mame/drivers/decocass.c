@@ -383,7 +383,7 @@ static PALETTE_INIT( decocass )
 static MACHINE_DRIVER_START( decocass )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502,750000)
+	MDRV_CPU_ADD_TAG("main", M6502,750000)
 	MDRV_CPU_PROGRAM_MAP(decocass_map,0)
 
 	MDRV_CPU_ADD(M6502,500000) /* 500 kHz */

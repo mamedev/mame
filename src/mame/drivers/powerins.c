@@ -350,7 +350,7 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( powerins )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12MHz */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12MHz */
 	MDRV_CPU_PROGRAM_MAP(powerins_readmem,powerins_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 

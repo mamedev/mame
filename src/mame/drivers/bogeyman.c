@@ -226,7 +226,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( bogeyman )
 	// basic machine hardware
-	MDRV_CPU_ADD(M6502, 2000000)	// 12 MHz clock on board
+	MDRV_CPU_ADD_TAG("main", M6502, 2000000)	// 12 MHz clock on board
 	MDRV_CPU_PROGRAM_MAP(bogeyman_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 16) // Controls sound
 

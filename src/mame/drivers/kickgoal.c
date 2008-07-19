@@ -665,7 +665,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( kickgoal )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(kickgoal_program_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 	MDRV_CPU_PERIODIC_INT(kickgoal_interrupt, 240)
@@ -701,7 +701,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( actionhw )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_12MHz)	/* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_12MHz)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(kickgoal_program_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 

@@ -599,7 +599,7 @@ static const struct pit8253_config taitowlf_pit8254_config =
 static MACHINE_DRIVER_START(taitowlf)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PENTIUM, 200000000)
+	MDRV_CPU_ADD_TAG("main", PENTIUM, 200000000)
 	MDRV_CPU_PROGRAM_MAP(taitowlf_map, 0)
 	MDRV_CPU_IO_MAP(taitowlf_io, 0)
 

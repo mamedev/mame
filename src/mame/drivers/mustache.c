@@ -204,7 +204,7 @@ static INTERRUPT_GEN( assert_irq )
 static MACHINE_DRIVER_START( mustache )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, CPU_CLOCK)
+	MDRV_CPU_ADD_TAG("main", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_VBLANK_INT("main", assert_irq)
 

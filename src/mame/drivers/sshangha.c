@@ -344,7 +344,7 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( sshangha )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 28000000/2)
+	MDRV_CPU_ADD_TAG("main", M68000, 28000000/2)
 	MDRV_CPU_PROGRAM_MAP(sshangha_readmem,sshangha_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 

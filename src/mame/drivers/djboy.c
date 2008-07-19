@@ -826,7 +826,7 @@ static INTERRUPT_GEN( djboy_interrupt )
 }
 
 static MACHINE_DRIVER_START( djboy )
-	MDRV_CPU_ADD(Z80,6000000)
+	MDRV_CPU_ADD_TAG("main", Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu0_am,0)
 	MDRV_CPU_IO_MAP(cpu0_port_am,0)
 	MDRV_CPU_VBLANK_INT_HACK(djboy_interrupt,2)

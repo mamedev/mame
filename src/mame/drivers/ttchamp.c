@@ -223,7 +223,7 @@ static INTERRUPT_GEN( ttchamp_irq ) /* right? */
 
 static MACHINE_DRIVER_START( ttchamp )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30, 8000000)
+	MDRV_CPU_ADD_TAG("main", V30, 8000000)
 	MDRV_CPU_PROGRAM_MAP(ttchamp_map, 0)
 	MDRV_CPU_IO_MAP(ttchamp_io,0)
 	MDRV_CPU_VBLANK_INT("main", ttchamp_irq)

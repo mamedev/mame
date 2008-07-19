@@ -637,7 +637,7 @@ static const struct TMS5220interface tms5220_interface =
 static MACHINE_DRIVER_START( zaccaria )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,XTAL_18_432MHz/6)	/* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", Z80,XTAL_18_432MHz/6)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
@@ -679,10 +679,10 @@ static MACHINE_DRIVER_START( zaccaria )
 	MDRV_SOUND_ADD("ay2", AY8910, XTAL_3_579545MHz/2) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac1", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.0)		/* first DAC sounds awful */
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF) */

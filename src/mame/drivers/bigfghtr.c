@@ -418,7 +418,7 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( bigfghtr )
-	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz?? */
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(mainmem,0)
 
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)

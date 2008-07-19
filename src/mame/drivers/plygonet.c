@@ -685,7 +685,7 @@ static GFXDECODE_START( plygonet )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( plygonet )
-	MDRV_CPU_ADD(M68EC020, 16000000)	/* 16 MHz (xtal is 32.0 MHz) */
+	MDRV_CPU_ADD_TAG("main", M68EC020, 16000000)	/* 16 MHz (xtal is 32.0 MHz) */
 	MDRV_CPU_PROGRAM_MAP(polygonet_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(polygonet_interrupt, 2)
 

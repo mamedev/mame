@@ -286,7 +286,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( goldstar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3579545)//(4000000?)
+	MDRV_CPU_ADD_TAG("main", Z80, 3579545)//(4000000?)
 	MDRV_CPU_PROGRAM_MAP(map,0)
 	MDRV_CPU_IO_MAP(readport,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -322,7 +322,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( goldstbl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3579545)//(4000000?)
+	MDRV_CPU_ADD_TAG("main", Z80, 3579545)//(4000000?)
 	MDRV_CPU_PROGRAM_MAP(map,0)
 	MDRV_CPU_IO_MAP(readport,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -357,7 +357,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( moonlght )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3579545)//(4000000?)
+	MDRV_CPU_ADD_TAG("main", Z80, 3579545)//(4000000?)
 	MDRV_CPU_PROGRAM_MAP(map,0)
 	MDRV_CPU_IO_MAP(readport,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

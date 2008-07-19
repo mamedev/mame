@@ -338,7 +338,7 @@ static DRIVER_INIT( ashnojoe )
 static MACHINE_DRIVER_START( ashnojoe )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz (verified on pcb) */
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000) /* 8 MHz (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(ashnojoe_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 

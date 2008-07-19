@@ -628,11 +628,20 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 	{
 		extern void dummy_get_info(UINT32 state, cpuinfo *info);
 		const cpu_config *cpu = &config->cpu[cpunum];
-		int spacenum;
+		int spacenum, checknum;
 
 		/* skip empty entries */
 		if (cpu->type == CPU_DUMMY)
 			continue;
+
+		/* check for duplicate tags */
+		if (cpu->tag != NULL)
+			for (checknum = 0; checknum < cpunum; checknum++)
+				if (config->cpu[checknum].tag != NULL && strcmp(cpu->tag, config->cpu[checknum].tag) == 0)
+				{
+					mame_printf_error("%s: %s has multiple CPUs tagged as '%s'\n", driver->source_file, driver->name, cpu->tag);
+					error = TRUE;
+				}
 
 		/* checks to see if this driver is using a dummy CPU */
 		if (cputype_get_interface(cpu->type)->get_info == dummy_get_info)
@@ -1356,7 +1365,16 @@ static int validate_sound(int drivnum, const machine_config *config)
 	/* make sure the sounds are wired to the speakers correctly */
 	for (sndnum = 0; sndnum < MAX_SOUND && config->sound[sndnum].type != SOUND_DUMMY; sndnum++)
 	{
-		int routenum;
+		int routenum, checknum;
+
+		/* check for duplicate tags */
+		if (config->sound[sndnum].tag != NULL)
+			for (checknum = 0; checknum < sndnum; checknum++)
+				if (config->sound[checknum].tag != NULL && strcmp(config->sound[sndnum].tag, config->sound[checknum].tag) == 0)
+				{
+					mame_printf_error("%s: %s has multiple sound chips tagged as '%s'\n", driver->source_file, driver->name, config->sound[sndnum].tag);
+					error = TRUE;
+				}
 
 		/* loop over all the routes */
 		for (routenum = 0; routenum < config->sound[sndnum].routes; routenum++)

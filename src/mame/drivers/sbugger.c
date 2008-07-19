@@ -227,7 +227,7 @@ INPUT_PORTS_END
 /* machine driver */
 
 static MACHINE_DRIVER_START( sbugger )
-	MDRV_CPU_ADD(8085A, 6000000)        /* 3.00 MHz??? */
+	MDRV_CPU_ADD_TAG("main", 8085A, 6000000)        /* 3.00 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq3_line_hold,NUM_INTS_FRAME)

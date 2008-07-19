@@ -697,7 +697,7 @@ static MACHINE_RESET( aso )
 static MACHINE_DRIVER_START( aso )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(aso_cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -741,7 +741,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hal21 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(hal21_cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

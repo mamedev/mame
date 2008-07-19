@@ -370,7 +370,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( silkroad )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, 16000000)
+	MDRV_CPU_ADD_TAG("main", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 

@@ -528,7 +528,7 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( vigilant )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3579645)		   /* 3.579645 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 3579645)		   /* 3.579645 MHz */
 	MDRV_CPU_PROGRAM_MAP(vigilant_map,0)
 	MDRV_CPU_IO_MAP(vigilant_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -571,7 +571,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( buccanrs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 5688800)		   /* 5.688800 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 5688800)		   /* 5.688800 MHz */
 	MDRV_CPU_PROGRAM_MAP(vigilant_map,0)
 	MDRV_CPU_IO_MAP(vigilant_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -630,7 +630,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kikcubic )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3579645)		   /* 3.579645 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 3579645)		   /* 3.579645 MHz */
 	MDRV_CPU_PROGRAM_MAP(kikcubic_map,0)
 	MDRV_CPU_IO_MAP(kikcubic_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

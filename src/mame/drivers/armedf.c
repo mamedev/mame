@@ -755,7 +755,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( terraf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz?? */
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(terraf_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -796,7 +796,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( terrafb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz?? */
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(terrafb_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -843,7 +843,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kodure )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz?? */
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(kodure_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -885,7 +885,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( armedf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz?? */
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(armedf_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -927,7 +927,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cclimbr2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz?? */
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(cclimbr2_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -968,7 +968,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( legion )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz?? */
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(legion_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -1009,7 +1009,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( legiono )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz?? */
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(legiono_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 

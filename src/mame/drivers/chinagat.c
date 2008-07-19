@@ -494,7 +494,7 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( chinagat )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309,12000000/2)		/* 1.5 MHz (12MHz oscillator ???) */
+	MDRV_CPU_ADD_TAG("main", HD6309,12000000/2)		/* 1.5 MHz (12MHz oscillator ???) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", chinagat_interrupt)
 
@@ -538,7 +538,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( saiyugb1 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809,12000000/8)		/* 68B09EP 1.5 MHz (12MHz oscillator) */
+	MDRV_CPU_ADD_TAG("main", M6809,12000000/8)		/* 68B09EP 1.5 MHz (12MHz oscillator) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", chinagat_interrupt)
 
@@ -586,7 +586,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( saiyugb2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809,12000000/8)		/* 1.5 MHz (12MHz oscillator) */
+	MDRV_CPU_ADD_TAG("main", M6809,12000000/8)		/* 1.5 MHz (12MHz oscillator) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", chinagat_interrupt)
 

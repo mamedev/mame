@@ -360,7 +360,7 @@ static const struct K007232_interface k007232_interface_2 =
 static MACHINE_DRIVER_START( chqflag )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(KONAMI,XTAL_24MHz/8)	/* 052001 (verified on pcb) */
+	MDRV_CPU_ADD_TAG("main", KONAMI,XTAL_24MHz/8)	/* 052001 (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(chqflag_readmem,chqflag_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(chqflag_interrupt,16)	/* ? */
 

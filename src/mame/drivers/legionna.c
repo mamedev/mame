@@ -1037,7 +1037,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( legionna )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,20000000/2) 	/* ??? */
+	MDRV_CPU_ADD_TAG("main", M68000,20000000/2) 	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(legionna_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)/* VBL */
 
@@ -1069,7 +1069,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( heatbrl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,20000000/2) 	/* ??? */
+	MDRV_CPU_ADD_TAG("main", M68000,20000000/2) 	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(heatbrl_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)/* VBL */
 
@@ -1100,7 +1100,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( godzilla )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 20000000/2)
+	MDRV_CPU_ADD_TAG("main", M68000, 20000000/2)
 	MDRV_CPU_PROGRAM_MAP(godzilla_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
@@ -1131,7 +1131,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( denjinmk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 20000000/2)
+	MDRV_CPU_ADD_TAG("main", M68000, 20000000/2)
 	MDRV_CPU_PROGRAM_MAP(denjinmk_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
@@ -1162,7 +1162,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sdgndmrb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 20000000/2)
+	MDRV_CPU_ADD_TAG("main", M68000, 20000000/2)
 	MDRV_CPU_PROGRAM_MAP(sdgndmrb_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
@@ -1194,7 +1194,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cupsoc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,20000000/2)
+	MDRV_CPU_ADD_TAG("main", M68000,20000000/2)
 	MDRV_CPU_PROGRAM_MAP(cupsoc_mem,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)/* VBL */
 
@@ -1226,7 +1226,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cupsocbl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,12000000)
+	MDRV_CPU_ADD_TAG("main", M68000,12000000)
 	MDRV_CPU_PROGRAM_MAP(cupsocbl_mem,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold) /* VBL */
 

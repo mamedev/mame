@@ -296,7 +296,7 @@ static VIDEO_UPDATE( dgpix )
 }
 
 static MACHINE_DRIVER_START( dgpix )
-	MDRV_CPU_ADD(E132XT, 20000000*4)	/* 4x internal multiplier */
+	MDRV_CPU_ADD_TAG("main", E132XT, 20000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 

@@ -474,7 +474,7 @@ static MACHINE_START( xmen )
 static MACHINE_DRIVER_START( xmen )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)	/* ? */
+	MDRV_CPU_ADD_TAG("main", M68000, 16000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(xmen_interrupt,2)
 
@@ -541,7 +541,7 @@ static INTERRUPT_GEN( xmen6p_interrupt )
 static MACHINE_DRIVER_START( xmen6p )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)	/* ? */
+	MDRV_CPU_ADD_TAG("main", M68000, 16000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(6p_main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(xmen6p_interrupt,2)
 

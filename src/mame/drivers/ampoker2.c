@@ -1016,7 +1016,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( ampoker2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MASTER_CLOCK/2)		/* 3 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/2)		/* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(ampoker2_map, 0)
 	MDRV_CPU_IO_MAP(ampoker2_io_map, 0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1536)

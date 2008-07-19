@@ -272,7 +272,7 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( lemmings )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 14000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(lemmings_readmem,lemmings_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 

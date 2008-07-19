@@ -241,7 +241,7 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( shisen )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 6000000)	/* 6 MHz ? */
+	MDRV_CPU_ADD_TAG("main", Z80, 6000000)	/* 6 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

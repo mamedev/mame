@@ -559,7 +559,7 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( lsasquad )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 6000000)	/* 6 MHz? */
+	MDRV_CPU_ADD_TAG("main", Z80, 6000000)	/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -605,7 +605,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( daikaiju )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 6000000)
+	MDRV_CPU_ADD_TAG("main", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(mem_daikaiju, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

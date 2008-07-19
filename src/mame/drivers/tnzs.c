@@ -1380,7 +1380,7 @@ static const struct Samplesinterface samples_interface =
 static MACHINE_DRIVER_START( arknoid2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL_12MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", Z80, XTAL_12MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", arknoid2_interrupt)
 
@@ -1419,7 +1419,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( drtoppel )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
+	MDRV_CPU_ADD_TAG("main", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", arknoid2_interrupt)
 
@@ -1461,7 +1461,7 @@ static const i8x41_config i8042_config = { TYPE_I8X42 };
 static MACHINE_DRIVER_START( tnzs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
+	MDRV_CPU_ADD_TAG("main", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1504,7 +1504,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( insectx )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL_12MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", Z80, XTAL_12MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1542,7 +1542,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kageki )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL_12MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1655,7 +1655,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( jpopnics )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,XTAL_12MHz/2) /* Not verified - Main board Crystal is 12MHz */
+	MDRV_CPU_ADD_TAG("main", Z80,XTAL_12MHz/2) /* Not verified - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(jpopnics_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

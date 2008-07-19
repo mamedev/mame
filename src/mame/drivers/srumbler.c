@@ -256,7 +256,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( srumbler )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 1500000)        /* 1.5 MHz (?) */
+	MDRV_CPU_ADD_TAG("main", M6809, 1500000)        /* 1.5 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(srumbler_interrupt,2)
 

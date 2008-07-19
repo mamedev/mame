@@ -998,7 +998,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( exidy440 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD_TAG("main", M6809, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(exidy440_map,0)
 	MDRV_CPU_VBLANK_INT("main", exidy440_vblank_interrupt)
 

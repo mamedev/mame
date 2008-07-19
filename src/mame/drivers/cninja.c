@@ -779,7 +779,7 @@ static const struct YM2151interface ym2151_interface2 =
 static MACHINE_DRIVER_START( cninja )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(cninja_readmem,cninja_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
@@ -828,7 +828,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( stoneage )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(cninja_readmem,cninja_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
@@ -874,7 +874,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( edrandy )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(edrandy_readmem,edrandy_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
@@ -923,7 +923,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( robocop2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 14000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(robocop2_readmem,robocop2_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
@@ -952,11 +952,11 @@ static MACHINE_DRIVER_START( robocop2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ym", YM2203, 32220000/8)
+	MDRV_SOUND_ADD("ym1", YM2203, 32220000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
 
-	MDRV_SOUND_ADD("ym", YM2151, 32220000/9)
+	MDRV_SOUND_ADD("ym2", YM2151, 32220000/9)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.45)
 	MDRV_SOUND_ROUTE(1, "right", 0.45)
@@ -975,7 +975,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mutantf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 14000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(mutantf_readmem,mutantf_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 

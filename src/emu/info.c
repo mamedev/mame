@@ -629,6 +629,8 @@ static void print_game_chips(FILE *out, const game_driver *game, const machine_c
 		{
 			fprintf(out, "\t\t<chip");
 			fprintf(out, " type=\"cpu\"");
+			if (config->cpu[chipnum].tag != NULL)
+				fprintf(out, " tag=\"%s\"", xml_normalize_string(config->cpu[chipnum].tag));
 			fprintf(out, " name=\"%s\"", xml_normalize_string(cputype_name(config->cpu[chipnum].type)));
 			fprintf(out, " clock=\"%d\"", config->cpu[chipnum].clock);
 			fprintf(out, "/>\n");
@@ -640,6 +642,7 @@ static void print_game_chips(FILE *out, const game_driver *game, const machine_c
 		{
 			fprintf(out, "\t\t<chip");
 			fprintf(out, " type=\"audio\"");
+			fprintf(out, " tag=\"%s\"", xml_normalize_string(config->sound[chipnum].tag));
 			fprintf(out, " name=\"%s\"", xml_normalize_string(sndtype_name(config->sound[chipnum].type)));
 			if (config->sound[chipnum].clock != 0)
 				fprintf(out, " clock=\"%d\"", config->sound[chipnum].clock);
@@ -970,6 +973,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t<!ATTLIST sample name CDATA #REQUIRED>\n"
 		"\t\t<!ELEMENT chip EMPTY>\n"
 		"\t\t\t<!ATTLIST chip name CDATA #REQUIRED>\n"
+		"\t\t\t<!ATTLIST chip tag CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST chip type (cpu|audio) #REQUIRED>\n"
 		"\t\t\t<!ATTLIST chip clock CDATA #IMPLIED>\n"
 		"\t\t<!ELEMENT display EMPTY>\n"

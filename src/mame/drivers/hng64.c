@@ -1516,7 +1516,7 @@ static MACHINE_RESET(hyperneo)
 
 static MACHINE_DRIVER_START( hng64 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(R4600BE, MASTER_CLOCK)  	// actually R4300
+	MDRV_CPU_ADD_TAG("main", R4600BE, MASTER_CLOCK)  	// actually R4300
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(hng_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq_start,3)

@@ -258,7 +258,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( dday )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 2000000)     /* 2 MHz ? */
+	MDRV_CPU_ADD_TAG("main", Z80, 2000000)     /* 2 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 
 	/* video hardware */

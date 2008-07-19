@@ -1535,7 +1535,7 @@ static const struct C140interface C140_interface_typeB =
 };
 
 static MACHINE_DRIVER_START( s21base )
-	MDRV_CPU_ADD(M68000,12288000) /* Master */
+	MDRV_CPU_ADD_TAG("main", M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(namcos21_68k_master, namcos21_68k_common)
 	MDRV_CPU_VBLANK_INT("main", namcos2_68k_master_vblank)
 
@@ -1614,7 +1614,7 @@ static MACHINE_DRIVER_START( poly_c140_typeB )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( driveyes )
-	MDRV_CPU_ADD(M68000,12288000) /* Master */
+	MDRV_CPU_ADD_TAG("main", M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(driveyes_68k_master, driveyes_68k_common)
 	MDRV_CPU_VBLANK_INT("main", namcos2_68k_master_vblank)
 
@@ -1669,7 +1669,7 @@ static MACHINE_DRIVER_START( driveyes )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( winrun_c140_typeB )
-	MDRV_CPU_ADD(M68000,12288000) /* Master */
+	MDRV_CPU_ADD_TAG("main", M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(am_master_winrun,0)
 	MDRV_CPU_VBLANK_INT("main", namcos2_68k_master_vblank)
 

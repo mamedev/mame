@@ -261,7 +261,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( skyraid )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, 12096000 / 12)
+	MDRV_CPU_ADD_TAG("main", M6502, 12096000 / 12)
 	MDRV_CPU_PROGRAM_MAP(skyraid_readmem, skyraid_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

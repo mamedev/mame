@@ -3741,7 +3741,7 @@ static const struct YM2203interface sprtmtch_ym2203_interface =
 static MACHINE_DRIVER_START( sprtmtch )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,22000000 / 4)	/* 5.5MHz */
+	MDRV_CPU_ADD_TAG("main", Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
 	MDRV_CPU_IO_MAP(sprtmtch_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */

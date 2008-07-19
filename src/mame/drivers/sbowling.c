@@ -328,7 +328,7 @@ static PALETTE_INIT( sbowling )
 
 static MACHINE_DRIVER_START( sbowling )
 
-	MDRV_CPU_ADD(8080, 19968000/10 )
+	MDRV_CPU_ADD_TAG("main", 8080, 19968000/10 )
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(port_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(sbw_interrupt, 2)

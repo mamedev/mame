@@ -670,7 +670,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fghtbskt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL_12MHz/4)     /* 3 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, XTAL_12MHz/4)     /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(fghtbskt_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 

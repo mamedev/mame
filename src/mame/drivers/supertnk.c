@@ -410,7 +410,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( supertnk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(TMS9980, 2598750) /* ? to which frequency is the 20.79 Mhz crystal mapped down? */
+	MDRV_CPU_ADD_TAG("main", TMS9980, 2598750) /* ? to which frequency is the 20.79 Mhz crystal mapped down? */
 	MDRV_CPU_PROGRAM_MAP(supertnk_map,0)
 	MDRV_CPU_IO_MAP(supertnk_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", supertnk_interrupt)

@@ -562,7 +562,7 @@ static GFXDECODE_START( terracre )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( amazon )
-	MDRV_CPU_ADD(M68000, 8000000 )
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000 )
 	MDRV_CPU_PROGRAM_MAP(amazon_readmem,amazon_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -602,7 +602,7 @@ static MACHINE_DRIVER_START( amazon )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ym3526 )
-	MDRV_CPU_ADD(M68000, 8000000 )
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000 )
 	MDRV_CPU_PROGRAM_MAP(terracre_readmem,terracre_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -640,7 +640,7 @@ static MACHINE_DRIVER_START( ym3526 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ym2203 )
-	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz?? */
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(terracre_readmem,terracre_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 

@@ -769,7 +769,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( nycaptor )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,8000000/2)		/* ??? */
+	MDRV_CPU_ADD_TAG("main", Z80,8000000/2)		/* ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -831,7 +831,7 @@ static MACHINE_DRIVER_START( nycaptor )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cyclshtg )
-	MDRV_CPU_ADD(Z80,8000000/2)
+	MDRV_CPU_ADD_TAG("main", Z80,8000000/2)
 
 	MDRV_CPU_PROGRAM_MAP(cyclshtg_readmem,cyclshtg_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -893,7 +893,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( bronx )
-	MDRV_CPU_ADD(Z80,8000000/2)
+	MDRV_CPU_ADD_TAG("main", Z80,8000000/2)
 
 	MDRV_CPU_PROGRAM_MAP(bronx_readmem, bronx_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

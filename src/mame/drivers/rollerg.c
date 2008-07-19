@@ -245,7 +245,7 @@ static const struct K053260_interface k053260_interface =
 static MACHINE_DRIVER_START( rollerg )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(KONAMI, 3000000)		/* ? */
+	MDRV_CPU_ADD_TAG("main", KONAMI, 3000000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

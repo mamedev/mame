@@ -173,7 +173,7 @@ static INTERRUPT_GEN( jackpool_interrupt )
 
 
 static MACHINE_DRIVER_START( jackpool )
-	MDRV_CPU_ADD(M68000, 12000000) // ?
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000) // ?
 	MDRV_CPU_PROGRAM_MAP(jackpool_readmem,jackpool_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(jackpool_interrupt,3)  // ?
 

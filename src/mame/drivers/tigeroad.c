@@ -551,7 +551,7 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( tigeroad )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_10MHz) /* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_10MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -595,8 +595,7 @@ static MACHINE_DRIVER_START( toramich )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(tigeroad)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* ? */
+	MDRV_CPU_ADD_TAG("audio", Z80, 3579545) /* ? */
 	MDRV_CPU_PROGRAM_MAP(sample_readmem,sample_writemem)
 	MDRV_CPU_IO_MAP(sample_readport,sample_writeport)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,4000)	/* ? */

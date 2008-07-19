@@ -364,7 +364,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( magmax )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_16MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_16MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(magmax_readmem,magmax_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 

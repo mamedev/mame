@@ -719,7 +719,7 @@ static const struct YM2151interface whizz_ym2151_interface =
 static MACHINE_DRIVER_START( sidearms )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz (?) */
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000) /* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -765,7 +765,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( turtship )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz (?) */
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000) /* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(turtship_readmem,turtship_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -810,7 +810,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( whizz )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)        /* 4 MHz (?) */
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000)        /* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(whizz_readmem,whizz_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

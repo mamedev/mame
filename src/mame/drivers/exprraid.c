@@ -302,7 +302,7 @@ static INTERRUPT_GEN( exprraid_interrupt )
 static MACHINE_DRIVER_START( exprraid )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, 4000000)        /* 4 MHz ??? */
+	MDRV_CPU_ADD_TAG("main", M6502, 4000000)        /* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(master_map, 0)
 	MDRV_CPU_VBLANK_INT("main", exprraid_interrupt)
 

@@ -730,7 +730,7 @@ static INTERRUPT_GEN( undrfire_interrupt )
 static MACHINE_DRIVER_START( undrfire )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, 16000000)	/* 16 MHz */
+	MDRV_CPU_ADD_TAG("main", M68EC020, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(undrfire_map,0)
 	MDRV_CPU_VBLANK_INT("main", undrfire_interrupt)
 
@@ -761,7 +761,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cbombers )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, 16000000)	/* 16 MHz */
+	MDRV_CPU_ADD_TAG("main", M68EC020, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(cbombers_cpua_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 

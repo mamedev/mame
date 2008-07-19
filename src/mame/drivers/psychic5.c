@@ -553,7 +553,7 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( psychic5 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 6000000)
+	MDRV_CPU_ADD_TAG("main", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(psychic5_interrupt,2)
 

@@ -130,7 +130,7 @@ ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( paranoia )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(H6280, PCE_MAIN_CLOCK/3)
+	MDRV_CPU_ADD_TAG("main", H6280, PCE_MAIN_CLOCK/3)
 	MDRV_CPU_PROGRAM_MAP(pce_mem, 0)
 	MDRV_CPU_IO_MAP(pce_io, 0)
 	MDRV_CPU_VBLANK_INT_HACK(pce_interrupt, VDC_LPF)

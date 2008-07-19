@@ -674,7 +674,7 @@ static MACHINE_DRIVER_START( grchamp )
 
 	/* basic machine hardware */
 	/* CPU BOARD */
-	MDRV_CPU_ADD(Z80, PIXEL_CLOCK/2)
+	MDRV_CPU_ADD_TAG("main", Z80, PIXEL_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", grchamp_cpu0_interrupt)

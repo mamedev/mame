@@ -697,7 +697,7 @@ static const struct K007232_interface k007232_interface =
 static MACHINE_DRIVER_START( scontra )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(KONAMI, 3000000)	/* 052001 */
+	MDRV_CPU_ADD_TAG("main", KONAMI, 3000000)	/* 052001 */
 	MDRV_CPU_PROGRAM_MAP(scontra_readmem,scontra_writemem)
 	MDRV_CPU_VBLANK_INT("main", scontra_interrupt)
 
@@ -739,7 +739,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( thunderx )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(KONAMI, 3000000)		/* ? */
+	MDRV_CPU_ADD_TAG("main", KONAMI, 3000000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(thunderx_readmem,thunderx_writemem)
 	MDRV_CPU_VBLANK_INT("main", scontra_interrupt)
 

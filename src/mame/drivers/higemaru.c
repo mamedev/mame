@@ -173,7 +173,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( higemaru )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz ? Main xtal is 12MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000)	/* 4 MHz ? Main xtal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(higemaru_interrupt,2)
 

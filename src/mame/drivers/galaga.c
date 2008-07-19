@@ -1646,7 +1646,7 @@ static const struct Samplesinterface battles_samples_interface =
 static MACHINE_DRIVER_START( bosco )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(bosco_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
@@ -1715,7 +1715,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( galaga )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(galaga_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
@@ -1784,7 +1784,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( xevious )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(xevious_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
@@ -1868,7 +1868,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( digdug )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(digdug_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 

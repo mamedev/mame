@@ -476,7 +476,7 @@ static const struct MSM5232interface msm5232_interface =
 
 static MACHINE_DRIVER_START( bigevglf )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,10000000/2)		/* 5 MHz ? */
+	MDRV_CPU_ADD_TAG("main", Z80,10000000/2)		/* 5 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(bigevglf_readport,bigevglf_writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* vblank */

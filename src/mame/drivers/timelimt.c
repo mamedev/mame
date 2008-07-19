@@ -263,7 +263,7 @@ static INTERRUPT_GEN( timelimt_irq ) {
 static MACHINE_DRIVER_START( timelimt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 5000000)	/* 5.000 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 5000000)	/* 5.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,0)
 	MDRV_CPU_VBLANK_INT("main", timelimt_irq)

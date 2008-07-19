@@ -110,7 +110,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 static MACHINE_DRIVER_START( tcl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,12000000/4)
+	MDRV_CPU_ADD_TAG("main", Z80,12000000/4)
 	MDRV_CPU_PROGRAM_MAP(tcl_map,0)
 
 	/* video hardware */

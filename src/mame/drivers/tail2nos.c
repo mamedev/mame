@@ -240,7 +240,7 @@ static const struct YM2608interface ym2608_interface =
 static MACHINE_DRIVER_START( tail2nos )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,XTAL_20MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", M68000,XTAL_20MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 

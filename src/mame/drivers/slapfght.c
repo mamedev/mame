@@ -831,7 +831,7 @@ static VIDEO_EOF( perfrman )
 static MACHINE_DRIVER_START( perfrman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,16000000/4)			/* 4MHz ???, 16MHz Oscillator */
+	MDRV_CPU_ADD_TAG("main", Z80,16000000/4)			/* 4MHz ???, 16MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(perfrman_readmem,perfrman_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -878,7 +878,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tigerhb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 6000000)
+	MDRV_CPU_ADD_TAG("main", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(tigerh_readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,tigerh_writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -924,7 +924,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tigerh )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL_36MHz/6) /* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", Z80, XTAL_36MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tigerh_readmem,writemem)
 	MDRV_CPU_IO_MAP(tigerh_readport,tigerh_writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

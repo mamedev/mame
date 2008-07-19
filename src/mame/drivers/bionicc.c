@@ -346,7 +346,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( bionicc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, MASTER_CLOCK / 2) /* 12 MHz - verified in schematics */
+	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK / 2) /* 12 MHz - verified in schematics */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(bionicc_interrupt,8)
 

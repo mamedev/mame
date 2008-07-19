@@ -701,7 +701,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( argus )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 5000000)			/* 4 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 5000000)			/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(argus_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 
@@ -738,7 +738,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( valtric )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 5000000)			/* 5 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 5000000)			/* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(valtric_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 
@@ -781,7 +781,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( butasan )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 5000000)			/* 5 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 5000000)			/* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(butasan_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 
@@ -824,7 +824,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bombsa )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 5000000)			/* 5 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 5000000)			/* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(bombsa_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 

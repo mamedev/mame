@@ -1692,7 +1692,7 @@ static const struct AY8910interface ay8910_intf_eeprom =
 static MACHINE_DRIVER_START( berlwall )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* MC68000P12 */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* MC68000P12 */
 	MDRV_CPU_PROGRAM_MAP(berlwall,0)
 	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
@@ -1739,7 +1739,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bakubrkr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_12MHz) /* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_12MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(bakubrkr,0)
 	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
@@ -1795,7 +1795,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( blazeon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,12000000)	/* TMP68HC000-12 */
+	MDRV_CPU_ADD_TAG("main", M68000,12000000)	/* TMP68HC000-12 */
 	MDRV_CPU_PROGRAM_MAP(blazeon,0)
 	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
@@ -1940,7 +1940,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mgcrystl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_12MHz) /* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_12MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mgcrystl,0)
 	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
@@ -2010,7 +2010,7 @@ static INTERRUPT_GEN( shogwarr_interrupt )
 static MACHINE_DRIVER_START( shogwarr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(shogwarr,0)
 	MDRV_CPU_VBLANK_INT_HACK(shogwarr_interrupt,SHOGWARR_INTERRUPTS_NUM)
 

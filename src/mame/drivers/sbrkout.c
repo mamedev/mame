@@ -477,7 +477,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( sbrkout )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502,MAIN_CLOCK/16) 	   /* 375 KHz? Should be 750KHz? */
+	MDRV_CPU_ADD_TAG("main", M6502,MAIN_CLOCK/16) 	   /* 375 KHz? Should be 750KHz? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_MACHINE_START(sbrkout)

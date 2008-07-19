@@ -284,7 +284,7 @@ static const struct K007232_interface k007232_interface =
 static MACHINE_DRIVER_START( flkatck )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */
+	MDRV_CPU_ADD_TAG("main", HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */
 	MDRV_CPU_PROGRAM_MAP(flkatck_readmem,flkatck_writemem)
 	MDRV_CPU_VBLANK_INT("main", flkatck_interrupt)
 

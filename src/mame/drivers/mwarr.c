@@ -450,7 +450,7 @@ static VIDEO_UPDATE( mwarr )
 }
 
 static MACHINE_DRIVER_START( mwarr )
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(mwarr_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 

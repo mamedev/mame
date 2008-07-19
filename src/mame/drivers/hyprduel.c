@@ -719,7 +719,7 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( hyprduel )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,20000000/2)		/* 10MHz */
+	MDRV_CPU_ADD_TAG("main", M68000,20000000/2)		/* 10MHz */
 	MDRV_CPU_PROGRAM_MAP(hyprduel_readmem,hyprduel_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(hyprduel_interrupt,RASTER_LINES)
 
@@ -760,7 +760,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( magerror )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,20000000/2)		/* 10MHz */
+	MDRV_CPU_ADD_TAG("main", M68000,20000000/2)		/* 10MHz */
 	MDRV_CPU_PROGRAM_MAP(magerror_readmem,magerror_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(hyprduel_interrupt,RASTER_LINES)
 

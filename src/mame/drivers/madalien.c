@@ -175,7 +175,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( madalien )
 
 	/* main CPU */
-	MDRV_CPU_ADD(M6502, MADALIEN_MAIN_CLOCK / 8)    /* 1324kHz */
+	MDRV_CPU_ADD_TAG("main", M6502, MADALIEN_MAIN_CLOCK / 8)    /* 1324kHz */
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 
 	/* audio CPU */

@@ -1493,7 +1493,7 @@ static const struct AY8910interface ay8912_interface_2 =
 
 static MACHINE_DRIVER_START( mazerbla )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000)	/* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 
@@ -1536,7 +1536,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( greatgun )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000)	/* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(gg_readport,gg_writeport)
 

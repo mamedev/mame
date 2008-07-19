@@ -860,7 +860,7 @@ static const tms34010_config tms_config =
  *************************************/
 
 static MACHINE_DRIVER_START( jpmimpct )
-	MDRV_CPU_ADD(M68000, 8000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(m68k_program_map, 0)
 
  	MDRV_CPU_ADD(TMS34010, 40000000)

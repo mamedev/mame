@@ -243,7 +243,7 @@ static GFXDECODE_START( ksayakyu )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( ksayakyu )
-	MDRV_CPU_ADD(Z80,8000000/2)
+	MDRV_CPU_ADD_TAG("main", Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(maincpu_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

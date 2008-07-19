@@ -1144,7 +1144,7 @@ static MACHINE_DRIVER_START( genpeitd )
 	MDRV_CPU_PROGRAM_MAP(genpeitd_mcu_map,0)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("namco", NAMCO_63701X, 6000000)
+	MDRV_SOUND_ADD("namco2", NAMCO_63701X, 6000000)
 	MDRV_SOUND_CONFIG(namco_63701x_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1161,7 +1161,7 @@ static MACHINE_DRIVER_START( rthunder )
 	MDRV_CPU_PROGRAM_MAP(rthunder_mcu_map,0)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("namco", NAMCO_63701X, 6000000)
+	MDRV_SOUND_ADD("namco2", NAMCO_63701X, 6000000)
 	MDRV_SOUND_CONFIG(namco_63701x_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1178,7 +1178,7 @@ static MACHINE_DRIVER_START( wndrmomo )
 	MDRV_CPU_PROGRAM_MAP(wndrmomo_mcu_map,0)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("namco", NAMCO_63701X, 6000000)
+	MDRV_SOUND_ADD("namco2", NAMCO_63701X, 6000000)
 	MDRV_SOUND_CONFIG(namco_63701x_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

@@ -475,7 +475,7 @@ static const tms34010_config slave_config =
 static MACHINE_DRIVER_START( exterm )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(TMS34010, 40000000)
+	MDRV_CPU_ADD_TAG("main", TMS34010, 40000000)
 	MDRV_CPU_CONFIG(master_config)
 	MDRV_CPU_PROGRAM_MAP(master_map,0)
 

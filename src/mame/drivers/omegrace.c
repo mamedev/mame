@@ -479,7 +479,7 @@ static MACHINE_DRIVER_START( omegrace )
 	/* main CPU */
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS161, Pin 13 = divide by 4 */
-	MDRV_CPU_ADD(Z80,12000000/4)
+	MDRV_CPU_ADD_TAG("main", Z80,12000000/4)
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_IO_MAP(port_map, 0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,250)

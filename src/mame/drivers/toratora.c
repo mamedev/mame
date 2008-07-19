@@ -399,7 +399,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( toratora )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6800,500000)	/* ?????? game speed is entirely controlled by this */
+	MDRV_CPU_ADD_TAG("main", M6800,500000)	/* ?????? game speed is entirely controlled by this */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_PERIODIC_INT(toratora_timer,16)	/* timer counting at 16 Hz */
 

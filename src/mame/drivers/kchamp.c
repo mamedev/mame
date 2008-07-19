@@ -440,7 +440,7 @@ static INTERRUPT_GEN( sound_int ) {
 static MACHINE_DRIVER_START( kchampvs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", kc_interrupt)
@@ -488,7 +488,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kchamp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(kc_readmem,kc_writemem)
 	MDRV_CPU_IO_MAP(kc_readport,kc_writeport)
 	MDRV_CPU_VBLANK_INT("main", kc_interrupt)

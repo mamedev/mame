@@ -259,7 +259,7 @@ static GFXDECODE_START( pitnrun )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( pitnrun )
-	MDRV_CPU_ADD(Z80,XTAL_18_432MHz/6)		 /* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", Z80,XTAL_18_432MHz/6)		 /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", pitnrun_nmi_source)
 

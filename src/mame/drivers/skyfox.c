@@ -254,7 +254,7 @@ static INTERRUPT_GEN( skyfox_interrupt )
 static MACHINE_DRIVER_START( skyfox )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(skyfox_readmem,skyfox_writemem)
 	MDRV_CPU_VBLANK_INT("main", skyfox_interrupt)		/* NMI caused by coin insertion */
 

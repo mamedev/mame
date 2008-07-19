@@ -574,7 +574,7 @@ INPUT_PORTS_END
 /*** MACHINE DRIVER **********************************************************/
 
 static MACHINE_DRIVER_START( gstriker )
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -615,7 +615,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( vgoal )
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(vgoal_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 

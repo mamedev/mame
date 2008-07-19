@@ -120,7 +120,7 @@ static INTERRUPT_GEN( gunpey_interrupt )
 static MACHINE_DRIVER_START( gunpey )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30, 57242400 / 4)
+	MDRV_CPU_ADD_TAG("main", V30, 57242400 / 4)
 	MDRV_CPU_PROGRAM_MAP(mem_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", gunpey_interrupt)

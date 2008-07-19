@@ -751,7 +751,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( tsamurai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(z80_readport,z80_writeport)
 	MDRV_CPU_VBLANK_INT("main", samurai_interrupt)
@@ -796,7 +796,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( m660 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_m660,writemem_m660)
 	MDRV_CPU_IO_MAP(z80_readport,z80_writeport_m660)
 	MDRV_CPU_VBLANK_INT("main", samurai_interrupt)
@@ -847,7 +847,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vsgongf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_vsgongf,writemem_vsgongf)
 	MDRV_CPU_VBLANK_INT("main", samurai_interrupt)
 

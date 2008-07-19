@@ -239,7 +239,7 @@ static INTERRUPT_GEN( ultrsprt_vblank )
 
 static MACHINE_DRIVER_START( ultrsprt )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC403GA, 25000000)		/* PowerPC 403GA 25MHz */
+	MDRV_CPU_ADD_TAG("main", PPC403GA, 25000000)		/* PowerPC 403GA 25MHz */
 	MDRV_CPU_PROGRAM_MAP(ultrsprt_map, 0)
 	MDRV_CPU_VBLANK_INT("main", ultrsprt_vblank)
 

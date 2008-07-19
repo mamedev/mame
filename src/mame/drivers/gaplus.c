@@ -540,7 +540,7 @@ static const struct Samplesinterface samples_interface =
 static MACHINE_DRIVER_START( gaplus )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809,	24576000/16)	/* 1.536 MHz */
+	MDRV_CPU_ADD_TAG("main", M6809,	24576000/16)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu1,writemem_cpu1)
 	MDRV_CPU_VBLANK_INT("main", gaplus_interrupt_1)
 

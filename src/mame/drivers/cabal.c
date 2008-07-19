@@ -501,7 +501,7 @@ static const struct MSM5205interface msm5205_interface_2 =
 static MACHINE_DRIVER_START( cabal )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_20MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_20MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -546,7 +546,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cabalbl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_20MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_20MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cabalbl_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 

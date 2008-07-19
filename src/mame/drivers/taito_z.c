@@ -3041,7 +3041,7 @@ Contcirc road glitchiness in attract?
 static MACHINE_DRIVER_START( contcirc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(contcirc_readmem,contcirc_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -3098,7 +3098,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( chasehq )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(chasehq_readmem,chasehq_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
@@ -3153,7 +3153,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( enforce )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(enforce_readmem,enforce_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -3211,7 +3211,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bshark )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(bshark_readmem,bshark_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
@@ -3263,7 +3263,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sci )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sci_readmem,sci_writemem)
 	MDRV_CPU_VBLANK_INT("main", sci_interrupt)
 
@@ -3319,7 +3319,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( nightstr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(nightstr_readmem,nightstr_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
@@ -3376,7 +3376,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( aquajack )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(aquajack_readmem,aquajack_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
@@ -3432,7 +3432,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( spacegun )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz ??? */
+	MDRV_CPU_ADD_TAG("main", M68000, 16000000)	/* 16 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(spacegun_readmem,spacegun_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
@@ -3484,7 +3484,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dblaxle )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz ??? */
+	MDRV_CPU_ADD_TAG("main", M68000, 16000000)	/* 16 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(dblaxle_readmem,dblaxle_writemem)
 	MDRV_CPU_VBLANK_INT("main", dblaxle_interrupt)
 
@@ -3540,7 +3540,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( racingb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz ??? */
+	MDRV_CPU_ADD_TAG("main", M68000, 16000000)	/* 16 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(racingb_readmem,racingb_writemem)
 	MDRV_CPU_VBLANK_INT("main", dblaxle_interrupt)
 

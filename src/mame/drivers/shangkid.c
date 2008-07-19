@@ -474,7 +474,7 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( dynamski )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3000000) /* ? */
+	MDRV_CPU_ADD_TAG("main", Z80, 3000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(dynamski_map,0)
 	MDRV_CPU_IO_MAP(dynamski_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

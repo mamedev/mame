@@ -233,7 +233,7 @@ static VIDEO_START( sangho )
 
 static MACHINE_DRIVER_START(pzlestar)
 
-	MDRV_CPU_ADD(Z80,8000000) // ?
+	MDRV_CPU_ADD_TAG("main", Z80,8000000) // ?
 	MDRV_CPU_PROGRAM_MAP(readmem, 0)
 	MDRV_CPU_IO_MAP(readport_pzlestar,writeport_pzlestar)
 	MDRV_CPU_VBLANK_INT_HACK(sangho_interrupt,262)
@@ -266,7 +266,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(sexyboom )
 
-	MDRV_CPU_ADD(Z80,8000000) // ?
+	MDRV_CPU_ADD_TAG("main", Z80,8000000) // ?
 	MDRV_CPU_PROGRAM_MAP(readmem, 0)
 	MDRV_CPU_IO_MAP(readport_sexyboom,writeport_sexyboom)
 	MDRV_CPU_VBLANK_INT_HACK(sangho_interrupt,262)

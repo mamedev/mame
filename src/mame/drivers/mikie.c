@@ -244,7 +244,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( mikie )
 	// basic machine hardware
-	MDRV_CPU_ADD(M6809, 1250000)	// ??? MC68A09E
+	MDRV_CPU_ADD_TAG("main", M6809, 1250000)	// ??? MC68A09E
 	MDRV_CPU_PROGRAM_MAP(mikie_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

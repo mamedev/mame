@@ -326,7 +326,7 @@ static const struct YM2610interface ym2610_interface =
 /*** MACHINE DRIVER **********************************************************/
 
 static MACHINE_DRIVER_START( suprslam )
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(suprslam_readmem,suprslam_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 

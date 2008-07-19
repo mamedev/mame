@@ -275,7 +275,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( dcon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
@@ -304,7 +304,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sdgndmps )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 

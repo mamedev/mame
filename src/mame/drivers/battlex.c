@@ -208,7 +208,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( battlex )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,10000000/2 )		 /* 10 MHz, divided ? (Z80A CPU) */
+	MDRV_CPU_ADD_TAG("main", Z80,10000000/2 )		 /* 10 MHz, divided ? (Z80A CPU) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8) /* controls game speed? */

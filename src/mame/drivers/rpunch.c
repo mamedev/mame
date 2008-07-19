@@ -504,7 +504,7 @@ static const struct upd7759_interface upd7759_interface =
 static MACHINE_DRIVER_START( rpunch )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, MASTER_CLOCK/2)
+	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK/4)

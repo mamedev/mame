@@ -876,7 +876,7 @@ NAMCO_C7X_HARDWARE
 
 static MACHINE_DRIVER_START( coh100 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD_TAG("main",  PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( namcos11_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", namcos11_vblank)
 

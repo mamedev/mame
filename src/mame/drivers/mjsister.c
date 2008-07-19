@@ -311,7 +311,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( mjsister )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MCLK/2) /* 6.000 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, MCLK/2) /* 6.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(mjsister_readmem,mjsister_writemem)
 	MDRV_CPU_IO_MAP(mjsister_readport,mjsister_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)

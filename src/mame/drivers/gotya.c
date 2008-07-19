@@ -198,7 +198,7 @@ static const struct Samplesinterface samples_interface =
 static MACHINE_DRIVER_START( gotya )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,18432000/6)	/* 3.072 MHz ??? */
+	MDRV_CPU_ADD_TAG("main", Z80,18432000/6)	/* 3.072 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

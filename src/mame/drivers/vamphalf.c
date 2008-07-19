@@ -615,7 +615,7 @@ static MACHINE_DRIVER_START( sound_ym_oki )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sound_qs1000 )
-	MDRV_CPU_ADD(I8052, 24000000/4)	/* 6 MHz? */
+	MDRV_CPU_ADD_TAG("audio", I8052, 24000000/4)	/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(qs1000_prg_map, 0)
 	MDRV_CPU_DATA_MAP( qs1000_data_map, 0 )
 

@@ -686,7 +686,7 @@ static MACHINE_RESET( igs_180 )
 static MACHINE_DRIVER_START( igs_180 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z180, XTAL_16MHz / 2)
+	MDRV_CPU_ADD_TAG("main", Z180, XTAL_16MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(igs_180_map,0)
 	MDRV_CPU_IO_MAP(igs_180_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(igs_180_interrupt,2)

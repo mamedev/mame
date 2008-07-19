@@ -349,7 +349,7 @@ static const struct Y8950interface y8950_interface =
 static MACHINE_DRIVER_START( ginganin )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 6000000)	/* ? */
+	MDRV_CPU_ADD_TAG("main", M68000, 6000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold) /* ? (vectors 1-7 cointain the same address) */
 

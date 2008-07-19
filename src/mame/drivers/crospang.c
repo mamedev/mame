@@ -403,7 +403,7 @@ static const struct YM3812interface ym3812_interface =
 static MACHINE_DRIVER_START( crospang )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 14318180/2)
+	MDRV_CPU_ADD_TAG("main", M68000, 14318180/2)
 	MDRV_CPU_PROGRAM_MAP(crospang_readmem,crospang_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -441,7 +441,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bestri )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 14318180/2)
+	MDRV_CPU_ADD_TAG("main", M68000, 14318180/2)
 	MDRV_CPU_PROGRAM_MAP(bestri_readmem,bestri_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 

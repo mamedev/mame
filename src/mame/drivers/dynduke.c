@@ -272,7 +272,7 @@ static MACHINE_DRIVER_START( dynduke )
 	MDRV_CPU_PROGRAM_MAP(master_map, 0)
 	MDRV_CPU_VBLANK_INT("main", dynduke_interrupt)
 
-	MDRV_CPU_ADD(V30, 16000000/2) // NEC V30-8 CPU
+	MDRV_CPU_ADD_TAG("slave", V30, 16000000/2) // NEC V30-8 CPU
 	MDRV_CPU_PROGRAM_MAP(slave_map, 0)
 	MDRV_CPU_VBLANK_INT("main", dynduke_interrupt)
 

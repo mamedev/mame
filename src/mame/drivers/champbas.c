@@ -611,7 +611,7 @@ static MACHINE_DRIVER_START( talbot )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD(Z80, XTAL_18_432MHz/6)
+	MDRV_CPU_ADD_TAG("main", Z80, XTAL_18_432MHz/6)
 	MDRV_CPU_PROGRAM_MAP(talbot_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
@@ -645,7 +645,7 @@ static MACHINE_DRIVER_START( champbas )
 	/* basic machine hardware */
 
 	/* main cpu */
-	MDRV_CPU_ADD(Z80, XTAL_18_432MHz/6)
+	MDRV_CPU_ADD_TAG("main", Z80, XTAL_18_432MHz/6)
 	MDRV_CPU_PROGRAM_MAP(champbas_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
@@ -695,7 +695,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( exctsccr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)	/* 4.0 MHz (?) */
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000)	/* 4.0 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(exctsccr_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
@@ -751,7 +751,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( exctsccb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, XTAL_18_432MHz/6)
+	MDRV_CPU_ADD_TAG("main", Z80, XTAL_18_432MHz/6)
 	MDRV_CPU_PROGRAM_MAP(exctsccb_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 

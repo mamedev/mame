@@ -695,7 +695,7 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 
 static MACHINE_DRIVER_START( laserbat )
 
-	MDRV_CPU_ADD(S2650, 14318180/4) // ???
+	MDRV_CPU_ADD_TAG("main", S2650, 14318180/4) // ???
 	MDRV_CPU_PROGRAM_MAP(laserbat_map,0)
 	MDRV_CPU_IO_MAP(laserbat_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", laserbat_interrupt)
@@ -729,7 +729,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( catnmous )
 
-	MDRV_CPU_ADD(S2650, 14318000/4)	/* ? */
+	MDRV_CPU_ADD_TAG("main", S2650, 14318000/4)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(laserbat_map,0)
 	MDRV_CPU_IO_MAP(catnmous_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", laserbat_interrupt)

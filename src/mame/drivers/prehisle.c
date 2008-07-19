@@ -234,7 +234,7 @@ static const struct upd7759_interface upd7759_interface =
 static MACHINE_DRIVER_START( prehisle )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_18MHz/2) 	/* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_18MHz/2) 	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(prehisle_readmem,prehisle_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 

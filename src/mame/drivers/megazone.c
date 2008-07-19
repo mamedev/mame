@@ -314,7 +314,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( megazone )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 18432000/9)        /* 2 MHz */
+	MDRV_CPU_ADD_TAG("main", M6809, 18432000/9)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

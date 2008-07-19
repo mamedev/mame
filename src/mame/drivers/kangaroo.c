@@ -370,7 +370,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( nomcu )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MASTER_CLOCK/4)
+	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

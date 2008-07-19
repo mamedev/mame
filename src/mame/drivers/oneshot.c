@@ -369,7 +369,7 @@ static const struct YM3812interface ym3812_interface =
 static MACHINE_DRIVER_START( oneshot )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(oneshot_readmem,oneshot_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 

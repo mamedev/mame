@@ -357,7 +357,7 @@ static INTERRUPT_GEN( cultures_interrupt )
 static MACHINE_DRIVER_START( cultures )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MCLK/2) /* 8.000 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, MCLK/2) /* 8.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(cultures_map,0)
 	MDRV_CPU_IO_MAP(cultures_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", cultures_interrupt)

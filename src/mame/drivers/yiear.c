@@ -254,7 +254,7 @@ static const struct VLM5030interface vlm5030_interface =
 static MACHINE_DRIVER_START( yiear )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809,18432000/16)	/* ???? */
+	MDRV_CPU_ADD_TAG("main", M6809,18432000/16)	/* ???? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 	MDRV_CPU_PERIODIC_INT(yiear_nmi_interrupt,500)	/* music tempo (correct frequency unknown) */

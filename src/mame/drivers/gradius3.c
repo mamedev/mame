@@ -338,7 +338,7 @@ static const struct K007232_interface k007232_interface =
 static MACHINE_DRIVER_START( gradius3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)	/* 10 MHz */
+	MDRV_CPU_ADD_TAG("main", M68000, 10000000)	/* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(gradius3_map,0)
 	MDRV_CPU_VBLANK_INT("main", cpuA_interrupt)
 

@@ -445,7 +445,7 @@ static MACHINE_RESET( pturn )
 }
 
 static MACHINE_DRIVER_START( pturn )
-	MDRV_CPU_ADD(Z80, 12000000/3)
+	MDRV_CPU_ADD_TAG("main", Z80, 12000000/3)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", pturn_main_intgen)
 	MDRV_MACHINE_RESET(pturn)

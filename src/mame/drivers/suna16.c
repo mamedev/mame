@@ -852,7 +852,7 @@ static INTERRUPT_GEN( bssoccer_interrupt )
 static MACHINE_DRIVER_START( bssoccer )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)	/* ? */
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(bssoccer_readmem,bssoccer_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(bssoccer_interrupt,2)
 
@@ -915,7 +915,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( uballoon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(uballoon_readmem,uballoon_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -968,7 +968,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sunaq )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 24000000/4)
+	MDRV_CPU_ADD_TAG("main", M68000, 24000000/4)
 	MDRV_CPU_PROGRAM_MAP(sunaq_readmem,sunaq_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -1043,7 +1043,7 @@ static const struct AY8910interface bestbest_ay8910_interface =
 
 static MACHINE_DRIVER_START( bestbest )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 24000000/4)
+	MDRV_CPU_ADD_TAG("main", M68000, 24000000/4)
 	MDRV_CPU_PROGRAM_MAP(bestbest_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(bssoccer_interrupt,2)
 

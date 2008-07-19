@@ -300,7 +300,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( hitme )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(8080, 8945000/16)
+	MDRV_CPU_ADD_TAG("main", 8080, 8945000/16)
 	MDRV_CPU_PROGRAM_MAP(hitme_map,0)
 	MDRV_CPU_IO_MAP(hitme_portmap,0)
 

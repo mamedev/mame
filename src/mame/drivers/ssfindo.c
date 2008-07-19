@@ -598,7 +598,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( ssfindo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(ARM7, 54000000) // guess...
+	MDRV_CPU_ADD_TAG("main", ARM7, 54000000) // guess...
 	MDRV_CPU_PROGRAM_MAP(ssfindo_map,0)
 
 	MDRV_CPU_VBLANK_INT("main", ssfindo_interrupt)
@@ -621,7 +621,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ppcar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(ARM7, 54000000) // guess...
+	MDRV_CPU_ADD_TAG("main", ARM7, 54000000) // guess...
 	MDRV_CPU_PROGRAM_MAP(ppcar_map,0)
 
 	MDRV_CPU_VBLANK_INT("main", ssfindo_interrupt)

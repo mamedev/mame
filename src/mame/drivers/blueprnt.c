@@ -272,7 +272,7 @@ static const struct AY8910interface ay8910_interface_2 =
 
 static MACHINE_DRIVER_START( blueprnt )
 	// basic machine hardware
-	MDRV_CPU_ADD(Z80, 7000000/2)	// 3.5 MHz
+	MDRV_CPU_ADD_TAG("main", Z80, 7000000/2)	// 3.5 MHz
 	MDRV_CPU_PROGRAM_MAP(blueprnt_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

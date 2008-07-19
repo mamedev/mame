@@ -633,7 +633,7 @@ static const tms34010_config tms_config =
 
 static MACHINE_DRIVER_START( wunit )
 
-	MDRV_CPU_ADD(TMS34010, 50000000)
+	MDRV_CPU_ADD_TAG("main", TMS34010, 50000000)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 

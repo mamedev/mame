@@ -609,7 +609,7 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( rainbow )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_16MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_16MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(rainbow_readmem,rainbow_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
@@ -646,7 +646,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( jumping )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_24MHz/3)	/* not verified but matches original */
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_24MHz/3)	/* not verified but matches original */
 	MDRV_CPU_PROGRAM_MAP(jumping_readmem,jumping_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 

@@ -278,7 +278,7 @@ static const struct AY8910interface ay8910_interface =
 
 static MACHINE_DRIVER_START( exerion )
 
-	MDRV_CPU_ADD(Z80, EXERION_CPU_CLOCK)
+	MDRV_CPU_ADD_TAG("main", Z80, EXERION_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_CPU_ADD(Z80, EXERION_CPU_CLOCK)

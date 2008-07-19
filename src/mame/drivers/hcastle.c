@@ -266,7 +266,7 @@ static const struct YM3812interface ym3812_interface =
 static MACHINE_DRIVER_START( hcastle )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(KONAMI, 3000000)	/* Derived from 24 MHz clock */
+	MDRV_CPU_ADD_TAG("main", KONAMI, 3000000)	/* Derived from 24 MHz clock */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

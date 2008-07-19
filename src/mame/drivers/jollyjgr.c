@@ -398,7 +398,7 @@ static INTERRUPT_GEN( jollyjgr_interrupt )
 }
 
 static MACHINE_DRIVER_START( jollyjgr )
-	MDRV_CPU_ADD(Z80, 3579545)		 /* 3,579545 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, 3579545)		 /* 3,579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(jollyjgr_map,0)
 	MDRV_CPU_VBLANK_INT("main", jollyjgr_interrupt)
 

@@ -586,7 +586,7 @@ The game is displayed on 2 monitors
 static MACHINE_DRIVER_START( tbowl )
 
 	/* CPU on Board '6206B' */
-	MDRV_CPU_ADD(Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
+	MDRV_CPU_ADD_TAG("main", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
 	MDRV_CPU_PROGRAM_MAP(readmem_6206B,writemem_6206B)
 	MDRV_CPU_VBLANK_INT("left", irq0_line_hold)
 

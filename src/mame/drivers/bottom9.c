@@ -401,7 +401,7 @@ static const struct K007232_interface k007232_interface_2 =
 static MACHINE_DRIVER_START( bottom9 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 2000000) /* ? */
+	MDRV_CPU_ADD_TAG("main", M6809, 2000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(bottom9_readmem,bottom9_writemem)
 	MDRV_CPU_VBLANK_INT("main", bottom9_interrupt)
 

@@ -1562,7 +1562,7 @@ static const struct YM2610interface sngkace_ym2610_interface =
 static MACHINE_DRIVER_START( sngkace )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, 16000000)
+	MDRV_CPU_ADD_TAG("main", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(psikyo_readmem,psikyo_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -1616,7 +1616,7 @@ static const struct YM2610interface gunbird_ym2610_interface =
 static MACHINE_DRIVER_START( gunbird )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, 16000000)
+	MDRV_CPU_ADD_TAG("main", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(psikyo_readmem,psikyo_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -1678,7 +1678,7 @@ static const struct YMF278B_interface ymf278b_interface =
 static MACHINE_DRIVER_START( s1945 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, 16000000)
+	MDRV_CPU_ADD_TAG("main", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(psikyo_readmem,psikyo_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 

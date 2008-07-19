@@ -859,7 +859,7 @@ static const tms34010_config vgb_config =
 
 
 static MACHINE_DRIVER_START( micro3d )
-	MDRV_CPU_ADD(M68000, 12000000 )
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000 )
 	MDRV_CPU_PROGRAM_MAP(hostmem,0)
 	MDRV_CPU_VBLANK_INT("main", micro3d_vblank)
 

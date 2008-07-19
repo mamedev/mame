@@ -1225,7 +1225,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mrokumei )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 16000000/4)	/* 4MHz ? */
+	MDRV_CPU_ADD_TAG("main", M6809, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mrokumei_readmem,mrokumei_writemem)
 	MDRV_CPU_VBLANK_INT("main", homedata_irq)	/* also triggered by the blitter */
 
@@ -1289,7 +1289,7 @@ static const UPD7810_CONFIG upd_config =
 static MACHINE_DRIVER_START( reikaids )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 16000000/4)	/* 4MHz ? */
+	MDRV_CPU_ADD_TAG("main", M6809, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(reikaids_readmem,reikaids_writemem)
 	MDRV_CPU_VBLANK_INT("main", homedata_irq)	/* also triggered by the blitter */
 
@@ -1339,7 +1339,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pteacher )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 16000000/4)	/* 4MHz ? */
+	MDRV_CPU_ADD_TAG("main", M6809, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(pteacher_readmem,pteacher_writemem)
 	MDRV_CPU_VBLANK_INT("main", homedata_irq)	/* also triggered by the blitter */
 

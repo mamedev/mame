@@ -325,7 +325,7 @@ static const struct POKEYinterface pokey_interface_2 =
 static MACHINE_DRIVER_START( cloak )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502,1000000)		/* 1 MHz ???? */
+	MDRV_CPU_ADD_TAG("main", M6502,1000000)		/* 1 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(master_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 

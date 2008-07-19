@@ -296,7 +296,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( iqblock )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,12000000/2)	/* 6 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80,12000000/2)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)
@@ -328,7 +328,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cabaret )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z180,12000000/2)	/* 6 MHz , appears to use Z180 instructions */
+	MDRV_CPU_ADD_TAG("main", Z180,12000000/2)	/* 6 MHz , appears to use Z180 instructions */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)
@@ -360,7 +360,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pokerigs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z180,12000000/2)	/* 6 MHz */
+	MDRV_CPU_ADD_TAG("main", Z180,12000000/2)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(pokerigs_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)

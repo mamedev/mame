@@ -580,7 +580,7 @@ static MACHINE_START( taitoh )
 static MACHINE_DRIVER_START( syvalion )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000 / 2)		/* 12 MHz */
+	MDRV_CPU_ADD_TAG("main", M68000,24000000 / 2)		/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(syvalion_readmem,syvalion_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -619,7 +619,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( recordbr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000 / 2)		/* 12 MHz */
+	MDRV_CPU_ADD_TAG("main", M68000,24000000 / 2)		/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(recordbr_readmem,recordbr_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -658,7 +658,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dleague )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,24000000 / 2)		/* 12 MHz */
+	MDRV_CPU_ADD_TAG("main", M68000,24000000 / 2)		/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(dleague_readmem,dleague_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 

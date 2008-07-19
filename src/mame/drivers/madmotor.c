@@ -284,7 +284,7 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( madmotor )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000) /* Custom chip 59, 24 MHz crystal */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000) /* Custom chip 59, 24 MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(madmotor_readmem,madmotor_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL */
 

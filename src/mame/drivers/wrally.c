@@ -247,7 +247,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( wrally )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,XTAL_24MHz/2)		/* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", M68000,XTAL_24MHz/2)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(wrally_readmem, 0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 

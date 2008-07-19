@@ -378,7 +378,7 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( rastan )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_16MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_16MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(rastan_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 

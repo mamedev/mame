@@ -836,7 +836,7 @@ static const struct YM2203interface ym2203_interface_2 =
 static MACHINE_DRIVER_START( darius )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,16000000/2)	/* 8 MHz ? */
+	MDRV_CPU_ADD_TAG("main", M68000,16000000/2)	/* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(darius_readmem,darius_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 

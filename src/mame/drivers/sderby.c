@@ -251,7 +251,7 @@ static GFXDECODE_START( sderby )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( sderby )
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(sderby_readmem,sderby_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -279,7 +279,7 @@ static MACHINE_DRIVER_START( sderby )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pmroulet )
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(roulette_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 

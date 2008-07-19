@@ -508,7 +508,7 @@ static const struct Samplesinterface astinvad_samples_interface =
 static MACHINE_DRIVER_START( kamikaze )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MASTER_CLOCK)
+	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(kamikaze_map,0)
 	MDRV_CPU_IO_MAP(kamikaze_portmap,0)
 
@@ -548,7 +548,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( spaceint )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MASTER_CLOCK)        /* a guess */
+	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK)        /* a guess */
 	MDRV_CPU_PROGRAM_MAP(spaceint_map,0)
 	MDRV_CPU_IO_MAP(spaceint_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

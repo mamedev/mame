@@ -461,7 +461,7 @@ static const struct Samplesinterface natodef_samples_interface =
 static MACHINE_DRIVER_START( sharkatt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)        /* 4 MHz? */
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000)        /* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sharkatt_readmem,sharkatt_writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", thief_interrupt)
@@ -497,7 +497,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( thief )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz? */
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000) /* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(thief_readmem,thief_writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", thief_interrupt)
@@ -533,7 +533,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( natodef )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz? */
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000) /* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(thief_readmem,thief_writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", thief_interrupt)

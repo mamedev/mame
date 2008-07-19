@@ -451,7 +451,7 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( pushman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -494,7 +494,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bballs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(bballs_readmem,bballs_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 

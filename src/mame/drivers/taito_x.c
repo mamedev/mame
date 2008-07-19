@@ -1004,7 +1004,7 @@ static MACHINE_START( taitox )
 static MACHINE_DRIVER_START( superman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_16MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_16MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(superman_readmem,superman_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -1044,7 +1044,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( daisenpu )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_16MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_16MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(daisenpu_readmem,daisenpu_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -1081,7 +1081,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gigandes )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)	/* 8 MHz? */
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000)	/* 8 MHz? */
 	MDRV_CPU_PROGRAM_MAP(gigandes_readmem,gigandes_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -1120,7 +1120,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ballbros )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)	/* 8 MHz? */
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000)	/* 8 MHz? */
 	MDRV_CPU_PROGRAM_MAP(ballbros_readmem,ballbros_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 

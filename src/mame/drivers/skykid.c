@@ -451,7 +451,7 @@ static const struct namco_interface namco_interface =
 static MACHINE_DRIVER_START( skykid )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809,49152000/32)
+	MDRV_CPU_ADD_TAG("main", M6809,49152000/32)
 	MDRV_CPU_PROGRAM_MAP(skykid_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 

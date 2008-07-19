@@ -301,7 +301,7 @@ static MACHINE_START( sprcros2 )
 static MACHINE_DRIVER_START( sprcros2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,10000000/2)
+	MDRV_CPU_ADD_TAG("main", Z80,10000000/2)
 	MDRV_CPU_PROGRAM_MAP(sprcros2_m_readmem,sprcros2_m_writemem)
 	MDRV_CPU_IO_MAP(sprcros2_m_readport,sprcros2_m_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(sprcros2_m_interrupt,2)	//1 nmi + 1 irq

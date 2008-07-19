@@ -237,7 +237,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( toobin )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68010, ATARI_CLOCK_32MHz/4)
+	MDRV_CPU_ADD_TAG("main", M68010, ATARI_CLOCK_32MHz/4)
 	MDRV_CPU_PROGRAM_MAP(main_readmem,main_writemem)
 
 	MDRV_MACHINE_RESET(toobin)

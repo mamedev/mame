@@ -436,7 +436,7 @@ static const struct YM2203interface ym2203_intf_sandscrp =
 static MACHINE_DRIVER_START( sandscrp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,12000000)	/* TMP68HC000N-12 */
+	MDRV_CPU_ADD_TAG("main", M68000,12000000)	/* TMP68HC000N-12 */
 	MDRV_CPU_PROGRAM_MAP(sandscrp,0)
 	MDRV_CPU_VBLANK_INT("main", sandscrp_interrupt)
 

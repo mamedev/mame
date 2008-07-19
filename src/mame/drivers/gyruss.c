@@ -517,7 +517,7 @@ DISCRETE_SOUND_END
 static MACHINE_DRIVER_START( gyruss )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz (?) */
+	MDRV_CPU_ADD_TAG("main", Z80, 3072000)	/* 3.072 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(main_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 

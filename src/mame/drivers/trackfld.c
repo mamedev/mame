@@ -844,7 +844,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hyprolyb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 2048000)        /* 1.400 MHz ??? */
+	MDRV_CPU_ADD_TAG("main", M6809, 2048000)        /* 1.400 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

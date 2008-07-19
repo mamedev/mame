@@ -702,7 +702,7 @@ static const struct AY8910interface pkunwar_ay8910_interface_2 =
 static MACHINE_DRIVER_START( nova2001 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MAIN_CLOCK/4)	// 3 MHz verified on schematics
+	MDRV_CPU_ADD_TAG("main", Z80, MAIN_CLOCK/4)	// 3 MHz verified on schematics
 	MDRV_CPU_PROGRAM_MAP(nova2001_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -735,7 +735,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ninjakun )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MAIN_CLOCK/4)	// 3 MHz
+	MDRV_CPU_ADD_TAG("main", Z80, MAIN_CLOCK/4)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(ninjakun_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -776,7 +776,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pkunwar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MAIN_CLOCK/4)	// 3 MHz
+	MDRV_CPU_ADD_TAG("main", Z80, MAIN_CLOCK/4)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(pkunwar_map,0)
 	MDRV_CPU_IO_MAP(pkunwar_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -810,7 +810,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( raiders5 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MAIN_CLOCK/4)	// 3 MHz
+	MDRV_CPU_ADD_TAG("main", Z80, MAIN_CLOCK/4)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(raiders5_cpu1_map,0)
 	MDRV_CPU_IO_MAP(raiders5_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

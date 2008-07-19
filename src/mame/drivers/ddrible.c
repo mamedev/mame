@@ -347,7 +347,7 @@ static const struct VLM5030interface vlm5030_interface =
 static MACHINE_DRIVER_START( ddribble )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu0,writemem_cpu0)
 	MDRV_CPU_VBLANK_INT("main", ddrible_interrupt_0)
 

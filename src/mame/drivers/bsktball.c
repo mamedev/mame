@@ -209,7 +209,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( bsktball )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502,750000)
+	MDRV_CPU_ADD_TAG("main", M6502,750000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(bsktball_interrupt,8)
 

@@ -380,7 +380,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( pandoras )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809,18432000/6)	/* CPU A */
+	MDRV_CPU_ADD_TAG("main", M6809,18432000/6)	/* CPU A */
 	MDRV_CPU_PROGRAM_MAP(pandoras_readmem_a,pandoras_writemem_a)
 	MDRV_CPU_VBLANK_INT("main", pandoras_interrupt_a)
 

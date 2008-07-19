@@ -281,7 +281,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( munchmo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3750000) /* ? */
+	MDRV_CPU_ADD_TAG("main", Z80, 3750000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(mnchmobl_interrupt,2)
 

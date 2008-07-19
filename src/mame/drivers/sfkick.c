@@ -80,7 +80,7 @@ static VIDEO_UPDATE( sfkick )
 
 static MACHINE_DRIVER_START( sfkick )
 
-	MDRV_CPU_ADD(Z80,8000000) // ?
+	MDRV_CPU_ADD_TAG("main", Z80,8000000) // ?
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 //  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

@@ -351,7 +351,7 @@ static NVRAM_HANDLER( galastrm )
 
 static MACHINE_DRIVER_START( galastrm )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, 16000000)	/* 16 MHz */
+	MDRV_CPU_ADD_TAG("main", M68EC020, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(galastrm_readmem,galastrm_writemem)
 	MDRV_CPU_VBLANK_INT("main", galastrm_interrupt) /* VBL */
 

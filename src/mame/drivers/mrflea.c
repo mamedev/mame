@@ -279,7 +279,7 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( mrflea )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz? */
+	MDRV_CPU_ADD_TAG("main", Z80, 4000000) /* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* NMI resets the game */

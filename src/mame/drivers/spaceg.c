@@ -364,7 +364,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( spaceg )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,2500000)		 /* 2.5 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80,2500000)		 /* 2.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(readwritemem,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)	/* 60 Hz NMIs (verified) */
 

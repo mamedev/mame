@@ -254,7 +254,7 @@ static const struct K053260_interface k053260_interface =
 static MACHINE_DRIVER_START( asterix )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", asterix_interrupt)
 

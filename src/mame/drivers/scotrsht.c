@@ -223,7 +223,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( scotrsht )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 18432000/6)        /* 3.072 MHz */
+	MDRV_CPU_ADD_TAG("main", M6809, 18432000/6)        /* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(scotrsht_map,0)
 	MDRV_CPU_VBLANK_INT("main", scotrsht_interrupt)
 

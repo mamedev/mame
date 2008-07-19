@@ -396,7 +396,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( dcheese )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, MAIN_OSC)
+	MDRV_CPU_ADD_TAG("main", M68000, MAIN_OSC)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map,0)
 	MDRV_CPU_VBLANK_INT("main", dcheese_vblank)
 

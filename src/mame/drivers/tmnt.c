@@ -2342,7 +2342,7 @@ static const struct K053260_interface k053260_interface =
 static MACHINE_DRIVER_START( cuebrick )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)	/* 8 MHz */
+	MDRV_CPU_ADD_TAG("main", M68000, 8000000)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(cuebrick_main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(cuebrick_interrupt,10)
 
@@ -2375,7 +2375,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mia )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_24MHz/3)
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_24MHz/3)
 	MDRV_CPU_PROGRAM_MAP(mia_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
@@ -2421,7 +2421,7 @@ static MACHINE_RESET( tmnt )
 static MACHINE_DRIVER_START( tmnt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_24MHz/3)
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_24MHz/3)
 	MDRV_CPU_PROGRAM_MAP(tmnt_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
@@ -2470,7 +2470,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( punkshot )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_24MHz/2)
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_24MHz/2)
 	MDRV_CPU_PROGRAM_MAP(punkshot_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", punkshot_interrupt)
 
@@ -2509,7 +2509,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( lgtnfght )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_24MHz/2)
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_24MHz/2)
 	MDRV_CPU_PROGRAM_MAP(lgtnfght_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", lgtnfght_interrupt)
 
@@ -2548,7 +2548,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( blswhstl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
+	MDRV_CPU_ADD_TAG("main", M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(blswhstl_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", punkshot_interrupt)
 
@@ -2608,7 +2608,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( glfgreat )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* ? */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(glfgreat_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", lgtnfght_interrupt)
 
@@ -2657,7 +2657,7 @@ static const struct K054539interface k054539_interface =
 static MACHINE_DRIVER_START( prmrsocr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* ? */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(prmrsocr_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", lgtnfght_interrupt)
 
@@ -2697,7 +2697,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tmnt2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_32MHz/2)
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_32MHz/2)
 	MDRV_CPU_PROGRAM_MAP(tmnt2_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", punkshot_interrupt)
 
@@ -2744,7 +2744,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ssriders )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_32MHz/2)
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_32MHz/2)
 	MDRV_CPU_PROGRAM_MAP(ssriders_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", punkshot_interrupt)
 
@@ -2787,7 +2787,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sunsetbl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
+	MDRV_CPU_ADD_TAG("main", M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(sunsetbl_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
@@ -2820,7 +2820,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( thndrx2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
+	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(thndrx2_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", punkshot_interrupt)
 

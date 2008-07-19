@@ -275,7 +275,7 @@ static INTERRUPT_GEN( goodejan_interrupt )
 static MACHINE_DRIVER_START( goodejan )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30, GOODEJAN_MHZ2/2)
+	MDRV_CPU_ADD_TAG("main", V30, GOODEJAN_MHZ2/2)
 	MDRV_CPU_PROGRAM_MAP(goodejan_map,0)
 	MDRV_CPU_IO_MAP(goodejan_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(goodejan_interrupt,2)

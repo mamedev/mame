@@ -193,7 +193,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( ikki )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,8000000/2) /* 4.000MHz */
+	MDRV_CPU_ADD_TAG("main", Z80,8000000/2) /* 4.000MHz */
 	MDRV_CPU_PROGRAM_MAP(ikki_cpu1,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 

@@ -1237,7 +1237,7 @@ static const struct YM3812interface ym3812_interface =
 static MACHINE_DRIVER_START( rallybik )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(rallybik_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
@@ -1277,7 +1277,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( truxton )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(truxton_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
@@ -1317,7 +1317,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hellfire )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(hellfire_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
@@ -1357,7 +1357,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( zerowing )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(zerowing_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
@@ -1397,7 +1397,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( demonwld )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(demonwld_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
@@ -1441,7 +1441,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( samesame )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(samesame_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
@@ -1475,7 +1475,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( outzone )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(outzone_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
@@ -1515,7 +1515,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vimana )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, XTAL_10MHz) /* verified on pcb */
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_10MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(vimana_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 

@@ -372,7 +372,7 @@ static MACHINE_RESET( pipeline )
 static MACHINE_DRIVER_START( pipeline )
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD(Z80, 7372800/2)
+	MDRV_CPU_ADD_TAG("main", Z80, 7372800/2)
 	MDRV_CPU_PROGRAM_MAP(cpu0_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 

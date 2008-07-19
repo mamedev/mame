@@ -1268,7 +1268,7 @@ static INTERRUPT_GEN( taitojc_int6 )
 }
 
 static MACHINE_DRIVER_START( taitojc )
-	MDRV_CPU_ADD(M68040, 25000000)
+	MDRV_CPU_ADD_TAG("main", M68040, 25000000)
 	MDRV_CPU_PROGRAM_MAP(taitojc_map, 0)
 	MDRV_CPU_VBLANK_INT("main", taitojc_vblank)
 	MDRV_CPU_PERIODIC_INT(taitojc_int6, 1000)

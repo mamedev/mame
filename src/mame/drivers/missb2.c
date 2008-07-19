@@ -355,7 +355,7 @@ static INTERRUPT_GEN( missb2_interrupt )
 
 static MACHINE_DRIVER_START( missb2 )
 	// basic machine hardware
-	MDRV_CPU_ADD(Z80, MAIN_XTAL/4)	// 6 MHz
+	MDRV_CPU_ADD_TAG("main", Z80, MAIN_XTAL/4)	// 6 MHz
 	MDRV_CPU_PROGRAM_MAP(master_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

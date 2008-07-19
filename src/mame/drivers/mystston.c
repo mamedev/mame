@@ -211,7 +211,7 @@ static MACHINE_DRIVER_START( mystston )
 	MDRV_DRIVER_DATA(mystston_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, CPU_CLOCK)
+	MDRV_CPU_ADD_TAG("main", M6502, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	/* video hardware */
