@@ -2157,7 +2157,8 @@ WRITE16_HANDLER( model1_vr_tgp_w )
 const struct mb86233_config model1_vr_tgp_config =
 {
 	copro_fifoin_pop,
-	copro_fifoout_push
+	copro_fifoout_push,
+	REGION_USER5
 };
 
 /* TGP memory map */
