@@ -959,11 +959,11 @@ void m92_sprite_interrupt(running_machine *machine)
 static MACHINE_DRIVER_START( m92 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",V33,18000000/2)	/* NEC V33, 18 MHz clock */
+	MDRV_CPU_ADD("main",V33,18000000/2)	/* NEC V33, 18 MHz clock */
 	MDRV_CPU_PROGRAM_MAP(m92_map,0)
 	MDRV_CPU_IO_MAP(m92_portmap,0)
 
-	MDRV_CPU_ADD_TAG("sound" ,V30, 14318180/2)	/* 14.31818 MHz */
+	MDRV_CPU_ADD("sound" ,V30, 14318180/2)	/* 14.31818 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_START(m92)

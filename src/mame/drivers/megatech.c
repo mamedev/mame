@@ -613,7 +613,7 @@ static MACHINE_DRIVER_START( megatech )
 	MDRV_IMPORT_FROM(megadriv)
 
 	/* Megatech has an extra SMS based bios *and* an additional screen */
-	MDRV_CPU_ADD_TAG("megatech_bios", Z80, MASTER_CLOCK / 15) /* ?? */
+	MDRV_CPU_ADD("megatech_bios", Z80, MASTER_CLOCK / 15) /* ?? */
 	MDRV_CPU_PROGRAM_MAP(megatech_bios_map, 0)
 	MDRV_CPU_IO_MAP(megatech_bios_portmap,0)
 

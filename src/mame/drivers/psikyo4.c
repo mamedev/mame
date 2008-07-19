@@ -489,7 +489,7 @@ static const struct YMF278B_interface ymf278b_interface =
 
 static MACHINE_DRIVER_START( ps4big )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", SH2, MASTER_CLOCK/2)
+	MDRV_CPU_ADD("main", SH2, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(ps4_readmem,ps4_writemem)
 	MDRV_CPU_VBLANK_INT("left", psikyosh_interrupt)
 

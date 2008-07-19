@@ -338,12 +338,11 @@ static const struct upd7759_interface upd7759_interface =
 static MACHINE_DRIVER_START( bladestl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", HD6309, 24000000/2)		/* 24MHz/2 (?) */
+	MDRV_CPU_ADD("main", HD6309, 24000000/2)		/* 24MHz/2 (?) */
 	MDRV_CPU_PROGRAM_MAP(bladestl_readmem,bladestl_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(bladestl_interrupt,2) /* (1 IRQ + 1 NMI) */
 
-	MDRV_CPU_ADD(M6809, 2000000)
-	/* audio CPU */		/* ? */
+	MDRV_CPU_ADD("audio", M6809, 2000000)
 	MDRV_CPU_PROGRAM_MAP(bladestl_readmem_sound,bladestl_writemem_sound)
 
 	MDRV_INTERLEAVE(10)

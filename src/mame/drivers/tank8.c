@@ -329,7 +329,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( tank8 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6800, 11055000 / 10) /* ? */
+	MDRV_CPU_ADD("main", M6800, 11055000 / 10) /* ? */
 	MDRV_CPU_PROGRAM_MAP(tank8_cpu_map, 0)
 
 	MDRV_MACHINE_RESET(tank8)

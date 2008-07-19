@@ -365,12 +365,11 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( funkyjet )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 14000000) /* 28 MHz crystal */
+	MDRV_CPU_ADD("main", M68000, 14000000) /* 28 MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(funkyjet_readmem,funkyjet_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD(H6280,32220000/4)	/* Custom chip 45, Audio section crystal is 32.220 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", H6280,32220000/4)	/* Custom chip 45, Audio section crystal is 32.220 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */

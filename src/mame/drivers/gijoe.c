@@ -341,12 +341,11 @@ static const struct K054539interface k054539_interface =
 static MACHINE_DRIVER_START( gijoe )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000)	/* Confirmed */
+	MDRV_CPU_ADD("main", M68000, 16000000)	/* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
 	MDRV_CPU_VBLANK_INT("main", gijoe_interrupt)
 
-	MDRV_CPU_ADD(Z80, 8000000)
-	/* audio CPU */	/* Amuse & confirmed. z80e */
+	MDRV_CPU_ADD("audio", Z80, 8000000)	/* Amuse & confirmed. z80e */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_START(gijoe)

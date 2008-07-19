@@ -802,7 +802,7 @@ static const struct CustomSound_interface warpwarp_custom_interface =
 static MACHINE_DRIVER_START( geebee )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8080,XTAL_18_432MHz/9) /* verified on pcb */
+	MDRV_CPU_ADD("main", 8080,XTAL_18_432MHz/9) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(geebee_map,0)
 	MDRV_CPU_IO_MAP(geebee_port_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_pulse)
@@ -846,7 +846,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bombbee )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8080,18432000/9) 		/* 18.432 MHz / 9 */
+	MDRV_CPU_ADD("main", 8080,18432000/9) 		/* 18.432 MHz / 9 */
 	MDRV_CPU_PROGRAM_MAP(bombbee_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 

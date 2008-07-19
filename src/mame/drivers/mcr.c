@@ -1508,7 +1508,7 @@ static const struct Samplesinterface journey_samples_interface =
 static MACHINE_DRIVER_START( mcr_90009 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MAIN_OSC_MCR_I/8)
+	MDRV_CPU_ADD("main", Z80, MAIN_OSC_MCR_I/8)
 	MDRV_CPU_CONFIG(mcr_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(cpu_90009_map,0)
 	MDRV_CPU_IO_MAP(cpu_90009_portmap,0)
@@ -1596,7 +1596,7 @@ static MACHINE_DRIVER_START( mcr_91490_ipu )
 	MDRV_IMPORT_FROM(mcr_91490_snt)
 	MDRV_MACHINE_START(nflfoot)
 
-	MDRV_CPU_ADD_TAG("ipu", Z80, 7372800/2)
+	MDRV_CPU_ADD("ipu", Z80, 7372800/2)
 	MDRV_CPU_CONFIG(mcr_ipu_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(ipu_91695_map,0)
 	MDRV_CPU_IO_MAP(ipu_91695_portmap,0)

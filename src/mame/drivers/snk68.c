@@ -599,11 +599,11 @@ static const struct upd7759_interface upd7759_interface =
 static MACHINE_DRIVER_START( pow )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_18MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_18MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(pow_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, XTAL_8MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("sound", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 

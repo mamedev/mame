@@ -991,15 +991,15 @@ static const struct jaguar_config dsp_config =
 static MACHINE_DRIVER_START( cojagr3k )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", R3041BE, R3000_CLOCK)
+	MDRV_CPU_ADD("main", R3041BE, R3000_CLOCK)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(r3000_map,0)
 
-	MDRV_CPU_ADD(JAGUARGPU, JAGUAR_CLOCK/2)
+	MDRV_CPU_ADD("gpu", JAGUARGPU, JAGUAR_CLOCK/2)
 	MDRV_CPU_CONFIG(gpu_config)
 	MDRV_CPU_PROGRAM_MAP(gpu_map,0)
 
-	MDRV_CPU_ADD(JAGUARDSP, JAGUAR_CLOCK/2)
+	MDRV_CPU_ADD("audio", JAGUARDSP, JAGUAR_CLOCK/2)
 	MDRV_CPU_CONFIG(dsp_config)
 	MDRV_CPU_PROGRAM_MAP(dsp_map,0)
 

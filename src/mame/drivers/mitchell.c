@@ -1131,7 +1131,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mgakuen )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 6000000)	/* ??? */
+	MDRV_CPU_ADD("main", Z80, 6000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(mgakuen_readmem,mgakuen_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
@@ -1165,7 +1165,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pang )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80, 8000000)	/* (verified on pcb) */
+	MDRV_CPU_ADD("main",Z80, 8000000)	/* (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
@@ -1241,7 +1241,7 @@ static MACHINE_DRIVER_START( spangbl )
 	MDRV_CPU_IO_MAP(spangb_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD_TAG("sound",Z80, 8000000)
+	MDRV_CPU_ADD("sound",Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(spangb_sound_memmap,0 )
 	MDRV_CPU_IO_MAP(spangb_sound_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -1263,14 +1263,13 @@ static MACHINE_DRIVER_START( mstworld )
 	/* it doesn't glitch with the clock speed set to 4x normal, however this is incorrect..
       the interrupt handling (and probably various irq flags / vbl flags handling etc.) is
       more likely wrong.. the game appears to run too fast anyway .. */
-	MDRV_CPU_ADD_TAG("main", Z80, 6000000*4)
+	MDRV_CPU_ADD("main", Z80, 6000000*4)
 
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(mstworld_readport,mstworld_writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,6000000)		 /* 6 MHz? */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,6000000)		 /* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(mstworld_sound_readmem,mstworld_sound_writemem)
 
 	/* video hardware */
@@ -1299,7 +1298,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( marukin )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 8000000)	/* Super Pang says 8MHZ ORIGINAL BOARD */
+	MDRV_CPU_ADD("main", Z80, 8000000)	/* Super Pang says 8MHZ ORIGINAL BOARD */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */

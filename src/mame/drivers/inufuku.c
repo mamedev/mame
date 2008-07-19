@@ -398,12 +398,11 @@ static const struct YM2610interface ym2610_interface =
 static MACHINE_DRIVER_START( inufuku )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 32000000/2)	/* 16.00 MHz */
+	MDRV_CPU_ADD("main", M68000, 32000000/2)	/* 16.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(inufuku_readmem, inufuku_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, 32000000/4)		/* 8.00 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 32000000/4)		/* 8.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(inufuku_readmem_sound, inufuku_writemem_sound)
 	MDRV_CPU_IO_MAP(inufuku_readport_sound, inufuku_writeport_sound)
 								/* IRQs are triggered by the YM2610 */

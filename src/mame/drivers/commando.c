@@ -239,12 +239,11 @@ static INTERRUPT_GEN( commando_interrupt )
 
 static MACHINE_DRIVER_START( commando )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", Z80, PHI_MAIN)	// ???
+	MDRV_CPU_ADD("main", Z80, PHI_MAIN)	// ???
 	MDRV_CPU_PROGRAM_MAP(commando_map, 0)
 	MDRV_CPU_VBLANK_INT("main", commando_interrupt)
 
-	MDRV_CPU_ADD(Z80, PHI_B)	// 3 MHz
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, PHI_B)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
 

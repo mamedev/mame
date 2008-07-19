@@ -236,7 +236,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( carpolo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502,11289000/12)		/* 940.75 kHz */
+	MDRV_CPU_ADD("main", M6502,11289000/12)		/* 940.75 kHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", carpolo_timer_interrupt)	/* this not strictly VBLANK,
                                                        but it's supposed to happen 60

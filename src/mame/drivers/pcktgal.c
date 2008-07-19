@@ -236,12 +236,11 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( pcktgal )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 2000000)
+	MDRV_CPU_ADD("main", M6502, 2000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(M6502, 1500000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */

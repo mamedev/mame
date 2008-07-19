@@ -103,7 +103,7 @@ ADDRESS_MAP_END
  *************************************/
 
 MACHINE_DRIVER_START( qix_audio )
-	MDRV_CPU_ADD_TAG("audio", M6802, SOUND_CLOCK_OSC/2)		/* 0.92 MHz */
+	MDRV_CPU_ADD("audio", M6802, SOUND_CLOCK_OSC/2)		/* 0.92 MHz */
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")

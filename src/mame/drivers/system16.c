@@ -443,10 +443,10 @@ static WRITE16_HANDLER( sys16_coinctrl_w )
 static MACHINE_DRIVER_START( system16 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_VBLANK_INT("main", sys16_interrupt)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 4000000)
+	MDRV_CPU_ADD("sound", Z80, 4000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)

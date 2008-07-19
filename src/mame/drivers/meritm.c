@@ -881,7 +881,7 @@ static NVRAM_HANDLER(meritm_crt260)
 #define MSX2_VISIBLE_YBORDER_PIXELS	14 * 2
 
 static MACHINE_DRIVER_START(meritm_crt250)
-	MDRV_CPU_ADD_TAG("main", Z80, SYSTEM_CLK/6)
+	MDRV_CPU_ADD("main", Z80, SYSTEM_CLK/6)
 	MDRV_CPU_PROGRAM_MAP(meritm_crt250_map,0)
 	MDRV_CPU_IO_MAP(meritm_crt250_io_map,0)
 	MDRV_CPU_CONFIG(meritm_daisy_chain)

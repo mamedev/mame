@@ -440,7 +440,7 @@ static MACHINE_RESET( phoenix )
 static MACHINE_DRIVER_START( phoenix )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8085A, CPU_CLOCK)	/* 2.75 MHz */
+	MDRV_CPU_ADD("main", 8085A, CPU_CLOCK)	/* 2.75 MHz */
 	MDRV_CPU_PROGRAM_MAP(phoenix_memory_map, 0)
 
 	MDRV_MACHINE_RESET(phoenix)
@@ -506,7 +506,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( survival )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8085A, CPU_CLOCK)	/* 5.50 MHz */
+	MDRV_CPU_ADD("main", 8085A, CPU_CLOCK)	/* 5.50 MHz */
 	MDRV_CPU_PROGRAM_MAP(survival_memory_map, 0)
 
 	MDRV_MACHINE_RESET(phoenix)

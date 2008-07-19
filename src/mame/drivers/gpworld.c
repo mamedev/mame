@@ -430,7 +430,7 @@ GFXDECODE_END
 /* DRIVER */
 static MACHINE_DRIVER_START( gpworld )
 /*  main cpu */
-	MDRV_CPU_ADD_TAG("main", Z80, GUESSED_CLOCK)
+	MDRV_CPU_ADD("main", Z80, GUESSED_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(mainmem,0)
 	MDRV_CPU_IO_MAP(mainport,0)
 	MDRV_CPU_VBLANK_INT("main", vblank_callback_gpworld)

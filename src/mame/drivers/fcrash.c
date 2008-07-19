@@ -662,11 +662,11 @@ static const struct MSM5205interface msm5205_interface2 =
 static MACHINE_DRIVER_START( fcrash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(fcrash_map,0)
 	MDRV_CPU_VBLANK_INT("main", cps1_interrupt)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 24000000/6) /* ? */
+	MDRV_CPU_ADD("sound", Z80, 24000000/6) /* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
@@ -711,11 +711,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kodb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(kodb_map,0)
 	MDRV_CPU_VBLANK_INT("main", cps1_interrupt)
 
-//  MDRV_CPU_ADD_TAG("sound", Z80, 3579545)
+//  MDRV_CPU_ADD("sound", Z80, 3579545)
 	/* audio CPU */
 //  MDRV_CPU_PROGRAM_MAP(sub_map,0)
 

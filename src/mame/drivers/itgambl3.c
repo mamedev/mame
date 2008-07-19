@@ -172,7 +172,7 @@ MACHINE_RESET( itgambl3 )
 static MACHINE_DRIVER_START( itgambl3 )
 
     /* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", H83044, MAIN_CLOCK)	/* wrong CPU, but we have not a M16C core ATM */
+	MDRV_CPU_ADD("main", H83044, MAIN_CLOCK)	/* wrong CPU, but we have not a M16C core ATM */
 	MDRV_CPU_PROGRAM_MAP(itgambl3_map,0)
 
     /* video hardware */

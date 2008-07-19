@@ -201,7 +201,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( glass )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,24000000/2)		/* 12 MHz (M680000 P12) */
+	MDRV_CPU_ADD("main", M68000,24000000/2)		/* 12 MHz (M680000 P12) */
 	MDRV_CPU_PROGRAM_MAP(glass_readmem,glass_writemem)
 	MDRV_CPU_VBLANK_INT("main", glass_interrupt)
 

@@ -785,11 +785,11 @@ static VIDEO_EOF( asuka )
 static MACHINE_DRIVER_START( bonzeadv )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 8000000)    /* checked on PCB */
+	MDRV_CPU_ADD("main", M68000, 8000000)    /* checked on PCB */
 	MDRV_CPU_PROGRAM_MAP(bonzeadv_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD(Z80,4000000)    /* sound CPU, also required for test mode */
+	MDRV_CPU_ADD("audio", Z80,4000000)    /* sound CPU, also required for test mode */
 	MDRV_CPU_PROGRAM_MAP(bonzeadv_z80_map,0)
 
 	MDRV_INTERLEAVE(10)
@@ -823,11 +823,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( asuka )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_16MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(asuka_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_16MHz/4)	/* verified on pcb */
+	MDRV_CPU_ADD("audio", Z80, XTAL_16MHz/4)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(z80_map,0)
 
 	MDRV_INTERLEAVE(10)
@@ -864,11 +864,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cadash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_32MHz/2)	/* 68000p12 running at 16Mhz, verified on pcb  */
+	MDRV_CPU_ADD("main", M68000, XTAL_32MHz/2)	/* 68000p12 running at 16Mhz, verified on pcb  */
 	MDRV_CPU_PROGRAM_MAP(cadash_map,0)
 	MDRV_CPU_VBLANK_INT("main", cadash_interrupt)
 
-	MDRV_CPU_ADD(Z80, XTAL_8MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cadash_z80_map,0)
 
 	MDRV_INTERLEAVE(10)
@@ -901,11 +901,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mofflott )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 8000000)	/* 8 MHz ??? */
+	MDRV_CPU_ADD("main", M68000, 8000000)	/* 8 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(asuka_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(z80_map,0)
 
 	MDRV_INTERLEAVE(10)
@@ -942,11 +942,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( galmedes )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 8000000)	/* 8 MHz ??? */
+	MDRV_CPU_ADD("main", M68000, 8000000)	/* 8 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(asuka_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(cadash_z80_map,0)
 
 	MDRV_INTERLEAVE(10)
@@ -979,11 +979,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( eto )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 8000000)	/* 8 MHz ??? */
+	MDRV_CPU_ADD("main", M68000, 8000000)	/* 8 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(eto_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(cadash_z80_map,0)
 
 	MDRV_INTERLEAVE(10)

@@ -575,7 +575,7 @@ static const struct CustomSound_interface redbaron_custom_interface =
 static MACHINE_DRIVER_START( bzone )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, MASTER_CLOCK / 8)
+	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK / 8)
 	MDRV_CPU_PROGRAM_MAP(bzone_map,0)
 	MDRV_CPU_PERIODIC_INT(bzone_interrupt, (double)MASTER_CLOCK / 4096 / 12)
 

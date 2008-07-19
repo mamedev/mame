@@ -727,12 +727,11 @@ static VIDEO_EOF( mechatt )
 static MACHINE_DRIVER_START( bbusters )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(bbuster_readmem,bbuster_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(bbuster,4)
 
-	MDRV_CPU_ADD(Z80,4000000) /* Accurate */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,4000000) /* Accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 
@@ -771,12 +770,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mechatt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(mechatt_readmem,mechatt_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD(Z80,4000000) /* Accurate */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,4000000) /* Accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sounda_readport,sounda_writeport)
 

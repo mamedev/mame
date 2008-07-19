@@ -156,7 +156,7 @@ static const struct YM3438interface ym3438_intf =
 static MACHINE_DRIVER_START( puckpkmn )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",M68000, MASTER_CLOCK/7) 		/*???*/
+	MDRV_CPU_ADD("main",M68000, MASTER_CLOCK/7) 		/*???*/
 	MDRV_CPU_PROGRAM_MAP(puckpkmn_readmem,puckpkmn_writemem)
 	MDRV_CPU_VBLANK_INT("main", genesis_vblank_interrupt)
 

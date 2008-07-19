@@ -6533,7 +6533,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( ddenlovr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",M68000,24000000 / 2)
+	MDRV_CPU_ADD("main",M68000,24000000 / 2)
 	MDRV_CPU_PROGRAM_MAP(ddenlovr_readmem,ddenlovr_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -6652,7 +6652,7 @@ static INTERRUPT_GEN( rtc_irq )
 static MACHINE_DRIVER_START( quizchq )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 8000000)	/* ? */
+	MDRV_CPU_ADD("main", Z80, 8000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(quizchq_readmem,quizchq_writemem)
 	MDRV_CPU_IO_MAP(quizchq_readport,quizchq_writeport)
 	MDRV_CPU_VBLANK_INT("main", quizchq_irq)
@@ -6725,12 +6725,12 @@ static INTERRUPT_GEN( mmpanic_irq )
 static MACHINE_DRIVER_START( mmpanic )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 8000000)
+	MDRV_CPU_ADD("main", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(mmpanic_readmem,mmpanic_writemem)
 	MDRV_CPU_IO_MAP(mmpanic_readport,mmpanic_writeport)
 	MDRV_CPU_VBLANK_INT("main", mmpanic_irq)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 3579545)
+	MDRV_CPU_ADD("sound", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(mmpanic_sound_readmem,mmpanic_sound_writemem)
 	MDRV_CPU_IO_MAP(mmpanic_sound_readport,mmpanic_sound_writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	// NMI by main cpu
@@ -6797,7 +6797,7 @@ static INTERRUPT_GEN( hanakanz_irq )
 static MACHINE_DRIVER_START( hanakanz )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,8000000)	// TMPZ84C015BF-8
+	MDRV_CPU_ADD("main",Z80,8000000)	// TMPZ84C015BF-8
 	MDRV_CPU_PROGRAM_MAP(hanakanz_readmem,hanakanz_writemem)
 	MDRV_CPU_IO_MAP(hanakanz_readport,hanakanz_writeport)
 	MDRV_CPU_VBLANK_INT("main", hanakanz_irq)

@@ -1419,10 +1419,10 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( defender )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, MASTER_CLOCK/3/4)
+	MDRV_CPU_ADD("main", M6809, MASTER_CLOCK/3/4)
 	MDRV_CPU_PROGRAM_MAP(defender_map,0)
 
-	MDRV_CPU_ADD_TAG("sound", M6808, SOUND_CLOCK)
+	MDRV_CPU_ADD("sound", M6808, SOUND_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(defender_sound_map,0)
 
 	MDRV_MACHINE_RESET(defender)
@@ -1540,10 +1540,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( williams2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, MASTER_CLOCK/3/4)
+	MDRV_CPU_ADD("main", M6809, MASTER_CLOCK/3/4)
 	MDRV_CPU_PROGRAM_MAP(williams2_map,0)
 
-	MDRV_CPU_ADD_TAG("sound", M6808, MASTER_CLOCK/3)	/* yes, this is different from the older games */
+	MDRV_CPU_ADD("sound", M6808, MASTER_CLOCK/3)	/* yes, this is different from the older games */
 	MDRV_CPU_PROGRAM_MAP(williams2_sound_map,0)
 
 	MDRV_MACHINE_RESET(williams2)

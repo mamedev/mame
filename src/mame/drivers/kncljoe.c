@@ -263,11 +263,11 @@ static MACHINE_DRIVER_START( kncljoe )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_6MHz)  /* verified on pcb */
+	MDRV_CPU_ADD("main", Z80, XTAL_6MHz)  /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD_TAG("sound", M6803, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("sound", M6803, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 	MDRV_CPU_PERIODIC_INT(sound_nmi, (double)3970) //measured 3.970 kHz

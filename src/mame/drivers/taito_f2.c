@@ -3736,10 +3736,10 @@ static MACHINE_RESET( qcrayon )
 static MACHINE_DRIVER_START( taito_f2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 24000000/2)	/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000, 24000000/2)	/* 12 MHz */
 	MDRV_CPU_VBLANK_INT("main", taitof2_interrupt)
 
-	MDRV_CPU_ADD_TAG("audio", Z80, 24000000/6)	/* 4 MHz */
+	MDRV_CPU_ADD("audio", Z80, 24000000/6)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_START(f2)
@@ -4188,12 +4188,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( camltrya )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,24000000/2)	/* verified on pcb  */
+	MDRV_CPU_ADD("main", M68000,24000000/2)	/* verified on pcb  */
 	MDRV_CPU_PROGRAM_MAP(cameltry_readmem,cameltry_writemem)
 	MDRV_CPU_VBLANK_INT("main", taitof2_interrupt)
 
-	MDRV_CPU_ADD(Z80,24000000/4)	/* verifed on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,24000000/4)	/* verifed on pcb */
 	MDRV_CPU_PROGRAM_MAP(camltrya_sound_readmem,camltrya_sound_writemem)
 
 	/* video hardware */
@@ -4230,12 +4229,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( driveout )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,24000000/2)	/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000,24000000/2)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(driveout_readmem,driveout_writemem)
 	MDRV_CPU_VBLANK_INT("main", taitof2_interrupt)
 
-	MDRV_CPU_ADD(Z80,24000000/6)	/* 4 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,24000000/6)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(driveout_sound_readmem,driveout_sound_writemem)
 
 	/* video hardware */

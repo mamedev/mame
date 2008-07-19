@@ -1066,7 +1066,7 @@ static INTERRUPT_GEN( rabbit_interrupts )
 }
 
 static MACHINE_DRIVER_START( rabbit )
-	MDRV_CPU_ADD_TAG("main",M68EC020,24000000) /* 24 MHz */
+	MDRV_CPU_ADD("main",M68EC020,24000000) /* 24 MHz */
 	MDRV_CPU_PROGRAM_MAP(rabbit_readmem,rabbit_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(rabbit_interrupts,262)
 	/* (rabbit) */

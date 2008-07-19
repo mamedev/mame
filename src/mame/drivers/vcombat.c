@@ -94,14 +94,14 @@ static VIDEO_UPDATE( vcombat )
 }
 
 static MACHINE_DRIVER_START( vcombat )
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_12MHz)
+	MDRV_CPU_ADD("main", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
-	MDRV_CPU_ADD_TAG("sound", M68000, XTAL_12MHz)
+	MDRV_CPU_ADD("sound", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 /*
     Virtual combat has an i860 on each of its two upper boards.
-    MDRV_CPU_ADD_TAG("video", i860, XTAL_20MHz)
+    MDRV_CPU_ADD("video", i860, XTAL_20MHz)
     MDRV_CPU_PROGRAM_MAP(video_map,0)
 */
 

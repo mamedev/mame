@@ -1310,11 +1310,11 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( konamigx )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68EC020, 24000000)
+	MDRV_CPU_ADD("main", M68EC020, 24000000)
 	MDRV_CPU_PROGRAM_MAP(gx_base_memmap, gx_type2_map)
 	MDRV_CPU_VBLANK_INT("main", konamigx_vbinterrupt)
 
-	MDRV_CPU_ADD_TAG("sound", M68000, 8000000)
+	MDRV_CPU_ADD("sound", M68000, 8000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(gxsndmap, 0)
 	MDRV_CPU_PERIODIC_INT(irq2_line_hold, 480)

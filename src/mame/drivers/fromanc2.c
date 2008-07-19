@@ -702,16 +702,15 @@ static const struct YM2610interface ym2610_interface =
 static MACHINE_DRIVER_START( fromanc2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,32000000/2)		/* 16.00 MHz */
+	MDRV_CPU_ADD("main", M68000,32000000/2)		/* 16.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_main,fromanc2_writemem_main)
 	MDRV_CPU_VBLANK_INT("left", fromanc2_interrupt)
 
-	MDRV_CPU_ADD(Z80,32000000/4)
-	/* audio CPU */		/* 8.00 MHz */
+	MDRV_CPU_ADD("audio", Z80,32000000/4)		/* 8.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_sound,fromanc2_writemem_sound)
 	MDRV_CPU_IO_MAP(fromanc2_readport_sound,fromanc2_writeport_sound)
 
-	MDRV_CPU_ADD(Z80,32000000/4)		/* 8.00 MHz */
+	MDRV_CPU_ADD("sub", Z80,32000000/4)		/* 8.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_sub,fromanc2_writemem_sub)
 	MDRV_CPU_IO_MAP(fromanc2_readport_sub,fromanc2_writeport_sub)
 
@@ -755,16 +754,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fromancr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,32000000/2)		/* 16.00 MHz */
+	MDRV_CPU_ADD("main", M68000,32000000/2)		/* 16.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromancr_readmem_main,fromancr_writemem_main)
 	MDRV_CPU_VBLANK_INT("left", fromanc2_interrupt)
 
-	MDRV_CPU_ADD(Z80,32000000/4)
-	/* audio CPU */		/* 8.00 MHz */
+	MDRV_CPU_ADD("audio", Z80,32000000/4)		/* 8.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_sound,fromanc2_writemem_sound)
 	MDRV_CPU_IO_MAP(fromanc2_readport_sound,fromanc2_writeport_sound)
 
-	MDRV_CPU_ADD(Z80,32000000/4)		/* 8.00 MHz */
+	MDRV_CPU_ADD("sub", Z80,32000000/4)		/* 8.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_sub,fromanc2_writemem_sub)
 	MDRV_CPU_IO_MAP(fromanc2_readport_sub,fromanc2_writeport_sub)
 
@@ -807,12 +805,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fromanc4 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,32000000/2)		/* 16.00 MHz */
+	MDRV_CPU_ADD("main", M68000,32000000/2)		/* 16.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc4_readmem_main,fromanc4_writemem_main)
 	MDRV_CPU_VBLANK_INT("left", fromanc2_interrupt)
 
-	MDRV_CPU_ADD(Z80,32000000/4)
-	/* audio CPU */		/* 8.00 MHz */
+	MDRV_CPU_ADD("audio", Z80,32000000/4)		/* 8.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_sound,fromanc2_writemem_sound)
 	MDRV_CPU_IO_MAP(fromanc2_readport_sound,fromanc2_writeport_sound)
 

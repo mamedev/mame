@@ -309,7 +309,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( ace )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8080, 18000000 / 9)	/* 2 MHz ? */
+	MDRV_CPU_ADD("main", 8080, 18000000 / 9)	/* 2 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	/* video hardware */

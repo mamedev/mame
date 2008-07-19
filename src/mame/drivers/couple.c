@@ -434,7 +434,7 @@ static GFXDECODE_START( couple )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( couple )
-	MDRV_CPU_ADD_TAG("main", Z80,18432000/6)		 /* ?? */
+	MDRV_CPU_ADD("main", Z80,18432000/6)		 /* ?? */
 	MDRV_CPU_PROGRAM_MAP(merit_mem,0)
 	MDRV_CPU_IO_MAP(merit_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

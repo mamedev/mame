@@ -90,7 +90,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( tarzan )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,8000000)		 /* ? */
+	MDRV_CPU_ADD("main", Z80,8000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(tarzan_map,0)
 
 	/* video hardware */

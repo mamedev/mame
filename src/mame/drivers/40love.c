@@ -1023,15 +1023,15 @@ static const struct MSM5232interface msm5232_interface =
 static MACHINE_DRIVER_START( 40love )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,8000000/2) /* OK */
+	MDRV_CPU_ADD("main",Z80,8000000/2) /* OK */
 	MDRV_CPU_PROGRAM_MAP(40love_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD_TAG("audio",Z80,8000000/2) /* OK */
+	MDRV_CPU_ADD("audio",Z80,8000000/2) /* OK */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* source/number of IRQs is unknown */
 
-	MDRV_CPU_ADD_TAG("mcu",M68705,18432000/6) /* OK */
+	MDRV_CPU_ADD("mcu",M68705,18432000/6) /* OK */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	MDRV_INTERLEAVE(100)	/* high interleave to ensure proper synchronization of CPUs */
@@ -1079,15 +1079,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( undoukai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,8000000/2)
+	MDRV_CPU_ADD("main",Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(undoukai_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD_TAG("audio",Z80,8000000/2)
+	MDRV_CPU_ADD("audio",Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* source/number of IRQs is unknown */
 
-//  MDRV_CPU_ADD_TAG("mcu",M68705,18432000/6)
+//  MDRV_CPU_ADD("mcu",M68705,18432000/6)
 //  MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	MDRV_MACHINE_RESET(ta7630)	/* init machine */

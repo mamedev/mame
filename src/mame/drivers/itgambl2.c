@@ -193,7 +193,7 @@ static const struct upd7759_interface upd7759_interface =
 static MACHINE_DRIVER_START( itgambl2 )
 
     /* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", H83044, MAIN_CLOCK)	/* wrong CPU, but we have not a H8/3337 core ATM */
+	MDRV_CPU_ADD("main", H83044, MAIN_CLOCK)	/* wrong CPU, but we have not a H8/3337 core ATM */
 	MDRV_CPU_PROGRAM_MAP(itgambl2_map,0)
 
     /* video hardware */

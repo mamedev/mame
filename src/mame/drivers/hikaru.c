@@ -283,7 +283,7 @@ ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( hikaru )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", SH4, CPU_CLOCK)
+	MDRV_CPU_ADD("main", SH4, CPU_CLOCK)
 //  MDRV_CPU_CONFIG(sh4cpu_config)
 	MDRV_CPU_PROGRAM_MAP(hikaru_map,0)
 //  MDRV_CPU_IO_MAP(hikaru_port,0)

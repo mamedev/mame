@@ -687,12 +687,11 @@ static MACHINE_RESET( karnov )
 static MACHINE_DRIVER_START( karnov )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)	/* 10 MHz */
+	MDRV_CPU_ADD("main", M68000, 10000000)	/* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(karnov_readmem,karnov_writemem)
 	MDRV_CPU_VBLANK_INT("main", karnov_interrupt)
 
-	MDRV_CPU_ADD(M6502, 1500000)
-	/* audio CPU */	/* Accurate */
+	MDRV_CPU_ADD("audio", M6502, 1500000)	/* Accurate */
 	MDRV_CPU_PROGRAM_MAP(karnov_s_readmem,karnov_s_writemem)
 
 	MDRV_MACHINE_RESET(karnov)
@@ -729,12 +728,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( wndrplnt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)	/* 10 MHz */
+	MDRV_CPU_ADD("main", M68000, 10000000)	/* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(karnov_readmem,karnov_writemem)
 	MDRV_CPU_VBLANK_INT("main", karnov_interrupt)
 
-	MDRV_CPU_ADD(M6502, 1500000)
-	/* audio CPU */	/* Accurate */
+	MDRV_CPU_ADD("audio", M6502, 1500000)	/* Accurate */
 	MDRV_CPU_PROGRAM_MAP(karnov_s_readmem,karnov_s_writemem)
 
 	MDRV_MACHINE_RESET(karnov)

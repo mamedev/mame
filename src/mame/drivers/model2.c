@@ -1788,14 +1788,14 @@ static const struct mb86233_config tgp_config =
 
 /* original Model 2 */
 static MACHINE_DRIVER_START( model2o )
-	MDRV_CPU_ADD_TAG("main", I960, 25000000)
+	MDRV_CPU_ADD("main", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2_base_mem, model2o_mem)
  	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
 
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD("audio", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(model1_snd, 0)
 
-	MDRV_CPU_ADD(MB86233, 16000000)
+	MDRV_CPU_ADD("tgp", MB86233, 16000000)
 	MDRV_CPU_CONFIG(tgp_config)
 	MDRV_CPU_PROGRAM_MAP(copro_tgp_map, 0)
 
@@ -1835,14 +1835,14 @@ MACHINE_DRIVER_END
 
 /* 2A-CRX */
 static MACHINE_DRIVER_START( model2a )
-	MDRV_CPU_ADD_TAG("main", I960, 25000000)
+	MDRV_CPU_ADD("main", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2_base_mem, model2a_crx_mem)
  	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
 
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD("audio", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model2_snd, 0)
 
-	MDRV_CPU_ADD(MB86233, 16000000)
+	MDRV_CPU_ADD("tgp", MB86233, 16000000)
 	MDRV_CPU_CONFIG(tgp_config)
 	MDRV_CPU_PROGRAM_MAP(copro_tgp_map, 0)
 
@@ -1879,18 +1879,18 @@ static const sharc_config sharc_cfg =
 
 /* 2B-CRX */
 static MACHINE_DRIVER_START( model2b )
-	MDRV_CPU_ADD_TAG("main", I960, 25000000)
+	MDRV_CPU_ADD("main", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2_base_mem, model2b_crx_mem)
  	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
 
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD("audio", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model2_snd, 0)
 
-	MDRV_CPU_ADD(ADSP21062, 40000000)
+	MDRV_CPU_ADD("dsp", ADSP21062, 40000000)
 	MDRV_CPU_CONFIG(sharc_cfg)
 	MDRV_CPU_DATA_MAP(copro_sharc_map, 0)
 
-	//MDRV_CPU_ADD(ADSP21062, 40000000)
+	//MDRV_CPU_ADD("dsp2", ADSP21062, 40000000)
 	//MDRV_CPU_CONFIG(sharc_cfg)
 	//MDRV_CPU_DATA_MAP(geo_sharc_map, 0)
 
@@ -1923,11 +1923,11 @@ MACHINE_DRIVER_END
 
 /* 2C-CRX */
 static MACHINE_DRIVER_START( model2c )
-	MDRV_CPU_ADD_TAG("main", I960, 25000000)
+	MDRV_CPU_ADD("main", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2_base_mem, model2c_crx_mem)
  	MDRV_CPU_VBLANK_INT_HACK(model2c_interrupt,3)
 
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD("audio", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model2_snd, 0)
 
 	MDRV_MACHINE_RESET(model2c)

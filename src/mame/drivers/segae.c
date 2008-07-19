@@ -2040,7 +2040,7 @@ static VIDEO_UPDATE(systeme)
 
 
 static MACHINE_DRIVER_START( systeme )
-	MDRV_CPU_ADD_TAG("z80", Z80, 10738600/2) /* correct for hangonjr, and astroflash/transformer at least  */
+	MDRV_CPU_ADD("z80", Z80, 10738600/2) /* correct for hangonjr, and astroflash/transformer at least  */
 	MDRV_CPU_PROGRAM_MAP(systeme_readmem,systeme_writemem)
 	MDRV_CPU_IO_MAP(sms_readport,sms_writeport)
 

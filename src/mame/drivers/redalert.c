@@ -272,7 +272,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( redalert )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD("main", M6502, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(redalert_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", redalert_vblank_interrupt)
 
@@ -287,7 +287,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( demoneye )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD("main", M6502, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(demoneye_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", redalert_vblank_interrupt)
 

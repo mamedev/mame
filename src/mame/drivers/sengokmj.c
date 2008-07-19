@@ -285,7 +285,7 @@ static INTERRUPT_GEN( sengokmj_interrupt )
 static MACHINE_DRIVER_START( sengokmj )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", V30, 16000000/2) /* V30-8 */
+	MDRV_CPU_ADD("main", V30, 16000000/2) /* V30-8 */
 	MDRV_CPU_PROGRAM_MAP(sengokmj_map,0)
 	MDRV_CPU_IO_MAP(sengokmj_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", sengokmj_interrupt)

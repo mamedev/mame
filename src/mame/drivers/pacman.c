@@ -3066,7 +3066,7 @@ static const struct namco_interface namco_interface =
 static MACHINE_DRIVER_START( pacman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/6)
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)
 	MDRV_CPU_PROGRAM_MAP(pacman_map,0)
 	MDRV_CPU_IO_MAP(0,writeport)
 	MDRV_CPU_VBLANK_INT_HACK(pacman_interrupt,2)
@@ -3232,7 +3232,7 @@ static MACHINE_DRIVER_START( s2650games )
 	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_REMOVE("main")
-	MDRV_CPU_ADD_TAG("main", S2650, MASTER_CLOCK/6/2)	/* 2H */
+	MDRV_CPU_ADD("main", S2650, MASTER_CLOCK/6/2)	/* 2H */
 	MDRV_CPU_PROGRAM_MAP(s2650games_map,0)
 	MDRV_CPU_VBLANK_INT("main", s2650_interrupt)
 

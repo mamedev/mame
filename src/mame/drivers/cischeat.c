@@ -1747,19 +1747,19 @@ static INTERRUPT_GEN( cischeat_interrupt )
 static MACHINE_DRIVER_START( bigrun )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("cpu1", M68000, 10000000)
+	MDRV_CPU_ADD("cpu1", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(bigrun_readmem,bigrun_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(cischeat_interrupt,CISCHEAT_INTERRUPT_NUM)
 
-	MDRV_CPU_ADD_TAG("cpu2", M68000, 10000000)
+	MDRV_CPU_ADD("cpu2", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(bigrun_readmem2,bigrun_writemem2)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD_TAG("cpu3", M68000, 10000000)
+	MDRV_CPU_ADD("cpu3", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(bigrun_readmem3,bigrun_writemem3)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD_TAG("sound", M68000, 6000000)
+	MDRV_CPU_ADD("sound", M68000, 6000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(bigrun_sound_readmem,bigrun_sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq4_line_hold,CISCHEAT_SOUND_INTERRUPT_NUM)
@@ -1863,7 +1863,7 @@ static MACHINE_DRIVER_START( f1gpstr2 )
 	MDRV_CPU_MODIFY("sound")
 	MDRV_CPU_PROGRAM_MAP(f1gpstr2_sound_readmem,f1gpstr2_sound_writemem)
 
-	MDRV_CPU_ADD_TAG("cpu5", M68000, 10000000)
+	MDRV_CPU_ADD("cpu5", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(f1gpstr2_io_readmem,f1gpstr2_io_writemem)
 MACHINE_DRIVER_END
 
@@ -1893,7 +1893,7 @@ static INTERRUPT_GEN( interrupt_scudhamm )
 static MACHINE_DRIVER_START( scudhamm )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",M68000, 12000000)
+	MDRV_CPU_ADD("main",M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_scudhamm,writemem_scudhamm)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_scudhamm,INTERRUPT_NUM_SCUDHAMM)
 

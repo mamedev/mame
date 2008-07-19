@@ -34,7 +34,7 @@ static VIDEO_UPDATE( 39in1 )
 }
 
 static MACHINE_DRIVER_START( 39in1 )
-	MDRV_CPU_ADD_TAG("main", ARM7, 200000000)	// actually Xscale PXA255, but ARM7 is a compatible subset
+	MDRV_CPU_ADD("main", ARM7, 200000000)	// actually Xscale PXA255, but ARM7 is a compatible subset
 	MDRV_CPU_PROGRAM_MAP(39in1_map,0)
 
 	MDRV_PALETTE_LENGTH(32768)

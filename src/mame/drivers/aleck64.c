@@ -427,12 +427,12 @@ static MACHINE_RESET( aleck64 )
 
 static MACHINE_DRIVER_START( aleck64 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", R4600BE, 93750000)
+	MDRV_CPU_ADD("main", R4600BE, 93750000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(n64_map, 0)
 	MDRV_CPU_VBLANK_INT("main", n64_vblank)
 
-	MDRV_CPU_ADD_TAG("rsp", RSP, 62500000)
+	MDRV_CPU_ADD("rsp", RSP, 62500000)
 	MDRV_CPU_CONFIG(n64_rsp_config)
 	MDRV_CPU_PROGRAM_MAP(rsp_map, 0)
 

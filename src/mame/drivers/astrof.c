@@ -839,7 +839,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD("main", M6502, MAIN_CPU_CLOCK)
 	MDRV_TIMER_ADD_SCANLINE("VBLANK", irq_callback, "main", VBSTART, 0)
 
 	/* video hardware */

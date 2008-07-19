@@ -159,7 +159,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( 4enraya )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,8000000/2)
+	MDRV_CPU_ADD("main",Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)

@@ -252,13 +252,12 @@ static MACHINE_START( blktiger )
 static MACHINE_DRIVER_START( blktiger )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_24MHz/4)	/* verified on pcb */
+	MDRV_CPU_ADD("main", Z80, XTAL_24MHz/4)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mem_map, 0)
 	MDRV_CPU_IO_MAP(port_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_mem_map, 0)
 
 	MDRV_MACHINE_START(blktiger)

@@ -1533,11 +1533,11 @@ static const struct ES5506interface es5506_interface =
 static MACHINE_DRIVER_START( timekill )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, CPU_CLOCK)
+	MDRV_CPU_ADD("main", M68000, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(timekill_map,0)
 	MDRV_CPU_VBLANK_INT("main", generate_int1)
 
-	MDRV_CPU_ADD_TAG("sound", M6809, SOUND_CLOCK/8)
+	MDRV_CPU_ADD("sound", M6809, SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_RESET(itech32)
@@ -1585,13 +1585,13 @@ static MACHINE_DRIVER_START( drivedge )
 	MDRV_CPU_PROGRAM_MAP(drivedge_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(NULL,0)
 
-	MDRV_CPU_ADD(TMS32031, TMS_CLOCK)
+	MDRV_CPU_ADD("dsp1", TMS32031, TMS_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(drivedge_tms1_map,0)
 
-	MDRV_CPU_ADD(TMS32031, TMS_CLOCK)
+	MDRV_CPU_ADD("dsp2", TMS32031, TMS_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(drivedge_tms2_map,0)
 
-//  MDRV_CPU_ADD(M6803, 8000000/4) -- network CPU
+//  MDRV_CPU_ADD("comm", M6803, 8000000/4) -- network CPU
 
 	MDRV_MACHINE_RESET(drivedge)
 	MDRV_INTERLEAVE(100)

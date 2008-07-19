@@ -282,12 +282,11 @@ static const struct CustomSound_interface custom_interface =
 static MACHINE_DRIVER_START( firebatl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 3000000)	/* ? */
+	MDRV_CPU_ADD("main", Z80, 3000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(clshroad_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ, no NMI */
 
-	MDRV_CPU_ADD(Z80, 3000000)	/* ? */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 3000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(clshroad_sound_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ, no NMI */
 
@@ -319,12 +318,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( clshroad )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 18432000/4)	/* ? real speed unknown. 3MHz is too low and causes problems */
+	MDRV_CPU_ADD("main", Z80, 18432000/4)	/* ? real speed unknown. 3MHz is too low and causes problems */
 	MDRV_CPU_PROGRAM_MAP(clshroad_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ, no NMI */
 
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* ? */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 18432000/6)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(clshroad_sound_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ, no NMI */
 

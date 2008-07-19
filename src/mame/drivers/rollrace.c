@@ -237,12 +237,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( rollrace )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,XTAL_24MHz/8) /* verified on pcb */
+	MDRV_CPU_ADD("main", Z80,XTAL_24MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(Z80,XTAL_24MHz/16) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,XTAL_24MHz/16) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_snd,writemem_snd)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)
 

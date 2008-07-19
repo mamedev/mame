@@ -343,7 +343,7 @@ static GFXDECODE_START( magic10 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( magic10 )
-	MDRV_CPU_ADD_TAG("cpu", M68000, 10000000) // ?
+	MDRV_CPU_ADD("cpu", M68000, 10000000) // ?
 	MDRV_CPU_PROGRAM_MAP(magic10_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 

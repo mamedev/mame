@@ -271,12 +271,11 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( pass )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 14318180/2 )
+	MDRV_CPU_ADD("main", M68000, 14318180/2 )
 	MDRV_CPU_PROGRAM_MAP(pass_readmem,pass_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold) /* all the same */
 
-	MDRV_CPU_ADD(Z80, 14318180/4 )
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 14318180/4 )
 	MDRV_CPU_PROGRAM_MAP(pass_sound_readmem,pass_sound_writemem)
 	MDRV_CPU_IO_MAP(pass_sound_readport,pass_sound_writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

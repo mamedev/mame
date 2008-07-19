@@ -1077,7 +1077,7 @@ static MACHINE_RESET( pballoon )
 
 static MACHINE_DRIVER_START( sasuke )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", M6502, 11289000/16) // 700 kHz
+	MDRV_CPU_ADD("main", M6502, 11289000/16) // 700 kHz
 	MDRV_CPU_PROGRAM_MAP(sasuke_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(satansat_interrupt, 2)
 
@@ -1151,8 +1151,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vanguard )
 	// basic machine hardware
-	//MDRV_CPU_ADD_TAG("main", M6502, 11289000/8)   // 1.4 MHz
-	MDRV_CPU_ADD_TAG("main", M6502, 930000)		// adjusted
+	//MDRV_CPU_ADD("main", M6502, 11289000/8)   // 1.4 MHz
+	MDRV_CPU_ADD("main", M6502, 930000)		// adjusted
 	MDRV_CPU_PROGRAM_MAP(vanguard_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(rockola_interrupt, 2)
 

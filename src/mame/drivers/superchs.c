@@ -414,14 +414,13 @@ static NVRAM_HANDLER( superchs )
 static MACHINE_DRIVER_START( superchs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68EC020, 16000000)	/* 16 MHz */
+	MDRV_CPU_ADD("main", M68EC020, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(superchs_readmem,superchs_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)/* VBL */
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 
-
-	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
+	MDRV_CPU_ADD("sub", M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(superchs_cpub_readmem,superchs_cpub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)/* VBL */
 

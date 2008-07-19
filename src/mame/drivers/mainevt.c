@@ -707,12 +707,11 @@ static const struct upd7759_interface upd7759_interface =
 static MACHINE_DRIVER_START( mainevt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", HD6309, 3000000*4)	/* ?? */
+	MDRV_CPU_ADD("main", HD6309, 3000000*4)	/* ?? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", mainevt_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3579545)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,8)	/* ??? */
 
@@ -748,12 +747,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( devstors )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", HD6309, 3000000*4)	/* ?? */
+	MDRV_CPU_ADD("main", HD6309, 3000000*4)	/* ?? */
 	MDRV_CPU_PROGRAM_MAP(dv_readmem,dv_writemem)
 	MDRV_CPU_VBLANK_INT("main", dv_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3579545)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(dv_sound_readmem,dv_sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 

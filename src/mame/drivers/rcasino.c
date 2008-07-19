@@ -295,7 +295,7 @@ static const struct AY8910interface ay8910_interface =
 
 static MACHINE_DRIVER_START( rcasino )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", Z80, 8000000/2)	// ???
+	MDRV_CPU_ADD("main", Z80, 8000000/2)	// ???
 	MDRV_CPU_PROGRAM_MAP(rcasino_map, 0)
 	MDRV_CPU_IO_MAP(rcasino_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

@@ -231,11 +231,11 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( formatz )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, XTAL_10MHz/8) /* verified on pcb */
+	MDRV_CPU_ADD("main", M6809, XTAL_10MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", aeroboto_interrupt)
 
-	MDRV_CPU_ADD_TAG("audio", M6809, XTAL_10MHz/16) /* verified on pcb */
+	MDRV_CPU_ADD("audio", M6809, XTAL_10MHz/16) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

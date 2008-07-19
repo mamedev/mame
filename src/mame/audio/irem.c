@@ -363,7 +363,7 @@ static MACHINE_DRIVER_START( irem_audio_base )
 	MDRV_SOUND_START(irem_audio)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_IO_MAP(irem_sound_portmap,0)
 
 	/* sound hardware */
@@ -391,7 +391,7 @@ MACHINE_DRIVER_START( m52_sound_c_audio )
 	MDRV_SOUND_START(irem_audio)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_IO_MAP(irem_sound_portmap,0)
 	MDRV_CPU_PROGRAM_MAP(m52_small_sound_map,0)
 

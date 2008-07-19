@@ -1237,11 +1237,11 @@ static const struct YM3812interface ym3812_interface =
 static MACHINE_DRIVER_START( rallybik )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(rallybik_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
-	MDRV_CPU_ADD(Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
+	MDRV_CPU_ADD("audio", Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
 	MDRV_CPU_IO_MAP(rallybik_sound_io_map, 0)
 
@@ -1277,11 +1277,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( truxton )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(truxton_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
-	MDRV_CPU_ADD(Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
+	MDRV_CPU_ADD("audio", Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
 	MDRV_CPU_IO_MAP(truxton_sound_io_map, 0)
 
@@ -1317,11 +1317,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hellfire )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(hellfire_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
-	MDRV_CPU_ADD(Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
+	MDRV_CPU_ADD("audio", Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
 	MDRV_CPU_IO_MAP(hellfire_sound_io_map, 0)
 
@@ -1357,11 +1357,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( zerowing )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(zerowing_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
-	MDRV_CPU_ADD(Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
+	MDRV_CPU_ADD("audio", Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
 	MDRV_CPU_IO_MAP(zerowing_sound_io_map, 0)
 
@@ -1397,15 +1397,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( demonwld )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(demonwld_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
-	MDRV_CPU_ADD(Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
+	MDRV_CPU_ADD("audio", Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
 	MDRV_CPU_IO_MAP(demonwld_sound_io_map, 0)
 
-	MDRV_CPU_ADD(TMS32010,28000000/2)	/* 14MHz CLKin */
+	MDRV_CPU_ADD("dsp", TMS32010,28000000/2)	/* 14MHz CLKin */
 	MDRV_CPU_PROGRAM_MAP(DSP_program_map,0)
 	MDRV_CPU_IO_MAP(DSP_io_map,0)
 
@@ -1441,7 +1441,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( samesame )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(samesame_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
@@ -1475,11 +1475,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( outzone )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(outzone_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
-	MDRV_CPU_ADD(Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
+	MDRV_CPU_ADD("audio", Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
 	MDRV_CPU_IO_MAP(outzone_sound_io_map, 0)
 
@@ -1515,7 +1515,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vimana )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_10MHz) /* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_10MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(vimana_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 

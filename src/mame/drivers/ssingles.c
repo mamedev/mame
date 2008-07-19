@@ -255,7 +255,7 @@ static INPUT_PORTS_START( ssingles )
 INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( ssingles )
-	MDRV_CPU_ADD_TAG("main", Z80,4000000)		 /* ? MHz */
+	MDRV_CPU_ADD("main", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(ssingles_map,0)
 	MDRV_CPU_IO_MAP(ssingles_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)

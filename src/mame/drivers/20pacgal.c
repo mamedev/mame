@@ -295,7 +295,7 @@ static MACHINE_DRIVER_START( 20pacgal )
 	MDRV_DRIVER_DATA(_20pacgal_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z180, MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD("main", Z180, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(20pacgal_map,0)
 	MDRV_CPU_IO_MAP(20pacgal_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)

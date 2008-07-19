@@ -682,7 +682,7 @@ static const struct NiLe_interface nile_interface =
 };
 
 static MACHINE_DRIVER_START( srmp6 )
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(srmp6,0)
 	MDRV_CPU_VBLANK_INT_HACK(srmp6_interrupt,2)
 

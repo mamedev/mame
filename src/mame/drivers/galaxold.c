@@ -2304,7 +2304,7 @@ static const struct AY8910interface bongo_ay8910_interface =
 static MACHINE_DRIVER_START( galaxold_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, PIXEL_CLOCK/2)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, PIXEL_CLOCK/2)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(galaxold_readmem,galaxold_writemem)
 
 	MDRV_MACHINE_RESET(galaxold)
@@ -2468,7 +2468,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( drivfrcg )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", S2650, 18432000/6)
+	MDRV_CPU_ADD("main", S2650, 18432000/6)
 	MDRV_CPU_PROGRAM_MAP(drivfrcg,0)
 	MDRV_CPU_IO_MAP(drivfrcg_io,0)
 	MDRV_CPU_VBLANK_INT("main", hunchbks_vh_interrupt)
@@ -2514,7 +2514,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hunchbkg )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", S2650, PIXEL_CLOCK/2)
+	MDRV_CPU_ADD("main", S2650, PIXEL_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(hunchbkg,0)
 	MDRV_CPU_IO_MAP(hunchbkg_io,0)
 	MDRV_CPU_VBLANK_INT("main", hunchbks_vh_interrupt)
@@ -2545,8 +2545,7 @@ static MACHINE_DRIVER_START( harem )
 	MDRV_CPU_PROGRAM_MAP(harem_cpu1,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(Z80, 1620000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 1620000)
 	MDRV_CPU_PROGRAM_MAP(harem_cpu2,0)
 	MDRV_CPU_IO_MAP(harem_cpu2_io,0)
 
@@ -2577,7 +2576,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( racknrol )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", S2650, PIXEL_CLOCK/2)
+	MDRV_CPU_ADD("main", S2650, PIXEL_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(racknrol,0)
 	MDRV_CPU_IO_MAP(racknrol_io,0)
 	MDRV_CPU_VBLANK_INT("main", hunchbks_vh_interrupt)
@@ -2635,7 +2634,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hexpoola )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", S2650, PIXEL_CLOCK/2)
+	MDRV_CPU_ADD("main", S2650, PIXEL_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(racknrol,0)
 	MDRV_CPU_IO_MAP(hexpoola_io,0)
 	MDRV_CPU_VBLANK_INT("main", hunchbks_vh_interrupt)

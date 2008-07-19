@@ -321,12 +321,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( matmania )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 1500000)	/* 1.5 MHz ???? */
+	MDRV_CPU_ADD("main", M6502, 1500000)	/* 1.5 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(matmania_readmem,matmania_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(M6502, 1200000)
-	/* audio CPU */	/* 1.2 MHz ???? */
+	MDRV_CPU_ADD("audio", M6502, 1200000)	/* 1.2 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,15)	/* ???? */
 								/* IRQs are caused by the main CPU */
@@ -377,15 +376,14 @@ static const struct YM3526interface ym3526_interface =
 static MACHINE_DRIVER_START( maniach )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 1500000)	/* 1.5 MHz ???? */
+	MDRV_CPU_ADD("main", M6502, 1500000)	/* 1.5 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(maniach_readmem,maniach_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(M6809, 1500000)
-	/* audio CPU */	/* 1.5 MHz ???? */
+	MDRV_CPU_ADD("audio", M6809, 1500000)	/* 1.5 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(maniach_sound_readmem,maniach_sound_writemem)
 								/* IRQs are caused by the main CPU */
-	MDRV_CPU_ADD(M68705, 1500000*2)	/* (don't know really how fast, but it doesn't need to even be this fast) */
+	MDRV_CPU_ADD("mcu", M68705, 1500000*2)	/* (don't know really how fast, but it doesn't need to even be this fast) */
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
 	MDRV_INTERLEAVE(100)	/* 100 CPU slice per frame - high interleaving to sync main and mcu */

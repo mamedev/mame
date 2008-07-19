@@ -266,7 +266,7 @@ static const TMS9928a_interface tms9928a_interface =
  *************************************/
 
 static MACHINE_DRIVER_START( sg1000a )
-	MDRV_CPU_ADD_TAG("main", Z80, 3579545)       /* 3.579545 Mhz */
+	MDRV_CPU_ADD("main", Z80, 3579545)       /* 3.579545 Mhz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", sg100a_interrupt)

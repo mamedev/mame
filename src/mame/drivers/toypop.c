@@ -568,16 +568,15 @@ static const struct namco_interface namco_interface =
 static MACHINE_DRIVER_START( liblrabl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, 1536000)	/* 1.536 MHz (measured on Libble Rabble board) */
+	MDRV_CPU_ADD("main", M6809, 1536000)	/* 1.536 MHz (measured on Libble Rabble board) */
 	MDRV_CPU_PROGRAM_MAP(readmem_mainCPU_liblrabl,writemem_mainCPU_liblrabl)
 	MDRV_CPU_VBLANK_INT("main", toypop_main_interrupt)
 
-	MDRV_CPU_ADD(M6809, 1536000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6809, 1536000)
 	MDRV_CPU_PROGRAM_MAP(readmem_soundCPU,writemem_soundCPU)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD(M68000, 6144000)	/* 6.144 MHz (measured on Libble Rabble board) */
+	MDRV_CPU_ADD("sub", M68000, 6144000)	/* 6.144 MHz (measured on Libble Rabble board) */
 	MDRV_CPU_PROGRAM_MAP(readmem_68k,writemem_68k)
 	MDRV_CPU_VBLANK_INT("main", toypop_m68000_interrupt)
 

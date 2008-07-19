@@ -494,7 +494,7 @@ static INTERRUPT_GEN( bmc_interrupt )
 }
 
 static MACHINE_DRIVER_START( bmcbowl )
-	MDRV_CPU_ADD_TAG("main", M68000, 21477270/2 )
+	MDRV_CPU_ADD("main", M68000, 21477270/2 )
 	MDRV_CPU_PROGRAM_MAP(bmcbowl_mem,0)
 	MDRV_CPU_VBLANK_INT_HACK(bmc_interrupt,2)
 

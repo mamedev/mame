@@ -774,7 +774,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, EXIDY_CPU_CLOCK)
+	MDRV_CPU_ADD("main", M6502, EXIDY_CPU_CLOCK)
 	MDRV_CPU_VBLANK_INT("main", exidy_vblank_interrupt)
 
 	/* video hardware */

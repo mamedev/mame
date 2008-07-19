@@ -578,12 +578,12 @@ static INTERRUPT_GEN( vendetta_irq )
 static MACHINE_DRIVER_START( vendetta )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", KONAMI, 6000000)	/* this is strange, seems an overclock but */
-//  MDRV_CPU_ADD_TAG("main", KONAMI, 3000000)   /* is needed to have correct music speed */
+	MDRV_CPU_ADD("main", KONAMI, 6000000)	/* this is strange, seems an overclock but */
+//  MDRV_CPU_ADD("main", KONAMI, 3000000)   /* is needed to have correct music speed */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", vendetta_irq)
 
-	MDRV_CPU_ADD_TAG("audio", Z80, 3579545)	/* verified with PCB */
+	MDRV_CPU_ADD("audio", Z80, 3579545)	/* verified with PCB */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
                             /* interrupts are triggered by the main CPU */
 

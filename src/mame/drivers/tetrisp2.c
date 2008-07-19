@@ -1250,7 +1250,7 @@ static DRIVER_INIT( rockn3 )
 static MACHINE_DRIVER_START( tetrisp2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(tetrisp2_readmem,tetrisp2_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -1283,7 +1283,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( nndmseal )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_12MHz)
+	MDRV_CPU_ADD("main", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(nndmseal_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -1315,7 +1315,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rockn )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(rockn1_readmem,rockn1_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -1348,7 +1348,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rockn2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(rockn2_readmem,rockn2_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -1381,11 +1381,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rocknms )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(rocknms_main_readmem,rocknms_main_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq2_line_hold)
 
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD("sub", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(rocknms_sub_readmem,rocknms_sub_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq2_line_hold)
 

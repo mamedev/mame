@@ -435,7 +435,7 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( toki ) /* KOYO 20.000MHz near the cpu */
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,XTAL_20MHz /2) 	/* verified on pcb */
+	MDRV_CPU_ADD("main", M68000,XTAL_20MHz /2) 	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(toki_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)/* VBL */
 
@@ -467,12 +467,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tokib )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 10MHz causes bad slowdowns with monkey machine rd1 */
+	MDRV_CPU_ADD("main", M68000, 12000000)	/* 10MHz causes bad slowdowns with monkey machine rd1 */
 	MDRV_CPU_PROGRAM_MAP(tokib_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL (could be level1, same vector) */
 
-	MDRV_CPU_ADD(Z80, 4000000)	/* verified with PCB */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* verified with PCB */
 	MDRV_CPU_PROGRAM_MAP(tokib_audio_map,0)
 
 	/* video hardware */

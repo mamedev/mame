@@ -370,7 +370,7 @@ static const struct YMZ280Binterface ymz280b_intf =
 };
 
 static MACHINE_DRIVER_START( galpani3 )
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000)	 // ? (from which clock?)
+	MDRV_CPU_ADD("main", M68000, 16000000)	 // ? (from which clock?)
 	MDRV_CPU_PROGRAM_MAP(galpani3_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(galpani3_vblank, 3)
 

@@ -2149,13 +2149,12 @@ static const struct K007232_interface k007232_interface =
 static MACHINE_DRIVER_START( nemesis )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,18432000/2)         /* 9.216 MHz? */
+	MDRV_CPU_ADD("main", M68000,18432000/2)         /* 9.216 MHz? */
 //          14318180/2, /* From schematics, should be accurate */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", nemesis_interrupt)
 
-	MDRV_CPU_ADD(Z80,14318180/4)
-	/* audio CPU */ /* From schematics, should be accurate */
+	MDRV_CPU_ADD("audio", Z80,14318180/4) /* From schematics, should be accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)	/* fixed */
 
 	MDRV_MACHINE_RESET(nemesis)
@@ -2198,12 +2197,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( konamigt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,18432000/2)         /* 9.216 MHz? */
+	MDRV_CPU_ADD("main", M68000,18432000/2)         /* 9.216 MHz? */
 	MDRV_CPU_PROGRAM_MAP(konamigt_readmem,konamigt_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(konamigt_interrupt,2)
 
-	MDRV_CPU_ADD(Z80,14318180/4)
-	/* audio CPU */        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80,14318180/4)        /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_RESET(nemesis)
@@ -2242,12 +2240,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( salamand )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,18432000/2)       /* 9.216MHz */
+	MDRV_CPU_ADD("main", M68000,18432000/2)       /* 9.216MHz */
 	MDRV_CPU_PROGRAM_MAP(salamand_readmem,salamand_writemem)
 	MDRV_CPU_VBLANK_INT("main", salamand_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3579545)         /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sal_sound_readmem,sal_sound_writemem)
 
 	MDRV_MACHINE_RESET(nemesis)
@@ -2293,12 +2290,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( blkpnthr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,18432000/2)         /* 9.216 MHz? */
+	MDRV_CPU_ADD("main", M68000,18432000/2)         /* 9.216 MHz? */
 	MDRV_CPU_PROGRAM_MAP(blkpnthr_readmem,blkpnthr_writemem)
 	MDRV_CPU_VBLANK_INT("main", blkpnthr_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3579545)        /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sal_sound_readmem,sal_sound_writemem)
 
 	MDRV_MACHINE_RESET(nemesis)
@@ -2339,12 +2335,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( citybomb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,18432000/2)         /* 9.216 MHz? */
+	MDRV_CPU_ADD("main", M68000,18432000/2)         /* 9.216 MHz? */
 	MDRV_CPU_PROGRAM_MAP(citybomb_readmem,citybomb_writemem)
 	MDRV_CPU_VBLANK_INT("main", salamand_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3579545)        /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(city_sound_readmem,city_sound_writemem)
 
 	MDRV_MACHINE_RESET(nemesis)
@@ -2389,12 +2384,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( nyanpani )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,18432000/2)         /* 9.216 MHz? */
+	MDRV_CPU_ADD("main", M68000,18432000/2)         /* 9.216 MHz? */
 	MDRV_CPU_PROGRAM_MAP(nyanpani_readmem,nyanpani_writemem)
 	MDRV_CPU_VBLANK_INT("main", salamand_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3579545)        /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(city_sound_readmem,city_sound_writemem)
 
 	MDRV_MACHINE_RESET(nemesis)
@@ -2439,11 +2433,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gx400 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,18432000/2)     /* 9.216MHz */
+	MDRV_CPU_ADD("main", M68000,18432000/2)     /* 9.216MHz */
 	MDRV_CPU_PROGRAM_MAP(gx400_readmem,gx400_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(gx400_interrupt,3)
 
-	MDRV_CPU_ADD(Z80,14318180/4)        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80,14318180/4)        /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(gx400_sound_readmem,gx400_sound_writemem)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)	/* interrupts are triggered by the main CPU */
 
@@ -2487,12 +2481,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rf2_gx400 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,18432000/2)     /* 9.216MHz */
+	MDRV_CPU_ADD("main", M68000,18432000/2)     /* 9.216MHz */
 	MDRV_CPU_PROGRAM_MAP(rf2_gx400_readmem,rf2_gx400_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(gx400_interrupt,3)
 
-	MDRV_CPU_ADD(Z80,14318180/4)
-	/* audio CPU */        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80,14318180/4)        /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(gx400_sound_readmem,gx400_sound_writemem)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)	/* interrupts are triggered by the main CPU */
 
@@ -2535,12 +2528,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hcrash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,18432000/3)         /* 6.144MHz */
+	MDRV_CPU_ADD("main", M68000,18432000/3)         /* 6.144MHz */
 	MDRV_CPU_PROGRAM_MAP(hcrash_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(konamigt_interrupt,2)
 
-	MDRV_CPU_ADD(Z80,14318180/4)
-	/* audio CPU */        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80,14318180/4)       /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sal_sound_readmem,sal_sound_writemem)
 
 	MDRV_MACHINE_RESET(nemesis)

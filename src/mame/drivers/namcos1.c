@@ -973,19 +973,19 @@ static const struct namco_interface namco_interface =
 static MACHINE_DRIVER_START( ns1 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809,49152000/32)
+	MDRV_CPU_ADD("main", M6809,49152000/32)
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD(M6809,49152000/32)
+	MDRV_CPU_ADD("sub", M6809,49152000/32)
 	MDRV_CPU_PROGRAM_MAP(sub_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD(M6809,49152000/32)
+	MDRV_CPU_ADD("audio", M6809,49152000/32)
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD_TAG("MCU",HD63701,49152000/8)
+	MDRV_CPU_ADD("MCU",HD63701,49152000/8)
 	MDRV_CPU_PROGRAM_MAP(mcu_map, 0)
 	MDRV_CPU_IO_MAP(mcu_port_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)

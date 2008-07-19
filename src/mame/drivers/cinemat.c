@@ -980,7 +980,7 @@ static const struct CCPUConfig config_jmi =
 static MACHINE_DRIVER_START( cinemat_nojmi_4k )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", CCPU, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("main", CCPU, MASTER_CLOCK/4)
 	MDRV_CPU_CONFIG(config_nojmi)
 	MDRV_CPU_PROGRAM_MAP(program_map_4k,0)
 	MDRV_CPU_DATA_MAP(data_map,0)

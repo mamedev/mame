@@ -208,12 +208,11 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( blockhl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", KONAMI,3000000)		/* Konami custom 052526 */
+	MDRV_CPU_ADD("main", KONAMI,3000000)		/* Konami custom 052526 */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", blockhl_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */		/* ? */
+	MDRV_CPU_ADD("audio", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_RESET(blockhl)

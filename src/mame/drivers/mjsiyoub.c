@@ -84,11 +84,11 @@ static const struct MSM5205interface msm5205_interface =
 
 static MACHINE_DRIVER_START( mjsiyoub )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,18432000/4)
+	MDRV_CPU_ADD("main", Z80,18432000/4)
 	MDRV_CPU_PROGRAM_MAP(readmem1,writemem1)
 //  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,18432000/4)
+	MDRV_CPU_ADD("sub", Z80,18432000/4)
 	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
 //  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

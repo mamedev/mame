@@ -688,16 +688,15 @@ static const struct YM2203interface ym2203_interface =
 
 static MACHINE_DRIVER_START( tokio )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", Z80, MAIN_XTAL/4)	// 6 MHz
+	MDRV_CPU_ADD("main", Z80, MAIN_XTAL/4)	// 6 MHz
 	MDRV_CPU_PROGRAM_MAP(tokio_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, MAIN_XTAL/4)	// 6 MHz
+	MDRV_CPU_ADD("slave", Z80, MAIN_XTAL/4)	// 6 MHz
 	MDRV_CPU_PROGRAM_MAP(tokio_slave_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, MAIN_XTAL/8)
-	/* audio CPU */	// 3 MHz
+	MDRV_CPU_ADD("audio", Z80, MAIN_XTAL/8)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(tokio_sound_map, 0) // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
 
 	MDRV_INTERLEAVE(100) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
@@ -729,19 +728,18 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bublbobl )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", Z80, MAIN_XTAL/4)	// 6 MHz
+	MDRV_CPU_ADD("main", Z80, MAIN_XTAL/4)	// 6 MHz
 	MDRV_CPU_PROGRAM_MAP(master_map, 0)
 	// IRQs are triggered by the MCU
 
-	MDRV_CPU_ADD(Z80, MAIN_XTAL/4)	// 6 MHz
+	MDRV_CPU_ADD("slave", Z80, MAIN_XTAL/4)	// 6 MHz
 	MDRV_CPU_PROGRAM_MAP(slave_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, MAIN_XTAL/8)
-	/* audio CPU */	// 3 MHz
+	MDRV_CPU_ADD("audio", Z80, MAIN_XTAL/8)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0) // IRQs are triggered by the YM2203
 
-	MDRV_CPU_ADD_TAG("mcu", M6801, 4000000)	// actually 6801U4  // xtal is 4MHz, divided by 4 internally
+	MDRV_CPU_ADD("mcu", M6801, 4000000)	// actually 6801U4  // xtal is 4MHz, divided by 4 internally
 	MDRV_CPU_PROGRAM_MAP(mcu_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_pulse) // comes from the same clock that latches the INT pin on the second Z80
 
@@ -789,7 +787,7 @@ static MACHINE_DRIVER_START( bub68705 )
 	MDRV_IMPORT_FROM(bublbobl)
 	MDRV_CPU_REMOVE("mcu")
 
-	MDRV_CPU_ADD_TAG("mcu", M68705, 4000000)	// xtal is 4MHz, divided by 4 internally
+	MDRV_CPU_ADD("mcu", M68705, 4000000)	// xtal is 4MHz, divided by 4 internally
 	MDRV_CPU_PROGRAM_MAP(bootlegmcu_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(bublbobl_m68705_interrupt, 2) // ??? should come from the same clock which latches the INT pin on the second Z80
 MACHINE_DRIVER_END

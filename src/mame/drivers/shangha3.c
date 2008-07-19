@@ -500,7 +500,7 @@ static const struct YM3438interface ym3438_interface =
 static MACHINE_DRIVER_START( shangha3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 8000000)
+	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(shangha3_readmem,shangha3_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
@@ -536,11 +536,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( heberpop )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 8000000)
+	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(heberpop_readmem,heberpop_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD(Z80, 6000000)	/* 6 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80, 6000000)	/* 6 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(heberpop_sound_readmem,heberpop_sound_writemem)
 	MDRV_CPU_IO_MAP(heberpop_sound_readport,heberpop_sound_writeport)
 								/* NMI triggered by YM3438 */
@@ -578,11 +578,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( blocken )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 8000000)
+	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(blocken_readmem,blocken_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD(Z80, 6000000)	/* 6 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80, 6000000)	/* 6 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(heberpop_sound_readmem,heberpop_sound_writemem)
 	MDRV_CPU_IO_MAP(heberpop_sound_readport,heberpop_sound_writeport)
 								/* NMI triggered by YM3438 */

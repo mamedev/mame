@@ -345,11 +345,11 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( wwfsstar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(wwfsstars_interrupt,272)
 
-	MDRV_CPU_ADD(Z80, 3579545)
+	MDRV_CPU_ADD("audio", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */

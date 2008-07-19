@@ -815,16 +815,15 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( tnk3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_13_4MHz/4) /* verified on pcb */
+	MDRV_CPU_ADD("main", Z80, XTAL_13_4MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tnk3_cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_13_4MHz/4) /* verified on pcb */
+	MDRV_CPU_ADD("sub", Z80, XTAL_13_4MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tnk3_cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_8MHz/2) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(YM3526_sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
@@ -859,16 +858,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( athena )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(tnk3_cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("sub", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(tnk3_cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(YM3526_YM3526_sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
@@ -907,16 +905,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ikari )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_13_4MHz/4) /* verified on pcb */
+	MDRV_CPU_ADD("main", Z80, XTAL_13_4MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_13_4MHz/4) /* verified on pcb */
+	MDRV_CPU_ADD("sub", Z80, XTAL_13_4MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_8MHz/2) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(YM3526_YM3526_sound_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -955,16 +952,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( victroad )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_13_4MHz/4) /* verified on pcb */
+	MDRV_CPU_ADD("main", Z80, XTAL_13_4MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_13_4MHz/4) /* verified on pcb */
+	MDRV_CPU_ADD("sub", Z80, XTAL_13_4MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_8MHz/2) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1003,16 +999,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gwar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_8MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("main", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_8MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("sub", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_8MHz/2) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1049,17 +1044,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bermudat )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	// 5MHz gives CPUB higher priority or ROM test will fail if the first NMI is triggered too early by CPUA
-	MDRV_CPU_ADD(Z80, 5000000)
+	MDRV_CPU_ADD("sub", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1096,16 +1090,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( psychos )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("sub", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
@@ -1142,16 +1135,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( chopper1 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("sub", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(YM3812_Y8950_sound_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1188,15 +1180,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tdfever )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", snk_irq_AB)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("sub", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(cpuB_map,0)
 //  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -1236,16 +1228,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tdfever2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", snk_irq_AB)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("sub", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(cpuB_map,0)
 //  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1284,16 +1275,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fsoccer )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_8MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("main", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_8MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("sub", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_8MHz/2) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(Y8950_sound_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 

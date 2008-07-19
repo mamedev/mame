@@ -328,7 +328,7 @@ static PALETTE_INIT( dragrace )
 static MACHINE_DRIVER_START( dragrace )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6800, 12096000 / 12)
+	MDRV_CPU_ADD("main", M6800, 12096000 / 12)
 	MDRV_CPU_PROGRAM_MAP(dragrace_readmem, dragrace_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
 	MDRV_WATCHDOG_VBLANK_INIT(8)

@@ -817,16 +817,15 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( sf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 8000000)	/* 8 MHz ? (xtal is 16MHz) */
+	MDRV_CPU_ADD("main", M68000, 8000000)	/* 8 MHz ? (xtal is 16MHz) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* ? xtal is 3.579545MHz */
+	MDRV_CPU_ADD("audio", Z80, 3579545)	/* ? xtal is 3.579545MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* NMIs are caused by the main CPU */
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* ? xtal is 3.579545MHz */
+
+	MDRV_CPU_ADD("audio2", Z80, 3579545)	/* ? xtal is 3.579545MHz */
 	MDRV_CPU_PROGRAM_MAP(sound2_readmem,sound2_writemem)
 	MDRV_CPU_IO_MAP(sound2_readport,sound2_writeport)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,8000)

@@ -1723,7 +1723,7 @@ static const struct YM3812interface ym3812_interface =
 static MACHINE_DRIVER_START( itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, CLOCK_8MHz/4)
+	MDRV_CPU_ADD("main", M6809, CLOCK_8MHz/4)
 	MDRV_CPU_PROGRAM_MAP(tmslo_map,0)
 	MDRV_CPU_VBLANK_INT("main", generate_nmi)
 
@@ -1761,7 +1761,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( itech8_sound_ym2203 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("sound", M6809, CLOCK_8MHz/4)
+	MDRV_CPU_ADD("sound", M6809, CLOCK_8MHz/4)
 	MDRV_CPU_PROGRAM_MAP(sound2203_map,0)
 
 	/* sound hardware */
@@ -1777,7 +1777,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( itech8_sound_ym3812 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("sound", M6809, CLOCK_8MHz/4)
+	MDRV_CPU_ADD("sound", M6809, CLOCK_8MHz/4)
 	MDRV_CPU_PROGRAM_MAP(sound3812_map,0)
 
 	/* sound hardware */
@@ -1790,7 +1790,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( itech8_sound_ym3812_external )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("sound", M6809, CLOCK_8MHz/4)
+	MDRV_CPU_ADD("sound", M6809, CLOCK_8MHz/4)
 	MDRV_CPU_PROGRAM_MAP(sound3812_external_map,0)
 
 	/* sound hardware */
@@ -1847,7 +1847,7 @@ static MACHINE_DRIVER_START( slikshot_hi )
 	MDRV_IMPORT_FROM(itech8_core_hi)
 	MDRV_IMPORT_FROM(itech8_sound_ym2203)
 
-	MDRV_CPU_ADD(Z80, CLOCK_8MHz/2)
+	MDRV_CPU_ADD("sub", Z80, CLOCK_8MHz/2)
 	MDRV_CPU_PROGRAM_MAP(slikz80_mem_map,0)
 	MDRV_CPU_IO_MAP(slikz80_io_map,0)
 
@@ -1864,7 +1864,7 @@ static MACHINE_DRIVER_START( slikshot_lo )
 	MDRV_IMPORT_FROM(itech8_core_lo)
 	MDRV_IMPORT_FROM(itech8_sound_ym2203)
 
-	MDRV_CPU_ADD(Z80, CLOCK_8MHz/2)
+	MDRV_CPU_ADD("sub", Z80, CLOCK_8MHz/2)
 	MDRV_CPU_PROGRAM_MAP(slikz80_mem_map,0)
 	MDRV_CPU_IO_MAP(slikz80_io_map,0)
 

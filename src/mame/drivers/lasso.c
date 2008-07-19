@@ -465,11 +465,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 11289000/16)	/* guess */
+	MDRV_CPU_ADD("main", M6502, 11289000/16)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(lasso_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD_TAG("audio", M6502, 600000)
+	MDRV_CPU_ADD("audio", M6502, 600000)
 	MDRV_CPU_PROGRAM_MAP(lasso_audio_map, 0)
 
 	MDRV_INTERLEAVE(100)
@@ -503,7 +503,7 @@ static MACHINE_DRIVER_START( lasso )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(base)
-	MDRV_CPU_ADD_TAG("blitter", M6502, 11289000/16)	/* guess */
+	MDRV_CPU_ADD("blitter", M6502, 11289000/16)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(lasso_coprocessor_map,0)
 
 MACHINE_DRIVER_END

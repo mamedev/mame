@@ -441,7 +441,7 @@ static const mc6845_interface mc6845_intf =
 
 
 MACHINE_DRIVER_START( qix_video )
-	MDRV_CPU_ADD_TAG("video", M6809, MAIN_CLOCK_OSC/4/4)	/* 1.25 MHz */
+	MDRV_CPU_ADD("video", M6809, MAIN_CLOCK_OSC/4/4)	/* 1.25 MHz */
 	MDRV_CPU_PROGRAM_MAP(qix_video_map,0)
 
 	MDRV_VIDEO_START(qix)

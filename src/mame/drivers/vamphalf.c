@@ -581,7 +581,7 @@ static ADDRESS_MAP_START( qs1000_data_map, ADDRESS_SPACE_DATA, 8 )
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( common )
-	MDRV_CPU_ADD_TAG("main", E116T, 50000000)	/* 50 MHz */
+	MDRV_CPU_ADD("main", E116T, 50000000)	/* 50 MHz */
 	MDRV_CPU_PROGRAM_MAP(common_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -615,7 +615,7 @@ static MACHINE_DRIVER_START( sound_ym_oki )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sound_qs1000 )
-	MDRV_CPU_ADD_TAG("audio", I8052, 24000000/4)	/* 6 MHz? */
+	MDRV_CPU_ADD("audio", I8052, 24000000/4)	/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(qs1000_prg_map, 0)
 	MDRV_CPU_DATA_MAP( qs1000_data_map, 0 )
 

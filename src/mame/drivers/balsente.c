@@ -1174,12 +1174,11 @@ static const struct cem3394_interface cem_interface =
 static MACHINE_DRIVER_START( balsente )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, 5000000/4)
+	MDRV_CPU_ADD("main", M6809, 5000000/4)
 	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", balsente_update_analog_inputs)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_IO_MAP(cpu2_io_map,0)
 
@@ -1233,7 +1232,7 @@ static MACHINE_DRIVER_START( shrike )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(balsente)
 
-	MDRV_CPU_ADD_TAG("68k", M68000, 8000000)
+	MDRV_CPU_ADD("68k", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(shrike68k_map,0)
 
 	MDRV_INTERLEAVE(100)

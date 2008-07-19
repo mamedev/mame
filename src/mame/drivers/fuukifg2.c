@@ -562,11 +562,10 @@ static MACHINE_RESET( fuuki16 )
 static MACHINE_DRIVER_START( fuuki16 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(fuuki16_readmem,fuuki16_writemem)
 
-	MDRV_CPU_ADD(Z80, 3000000)
-	/* audio CPU */	/* ? */
+	MDRV_CPU_ADD("audio", Z80, 3000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(fuuki16_sound_readmem,fuuki16_sound_writemem)
 	MDRV_CPU_IO_MAP(fuuki16_sound_readport,fuuki16_sound_writeport)
 

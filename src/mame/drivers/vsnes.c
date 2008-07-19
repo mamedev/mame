@@ -2034,7 +2034,7 @@ static const struct NESinterface nes_interface_2 =
 static MACHINE_DRIVER_START( vsnes )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", N2A03,N2A03_DEFAULTCLOCK)
+	MDRV_CPU_ADD("main", N2A03,N2A03_DEFAULTCLOCK)
 	MDRV_CPU_PROGRAM_MAP(vsnes_cpu1_map,0)
 								/* some carts also trigger IRQs */
 	MDRV_MACHINE_RESET(vsnes)
@@ -2067,10 +2067,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vsdual )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", N2A03,N2A03_DEFAULTCLOCK)
+	MDRV_CPU_ADD("main", N2A03,N2A03_DEFAULTCLOCK)
 	MDRV_CPU_PROGRAM_MAP(vsnes_cpu1_map,0)
 								/* some carts also trigger IRQs */
-	MDRV_CPU_ADD(N2A03,N2A03_DEFAULTCLOCK)
+	MDRV_CPU_ADD("sub", N2A03,N2A03_DEFAULTCLOCK)
 	MDRV_CPU_PROGRAM_MAP(vsnes_cpu2_map,0)
 								/* some carts also trigger IRQs */
 	MDRV_MACHINE_RESET(vsdual)

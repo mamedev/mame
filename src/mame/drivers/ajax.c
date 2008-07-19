@@ -228,14 +228,14 @@ static const struct K007232_interface k007232_interface_2 =
 static MACHINE_DRIVER_START( ajax )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", KONAMI, 3000000)	/* 12/4 MHz*/
+	MDRV_CPU_ADD("main", KONAMI, 3000000)	/* 12/4 MHz*/
 	MDRV_CPU_PROGRAM_MAP(ajax_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", ajax_interrupt)	/* IRQs triggered by the 051960 */
 
-	MDRV_CPU_ADD_TAG("sub", M6809, 3000000)	/* ? */
+	MDRV_CPU_ADD("sub", M6809, 3000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(ajax_sub_map,0)
 
-	MDRV_CPU_ADD_TAG("audio", Z80, 3579545)	/* 3.58 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3579545)	/* 3.58 MHz */
 	MDRV_CPU_PROGRAM_MAP(ajax_sound_map,0)
 
 	MDRV_INTERLEAVE(10)

@@ -1748,7 +1748,7 @@ DISCRETE_SOUND_END
 static MACHINE_DRIVER_START( galaxian_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, GALAXIAN_PIXEL_CLOCK/3/2)
+	MDRV_CPU_ADD("main", Z80, GALAXIAN_PIXEL_CLOCK/3/2)
 	MDRV_CPU_PROGRAM_MAP(galaxian_map,0)
 	MDRV_CPU_VBLANK_INT("main", interrupt_gen)
 
@@ -1797,7 +1797,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( konami_sound_1x_ay8910 )
 
 	/* 2nd CPU to drive sound */
-	MDRV_CPU_ADD_TAG("sound", Z80, KONAMI_SOUND_CLOCK/8)
+	MDRV_CPU_ADD("sound", Z80, KONAMI_SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(frogger_sound_map,0)
 	MDRV_CPU_IO_MAP(frogger_sound_portmap,0)
 
@@ -1817,7 +1817,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( konami_sound_2x_ay8910 )
 
 	/* 2nd CPU to drive sound */
-	MDRV_CPU_ADD_TAG("sound", Z80, KONAMI_SOUND_CLOCK/8)
+	MDRV_CPU_ADD("sound", Z80, KONAMI_SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(konami_sound_map,0)
 	MDRV_CPU_IO_MAP(konami_sound_portmap,0)
 
@@ -1910,7 +1910,7 @@ static MACHINE_DRIVER_START( checkman )
 	MDRV_IMPORT_FROM(mooncrst)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 1620000)	/* 1.62 MHz */
+	MDRV_CPU_ADD("audio", Z80, 1620000)	/* 1.62 MHz */
 	MDRV_CPU_PROGRAM_MAP(checkman_sound_map,0)
 	MDRV_CPU_IO_MAP(checkman_sound_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* NMIs are triggered by the main CPU */
@@ -1925,7 +1925,7 @@ static MACHINE_DRIVER_START( checkmaj )
 	MDRV_IMPORT_FROM(galaxian)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 1620000)
+	MDRV_CPU_ADD("audio", Z80, 1620000)
 	MDRV_CPU_PROGRAM_MAP(checkmaj_sound_map,0)
 
 	MDRV_TIMER_ADD_SCANLINE("irq0", checkmaj_irq0_gen, "main", 0, 8)
@@ -1960,7 +1960,7 @@ static MACHINE_DRIVER_START( kingball )
 	MDRV_IMPORT_FROM(mooncrst)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,5000000/2)
+	MDRV_CPU_ADD("audio", Z80,5000000/2)
 	MDRV_CPU_PROGRAM_MAP(kingball_sound_map,0)
 	MDRV_CPU_IO_MAP(kingball_sound_portmap,0)
 
@@ -2060,7 +2060,7 @@ static MACHINE_DRIVER_START( explorer )
 	MDRV_CPU_PROGRAM_MAP(theend_map,0)
 
 	/* 2nd CPU to drive sound */
-	MDRV_CPU_ADD(Z80,KONAMI_SOUND_CLOCK/8)
+	MDRV_CPU_ADD("audio", Z80,KONAMI_SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(konami_sound_map,0)
 	MDRV_CPU_IO_MAP(konami_sound_portmap,0)
 
@@ -2102,7 +2102,7 @@ static MACHINE_DRIVER_START( sfx )
 	MDRV_CPU_PROGRAM_MAP(sfx_map,0)
 
 	/* 3rd CPU for the sample player */
-	MDRV_CPU_ADD(Z80, KONAMI_SOUND_CLOCK/8)
+	MDRV_CPU_ADD("audio", Z80, KONAMI_SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(sfx_sample_map,0)
 	MDRV_CPU_IO_MAP(sfx_sample_portmap,0)
 

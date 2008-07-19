@@ -303,7 +303,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( clayshoo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,5068000/4)		/* 5.068/4 Mhz (divider is a guess) */
+	MDRV_CPU_ADD("main", Z80,5068000/4)		/* 5.068/4 Mhz (divider is a guess) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

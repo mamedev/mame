@@ -275,7 +275,7 @@ static const struct CustomSound_interface tiamc1_custom_interface =
 
 static MACHINE_DRIVER_START( tiamc1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8080,16000000/9)		 /* 16 MHz */
+	MDRV_CPU_ADD("main", 8080,16000000/9)		 /* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(tiamc1_readmem,tiamc1_writemem)
 	MDRV_CPU_IO_MAP(tiamc1_readport,tiamc1_writeport)
 

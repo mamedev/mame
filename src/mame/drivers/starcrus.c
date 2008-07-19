@@ -170,7 +170,7 @@ static const struct Samplesinterface samples_interface =
 static MACHINE_DRIVER_START( starcrus )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8080,9750000/9)  /* 8224 chip is a divide by 9 */
+	MDRV_CPU_ADD("main", 8080,9750000/9)  /* 8224 chip is a divide by 9 */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

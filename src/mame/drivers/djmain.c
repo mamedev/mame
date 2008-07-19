@@ -1226,8 +1226,8 @@ static MACHINE_DRIVER_START( djmain )
 
 	/* basic machine hardware */
 	// popn3 works 9.6 MHz or slower in some songs */
-	//MDRV_CPU_ADD_TAG("main", M68EC020, 18432000/2)    /*  9.216 MHz!? */
-	MDRV_CPU_ADD_TAG("main", M68EC020, 32000000/4)	/*  8.000 MHz!? */
+	//MDRV_CPU_ADD("main", M68EC020, 18432000/2)    /*  9.216 MHz!? */
+	MDRV_CPU_ADD("main", M68EC020, 32000000/4)	/*  8.000 MHz!? */
 	MDRV_CPU_PROGRAM_MAP(memory_map, 0)
 	MDRV_CPU_VBLANK_INT("main", vb_interrupt)
 

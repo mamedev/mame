@@ -437,11 +437,11 @@ static const struct YM3812interface lordgun_ym3812_interface =
 };
 
 static MACHINE_DRIVER_START( lordgun )
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(lordgun_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 5000000)
+	MDRV_CPU_ADD("sound", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(lordgun_soundmem_map,0)
 	MDRV_CPU_IO_MAP(lordgun_soundio_map,0)
 

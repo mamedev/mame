@@ -411,7 +411,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( powerbal )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(powerbal_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -439,7 +439,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( magicstk )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(magicstk_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 

@@ -266,12 +266,11 @@ static INTERRUPT_GEN( madgear_interrupt )
 static MACHINE_DRIVER_START( lastduel )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000) /* Could be 8 MHz */
+	MDRV_CPU_ADD("main", M68000, 10000000) /* Could be 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(lastduel_readmem,lastduel_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(lastduel_interrupt,3)	/* 1 for vbl, 2 for control reads?? */
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */ /* Accurate */
+	MDRV_CPU_ADD("audio", Z80, 3579545) /* Accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */
@@ -306,12 +305,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( madgear )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000) /* Accurate */
+	MDRV_CPU_ADD("main", M68000, 10000000) /* Accurate */
 	MDRV_CPU_PROGRAM_MAP(madgear_readmem,madgear_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(madgear_interrupt,3)	/* 1 for vbl, 2 for control reads?? */
 
-	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mg_sound_readmem,mg_sound_writemem)
 
 	/* video hardware */

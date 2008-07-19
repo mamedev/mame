@@ -457,7 +457,7 @@ static const struct POKEYinterface pokey_interface =
 static MACHINE_DRIVER_START( cloud9 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, MASTER_CLOCK/8)
+	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(cloud9_map,0)
 
 	MDRV_MACHINE_START(cloud9)

@@ -77,7 +77,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( comebaby )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", PENTIUM, 2000000000) /* Probably a Pentium .. ?? Mhz*/
+	MDRV_CPU_ADD("main", PENTIUM, 2000000000) /* Probably a Pentium .. ?? Mhz*/
 	MDRV_CPU_PROGRAM_MAP(comebaby_map, 0)
 
  	/* video hardware */

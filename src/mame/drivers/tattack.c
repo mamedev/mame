@@ -181,7 +181,7 @@ static PALETTE_INIT( tattack  )
 static MACHINE_DRIVER_START( tattack )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 8000000 / 2)	/* 4 MHz ? */
+	MDRV_CPU_ADD("main", Z80, 8000000 / 2)	/* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mem, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

@@ -345,7 +345,7 @@ static MACHINE_DRIVER_START( mario_base )
 	MDRV_DRIVER_DATA(mario_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, Z80_CLOCK)	/* verified on pcb */
+	MDRV_CPU_ADD("main", Z80, Z80_CLOCK)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mario_map, 0)
 	MDRV_CPU_IO_MAP(0,mario_writeport)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)

@@ -144,15 +144,15 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( sgladiat )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sgladiat_cpuA_map,0)
 //  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 5000000)
+	MDRV_CPU_ADD("sub", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(sgladiat_cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", snk_irq_BA)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sgladiat_sound_map,0)
 	MDRV_CPU_IO_MAP(sgladiat_sound_portmap,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 244)	// Marvin's frequency, sounds ok

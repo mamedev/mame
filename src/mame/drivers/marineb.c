@@ -508,7 +508,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( marineb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 3072000)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, 3072000)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(marineb_map,0)
 	MDRV_CPU_IO_MAP(marineb_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)

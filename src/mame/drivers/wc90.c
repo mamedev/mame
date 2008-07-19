@@ -320,16 +320,15 @@ static const struct YM2608interface ym2608_interface =
 static MACHINE_DRIVER_START( wc90 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 6000000)	/* 6.0 MHz ??? */
+	MDRV_CPU_ADD("main", Z80, 6000000)	/* 6.0 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wc90_map_1,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 6000000)	/* 6.0 MHz ??? */
+	MDRV_CPU_ADD("sub", Z80, 6000000)	/* 6.0 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wc90_map_2,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	/* audio CPU */	/* 4 MHz ???? */
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	/* NMIs are triggered by the main CPU */
 

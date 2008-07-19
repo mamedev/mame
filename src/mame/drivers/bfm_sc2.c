@@ -2226,7 +2226,7 @@ static const struct upd7759_interface upd7759_interface =
 static MACHINE_DRIVER_START( scorpion2_vid )
 	MDRV_MACHINE_RESET( init )							// main scorpion2 board initialisation
 	MDRV_INTERLEAVE(16)									// needed for serial communication !!
-	MDRV_CPU_ADD_TAG("main", M6809, MASTER_CLOCK/4 )	// 6809 CPU at 2 Mhz
+	MDRV_CPU_ADD("main", M6809, MASTER_CLOCK/4 )	// 6809 CPU at 2 Mhz
 	MDRV_CPU_PROGRAM_MAP(memmap_vid,0)					// setup scorpion2 board memorymap
 	MDRV_CPU_PERIODIC_INT(timer_irq, 1000)				// generate 1000 IRQ's per second
 
@@ -2247,7 +2247,7 @@ static MACHINE_DRIVER_START( scorpion2_vid )
 	MDRV_PALETTE_INIT(adder2)
 	MDRV_GFXDECODE(adder2)
 
-	MDRV_CPU_ADD_TAG("adder2", M6809, MASTER_CLOCK/4 )	// adder2 board 6809 CPU at 2 Mhz
+	MDRV_CPU_ADD("adder2", M6809, MASTER_CLOCK/4 )	// adder2 board 6809 CPU at 2 Mhz
 	MDRV_CPU_PROGRAM_MAP(adder2_memmap,0)				// setup adder2 board memorymap
 	MDRV_CPU_VBLANK_INT("ADDER", adder2_vbl)			// board has a VBL IRQ
 

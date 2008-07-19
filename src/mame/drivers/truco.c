@@ -138,7 +138,7 @@ static INTERRUPT_GEN( truco_interrupt )
 static MACHINE_DRIVER_START( truco )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, 750000)        /* ?? guess */
+	MDRV_CPU_ADD("main", M6809, 750000)        /* ?? guess */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_CPU_VBLANK_INT("main", truco_interrupt)

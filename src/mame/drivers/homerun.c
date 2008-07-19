@@ -186,7 +186,7 @@ INPUT_PORTS_END
 
 
 static MACHINE_DRIVER_START( homerun )
-	MDRV_CPU_ADD_TAG("main", Z80, 5000000)
+	MDRV_CPU_ADD("main", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(homerun_memmap, 0)
 	MDRV_CPU_IO_MAP(homerun_iomap, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

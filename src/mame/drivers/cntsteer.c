@@ -716,16 +716,15 @@ static MACHINE_RESET( zerotrgt )
 
 
 static MACHINE_DRIVER_START( cntsteer )
-	MDRV_CPU_ADD_TAG("main", M6809, 2000000)		 /* ? */
+	MDRV_CPU_ADD("main", M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) /* ? */
 
-	MDRV_CPU_ADD(M6809, 2000000)		 /* ? */
+	MDRV_CPU_ADD("sub", M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu2_map,0)
 //  MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) /* ? */
 
-//  MDRV_CPU_ADD(M6502, 1500000)        /* ? */
-//  /* audio CPU */
+//  MDRV_CPU_ADD("audio", M6502, 1500000)        /* ? */
 //  MDRV_CPU_PROGRAM_MAP(sound_map,0)
 //  MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16) /* ? */ // should be interrupt, 16?
 
@@ -751,16 +750,15 @@ static MACHINE_DRIVER_START( cntsteer )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( zerotrgt )
-	MDRV_CPU_ADD_TAG("main", M6809, 2000000)		 /* ? */
+	MDRV_CPU_ADD("main", M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) /* ? */
 
-	MDRV_CPU_ADD(M6809, 2000000)		 /* ? */
+	MDRV_CPU_ADD("sub", M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu2_map,0)
 //  MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) /* ? */
 
-	MDRV_CPU_ADD(M6502, 1500000)		/* ? */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6502, 1500000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_pulse,16) /* ? */ // should be interrupt, 16?
 	MDRV_CPU_PERIODIC_INT(sound_interrupt, 1000)

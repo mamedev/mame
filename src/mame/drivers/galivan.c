@@ -556,13 +556,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( galivan )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,12000000/2)		/* 6 MHz? */
+	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,8000000/2)
-	/* audio CPU */		/* 4 MHz? */
+	MDRV_CPU_ADD("audio", Z80,8000000/2)		/* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 7250)  /* timed interrupt, ?? Hz */
@@ -600,13 +599,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ninjemak )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,12000000/2)		/* 6 MHz? */
+	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,ninjemak_writemem)
 	MDRV_CPU_IO_MAP(ninjemak_readport,ninjemak_writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,8000000/2)
-	/* audio CPU */		/* 4 MHz? */
+	MDRV_CPU_ADD("audio", Z80,8000000/2)		/* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 7250)	/* timed interrupt, ?? Hz */

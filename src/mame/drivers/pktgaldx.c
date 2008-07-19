@@ -342,7 +342,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( pktgaldx )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 14000000)
+	MDRV_CPU_ADD("main", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(pktgaldx_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
@@ -377,7 +377,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pktgaldb )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(pktgaldb_readmem,pktgaldb_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 

@@ -927,12 +927,11 @@ static const struct YM3812interface ym3812b_interface =
 static MACHINE_DRIVER_START( hbarrel )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(dec0_readmem,dec0_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL, level 5 interrupts from i8751 */
 
-	MDRV_CPU_ADD(M6502, 1500000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(dec0_s_readmem,dec0_s_writemem)
 
 	/* video hardware */
@@ -970,12 +969,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( baddudes )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(dec0_readmem,dec0_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL, level 5 interrupts from i8751 */
 
-	MDRV_CPU_ADD(M6502, 1500000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(dec0_s_readmem,dec0_s_writemem)
 
 	/* video hardware */
@@ -1013,12 +1011,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( birdtry )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(dec0_readmem,dec0_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL, level 5 interrupts from i8751 */
 
-	MDRV_CPU_ADD(M6502, 1500000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(dec0_s_readmem,dec0_s_writemem)
 
 	/* video hardware */
@@ -1056,15 +1053,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( robocop )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(dec0_readmem,dec0_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL */
 
-	MDRV_CPU_ADD(M6502, 1500000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(dec0_s_readmem,dec0_s_writemem)
 
-	MDRV_CPU_ADD(H6280,21477200/16) /* 21.4772MHz clock */
+	MDRV_CPU_ADD("sub", H6280,21477200/16) /* 21.4772MHz clock */
 	MDRV_CPU_PROGRAM_MAP(robocop_sub_readmem,robocop_sub_writemem)
 
 	MDRV_INTERLEAVE(50)	/* Interleave between HuC6280 & 68000 */
@@ -1104,12 +1100,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( robocopb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(dec0_readmem,dec0_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL */
 
-	MDRV_CPU_ADD(M6502, 1500000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(dec0_s_readmem,dec0_s_writemem)
 
 	/* video hardware */
@@ -1147,15 +1142,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hippodrm )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(dec0_readmem,dec0_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL */
 
-	MDRV_CPU_ADD(M6502, 1500000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(dec0_s_readmem,dec0_s_writemem)
 
-	MDRV_CPU_ADD(H6280,21477200/16) /* 21.4772MHz clock */
+	MDRV_CPU_ADD("sub", H6280,21477200/16) /* 21.4772MHz clock */
 	MDRV_CPU_PROGRAM_MAP(hippodrm_sub_readmem,hippodrm_sub_writemem)
 
 	MDRV_INTERLEAVE(5)	/* Interleave between H6280 & 68000 */
@@ -1195,12 +1189,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( slyspy )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
+	MDRV_CPU_ADD("main", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
 	MDRV_CPU_PROGRAM_MAP(slyspy_readmem,slyspy_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL */
 
-	MDRV_CPU_ADD(H6280, XTAL_12MHz/2/3)
-	/* audio CPU */ /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
+	MDRV_CPU_ADD("audio", H6280, XTAL_12MHz/2/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(slyspy_s_readmem,slyspy_s_writemem)
 
 	/* video hardware */
@@ -1238,12 +1231,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( midres )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
+	MDRV_CPU_ADD("main", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
 	MDRV_CPU_PROGRAM_MAP(midres_readmem,midres_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL */
 
-	MDRV_CPU_ADD(H6280, XTAL_24MHz/4/3)
-	/* audio CPU */ /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
+	MDRV_CPU_ADD("audio", H6280, XTAL_24MHz/4/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(midres_s_readmem,midres_s_writemem)
 
 	/* video hardware */

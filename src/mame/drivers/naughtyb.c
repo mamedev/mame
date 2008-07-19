@@ -379,7 +379,7 @@ static const struct TMS36XXinterface tms3615_interface =
 static MACHINE_DRIVER_START( naughtyb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
+	MDRV_CPU_ADD("main", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", naughtyb_interrupt)
 
@@ -416,7 +416,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( popflame )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
+	MDRV_CPU_ADD("main", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
 	MDRV_CPU_PROGRAM_MAP(readmem,popflame_writemem)
 	MDRV_CPU_VBLANK_INT("main", naughtyb_interrupt)
 

@@ -984,7 +984,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( root )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/16)
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/16)
 	MDRV_CPU_PROGRAM_MAP(zaxxon_map, 0)
 	MDRV_CPU_VBLANK_INT("main", vblank_int)
 
@@ -1052,7 +1052,7 @@ static MACHINE_DRIVER_START( congo )
 	MDRV_DEVICE_MODIFY( "ppi8255", PPI8255 )
 	MDRV_DEVICE_CONFIG( congo_ppi_intf )
 
-	MDRV_CPU_ADD(Z80, SOUND_CLOCK)
+	MDRV_CPU_ADD("audio", Z80, SOUND_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(congo_sound_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)SOUND_CLOCK/16/16/16/4)
 

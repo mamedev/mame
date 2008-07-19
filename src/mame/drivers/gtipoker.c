@@ -54,7 +54,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( gtipoker )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,4000000)		 /* ? MHz */
+	MDRV_CPU_ADD("main", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(gtipoker_memmap,0)
 	MDRV_CPU_IO_MAP(gtipoker_iomap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

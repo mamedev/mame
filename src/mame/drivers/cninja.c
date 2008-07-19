@@ -779,12 +779,11 @@ static const struct YM2151interface ym2151_interface2 =
 static MACHINE_DRIVER_START( cninja )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(cninja_readmem,cninja_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(H6280,32220000/8)
-	/* audio CPU */	/* Accurate */
+	MDRV_CPU_ADD("audio", H6280,32220000/8)	/* Accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_RESET(cninja)
@@ -828,12 +827,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( stoneage )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(cninja_readmem,cninja_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(stoneage_s_readmem,stoneage_s_writemem)
 
 	MDRV_MACHINE_RESET(cninja)
@@ -874,12 +872,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( edrandy )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(edrandy_readmem,edrandy_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(H6280,32220000/8)
-	/* audio CPU */	/* Accurate */
+	MDRV_CPU_ADD("audio", H6280,32220000/8)	/* Accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_RESET(cninja)
@@ -923,12 +920,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( robocop2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 14000000)
+	MDRV_CPU_ADD("main", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(robocop2_readmem,robocop2_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(H6280,32220000/8)
-	/* audio CPU */	/* Accurate */
+	MDRV_CPU_ADD("audio", H6280,32220000/8)	/* Accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_RESET(cninja)
@@ -975,12 +971,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mutantf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 14000000)
+	MDRV_CPU_ADD("main", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(mutantf_readmem,mutantf_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD(H6280,32220000/8)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", H6280,32220000/8)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_mutantf,sound_writemem_mutantf)
 
 	/* video hardware */

@@ -207,7 +207,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( tourtabl )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, MASTER_CLOCK / 3)	/* actually M6507 */
+	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK / 3)	/* actually M6507 */
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
 
 	MDRV_MACHINE_START(tourtabl)

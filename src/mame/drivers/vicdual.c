@@ -247,7 +247,7 @@ UINT8 vicdual_characterram_r(offs_t offset)
 static MACHINE_DRIVER_START( vicdual_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, VICDUAL_MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD("main", Z80, VICDUAL_MAIN_CPU_CLOCK)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

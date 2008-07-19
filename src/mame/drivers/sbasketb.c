@@ -236,12 +236,11 @@ static const struct VLM5030interface sbasketb_vlm5030_interface =
 static MACHINE_DRIVER_START( sbasketb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, 1400000)        /* 1.400 MHz ??? */
+	MDRV_CPU_ADD("main", M6809, 1400000)        /* 1.400 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,14318000/4)
-	/* audio CPU */	/* 3.5795 MHz */
+	MDRV_CPU_ADD("audio", Z80,14318000/4)	/* 3.5795 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */

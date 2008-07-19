@@ -263,7 +263,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( victor5 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z180, XTAL_12MHz / 3)	// 4 MHz?
+	MDRV_CPU_ADD("main", Z180, XTAL_12MHz / 3)	// 4 MHz?
 	MDRV_CPU_PROGRAM_MAP(victor5_map,0)
 	MDRV_CPU_IO_MAP(subsino_iomap,0)
 
@@ -303,7 +303,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( srider )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z180, XTAL_12MHz / 3)	// 4 MHz?
+	MDRV_CPU_ADD("main", Z180, XTAL_12MHz / 3)	// 4 MHz?
 	MDRV_CPU_PROGRAM_MAP(srider_map,0)
 	MDRV_CPU_IO_MAP(subsino_iomap,0)
 

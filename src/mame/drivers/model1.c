@@ -1506,12 +1506,12 @@ ROM_START( wingwara )
 ROM_END
 
 static MACHINE_DRIVER_START( model1 )
-	MDRV_CPU_ADD_TAG("main", V60, 16000000)
+	MDRV_CPU_ADD("main", V60, 16000000)
 	MDRV_CPU_PROGRAM_MAP(model1_mem, 0)
 	MDRV_CPU_IO_MAP(model1_io, 0)
 	MDRV_CPU_VBLANK_INT_HACK(model1_interrupt, 2)
 
-	MDRV_CPU_ADD(M68000, 10000000)	// verified on real h/w
+	MDRV_CPU_ADD("audio", M68000, 10000000)	// verified on real h/w
 	MDRV_CPU_PROGRAM_MAP(model1_snd, 0)
 
 	MDRV_MACHINE_RESET(model1)
@@ -1550,15 +1550,15 @@ static MACHINE_DRIVER_START( model1 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( model1_vr )
-	MDRV_CPU_ADD_TAG("main", V60, 16000000)
+	MDRV_CPU_ADD("main", V60, 16000000)
 	MDRV_CPU_PROGRAM_MAP(model1_vr_mem, 0)
 	MDRV_CPU_IO_MAP(model1_vr_io, 0)
 	MDRV_CPU_VBLANK_INT_HACK(model1_interrupt, 2)
 
-	MDRV_CPU_ADD(M68000, 10000000)	// verified on real h/w
+	MDRV_CPU_ADD("audio", M68000, 10000000)	// verified on real h/w
 	MDRV_CPU_PROGRAM_MAP(model1_snd, 0)
 
-	MDRV_CPU_ADD(MB86233, 16000000)
+	MDRV_CPU_ADD("tgp", MB86233, 16000000)
 	MDRV_CPU_CONFIG(model1_vr_tgp_config)
 	MDRV_CPU_PROGRAM_MAP(model1_vr_tgp_map, 0)
 

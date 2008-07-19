@@ -733,7 +733,7 @@ static INTERRUPT_GEN( filetto_irq )
 
 
 static MACHINE_DRIVER_START( filetto )
-	MDRV_CPU_ADD_TAG("main", I8088, 8000000)
+	MDRV_CPU_ADD("main", I8088, 8000000)
 	MDRV_CPU_PROGRAM_MAP(filetto_map,0)
 	MDRV_CPU_IO_MAP(filetto_io,0)
 	MDRV_CPU_VBLANK_INT_HACK(filetto_irq,200)

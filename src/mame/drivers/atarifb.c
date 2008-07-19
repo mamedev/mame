@@ -560,7 +560,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( atarifb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 750000)
+	MDRV_CPU_ADD("main", M6502, 750000)
 	MDRV_CPU_PROGRAM_MAP(atarifb_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 

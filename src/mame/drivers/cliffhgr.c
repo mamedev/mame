@@ -736,7 +736,7 @@ extern const discrete_sound_block cliffhgr_discrete_interface[];
 
 static MACHINE_DRIVER_START( cliffhgr )
 
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)       /* 4MHz */
+	MDRV_CPU_ADD("main", Z80, 4000000)       /* 4MHz */
 	MDRV_CPU_PROGRAM_MAP(mainmem,0)
 	MDRV_CPU_IO_MAP(mainport,0)
 	MDRV_CPU_VBLANK_INT("main", cliff_vsync)

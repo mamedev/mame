@@ -746,11 +746,11 @@ static const struct YMZ280Binterface ymz280b_intf =
 
 static MACHINE_DRIVER_START( jchan )
 
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(jchan_main,0)
 	MDRV_CPU_VBLANK_INT_HACK(jchan_vblank, 2)
 
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD("sub", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(jchan_sub,0)
 
 	MDRV_GFXDECODE(jchan)

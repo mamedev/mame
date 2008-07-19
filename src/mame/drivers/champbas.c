@@ -611,12 +611,12 @@ static MACHINE_DRIVER_START( talbot )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_18_432MHz/6)
+	MDRV_CPU_ADD("main", Z80, XTAL_18_432MHz/6)
 	MDRV_CPU_PROGRAM_MAP(talbot_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	/* MCU */
-	MDRV_CPU_ADD_TAG(CPUTAG_MCU, ALPHA8201, XTAL_18_432MHz/6/8)
+	MDRV_CPU_ADD(CPUTAG_MCU, ALPHA8201, XTAL_18_432MHz/6/8)
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	/* video hardware */
@@ -645,12 +645,12 @@ static MACHINE_DRIVER_START( champbas )
 	/* basic machine hardware */
 
 	/* main cpu */
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_18_432MHz/6)
+	MDRV_CPU_ADD("main", Z80, XTAL_18_432MHz/6)
 	MDRV_CPU_PROGRAM_MAP(champbas_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(Z80, XTAL_18_432MHz/6)
+	MDRV_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
 	MDRV_CPU_PROGRAM_MAP(champbas_sub_map,0)
 
 	/* video hardware */
@@ -684,7 +684,7 @@ static MACHINE_DRIVER_START( champmcu )
 	MDRV_IMPORT_FROM(champbas)
 
 	/* MCU */
-	MDRV_CPU_ADD_TAG(CPUTAG_MCU, ALPHA8201, XTAL_18_432MHz/6/8)
+	MDRV_CPU_ADD(CPUTAG_MCU, ALPHA8201, XTAL_18_432MHz/6/8)
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	/* to MCU timeout champbbj */
@@ -695,17 +695,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( exctsccr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)	/* 4.0 MHz (?) */
+	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4.0 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(exctsccr_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD(Z80, 4123456)	/* ??? with 4 MHz, nested NMIs might happen */
+	MDRV_CPU_ADD("audio", Z80, 4123456)	/* ??? with 4 MHz, nested NMIs might happen */
 	MDRV_CPU_PROGRAM_MAP(exctsccr_sub_map,0)
 	MDRV_CPU_IO_MAP(0,exctsccr_sound_writeport)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 4000) /* 4 kHz, updates the dac */
 
 	/* MCU */
-	MDRV_CPU_ADD_TAG(CPUTAG_MCU, ALPHA8301, XTAL_18_432MHz/6/8)
+	MDRV_CPU_ADD(CPUTAG_MCU, ALPHA8301, XTAL_18_432MHz/6/8)
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	MDRV_MACHINE_START(exctsccr)
@@ -751,11 +751,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( exctsccb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_18_432MHz/6)
+	MDRV_CPU_ADD("main", Z80, XTAL_18_432MHz/6)
 	MDRV_CPU_PROGRAM_MAP(exctsccb_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD(Z80, XTAL_18_432MHz/6)
+	MDRV_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
 	MDRV_CPU_PROGRAM_MAP(champbas_sub_map,0)
 
 	/* video hardware */

@@ -255,7 +255,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( dominob )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,8000000/2)
+	MDRV_CPU_ADD("main", Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_IO_MAP(portmap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

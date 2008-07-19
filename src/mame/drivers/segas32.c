@@ -2160,11 +2160,11 @@ static READ16_HANDLER( dual_pcb_masterslave )
 static MACHINE_DRIVER_START( system32 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", V60, MASTER_CLOCK/2)
+	MDRV_CPU_ADD("main", V60, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(system32_map,0)
 	MDRV_CPU_VBLANK_INT("main", start_of_vblank_int)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("sound", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(system32_sound_map,0)
 	MDRV_CPU_IO_MAP(system32_sound_portmap,0)
 
@@ -2206,7 +2206,7 @@ static MACHINE_DRIVER_START( system32_v25 )
 	MDRV_IMPORT_FROM(system32)
 
 	/* add a V25 for protection */
-	MDRV_CPU_ADD(V25, 10000000)
+	MDRV_CPU_ADD("mcu", V25, 10000000)
 	MDRV_CPU_PROGRAM_MAP(ga2_v25_map,0)
 MACHINE_DRIVER_END
 
@@ -2214,11 +2214,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( multi32 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", V70, MULTI32_CLOCK/2)
+	MDRV_CPU_ADD("main", V70, MULTI32_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(multi32_map,0)
 	MDRV_CPU_VBLANK_INT("left", start_of_vblank_int)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("sound", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(multi32_sound_map,0)
 	MDRV_CPU_IO_MAP(multi32_sound_portmap,0)
 

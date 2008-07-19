@@ -1562,12 +1562,11 @@ static const struct YM2610interface sngkace_ym2610_interface =
 static MACHINE_DRIVER_START( sngkace )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68EC020, 16000000)
+	MDRV_CPU_ADD("main", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(psikyo_readmem,psikyo_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */	/* ? */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(sngkace_sound_readmem,sngkace_sound_writemem)
 	MDRV_CPU_IO_MAP(sngkace_sound_readport,sngkace_sound_writeport)
 
@@ -1616,12 +1615,11 @@ static const struct YM2610interface gunbird_ym2610_interface =
 static MACHINE_DRIVER_START( gunbird )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68EC020, 16000000)
+	MDRV_CPU_ADD("main", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(psikyo_readmem,psikyo_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
 	MDRV_CPU_PROGRAM_MAP(gunbird_sound_readmem,gunbird_sound_writemem)
 	MDRV_CPU_IO_MAP(gunbird_sound_readport,gunbird_sound_writeport)
 
@@ -1678,12 +1676,11 @@ static const struct YMF278B_interface ymf278b_interface =
 static MACHINE_DRIVER_START( s1945 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68EC020, 16000000)
+	MDRV_CPU_ADD("main", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(psikyo_readmem,psikyo_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
 	MDRV_CPU_PROGRAM_MAP(gunbird_sound_readmem,gunbird_sound_writemem)
 	MDRV_CPU_IO_MAP(s1945_sound_readport,s1945_sound_writeport)
 

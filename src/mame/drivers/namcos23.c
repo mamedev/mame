@@ -1027,11 +1027,11 @@ static const struct C352interface c352_interface =
 static MACHINE_DRIVER_START( s23 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", R4650BE, 166000000)
+	MDRV_CPU_ADD("main", R4650BE, 166000000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(ss23_map, 0)
 
-	MDRV_CPU_ADD(H83002, 14745600 )
+	MDRV_CPU_ADD("audio", H83002, 14745600 )
 	MDRV_CPU_PROGRAM_MAP( s23h8rwmap, 0 )
 	MDRV_CPU_IO_MAP( s23h8iomap, 0 )
 	MDRV_CPU_VBLANK_INT("main", irq1_line_pulse)
@@ -1065,12 +1065,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ss23 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", R4650BE, 166000000)
+	MDRV_CPU_ADD("main", R4650BE, 166000000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(ss23_map, 0)
 	MDRV_CPU_VBLANK_INT("main", namcos23_interrupt)
 
-	MDRV_CPU_ADD(H83002, 14745600 )
+	MDRV_CPU_ADD("audio", H83002, 14745600 )
 	MDRV_CPU_PROGRAM_MAP( s23h8rwmap, 0 )
 	MDRV_CPU_IO_MAP( s23h8iomap, 0 )
 	MDRV_CPU_VBLANK_INT("main", irq1_line_pulse)

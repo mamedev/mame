@@ -2219,7 +2219,7 @@ static const mips3_config config =
 static MACHINE_DRIVER_START( vegascore )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", R5000LE, SYSTEM_CLOCK*2)
+	MDRV_CPU_ADD("main", R5000LE, SYSTEM_CLOCK*2)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(vegas_map_8mb,0)
 

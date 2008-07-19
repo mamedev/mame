@@ -459,18 +459,17 @@ static MACHINE_START( xsleena )
 static MACHINE_DRIVER_START( xsleena )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, 1500000)	/* Confirmed 1.5MHz */
+	MDRV_CPU_ADD("main", M6809, 1500000)	/* Confirmed 1.5MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(xain_interrupt,256)
 
-	MDRV_CPU_ADD(M6809, 1500000)	/* Confirmed 1.5MHz */
+	MDRV_CPU_ADD("sub", M6809, 1500000)	/* Confirmed 1.5MHz */
 	MDRV_CPU_PROGRAM_MAP(cpu_map_B,0)
 
-	MDRV_CPU_ADD(M6809, 1500000)	/* Confirmed 1.5MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6809, 1500000)	/* Confirmed 1.5MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
-//  MDRV_CPU_ADD(M68705, 3000000)    /* Confirmed 3MHz */
+//  MDRV_CPU_ADD("mcu", M68705, 3000000)    /* Confirmed 3MHz */
 //  MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	MDRV_MACHINE_START(xsleena)

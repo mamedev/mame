@@ -488,7 +488,7 @@ ADDRESS_MAP_END
 
 /********* machine driver ***********/
 MACHINE_DRIVER_START(mcr_ssio)
-	MDRV_CPU_ADD_TAG("ssio", Z80, SSIO_CLOCK/2/4)
+	MDRV_CPU_ADD("ssio", Z80, SSIO_CLOCK/2/4)
 	MDRV_CPU_PROGRAM_MAP(ssio_map,0)
 	MDRV_CPU_PERIODIC_INT(ssio_14024_clock, SSIO_CLOCK/2/16/10)
 
@@ -608,7 +608,7 @@ static const pia6821_interface csdeluxe_pia_intf =
 
 /********* machine driver ***********/
 MACHINE_DRIVER_START(chip_squeak_deluxe)
-	MDRV_CPU_ADD_TAG("csd", M68000, CSDELUXE_CLOCK/2)
+	MDRV_CPU_ADD("csd", M68000, CSDELUXE_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(csdeluxe_map,0)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -617,7 +617,7 @@ MACHINE_DRIVER_START(chip_squeak_deluxe)
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START(chip_squeak_deluxe_stereo)
-	MDRV_CPU_ADD_TAG("csd", M68000, CSDELUXE_CLOCK/2)
+	MDRV_CPU_ADD("csd", M68000, CSDELUXE_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(csdeluxe_map,0)
 
 	MDRV_SOUND_ADD("csd", DAC, 0)
@@ -715,7 +715,7 @@ static const pia6821_interface soundsgood_pia_intf =
 
 /********* machine driver ***********/
 MACHINE_DRIVER_START(sounds_good)
-	MDRV_CPU_ADD_TAG("sg", M68000, SOUNDSGOOD_CLOCK/2)
+	MDRV_CPU_ADD("sg", M68000, SOUNDSGOOD_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(soundsgood_map,0)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -804,7 +804,7 @@ static const pia6821_interface turbocs_pia_intf =
 
 /********* machine driver ***********/
 MACHINE_DRIVER_START(turbo_chip_squeak)
-	MDRV_CPU_ADD_TAG("tcs", M6809E, TURBOCS_CLOCK)
+	MDRV_CPU_ADD("tcs", M6809E, TURBOCS_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(turbocs_map,0)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -952,7 +952,7 @@ static const pia6821_interface squawkntalk_pia1_intf =
 
 /********* machine driver ***********/
 MACHINE_DRIVER_START(squawk_n_talk)
-	MDRV_CPU_ADD_TAG("snt", M6802, SQUAWKTALK_CLOCK)
+	MDRV_CPU_ADD("snt", M6802, SQUAWKTALK_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(squawkntalk_map,0)
 
 	/* only used on Discs of Tron, which is stereo */

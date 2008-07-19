@@ -465,7 +465,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( sprint8 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6800, 11055000 / 11) /* ? */
+	MDRV_CPU_ADD("main", M6800, 11055000 / 11) /* ? */
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
 
 	MDRV_MACHINE_RESET(sprint8)

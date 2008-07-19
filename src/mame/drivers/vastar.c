@@ -307,12 +307,12 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( vastar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 3072000)	/* 3.072 MHz ???? */
+	MDRV_CPU_ADD("main", Z80, 3072000)	/* 3.072 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_port_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz ???? */
+	MDRV_CPU_ADD("sub", Z80, 3072000)	/* 3.072 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_IO_MAP(cpu2_port_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* ??? */

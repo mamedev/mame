@@ -603,17 +603,17 @@ static MACHINE_RESET( airbustr )
 
 static MACHINE_DRIVER_START( airbustr )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("master", Z80, 6000000)	// ???
+	MDRV_CPU_ADD("master", Z80, 6000000)	// ???
 	MDRV_CPU_PROGRAM_MAP(master_map, 0)
 	MDRV_CPU_IO_MAP(master_io_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(master_interrupt, 2)	// nmi caused by sub cpu?, ?
 
-	MDRV_CPU_ADD_TAG("slave", Z80, 6000000)	// ???
+	MDRV_CPU_ADD("slave", Z80, 6000000)	// ???
 	MDRV_CPU_PROGRAM_MAP(slave_map, 0)
 	MDRV_CPU_IO_MAP(slave_io_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(slave_interrupt, 2)		// nmi caused by main cpu, ?
 
-	MDRV_CPU_ADD_TAG("audio", Z80, 6000000)	// ???
+	MDRV_CPU_ADD("audio", Z80, 6000000)	// ???
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_IO_MAP(sound_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)		// nmi are caused by sub cpu writing a sound command

@@ -1520,12 +1520,12 @@ static const struct sp0250_interface sp0250_interface =
 static MACHINE_DRIVER_START( gottlieb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", I8088, 5000000)	/* 5 MHz */
+	MDRV_CPU_ADD("main", I8088, 5000000)	/* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(gottlieb_map,0)
 	MDRV_CPU_VBLANK_INT("main", gottlieb_interrupt)
 
 	/* audio CPU */
-	MDRV_CPU_ADD_TAG("sound", M6502, 3579545/4)	/* the board can be set to /2 as well */
+	MDRV_CPU_ADD("sound", M6502, 3579545/4)	/* the board can be set to /2 as well */
 	MDRV_CPU_PROGRAM_MAP(gottlieb_sound_map,0)
 								/* NMIs are triggered by the Votrax SC-01 */
 
@@ -1598,15 +1598,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gottlieb2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", I8088, 5000000)	/* 5 MHz */
+	MDRV_CPU_ADD("main", I8088, 5000000)	/* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(gottlieb_map,0)
 	MDRV_CPU_VBLANK_INT("main", gottlieb_interrupt)
 
-	MDRV_CPU_ADD_TAG("sound", M6502, 1000000)	/* 1 MHz */
+	MDRV_CPU_ADD("sound", M6502, 1000000)	/* 1 MHz */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(stooges_sound_map,0)
 
-	MDRV_CPU_ADD_TAG("sound2", M6502, 1000000)	/* 1 MHz */
+	MDRV_CPU_ADD("sound2", M6502, 1000000)	/* 1 MHz */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(stooges_sound2_map,0)
 

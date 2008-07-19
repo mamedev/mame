@@ -961,16 +961,16 @@ static const struct SEGAPCMinterface segapcm_interface =
 static MACHINE_DRIVER_START( yboard )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
-	MDRV_CPU_ADD_TAG("subx", M68000, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("subx", M68000, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(subx_map,0)
 
-	MDRV_CPU_ADD_TAG("suby", M68000, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("suby", M68000, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(suby_map,0)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, SOUND_CLOCK/8)
+	MDRV_CPU_ADD("sound", Z80, SOUND_CLOCK/8)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)

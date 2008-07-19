@@ -384,15 +384,15 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( wc90b )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_14MHz/2)
+	MDRV_CPU_ADD("main", Z80, XTAL_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(wc90b_map1,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_14MHz/2)
+	MDRV_CPU_ADD("sub", Z80, XTAL_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(wc90b_map2,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_19_6608MHz/8)
+	MDRV_CPU_ADD("audio", Z80, XTAL_19_6608MHz/8)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
 	/* IRQs are triggered by the main CPU */
 

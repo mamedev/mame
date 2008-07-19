@@ -231,7 +231,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( dommy )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 1500000)
+	MDRV_CPU_ADD("main", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(dommy_readmem,dommy_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,16)
 
@@ -264,7 +264,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( scregg )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 1500000)
+	MDRV_CPU_ADD("main", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(eggs_readmem,eggs_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,16)
 

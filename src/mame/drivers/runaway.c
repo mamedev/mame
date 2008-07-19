@@ -352,7 +352,7 @@ static const struct POKEYinterface pokey_interface_2 =
 static MACHINE_DRIVER_START( runaway )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 12096000 / 8) /* ? */
+	MDRV_CPU_ADD("main", M6502, 12096000 / 8) /* ? */
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
 
 	MDRV_MACHINE_RESET(runaway)

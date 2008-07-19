@@ -384,16 +384,16 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( chinhero )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_18_432MHz/6) /* verified on pcb */
+	MDRV_CPU_ADD("main", Z80, XTAL_18_432MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(chinhero_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD_TAG("bbx", Z80, XTAL_18_432MHz/6) /* verified on pcb */
+	MDRV_CPU_ADD("bbx", Z80, XTAL_18_432MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(chinhero_bbx_map,0)
 	MDRV_CPU_IO_MAP(chinhero_bbx_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD_TAG("audio", Z80, XTAL_18_432MHz/6) /* verified on pcb */
+	MDRV_CPU_ADD("audio", Z80, XTAL_18_432MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(chinhero_sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
@@ -474,7 +474,7 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( dynamski )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 3000000) /* ? */
+	MDRV_CPU_ADD("main", Z80, 3000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(dynamski_map,0)
 	MDRV_CPU_IO_MAP(dynamski_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

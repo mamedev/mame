@@ -252,7 +252,7 @@ static NVRAM_HANDLER( showhand )
 
 static MACHINE_DRIVER_START( astrocorp )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_25_601712MHz / 2)
+	MDRV_CPU_ADD("main", M68000, XTAL_25_601712MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(astrocorp_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 

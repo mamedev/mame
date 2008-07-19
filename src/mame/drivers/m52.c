@@ -383,7 +383,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( m52 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/6)
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

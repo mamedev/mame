@@ -616,11 +616,11 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( system_A )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
+	MDRV_CPU_ADD("main", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
 	MDRV_CPU_PROGRAM_MAP(readmem_A,writemem_A)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_A,INTERRUPT_NUM_A)
 
-	MDRV_CPU_ADD_TAG("sound", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
+	MDRV_CPU_ADD("sound", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_A,sound_writemem_A)
 
@@ -726,7 +726,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( system_D )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, SYS_D_CPU_CLOCK)	/* 8MHz */
+	MDRV_CPU_ADD("main", M68000, SYS_D_CPU_CLOCK)	/* 8MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_D,writemem_D)
 	MDRV_CPU_VBLANK_INT("main", interrupt_D)
 
@@ -788,12 +788,11 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( system_Z )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
+	MDRV_CPU_ADD("main", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
 	MDRV_CPU_PROGRAM_MAP(readmem_A,writemem_A)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_A,INTERRUPT_NUM_A)
 
-	MDRV_CPU_ADD(Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_z80,sound_writemem_z80)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 

@@ -39,7 +39,7 @@ INPUT_PORTS_END
 
 
 static MACHINE_DRIVER_START( igs_m68 )
-	MDRV_CPU_ADD_TAG("main", M68000, 22000000 /2)	 // 11mhz
+	MDRV_CPU_ADD("main", M68000, 22000000 /2)	 // 11mhz
 	MDRV_CPU_PROGRAM_MAP(igs_m68_map,0)
 	//MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 

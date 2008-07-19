@@ -475,7 +475,7 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( limenko )
-	MDRV_CPU_ADD_TAG("main", E132XN, 20000000*4)	/* 4x internal multiplier */
+	MDRV_CPU_ADD("main", E132XN, 20000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(limenko_map,0)
 	MDRV_CPU_IO_MAP(limenko_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -500,12 +500,12 @@ static MACHINE_DRIVER_START( limenko )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( spotty )
-	MDRV_CPU_ADD_TAG("main", GMS30C2232, 20000000)	/* 20 MHz, no internal multiplier */
+	MDRV_CPU_ADD("main", GMS30C2232, 20000000)	/* 20 MHz, no internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(spotty_map,0)
 	MDRV_CPU_IO_MAP(spotty_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(I8051, 4000000)	/* 4 MHz */
+	MDRV_CPU_ADD("audio", I8051, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(spotty_sound_prg_map, 0)
 	MDRV_CPU_DATA_MAP(0, 0)
 	MDRV_CPU_IO_MAP(spotty_sound_io_map,0)

@@ -2722,7 +2722,7 @@ static DRIVER_INIT( salarymc )
 
 static MACHINE_DRIVER_START( konami573 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",  PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD("main",  PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( konami573_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", sys573_vblank)
 

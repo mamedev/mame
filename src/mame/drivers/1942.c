@@ -270,11 +270,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( 1942 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MAIN_CPU_CLOCK)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("main", Z80, MAIN_CPU_CLOCK)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(c1942_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(c1942_interrupt,2)
 
-	MDRV_CPU_ADD_TAG("audio", Z80, SOUND_CPU_CLOCK)	/* 3 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80, SOUND_CPU_CLOCK)	/* 3 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 

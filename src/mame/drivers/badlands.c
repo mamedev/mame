@@ -436,11 +436,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( badlands )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("main", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", vblank_int)
 
-	MDRV_CPU_ADD(M6502, ATARI_CLOCK_14MHz/8)
+	MDRV_CPU_ADD("audio", M6502, ATARI_CLOCK_14MHz/8)
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
 	MDRV_MACHINE_RESET(badlands)
@@ -652,11 +652,11 @@ static MACHINE_RESET( badlandb )
 static MACHINE_DRIVER_START( badlandb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 2800000/2)
+	MDRV_CPU_ADD("main", M68000, 2800000/2)
 	MDRV_CPU_PROGRAM_MAP(bootleg_map,0)
 	MDRV_CPU_VBLANK_INT("main", vblank_int)
 
-//  MDRV_CPU_ADD(Z80, 2800000/8)
+//  MDRV_CPU_ADD("audio", Z80, 2800000/8)
 //  MDRV_CPU_PROGRAM_MAP(bootleg_soundmap,0)
 
 	MDRV_MACHINE_RESET(badlandb)

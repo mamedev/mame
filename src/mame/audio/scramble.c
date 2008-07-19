@@ -424,7 +424,7 @@ static SOUND_START( ad2083 )
 
 MACHINE_DRIVER_START( ad2083_audio )
 
-	MDRV_CPU_ADD_TAG("audio", Z80, 14318000/8)	/* 1.78975 MHz */
+	MDRV_CPU_ADD("audio", Z80, 14318000/8)	/* 1.78975 MHz */
 	MDRV_CPU_PROGRAM_MAP(ad2083_sound_map,0)
 	MDRV_CPU_IO_MAP(ad2083_sound_io_map,0)
 

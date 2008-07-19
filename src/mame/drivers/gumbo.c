@@ -307,7 +307,7 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( gumbo )
-	MDRV_CPU_ADD_TAG("main", M68000, 14318180 /2)	 // or 10mhz? ?
+	MDRV_CPU_ADD("main", M68000, 14318180 /2)	 // or 10mhz? ?
 	MDRV_CPU_PROGRAM_MAP(gumbo_readmem,gumbo_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold) // all the same
 

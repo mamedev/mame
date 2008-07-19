@@ -637,15 +637,15 @@ static const struct TMS5220interface tms5220_interface =
 static MACHINE_DRIVER_START( zaccaria )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,XTAL_18_432MHz/6)	/* verified on pcb */
+	MDRV_CPU_ADD("main", Z80,XTAL_18_432MHz/6)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(M6802,XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("audio", M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map_1,0)
 	MDRV_CPU_PERIODIC_INT(zaccaria_cb1_toggle,(double)3580000/4096)
 
-	MDRV_CPU_ADD(M6802,XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("audio2", M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map_2,0)
 
 	MDRV_MACHINE_START(zaccaria)

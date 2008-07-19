@@ -243,12 +243,9 @@ union _machine_config_token
 
 
 /* add/modify/remove/replace CPUs */
-#define MDRV_CPU_ADD_TAG(_tag, _type, _clock) \
+#define MDRV_CPU_ADD(_tag, _type, _clock) \
 	TOKEN_UINT64_PACK3(MCONFIG_TOKEN_CPU_ADD, 8, CPU_##_type, 24, _clock, 32), \
 	TOKEN_STRING(_tag),
-
-#define MDRV_CPU_ADD(_type, _clock) \
-	MDRV_CPU_ADD_TAG(NULL, _type, _clock)
 
 #define MDRV_CPU_MODIFY(_tag) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_MODIFY, 8), \

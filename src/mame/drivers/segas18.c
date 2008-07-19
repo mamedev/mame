@@ -1266,11 +1266,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( system18 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(system18_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 8000000)
+	MDRV_CPU_ADD("sound", Z80, 8000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
@@ -1310,7 +1310,7 @@ static MACHINE_DRIVER_START( system18_8751 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_VBLANK_INT_HACK(NULL,0)
 
-	MDRV_CPU_ADD(I8751, 8000000)
+	MDRV_CPU_ADD("mcu", I8751, 8000000)
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_DATA_MAP(mcu_data_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_pulse)

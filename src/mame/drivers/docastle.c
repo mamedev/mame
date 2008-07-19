@@ -650,17 +650,17 @@ static const struct MSM5205interface msm5205_interface =
 
 static MACHINE_DRIVER_START( docastle )
 	// basic machine hardware
-//  MDRV_CPU_ADD_TAG("main", Z80, 4000000)  // 4 MHz
-	MDRV_CPU_ADD_TAG("main", Z80, 3980000)	// make dip switches work in docastle and dorunrun and fix dorunru2 attract sequence
+//  MDRV_CPU_ADD("main", Z80, 4000000)  // 4 MHz
+	MDRV_CPU_ADD("main", Z80, 3980000)	// make dip switches work in docastle and dorunrun and fix dorunru2 attract sequence
 	MDRV_CPU_PROGRAM_MAP(docastle_map, 0)
 	MDRV_CPU_IO_MAP(docastle_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD_TAG("slave", Z80, 4000000)	// 4 MHz
+	MDRV_CPU_ADD("slave", Z80, 4000000)	// 4 MHz
 	MDRV_CPU_PROGRAM_MAP(docastle_map2, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 8)
 
-	MDRV_CPU_ADD(Z80, 4000000)	// 4 MHz
+	MDRV_CPU_ADD("cpu3", Z80, 4000000)	// 4 MHz
 	MDRV_CPU_PROGRAM_MAP(docastle_map3, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 

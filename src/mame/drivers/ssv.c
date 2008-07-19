@@ -2795,7 +2795,7 @@ static DRIVER_INIT( jsk )			{	init_ssv();
 static MACHINE_DRIVER_START( ssv )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", V60, 16000000) /* Based on STA-0001 & STA-0001B System boards */
+	MDRV_CPU_ADD("main", V60, 16000000) /* Based on STA-0001 & STA-0001B System boards */
 	MDRV_CPU_VBLANK_INT_HACK(ssv_interrupt,2)	/* Vblank */
 
 	MDRV_MACHINE_RESET(ssv)
@@ -3077,7 +3077,7 @@ static MACHINE_DRIVER_START( jsk )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(jsk_readmem, jsk_writemem)
 
-	MDRV_CPU_ADD(V810,25000000)
+	MDRV_CPU_ADD("sub", V810,25000000)
 	MDRV_CPU_PROGRAM_MAP(jsk_v810_mem, 0)
 
 	/* video hardware */

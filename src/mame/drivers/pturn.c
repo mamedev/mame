@@ -445,13 +445,12 @@ static MACHINE_RESET( pturn )
 }
 
 static MACHINE_DRIVER_START( pturn )
-	MDRV_CPU_ADD_TAG("main", Z80, 12000000/3)
+	MDRV_CPU_ADD("main", Z80, 12000000/3)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", pturn_main_intgen)
 	MDRV_MACHINE_RESET(pturn)
 
-	MDRV_CPU_ADD(Z80, 12000000/3)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 12000000/3)
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(pturn_sub_intgen,3)
 

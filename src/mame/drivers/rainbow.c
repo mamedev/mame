@@ -609,11 +609,11 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( rainbow )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_16MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(rainbow_readmem,rainbow_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_16MHz/4) /* verified on pcb */
+	MDRV_CPU_ADD("audio", Z80, XTAL_16MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(rainbow_s_readmem,rainbow_s_writemem)
 
 	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
@@ -646,11 +646,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( jumping )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_24MHz/3)	/* not verified but matches original */
+	MDRV_CPU_ADD("main", M68000, XTAL_24MHz/3)	/* not verified but matches original */
 	MDRV_CPU_PROGRAM_MAP(jumping_readmem,jumping_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_18_432MHz/6)	/* not verified but music tempo matches original */
+	MDRV_CPU_ADD("audio", Z80, XTAL_18_432MHz/6)	/* not verified but music tempo matches original */
 	MDRV_CPU_PROGRAM_MAP(jumping_sound_readmem,jumping_sound_writemem)
 
 	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame - enough ? */

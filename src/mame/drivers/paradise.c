@@ -537,7 +537,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( paradise )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_12MHz/2)			/* Z8400B - 6mhz Verified */
+	MDRV_CPU_ADD("main", Z80, XTAL_12MHz/2)			/* Z8400B - 6mhz Verified */
 	MDRV_CPU_PROGRAM_MAP(paradise_map,0)
 	MDRV_CPU_IO_MAP(paradise_readport,paradise_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No nmi routine */

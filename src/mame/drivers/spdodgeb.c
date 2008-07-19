@@ -433,12 +433,11 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( spdodgeb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502,12000000/6)	/* 2MHz ? */
+	MDRV_CPU_ADD("main", M6502,12000000/6)	/* 2MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(spdodgeb_interrupt,33)	/* 1 IRQ every 8 visible scanlines, plus NMI for vblank */
 
-	MDRV_CPU_ADD(M6809,12000000/6)
-	/* audio CPU */	/* 2MHz ? */
+	MDRV_CPU_ADD("audio", M6809,12000000/6)	/* 2MHz ? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */

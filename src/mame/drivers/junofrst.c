@@ -335,16 +335,14 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( junofrst )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, 1500000)			/* 1.5 MHz ??? */
+	MDRV_CPU_ADD("main", M6809, 1500000)			/* 1.5 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,14318000/8)
-	/* audio CPU */	/* 1.78975 MHz */
+	MDRV_CPU_ADD("audio", Z80,14318000/8)	/* 1.78975 MHz */
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
-	MDRV_CPU_ADD(I8039,8000000)
-	/* audio CPU */	/* 8MHz crystal */
+	MDRV_CPU_ADD("mcu", I8039,8000000)	/* 8MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_IO_MAP(mcu_io_map,0)
 

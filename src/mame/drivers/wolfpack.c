@@ -323,7 +323,7 @@ static MACHINE_DRIVER_START(wolfpack)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 12096000 / 16)
+	MDRV_CPU_ADD("main", M6502, 12096000 / 16)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	/* video hardware */

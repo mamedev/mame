@@ -145,13 +145,13 @@ static const TMS9928a_interface tms9928a_interface =
 
 static MACHINE_DRIVER_START( kingpin )
 /*  MAIN CPU */
-	MDRV_CPU_ADD_TAG("main", Z80, 3579545)
+	MDRV_CPU_ADD("main", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(kingpin_program_map,0)
 	MDRV_CPU_IO_MAP(kingpin_readport,kingpin_writeport)
 	MDRV_CPU_VBLANK_INT("main", kingpin_video_interrupt)
 
 /*  SOUND CPU */
-	MDRV_CPU_ADD(Z80, 3579545)
+	MDRV_CPU_ADD("audio", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(kingpin_sound_map,0)
 	/*MDRV_CPU_IO_MAP(readport2,writeport2)*/
 

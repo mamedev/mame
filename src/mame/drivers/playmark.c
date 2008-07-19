@@ -965,11 +965,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( bigtwin )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(bigtwin_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-	MDRV_CPU_ADD(PIC16C57, 12000000)	/* 3MHz */
+	MDRV_CPU_ADD("mcu", PIC16C57, 12000000)	/* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
@@ -999,11 +999,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( wbeachvl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(wbeachvl_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-//  MDRV_CPU_ADD(PIC16C57, 12000000)   /* 3MHz */
+//  MDRV_CPU_ADD("mcu", PIC16C57, 12000000)   /* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
 //  MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
@@ -1034,11 +1034,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( excelsr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(excelsr_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-	MDRV_CPU_ADD(PIC16C57, 12000000)	/* 3MHz */
+	MDRV_CPU_ADD("mcu", PIC16C57, 12000000)	/* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
@@ -1067,11 +1067,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hotmind )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_24MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_24MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(hotmind_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-	MDRV_CPU_ADD(PIC16C57, XTAL_24MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("mcu", PIC16C57, XTAL_24MHz/2)	/* verified on pcb */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
@@ -1102,11 +1102,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hrdtimes )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_24MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_24MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(hrdtimes_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-//  MDRV_CPU_ADD(PIC16C57, XTAL_24MHz/2)    /* verified on pcb */
+//  MDRV_CPU_ADD("mcu", PIC16C57, XTAL_24MHz/2)    /* verified on pcb */
 	/* Program and Data Maps are internal to the MCU */
 //  MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 

@@ -243,12 +243,11 @@ static GFXDECODE_START( ksayakyu )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( ksayakyu )
-	MDRV_CPU_ADD_TAG("main", Z80,8000000/2)
+	MDRV_CPU_ADD("main", Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(maincpu_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 80000000/2)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 80000000/2)
 	MDRV_CPU_PROGRAM_MAP(soundcpu_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 

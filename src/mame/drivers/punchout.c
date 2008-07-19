@@ -700,13 +700,12 @@ static const struct VLM5030interface vlm5030_interface =
 static MACHINE_DRIVER_START( punchout )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 8000000/2)	/* 4 MHz */
+	MDRV_CPU_ADD("main", Z80, 8000000/2)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(punchout_map,0)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("top", nmi_line_pulse)
 
-	MDRV_CPU_ADD(N2A03, N2A03_DEFAULTCLOCK)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", N2A03, N2A03_DEFAULTCLOCK)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT("top", nmi_line_pulse)
 

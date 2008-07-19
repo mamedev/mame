@@ -341,13 +341,13 @@ static INTERRUPT_GEN( vblank_callback_lgp )
 /* DRIVER */
 static MACHINE_DRIVER_START( lgp )
 /*  main cpu */
-	MDRV_CPU_ADD_TAG("main", Z80, CPU_PCB_CLOCK)
+	MDRV_CPU_ADD("main", Z80, CPU_PCB_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_program_map,0)
 	MDRV_CPU_IO_MAP(main_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", vblank_callback_lgp)
 
 /*  sound cpu */
-	MDRV_CPU_ADD(Z80, SOUND_PCB_CLOCK)
+	MDRV_CPU_ADD("audio", Z80, SOUND_PCB_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(sound_program_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 

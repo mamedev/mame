@@ -736,7 +736,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( cpoker )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80, 3579545)
+	MDRV_CPU_ADD("main",Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(map,0)
 	MDRV_CPU_IO_MAP(cpoker_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(cpoker_interrupt,8)

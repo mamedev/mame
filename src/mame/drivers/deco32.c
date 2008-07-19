@@ -1872,12 +1872,11 @@ static INTERRUPT_GEN( tattass_snd_interrupt )
 static MACHINE_DRIVER_START( captaven )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", ARM, 28000000/4)
+	MDRV_CPU_ADD("main", ARM, 28000000/4)
 	MDRV_CPU_PROGRAM_MAP(captaven_readmem,captaven_writemem)
 	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
-	MDRV_CPU_ADD(H6280, 32220000/8)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", H6280, 32220000/8)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_RESET(deco32)
@@ -1920,12 +1919,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fghthist )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", ARM, 28000000/4)
+	MDRV_CPU_ADD("main", ARM, 28000000/4)
 	MDRV_CPU_PROGRAM_MAP(fghthist_readmem,fghthist_writemem)
 	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
-	MDRV_CPU_ADD(H6280, 32220000/8)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", H6280, 32220000/8)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_NVRAM_HANDLER(93C46)
@@ -1967,11 +1965,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fghthsta )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", ARM, 28000000/4)
+	MDRV_CPU_ADD("main", ARM, 28000000/4)
 	MDRV_CPU_PROGRAM_MAP(fghthsta_memmap,0)
 	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
-	MDRV_CPU_ADD(H6280, 32220000/8) /* audio CPU */
+	MDRV_CPU_ADD("audio", H6280, 32220000/8) /* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_NVRAM_HANDLER(93C46)
@@ -2013,12 +2011,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dragngun )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", ARM, 28000000/4)
+	MDRV_CPU_ADD("main", ARM, 28000000/4)
 	MDRV_CPU_PROGRAM_MAP(dragngun_readmem,dragngun_writemem)
 	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
-	MDRV_CPU_ADD(H6280, 32220000/8)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", H6280, 32220000/8)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_RESET(deco32)
@@ -2067,12 +2064,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( lockload )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", ARM, 28000000/4)
+	MDRV_CPU_ADD("main", ARM, 28000000/4)
 	MDRV_CPU_PROGRAM_MAP(lockload_readmem,lockload_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(deco32_vbl_interrupt,2) // From 2
 
-	MDRV_CPU_ADD(H6280, 32220000/8)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", H6280, 32220000/8)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_RESET(deco32)
@@ -2121,12 +2117,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tattass )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", ARM, 28000000/4) /* Unconfirmed */
+	MDRV_CPU_ADD("main", ARM, 28000000/4) /* Unconfirmed */
 	MDRV_CPU_PROGRAM_MAP(tattass_readmem,tattass_writemem)
 	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
-	MDRV_CPU_ADD(M6809, 2000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6809, 2000000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_tattass,sound_writemem_tattass)
 	MDRV_CPU_PERIODIC_INT(tattass_snd_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
 
@@ -2159,11 +2154,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( nslasher )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", ARM, 28322000/4)
+	MDRV_CPU_ADD("main", ARM, 28322000/4)
 	MDRV_CPU_PROGRAM_MAP(nslasher_readmem,nslasher_writemem)
 	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
-	MDRV_CPU_ADD(Z80, 32220000/9)
+	MDRV_CPU_ADD("audio", Z80, 32220000/9)
 	MDRV_CPU_PROGRAM_MAP(nslasher_sound,0)
 	MDRV_CPU_IO_MAP(nslasher_io_sound,0)
 

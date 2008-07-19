@@ -1032,7 +1032,7 @@ static const struct pit8253_config mediagx_pit8254_config =
 static MACHINE_DRIVER_START(mediagx)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", MEDIAGX, 166000000)
+	MDRV_CPU_ADD("main", MEDIAGX, 166000000)
 	MDRV_CPU_PROGRAM_MAP(mediagx_map, 0)
 	MDRV_CPU_IO_MAP(mediagx_io, 0)
 

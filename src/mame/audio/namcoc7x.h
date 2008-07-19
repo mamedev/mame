@@ -34,13 +34,13 @@ static const struct C352interface namcoc7x_c352_interface =	\
 	ROM_LOAD( "pr1data.8k", 0x80000, 0x80000, BAD_DUMP CRC(2e5767a4) SHA1(390bf05c90044d841fe2dd4a427177fa1570b9a6) )
 
 #define NAMCO_C7X_MCU(clock)	\
-	MDRV_CPU_ADD_TAG("mcu", M37702, clock)	\
+	MDRV_CPU_ADD("mcu", M37702, clock)	\
 	MDRV_CPU_PROGRAM_MAP(namcoc7x_mcu_map, 0)	\
 	MDRV_CPU_IO_MAP(namcoc7x_mcu_io, 0)	\
 	MDRV_CPU_VBLANK_INT_HACK(namcoc7x_interrupt, 2)
 
 #define NAMCO_C7X_MCU_SHARED(clock)	\
-	MDRV_CPU_ADD_TAG("mcu", M37702, clock)	\
+	MDRV_CPU_ADD("mcu", M37702, clock)	\
 	MDRV_CPU_PROGRAM_MAP(namcoc7x_mcu_share_map, 0)	\
 	MDRV_CPU_IO_MAP(namcoc7x_mcu_io, 0)	\
 	MDRV_CPU_VBLANK_INT_HACK(namcoc7x_interrupt, 2)

@@ -292,12 +292,11 @@ static const struct VLM5030interface vlm5030_interface =
 static MACHINE_DRIVER_START( rockrage )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", HD6309, 3000000*4)		/* 24MHz/8 */
+	MDRV_CPU_ADD("main", HD6309, 3000000*4)		/* 24MHz/8 */
 	MDRV_CPU_PROGRAM_MAP(rockrage_readmem,rockrage_writemem)
 	MDRV_CPU_VBLANK_INT("main", rockrage_interrupt)
 
-	MDRV_CPU_ADD(M6809, 1500000)		/* 24MHz/16 */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6809, 1500000)		/* 24MHz/16 */
 	MDRV_CPU_PROGRAM_MAP(rockrage_readmem_sound,rockrage_writemem_sound)
 
 	/* video hardware */

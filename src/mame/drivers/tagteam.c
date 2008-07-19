@@ -254,12 +254,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( tagteam )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 1500000)	/* 1.5 MHz ?? */
+	MDRV_CPU_ADD("main", M6502, 1500000)	/* 1.5 MHz ?? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", tagteam_interrupt)
 
-	MDRV_CPU_ADD(M6502, 975000)
-	/* audio CPU */  /* 975 kHz ?? */
+	MDRV_CPU_ADD("audio", M6502, 975000)  /* 975 kHz ?? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)   /* IRQs are triggered by the main CPU */
 

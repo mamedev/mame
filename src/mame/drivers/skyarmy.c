@@ -261,7 +261,7 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( skyarmy )
-	MDRV_CPU_ADD_TAG("main", Z80,4000000)
+	MDRV_CPU_ADD("main", Z80,4000000)
 	MDRV_CPU_PROGRAM_MAP(skyarmy_readmem,skyarmy_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

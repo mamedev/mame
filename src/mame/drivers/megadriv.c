@@ -2956,7 +2956,7 @@ INPUT_PORTS_END
 MACHINE_DRIVER_START( megdsvp )
 	MDRV_IMPORT_FROM(megadriv)
 
-	MDRV_CPU_ADD(SSP1601, MASTER_CLOCK / 7 * 3) /* ~23 MHz (guessed) */
+	MDRV_CPU_ADD("svp", SSP1601, MASTER_CLOCK / 7 * 3) /* ~23 MHz (guessed) */
 	MDRV_CPU_PROGRAM_MAP(svp_ssp_map, 0)
 	MDRV_CPU_IO_MAP(svp_ext_map, 0)
 	/* IRQs are not used by this CPU */
@@ -5015,11 +5015,11 @@ static NVRAM_HANDLER( megadriv )
 
 
 MACHINE_DRIVER_START( megadriv )
-	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK / 7) /* 7.67 MHz */
+	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK / 7) /* 7.67 MHz */
 	MDRV_CPU_PROGRAM_MAP(megadriv_readmem,megadriv_writemem)
 	/* IRQs are handled via the timers */
 
-	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK / 15) /* 3.58 MHz */
+	MDRV_CPU_ADD("sound", Z80, MASTER_CLOCK / 15) /* 3.58 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
 	MDRV_CPU_IO_MAP(z80_portmap,0)
 	/* IRQ handled via the timers */
@@ -5082,10 +5082,10 @@ MACHINE_DRIVER_START( _32x )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(_32x_readmem,_32x_writemem)
 
-	MDRV_CPU_ADD_TAG("SH2main", SH2, 10000000 )
+	MDRV_CPU_ADD("SH2main", SH2, 10000000 )
 	MDRV_CPU_PROGRAM_MAP(sh2main_readmem,sh2main_writemem)
 
-	MDRV_CPU_ADD_TAG("SH2slave", SH2, 10000000 )
+	MDRV_CPU_ADD("SH2slave", SH2, 10000000 )
 	MDRV_CPU_PROGRAM_MAP(sh2slave_readmem,sh2slave_writemem)
 MACHINE_DRIVER_END
 

@@ -930,7 +930,7 @@ static const struct CustomSound_interface custom_interface =
 
 MACHINE_DRIVER_START( exidy440_audio )
 
-	MDRV_CPU_ADD_TAG("audio", M6809, EXIDY440_AUDIO_CLOCK)
+	MDRV_CPU_ADD("audio", M6809, EXIDY440_AUDIO_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(exidy440_audio_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 

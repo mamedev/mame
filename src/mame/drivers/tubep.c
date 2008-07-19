@@ -902,20 +902,20 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( tubep )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,16000000 / 4)	/* 4 MHz */
+	MDRV_CPU_ADD("main",Z80,16000000 / 4)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(tubep_main_map,0)
 	MDRV_CPU_IO_MAP(tubep_main_portmap,0)
 
-	MDRV_CPU_ADD_TAG("slave",Z80,16000000 / 4)	/* 4 MHz */
+	MDRV_CPU_ADD("slave",Z80,16000000 / 4)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(tubep_second_map,0)
 	MDRV_CPU_IO_MAP(tubep_second_portmap,0)
 
 	/* audio CPU */
-	MDRV_CPU_ADD_TAG("sound",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
+	MDRV_CPU_ADD("sound",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
 	MDRV_CPU_PROGRAM_MAP(tubep_sound_map,0)
 	MDRV_CPU_IO_MAP(tubep_sound_portmap,0)
 
-	MDRV_CPU_ADD_TAG("nsc",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
+	MDRV_CPU_ADD("nsc",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
 	MDRV_CPU_PROGRAM_MAP(nsc_map,0)
 
 	MDRV_INTERLEAVE(100)
@@ -958,7 +958,7 @@ static MACHINE_DRIVER_START( tubepb )
 
 	MDRV_CPU_REMOVE("nsc")
 
-	MDRV_CPU_ADD(M6802,6000000) /* ? MHz Xtal */
+	MDRV_CPU_ADD("mcu", M6802,6000000) /* ? MHz Xtal */
 	MDRV_CPU_PROGRAM_MAP(nsc_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 MACHINE_DRIVER_END
@@ -967,20 +967,20 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rjammer )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,16000000 / 4)	/* 4 MHz */
+	MDRV_CPU_ADD("main",Z80,16000000 / 4)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(rjammer_main_map,0)
 	MDRV_CPU_IO_MAP(rjammer_main_portmap,0)
 
-	MDRV_CPU_ADD_TAG("slave",Z80,16000000 / 4)	/* 4 MHz */
+	MDRV_CPU_ADD("slave",Z80,16000000 / 4)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(rjammer_second_map,0)
 	MDRV_CPU_IO_MAP(rjammer_second_portmap,0)
 
 	/* audio CPU */
-	MDRV_CPU_ADD_TAG("sound",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
+	MDRV_CPU_ADD("sound",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
 	MDRV_CPU_PROGRAM_MAP(rjammer_sound_map,0)
 	MDRV_CPU_IO_MAP(rjammer_sound_portmap,0)
 
-	MDRV_CPU_ADD_TAG("nsc",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
+	MDRV_CPU_ADD("nsc",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
 	MDRV_CPU_PROGRAM_MAP(nsc_map,0)
 
 	MDRV_MACHINE_START(rjammer)

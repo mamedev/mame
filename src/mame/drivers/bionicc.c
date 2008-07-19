@@ -346,12 +346,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( bionicc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK / 2) /* 12 MHz - verified in schematics */
+	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK / 2) /* 12 MHz - verified in schematics */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(bionicc_interrupt,8)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(Z80, EXO3_F0_CLK / 4)   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
+	MDRV_CPU_ADD("audio", Z80, EXO3_F0_CLK / 4)   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	/* FIXME: interrupt timing
      * schematics indicate that nmi_line is set on  M680000 access with AB1=1

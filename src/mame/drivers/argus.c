@@ -701,11 +701,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( argus )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 5000000)			/* 4 MHz */
+	MDRV_CPU_ADD("main", Z80, 5000000)			/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(argus_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 
-	MDRV_CPU_ADD(Z80, 5000000)
+	MDRV_CPU_ADD("audio", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map_a,0)
 	MDRV_CPU_IO_MAP(sound_portmap_1,0)
 
@@ -738,11 +738,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( valtric )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 5000000)			/* 5 MHz */
+	MDRV_CPU_ADD("main", Z80, 5000000)			/* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(valtric_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 
-	MDRV_CPU_ADD(Z80, 5000000)
+	MDRV_CPU_ADD("audio", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map_a,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2,0)
 
@@ -781,11 +781,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( butasan )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 5000000)			/* 5 MHz */
+	MDRV_CPU_ADD("main", Z80, 5000000)			/* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(butasan_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 
-	MDRV_CPU_ADD(Z80, 5000000)
+	MDRV_CPU_ADD("audio", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map_b,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2,0)
 
@@ -824,11 +824,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bombsa )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 5000000)			/* 5 MHz */
+	MDRV_CPU_ADD("main", Z80, 5000000)			/* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(bombsa_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 
-	MDRV_CPU_ADD(Z80, 12000000 / 2)		/* maybe CPU speeds are reversed? Probably not (ajg) */
+	MDRV_CPU_ADD("audio", Z80, 12000000 / 2)		/* maybe CPU speeds are reversed? Probably not (ajg) */
 	MDRV_CPU_PROGRAM_MAP(sound_map_c,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2,0)
 

@@ -850,7 +850,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( g80r_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, VIDEO_CLOCK/4)
+	MDRV_CPU_ADD("main", Z80, VIDEO_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", segag80r_vblank_start)
@@ -963,7 +963,7 @@ static MACHINE_DRIVER_START( sindbadm )
 
 	/* sound boards */
 
-	MDRV_CPU_ADD(Z80, SINDBADM_SOUND_CLOCK/2)
+	MDRV_CPU_ADD("audio", Z80, SINDBADM_SOUND_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(sindbadm_sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 

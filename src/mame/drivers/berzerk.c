@@ -861,7 +861,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( berzerk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD("main", Z80, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(berzerk_map,0)
 	MDRV_CPU_IO_MAP(berzerk_io_map,0)
 

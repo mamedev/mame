@@ -871,11 +871,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( hangon_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK_25MHz/4)
+	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK_25MHz/4)
 	MDRV_CPU_PROGRAM_MAP(hangon_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD_TAG("sub", M68000, MASTER_CLOCK_25MHz/4)
+	MDRV_CPU_ADD("sub", M68000, MASTER_CLOCK_25MHz/4)
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
 	MDRV_MACHINE_RESET(hangon)
@@ -918,7 +918,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sound_board_2203 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK_8MHz/2)
+	MDRV_CPU_ADD("sound", Z80, MASTER_CLOCK_8MHz/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map_2203,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2203,0)
 
@@ -946,7 +946,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sound_board_2203x2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK_8MHz/2)
+	MDRV_CPU_ADD("sound", Z80, MASTER_CLOCK_8MHz/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map_2151,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2203x2,0)
 
@@ -984,7 +984,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sound_board_2151 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK_8MHz/2)
+	MDRV_CPU_ADD("sound", Z80, MASTER_CLOCK_8MHz/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map_2151,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2151,0)
 
@@ -1030,7 +1030,7 @@ static MACHINE_DRIVER_START( sharrier )
 	MDRV_IMPORT_FROM(sharrier_base)
 	MDRV_IMPORT_FROM(sound_board_2203)
 
-	MDRV_CPU_ADD_TAG("mcu", I8751, 8000000)
+	MDRV_CPU_ADD("mcu", I8751, 8000000)
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_DATA_MAP(mcu_data_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_pulse)

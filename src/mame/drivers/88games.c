@@ -271,11 +271,11 @@ static const struct upd7759_interface upd7759_interface_2 =
 static MACHINE_DRIVER_START( 88games )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", KONAMI, 3000000) /* ? */
+	MDRV_CPU_ADD("main", KONAMI, 3000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", k88games_interrupt)
 
-	MDRV_CPU_ADD_TAG("audio", Z80, 3579545)
+	MDRV_CPU_ADD("audio", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_RESET(88games)

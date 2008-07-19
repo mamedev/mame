@@ -3427,12 +3427,12 @@ static const struct YMZ280Binterface ymz280b_interface =
 static MACHINE_DRIVER_START( tekipaki )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, 10000000)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(tekipaki_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 #if USE_HD64x180
-	MDRV_CPU_ADD(Z180, 10000000)			/* HD647180 CPU actually */
+	MDRV_CPU_ADD("mcu", Z180, 10000000)			/* HD647180 CPU actually */
 	MDRV_CPU_PROGRAM_MAP(hd647180_mem, 0)
 #endif
 
@@ -3466,12 +3466,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ghox )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_10MHz)			/* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_10MHz)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(ghox_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 #if USE_HD64x180
-	MDRV_CPU_ADD(Z180, XTAL_10MHz)			/* HD647180 CPU actually */
+	MDRV_CPU_ADD("mcu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
 	MDRV_CPU_PROGRAM_MAP(hd647180_mem, 0)
 #endif
 
@@ -3504,12 +3504,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dogyuun )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_25MHz/2)			/* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_25MHz/2)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(dogyuun_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 #if USE_V25
-	MDRV_CPU_ADD(V25, XTAL_25MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_ADD("audio", V25, XTAL_25MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
 	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem, 0)
 	//MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
@@ -3547,13 +3547,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kbash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000)			/* 16MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, 16000000)			/* 16MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(kbash_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 	/* ROM based v25 */
 #if USE_V25
-	MDRV_CPU_ADD(V25, 16000000)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_ADD("mcu", V25, 16000000)			/* NEC V25+ type Toaplan marked CPU ??? */
 	MDRV_CPU_PROGRAM_MAP(V25_mem, 0)
 	MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
@@ -3590,7 +3590,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( kbash2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000)			/* 16MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, 16000000)			/* 16MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(kbash2_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
@@ -3628,7 +3628,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( truxton2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_16MHz)			/* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(truxton2_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq2)
 
@@ -3665,11 +3665,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pipibibs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_10MHz)			/* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_10MHz)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(pipibibs_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD(Z80,XTAL_27MHz/8)			/* verified on pcb */
+	MDRV_CPU_ADD("audio", Z80,XTAL_27MHz/8)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_z80_mem, 0)
 
 	MDRV_INTERLEAVE(10)
@@ -3704,11 +3704,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( whoopee )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, 10000000)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(tekipaki_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD(Z80, 27000000/8)			/* This should be a HD647180 */
+	MDRV_CPU_ADD("audio", Z80, 27000000/8)			/* This should be a HD647180 */
 											/* Change this to 10MHz when HD647180 gets dumped. 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(sound_z80_mem, 0)
 
@@ -3744,11 +3744,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pipibibi )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, 10000000)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(pipibibi_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD(Z80,27000000/8)			/* ??? 3.37MHz */
+	MDRV_CPU_ADD("audio", Z80,27000000/8)			/* ??? 3.37MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_z80_mem, 0)
 
 	MDRV_INTERLEAVE(10)
@@ -3783,12 +3783,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fixeight )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_16MHz)			/* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(fixeight_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 #if USE_V25
-	MDRV_CPU_ADD(V25, XTAL_16MHz)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_ADD("audio", V25, XTAL_16MHz)			/* NEC V25+ type Toaplan marked CPU ??? */
 	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem, 0)
 	//MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
@@ -3826,7 +3826,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fixeighb )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, 10000000)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(fixeighb_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq2)
 
@@ -3860,12 +3860,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vfive )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, 10000000)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(vfive_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 #if USE_V25
-	MDRV_CPU_ADD(V25, 32000000/2)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_ADD("audio", V25, 32000000/2)			/* NEC V25+ type Toaplan marked CPU ??? */
 	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem, 0)
 	//MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
@@ -3916,12 +3916,12 @@ static const struct YM2151interface batsugun_ym2151_interface =
 static MACHINE_DRIVER_START( batsugun )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(batsugun_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 #if USE_V25
-	MDRV_CPU_ADD(V25, 32000000/2)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_ADD("audio", V25, 32000000/2)			/* NEC V25+ type Toaplan marked CPU ??? */
 	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem, 0)
 	//MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
@@ -3960,7 +3960,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( snowbro2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(snowbro2_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
@@ -3997,11 +3997,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mahoudai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(mahoudai_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD(Z80,32000000/8)			/* 4MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("audio", Z80,32000000/8)			/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(raizing_sound_z80_mem, 0)
 
 	MDRV_INTERLEAVE(10)
@@ -4039,11 +4039,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( shippumd )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(shippumd_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD(Z80,32000000/8)			/* 4MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("audio", Z80,32000000/8)			/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(raizing_sound_z80_mem, 0)
 
 	MDRV_INTERLEAVE(10)
@@ -4081,11 +4081,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bgaregga )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(bgaregga_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD(Z80,32000000/8)			/* 4MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("audio", Z80,32000000/8)			/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(bgaregga_sound_z80_mem, 0)
 
 	MDRV_INTERLEAVE(100)
@@ -4123,11 +4123,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( batrider )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(batrider_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq2)
 
-	MDRV_CPU_ADD(Z80,32000000/8)			/* 4MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("audio", Z80,32000000/8)			/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(batrider_sound_z80_mem, 0)
 	MDRV_CPU_IO_MAP(batrider_sound_z80_port, 0)
 
@@ -4168,11 +4168,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bbakraid )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,32000000/2)
+	MDRV_CPU_ADD("main", M68000,32000000/2)
 	MDRV_CPU_PROGRAM_MAP(bbakraid_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq1)
 
-	MDRV_CPU_ADD(Z80,32000000/4)
+	MDRV_CPU_ADD("audio", Z80,32000000/4)
 	MDRV_CPU_PROGRAM_MAP(bbakraid_sound_z80_mem, 0)
 	MDRV_CPU_IO_MAP(bbakraid_sound_z80_port, 0)
 	MDRV_CPU_PERIODIC_INT(bbakraid_snd_interrupt, 448)

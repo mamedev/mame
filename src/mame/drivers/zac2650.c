@@ -308,7 +308,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( tinvader )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", S2650, 3800000/4)
+	MDRV_CPU_ADD("main", S2650, 3800000/4)
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_IO_MAP(port_map,0)
 

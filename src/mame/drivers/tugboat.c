@@ -303,7 +303,7 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( tugboat )
-	MDRV_CPU_ADD_TAG("main", M6502, 2000000)	/* 2 MHz ???? */
+	MDRV_CPU_ADD("main", M6502, 2000000)	/* 2 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 

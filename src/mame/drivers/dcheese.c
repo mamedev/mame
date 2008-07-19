@@ -396,11 +396,11 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( dcheese )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, MAIN_OSC)
+	MDRV_CPU_ADD("main", M68000, MAIN_OSC)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map,0)
 	MDRV_CPU_VBLANK_INT("main", dcheese_vblank)
 
-	MDRV_CPU_ADD(M6809, SOUND_OSC/16)
+	MDRV_CPU_ADD("audio", M6809, SOUND_OSC/16)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu_map,0)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 480)	/* accurate for fredmem */
 

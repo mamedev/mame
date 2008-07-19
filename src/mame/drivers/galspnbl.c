@@ -278,12 +278,11 @@ static const struct YM3812interface ym3812_interface =
 static MACHINE_DRIVER_START( galspnbl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)	/* 10 MHz ??? */
+	MDRV_CPU_ADD("main", M68000, 10000000)	/* 10 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq3_line_hold)/* also has vector for 6, but it does nothing */
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */	/* 4 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 								/* NMI is caused by the main CPU */
 

@@ -697,16 +697,15 @@ static MACHINE_RESET( aso )
 static MACHINE_DRIVER_START( aso )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(aso_cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("sub", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(aso_cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(aso_sound_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -741,16 +740,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hal21 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(hal21_cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("sub", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(hal21_cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(hal21_sound_map,0)
 	MDRV_CPU_IO_MAP(hal21_sound_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", hal21_sound_interrupt)

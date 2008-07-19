@@ -719,12 +719,11 @@ static const struct YM2151interface whizz_ym2151_interface =
 static MACHINE_DRIVER_START( sidearms )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000) /* 4 MHz (?) */
+	MDRV_CPU_ADD("main", Z80, 4000000) /* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz (?) */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000) /* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */
@@ -765,12 +764,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( turtship )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000) /* 4 MHz (?) */
+	MDRV_CPU_ADD("main", Z80, 4000000) /* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(turtship_readmem,turtship_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz (?) */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000) /* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */
@@ -810,12 +808,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( whizz )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)        /* 4 MHz (?) */
+	MDRV_CPU_ADD("main", Z80, 4000000)        /* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(whizz_readmem,whizz_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(whizz_sound_readmem,whizz_sound_writemem)
 	MDRV_CPU_IO_MAP(whizz_readport,whizz_writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

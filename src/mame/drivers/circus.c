@@ -271,7 +271,7 @@ static INTERRUPT_GEN( ripcord_interrupt )
 static MACHINE_DRIVER_START( circus )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502,11289000/16) /* 705.562kHz */
+	MDRV_CPU_ADD("main", M6502,11289000/16) /* 705.562kHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -306,7 +306,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( robotbwl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502,11289000/16) /* 705.562kHz */
+	MDRV_CPU_ADD("main", M6502,11289000/16) /* 705.562kHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -340,7 +340,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( crash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502,11289000/16) /* 705.562kHz */
+	MDRV_CPU_ADD("main", M6502,11289000/16) /* 705.562kHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
@@ -374,7 +374,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ripcord )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 705562)        /* 11.289MHz / 16 */
+	MDRV_CPU_ADD("main", M6502, 705562)        /* 11.289MHz / 16 */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	//MDRV_CPU_VBLANK_INT("main", ripcord_interrupt) //AT
 

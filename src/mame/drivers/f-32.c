@@ -149,7 +149,7 @@ static INPUT_PORTS_START( mosaicf2 )
 INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( mosaicf2 )
-	MDRV_CPU_ADD_TAG("main", E132XN, 20000000*4)	/* 4x internal multiplier */
+	MDRV_CPU_ADD("main", E132XN, 20000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(common_map,0)
 	MDRV_CPU_IO_MAP(mosaicf2_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

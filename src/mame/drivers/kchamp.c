@@ -440,13 +440,12 @@ static INTERRUPT_GEN( sound_int ) {
 static MACHINE_DRIVER_START( kchampvs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
+	MDRV_CPU_ADD("main", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", kc_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3000000)
-	/* audio CPU */	/* 12MHz / 4 = 3.0 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 			/* irq's triggered from main cpu */
@@ -488,13 +487,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kchamp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
+	MDRV_CPU_ADD("main", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(kc_readmem,kc_writemem)
 	MDRV_CPU_IO_MAP(kc_readport,kc_writeport)
 	MDRV_CPU_VBLANK_INT("main", kc_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3000000)
-	/* audio CPU */	/* 12MHz / 4 = 3.0 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(kc_sound_readmem,kc_sound_writemem)
 	MDRV_CPU_IO_MAP(kc_sound_readport,kc_sound_writeport)
 	MDRV_CPU_PERIODIC_INT(sound_int, 125) /* Hz */

@@ -380,20 +380,18 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( pandoras )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809,18432000/6)	/* CPU A */
+	MDRV_CPU_ADD("main", M6809,18432000/6)	/* CPU A */
 	MDRV_CPU_PROGRAM_MAP(pandoras_readmem_a,pandoras_writemem_a)
 	MDRV_CPU_VBLANK_INT("main", pandoras_interrupt_a)
 
-	MDRV_CPU_ADD(M6809,18432000/6)	/* CPU B */
+	MDRV_CPU_ADD("sub", M6809,18432000/6)	/* CPU B */
 	MDRV_CPU_PROGRAM_MAP(pandoras_readmem_b,pandoras_writemem_b)
 	MDRV_CPU_VBLANK_INT("main", pandoras_interrupt_b)
 
-	MDRV_CPU_ADD(Z80,14318000/8)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,14318000/8)
 	MDRV_CPU_PROGRAM_MAP(pandoras_readmem_snd,pandoras_writemem_snd)
 
-	MDRV_CPU_ADD(I8039,14318000/2)
-	/* audio CPU */
+	MDRV_CPU_ADD("mcu", I8039,14318000/2)
 	MDRV_CPU_PROGRAM_MAP(i8039_readmem,i8039_writemem)
 	MDRV_CPU_IO_MAP(i8039_readport,i8039_writeport)
 

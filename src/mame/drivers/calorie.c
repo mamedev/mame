@@ -360,11 +360,11 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( calorie )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,4000000)		 /* 4 MHz */
+	MDRV_CPU_ADD("main", Z80,4000000)		 /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(calorie_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,3000000)		 /* 3 MHz */
+	MDRV_CPU_ADD("audio", Z80,3000000)		 /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(calorie_sound_map,0)
 	MDRV_CPU_IO_MAP(calorie_sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 64)

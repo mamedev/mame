@@ -184,12 +184,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( carjmbre )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,18432000/6)
+	MDRV_CPU_ADD("main", Z80,18432000/6)
 	MDRV_CPU_PROGRAM_MAP(carjmbre_readmem,carjmbre_writemem)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(Z80, 1500000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 1500000)
 	MDRV_CPU_PROGRAM_MAP(carjmbre_sound_readmem,carjmbre_sound_writemem)
 	MDRV_CPU_IO_MAP(carjmbre_sound_readport,carjmbre_sound_writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

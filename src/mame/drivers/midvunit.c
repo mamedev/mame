@@ -1008,7 +1008,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( midvcommon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", TMS32031, CPU_CLOCK)
+	MDRV_CPU_ADD("main", TMS32031, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(midvunit_map,0)
 
 	MDRV_MACHINE_START(midvunit)

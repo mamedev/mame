@@ -479,7 +479,7 @@ static INTERRUPT_GEN( simpl156_vbl_interrupt )
 static MACHINE_DRIVER_START( chainrec )
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD_TAG("DE156", ARM, 28000000 /* /4 */)	/*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
+	MDRV_CPU_ADD("DE156", ARM, 28000000 /* /4 */)	/*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
 	MDRV_CPU_PROGRAM_MAP(chainrec_map,0)
 	MDRV_CPU_VBLANK_INT("main", simpl156_vbl_interrupt)
 

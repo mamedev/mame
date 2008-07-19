@@ -164,12 +164,12 @@ static const struct YM2203interface ym2203_interface_1 =
 static MACHINE_DRIVER_START( cowrace )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(mem_map_cowrace,0)
 	MDRV_CPU_IO_MAP(io_map_cowrace,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(mem_map_sound_cowrace,0)
 	MDRV_CPU_IO_MAP(io_map_sound_cowrace,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	// NMI by main CPU

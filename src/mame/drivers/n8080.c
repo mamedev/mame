@@ -76,7 +76,7 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( spacefev )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8080, 20160000 / 10)
+	MDRV_CPU_ADD("main", 8080, 20160000 / 10)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt, 2)
@@ -101,7 +101,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sheriff )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8080, 20160000 / 10)
+	MDRV_CPU_ADD("main", 8080, 20160000 / 10)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt, 2)
@@ -126,7 +126,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( helifire )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8080, 20160000 / 10)
+	MDRV_CPU_ADD("main", 8080, 20160000 / 10)
 	MDRV_CPU_PROGRAM_MAP(helifire_main_cpu_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt, 2)

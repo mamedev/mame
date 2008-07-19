@@ -346,7 +346,7 @@ static MACHINE_DRIVER_START( jedi )
 	MDRV_DRIVER_DATA(jedi_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, JEDI_MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD("main", M6502, JEDI_MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_INTERLEAVE(4)

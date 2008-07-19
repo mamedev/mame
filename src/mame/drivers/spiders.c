@@ -689,12 +689,12 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( spiders )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, 2800000)
+	MDRV_CPU_ADD("main", M6809, 2800000)
 	MDRV_CPU_PROGRAM_MAP(spiders_main_map,0)
 	MDRV_CPU_PERIODIC_INT(update_pia_1, 25)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(M6802, 3000000)
+	MDRV_CPU_ADD("audio", M6802, 3000000)
 	MDRV_CPU_PROGRAM_MAP(spiders_audio_map,0)
 
 	MDRV_MACHINE_START(spiders)

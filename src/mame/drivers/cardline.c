@@ -194,7 +194,7 @@ static PALETTE_INIT(cardline)
 static MACHINE_DRIVER_START( cardline )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", I8051,12000000)
+	MDRV_CPU_ADD("main", I8051,12000000)
 	MDRV_CPU_PROGRAM_MAP(mem_prg,0)
 	MDRV_CPU_DATA_MAP(mem_data,0)
 	MDRV_CPU_IO_MAP(mem_io,0)

@@ -1558,7 +1558,7 @@ static const struct z80_irq_daisy_chain daisy_chain[] =
 MACHINE_DRIVER_START( demon_sound )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("audio", Z80, 3579545)
+	MDRV_CPU_ADD("audio", Z80, 3579545)
 	MDRV_CPU_CONFIG(daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(demon_sound_map,0)
 	MDRV_CPU_IO_MAP(demon_sound_ports,0)

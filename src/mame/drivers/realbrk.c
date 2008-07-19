@@ -681,7 +681,7 @@ static INTERRUPT_GEN( realbrk_interrupt )
 static MACHINE_DRIVER_START( realbrk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",M68000,32000000 / 2)			/* !! TMP68301 !! */
+	MDRV_CPU_ADD("main",M68000,32000000 / 2)			/* !! TMP68301 !! */
 	MDRV_CPU_PROGRAM_MAP(realbrk_mem,base_mem)
 	MDRV_CPU_VBLANK_INT("main", realbrk_interrupt)
 

@@ -212,7 +212,7 @@ static const struct YM2203interface ym2203_interface =
 };
 
 static MACHINE_DRIVER_START( compgolf )
-	MDRV_CPU_ADD_TAG("main", M6809, 2000000)
+	MDRV_CPU_ADD("main", M6809, 2000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 

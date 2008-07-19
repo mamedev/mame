@@ -337,11 +337,11 @@ static const tms34010_config tms_config =
 
 static MACHINE_DRIVER_START( btoads )
 
-	MDRV_CPU_ADD_TAG("main", TMS34020, CPU_CLOCK/2)
+	MDRV_CPU_ADD("main", TMS34020, CPU_CLOCK/2)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
-	MDRV_CPU_ADD(Z80, SOUND_CLOCK/4)
+	MDRV_CPU_ADD("audio", Z80, SOUND_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_assert, 183)

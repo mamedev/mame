@@ -182,7 +182,7 @@ static MACHINE_RESET( itgamble )
 static MACHINE_DRIVER_START( itgamble )
 
     /* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", H83044, MAIN_CLOCK/2)	/* probably the wrong CPU */
+	MDRV_CPU_ADD("main", H83044, MAIN_CLOCK/2)	/* probably the wrong CPU */
 	MDRV_CPU_PROGRAM_MAP(itgamble_map,0)
 
     /* video hardware */

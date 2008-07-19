@@ -751,17 +751,15 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( tsamurai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(z80_readport,z80_writeport)
 	MDRV_CPU_VBLANK_INT("main", samurai_interrupt)
 
-	MDRV_CPU_ADD(Z80, 2000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound1,writemem_sound1)
 
-	MDRV_CPU_ADD(Z80, 2000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio2", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound2,writemem_sound2)
 
 	/* video hardware */
@@ -796,21 +794,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( m660 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_m660,writemem_m660)
 	MDRV_CPU_IO_MAP(z80_readport,z80_writeport_m660)
 	MDRV_CPU_VBLANK_INT("main", samurai_interrupt)
 
-	MDRV_CPU_ADD(Z80, 2000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound1_m660,writemem_sound1_m660)
 
-	MDRV_CPU_ADD(Z80, 2000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio2", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound2_m660,writemem_sound2_m660)
 
-	MDRV_CPU_ADD(Z80, 2000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio3", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound3_m660,writemem_sound3_m660)
 	MDRV_CPU_IO_MAP(readport_sound3_m660,writeport_sound3_m660)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
@@ -847,11 +842,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vsgongf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)
+	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_vsgongf,writemem_vsgongf)
 	MDRV_CPU_VBLANK_INT("main", samurai_interrupt)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound_vsgongf,writemem_sound_vsgongf)
 	MDRV_CPU_IO_MAP(0,z80_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(vsgongf_sound_interrupt,3)

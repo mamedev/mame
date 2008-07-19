@@ -176,12 +176,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( zerozone )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)	/* 10 MHz */
+	MDRV_CPU_ADD("main", M68000, 10000000)	/* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, 1000000)
-	/* audio CPU */	/* 1 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80, 1000000)	/* 1 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_INTERLEAVE(10)

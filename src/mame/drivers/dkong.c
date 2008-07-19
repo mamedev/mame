@@ -1596,7 +1596,7 @@ static MACHINE_DRIVER_START( dkong_base )
 	MDRV_DRIVER_DATA(dkong_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, CLOCK_1H)
+	MDRV_CPU_ADD("main", Z80, CLOCK_1H)
 	MDRV_CPU_PROGRAM_MAP(dkong_map, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
@@ -1683,7 +1683,7 @@ static MACHINE_DRIVER_START( dkong3 )
 	MDRV_DRIVER_DATA(dkong_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_8MHz / 2)	/* verified in schematics */
+	MDRV_CPU_ADD("main", Z80, XTAL_8MHz / 2)	/* verified in schematics */
 	MDRV_CPU_PROGRAM_MAP(dkong3_map, 0)
 	MDRV_CPU_IO_MAP(0, dkong3_io_map)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)

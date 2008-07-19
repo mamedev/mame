@@ -658,7 +658,7 @@ GFXDECODE_END
  *************************************/
 
 static MACHINE_DRIVER_START( base )
-	MDRV_CPU_ADD_TAG("main",Z80, 18432000/6)	//confirmed
+	MDRV_CPU_ADD("main",Z80, 18432000/6)	//confirmed
 	MDRV_CPU_PROGRAM_MAP(pbillrd_readmem,pbillrd_writemem)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 50*3) //??
 	MDRV_CPU_VBLANK_INT("main", freekick_irqgen)

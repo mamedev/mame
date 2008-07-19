@@ -648,7 +648,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( magicfly )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, MASTER_CLOCK/12)	/* guess */
+	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK/12)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(magicfly_map, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 

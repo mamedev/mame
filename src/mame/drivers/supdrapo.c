@@ -262,7 +262,7 @@ static VIDEO_UPDATE( supdrapo )
 }
 
 static MACHINE_DRIVER_START( supdrapo )
-	MDRV_CPU_ADD_TAG("main", Z80,8000000/2)		 /* ??? */
+	MDRV_CPU_ADD("main", Z80,8000000/2)		 /* ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

@@ -1399,12 +1399,11 @@ static MACHINE_RESET( ms32 )
 static MACHINE_DRIVER_START( ms32 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", V70, 20000000) // 20MHz
+	MDRV_CPU_ADD("main", V70, 20000000) // 20MHz
 	MDRV_CPU_PROGRAM_MAP(ms32_readmem,ms32_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(ms32_interrupt,32)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(ms32_snd_readmem, ms32_snd_writemem)
 
 	MDRV_INTERLEAVE(1000)

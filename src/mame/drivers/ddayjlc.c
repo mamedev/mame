@@ -401,12 +401,11 @@ static INTERRUPT_GEN( ddayjlc_snd_interrupt )
 }
 
 static MACHINE_DRIVER_START( ddayjlc )
-	MDRV_CPU_ADD_TAG("main", Z80,12000000/3)
+	MDRV_CPU_ADD("main", Z80,12000000/3)
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 	MDRV_CPU_VBLANK_INT("main", ddayjlc_interrupt)
 
-	MDRV_CPU_ADD(Z80, 12000000/4)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 12000000/4)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
 	MDRV_CPU_VBLANK_INT("main", ddayjlc_snd_interrupt)
 

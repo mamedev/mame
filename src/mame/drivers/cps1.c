@@ -3607,11 +3607,11 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( cps1_10MHz )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", cps1_interrupt)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 3579545)
+	MDRV_CPU_ADD("sound", Z80, 3579545)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
@@ -3692,11 +3692,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cpspicb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", cps1_qsound_interrupt)
 
-	MDRV_CPU_ADD_TAG("sound", PIC16C57, 12000000)
+	MDRV_CPU_ADD("sound", PIC16C57, 12000000)
 	MDRV_CPU_FLAGS(CPU_DISABLE) /* no valid dumps .. */
 
 	/* video hardware */
@@ -3767,11 +3767,11 @@ static const struct MSM5205interface msm5205_interface2 =
 static MACHINE_DRIVER_START( sf2mdt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
+	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", cps1_interrupt)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 3579545)
+	MDRV_CPU_ADD("sound", Z80, 3579545)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sf2mdt_z80map,0)
 

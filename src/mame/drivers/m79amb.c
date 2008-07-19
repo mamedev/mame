@@ -192,7 +192,7 @@ static DRIVER_INIT( m79amb )
 static MACHINE_DRIVER_START( m79amb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8080, 1996800)
+	MDRV_CPU_ADD("main", 8080, 1996800)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", m79amb_interrupt)
 

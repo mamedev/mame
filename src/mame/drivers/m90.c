@@ -750,13 +750,12 @@ static INTERRUPT_GEN( bomblord_interrupt )
 /* Basic hardware -- no decryption table is setup for CPU */
 static MACHINE_DRIVER_START( m90 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", V30,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
+	MDRV_CPU_ADD("main", V30,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io,0)
 	MDRV_CPU_VBLANK_INT("main", m90_interrupt)
 
-	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
@@ -831,15 +830,14 @@ static const nec_config bomberman_config ={ 	bomberman_decryption_table, };
 static MACHINE_DRIVER_START( bombrman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", V30,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
+	MDRV_CPU_ADD("main", V30,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
 	MDRV_CPU_CONFIG(bomberman_config)
 
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io,0)
 	MDRV_CPU_VBLANK_INT("main", m90_interrupt)
 
-	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
@@ -877,15 +875,14 @@ static const nec_config dynablaster_config ={ 	dynablaster_decryption_table, };
 static MACHINE_DRIVER_START( bbmanw )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", V30,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
+	MDRV_CPU_ADD("main", V30,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
 	MDRV_CPU_CONFIG(dynablaster_config)
 
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io,0)
 	MDRV_CPU_VBLANK_INT("main", m90_interrupt)
 
-	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(bbmanw_sound_readport,bbmanw_sound_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
@@ -941,13 +938,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dynablsb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", V30,32000000/4)
+	MDRV_CPU_ADD("main", V30,32000000/4)
 	MDRV_CPU_PROGRAM_MAP(dynablsb_main_cpu,0)
 	MDRV_CPU_IO_MAP(dynablsb_cpu_io,0)
 	MDRV_CPU_VBLANK_INT("main", m90_interrupt)
 
-	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz)
-	/* audio CPU */	/* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */

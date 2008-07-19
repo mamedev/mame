@@ -406,7 +406,7 @@ static INTERRUPT_GEN( groundfx_interrupt )
 static MACHINE_DRIVER_START( groundfx )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68EC020, 16000000)	/* 16 MHz */
+	MDRV_CPU_ADD("main", M68EC020, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(groundfx_readmem,groundfx_writemem)
 	MDRV_CPU_VBLANK_INT("main", groundfx_interrupt)
 

@@ -175,7 +175,7 @@ static INTERRUPT_GEN( dderby_interrupt )
 
 static MACHINE_DRIVER_START( dderby )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,8000000)		 /* ? MHz */
+	MDRV_CPU_ADD("main", Z80,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(memmap,0)
 	MDRV_CPU_VBLANK_INT("main", dderby_interrupt)
 

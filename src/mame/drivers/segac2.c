@@ -1369,7 +1369,7 @@ static const struct YM3438interface ym3438_intf =
 static MACHINE_DRIVER_START( segac )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XL2_CLOCK/6)
+	MDRV_CPU_ADD("main", M68000, XL2_CLOCK/6)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", genesis_vblank_interrupt)
 

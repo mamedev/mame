@@ -348,7 +348,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( zerohour )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)  /* 4 MHz */
+	MDRV_CPU_ADD("main", Z80, 4000000)  /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(zero_readmem,zero_writemem)
 	MDRV_CPU_VBLANK_INT("main", redclash_interrupt)
 
@@ -375,7 +375,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( redclash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)  /* 4 MHz */
+	MDRV_CPU_ADD("main", Z80, 4000000)  /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", redclash_interrupt)
 

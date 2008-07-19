@@ -320,13 +320,13 @@ DISCRETE_SOUND_END
 static MACHINE_DRIVER_START( circusc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, 2048000)        /* 2 MHz */
+	MDRV_CPU_ADD("main", M6809, 2048000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 
 	/* audio CPU */     /* Z80 Clock is derived from a 14.31818 MHz crystal */
-	MDRV_CPU_ADD(Z80,14318180/4)
+	MDRV_CPU_ADD("audio", Z80,14318180/4)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_START(circusc)

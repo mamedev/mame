@@ -2018,7 +2018,7 @@ static MACHINE_RESET( firebeat )
 static MACHINE_DRIVER_START(firebeat)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", PPC403GCX, 66000000)
+	MDRV_CPU_ADD("main", PPC403GCX, 66000000)
 	MDRV_CPU_PROGRAM_MAP(firebeat_map, 0)
 	MDRV_CPU_VBLANK_INT("main", firebeat_interrupt)
 
@@ -2057,7 +2057,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(firebeat2)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", PPC403GCX, 66000000)
+	MDRV_CPU_ADD("main", PPC403GCX, 66000000)
 	MDRV_CPU_PROGRAM_MAP(firebeat_map, 0)
 	MDRV_CPU_VBLANK_INT("left", firebeat_interrupt)
 
@@ -2102,7 +2102,7 @@ static MACHINE_DRIVER_START(firebeat_spu)
 
 	MDRV_IMPORT_FROM(firebeat)
 
-	MDRV_CPU_ADD_TAG("audio", M68000, 16000000)
+	MDRV_CPU_ADD("audio", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(spu_map, 0)
 
 MACHINE_DRIVER_END

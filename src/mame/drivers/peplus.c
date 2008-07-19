@@ -1002,7 +1002,7 @@ static MACHINE_RESET( peplus )
 
 static MACHINE_DRIVER_START( peplus )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", I8052, 3686400*2)
+	MDRV_CPU_ADD("main", I8052, 3686400*2)
 	MDRV_CPU_PROGRAM_MAP(peplus_map, 0)
 	MDRV_CPU_DATA_MAP(peplus_datamap, 0)
 	MDRV_CPU_IO_MAP(peplus_iomap, 0)

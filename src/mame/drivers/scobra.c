@@ -1114,11 +1114,10 @@ static const struct AY8910interface scobra_ay8910_interface_2 =
 static MACHINE_DRIVER_START( type1 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(type1_readmem,type1_writemem)
 
-	MDRV_CPU_ADD(Z80,14318000/8)
-	/* audio CPU */	/* 1.78975 MHz */
+	MDRV_CPU_ADD("audio", Z80,14318000/8)	/* 1.78975 MHz */
 	MDRV_CPU_PROGRAM_MAP(scobra_sound_readmem,scobra_sound_writemem)
 	MDRV_CPU_IO_MAP(scobra_sound_readport,scobra_sound_writeport)
 
@@ -1253,10 +1252,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hustler )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(hustler_readmem,hustler_writemem)
 
-	MDRV_CPU_ADD_TAG("sound",Z80,14318000/8)
+	MDRV_CPU_ADD("sound",Z80,14318000/8)
 	/* audio CPU */	/* 1.78975 MHz */
 	MDRV_CPU_PROGRAM_MAP(hustler_sound_readmem,hustler_sound_writemem)
 	MDRV_CPU_IO_MAP(hustler_sound_readport,hustler_sound_writeport)

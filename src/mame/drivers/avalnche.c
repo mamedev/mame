@@ -217,7 +217,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( avalnche )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502,12096000/16)	   /* clock input is the "2H" signal divided by two */
+	MDRV_CPU_ADD("main", M6502,12096000/16)	   /* clock input is the "2H" signal divided by two */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(avalnche_interrupt,8)
 

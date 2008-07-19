@@ -265,12 +265,11 @@ static INTERRUPT_GEN( pbaction_interrupt )
 static MACHINE_DRIVER_START( pbaction )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)	/* 4 MHz? */
+	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(Z80, 3072000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 3072000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(0,sound_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(pbaction_interrupt,2)	/* ??? */

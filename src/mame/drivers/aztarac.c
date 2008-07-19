@@ -148,11 +148,11 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( aztarac )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 8000000)
+	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD(Z80, 2000000)
+	MDRV_CPU_ADD("audio", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_PERIODIC_INT(aztarac_snd_timed_irq, 100)
 

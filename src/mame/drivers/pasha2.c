@@ -387,7 +387,7 @@ static VIDEO_UPDATE( pasha2 )
 }
 
 static MACHINE_DRIVER_START( pasha2 )
-	MDRV_CPU_ADD_TAG("main", E116XT, 20000000*4)		/* 4x internal multiplier */
+	MDRV_CPU_ADD("main", E116XT, 20000000*4)		/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(pasha2_map,0)
 	MDRV_CPU_IO_MAP(pasha2_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

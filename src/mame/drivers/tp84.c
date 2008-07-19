@@ -418,16 +418,15 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( tp84 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("cpu1",M6809, XTAL_18_432MHz/12) /* verified on pcb */
+	MDRV_CPU_ADD("cpu1",M6809, XTAL_18_432MHz/12) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tp84_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(M6809, XTAL_18_432MHz/12)	/* verified on pcb */
+	MDRV_CPU_ADD("sub", M6809, XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	/* audio CPU */
-	MDRV_CPU_ADD(Z80,XTAL_14_31818MHz/4) /* verified on pcb */
+	MDRV_CPU_ADD("audio", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
 	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */

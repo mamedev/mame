@@ -695,15 +695,14 @@ static MACHINE_START( topspeed )
 static MACHINE_DRIVER_START( topspeed )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz ??? */
+	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(topspeed_readmem,topspeed_writemem)
 	MDRV_CPU_VBLANK_INT("main", topspeed_interrupt)
 
-	MDRV_CPU_ADD(Z80,16000000/4)
-	/* audio CPU */	/* 4 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80,16000000/4)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
 
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
+	MDRV_CPU_ADD("sub", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(topspeed_cpub_readmem,topspeed_cpub_writemem)
 	MDRV_CPU_VBLANK_INT("main", topspeed_cpub_interrupt)
 

@@ -982,11 +982,11 @@ static MACHINE_RESET( nmg5 )
 static MACHINE_DRIVER_START( nmg5 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000)	/* 16 MHz */
+	MDRV_CPU_ADD("main", M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(nmg5_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 4000000)		/* 4 MHz */
+	MDRV_CPU_ADD("sound", Z80, 4000000)		/* 4 MHz */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(nmg5_sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)

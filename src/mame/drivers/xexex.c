@@ -455,15 +455,13 @@ static const struct K054539interface k054539_interface =
 static MACHINE_DRIVER_START( xexex )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000)	// 16MHz (32MHz xtal)
+	MDRV_CPU_ADD("main", M68000, 16000000)	// 16MHz (32MHz xtal)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(xexex_interrupt,2)
 
 	// 8MHz (PCB shows one 32MHz/18.432MHz xtal, reference: www.system16.com)
 	// more likely 32MHz since 18.432MHz yields 4.608MHz(too slow) or 9.216MHz(too fast) with integer divisors
-	MDRV_CPU_ADD(Z80, 8000000)
-
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_INTERLEAVE(32)

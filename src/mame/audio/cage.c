@@ -642,7 +642,7 @@ ADDRESS_MAP_END
 MACHINE_DRIVER_START( cage )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("cage", TMS32031, 33868800)
+	MDRV_CPU_ADD("cage", TMS32031, 33868800)
 	/* audio CPU */
 	MDRV_CPU_CONFIG(cage_config)
 	MDRV_CPU_PROGRAM_MAP(cage_map,0)

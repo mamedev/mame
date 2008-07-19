@@ -247,11 +247,11 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( wrally )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,XTAL_24MHz/2)		/* verified on pcb */
+	MDRV_CPU_ADD("main", M68000,XTAL_24MHz/2)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(wrally_readmem, 0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD(DS5002FP, XTAL_24MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("mcu", DS5002FP, XTAL_24MHz/2)	/* verified on pcb */
 	MDRV_CPU_CONFIG(dallas_config)
 	MDRV_CPU_PROGRAM_MAP(dallas_rom, 0)
 	MDRV_CPU_DATA_MAP(dallas_ram, 0)

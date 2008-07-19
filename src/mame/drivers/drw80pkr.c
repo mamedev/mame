@@ -220,7 +220,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( drw80pkr )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", I8039, 7864300)
+	MDRV_CPU_ADD("main", I8039, 7864300)
 	MDRV_CPU_PROGRAM_MAP(drw80pkr_map, 0)
     MDRV_CPU_IO_MAP(drw80pkr_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

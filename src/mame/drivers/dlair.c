@@ -803,7 +803,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( dlair )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK_US/4)
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK_US/4)
 	MDRV_CPU_PROGRAM_MAP(dlus_map,0)
 	MDRV_CPU_VBLANK_INT("main", vblank_callback)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)MASTER_CLOCK_US/8/16/16/16/16)
@@ -841,7 +841,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dleuro )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK_EURO/4)
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK_EURO/4)
 	MDRV_CPU_CONFIG(dleuro_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(dleuro_map,0)
 	MDRV_CPU_IO_MAP(dleuro_io_map,0)

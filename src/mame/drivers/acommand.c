@@ -517,7 +517,7 @@ static INTERRUPT_GEN( acommand_irq )
 static MACHINE_DRIVER_START( acommand )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",M68000,12000000)
+	MDRV_CPU_ADD("main",M68000,12000000)
 	MDRV_CPU_PROGRAM_MAP(acommand,0)
 	MDRV_CPU_VBLANK_INT_HACK(acommand_irq,2)
 

@@ -552,20 +552,19 @@ static INTERRUPT_GEN( kingofb_interrupt ) {
 static MACHINE_DRIVER_START( kingofb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)        /* 4.0 MHz */
+	MDRV_CPU_ADD("main", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_readmem,main_writemem)
 	MDRV_CPU_VBLANK_INT("main", kingofb_interrupt)
 
-	MDRV_CPU_ADD(Z80, 4000000)        /* 4.0 MHz */
+	MDRV_CPU_ADD("video", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(video_readmem,video_writemem)
 	MDRV_CPU_VBLANK_INT("main", kingofb_interrupt)
 
-	MDRV_CPU_ADD(Z80, 4000000)        /* 4.0 MHz */
+	MDRV_CPU_ADD("sprite", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(sprite_readmem,sprite_writemem)
 	MDRV_CPU_VBLANK_INT("main", kingofb_interrupt)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */        /* 4.0 MHz */
+	MDRV_CPU_ADD("audio", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */
@@ -603,20 +602,19 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ringking )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)        /* 4.0 MHz */
+	MDRV_CPU_ADD("main", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(rk_main_readmem,rk_main_writemem)
 	MDRV_CPU_VBLANK_INT("main", kingofb_interrupt)
 
-	MDRV_CPU_ADD(Z80, 4000000)        /* 4.0 MHz */
+	MDRV_CPU_ADD("video", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(rk_video_readmem,rk_video_writemem)
 	MDRV_CPU_VBLANK_INT("main", kingofb_interrupt)
 
-	MDRV_CPU_ADD(Z80, 4000000)        /* 4.0 MHz */
+	MDRV_CPU_ADD("sprite", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(rk_sprite_readmem,rk_sprite_writemem)
 	MDRV_CPU_VBLANK_INT("main", kingofb_interrupt)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */        /* 4.0 MHz */
+	MDRV_CPU_ADD("audio", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(rk_sound_readport,rk_sound_writeport)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */

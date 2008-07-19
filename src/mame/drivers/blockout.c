@@ -200,12 +200,11 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( blockout )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
+	MDRV_CPU_ADD("main", M68000, 10000000)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(blockout_interrupt,2)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3579545)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */

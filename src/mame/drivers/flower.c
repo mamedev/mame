@@ -233,17 +233,17 @@ static const struct CustomSound_interface custom_interface =
 static MACHINE_DRIVER_START( flower )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,8000000)
+	MDRV_CPU_ADD("main", Z80,8000000)
 	MDRV_CPU_PROGRAM_MAP(flower_cpu1,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,10)
 //  MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) //nmis stuff up the writes to shared ram
 
-	MDRV_CPU_ADD(Z80,8000000)
+	MDRV_CPU_ADD("sub", Z80,8000000)
 	MDRV_CPU_PROGRAM_MAP(flower_cpu2,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 //  MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(Z80,8000000)
+	MDRV_CPU_ADD("audio", Z80,8000000)
 	MDRV_CPU_PROGRAM_MAP(flower_sound_cpu,0)
 	MDRV_CPU_PERIODIC_INT(sn_irq, 90)	/* periodic interrupt, don't know about the frequency */
 

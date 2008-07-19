@@ -1576,20 +1576,20 @@ via software as INT1
 /*************************************************************/
 
 static MACHINE_DRIVER_START( default )
-	MDRV_CPU_ADD_TAG("main", M68000, 12288000)
+	MDRV_CPU_ADD("main", M68000, 12288000)
 	MDRV_CPU_PROGRAM_MAP(master_default_am,common_default_am)
 	MDRV_CPU_VBLANK_INT("main", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD(M68000, 12288000)
+	MDRV_CPU_ADD("slave", M68000, 12288000)
 	MDRV_CPU_PROGRAM_MAP(slave_default_am,common_default_am)
 	MDRV_CPU_VBLANK_INT("main", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD(M6809,3072000) // Sound handling
+	MDRV_CPU_ADD("audio", M6809,3072000) // Sound handling
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
-	MDRV_CPU_ADD(HD63705,2048000) // I/O handling
+	MDRV_CPU_ADD("mcu", HD63705,2048000) // I/O handling
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1650,20 +1650,20 @@ static MACHINE_DRIVER_START( default3 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gollygho )
-	MDRV_CPU_ADD_TAG("main", M68000, 12288000)
+	MDRV_CPU_ADD("main", M68000, 12288000)
 	MDRV_CPU_PROGRAM_MAP(master_default_am,common_default_am)
 	MDRV_CPU_VBLANK_INT("main", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD(M68000, 12288000)
+	MDRV_CPU_ADD("slave", M68000, 12288000)
 	MDRV_CPU_PROGRAM_MAP(slave_default_am,common_default_am)
 	MDRV_CPU_VBLANK_INT("main", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD(M6809,3072000) // Sound handling
+	MDRV_CPU_ADD("audio", M6809,3072000) // Sound handling
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
-	MDRV_CPU_ADD(HD63705,2048000) // I/O handling
+	MDRV_CPU_ADD("mcu", HD63705,2048000) // I/O handling
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1700,20 +1700,20 @@ static MACHINE_DRIVER_START( gollygho )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( finallap )
-	MDRV_CPU_ADD_TAG("main", M68000, 12288000)
+	MDRV_CPU_ADD("main", M68000, 12288000)
 	MDRV_CPU_PROGRAM_MAP(master_finallap_am,common_finallap_am)
 	MDRV_CPU_VBLANK_INT("main", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD(M68000, 12288000)
+	MDRV_CPU_ADD("slave", M68000, 12288000)
 	MDRV_CPU_PROGRAM_MAP(slave_finallap_am,common_finallap_am)
 	MDRV_CPU_VBLANK_INT("main", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD(M6809,3072000) // Sound handling
+	MDRV_CPU_ADD("audio", M6809,3072000) // Sound handling
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
-	MDRV_CPU_ADD(HD63705,2048000) // I/O handling
+	MDRV_CPU_ADD("mcu", HD63705,2048000) // I/O handling
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1750,20 +1750,20 @@ static MACHINE_DRIVER_START( finallap )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sgunner )
-	MDRV_CPU_ADD_TAG("main", M68000, 12288000)
+	MDRV_CPU_ADD("main", M68000, 12288000)
 	MDRV_CPU_PROGRAM_MAP(master_sgunner_am,common_sgunner_am)
 	MDRV_CPU_VBLANK_INT("main", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD(M68000, 12288000)
+	MDRV_CPU_ADD("slave", M68000, 12288000)
 	MDRV_CPU_PROGRAM_MAP(slave_sgunner_am,common_sgunner_am)
 	MDRV_CPU_VBLANK_INT("main", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD(M6809,3072000) // Sound handling
+	MDRV_CPU_ADD("audio", M6809,3072000) // Sound handling
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
-	MDRV_CPU_ADD(HD63705,2048000) // I/O handling
+	MDRV_CPU_ADD("mcu", HD63705,2048000) // I/O handling
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1800,20 +1800,20 @@ static MACHINE_DRIVER_START( sgunner )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( luckywld )
-	MDRV_CPU_ADD_TAG("main", M68000, 12288000)
+	MDRV_CPU_ADD("main", M68000, 12288000)
 	MDRV_CPU_PROGRAM_MAP(master_luckywld_am,common_luckywld_am)
 	MDRV_CPU_VBLANK_INT("main", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD(M68000, 12288000)
+	MDRV_CPU_ADD("slave", M68000, 12288000)
 	MDRV_CPU_PROGRAM_MAP(slave_luckywld_am,common_luckywld_am)
 	MDRV_CPU_VBLANK_INT("main", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD(M6809,3072000) /* Sound handling */
+	MDRV_CPU_ADD("audio", M6809,3072000) /* Sound handling */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,120)
 
-	MDRV_CPU_ADD(HD63705,2048000) /* I/O handling */
+	MDRV_CPU_ADD("mcu", HD63705,2048000) /* I/O handling */
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1850,20 +1850,20 @@ static MACHINE_DRIVER_START( luckywld )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( metlhawk )
-	MDRV_CPU_ADD_TAG("main", M68000, 12288000)
+	MDRV_CPU_ADD("main", M68000, 12288000)
 	MDRV_CPU_PROGRAM_MAP(master_metlhawk_am,common_metlhawk_am)
 	MDRV_CPU_VBLANK_INT("main", namcos2_68k_master_vblank)
 
-	MDRV_CPU_ADD(M68000, 12288000)
+	MDRV_CPU_ADD("slave", M68000, 12288000)
 	MDRV_CPU_PROGRAM_MAP(slave_metlhawk_am,common_metlhawk_am)
 	MDRV_CPU_VBLANK_INT("main", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD(M6809,3072000) /* Sound handling */
+	MDRV_CPU_ADD("audio", M6809,3072000) /* Sound handling */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,120)
 
-	MDRV_CPU_ADD(HD63705,2048000) /* I/O handling */
+	MDRV_CPU_ADD("mcu", HD63705,2048000) /* I/O handling */
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

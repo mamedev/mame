@@ -290,7 +290,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( ultratnk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, PIXEL_CLOCK / 8)
+	MDRV_CPU_ADD("main", M6502, PIXEL_CLOCK / 8)
 	MDRV_CPU_PROGRAM_MAP(ultratnk_cpu_map, 0)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)

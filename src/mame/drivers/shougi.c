@@ -374,17 +374,17 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( shougi )
 
-	MDRV_CPU_ADD_TAG("main", Z80,10000000/4)
+	MDRV_CPU_ADD("main", Z80,10000000/4)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", shougi_vblank_nmi)
 
-	MDRV_CPU_ADD(Z80,10000000/4)
+	MDRV_CPU_ADD("sub", Z80,10000000/4)
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 	MDRV_CPU_IO_MAP(readport_sub,0)
 	/* NMIs triggered in shougi_vblank_nmi() */
 
 	/* MCU */
-	MDRV_CPU_ADD(ALPHA8201, 10000000/4/8)
+	MDRV_CPU_ADD("mcu", ALPHA8201, 10000000/4/8)
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	MDRV_INTERLEAVE(10)

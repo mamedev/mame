@@ -931,11 +931,11 @@ static const struct Samplesinterface samples_interface =
 static MACHINE_DRIVER_START( ninjakd2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MAIN_CLOCK_12/2)		/* verified */
+	MDRV_CPU_ADD("main", Z80, MAIN_CLOCK_12/2)		/* verified */
 	MDRV_CPU_PROGRAM_MAP(ninjakd2_main_cpu,0)
 	MDRV_CPU_VBLANK_INT("main", ninjakd2_interrupt)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, MAIN_CLOCK_5)		/* verified */
+	MDRV_CPU_ADD("sound", Z80, MAIN_CLOCK_5)		/* verified */
 	MDRV_CPU_PROGRAM_MAP(ninjakd2_sound_cpu,0)
 	MDRV_CPU_IO_MAP(ninjakd2_sound_io,0)
 

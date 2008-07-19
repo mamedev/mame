@@ -604,7 +604,7 @@ static INTERRUPT_GEN( statriv2_interrupt )
 static MACHINE_DRIVER_START( statriv2 )
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-	MDRV_CPU_ADD_TAG("main",8085A,12400000*2)              /* 12.4MHz / 4? */
+	MDRV_CPU_ADD("main",8085A,12400000*2)              /* 12.4MHz / 4? */
 	MDRV_CPU_PROGRAM_MAP(statriv2_readmem,statriv2_writemem)
 	MDRV_CPU_IO_MAP(statriv2_readport,statriv2_writeport)
 	MDRV_CPU_VBLANK_INT("main", statriv2_interrupt)

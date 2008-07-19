@@ -292,12 +292,11 @@ static const struct YM3526interface ym3526_interface =
 static MACHINE_DRIVER_START( sidepckt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, 2000000)        /* 2 MHz */
+	MDRV_CPU_ADD("main", M6809, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(M6502, 1500000)
-	/* audio CPU */        /* 1.5 MHz */
+	MDRV_CPU_ADD("audio", M6502, 1500000)        /* 1.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* NMIs are triggered by the main cpu */
 
@@ -331,12 +330,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sidepctj )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, 2000000)        /* 2 MHz */
+	MDRV_CPU_ADD("main", M6809, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,j_writemem)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(M6502, 1500000)
-	/* audio CPU */        /* 1.5 MHz */
+	MDRV_CPU_ADD("audio", M6502, 1500000)        /* 1.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* NMIs are triggered by the main cpu */
 

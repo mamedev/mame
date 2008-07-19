@@ -647,7 +647,7 @@ static VIDEO_UPDATE(ltcasino)
 
 static MACHINE_DRIVER_START( ltcasino )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502,2000000)		 /* ? MHz */
+	MDRV_CPU_ADD("main", M6502,2000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

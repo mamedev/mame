@@ -362,7 +362,7 @@ static INTERRUPT_GEN( sauro_interrupt )
 
 static MACHINE_DRIVER_START( tecfri )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)        // 4 MHz???
+	MDRV_CPU_ADD("main", Z80, 4000000)        // 4 MHz???
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
@@ -403,8 +403,7 @@ static MACHINE_DRIVER_START( sauro )
 	MDRV_CPU_PROGRAM_MAP(sauro_readmem, sauro_writemem)
 	MDRV_CPU_IO_MAP(sauro_readport, sauro_writeport)
 
-	MDRV_CPU_ADD(Z80, 4000000)	// 4 MHz?
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	// 4 MHz?
 	MDRV_CPU_PROGRAM_MAP(sauro_sound_readmem, sauro_sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(sauro_interrupt, 8) // ?
 

@@ -560,13 +560,12 @@ static const struct YM2610interface ym2610_interface =
 static MACHINE_DRIVER_START( pipedrm )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,12000000/2)
+	MDRV_CPU_ADD("main", Z80,12000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,14318000/4)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,14318000/4)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
@@ -600,13 +599,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hatris )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,12000000/2)
+	MDRV_CPU_ADD("main", Z80,12000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,14318000/4)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,14318000/4)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(hatris_sound_portmap,0)
 

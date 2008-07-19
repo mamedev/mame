@@ -328,18 +328,18 @@ static INTERRUPT_GEN( vblank_callback_istellar )
 /* DRIVER */
 static MACHINE_DRIVER_START( istellar )
 /*  main cpu */
-	MDRV_CPU_ADD_TAG("main", Z80, GUESSED_CLOCK)
+	MDRV_CPU_ADD("main", Z80, GUESSED_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(z80_0_mem,0)
 	MDRV_CPU_IO_MAP(z80_0_io,0)
 	MDRV_CPU_VBLANK_INT("main", vblank_callback_istellar)
 
 /*  sound cpu */
-	MDRV_CPU_ADD(Z80, GUESSED_CLOCK)
+	MDRV_CPU_ADD("audio", Z80, GUESSED_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(z80_1_mem,0)
 	MDRV_CPU_IO_MAP(z80_1_io,0)
 
 /*  ldp comm cpu */
-	MDRV_CPU_ADD(Z80, GUESSED_CLOCK)
+	MDRV_CPU_ADD("sub", Z80, GUESSED_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(z80_2_mem,0)
 	MDRV_CPU_IO_MAP(z80_2_io,0)
 

@@ -418,7 +418,7 @@ static const struct ST0016interface st0016_interface =
 
 static MACHINE_DRIVER_START( st0016 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,8000000) /* 8 MHz ? */
+	MDRV_CPU_ADD("main",Z80,8000000) /* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(st0016_mem,0)
 	MDRV_CPU_IO_MAP(st0016_io,0)
 
@@ -450,7 +450,7 @@ static MACHINE_DRIVER_START( mayjinsn )
 	MDRV_IMPORT_FROM(st0016)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(st0016_m2_io,0)
-	MDRV_CPU_ADD(V810, 10000000)//25 Mhz ?
+	MDRV_CPU_ADD("sub", V810, 10000000)//25 Mhz ?
 	MDRV_CPU_PROGRAM_MAP(v810_mem,0)
 	MDRV_INTERLEAVE(1)
 MACHINE_DRIVER_END

@@ -401,12 +401,11 @@ static const struct VLM5030interface hyperspt_vlm5030_interface =
 static MACHINE_DRIVER_START( hyperspt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, XTAL_18_432MHz/12)	/* verified on pcb */
+	MDRV_CPU_ADD("main", M6809, XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(hyperspt_readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,XTAL_14_31818MHz/4) /* verified on pcb */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_NVRAM_HANDLER(hyperspt)

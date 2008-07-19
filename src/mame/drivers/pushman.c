@@ -451,17 +451,16 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( pushman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 8000000)
+	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(0,sound_writeport)
 
 	/* ElSemi. Reversed the CPU order so the sound callback works with bballs */
-	MDRV_CPU_ADD(M68705, 4000000)	/* No idea */
+	MDRV_CPU_ADD("mcu", M68705, 4000000)	/* No idea */
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
 	MDRV_INTERLEAVE(60)
@@ -494,12 +493,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bballs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 8000000)
+	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(bballs_readmem,bballs_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(0,sound_writeport)
 

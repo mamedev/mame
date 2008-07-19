@@ -2660,22 +2660,22 @@ static const struct C352interface c352_interface =
 };
 
 static MACHINE_DRIVER_START( namcos22s )
-	MDRV_CPU_ADD_TAG("main", M68EC020,SS22_MASTER_CLOCK/2)
+	MDRV_CPU_ADD("main", M68EC020,SS22_MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(namcos22s_am,0)
 	MDRV_CPU_VBLANK_INT_HACK(namcos22s_interrupt,2)
 
-	MDRV_CPU_ADD_TAG("master", TMS32025,SS22_MASTER_CLOCK)
+	MDRV_CPU_ADD("master", TMS32025,SS22_MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(master_dsp_program,0)
 	MDRV_CPU_DATA_MAP(master_dsp_data,0)
 	MDRV_CPU_IO_MAP(master_dsp_io,0)
 	MDRV_CPU_VBLANK_INT_HACK(dsp_serial_pulse1,SERIAL_IO_PERIOD)
 
-	MDRV_CPU_ADD_TAG("slave", TMS32025,SS22_MASTER_CLOCK)
+	MDRV_CPU_ADD("slave", TMS32025,SS22_MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(slave_dsp_program,0)
 	MDRV_CPU_DATA_MAP(slave_dsp_data,0)
 	MDRV_CPU_IO_MAP(slave_dsp_io,0)
 
-	MDRV_CPU_ADD_TAG("mcu", M37710, SS22_MASTER_CLOCK/3)
+	MDRV_CPU_ADD("mcu", M37710, SS22_MASTER_CLOCK/3)
 	MDRV_CPU_PROGRAM_MAP(mcu_program, 0)
 	MDRV_CPU_IO_MAP( mcu_io, 0 )
 	MDRV_CPU_VBLANK_INT_HACK(mcu_interrupt, 3)
@@ -3075,22 +3075,22 @@ static MACHINE_RESET(namcos22)
 }
 
 static MACHINE_DRIVER_START( namcos22 )
-	MDRV_CPU_ADD_TAG("main", M68020,SS22_MASTER_CLOCK/2) /* 25 MHz? */
+	MDRV_CPU_ADD("main", M68020,SS22_MASTER_CLOCK/2) /* 25 MHz? */
 	MDRV_CPU_PROGRAM_MAP(namcos22_am,0)
 	MDRV_CPU_VBLANK_INT_HACK(namcos22_interrupt,2)
 
-	MDRV_CPU_ADD(TMS32025,SS22_MASTER_CLOCK) /* ? */
+	MDRV_CPU_ADD("dspmaster", TMS32025,SS22_MASTER_CLOCK) /* ? */
 	MDRV_CPU_PROGRAM_MAP(master_dsp_program,0)
 	MDRV_CPU_DATA_MAP(master_dsp_data,0)
 	MDRV_CPU_IO_MAP(master_dsp_io,0)
 	MDRV_CPU_VBLANK_INT_HACK(dsp_serial_pulse1,SERIAL_IO_PERIOD)
 
-	MDRV_CPU_ADD(TMS32025,SS22_MASTER_CLOCK) /* ? */
+	MDRV_CPU_ADD("dspslave", TMS32025,SS22_MASTER_CLOCK) /* ? */
 	MDRV_CPU_PROGRAM_MAP(slave_dsp_program,0)
 	MDRV_CPU_DATA_MAP(slave_dsp_data,0)
 	MDRV_CPU_IO_MAP(slave_dsp_io,0)
 
-	MDRV_CPU_ADD(M37702, SS22_MASTER_CLOCK/3)	// C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
+	MDRV_CPU_ADD("mcu", M37702, SS22_MASTER_CLOCK/3)	// C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
 	MDRV_CPU_PROGRAM_MAP( mcu_s22_program, 0 )
 	MDRV_CPU_IO_MAP( mcu_s22_io, 0 )
 

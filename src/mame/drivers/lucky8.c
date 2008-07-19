@@ -356,7 +356,7 @@ static const struct AY8910interface ay8910_interface =
 
 static MACHINE_DRIVER_START( lucky8 )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", Z80, 12000000/4)	// ??? Runs far too fast
+	MDRV_CPU_ADD("main", Z80, 12000000/4)	// ??? Runs far too fast
 	MDRV_CPU_PROGRAM_MAP(lucky8_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

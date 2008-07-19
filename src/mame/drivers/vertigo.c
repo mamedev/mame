@@ -105,7 +105,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( vertigo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 8000000)
+	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(vertigo_map,0)
 	MDRV_CPU_PERIODIC_INT(vertigo_interrupt,60)
 
@@ -116,7 +116,7 @@ static MACHINE_DRIVER_START( vertigo )
 
 	/* motor controller */
 	/*
-    MDRV_CPU_ADD(M6805, 1000000)
+    MDRV_CPU_ADD("motor", M6805, 1000000)
     MDRV_CPU_PROGRAM_MAP(vertigo_motor,0)
     */
 	MDRV_MACHINE_RESET(vertigo)

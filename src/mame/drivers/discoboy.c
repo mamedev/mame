@@ -474,12 +474,12 @@ static const struct MSM5205interface discoboy_msm5205_interface =
 
 static MACHINE_DRIVER_START( discoboy )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,12000000/2)		 /* 6 MHz? */
+	MDRV_CPU_ADD("main", Z80,12000000/2)		 /* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,10000000/2)		 /* 5 MHz? */
+	MDRV_CPU_ADD("audio", Z80,10000000/2)		 /* 5 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 //  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

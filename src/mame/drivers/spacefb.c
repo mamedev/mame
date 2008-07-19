@@ -357,11 +357,11 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( spacefb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, SPACEFB_MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD("main", Z80, SPACEFB_MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(spacefb_main_map,0)
 	MDRV_CPU_IO_MAP(spacefb_main_io_map,0)
 
-	MDRV_CPU_ADD(I8035, SPACEFB_AUDIO_CPU_CLOCK)
+	MDRV_CPU_ADD("audio", I8035, SPACEFB_AUDIO_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(spacefb_audio_map,0)
 	MDRV_CPU_IO_MAP(spacefb_audio_io_map,0)
 

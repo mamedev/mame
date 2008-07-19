@@ -1646,28 +1646,28 @@ static const struct Samplesinterface battles_samples_interface =
 static MACHINE_DRIVER_START( bosco )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(bosco_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(bosco_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub2", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(bosco_map,0)
 
-	MDRV_CPU_ADD_TAG(CPUTAG_50XX, MB8842, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_ADD(CPUTAG_50XX, MB8842, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_50xx_map_program,0)
 	MDRV_CPU_DATA_MAP(namco_50xx_map_data,0)
 	MDRV_CPU_IO_MAP(namco_50xx_map_io,0)
 
-	MDRV_CPU_ADD_TAG(CPUTAG_50XX_2, MB8842, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_ADD(CPUTAG_50XX_2, MB8842, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_50xx_2_map_program,0)
 	MDRV_CPU_DATA_MAP(namco_50xx_2_map_data,0)
 	MDRV_CPU_IO_MAP(namco_50xx_2_map_io,0)
 
-	MDRV_CPU_ADD_TAG(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program,0)
 	MDRV_CPU_DATA_MAP(namco_54xx_map_data,0)
 	MDRV_CPU_IO_MAP(namco_54xx_map_io,0)
@@ -1715,18 +1715,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( galaga )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(galaga_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(galaga_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub2", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(galaga_map,0)
 
-	MDRV_CPU_ADD_TAG(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program,0)
 	MDRV_CPU_DATA_MAP(namco_54xx_map_data,0)
 	MDRV_CPU_IO_MAP(namco_54xx_map_io,0)
@@ -1773,7 +1773,7 @@ static MACHINE_DRIVER_START( galagab )
 
 	MDRV_CPU_REMOVE(CPUTAG_54XX)
 
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub3", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem4_galaga,writemem4_galaga)
 
 	/* sound hardware */
@@ -1784,23 +1784,23 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( xevious )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(xevious_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(xevious_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub2", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(xevious_map,0)
 
-	MDRV_CPU_ADD_TAG(CPUTAG_50XX, MB8842, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_ADD(CPUTAG_50XX, MB8842, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_50xx_map_program,0)
 	MDRV_CPU_DATA_MAP(namco_50xx_map_data,0)
 	MDRV_CPU_IO_MAP(namco_50xx_map_io,0)
 
-	MDRV_CPU_ADD_TAG(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program,0)
 	MDRV_CPU_DATA_MAP(namco_54xx_map_data,0)
 	MDRV_CPU_IO_MAP(namco_54xx_map_io,0)
@@ -1847,7 +1847,7 @@ static MACHINE_DRIVER_START( battles )
 	MDRV_CPU_REMOVE(CPUTAG_50XX)
 	MDRV_CPU_REMOVE(CPUTAG_54XX)
 
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub3", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem4_battles,writemem4_battles)
 	MDRV_CPU_VBLANK_INT("main", battles_interrupt_4)
 
@@ -1868,15 +1868,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( digdug )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(digdug_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(digdug_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub2", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(digdug_map,0)
 
 	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
@@ -1913,7 +1913,7 @@ static MACHINE_DRIVER_START( dzigzag )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(digdug)
 
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub3", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem4_dzigzag,writemem4_dzigzag)
 MACHINE_DRIVER_END
 

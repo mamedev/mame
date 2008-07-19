@@ -267,13 +267,13 @@ static MACHINE_RESET(speglsht)
 
 static MACHINE_DRIVER_START( speglsht )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80, 8000000) /* 8 MHz ? */
+	MDRV_CPU_ADD("main",Z80, 8000000) /* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(st0016_mem,0)
 	MDRV_CPU_IO_MAP(st0016_io,0)
 
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(R3000LE, 25000000)
+	MDRV_CPU_ADD("sub", R3000LE, 25000000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(speglsht_mem,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_gen)

@@ -2671,7 +2671,7 @@ static NVRAM_HANDLER( cps3 )
 
 static MACHINE_DRIVER_START( cps3 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", SH2, 6250000*4) // external clock is 6.25 Mhz, it sets the intenral multiplier to 4x (this should probably be handled in the core..)
+	MDRV_CPU_ADD("main", SH2, 6250000*4) // external clock is 6.25 Mhz, it sets the intenral multiplier to 4x (this should probably be handled in the core..)
 	MDRV_CPU_PROGRAM_MAP(cps3_map,0)
 	MDRV_CPU_VBLANK_INT("main", cps3_vbl_interrupt)
 	MDRV_CPU_PERIODIC_INT(cps3_other_interrupt,80) /* ?source? */

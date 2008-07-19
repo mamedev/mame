@@ -1719,12 +1719,12 @@ static INTERRUPT_GEN( vblank_gen )
 }
 
 static MACHINE_DRIVER_START( bfcobra )
-	MDRV_CPU_ADD_TAG("main", Z80, Z80_XTAL)
+	MDRV_CPU_ADD("main", Z80, Z80_XTAL)
 	MDRV_CPU_PROGRAM_MAP(z80_prog_map, 0)
 	MDRV_CPU_IO_MAP(z80_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", vblank_gen)
 
-	MDRV_CPU_ADD(M6809, M6809_XTAL)
+	MDRV_CPU_ADD("audio", M6809, M6809_XTAL)
 	MDRV_CPU_PROGRAM_MAP(m6809_prog_map, 0)
 	MDRV_CPU_PERIODIC_INT(timer_irq, 1000)
 

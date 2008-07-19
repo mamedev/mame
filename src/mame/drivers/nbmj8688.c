@@ -2811,7 +2811,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( NBMJDRV_4096 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 5000000)	/* 5.00 MHz */
+	MDRV_CPU_ADD("main", Z80, 5000000)	/* 5.00 MHz */
 	MDRV_CPU_VBLANK_INT("main", nb1413m3_interrupt)
 
 	MDRV_MACHINE_RESET(nb1413m3)
@@ -2926,7 +2926,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mbmj_p16bit_LCD )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 5000000)	/* 5.00 MHz */
+	MDRV_CPU_ADD("main", Z80, 5000000)	/* 5.00 MHz */
 	MDRV_CPU_VBLANK_INT("main", nb1413m3_interrupt)
 	MDRV_CPU_PROGRAM_MAP(readmem_secolove, writemem_secolove)
 	MDRV_CPU_IO_MAP(readport_secolove, writeport_p16bit_LCD)

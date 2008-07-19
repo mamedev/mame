@@ -239,11 +239,11 @@ static INTERRUPT_GEN( ultrsprt_vblank )
 
 static MACHINE_DRIVER_START( ultrsprt )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", PPC403GA, 25000000)		/* PowerPC 403GA 25MHz */
+	MDRV_CPU_ADD("main", PPC403GA, 25000000)		/* PowerPC 403GA 25MHz */
 	MDRV_CPU_PROGRAM_MAP(ultrsprt_map, 0)
 	MDRV_CPU_VBLANK_INT("main", ultrsprt_vblank)
 
-	MDRV_CPU_ADD(M68000, 8000000)		/* Not sure about the frequency */
+	MDRV_CPU_ADD("audio", M68000, 8000000)		/* Not sure about the frequency */
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_PERIODIC_INT(irq5_line_hold, 1)	// ???
 

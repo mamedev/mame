@@ -547,7 +547,7 @@ static MACHINE_DRIVER_START( qix )
 	MDRV_DRIVER_DATA(qix_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, MAIN_CLOCK_OSC/4/4)	/* 1.25 MHz */
+	MDRV_CPU_ADD("main", M6809, MAIN_CLOCK_OSC/4/4)	/* 1.25 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	/* high interleave needed to ensure correct text in service mode */
@@ -571,7 +571,7 @@ static MACHINE_DRIVER_START( mcu )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(qix)
 
-	MDRV_CPU_ADD(M68705, COIN_CLOCK_OSC)	/* 1.00 MHz */
+	MDRV_CPU_ADD("mcu", M68705, COIN_CLOCK_OSC)	/* 1.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	MDRV_MACHINE_START(qixmcu)

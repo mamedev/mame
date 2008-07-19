@@ -880,7 +880,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( zwackery )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 7652400)	/* should be XTAL_16MHz/2 */
+	MDRV_CPU_ADD("main", M68000, 7652400)	/* should be XTAL_16MHz/2 */
 	MDRV_CPU_PROGRAM_MAP(zwackery_map,0)
 	MDRV_CPU_VBLANK_INT("main", mcr68_interrupt)
 
@@ -910,7 +910,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mcr68 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 7723800)
+	MDRV_CPU_ADD("main", M68000, 7723800)
 	MDRV_CPU_PROGRAM_MAP(mcr68_map,0)
 	MDRV_CPU_VBLANK_INT("main", mcr68_interrupt)
 

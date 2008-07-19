@@ -1305,7 +1305,7 @@ static const struct TMS5110interface tms5110_interface =
 
 MACHINE_DRIVER_START( dkong2b_audio )
 
-	MDRV_CPU_ADD_TAG("sound", I8035,I8035_CLOCK)
+	MDRV_CPU_ADD("sound", I8035,I8035_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(dkong_sound_map,0)
 	MDRV_CPU_IO_MAP(dkong_sound_io_map, 0)
 
@@ -1343,7 +1343,7 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( dkongjr_audio )
 
-	MDRV_CPU_ADD_TAG("sound", I8035,I8035_CLOCK)
+	MDRV_CPU_ADD("sound", I8035,I8035_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(dkong_sound_map,0)
 	MDRV_CPU_IO_MAP(dkongjr_sound_io_map, 0)
 
@@ -1360,11 +1360,11 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( dkong3_audio )
 
-	MDRV_CPU_ADD_TAG("n2a03a", N2A03,N2A03_DEFAULTCLOCK)
+	MDRV_CPU_ADD("n2a03a", N2A03,N2A03_DEFAULTCLOCK)
 	MDRV_CPU_PROGRAM_MAP(dkong3_sound1_map, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD_TAG("n2a03b", N2A03,N2A03_DEFAULTCLOCK)
+	MDRV_CPU_ADD("n2a03b", N2A03,N2A03_DEFAULTCLOCK)
 	MDRV_CPU_PROGRAM_MAP(dkong3_sound2_map, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 

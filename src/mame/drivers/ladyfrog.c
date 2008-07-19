@@ -281,12 +281,11 @@ static GFXDECODE_START( ladyfrog )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( ladyfrog )
-	MDRV_CPU_ADD_TAG("main", Z80,8000000/2)
+	MDRV_CPU_ADD("main", Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,8000000/2)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 

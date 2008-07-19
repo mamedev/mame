@@ -347,15 +347,15 @@ static const struct VLM5030interface vlm5030_interface =
 static MACHINE_DRIVER_START( ddribble )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
+	MDRV_CPU_ADD("main", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu0,writemem_cpu0)
 	MDRV_CPU_VBLANK_INT("main", ddrible_interrupt_0)
 
-	MDRV_CPU_ADD(M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
+	MDRV_CPU_ADD("cpu1", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu1,writemem_cpu1)
 	MDRV_CPU_VBLANK_INT("main", ddrible_interrupt_1)
 
-	MDRV_CPU_ADD(M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
+	MDRV_CPU_ADD("cpu2", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu2,writemem_cpu2)
 
 	MDRV_INTERLEAVE(100)	/* we need heavy synch */

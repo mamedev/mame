@@ -1016,7 +1016,7 @@ static const tms34010_config yunit_tms_config =
 static MACHINE_DRIVER_START( zunit )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", TMS34010, FAST_MASTER_CLOCK)
+	MDRV_CPU_ADD("main", TMS34010, FAST_MASTER_CLOCK)
 	MDRV_CPU_CONFIG(zunit_tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
@@ -1049,7 +1049,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( yunit_core )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", TMS34010, SLOW_MASTER_CLOCK)
+	MDRV_CPU_ADD("main", TMS34010, SLOW_MASTER_CLOCK)
 	MDRV_CPU_CONFIG(yunit_tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
@@ -1136,7 +1136,7 @@ static MACHINE_DRIVER_START( mkyawdim )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(yunit_core)
 
-	MDRV_CPU_ADD(Z80, 5000000)
+	MDRV_CPU_ADD("audio", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(yawdim_sound_map,0)
 
 	/* video hardware */

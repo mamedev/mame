@@ -239,11 +239,11 @@ static MACHINE_DRIVER_START( aliens )
 
 	/* external clock should be 12MHz probably, CPU internal divider and precise cycle timings */
 	/* are unknown though. 3MHz is too low, sprites flicker in the pseudo-3D levels */
-	MDRV_CPU_ADD_TAG("main", KONAMI, 6000000)		/* ? */
+	MDRV_CPU_ADD("main", KONAMI, 6000000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(aliens_map,0)
 	MDRV_CPU_VBLANK_INT("main", aliens_interrupt)
 
-	MDRV_CPU_ADD_TAG("audio", Z80, 3579545)
+	MDRV_CPU_ADD("audio", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(aliens_sound_map,0)
 
 	MDRV_MACHINE_RESET(aliens)

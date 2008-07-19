@@ -296,7 +296,7 @@ ADDRESS_MAP_END
 
 
 MACHINE_DRIVER_START( carnival_audio )
-	MDRV_CPU_ADD_TAG("audio", I8039, 3579545)
+	MDRV_CPU_ADD("audio", I8039, 3579545)
 	MDRV_CPU_PROGRAM_MAP(carnival_audio_map,0)
 	MDRV_CPU_IO_MAP(carnival_audio_io_map,0)
 

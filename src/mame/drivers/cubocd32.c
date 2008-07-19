@@ -227,7 +227,7 @@ static const struct CustomSound_interface amiga_custom_interface =
 static MACHINE_DRIVER_START( cd32 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68EC020, AMIGA_68EC020_PAL_CLOCK) /* 14.3 Mhz */
+	MDRV_CPU_ADD("main", M68EC020, AMIGA_68EC020_PAL_CLOCK) /* 14.3 Mhz */
 	MDRV_CPU_PROGRAM_MAP(cd32_map,0)
 
 	MDRV_MACHINE_RESET(amiga)

@@ -562,12 +562,11 @@ static GFXDECODE_START( terracre )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( amazon )
-	MDRV_CPU_ADD_TAG("main", M68000, 8000000 )
+	MDRV_CPU_ADD("main", M68000, 8000000 )
 	MDRV_CPU_PROGRAM_MAP(amazon_readmem,amazon_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */	/* 4 MHz???? */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz???? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport_3526)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)	/* ??? */
@@ -602,12 +601,11 @@ static MACHINE_DRIVER_START( amazon )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ym3526 )
-	MDRV_CPU_ADD_TAG("main", M68000, 8000000 )
+	MDRV_CPU_ADD("main", M68000, 8000000 )
 	MDRV_CPU_PROGRAM_MAP(terracre_readmem,terracre_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */	/* 4 MHz???? */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz???? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport_3526)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)	/* ??? */
@@ -640,12 +638,11 @@ static MACHINE_DRIVER_START( ym3526 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ym2203 )
-	MDRV_CPU_ADD_TAG("main", M68000, 8000000) /* 8 MHz?? */
+	MDRV_CPU_ADD("main", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(terracre_readmem,terracre_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */	/* 4 MHz???? */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz???? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport_2203)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)	/* ??? */

@@ -519,7 +519,7 @@ static const tms34010_config tms_config_lethalj =
 static MACHINE_DRIVER_START( gameroom )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", TMS34010, MASTER_CLOCK)
+	MDRV_CPU_ADD("main", TMS34010, MASTER_CLOCK)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(lethalj_map,0)
 

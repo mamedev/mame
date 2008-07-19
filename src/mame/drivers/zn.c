@@ -421,7 +421,7 @@ static void zn_machine_init( running_machine *machine )
 
 static MACHINE_DRIVER_START( zn1_1mb_vram )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG( "MAIN", PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD( "MAIN", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
@@ -457,7 +457,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( zn2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG( "MAIN", PSXCPU, XTAL_100MHz )
+	MDRV_CPU_ADD( "MAIN", PSXCPU, XTAL_100MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
@@ -679,8 +679,7 @@ static const struct QSound_interface qsound_interface =
 static MACHINE_DRIVER_START( coh1000c )
 	MDRV_IMPORT_FROM( zn1_1mb_vram )
 
-	MDRV_CPU_ADD( Z80, 8000000 )
-	/* audio CPU */  /* 8MHz ?? */
+	MDRV_CPU_ADD("audio",  Z80, 8000000 )  /* 8MHz ?? */
 	MDRV_CPU_PROGRAM_MAP( qsound_map, 0 )
 	MDRV_CPU_IO_MAP( qsound_portmap, 0 )
 	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
@@ -697,8 +696,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( coh1002c )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
-	MDRV_CPU_ADD( Z80, 8000000 )
-	/* audio CPU */  /* 8MHz ?? */
+	MDRV_CPU_ADD("audio",  Z80, 8000000 )  /* 8MHz ?? */
 	MDRV_CPU_PROGRAM_MAP( qsound_map, 0 )
 	MDRV_CPU_IO_MAP( qsound_portmap, 0 )
 	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
@@ -881,8 +879,7 @@ static MACHINE_RESET( coh3002c )
 static MACHINE_DRIVER_START( coh3002c )
 	MDRV_IMPORT_FROM( zn2 )
 
-	/* audio CPU */  /* 8MHz ?? */
-	MDRV_CPU_ADD( Z80, 8000000 )
+	MDRV_CPU_ADD("audio", Z80, 8000000 )	/* 8MHz ?? */
 	MDRV_CPU_PROGRAM_MAP( qsound_map, 0 )
 	MDRV_CPU_IO_MAP( qsound_portmap, 0 )
 	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
@@ -1287,8 +1284,7 @@ static MACHINE_DRIVER_START( coh1000ta )
 	MDRV_CPU_MODIFY( "MAIN" )
 	MDRV_CPU_VBLANK_INT("main", coh1000t_vblank)
 
-	MDRV_CPU_ADD( Z80, 16000000 / 4 )
-	/* audio CPU */	/* 4 MHz */
+	MDRV_CPU_ADD("audio", Z80, 16000000 / 4 )	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP( fx1a_sound_map, 0 )
 	MDRV_MACHINE_RESET( coh1000ta )
 	MDRV_NVRAM_HANDLER( coh1000ta )
@@ -1931,7 +1927,7 @@ static MACHINE_DRIVER_START( coh1002e )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
 	/* audio CPU */
-	MDRV_CPU_ADD( M68000, 12000000 )
+	MDRV_CPU_ADD("audio", M68000, 12000000 )
 	MDRV_CPU_PROGRAM_MAP( psarc_snd_map, 0 )
 
 	MDRV_MACHINE_RESET( coh1002e )
@@ -2394,7 +2390,7 @@ static MACHINE_DRIVER_START( coh1001l )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
 //  /* audio CPU */
-//  MDRV_CPU_ADD( M68000, 10000000 )
+//  MDRV_CPU_ADD("audio", M68000, 10000000 )
 //  MDRV_CPU_PROGRAM_MAP( atlus_snd_map, 0 )
 
 	MDRV_MACHINE_RESET( coh1001l )
@@ -2711,7 +2707,7 @@ static MACHINE_DRIVER_START( coh1002msnd )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
 	/* audio CPU */
-	MDRV_CPU_ADD( Z80, 32000000/8 )
+	MDRV_CPU_ADD("audio", Z80, 32000000/8 )
 	MDRV_CPU_PROGRAM_MAP( cbaj_z80_map, 0 )
 	MDRV_CPU_IO_MAP( cbaj_z80_port_map, 0 )
 
@@ -2727,7 +2723,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( coh1002ml )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
-	MDRV_CPU_ADD( Z80, 8000000 )
+	MDRV_CPU_ADD("link", Z80, 8000000 )
 	MDRV_CPU_PROGRAM_MAP( link_map, 0 )
 
 	MDRV_MACHINE_RESET( coh1002m )

@@ -594,14 +594,14 @@ static const struct YM2610interface airsys_ym2610_interface =
 static MACHINE_DRIVER_START( airsys )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,24000000 / 2)		/* 12 MHz ??? */
+	MDRV_CPU_ADD("main", M68000,24000000 / 2)		/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(airsys_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(Z80,8000000 / 2)			/* 4 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80,8000000 / 2)			/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 
-	MDRV_CPU_ADD(TMS32025,24000000)			/* 24 MHz ??? *///
+	MDRV_CPU_ADD("dsp", TMS32025,24000000)			/* 24 MHz ??? *///
 	MDRV_CPU_PROGRAM_MAP(DSP_map_program, 0)
 	MDRV_CPU_DATA_MAP(DSP_map_data, 0)
 	MDRV_CPU_IO_MAP(DSP_map_io, 0)

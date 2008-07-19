@@ -518,10 +518,10 @@ static const struct POKEYinterface pokey_interface =
 static MACHINE_DRIVER_START( mhavoc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("alpha", M6502, MHAVOC_CLOCK_2_5M)		/* 2.5 MHz */
+	MDRV_CPU_ADD("alpha", M6502, MHAVOC_CLOCK_2_5M)		/* 2.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(alpha_map, 0)
 
-	MDRV_CPU_ADD_TAG("gamma", M6502, MHAVOC_CLOCK_1_25M)	/* 1.25 MHz */
+	MDRV_CPU_ADD("gamma", M6502, MHAVOC_CLOCK_1_25M)	/* 1.25 MHz */
 	MDRV_CPU_PROGRAM_MAP(gamma_map, 0)
 
 	MDRV_MACHINE_RESET(mhavoc)

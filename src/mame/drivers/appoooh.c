@@ -213,7 +213,7 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( appoooh )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,18432000/6)	/* ??? the main xtal is 18.432 MHz */
+	MDRV_CPU_ADD("main", Z80,18432000/6)	/* ??? the main xtal is 18.432 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
@@ -415,7 +415,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( robowres )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,18432000/6)	/* ??? the main xtal is 18.432 MHz */
+	MDRV_CPU_ADD("main", Z80,18432000/6)	/* ??? the main xtal is 18.432 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)

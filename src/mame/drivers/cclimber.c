@@ -1066,7 +1066,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( root )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/3/2)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/3/2)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(cclimber_map,0)
 	MDRV_CPU_IO_MAP(cclimber_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
@@ -1129,7 +1129,7 @@ static MACHINE_DRIVER_START( yamato )
 	MDRV_CPU_PROGRAM_MAP(yamato_map,0)
 	MDRV_CPU_IO_MAP(yamato_portmap,0)
 
-	MDRV_CPU_ADD(Z80, 3072000) /* 3.072 MHz ? */
+	MDRV_CPU_ADD("audio", Z80, 3072000) /* 3.072 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(yamato_audio_map,0)
 	MDRV_CPU_IO_MAP(yamato_audio_portmap,0)
 
@@ -1170,11 +1170,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( swimmer )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 3072000)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, 3072000)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(swimmer_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(Z80,4000000/2)
+	MDRV_CPU_ADD("audio", Z80,4000000/2)
 	MDRV_CPU_PROGRAM_MAP(swimmer_audio_map,0)
 	MDRV_CPU_IO_MAP(swimmer_audio_portmap,0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, (double)4000000/16384) /* IRQs are triggered by the main CPU */

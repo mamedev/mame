@@ -200,7 +200,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( cball )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6800, 12096000 / 16) /* ? */
+	MDRV_CPU_ADD("main", M6800, 12096000 / 16) /* ? */
 	MDRV_CPU_PROGRAM_MAP(cpu_map, 0)
 
 	MDRV_MACHINE_RESET(cball)

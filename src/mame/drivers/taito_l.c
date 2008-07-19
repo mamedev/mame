@@ -2170,15 +2170,15 @@ static const struct YM2203interface ym2203_interface_single =
 static MACHINE_DRIVER_START( fhawk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("cpu1", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
+	MDRV_CPU_ADD("cpu1", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
 	MDRV_CPU_PROGRAM_MAP(fhawk_readmem,fhawk_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 4000000)	/* verified on pcb */
+	MDRV_CPU_ADD("sound", Z80, 4000000)	/* verified on pcb */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(fhawk_3_readmem,fhawk_3_writemem)
 
-	MDRV_CPU_ADD_TAG("cpu2", Z80, 12000000/3) 	/* verified on pcb */
+	MDRV_CPU_ADD("cpu2", Z80, 12000000/3) 	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(fhawk_2_readmem,fhawk_2_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,3) /* fixes slow down problems */
 
@@ -2270,11 +2270,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kurikint )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
+	MDRV_CPU_ADD("main", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
 	MDRV_CPU_PROGRAM_MAP(kurikint_readmem,kurikint_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
-	MDRV_CPU_ADD( Z80, 12000000/3) 	/* verified on pcb */
+	MDRV_CPU_ADD("audio",  Z80, 12000000/3) 	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(kurikint_2_readmem,kurikint_2_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -2321,7 +2321,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( plotting )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
+	MDRV_CPU_ADD("main", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
 	MDRV_CPU_PROGRAM_MAP(plotting_readmem,plotting_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
@@ -2410,11 +2410,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( evilston )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 13330560/2) 	/* not verfied */
+	MDRV_CPU_ADD("main", Z80, 13330560/2) 	/* not verfied */
 	MDRV_CPU_PROGRAM_MAP(evilston_readmem,evilston_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
-	MDRV_CPU_ADD(Z80, 12000000/3) 	/* not verified */
+	MDRV_CPU_ADD("audio", Z80, 12000000/3) 	/* not verified */
 	MDRV_CPU_PROGRAM_MAP(evilston_2_readmem,evilston_2_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

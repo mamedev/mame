@@ -369,11 +369,11 @@ static INTERRUPT_GEN( thedeep_interrupt )
 static MACHINE_DRIVER_START( thedeep )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 6000000)		/* 6MHz */
+	MDRV_CPU_ADD("main", Z80, 6000000)		/* 6MHz */
 	MDRV_CPU_PROGRAM_MAP(thedeep_readmem,thedeep_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(thedeep_interrupt,2)	/* IRQ by MCU, NMI by vblank (maskable) */
 
- 	MDRV_CPU_ADD(M65C02, 2000000)	/* 2MHz */
+ 	MDRV_CPU_ADD("audio", M65C02, 2000000)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(thedeep_sound_readmem,thedeep_sound_writemem)
 	/* IRQ by YM2203, NMI by when sound latch written by main cpu */
 

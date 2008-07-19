@@ -307,15 +307,15 @@ static const struct YM2203interface ym2203_interface =
 
 static MACHINE_DRIVER_START( lkage )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,6000000)
+	MDRV_CPU_ADD("main", Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(lkage,0)
 	MDRV_CPU_IO_MAP(readport,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 6000000)
+	MDRV_CPU_ADD("audio", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 								/* IRQs are triggered by the YM2203 */
-	MDRV_CPU_ADD(M68705,4000000)	/* ??? */
+	MDRV_CPU_ADD("mcu", M68705,4000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 
 	/* video hardware */
@@ -352,12 +352,12 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( lkageb )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,6000000)
+	MDRV_CPU_ADD("main", Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(lkage,0)
 	MDRV_CPU_IO_MAP(readport,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 6000000)
+	MDRV_CPU_ADD("audio", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 								/* IRQs are triggered by the YM2203 */
 

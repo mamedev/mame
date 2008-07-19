@@ -799,7 +799,7 @@ static const struct AY8910interface merit_ay8912_interface =
 
 
 static MACHINE_DRIVER_START( pitboss )
-	MDRV_CPU_ADD_TAG("main",Z80,2500000)		 /* ?? */
+	MDRV_CPU_ADD("main",Z80,2500000)		 /* ?? */
 	MDRV_CPU_PROGRAM_MAP(pitboss_map,0)
 	MDRV_CPU_IO_MAP(trvwhiz_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

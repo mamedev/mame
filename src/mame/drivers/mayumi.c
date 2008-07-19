@@ -282,7 +282,7 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( mayumi )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MCLK/2) /* 5.000 MHz ? */
+	MDRV_CPU_ADD("main", Z80, MCLK/2) /* 5.000 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", mayumi_interrupt)

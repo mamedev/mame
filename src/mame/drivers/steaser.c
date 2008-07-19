@@ -229,7 +229,7 @@ static INTERRUPT_GEN( steaser_irq )
 }
 
 static MACHINE_DRIVER_START( steaser )
-	MDRV_CPU_ADD_TAG("main", M68000, 11059200 )
+	MDRV_CPU_ADD("main", M68000, 11059200 )
 	MDRV_CPU_PROGRAM_MAP(steaser_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(steaser_irq,4)
 

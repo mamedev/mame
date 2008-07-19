@@ -372,16 +372,16 @@ static MACHINE_RESET( pipeline )
 static MACHINE_DRIVER_START( pipeline )
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD_TAG("main", Z80, 7372800/2)
+	MDRV_CPU_ADD("main", Z80, 7372800/2)
 	MDRV_CPU_PROGRAM_MAP(cpu0_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(Z80, 7372800/2)
+	MDRV_CPU_ADD("audio", Z80, 7372800/2)
 	MDRV_CPU_CONFIG(daisy_chain_sound)
 	MDRV_CPU_PROGRAM_MAP(cpu1_mem, 0)
 	MDRV_CPU_IO_MAP(sound_port, 0)
 
-	MDRV_CPU_ADD(M68705, 7372800/2)
+	MDRV_CPU_ADD("mcu", M68705, 7372800/2)
 	MDRV_CPU_PROGRAM_MAP(mcu_mem, 0)
 
 	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )

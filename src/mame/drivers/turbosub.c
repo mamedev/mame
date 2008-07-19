@@ -330,14 +330,14 @@ ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( turbosub )
 
-	MDRV_CPU_ADD_TAG("main", M6809E,4000000)
+	MDRV_CPU_ADD("main", M6809E,4000000)
 	MDRV_CPU_PROGRAM_MAP(game_cpu_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)		/* Unverified */
 
-	MDRV_CPU_ADD(M6809E,4000000)
+	MDRV_CPU_ADD("frame", M6809E,4000000)
 	MDRV_CPU_PROGRAM_MAP(frame_cpu_map,0)
 
-	MDRV_CPU_ADD(M6809E,4000000)
+	MDRV_CPU_ADD("audio", M6809E,4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu_map,0)
 
 	/* video hardware */

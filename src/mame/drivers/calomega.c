@@ -1909,7 +1909,7 @@ static const struct AY8910interface sys905_ay8912_intf =
 
 static MACHINE_DRIVER_START( sys903 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, CPU_CLOCK)	/* confirmed */
+	MDRV_CPU_ADD("main", M6502, CPU_CLOCK)	/* confirmed */
 	MDRV_CPU_PROGRAM_MAP(sys903_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

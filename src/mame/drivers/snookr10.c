@@ -721,7 +721,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( snookr10 )
 
     /* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M65SC02, MASTER_CLOCK/8)	/* 2 MHz (1.999 MHz measured) */
+	MDRV_CPU_ADD("main", M65SC02, MASTER_CLOCK/8)	/* 2 MHz (1.999 MHz measured) */
 	MDRV_CPU_PROGRAM_MAP(snookr10_map, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 

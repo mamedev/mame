@@ -246,12 +246,12 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( ultraman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000,24000000/2)		/* 12 MHz? */
+	MDRV_CPU_ADD("main", M68000,24000000/2)		/* 12 MHz? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	/* audio CPU */		/* 4 MHz? */
-	MDRV_CPU_ADD(Z80,24000000/6)
+	MDRV_CPU_ADD("audio", Z80,24000000/6)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 

@@ -460,11 +460,11 @@ static INTERRUPT_GEN( galpani2_interrupt2 )
 static MACHINE_DRIVER_START( galpani2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000)	/* 16MHz */
+	MDRV_CPU_ADD("main", M68000, 16000000)	/* 16MHz */
 	MDRV_CPU_PROGRAM_MAP(galpani2_mem1, 0)
 	MDRV_CPU_VBLANK_INT_HACK(galpani2_interrupt,GALPANI2_INTERRUPTS_NUM)
 
-	MDRV_CPU_ADD(M68000, 16000000)	/* 16MHz */
+	MDRV_CPU_ADD("sub", M68000, 16000000)	/* 16MHz */
 	MDRV_CPU_PROGRAM_MAP(galpani2_mem2, 0)
 	MDRV_CPU_VBLANK_INT_HACK(galpani2_interrupt2,GALPANI2_INTERRUPTS_NUM2)
 

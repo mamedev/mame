@@ -407,7 +407,7 @@ static MACHINE_START(f3)
 static MACHINE_DRIVER_START( f3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68EC020, 16000000)
+	MDRV_CPU_ADD("main", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(f3_readmem,f3_writemem)
 	MDRV_CPU_VBLANK_INT("main", f3_interrupt2)
 
@@ -492,7 +492,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( bubsympb )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68EC020, 16000000)
+	MDRV_CPU_ADD("main", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(f3_readmem,f3_writemem)
 	MDRV_CPU_VBLANK_INT("main", f3_interrupt2)
 

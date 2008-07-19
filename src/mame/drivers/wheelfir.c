@@ -632,11 +632,11 @@ static INTERRUPT_GEN( wheelfir_irq )
 
 
 static MACHINE_DRIVER_START( wheelfir )
-	MDRV_CPU_ADD_TAG("main", M68000, 32000000)
+	MDRV_CPU_ADD("main", M68000, 32000000)
 	MDRV_CPU_PROGRAM_MAP(wheelfir_main, 0)
 	MDRV_CPU_VBLANK_INT_HACK(wheelfir_irq,256)  // 1,3,5 valid
 
-	MDRV_CPU_ADD_TAG("sub", M68000, 32000000/2)
+	MDRV_CPU_ADD("sub", M68000, 32000000/2)
 	MDRV_CPU_PROGRAM_MAP(wheelfir_sub, 0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold) // 1 valid
 

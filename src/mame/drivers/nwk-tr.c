@@ -1089,13 +1089,13 @@ static MACHINE_RESET( nwktr )
 static MACHINE_DRIVER_START( nwktr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
+	MDRV_CPU_ADD("main", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_PROGRAM_MAP(nwktr_map, 0)
 
-	MDRV_CPU_ADD(M68000, 64000000/4)	/* 16MHz */
+	MDRV_CPU_ADD("audio", M68000, 64000000/4)	/* 16MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_memmap, 0)
 
-	MDRV_CPU_ADD(ADSP21062, 36000000)
+	MDRV_CPU_ADD("dsp", ADSP21062, 36000000)
 	MDRV_CPU_CONFIG(sharc_cfg)
 	MDRV_CPU_DATA_MAP(sharc_map, 0)
 

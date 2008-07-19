@@ -669,7 +669,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( ladybug )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)	/* 4 MHz */
+	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(ladybug_map,0)
 
 	/* video hardware */
@@ -701,11 +701,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sraider )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 4000000)	/* 4 MHz */
+	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sraider_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
+	MDRV_CPU_ADD("sub", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sraider_cpu2_map,0)
 	MDRV_CPU_IO_MAP(sraider_cpu2_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

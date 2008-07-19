@@ -517,21 +517,19 @@ DISCRETE_SOUND_END
 static MACHINE_DRIVER_START( gyruss )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 3072000)	/* 3.072 MHz (?) */
+	MDRV_CPU_ADD("main", Z80, 3072000)	/* 3.072 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(main_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD(M6809, 2000000)        /* 2 MHz ??? */
+	MDRV_CPU_ADD("syb", M6809, 2000000)        /* 2 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_cpu2_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,14318180/4)
-	/* audio CPU */	/* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80,14318180/4)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(audio_cpu1_map,0)
 	MDRV_CPU_IO_MAP(audio_cpu1_io_map,0)
 
-	MDRV_CPU_ADD(I8039,8000000)
-	/* audio CPU */	/* 8MHz crystal */
+	MDRV_CPU_ADD("audio2", I8039,8000000)	/* 8MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(audio_cpu2_map,0)
 	MDRV_CPU_IO_MAP(audio_cpu2_io_map,0)
 

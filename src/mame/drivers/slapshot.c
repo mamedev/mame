@@ -554,12 +554,11 @@ static const struct YM2610interface ym2610_interface =
 static MACHINE_DRIVER_START( slapshot )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
+	MDRV_CPU_ADD("main", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
 	MDRV_CPU_PROGRAM_MAP(slapshot_readmem,slapshot_writemem)
 	MDRV_CPU_VBLANK_INT("main", slapshot_interrupt)
 
-	MDRV_CPU_ADD(Z80,32000000/8)
-	/* audio CPU */	/* 4 MHz */
+	MDRV_CPU_ADD("audio", Z80,32000000/8)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_readmem,z80_sound_writemem)
 
 	MDRV_INTERLEAVE(10)
@@ -596,12 +595,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( opwolf3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
+	MDRV_CPU_ADD("main", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
 	MDRV_CPU_PROGRAM_MAP(opwolf3_readmem,opwolf3_writemem)
 	MDRV_CPU_VBLANK_INT("main", slapshot_interrupt)
 
-	MDRV_CPU_ADD(Z80,32000000/8)
-	/* audio CPU */	/* 4 MHz */
+	MDRV_CPU_ADD("audio", Z80,32000000/8)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_readmem,z80_sound_writemem)
 
 	MDRV_INTERLEAVE(10)

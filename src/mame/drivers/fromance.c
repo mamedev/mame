@@ -1057,11 +1057,11 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( nekkyoku )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,12000000/2)		/* 6.00 Mhz ? */
+	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(nekkyoku_readmem_main,nekkyoku_writemem_main)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 Mhz ? */
+	MDRV_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(nekkyoku_readmem_sub,nekkyoku_writemem_sub)
 	MDRV_CPU_IO_MAP(nekkyoku_readport_sub,nekkyoku_writeport_sub)
 
@@ -1095,11 +1095,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( idolmj )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,12000000/2)		/* 6.00 Mhz ? */
+	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_readmem_main,fromance_writemem_main)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 Mhz ? */
+	MDRV_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_readmem_sub,fromance_writemem_sub)
 	MDRV_CPU_IO_MAP(fromance_readport_sub,idolmj_writeport_sub)
 
@@ -1133,11 +1133,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fromance )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,12000000/2)		/* 6.00 Mhz ? */
+	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_readmem_main,fromance_writemem_main)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 Mhz ? */
+	MDRV_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_readmem_sub,fromance_writemem_sub)
 	MDRV_CPU_IO_MAP(fromance_readport_sub,fromance_writeport_sub)
 

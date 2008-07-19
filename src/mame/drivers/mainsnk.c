@@ -371,12 +371,11 @@ static GFXDECODE_START( mainsnk )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( mainsnk )
-	MDRV_CPU_ADD_TAG("main", Z80, 3360000)
+	MDRV_CPU_ADD("main", Z80, 3360000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,4000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,4000000)
  	MDRV_CPU_PROGRAM_MAP(sound_map,0)
  	MDRV_CPU_IO_MAP(sound_portmap,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 244)

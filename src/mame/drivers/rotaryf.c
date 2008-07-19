@@ -149,7 +149,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( rotaryf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",8085A,4000000) /* 8080? */ /* 2 MHz? */
+	MDRV_CPU_ADD("main",8085A,4000000) /* 8080? */ /* 2 MHz? */
 	MDRV_CPU_PROGRAM_MAP(rotaryf_map,0)
 	MDRV_CPU_IO_MAP(rotaryf_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(rotaryf_interrupt,5)

@@ -625,12 +625,12 @@ static void snd_irq(running_machine *machine, int num)
 static MACHINE_DRIVER_START( m63 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("maincpu",Z80,XTAL_12MHz/4)     /* 3 MHz */
+	MDRV_CPU_ADD("maincpu",Z80,XTAL_12MHz/4)     /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(m63_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* audio CPU */
-	MDRV_CPU_ADD_TAG("soundcpu",I8039,XTAL_12MHz/4)	/* ????? */
+	MDRV_CPU_ADD("soundcpu",I8039,XTAL_12MHz/4)	/* ????? */
 	MDRV_CPU_PROGRAM_MAP(i8039_map,0)
 	MDRV_CPU_IO_MAP(i8039_port_map,0)
 	MDRV_CPU_PERIODIC_INT(snd_irq, 60)
@@ -670,12 +670,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fghtbskt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_12MHz/4)     /* 3 MHz */
+	MDRV_CPU_ADD("main", Z80, XTAL_12MHz/4)     /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(fghtbskt_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(I8039,XTAL_12MHz/4)	/* ????? */
+	MDRV_CPU_ADD("audio", I8039,XTAL_12MHz/4)	/* ????? */
 	MDRV_CPU_PROGRAM_MAP(i8039_map,0)
 	MDRV_CPU_IO_MAP(i8039_port_map,0)
 	MDRV_CPU_PERIODIC_INT(snd_irq, 60/2)

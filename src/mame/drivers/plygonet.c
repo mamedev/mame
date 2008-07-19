@@ -685,16 +685,16 @@ static GFXDECODE_START( plygonet )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( plygonet )
-	MDRV_CPU_ADD_TAG("main", M68EC020, 16000000)	/* 16 MHz (xtal is 32.0 MHz) */
+	MDRV_CPU_ADD("main", M68EC020, 16000000)	/* 16 MHz (xtal is 32.0 MHz) */
 	MDRV_CPU_PROGRAM_MAP(polygonet_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(polygonet_interrupt, 2)
 
-	MDRV_CPU_ADD(DSP56156, 10000000)		/* should be 40.0 MHz */
+	MDRV_CPU_ADD("dsp", DSP56156, 10000000)		/* should be 40.0 MHz */
 	MDRV_CPU_FLAGS(CPU_DISABLE)
 	MDRV_CPU_PROGRAM_MAP(dsp56156_p_map, 0)
 	MDRV_CPU_DATA_MAP(dsp56156_d_map, 0)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 8000000)
+	MDRV_CPU_ADD("sound", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_PERIODIC_INT(audio_interrupt, 480)
 

@@ -402,7 +402,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( gat )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/24)	/* guess */
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/24)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(gat_map, 0)
 	MDRV_CPU_IO_MAP(gat_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)

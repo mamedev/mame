@@ -656,7 +656,7 @@ static MACHINE_RESET( qdrmfgp2 )
 static MACHINE_DRIVER_START( qdrmfgp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 32000000/2)	/*  16.000 MHz */
+	MDRV_CPU_ADD("main", M68000, 32000000/2)	/*  16.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(qdrmfgp_interrupt, 2)
 
@@ -691,7 +691,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( qdrmfgp2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 32000000/2)	/*  16.000 MHz */
+	MDRV_CPU_ADD("main", M68000, 32000000/2)	/*  16.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(gp2_readmem,gp2_writemem)
 	MDRV_CPU_VBLANK_INT("main", qdrmfgp2_interrupt)
 

@@ -1235,12 +1235,12 @@ static const struct m68k_encryption_interface cps2_encryption =
 static MACHINE_DRIVER_START( cps2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, 16000000)
 	MDRV_CPU_CONFIG(cps2_encryption)
 	MDRV_CPU_PROGRAM_MAP(cps2_readmem,cps2_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(cps2_interrupt,262)	// 262  /* ??? interrupts per frame */
 
-	MDRV_CPU_ADD(Z80, 8000000)
+	MDRV_CPU_ADD("audio", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(qsound_sub_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 251)	/* 251 is good (see 'mercy mercy mercy'section of sgemf attract mode for accurate sound sync */
 

@@ -568,7 +568,7 @@ static MACHINE_RESET( multigm3 )
 
 static MACHINE_DRIVER_START( multigam )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", N2A03, N2A03_DEFAULTCLOCK)
+	MDRV_CPU_ADD("main", N2A03, N2A03_DEFAULTCLOCK)
 	MDRV_CPU_PROGRAM_MAP(multigam_map, 0)
 
 	MDRV_MACHINE_RESET( multigam )

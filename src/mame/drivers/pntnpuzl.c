@@ -452,7 +452,7 @@ INPUT_PORTS_END
 
 
 static MACHINE_DRIVER_START( pntnpuzl )
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)//??
+	MDRV_CPU_ADD("main", M68000, 12000000)//??
 	MDRV_CPU_PROGRAM_MAP(pntnpuzl_map,0)
 	MDRV_CPU_VBLANK_INT("main", pntnpuzl_irq)	// irq1 = coin irq2 = service irq4 = coin
 

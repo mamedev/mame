@@ -1624,7 +1624,7 @@ static const struct POKEYinterface warlords_pokey_interface =
 static MACHINE_DRIVER_START( centiped )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 12096000/8)	/* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
+	MDRV_CPU_ADD("main", M6502, 12096000/8)	/* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
 	MDRV_CPU_PROGRAM_MAP(centiped_map,0)
 
 	MDRV_MACHINE_START(centiped)
@@ -1753,7 +1753,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bullsdrt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", S2650, 12096000/8)
+	MDRV_CPU_ADD("main", S2650, 12096000/8)
 	MDRV_CPU_PROGRAM_MAP(bullsdrt_map,0)
 	MDRV_CPU_IO_MAP(bullsdrt_port_map,0)
 

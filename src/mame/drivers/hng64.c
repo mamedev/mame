@@ -1516,15 +1516,15 @@ static MACHINE_RESET(hyperneo)
 
 static MACHINE_DRIVER_START( hng64 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", R4600BE, MASTER_CLOCK)  	// actually R4300
+	MDRV_CPU_ADD("main", R4600BE, MASTER_CLOCK)  	// actually R4300
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(hng_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq_start,3)
 
-	MDRV_CPU_ADD(V30,8000000)		 		// v53, 16? mhz!
+	MDRV_CPU_ADD("audio", V30,8000000)		 		// v53, 16? mhz!
 	MDRV_CPU_PROGRAM_MAP(hng_sound_map,0)
 
-	MDRV_CPU_ADD(Z80,MASTER_CLOCK/4)		/* KL5C80A12CFP - binary compatible with Z80. */
+	MDRV_CPU_ADD("comm", Z80,MASTER_CLOCK/4)		/* KL5C80A12CFP - binary compatible with Z80. */
 	MDRV_CPU_PROGRAM_MAP(hng_comm_map,0)
 	MDRV_CPU_IO_MAP(hng_comm_io_map, 0)
 

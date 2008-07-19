@@ -831,12 +831,12 @@ static VIDEO_EOF( perfrman )
 static MACHINE_DRIVER_START( perfrman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,16000000/4)			/* 4MHz ???, 16MHz Oscillator */
+	MDRV_CPU_ADD("main", Z80,16000000/4)			/* 4MHz ???, 16MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(perfrman_readmem,perfrman_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,16000000/8)			/* 2MHz ???, 16MHz Oscillator */
+	MDRV_CPU_ADD("audio", Z80,16000000/8)			/* 2MHz ???, 16MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(perfrman_sound_readmem,perfrman_sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(getstar_interrupt,4)	/* music speed, verified */
 
@@ -878,12 +878,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tigerhb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 6000000)
+	MDRV_CPU_ADD("main", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(tigerh_readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,tigerh_writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 6000000)
+	MDRV_CPU_ADD("audio", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,6)    /* ??? */
 
@@ -924,16 +924,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tigerh )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, XTAL_36MHz/6) /* verified on pcb */
+	MDRV_CPU_ADD("main", Z80, XTAL_36MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tigerh_readmem,writemem)
 	MDRV_CPU_IO_MAP(tigerh_readport,tigerh_writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_36MHz/12) /* verified on pcb */
+	MDRV_CPU_ADD("audio", Z80, XTAL_36MHz/12) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,6)    /* ??? */
 
-	MDRV_CPU_ADD(M68705,XTAL_36MHz/12) /* verified on pcb */
+	MDRV_CPU_ADD("mcu", M68705,XTAL_36MHz/12) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 
 	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
@@ -974,12 +974,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( slapfigh )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80, XTAL_36MHz/6) /* verified on pcb */
+	MDRV_CPU_ADD("main",Z80, XTAL_36MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_36MHz/12) /* verified on pcb */
+	MDRV_CPU_ADD("audio", Z80, XTAL_36MHz/12) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(getstar_interrupt, 3)
 

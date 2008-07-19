@@ -558,11 +558,11 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( opwolf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000 )	/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000, 12000000 )	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(opwolf_readmem,opwolf_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000 )	/* 4 MHz */
+	MDRV_CPU_ADD("audio", Z80, 4000000 )	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
 
 	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
@@ -607,14 +607,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( opwolfb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz ??? */
+	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(opwolfb_readmem,opwolfb_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
 
-	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("sub", Z80, 4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sub_z80_readmem,sub_z80_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

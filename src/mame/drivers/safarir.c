@@ -262,7 +262,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( safarir )
 
  	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8080, 3072000)	/* 3 MHz ? */
+	MDRV_CPU_ADD("main", 8080, 3072000)	/* 3 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 
 	MDRV_MACHINE_START(safarir)

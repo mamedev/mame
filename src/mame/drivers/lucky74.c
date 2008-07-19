@@ -833,7 +833,7 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( lucky74 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/8)	/* guess */
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/8)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(lucky74_map, 0)
 	MDRV_CPU_IO_MAP(lucky74_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_interrupt)

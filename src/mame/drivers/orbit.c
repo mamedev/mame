@@ -291,7 +291,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( orbit )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6800, MASTER_CLOCK / 16)
+	MDRV_CPU_ADD("main", M6800, MASTER_CLOCK / 16)
 	MDRV_CPU_PROGRAM_MAP(orbit_map, 0)
 	MDRV_CPU_VBLANK_INT("main", orbit_interrupt)
 

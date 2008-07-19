@@ -875,7 +875,7 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( ojankohs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,12000000/2)		/* 6.00 MHz ? */
+	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem_ojankohs,writemem_ojankohs)
 	MDRV_CPU_IO_MAP(readport_ojankohs,writeport_ojankohs)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -912,7 +912,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ojankoy )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,12000000/2)		/* 6.00 MHz ? */
+	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem_ojankoy,writemem_ojankoy)
 	MDRV_CPU_IO_MAP(readport_ojankohs,writeport_ojankoy)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -950,7 +950,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ccasino )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,12000000/2)		/* 6.00 MHz ? */
+	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem_ojankoy,writemem_ojankoy)
 	MDRV_CPU_IO_MAP(readport_ccasino,writeport_ccasino)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -987,7 +987,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ojankoc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,8000000/2)			/* 4.00 MHz */
+	MDRV_CPU_ADD("main", Z80,8000000/2)			/* 4.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_ojankoc,writemem_ojankoc)
 	MDRV_CPU_IO_MAP(readport_ojankoc,writeport_ojankoc)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

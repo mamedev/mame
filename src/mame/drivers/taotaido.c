@@ -331,12 +331,12 @@ static const struct YM2610interface ym2610_interface =
 };
 
 static MACHINE_DRIVER_START( taotaido )
-	MDRV_CPU_ADD_TAG("main", M68000, 32000000/2)
+	MDRV_CPU_ADD("main", M68000, 32000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(Z80,20000000/4) // ??
+	MDRV_CPU_ADD("audio", Z80,20000000/4) // ??
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_port_map,0)
 								/* IRQs are triggered by the YM2610 */

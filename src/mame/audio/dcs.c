@@ -590,7 +590,7 @@ ADDRESS_MAP_END
 
 /* Basic DCS system with ADSP-2105 and 2k of SRAM (T-unit, V-unit, Killer Instinct) */
 MACHINE_DRIVER_START( dcs_audio_2k )
-	MDRV_CPU_ADD_TAG("dcs", ADSP2105, XTAL_10MHz)
+	MDRV_CPU_ADD("dcs", ADSP2105, XTAL_10MHz)
 	MDRV_CPU_PROGRAM_MAP(dcs_2k_program_map,0)
 	MDRV_CPU_DATA_MAP(dcs_2k_data_map,0)
 
@@ -628,7 +628,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 MACHINE_DRIVER_START( dcs2_audio_2115 )
-	MDRV_CPU_ADD_TAG("dcs2", ADSP2115, XTAL_16MHz)
+	MDRV_CPU_ADD("dcs2", ADSP2115, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(dcs2_2115_program_map,0)
 	MDRV_CPU_DATA_MAP(dcs2_2115_data_map,0)
 
@@ -658,7 +658,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 MACHINE_DRIVER_START( dcs2_audio_dsio )
-	MDRV_CPU_ADD_TAG("dsio", ADSP2181, XTAL_32MHz)
+	MDRV_CPU_ADD("dsio", ADSP2181, XTAL_32MHz)
 	MDRV_CPU_PROGRAM_MAP(dsio_program_map,0)
 	MDRV_CPU_DATA_MAP(dsio_data_map,0)
 	MDRV_CPU_IO_MAP(dsio_io_map,0)
@@ -681,7 +681,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 MACHINE_DRIVER_START( dcs2_audio_denver )
-	MDRV_CPU_ADD_TAG("denver", ADSP2181, XTAL_33_333MHz)
+	MDRV_CPU_ADD("denver", ADSP2181, XTAL_33_333MHz)
 	MDRV_CPU_PROGRAM_MAP(denver_program_map,0)
 	MDRV_CPU_DATA_MAP(denver_data_map,0)
 	MDRV_CPU_IO_MAP(denver_io_map,0)

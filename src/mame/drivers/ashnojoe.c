@@ -338,11 +338,11 @@ static DRIVER_INIT( ashnojoe )
 static MACHINE_DRIVER_START( ashnojoe )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 8000000) /* 8 MHz (verified on pcb) */
+	MDRV_CPU_ADD("main", M68000, 8000000) /* 8 MHz (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(ashnojoe_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz (verified on pcb) */
+	MDRV_CPU_ADD("audio", Z80, 4000000) /* 4 MHz (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 

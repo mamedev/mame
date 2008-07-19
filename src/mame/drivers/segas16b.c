@@ -3243,11 +3243,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( system16b )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK_10MHz)
+	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK_10MHz)
 	MDRV_CPU_PROGRAM_MAP(system16b_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK_10MHz/2)
+	MDRV_CPU_ADD("sound", Z80, MASTER_CLOCK_10MHz/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
@@ -3282,7 +3282,7 @@ static MACHINE_DRIVER_START( system16b_8751 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_VBLANK_INT("main", i8751_main_cpu_vblank)
 
-	MDRV_CPU_ADD_TAG("mcu", I8751, MASTER_CLOCK_8MHz)
+	MDRV_CPU_ADD("mcu", I8751, MASTER_CLOCK_8MHz)
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_DATA_MAP(mcu_data_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_pulse)

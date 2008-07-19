@@ -527,11 +527,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( gauntlet )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68010, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("main", M68010, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
 
-	MDRV_CPU_ADD(M6502, ATARI_CLOCK_14MHz/8)
+	MDRV_CPU_ADD("audio", M6502, ATARI_CLOCK_14MHz/8)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_RESET(gauntlet)

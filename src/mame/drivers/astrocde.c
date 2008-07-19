@@ -1260,7 +1260,7 @@ static const struct z80_irq_daisy_chain tenpin_daisy_chain[] =
 static MACHINE_DRIVER_START( astrocade_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, ASTROCADE_CLOCK/4)
+	MDRV_CPU_ADD("main", Z80, ASTROCADE_CLOCK/4)
 	/* each game has its own map */
 
 	MDRV_MACHINE_START(astrocde)
@@ -1465,7 +1465,7 @@ static MACHINE_DRIVER_START( tenpindx )
 	MDRV_CPU_PROGRAM_MAP(profpac_map,0)
 	MDRV_CPU_IO_MAP(port_map_16col_pattern_nosound,0)
 
-	MDRV_CPU_ADD(Z80, ASTROCADE_CLOCK/4)	/* real clock unknown */
+	MDRV_CPU_ADD("sub", Z80, ASTROCADE_CLOCK/4)	/* real clock unknown */
 	MDRV_CPU_CONFIG(tenpin_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(tenpin_sub_map,0)
 	MDRV_CPU_IO_MAP(tenpin_sub_io_map,0)

@@ -553,16 +553,15 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( dassault )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 14000000) /* Accurate */
+	MDRV_CPU_ADD("main", M68000, 14000000) /* Accurate */
 	MDRV_CPU_PROGRAM_MAP(dassault_readmem,dassault_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD(M68000, 14000000) /* Accurate */
+	MDRV_CPU_ADD("sub", M68000, 14000000) /* Accurate */
 	MDRV_CPU_PROGRAM_MAP(dassault_sub_readmem,dassault_sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD(H6280,32220000/8)
-	/* audio CPU */	/* Accurate */
+	MDRV_CPU_ADD("audio", H6280,32220000/8)	/* Accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_INTERLEAVE(140) /* 140 CPU slices per frame */

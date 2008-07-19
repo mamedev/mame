@@ -674,7 +674,7 @@ static NVRAM_HANDLER( zeropnt2 )
 static MACHINE_DRIVER_START( burglarx )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_burglarx,writemem_burglarx)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -721,7 +721,7 @@ static MACHINE_RESET( zeropt )
 static MACHINE_DRIVER_START( zeropnt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_zeropnt,writemem_zeropnt)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
@@ -763,7 +763,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( zeropnt2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68EC020, 16000000)
+	MDRV_CPU_ADD("main", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_zeropnt2,writemem_zeropnt2)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 

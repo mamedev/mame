@@ -360,15 +360,15 @@ static const struct AY8910interface ay8910_interface_2 =
 static MACHINE_DRIVER_START( taxidrvr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("main", Z80,4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("sub", Z80,4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* ??? */
 
-	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80,4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(cpu3_map,0)
 	MDRV_CPU_IO_MAP(cpu3_port_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* ??? */

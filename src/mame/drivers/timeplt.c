@@ -359,7 +359,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( timeplt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/3/2)	/* not confirmed, but common for Konami games of the era */
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/3/2)	/* not confirmed, but common for Konami games of the era */
 	MDRV_CPU_PROGRAM_MAP(timeplt_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", timeplt_interrupt)
 

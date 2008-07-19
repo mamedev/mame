@@ -194,7 +194,7 @@ static VIDEO_UPDATE(murogem)
 
 static MACHINE_DRIVER_START( murogem )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6802,8000000)		 /* ? MHz */
+	MDRV_CPU_ADD("main", M6802,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(murogem_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

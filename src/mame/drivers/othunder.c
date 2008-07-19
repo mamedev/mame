@@ -705,13 +705,12 @@ static const struct YM2610interface ym2610_interface =
 static MACHINE_DRIVER_START( othunder )
 
 	/* basic machine hardware */
-//  MDRV_CPU_ADD_TAG("main", M68000, 24000000/2 )   /* 12 MHz */
-	MDRV_CPU_ADD_TAG("main", M68000, 13000000 )	/* fixes garbage graphics on startup */
+//  MDRV_CPU_ADD("main", M68000, 24000000/2 )   /* 12 MHz */
+	MDRV_CPU_ADD("main", M68000, 13000000 )	/* fixes garbage graphics on startup */
 	MDRV_CPU_PROGRAM_MAP(othunder_map,0)
 	MDRV_CPU_VBLANK_INT("main", vblank_interrupt)
 
-	MDRV_CPU_ADD(Z80,16000000/4 )	/* 4 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80,16000000/4 )	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
 
 	MDRV_NVRAM_HANDLER(othunder)

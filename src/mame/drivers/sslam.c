@@ -728,11 +728,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( sslam )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(sslam_program_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-	MDRV_CPU_ADD(I8051, 12000000)
+	MDRV_CPU_ADD("audio", I8051, 12000000)
 	MDRV_CPU_FLAGS(CPU_DISABLE)		/* Internal code is not dumped - 2 boards were protected */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(0,0)
@@ -762,11 +762,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( powerbls )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)	/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(powerbls_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-	MDRV_CPU_ADD(I8051, 12000000)
+	MDRV_CPU_ADD("audio", I8051, 12000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 

@@ -838,7 +838,7 @@ MACHINE_DRIVER_START( monsterb_sound_board )
 	MDRV_DEVICE_CONFIG( monsterb_ppi_intf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("audio", N7751, 6000000)
+	MDRV_CPU_ADD("audio", N7751, 6000000)
 	MDRV_CPU_PROGRAM_MAP(monsterb_7751_map,0)
 	MDRV_CPU_IO_MAP(monsterb_7751_portmap,0)
 

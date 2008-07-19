@@ -432,7 +432,7 @@ static const struct YMZ280Binterface ymz280b_intf =
 static MACHINE_DRIVER_START( avengrgs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
+	MDRV_CPU_ADD("main", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 
 	MDRV_MACHINE_RESET(mlc)
@@ -464,7 +464,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mlc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
+	MDRV_CPU_ADD("main", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 
 	MDRV_MACHINE_RESET(mlc)

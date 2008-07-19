@@ -445,13 +445,12 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( bking )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main_cpu", Z80, XTAL_12MHz/4)	/* 3 MHz */
+	MDRV_CPU_ADD("main_cpu", Z80, XTAL_12MHz/4)	/* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(bking_map,0)
 	MDRV_CPU_IO_MAP(bking_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, XTAL_6MHz/2)	/* 3 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, XTAL_6MHz/2)	/* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(bking_audio_map,0)
 	/* interrupts (from Jungle King hardware, might be wrong): */
 	/* - no interrupts synced with vblank */
@@ -494,7 +493,7 @@ static MACHINE_DRIVER_START( bking3 )
 	MDRV_CPU_MODIFY("main_cpu")
 	MDRV_CPU_IO_MAP(bking3_io_map,0)
 
-	MDRV_CPU_ADD(M68705, XTAL_3MHz)      /* xtal is 3MHz, divided by 4 internally */
+	MDRV_CPU_ADD("mcu", M68705, XTAL_3MHz)      /* xtal is 3MHz, divided by 4 internally */
 	MDRV_CPU_PROGRAM_MAP(m68705_map,0)
 
 	MDRV_MACHINE_RESET(buggychl)

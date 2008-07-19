@@ -412,10 +412,10 @@ static const struct CustomSound_interface snes_sound_interface =
 
 static MACHINE_DRIVER_START( snes )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", G65816, 3580000)	/* 2.68Mhz, also 3.58Mhz */
+	MDRV_CPU_ADD("main", G65816, 3580000)	/* 2.68Mhz, also 3.58Mhz */
 	MDRV_CPU_PROGRAM_MAP(snes_map, 0)
 
-	MDRV_CPU_ADD_TAG("sound", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
+	MDRV_CPU_ADD("sound", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(spc_mem, 0)
 

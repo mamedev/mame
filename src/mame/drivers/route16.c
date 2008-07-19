@@ -609,12 +609,12 @@ static const struct SN76477interface sn76477_interface =
 static MACHINE_DRIVER_START( route16 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("cpu1", Z80, 2500000)	/* 10MHz / 4 = 2.5MHz */
+	MDRV_CPU_ADD("cpu1", Z80, 2500000)	/* 10MHz / 4 = 2.5MHz */
 	MDRV_CPU_PROGRAM_MAP(route16_cpu1_map,0)
 	MDRV_CPU_IO_MAP(cpu1_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD_TAG("cpu2", Z80, 2500000)	/* 10MHz / 4 = 2.5MHz */
+	MDRV_CPU_ADD("cpu2", Z80, 2500000)	/* 10MHz / 4 = 2.5MHz */
 	MDRV_CPU_PROGRAM_MAP(route16_cpu2_map,0)
 
 	/* video hardware */

@@ -434,7 +434,7 @@ static const struct Samplesinterface samples_interface =
 static MACHINE_DRIVER_START( gridlee )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, BALSENTE_CPU_CLOCK)
+	MDRV_CPU_ADD("main", M6809, BALSENTE_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu1,writemem_cpu1)
 
 	MDRV_MACHINE_RESET(gridlee)

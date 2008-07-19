@@ -559,15 +559,14 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( lsasquad )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 6000000)	/* 6 MHz? */
+	MDRV_CPU_ADD("main", Z80, 6000000)	/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */	/* 4 MHz? */
+	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* IRQs are triggered by the YM2203 */
-	MDRV_CPU_ADD(M68705,4000000)	/* ? */
+	MDRV_CPU_ADD("mcu", M68705,4000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 
 	MDRV_INTERLEAVE(500)	/* 500 CPU slices per frame - an high value to ensure proper */
@@ -605,12 +604,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( daikaiju )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 6000000)
+	MDRV_CPU_ADD("main", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(mem_daikaiju, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 3000000)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 3000000)
 	MDRV_CPU_PROGRAM_MAP(sound_mem_daikaiju, 0)
 	/* IRQs are triggered by the YM2203 */
 

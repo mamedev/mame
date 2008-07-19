@@ -255,7 +255,7 @@ static PALETTE_INIT( flyball )
 static MACHINE_DRIVER_START( flyball )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 12096000 / 16)
+	MDRV_CPU_ADD("main", M6502, 12096000 / 16)
 	MDRV_CPU_PROGRAM_MAP(flyball_map, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 

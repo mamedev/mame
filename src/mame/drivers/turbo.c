@@ -1077,7 +1077,7 @@ static MACHINE_DRIVER_START( turbo )
 	MDRV_DRIVER_DATA(turbo_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(turbo_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1115,7 +1115,7 @@ static MACHINE_DRIVER_START( subroc3d )
 	MDRV_DRIVER_DATA(turbo_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(subroc3d_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1146,11 +1146,11 @@ static MACHINE_DRIVER_START( buckrog )
 	MDRV_DRIVER_DATA(turbo_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(buckrog_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("sub", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(buckrog_cpu2_map,0)
 	MDRV_CPU_IO_MAP(buckrog_cpu2_portmap,0)
 

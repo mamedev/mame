@@ -453,7 +453,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( bloodbro )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_20MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, XTAL_20MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(bloodbro_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 

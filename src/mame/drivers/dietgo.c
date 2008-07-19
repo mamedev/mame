@@ -194,11 +194,11 @@ static const struct YM2151interface ym2151_interface =
 
 static MACHINE_DRIVER_START( dietgo )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, XTAL_28MHz/2) /* DE102 (verified on pcb) */
+	MDRV_CPU_ADD("main", M68000, XTAL_28MHz/2) /* DE102 (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(dietgo_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_CPU_ADD(H6280, XTAL_32_22MHz/4/3)	/* Custom chip 45; XIN is 32.220MHZ/4, verified on pcb */
+	MDRV_CPU_ADD("audio", H6280, XTAL_32_22MHz/4/3)	/* Custom chip 45; XIN is 32.220MHZ/4, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */

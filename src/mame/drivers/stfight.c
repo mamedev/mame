@@ -454,12 +454,11 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( stfight )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 3000000)	/* 3 MHz */
+	MDRV_CPU_ADD("main", Z80, 3000000)	/* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu1,writemem_cpu1)
 	MDRV_CPU_VBLANK_INT("main", stfight_vb_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3000000)
-	/* audio CPU */	/* 3 MHz */
+	MDRV_CPU_ADD("audio", Z80, 3000000)	/* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu2,writemem_cpu2)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,120)
 

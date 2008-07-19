@@ -373,7 +373,7 @@ static NVRAM_HANDLER( gunbustr )
 static MACHINE_DRIVER_START( gunbustr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68EC020, 16000000)	/* 16 MHz */
+	MDRV_CPU_ADD("main", M68EC020, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(gunbustr_readmem,gunbustr_writemem)
 	MDRV_CPU_VBLANK_INT("main", gunbustr_interrupt) /* VBL */
 

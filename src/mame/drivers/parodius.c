@@ -297,12 +297,11 @@ static const struct K053260_interface k053260_interface =
 static MACHINE_DRIVER_START( parodius )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", KONAMI, 3000000)		/* 053248 */
+	MDRV_CPU_ADD("main", KONAMI, 3000000)		/* 053248 */
 	MDRV_CPU_PROGRAM_MAP(parodius_readmem,parodius_writemem)
 	MDRV_CPU_VBLANK_INT("main", parodius_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */
+	MDRV_CPU_ADD("audio", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(parodius_readmem_sound,parodius_writemem_sound)
 								/* NMIs are triggered by the 053260 */
 

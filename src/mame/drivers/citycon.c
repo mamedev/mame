@@ -214,12 +214,11 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( citycon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809, 2048000)        /* 2.048 MHz ??? */
+	MDRV_CPU_ADD("main", M6809, 2048000)        /* 2.048 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(M6809, 640000)
-	/* audio CPU */        /* 0.640 MHz ??? */
+	MDRV_CPU_ADD("audio", M6809, 640000)       /* 0.640 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

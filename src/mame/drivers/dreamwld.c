@@ -445,7 +445,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( dreamwld )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68EC020, MASTER_CLOCK/2)
+	MDRV_CPU_ADD("main", M68EC020, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(dreamwld_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold) // 4, 5, or 6, all point to the same place
 

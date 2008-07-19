@@ -1172,10 +1172,10 @@ static MACHINE_DRIVER_START( gameplan )
 	MDRV_DRIVER_DATA(gameplan_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, GAMEPLAN_MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD("main", M6502, GAMEPLAN_MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(gameplan_main_map,0)
 
-	MDRV_CPU_ADD_TAG("audio", M6502, GAMEPLAN_AUDIO_CPU_CLOCK)
+	MDRV_CPU_ADD("audio", M6502, GAMEPLAN_AUDIO_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(gameplan_audio_map,0)
 
 	MDRV_MACHINE_START(gameplan)

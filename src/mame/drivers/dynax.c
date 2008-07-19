@@ -3626,7 +3626,7 @@ static const struct MSM5205interface hanamai_msm5205_interface =
 static MACHINE_DRIVER_START( hanamai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,22000000 / 4)	/* 5.5MHz */
+	MDRV_CPU_ADD("main",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
 	MDRV_CPU_IO_MAP(hanamai_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
@@ -3683,7 +3683,7 @@ static const struct AY8910interface hnoridur_ay8910_interface =
 static MACHINE_DRIVER_START( hnoridur )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,22000000 / 4)	/* 5.5MHz */
+	MDRV_CPU_ADD("main",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(hnoridur_mem_map,0)
 	MDRV_CPU_IO_MAP(hnoridur_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
@@ -3741,7 +3741,7 @@ static const struct YM2203interface sprtmtch_ym2203_interface =
 static MACHINE_DRIVER_START( sprtmtch )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80,22000000 / 4)	/* 5.5MHz */
+	MDRV_CPU_ADD("main", Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
 	MDRV_CPU_IO_MAP(sprtmtch_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
@@ -3781,7 +3781,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mjfriday )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,24000000/4)	/* 6 MHz? */
+	MDRV_CPU_ADD("main",Z80,24000000/4)	/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
 	MDRV_CPU_IO_MAP(mjfriday_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -3921,12 +3921,12 @@ static const struct MSM5205interface jantouki_msm5205_interface =
 static MACHINE_DRIVER_START( jantouki )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,22000000 / 4)	/* 5.5MHz */
+	MDRV_CPU_ADD("main",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(jantouki_mem_map,0)
 	MDRV_CPU_IO_MAP(jantouki_io_map,0)
 	MDRV_CPU_VBLANK_INT("top", jantouki_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
-	MDRV_CPU_ADD_TAG("sound",Z80,22000000 / 4)	/* 5.5MHz */
+	MDRV_CPU_ADD("sound",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(jantouki_sound_mem_map,0)
 	MDRV_CPU_IO_MAP(jantouki_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT("top", jantouki_sound_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
@@ -4089,7 +4089,7 @@ static const struct AY8910interface htengoku_ay8910_interface =
 static MACHINE_DRIVER_START( htengoku )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80,20000000 / 4)
+	MDRV_CPU_ADD("main",Z80,20000000 / 4)
 	MDRV_CPU_PROGRAM_MAP(yarunara_mem_map,0)
 	MDRV_CPU_IO_MAP(htengoku_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
@@ -4152,7 +4152,7 @@ static const struct AY8910interface tenkai_ay8910_interface =
 static MACHINE_DRIVER_START( tenkai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",TMP91640, 21472700 / 2)
+	MDRV_CPU_ADD("main",TMP91640, 21472700 / 2)
 	MDRV_CPU_PROGRAM_MAP(tenkai_map,0)
 	MDRV_CPU_IO_MAP(tenkai_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(tenkai_interrupt,3)

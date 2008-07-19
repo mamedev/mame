@@ -409,7 +409,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( beathead )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", ASAP, ATARI_CLOCK_14MHz)
+	MDRV_CPU_ADD("main", ASAP, ATARI_CLOCK_14MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_MACHINE_RESET(beathead)
