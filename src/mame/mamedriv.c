@@ -4023,7 +4023,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mp_bio )	/* 06 */
 	DRIVER( mp_soni2 )	/* 07 */
 				/* 08 */
-				/* 09 */
+	DRIVER( mp_shnb3 )	/* 09 */
 				/* 10 */
 	DRIVER( mp_mazin )	/* 11 */
 	DRIVER( mp_col3 )	/* ?? */

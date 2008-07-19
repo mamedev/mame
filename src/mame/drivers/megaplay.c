@@ -391,6 +391,22 @@ static INPUT_PORTS_START ( mp_soni2 )
     PORT_DIPSETTING( 0x0c, "3" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START ( mp_shnb3 )
+	PORT_INCLUDE( megaplay )
+
+	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW3:1,2")
+    PORT_DIPSETTING( 0x00, "4" )
+    PORT_DIPSETTING( 0x01, "3" )
+    PORT_DIPSETTING( 0x02, "2" )
+    PORT_DIPSETTING( 0x03, "1" )
+	PORT_DIPNAME( 0xc, 0x0c, DEF_STR ( Difficulty ) ) PORT_DIPLOCATION("SW3:3,4")
+    PORT_DIPSETTING( 0x00, "Expert" )
+    PORT_DIPSETTING( 0x04, DEF_STR ( Hard ) )
+    PORT_DIPSETTING( 0x08, DEF_STR ( Easy ) )
+    PORT_DIPSETTING( 0x0c, DEF_STR ( Normal ) )
+INPUT_PORTS_END
+
 /*MEGAPLAY specific*/
 
 static READ8_HANDLER( megaplay_bios_banksel_r )
@@ -918,6 +934,18 @@ ROM_START( mp_mazin ) /* Mazin Wars */
 	MEGAPLAY_BIOS
 ROM_END
 
+ROM_START( mp_shnb3 ) /* Shinobi 3 */
+	ROM_REGION( 0x400000, REGION_CPU1, 0 )
+	ROM_LOAD16_WORD_SWAP( "mpr-16197.ic1", 0x000000, 0x100000, CRC(48162361) SHA1(77d544509339b5ddf6d19941377e81d29e9e21dc) )
+	/* Game Instruction rom copied to 0x300000 - 0x310000 (odd / even bytes equal) */
+
+	ROM_REGION( 0x8000, REGION_USER1, 0 ) /* Game Instructions */
+	ROM_LOAD( "epr-15175-09.ic2", 0x000000, 0x08000, CRC(6254e45a) SHA1(8667922a6eade03c964ce224f7fa39ba871c60a4) )
+
+	ROM_REGION( 0x28000, REGION_CPU3, 0 ) /* Bios */
+	MEGAPLAY_BIOS
+ROM_END
+
 
 static void megplay_stat(running_machine *machine)
 {
@@ -1007,11 +1035,11 @@ Columns 3            171-5834                      610-0297-04*         2       
 Streets Of Rage II   171-6215A   837-9165-05       610-0297-05          MPR-15425   (8316200A)  EPR-15175-05 (27256)   n/a
 Bio-Hazard Battle    171-6215A   837-9165-06       610-0298-06          MPR-15699-F (838200)    EPR-15175-06 (27256)   n/a
 Sonic The Hedgehog 2 171-6215A   837-9165-07       610-0297-07          MPR-16011   (838200)    EPR-15175-07 (27256)   n/a
+Shinobi III          171-6215A   837-9165-09       610-0297-09          MPR-16197   (838200)    EPR-15175-09 (27256)   n/a
 Mazin Wars           171-6215A   837-9165-11       610-0297-11          MPR-16460   (838200)    EPR-15175-11 (27256)   n/a
 
 * This is the code for Tecmo World Cup, as the ROMs in the Columns 3 cart
 didn't have original Sega part numbers it's probably a converted TWC cart
-
 */
 
 /* -- */ GAME( 1993, megaplay, 0, mpnew, megaplay, megaplay, ROT0, "Sega",                  "Mega Play BIOS", GAME_IS_BIOS_ROOT )
@@ -1023,7 +1051,7 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 /* 06 */ GAME( 1993, mp_bio,   megaplay, mpnew, mp_bio,   megaplay, ROT0, "Sega",                  "Bio-hazard Battle (Mega Play)" , 0 )
 /* 07 */ GAME( 1993, mp_soni2, megaplay, mpnew, mp_soni2, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega Play)" , 0 )
 /* 08 */
-/* 09 */
+/* 09 */ GAME( 1993, mp_shnb3, megaplay, mpnew, mp_shnb3, megaplay, ROT0, "Sega",                  "Shinobi III (Mega Play)" , 0 )
 /* 10 */
 /* 11 */ GAME( 1993, mp_mazin, megaplay, mpnew, mp_mazin, megaplay, ROT0, "Sega",                  "Mazin Wars / Mazin Saga (Mega Play)",0  )
 
@@ -1032,7 +1060,6 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 
 /* Also confirmed to exist:
 Gunstar Heroes
-Shinobi III
 
 system16.com lists 'Streets of Rage' but this seems unlikely, there are no gaps in
 the numbering prior to 'Streets of Rage 2'
