@@ -8,1977 +8,2192 @@
 
 #include "dsp56k.h"
 
-/* todo: fix the syntax for many opcodes to be true DSP56k assembly
- *
- *
-*/
+/* Main opcode categories */
+static unsigned assemble_x_memory_data_move_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
+static unsigned assemble_dual_x_memory_data_read_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
+static unsigned assemble_TCC_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
+static unsigned assemble_bitfield_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
+static unsigned assemble_no_parallel_move_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
+static unsigned assemble_immediate_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
+static unsigned assemble_movec_opcodes(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
+static unsigned assemble_misc_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
+static unsigned assemble_unique_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
+
+/* Sub-opcode decoding */
+static void decode_data_ALU_opcode(const UINT16 op_byte, char* opcode_str, char* arg_str);
+static void decode_data_ALU_opcode_dual_move(const UINT16 op_byte, char* opcode_str, char* arg_str);
+
+/* Direct opcode decoding */
+static unsigned decode_TCC_opcode(const UINT16 op, char* opcode_str, char* arg_str);
+static unsigned decode_bitfield_opcode(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static unsigned decode_no_parallel_move_opcode(const UINT16 op, const UINT16 op2, const UINT16 pc, char* opcode_str, char* arg_str);
+static unsigned decode_immediate_opcode(const UINT16 op, const UINT16 pc, char* opcode_str, char* arg_str);
+static unsigned decode_movec_opcodes(const UINT16 op, const UINT16 op2, const UINT16 pc, char* opcode_str, char* arg_str);
+static unsigned decode_misc_opcode(const UINT16 op, const UINT16 pc, char* opcode_str, char* arg_str);
+static unsigned decode_unique_opcode(const UINT16 op, const UINT16 op2, const UINT16 pc, char* opcode_str, char* arg_str);
+
+/* Parallel operation decoding */
+static void decode_x_memory_data_move(const UINT16 op_byte, char* parallel_move_str);
+static void decode_dual_x_memory_data_read(const UINT16 op, char* parallel_move_str, char* parallel_move_str2);
 
 
-// Main opcode categories
-static unsigned DecodeDataALUOpcode(char *buffer, UINT16 op, unsigned pc, int parallelType) ;
-//static unsigned DecodeDXMDROpcode(char *buffer, UINT16 op, unsigned pc) ;
-static unsigned DecodeNPMOpcode(char *buffer, UINT16 op, unsigned pc, const UINT8 *oprom) ;
-static unsigned DecodeMisfitOpcode(char *buffer, UINT16 op, unsigned pc, const UINT8 *oprom) ;
-static unsigned DecodeSpecialOpcode(char *buffer, UINT16 op, unsigned pc, const UINT8 *oprom) ;
+/* Helper functions */
+#define BITS(CUR,MASK) (dsp56k_op_mask(CUR,MASK))
+static UINT16 dsp56k_op_mask(UINT16 op, UINT16 mask);
+
+enum bbbType  { BBB_UPPER, BBB_MIDDLE, BBB_LOWER };
+
+/* Table decoder functions */
+static int  decode_BBB_table  (UINT16 BBB);
+static void decode_cccc_table (UINT16 cccc, char *mnemonic);
+static void decode_DDDDD_table(UINT16 DDDDD, char *SD);
+static void decode_DD_table   (UINT16 DD, char *SD);
+static void decode_DDF_table  (UINT16 DD, UINT16 F, char *S, char *D);
+static void decode_EE_table   (UINT16 EE, char *D);
+static void decode_F_table    (UINT16 F, char *SD);
+static void decode_h0hF_table (UINT16 h0h, UINT16 F, char *S, char *D);
+static void decode_HH_table   (UINT16 HH, char *SD);
+static void decode_HHH_table  (UINT16 HHH, char *SD);
+/* static void decode_IIII_table (UINT16 IIII, char *S, char *D); */
+static void decode_JJJF_table (UINT16 JJJ, UINT16 F, char *S, char *D);
+static void decode_JJF_table  (UINT16 JJ, UINT16 F, char *S, char *D);
+static void decode_JF_table   (UINT16 J, UINT16 F, char *S, char *D);
+/* static void decode_k_table    (UINT16 k, char *Dnot); */
+static void decode_kSign_table(UINT16 k, char *plusMinus);
+static void decode_KKK_table  (UINT16 KKK, char *D1, char *D2);
+/* static int  decode_NN_table   (UINT16 NN); */
+static void decode_QQF_table  (UINT16 QQ, UINT16 F, char *S1, char *S2, char *D);
+static void decode_QQF_special_table(UINT16 QQ, UINT16 F, char *S1, char *S2, char *D);
+static void decode_QQQF_table (UINT16 QQQ, UINT16 F, char *S1, char *S2, char *D);
+static int  decode_RR_table   (UINT16 RR);
+static int  decode_rr_table   (UINT16 rr);
+static void decode_s_table    (UINT16 s, char *arithmetic);
+static void decode_ss_table   (UINT16 ss, char *arithmetic);
+static void decode_uuuuF_table(UINT16 uuuu, UINT16 F, char *arg, char *S, char *D);
+static void decode_Z_table    (UINT16 Z, char *ea);
+
+static void assemble_ea_from_m_table (UINT16 m, int n, char *ea);
+static void assemble_eas_from_m_table(UINT16 mm, int n1, int n2, char *ea1, char *ea2);
+static void assemble_ea_from_MM_table(UINT16 MM, int n, char *ea);
+static void assemble_ea_from_t_table (UINT16 t, UINT16 val, char *ea);
+static void assemble_ea_from_q_table (UINT16 q, int n, char *ea);
+/* static void assemble_ea_from_z_table (UINT16 z, int n, char *ea); */
+
+static void assemble_D_from_P_table(UINT16 P, UINT16 ppppp, char *D);
+static void assemble_arguments_from_W_table(UINT16 W, char *args, char ma, char *SD, char *ea);
+static void assemble_reg_from_W_table(UINT16 W, char *args, char ma, char *SD, UINT8 xx);
+
+static void assemble_address_from_IO_short_address(UINT16 pp, char *ea);
+static INT8 get_6_bit_relative_value(UINT16 bits);
 
 
-// Parallel memory operation decoding
-static void AppendXMDM(char *buffer, UINT16 op) ;
-static void AppendXMDMSpecial(char *buffer, UINT16 op, char *working) ;
-static void AppendARU(char *buffer, UINT16 op) ;
-static void AppendRRDM(char *buffer, UINT16 op, char *working) ;
-
-//static void AppendDXMDR(char *buffer, UINT16 op) ;
-
-
-// Helper functions
-#define BITS(CUR,MASK) (Dsp56kOpMask(CUR,MASK))
-static UINT16 Dsp56kOpMask(UINT16 op, UINT16 mask) ;
-
-
-enum bbbType  { BBB_UPPER, BBB_MIDDLE, BBB_LOWER } ;
-
-// Table decoder functions...
-static int  DecodeBBBTable  (UINT16 BBB             ) ;
-static void DecodeccccTable (UINT16 cccc,           char *mnemonic) ;
-static void DecodeDDDDDTable(UINT16 DDDDD,          char *SD) ;
-static void DecodeDDTable   (UINT16 DD,             char *SD) ;
-//static void DecodeDDFTable  (UINT16 DD,   UINT16 F, char *S, char *D) ;
-static void DecodeEETable   (UINT16 EE,             char *D) ;
-static void DecodeFTable    (UINT16 F,              char *SD) ;
-static void Decodeh0hFTable (UINT16 h0h,  UINT16 F, char *S, char *D) ;
-static void DecodeHHTable   (UINT16 HH,             char *SD) ;
-static void DecodeHHHTable  (UINT16 HHH,            char *SD) ;
-static void DecodeIIIITable (UINT16 IIII,           char *S, char *D) ;
-static void DecodeJJJFTable (UINT16 JJJ,  UINT16 F, char *S, char *D) ;
-static void DecodeJJFTable  (UINT16 JJ,   UINT16 F, char *S, char *D) ;
-//static void DecodeJFTable   (UINT16 J,    UINT16 F, char *S, char *D) ;
-//static void DecodekTable    (UINT16 k,              char *Dnot) ;
-//static void DecodekSignTable(UINT16 k,              char *plusMinus) ;
-//static void DecodeKKKTable  (UINT16 KKK,            char *D1, char *D2) ;
-//static int  DecodeNNTable   (UINT16 NN) ;
-//static void DecodeQQFTable  (UINT16 QQ,   UINT16 F, char *S1, char *S2, char *D) ;
-static void DecodeQQFTableSp(UINT16 QQ,   UINT16 F, char *S1, char *S2, char *D) ;
-//static void DecodeQQQFTable (UINT16 QQQ,  UINT16 F, char *S1, char *S2, char *D) ;
-static int  DecodeRRTable   (UINT16 RR) ;
-static void DecodesTable    (UINT16 s,              char *arithmetic) ;
-//static void DecodessTable   (UINT16 ss,             char *arithmetic) ;
-//static void DecodeuuuuFTable(UINT16 uuuu, UINT16 F, char *arg, char *S, char *D) ;
-static void DecodeZTable    (UINT16 Z,              char *ea) ;
-
-
-static void AssembleeaFrommTable (UINT16 m,  int n,          char *ea) ;
-//static void AssembleeaFrommmTable(UINT16 mm, int n1, int n2, char *ea1, char *ea2) ;
-static void AssembleeaFromMMTable(UINT16 MM, int n,          char *ea) ;
-static void AssembleeaFromtTable (UINT16 t,  UINT16 val,     char *ea) ;
-static void AssembleeaFromqTable (UINT16 q,  int n,          char *ea) ;
-static void AssembleeaFromzTable (UINT16 z,  int n,          char *ea) ;
-
-static void AssembleDFromPTable(UINT16 P, UINT16 ppppp, char *D) ;
-static void AssembleArgumentsFromWTable(UINT16 W, char *args, char ma, char *SD, char *ea) ;
-static void AssembleRegFromWTable(UINT16 W, char *args, char ma, char *SD, UINT8 xx) ;
-
-static void AssembleAddressFromIOShortAddress(UINT16 pp, char *ea) ;
-static void AssembleAddressFrom6BitSignedRelativeShortAddress(UINT16 srs, char *ea) ;
-
-// Main disassembly function
+/*****************************/
+/* Main disassembly function */
+/*****************************/
 offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	UINT16 op = oprom[0] | (oprom[1] << 8);
-	unsigned size = 0 ;
+	unsigned size = 0;
+	const UINT16 op  = oprom[0] | (oprom[1] << 8);
+	const UINT16 op2 = oprom[2] | (oprom[3] << 8);
 
-	pc <<= 1 ;
+	/* FILTER FOR PARALLEL DATA MOVES */
+	if (BITS(op,0x8000))
+	{
+		/* ALU opcode with a single parallel data move */
+		size = assemble_x_memory_data_move_ALU_opcode(buffer, op, op2, pc);
+	}
+	else if (BITS(op,0xe000) == 0x3)
+	{
+		/* ALU opcode with two parallel data moves */
+		size = assemble_dual_x_memory_data_read_ALU_opcode(buffer, op, op2, pc);
+	}
+	else if (BITS(op,0xff00) == 0x4a)	/* TODO */
+	{
+		/* ALU opcode without any parallel data move */
+		sprintf(buffer, "No parallel data move unimplemented.");
+		size = 1;
+	}
+	else if (BITS(op,0xf000) == 0x4)	/* TODO */
+	{
+		/* ALU opcode with a parallel register to register move */
+		sprintf(buffer, "Parallel register to register data move unimplemented.");
+		size = 1;
+	}
+	else if (BITS(op,0xf800) == 0x6)	/* TODO */
+	{
+		/* ALU opcode with an address register update */
+		sprintf(buffer, "Parallel address register update unimplemented.");
+		size = 1;
+	}
+	else if (BITS(op,0xf000) == 0x5)	/* TODO */
+	{
+		/* ALU opcode with an cooperative x data memory move */
+		sprintf(buffer, "Parallel coorperative x data memory move unimplemented.");
+		size = 1;
+	}
+	else if (BITS(op,0xff00) == 0x05)	/* TODO */
+	{
+		/* ALU opcode with x memory data move + short displacement */
+		sprintf(buffer, "Parallel x memory data move + short displacement unimplemented.");
+		size = 2;
+	}
+	else if (BITS(op,0xfe00) == 0xb)	/* TODO */
+	{
+		/* ALU opcode with x memory data write and register data move */
+		/* Don't forget these two, unique cases */
+		/* MPY             X       0001 0110 xxxx xxxx */
+		/* MAC             X       0001 0111 xxxx xxxx */
+		sprintf(buffer, "Parallel x memory data write and register data move unimplemented.");
+		size = 1;
+	}
+	
+	/* Tcc is a unique critter */
+	if (BITS(op,0xfc00) == 0x4)
+	{
+		size = assemble_TCC_opcode(buffer, op, op2, pc);
+	}
+	
+	/* Operations that do not allow a parallel move */
+	if (BITS(op,0xff00) == 0x14)
+	{
+		size = assemble_bitfield_opcode(buffer, op, op2, pc);
+	}
+	if (BITS(op,0xff00) == 0x15)
+	{
+		size = assemble_no_parallel_move_opcode(buffer, op, op2, pc);
+	}
+	if (BITS(op,0xf800) == 0x3)
+	{
+		size = assemble_immediate_opcode(buffer, op, op2, pc);
+	}
+	if (BITS(op,0xf800) == 0x7)
+	{
+		size = assemble_movec_opcodes(buffer, op, op2, pc);
+	}
+	if (BITS(op,0xf000) == 0x2)
+	{
+		size = assemble_misc_opcode(buffer, op, op2, pc);
+	}
+	
+	if (BITS(op,0xf000) == 0x0)
+	{
+		size = assemble_unique_opcode(buffer, op, op2, pc);
+	}
 
-	if (BITS(op,0x8000))													// First, the parallel data move instructions
-	{
-		size = DecodeDataALUOpcode(buffer, op, pc, PARALLEL_TYPE_XMDM) ;
-	}
-	else if (BITS(op,0xf000) == 0x5)
-	{
-		size = DecodeDataALUOpcode(buffer, op, pc, PARALLEL_TYPE_XMDM_SPECIAL) ;
-	}
-	else if (BITS(op,0xff00) == 0x4a)
-	{
-		size = DecodeDataALUOpcode(buffer, op, pc, PARALLEL_TYPE_NODM) ;
-	}
-	else if (BITS(op,0xf000) == 0x04)
-	{
-		size = DecodeDataALUOpcode(buffer, op, pc, PARALLEL_TYPE_RRDM) ;
-	}
-	else if (BITS(op,0xf800) == 0x06)
-	{
-		size = DecodeDataALUOpcode(buffer, op, pc, PARALLEL_TYPE_ARU) ;
-	}
-
-	else if (BITS(op,0x4000))
-	{
-		// size = DecodeDXMDROpcode(buffer, op, pc) ;
-		sprintf(buffer, "unknown") ;
-		size = 1 ;
-	}
-	else if (BITS(op,0xf000) == 0x1)
-	{
-		size = DecodeNPMOpcode(buffer, op, pc, oprom) ;
-	}
-	else if (BITS(op,0x2000))
-	{
-		size = DecodeMisfitOpcode(buffer, op, pc, oprom) ;
-	}
-	else if (BITS(op,0xf000) == 0x0)
-	{
-		size = DecodeSpecialOpcode(buffer, op, pc, oprom) ;
-	}
-
+	/* Not recognized?  Nudge debugger onto the next opcode. */
 	if (size == 0)
 	{
-		sprintf(buffer, "unknown") ;
-		size = 1 ;						// Just to get the debugger past the bad opcode
+		sprintf(buffer, "unknown");
+		size = 1;
 	}
 
 	return size | DASMFLAG_SUPPORTED;
 }
 
 
-static unsigned DecodeDataALUOpcode(char *buffer, UINT16 op, unsigned pc, int parallelType)
+static unsigned assemble_x_memory_data_move_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
 {
-	unsigned retSize = 0 ;
+	/* All operations are of length 1 */
+	unsigned opSize = 1;
 
-	char S1[32] ;
-	char D[32] ;
+	/* Recovered strings */
+	char arg_str[128] = "";
+	char opcode_str[128] = "";
+	char parallel_move_str[128] = "";
+	
+	/* Init */
+	sprintf(buffer, " ");
 
-	switch(BITS(op,0x0070))
-	{
-		case 0x0:
-			if (BITS(op,0x0007) == 0x1)
-			{
-				// CLR - 1mRR HHHW 0000 F001
-				DecodeFTable(BITS(op,0x0008), D) ;
-				sprintf(buffer, "clr       %s", D) ;
-				retSize = 1 ;
-			}
-			else
-			{
-				// ADD - 1mRR HHHW 0000 FJJJ
-				DecodeJJJFTable(BITS(op,0x0007), BITS(op,0x0008), S1, D) ;
-				sprintf(buffer, "add       %s,%s", S1, D) ;
-				retSize = 1 ;
-			}
-			break ;
+	/* First, decode the Data ALU opcode */
+	decode_data_ALU_opcode(BITS(op,0x00ff), opcode_str, arg_str);
+	
+	/* Next, decode the X Memory Data Move */
+	decode_x_memory_data_move(BITS(op,0xff00), parallel_move_str);
+	
+	/* Finally, assemble the full opcode */
+	sprintf(buffer, "%s    %s    %s", opcode_str, arg_str, parallel_move_str);
+	
+	return opSize;
+}
 
-		case 0x1:
-			if (BITS(op,0x000f) == 0x1)
-			{
-				// MOVE - 1mRR HHHW 0001 0001
-				// Funny operation :)
-				sprintf(buffer, "move      ") ;
-				retSize = 1 ;
-			}
-			else
-			{
-				// TFR - 1mRR HHHW 0001 FJJJ
-				DecodeJJJFTable(BITS(op,0x0007), BITS(op,0x0008), S1, D) ;
-				sprintf(buffer, "tfr       %s,%s", S1, D) ;
-				retSize = 1 ;
-			}
-			break ;
+/* Working save for a couple of opcode oddities */
+static unsigned assemble_dual_x_memory_data_read_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
+{
+	/* All operations are of length 1 */
+	unsigned opSize = 1;
+	
+	/* Recovered strings */
+	char arg_str[128] = "";
+	char opcode_str[128] = "";
+	char parallel_move_str[128] = "";
+	char parallel_move_str2[128] = "";
+	
+	/* Init */
+	sprintf(buffer, " ");
 
-		case 0x2:
-			if (BITS(op,0x0007) == 0x0)
-			{
-				// RND - 1mRR HHHW 0010 F000
-/*              DecodeFTable(BITS(op,0x0008), D) ;
-                sprintf(buffer, "rnd       %s", D) ;
-                retSize = 1 ;
-*/			}
-			else if (BITS(op,0x0007) == 0x1)
-			{
-				// TST - 1mRR HHHW 0010 F001
-	            DecodeFTable(BITS(op,0x0008), D) ;
-                sprintf(buffer, "tst       %s", D) ;
-                retSize = 1 ;
-			}
-			else if (BITS(op,0x0007) == 0x2)
-			{
-				// INC - 1mRR HHHW 0010 F010
-/*              DecodeFTable(BITS(op,0x0008), D) ;
-                sprintf(buffer, "inc       %s", D) ;
-                retSize = 1 ;
-*/			}
-			else if (BITS(op,0x0007) == 0x3)
-			{
-				// INC24 - 1mRR HHHW 0010 F011
-/*              DecodeFTable(BITS(op,0x0008), D) ;
-                sprintf(buffer, "inc24     %s", D) ;
-                retSize = 1 ;
-*/			}
-			else
-			{
-				// OR - 1mRR HHHW 0010 F1JJ
-				DecodeJJFTable(BITS(op,0x0003),BITS(op,0x0008), S1, D) ;
-				sprintf(buffer, "or        %s,%s", S1, D) ;
-				retSize = 1 ;
-			}
-			break ;
+	/* First, decode the Data ALU opcode */
+	decode_data_ALU_opcode_dual_move(BITS(op,0x00ff), opcode_str, arg_str);
+	
+	/* Next, decode the Dual X Memory Data Read */
+	decode_dual_x_memory_data_read(op, parallel_move_str, parallel_move_str2);
+	
+	/* Finally, assemble the full opcode */
+	sprintf(buffer, "%s    %s    %s %s", opcode_str, arg_str, parallel_move_str, parallel_move_str2);
 
-		case 0x3:
-			if (BITS(op,0x0007) == 0x0)
-			{
-				// ASR - 1mRR HHHW 0011 F000
-				DecodeFTable(BITS(op,0x0008), D) ;
-				sprintf(buffer, "asr       %s", D) ;
-				retSize = 1 ;
-			}
-			else if (BITS(op,0x0007) == 0x1)
-			{
-/*
-                // ASL - 1mRR HHHW 0011 F001
-                DecodeFTable(BITS(op,0x0008), D) ;
-                sprintf(buffer, "asl       %s", D) ;
-                retSize = 1 ;
-*/			}
-			else if (BITS(op,0x0007) == 0x2)
-			{
-				// LSR - 1mRR HHHW 0011 F010
-				DecodeFTable(BITS(op,0x0008), D) ;
-				sprintf(buffer, "lsr       %s", D) ;
-				retSize = 1 ;
-			}
-			else if (BITS(op,0x0007) == 0x3)
-			{
-/*
-                // LSL - 1mRR HHHW 0011 F011
-                DecodeFTable(BITS(op,0x0008), D) ;
-                sprintf(buffer, "lsl       %s", D) ;
-                retSize = 1 ;
-*/			}
-			else
-			{
-				// EOR - 1mRR HHHW 0011 F1JJ
-				DecodeJJFTable(BITS(op,0x0003),BITS(op,0x0008), S1, D) ;
-				sprintf(buffer, "eor       %s,%s", S1, D) ;
-				retSize = 1 ;
-			}
-			break ;
+	return opSize;
+}
 
-		case 0x4:
-			if (BITS(op,0x0007) == 0x1)
-			{
-				// SUBL - 1mRR HHHW 0100 F001
-				// There's something strange about this opcode - there's only one option for F!
-/*              if (!BITS(op,0x0008))
-                    sprintf(buffer, "subl      B,A") ;
-                else
-                    sprintf(buffer, "subl      (other!)") ;
-                retSize = 1 ;
-*/			}
-			else
-			{
-				// SUB - 1mRR HHHW 0100 FJJJ
-/*              DecodeJJJFTable(BITS(op,0x0007), BITS(op,0x0008), S1, D) ;
-                sprintf(buffer, "sub       %s,%s", S1, D) ;
-                retSize = 1 ;
-*/			}
-			break ;
+static unsigned assemble_TCC_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
+{
+	/* TCC is of length 1 */
+	unsigned opSize = 1;
+	
+	/* Recovered strings */
+	char arg_str[128] = "";
+	char opcode_str[128] = "";
+	
+	/* Init */
+	sprintf(buffer, " ");
 
-		case 0x5:
-			if (BITS(op,0x0007) == 0x1)
-			{
-				// CLR24 - 1mRR HHHW 0101 F001
-/*              DecodeFTable(BITS(op,0x0008), D) ;
-                sprintf(buffer, "clr24     %s", D) ;
-                retSize = 1 ;
-*/			}
-			else if (BITS(op,0x0006) == 0x1)
-			{
-				// SBC - 1mRR HHHW 0101 F01J
-/*              DecodeJFTable(BITS(op,0x0001), BITS(op,0x0008), S1, D) ;
-                sprintf(buffer, "sbc       %s,%s", S1, D) ;
-                retSize = 1 ;
-*/			}
-			else
-			{
-				// CMP - 1mRR HHHW 0101 FJJJ
-				DecodeJJJFTable(BITS(op,0x0007), BITS(op,0x0008), S1, D) ;
-				sprintf(buffer, "cmp       %s,%s", S1,D) ;
-				retSize = 1 ;
-			}
-			break ;
+	/* Simply decode the opcode and its arguments */
+	opSize = decode_TCC_opcode(op, opcode_str, arg_str);
+	
+	/* Finally, assemble the full opcode */
+	sprintf(buffer, "%s    %s", opcode_str, arg_str);
 
-		case 0x6:
-			if (BITS(op,0x0007) == 0x0)
-			{
-				// NEG - 1mRR HHHW 0110 F000
-/*              DecodeFTable(BITS(op,0x0008), D) ;
-                sprintf(buffer, "neg       %s", D) ;
-                retSize = 1 ;
-*/			}
-			else if (BITS(op,0x0007) == 0x1)
-			{
-				// NOT - 1mRR HHHW 0110 F001
-				DecodeFTable(BITS(op,0x0008), D) ;
-				sprintf(buffer, "not       %s", D) ;
-				retSize = 1 ;
-			}
-			else if (BITS(op,0x0007) == 0x2)
-			{
-				// DEC - 1mRR HHHW 0110 F010
-/*              DecodeFTable(BITS(op,0x0008), D) ;
-                sprintf(buffer, "dec       %s", D) ;
-                retSize = 1 ;
-*/			}
-			else if (BITS(op,0x0007) == 0x3)
-			{
-				// DEC24 - 1mRR HHHW 0110 F011
-				DecodeFTable(BITS(op,0x0008), D) ;
-				sprintf(buffer, "dec24     %s", D) ;
-				retSize = 1 ;
-			}
-			else
-			{
-				// AND - 1mRR HHHW 0110 F1JJ
-				DecodeJJFTable(BITS(op,0x0003),BITS(op,0x0008), S1, D) ;
-				sprintf(buffer, "and       %s,%s", S1, D) ;
-				retSize = 1 ;
-			}
-			break ;
+	return opSize;
+}
 
-		case 0x7:
-			if (BITS(op,0x0007) == 0x1)
-			{
-				// ABS - 1mRR HHHW 0111 F001
-/*              DecodeFTable(BITS(op,0x0008), D) ;
-                sprintf(buffer, "abs       %s", D) ;
-                retSize = 1 ;
-*/			}
-			else if (BITS(op,0x0007) == 0x2)
-			{
-				// ROR - 1mRR HHHW 0111 F010
-/*              DecodeFTable(BITS(op,0x0008), D) ;
-                sprintf(buffer, "ror       %s", D) ;
-                retSize = 1 ;
-*/			}
-			else if (BITS(op,0x0007) == 0x3)
-			{
-				// ROL - 1mRR HHHW 0111 F011
-/*              DecodeFTable(BITS(op,0x0008), D) ;
-                sprintf(buffer, "rol       %s", D) ;
-                retSize = 1 ;
-*/			}
-			else
-			{
-				// CMPM - 1mRR HHHW 0111 FJJJ
-/*              DecodeJJJFTable(BITS(op,0x0007), BITS(op,0x0008), S1, D) ;
-                sprintf(buffer, "cmpm      %s,%s", S1,D) ;
-                retSize = 1 ;
-*/			}
+static unsigned assemble_bitfield_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
+{
+	/* All bitfield ops are length 2 */
+	unsigned opSize = 2;
+	
+	/* Recovered strings */
+	char arg_str[128] = "";
+	char opcode_str[128] = "";
+	
+	/* Init */
+	sprintf(buffer, " ");
 
-			break ;
-	}
+	/* Simply decode the opcode and its arguments */
+	opSize = decode_bitfield_opcode(op, op2, opcode_str, arg_str);
+	
+	/* Finally, assemble the full opcode */
+	sprintf(buffer, "%s    %s", opcode_str, arg_str);
 
-/*
-    // Otherwise you're looking at a MPY/MAC operation...
-    if (BITS(op,0x0080))                                                                    // Maybe i should un-consolidate here?
-    {
-        DecodeQQQFTable(BITS(op,0x0007), BITS(op,0x0008), S1, S2, D) ;
-        DecodekSignTable(BITS(op,0x0040), sign) ;
+	return opSize;
+}
 
-        switch(BITS(op,0x00b0))
-        {
-            // MPY - 1mRR HHHH 1k00 FQQQ
-            case 0x4: sprintf(buffer, "mpy       (%s)%s,%s,%s", sign, S2, S1, D)  ; break ;
+static unsigned assemble_no_parallel_move_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
+{
+	/* Length is variable */
+	unsigned opSize = 0;
 
-            // MPYR - 1mRR HHHH 1k01 FQQQ
-            case 0x5: sprintf(buffer, "mpyr      (%s)%s,%s,%s", sign, S2, S1, D) ; break ;
+	/* Recovered strings */
+	char arg_str[128] = "";
+	char opcode_str[128] = "";
 
-            // MAC - 1mRR HHHH 1k10 FQQQ
-            case 0x6: sprintf(buffer, "mac       (%s)%s,%s,%s", sign, S2, S1, D)  ; break ;
+	/* Init */
+	sprintf(buffer, " ");
 
-            // MACR - 1mRR HHHH 1k11 FQQQ
-            case 0x7: sprintf(buffer, "macr      (%s)%s,%s,%s", sign, S1, S2, D) ; break ;
-            // !! It's a little odd that macr is S1,S2 while everyone else is S2,S1 !!
-        }
+	/* Simply decode the opcode and its arguments */
+	opSize = decode_no_parallel_move_opcode(op, op2, pc, opcode_str, arg_str);
 
-        retSize = 1 ;
-    }
-*/
+	/* Finally, assemble the full opcode */
+	sprintf(buffer, "%s    %s", opcode_str, arg_str);
+	
+	return opSize;
+}
 
-//  mame_printf_debug("op : %04x parallelType : %d\n", op, parallelType) ;
+static unsigned assemble_immediate_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
+{
+	/* Length is variable */
+	unsigned opSize = 0;
 
-	switch (parallelType)
-	{
-		case PARALLEL_TYPE_XMDM:
-			AppendXMDM(buffer, op) ;
-			break ;
+	/* Recovered strings */
+	char arg_str[128] = "";
+	char opcode_str[128] = "";
 
-		case PARALLEL_TYPE_XMDM_SPECIAL:
-			AppendXMDMSpecial(buffer, op, D) ;
-			break ;
+	/* Init */
+	sprintf(buffer, " ");
 
-		case PARALLEL_TYPE_NODM:
-			// Do Nothing :)...
-			break ;
+	/* Decode the 4 opcode and their arguments */
+	opSize = decode_immediate_opcode(op, pc, opcode_str, arg_str);
 
-		case PARALLEL_TYPE_ARU:
-			AppendARU(buffer, op) ;
-			break ;
+	/* Finally, assemble the full opcode */
+	sprintf(buffer, "%s    %s", opcode_str, arg_str);
 
-		case PARALLEL_TYPE_RRDM:
-			AppendRRDM(buffer, op, D) ;
-			break ;
-	}
+	return opSize;
+}
 
-	return retSize ;
+static unsigned assemble_movec_opcodes(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
+{
+	/* Length is variable */
+	unsigned opSize = 0;
+
+	/* Recovered strings */
+	char arg_str[128] = "";
+	char opcode_str[128] = "";
+
+	/* Init */
+	sprintf(buffer, " ");
+
+	/* Simply decode the opcode and its arguments */
+	opSize = decode_movec_opcodes(op, op2, pc, opcode_str, arg_str);
+
+	/* Finally, assemble the full opcode */
+	sprintf(buffer, "%s    %s", opcode_str, arg_str);
+	
+	return opSize;
+}
+
+static unsigned assemble_misc_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
+{
+	/* Length is variable */
+	unsigned opSize = 0;
+
+	/* Recovered strings */
+	char arg_str[128] = "";
+	char opcode_str[128] = "";
+
+	/* Init */
+	sprintf(buffer, " ");
+
+	/* Simply decode the opcode and its arguments */
+	opSize = decode_misc_opcode(op, pc, opcode_str, arg_str);
+
+	/* Finally, assemble the full opcode */
+	sprintf(buffer, "%s    %s", opcode_str, arg_str);
+	
+	return opSize;
+}
+
+/* Working except for a TODO */
+static unsigned assemble_unique_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
+{
+	/* Length is variable */
+	unsigned opSize = 0;
+
+	/* Recovered strings */
+	char arg_str[128] = "";
+	char opcode_str[128] = "";
+
+	/* Init */
+	sprintf(buffer, " ");
+
+	/* Simply decode the opcode and its arguments */
+	opSize = decode_unique_opcode(op, op2, pc, opcode_str, arg_str);
+
+	/* Finally, assemble the full opcode */
+	sprintf(buffer, "%s    %s", opcode_str, arg_str);
+	
+	return opSize;
 }
 
 
-#ifdef UNUSED_FUNCTION
-static unsigned DecodeDXMDROpcode(char *buffer, UINT16 op, unsigned pc)
+/**************************/
+/* Actual opcode decoding */
+/**************************/
+static void decode_data_ALU_opcode(const UINT16 op_byte, char* opcode_str, char* arg_str)
 {
-	unsigned retSize = 0 ;
+	char D[128];
+	char S1[128];
 
-	char S1[32] ;
-	char S2[32] ;
-	char D[32] ;
-	char arg[32] ;
-
-	if (!BITS(op,0x0080))
+	if (!BITS(op_byte, 0x80))
 	{
-		if (BITS(op,0x0014) != 0x2)
-		{
-			// ADD - 011m mKKK 0rru Fuuu
-			// SUB - 011m mKKK 0rru Fuuu
-			DecodeuuuuFTable(BITS(op,0x0013), BITS(op,0x0008), arg, S1, D) ;
-			sprintf(buffer, "%s       %s,%s", arg, S1, D) ;
-			retSize = 1 ;
-		}
-		else if (BITS(op,0x0014) == 0x2)
-		{
-			// TFR - 011m mKKK 0rr1 F0DD
-			DecodeDDFTable(BITS(op,0x0003), BITS(op,0x0008), S1, D) ;
-			sprintf(buffer, "tfr       %s,%s", S1, D) ;
-			retSize = 1 ;
-
-			// MOVE - 011m mKKK 0rr1 0000
-			// !!! What?  The opcode is .identical. to the TFR one.  Wait, that makes sense, right?
-		}
-	}
-	else
-	{
-		switch (BITS(op,0x0014))
+		switch(BITS(op_byte,0x70))
 		{
 			case 0x0:
-				// MPY - 011m mKKK 1xx0 F0QQ
-				// What the hell are those two x's : i bet they're supposed to be -'s?
-				DecodeQQFTable(BITS(op,0x0003), BITS(op,0x0008), S1, S2, D) ;
-				sprintf(buffer, "mpy       %s,%s,%s", S1, S2, D) ;
-				retSize = 1 ;
-				break ;
+				if (BITS(op_byte,0x07) == 0x1)
+				{
+					/* CLR - 1mRR HHHW 0000 F001 */
+					decode_F_table(BITS(op_byte,0x08), D);
+					sprintf(opcode_str, "clr");
+					sprintf(arg_str, "%s", D);
+				}
+				else
+				{
+					/* ADD - 1mRR HHHW 0000 FJJJ */
+					decode_JJJF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, D);
+					sprintf(opcode_str, "add");
+					sprintf(arg_str, "%s,%s", S1, D);
+				}
+				break;
 
 			case 0x1:
-				// MAC - 011m mKKK 1xx0 F1QQ
-				// What the hell are those two x's : i bet they're supposed to be -'s?
-				DecodeQQFTable(BITS(op,0x0003), BITS(op,0x0008), S1, S2, D) ;
-				sprintf(buffer, "mac       %s,%s,%s", S1, S2, D) ;
-				retSize = 1 ;
-				break ;
+				if (BITS(op_byte,0x0f) == 0x1)
+				{
+					/* MOVE - 1mRR HHHW 0001 0001 */
+					/* Equivalent to a NOP (+ parallel move) */
+					sprintf(opcode_str, "move");
+					sprintf(arg_str, " ");
+				}
+				else
+				{
+					/* TFR - 1mRR HHHW 0001 FJJJ */
+					decode_JJJF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, D);
+					sprintf(opcode_str, "tfr");
+					sprintf(arg_str, "%s,%s", S1, D);
+				}
+				break;
 
 			case 0x2:
-				// MPYR - 011m mKKK 1--1 F0QQ
-				DecodeQQFTable(BITS(op,0x0003), BITS(op,0x0008), S1, S2, D) ;
-				sprintf(buffer, "mpyr      %s,%s,%s", S1, S2, D) ;
-				retSize = 1 ;
-				break ;
-
-			case 0x3:
-				// MACR - 011m mKKK 1--1 F1QQ
-				DecodeQQFTable(BITS(op,0x0003), BITS(op,0x0008), S1, S2, D) ;
-				sprintf(buffer, "macr      %s,%s,%s", S1, S2, D) ;
-				retSize = 1 ;
-				break ;
-		}
-	}
-
-	AppendDXMDR(buffer, op) ;
-
-	return retSize ;
-}
-#endif
-
-
-static unsigned DecodeNPMOpcode(char *buffer, UINT16 op, unsigned pc, const UINT8 *oprom)
-{
-	unsigned retSize = 0 ;
-
-	char S1[32] ;
-	char S2[32] ;
-	char SD[32] ;
-	char D[32] ;
-	char A[32] ;
-	char M[32] ;
-	char args[32] ;
-	int Rnum ;
-
-
-	if (BITS(op,0x0f00) == 0x4)
-	{
-		// Bitfield Immediate
-		int upperMiddleLower = -1 ;
-		UINT16 iVal = 0x0000 ;
-        UINT16 rVal = 0x0000 ;
-		char D[32] ;
-
-		UINT32 op2 = oprom[2] | (oprom[3] << 8);
-
-		// Decode the common parts
-		upperMiddleLower = DecodeBBBTable(BITS(op2,0xe000)) ;
-		iVal = BITS(op2,0x00ff) ;
-
-		switch(upperMiddleLower)
-		{
-			case BBB_UPPER:  iVal <<= 8; break ;
-			case BBB_MIDDLE: iVal <<= 4; break ;
-			case BBB_LOWER:  iVal <<= 0; break ;
-		}
-
-		switch(BITS(op,0x00e0))
-		{
-			case 0x6: case 0x7: case 0x2: case 0x3:
-				AssembleDFromPTable(BITS(op,0x0020), BITS(op,0x001f), D) ;
-				break ;
-
-			case 0x5: case 0x1:
-				// !! Probably want to combine this into something that returns a 'string'... !!
-				rVal = DecodeRRTable(BITS(op,0x0003)) ;
-				sprintf(D, "X:(R%d)", rVal) ;
-				break ;
-
-			case 0x4: case 0x0:
-				DecodeDDDDDTable(BITS(op,0x001f), D) ;
-				break ;
-		}
-
-		switch(BITS(op2,0x1f00))
-		{
-			// !!! retsize = 2 put here for debugging help - put it at the end eventually...
-			case 0x12: sprintf(buffer, "bfchg     #%04x,%s", iVal, D)  ; retSize = 2 ; break ;
-			case 0x04: sprintf(buffer, "bfclr     #%04x,%s", iVal, D)  ; retSize = 2 ; break ;
-			case 0x18: sprintf(buffer, "bfset     #%04x,%s", iVal, D)  ; retSize = 2 ; break ;
-//          case 0x10: sprintf(buffer, "bftsth    #%04x,%s", iVal, D) ; retSize = 2 ; break ;
-			case 0x00: sprintf(buffer, "bftstl    #%04x,%s", iVal, D) ; retSize = 2 ; break ;
-		}
-
-		// uncomment me someday
-//      retSize = 2 ;
-	}
-	else if (BITS(op,0x0f00) == 0x5)
-	{
-		switch(BITS(op,0x0074))
-		{
-			case 0x0:
-				if (BITS(op,0x0006) == 0x0)
+				if (BITS(op_byte,0x07) == 0x0)
 				{
-					// TFR(2) - 0001 0101 0000 F00J
-/*                  DecodeJFTable(BITS(op,0x0001),BITS(op,0x0008), D, S1) ;
-                    sprintf(buffer, "tfr2      %s,%s", S1, D) ;
-                    retSize = 1 ;
-*/					// !?! Documentation bug !?!
-					// !!!  the source and destination are backwards for TFR(2), and no mention of it is made !!!
+					/* RND - 1mRR HHHW 0010 F000 */
+					decode_F_table(BITS(op_byte,0x08), D);
+					sprintf(opcode_str, "rnd");
+					sprintf(arg_str, "%s", D);
 				}
-				else if (BITS(op,0x0006) == 0x1)
+				else if (BITS(op_byte,0x07) == 0x1)
 				{
-					// ADC - 0001 0101 0000 F01J
-/*                  DecodeJFTable(BITS(op,0x0001),BITS(op,0x0008), S1, D) ;
-                    sprintf(buffer, "adc       %s,%s", S1, D) ;
-                    retSize = 1 ;
-*/				}
-				break ;
+					/* TST - 1mRR HHHW 0010 F001 */
+		            decode_F_table(BITS(op_byte,0x08), D);
+					sprintf(opcode_str, "tst");
+					sprintf(arg_str, "%s", D);
+				}
+				else if (BITS(op_byte,0x07) == 0x2)
+				{
+					/* INC - 1mRR HHHW 0010 F010 */
+					decode_F_table(BITS(op_byte,0x08), D);
+					sprintf(opcode_str, "inc");
+					sprintf(arg_str, "%s", D);
+				}
+				else if (BITS(op_byte,0x07) == 0x3)
+				{
+					/* INC24 - 1mRR HHHW 0010 F011 */
+					decode_F_table(BITS(op_byte,0x08), D);
+					sprintf(opcode_str, "inc24");
+					sprintf(arg_str, "%s", D);
+				}
+				else
+				{
+					/* OR - 1mRR HHHW 0010 F1JJ */
+					decode_JJF_table(BITS(op_byte,0x03),BITS(op_byte,0x08), S1, D);
+					sprintf(opcode_str, "or");
+					sprintf(arg_str, "%s,%s", S1, D);
+				}
+				break;
 
 			case 0x3:
-					// TST(2) - 0001 0101 0001 -1DD
-					DecodeDDTable(BITS(op,0x0003), S1) ;
-					sprintf(buffer, "tst(2)    %s", S1) ;
-					retSize = 1 ;
-				break ;
+				if (BITS(op_byte,0x07) == 0x0)
+				{
+					/* ASR - 1mRR HHHW 0011 F000 */
+					decode_F_table(BITS(op_byte,0x08), D);
+					sprintf(opcode_str, "asr");
+					sprintf(arg_str, "%s", D);
+				}
+				else if (BITS(op_byte,0x07) == 0x1)
+				{
+	                /* ASL - 1mRR HHHW 0011 F001 */
+	                decode_F_table(BITS(op_byte,0x08), D);
+					sprintf(opcode_str, "asl");
+					sprintf(arg_str, "%s", D);
+				}
+				else if (BITS(op_byte,0x07) == 0x2)
+				{
+					/* LSR - 1mRR HHHW 0011 F010 */
+					decode_F_table(BITS(op_byte,0x08), D);
+					sprintf(opcode_str, "lsr");
+					sprintf(arg_str, "%s", D);
+				}
+				else if (BITS(op_byte,0x07) == 0x3)
+				{
+	                /* LSL - 1mRR HHHW 0011 F011 */
+	                decode_F_table(BITS(op_byte,0x08), D);
+					sprintf(opcode_str, "lsl");
+					sprintf(arg_str, "%s", D);
+				}
+				else
+				{
+					/* EOR - 1mRR HHHW 0011 F1JJ */
+					decode_JJF_table(BITS(op_byte,0x03),BITS(op_byte,0x08), S1, D);
+					sprintf(opcode_str, "eor");
+					sprintf(arg_str, "%s,%s", S1, D);
+				}
+				break;
 
 			case 0x4:
-					// NORM - 0001 0101 0010 F0RR
-/*                  DecodeFTable(BITS(op,0x0008), D) ;
-                    Rnum = DecodeRRTable(BITS(op,0x0003)) ;
-                    sprintf(buffer, "norm      %s,R%d", S1, Rnum) ;
-                    retSize = 1 ;
-*/				break ;
+				if (BITS(op_byte,0x07) == 0x1)
+				{
+					/* SUBL - 1mRR HHHW 0100 F001 */
+					sprintf(opcode_str, "subl");
+					
+					/* Only one option for the F table */
+					if (!BITS(op_byte,0x08))
+						sprintf(arg_str, "B,A");
+					else
+						sprintf(arg_str, "!");
+				}
+				else
+				{
+					/* SUB - 1mRR HHHW 0100 FJJJ */
+					decode_JJJF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, D);
+					sprintf(opcode_str, "sub");
+					sprintf(arg_str, "%s,%s", S1, D);
+				}
+				break;
+
+			case 0x5:
+				if (BITS(op_byte,0x07) == 0x1)
+				{
+					/* CLR24 - 1mRR HHHW 0101 F001 */
+					decode_F_table(BITS(op_byte,0x08), D);
+					sprintf(opcode_str, "clr24");
+					sprintf(arg_str, "%s", D);
+				}
+				else if (BITS(op_byte,0x06) == 0x1)
+				{
+					/* SBC - 1mRR HHHW 0101 F01J */
+					decode_JF_table(BITS(op_byte,0x01), BITS(op_byte,0x08), S1, D);
+					sprintf(opcode_str, "sbc");
+					sprintf(arg_str, "%s,%s", S1, D);
+				}
+				else
+				{
+					/* CMP - 1mRR HHHW 0101 FJJJ */
+					decode_JJJF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, D);
+					/* TODO: This is a JJJF limited */
+					sprintf(opcode_str, "cmp");
+					sprintf(arg_str, "%s,%s", S1,D);
+				}
+				break;
 
 			case 0x6:
-				if (BITS(op,0x0003) == 0x0)
+				if (BITS(op_byte,0x07) == 0x0)
 				{
-					// ASR4 - 0001 0101 0011 F000
-/*                  DecodeFTable(BITS(op,0x0008), D) ;
-                    sprintf(buffer, "asr4      %s", D) ;
-                    retSize = 1 ;
-*/				}
-				else if (BITS(op,0x0003) == 0x1)
+					/* NEG - 1mRR HHHW 0110 F000 */
+					decode_F_table(BITS(op_byte,0x08), D);
+					sprintf(opcode_str, "neg");
+					sprintf(arg_str, "%s", D);
+				}
+				else if (BITS(op_byte,0x07) == 0x1)
 				{
-					// ASL4 - 0001 0101 0011 F001
-/*                  DecodeFTable(BITS(op,0x0008), D) ;
-                    sprintf(buffer, "asl4      %s", D) ;
-                    retSize = 1 ;
-*/				}
-				break ;
-
-			case 0x1: case 0x5: case 0x9: case 0xd:
-					// DIV - 0001 0101 0--0 F1DD
-/*                  DecodeDDFTable(BITS(op,0x0003), BITS(op,0x0008), S1, D) ;
-                    sprintf(buffer, "div       %s,%s", S1, D) ;
-                    retSize = 1 ;
-*/				break ;
-
-			case 0xa:
-				if (BITS(op,0x0003) == 0x0)
+					/* NOT - 1mRR HHHW 0110 F001 */
+					decode_F_table(BITS(op_byte,0x08), D);
+					sprintf(opcode_str, "not");
+					sprintf(arg_str, "%s", D);
+				}
+				else if (BITS(op_byte,0x07) == 0x2)
 				{
-					// ZERO - 0001 0101 0101 F000
-/*                  DecodeFTable(BITS(op,0x0008), D) ;
-                    sprintf(buffer, "zero      %s", D) ;
-                    retSize = 1 ;
-*/				}
-				else if (BITS(op,0x0003) == 0x2)
+					/* DEC - 1mRR HHHW 0110 F010 */
+					decode_F_table(BITS(op_byte,0x08), D);
+					sprintf(opcode_str, "dec");
+					sprintf(arg_str, "%s", D);
+				}
+				else if (BITS(op_byte,0x07) == 0x3)
 				{
-					// EXT - 0001 0101 0101 F010
-/*                  DecodeFTable(BITS(op,0x0008), D) ;
-                    sprintf(buffer, "ext       %s", D) ;
-                    retSize = 1 ;
-*/				}
-				break ;
-
-			case 0xc:
-				if (BITS(op,0x0003) == 0x0)
+					/* DEC24 - 1mRR HHHW 0110 F011 */
+					decode_F_table(BITS(op_byte,0x08), D);
+					sprintf(opcode_str, "dec24");
+					sprintf(arg_str, "%s", D);
+				}
+				else
 				{
-					// NEGC - 0001 0101 0110 F000
-/*                  DecodeFTable(BITS(op,0x0008), D) ;
-                    sprintf(buffer, "negc      %s", D) ;
-                    retSize = 1 ;
-*/				}
-				break ;
+					/* AND - 1mRR HHHW 0110 F1JJ */
+					decode_JJF_table(BITS(op_byte,0x03),BITS(op_byte,0x08), S1, D);
+					sprintf(opcode_str, "and");
+					sprintf(arg_str, "%s,%s", S1, D);
+				}
+				break;
 
-			case 0xe:
-				if (BITS(op,0x0003) == 0x0)
+			case 0x7:
+				if (BITS(op_byte,0x07) == 0x1)
 				{
-					// ASR16 - 0001 0101 0111 F000
-/*                  DecodeFTable(BITS(op,0x0008), D) ;
-                    sprintf(buffer, "asr16     %s", D) ;
-                    retSize = 1 ;
-*/				}
-				else if (BITS(op,0x0003) == 0x1)
+					/* ABS - 1mRR HHHW 0111 F001 */
+					decode_F_table(BITS(op_byte,0x08), D);
+					sprintf(opcode_str, "abs");
+					sprintf(arg_str, "%s", D);
+				}
+				else if (BITS(op_byte,0x07) == 0x2)
 				{
-					// SWAP - 0001 0101 0111 F001
-/*                  DecodeFTable(BITS(op,0x0008), D) ;
-                    sprintf(buffer, "swap      %s", D) ;
-                    retSize = 1 ;
-*/				}
-				break ;
-		}
-
-		switch(BITS(op,0x00f0))
-		{
-			case 0x8:
-				// IMPY - 0001 0101 1000 FQQQ
-/*              DecodeQQQFTable(BITS(op,0x0007), BITS(op,0x0008), S1, S2, D) ;
-                sprintf(buffer, "impy      %s,%s,%s", S1, S2, D) ;
-                retSize = 1 ;
-*/				break ;
-			case 0xa:
-				// IMAC - 0001 0101 1010 FQQQ
-/*              DecodeQQQFTable(BITS(op,0x0007), BITS(op,0x0008), S1, S2, D) ;
-                sprintf(buffer, "imac      %s,%s,%s", S1, S2, D) ;
-                retSize = 1 ;
-*/				break ;
-			case 0x9: case 0xb:
-				// DMAC(ss,su,uu) - 0001 0101 10s1 FsQQ
-/*              DecodessTable(BITS(op,0x0024), A) ;
-                DecodeQQFTableSp(BITS(op,0x0003), BITS(op,0x0008), S2, S1, D) ;     // Special QQF
-                sprintf(buffer, "dmac(%s)  %s,%s,%s", A, S1, S2, D) ;
-                retSize = 1 ;
-*/				break ;
-			case 0xc:
-				// MPY(su,uu) - 0001 0101 1100 FsQQ
-/*              DecodesTable(BITS(op,0x0004), A) ;
-                DecodeQQFTableSp(BITS(op,0x0003), BITS(op,0x0008), S2, S1, D) ;     // Special QQF
-                sprintf(buffer, "mpy(%s)   %s,%s,%s", A, S1, S2, D) ;
-                retSize = 1 ;
-*/				break ;
-			case 0xe:
-				// MAC(su,uu) - 0001 0101 1110 FsQQ
-				DecodesTable(BITS(op,0x0004), A) ;
-				DecodeQQFTableSp(BITS(op,0x0003), BITS(op,0x0008), S2, S1, D) ;		// Special QQF
-				sprintf(buffer, "mac(%s)   %s,%s,%s", A, S1, S2, D) ;
-				retSize = 1 ;
-				break ;
-		}
-	}
-	else if ((BITS(op,0x0f00) == 0x6))
-	{
-/*
-        char S[32] ;
-
-        // MPY - 0001 0110 RRDD FQQQ
-        DecodekTable(BITS(op,0x0100), Dnot) ;
-        Rnum = DecodeRRTable(BITS(op,0x00c0)) ;
-        DecodeDDTable(BITS(op,0x0030), S) ;
-        DecodeQQQFTable(BITS(op,0x0007), BITS(op,0x0008), S1, S2, D) ;
-        sprintf(buffer, "mpy       %s,%s,%s %s,(R%d)+N%d %s,%s", S1, S2, D, Dnot, Rnum, Rnum, S, Dnot) ;
-        // Strange, but not entirely out of the question - this 'k' parameter is hardcoded
-        // I cheat here and do the parallel memory data move above - this specific one is only used twice
-        retSize = 1 ;
-*/	}
-	else if ((BITS(op,0x0f00) == 0x7))
-	{
-/*
-        char S[32] ;
-
-        // MAC - 0001 0111 RRDD FQQQ
-        DecodekTable(BITS(op,0x0100), Dnot) ;
-        Rnum = DecodeRRTable(BITS(op,0x00c0)) ;
-        DecodeDDTable(BITS(op,0x0030), S) ;
-        DecodeQQQFTable(BITS(op,0x0007), BITS(op,0x0008), S1, S2, D) ;
-        sprintf(buffer, "mac       %s,%s,%s %s,(R%d)+N%d %s,%s", S1, S2, D, Dnot, Rnum, Rnum, S, Dnot) ;
-        // Strange, but not entirely out of the question - this 'k' parameter is hardcoded
-        // I cheat here and do the parallel memory data move above - this specific one is only used twice
-        retSize = 1 ;
-*/	}
-	else if ((BITS(op,0x0800) == 0x1))
-	{
-		if (BITS(op,0x0600))
-		{
-			if (!BITS(op,0x0100))
-			{
-				// ANDI - 0001 1EE0 iiii iiii
-				DecodeEETable(BITS(op,0x0600), D) ;
-				sprintf(buffer, "and(i)    #%02x,%s", BITS(op,0x00ff), D) ;
-				retSize = 1 ;
-			}
-			else
-			{
-				// ORI - 0001 1EE1 iiii iiii
-/*              DecodeEETable(BITS(op,0x0600), D) ;
-                sprintf(buffer, "or(i)     #%02x,%s", BITS(op,0x00ff), D) ;
-                retSize = 1 ;
-*/			}
-		}
-		else
-		{
-			if (!BITS(op,0x0020))
-			{
-				// MOVE(S) - 0001 100W HH0a aaaa
-/*
-                DecodeHHTable(BITS(op,0x00c0), SD) ;
-                sprintf(A, "X:%02x", BITS(op,0x001f)) ;
-                AssembleArgumentsFromWTable(BITS(op,0x0100), args, 'X', SD, A) ;
-                sprintf(buffer, "move(s)   %s", args) ;
-                retSize = 1 ;
-*/			}
-			else
-			{
-				char fullAddy[128] ;									// Convert Short Absolute Address to full 16-bit
-
-				// MOVE(P) - 0001 100W HH1p pppp
-				DecodeHHTable(BITS(op,0x00c0), SD) ;
-
-				AssembleAddressFromIOShortAddress(BITS(op,0x001f), fullAddy) ;
-
-				sprintf(A, "%02x (%s)", BITS(op,0x001f), fullAddy) ;
-				AssembleArgumentsFromWTable(BITS(op,0x0100), args, 'X', SD, A) ;
-				sprintf(buffer, "move(p)   %s", args) ;
-				retSize = 1 ;
-			}
-		}
-	}
-	else if ((BITS(op,0x0c00) == 0x0))
-	{
-		// T.cc - 0001 00cc ccTT Fh0h
-		DecodeccccTable(BITS(op,0x03c0), M) ;
-		Rnum = DecodeRRTable(BITS(op,0x0030)) ;
-		Decodeh0hFTable(BITS(op,0x0007),BITS(op,0x0008), S1, D) ;
-		if (S1[0] == D[0] && D[0] == 'A')
-			sprintf(buffer, "t.%s  %s,%s", M, S1, D) ;
-		else
-			sprintf(buffer, "t.%s  %s,%s  R0,R%d", M, S1, D, Rnum) ;
-		// !! Might not be right - gotta' double-check !!
-		retSize = 1 ;
-	}
-
-	return retSize ;
-}
-
-
-unsigned DecodeMisfitOpcode(char *buffer, UINT16 op, unsigned pc, const UINT8 *oprom)
-{
-	unsigned retSize = 0 ;
-
-	char S1[32] ;
-	char D1[32] ;
-	char SD[32] ;
-	char M[32] ;
-	char ea[32] ;
-	char args[32] ;
-	int Rnum ;
-
-	if (BITS(op,0x1000)== 0x0)
-	{
-		switch(BITS(op,0x0c00))
-		{
-			// MOVE(I) - 0010 00DD BBBB BBBB
-			case 0x0:
-				DecodeDDTable(BITS(op,0x0300), D1) ;
-				sprintf(buffer, "move(i)   #%02x,%s", BITS(op,0x00ff), D1) ;
-				retSize = 1 ;
-				break ;
-
-			// TFR(3) - 0010 01mW RRDD FHHH
-			case 0x1:
-/*              DecodeDDFTable(BITS(op,0x0030), BITS(op,0x0008), D1, S1) ;          // Intentionally switched
-                DecodeHHHTable(BITS(op,0x0007), SD) ;
-                Rnum = DecodeRRTable(BITS(op,0x00c0)) ;
-                AssembleeaFrommTable(BITS(op,0x0200), Rnum, ea) ;
-                AssembleArgumentsFromWTable(BITS(op,0x0100), args, 'X', SD, ea) ;
-                sprintf(buffer, "tfr3      %s,%s %s", S1, D1, args) ;
-                retSize = 1 ;
-*/				break ;
-
-			// MOVE(C) - 0010 10dd dddD DDDD
-			case 0x2:
-				DecodeDDDDDTable(BITS(op,0x03e0), S1) ;
-				DecodeDDDDDTable(BITS(op,0x001f), D1) ;
-				sprintf(buffer, "move(c)   %s,%s", S1, D1) ;
-				retSize = 1 ;
-				break ;
-
-			// B.cc - 0010 11cc ccee eeee
-			case 0x3:
-				DecodeccccTable(BITS(op,0x3c0), M) ;
-				AssembleAddressFrom6BitSignedRelativeShortAddress(BITS(op,0x003f), ea) ;
-				sprintf(buffer, "b.%s  %s (%02x)", M, ea, BITS(op,0x003f)) ;
-				retSize = 1 ;
-				break ;
+					/* ROR - 1mRR HHHW 0111 F010 */
+					decode_F_table(BITS(op_byte,0x08), D);
+					sprintf(opcode_str, "ror");
+					sprintf(arg_str, "%s", D);
+				}
+				else if (BITS(op_byte,0x07) == 0x3)
+				{
+					/* ROL - 1mRR HHHW 0111 F011 */
+					decode_F_table(BITS(op_byte,0x08), D);
+					sprintf(opcode_str, "rol");
+					sprintf(arg_str, "%s", D);
+				}
+				else
+				{
+					/* CMPM - 1mRR HHHW 0111 FJJJ */
+					decode_JJJF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, D);
+					/* TODO: This is JJJF limited */
+					sprintf(opcode_str, "cmpm");
+					sprintf(arg_str, "%s,%s", S1,D);
+				}
+				break;
 		}
 	}
 	else
 	{
-		if (BITS(op,0x0010) == 0x0)
+		char S2[128];
+		char SIGN[128];
+
+        decode_QQQF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, S2, D);
+        decode_kSign_table(BITS(op_byte,0x40), SIGN);
+
+        switch(BITS(op_byte,0x30))
+        {
+			/* MPY - 1mRR HHHH 1k00 FQQQ */
+            case 0x0:
+				sprintf(opcode_str, "mpy");
+				sprintf(arg_str, "(%s)%s,%s,%s", SIGN, S2, S1, D);
+				break;
+
+            /* MPYR - 1mRR HHHH 1k01 FQQQ */
+            case 0x1:
+				sprintf(opcode_str, "mpyr");
+				sprintf(arg_str, "(%s)%s,%s,%s", SIGN, S2, S1, D);
+				break;
+			
+            /* MAC - 1mRR HHHH 1k10 FQQQ */
+            case 0x2:
+				sprintf(opcode_str, "mac");
+				sprintf(arg_str, "(%s)%s,%s,%s", SIGN, S2, S1, D);
+				break;
+
+            /* MACR - 1mRR HHHH 1k11 FQQQ */
+            case 0x3: 
+				sprintf(opcode_str, "macr");
+	            /* TODO: It's a little odd that macr is S1,S2 while everyone else is S2,S1.  Check! */
+				sprintf(arg_str, "(%s)%s,%s,%s", SIGN, S1, S2, D);
+				break;
+        }
+	}
+}
+
+/* TODO: Triple-check these.  There's weirdness around TFR & MOVE */
+static void decode_data_ALU_opcode_dual_move(const UINT16 op_byte, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	char S1[32];
+	char S2[32];
+	char arg[32];
+
+	if (!BITS(op_byte,0x80))
+	{
+		if (BITS(op_byte,0x14) != 0x2)
 		{
-			// MOVE(C) - 0011 1WDD DDD0 MMRR
-			DecodeDDDDDTable(BITS(op,0x03e0), SD) ;
-			Rnum = DecodeRRTable(BITS(op,0x0003)) ;
-			AssembleeaFromMMTable(BITS(op,0x000c), Rnum, ea) ;
-			AssembleArgumentsFromWTable(BITS(op,0x0400), args, 'X', SD, ea) ;
-			sprintf(buffer, "move(c)   %s", args) ;
-			retSize = 1 ;
+			/* ADD - 011m mKKK 0rru Fuuu */
+			/* SUB - 011m mKKK 0rru Fuuu */
+			/* These two opcodes are conflated */
+			decode_uuuuF_table(BITS(op_byte,0x17), BITS(op_byte,0x08), arg, S1, D);
+			sprintf(opcode_str, "%s", arg);
+			sprintf(arg_str, "%s,%s", S1, D);
+		}
+		else if (BITS(op_byte,0x14) == 0x2)
+		{
+			/* TFR - 011m mKKK 0rr1 F0DD */
+			/* MOVE - 011m mKKK 0rr1 0000 */
+			/* TODO: This MOVE opcode is .identical. to the TFR one.  Investigate. */
+			decode_DDF_table(BITS(op_byte,0x03), BITS(op_byte,0x08), S1, D);
+			sprintf(opcode_str, "tfr");
+			sprintf(arg_str, "%s,%s", S1, D);
+		}
+	}
+	else
+	{
+		decode_QQF_table(BITS(op_byte,0x03), BITS(op_byte,0x08), S1, S2, D);
+		sprintf(arg_str, "%s,%s,%s", S1, S2, D);	/* Oddly, these 4 have identical operand ordering as */
+													/* compared to single memory move equivalents */
+		switch (BITS(op_byte,0x14))
+		{
+			case 0x0:
+				/* MPY - 011m mKKK 1rr0 F0QQ */
+				sprintf(opcode_str, "mpy");
+				break;
+
+			case 0x1:
+				/* MAC - 011m mKKK 1rr0 F1QQ */
+				sprintf(opcode_str, "mac");
+				break;
+
+			case 0x2:
+				/* MPYR - 011m mKKK 1rr1 F0QQ */
+				sprintf(opcode_str, "mpyr");
+				break;
+
+			case 0x3:
+				/* MACR - 011m mKKK 1rr1 F1QQ */
+				sprintf(opcode_str, "macr");
+				break;
+		}
+	}
+}
+
+static unsigned decode_TCC_opcode(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Rnum = -1;
+	char M[32];
+	char D[32];
+	char S[32];
+	
+	decode_cccc_table(BITS(op,0x03c0), M);
+	sprintf(opcode_str, "t.%s", M);
+
+	Rnum = decode_RR_table(BITS(op,0x0030));
+	decode_h0hF_table(BITS(op,0x0007),BITS(op,0x0008), S, D);
+	sprintf(arg_str, "%s,%s  R0,R%d", S, D, Rnum);
+
+	/* TODO: Investigate
+	if (S1[0] == D[0] && D[0] == 'A')
+		sprintf(buffer, "t.%s  %s,%s", M, S1, D);
+	else
+		sprintf(buffer, "t.%s  %s,%s  R0,R%d", M, S1, D, Rnum);
+	*/
+	
+	return 1;
+}
+
+/* TODO: Check all (dual-world) */
+static unsigned decode_bitfield_opcode(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	int upperMiddleLower = -1;
+	UINT16 iVal = 0x0000;
+	UINT16 rVal = 0x0000;
+
+	/* Decode the common parts */
+	upperMiddleLower = decode_BBB_table(BITS(op2,0xe000));
+	iVal = BITS(op2,0x00ff);
+
+	switch(upperMiddleLower)
+	{
+		case BBB_UPPER:  iVal <<= 8; break;
+		case BBB_MIDDLE: iVal <<= 4; break;
+		case BBB_LOWER:  iVal <<= 0; break;
+	}
+
+	switch(BITS(op,0x00e0))
+	{
+		case 0x6: case 0x7: case 0x2: case 0x3:
+			assemble_D_from_P_table(BITS(op,0x0020), BITS(op,0x001f), D);
+			break;
+
+		case 0x5: case 0x1:
+			rVal = decode_RR_table(BITS(op,0x0003));
+			sprintf(D, "X:(R%d)", rVal);
+			break;
+
+		case 0x4: case 0x0:
+			decode_DDDDD_table(BITS(op,0x001f), D);
+			break;
+	}
+	sprintf(arg_str, "#%04x,%s", iVal, D);
+
+	switch(BITS(op2,0x1f00))
+	{
+		case 0x12: sprintf(opcode_str, "bfchg");  break;
+		case 0x04: sprintf(opcode_str, "bfclr");  break;
+		case 0x18: sprintf(opcode_str, "bfset");  break;
+		case 0x10: sprintf(opcode_str, "bftsth"); break;
+		case 0x00: sprintf(opcode_str, "bftstl"); break;
+	}
+
+	return 2;
+}
+
+static unsigned decode_no_parallel_move_opcode(const UINT16 op, const UINT16 op2, const UINT16 pc, char* opcode_str, char* arg_str)
+{
+	unsigned retSize = 1;
+	
+	int Rnum = -1;
+	char A[32];
+	char D[32];
+	char S1[32];
+	char S2[32];
+	
+	switch(BITS(op,0x0074))
+	{
+		case 0x0:
+			if (BITS(op,0x0006) == 0x0)
+			{
+				/* TFR(2) - 0001 0101 0000 F00J */
+				decode_JF_table(BITS(op,0x0001),BITS(op,0x0008), D, S1);
+				sprintf(opcode_str, "tfr2");
+				sprintf(arg_str, "%s,%s", S1, D);
+			}
+			else if (BITS(op,0x0006) == 0x1)
+			{
+				/* ADC - 0001 0101 0000 F01J */
+				decode_JF_table(BITS(op,0x0001),BITS(op,0x0008), S1, D);
+				sprintf(opcode_str, "adc");
+				sprintf(arg_str, "%s,%s", S1, D);
+			}
+			break;
+
+		case 0x3:
+			/* TST(2) - 0001 0101 0001 -1DD */
+			decode_DD_table(BITS(op,0x0003), S1);
+			sprintf(opcode_str, "tst2");
+			sprintf(arg_str, "%s", S1);
+			break;
+
+		case 0x4:
+			/* NORM - 0001 0101 0010 F0RR */
+			decode_F_table(BITS(op,0x0008), D);
+			Rnum = decode_RR_table(BITS(op,0x0003));
+			sprintf(opcode_str, "norm");
+			sprintf(arg_str, "R%d,%s", Rnum, D);
+			break;
+
+		case 0x6:
+			if (BITS(op,0x0003) == 0x0)
+			{
+				/* ASR4 - 0001 0101 0011 F000 */
+				decode_F_table(BITS(op,0x0008), D);
+				sprintf(opcode_str, "asr4");
+				sprintf(arg_str, "%s", D);
+			}
+			else if (BITS(op,0x0003) == 0x1)
+			{
+				/* ASL4 - 0001 0101 0011 F001 */
+				decode_F_table(BITS(op,0x0008), D);
+				sprintf(opcode_str, "asl4");
+				sprintf(arg_str, "%s", D);
+			}
+			break;
+
+		case 0x1: case 0x5: case 0x9: case 0xd:
+			/* DIV - 0001 0101 0--0 F1DD */
+			decode_DDF_table(BITS(op,0x0003), BITS(op,0x0008), S1, D);
+			sprintf(opcode_str, "div");
+			sprintf(arg_str, "%s,%s", S1, D);
+			break;
+
+		case 0xa:
+			if (BITS(op,0x0003) == 0x0)
+			{
+				/* ZERO - 0001 0101 0101 F000 */
+				decode_F_table(BITS(op,0x0008), D);
+				sprintf(opcode_str, "zero");
+				sprintf(arg_str, "%s", D);
+			}
+			else if (BITS(op,0x0003) == 0x2)
+			{
+				/* EXT - 0001 0101 0101 F010 */
+				decode_F_table(BITS(op,0x0008), D);
+				sprintf(opcode_str, "ext");
+				sprintf(arg_str, "%s", D);
+			}
+			break;
+
+		case 0xc:
+			if (BITS(op,0x0003) == 0x0)
+			{
+				/* NEGC - 0001 0101 0110 F000 */
+				decode_F_table(BITS(op,0x0008), D);
+				sprintf(opcode_str, "negc");
+				sprintf(arg_str, "%s", D);
+			}
+			break;
+
+		case 0xe:
+			if (BITS(op,0x0003) == 0x0)
+			{
+				/* ASR16 - 0001 0101 0111 F000 */
+				decode_F_table(BITS(op,0x0008), D);
+				sprintf(opcode_str, "asr16");
+				sprintf(arg_str, "%s", D);
+			}
+			else if (BITS(op,0x0003) == 0x1)
+			{
+				/* SWAP - 0001 0101 0111 F001 */
+				decode_F_table(BITS(op,0x0008), D);
+				sprintf(opcode_str, "swap");
+				sprintf(arg_str, "%s", D);
+			}
+			break;
+	}
+
+	switch(BITS(op,0x00f0))
+	{
+		case 0x8:
+			/* IMPY - 0001 0101 1000 FQQQ */
+			decode_QQQF_table(BITS(op,0x0007), BITS(op,0x0008), S1, S2, D);
+			sprintf(opcode_str, "impy");
+			sprintf(arg_str, "%s,%s,%s", S1, S2, D);
+			break;
+		case 0xa:
+			/* IMAC - 0001 0101 1010 FQQQ */
+			decode_QQQF_table(BITS(op,0x0007), BITS(op,0x0008), S1, S2, D);
+			sprintf(opcode_str, "imac");
+			sprintf(arg_str, "%s,%s,%s", S1, S2, D);
+			break;
+		case 0x9: case 0xb:
+			/* DMAC(ss,su,uu) - 0001 0101 10s1 FsQQ */
+			decode_ss_table(BITS(op,0x0024), A);
+			decode_QQF_special_table(BITS(op,0x0003), BITS(op,0x0008), S1, S2, D);     /* Special QQF */
+			sprintf(opcode_str, "dmac(%s)", A);
+			sprintf(arg_str, "%s,%s,%s", S1, S2, D);
+			break;
+		case 0xc:
+			/* MPY(su,uu) - 0001 0101 1100 FsQQ */
+			decode_s_table(BITS(op,0x0004), A);
+			decode_QQF_special_table(BITS(op,0x0003), BITS(op,0x0008), S1, S2, D);     /* Special QQF */
+			sprintf(opcode_str, "mpy(%s)", A);
+			sprintf(arg_str, "%s,%s,%s", S1, S2, D);
+			break;
+		case 0xe:
+			/* MAC(su,uu) - 0001 0101 1110 FsQQ */
+			decode_s_table(BITS(op,0x0004), A);
+			decode_QQF_special_table(BITS(op,0x0003), BITS(op,0x0008), S1, S2, D);		/* Special QQF */
+			sprintf(opcode_str, "mac(%s)", A);
+			sprintf(arg_str, "%s,%s,%s", S1, S2, D);
+			break;
+	}
+
+	return retSize;
+}
+
+static unsigned decode_immediate_opcode(const UINT16 op, const UINT16 pc, char* opcode_str, char* arg_str)
+{
+	unsigned retSize = 1;
+
+	if (BITS(op,0x0600))
+	{
+		if (!BITS(op,0x0100))
+		{
+			/* ANDI - 0001 1EE0 iiii iiii */
+			char D[32];
+			decode_EE_table(BITS(op,0x0600), D);
+			sprintf(opcode_str, "and(i)");
+			sprintf(arg_str, "#%02x,%s", BITS(op,0x00ff), D);
 		}
 		else
 		{
-			if (BITS(op,0x0004) == 0x0)
-			{
-				// MOVE(C) - 0011 1WDD DDD1 q0RR
-	            DecodeDDDDDTable(BITS(op,0x03e0), SD) ;
-                Rnum = DecodeRRTable(BITS(op,0x0003)) ;
-                AssembleeaFromqTable(BITS(op,0x0008), Rnum, ea) ;
-                AssembleArgumentsFromWTable(BITS(op,0x0400), args, 'X', SD, ea) ;
-                sprintf(buffer, "move(c)   %s", args) ;
-                retSize = 1 ;
-			}
-			else
-			{
-				switch(BITS(op,0x0006))
-				{
-					// MOVE(C) - 0011 1WDD DDD1 t10- xxxx xxxx xxxx xxxx
-					case 0x2:
-						DecodeDDDDDTable(BITS(op,0x03e0), SD) ;
-						AssembleeaFromtTable(BITS(op,0x0008), oprom[2] | (oprom[3] << 8), ea) ;
-						// !!! I'm pretty sure this is  in the right order - same issue as the WTables !!!
-						if (BITS(op,0x0400))												// fixed - 02/03/05
-							sprintf(args, "%s,%s", ea, SD) ;
-						else
-							sprintf(args, "%s,%s", SD, ea) ;
-						sprintf(buffer, "move(c)   %s", args) ;
-						retSize = 2 ;
-						break ;
+			/* ORI - 0001 1EE1 iiii iiii */
+			char D[32];
+            decode_EE_table(BITS(op,0x0600), D);
+			sprintf(opcode_str, "or(i)");
+			sprintf(arg_str, "#%02x,%s", BITS(op,0x00ff), D);
+		}
+	}
+	else
+	{
+		if (!BITS(op,0x0020))
+		{
+			/* MOVE(S) - 0001 100W HH0a aaaa */
+			char A[32];
+			char SD[32];
+			char args[32];
+			decode_HH_table(BITS(op,0x00c0), SD);
+			sprintf(A, "00%02x", BITS(op,0x001f));
+			assemble_arguments_from_W_table(BITS(op,0x0100), args, 'X', SD, A);
+			sprintf(opcode_str, "move(s)");
+			sprintf(arg_str, "%s", args);
+		}
+		else
+		{
+			/* MOVE(P) - 0001 100W HH1p pppp */
+			char A[32];
+			char SD[32];
+			char args[32];
+			char fullAddy[128];
+			decode_HH_table(BITS(op,0x00c0), SD);
+			assemble_address_from_IO_short_address(BITS(op,0x001f), fullAddy);	/* Convert Short Absolute Address to full 16-bit */
+			sprintf(A, "%02x (%s)", BITS(op,0x001f), fullAddy);
+			assemble_arguments_from_W_table(BITS(op,0x0100), args, 'X', SD, A);
+			sprintf(opcode_str, "move(p)");
+			sprintf(arg_str, "%s", args);
+		}
+	}
+	
+	return retSize;
+}
 
-					// MOVE(C) - 0011 1WDD DDD1 Z11-
-					case 0x3:
-                        DecodeDDDDDTable(BITS(op,0x03e0), SD) ;
-                        DecodeZTable(BITS(op,0x0008), ea) ;				// Fixed - 11/26/06
-                        AssembleArgumentsFromWTable(BITS(op,0x0400), args, 'X', SD, ea) ;
-                        sprintf(buffer, "move(c)   %s", args) ;
-                        retSize = 1 ;
-						break ;
-				}
+static unsigned decode_movec_opcodes(const UINT16 op, const UINT16 op2, const UINT16 pc, char* opcode_str, char* arg_str)
+{
+	unsigned retSize = 1;
+
+	char SD[32];
+	char ea[32];
+	char args[64];
+	int Rnum = -1;
+	
+	if (BITS(op,0x0010) == 0x0)
+	{
+		/* MOVE(C) - 0011 1WDD DDD0 MMRR */
+		decode_DDDDD_table(BITS(op,0x03e0), SD);
+		Rnum = decode_RR_table(BITS(op,0x0003));
+		assemble_ea_from_MM_table(BITS(op,0x000c), Rnum, ea);
+		assemble_arguments_from_W_table(BITS(op,0x0400), args, 'X', SD, ea);
+		sprintf(opcode_str, "move(c)");
+		sprintf(arg_str, "%s", args);
+	}
+	else
+	{
+		if (BITS(op,0x0004) == 0x0)
+		{
+			/* MOVE(C) - 0011 1WDD DDD1 q0RR */
+			decode_DDDDD_table(BITS(op,0x03e0), SD);
+			Rnum = decode_RR_table(BITS(op,0x0003));
+			assemble_ea_from_q_table(BITS(op,0x0008), Rnum, ea);
+			assemble_arguments_from_W_table(BITS(op,0x0400), args, 'X', SD, ea);
+			sprintf(opcode_str, "move(c)");
+			sprintf(arg_str, "%s", args);
+		}
+		else
+		{
+			switch(BITS(op,0x0006))
+			{
+				/* MOVE(C) - 0011 1WDD DDD1 t10- xxxx xxxx xxxx xxxx */
+				case 0x2:
+					decode_DDDDD_table(BITS(op,0x03e0), SD);
+					assemble_ea_from_t_table(BITS(op,0x0008), op2, ea);
+					/* !!! I'm pretty sure this is  in the right order - same issue as the WTables !!! */
+					if (BITS(op,0x0400))												/* fixed - 02/03/05 */
+						sprintf(args, "%s,%s", ea, SD);
+					else
+						sprintf(args, "%s,%s", SD, ea);
+					sprintf(opcode_str, "move(c)");
+					sprintf(arg_str, "%s", args);
+					retSize = 2;
+					break;
+
+				/* MOVE(C) - 0011 1WDD DDD1 Z11- */
+				case 0x3:
+					decode_DDDDD_table(BITS(op,0x03e0), SD);
+					decode_Z_table(BITS(op,0x0008), ea);
+					assemble_arguments_from_W_table(BITS(op,0x0400), args, 'X', SD, ea);
+					sprintf(opcode_str, "move(c)");
+					sprintf(arg_str, "%s", args);
+					break;
 			}
 		}
 	}
 
-	return retSize ;
+	return retSize;
 }
 
-
-static unsigned DecodeSpecialOpcode(char *buffer, UINT16 op, unsigned pc, const UINT8 *oprom)
+static unsigned decode_misc_opcode(const UINT16 op, const UINT16 pc, char* opcode_str, char* arg_str)
 {
-	unsigned retSize = 0 ;
+	unsigned retSize = 1;
+	
+	char M[32];
+	char S1[32];
+	char SD[32];
+	char D1[32];
+	char ea[32];
+	char args[64];
+	int Rnum = -1;
+	int relativeInt = 666;
+	
+	switch(BITS(op,0x0c00))
+	{
+		/* MOVE(I) - 0010 00DD BBBB BBBB */
+		case 0x0:
+			decode_DD_table(BITS(op,0x0300), D1);
+			sprintf(opcode_str, "move(i)");
+			sprintf(arg_str, "#%02x,%s", BITS(op,0x00ff), D1);
+			break;
 
-	char S1[32] ;
-	char SD[32] ;
-	char M[32] ;
-	char args[32] ;
-	char ea[32] ;
-	int Rnum ;
+		/* TFR(3) - 0010 01mW RRDD FHHH */
+		case 0x1:
+            decode_DDF_table(BITS(op,0x0030), BITS(op,0x0008), D1, S1);          /* Intentionally switched */
+			decode_HHH_table(BITS(op,0x0007), SD);
+			Rnum = decode_RR_table(BITS(op,0x00c0));
+			assemble_ea_from_m_table(BITS(op,0x0200), Rnum, ea);
+			assemble_arguments_from_W_table(BITS(op,0x0100), args, 'X', SD, ea);
+			sprintf(opcode_str, "tfr3");
+			sprintf(arg_str, "%s,%s %s", S1, D1, args);
+			break;
+
+		/* MOVE(C) - 0010 10dd dddD DDDD */
+		case 0x2:
+			decode_DDDDD_table(BITS(op,0x03e0), S1);
+			decode_DDDDD_table(BITS(op,0x001f), D1);
+			sprintf(opcode_str, "move(c)");
+			sprintf(arg_str, "%s,%s", S1, D1);
+			break;
+
+		/* B.cc - 0010 11cc ccee eeee */
+		case 0x3:
+			decode_cccc_table(BITS(op,0x3c0), M);
+			relativeInt = get_6_bit_relative_value(BITS(op,0x003f));
+			sprintf(opcode_str, "b.%s", M);
+			sprintf(arg_str, "%04x (%d)", (int)pc + relativeInt, relativeInt);
+			break;
+	}
+	
+	return retSize;
+}
+
+/* TODO: Check all dual-word guys */
+static unsigned decode_unique_opcode(const UINT16 op, const UINT16 op2, const UINT16 pc, char* opcode_str, char* arg_str)
+{
+	unsigned retSize = 1;
+
+	char ea[32];
+	char ea2[32];
+	char S1[32];
+	char SD[32];
+	char args[32];
 
 	if (BITS(op,0x0ff0) == 0x0)
 	{
 		switch (BITS(op,0x000f))
 		{
-			// NOP - 0000 0000 0000 0000
+			/* NOP - 0000 0000 0000 0000 */
 			case 0x0:
-				sprintf(buffer, "nop") ;
-				retSize = 1 ;
-				break ;
+				sprintf(opcode_str, "nop");
+				sprintf(arg_str, " ");
+				break;
 
-			// Debug - 0000 0000 0000 0001
+			/* Debug - 0000 0000 0000 0001 */
 			case 0x1:
-/*              sprintf(buffer, "debug") ;
-                retSize = 1 ;
-*/				break ;
+				sprintf(opcode_str, "debug");
+				sprintf(arg_str, " ");
+				break;
 
-			// DO FOREVER - 0000 0000 0000 0010 xxxx xxxx xxxx xxxx
+			/* DO FOREVER - 0000 0000 0000 0010 xxxx xxxx xxxx xxxx */
 			case 0x2:
-				sprintf(buffer, "doForever %04x", oprom[2] | (oprom[3] << 8)) ;
-				retSize = 2 ;
-				break ;
+				sprintf(opcode_str, "doForever");
+				sprintf(arg_str, "%04x", op2);
+				retSize = 2;
+				break;
 
-			// chkaau - 0000 0000 0000 0100
+			/* chkaau - 0000 0000 0000 0100 */
 			case 0x4:
-/*              sprintf(buffer, "chkaau") ;
-                retSize = 1 ;
-*/				break ;
+				sprintf(opcode_str, "chkaau");
+				sprintf(arg_str, " ");
+				break;
 
-			// SWI - 0000 0000 0000 0101
+			/* SWI - 0000 0000 0000 0101 */
 			case 0x5:
-/*              sprintf(buffer, "swi") ;
-                retSize = 1 ;
-*/				break ;
+				sprintf(opcode_str, "swi");
+				sprintf(arg_str, " ");
+				break;
 
-			// RTS - 0000 0000 0000 0110
+			/* RTS - 0000 0000 0000 0110 */
 			case 0x6:
-				sprintf(buffer, "rts") ;
-				retSize = 1 | DASMFLAG_STEP_OUT;
-				break ;
+				sprintf(opcode_str, "rts");
+				sprintf(arg_str, " ");
+				retSize |= DASMFLAG_STEP_OUT;
+				break;
 
-			// RTI - 0000 0000 0000 0111
+			/* RTI - 0000 0000 0000 0111 */
 			case 0x7:
-	            sprintf(buffer, "rti") ;
-                retSize = 1 | DASMFLAG_STEP_OUT;
-				break ;
+				sprintf(opcode_str, "rti");
+				sprintf(arg_str, " ");
+                retSize |= DASMFLAG_STEP_OUT;
+				break;
 
-			// RESET - 0000 0000 0000 1000
+			/* RESET - 0000 0000 0000 1000 */
 			case 0x8:
-/*              sprintf(buffer, "reset") ;
-                retSize = 1 ;
-*/				break ;
+				sprintf(opcode_str, "reset");
+				sprintf(arg_str, " ");
+				break;
 
-			// Enddo - 0000 0000 0000 1001
+			/* Enddo - 0000 0000 0000 1001 */
 			case 0x9:
-/*              sprintf(buffer, "endDo") ;
-                retSize = 1 ;
-*/				break ;
+				sprintf(opcode_str, "enddo");
+				sprintf(arg_str, " ");
+				break;
 
-			// STOP - 0000 0000 0000 1010
+			/* STOP - 0000 0000 0000 1010 */
 			case 0xa:
-/*              sprintf(buffer, "stop") ;
-                retSize = 1 ;
-*/				break ;
+				sprintf(opcode_str, "stop");
+				sprintf(arg_str, " ");
+				break;
 
-			// WAIT - 0000 0000 0000 1011
+			/* WAIT - 0000 0000 0000 1011 */
 			case 0xb:
-/*              sprintf(buffer, "wait") ;
-                retSize = 1 ;
-*/				break ;
+				sprintf(opcode_str, "wait");
+				sprintf(arg_str, " ");
+				break;
 
-			// ILLEGAL - 0000 0000 0000 1111
+			/* ILLEGAL - 0000 0000 0000 1111 */
 			case 0xf:
-/*              sprintf(buffer, "illegal") ;
-                retSize = 1 ;
-*/				break ;
-
+				sprintf(opcode_str, "illegal");
+				sprintf(arg_str, " ");
+				break;
 		}
 	}
 	else if (BITS(op,0x0f00) == 0x0)
 	{
+		int Rnum = -1;
+		char M[32] = "";
+		
 		switch(BITS(op,0x00e0))
 		{
 			case 0x2:
-				// DEBUG.cc - 0000 0000 0101 cccc
-/*              DecodeccccTable(BITS(op,0x000f), M) ;
-                sprintf(buffer, "debug.%s", M) ;
-                retSize = 1 ;
-*/				break ;
+				/* DEBUG.cc - 0000 0000 0101 cccc */
+				decode_cccc_table(BITS(op,0x000f), M);
+				sprintf(opcode_str, "debug.%s", M);
+				sprintf(arg_str, " ");
+				break;
 
 			case 0x6:
-				// DO - 0000 0000 110- --RR xxxx xxxx xxxx xxxx
-/*              Rnum = DecodeRRTable(BITS(op,0x0003)) ;
-                sprintf(buffer, "do        X:(R%d),%02x", Rnum, oprom[2] | (oprom[3] << 8)) ;
-                retSize = 2 ;
-*/				break ;
+				/* DO - 0000 0000 110- --RR xxxx xxxx xxxx xxxx */
+				Rnum = decode_RR_table(BITS(op,0x0003));
+				sprintf(opcode_str, "do");
+				sprintf(arg_str, "X:(R%d),%02x", Rnum, op2);
+                retSize = 2;
+				break;
 
 			case 0x7:
-				// REP - 0000 0000 111- --RR
-/*              Rnum = DecodeRRTable(BITS(op,0x0003)) ;
-                sprintf(buffer, "rep       X:(R%d)", Rnum) ;
-                retSize = 1 ;
-*/				break ;
+				/* REP - 0000 0000 111- --RR */
+				Rnum = decode_RR_table(BITS(op,0x0003));
+				sprintf(opcode_str, "rep");
+				sprintf(arg_str, "X:(R%d)", Rnum);
+				break;
 		}
 	}
 	else if (BITS(op,0x0f00) == 0x1)
 	{
+		char M[32] = "";
+
 		if (BITS(op,0x00f0) == 0x1)
 		{
-			// BRK.cc - 0000 0001 0001 cccc
-/*          DecodeccccTable(BITS(op,0x000f), M) ;
-            sprintf(buffer, "brk.%s", M) ;
-            retSize = 1 ;
-*/		}
+			/* BRK.cc - 0000 0001 0001 cccc */
+			decode_cccc_table(BITS(op,0x000f), M);
+			sprintf(opcode_str, "brk.%s", M);
+			sprintf(arg_str, " ");
+		}
 		else if (BITS(op,0x00f0) == 0x2)
 		{
-			switch(BITS(op,0x000c))								// Consolidation can happen here
+			/* All 4 instructions have the same RR encoding */
+			int Rnum = decode_RR_table(BITS(op,0x0003));
+
+			switch(BITS(op,0x000c))
 			{
-				// JSR - 0000 0001 0010 00RR
+				/* JSR - 0000 0001 0010 00RR */
 				case 0x0:
-/*                  Rnum = DecodeRRTable(BITS(op,0x0003)) ;
-                    sprintf(buffer, "jsr       R%d", Rnum) ;
-                    retSize = 1 ; // I think aaron guessed incorrectly? | DASMFLAG_STEP_OVER;
-*/					break ;
+                    sprintf(opcode_str, "jsr");
+                    sprintf(arg_str, "R%d", Rnum);
+                    retSize |= DASMFLAG_STEP_OVER;
+					break;
 
-				// JMP - 0000 0001 0010 01RR
+				/* JMP - 0000 0001 0010 01RR */
 				case 0x1:
-					Rnum = DecodeRRTable(BITS(op,0x0003)) ;
-                    sprintf(buffer, "jmp       R%d", Rnum) ;
-                    retSize = 1 ;
-					break ;
+                    sprintf(opcode_str, "jmp");
+                    sprintf(arg_str, "R%d", Rnum);
+					break;
 
-				// BSR - 0000 0001 0010 10RR
+				/* BSR - 0000 0001 0010 10RR */
 				case 0x2:
-/*                  Rnum = DecodeRRTable(BITS(op,0x0003)) ;
-                    sprintf(buffer, "bsr       R%d", Rnum) ;
-                    retSize = 1 | DASMFLAG_STEP_OVER;
-*/					break ;
+                    sprintf(opcode_str, "bsr");
+                    sprintf(arg_str, "R%d", Rnum);
+                    retSize |= DASMFLAG_STEP_OVER;
+					break;
 
-				// BRA - 0000 0001 0010 11RR
+				/* BRA - 0000 0001 0010 11RR */
 				case 0x3:
-/*                  Rnum = DecodeRRTable(BITS(op,0x0003)) ;
-                    sprintf(buffer, "bra       R%d", Rnum) ;
-                    retSize = 1 ;
-*/					break ;
+                    sprintf(opcode_str, "bra");
+                    sprintf(arg_str, "R%d", Rnum);
+					break;
 			}
 		}
 		else if (BITS(op,0x00f0) == 0x3)
 		{
 			switch(BITS(op,0x000c))
 			{
-				// JSR - 0000 0001 0011 00-- xxxx xxxx xxxx xxxx
+				/* JSR - 0000 0001 0011 00-- xxxx xxxx xxxx xxxx */
 				case 0x0:
-	                sprintf(buffer, "jsr       %04x", oprom[2] | (oprom[3] << 8)) ;
-                    retSize = 2 | DASMFLAG_STEP_OVER;
-					break ;
+					sprintf(opcode_str, "jsr");
+					sprintf(arg_str, "%04x", op2);
+					retSize = 2;
+                    retSize |= DASMFLAG_STEP_OVER;
+					break;
 
-				// JMP - 0000 0001 0011 01-- xxxx xxxx xxxx xxxx
+				/* JMP - 0000 0001 0011 01-- xxxx xxxx xxxx xxxx */
 				case 0x1:
-					sprintf(buffer, "jmp       %04x", oprom[2] | (oprom[3] << 8)) ;
-					retSize = 2 ;
-					break ;
+					sprintf(opcode_str, "jmp");
+					sprintf(arg_str, "%04x", op2);
+					retSize = 2;
+					break;
 
-				// BSR - 0000 0001 0011 10-- xxxx xxxx xxxx xxxx
+				/* BSR - 0000 0001 0011 10-- xxxx xxxx xxxx xxxx */
 				case 0x2:
-					sprintf(buffer, "bsr       %d (0x%04x)", oprom[2] | (oprom[3] << 8), oprom[2] | (oprom[3] << 8)) ;
-					retSize = 2 | DASMFLAG_STEP_OVER;
-					break ;
+					sprintf(opcode_str, "bsr");
+					sprintf(arg_str, "%d (0x%04x)", op2, op2);
+					retSize = 2;
+					retSize |= DASMFLAG_STEP_OVER;
+					break;
 
-				// BRA - 0000 0001 0011 11-- xxxx xxxx xxxx xxxx
+				/* BRA - 0000 0001 0011 11-- xxxx xxxx xxxx xxxx */
 				case 0x3:
-/*                  sprintf(buffer, "bra       %d (%04x)", oprom[2] | (oprom[3] << 8), oprom[2] | (oprom[3] << 8)) ;
-                    retSize = 2 ;
-*/					break ;
+					sprintf(opcode_str, "bra");
+					sprintf(arg_str, "%d (0x%04x)", op2, op2);
+                    retSize = 2;
+					break;
 			}
 		}
 		else if (BITS(op,0x00f0) == 0x5)
 		{
-			// REP.cc - 0000 0001 0101 cccc
-/*          DecodeccccTable(BITS(op,0x000f), M) ;
-            sprintf(buffer, "rep.%s", M) ;
-            retSize = 1 ;
-*/			// !!! Should I decode the next instruction and put it here ???  probably...
+			char M[32] = "";
+			
+			/* REP.cc - 0000 0001 0101 cccc */
+			decode_cccc_table(BITS(op,0x000f), M);
+			sprintf(opcode_str, "rep.%s", M);
+			sprintf(arg_str, " ");
+			/* !!! Should I decode the next instruction and put it here ???  probably... */
 		}
 		else if (BITS(op,0x0080) == 0x1)
 		{
-			// LEA - 0000 0001 10TT MMRR - 0000 0001 11NN MMRR
-/*          Rnum = DecodeRRTable(BITS(op,0x0030)) ;
-            AssembleeaFromMMTable(BITS(op,0x000c), BITS(op,0x0003), ea) ;
+			/* LEA - 0000 0001 10TT MMRR */
+			/*     - 0000 0001 11NN MMRR */
+			int Rnum = decode_RR_table(BITS(op,0x0030));
+            assemble_ea_from_MM_table(BITS(op,0x000c), BITS(op,0x0003), ea);
+			sprintf(opcode_str, "lea");
             if (BITS(op,0x0040))
-                sprintf(buffer, "lea       %s,R%d", ea, Rnum) ;
+				sprintf(arg_str, "%s,R%d", ea, Rnum);
             else
-                sprintf(buffer, "lea       %s,N%d", ea, Rnum) ;
-            retSize = 1 ;
-*/		}
+				sprintf(arg_str, "%s,N%d", ea, Rnum);
+		}
 	}
 	else if (BITS(op,0x0e00) == 0x1)
 	{
-
+		sprintf(opcode_str, "move(m)");
+		
 		if (BITS(op,0x0020) == 0x0)
 		{
-			// MOVE(M) - 0000 001W RR0M MHHH
-			Rnum = DecodeRRTable(BITS(op,0x00c0)) ;
-			DecodeHHHTable(BITS(op,0x0007), SD) ;
-			AssembleeaFromMMTable(BITS(op,0x0018), Rnum, ea) ;
-			AssembleArgumentsFromWTable(BITS(op,0x0100), args, 'P', SD, ea) ;
-			sprintf(buffer, "move(m)   %s", args) ;
-			// !!! The docs list the read/write order backwards for all move(m)'s - crackbabies ???
-			retSize = 1 ;
+			/* MOVE(M) - 0000 001W RR0M MHHH */
+			int Rnum = decode_RR_table(BITS(op,0x00c0));
+			decode_HHH_table(BITS(op,0x0007), SD);
+			assemble_ea_from_MM_table(BITS(op,0x0018), Rnum, ea);
+			assemble_arguments_from_W_table(BITS(op,0x0100), args, 'P', SD, ea);
+			sprintf(arg_str, "%s", args);
 		}
 		else
 		{
-			// MOVE(M) - 0000 001W RR11 mmRR
-/*          AssembleeaFrommmTable(BITS(op,0x000c), BITS(op,0x00c0), BITS(op,0x0003), ea, ea2) ;
-            sprintf(SD, "P:%s", ea) ;
-            AssembleArgumentsFromWTable(BITS(op,0x0100), args, 'X', SD, ea2) ;
-            // !!! The docs list the read/write order backwards for all move(m)'s - crackbabies ???
-            sprintf(buffer, "move(m)   %s", args) ;
-            retSize = 1 ;
-*/		}
+			/* MOVE(M) - 0000 001W RR11 mmRR */
+			assemble_eas_from_m_table(BITS(op,0x000c), BITS(op,0x00c0), BITS(op,0x0003), ea, ea2);
+            sprintf(SD, "P:%s", ea);
+            assemble_arguments_from_W_table(BITS(op,0x0100), args, 'X', SD, ea2);
+			sprintf(arg_str, "%s", args);
+		}
 	}
 	else if (BITS(op,0x0f00) == 0x4)
 	{
 		if (BITS(op,0x0020) == 0x0)
 		{
-			// DO - 0000 0100 000D DDDD xxxx xxxx xxxx xxxx
-			DecodeDDDDDTable(BITS(op,0x001f), S1) ;
-			sprintf(buffer, "do        %s,%04x", S1, oprom[2] | (oprom[3] << 8)) ;
-			retSize = 2 ;
+			/* DO - 0000 0100 000D DDDD xxxx xxxx xxxx xxxx */
+			decode_DDDDD_table(BITS(op,0x001f), S1);
+			sprintf(opcode_str, "do");
+			sprintf(arg_str, "%s,%04x", S1, op2);
+			retSize = 2;
 		}
 		else
 		{
-			// REP - 0000 0100 001D DDDD
-            DecodeDDDDDTable(BITS(op,0x001f), S1) ;
-            sprintf(buffer, "rep       %s", S1) ;
-            retSize = 1 ;
+			/* REP - 0000 0100 001D DDDD */
+            decode_DDDDD_table(BITS(op,0x001f), S1);
+			sprintf(opcode_str, "rep");
+			sprintf(arg_str, "%s", S1);
 		}
 	}
 	else if (BITS(op,0x0f00) == 0x5)
 	{
-		UINT8 B ;
-		UINT16 op2 = oprom[2] | (oprom[3] << 8) ;
+		UINT8 B;
 
 		if (BITS(op2,0xfe20) == 0x02)
 		{
-			// MOVE(M) - 0000 0101 BBBB BBBB | 0000 001W --0- -HHH
-			B = BITS(op,0x00ff) ;
-			DecodeHHHTable(BITS(op2,0x0007), SD) ;
-			AssembleRegFromWTable(BITS(op2,0x0100), args, 'P', SD, B) ;
-			sprintf(buffer, "move(m)   %s", args) ;
-			// !!! The docs list the read/write order backwards for all move(m)'s - crackbabies ???
-			retSize = 2 ;
+			/* MOVE(M) - 0000 0101 BBBB BBBB | 0000 001W --0- -HHH */
+			B = BITS(op,0x00ff);
+			decode_HHH_table(BITS(op2,0x0007), SD);
+			assemble_reg_from_W_table(BITS(op2,0x0100), args, 'P', SD, B);
+			sprintf(opcode_str, "move(m)");
+			sprintf(arg_str, "%s", args);
+			/* !!! The docs list the read/write order backwards for all move(m)'s - crackbabies ??? */
+			retSize = 2;
 		}
 		else if (BITS(op2,0xf810) == 0x0e)
 		{
-			// MOVE(C) - 0000 0101 BBBB BBBB | 0011 1WDD DDD0 ----
-/*          B = BITS(op,0x00ff) ;
-            DecodeDDDDDTable(BITS(op2,0x03e0), SD) ;
-            AssembleRegFromWTable(BITS(op2,0x0400), args, 'X', SD, B) ;
-            sprintf(buffer, "move(c)   %s", args) ;
-            retSize = 2 ;
-*/		}
+			/* MOVE(C) - 0000 0101 BBBB BBBB | 0011 1WDD DDD0 ---- */
+			B = BITS(op,0x00ff);
+            decode_DDDDD_table(BITS(op2,0x03e0), SD);
+            assemble_reg_from_W_table(BITS(op2,0x0400), args, 'X', SD, B);
+			sprintf(opcode_str, "move(c)");
+			sprintf(arg_str, "%s", args);
+            retSize = 2;
+		}
 		else if (BITS(op2,0x00ff) == 0x11)
 		{
-			// MOVE - 0000 0101 BBBB BBBB | ---- HHHW 0001 0001
-/*          B = BITS(op,0x00ff) ;
-            DecodeHHHTable(BITS(op2,0x0e00), SD) ;
-            AssembleRegFromWTable(BITS(op2,0x0100), args, 'X', SD, B) ;
-            sprintf(buffer, "move      %s", args) ;
-            retSize = 2 ;
-*/		}
+			/* MOVE - 0000 0101 BBBB BBBB | ---- HHHW 0001 0001 */
+			B = BITS(op,0x00ff);
+            decode_HHH_table(BITS(op2,0x0e00), SD);
+            assemble_reg_from_W_table(BITS(op2,0x0100), args, 'X', SD, B);
+			sprintf(opcode_str, "move");
+			sprintf(arg_str, "%s", args);
+            retSize = 2;
+		}
 	}
 	else if (BITS(op,0x0f00) == 0x6)
 	{
+		int Rnum = -1;
+		char M[32] = "";
+
 		switch(BITS(op,0x0030))
 		{
 			case 0x0:
-				// JS.cc - 0000 0110 RR00 cccc
-/*              DecodeccccTable(BITS(op,0x000f), M) ;
-                Rnum = DecodeRRTable(BITS(op,0x00c0)) ;
-                sprintf(buffer, "js.%s  R%d\n", M, Rnum) ;
-                retSize = 1 ;
-*/				break ;
+				/* JS.cc - 0000 0110 RR00 cccc */
+				decode_cccc_table(BITS(op,0x000f), M);
+                Rnum = decode_RR_table(BITS(op,0x00c0));
+				sprintf(opcode_str, "js.%s", M);
+				sprintf(arg_str, "R%d", Rnum);
+				retSize |= DASMFLAG_STEP_OVER;	/* probably.  What's the diff between a branch and a jump? */
+				break;
 
 			case 0x1:
-				// JS.cc - 0000 0110 --01 cccc xxxx xxxx xxxx xxxx
-/*              DecodeccccTable(BITS(op,0x000f), M) ;
-                sprintf(buffer, "js.%s  %04x", M, oprom[2] | (oprom[3] << 8)) ;
-                retSize = 2 ;
-*/				break ;
+				/* JS.cc - 0000 0110 --01 cccc xxxx xxxx xxxx xxxx */
+				decode_cccc_table(BITS(op,0x000f), M);
+				sprintf(opcode_str, "js.%s", M);
+				sprintf(arg_str, "%04x", op2);
+                retSize = 2;
+				retSize |= DASMFLAG_STEP_OVER;	/* probably */
+				break;
 
 			case 0x2:
-				// J.cc - 0000 0110 RR10 cccc
-/*              DecodeccccTable(BITS(op,0x000f), M) ;
-                Rnum = DecodeRRTable(BITS(op,0x00c0)) ;
-                sprintf(buffer, "j.%s  R%d", M, Rnum) ;
-                retSize = 1 ;
-*/				break ;
+				/* J.cc - 0000 0110 RR10 cccc */
+				decode_cccc_table(BITS(op,0x000f), M);
+                Rnum = decode_RR_table(BITS(op,0x00c0));
+				sprintf(opcode_str, "j.%s", M);
+                sprintf(arg_str, "R%d", Rnum);
+				break;
 
 			case 0x3:
-				// J.cc - 0000 0110 --11 cccc xxxx xxxx xxxx xxxx
-/*              DecodeccccTable(BITS(op,0x000f), M) ;
-                sprintf(buffer, "j.%s  %04x", M, oprom[2] | (oprom[3] << 8)) ;
-                retSize = 2 ;
-*/				break ;
+				/* J.cc - 0000 0110 --11 cccc xxxx xxxx xxxx xxxx */
+				decode_cccc_table(BITS(op,0x000f), M);
+				sprintf(opcode_str, "j.%s", M);
+				sprintf(arg_str, "%04x", op2);
+                retSize = 2;
+				break;
 		}
 	}
 	else if (BITS(op,0x0f00) == 0x7)
 	{
+		int Rnum = -1;
+		char M[32] = "";
+
 		switch(BITS(op,0x0030))
 		{
 			case 0x0:
-				// BS.cc - 0000 0111 RR00 cccc
-/*              DecodeccccTable(BITS(op,0x000f), M) ;
-                Rnum = DecodeRRTable(BITS(op,0x00c0)) ;
-                sprintf(buffer, "bs.%s  R%d\n", M, Rnum) ;
-                retSize = 1 ;
-*/				break ;
+				/* BS.cc - 0000 0111 RR00 cccc */
+				decode_cccc_table(BITS(op,0x000f), M);
+                Rnum = decode_RR_table(BITS(op,0x00c0));
+				sprintf(opcode_str, "bs.%s", M);
+				sprintf(arg_str, "R%d", Rnum);
+				retSize |= DASMFLAG_STEP_OVER;	/* probably.  What's the diff between a branch and a jump? */
+				break;
 
 			case 0x1:
-				// BS.cc - 0000 0111 --01 cccc xxxx xxxx xxxx xxxx
-				DecodeccccTable(BITS(op,0x000f), M) ;
-				sprintf(buffer, "bs.%s %d (0x%04x)", M, (INT16)(oprom[2] | (oprom[3] << 8)), oprom[2] | (oprom[3] << 8)) ;
-				retSize = 2 ;
-				break ;
+				/* BS.cc - 0000 0111 --01 cccc xxxx xxxx xxxx xxxx */
+				decode_cccc_table(BITS(op,0x000f), M);
+				sprintf(opcode_str, "bs.%s", M);
+				sprintf(arg_str, "%d (0x%04x)", (INT16)(op2), op2);
+				retSize = 2;
+				retSize |= DASMFLAG_STEP_OVER;	/* probably */
+				break;
 
 			case 0x2:
-				// B.cc - 0000 0111 RR10 cccc
-/*              DecodeccccTable(BITS(op,0x000f), M) ;
-                Rnum = DecodeRRTable(BITS(op,0x00c0)) ;
-                sprintf(buffer, "b.%s  R%d", M, Rnum) ;
-                retSize = 1 ;
-*/				break ;
+				/* B.cc - 0000 0111 RR10 cccc */
+				decode_cccc_table(BITS(op,0x000f), M);
+                Rnum = decode_RR_table(BITS(op,0x00c0));
+				sprintf(opcode_str, "b.%s", M);
+				sprintf(arg_str, "R%d", Rnum);
+				break;
 
 			case 0x3:
-				// B.cc - 0000 0111 --11 cccc xxxx xxxx xxxx xxxx
-				DecodeccccTable(BITS(op,0x000f), M) ;
-				sprintf(buffer, "b.%s  %04x (%d)", M, oprom[2] | (oprom[3] << 8), oprom[2] | (oprom[3] << 8)) ;
-				retSize = 2 ;
-				break ;
+				/* B.cc - 0000 0111 --11 cccc xxxx xxxx xxxx xxxx */
+				decode_cccc_table(BITS(op,0x000f), M);
+				sprintf(opcode_str, "b.%s", M);
+				sprintf(arg_str, "%04x (%d)", op2, op2);
+				retSize = 2;
+				break;
 		}
 	}
 	else if (BITS(op,0x0800))
 	{
+		int Rnum = -1;
+
 		switch (BITS(op,0x0700))
 		{
-			// JSR - 0000 1010 AAAA AAAA
+			/* JSR - 0000 1010 AAAA AAAA */
 			case 0x2:
-/*              sprintf(buffer, "jsr       %02x", BITS(op,0x00ff)) ;
-                retSize = 1 ;
-*/				break ;
+				sprintf(opcode_str, "jsr");
+				sprintf(arg_str, "%d (0x%02x)", BITS(op,0x00ff), BITS(op,0x00ff));
+                retSize |= DASMFLAG_STEP_OVER;
+				break;
 
-			// BRA - 0000 1011 aaaa aaaa
+			/* BRA - 0000 1011 aaaa aaaa */
 			case 0x3:
-				sprintf(buffer, "bra       %d (0x%02x)", (INT8)BITS(op,0x00ff), BITS(op,0x00ff)) ;
-				retSize = 1 ;
-				break ;
+				sprintf(opcode_str, "bra");
+				sprintf(arg_str, "%d (0x%02x)", (INT8)BITS(op,0x00ff), pc + (INT8)BITS(op,0x00ff));
+				break;
 
-			// MOVE(P) - 0000 110W RRmp pppp
+			/* MOVE(P) - 0000 110W RRmp pppp */
 			case 0x4: case 0x5:
 			{
-				char fullAddy[128] ;									// Convert Short Absolute Address to full 16-bit
-				Rnum = DecodeRRTable(BITS(op,0x00c0)) ;
-				AssembleeaFrommTable(BITS(op,0x0020), Rnum, ea) ;
-
-				AssembleAddressFromIOShortAddress(BITS(op,0x001f), fullAddy) ;
-
-				sprintf(SD, "X:%02x (%s)", BITS(op,0x001f), fullAddy) ;
-
-				// !! order (pretty sure pp is S/D in the docs) !!
-				AssembleArgumentsFromWTable(BITS(op,0x0100), args, 'X', SD, ea) ;
-				sprintf(buffer, "move(p)   %s", args) ;
-				retSize = 1 ;
-				break ;
+				char fullAddy[128];		/* Convert Short Absolute Address to full 16-bit */
+				Rnum = decode_RR_table(BITS(op,0x00c0));
+				assemble_ea_from_m_table(BITS(op,0x0020), Rnum, ea);
+				assemble_address_from_IO_short_address(BITS(op,0x001f), fullAddy);
+				sprintf(SD, "X:%02x (%s)", BITS(op,0x001f), fullAddy);
+				assemble_arguments_from_W_table(BITS(op,0x0100), args, 'X', SD, ea);
+				sprintf(opcode_str, "move(p)");
+				sprintf(arg_str, "%s", args);
+				break;
 			}
 
-			// DO - 0000 1110 iiii iiii xxxx xxxx xxxx xxxx
+			/* DO - 0000 1110 iiii iiii xxxx xxxx xxxx xxxx */
 			case 0x6:
-				sprintf(buffer, "do        #%02x,%04x", BITS(op,0x00ff), oprom[2] | (oprom[3] << 8)) ;
-				retSize = 2 ;
-				break ;
+				sprintf(opcode_str, "do");
+				sprintf(arg_str, "#%02x,%04x", BITS(op,0x00ff), op2);
+				retSize = 2;
+				break;
 
-			// REP - 0000 1111 iiii iiii
+			/* REP - 0000 1111 iiii iiii */
 			case 0x7:
-				sprintf(buffer, "rep       #%02x", BITS(op,0x00ff)) ;
-				retSize = 1 ;
-				break ;
+				sprintf(opcode_str, "rep");
+				sprintf(arg_str, "%d (0x%02x)", BITS(op,0x00ff), BITS(op,0x00ff));
+				break;
 		}
 	}
 
-	return retSize ;
+	return retSize;
 }
 
 
-
-
-
-////////////////////////////////////////
-// PARALLEL MEMORY OPERATION DECODING //
-////////////////////////////////////////
-
-static void AppendXMDM(char *buffer, UINT16 op)
+/*******************************/
+/* Parallel data move decoding */
+/*******************************/
+static void decode_x_memory_data_move(const UINT16 op_byte, char* parallel_move_str)
 {
-	int Rnum ;
-	char SD[32] ;
-	char ea[32] ;
-	char args[32] ;
+	int Rnum;
+	char SD[32];
+	char ea[32];
+	char args[32];
 
-	// 1mRR HHHW ---- ----
-	Rnum = DecodeRRTable(BITS(op,0x3000)) ;
-	DecodeHHHTable(BITS(op,0x0e00), SD) ;
-	AssembleeaFrommTable(BITS(op,0x4000), Rnum, ea) ;
-	AssembleArgumentsFromWTable(BITS(op,0x0100), args, 'X', SD, ea) ;
+	/* Byte: 1mRR HHHW ---- ---- */
+	Rnum = decode_RR_table(BITS(op_byte,0x30));
+	decode_HHH_table(BITS(op_byte,0x0e), SD);
+	assemble_ea_from_m_table(BITS(op_byte,0x40), Rnum, ea);
+	assemble_arguments_from_W_table(BITS(op_byte,0x01), args, 'X', SD, ea);
 
-	strcat(buffer, "  ")  ;
-	strcat(buffer, args) ;
+	sprintf(parallel_move_str, "%s", args);
 }
 
-// !!! NOT FULLY IMPLEMENTED !!!
-static void AppendXMDMSpecial(char *buffer, UINT16 op, char *working)
+static void decode_dual_x_memory_data_read(const UINT16 op, char* parallel_move_str, char* parallel_move_str2)
 {
-	// This is actually a little tricky 'cuz X:(F1) comes from the 'Data ALU' operation...
-	// (page 326 of the family manual)
+	int Rnum;
+	char D1[32] = "";
+	char D2[32] = "";
+	char ea1[32] = "";
+	char ea2[32] = "";
 
-	// !! Also, p326 mentions 'F1' is the upper word of the accumulator which is not used by the parallel data ALU operation
-	//                        (in case of no Data ALU operation, A1 is chosen as F)
-	//    my question is : when is there .not. a Data ALU operation ??
+	/* 011m mKKK -rr- ---- */
+	Rnum = decode_rr_table(BITS(op,0x0060));
+	decode_KKK_table(BITS(op,0x0700), D1, D2);
+	assemble_eas_from_m_table(BITS(op,0x1800), Rnum, 3, ea1, ea2);
 
-	char SD[32] ;
-	char args[32] ;
-	char dest[32] ;
-
-	if (working[0] == 'B')
-		sprintf(dest, "(A1)") ;
-	else if (working[0] == 'A')
-		sprintf(dest, "(B1)") ;
-	else
-		sprintf(dest, "(wtf)") ;
-
-	DecodeHHHTable(BITS(op,0x0e00), SD) ;
-	AssembleArgumentsFromWTable(BITS(op,0x0100), args, 'X', SD, dest) ;
-
-	strcat(buffer, "  ") ;
-	strcat(buffer, args) ;
-}
-
-static void AppendARU(char *buffer, UINT16 op)
-{
-	char ea[32] ;
-	int rr = DecodeRRTable(BITS(op,0x0300)) ;
-
-	AssembleeaFromzTable(BITS(op,0x0400), rr, ea) ;
-
-	strcat(buffer, ea) ;
-}
-
-static void AppendRRDM(char *buffer, UINT16 op, char *working)
-{
-	char S[32], D[32] ;
-	char final[128] ;
-
-	DecodeIIIITable(BITS(op,0x0f00), S, D) ;
-
-	if (D[0] == '^')
+	if (Rnum == -1)
 	{
-		if (working[0] == 'B')
-			sprintf(D, "A") ;
-		else if (working[0] == 'A')
-			sprintf(D, "B") ;
-		else
-			sprintf(D, "(wtf)") ;
+		sprintf(ea1, "(!!)!");
 	}
 
-	if (S[0] == 'F')
-	{
-		sprintf(S, "%s", working) ;
-	}
-
-	sprintf(final, "%s,%s", S, D) ;
-
-	strcat(buffer, "  ") ;
-	strcat(buffer, final) ;
+	sprintf(parallel_move_str,  "X:%s,%s", ea1, D1);
+	sprintf(parallel_move_str2, "X:%s,%s", ea2, D2);
 }
 
-#ifdef UNUSED_FUNCTION
-static void AppendDXMDR(char *buffer, UINT16 op)
-{
-	char D1[32] ;
-	char D2[32] ;
-	char ea1[32] ;
-	char ea2[32] ;
-	int Rnum ;
 
-	char temp[128] ;
+/* MISSING MPY */
+/*
+        char S[32];
 
-	// 011m mKKK -rr- ----
-	Rnum = BITS(op,0x0060) ;
-	DecodeKKKTable(BITS(op,0x0700), D1, D2) ;
-	AssembleeaFrommmTable(BITS(op,0x1800), Rnum, 3, ea1, ea2) ;
+        // MPY - 0001 0110 RRDD FQQQ
+        decode_k_table(BITS(op,0x0100), Dnot);
+        Rnum = decode_RR_table(BITS(op,0x00c0));
+        decode_DD_table(BITS(op,0x0030), S);
+        decode_QQQF_table(BITS(op,0x0007), BITS(op,0x0008), S1, S2, D);
+        sprintf(buffer, "mpy       %s,%s,%s %s,(R%d)+N%d %s,%s", S1, S2, D, Dnot, Rnum, Rnum, S, Dnot);
+        // Strange, but not entirely out of the question - this 'k' parameter is hardcoded
+        // I cheat here and do the parallel memory data move above - this specific one is only used twice
+        retSize = 1;
+*/
 
-	sprintf(temp, "  X:%s,%s X:%s,%s", ea1, D1, ea2, D2) ;
-	strcat(buffer, temp) ;
-}
-#endif
+/* MISSING MAC */
+/*
+        char S[32];
+
+        // MAC - 0001 0111 RRDD FQQQ
+        decode_k_table(BITS(op,0x0100), Dnot);
+        Rnum = decode_RR_table(BITS(op,0x00c0));
+        decode_DD_table(BITS(op,0x0030), S);
+        decode_QQQF_table(BITS(op,0x0007), BITS(op,0x0008), S1, S2, D);
+        sprintf(buffer, "mac       %s,%s,%s %s,(R%d)+N%d %s,%s", S1, S2, D, Dnot, Rnum, Rnum, S, Dnot);
+        // Strange, but not entirely out of the question - this 'k' parameter is hardcoded
+        // I cheat here and do the parallel memory data move above - this specific one is only used twice
+        retSize = 1;
+*/
 
 
 
-/////////////////////////////
-// TABLE DECODER FUNCTIONS //
-/////////////////////////////
-
-static int DecodeBBBTable(UINT16 BBB)
+/******************/
+/* Table decoding */
+/******************/
+static int decode_BBB_table(UINT16 BBB)
 {
 	switch(BBB)
 	{
-		case 0x4: return BBB_UPPER  ; break ;
-		case 0x2: return BBB_MIDDLE ; break ;
-		case 0x1: return BBB_LOWER  ; break ;
+		case 0x4: return BBB_UPPER ; break;
+		case 0x2: return BBB_MIDDLE; break;
+		case 0x1: return BBB_LOWER ; break;
 	}
 
-	return BBB_LOWER ;                          // Not really safe...
+	return BBB_LOWER;                          /* Not really safe... */
 }
 
-static void DecodeccccTable(UINT16 cccc, char *mnemonic)
+static void decode_cccc_table(UINT16 cccc, char *mnemonic)
 {
 	switch (cccc)
 	{
-		case 0x0: sprintf(mnemonic, "cc(hs)") ; break ;
-		case 0x1: sprintf(mnemonic, "ge    ") ; break ;
-		case 0x2: sprintf(mnemonic, "ne    ") ; break ;
-		case 0x3: sprintf(mnemonic, "pl    ") ; break ;
-		case 0x4: sprintf(mnemonic, "nn    ") ; break ;
-		case 0x5: sprintf(mnemonic, "ec    ") ; break ;
-		case 0x6: sprintf(mnemonic, "lc    ") ; break ;
-		case 0x7: sprintf(mnemonic, "gt    ") ; break ;
-		case 0x8: sprintf(mnemonic, "cs(lo)") ; break ;
-		case 0x9: sprintf(mnemonic, "lt    ") ; break ;
-		case 0xa: sprintf(mnemonic, "eq    ") ; break ;
-		case 0xb: sprintf(mnemonic, "mi    ") ; break ;
-		case 0xc: sprintf(mnemonic, "nr    ") ; break ;
-		case 0xd: sprintf(mnemonic, "es    ") ; break ;
-		case 0xe: sprintf(mnemonic, "ls    ") ; break ;
-		case 0xf: sprintf(mnemonic, "le    ") ; break ;
+		case 0x0: sprintf(mnemonic, "cc(hs)"); break;
+		case 0x1: sprintf(mnemonic, "ge    "); break;
+		case 0x2: sprintf(mnemonic, "ne    "); break;
+		case 0x3: sprintf(mnemonic, "pl    "); break;
+		case 0x4: sprintf(mnemonic, "nn    "); break;
+		case 0x5: sprintf(mnemonic, "ec    "); break;
+		case 0x6: sprintf(mnemonic, "lc    "); break;
+		case 0x7: sprintf(mnemonic, "gt    "); break;
+		case 0x8: sprintf(mnemonic, "cs(lo)"); break;
+		case 0x9: sprintf(mnemonic, "lt    "); break;
+		case 0xa: sprintf(mnemonic, "eq    "); break;
+		case 0xb: sprintf(mnemonic, "mi    "); break;
+		case 0xc: sprintf(mnemonic, "nr    "); break;
+		case 0xd: sprintf(mnemonic, "es    "); break;
+		case 0xe: sprintf(mnemonic, "ls    "); break;
+		case 0xf: sprintf(mnemonic, "le    "); break;
 	}
 }
 
-static void DecodeDDDDDTable(UINT16 DDDDD, char *SD)
+static void decode_DDDDD_table(UINT16 DDDDD, char *SD)
 {
 	switch(DDDDD)
 	{
-		case 0x00: sprintf(SD, "X0") ;  break ;
-		case 0x01: sprintf(SD, "Y0") ;  break ;
-		case 0x02: sprintf(SD, "X1") ;  break ;
-		case 0x03: sprintf(SD, "Y1") ;  break ;
-		case 0x04: sprintf(SD, "A") ;   break ;
-		case 0x05: sprintf(SD, "B") ;   break ;
-		case 0x06: sprintf(SD, "A0") ;  break ;
-		case 0x07: sprintf(SD, "B0") ;  break ;
-		case 0x08: sprintf(SD, "LC") ;  break ;
-		case 0x09: sprintf(SD, "SR") ;  break ;
-		case 0x0a: sprintf(SD, "OMR") ; break ;
-		case 0x0b: sprintf(SD, "SP") ;  break ;
-		case 0x0c: sprintf(SD, "A1") ;  break ;
-		case 0x0d: sprintf(SD, "B1") ;  break ;
-		case 0x0e: sprintf(SD, "A2") ;  break ;
-		case 0x0f: sprintf(SD, "B2") ;  break ;
+		case 0x00: sprintf(SD, "X0");  break;
+		case 0x01: sprintf(SD, "Y0");  break;
+		case 0x02: sprintf(SD, "X1");  break;
+		case 0x03: sprintf(SD, "Y1");  break;
+		case 0x04: sprintf(SD, "A");   break;
+		case 0x05: sprintf(SD, "B");   break;
+		case 0x06: sprintf(SD, "A0");  break;
+		case 0x07: sprintf(SD, "B0");  break;
+		case 0x08: sprintf(SD, "LC");  break;
+		case 0x09: sprintf(SD, "SR");  break;
+		case 0x0a: sprintf(SD, "OMR"); break;
+		case 0x0b: sprintf(SD, "SP");  break;
+		case 0x0c: sprintf(SD, "A1");  break;
+		case 0x0d: sprintf(SD, "B1");  break;
+		case 0x0e: sprintf(SD, "A2");  break;
+		case 0x0f: sprintf(SD, "B2");  break;
 
-		case 0x10: sprintf(SD, "R0") ;  break ;
-		case 0x11: sprintf(SD, "R1") ;  break ;
-		case 0x12: sprintf(SD, "R2") ;  break ;
-		case 0x13: sprintf(SD, "R3") ;  break ;
-		case 0x14: sprintf(SD, "M0") ;  break ;
-		case 0x15: sprintf(SD, "M1") ;  break ;
-		case 0x16: sprintf(SD, "M2") ;  break ;
-		case 0x17: sprintf(SD, "M3") ;  break ;
-		case 0x18: sprintf(SD, "SSH") ; break ;
-		case 0x19: sprintf(SD, "SSL") ; break ;
-		case 0x1a: sprintf(SD, "LA") ;  break ;
-		//no 0x1b
-		case 0x1c: sprintf(SD, "N0") ;  break ;
-		case 0x1d: sprintf(SD, "N1") ;  break ;
-		case 0x1e: sprintf(SD, "N2") ;  break ;
-		case 0x1f: sprintf(SD, "N3") ;  break ;
+		case 0x10: sprintf(SD, "R0");  break;
+		case 0x11: sprintf(SD, "R1");  break;
+		case 0x12: sprintf(SD, "R2");  break;
+		case 0x13: sprintf(SD, "R3");  break;
+		case 0x14: sprintf(SD, "M0");  break;
+		case 0x15: sprintf(SD, "M1");  break;
+		case 0x16: sprintf(SD, "M2");  break;
+		case 0x17: sprintf(SD, "M3");  break;
+		case 0x18: sprintf(SD, "SSH"); break;
+		case 0x19: sprintf(SD, "SSL"); break;
+		case 0x1a: sprintf(SD, "LA");  break;
+		case 0x1b: sprintf(SD, "!!");  break; /* no 0x1b */
+		case 0x1c: sprintf(SD, "N0");  break;
+		case 0x1d: sprintf(SD, "N1");  break;
+		case 0x1e: sprintf(SD, "N2");  break;
+		case 0x1f: sprintf(SD, "N3");  break;
 	}
 }
 
-static void DecodeDDTable(UINT16 DD, char *SD)
+static void decode_DD_table(UINT16 DD, char *SD)
 {
 	switch (DD)
 	{
-		case 0x0: sprintf(SD, "X0") ; break ;
-		case 0x1: sprintf(SD, "Y0") ; break ;
-		case 0x2: sprintf(SD, "X1") ; break ;
-		case 0x3: sprintf(SD, "Y1") ; break ;
+		case 0x0: sprintf(SD, "X0"); break;
+		case 0x1: sprintf(SD, "Y0"); break;
+		case 0x2: sprintf(SD, "X1"); break;
+		case 0x3: sprintf(SD, "Y1"); break;
 	}
 }
 
-#ifdef UNUSED_FUNCTION
-static void DecodeDDFTable(UINT16 DD, UINT16 F, char *S, char *D)
+static void decode_DDF_table(UINT16 DD, UINT16 F, char *S, char *D)
 {
-	UINT16 switchVal = (DD << 1) | F ;
+	UINT16 switchVal = (DD << 1) | F;
 
 	switch (switchVal)
 	{
-		case 0x0: sprintf(S, "X0") ; sprintf(D, "A") ; break ;
-		case 0x1: sprintf(S, "X0") ; sprintf(D, "B") ; break ;
-		case 0x2: sprintf(S, "Y0") ; sprintf(D, "A") ; break ;
-		case 0x3: sprintf(S, "Y0") ; sprintf(D, "B") ; break ;
-		case 0x4: sprintf(S, "X1") ; sprintf(D, "A") ; break ;
-		case 0x5: sprintf(S, "X1") ; sprintf(D, "B") ; break ;
-		case 0x6: sprintf(S, "Y1") ; sprintf(D, "A") ; break ;
-		case 0x7: sprintf(S, "Y1") ; sprintf(D, "B") ; break ;
+		case 0x0: sprintf(S, "X0"); sprintf(D, "A"); break;
+		case 0x1: sprintf(S, "X0"); sprintf(D, "B"); break;
+		case 0x2: sprintf(S, "Y0"); sprintf(D, "A"); break;
+		case 0x3: sprintf(S, "Y0"); sprintf(D, "B"); break;
+		case 0x4: sprintf(S, "X1"); sprintf(D, "A"); break;
+		case 0x5: sprintf(S, "X1"); sprintf(D, "B"); break;
+		case 0x6: sprintf(S, "Y1"); sprintf(D, "A"); break;
+		case 0x7: sprintf(S, "Y1"); sprintf(D, "B"); break;
 	}
 }
-#endif
 
-static void DecodeEETable(UINT16 EE, char *D)
+static void decode_EE_table(UINT16 EE, char *D)
 {
 	switch(EE)
 	{
-		case 0x1: sprintf(D, "MR") ;  break ;
-		case 0x3: sprintf(D, "CCR") ; break ;
-		case 0x2: sprintf(D, "OMR") ; break ;
+		case 0x1: sprintf(D, "MR");  break;
+		case 0x3: sprintf(D, "CCR"); break;
+		case 0x2: sprintf(D, "OMR"); break;
 	}
 }
 
-static void DecodeFTable(UINT16 F, char *SD)
+static void decode_F_table(UINT16 F, char *SD)
 {
 	switch(F)
 	{
-		case 0x0: sprintf(SD, "A") ; break ;
-		case 0x1: sprintf(SD, "B") ; break ;
+		case 0x0: sprintf(SD, "A"); break;
+		case 0x1: sprintf(SD, "B"); break;
 	}
 }
 
-static void Decodeh0hFTable(UINT16 h0h, UINT16 F, char *S, char *D)
+static void decode_h0hF_table(UINT16 h0h, UINT16 F, char *S, char *D)
 {
-	UINT16 switchVal = (h0h << 1) | F ;
+	UINT16 switchVal = (h0h << 1) | F;
 
 	switch (switchVal)
 	{
-		case 0x8: sprintf(S, "X0") ; sprintf(D, "A") ; break ;
-		case 0x9: sprintf(S, "X0") ; sprintf(D, "B") ; break ;
-		case 0xa: sprintf(S, "Y0") ; sprintf(D, "A") ; break ;
-		case 0xb: sprintf(S, "Y0") ; sprintf(D, "B") ; break ;
-		case 0x2: sprintf(S, "A")  ; sprintf(D, "A") ; break ;
-		case 0x1: sprintf(S, "A")  ; sprintf(D, "B") ; break ;
-		case 0x0: sprintf(S, "B")  ; sprintf(D, "A") ; break ;
-		case 0x3: sprintf(S, "B")  ; sprintf(D, "B") ; break ;
+		case 0x8: sprintf(S, "X0"); sprintf(D, "A"); break;
+		case 0x9: sprintf(S, "X0"); sprintf(D, "B"); break;
+		case 0xa: sprintf(S, "Y0"); sprintf(D, "A"); break;
+		case 0xb: sprintf(S, "Y0"); sprintf(D, "B"); break;
+		case 0x2: sprintf(S, "A") ; sprintf(D, "A"); break;
+		case 0x1: sprintf(S, "A") ; sprintf(D, "B"); break;
+		case 0x0: sprintf(S, "B") ; sprintf(D, "A"); break;
+		case 0x3: sprintf(S, "B") ; sprintf(D, "B"); break;
 	}
 }
 
-static void DecodeHHTable(UINT16 HH, char *SD)
+static void decode_HH_table(UINT16 HH, char *SD)
 {
 	switch(HH)
 	{
-		case 0x0: sprintf(SD, "X0") ; break ;
-		case 0x1: sprintf(SD, "Y0") ; break ;
-		case 0x2: sprintf(SD, "A")  ; break ;
-		case 0x3: sprintf(SD, "B")  ; break ;
+		case 0x0: sprintf(SD, "X0"); break;
+		case 0x1: sprintf(SD, "Y0"); break;
+		case 0x2: sprintf(SD, "A") ; break;
+		case 0x3: sprintf(SD, "B") ; break;
 	}
 }
 
-static void DecodeHHHTable(UINT16 HHH, char *SD)
+static void decode_HHH_table(UINT16 HHH, char *SD)
 {
 	switch(HHH)
 	{
-		case 0x0: sprintf(SD, "X0") ; break ;
-		case 0x1: sprintf(SD, "Y0") ; break ;
-		case 0x2: sprintf(SD, "X1") ; break ;
-		case 0x3: sprintf(SD, "Y1") ; break ;
-		case 0x4: sprintf(SD, "A")  ; break ;
-		case 0x5: sprintf(SD, "B")  ; break ;
-		case 0x6: sprintf(SD, "A0") ; break ;
-		case 0x7: sprintf(SD, "B0") ; break ;
+		case 0x0: sprintf(SD, "X0"); break;
+		case 0x1: sprintf(SD, "Y0"); break;
+		case 0x2: sprintf(SD, "X1"); break;
+		case 0x3: sprintf(SD, "Y1"); break;
+		case 0x4: sprintf(SD, "A") ; break;
+		case 0x5: sprintf(SD, "B") ; break;
+		case 0x6: sprintf(SD, "A0"); break;
+		case 0x7: sprintf(SD, "B0"); break;
 	}
 }
 
-// I don't know if this is ever used?
-static void DecodeIIIITable(UINT16 IIII, char *S, char *D)
+#ifdef UNUSED_FUNCTION
+static void decode_IIII_table(UINT16 IIII, char *S, char *D)
 {
 	switch(IIII)
 	{
-		case 0x0: sprintf(S, "X0") ; sprintf(D, "^F^") ; break ;
-		case 0x1: sprintf(S, "Y0") ; sprintf(D, "^F^") ; break ;
-		case 0x2: sprintf(S, "X1") ; sprintf(D, "^F^") ; break ;
-		case 0x3: sprintf(S, "Y1") ; sprintf(D, "^F^") ; break ;
-		case 0x4: sprintf(S, "A") ;  sprintf(D, "X0")  ; break ;
-		case 0x5: sprintf(S, "B") ;  sprintf(D, "Y0")  ; break ;
-		case 0x6: sprintf(S, "A0") ; sprintf(D, "X0")  ; break ;
-		case 0x7: sprintf(S, "B0") ; sprintf(D, "Y0")  ; break ;
-		case 0x8: sprintf(S, "F") ;  sprintf(D, "^F^") ; break ;
-		case 0x9: sprintf(S, "F") ;  sprintf(D, "^F^") ; break ;
-		case 0xc: sprintf(S, "A") ;  sprintf(D, "X1")  ; break ;
-		case 0xd: sprintf(S, "B") ;  sprintf(D, "Y1")  ; break ;
-		case 0xe: sprintf(S, "A0") ; sprintf(D, "X1")  ; break ;
-		case 0xf: sprintf(S, "B0") ; sprintf(D, "Y1")  ; break ;
+		case 0x0: sprintf(S, "X0"); sprintf(D, "^F"); break;
+		case 0x1: sprintf(S, "Y0"); sprintf(D, "^F"); break;
+		case 0x2: sprintf(S, "X1"); sprintf(D, "^F"); break;
+		case 0x3: sprintf(S, "Y1"); sprintf(D, "^F"); break;
+		case 0x4: sprintf(S, "A");  sprintf(D, "X0"); break;
+		case 0x5: sprintf(S, "B");  sprintf(D, "Y0"); break;
+		case 0x6: sprintf(S, "A0"); sprintf(D, "X0"); break;
+		case 0x7: sprintf(S, "B0"); sprintf(D, "Y0"); break;
+		case 0x8: sprintf(S, "F");  sprintf(D, "^F"); break;
+		case 0x9: sprintf(S, "F");  sprintf(D, "^F"); break;
+		case 0xc: sprintf(S, "A");  sprintf(D, "X1"); break;
+		case 0xd: sprintf(S, "B");  sprintf(D, "Y1"); break;
+		case 0xe: sprintf(S, "A0"); sprintf(D, "X1"); break;
+		case 0xf: sprintf(S, "B0"); sprintf(D, "Y1"); break;
 	}
 }
+#endif
 
-static void DecodeJJJFTable(UINT16 JJJ, UINT16 F, char *S, char *D)
+static void decode_JJJF_table(UINT16 JJJ, UINT16 F, char *S, char *D)
 {
-	UINT16 switchVal = (JJJ << 1) | F ;
+	UINT16 switchVal = (JJJ << 1) | F;
 
 	switch(switchVal)
 	{
-		case 0x0: sprintf(S, "B")  ; sprintf(D, "A") ; break ;
-		case 0x1: sprintf(S, "A")  ; sprintf(D, "B") ; break ;
-		case 0x4: sprintf(S, "X")  ; sprintf(D, "A") ; break ;
-		case 0x5: sprintf(S, "X")  ; sprintf(D, "B") ; break ;
-		case 0x6: sprintf(S, "Y")  ; sprintf(D, "A") ; break ;
-		case 0x7: sprintf(S, "Y")  ; sprintf(D, "B") ; break ;
-		case 0x8: sprintf(S, "X0") ; sprintf(D, "A") ; break ;
-		case 0x9: sprintf(S, "X0") ; sprintf(D, "B") ; break ;
-		case 0xa: sprintf(S, "Y0") ; sprintf(D, "A") ; break ;
-		case 0xb: sprintf(S, "Y0") ; sprintf(D, "B") ; break ;
-		case 0xc: sprintf(S, "X1") ; sprintf(D, "A") ; break ;
-		case 0xd: sprintf(S, "X1") ; sprintf(D, "B") ; break ;
-		case 0xe: sprintf(S, "Y1") ; sprintf(D, "A") ; break ;
-		case 0xf: sprintf(S, "Y1") ; sprintf(D, "B") ; break ;
+		case 0x0: sprintf(S, "B") ; sprintf(D, "A"); break;
+		case 0x1: sprintf(S, "A") ; sprintf(D, "B"); break;
+		case 0x2: sprintf(S, "!") ; sprintf(D, "!"); break;
+		case 0x3: sprintf(S, "!") ; sprintf(D, "!"); break;
+		case 0x4: sprintf(S, "X") ; sprintf(D, "A"); break;
+		case 0x5: sprintf(S, "X") ; sprintf(D, "B"); break;
+		case 0x6: sprintf(S, "Y") ; sprintf(D, "A"); break;
+		case 0x7: sprintf(S, "Y") ; sprintf(D, "B"); break;
+		case 0x8: sprintf(S, "X0"); sprintf(D, "A"); break;
+		case 0x9: sprintf(S, "X0"); sprintf(D, "B"); break;
+		case 0xa: sprintf(S, "Y0"); sprintf(D, "A"); break;
+		case 0xb: sprintf(S, "Y0"); sprintf(D, "B"); break;
+		case 0xc: sprintf(S, "X1"); sprintf(D, "A"); break;
+		case 0xd: sprintf(S, "X1"); sprintf(D, "B"); break;
+		case 0xe: sprintf(S, "Y1"); sprintf(D, "A"); break;
+		case 0xf: sprintf(S, "Y1"); sprintf(D, "B"); break;
 	}
 }
 
-static void DecodeJJFTable(UINT16 JJ, UINT16 F, char *S, char *D)
+static void decode_JJF_table(UINT16 JJ, UINT16 F, char *S, char *D)
 {
-	UINT16 switchVal = (JJ << 1) | F ;
+	UINT16 switchVal = (JJ << 1) | F;
 
 	switch (switchVal)
 	{
-		case 0x0: sprintf(S, "X0") ; sprintf(D, "A") ; break ;
-		case 0x1: sprintf(S, "X0") ; sprintf(D, "B") ; break ;
-		case 0x2: sprintf(S, "Y0") ; sprintf(D, "A") ; break ;
-		case 0x3: sprintf(S, "Y0") ; sprintf(D, "B") ; break ;
-		case 0x4: sprintf(S, "X1") ; sprintf(D, "A") ; break ;
-		case 0x5: sprintf(S, "X1") ; sprintf(D, "B") ; break ;
-		case 0x6: sprintf(S, "Y1") ; sprintf(D, "A") ; break ;
-		case 0x7: sprintf(S, "Y1") ; sprintf(D, "B") ; break ;
+		case 0x0: sprintf(S, "X0"); sprintf(D, "A"); break;
+		case 0x1: sprintf(S, "X0"); sprintf(D, "B"); break;
+		case 0x2: sprintf(S, "Y0"); sprintf(D, "A"); break;
+		case 0x3: sprintf(S, "Y0"); sprintf(D, "B"); break;
+		case 0x4: sprintf(S, "X1"); sprintf(D, "A"); break;
+		case 0x5: sprintf(S, "X1"); sprintf(D, "B"); break;
+		case 0x6: sprintf(S, "Y1"); sprintf(D, "A"); break;
+		case 0x7: sprintf(S, "Y1"); sprintf(D, "B"); break;
+	}
+}
+
+static void decode_JF_table(UINT16 J, UINT16 F, char *S, char *D)
+{
+	UINT16 switchVal = (J << 1) | F;
+
+	switch(switchVal)
+	{
+		case 0x0: sprintf(S, "X"); sprintf(D, "A"); break;
+		case 0x1: sprintf(S, "X"); sprintf(D, "B"); break;
+		case 0x2: sprintf(S, "Y"); sprintf(D, "A"); break;
+		case 0x3: sprintf(S, "Y"); sprintf(D, "B"); break;
 	}
 }
 
 #ifdef UNUSED_FUNCTION
-static void DecodeJFTable(UINT16 J, UINT16 F, char *S, char *D)
-{
-	UINT16 switchVal = (J << 1) | F ;
-
-	switch(switchVal)
-	{
-		case 0x0: sprintf(S, "X") ; sprintf(D, "A") ; break ;
-		case 0x1: sprintf(S, "X") ; sprintf(D, "B") ; break ;
-		case 0x2: sprintf(S, "Y") ; sprintf(D, "A") ; break ;
-		case 0x3: sprintf(S, "Y") ; sprintf(D, "B") ; break ;
-	}
-}
-
-static void DecodekTable(UINT16 k, char *Dnot)
+static void decode_k_table(UINT16 k, char *Dnot)
 {
 	switch(k)
 	{
-		case 0x0: sprintf(Dnot, "B") ; break ;
-		case 0x1: sprintf(Dnot, "A") ; break ;
+		case 0x0: sprintf(Dnot, "B"); break;
+		case 0x1: sprintf(Dnot, "A"); break;
 	}
 }
+#endif
 
-static void DecodekSignTable(UINT16 k, char *plusMinus)
+static void decode_kSign_table(UINT16 k, char *plusMinus)
 {
 	switch(k)
 	{
-		case 0x0: sprintf(plusMinus, "+") ; break ;
-		case 0x1: sprintf(plusMinus, "-") ; break ;
+		case 0x0: sprintf(plusMinus, "+"); break;
+		case 0x1: sprintf(plusMinus, "-"); break;
 	}
 }
 
-static void DecodeKKKTable  (UINT16 KKK, char *D1, char *D2)
+static void decode_KKK_table(UINT16 KKK, char *D1, char *D2)
 {
 	switch(KKK)
 	{
-		case 0x0: sprintf(D1, "^F^") ; sprintf(D2, "X0") ; break ;
-		case 0x1: sprintf(D1, "Y0")  ; sprintf(D2, "X0") ; break ;
-		case 0x2: sprintf(D1, "X1")  ; sprintf(D2, "X0") ; break ;
-		case 0x3: sprintf(D1, "Y1")  ; sprintf(D2, "X0") ; break ;
-		case 0x4: sprintf(D1, "X0")  ; sprintf(D2, "X1") ; break ;
-		case 0x5: sprintf(D1, "Y0")  ; sprintf(D2, "X1") ; break ;
-		case 0x6: sprintf(D1, "^F^") ; sprintf(D2, "Y0") ; break ;
-		case 0x7: sprintf(D1, "Y1")  ; sprintf(D2, "X1") ; break ;
-	}
-}
-
-static int DecodeNNTable(UINT16 NN)
-{
-	return NN ;
-}
-
-static void DecodeQQFTable(UINT16 QQ, UINT16 F, char *S1, char *S2, char *D)
-{
-	UINT16 switchVal = (QQ << 1) | F ;
-
-	switch(switchVal)
-	{
-		case 0x0: sprintf(S1, "X0") ; sprintf(S2, "Y0") ; sprintf(D, "A") ; break ;
-		case 0x1: sprintf(S1, "X0") ; sprintf(S2, "Y0") ; sprintf(D, "B") ; break ;
-		case 0x2: sprintf(S1, "X0") ; sprintf(S2, "Y1") ; sprintf(D, "A") ; break ;
-		case 0x3: sprintf(S1, "X0") ; sprintf(S2, "Y1") ; sprintf(D, "B") ; break ;
-		case 0x4: sprintf(S1, "X1") ; sprintf(S2, "Y0") ; sprintf(D, "A") ; break ;
-		case 0x5: sprintf(S1, "X1") ; sprintf(S2, "Y0") ; sprintf(D, "B") ; break ;
-		case 0x6: sprintf(S1, "X1") ; sprintf(S2, "Y1") ; sprintf(D, "A") ; break ;
-		case 0x7: sprintf(S1, "X1") ; sprintf(S2, "Y1") ; sprintf(D, "B") ; break ;
-	}
-}
-#endif
-
-static void DecodeQQFTableSp(UINT16 QQ, UINT16 F, char *S1, char *S2, char *D)
-{
-	UINT16 switchVal = (QQ << 1) | F ;
-
-	switch(switchVal)
-	{
-		case 0x0: sprintf(S1, "Y0") ; sprintf(S2, "X0") ; sprintf(D, "A") ; break ;
-		case 0x1: sprintf(S1, "Y0") ; sprintf(S2, "X0") ; sprintf(D, "B") ; break ;
-		case 0x2: sprintf(S1, "Y1") ; sprintf(S2, "X0") ; sprintf(D, "A") ; break ;
-		case 0x3: sprintf(S1, "Y1") ; sprintf(S2, "X0") ; sprintf(D, "B") ; break ;
-		case 0x4: sprintf(S1, "X1") ; sprintf(S2, "Y0") ; sprintf(D, "A") ; break ;
-		case 0x5: sprintf(S1, "X1") ; sprintf(S2, "Y0") ; sprintf(D, "B") ; break ;
-		case 0x6: sprintf(S1, "X1") ; sprintf(S2, "Y1") ; sprintf(D, "A") ; break ;
-		case 0x7: sprintf(S1, "X1") ; sprintf(S2, "Y1") ; sprintf(D, "B") ; break ;
+		case 0x0: sprintf(D1, "^F"); sprintf(D2, "X0"); break;
+		case 0x1: sprintf(D1, "Y0"); sprintf(D2, "X0"); break;
+		case 0x2: sprintf(D1, "X1"); sprintf(D2, "X0"); break;
+		case 0x3: sprintf(D1, "Y1"); sprintf(D2, "X0"); break;
+		case 0x4: sprintf(D1, "X0"); sprintf(D2, "X1"); break;
+		case 0x5: sprintf(D1, "Y0"); sprintf(D2, "X1"); break;
+		case 0x6: sprintf(D1, "^F"); sprintf(D2, "Y0"); break;
+		case 0x7: sprintf(D1, "Y1"); sprintf(D2, "X1"); break;
 	}
 }
 
 #ifdef UNUSED_FUNCTION
-static void DecodeQQQFTable(UINT16 QQQ, UINT16 F, char *S1, char *S2, char *D)
+static int decode_NN_table(UINT16 NN)
 {
-	UINT16 switchVal = (QQQ << 1) | F ;
-
-	switch(switchVal)
-	{
-		case 0x0: sprintf(S1, "X0") ; sprintf(S2, "X0") ; sprintf(D, "A") ; break ;
-		case 0x1: sprintf(S1, "X0") ; sprintf(S2, "X0") ; sprintf(D, "B") ; break ;
-		case 0x2: sprintf(S1, "X1") ; sprintf(S2, "X0") ; sprintf(D, "A") ; break ;
-		case 0x3: sprintf(S1, "X1") ; sprintf(S2, "X0") ; sprintf(D, "B") ; break ;
-		case 0x4: sprintf(S1, "A1") ; sprintf(S2, "Y0") ; sprintf(D, "A") ; break ;
-		case 0x5: sprintf(S1, "A1") ; sprintf(S2, "Y0") ; sprintf(D, "B") ; break ;
-		case 0x6: sprintf(S1, "B1") ; sprintf(S2, "X0") ; sprintf(D, "A") ; break ;
-		case 0x7: sprintf(S1, "B1") ; sprintf(S2, "X0") ; sprintf(D, "B") ; break ;
-		case 0x8: sprintf(S1, "Y0") ; sprintf(S2, "X0") ; sprintf(D, "A") ; break ;
-		case 0x9: sprintf(S1, "Y0") ; sprintf(S2, "X0") ; sprintf(D, "B") ; break ;
-		case 0xa: sprintf(S1, "Y1") ; sprintf(S2, "X0") ; sprintf(D, "A") ; break ;
-		case 0xb: sprintf(S1, "Y1") ; sprintf(S2, "X0") ; sprintf(D, "B") ; break ;
-		case 0xc: sprintf(S1, "Y0") ; sprintf(S2, "X1") ; sprintf(D, "A") ; break ;
-		case 0xd: sprintf(S1, "Y0") ; sprintf(S2, "X1") ; sprintf(D, "B") ; break ;
-		case 0xe: sprintf(S1, "Y1") ; sprintf(S2, "X1") ; sprintf(D, "A") ; break ;
-		case 0xf: sprintf(S1, "Y1") ; sprintf(S2, "X1") ; sprintf(D, "B") ; break ;
-	}
+	return NN;
 }
 #endif
 
-static int DecodeRRTable(UINT16 RR)
+static void decode_QQF_table(UINT16 QQ, UINT16 F, char *S1, char *S2, char *D)
 {
-	return RR ;
+	UINT16 switchVal = (QQ << 1) | F;
+
+	switch(switchVal)
+	{
+		case 0x0: sprintf(S1, "X0"); sprintf(S2, "Y0"); sprintf(D, "A"); break;
+		case 0x1: sprintf(S1, "X0"); sprintf(S2, "Y0"); sprintf(D, "B"); break;
+		case 0x2: sprintf(S1, "X0"); sprintf(S2, "Y1"); sprintf(D, "A"); break;
+		case 0x3: sprintf(S1, "X0"); sprintf(S2, "Y1"); sprintf(D, "B"); break;
+		case 0x4: sprintf(S1, "X1"); sprintf(S2, "Y0"); sprintf(D, "A"); break;
+		case 0x5: sprintf(S1, "X1"); sprintf(S2, "Y0"); sprintf(D, "B"); break;
+		case 0x6: sprintf(S1, "X1"); sprintf(S2, "Y1"); sprintf(D, "A"); break;
+		case 0x7: sprintf(S1, "X1"); sprintf(S2, "Y1"); sprintf(D, "B"); break;
+	}
 }
 
-static void DecodesTable(UINT16 s, char *arithmetic)
+static void decode_QQF_special_table(UINT16 QQ, UINT16 F, char *S1, char *S2, char *D)
+{
+	UINT16 switchVal = (QQ << 1) | F;
+
+	switch(switchVal)
+	{
+		case 0x0: sprintf(S1, "Y0"); sprintf(S2, "X0"); sprintf(D, "A"); break;
+		case 0x1: sprintf(S1, "Y0"); sprintf(S2, "X0"); sprintf(D, "B"); break;
+		case 0x2: sprintf(S1, "Y1"); sprintf(S2, "X0"); sprintf(D, "A"); break;
+		case 0x3: sprintf(S1, "Y1"); sprintf(S2, "X0"); sprintf(D, "B"); break;
+		case 0x4: sprintf(S1, "X1"); sprintf(S2, "Y0"); sprintf(D, "A"); break;
+		case 0x5: sprintf(S1, "X1"); sprintf(S2, "Y0"); sprintf(D, "B"); break;
+		case 0x6: sprintf(S1, "X1"); sprintf(S2, "Y1"); sprintf(D, "A"); break;
+		case 0x7: sprintf(S1, "X1"); sprintf(S2, "Y1"); sprintf(D, "B"); break;
+	}
+}
+
+static void decode_QQQF_table(UINT16 QQQ, UINT16 F, char *S1, char *S2, char *D)
+{
+	UINT16 switchVal = (QQQ << 1) | F;
+
+	switch(switchVal)
+	{
+		case 0x0: sprintf(S1, "X0"); sprintf(S2, "X0"); sprintf(D, "A"); break;
+		case 0x1: sprintf(S1, "X0"); sprintf(S2, "X0"); sprintf(D, "B"); break;
+		case 0x2: sprintf(S1, "X1"); sprintf(S2, "X0"); sprintf(D, "A"); break;
+		case 0x3: sprintf(S1, "X1"); sprintf(S2, "X0"); sprintf(D, "B"); break;
+		case 0x4: sprintf(S1, "A1"); sprintf(S2, "Y0"); sprintf(D, "A"); break;
+		case 0x5: sprintf(S1, "A1"); sprintf(S2, "Y0"); sprintf(D, "B"); break;
+		case 0x6: sprintf(S1, "B1"); sprintf(S2, "X0"); sprintf(D, "A"); break;
+		case 0x7: sprintf(S1, "B1"); sprintf(S2, "X0"); sprintf(D, "B"); break;
+		case 0x8: sprintf(S1, "Y0"); sprintf(S2, "X0"); sprintf(D, "A"); break;
+		case 0x9: sprintf(S1, "Y0"); sprintf(S2, "X0"); sprintf(D, "B"); break;
+		case 0xa: sprintf(S1, "Y1"); sprintf(S2, "X0"); sprintf(D, "A"); break;
+		case 0xb: sprintf(S1, "Y1"); sprintf(S2, "X0"); sprintf(D, "B"); break;
+		case 0xc: sprintf(S1, "Y0"); sprintf(S2, "X1"); sprintf(D, "A"); break;
+		case 0xd: sprintf(S1, "Y0"); sprintf(S2, "X1"); sprintf(D, "B"); break;
+		case 0xe: sprintf(S1, "Y1"); sprintf(S2, "X1"); sprintf(D, "A"); break;
+		case 0xf: sprintf(S1, "Y1"); sprintf(S2, "X1"); sprintf(D, "B"); break;
+	}
+}
+
+static int decode_RR_table(UINT16 RR)
+{
+	return RR;
+}
+
+static int decode_rr_table(UINT16 rr)
+{
+	if (rr != 0x3)
+		return rr;
+	else
+		return -1;
+}
+
+static void decode_s_table(UINT16 s, char *arithmetic)
 {
 	switch(s)
 	{
-		case 0x0: sprintf(arithmetic, "su") ; break ;
-		case 0x1: sprintf(arithmetic, "uu") ; break ;
+		case 0x0: sprintf(arithmetic, "su"); break;
+		case 0x1: sprintf(arithmetic, "uu"); break;
 	}
 }
 
-#ifdef UNUSED_FUNCTION
-static void DecodessTable(UINT16 ss, char *arithmetic)
+static void decode_ss_table(UINT16 ss, char *arithmetic)
 {
 	switch(ss)
 	{
-		case 0x0: sprintf(arithmetic, "ss") ; break ;
-		case 0x1: sprintf(arithmetic, "ss") ; break ;
-		case 0x2: sprintf(arithmetic, "su") ; break ;
-		case 0x3: sprintf(arithmetic, "uu") ; break ;
+		case 0x0: sprintf(arithmetic, "ss"); break;
+		case 0x1: sprintf(arithmetic, "ss"); break;
+		case 0x2: sprintf(arithmetic, "su"); break;
+		case 0x3: sprintf(arithmetic, "uu"); break;
 	}
 }
 
-static void DecodeuuuuFTable(UINT16 uuuu, UINT16 F, char *arg, char *S, char *D)
+static void decode_uuuuF_table(UINT16 uuuu, UINT16 F, char *arg, char *S, char *D)
 {
-	UINT16 switchVal = (uuuu << 1) | F ;
+	UINT16 switchVal = (uuuu << 1) | F;
 
 	switch(switchVal)
 	{
-		// The add and sub cases are piled on top of one another
-		case 0x00: sprintf(arg, "add") ; case 0x08: sprintf(arg, "sub") ; sprintf(S, "X0") ; sprintf(D, "A") ; break ;
-		case 0x01: sprintf(arg, "add") ; case 0x09: sprintf(arg, "sub") ; sprintf(S, "X0") ; sprintf(D, "B") ; break ;
-		case 0x02: sprintf(arg, "add") ; case 0x0a: sprintf(arg, "sub") ; sprintf(S, "Y0") ; sprintf(D, "A") ; break ;
-		case 0x03: sprintf(arg, "add") ; case 0x0b: sprintf(arg, "sub") ; sprintf(S, "Y0") ; sprintf(D, "B") ; break ;
-		case 0x04: sprintf(arg, "add") ; case 0x0c: sprintf(arg, "sub") ; sprintf(S, "X1") ; sprintf(D, "A") ; break ;
-		case 0x05: sprintf(arg, "add") ; case 0x0d: sprintf(arg, "sub") ; sprintf(S, "X1") ; sprintf(D, "B") ; break ;
-		case 0x06: sprintf(arg, "add") ; case 0x0e: sprintf(arg, "sub") ; sprintf(S, "Y1") ; sprintf(D, "A") ; break ;
-		case 0x07: sprintf(arg, "add") ; case 0x0f: sprintf(arg, "sub") ; sprintf(S, "Y1") ; sprintf(D, "B") ; break ;
-		case 0x18: sprintf(arg, "add") ; case 0x1a: sprintf(arg, "sub") ; sprintf(S, "B")  ; sprintf(D, "A") ; break ;
-		case 0x19: sprintf(arg, "add") ; case 0x1b: sprintf(arg, "sub") ; sprintf(S, "A")  ; sprintf(D, "B") ; break ;
+		case 0x00: sprintf(arg, "add"); sprintf(S, "X0"); sprintf(D, "A"); break;
+		case 0x08: sprintf(arg, "sub"); sprintf(S, "X0"); sprintf(D, "A"); break;
+		case 0x01: sprintf(arg, "add"); sprintf(S, "X0"); sprintf(D, "B"); break;
+		case 0x09: sprintf(arg, "sub"); sprintf(S, "X0"); sprintf(D, "B"); break;
+		case 0x02: sprintf(arg, "add"); sprintf(S, "Y0"); sprintf(D, "A"); break;
+		case 0x0a: sprintf(arg, "sub"); sprintf(S, "Y0"); sprintf(D, "A"); break;
+		case 0x03: sprintf(arg, "add"); sprintf(S, "Y0"); sprintf(D, "B"); break;
+		case 0x0b: sprintf(arg, "sub"); sprintf(S, "Y0"); sprintf(D, "B"); break;
+		case 0x04: sprintf(arg, "add"); sprintf(S, "X1"); sprintf(D, "A"); break;
+		case 0x0c: sprintf(arg, "sub"); sprintf(S, "X1"); sprintf(D, "A"); break;
+		case 0x05: sprintf(arg, "add"); sprintf(S, "X1"); sprintf(D, "B"); break;
+		case 0x0d: sprintf(arg, "sub"); sprintf(S, "X1"); sprintf(D, "B"); break;
+		case 0x06: sprintf(arg, "add"); sprintf(S, "Y1"); sprintf(D, "A"); break;
+		case 0x0e: sprintf(arg, "sub"); sprintf(S, "Y1"); sprintf(D, "A"); break;
+		case 0x07: sprintf(arg, "add"); sprintf(S, "Y1"); sprintf(D, "B"); break;
+		case 0x0f: sprintf(arg, "sub"); sprintf(S, "Y1"); sprintf(D, "B"); break;
+		case 0x18: sprintf(arg, "add"); sprintf(S, "B") ; sprintf(D, "A"); break;
+		case 0x1a: sprintf(arg, "sub"); sprintf(S, "B") ; sprintf(D, "A"); break;
+		case 0x19: sprintf(arg, "add"); sprintf(S, "A") ; sprintf(D, "B"); break;
+		case 0x1b: sprintf(arg, "sub"); sprintf(S, "A") ; sprintf(D, "B"); break;
 	}
 }
-#endif
 
-static void DecodeZTable(UINT16 Z, char *ea)
+static void decode_Z_table(UINT16 Z, char *ea)
 {
-	// This is fixed as per the Family Manual addendum
+	/* This is fixed as per the Family Manual errata addendum */
 	switch(Z)
 	{
-		case 0x1: sprintf(ea, "(A1)") ; break ;
-		case 0x0: sprintf(ea, "(B1)") ; break ;
+		case 0x1: sprintf(ea, "(A1)"); break;
+		case 0x0: sprintf(ea, "(B1)"); break;
 	}
 }
 
-
-static void AssembleeaFrommTable(UINT16 m, int n, char *ea)
+static void assemble_ea_from_m_table(UINT16 m, int n, char *ea)
 {
 	switch(m)
 	{
-		case 0x0: sprintf(ea, "(R%d)+",n)        ; break ;
-		case 0x1: sprintf(ea, "(R%d)+N%d", n, n) ; break ;
+		case 0x0: sprintf(ea, "(R%d)+",n)       ; break;
+		case 0x1: sprintf(ea, "(R%d)+N%d", n, n); break;
 	}
 }
 
-#ifdef UNUSED_FUNCTION
-static void AssembleeaFrommmTable(UINT16 mm, int n1, int n2, char *ea1, char *ea2)
+static void assemble_eas_from_m_table(UINT16 mm, int n1, int n2, char *ea1, char *ea2)
 {
 	switch(mm)
 	{
-		case 0x0: sprintf(ea1, "(R%d)+",    n1)     ;
-			      sprintf(ea2, "(R%d)+",    n2)     ; break ;
-		case 0x1: sprintf(ea1, "(R%d)+",    n1)     ;
-			      sprintf(ea2, "(R%d)+N%d", n2, n2) ; break ;
-		case 0x2: sprintf(ea1, "(R%d)+N%d", n1, n1) ;
-			      sprintf(ea2, "(R%d)+",    n2)     ; break ;
-		case 0x3: sprintf(ea1, "(R%d)+N%d", n1, n1) ;
-			      sprintf(ea2, "(R%d)+N%d", n2, n2) ; break ;
+		case 0x0: sprintf(ea1, "(R%d)+",    n1)    ;
+			      sprintf(ea2, "(R%d)+",    n2)    ; break;
+		case 0x1: sprintf(ea1, "(R%d)+",    n1)    ;
+			      sprintf(ea2, "(R%d)+N%d", n2, n2); break;
+		case 0x2: sprintf(ea1, "(R%d)+N%d", n1, n1);
+			      sprintf(ea2, "(R%d)+",    n2)    ; break;
+		case 0x3: sprintf(ea1, "(R%d)+N%d", n1, n1);
+			      sprintf(ea2, "(R%d)+N%d", n2, n2); break;
+	}
+}
+
+static void assemble_ea_from_MM_table(UINT16 MM, int n, char *ea)
+{
+	switch(MM)
+	{
+		case 0x0: sprintf(ea, "(R%d)",     n)   ; break;
+		case 0x1: sprintf(ea, "(R%d)+",    n)   ; break;
+		case 0x2: sprintf(ea, "(R%d)-",    n)   ; break;
+		case 0x3: sprintf(ea, "(R%d)+N%d", n, n); break;
+	}
+}
+
+static void assemble_ea_from_q_table(UINT16 q, int n, char *ea)
+{
+	switch(q)
+	{
+		case 0x0: sprintf(ea, "(R%d+N%d)", n, n); break;
+		case 0x1: sprintf(ea, "-(R%d)",    n)   ; break;
+	}
+}
+
+static void assemble_ea_from_t_table(UINT16 t,  UINT16 val, char *ea)
+{
+	switch(t)
+	{
+		/* !!! Looking at page 336 of UM, I'm not sure if 0 is X: or if 0 is just # !!! */
+		case 0x0: sprintf(ea, "X:%04x", val); break;
+		case 0x1: sprintf(ea, "#%04x", val);  break;
+	}
+}
+
+
+#ifdef UNUSED_FUNCTION
+static void assemble_ea_from_z_table(UINT16 z, int n, char *ea)
+{
+	switch(z)
+	{
+		case 0x0: sprintf(ea, "(R%d)-",    n)   ; break;
+		case 0x1: sprintf(ea, "(R%d)+N%d", n, n); break;
 	}
 }
 #endif
 
-static void AssembleeaFromMMTable(UINT16 MM, int n, char *ea)
+static void assemble_D_from_P_table(UINT16 P, UINT16 ppppp, char *D)
 {
-	switch(MM)
-	{
-		case 0x0: sprintf(ea, "(R%d)",     n)    ; break ;
-		case 0x1: sprintf(ea, "(R%d)+",    n)    ; break ;
-		case 0x2: sprintf(ea, "(R%d)-",    n)    ; break ;
-		case 0x3: sprintf(ea, "(R%d)+N%d", n, n) ; break ;
-	}
-}
-
-static void AssembleeaFromqTable(UINT16 q, int n, char *ea)
-{
-	switch(q)
-	{
-		case 0x0: sprintf(ea, "(R%d+N%d)", n, n) ; break ;
-		case 0x1: sprintf(ea, "-(R%d)",    n)    ; break ;
-	}
-}
-
-static void AssembleeaFromtTable(UINT16 t,  UINT16 val, char *ea)
-{
-	switch(t)
-	{
-		// !!! Looking at page 336 of UM, I'm not sure if 0 is X: or if 0 is just # !!!
-		case 0x0: sprintf(ea, "X:%04x", val) ; break ;
-		case 0x1: sprintf(ea, "#%04x", val) ;  break ;
-	}
-}
-
-// Not sure if this one is even used?
-static void AssembleeaFromzTable(UINT16 z, int n, char *ea)
-{
-	switch(z)
-	{
-		case 0x0: sprintf(ea, "(R%d)-",    n)    ; break ;
-		case 0x1: sprintf(ea, "(R%d)+N%d", n, n) ; break ;
-	}
-}
-
-static void AssembleDFromPTable(UINT16 P, UINT16 ppppp, char *D)
-{
-	char fullAddy[128] ;		// Convert Short Absolute Address to full 16-bit
+	char fullAddy[128];		/* Convert Short Absolute Address to full 16-bit */
 
 	switch(P)
 	{
-		case 0x0: sprintf(D, "X:%02x", ppppp) ; break ;
+		case 0x0: sprintf(D, "X:%02x", ppppp); break;
 		case 0x1:
-			AssembleAddressFromIOShortAddress(ppppp, fullAddy) ;
-			sprintf(D, "X:%02x (%s)", ppppp, fullAddy) ;
-			break ;
+			assemble_address_from_IO_short_address(ppppp, fullAddy);
+			sprintf(D, "X:%02x (%s)", ppppp, fullAddy);
+			break;
 	}
 }
 
-static void AssembleArgumentsFromWTable(UINT16 W, char *args, char ma, char *SD, char *ea)
+static void assemble_arguments_from_W_table(UINT16 W, char *args, char ma, char *SD, char *ea)
 {
 	switch(W)
 	{
-		case 0x0: sprintf(args, "%s,%c:%s", SD, ma, ea) ; break ;
-		case 0x1: sprintf(args, "%c:%s,%s", ma, ea, SD) ; break ;
+		case 0x0: sprintf(args, "%s,%c:%s", SD, ma, ea); break;
+		case 0x1: sprintf(args, "%c:%s,%s", ma, ea, SD); break;
 	}
 }
 
-static void AssembleRegFromWTable(UINT16 W, char *args, char ma, char *SD, UINT8 xx)
+static void assemble_reg_from_W_table(UINT16 W, char *args, char ma, char *SD, UINT8 xx)
 {
 	switch(W)
 	{
-		case 0x0: sprintf(args, "%s,%c:(R2+%02x)", SD, ma, xx) ; break ;
-		case 0x1: sprintf(args, "%c:(R2+%02x),%s", ma, xx, SD) ; break ;
+		case 0x0: sprintf(args, "%s,%c:(R2+%02x)", SD, ma, xx); break;
+		case 0x1: sprintf(args, "%c:(R2+%02x),%s", ma, xx, SD); break;
 	}
 }
 
-static void AssembleAddressFromIOShortAddress(UINT16 pp, char *ea)
+static void assemble_address_from_IO_short_address(UINT16 pp, char *ea)
 {
-	UINT16 fullAddy = 0xffe0 ;
-	fullAddy |= pp ;
+	UINT16 fullAddy = 0xffe0;
+	fullAddy |= pp;
 
-	sprintf(ea, "%.04x", fullAddy) ;
+	sprintf(ea, "%.04x", fullAddy);
 }
 
-static void AssembleAddressFrom6BitSignedRelativeShortAddress(UINT16 srs, char *ea)
+static INT8 get_6_bit_relative_value(UINT16 bits)
 {
-	UINT16 fullAddy = srs ;
-	if (fullAddy & 0x0020) fullAddy |= 0xffc0 ;
-
-	sprintf(ea, "%d", (INT16)fullAddy) ;
+	UINT16 fullAddy = bits;
+	if (fullAddy & 0x0020)
+		fullAddy |= 0xffc0;
+		
+	return (INT8)fullAddy;
 }
 
 
+/********************/
+/* HELPER FUNCTIONS */
+/********************/
 
-//////////////////////
-// HELPER FUNCTIONS //
-//////////////////////
-
-static UINT16 Dsp56kOpMask(UINT16 cur, UINT16 mask)
+static UINT16 dsp56k_op_mask(UINT16 cur, UINT16 mask)
 {
-	int i ;
+	int i;
 
-	UINT16 retVal = (cur & mask) ;
-	UINT16 temp = 0x0000 ;
-	int offsetCount = 0 ;
+	UINT16 retVal = (cur & mask);
+	UINT16 temp = 0x0000;
+	int offsetCount = 0;
 
-	// Shift everything right, eliminating 'whitespace'...
+	/* Shift everything right, eliminating 'whitespace'... */
 	for (i = 0; i < 16; i++)
 	{
-		if (mask & (0x1<<i))		// If mask bit is non-zero
+		if (mask & (0x1<<i))		/* If mask bit is non-zero */
 		{
-			temp |= (((retVal >> i) & 0x1) << offsetCount) ;
-			offsetCount++ ;
+			temp |= (((retVal >> i) & 0x1) << offsetCount);
+			offsetCount++;
 		}
 	}
 
-	return temp ;
+	return temp;
 }
 
 
@@ -2046,6 +2261,15 @@ MAC             X       011x xxxx 1xx0 x1xx
 MPYR            X       011x xxxx 1XX1 x0xx
 MACR            X       011x xxxx 1XX1 x1xx
 
+TODO: don't forget us
+x memory data write and register data move - unique
+-----------------
+MPY             X       0001 0110 xxxx xxxx
+MAC             X       0001 0111 xxxx xxxx
+
+ODDBALL
+-------
+Tcc             X       0001 00xx xxxx xx0x
 
 BITFIELD
 -----------------
@@ -2096,14 +2320,6 @@ DMAC(ss,su,uu)  X       0001 0101 10x1 xxxx
 MPY(su,uu)      X       0001 0101 1100 xxxx
 MAC(su,uu)      X       0001 0101 1110 xxxx
 
-
-XMDWRDM
------------------
-
-MPY             X       0001 0110 xxxx xxxx
-MAC             X       0001 0111 xxxx xxxx
-
-
 IMMEDIATE
 -----------------
 
@@ -2119,10 +2335,6 @@ MOVE(P)         X       0001 100x xx1x xxxx
 
 -----------------
 
-Tcc             X       0001 00xx xxxx xx0x
-
------------------
-
 MOVE(I)         X       0010 00xx xxxx xxxx
 TFR3            X       0010 01xx xxxx xxxx
 MOVE(C)         X       0010 10xx xxxx xxxx
@@ -2134,6 +2346,13 @@ MOVE(C)         X       0011 1xxx xxx0 xxxx
 MOVE(C)         X       0011 1xxx xxx1 x0xx
 MOVE(C)         X       0011 1xxx xxx1 x10X xxxx xxxx xxxx xxxx
 MOVE(C)         X       0011 1xxx xxx1 x11X
+
+
+
+
+
+
+
 
 -----------------
 
