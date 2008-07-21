@@ -48,50 +48,34 @@ static WRITE8_HANDLER( battlnts_bankswitch_w )
 	/* other bits unknown */
 }
 
-static ADDRESS_MAP_START( battlnts_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(K007342_r)			/* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_READ(K007420_r)			/* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_READ(K007342_scroll_r)	/* Scroll RAM */
-	AM_RANGE(0x2400, 0x24ff) AM_READ(SMH_RAM)			/* Palette */
-	AM_RANGE(0x2e00, 0x2e00) AM_READ(input_port_0_r) 	/* DIPSW #1 */
-	AM_RANGE(0x2e01, 0x2e01) AM_READ(input_port_4_r) 	/* 2P controls */
-	AM_RANGE(0x2e02, 0x2e02) AM_READ(input_port_3_r) 	/* 1P controls */
-	AM_RANGE(0x2e03, 0x2e03) AM_READ(input_port_2_r) 	/* coinsw, testsw, startsw */
-	AM_RANGE(0x2e04, 0x2e04) AM_READ(input_port_1_r) 	/* DISPW #2 */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)			/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)			/* ROM 777e02.bin */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( battlnts_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(K007342_w)				/* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_WRITE(K007420_w)				/* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_WRITE(K007342_scroll_w)		/* Scroll RAM */
-	AM_RANGE(0x2400, 0x24ff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram)/* palette */
-	AM_RANGE(0x2600, 0x2607) AM_WRITE(K007342_vreg_w) 		/* Video Registers */
+static ADDRESS_MAP_START( battlnts_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(K007342_r, K007342_w)	/* Color RAM + Video RAM */
+	AM_RANGE(0x2000, 0x21ff) AM_READWRITE(K007420_r, K007420_w)	/* Sprite RAM */
+	AM_RANGE(0x2200, 0x23ff) AM_READWRITE(K007342_scroll_r, K007342_scroll_w)		/* Scroll RAM */
+	AM_RANGE(0x2400, 0x24ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram)/* palette */
+	AM_RANGE(0x2600, 0x2607) AM_WRITE(K007342_vreg_w) 			/* Video Registers */
+	AM_RANGE(0x2e00, 0x2e00) AM_READ(input_port_0_r) 			/* DIPSW #1 */
+	AM_RANGE(0x2e01, 0x2e01) AM_READ(input_port_4_r) 			/* 2P controls */
+	AM_RANGE(0x2e02, 0x2e02) AM_READ(input_port_3_r) 			/* 1P controls */
+	AM_RANGE(0x2e03, 0x2e03) AM_READ(input_port_2_r) 			/* coinsw, testsw, startsw */
+	AM_RANGE(0x2e04, 0x2e04) AM_READ(input_port_1_r) 			/* DISPW #2 */
 	AM_RANGE(0x2e08, 0x2e08) AM_WRITE(battlnts_bankswitch_w)	/* bankswitch control */
 	AM_RANGE(0x2e0c, 0x2e0c) AM_WRITE(battlnts_spritebank_w)	/* sprite bank select */
-	AM_RANGE(0x2e10, 0x2e10) AM_WRITE(watchdog_reset_w)		/* watchdog reset */
-	AM_RANGE(0x2e14, 0x2e14) AM_WRITE(soundlatch_w)			/* sound code # */
-	AM_RANGE(0x2e18, 0x2e18) AM_WRITE(battlnts_sh_irqtrigger_w)/* cause interrupt on audio CPU */
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_ROM)				/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)				/* ROM 777e02.bin */
+	AM_RANGE(0x2e10, 0x2e10) AM_WRITE(watchdog_reset_w)			/* watchdog reset */
+	AM_RANGE(0x2e14, 0x2e14) AM_WRITE(soundlatch_w)				/* sound code # */
+	AM_RANGE(0x2e18, 0x2e18) AM_WRITE(battlnts_sh_irqtrigger_w)	/* cause interrupt on audio CPU */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)						/* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM 777e02.bin */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( battlnts_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* ROM 777c01.rom */
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)				/* RAM */
-	AM_RANGE(0xa000, 0xa000) AM_READ(YM3812_status_port_0_r) /* YM3812 (chip 1) */
-	AM_RANGE(0xc000, 0xc000) AM_READ(YM3812_status_port_1_r) /* YM3812 (chip 2) */
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)			/* soundlatch_r */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( battlnts_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)					/* ROM 777c01.rom */
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)					/* RAM */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM3812_control_port_0_w)	/* YM3812 (chip 1) */
+static ADDRESS_MAP_START( battlnts_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM							/* ROM 777c01.rom */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM							/* RAM */
+	AM_RANGE(0xa000, 0xa000) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w)	/* YM3812 (chip 1) */
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM3812_write_port_0_w)		/* YM3812 (chip 1) */
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM3812_control_port_1_w)	/* YM3812 (chip 2) */
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(YM3812_status_port_1_r, YM3812_control_port_1_w)	/* YM3812 (chip 2) */
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM3812_write_port_1_w)		/* YM3812 (chip 2) */
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)			/* soundlatch_r */
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -262,11 +246,11 @@ static MACHINE_DRIVER_START( battlnts )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", HD6309, 3000000*4)		/* ? */
-	MDRV_CPU_PROGRAM_MAP(battlnts_readmem,battlnts_writemem)
+	MDRV_CPU_PROGRAM_MAP(battlnts_map,0)
 	MDRV_CPU_VBLANK_INT("main", battlnts_interrupt)
 
 	MDRV_CPU_ADD("audio", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(battlnts_readmem_sound,battlnts_writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(battlnts_sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -629,8 +629,7 @@ static void print_game_chips(FILE *out, const game_driver *game, const machine_c
 		{
 			fprintf(out, "\t\t<chip");
 			fprintf(out, " type=\"cpu\"");
-			if (config->cpu[chipnum].tag != NULL)
-				fprintf(out, " tag=\"%s\"", xml_normalize_string(config->cpu[chipnum].tag));
+			fprintf(out, " tag=\"%s\"", xml_normalize_string(config->cpu[chipnum].tag));
 			fprintf(out, " name=\"%s\"", xml_normalize_string(cputype_name(config->cpu[chipnum].type)));
 			fprintf(out, " clock=\"%d\"", config->cpu[chipnum].clock);
 			fprintf(out, "/>\n");
