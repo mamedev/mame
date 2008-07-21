@@ -27,7 +27,7 @@
 #include "machine/laserdsc.h"
 
 
-static laserdisc_info *discinfo;
+static const device_config *laserdisc;
 static emu_timer *serial_timer;
 static UINT8 serial_timer_active;
 static UINT16 input_select;
@@ -124,7 +124,7 @@ static VIDEO_UPDATE( alg )
 		fixedvis.max_y++;
 
 		/* first lay down the video data */
-		laserdisc_get_video(discinfo, &vidbitmap);
+		laserdisc_get_video(laserdisc, &vidbitmap);
 		if (video_texture == NULL)
 			video_texture = render_texture_alloc(NULL, NULL);
 		render_texture_set_bitmap(video_texture, vidbitmap, NULL, 0, TEXFORMAT_YUY16);
@@ -140,8 +140,8 @@ static VIDEO_UPDATE( alg )
 		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
 
 		/* display disc information */
-		if (discinfo != NULL)
-			popmessage("%s", laserdisc_describe_state(discinfo));
+		if (laserdisc != NULL)
+			popmessage("%s", laserdisc_describe_state(laserdisc));
 	}
 
 	return 0;
@@ -157,7 +157,8 @@ static VIDEO_UPDATE( alg )
 
 static MACHINE_START( alg )
 {
-	discinfo = laserdisc_init(machine, LASERDISC_TYPE_LDP1450, get_disk_handle(0), 1);
+	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
+
 	serial_timer = timer_alloc(response_timer, NULL);
 	serial_timer_active = FALSE;
 }
@@ -166,7 +167,6 @@ static MACHINE_START( alg )
 static MACHINE_RESET( alg )
 {
 	MACHINE_RESET_CALL(amiga);
-	laserdisc_reset(discinfo, 0);
 }
 
 
@@ -180,16 +180,16 @@ static MACHINE_RESET( alg )
 static TIMER_CALLBACK( response_timer )
 {
 	/* if we still have data to send, do it now */
-	if (laserdisc_line_r(discinfo, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
+	if (laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
-		UINT8 data = laserdisc_data_r(discinfo);
+		UINT8 data = laserdisc_data_r(laserdisc);
 		if (data != 0x0a)
 			mame_printf_debug("Sending serial data = %02X\n", data);
 		amiga_serial_in_w(data);
 	}
 
 	/* if there's more to come, set another timer */
-	if (laserdisc_line_r(discinfo, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
+	if (laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(), 0);
 	else
 		serial_timer_active = FALSE;
@@ -199,10 +199,10 @@ static TIMER_CALLBACK( response_timer )
 static void vsync_callback(void)
 {
 	/* only clock the disc every other frame */
-	laserdisc_vsync(discinfo);
+	laserdisc_vsync(laserdisc);
 
 	/* if we have data available, set a timer to read it */
-	if (!serial_timer_active && laserdisc_line_r(discinfo, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
+	if (!serial_timer_active && laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
 		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(), 0);
 		serial_timer_active = TRUE;
@@ -213,10 +213,10 @@ static void vsync_callback(void)
 static void serial_w(UINT16 data)
 {
 	/* write to the laserdisc player */
-	laserdisc_data_w(discinfo, data & 0xff);
+	laserdisc_data_w(laserdisc, data & 0xff);
 
 	/* if we have data available, set a timer to read it */
-	if (!serial_timer_active && laserdisc_line_r(discinfo, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
+	if (!serial_timer_active && laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
 		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(), 0);
 		serial_timer_active = TRUE;
@@ -471,6 +471,8 @@ static MACHINE_DRIVER_START( alg_r1 )
 	MDRV_MACHINE_START(alg)
 	MDRV_MACHINE_RESET(alg)
 	MDRV_NVRAM_HANDLER(generic_0fill)
+	
+	MDRV_LASERDISC_ADD("laserdisc", SONY_LDP1450, 0, "laserdisc")
 
     /* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER)

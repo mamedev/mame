@@ -268,7 +268,7 @@ static const raster_info predef_raster_table[] =
 
 /*-------------------------------------------------
     get_safe_token - makes sure that the passed
-    in device is, in fact, an IDE controller
+    in device is, in fact, a voodoo device
 -------------------------------------------------*/
 
 INLINE voodoo_state *get_safe_token(const device_config *device)

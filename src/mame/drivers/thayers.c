@@ -18,8 +18,7 @@
 
 extern const char layout_dlair[];
 
-static laserdisc_info *discinfo;
-static UINT8 laserdisc_type;
+static const device_config *laserdisc;
 static UINT8 laserdisc_data;
 
 static int rx_bit;
@@ -44,8 +43,7 @@ static const UINT8 led_map[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x0
 static VIDEO_UPDATE( thayers )
 {
 	/* display disc information */
-	if (discinfo != NULL)
-		popmessage("%s", laserdisc_describe_state(discinfo));
+	popmessage("%s", laserdisc_describe_state(laserdisc));
 
 	return 0;
 }
@@ -324,7 +322,7 @@ static READ8_HANDLER( dsw_b_r )
 
 static READ8_HANDLER( laserdsc_data_r )
 {
-	return laserdisc_data_r(discinfo);
+	return laserdisc_data_r(laserdisc);
 }
 
 static WRITE8_HANDLER( laserdsc_data_w )
@@ -353,21 +351,21 @@ static WRITE8_HANDLER( laserdsc_control_w )
 
 	if (BIT(data, 5))
 	{
-		laserdisc_data_w(discinfo, laserdisc_data);
+		laserdisc_data_w(laserdisc, laserdisc_data);
 	}
 
-	switch (laserdisc_type)
+	switch (device_get_info_int(laserdisc, LDINFO_INT_TYPE))
 	{
-	case LASERDISC_TYPE_PR7820:
+	case LASERDISC_TYPE_PIONEER_PR7820:
 		pr7820_enter = BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE;
 
-		laserdisc_line_w(discinfo, LASERDISC_LINE_ENTER, pr7820_enter);
+		laserdisc_line_w(laserdisc, LASERDISC_LINE_ENTER, pr7820_enter);
 
 		// BIT(data, 7) is INT/_EXT, but there is no such input line in laserdsc.h
 		break;
 
-	case LASERDISC_TYPE_LDV1000:
-		laserdisc_line_w(discinfo, LASERDISC_LINE_ENTER, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+	case LASERDISC_TYPE_PIONEER_LDV1000:
+		laserdisc_line_w(laserdisc, LASERDISC_LINE_ENTER, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 		break;
 	}
 }
@@ -599,16 +597,13 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( laserdisc_enter_r )
 {
-	if (discinfo == NULL)
-		return 0;
-
-	switch (laserdisc_type)
+	switch (device_get_info_int(laserdisc, LDINFO_INT_TYPE))
 	{
-	case LASERDISC_TYPE_PR7820:
-		return pr7820_enter;
+		case LASERDISC_TYPE_PIONEER_PR7820:
+			return pr7820_enter;
 
-	case LASERDISC_TYPE_LDV1000:
-		return (laserdisc_line_r(discinfo, LASERDISC_LINE_STATUS) == ASSERT_LINE) ? 0 : 1;
+		case LASERDISC_TYPE_PIONEER_LDV1000:
+			return (laserdisc_line_r(laserdisc, LASERDISC_LINE_STATUS) == ASSERT_LINE) ? 0 : 1;
 	}
 
 	return 0;
@@ -616,16 +611,13 @@ static CUSTOM_INPUT( laserdisc_enter_r )
 
 static CUSTOM_INPUT( laserdisc_ready_r )
 {
-	if (discinfo == NULL)
-		return 0;
-
-	switch (laserdisc_type)
+	switch (device_get_info_int(laserdisc, LDINFO_INT_TYPE))
 	{
-	case LASERDISC_TYPE_PR7820:
-		return (laserdisc_line_r(discinfo, LASERDISC_LINE_READY) == ASSERT_LINE) ? 0 : 1;
+		case LASERDISC_TYPE_PIONEER_PR7820:
+			return (laserdisc_line_r(laserdisc, LASERDISC_LINE_READY) == ASSERT_LINE) ? 0 : 1;
 
-	case LASERDISC_TYPE_LDV1000:
-		return (laserdisc_line_r(discinfo, LASERDISC_LINE_COMMAND) == ASSERT_LINE) ? 0 : 1;
+		case LASERDISC_TYPE_PIONEER_LDV1000:
+			return (laserdisc_line_r(laserdisc, LASERDISC_LINE_COMMAND) == ASSERT_LINE) ? 0 : 1;
 	}
 
 	return 0;
@@ -736,23 +728,19 @@ INPUT_PORTS_END
 
 static MACHINE_START( thayers )
 {
-	laserdisc_type = LASERDISC_TYPE_LDV1000;
-
-	discinfo = laserdisc_init(machine, laserdisc_type, get_disk_handle(0), 0);
-
+	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
 	memset(&ssi263, 0, sizeof(ssi263));
 }
 
 static MACHINE_RESET( thayers )
 {
-	laserdisc_type = (input_port_read(machine, "DSWB") & 0x18) ? LASERDISC_TYPE_LDV1000 : LASERDISC_TYPE_PR7820;
-
-	laserdisc_reset(discinfo, laserdisc_type);
+	int newtype = (input_port_read(machine, "DSWB") & 0x18) ? LASERDISC_TYPE_PIONEER_LDV1000 : LASERDISC_TYPE_PIONEER_PR7820;
+	device_set_info_int(laserdisc, LDINFO_INT_TYPE, newtype);
 }
 
 static INTERRUPT_GEN( vblank_callback_thayers )
 {
-	laserdisc_vsync(discinfo);
+	laserdisc_vsync(laserdisc);
 }
 
 /* COP400 Interface */
@@ -773,13 +761,15 @@ static MACHINE_DRIVER_START( thayers )
 	MDRV_CPU_IO_MAP(thayers_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", vblank_callback_thayers)
 
-	MDRV_MACHINE_START(thayers)
-	MDRV_MACHINE_RESET(thayers)
-
 	MDRV_CPU_ADD("mcu", COP421, XTAL_4MHz/2) // COP421L-PCA/N
 	MDRV_CPU_PROGRAM_MAP(thayers_cop_map, 0)
 	MDRV_CPU_IO_MAP(thayers_cop_io_map, 0)
 	MDRV_CPU_CONFIG(thayers_cop_intf)
+
+	MDRV_MACHINE_START(thayers)
+	MDRV_MACHINE_RESET(thayers)
+
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR7820, 0, "laserdisc")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

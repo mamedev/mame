@@ -54,7 +54,7 @@ static UINT8* tile_RAM;
 static UINT8* sprite_RAM;
 static UINT8* palette_RAM;
 
-static laserdisc_info *discinfo;
+static const device_config *laserdisc;
 
 
 /* VIDEO GOODS */
@@ -209,12 +209,16 @@ static VIDEO_UPDATE( gpworld )
 	gpworld_draw_sprites(screen->machine, bitmap, cliprect);
 
 	/* display disc information */
-	if (discinfo != NULL)
-		popmessage("%s", laserdisc_describe_state(discinfo));
+	popmessage("%s", laserdisc_describe_state(laserdisc));
 
 	return 0;
 }
 
+
+static MACHINE_START( gpworld )
+{
+	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
+}
 
 
 /* MEMORY HANDLERS */
@@ -384,12 +388,6 @@ static INPUT_PORTS_START( gpworld )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_START( gpworld )
-{
-	discinfo = laserdisc_init(machine, LASERDISC_TYPE_LDV1000, get_disk_handle(0), 0);
-	return;
-}
-
 static TIMER_CALLBACK( irq_stop )
 {
 	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
@@ -400,8 +398,8 @@ static INTERRUPT_GEN( vblank_callback_gpworld )
 	/* Do an NMI if the enabled bit is set */
 	if (nmi_enable)
 	{
-		laserdisc_data_w(discinfo,ldp_write_latch);
-		ldp_read_latch  = laserdisc_data_r(discinfo);
+		laserdisc_data_w(laserdisc,ldp_write_latch);
+		ldp_read_latch  = laserdisc_data_r(laserdisc);
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
@@ -409,7 +407,7 @@ static INTERRUPT_GEN( vblank_callback_gpworld )
 	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_USEC(100), NULL, 0, irq_stop);
 
-	laserdisc_vsync(discinfo);
+	laserdisc_vsync(laserdisc);
 }
 
 static const gfx_layout gpworld_tile_layout =
@@ -437,6 +435,8 @@ static MACHINE_DRIVER_START( gpworld )
 
 	MDRV_MACHINE_START(gpworld)
 
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, 0, "laserdisc")
+
 /*  video */
 
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -450,6 +450,13 @@ static MACHINE_DRIVER_START( gpworld )
 	MDRV_PALETTE_LENGTH(1024)
 	MDRV_VIDEO_UPDATE(gpworld)
 
+/*  sound */
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
+	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
+	MDRV_SOUND_ROUTE(0, "left", 1.0)
+	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
 
 

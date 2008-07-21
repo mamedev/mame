@@ -27,7 +27,7 @@
 #include "machine/laserdsc.h"
 #include "video/resnet.h"
 
-static laserdisc_info *discinfo;
+static const device_config *laserdisc;
 static UINT8 superdq_ld_in_latch = 0, superdq_ld_out_latch = 0xff;
 
 static tilemap *superdq_tilemap;
@@ -63,14 +63,14 @@ static VIDEO_UPDATE( superdq )
 {
 	tilemap_draw(bitmap,cliprect,superdq_tilemap,0,0);
 
-	if (!video_skip_this_frame() && discinfo != NULL)
+	if (!video_skip_this_frame())
 	{
 		bitmap_t *vidbitmap;
 		rectangle fixedvis = *video_screen_get_visible_area(screen);
 		fixedvis.max_x++;
 		fixedvis.max_y++;
 
-		laserdisc_get_video(discinfo, &vidbitmap);
+		laserdisc_get_video(laserdisc, &vidbitmap);
 
 		/* first lay down the video data */
 		if (video_texture == NULL)
@@ -92,8 +92,7 @@ static VIDEO_UPDATE( superdq )
 	}
 
 	/* display disc information */
-	if (discinfo != NULL)
-		popmessage("%s", laserdisc_describe_state(discinfo));
+	popmessage("%s", laserdisc_describe_state(laserdisc));
 
 	return 0;
 }
@@ -145,24 +144,19 @@ static PALETTE_INIT( superdq )
 	}
 }
 
-static MACHINE_START( superdq )
-{
-	discinfo = laserdisc_init(machine, LASERDISC_TYPE_LDV1000, get_disk_handle(0), 0);
-}
-
 static INTERRUPT_GEN( superdq_vblank )
 {
-	laserdisc_vsync(discinfo);
+	laserdisc_vsync(laserdisc);
 
 	/* status is read when the STATUS line from the laserdisc
        toggles (600usec after the vblank). We could set up a
        timer to do that, but this works as well */
-	superdq_ld_in_latch = laserdisc_data_r(discinfo);
+	superdq_ld_in_latch = laserdisc_data_r(laserdisc);
 
 	/* command is written when the COMMAND line from the laserdisc
        toggles (680usec after the vblank). We could set up a
        timer to do that, but this works as well */
-	laserdisc_data_w(discinfo, superdq_ld_out_latch);
+	laserdisc_data_w(laserdisc, superdq_ld_out_latch);
 	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 }
 
@@ -329,6 +323,12 @@ GFXDECODE_END
  *
  *************************************/
 
+static MACHINE_START( superdq )
+{
+	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
+}
+
+
 static MACHINE_DRIVER_START( superdq )
 
 	/* basic machine hardware */
@@ -336,8 +336,10 @@ static MACHINE_DRIVER_START( superdq )
 	MDRV_CPU_PROGRAM_MAP(superdq_map,0)
 	MDRV_CPU_IO_MAP(superdq_io,0)
 	MDRV_CPU_VBLANK_INT("main", superdq_vblank)
-
+	
 	MDRV_MACHINE_START(superdq)
+
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, 0, "laserdisc")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER)

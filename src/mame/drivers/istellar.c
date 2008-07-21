@@ -30,7 +30,7 @@ Todo:
 
 
 /* Misc variables */
-static laserdisc_info *discinfo;
+static const device_config *laserdisc;
 
 static UINT8 *tile_ram;
 static UINT8 *tile_control_ram;
@@ -50,8 +50,7 @@ static VIDEO_UPDATE( istellar )
 	fillbitmap(bitmap, 0, cliprect);
 
 	/* display disc information */
-	if (discinfo != NULL)
-		popmessage("%s", laserdisc_describe_state(discinfo));
+	popmessage("%s", laserdisc_describe_state(laserdisc));
 
 	/* DEBUG */
 	/*
@@ -80,6 +79,12 @@ static VIDEO_UPDATE( istellar )
 	/* Draw sprites */
 
 	return 0;
+}
+
+
+static MACHINE_START( istellar )
+{
+	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
 }
 
 
@@ -113,7 +118,7 @@ static WRITE8_HANDLER(z80_0_latch2_write)
 /* Z80 2 R/W */
 static READ8_HANDLER(z80_2_ldp_read)
 {
-	UINT8 readResult = laserdisc_data_r(discinfo);
+	UINT8 readResult = laserdisc_data_r(laserdisc);
 	logerror("CPU2 : reading LDP : %x\n", readResult);
 	return readResult;
 }
@@ -146,7 +151,7 @@ static WRITE8_HANDLER(z80_2_latch1_write)
 static WRITE8_HANDLER(z80_2_ldp_write)
 {
 	logerror("CPU2 : writing LDP : 0x%x\n", data);
-	laserdisc_data_w(discinfo,data);
+	laserdisc_data_w(laserdisc,data);
 }
 
 
@@ -306,11 +311,6 @@ static GFXDECODE_START( istellar )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, istellar_gfx_layout, 0x0, 0x100 )
 GFXDECODE_END
 
-static MACHINE_START( istellar )
-{
-	discinfo = laserdisc_init(machine, LASERDISC_TYPE_LDV1000, get_disk_handle(0), 0);
-}
-
 static INTERRUPT_GEN( vblank_callback_istellar )
 {
 	/* Interrupt presumably comes from VBlank */
@@ -321,7 +321,7 @@ static INTERRUPT_GEN( vblank_callback_istellar )
 
 	/* Only do the LDP's sync once */
 	if (cpunum == 0)
-		laserdisc_vsync(discinfo);
+		laserdisc_vsync(laserdisc);
 }
 
 
@@ -342,8 +342,10 @@ static MACHINE_DRIVER_START( istellar )
 	MDRV_CPU_ADD("sub", Z80, GUESSED_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(z80_2_mem,0)
 	MDRV_CPU_IO_MAP(z80_2_io,0)
-
+	
 	MDRV_MACHINE_START(istellar)
+
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, 0, "laserdisc")
 
 /*  video */
 
@@ -361,6 +363,12 @@ static MACHINE_DRIVER_START( istellar )
 	MDRV_VIDEO_UPDATE(istellar)
 
 /*  sound */
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
+	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
+	MDRV_SOUND_ROUTE(0, "left", 1.0)
+	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
 
 

@@ -21,11 +21,14 @@
 ***************************************************************************/
 
 /* types of players supported */
-#define LASERDISC_TYPE_PR7820		1			/* Pioneer PR-7820 */
-#define LASERDISC_TYPE_LDV1000		2			/* Pioneer LD-V1000 */
-#define LASERDISC_TYPE_22VP932		3			/* Phillips 22VP932 (PAL) */
-#define LASERDISC_TYPE_LDP1450		4			/* Sony LDP-1450 */
-#define LASERDISC_TYPE_PR8210		5			/* Pioneer PR-8210 / LD-V1100 */
+enum
+{
+	LASERDISC_TYPE_PIONEER_PR7820,			/* Pioneer PR-7820 */
+	LASERDISC_TYPE_PIONEER_PR8210,			/* Pioneer PR-8210 / LD-V1100 */
+	LASERDISC_TYPE_PIONEER_LDV1000,			/* Pioneer LD-V1000 */
+	LASERDISC_TYPE_PHILLIPS_22VP932,		/* Phillips 22VP932 (PAL) */
+	LASERDISC_TYPE_SONY_LDP1450,			/* Sony LDP-1450 */
+};
 
 /* laserdisc control lines */
 #define LASERDISC_LINE_ENTER		0			/* "ENTER" key/line */
@@ -46,13 +49,40 @@
 #define LASERDISC_CODE_LINE17		3
 #define LASERDISC_CODE_LINE18		4
 
+/* device configuration */
+enum
+{
+	LDINFO_INT_TYPE = DEVINFO_INT_DEVICE_SPECIFIC
+};
+
 
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _laserdisc_info laserdisc_info;
+typedef struct _laserdisc_config laserdisc_config;
+struct _laserdisc_config
+{
+	int			type;
+	int			disknum;
+	const char *soundtag;
+};
+
+
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_LASERDISC_ADD(_tag, _type, _disknum, _soundtag) \
+	MDRV_DEVICE_ADD(_tag, LASERDISC) \
+	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, type, LASERDISC_TYPE_##_type) \
+	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, disknum, _disknum) \
+	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, soundtag, _soundtag)
+
+#define MDRV_LASERDISC_REMOVE(_tag, _type) \
+	MDRV_DEVICE_REMOVE(_tag, _type)
 
 
 
@@ -68,19 +98,23 @@ extern const struct CustomSound_interface laserdisc_custom_interface;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-laserdisc_info *laserdisc_init(running_machine *machine, int type, chd_file *chd, int custom_index);
-void laserdisc_reset(laserdisc_info *info, int type);
-void laserdisc_exit(laserdisc_info *info);
-void laserdisc_vsync(laserdisc_info *info);
-const char *laserdisc_describe_state(laserdisc_info *info);
-UINT32 laserdisc_get_video(laserdisc_info *info, bitmap_t **bitmap);
-UINT32 laserdisc_get_field_code(laserdisc_info *info, UINT8 code);
+void laserdisc_vsync(const device_config *device);
+const char *laserdisc_describe_state(const device_config *device);
+UINT32 laserdisc_get_video(const device_config *device, bitmap_t **bitmap);
+UINT32 laserdisc_get_field_code(const device_config *device, UINT8 code);
 
-void laserdisc_data_w(laserdisc_info *info, UINT8 data);
-void laserdisc_line_w(laserdisc_info *info, UINT8 line, UINT8 newstate);
-UINT8 laserdisc_data_r(laserdisc_info *info);
-UINT8 laserdisc_line_r(laserdisc_info *info, UINT8 line);
+void laserdisc_data_w(const device_config *device, UINT8 data);
+void laserdisc_line_w(const device_config *device, UINT8 line, UINT8 newstate);
+UINT8 laserdisc_data_r(const device_config *device);
+UINT8 laserdisc_line_r(const device_config *device, UINT8 line);
 
-void pr7820_set_slow_speed(laserdisc_info *info, double frame_rate_scaler);
+void pr7820_set_slow_speed(const device_config *device, double frame_rate_scaler);
+
+
+/* ----- device interface ----- */
+
+/* device get info callback */
+#define LASERDISC DEVICE_GET_INFO_NAME(laserdisc)
+DEVICE_GET_INFO( laserdisc );
 
 #endif 	/* __LASERDSC_H__ */

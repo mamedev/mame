@@ -30,7 +30,7 @@ static UINT8* color_RAM;
 static UINT8* fix_RAM;
 static UINT8* out_RAM;
 
-static laserdisc_info *discinfo;
+static const device_config *laserdisc;
 static UINT8 ldv1000_input_latch;
 static UINT8 ldv1000_output_latch;
 
@@ -86,8 +86,7 @@ static VIDEO_UPDATE( astron )
 	astron_draw_sprites(bitmap, cliprect);
 
 	/* display disc information */
-	if (discinfo != NULL)
-		popmessage("%s", laserdisc_describe_state(discinfo));
+	popmessage("%s", laserdisc_describe_state(laserdisc));
 
 	return 0;
 }
@@ -99,7 +98,7 @@ static VIDEO_UPDATE( astron )
 static READ8_HANDLER( astron_DISC_read )
 {
 	if (nmi_enable)
-		ldv1000_input_latch = laserdisc_data_r(discinfo);
+		ldv1000_input_latch = laserdisc_data_r(laserdisc);
 
 	logerror("DISC read   (0x%04x) @ 0x%04x [0x%x]\n", ldv1000_input_latch, offset, activecpu_get_pc());
 
@@ -133,7 +132,7 @@ static WRITE8_HANDLER( astron_DISC_write )
 	ldv1000_output_latch = data;
 
 	if (nmi_enable)
-		laserdisc_data_w(discinfo, ldv1000_output_latch);
+		laserdisc_data_w(laserdisc, ldv1000_output_latch);
 }
 
 static WRITE8_HANDLER( astron_OUT_write )
@@ -323,20 +322,21 @@ static INPUT_PORTS_START( astron )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )         								  /* SW15 = nonJAMMA pin W  = unused? */
 INPUT_PORTS_END
 
-static MACHINE_START( astron )
-{
-	discinfo = laserdisc_init(machine, LASERDISC_TYPE_LDV1000, get_disk_handle(0), 0);
-}
-
 static INTERRUPT_GEN( vblank_callback_astron )
 {
-	laserdisc_vsync(discinfo);
+	laserdisc_vsync(laserdisc);
 }
 
 static GFXDECODE_START( segald )
     GFXDECODE_ENTRY( REGION_GFX1, 0, gfx_8x8x1,  0, 1 )		/* CHARACTERS */
 	/* SPRITES are apparently non-uniform in width - not straightforward to decode */
 GFXDECODE_END
+
+
+static MACHINE_START( astron )
+{
+	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
+}
 
 
 /* DRIVER */
@@ -349,6 +349,8 @@ static MACHINE_DRIVER_START( astron )
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1000.0/59.94)
 
 	MDRV_MACHINE_START(astron)
+
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, 0, "laserdisc")
 
 /*  video */
 
@@ -363,6 +365,13 @@ static MACHINE_DRIVER_START( astron )
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_VIDEO_UPDATE(astron)
 
+	/* sound hardare */
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
+	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
+	MDRV_SOUND_ROUTE(0, "left", 1.0)
+	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
 
 

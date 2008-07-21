@@ -72,7 +72,7 @@ Dumping Notes:
 #define SOUND_PCB_CLOCK (6000000)
 
 /* Misc variables */
-static laserdisc_info *discinfo;
+static const device_config *laserdisc;
 
 static UINT8 *tile_ram;
 static UINT8 *tile_control_ram;
@@ -87,8 +87,7 @@ static VIDEO_UPDATE( lgp )
 	fillbitmap(bitmap, 0, cliprect);
 
 	/* display disc information */
-	if (discinfo != NULL)
-		popmessage("%s", laserdisc_describe_state(discinfo));
+	popmessage("%s", laserdisc_describe_state(laserdisc));
 
 	/* Draw tiles */
 	for (charx = 0; charx < 32; charx++)
@@ -114,12 +113,12 @@ static VIDEO_UPDATE( lgp )
 /* Main Z80 R/W */
 static READ8_HANDLER(ldp_read)
 {
-	return laserdisc_data_r(discinfo);
+	return laserdisc_data_r(laserdisc);
 }
 
 static WRITE8_HANDLER(ldp_write)
 {
-	laserdisc_data_w(discinfo,data);
+	laserdisc_data_w(laserdisc,data);
 }
 
 
@@ -315,11 +314,6 @@ static GFXDECODE_START( lgp )
 	GFXDECODE_ENTRY(REGION_GFX4, 0, lgp_gfx_layout_16x32, 0x0, 0x100)
 GFXDECODE_END
 
-static MACHINE_START( lgp )
-{
-	discinfo = laserdisc_init(machine, LASERDISC_TYPE_LDV1000, get_disk_handle(0), 0);
-}
-
 static TIMER_CALLBACK( irq_stop )
 {
 	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
@@ -334,7 +328,13 @@ static INTERRUPT_GEN( vblank_callback_lgp )
 	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, irq_stop);
 
-	laserdisc_vsync(discinfo);
+	laserdisc_vsync(laserdisc);
+}
+
+
+static MACHINE_START( lgp )
+{
+	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
 }
 
 
@@ -353,6 +353,8 @@ static MACHINE_DRIVER_START( lgp )
 
 	MDRV_MACHINE_START(lgp)
 
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, 0, "laserdisc")
+
 /*  video */
 
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -369,6 +371,12 @@ static MACHINE_DRIVER_START( lgp )
 	MDRV_VIDEO_UPDATE(lgp)
 
 /*  sound */
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
+	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
+	MDRV_SOUND_ROUTE(0, "left", 1.0)
+	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
 
 

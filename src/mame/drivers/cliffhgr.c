@@ -82,7 +82,7 @@ Side 2 = 0x8F7DDD (or 0x880000 | ( 0x77 << 12 ) | 0x0DDD)
 #define CLIFF_ENABLE_SND_1	NODE_01
 #define CLIFF_ENABLE_SND_2	NODE_02
 
-static laserdisc_info *discinfo = NULL;
+static const device_config *laserdisc;
 
 static int port_bank = 0;
 static int phillips_code = 0;
@@ -101,7 +101,6 @@ static void video_cleanup(running_machine *machine)
 		render_texture_free(video_texture);
 	if (overlay_texture != NULL)
 		render_texture_free(overlay_texture);
-	laserdisc_exit(discinfo);
 }
 
 static VIDEO_UPDATE( cliff )
@@ -109,14 +108,14 @@ static VIDEO_UPDATE( cliff )
 	/* update the TMS9928A video */
 	VIDEO_UPDATE_CALL(tms9928a);
 
-	if (discinfo != NULL)
+	if (laserdisc != NULL)
 	{
 		bitmap_t *vidbitmap;
 		rectangle fixedvis = *TMS9928A_get_visarea();
 		fixedvis.max_x++;
 		fixedvis.max_y++;
 
-		laserdisc_get_video(discinfo, &vidbitmap);
+		laserdisc_get_video(laserdisc, &vidbitmap);
 
 		/* first lay down the video data */
 		if (video_texture == NULL)
@@ -138,8 +137,8 @@ static VIDEO_UPDATE( cliff )
 	}
 
 	/* display disc information */
-	if (discinfo != NULL)
-		popmessage("%s", laserdisc_describe_state(discinfo));
+	if (laserdisc != NULL)
+		popmessage("%s", laserdisc_describe_state(laserdisc));
 
 	return 0;
 }
@@ -175,7 +174,7 @@ static READ8_HANDLER( cliff_port_r )
 
 static READ8_HANDLER( cliff_phillips_code_r )
 {
-	if ( discinfo != NULL )
+	if ( laserdisc != NULL )
 	{
 		return ( phillips_code >> (8*offset) ) & 0xff;
 	}
@@ -219,7 +218,7 @@ static WRITE8_HANDLER( cliff_irqack_w )
 
 static WRITE8_HANDLER( cliff_ldwire_w )
 {
-	laserdisc_line_w(discinfo,LASERDISC_LINE_CONTROL,(data&1) ? ASSERT_LINE : CLEAR_LINE );
+	laserdisc_line_w(laserdisc,LASERDISC_LINE_CONTROL,(data&1) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -228,7 +227,7 @@ static WRITE8_HANDLER( cliff_ldwire_w )
 static INTERRUPT_GEN( cliff_vsync )
 {
 	/* clock the laserdisc and video chip every 60Hz */
-	laserdisc_vsync(discinfo);
+	laserdisc_vsync(laserdisc);
 	TMS9928A_interrupt(machine);
 }
 
@@ -239,12 +238,12 @@ static TIMER_CALLBACK( cliff_irq_callback )
 	switch (param)
 	{
 		case 17:
-			phillips_code = laserdisc_get_field_code(discinfo, LASERDISC_CODE_LINE17);
+			phillips_code = laserdisc_get_field_code(laserdisc, LASERDISC_CODE_LINE17);
 			param = 18;
 			break;
 
 		case 18:
-			phillips_code = laserdisc_get_field_code(discinfo, LASERDISC_CODE_LINE18);
+			phillips_code = laserdisc_get_field_code(laserdisc, LASERDISC_CODE_LINE18);
 			param = 17;
 			break;
 	}
@@ -265,7 +264,7 @@ static void vdp_interrupt (running_machine *machine, int state)
 
 static MACHINE_START( cliffhgr )
 {
-	discinfo = laserdisc_init(machine, LASERDISC_TYPE_PR8210, get_disk_handle(0), 0);
+	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
 	irq_timer = timer_alloc(cliff_irq_callback, NULL);
 }
 
@@ -746,6 +745,8 @@ static MACHINE_DRIVER_START( cliffhgr )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210, 0, "laserdisc")
+
 	/* start with the TMS9928a video configuration */
 	MDRV_IMPORT_FROM(tms9928a)
 
@@ -758,13 +759,11 @@ static MACHINE_DRIVER_START( cliffhgr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	/* laserdisc audio */
 	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
-	/* discrete sounds */
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(cliffhgr)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
