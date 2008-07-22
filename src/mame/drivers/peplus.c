@@ -1306,6 +1306,23 @@ ROM_START( peps0716 ) /* Normal board : River Gambler Slots (PS0716) */
 	ROM_LOAD( "cap2266.u50", 0x0000, 0x0100, CRC(5aaff103) SHA1(9cfda9c095cb77a8bb761c131a0f358e79b97abc) )
 ROM_END
 
+ROM_START( pex2069p ) /* Superboard : Double Double Bonus Poker (X002069P) */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) )
+
+	ROM_REGION( 0x10000, REGION_USER1, 0 )
+	ROM_LOAD( "x002069p.u66",   0x00000, 0x10000, CRC(875ecfcf) SHA1(80472cb43b36e518216e60a9b4883a81163718a2) )
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "mro-cg2185.u77",	 0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
+	ROM_LOAD( "mgo-cg2185.u78",	 0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
+	ROM_LOAD( "mbo-cg2185.u79",	 0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
+	ROM_LOAD( "mxo-cg2185.u80",	 0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
+
+	ROM_REGION( 0x100, REGION_PROMS, 0 )
+	ROM_LOAD( "cap1321.u43", 0x0000, 0x0100, CRC(1e19c0ff) SHA1(e48ebc4a3c88e8b8c9740841dac919e9bb2c4b7f) )
+ROM_END
+
 ROM_START( pexp0019 ) /* Superboard : Deuces Wild Poker (XP000019) */
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "xp000019.u67",   0x00000, 0x10000, CRC(8ac876eb) SHA1(105b4aee2692ccb20795586ccbdf722c59db66cf) )
@@ -1407,6 +1424,7 @@ GAMEL(1996, peps0615, 0,      peplus,  peplus_slots, peplus,   ROT0,  "IGT - Int
 GAMEL(1996, peps0716, 0,      peplus,  peplus_slots, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PS0716) River Gambler Slots",           0,   layout_pe_slots )
 
 /* Superboard : poker */
+GAMEL(1995, pex2069p, 0,      peplus,  peplus_poker, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (X002069P) Double Double Bonus Poker",   0,   layout_pe_poker )
 GAMEL(1995, pexp0019, 0,      peplus,  peplus_poker, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XP000019) Deuces Wild Poker",           0,   layout_pe_poker )
 GAMEL(1995, pexp0112, 0,      peplus,  peplus_poker, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XP000112) White Hot Aces Poker",        0,   layout_pe_poker )
 
