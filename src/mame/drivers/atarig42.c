@@ -399,7 +399,7 @@ static INPUT_PORTS_START( roadriot )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	JSA_III_PORT	/* audio board port */
+	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
 
 	PORT_START_TAG("A2D0")		/* analog 0 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
@@ -450,7 +450,7 @@ static INPUT_PORTS_START( guardian )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	JSA_III_PORT	/* audio board port */
+	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
 
 	PORT_START_TAG("A2D0")		/* analog 0 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )

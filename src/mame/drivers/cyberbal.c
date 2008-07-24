@@ -352,7 +352,7 @@ static INPUT_PORTS_START( cyberb2p )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_VBLANK )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 
-	JSA_II_PORT		/* audio board port */
+	PORT_INCLUDE( atarijsa_ii )		/* audio board port */
 INPUT_PORTS_END
 
 

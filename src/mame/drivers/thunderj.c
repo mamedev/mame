@@ -280,7 +280,7 @@ static INPUT_PORTS_START( thunderj )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 
-	JSA_II_PORT		/* audio board port */
+	PORT_INCLUDE( atarijsa_ii )		/* audio board port */
 INPUT_PORTS_END
 
 

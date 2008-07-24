@@ -1255,7 +1255,7 @@ static INPUT_PORTS_START( spclords )
 	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_SPECIAL )	/* +5V */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	JSA_III_PORT	/* audio board port */
+	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
 
 	PORT_START_TAG("A2D0")		/* A2D @ 0xD00000 */
 	PORT_BIT ( 0x00ff, 0x0080, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -1305,7 +1305,7 @@ static INPUT_PORTS_START( motofren )
 	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_SPECIAL )	/* +5V */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	JSA_III_PORT	/* audio board port */
+	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
 
 	PORT_START_TAG("A2D0")		/* A2D @ 0xD00000 */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
@@ -1355,7 +1355,7 @@ static INPUT_PORTS_START( rrreveng )
 	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_SPECIAL )	/* +5V */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	JSA_III_PORT	/* audio board port */
+	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
 
 	PORT_START_TAG("A2D0")		/* A2D @ 0xD00000 */
 	PORT_BIT ( 0x00ff, 0x0010, IPT_PEDAL ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)

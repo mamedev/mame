@@ -190,7 +190,7 @@ static INPUT_PORTS_START( batman )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_VBLANK )
 
-	JSA_III_PORT	/* audio board port */
+	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
 INPUT_PORTS_END
 
 

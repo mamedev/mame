@@ -150,7 +150,7 @@ static INPUT_PORTS_START( blstroid )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	JSA_I_PORT	/* audio board port */
+	PORT_INCLUDE( atarijsa_i )		/* audio port */
 INPUT_PORTS_END
 
 

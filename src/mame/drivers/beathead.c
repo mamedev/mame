@@ -395,7 +395,7 @@ static INPUT_PORTS_START( beathead )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	JSA_III_PORT	/* audio board port */
+	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
 INPUT_PORTS_END
 
 

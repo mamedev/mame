@@ -173,7 +173,7 @@ static INPUT_PORTS_START( toobin )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	JSA_I_PORT	/* audio board port */
+	PORT_INCLUDE( atarijsa_i )		/* audio port */
 INPUT_PORTS_END
 
 

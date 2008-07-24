@@ -275,7 +275,7 @@ static INPUT_PORTS_START( hydra )
 	PORT_START_TAG("ADC2")      /* ADC 2 @ fc8000 */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	JSA_II_PORT		/* audio board port */
+	PORT_INCLUDE( atarijsa_ii )		/* audio board port */
 	PORT_MODIFY( "JSAII" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
@@ -320,7 +320,7 @@ static INPUT_PORTS_START( pitfight )
 	PORT_START_TAG("ADC2")      /* not used */
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	JSA_II_PORT		/* audio board port */
+	PORT_INCLUDE( atarijsa_ii )		/* audio board port */
 	PORT_MODIFY( "JSAII" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
@@ -358,7 +358,7 @@ static INPUT_PORTS_START( pitfighj )
 	PORT_START_TAG("ADC2")      /* not used */
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	JSA_II_PORT		/* audio board port */
+	PORT_INCLUDE( atarijsa_ii )		/* audio board port */
 	PORT_MODIFY( "JSAII" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
