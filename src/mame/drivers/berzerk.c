@@ -726,8 +726,8 @@ static INPUT_PORTS_START( frenzy )
 
 	PORT_START_TAG("F2")
 	/* Bit 0 does some more hardware tests. According to the manual, both bit 0 & 1 must be:
-	   - ON for Signature Analysis (S.A.)
-	   - OFF for game operation		*/
+       - ON for Signature Analysis (S.A.)
+       - OFF for game operation     */
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )	// F2:1,2
 	PORT_DIPNAME( 0x04, 0x00, "Input Test Mode" ) PORT_CODE(KEYCODE_F2) PORT_TOGGLE PORT_DIPLOCATION("F2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )

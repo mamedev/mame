@@ -287,7 +287,7 @@ static MACHINE_DRIVER_START( esh )
 	MDRV_CPU_VBLANK_INT("main", vblank_callback_esh)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
-	
+
 	MDRV_MACHINE_START(esh)
 
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, 0, "laserdisc")

@@ -862,12 +862,12 @@ static CUSTOM_INPUT( korokoro_hopper_r )
 
 static ADDRESS_MAP_START( korokoro_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ( SMH_ROM				)	// ROM
-//	AM_RANGE(0x100000, 0x107fff) AM_READ( SMH_RAM				)	// Layer 0
-//	AM_RANGE(0x140000, 0x140005) AM_READ( SMH_RAM				)	// Layer 0 Control
-//	AM_RANGE(0x180000, 0x187fff) AM_READ( SMH_RAM				)	// Sprites
+//  AM_RANGE(0x100000, 0x107fff) AM_READ( SMH_RAM               )   // Layer 0
+//  AM_RANGE(0x140000, 0x140005) AM_READ( SMH_RAM               )   // Layer 0 Control
+//  AM_RANGE(0x180000, 0x187fff) AM_READ( SMH_RAM               )   // Sprites
 	AM_RANGE(0x1c0000, 0x1c0007) AM_READ( cave_irq_cause_r		)	// IRQ Cause
-//	AM_RANGE(0x200000, 0x207fff) AM_READ( SMH_RAM				)	// Palette
-//	AM_RANGE(0x240000, 0x240003) AM_READ( cave_sound_r			)	// YMZ280
+//  AM_RANGE(0x200000, 0x207fff) AM_READ( SMH_RAM               )   // Palette
+//  AM_RANGE(0x240000, 0x240003) AM_READ( cave_sound_r          )   // YMZ280
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("IN0")				// Inputs + ???
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1")				// Inputs + EEPROM
 	AM_RANGE(0x300000, 0x30ffff) AM_READ( SMH_RAM				)	// RAM

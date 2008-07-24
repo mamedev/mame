@@ -14,23 +14,23 @@
 
 ****************************************************************************
 
-	Thanks to Frans van Egmond for locating and dumping Tylz
+    Thanks to Frans van Egmond for locating and dumping Tylz
 
-	Notes:
+    Notes:
 
-	There was a bug in the hardware of the GG1 and GG2 boards, which is not
-	emulated. The bug seems to have disappeared with the later revision of 
-	the board, e.g the board used by 3Stooges and Mach3 don't seem to have 
-	it). The bug was affecting the first character column (on horizontal 
-	games): screen memory could be used, but whatever was stored in this 
-	column, always the same character was displayed.
+    There was a bug in the hardware of the GG1 and GG2 boards, which is not
+    emulated. The bug seems to have disappeared with the later revision of
+    the board, e.g the board used by 3Stooges and Mach3 don't seem to have
+    it). The bug was affecting the first character column (on horizontal
+    games): screen memory could be used, but whatever was stored in this
+    column, always the same character was displayed.
 
-	This led to two consequences:
-	- the image on the monitor had to be stretched so that the column was 
-	  not visible
-	- game designers were not using the first column. In fact, when the 
-	  first column was ejected from the screen, the last one was usually 
-	  out too, so it wasn't used either...
+    This led to two consequences:
+    - the image on the monitor had to be stretched so that the column was
+      not visible
+    - game designers were not using the first column. In fact, when the
+      first column was ejected from the screen, the last one was usually
+      out too, so it wasn't used either...
 
 ****************************************************************************
 
@@ -217,12 +217,12 @@ static MACHINE_RESET( gottlieb )
  *  Input ports
  *
  *************************************/
- 
+
 static CUSTOM_INPUT( analog_delta_r )
 {
 	const char *string = param;
 	int which = string[0] - '0';
-	
+
 	return input_port_read(field->port->machine, &string[1]) - track[which];
 }
 
@@ -302,7 +302,7 @@ static READ8_HANDLER( gottlieb_laserdisc_status_r )
 			return ((tmp / 10) << 4) | (tmp % 10);
 
 		case 2:
-			if (lasermpx == 1) 
+			if (lasermpx == 1)
 			{
 				/* bits 0-2 frame number MSN */
 				/* bit 3 audio buffer ready */
@@ -316,7 +316,7 @@ static READ8_HANDLER( gottlieb_laserdisc_status_r )
 			{	/* read audio buffer */
 				if (skipfirstbyte) audioptr++;
 				skipfirstbyte = 0;
-				if (audiobuffer_region) 
+				if (audiobuffer_region)
 				{
 					logerror("audio bufread: %02x\n",audiobuffer_region[audioptr]);
 					return audiobuffer_region[audioptr++];
@@ -455,7 +455,7 @@ static ADDRESS_MAP_START( reactor_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0f00) AM_WRITEONLY AM_BASE(&spriteram)							/* FRSEL */
 	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM_WRITE(gottlieb_videoram_w) AM_BASE(&videoram)		/* BRSEL */
 	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_BASE(&gottlieb_charram)				/* BOJRSEL1 */
-/*	AM_RANGE(0x5000, 0x5fff) AM_WRITE() */																/* BOJRSEL2 */
+/*  AM_RANGE(0x5000, 0x5fff) AM_WRITE() */																/* BOJRSEL2 */
 	AM_RANGE(0x6000, 0x601f) AM_MIRROR(0x0fe0) AM_WRITE(gottlieb_paletteram_w) AM_BASE(&paletteram)		/* COLSEL */
 	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0ff8) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff8) AM_WRITE(gottlieb_analog_reset_w)						/* A1J2 interface */
@@ -483,7 +483,7 @@ static ADDRESS_MAP_START( gottlieb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5801, 0x5801) AM_MIRROR(0x07f8) AM_WRITE(gottlieb_analog_reset_w)						/* A1J2 interface */
 	AM_RANGE(0x5802, 0x5802) AM_MIRROR(0x07f8) AM_WRITE(gottlieb_sh_w)									/* OP20-27 */
 	AM_RANGE(0x5803, 0x5803) AM_MIRROR(0x07f8) AM_WRITE(gottlieb_video_outputs_w)						/* OP30-37 */
-/*	AM_RANGE(0x5804, 0x5804) AM_MIRROR(0x07f8) AM_WRITE()*/												/* OP40-47 */
+/*  AM_RANGE(0x5804, 0x5804) AM_MIRROR(0x07f8) AM_WRITE()*/												/* OP40-47 */
 	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x07f8) AM_READ_PORT("DSW")
 	AM_RANGE(0x5801, 0x5801) AM_MIRROR(0x07f8) AM_READ_PORT("IN1")										/* IP10-17 */
 	AM_RANGE(0x5802, 0x5802) AM_MIRROR(0x07f8) AM_READ_PORT("IN2")										/* trackball H */
@@ -587,7 +587,7 @@ static INPUT_PORTS_START( reactor )
 	PORT_BIT ( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT ( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT ( 0xc0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	
+
 	PORT_START_TAG("SB1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
@@ -648,7 +648,7 @@ static INPUT_PORTS_START( mplanets )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	
+
 	PORT_START_TAG("SB1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
@@ -725,7 +725,7 @@ static INPUT_PORTS_START( tylz )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START_TAG("SB1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
@@ -792,7 +792,7 @@ static INPUT_PORTS_START( qbert )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	
+
 	PORT_START_TAG("SB1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
@@ -863,7 +863,7 @@ static INPUT_PORTS_START( qbertqub )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	
+
 	PORT_START_TAG("SB1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
@@ -927,7 +927,7 @@ static INPUT_PORTS_START( krull )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
-	
+
 	PORT_START_TAG("SB1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
@@ -1177,7 +1177,7 @@ PORT_DIPSETTING(    0xc2, DEF_STR( Free_Play ) ) */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Bunt") PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	
+
 	PORT_START_TAG("SB1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
@@ -1295,7 +1295,7 @@ static INPUT_PORTS_START( insector )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	
+
 	PORT_START_TAG("SB1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
@@ -1414,7 +1414,7 @@ static INPUT_PORTS_START( wizwarz )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
-	
+
 	PORT_START_TAG("TRACKY")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
 INPUT_PORTS_END
@@ -1467,7 +1467,7 @@ static INPUT_PORTS_START( argusg )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	
+
 	PORT_START_TAG("SB1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
@@ -1538,7 +1538,7 @@ static INPUT_PORTS_START( kngtmare )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
-	
+
 	PORT_START_TAG("SB1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
@@ -1743,7 +1743,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gottlieb_soundrev1 )
 	MDRV_SOUND_START( gottlieb1 )
-	
+
 	MDRV_RIOT6532_ADD("riot", SOUND1_CLOCK/4, gottlieb_riot6532_intf)
 
 	/* audio CPU */
@@ -1766,7 +1766,7 @@ static MACHINE_DRIVER_START( gottlieb_soundrev2 )
 
 	/* sound hardware */
 	MDRV_SOUND_START( gottlieb2 )
-	
+
 	MDRV_SOUND_ADD("dac1", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 

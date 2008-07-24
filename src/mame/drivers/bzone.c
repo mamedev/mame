@@ -191,12 +191,12 @@
     Left and Center same, right different denomination  | On |Off |    |    |
     Right and Center same, left differnnt denomination  |Off | On |    |    |
     All different denominations                         |Off |Off |    |    |
-														---------------------
+                                                        ---------------------
 
 
-	2008-07
-	Dip locations added from the notes above (factory settings for bzone
-	from the manual).
+    2008-07
+    Dip locations added from the notes above (factory settings for bzone
+    from the manual).
 
 ***************************************************************************/
 

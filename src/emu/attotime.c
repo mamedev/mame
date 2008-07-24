@@ -54,7 +54,7 @@ attoseconds_t attotime_to_attoseconds(attotime _time)
 
 
 /*-------------------------------------------------
-    attotime_to_ticks - convert an attotime to 
+    attotime_to_ticks - convert an attotime to
     clock ticks at the given frequency
 -------------------------------------------------*/
 
@@ -66,7 +66,7 @@ INT64 attotime_to_ticks(attotime _time, INT32 frequency)
 
 
 /*-------------------------------------------------
-    ticks_to_attotime - convert clock ticks at 
+    ticks_to_attotime - convert clock ticks at
     the given frequency to an attotime
 -------------------------------------------------*/
 

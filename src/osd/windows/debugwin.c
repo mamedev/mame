@@ -344,7 +344,7 @@ int debugwin_seq_pressed(void)
 		{
 			int vkey = wininput_vkey_for_mame_code(code);
 			int pressed = (vkey != 0 && (GetAsyncKeyState(vkey) & 0x8000) != 0);
-			
+
 			// if this is the first in the sequence, result is set equal
 			if (first)
 				result = pressed ^ invert;

@@ -876,7 +876,7 @@ static INPUT_PORTS_START( btlkroad )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_VBLANK  )	// vblank	ACTIVE_HIGH fixes slowdowns, but is it right?
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_VBLANK  )	// vblank   ACTIVE_HIGH fixes slowdowns, but is it right?
 
 	// This DSW is used for debugging the game
 	PORT_DIPNAME( 0x0100, 0x0100, "Unknown 3-0" )	// tested!

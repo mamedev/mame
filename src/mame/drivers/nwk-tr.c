@@ -1174,7 +1174,7 @@ static DRIVER_INIT(thrilld)
 {
 	int i;
 	UINT16 checksum;
-		
+
 	backup_ram = auto_malloc(0x2000);
 	memset(backup_ram, 0, 0x2000);
 

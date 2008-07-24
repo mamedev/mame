@@ -585,7 +585,7 @@ void debug_cpu_instruction_hook(running_machine *machine, offs_t curpc)
 	if (global.execution_state == EXECUTION_STATE_STOPPED)
 	{
 		int firststop = TRUE;
-		
+
 		/* reset any transient state */
 		reset_transient_flags(machine);
 

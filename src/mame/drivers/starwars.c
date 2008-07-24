@@ -385,7 +385,7 @@ static MACHINE_DRIVER_START( starwars )
 
 	MDRV_MACHINE_RESET(starwars)
 	MDRV_NVRAM_HANDLER(generic_0fill)
-	
+
 	MDRV_RIOT6532_ADD("riot", MASTER_CLOCK / 8, starwars_riot6532_intf)
 
 	/* video hardware */

@@ -56,7 +56,7 @@ WRITE8_HANDLER( gottlieb_paletteram_w )
 	int r, g, b, val;
 
 	paletteram[offset] = data;
-	
+
 	val = paletteram[offset | 1];
 	r = combine_4_weights(weights, (val >> 0) & 1, (val >> 1) & 1, (val >> 2) & 1, (val >> 3) & 1);
 
@@ -136,7 +136,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( gottlieb )
 {
 	static const int resistances[4] = { 2000, 1000, 470, 240 };
-	
+
 	/* compute palette information */
 	/* note that there really are pullup/pulldown resistors, but this situation is complicated */
 	/* by the use of transistors, so we ignore that and just use the realtive resistor weights */

@@ -29,10 +29,10 @@
 
     If you have any questions about how this driver works, don't hesitate to
     ask.  - Mike Balfour (mab22@po.cwru.edu)
-	
-	
-	2008-07
-	Dip locations verified with manual.
+
+
+    2008-07
+    Dip locations verified with manual.
 
 ***************************************************************************/
 

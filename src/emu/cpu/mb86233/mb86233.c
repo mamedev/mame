@@ -157,7 +157,7 @@ static void mb86233_reset(void)
 
 #define ZERO_FLAG	(1 << 0)
 #define SIGN_FLAG	(1 << 1)
-#define EXTERNAL_FLAG	(1 << 2)		//This seems to be a flag coming from some external circuit¿?
+#define EXTERNAL_FLAG	(1 << 2)		//This seems to be a flag coming from some external circuit??
 
 static void FLAGSF( float v )
 {

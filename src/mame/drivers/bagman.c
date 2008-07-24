@@ -56,7 +56,7 @@ I/O C  ;AY-3-8910 Data Read Reg.
 
 DIP locations verified for:
     - bagman (manual)
-	- squaitsa (manual)
+    - squaitsa (manual)
 
 ***************************************************************************/
 

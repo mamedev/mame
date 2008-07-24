@@ -709,7 +709,7 @@ int wininput_vkey_for_mame_code(input_code code)
 	{
 		input_item_id id = INPUT_CODE_ITEMID(code);
 		int tablenum;
-	
+
 		// scan the table for a match
 		for (tablenum = 0; tablenum < ARRAY_LENGTH(win_key_trans_table); tablenum++)
 			if (win_key_trans_table[tablenum][MAME_KEY] == id)

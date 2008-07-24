@@ -191,7 +191,7 @@ static MACHINE_DRIVER_START( tourtabl )
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_MACHINE_START(tourtabl)
-	
+
 	MDRV_RIOT6532_ADD("riot1", MASTER_CLOCK / 3, r6532_interface_0)
 	MDRV_RIOT6532_ADD("riot2", MASTER_CLOCK / 3, r6532_interface_1)
 

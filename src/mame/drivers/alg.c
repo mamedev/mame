@@ -471,7 +471,7 @@ static MACHINE_DRIVER_START( alg_r1 )
 	MDRV_MACHINE_START(alg)
 	MDRV_MACHINE_RESET(alg)
 	MDRV_NVRAM_HANDLER(generic_0fill)
-	
+
 	MDRV_LASERDISC_ADD("laserdisc", SONY_LDP1450, 0, "laserdisc")
 
     /* video hardware */

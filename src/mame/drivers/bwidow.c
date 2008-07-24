@@ -211,8 +211,8 @@
 
     **In operator Information Display, this option displays same as no bonus.
 
-	2008-07
-	Dip locations added from the notes above
+    2008-07
+    Dip locations added from the notes above
 
 ***************************************************************************/
 

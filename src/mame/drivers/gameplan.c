@@ -202,7 +202,7 @@ static const riot6532_interface r6532_interface =
 static MACHINE_START( gameplan )
 {
 	gameplan_state *state = machine->driver_data;
-	
+
 	state->riot = device_list_find_by_tag(machine->config->devicelist, RIOT6532, "riot");
 
 	via_config(1, &via_1_interface);

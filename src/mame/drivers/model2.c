@@ -193,7 +193,7 @@ static UINT32 copro_fifoout_pop(void)
 
 	copro_fifoout_num--;
 
-//	logerror("COPRO FIFOOUT POP %08X, %f, %d\n", r, *(float*)&r,copro_fifoout_num);
+//  logerror("COPRO FIFOOUT POP %08X, %f, %d\n", r, *(float*)&r,copro_fifoout_num);
 
 	// set SHARC flag 1: 0 if space available, 1 if FIFO full
 	if (dsp_type == DSP_TYPE_SHARC)
@@ -224,7 +224,7 @@ static void copro_fifoout_push(UINT32 data)
 		return;
 	}
 
-//	logerror("COPRO FIFOOUT PUSH %08X, %f, %d\n", data, *(float*)&data,copro_fifoout_num);
+//  logerror("COPRO FIFOOUT PUSH %08X, %f, %d\n", data, *(float*)&data,copro_fifoout_num);
 
 	copro_fifoout_data[copro_fifoout_wpos++] = data;
 	if (copro_fifoout_wpos == COPRO_FIFOOUT_SIZE)
@@ -862,7 +862,7 @@ static READ32_HANDLER(hotd_unk_r)
 
 /*static READ32_HANDLER(sonic_unk_r)
 {
-	return 0x001a0000;
+    return 0x001a0000;
 }
 */
 static READ32_HANDLER(daytona_unk_r)

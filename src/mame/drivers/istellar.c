@@ -342,7 +342,7 @@ static MACHINE_DRIVER_START( istellar )
 	MDRV_CPU_ADD("sub", Z80, GUESSED_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(z80_2_mem,0)
 	MDRV_CPU_IO_MAP(z80_2_io,0)
-	
+
 	MDRV_MACHINE_START(istellar)
 
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, 0, "laserdisc")

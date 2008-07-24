@@ -7,7 +7,7 @@ Similar to S.P.Y.
 driver by Nicola Salmoria
 
 2008-07
-Dip locations and factory settings verified with US manual. 
+Dip locations and factory settings verified with US manual.
 To be verified for Main Stadium
 
 ***************************************************************************/

@@ -115,7 +115,7 @@ static int dma8257_do_operation(running_machine *machine, dma8257_t *dma8257, in
 			data = 0;
 			logerror("8257: No channel read function for channel %d defined.\n",channel);
 		}
-		
+
 		if (dma8257->intf->memory_write!=NULL) {
 			dma8257->intf->memory_write(machine, dma8257->address[channel], data);
 		} else {
@@ -172,7 +172,7 @@ static TIMER_CALLBACK( dma8257_timerproc )
 	{
 		dma8257->drq    &= ~(0x01 << channel);
 		dma8257_update_status(machine, dma8257);
-  		if (!(DMA_MODE_AUTOLOAD(dma8257->mode) && channel==2)) {		
+  		if (!(DMA_MODE_AUTOLOAD(dma8257->mode) && channel==2)) {
 			if (DMA_MODE_TCSTOP(dma8257->mode)) {
 				dma8257->mode &= ~(0x01 << channel);
 			}

@@ -145,8 +145,8 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd603, 0xd603) AM_READ_PORT("IN0")	/* player inputs */
 	AM_RANGE(0xd608, 0xd608) AM_READ_PORT("WHEEL")
 	AM_RANGE(0xd609, 0xd609) AM_READ_PORT("IN1")	/* coin + accelerator */
-//	AM_RANGE(0xd60a, 0xd60a) // other inputs, not used? 
-//	AM_RANGE(0xd60b, 0xd60b) // other inputs, not used?
+//  AM_RANGE(0xd60a, 0xd60a) // other inputs, not used?
+//  AM_RANGE(0xd60b, 0xd60b) // other inputs, not used?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -157,18 +157,18 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(buggychl_sprite_lookup_w)
 	AM_RANGE(0xa000, 0xbfff) AM_WRITE(buggychl_chargen_w) AM_BASE(&buggychl_character_ram)
 	AM_RANGE(0xc800, 0xcfff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-//	AM_RANGE(0xd000, 0xd000) // horizon
+//  AM_RANGE(0xd000, 0xd000) // horizon
 	AM_RANGE(0xd100, 0xd100) AM_WRITE(buggychl_ctrl_w)
 	AM_RANGE(0xd200, 0xd200) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xd300, 0xd300) AM_WRITE(watchdog_reset_w)
-//	AM_RANGE(0xd301, 0xd301)
-//	AM_RANGE(0xd302, 0xd302) // reset mcu
+//  AM_RANGE(0xd301, 0xd301)
+//  AM_RANGE(0xd302, 0xd302) // reset mcu
 	AM_RANGE(0xd303, 0xd303) AM_WRITE(buggychl_sprite_lookup_bank_w)
-//	AM_RANGE(0xd304, 0xd307) // sccon 1-4
+//  AM_RANGE(0xd304, 0xd307) // sccon 1-4
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(buggychl_mcu_w)
 	AM_RANGE(0xd500, 0xd57f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd610, 0xd610) AM_WRITE(sound_command_w)
-//	AM_RANGE(0xd613, 0xd613) // reset sound cpu & sound chips
+//  AM_RANGE(0xd613, 0xd613) // reset sound cpu & sound chips
 	AM_RANGE(0xd618, 0xd618) AM_WRITE(SMH_NOP)	/* accelerator clear */
 	AM_RANGE(0xd700, 0xd7ff) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_be_w) AM_BASE(&paletteram)
 	AM_RANGE(0xd840, 0xd85f) AM_WRITE(SMH_RAM) AM_BASE(&buggychl_scrollv)
@@ -181,7 +181,7 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x47ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)
-//  AM_RANGE(0x5001, 0x5001) AM_READ(SMH_RAM)	/* is command pending? */
+//  AM_RANGE(0x5001, 0x5001) AM_READ(SMH_RAM)   /* is command pending? */
 	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_ROM)	/* space for diagnostics ROM */
 ADDRESS_MAP_END
 
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4810, 0x481d) AM_WRITE(MSM5232_0_w)
 	AM_RANGE(0x4820, 0x4820) AM_WRITE(SMH_RAM)	/* VOL/BAL   for the 7630 on the MSM5232 output */
 	AM_RANGE(0x4830, 0x4830) AM_WRITE(SMH_RAM)	/* TRBL/BASS for the 7630 on the MSM5232 output  */
-//  AM_RANGE(0x5000, 0x5000) AM_WRITE(SMH_RAM)	/* to main cpu */
+//  AM_RANGE(0x5000, 0x5000) AM_WRITE(SMH_RAM)  /* to main cpu */
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0x5003, 0x5003) AM_WRITE(sound_enable_w)

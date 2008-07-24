@@ -146,13 +146,13 @@ offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 		sprintf(buffer, "Parallel x memory data write and register data move unimplemented.");
 		size = 1;
 	}
-	
+
 	/* Tcc is a unique critter */
 	if (BITS(op,0xfc00) == 0x4)
 	{
 		size = assemble_TCC_opcode(buffer, op, op2, pc);
 	}
-	
+
 	/* Operations that do not allow a parallel move */
 	if (BITS(op,0xff00) == 0x14)
 	{
@@ -174,7 +174,7 @@ offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 	{
 		size = assemble_misc_opcode(buffer, op, op2, pc);
 	}
-	
+
 	if (BITS(op,0xf000) == 0x0)
 	{
 		size = assemble_unique_opcode(buffer, op, op2, pc);
@@ -200,19 +200,19 @@ static unsigned assemble_x_memory_data_move_ALU_opcode(char* buffer, const UINT1
 	char arg_str[128] = "";
 	char opcode_str[128] = "";
 	char parallel_move_str[128] = "";
-	
+
 	/* Init */
 	sprintf(buffer, " ");
 
 	/* First, decode the Data ALU opcode */
 	decode_data_ALU_opcode(BITS(op,0x00ff), opcode_str, arg_str);
-	
+
 	/* Next, decode the X Memory Data Move */
 	decode_x_memory_data_move(BITS(op,0xff00), parallel_move_str);
-	
+
 	/* Finally, assemble the full opcode */
 	sprintf(buffer, "%s    %s    %s", opcode_str, arg_str, parallel_move_str);
-	
+
 	return opSize;
 }
 
@@ -221,22 +221,22 @@ static unsigned assemble_dual_x_memory_data_read_ALU_opcode(char* buffer, const 
 {
 	/* All operations are of length 1 */
 	unsigned opSize = 1;
-	
+
 	/* Recovered strings */
 	char arg_str[128] = "";
 	char opcode_str[128] = "";
 	char parallel_move_str[128] = "";
 	char parallel_move_str2[128] = "";
-	
+
 	/* Init */
 	sprintf(buffer, " ");
 
 	/* First, decode the Data ALU opcode */
 	decode_data_ALU_opcode_dual_move(BITS(op,0x00ff), opcode_str, arg_str);
-	
+
 	/* Next, decode the Dual X Memory Data Read */
 	decode_dual_x_memory_data_read(op, parallel_move_str, parallel_move_str2);
-	
+
 	/* Finally, assemble the full opcode */
 	sprintf(buffer, "%s    %s    %s %s", opcode_str, arg_str, parallel_move_str, parallel_move_str2);
 
@@ -247,17 +247,17 @@ static unsigned assemble_TCC_opcode(char* buffer, const UINT16 op, const UINT16 
 {
 	/* TCC is of length 1 */
 	unsigned opSize = 1;
-	
+
 	/* Recovered strings */
 	char arg_str[128] = "";
 	char opcode_str[128] = "";
-	
+
 	/* Init */
 	sprintf(buffer, " ");
 
 	/* Simply decode the opcode and its arguments */
 	opSize = decode_TCC_opcode(op, opcode_str, arg_str);
-	
+
 	/* Finally, assemble the full opcode */
 	sprintf(buffer, "%s    %s", opcode_str, arg_str);
 
@@ -268,17 +268,17 @@ static unsigned assemble_bitfield_opcode(char* buffer, const UINT16 op, const UI
 {
 	/* All bitfield ops are length 2 */
 	unsigned opSize = 2;
-	
+
 	/* Recovered strings */
 	char arg_str[128] = "";
 	char opcode_str[128] = "";
-	
+
 	/* Init */
 	sprintf(buffer, " ");
 
 	/* Simply decode the opcode and its arguments */
 	opSize = decode_bitfield_opcode(op, op2, opcode_str, arg_str);
-	
+
 	/* Finally, assemble the full opcode */
 	sprintf(buffer, "%s    %s", opcode_str, arg_str);
 
@@ -302,7 +302,7 @@ static unsigned assemble_no_parallel_move_opcode(char* buffer, const UINT16 op, 
 
 	/* Finally, assemble the full opcode */
 	sprintf(buffer, "%s    %s", opcode_str, arg_str);
-	
+
 	return opSize;
 }
 
@@ -344,7 +344,7 @@ static unsigned assemble_movec_opcodes(char* buffer, const UINT16 op, const UINT
 
 	/* Finally, assemble the full opcode */
 	sprintf(buffer, "%s    %s", opcode_str, arg_str);
-	
+
 	return opSize;
 }
 
@@ -365,7 +365,7 @@ static unsigned assemble_misc_opcode(char* buffer, const UINT16 op, const UINT16
 
 	/* Finally, assemble the full opcode */
 	sprintf(buffer, "%s    %s", opcode_str, arg_str);
-	
+
 	return opSize;
 }
 
@@ -387,7 +387,7 @@ static unsigned assemble_unique_opcode(char* buffer, const UINT16 op, const UINT
 
 	/* Finally, assemble the full opcode */
 	sprintf(buffer, "%s    %s", opcode_str, arg_str);
-	
+
 	return opSize;
 }
 
@@ -519,7 +519,7 @@ static void decode_data_ALU_opcode(const UINT16 op_byte, char* opcode_str, char*
 				{
 					/* SUBL - 1mRR HHHW 0100 F001 */
 					sprintf(opcode_str, "subl");
-					
+
 					/* Only one option for the F table */
 					if (!BITS(op_byte,0x08))
 						sprintf(arg_str, "B,A");
@@ -652,7 +652,7 @@ static void decode_data_ALU_opcode(const UINT16 op_byte, char* opcode_str, char*
 				sprintf(opcode_str, "mpyr");
 				sprintf(arg_str, "(%s)%s,%s,%s", SIGN, S2, S1, D);
 				break;
-			
+
             /* MAC - 1mRR HHHH 1k10 FQQQ */
             case 0x2:
 				sprintf(opcode_str, "mac");
@@ -660,7 +660,7 @@ static void decode_data_ALU_opcode(const UINT16 op_byte, char* opcode_str, char*
 				break;
 
             /* MACR - 1mRR HHHH 1k11 FQQQ */
-            case 0x3: 
+            case 0x3:
 				sprintf(opcode_str, "macr");
 	            /* TODO: It's a little odd that macr is S1,S2 while everyone else is S2,S1.  Check! */
 				sprintf(arg_str, "(%s)%s,%s,%s", SIGN, S1, S2, D);
@@ -734,7 +734,7 @@ static unsigned decode_TCC_opcode(const UINT16 op, char* opcode_str, char* arg_s
 	char M[32];
 	char D[32];
 	char S[32];
-	
+
 	decode_cccc_table(BITS(op,0x03c0), M);
 	sprintf(opcode_str, "t.%s", M);
 
@@ -743,12 +743,12 @@ static unsigned decode_TCC_opcode(const UINT16 op, char* opcode_str, char* arg_s
 	sprintf(arg_str, "%s,%s  R0,R%d", S, D, Rnum);
 
 	/* TODO: Investigate
-	if (S1[0] == D[0] && D[0] == 'A')
-		sprintf(buffer, "t.%s  %s,%s", M, S1, D);
-	else
-		sprintf(buffer, "t.%s  %s,%s  R0,R%d", M, S1, D, Rnum);
-	*/
-	
+    if (S1[0] == D[0] && D[0] == 'A')
+        sprintf(buffer, "t.%s  %s,%s", M, S1, D);
+    else
+        sprintf(buffer, "t.%s  %s,%s  R0,R%d", M, S1, D, Rnum);
+    */
+
 	return 1;
 }
 
@@ -803,13 +803,13 @@ static unsigned decode_bitfield_opcode(const UINT16 op, const UINT16 op2, char* 
 static unsigned decode_no_parallel_move_opcode(const UINT16 op, const UINT16 op2, const UINT16 pc, char* opcode_str, char* arg_str)
 {
 	unsigned retSize = 1;
-	
+
 	int Rnum = -1;
 	char A[32];
 	char D[32];
 	char S1[32];
 	char S2[32];
-	
+
 	switch(BITS(op,0x0074))
 	{
 		case 0x0:
@@ -1005,7 +1005,7 @@ static unsigned decode_immediate_opcode(const UINT16 op, const UINT16 pc, char* 
 			sprintf(arg_str, "%s", args);
 		}
 	}
-	
+
 	return retSize;
 }
 
@@ -1017,7 +1017,7 @@ static unsigned decode_movec_opcodes(const UINT16 op, const UINT16 op2, const UI
 	char ea[32];
 	char args[64];
 	int Rnum = -1;
-	
+
 	if (BITS(op,0x0010) == 0x0)
 	{
 		/* MOVE(C) - 0011 1WDD DDD0 MMRR */
@@ -1076,7 +1076,7 @@ static unsigned decode_movec_opcodes(const UINT16 op, const UINT16 op2, const UI
 static unsigned decode_misc_opcode(const UINT16 op, const UINT16 pc, char* opcode_str, char* arg_str)
 {
 	unsigned retSize = 1;
-	
+
 	char M[32];
 	char S1[32];
 	char SD[32];
@@ -1085,7 +1085,7 @@ static unsigned decode_misc_opcode(const UINT16 op, const UINT16 pc, char* opcod
 	char args[64];
 	int Rnum = -1;
 	int relativeInt = 666;
-	
+
 	switch(BITS(op,0x0c00))
 	{
 		/* MOVE(I) - 0010 00DD BBBB BBBB */
@@ -1122,7 +1122,7 @@ static unsigned decode_misc_opcode(const UINT16 op, const UINT16 pc, char* opcod
 			sprintf(arg_str, "%04x (%d)", (int)pc + relativeInt, relativeInt);
 			break;
 	}
-	
+
 	return retSize;
 }
 
@@ -1221,7 +1221,7 @@ static unsigned decode_unique_opcode(const UINT16 op, const UINT16 op2, const UI
 	{
 		int Rnum = -1;
 		char M[32] = "";
-		
+
 		switch(BITS(op,0x00e0))
 		{
 			case 0x2:
@@ -1330,7 +1330,7 @@ static unsigned decode_unique_opcode(const UINT16 op, const UINT16 op2, const UI
 		else if (BITS(op,0x00f0) == 0x5)
 		{
 			char M[32] = "";
-			
+
 			/* REP.cc - 0000 0001 0101 cccc */
 			decode_cccc_table(BITS(op,0x000f), M);
 			sprintf(opcode_str, "rep.%s", M);
@@ -1353,7 +1353,7 @@ static unsigned decode_unique_opcode(const UINT16 op, const UINT16 op2, const UI
 	else if (BITS(op,0x0e00) == 0x1)
 	{
 		sprintf(opcode_str, "move(m)");
-		
+
 		if (BITS(op,0x0020) == 0x0)
 		{
 			/* MOVE(M) - 0000 001W RR0M MHHH */
@@ -2166,7 +2166,7 @@ static INT8 get_6_bit_relative_value(UINT16 bits)
 	UINT16 fullAddy = bits;
 	if (fullAddy & 0x0020)
 		fullAddy |= 0xffc0;
-		
+
 	return (INT8)fullAddy;
 }
 

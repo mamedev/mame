@@ -189,7 +189,7 @@ TODO:
 ----
 
 2008-07
-Dip location verified from manual for: cclimber, guzzler, swimmer	
+Dip location verified from manual for: cclimber, guzzler, swimmer
 
 ***************************************************************************/
 
@@ -296,7 +296,7 @@ static ADDRESS_MAP_START( cannonb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0x8800, 0x88ff) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&cclimber_bigsprite_videoram) /* must not return what's written (game will reset after coin insert if it returns 0xff)*/
-//	AM_RANGE(0x8900, 0x8bff) AM_WRITE(SMH_RAM)  /* not used, but initialized */
+//  AM_RANGE(0x8900, 0x8bff) AM_WRITE(SMH_RAM)  /* not used, but initialized */
 	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&cclimber_videoram)
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
@@ -350,9 +350,9 @@ static ADDRESS_MAP_START( yamato_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(cclimber_colorram_w) AM_BASE(&cclimber_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE(SMH_RAM) AM_BASE(&cclimber_flip_screen)
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2") 
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") 
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("COIN") 
+	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2")
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
+	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("COIN")
 	AM_RANGE(0xba00, 0xba00) AM_READ_PORT("START")	/* maybe a mirror of b800 */
 ADDRESS_MAP_END
 
@@ -373,7 +373,7 @@ static ADDRESS_MAP_START( toprollr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa005, 0xa006) AM_WRITE(toprollr_rombank_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2") AM_WRITE(cclimber_sample_rate_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(cclimber_sample_volume_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("SYSTEM") 
+	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

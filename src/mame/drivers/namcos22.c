@@ -4865,7 +4865,7 @@ static INPUT_PORTS_START( ridgera )
 INPUT_PORTS_END /* Ridge Racer */
 
 static INPUT_PORTS_START( raveracw )
-	PORT_START_TAG("DSW0")	
+	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x0001, 0x0001, "DIP2-1 (test mode)" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )

@@ -97,7 +97,7 @@ INPUT_PORTS_END
 /* Almost identical, no number of bases selection */
 static INPUT_PORTS_START( sinvader )
 	PORT_INCLUDE( tinvader )
-	
+
 	PORT_MODIFY("1E80")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 

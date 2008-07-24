@@ -6,8 +6,8 @@
 
     Emulation by Bryan McPhail, mish@tendril.co.uk and T.Nogi
 
-	2008-07
-	Dip Locations added based on crazykong BogeyManor.txt
+    2008-07
+    Dip Locations added based on crazykong BogeyManor.txt
 
 ***************************************************************************/
 

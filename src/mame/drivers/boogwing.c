@@ -73,8 +73,8 @@
           It fades in to blue, then fades out to nothing again after a few seconds (Guru).
           (Potentially related to note above about bit 3 in priority word)
 
-	2008-07
-	Dip Locations added according to the manual of the JPN version
+    2008-07
+    Dip Locations added according to the manual of the JPN version
 */
 
 #include "driver.h"

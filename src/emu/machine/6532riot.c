@@ -53,7 +53,7 @@ struct _riot6532_state
 	int				index;
 
 	riot6532_port	port[2];
-	
+
 	UINT8			irqstate;
 	UINT8			irqenable;
 
@@ -144,11 +144,11 @@ INLINE UINT8 get_timer(riot6532_state *riot)
 	/* if idle, return 0 */
 	if (riot->timerstate == TIMER_IDLE)
 		return 0;
-	
+
 	/* if counting, return the number of ticks remaining */
 	else if (riot->timerstate == TIMER_COUNTING)
 		return attotime_to_ticks(timer_timeleft(riot->timer), riot->clock) >> riot->timershift;
-	
+
 	/* if finishing, return the number of ticks without the shift */
 	else
 		return attotime_to_ticks(timer_timeleft(riot->timer), riot->clock);
@@ -177,12 +177,12 @@ static TIMER_CALLBACK( timer_end_callback )
 	{
 		riot->timerstate = TIMER_FINISHING;
 		timer_adjust_oneshot(riot->timer, ticks_to_attotime(256, riot->clock), 0);
-	
+
 		/* signal timer IRQ as well */
 		riot->irqstate |= TIMER_FLAG;
 		update_irqstate(device);
 	}
-	
+
 	/* if we finished finishing, switch to the idle state */
 	else if (riot->timerstate == TIMER_FINISHING)
 	{
@@ -211,27 +211,27 @@ WRITE8_DEVICE_HANDLER( riot6532_w )
 		static const UINT8 timershift[4] = { 0, 3, 6, 10 };
 		attotime curtime = timer_get_time();
 		INT64 target;
-		
+
 		/* A0-A1 contain the timer divisor */
 		riot->timershift = timershift[offset & 3];
-		
+
 		/* A3 contains the timer IRQ enable */
 		if (offset & 8)
 			riot->irqenable |= TIMER_FLAG;
 		else
 			riot->irqenable &= ~TIMER_FLAG;
-		
+
 		/* writes here clear the timer flag */
 		if (riot->timerstate != TIMER_FINISHING || get_timer(riot) != 0xff)
 			riot->irqstate &= ~TIMER_FLAG;
 		update_irqstate(device);
-		
+
 		/* update the timer */
 		riot->timerstate = TIMER_COUNTING;
 		target = attotime_to_ticks(curtime, riot->clock) + 1 + (data << riot->timershift);
 		timer_adjust_oneshot(riot->timer, attotime_sub(ticks_to_attotime(target, riot->clock), curtime), 0);
 	}
-	
+
 	/* if A4 == 0 and A2 == 1, we are writing to the edge detect control */
 	else if ((offset & 0x14) == 0x04)
 	{
@@ -240,21 +240,21 @@ WRITE8_DEVICE_HANDLER( riot6532_w )
 			riot->irqenable |= PA7_FLAG;
 		else
 			riot->irqenable &= ~PA7_FLAG;
-		
+
 		/* A0 specifies the edge detect direction: 0=negative, 1=positive */
 		riot->pa7dir = (offset & 1) << 7;
 	}
-	
+
 	/* if A4 == anything and A2 == 0, we are writing to the I/O section */
 	else
 	{
 		/* A1 selects the port */
 		riot6532_port *port = &riot->port[(offset >> 1) & 1];
-		
+
 		/* if A0 == 1, we are writing to the port's DDR */
 		if (offset & 1)
 			port->ddr = data;
-		
+
 		/* if A0 == 0, we are writing to the port's output */
 		else
 		{
@@ -265,7 +265,7 @@ WRITE8_DEVICE_HANDLER( riot6532_w )
 			else
 				logerror("6532RIOT chip %s: Port %c is being written to but has no handler.  PC: %08X - %02X\n", device->tag, 'A' + (offset & 1), safe_activecpu_get_pc(), data);
 		}
-		
+
 		/* writes to port A need to update the PA7 state */
 		if (port == &riot->port[0])
 			update_pa7_state(device);
@@ -281,7 +281,7 @@ READ8_DEVICE_HANDLER( riot6532_r )
 {
 	riot6532_state *riot = get_safe_token(device);
 	UINT8 val = 0;
-	
+
 	/* if A2 == 1 and A0 == 1, we are reading interrupt flags */
 	if ((offset & 0x05) == 0x05)
 	{
@@ -291,7 +291,7 @@ READ8_DEVICE_HANDLER( riot6532_r )
 		riot->irqstate &= ~PA7_FLAG;
 		update_irqstate(device);
 	}
-	
+
 	/* if A2 == 1 and A0 == 0, we are reading the timer */
 	else if ((offset & 0x05) == 0x04)
 	{
@@ -302,23 +302,23 @@ READ8_DEVICE_HANDLER( riot6532_r )
 			riot->irqenable |= TIMER_FLAG;
 		else
 			riot->irqenable &= ~TIMER_FLAG;
-		
+
 		/* implicitly clears the timer flag */
 		if (riot->timerstate != TIMER_FINISHING || val != 0xff)
 			riot->irqstate &= ~TIMER_FLAG;
 		update_irqstate(device);
 	}
-	
+
 	/* if A2 == 0 and A0 == anything, we are reading from ports */
 	else
 	{
 		/* A1 selects the port */
 		riot6532_port *port = &riot->port[(offset >> 1) & 1];
-		
+
 		/* if A0 == 1, we are reading the port's DDR */
 		if (offset & 1)
 			val = port->ddr;
-		
+
 		/* if A0 == 0, we are reading the port as an input */
 		else
 		{
@@ -439,7 +439,7 @@ static DEVICE_START( riot6532 )
 	riot->intf = device->static_config;
 	riot->index = device_list_index(device->machine->config->devicelist, RIOT6532, device->tag);
 	riot->clock = config->clock;
-	
+
 	/* configure the ports */
 	riot->port[0].in_func = riot->intf->in_a_func;
 	riot->port[0].out_func = riot->intf->out_a_func;
@@ -461,7 +461,7 @@ static DEVICE_START( riot6532 )
 
 	state_save_register_item(unique_tag, 0, riot->irqstate);
 	state_save_register_item(unique_tag, 0, riot->irqenable);
-	
+
 	state_save_register_item(unique_tag, 0, riot->pa7dir);
 	state_save_register_item(unique_tag, 0, riot->pa7prev);
 
@@ -479,7 +479,7 @@ static DEVICE_RESET( riot6532 )
 	riot->port[0].ddr = 0;
 	riot->port[1].out = 0;
 	riot->port[1].ddr = 0;
-	
+
 	/* reset IRQ states */
 	riot->irqenable = 0;
 	riot->irqstate = 0;

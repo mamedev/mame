@@ -13,13 +13,13 @@
 ****************************************************************************
 
     Note:  The original hardware uses the Player 1 and Player 2 Start buttons
-    as the Jump/Shoot buttons. 
-	
+    as the Jump/Shoot buttons.
+
     If you have any questions about how this driver works, don't hesitate to
     ask.  - Mike Balfour (mab22@po.cwru.edu)
-	
-	2008-07
-	Dip locations verified with manual
+
+    2008-07
+    Dip locations verified with manual
 
 ***************************************************************************/
 

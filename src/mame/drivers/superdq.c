@@ -344,7 +344,7 @@ static MACHINE_DRIVER_START( superdq )
 	MDRV_CPU_PROGRAM_MAP(superdq_map,0)
 	MDRV_CPU_IO_MAP(superdq_io,0)
 	MDRV_CPU_VBLANK_INT("main", superdq_vblank)
-	
+
 	MDRV_MACHINE_START(superdq)
 	MDRV_MACHINE_RESET(superdq)
 

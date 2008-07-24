@@ -139,7 +139,7 @@ static INPUT_PORTS_START( xybots )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_INCLUDE( atarijsa_i )		/* audio port */
-	/* Xybots uses a swapped version */	
+	/* Xybots uses a swapped version */
 	PORT_MODIFY("JSAI")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
