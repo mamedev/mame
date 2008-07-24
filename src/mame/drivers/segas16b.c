@@ -1141,7 +1141,7 @@ static READ16_HANDLER( standard_io_r )
 		}
 
 		case 0x2000/2:
-			return input_port_read(machine, (offset & 1) ? "DSW2" : "DSW1");
+			return input_port_read(machine, (offset & 1) ? "DSW1" : "DSW2");
 	}
 	logerror("%06X:standard_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
 	return segaic16_open_bus_r(machine,0,mem_mask);
