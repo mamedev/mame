@@ -298,6 +298,17 @@ DECL_NORETURN void CLIB_DECL fatalerror_exitcode(int exitcode, const char *text,
     INLINE FUNCTIONS
 ***************************************************************************/
 
+/* population count */
+INLINE int popcount(UINT32 val)
+{
+	int count;
+
+	for (count = 0; val != 0; count++)
+		val &= val - 1;
+	return count;
+}
+
+
 /* convert a series of 32 bits into a float */
 INLINE float u2f(UINT32 v)
 {

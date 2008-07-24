@@ -707,8 +707,8 @@ static WRITE16_HANDLER( mcu_command_w )
  */
 static READ16_HANDLER( custom_key_r )
 {
-	static UINT8 keyseq;
 	static UINT16 count;
+	static UINT32 keyval;
 	int old_count;
 
 	old_count = count;
@@ -763,17 +763,18 @@ static READ16_HANDLER( custom_key_r )
 
 	case NAMCO_TINKLPIT:
 		if( offset==7 ) return 0x016f;
-		if( offset==4 ) keyseq = 0;
+		if( offset==4 ) keyval = 0;
 		if( offset==3 )
 		{
-			static const UINT16 data[] =
-			{
-				0x0000,0x2000,0x2100,0x2104,0x0106,0x0007,0x4003,0x6021,
-				0x61a0,0x31a4,0x9186,0x9047,0xc443,0x6471,0x6db0,0x39bc,
-				0x9b8e,0x924f,0xc643,0x6471,0x6db0,0x19bc,0xba8e,0xb34b,
-				0xe745,0x4576,0x0cb7,0x789b,0xdb29,0xc2ec,0x16e2,0xb491
-			};
-			return data[(keyseq++)&0x1f];
+			UINT16 res;
+			res = BITSWAP16(keyval, 22,26,31,23,18,20,16,30,24,21,25,19,17,29,28,27);
+
+			keyval >>= 1;
+printf("popcount(%08X) = %d\n", keyval & 0x58000c00, popcount(keyval & 0x58000c00));
+			if((!keyval) || (popcount(keyval & 0x58000c00) & 1))
+				keyval ^= 0x80000000;
+
+			return res;
 		}
 		break;
 
