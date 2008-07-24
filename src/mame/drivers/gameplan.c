@@ -146,7 +146,7 @@ static WRITE8_HANDLER( audio_trigger_w )
 	UINT8 cmd = (data << 7) | (state->audio_cmd & 0x7f);
 
 	soundlatch_w(machine, 0, cmd);
-	r6532_0_porta_w(machine, 0, cmd);
+	riot6532_porta_in_set(state->riot, cmd, 0xff);
 }
 
 
@@ -167,19 +167,31 @@ static const struct via6522_interface via_2_interface =
  *
  *************************************/
 
-static void r6532_irq(running_machine *machine, int state)
+static void r6532_irq(const device_config *device, int state)
 {
-	cpunum_set_input_line(machine, 1, 0, state);
+	cpunum_set_input_line(device->machine, 1, 0, state);
 }
 
 
-static const struct riot6532_interface r6532_interface =
+static UINT8 r6532_soundlatch_r(const device_config *device, UINT8 olddata)
 {
-	soundlatch_r,		/* port A read handler */
-	0,					/* port B read handler */
-	0,					/* port A write handler */
-	soundlatch2_w,		/* port B write handler */
-	r6532_irq			/* IRQ callback */
+	return soundlatch_r(device->machine, 0);
+}
+
+
+static void r6532_soundlatch2_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+{
+	soundlatch2_w(device->machine, 0, newdata);
+}
+
+
+static const riot6532_interface r6532_interface =
+{
+	r6532_soundlatch_r,		/* port A read handler */
+	NULL,					/* port B read handler */
+	NULL,					/* port A write handler */
+	r6532_soundlatch2_w,	/* port B write handler */
+	r6532_irq				/* IRQ callback */
 };
 
 
@@ -193,13 +205,11 @@ static const struct riot6532_interface r6532_interface =
 static MACHINE_START( gameplan )
 {
 	gameplan_state *state = machine->driver_data;
+	
+	state->riot = device_list_find_by_tag(machine->config->devicelist, RIOT6532, "riot");
 
 	via_config(1, &via_1_interface);
 	via_config(2, &via_2_interface);
-
-	r6532_config(machine, 0, &r6532_interface);
-	r6532_set_clock(0, GAMEPLAN_AUDIO_CPU_CLOCK);
-	r6532_reset(machine, 0);
 
 	/* register for save states */
 	state_save_register_global(state->current_port);
@@ -247,7 +257,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gameplan_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
-	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_READWRITE(r6532_0_r, r6532_0_w)
+	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
 	AM_RANGE(0x2000, 0x9fff) AM_NOP
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_READ(AY8910_read_port_0_r)
@@ -261,7 +271,7 @@ ADDRESS_MAP_END
 /* same as Gameplan, but larger ROM */
 static ADDRESS_MAP_START( leprechn_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
-	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_READWRITE(r6532_0_r, r6532_0_w)
+	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
 	AM_RANGE(0x2000, 0x9fff) AM_NOP
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_READ(AY8910_read_port_0_r)
@@ -1163,7 +1173,7 @@ static const struct AY8910interface ay8910_interface =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	input_port_6_r,
-	input_port_7_r,
+	input_port_7_r
 };
 
 
@@ -1177,6 +1187,8 @@ static MACHINE_DRIVER_START( gameplan )
 
 	MDRV_CPU_ADD("audio", M6502, GAMEPLAN_AUDIO_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(gameplan_audio_map,0)
+
+	MDRV_RIOT6532_ADD("riot", GAMEPLAN_AUDIO_CPU_CLOCK, r6532_interface)
 
 	MDRV_MACHINE_START(gameplan)
 	MDRV_MACHINE_RESET(gameplan)

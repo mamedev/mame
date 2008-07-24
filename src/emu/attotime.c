@@ -53,6 +53,32 @@ attoseconds_t attotime_to_attoseconds(attotime _time)
 }
 
 
+/*-------------------------------------------------
+    attotime_to_ticks - convert an attotime to 
+    clock ticks at the given frequency
+-------------------------------------------------*/
+
+INT64 attotime_to_ticks(attotime _time, INT32 frequency)
+{
+	INT32 fracticks = attotime_mul(attotime_make(0, _time.attoseconds), frequency).seconds;
+	return (INT64)_time.seconds * (INT64)frequency + fracticks;
+}
+
+
+/*-------------------------------------------------
+    ticks_to_attotime - convert clock ticks at 
+    the given frequency to an attotime
+-------------------------------------------------*/
+
+attotime ticks_to_attotime(INT64 ticks, INT32 frequency)
+{
+	attotime result;
+	result.seconds = ticks / frequency;
+	result.attoseconds = HZ_TO_ATTOSECONDS(frequency) * (ticks - (INT64)result.seconds * (INT64)frequency);
+	return result;
+}
+
+
 
 /***************************************************************************
     CORE MATH FUNCTIONS

@@ -137,6 +137,12 @@ extern const attotime 		attotime_never;
 /* convert an attotime to attoseconds, clamping to maximum positive/negative values */
 attoseconds_t attotime_to_attoseconds(attotime _time);
 
+/* convert an attotime to clock ticks at the given frequency */
+INT64 attotime_to_ticks(attotime _time, INT32 frequency);
+
+/* convert clock ticks at the given frequency to an attotime */
+attotime ticks_to_attotime(INT64 ticks, INT32 frequency);
+
 
 /* ----- core math functions ----- */
 

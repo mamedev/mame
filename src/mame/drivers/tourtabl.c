@@ -16,39 +16,14 @@
 #define MASTER_CLOCK	3579575
 
 
-static UINT8* r6532_0_ram;
-static UINT8* r6532_1_ram;
-
-
-
-static WRITE8_HANDLER( tourtabl_led_w )
+static void tourtabl_led_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
-	set_led_status(0, data & 0x40); /* start 1 */
-	set_led_status(1, data & 0x20); /* start 2 */
-	set_led_status(2, data & 0x10); /* start 4 */
-	set_led_status(3, data & 0x80); /* select game */
+	set_led_status(0, newdata & 0x40); /* start 1 */
+	set_led_status(1, newdata & 0x20); /* start 2 */
+	set_led_status(2, newdata & 0x10); /* start 4 */
+	set_led_status(3, newdata & 0x80); /* select game */
 
-	coin_lockout_global_w(!(data & 0x80));
-}
-
-
-static WRITE8_HANDLER( r6532_0_ram_w )
-{
-	r6532_0_ram[offset] = data;
-}
-static WRITE8_HANDLER( r6532_1_ram_w )
-{
-	r6532_1_ram[offset] = data;
-}
-
-
-static READ8_HANDLER( r6532_0_ram_r )
-{
-	return r6532_0_ram[offset];
-}
-static READ8_HANDLER( r6532_1_ram_r )
-{
-	return r6532_1_ram[offset];
+	coin_lockout_global_w(!(newdata & 0x80));
 }
 
 
@@ -65,46 +40,56 @@ static READ8_HANDLER( tourtabl_get_databus_contents )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x007F) AM_READ(tia_r)
-	AM_RANGE(0x0080, 0x00FF) AM_READ(r6532_0_ram_r)
-	AM_RANGE(0x0100, 0x017F) AM_READ(tia_r)
-	AM_RANGE(0x0180, 0x01FF) AM_READ(r6532_0_ram_r)
-	AM_RANGE(0x0280, 0x029F) AM_READ(r6532_0_r)
-	AM_RANGE(0x0400, 0x047F) AM_READ(r6532_1_ram_r)
-	AM_RANGE(0x0500, 0x051F) AM_READ(r6532_1_r)
-	AM_RANGE(0x0800, 0x1FFF) AM_READ(SMH_ROM)
-	AM_RANGE(0xE800, 0xFFFF) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_READWRITE(tia_r, tia_w)
+	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM
+	AM_RANGE(0x0280, 0x029f) AM_DEVREADWRITE(RIOT6532, "riot1", riot6532_r, riot6532_w)
+	AM_RANGE(0x0400, 0x047f) AM_RAM
+	AM_RANGE(0x0500, 0x051f) AM_DEVREADWRITE(RIOT6532, "riot2", riot6532_r, riot6532_w)
+	AM_RANGE(0x0800, 0x1fff) AM_ROM
+	AM_RANGE(0xe800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x007F) AM_WRITE(tia_w)
-	AM_RANGE(0x0080, 0x00FF) AM_WRITE(r6532_0_ram_w) AM_BASE(&r6532_0_ram)
-	AM_RANGE(0x0100, 0x017F) AM_WRITE(tia_w)
-	AM_RANGE(0x0180, 0x01FF) AM_WRITE(r6532_0_ram_w)
-	AM_RANGE(0x0280, 0x029F) AM_WRITE(r6532_0_w)
-	AM_RANGE(0x0400, 0x047F) AM_WRITE(r6532_1_ram_w) AM_BASE(&r6532_1_ram)
-	AM_RANGE(0x0500, 0x051F) AM_WRITE(r6532_1_w)
-	AM_RANGE(0x0800, 0x1FFF) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xE800, 0xFFFF) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
-
-
-static const struct riot6532_interface r6532_interface_0 =
+static UINT8 port6_r(const device_config *device, UINT8 olddata)
 {
-	input_port_6_r,
-	input_port_7_r,
+	return input_port_read_indexed(device->machine, 6);
+}
+
+static UINT8 port7_r(const device_config *device, UINT8 olddata)
+{
+	return input_port_read_indexed(device->machine, 7);
+}
+
+static UINT8 port8_r(const device_config *device, UINT8 olddata)
+{
+	return input_port_read_indexed(device->machine, 8);
+}
+
+static UINT8 port9_r(const device_config *device, UINT8 olddata)
+{
+	return input_port_read_indexed(device->machine, 9);
+}
+
+static void watchdog_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+{
+	watchdog_reset(device->machine);
+}
+
+static const riot6532_interface r6532_interface_0 =
+{
+	port6_r,
+	port7_r,
 	NULL,
-	watchdog_reset_w,
+	watchdog_w,
 	NULL
 };
 
 
-static const struct riot6532_interface r6532_interface_1 =
+static const riot6532_interface r6532_interface_1 =
 {
-	input_port_8_r,
-	input_port_9_r,
+	port8_r,
+	port9_r,
 	NULL,
 	tourtabl_led_w,
 	NULL
@@ -121,11 +106,6 @@ static const struct tia_interface tourtabl_tia_interface =
 
 static MACHINE_START( tourtabl )
 {
-	r6532_config(machine, 0, &r6532_interface_0);
-	r6532_config(machine, 1, &r6532_interface_1);
-	r6532_reset(machine, 0);
-	r6532_reset(machine, 1);
-
 	tia_init( machine, &tourtabl_tia_interface );
 }
 
@@ -208,9 +188,12 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( tourtabl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK / 3)	/* actually M6507 */
-	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_MACHINE_START(tourtabl)
+	
+	MDRV_RIOT6532_ADD("riot1", MASTER_CLOCK / 3, r6532_interface_0)
+	MDRV_RIOT6532_ADD("riot2", MASTER_CLOCK / 3, r6532_interface_1)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

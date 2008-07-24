@@ -1,11 +1,52 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/6532riot.h"
 #include "sound/samples.h"
 #include "sound/dac.h"
 #include "sound/ay8910.h"
 #include "sound/sp0250.h"
 
+
+static const device_config *riot;
+
+
+/*************************************
+ *
+ *  RIOT interfaces
+ *
+ *************************************/
+
+SOUND_START( gottlieb1 )
+{
+	riot = device_list_find_by_tag(machine->config->devicelist, RIOT6532, "riot");
+}
+
+static UINT8 r6532_portb_r(const device_config *device, UINT8 olddata)
+{
+	return input_port_read(device->machine, "SB1");
+}
+
+static void r6532_portb_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+{
+	cpunum_set_input_line(device->machine, 1, INPUT_LINE_NMI, (newdata & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+
+static void snd_interrupt(const device_config *device, int state)
+{
+	cpunum_set_input_line(device->machine, 1, M6502_IRQ_LINE, state);
+}
+
+
+const riot6532_interface gottlieb_riot6532_intf =
+{
+	NULL,
+	r6532_portb_r,
+	NULL,
+	r6532_portb_w,
+	snd_interrupt
+};
 
 
 static void play_sample(const char *phonemes)
@@ -75,22 +116,24 @@ WRITE8_HANDLER( gottlieb_sh_w )
 				}
 			}
 		}
+	}
 
-		soundlatch_w(machine,offset,data);
-
-		switch (cpu_gettotalcpu())
+	switch (cpu_gettotalcpu())
+	{
+	case 2:
+		/* Revision 1 sound board */
+		riot6532_porta_in_set(riot, (~data & 0x3f) | (((data & 0x0f) != 0x0f) << 7), 0xbf);
+		break;
+	case 3:
+	case 4:
+		/* Revision 2 & 3 sound board */
+		if ((data&0x0f) != 0xf)
 		{
-		case 2:
-			/* Revision 1 sound board */
-			cpunum_set_input_line(machine, 1,M6502_IRQ_LINE,HOLD_LINE);
-			break;
-		case 3:
-		case 4:
-			/* Revision 2 & 3 sound board */
+			soundlatch_w(machine,offset,data);
 			cpunum_set_input_line(machine, cpu_gettotalcpu()-1,M6502_IRQ_LINE,HOLD_LINE);
 			cpunum_set_input_line(machine, cpu_gettotalcpu()-2,M6502_IRQ_LINE,HOLD_LINE);
-			break;
 		}
+		break;
 	}
 }
 
@@ -168,24 +211,6 @@ WRITE8_HANDLER( gottlieb_speech_clock_DAC_w )
 
 
 
-UINT8 *gottlieb_riot_regs;
-    /* lazy handling of the 6532's I/O, and no handling of timers at all */
-
-READ8_HANDLER( gottlieb_riot_r )
-{
-    switch (offset) {
-	case 0: /* port A */
-		return soundlatch_r(machine,0) ^ 0xff;	/* invert command */
-	case 2: /* port B */
-		return 0x40;    /* say that PB6 is 1 (test SW1 not pressed) */
-	case 5: /* interrupt register */
-		return 0x40;    /* say that edge detected on PA7 */
-	default:
-		return gottlieb_riot_regs[offset];
-    }
-}
-
-
 
 
 static UINT8 psg_latch;
@@ -195,7 +220,8 @@ static int sp0250_drq;
 static UINT8 sp0250_latch;
 
 static TIMER_CALLBACK( nmi_callback );
-void gottlieb_sound_init(void)
+
+SOUND_START( gottlieb2 )
 {
 	nmi_timer = timer_alloc(nmi_callback, NULL);
 }

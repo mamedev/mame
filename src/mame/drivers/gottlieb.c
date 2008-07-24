@@ -1,23 +1,36 @@
 /***************************************************************************
 
-Gottlieb driver : dedicated to Warren Davis, Jeff Lee, Tim Skelly & David Thiel
+    Gottlieb hardware
+    dedicated to Warren Davis, Jeff Lee, Tim Skelly & David Thiel
 
-driver by Fabrice Frances & Nicola Salmoria
-thanks to Frans van Egmond for locating and dumping Tylz
+    driver by Fabrice Frances & Nicola Salmoria
 
-Notes:
-There was a bug in the hardware of the GG1 and GG2 boards, which is not
-emulated. The bug seems to have disappeared with the later revision of the
-board, e.g the board used by 3Stooges and Mach3 don't seem to have it).
-The bug was affecting the first character column (on horizontal games):
-screen memory could be used, but whatever was stored in this column, always
-the same character was displayed.
-This led to two consequences:
-- the image on the monitor had to be stretched so that the column was not
-  visible
-- game designers were not using the first column. In fact, when the first
-  column was ejected from the screen, the last one was usually out too,
-  so it wasn't used either...
+    Games supported:
+        * Cloud 9
+        * Firebeast
+
+    Known issues:
+        * none at this time
+
+****************************************************************************
+
+	Thanks to Frans van Egmond for locating and dumping Tylz
+
+	Notes:
+
+	There was a bug in the hardware of the GG1 and GG2 boards, which is not
+	emulated. The bug seems to have disappeared with the later revision of 
+	the board, e.g the board used by 3Stooges and Mach3 don't seem to have 
+	it). The bug was affecting the first character column (on horizontal 
+	games): screen memory could be used, but whatever was stored in this 
+	column, always the same character was displayed.
+
+	This led to two consequences:
+	- the image on the monitor had to be stretched so that the column was 
+	  not visible
+	- game designers were not using the first column. In fact, when the 
+	  first column was ejected from the screen, the last one was usually 
+	  out too, so it wasn't used either...
 
 ****************************************************************************
 
@@ -148,107 +161,30 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 ***************************************************************************/
 
 #include "driver.h"
+#include "machine/6532riot.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
 #include "sound/sp0250.h"
+#include "gottlieb.h"
 
 
-extern UINT8 *gottlieb_charram;
-extern UINT8 *gottlieb_riot_regs;
 
-extern WRITE8_HANDLER( gottlieb_videoram_w );
-extern WRITE8_HANDLER( gottlieb_charram_w );
-extern WRITE8_HANDLER( gottlieb_video_outputs_w );
-extern WRITE8_HANDLER( usvsthem_video_outputs_w );
-extern WRITE8_HANDLER( gottlieb_paletteram_w );
+#define SYSTEM_CLOCK		XTAL_20MHz
+#define CPU_CLOCK			XTAL_15MHz
+#define SOUND1_CLOCK		XTAL_3_579545MHz
 
-VIDEO_START( gottlieb );
-VIDEO_UPDATE( gottlieb );
-VIDEO_START( vidvince );
 
-WRITE8_HANDLER( gottlieb_sh_w );
 
-READ8_HANDLER( riot_ram_r );
-READ8_HANDLER( gottlieb_riot_r );
-WRITE8_HANDLER( riot_ram_w );
-WRITE8_HANDLER( gottlieb_riot_w );
-WRITE8_HANDLER( gottlieb_speech_w );
-WRITE8_HANDLER( gottlieb_speech_clock_DAC_w );
-void gottlieb_sound_init(void);
-void stooges_sp0250_drq(int level);
-READ8_HANDLER( stooges_sound_input_r );
-WRITE8_HANDLER( stooges_8910_latch_w );
-WRITE8_HANDLER( stooges_sp0250_latch_w );
-WRITE8_HANDLER( stooges_sound_control_w );
-WRITE8_HANDLER( gottlieb_nmi_rate_w );
-WRITE8_HANDLER( gottlieb_cause_dac_nmi_w );
-
+/*************************************
+ *
+ *  Globals
+ *
+ *************************************/
 
 static UINT8 *audiobuffer_region;
-
-static MACHINE_RESET( gottlieb )
-{
-	audiobuffer_region = memory_region(machine, REGION_USER1);
-}
-
-
 static int track[2];
-
-static READ8_HANDLER( gottlieb_track_0_r )
-{
-	return input_port_read(machine, "IN2") - track[0];
-}
-
-static READ8_HANDLER( gottlieb_track_1_r )
-{
-	return input_port_read(machine, "IN3") - track[1];
-}
-
-static WRITE8_HANDLER( gottlieb_track_reset_w )
-{
-	/* reset the trackball counters */
-	track[0] = input_port_read(machine, "IN2");
-	track[1] = input_port_read(machine, "IN3");
-}
-
 static int joympx;
-
-static READ8_HANDLER( stooges_IN4_r )
-{
-	int joy;
-
-	switch (joympx)
-	{
-		case 0:
-		default:
-			joy = ((input_port_read(machine, "IN4") >> 0) & 0x0f);	/* joystick 1 */
-			break;
-		case 1:
-			joy = ((input_port_read(machine, "IN5") >> 0) & 0x0f);	/* joystick 2 */
-			break;
-		case 2:
-			joy = ((input_port_read(machine, "IN5") >> 4) & 0x0f);	/* joystick 3 */
-			break;
-	}
-
-	return joy | (input_port_read(machine, "IN4") & 0xf0);
-}
-
-static WRITE8_HANDLER( reactor_output_w )
-{
-	set_led_status(0,data & 0x20);
-	set_led_status(1,data & 0x40);
-	set_led_status(2,data & 0x80);
-	gottlieb_video_outputs_w(machine,offset,data);
-}
-
-static WRITE8_HANDLER( stooges_output_w )
-{
-	joympx = (data >> 5) & 0x03;
-	gottlieb_video_outputs_w(machine,offset,data);
-}
-
 
 static int current_frame = 1;
 static int laserdisc_playing;
@@ -261,6 +197,80 @@ static int lastcmd;
 static int odd_field;
 static int access_time;
 
+
+
+/*************************************
+ *
+ *  Initialization
+ *
+ *************************************/
+
+static MACHINE_RESET( gottlieb )
+{
+	audiobuffer_region = memory_region(machine, REGION_USER1);
+}
+
+
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
+ 
+static CUSTOM_INPUT( analog_delta_r )
+{
+	const char *string = param;
+	int which = string[0] - '0';
+	
+	return input_port_read(field->port->machine, &string[1]) - track[which];
+}
+
+
+static WRITE8_HANDLER( gottlieb_analog_reset_w )
+{
+	/* reset the trackball counters */
+	track[0] = input_port_read_safe(machine, "TRACKX", 0);
+	track[1] = input_port_read_safe(machine, "TRACKY", 0);
+}
+
+
+static CUSTOM_INPUT( stooges_joystick_r )
+{
+	static const char *joyport[] = { "P1JOY", "P2JOY", "P3JOY", NULL };
+	return (joyport[joympx & 3] != NULL) ? input_port_read(field->port->machine, joyport[joympx & 3]) : 0xff;
+}
+
+
+
+/*************************************
+ *
+ *  Output ports
+ *
+ *************************************/
+
+static WRITE8_HANDLER( reactor_output_w )
+{
+	set_led_status(0,data & 0x20);
+	set_led_status(1,data & 0x40);
+	set_led_status(2,data & 0x80);
+	gottlieb_video_outputs_w(machine,offset,data);
+}
+
+
+static WRITE8_HANDLER( stooges_output_w )
+{
+	joympx = (data >> 5) & 0x03;
+	gottlieb_video_outputs_w(machine,offset,data);
+}
+
+
+
+/*************************************
+ *
+ *  Laserdisc interface
+ *
+ *************************************/
 
 /* The only sure thing I know about the Philips 24-bit frame number code is that the
  * 4 most significant bits are 1's and these four 1's are used to detect a valid frame
@@ -285,14 +295,15 @@ static READ8_HANDLER( gottlieb_laserdisc_status_r )
 			tmp = current_frame % 100;
 			logerror("LSB frame read: %d\n",tmp);
 			return ((tmp / 10) << 4) | (tmp % 10);
-			break;
+
 		case 1:
 			tmp = (current_frame / 100) % 100;
 			logerror("MSB frame read: %d\n",tmp);
 			return ((tmp / 10) << 4) | (tmp % 10);
-			break;
+
 		case 2:
-			if (lasermpx == 1) {
+			if (lasermpx == 1) 
+			{
 				/* bits 0-2 frame number MSN */
 				/* bit 3 audio buffer ready */
 				/* bit 4 ready to send new laserdisc command? */
@@ -300,13 +311,18 @@ static READ8_HANDLER( gottlieb_laserdisc_status_r )
 				/* bit 6 break in audio trasmission */
 				/* bit 7 missing audio clock */
 				return ((current_frame / 10000) & 0x7) | (audioready << 3) | 0x10 | (discready << 5);
-			} else {	/* read audio buffer */
+			}
+			else
+			{	/* read audio buffer */
 				if (skipfirstbyte) audioptr++;
 				skipfirstbyte = 0;
-				if (audiobuffer_region) {
+				if (audiobuffer_region) 
+				{
 					logerror("audio bufread: %02x\n",audiobuffer_region[audioptr]);
 					return audiobuffer_region[audioptr++];
-				} else {
+				}
+				else
+				{
 					logerror("audiobuffer is null !!");
 					return 0xFF; /* don't know what to do in this case ;-) */
 				}
@@ -381,8 +397,26 @@ logerror("laserdisc command %02x -> %02x\n",data,cmd);
 	}
 }
 
+
+
+/*************************************
+ *
+ *  Interrupt generation
+ *
+ *************************************/
+
+static TIMER_CALLBACK( nmi_clear )
+{
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+
 static INTERRUPT_GEN( gottlieb_interrupt )
 {
+	/* assert the NMI and set a timer to clear it at the first visible line */
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, nmi_clear);
+
 	if (access_time > 0) {
 		access_time--;
 		if (access_time == 0)
@@ -405,53 +439,75 @@ logerror("current frame : %d\n",current_frame);
 			else audioready = 0;
 		}
 	}
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
+
+/*************************************
+ *
+ *  Main CPU memory handlers
+ *
+ *************************************/
+
 static ADDRESS_MAP_START( reactor_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x00000, 0x01fff) AM_RAM
-	AM_RANGE(0x02000, 0x020ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x03000, 0x033ff) AM_MIRROR(0x0400) AM_RAM_WRITE(gottlieb_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x04000, 0x04fff) AM_RAM_WRITE(gottlieb_charram_w) AM_BASE(&gottlieb_charram)
-	AM_RANGE(0x06000, 0x0601f) AM_WRITE(gottlieb_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0x07000, 0x07000) AM_READWRITE(input_port_0_r, watchdog_reset_w)	/* DSW */
-	AM_RANGE(0x07001, 0x07001) AM_READWRITE(input_port_1_r, gottlieb_track_reset_w)	/* buttons */
-	AM_RANGE(0x07002, 0x07002) AM_READWRITE(gottlieb_track_0_r, gottlieb_sh_w)	/* trackball H */
-	AM_RANGE(0x07003, 0x07003) AM_READWRITE(gottlieb_track_1_r, reactor_output_w)	/* trackball V */
-	AM_RANGE(0x07004, 0x07004) AM_READ(input_port_4_r)	/* joystick */
-	AM_RANGE(0x08000, 0x0ffff) AM_ROM
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0f00) AM_WRITEONLY AM_BASE(&spriteram)							/* FRSEL */
+	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM_WRITE(gottlieb_videoram_w) AM_BASE(&videoram)		/* BRSEL */
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_BASE(&gottlieb_charram)				/* BOJRSEL1 */
+/*	AM_RANGE(0x5000, 0x5fff) AM_WRITE() */																/* BOJRSEL2 */
+	AM_RANGE(0x6000, 0x601f) AM_MIRROR(0x0fe0) AM_WRITE(gottlieb_paletteram_w) AM_BASE(&paletteram)		/* COLSEL */
+	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0ff8) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff8) AM_WRITE(gottlieb_analog_reset_w)						/* A1J2 interface */
+	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff8) AM_WRITE(gottlieb_sh_w)									/* trackball H */
+	AM_RANGE(0x7003, 0x7003) AM_MIRROR(0x0ff8) AM_WRITE(reactor_output_w)								/* trackball V */
+	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0ff8) AM_READ_PORT("DSW")
+	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff8) AM_READ_PORT("IN1")										/* buttons */
+	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff8) AM_READ_PORT("IN2")										/* trackball H */
+	AM_RANGE(0x7003, 0x7003) AM_MIRROR(0x0ff8) AM_READ_PORT("IN3")										/* trackball V */
+	AM_RANGE(0x7004, 0x7004) AM_MIRROR(0x0ff8) AM_READ_PORT("IN4")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( gottlieb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x00000, 0x00fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x01000, 0x01fff) AM_RAM AM_REGION(REGION_CPU1, 0x1000)	/* or ROM */
-	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_REGION(REGION_CPU1, 0x2000) 	/* or ROM */
-	AM_RANGE(0x03000, 0x037ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)	// argusg wants to check this
-	AM_RANGE(0x03800, 0x03bff) AM_MIRROR(0x0400) AM_RAM_WRITE(gottlieb_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x04000, 0x04fff) AM_RAM_WRITE(gottlieb_charram_w) AM_BASE(&gottlieb_charram)
-	AM_RANGE(0x05000, 0x0501f) AM_WRITE(gottlieb_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0x05800, 0x05800) AM_READWRITE(input_port_0_r, watchdog_reset_w)	/* DSW */
-	AM_RANGE(0x05801, 0x05801) AM_READWRITE(input_port_1_r, gottlieb_track_reset_w)	/* buttons */
-	AM_RANGE(0x05802, 0x05802) AM_READWRITE(gottlieb_track_0_r, gottlieb_sh_w)	/* trackball H */
-	AM_RANGE(0x05803, 0x05803) AM_READWRITE(gottlieb_track_1_r, gottlieb_video_outputs_w)	/* trackball V */
-	AM_RANGE(0x05804, 0x05804) AM_READ(input_port_4_r)	/* joystick */
-	AM_RANGE(0x05805, 0x05807) AM_READ(gottlieb_laserdisc_status_r)
-	AM_RANGE(0x06000, 0x0ffff) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_REGION(REGION_CPU1, 0x1000)	/* or ROM */
+	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_REGION(REGION_CPU1, 0x2000) 	/* or ROM */
+	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0700) AM_WRITEONLY AM_BASE(&spriteram)							/* FRSEL */
+	AM_RANGE(0x3800, 0x3bff) AM_MIRROR(0x0400) AM_RAM_WRITE(gottlieb_videoram_w) AM_BASE(&videoram)		/* BRSEL */
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_BASE(&gottlieb_charram)				/* BOJRSEL1 */
+	AM_RANGE(0x5000, 0x501f) AM_MIRROR(0x07e0) AM_WRITE(gottlieb_paletteram_w) AM_BASE(&paletteram)		/* COLSEL */
+	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x07f8) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x5801, 0x5801) AM_MIRROR(0x07f8) AM_WRITE(gottlieb_analog_reset_w)						/* A1J2 interface */
+	AM_RANGE(0x5802, 0x5802) AM_MIRROR(0x07f8) AM_WRITE(gottlieb_sh_w)									/* OP20-27 */
+	AM_RANGE(0x5803, 0x5803) AM_MIRROR(0x07f8) AM_WRITE(gottlieb_video_outputs_w)						/* OP30-37 */
+/*	AM_RANGE(0x5804, 0x5804) AM_MIRROR(0x07f8) AM_WRITE()*/												/* OP40-47 */
+	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x07f8) AM_READ_PORT("DSW")
+	AM_RANGE(0x5801, 0x5801) AM_MIRROR(0x07f8) AM_READ_PORT("IN1")										/* IP10-17 */
+	AM_RANGE(0x5802, 0x5802) AM_MIRROR(0x07f8) AM_READ_PORT("IN2")										/* trackball H */
+	AM_RANGE(0x5803, 0x5803) AM_MIRROR(0x07f8) AM_READ_PORT("IN3")										/* trackball V */
+	AM_RANGE(0x5804, 0x5804) AM_MIRROR(0x07f8) AM_READ_PORT("IN4")										/* IP40-47 */
+	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( gottlieb_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+
+/*************************************
+ *
+ *  Sound CPU memory handlers
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( sound1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	/* A15 not decoded except in expansion socket */
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0180) AM_RAM
-	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x01e0) AM_READWRITE(gottlieb_riot_r, SMH_RAM) AM_BASE(&gottlieb_riot_regs)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(DAC_0_data_w)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(gottlieb_speech_w)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(gottlieb_speech_clock_DAC_w)
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0d80) AM_RAM
+	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0de0) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_WRITE(DAC_0_data_w)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0fff) AM_WRITE(gottlieb_speech_w)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_WRITE(gottlieb_speech_clock_DAC_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -480,6 +536,12 @@ ADDRESS_MAP_END
 
 
 
+/*************************************
+ *
+ *  Port definitions
+ *
+ *************************************/
+
 static INPUT_PORTS_START( reactor )
 	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Sound with Logos" )
@@ -507,8 +569,8 @@ static INPUT_PORTS_START( reactor )
 	PORT_DIPSETTING(    0x80, "20000" )
 
 	PORT_START_TAG("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
-	PORT_SERVICE( 0x02, IP_ACTIVE_LOW )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
+	PORT_SERVICE_DIPLOC( 0x02, IP_ACTIVE_LOW, "SB1:8" )
 	PORT_BIT ( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START_TAG("IN2")	/* trackball H */
@@ -525,6 +587,18 @@ static INPUT_PORTS_START( reactor )
 	PORT_BIT ( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT ( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT ( 0xc0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	
+	PORT_START_TAG("SB1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
+	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mplanets )
@@ -563,7 +637,7 @@ static INPUT_PORTS_START( mplanets )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN3")	/* trackball V (dial) */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "1TRACKY")
 
 	PORT_START_TAG("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -574,6 +648,21 @@ static INPUT_PORTS_START( mplanets )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	
+	PORT_START_TAG("SB1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
+	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
+
+	PORT_START_TAG("TRACKY")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tylz )
@@ -636,6 +725,18 @@ static INPUT_PORTS_START( tylz )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	
+	PORT_START_TAG("SB1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
+	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( qbert )
@@ -691,6 +792,18 @@ static INPUT_PORTS_START( qbert )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	
+	PORT_START_TAG("SB1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
+	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( qbertqub )
@@ -750,6 +863,18 @@ static INPUT_PORTS_START( qbertqub )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	
+	PORT_START_TAG("SB1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
+	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( krull )
@@ -802,6 +927,18 @@ static INPUT_PORTS_START( krull )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
+	
+	PORT_START_TAG("SB1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
+	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mach3 )
@@ -953,27 +1090,30 @@ static INPUT_PORTS_START( 3stooges )
 	PORT_START_TAG("IN3")	/* trackball V not used */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN4")	/* joystick 2 (Moe) */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_START_TAG("IN4")	/* joystick inputs */
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(stooges_joystick_r, NULL)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	/* the bottom four bits of the previous port are multiplexed among */
-	/* three joysticks - the following port contains settings for the other two */
-	PORT_START_TAG("IN5")
+	PORT_START_TAG("P1JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+
+	PORT_START_TAG("P2JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+
+	PORT_START_TAG("P3JOY")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( curvebal )
@@ -1037,6 +1177,18 @@ PORT_DIPSETTING(    0xc2, DEF_STR( Free_Play ) ) */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Bunt") PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	
+	PORT_START_TAG("SB1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
+	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( screwloo )
@@ -1143,6 +1295,18 @@ static INPUT_PORTS_START( insector )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	
+	PORT_START_TAG("SB1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
+	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vidvince )
@@ -1238,8 +1402,8 @@ static INPUT_PORTS_START( wizwarz )
 	PORT_START_TAG("IN2")	/* trackball H not used */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN3")	/* trackball V not used */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
+	PORT_START_TAG("IN3")	/* trackball V is a dial input */
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "1TRACKY")
 
 	PORT_START_TAG("IN4")	/* ? */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -1250,6 +1414,9 @@ static INPUT_PORTS_START( wizwarz )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
+	
+	PORT_START_TAG("TRACKY")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( argusg )
@@ -1288,21 +1455,36 @@ static INPUT_PORTS_START( argusg )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START_TAG("IN2")	/* trackball H */
-	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(15) PORT_KEYDELTA(20)
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "0TRACKX")
 
 	PORT_START_TAG("IN3")	/* trackball V */
-	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(15) PORT_KEYDELTA(20)
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "1TRACKY")
 
 /* NOTE: Buttons are shared for both players; are mirrored to each side of the controller */
 	PORT_START_TAG("IN4")
-	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT ( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT ( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT ( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT ( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	
+	PORT_START_TAG("SB1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
+	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
+
+	PORT_START_TAG("TRACKX")
+	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(15) PORT_KEYDELTA(20)
+
+	PORT_START_TAG("TRACKY")
+	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(15) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kngtmare )
@@ -1356,54 +1538,76 @@ static INPUT_PORTS_START( kngtmare )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
+	
+	PORT_START_TAG("SB1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
+	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
 INPUT_PORTS_END
+
+
+
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 /* the games can store char gfx data in either a 4k RAM area (128 chars), or */
 /* a 8k ROM area (256 chars). */
-static const gfx_layout charRAMlayout =
+static const gfx_layout bg_ram_layout =
 {
-	8,8,    /* 8*8 characters */
-	128,    /* 128 characters */
-	4,      /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28},
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8    /* every char takes 32 consecutive bytes */
-};
-
-static const gfx_layout charROMlayout =
-{
-	8,8,    /* 8*8 characters */
-	256,    /* 256 characters */
-	4,      /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28},
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8    /* every char takes 32 consecutive bytes */
-};
-
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,4),
-	4,      /* 4 bits per pixel */
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	8,8,
+	128,
+	4,
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,32) },
 	32*8
 };
 
-static GFXDECODE_START( charRAM )
-	GFXDECODE_ENTRY( 0,           0x4000, charRAMlayout, 0, 1 )	/* the game dynamically modifies this */
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout,  0, 1 )
+static const gfx_layout bg_rom_layout =
+{
+	8,8,
+	256,
+	4,
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,32) },
+	32*8
+};
+
+static const gfx_layout fg_layout =
+{
+	16,16,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ STEP16(0,1) },
+	{ STEP16(0,16) },
+	32*8
+};
+
+static GFXDECODE_START( gfxdecode )
+	GFXDECODE_ENTRY( 0,           0x4000, bg_ram_layout, 0, 1 )	/* the game dynamically modifies this */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, bg_rom_layout, 0, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, fg_layout,     0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( charROM )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charROMlayout, 0, 1 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout,  0, 1 )
-GFXDECODE_END
 
+
+/*************************************
+ *
+ *  Sound interfaces
+ *
+ *************************************/
 
 static const char *const reactor_sample_names[] =
 {
@@ -1504,43 +1708,29 @@ static const struct sp0250_interface sp0250_interface =
 
 
 
-/********************************************************************
-*
-*  Machine Driver macro
-*  ====================
-*
-*  There are two versions of the machine driver,
-*  one for revision 1 sound board (1x6502 + DAC + Votrax),
-*  one for revision 2 (2x6502 + DAC + GI SP-0250 speech chip + 2x8910).
-*  They are identical apart form the sound CPU subsections.
-*
-********************************************************************/
+/*************************************
+ *
+ *  Core machine drivers
+ *
+ *************************************/
 
-/* games using the revision 1 sound board */
-static MACHINE_DRIVER_START( gottlieb )
+static MACHINE_DRIVER_START( gottlieb_core )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", I8088, 5000000)	/* 5 MHz */
+	MDRV_CPU_ADD("main", I8088, CPU_CLOCK/3)
 	MDRV_CPU_PROGRAM_MAP(gottlieb_map,0)
 	MDRV_CPU_VBLANK_INT("main", gottlieb_interrupt)
 
-	/* audio CPU */
-	MDRV_CPU_ADD("sound", M6502, 3579545/4)	/* the board can be set to /2 as well */
-	MDRV_CPU_PROGRAM_MAP(gottlieb_sound_map,0)
-								/* NMIs are triggered by the Votrax SC-01 */
-
 	MDRV_MACHINE_RESET(gottlieb)
 	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_WATCHDOG_VBLANK_INIT(16)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(61)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1018)	/* frames per second, vblank duration */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+	MDRV_SCREEN_RAW_PARAMS(SYSTEM_CLOCK/4, 318, 0, 256, 256, 0, 240)
 
-	MDRV_GFXDECODE(charROM)
+	MDRV_GFXDECODE(gfxdecode)
 	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_VIDEO_START(gottlieb)
@@ -1548,88 +1738,35 @@ static MACHINE_DRIVER_START( gottlieb )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+MACHINE_DRIVER_END
 
+
+static MACHINE_DRIVER_START( gottlieb_soundrev1 )
+	MDRV_SOUND_START( gottlieb1 )
+	
+	MDRV_RIOT6532_ADD("riot", SOUND1_CLOCK/4, gottlieb_riot6532_intf)
+
+	/* audio CPU */
+	MDRV_CPU_ADD("audio", M6502, SOUND1_CLOCK/4)	/* the board can be set to /2 as well */
+	MDRV_CPU_PROGRAM_MAP(sound1_map,0)
+
+	/* sound hardware */
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( reactor )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(gottlieb)
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(reactor_map,0)
-
-	MDRV_NVRAM_HANDLER(NULL)
-
-	/* video hardware */
-	MDRV_GFXDECODE(charRAM)
-
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(reactor_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( qbert )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(gottlieb)
-
-	/* video hardware */
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(qbert_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( krull )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(gottlieb)
-
-	/* video hardware */
-	MDRV_GFXDECODE(charRAM)
-MACHINE_DRIVER_END
-
-
-/* games using the revision 2 sound board */
-static MACHINE_DRIVER_START( gottlieb2 )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("main", I8088, 5000000)	/* 5 MHz */
-	MDRV_CPU_PROGRAM_MAP(gottlieb_map,0)
-	MDRV_CPU_VBLANK_INT("main", gottlieb_interrupt)
-
-	MDRV_CPU_ADD("sound", M6502, 1000000)	/* 1 MHz */
-	/* audio CPU */
+static MACHINE_DRIVER_START( gottlieb_soundrev2 )
+	/* audio CPUs */
+	MDRV_CPU_ADD("audio", M6502, 1000000)	/* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(stooges_sound_map,0)
 
-	MDRV_CPU_ADD("sound2", M6502, 1000000)	/* 1 MHz */
-	/* audio CPU */
+	MDRV_CPU_ADD("audio2", M6502, 1000000)	/* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(stooges_sound2_map,0)
 
-	MDRV_MACHINE_RESET(gottlieb)
-	MDRV_NVRAM_HANDLER(generic_1fill)
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(61)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1018)	/* frames per second, vblank duration */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-
-	MDRV_GFXDECODE(charROM)
-	MDRV_PALETTE_LENGTH(16)
-
-	MDRV_VIDEO_START(gottlieb)
-	MDRV_VIDEO_UPDATE(gottlieb)
-
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
+	MDRV_SOUND_START( gottlieb2 )
+	
 	MDRV_SOUND_ADD("dac1", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
@@ -1648,27 +1785,57 @@ static MACHINE_DRIVER_START( gottlieb2 )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( stooges )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(gottlieb2)
-	MDRV_GFXDECODE(charRAM)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( vidvince )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(gottlieb2)
-	MDRV_VIDEO_START(vidvince)
-
+static MACHINE_DRIVER_START( gottlieb1 )
+	MDRV_IMPORT_FROM(gottlieb_core)
+	MDRV_IMPORT_FROM(gottlieb_soundrev1)
 MACHINE_DRIVER_END
 
 
-/***************************************************************************
+static MACHINE_DRIVER_START( gottlieb2 )
+	MDRV_IMPORT_FROM(gottlieb_core)
+	MDRV_IMPORT_FROM(gottlieb_soundrev2)
+MACHINE_DRIVER_END
 
-  Game driver(s)
 
-***************************************************************************/
+
+/*************************************
+ *
+ *  Specific machine drivers
+ *
+ *************************************/
+
+static MACHINE_DRIVER_START( reactor )
+	MDRV_IMPORT_FROM(gottlieb1)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(reactor_map,0)
+
+	MDRV_NVRAM_HANDLER(NULL)
+
+	/* sound hardware */
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
+	MDRV_SOUND_CONFIG(reactor_samples_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( qbert )
+	MDRV_IMPORT_FROM(gottlieb1)
+
+	/* video hardware */
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
+	MDRV_SOUND_CONFIG(qbert_samples_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+
+
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( reactor )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -1685,42 +1852,39 @@ ROM_START( reactor )
 	ROM_LOAD( "snd1",         0x7000, 0x800, CRC(d958a0fd) SHA1(3c383076c68a929f96d844e89b09f3075f331906) )
 	ROM_LOAD( "snd2",         0x7800, 0x800, CRC(5dc86942) SHA1(a449fcfb25521a0e7523184518b5204dac56e5f8) )
 
-	/* no gfx1 (RAM is used) */
+	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
+	/* no ROMs; RAM is used instead */
 
 	ROM_REGION( 0x8000, REGION_GFX2, ROMREGION_DISPOSE )
-	/* 0000-0fff empty */
 	ROM_LOAD( "fg3",          0x1000, 0x1000, CRC(8416ad53) SHA1(f868259b97675e58b6a7f1dc3c2a4ecf6aa0570e) )	/* sprites */
-	/* 2000-2fff empty */
 	ROM_LOAD( "fg2",          0x3000, 0x1000, CRC(5489605a) SHA1(f4bbaaa8cd881dc164b118d1e516edeeea54c1d8) )
-	/* 4000-4fff empty */
 	ROM_LOAD( "fg1",          0x5000, 0x1000, CRC(18396c57) SHA1(39d90a842a03091414ed58d4128b524ecc20c9f1) )
-	/* 6000-6fff empty */
 	ROM_LOAD( "fg0",          0x7000, 0x1000, CRC(d1f20e15) SHA1(dba9aa0fec8b720a33d78b3dd1d7f74040048f7e) )
 ROM_END
 
 ROM_START( mplanets )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "rom4.c16",         0x6000, 0x2000, CRC(5402077f) SHA1(f4e8699ab3c6dfc0f86b6df86d2a5b35caf2ca73) )
-	ROM_LOAD( "rom3.c14-15",         0x8000, 0x2000, CRC(5d18d740) SHA1(30307d98704c49dec5aecd0a1ec2f06f1869a5d2) )
-	ROM_LOAD( "rom2.c13-14",         0xa000, 0x2000, CRC(960c3bb1) SHA1(305a7904fa8c0b9823ad186d1c5c7460c0900bad) )
-	ROM_LOAD( "rom1.c12-13",         0xc000, 0x2000, CRC(eb515f10) SHA1(31c3519328eba7adc4a3b0adcc0384f606d81a57) )
-	ROM_LOAD( "rom0.c11-12",         0xe000, 0x2000, CRC(74de78aa) SHA1(7ebd02e660c1413eff284a7ca77feeff41c1e2b7) )
+	ROM_LOAD( "rom4.c16",     0x6000, 0x2000, CRC(5402077f) SHA1(f4e8699ab3c6dfc0f86b6df86d2a5b35caf2ca73) )
+	ROM_LOAD( "rom3.c14-15",  0x8000, 0x2000, CRC(5d18d740) SHA1(30307d98704c49dec5aecd0a1ec2f06f1869a5d2) )
+	ROM_LOAD( "rom2.c13-14",  0xa000, 0x2000, CRC(960c3bb1) SHA1(305a7904fa8c0b9823ad186d1c5c7460c0900bad) )
+	ROM_LOAD( "rom1.c12-13",  0xc000, 0x2000, CRC(eb515f10) SHA1(31c3519328eba7adc4a3b0adcc0384f606d81a57) )
+	ROM_LOAD( "rom0.c11-12",  0xe000, 0x2000, CRC(74de78aa) SHA1(7ebd02e660c1413eff284a7ca77feeff41c1e2b7) )
 
 	/* note from f205v: my original Gottlieb PCB only sports one 2732 sound EPROM labeled "snd.3h"
     It contains the two joint roms you can find herefollowing, therefore the sound is identical */
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "snd1",         0x7000, 0x800, CRC(453193a1) SHA1(317ec81f71661eaa92624c0304a52b635dcd5613) )
-	ROM_LOAD( "snd2",         0x7800, 0x800, CRC(f5ffc98f) SHA1(516e895df94942fc51f1b51eb9316d4296df82e7) )
+	ROM_LOAD( "snd1",         0x7000, 0x0800, CRC(453193a1) SHA1(317ec81f71661eaa92624c0304a52b635dcd5613) )
+	ROM_LOAD( "snd2",         0x7800, 0x0800, CRC(f5ffc98f) SHA1(516e895df94942fc51f1b51eb9316d4296df82e7) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "bg0.e11-12",          0x0000, 0x1000, CRC(709aa24c) SHA1(95be072bf63320f4b44feaf88003ba011754e20f) )	/* chars */
-	ROM_LOAD( "bg1.e13",          0x1000, 0x1000, CRC(4921e345) SHA1(7b6e03458222be501ed150ffbd489433027fc6cb) )
+	ROM_LOAD( "bg0.e11-12",   0x0000, 0x1000, CRC(709aa24c) SHA1(95be072bf63320f4b44feaf88003ba011754e20f) )	/* chars */
+	ROM_LOAD( "bg1.e13",      0x1000, 0x1000, CRC(4921e345) SHA1(7b6e03458222be501ed150ffbd489433027fc6cb) )
 
 	ROM_REGION( 0x8000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "fg3.k7-8",          0x0000, 0x2000, CRC(c990b39f) SHA1(d1b6060744b78df430e914504b20e8693829bbd5) )	/* sprites */
-	ROM_LOAD( "fg2.k6",          0x2000, 0x2000, CRC(735e2522) SHA1(9fac59e9b1d81695d3da32107d640726cf96e31a) )
-	ROM_LOAD( "fg1.k5",          0x4000, 0x2000, CRC(6456cc1c) SHA1(12c20f0ce49a7d3579049e8ba95e542c4aaee241) )
-	ROM_LOAD( "fg0.k4",          0x6000, 0x2000, CRC(a920e325) SHA1(60f15d5014a55d9c18b06c17c7587d45716619e4) )
+	ROM_LOAD( "fg3.k7-8",     0x0000, 0x2000, CRC(c990b39f) SHA1(d1b6060744b78df430e914504b20e8693829bbd5) )	/* sprites */
+	ROM_LOAD( "fg2.k6",       0x2000, 0x2000, CRC(735e2522) SHA1(9fac59e9b1d81695d3da32107d640726cf96e31a) )
+	ROM_LOAD( "fg1.k5",       0x4000, 0x2000, CRC(6456cc1c) SHA1(12c20f0ce49a7d3579049e8ba95e542c4aaee241) )
+	ROM_LOAD( "fg0.k4",       0x6000, 0x2000, CRC(a920e325) SHA1(60f15d5014a55d9c18b06c17c7587d45716619e4) )
 ROM_END
 
 ROM_START( mplanuk )
@@ -1852,7 +2016,7 @@ ROM_START( qberttst )
 ROM_END
 
 /* test rom, not a game */
-ROM_START( qbtrktst)
+ROM_START( qbtrktst )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "qb-rom2.bin",  0xa000, 0x2000, CRC(fe434526) SHA1(4cfc5d52dd6c82163e035af82d6112c0c93a3797) )
 	ROM_LOAD( "qb-rom1.bin",  0xc000, 0x2000, CRC(55635447) SHA1(ca6acdef1c9e06b33efe1f0a2df2dfb03723cfbe) )
@@ -1997,7 +2161,8 @@ ROM_START( krull )
 	ROM_LOAD( "snd1.bin",     0x6000, 0x1000, CRC(dd2b30b4) SHA1(f01cb64932493bf69d4fc75a7fa809ff6f6e4263) )
 	ROM_LOAD( "snd2.bin",     0x7000, 0x1000, CRC(8cab901b) SHA1(b886532828efc8cf442e2ee4ebbfe37acd489f62) )
 
-	/* no gfx1 (RAM is used) */
+	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
+	/* no ROMs; RAM is used instead */
 
 	ROM_REGION( 0x8000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "fg3.bin",      0x0000, 0x2000, CRC(82d77a45) SHA1(753476609c4bf4f0f0cd28d61fd8aef6967bda57) )	/* sprites */
@@ -2096,7 +2261,8 @@ ROM_START( 3stooges )
 	ROM_LOAD( "yrom2",        0xc000, 0x2000, CRC(90f9c940) SHA1(646dacc902cf235948ac9c064c92390e2764370b) )
 	ROM_LOAD( "yrom1",        0xe000, 0x2000, CRC(55f8ab30) SHA1(a6b6318f12fd4a1fab61b82cde33759da615d5b2) )
 
-	/* no gfx1 (RAM is used) */
+	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
+	/* no ROMs; RAM is used instead */
 
 	ROM_REGION( 0x8000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "gv113fg3",     0x0000, 0x2000, CRC(28071212) SHA1(33ce5cfae3491658f8b4cb977dc2da0a75dffee4) )	/* sprites */
@@ -2144,7 +2310,8 @@ ROM_START( vidvince )
 	ROM_LOAD( "gv132_yrom1_snd_2764.n3",        0xe000, 0x2000, CRC(befa4b97) SHA1(424b40844629631a3f31cc12c61ac7000b5f3eb9) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "gv132_bg0_2732.e11e12",          0x1000, 0x1000, CRC(1521bb4a) SHA1(a3a1209c74f1ca18f0be2d2c7b1fa2af625dfa5f) )	/* chars */
+	ROM_LOAD( "gv132_bg0_2732.e11e12",          0x0000, 0x1000, CRC(1521bb4a) SHA1(a3a1209c74f1ca18f0be2d2c7b1fa2af625dfa5f) )	/* chars */
+	/* RAM is used for the other half */
 
 	ROM_REGION( 0x8000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "gv132_fg3_2764.k7k8",   0x0000, 0x2000, CRC(42a78a52) SHA1(7d24006d6746d21939dd0c6241a8d67c42073163) )	/* sprites */
@@ -2192,7 +2359,8 @@ ROM_START( argusg )
 	ROM_LOAD( "arg_snd1_2716.u5",  0x7000, 0x800, CRC(3a6cf455) SHA1(0c701aa4d956947a101212b494b030cd2df5a2d6) )
 	ROM_LOAD( "arg_snd2_2716.u6",  0x7800, 0x800, CRC(ddf32040) SHA1(61ae22faa013b29a5fbd9520073f172a98ca38ec) )
 
-	/* no gfx1 (RAM is used) */
+	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
+	/* no ROMs; RAM is used instead */
 
 	ROM_REGION( 0x8000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "arg_fg3_2764.k7k8",    0x0000, 0x2000, CRC(cdb6e25c) SHA1(d439a4c777c585d1ee89410816c9f7580f7e0ae8) )	/* sprites */
@@ -2211,60 +2379,89 @@ ROM_START( kngtmare )
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "gv112_snd",              0x7000, 0x1000, NO_DUMP )
 
+	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "gv112_bg0_2732.e11e12",  0x0000, 0x1000, CRC(a74591fd) SHA1(e6916cfa44cbe4c0d58fb0307c70580a6fabfcf1) )
+	ROM_LOAD( "gv112_bg1_2732.e13",     0x1000, 0x1000, CRC(5a226e6a) SHA1(faf119a8db823f2fc57c0e789b5f3486bca1feb1) )
+
 	ROM_REGION( 0x8000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "gv112_fg3_2764.k7k8",    0x0000, 0x2000, CRC(d1886658) SHA1(2ba452acfb3548c02137c8732e1f7cf8f4c31275) )
 	ROM_LOAD( "gv112_fg2_2764.k6",      0x2000, 0x2000, CRC(e1c73f0c) SHA1(3e91d6184f94b06ab0342504da387ac41d1a83b3) )
 	ROM_LOAD( "gv112_fg1_2764.k5",      0x4000, 0x2000, CRC(724bc3ea) SHA1(305945e7224c3463083c7579a826ec7eba846067) )
 	ROM_LOAD( "gv112_fg0_2764.k4",      0x6000, 0x2000, CRC(0311bbd9) SHA1(0a4f8268dab696bcb25738a482add24fb1f5f09d) )
-
-	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "gv112_bg0_2732.e11e12",  0x0000, 0x1000, CRC(a74591fd) SHA1(e6916cfa44cbe4c0d58fb0307c70580a6fabfcf1) )
-	ROM_LOAD( "gv112_bg1_2732.e13",     0x1000, 0x1000, CRC(5a226e6a) SHA1(faf119a8db823f2fc57c0e789b5f3486bca1feb1) )
 ROM_END
 
 
-static DRIVER_INIT( gottlieb )
+
+/*************************************
+ *
+ *  Driver initialization
+ *
+ *************************************/
+
+static DRIVER_INIT( ramtiles )
 {
-	gottlieb_sound_init();
+	gottlieb_gfxcharlo = gottlieb_gfxcharhi = 0;
 }
+
+
+static DRIVER_INIT( romtiles )
+{
+	gottlieb_gfxcharlo = gottlieb_gfxcharhi = 1;
+}
+
+
+static DRIVER_INIT( vidvince )
+{
+	gottlieb_gfxcharlo = 1;
+	gottlieb_gfxcharhi = 0;
+}
+
 
 static DRIVER_INIT( stooges )
 {
-	gottlieb_sound_init();
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05804, 0x05804, 0, 0, stooges_IN4_r);
+	DRIVER_INIT_CALL(ramtiles);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05803, 0x05803, 0, 0, stooges_output_w);
 }
 
+
 static DRIVER_INIT( laserdsc )
 {
-	gottlieb_sound_init();
+	DRIVER_INIT_CALL(romtiles);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05805, 0x05807, 0, 0x007f8, gottlieb_laserdisc_status_r);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05803, 0x05803, 0, 0, usvsthem_video_outputs_w);      /* OUT1 */
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05805, 0x05805, 0, 0, gottlieb_laserdisc_command_w);	/* command for the player */
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05806, 0x05806, 0, 0, gottlieb_laserdisc_mpx_w);
 }
 
 
-GAME( 1982, reactor,  0,        reactor,  reactor,  0,        ROT0,   "Gottlieb", "Reactor", 0 )
-GAME( 1982, qbert,    0,        qbert,    qbert,    0,        ROT270, "Gottlieb", "Q*bert (US set 1)", 0 )
-GAME( 1982, qberta,   qbert,    qbert,    qbert,    0,        ROT270, "Gottlieb", "Q*bert (US set 2)", 0 )
-GAME( 1982, qbertjp,  qbert,    qbert,    qbert,    0,        ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", 0 )
-GAME( 1982, myqbert,  qbert,    qbert,    qbert,    0,        ROT270, "Gottlieb", "Mello Yello Q*bert", 0 )
-GAME( 1982, qberttst, qbert,    qbert,    qbert,    0,        ROT270, "Gottlieb", "Q*bert (early test version)", 0 )
-GAME( 1982, qbtrktst, qbert,    qbert,    qbert,    0,        ROT270, "Gottlieb", "Q*bert Board Input Test Rom", 0 )
-GAME( 1982, insector, 0,        gottlieb, insector, 0,        ROT0,   "Gottlieb", "Insector (prototype)", 0 )
-GAME( 1982, tylz,     0,        qbert,    tylz,     0,        ROT0,   "Mylstar",  "Tylz (prototype)", GAME_IMPERFECT_SOUND ) // modified sound hw?
-GAME( 1984, argusg,   0,        krull,    argusg,   0,        ROT0,   "Gottlieb", "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
-GAME( 1983, mplanets, 0,        gottlieb, mplanets, 0,        ROT270, "Gottlieb", "Mad Planets", 0 )
-GAME( 1983, mplanuk,  mplanets, gottlieb, mplanets, 0,        ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )
-GAME( 1983, krull,    0,        krull,    krull,    0,        ROT270, "Gottlieb", "Krull", 0 )
-GAME( 1983, kngtmare, 0,        gottlieb, kngtmare, 0,        ROT0,   "Gottlieb", "Knightmare (prototype)", GAME_NO_SOUND )
-GAME( 1983, sqbert,   0,        qbert,    qbert,    0,        ROT270, "Mylstar", "Faster, Harder, More Challenging Q*bert (prototype)", 0 )
-GAME( 1983, qbertqub, 0,        qbert,    qbertqub, 0,        ROT270, "Mylstar", "Q*bert's Qubes", 0 )
-GAME( 1983, mach3,    0,        gottlieb2,mach3,    laserdsc, ROT0,   "Mylstar", "M.A.C.H. 3", GAME_NOT_WORKING )
-GAME( 1983, screwloo, 0,        gottlieb2,screwloo, gottlieb, ROT0,   "Mylstar", "Screw Loose (prototype)", 0 )
-GAME( 1984, cobram3,  0,        gottlieb2,mach3,    laserdsc, ROT0,   "Data East","Cobra Command", GAME_NOT_WORKING )
-GAME( 1984, curvebal, 0,        gottlieb, curvebal, 0,        ROT270, "Mylstar", "Curve Ball", 0 )
-GAME( 1984, usvsthem, 0,        gottlieb2,usvsthem, laserdsc, ROT0,   "Mylstar", "Us vs. Them", GAME_NOT_WORKING )
-GAME( 1984, 3stooges, 0,        stooges,  3stooges, stooges,  ROT0,   "Mylstar", "The Three Stooges In Brides Is Brides", 0 )
-GAME( 1984, vidvince, 0,        vidvince, vidvince, gottlieb, ROT0,   "Mylstar", "Video Vince and the Game Factory (prototype)", GAME_IMPERFECT_GRAPHICS ) // sprite wrapping issues
-GAME( 1984, wizwarz,  0,        gottlieb2,wizwarz,  gottlieb, ROT0,   "Mylstar", "Wiz Warz (prototype)", 0 )
+
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
+
+GAME( 1982, reactor,  0,        reactor,   reactor,  ramtiles, ROT0,   "Gottlieb", "Reactor", 0 )
+GAME( 1982, qbert,    0,        qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (US set 1)", 0 )
+GAME( 1982, qberta,   qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (US set 2)", 0 )
+GAME( 1982, qbertjp,  qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", 0 )
+GAME( 1982, myqbert,  qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Mello Yello Q*bert", 0 )
+GAME( 1982, qberttst, qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (early test version)", 0 )
+GAME( 1982, qbtrktst, qbert,    qbert,     qbert,    romtiles, ROT270, "Gottlieb", "Q*bert Board Input Test Rom", 0 )
+GAME( 1982, insector, 0,        gottlieb1, insector, romtiles, ROT0,   "Gottlieb", "Insector (prototype)", 0 )
+GAME( 1982, tylz,     0,        qbert,     tylz,     romtiles, ROT0,   "Mylstar",  "Tylz (prototype)", GAME_IMPERFECT_SOUND ) // modified sound hw?
+GAME( 1984, argusg,   0,        gottlieb1, argusg,   ramtiles, ROT0,   "Gottlieb", "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
+GAME( 1983, mplanets, 0,        gottlieb1, mplanets, romtiles, ROT270, "Gottlieb", "Mad Planets", 0 )
+GAME( 1983, mplanuk,  mplanets, gottlieb1, mplanets, romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )
+GAME( 1983, krull,    0,        gottlieb1, krull,    ramtiles, ROT270, "Gottlieb", "Krull", 0 )
+GAME( 1983, kngtmare, 0,        gottlieb1, kngtmare, romtiles, ROT0,   "Gottlieb", "Knightmare (prototype)", GAME_NO_SOUND )
+GAME( 1983, sqbert,   0,        qbert,     qbert,    romtiles, ROT270, "Mylstar", "Faster, Harder, More Challenging Q*bert (prototype)", 0 )
+GAME( 1983, qbertqub, 0,        qbert,     qbertqub, romtiles, ROT270, "Mylstar", "Q*bert's Qubes", 0 )
+GAME( 1983, mach3,    0,        gottlieb2, mach3,    laserdsc, ROT0,   "Mylstar", "M.A.C.H. 3", GAME_NOT_WORKING )
+GAME( 1983, screwloo, 0,        gottlieb2, screwloo, romtiles, ROT0,   "Mylstar", "Screw Loose (prototype)", 0 )
+GAME( 1984, cobram3,  0,        gottlieb2, mach3,    laserdsc, ROT0,   "Data East","Cobra Command", GAME_NOT_WORKING )
+GAME( 1984, curvebal, 0,        gottlieb1, curvebal, romtiles, ROT270, "Mylstar", "Curve Ball", 0 )
+GAME( 1984, usvsthem, 0,        gottlieb2, usvsthem, laserdsc, ROT0,   "Mylstar", "Us vs. Them", GAME_NOT_WORKING )
+GAME( 1984, 3stooges, 0,        gottlieb2, 3stooges, stooges,  ROT0,   "Mylstar", "The Three Stooges In Brides Is Brides", 0 )
+GAME( 1984, vidvince, 0,        gottlieb2, vidvince, vidvince, ROT0,   "Mylstar", "Video Vince and the Game Factory (prototype)", GAME_IMPERFECT_GRAPHICS ) // sprite wrapping issues
+GAME( 1984, wizwarz,  0,        gottlieb2, wizwarz,  romtiles, ROT0,   "Mylstar", "Wiz Warz (prototype)", 0 )

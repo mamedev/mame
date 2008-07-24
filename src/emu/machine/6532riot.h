@@ -4,84 +4,72 @@
 
 ***************************************************************************/
 
-#ifndef RIOT_6532
-#define RIOT_6532
+#ifndef __RIOT6532_H__
+#define __RIOT6532_H__
 
-#define	MAX_R6532	8
 
-struct riot6532_interface
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _riot6532_config riot6532_config;
+struct _riot6532_config
 {
-	read8_machine_func in_a_func;
-	read8_machine_func in_b_func;
-	write8_machine_func out_a_func;
-	write8_machine_func out_b_func;
-	void (*irq_func)(running_machine *machine, int state);
+	UINT32					clock;
 };
 
-void r6532_set_clock(int which, int clock);
-void r6532_reset(running_machine *machine, int which);
-void r6532_config(running_machine *machine, int which, const struct riot6532_interface* intf);
-UINT8 r6532_read(running_machine *machine, int which, offs_t offset);
-void r6532_write(running_machine *machine, int which, offs_t offset, UINT8 data);
-void r6532_set_input_a(running_machine *machine, int which, UINT8 data);
-void r6532_set_input_b(int which, UINT8 data);
 
-/******************* Standard 8-bit CPU interfaces, D0-D7 *******************/
+typedef UINT8 (*riot_read_func)(const device_config *device, UINT8 olddata);
+typedef void (*riot_write_func)(const device_config *device, UINT8 newdata, UINT8 olddata);
+typedef void (*riot_irq_func)(const device_config *device, int state);
 
-READ8_HANDLER( r6532_0_r );
-READ8_HANDLER( r6532_1_r );
-READ8_HANDLER( r6532_2_r );
-READ8_HANDLER( r6532_3_r );
-READ8_HANDLER( r6532_4_r );
-READ8_HANDLER( r6532_5_r );
-READ8_HANDLER( r6532_6_r );
-READ8_HANDLER( r6532_7_r );
 
-WRITE8_HANDLER( r6532_0_w );
-WRITE8_HANDLER( r6532_1_w );
-WRITE8_HANDLER( r6532_2_w );
-WRITE8_HANDLER( r6532_3_w );
-WRITE8_HANDLER( r6532_4_w );
-WRITE8_HANDLER( r6532_5_w );
-WRITE8_HANDLER( r6532_6_w );
-WRITE8_HANDLER( r6532_7_w );
+typedef struct _riot6532_interface riot6532_interface;
+struct _riot6532_interface
+{
+	riot_read_func		in_a_func;
+	riot_read_func		in_b_func;
+	riot_write_func		out_a_func;
+	riot_write_func		out_b_func;
+	riot_irq_func		irq_func;
+};
 
-/******************* 8-bit A/B port interfaces *******************/
 
-WRITE8_HANDLER( r6532_0_porta_w );
-WRITE8_HANDLER( r6532_1_porta_w );
-WRITE8_HANDLER( r6532_2_porta_w );
-WRITE8_HANDLER( r6532_3_porta_w );
-WRITE8_HANDLER( r6532_4_porta_w );
-WRITE8_HANDLER( r6532_5_porta_w );
-WRITE8_HANDLER( r6532_6_porta_w );
-WRITE8_HANDLER( r6532_7_porta_w );
 
-WRITE8_HANDLER( r6532_0_portb_w );
-WRITE8_HANDLER( r6532_1_portb_w );
-WRITE8_HANDLER( r6532_2_portb_w );
-WRITE8_HANDLER( r6532_3_portb_w );
-WRITE8_HANDLER( r6532_4_portb_w );
-WRITE8_HANDLER( r6532_5_portb_w );
-WRITE8_HANDLER( r6532_6_portb_w );
-WRITE8_HANDLER( r6532_7_portb_w );
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
 
-READ8_HANDLER( r6532_0_porta_r );
-READ8_HANDLER( r6532_1_porta_r );
-READ8_HANDLER( r6532_2_porta_r );
-READ8_HANDLER( r6532_3_porta_r );
-READ8_HANDLER( r6532_4_porta_r );
-READ8_HANDLER( r6532_5_porta_r );
-READ8_HANDLER( r6532_6_porta_r );
-READ8_HANDLER( r6532_7_porta_r );
+#define MDRV_RIOT6532_ADD(_tag, _clock, _intrf) \
+	MDRV_DEVICE_ADD(_tag, RIOT6532) \
+	MDRV_DEVICE_CONFIG_DATA32(riot6532_config, clock, _clock) \
+	MDRV_DEVICE_CONFIG(_intrf)
 
-READ8_HANDLER( r6532_0_portb_r );
-READ8_HANDLER( r6532_1_portb_r );
-READ8_HANDLER( r6532_2_portb_r );
-READ8_HANDLER( r6532_3_portb_r );
-READ8_HANDLER( r6532_4_portb_r );
-READ8_HANDLER( r6532_5_portb_r );
-READ8_HANDLER( r6532_6_portb_r );
-READ8_HANDLER( r6532_7_portb_r );
+#define MDRV_RIOT6532_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, RIOT6532)
+
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+READ8_DEVICE_HANDLER( riot6532_r );
+WRITE8_DEVICE_HANDLER( riot6532_w );
+
+void riot6532_porta_in_set(const device_config *device, UINT8 data, UINT8 mask);
+void riot6532_portb_in_set(const device_config *device, UINT8 data, UINT8 mask);
+
+UINT8 riot6532_porta_in_get(const device_config *device);
+UINT8 riot6532_portb_in_get(const device_config *device);
+
+UINT8 riot6532_porta_out_get(const device_config *device);
+UINT8 riot6532_portb_out_get(const device_config *device);
+
+
+/* ----- device interface ----- */
+
+#define RIOT6532 DEVICE_GET_INFO_NAME(riot6532)
+DEVICE_GET_INFO( riot6532 );
 
 #endif

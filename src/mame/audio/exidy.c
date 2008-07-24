@@ -10,6 +10,7 @@
 #include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
+#include "machine/6532riot.h"
 #include "sound/hc55516.h"
 #include "sound/5220intf.h"
 #include "sound/custom.h"
@@ -50,16 +51,7 @@ enum
 static UINT8 riot_irq_state;
 
 /* 6532 variables */
-static emu_timer *riot_timer;
-static UINT8 riot_irq_flag;
-static UINT8 riot_timer_irq_enable;
-static UINT8 riot_PA7_irq_enable;
-static UINT8 riot_porta_data;
-static UINT8 riot_porta_ddr;
-static UINT8 riot_portb_data;
-static UINT8 riot_portb_ddr;
-static int riot_clock_divisor;
-static UINT8 riot_state;
+static const device_config *riot;
 
 /* 6840 variables */
 struct sh6840_timer_channel
@@ -111,16 +103,6 @@ static int has_tms5220;
 /* sound streaming variables */
 static sound_stream *exidy_stream;
 static double freq_to_step;
-
-
-
-/*************************************
- *
- *  Prototypes
- *
- *************************************/
-
-static TIMER_CALLBACK( riot_interrupt );
 
 
 
@@ -403,176 +385,64 @@ void exidy_sh6840_sh_reset(void *token)
 
 /*************************************
  *
- *  6532 RIOT timer callback
+ *  6532 interface
  *
  *************************************/
 
-static TIMER_CALLBACK( riot_interrupt )
+static void r6532_irq(const device_config *device, int state)
 {
-	/* if we're doing the initial interval counting... */
-	if (riot_state == RIOT_COUNT)
-	{
-		/* generate the IRQ */
-		riot_irq_flag |= 0x80;
-		riot_irq_state = riot_timer_irq_enable;
-		update_irq_state(machine, 0);
+	riot_irq_state = (state == ASSERT_LINE) ? 1 : 0;
+	update_irq_state(device->machine, 0);
+}
 
-		/* now start counting clock cycles down */
-		riot_state = RIOT_POST_COUNT;
-		timer_adjust_oneshot(riot_timer, attotime_mul(ATTOTIME_IN_HZ(SH6532_CLOCK), 0xff), 0);
-	}
 
-	/* if not, we are done counting down */
-	else
+static void r6532_porta_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+{
+	if (has_mc3417)
+		cpunum_set_input_line(device->machine, 2, INPUT_LINE_RESET, (newdata & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+
+static void r6532_portb_w(const device_config *device, UINT8 newdata, UINT8 olddata)
+{
+	if (has_tms5220)
 	{
-		riot_state = RIOT_IDLE;
-		timer_adjust_oneshot(riot_timer, attotime_never, 0);
+		if ((olddata & 0x01) && !(newdata & 0x01))
+		{
+			riot6532_porta_in_set(riot, tms5220_status_r(device->machine, 0), 0xff);
+			logerror("(%f)%04X:TMS5220 status read = %02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), tms5220_status_r(device->machine, 0));
+		}
+		if ((olddata & 0x02) && !(newdata & 0x02))
+		{
+			logerror("(%f)%04X:TMS5220 data write = %02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), riot6532_porta_out_get(riot));
+			tms5220_data_w(device->machine, 0, riot6532_porta_out_get(riot));
+		}
 	}
 }
 
 
-
-/*************************************
- *
- *  6532 RIOT write handler
- *
- *************************************/
-
-static WRITE8_HANDLER( exidy_shriot_w )
+static UINT8 r6532_portb_r(const device_config *device, UINT8 olddata)
 {
-	/* I/O is done if A2 == 0 */
-	if ((offset & 0x04) == 0)
+	UINT8 newdata = olddata;
+	if (has_tms5220)
 	{
-		switch (offset & 0x03)
-		{
-			case 0:	/* port A */
-				if (has_mc3417)
-					cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-				riot_porta_data = (riot_porta_data & ~riot_porta_ddr) | (data & riot_porta_ddr);
-				break;
-
-			case 1:	/* port A DDR */
-				riot_porta_ddr = data;
-				break;
-
-			case 2:	/* port B */
-				if (has_tms5220)
-				{
-					if (!(data & 0x01) && (riot_portb_data & 0x01))
-					{
-						riot_porta_data = tms5220_status_r(machine, 0);
-						logerror("(%f)%04X:TMS5220 status read = %02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), riot_porta_data);
-					}
-					if (!(data & 0x02) && (riot_portb_data & 0x02))
-					{
-						logerror("(%f)%04X:TMS5220 data write = %02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), riot_porta_data);
-						tms5220_data_w(machine, 0, riot_porta_data);
-					}
-				}
-				riot_portb_data = (riot_portb_data & ~riot_portb_ddr) | (data & riot_portb_ddr);
-				break;
-
-			case 3:	/* port B DDR */
-				riot_portb_ddr = data;
-				break;
-		}
+		newdata &= ~0x0c;
+		if (!tms5220_ready_r()) newdata |= 0x04;
+		if (!tms5220_int_r()) newdata |= 0x08;
 	}
-
-	/* PA7 edge detect control if A2 == 1 and A4 == 0 */
-	else if ((offset & 0x10) == 0)
-	{
-		riot_PA7_irq_enable = offset & 0x03;
-	}
-
-	/* timer enable if A2 == 1 and A4 == 1 */
-	else
-	{
-		static const int divisors[4] = { 1, 8, 64, 1024 };
-
-		/* make sure the IRQ state is clear */
-		if (riot_state != RIOT_COUNT)
-			riot_irq_flag &= ~0x80;
-		riot_irq_state = 0;
-		update_irq_state(machine, 0);
-
-		/* set the enable from the offset */
-		riot_timer_irq_enable = (offset & 0x08) ? 1 : 0;
-
-		/* set a new timer */
-		riot_clock_divisor = divisors[offset & 0x03];
-		timer_adjust_oneshot(riot_timer, attotime_mul(ATTOTIME_IN_HZ(SH6532_CLOCK), data * riot_clock_divisor), 0);
-		riot_state = RIOT_COUNT;
-	}
+	return newdata;
 }
 
 
-
-/*************************************
- *
- *  6532 RIOT read handler
- *
- *************************************/
-
-static READ8_HANDLER( exidy_shriot_r )
+static const riot6532_interface r6532_interface =
 {
-	/* I/O is done if A2 == 0 */
-	if ((offset & 0x04) == 0)
-	{
-		switch (offset & 0x03)
-		{
-			case 0x00:	/* port A */
-				return riot_porta_data;
+	NULL,					/* port A read handler */
+	r6532_portb_r,			/* port B read handler */
+	r6532_porta_w,			/* port A write handler */
+	r6532_portb_w,			/* port B write handler */
+	r6532_irq				/* IRQ callback */
+};
 
-			case 0x01:	/* port A DDR */
-				return riot_porta_ddr;
-
-			case 0x02:	/* port B */
-				if (has_tms5220)
-				{
-					riot_portb_data &= ~0x0c;
-					if (!tms5220_ready_r()) riot_portb_data |= 0x04;
-					if (!tms5220_int_r()) riot_portb_data |= 0x08;
-				}
-				return riot_portb_data;
-
-			case 0x03:	/* port B DDR */
-				return riot_portb_ddr;
-		}
-	}
-
-	/* interrupt flags are read if A2 == 1 and A0 == 1 */
-	else if (offset & 0x01)
-	{
-		int temp = riot_irq_flag;
-		riot_irq_flag = 0;
-		riot_irq_state = 0;
-		update_irq_state(machine, 0);
-		return temp;
-	}
-
-	/* timer count is read if A2 == 1 and A0 == 0 */
-	else
-	{
-		/* set the enable from the offset */
-		riot_timer_irq_enable = offset & 0x08;
-
-		/* compute the timer based on the current state */
-		switch (riot_state)
-		{
-			case RIOT_IDLE:
-				return 0x00;
-
-			case RIOT_COUNT:
-				return attotime_to_double(timer_timeleft(riot_timer)) * SH6532_CLOCK / riot_clock_divisor;
-
-			case RIOT_POST_COUNT:
-				return attotime_to_double(timer_timeleft(riot_timer)) * SH6532_CLOCK;
-		}
-	}
-
-	logerror("Undeclared RIOT read: %x  PC:%x\n",offset,activecpu_get_pc());
-	return 0xff;
-}
 
 
 
@@ -762,6 +632,8 @@ static void *venture_common_sh_start(int clock, const struct CustomSound_interfa
 
 	void *ret = exidy_sh6840_sh_start(clock, config);
 
+	riot = device_list_find_by_tag(Machine->config->devicelist, RIOT6532, "riot");
+
 	has_sh8253  = TRUE;
 	has_tms5220 = _has_tms5220;
 
@@ -772,9 +644,6 @@ static void *venture_common_sh_start(int clock, const struct CustomSound_interfa
 		if (Machine->config->sound[i].type == SOUND_MC3417)
 			has_mc3417 = TRUE;
 	}
-
-	/* 6532 */
-    riot_timer = timer_alloc(riot_interrupt, NULL);
 
 	/* 8253 */
 	freq_to_step = (double)(1 << 24) / (double)SH8253_CLOCK;
@@ -800,12 +669,7 @@ static void venture_sh_reset(void *token)
 	pia_reset();
 
 	/* 6532 */
-	riot_irq_flag = 0;
-	riot_timer_irq_enable = 0;
-	riot_porta_data = 0xff;
-	riot_portb_data = 0xff;
-	riot_clock_divisor = 1;
-	riot_state = RIOT_IDLE;
+	device_reset(riot);
 
 	/* 8253 */
 	memset(sh8253_timer, 0, sizeof(sh8253_timer));
@@ -823,7 +687,7 @@ static const struct CustomSound_interface venture_custom_interface =
 static ADDRESS_MAP_START( venture_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0780) AM_RAM
-	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0780) AM_READWRITE(exidy_shriot_r, exidy_shriot_w)
+	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0780) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
 	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x07fc) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x1800, 0x1803) AM_MIRROR(0x07fc) AM_READWRITE(exidy_sh8253_r, exidy_sh8253_w)
 	AM_RANGE(0x2000, 0x27ff) AM_WRITE(exidy_sound_filter_w)
@@ -837,6 +701,8 @@ MACHINE_DRIVER_START( venture_audio )
 
 	MDRV_CPU_ADD("audio", M6502, 3579545/4)
 	MDRV_CPU_PROGRAM_MAP(venture_audio_map,0)
+
+	MDRV_RIOT6532_ADD("riot", SH6532_CLOCK, r6532_interface)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -859,7 +725,7 @@ static WRITE8_HANDLER( mtrap_voiceio_w )
 		hc55516_digit_w(0, data & 1);
 
 	if (!(offset & 0x20))
-		riot_portb_data = data & 1;
+		riot6532_portb_in_set(riot, data & 1, 0xff);
 }
 
 
@@ -867,10 +733,10 @@ static READ8_HANDLER( mtrap_voiceio_r )
 {
 	if (!(offset & 0x80))
 	{
-		int data = (riot_porta_data & 0x06) >> 1;
-		data |= (riot_porta_data & 0x01) << 2;
-		data |= (riot_porta_data & 0x08);
-
+		UINT8 porta = riot6532_porta_out_get(riot);
+		UINT8 data = (porta & 0x06) >> 1;
+		data |= (porta & 0x01) << 2;
+		data |= (porta & 0x08);
 		return data;
 	}
 
@@ -1017,7 +883,7 @@ static const struct CustomSound_interface victory_custom_interface =
 
 static ADDRESS_MAP_START( victory_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0f00) AM_RAM
-	AM_RANGE(0x1000, 0x107f) AM_MIRROR(0x0f80) AM_READWRITE(exidy_shriot_r, exidy_shriot_w)
+	AM_RANGE(0x1000, 0x107f) AM_MIRROR(0x0f80) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x0ffc) AM_READWRITE(exidy_sh8253_r, exidy_sh8253_w)
 	AM_RANGE(0x4000, 0x4fff) AM_NOP
@@ -1032,6 +898,8 @@ MACHINE_DRIVER_START( victory_audio )
 
 	MDRV_CPU_ADD("audio", M6502, VICTORY_AUDIO_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(victory_audio_map,0)
+
+	MDRV_RIOT6532_ADD("riot", SH6532_CLOCK, r6532_interface)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
