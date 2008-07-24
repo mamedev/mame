@@ -1290,7 +1290,7 @@ input_port_value input_port_read(running_machine *machine, const char *tag)
 
 
 /*-------------------------------------------------
-    input_port_read_indexed - return the value of
+    input_port_read_safe - return the value of
     an input port specified by tag, or a default
     value if the port does not exist
 -------------------------------------------------*/
@@ -1299,18 +1299,6 @@ input_port_value input_port_read_safe(running_machine *machine, const char *tag,
 {
 	const input_port_config *port = input_port_by_tag(machine->portconfig, tag);
 	return (port == NULL) ? defvalue : input_port_read_direct(port);
-}
-
-
-/*-------------------------------------------------
-    input_port_read_indexed - return the value of
-    an input port specified by index
--------------------------------------------------*/
-
-input_port_value input_port_read_indexed(running_machine *machine, int portnum)
-{
-	const input_port_config *port = input_port_by_index(machine->portconfig, portnum);
-	return (port == NULL) ? 0 : input_port_read_direct(port);
 }
 
 

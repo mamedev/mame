@@ -477,7 +477,8 @@ static READ32_HANDLER(analog_2b_r)
 	UINT32 iptval=0x00ff;
 	if(analog_channel<4)
 	{
-		iptval=input_port_read_indexed(machine, 3+analog_channel);
+		static const char *ports[] = { "ANA0", "ANA1", "ANA2", "ANA3" };
+		iptval=input_port_read_safe(machine, ports[analog_channel], 0);
 		++analog_channel;
 	}
 	return (iptval<<16)|0x0000001a;
@@ -1527,13 +1528,13 @@ static INPUT_PORTS_START( srallyc)
 	PORT_START_TAG("IN2")
 	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("STEER")	// steer
+	PORT_START_TAG("ANA0")	// steer
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START_TAG("ACCEL")	// accel
+	PORT_START_TAG("ANA1")	// accel
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START_TAG("BREAK")	// brake
+	PORT_START_TAG("ANA2")	// brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 

@@ -53,22 +53,22 @@ ADDRESS_MAP_END
 
 static UINT8 port6_r(const device_config *device, UINT8 olddata)
 {
-	return input_port_read_indexed(device->machine, 6);
+	return input_port_read(device->machine, "RIOT0_SWA");
 }
 
 static UINT8 port7_r(const device_config *device, UINT8 olddata)
 {
-	return input_port_read_indexed(device->machine, 7);
+	return input_port_read(device->machine, "RIOT0_SWB");
 }
 
 static UINT8 port8_r(const device_config *device, UINT8 olddata)
 {
-	return input_port_read_indexed(device->machine, 8);
+	return input_port_read(device->machine, "RIOT1_SWA");
 }
 
 static UINT8 port9_r(const device_config *device, UINT8 olddata)
 {
-	return input_port_read_indexed(device->machine, 9);
+	return input_port_read(device->machine, "RIOT1_SWB");
 }
 
 static void watchdog_w(const device_config *device, UINT8 newdata, UINT8 olddata)

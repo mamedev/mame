@@ -694,6 +694,18 @@ READ32_HANDLER( watchdog_reset32_r ) { watchdog_reset(machine); return 0xfffffff
 ***************************************************************************/
 
 /*-------------------------------------------------
+    input_port_read_indexed - return the value of
+    an input port specified by index
+-------------------------------------------------*/
+
+static input_port_value input_port_read_indexed(running_machine *machine, int portnum)
+{
+	const input_port_config *port = input_port_by_index(machine->portconfig, portnum);
+	return (port == NULL) ? 0 : input_port_read_direct(port);
+}
+
+
+/*-------------------------------------------------
     8-bit read handlers
 -------------------------------------------------*/
 
