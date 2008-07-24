@@ -192,15 +192,15 @@ void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int sample
 		// if we're between play and write positions, then bump forward, but only in full chunks
 		while (stream_in < write_position)
 		{
-//logerror("Underflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)stream_buffer_in, (int)bytes_this_frame);
+//printf("Underflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)stream_buffer_in, (int)bytes_this_frame);
 			buffer_underflows++;
-			stream_in += samples_this_frame;
+			stream_in += bytes_this_frame;
 		}
 
 		// if we're going to overlap the play position, just skip this chunk
 		if (stream_in + bytes_this_frame > play_position + stream_buffer_size)
 		{
-//logerror("Overflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)stream_buffer_in, (int)bytes_this_frame);
+//printf("Overflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)stream_buffer_in, (int)bytes_this_frame);
 			buffer_overflows++;
 			return;
 		}
