@@ -86,7 +86,7 @@ static MACHINE_RESET( aquarium )
 static READ16_HANDLER( aquarium_coins_r )
 {
 	int data;
-	data = (input_port_read(machine, "IN1") & 0x7fff);
+	data = (input_port_read(machine, "SYSTEM") & 0x7fff);
 	data |= aquarium_snd_ack;
 	aquarium_snd_ack = 0;
 	return data;
@@ -151,12 +151,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc80000, 0xc81fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xd80014, 0xd8001f) AM_WRITE(SMH_RAM) AM_BASE(&aquarium_scroll)
-	AM_RANGE(0xd80068, 0xd80069) AM_WRITENOP  /* probably not used */
-	AM_RANGE(0xd80080, 0xd80081) AM_READ(input_port_0_word_r)
+	AM_RANGE(0xd80068, 0xd80069) AM_WRITENOP		/* probably not used */
+	AM_RANGE(0xd80080, 0xd80081) AM_READ_PORT("DSW")
 	AM_RANGE(0xd80082, 0xd80083) AM_READ(SMH_NOP)	/* stored but not read back ? check code at 0x01f440 */
-	AM_RANGE(0xd80084, 0xd80085) AM_READ(input_port_1_word_r)
+	AM_RANGE(0xd80084, 0xd80085) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xd80086, 0xd80087) AM_READ(aquarium_coins_r)
-	AM_RANGE(0xd80088, 0xd80089) AM_WRITENOP /* ?? video related */
+	AM_RANGE(0xd80088, 0xd80089) AM_WRITENOP		/* ?? video related */
 	AM_RANGE(0xd8008a, 0xd8008b) AM_WRITE(aquarium_sound_w)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -215,7 +215,7 @@ static INPUT_PORTS_START( aquarium )
 	PORT_DIPUNUSED( 0x4000, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x8000, IP_ACTIVE_LOW )
 
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -233,7 +233,7 @@ static INPUT_PORTS_START( aquarium )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* untested */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )

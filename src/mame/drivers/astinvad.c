@@ -281,7 +281,7 @@ static WRITE8_HANDLER( astinvad_sound2_w )
 	if (bits_gone_hi & 0x08) sample_start(5, SND_FLEET4, 0);
 	if (bits_gone_hi & 0x10) sample_start(4, SND_UFOHIT, 0);
 
-	screen_flip = (input_port_read(machine, "IN3") & data & 0x20) ? 0xff : 0x00;
+	screen_flip = (input_port_read(machine, "CABINET") & data & 0x20) ? 0xff : 0x00;
 }
 
 
@@ -312,7 +312,7 @@ static WRITE8_HANDLER( spaceint_sound2_w )
 
 	if (bits_gone_hi & 0x04) sample_start(3, SND_INVADERHIT, 0);
 
-	screen_flip = (input_port_read(machine, "IN3") & data & 0x80) ? 0xff : 0x00;
+	screen_flip = (input_port_read(machine, "CABINET") & data & 0x80) ? 0xff : 0x00;
 }
 
 
@@ -346,8 +346,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spaceint_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_WRITE(spaceint_sound1_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(color_latch_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(spaceint_sound2_w)
@@ -392,7 +392,7 @@ static INPUT_PORTS_START( kamikaze )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")
+	PORT_START_TAG("CABINET")
 	PORT_DIPNAME( 0xff, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0xff, DEF_STR( Cocktail ) )
@@ -462,7 +462,7 @@ static INPUT_PORTS_START( spaceint )
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(spaceint_coin_inserted, 0)
 
-	PORT_START_TAG("IN3")
+	PORT_START_TAG("CABINET")
 	PORT_DIPNAME( 0xff, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0xff, DEF_STR( Cocktail ) )

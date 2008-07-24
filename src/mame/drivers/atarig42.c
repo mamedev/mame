@@ -350,10 +350,10 @@ static WRITE16_HANDLER( guardians_sloop_data_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x080001) AM_ROM
-	AM_RANGE(0xe00000, 0xe00001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0xe00002, 0xe00003) AM_READ(input_port_1_word_r)
+	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("IN0")
+	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("IN1")
 	AM_RANGE(0xe00010, 0xe00011) AM_READ(special_port2_r)
-	AM_RANGE(0xe00012, 0xe00013) AM_READ(input_port_3_word_r)
+	AM_RANGE(0xe00012, 0xe00013) AM_READ_PORT("JSAIII")
 	AM_RANGE(0xe00020, 0xe00027) AM_READWRITE(a2d_data_r, a2d_select_w)
 	AM_RANGE(0xe00030, 0xe00031) AM_READ(atarigen_sound_r)
 	AM_RANGE(0xe00040, 0xe00041) AM_WRITE(atarigen_sound_w)

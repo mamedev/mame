@@ -280,11 +280,11 @@ static WRITE8_HANDLER( butasan_pagedram_w )
 static ADDRESS_MAP_START( argus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(1)
-	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_0_r)			// Coin
-	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_1_r)			// Player 1
-	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_2_r)			// Player 2
-	AM_RANGE(0xc003, 0xc003) AM_READ(input_port_3_r)			// DSW 1
-	AM_RANGE(0xc004, 0xc004) AM_READ(input_port_4_r)			// DSW 2
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
+	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
+	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE(argus_flipscreen_w)
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
@@ -304,11 +304,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( valtric_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(1)
-	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_0_r)			// Coin
-	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_1_r)			// Player 1
-	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_2_r)			// Player 2
-	AM_RANGE(0xc003, 0xc003) AM_READ(input_port_3_r)			// DSW 1
-	AM_RANGE(0xc004, 0xc004) AM_READ(input_port_4_r)			// DSW 2
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
+	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
+	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE(argus_flipscreen_w)
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
@@ -327,11 +327,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( butasan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(1)
-	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_0_r)			// Coin
-	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_1_r)			// Player 1
-	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_2_r)			// Player 2
-	AM_RANGE(0xc003, 0xc003) AM_READ(input_port_3_r)			// DSW 1
-	AM_RANGE(0xc004, 0xc004) AM_READ(input_port_4_r)			// DSW 2
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
+	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
+	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE(argus_flipscreen_w)
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
@@ -369,11 +369,11 @@ static ADDRESS_MAP_START( bombsa_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 
 	/* Input ports */
-	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_0_r)					// Coin
-	AM_RANGE(0xe001, 0xe001) AM_READ(input_port_1_r)					// Player 1
-	AM_RANGE(0xe002, 0xe002) AM_READ(input_port_2_r)					// Player 2
-	AM_RANGE(0xe003, 0xe003) AM_READ(input_port_3_r)					// DSW 1
-	AM_RANGE(0xe004, 0xe004) AM_READ(input_port_4_r)					// DSW 2
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("P1")
+	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("P2")
+	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("DSW1")
+	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM) // ??
 	AM_RANGE(0xe800, 0xefff) AM_READWRITE(bombsa_txram_r, bombsa_txram_w) AM_BASE(&argus_txram) // banked? it gets corrupted at game start, maybe its banked and one layer can be 16x16 or 8x8?
 	AM_RANGE(0xf000, 0xffff) AM_READWRITE(bombsa_paletteram_r, bombsa_paletteram_w) AM_BASE(&argus_paletteram) // banked?
@@ -420,20 +420,18 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( argus )
-	/* System control */
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("SYSTEM")	/* System control */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	//PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+//	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	 /* Player 1 control */
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P1")	 /* Player 1 control */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -443,8 +441,7 @@ static INPUT_PORTS_START( argus )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	/* Player 2 control */
-	PORT_START_TAG("IN2")
+	PORT_START_TAG("P2")	/* Player 2 control */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
@@ -531,7 +528,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( butasan )
 	PORT_INCLUDE( valtric )
 
-	PORT_MODIFY("IN0")
+	PORT_MODIFY("SYSTEM")
 	PORT_SERVICE( 0x20,	IP_ACTIVE_LOW )
 
 	PORT_MODIFY("DSW1")
@@ -563,7 +560,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( bombsa )
 	PORT_INCLUDE( argus )
 
-	PORT_MODIFY("IN0")
+	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x20,	IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_MODIFY("DSW1")

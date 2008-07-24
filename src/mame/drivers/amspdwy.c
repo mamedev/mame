@@ -80,8 +80,8 @@ static ADDRESS_MAP_START( amspdwy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(amspdwy_colorram_w) AM_BASE(&colorram)	// Layer
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM												// Unused?
 //  AM_RANGE(0xa000, 0xa000) AM_WRITENOP                                        // ?
-	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)							// DSW 1
-	AM_RANGE(0xa400, 0xa400) AM_READWRITE(input_port_1_r, amspdwy_flipscreen_w)	// DSW 2 + Toggle Flip Screen?
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")
+	AM_RANGE(0xa400, 0xa400) AM_READ_PORT("DSW2") AM_WRITE(amspdwy_flipscreen_w)	// DSW 2 + Toggle Flip Screen?
 	AM_RANGE(0xa800, 0xa800) AM_READ(amspdwy_wheel_0_r)							// Player 1
 	AM_RANGE(0xac00, 0xac00) AM_READ(amspdwy_wheel_1_r)							// Player 2
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP										// ? Exiting IRQ
@@ -133,7 +133,6 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( amspdwy )
-
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, "Character Test" )		PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -190,7 +189,6 @@ static INPUT_PORTS_START( amspdwy )
 
 	PORT_START_TAG("AN2")	// Player 2 Analog Fake Port
 	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(20) PORT_CODE_DEC(KEYCODE_D) PORT_CODE_INC(KEYCODE_G) PORT_PLAYER(2)
-
 INPUT_PORTS_END
 
 

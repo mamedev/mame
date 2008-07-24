@@ -74,26 +74,26 @@ static WRITE8_HANDLER ( aeroboto_1a2_w )
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x01a2, 0x01a2) AM_WRITE(aeroboto_1a2_w) // affects IRQ line (more protection?)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&aeroboto_mainram) // main  RAM
-	AM_RANGE(0x0800, 0x08ff) AM_RAM // tile color buffer; copied to 0x2000
-	AM_RANGE(0x0900, 0x09ff) AM_WRITE(SMH_RAM) // a backup of default tile colors
-	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(aeroboto_videoram_w) AM_BASE(&aeroboto_videoram) // tile RAM
-	AM_RANGE(0x1800, 0x183f) AM_RAM AM_BASE(&aeroboto_hscroll) // horizontal scroll regs
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(aeroboto_tilecolor_w) AM_BASE(&aeroboto_tilecolor) // tile color RAM
-	AM_RANGE(0x1840, 0x27ff) AM_WRITE(SMH_NOP) // cleared during custom LSI test
-	AM_RANGE(0x2800, 0x28ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) // sprite RAM
-	AM_RANGE(0x2900, 0x2fff) AM_WRITE(SMH_NOP) // cleared along with sprite RAM
-	AM_RANGE(0x2973, 0x2973) AM_READ(aeroboto_2973_r) // protection read
+	AM_RANGE(0x01a2, 0x01a2) AM_WRITE(aeroboto_1a2_w)			// affects IRQ line (more protection?)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&aeroboto_mainram)	// main  RAM
+	AM_RANGE(0x0800, 0x08ff) AM_RAM								// tile color buffer; copied to 0x2000
+	AM_RANGE(0x0900, 0x09ff) AM_WRITE(SMH_RAM)					// a backup of default tile colors
+	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(aeroboto_videoram_w) AM_BASE(&aeroboto_videoram)		// tile RAM
+	AM_RANGE(0x1800, 0x183f) AM_RAM AM_BASE(&aeroboto_hscroll)	// horizontal scroll regs
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(aeroboto_tilecolor_w) AM_BASE(&aeroboto_tilecolor)	// tile color RAM
+	AM_RANGE(0x1840, 0x27ff) AM_WRITE(SMH_NOP)					// cleared during custom LSI test
+	AM_RANGE(0x2800, 0x28ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)				// sprite RAM
+	AM_RANGE(0x2900, 0x2fff) AM_WRITE(SMH_NOP)					// cleared along with sprite RAM
+	AM_RANGE(0x2973, 0x2973) AM_READ(aeroboto_2973_r)			// protection read
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(aeroboto_in0_r, aeroboto_3000_w)
-	AM_RANGE(0x3001, 0x3001) AM_READWRITE(input_port_2_r, soundlatch_w)
-	AM_RANGE(0x3002, 0x3002) AM_READWRITE(input_port_3_r, soundlatch2_w)
+	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1") AM_WRITE(soundlatch_w)
+	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_WRITE(soundlatch2_w)
 	AM_RANGE(0x3003, 0x3003) AM_WRITEONLY AM_BASE(&aeroboto_vscroll)
 	AM_RANGE(0x3004, 0x3004) AM_READWRITE(aeroboto_201_r, SMH_RAM) AM_BASE(&aeroboto_starx)
-	AM_RANGE(0x3005, 0x3005) AM_WRITEONLY AM_BASE(&aeroboto_stary) // usable but probably wrong
+	AM_RANGE(0x3005, 0x3005) AM_WRITEONLY AM_BASE(&aeroboto_stary)	// usable but probably wrong
 	AM_RANGE(0x3006, 0x3006) AM_WRITEONLY AM_BASE(&aeroboto_bgcolor)
-	AM_RANGE(0x3800, 0x3800) AM_READNOP // watchdog or IRQ ack
-	AM_RANGE(0x4000, 0xffff) AM_ROM // main ROM
+	AM_RANGE(0x3800, 0x3800) AM_READNOP							// watchdog or IRQ ack
+	AM_RANGE(0x4000, 0xffff) AM_ROM								// main ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -110,7 +110,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( formatz )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -120,7 +120,7 @@ static INPUT_PORTS_START( formatz )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL

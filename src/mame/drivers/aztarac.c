@@ -60,8 +60,8 @@ static READ16_HANDLER( nvram_r )
 
 static READ16_HANDLER( joystick_r )
 {
-    return (((input_port_read(machine, "IN0") - 0xf) << 8) |
-            ((input_port_read(machine, "IN1") - 0xf) & 0xff));
+    return (((input_port_read(machine, "STICKZ") - 0xf) << 8) |
+            ((input_port_read(machine, "STICKY") - 0xf) & 0xff));
 }
 
 
@@ -76,9 +76,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM
 	AM_RANGE(0x022000, 0x0220ff) AM_READWRITE(nvram_r, SMH_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x027000, 0x027001) AM_READ(joystick_r)
-	AM_RANGE(0x027004, 0x027005) AM_READ(input_port_3_word_r)
+	AM_RANGE(0x027004, 0x027005) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x027008, 0x027009) AM_READWRITE(aztarac_sound_r, aztarac_sound_w)
-	AM_RANGE(0x02700c, 0x02700d) AM_READ(input_port_2_word_r)
+	AM_RANGE(0x02700c, 0x02700d) AM_READ_PORT("DIAL")
 	AM_RANGE(0x02700e, 0x02700f) AM_READ(watchdog_reset16_r)
 	AM_RANGE(0xff8000, 0xffafff) AM_RAM AM_BASE(&aztarac_vectorram)
 	AM_RANGE(0xffb000, 0xffb001) AM_WRITE(aztarac_ubr_w)
@@ -117,16 +117,16 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( aztarac )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("STICKZ")
 	PORT_BIT( 0x1f, 0xf, IPT_AD_STICK_Z ) PORT_MINMAX(0,0x1e) PORT_SENSITIVITY(100) PORT_KEYDELTA(1)
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("STICKY")
 	PORT_BIT( 0x1f, 0xf, IPT_AD_STICK_Y ) PORT_MINMAX(0,0x1e) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_REVERSE
 
-	PORT_START_TAG("IN2")
+	PORT_START_TAG("DIAL")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE
 
-	PORT_START_TAG("IN3")
+	PORT_START_TAG("INPUTS")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )

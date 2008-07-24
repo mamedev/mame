@@ -576,14 +576,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ampoker2_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x0f) AM_WRITENOP				/* inexistent in the real hardware */
-	AM_RANGE(0x10, 0x10) AM_READ(input_port_0_r)
-	AM_RANGE(0x11, 0x11) AM_READ(input_port_1_r)
-	AM_RANGE(0x12, 0x12) AM_READ(input_port_2_r)
-	AM_RANGE(0x13, 0x13) AM_READ(input_port_3_r)
-	AM_RANGE(0x14, 0x14) AM_READ(input_port_4_r)
-	AM_RANGE(0x15, 0x15) AM_READ(input_port_5_r)
-	AM_RANGE(0x16, 0x16) AM_READ(input_port_6_r)
-	AM_RANGE(0x17, 0x17) AM_READ(input_port_7_r)
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
+	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
+	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN2")
+	AM_RANGE(0x13, 0x13) AM_READ_PORT("IN3")
+	AM_RANGE(0x14, 0x14) AM_READ_PORT("IN4")
+	AM_RANGE(0x15, 0x15) AM_READ_PORT("IN5")
+	AM_RANGE(0x16, 0x16) AM_READ_PORT("IN6")
+	AM_RANGE(0x17, 0x17) AM_READ_PORT("IN7")
 //  AM_RANGE(0x21, 0x21) AM_WRITENOP                    /* undocumented, write 0x1a after each reset */
 	AM_RANGE(0x30, 0x30) AM_WRITE (ampoker2_port30_w)	/* see write handlers */
 	AM_RANGE(0x31, 0x31) AM_WRITE (ampoker2_port31_w)	/* see write handlers */

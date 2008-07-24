@@ -259,8 +259,8 @@ static INPUT_PORTS_START( alleymas )		/* complete, verified from code */
 
 	PORT_START_TAG("IN2")	/* 0xD0 */
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )		/* redundant inputs */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )		/* redundant inputs */
+//	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )		/* redundant inputs */
+//	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )		/* redundant inputs */
 
 	PORT_START_TAG("IN3")	/* 0xD1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_EEPROM_DATA )

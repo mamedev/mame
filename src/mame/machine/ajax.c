@@ -109,7 +109,7 @@ static WRITE8_HANDLER( ajax_lamps_w )
 READ8_HANDLER( ajax_ls138_f10_r )
 {
 	int data = 0, index;
-	static const char *portnames[] = { "IN0", "IN1", "DSW1", "DSW2" };
+	static const char *portnames[] = { "SYSTEM", "P1", "DSW1", "DSW2" };
 
 	switch ((offset & 0x01c0) >> 6)
 	{
@@ -117,7 +117,7 @@ READ8_HANDLER( ajax_ls138_f10_r )
 			data = mame_rand(machine);
 			break;
 		case 0x04:	/* 2P inputs */
-			data = input_port_read(machine, "IN2");
+			data = input_port_read(machine, "P2");
 			break;
 		case 0x06:	/* 1P inputs + DIPSW #1 & #2 */
 			index = offset & 0x01;

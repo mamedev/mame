@@ -183,9 +183,9 @@ INPUT_PORTS_END
 /*******************************************************/
 
 static ADDRESS_MAP_START( invadpt2_io_map, ADDRESS_SPACE_IO, 8 )
-    AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-    AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-    AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, mb14241_0_shift_count_w)
+    AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+    AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+    AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW0") AM_WRITE(mb14241_0_shift_count_w)
     AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, invadpt2_sh_port_1_w)
     AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
     AM_RANGE(0x05, 0x05) AM_WRITE(invadpt2_sh_port_2_w)
@@ -240,9 +240,9 @@ MACHINE_DRIVER_END
 /*******************************************************/
 
 static ADDRESS_MAP_START( spcewars_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, mb14241_0_shift_count_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW0") AM_WRITE(mb14241_0_shift_count_w)
 	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, spcewars_sh_port_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(invadpt2_sh_port_2_w)
@@ -300,9 +300,9 @@ ADDRESS_MAP_END
 
 /* at least one of these MWA8_NOPs must be sound related */
 static ADDRESS_MAP_START( cosmo_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, SMH_NOP)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_1_r, SMH_NOP)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, SMH_NOP)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITENOP
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITENOP
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW0") AM_WRITENOP
     AM_RANGE(0x03, 0x03) AM_WRITE(invadpt2_sh_port_1_w)
     AM_RANGE(0x05, 0x05) AM_WRITE(cosmo_sh_port_2_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
@@ -399,9 +399,9 @@ INPUT_PORTS_END
 /*******************************************************/
 
 static ADDRESS_MAP_START( invrvnge_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, mb14241_0_shift_count_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW0") AM_WRITE(mb14241_0_shift_count_w)
 	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, invrvnge_sh_port_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
 ADDRESS_MAP_END
@@ -429,17 +429,17 @@ static INPUT_PORTS_START( invrvnge )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START_TAG("DSW0")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )									PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )			PORT_DIPLOCATION("SW1:3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )										PORT_DIPLOCATION("SW1:3")
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:4" )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)					PORT_DIPLOCATION("SW1:5")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)	PORT_DIPLOCATION("SW1:6")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)	PORT_DIPLOCATION("SW1:7")
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )									PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 
@@ -527,9 +527,9 @@ INPUT_PORTS_END
 /*******************************************************/
 
 static ADDRESS_MAP_START( lrescue_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, mb14241_0_shift_count_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW0") AM_WRITE(mb14241_0_shift_count_w)
 	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, lrescue_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(lrescue_sh_port_2_w)
@@ -666,9 +666,9 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( rollingc_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, rollingc_sh_port_w)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, mb14241_0_shift_count_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(rollingc_sh_port_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW0") AM_WRITE(mb14241_0_shift_count_w)
 	AM_RANGE(0x03, 0x03) AM_READ(mb14241_0_shift_result_r)
 	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
 ADDRESS_MAP_END
@@ -725,9 +725,9 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( schaser_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, mb14241_0_shift_count_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW0") AM_WRITE(mb14241_0_shift_count_w)
 	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, schaser_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(schaser_sh_port_2_w)
@@ -827,9 +827,9 @@ MACHINE_DRIVER_END
 /*******************************************************/
 
 static ADDRESS_MAP_START( schasrcv_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, mb14241_0_shift_count_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW0") AM_WRITE(mb14241_0_shift_count_w)
 	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, schasrcv_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(schasrcv_sh_port_2_w)
@@ -846,12 +846,12 @@ static INPUT_PORTS_START( schasrcv )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
 
 	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )									PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)	PORT_DIPLOCATION("SW1:2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)		PORT_DIPLOCATION("SW1:3")
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Difficulty ) )								PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)					PORT_DIPLOCATION("SW1:5")
@@ -890,17 +890,17 @@ static int sfl_int=0;
 
 static READ8_HANDLER( sfl_input_r )
 {
-	sfl_int^=0x80;//vblank flag ?
-	return sfl_int|input_port_read(machine, "DSW0");
+	sfl_int^=0x80;	//vblank flag ?
+	return sfl_int | input_port_read(machine, "DSW0");
 }
 
 static ADDRESS_MAP_START( sflush_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&mw8080bw_ram) AM_SIZE(&mw8080bw_ram_size)
-	AM_RANGE(0x8008, 0x8008) AM_READ(input_port_2_r)
+	AM_RANGE(0x8008, 0x8008) AM_READ_PORT("PADDLE")
 	AM_RANGE(0x8009, 0x8009) AM_READ(mb14241_0_shift_result_r)
 	AM_RANGE(0x800a, 0x800a) AM_READ(sfl_input_r)
-	AM_RANGE(0x800b, 0x800b) AM_READ(input_port_0_r)
+	AM_RANGE(0x800b, 0x800b) AM_READ_PORT("IN0")
 	AM_RANGE(0x8018, 0x8018) AM_WRITE(mb14241_0_shift_data_w)
 	AM_RANGE(0x8019, 0x8019) AM_WRITE(mb14241_0_shift_count_w)
 	AM_RANGE(0x801a, 0x801a) AM_WRITE(SMH_NOP)
@@ -928,7 +928,7 @@ static INPUT_PORTS_START( sflush )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_TILT  )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -946,7 +946,7 @@ static INPUT_PORTS_START( sflush )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 
-	PORT_START_TAG("IN2")
+	PORT_START_TAG("PADDLE")
 	PORT_BIT( 0xff, 0x6a, IPT_PADDLE ) PORT_MINMAX(0x16,0xbf) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_CENTERDELTA(0)
 INPUT_PORTS_END
 
@@ -959,9 +959,9 @@ INPUT_PORTS_END
 /*******************************************************/
 
 static ADDRESS_MAP_START( lupin3_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, mb14241_0_shift_count_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW0") AM_WRITE(mb14241_0_shift_count_w)
 	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, lupin3_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(lupin3_sh_port_2_w)
@@ -1063,9 +1063,9 @@ UINT8 polaris_get_cloud_pos(void)
 // It sounds better then the actual circuit used.
 // Probably an unfinished feature.
 static ADDRESS_MAP_START( polaris_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, mb14241_0_shift_count_w)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, polaris_sh_port_1_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(mb14241_0_shift_count_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW0") AM_WRITE(polaris_sh_port_1_w)
 	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, mb14241_0_shift_data_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(polaris_sh_port_2_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(watchdog_reset_w)
@@ -1107,7 +1107,7 @@ static INPUT_PORTS_START( polaris )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	/* The Demo Sounds dip switch does function.
-     * It allows the sonar sounds to play in demo mode. */
+       It allows the sonar sounds to play in demo mode. */
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
@@ -1232,9 +1232,9 @@ INPUT_PORTS_END
 /*******************************************************/
 
 static ADDRESS_MAP_START( ballbomb_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, mb14241_0_shift_count_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW0") AM_WRITE(mb14241_0_shift_count_w)
 	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, ballbomb_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(ballbomb_sh_port_2_w)
@@ -1281,8 +1281,8 @@ static ADDRESS_MAP_START( yosakdon_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yosakdon_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_0_r)
-	AM_RANGE(0x02, 0x02) AM_READ(input_port_1_r)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1")
 	AM_RANGE(0x03, 0x03) AM_WRITE(yosakdon_sh_port_1_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(yosakdon_sh_port_2_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP) /* character numbers */
@@ -1373,8 +1373,6 @@ static INPUT_PORTS_START( indianbt )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START_TAG("DUMMY") /*  cabinet fake port  must be 4th  */
-
 	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -1414,8 +1412,8 @@ static READ8_HANDLER(indianbt_r)
 
 static ADDRESS_MAP_START( indianbt_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ(indianbt_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_0_r)
-	AM_RANGE(0x02, 0x02) AM_READ(input_port_1_r) AM_WRITE(mb14241_0_shift_count_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW0") AM_WRITE(mb14241_0_shift_count_w)
 	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, indianbt_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(indianbt_sh_port_2_w)
@@ -1491,7 +1489,7 @@ static INPUT_PORTS_START( shuttlei )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("INPUTS")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1514,8 +1512,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( shuttlei_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xfc, 0xfc) AM_WRITENOP /* game writes 0xAA every so often (perhaps when base hit?) */
 	AM_RANGE(0xfd, 0xfd) AM_WRITE(shuttlei_sh_port_1_w)
-	AM_RANGE(0xfe, 0xfe) AM_READWRITE(input_port_0_r, shuttlei_sh_port_2_w)
-	AM_RANGE(0xff, 0xff) AM_READ(input_port_1_r)
+	AM_RANGE(0xfe, 0xfe) AM_READ_PORT("DSW") AM_WRITE(shuttlei_sh_port_2_w)
+	AM_RANGE(0xff, 0xff) AM_READ_PORT("INPUTS")
 //         port fd (write) is for sound
 ADDRESS_MAP_END
 
@@ -1584,14 +1582,14 @@ static ADDRESS_MAP_START( darthvdr_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( darthvdr_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
 	AM_RANGE(0x00, 0x0f) AM_WRITENOP
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( darthvdr )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
@@ -1607,7 +1605,7 @@ static INPUT_PORTS_START( darthvdr )
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x80, "6" )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
