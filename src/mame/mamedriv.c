@@ -2069,6 +2069,7 @@ const game_driver * const drivers[] =
 	DRIVER( demonwl1 )	/* TP-016 (c) 1989 Toaplan + Taito license */
 	DRIVER( demonwl2 )	/* TP-016 (c) 1989 Toaplan */
 	DRIVER( demonwl3 )	/* TP-016 (c) 1989 Toaplan */
+	DRIVER( demonwl4 )	/* TP-016 (c) 1989 Toaplan */
 	DRIVER( fireshrk )	/* TP-017 (c) 1990 Toaplan */
 	DRIVER( samesame )	/* TP-017 (c) 1989 Toaplan */
 	DRIVER( samesam2 )	/* TP-017 (c) 1989 Toaplan */
