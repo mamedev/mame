@@ -2742,6 +2742,9 @@ ROM_START( plotting ) /* Likely B96-10 or higher by Taito's rom numbering system
 	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "b96-07.ic9", 0x00000, 0x10000, CRC(0713a387) SHA1(0fc1242ce02a56279fa1d5270c905bba7cdcd072) )
 	ROM_LOAD( "b96-08.ic8", 0x10000, 0x10000, CRC(55b8e294) SHA1(14405638f751adfadb022bf7a0123a3972d4a617) )
+
+	ROM_REGION( 0x0200, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_LOAD( "gal16v8-b6-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified */
 ROM_END
 
 
@@ -2753,6 +2756,9 @@ ROM_START( plottina ) /* B96-09 or higher by Taito's rom numbering system, demo 
 	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "b96-02.ic9", 0x00000, 0x10000, CRC(6e0bad2a) SHA1(73996688cd058a2f56f61ea60144b9c673919a58) )
 	ROM_LOAD( "b96-03.ic8", 0x10000, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
+
+	ROM_REGION( 0x0200, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_LOAD( "gal16v8-b6-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified */
 ROM_END
 
 ROM_START( plottinb ) /* The first (earliest) "World" version by Taito's rom numbering system, demo mode is 2 players */
@@ -2763,6 +2769,9 @@ ROM_START( plottinb ) /* The first (earliest) "World" version by Taito's rom num
 	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "b96-02.ic9", 0x00000, 0x10000, CRC(6e0bad2a) SHA1(73996688cd058a2f56f61ea60144b9c673919a58) )
 	ROM_LOAD( "b96-03.ic8", 0x10000, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
+
+	ROM_REGION( 0x0200, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_LOAD( "gal16v8-b6-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified */
 ROM_END
 
 ROM_START( plottinu ) /* The demo mode is 2 players */
@@ -2773,6 +2782,9 @@ ROM_START( plottinu ) /* The demo mode is 2 players */
 	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "b96-02.ic9", 0x00000, 0x10000, CRC(6e0bad2a) SHA1(73996688cd058a2f56f61ea60144b9c673919a58) )
 	ROM_LOAD( "b96-03.ic8", 0x10000, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
+
+	ROM_REGION( 0x0200, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_LOAD( "gal16v8-b6-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified */
 ROM_END
 
 ROM_START( flipull ) /* The demo mode is 1 player */
