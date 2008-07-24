@@ -186,12 +186,13 @@ Check gticlub.c for details on the bottom board.
 #include "video/gticlub.h"
 
 
-static UINT8 led_reg0 = 0x7f, led_reg1 = 0x7f;
+static UINT8 led_reg0, led_reg1;
 
 
 // defined in drivers/gticlub.c
 extern READ8_HANDLER(K056230_r);
 extern WRITE8_HANDLER(K056230_w);
+extern UINT32 *lanc_ram;
 extern READ32_HANDLER(lanc_ram_r);
 extern WRITE32_HANDLER(lanc_ram_w);
 
@@ -219,6 +220,7 @@ READ32_HANDLER(K001604_reg_r);
 static VIDEO_START( jetwave )
 {
 	K001005_init(machine);
+	K001006_init(machine);
 	K001604_vh_start(machine, 0);
 }
 
@@ -267,6 +269,7 @@ static VIDEO_START( zr107 )
 	};
 
 	K056832_vh_start(machine, REGION_GFX2, K056832_BPP_8, 1, scrolld, game_tile_callback, 0);
+	K001006_init(machine);
 	K001005_init(machine);
 }
 
@@ -483,7 +486,7 @@ static ADDRESS_MAP_START( zr107_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x780c0000, 0x780c0007) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_READWRITE8(K056230_r, K056230_w, 0xffffffff)				/* LANC registers */
-	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_READWRITE(lanc_ram_r, lanc_ram_w)		/* LANC Buffer RAM (27E) */
+	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_READWRITE(lanc_ram_r, lanc_ram_w) AM_BASE(&lanc_ram)		/* LANC Buffer RAM (27E) */
 	AM_RANGE(0x7e00c000, 0x7e00c007) AM_WRITE(K056800_host_w)
 	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_READ(K056800_host_r)
 	AM_RANGE(0x7f800000, 0x7f9fffff) AM_ROM AM_SHARE(2)
@@ -714,7 +717,7 @@ static INPUT_PORTS_START( jetwave )
 
 INPUT_PORTS_END
 
-static sharc_config sharc_cfg =
+static const sharc_config sharc_cfg =
 {
 	BOOT_MODE_EPROM
 };
@@ -835,10 +838,11 @@ static void sound_irq_callback(running_machine *machine, int irq)
 		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ2, PULSE_LINE);
 }
 
-static DRIVER_INIT(zr107)
+static void init_zr107(running_machine *machine)
 {
-	init_konami_cgboard(1, CGBOARD_TYPE_ZR107);
 	sharc_dataram = auto_malloc(0x100000);
+	led_reg0 = led_reg1 = 0x7f;
+	ccu_vcth = ccu_vctl = 0;
 
 	K001005_preprocess_texture_data(memory_region(machine, REGION_GFX1), memory_region_length(machine, REGION_GFX1), 0);
 
@@ -847,16 +851,16 @@ static DRIVER_INIT(zr107)
 	adc083x_init(0, ADC0838, adc0838_callback);
 }
 
+static DRIVER_INIT(zr107)
+{
+	init_konami_cgboard(1, CGBOARD_TYPE_ZR107);
+	init_zr107(machine);
+}
+
 static DRIVER_INIT(jetwave)
 {
 	init_konami_cgboard(1, CGBOARD_TYPE_GTICLUB);
-	sharc_dataram = auto_malloc(0x100000);
-
-	K001005_preprocess_texture_data(memory_region(machine, REGION_GFX1), memory_region_length(machine, REGION_GFX1), 0);
-
-	K056800_init(sound_irq_callback);
-
-	adc083x_init(0, ADC0838, adc0838_callback);
+	init_zr107(machine);
 }
 
 /*****************************************************************************/

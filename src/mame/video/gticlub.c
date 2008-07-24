@@ -27,8 +27,6 @@ void K001604_draw_back_layer(int chip, bitmap_t *bitmap, const rectangle *clipre
 extern UINT8 gticlub_led_reg0;
 extern UINT8 gticlub_led_reg1;
 
-static poly_manager *poly;
-
 
 
 /*****************************************************************************/
@@ -36,12 +34,28 @@ static poly_manager *poly;
 
 #define MAX_K001006_CHIPS		2
 
-static UINT16 K001006_pal_ram[MAX_K001006_CHIPS][0x800];
-static UINT16 K001006_unknown_ram[MAX_K001006_CHIPS][0x1000];
+static UINT16 *K001006_pal_ram[MAX_K001006_CHIPS];
+static UINT16 *K001006_unknown_ram[MAX_K001006_CHIPS];
 static UINT32 K001006_addr[MAX_K001006_CHIPS] = { 0, 0 };
 static int K001006_device_sel[MAX_K001006_CHIPS] = { 0, 0 };
 
-static UINT32 K001006_palette[MAX_K001006_CHIPS][0x800];
+static UINT32 *K001006_palette[MAX_K001006_CHIPS];
+
+void K001006_init(running_machine *machine)
+{
+	int i;
+	for (i=0; i<MAX_K001006_CHIPS; i++)
+	{
+		K001006_pal_ram[i] = auto_malloc(0x800*sizeof(UINT16));
+		memset(K001006_pal_ram[i], 0, 0x800*sizeof(UINT16));
+		K001006_unknown_ram[i] = auto_malloc(0x1000*sizeof(UINT16));
+		memset(K001006_unknown_ram[i], 0, 0x1000*sizeof(UINT16));
+		K001006_addr[i] = 0;
+		K001006_device_sel[i] = 0;
+		K001006_palette[i] = auto_malloc(0x800*sizeof(UINT32));
+		memset(K001006_palette[i], 0, 0x800*sizeof(UINT32));
+	}
+}
 
 static UINT32 K001006_r(running_machine *machine, int chip, int offset, UINT32 mem_mask)
 {
@@ -176,6 +190,11 @@ static int tex_mirror_table[4][128];
 
 static int K001005_bitmap_page = 0;
 
+static poly_manager *poly;
+static poly_vertex prev_v[4];
+static int prev_poly_type;
+
+
 void K001005_swap_buffers(running_machine *machine);
 
 static void K001005_exit(running_machine *machine)
@@ -213,6 +232,16 @@ void K001005_init(running_machine *machine)
 		tex_mirror_table[2][i] = ((i & 0x3f) >= 0x20) ? (0x1f - (i & 0x1f)) : i & 0x1f;
 		tex_mirror_table[3][i] = ((i & 0x7f) >= 0x40) ? (0x3f - (i & 0x3f)) : i & 0x3f;
 	}
+
+	K001005_status = 0;
+	K001005_ram_ptr = 0;
+	K001005_fifo_read_ptr = 0;
+	K001005_fifo_write_ptr = 0;
+	K001005_3d_fifo_ptr = 0;
+	K001005_bitmap_page = 0;
+
+	memset(prev_v, 0, sizeof(prev_v));
+	prev_poly_type = 0;
 }
 
 // rearranges the texture data to a more practical order
@@ -523,9 +552,6 @@ static void draw_scanline_tex(void *dest, INT32 scanline, const poly_extent *ext
 		w += dw;
 	}
 }
-
-static poly_vertex prev_v[4];
-static int prev_poly_type;
 
 static void render_polygons(running_machine *machine)
 {
@@ -955,15 +981,20 @@ void K001005_swap_buffers(running_machine *machine)
 	}
 }
 
-VIDEO_START( gticlub )
-{
-	K001005_init(machine);
-	K001604_vh_start(machine, 0);
-}
-
 static int tick = 0;
 static int debug_tex_page = 0;
 static int debug_tex_palette = 0;
+
+VIDEO_START( gticlub )
+{
+	tick = 0;
+	debug_tex_page = 0;
+	debug_tex_palette = 0;
+
+	K001006_init(machine);
+	K001005_init(machine);
+	K001604_vh_start(machine, 0);
+}
 
 VIDEO_UPDATE( gticlub )
 {
@@ -1000,7 +1031,7 @@ VIDEO_UPDATE( gticlub )
 			debug_tex_palette = 0;
 	}
 
-	/*
+#if 0
     if (debug_tex_page > 0)
     {
         char string[200];
@@ -1022,7 +1053,7 @@ VIDEO_UPDATE( gticlub )
         sprintf(string, "Texture page %d\nPalette %d", debug_tex_page, debug_tex_palette);
         //popmessage("%s", string);
     }
-    */
+#endif
 
 	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg1);

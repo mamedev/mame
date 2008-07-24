@@ -318,10 +318,10 @@
 #include "sound/rf5c400.h"
 #include "rendlay.h"
 
-static UINT8 led_reg0 = 0x7f, led_reg1 = 0x7f;
+static UINT8 led_reg0, led_reg1;
 static UINT32 *workram;
 static UINT32 *sharc_dataram[2];
-static UINT8 jvs_sdata[1024];
+static UINT8 *jvs_sdata;
 static UINT32 jvs_sdata_ptr = 0;
 static UINT8 *backup_ram;
 
@@ -335,7 +335,7 @@ static UINT32 *K037122_char_ram[MAX_K037122_CHIPS];
 static UINT8 *K037122_dirty_map[MAX_K037122_CHIPS];
 static int K037122_gfx_index[MAX_K037122_CHIPS], K037122_char_dirty[MAX_K037122_CHIPS];
 static tilemap *K037122_layer[MAX_K037122_CHIPS][2];
-static UINT32 K037122_reg[MAX_K037122_CHIPS][256];
+static UINT32 *K037122_reg[MAX_K037122_CHIPS];
 
 #define K037122_NUM_TILES		16384
 
@@ -431,6 +431,8 @@ static int K037122_vh_start(running_machine *machine, int chip)
 
 	K037122_dirty_map[chip] = auto_malloc(K037122_NUM_TILES);
 
+	K037122_reg[chip] = auto_malloc(0x400);
+
 	if (chip == 0)
 	{
 		K037122_layer[chip][0] = tilemap_create(K037122_0_tile_info_layer0, tilemap_scan_rows, 8, 8, 256, 64);
@@ -448,13 +450,14 @@ static int K037122_vh_start(running_machine *machine, int chip)
 	memset(K037122_char_ram[chip], 0, 0x200000);
 	memset(K037122_tile_ram[chip], 0, 0x20000);
 	memset(K037122_dirty_map[chip], 0, K037122_NUM_TILES);
+	memset(K037122_reg[chip], 0, 0x400);
 
 	machine->gfx[K037122_gfx_index[chip]] = allocgfx(&K037122_char_layout);
 	decodegfx(machine->gfx[K037122_gfx_index[chip]], (UINT8*)K037122_char_ram[chip], 0, machine->gfx[K037122_gfx_index[chip]]->total_elements);
 
 	machine->gfx[K037122_gfx_index[chip]]->total_colors = machine->config->total_colors / 16;
 
-	state_save_register_item_array("K037122", chip, K037122_reg[chip]);
+	state_save_register_item_pointer("K037122", chip, K037122_reg[chip], 0x400/sizeof(K037122_reg[chip][0]));
 	state_save_register_item_pointer("K037122", chip, K037122_char_ram[chip], 0x200000/sizeof(K037122_char_ram[chip][0]));
 	state_save_register_item_pointer("K037122", chip, K037122_tile_ram[chip], 0x20000/sizeof(K037122_tile_ram[chip][0]));
 	state_save_register_postload(machine, K037122_postload, (void *)(FPTR)chip);
@@ -665,7 +668,7 @@ static VIDEO_UPDATE( hornet_2board )
 static READ8_HANDLER( sysreg_r )
 {
 	UINT8 r = 0;
-	static const char *portnames[] = { "IN0", "IN1", "IN2" };
+	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 
 	switch (offset)
 	{
@@ -987,7 +990,7 @@ static const struct RF5C400interface rf5c400_interface =
 	REGION_SOUND1
 };
 
-static sharc_config sharc_cfg =
+static const sharc_config sharc_cfg =
 {
 	BOOT_MODE_EPROM
 };
@@ -1004,6 +1007,10 @@ static sharc_config sharc_cfg =
 
 static MACHINE_START( hornet )
 {
+	jvs_sdata_ptr = 0;
+	jvs_sdata = auto_malloc(1024);
+	memset(jvs_sdata, 0, 1024);
+
 	/* set conservative DRC options */
 	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
 
@@ -1016,7 +1023,7 @@ static MACHINE_START( hornet )
 
 	state_save_register_global(led_reg0);
 	state_save_register_global(led_reg1);
-	state_save_register_global_array(jvs_sdata);
+	state_save_register_global_pointer(jvs_sdata, 1024);
 	state_save_register_global(jvs_sdata_ptr);
 }
 
@@ -1239,7 +1246,7 @@ static void jamma_jvs_cmd_exec(void)
 
 	length = jvs_decode_data(&jvs_sdata[3], data, byte_num-1);
 
-	/*
+#if 0
     printf("jvs input data:\n");
     for (i=0; i < byte_num; i++)
     {
@@ -1253,7 +1260,7 @@ static void jamma_jvs_cmd_exec(void)
         printf("%02X ", data[i]);
     }
     printf("\n\n");
-    */
+#endif
 
 	// clear return data
 	memset(rdata, 0, sizeof(rdata));
@@ -1306,7 +1313,7 @@ static void sound_irq_callback(running_machine *machine, int irq)
 		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ2, PULSE_LINE);
 }
 
-static void init_hornet(running_machine *machine, const UINT8 *backupdef)
+static void init_hornet(running_machine *machine)
 {
 	init_konami_cgboard(1, CGBOARD_TYPE_HORNET);
 	set_cgboard_texture_bank(0, 5, memory_region(machine, REGION_USER5));
@@ -1314,14 +1321,13 @@ static void init_hornet(running_machine *machine, const UINT8 *backupdef)
 	K056800_init(sound_irq_callback);
 	K033906_init();
 
-	backup_ram = auto_malloc(0x2000);
-	memcpy(backup_ram, backupdef, 0x2000);
+	led_reg0 = led_reg1 = 0x7f;
 	timekeeper_init(machine, 0, TIMEKEEPER_M48T58, backup_ram);
 
 	ppc4xx_spu_set_tx_handler(0, jamma_jvs_w);
 }
 
-static void init_hornet_2board(running_machine *machine, const UINT8 *backupdef)
+static void init_hornet_2board(running_machine *machine)
 {
 	init_konami_cgboard(2, CGBOARD_TYPE_HORNET);
 	set_cgboard_texture_bank(0, 5, memory_region(machine, REGION_USER5));
@@ -1330,8 +1336,7 @@ static void init_hornet_2board(running_machine *machine, const UINT8 *backupdef)
 	K056800_init(sound_irq_callback);
 	K033906_init();
 
-	backup_ram = auto_malloc(0x2000);
-	memcpy(backup_ram, backupdef, 0x2000);
+	led_reg0 = led_reg1 = 0x7f;
 	timekeeper_init(machine, 0, TIMEKEEPER_M48T58, backup_ram);
 
 	ppc4xx_spu_set_tx_handler(0, jamma_jvs_w);
@@ -1339,7 +1344,10 @@ static void init_hornet_2board(running_machine *machine, const UINT8 *backupdef)
 
 static DRIVER_INIT(gradius4)
 {
-	UINT8 backupdef[0x2000] = { 0 };
+	UINT8 *backupdef;
+
+	backupdef = auto_malloc(0x2000);
+	memset(backupdef, 0, 0x2000);
 
 	/* RTC data */
 	backupdef[0x00] = 0x47;	// 'G'
@@ -1359,14 +1367,18 @@ static DRIVER_INIT(gradius4)
 	backupdef[0x0e] = 0x02;	// checksum
 	backupdef[0x0f] = 0xd7;	// checksum
 
-	init_hornet(machine, backupdef);
+	backup_ram = backupdef;
+	init_hornet(machine);
 }
 
 static DRIVER_INIT(nbapbp)
 {
-	UINT8 backupdef[0x2000] = { 0 };
+	UINT8 *backupdef;
 	int i;
 	UINT16 checksum;
+
+	backupdef = auto_malloc(0x2000);
+	memset(backupdef, 0, 0x2000);
 
 	/* RTC data */
 	backupdef[0x00] = 0x47;	// 'G'
@@ -1393,14 +1405,18 @@ static DRIVER_INIT(nbapbp)
 	backupdef[0x0e] = (checksum >> 8) & 0xff;	// checksum
 	backupdef[0x0f] = (checksum >> 0) & 0xff;	// checksum
 
-	init_hornet(machine, backupdef);
+	backup_ram = backupdef;
+	init_hornet(machine);
 }
 
 static DRIVER_INIT(terabrst)
 {
-	UINT8 backupdef[0x2000] = { 0 };
+	UINT8 *backupdef;
 	int i;
 	UINT16 checksum;
+
+	backupdef = auto_malloc(0x2000);
+	memset(backupdef, 0, 0x2000);
 
 	/* RTC data */
 	backupdef[0x00] = 0x47;	// 'G'
@@ -1427,14 +1443,18 @@ static DRIVER_INIT(terabrst)
 	backupdef[0x0e] = (checksum >> 8) & 0xff;	// checksum
 	backupdef[0x0f] = (checksum >> 0) & 0xff;	// checksum
 
-	init_hornet_2board(machine, backupdef);
+	backup_ram = backupdef;
+	init_hornet_2board(machine);
 }
 
 static DRIVER_INIT(sscope)
 {
-	UINT8 backupdef[0x2000] = { 0 };
+	UINT8 *backupdef;
 	int i;
 	UINT16 checksum;
+
+	backupdef = auto_malloc(0x2000);
+	memset(backupdef, 0, 0x2000);
 
 	/* RTC data */
 	backupdef[0x00] = 0x47;	// 'G'
@@ -1461,14 +1481,18 @@ static DRIVER_INIT(sscope)
 	backupdef[0x0e] = (checksum >> 8) & 0xff;	// checksum
 	backupdef[0x0f] = (checksum >> 0) & 0xff;	// checksum
 
-	init_hornet_2board(machine, backupdef);
+	backup_ram = backupdef;
+	init_hornet_2board(machine);
 }
 
 static DRIVER_INIT(sscope2)
 {
-	UINT8 backupdef[0x2000] = { 0 };
+	UINT8 *backupdef;
 	int i;
 	int checksum;
+
+	backupdef = auto_malloc(0x2000);
+	memset(backupdef, 0, 0x2000);
 
 	/* RTC data */
 	backupdef[0x00] = 0x47;	// 'G'
@@ -1523,7 +1547,8 @@ static DRIVER_INIT(sscope2)
 	backupdef[0x1f4e] = (checksum >> 8) & 0xff;	// checksum
 	backupdef[0x1f4f] = (checksum >> 0) & 0xff;	// checksum
 
-	init_hornet_2board(machine, backupdef);
+	backup_ram = backupdef;
+	init_hornet_2board(machine);
 }
 
 /*****************************************************************************/
