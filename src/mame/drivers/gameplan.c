@@ -127,32 +127,33 @@ static const struct via6522_interface via_1_interface =
 
 static WRITE8_HANDLER( audio_reset_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	gameplan_state *state = machine->driver_data;
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	if (data == 0)
+	{
+		device_reset(state->riot);
+		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(10));
+	}
 }
 
 
 static WRITE8_HANDLER( audio_cmd_w )
 {
 	gameplan_state *state = machine->driver_data;
-
-	state->audio_cmd = data & 0x7f;
+	riot6532_porta_in_set(state->riot, data, 0x7f);
 }
 
 
 static WRITE8_HANDLER( audio_trigger_w )
 {
 	gameplan_state *state = machine->driver_data;
-
-	UINT8 cmd = (data << 7) | (state->audio_cmd & 0x7f);
-
-	soundlatch_w(machine, 0, cmd);
-	riot6532_porta_in_set(state->riot, cmd, 0xff);
+	riot6532_porta_in_set(state->riot, data << 7, 0x80);
 }
 
 
 static const struct via6522_interface via_2_interface =
 {
-	0, soundlatch2_r,					  /*inputs : A/B         */
+	0, soundlatch_r,					  /*inputs : A/B         */
 	0, 0, 0, 0,							  /*inputs : CA/B1,CA/B2 */
 	audio_cmd_w, 0,						  /*outputs: A/B         */
 	0, 0, audio_trigger_w, audio_reset_w, /*outputs: CA/B1,CA/B2 */
@@ -170,27 +171,23 @@ static const struct via6522_interface via_2_interface =
 static void r6532_irq(const device_config *device, int state)
 {
 	cpunum_set_input_line(device->machine, 1, 0, state);
+	if (state == ASSERT_LINE)
+		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(10));
 }
 
 
-static UINT8 r6532_soundlatch_r(const device_config *device, UINT8 olddata)
+static void r6532_soundlatch_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
-	return soundlatch_r(device->machine, 0);
-}
-
-
-static void r6532_soundlatch2_w(const device_config *device, UINT8 newdata, UINT8 olddata)
-{
-	soundlatch2_w(device->machine, 0, newdata);
+	soundlatch_w(device->machine, 0, newdata);
 }
 
 
 static const riot6532_interface r6532_interface =
 {
-	r6532_soundlatch_r,		/* port A read handler */
+	NULL,					/* port A read handler */
 	NULL,					/* port B read handler */
 	NULL,					/* port A write handler */
-	r6532_soundlatch2_w,	/* port B write handler */
+	r6532_soundlatch_w,		/* port B write handler */
 	r6532_irq				/* IRQ callback */
 };
 
@@ -213,7 +210,6 @@ static MACHINE_START( gameplan )
 
 	/* register for save states */
 	state_save_register_global(state->current_port);
-	state_save_register_global(state->audio_cmd);
 }
 
 
@@ -242,8 +238,6 @@ static ADDRESS_MAP_START( gameplan_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x200f) AM_MIRROR(0x07f0) AM_READWRITE(via_0_r, via_0_w)	/* VIA 1 */
 	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x07f0) AM_READWRITE(via_1_r, via_1_w)	/* VIA 2 */
 	AM_RANGE(0x3000, 0x300f) AM_MIRROR(0x07f0) AM_READWRITE(via_2_r, via_2_w)	/* VIA 3 */
-	AM_RANGE(0x3800, 0x3fff) AM_NOP
-	AM_RANGE(0x4000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -258,12 +252,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gameplan_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
 	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
-	AM_RANGE(0x2000, 0x9fff) AM_NOP
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_READ(AY8910_read_port_0_r)
 	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_NOP
-	AM_RANGE(0xc000, 0xdfff) AM_NOP
 	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_ROM
 ADDRESS_MAP_END
 
@@ -272,12 +263,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( leprechn_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
 	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
-	AM_RANGE(0x2000, 0x9fff) AM_NOP
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_READ(AY8910_read_port_0_r)
 	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_NOP
-	AM_RANGE(0xc000, 0xdfff) AM_NOP
 	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM
 ADDRESS_MAP_END
 

@@ -169,14 +169,14 @@ static TIMER_CALLBACK( timer_end_callback )
 {
 	const device_config *device = ptr;
 	riot6532_state *riot = get_safe_token(device);
-	
+
 	assert(riot->timerstate != TIMER_IDLE);
-	
+
 	/* if we finished counting, switch to the finishing state */
 	if (riot->timerstate == TIMER_COUNTING)
 	{
 		riot->timerstate = TIMER_FINISHING;
-		timer_adjust_oneshot(riot->timer, ticks_to_attotime(255, riot->clock), 0);
+		timer_adjust_oneshot(riot->timer, ticks_to_attotime(256, riot->clock), 0);
 	
 		/* signal timer IRQ as well */
 		riot->irqstate |= TIMER_FLAG;
