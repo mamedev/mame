@@ -414,8 +414,8 @@ static READ16_HANDLER( othunder_TC0220IOC_r )
 
 static READ16_HANDLER( othunder_lightgun_r )
 {
-	static const char *const dswname[4] = { P1X_PORT_TAG, P1Y_PORT_TAG, P2X_PORT_TAG, P2Y_PORT_TAG };
-	return input_port_read(machine, dswname[offset]);
+	static const char *const portname[4] = { P1X_PORT_TAG, P1Y_PORT_TAG, P2X_PORT_TAG, P2Y_PORT_TAG };
+	return input_port_read(machine, portname[offset]);
 }
 
 static WRITE16_HANDLER( othunder_lightgun_w )
@@ -537,7 +537,7 @@ static ADDRESS_MAP_START( z80_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(othunder_TC0310FAM_w) /* pan */
 	AM_RANGE(0xe600, 0xe600) AM_WRITE(SMH_NOP) /* ? */
-	AM_RANGE(0xea00, 0xea00) AM_READ(input_port_9_r)	/* rotary input */
+	AM_RANGE(0xea00, 0xea00) AM_READ_PORT(ROTARY_PORT_TAG)	/* rotary input */
 	AM_RANGE(0xee00, 0xee00) AM_WRITE(SMH_NOP) /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP) /* ? */
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
@@ -592,6 +592,7 @@ static INPUT_PORTS_START( othunder )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START_TAG("IN1")	/* unused */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)

@@ -4951,22 +4951,22 @@ READ8_HANDLER( TC0220IOC_r )
 	switch (offset)
 	{
 		case 0x00:	/* IN00-07 (DSA) */
-			return input_port_read_indexed(machine, 0);
+			return input_port_read(machine, "DSWA");
 
 		case 0x01:	/* IN08-15 (DSB) */
-			return input_port_read_indexed(machine, 1);
+			return input_port_read(machine, "DSWB");
 
 		case 0x02:	/* IN16-23 (1P) */
-			return input_port_read_indexed(machine, 2);
+			return input_port_read(machine, "IN0");
 
 		case 0x03:	/* IN24-31 (2P) */
-			return input_port_read_indexed(machine, 3);
+			return input_port_read(machine, "IN1");
 
 		case 0x04:	/* coin counters and lockout */
 			return TC0220IOC_regs[4];
 
 		case 0x07:	/* INB0-7 (coin) */
-			return input_port_read_indexed(machine, 4);
+			return input_port_read(machine, "IN2");
 
 		default:
 logerror("PC %06x: warning - read TC0220IOC address %02x\n",activecpu_get_pc(),offset);
@@ -5112,22 +5112,22 @@ READ8_HANDLER( TC0510NIO_r )
 	switch (offset)
 	{
 		case 0x00:	/* DSA */
-			return input_port_read_indexed(machine, 0);
+			return input_port_read(machine, "DSWA");
 
 		case 0x01:	/* DSB */
-			return input_port_read_indexed(machine, 1);
+			return input_port_read(machine, "DSWB");
 
 		case 0x02:	/* 1P */
-			return input_port_read_indexed(machine, 2);
+			return input_port_read(machine, "IN0");
 
 		case 0x03:	/* 2P */
-			return input_port_read_indexed(machine, 3);
+			return input_port_read(machine, "IN1");
 
 		case 0x04:	/* coin counters and lockout */
 			return TC0510NIO_regs[4];
 
 		case 0x07:	/* coin */
-			return input_port_read_indexed(machine, 4);
+			return input_port_read(machine, "IN2");
 
 		default:
 logerror("PC %06x: warning - read TC0510NIO address %02x\n",activecpu_get_pc(),offset);
@@ -5195,22 +5195,22 @@ READ8_HANDLER( TC0640FIO_r )
 	switch (offset)
 	{
 		case 0x00:	/* DSA */
-			return input_port_read_indexed(machine, 0);
+			return input_port_read(machine, "DSWA");
 
 		case 0x01:	/* DSB */
-			return input_port_read_indexed(machine, 1);
+			return input_port_read(machine, "DSWB");
 
 		case 0x02:	/* 1P */
-			return input_port_read_indexed(machine, 2);
+			return input_port_read(machine, "IN0");
 
 		case 0x03:	/* 2P */
-			return input_port_read_indexed(machine, 3);
+			return input_port_read(machine, "IN1");
 
 		case 0x04:	/* coin counters and lockout */
 			return TC0640FIO_regs[4];
 
 		case 0x07:	/* coin */
-			return input_port_read_indexed(machine, 4);
+			return input_port_read(machine, "IN2");
 
 		default:
 logerror("PC %06x: warning - read TC0640FIO address %02x\n",activecpu_get_pc(),offset);

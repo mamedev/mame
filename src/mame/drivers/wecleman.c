@@ -407,11 +407,11 @@ static WRITE16_HANDLER( selected_ip_w )
 static READ16_HANDLER( selected_ip_r )
 {
 	switch ( (wecleman_selected_ip >> 5) & 3 )
-	{												// From WEC Le Mans Schems:
-		case 0:  return input_port_read_indexed(machine,4);		// Accel - Schems: Accelevr
-		case 1:  return ~0;							// ????? - Schems: Not Used
-		case 2:  return input_port_read_indexed(machine,5);		// Wheel - Schems: Handlevr
-		case 3:  return ~0;							// Table - Schems: Turnvr
+	{																	// From WEC Le Mans Schems:
+		case 0:  return input_port_read(machine, "ACCEL");		// Accel - Schems: Accelevr
+		case 1:  return ~0;												// ????? - Schems: Not Used
+		case 2:  return input_port_read(machine, "STEER");		// Wheel - Schems: Handlevr
+		case 3:  return ~0;												// Table - Schems: Turnvr
 
 		default: return ~0;
 	}
@@ -547,10 +547,10 @@ static ADDRESS_MAP_START( wecleman_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)	// Selects accelerator / wheel / ..
 	AM_RANGE(0x140004, 0x140005) AM_WRITE(irqctrl_w)	// Main CPU controls the other CPUs
 	AM_RANGE(0x140006, 0x140007) AM_WRITE(SMH_NOP)	// Watchdog reset
-	AM_RANGE(0x140010, 0x140011) AM_READ(input_port_0_word_r)	// Coins + brake + gear
-	AM_RANGE(0x140012, 0x140013) AM_READ(input_port_1_word_r)	// ??
-	AM_RANGE(0x140014, 0x140015) AM_READ(input_port_2_word_r)	// DSW
-	AM_RANGE(0x140016, 0x140017) AM_READ(input_port_3_word_r)	// DSW
+	AM_RANGE(0x140010, 0x140011) AM_READ_PORT("IN0")	// Coins + brake + gear
+	AM_RANGE(0x140012, 0x140013) AM_READ_PORT("IN1")	// ??
+	AM_RANGE(0x140014, 0x140015) AM_READ_PORT("DSWA")	// DSW 2
+	AM_RANGE(0x140016, 0x140017) AM_READ_PORT("DSWB")	// DSW 1
 	AM_RANGE(0x140020, 0x140021) AM_WRITE(SMH_RAM)	// Paired with writes to $140003
 	AM_RANGE(0x140020, 0x140021) AM_READ(selected_ip_r)	// Accelerator or Wheel or ..
 	AM_RANGE(0x140030, 0x140031) AM_WRITE(SMH_NOP)	// toggles between 0 & 1 on hitting bumps and crashes (vibration?)
@@ -609,10 +609,10 @@ static ADDRESS_MAP_START( hotchase_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)	// Selects accelerator / wheel /
 	AM_RANGE(0x140004, 0x140005) AM_WRITE(irqctrl_w)	// Main CPU controls the other CPUs
 	AM_RANGE(0x140006, 0x140007) AM_READ(SMH_NOP)	// Watchdog reset
-	AM_RANGE(0x140010, 0x140011) AM_READ(input_port_0_word_r)	// Coins + brake + gear
-	AM_RANGE(0x140012, 0x140013) AM_READ(input_port_1_word_r)	// ?? bit 4 from sound cpu
-	AM_RANGE(0x140014, 0x140015) AM_READ(input_port_2_word_r)	// DSW 2
-	AM_RANGE(0x140016, 0x140017) AM_READ(input_port_3_word_r)	// DSW 1
+	AM_RANGE(0x140010, 0x140011) AM_READ_PORT("IN0")	// Coins + brake + gear
+	AM_RANGE(0x140012, 0x140013) AM_READ_PORT("IN1")	// ?? bit 4 from sound cpu
+	AM_RANGE(0x140014, 0x140015) AM_READ_PORT("DSW2")	// DSW 2
+	AM_RANGE(0x140016, 0x140017) AM_READ_PORT("DSW1")	// DSW 1
 	AM_RANGE(0x140020, 0x140021) AM_READWRITE(selected_ip_r, SMH_NOP)	// Paired with writes to $140003
 	AM_RANGE(0x140022, 0x140023) AM_READ(SMH_NOP)	// ??
 	AM_RANGE(0x140030, 0x140031) AM_WRITE(SMH_NOP)	// signal to cabinet vibration motors?
@@ -814,24 +814,24 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( wecleman )
-	PORT_START	/* IN0 - Controls and Coins - $140011.b */
+	PORT_START_TAG("IN0")	/* IN0 - Controls and Coins - $140011.b */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Shift") PORT_TOGGLE
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Brake")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Shift") PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Brake")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START	/* IN1 - Motor? - $140013.b */
+	PORT_START_TAG("IN1")	/* IN1 - Motor? - $140013.b */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 )	// right sw
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )	// left sw
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 )	// thermo
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )	// from sound cpu ?
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* IN2 - DSW A (Coinage) - $140015.b */
+	PORT_START_TAG("DSWA")	/* IN2 - DSW A (Coinage) - $140015.b */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -866,7 +866,7 @@ static INPUT_PORTS_START( wecleman )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
 
-	PORT_START	/* IN3 - DSW B (options) - $140017.b */
+	PORT_START_TAG("DSWB")	/* IN3 - DSW B (options) - $140017.b */
 	PORT_DIPNAME( 0x01, 0x01, "Speed Unit" )
 	PORT_DIPSETTING(    0x01, "km/h" )
 	PORT_DIPSETTING(    0x00, "mph" )
@@ -891,10 +891,10 @@ static INPUT_PORTS_START( wecleman )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	/* IN4 - Accelerator - $140021.b (0) */
+	PORT_START_TAG("ACCEL")	/* IN4 - Accelerator - $140021.b (0) */
 	PORT_BIT( 0xff, 0, IPT_PEDAL ) PORT_MINMAX(0,0x80) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START	/* IN5 - Steering Wheel - $140021.b (2) */
+	PORT_START_TAG("STEER")	/* IN5 - Steering Wheel - $140021.b (2) */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 
@@ -904,24 +904,24 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( hotchase )
-	PORT_START	/* IN0 - Controls and Coins - $140011.b */
+	PORT_START_TAG("IN0")	/* IN0 - Controls and Coins - $140011.b */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shift") PORT_TOGGLE
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Brake")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shift") PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Brake")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN1 - Motor? - $140013.b */
+	PORT_START_TAG("IN1")	/* IN1 - Motor? - $140013.b */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 )	// right sw
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )	// left sw
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 )	// thermo
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )	// from sound cpu ?
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* IN2 - DSW 2 (options) - $140015.b */
+	PORT_START_TAG("DSW2")	/* IN2 - DSW 2 (options) - $140015.b */
 	PORT_DIPNAME( 0x01, 0x01, "Speed Unit" )
 	PORT_DIPSETTING(    0x01, "KM" )
 	PORT_DIPSETTING(    0x00, "M.P.H." )
@@ -947,7 +947,7 @@ static INPUT_PORTS_START( hotchase )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	/* IN3 - DSW 1 (Coinage) - $140017.b */
+	PORT_START_TAG("DSW1")	/* IN3 - DSW 1 (Coinage) - $140017.b */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
@@ -982,10 +982,10 @@ static INPUT_PORTS_START( hotchase )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin/99 Credits" )
 
-	PORT_START	/* IN4 - Accelerator - $140021.b (0) */
+	PORT_START_TAG("ACCEL")	/* IN4 - Accelerator - $140021.b (0) */
 	PORT_BIT( 0xff, 0, IPT_PEDAL ) PORT_MINMAX(0,0x80) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START	/* IN5 - Steering Wheel - $140021.b (2) */
+	PORT_START_TAG("STEER")	/* IN5 - Steering Wheel - $140021.b (2) */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 

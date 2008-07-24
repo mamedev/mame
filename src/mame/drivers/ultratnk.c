@@ -52,9 +52,9 @@ static TIMER_CALLBACK( nmi_callback	)
 
 	/* NMI and watchdog are disabled during service mode */
 
-	watchdog_enable(machine, input_port_read_indexed(machine, 0) & 0x40);
+	watchdog_enable(machine, input_port_read(machine, "IN0") & 0x40);
 
-	if (input_port_read_indexed(machine, 0) & 0x40)
+	if (input_port_read(machine, "IN0") & 0x40)
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, nmi_callback);
@@ -153,8 +153,8 @@ static ADDRESS_MAP_START( ultratnk_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x700) AM_READWRITE(ultratnk_wram_r, ultratnk_wram_w)
 	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE(ultratnk_video_ram_w) AM_BASE(&videoram)
 
-	AM_RANGE(0x1000, 0x17ff) AM_READ(input_port_0_r)
-	AM_RANGE(0x1800, 0x1fff) AM_READ(input_port_1_r)
+	AM_RANGE(0x1000, 0x17ff) AM_READ_PORT("IN0")
+	AM_RANGE(0x1800, 0x1fff) AM_READ_PORT("IN1")
 
 	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x718) AM_READ(ultratnk_analog_r)
 	AM_RANGE(0x2020, 0x2027) AM_MIRROR(0x718) AM_READ(ultratnk_coin_r)
@@ -179,7 +179,6 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( ultratnk )
-
 	PORT_START_TAG("IN0")
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )

@@ -351,17 +351,9 @@ static MACHINE_RESET( drivedge )
  *
  *************************************/
 
-static READ16_HANDLER( special_port3_r )
+static READ16_HANDLER( special_port_r )
 {
-	int result = input_port_read_indexed(machine, 3);
-	if (sound_int_state) result ^= 0x08;
-	return result;
-}
-
-
-static READ16_HANDLER( special_port4_r )
-{
-	int result = input_port_read_indexed(machine, 4);
+	int result = input_port_read(machine, "DIPS");
 	if (sound_int_state) result ^= 0x08;
 	return result;
 }
@@ -472,7 +464,7 @@ static READ32_HANDLER( trackball32_4bit_combined_r )
 
 static READ32_HANDLER( drivedge_steering_r )
 {
-	int val = input_port_read_indexed(machine, 5) * 2 - 0x100;
+	int val = input_port_read(machine, "STEER") * 2 - 0x100;
 	if (val < 0) val = 0x100 | (-val);
 	return val << 16;
 }
@@ -480,7 +472,7 @@ static READ32_HANDLER( drivedge_steering_r )
 
 static READ32_HANDLER( drivedge_gas_r )
 {
-	int val = input_port_read_indexed(machine, 6);
+	int val = input_port_read(machine, "GAS");
 	return val << 16;
 }
 
@@ -822,10 +814,10 @@ static NVRAM_HANDLER( tournament )
 /*------ Time Killers memory layout ------*/
 static ADDRESS_MAP_START( timekill_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_BASE(&main_ram) AM_SIZE(&main_ram_size)
-	AM_RANGE(0x040000, 0x040001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x048000, 0x048001) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x050000, 0x050001) AM_READWRITE(input_port_2_word_r, timekill_intensity_w)
-	AM_RANGE(0x058000, 0x058001) AM_READWRITE(special_port3_r, watchdog_reset16_w)
+	AM_RANGE(0x040000, 0x040001) AM_READ_PORT("P1")
+	AM_RANGE(0x048000, 0x048001) AM_READ_PORT("P2")
+	AM_RANGE(0x050000, 0x050001) AM_READ_PORT("SYSTEM") AM_WRITE(timekill_intensity_w)
+	AM_RANGE(0x058000, 0x058001) AM_READWRITE(special_port_r, watchdog_reset16_w)
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(timekill_colora_w)
 	AM_RANGE(0x068000, 0x068001) AM_WRITE(timekill_colorbc_w)
 	AM_RANGE(0x070000, 0x070001) AM_WRITENOP	/* noisy */
@@ -840,11 +832,11 @@ ADDRESS_MAP_END
 /*------ BloodStorm and later games memory layout ------*/
 static ADDRESS_MAP_START( bloodstm_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE(&main_ram) AM_SIZE(&main_ram_size)
-	AM_RANGE(0x080000, 0x080001) AM_READWRITE(input_port_0_word_r, int1_ack_w)
-	AM_RANGE(0x100000, 0x100001) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x180000, 0x180001) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE(input_port_3_word_r, watchdog_reset16_w)
-	AM_RANGE(0x280000, 0x280001) AM_READ(special_port4_r)
+	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1") AM_WRITE(int1_ack_w)
+	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P2")
+	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P3")
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P4") AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x280000, 0x280001) AM_READ(special_port_r)
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(bloodstm_color1_w)
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(bloodstm_color2_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(watchdog_reset16_w)
@@ -852,7 +844,7 @@ static ADDRESS_MAP_START( bloodstm_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE(bloodstm_video_r, bloodstm_video_w) AM_BASE(&itech32_video)
 	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE(bloodstm_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(bloodstm_plane_w)
-	AM_RANGE(0x780000, 0x780001) AM_READ(input_port_5_word_r)
+	AM_RANGE(0x780000, 0x780001) AM_READ_PORT("EXTRA")
 	AM_RANGE(0x800000, 0x87ffff) AM_MIRROR(0x780000) AM_ROM AM_REGION(REGION_USER1, 0) AM_BASE(&main_rom)
 ADDRESS_MAP_END
 
@@ -906,7 +898,7 @@ AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE(test2_r, test2_w)
 #endif
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x40000) AM_RAM AM_BASE((UINT32 **)&main_ram) AM_SIZE(&main_ram_size)
 	AM_RANGE(0x080000, 0x080003) AM_READ16(input_port_3_word_r, 0xffff0000)
-	AM_RANGE(0x082000, 0x082003) AM_READ16(special_port4_r, 0xffff0000)
+	AM_RANGE(0x082000, 0x082003) AM_READ16(special_port_r, 0xffff0000)
 	AM_RANGE(0x084000, 0x084003) AM_READWRITE(sound_data32_r, sound_data32_w)
 //  AM_RANGE(0x086000, 0x08623f) AM_RAM -- networking -- first 0x40 bytes = our data, next 0x40*8 bytes = their data, r/w on IRQ2
 	AM_RANGE(0x088000, 0x088003) AM_READ(drivedge_steering_r)
@@ -946,7 +938,7 @@ static ADDRESS_MAP_START( itech020_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x100000, 0x100003) AM_READ16(input_port_1_word_r, 0xffff0000)
 	AM_RANGE(0x180000, 0x180003) AM_READ16(input_port_2_word_r, 0xffff0000)
 	AM_RANGE(0x200000, 0x200003) AM_READ16(input_port_3_word_r, 0xffff0000)
-	AM_RANGE(0x280000, 0x280003) AM_READ16(special_port4_r, 0xffff0000)
+	AM_RANGE(0x280000, 0x280003) AM_READ16(special_port_r, 0xffff0000)
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(itech020_color1_w)
 	AM_RANGE(0x380000, 0x380003) AM_WRITE(itech020_color2_w)
 	AM_RANGE(0x400000, 0x400003) AM_WRITE(watchdog_reset32_w)
@@ -1006,7 +998,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( timekill )
-	PORT_START	/* 40000 */
+	PORT_START_TAG("P1")		/* 40000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
@@ -1016,7 +1008,7 @@ static INPUT_PORTS_START( timekill )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
-	PORT_START	/* 48000 */
+	PORT_START_TAG("P2")	/* 48000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
@@ -1026,7 +1018,7 @@ static INPUT_PORTS_START( timekill )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 
-	PORT_START	/* 50000 */
+	PORT_START_TAG("SYSTEM")	/* 50000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
@@ -1036,7 +1028,7 @@ static INPUT_PORTS_START( timekill )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* 58000 */
+	PORT_START_TAG("DIPS")	/* 58000 */
 	PORT_SERVICE_NO_TOGGLE( 0x0001, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_VBLANK )
@@ -1176,7 +1168,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( drivedge )
-	PORT_START	/* 8C000 */
+	PORT_START_TAG("8C000")		/* 8C000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Gear 1") PORT_CODE(KEYCODE_Z) PORT_PLAYER(1)
@@ -1186,7 +1178,7 @@ static INPUT_PORTS_START( drivedge )
 	PORT_SERVICE_NO_TOGGLE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* 8E000 */
+	PORT_START_TAG("8E000")		/* 8E000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Fan") PORT_CODE(KEYCODE_F) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Tow Truck") PORT_CODE(KEYCODE_T) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Horn") PORT_CODE(KEYCODE_SPACE) PORT_PLAYER(1)
@@ -1196,7 +1188,7 @@ static INPUT_PORTS_START( drivedge )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* 200000 */
+	PORT_START_TAG("200000")		/* 200000 */
 	PORT_SERVICE_NO_TOGGLE( 0x0100, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_VBLANK )
@@ -1212,16 +1204,17 @@ static INPUT_PORTS_START( drivedge )
 	PORT_DIPSETTING(      0x7000, "8" )
 	PORT_SERVICE_DIPLOC( 0x8000, IP_ACTIVE_HIGH, "SW1:1" )
 
-	PORT_START	/* 80000 */
+	PORT_START_TAG("80000")		/* 80000 */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x06) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_PLAYER(3)
 
-	PORT_START	/* 82000 */
+	/* here we use "DIPS" to simplify the read handlers */
+	PORT_START_TAG("DIPS")		/* 82000 */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x06) PORT_SENSITIVITY(2) PORT_KEYDELTA(40) PORT_PLAYER(2)
 
-	PORT_START	/* 88000 */
+	PORT_START_TAG("STEER")		/* 88000 */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
 
-	PORT_START	/* 8A000 */
+	PORT_START_TAG("GAS")		/* 8A000 */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x0c) PORT_SENSITIVITY(1) PORT_KEYDELTA(20) PORT_PLAYER(1)
 INPUT_PORTS_END
 

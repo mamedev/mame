@@ -268,8 +268,8 @@ static READ8_HANDLER( depthch_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read_indexed(machine, 0);
-	if (offset & 0x08)  ret = input_port_read_indexed(machine, 1);
+	if (offset & 0x01)  ret = input_port_read(machine, "IN0");
+	if (offset & 0x08)  ret = input_port_read(machine, "IN1");
 
 	return ret;
 }
@@ -305,11 +305,11 @@ static INPUT_PORTS_START( depthch )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_DIPNAME (0x30, 0x30, DEF_STR( Coinage ) )
-	PORT_DIPSETTING (   0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING (   0x10, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING (   0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING (   0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 
 	PORT_START_TAG("IN1")
@@ -350,8 +350,8 @@ static READ8_HANDLER( safari_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read_indexed(machine, 0);
-	if (offset & 0x08)  ret = input_port_read_indexed(machine, 1);
+	if (offset & 0x01)  ret = input_port_read(machine, "IN0");
+	if (offset & 0x08)  ret = input_port_read(machine, "IN1");
 
 	return ret;
 }
@@ -389,19 +389,19 @@ static INPUT_PORTS_START( safari )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Aim Up") PORT_CODE(KEYCODE_A)
-	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Aim Down") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Aim Up") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Aim Down") PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(vicdual_get_64v, 0)
 	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
-	PORT_DIPNAME (0x30, 0x30, DEF_STR( Coinage ) )
-	PORT_DIPSETTING (   0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING (   0x10, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING (   0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING (   0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(vicdual_read_coin_status, 0)
 
@@ -434,8 +434,8 @@ static READ8_HANDLER( frogs_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read_indexed(machine, 0);
-	if (offset & 0x08)  ret = input_port_read_indexed(machine, 1);
+	if (offset & 0x01)  ret = input_port_read(machine, "IN0");
+	if (offset & 0x08)  ret = input_port_read(machine, "IN1");
 
 	return ret;
 }
@@ -542,8 +542,8 @@ static READ8_HANDLER( headon_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read_indexed(machine, 0);
-	if (offset & 0x08)  ret = input_port_read_indexed(machine, 1);
+	if (offset & 0x01)  ret = input_port_read(machine, "IN0");
+	if (offset & 0x08)  ret = input_port_read(machine, "IN1");
 
 	return ret;
 }
@@ -553,9 +553,9 @@ static READ8_HANDLER( sspaceat_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read_indexed(machine,0);
-	if (offset & 0x04)  ret = input_port_read_indexed(machine,1);
-	if (offset & 0x08)  ret = input_port_read_indexed(machine,2);
+	if (offset & 0x01)  ret = input_port_read(machine, "IN0");
+	if (offset & 0x04)  ret = input_port_read(machine, "IN1");
+	if (offset & 0x08)  ret = input_port_read(machine, "IN2");
 
 	return ret;
 }
@@ -742,10 +742,10 @@ static READ8_HANDLER( headon2_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read_indexed(machine,0);
+	if (offset & 0x01)  ret = input_port_read(machine, "IN0");
  	if (offset & 0x02)  /* schematics show this as in input port, but never read from */
-	if (offset & 0x04)  ret = input_port_read_indexed(machine,1);
-	if (offset & 0x08)  ret = input_port_read_indexed(machine,2);
+	if (offset & 0x04)  ret = input_port_read(machine, "IN1");
+	if (offset & 0x08)  ret = input_port_read(machine, "IN2");
 	if (offset & 0x12)  logerror("********* Read from port %x\n", offset);
 
 	return ret;
@@ -2096,8 +2096,8 @@ static READ8_HANDLER( nsub_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read_indexed(machine, 0);
-	if (offset & 0x08)  ret = input_port_read_indexed(machine, 1);
+	if (offset & 0x01)  ret = input_port_read(machine, "IN0");
+	if (offset & 0x08)  ret = input_port_read(machine, "IN1");
 
 	return ret;
 }
@@ -2191,9 +2191,9 @@ static READ8_HANDLER( invinco_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_read_indexed(machine, 0);
-	if (offset & 0x02)  ret = input_port_read_indexed(machine, 1);
-	if (offset & 0x08)  ret = input_port_read_indexed(machine, 2);
+	if (offset & 0x01)  ret = input_port_read(machine, "IN0");
+	if (offset & 0x02)  ret = input_port_read(machine, "IN1");
+	if (offset & 0x08)  ret = input_port_read(machine, "IN2");
 
 	return ret;
 }

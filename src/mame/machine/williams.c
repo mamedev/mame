@@ -602,7 +602,7 @@ READ8_HANDLER( williams_input_port_49way_0_5_r )
 	if (port_select)
 		return williams_49way_port_0_r(machine,0);
 	else
-		return input_port_read_indexed(machine, 5);
+		return input_port_read(machine, "IN3");
 }
 
 
@@ -851,7 +851,7 @@ WRITE8_HANDLER( blaster_bank_select_w )
 static READ8_HANDLER( lottofun_input_port_0_r )
 {
 	/* merge in the ticket dispenser status */
-	return input_port_read_indexed(machine,0) | ticket_dispenser_r(machine,offset);
+	return input_port_read(machine, "IN0") | ticket_dispenser_r(machine,offset);
 }
 
 
@@ -865,7 +865,7 @@ static READ8_HANDLER( lottofun_input_port_0_r )
 static READ8_HANDLER( tshoot_input_port_0_3_r )
 {
 	/* merge in the gun inputs with the standard data */
-	int data = input_port_0_r(machine, offset);
+	int data = input_port_read(machine, "IN0");
 	int gun = (data & 0x3f) ^ ((data & 0x3f) >> 1);
 	return (data & 0xc0) | gun;
 

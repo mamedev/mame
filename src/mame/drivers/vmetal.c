@@ -143,14 +143,14 @@ static WRITE16_HANDLER( vmetal_mid2tileram_w )
 }
 
 
-static READ16_HANDLER ( varia_dips_bit8_r ) { return ((input_port_read_indexed(machine, 3) & 0x80) << 0) | ((input_port_read_indexed(machine, 2) & 0x80) >> 1); }
-static READ16_HANDLER ( varia_dips_bit7_r ) { return ((input_port_read_indexed(machine, 3) & 0x40) << 1) | ((input_port_read_indexed(machine, 2) & 0x40) >> 0); }
-static READ16_HANDLER ( varia_dips_bit6_r ) { return ((input_port_read_indexed(machine, 3) & 0x20) << 2) | ((input_port_read_indexed(machine, 2) & 0x20) << 1); }
-static READ16_HANDLER ( varia_dips_bit5_r ) { return ((input_port_read_indexed(machine, 3) & 0x10) << 3) | ((input_port_read_indexed(machine, 2) & 0x10) << 2); }
-static READ16_HANDLER ( varia_dips_bit4_r ) { return ((input_port_read_indexed(machine, 3) & 0x08) << 4) | ((input_port_read_indexed(machine, 2) & 0x08) << 3); }
-static READ16_HANDLER ( varia_dips_bit3_r ) { return ((input_port_read_indexed(machine, 3) & 0x04) << 5) | ((input_port_read_indexed(machine, 2) & 0x04) << 4); }
-static READ16_HANDLER ( varia_dips_bit2_r ) { return ((input_port_read_indexed(machine, 3) & 0x02) << 6) | ((input_port_read_indexed(machine, 2) & 0x02) << 5); }
-static READ16_HANDLER ( varia_dips_bit1_r ) { return ((input_port_read_indexed(machine, 3) & 0x01) << 7) | ((input_port_read_indexed(machine, 2) & 0x01) << 6); }
+static READ16_HANDLER ( varia_dips_bit8_r ) { return ((input_port_read(machine, "DSW2") & 0x80) << 0) | ((input_port_read(machine, "DSW1") & 0x80) >> 1); }
+static READ16_HANDLER ( varia_dips_bit7_r ) { return ((input_port_read(machine, "DSW2") & 0x40) << 1) | ((input_port_read(machine, "DSW1") & 0x40) >> 0); }
+static READ16_HANDLER ( varia_dips_bit6_r ) { return ((input_port_read(machine, "DSW2") & 0x20) << 2) | ((input_port_read(machine, "DSW1") & 0x20) << 1); }
+static READ16_HANDLER ( varia_dips_bit5_r ) { return ((input_port_read(machine, "DSW2") & 0x10) << 3) | ((input_port_read(machine, "DSW1") & 0x10) << 2); }
+static READ16_HANDLER ( varia_dips_bit4_r ) { return ((input_port_read(machine, "DSW2") & 0x08) << 4) | ((input_port_read(machine, "DSW1") & 0x08) << 3); }
+static READ16_HANDLER ( varia_dips_bit3_r ) { return ((input_port_read(machine, "DSW2") & 0x04) << 5) | ((input_port_read(machine, "DSW1") & 0x04) << 4); }
+static READ16_HANDLER ( varia_dips_bit2_r ) { return ((input_port_read(machine, "DSW2") & 0x02) << 6) | ((input_port_read(machine, "DSW1") & 0x02) << 5); }
+static READ16_HANDLER ( varia_dips_bit1_r ) { return ((input_port_read(machine, "DSW2") & 0x01) << 7) | ((input_port_read(machine, "DSW1") & 0x01) << 6); }
 
 static WRITE16_HANDLER( vmetal_control_w )
 {
@@ -227,8 +227,8 @@ static ADDRESS_MAP_START( varia_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_BASE(&vmetal_videoregs)
 	AM_RANGE(0x179700, 0x179713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
 
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE(input_port_0_word_r, vmetal_control_w)
-	AM_RANGE(0x200002, 0x200003) AM_READ(input_port_1_word_r )
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_WRITE(vmetal_control_w)
+	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 
 	/* i have no idea whats meant to be going on here .. it seems to read one bit of the dips from some of them, protection ??? */
 	AM_RANGE(0x30fffe, 0x30ffff) AM_READ(varia_random )  // nothing?
@@ -259,7 +259,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( varia )
-	PORT_START		/* IN0 */
+	PORT_START_TAG("P1_P2")	/* IN0 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -277,7 +277,7 @@ static INPUT_PORTS_START( varia )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START		/* IN1 */
+	PORT_START_TAG("SYSTEM")	/* IN1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_TILT )
@@ -285,7 +285,7 @@ static INPUT_PORTS_START( varia )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2 ) // 'Test'
 	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
 
-	PORT_START		/* Dips 1 */
+	PORT_START_TAG("DSW1")	/* Dips 1 */
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C )  )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_1C )  )
@@ -311,7 +311,7 @@ static INPUT_PORTS_START( varia )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START		/* Dips 2 */
+	PORT_START_TAG("DSW2")	/* Dips 2 */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ))
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

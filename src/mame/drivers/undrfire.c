@@ -291,13 +291,13 @@ static READ32_HANDLER( undrfire_input_r )
 	{
 		case 0x00:
 		{
-			return (input_port_read_indexed(machine,0) << 16) | input_port_read_indexed(machine,1) |
+			return (input_port_read(machine, "IN0") << 16) | input_port_read(machine, "IN1") |
 				  (eeprom_read_bit() << 7) | frame_counter;
 		}
 
 		case 0x01:
 		{
-			return input_port_read_indexed(machine,2) | (coin_word << 16);
+			return input_port_read(machine, "IN2") | (coin_word << 16);
 		}
  	}
 
@@ -405,8 +405,8 @@ static READ32_HANDLER( undrfire_lightgun_r )
 
 		case 0x00:	/* P1 */
 		{
-			x = input_port_read_indexed(machine,3) << 6;
-			y = input_port_read_indexed(machine,4) << 6;
+			x = input_port_read(machine, "GUNX1") << 6;
+			y = input_port_read(machine, "GUNY1") << 6;
 
 			return ((x << 24) &0xff000000) | ((x << 8) &0xff0000)
 				 | ((y << 8) &0xff00) | ((y >> 8) &0xff) ;
@@ -414,8 +414,8 @@ static READ32_HANDLER( undrfire_lightgun_r )
 
 		case 0x01:	/* P2 */
 		{
-			x = input_port_read_indexed(machine,5) << 6;
-			y = input_port_read_indexed(machine,6) << 6;
+			x = input_port_read(machine, "GUNX2") << 6;
+			y = input_port_read(machine, "GUNY2") << 6;
 
 			return ((x << 24) &0xff000000) | ((x << 8) &0xff0000)
 				 | ((y << 8) &0xff00) | ((y >> 8) &0xff) ;
@@ -471,7 +471,7 @@ static WRITE32_HANDLER( cbombers_cpua_ctrl_w )
 
 static READ32_HANDLER( cbombers_adc_r )
 {
-	return (input_port_read_indexed(machine, 3) << 24);
+	return (input_port_read(machine, "STEER") << 24);
 }
 
 static WRITE32_HANDLER( cbombers_adc_w )
@@ -587,16 +587,16 @@ static INPUT_PORTS_START( undrfire )
 
 	/* Gun inputs (real range is 0-0xffff: we use standard 0-255 and shift later) */
 
-	PORT_START_TAG("IN3")	/* IN 3, P1X */
+	PORT_START_TAG("GUNX1")	/* IN 3, P1X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, -1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START_TAG("IN4")	/* IN 4, P1Y */
+	PORT_START_TAG("GUNY1")	/* IN 4, P1Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_PLAYER(1)
 
-	PORT_START_TAG("IN5")	/* IN 5, P2X */
+	PORT_START_TAG("GUNX2")	/* IN 5, P2X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, -1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START_TAG("IN6")	/* IN 6, P2Y */
+	PORT_START_TAG("GUNY2")	/* IN 6, P2Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_PLAYER(2)
 
 	PORT_START_TAG("FAKE")
@@ -654,7 +654,7 @@ static INPUT_PORTS_START( cbombers )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")	/* IN 3, steering wheel */
+	PORT_START_TAG("STEER")	/* IN 3, steering wheel */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
 INPUT_PORTS_END
 

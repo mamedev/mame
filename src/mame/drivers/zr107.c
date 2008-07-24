@@ -306,6 +306,7 @@ static CUSTOM_INPUT( adcdo_r )
 static READ8_HANDLER( sysreg_r )
 {
 	UINT32 r = 0;
+	static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	switch (offset)
 	{
@@ -313,7 +314,7 @@ static READ8_HANDLER( sysreg_r )
 		case 1:	/* I/O port 1 */
 		case 2:	/* I/O port 2 */
 		case 3:	/* System Port 0 */
-			r = input_port_read_indexed(machine, offset);
+			r = input_port_read(machine, portnames[offset]);
 			break;
 
 		case 4:	/* System Port 1 */
@@ -404,11 +405,11 @@ static double adc0838_callback(int input)
 	switch (input)
 	{
 		case ADC083X_CH0:
-			return (double)(5 * input_port_read_indexed(Machine, 4)) / 255.0;
+			return (double)(5 * input_port_read(Machine, "ANALOG1")) / 255.0;
 		case ADC083X_CH1:
-			return (double)(5 * input_port_read_indexed(Machine, 5)) / 255.0;
+			return (double)(5 * input_port_read(Machine, "ANALOG2")) / 255.0;
 		case ADC083X_CH2:
-			return (double)(5 * input_port_read_indexed(Machine, 6)) / 255.0;
+			return (double)(5 * input_port_read(Machine, "ANALOG3")) / 255.0;
 		case ADC083X_CH3:
 			return 0;
 		case ADC083X_COM:
@@ -581,7 +582,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( midnrun )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )		// View switch
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )		// Shift up
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )		// Shift down
@@ -589,14 +590,14 @@ static INPUT_PORTS_START( midnrun )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x0b, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(adcdo_r, 0)
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -625,7 +626,7 @@ static INPUT_PORTS_START( midnrun )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( windheat )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )		// View switch
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )		// Shift up
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )		// Shift down
@@ -633,14 +634,14 @@ static INPUT_PORTS_START( windheat )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x0b, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(adcdo_r, 0)
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -669,7 +670,7 @@ static INPUT_PORTS_START( windheat )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jetwave )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
@@ -677,14 +678,14 @@ static INPUT_PORTS_START( jetwave )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x0b, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(adcdo_r, 0)
 
-	PORT_START
+	PORT_START_TAG("IN3")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )

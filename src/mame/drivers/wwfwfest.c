@@ -149,24 +149,24 @@ static READ16_HANDLER( wwfwfest_inputs_read )
 	switch (offset)
 	{
 	case 0x00:
-	tmp = input_port_read_indexed(machine, 0) | input_port_read_indexed(machine, 4) << 8;
+	tmp = input_port_read(machine, "P1") | input_port_read(machine, "SYSTEM") << 8;
 	tmp &= 0xcfff;
-	tmp |= ((input_port_read_indexed(machine, 7) & 0xc0) << 6);
+	tmp |= ((input_port_read(machine, "DSW2") & 0xc0) << 6);
 	break;
 	case 0x01:
-	tmp = input_port_read_indexed(machine, 1);
+	tmp = input_port_read(machine, "P2");
 	tmp &= 0xc0ff;
-	tmp |= ((input_port_read_indexed(machine, 7) & 0x3f)<<8);
+	tmp |= ((input_port_read(machine, "DSW2") & 0x3f)<<8);
 	break;
 	case 0x02:
-	tmp = input_port_read_indexed(machine, 2);
+	tmp = input_port_read(machine, "P3");
 	tmp &= 0xc0ff;
-	tmp |= ((input_port_read_indexed(machine, 6) & 0x3f)<<8);
+	tmp |= ((input_port_read(machine, "DSW1") & 0x3f)<<8);
 	break;
 	case 0x03:
-	tmp = (input_port_read_indexed(machine, 3) | input_port_read_indexed(machine, 5) << 8) ;
+	tmp = (input_port_read(machine, "P4") | input_port_read(machine, "VBLANK") << 8) ;
 	tmp &= 0xfcff;
-	tmp |= ((input_port_read_indexed(machine, 6) & 0xc0) << 2);
+	tmp |= ((input_port_read(machine, "DSW1") & 0xc0) << 2);
 	break;
 	}
 
@@ -193,7 +193,7 @@ static WRITE16_HANDLER ( wwfwfest_soundwrite )
 *******************************************************************************/
 
 static INPUT_PORTS_START( wwfwfest )
-	PORT_START	/* Player 1 */
+	PORT_START_TAG("P1")	/* Player 1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -203,7 +203,7 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START /* Player 2 */
+	PORT_START_TAG("P2")	/* Player 2 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
@@ -213,7 +213,7 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START /* Player 3 */
+	PORT_START_TAG("P3")	/* Player 3 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
@@ -223,7 +223,7 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START3 )
 
-	PORT_START /* Player 4 */
+	PORT_START_TAG("P4")	/* Player 4 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
@@ -233,7 +233,7 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START4 )
 
-	PORT_START /* Misc 1 */
+	PORT_START_TAG("SYSTEM")	/* Misc 1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -243,7 +243,7 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START /* Misc 2 */
+	PORT_START_TAG("VBLANK")	/* Misc 2 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_VBLANK )
@@ -255,7 +255,7 @@ static INPUT_PORTS_START( wwfwfest )
 
 	/* Nb:  There are actually 3 dips on the board, 2 * 8, and 1 *4 */
 
-	PORT_START /* Dips 1 */
+	PORT_START_TAG("DSW1")	/* Dips 1 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C )  )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C )  )
@@ -280,7 +280,7 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START /* Dips 2 */
+	PORT_START_TAG("DSW2")	/* Dips 2 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )

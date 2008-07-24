@@ -547,12 +547,12 @@ static WRITE16_HANDLER( rotate_port_w )
 static READ16_HANDLER( wgp_adinput_r )
 {
 	int steer = 0x40;
-	int fake = input_port_read_safe(machine, FAKE_PORT_TAG,0x00);
+	int fake = input_port_read_safe(machine, FAKE_PORT_TAG, 0x00);
 
 	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
 	{
 		/* Reduce span to 0x80 */
-		steer = (input_port_read_safe(machine, STEER_PORT_TAG,0x00) * 0x80) / 0x100;
+		steer = (input_port_read_safe(machine, STEER_PORT_TAG, 0x00) * 0x80) / 0x100;
 	}
 	else	/* Digital steer */
 	{
@@ -597,7 +597,7 @@ static READ16_HANDLER( wgp_adinput_r )
 		}
 
 		case 0x05:
-			return input_port_read_safe(machine, UNKNOWN_PORT_TAG,0x00);	/* unknown */
+			return input_port_read_safe(machine, UNKNOWN_PORT_TAG, 0x00);	/* unknown */
 	}
 
 logerror("CPU #0 PC %06x: warning - read unmapped a/d input offset %06x\n",activecpu_get_pc(),offset);

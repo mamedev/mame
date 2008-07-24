@@ -51,7 +51,7 @@ static void handle_coins(running_machine *machine, int coin)
 
 	if (coin & 1)	// Coin 2 !
 	{
-		tmp = (input_port_read_indexed(machine, 2) & 0xc0) >> 6;
+		tmp = (input_port_read(machine, "DSW") & 0xc0) >> 6;
 		coins++;
 		if (coins >= coinage_table[tmp][0])
 		{
@@ -64,7 +64,7 @@ static void handle_coins(running_machine *machine, int coin)
 
 	if (coin & 2)	// Coin 1 !
 	{
-		tmp = (input_port_read_indexed(machine, 2) & 0x30) >> 4;
+		tmp = (input_port_read(machine, "DSW") & 0x30) >> 4;
 		coins++;
 		if (coins >= coinage_table[tmp][0])
 		{
@@ -98,14 +98,14 @@ static READ8_HANDLER ( xyonix_io_r )
 		switch (e0_data)
 		{
 			case 0x81 :
-				return input_port_read_indexed(machine, 0) & 0x7f;
+				return input_port_read(machine, "P1") & 0x7f;
 				break;
 			case 0x82 :
-				return input_port_read_indexed(machine, 1) & 0x7f;
+				return input_port_read(machine, "P2") & 0x7f;
 				break;
 			case 0x91:
 				/* check coin inputs */
-				coin = ((input_port_read_indexed(machine, 0) & 0x80) >> 7) | ((input_port_read_indexed(machine, 1) & 0x80) >> 6);
+				coin = ((input_port_read(machine, "P1") & 0x80) >> 7) | ((input_port_read(machine, "P2") & 0x80) >> 6);
 				if (coin ^ prev_coin && coin != 3)
 				{
 					if (credits < 9) handle_coins(machine, coin);
@@ -114,7 +114,7 @@ static READ8_HANDLER ( xyonix_io_r )
 				return credits;
 				break;
 			case 0x92:
-				return ((input_port_read_indexed(machine, 0) & 0x80) >> 7) | ((input_port_read_indexed(machine, 1) & 0x80) >> 6);
+				return ((input_port_read(machine, "P1") & 0x80) >> 7) | ((input_port_read(machine, "P2") & 0x80) >> 6);
 				break;
 			case 0xe0:	/* reset? */
 				coins = 0;
@@ -126,10 +126,10 @@ static READ8_HANDLER ( xyonix_io_r )
 				return 0xff;
 				break;
 			case 0xfe:	/* Dip Switches 1 to 4 */
-				return input_port_read_indexed(machine, 2) & 0x0f;
+				return input_port_read(machine, "DSW") & 0x0f;
 				break;
 			case 0xff:	/* Dip Switches 5 to 8 */
-				return input_port_read_indexed(machine, 2) >> 4;
+				return input_port_read(machine, "DSW") >> 4;
 				break;
 		}
 	}
@@ -167,7 +167,7 @@ ADDRESS_MAP_END
 /* Inputs Ports **************************************************************/
 
 static INPUT_PORTS_START( xyonix )
-	PORT_START
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -177,7 +177,7 @@ static INPUT_PORTS_START( xyonix )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )		/* handled by xyonix_io_r() */
 
-	PORT_START
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -187,7 +187,7 @@ static INPUT_PORTS_START( xyonix )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )		/* handled by xyonix_io_r() */
 
-	PORT_START
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )

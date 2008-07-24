@@ -52,7 +52,7 @@ static READ32_HANDLER( eeprom_r )
 	UINT32 r = 0;
 
 	if (ACCESSING_BITS_24_31)
-		r |= (((eeprom_read_bit()) << 1) | (input_port_read_indexed(machine, 6) << 3)) << 24;
+		r |= (((eeprom_read_bit()) << 1) | (input_port_read(machine, "SERVICE") << 3)) << 24;
 
 	return r;
 }
@@ -69,12 +69,12 @@ static WRITE32_HANDLER( eeprom_w )
 
 static READ32_HANDLER( control1_r )
 {
-	return (input_port_read_indexed(machine, 0) << 28) | ((input_port_read_indexed(machine, 1) & 0xfff) << 16) | (input_port_read_indexed(machine, 2) & 0xfff);
+	return (input_port_read(machine, "P1") << 28) | ((input_port_read(machine, "STICKX1") & 0xfff) << 16) | (input_port_read(machine, "STICKY1") & 0xfff);
 }
 
 static READ32_HANDLER( control2_r )
 {
-	return (input_port_read_indexed(machine, 3) << 28) | ((input_port_read_indexed(machine, 4) & 0xfff) << 16) | (input_port_read_indexed(machine, 5) & 0xfff);
+	return (input_port_read(machine, "P2") << 28) | ((input_port_read(machine, "STICKX2") & 0xfff) << 16) | (input_port_read(machine, "STICKY2") & 0xfff);
 }
 
 static WRITE32_HANDLER( int_ack_w )
@@ -178,29 +178,29 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 static INPUT_PORTS_START( ultrsprt )
-	PORT_START
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("STICKX1")
 	PORT_BIT( 0xfff, 0x800, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("STICKY1")
 	PORT_BIT( 0xfff, 0x800, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_START2 )
 
-	PORT_START
+	PORT_START_TAG("STICKX2")
 	PORT_BIT( 0xfff, 0x800, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("STICKY2")
 	PORT_BIT( 0xfff, 0x800, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START
+	PORT_START_TAG("SERVICE")
 	PORT_SERVICE_NO_TOGGLE( 0x1, IP_ACTIVE_LOW )
 
 INPUT_PORTS_END

@@ -55,16 +55,12 @@ static int toggle_bit;
 
 static READ16_HANDLER( wheelfir_rand1 )
 {
-
-
-
-
-	return input_port_read_indexed(machine, 0)^toggle_bit;// mame_rand(machine);
+	return input_port_read(machine, "IN0") ^ toggle_bit;	// mame_rand(machine);
 }
 
 static READ16_HANDLER( wheelfir_rand2 )
 {
-	return input_port_read_indexed(machine, 1);// mame_rand(machine);
+	return input_port_read(machine, "IN1");		// mame_rand(machine);
 }
 
 
@@ -380,8 +376,8 @@ static ADDRESS_MAP_START( wheelfir_main, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x7c0000, 0x7c0001) AM_READ(wheelfir_rand1)
 	AM_RANGE(0x780000, 0x780001) AM_READ(wheelfir_rand2)
-	AM_RANGE(0x7e0000, 0x7e0001) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x7e0002, 0x7e0003) AM_READ(input_port_3_word_r)
+	AM_RANGE(0x7e0000, 0x7e0001) AM_READ_PORT("P1")
+	AM_RANGE(0x7e0002, 0x7e0003) AM_READ_PORT("P2")
 
 
 	AM_RANGE(0x700000, 0x70001f) AM_WRITE(wheelfir_blit_w) // blitter stuff
@@ -410,7 +406,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( wheelfir )
-	PORT_START	/* 16bit */
+	PORT_START_TAG("IN0")	/* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0001, "0" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -460,7 +456,7 @@ static INPUT_PORTS_START( wheelfir )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	/* 16bit */
+	PORT_START_TAG("IN1")	/* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0001, "1" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -510,7 +506,7 @@ static INPUT_PORTS_START( wheelfir )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	/* 16bit */
+	PORT_START_TAG("P1")	/* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -530,7 +526,7 @@ static INPUT_PORTS_START( wheelfir )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* 16bit */
+	PORT_START_TAG("P2")	/* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)

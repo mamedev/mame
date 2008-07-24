@@ -152,7 +152,7 @@ static WRITE8_HANDLER( port_c0_w )
 
 static READ8_HANDLER( eeprom_r )
 {
-	return ((~eeprom_read_bit()&0x01)<<6) | (0xff&~0x40);
+	return ((~eeprom_read_bit() & 0x01)<<6) | (0xff & ~0x40);
 }
 
 static UINT8 mux_data;
@@ -161,14 +161,14 @@ static READ8_HANDLER( mux_r )
 {
 	switch(mux_data)
 	{
-		case 0x00: return input_port_read_indexed(machine, 0);
-		case 0x01: return input_port_read_indexed(machine, 1);
-		case 0x02: return input_port_read_indexed(machine, 2);
-		case 0x04: return input_port_read_indexed(machine, 3);
-		case 0x08: return input_port_read_indexed(machine, 4);
+		case 0x00: return input_port_read(machine, "IN0");
+		case 0x01: return input_port_read(machine, "IN1");
+		case 0x02: return input_port_read(machine, "IN2");
+		case 0x04: return input_port_read(machine, "IN3");
+		case 0x08: return input_port_read(machine, "IN4");
 		/* FIXME: Was this a quick hack? */
-		case 0x10: return 0xff; //return input_port_read_indexed(machine, 5);
-		case 0x20: return 0xff; //return input_port_read_indexed(machine, 6);
+		case 0x10: return 0xff; //return input_port_read(machine, "IN5");
+		case 0x20: return 0xff; //return input_port_read(machine, "IN6");
 	}
 	return 0xff;
 }
@@ -254,7 +254,7 @@ MACHINE_DRIVER_END
 /***************************************************************************************/
 
 static INPUT_PORTS_START( yumefuda )
-	PORT_START
+	PORT_START_TAG( "IN0")
 	PORT_DIPNAME( 0x01, 0x01, "Port 0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -276,7 +276,7 @@ static INPUT_PORTS_START( yumefuda )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG( "IN1")
 	PORT_DIPNAME( 0x01, 0x01, "Port 1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -298,7 +298,7 @@ static INPUT_PORTS_START( yumefuda )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG( "IN2")
 	PORT_DIPNAME( 0x01, 0x01, "Port 2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -316,7 +316,7 @@ static INPUT_PORTS_START( yumefuda )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
 
-	PORT_START
+	PORT_START_TAG( "IN3")
 	PORT_DIPNAME( 0x01, 0x01, "Port 3" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -338,7 +338,7 @@ static INPUT_PORTS_START( yumefuda )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG( "IN4")
 	PORT_DIPNAME( 0x01, 0x01, "Port 4" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -364,7 +364,7 @@ static INPUT_PORTS_START( yumefuda )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 /*
-    PORT_START
+    PORT_START_TAG( "IN5")
     PORT_DIPNAME( 0x01, 0x01, "Port 5" )
     PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -390,7 +390,7 @@ static INPUT_PORTS_START( yumefuda )
     PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-    PORT_START
+    PORT_START_TAG( "IN6")
     PORT_DIPNAME( 0x01, 0x01, "Port 6" )
     PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )

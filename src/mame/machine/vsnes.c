@@ -118,8 +118,8 @@ WRITE8_HANDLER( vsnes_in0_w )
 	if ( data & 1 )
 	{
 		/* load up the latches */
-		input_latch[0] = input_port_read_indexed(machine,  0 );
-		input_latch[1] = input_port_read_indexed(machine,  1 );
+		input_latch[0] = input_port_read(machine, "IN0");
+		input_latch[1] = input_port_read(machine, "IN1");
 	}
 }
 
@@ -130,8 +130,8 @@ static READ8_HANDLER( gun_in0_r )
 	/* shift */
 	input_latch[0] >>= 1;
 
-	ret |= input_port_read_indexed(machine,  2 ); 				/* merge coins, etc */
-	ret |= ( input_port_read_indexed(machine,  3 ) & 3 ) << 3; /* merge 2 dipswitches */
+	ret |= input_port_read(machine, "COINS"); 				/* merge coins, etc */
+	ret |= ( input_port_read(machine, "DSW0") & 3 ) << 3; /* merge 2 dipswitches */
 
 /* The gun games expect a 1 returned on every 5th read after sound_fix is reset*/
 /* Info Supplied by Ben Parnell <xodnizel@home.com> of FCE Ultra fame */
@@ -156,8 +156,8 @@ READ8_HANDLER( vsnes_in0_r )
 	/* shift */
 	input_latch[0] >>= 1;
 
-	ret |= input_port_read_indexed(machine,  2 ); 				/* merge coins, etc */
-	ret |= ( input_port_read_indexed(machine,  3 ) & 3 ) << 3; /* merge 2 dipswitches */
+	ret |= input_port_read(machine, "COINS"); 				/* merge coins, etc */
+	ret |= ( input_port_read(machine, "DSW0") & 3 ) << 3;	/* merge 2 dipswitches */
 
 	return ret;
 
@@ -168,7 +168,7 @@ READ8_HANDLER( vsnes_in1_r )
 {
 	int ret = ( input_latch[1] ) & 1;
 
-	ret |= input_port_read_indexed(machine,  3 ) & ~3;			/* merge the rest of the dipswitches */
+	ret |= input_port_read(machine, "DSW0") & ~3;			/* merge the rest of the dipswitches */
 
 	/* shift */
 	input_latch[1] >>= 1;
@@ -182,8 +182,8 @@ WRITE8_HANDLER( vsnes_in0_1_w )
 	if ( data & 1 )
 	{
 		/* load up the latches */
-		input_latch[2] = input_port_read_indexed(machine,  4 );
-		input_latch[3] = input_port_read_indexed(machine,  5 );
+		input_latch[2] = input_port_read(machine, "IN2");
+		input_latch[3] = input_port_read(machine, "IN3");
 	}
 }
 
@@ -194,8 +194,8 @@ READ8_HANDLER( vsnes_in0_1_r )
 	/* shift */
 	input_latch[2] >>= 1;
 
-	ret |= input_port_read_indexed(machine,  6 ); 				/* merge coins, etc */
-	ret |= ( input_port_read_indexed(machine,  7 ) & 3 ) << 3; /* merge 2 dipswitches */
+	ret |= input_port_read(machine, "COINS2"); 				/* merge coins, etc */
+	ret |= ( input_port_read(machine, "DSW1") & 3 ) << 3;	/* merge 2 dipswitches */
 	return ret;
 }
 
@@ -203,7 +203,7 @@ READ8_HANDLER( vsnes_in1_1_r )
 {
 	int ret = ( input_latch[3] ) & 1;
 
-	ret |= input_port_read_indexed(machine,  7 ) & ~3;			/* merge the rest of the dipswitches */
+	ret |= input_port_read(machine, "DSW1") & ~3;			/* merge the rest of the dipswitches */
 
 	/* shift */
 	input_latch[3] >>= 1;
@@ -346,13 +346,13 @@ static WRITE8_HANDLER( gun_in0_w )
 	{
 
 		/* load up the latches */
-		input_latch[0] = input_port_read_indexed(machine,  0 );
+		input_latch[0] = input_port_read(machine, "IN0");
 
 		/* do the gun thing */
 		if ( vsnes_gun_controller )
 		{
-			int x = input_port_read_indexed(machine,  4 );
-			int y = input_port_read_indexed(machine,  5 );
+			int x = input_port_read(machine, "GUNX");
+			int y = input_port_read(machine, "GUNY");
 			UINT32 pix, color_base;
 
 			/* get the pixel at the gun position */
@@ -369,7 +369,7 @@ static WRITE8_HANDLER( gun_in0_w )
 			}
 		}
 
-		input_latch[1] = input_port_read_indexed(machine,  1 );
+		input_latch[1] = input_port_read(machine, "IN1");
 	}
 
     if ( ( zapstore & 1 ) && ( !( data & 1 ) ) )

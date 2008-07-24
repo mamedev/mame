@@ -1049,29 +1049,29 @@ nthbyte( const UINT32 *pSource, int offs )
 
 /* mask,default,type,sensitivity,delta,min,max */
 #define DRIVING_ANALOG_PORTS \
-	PORT_START \
+	PORT_START_TAG("GAS") \
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) \
-	PORT_START \
+	PORT_START_TAG("BRAKE") \
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) \
-	PORT_START \
+	PORT_START_TAG("STEER") \
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
 /* TODO: REMOVE (THIS IS HANDLED BY "SUBCPU") */
 static void
 ReadAnalogDrivingPorts( running_machine *machine, UINT16 *gas, UINT16 *brake, UINT16 *steer )
 {
-	*gas   = input_port_read_indexed(machine, 2);
-	*brake = input_port_read_indexed(machine, 3);
-	*steer = input_port_read_indexed(machine, 4);
+	*gas   = input_port_read(machine, "GAS");
+	*brake = input_port_read(machine, "BRAKE");
+	*steer = input_port_read(machine, "STEER");
 }
 
 /* TODO: REMOVE (THIS IS HANDLED BY "SUBCPU") */
 static UINT16
 AnalogAsDigital( running_machine *machine )
 {
-	UINT16 stick = input_port_read_indexed(machine, 1);
-	UINT16 gas   = input_port_read_indexed(machine, 2);
-	UINT16 steer = input_port_read_indexed(machine, 4);
+	UINT16 stick = input_port_read_safe(machine, "INPUTS", 0);
+	UINT16 gas   = input_port_read_safe(machine, "GAS", 0);
+	UINT16 steer = input_port_read_safe(machine, "STEER", 0);
 	UINT16 result = 0xffff;
 
 	switch( namcos22_gametype )
@@ -1079,15 +1079,15 @@ AnalogAsDigital( running_machine *machine )
 	case NAMCOS22_RAVE_RACER:
 	case NAMCOS22_RIDGE_RACER:
 	case NAMCOS22_RIDGE_RACER2:
-		if( gas==0xff )
+		if( gas == 0xff )
 		{
 			result ^= 0x0100; /* CHOOSE */
 		}
-		if( steer==0x00 )
+		if( steer == 0x00 )
 		{
 			result ^= 0x0040; /* PREV */
 		}
-		else if( steer==0xff )
+		else if( steer == 0xff )
 		{
 			result ^= 0x0080; /* NEXT */
 		}
@@ -1100,11 +1100,11 @@ AnalogAsDigital( running_machine *machine )
 			result ^= 0x0001; /* CHOOSE */
 		}
 		stick &= 3;
-		if( stick==1 )
+		if( stick == 1 )
 		{ /* Stick Shift Up */
 			result ^= 0x0040; /* PREV */
 		}
-		if( stick==2 )
+		if( stick == 2 )
 		{ /* Stick Shift Down */
 			result ^= 0x0080; /* NEXT */
 		}
@@ -1123,7 +1123,7 @@ HandleCoinage(running_machine *machine, int slots)
 	UINT16 *share16 = (UINT16 *)namcos22_shareram;
 	UINT32 coin_state;
 
-	coin_state = input_port_read_indexed(machine, 1) & 0x1200;
+	coin_state = input_port_read(machine, "INPUTS") & 0x1200;
 
 	if (!(coin_state & 0x1000) && (old_coin_state & 0x1000))
 	{
@@ -1149,10 +1149,10 @@ HandleCoinage(running_machine *machine, int slots)
 static void
 HandleDrivingIO( running_machine *machine )
 {
-	if( nthbyte(namcos22_system_controller,0x18)!=0 )
+	if( nthbyte(namcos22_system_controller, 0x18) != 0 )
 	{
-		UINT16 flags = input_port_read_indexed(machine, 1);
-		UINT16 gas,brake,steer;
+		UINT16 flags = input_port_read(machine, "INPUTS");
+		UINT16 gas, brake, steer;
 		ReadAnalogDrivingPorts( machine, &gas, &brake, &steer );
 
 		HandleCoinage(machine, 2);
@@ -1205,17 +1205,17 @@ HandleDrivingIO( running_machine *machine )
 static void
 HandleCyberCommandoIO( running_machine *machine )
 {
-	if( nthbyte(namcos22_system_controller,0x18)!=0 )
+	if( nthbyte(namcos22_system_controller, 0x18) != 0 )
 	{
-		UINT16 flags = input_port_read_indexed(machine, 1);
+		UINT16 flags = input_port_read(machine, "INPUTS");
 
-		UINT16 volume0 = input_port_read_indexed(machine, 2)*0x10;
-		UINT16 volume1 = input_port_read_indexed(machine, 3)*0x10;
-		UINT16 volume2 = input_port_read_indexed(machine, 4)*0x10;
-		UINT16 volume3 = input_port_read_indexed(machine, 5)*0x10;
+		UINT16 volume0 = input_port_read(machine, "STICKY1") * 0x10;
+		UINT16 volume1 = input_port_read(machine, "STICKY2") * 0x10;
+		UINT16 volume2 = input_port_read(machine, "STICKX1") * 0x10;
+		UINT16 volume3 = input_port_read(machine, "STICKX2") * 0x10;
 
-		namcos22_shareram[0x030/4] = (flags<<16)|volume0;
-		namcos22_shareram[0x034/4] = (volume1<<16)|volume2;
+		namcos22_shareram[0x030/4] = (flags<<16) | volume0;
+		namcos22_shareram[0x034/4] = (volume1<<16) | volume2;
 		namcos22_shareram[0x038/4] = volume3<<16;
 
 		HandleCoinage(machine, 1);
@@ -2161,7 +2161,7 @@ static WRITE32_HANDLER( namcos22_portbit_w )
 
 static READ32_HANDLER( namcos22_dipswitch_r )
 {
-	return input_port_read_indexed(machine, 0)<<16;
+	return input_port_read(machine, "DSW0")<<16;
 }
 
 static READ32_HANDLER( namcos22_mcuram_r )
@@ -2231,8 +2231,8 @@ static WRITE32_HANDLER( spotram_w )
 
 static READ32_HANDLER( namcos22_gun_r )
 {
-	int xpos = input_port_read_indexed(machine, 1)*640/0xff;
-	int ypos = input_port_read_indexed(machine, 2)*480/0xff;
+	int xpos = input_port_read_safe(machine, "LIGHTX", 0) * 640 / 0xff;
+	int ypos = input_port_read_safe(machine, "LIGHTY", 0) * 480 / 0xff;
 	switch( offset )
 	{
 	case 0: /* 430000 */
@@ -2300,20 +2300,20 @@ static ADDRESS_MAP_START( namcos22s_am, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x460000, 0x463fff) AM_RAM AM_BASE(&namcos22_nvmem) AM_SIZE(&namcos22_nvmem_size)
 	AM_RANGE(0x700000, 0x70001f) AM_READ(namcos22_system_controller_r) AM_WRITE(namcos22_system_controller_w) AM_BASE(&namcos22_system_controller)
 	AM_RANGE(0x800000, 0x800003) AM_WRITE(namcos22_port800000_w) /* (C304 C399)  40380000 during SPOT test */
-   AM_RANGE(0x810000, 0x81000f) AM_RAM AM_BASE(&namcos22_czattr)
-   AM_RANGE(0x810200, 0x8103ff) AM_READ(namcos22_czram_r) AM_WRITE(namcos22_czram_w)
+	AM_RANGE(0x810000, 0x81000f) AM_RAM AM_BASE(&namcos22_czattr)
+	AM_RANGE(0x810200, 0x8103ff) AM_READ(namcos22_czram_r) AM_WRITE(namcos22_czram_w)
 	AM_RANGE(0x820000, 0x8202ff) AM_RAM /* unknown (air combat) */
 	AM_RANGE(0x824000, 0x8243ff) AM_READ(namcos22_gamma_r) AM_WRITE(namcos22_gamma_w) AM_BASE(&namcos22_gamma)
 	AM_RANGE(0x828000, 0x83ffff) AM_READ(namcos22_paletteram_r) AM_WRITE(namcos22_paletteram_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x860000, 0x860007) AM_READ(spotram_r) AM_WRITE(spotram_w)
 	AM_RANGE(0x880000, 0x89dfff) AM_READ(SMH_RAM) AM_WRITE(namcos22_cgram_w) AM_BASE(&namcos22_cgram)
 	AM_RANGE(0x89e000, 0x89ffff) AM_READ(namcos22_textram_r) AM_WRITE(namcos22_textram_w) AM_BASE(&namcos22_textram)
-   AM_RANGE(0x8a0000, 0x8a000f) AM_RAM  AM_BASE(&namcos22_tilemapattr)
+	AM_RANGE(0x8a0000, 0x8a000f) AM_RAM AM_BASE(&namcos22_tilemapattr)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE(&namcos22_vics_data)
 	AM_RANGE(0x940000, 0x94007f) AM_RAM AM_BASE(&namcos22_vics_control)
 	AM_RANGE(0x980000, 0x9affff) AM_RAM AM_BASE(&spriteram32) /* C374 */
 	AM_RANGE(0xa04000, 0xa0bfff) AM_READ(namcos22_mcuram_r) AM_WRITE(namcos22_mcuram_w) AM_BASE(&namcos22_shareram) /* COM RAM */
-   AM_RANGE(0xc00000, 0xc1ffff) AM_READ(namcos22_dspram_r) AM_WRITE(namcos22_dspram_w) AM_BASE(&namcos22_polygonram)
+	AM_RANGE(0xc00000, 0xc1ffff) AM_READ(namcos22_dspram_r) AM_WRITE(namcos22_dspram_w) AM_BASE(&namcos22_polygonram)
 	AM_RANGE(0xe00000, 0xe3ffff) AM_RAM /* workram */
 ADDRESS_MAP_END
 
@@ -2466,8 +2466,8 @@ static READ8_HANDLER( propcycle_mcu_adc_r )
 {
 	static UINT16 ddx, ddy;
 
-	ddx = ((input_port_read_indexed(machine, 2)^0xff)-1)<<2;
-	ddy = (input_port_read_indexed(machine, 3)-1)<<2;
+	ddx = ((input_port_read(machine, "STICKX")^0xff) - 1)<<2;
+	ddy = (input_port_read(machine, "STICKY") - 1)<<2;
 
 	switch (offset)
 	{
@@ -2480,7 +2480,7 @@ static READ8_HANDLER( propcycle_mcu_adc_r )
 			// and timer A3 is configured by the MCU program to cause an interrupt each time
 			// it's clocked.  by counting the number of interrupts in a frame, we can determine
 			// how fast the user is pedaling.
-			if( input_port_read_indexed(machine, 1) & 0x10 )
+			if( input_port_read(machine, "JOY") & 0x10 )
 			{
 				int i;
 				for (i = 0; i < 16; i++)
@@ -2509,12 +2509,12 @@ static READ8_HANDLER( propcycle_mcu_adc_r )
 // 0 H+L = swing, 1 H+L = edge
 static READ8_HANDLER( alpineracer_mcu_adc_r )
 {
-	UINT16 swing = (0xff-input_port_read_indexed(machine, 2))<<2;
-	UINT16 edge = (0xff-input_port_read_indexed(machine, 3))<<2;
+	UINT16 swing = (0xff - input_port_read(machine, "SWING"))<<2;
+	UINT16 edge = (0xff - input_port_read(machine, "EDGE"))<<2;
 
 	// fake out the centering a bit
-	if (input_port_read_indexed(machine, 2) == 0x80) swing = 0x200;
-	if (input_port_read_indexed(machine, 3) == 0x80) edge = 0x200;
+	if (input_port_read(machine, "SWING") == 0x80) swing = 0x200;
+	if (input_port_read(machine, "EDGE") == 0x80) edge = 0x200;
 
 	switch (offset)
 	{
@@ -2585,9 +2585,9 @@ static READ8_HANDLER( airco22_mcu_adc_r )
 {
 	UINT16 pedal, x, y;
 
-	pedal = input_port_read_indexed(machine, 1)<<2;
-	x = input_port_read_indexed(machine, 2)<<2;
-	y = input_port_read_indexed(machine, 3)<<2;
+	pedal = input_port_read(machine, "PEDAL")<<2;
+	x = input_port_read(machine, "STICKX")<<2;
+	y = input_port_read(machine, "STICKY")<<2;
 
 
 	switch (offset)
@@ -4280,7 +4280,7 @@ ROM_END
 /*******************************************************************/
 
 static INPUT_PORTS_START( alpiner )
-	PORT_START
+	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x01, 0x01, "DIP4-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -4306,7 +4306,7 @@ static INPUT_PORTS_START( alpiner )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG( "MCUP5A" )
+	PORT_START_TAG("MCUP5A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -4316,13 +4316,13 @@ static INPUT_PORTS_START( alpiner )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* R SELECTION */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START /* SWING */
+	PORT_START_TAG("SWING")	/* SWING */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START /* EDGE */
+	PORT_START_TAG("EDGE")	/* EDGE */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START_TAG( "MCUP5B" )
+	PORT_START_TAG("MCUP5B")
 	PORT_DIPNAME( 0x01, 0x01, "DIP5-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -4351,7 +4351,7 @@ INPUT_PORTS_END /* Alpine Racer */
 
 
 static INPUT_PORTS_START( airco22 )
-	PORT_START
+	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x01, 0x01, "DIP1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -4377,16 +4377,16 @@ static INPUT_PORTS_START( airco22 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("PEDAL")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START
+	PORT_START_TAG("STICKX")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START
+	PORT_START_TAG("STICKY")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START_TAG( "MCUP5A" )
+	PORT_START_TAG("MCUP5A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 )
 //  PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -4398,12 +4398,12 @@ static INPUT_PORTS_START( airco22 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
 //  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG( "MCUP5B" )
+	PORT_START_TAG("MCUP5B")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_BUTTON3 )
 INPUT_PORTS_END /* Air Combat22 */
 
 static INPUT_PORTS_START( cybrcycc )
-	PORT_START
+	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x01, 0x01, "DIP4-1 (Test Mode)" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -4429,7 +4429,9 @@ static INPUT_PORTS_START( cybrcycc )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG( "MCUP5A" )
+	DRIVING_ANALOG_PORTS
+
+	PORT_START_TAG("MCUP5A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -4439,9 +4441,7 @@ static INPUT_PORTS_START( cybrcycc )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	DRIVING_ANALOG_PORTS
-
-	PORT_START_TAG( "MCUP5B" )
+	PORT_START_TAG("MCUP5B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -4453,7 +4453,7 @@ static INPUT_PORTS_START( cybrcycc )
 INPUT_PORTS_END /* Cyber Cycles */
 
 static INPUT_PORTS_START( propcycl )
-	PORT_START /* DIP4 */
+	PORT_START_TAG("DSW0")	/* DIP4 */
 	PORT_DIPNAME( 0x01, 0x01, "DIP1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -4479,7 +4479,7 @@ static INPUT_PORTS_START( propcycl )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("JOY")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
@@ -4487,13 +4487,13 @@ static INPUT_PORTS_START( propcycl )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 
-	PORT_START
+	PORT_START_TAG("STICKX")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START
+	PORT_START_TAG("STICKY")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START_TAG( "MCUP5A" )
+	PORT_START_TAG("MCUP5A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -4503,7 +4503,7 @@ static INPUT_PORTS_START( propcycl )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG( "MCUP5B" )
+	PORT_START_TAG("MCUP5B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -4515,7 +4515,7 @@ static INPUT_PORTS_START( propcycl )
 INPUT_PORTS_END /* Prop Cycle */
 
 static INPUT_PORTS_START( cybrcomm )
-	PORT_START
+	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x0001, 0x0001, "DIP2-1" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -4565,7 +4565,7 @@ static INPUT_PORTS_START( cybrcomm )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* SHOOT */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* MISSLE */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -4583,18 +4583,18 @@ static INPUT_PORTS_START( cybrcomm )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START /* VOLUME1 */
+	PORT_START_TAG("STICKY1")	/* VOLUME1 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(	100) PORT_KEYDELTA(4) PORT_PLAYER(1)   /* right joystick: vertical */
-	PORT_START /* VOLUME2 */
+	PORT_START_TAG("STICKY2")	/* VOLUME2 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(	100) PORT_KEYDELTA(4) PORT_PLAYER(2)   /* left joystick: vertical */
-	PORT_START /* VOLUME3 */
+	PORT_START_TAG("STICKX1")	/* VOLUME3 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(	100) PORT_KEYDELTA(4) PORT_PLAYER(1)   /* right joystick: horizontal */
-	PORT_START /* VOLUME4 */
+	PORT_START_TAG("STICKX2")	/* VOLUME4 */
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(	100) PORT_KEYDELTA(4) PORT_PLAYER(2)   /* left joystick: horizontal */
 INPUT_PORTS_END /* Cyber Commando */
 
 static INPUT_PORTS_START( timecris )
-	PORT_START
+	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x01, 0x01, "DIP4-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -4618,12 +4618,12 @@ static INPUT_PORTS_START( timecris )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START
+	PORT_START_TAG( "LIGHTX" )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, -0.1, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(4)
-	PORT_START
+	PORT_START_TAG( "LIGHTY" )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, -0.184, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(4)
 
-  	PORT_START_TAG( "MCUP5A" )
+  	PORT_START_TAG("MCUP5A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -4633,14 +4633,14 @@ static INPUT_PORTS_START( timecris )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG( "MCUP5B" )
+	PORT_START_TAG("MCUP5B")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END /* Time Crisis */
 
 /*****************************************************************************************************/
 
 static INPUT_PORTS_START( acedrvr )
-	PORT_START /* 0: DIP2 and DIP3 */
+	PORT_START_TAG("DSW0")	/* 0: DIP2 and DIP3 */
 	PORT_DIPNAME( 0x0001, 0x0001, "DIP2-1" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -4690,7 +4690,7 @@ static INPUT_PORTS_START( acedrvr )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
-	PORT_START /* 1 */
+	PORT_START_TAG("INPUTS")	/* 1 */
 	PORT_DIPNAME( 0x0003, 0x0003, "Shift" )
 	PORT_DIPSETTING(    0x0001, "Up" )
 	PORT_DIPSETTING(    0x0003, "Center" )
@@ -4714,7 +4714,7 @@ static INPUT_PORTS_START( acedrvr )
 INPUT_PORTS_END /* Ace Driver */
 
 static INPUT_PORTS_START( victlap )
-	PORT_START /* 0: DIP2 and DIP3 */
+	PORT_START_TAG("DSW0")	/* 0: DIP2 and DIP3 */
 	PORT_DIPNAME( 0x0001, 0x0001, "DIP2-1" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -4764,7 +4764,7 @@ static INPUT_PORTS_START( victlap )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
-	PORT_START /* 1 */
+	PORT_START_TAG("INPUTS")	/* 1 */
 	PORT_DIPNAME( 0x0003, 0x0003, "Shift" )
 	PORT_DIPSETTING(    0x0001, "Up" )
 	PORT_DIPSETTING(    0x0003, "Center" )
@@ -4790,7 +4790,7 @@ static INPUT_PORTS_START( victlap )
 INPUT_PORTS_END /* Victory Lap */
 
 static INPUT_PORTS_START( ridgera )
-	PORT_START /* 0: DIP2 and DIP3 */
+	PORT_START_TAG("DSW0")	/* 0: DIP2 and DIP3 */
 	PORT_DIPNAME( 0x0001, 0x0001, "DIP2-1 (test mode?)" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -4840,7 +4840,7 @@ static INPUT_PORTS_START( ridgera )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
-	PORT_START /* 1 */
+	PORT_START_TAG("INPUTS")	/* 1 */
 	PORT_DIPNAME( 0x000f, 0x000a, "Stick Shift" )
 	PORT_DIPSETTING( 0xa, "1" )
 	PORT_DIPSETTING( 0x9, "2" )
@@ -4865,7 +4865,7 @@ static INPUT_PORTS_START( ridgera )
 INPUT_PORTS_END /* Ridge Racer */
 
 static INPUT_PORTS_START( raveracw )
-	PORT_START
+	PORT_START_TAG("DSW0")	
 	PORT_DIPNAME( 0x0001, 0x0001, "DIP2-1 (test mode)" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -4915,7 +4915,7 @@ static INPUT_PORTS_START( raveracw )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
-	PORT_START /* 1 */
+	PORT_START_TAG("INPUTS")	/* 1 */
 	PORT_DIPNAME( 0x000f, 0x000a, "Stick Shift" )
 	PORT_DIPSETTING( 0xa, "1" )
 	PORT_DIPSETTING( 0x9, "2" )

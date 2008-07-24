@@ -144,12 +144,13 @@ static int handle_joystick;
 static READ8_HANDLER( geebee_in_r )
 {
 	int res;
+	static const char *portnames[] = { "SW0", "SW1", "DSW2", "PLACEHOLDER" };	// "IN1" & "IN2" are read separately when offset==3
 
 	offset &= 3;
-	res = input_port_read_indexed(machine, offset);
+	res = input_port_read_safe(machine, portnames[offset], 0);
 	if (offset == 3)
 	{
-		res = input_port_read_indexed(machine, 3 + (flip_screen_get() & 1));	// read player 2 input in cocktail mode
+		res = input_port_read(machine, (flip_screen_get() & 1) ? "IN2" : "IN1");	// read player 2 input in cocktail mode
 		if (handle_joystick)
 		{
 			/* map digital two-way joystick to two fixed VOLIN values */
@@ -217,13 +218,13 @@ static WRITE8_HANDLER( geebee_out7_w )
 /* Read Switch Inputs */
 static READ8_HANDLER( warpwarp_sw_r )
 {
-	return (input_port_read_indexed(machine, 0) >> (offset & 7)) & 1;
+	return (input_port_read(machine, "IN0") >> (offset & 7)) & 1;
 }
 
 /* Read Dipswitches */
 static READ8_HANDLER( warpwarp_dsw1_r )
 {
-	return (input_port_read_indexed(machine, 1) >> (offset & 7)) & 1;
+	return (input_port_read(machine, "DSW1") >> (offset & 7)) & 1;
 }
 
 /* Read mux Controller Inputs */
@@ -231,7 +232,7 @@ static READ8_HANDLER( warpwarp_vol_r )
 {
 	int res;
 
-	res = input_port_read_indexed(machine, 2 + (flip_screen_get() & 1));
+	res = input_port_read(machine, (flip_screen_get() & 1) ? "VOLIN2" : "VOLIN1");
 	if (handle_joystick)
 	{
 		if (res & 1) return 0x0f;
@@ -372,10 +373,10 @@ static INPUT_PORTS_START( geebee )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("VOLIN")
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0xff, 0x58, IPT_PADDLE ) PORT_MINMAX(0x10,0xa0) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_REVERSE
 
-	PORT_START_TAG("VOLINC") //Cocktail
+	PORT_START_TAG("IN2")	/* Cocktail */
 	PORT_BIT( 0xff, 0x58, IPT_PADDLE ) PORT_MINMAX(0x10,0xa0) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_REVERSE PORT_COCKTAIL
 INPUT_PORTS_END
 
@@ -412,11 +413,11 @@ static INPUT_PORTS_START( navarone )
 	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("FAKE1")	/* Fake input port to support digital joystick */
+	PORT_START_TAG("IN1")	/* Fake input port to support digital joystick */
 	PORT_BIT( 0x01, 0x00, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x02, 0x00, IPT_JOYSTICK_LEFT )
 
-	PORT_START_TAG("FAKE2")	/* Fake input port to support digital joystick */
+	PORT_START_TAG("IN2")	/* Fake input port to support digital joystick */
 	PORT_BIT( 0x01, 0x00, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
 	PORT_BIT( 0x02, 0x00, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 INPUT_PORTS_END
@@ -452,11 +453,11 @@ static INPUT_PORTS_START( kaitei )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW,	IPT_UNUSED )
 
-	PORT_START_TAG("FAKE1")	/* Fake input port to support digital joystick */
+	PORT_START_TAG("IN1")	/* Fake input port to support digital joystick */
 	PORT_BIT( 0x01, 0x00, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x02, 0x00, IPT_JOYSTICK_LEFT )
 
-	PORT_START_TAG("FAKE")	/* Fake input port to support digital joystick */
+	PORT_START_TAG("IN2")	/* Fake input port to support digital joystick */
 	PORT_BIT( 0x01, 0x00, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
 	PORT_BIT( 0x02, 0x00, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 INPUT_PORTS_END
@@ -496,11 +497,11 @@ static INPUT_PORTS_START( kaiteik )
 	PORT_DIPSETTING(	0x20, DEF_STR( On ) )
 	PORT_BIT( 0xc0, 0x80, IPT_UNKNOWN )	// game verifies these two bits and freezes if they don't match
 
-	PORT_START_TAG("VOLIN1")
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x3f, 0x00, IPT_UNKNOWN )
 	PORT_BIT( 0xc0, 0x80, IPT_UNKNOWN )	// game verifies these two bits and freezes if they don't match
 
-	PORT_START_TAG("VOLIN2")
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x3f, 0x00, IPT_UNKNOWN )
 	PORT_BIT( 0xc0, 0x80, IPT_UNKNOWN )	// game verifies these two bits and freezes if they don't match
 INPUT_PORTS_END
@@ -537,11 +538,11 @@ static INPUT_PORTS_START( sos )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("FAKE1")	/* Fake input port to support digital joystick */
+	PORT_START_TAG("IN1")	/* Fake input port to support digital joystick */
 	PORT_BIT( 0x01, 0x00, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x02, 0x00, IPT_JOYSTICK_LEFT )
 
-	PORT_START_TAG("FAKE2")	/* Fake input port to support digital joystick */
+	PORT_START_TAG("IN2")	/* Fake input port to support digital joystick */
 	PORT_BIT( 0x01, 0x00, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
 	PORT_BIT( 0x02, 0x00, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 INPUT_PORTS_END
@@ -591,32 +592,9 @@ static INPUT_PORTS_START( bombbee )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cutieq )
-	PORT_START_TAG("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_INCLUDE( bombbee )
 
-	PORT_START_TAG("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x00, "3" )
-	PORT_DIPSETTING(	0x04, "4" )
-//  PORT_DIPSETTING(    0x08, "4" )             // duplicated setting
-	PORT_DIPSETTING(	0x0c, "5" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(	0x00, "50000" )
 	PORT_DIPSETTING(	0x20, "60000" )
@@ -626,12 +604,6 @@ static INPUT_PORTS_START( cutieq )
 	PORT_DIPSETTING(	0xa0, "150000" )
 	PORT_DIPSETTING(	0xc0, "200000" )
 	PORT_DIPSETTING(	0xe0, DEF_STR( None ) )
-
-	PORT_START_TAG("VOLIN1")	/* Mux input - player 1 controller - handled by warpwarp_vol_r */
-	PORT_BIT( 0xff, 0x60, IPT_PADDLE ) PORT_MINMAX(0x14,0xac) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE
-
-	PORT_START_TAG("VOLIN2")	/* Mux input - player 2 controller - handled by warpwarp_vol_r */
-	PORT_BIT( 0xff, 0x60, IPT_PADDLE ) PORT_MINMAX(0x14,0xac) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_COCKTAIL
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( warpwarp )
@@ -694,60 +666,12 @@ INPUT_PORTS_END
 
 /* has High Score Initials dip switch instead of rack test */
 static INPUT_PORTS_START( warpwarr )
-	PORT_START_TAG("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Upright ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_INCLUDE( warpwarp )
 
-	PORT_START_TAG("DSW1")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x00, "2" )
-	PORT_DIPSETTING(	0x04, "3" )
-	PORT_DIPSETTING(	0x08, "4" )
-	PORT_DIPSETTING(	0x0c, "5" )
-	/* Bonus Lives when "Lives" Dip Switch is set to "2", "3" or "4" */
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(	0x00, "8000 30000" )
-	PORT_DIPSETTING(	0x10, "10000 40000" )
-	PORT_DIPSETTING(	0x20, "15000 60000" )
-	PORT_DIPSETTING(	0x30, DEF_STR( None ) )
-	/* Bonus Lives when "Lives" Dip Switch is set to "5"
-    PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )
-    PORT_DIPSETTING(    0x00, "30000" )
-    PORT_DIPSETTING(    0x10, "40000" )
-    PORT_DIPSETTING(    0x20, "60000" )
-    PORT_DIPSETTING(    0x30, DEF_STR( None ) )
-    */
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x80, 0x00, "High Score Initials" )
 	PORT_DIPSETTING(	0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Yes ) )
-
-	PORT_START_TAG("VOLIN1")	/* FAKE - input port to simulate an analog stick - handled by warpwarp_vol_r */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-
-	PORT_START_TAG("VOLIN2")	/* FAKE - input port to simulate an analog stick - handled by warpwarp_vol_r */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 INPUT_PORTS_END
 
 

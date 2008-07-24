@@ -53,7 +53,7 @@ VIDEO_UPDATE( thief );
 static INTERRUPT_GEN( thief_interrupt )
 {
 	/* SLAM switch causes an NMI if it's pressed */
-	if( (input_port_read_indexed(machine, 3) & 0x10) == 0 )
+	if( (input_port_read(machine, "P2") & 0x10) == 0 )
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	else
 		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
@@ -158,10 +158,10 @@ static READ8_HANDLER( thief_io_r )
 {
 	switch( thief_input_select )
 	{
-		case 0x01: return input_port_read_indexed(machine, 0); /* dsw#1 */
-		case 0x02: return input_port_read_indexed(machine, 1); /* dsw#2 */
-		case 0x04: return input_port_read_indexed(machine, 2); /* inp#1 */
-		case 0x08: return input_port_read_indexed(machine, 3); /* inp#2 */
+		case 0x01: return input_port_read(machine, "DSW1");
+		case 0x02: return input_port_read(machine, "DSW2");
+		case 0x04: return input_port_read(machine, "P1");
+		case 0x08: return input_port_read(machine, "P2");
 	}
 	return 0x00;
 }
@@ -219,13 +219,13 @@ ADDRESS_MAP_END
 /**********************************************************/
 
 static INPUT_PORTS_START( sharkatt )
-	PORT_START      /* IN0 */
+	PORT_START_TAG("DSW1")	/* IN0 */
 	PORT_DIPNAME( 0x7f, 0x7f, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x7f, DEF_STR( 1C_1C ) ) // if any are set
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
-	PORT_START      /* IN1 */
+	PORT_START_TAG("DSW2")	/* IN1 */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(	0x00, "3" )
 	PORT_DIPSETTING(	0x01, "4" )
@@ -250,7 +250,7 @@ static INPUT_PORTS_START( sharkatt )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
 
-	PORT_START      /* IN2 */
+	PORT_START_TAG("P1")	/* IN2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -260,7 +260,7 @@ static INPUT_PORTS_START( sharkatt )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
-	PORT_START      /* IN3 */
+	PORT_START_TAG("P2")	/* IN3 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -272,7 +272,7 @@ static INPUT_PORTS_START( sharkatt )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( thief )
-	PORT_START
+	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -296,7 +296,7 @@ static INPUT_PORTS_START( thief )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	PORT_START
+	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00|0x0c, "10K" )
 	PORT_DIPSETTING(    0x01|0x0c, "20K" )
@@ -319,7 +319,7 @@ static INPUT_PORTS_START( thief )
 	PORT_DIPSETTING(    0x80|0x60, "I/O Board Test" )
 	PORT_DIPSETTING(    0x80|0x70, "Reserved" )
 
-	PORT_START
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -329,7 +329,7 @@ static INPUT_PORTS_START( thief )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
@@ -341,7 +341,7 @@ static INPUT_PORTS_START( thief )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( natodef )
-	PORT_START
+	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -364,7 +364,7 @@ static INPUT_PORTS_START( natodef )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
-	PORT_START
+	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -386,7 +386,7 @@ static INPUT_PORTS_START( natodef )
 	PORT_DIPSETTING(    0x80|0x60, "I/O Board Test" )
 	PORT_DIPSETTING(    0x80|0x70, "Reserved" )
 
-	PORT_START
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -396,7 +396,7 @@ static INPUT_PORTS_START( natodef )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL

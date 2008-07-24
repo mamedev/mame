@@ -467,6 +467,9 @@ static INPUT_PORTS_START( topland )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED )
+
 	/* The range of these sticks reflects the range test mode displays.
        Eventually we want standard 0-0xff input range and a scale-up later
        in the stick_r routines.  And fake DSW with self-centering option
@@ -528,6 +531,9 @@ static INPUT_PORTS_START( ainferno )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_PLAYER(1)	/* pedal l */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	/* The range of these sticks reflects the range test mode displays.
        Eventually we want standard 0-0xff input range and a scale-up later
