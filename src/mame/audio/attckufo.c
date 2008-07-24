@@ -55,11 +55,11 @@
 #define NOISE_FREQUENCY ((14318181/14)/NOISE_VALUE)
 #define NOISE_FREQUENCY_MAX ((14318181/14)/32/1)
 
-static int tone1pos = 0, tone2pos = 0, tone3pos = 0,
-	tonesize, tone1samples = 1, tone2samples = 1, tone3samples = 1,
-	noisesize,		  /* number of samples */
-	noisepos = 0,         /* pos of tone */
-	noisesamples = 1;	  /* count of samples to give out per tone */
+static int tone1pos = 0, tone2pos = 0, tone3pos = 0;
+static int tonesize, tone1samples, tone2samples, tone3samples;
+static int noisesize,		  /* number of samples */
+	noisepos,         /* pos of tone */
+	noisesamples;	  /* count of samples to give out per tone */
 
 static sound_stream *channel;
 static INT16 *tone;
@@ -218,6 +218,8 @@ void *attckufo_custom_start(int clock, const struct CustomSound_interface *confi
 	/* buffer for fastest played sample for 5 second
      * so we have enough data for min 5 second */
 	noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;
+	noisepos = 0;
+	noisesamples = 1;
 	noise = (INT8*) auto_malloc (noisesize * sizeof (noise[0]));
 	{
 		int noiseshift = 0x7ffff8;
@@ -250,6 +252,8 @@ void *attckufo_custom_start(int clock, const struct CustomSound_interface *confi
 		}
 	}
 	tonesize = OUTPUT_RATE / TONE_FREQUENCY_MIN;
+	tone1pos = tone2pos = tone3pos = 0;
+	tone1samples = tone2samples = tone3samples = 1;
 
 	tone = (INT16*) auto_malloc (tonesize * sizeof (tone[0]));
 

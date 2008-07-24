@@ -31,9 +31,9 @@ static int horiz_scroll_high=0;
 static int rear_horiz_scroll_low=0;
 static int rear_horiz_scroll_high=0;
 static int rear_color=0;
-static int rear_disable=1;
+static int rear_disable;
 
-static int rear_refresh=1;
+static int rear_refresh;
 
 static bitmap_t *bg_bitmap;
 
@@ -43,6 +43,17 @@ VIDEO_START( vigilant )
 	bg_bitmap = auto_bitmap_alloc(512*4,256,video_screen_get_format(machine->primary_screen));
 }
 
+
+VIDEO_RESET( vigilant )
+{
+	horiz_scroll_low = 0;
+	horiz_scroll_high = 0;
+	rear_horiz_scroll_low = 0;
+	rear_horiz_scroll_high = 0;
+	rear_color = 0;
+	rear_disable = 1;
+	rear_refresh = 1;
+}
 
 
 /***************************************************************************

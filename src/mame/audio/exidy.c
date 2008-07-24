@@ -75,10 +75,10 @@ static struct sh6840_timer_channel sh6840_timer[3];
 static INT16 sh6840_volume[3];
 static UINT8 sh6840_MSB;
 static UINT8 sh6840_LFSR_oldxor = 0; /* should be saved in savestate */
-static UINT32 sh6840_LFSR_0 = 0xffffffff;/* ditto */
-static UINT32 sh6840_LFSR_1 = 0xffffffff;/* ditto */
-static UINT32 sh6840_LFSR_2 = 0xffffffff;/* ditto */
-static UINT32 sh6840_LFSR_3 = 0xffffffff;/* ditto */
+static UINT32 sh6840_LFSR_0;/* ditto */
+static UINT32 sh6840_LFSR_1;/* ditto */
+static UINT32 sh6840_LFSR_2;/* ditto */
+static UINT32 sh6840_LFSR_3;/* ditto */
 static UINT32 sh6840_clocks_per_sample;
 static UINT32 sh6840_clock_count;
 

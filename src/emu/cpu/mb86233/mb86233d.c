@@ -538,8 +538,8 @@ unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 
 	    case 0x0e:	/* Load 24 bit val */
 		{
-		    UINT32	sub=(opcode>>24)&0x3;
-			const char regs[4] = { 'p', 'a', 'b', 'd' };
+			UINT32 sub=(opcode>>24)&0x3;
+			static const char regs[4] = { 'p', 'a', 'b', 'd' };
 
 			p += sprintf(p,"LDIMM24 0x%X->%c",opcode&0xffffff, regs[sub]);
 		}

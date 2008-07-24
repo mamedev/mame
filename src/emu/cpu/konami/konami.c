@@ -162,7 +162,7 @@ static PAIR ea;         /* effective address */
 	}
 
 /* public globals */
-static int konami_ICount=50000;
+static int konami_ICount;
 //int konami_Flags; /* flags for speed optimization (obsolete!!) */
 
 /* these are re-defined in konami.h TO RAM, ROM or functions in memory.c */

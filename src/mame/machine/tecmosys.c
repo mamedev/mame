@@ -33,13 +33,13 @@
 
 UINT8 device_read_ptr;
 UINT8 device_status;
-struct prot_data* device_data;
+const struct prot_data* device_data;
 static UINT8 device_value = 0xff;
 
 // deroon prot data
-static UINT8 deroon_passwd[] = {'L','U','N','A',0};
-static UINT8 deroon_upload[] = {0x02, 0x4e, 0x75, 0x00 }; // code length, code, 0x00 trailer
-struct prot_data deroon_data =
+static const UINT8 deroon_passwd[] = {'L','U','N','A',0};
+static const UINT8 deroon_upload[] = {0x02, 0x4e, 0x75, 0x00 }; // code length, code, 0x00 trailer
+const struct prot_data deroon_data =
 {
 	5,
 	deroon_passwd,
@@ -55,9 +55,9 @@ struct prot_data deroon_data =
 };
 
 // tkdensho prot data
-static UINT8 tkdensho_passwd[] = {'A','G','E','P','R','O','T','E','C','T',' ','S','T','A','R','T',0};
-static UINT8 tkdensho_upload[] = {0x06, 0x4e, 0xf9, 0x00, 0x00, 0x22, 0xc4,0x00};
-struct prot_data tkdensho_data =
+static const UINT8 tkdensho_passwd[] = {'A','G','E','P','R','O','T','E','C','T',' ','S','T','A','R','T',0};
+static const UINT8 tkdensho_upload[] = {0x06, 0x4e, 0xf9, 0x00, 0x00, 0x22, 0xc4,0x00};
+const struct prot_data tkdensho_data =
 {
 	0x11,
 	tkdensho_passwd,
@@ -72,7 +72,7 @@ struct prot_data tkdensho_data =
 	{ 0xbf, 0xfa, 0xda, 0xda }
 };
 
-struct prot_data tkdensha_data =
+const struct prot_data tkdensha_data =
 {
 	0x11,
 	tkdensho_passwd,

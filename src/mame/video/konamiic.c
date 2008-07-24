@@ -2954,7 +2954,7 @@ WRITE8_HANDLER( K052109_051960_w )
 /*                                                                         */
 /***************************************************************************/
 
-static int K05324x_z_rejection = -1;
+static int K05324x_z_rejection;
 
 /*
     In a K053247+K055555 setup objects with Z-code 0x00 should be ignored

@@ -934,6 +934,7 @@ static MACHINE_DRIVER_START( tubep )
 
 	MDRV_PALETTE_INIT(tubep)
 	MDRV_VIDEO_START(tubep)
+	MDRV_VIDEO_RESET(tubep)
 	MDRV_VIDEO_UPDATE(tubep)
 
 	/* sound hardware */
@@ -998,6 +999,7 @@ static MACHINE_DRIVER_START( rjammer )
 
 	MDRV_PALETTE_INIT(rjammer)
 	MDRV_VIDEO_START(tubep)
+	MDRV_VIDEO_RESET(tubep)
 	MDRV_VIDEO_UPDATE(rjammer)
 
 	/* sound hardware */

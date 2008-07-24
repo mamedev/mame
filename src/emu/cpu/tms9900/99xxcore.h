@@ -499,13 +499,7 @@ typedef struct
 
 }	tms99xx_Regs;
 
-static tms99xx_Regs I =
-{
-	0,0,0,0,  /* don't care */
-	0,        /* no pending interrupt */
-	0,        /* LOAD* inactive */
-  16, 0,    /* INTREQ* inactive */
-};
+static tms99xx_Regs I;
 static UINT8 lastparity;  /* rather than handling ST_OP directly, we copy the last value which
                                   would set it here */
 
@@ -1280,6 +1274,7 @@ static void tms99xx_init(int index, int clock, const void *config, int (*irqcall
 
 	register_for_save_state(index);
 
+	I.irq_level = 16;
 	I.irq_callback = irqcallback;
 
 #if (TMS99XX_MODEL == TMS9995_ID)

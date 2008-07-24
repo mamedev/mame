@@ -61,6 +61,8 @@ AT08XX03:
 static UINT8 *hal21_vreg, *hal21_sndfifo;
 static UINT8 *textram;
 static UINT8 *aso_scroll_sync;
+static int color[2];
+
 
 /**************************************************************************/
 // Test Handlers
@@ -179,10 +181,16 @@ static VIDEO_START( aso )
 }
 
 
+static VIDEO_RESET( aso )
+{
+	color[0] = 8;
+	color[1] = 8;
+}
+
+
 static void hal21_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int scrollx, int scrolly, int attrs,
 								const gfx_element *gfx )
 {
-	static int color[2] = {8, 8};
 	int bankbase, c, x, y, offsx, offsy, dx, dy, sx, sy, offs, tile_number;
 
 	bankbase = attrs<<3 & 0x100;
@@ -728,6 +736,7 @@ static MACHINE_DRIVER_START( aso )
 
 	MDRV_PALETTE_INIT(aso)
 	MDRV_VIDEO_START(aso)
+	MDRV_VIDEO_RESET(aso)
 	MDRV_VIDEO_UPDATE(aso)
 
 	/* sound hardware */
@@ -773,6 +782,7 @@ static MACHINE_DRIVER_START( hal21 )
 
 	MDRV_PALETTE_INIT(aso)
 	MDRV_VIDEO_START(aso)
+	MDRV_VIDEO_RESET(aso)
 	MDRV_VIDEO_UPDATE(aso)
 
 	/* sound hardware */

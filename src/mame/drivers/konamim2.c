@@ -283,7 +283,7 @@ static READ64_HANDLER(unk2_r)
 }
 #endif
 
-static UINT64 unk3 = -1;
+static UINT64 unk3;
 static READ64_HANDLER(unk3_r)
 {
 	//return U64(0xffffffffffffffff);
@@ -1223,6 +1223,8 @@ ROM_END
 
 static DRIVER_INIT( m2 )
 {
+	unk3 = U64(0xffffffffffffffff);
+	unk20004 = 0;
 	cde_init();
 }
 

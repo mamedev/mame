@@ -30,18 +30,24 @@ static int dac_enable;
 #define ENABLE_CTR1     0x08
 
 static	int channel;
-static	int freq1 = 1000;
-static	int freq2 = 1000;
+static	int freq1;
+static	int freq2;
 static const INT16 waveform[2] = { -120*256, 120*256 };
+static  UINT8 latched_0c01 = 0;
+static	UINT8 latched_0c02 = 0;
+static	UINT8 latched_0c03 = 0;
 
 /************************************/
 /* Sound handler start              */
 /************************************/
 void meadows_sh_start(void)
 {
-	int vol[2];
-
-	vol[0]=vol[1]=255;
+	meadows_0c00 = meadows_0c01 = meadows_0c02 = meadows_0c03 = 0;
+	meadows_dac = 0;
+	dac_enable = 0;
+	channel = 0;
+	freq1 = freq2 = 1000;
+	latched_0c01 = latched_0c02 = latched_0c03 = 0;
 
 	sample_set_volume(0,0);
 	sample_start_raw(0,waveform,ARRAY_LENGTH(waveform),freq1,1);
@@ -54,12 +60,9 @@ void meadows_sh_start(void)
 /************************************/
 void meadows_sh_update(void)
 {
-static  UINT8 latched_0c01 = 0;
-static	UINT8 latched_0c02 = 0;
-static	UINT8 latched_0c03 = 0;
-int preset, amp;
+	int preset, amp;
 
-    if (latched_0c01 != meadows_0c01 || latched_0c03 != meadows_0c03)
+	if (latched_0c01 != meadows_0c01 || latched_0c03 != meadows_0c03)
 	{
 		/* amplitude is a combination of the upper 4 bits of 0c01 */
 		/* and bit 4 merged from S2650's flag output */
@@ -75,7 +78,7 @@ int preset, amp;
 		logerror("meadows ctr1 channel #%d preset:%3d freq:%5d amp:%d\n", channel, preset, freq1, amp);
 		sample_set_freq(0, freq1 * sizeof(waveform)/2);
 		sample_set_volume(0,amp/255.0);
-    }
+	}
 
 	if (latched_0c02 != meadows_0c02 || latched_0c03 != meadows_0c03)
 	{
@@ -93,7 +96,7 @@ int preset, amp;
 		logerror("meadows ctr2 channel #%d preset:%3d freq:%5d amp:%d\n", channel+1, preset, freq2, amp);
 		sample_set_freq(1, freq2 * sizeof(waveform));
 		sample_set_volume(1,amp/255.0);
-    }
+	}
 
 	if (latched_0c03 != meadows_0c03)
 	{
@@ -103,9 +106,9 @@ int preset, amp;
 			DAC_data_w(0, meadows_dac);
 		else
 			DAC_data_w(0, 0);
-    }
+	}
 
-    latched_0c01 = meadows_0c01;
+	latched_0c01 = meadows_0c01;
 	latched_0c02 = meadows_0c02;
 	latched_0c03 = meadows_0c03;
 }

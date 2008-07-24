@@ -17,7 +17,7 @@ static tilemap* bg0_tilemap;
 static tilemap* bg1_tilemap;
 static tilemap* bg2_tilemap;
 
-static int bank_mask = 1;
+static int bank_mask;
 static int robokid_bg0_bank = 0;
 static int robokid_bg1_bank = 0;
 static int robokid_bg2_bank = 0;

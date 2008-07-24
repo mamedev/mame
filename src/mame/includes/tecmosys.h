@@ -17,8 +17,8 @@ enum DEV_STATUS
 struct prot_data
 {
 	UINT8 passwd_len;
-	UINT8* passwd;
-	UINT8* code;
+	const UINT8* passwd;
+	const UINT8* code;
 	UINT8 checksum_ranges[17];
 	UINT8 checksums[4];
 };
@@ -32,10 +32,10 @@ WRITE16_HANDLER(prot_data_w);
 
 extern UINT8 device_read_ptr;
 extern UINT8 device_status;
-extern struct prot_data* device_data;
-extern struct prot_data deroon_data;
-extern struct prot_data tkdensho_data;
-extern struct prot_data tkdensha_data;
+extern const struct prot_data* device_data;
+extern const struct prot_data deroon_data;
+extern const struct prot_data tkdensho_data;
+extern const struct prot_data tkdensha_data;
 
 
 

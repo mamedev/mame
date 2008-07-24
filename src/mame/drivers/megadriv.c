@@ -56,12 +56,12 @@ Known Non-Issues (confirmed on Real Genesis)
 /* the same on all systems? */
 #define MASTER_CLOCK		53693100
 /* timing details */
-static int megadriv_framerate = 60;
-static int megadrive_total_scanlines = 262;
-static int megadrive_visible_scanlines = 224;
-static int megadrive_irq6_scanline = 224;
+static int megadriv_framerate;
+static int megadrive_total_scanlines;
+static int megadrive_visible_scanlines;
+static int megadrive_irq6_scanline;
 //int megadrive_irq6_hpos = 320;
-static int megadrive_z80irq_scanline = 226;
+static int megadrive_z80irq_scanline;
 //int megadrive_z80irq_hpos = 320;
 static int megadrive_imode = 0;
 static int megadrive_imode_odd_frame = 0;
@@ -77,7 +77,6 @@ static UINT16* video_renderline;
 static UINT16* megadrive_vdp_palette_lookup;
 static UINT16* megadrive_vdp_palette_lookup_shadow;
 static UINT16* megadrive_vdp_palette_lookup_highlight;
-static UINT8 oldscreenwidth = 3;
 UINT16* megadrive_ram;
 static UINT8 megadrive_vram_fill_pending = 0;
 static UINT16 megadrive_vram_fill_length = 0;
@@ -2997,8 +2996,6 @@ VIDEO_START(megadriv)
 	highpri_renderline = auto_malloc(320);
 	video_renderline = auto_malloc(320*2);
 
-	oldscreenwidth = -1; // 40 cell mode
-
 	megadrive_vdp_palette_lookup = auto_malloc(0x40*2);
 	megadrive_vdp_palette_lookup_shadow = auto_malloc(0x40*2);
 	megadrive_vdp_palette_lookup_highlight = auto_malloc(0x40*2);
@@ -4630,7 +4627,7 @@ INLINE UINT16 get_hposition(void)
      ---------- cycles 127840, 003b363e ba41aaaa (End of frame / start of next)
 */
 
-static int irq4counter = -1;
+static int irq4counter;
 
 static emu_timer* render_timer;
 
@@ -4818,6 +4815,11 @@ MACHINE_RESET( megadriv )
 	memset(megadrive_ram,0x00,0x10000);
 
 
+	irq4counter = -1;
+	megadrive_total_scanlines = 262;
+	megadrive_visible_scanlines = 224;
+	megadrive_irq6_scanline = 224;
+	megadrive_z80irq_scanline = 226;
 }
 
 void megadriv_stop_scanline_timer(void)

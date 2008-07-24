@@ -10,12 +10,12 @@
 #define VERBOSE 0
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-const char* duart68681_reg_read_names[0x10] =
+static const char *const duart68681_reg_read_names[0x10] =
 {
 	"MRA", "SRA", "BRG Test", "RHRA", "IPCR", "ISR", "CTU", "CTL", "MRB", "SRB", "1X/16X Test", "RHRB", "IVR", "Input Ports", "Start Counter", "Stop Counter"
 };
 
-const char* duart68681_reg_write_names[0x10] =
+static const char *const duart68681_reg_write_names[0x10] =
 {
 	"MRA", "CSRA", "CRA", "THRA", "ACR", "IMR", "CRUR", "CTLR", "MRB", "CSRB", "CRB", "THRB", "IVR", "OPCR", "Set OP Bits", "Reset OP Bits"
 };
@@ -142,8 +142,8 @@ static void duart68681_write_MR(duart68681_state *duart68681, int ch, UINT8 data
 
 static void duart68681_write_CSR(duart68681_state *duart68681, int ch, UINT8 data, UINT8 ACR)
 {
-	const int baud_rate_ACR_0[] = { 50, 110, 134, 200, 300, 600, 1200, 1050, 2400, 4800, 7200, 9600, 38400, 0, 0, 0 };
-	const int baud_rate_ACR_1[] = { 75, 110, 134, 150, 300, 600, 1200, 2000, 2400, 4800, 1800, 9600, 19200, 0, 0, 0 };
+	static const int baud_rate_ACR_0[] = { 50, 110, 134, 200, 300, 600, 1200, 1050, 2400, 4800, 7200, 9600, 38400, 0, 0, 0 };
+	static const int baud_rate_ACR_1[] = { 75, 110, 134, 150, 300, 600, 1200, 2000, 2400, 4800, 1800, 9600, 19200, 0, 0, 0 };
 
 	duart68681->channel[ch].CSR = data;
 

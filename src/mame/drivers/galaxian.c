@@ -1610,7 +1610,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static struct AY8910interface frogger_ay8910_interface =
+static const struct AY8910interface frogger_ay8910_interface =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
@@ -1620,7 +1620,7 @@ static struct AY8910interface frogger_ay8910_interface =
 	NULL
 };
 
-static struct AY8910interface konami_ay8910_interface_1 =
+static const struct AY8910interface konami_ay8910_interface_1 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
@@ -1630,7 +1630,7 @@ static struct AY8910interface konami_ay8910_interface_1 =
 	NULL
 };
 
-static struct AY8910interface konami_ay8910_interface_2 =
+static const struct AY8910interface konami_ay8910_interface_2 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
@@ -1640,7 +1640,7 @@ static struct AY8910interface konami_ay8910_interface_2 =
 	NULL
 };
 
-static struct AY8910interface explorer_ay8910_interface_1 =
+static const struct AY8910interface explorer_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1650,7 +1650,7 @@ static struct AY8910interface explorer_ay8910_interface_1 =
 	NULL
 };
 
-static struct AY8910interface explorer_ay8910_interface_2 =
+static const struct AY8910interface explorer_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1660,7 +1660,7 @@ static struct AY8910interface explorer_ay8910_interface_2 =
 	NULL
 };
 
-static struct AY8910interface sfx_ay8910_interface =
+static const struct AY8910interface sfx_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1670,7 +1670,7 @@ static struct AY8910interface sfx_ay8910_interface =
 	sfx_sample_control_w
 };
 
-static struct AY8910interface scorpion_ay8910_interface =
+static const struct AY8910interface scorpion_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1680,7 +1680,7 @@ static struct AY8910interface scorpion_ay8910_interface =
 	scorpion_sound_control_w,
 };
 
-static struct AY8910interface checkmaj_ay8910_interface =
+static const struct AY8910interface checkmaj_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

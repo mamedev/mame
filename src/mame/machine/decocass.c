@@ -15,13 +15,14 @@ INT32 tape_speed;
 attotime tape_time0;
 emu_timer *tape_timer;
 
-static INT32 firsttime = 1;
+static INT32 firsttime;
 static INT32 tape_present;
 static INT32 tape_blocks;
 static INT32 tape_length;
 static INT32 tape_bot_eot;
 static UINT8 crc16_lsb;
 static UINT8 crc16_msb;
+static UINT8 latch1;
 
 /* pre-calculated crc16 of the tape blocks */
 static UINT8 tape_crc16_lsb[256];
@@ -587,7 +588,6 @@ static void decocass_fno(offs_t offset, UINT8 data)
 
 static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 {
-	static UINT8 latch1;
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -667,7 +667,6 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 
 static READ8_HANDLER( decocass_type1_pass_136_r )
 {
-	static UINT8 latch1;
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -747,7 +746,6 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 
 static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 {
-	static UINT8 latch1;
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -827,7 +825,6 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 
 static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 {
-	static UINT8 latch1;
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -909,7 +906,6 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 
 static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 {
-	static UINT8 latch1;
 	UINT8 data;
 
 	if (1 == (offset & 1))
@@ -1660,6 +1656,7 @@ static void decocass_init_common(running_machine *machine)
 	tape_timer = timer_alloc(NULL, NULL);
 
 	firsttime = 1;
+	latch1 = 0;
 	tape_present = 1;
 	tape_blocks = 0;
 	for (i = memory_region_length(machine, REGION_USER2) / 256 - 1; !tape_blocks && i > 0; i--)

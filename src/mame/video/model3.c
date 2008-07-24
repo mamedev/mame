@@ -73,6 +73,7 @@ static void translate_matrix_stack(float x, float y, float z);
 static void traverse_list(UINT32 address);
 static void draw_block(UINT32 address);
 static void draw_viewport(int pri, UINT32 address);
+static void invalidate_texture(int page, int texx, int texy, int texwidth, int texheight);
 
 /*****************************************************************************/
 
@@ -118,14 +119,40 @@ static cached_texture *texcache[2][1024/32][2048/32];
 static int list_depth = 0;
 
 
+static int tick = 0;
+static int debug_layer_disable = 0;
+
+
+static UINT64 vid_reg0;
+
+/* matrix stack */
+#define MATRIX_STACK_SIZE	256
+
+static int matrix_stack_ptr = 0;
+static MATRIX matrix_stack[MATRIX_STACK_SIZE];
+
+#ifdef UNUSED_DEFINITION
+static const int num_bits[16] = { 0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4 };
+#endif
+
+static MATRIX coordinate_system;
+static float viewport_focal_length;
+static int viewport_region_x;
+static int viewport_region_y;
+static int viewport_region_width;
+static int viewport_region_height;
+
+static PLANE clip_plane[5];
+
+static UINT32 matrix_base_address;
+
+
 #define BYTE_REVERSE32(x)		(((x >> 24) & 0xff) | \
 								((x >> 8) & 0xff00) | \
 								((x << 8) & 0xff0000) | \
 								((x << 24) & 0xff000000))
 
 #define BYTE_REVERSE16(x)		(((x >> 8) & 0xff) | ((x << 8) & 0xff00))
-
-static void invalidate_texture(int page, int texx, int texy, int texwidth, int texheight);
 
 
 static void model3_exit(running_machine *machine)
@@ -173,6 +200,16 @@ VIDEO_START( model3 )
 	memset(culling_ram, 0, 0x400000);
 	memset(polygon_ram, 0, 0x400000);
 	memset(texture_fifo, 0, 0x100000);
+
+	tick = 0;
+	debug_layer_disable = 0;
+	vid_reg0 = 0;
+
+	viewport_focal_length = 300.;
+	viewport_region_x = 0;
+	viewport_region_y = 0;
+	viewport_region_width = 496;
+	viewport_region_height = 384;
 
 	init_matrix_stack();
 }
@@ -242,7 +279,7 @@ static void draw_tile_8bit(bitmap_t *bitmap, int tx, int ty, int tilenum)
 		tile += 8;
 	}
 }
-#if 0
+#ifdef UNUSED_FUNCTION
 static void draw_texture_sheet(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int x,y;
@@ -352,9 +389,6 @@ static void copy_screen(bitmap_t *bitmap, const rectangle *cliprect)
 }
 #endif
 
-static int tick = 0;
-static int debug_layer_disable = 0;
-
 VIDEO_UPDATE( model3 )
 {
 	int layer_scroll_x[4], layer_scroll_y[4];
@@ -451,7 +485,6 @@ WRITE64_HANDLER(model3_tile_w)
 	COMBINE_DATA(&m3_tile_ram[offset]);
 }
 
-static UINT64 vid_reg0;
 READ64_HANDLER(model3_vid_reg_r)
 {
 	switch(offset)
@@ -918,12 +951,6 @@ static void matrix_multiply(MATRIX a, MATRIX b, MATRIX *out)
 	memcpy(out, &tmp, sizeof(MATRIX));
 }
 
-/* matrix stack */
-#define MATRIX_STACK_SIZE	256
-
-static int matrix_stack_ptr = 0;
-static MATRIX matrix_stack[MATRIX_STACK_SIZE];
-
 static void init_matrix_stack(void)
 {
 	/* initialize the first matrix as identity */
@@ -952,7 +979,7 @@ static void get_top_matrix(MATRIX *out)
 	memcpy( out, &matrix_stack[matrix_stack_ptr], sizeof(MATRIX));
 }
 
-void push_matrix_stack(void)
+static void push_matrix_stack(void)
 {
 	matrix_stack_ptr++;
 	if (matrix_stack_ptr >= MATRIX_STACK_SIZE)
@@ -961,19 +988,19 @@ void push_matrix_stack(void)
 	memcpy( &matrix_stack[matrix_stack_ptr], &matrix_stack[matrix_stack_ptr-1], sizeof(MATRIX));
 }
 
-void pop_matrix_stack(void)
+static void pop_matrix_stack(void)
 {
 	matrix_stack_ptr--;
 	if (matrix_stack_ptr < 0)
 		fatalerror("pop_matrix_stack: matrix stack underflow");
 }
 
-void multiply_matrix_stack(MATRIX matrix)
+static void multiply_matrix_stack(MATRIX matrix)
 {
 	matrix_multiply(matrix, matrix_stack[matrix_stack_ptr], &matrix_stack[matrix_stack_ptr]);
 }
 
-void translate_matrix_stack(float x, float y, float z)
+static void translate_matrix_stack(float x, float y, float z)
 {
 	MATRIX tm;
 
@@ -1059,19 +1086,6 @@ static int clip_polygon(const poly_vertex *v, int num_vertices, PLANE cp, poly_v
 	memcpy(&vout[0], &clipv[0], sizeof(vout[0]) * clip_verts);
 	return clip_verts;
 }
-
-#ifdef UNUSED_DEFINITION
-static const int num_bits[16] = { 0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4 };
-#endif
-
-static MATRIX coordinate_system;
-static float viewport_focal_length = 300;
-static int viewport_region_x = 0;
-static int viewport_region_y = 0;
-static int viewport_region_width = 496;
-static int viewport_region_height = 384;
-
-static PLANE clip_plane[5];
 
 static void render_one(TRIANGLE *tri)
 {
@@ -1298,8 +1312,6 @@ static void draw_model(UINT32 addr)
 
 /*****************************************************************************/
 /* display list parser */
-
-static UINT32 matrix_base_address;
 
 static UINT32 *get_memory_pointer(UINT32 address)
 {

@@ -38,8 +38,8 @@ static UINT32	romHI_addr_msb = 0;
 static UINT8	DISP = 0;
 static UINT8	background_romsel = 0;
 static UINT8	color_A4 = 0;
-static UINT8	ls175_b7 = 0x0f | 0xf0;
-static UINT8	ls175_e8 = 0x0f;
+static UINT8	ls175_b7;
+static UINT8	ls175_e8;
 static UINT8	ls377_data = 0;
 static UINT32	page = 0;
 
@@ -368,7 +368,6 @@ PALETTE_INIT( tubep )
 VIDEO_START( tubep )
 {
 	spritemap = auto_malloc(256*256*2);
-	memset(spritemap,0,256*256*2);
 
 	/* Set up save state */
 	state_save_register_global(romD_addr);
@@ -392,6 +391,34 @@ VIDEO_START( tubep )
 	state_save_register_global(ls175_e8);
 	state_save_register_global(ls377_data);
 	state_save_register_global(page);
+}
+
+
+VIDEO_RESET( tubep )
+{
+	memset(spritemap,0,256*256*2);
+
+	romD_addr = 0;
+	romEF_addr = 0;
+	E16_add_b = 0;
+	HINV = 0;
+	VINV = 0;
+	XSize = 0;
+	YSize = 0;
+	mark_1 = 0;
+	mark_2 = 0;
+	colorram_addr_hi = 0;
+	ls273_g6 = 0;
+	ls273_j6 = 0;
+	romHI_addr_mid = 0;
+	romHI_addr_msb = 0;
+	DISP = 0;
+	background_romsel = 0;
+	color_A4 = 0;
+	ls175_b7 = 0x0f | 0xf0;
+	ls175_e8 = 0x0f;
+	ls377_data = 0;
+	page = 0;
 }
 
 

@@ -207,6 +207,7 @@ WRITE32_HANDLER ( skns_v3_regs_w );
 WRITE32_HANDLER ( skns_pal_regs_w );
 WRITE32_HANDLER ( skns_palette_ram_w );
 VIDEO_START(skns);
+VIDEO_RESET(skns);
 VIDEO_EOF(skns);
 VIDEO_UPDATE(skns);
 
@@ -970,6 +971,7 @@ static MACHINE_DRIVER_START(skns)
 	MDRV_GFXDECODE(skns_bg)
 
 	MDRV_VIDEO_START(skns)
+	MDRV_VIDEO_RESET(skns)
 	MDRV_VIDEO_EOF(skns)
 	MDRV_VIDEO_UPDATE(skns)
 

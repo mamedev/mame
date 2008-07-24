@@ -143,8 +143,8 @@ static tilemap *bg0_tilemap = NULL;
 static tilemap *bg1_tilemap = NULL;
 static tilemap *bombsa_bg_tilemap = NULL;
 
-static UINT8 argus_bg_status    = 0x01;
-static UINT8 butasan_bg1_status = 0x01;
+static UINT8 argus_bg_status;
+static UINT8 butasan_bg1_status;
 static UINT8 argus_bg_purple  = 0;
 static UINT8 argus_flipscreen = 0;
 
@@ -302,9 +302,16 @@ static TILE_GET_INFO( butasan_get_bg1_tile_info )
   Initialize and destroy video hardware emulation
 ***************************************************************************/
 
+static void reset_common(void)
+{
+	argus_bg_status = 0x01;
+	argus_bg_purple = 0;
+	argus_flipscreen = 0;
+	argus_palette_intensity = 0;
+}
+
 VIDEO_START( argus )
 {
-	lowbitscroll = 0;
 	/*                           info                      offset             type                  w   h  col  row */
 	bg0_tilemap = tilemap_create(argus_get_bg0_tile_info,  tilemap_scan_cols,       16, 16, 32, 32);
 	bg1_tilemap = tilemap_create(argus_get_bg1_tile_info,  tilemap_scan_cols,  16, 16, 32, 32);
@@ -312,16 +319,24 @@ VIDEO_START( argus )
 
 	/* dummy RAM for back ground */
 	argus_dummy_bg0ram = auto_malloc( 0x800 );
-	memset( argus_dummy_bg0ram, 0, 0x800 );
-
-	memset( argus_bg0_scrollx, 0x00, 2 );
 
 	tilemap_set_transparent_pen( bg0_tilemap, 15 );
 	tilemap_set_transparent_pen( bg1_tilemap, 15 );
 	tilemap_set_transparent_pen( tx_tilemap,  15 );
 
 	jal_blend_table = auto_malloc(0xc00);
-	memset(jal_blend_table,0,0xc00) ;
+}
+
+VIDEO_RESET( argus )
+{
+	lowbitscroll = 0;
+	prvscrollx = 0;
+
+	memset( argus_dummy_bg0ram, 0, 0x800 );
+	memset( argus_bg0_scrollx, 0x00, 2 );
+
+	memset(jal_blend_table,0,0xc00);
+	reset_common();
 }
 
 VIDEO_START( valtric )
@@ -334,7 +349,13 @@ VIDEO_START( valtric )
 	tilemap_set_transparent_pen( tx_tilemap,  15 );
 	mosaicbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	jal_blend_table = auto_malloc(0xc00);
-	memset(jal_blend_table,0,0xc00) ;
+}
+
+VIDEO_RESET( valtric )
+{
+	valtric_mosaic = 0;
+	memset(jal_blend_table,0,0xc00);
+	reset_common();
 }
 
 VIDEO_START( butasan )
@@ -349,15 +370,22 @@ VIDEO_START( butasan )
 	butasan_txbackram = auto_malloc( BUTASAN_TXBACK_RAMSIZE );
 	butasan_bg0backram = auto_malloc( BUTASAN_BG0BACK_RAMSIZE );
 
+	tilemap_set_transparent_pen( tx_tilemap,  15 );
+
+	jal_blend_table = auto_malloc(0xc00);
+}
+
+VIDEO_RESET( butasan )
+{
+	butasan_bg1_status = 0x01;
+
 	memset( butasan_txram,      0x00, BUTASAN_TEXT_RAMSIZE );
 	memset( butasan_bg0ram,     0x00, BUTASAN_BG0_RAMSIZE );
 	memset( butasan_txbackram,  0x00, BUTASAN_TXBACK_RAMSIZE );
 	memset( butasan_bg0backram, 0x00, BUTASAN_BG0BACK_RAMSIZE );
 
-	tilemap_set_transparent_pen( tx_tilemap,  15 );
-
-	jal_blend_table = auto_malloc(0xc00);
-	memset(jal_blend_table,0,0xc00) ;
+	memset(jal_blend_table,0,0xc00);
+	reset_common();
 }
 
 #if 0
@@ -419,6 +447,13 @@ VIDEO_START( bombsa )
 //  memset(jal_blend_table,0,0xc00) ;
 
 	bomba_otherram = auto_malloc(0x1000);
+}
+
+VIDEO_RESET( bombsa )
+{
+	bombsa_ram_page = 0;
+	memset(bomba_otherram, 0, 0x1000);
+	reset_common();
 }
 
 /***************************************************************************

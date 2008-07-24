@@ -650,7 +650,7 @@ static void log_enable_line(struct SN76477 *sn)
 
 static void log_mixer_mode(struct SN76477 *sn)
 {
-	const char *desc[] =
+	static const char *const desc[] =
 	{
 		"VCO", "SLF", "Noise", "VCO/Noise",
 		"SLF/Noise", "SLF/VCO/Noise", "SLF/VCO", "Inhibit"
@@ -662,7 +662,7 @@ static void log_mixer_mode(struct SN76477 *sn)
 
 static void log_envelope_mode(struct SN76477 *sn)
 {
-	const char *desc[] =
+	static const char *const desc[] =
 	{
 		"VCO", "One-Shot", "Mixer Only", "VCO with Alternating Polarity"
 	};
@@ -673,7 +673,7 @@ static void log_envelope_mode(struct SN76477 *sn)
 
 static void log_vco_mode(struct SN76477 *sn)
 {
-	const char *desc[] =
+	static const char *const desc[] =
 	{
 		"External (Pin 16)", "Internal (SLF)"
 	};

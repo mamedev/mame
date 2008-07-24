@@ -383,9 +383,10 @@ static ADDRESS_MAP_START( gekitsui_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static int newdata[5];
+
 static WRITE8_HANDLER(scrivi)
 {
-	static int newdata[5] = {-1,-1,-1,-1,-1};
 	if(offset == 0)
 	{
 		scrolly = data;
@@ -958,6 +959,10 @@ static void init_cntsteer(void)
 
 static DRIVER_INIT( zerotrgt )
 {
+	int i;
+	for (i=0; i<ARRAY_LENGTH(newdata); i++)
+		newdata[i] = -1;
+
 	zerotrgt_rearrange_gfx(0x02000, 0x10000);
 }
 

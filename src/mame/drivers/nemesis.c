@@ -80,6 +80,7 @@ static int irq_on = 0;
 static int irq1_on = 0;
 static int irq2_on = 0;
 static int irq4_on = 0;
+static UINT8 a;
 
 
 static MACHINE_RESET( nemesis )
@@ -88,6 +89,7 @@ static MACHINE_RESET( nemesis )
 	irq1_on = 0;
 	irq2_on = 0;
 	irq4_on = 0;
+	a = 1;
 }
 
 
@@ -743,7 +745,6 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( wd_r )
 {
-	static int a=1;
 	a^= 1;
 	return a;
 }

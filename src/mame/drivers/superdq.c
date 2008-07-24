@@ -28,7 +28,8 @@
 #include "video/resnet.h"
 
 static const device_config *laserdisc;
-static UINT8 superdq_ld_in_latch = 0, superdq_ld_out_latch = 0xff;
+static UINT8 superdq_ld_in_latch;
+static UINT8 superdq_ld_out_latch;
 
 static tilemap *superdq_tilemap;
 static int superdq_color_bank = 0;
@@ -142,6 +143,13 @@ static PALETTE_INIT( superdq )
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
+}
+
+static MACHINE_RESET( superdq )
+{
+	superdq_ld_in_latch = 0;
+	superdq_ld_out_latch = 0xff;
+	superdq_color_bank = 0;
 }
 
 static INTERRUPT_GEN( superdq_vblank )
@@ -338,6 +346,7 @@ static MACHINE_DRIVER_START( superdq )
 	MDRV_CPU_VBLANK_INT("main", superdq_vblank)
 	
 	MDRV_MACHINE_START(superdq)
+	MDRV_MACHINE_RESET(superdq)
 
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, 0, "laserdisc")
 

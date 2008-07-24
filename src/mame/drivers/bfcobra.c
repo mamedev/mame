@@ -252,7 +252,7 @@ static struct
 #define RED_6 ( 6 << 5 )
 #define RED_7 ( 7 << 5 )
 
-static UINT8 col4bit[16]=
+static const UINT8 col4bit_default[16]=
 {
 	BLUE_0 | GREEN_0 | RED_0,
 	BLUE_1,
@@ -272,7 +272,7 @@ static UINT8 col4bit[16]=
 	RED_7 | GREEN_7 | BLUE_3
 };
 
-static UINT8 col3bit[16]=
+static const UINT8 col3bit_default[16]=
 {
 	0,
 	BLUE_3,
@@ -292,45 +292,43 @@ static UINT8 col3bit[16]=
 	RED_7 | GREEN_7 | BLUE_3
 };
 
+static UINT8 col4bit[16];
+static UINT8 col3bit[16];
 static UINT8 col8bit[256];
 static UINT8 col7bit[256];
 static UINT8 col6bit[256];
-static UINT8 col76index[] = {0, 2, 4, 7};
+static const UINT8 col76index[] = {0, 2, 4, 7};
 
+
+static VIDEO_START( bfcobra )
+{
+	int i;
+
+	memcpy(col4bit, col4bit_default, sizeof(col4bit));
+	memcpy(col3bit, col3bit_default, sizeof(col3bit));
+	for (i = 0; i < 256; ++i)
+	{
+		UINT8 col;
+
+		col8bit[i] = i;
+		col = i & 0x7f;
+		col = (col & 0x1f) | (col76index[ ( (col & 0x60) >> 5 ) & 3] << 5);
+		col7bit[i] = col;
+
+		col = (col & 3) | (col76index[( (col & 0x0c) >> 2) & 3] << 2 ) |
+			  (col76index[( (col & 0x30) >> 4) & 3] << 5 );
+		col6bit[i] = col;
+	}
+}
 
 static VIDEO_UPDATE( bfcobra )
 {
-	static int init_colour_indexes = 1;
 	int x, y;
 	UINT8  *src;
 	UINT32 *dest;
 	UINT32 offset;
 	UINT8 *hirescol;
 	UINT8 *lorescol;
-
-	/*
-        The following is a dirty hack to init the palette index tables
-        this should really be done elsewhere, preferably at compile time.
-    */
-	if (init_colour_indexes == 1)
-	{
-		init_colour_indexes = 0;
-
-		for (x = 0; x < 256; ++x)
-		{
-			UINT8 col;
-
-			col8bit[x] = x;
-			col = x & 0x7f;
-			col = (col & 0x1f) | (col76index[ ( (col & 0x60) >> 5 ) & 3] << 5);
-			col7bit[x] = col;
-
-			col = (col & 3) | (col76index[( (col & 0x0c) >> 2) & 3] << 2 ) |
-				  (col76index[( (col & 0x30) >> 4) & 3] << 5 );
-			col6bit[x] = col;
-		}
-	}
-
 
 	/* Select screen has to be programmed into two registers */
 	/* No idea what happens if the registers are different */
@@ -1750,6 +1748,7 @@ static MACHINE_DRIVER_START( bfcobra )
 	MDRV_SOUND_CONFIG(upd7759_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
+	MDRV_VIDEO_START(bfcobra)
 	MDRV_VIDEO_UPDATE(bfcobra)
 MACHINE_DRIVER_END
 

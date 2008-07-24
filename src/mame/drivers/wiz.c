@@ -184,9 +184,10 @@ VIDEO_UPDATE( kungfut );
 #define STINGER_BOOM_EN1	NODE_03
 #define STINGER_BOOM_EN2	NODE_04
 
+static int dsc0, dsc1;
+
 static WRITE8_HANDLER( sound_command_w )
 {
-	static int dsc0=1, dsc1=1;
 	switch (offset)
 	{
 		// 0x90 triggers a jump to non-existant address(development system?) and must be filtered
@@ -689,6 +690,11 @@ DISCRETE_SOUND_END
 //* ANALOG SOUND ENDS
 
 
+static MACHINE_RESET( wiz )
+{
+	dsc0 = dsc1 = 1;
+}
+
 static MACHINE_DRIVER_START( wiz )
 
 	/* basic machine hardware */
@@ -699,6 +705,8 @@ static MACHINE_DRIVER_START( wiz )
 	MDRV_CPU_ADD("audio", Z80, 14318000/8)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)	/* ??? */
+
+	MDRV_MACHINE_RESET( wiz )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

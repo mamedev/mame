@@ -58,9 +58,9 @@ static UINT8* cchip_ram=0;
 static UINT8 cchip_last_7a=0;
 static UINT8 cchip_last_04=0;
 static UINT8 cchip_last_05=0;
-static UINT8 cchip_coins_for_credit[2]={1,1};
-static UINT8 cchip_credits_for_coin[2]={1,1};
-static UINT8 cchip_coins[2]={0,0};
+static UINT8 cchip_coins_for_credit[2];
+static UINT8 cchip_credits_for_coin[2];
+static UINT8 cchip_coins[2];
 static UINT8 c588=0, c589=0, c58a=0; // These variables derived from the bootleg
 
 static const UINT16 level_data_00[0xcc] =
@@ -738,9 +738,14 @@ void opwolf_cchip_init(void)
 	state_save_register_global(cchip_credits_for_coin[1]);
 	state_save_register_global_pointer(cchip_ram, 0x400 * 8);
 
+	current_bank=0;
+	current_cmd=0;
 	cchip_last_7a=0;
 	cchip_last_04=0xfc;
 	cchip_last_05=0xff;
+	c588=0;
+	c589=0;
+	c58a=0;
 	cchip_coins[0]=0;
 	cchip_coins[1]=0;
 	cchip_coins_for_credit[0]=1;

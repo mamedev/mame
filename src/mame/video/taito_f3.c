@@ -293,7 +293,7 @@ static struct tempsprite *spritelist;
 static const struct tempsprite *sprite_end;
 
 static void get_sprite_info(running_machine *machine, const UINT32 *spriteram32_ptr);
-static int sprite_lag=1;
+static int sprite_lag;
 static UINT8 sprite_pri_usage=0;
 
 struct f3_playfield_line_inf
@@ -348,21 +348,68 @@ pri_alp_bitmap
 1--- ----    alpha level b b000
 1111 1111    opaque pixel
 */
-static int f3_alpha_level_2as=127;
-static int f3_alpha_level_2ad=127;
-static int f3_alpha_level_3as=127;
-static int f3_alpha_level_3ad=127;
-static int f3_alpha_level_2bs=127;
-static int f3_alpha_level_2bd=127;
-static int f3_alpha_level_3bs=127;
-static int f3_alpha_level_3bd=127;
+static int f3_alpha_level_2as;
+static int f3_alpha_level_2ad;
+static int f3_alpha_level_3as;
+static int f3_alpha_level_3ad;
+static int f3_alpha_level_2bs;
+static int f3_alpha_level_2bd;
+static int f3_alpha_level_3bs;
+static int f3_alpha_level_3bd;
+static int alpha_level_last;
 
 static void init_alpha_blend_func(void);
 
-static int width_mask=0x1ff;
-static int twidth_mask=0x1f,twidth_mask_bit=5;
+static int width_mask;
+static int twidth_mask;
+static int twidth_mask_bit;
+
 static UINT8 *tile_opaque_sp;
 static UINT8 *tile_opaque_pf;
+
+
+static UINT8 add_sat[256][256];
+
+static int alpha_s_1_1;
+static int alpha_s_1_2;
+static int alpha_s_1_4;
+static int alpha_s_1_5;
+static int alpha_s_1_6;
+static int alpha_s_1_8;
+static int alpha_s_1_9;
+static int alpha_s_1_a;
+
+static int alpha_s_2a_0;
+static int alpha_s_2a_4;
+static int alpha_s_2a_8;
+
+static int alpha_s_2b_0;
+static int alpha_s_2b_4;
+static int alpha_s_2b_8;
+
+static int alpha_s_3a_0;
+static int alpha_s_3a_1;
+static int alpha_s_3a_2;
+
+static int alpha_s_3b_0;
+static int alpha_s_3b_1;
+static int alpha_s_3b_2;
+
+static UINT32 dval;
+static UINT8 pval;
+static UINT8 tval;
+static UINT8 pdest_2a;
+static UINT8 pdest_2b;
+static int tr_2a;
+static int tr_2b;
+static UINT8 pdest_3a;
+static UINT8 pdest_3b;
+static int tr_3a;
+static int tr_3b;
+
+static int (*dpix_n[8][16])(UINT32 s_pix);
+static int (**dpix_lp[5])(UINT32 s_pix);
+static int (**dpix_sp[9])(UINT32 s_pix);
 
 
 /******************************************************************************/
@@ -552,6 +599,25 @@ VIDEO_START( f3 )
 {
 	const struct F3config *pCFG=&f3_config_table[0];
 	int tile, width, height;
+
+	f3_alpha_level_2as=127;
+	f3_alpha_level_2ad=127;
+	f3_alpha_level_3as=127;
+	f3_alpha_level_3ad=127;
+	f3_alpha_level_2bs=127;
+	f3_alpha_level_2bd=127;
+	f3_alpha_level_3bs=127;
+	f3_alpha_level_3bd=127;
+	alpha_level_last = -1;
+
+	pdest_2a = 0x10;
+	pdest_2b = 0x20;
+	tr_2a = 0;
+	tr_2b = 1;
+	pdest_3a = 0x40;
+	pdest_3b = 0x80;
+	tr_3a = 0;
+	tr_3b = 1;
 
 	spritelist=0;
 	spriteram32_buffered=0;
@@ -835,49 +901,6 @@ WRITE32_HANDLER( f3_palette_24bit_w )
 }
 
 /******************************************************************************/
-
-static UINT8 add_sat[256][256];
-
-static int alpha_s_1_1;
-static int alpha_s_1_2;
-static int alpha_s_1_4;
-static int alpha_s_1_5;
-static int alpha_s_1_6;
-static int alpha_s_1_8;
-static int alpha_s_1_9;
-static int alpha_s_1_a;
-
-static int alpha_s_2a_0;
-static int alpha_s_2a_4;
-static int alpha_s_2a_8;
-
-static int alpha_s_2b_0;
-static int alpha_s_2b_4;
-static int alpha_s_2b_8;
-
-static int alpha_s_3a_0;
-static int alpha_s_3a_1;
-static int alpha_s_3a_2;
-
-static int alpha_s_3b_0;
-static int alpha_s_3b_1;
-static int alpha_s_3b_2;
-
-static UINT32 dval;
-static UINT8 pval;
-static UINT8 tval;
-static UINT8 pdest_2a = 0x10;
-static UINT8 pdest_2b = 0x20;
-static int tr_2a = 0;
-static int tr_2b = 1;
-static UINT8 pdest_3a = 0x40;
-static UINT8 pdest_3b = 0x80;
-static int tr_3a = 0;
-static int tr_3b = 1;
-
-static int (*dpix_n[8][16])(UINT32 s_pix);
-static int (**dpix_lp[5])(UINT32 s_pix);
-static int (**dpix_sp[9])(UINT32 s_pix);
 
 /*============================================================================*/
 
@@ -2213,7 +2236,6 @@ static void scanline_draw(running_machine *machine, bitmap_t *bitmap, const rect
 
 	while(1)
 	{
-		static int alpha_level_last=-1;
 		int pos;
 		int pri[5],alpha_mode[5],alpha_mode_flag[5],alpha_level;
 		UINT16 sprite_alpha;

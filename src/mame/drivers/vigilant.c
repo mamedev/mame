@@ -23,6 +23,7 @@ Buccaneers has a 5.6888 Mhz and a 18.432 Mhz OSC
 
 /* video/vigilant.c */
 VIDEO_START( vigilant );
+VIDEO_RESET( vigilant );
 WRITE8_HANDLER( vigilant_paletteram_w );
 WRITE8_HANDLER( vigilant_sprite_paletteram_w );
 WRITE8_HANDLER( vigilant_horiz_scroll_w );
@@ -552,6 +553,7 @@ static MACHINE_DRIVER_START( vigilant )
 	MDRV_PALETTE_LENGTH(512+32)	/* 512 real palette, 32 virtual palette */
 
 	MDRV_VIDEO_START(vigilant)
+	MDRV_VIDEO_RESET(vigilant)
 	MDRV_VIDEO_UPDATE(vigilant)
 
 	/* sound hardware */
@@ -594,6 +596,7 @@ static MACHINE_DRIVER_START( buccanrs )
 	MDRV_PALETTE_LENGTH(512+32)	/* 512 real palette, 32 virtual palette */
 
 	MDRV_VIDEO_START(vigilant)
+	MDRV_VIDEO_RESET(vigilant)
 	MDRV_VIDEO_UPDATE(vigilant)
 
 	/* sound hardware */
@@ -652,6 +655,7 @@ static MACHINE_DRIVER_START( kikcubic )
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(vigilant)
+	MDRV_VIDEO_RESET(vigilant)
 	MDRV_VIDEO_UPDATE(kikcubic)
 
 	/* sound hardware */

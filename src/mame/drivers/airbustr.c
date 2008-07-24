@@ -226,6 +226,8 @@ Code at 505: waits for bit 1 to go low, writes command, waits for bit
 
 static UINT8 *devram;
 static int soundlatch_status, soundlatch2_status;
+static int master_addr;
+static int slave_addr;
 
 extern UINT8 *airbustr_videoram2, *airbustr_colorram2;
 
@@ -575,18 +577,14 @@ static const struct YM2203interface ym2203_interface =
 
 static INTERRUPT_GEN( master_interrupt )
 {
-	static int addr = 0xff;
-
-	addr ^= 0x02;
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, addr);
+	master_addr ^= 0x02;
+	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, master_addr);
 }
 
 static INTERRUPT_GEN( slave_interrupt )
 {
-	static int addr = 0xfd;
-
-	addr ^= 0x02;
-	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, addr);
+	slave_addr ^= 0x02;
+	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, slave_addr);
 }
 
 /* Machine Initialization */
@@ -594,6 +592,8 @@ static INTERRUPT_GEN( slave_interrupt )
 static MACHINE_RESET( airbustr )
 {
 	soundlatch_status = soundlatch2_status = 0;
+	master_addr = 0xff;
+	slave_addr = 0xfd;
 	master_bankswitch_w(machine, 0, 0x02);
 	slave_bankswitch_w(machine, 0, 0x02);
 	sound_bankswitch_w(machine, 0, 0x02);

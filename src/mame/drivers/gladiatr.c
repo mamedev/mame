@@ -337,7 +337,7 @@ static WRITE8_HANDLER( gladiatr_irq_patch_w )
 
 
 
-static int data1,data2,flag1=1,flag2=1;
+static int data1,data2,flag1,flag2;
 
 static WRITE8_HANDLER(qx0_w)
 {
@@ -379,6 +379,12 @@ static READ8_HANDLER(qx1_r)
 		return data2;
 	else
 		return flag1;
+}
+
+static MACHINE_RESET( ppking )
+{
+	data1 = data2 = 0;
+	flag1 = flag2 = 1;
 }
 
 static ADDRESS_MAP_START( ppking_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -699,6 +705,7 @@ static MACHINE_DRIVER_START( ppking )
 
 	MDRV_INTERLEAVE(100)
 
+	MDRV_MACHINE_RESET(ppking)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */

@@ -112,6 +112,10 @@ VIDEO_START( argus );
 VIDEO_START( valtric );
 VIDEO_START( butasan );
 VIDEO_START( bombsa );
+VIDEO_RESET( argus );
+VIDEO_RESET( valtric );
+VIDEO_RESET( butasan );
+VIDEO_RESET( bombsa );
 VIDEO_UPDATE( argus );
 VIDEO_UPDATE( valtric );
 VIDEO_UPDATE( butasan );
@@ -719,6 +723,7 @@ static MACHINE_DRIVER_START( argus )
 	MDRV_PALETTE_LENGTH(896)
 
 	MDRV_VIDEO_START(argus)
+	MDRV_VIDEO_RESET(argus)
 	MDRV_VIDEO_UPDATE(argus)
 
 	/* sound hardware */
@@ -756,6 +761,7 @@ static MACHINE_DRIVER_START( valtric )
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_VIDEO_START(valtric)
+	MDRV_VIDEO_RESET(valtric)
 	MDRV_VIDEO_UPDATE(valtric)
 
 	/* sound hardware */
@@ -799,6 +805,7 @@ static MACHINE_DRIVER_START( butasan )
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_VIDEO_START(butasan)
+	MDRV_VIDEO_RESET(butasan)
 	MDRV_VIDEO_UPDATE(butasan)
 
 	/* sound hardware */
@@ -842,6 +849,7 @@ static MACHINE_DRIVER_START( bombsa )
 	MDRV_PALETTE_LENGTH(0x1000/2)
 
 	MDRV_VIDEO_START(bombsa)
+	MDRV_VIDEO_RESET(bombsa)
 	MDRV_VIDEO_UPDATE(bombsa)
 
 	/* sound hardware */

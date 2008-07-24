@@ -3050,7 +3050,7 @@ static void d68020_unpk_mm(void)
   1 = pc idx
 */
 
-static opcode_struct g_opcode_info[] =
+static const opcode_struct g_opcode_info[] =
 {
 /*  opcode handler    mask    match   ea mask */
 	{d68000_1010         , 0xf000, 0xa000, 0x000},
@@ -3425,19 +3425,17 @@ static void build_opcode_table(void)
 	uint i;
 	uint opcode;
 	opcode_struct* ostruct;
-	uint opcode_info_length = 0;
+	opcode_struct opcode_info[ARRAY_LENGTH(g_opcode_info)];
 
-	for(ostruct = g_opcode_info;ostruct->opcode_handler != 0;ostruct++)
-		opcode_info_length++;
-
-	qsort((void *)g_opcode_info, opcode_info_length, sizeof(g_opcode_info[0]), compare_nof_true_bits);
+	memcpy(opcode_info, g_opcode_info, sizeof(g_opcode_info));
+	qsort((void *)opcode_info, ARRAY_LENGTH(opcode_info)-1, sizeof(opcode_info[0]), compare_nof_true_bits);
 
 	for(i=0;i<0x10000;i++)
 	{
 		g_instruction_table[i] = d68000_illegal; /* default to illegal */
 		opcode = i;
 		/* search through opcode info for a match */
-		for(ostruct = g_opcode_info;ostruct->opcode_handler != 0;ostruct++)
+		for(ostruct = opcode_info;ostruct->opcode_handler != 0;ostruct++)
 		{
 			/* match opcode mask and allowed ea modes */
 			if((opcode & ostruct->mask) == ostruct->match)

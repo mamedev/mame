@@ -35,7 +35,7 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 static emu_timer *lfotimer = NULL;
-static INT32 freq = MAXFREQ;
+static INT32 freq;
 
 #define STEP 1
 
@@ -185,6 +185,8 @@ WRITE8_HANDLER( galaxian_shoot_enable_w )
 static void galaxian_sh_start(void)
 {
 	int i, j, sweep, charge, countdown, generator, bit1, bit2;
+
+	freq = MAXFREQ;
 
 	sample_set_volume(CHANNEL_NOISE, NOISE_VOLUME);
 	sample_set_volume(CHANNEL_SHOOT, SHOOT_VOLUME);

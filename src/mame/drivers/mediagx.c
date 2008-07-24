@@ -88,7 +88,8 @@ static UINT8 pal[768];
 static UINT32 *main_ram;
 
 static UINT32 disp_ctrl_reg[256/4];
-static int frame_width = 1, frame_height = 1;
+static int frame_width;
+static int frame_height;
 
 static UINT32 memory_ctrl_reg[256/4];
 static int pal_index = 0;
@@ -1119,6 +1120,8 @@ static void mediagx_set_keyb_int(int state) {
 
 static void init_mediagx(running_machine *machine)
 {
+	frame_width = frame_height = 1;
+
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT,mediagx_set_keyb_int);
 	mc146818_init(machine, MC146818_STANDARD);
 

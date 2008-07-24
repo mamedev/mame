@@ -6,6 +6,7 @@ VIDEO_UPDATE( tubep );
 PALETTE_INIT( rjammer );
 VIDEO_UPDATE( rjammer );
 VIDEO_START( tubep );
+VIDEO_RESET( tubep );
 
 extern UINT8 *rjammer_backgroundram;
 extern UINT8 *tubep_backgroundram;

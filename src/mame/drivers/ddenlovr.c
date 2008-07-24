@@ -135,15 +135,15 @@ static int ddenlovr_blitter_irq_flag,ddenlovr_blitter_irq_enable;
 static int ddenlovr_rect_width, ddenlovr_rect_height;
 static int ddenlovr_clip_width, ddenlovr_clip_height;
 static int ddenlovr_line_length;
-static int ddenlovr_clip_ctrl = 0xf,ddenlovr_clip_x,ddenlovr_clip_y;
+static int ddenlovr_clip_ctrl,ddenlovr_clip_x,ddenlovr_clip_y;
 static int ddenlovr_scroll[8*2];
 static int ddenlovr_priority, ddenlovr_priority2;
 static int ddenlovr_bgcolor, ddenlovr_bgcolor2;
-static int ddenlovr_layer_enable=0x0f, ddenlovr_layer_enable2=0x0f;
+static int ddenlovr_layer_enable, ddenlovr_layer_enable2;
 static int ddenlovr_palette_base[8], ddenlovr_palette_mask[8];
 static int ddenlovr_transparency_pen[8], ddenlovr_transparency_mask[8];
 static int ddenlovr_blit_reg;
-static int ddenlovr_blit_pen_mask = 0xff;	// not implemented
+static int ddenlovr_blit_pen_mask;	// not implemented
 static int ddenlovr_blit_rom_bits;			// usually 8, 16 in hanakanz
 static const int *ddenlovr_blit_commands;
 
@@ -163,6 +163,10 @@ VIDEO_START(ddenlovr)
 	}
 
 	extra_layers = 0;
+
+	ddenlovr_clip_ctrl = 0x0f;
+	ddenlovr_layer_enable = ddenlovr_layer_enable2 = 0x0f;
+	ddenlovr_blit_pen_mask = 0xff;
 
 	// older games do not set these !?
 	ddenlovr_clip_width = 0x400;
