@@ -488,33 +488,15 @@ static DRIVER_INIT( vshoot )
 	namcoc7x_on_driver_init(machine);
 } /* vshoot */
 
-static void
-ShuffleDataROMs( running_machine *machine )
-{
-	size_t len = memory_region_length(machine, REGION_USER1)/4;
-	UINT8 *pMem8 = (UINT8 *)memory_region( machine, REGION_USER1 );
-	UINT32 *pMem32 = (UINT32 *)pMem8;
-	int i;
-
-	for( i=0; i<len; i++ )
-	{
-		pMem32[i] = (pMem8[0]<<16)|(pMem8[1]<<24)|(pMem8[2]<<0)|(pMem8[3]<<8);
-		pMem8+=4;
-	}
-	memory_set_bankptr( 1, pMem32 );
-}
-
 static DRIVER_INIT( machbrkr )
 {
 	namcos2_gametype = NAMCONB2_MACH_BREAKERS;
-	ShuffleDataROMs(machine);
 	namcoc7x_on_driver_init(machine);
 }
 
 static DRIVER_INIT( outfxies )
 {
 	namcos2_gametype = NAMCONB2_OUTFOXIES;
-	ShuffleDataROMs(machine);
 	namcoc7x_on_driver_init(machine);
 }
 
@@ -726,7 +708,7 @@ static ADDRESS_MAP_START( namconb2_am, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1c0000, 0x1cffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
 	AM_RANGE(0x200000, 0x2fffff) AM_READ(SMH_RAM) AM_WRITE(sharedram_w) AM_BASE(&namconb1_workram32) /* shared with MCU */
-	AM_RANGE(0x400000, 0x4fffff) AM_READ(SMH_BANK1)/* data ROMs */
+	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION(REGION_USER1, 0)
 	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE(namco_obj32_r,namco_obj32_w)
 	AM_RANGE(0x620000, 0x620007) AM_READWRITE(namco_spritepos32_r,namco_spritepos32_w)
 	AM_RANGE(0x640000, 0x64000f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* unknown xy offset */
@@ -1120,9 +1102,9 @@ ROM_START( outfxies )
 	ROM_REGION( 0x200000, NAMCONB1_TILEGFXREGION, ROMREGION_DISPOSE )
 	ROM_LOAD( "ou1-scr0", 0x000000, 0x200000, CRC(b3b3f2e9) SHA1(541bd7e9ba12aff4ec4033bd9c6bb19476acb3c4) )
 
-	ROM_REGION( 0x100000, REGION_USER1, 0 )
-	ROM_LOAD( "ou1dat0.20a", 0x00000, 0x80000, CRC(1a49aead) SHA1(df243aff1a6fb5bcf4d5d883c5af2374a4aff477) )
-	ROM_LOAD( "ou1dat1.20b", 0x80000, 0x80000, CRC(63bb119d) SHA1(d4c2820243b84c3f5cdf7f9e66bb50f53d0efed2) )
+	ROM_REGION32_BE( 0x100000, REGION_USER1, 0 )
+	ROM_LOAD16_WORD_SWAP( "ou1dat0.20a", 0x00000, 0x80000, CRC(1a49aead) SHA1(df243aff1a6fb5bcf4d5d883c5af2374a4aff477) )
+	ROM_LOAD16_WORD_SWAP( "ou1dat1.20b", 0x80000, 0x80000, CRC(63bb119d) SHA1(d4c2820243b84c3f5cdf7f9e66bb50f53d0efed2) )
 ROM_END
 
 ROM_START( outfxesj )
@@ -1163,9 +1145,9 @@ ROM_START( outfxesj )
 	ROM_REGION( 0x200000, NAMCONB1_TILEGFXREGION, ROMREGION_DISPOSE )
 	ROM_LOAD( "ou1-scr0", 0x000000, 0x200000, CRC(b3b3f2e9) SHA1(541bd7e9ba12aff4ec4033bd9c6bb19476acb3c4) )
 
-	ROM_REGION( 0x100000, REGION_USER1, 0 )
-	ROM_LOAD( "ou1dat0.20a", 0x00000, 0x80000, CRC(1a49aead) SHA1(df243aff1a6fb5bcf4d5d883c5af2374a4aff477) )
-	ROM_LOAD( "ou1dat1.20b", 0x80000, 0x80000, CRC(63bb119d) SHA1(d4c2820243b84c3f5cdf7f9e66bb50f53d0efed2) )
+	ROM_REGION32_BE( 0x100000, REGION_USER1, 0 )
+	ROM_LOAD16_WORD_SWAP( "ou1dat0.20a", 0x00000, 0x80000, CRC(1a49aead) SHA1(df243aff1a6fb5bcf4d5d883c5af2374a4aff477) )
+	ROM_LOAD16_WORD_SWAP( "ou1dat1.20b", 0x80000, 0x80000, CRC(63bb119d) SHA1(d4c2820243b84c3f5cdf7f9e66bb50f53d0efed2) )
 ROM_END
 
 
@@ -1211,8 +1193,8 @@ ROM_START( machbrkr )
 	ROM_LOAD( "mb1_scr1.1c", 0x200000, 0x200000, CRC(fb2b1939) SHA1(bf9d7b93205e7012aa86693f3d2ba8f4d729bc97) )
 	ROM_LOAD( "mb1_scr2.1b", 0x400000, 0x200000, CRC(0e6097a5) SHA1(b6c64b3e34ba913138b6b7c3d99d2be4f3ceda08) )
 
-	ROM_REGION( 0x100000, REGION_USER1, 0 )
-	ROM_LOAD( "mb1_dat0.20a", 0x00000, 0x80000, CRC(fb2e3cd1) SHA1(019b1d645a07619036522f42e0b9a537f39b6b93) )
+	ROM_REGION32_BE( 0x100000, REGION_USER1, 0 )
+	ROM_LOAD16_WORD_SWAP( "mb1_dat0.20a", 0x00000, 0x80000, CRC(fb2e3cd1) SHA1(019b1d645a07619036522f42e0b9a537f39b6b93) )
 ROM_END
 
 /***************************************************************/
