@@ -47,8 +47,8 @@
 /* DIP switch rendering parameters */
 #define DIP_SWITCH_HEIGHT		0.05f
 #define DIP_SWITCH_SPACING		0.01
-#define SINGLE_TOGGLE_SWITCH_FIELD_WIDTH 0.02f
-#define SINGLE_TOGGLE_SWITCH_WIDTH 0.015f
+#define SINGLE_TOGGLE_SWITCH_FIELD_WIDTH 0.025f
+#define SINGLE_TOGGLE_SWITCH_WIDTH 0.020f
 /* make the switch 80% of the width space and 1/2 of the switch height */
 #define PERCENTAGE_OF_HALF_FIELD_USED 0.80f
 #define SINGLE_TOGGLE_SWITCH_HEIGHT ((DIP_SWITCH_HEIGHT / 2) * PERCENTAGE_OF_HALF_FIELD_USED)
@@ -2068,6 +2068,8 @@ static void menu_settings_custom_render(running_machine *machine, ui_menu *menu,
 
 static void menu_settings_custom_render_one(float x1, float y1, float x2, float y2, const dip_descriptor *dip, UINT32 selectedmask)
 {
+	float switch_field_width = SINGLE_TOGGLE_SWITCH_FIELD_WIDTH * render_get_ui_aspect();
+	float switch_width = SINGLE_TOGGLE_SWITCH_WIDTH * render_get_ui_aspect();
 	int numtoggles, toggle;
 	float switch_toggle_gap;
 	float y1_off, y1_on;
@@ -2076,7 +2078,7 @@ static void menu_settings_custom_render_one(float x1, float y1, float x2, float 
 	numtoggles = 32 - count_leading_zeros(dip->mask);
 
 	/* center based on the number of switches */
- 	x1 += (x2 - x1 - numtoggles * SINGLE_TOGGLE_SWITCH_FIELD_WIDTH) / 2;
+ 	x1 += (x2 - x1 - numtoggles * switch_field_width) / 2;
 
 	/* draw the dip switch name */
 	ui_draw_text_full(	dip->name,
@@ -2102,28 +2104,28 @@ static void menu_settings_custom_render_one(float x1, float y1, float x2, float 
 		float innerx1;
 
 		/* first outline the switch */
-		ui_draw_outlined_box(x1, y1, x1 + SINGLE_TOGGLE_SWITCH_FIELD_WIDTH, y2, UI_FILLCOLOR);
+		ui_draw_outlined_box(x1, y1, x1 + switch_field_width, y2, UI_FILLCOLOR);
 
 		/* compute x1/x2 for the inner filled in switch */
-		innerx1 = x1 + (SINGLE_TOGGLE_SWITCH_FIELD_WIDTH - SINGLE_TOGGLE_SWITCH_WIDTH) / 2;
+		innerx1 = x1 + (switch_field_width - switch_width) / 2;
 
 		/* see if the switch is actually used */
 		if (dip->mask & (1 << toggle))
 		{
 			float innery1 = (dip->state & (1 << toggle)) ? y1_on : y1_off;
-			render_ui_add_rect(innerx1, innery1, innerx1 + SINGLE_TOGGLE_SWITCH_WIDTH, innery1 + SINGLE_TOGGLE_SWITCH_HEIGHT,
+			render_ui_add_rect(innerx1, innery1, innerx1 + switch_width, innery1 + SINGLE_TOGGLE_SWITCH_HEIGHT,
 							   (selectedmask & (1 << toggle)) ? MENU_SELECTCOLOR : ARGB_WHITE,
 							   PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
 		else
 		{
-			render_ui_add_rect(innerx1, y1_off, innerx1 + SINGLE_TOGGLE_SWITCH_WIDTH, y1_on + SINGLE_TOGGLE_SWITCH_HEIGHT,
+			render_ui_add_rect(innerx1, y1_off, innerx1 + switch_width, y1_on + SINGLE_TOGGLE_SWITCH_HEIGHT,
 							   MENU_UNAVAILABLECOLOR,
 							   PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
 
 		/* advance to the next switch */
-		x1 += SINGLE_TOGGLE_SWITCH_FIELD_WIDTH;
+		x1 += switch_field_width;
 	}
 }
 
@@ -3149,10 +3151,3 @@ static void menu_render_triangle(bitmap_t *dest, const bitmap_t *source, const r
 		}
 	}
 }
-
-
-
-/***************************************************************************
-    ACCESSORS
-***************************************************************************/
-
