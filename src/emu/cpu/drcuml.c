@@ -1369,9 +1369,7 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 	static const UINT64 instsizemask[] = { 0, 0, 0, 0, 0xffffffff, 0, 0, 0, U64(0xffffffffffffffff) };
 	static const UINT64 paramsizemask[] = { 0xff, 0xffff, 0xffffffff, U64(0xffffffffffffffff) };
 	drcuml_opcode origop = inst->opcode;
-#if LOG_SIMPLIFICATIONS
 	drcuml_instruction orig = *inst;
-#endif
 
 	switch (inst->opcode)
 	{
@@ -1688,15 +1686,13 @@ static void simplify_instruction_with_no_flags(drcuml_block *block, drcuml_instr
 			break;
 	}
 
-#if LOG_SIMPLIFICATIONS
-	if (memcmp(&orig, inst, sizeof(orig)) != 0)
+	if (LOG_SIMPLIFICATIONS && memcmp(&orig, inst, sizeof(orig)) != 0)
 	{
 		char disasm1[256], disasm2[256];
 		drcuml_disasm(&orig, disasm1, block->drcuml);
 		drcuml_disasm(inst, disasm2, block->drcuml);
 		mame_printf_debug("Simplified: %-50.50s -> %s\n", disasm1, disasm2);
 	}
-#endif
 
 	/* if the opcode changed, validate and reoptimize */
 	if (inst->opcode != origop)

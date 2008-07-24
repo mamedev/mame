@@ -45,7 +45,7 @@ Registers per channel:
 #define LOG_SOUND(x) do { if (VERBOSE_SOUND) logerror x; } while (0)
 #define LOG_READ_WRITES(x) do { if (VERBOSE_READ_WRITES) logerror x; } while (0)
 
-//#define LOG_WAVE  1
+#define LOG_WAVE  0
 //#define ALT_MIX
 
 #define GAELCO_NUM_CHANNELS 	0x07
@@ -76,9 +76,7 @@ struct GAELCOSND
 	INT16 volume_table[VOLUME_LEVELS][256];
 };
 
-#ifdef LOG_WAVE
-void *	wavraw;					/* raw waveform */
-#endif
+static void *	wavraw;					/* raw waveform */
 
 /*============================================================================
                         CG-1V/GAE1 Sound Update
@@ -182,9 +180,8 @@ static void gaelco_update(void *param, stream_sample_t **inputs, stream_sample_t
 		buffer[1][j] = output_r;
 	}
 
-#ifdef LOG_WAVE
-	wav_add_data_16lr(wavraw, buffer[0], buffer[1], length);
-#endif
+	if (wavraw)
+		wav_add_data_32lr(wavraw, buffer[0], buffer[1], length, 0);
 }
 
 /*============================================================================
@@ -271,9 +268,8 @@ static void *gaelcosnd_start(sound_type sndtype, int sndindex, int clock, const 
 		}
 	}
 
-#ifdef LOG_WAVE
-	wavraw = wav_open("gae1_snd.wav", 8000, 2);
-#endif
+	if (LOG_WAVE)
+		wavraw = wav_open("gae1_snd.wav", 8000, 2);
 
 	return info;
 }
@@ -291,9 +287,9 @@ static void *gaelco_cg1v_start(int sndindex, int clock, const void *config)
 
 static void gaelco_stop(void *chip)
 {
-#ifdef LOG_WAVE
-	wav_close(wavraw);
-#endif
+	if (wavraw)
+		wav_close(wavraw);
+	wavraw = NULL;
 }
 
 

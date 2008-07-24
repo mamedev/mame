@@ -185,13 +185,12 @@ static void ppcdrc_recompile(drc_core *drc)
 	/* end the sequence */
 	drc_end_sequence(drc);
 
-#if LOG_CODE
+if (0)
 {
 	char label[40];
 	sprintf(label, "Code @ %08X", ppc.pc);
 	code_log(label, start, drc->cache_top);
 }
-#endif
 }
 
 static void update_counters(drc_core *drc)

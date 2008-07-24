@@ -340,10 +340,7 @@
 
 #define LOG 0
 #define LOG_EXTRA 0
-
-#ifndef LOG_IOT_EXTRA
 #define LOG_IOT_EXTRA 0
-#endif
 
 
 static void execute_instruction(void);

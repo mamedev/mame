@@ -260,8 +260,6 @@ static void mips_stop( void )
 	debugger_instruction_hook(Machine,  mipscpu.pc );
 }
 
-#if LOG_BIOSCALL
-
 static const struct
 {
 	int address;
@@ -938,8 +936,6 @@ static void log_syscall( void )
 	logerror( "%08x: syscall %s\n", (unsigned int)activecpu_get_reg( MIPS_R31 ) - 8, buf );
 }
 
-#endif
-
 static UINT32 mips_cache_readword( UINT32 offset )
 {
 	UINT32 data = 0;
@@ -1450,12 +1446,10 @@ static void mips_common_exception( int exception, UINT32 romOffset, UINT32 ramOf
 		mips_set_cp0r( CP0_EPC, mipscpu.pc );
 	}
 
-#if LOG_BIOSCALL
-	if( exception != EXC_INT )
+	if( LOG_BIOSCALL && exception != EXC_INT )
 	{
 		logerror( "%08x: Exception %d\n", mipscpu.pc, exception );
 	}
-#endif
 
 	mipscpu.delayr = 0;
 	mipscpu.delayv = 0;
@@ -1799,10 +1793,7 @@ static int mips_execute( int cycles )
 	mips_ICount = cycles;
 	do
 	{
-#if LOG_BIOSCALL
-		log_bioscall();
-#endif
-
+		if (LOG_BIOSCALL) log_bioscall();
 		debugger_instruction_hook(Machine,  mipscpu.pc );
 
 		mipscpu.op = cpu_readop32( mipscpu.pc );
@@ -1848,9 +1839,7 @@ static int mips_execute( int cycles )
 				break;
 
 			case FUNCT_SYSCALL:
-#if LOG_BIOSCALL
-				log_syscall();
-#endif
+				if (LOG_BIOSCALL) log_syscall();
 				mips_exception( EXC_SYS );
 				break;
 

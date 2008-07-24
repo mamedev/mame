@@ -912,11 +912,7 @@ static void process_object_list(running_machine *machine, int vc, UINT16 *_scanl
 	for (x = 0; x < 336; x++)
 		scanline[x] = gpu_regs[BG];
 
-#if LOG_OBJECTS
-	logit = (y == cliprect->min_y);
-#else
-	logit = 0;
-#endif
+	logit = LOG_OBJECTS;
 
 	/* fetch the object pointer */
 	objdata = (UINT32 *)get_jaguar_memory((gpu_regs[OLP_H] << 16) | gpu_regs[OLP_L]);

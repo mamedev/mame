@@ -241,7 +241,6 @@ static UINT32 akiko_c2p_read(void)
 	return val;
 }
 
-#if LOG_AKIKO
 static const char *const akiko_reg_names[] =
 {
 	/*0*/	"ID",
@@ -272,7 +271,6 @@ const char* get_akiko_reg_name(int reg)
 		return "???";
 	}
 }
-#endif
 
 /*************************************
  *
@@ -358,9 +356,7 @@ static void akiko_set_cd_status( UINT32 status )
 
 	if ( akiko.cdrom_status[0] & akiko.cdrom_status[1] )
 	{
-#if LOG_AKIKO_CD
-		logerror( "Akiko CD IRQ\n" );
-#endif
+		if (LOG_AKIKO_CD) logerror( "Akiko CD IRQ\n" );
 		amiga_custom_w(Machine, REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
 	}
 }
@@ -462,9 +458,7 @@ static TIMER_CALLBACK(akiko_dma_proc)
 			}
 		}
 
-#if LOG_AKIKO_CD
-		logerror( "DMA: sector %d - address %08x\n", akiko.cdrom_lba_cur, akiko.cdrom_address[0] + (index*4096) );
-#endif
+		if (LOG_AKIKO_CD) logerror( "DMA: sector %d - address %08x\n", akiko.cdrom_lba_cur, akiko.cdrom_address[0] + (index*4096) );
 
 		for( i = 0; i < 2352; i += 2 )
 		{
@@ -551,9 +545,7 @@ static TIMER_CALLBACK( akiko_cd_delayed_cmd )
 
 	if ( param == 0x05 )
 	{
-#if LOG_AKIKO_CD
-		logerror( "AKIKO: Completing Command %d\n", param );
-#endif
+		if (LOG_AKIKO_CD) logerror( "AKIKO: Completing Command %d\n", param );
 
 		resp[0] = 0x06;
 
@@ -591,9 +583,7 @@ static void akiko_update_cdrom( void )
 
 		cmd &= 0x0f;
 
-#if LOG_AKIKO_CD
-		logerror( "CDROM command: %02X\n", cmd );
-#endif
+		if (LOG_AKIKO_CD) logerror( "CDROM command: %02X\n", cmd );
 
 		if ( cmd == 0x02 ) /* pause audio */
 		{
@@ -651,9 +641,7 @@ static void akiko_update_cdrom( void )
 
 				if ( cmdbuf[7] == 0x80 )
 				{
-#if LOG_AKIKO_CD
-					logerror( "AKIKO CD: PC:%06x Data read - start lba: %08x - end lba: %08x\n", safe_activecpu_get_pc(), startpos, endpos );
-#endif
+					if (LOG_AKIKO_CD) logerror( "AKIKO CD: PC:%06x Data read - start lba: %08x - end lba: %08x\n", safe_activecpu_get_pc(), startpos, endpos );
 					akiko.cdrom_speed = (cmdbuf[8] & 0x40) ? 2 : 1;
 					akiko.cdrom_lba_start = startpos;
 					akiko.cdrom_lba_end = endpos;
@@ -668,9 +656,7 @@ static void akiko_update_cdrom( void )
 				}
 				else
 				{
-#if LOG_AKIKO_CD
-					logerror( "AKIKO CD: Seek - start lba: %08x - end lba: %08x\n", startpos, endpos );
-#endif
+					if (LOG_AKIKO_CD) logerror( "AKIKO CD: Seek - start lba: %08x - end lba: %08x\n", startpos, endpos );
 					akiko.cdrom_track_index = 0;
 
 					for( i = 0; i < cdrom_get_last_track(akiko.cdrom); i++ )
@@ -763,12 +749,10 @@ READ32_HANDLER(amiga_akiko32_r)
 {
 	UINT32		retval;
 
-#if LOG_AKIKO
-	if ( offset < (0x30/4) )
+	if ( LOG_AKIKO && offset < (0x30/4) )
 	{
 		logerror( "Reading AKIKO reg %0x [%s] at PC=%06x\n", offset, get_akiko_reg_name(offset), activecpu_get_pc() );
 	}
-#endif
 
 	switch( offset )
 	{
@@ -825,12 +809,10 @@ READ32_HANDLER(amiga_akiko32_r)
 
 WRITE32_HANDLER(amiga_akiko32_w)
 {
-#if LOG_AKIKO
-	if ( offset < (0x30/4) )
+	if ( LOG_AKIKO && offset < (0x30/4) )
 	{
 		logerror( "Writing AKIKO reg %0x [%s] with %08x at PC=%06x\n", offset, get_akiko_reg_name(offset), data, activecpu_get_pc() );
 	}
-#endif
 
 	switch( offset )
 	{
@@ -869,9 +851,7 @@ WRITE32_HANDLER(amiga_akiko32_w)
 			break;
 
 		case 0x20/4:	/* CDROM DMA SECTOR READ REQUEST WRITE */
-#if LOG_AKIKO_CD
-			logerror( "Read Req mask W: data %08x - mem mask %08x\n", data, mem_mask );
-#endif
+			if (LOG_AKIKO_CD) logerror( "Read Req mask W: data %08x - mem mask %08x\n", data, mem_mask );
 			if ( ACCESSING_BITS_16_31 )
 			{
 				akiko.cdrom_readreqmask = (data >> 16);
@@ -880,9 +860,7 @@ WRITE32_HANDLER(amiga_akiko32_w)
 			break;
 
 		case 0x24/4:	/* CDROM DMA ENABLE? */
-#if LOG_AKIKO_CD
-			logerror( "DMA enable W: data %08x - mem mask %08x\n", data, mem_mask );
-#endif
+			if (LOG_AKIKO_CD) logerror( "DMA enable W: data %08x - mem mask %08x\n", data, mem_mask );
 			if ( ( akiko.cdrom_dmacontrol ^ data ) & 0x04000000 )
 			{
 				if ( data & 0x04000000 )

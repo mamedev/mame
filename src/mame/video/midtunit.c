@@ -718,7 +718,8 @@ WRITE16_HANDLER( midtunit_dma_w )
 	/* determine the offset */
 	gfxoffset = dma_register[DMA_OFFSETLO] | (dma_register[DMA_OFFSETHI] << 16);
 
-#if LOG_DMA
+if (LOG_DMA)
+{
 	if (input_code_pressed(KEYCODE_L))
 	{
 		logerror("DMA command %04X: (bpp=%d skip=%d xflip=%d yflip=%d preskip=%d postskip=%d)\n",
@@ -734,8 +735,7 @@ WRITE16_HANDLER( midtunit_dma_w )
 				dma_register[DMA_CONFIG]);
 		logerror("----\n");
 	}
-#endif
-
+}
 	/* special case: drawing mode C doesn't need to know about any pixel data */
 	if ((command & 0x0f) == 0x0c)
 		gfxoffset = 0;

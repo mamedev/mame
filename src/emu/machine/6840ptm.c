@@ -39,12 +39,7 @@
 // Defines /////////////////////////////////////////////////////////////
 
 #define PTMVERBOSE 0
-
-#if PTMVERBOSE
-	#define PLOG(x)	logerror x;
-#else
-	#define PLOG(x)
-#endif
+#define PLOG(x) do { if (PTMVERBOSE) logerror x; } while (0)
 
 enum
 {

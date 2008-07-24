@@ -4,6 +4,8 @@
 #include "sound/discrete.h"
 #include "sound/samples.h"
 
+#define BLOCKADE_LOG 0
+
 /*
  * This still needs the noise generator stuff,
  * along with proper mixing and volume control
@@ -42,18 +44,14 @@ WRITE8_HANDLER( blockade_sound_freq_w )
 
 WRITE8_HANDLER( blockade_env_on_w )
 {
-//#ifdef BLOCKADE_LOG
-//    mame_printf_debug("Boom Start\n");
-//#endif
+    if (BLOCKADE_LOG) mame_printf_debug("Boom Start\n");
     sample_start(0,0,0);
     return;
 }
 
 WRITE8_HANDLER( blockade_env_off_w )
 {
-//#ifdef BLOCKADE_LOG
-//    mame_printf_debug("Boom End\n");
-//#endif
+    if (BLOCKADE_LOG) mame_printf_debug("Boom End\n");
     return;
 }
 

@@ -21,7 +21,8 @@ READ16_HANDLER( tx1_crtc_r )
 
 WRITE16_HANDLER( tx1_crtc_w )
 {
-#if PRINT_CRTC_DATA
+if (PRINT_CRTC_DATA)
+{
 	data &= 0xff;
 	if (offset == 0)
 	{
@@ -51,7 +52,7 @@ WRITE16_HANDLER( tx1_crtc_w )
 	{
 		mame_printf_debug("0x%.2x, (%d)\n",data, data);
 	}
-#endif
+}
 }
 
 

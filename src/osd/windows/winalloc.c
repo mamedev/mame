@@ -39,6 +39,12 @@
 // set this to 1 to record all mallocs and frees in the logfile
 #define LOG_CALLS		0
 
+#if LOG_CALLS
+#define LOG(x) do { if (LOG_CALLS) logerror x; } while (0)
+void CLIB_DECL logerror(const char *text,...);
+#else
+#define LOG(x)
+#endif
 
 
 //============================================================
@@ -177,13 +183,11 @@ void *malloc_file_line(size_t size, const char *file, int line)
 		block_base = (UINT8 *)GlobalAlloc(GMEM_FIXED, size);
 	}
 
-#if LOG_CALLS
 	// logging
 	if (file != NULL)
-		logerror("malloc #%06d size = %d (%s:%d)\n", id, size, file, line);
+		LOG(("malloc #%06d size = %d (%s:%d)\n", id, size, file, line));
 	else
-		logerror("malloc #%06d size = %d\n", id, size);
-#endif // LOG_CALLS
+		LOG(("malloc #%06d size = %d\n", id, size));
 
 	return block_base;
 }
@@ -344,9 +348,7 @@ void CLIB_DECL free_file_line(void *memory, const char *file, int line)
 		// free the memory
 		VirtualFree((UINT8 *)memory - ((size_t)memory & (PAGE_SIZE-1)) - PAGE_SIZE, 0, MEM_RELEASE);
 
-#if LOG_CALLS
-		logerror("free #%06d size = %d\n", entry->id, entry->size);
-#endif // LOG_CALLS
+		LOG(("free #%06d size = %d\n", entry->id, entry->size));
 	}
 	else
 	{

@@ -203,7 +203,8 @@ double compute_resistor_weights(
 	}
 
 /* debug code */
-#if VERBOSE
+if (VERBOSE)
+{
 	logerror("compute_resistor_weights():  scaler = %15.10f\n",scale);
 	logerror("min val :%i  max val:%i  Total number of networks :%i\n", minval, maxval, networks_no );
 
@@ -224,7 +225,7 @@ double compute_resistor_weights(
 		}
 		logerror("                              sum of scaled weights = %15.10f\n", sum  );
 	}
-#endif
+}
 /* debug end */
 
 	return (scale);
@@ -396,7 +397,8 @@ double compute_resistor_net_outputs(
 	}
 
 /* debug code */
-#if VERBOSE
+if (VERBOSE)
+{
 	logerror("compute_resistor_net_outputs():  scaler = %15.10f\n",scale);
 	logerror("min val :%i  max val:%i  Total number of networks :%i\n", minval, maxval, networks_no );
 
@@ -418,7 +420,7 @@ double compute_resistor_net_outputs(
 			logerror("   combination %2i  out=%10.5f (scaled = %15.10f)\n", n, o[i*(1<<MAX_RES_PER_NET)+n], os[i*(1<<MAX_RES_PER_NET)+n] );
 		}
 	}
-#endif
+}
 /* debug end */
 
 	free(o);

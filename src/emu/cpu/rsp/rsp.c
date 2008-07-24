@@ -26,9 +26,7 @@
 
 extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 
-#if LOG_INSTRUCTION_EXECUTION
 static FILE *exec_output;
-#endif
 
 
 static rsp_config *config;
@@ -350,9 +348,8 @@ static void rsp_init(int index, int clock, const void *_config, int (*irqcallbac
     int accumIdx;
 	config = (rsp_config *)_config;
 
-#if LOG_INSTRUCTION_EXECUTION
-	exec_output = fopen("rsp_execute.txt", "wt");
-#endif
+	if (LOG_INSTRUCTION_EXECUTION)
+		exec_output = fopen("rsp_execute.txt", "wt");
 
 	rsp.irq_callback = irqcallback;
 
@@ -427,9 +424,9 @@ static void rsp_exit(void)
 	}
 #endif
 
-#if LOG_INSTRUCTION_EXECUTION
-	fclose(exec_output);
-#endif
+	if (exec_output)
+		fclose(exec_output);
+	exec_output = NULL;
 }
 
 static void rsp_reset(void)
@@ -2629,9 +2626,8 @@ static int rsp_execute(int cycles)
 						(config->sp_set_status)(0x3);
 						rsp_icount = MIN(rsp_icount, 1);
 
-#if LOG_INSTRUCTION_EXECUTION
-						fprintf(exec_output, "\n---------- break ----------\n\n");
-#endif
+						if (LOG_INSTRUCTION_EXECUTION) fprintf(exec_output, "\n---------- break ----------\n\n");
+
 						break;
 					}
 					case 0x20:	/* ADD */		if (RDREG) RDVAL = (INT32)(RSVAL + RTVAL); break;
@@ -2783,7 +2779,7 @@ static int rsp_execute(int cycles)
 			}
 		}
 
-#if LOG_INSTRUCTION_EXECUTION
+		if (LOG_INSTRUCTION_EXECUTION)
 		{
 			int i, l;
 			static UINT32 prev_regs[32];
@@ -2827,7 +2823,6 @@ static int rsp_execute(int cycles)
 			fprintf(exec_output, "\n");
 
 		}
-#endif
 
 		--rsp_icount;
 

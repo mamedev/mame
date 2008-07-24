@@ -19,7 +19,8 @@
 #include "deprecat.h"
 
 
-//#define LOG_LOAD
+#define LOG_LOAD 0
+#define LOG(x) do { if (LOG_LOAD) debugload x; } while(0)
 
 
 
@@ -163,7 +164,6 @@ const rom_entry *rom_next_chunk(const rom_entry *romp)
 
 static void CLIB_DECL ATTR_PRINTF(1,2) debugload(const char *string, ...)
 {
-#ifdef LOG_LOAD
 	static int opened;
 	va_list arg;
 	FILE *f;
@@ -176,7 +176,6 @@ static void CLIB_DECL ATTR_PRINTF(1,2) debugload(const char *string, ...)
 		va_end(arg);
 		fclose(f);
 	}
-#endif
 }
 
 
@@ -221,7 +220,7 @@ static int determine_bios_rom(rom_load_data *romdata, const rom_entry *romp)
 		bios_no = 1;
 	}
 
-	debugload("Using System BIOS: %d\n", bios_no);
+	LOG(("Using System BIOS: %d\n", bios_no));
 	return bios_no;
 }
 
@@ -457,12 +456,12 @@ static void region_post_process(running_machine *machine, rom_load_data *romdata
 	UINT8 *base;
 	int i, j;
 
-	debugload("+ datawidth=%d little=%d\n", datawidth, littleendian);
+	LOG(("+ datawidth=%d little=%d\n", datawidth, littleendian));
 
 	/* if the region is inverted, do that now */
 	if (regionflags & ROMREGION_INVERTMASK)
 	{
-		debugload("+ Inverting region\n");
+		LOG(("+ Inverting region\n"));
 		for (i = 0, base = regionbase; i < regionlength; i++)
 			*base++ ^= 0xff;
 	}
@@ -474,7 +473,7 @@ static void region_post_process(running_machine *machine, rom_load_data *romdata
 	if (datawidth > 1 && littleendian)
 #endif
 	{
-		debugload("+ Byte swapping region\n");
+		LOG(("+ Byte swapping region\n"));
 		for (i = 0, base = regionbase; i < regionlength; i += datawidth)
 		{
 			UINT8 temp[8];
@@ -562,7 +561,7 @@ static int read_rom_data(rom_load_data *romdata, const rom_entry *romp)
 	UINT8 *base = romdata->regionbase + ROM_GETOFFSET(romp);
 	int i;
 
-	debugload("Loading ROM data: offs=%X len=%X mask=%02X group=%d skip=%d reverse=%d\n", ROM_GETOFFSET(romp), numbytes, datamask, groupsize, skip, reversed);
+	LOG(("Loading ROM data: offs=%X len=%X mask=%02X group=%d skip=%d reverse=%d\n", ROM_GETOFFSET(romp), numbytes, datamask, groupsize, skip, reversed));
 
 	/* make sure the length was an even multiple of the group size */
 	if (numbytes % groupsize != 0)
@@ -589,12 +588,12 @@ static int read_rom_data(rom_load_data *romdata, const rom_entry *romp)
 		UINT8 *bufptr = romdata->tempbuf;
 
 		/* read as much as we can */
-		debugload("  Reading %X bytes into buffer\n", bytesleft);
+		LOG(("  Reading %X bytes into buffer\n", bytesleft));
 		if (rom_fread(romdata, romdata->tempbuf, bytesleft) != bytesleft)
 			return 0;
 		numbytes -= bytesleft;
 
-		debugload("  Copying to %p\n", base);
+		LOG(("  Copying to %p\n", base));
 
 		/* unmasked cases */
 		if (datamask == 0xff)
@@ -650,7 +649,7 @@ static int read_rom_data(rom_load_data *romdata, const rom_entry *romp)
 				}
 		}
 	}
-	debugload("  All done\n");
+	LOG(("  All done\n"));
 	return ROM_GETLENGTH(romp);
 }
 
@@ -753,7 +752,7 @@ static void process_rom_entries(rom_load_data *romdata, const rom_entry *romp)
 				int explength = 0;
 
 				/* open the file */
-				debugload("Opening ROM file: %s\n", ROM_GETNAME(romp));
+				LOG(("Opening ROM file: %s\n", ROM_GETNAME(romp)));
 				if (!open_rom_file(romdata, romp))
 					handle_missing_file(romdata, romp);
 
@@ -783,9 +782,9 @@ static void process_rom_entries(rom_load_data *romdata, const rom_entry *romp)
 					/* if this was the first use of this file, verify the length and CRC */
 					if (baserom)
 					{
-						debugload("Verifying length (%X) and checksums\n", explength);
+						LOG(("Verifying length (%X) and checksums\n", explength));
 						verify_length_and_hash(romdata, ROM_GETNAME(baserom), explength, ROM_GETHASHDATA(baserom));
-						debugload("Verify finished\n");
+						LOG(("Verify finished\n"));
 					}
 
 					/* reseek to the start and clear the baserom so we don't reverify */
@@ -799,7 +798,7 @@ static void process_rom_entries(rom_load_data *romdata, const rom_entry *romp)
 				/* close the file */
 				if (romdata->file)
 				{
-					debugload("Closing ROM file\n");
+					LOG(("Closing ROM file\n"));
 					mame_fclose(romdata->file);
 					romdata->file = NULL;
 				}
@@ -919,12 +918,12 @@ static chd_error open_disk_diff(const game_driver *drv, const rom_entry *romp, c
 	*diff_chd = NULL;
 
 	/* try to open the diff */
-	debugload("Opening differencing image file: %s\n", astring_c(fname));
+	LOG(("Opening differencing image file: %s\n", astring_c(fname)));
 	filerr = mame_fopen(SEARCHPATH_IMAGE_DIFF, astring_c(fname), OPEN_FLAG_READ | OPEN_FLAG_WRITE, diff_file);
 	if (filerr != FILERR_NONE)
 	{
 		/* didn't work; try creating it instead */
-		debugload("Creating differencing image: %s\n", astring_c(fname));
+		LOG(("Creating differencing image: %s\n", astring_c(fname)));
 		filerr = mame_fopen(SEARCHPATH_IMAGE_DIFF, astring_c(fname), OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, diff_file);
 		if (filerr != FILERR_NONE)
 		{
@@ -938,7 +937,7 @@ static chd_error open_disk_diff(const game_driver *drv, const rom_entry *romp, c
 			goto done;
 	}
 
-	debugload("Opening differencing image file: %s\n", astring_c(fname));
+	LOG(("Opening differencing image file: %s\n", astring_c(fname)));
 	err = chd_open_file(mame_core_file(*diff_file), CHD_OPEN_READWRITE, source, diff_chd);
 	if (err != CHDERR_NONE)
 		goto done;
@@ -977,7 +976,7 @@ static void process_disk_entries(rom_load_data *romdata, const rom_entry *romp)
 			filename = astring_assemble_2(astring_alloc(), ROM_GETNAME(romp), ".chd");
 
 			/* first open the source drive */
-			debugload("Opening disk image: %s\n", astring_c(filename));
+			LOG(("Opening disk image: %s\n", astring_c(filename)));
 			err = open_disk_image(Machine->gamedrv, romp, &chd.origfile, &chd.origchd);
 			if (err != CHDERR_NONE)
 			{
@@ -1030,7 +1029,7 @@ static void process_disk_entries(rom_load_data *romdata, const rom_entry *romp)
 			}
 
 			/* we're okay, add to the list of disks */
-			debugload("Assigning to handle %d\n", DISK_GETINDEX(romp));
+			LOG(("Assigning to handle %d\n", DISK_GETINDEX(romp)));
 			*chd_list_tailptr = auto_malloc(sizeof(**chd_list_tailptr));
 			**chd_list_tailptr = chd;
 			chd_list_tailptr = &(*chd_list_tailptr)->next;
@@ -1116,7 +1115,7 @@ void rom_init(running_machine *machine, const rom_entry *romp)
 		UINT32 regionflags = ROMREGION_GETFLAGS(region);
 		int regiontype = ROMREGION_GETTYPE(region);
 
-		debugload("Processing region %02X (length=%X)\n", regiontype, regionlength);
+		LOG(("Processing region %02X (length=%X)\n", regiontype, regionlength));
 
 		/* the first entry must be a region */
 		assert(ROMENTRY_ISREGION(region));
@@ -1128,7 +1127,7 @@ void rom_init(running_machine *machine, const rom_entry *romp)
 		/* remember the base and length */
 		romdata.regionbase = new_memory_region(machine, regiontype, regionlength, regionflags);
 		romdata.regionlength = regionlength;
-		debugload("Allocated %X bytes @ %p\n", romdata.regionlength, romdata.regionbase);
+		LOG(("Allocated %X bytes @ %p\n", romdata.regionlength, romdata.regionbase));
 
 		/* clear the region if it's requested */
 		if (ROMREGION_ISERASE(region))
@@ -1159,7 +1158,7 @@ void rom_init(running_machine *machine, const rom_entry *romp)
 	for (regnum = 0; regnum < REGION_MAX; regnum++)
 		if (regionlist[regnum])
 		{
-			debugload("Post-processing region %02X\n", regnum);
+			LOG(("Post-processing region %02X\n", regnum));
 			region_post_process(machine, &romdata, regnum);
 		}
 

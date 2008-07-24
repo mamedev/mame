@@ -550,9 +550,10 @@ static WRITE32_HANDLER ( rabbit_rombank_w )
 
 static WRITE32_HANDLER( rabbit_audio_w )
 {
-#if VERBOSE_AUDIO_LOG
 	int reg, voice, base, i;
 
+if (VERBOSE_AUDIO_LOG)
+{
 	if (mem_mask == 0xffff0000)
 	{
 		reg = offset*2;
@@ -602,7 +603,7 @@ static WRITE32_HANDLER( rabbit_audio_w )
 			logerror("Unknown write %04x to global reg %d\n", data, reg);
 		}
 	}
-#endif
+}
 }
 
 #define BLITCMDLOG 0

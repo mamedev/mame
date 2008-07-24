@@ -33,7 +33,7 @@ Notes:  Support is complete with the exception of the noise generator.
 #include "sound/samples.h"
 #include "sound/discrete.h"
 
-/* #define BLOCKADE_LOG 1 */
+#define BLOCKADE_LOG 0
 
 /* These are used to simulate coin latch circuitry */
 
@@ -86,9 +86,7 @@ static WRITE8_HANDLER( blockade_coin_latch_w )
 {
     if (data & 0x80)
     {
-    #ifdef BLOCKADE_LOG
-        mame_printf_debug("Reset Coin Latch\n");
-    #endif
+        if (BLOCKADE_LOG) mame_printf_debug("Reset Coin Latch\n");
         if (just_been_reset)
         {
             just_been_reset = 0;
@@ -100,15 +98,11 @@ static WRITE8_HANDLER( blockade_coin_latch_w )
 
     if (data & 0x20)
     {
-    #ifdef BLOCKADE_LOG
-        mame_printf_debug("Pin 19 High\n");
-    #endif
+        if (BLOCKADE_LOG) mame_printf_debug("Pin 19 High\n");
     }
     else
     {
-    #ifdef BLOCKADE_LOG
-        mame_printf_debug("Pin 19 Low\n");
-    #endif
+        if (BLOCKADE_LOG) mame_printf_debug("Pin 19 Low\n");
     }
 
     return;

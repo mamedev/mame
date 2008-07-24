@@ -32,12 +32,7 @@
  *************************************/
 
 #define LOG_FDC_COMMANDS	0
-
-#if LOG_FDC_COMMANDS
-	#define FDC_LOG(x)		mame_printf_debug x
-#else
-	#define FDC_LOG(x)
-#endif
+#define FDC_LOG(x) do { if (LOG_FDC_COMMANDS) mame_printf_debug x; } while(0)
 
 
 enum

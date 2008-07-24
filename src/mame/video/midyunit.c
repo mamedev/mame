@@ -457,7 +457,8 @@ WRITE16_HANDLER( midyunit_dma_w )
 	if (!(command & 0x8000))
 		return;
 
-#if LOG_DMA
+if (LOG_DMA)
+{
 	if (input_code_pressed(KEYCODE_L))
 	{
 		logerror("----\n");
@@ -470,7 +471,7 @@ WRITE16_HANDLER( midyunit_dma_w )
 		logerror("  palette=%04X color=%04X\n",
 				dma_register[DMA_PALETTE], dma_register[DMA_COLOR]);
 	}
-#endif
+}
 
 	profiler_mark(PROFILER_USER1);
 

@@ -174,10 +174,12 @@ static READ16_HANDLER( thunderj_atarivc_r )
        memory (which is what it does if this interrupt test fails -- see the code
        at $1E56 to see!) */
 
-	/* Use these lines to detect when things go south:
+	/* Use these lines to detect when things go south: */
 
-    if (cpu_readmem24bew_word(0x163482) > 0xfff)
-        mame_printf_debug("You're screwed!");*/
+#if 0
+	if (program_read_word(0x163482) > 0xfff)
+		mame_printf_debug("You're screwed!");
+#endif
 
 	return atarivc_r(machine->primary_screen, offset);
 }

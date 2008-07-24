@@ -133,10 +133,8 @@ static FILE *sample[1];
 	#endif
 #endif
 
-/*#define LOG_CYM_FILE*/
-#ifdef LOG_CYM_FILE
-	FILE * cymfile = NULL;
-#endif
+#define LOG_CYM_FILE 0
+static FILE * cymfile = NULL;
 
 
 
@@ -1623,8 +1621,7 @@ static void OPL3WriteReg(OPL3 *chip, int r, int v)
 
 
 
-#ifdef LOG_CYM_FILE
-	if ((cymfile) && ((r&255)!=0) && (r!=255) )
+	if (LOG_CYM_FILE && (cymfile) && ((r&255)!=0) && (r!=255) )
 	{
 		if (r>0xff)
 			fputc( (unsigned char)0xff, cymfile );/*mark writes to second register set*/
@@ -1632,7 +1629,6 @@ static void OPL3WriteReg(OPL3 *chip, int r, int v)
 		fputc( (unsigned char)r&0xff, cymfile );
 		fputc( (unsigned char)v, cymfile );
 	}
-#endif
 
 	if(r&0x100)
 	{
@@ -2240,7 +2236,6 @@ static void OPL3WriteReg(OPL3 *chip, int r, int v)
 	}
 }
 
-#ifdef LOG_CYM_FILE
 static TIMER_CALLBACK( cymfile_callback )
 {
 	if (cymfile)
@@ -2248,7 +2243,6 @@ static TIMER_CALLBACK( cymfile_callback )
 		fputc( (unsigned char)0, cymfile );
 	}
 }
-#endif
 
 /* lock/unlock for common table */
 static int OPL3_LockTable(void)
@@ -2266,13 +2260,14 @@ static int OPL3_LockTable(void)
 		return -1;
 	}
 
-#ifdef LOG_CYM_FILE
-	cymfile = fopen("ymf262_.cym","wb");
-	if (cymfile)
-		timer_pulse ( ATTOTIME_IN_HZ(110), 0, cymfile_callback); /*110 Hz pulse timer*/
-	else
-		logerror("Could not create ymf262_.cym file\n");
-#endif
+	if (LOG_CYM_FILE)
+	{
+		cymfile = fopen("ymf262_.cym","wb");
+		if (cymfile)
+			timer_pulse ( ATTOTIME_IN_HZ(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
+		else
+			logerror("Could not create ymf262_.cym file\n");
+	}
 
 	return 0;
 }
@@ -2287,11 +2282,9 @@ static void OPL3_UnLockTable(void)
 	cur_chip = NULL;
 	OPLCloseTable();
 
-#ifdef LOG_CYM_FILE
-	fclose (cymfile);
+	if (LOG_CYM_FILE)
+		fclose (cymfile);
 	cymfile = NULL;
-#endif
-
 }
 
 static void OPL3ResetChip(OPL3 *chip)

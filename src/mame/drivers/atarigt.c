@@ -286,9 +286,7 @@ static void tmek_update_mode(offs_t offset)
 
 static void tmek_protection_w(offs_t offset, UINT16 data)
 {
-#if LOG_PROTECTION
-	logerror("%06X:Protection W@%06X = %04X\n", activecpu_get_previouspc(), offset, data);
-#endif
+	if (LOG_PROTECTION) logerror("%06X:Protection W@%06X = %04X\n", activecpu_get_previouspc(), offset, data);
 
 	/* track accesses */
 	tmek_update_mode(offset);
@@ -303,9 +301,7 @@ static void tmek_protection_w(offs_t offset, UINT16 data)
 
 static void tmek_protection_r(offs_t offset, UINT16 *data)
 {
-#if LOG_PROTECTION
-	logerror("%06X:Protection R@%06X\n", activecpu_get_previouspc(), offset);
-#endif
+	if (LOG_PROTECTION) logerror("%06X:Protection R@%06X\n", activecpu_get_previouspc(), offset);
 
 	/* track accesses */
 	tmek_update_mode(offset);
@@ -347,21 +343,21 @@ static void primage_update_mode(offs_t offset)
 		/* this is from the code at $20f90 */
 		if (protaddr[1] == 0xdcc7c4 && protaddr[2] == 0xdcc7c4 && protaddr[3] == 0xdc4010)
 		{
-//          logerror("prot:Entering mode 1\n");
+			if (LOG_PROTECTION) logerror("prot:Entering mode 1\n");
 			protmode = 1;
 		}
 
 		/* this is from the code at $27592 */
 		if (protaddr[0] == 0xdcc7ca && protaddr[1] == 0xdcc7ca && protaddr[2] == 0xdcc7c6 && protaddr[3] == 0xdc4022)
 		{
-//          logerror("prot:Entering mode 2\n");
+			if (LOG_PROTECTION) logerror("prot:Entering mode 2\n");
 			protmode = 2;
 		}
 
 		/* this is from the code at $3d8dc */
 		if (protaddr[0] == 0xdcc7c0 && protaddr[1] == 0xdcc7c0 && protaddr[2] == 0xdc80f2 && protaddr[3] == 0xdc7af2)
 		{
-//          logerror("prot:Entering mode 3\n");
+			if (LOG_PROTECTION) logerror("prot:Entering mode 3\n");
 			protmode = 3;
 		}
 	}
@@ -371,8 +367,8 @@ static void primage_update_mode(offs_t offset)
 
 static void primrage_protection_w(offs_t offset, UINT16 data)
 {
-#if LOG_PROTECTION
-{
+	if (LOG_PROTECTION)
+	{
 	UINT32 pc = activecpu_get_previouspc();
 	switch (pc)
 	{
@@ -409,8 +405,7 @@ static void primrage_protection_w(offs_t offset, UINT16 data)
 			logerror("%06X:Unknown protection W@%06X = %04X\n", activecpu_get_previouspc(), offset, data);
 			break;
 	}
-}
-#endif
+	}
 
 /* mask = 0x78fff */
 
@@ -424,7 +419,7 @@ static void primrage_protection_w(offs_t offset, UINT16 data)
 	if (protmode == 2)
 	{
 		int temp = (offset - 0xdc7800) / 2;
-//      logerror("prot:mode 2 param = %04X\n", temp);
+		if (LOG_PROTECTION) logerror("prot:mode 2 param = %04X\n", temp);
 		protresult = temp * 0x6915 + 0x6915;
 	}
 
@@ -432,7 +427,7 @@ static void primrage_protection_w(offs_t offset, UINT16 data)
 	{
 		if (offset == 0xdc4700)
 		{
-//          logerror("prot:Clearing mode 3\n");
+			if (LOG_PROTECTION) logerror("prot:Clearing mode 3\n");
 			protmode = 0;
 		}
 	}
@@ -445,7 +440,7 @@ static void primrage_protection_r(offs_t offset, UINT16 *data)
 	/* track accesses */
 	primage_update_mode(offset);
 
-#if LOG_PROTECTION
+if (LOG_PROTECTION)
 {
 	UINT32 pc = activecpu_get_previouspc();
 	UINT32 p1, p2, a6;
@@ -468,8 +463,8 @@ static void primrage_protection_r(offs_t offset, UINT16 *data)
 			break;
 		case 0x275cc:
 			a6 = activecpu_get_reg(M68K_A6);
-			p1 = (cpu_readmem24bedw_word(a6+8) << 16) | cpu_readmem24bedw_word(a6+10);
-			p2 = (cpu_readmem24bedw_word(a6+12) << 16) | cpu_readmem24bedw_word(a6+14);
+			p1 = (program_read_word(a6+8) << 16) | program_read_word(a6+10);
+			p2 = (program_read_word(a6+12) << 16) | program_read_word(a6+14);
 			logerror("Known Protection @ 275BC(%08X, %08X): R@%06X ", p1, p2, offset);
 			break;
 		case 0x275d2:
@@ -486,7 +481,7 @@ static void primrage_protection_r(offs_t offset, UINT16 *data)
 		/* protection code from 3d8dc - 3d95a */
 		case 0x3d8f4:
 			a6 = activecpu_get_reg(M68K_A6);
-			p1 = (cpu_readmem24bedw_word(a6+12) << 16) | cpu_readmem24bedw_word(a6+14);
+			p1 = (program_read_word(a6+12) << 16) | program_read_word(a6+14);
 			logerror("Known Protection @ 3D8F4(%08X): R@%06X ", p1, offset);
 			break;
 		case 0x3d8fa:
@@ -497,7 +492,7 @@ static void primrage_protection_r(offs_t offset, UINT16 *data)
 		/* protection code from 437fa - 43860 */
 		case 0x43814:
 			a6 = activecpu_get_reg(M68K_A6);
-			p1 = cpu_readmem24bedw(a6+15);
+			p1 = program_read_dword(a6+14) & 0xffffff;
 			logerror("Known Protection @ 43814(%08X): R@%06X ", p1, offset);
 			break;
 		case 0x4381c:
@@ -514,7 +509,6 @@ static void primrage_protection_r(offs_t offset, UINT16 *data)
 			break;
 	}
 }
-#endif
 
 	/* handle specific reads */
 	switch (offset)
@@ -533,7 +527,7 @@ static void primrage_protection_r(offs_t offset, UINT16 *data)
 			{
 				*data = protresult;
 				protmode = 0;
-//              logerror("prot:Clearing mode 2\n");
+			if (LOG_PROTECTION) logerror("prot:Clearing mode 2\n");
 			}
 			break;
 
@@ -541,7 +535,7 @@ static void primrage_protection_r(offs_t offset, UINT16 *data)
 			if (protmode == 1)
 			{
 				protmode = 0;
-//              logerror("prot:Clearing mode 1\n");
+			if (LOG_PROTECTION) logerror("prot:Clearing mode 1\n");
 			}
 			break;
 	}

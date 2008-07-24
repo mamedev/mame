@@ -1295,9 +1295,7 @@ UINT32 jaguargpu_ctrl_r(int cpunum, offs_t offset)
 {
 	UINT32 result;
 
-#if LOG_GPU_IO
-	logerror("%08X/%d:GPU read register @ F021%02X\n", activecpu_get_previouspc(), cpu_getactivecpu(), offset * 4);
-#endif
+	if (LOG_GPU_IO) logerror("%08X/%d:GPU read register @ F021%02X\n", activecpu_get_previouspc(), cpu_getactivecpu(), offset * 4);
 
 	/* switch to the target context */
 	cpuintrf_push_context(cpunum);
@@ -1312,10 +1310,8 @@ void jaguargpu_ctrl_w(int cpunum, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	UINT32 			oldval, newval;
 
-#if LOG_GPU_IO
-	if (offset != G_HIDATA)
+	if (LOG_GPU_IO && offset != G_HIDATA)
 		logerror("%08X/%d:GPU write register @ F021%02X = %08X\n", activecpu_get_previouspc(), cpu_getactivecpu(), offset * 4, data);
-#endif
 
 	/* switch to the target context */
 	cpuintrf_push_context(cpunum);
@@ -1408,10 +1404,8 @@ UINT32 jaguardsp_ctrl_r(int cpunum, offs_t offset)
 {
 	UINT32 result;
 
-#if LOG_DSP_IO
-	if (offset != D_FLAGS)
+	if (LOG_DSP_IO && offset != D_FLAGS)
 		logerror("%08X/%d:DSP read register @ F1A1%02X\n", activecpu_get_previouspc(), cpu_getactivecpu(), offset * 4);
-#endif
 
 	/* switch to the target context */
 	cpuintrf_push_context(cpunum);
@@ -1426,10 +1420,8 @@ void jaguardsp_ctrl_w(int cpunum, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	UINT32 			oldval, newval;
 
-#if LOG_DSP_IO
-	if (offset != D_FLAGS)
+	if (LOG_DSP_IO && offset != D_FLAGS)
 		logerror("%08X/%d:DSP write register @ F1A1%02X = %08X\n", activecpu_get_previouspc(), cpu_getactivecpu(), offset * 4, data);
-#endif
 
 	/* switch to the target context */
 	cpuintrf_push_context(cpunum);

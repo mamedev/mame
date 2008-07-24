@@ -886,7 +886,8 @@ static void tlb_write_common(mips3_state *mips, int tlbindex)
 
 static void tlb_entry_log_half(mips3_tlb_entry *entry, int tlbindex, int which)
 {
-#if PRINTF_TLB
+if (PRINTF_TLB)
+{
 	UINT64 hi = entry->entry_hi;
 	UINT64 lo = entry->entry_lo[which];
 	UINT32 vpn = (((hi >> 13) & 0x07ffffff) << 1);
@@ -903,5 +904,5 @@ static void tlb_entry_log_half(mips3_tlb_entry *entry, int tlbindex, int which)
 	printf("index=%08X  pagesize=%08X  vaddr=%08X%08X  paddr=%08X%08X  asid=%02X  r=%X  c=%X  dvg=%c%c%c\n",
 			tlbindex, pagesize, (UINT32)(vaddr >> 32), (UINT32)vaddr, (UINT32)(paddr >> 32), (UINT32)paddr,
 			asid, r, c, (lo & 4) ? 'd' : '.', (lo & 2) ? 'v' : '.', (lo & 1) ? 'g' : '.');
-#endif
+}
 }

@@ -186,10 +186,8 @@ static FILE *sample[1];
 	#endif
 #endif
 
-/* #define LOG_CYM_FILE */
-#ifdef LOG_CYM_FILE
-	FILE * cymfile = NULL;
-#endif
+#define LOG_CYM_FILE 0
+static FILE * cymfile = NULL;
 
 
 
@@ -1458,13 +1456,11 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v)
 	r &= 0xff;
 	v &= 0xff;
 
-#ifdef LOG_CYM_FILE
-	if ((cymfile) && (r!=0) )
+	if (LOG_CYM_FILE && (cymfile) && (r!=0) )
 	{
 		fputc( (unsigned char)r, cymfile );
 		fputc( (unsigned char)v, cymfile );
 	}
-#endif
 
 
 	switch(r&0xe0)
@@ -1721,7 +1717,6 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v)
 	}
 }
 
-#ifdef LOG_CYM_FILE
 static TIMER_CALLBACK( cymfile_callback )
 {
 	if (cymfile)
@@ -1729,7 +1724,6 @@ static TIMER_CALLBACK( cymfile_callback )
 		fputc( (unsigned char)0, cymfile );
 	}
 }
-#endif
 
 /* lock/unlock for common table */
 static int OPL_LockTable(void)
@@ -1747,13 +1741,14 @@ static int OPL_LockTable(void)
 		return -1;
 	}
 
-#ifdef LOG_CYM_FILE
-	cymfile = fopen("3812_.cym","wb");
-	if (cymfile)
-		timer_pulse ( ATTOTIME_IN_HZ(110), 0, cymfile_callback); /*110 Hz pulse timer*/
-	else
-		logerror("Could not create file 3812_.cym\n");
-#endif
+	if (LOG_CYM_FILE)
+	{
+		cymfile = fopen("3812_.cym","wb");
+		if (cymfile)
+			timer_pulse ( ATTOTIME_IN_HZ(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
+		else
+			logerror("Could not create file 3812_.cym\n");
+	}
 
 	return 0;
 }
@@ -1768,11 +1763,9 @@ static void OPL_UnLockTable(void)
 	cur_chip = NULL;
 	OPLCloseTable();
 
-#ifdef LOG_CYM_FILE
-	fclose (cymfile);
+	if (cymfile)
+		fclose (cymfile);
 	cymfile = NULL;
-#endif
-
 }
 
 static void OPLResetChip(FM_OPL *OPL)

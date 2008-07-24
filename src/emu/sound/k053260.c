@@ -246,9 +246,7 @@ INLINE void check_bounds( struct K053260_chip_def *ic, int channel ) {
 
 		ic->channels[channel].size = ic->rom_size - channel_start;
 	}
-#if LOG
-	logerror("K053260: Sample Start = %06x, Sample End = %06x, Sample rate = %04lx, PPCM = %s\n", channel_start, channel_end, ic->channels[channel].rate, ic->channels[channel].ppcm ? "yes" : "no" );
-#endif
+	if (LOG) logerror("K053260: Sample Start = %06x, Sample End = %06x, Sample rate = %04lx, PPCM = %s\n", channel_start, channel_end, ic->channels[channel].rate, ic->channels[channel].ppcm ? "yes" : "no" );
 }
 
 static void K053260_write( int chip, offs_t offset, UINT8 data )

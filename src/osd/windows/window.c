@@ -183,6 +183,7 @@ static void mtlog_dump(void)
 }
 #else
 void mtlog_add(const char *event) { }
+static void mtlog_dump(void) { }
 #endif
 
 
@@ -286,9 +287,7 @@ static void winwindow_exit(running_machine *machine)
 		PostThreadMessage(window_threadid, WM_USER_SELF_TERMINATE, 0, 0);
 		WaitForSingleObject(window_thread, INFINITE);
 
-#if (LOG_THREADS)
 		mtlog_dump();
-#endif
 	}
 
 	// kill the UI pause event

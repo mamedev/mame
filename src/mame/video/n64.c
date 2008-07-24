@@ -8,9 +8,7 @@
 
 #define LOG_RDP_EXECUTION 		0
 
-#if LOG_RDP_EXECUTION
 static FILE *rdp_exec;
-#endif
 
 static UINT32 rdp_cmd_data[0x1000];
 static int rdp_cmd_ptr = 0;
@@ -262,9 +260,8 @@ while (0)
 
 VIDEO_START(n64)
 {
-#if LOG_RDP_EXECUTION
-	rdp_exec = fopen("rdp_execute.txt", "wt");
-#endif
+	if (LOG_RDP_EXECUTION)
+		rdp_exec = fopen("rdp_execute.txt", "wt");
 
 	texture_cache = auto_malloc(0x100000);
 
@@ -2485,10 +2482,8 @@ INLINE UINT32 READ_RDP_DATA(UINT32 address)
 	}
 }
 
-#if LOG_RDP_EXECUTION
 static const char *const image_format[] = { "RGBA", "YUV", "CI", "IA", "I", "???", "???", "???" };
 static const char *const image_size[] = { "4-bit", "8-bit", "16-bit", "32-bit" };
-#endif
 
 static const int rdp_command_length[64] =
 {
@@ -2558,7 +2553,6 @@ static const int rdp_command_length[64] =
 	8			// 0x3f, Set_Color_Image
 };
 
-#if LOG_RDP_EXECUTION
 static int rdp_dasm(char *buffer)
 {
 	int i;
@@ -2865,7 +2859,6 @@ static int rdp_dasm(char *buffer)
 
 	return rdp_command_length[command];
 }
-#endif
 
 /*****************************************************************************/
 
@@ -3496,14 +3489,13 @@ void rdp_process_list(void)
 			//fatalerror("rdp_process_list: not enough rdp command data: cur = %d, ptr = %d, expected = %d\n", rdp_cmd_cur, rdp_cmd_ptr, rdp_command_length[cmd]);
 		}
 
-#if LOG_RDP_EXECUTION
+		if (LOG_RDP_EXECUTION)
 		{
 			char string[4000];
 			rdp_dasm(string);
 
 			fprintf(rdp_exec, "%08X: %08X %08X   %s\n", dp_start+(rdp_cmd_cur * 4), rdp_cmd_data[rdp_cmd_cur+0], rdp_cmd_data[rdp_cmd_cur+1], string);
 		}
-#endif
 
 		// execute the command
 		rdp_command_table[cmd](rdp_cmd_data[rdp_cmd_cur+0], rdp_cmd_data[rdp_cmd_cur+1]);

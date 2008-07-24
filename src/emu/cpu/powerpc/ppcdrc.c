@@ -3966,11 +3966,12 @@ static int generate_instruction_3f(drcuml_block *block, compiler_state *compiler
 
 static void log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op)
 {
-#if (LOG_UML)
 	char buffer[100];
-	ppc_dasm_one(buffer, pc, op);
-	UML_COMMENT(block, "%08X: %s", pc, buffer);										// comment
-#endif
+	if (LOG_UML)
+	{
+		ppc_dasm_one(buffer, pc, op);
+		UML_COMMENT(block, "%08X: %s", pc, buffer);										// comment
+	}
 }
 
 
@@ -4149,14 +4150,16 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 		char buffer[100];
 
 		/* disassemle the current instruction and output it to the log */
-#if (LOG_UML || LOG_NATIVE)
-		if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
-			strcpy(buffer, "<virtual nop>");
+		if (LOG_UML || LOG_NATIVE)
+		{
+			if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
+				strcpy(buffer, "<virtual nop>");
+			else
+				ppc_dasm_one(buffer, desclist->pc, *desclist->opptr.l);
+		}
 		else
-			ppc_dasm_one(buffer, desclist->pc, *desclist->opptr.l);
-#else
-		strcpy(buffer, "???");
-#endif
+			strcpy(buffer, "???");
+
 		drcuml_log_printf(drcuml, "%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), buffer);
 
 		/* output register states */

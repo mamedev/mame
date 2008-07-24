@@ -794,13 +794,8 @@ static UINT8 bit_xor;
 static struct slapstic_data slapstic;
 
 
-#if LOG_SLAPSTIC
-	static void slapstic_log(offs_t offset);
-	static FILE *slapsticlog;
-#else
-	#define slapstic_log(o)
-#endif
-
+static void slapstic_log(offs_t offset);
+static FILE *slapsticlog;
 
 
 /*************************************
@@ -1123,7 +1118,8 @@ int slapstic_tweak(offs_t offset)
 	}
 
 	/* log this access */
-	slapstic_log(offset);
+	if (LOG_SLAPSTIC)
+		slapstic_log(offset);
 
 	/* return the active bank */
 	return current_bank;
@@ -1137,7 +1133,6 @@ int slapstic_tweak(offs_t offset)
  *
  *************************************/
 
-#if LOG_SLAPSTIC
 static void slapstic_log(offs_t offset)
 {
 	static attotime last_time;
@@ -1192,4 +1187,3 @@ static void slapstic_log(offs_t offset)
 		fflush(slapsticlog);
 	}
 }
-#endif

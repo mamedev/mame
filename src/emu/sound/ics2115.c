@@ -73,7 +73,7 @@ static int caller_get_pc(void)
 	if(pc == 0x14b || pc == 0x26e || pc == 0x284 || pc == 0x28d ||
 	   pc == 0x290 || pc == 0x299 || pc == 0x2a2 || pc == 0x2b3) {
 		int sp = z80_get_reg(Z80_SP);
-		pc = cpu_readmem16(sp)|(cpu_readmem16((UINT16)(sp+1)) << 8);
+		pc = program_read_word(sp)|(program_read_word((UINT16)(sp+1)) << 8);
 	}
 #endif
 

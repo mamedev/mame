@@ -334,9 +334,7 @@ static void bsmt2000_update(void *param, stream_sample_t **inputs, stream_sample
 
 static void bsmt2000_reg_write(bsmt2000_chip *chip, offs_t offset, UINT16 data)
 {
-#if LOG_COMMANDS
-	mame_printf_debug("BSMT write: reg %02X = %04X\n", offset, data);
-#endif
+	if (LOG_COMMANDS) mame_printf_debug("BSMT write: reg %02X = %04X\n", offset, data);
 
 	/* remember the last write */
 	chip->last_register = offset;

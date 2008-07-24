@@ -19,12 +19,7 @@
 #include "v9938.h"
 
 #define VERBOSE 0
-
-#if VERBOSE
-#define LOG(x)	logerror x
-#else
-#define LOG(x)
-#endif
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 typedef struct {
 	/* general */
@@ -2423,7 +2418,6 @@ static UINT8 v9938_vdp_to_cpu (void)
 /*************************************************************/
 static void ReportVdpCommand(register UINT8 Op)
 {
-#if VERBOSE
 	static const char *const Ops[16] =
 	{
 		"SET ","AND ","OR  ","XOR ","NOT ","NOP ","NOP ","NOP ",
@@ -2434,7 +2428,6 @@ static void ReportVdpCommand(register UINT8 Op)
 		" ABRT"," ????"," ????"," ????","POINT"," PSET"," SRCH"," LINE",
 		" LMMV"," LMMM"," LMCM"," LMMC"," HMMV"," HMMM"," YMMM"," HMMC"
 	};
-#endif
 
 	register UINT8 CL, CM, LO;
 	register int SX,SY, DX,DY, NX,NY;

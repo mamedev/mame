@@ -31,4 +31,3 @@ enum {
 };
 
 #define PEEK_OP(pc) cpu_readop(pc)
-#define PEEK_NIBBLE(adr) cpu_readmem_16(adr)

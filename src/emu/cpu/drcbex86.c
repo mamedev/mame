@@ -3077,12 +3077,10 @@ static void fixup_exception(drccodeptr *codeptr, void *param1, void *param2, voi
     logging of hashjmps
 -------------------------------------------------*/
 
-#if LOG_HASHJMPS
 static void debug_log_hashjmp(int mode, offs_t pc)
 {
 	printf("mode=%d PC=%08X\n", mode, pc);
 }
-#endif
 
 
 
@@ -3280,11 +3278,12 @@ static x86code *op_hashjmp(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &modep, PTYPE_MRI, &pcp, PTYPE_MRI, &exp, PTYPE_M);
 
-#if LOG_HASHJMPS
-	emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 4), &pcp);
-	emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 0), &modep);
-	emit_call(&dst, (x86code *)debug_log_hashjmp);
-#endif
+	if (LOG_HASHJMPS)
+	{
+		emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 4), &pcp);
+		emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 0), &modep);
+		emit_call(&dst, (x86code *)debug_log_hashjmp);
+	}
 
 	/* load the stack base one word early so we end up at the right spot after our call below */
 	emit_mov_r32_m32(&dst, REG_ESP, MABS(&drcbe->hashstacksave));						// mov   esp,[hashstacksave]

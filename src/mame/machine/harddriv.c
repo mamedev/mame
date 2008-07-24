@@ -912,8 +912,7 @@ WRITE16_HANDLER( hd68k_adsp_buffer_w )
 
 static TIMER_CALLBACK( deferred_adsp_bank_switch )
 {
-#if LOG_COMMANDS
-	if (m68k_adsp_buffer_bank != param && input_code_pressed(KEYCODE_L))
+	if (LOG_COMMANDS && m68k_adsp_buffer_bank != param && input_code_pressed(KEYCODE_L))
 	{
 		static FILE *commands;
 		if (!commands) commands = fopen("commands.log", "w");
@@ -956,7 +955,7 @@ static TIMER_CALLBACK( deferred_adsp_bank_switch )
 				fprintf(commands, "  %04X\n", *current++);
 		}
 	}
-#endif
+
 	m68k_adsp_buffer_bank = param;
 	logerror("ADSP bank = %d\n", param);
 }

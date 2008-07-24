@@ -312,6 +312,7 @@ static void drcbex64_get_info(drcbe_state *state, drcbe_info *info);
 
 /* private helper functions */
 static void fixup_label(void *parameter, drccodeptr labelcodeptr);
+static void debug_log_hashjmp(int mode, offs_t pc);
 
 
 
@@ -714,9 +715,8 @@ static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, UINT32
 
 	/* get pointers to C functions we need to call */
 	drcbe->debug_cpu_instruction_hook = (x86code *)debug_cpu_instruction_hook;
-#if LOG_HASHJMPS
-	drcbe->debug_log_hashjmp = (x86code *)debug_log_hashjmp;
-#endif
+	if (LOG_HASHJMPS)
+		drcbe->debug_log_hashjmp = (x86code *)debug_log_hashjmp;
 	drcbe->drcmap_get_value = (x86code *)drcmap_get_value;
 
 	/* allocate hash tables */
@@ -2951,12 +2951,10 @@ static void fixup_exception(drccodeptr *codeptr, void *param1, void *param2, voi
     logging of hashjmps
 -------------------------------------------------*/
 
-#if LOG_HASHJMPS
 static void debug_log_hashjmp(int mode, offs_t pc)
 {
 	printf("mode=%d PC=%08X\n", mode, pc);
 }
-#endif
 
 
 
@@ -3155,11 +3153,12 @@ static x86code *op_hashjmp(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 	/* normalize parameters */
 	param_normalize_3(drcbe, inst, &modep, PTYPE_MRI, &pcp, PTYPE_MRI, &exp, PTYPE_M);
 
-#if LOG_HASHJMPS
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &pcp);
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &modep);
-	emit_smart_call_m64(drcbe, &dst, &drcbe->debug_log_hashjmp);
-#endif
+	if (LOG_HASHJMPS)
+	{
+		emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &pcp);
+		emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &modep);
+		emit_smart_call_m64(drcbe, &dst, &drcbe->debug_log_hashjmp);
+	}
 
 	/* load the stack base one word early so we end up at the right spot after our call below */
 	emit_mov_r64_m64(&dst, REG_RSP, MABS(drcbe, &drcbe->hashstacksave));				// mov   rsp,[hashstacksave]

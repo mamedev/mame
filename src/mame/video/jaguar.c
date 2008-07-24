@@ -551,7 +551,7 @@ static void blitter_run(void)
 #endif
 
 
-#if LOG_BLITTER_STATS
+if (LOG_BLITTER_STATS)
 {
 static UINT32 blitter_stats[1000][4];
 static UINT64 blitter_pixels[1000];
@@ -584,7 +584,6 @@ if (++reps % 100 == 99)
 	mame_printf_debug("---\n");
 }
 }
-#endif
 
 	generic_blitter(blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
 	profiler_mark(PROFILER_END);

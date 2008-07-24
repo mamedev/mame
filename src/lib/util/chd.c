@@ -812,9 +812,7 @@ void chd_close(chd_file *chd)
 	if (chd->owns_file && chd->file != NULL)
 		core_fclose(chd->file);
 
-#if PRINTF_MAX_HUNK
-	printf("Max hunk = %d/%d\n", chd->maxhunk, chd->header.totalhunks);
-#endif
+	if (PRINTF_MAX_HUNK) printf("Max hunk = %d/%d\n", chd->maxhunk, chd->header.totalhunks);
 
 	/* free our memory */
 	free(chd);

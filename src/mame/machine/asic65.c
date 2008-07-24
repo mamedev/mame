@@ -185,9 +185,7 @@ static TIMER_CALLBACK( m68k_asic65_deferred_w )
 WRITE16_HANDLER( asic65_data_w )
 {
 	/* logging */
-#if LOG_ASIC
-	if (!asic65_log) asic65_log = fopen("asic65.log", "w");
-#endif
+	if (LOG_ASIC && !asic65_log) asic65_log = fopen("asic65.log", "w");
 
 	/* rom-based use a deferred write mechanism */
 	if (asic65_type == ASIC65_ROMBASED)
@@ -434,9 +432,7 @@ READ16_HANDLER( asic65_r )
 		}
 	}
 
-#if LOG_ASIC
-	if (!asic65_log) asic65_log = fopen("asic65.log", "w");
-#endif
+	if (LOG_ASIC && !asic65_log) asic65_log = fopen("asic65.log", "w");
 	if (asic65_log) fprintf(asic65_log, " (R=%04X)", result);
 
 	return result;

@@ -22,12 +22,9 @@
 		#undef USE_MAME_TIMERS
 	#endif
 #endif
-#ifdef USE_MAME_TIMERS
-	/*#define LOG_CYM_FILE*/
-	#ifdef LOG_CYM_FILE
-		FILE * cymfile = NULL;
-	#endif
-#endif
+
+#define LOG_CYM_FILE 0
+static FILE * cymfile = NULL;
 
 
 /* struct describing a single operator */
@@ -1061,13 +1058,11 @@ void YM2151WriteReg(void *_chip, int r, int v)
 	chip->status |= 0x80;	/* set busy flag for 64 chip clock cycles */
 #endif
 
-#ifdef LOG_CYM_FILE
-	if ((cymfile) && (r!=0) )
+	if (LOG_CYM_FILE && (cymfile) && (r!=0) )
 	{
 		fputc( (unsigned char)r, cymfile );
 		fputc( (unsigned char)v, cymfile );
 	}
-#endif
 
 
 	switch(r & 0xe0){
@@ -1364,13 +1359,11 @@ void YM2151WriteReg(void *_chip, int r, int v)
 }
 
 
-#ifdef LOG_CYM_FILE
 static TIMER_CALLBACK( cymfile_callback )
 {
 	if (cymfile)
 		fputc( (unsigned char)0, cymfile );
 }
-#endif
 
 
 int YM2151ReadStatus( void *_chip )
@@ -1552,13 +1545,14 @@ void * YM2151Init(int index, int clock, int rate)
 	YM2151ResetChip(PSG);
 	/*logerror("YM2151[init] clock=%i sampfreq=%i\n", PSG->clock, PSG->sampfreq);*/
 
-#ifdef LOG_CYM_FILE
-	cymfile = fopen("2151_.cym","wb");
-	if (cymfile)
-		timer_pulse ( ATTOTIME_IN_HZ(110), 0, cymfile_callback); /*110 Hz pulse timer*/
-	else
-		logerror("Could not create file 2151_.cym\n");
-#endif
+	if (LOG_CYM_FILE)
+	{
+		cymfile = fopen("2151_.cym","wb");
+		if (cymfile)
+			timer_pulse ( ATTOTIME_IN_HZ(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
+		else
+			logerror("Could not create file 2151_.cym\n");
+	}
 
 	return PSG;
 }
@@ -1571,10 +1565,9 @@ void YM2151Shutdown(void *_chip)
 
 	free (chip);
 
-#ifdef LOG_CYM_FILE
-	fclose (cymfile);
+	if (cymfile)
+		fclose (cymfile);
 	cymfile = NULL;
-#endif
 
 #ifdef SAVE_SAMPLE
 	fclose(sample[8]);
