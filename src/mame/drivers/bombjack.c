@@ -90,6 +90,9 @@ Stephh's notes (based on the game Z80 code and some tests) :
       * 'bombjack' : "YOU ARE LUCKY"
       * 'bombjac2' : "YOU ARE LUCY"
 
+2008-07
+Dip Locations and factory settings verified with manual
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -139,12 +142,12 @@ static READ8_HANDLER( bombjack_soundlatch_r )
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x97ff) AM_READ(SMH_RAM)	/* including video and color RAM */
-	AM_RANGE(0xb000, 0xb000) AM_READ(input_port_0_r)	/* player 1 input */
-	AM_RANGE(0xb001, 0xb001) AM_READ(input_port_1_r)	/* player 2 input */
-	AM_RANGE(0xb002, 0xb002) AM_READ(input_port_2_r)	/* coin */
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("P1")
+	AM_RANGE(0xb001, 0xb001) AM_READ_PORT("P2")
+	AM_RANGE(0xb002, 0xb002) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb003, 0xb003) AM_READ(SMH_NOP)	/* watchdog reset? */
-	AM_RANGE(0xb004, 0xb004) AM_READ(input_port_3_r)	/* DSW1 */
-	AM_RANGE(0xb005, 0xb005) AM_READ(input_port_4_r)	/* DSW2 */
+	AM_RANGE(0xb004, 0xb004) AM_READ_PORT("DSW1")
+	AM_RANGE(0xb005, 0xb005) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -187,7 +190,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( bombjack )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -197,7 +200,7 @@ static INPUT_PORTS_START( bombjack )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* probably unused */
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
@@ -207,38 +210,39 @@ static INPUT_PORTS_START( bombjack )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* probably unused */
 
-	PORT_START	/* IN2 */
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 
-	PORT_START	/* DSW0 */
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
+	PORT_START_TAG("DSW1")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:!3,!4")
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:!5,!6")
 	PORT_DIPSETTING(    0x30, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START	/* DSW1 */
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Bonus_Life ) )       /* see notes */
+	PORT_START_TAG("DSW2")
+	/* Manual states DSW2 bits 0-2 are unused and have to be left on OFF (0x00) */
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!1,!2,!3")	/* see notes */
 	PORT_DIPSETTING(    0x02, "Every 30k" )
 	PORT_DIPSETTING(    0x01, "Every 100k" )
 	PORT_DIPSETTING(    0x07, "50k, 100k and 300k" )
@@ -247,17 +251,17 @@ static INPUT_PORTS_START( bombjack )
 	PORT_DIPSETTING(    0x06, "100k and 300k" )
 	PORT_DIPSETTING(    0x04, "100k only" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x18, 0x00, "Bird Speed" )
+	PORT_DIPNAME( 0x18, 0x10, "Bird Speed" ) PORT_DIPLOCATION("SW2:!4,!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x60, 0x00, "Enemies Number & Speed" )
+	PORT_DIPNAME( 0x60, 0x40, "Enemies Number & Speed" ) PORT_DIPLOCATION("SW2:!6,!7")
 	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x00, "Special Coin" )
+	PORT_DIPNAME( 0x80, 0x00, "Special Coin" ) PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 INPUT_PORTS_END

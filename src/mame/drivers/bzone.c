@@ -191,7 +191,12 @@
     Left and Center same, right different denomination  | On |Off |    |    |
     Right and Center same, left differnnt denomination  |Off | On |    |    |
     All different denominations                         |Off |Off |    |    |
-                                                    ---------------------
+														---------------------
+
+
+	2008-07
+	Dip locations added from the notes above (factory settings for bzone
+	from the manual).
 
 ***************************************************************************/
 
@@ -314,8 +319,8 @@ static ADDRESS_MAP_START( bzone_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ(bzone_IN0_r)    /* IN0 */
-	AM_RANGE(0x0a00, 0x0a00) AM_READ(input_port_1_r)	/* DSW1 */
-	AM_RANGE(0x0c00, 0x0c00) AM_READ(input_port_2_r)	/* DSW2 */
+	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW0")
+	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(bzone_coin_counter_w)
 	AM_RANGE(0x1200, 0x1200) AM_WRITE(avgdvg_go_w)
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
@@ -334,18 +339,18 @@ static ADDRESS_MAP_START( redbaron_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ(bzone_IN0_r)    /* IN0 */
-	AM_RANGE(0x0a00, 0x0a00) AM_READ(input_port_1_r)	/* DSW1 */
-	AM_RANGE(0x0c00, 0x0c00) AM_READ(input_port_2_r)	/* DSW2 */
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(SMH_NOP)			/* coin out */
+	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW0")
+	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("DSW1")
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(SMH_NOP)		/* coin out */
 	AM_RANGE(0x1200, 0x1200) AM_WRITE(avgdvg_go_w)
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1600, 0x1600) AM_WRITE(avgdvg_reset_w)
 	AM_RANGE(0x1800, 0x1800) AM_READ(mb_status_r)
-	AM_RANGE(0x1802, 0x1802) AM_READ(input_port_4_r)	/* IN4 */
+	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN4")
 	AM_RANGE(0x1804, 0x1804) AM_READ(mb_lo_r)
 	AM_RANGE(0x1806, 0x1806) AM_READ(mb_hi_r)
 	AM_RANGE(0x1808, 0x1808) AM_WRITE(redbaron_sounds_w)	/* and select joystick pot also */
-	AM_RANGE(0x180a, 0x180a) AM_WRITE(SMH_NOP)			/* sound reset, yet todo */
+	AM_RANGE(0x180a, 0x180a) AM_WRITE(SMH_NOP)				/* sound reset, yet todo */
 	AM_RANGE(0x180c, 0x180c) AM_WRITE(atari_vg_earom_ctrl_w)
 	AM_RANGE(0x1810, 0x181f) AM_READWRITE(pokey1_r, pokey1_w)
 	AM_RANGE(0x1820, 0x185f) AM_READWRITE(atari_vg_earom_r, atari_vg_earom_w)
@@ -380,53 +385,53 @@ ADDRESS_MAP_END
 
 #define BZONEDSW0\
 	PORT_START_TAG("DSW0")\
-	PORT_DIPNAME(0x03, 0x01, DEF_STR( Lives ) )\
-	PORT_DIPSETTING (  0x00, "2" )\
-	PORT_DIPSETTING (  0x01, "3" )\
-	PORT_DIPSETTING (  0x02, "4" )\
-	PORT_DIPSETTING (  0x03, "5" )\
-	PORT_DIPNAME(0x0c, 0x04, "Missile appears at" )\
-	PORT_DIPSETTING (  0x00, "5000" )\
-	PORT_DIPSETTING (  0x04, "10000" )\
-	PORT_DIPSETTING (  0x08, "20000" )\
-	PORT_DIPSETTING (  0x0c, "30000" )\
-	PORT_DIPNAME(0x30, 0x10, DEF_STR( Bonus_Life ) )\
-	PORT_DIPSETTING (  0x10, "15k and 100k" )\
-	PORT_DIPSETTING (  0x20, "20k and 100k" )\
-	PORT_DIPSETTING (  0x30, "50k and 100k" )\
-	PORT_DIPSETTING (  0x00, DEF_STR( None ) )\
-	PORT_DIPNAME(0xc0, 0x00, DEF_STR( Language ) )\
-	PORT_DIPSETTING (  0x00, DEF_STR( English ))\
-	PORT_DIPSETTING (  0x40, DEF_STR( German ))\
-	PORT_DIPSETTING (  0x80, DEF_STR( French ))\
-  	PORT_DIPSETTING (  0xc0, DEF_STR( Spanish ))
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("M10:1,2")\
+	PORT_DIPSETTING(	0x00, "2" )\
+	PORT_DIPSETTING(	0x01, "3" )\
+	PORT_DIPSETTING(	0x02, "4" )\
+	PORT_DIPSETTING(	0x03, "5" )\
+	PORT_DIPNAME( 0x0c, 0x04, "Missile appears at" ) PORT_DIPLOCATION("M10:3,4")\
+	PORT_DIPSETTING(	0x00, "5000" )\
+	PORT_DIPSETTING(	0x04, "10000" )\
+	PORT_DIPSETTING(	0x08, "20000" )\
+	PORT_DIPSETTING(	0x0c, "30000" )\
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("M10:5,6")\
+	PORT_DIPSETTING(	0x10, "15k and 100k" )\
+	PORT_DIPSETTING(	0x20, "20k and 100k" )\
+	PORT_DIPSETTING(	0x30, "50k and 100k" )\
+	PORT_DIPSETTING(	0x00, DEF_STR( None ) )\
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("M10:7,8")\
+	PORT_DIPSETTING(	0x00, DEF_STR( English ))\
+	PORT_DIPSETTING(	0x40, DEF_STR( German ))\
+	PORT_DIPSETTING(	0x80, DEF_STR( French ))\
+  	PORT_DIPSETTING(	0xc0, DEF_STR( Spanish ))
 
 #define BZONEDSW1\
 	PORT_START_TAG("DSW1")\
-	PORT_DIPNAME(0x03, 0x02, DEF_STR( Coinage ) )\
-	PORT_DIPSETTING (  0x03, DEF_STR( 2C_1C ) )\
-	PORT_DIPSETTING (  0x02, DEF_STR( 1C_1C ) )\
-	PORT_DIPSETTING (  0x01, DEF_STR( 1C_2C ) )\
-	PORT_DIPSETTING (  0x00, DEF_STR( Free_Play ) )\
-	PORT_DIPNAME(0x0c, 0x00, DEF_STR( Coin_B ) )\
-	PORT_DIPSETTING (  0x00, "*1" )\
-	PORT_DIPSETTING (  0x04, "*4" )\
-	PORT_DIPSETTING (  0x08, "*5" )\
-	PORT_DIPSETTING (  0x0c, "*6" )\
-	PORT_DIPNAME(0x10, 0x00, DEF_STR( Coin_A ) )\
-	PORT_DIPSETTING (  0x00, "*1" )\
-	PORT_DIPSETTING (  0x10, "*2" )\
-	PORT_DIPNAME(0xe0, 0x00, "Bonus Coins" )\
-	PORT_DIPSETTING (  0x00, DEF_STR( None ) )\
-	PORT_DIPSETTING (  0x20, "3 credits/2 coins" )\
-	PORT_DIPSETTING (  0x40, "5 credits/4 coins" )\
-	PORT_DIPSETTING (  0x60, "6 credits/4 coins" )\
-  	PORT_DIPSETTING (  0x80, "6 credits/5 coins" )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("P10:1,2")\
+	PORT_DIPSETTING(	0x03, DEF_STR( 2C_1C ) )\
+	PORT_DIPSETTING(	0x02, DEF_STR( 1C_1C ) )\
+	PORT_DIPSETTING(	0x01, DEF_STR( 1C_2C ) )\
+	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )\
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("P10:3,4")\
+	PORT_DIPSETTING(	0x00, "*1" )\
+	PORT_DIPSETTING(	0x04, "*4" )\
+	PORT_DIPSETTING(	0x08, "*5" )\
+	PORT_DIPSETTING(	0x0c, "*6" )\
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("P10:5")\
+	PORT_DIPSETTING(	0x00, "*1" )\
+	PORT_DIPSETTING(	0x10, "*2" )\
+	PORT_DIPNAME( 0xe0, 0x00, "Bonus Coins" ) PORT_DIPLOCATION("P10:6,7,8")\
+	PORT_DIPSETTING(	0x00, DEF_STR( None ) )\
+	PORT_DIPSETTING(	0x20, "3 credits/2 coins" )\
+	PORT_DIPSETTING(	0x40, "5 credits/4 coins" )\
+	PORT_DIPSETTING(	0x60, "6 credits/4 coins" )\
+  	PORT_DIPSETTING(	0x80, "6 credits/5 coins" )
 
 static INPUT_PORTS_START( bzone )
-BZONEIN0
-BZONEDSW0
-BZONEDSW1
+	BZONEIN0
+	BZONEDSW0
+	BZONEDSW1
 
 	PORT_START_TAG("IN3")
   	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_2WAY
@@ -441,34 +446,35 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( redbaron )
-BZONEIN0
+	BZONEIN0
+
 	PORT_START_TAG("DSW0")
 	/* See the table above if you are really interested */
-	PORT_DIPNAME(0xff, 0xfd, DEF_STR( Coinage ) )
-	PORT_DIPSETTING (  0xfd, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0xff, 0xfd, DEF_STR( Coinage ) ) PORT_DIPLOCATION("M10:1,2,3,4,5,6,7,8")
+	PORT_DIPSETTING(	0xfd, DEF_STR( Normal ) )
 
 	PORT_START_TAG("DSW1")
-	PORT_DIPNAME(0x03, 0x03, DEF_STR( Language ) )
-	PORT_DIPSETTING (  0x00, DEF_STR( German ) )
-	PORT_DIPSETTING (  0x01, DEF_STR( French ) )
-	PORT_DIPSETTING (  0x02, DEF_STR( Spanish ) )
-	PORT_DIPSETTING (  0x03, DEF_STR( English ) )
-	PORT_DIPNAME(0x0c, 0x04, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING (  0x0c, "2k 10k 30k" )
-	PORT_DIPSETTING (  0x08, "4k 15k 40k" )
-	PORT_DIPSETTING (  0x04, "6k 20k 50k" )
-	PORT_DIPSETTING (  0x00, DEF_STR( None ) )
-	PORT_DIPNAME(0x30, 0x20, DEF_STR( Lives ) )
-	PORT_DIPSETTING (  0x30, "2" )
-	PORT_DIPSETTING (  0x20, "3" )
-	PORT_DIPSETTING (  0x10, "4" )
-	PORT_DIPSETTING (  0x00, "5" )
-	PORT_DIPNAME(0x40, 0x40, "One Play Minimum" )
-	PORT_DIPSETTING (  0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING (  0x00, DEF_STR( On ) )
-	PORT_DIPNAME(0x80, 0x80, "Self Adjust Diff" )
-	PORT_DIPSETTING (  0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING (  0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Language ) ) PORT_DIPLOCATION("P10:1,2")
+	PORT_DIPSETTING(	0x00, DEF_STR( German ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( French ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( Spanish ) )
+	PORT_DIPSETTING(	0x03, DEF_STR( English ) )
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("P10:3,4")
+	PORT_DIPSETTING(	0x0c, "2k 10k 30k" )
+	PORT_DIPSETTING(	0x08, "4k 15k 40k" )
+	PORT_DIPSETTING(	0x04, "6k 20k 50k" )
+	PORT_DIPSETTING(	0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x30, 0x20, DEF_STR( Lives ) ) PORT_DIPLOCATION("P10:5,6")
+	PORT_DIPSETTING(	0x30, "2" )
+	PORT_DIPSETTING(	0x20, "3" )
+	PORT_DIPSETTING(	0x10, "4" )
+	PORT_DIPSETTING(	0x00, "5" )
+	PORT_DIPNAME( 0x40, 0x40, "One Play Minimum" ) PORT_DIPLOCATION("P10:7")
+	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Self Adjust Diff" ) PORT_DIPLOCATION("P10:8")
+	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
 	/* IN3 - the real machine reads either the X or Y axis from this port */
 	/* Instead, we use the two fake 5 & 6 ports and bank-switch the proper */
@@ -495,9 +501,9 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( bradley )
-BZONEIN0
-BZONEDSW0
-BZONEDSW1
+	BZONEIN0
+	BZONEDSW0
+	BZONEDSW1
 
 	PORT_START_TAG("IN3")
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )

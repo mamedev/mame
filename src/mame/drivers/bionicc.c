@@ -97,13 +97,13 @@ logerror("%06x: hacked_controls_r %04x %04x\n",activecpu_get_pc(),offset,bionicc
 
 static WRITE16_HANDLER( bionicc_mpu_trigger_w )
 {
-	data = input_port_read(machine, "IN0") >> 12;
+	data = input_port_read(machine, "SYSTEM") >> 12;
 	bionicc_inp[0] = data ^ 0x0f;
 
-	data = input_port_read(machine, "IN2");		/* player 2 controls */
+	data = input_port_read(machine, "P2");
 	bionicc_inp[1] = data ^ 0xff;
 
-	data = input_port_read(machine, "IN1");		/* player 1 controls */
+	data = input_port_read(machine, "P1");
 	bionicc_inp[2] = data ^ 0xff;
 }
 
@@ -150,8 +150,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xfe0d00, 0xfe3fff) AM_RAM              /* RAM? */
 	AM_RANGE(0xfe4000, 0xfe4001) AM_WRITE(bionicc_gfxctrl_w)	/* + coin counters */
-	AM_RANGE(0xfe4000, 0xfe4001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0xfe4002, 0xfe4003) AM_READ(input_port_1_word_r)
+	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("DSW")
 	AM_RANGE(0xfe8010, 0xfe8017) AM_WRITE(bionicc_scroll_w)
 	AM_RANGE(0xfe801a, 0xfe801b) AM_WRITE(bionicc_mpu_trigger_w)	/* ??? not sure, but looks like it */
 	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(bionicc_txvideoram_w) AM_BASE(&bionicc_txvideoram)
@@ -175,7 +175,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( bionicc )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START1 )
@@ -227,7 +227,7 @@ static INPUT_PORTS_START( bionicc )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -237,7 +237,7 @@ static INPUT_PORTS_START( bionicc )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL

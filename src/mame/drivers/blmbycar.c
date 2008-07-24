@@ -76,7 +76,7 @@ static UINT8 pot_wheel = 0;
 static WRITE16_HANDLER( blmbycar_pot_wheel_reset_w )
 {
 	if (ACCESSING_BITS_0_7)
-		pot_wheel = ~input_port_read(machine, "IN1") & 0xff;
+		pot_wheel = ~input_port_read(machine, "WHEEL") & 0xff;
 }
 
 static WRITE16_HANDLER( blmbycar_pot_wheel_shift_w )
@@ -101,7 +101,7 @@ static READ16_HANDLER( blmbycar_pot_wheel_r )
 
 static READ16_HANDLER( blmbycar_opt_wheel_r )
 {
-	return	(~input_port_read(machine, "IN1") & 0xff) << 8;
+	return	(~input_port_read(machine, "WHEEL") & 0xff) << 8;
 }
 
 
@@ -124,10 +124,10 @@ static ADDRESS_MAP_START( blmbycar_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x106000, 0x107fff) AM_READ(SMH_RAM					)	// Layer 0
 	AM_RANGE(0x440000, 0x441fff) AM_READ(SMH_RAM					)	//
 	AM_RANGE(0x444000, 0x445fff) AM_READ(SMH_RAM					)	// Sprites (size?)
-	AM_RANGE(0x700000, 0x700001) AM_READ(input_port_0_word_r		)	// 2 x DSW0
-	AM_RANGE(0x700002, 0x700003) AM_READ(input_port_1_word_r		)	// Joystick + Buttons
+	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
+	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x700004, 0x700005) AM_READ(blmbycar_opt_wheel_r		)	// Wheel (optical)
-	AM_RANGE(0x700006, 0x700007) AM_READ(input_port_3_word_r		)	//
+	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("UNK")
 	AM_RANGE(0x700008, 0x700009) AM_READ(blmbycar_pot_wheel_r		)	// Wheel (potentiometer)
 	AM_RANGE(0x70000e, 0x70000f) AM_READ(OKIM6295_status_0_lsb_r	)	// Sound
 ADDRESS_MAP_END
@@ -174,8 +174,8 @@ static ADDRESS_MAP_START( watrball_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x106000, 0x107fff) AM_READ(SMH_RAM					)	// Layer 0
 	AM_RANGE(0x440000, 0x441fff) AM_READ(SMH_RAM					)	//
 	AM_RANGE(0x444000, 0x445fff) AM_READ(SMH_RAM					)	// Sprites (size?)
-	AM_RANGE(0x700000, 0x700001) AM_READ(input_port_0_word_r		)
-	AM_RANGE(0x700002, 0x700003) AM_READ(input_port_1_word_r		)
+	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
+	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x700006, 0x700007) AM_READ(SMH_NOP	            	)   // read
 	AM_RANGE(0x700008, 0x700009) AM_READ(waterball_unk_r	     	)   // 0x0008 must toggle
 	AM_RANGE(0x70000e, 0x70000f) AM_READ(OKIM6295_status_0_lsb_r	)	// Sound
@@ -258,7 +258,7 @@ static INPUT_PORTS_START( blmbycar )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START_TAG("IN0")	// IN1 - $700002.w
+	PORT_START_TAG("P1_P2")	// IN1 - $700002.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
@@ -277,10 +277,10 @@ static INPUT_PORTS_START( blmbycar )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1  )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2  )
 
-	PORT_START_TAG("IN1")	// IN2 - $700004.w
+	PORT_START_TAG("WHEEL")	// IN2 - $700004.w
 	PORT_BIT ( 0x00ff, 0x0080, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(1)
 
-	PORT_START_TAG("IN2")	// IN3 - $700006.w
+	PORT_START_TAG("UNK")	// IN3 - $700006.w
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 INPUT_PORTS_END
@@ -325,7 +325,7 @@ static INPUT_PORTS_START( watrball )
 	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:2" )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:1" )
 
-	PORT_START_TAG("IN0")	/* 16bit */
+	PORT_START_TAG("P1_P2")	/* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)

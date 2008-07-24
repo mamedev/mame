@@ -69,11 +69,11 @@ static ADDRESS_MAP_START( bigstrkb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1f8000, 0x1f87ff) AM_RAM AM_BASE(&bigstrkb_spriteram)
 	AM_RANGE(0x1f8800, 0x1fffff) AM_RAM
 
-	AM_RANGE(0x700000, 0x700001) AM_READ(input_port_0_word_r) /* Dip 1 */
-	AM_RANGE(0x700002, 0x700003) AM_READ(input_port_1_word_r) /* Dip 2 */
-	AM_RANGE(0x700004, 0x700005) AM_READ(input_port_2_word_r) /* System */
-	AM_RANGE(0x70000a, 0x70000b) AM_READ(input_port_4_word_r) /* Player 1 */
-	AM_RANGE(0x70000c, 0x70000d) AM_READ(input_port_3_word_r) /* Player 2 */
+	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW0")
+	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
+	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("P2")
+	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("P1")
 	AM_RANGE(0x700020, 0x700027) AM_WRITEONLY AM_BASE(&bsb_vidreg1)
 	AM_RANGE(0x700030, 0x700037) AM_WRITEONLY AM_BASE(&bsb_vidreg2)
 
@@ -99,7 +99,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, start )
 
 static INPUT_PORTS_START( bigstrkb )
-	PORT_START	/* DSW0 (0x700000.w) */
+	PORT_START_TAG("DSW0")	/* DSW0 (0x700000.w) */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
@@ -127,7 +127,7 @@ static INPUT_PORTS_START( bigstrkb )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )	// also set "Coin A" to "Free Play"
 	/* 0x10 to 0x50 gives 2C_3C */
 
-	PORT_START	/* DSW1 (0x700002.w) */
+	PORT_START_TAG("DSW1")	/* DSW1 (0x700002.w) */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )	// Check code at 0x00097c (flip screen)
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -149,7 +149,7 @@ static INPUT_PORTS_START( bigstrkb )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	/* System inputs (0x700004.w) */
+	PORT_START_TAG("SYSTEM")	/* System inputs (0x700004.w) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -159,10 +159,10 @@ static INPUT_PORTS_START( bigstrkb )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* Player 1 controls (0x70000c.w) */
+	PORT_START_TAG("P1")	/* Player 1 controls (0x70000c.w) */
 	BIGSTRKB_PLAYER_INPUT( 1, IPT_START1 )
 
-	PORT_START	/* Player 2 controls (0x70000a.w) */
+	PORT_START_TAG("P2")	/* Player 2 controls (0x70000a.w) */
 	BIGSTRKB_PLAYER_INPUT( 2, IPT_START2 )
 INPUT_PORTS_END
 

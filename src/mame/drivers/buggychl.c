@@ -74,6 +74,8 @@ db00 - dbff /ScrollRQ (S37)
 
 dcxx = /SPOSI (S36)
 
+2008-07
+Dip locations and factory settings verified from dip listing
 
 ***************************************************************************/
 
@@ -129,22 +131,22 @@ static WRITE8_HANDLER( sound_enable_w )
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM) /* A22-04 (23) */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_ROM) /* A22-05 (22) */
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM) /* 6116 SRAM (36) */
-	AM_RANGE(0x8800, 0x8fff) AM_READ(SMH_RAM) /* 6116 SRAM (35) */
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)		/* A22-04 (23) */
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_ROM)		/* A22-05 (22) */
+	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)		/* 6116 SRAM (36) */
+	AM_RANGE(0x8800, 0x8fff) AM_READ(SMH_RAM)		/* 6116 SRAM (35) */
 	AM_RANGE(0xa000, 0xbfff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xc800, 0xcfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xd400, 0xd400) AM_READ(buggychl_mcu_r)
 	AM_RANGE(0xd401, 0xd401) AM_READ(buggychl_mcu_status_r)
-	AM_RANGE(0xd600, 0xd600) AM_READ(input_port_0_r)	/* dsw */
-	AM_RANGE(0xd601, 0xd601) AM_READ(input_port_1_r)	/* dsw */
-	AM_RANGE(0xd602, 0xd602) AM_READ(input_port_2_r)	/* dsw */
-	AM_RANGE(0xd603, 0xd603) AM_READ(input_port_3_r)	/* player inputs */
-	AM_RANGE(0xd608, 0xd608) AM_READ(input_port_4_r)	/* wheel */
-	AM_RANGE(0xd609, 0xd609) AM_READ(input_port_5_r)	/* coin + accelerator */
-//  { 0xd60a, 0xd60a, other inputs, not used?
-//  { 0xd60b, 0xd60b, other inputs, not used?
+	AM_RANGE(0xd600, 0xd600) AM_READ_PORT("DSW1")
+	AM_RANGE(0xd601, 0xd601) AM_READ_PORT("DSW2")
+	AM_RANGE(0xd602, 0xd602) AM_READ_PORT("DSW3")
+	AM_RANGE(0xd603, 0xd603) AM_READ_PORT("IN0")	/* player inputs */
+	AM_RANGE(0xd608, 0xd608) AM_READ_PORT("WHEEL")
+	AM_RANGE(0xd609, 0xd609) AM_READ_PORT("IN1")	/* coin + accelerator */
+//	AM_RANGE(0xd60a, 0xd60a) // other inputs, not used? 
+//	AM_RANGE(0xd60b, 0xd60b) // other inputs, not used?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -155,18 +157,18 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(buggychl_sprite_lookup_w)
 	AM_RANGE(0xa000, 0xbfff) AM_WRITE(buggychl_chargen_w) AM_BASE(&buggychl_character_ram)
 	AM_RANGE(0xc800, 0xcfff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-//  { 0xd000, 0xd000, horizon
+//	AM_RANGE(0xd000, 0xd000) // horizon
 	AM_RANGE(0xd100, 0xd100) AM_WRITE(buggychl_ctrl_w)
 	AM_RANGE(0xd200, 0xd200) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xd300, 0xd300) AM_WRITE(watchdog_reset_w)
-//  { 0xd301, 0xd301,
-//  { 0xd302, 0xd302, reset mcu
+//	AM_RANGE(0xd301, 0xd301)
+//	AM_RANGE(0xd302, 0xd302) // reset mcu
 	AM_RANGE(0xd303, 0xd303) AM_WRITE(buggychl_sprite_lookup_bank_w)
-//  { 0xd304, 0xd307, sccon 1-4
+//	AM_RANGE(0xd304, 0xd307) // sccon 1-4
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(buggychl_mcu_w)
 	AM_RANGE(0xd500, 0xd57f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd610, 0xd610) AM_WRITE(sound_command_w)
-//  { 0xd613, 0xd613, reset sound cpu & sound chips
+//	AM_RANGE(0xd613, 0xd613) // reset sound cpu & sound chips
 	AM_RANGE(0xd618, 0xd618) AM_WRITE(SMH_NOP)	/* accelerator clear */
 	AM_RANGE(0xd700, 0xd7ff) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_be_w) AM_BASE(&paletteram)
 	AM_RANGE(0xd840, 0xd85f) AM_WRITE(SMH_RAM) AM_BASE(&buggychl_scrollv)
@@ -179,7 +181,7 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x47ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)
-//  AM_RANGE(0x5001, 0x5001) AM_READ(SMH_RAM)  /* is command pending? */
+//  AM_RANGE(0x5001, 0x5001) AM_READ(SMH_RAM)	/* is command pending? */
 	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_ROM)	/* space for diagnostics ROM */
 ADDRESS_MAP_END
 
@@ -193,7 +195,7 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4810, 0x481d) AM_WRITE(MSM5232_0_w)
 	AM_RANGE(0x4820, 0x4820) AM_WRITE(SMH_RAM)	/* VOL/BAL   for the 7630 on the MSM5232 output */
 	AM_RANGE(0x4830, 0x4830) AM_WRITE(SMH_RAM)	/* TRBL/BASS for the 7630 on the MSM5232 output  */
-//  AM_RANGE(0x5000, 0x5000) AM_WRITE(SMH_RAM) /* to main cpu */
+//  AM_RANGE(0x5000, 0x5000) AM_WRITE(SMH_RAM)	/* to main cpu */
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0x5003, 0x5003) AM_WRITE(sound_enable_w)
@@ -224,28 +226,28 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( buggychl )
-	PORT_START_TAG("IN0")
-	PORT_DIPNAME( 0x03, 0x03, "Game Over Bonus" )	// Arks/Flags/Fuel
+	PORT_START_TAG("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, "Game Over Bonus" ) PORT_DIPLOCATION("SW1:1,2")	/* Arks/Flags/Fuel */
 	PORT_DIPSETTING(    0x03, "2000/1000/50" )
 	PORT_DIPSETTING(    0x02, "1000/500/30" )
 	PORT_DIPSETTING(    0x01, "500/200/10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )			// 1300 units of fuel
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )		// 1200 units of fuel
-	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )			// 1100 units of fuel
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )		// 1000 units of fuel
-	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )			/* 1300 units of fuel */
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )		/* 1200 units of fuel */
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )			/* 1100 units of fuel */
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )		/* 1000 units of fuel */
+	PORT_SERVICE_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW1:6" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )		/* Only listed as OFF in the manual */
 
-	PORT_START_TAG("IN1")
-	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
+	PORT_START_TAG("DSW2")
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:1,2,3,4")
 	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 7C_1C ) )
@@ -262,7 +264,7 @@ static INPUT_PORTS_START( buggychl )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ) )
-	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW2:5,6,7,8")
 	PORT_DIPSETTING(    0xf0, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 7C_1C ) )
@@ -280,47 +282,47 @@ static INPUT_PORTS_START( buggychl )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
-	PORT_START_TAG("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "Start button needed" )
+	PORT_START_TAG("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "Start button needed" ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x04, 0x04, "Fuel loss (Cheat)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )		/* Only listed as OFF in the manual */
+	PORT_DIPNAME( 0x04, 0x04, "Fuel loss (Cheat)") PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Crash only" )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x10, 0x10, "Coinage Display" )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )		/* Only listed as OFF in the manual */
+	PORT_DIPNAME( 0x10, 0x10, "Coinage Display" ) PORT_DIPLOCATION("SW3:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, "Year Display" )
+	PORT_DIPNAME( 0x20, 0x20, "Year Display" ) PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")
+	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)") PORT_DIPLOCATION("SW3:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Coin Slots" )
+	PORT_DIPNAME( 0x80, 0x80, "Coin Slots" ) PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x80, "2" )
 
-	PORT_START_TAG("IN3")
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 )	/* shift */
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Test Button") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Test Button") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN4") /* wheel */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_REVERSE
-
-	PORT_START_TAG("IN5")
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_BUTTON1 )	/* accelerator */
+
+	PORT_START_TAG("WHEEL") /* wheel */
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_REVERSE
 INPUT_PORTS_END
 
 

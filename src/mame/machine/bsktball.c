@@ -147,9 +147,6 @@ READ8_HANDLER( bsktball_in0_r )
 	else
 	{
 		temp = input_port_read(machine, "IN0") & 0x0F;
-		/* Remap button 1 back to the Start button */
-		/* NOTE:  This is an ADDED feature, not a part of the original hardware! */
-		temp = (temp) & (temp>>2);
 
 		return (temp | DR0 | DR1 | DR2 | DR3);
 	}

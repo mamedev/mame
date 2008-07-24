@@ -228,7 +228,7 @@ static READ16_HANDLER( bishjan_input_r )
 			res = input_port_read(machine, port[i]);
 
 	return	(res << 8) |
-			input_port_read(machine, "IN0") |
+			input_port_read(machine, "SYSTEM") |
 			((bishjan_hopper && !(video_screen_get_frame_number(machine->primary_screen)%10)) ? 0x00 : 0x04)	// bit 2: hopper sensor
 	;
 }
@@ -289,11 +289,11 @@ static ADDRESS_MAP_START( bishjan_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE( 0xa00020, 0xa00025 ) AM_WRITE( SMH_RAM ) AM_BASE( &bishjan_scroll )
 
-	AM_RANGE( 0xc00000, 0xc00001 ) AM_READ( input_port_1_word_r )	// c00001 sw1
-	AM_RANGE( 0xc00002, 0xc00003 ) AM_READWRITE( input_port_2_word_r, bishjan_input_w )	// in c
+	AM_RANGE( 0xc00000, 0xc00001 ) AM_READ_PORT("DSW")	// c00001 sw1
+	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ_PORT("JOY") AM_WRITE( bishjan_input_w )	// in c
 	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ( bishjan_input_r )	// in a & b
 	AM_RANGE( 0xc00006, 0xc00007 ) AM_READ( bishjan_unk_r )		// c00006 in d ($18)
-	AM_RANGE( 0xc00008, 0xc00009 ) AM_READWRITE( input_port_0_word_r, bishjan_coin_w )	// c00009 reset
+	AM_RANGE( 0xc00008, 0xc00009 ) AM_READ_PORT("RESET") AM_WRITE( bishjan_coin_w )	// c00009 reset
 ADDRESS_MAP_END
 
 
@@ -352,16 +352,16 @@ static INPUT_PORTS_START( bishjan )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START_TAG("JOY")		/* IN2 - C */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1			)	// start (joy)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1			) PORT_NAME("1 Player Start (Joy Mode)")	// start (joy)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	)	// down (joy)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	)	// left (joy)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	)	// right (joy)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1		)	// n (joy)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_BET	)	// bet (joy)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_MAHJONG_BET	) PORT_NAME("P1 Mahjong Bet (Joy Mode)")	// bet (joy)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2		)	// select (joy)
 
-	PORT_START_TAG("IN0")		/* IN3 - A */
+	PORT_START_TAG("SYSTEM")		/* IN3 - A */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN		)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE		)	// test
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH,IPT_SPECIAL		)	// hopper sensor

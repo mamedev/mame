@@ -13,11 +13,13 @@
 ****************************************************************************
 
     Note:  The original hardware uses the Player 1 and Player 2 Start buttons
-    as the Jump/Shoot buttons.  I've taken button 1 and mapped it to the Start
-    buttons to keep people from getting confused.
-
+    as the Jump/Shoot buttons. 
+	
     If you have any questions about how this driver works, don't hesitate to
     ask.  - Mike Balfour (mab22@po.cwru.edu)
+	
+	2008-07
+	Dip locations verified with manual
 
 ***************************************************************************/
 
@@ -103,39 +105,40 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( bsktball )
 	PORT_START_TAG("TRACK0_X")
-	PORT_BIT( 0xFF, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) /* Sensitivity, clip, min, max */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) /* Sensitivity, clip, min, max */
 
 	PORT_START_TAG("TRACK0_Y")
-	PORT_BIT( 0xFF, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
 	PORT_START_TAG("TRACK1_X")
-	PORT_BIT( 0xFF, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) /* Sensitivity, clip, min, max */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) /* Sensitivity, clip, min, max */
 
 	PORT_START_TAG("TRACK1_Y")
-	PORT_BIT( 0xFF, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
 	PORT_START_TAG("IN0")
-	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* SPARE */
-	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* SPARE */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
+	/* 0x04 - SPARE */
+	/* 0x08 - SPARE */
 	/* 0x10 - DR0 = PL2 H DIR */
 	/* 0x20 - DR1 = PL2 V DIR */
 	/* 0x40 - DR2 = PL1 H DIR */
 	/* 0x80 - DR3 = PL1 V DIR */
 
 	PORT_START_TAG("IN1")
-	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
-	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* SPARE */
-	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* TEST STEP */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* SPARE */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* TEST STEP */
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
-	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* COIN 0 */
-	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) /* COIN 1 */
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) /* COIN 2 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* COIN 0 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) /* COIN 1 */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) /* COIN 2 */
 
 	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x07, 0x00, "Play Time per Credit" )
+	PORT_DIPNAME( 0x07, 0x00, "Play Time per Credit" ) PORT_DIPLOCATION("SW:1,2,3")
 	PORT_DIPSETTING(	0x07, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(	0x06, "2:30" )
 	PORT_DIPSETTING(	0x05, "2:00" )
@@ -144,16 +147,16 @@ static INPUT_PORTS_START( bsktball )
 	PORT_DIPSETTING(	0x02, "0:45" )
 	PORT_DIPSETTING(	0x01, "0:30" )
 	PORT_DIPSETTING(	0x00, "1:00" )
-	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:4,5")
 	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(	0x10, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(	0x18, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x20, 0x00, "Cost" )
+	PORT_DIPNAME( 0x20, 0x00, "Cost" ) PORT_DIPLOCATION("SW:6")
 	PORT_DIPSETTING(	0x20, "Two Coin Minimum" )
 	PORT_DIPSETTING(	0x00, "One Coin Minimum" )
-	PORT_DIPNAME( 0xC0, 0x00, DEF_STR( Language ) )
-	PORT_DIPSETTING(	0xC0, DEF_STR( German ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("SW:7,8")
+	PORT_DIPSETTING(	0xc0, DEF_STR( German ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( French ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( Spanish ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( English ) )

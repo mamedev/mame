@@ -45,23 +45,6 @@ static UINT8 *actfancr_ram;
 
 /******************************************************************************/
 
-static READ8_HANDLER( actfan_control_0_r )
-{
-	return input_port_read(machine, "SYSTEM");	/* VBL */
-}
-
-static READ8_HANDLER( actfan_control_1_r )
-{
-	switch (offset)
-	{
-		case 0: return input_port_read(machine, "P1");
-		case 1: return input_port_read(machine, "P2");
-		case 2: return input_port_read(machine, "DSW1");
-		case 3: return input_port_read(machine, "DSW2");
-	}
-	return 0xff;
-}
-
 static int trio_control_select;
 
 static WRITE8_HANDLER( triothep_control_select_w )
@@ -100,8 +83,11 @@ static ADDRESS_MAP_START( actfan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(buffer_spriteram_w)
 	AM_RANGE(0x120000, 0x1205ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
-	AM_RANGE(0x130000, 0x130003) AM_READ(actfan_control_1_r)
-	AM_RANGE(0x140000, 0x140001) AM_READ(actfan_control_0_r)
+	AM_RANGE(0x130000, 0x130000) AM_READ_PORT("P1")
+	AM_RANGE(0x130001, 0x130001) AM_READ_PORT("P2")
+	AM_RANGE(0x130002, 0x130002) AM_READ_PORT("DSW1")
+	AM_RANGE(0x130003, 0x130003) AM_READ_PORT("DSW2")
+	AM_RANGE(0x140000, 0x140001) AM_READ_PORT("SYSTEM")	/* VBL */
 	AM_RANGE(0x150000, 0x150001) AM_WRITE(actfancr_sound_w)
 	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE(&actfancr_ram) /* Main ram */
 ADDRESS_MAP_END
@@ -140,7 +126,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( actfancr )
-	PORT_START_TAG("P1")	/* Player 1 controls */
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -150,7 +136,7 @@ static INPUT_PORTS_START( actfancr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START_TAG("P2")	/* Player 2 controls */
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -160,7 +146,7 @@ static INPUT_PORTS_START( actfancr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("SYSTEM")	/* start buttons */
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -214,10 +200,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( triothep )
 	PORT_INCLUDE( actfancr )
 
-	PORT_MODIFY("P1")	/* Player 1 controls */
+	PORT_MODIFY("P1")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 
-	PORT_MODIFY("P2")	/* Player 2 controls */
+	PORT_MODIFY("P2")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
 
 	PORT_MODIFY("DSW2")

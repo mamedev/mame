@@ -54,11 +54,11 @@ static ADDRESS_MAP_START( battlnts_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2200, 0x23ff) AM_READWRITE(K007342_scroll_r, K007342_scroll_w)		/* Scroll RAM */
 	AM_RANGE(0x2400, 0x24ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram)/* palette */
 	AM_RANGE(0x2600, 0x2607) AM_WRITE(K007342_vreg_w) 			/* Video Registers */
-	AM_RANGE(0x2e00, 0x2e00) AM_READ(input_port_0_r) 			/* DIPSW #1 */
-	AM_RANGE(0x2e01, 0x2e01) AM_READ(input_port_4_r) 			/* 2P controls */
-	AM_RANGE(0x2e02, 0x2e02) AM_READ(input_port_3_r) 			/* 1P controls */
-	AM_RANGE(0x2e03, 0x2e03) AM_READ(input_port_2_r) 			/* coinsw, testsw, startsw */
-	AM_RANGE(0x2e04, 0x2e04) AM_READ(input_port_1_r) 			/* DISPW #2 */
+	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("DSW1")
+	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P2")
+	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P1")
+	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW3")				/* coinsw, testsw, startsw */
+	AM_RANGE(0x2e04, 0x2e04) AM_READ_PORT("DSW2")
 	AM_RANGE(0x2e08, 0x2e08) AM_WRITE(battlnts_bankswitch_w)	/* bankswitch control */
 	AM_RANGE(0x2e0c, 0x2e0c) AM_WRITE(battlnts_spritebank_w)	/* sprite bank select */
 	AM_RANGE(0x2e10, 0x2e10) AM_WRITE(watchdog_reset_w)			/* watchdog reset */

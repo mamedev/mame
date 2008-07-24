@@ -15,6 +15,8 @@ Changes 29/03/2005 - Pierpaolo Prazzoli
 - Added sprites wraparound
 - Added sprites color masking
 
+Dip Locations added according to Service Mode
+
 *******************************************************************************************/
 
 #include "driver.h"
@@ -193,11 +195,11 @@ static ADDRESS_MAP_START( bestleag_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0f8000, 0x0f800b) AM_RAM AM_BASE(&bestleag_vregs)
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x300010, 0x300011) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x300012, 0x300013) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x300014, 0x300015) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x300016, 0x300017) AM_READ(input_port_3_word_r)
-	AM_RANGE(0x300018, 0x300019) AM_READ(input_port_4_word_r)
+	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
+	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2")
+	AM_RANGE(0x300016, 0x300017) AM_READ_PORT("DSWA")
+	AM_RANGE(0x300018, 0x300019) AM_READ_PORT("DSWB")
 	AM_RANGE(0x30001c, 0x30001d) AM_WRITE(oki_bank_w)
 	AM_RANGE(0x30001e, 0x30001f) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP
@@ -215,7 +217,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 static INPUT_PORTS_START( bestleag )
-	PORT_START	/* System inputs */
+	PORT_START_TAG("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -225,14 +227,14 @@ static INPUT_PORTS_START( bestleag )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START	/* Player 1 controls */
+	PORT_START_TAG("P1")
 	BESTLEAG_PLAYER_INPUT( 1 )
 
-	PORT_START	/* Player 2 controls */
+	PORT_START_TAG("P2")
 	BESTLEAG_PLAYER_INPUT( 2 )
 
-	PORT_START	/* DSW0 */
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
+	PORT_START_TAG("DSWA")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW.A:1,2,3,4")
 	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
@@ -245,7 +247,7 @@ static INPUT_PORTS_START( bestleag )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )	// also set "Coin B" to "Free Play"
 	/* 0x01 to 0x05 gives 2C_3C */
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW.A:5,6,7,8")
 	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
@@ -259,27 +261,27 @@ static INPUT_PORTS_START( bestleag )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )	// also set "Coin A" to "Free Play"
 	/* 0x10 to 0x50 gives 2C_3C */
 
-	PORT_START	/* DSW1 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) // Doesn't work ?
+	PORT_START_TAG("DSWB")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW.B:1") // Doesn't work ?
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW.B:2,3")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x18, 0x18, "Timer Speed" )
+	PORT_DIPNAME( 0x18, 0x18, "Timer Speed" ) PORT_DIPLOCATION("SW.B:4,5")
 	PORT_DIPSETTING(    0x08, "Slow" )				// 65
 	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )	// 50
 	PORT_DIPSETTING(    0x10, "Fast" )				// 35
 	PORT_DIPSETTING(    0x00, "Fastest" )			// 25
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW.B:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "2 Players Game" )
+	PORT_DIPNAME( 0x40, 0x40, "2 Players Game" ) PORT_DIPLOCATION("SW.B:7")
 	PORT_DIPSETTING(    0x40, "1 Credit" )
 	PORT_DIPSETTING(    0x00, "2 Credits" )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW.B:8")
 INPUT_PORTS_END
 
 /* GFX Decode */

@@ -91,12 +91,12 @@ static WRITE8_HANDLER( battlane_cpu_command_w )
 
 static ADDRESS_MAP_START( battlane_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)
-    AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(battlane_tileram_w) AM_SHARE(2) AM_BASE(&battlane_tileram)
-    AM_RANGE(0x1800, 0x18ff) AM_RAM_WRITE(battlane_spriteram_w) AM_SHARE(3) AM_BASE(&battlane_spriteram)
-	AM_RANGE(0x1c00, 0x1c00) AM_READWRITE(input_port_0_r, battlane_video_ctrl_w)
-    AM_RANGE(0x1c01, 0x1c01) AM_READWRITE(input_port_1_r, battlane_scrollx_w)
-	AM_RANGE(0x1c02, 0x1c02) AM_READWRITE(input_port_2_r, battlane_scrolly_w)
-	AM_RANGE(0x1c03, 0x1c03) AM_READWRITE(input_port_3_r, battlane_cpu_command_w)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(battlane_tileram_w) AM_SHARE(2) AM_BASE(&battlane_tileram)
+	AM_RANGE(0x1800, 0x18ff) AM_RAM_WRITE(battlane_spriteram_w) AM_SHARE(3) AM_BASE(&battlane_spriteram)
+	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("P1") AM_WRITE(battlane_video_ctrl_w)
+	AM_RANGE(0x1c01, 0x1c01) AM_READ_PORT("P2") AM_WRITE(battlane_scrollx_w)
+	AM_RANGE(0x1c02, 0x1c02) AM_READ_PORT("DSW1") AM_WRITE(battlane_scrolly_w)
+	AM_RANGE(0x1c03, 0x1c03) AM_READ_PORT("DSW2") AM_WRITE(battlane_cpu_command_w)
 	AM_RANGE(0x1c04, 0x1c04) AM_READWRITE(YM3526_status_port_0_r, YM3526_control_port_0_w)
 	AM_RANGE(0x1c05, 0x1c05) AM_WRITE(YM3526_write_port_0_w)
 	AM_RANGE(0x1e00, 0x1e3f) AM_WRITE(battlane_palette_w)
@@ -117,7 +117,7 @@ static INTERRUPT_GEN( battlane_cpu1_interrupt )
 
 
 static INPUT_PORTS_START( battlane )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -127,7 +127,7 @@ static INPUT_PORTS_START( battlane )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
@@ -135,7 +135,7 @@ static INPUT_PORTS_START( battlane )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:1,2")

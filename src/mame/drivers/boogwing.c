@@ -72,6 +72,9 @@
         * The final boss shoots a blue beam downwards during the battle.  This should have alpha.
           It fades in to blue, then fades out to nothing again after a few seconds (Guru).
           (Potentially related to note above about bit 3 in priority word)
+
+	2008-07
+	Dip Locations added according to the manual of the JPN version
 */
 
 #include "driver.h"
@@ -100,9 +103,9 @@ static ADDRESS_MAP_START( boogwing_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x244000, 0x244001) AM_WRITE(buffer_spriteram16_2_w)
 	AM_RANGE(0x246000, 0x2467ff) AM_RAM AM_BASE(&spriteram16_2) AM_SIZE(&spriteram_2_size)
 
-	AM_RANGE(0x24e6c0, 0x24e6c1) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x24e138, 0x24e139) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x24e344, 0x24e345) AM_READ(input_port_2_word_r)
+	AM_RANGE(0x24e6c0, 0x24e6c1) AM_READ_PORT("DSW")
+	AM_RANGE(0x24e138, 0x24e139) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x24e344, 0x24e345) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x24e000, 0x24e7ff) AM_WRITE(deco16_104_prot_w) AM_BASE(&deco16_prot_ram)
 
 	AM_RANGE(0x260000, 0x26000f) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf12_control)
@@ -150,14 +153,14 @@ ADDRESS_MAP_END
 /**********************************************************************************/
 
 static INPUT_PORTS_START( boogwing )
-	PORT_START	/* 16bit */
+	PORT_START_TAG("SYSTEM")	/* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START	/* 16bit */
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )
+	PORT_START_TAG("DSW")	/* 16bit */
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
@@ -166,7 +169,7 @@ static INPUT_PORTS_START( boogwing )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ) )
@@ -175,36 +178,36 @@ static INPUT_PORTS_START( boogwing )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Continue Coin" )
+	PORT_DIPNAME( 0x0080, 0x0080, "Continue Coin" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, "Normal Coin Credit" )
 	PORT_DIPSETTING(      0x0000, "2 Start/1 Continue" )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0100, "1" )
 	PORT_DIPSETTING(      0x0300, "2" )
 	PORT_DIPSETTING(      0x0200, "3" )
 	PORT_DIPSETTING(      0x0000, "4" )
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x1000, 0x1000, "Coin Slots" )
+	PORT_DIPNAME( 0x1000, 0x1000, "Coin Slots" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x1000, "Common" )
 	PORT_DIPSETTING(      0x0000, "Individual" )
-	PORT_DIPNAME( 0x2000, 0x2000, "Stage Reset" ) /* At loss of life */
+	PORT_DIPNAME( 0x2000, 0x2000, "Stage Reset" ) PORT_DIPLOCATION("SW2:6")	/* At loss of life */
 	PORT_DIPSETTING(      0x2000, "Point of Termination" )
 	PORT_DIPSETTING(      0x0000, "Beginning of Stage" )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) ) /* Manual shows as OFF and states "Don't Change" */
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7") /* Manual shows as OFF and states "Don't Change" */
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	/* 16bit */
+	PORT_START_TAG("INPUTS")	/* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
