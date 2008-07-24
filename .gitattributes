@@ -2250,6 +2250,7 @@ src/mame/includes/gaplus.h svneol=native#text/plain
 src/mame/includes/gauntlet.h svneol=native#text/plain
 src/mame/includes/gcpinbal.h svneol=native#text/plain
 src/mame/includes/genesis.h svneol=native#text/plain
+src/mame/includes/gottlieb.h svneol=native#text/plain
 src/mame/includes/grchamp.h svneol=native#text/plain
 src/mame/includes/gridlee.h svneol=native#text/plain
 src/mame/includes/gstriker.h svneol=native#text/plain
