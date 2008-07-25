@@ -9,23 +9,10 @@
 
 /*----------- defined in audio/gottlieb.c -----------*/
 
-extern const riot6532_interface gottlieb_riot6532_intf;
-
-SOUND_START( gottlieb1 );
-SOUND_START( gottlieb2 );
+MACHINE_DRIVER_EXTERN( gottlieb_soundrev1 );
+MACHINE_DRIVER_EXTERN( gottlieb_soundrev2 );
 
 WRITE8_HANDLER( gottlieb_sh_w );
-
-WRITE8_HANDLER( gottlieb_speech_w );
-WRITE8_HANDLER( gottlieb_speech_clock_DAC_w );
-void gottlieb_sound_init(void);
-void stooges_sp0250_drq(int level);
-READ8_HANDLER( stooges_sound_input_r );
-WRITE8_HANDLER( stooges_8910_latch_w );
-WRITE8_HANDLER( stooges_sp0250_latch_w );
-WRITE8_HANDLER( stooges_sound_control_w );
-WRITE8_HANDLER( gottlieb_nmi_rate_w );
-WRITE8_HANDLER( gottlieb_cause_dac_nmi_w );
 
 
 /*----------- defined in video/gottlieb.c -----------*/

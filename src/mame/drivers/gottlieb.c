@@ -6,8 +6,24 @@
     driver by Fabrice Frances & Nicola Salmoria
 
     Games supported:
-        * Cloud 9
-        * Firebeast
+        * Reactor
+        * Q*Bert [6 sets]
+        * Insector (prototype)
+        * Tylz (prototype)
+        * Argus (prototype)
+        * Mad Planets
+        * Krull
+        * Knightmare (prototype)
+        * Faster, Harder, More Challenging Q*bert (prototype)
+        * Q*Bert's Qubes
+        * M.A.C.H. 3
+        * Screw Loose (prototype)
+        * Cobra Command
+        * Curve Ball
+        * Us vs. Them
+        * The Three Stooges in Brides Is Brides
+        * Video Vince and the Game Factory (prototype)
+        * Wiz Warz (prototype)
 
     Known issues:
         * none at this time
@@ -172,7 +188,6 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 
 #define SYSTEM_CLOCK		XTAL_20MHz
 #define CPU_CLOCK			XTAL_15MHz
-#define SOUND1_CLOCK		XTAL_3_579545MHz
 
 
 
@@ -490,48 +505,6 @@ static ADDRESS_MAP_START( gottlieb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5803, 0x5803) AM_MIRROR(0x07f8) AM_READ_PORT("IN3")										/* trackball V */
 	AM_RANGE(0x5804, 0x5804) AM_MIRROR(0x07f8) AM_READ_PORT("IN4")										/* IP40-47 */
 	AM_RANGE(0x6000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-
-
-/*************************************
- *
- *  Sound CPU memory handlers
- *
- *************************************/
-
-static ADDRESS_MAP_START( sound1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	/* A15 not decoded except in expansion socket */
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0d80) AM_RAM
-	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0de0) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_WRITE(DAC_0_data_w)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0fff) AM_WRITE(gottlieb_speech_w)
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_WRITE(gottlieb_speech_clock_DAC_w)
-	AM_RANGE(0x6000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( stooges_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_WRITE(DAC_0_data_w)
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( stooges_sound2_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(stooges_sp0250_latch_w)	/* speech chip. The game sends strings */
-									/* of 15 bytes (clocked by 4000). The chip also */
-									/* checks a DATA REQUEST bit in 6000. */
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(stooges_sound_control_w)
-	AM_RANGE(0x6000, 0x6000) AM_READ(stooges_sound_input_r)	/* various signals */
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(stooges_8910_latch_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(gottlieb_nmi_rate_w)	/* the timer generates NMIs */
-	AM_RANGE(0xa800, 0xa800) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(gottlieb_cause_dac_nmi_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -1680,8 +1653,8 @@ static const char *const qbert_sample_names[] =
 	"fx_21h.wav", /* random speech, voice clock 62 */
 	"fx_22.wav", /* EH2 with decreasing voice clock */
 	"fx_23.wav", /* O1 with varying voice clock */
-	"fx_28.wav", /* "hello, I'm ready" */
-	"fx_36.wav", /* "byebye" */
+	"fx_28.wav",
+	"fx_36.wav",
 	"knocker.wav",
 	0	/* end of array */
 };
@@ -1700,11 +1673,6 @@ static const struct Samplesinterface reactor_samples_interface =
 
 #define gottlieb_samples_interface qbert_samples_interface	/* not used */
 #define krull_samples_interface qbert_samples_interface		/* not used */
-
-static const struct sp0250_interface sp0250_interface =
-{
-	stooges_sp0250_drq
-};
 
 
 
@@ -1738,50 +1706,6 @@ static MACHINE_DRIVER_START( gottlieb_core )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( gottlieb_soundrev1 )
-	MDRV_SOUND_START( gottlieb1 )
-
-	MDRV_RIOT6532_ADD("riot", SOUND1_CLOCK/4, gottlieb_riot6532_intf)
-
-	/* audio CPU */
-	MDRV_CPU_ADD("audio", M6502, SOUND1_CLOCK/4)	/* the board can be set to /2 as well */
-	MDRV_CPU_PROGRAM_MAP(sound1_map,0)
-
-	/* sound hardware */
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( gottlieb_soundrev2 )
-	/* audio CPUs */
-	MDRV_CPU_ADD("audio", M6502, 1000000)	/* 1 MHz */
-	MDRV_CPU_PROGRAM_MAP(stooges_sound_map,0)
-
-	MDRV_CPU_ADD("audio2", M6502, 1000000)	/* 1 MHz */
-	MDRV_CPU_PROGRAM_MAP(stooges_sound2_map,0)
-
-	/* sound hardware */
-	MDRV_SOUND_START( gottlieb2 )
-
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-
-	MDRV_SOUND_ADD("ay1", AY8910, 2000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-
-	MDRV_SOUND_ADD("ay2", AY8910, 2000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-
-	MDRV_SOUND_ADD("sp", SP0250, 3120000)
-	MDRV_SOUND_CONFIG(sp0250_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
