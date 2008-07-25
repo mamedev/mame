@@ -1261,7 +1261,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"wofa",     CPS_B_21_DEF, mapper_TK263B },	/* bootleg? */
 	{"wofu",     CPS_B_21_QS1, mapper_TK263B },
 	{"wofj",     CPS_B_21_QS1, mapper_TK263B },
-	{"wofhfh",   CPS_B_21_DEF, mapper_TK263B }, /* Chinese bootleg */
+	{"wofhfh",   CPS_B_21_DEF, mapper_TK263B, 0x36 }, /* Chinese bootleg */
 	{"dino",     CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
 	{"dinou",    CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
 	{"dinoj",    CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
