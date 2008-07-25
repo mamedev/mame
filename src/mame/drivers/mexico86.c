@@ -10,15 +10,15 @@ Notes:
   There is additional code for a third Z80 in the bootleg version, I don't
   know if it's related or if its just a replacement for the 68705.
 
-- kicknrun does a PS4 STOP ERROR short after boot, but works afterwards.
-  PS4 is the mcu.
+- kicknrun does a PS4 STOP ERROR shortly after boot, but works afterwards.
+  PS4 is the MC6801U4 mcu.
 
 - Kiki Kaikai suffers from random lock-up's. It happens when the sound
   CPU misses CTS from YM2203. The processor will loop infinitely and the main
   CPU will in turn wait forever. It's difficult to meet the required level
-  of synchronization. THis is kludged by filtering the 2203's busy signal.
+  of synchronization. This is kludged by filtering the 2203's busy signal.
 
-- KiKi KaiKai uses a custom 68701 MCU which isn't dumped. The bootleg Knight Boy
+- KiKi KaiKai uses a custom MC6801U4 MCU which isn't dumped. The bootleg Knight Boy
   replaces it with a 68705. The bootleg is NOT 100% equivalent to the original
   (a situation similar to Bubble Bobble): collision detection is imperfect, the
   player can't be killed by some enemies.
@@ -35,12 +35,12 @@ Notes:
 
 Note MCU labeling:
 
-Kick and RUN     Bubble Bobble
--------------    ------------
-TAITO  A87-01    TAITO A78-01
-JPH1021P         JPH1011P
-185              185
-PS4  J8648       PS4  J8635
+Bubble Bobble   KiKi KaiKai      Kick and RUN
+-------------   -------------    -------------
+TAITO A78-01    TAITO A85-01     TAITO A87-01
+JPH1011P        JPH1020P         JPH1021P
+185             185              185
+PS4  J8635      PS4  J8541       PS4  J8648
 
 ***************************************************************************/
 
@@ -433,7 +433,7 @@ static MACHINE_DRIVER_START( kikikai )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_VBLANK_INT("main", kikikai_interrupt) // IRQs should be triggered by the MCU, but we don't have it
 
-	MDRV_CPU_REMOVE("mcu")	// we don't have code for the 68701
+	MDRV_CPU_REMOVE("mcu")	// we don't have code for the MC6801U4
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(kikikai)
@@ -457,6 +457,7 @@ ROM_START( kikikai )
 	ROM_LOAD( "a85-11.f6", 0x0000, 0x8000, CRC(cc3539db) SHA1(4239a40fdee65cba613e4b4ec54cf7899480e366) )
 
 	ROM_REGION( 0x0800, REGION_CPU3, 0 )    /* 2k for the microcontroller (MC6801U4 type MCU) */
+	/* MCU labeled TAITO A85 01,  JPH1020P, 185, PS4 */
 	ROM_LOAD( "a85-01.g8",    0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_INVERT )
