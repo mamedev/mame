@@ -57,6 +57,7 @@ typedef struct _ui_menu ui_menu;
 /* menu-related callback functions */
 typedef void (*ui_menu_handler_func)(running_machine *machine, ui_menu *menu, void *parameter, void *state);
 typedef void (*ui_menu_custom_func)(running_machine *machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
+typedef void (*ui_menu_destroy_state_func)(ui_menu *menu, void *state);
 
 
 /* menu-related events */
@@ -106,7 +107,7 @@ const ui_menu_event *ui_menu_process(ui_menu *menu, UINT32 flags);
 void ui_menu_set_custom_render(ui_menu *menu, ui_menu_custom_func custom, float top, float bottom);
 
 /* allocate permanent memory to represent the menu's state */
-void *ui_menu_alloc_state(ui_menu *menu, size_t size);
+void *ui_menu_alloc_state(ui_menu *menu, size_t size, ui_menu_destroy_state_func destroy_state);
 
 /* allocate temporary memory from the menu's memory pool */
 void *ui_menu_pool_alloc(ui_menu *menu, size_t size);
