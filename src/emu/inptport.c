@@ -1139,6 +1139,9 @@ const input_seq *input_type_seq(running_machine *machine, int type, int player, 
 {
 	static const input_seq ip_none = SEQ_DEF_0;
 
+	assert((type >= 0) && (type < __ipt_max));
+	assert((player >= 0) && (player < MAX_PLAYERS));
+
 	/* if we have a machine, use the live state and quick lookup */
 	if (machine != NULL)
 	{
