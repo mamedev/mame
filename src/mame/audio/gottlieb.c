@@ -12,7 +12,7 @@
 #include "sound/samples.h"
 #include "sound/dac.h"
 #include "sound/ay8910.h"
-#include "sound/votrax.h"
+//#include "sound/votrax.h"
 #include "sound/sp0250.h"
 
 
