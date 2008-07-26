@@ -234,7 +234,9 @@ struct _d3d
 //  PROTOTYPES
 //============================================================
 
+#if DIRECT3D_VERSION < 0x0900
 d3d *drawd3d8_init(void);
+#endif
 d3d *drawd3d9_init(void);
 
 

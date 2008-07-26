@@ -455,9 +455,11 @@ int drawd3d_init(win_draw_callbacks *callbacks)
 	if (version >= 9)
 		d3dintf = drawd3d9_init();
 
+#if DIRECT3D_VERSION < 0x0900
 	// if that didn't work, try Direct3D 8
 	if (d3dintf == NULL && version >= 8)
 		d3dintf = drawd3d8_init();
+#endif
 
 	// if we failed, note the error
 	if (d3dintf == NULL)

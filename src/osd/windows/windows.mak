@@ -194,8 +194,16 @@ ifdef WIN95_MULTIMON
 CFLAGS += -DWIN95_MULTIMON
 endif
 
-# add the windows libaries
-LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldinput -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
+# add the windows libraries
+LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
+
+ifeq ($(DIRECTINPUT),7)
+LIBS += -ldinput
+CFLAGS += -DDIRECTINPUT_VERSION=0x0700
+else
+LIBS += -ldinput8
+CFLAGS += -DDIRECTINPUT_VERSION=0x0800
+endif
 
 ifdef PTR64
 ifdef MSVC_BUILD
@@ -236,7 +244,6 @@ endif
 #-------------------------------------------------
 
 OSDOBJS = \
-	$(WINOBJ)/d3d8intf.o \
 	$(WINOBJ)/d3d9intf.o \
 	$(WINOBJ)/drawd3d.o \
 	$(WINOBJ)/drawdd.o \
@@ -248,6 +255,12 @@ OSDOBJS = \
 	$(WINOBJ)/video.o \
 	$(WINOBJ)/window.o \
 	$(WINOBJ)/winmain.o
+
+ifeq ($(DIRECT3D),8)
+OSDOBJS += $(WINOBJ)/d3d8intf.o
+else
+CFLAGS += -DDIRECT3D_VERSION=0x0900
+endif
 
 # extra dependencies
 $(WINOBJ)/drawdd.o : 	$(SRC)/emu/rendersw.c
