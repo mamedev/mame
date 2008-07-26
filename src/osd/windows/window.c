@@ -270,6 +270,10 @@ static void winwindow_exit(running_machine *machine)
 {
 	assert(GetCurrentThreadId() == main_threadid);
 
+	// possibly kill the debug window
+	if (options_get_bool(mame_options(), OPTION_DEBUG))
+		debugwin_destroy_windows();
+
 	// free all the windows
 	while (win_window_list != NULL)
 	{

@@ -124,10 +124,6 @@ static void video_exit(running_machine *machine)
 		bitmap_free(effect_bitmap);
 	effect_bitmap = NULL;
 
-	// possibly kill the debug window
-	if (options_get_bool(mame_options(), OPTION_DEBUG))
-		debugwin_destroy_windows();
-
 	// free all of our monitor information
 	while (win_monitor_list != NULL)
 	{
