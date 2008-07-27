@@ -742,7 +742,7 @@ void osd_customize_input_type_list(input_type_desc *typelist)
 
 #ifdef MESS
 			case IPT_OSD_2:
-				if (mess_use_new_ui())
+				if (ui_mess_use_new_ui(Machine))
 				{
 					typedesc->token = "TOGGLE_MENUBAR";
 					typedesc->name = "Toggle Menubar";

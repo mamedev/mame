@@ -22,6 +22,7 @@
 
 #ifdef MESS
 #include "image.h"
+#include "uimess.h"
 #endif /* MESS */
 
 
@@ -225,6 +226,7 @@ struct _running_machine
 	ui_input_private *		ui_input_data;		/* internal data from uiinput.c */
 #ifdef MESS
 	images_private *		images_data;		/* internal data from image.c */
+	ui_mess_private *		ui_mess_data;		/* internal data from uimess.c */
 #endif /* MESS */
 
 	/* driver-specific information */

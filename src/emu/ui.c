@@ -450,11 +450,6 @@ void ui_update_and_render(running_machine *machine)
 	/* decrement the frame counter if it is non-zero */
 	else if (allow_rescale != 0)
 		allow_rescale--;
-
-#ifdef MESS
-	/* let MESS display its stuff */
-	mess_ui_update(machine);
-#endif /* MESS */
 }
 
 
@@ -1259,7 +1254,7 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 	}
 
 #ifdef MESS
-	if (mess_disable_builtin_ui(machine))
+	if (ui_mess_handler_ingame(machine))
 		return 0;
 #endif /* MESS */
 
@@ -1385,12 +1380,6 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 	}
 	else
 		video_set_fastforward(FALSE);
-
-#ifdef MESS
-	/* paste? */
-	if (ui_input_pressed(machine, IPT_UI_PASTE))
-		ui_paste(machine);
-#endif /* MESS */
 
 	return 0;
 }

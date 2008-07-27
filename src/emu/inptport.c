@@ -103,8 +103,8 @@
 #include <stdarg.h>
 
 #ifdef MESS
-#include "inputx.h"
-#endif
+#include "uimess.h"
+#endif /* MESS */
 
 
 /***************************************************************************
@@ -2300,7 +2300,7 @@ static int frame_get_digital_field_state(const input_field_config *field)
 
 #ifdef MESS
 	/* (MESS-specific) check for disabled keyboard */
-	if (field->type == IPT_KEYBOARD && osd_keyboard_disabled())
+	if (field->type == IPT_KEYBOARD && ui_mess_keyboard_disabled(field->port->machine))
 		return FALSE;
 #endif /* MESS */
 
