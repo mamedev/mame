@@ -95,8 +95,8 @@ Notes:
 
 TS 2008.06.14:
 - Addedd sound emulation - atomboy and fghtbskt req different interrupt (T1)
-  timing than wilytowr, otherwise music/fx tempo is too fast. Maybe both
-  tmings are wrong - must be verified on real pcb.
+  timing than wilytowr, otherwise music/fx tempo is too fast. 
+  Music tempo and pitch verified on real pcb.
 - Extra space in atomboy 2764 eproms is filled with garbage z80 code
   (taken from one of code roms, but from different offset)
 - Fghtbskt has one AY, but every frame writes 0 to 2nd AY regs - probably
@@ -654,11 +654,11 @@ static MACHINE_DRIVER_START( m63 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono") /* ????? */
 
-	MDRV_SOUND_ADD("ay1", AY8910, 3579545/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 3579545/4) /* ????? */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MDRV_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8) /* ????? */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( atomboy )
@@ -698,7 +698,7 @@ static MACHINE_DRIVER_START( fghtbskt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 12000000/4/2)
+	MDRV_SOUND_ADD("ay", AY8910, XTAL_12MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
