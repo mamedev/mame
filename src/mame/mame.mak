@@ -1576,7 +1576,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/lethalj.o $(VIDEO)/lethalj.o \
 	$(DRIVERS)/limenko.o \
 	$(DRIVERS)/ltcasino.o \
-	$(DRIVERS)/lucky74.o \
+	$(DRIVERS)/lucky74.o $(VIDEO)/lucky74.o \
 	$(DRIVERS)/lucky8.o \
 	$(DRIVERS)/magic10.o \
 	$(DRIVERS)/magicfly.o \
@@ -1700,6 +1700,8 @@ $(DRIVERS)/firebeat.o:	$(LAYOUT)/firebeat.lh
 $(DRIVERS)/funworld.o:	$(LAYOUT)/funworld.lh
 
 $(DRIVERS)/lazercmd.o:	$(LAYOUT)/lazercmd.lh
+
+$(DRIVERS)/lucky74.o:	$(LAYOUT)/lucky74.lh
 
 $(DRIVERS)/maxaflex.o:	$(LAYOUT)/maxaflex.lh
 

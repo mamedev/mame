@@ -1,15 +1,15 @@
 /****************************************************************************************
 
-    LUCKY 74 - WING CO.LTD.
-    -----------------------
+    LUCKY 74 - WING CO.,LTD.
+    ------------------------
 
     Driver by Roberto Fresca.
 
 
     Games running on this hardware:
 
-    * Lucky 74 (small),  1988,  Wing Co.Ltd.
-    * Lucky 74 (big),    1988,  Wing Co.Ltd.
+    * Lucky 74 (small),  1988,  Wing Co.,Ltd.
+    * Lucky 74 (big),    1988,  Wing Co.,Ltd.
 
 
 *****************************************************************************************
@@ -57,7 +57,7 @@
                     'LUCKY 74-7'
 
 
-    PCB is original from WING Co.Ltd.
+    PCB is original from WING Co.,Ltd.
 
 
     The M5M82C255ASP (82c255) is a general purpose programmable I/O. It is compatible with the 8255
@@ -148,10 +148,10 @@
     *** Dev Notes ***
 
 
-    - Sound seems to be triggered at 0xf100. Each event writes sequences
-      like 0x84 0x07 0x99 0x9c 0x9f...
+    - Sound seems to be triggered writting at 0xf100.
+      Each event writes sequences like (0x84 0x07 0x99 0x9c 0x9f)...
 
-    - After z80 port 0x00 request, there are writes to port 0x00 to 0x05.
+    - After z80 port 0x00 request, there are writes to ports 0x00 to 0x05.
 
 
 
@@ -161,7 +161,7 @@
     *** Game Notes ***
 
 
-    This game was one of the 'classics'.
+    This game was one of the most wanted 'classics' regarding gambling games.
 
     Lucky 74 is a strip poker game with anime theme. It has a nice double-up feature, and
     the objective is obviously to win hands till you can see the girl naked, like other
@@ -175,7 +175,7 @@
 
 
 
-    - DIP Switch 3-7 change the pay table.
+    - DIP Switch 3-7 change the poker mode, but also the pay table.
 
     Table 1 (per unit): 500 100 40 10 7 5 3 2 1
     Table 2 (per unit): 500 200 100 40 10 7 5 3 2
@@ -196,6 +196,61 @@
 *****************************************************************************************
 
 
+    *** Tech Notes ***
+
+
+    The following notes were mostly 're-translated' from a very poor translated instructions sheet:
+
+
+    In order to change the DIP switches, always turn the power OFF/ON and reset memory.
+
+
+    Note 1: Auto Hold type YES
+
+      A) Hold Type: (DIP SW 3-8 OFF)
+
+         The game selects and holds automatically favorable cards after DEAL button is pressed. 
+	     Selects can be cancelled pressing the CANCEL button.
+
+	  B) Discard type: (DIP SW 3-8 ON)
+	     Starts game as Hold type, however Non-Held card(s) will be 
+	     automatically recalled by pressing DEAL button. Also even one 
+	     card is discarded, all HELD cards are disappeared and returns 
+	     to normal game.
+
+    Note 2: Always reset memory when JACKPOT points are changed.
+    
+    Note 3: Always reset memory when BONUS points are changed.
+    
+    Note 4: Always reset memory FOR PERCENTAGE changes.
+    
+    Note 5: COIN B is 5 times COIN A. KEY IN is 10 times coin A.
+    
+    Note 6: Each time a game is won, the woman will take one of her clothes off.
+            When all the clothes are taken off, a bonus point ten times the BET number
+            will be scored. This bonus cannot be scored if there is no woman's figure.
+
+    Note 7: The double up 1 follows usual system. In 2, a card except spade 7
+    (sic)   will be placed between the card to be turned up and the LAST 6 DATA.
+            This card will change by pressing the DOUBLE UP SW. Anticipate the
+            number of the next card which will turned up and stop. When the
+            game is won by pressing BIG or SMALL, and the anticipated card and
+            the turned up card happens to be the same number, then the scored 
+            points will be four times greater.
+
+
+    * During FEVER, BET greater than the BET points achieved during FEVER cannot 
+      be scored.
+    
+    * The KEY OUT consists of two steps. During first OUT, points over 100 will
+      become cleared and during the second OUT, points below 100 will become 
+      cleared.
+
+  
+
+*****************************************************************************************
+
+
     --------------------
     ***  Memory Map  ***
     --------------------
@@ -208,7 +263,7 @@
     0xE800 - 0xEFFF    ; Color RAM 2 (VRAM2-2).
     0xF000 - 0xF003    ; PPI8255_0 --> Input Ports 0 & 1.
     0xF080 - 0xF083    ; PPI8255_2 --> DSW1, DSW2, DSW3.
-    0xF0C0 - 0xF0C3    ; PPI8255_3 --> DSW4.
+    0xF0C0 - 0xF0C3    ; PPI8255_3 --> DSW4, LAMPS A & B.
     0xF200 - 0xF203    ; PPI8255_1 --> Input Ports 2 & 4.
     0xF400 - 0xF400    ; YM2149 control port 0.
     0xF600 - 0xF600    ; YM2149 R/W port 0 (Input Port 3).
@@ -221,7 +276,20 @@
     DRIVER UPDATES:
 
 
-    [2008-07-06]
+    [2008-07-28]
+
+    - Pre-defined CPU and SND clocks.
+    - Switched the color system to RESNET calculations.
+    - Completed the remaining DIP switches.
+    - Added lamps support. Created a layout to show them.
+    - Changes on the interrupt system (need to be verified on the PCB).
+    - Renamed the graphics regions to more descriptive names.
+    - Corrected the manufacturer's name.
+    - Splitted the driver to driver + video.
+    - Updated technical notes.
+
+
+    [2008-07-03]
 
     - Initial release.
     - Set the proper screen size.
@@ -263,7 +331,6 @@
     - Fix sounds (YM-2149F).
     - Add ADPCM samples (OKI M5205).
     - Figure out the unknown R/W.
-    - Switch the color system to RESNET.
     - USART comm.
     - Co-processor.
 
@@ -271,174 +338,90 @@
 *****************************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_12MHz		/* confirmed */
+#define MASTER_CLOCK	XTAL_12MHz			/* confirmed */
+#define CPU_CLOCK		(MASTER_CLOCK/8)	/* guess */
+#define YM2149_CLOCK	(MASTER_CLOCK/8)	/* guess */
 
 #include "driver.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "machine/8255ppi.h"
+#include "lucky74.lh"
 
-static UINT8 unk;
+/* from video hardware */
+extern UINT8 *fg_videoram, *fg_colorram, *bg_videoram, *bg_colorram;
+WRITE8_HANDLER( fg_videoram_w );
+WRITE8_HANDLER( fg_colorram_w );
+WRITE8_HANDLER( bg_videoram_w );
+WRITE8_HANDLER( bg_colorram_w );
+PALETTE_INIT( lucky74 );
+VIDEO_START( lucky74 );
+VIDEO_UPDATE( lucky74 );
 
-
-/*************************
-*     Video Hardware     *
-*************************/
-
-static UINT8 *videoram1, *videoram2, *colorram1, *colorram2;
-static tilemap *fg_tilemap, *bg_tilemap;
-
-
-static WRITE8_HANDLER( lucky74_videoram1_w )
-{
-	videoram1[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
-}
-
-static WRITE8_HANDLER( lucky74_colorram1_w )
-{
-	colorram1[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
-}
-
-static WRITE8_HANDLER( lucky74_videoram2_w )
-{
-	videoram2[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
-}
-
-static WRITE8_HANDLER( lucky74_colorram2_w )
-{
-	colorram2[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
-}
-
-
-static TILE_GET_INFO( get_fg_tile_info )
-{
-/*  - bits -
-    7654 3210
-    ---- xxxx   tiles color.
-    xxxx ----   tiles page offset.
-*/
-	int bank = 0;
-	int attr = colorram1[tile_index];
-	int code = videoram1[tile_index] + ((attr & 0xf0) << 4);
-	int color = (attr & 0x0f);
-
-	SET_TILE_INFO(bank, code, color, 0);
-}
-
-
-static TILE_GET_INFO( get_bg_tile_info )
-{
-/*  - bits -
-    7654 3210
-    ---- xxxx   tiles color.
-    xxxx ----   tiles page offset.
-*/
-	int bank = 1;
-	int attr = colorram2[tile_index];
-	int code = videoram2[tile_index] + ((attr & 0xf0) << 4);
-	int color = (attr & 0x0f);
-
-	SET_TILE_INFO(bank, code, color, 0);
-}
-
-
-static VIDEO_START( lucky74 )
-{
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
-
-	tilemap_set_transparent_pen(fg_tilemap, 0);
-}
-
-
-static VIDEO_UPDATE( lucky74 )
-{
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
-	return 0;
-}
-
-
-static PALETTE_INIT( lucky74 )
-/*
-   There are 2 states (see the technical notes).
-   We're constructing a double-sized palette with one half for each state.
-*/
-{
-	int i;
-
-	for (i = 0; i < 256; i++)
-	{
-		int bit0, bit1, bit2, bit3, r1, g1, b1, r2, g2, b2;
-
-        /* red component (state 1, PROM E6) */
-		bit0 = (color_prom[0x000 + i] >> 0) & 0x01;
-		bit1 = (color_prom[0x000 + i] >> 1) & 0x01;
-		bit2 = (color_prom[0x000 + i] >> 2) & 0x01;
-		bit3 = (color_prom[0x000 + i] >> 3) & 0x01;
-		r1 = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-        /* red component (state 2, PROM E7) */
-		bit0 = (color_prom[0x100 + i] >> 0) & 0x01;
-		bit1 = (color_prom[0x100 + i] >> 1) & 0x01;
-		bit2 = (color_prom[0x100 + i] >> 2) & 0x01;
-		bit3 = (color_prom[0x100 + i] >> 3) & 0x01;
-		r2 = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-        /* green component (state 1, PROM D6) */
-		bit0 = (color_prom[0x200 + i] >> 0) & 0x01;
-		bit1 = (color_prom[0x200 + i] >> 1) & 0x01;
-		bit2 = (color_prom[0x200 + i] >> 2) & 0x01;
-		bit3 = (color_prom[0x200 + i] >> 3) & 0x01;
-		g1 = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-        /* green component (state 2, PROM D7) */
-		bit0 = (color_prom[0x300 + i] >> 0) & 0x01;
-		bit1 = (color_prom[0x300 + i] >> 1) & 0x01;
-		bit2 = (color_prom[0x300 + i] >> 2) & 0x01;
-		bit3 = (color_prom[0x300 + i] >> 3) & 0x01;
-		g2 = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-        /* blue component (state 1, PROM C6) */
-		bit0 = (color_prom[0x400 + i] >> 0) & 0x01;
-		bit1 = (color_prom[0x400 + i] >> 1) & 0x01;
-		bit2 = (color_prom[0x400 + i] >> 2) & 0x01;
-		bit3 = (color_prom[0x400 + i] >> 3) & 0x01;
-		b1 = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-        /* blue component (state 2, PROM C7) */
-		bit0 = (color_prom[0x500 + i] >> 0) & 0x01;
-		bit1 = (color_prom[0x500 + i] >> 1) & 0x01;
-		bit2 = (color_prom[0x500 + i] >> 2) & 0x01;
-		bit3 = (color_prom[0x500 + i] >> 3) & 0x01;
-		b2 = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-
-        /* PROMs circuitry, 1st state */
-		palette_set_color(machine, i, MAKE_RGB(r1, g1, b1));
-
-        /* PROMs circuitry, 2nd state */
-		palette_set_color(machine, i + 256, MAKE_RGB(r2, g2, b2));
-	}
-}
+static UINT8 ym2149_portb;
 
 
 /*****************************
 *    Read/Write  Handlers    *
 *****************************/
 
-static READ8_HANDLER( testport_rw )
+static READ8_HANDLER( testport_r )
 {
-	return 0xff;
+/* The code expects bit 0 activated from z80 port0, and then write to ports 0-5 (code at 0x793c) */
+	return 0x01;
 }
 
-static WRITE8_HANDLER( unk_w )
+static WRITE8_HANDLER( ym2149_portb_w )
 {
-	unk = data;
+/*  when is in game mode writes 0x0a
+    when is in test mode writes 0x0e
+    after reset writes 0x16
+*/
+	ym2149_portb = data;
+}
+
+//static WRITE8_HANDLER( debug_w )
+//{
+//	popmessage("written : %02X", data);
+//}
+
+static WRITE8_HANDLER(lamps_a_w)
+{
+/*  LAMPSA:
+
+    7654 3210
+    ---- --xx  D-UP + TAKE SCORE (need to be individualized)
+    ---- xx--  BIG + SMALL (need to be individualized)
+*/
+
+	output_set_lamp_value(8, (data >> 0) & 1);		/* D-UP? */
+	output_set_lamp_value(9, (data >> 1) & 1);		/* TAKE SCORE? */
+	output_set_lamp_value(10, (data >> 2) & 1);		/* BIG? */
+	output_set_lamp_value(11, (data >> 3) & 1);		/* SMALL? */
+}
+
+static WRITE8_HANDLER(lamps_b_w)
+{
+/*  LAMPSB:
+
+    7654 3210
+    ---- ---x  HOLD1
+    ---- --x-  HOLD2
+    ---- -x--  HOLD3
+    ---- x---  HOLD4
+    ---x ----  HOLD5
+    -xx- ----  BET + START (need to be individualized)
+    x--- ----  CANCEL (should lit start too?)
+*/
+
+	output_set_lamp_value(0, (data >> 0) & 1);						/* HOLD1 */
+	output_set_lamp_value(1, (data >> 1) & 1);						/* HOLD2 */
+	output_set_lamp_value(2, (data >> 2) & 1);						/* HOLD3 */
+	output_set_lamp_value(3, (data >> 3) & 1);						/* HOLD4 */
+	output_set_lamp_value(4, (data >> 4) & 1);						/* HOLD5 */
+	output_set_lamp_value(5, (data >> 5) & 1);						/* BET? */
+	output_set_lamp_value(6, ((data >> 6) & 1)|((data >> 7) & 1));	/* START? */
+	output_set_lamp_value(7, (data >> 7) & 1);						/* CANCEL */
 }
 
 
@@ -448,7 +431,7 @@ static WRITE8_HANDLER( unk_w )
 
 static INTERRUPT_GEN( nmi_interrupt )
 {
-	if ((unk & 0x10) == 0)	/* ym2149 portB bit 4 trigger the NMI */
+	if ((ym2149_portb & 0x10) == 0)	/* ym2149 portB bit 4 trigger the NMI */
 	{
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	}
@@ -462,13 +445,14 @@ static INTERRUPT_GEN( nmi_interrupt )
 static ADDRESS_MAP_START( lucky74_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* NVRAM */
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_WRITE(lucky74_videoram1_w) AM_BASE(&videoram1)		/* VRAM1-1 */
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_WRITE(lucky74_colorram1_w) AM_BASE(&colorram1)		/* VRAM1-2 */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(lucky74_videoram2_w) AM_BASE(&videoram2)		/* VRAM2-1 */
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_WRITE(lucky74_colorram2_w) AM_BASE(&colorram2)		/* VRAM2-2 */
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)			/* VRAM1-1 */
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_WRITE(fg_colorram_w) AM_BASE(&fg_colorram)			/* VRAM1-2 */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)			/* VRAM2-1 */
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_WRITE(bg_colorram_w) AM_BASE(&bg_colorram)			/* VRAM2-2 */
 	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports 0 & 1 */
 	AM_RANGE(0xf080, 0xf083) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)	/* DSW 1, 2 & 3 */
 	AM_RANGE(0xf0c0, 0xf0c3) AM_DEVREADWRITE(PPI8255, "ppi8255_3", ppi8255_r, ppi8255_w)	/* DSW 4 */
+//	AM_RANGE(0xf100, 0xf100) AM_WRITE(debug_w)	/* seems to be sounds commands */
 	AM_RANGE(0xf200, 0xf203) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports 2 & 4 */
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xf600, 0xf600) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)		/* YM2149 (Input Port 1) */
@@ -476,7 +460,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lucky74_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(testport_rw)
+	AM_RANGE(0x00, 0x00) AM_READ(testport_r)
 //  AM_RANGE(0x00, 0x05) AM_WRITE(???)
 //  AM_RANGE(0xff, 0xff) AM_READWRITE(???)
 ADDRESS_MAP_END
@@ -580,7 +564,7 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)	/* 'D' in test mode */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)	/* 'E' in test mode */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Small")  PORT_CODE(KEYCODE_S)	/* 'F' in test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Input G")  PORT_CODE(KEYCODE_J)	/* 'G' in test mode */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Input G")  PORT_CODE(KEYCODE_J)	/* 'G' in test mode (inverted screen) */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Input H")  PORT_CODE(KEYCODE_K)	/* 'H' in test mode */
 
 	PORT_START_TAG("IN1")
@@ -589,8 +573,8 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Cancel")      PORT_CODE(KEYCODE_N)	/* 'K' in test mode */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Double-Up")  PORT_CODE(KEYCODE_3)	/* 'L' in test mode */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Take Score") PORT_CODE(KEYCODE_4)	/* 'M' & 'Q' in test mode */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Big")        PORT_CODE(KEYCODE_A)	/* 'N' in test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Input O & P")   PORT_CODE(KEYCODE_M)	/* 'O' & 'P' in test mode */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Big")        PORT_CODE(KEYCODE_A)	/* 'N' & 'P' in test mode */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Input O")       PORT_CODE(KEYCODE_M)	/* 'O' in test mode (normal screen) */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* not in test mode */
 
 	PORT_START_TAG("IN2")
@@ -603,7 +587,7 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")	/* driven through YM2149, port A */
+	PORT_START_TAG("IN3")	/* YM2149, port A */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )    PORT_IMPULSE(2)	/* Coin A */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Key In")	PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )    PORT_IMPULSE(2)	/* Coin B */
@@ -624,33 +608,38 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START_TAG("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Unknown 1-1" )	PORT_DIPLOCATION("DSW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Jackpot" )		PORT_DIPLOCATION("DSW1:2")
-	PORT_DIPSETTING(    0x02, "2000" )
-	PORT_DIPSETTING(    0x00, "3000" )
-	PORT_DIPNAME( 0x04, 0x04, "Unknown 1-3" )	PORT_DIPLOCATION("DSW1:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Unknown 1-4" )	PORT_DIPLOCATION("DSW1:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown 1-5" )	PORT_DIPLOCATION("DSW1:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown 1-6" )	PORT_DIPLOCATION("DSW1:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 1-7" )	PORT_DIPLOCATION("DSW1:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 1-8" )	PORT_DIPLOCATION("DSW1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "Auto Hold" )				PORT_DIPLOCATION("DSW1:1")  /* see note 1 */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x02, "Jackpot" )				PORT_DIPLOCATION("DSW1:2")  /* see note 2 */
+	PORT_DIPSETTING(    0x02, "Bet x 100" )
+	PORT_DIPSETTING(    0x00, "Bet x 150" )
+	PORT_DIPNAME( 0x04, 0x04, "Ceiling Bonus Point" )	PORT_DIPLOCATION("DSW1:3") /* see note 3 */
+	PORT_DIPSETTING(    0x04, "Bet x 40"  )
+	PORT_DIPSETTING(    0x00, "Bet x 50"  )
+	PORT_DIPNAME( 0x78, 0x78, "Percentage" )			PORT_DIPLOCATION("DSW1:4,5,6,7") /* see note 4 */
+	PORT_DIPSETTING(    0x00, "90%" )	/* 110% in the instruction sheet */
+	PORT_DIPSETTING(    0x08, "87%" )	/* 106% in the instruction sheet */
+	PORT_DIPSETTING(    0x10, "84%" )	/* 102% in the instruction sheet */
+	PORT_DIPSETTING(    0x18, "81%" )	/* 98% in the instruction sheet */
+	PORT_DIPSETTING(    0x20, "78%" )	/* 94% in the instruction sheet */
+	PORT_DIPSETTING(    0x28, "75%" )	/* 90% in the instruction sheet */
+	PORT_DIPSETTING(    0x30, "72%" )	/* 86% in the instruction sheet */
+	PORT_DIPSETTING(    0x38, "69%" )	/* 82% in the instruction sheet */
+	PORT_DIPSETTING(    0x40, "66%" )	/* 78% in the instruction sheet */
+	PORT_DIPSETTING(    0x48, "63%" )	/* 74% in the instruction sheet */
+	PORT_DIPSETTING(    0x50, "60%" )	/* 70% in the instruction sheet */
+	PORT_DIPSETTING(    0x58, "57%" )	/* 66% in the instruction sheet */
+	PORT_DIPSETTING(    0x60, "54%" )	/* 62% in the instruction sheet */
+	PORT_DIPSETTING(    0x68, "51%" )	/* 58% in the instruction sheet */
+	PORT_DIPSETTING(    0x70, "48%" )	/* 54% in the instruction sheet */
+	PORT_DIPSETTING(    0x78, "45%" )	/* 50% in the instruction sheet */
+	PORT_DIPNAME( 0x80, 0x80, "Panties" )				PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x00, "Without" )
+	PORT_DIPSETTING(    0x80, "With" )
 
 	PORT_START_TAG("DSW2")
-    /* DIPs 1-4 handle the harcoded coinage for Coin A, B and Remote credits */
+    /* DIPs 1-4 handle the harcoded coinage for Coin A, B and Remote credits (B = A x 5; R = A x 10) */
 	PORT_DIPNAME( 0x0f, 0x0f, "Coinage A, B & Remote" )	PORT_DIPLOCATION("DSW2:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "A: 20 Coins/1 Credit; B: 4 Coins/1 Credit;   R: 2 Pulses/1 Credit   " )
 	PORT_DIPSETTING(    0x01, "A: 15 Coins/1 Credit; B: 3 Coins/1 Credit;   R: 15 Pulses/10 Credits" )
@@ -688,55 +677,53 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_DIPSETTING(    0xf0, "1 Coin/50 Credits" )
 
 	PORT_START_TAG("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, "Bet Max" )		PORT_DIPLOCATION("DSW3:1")
+	PORT_DIPNAME( 0x01, 0x01, "Bet Max" )						PORT_DIPLOCATION("DSW3:1")
 	PORT_DIPSETTING(    0x01, "20" )
 	PORT_DIPSETTING(    0x00, "40" )
-	PORT_DIPNAME( 0x02, 0x02, "Unknown 3-2" )	PORT_DIPLOCATION("DSW3:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Unknown 3-3" )	PORT_DIPLOCATION("DSW3:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, "Limit" )			PORT_DIPLOCATION("DSW3:4,5")
+	PORT_DIPNAME( 0x06, 0x06, "Minimum Bet" )					PORT_DIPLOCATION("DSW3:2,3")	/* Bet Min */
+	PORT_DIPSETTING(    0x06, "1" )
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPSETTING(    0x02, "8" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0x18, 0x18, "Limit" )							PORT_DIPLOCATION("DSW3:4,5")
 	PORT_DIPSETTING(    0x18, "No Limit" )
 	PORT_DIPSETTING(    0x10, "10000" )
 	PORT_DIPSETTING(    0x08, "15000" )
 	PORT_DIPSETTING(    0x00, "20000" )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown 3-6" )	PORT_DIPLOCATION("DSW3:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Pay Table" )		PORT_DIPLOCATION("DSW3:7")
-	PORT_DIPSETTING(    0x40, "Table 1" )	/* see the game notes */
-	PORT_DIPSETTING(    0x00, "Table 2" )	/* see the game notes */
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 3-8" )	PORT_DIPLOCATION("DSW3:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Woman's figure in Main Game" )	PORT_DIPLOCATION("DSW3:6") /* see note 6 */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x40, "Type of Poker" )					PORT_DIPLOCATION("DSW3:7")
+	PORT_DIPSETTING(    0x40, "A - Without Wild Card" )	/* see the game notes */
+	PORT_DIPSETTING(    0x00, "B - Joker Wild Poker" )	/* see the game notes */
+	PORT_DIPNAME( 0x80, 0x80, "Kinds of Poker" )				PORT_DIPLOCATION("DSW3:8")
+	PORT_DIPSETTING(    0x80, "A - Hold" )
+	PORT_DIPSETTING(    0x00, "B - Discard" )
 
 	PORT_START_TAG("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, "Unknown 4-1" )	PORT_DIPLOCATION("DSW4:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Unknown 4-2" )	PORT_DIPLOCATION("DSW4:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Unknown 4-3" )	PORT_DIPLOCATION("DSW4:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Unknown 4-4" )	PORT_DIPLOCATION("DSW4:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown 4-5" )	PORT_DIPLOCATION("DSW4:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown 4-6" )	PORT_DIPLOCATION("DSW4:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 4-7" )	PORT_DIPLOCATION("DSW4:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 4-8" )	PORT_DIPLOCATION("DSW4:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "Hopper Coin SW" )				PORT_DIPLOCATION("DSW4:1")
+	PORT_DIPSETTING(    0x01, "Active Low" )
+	PORT_DIPSETTING(    0x00, "Active High" )
+	PORT_DIPNAME( 0x02, 0x02, "Coin Payment" )					PORT_DIPLOCATION("DSW4:2")
+	PORT_DIPSETTING(    0x00, "Auto" )
+	PORT_DIPSETTING(    0x02, "Auto by PAYOUT SW" )
+	PORT_DIPNAME( 0x04, 0x04, "Hopper Capacity" )				PORT_DIPLOCATION("DSW4:3")
+	PORT_DIPSETTING(    0x04, "700" )
+	PORT_DIPSETTING(    0x00, "Unlimited" )
+	PORT_DIPNAME( 0x08, 0x08, "Woman's figure in D-UP game" )	PORT_DIPLOCATION("DSW4:4")	/* doesn't seems to work */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10, 0x10, "Double-Up game" )				PORT_DIPLOCATION("DSW4:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, "Stop by 6th Double-Up" )			PORT_DIPLOCATION("DSW4:6") /* see note 7 */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0xC0, 0xC0, "Double-Up difficulty" )			PORT_DIPLOCATION("DSW4:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )		/* easy */
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )	/* .... */
+	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )		/* .... */
+	PORT_DIPSETTING(    0xC0, DEF_STR( Hardest ) )	/* difficult */
 INPUT_PORTS_END
 
 
@@ -761,8 +748,8 @@ static const gfx_layout tilelayout =
 ******************************/
 
 static GFXDECODE_START( lucky74 )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 16 )	/* text, frames & cards */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 256, 16 )	/* title & whores */
+	GFXDECODE_ENTRY( "fgtiles", 0, tilelayout, 0, 16 )		/* text, frames & cards */
+	GFXDECODE_ENTRY( "bgtiles", 0, tilelayout, 256, 16 )	/* title & whores */
 GFXDECODE_END
 
 
@@ -770,21 +757,21 @@ GFXDECODE_END
 *     PPI 82C255 (x2) Interfaces     *
 *************************************/
 
-/* Each 82C255 behaves like 2x 8255.
-   Since we don't support yet, we replace both 82C255
+/* Each 82C255 behaves like 2x 8255 (in mode 0).
+   Since MAME doesn't support it yet, I replaced both 82C255
    with 4x 8255...
 */
 static const ppi8255_interface ppi8255_intf[4] =
 {
-	{	/* A & B as input */
+	{	/* A & B set as input */
 		input_port_0_r,			/* Port A read, IN0 */
 		input_port_1_r,			/* Port B read, IN1 */
 		NULL,					/* Port C read */
 		NULL,					/* Port A write */
 		NULL,					/* Port B write */
-		NULL					/* Port C write */
+		NULL					/* Port C writes: 0x00 after reset, 0xff during game, and 0xfd when tap F2 for percentage and run count */
 	},
-	{	/* A & C as input */
+	{	/* A & C set as input */
 		input_port_2_r,			/* Port A read, IN2 */
 		NULL,					/* Port B read */
 		input_port_4_r,			/* Port C read, IN4 */
@@ -792,7 +779,7 @@ static const ppi8255_interface ppi8255_intf[4] =
 		NULL,					/* Port B write */
 		NULL					/* Port C write */
 	},
-	{	/* A, B & C as input */
+	{	/* A, B & C set as input */
 		input_port_5_r,			/* Port A read, DSW1 */
 		input_port_6_r,			/* Port B read, DSW2 */
 		input_port_7_r,			/* Port C read, DSW3 */
@@ -800,13 +787,13 @@ static const ppi8255_interface ppi8255_intf[4] =
 		NULL,					/* Port B write */
 		NULL					/* Port C write */
 	},
-	{	/* A as input */
+	{	/* A set as input */
 		input_port_8_r,			/* Port A read, DSW4 */
 		NULL,					/* Port B read */
 		NULL,					/* Port C read */
 		NULL,					/* Port A write */
-		NULL,					/* Port B write */
-		NULL					/* Port C write */
+		lamps_a_w,				/* Port B write, LAMPSA */
+		lamps_b_w				/* Port C write, LAMPSB */
 	}
 };
 
@@ -822,7 +809,7 @@ static const struct AY8910interface ay8910_interface =
 	input_port_3_r,
 	NULL,	/* a sort of status byte */
 	NULL,
-	unk_w
+	ym2149_portb_w
 };
 
 
@@ -833,10 +820,11 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( lucky74 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/8)	/* guess */
+	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(lucky74_map, 0)
 	MDRV_CPU_IO_MAP(lucky74_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_interrupt)
+//	MDRV_CPU_VBLANK_INT("main", nmi_interrupt)
+	MDRV_CPU_PERIODIC_INT(nmi_interrupt,120)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -852,7 +840,6 @@ static MACHINE_DRIVER_START( lucky74 )
 
 	MDRV_DEVICE_ADD( "ppi8255_3", PPI8255 )
 	MDRV_DEVICE_CONFIG( ppi8255_intf[3] )
-
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -873,10 +860,9 @@ static MACHINE_DRIVER_START( lucky74 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, MASTER_CLOCK/8)	/* YM2149F */
+	MDRV_SOUND_ADD("ay", AY8910, YM2149_CLOCK)	/* YM2149F */
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
 MACHINE_DRIVER_END
 
 
@@ -888,13 +874,13 @@ ROM_START( lucky74s )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "luckychi.00",	0x0000, 0x10000, CRC(3b906f0e) SHA1(1f9abd168c60b0d22fa6c7391bfdf5f3aabd66ef) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "fgtiles", ROMREGION_DISPOSE )
 	ROM_LOAD( "luckychi.12",	0x00000, 0x8000, CRC(ff934c20) SHA1(07cd2225dfc0e5b74be2e1b379c6b180e37660db) )
 	ROM_LOAD( "luckychi.11",	0x08000, 0x8000, CRC(2fd6fb8a) SHA1(1a910e0a2e6db22a8d9a65d7b932f9ca39601e9c) )
 	ROM_LOAD( "luckychi.13",	0x10000, 0x8000, CRC(c70a6da3) SHA1(195772ef649e21a5c54c5871e7b858967b6ebee8) )
 	ROM_LOAD( "luckychi.14",	0x18000, 0x8000, CRC(b5813b67) SHA1(cce38e33a5218d6839d956174807d88e7c070d5a) )
 
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "bgtiles", ROMREGION_DISPOSE )
 	ROM_LOAD( "luckychi.17",	0x00000, 0x8000, CRC(010ffa4a) SHA1(8856d61b71e951509073bc359851f47c39c4274d) )
 	ROM_LOAD( "luckychi.16",	0x08000, 0x8000, CRC(15104810) SHA1(586df734740209e2a05932e31d2a301d330e8cbd) )
 	ROM_LOAD( "luckychi.18",	0x10000, 0x8000, CRC(f2d45e76) SHA1(46df7bf98434c836fd38539575a35bf67c9ec2c6) )
@@ -921,13 +907,13 @@ ROM_START( lucky74b )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "luckygde.00",	0x0000, 0x10000, CRC(e3f7db99) SHA1(5c7d9d3fed9eb19d3d666c8c08b34968a9996a96) )	/* bad dump? */
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "fgtiles", ROMREGION_DISPOSE )
 	ROM_LOAD( "luckygde.12",	0x00000, 0x8000, CRC(7127465b) SHA1(3f72f91652fcab52c073744b1651fdfe772c584a) )
 	ROM_LOAD( "luckygde.11",	0x08000, 0x8000, CRC(8a5ea91a) SHA1(8d22615c00ff7c8a27cd721618b5d32a8d089c95) )
 	ROM_LOAD( "luckygde.13",	0x10000, 0x8000, CRC(bbb63ac1) SHA1(ab986055e34d90e81caf20c28c5ad89715209d0e) )
 	ROM_LOAD( "luckygde.14",	0x18000, 0x8000, CRC(dcffdf07) SHA1(d63fd7d23e488650d3731830f07bce0ce64424b8) )
 
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "bgtiles", ROMREGION_DISPOSE )
 	ROM_LOAD( "luckygde.17",	0x00000, 0x8000, CRC(18da3468) SHA1(6dc60da939bfa7528e1fe75a85328a32047c8990) )
 	ROM_LOAD( "luckygde.16",	0x08000, 0x8000, CRC(0e831be5) SHA1(302a68203f565718f7f537dab50fb52250c48859) )
 	ROM_LOAD( "luckygde.18",	0x10000, 0x8000, CRC(717e5f4e) SHA1(0f14c9525bf77bbc4de0d9695648acb40870a176) )
@@ -950,6 +936,6 @@ ROM_END
 *                Game Drivers                *
 **********************************************
 
-      YEAR  NAME      PARENT    MACHINE  INPUT     INIT  ROT    COMPANY         FULLNAME           FLAGS */
-GAME( 1988, lucky74s, 0,        lucky74, lucky74,  0,    ROT0, "Wing Co.Ltd.", "Lucky 74 (small)", GAME_NO_SOUND )
-GAME( 1988, lucky74b, lucky74s, lucky74, lucky74,  0,    ROT0, "Wing Co.Ltd.", "Lucky 74 (big)",   GAME_NO_SOUND | GAME_NOT_WORKING )
+       YEAR  NAME      PARENT    MACHINE  INPUT     INIT  ROT    COMPANY          FULLNAME           FLAGS                             LAYOUT  */
+GAMEL( 1988, lucky74s, 0,        lucky74, lucky74,  0,    ROT0, "Wing Co.,Ltd.", "Lucky 74 (small)", GAME_NO_SOUND                   , layout_lucky74 )
+GAMEL( 1988, lucky74b, lucky74s, lucky74, lucky74,  0,    ROT0, "Wing Co.,Ltd.", "Lucky 74 (big)",   GAME_NO_SOUND | GAME_NOT_WORKING, layout_lucky74 )
