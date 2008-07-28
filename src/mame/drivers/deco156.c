@@ -548,52 +548,52 @@ Notes:
 */
 
 ROM_START( hvysmsh )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x100000, "main", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD32_WORD( "lp00-2.2j",    0x000002, 0x080000, CRC(3f8fd724) SHA1(8efb27b96dbdc58715eb44c7846f30d485e1ded4) )
 	ROM_LOAD32_WORD( "lp01-2.3j",    0x000000, 0x080000, CRC(a6fe282a) SHA1(10295b740ced35b3bb1f48ca3af2e985912405ec) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mbg-00.9a",    0x000000, 0x080000, CRC(7d94eb16) SHA1(31cf5302eba37e935865822aebd76c700bc51eaf) )
 	ROM_CONTINUE( 0x100000, 0x080000)
 	ROM_CONTINUE( 0x080000, 0x080000)
 	ROM_CONTINUE( 0x180000, 0x080000)
 
-	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x800000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "mbg-01.10a",    0x000000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
 	ROM_LOAD16_BYTE( "mbg-02.11a",    0x000001, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki1", 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "mbg-03.10k",    0x00000, 0x80000,  CRC(4b809420) SHA1(ad0278745002320804a31af0b772f9ab5f075027) )
 
-	ROM_REGION( 0x200000, RGNCLASS_SOUND, "oki2", 0 ) /* Oki samples */
+	ROM_REGION( 0x200000, "oki2", 0 ) /* Oki samples */
 	ROM_LOAD( "mbg-04.11k",    0x00000, 0x200000, CRC(2281c758) SHA1(934691b4002ecd6bc9a09b8970ff18a09451d492) )
 
-//  ROM_REGION( 0x80, RGNCLASS_USER, "user1", 0 ) /* eeprom */
+//  ROM_REGION( 0x80, "user1", 0 ) /* eeprom */
 //  ROM_LOAD( "93c46.8k",    0x00, 0x80, CRC(d31fbd5b) SHA1(bf044408c637f6b39afd30ccb86af183ec0acc02) )
 ROM_END
 
 ROM_START( hvysmsha )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x100000, "main", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD32_WORD( "2j.bin",    0x000002, 0x080000, CRC(333a92c1) SHA1(b7e174ea081febb765298aa1c6533b2f9f162bce) )
 	ROM_LOAD32_WORD( "3j.bin",    0x000000, 0x080000, CRC(8c24c5ed) SHA1(ab9689530f4f4a6015ce0a6f8e0d796b0618cd79) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mbg-00.9a",    0x000000, 0x080000, CRC(7d94eb16) SHA1(31cf5302eba37e935865822aebd76c700bc51eaf) )
 	ROM_CONTINUE( 0x100000, 0x080000)
 	ROM_CONTINUE( 0x080000, 0x080000)
 	ROM_CONTINUE( 0x180000, 0x080000)
 
-	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x800000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "mbg-01.10a",    0x000000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
 	ROM_LOAD16_BYTE( "mbg-02.11a",    0x000001, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki1", 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples */
 	ROM_LOAD( "mbg-03.10k",    0x00000, 0x80000,  CRC(4b809420) SHA1(ad0278745002320804a31af0b772f9ab5f075027) )
 
-	ROM_REGION( 0x200000, RGNCLASS_SOUND, "oki2", 0 ) /* Oki samples */
+	ROM_REGION( 0x200000, "oki2", 0 ) /* Oki samples */
 	ROM_LOAD( "mbg-04.11k",    0x00000, 0x200000, CRC(2281c758) SHA1(934691b4002ecd6bc9a09b8970ff18a09451d492) )
 
-//  ROM_REGION( 0x80, RGNCLASS_USER, "user1", 0 ) /* eeprom */
+//  ROM_REGION( 0x80, "user1", 0 ) /* eeprom */
 //  ROM_LOAD( "93c46.8k",    0x00, 0x80, CRC(d31fbd5b) SHA1(bf044408c637f6b39afd30ccb86af183ec0acc02) )
 ROM_END
 
@@ -638,21 +638,21 @@ Notes:
 */
 
 ROM_START( wcvol95 )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x100000, "main", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD32_WORD( "pn00-0.2f",    0x000002, 0x080000, CRC(c9ed2006) SHA1(cee93eafc42c4de7a1453c85e7d6bca8d62cdc7b) )
 	ROM_LOAD32_WORD( "pn01-0.4f",    0x000000, 0x080000, CRC(1c3641c3) SHA1(60dddc3585e4dedb485f7505fee03495f615c0c0) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mbx-00.9a",    0x000000, 0x080000, CRC(a0b24204) SHA1(cec8089c6c635f23b3a4aeeef2c43f519568ad70) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "mbx-01.12a",    0x000000, 0x100000, CRC(73deb3f1) SHA1(c0cabecfd88695afe0f27c5bb115b4973907207d) )
 	ROM_LOAD16_BYTE( "mbx-02.13a",    0x000001, 0x100000, CRC(3204d324) SHA1(44102f71bae44bf3a9bd2de7e5791d959a2c9bdd) )
 
-	ROM_REGION( 0x200000, RGNCLASS_SOUND, "ymz", 0 ) /* YMZ280B-F samples */
+	ROM_REGION( 0x200000, "ymz", 0 ) /* YMZ280B-F samples */
 	ROM_LOAD( "mbx-03.13j",    0x00000, 0x200000,  CRC(061632bc) SHA1(7900ac56e59f4a4e5768ce72f4a4b7c5875f5ae8) )
 
-//  ROM_REGION( 0x80, RGNCLASS_USER, "user1", 0 ) /* eeprom */
+//  ROM_REGION( 0x80, "user1", 0 ) /* eeprom */
 //  ROM_LOAD( "93c46.3k",    0x00, 0x80, CRC(88f8e270) SHA1(cb82203ad38e0c12ea998562b7b785979726afe5) )
 ROM_END
 
@@ -660,8 +660,8 @@ ROM_END
 
 static void descramble_sound( running_machine *machine, const char *tag )
 {
-	UINT8 *rom = memory_region(machine, RGNCLASS_SOUND, tag);
-	int length = memory_region_length(machine, RGNCLASS_SOUND, tag);
+	UINT8 *rom = memory_region(machine, tag);
+	int length = memory_region_length(machine, tag);
 	UINT8 *buf1 = malloc_or_die(length);
 	UINT32 x;
 

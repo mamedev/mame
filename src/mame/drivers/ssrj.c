@@ -49,7 +49,7 @@ static int oldport=0x80;
 
 static MACHINE_RESET(ssrj)
 {
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *rom = memory_region(machine, "main");
 	memset(&rom[0xc000], 0 ,0x3fff); /* req for some control types */
 	oldport = 0x80;
 }
@@ -201,16 +201,16 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( ssrj )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "a40-01.bin",   0x0000, 0x4000, CRC(1ff7dbff) SHA1(a9e676ee087141d62f880cd98e7748db1e6e9461) )
 	ROM_LOAD( "a40-02.bin",   0x4000, 0x4000, CRC(bbb36f9f) SHA1(9f85bac639d18ee932273a6c00b36ac969e69bb8) )
 
-	ROM_REGION( 0x6000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "a40-03.bin",   0x0000, 0x2000, CRC(3753182a) SHA1(3eda34f967563b11416344da87b7be46cbecff2b) )
 	ROM_LOAD( "a40-04.bin",   0x2000, 0x2000, CRC(96471816) SHA1(e24b690085602b8bde079e596c2879deab128c83) )
 	ROM_LOAD( "a40-05.bin",   0x4000, 0x2000, CRC(dce9169e) SHA1(2cdda1453b2913fad931788e1db0bc01ce923a04) )
 
-	ROM_REGION( 0x100, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "proms",  0x0000, 0x0100, NO_DUMP )
 
 ROM_END

@@ -458,7 +458,7 @@ static void *ics2115_start(const char *tag, int sndindex, int clock, const void 
 
 	chip->intf = config;
 	chip->index = sndindex;
-	chip->rom = memory_region(Machine, RGNCLASS_SOUND, tag);
+	chip->rom = memory_region(Machine, tag);
 	chip->timer[0].timer = timer_alloc(timer_cb_0, chip);
 	chip->timer[1].timer = timer_alloc(timer_cb_1, chip);
 	chip->ulaw = auto_malloc(256*sizeof(INT16));

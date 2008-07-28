@@ -187,7 +187,7 @@ static MACHINE_RESET( common )
 	framenum = 0;
 
 	/* boot the ADSP chip */
-	src = (UINT16 *)memory_region(machine, RGNCLASS_USER, "user1");
+	src = (UINT16 *)memory_region(machine, "user1");
 	for (i = 0; i < (src[3] & 0xff) * 8; i++)
 	{
 		UINT32 opcode = ((src[i*4+0] & 0xff) << 16) | ((src[i*4+1] & 0xff) << 8) | (src[i*4+2] & 0xff);
@@ -200,7 +200,7 @@ static MACHINE_RESET( common )
 	/* allocate a timer for feeding the autobuffer */
 	adsp_autobuffer_timer = timer_alloc(adsp_autobuffer_irq, NULL);
 
-	memory_configure_bank(1, 0, 256, memory_region(machine, RGNCLASS_USER, "user1"), 0x4000);
+	memory_configure_bank(1, 0, 256, memory_region(machine, "user1"), 0x4000);
 	memory_set_bank(1, 0);
 
 	/* keep the TMS32031 halted until the code is ready to go */
@@ -764,7 +764,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tms_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(tms_m68k_ram_r, tms_m68k_ram_w)
-	AM_RANGE(0x400000, 0x5fffff) AM_ROM AM_REGION(RGNCLASS_USER, "user2", 0)
+	AM_RANGE(0x400000, 0x5fffff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0xc00000, 0xc00007) AM_WRITE(gaelco3d_render_w)
 ADDRESS_MAP_END
 
@@ -985,24 +985,24 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( speedup )
-	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x200000, "main", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "sup10.bin", 0x000000, 0x80000, CRC(07e70bae) SHA1(17013d859ec075e12518b094040a056d850b3271) )
 	ROM_LOAD16_BYTE( "sup15.bin", 0x000001, 0x80000, CRC(7947c28d) SHA1(46efb56d0f7fe2e92d0d04dcd2f130aef3be436d) )
 
-	ROM_REGION16_LE( 0x400000, RGNCLASS_USER, "user1", 0 )	/* ADSP-2115 code & data */
+	ROM_REGION16_LE( 0x400000, "user1", 0 )	/* ADSP-2115 code & data */
 	ROM_LOAD( "sup25.bin", 0x0000000, 0x400000, CRC(284c7cd1) SHA1(58fbe73195aac9808a347c543423593e17ad3a10) )
 
-	ROM_REGION32_LE( 0x800000, RGNCLASS_USER, "user2", 0 )
+	ROM_REGION32_LE( 0x800000, "user2", 0 )
 	ROM_LOAD32_WORD( "sup32.bin", 0x000000, 0x200000, CRC(aed151de) SHA1(a139d4451d3758aa70621a25289d64c98c26d5c0) )
 	ROM_LOAD32_WORD( "sup33.bin", 0x000002, 0x200000, CRC(9be6ab7d) SHA1(8bb07f2a096d1f8989a5a409f87b35b7d771de88) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "sup12.bin", 0x0000000, 0x400000, CRC(311f3247) SHA1(95014ea177011521a01df85fb511e5e6673dbdcb) )
 	ROM_LOAD( "sup14.bin", 0x0400000, 0x400000, CRC(3ad3c089) SHA1(1bd577679ed436251995a100aece2c26c0214fd8) )
 	ROM_LOAD( "sup11.bin", 0x0800000, 0x400000, CRC(b993e65a) SHA1(b95bd4c1eac7fba1d2429250446b58f741350bb3) )
 	ROM_LOAD( "sup13.bin", 0x0c00000, 0x400000, CRC(ad00023c) SHA1(9d7cce280fff38d7e0dac21e7a1774809d9758bd) )
 
-	ROM_REGION( 0x0080000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0080000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "ic35.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) )
 	ROM_LOAD( "ic34.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) )
 	/* these 2 are copies of the previous 2 */
@@ -1012,26 +1012,26 @@ ROM_END
 
 
 ROM_START( surfplnt )
-	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x200000, "main", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "surfplnt.u5",  0x000000, 0x80000, CRC(c96e0a18) SHA1(b313d02d1d1bff8717b3d798e6ae681baefc1061) )
 	ROM_LOAD16_BYTE( "surfplnt.u11", 0x000001, 0x80000, CRC(99211d2d) SHA1(dee5b157489ce9c6988c8eec92fa91fff60d521c) )
 	ROM_LOAD16_BYTE( "surfplnt.u8",  0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
 	ROM_LOAD16_BYTE( "surfplnt.u13", 0x100001, 0x80000, CRC(d9754369) SHA1(0d82569cb925402a9f4634e52f15435112ec4878) )
 
-	ROM_REGION16_LE( 0x400000, RGNCLASS_USER, "user1", 0 )	/* ADSP-2115 code & data */
+	ROM_REGION16_LE( 0x400000, "user1", 0 )	/* ADSP-2115 code & data */
 	ROM_LOAD( "pls.18", 0x0000000, 0x400000, CRC(a1b64695) SHA1(7487cd51305e30a5b55aada0bae9161fcb3fcd19) )
 
-	ROM_REGION32_LE( 0x800000, RGNCLASS_USER, "user2", 0 )
+	ROM_REGION32_LE( 0x800000, "user2", 0 )
 	ROM_LOAD32_WORD( "pls.40", 0x000000, 0x400000, CRC(26877ad3) SHA1(2e0c15b0e060e0b3d5b5cdaf1e22b9ec8e1abc9a) )
 	ROM_LOAD32_WORD( "pls.37", 0x000002, 0x400000, CRC(75893062) SHA1(81f10243336a309f8cc8532ee9a130ecc35bbcd6) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "pls.7",  0x0000000, 0x400000, CRC(04bd1605) SHA1(4871758e57af5132c30137cd6c46f1a3a567b640) )
 	ROM_LOAD( "pls.9",  0x0400000, 0x400000, CRC(f4400160) SHA1(206557cd4c73b6b3a04bd35b48de736c7546c5e1) )
 	ROM_LOAD( "pls.12", 0x0800000, 0x400000, CRC(edc2e826) SHA1(48d428f928a9805a62bbeaecffcac21aaa76ce77) )
 	ROM_LOAD( "pls.15", 0x0c00000, 0x400000, CRC(b0f6b8da) SHA1(7404ec7455adf145919a28907443994f6a5706a1) )
 
-	ROM_REGION( 0x0080000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0080000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "surfplnt.u19", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) )
 	ROM_LOAD( "surfplnt.u20", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
 	ROM_LOAD( "surfplnt.u21", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
@@ -1045,20 +1045,20 @@ ROM_END
 
 
 ROM_START( radikalb )
-	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 )	/* 68020 code */
+	ROM_REGION( 0x200000, "main", 0 )	/* 68020 code */
 	ROM_LOAD32_BYTE( "rab.6",  0x000000, 0x80000, CRC(ccac98c5) SHA1(43a30caf9880f48aba79676f9e746fdc6258139d) )
 	ROM_LOAD32_BYTE( "rab.12", 0x000001, 0x80000, CRC(26199506) SHA1(1b7b44895aa296eab8061ae85cbb5b0d30119dc7) )
 	ROM_LOAD32_BYTE( "rab.14", 0x000002, 0x80000, CRC(4a0ac8cb) SHA1(4883e5eddb833dcd39376be435aa8e8e2ec47ab5) )
 	ROM_LOAD32_BYTE( "rab.19", 0x000003, 0x80000, CRC(2631bd61) SHA1(57331ad49e7284b82073f696049de109b7683b03) )
 
-	ROM_REGION16_LE( 0x400000, RGNCLASS_USER, "user1", 0 )	/* ADSP-2115 code & data */
+	ROM_REGION16_LE( 0x400000, "user1", 0 )	/* ADSP-2115 code & data */
 	ROM_LOAD( "rab.23", 0x0000000, 0x400000, CRC(dcf52520) SHA1(ab54421c182436660d2a56a334c1aa335424644a) )
 
-	ROM_REGION32_LE( 0x800000, RGNCLASS_USER, "user2", 0 )
+	ROM_REGION32_LE( 0x800000, "user2", 0 )
 	ROM_LOAD32_WORD( "rab.48", 0x000000, 0x400000, CRC(9c56a06a) SHA1(54f12d8b55fa14446c47e31684c92074c4157fe1) )
 	ROM_LOAD32_WORD( "rab.45", 0x000002, 0x400000, CRC(7e698584) SHA1(a9423835a126396902c499e9f7df3b68c2ab28a8) )
 
-	ROM_REGION( 0x2000000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rab.8",  0x0000000, 0x400000, CRC(4fbd4737) SHA1(594438d3edbe00682290986cc631615d7bef67f3) )
 	ROM_LOAD( "rab.10", 0x0800000, 0x400000, CRC(870b0ce4) SHA1(75910dca87d2eb3a6b4a28f6e9c63a6b6700de84) )
 	ROM_LOAD( "rab.15", 0x1000000, 0x400000, CRC(edb9d409) SHA1(1f8df507e990eee197f2779b45bd8f143d1bd439) )
@@ -1069,7 +1069,7 @@ ROM_START( radikalb )
 	ROM_LOAD( "rab.16", 0x1400000, 0x400000, CRC(9d595e46) SHA1(b985332974e1fb0b9d20d521da0d7deceea93a8a) )
 	ROM_LOAD( "rab.18", 0x1c00000, 0x400000, CRC(3084bc49) SHA1(9da43482293eeb08ceae67455b2fcd97b6ef5109) )
 
-	ROM_REGION( 0x0080000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0080000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "rab.24", 0x0000000, 0x020000, CRC(2984bc1d) SHA1(1f62bdaa86feeff96640e325f8241b9c5f383a44) )
 	ROM_LOAD( "rab.25", 0x0020000, 0x020000, CRC(777758e3) SHA1(bd334b1ba46189ac8509eee3a4ab295c121400fd) )
 	ROM_LOAD( "rab.26", 0x0040000, 0x020000, CRC(bd9c1b54) SHA1(c9ef679cf7eca9ed315ea62a7ada452bc85f7a6a) )
@@ -1095,13 +1095,13 @@ static DRIVER_INIT( gaelco3d )
 	int x, y;
 
 	/* allocate memory */
-	gaelco3d_texture_size = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
-	gaelco3d_texmask_size = memory_region_length(machine, RGNCLASS_GFX, "gfx2") * 8;
+	gaelco3d_texture_size = memory_region_length(machine, "gfx1");
+	gaelco3d_texmask_size = memory_region_length(machine, "gfx2") * 8;
 	gaelco3d_texture = auto_malloc(gaelco3d_texture_size);
 	gaelco3d_texmask = auto_malloc(gaelco3d_texmask_size);
 
 	/* first expand the pixel data */
-	src = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	src = memory_region(machine, "gfx1");
 	dst = gaelco3d_texture;
 	for (y = 0; y < gaelco3d_texture_size/4096; y += 2)
 		for (x = 0; x < 4096; x += 2)
@@ -1113,7 +1113,7 @@ static DRIVER_INIT( gaelco3d )
 		}
 
 	/* then expand the mask data */
-	src = memory_region(machine, RGNCLASS_GFX, "gfx2");
+	src = memory_region(machine, "gfx2");
 	dst = gaelco3d_texmask;
 	for (y = 0; y < gaelco3d_texmask_size/4096; y++)
 		for (x = 0; x < 4096; x++)

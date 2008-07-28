@@ -259,9 +259,9 @@ static void *gaelcosnd_start(sound_type sndtype, const char *tag, int sndindex, 
 		info->banks[j] = intf->banks[j];
 	}
 	info->stream = stream_create(0, 2, 8000, info, gaelco_update);
-	info->snd_data = (UINT8 *)memory_region(Machine, RGNCLASS_GFX, intf->gfxregion);
+	info->snd_data = (UINT8 *)memory_region(Machine, intf->gfxregion);
 	if (info->snd_data == NULL)
-		info->snd_data = (UINT8 *)memory_region(Machine, RGNCLASS_SOUND, tag);
+		info->snd_data = (UINT8 *)memory_region(Machine, tag);
 
 	/* init volume table */
 	for (vol = 0; vol < VOLUME_LEVELS; vol++){

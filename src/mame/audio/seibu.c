@@ -106,7 +106,7 @@ static UINT8 decrypt_opcode(int a,int src)
 void seibu_sound_decrypt(running_machine *machine,const char *cpu,int length)
 {
 	UINT8 *decrypt = auto_malloc(length);
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, cpu);
+	UINT8 *rom = memory_region(machine, cpu);
 	int i;
 
 	memory_set_decrypted_region(mame_find_cpu_index(machine, cpu), 0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
@@ -179,7 +179,7 @@ static void *seibu_adpcm_start(int clock, const struct CustomSound_interface *co
 			state->allocated = 1;
 			state->playing = 0;
 			state->stream = stream_create(0, 1, clock, state, seibu_adpcm_callback);
-			state->base = memory_region(Machine, RGNCLASS_SOUND, "adpcm");
+			state->base = memory_region(Machine, "adpcm");
 			reset_adpcm(&state->adpcm);
 			return state;
 		}
@@ -198,8 +198,8 @@ static void seibu_adpcm_stop(void *token)
 
 void seibu_adpcm_decrypt(running_machine *machine, const char *region)
 {
-	UINT8 *ROM = memory_region(machine, RGNCLASS_SOUND, region);
-	int len = memory_region_length(machine, RGNCLASS_SOUND, region);
+	UINT8 *ROM = memory_region(machine, region);
+	int len = memory_region_length(machine, region);
 	int i;
 
 	for (i = 0; i < len; i++)
@@ -356,8 +356,8 @@ void seibu_ym2203_irqhandler(running_machine *machine, int linestate)
 
 MACHINE_RESET( seibu_sound )
 {
-	int romlength = memory_region_length(machine, RGNCLASS_CPU, "audio");
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "audio");
+	int romlength = memory_region_length(machine, "audio");
+	UINT8 *rom = memory_region(machine, "audio");
 
 	sound_cpu=mame_find_cpu_index(machine, "audio");
 	update_irq_lines(machine, VECTOR_INIT);

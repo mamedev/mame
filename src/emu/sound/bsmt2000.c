@@ -121,8 +121,8 @@ static void *bsmt2000_start(const char *tag, int sndindex, int clock, const void
 	chip->clock = clock;
 
 	/* initialize the regions */
-	chip->region_base = (INT8 *)memory_region(Machine, RGNCLASS_SOUND, tag);
-	chip->total_banks = memory_region_length(Machine, RGNCLASS_SOUND, tag) / 0x10000;
+	chip->region_base = (INT8 *)memory_region(Machine, tag);
+	chip->total_banks = memory_region_length(Machine, tag) / 0x10000;
 
 	/* register chip-wide data for save states */
 	state_save_register_item("bsmt2000", sndindex * 16, chip->last_register);

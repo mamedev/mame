@@ -476,22 +476,22 @@ MACHINE_DRIVER_END
 
 
 ROM_START( crospang )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* 68k */
+	ROM_REGION( 0x100000, "main", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "p1.bin", 0x00001, 0x20000, CRC(0bcbbaad) SHA1(807f07be340d7af0aad8d49461b5a7f0221ea3b7) )
 	ROM_LOAD16_BYTE( "p2.bin", 0x00000, 0x20000, CRC(0947d204) SHA1(35e7e277c51888a66d305994bf05c3f6bfc3c29e) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* z80  */
+	ROM_REGION( 0x10000, "audio", 0 ) /* z80  */
 	ROM_LOAD( "s1.bin", 0x00000, 0x10000, CRC(d61a224c) SHA1(5cd1b2d136ad58ab550c7ba135558d6c8a4cd8f6) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 ) /* samples */
+	ROM_REGION( 0x20000, "oki", 0 ) /* samples */
 	ROM_LOAD( "s2.bin", 0x00000, 0x20000, CRC(9f9ecd22) SHA1(631ffe14018ba39658c435b8ecb23b19a14569ee) ) // sample rom contains oksan?
 
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", 0 ) /* bg tiles */
+	ROM_REGION( 0x80000, "gfx1", 0 ) /* bg tiles */
 	ROM_LOAD16_BYTE( "rom1.bin", 0x00000, 0x40000, CRC(905042bb) SHA1(ed5b97e88d24e55f8fcfaaa34251582976cb2527) )
 	ROM_LOAD16_BYTE( "rom2.bin", 0x00001, 0x40000, CRC(bc4381e9) SHA1(af0690c253bead3448db5ec8fb258d8284646e89) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", 0 ) /* sprites */
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "rom3.bin", 0x000000, 0x80000, CRC(cc6e1fce) SHA1(eb5b3ca7222f48916dc6206f987b2669fe7e7c6b) )
 	ROM_LOAD16_BYTE( "rom4.bin", 0x000001, 0x80000, CRC(9a91d494) SHA1(1c6280f662f1cf53f7f6defb7e215da75b573fdf) )
 	ROM_LOAD16_BYTE( "rom5.bin", 0x100000, 0x80000, CRC(53a34dc5) SHA1(2e5cf8093bf507e81d7447736b7727c3fd20c471) )
@@ -525,17 +525,17 @@ OKI M6295
 */
 
 ROM_START( heuksun )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "ua02.j3", 0x00001, 0x80000, CRC(db2b9c8e) SHA1(aa37e3a056957a12888e2e3112fe78a6bff7d76f) )
 	ROM_LOAD16_BYTE( "ua03.j5", 0x00000, 0x80000, CRC(de9f01e8) SHA1(3ee9206e7c3c7bebd7cde6f201c2fa7f9f6553b7) )
 
-	ROM_REGION( 0x040000, RGNCLASS_CPU, "audio", 0 ) /* Z80 */
+	ROM_REGION( 0x040000, "audio", 0 ) /* Z80 */
 	ROM_LOAD( "us02.r4", 0x00000, 0x10000, CRC(c7cc05fa) SHA1(5fbf479be98f618c63e4c74a250d51279c2f5e3b) )
 
-	ROM_REGION( 0x040000, RGNCLASS_SOUND, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "us08.u7", 0x00000, 0x40000, CRC(ae177589) SHA1(9a1e2b848046f3506ede4f218a9175cc8e984ad8) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 ) // tiles
+	ROM_REGION( 0x200000, "gfx1", 0 ) // tiles
 	ROM_LOAD16_BYTE( "uc08.r11", 0x00001, 0x20000, CRC(242cee69) SHA1(71112ea6aac4db9b923315656f12d2f72173d9cd) )
 	ROM_CONTINUE ( 0x100001,0x20000)
 	ROM_CONTINUE ( 0x040001,0x20000)
@@ -546,7 +546,7 @@ ROM_START( heuksun )
 	ROM_CONTINUE ( 0x140000,0x20000)
 
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 ) // sprites
+	ROM_REGION( 0x100000, "gfx2", 0 ) // sprites
 	ROM_LOAD16_BYTE( "ud14.p11", 0x00000, 0x40000, CRC(4fc2b574) SHA1(f3330d9cc3065b5a96e222300c2ae01e57241632) )
 	ROM_LOAD16_BYTE( "ud15.m11", 0x00001, 0x40000, CRC(1d6187a6) SHA1(51f1ac086d67e8b35081ddc14e28b218d3153779) )
 	ROM_LOAD16_BYTE( "ud16.l11", 0x80000, 0x40000, CRC(eabec43e) SHA1(fa0a7886ccaf90e9ed59dc283e27f9e8e9aa7d29) )
@@ -599,17 +599,17 @@ ud17.e12 D
 */
 
 ROM_START( bestri )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "ua02.i3", 0x00001, 0x80000, CRC(9e94023d) SHA1(61a07eb835d324cb4fe7e3d366dd3907838b2554) )
 	ROM_LOAD16_BYTE( "ua03.i5", 0x00000, 0x80000, CRC(08cfa8d8) SHA1(684729887bf2dd2fe22e5bd2e32073169d426e02) )
 
-	ROM_REGION( 0x040000, RGNCLASS_CPU, "audio", 0 ) /* Z80 */
+	ROM_REGION( 0x040000, "audio", 0 ) /* Z80 */
 	ROM_LOAD( "us02.p3", 0x00000, 0x10000, CRC(c7cc05fa) SHA1(5fbf479be98f618c63e4c74a250d51279c2f5e3b) ) // same as huek
 
-	ROM_REGION( 0x040000, RGNCLASS_SOUND, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "us08.q7", 0x00000, 0x40000, CRC(85d8f3de) SHA1(af55678bbe2c187cfee063c6f74cdd568307a7a2) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 ) // tiles
+	ROM_REGION( 0x200000, "gfx1", 0 ) // tiles
 
 	ROM_LOAD16_BYTE( "uc08.m12", 0x00001, 0x20000, CRC(2fc0c30e) SHA1(0c50efd20340f10961e872b3cd63c36aefed26f0) )
 	ROM_CONTINUE ( 0x100001,0x20000)
@@ -629,7 +629,7 @@ ROM_START( bestri )
 	ROM_CONTINUE ( 0x1c0000,0x20000)
 
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", 0 ) // sprites
+	ROM_REGION( 0x200000, "gfx2", 0 ) // sprites
 	ROM_LOAD16_BYTE( "ud14.j12", 0x000000, 0x80000, CRC(141c696e) SHA1(3d35a20f7c12a8d8a9f6d351f06fb9df0c673354) )
 	ROM_LOAD16_BYTE( "ud15.h12", 0x000001, 0x80000, CRC(7c04adc0) SHA1(9883565d6556ce8ae3da6c91cbf04894e87e6923) )
 	ROM_LOAD16_BYTE( "ud16.g12", 0x100000, 0x80000, CRC(3282ea76) SHA1(cc21cac35f47ba299823c2cfe6b4946f8483b821) )
@@ -639,8 +639,8 @@ ROM_END
 
 static void tumblepb_gfx1_rearrange(running_machine *machine)
 {
-	UINT8 *rom = memory_region(machine, RGNCLASS_GFX, "gfx1");
-	int len = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
+	UINT8 *rom = memory_region(machine, "gfx1");
+	int len = memory_region_length(machine, "gfx1");
 	int i;
 
 	/* gfx data is in the wrong order */

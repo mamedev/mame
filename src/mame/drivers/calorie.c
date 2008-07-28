@@ -89,7 +89,7 @@ static tilemap *bg_tilemap,*fg_tilemap;
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *src = memory_region(machine, RGNCLASS_USER, "user1");
+	UINT8 *src = memory_region(machine, "user1");
 	int bg_base = (calorie_bg & 0x0f) * 0x200;
 	int code  = src[bg_base + tile_index] | (((src[bg_base + tile_index + 0x100]) & 0x10) << 4);
 	int color = src[bg_base + tile_index + 0x100] & 0x0f;
@@ -398,58 +398,58 @@ MACHINE_DRIVER_END
 
 
 ROM_START( calorie )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "epr10072.1j", 0x00000, 0x4000, CRC(ade792c1) SHA1(6ea5afb00a87037d502c17adda7e4060d12680d7) )
 	ROM_LOAD( "epr10073.1k", 0x04000, 0x4000, CRC(b53e109f) SHA1(a41c5affe917232e7adf40d7c15cff778b197e90) )
 	ROM_LOAD( "epr10074.1m", 0x08000, 0x4000, CRC(a08da685) SHA1(69f9cfebc771312dbb1726350c2d9e9e8c46353f) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "epr10075.4d", 0x0000, 0x4000, CRC(ca547036) SHA1(584a65482f2b92a4c08c37560450d6db68a56c7b) )
 
-	ROM_REGION( 0x2000, RGNCLASS_USER, "user1", 0 ) /* background tilemaps */
+	ROM_REGION( 0x2000, "user1", 0 ) /* background tilemaps */
 	ROM_LOAD( "epr10079.8d", 0x0000, 0x2000, CRC(3c61a42c) SHA1(68ea6b5d2f3c6a9e5308c08dde20424f20021a73) )
 
-	ROM_REGION( 0xc000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* sprites */
+	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE ) /* sprites */
 	ROM_LOAD( "epr10071.7m", 0x0000, 0x4000, CRC(5f55527a) SHA1(ec1ba8f95ac47a0c783e117ef4af6fe0ab5925b5) )
 	ROM_LOAD( "epr10070.7k", 0x4000, 0x4000, CRC(97f35a23) SHA1(869553a334e1b3ba900a8b9c9eaf25fbc6ab31dd) )
 	ROM_LOAD( "epr10069.7j", 0x8000, 0x4000, CRC(c0c3deaf) SHA1(8bf2e2146b794a330a079dd080f0586500964b1a) )
 
-	ROM_REGION( 0x6000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) /* tiles  */
+	ROM_REGION( 0x6000, "gfx2", ROMREGION_DISPOSE ) /* tiles  */
 	ROM_LOAD( "epr10082.5r", 0x0000, 0x2000, CRC(5984ea44) SHA1(010011b5b8dfa593c6fc7d2366f8cf82fcc8c978) )
 	ROM_LOAD( "epr10081.4r", 0x2000, 0x2000, CRC(e2d45dd8) SHA1(5e11089680b574ea4cbf64510e51b0a945f79174) )
 	ROM_LOAD( "epr10080.3r", 0x4000, 0x2000, CRC(42edfcfe) SHA1(feba7b1daffcad24d4c24f55ab5466f8cebf31ad) )
 
-	ROM_REGION( 0xc000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE ) /* tiles */
+	ROM_REGION( 0xc000, "gfx3", ROMREGION_DISPOSE ) /* tiles */
 	ROM_LOAD( "epr10078.7d", 0x0000, 0x4000, CRC(5b8eecce) SHA1(e7eee82081939b361edcbb9587b072b4b9a162f9) )
 	ROM_LOAD( "epr10077.6d", 0x4000, 0x4000, CRC(01bcb609) SHA1(5d01fa75f214d34483284aaaef985ab92a606505) )
 	ROM_LOAD( "epr10076.5d", 0x8000, 0x4000, CRC(b1529782) SHA1(8e0e92aae4c8dd8720414372aa767054cc316a0f) )
 ROM_END
 
 ROM_START( calorieb )
-	ROM_REGION( 0x1c000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x1c000, "main", 0 )
 	ROM_LOAD( "12.bin",      0x10000, 0x4000, CRC(cf5fa69e) SHA1(520d5652e93a672a1fc147295fbd63b873967885) )
 	ROM_CONTINUE(            0x00000, 0x4000 )
 	ROM_LOAD( "13.bin",      0x14000, 0x4000, CRC(52e7263f) SHA1(4d684c9e3f08ddb18b0b3b982aba82d3c809a633) )
 	ROM_CONTINUE(            0x04000, 0x4000 )
 	ROM_LOAD( "epr10074.1m", 0x08000, 0x4000, CRC(a08da685) SHA1(69f9cfebc771312dbb1726350c2d9e9e8c46353f) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "epr10075.4d", 0x0000, 0x4000, CRC(ca547036) SHA1(584a65482f2b92a4c08c37560450d6db68a56c7b) )
 
-	ROM_REGION( 0x2000, RGNCLASS_USER, "user1", 0 ) /* background tilemaps */
+	ROM_REGION( 0x2000, "user1", 0 ) /* background tilemaps */
 	ROM_LOAD( "epr10079.8d", 0x0000, 0x2000, CRC(3c61a42c) SHA1(68ea6b5d2f3c6a9e5308c08dde20424f20021a73) )
 
-	ROM_REGION( 0xc000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* sprites */
+	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE ) /* sprites */
 	ROM_LOAD( "epr10071.7m", 0x0000, 0x4000, CRC(5f55527a) SHA1(ec1ba8f95ac47a0c783e117ef4af6fe0ab5925b5) )
 	ROM_LOAD( "epr10070.7k", 0x4000, 0x4000, CRC(97f35a23) SHA1(869553a334e1b3ba900a8b9c9eaf25fbc6ab31dd) )
 	ROM_LOAD( "epr10069.7j", 0x8000, 0x4000, CRC(c0c3deaf) SHA1(8bf2e2146b794a330a079dd080f0586500964b1a) )
 
-	ROM_REGION( 0x6000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) /* tiles  */
+	ROM_REGION( 0x6000, "gfx2", ROMREGION_DISPOSE ) /* tiles  */
 	ROM_LOAD( "epr10082.5r", 0x0000, 0x2000, CRC(5984ea44) SHA1(010011b5b8dfa593c6fc7d2366f8cf82fcc8c978) )
 	ROM_LOAD( "epr10081.4r", 0x2000, 0x2000, CRC(e2d45dd8) SHA1(5e11089680b574ea4cbf64510e51b0a945f79174) )
 	ROM_LOAD( "epr10080.3r", 0x4000, 0x2000, CRC(42edfcfe) SHA1(feba7b1daffcad24d4c24f55ab5466f8cebf31ad) )
 
-	ROM_REGION( 0xc000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE ) /* tiles */
+	ROM_REGION( 0xc000, "gfx3", ROMREGION_DISPOSE ) /* tiles */
 	ROM_LOAD( "epr10078.7d", 0x0000, 0x4000, CRC(5b8eecce) SHA1(e7eee82081939b361edcbb9587b072b4b9a162f9) )
 	ROM_LOAD( "epr10077.6d", 0x4000, 0x4000, CRC(01bcb609) SHA1(5d01fa75f214d34483284aaaef985ab92a606505) )
 	ROM_LOAD( "epr10076.5d", 0x8000, 0x4000, CRC(b1529782) SHA1(8e0e92aae4c8dd8720414372aa767054cc316a0f) )
@@ -463,7 +463,7 @@ static DRIVER_INIT( calorie )
 
 static DRIVER_INIT( calorieb )
 {
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, RGNCLASS_CPU, "main") + 0x10000);
+	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, "main") + 0x10000);
 }
 
 

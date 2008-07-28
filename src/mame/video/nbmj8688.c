@@ -184,7 +184,7 @@ WRITE8_HANDLER( mjsikaku_scrolly_w )
 
 WRITE8_HANDLER( mjsikaku_romsel_w )
 {
-	int gfxlen = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
+	int gfxlen = memory_region_length(machine, "gfx1");
 	mjsikaku_gfxrom = (data & 0x0f);
 
 	if ((mjsikaku_gfxrom << 17) > (gfxlen - 1))
@@ -198,7 +198,7 @@ WRITE8_HANDLER( mjsikaku_romsel_w )
 
 WRITE8_HANDLER( secolove_romsel_w )
 {
-	int gfxlen = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
+	int gfxlen = memory_region_length(machine, "gfx1");
 	mjsikaku_gfxrom = ((data & 0xc0) >> 4) + (data & 0x03);
 	mjsikaku_gfxflag2_w(machine, 0, data);
 
@@ -213,7 +213,7 @@ WRITE8_HANDLER( secolove_romsel_w )
 
 WRITE8_HANDLER( crystalg_romsel_w )
 {
-	int gfxlen = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
+	int gfxlen = memory_region_length(machine, "gfx1");
 	mjsikaku_gfxrom = (data & 0x03);
 	mjsikaku_gfxflag2_w(machine, 0, data);
 
@@ -228,7 +228,7 @@ WRITE8_HANDLER( crystalg_romsel_w )
 
 WRITE8_HANDLER( seiha_romsel_w )
 {
-	int gfxlen = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
+	int gfxlen = memory_region_length(machine, "gfx1");
 	mjsikaku_gfxrom = (data & 0x1f);
 	mjsikaku_gfxflag3_w(machine, 0, data);
 
@@ -296,7 +296,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 
 static void mbmj8688_gfxdraw(running_machine *machine, int gfxtype)
 {
-	UINT8 *GFX = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	UINT8 *GFX = memory_region(machine, "gfx1");
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -339,7 +339,7 @@ static void mbmj8688_gfxdraw(running_machine *machine, int gfxtype)
 		skipy = -1;
 	}
 
-	gfxlen = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
+	gfxlen = memory_region_length(machine, "gfx1");
 	gfxaddr = (mjsikaku_gfxrom << 17) + (blitter_src_addr << 1);
 //popmessage("ADDR:%08X DX:%03d DY:%03d SX:%03d SY:%03d", gfxaddr, startx, starty, sizex, sizey);
 //if (blitter_direction_x|blitter_direction_y) popmessage("ADDR:%08X FX:%01d FY:%01d", gfxaddr, blitter_direction_x, blitter_direction_y);

@@ -2,7 +2,7 @@
 #include "megadriv.h"
 
 ROM_START( ssf2ghw )
-	ROM_REGION( 0x1400000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x1400000, "main", 0 ) /* 68000 Code */
 	/* Special Case, custom PCB, linear ROM mapping of 5meg */
 	ROM_LOAD16_BYTE( "rom_a", 0x000000, 0x200000,  CRC(59726521) SHA1(3120bac17f56c01ffb9d3f9e31efa0263e3774af) )
 	ROM_LOAD16_BYTE( "rom_b", 0x000001, 0x200000,  CRC(7dad5540) SHA1(9279068b2218d239fdd557dd959ac70e74853178) )
@@ -21,7 +21,7 @@ static DRIVER_INIT( ssf2ghw )
 	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA130F0, 0xA130FF, 0, 0, SMH_NOP); // custom banking is disabled (!)
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x5fffff, 0, 0, SMH_BANK5, SMH_UNMAP);
 
-	memory_set_bankptr( 5, memory_region( machine, RGNCLASS_CPU, "main" )+0x400000 );
+	memory_set_bankptr( 5, memory_region( machine, "main" )+0x400000 );
 
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x770070, 0x770075, 0, 0, ssf2ghw_dsw_r );
 

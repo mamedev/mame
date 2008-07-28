@@ -119,7 +119,7 @@ READ8_HANDLER( hyprolyb_speech_r )
 WRITE8_HANDLER( hyprolyb_ADPCM_data_w )
 {
     int cmd,start,end;
-    UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "adpcm");
+    UINT8 *RAM = memory_region(machine, "adpcm");
 
 
     /* simulate the operation of the 6802 */

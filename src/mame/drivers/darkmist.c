@@ -43,7 +43,7 @@ int darkmist_hw;
 static WRITE8_HANDLER(darkmist_hw_w)
 {
   darkmist_hw=data;
-  memory_set_bankptr(1,&memory_region(machine, RGNCLASS_CPU, "main")[0x010000+((data&0x80)?0x4000:0)]);
+  memory_set_bankptr(1,&memory_region(machine, "main")[0x010000+((data&0x80)?0x4000:0)]);
 }
 
 static READ8_HANDLER(t5182shared_r)
@@ -280,48 +280,48 @@ static MACHINE_DRIVER_START( darkmist )
 MACHINE_DRIVER_END
 
 ROM_START( darkmist )
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x18000, "main", 0 )
 	ROM_LOAD( "dm_15.rom", 0x00000, 0x08000, CRC(21e6503c) SHA1(09174fb424b76f7f2a381297e3420ddd2e76b008) )
 
 	ROM_LOAD( "dm_16.rom", 0x10000, 0x08000, CRC(094579d9) SHA1(2449bc9ba38396912ee9b72dd870ea9fcff95776) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "T5182", 0 ) /* Toshiba T5182 module */
+	ROM_REGION( 0x10000, "T5182", 0 ) /* Toshiba T5182 module */
 	ROM_LOAD( "t5182.rom", 0x0000, 0x2000, CRC(d354c8fc) SHA1(a1c9e1ac293f107f69cc5788cf6abc3db1646e33) )
 	ROM_LOAD( "dm_17.rom", 0x8000, 0x8000, CRC(7723dcae) SHA1(a0c69e7a7b6fd74f7ed6b9c6419aed94aabcd4b0) )
 
-	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "dm_13.rom", 0x00000, 0x02000, CRC(38bb38d9) SHA1(d751990166dd3d503c5de7667679b96210061cd1) )
 	ROM_LOAD( "dm_14.rom", 0x02000, 0x02000, CRC(ac5a31f3) SHA1(79083390671062be2eab93cc875a0f86d709a963) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", 0 )
+	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "dm_05.rom", 0x10000, 0x10000, CRC(ca79a738) SHA1(66a76ea0d8ecc44f6cc77102303df74f40bf6118) )
 	ROM_LOAD( "dm_01.rom", 0x00000, 0x10000, CRC(652aee6b) SHA1(f4150784f7bd7be83a0041e4c52540aa564062ba) )
 	ROM_LOAD( "dm_06.rom", 0x30000, 0x10000, CRC(9629ed2c) SHA1(453f6a0b12efdadd7fcbe03ad37afb0afa6be051) )
 	ROM_LOAD( "dm_02.rom", 0x20000, 0x10000, CRC(e2dd15aa) SHA1(1f3a6a1e1afabfe9dc47549ef13ae7696302ae88) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx3", 0)
+	ROM_REGION( 0x40000, "gfx3", 0)
 	ROM_LOAD( "dm_09.rom", 0x00000, 0x10000, CRC(52154b50) SHA1(5ee1a4bcf0752a057b9993b0069d744c35cf55f4) )
 	ROM_LOAD( "dm_11.rom", 0x10000, 0x08000, CRC(3118e2f9) SHA1(dfd946ea1310851f97d31ce58d8280f2d92b0f59) )
 	ROM_LOAD( "dm_10.rom", 0x20000, 0x10000, CRC(34fd52b5) SHA1(c4ee464ed79ec91f993b0f894572c0288f0ad1d4) )
 	ROM_LOAD( "dm_12.rom", 0x30000, 0x08000, CRC(cc4b9839) SHA1(b7e95513d2e06929fed5005caf3bf8c3fba0b597) )
 
-	ROM_REGION( 0x8000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x8000, "user1", 0 )
 	/* BG layer map ( 512x64 )*/
 	ROM_LOAD( "dm_03.rom", 0x00000, 0x08000, CRC(60b40c2a) SHA1(c046273b15dab95ea4851c26ce941e580fa1b6ec) )
 
-	ROM_REGION( 0x8000, RGNCLASS_USER, "user2", 0 )
+	ROM_REGION( 0x8000, "user2", 0 )
 	/* BG layer attr ( 512x64 ) */
 	ROM_LOAD( "dm_04.rom", 0x00000, 0x08000, CRC(d47b8cd9) SHA1(86eb7a5d8ea63c0c91f455b1b8322cc7b9c4a968) )
 
-	ROM_REGION( 0x04000, RGNCLASS_USER, "user3", 0 )
+	ROM_REGION( 0x04000, "user3", 0 )
 	/* FG layer map ( 64x256 ) */
 	ROM_LOAD( "dm_07.rom", 0x00000, 0x04000, CRC(889b1277) SHA1(78405110b9cf1ab988c0cbfdb668498dadb41229) )
 
-	ROM_REGION( 0x04000, RGNCLASS_USER, "user4", 0 )
+	ROM_REGION( 0x04000, "user4", 0 )
 	/* FG layer attr ( 64x256 ) */
 	ROM_LOAD( "dm_08.rom", 0x00000, 0x04000, CRC(f76f6f46) SHA1(ce1c67dc8976106b24fee8d3a0b9e5deb016a327) )
 
-	ROM_REGION( 0x0600, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0600, "proms", 0 )
 	/* color lookup tables */
 	ROM_LOAD( "63s281n.m7",  0x0000, 0x0100, CRC(897ef49f) SHA1(e40c0fb0a68aa91ceaee86e774a428819a4794bb) )
 	ROM_LOAD( "63s281n.d7",  0x0100, 0x0100, CRC(a9975a96) SHA1(3a34569fc68ac15f91e1e90d4e273f844b315091) )
@@ -340,8 +340,8 @@ static void decrypt_gfx(running_machine *machine)
 	int size;
 	int i;
 
-	rom = memory_region(machine, RGNCLASS_GFX, "gfx1");
-	size = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
+	rom = memory_region(machine, "gfx1");
+	size = memory_region_length(machine, "gfx1");
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -363,8 +363,8 @@ static void decrypt_gfx(running_machine *machine)
 	}
 
 
-	rom = memory_region(machine, RGNCLASS_GFX, "gfx2");
-	size = memory_region_length(machine, RGNCLASS_GFX, "gfx2");
+	rom = memory_region(machine, "gfx2");
+	size = memory_region_length(machine, "gfx2");
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -386,8 +386,8 @@ static void decrypt_gfx(running_machine *machine)
 	}
 
 
-	rom = memory_region(machine, RGNCLASS_GFX, "gfx3");
-	size = memory_region_length(machine, RGNCLASS_GFX, "gfx3");
+	rom = memory_region(machine, "gfx3");
+	size = memory_region_length(machine, "gfx3");
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -414,7 +414,7 @@ static void decrypt_gfx(running_machine *machine)
 static void decrypt_snd(running_machine *machine)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "T5182");
+	UINT8 *ROM = memory_region(machine, "T5182");
 
 	for(i=0x8000;i<0x10000;i++)
 		ROM[i] = BITSWAP8(ROM[i], 7,1,2,3,4,5,6,0);
@@ -423,7 +423,7 @@ static void decrypt_snd(running_machine *machine)
 static DRIVER_INIT(darkmist)
 {
 	int i, len;
-	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *ROM = memory_region(machine, "main");
 	UINT8 *buffer = malloc_or_die(0x10000);
 	UINT8 *decrypt = auto_malloc(0x8000);
 
@@ -459,8 +459,8 @@ static DRIVER_INIT(darkmist)
 	memory_set_bankptr(1,&ROM[0x010000]);
 
 	/* adr line swaps */
-	ROM = memory_region(machine, RGNCLASS_USER, "user1");
-	len = memory_region_length(machine, RGNCLASS_USER, "user1");
+	ROM = memory_region(machine, "user1");
+	len = memory_region_length(machine, "user1");
 	memcpy( buffer, ROM, len );
 
 	for(i=0;i<len;i++)
@@ -468,24 +468,24 @@ static DRIVER_INIT(darkmist)
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,6,5,4,3,2,14,13,12,11,8,7,1,0,10,9)];
 	}
 
-	ROM = memory_region(machine, RGNCLASS_USER, "user2");
-	len = memory_region_length(machine, RGNCLASS_USER, "user2");
+	ROM = memory_region(machine, "user2");
+	len = memory_region_length(machine, "user2");
 	memcpy( buffer, ROM, len );
 	for(i=0;i<len;i++)
 	{
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,6,5,4,3,2,14,13,12,11,8,7,1,0,10,9)];
 	}
 
-	ROM = memory_region(machine, RGNCLASS_USER, "user3");
-	len = memory_region_length(machine, RGNCLASS_USER, "user3");
+	ROM = memory_region(machine, "user3");
+	len = memory_region_length(machine, "user3");
 	memcpy( buffer, ROM, len );
 	for(i=0;i<len;i++)
 	{
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14 ,5,4,3,2,11,10,9,8,13,12,1,0,7,6)];
 	}
 
-	ROM = memory_region(machine, RGNCLASS_USER, "user4");
-	len = memory_region_length(machine, RGNCLASS_USER, "user4");
+	ROM = memory_region(machine, "user4");
+	len = memory_region_length(machine, "user4");
 	memcpy( buffer, ROM, len );
 	for(i=0;i<len;i++)
 	{

@@ -406,22 +406,22 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( timeplt )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "tm1",          0x0000, 0x2000, CRC(1551f1b9) SHA1(c72f30988ac00cbe6549b71c3bcb414511e8b997) )
 	ROM_LOAD( "tm2",          0x2000, 0x2000, CRC(58636cb5) SHA1(ab517efa93ae7be780af55faea82a6e83edd828c) )
 	ROM_LOAD( "tm3",          0x4000, 0x2000, CRC(ff4e0d83) SHA1(ef98a1abb45b22d7498a0aca520f43bbee248b22) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "tpsound", 0 )
+	ROM_REGION( 0x10000, "tpsound", 0 )
 	ROM_LOAD( "tm7",          0x0000, 0x1000, CRC(d66da813) SHA1(408fca4515e8af84211df3e204c8776b2f8adb23) )
 
-	ROM_REGION( 0x2000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "tm6",          0x0000, 0x2000, CRC(c2507f40) SHA1(07221875e3f81d9def67c57a7ccd82d52ce65e01) )
 
-	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "tm4",          0x0000, 0x2000, CRC(7e437c3e) SHA1(cbe2ccd2cd503af62f009cd5aab73aa7366230b1) )
 	ROM_LOAD( "tm5",          0x2000, 0x2000, CRC(e8ca87b9) SHA1(5dd30d3fb9fd8cf9e6a8e37e7ea858c7fd038a7e) )
 
-	ROM_REGION( 0x0240, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0240, "proms", 0 )
 	ROM_LOAD( "timeplt.b4",   0x0000, 0x0020, CRC(34c91839) SHA1(f62e279e21fce171231d3139be7adabe1f4b8c2e) ) /* palette */
 	ROM_LOAD( "timeplt.b5",   0x0020, 0x0020, CRC(463b2b07) SHA1(9ad275365eba4869f94749f39ff8705d92056a10) ) /* palette */
 	ROM_LOAD( "timeplt.e9",   0x0040, 0x0100, CRC(4bbb2150) SHA1(678433b21aae1daa938e32d3293eeed529a42ef9) ) /* sprite lookup table */
@@ -429,22 +429,22 @@ ROM_START( timeplt )
 ROM_END
 
 ROM_START( timeplta )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "cd_e1.bin",         0x0000, 0x2000, CRC(a4513b35) SHA1(1b1944ec5317d71af86e21e0691caae180dee7b5) )
 	ROM_LOAD( "cd_e2.bin",         0x2000, 0x2000, CRC(38b0c72a) SHA1(8f0950deb2f9e2b65714318b9e837a1c837f52a9) )
 	ROM_LOAD( "cd_e3.bin",         0x4000, 0x2000, CRC(83846870) SHA1(b1741e7e5674f9e63e113ead0cb7f5ef874eac5f) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "tpsound", 0 )
+	ROM_REGION( 0x10000, "tpsound", 0 )
 	ROM_LOAD( "tm7",          0x0000, 0x1000, CRC(d66da813) SHA1(408fca4515e8af84211df3e204c8776b2f8adb23) )
 
-	ROM_REGION( 0x2000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "tm6",          0x0000, 0x2000, CRC(c2507f40) SHA1(07221875e3f81d9def67c57a7ccd82d52ce65e01) )
 
-	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "tm4",          0x0000, 0x2000, CRC(7e437c3e) SHA1(cbe2ccd2cd503af62f009cd5aab73aa7366230b1) )
 	ROM_LOAD( "tm5",          0x2000, 0x2000, CRC(e8ca87b9) SHA1(5dd30d3fb9fd8cf9e6a8e37e7ea858c7fd038a7e) )
 
-	ROM_REGION( 0x0240, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0240, "proms", 0 )
 	ROM_LOAD( "timeplt.b4",   0x0000, 0x0020, CRC(34c91839) SHA1(f62e279e21fce171231d3139be7adabe1f4b8c2e) ) /* palette */
 	ROM_LOAD( "timeplt.b5",   0x0020, 0x0020, CRC(463b2b07) SHA1(9ad275365eba4869f94749f39ff8705d92056a10) ) /* palette */
 	ROM_LOAD( "timeplt.e9",   0x0040, 0x0100, CRC(4bbb2150) SHA1(678433b21aae1daa938e32d3293eeed529a42ef9) ) /* sprite lookup table */
@@ -452,22 +452,22 @@ ROM_START( timeplta )
 ROM_END
 
 ROM_START( timepltc )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "cd1y",         0x0000, 0x2000, CRC(83ec72c2) SHA1(f3dbc8362f6bdad1baa65cf5d95611e79de381a4) )
 	ROM_LOAD( "cd2y",         0x2000, 0x2000, CRC(0dcf5287) SHA1(c36628367e81ac07f5ace72b45ebb7140b6aa116) )
 	ROM_LOAD( "cd3y",         0x4000, 0x2000, CRC(c789b912) SHA1(dead7b20a40769e48738fccc3a17e2266aac445d) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "tpsound", 0 )
+	ROM_REGION( 0x10000, "tpsound", 0 )
 	ROM_LOAD( "tm7",          0x0000, 0x1000, CRC(d66da813) SHA1(408fca4515e8af84211df3e204c8776b2f8adb23) )
 
-	ROM_REGION( 0x2000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "tm6",          0x0000, 0x2000, CRC(c2507f40) SHA1(07221875e3f81d9def67c57a7ccd82d52ce65e01) )
 
-	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "tm4",          0x0000, 0x2000, CRC(7e437c3e) SHA1(cbe2ccd2cd503af62f009cd5aab73aa7366230b1) )
 	ROM_LOAD( "tm5",          0x2000, 0x2000, CRC(e8ca87b9) SHA1(5dd30d3fb9fd8cf9e6a8e37e7ea858c7fd038a7e) )
 
-	ROM_REGION( 0x0240, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0240, "proms", 0 )
 	ROM_LOAD( "timeplt.b4",   0x0000, 0x0020, CRC(34c91839) SHA1(f62e279e21fce171231d3139be7adabe1f4b8c2e) ) /* palette */
 	ROM_LOAD( "timeplt.b5",   0x0020, 0x0020, CRC(463b2b07) SHA1(9ad275365eba4869f94749f39ff8705d92056a10) ) /* palette */
 	ROM_LOAD( "timeplt.e9",   0x0040, 0x0100, CRC(4bbb2150) SHA1(678433b21aae1daa938e32d3293eeed529a42ef9) ) /* sprite lookup table */
@@ -475,22 +475,22 @@ ROM_START( timepltc )
 ROM_END
 
 ROM_START( spaceplt )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "sp1",          0x0000, 0x2000, CRC(ac8ca3ae) SHA1(9781138becd17aa70e877138e126ebb1fbff6192) )
 	ROM_LOAD( "sp2",          0x2000, 0x2000, CRC(1f0308ef) SHA1(dd88378fc4cefe473f310d4730268c98354a4a44) )
 	ROM_LOAD( "sp3",          0x4000, 0x2000, CRC(90aeca50) SHA1(9c6fddfeafa84f5284ec8f7c9d46216b110badc1) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "tpsound", 0 )
+	ROM_REGION( 0x10000, "tpsound", 0 )
 	ROM_LOAD( "tm7",          0x0000, 0x1000, CRC(d66da813) SHA1(408fca4515e8af84211df3e204c8776b2f8adb23) )
 
-	ROM_REGION( 0x2000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "sp6",          0x0000, 0x2000, CRC(76caa8af) SHA1(f81bb73877d415a6587a32bddaad6db8a8fd4941) )
 
-	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "sp4",          0x0000, 0x2000, CRC(3781ce7a) SHA1(68bb73f67494c3b24f7fd0d79153c9793f4b3a5b) )
 	ROM_LOAD( "tm5",          0x2000, 0x2000, CRC(e8ca87b9) SHA1(5dd30d3fb9fd8cf9e6a8e37e7ea858c7fd038a7e) )
 
-	ROM_REGION( 0x0240, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0240, "proms", 0 )
 	ROM_LOAD( "timeplt.b4",   0x0000, 0x0020, CRC(34c91839) SHA1(f62e279e21fce171231d3139be7adabe1f4b8c2e) ) /* palette */
 	ROM_LOAD( "timeplt.b5",   0x0020, 0x0020, CRC(463b2b07) SHA1(9ad275365eba4869f94749f39ff8705d92056a10) ) /* palette */
 	ROM_LOAD( "timeplt.e9",   0x0040, 0x0100, CRC(4bbb2150) SHA1(678433b21aae1daa938e32d3293eeed529a42ef9) ) /* sprite lookup table */
@@ -499,23 +499,23 @@ ROM_END
 
 
 ROM_START( psurge )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "p1",           0x0000, 0x2000, CRC(05f9ba12) SHA1(ad88838d1a0c64830281e425d4ad2498ba959098) )
 	ROM_LOAD( "p2",           0x2000, 0x2000, CRC(3ff41576) SHA1(9bdbad31c65dff76942967b5a334407b0326f752) )
 	ROM_LOAD( "p3",           0x4000, 0x2000, CRC(e8fe120a) SHA1(b6320c9cb1a67097692aa0de7d88b0dfb63dedd7) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "tpsound", 0 )
+	ROM_REGION( 0x10000, "tpsound", 0 )
 	ROM_LOAD( "p6",           0x0000, 0x1000, CRC(b52d01fa) SHA1(9b6cf9ea51d3a87c174f34d42a4b1b5f38b48723) )
 	ROM_LOAD( "p7",           0x1000, 0x1000, CRC(9db5c0ce) SHA1(b5bc1d89a7f7d7a0baae64390c37ee11f69a0e76) )
 
-	ROM_REGION( 0x2000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "p4",           0x0000, 0x2000, CRC(26fd7f81) SHA1(eb282313a37d7d611bf90f9b0b527adee9ae283f) )
 
-	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "p5",           0x0000, 0x2000, CRC(6066ec8e) SHA1(7f1155cf8a2d63c0740a4b56f1e09e7dfc749302) )
 	ROM_LOAD( "tm5",          0x2000, 0x2000, CRC(e8ca87b9) SHA1(5dd30d3fb9fd8cf9e6a8e37e7ea858c7fd038a7e) )
 
-	ROM_REGION( 0x0240, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0240, "proms", 0 )
 	ROM_LOAD( "timeplt.b4",   0x0000, 0x0020, BAD_DUMP CRC(34c91839) SHA1(f62e279e21fce171231d3139be7adabe1f4b8c2e)  ) /* palette */
 	ROM_LOAD( "timeplt.b5",   0x0020, 0x0020, BAD_DUMP CRC(463b2b07) SHA1(9ad275365eba4869f94749f39ff8705d92056a10)  ) /* palette */
 	ROM_LOAD( "timeplt.e9",   0x0040, 0x0100, BAD_DUMP CRC(4bbb2150) SHA1(678433b21aae1daa938e32d3293eeed529a42ef9)  ) /* sprite lookup table */

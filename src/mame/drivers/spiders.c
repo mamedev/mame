@@ -540,7 +540,7 @@ static READ8_HANDLER( gfx_rom_r )
 
 	if (gfx_rom_ctrl_mode)
 	{
-		UINT8 *rom = memory_region(machine, RGNCLASS_GFX, "gfx1");
+		UINT8 *rom = memory_region(machine, "gfx1");
 
 		ret = rom[gfx_rom_address];
 
@@ -725,16 +725,16 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( spiders )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "sp-ic74",      0xc000, 0x1000, CRC(6a2578f6) SHA1(ddfe4fb2ccc925df7ae97821f8681b32e47630b4) )
 	ROM_LOAD( "sp-ic73",      0xd000, 0x1000, CRC(d69b2f21) SHA1(ea2b07d19bd50c3b57da8fd8e13b8ab0e8ca3084) )
 	ROM_LOAD( "sp-ic72",      0xe000, 0x1000, CRC(464125da) SHA1(94e9edd52e8bd72bbb5dc91b0aa11955e940799c) )
 	ROM_LOAD( "sp-ic71",      0xf000, 0x1000, CRC(a9539b18) SHA1(2d02343a78a4a65e5a1798552cd015f16ad5423a) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "sp-ic3",       0xf800, 0x0800, CRC(944d761e) SHA1(23b1f9234e0de678e96d1a6876d8d0a341150385) )
 
-	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "sp-ic33",      0x0000, 0x1000, CRC(b6731baa) SHA1(b551030df417b40f4a8488fc82a8b5809d3d32f6) )
 	ROM_LOAD( "sp-ic25",      0x1000, 0x1000, CRC(baec64e7) SHA1(beb45e2e6270607c14cdf964c08fe320ce8236a0) )
 	ROM_LOAD( "sp-ic24",      0x2000, 0x1000, CRC(a40a5517) SHA1(3f524c7dbbfe8aad7860d15c38d2702732895681) )
@@ -746,16 +746,16 @@ ROM_END
 
 
 ROM_START( spiders2 )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "sp-ic74",      0xc000, 0x1000, CRC(6a2578f6) SHA1(ddfe4fb2ccc925df7ae97821f8681b32e47630b4) )
 	ROM_LOAD( "sp2.bin",      0xd000, 0x1000, CRC(cf71d12b) SHA1(369e91f637e8cd898354ddee04e24d4894968f79) )
 	ROM_LOAD( "sp-ic72",      0xe000, 0x1000, CRC(464125da) SHA1(94e9edd52e8bd72bbb5dc91b0aa11955e940799c) )
 	ROM_LOAD( "sp4.bin",      0xf000, 0x1000, CRC(f3d126bb) SHA1(ecc9156a7da661fa7543d7656aa7da77274e0842) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "sp-ic3",       0xf800, 0x0800, CRC(944d761e) SHA1(23b1f9234e0de678e96d1a6876d8d0a341150385) )
 
-	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "sp-ic33",      0x0000, 0x1000, CRC(b6731baa) SHA1(b551030df417b40f4a8488fc82a8b5809d3d32f6) )
 	ROM_LOAD( "sp-ic25",      0x1000, 0x1000, CRC(baec64e7) SHA1(beb45e2e6270607c14cdf964c08fe320ce8236a0) )
 	ROM_LOAD( "sp-ic24",      0x2000, 0x1000, CRC(a40a5517) SHA1(3f524c7dbbfe8aad7860d15c38d2702732895681) )
@@ -767,16 +767,16 @@ ROM_END
 
 
 ROM_START( spinner )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "sp01-100.r1",  0xc000, 0x1000, CRC(e85faa36) SHA1(ef1c479d503ef6a833ae1f9d5a260f9e50c1f2d4) )
 	ROM_LOAD( "sp02-99.s1",   0xd000, 0x1000, CRC(4bcd2b35) SHA1(dff3c6e68cc5384863a123661422d929e7406dee) )
 	ROM_LOAD( "sp03-98.t1",   0xe000, 0x1000, CRC(fdabc5df) SHA1(a3276eb1f09f6a3c406721f89993a39c92fb7728) )
 	ROM_LOAD( "sp04-97.v1",   0xf000, 0x1000, CRC(62798f96) SHA1(1407a2ccb2b8f998f2ee494f52a471b627895dbe) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "sp41-28.d9",   0xf800, 0x0800, CRC(944d761e) SHA1(23b1f9234e0de678e96d1a6876d8d0a341150385) )
 
-	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "sp05-25.k8",   0x0000, 0x1000, CRC(ccc696ee) SHA1(1d41e9eb0cae73b221327d7b6e02450275d056c6) )
 	ROM_LOAD( "sp06-17.k9",   0x1000, 0x1000, CRC(d3d06722) SHA1(da510ed162e5c310945123c9ce6d5648c7b0ae48) )
 	ROM_LOAD( "sp07-16.l9",   0x2000, 0x1000, CRC(a40a5517) SHA1(3f524c7dbbfe8aad7860d15c38d2702732895681) )

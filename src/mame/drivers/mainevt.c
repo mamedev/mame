@@ -59,7 +59,7 @@ static INTERRUPT_GEN( dv_interrupt )
 
 static WRITE8_HANDLER( mainevt_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 	int bankaddress;
 
 	/* bit 0-1 ROM bank select */
@@ -786,30 +786,30 @@ MACHINE_DRIVER_END
 /* 4 players - English title screen - No "Warning" message in the ROM */
 
 ROM_START( mainevt )
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x40000, "main", 0 )
 	ROM_LOAD( "799c02.k11",   0x10000, 0x08000, CRC(e2e7dbd5) SHA1(80314cd42a9f47f7bb82a2160fb5ef2ddc6dff30) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "799c01.f7",    0x00000, 0x08000, CRC(447c4c5c) SHA1(86e42132793c59cc6feece143516f7ecd4ed14e8) )
 
-	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x20000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD16_BYTE( "799c06.f22",   0x00000, 0x08000, CRC(f839cb58) SHA1(b36202ca2b68b6249c3f972ad09501e28a0162f7) )
 	ROM_LOAD16_BYTE( "799c07.h22",   0x00001, 0x08000, CRC(176df538) SHA1(379e1de81afb85b1559de170cd2ab9f4af2b137e) )
 	ROM_LOAD16_BYTE( "799c08.j22",   0x10000, 0x08000, CRC(d01e0078) SHA1(7ac242eb24271ac2783ec4d9e97ae051f1f3363a) )
 	ROM_LOAD16_BYTE( "799c09.k22",   0x10001, 0x08000, CRC(9baec75e) SHA1(a8f6102c8fd46f18678f336bc44be31458ca9256) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD( "799b04.h4",    0x00000, 0x80000, CRC(323e0c2b) SHA1(c108d656b6ceff13c910739e4ca760acbb640de3) )
 	ROM_LOAD( "799b05.k4",    0x80000, 0x80000, CRC(571c5831) SHA1(2a18f0bcf6946ada6e0bde7edbd11afd4db1c170) )
 
-	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141n.bin",  0x0000, 0x0100, CRC(61f6c8d1) SHA1(c70f1f8e434aaaffb89e30e2230a08374ef324ad) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "konami", 0 )	/* 512k for 007232 samples */
+	ROM_REGION( 0x80000, "konami", 0 )	/* 512k for 007232 samples */
 	ROM_LOAD( "799b03.d4",    0x00000, 0x80000, CRC(f1cfd342) SHA1(079afc5c631de7f5b652d0ce6fd44b3aacd14a1b) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "upd", 0 )	/* 512k for the UPD7759C samples */
+	ROM_REGION( 0x80000, "upd", 0 )	/* 512k for the UPD7759C samples */
 	ROM_LOAD( "799b06.c22",   0x00000, 0x80000, CRC(2c8c47d7) SHA1(18a899767177ddfd870df9ed156d8bbc04b58a19) )
 ROM_END
 
@@ -817,30 +817,30 @@ ROM_END
 /* 4 players - English title screen - No "Warning" message in the ROM */
 
 ROM_START( mainevto )
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x40000, "main", 0 )
 	ROM_LOAD( "799_02.k11",   0x10000, 0x08000, CRC(c143596b) SHA1(5da7efaf0f7c7a493cc242eae115f278bc9c134b) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "799c01.f7",    0x00000, 0x08000, CRC(447c4c5c) SHA1(86e42132793c59cc6feece143516f7ecd4ed14e8) )
 
-	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x20000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD16_BYTE( "799c06.f22",   0x00000, 0x08000, CRC(f839cb58) SHA1(b36202ca2b68b6249c3f972ad09501e28a0162f7) )
 	ROM_LOAD16_BYTE( "799c07.h22",   0x00001, 0x08000, CRC(176df538) SHA1(379e1de81afb85b1559de170cd2ab9f4af2b137e) )
 	ROM_LOAD16_BYTE( "799c08.j22",   0x10000, 0x08000, CRC(d01e0078) SHA1(7ac242eb24271ac2783ec4d9e97ae051f1f3363a) )
 	ROM_LOAD16_BYTE( "799c09.k22",   0x10001, 0x08000, CRC(9baec75e) SHA1(a8f6102c8fd46f18678f336bc44be31458ca9256) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD( "799b04.h4",    0x00000, 0x80000, CRC(323e0c2b) SHA1(c108d656b6ceff13c910739e4ca760acbb640de3) )
 	ROM_LOAD( "799b05.k4",    0x80000, 0x80000, CRC(571c5831) SHA1(2a18f0bcf6946ada6e0bde7edbd11afd4db1c170) )
 
-	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141n.bin",  0x0000, 0x0100, CRC(61f6c8d1) SHA1(c70f1f8e434aaaffb89e30e2230a08374ef324ad) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "konami", 0 )	/* 512k for 007232 samples */
+	ROM_REGION( 0x80000, "konami", 0 )	/* 512k for 007232 samples */
 	ROM_LOAD( "799b03.d4",    0x00000, 0x80000, CRC(f1cfd342) SHA1(079afc5c631de7f5b652d0ce6fd44b3aacd14a1b) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "upd", 0 )	/* 512k for the UPD7759C samples */
+	ROM_REGION( 0x80000, "upd", 0 )	/* 512k for the UPD7759C samples */
 	ROM_LOAD( "799b06.c22",   0x00000, 0x80000, CRC(2c8c47d7) SHA1(18a899767177ddfd870df9ed156d8bbc04b58a19) )
 ROM_END
 
@@ -848,30 +848,30 @@ ROM_END
 /* 2 players - English title screen - "Warning" message in the ROM (not displayed) */
 
 ROM_START( mainev2p )
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x40000, "main", 0 )
 	ROM_LOAD( "799x02.k11",   0x10000, 0x08000, CRC(42cfc650) SHA1(2d1918ebc0d93a2356ad995a6854dbde7c3b8daf) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "799c01.f7",    0x00000, 0x08000, CRC(447c4c5c) SHA1(86e42132793c59cc6feece143516f7ecd4ed14e8) )
 
-	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x20000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD16_BYTE( "799c06.f22",   0x00000, 0x08000, CRC(f839cb58) SHA1(b36202ca2b68b6249c3f972ad09501e28a0162f7) )
 	ROM_LOAD16_BYTE( "799c07.h22",   0x00001, 0x08000, CRC(176df538) SHA1(379e1de81afb85b1559de170cd2ab9f4af2b137e) )
 	ROM_LOAD16_BYTE( "799c08.j22",   0x10000, 0x08000, CRC(d01e0078) SHA1(7ac242eb24271ac2783ec4d9e97ae051f1f3363a) )
 	ROM_LOAD16_BYTE( "799c09.k22",   0x10001, 0x08000, CRC(9baec75e) SHA1(a8f6102c8fd46f18678f336bc44be31458ca9256) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD( "799b04.h4",    0x00000, 0x80000, CRC(323e0c2b) SHA1(c108d656b6ceff13c910739e4ca760acbb640de3) )
 	ROM_LOAD( "799b05.k4",    0x80000, 0x80000, CRC(571c5831) SHA1(2a18f0bcf6946ada6e0bde7edbd11afd4db1c170) )
 
-	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141n.bin",  0x0000, 0x0100, CRC(61f6c8d1) SHA1(c70f1f8e434aaaffb89e30e2230a08374ef324ad) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "konami", 0 )	/* 512k for 007232 samples */
+	ROM_REGION( 0x80000, "konami", 0 )	/* 512k for 007232 samples */
 	ROM_LOAD( "799b03.d4",    0x00000, 0x80000, CRC(f1cfd342) SHA1(079afc5c631de7f5b652d0ce6fd44b3aacd14a1b) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "upd", 0 )	/* 512k for the UPD7759C samples */
+	ROM_REGION( 0x80000, "upd", 0 )	/* 512k for the UPD7759C samples */
 	ROM_LOAD( "799b06.c22",   0x00000, 0x80000, CRC(2c8c47d7) SHA1(18a899767177ddfd870df9ed156d8bbc04b58a19) )
 ROM_END
 
@@ -879,130 +879,130 @@ ROM_END
 /* 2 players - Japan title screen - "Warning" message in the ROM (displayed) */
 
 ROM_START( ringohja )
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x40000, "main", 0 )
 	ROM_LOAD( "799n02.k11",   0x10000, 0x08000, CRC(f9305dd0) SHA1(7135053be9d46ac9c09ab63eca1eb71825a71a13) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "799c01.f7",    0x00000, 0x08000, CRC(447c4c5c) SHA1(86e42132793c59cc6feece143516f7ecd4ed14e8) )
 
-	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x20000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD16_BYTE( "799c06.f22",   0x00000, 0x08000, CRC(f839cb58) SHA1(b36202ca2b68b6249c3f972ad09501e28a0162f7) )
 	ROM_LOAD16_BYTE( "799c07.h22",   0x00001, 0x08000, CRC(176df538) SHA1(379e1de81afb85b1559de170cd2ab9f4af2b137e) )
 	ROM_LOAD16_BYTE( "799c08.j22",   0x10000, 0x08000, CRC(d01e0078) SHA1(7ac242eb24271ac2783ec4d9e97ae051f1f3363a) )
 	ROM_LOAD16_BYTE( "799c09.k22",   0x10001, 0x08000, CRC(9baec75e) SHA1(a8f6102c8fd46f18678f336bc44be31458ca9256) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD( "799b04.h4",    0x00000, 0x80000, CRC(323e0c2b) SHA1(c108d656b6ceff13c910739e4ca760acbb640de3) )
 	ROM_LOAD( "799b05.k4",    0x80000, 0x80000, CRC(571c5831) SHA1(2a18f0bcf6946ada6e0bde7edbd11afd4db1c170) )
 
-	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141n.bin",  0x0000, 0x0100, CRC(61f6c8d1) SHA1(c70f1f8e434aaaffb89e30e2230a08374ef324ad) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "konami", 0 )	/* 512k for 007232 samples */
+	ROM_REGION( 0x80000, "konami", 0 )	/* 512k for 007232 samples */
 	ROM_LOAD( "799b03.d4",    0x00000, 0x80000, CRC(f1cfd342) SHA1(079afc5c631de7f5b652d0ce6fd44b3aacd14a1b) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "upd", 0 )	/* 512k for the UPD7759C samples */
+	ROM_REGION( 0x80000, "upd", 0 )	/* 512k for the UPD7759C samples */
 	ROM_LOAD( "799b06.c22",   0x00000, 0x80000, CRC(2c8c47d7) SHA1(18a899767177ddfd870df9ed156d8bbc04b58a19) )
 ROM_END
 
 ROM_START( devstors )
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x40000, "main", 0 )
 	ROM_LOAD( "890-z02.k11",  0x10000, 0x08000, CRC(ebeb306f) SHA1(838fcfe95dfedd61f21f34301d48e337db765ab2) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "dev-k01.rom",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x40000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD16_BYTE( "dev-f06.rom",  0x00000, 0x10000, CRC(26592155) SHA1(aa1f8662f091ca1eb495223e41a35edd861ae9e9) )
 	ROM_LOAD16_BYTE( "dev-f07.rom",  0x00001, 0x10000, CRC(6c74fa2e) SHA1(419a2ad31d269fafe4c474bf512e935d5e018846) )
 	ROM_LOAD16_BYTE( "dev-f08.rom",  0x20000, 0x10000, CRC(29e12e80) SHA1(6d09e190055218e2dfd07838f1446dfb5f801206) )
 	ROM_LOAD16_BYTE( "dev-f09.rom",  0x20001, 0x10000, CRC(67ca40d5) SHA1(ff719f55d2534ff076fbdd2bcb7d12c683bfe958) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD( "dev-f04.rom",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
 	ROM_LOAD( "dev-f05.rom",  0x80000, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
 
-	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "devaprom.bin", 0x0000, 0x0100, CRC(d3620106) SHA1(528a0a34754902d0f262a9619c6105da6de99354) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "konami", 0 )	/* 512k for 007232 samples */
+	ROM_REGION( 0x80000, "konami", 0 )	/* 512k for 007232 samples */
  	ROM_LOAD( "dev-f03.rom",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
 ROM_END
 
 ROM_START( devstor2 )
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x40000, "main", 0 )
 	ROM_LOAD( "dev-x02.rom",  0x10000, 0x08000, CRC(e58ebb35) SHA1(4253b6a7128534cc0866bc910a271d91ac8b40fd) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "dev-k01.rom",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x40000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD16_BYTE( "dev-f06.rom",  0x00000, 0x10000, CRC(26592155) SHA1(aa1f8662f091ca1eb495223e41a35edd861ae9e9) )
 	ROM_LOAD16_BYTE( "dev-f07.rom",  0x00001, 0x10000, CRC(6c74fa2e) SHA1(419a2ad31d269fafe4c474bf512e935d5e018846) )
 	ROM_LOAD16_BYTE( "dev-f08.rom",  0x20000, 0x10000, CRC(29e12e80) SHA1(6d09e190055218e2dfd07838f1446dfb5f801206) )
 	ROM_LOAD16_BYTE( "dev-f09.rom",  0x20001, 0x10000, CRC(67ca40d5) SHA1(ff719f55d2534ff076fbdd2bcb7d12c683bfe958) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD( "dev-f04.rom",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
 	ROM_LOAD( "dev-f05.rom",  0x80000, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
 
-	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "devaprom.bin", 0x0000, 0x0100, CRC(d3620106) SHA1(528a0a34754902d0f262a9619c6105da6de99354) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "konami", 0 )	/* 512k for 007232 samples */
+	ROM_REGION( 0x80000, "konami", 0 )	/* 512k for 007232 samples */
  	ROM_LOAD( "dev-f03.rom",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
 ROM_END
 
 ROM_START( devstor3 )
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x40000, "main", 0 )
 	ROM_LOAD( "890k02.k11",   0x10000, 0x08000, CRC(52f4ccdd) SHA1(074e526ed170a5f2083c8c0808734291a2ea7403) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "dev-k01.rom",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x40000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD16_BYTE( "dev-f06.rom",  0x00000, 0x10000, CRC(26592155) SHA1(aa1f8662f091ca1eb495223e41a35edd861ae9e9) )
 	ROM_LOAD16_BYTE( "dev-f07.rom",  0x00001, 0x10000, CRC(6c74fa2e) SHA1(419a2ad31d269fafe4c474bf512e935d5e018846) )
 	ROM_LOAD16_BYTE( "dev-f08.rom",  0x20000, 0x10000, CRC(29e12e80) SHA1(6d09e190055218e2dfd07838f1446dfb5f801206) )
 	ROM_LOAD16_BYTE( "dev-f09.rom",  0x20001, 0x10000, CRC(67ca40d5) SHA1(ff719f55d2534ff076fbdd2bcb7d12c683bfe958) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD( "dev-f04.rom",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
 	ROM_LOAD( "dev-f05.rom",  0x80000, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
 
-	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "devaprom.bin", 0x0000, 0x0100, CRC(d3620106) SHA1(528a0a34754902d0f262a9619c6105da6de99354) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "konami", 0 )	/* 512k for 007232 samples */
+	ROM_REGION( 0x80000, "konami", 0 )	/* 512k for 007232 samples */
  	ROM_LOAD( "dev-f03.rom",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
 ROM_END
 
 ROM_START( garuka )
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x40000, "main", 0 )
 	ROM_LOAD( "890w02.bin",   0x10000, 0x08000, CRC(b2f6f538) SHA1(95dad3258a2e4c5648d0fc22c06fa3e2da3b5ed1) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "dev-k01.rom",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x40000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD16_BYTE( "dev-f06.rom",  0x00000, 0x10000, CRC(26592155) SHA1(aa1f8662f091ca1eb495223e41a35edd861ae9e9) )
 	ROM_LOAD16_BYTE( "dev-f07.rom",  0x00001, 0x10000, CRC(6c74fa2e) SHA1(419a2ad31d269fafe4c474bf512e935d5e018846) )
 	ROM_LOAD16_BYTE( "dev-f08.rom",  0x20000, 0x10000, CRC(29e12e80) SHA1(6d09e190055218e2dfd07838f1446dfb5f801206) )
 	ROM_LOAD16_BYTE( "dev-f09.rom",  0x20001, 0x10000, CRC(67ca40d5) SHA1(ff719f55d2534ff076fbdd2bcb7d12c683bfe958) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD( "dev-f04.rom",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
 	ROM_LOAD( "dev-f05.rom",  0x80000, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
 
-	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "devaprom.bin", 0x0000, 0x0100, CRC(d3620106) SHA1(528a0a34754902d0f262a9619c6105da6de99354) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "konami", 0 )	/* 512k for 007232 samples */
+	ROM_REGION( 0x80000, "konami", 0 )	/* 512k for 007232 samples */
  	ROM_LOAD( "dev-f03.rom",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
 ROM_END
 

@@ -69,7 +69,7 @@ VIDEO_UPDATE( exzisus );
 
 static WRITE8_HANDLER( exzisus_cpua_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 	static int exzisus_cpua_bank = 0;
 
 	if ( (data & 0x0f) != exzisus_cpua_bank )
@@ -86,7 +86,7 @@ static WRITE8_HANDLER( exzisus_cpua_bankswitch_w )
 
 static WRITE8_HANDLER( exzisus_cpub_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "cpub");
+	UINT8 *RAM = memory_region(machine, "cpub");
 	static int exzisus_cpub_bank = 0;
 
 	if ( (data & 0x0f) != exzisus_cpub_bank )
@@ -139,7 +139,7 @@ static WRITE8_HANDLER( exzisus_cpub_reset_w )
 // the RAM check to work
 static DRIVER_INIT( exzisus )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 
 	/* Fix WORK RAM error */
 	RAM[0x67fd] = 0x18;
@@ -373,24 +373,24 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( exzisus )
-	ROM_REGION( 0x48000, RGNCLASS_CPU, "main", 0 ) 					/* Z80 CPU A */
+	ROM_REGION( 0x48000, "main", 0 ) 					/* Z80 CPU A */
 	ROM_LOAD( "b23-10.bin", 0x00000, 0x08000, CRC(c80216fc) SHA1(7b952779c420be08573768f09bd65d0a188df024) )
 	ROM_CONTINUE(           0x10000, 0x08000 )
 	ROM_LOAD( "b23-12.bin", 0x18000, 0x10000, CRC(13637f54) SHA1(c175bc60120e32eec6ccca822fa497a42dd59823) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )     				/* Z80 for Sound */
+	ROM_REGION( 0x10000, "audio", 0 )     				/* Z80 for Sound */
 	ROM_LOAD( "b23-14.bin",  0x00000, 0x08000, CRC(f7ca7df2) SHA1(6048d9341f0303546e447a76439e1927d14cdd57) )
 
-	ROM_REGION( 0x48000, RGNCLASS_CPU, "cpub", 0 )     				/* Z80 CPU B */
+	ROM_REGION( 0x48000, "cpub", 0 )     				/* Z80 CPU B */
 	ROM_LOAD( "b23-11.bin", 0x00000, 0x08000, CRC(d6a79cef) SHA1(e2b56aa38c017b24b50f304b9fe49ee14006f9a4) )
 	ROM_CONTINUE(           0x10000, 0x08000 )
 	ROM_LOAD( "b12-12.bin", 0x18000, 0x10000, CRC(a662be67) SHA1(0643480d56d8ac020288db800a705dd5d0d3ad9f) )
 	ROM_LOAD( "b12-13.bin", 0x28000, 0x10000, CRC(04a29633) SHA1(39476365241718f01f9630c12467cb24791a67e1) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpuc", 0 )     				/* Z80 CPU C */
+	ROM_REGION( 0x10000, "cpuc", 0 )     				/* Z80 CPU C */
 	ROM_LOAD( "b23-13.bin",  0x00000, 0x08000, CRC(51110aa1) SHA1(34c2701625eb1987affad1efd19ff8c9971456ae) )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT )	/* BG 0 */
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT )	/* BG 0 */
 	ROM_LOAD( "b12-16.bin",  0x00000, 0x10000, CRC(6fec6acb) SHA1(2289c116d3f6093988a088d011f192dd4a99aa77) )
 	ROM_LOAD( "b12-18.bin",  0x10000, 0x10000, CRC(64e358aa) SHA1(cd1a23458b1a2f9c8c8aea8086dc04e0f6cc6908) )
 	ROM_LOAD( "b12-20.bin",  0x20000, 0x10000, CRC(87f52e89) SHA1(3f8530aca087fa2a32dc6dfbcfe2f86604ee3ca1) )
@@ -398,13 +398,13 @@ ROM_START( exzisus )
 	ROM_LOAD( "b12-17.bin",  0x50000, 0x10000, CRC(db1d5a6c) SHA1(c2e1b8d92c2b3b2ce775ed50ca4a37e84ed35a93) )
 	ROM_LOAD( "b12-19.bin",  0x60000, 0x10000, CRC(772b2641) SHA1(35cc6d5a725f1817791e710afde992e64d14104f) )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE | ROMREGION_INVERT )	/* BG 1 */
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE | ROMREGION_INVERT )	/* BG 1 */
 	ROM_LOAD( "b23-06.bin",  0x00000, 0x10000, CRC(44f8f661) SHA1(d77160a89e45556cd9ce211d89c398e1086d8d92) )
 	ROM_LOAD( "b23-08.bin",  0x10000, 0x10000, CRC(1ce498c1) SHA1(a9ce3de997089bd40c99bd89919b459c9f215fc8) )
 	ROM_LOAD( "b23-07.bin",  0x40000, 0x10000, CRC(d7f6ec89) SHA1(e8da207ddaf46ceff870b45ecec0e89c499291b4) )
 	ROM_LOAD( "b23-09.bin",  0x50000, 0x10000, CRC(6651617f) SHA1(6351a0b01589cb181b896285ade70e9dfcd799ec) )
 
-	ROM_REGION( 0x00c00, RGNCLASS_PROMS, "proms", 0 )					/* PROMS */
+	ROM_REGION( 0x00c00, "proms", 0 )					/* PROMS */
 	ROM_LOAD( "b23-04.bin",  0x00000, 0x00400, CRC(5042cffa) SHA1(c969748866a12681cf2dbf25a46da2c4e4f92313) )
 	ROM_LOAD( "b23-03.bin",  0x00400, 0x00400, CRC(9458fd45) SHA1(7f7cdacf37bb6f15de1109fa73ba3c5fc88893d0) )
 	ROM_LOAD( "b23-05.bin",  0x00800, 0x00400, CRC(87f0f69a) SHA1(37df6fd56245fab9beaabfd86fd8f95d7c42c2a5) )

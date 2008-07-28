@@ -60,7 +60,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( kyugo )
 {
-	color_codes = memory_region(machine, RGNCLASS_PROMS, "proms") + 0x300;
+	color_codes = memory_region(machine, "proms") + 0x300;
 
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,  8,8, 64,32);

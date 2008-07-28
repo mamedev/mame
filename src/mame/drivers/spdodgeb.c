@@ -92,7 +92,7 @@ static void spd_adpcm_int(running_machine *machine, int chip)
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(machine, RGNCLASS_SOUND, "adpcm") + 0x10000 * chip;
+		UINT8 *ROM = memory_region(machine, "adpcm") + 0x10000 * chip;
 
 		adpcm_data[chip] = ROM[adpcm_pos[chip]++];
 		MSM5205_data_w(chip,adpcm_data[chip] >> 4);
@@ -477,29 +477,29 @@ MACHINE_DRIVER_END
 
 
 ROM_START( spdodgeb )
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x18000, "main", 0 )
 	ROM_LOAD( "22a-04.139",	  0x10000, 0x08000, CRC(66071fda) SHA1(4a239295900e6234a2a693321ca821671747a58e) )  /* Two banks */
 	ROM_CONTINUE(             0x08000, 0x08000 )		 /* Static code */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "audio", 0 ) /* audio cpu */
 	ROM_LOAD( "22j5-0.33",    0x08000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu2", 0 ) /* I/O mcu */
+	ROM_REGION( 0x10000, "cpu2", 0 ) /* I/O mcu */
 	ROM_LOAD( "63701.bin",    0xc000, 0x4000, NO_DUMP )	/* missing */
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* text */
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE ) /* text */
 	ROM_LOAD( "22a-4.121",    0x00000, 0x20000, CRC(acc26051) SHA1(445224238cce420990894824d95447e3f63a9ef0) )
 	ROM_LOAD( "22a-3.107",    0x20000, 0x20000, CRC(10bb800d) SHA1(265a3d67669034d17713b505ef55cd1c90f8d205) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "22a-1.2",      0x00000, 0x20000, CRC(3bd1c3ec) SHA1(40f61552ea6f7a81915fe3e13f75dc1dc69da33e) )
 	ROM_LOAD( "22a-2.35",     0x20000, 0x20000, CRC(409e1be1) SHA1(35a77fc8fe6fc212734e2f452dbde9b8cf696f61) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "adpcm", 0 ) /* adpcm samples */
+	ROM_REGION( 0x20000, "adpcm", 0 ) /* adpcm samples */
 	ROM_LOAD( "22j6-0.83",    0x00000, 0x10000, CRC(744a26e3) SHA1(519f22f1e5cc417cb8f9ced97e959d23c711283b) )
 	ROM_LOAD( "22j7-0.82",    0x10000, 0x10000, CRC(2fa1de21) SHA1(e8c7af6057b64ecadd3473b82abd8e9f873082fd) )
 
-	ROM_REGION( 0x0800, RGNCLASS_PROMS, "proms", 0 )	/* color PROMs */
+	ROM_REGION( 0x0800, "proms", 0 )	/* color PROMs */
 	ROM_LOAD( "mb7132e.158",  0x0000, 0x0400, CRC(7e623722) SHA1(e1fe60533237bd0aba5c8de9775df620ed5227c0) )
 	ROM_LOAD( "mb7122e.159",  0x0400, 0x0400, CRC(69706e8d) SHA1(778ee88ff566aa38c80e0e61bb3fe8458f0e9450) )
 ROM_END
@@ -536,29 +536,29 @@ TJ22J2-0.35 /
 */
 
 ROM_START( nkdodge )
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x18000, "main", 0 )
 	ROM_LOAD( "22j4-0.139",	  0x10000, 0x08000, CRC(aa674fd8) SHA1(4e8d3e07b54d23b221cb39cf10389bc7a56c4021) )  /* Two banks */
 	ROM_CONTINUE(             0x08000, 0x08000 )		 /* Static code */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "audio", 0 ) /* audio cpu */
 	ROM_LOAD( "22j5-0.33",    0x08000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu2", 0 ) /* I/O mcu */
+	ROM_REGION( 0x10000, "cpu2", 0 ) /* I/O mcu */
 	ROM_LOAD( "63701.bin",    0xc000, 0x4000, NO_DUMP )	/* missing */
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* text */
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE ) /* text */
 	ROM_LOAD( "tj22j4-0.121",    0x00000, 0x20000, CRC(d2922b3f) SHA1(30ad37f8355c732b545017c2fc56879256b650be) )
 	ROM_LOAD( "tj22j3-0.107",    0x20000, 0x20000, CRC(79cd1315) SHA1(2d7a877e59f704b10b5f609e60fa565c68f5fdb0) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "tj22j1-0.2",      0x00000, 0x20000, CRC(9ed27a8d) SHA1(d80d275bbe91f3e1bd0495a2d7a3be0280a7cda1) )
 	ROM_LOAD( "tj22j2-0.35",     0x20000, 0x20000, CRC(768934f9) SHA1(922f3154dcfb29c2e5c1bebc53247136160f1229) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "adpcm", 0 ) /* adpcm samples */
+	ROM_REGION( 0x20000, "adpcm", 0 ) /* adpcm samples */
 	ROM_LOAD( "22j6-0.83",    0x00000, 0x10000, CRC(744a26e3) SHA1(519f22f1e5cc417cb8f9ced97e959d23c711283b) )
 	ROM_LOAD( "22j7-0.82",    0x10000, 0x10000, CRC(2fa1de21) SHA1(e8c7af6057b64ecadd3473b82abd8e9f873082fd) )
 
-	ROM_REGION( 0x0800, RGNCLASS_PROMS, "proms", 0 )	/* color PROMs */
+	ROM_REGION( 0x0800, "proms", 0 )	/* color PROMs */
 	ROM_LOAD( "22j8-0.158",  0x0000, 0x0400, CRC(c368440f) SHA1(39762d102a42211f24db16bc721b01230df1c4d6) )
 	ROM_LOAD( "22j9-0.159",  0x0400, 0x0400, CRC(6059f401) SHA1(280b1bda3a55f2d8c2fd4552c4dcec7100f0170f) )
 ROM_END
@@ -566,33 +566,33 @@ ROM_END
 /* the bootleg just seems to have the gfx roms in a different format, program is identical */
 
 ROM_START( nkdodgeb )
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x18000, "main", 0 )
 	ROM_LOAD( "12.bin",	      0x10000, 0x08000, CRC(aa674fd8) SHA1(4e8d3e07b54d23b221cb39cf10389bc7a56c4021) )  /* Two banks */
 	ROM_CONTINUE(             0x08000, 0x08000 )		 /* Static code */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "audio", 0 ) /* audio cpu */
 	ROM_LOAD( "22j5-0.33",    0x08000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu2", 0 ) /* I/O mcu */
+	ROM_REGION( 0x10000, "cpu2", 0 ) /* I/O mcu */
 	ROM_LOAD( "63701.bin",    0xc000, 0x4000, NO_DUMP )	/* missing */
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* text */
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE ) /* text */
 	ROM_LOAD( "10.bin",       0x00000, 0x10000, CRC(442326fd) SHA1(e0e9e1dfdca3edd6e2522f55c191b40b81b8eaff) )
 	ROM_LOAD( "11.bin",       0x10000, 0x10000, CRC(2140b070) SHA1(7a9d89eb6130b1dd21236fefaeb09a29c7f0d208) )
 	ROM_LOAD( "9.bin",        0x20000, 0x10000, CRC(18660ac1) SHA1(be6a47eea9649d7b9ff8b30a4de643522c9869e6) )
 	ROM_LOAD( "8.bin",        0x30000, 0x10000, CRC(5caae3c9) SHA1(f81a1c4ce2117d41e81542d417ff3573ea0f5313) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "2.bin",        0x00000, 0x10000, CRC(1271583e) SHA1(98a597f2be1abdac6c4de811cfa8a53549bc6904) )
 	ROM_LOAD( "1.bin",        0x10000, 0x10000, CRC(5ae6cccf) SHA1(6bd385d6559b54c681d05eed2e91bfc2aa3e6844) )
 	ROM_LOAD( "4.bin",        0x20000, 0x10000, CRC(f5022822) SHA1(fa67b1f70da80365f14776b712df6f656e603fb0) )
 	ROM_LOAD( "3.bin",        0x30000, 0x10000, CRC(05a71179) SHA1(7e5ed81b37ac458d7a40e89f83f1efb742e797a8) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "adpcm", 0 ) /* adpcm samples */
+	ROM_REGION( 0x20000, "adpcm", 0 ) /* adpcm samples */
 	ROM_LOAD( "22j6-0.83",    0x00000, 0x10000, CRC(744a26e3) SHA1(519f22f1e5cc417cb8f9ced97e959d23c711283b) )
 	ROM_LOAD( "22j7-0.82",    0x10000, 0x10000, CRC(2fa1de21) SHA1(e8c7af6057b64ecadd3473b82abd8e9f873082fd) )
 
-	ROM_REGION( 0x0800, RGNCLASS_PROMS, "proms", 0 )	/* color PROMs */
+	ROM_REGION( 0x0800, "proms", 0 )	/* color PROMs */
 	ROM_LOAD( "27s191.bin",  0x0000, 0x0800, CRC(317e42ea) SHA1(59caacc02fb7fb11604bd177f790fd68830ca7c1) )
 	ROM_LOAD( "82s137.bin",  0x0400, 0x0400, CRC(6059f401) SHA1(280b1bda3a55f2d8c2fd4552c4dcec7100f0170f) )
 ROM_END

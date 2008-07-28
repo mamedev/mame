@@ -34,7 +34,7 @@ static WRITE8_HANDLER( battlnts_sh_irqtrigger_w )
 
 static WRITE8_HANDLER( battlnts_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 	int bankaddress;
 
 	/* bits 6 & 7 = bank number */
@@ -283,77 +283,77 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( battlnts )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "main", 0 ) /* code + banked roms */
 	ROM_LOAD( "777_g02.7e", 0x08000, 0x08000, CRC(dbd8e17e) SHA1(586a22b714011c67a915c4a350ceca19ff875635) ) /* fixed ROM */
 	ROM_LOAD( "777_g03.8e", 0x10000, 0x10000, CRC(7bd44fef) SHA1(308ec5246f5537b34e368535672ac687f456750a) ) /* banked ROM */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "777_c01.10a",  0x00000, 0x08000, CRC(c21206e9) SHA1(7b133e04be67dc061a186ab0481d848b69b370d7) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "777_c04.13a",  0x00000, 0x40000, CRC(45d92347) SHA1(8537b4ccd0a80ea3260ef82fde177f1d65a49c03) ) /* tiles */
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "777_c05.13e",  0x00000, 0x40000, CRC(aeee778c) SHA1(fc58ada9c97361d13439b7b0918c947d48402445) ) /* sprites */
 ROM_END
 
 ROM_START( battlntj )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "main", 0 ) /* code + banked roms */
 	ROM_LOAD( "777_e02.7e",  0x08000, 0x08000, CRC(d631cfcb) SHA1(7787da0dd8cd218abc27204e517e04d7a1913a3b) ) /* fixed ROM */
 	ROM_LOAD( "777_e03.8e",  0x10000, 0x10000, CRC(5ef1f4ef) SHA1(e3e6e1fc5a65328d94c23e2e76eef3504b70e58b) ) /* banked ROM */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "777_c01.10a",  0x00000, 0x08000, CRC(c21206e9) SHA1(7b133e04be67dc061a186ab0481d848b69b370d7) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "777_c04.13a",  0x00000, 0x40000, CRC(45d92347) SHA1(8537b4ccd0a80ea3260ef82fde177f1d65a49c03) ) /* tiles */
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "777_c05.13e",  0x00000, 0x40000, CRC(aeee778c) SHA1(fc58ada9c97361d13439b7b0918c947d48402445) ) /* sprites */
 ROM_END
 
 ROM_START( rackemup )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "main", 0 ) /* code + banked roms */
 	ROM_LOAD( "765_l02.7e",  0x08000, 0x08000, CRC(3dfc48bd) SHA1(9ba98e9f27dd0a6efec145bea2a5ae7df8567437) ) /* fixed ROM */
 	ROM_LOAD( "765_j03.8e",  0x10000, 0x10000, CRC(a13fd751) SHA1(27ec66835c85b7ac0221a813d38e9cca0d9be3b8) ) /* banked ROM */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "765_j01.10a", 0x00000, 0x08000, CRC(77ae753e) SHA1(9e463a825d31bb79644b083d24b25670d96441c5) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "765_l04.13a", 0x00000, 0x40000, CRC(acfbeee2) SHA1(c2bf750892ba33d4610fa4497170f49c101ed4c1) ) /* tiles */
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "765_l05.13e", 0x00000, 0x40000, CRC(1bb6855f) SHA1(251081564dfede8fa9a422081d58465fe5ca4ed1) ) /* sprites */
 ROM_END
 
 ROM_START( thehustl )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "main", 0 ) /* code + banked roms */
 	ROM_LOAD( "765_m02.7e",  0x08000, 0x08000, CRC(934807b9) SHA1(84e13a5c1587ee28330f369f9a1180219edbda9d) ) /* fixed ROM */
 	ROM_LOAD( "765_j03.8e",  0x10000, 0x10000, CRC(a13fd751) SHA1(27ec66835c85b7ac0221a813d38e9cca0d9be3b8) ) /* banked ROM */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "765_j01.10a", 0x00000, 0x08000, CRC(77ae753e) SHA1(9e463a825d31bb79644b083d24b25670d96441c5) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "765_e04.13a", 0x00000, 0x40000, CRC(08c2b72e) SHA1(02d9c690da839d6fee75fffdf66a4d3da35a0263) ) /* tiles */
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "765_e05.13e", 0x00000, 0x40000, CRC(ef044655) SHA1(c8272283eab8fc2899979da398819cb72c92a299) ) /* sprites */
 ROM_END
 
 ROM_START( thehustj )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "main", 0 ) /* code + banked roms */
 	ROM_LOAD( "765_j02.7e",  0x08000, 0x08000, CRC(2ac14c75) SHA1(b88f6279ab88719f4207e28486a0022554668382) ) /* fixed ROM */
 	ROM_LOAD( "765_j03.8e",  0x10000, 0x10000, CRC(a13fd751) SHA1(27ec66835c85b7ac0221a813d38e9cca0d9be3b8) ) /* banked ROM */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "765_j01.10a", 0x00000, 0x08000, CRC(77ae753e) SHA1(9e463a825d31bb79644b083d24b25670d96441c5) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "765_e04.13a", 0x00000, 0x40000, CRC(08c2b72e) SHA1(02d9c690da839d6fee75fffdf66a4d3da35a0263) ) /* tiles */
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "765_e05.13e", 0x00000, 0x40000, CRC(ef044655) SHA1(c8272283eab8fc2899979da398819cb72c92a299) ) /* sprites */
 ROM_END
 
@@ -389,7 +389,7 @@ static void shuffle(UINT8 *buf,int len)
 static DRIVER_INIT( rackemup )
 {
 	/* rearrange char ROM */
-	shuffle(memory_region(machine, RGNCLASS_GFX, "gfx1"),memory_region_length(machine, RGNCLASS_GFX, "gfx1"));
+	shuffle(memory_region(machine, "gfx1"),memory_region_length(machine, "gfx1"));
 }
 
 

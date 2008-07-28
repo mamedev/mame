@@ -528,10 +528,10 @@ static void SCSP_Init(const char *tag, struct _SCSP *SCSP, const struct SCSPinte
 			SCSP->Master=0;
 		}
 
-		SCSP->SCSPRAM = memory_region(Machine, RGNCLASS_SOUND, tag);
+		SCSP->SCSPRAM = memory_region(Machine, tag);
 		if (SCSP->SCSPRAM)
 		{
-			SCSP->SCSPRAM_LENGTH = memory_region_length(Machine, RGNCLASS_SOUND, tag);
+			SCSP->SCSPRAM_LENGTH = memory_region_length(Machine, tag);
 			SCSP->DSP.SCSPRAM = (UINT16 *)SCSP->SCSPRAM;
 			SCSP->DSP.SCSPRAM_LENGTH = SCSP->SCSPRAM_LENGTH/2;
 			SCSP->SCSPRAM += intf->roffset;

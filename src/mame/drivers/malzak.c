@@ -65,7 +65,7 @@ static READ8_HANDLER( fake_VRLE_r )
 
 static READ8_HANDLER( bank_r )
 {
-	UINT8* bank = memory_region(machine, RGNCLASS_USER, "user2");
+	UINT8* bank = memory_region(machine, "user2");
 
 	return bank[offset + (malzak_bank1 * 0x0400)];
 }
@@ -383,7 +383,7 @@ static MACHINE_DRIVER_START( malzak2 )
 MACHINE_DRIVER_END
 
 ROM_START( malzak )
-	ROM_REGION( 0x8000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x8000, "main", 0 )
 	ROM_LOAD( "malzak.5",     0x0000, 0x0800, CRC(75355c98) SHA1(7036ed5d9ee38585b1a6bc204d410d5fb5ddd81f) )
 	ROM_CONTINUE( 0x2000, 0x0800 )
 	ROM_LOAD( "malzak.4",     0x0800, 0x0400, CRC(744c81e3) SHA1(c08d6df3cf2808a5f99d8247fc19a59be88121a9) )
@@ -392,19 +392,19 @@ ROM_START( malzak )
 	ROM_LOAD( "malzak.3",     0x4400, 0x0800, CRC(b947229e) SHA1(37b88b5aa91a483fcfe60a9bdd67a66f6378c487) )
 
 	// Screen data
-	ROM_REGION(0x0800, RGNCLASS_USER, "user2", 0)
+	ROM_REGION(0x0800, "user2", 0)
 	ROM_LOAD( "malzak.2",     0x0000, 0x0800, CRC(2a12ad67) SHA1(f89a50b62311a170004c061abd8dedc3ebd84748) )
 
-	ROM_REGION( 0x0800, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0800, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "malzak.1",     0x0000, 0x0800, CRC(74d5ff7b) SHA1(cae326370dc83b86542f9d070e2dc91b1b833356) )
 
-	ROM_REGION(0x01000, RGNCLASS_GFX, "gfx2",0) // SAA5050 internal character ROM
+	ROM_REGION(0x01000, "gfx2",0) // SAA5050 internal character ROM
 	ROM_LOAD("p2000.chr", 0x0140, 0x08c0, BAD_DUMP CRC(78c17e3e) SHA1(4e1c59dc484505de1dc0b1ba7e5f70a54b0d4ccc) )
 
 ROM_END
 
 ROM_START( malzak2 )
-	ROM_REGION( 0x8000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x8000, "main", 0 )
 	ROM_LOAD( "malz1a.bin",   0x000000, 0x000800, CRC(5c3cb14c) SHA1(2d3b5703cb9a47e34aa593f0e8d42d4e67c167d9) )
 	ROM_CONTINUE( 0x2000, 0x0800 )
 
@@ -416,13 +416,13 @@ ROM_START( malzak2 )
 	ROM_LOAD( "malz3c.bin",     0x4400, 0x0800, CRC(54d6a02e) SHA1(80c550d74da770689fe451cb0ee8e550a63b1b96) )
 
 	// Screen data
-	ROM_REGION(0x0800, RGNCLASS_USER, "user2", 0)
+	ROM_REGION(0x0800, "user2", 0)
 	ROM_LOAD( "malz4d.bin",     0x0000, 0x0800, CRC(5c6ca415) SHA1(e7571519ac7911507d2c1cf975a7663f41321cb9) )
 
-	ROM_REGION( 0x0800, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0800, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "malzak.1",     0x0000, 0x0800, CRC(74d5ff7b) SHA1(cae326370dc83b86542f9d070e2dc91b1b833356) )
 
-	ROM_REGION(0x01000, RGNCLASS_GFX, "gfx2",0) // SAA5050 internal character ROM
+	ROM_REGION(0x01000, "gfx2",0) // SAA5050 internal character ROM
 	ROM_LOAD("p2000.chr", 0x0140, 0x08c0, BAD_DUMP CRC(78c17e3e) SHA1(4e1c59dc484505de1dc0b1ba7e5f70a54b0d4ccc) )
 
 ROM_END

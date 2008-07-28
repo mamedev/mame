@@ -48,7 +48,7 @@ note: check this, its borrowed from tecmo.c / wc90.c at the moment and could wel
 static WRITE8_HANDLER( tbowlb_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -58,7 +58,7 @@ static WRITE8_HANDLER( tbowlb_bankswitch_w )
 static WRITE8_HANDLER( tbowlc_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "sub");
+	UINT8 *RAM = memory_region(machine, "sub");
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -201,7 +201,7 @@ static void tbowl_adpcm_int(running_machine *machine, int num)
 	static int adpcm_data[2] = { -1, -1 };
 
 	if (adpcm_pos[num] >= adpcm_end[num] ||
-				adpcm_pos[num] >= memory_region_length(machine, RGNCLASS_SOUND, "adpcm")/2)
+				adpcm_pos[num] >= memory_region_length(machine, "adpcm")/2)
 		MSM5205_reset_w(num,1);
 	else if (adpcm_data[num] != -1)
 	{
@@ -210,7 +210,7 @@ static void tbowl_adpcm_int(running_machine *machine, int num)
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(machine, RGNCLASS_SOUND, "adpcm") + 0x10000 * num;
+		UINT8 *ROM = memory_region(machine, "adpcm") + 0x10000 * num;
 
 		adpcm_data[num] = ROM[adpcm_pos[num]++];
 		MSM5205_data_w(num,adpcm_data[num] >> 4);
@@ -717,22 +717,22 @@ this fails its rom check so I assume its corrupt
 
 
 ROM_START( tbowl )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) /* NEC D70008AC-8 (Z80 Clone) */
+	ROM_REGION( 0x20000, "main", 0 ) /* NEC D70008AC-8 (Z80 Clone) */
 	ROM_LOAD( "4.11b",	    0x00000, 0x08000, CRC(db8a4f5d) SHA1(730dee040c18ed8736c07a7de0b986f667b0f2f5) )
 	ROM_LOAD( "6206b.5",	0x10000, 0x10000, CRC(133c5c11) SHA1(7d4e76db3505ccf033d0d9b8d21feaf09b76dcc4) )
 
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "sub", 0 ) /* NEC D70008AC-8 (Z80 Clone) */
+	ROM_REGION( 0x20000, "sub", 0 ) /* NEC D70008AC-8 (Z80 Clone) */
 	ROM_LOAD( "6206c.24",	0x00000, 0x10000, CRC(040c8138) SHA1(f6fea192bf2ef0a3f0876133c761488184f54f50) )
 	ROM_LOAD( "6206c.25",	0x10000, 0x10000, CRC(92c3cef5) SHA1(75883663b309bf46be544114c6e9086ab222300d) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* Z80 */
+	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 */
 	ROM_LOAD( "6206a.1",	0x00000, 0x08000, CRC(4370207b) SHA1(2c929b571c86d35e646870644751e86bd16b5e22) )
 
-	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Characters inc. Alphanumerics */
+	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Characters inc. Alphanumerics */
 	ROM_LOAD16_BYTE( "14.13l",	    0x00000, 0x08000, CRC(f9cf60b9) SHA1(0a79ed29f82ac7bd08062f922f79e439c194f30a) )
 	ROM_LOAD16_BYTE( "15.15l",	    0x00001, 0x08000, CRC(a23f6c53) SHA1(0bb64894a27f41d74117ec492aafd52bc5b16ca4) )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) /* BG GFX */
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE ) /* BG GFX */
 	ROM_LOAD16_BYTE( "6206b.6",	    0x40001, 0x10000, CRC(b9615ffa) SHA1(813896387291f5325ed7e4058347fe35c0d7b839) )
 	ROM_LOAD16_BYTE( "6206b.8",	    0x40000, 0x10000, CRC(6389c719) SHA1(8043907d6f5b37228c09f05bbf12b4b9bb9bc130) )
 	ROM_LOAD16_BYTE( "6206b.7",	    0x00001, 0x10000, CRC(d139c397) SHA1(4093220e6bddb95d0af445944bead7a064b64c39) )
@@ -742,7 +742,7 @@ ROM_START( tbowl )
 	ROM_LOAD16_BYTE( "6206b.11",    0x20001, 0x10000, CRC(06bf07bb) SHA1(9f12a39b8832bff2ffd84b7e6c1ddb2855ff924b) )
 	ROM_LOAD16_BYTE( "6206b.13",    0x20000, 0x10000, CRC(4ad72c16) SHA1(554474987349b5b11e181ee8a2d1308777b030c1) )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE ) /* SPR GFX */
+	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE ) /* SPR GFX */
 	ROM_LOAD16_BYTE( "6206c.16",	0x60001, 0x10000, CRC(1a2fb925) SHA1(bc96ee87372826d5bee2b4d2aefde4c47b9ee80a) )
 	ROM_LOAD16_BYTE( "6206c.20",	0x60000, 0x10000, CRC(70bb38a3) SHA1(5145b246f7720dd0359b97be35aa027af07cb6da) )
 	ROM_LOAD16_BYTE( "6206c.17",	0x40001, 0x10000, CRC(de16bc10) SHA1(88e2452c7caf44cd541c27fc56c99703f3330bd7) )
@@ -752,28 +752,28 @@ ROM_START( tbowl )
 	ROM_LOAD16_BYTE( "6206c.19",	0x00001, 0x10000, CRC(71795604) SHA1(57ef4f14dfe1829d5dddeba81bf2f7354d971d27) )
 	ROM_LOAD16_BYTE( "6206c.23",	0x00000, 0x10000, CRC(97fba168) SHA1(107de19614d57453a37462e1a4d499d14633d50b) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "adpcm", 0 )
+	ROM_REGION( 0x20000, "adpcm", 0 )
 	ROM_LOAD( "6206a.3",	0x00000, 0x10000, CRC(3aa24744) SHA1(06de3f9a2431777218cc67f59230fddbfa01cf2d) )
 	ROM_LOAD( "6206a.2",	0x10000, 0x10000, CRC(1e9e5936) SHA1(60370d1de28b1c5ffeff7843702aaddb19ff1f58) )
 ROM_END
 
 ROM_START( tbowlj )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) /* NEC D70008AC-8 (Z80 Clone) */
+	ROM_REGION( 0x20000, "main", 0 ) /* NEC D70008AC-8 (Z80 Clone) */
 	ROM_LOAD( "6206b.4",	0x00000, 0x08000, CRC(7ed3eff7) SHA1(4a17f2838e9bbed8b1638783c62d07d1074e2b35) )
 	ROM_LOAD( "6206b.5",	0x10000, 0x10000, CRC(133c5c11) SHA1(7d4e76db3505ccf033d0d9b8d21feaf09b76dcc4) )
 
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "sub", 0 ) /* NEC D70008AC-8 (Z80 Clone) */
+	ROM_REGION( 0x20000, "sub", 0 ) /* NEC D70008AC-8 (Z80 Clone) */
 	ROM_LOAD( "6206c.24",	0x00000, 0x10000, CRC(040c8138) SHA1(f6fea192bf2ef0a3f0876133c761488184f54f50) )
 	ROM_LOAD( "6206c.25",	0x10000, 0x10000, CRC(92c3cef5) SHA1(75883663b309bf46be544114c6e9086ab222300d) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* Z80 */
+	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 */
 	ROM_LOAD( "6206a.1",	0x00000, 0x08000, CRC(4370207b) SHA1(2c929b571c86d35e646870644751e86bd16b5e22) )
 
-	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Characters inc. Alphanumerics */
+	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Characters inc. Alphanumerics */
 	ROM_LOAD16_BYTE( "6206b.14",	0x00000, 0x08000, CRC(cf99d0bf) SHA1(d1f23e23c2ebd26e2ffe8b23a02d86e4d32c6f11) )
 	ROM_LOAD16_BYTE( "6206b.15",	0x00001, 0x08000, CRC(d69248cf) SHA1(4dad6a3fdc36b2fe625df0a43fd9e82d1dfd2af6) )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) /* BG GFX */
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE ) /* BG GFX */
 	ROM_LOAD16_BYTE( "6206b.6",	    0x40001, 0x10000, CRC(b9615ffa) SHA1(813896387291f5325ed7e4058347fe35c0d7b839) )
 	ROM_LOAD16_BYTE( "6206b.8",	    0x40000, 0x10000, CRC(6389c719) SHA1(8043907d6f5b37228c09f05bbf12b4b9bb9bc130) )
 	ROM_LOAD16_BYTE( "6206b.7",	    0x00001, 0x10000, CRC(d139c397) SHA1(4093220e6bddb95d0af445944bead7a064b64c39) )
@@ -783,7 +783,7 @@ ROM_START( tbowlj )
 	ROM_LOAD16_BYTE( "6206b.11",    0x20001, 0x10000, CRC(06bf07bb) SHA1(9f12a39b8832bff2ffd84b7e6c1ddb2855ff924b) )
 	ROM_LOAD16_BYTE( "6206b.13",    0x20000, 0x10000, CRC(4ad72c16) SHA1(554474987349b5b11e181ee8a2d1308777b030c1) )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE ) /* SPR GFX */
+	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE ) /* SPR GFX */
 	ROM_LOAD16_BYTE( "6206c.16",	0x60001, 0x10000, CRC(1a2fb925) SHA1(bc96ee87372826d5bee2b4d2aefde4c47b9ee80a) )
 	ROM_LOAD16_BYTE( "6206c.20",	0x60000, 0x10000, CRC(70bb38a3) SHA1(5145b246f7720dd0359b97be35aa027af07cb6da) )
 	ROM_LOAD16_BYTE( "6206c.17",	0x40001, 0x10000, CRC(de16bc10) SHA1(88e2452c7caf44cd541c27fc56c99703f3330bd7) )
@@ -793,7 +793,7 @@ ROM_START( tbowlj )
 	ROM_LOAD16_BYTE( "6206c.19",	0x00001, 0x10000, CRC(71795604) SHA1(57ef4f14dfe1829d5dddeba81bf2f7354d971d27) )
 	ROM_LOAD16_BYTE( "6206c.23",	0x00000, 0x10000, CRC(97fba168) SHA1(107de19614d57453a37462e1a4d499d14633d50b) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "adpcm", 0 )
+	ROM_REGION( 0x20000, "adpcm", 0 )
 	ROM_LOAD( "6206a.3",	0x00000, 0x10000, CRC(3aa24744) SHA1(06de3f9a2431777218cc67f59230fddbfa01cf2d) )
 	ROM_LOAD( "6206a.2",	0x10000, 0x10000, CRC(1e9e5936) SHA1(60370d1de28b1c5ffeff7843702aaddb19ff1f58) )
 ROM_END

@@ -534,7 +534,7 @@ static WRITE16_HANDLER( robocop_68000_share_w )
 static void h6280_decrypt(running_machine *machine, const char *cputag)
 {
 	int i;
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, cputag);
+	UINT8 *RAM = memory_region(machine, cputag);
 
 	/* Read each byte, decrypt it */
 	for (i=0x00000; i<0x10000; i++)
@@ -543,7 +543,7 @@ static void h6280_decrypt(running_machine *machine, const char *cputag)
 
 DRIVER_INIT( hippodrm )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "sub");
+	UINT8 *RAM = memory_region(machine, "sub");
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x180000, 0x180fff, 0, 0, hippodrm_68000_share_r, hippodrm_68000_share_w);
 	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xffc800, 0xffcfff, 0, 0, sprite_mirror_w);
@@ -559,7 +559,7 @@ DRIVER_INIT( hippodrm )
 
 DRIVER_INIT( slyspy )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "audio");
+	UINT8 *RAM = memory_region(machine, "audio");
 
 	h6280_decrypt(machine, "audio");
 
@@ -582,7 +582,7 @@ DRIVER_INIT( hbarrel )
 {
 	GAME=1;
 { /* Remove this patch once processing time of i8751 is simulated */
-UINT16 *rom = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
+UINT16 *rom = (UINT16 *)memory_region(machine, "main");
 rom[0xb68/2] = 0x8008;
 }
 }
@@ -591,7 +591,7 @@ DRIVER_INIT( hbarrelw )
 {
 	GAME=1;
 { /* Remove this patch once processing time of i8751 is simulated */
-UINT16 *rom = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
+UINT16 *rom = (UINT16 *)memory_region(machine, "main");
 rom[0xb3e/2] = 0x8008;
 }
 }
@@ -603,7 +603,7 @@ DRIVER_INIT( birdtry )
 
 	GAME=3;
 
-	src = memory_region(machine, RGNCLASS_GFX, "gfx4");
+	src = memory_region(machine, "gfx4");
 
 	/* some parts of the graphic have bytes swapped */
 	for (k = 0;k < 0x70000;k += 0x20000)

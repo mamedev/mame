@@ -716,7 +716,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( nyny )
-	ROM_REGION(0x10000, RGNCLASS_CPU, "main", 0)	/* main CPU */
+	ROM_REGION(0x10000, "main", 0)	/* main CPU */
 	ROM_LOAD( "nyny01s.100",  0xa800, 0x0800, CRC(a2b76eca) SHA1(e46717e6ad330be4c4e7d9fab4f055f89aa31bcc) )
 	ROM_LOAD( "nyny02s.099",  0xb000, 0x0800, CRC(ef2d4dae) SHA1(718c0ecf7770a780aebb1dc8bf4ca86ea0a5ea28) )
 	ROM_LOAD( "nyny03s.098",  0xb800, 0x0800, CRC(2734c229) SHA1(b028d057d26838bae50b8ddb90a3755b5315b4ee) )
@@ -725,18 +725,18 @@ ROM_START( nyny )
 	ROM_LOAD( "nyny06s.095",  0xf000, 0x0800, CRC(8c073052) SHA1(0ce103ac0e79124ac9f1e097dda1a0664b92b89b) )
 	ROM_LOAD( "nyny07s.094",  0xf800, 0x0800, CRC(d49d7429) SHA1(c12eaae7ba0b1d44c45a584232db03c5731c046a) )
 
-	ROM_REGION(0x10000, RGNCLASS_CPU, "audio", 0)	/* first audio CPU */
+	ROM_REGION(0x10000, "audio", 0)	/* first audio CPU */
 	ROM_LOAD( "nyny08.093",   0x5000, 0x0800, CRC(19ddb6c3) SHA1(0097fad542f9a33849565093c2fb106d90007b1a) )
 	ROM_LOAD( "nyny09.092",   0x6000, 0x0800, CRC(a359c6f1) SHA1(1bc7b487581399908c3cec823733810fb6d944ce) )
 	ROM_LOAD( "nyny10.091",   0x7000, 0x0800, CRC(a72a70fa) SHA1(deed7dec9cc43fa1d6c4854ba18169c894c9a2f0) )
 
-	ROM_REGION(0x10000, RGNCLASS_CPU, "audio2", 0) /* second audio CPU */
+	ROM_REGION(0x10000, "audio2", 0) /* second audio CPU */
 	ROM_LOAD( "nyny11.snd",   0x7000, 0x0800, CRC(650450fc) SHA1(214693df394ca05eff5dbe1e800107d326ba80f6) )
 ROM_END
 
 
 ROM_START( nynyg )
-	ROM_REGION(0x10000, RGNCLASS_CPU, "main", 0)	/* main CPU */
+	ROM_REGION(0x10000, "main", 0)	/* main CPU */
 	ROM_LOAD( "gny1.cpu",     0xa800, 0x0800, CRC(fb5b8f17) SHA1(2202325451dfd4e7c16cba93f0fade46929ffa72) )
 	ROM_LOAD( "gny2.cpu",     0xb000, 0x0800, CRC(d248dd93) SHA1(0c4579698f8917332041c08af6902b8f8acd7d62) )
 	ROM_LOAD( "gny3.cpu",     0xb800, 0x0800, CRC(223a9d09) SHA1(c2b12270d375587489208d6a1b37a4e3ec87bc20) )
@@ -745,12 +745,12 @@ ROM_START( nynyg )
 	ROM_LOAD( "gny6.cpu",     0xf000, 0x0800, CRC(4839d4d2) SHA1(cfd6f2f252ee2f6a4d881496a017c02d7dd77944) )
 	ROM_LOAD( "gny7.cpu",     0xf800, 0x0800, CRC(b7564c5b) SHA1(e1d8fe7f37aa7aa98f18c538fe6e688675cc2de1) )
 
-	ROM_REGION(0x10000, RGNCLASS_CPU, "audio", 0)	/* first audio CPU */
+	ROM_REGION(0x10000, "audio", 0)	/* first audio CPU */
 	ROM_LOAD( "gny8.cpu",     0x5000, 0x0800, CRC(e0bf7d00) SHA1(7afca3affa413179f4f59ce2cad89525cfa5efbc) )
 	ROM_LOAD( "gny9.cpu",     0x6000, 0x0800, CRC(639bc81a) SHA1(91819d49099e438ac8c70920a787aeaed3ed82e9) )
 	ROM_LOAD( "gny10.cpu",    0x7000, 0x0800, CRC(73764021) SHA1(bb2f62130142487afbd8d2540e2d4fe5bb67c4ee) )
 
-	ROM_REGION(0x10000, RGNCLASS_CPU, "audio2", 0) /* second audio CPU */
+	ROM_REGION(0x10000, "audio2", 0) /* second audio CPU */
 	/* The original dump of this ROM was bad [FIXED BITS (x1xxxxxx)] */
 	/* Since what's left is identical to the Sigma version, I'm assuming it's the same. */
 	ROM_LOAD( "nyny11.snd",   0x7000, 0x0800, CRC(650450fc) SHA1(214693df394ca05eff5dbe1e800107d326ba80f6) )
@@ -758,7 +758,7 @@ ROM_END
 
 
 ROM_START( arcadia )
-	ROM_REGION(0x10000, RGNCLASS_CPU, "main", 0)	/* main CPU */
+	ROM_REGION(0x10000, "main", 0)	/* main CPU */
 	ROM_LOAD( "ar-01",        0xa800, 0x0800, CRC(7b7e8f27) SHA1(2bb1d07d87ad5b952de9460c840d7e8b59ed1b4a) )
 	ROM_LOAD( "ar-02",        0xb000, 0x0800, CRC(81d9e172) SHA1(4279582f1edf54f0974fa277565d8ade6d9faa50) )
 	ROM_LOAD( "ar-03",        0xb800, 0x0800, CRC(2c5feb05) SHA1(6f8952e7744ba7d7b8b345d67f546b504f7a3b30) )
@@ -767,12 +767,12 @@ ROM_START( arcadia )
 	ROM_LOAD( "ar-06",        0xf000, 0x0800, CRC(27b79cc0) SHA1(2c5c3a9a09069751c5e9c23d0840ee4996006c0b) )
 	ROM_LOAD( "ar-07",        0xf800, 0x0800, CRC(be77a477) SHA1(817c069855634dd844f0068d64bfbf1862980d6b) )
 
-	ROM_REGION(0x10000, RGNCLASS_CPU, "audio", 0)	/* first audio CPU */
+	ROM_REGION(0x10000, "audio", 0)	/* first audio CPU */
 	ROM_LOAD( "ar-08",        0x5000, 0x0800, CRC(38569b25) SHA1(887a9afaa65d0961097f7fb5f1ae390d40e9c164) )
 	ROM_LOAD( "nyny09.092",   0x6000, 0x0800, CRC(a359c6f1) SHA1(1bc7b487581399908c3cec823733810fb6d944ce) )
 	ROM_LOAD( "nyny10.091",   0x7000, 0x0800, CRC(a72a70fa) SHA1(deed7dec9cc43fa1d6c4854ba18169c894c9a2f0) )
 
-	ROM_REGION(0x10000, RGNCLASS_CPU, "audio2", 0) /* second audio CPU */
+	ROM_REGION(0x10000, "audio2", 0) /* second audio CPU */
 	ROM_LOAD( "ar-11",        0x7000, 0x0800, CRC(208f4488) SHA1(533f8942e1c964cc88253e9dc4ec711f77607e4c) )
 ROM_END
 

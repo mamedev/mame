@@ -25,7 +25,7 @@
 static void get_pens(running_machine *machine, const _20pacgal_state *state, pen_t *pens)
 {
 	offs_t offs;
-	UINT8 *color_prom = memory_region(machine, RGNCLASS_PROMS, "proms") + (NUM_PENS * state->game_selected);
+	UINT8 *color_prom = memory_region(machine, "proms") + (NUM_PENS * state->game_selected);
 
 	for (offs = 0; offs < NUM_PENS ;offs++)
 	{

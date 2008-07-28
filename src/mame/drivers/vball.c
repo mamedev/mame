@@ -129,7 +129,7 @@ INTERRUPT_GEN( vball_interrupt );
 */
 static WRITE8_HANDLER( vb_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 	memory_set_bankptr( 1,&RAM[ 0x10000 + ( 0x4000 * ( data & 1 ) ) ] );
 
 	if (vball_gfxset != ((data  & 0x20) ^ 0x20)) {
@@ -481,15 +481,15 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( vball )
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "main", 0 )	/* Main CPU: 64k for code */
+	ROM_REGION( 0x18000, "main", 0 )	/* Main CPU: 64k for code */
 	ROM_LOAD( "vball.124",  0x10000, 0x08000, CRC(be04c2b5) SHA1(40fed4ae272719e940f1796ef35420ab451ab7b6) )/* Bankswitched */
 	ROM_CONTINUE(		0x08000, 0x08000 )		 /* Static code  */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* region#2: music CPU, 64kb */
+	ROM_REGION( 0x10000, "audio", 0 ) /* region#2: music CPU, 64kb */
 	ROM_LOAD( "vball.47",  0x00000, 0x8000,  CRC(10ca79ad) SHA1(aad4a09d6745ca0b5665cb00ff7a4e08ea434068) )
 
 	/* These are from the bootleg; the original has the image data stored in a special dip rom */
-	ROM_REGION(0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	 /* fg tiles */
+	ROM_REGION(0x80000, "gfx1", ROMREGION_DISPOSE )	 /* fg tiles */
 	ROM_LOAD( "vball13.bin",  0x00000, 0x10000, CRC(f26df8e1) SHA1(72186c1430d07c7fd9211245b539f05a0660bebe) ) /* 0,1,2,3 */
 	ROM_LOAD( "vball14.bin",  0x10000, 0x10000, CRC(c9798d0e) SHA1(ec156f6c7ecccaa216ce8076f75ad7627ee90945) ) /* 0,1,2,3 */
 	ROM_LOAD( "vball15.bin",  0x20000, 0x10000, CRC(68e69c4b) SHA1(9870674c91cab7215ad8ed40eb82facdee478fde) ) /* 0,1,2,3 */
@@ -499,43 +499,43 @@ ROM_START( vball )
 	ROM_LOAD( "vball11.bin",  0x60000, 0x10000, CRC(4754b303) SHA1(8630f077b542590ef1340a2f0a6b94086ff91c40) ) /* 0,1,2,3 */
 	ROM_LOAD( "vball12.bin",  0x70000, 0x10000, CRC(21294a84) SHA1(b36ea9ddf6879443d3104241997fa0f916856528) ) /* 0,1,2,3 */
 
-	ROM_REGION(0x40000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	 /* sprites */
+	ROM_REGION(0x40000, "gfx2", ROMREGION_DISPOSE )	 /* sprites */
 	ROM_LOAD( "vball.35",  0x00000, 0x20000, CRC(877826d8) SHA1(fd77298f9343051f66259dad9127f40afb95f385) ) /* 0,1,2,3 */
 	ROM_LOAD( "vball.5",   0x20000, 0x20000, CRC(c6afb4fa) SHA1(6d7c966300ce5fb2094476b393434486965d62b4) ) /* 0,1,2,3 */
 
-	ROM_REGION(0x20000, RGNCLASS_SOUND, "oki", 0 ) /* Sound region#1: adpcm */
+	ROM_REGION(0x20000, "oki", 0 ) /* Sound region#1: adpcm */
 	ROM_LOAD( "vball.78a",  0x00000, 0x10000, CRC(f3e63b76) SHA1(da54d1d7d7d55b73e49991e4363bc6f46e0f70eb) )
 	ROM_LOAD( "vball.78b",  0x10000, 0x10000, CRC(7ad9d338) SHA1(3e3c270fa69bda93b03f07a54145eb5e211ec8ba) )
 
-	ROM_REGION(0x1000, RGNCLASS_PROMS, "proms", 0 )	/* color PROMs */
+	ROM_REGION(0x1000, "proms", 0 )	/* color PROMs */
 	ROM_LOAD_NIB_LOW ( "vball.44",   0x0000, 0x00800, CRC(a317240f) SHA1(bd57ad516f7a8ff774276fd26b02dd34659d41ad) )
 	ROM_LOAD_NIB_HIGH( "vball.43",   0x0000, 0x00800, CRC(1ff70b4f) SHA1(a469baa0dda844ba307c09ddefb23f239cfe7b5f) )
 	ROM_LOAD( "vball.160",  0x0800, 0x00800, CRC(2ffb68b3) SHA1(d560fdcd5e5c79d37e5b5bde22fbaf662fe89252) )
 ROM_END
 
 ROM_START( vball2pj )
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "main", 0 )	/* Main CPU */
+	ROM_REGION( 0x18000, "main", 0 )	/* Main CPU */
 	ROM_LOAD( "25j2-2-5.124",  0x10000, 0x08000,  CRC(432509c4) SHA1(6de50e21d279f4ac9674bc91990ba9535e80908c) )/* Bankswitched */
 	ROM_CONTINUE(		  0x08000, 0x08000 )		 /* Static code  */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* region#2: music CPU, 64kb */
+	ROM_REGION( 0x10000, "audio", 0 ) /* region#2: music CPU, 64kb */
 	ROM_LOAD( "25j1-0.47",  0x00000, 0x8000,  CRC(10ca79ad) SHA1(aad4a09d6745ca0b5665cb00ff7a4e08ea434068) )
 //ROM_LOAD( "vball04.bin",  0x00000, 0x8000,  CRC(534dfbd9) SHA1(d0cb37caf94fa85da4ebdfe15e7a78109084bf91) )
 
    /* the original has the image data stored in a special ceramic embedded package made by Toshiba
      with part number 'TOSHIBA TRJ-101' (which has been dumped using a custom made adapter)
      there are a few bytes different between the bootleg and the original (the original is correct though!) */
-    ROM_REGION(0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* fg tiles */
+    ROM_REGION(0x80000, "gfx1", ROMREGION_DISPOSE ) /* fg tiles */
     ROM_LOAD( "trj-101.96",  0x00000, 0x80000, CRC(f343eee4) SHA1(1ce95285631f7ec91fe3f6c3d62b13f565d3816a) )
 
-	ROM_REGION(0x40000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	 /* sprites */
+	ROM_REGION(0x40000, "gfx2", ROMREGION_DISPOSE )	 /* sprites */
 	ROM_LOAD( "25j4-0.35",  0x00000, 0x20000, CRC(877826d8) SHA1(fd77298f9343051f66259dad9127f40afb95f385) ) /* 0,1,2,3 */
 	ROM_LOAD( "25j3-0.5",   0x20000, 0x20000, CRC(c6afb4fa) SHA1(6d7c966300ce5fb2094476b393434486965d62b4) ) /* 0,1,2,3 */
 
-	ROM_REGION(0x20000, RGNCLASS_SOUND, "oki", 0 ) /* Sound region#1: adpcm */
+	ROM_REGION(0x20000, "oki", 0 ) /* Sound region#1: adpcm */
 	ROM_LOAD( "25j0-0.78",  0x00000, 0x20000, CRC(8e04bdbf) SHA1(baafc5033c9442b83cb332c2c453c13117b31a3b) )
 
-	ROM_REGION(0x1000, RGNCLASS_PROMS, "proms", 0 )	/* color PROMs */
+	ROM_REGION(0x1000, "proms", 0 )	/* color PROMs */
 	ROM_LOAD_NIB_LOW ( "vball.44",   0x0000, 0x00800, CRC(a317240f) SHA1(bd57ad516f7a8ff774276fd26b02dd34659d41ad) )
 	ROM_LOAD_NIB_HIGH( "vball.43",   0x0000, 0x00800, CRC(1ff70b4f) SHA1(a469baa0dda844ba307c09ddefb23f239cfe7b5f) )
 	ROM_LOAD( "vball.160",  0x0800, 0x00800, CRC(2ffb68b3) SHA1(d560fdcd5e5c79d37e5b5bde22fbaf662fe89252) )

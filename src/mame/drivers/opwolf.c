@@ -317,7 +317,7 @@ static void opwolf_msm5205_vck(running_machine *machine, int chip)
 	}
 	else
 	{
-		adpcm_data[chip] = memory_region(machine, RGNCLASS_SOUND, "adpcm")[adpcm_pos[chip]];
+		adpcm_data[chip] = memory_region(machine, "adpcm")[adpcm_pos[chip]];
 		adpcm_pos[chip] = (adpcm_pos[chip] + 1) & 0x7ffff;
 		MSM5205_data_w(chip, adpcm_data[chip] >> 4);
 	}
@@ -661,23 +661,23 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( opwolf )
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )     /* 256k for 68000 code */
+	ROM_REGION( 0x40000, "main", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "b20-05-02.40",  0x00000, 0x10000, CRC(3ffbfe3a) SHA1(e41257e6af18bab4e36267a0c25a6aaa742972d2) )
 	ROM_LOAD16_BYTE( "b20-03-02.30",  0x00001, 0x10000, CRC(fdabd8a5) SHA1(866ec6168489024b8d157f2d5b1553d7f6e3d9b7) )
 	ROM_LOAD16_BYTE( "b20-04.39",     0x20000, 0x10000, CRC(216b4838) SHA1(2851cae00bb3e32e20f35fdab8ed6f149e658363) )
 	ROM_LOAD16_BYTE( "b20-20.29",     0x20001, 0x10000, CRC(d244431a) SHA1(cb6c1d330a526f05c205f68247328161b8d4a1ba) )
 
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "audio", 0 )      /* sound cpu */
+	ROM_REGION( 0x20000, "audio", 0 )      /* sound cpu */
 	ROM_LOAD( "b20-07.10",  0x00000, 0x04000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )	/* SCR tiles (8 x 8) */
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "b20-14.72",  0x00000, 0x80000, CRC(89f889e5) SHA1(1592f6ce4fbb75e33d6ab957e5b90242a7a7a8c4) )	/* Sprites (16 x 16) */
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "adpcm", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "adpcm", 0 )	/* ADPCM samples */
 	ROM_LOAD( "b20-08.21",  0x00000, 0x80000, CRC(f3e19c64) SHA1(39d48645f776c9c2ade537d959ecc6f9dc6dfa1b) )
 ROM_END
 
@@ -687,63 +687,63 @@ ROM_END
    has exactly the same change and the label is different (b20-17 instead of b20-20) so this seems unlikely */
 
 ROM_START( opwolfa )
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )     /* 256k for 68000 code */
+	ROM_REGION( 0x40000, "main", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "b20-05-02.40",  0x00000, 0x10000, CRC(3ffbfe3a) SHA1(e41257e6af18bab4e36267a0c25a6aaa742972d2) )
 	ROM_LOAD16_BYTE( "b20-03-02.30",  0x00001, 0x10000, CRC(fdabd8a5) SHA1(866ec6168489024b8d157f2d5b1553d7f6e3d9b7) )
 	ROM_LOAD16_BYTE( "b20-04.39",     0x20000, 0x10000, CRC(216b4838) SHA1(2851cae00bb3e32e20f35fdab8ed6f149e658363) )
 	ROM_LOAD16_BYTE( "b20-17",        0x20001, 0x10000, CRC(6043188e) SHA1(3a6f4836b1c19d37713f5714a947276baf1df50c) )
 
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "audio", 0 )      /* sound cpu */
+	ROM_REGION( 0x20000, "audio", 0 )      /* sound cpu */
 	ROM_LOAD( "b20-07.10",  0x00000, 0x04000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )	/* SCR tiles (8 x 8) */
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "b20-14.72",  0x00000, 0x80000, CRC(89f889e5) SHA1(1592f6ce4fbb75e33d6ab957e5b90242a7a7a8c4) )	/* Sprites (16 x 16) */
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "adpcm", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "adpcm", 0 )	/* ADPCM samples */
 	ROM_LOAD( "b20-08.21",  0x00000, 0x80000, CRC(f3e19c64) SHA1(39d48645f776c9c2ade537d959ecc6f9dc6dfa1b) )
 ROM_END
 
 
 ROM_START( opwolfu )
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )     /* 256k for 68000 code */
+	ROM_REGION( 0x40000, "main", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "b20-05-02.40",  0x00000, 0x10000, CRC(3ffbfe3a) SHA1(e41257e6af18bab4e36267a0c25a6aaa742972d2) )
 	ROM_LOAD16_BYTE( "b20-03-02.30",  0x00001, 0x10000, CRC(fdabd8a5) SHA1(866ec6168489024b8d157f2d5b1553d7f6e3d9b7) )
 	ROM_LOAD16_BYTE( "b20-04.39",     0x20000, 0x10000, CRC(216b4838) SHA1(2851cae00bb3e32e20f35fdab8ed6f149e658363) )
 	ROM_LOAD16_BYTE( "opwlf.29",      0x20001, 0x10000, CRC(b71bc44c) SHA1(5b404bd7630f01517ab98bda40ca43c11268035a) )
 
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "audio", 0 )      /* sound cpu */
+	ROM_REGION( 0x20000, "audio", 0 )      /* sound cpu */
 	ROM_LOAD( "b20-07.10",  0x00000, 0x04000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b20-13.13",  0x00000, 0x80000, CRC(f6acdab1) SHA1(716b94ab3fa330ecf22df576f6a9f47a49c7554a) )	/* SCR tiles (8 x 8) */
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "b20-14.72",  0x00000, 0x80000, CRC(89f889e5) SHA1(1592f6ce4fbb75e33d6ab957e5b90242a7a7a8c4) )	/* Sprites (16 x 16) */
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "adpcm", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x80000, "adpcm", 0 )	/* ADPCM samples */
 	ROM_LOAD( "b20-08.21",  0x00000, 0x80000, CRC(f3e19c64) SHA1(39d48645f776c9c2ade537d959ecc6f9dc6dfa1b) )
 ROM_END
 
 ROM_START( opwolfb )
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )     /* 256k for 68000 code */
+	ROM_REGION( 0x40000, "main", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "opwlfb.12",  0x00000, 0x10000, CRC(d87e4405) SHA1(de8a7763acd57293fbbff609e949ecd66c0f9234) )
 	ROM_LOAD16_BYTE( "opwlfb.10",  0x00001, 0x10000, CRC(9ab6f75c) SHA1(85310258ca005ffb031e8d6b3f43c3d1fc29ef14) )
 	ROM_LOAD16_BYTE( "opwlfb.13",  0x20000, 0x10000, CRC(61230c6e) SHA1(942764aec0c55ba00df8dbb54e127b73e24192ae) )
 	ROM_LOAD16_BYTE( "opwlfb.11",  0x20001, 0x10000, CRC(342e318d) SHA1(a52918d16884ca42b2a3b910bc71bfd81b45f1ab) )
 
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "audio", 0 )      /* sound cpu */
+	ROM_REGION( 0x20000, "audio", 0 )      /* sound cpu */
 	ROM_LOAD( "opwlfb.30",  0x00000, 0x04000, CRC(0669b94c) SHA1(f10894a6fad8ed144a528db696436b58f62ddee4) )
 	ROM_CONTINUE(           0x10000, 0x04000 ) /* banked stuff */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "sub", 0 )      /* c-chip substitute Z80 */
+	ROM_REGION( 0x10000, "sub", 0 )      /* c-chip substitute Z80 */
 	ROM_LOAD( "opwlfb.09",   0x00000, 0x08000, CRC(ab27a3dd) SHA1(cf589e7a9ccf3e86020b86f917fb91f3d8ba7512) )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "opwlfb.08",   0x00000, 0x10000, CRC(134d294e) SHA1(bd05169dbd761c2944f0ac51c1ec114577777452) )	/* SCR tiles (8 x 8) */
 	ROM_LOAD16_BYTE( "opwlfb.06",   0x20000, 0x10000, CRC(317d0e66) SHA1(70298c0ef5243f481b18f904be9404527d1d99d5) )
 	ROM_LOAD16_BYTE( "opwlfb.07",   0x40000, 0x10000, CRC(e1c4095e) SHA1(d5f1d26d6612e78001002f92de670e68e00c6f9e) )
@@ -753,7 +753,7 @@ ROM_START( opwolfb )
 	ROM_LOAD16_BYTE( "opwlfb.03",   0x40001, 0x10000, CRC(ccf8ba80) SHA1(8366f5ef0de885e5241567d1a083d98a8a2875d9) )
 	ROM_LOAD16_BYTE( "opwlfb.01",   0x60001, 0x10000, CRC(0a65f256) SHA1(4dfcd3cb138a87d002eb65a02f94e33f4d07676d) )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "opwlfb.14",   0x00000, 0x10000, CRC(663786eb) SHA1(a25710f6c16158e51d0934f184390a01ff0a614a) )	/* Sprites (16 x 16) */
 	ROM_LOAD16_BYTE( "opwlfb.15",   0x20000, 0x10000, CRC(315b8aa9) SHA1(4a904e5532421d933e4c401c03c958eb32b15e03) )
 	ROM_LOAD16_BYTE( "opwlfb.16",   0x40000, 0x10000, CRC(e01099e3) SHA1(4c5391d71978f72c57c140e58a767e138acdce12) )
@@ -763,7 +763,7 @@ ROM_START( opwolfb )
 	ROM_LOAD16_BYTE( "opwlfb.20",   0x40001, 0x10000, CRC(d80b9cc6) SHA1(b189f35eb206da1ab313620e251e6bb10edeee04) )
 	ROM_LOAD16_BYTE( "opwlfb.21",   0x60001, 0x10000, CRC(97d25157) SHA1(cfb3f76ed860d90235dc0e32919a5ec3d3e683dd) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "adpcm", 0 )	/* ADPCM samples (interleaved) */
+	ROM_REGION( 0x80000, "adpcm", 0 )	/* ADPCM samples (interleaved) */
 	ROM_LOAD16_BYTE( "opwlfb.29",   0x00000, 0x10000, CRC(05a9eac0) SHA1(26eb1acc65aeb759920b35bcbcac6d6c2789584c) )
 	ROM_LOAD16_BYTE( "opwlfb.28",   0x20000, 0x10000, CRC(281b2175) SHA1(3789e58da682041226f70eba87b31876cb206906) )
 	ROM_LOAD16_BYTE( "opwlfb.27",   0x40000, 0x10000, CRC(441211a6) SHA1(82e84ae90765df5f7f6b6f32a2bb52ac40132f8d) )
@@ -777,7 +777,7 @@ ROM_END
 
 static DRIVER_INIT( opwolf )
 {
-	UINT16* rom=(UINT16*)memory_region(machine, RGNCLASS_CPU, "main");
+	UINT16* rom=(UINT16*)memory_region(machine, "main");
 
 	opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -787,13 +787,13 @@ static DRIVER_INIT( opwolf )
 	opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
 	opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
 
-	memory_configure_bank(10, 0, 4, memory_region(machine, RGNCLASS_CPU, "audio") + 0x10000, 0x4000);
+	memory_configure_bank(10, 0, 4, memory_region(machine, "audio") + 0x10000, 0x4000);
 }
 
 
 static DRIVER_INIT( opwolfb )
 {
-	UINT16* rom=(UINT16*)memory_region(machine, RGNCLASS_CPU, "main");
+	UINT16* rom=(UINT16*)memory_region(machine, "main");
 
 	opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -801,7 +801,7 @@ static DRIVER_INIT( opwolfb )
 	opwolf_gun_xoffs = -2;
 	opwolf_gun_yoffs = 17;
 
-	memory_configure_bank(10, 0, 4, memory_region(machine, RGNCLASS_CPU, "audio") + 0x10000, 0x4000);
+	memory_configure_bank(10, 0, 4, memory_region(machine, "audio") + 0x10000, 0x4000);
 }
 
 

@@ -211,10 +211,10 @@ static WRITE16_HANDLER( igs_blit_flags_w )
 	UINT8 trans_pen, clear_pen, pen_hi, *dest;
 	UINT8 pen = 0;
 
-	UINT8 *gfx		=	memory_region(machine, RGNCLASS_GFX, "gfx1");
-	UINT8 *gfx2		=	memory_region(machine, RGNCLASS_GFX, "gfx2");
-	int gfx_size	=	memory_region_length(machine, RGNCLASS_GFX, "gfx1");
-	int gfx2_size	=	memory_region_length(machine, RGNCLASS_GFX, "gfx2");
+	UINT8 *gfx		=	memory_region(machine, "gfx1");
+	UINT8 *gfx2		=	memory_region(machine, "gfx2");
+	int gfx_size	=	memory_region_length(machine, "gfx1");
+	int gfx2_size	=	memory_region_length(machine, "gfx2");
 
 	const rectangle *clip = video_screen_get_visible_area(machine->primary_screen);
 
@@ -372,7 +372,7 @@ static WRITE16_HANDLER( igs_palette_w )
 static void grtwall_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, RGNCLASS_CPU, "main"));
+	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
 
 	int rom_size = 0x80000;
 
@@ -396,7 +396,7 @@ static void grtwall_decrypt(running_machine *machine)
 static void lhb_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, RGNCLASS_CPU, "main"));
+	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
 
 	int rom_size = 0x80000;
 
@@ -421,7 +421,7 @@ static void lhb_decrypt(running_machine *machine)
 static void chindrag_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, RGNCLASS_CPU, "main"));
+	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
 
 	int rom_size = 0x80000;
 
@@ -450,7 +450,7 @@ static void chindrag_decrypt(running_machine *machine)
 static void drgnwrld_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, RGNCLASS_CPU, "main"));
+	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
 
 	int rom_size = 0x80000;
 
@@ -480,7 +480,7 @@ static void chmplst2_decrypt(running_machine *machine)
 {
 	int i,j;
 	int rom_size = 0x80000;
-	UINT16 *src = (UINT16 *) (memory_region(machine, RGNCLASS_CPU, "main"));
+	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
 	UINT16 *result_data = malloc_or_die(rom_size);
 
  	for (i=0; i<rom_size/2; i++)
@@ -511,7 +511,7 @@ static void chmplst2_decrypt(running_machine *machine)
 static void vbowlj_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, RGNCLASS_CPU, "main"));
+	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
 
 	int rom_size = 0x80000;
 
@@ -546,7 +546,7 @@ static void vbowlj_decrypt(running_machine *machine)
 void vbowl_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, RGNCLASS_CPU, "main"));
+	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
 
 	int rom_size = 0x80000;
 
@@ -580,7 +580,7 @@ static void chmplst2_decrypt_gfx(running_machine *machine)
 {
 	int i;
 	unsigned rom_size = 0x200000;
-	UINT8 *src = (UINT8 *) (memory_region(machine, RGNCLASS_GFX, "gfx1"));
+	UINT8 *src = (UINT8 *) (memory_region(machine, "gfx1"));
 	UINT8 *result_data = malloc_or_die(rom_size);
 
 	for (i=0; i<rom_size; i++)
@@ -595,7 +595,7 @@ static void chindrag_gfx_decrypt(running_machine *machine)
 {
 	int i;
 	unsigned rom_size = 0x400000;
-	UINT8 *src = (UINT8 *) (memory_region(machine, RGNCLASS_GFX, "gfx1"));
+	UINT8 *src = (UINT8 *) (memory_region(machine, "gfx1"));
 	UINT8 *result_data = malloc_or_die(rom_size);
 
  	for (i=0; i<rom_size; i++)
@@ -2503,7 +2503,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( chmplst2 )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, RGNCLASS_CPU, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
 
 	chmplst2_decrypt(machine);
 	chmplst2_decrypt_gfx(machine);
@@ -2525,7 +2525,7 @@ static DRIVER_INIT( chmplst2 )
 
 static DRIVER_INIT( chindrag )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, RGNCLASS_CPU, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
 
 	chindrag_decrypt(machine);
 	chindrag_gfx_decrypt(machine);
@@ -2551,7 +2551,7 @@ static DRIVER_INIT( chindrag )
 
 static DRIVER_INIT( chugokur )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, RGNCLASS_CPU, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
 
 	chindrag_decrypt(machine);
 	chindrag_gfx_decrypt(machine);
@@ -2578,7 +2578,7 @@ static DRIVER_INIT( chugokur )
 
 static DRIVER_INIT( drgnwrld )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, RGNCLASS_CPU, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
 
 	drgnwrld_decrypt(machine);
 	chindrag_gfx_decrypt(machine);
@@ -2601,7 +2601,7 @@ static DRIVER_INIT( drgnwrld )
 
 static DRIVER_INIT( grtwall )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, RGNCLASS_CPU, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
 
 	grtwall_decrypt(machine);
 
@@ -2623,7 +2623,7 @@ static DRIVER_INIT( grtwall )
 
 static DRIVER_INIT( lhb )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, RGNCLASS_CPU, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
 
 	lhb_decrypt(machine);
 
@@ -2636,8 +2636,8 @@ static DRIVER_INIT( lhb )
 
 static DRIVER_INIT( vbowl )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, RGNCLASS_CPU, "main");
-	UINT8  *gfx = (UINT8 *)  memory_region(machine, RGNCLASS_GFX, "gfx1");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
+	UINT8  *gfx = (UINT8 *)  memory_region(machine, "gfx1");
 	int i;
 
 	vbowlj_decrypt(machine);
@@ -2654,8 +2654,8 @@ static DRIVER_INIT( vbowl )
 
 static DRIVER_INIT( vbowlj )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, RGNCLASS_CPU, "main");
-	UINT8  *gfx = (UINT8 *)  memory_region(machine, RGNCLASS_GFX, "gfx1");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
+	UINT8  *gfx = (UINT8 *)  memory_region(machine, "gfx1");
 	int i;
 
 	vbowlj_decrypt(machine);
@@ -2674,7 +2674,7 @@ static DRIVER_INIT( vbowlj )
 
 static DRIVER_INIT( xymg )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, RGNCLASS_CPU, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
 
 	lhb_decrypt(machine);
 
@@ -2747,18 +2747,18 @@ Notes:
 */
 
 ROM_START( chmplst2 )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x80000, "main", 0 )
 	ROM_LOAD( "maj2v185h.u29", 0x00000, 0x80000, CRC(2572d59a) SHA1(1d5362e209dadf8b21c10d1351d4bb038bfcaaef) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "igsm0501.u7", 0x00000, 0x200000, CRC(1c952bd6) SHA1(a6b6f1cdfb29647e81c032ffe59c94f1a10ceaf8) )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", 0 ) // high order bit of graphics (5th bit)
+	ROM_REGION( 0x80000, "gfx2", 0 ) // high order bit of graphics (5th bit)
 	/* these are identical ..seems ok as igs number is same, only ic changed */
 	ROM_LOAD( "igsm0502.u4", 0x00000, 0x80000, CRC(5d73ae99) SHA1(7283aa3d6b15ceb95db80756892be46eb997ef15) )
 	ROM_LOAD( "igsm0502.u5", 0x00000, 0x80000, CRC(5d73ae99) SHA1(7283aa3d6b15ceb95db80756892be46eb997ef15) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "igss0503.u38", 0x00000, 0x80000, CRC(c9609c9c) SHA1(f036e682b792033409966e84292a69275eaa05e5) )	// 2 banks
 ROM_END
 
@@ -2786,39 +2786,39 @@ SOUND DATA?: "CHINA DRAGON U44"
 */
 
 ROM_START( drgnwrld )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x80000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "chinadr-v0400.u3", 0x00000, 0x80000, CRC(a6daa2b8) SHA1(0cbfd001c1fd82a6385453d1c2a808add67746af) )
 
-	ROM_REGION( 0x420000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x420000, "gfx1", 0 )
 	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
 ROM_END
 
 ROM_START( drgwrld3 )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x80000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "chinadr-v0300.u3", 0x00000, 0x80000, CRC(5ac243e5) SHA1(50cccff0307239187ac2b65331ad2bcc666f8033) )
 
-	ROM_REGION( 0x420000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x420000, "gfx1", 0 )
 	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
 ROM_END
 
 ROM_START( chindrac )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x80000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "igs-d0303.u3", 0x00000, 0x80000, CRC(3b3c29bb) SHA1(77b7e58104314303985c283cce3aec40bd7b9334) )
 
-	ROM_REGION( 0x420000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x420000, "gfx1", 0 )
 	//ROM_LOAD( "igs-0301.u39", 0x000000, 0x400000, CRC(655ab941) SHA1(4bbefb27e8971446998508969661042c5111bc72) ) // bad dump
 	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
 
-	ROM_REGION( 0x40000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x40000, "user1", 0 )
 	ROM_LOAD( "ccdu15.u15", 0x000, 0x2e5, CRC(a15fce69) SHA1(3e38d75c7263bfb36aebdbbd55ebbdd7ca601633) )
 	//ROM_LOAD( "ccdu17.u17.bad.dump", 0x000, 0x104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
 	//ROM_LOAD( "ccdu18.u18.bad.dump", 0x000, 0x104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
@@ -2827,27 +2827,27 @@ ROM_END
 
 
 ROM_START( chugokur )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x80000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "china_jp.v20", 0x00000, 0x80000, CRC(9e018d1a) SHA1(fe14e6344434cabf43685e50fd49c90f05f565be) )
 
-	ROM_REGION( 0x420000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x420000, "gfx1", 0 )
 	// wasn't in this set ..
 	ROM_LOAD( "igs-d0301.u39",     0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
 	ROM_LOAD( "china.u44", 0x400000, 0x020000, CRC(10549746) SHA1(aebd83796679c85b43ad514b2771897f94e61294) ) // 1xxxxxxxxxxxxxxxx = 0x00
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) ) // original label: "sp"
 ROM_END
 
 ROM_START( chindrag )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x80000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "v-021j", 0x00000, 0x80000, CRC(2f87f6e4) SHA1(d43065b078fdd9605c121988ad3092dce6cf0bf1) )
 
-	ROM_REGION( 0x420000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x420000, "gfx1", 0 )
 	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
 	ROM_LOAD( "cg",    0x400000, 0x020000, CRC(2dda0be3) SHA1(587b7cab747d4336515c98eb3365341bb6c7e5e4) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) ) // original label: "sp"
 ROM_END
 
@@ -2864,15 +2864,15 @@ ROM_END
 */
 
 ROM_START( grtwall )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x80000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "wlcc4096.rom", 0x00000, 0x80000, CRC(3b16729f) SHA1(4ef4e5cbd6ccc65775e36c2c8b459bc1767d6574) )
 	ROM_CONTINUE        (                 0x00000, 0x80000 ) // 1ST+2ND IDENTICAL
 
-	ROM_REGION( 0x280000, RGNCLASS_GFX, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x280000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD( "m0201-ig.160", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
 	ROM_LOAD( "grtwall.gfx",  0x200000, 0x080000, CRC(1f7ad299) SHA1(ab0a8fb31906519b9352ba172def48456e8d565c) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "040-c3c2.snd", 0x00000, 0x80000, CRC(220949aa) SHA1(1e0dba168a0687d32aaaed42714ae24358f4a3e7) ) // 2 banks
 	ROM_CONTINUE(             0x00000, 0x80000 ) // 1ST+2ND IDENTICAL
 ROM_END
@@ -2889,41 +2889,41 @@ ROM_END
 */
 
 ROM_START( lhb )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x80000, "main", 0 )
 	// identical to LHB-4096
 	ROM_LOAD( "v305j-409", 0x00000, 0x80000, CRC(701de8ef) SHA1(4a77160f642f4de02fa6fbacf595b75c0d4a505d) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "m0201-ig.160", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x80000, "oki", 0 )
 	// identical to 040-c3c2.snd
 	ROM_LOAD( "m0202.snd", 0x00000, 0x80000, CRC(220949aa) SHA1(1e0dba168a0687d32aaaed42714ae24358f4a3e7) ) // 2 banks
 	ROM_CONTINUE(          0x00000, 0x80000 ) // 1ST+2ND IDENTICAL
 ROM_END
 
 ROM_START( lhba )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x80000, "main", 0 )
 	ROM_LOAD( "maj_v-033c.u30", 0x00000, 0x80000, CRC(02a0b716) SHA1(cd0ee32ea69f66768196b0e9b4df0fae3af84ed3) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "igs_m0201.u15", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x80000, "oki", 0 )
 	// identical to 040-c3c2.snd
 	ROM_LOAD( "igs_m0202.u39", 0x00000, 0x80000, CRC(106ac5f7) SHA1(5796a880c3424e3d2251b2223a0e594957afecaf) ) // 2 banks
 
 ROM_END
 
 ROM_START( dbc )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x80000, "main", 0 )
 	ROM_LOAD( "maj-h_v027h.u30", 0x00000, 0x80000, CRC(5d5ccd5b) SHA1(7a1223923f9a5825fd919ae9a36912284e705382) )
 
-	ROM_REGION( 0x300000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x300000, "gfx1", 0 )
 	ROM_LOAD( "igs_m0201.u15", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
 	ROM_LOAD( "maj-h_cg.u8",  0x200000, 0x080000, CRC(ee45cc46) SHA1(ed011f758a02026222994aaea0677a4e9580fbda) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "igs_m0202.u39", 0x00000, 0x80000, CRC(106ac5f7) SHA1(5796a880c3424e3d2251b2223a0e594957afecaf) ) // 2 banks
 
 ROM_END
@@ -2953,44 +2953,44 @@ there are 4 banks of 8 dip switches
 */
 
 ROM_START( vbowl )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x80000, "main", 0 )
 	/*
     This version reboots at the end of the game.  Is this a bad dump??  Don't think it's a protection check
     */
 	ROM_LOAD( "bowlingv101xcm.u45", 0x00000, 0x80000, CRC(ab8e3f1f) SHA1(69159e22559d6a26fe2afafd770aa640c192ba4b) )
 
-	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", 0)
+	ROM_REGION( 0x800000, "gfx1", 0)
 	ROM_LOAD( "vrbowlng.u69", 0x000000, 0x400000, CRC(b0d339e8) SHA1(a26a5e0202a78e8cdc562b10d64e14eadfa4e115) )
 	// extra space to expand every 4 bits to 8
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "vrbowlng.u68", 0x000000, 0x100000, CRC(b0ce27e7) SHA1(6d3ef97edd606f384b1e05b152fbea12714887b7) )
 
-	ROM_REGION( 0x400000, RGNCLASS_SOUND, "ics", 0 )
+	ROM_REGION( 0x400000, "ics", 0 )
 	ROM_LOAD( "vrbowlng.u67", 0x00000, 0x80000, CRC(53000936) SHA1(e50c6216f559a9248c095bdfae05c3be4be79ff3) )	// 8 bit signed mono & u-law
 	ROM_LOAD( "vrbowlng.u66", 0x80000, 0x80000, CRC(f62cf8ed) SHA1(c53e47e2c619ed974ad40ee4aaa4a35147ea8311) )	// 8 bit signed mono
-	ROM_COPY( RGNCLASS_SOUND, "ics", 0, 0x100000,0x100000)
-	ROM_COPY( RGNCLASS_SOUND, "ics", 0, 0x200000,0x100000)
-	ROM_COPY( RGNCLASS_SOUND, "ics", 0, 0x300000,0x100000)
+	ROM_COPY( "ics", 0, 0x100000,0x100000)
+	ROM_COPY( "ics", 0, 0x200000,0x100000)
+	ROM_COPY( "ics", 0, 0x300000,0x100000)
 ROM_END
 
 ROM_START( vbowlj )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x80000, "main", 0 )
 	ROM_LOAD( "vrbowlng.u45", 0x00000, 0x80000, CRC(091c19c1) SHA1(5a7bfbee357122e9061b38dfe988c3853b0984b0) ) // second half all 00
 
-	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", 0)
+	ROM_REGION( 0x800000, "gfx1", 0)
 	ROM_LOAD( "vrbowlng.u69", 0x000000, 0x400000, CRC(b0d339e8) SHA1(a26a5e0202a78e8cdc562b10d64e14eadfa4e115) )
 	// extra space to expand every 4 bits to 8
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "vrbowlng.u68", 0x000000, 0x100000, CRC(b0ce27e7) SHA1(6d3ef97edd606f384b1e05b152fbea12714887b7) )
 
-	ROM_REGION( 0x400000, RGNCLASS_SOUND, "ics", 0 )
+	ROM_REGION( 0x400000, "ics", 0 )
 	ROM_LOAD( "vrbowlng.u67", 0x00000, 0x80000, CRC(53000936) SHA1(e50c6216f559a9248c095bdfae05c3be4be79ff3) )	// 8 bit signed mono & u-law
 	ROM_LOAD( "vrbowlng.u66", 0x80000, 0x80000, CRC(f62cf8ed) SHA1(c53e47e2c619ed974ad40ee4aaa4a35147ea8311) )	// 8 bit signed mono
-	ROM_COPY( RGNCLASS_SOUND, "ics", 0, 0x100000,0x100000)
-	ROM_COPY( RGNCLASS_SOUND, "ics", 0, 0x200000,0x100000)
-	ROM_COPY( RGNCLASS_SOUND, "ics", 0, 0x300000,0x100000)
+	ROM_COPY( "ics", 0, 0x100000,0x100000)
+	ROM_COPY( "ics", 0, 0x200000,0x100000)
+	ROM_COPY( "ics", 0, 0x300000,0x100000)
 ROM_END
 
 
@@ -3005,14 +3005,14 @@ ROM_END
 */
 
 ROM_START( xymg )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x80000, "main", 0 )
 	ROM_LOAD( "u30-ebac.rom", 0x00000, 0x80000, CRC(7d272b6f) SHA1(15fd1be23cabdc77b747541f5cd9fed6b08be4ad) )
 
-	ROM_REGION( 0x280000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x280000, "gfx1", 0 )
 	ROM_LOAD( "m0201-ig.160", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
 	ROM_LOAD( "ygxy-u8.rom",  0x200000, 0x080000, CRC(56a2706f) SHA1(98bf4b3153eef53dd449e2538b4b7ff2cc2fe6fa) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x80000, "oki", 0 )
 	// identical to 040-c3c2.snd
 	ROM_LOAD( "m0202.snd", 0x00000, 0x80000, CRC(220949aa) SHA1(1e0dba168a0687d32aaaed42714ae24358f4a3e7) ) // 2 banks
 	ROM_CONTINUE(          0x00000, 0x80000 ) // 1ST+2ND IDENTICAL

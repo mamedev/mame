@@ -371,7 +371,7 @@ ATARI TUBE CHASE
 */
 
 ROM_START( tunhunt )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "001.lm1",	0x5000, 0x800, CRC(2601a3a4) SHA1(939bafc54576fdaccf688b49cc9d201b03feec3a) )
 	ROM_LOAD( "002.k1",		0x5800, 0x800, CRC(29bbf3df) SHA1(4a0ec4cfab362a976d3962b347f687db45095cfd) )
 	ROM_LOAD( "136000.103",	0x6000, 0x800, CRC(1a6a60a4) SHA1(7c60cc92595f1b90f421eabbaa20f657181ed4f0) )
@@ -380,14 +380,14 @@ ROM_START( tunhunt )
 	ROM_LOAD( "006.d1",		0x7800, 0x800, CRC(c3ae8519) SHA1(2b2e49065bc38429894ef29a29ffc60f96e64840) )
 	ROM_RELOAD( 		  	0xf800, 0x800 ) /* 6502 vectors  */
 
-	ROM_REGION( 0x400, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* alphanumeric characters */
+	ROM_REGION( 0x400, "gfx1", ROMREGION_DISPOSE ) /* alphanumeric characters */
 	ROM_LOAD( "019.c10",	0x000, 0x400, CRC(d6fd45a9) SHA1(c86ea3790c29c554199af8ad6f3d563dcb7723c7) )
 
-	ROM_REGION( 0x400, RGNCLASS_GFX, "gfx2", 0 ) /* "SHELL" objects (16x16 pixel sprites) */
+	ROM_REGION( 0x400, "gfx2", 0 ) /* "SHELL" objects (16x16 pixel sprites) */
 	ROM_LOAD( "016.a8",		0x000, 0x200, CRC(830e6c34) SHA1(37a5eeb722dd80c4224c7f622b0edabb3ac1ca19) )
 	ROM_LOAD( "017.b8",		0x200, 0x200, CRC(5bef8b5a) SHA1(bfd9c592a34ed4861a6ad76ef10ea0d9b76a92b2) )
 
-	ROM_REGION( 0x540, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x540, "proms", 0 )
 	ROM_LOAD( "013.d11",	0x000, 0x020, CRC(66f1f5eb) SHA1(bcf5348ae328cf943d2bf6e38df727c0c4c466b7) )	/* hue: BBBBGGGG? */
 	ROM_LOAD( "014.c11",	0x020, 0x020, CRC(662444b2) SHA1(2e510c1d9b7e34a3045048a46045e61fabaf918e) )	/* hue: RRRR----? */
 	ROM_LOAD( "015.n4",		0x040, 0x100, CRC(00e224a0) SHA1(1a384ef488791c62566c91b18d6a1fb4a5def2ba) )	/* timing? */
@@ -395,7 +395,7 @@ ROM_START( tunhunt )
 ROM_END
 
 ROM_START( tunhuntc )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "001.lm1",	0x5000, 0x800, CRC(2601a3a4) SHA1(939bafc54576fdaccf688b49cc9d201b03feec3a) )
 	ROM_LOAD( "002.k1",		0x5800, 0x800, CRC(29bbf3df) SHA1(4a0ec4cfab362a976d3962b347f687db45095cfd) )
 	ROM_LOAD( "003.j1",		0x6000, 0x800, CRC(360c0f47) SHA1(8e3d815836504c7651812e0e26423b0c7045621c) ) /* bad crc? fails self-test */
@@ -405,14 +405,14 @@ ROM_START( tunhuntc )
 	ROM_LOAD( "006.d1",		0x7800, 0x800, CRC(c3ae8519) SHA1(2b2e49065bc38429894ef29a29ffc60f96e64840) )
 	ROM_RELOAD( 		  	0xf800, 0x800 ) /* 6502 vectors  */
 
-	ROM_REGION( 0x400, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* alphanumeric characters */
+	ROM_REGION( 0x400, "gfx1", ROMREGION_DISPOSE ) /* alphanumeric characters */
 	ROM_LOAD( "019.c10",	0x000, 0x400, CRC(d6fd45a9) SHA1(c86ea3790c29c554199af8ad6f3d563dcb7723c7) )
 
-	ROM_REGION( 0x400, RGNCLASS_GFX, "gfx2", 0 ) /* "SHELL" objects (16x16 pixel sprites) */
+	ROM_REGION( 0x400, "gfx2", 0 ) /* "SHELL" objects (16x16 pixel sprites) */
 	ROM_LOAD( "016.a8",		0x000, 0x200, CRC(830e6c34) SHA1(37a5eeb722dd80c4224c7f622b0edabb3ac1ca19) )
 	ROM_LOAD( "017.b8",		0x200, 0x200, CRC(5bef8b5a) SHA1(bfd9c592a34ed4861a6ad76ef10ea0d9b76a92b2) )
 
-	ROM_REGION( 0x540, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x540, "proms", 0 )
 	ROM_LOAD( "013.d11",	0x000, 0x020, CRC(66f1f5eb) SHA1(bcf5348ae328cf943d2bf6e38df727c0c4c466b7) )	/* hue: BBBBGGGG? */
 	ROM_LOAD( "014.c11",	0x020, 0x020, CRC(662444b2) SHA1(2e510c1d9b7e34a3045048a46045e61fabaf918e) )	/* hue: RRRR----? */
 	ROM_LOAD( "015.n4",		0x040, 0x100, CRC(00e224a0) SHA1(1a384ef488791c62566c91b18d6a1fb4a5def2ba) )	/* timing? */

@@ -265,14 +265,14 @@ PCB is labeled Ver 1.3, while EPROMs are labeled Ver 1.2
 */
 
 ROM_START( capunc )
-	ROM_REGION( 0x1000000, RGNCLASS_CPU, "main", 0 ) /* all the program code is in here */
+	ROM_REGION( 0x1000000, "main", 0 ) /* all the program code is in here */
 	ROM_LOAD( "capunc.ver1.2.mcu", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "2.ver.1.2.ic18", 0x000000, 0x80000, CRC(5030f7eb) SHA1(106b61c84e3647b8d68d6c30ee7e63ec2df1f5fd) )
 	ROM_LOAD( "3.ver.1.2.ic17", 0x080000, 0x80000, CRC(2b50e312) SHA1(dc901540a5e1a25fe6e7deb58b0fe01f116aaf63) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
 ROM_END
 
@@ -313,14 +313,14 @@ in the samples ROM header. Replaced the sound ROM with the clean one.
 */
 
 ROM_START( capcor )
-	ROM_REGION( 0x1000000, RGNCLASS_CPU, "main", 0 ) /* all the program code is in here */
+	ROM_REGION( 0x1000000, "main", 0 ) /* all the program code is in here */
 	ROM_LOAD( "capcor.ver1.3.mcu", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "2.ic18", 0x000000, 0x80000, CRC(342bea85) SHA1(885080a9b55d64f9a93e3d5e31e6b13f272bdb93) )
 	ROM_LOAD( "3.ic17", 0x080000, 0x80000, CRC(ac530eff) SHA1(7c3a6e322311a1cd93801639a0498d5947fb14f2) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
 ROM_END
 
@@ -352,14 +352,14 @@ Note:
 */
 
 ROM_START( laperla )
-	ROM_REGION( 0x1000000, RGNCLASS_CPU, "main", 0 ) /* all the program code is in here */
+	ROM_REGION( 0x1000000, "main", 0 ) /* all the program code is in here */
 	ROM_LOAD( "laperla_ver2.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "2jolly.ic18", 0x000000, 0x80000, CRC(7bf3d5f2) SHA1(f3a51dd642358a20f6324f28fdf458e8ceaca7a1) )
 	ROM_LOAD( "3jolly.ic17", 0x080000, 0x80000, CRC(c3a8d9a0) SHA1(cc95c56ebc6137e11c82ed17be7c9f83ed7b6cfc) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
 ROM_END
 
@@ -400,14 +400,14 @@ laperla vs. laperlag
 */
 
 ROM_START( laperlag )
-	ROM_REGION( 0x1000000, RGNCLASS_CPU, "main", 0 ) /* all the program code is in here */
+	ROM_REGION( 0x1000000, "main", 0 ) /* all the program code is in here */
 	ROM_LOAD( "laperlag_ver2.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "ic18-laperlaneragold2.bin", 0x000000, 0x80000, CRC(ae37de44) SHA1(089f97678fa39aee1885d7c63c4bc7c88e7fe553) )
 	ROM_LOAD( "ic17-laperlaneragold3.bin", 0x080000, 0x80000, CRC(86da6d11) SHA1(e6b7f9ccbf2e91a60fdf38067ec7ac7e73dea8cd) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x20000, "oki", 0 ) /* M6295 samples */
 	ROM_LOAD( "ic25-uno.bin", 0x00000, 0x20000, CRC(e6a0854b) SHA1(394e01bb24abd1e0d2c447b4d620fc5d02257d8a) )
 ROM_END
 
@@ -439,16 +439,16 @@ Note:
 */
 
 ROM_START( euro2k2 )
-	ROM_REGION( 0x1000000, RGNCLASS_CPU, "main", 0 ) /* all the program code is in here */
+	ROM_REGION( 0x1000000, "main", 0 ) /* all the program code is in here */
 	ROM_LOAD( "euro2k2_ver2.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x180000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x180000, "gfx1", 0 )
 	ROM_LOAD( "4a.ic18", 0x000000, 0x80000, CRC(5decae2d) SHA1(d918aad0e2a1249b18677833f743c92fb678050a) )
 	ROM_LOAD( "5a.ic17", 0x080000, 0x80000, CRC(8f1bbbf3) SHA1(5efcf77674f8737fc1b98881acebacb26b10adc1) )
 	ROM_LOAD( "2a.ic20", 0x100000, 0x40000, CRC(f9bffb07) SHA1(efba175189d99a4548739a72f8a1f03c2782a3d0) )
 	ROM_LOAD( "3a.ic19", 0x140000, 0x40000, CRC(8b29cd56) SHA1(8a09e307271bceef6e9f863153d0f7a9bc6dc6bd) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(b9b1aff0) SHA1(35622d7d099a10e5c6bcae152fded1f50692f740) )
 ROM_END
 
@@ -494,16 +494,16 @@ euro2k2 vs. euro2k2a
 */
 
 ROM_START( euro2k2a )
-	ROM_REGION( 0x1000000, RGNCLASS_CPU, "main", 0 ) /* all the program code is in here */
+	ROM_REGION( 0x1000000, "main", 0 ) /* all the program code is in here */
 	ROM_LOAD( "euro2k2a_ver2.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x1c0000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x1c0000, "gfx1", 0 )
 	ROM_LOAD( "4a.ic18", 0x000000, 0x80000, CRC(5decae2d) SHA1(d918aad0e2a1249b18677833f743c92fb678050a) )
 	ROM_LOAD( "5a.ic17", 0x080000, 0x80000, CRC(8f1bbbf3) SHA1(5efcf77674f8737fc1b98881acebacb26b10adc1) )
 	ROM_LOAD( "2a.ic20", 0x100000, 0x40000, CRC(f9bffb07) SHA1(efba175189d99a4548739a72f8a1f03c2782a3d0) )
 	ROM_LOAD( "3a.ic19", 0x140000, 0x80000, CRC(56c8a73d) SHA1(49b44e5604cd8675d8f9770e5fb68dad4394e11d) ) /* identical halves */
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
 ROM_END
 
@@ -537,16 +537,16 @@ Note:
 */
 
 ROM_START( mnumber )	/* clocks should be changed for this game */
-	ROM_REGION( 0x1000000, RGNCLASS_CPU, "main", 0 )	/* all the program code is in here */
+	ROM_REGION( 0x1000000, "main", 0 )	/* all the program code is in here */
 	ROM_LOAD( "mnumber_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 )	/* different encoded gfx */
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* different encoded gfx */
 	ROM_LOAD( "mysterynumber3.u20", 0x000000, 0x80000, CRC(251f1e11) SHA1(e8c90b289e76cea6a541b701859be6465a381668) )
 	ROM_LOAD( "mysterynumber4.u21", 0x080000, 0x80000, CRC(2b8744e4) SHA1(8a12c6f300818de3738e7c44c7df71c432cb9975) )
 	ROM_LOAD( "mysterynumber1.u22", 0x100000, 0x80000, CRC(d2ce1f61) SHA1(8f30407050fc102191747996258d4b5da3a0d994) )
 	ROM_LOAD( "mysterynumber2.u19", 0x180000, 0x80000, CRC(7b3a3b32) SHA1(9db46aa12077a48951056705491da1cce747c374) ) /* identical halves */
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 ) /* M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
 	ROM_LOAD( "mysterynumber5.u6", 0x00000, 0x40000, CRC(80aba466) SHA1(e9bf7e1c3d1c6b1b0dba43dd79a71f89e63df814) )
 ROM_END
 

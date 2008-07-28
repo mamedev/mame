@@ -510,7 +510,7 @@ WRITE8_HANDLER( sega005_sound_a_w )
 
 INLINE void sega005_update_sound_data(running_machine *machine)
 {
-	UINT8 newval = memory_region(machine, RGNCLASS_SOUND, "005")[sound_addr];
+	UINT8 newval = memory_region(machine, "005")[sound_addr];
 	UINT8 diff = newval ^ sound_data;
 
 	//mame_printf_debug("  [%03X] = %02X\n", sound_addr, newval);
@@ -594,7 +594,7 @@ static void *sega005_custom_start(int clock, const struct CustomSound_interface 
 
 static void sega005_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	const UINT8 *sound_prom = memory_region(Machine, RGNCLASS_PROMS, "proms");
+	const UINT8 *sound_prom = memory_region(Machine, "proms");
 	int i;
 
 	/* no implementation yet */
@@ -889,7 +889,7 @@ static WRITE8_HANDLER( monsterb_sound_a_w )
 	tms36xx_note_w(0, 0, data & 15);
 
 	/* Top four data lines address an 82S123 ROM that enables/disables voices */
-	enable_val = memory_region(machine, RGNCLASS_SOUND, "prom")[(data & 0xF0) >> 4];
+	enable_val = memory_region(machine, "prom")[(data & 0xF0) >> 4];
 	tms3617_enable_w(0, enable_val >> 2);
 }
 
@@ -957,7 +957,7 @@ static WRITE8_HANDLER( n7751_rom_offset_w )
 static WRITE8_HANDLER( n7751_rom_select_w )
 {
 	/* P7 - ROM selects */
-	int numroms = memory_region_length(machine, RGNCLASS_SOUND, "n7751") / 0x1000;
+	int numroms = memory_region_length(machine, "n7751") / 0x1000;
 	sound_addr &= 0xfff;
 	if (!(data & 0x01) && numroms >= 1) sound_addr |= 0x0000;
 	if (!(data & 0x02) && numroms >= 2) sound_addr |= 0x1000;
@@ -969,7 +969,7 @@ static WRITE8_HANDLER( n7751_rom_select_w )
 static READ8_HANDLER( n7751_rom_r )
 {
 	/* read from BUS */
-	return memory_region(machine, RGNCLASS_SOUND, "n7751")[sound_addr];
+	return memory_region(machine, "n7751")[sound_addr];
 }
 
 

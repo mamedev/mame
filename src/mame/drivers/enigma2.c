@@ -170,7 +170,7 @@ static VIDEO_UPDATE( enigma2 )
 	pen_t pens[NUM_PENS];
 
 	const rectangle *visarea = video_screen_get_visible_area(screen);
-	UINT8 *prom = memory_region(screen->machine, RGNCLASS_PROMS, "proms");
+	UINT8 *prom = memory_region(screen->machine, "proms");
 	UINT8 *color_map_base = engima2_flip_screen ? &prom[0x0400] : &prom[0x0000];
 	UINT8 *star_map_base = (blink_count & 0x08) ? &prom[0x0c00] : &prom[0x0800];
 
@@ -621,7 +621,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( enigma2 )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "1.5d",         0x0000, 0x0800, CRC(499749de) SHA1(401928ff41d3b4cbb68e6ad3bf3be4a10ae1781f) )
 	ROM_LOAD( "2.7d",         0x0800, 0x0800, CRC(173c1329) SHA1(3f1ad46d0e58ab236e4ff2b385d09fbf113627da) )
 	ROM_LOAD( "3.8d",         0x1000, 0x0800, CRC(c7d3e6b1) SHA1(43f7c3a02b46747998260d5469248f21714fe12b) )
@@ -629,17 +629,17 @@ ROM_START( enigma2 )
 	ROM_LOAD( "5.11d",   	  0x4000, 0x0800, CRC(098ac15b) SHA1(cce28a2540a9eabb473391fff92895129ae41751) )
 	ROM_LOAD( "6.13d",   	  0x4800, 0x0800, CRC(240a9d4b) SHA1(ca1c69fafec0471141ce1254ddfaef54fecfcbf0) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "enigma2.s",    0x0000, 0x1000, CRC(68fd8c54) SHA1(69996d5dfd996f0aacb26e397bef314204a2a88a) )
 
-	ROM_REGION( 0x1000, RGNCLASS_PROMS, "proms", 0 )	/* color map/star map */
+	ROM_REGION( 0x1000, "proms", 0 )	/* color map/star map */
 	ROM_LOAD( "7.11f",        0x0000, 0x0800, CRC(409b5aad) SHA1(1b774a70f725637458ed68df9ed42476291b0e43) )
 	ROM_LOAD( "8.13f",        0x0800, 0x0800, CRC(e9cb116d) SHA1(41da4f46c5614ec3345c233467ebad022c6b0bf5) )
 ROM_END
 
 
 ROM_START( enigma2a )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "36_en1.bin",   0x0000, 0x0800, CRC(15f44806) SHA1(4a2f7bc91d4edf7a069e0865d964371c97af0a0a) )
 	ROM_LOAD( "35_en2.bin",   0x0800, 0x0800, CRC(e841072f) SHA1(6ab02fd9fdeac5ab887cd25eee3d6b70ab01f849) )
 	ROM_LOAD( "34_en3.bin",   0x1000, 0x0800, CRC(43d06cf4) SHA1(495af05d54c0325efb67347f691e64d194645d85) )
@@ -647,7 +647,7 @@ ROM_START( enigma2a )
 	ROM_LOAD( "5.11d",        0x4000, 0x0800, CRC(098ac15b) SHA1(cce28a2540a9eabb473391fff92895129ae41751) )
 	ROM_LOAD( "6.13d",   	  0x4800, 0x0800, CRC(240a9d4b) SHA1(ca1c69fafec0471141ce1254ddfaef54fecfcbf0) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "sound.bin",    0x0000, 0x0800, BAD_DUMP CRC(5f092d3c) SHA1(17c70f6af1b5560a45e6b1bdb330a98b27570fe9) )
 ROM_END
 
@@ -656,7 +656,7 @@ ROM_END
 static DRIVER_INIT(enigma2)
 {
 	offs_t i;
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "audio");
+	UINT8 *rom = memory_region(machine, "audio");
 
 	for(i = 0; i < 0x2000; i++)
 	{

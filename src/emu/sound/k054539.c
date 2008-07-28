@@ -447,8 +447,8 @@ static void K054539_init_chip(const char *tag, struct k054539_info *info, int cl
 	info->cur_ptr = 0;
 	memset(info->ram, 0, 0x4000*2+clock/50*2);
 
-	info->rom = memory_region(Machine, RGNCLASS_SOUND, (info->intf->rgnoverride != NULL) ? info->intf->rgnoverride : tag);
-	info->rom_size = memory_region_length(Machine, RGNCLASS_SOUND, (info->intf->rgnoverride != NULL) ? info->intf->rgnoverride : tag);
+	info->rom = memory_region(Machine, (info->intf->rgnoverride != NULL) ? info->intf->rgnoverride : tag);
+	info->rom_size = memory_region_length(Machine, (info->intf->rgnoverride != NULL) ? info->intf->rgnoverride : tag);
 	info->rom_mask = 0xffffffffU;
 	for(i=0; i<32; i++)
 		if((1U<<i) >= info->rom_size) {

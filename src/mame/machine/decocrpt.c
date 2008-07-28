@@ -598,10 +598,10 @@ static const UINT8 deco74_swap_table[0x800] =
 	4,7,2,2,1,3,4,4,1,7,0,2,5,4,7,3,7,6,1,5,6,0,7,4,1,1,5,2,2,6,7,2,
 };
 
-static void deco_decrypt(running_machine *machine,int rgnclass,const char *rgntag,const UINT8 *xor_table,const UINT16 *address_table,const UINT8 *swap_table,int remap_only)
+static void deco_decrypt(running_machine *machine,const char *rgntag,const UINT8 *xor_table,const UINT16 *address_table,const UINT8 *swap_table,int remap_only)
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, rgnclass, rgntag);
-	int len = memory_region_length(machine, rgnclass, rgntag)/2;
+	UINT16 *rom = (UINT16 *)memory_region(machine, rgntag);
+	int len = memory_region_length(machine, rgntag)/2;
 	UINT16 *buffer = malloc_or_die(len*2);
 	int i;
 
@@ -655,16 +655,16 @@ static void deco_decrypt(running_machine *machine,int rgnclass,const char *rgnta
 
 void deco56_decrypt_gfx(running_machine *machine, const char *tag)
 {
-	deco_decrypt(machine,RGNCLASS_GFX,tag,deco56_xor_table,deco56_address_table,deco56_swap_table, 0);
+	deco_decrypt(machine,tag,deco56_xor_table,deco56_address_table,deco56_swap_table, 0);
 }
 
 void deco74_decrypt_gfx(running_machine *machine, const char *tag)
 {
-	deco_decrypt(machine,RGNCLASS_GFX,tag,deco74_xor_table,deco74_address_table,deco74_swap_table, 0);
+	deco_decrypt(machine,tag,deco74_xor_table,deco74_address_table,deco74_swap_table, 0);
 }
 
 void deco56_remap_gfx(running_machine *machine, const char *tag)
 {
 	// Apply address remap, but not XOR/shift
-	deco_decrypt(machine,RGNCLASS_GFX,tag,deco56_xor_table,deco56_address_table,deco56_swap_table, 1);
+	deco_decrypt(machine,tag,deco56_xor_table,deco56_address_table,deco56_swap_table, 1);
 }

@@ -101,12 +101,12 @@ static void check_hotspots(int cpunum, int spacenum, offs_t address);
 static UINT64 expression_read_memory(const char *name, int space, UINT32 address, int size);
 static UINT64 expression_read_address_space(int cpuindex, int space, offs_t address, int size);
 static UINT64 expression_read_program_direct(int cpuindex, int opcode, offs_t address, int size);
-static UINT64 expression_read_memory_region(int rgnclass, const char *rgntag, offs_t address, int size);
+static UINT64 expression_read_memory_region(const char *rgntag, offs_t address, int size);
 static UINT64 expression_read_eeprom(offs_t address, int size);
 static void expression_write_memory(const char *name, int space, UINT32 address, int size, UINT64 data);
 static void expression_write_address_space(int cpuindex, int space, offs_t address, int size, UINT64 data);
 static void expression_write_program_direct(int cpuindex, int opcode, offs_t address, int size, UINT64 data);
-static void expression_write_memory_region(int rgnclass, const char *rgntag, offs_t address, int size, UINT64 data);
+static void expression_write_memory_region(const char *rgntag, offs_t address, int size, UINT64 data);
 static void expression_write_eeprom(offs_t address, int size, UINT64 data);
 
 /* variable getters/setters */
@@ -2163,25 +2163,10 @@ static UINT64 expression_read_memory(const char *name, int space, UINT32 address
 		case EXPSPACE_EEPROM:
 			return expression_read_eeprom(address, size);
 
-		case EXPSPACE_CPU:
+		case EXPSPACE_REGION:
 			if (name == NULL)
 				break;
-			return expression_read_memory_region(RGNCLASS_CPU, name, address, size);
-
-		case EXPSPACE_USER:
-			if (name == NULL)
-				break;
-			return expression_read_memory_region(RGNCLASS_USER, name, address, size);
-
-		case EXPSPACE_GFX:
-			if (name == NULL)
-				break;
-			return expression_read_memory_region(RGNCLASS_GFX, name, address, size);
-
-		case EXPSPACE_SOUND:
-			if (name == NULL)
-				break;
-			return expression_read_memory_region(RGNCLASS_SOUND, name, address, size);
+			return expression_read_memory_region(name, address, size);
 	}
 	return ~(UINT64)0 >> (64 - 8*size);
 }
@@ -2284,16 +2269,16 @@ static UINT64 expression_read_program_direct(int cpuindex, int opcode, offs_t ad
     from a memory region
 -------------------------------------------------*/
 
-static UINT64 expression_read_memory_region(int rgnclass, const char *rgntag, offs_t address, int size)
+static UINT64 expression_read_memory_region(const char *rgntag, offs_t address, int size)
 {
-	UINT8 *base = memory_region(Machine, rgnclass, rgntag);
+	UINT8 *base = memory_region(Machine, rgntag);
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
 
 	/* make sure we get a valid base before proceeding */
 	if (base != NULL)
 	{
-		UINT32 length = memory_region_length(Machine, rgnclass, rgntag);
-		UINT32 flags = memory_region_flags(Machine, rgnclass, rgntag);
+		UINT32 length = memory_region_length(Machine, rgntag);
+		UINT32 flags = memory_region_flags(Machine, rgntag);
 
 		/* call ourself recursively until we are byte-sized */
 		if (size > 1)
@@ -2302,8 +2287,8 @@ static UINT64 expression_read_memory_region(int rgnclass, const char *rgntag, of
 			UINT64 r0, r1;
 
 			/* read each half, from lower address to upper address */
-			r0 = expression_read_memory_region(rgnclass, rgntag, address + 0, halfsize);
-			r1 = expression_read_memory_region(rgnclass, rgntag, address + halfsize, halfsize);
+			r0 = expression_read_memory_region(rgntag, address + 0, halfsize);
+			r1 = expression_read_memory_region(rgntag, address + halfsize, halfsize);
 
 			/* assemble based on the target endianness */
 			if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
@@ -2388,28 +2373,10 @@ static void expression_write_memory(const char *name, int space, UINT32 address,
 			expression_write_eeprom(address, size, data);
 			break;
 
-		case EXPSPACE_CPU:
+		case EXPSPACE_REGION:
 			if (name == NULL)
 				break;
-			expression_write_memory_region(RGNCLASS_CPU, name, address, size, data);
-			break;
-			 
-		case EXPSPACE_USER:
-			if (name == NULL)
-				break;
-			expression_write_memory_region(RGNCLASS_USER, name, address, size, data);
-			break;
-			 
-		case EXPSPACE_GFX:
-			if (name == NULL)
-				break;
-			expression_write_memory_region(RGNCLASS_GFX, name, address, size, data);
-			break;
-			 
-		case EXPSPACE_SOUND:
-			if (name == NULL)
-				break;
-			expression_write_memory_region(RGNCLASS_SOUND, name, address, size, data);
+			expression_write_memory_region(name, address, size, data);
 			break;
 	}
 }
@@ -2516,15 +2483,15 @@ static void expression_write_program_direct(int cpuindex, int opcode, offs_t add
     from a memory region
 -------------------------------------------------*/
 
-static void expression_write_memory_region(int rgnclass, const char *rgntag, offs_t address, int size, UINT64 data)
+static void expression_write_memory_region(const char *rgntag, offs_t address, int size, UINT64 data)
 {
-	UINT8 *base = memory_region(Machine, rgnclass, rgntag);
+	UINT8 *base = memory_region(Machine, rgntag);
 
 	/* make sure we get a valid base before proceeding */
 	if (base != NULL)
 	{
-		UINT32 length = memory_region_length(Machine, rgnclass, rgntag);
-		UINT32 flags = memory_region_flags(Machine, rgnclass, rgntag);
+		UINT32 length = memory_region_length(Machine, rgntag);
+		UINT32 flags = memory_region_flags(Machine, rgntag);
 
 		/* call ourself recursively until we are byte-sized */
 		if (size > 1)
@@ -2546,8 +2513,8 @@ static void expression_write_memory_region(int rgnclass, const char *rgntag, off
 			}
 
 			/* write each half, from lower address to upper address */
-			expression_write_memory_region(rgnclass, rgntag, address + 0, halfsize, r0);
-			expression_write_memory_region(rgnclass, rgntag, address + halfsize, halfsize, r1);
+			expression_write_memory_region(rgntag, address + 0, halfsize, r0);
+			expression_write_memory_region(rgntag, address + halfsize, halfsize, r1);
 		}
 
 		/* only process if we're within range */

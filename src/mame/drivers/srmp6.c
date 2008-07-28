@@ -341,7 +341,7 @@ static WRITE16_HANDLER( video_regs_w )
 		case 0x5e/2: // bank switch, used by ROM check
 			LOG(("%x\n",data));
 
-			memory_set_bankptr(1,(UINT16 *)(memory_region(machine, RGNCLASS_SOUND, "nile") + (data & 0x0f)*0x200000));
+			memory_set_bankptr(1,(UINT16 *)(memory_region(machine, "nile") + (data & 0x0f)*0x200000));
 			break;
 
 		// set by IT4
@@ -424,7 +424,7 @@ static WRITE16_HANDLER(srmp6_dma_w)
 	COMBINE_DATA(&dmaram[offset]);
 	if(offset==13 && dmaram[offset]==0x40)
 	{
-		const UINT8 *rom = memory_region(machine, RGNCLASS_SOUND, "nile");
+		const UINT8 *rom = memory_region(machine, "nile");
 		UINT32 srctab=2*((((UINT32)dmaram[5])<<16)|dmaram[4]);
 		UINT32 srcdata=2*((((UINT32)dmaram[11])<<16)|dmaram[10]);
 		UINT32 len=4*(((((UINT32)dmaram[7]&3)<<16)|dmaram[6])+1); //??? WRONG!
@@ -547,7 +547,7 @@ static ADDRESS_MAP_START( srmp6, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM					// work RAM
 	AM_RANGE(0x600000, 0x7fffff) AM_READ(SMH_BANK1)	// banked ROM (used by ROM check)
-	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION(RGNCLASS_SOUND, "nile", 0)
+	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("nile", 0)
 
 	AM_RANGE(0x300000, 0x300005) AM_READWRITE(srmp6_inputs_r, srmp6_input_select_w)		// inputs
 	AM_RANGE(0x480000, 0x480fff) AM_RAM_WRITE(paletteram_w) AM_BASE(&paletteram16)
@@ -708,15 +708,15 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( srmp6 )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "sx011-10.4", 0x000001, 0x080000, CRC(8f4318a5) SHA1(44160968cca027b3d42805f2dd42662d11257ef6) )
 	ROM_LOAD16_BYTE( "sx011-11.5", 0x000000, 0x080000, CRC(7503d9cf) SHA1(03ab35f13b6166cb362aceeda18e6eda8d3abf50) )
 
-	ROM_REGION( 0x200000, RGNCLASS_USER, "user1", 0 ) /* 68000 Data */
+	ROM_REGION( 0x200000, "user1", 0 ) /* 68000 Data */
 	ROM_LOAD( "sx011-09.10", 0x000000, 0x200000, CRC(58f74438) SHA1(a256e39ca0406e513ab4dbd812fb0b559b4f61f2) )
 
  	/* these are accessed directly by the 68k, DMA device etc.  NOT decoded */
-	ROM_REGION( 0x2000000, RGNCLASS_SOUND, "nile", 0)	/* Banked ROM */
+	ROM_REGION( 0x2000000, "nile", 0)	/* Banked ROM */
 	ROM_LOAD16_WORD_SWAP( "sx011-08.15", 0x0000000, 0x0400000, CRC(01b3b1f0) SHA1(bbd60509c9ba78358edbcbb5953eafafd6e2eaf5) ) // CHR00
 	ROM_LOAD16_WORD_SWAP( "sx011-07.16", 0x0400000, 0x0400000, CRC(26e57dac) SHA1(91272268977c5fbff7e8fbe1147bf108bd2ed321) ) // CHR01
 	ROM_LOAD16_WORD_SWAP( "sx011-06.17", 0x0800000, 0x0400000, CRC(220ee32c) SHA1(77f39b54891c2381b967534b0f6d380962eadcae) ) // CHR02

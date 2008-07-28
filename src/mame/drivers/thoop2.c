@@ -70,7 +70,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( OKIM6295_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_SOUND, "oki");
+	UINT8 *RAM = memory_region(machine, "oki");
 
 	if (ACCESSING_BITS_0_7){
 		memcpy(&RAM[0x30000], &RAM[0x40000 + (data & 0x0f)*0x10000], 0x10000);
@@ -224,15 +224,15 @@ MACHINE_DRIVER_END
 
 
 ROM_START( thoop2 )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"th2c23.040",	0x000000, 0x080000, CRC(3e465753) SHA1(1ea1173b9fe5d652e7b5fafb822e2535cecbc198) )
 	ROM_LOAD16_BYTE(	"th2c22.040",	0x000001, 0x080000, CRC(837205b7) SHA1(f78b90c2be0b4dddaba26f074ea00eff863cfdb2) )
 
-	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "th2-h8.32m",		0x000000, 0x400000, CRC(60328a11) SHA1(fcdb374d2fc7ef5351a4181c471d192199dc2081) )
 	ROM_LOAD( "th2-h12.32m",	0x400000, 0x400000, CRC(b25c2d3e) SHA1(d70f3e4e2432d80c2ac87cd81208ada303bac04a) )
 
-	ROM_REGION( 0x140000, RGNCLASS_SOUND, "oki", 0 )	/* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x140000, "oki", 0 )	/* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "th2-c1.080",		0x000000, 0x100000, CRC(8fac8c30) SHA1(8e49bb596144761eae95f3e1266e57fb386664f2) )
 	ROM_RELOAD(					0x040000, 0x100000 )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched */

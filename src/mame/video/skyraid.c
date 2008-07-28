@@ -42,7 +42,7 @@ static void draw_text(running_machine *machine, bitmap_t* bitmap, const rectangl
 
 static void draw_terrain(running_machine *machine, bitmap_t* bitmap, const rectangle *cliprect)
 {
-	const UINT8* p = memory_region(machine, RGNCLASS_USER, "user1");
+	const UINT8* p = memory_region(machine, "user1");
 
 	int x;
 	int y;
@@ -120,7 +120,7 @@ static void draw_missiles(running_machine *machine, bitmap_t* bitmap, const rect
 
 static void draw_trapezoid(running_machine *machine, bitmap_t* dst, bitmap_t* src)
 {
-	const UINT8* p = memory_region(machine, RGNCLASS_USER, "user2");
+	const UINT8* p = memory_region(machine, "user2");
 
 	int x;
 	int y;

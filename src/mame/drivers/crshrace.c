@@ -134,7 +134,7 @@ TODO:
 
 static READ16_HANDLER( extrarom1_r )
 {
-	UINT8 *rom = memory_region(machine, RGNCLASS_USER, "user1");
+	UINT8 *rom = memory_region(machine, "user1");
 
 	offset *= 2;
 
@@ -143,7 +143,7 @@ static READ16_HANDLER( extrarom1_r )
 
 static READ16_HANDLER( extrarom2_r )
 {
-	UINT8 *rom = memory_region(machine, RGNCLASS_USER, "user2");
+	UINT8 *rom = memory_region(machine, "user2");
 
 	offset *= 2;
 
@@ -152,7 +152,7 @@ static READ16_HANDLER( extrarom2_r )
 
 static WRITE8_HANDLER( crshrace_sh_bankswitch_w )
 {
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "audio") + 0x10000;
+	UINT8 *rom = memory_region(machine, "audio") + 0x10000;
 
 	memory_set_bankptr(1,rom + (data & 0x03) * 0x8000);
 }
@@ -657,70 +657,70 @@ MACHINE_DRIVER_END
 
 
 ROM_START( crshrace )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x80000, "main", 0 )	/* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "1",            0x000000, 0x80000, CRC(21e34fb7) SHA1(be47b4a9bce2d6ce0a127dffe032c61547b2a3c0) )
 
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user1", 0 )	/* extra ROM */
+	ROM_REGION( 0x100000, "user1", 0 )	/* extra ROM */
 	ROM_LOAD( "w21",          0x000000, 0x100000, CRC(a5df7325) SHA1(614095a086164af5b5e73245744411187d81deec) )
 
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user2", 0 )	/* extra ROM */
+	ROM_REGION( 0x100000, "user2", 0 )	/* extra ROM */
 	ROM_LOAD( "w22",          0x000000, 0x100000, CRC(fc9d666d) SHA1(45aafcce82b668f93e51b5e4d092b1d0077e5192) )
 
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "audio", 0 )	/* 64k for the audio CPU + banks */
+	ROM_REGION( 0x30000, "audio", 0 )	/* 64k for the audio CPU + banks */
 	ROM_LOAD( "2",            0x00000, 0x20000, CRC(e70a900f) SHA1(edfe5df2dab5a7dccebe1a6f978144bcd516ab03) )
 	ROM_RELOAD(               0x10000, 0x20000 )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "h895",         0x000000, 0x100000, CRC(36ad93c3) SHA1(f68f229dd1a1f8bfd3b8f73b6627f5f00f809d34) )
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "w18",          0x000000, 0x100000, CRC(b15df90d) SHA1(56e38e6c40a02553b6b8c5282aa8f16b20779ebf) )
 	ROM_LOAD( "w19",          0x100000, 0x100000, CRC(28326b93) SHA1(997e9b250b984b012ce1d165add59c741fb18171) )
 	ROM_LOAD( "w20",          0x200000, 0x100000, CRC(d4056ad1) SHA1(4b45b14aa0766d7aef72f060e1cd28d67690d5fe) )
 	/* 300000-3fffff empty */
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x400000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "h897",         0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )
 	ROM_LOAD( "h896",         0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "h894",         0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ym", 0 ) /* sound samples */
 	ROM_LOAD( "h893",         0x000000, 0x100000, CRC(32513b63) SHA1(c4ede4aaa2611cedb53d47448422a1926acf3052) )
 ROM_END
 
 ROM_START( crshrac2 )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x80000, "main", 0 )	/* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "01-ic10.bin",  0x000000, 0x80000, CRC(b284aacd) SHA1(f0ef279cdec30eb32e8aa8cdd51e289b70f2d6f5) )
 
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user1", 0 )	/* extra ROM */
+	ROM_REGION( 0x100000, "user1", 0 )	/* extra ROM */
 	ROM_LOAD( "w21",          0x000000, 0x100000, CRC(a5df7325) SHA1(614095a086164af5b5e73245744411187d81deec) )	// IC14.BIN
 
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user2", 0 )	/* extra ROM */
+	ROM_REGION( 0x100000, "user2", 0 )	/* extra ROM */
 	ROM_LOAD( "w22",          0x000000, 0x100000, CRC(fc9d666d) SHA1(45aafcce82b668f93e51b5e4d092b1d0077e5192) )	// IC13.BIN
 
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "audio", 0 )	/* 64k for the audio CPU + banks */
+	ROM_REGION( 0x30000, "audio", 0 )	/* 64k for the audio CPU + banks */
 	ROM_LOAD( "2",            0x00000, 0x20000, CRC(e70a900f) SHA1(edfe5df2dab5a7dccebe1a6f978144bcd516ab03) )	// 02-IC58.BIN
 	ROM_RELOAD(               0x10000, 0x20000 )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "h895",         0x000000, 0x100000, CRC(36ad93c3) SHA1(f68f229dd1a1f8bfd3b8f73b6627f5f00f809d34) )	// IC50.BIN
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "w18",          0x000000, 0x100000, CRC(b15df90d) SHA1(56e38e6c40a02553b6b8c5282aa8f16b20779ebf) )	// ROM-A.BIN
 	ROM_LOAD( "w19",          0x100000, 0x100000, CRC(28326b93) SHA1(997e9b250b984b012ce1d165add59c741fb18171) )	// ROM-B.BIN
 	ROM_LOAD( "w20",          0x200000, 0x100000, CRC(d4056ad1) SHA1(4b45b14aa0766d7aef72f060e1cd28d67690d5fe) )	// ROM-C.BIN
 	/* 300000-3fffff empty */
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x400000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "h897",         0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )	// IC29.BIN
 	ROM_LOAD( "h896",         0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )	// IC75.BIN
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "h894",         0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )	// IC73.BIN
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ym", 0 ) /* sound samples */
 	ROM_LOAD( "h893",         0x000000, 0x100000, CRC(32513b63) SHA1(c4ede4aaa2611cedb53d47448422a1926acf3052) )	// IC69.BIN
 ROM_END
 
@@ -729,7 +729,7 @@ ROM_END
 void crshrace_patch_code(UINT16 offset)
 {
 	/* A hack which shows 3 player mode in code which is disabled */
-	UINT16 *RAM = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
 	RAM[(offset + 0)/2] = 0x4e71;
 	RAM[(offset + 2)/2] = 0x4e71;
 	RAM[(offset + 4)/2] = 0x4e71;

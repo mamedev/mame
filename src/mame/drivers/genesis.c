@@ -626,7 +626,7 @@ READ8_HANDLER ( genesis_z80_bank_r )
 	logerror("z80 read from address %x\n", address);
 
 	/* Read the data out of the 68k ROM */
-	if (address < 0x400000) return memory_region(machine, RGNCLASS_CPU, "sound")[BYTE_XOR(address)];
+	if (address < 0x400000) return memory_region(machine, "sound")[BYTE_XOR(address)];
 	/* else read the data out of the 68k RAM */
 //  else if (address > 0xff0000) return genesis_68k_ram[BYTE_XOR(offset)];
 

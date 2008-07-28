@@ -59,7 +59,7 @@ static UINT32 flash_cmd = 0;
 
 static READ32_HANDLER( flash_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, RGNCLASS_USER, "user1");
+	UINT32 *ROM = (UINT32 *)memory_region(machine, "user1");
 
 	if(offset >= (0x2000000 - flash_roms * 0x400000) / 4)
 	{
@@ -98,7 +98,7 @@ static WRITE32_HANDLER( flash_w )
 		if(data == 0xd0d00000)
 		{
 			// point to game settings
-			UINT8 *rom = (UINT8 *)memory_region(machine, RGNCLASS_USER, "user1") + offset*4;
+			UINT8 *rom = (UINT8 *)memory_region(machine, "user1") + offset*4;
 
 			// erase one block
 			memset(rom, 0xff, 0x10000);
@@ -116,7 +116,7 @@ static WRITE32_HANDLER( flash_w )
 		}
 		else
 		{
-			UINT16 *rom = (UINT16 *)memory_region(machine, RGNCLASS_USER, "user1");
+			UINT16 *rom = (UINT16 *)memory_region(machine, "user1");
 
 			// write game settings
 
@@ -189,7 +189,7 @@ static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x40000000, 0x4003ffff) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0xe0000000, 0xe1ffffff) AM_READWRITE(flash_r, flash_w)
 	AM_RANGE(0xe2000000, 0xe3ffffff) AM_READWRITE(flash_r, flash_w)
-	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0x1c00000)
+	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("user1", 0x1c00000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 32 )
@@ -209,7 +209,7 @@ static NVRAM_HANDLER( flashroms )
 	if (read_or_write)
 	{
 		// point to game settings
-		UINT8 *rom = (UINT8 *)memory_region(machine, RGNCLASS_USER, "user1") + 0x1c00000 + 0x360000;
+		UINT8 *rom = (UINT8 *)memory_region(machine, "user1") + 0x1c00000 + 0x360000;
 		UINT8 tmp[0x40000];
 		int i;
 
@@ -222,7 +222,7 @@ static NVRAM_HANDLER( flashroms )
 	else if (file)
 	{
 		// point to game settings
-		UINT8 *rom = (UINT8 *)memory_region(machine, RGNCLASS_USER, "user1") + 0x1c00000 + 0x360000;
+		UINT8 *rom = (UINT8 *)memory_region(machine, "user1") + 0x1c00000 + 0x360000;
 		UINT8 tmp[0x40000];
 		int i;
 
@@ -380,15 +380,15 @@ SEC KM6161002    : Graphics RAM (SOJ44)
 */
 
 ROM_START( xfiles )
-	ROM_REGION32_BE( 0x2000000, RGNCLASS_USER, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code & Data */
+	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code & Data */
 	/* 0 - 0x17fffff empty space */
 	ROM_LOAD16_WORD_SWAP( "u8.bin",  0x1800000, 0x400000, CRC(3b2c2bc1) SHA1(1c07fb5bd8a8c9b5fb169e6400fef845f3aee7aa) )
 	ROM_LOAD16_WORD_SWAP( "u9.bin",  0x1c00000, 0x400000, CRC(6ecdd1eb) SHA1(e26c9711e589865cc75ec693d382758fa52528b8) )
 
-	ROM_REGION( 0x400000, RGNCLASS_CPU, "cpu1", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "cpu1", 0 ) /* sound rom */
 	ROM_LOAD16_WORD_SWAP( "u10.bin", 0x0000000, 0x400000, CRC(f2ef1eb9) SHA1(d033d140fce6716d7d78509aa5387829f0a1404c) )
 
-	ROM_REGION( 0x1000, RGNCLASS_CPU, "cpu2", ROMREGION_DISPOSE ) /* PIC */
+	ROM_REGION( 0x1000, "cpu2", ROMREGION_DISPOSE ) /* PIC */
 	ROM_LOAD( "xfiles_pic",  0x0000, 0x1000, NO_DUMP ) // protected
 ROM_END
 
@@ -455,17 +455,17 @@ Notes:
 */
 
 ROM_START( kdynastg )
-	ROM_REGION32_BE( 0x2000000, RGNCLASS_USER, "user1", ROMREGION_ERASE00 )  /* Hyperstone CPU Code & Data */
+	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 )  /* Hyperstone CPU Code & Data */
 	/* 0 - 0x0ffffff empty space */
 	ROM_LOAD16_WORD_SWAP( "flash.u6",  0x1000000, 0x400000, CRC(280dd64e) SHA1(0e23b227b1183fb5591c3a849b5a5fe7faa23cc8) )
 	ROM_LOAD16_WORD_SWAP( "flash.u7",  0x1400000, 0x400000, CRC(f9125894) SHA1(abaad31f7a02143ea7029e47e6baf2976365f70c) )
 	ROM_LOAD16_WORD_SWAP( "flash.u8",  0x1800000, 0x400000, CRC(1016b61c) SHA1(eab4934e1f41cc26259e5187a94ceebd45888a94) )
 	ROM_LOAD16_WORD_SWAP( "flash.u9",  0x1c00000, 0x400000, CRC(093d9243) SHA1(2a643acc7144193aaa3606a84b0c67aadb4c543b) )
 
-	ROM_REGION( 0x400000, RGNCLASS_CPU, "cpu1", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "cpu1", 0 ) /* sound rom */
 	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x0000000, 0x400000, CRC(3f103cb1) SHA1(2ff9bd73f3005f09d872018b81c915b01d6703f5) )
 
-	ROM_REGION( 0x1000, RGNCLASS_CPU, "cpu2", ROMREGION_DISPOSE ) /* PIC */
+	ROM_REGION( 0x1000, "cpu2", ROMREGION_DISPOSE ) /* PIC */
 	ROM_LOAD( "kdynastg_pic",  0x0000, 0x1000, NO_DUMP ) // protected
 ROM_END
 
@@ -533,21 +533,21 @@ Notes:
 */
 
 ROM_START( fmaniac3 )
-	ROM_REGION32_BE( 0x2000000, RGNCLASS_USER, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code & Data */
+	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code & Data */
 	/* 0 - 0x17fffff empty space */
 	ROM_LOAD16_WORD_SWAP( "flash.u8", 0x1800000, 0x400000, CRC(dc08a224) SHA1(4d14145eb84ad13674296f81e90b9d60403fa0de) )
 	ROM_LOAD16_WORD_SWAP( "flash.u9", 0x1c00000, 0x400000, CRC(c1fee95f) SHA1(0ed5ed9fa18e7da9242a6df2c210c46de25a2281) )
 
-	ROM_REGION( 0x400000, RGNCLASS_CPU, "cpu1", 0 ) /* sound rom */
+	ROM_REGION( 0x400000, "cpu1", 0 ) /* sound rom */
 	ROM_LOAD16_WORD_SWAP( "flash.u10", 0x000000, 0x400000, CRC(dfeb91a0) SHA1(a4a79073c3f6135957ea8a4a66a9c71a3a39893c) )
 
-	ROM_REGION( 0x1000, RGNCLASS_CPU, "cpu2", ROMREGION_DISPOSE ) /* PIC */
+	ROM_REGION( 0x1000, "cpu2", ROMREGION_DISPOSE ) /* PIC */
 	// not present
 ROM_END
 
 static DRIVER_INIT( xfiles )
 {
-	UINT8 *rom = (UINT8 *)memory_region(machine, RGNCLASS_USER, "user1") + 0x1c00000;
+	UINT8 *rom = (UINT8 *)memory_region(machine, "user1") + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3aa92e)] = 3;
 	rom[BYTE4_XOR_BE(0x3aa92f)] = 0;
@@ -564,7 +564,7 @@ static DRIVER_INIT( xfiles )
 
 static DRIVER_INIT( kdynastg )
 {
-	UINT8 *rom = (UINT8 *)memory_region(machine, RGNCLASS_USER, "user1") + 0x1c00000;
+	UINT8 *rom = (UINT8 *)memory_region(machine, "user1") + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3aaa10)] = 3; // 129f0 - nopped call
 	rom[BYTE4_XOR_BE(0x3aaa11)] = 0;

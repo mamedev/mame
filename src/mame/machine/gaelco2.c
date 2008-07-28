@@ -23,10 +23,10 @@ static void gaelco2_ROM16_split_gfx(running_machine *machine, const char *src_re
 	int i;
 
 	/* get a pointer to the source data */
-	UINT8 *src = (UINT8 *)memory_region(machine, RGNCLASS_GFX, src_reg);
+	UINT8 *src = (UINT8 *)memory_region(machine, src_reg);
 
 	/* get a pointer to the destination data */
-	UINT8 *dst = (UINT8 *)memory_region(machine, RGNCLASS_GFX, dst_reg);
+	UINT8 *dst = (UINT8 *)memory_region(machine, dst_reg);
 
 	/* fill destination areas with the proper data */
 	for (i = 0; i < length/2; i++){

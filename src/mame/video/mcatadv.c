@@ -97,7 +97,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int width = ((source[2]&0xf000)>>12)*16;
 		int offset = tileno * 256;
 
-		UINT8 *sprdata = memory_region ( machine, RGNCLASS_GFX, "gfx1" );
+		UINT8 *sprdata = memory_region ( machine, "gfx1" );
 
 		int drawxpos, drawypos;
 		int xcnt,ycnt;

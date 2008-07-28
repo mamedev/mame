@@ -105,7 +105,7 @@ static WRITE16_HANDLER( es5503_word_lsb_w )
 				// if not writing a "halt", set the bank
 				if (!(data & 1))
 				{
-					ES5503_set_base_0(memory_region(machine, RGNCLASS_SOUND, "ensoniq") + ((data>>4)*0x10000));
+					ES5503_set_base_0(memory_region(machine, "ensoniq") + ((data>>4)*0x10000));
 				}
 			}
 		}
@@ -155,7 +155,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0)			/* System ROM */
+	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
 
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x204000, 0x2041ff) AM_READWRITE(es5503_word_lsb_r, es5503_word_lsb_w)
@@ -163,8 +163,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x282002, 0x282003) AM_READ_PORT("SW.HI")
 	AM_RANGE(0x284000, 0x28400f) AM_WRITE(output_w)
 	AM_RANGE(0x286000, 0x28600f) AM_READWRITE(coin_chip_r, coin_chip_w)
-	AM_RANGE(0x300000, 0x3bffff) AM_ROM AM_REGION(RGNCLASS_USER, "user2", 0)
-	AM_RANGE(0xf00000, 0xfbffff) AM_ROM AM_REGION(RGNCLASS_USER, "user2", 0)			/* Custom ROM */
+	AM_RANGE(0x300000, 0x3bffff) AM_ROM AM_REGION("user2", 0)
+	AM_RANGE(0xf00000, 0xfbffff) AM_ROM AM_REGION("user2", 0)			/* Custom ROM */
 ADDRESS_MAP_END
 
 
@@ -337,7 +337,7 @@ static const struct ES5503interface es5503_intf =
 static MACHINE_RESET(mquake)
 {
 	/* set ES5503 wave memory (this is banked in 64k increments) */
-	ES5503_set_base_0(memory_region(machine, RGNCLASS_SOUND, "ensoniq"));
+	ES5503_set_base_0(memory_region(machine, "ensoniq"));
 
 	MACHINE_RESET_CALL(amiga);
 }
@@ -400,11 +400,11 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( mquake )
-	ROM_REGION(0x80000, RGNCLASS_USER, "user1", 0)
+	ROM_REGION(0x80000, "user1", 0)
 	ROM_LOAD16_WORD_SWAP( "kick12.rom", 0x000000, 0x40000, CRC(a6ce1636) SHA1(11f9e62cf299f72184835b7b2a70a16333fc0d88) )
-	ROM_COPY( RGNCLASS_USER, "user1", 0x000000, 0x040000, 0x040000 )
+	ROM_COPY( "user1", 0x000000, 0x040000, 0x040000 )
 
-	ROM_REGION(0xc0000, RGNCLASS_USER, "user2", 0)
+	ROM_REGION(0xc0000, "user2", 0)
 	ROM_LOAD16_BYTE( "rom0l.bin",    0x00000, 0x10000, CRC(60c35ec3) SHA1(84fe88af54903cbd46044ef52bb50e8f94a94dcd) )
 	ROM_LOAD16_BYTE( "rom0h.bin",    0x00001, 0x10000, CRC(11551a68) SHA1(bc17e748cc7a4a547de230431ea08f0355c0eec8) )
 	ROM_LOAD16_BYTE( "rom1l.bin",    0x20000, 0x10000, CRC(0128c423) SHA1(b0465069452bd11b67c9a2f2b9021c91788bedbb) )
@@ -418,7 +418,7 @@ ROM_START( mquake )
 	ROM_LOAD16_BYTE( "rom5l.bin",    0xa0000, 0x10000, CRC(7b6ec532) SHA1(e19005269673134431eb55053d650f747f614b89) )
 	ROM_LOAD16_BYTE( "rom5h.bin",    0xa0001, 0x10000, CRC(ed8ec9b7) SHA1(510416bc88382e7a548635dcba53a2b615272e0f) )
 
-	ROM_REGION(0x040000, RGNCLASS_SOUND, "ensoniq", 0)
+	ROM_REGION(0x040000, "ensoniq", 0)
 	ROM_LOAD( "qrom0.bin",    0x000000, 0x010000, CRC(753e29b4) SHA1(4c7ccff02d310c7c669aa170e8efb6f2cb996432) )
 	ROM_LOAD( "qrom1.bin",    0x010000, 0x010000, CRC(e9e15629) SHA1(a0aa60357a13703f69a2a13e83f2187c9a1f63c1) )
 	ROM_LOAD( "qrom2.bin",    0x020000, 0x010000, CRC(837294f7) SHA1(99e383998105a63896096629a51b3a0e9eb16b17) )
@@ -452,7 +452,7 @@ static DRIVER_INIT(mquake)
 
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, RGNCLASS_USER, "user1"), 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, "user1"), 0);
 }
 
 

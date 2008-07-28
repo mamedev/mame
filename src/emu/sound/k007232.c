@@ -307,9 +307,9 @@ static void *k007232_start(const char *tag, int sndindex, int clock, const void 
 
 	/* Set up the chips */
 
-	info->pcmbuf[0] = (unsigned char *)memory_region(Machine, RGNCLASS_SOUND, tag);
-	info->pcmbuf[1] = (unsigned char *)memory_region(Machine, RGNCLASS_SOUND, tag);
-	info->pcmlimit  = (unsigned int)memory_region_length(Machine, RGNCLASS_SOUND, tag);
+	info->pcmbuf[0] = (unsigned char *)memory_region(Machine, tag);
+	info->pcmbuf[1] = (unsigned char *)memory_region(Machine, tag);
+	info->pcmlimit  = (unsigned int)memory_region_length(Machine, tag);
 
 	info->clock = clock;
 

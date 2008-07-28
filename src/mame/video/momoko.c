@@ -74,7 +74,7 @@ static void momoko_draw_bg_pri(running_machine *machine, bitmap_t *bitmap, int c
 	int xx,sx,sy,px,py,dot;
 	UINT32 gfxadr;
 	UINT8 d0, d1;
-	UINT8 *BG_GFX = memory_region( machine, RGNCLASS_GFX, "gfx2" );
+	UINT8 *BG_GFX = memory_region( machine, "gfx2" );
 	for (sy=0; sy<8; sy++)
 	{
 		gfxadr = chr*16 + sy*2;
@@ -105,10 +105,10 @@ VIDEO_UPDATE( momoko )
 {
 	int x, y, dx, dy, rx, ry, radr, chr, sy, fx, fy, px, py, offs, col, pri, flip ;
 
-	UINT8 *BG_MAP     = memory_region( screen->machine, RGNCLASS_USER, "user1" );
-	UINT8 *BG_COL_MAP = memory_region( screen->machine, RGNCLASS_USER, "user2" );
-	UINT8 *FG_MAP     = memory_region( screen->machine, RGNCLASS_USER, "user3" );
-	UINT8 *TEXT_COLOR = memory_region( screen->machine, RGNCLASS_PROMS, "proms" );
+	UINT8 *BG_MAP     = memory_region( screen->machine, "user1" );
+	UINT8 *BG_COL_MAP = memory_region( screen->machine, "user2" );
+	UINT8 *FG_MAP     = memory_region( screen->machine, "user3" );
+	UINT8 *TEXT_COLOR = memory_region( screen->machine, "proms" );
 
 
 	flip = momoko_flipscreen ^ (input_port_read(screen->machine, "FAKE") & 0x01);

@@ -561,8 +561,8 @@ VIDEO_START( sailormn_3_layers )
 static void get_sprite_info_cave(running_machine *machine)
 {
 	pen_t          base_pal	=	0;
-	const UINT8  *base_gfx	=	memory_region(machine, RGNCLASS_GFX, "gfx1");
-	int                   code_max	=	memory_region_length(machine, RGNCLASS_GFX, "gfx1") / (16*16);
+	const UINT8  *base_gfx	=	memory_region(machine, "gfx1");
+	int                   code_max	=	memory_region_length(machine, "gfx1") / (16*16);
 
 
 
@@ -690,8 +690,8 @@ static void get_sprite_info_cave(running_machine *machine)
 static void get_sprite_info_donpachi(running_machine *machine)
 {
 	pen_t          base_pal	=	0;
-	const UINT8  *base_gfx	=	memory_region(machine, RGNCLASS_GFX, "gfx1");
-	int                   code_max	=	memory_region_length(machine, RGNCLASS_GFX, "gfx1") / (16*16);
+	const UINT8  *base_gfx	=	memory_region(machine, "gfx1");
+	int                   code_max	=	memory_region_length(machine, "gfx1") / (16*16);
 
 	UINT16      *source;
 	UINT16      *finish;

@@ -421,26 +421,26 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( matmania )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "k0-03",        0x4000, 0x4000, CRC(314ab8a4) SHA1(dc86b2f71a9af8524edad2317343b0d05fe5ef4a) )
 	ROM_LOAD( "k1-03",        0x8000, 0x4000, CRC(3b3c3f08) SHA1(65f0c5dba0b8eeb5c2d42b050cac37c475e6a398) )
 	ROM_LOAD( "k2-03",        0xc000, 0x4000, CRC(286c0917) SHA1(50d6133406e7db0694b02858c7d06725744cf243) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )	/* 64k for audio code */
+	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for audio code */
 	ROM_LOAD( "k4-0",         0x8000, 0x4000, CRC(86dab489) SHA1(27f6eea29b0287e461e0e321fd7bfaada52c39dc) )
 	ROM_LOAD( "k5-0",         0xc000, 0x4000, CRC(4c41cdba) SHA1(a0af0c019bd6d9456cbbe83ecdeee689bc5f1bea) )
 
-	ROM_REGION( 0x06000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "ku-02",        0x00000, 0x2000, CRC(613c8698) SHA1(07acb2fe150a64029fd15d177c8b6481fcd9eb0b) )	/* Character ROMs - 1024 chars, 3 bpp */
 	ROM_LOAD( "kv-02",        0x02000, 0x2000, CRC(274ce14b) SHA1(58ed8c8fe0cc157d642aae596e41f2099c1ea6b1) )
 	ROM_LOAD( "kw-02",        0x04000, 0x2000, CRC(7588a9c4) SHA1(0c197a8fea1acb6c9a99071845be54c949ec83b1) )
 
-	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0c000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "kt-02",        0x00000, 0x4000, CRC(5d817c70) SHA1(f7759be40a8850d325440d336241ecd05b80c0bd) )	/* tile set */
 	ROM_LOAD( "ks-02",        0x04000, 0x4000, CRC(2e9f3ba0) SHA1(21d6686580de6ecfe57e458821fa92e966a42d95) )
 	ROM_LOAD( "kr-02",        0x08000, 0x4000, CRC(b057d3e3) SHA1(24216b22a69c1ecc7eabd7ae10de381e1ff0afc1) )
 
-	ROM_REGION( 0x54000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x54000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "k6-00",        0x00000, 0x4000, CRC(294d0878) SHA1(0aaae97e35d504dbf6c479ddf04b981847a23ea6) )	/* sprites */
 	ROM_LOAD( "k7-00",        0x04000, 0x4000, CRC(0908c2f5) SHA1(acc34c578f9a3521855ad4dd8fbd554e05c3f63c) )
 	ROM_LOAD( "k8-00",        0x08000, 0x4000, CRC(ae8341e1) SHA1(ca198087b3aec320543a19921015861324ace8a2) )
@@ -463,7 +463,7 @@ ROM_START( matmania )
 	ROM_LOAD( "kp-00",        0x4c000, 0x4000, CRC(9c84a969) SHA1(8492ba523e1c1ca94eeba1e53521dd74df854cb9) )
 	ROM_LOAD( "kq-00",        0x50000, 0x4000, CRC(fa2f0003) SHA1(7327ce822be8aea360210bbd466a8129788a65c3) )
 
-	ROM_REGION( 0x0080, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0080, "proms", 0 )
 	ROM_LOAD( "matmania.1",   0x0000, 0x0020, CRC(1b58f01f) SHA1(ffc098d85413777740a25c767096ba5b2aeaf5a8) ) /* char palette red and green components */
 	ROM_LOAD( "matmania.5",   0x0020, 0x0020, CRC(2029f85f) SHA1(7825d42eed284ea0fe7fd60304b8a27a1b5a4075) ) /* tile palette red and green components */
 	ROM_LOAD( "matmania.2",   0x0040, 0x0020, CRC(b6ac1fd5) SHA1(e312a8ff7317eb21320308400539a733c27e8fca) ) /* char palette blue component */
@@ -471,26 +471,26 @@ ROM_START( matmania )
 ROM_END
 
 ROM_START( excthour )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "e29",          0x04000, 0x4000, CRC(c453e855) SHA1(52ce83042ec04e7ba5b45a61316d6281cb10170a) )
 	ROM_LOAD( "e28",          0x08000, 0x4000, CRC(17b63708) SHA1(01c868b7ea32c4857f7187ce73a4cab5b4def246) )
 	ROM_LOAD( "e27",          0x0c000, 0x4000, CRC(269ab3bc) SHA1(f2f307c5fc6d50167be8904bef8c7ef21209be50) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )	/* 64k for audio code */
+	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for audio code */
 	ROM_LOAD( "k4-0",         0x8000, 0x4000, CRC(86dab489) SHA1(27f6eea29b0287e461e0e321fd7bfaada52c39dc) )
 	ROM_LOAD( "k5-0",         0xc000, 0x4000, CRC(4c41cdba) SHA1(a0af0c019bd6d9456cbbe83ecdeee689bc5f1bea) )
 
-	ROM_REGION( 0x06000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "e30",          0x00000, 0x2000, CRC(b2875329) SHA1(b37a8b95eb09f1ddc422cc981184b3ea40a5730d) )	/* Character ROMs - 1024 chars, 3 bpp */
 	ROM_LOAD( "e31",          0x02000, 0x2000, CRC(c9506de8) SHA1(1036f9acd8b391c03e6408fe1db3406e105373d9) )
 	ROM_LOAD( "e32",          0x04000, 0x2000, CRC(00d1635f) SHA1(3a7a20ff949d333ec4d3c0287d73e15dcfefdc71) )
 
-	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0c000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "e5",           0x00000, 0x4000, CRC(0604dc55) SHA1(dc4e36dac1a820d4e649132206a8b16603d08192) )	/* tile set */
 	ROM_LOAD( "ks-02",        0x04000, 0x4000, CRC(2e9f3ba0) SHA1(21d6686580de6ecfe57e458821fa92e966a42d95) )
 	ROM_LOAD( "e3",           0x08000, 0x4000, CRC(ebd273c6) SHA1(415f68ee10499583f5557aae6a41b5499013b5d2) )
 
-	ROM_REGION( 0x54000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x54000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "k6-00",        0x00000, 0x4000, CRC(294d0878) SHA1(0aaae97e35d504dbf6c479ddf04b981847a23ea6) )	/* sprites */
 	ROM_LOAD( "k7-00",        0x04000, 0x4000, CRC(0908c2f5) SHA1(acc34c578f9a3521855ad4dd8fbd554e05c3f63c) )
 	ROM_LOAD( "k8-00",        0x08000, 0x4000, CRC(ae8341e1) SHA1(ca198087b3aec320543a19921015861324ace8a2) )
@@ -513,7 +513,7 @@ ROM_START( excthour )
 	ROM_LOAD( "kp-00",        0x4c000, 0x4000, CRC(9c84a969) SHA1(8492ba523e1c1ca94eeba1e53521dd74df854cb9) )
 	ROM_LOAD( "kq-00",        0x50000, 0x4000, CRC(fa2f0003) SHA1(7327ce822be8aea360210bbd466a8129788a65c3) )
 
-	ROM_REGION( 0x0080, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0080, "proms", 0 )
 	ROM_LOAD( "matmania.1",   0x0000, 0x0020, CRC(1b58f01f) SHA1(ffc098d85413777740a25c767096ba5b2aeaf5a8) ) /* char palette red and green components */
 	ROM_LOAD( "matmania.5",   0x0020, 0x0020, CRC(2029f85f) SHA1(7825d42eed284ea0fe7fd60304b8a27a1b5a4075) ) /* tile palette red and green components */
 	ROM_LOAD( "matmania.2",   0x0040, 0x0020, CRC(b6ac1fd5) SHA1(e312a8ff7317eb21320308400539a733c27e8fca) ) /* char palette blue component */
@@ -521,30 +521,30 @@ ROM_START( excthour )
 ROM_END
 
 ROM_START( maniach )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "mc-mb2.bin",   0x04000, 0x4000, CRC(a6da1ba8) SHA1(d861c1c68b25272205939df43cdcca423ba7c937) )
 	ROM_LOAD( "mc-ma2.bin",   0x08000, 0x4000, CRC(84583323) SHA1(f1512fec6f3e03dc633a96917a114b0b6369c577) )
 	ROM_LOAD( "mc-m92.bin",   0x0c000, 0x4000, CRC(e209a500) SHA1(d1a3ab91ffbc321a51c99a2170aca3e217b22576) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )	/* 64k for audio code */
+	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for audio code */
 	ROM_LOAD( "mc-m50.bin",   0x4000, 0x4000, CRC(ba415d68) SHA1(484af7a1f109cc9546f17d19b53d284c934705db) )
 	ROM_LOAD( "mc-m40.bin",   0x8000, 0x4000, CRC(2a217ed0) SHA1(b06f7c9a2c96ffe78a7065e5edadfdbf985305a5) )
 	ROM_LOAD( "mc-m30.bin",   0xc000, 0x4000, CRC(95af1723) SHA1(691ca3f7400d10897e805ff691c904fb2d5bb53a) )
 
-	ROM_REGION( 0x0800, RGNCLASS_CPU, "mcu", 0 )	/* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
 	ROM_LOAD( "01",           0x0000, 0x0800, CRC(00c7f80c) SHA1(d2216f660eb8310b1530fa5dc844d26ba90c5e9c) )
 
-	ROM_REGION( 0x06000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mc-m60.bin",   0x00000, 0x2000, CRC(1cdbb117) SHA1(cce99c7380fa2a7ae070c7e2d64866866c976085) )	/* Character ROMs - 1024 chars, 3 bpp */
 	ROM_LOAD( "mc-m70.bin",   0x02000, 0x2000, CRC(553f0780) SHA1(eacce92ae7b872a35f289f79b33383f5442082d5) )
 	ROM_LOAD( "mc-m80.bin",   0x04000, 0x2000, CRC(9392ecb7) SHA1(fb4be39fc2f1c826b146bb5b4dd10eb56b23c300) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "mc-m01.bin",   0x00000, 0x8000, CRC(da558e4d) SHA1(0635f4cded061b0b3649ed1497f087ecd53d54a3) )	/* tile set */
 	ROM_LOAD( "mc-m10.bin",   0x08000, 0x8000, CRC(619a02f8) SHA1(18de76277c263c76b8d8d9093b3c1aebbf2b7ae4) )
 	ROM_LOAD( "mc-m20.bin",   0x10000, 0x8000, CRC(a617c6c1) SHA1(dccae543daa9987f2778327145fc785472f41228) )
 
-	ROM_REGION( 0x54000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x54000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "mc-mc0.bin",   0x00000, 0x4000, CRC(133d644f) SHA1(5378e0cb665c0aa65d7ad76c3f7c04a3bc301f64) )	/* sprites */
 	ROM_LOAD( "mc-md0.bin",   0x04000, 0x4000, CRC(e387b036) SHA1(828a42789d9ced9f9fcdfd08a43530008dcbbf2f) )
 	ROM_LOAD( "mc-me0.bin",   0x08000, 0x4000, CRC(b36b1283) SHA1(9d12ea9f7a0f12aad532c0f2d3608cf4a86933a6) )
@@ -567,13 +567,13 @@ ROM_START( maniach )
 	ROM_LOAD( "mc-mv0.bin",   0x4c000, 0x4000, CRC(36fc3e2d) SHA1(6cd358f29536ff6d5087570cb3e26fd9e971b888) )
 	ROM_LOAD( "mc-mw0.bin",   0x50000, 0x4000, CRC(135dce4c) SHA1(3e64a52400137d87b60adf9c307656eadbfe709c) )
 
-	ROM_REGION( 0x0080, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0080, "proms", 0 )
 	ROM_LOAD( "prom.2",       0x0000, 0x0020, CRC(32db2cf4) SHA1(854b3226a4843a6db94c01c6571294f17a469acf) ) /* char palette red and green components */
 	ROM_LOAD( "prom.16",      0x0020, 0x0020, CRC(18836d26) SHA1(950e1ea5184355501b41548d40732b96c5516fd7) ) /* tile palette red and green components */
 	ROM_LOAD( "prom.3",       0x0040, 0x0020, CRC(c7925311) SHA1(6b997803eb630b79886cebbe3bc49db1c1ab3fd9) ) /* char palette blue component */
 	ROM_LOAD( "prom.17",      0x0060, 0x0020, CRC(41f51d49) SHA1(7cfaf308752cbfddf5a37a31140119afc3febaa7) ) /* tile palette blue component */
 
-	ROM_REGION( 0x0600, RGNCLASS_PLDS, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0600, "plds", ROMREGION_DISPOSE )
 	ROM_LOAD( "pal10l8.51",   0x0000, 0x002c, CRC(424547af) SHA1(d5e57729906ae0caa8606c52284622e26509e025) )
 	ROM_LOAD( "pal10l8.56",   0x0100, 0x002c, CRC(5f6fdf22) SHA1(af6c285c4b23a15b9f1d9db2166681e1b518cc11) )
 	ROM_LOAD( "pal16r4a.117", 0x0200, 0x0104, CRC(76640daa) SHA1(3a0be5925ae9a73ea4275d1d641ada2bdb506c31) )
@@ -581,30 +581,30 @@ ROM_START( maniach )
 ROM_END
 
 ROM_START( maniach2 )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "ic40-mb1",     0x04000, 0x4000, CRC(b337a867) SHA1(a615283a70700028267e223df00e70bdd159ec09) )
 	ROM_LOAD( "ic41-ma1",     0x08000, 0x4000, CRC(85ec8279) SHA1(dada5fa6981573a1fbb235becbc647e1e2d497e1) )
 	ROM_LOAD( "ic42-m91",     0x0c000, 0x4000, CRC(a14b86dd) SHA1(73172dfeb34846beaa713c8886d56ed691139d06) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )	/* 64k for audio code */
+	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for audio code */
 	ROM_LOAD( "mc-m50.bin",   0x4000, 0x4000, CRC(ba415d68) SHA1(484af7a1f109cc9546f17d19b53d284c934705db) )
 	ROM_LOAD( "mc-m40.bin",   0x8000, 0x4000, CRC(2a217ed0) SHA1(b06f7c9a2c96ffe78a7065e5edadfdbf985305a5) )
 	ROM_LOAD( "mc-m30.bin",   0xc000, 0x4000, CRC(95af1723) SHA1(691ca3f7400d10897e805ff691c904fb2d5bb53a) )
 
-	ROM_REGION( 0x0800, RGNCLASS_CPU, "mcu", 0 )	/* 8k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
 	ROM_LOAD( "01",           0x0000, 0x0800, CRC(00c7f80c) SHA1(d2216f660eb8310b1530fa5dc844d26ba90c5e9c) )
 
-	ROM_REGION( 0x06000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mc-m60.bin",   0x00000, 0x2000, CRC(1cdbb117) SHA1(cce99c7380fa2a7ae070c7e2d64866866c976085) )	/* Character ROMs - 1024 chars, 3 bpp */
 	ROM_LOAD( "mc-m70.bin",   0x02000, 0x2000, CRC(553f0780) SHA1(eacce92ae7b872a35f289f79b33383f5442082d5) )
 	ROM_LOAD( "mc-m80.bin",   0x04000, 0x2000, CRC(9392ecb7) SHA1(fb4be39fc2f1c826b146bb5b4dd10eb56b23c300) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "mc-m01.bin",   0x00000, 0x8000, CRC(da558e4d) SHA1(0635f4cded061b0b3649ed1497f087ecd53d54a3) )	/* tile set */
 	ROM_LOAD( "mc-m10.bin",   0x08000, 0x8000, CRC(619a02f8) SHA1(18de76277c263c76b8d8d9093b3c1aebbf2b7ae4) )
 	ROM_LOAD( "mc-m20.bin",   0x10000, 0x8000, CRC(a617c6c1) SHA1(dccae543daa9987f2778327145fc785472f41228) )
 
-	ROM_REGION( 0x54000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x54000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "mc-mc0.bin",   0x00000, 0x4000, CRC(133d644f) SHA1(5378e0cb665c0aa65d7ad76c3f7c04a3bc301f64) )	/* sprites */
 	ROM_LOAD( "mc-md0.bin",   0x04000, 0x4000, CRC(e387b036) SHA1(828a42789d9ced9f9fcdfd08a43530008dcbbf2f) )
 	ROM_LOAD( "mc-me0.bin",   0x08000, 0x4000, CRC(b36b1283) SHA1(9d12ea9f7a0f12aad532c0f2d3608cf4a86933a6) )
@@ -627,13 +627,13 @@ ROM_START( maniach2 )
 	ROM_LOAD( "mc-mv0.bin",   0x4c000, 0x4000, CRC(36fc3e2d) SHA1(6cd358f29536ff6d5087570cb3e26fd9e971b888) )
 	ROM_LOAD( "mc-mw0.bin",   0x50000, 0x4000, CRC(135dce4c) SHA1(3e64a52400137d87b60adf9c307656eadbfe709c) )
 
-	ROM_REGION( 0x0080, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0080, "proms", 0 )
 	ROM_LOAD( "prom.2",       0x0000, 0x0020, CRC(32db2cf4) SHA1(854b3226a4843a6db94c01c6571294f17a469acf) ) /* char palette red and green components */
 	ROM_LOAD( "prom.16",      0x0020, 0x0020, CRC(18836d26) SHA1(950e1ea5184355501b41548d40732b96c5516fd7) ) /* tile palette red and green components */
 	ROM_LOAD( "prom.3",       0x0040, 0x0020, CRC(c7925311) SHA1(6b997803eb630b79886cebbe3bc49db1c1ab3fd9) ) /* char palette blue component */
 	ROM_LOAD( "prom.17",      0x0060, 0x0020, CRC(41f51d49) SHA1(7cfaf308752cbfddf5a37a31140119afc3febaa7) ) /* tile palette blue component */
 
-	ROM_REGION( 0x0600, RGNCLASS_PLDS, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0600, "plds", ROMREGION_DISPOSE )
 	ROM_LOAD( "pal10l8.51",   0x0000, 0x002c, CRC(424547af) SHA1(d5e57729906ae0caa8606c52284622e26509e025) )
 	ROM_LOAD( "pal10l8.56",   0x0100, 0x002c, CRC(5f6fdf22) SHA1(af6c285c4b23a15b9f1d9db2166681e1b518cc11) )
 	ROM_LOAD( "pal16r4a.117", 0x0200, 0x0104, CRC(76640daa) SHA1(3a0be5925ae9a73ea4275d1d641ada2bdb506c31) )

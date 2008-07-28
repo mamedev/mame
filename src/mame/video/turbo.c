@@ -275,7 +275,7 @@ INLINE UINT32 sprite_xscale(UINT8 dacinput, double vr1, double vr2, double cext)
 
 static void turbo_prepare_sprites(running_machine *machine, turbo_state *state, UINT8 y, sprite_info *info)
 {
-	const UINT8 *pr1119 = memory_region(machine, RGNCLASS_PROMS, "proms") + 0x200;
+	const UINT8 *pr1119 = memory_region(machine, "proms") + 0x200;
 	int sprnum;
 
 	/* initialize the line enable signals to 0 */
@@ -341,7 +341,7 @@ static void turbo_prepare_sprites(running_machine *machine, turbo_state *state, 
 
 static UINT32 turbo_get_sprite_bits(running_machine *machine, UINT8 road, sprite_info *sprinfo)
 {
-	const UINT8 *sprite_gfxdata = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	const UINT8 *sprite_gfxdata = memory_region(machine, "gfx1");
 	UINT8 sprlive = sprinfo->lst;
 	UINT32 sprdata = 0;
 	int level;
@@ -398,8 +398,8 @@ VIDEO_UPDATE( turbo )
 {
 	turbo_state *state = screen->machine->driver_data;
 	bitmap_t *fgpixmap = tilemap_get_pixmap(state->fg_tilemap);
-	const UINT8 *road_gfxdata = memory_region(screen->machine, RGNCLASS_GFX, "gfx3");
-	const UINT8 *prom_base = memory_region(screen->machine, RGNCLASS_PROMS, "proms");
+	const UINT8 *road_gfxdata = memory_region(screen->machine, "gfx3");
+	const UINT8 *prom_base = memory_region(screen->machine, "proms");
 	const UINT8 *pr1114 = prom_base + 0x000;
 	const UINT8 *pr1115 = prom_base + 0x020;
 	const UINT8 *pr1116 = prom_base + 0x040;
@@ -634,7 +634,7 @@ VIDEO_UPDATE( turbo )
 
 static void subroc3d_prepare_sprites(running_machine *machine, turbo_state *state, UINT8 y, sprite_info *info)
 {
-	const UINT8 *pr1449 = memory_region(machine, RGNCLASS_PROMS, "proms") + 0x300;
+	const UINT8 *pr1449 = memory_region(machine, "proms") + 0x300;
 	int sprnum;
 
 	/* initialize the line enable signals to 0 */
@@ -700,7 +700,7 @@ static UINT32 subroc3d_get_sprite_bits(running_machine *machine, sprite_info *sp
        end is in bit 1, plb in bit 0
     */
 	static const UINT8 plb_end[16] = { 0,1,1,2, 1,1,1,1, 1,1,1,1, 0,1,1,2 };
-	const UINT8 *sprite_gfxdata = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	const UINT8 *sprite_gfxdata = memory_region(machine, "gfx1");
 	UINT32 sprdata = 0;
 	int level;
 
@@ -753,7 +753,7 @@ VIDEO_UPDATE( subroc3d )
 {
 	turbo_state *state = screen->machine->driver_data;
 	bitmap_t *fgpixmap = tilemap_get_pixmap(state->fg_tilemap);
-	const UINT8 *prom_base = memory_region(screen->machine, RGNCLASS_PROMS, "proms");
+	const UINT8 *prom_base = memory_region(screen->machine, "proms");
 	const UINT8 *pr1419 = prom_base + 0x000;
 	const UINT8 *pr1620 = prom_base + 0x200;
 	const UINT8 *pr1450 = prom_base + 0x500;
@@ -853,7 +853,7 @@ VIDEO_UPDATE( subroc3d )
 
 static void buckrog_prepare_sprites(running_machine *machine, turbo_state *state, UINT8 y, sprite_info *info)
 {
-	const UINT8 *pr5196 = memory_region(machine, RGNCLASS_PROMS, "proms") + 0x100;
+	const UINT8 *pr5196 = memory_region(machine, "proms") + 0x100;
 	int sprnum;
 
 	/* initialize the line enable signals to 0 */
@@ -919,7 +919,7 @@ static UINT32 buckrog_get_sprite_bits(running_machine *machine, sprite_info *spr
        end is in bit 1, plb in bit 0
     */
 	static const UINT8 plb_end[16] = { 0,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,2 };
-	const UINT8 *sprite_gfxdata = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	const UINT8 *sprite_gfxdata = memory_region(machine, "gfx1");
 	UINT32 sprdata = 0;
 	int level;
 
@@ -972,8 +972,8 @@ VIDEO_UPDATE( buckrog )
 {
 	turbo_state *state = screen->machine->driver_data;
 	bitmap_t *fgpixmap = tilemap_get_pixmap(state->fg_tilemap);
-	const UINT8 *bgcolor = memory_region(screen->machine, RGNCLASS_GFX, "gfx3");
-	const UINT8 *prom_base = memory_region(screen->machine, RGNCLASS_PROMS, "proms");
+	const UINT8 *bgcolor = memory_region(screen->machine, "gfx3");
+	const UINT8 *prom_base = memory_region(screen->machine, "proms");
 	const UINT8 *pr5194 = prom_base + 0x000;
 	const UINT8 *pr5198 = prom_base + 0x500;
 	const UINT8 *pr5199 = prom_base + 0x700;

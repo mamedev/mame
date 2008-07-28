@@ -371,7 +371,7 @@ static OPBASE_HANDLER( missile_opbase_handler )
 	/* ROM? */
 	else if (address >= 0x5000)
 	{
-		opbase->rom = opbase->ram = memory_region(machine, RGNCLASS_CPU, "main") - offset;
+		opbase->rom = opbase->ram = memory_region(machine, "main") - offset;
 		return ~0;
 	}
 
@@ -383,7 +383,7 @@ static OPBASE_HANDLER( missile_opbase_handler )
 static MACHINE_START( missile )
 {
 	/* initialize globals */
-	writeprom = memory_region(machine, RGNCLASS_PROMS, "proms");
+	writeprom = memory_region(machine, "proms");
 	flipscreen = 0;
 
 	/* set up an opcode base handler since we use mapped handlers for RAM */
@@ -644,7 +644,7 @@ static READ8_HANDLER( missile_r )
 
 	/* ROM */
 	else if (offset >= 0x5000)
-		result = memory_region(machine, RGNCLASS_CPU, "main")[offset];
+		result = memory_region(machine, "main")[offset];
 
 	/* POKEY */
 	else if (offset < 0x4800)
@@ -920,7 +920,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( missile )
-	ROM_REGION( 0x8000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x8000, "main", 0 )
 	ROM_LOAD( "035820.02",    0x5000, 0x0800, CRC(7a62ce6a) SHA1(9a39978138dc28fdefe193bfae1b226391e471db) )
 	ROM_LOAD( "035821.02",    0x5800, 0x0800, CRC(df3bd57f) SHA1(0916925d3c94d766d33f0e4badf6b0add835d748) )
 	ROM_LOAD( "035822.02",    0x6000, 0x0800, CRC(a1cd384a) SHA1(a1dd0953423750a0fbc6e3dccbf2ca64ef5a1f54) )
@@ -928,13 +928,13 @@ ROM_START( missile )
 	ROM_LOAD( "035824.02",    0x7000, 0x0800, CRC(606e42e0) SHA1(9718f84a73c66b4e8ef7805a7ab638a7380624e1) )
 	ROM_LOAD( "035825.02",    0x7800, 0x0800, CRC(f752eaeb) SHA1(0339a6ce6744d2091cc7e07675e509b202b0f380) )
 
-	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "035826.01",   0x0000, 0x0020, CRC(86a22140) SHA1(2beebf7855e29849ada1823eae031fc98220bc43) )
 ROM_END
 
 
 ROM_START( missile2 )
-	ROM_REGION( 0x8000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x8000, "main", 0 )
 	ROM_LOAD( "35820-01.h1",  0x5000, 0x0800, CRC(41cbb8f2) SHA1(5dcb58276c08d75d36baadb6cefe30d4916de9b0) )
 	ROM_LOAD( "35821-01.jk1", 0x5800, 0x0800, CRC(728702c8) SHA1(6f25af7133d3ec79029117162649f94e93f36e0e) )
 	ROM_LOAD( "35822-01.kl1", 0x6000, 0x0800, CRC(28f0999f) SHA1(eb52b11c6757c8dc3be88b276ea4dc7dfebf7cf7) )
@@ -942,13 +942,13 @@ ROM_START( missile2 )
 	ROM_LOAD( "35824-01.np1", 0x7000, 0x0800, CRC(0ca089c8) SHA1(7f69ee990fd4fa1f2fceca7fc66fcaa02e4d2314) )
 	ROM_LOAD( "35825-01.r1",  0x7800, 0x0800, CRC(428cf0d5) SHA1(03cabbef50c33852fbbf38dd3eecaf70a82df82f) )
 
-	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "035826.01",   0x0000, 0x0020, CRC(86a22140) SHA1(2beebf7855e29849ada1823eae031fc98220bc43) )
 ROM_END
 
 
 ROM_START( suprmatk )
-	ROM_REGION( 0x9000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x9000, "main", 0 )
 	ROM_LOAD( "035820.02",    0x5000, 0x0800, CRC(7a62ce6a) SHA1(9a39978138dc28fdefe193bfae1b226391e471db) )
 	ROM_LOAD( "035821.02",    0x5800, 0x0800, CRC(df3bd57f) SHA1(0916925d3c94d766d33f0e4badf6b0add835d748) )
 	ROM_LOAD( "035822.02",    0x6000, 0x0800, CRC(a1cd384a) SHA1(a1dd0953423750a0fbc6e3dccbf2ca64ef5a1f54) )
@@ -958,13 +958,13 @@ ROM_START( suprmatk )
 	ROM_LOAD( "e0.rom",       0x8000, 0x0800, CRC(d0b20179) SHA1(e2a9855899b6ff96b8dba169e0ab83f00a95919f) )
 	ROM_LOAD( "e1.rom",       0x8800, 0x0800, CRC(c6c818a3) SHA1(b9c92a85c07dd343d990e196d37b92d92a85a5e0) )
 
-	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "035826.01",   0x0000, 0x0020, CRC(86a22140) SHA1(2beebf7855e29849ada1823eae031fc98220bc43) )
 ROM_END
 
 
 ROM_START( sprmatkd )
-	ROM_REGION( 0x8000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x8000, "main", 0 )
 	ROM_LOAD( "035820.sma",   0x5000, 0x0800, CRC(75f01b87) SHA1(32ed71b6a869d7b361f244c384bbe6f407f6c6d7) )
 	ROM_LOAD( "035821.sma",   0x5800, 0x0800, CRC(3320d67e) SHA1(5bb04b985421af6309818b94676298f4b90495cf) )
 	ROM_LOAD( "035822.sma",   0x6000, 0x0800, CRC(e6be5055) SHA1(43912cc565cb43256a9193594cf36abab1c85d6f) )
@@ -972,7 +972,7 @@ ROM_START( sprmatkd )
 	ROM_LOAD( "035824.sma",   0x7000, 0x0800, CRC(90a06be8) SHA1(f46fd6847bc9836d11ea0042df19fbf33ddab0db) )
 	ROM_LOAD( "035825.sma",   0x7800, 0x0800, CRC(1298213d) SHA1(c8e4301704e3700c339557f2a833e70f6a068d5e) )
 
-	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "035826.01",   0x0000, 0x0020, CRC(86a22140) SHA1(2beebf7855e29849ada1823eae031fc98220bc43) )
 ROM_END
 
@@ -990,7 +990,7 @@ PCB is marked: "VIDEOTRON BOLOGNA 002"
 */
 
 ROM_START( mcombat )
-	ROM_REGION( 0x8000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x8000, "main", 0 )
 	ROM_LOAD( "002-0-0.10a",  0x5000, 0x0800, CRC(589b81de) SHA1(06f18a837cedb0da5464dfaa04f92bd035db3752) )
 	ROM_LOAD( "002-1-1.9a",   0x5800, 0x0800, CRC(08796a78) SHA1(e5aabe775889752ad1581098fcbf52ff1fa03b3b) )
 	ROM_LOAD( "002-2-2.8a",   0x6000, 0x0800, CRC(59ab750c) SHA1(4555c27ddeb22ba895610a9c516fe574664a6f4b) )
@@ -998,13 +998,13 @@ ROM_START( mcombat )
 	ROM_LOAD( "002-4-4.6a",   0x7000, 0x0800, CRC(aac71e95) SHA1(7daf115eb2cdde69b7c4de1e1a6ee68cd2fd0f2c) )
 	ROM_LOAD( "002-5-5.5a",   0x7800, 0x0800, CRC(1b9a16e2) SHA1(03fb292bb6f815724b2fc4b2f561398000367373) )
 
-	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "mmi6331.6f",   0x0000, 0x0020, CRC(86a22140) SHA1(2beebf7855e29849ada1823eae031fc98220bc43) )
 ROM_END
 
 
 ROM_START( mcombata )
-	ROM_REGION( 0x8000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x8000, "main", 0 )
 	ROM_LOAD( "002-0-0.10a",  0x5000, 0x0800, CRC(589b81de) SHA1(06f18a837cedb0da5464dfaa04f92bd035db3752) )
 	ROM_LOAD( "002-1-1.9a",   0x5800, 0x0800, CRC(08796a78) SHA1(e5aabe775889752ad1581098fcbf52ff1fa03b3b) )
 	ROM_LOAD( "002-2-2.8a",   0x6000, 0x0800, CRC(59ab750c) SHA1(4555c27ddeb22ba895610a9c516fe574664a6f4b) )
@@ -1012,7 +1012,7 @@ ROM_START( mcombata )
 	ROM_LOAD( "4.bin",        0x7000, 0x0800, CRC(e3b5428d) SHA1(ac9eb459df68a117a49e92fbc5ed88faaf46a395) )
 	ROM_LOAD( "002-5-5.5a",   0x7800, 0x0800, CRC(1b9a16e2) SHA1(03fb292bb6f815724b2fc4b2f561398000367373) )
 
-	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "mmi6331.6f",   0x0000, 0x0020, CRC(86a22140) SHA1(2beebf7855e29849ada1823eae031fc98220bc43) )
 ROM_END
 
@@ -1025,7 +1025,7 @@ ROM_END
 static DRIVER_INIT( suprmatk )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *rom = memory_region(machine, "main");
 
 	for (i = 0; i < 0x40; i++)
 	{

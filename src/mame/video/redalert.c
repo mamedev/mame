@@ -76,7 +76,7 @@ static void get_pens(running_machine *machine, pen_t *pens)
 	double charmap_b_weights[2];
 	double back_r_weight[1];
 	double back_gb_weight[1];
-	const UINT8 *prom = memory_region(machine, RGNCLASS_PROMS, "proms");
+	const UINT8 *prom = memory_region(machine, "proms");
 
 	scaler = compute_resistor_weights(0, 0xff, -1,
 									  1, resistances_bitmap,     bitmap_weight,      470, 0,

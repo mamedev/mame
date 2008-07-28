@@ -283,7 +283,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( twins )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_BYTE( "1.bin", 0x000000, 0x080000, CRC(d5ef7b0d) SHA1(7261dca5bb0aef755b4f2b85a159b356e7ac8219) )
 	ROM_LOAD16_BYTE( "2.bin", 0x000001, 0x080000, CRC(8a5392f4) SHA1(e6a2ecdb775138a87d27aa4ad267bdec33c26baa) )
 ROM_END
@@ -307,7 +307,7 @@ hmm, we're only emulating 1x ay-3-8910, is the other at port 0 on this?
 */
 
 ROM_START( twinsa )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_BYTE( "lp.bin", 0x000000, 0x080000, CRC(4f07862e) SHA1(fbda1973f79c6938c7f026a4db706e78781c2df8) )
 	ROM_LOAD16_BYTE( "hp.bin", 0x000001, 0x080000, CRC(aaf74b83) SHA1(09bd76b9fc5cb7ba6ffe1a2581ffd5633fe440b3) )
 ROM_END

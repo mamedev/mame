@@ -680,7 +680,7 @@ static void *ymf278b_start(const char *tag, int sndindex, int clock, const void 
 
 	intf = (config != NULL) ? config : &defintrf;
 
-	ymf278b_init(chip, memory_region(Machine, RGNCLASS_SOUND, tag), intf->irq_callback, clock);
+	ymf278b_init(chip, memory_region(Machine, tag), intf->irq_callback, clock);
 	chip->stream = stream_create(0, 2, clock/768, chip, ymf278b_pcm_update);
 
 	// Volume table, 1 = -0.375dB, 8 = -3dB, 256 = -96dB

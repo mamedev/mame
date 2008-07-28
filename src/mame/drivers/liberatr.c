@@ -429,7 +429,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( liberatr )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )	/* 64k for code and data  */
+	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code and data  */
 	ROM_LOAD( "136012.206",   0x8000, 0x1000, CRC(1a0cb4a0) SHA1(595828a07af729a84aab4e0b51e873046b56b419) )
 	ROM_LOAD( "136012.205",   0x9000, 0x1000, CRC(2f071920) SHA1(8764f3e78451c4968bffb7c7f72d1ed862f4b185) )
 	ROM_LOAD( "136012.204",   0xa000, 0x1000, CRC(bcc91827) SHA1(3bfbe1f1db58437ccd204a857e58695f56819649) )
@@ -439,28 +439,28 @@ ROM_START( liberatr )
 	ROM_LOAD( "136012.200",   0xe000, 0x1000, CRC(1e98d21a) SHA1(92c7cc033c78ae0ce8127d49debe62263404feb1) )
 	ROM_RELOAD(				  0xf000, 0x1000 )		/* for interrupt/reset vectors  */
 
-	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx1", 0 )	/* planet image, used at runtime */
+	ROM_REGION( 0x4000, "gfx1", 0 )	/* planet image, used at runtime */
 	ROM_LOAD( "136012.110",   0x0000, 0x1000, CRC(6eb11221) SHA1(355b71812a18cbb2ee4dc20b3622fca1c96e4570) )
 	ROM_LOAD( "136012.107",   0x1000, 0x1000, CRC(8a616a63) SHA1(76794cc4e11048bb6f2628bd8b84c9a7e2e82551) )
 	ROM_LOAD( "136012.108",   0x2000, 0x1000, CRC(3f8e4cf6) SHA1(a9d0feb0892f343687e00b96f05adb423ee4d659) )
 	ROM_LOAD( "136012.109",   0x3000, 0x1000, CRC(dda0c0ef) SHA1(6e547c07c1abd17383a4389b0b4ced442ed65ce7) )
 
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0 )	/* latitude scaler */
+	ROM_REGION( 0x100, "user1", 0 )	/* latitude scaler */
 	ROM_LOAD_NIB_LOW ( "136012.123",   0x0000, 0x0100, CRC(b8c806e0) SHA1(19b1b9796e1e9a42899a92ec53288d17d5d15fb3) )
 	ROM_LOAD_NIB_HIGH( "136012.124",   0x0000, 0x0100, CRC(e51ec78f) SHA1(224237370c418361a00d62a77d39fa494e7d8831) )
 
-	ROM_REGION( 0x100, RGNCLASS_USER, "user2", 0 )	/* longitude scaler */
+	ROM_REGION( 0x100, "user2", 0 )	/* longitude scaler */
 	ROM_LOAD_NIB_LOW ( "136012.125",   0x0000, 0x0100, CRC(52ac8dd9) SHA1(125d54b562d079b974f2562e71ab7c7a0b97e709) )
 	ROM_LOAD_NIB_HIGH( "136012.126",   0x0000, 0x0100, CRC(2e670aa6) SHA1(a6bcc49d0948d2dfe497c5e3ad4a834fa78f779a) )
 
-	ROM_REGION( 0x200, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200, "proms", ROMREGION_DISPOSE )
     ROM_LOAD( "136012.021",   0x0000, 0x0100, CRC(ffdcd7bc) SHA1(2ce733203d628e299ec4fb93db8be1598b49142c) ) 	/* write protect PROM */
     ROM_LOAD( "136012.022",   0x0100, 0x0100, CRC(3353edce) SHA1(915308b11096fc1d02acf9b4af806a2a935dd748) )	/* sync PROM */
 ROM_END
 
 
 ROM_START( liberat2 )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )	/* 64k for code and data  */
+	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code and data  */
 	ROM_LOAD( "l6.bin",       0x6000, 0x1000, CRC(78093d06) SHA1(0f6ca01e27b32aae384a6ab67a6f14eedd3f1d9c) )
 	ROM_LOAD( "l5.bin",       0x7000, 0x1000, CRC(988db636) SHA1(8fdd07b397d4bef108aafb10c06c2fd53fc1f99a) )
 	ROM_LOAD( "l4.bin",       0x8000, 0x1000, CRC(ec114540) SHA1(eb35510b59f5e9624c3d94fb16dacb4968349030) )
@@ -469,21 +469,21 @@ ROM_START( liberat2 )
 	ROM_LOAD( "l1.bin",       0xb000, 0x1000, CRC(ef6e9f9e) SHA1(b1f7cc9e0a2ea08ec89428ad31161ac81e7faaaf) )
 	ROM_RELOAD(				  0xf000, 0x1000 )		/* for interrupt/reset vectors  */
 
-	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx1", 0 )	/* planet image, used at runtime */
+	ROM_REGION( 0x4000, "gfx1", 0 )	/* planet image, used at runtime */
 	ROM_LOAD( "136012.110",   0x0000, 0x1000, CRC(6eb11221) SHA1(355b71812a18cbb2ee4dc20b3622fca1c96e4570) )
 	ROM_LOAD( "136012.107",   0x1000, 0x1000, CRC(8a616a63) SHA1(76794cc4e11048bb6f2628bd8b84c9a7e2e82551) )
 	ROM_LOAD( "136012.108",   0x2000, 0x1000, CRC(3f8e4cf6) SHA1(a9d0feb0892f343687e00b96f05adb423ee4d659) )
 	ROM_LOAD( "136012.109",   0x3000, 0x1000, CRC(dda0c0ef) SHA1(6e547c07c1abd17383a4389b0b4ced442ed65ce7) )
 
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0 )	/* latitude scaler */
+	ROM_REGION( 0x100, "user1", 0 )	/* latitude scaler */
 	ROM_LOAD_NIB_LOW ( "136012.123",   0x0000, 0x0100, CRC(b8c806e0) SHA1(19b1b9796e1e9a42899a92ec53288d17d5d15fb3) )
 	ROM_LOAD_NIB_HIGH( "136012.124",   0x0000, 0x0100, CRC(e51ec78f) SHA1(224237370c418361a00d62a77d39fa494e7d8831) )
 
-	ROM_REGION( 0x100, RGNCLASS_USER, "user2", 0 )	/* longitude scaler */
+	ROM_REGION( 0x100, "user2", 0 )	/* longitude scaler */
 	ROM_LOAD_NIB_LOW ( "136012.125",   0x0000, 0x0100, CRC(52ac8dd9) SHA1(125d54b562d079b974f2562e71ab7c7a0b97e709) )
 	ROM_LOAD_NIB_HIGH( "136012.126",   0x0000, 0x0100, CRC(2e670aa6) SHA1(a6bcc49d0948d2dfe497c5e3ad4a834fa78f779a) )
 
-	ROM_REGION( 0x200, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200, "proms", ROMREGION_DISPOSE )
     ROM_LOAD( "136012.021",   0x0000, 0x0100, CRC(ffdcd7bc) SHA1(2ce733203d628e299ec4fb93db8be1598b49142c) ) 	/* write protect PROM */
     ROM_LOAD( "136012.022",   0x0100, 0x0100, CRC(3353edce) SHA1(915308b11096fc1d02acf9b4af806a2a935dd748) )	/* sync PROM */
 ROM_END

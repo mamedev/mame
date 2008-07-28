@@ -35,7 +35,7 @@ static int firq_enable;
 
 static WRITE8_HANDLER( ajax_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 	int bankaddress = 0;
 
 	/* rom select */
@@ -180,7 +180,7 @@ WRITE8_HANDLER( ajax_ls138_f10_w )
 
 WRITE8_HANDLER( ajax_bankswitch_2_w )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "sub");
+	UINT8 *RAM = memory_region(machine, "sub");
 	int bankaddress;
 
 	/* enable char ROM reading through the video RAM */

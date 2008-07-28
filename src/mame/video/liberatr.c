@@ -124,8 +124,8 @@ static void liberatr_init_planet(running_machine *machine, planet *liberatr_plan
 {
 	UINT16 longitude;
 
-	const UINT8 *latitude_scale = memory_region(machine, RGNCLASS_USER, "user1");
-	const UINT8 *longitude_scale = memory_region(machine, RGNCLASS_USER, "user2");
+	const UINT8 *latitude_scale = memory_region(machine, "user1");
+	const UINT8 *longitude_scale = memory_region(machine, "user2");
 
 	/* for each starting longitude */
 	for (longitude = 0; longitude < 0x100; longitude++)
@@ -274,8 +274,8 @@ VIDEO_START( liberatr )
 	liberatr_planets[1] = auto_malloc(sizeof(planet));
 
 	/* for each planet in the planet ROMs */
-	liberatr_init_planet(machine, liberatr_planets[0], &memory_region(machine, RGNCLASS_GFX, "gfx1")[0x2000]);
-	liberatr_init_planet(machine, liberatr_planets[1], &memory_region(machine, RGNCLASS_GFX, "gfx1")[0x0000]);
+	liberatr_init_planet(machine, liberatr_planets[0], &memory_region(machine, "gfx1")[0x2000]);
+	liberatr_init_planet(machine, liberatr_planets[1], &memory_region(machine, "gfx1")[0x0000]);
 }
 
 

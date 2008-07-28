@@ -163,7 +163,7 @@ READ16_HANDLER( namcos2_68k_eeprom_r ){
 /* 68000 Shared memory area - Data ROM area                  */
 /*************************************************************/
 READ16_HANDLER( namcos2_68k_data_rom_r ){
-	UINT16 *ROM = (UINT16 *)memory_region(machine, RGNCLASS_USER, "user1");
+	UINT16 *ROM = (UINT16 *)memory_region(machine, "user1");
 	return ROM[offset];
 }
 
@@ -712,8 +712,8 @@ INTERRUPT_GEN( namcos2_68k_gpu_vblank )
 
 WRITE8_HANDLER( namcos2_sound_bankselect_w )
 {
-	UINT8 *RAM=memory_region(machine, RGNCLASS_CPU, "audio");
-	UINT32 max = (memory_region_length(machine, RGNCLASS_CPU, "audio") - 0x10000) / 0x4000;
+	UINT8 *RAM=memory_region(machine, "audio");
+	UINT32 max = (memory_region_length(machine, "audio") - 0x10000) / 0x4000;
 	int bank = ( data >> 4 ) % max;	/* 991104.CAB */
 	memory_set_bankptr( CPU3_ROM1, &RAM[ 0x10000 + ( 0x4000 * bank ) ] );
 }

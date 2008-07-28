@@ -54,7 +54,7 @@ static int rombank;
 
 static MACHINE_RESET( thedeep )
 {
-	memory_set_bankptr(1, memory_region(machine, RGNCLASS_CPU, "main") + 0x10000 + 0 * 0x4000);
+	memory_set_bankptr(1, memory_region(machine, "main") + 0x10000 + 0 * 0x4000);
 	thedeep_scroll[0] = 0;
 	thedeep_scroll[1] = 0;
 	thedeep_scroll[2] = 0;
@@ -87,7 +87,7 @@ static WRITE8_HANDLER( thedeep_protection_w )
 			int new_rombank = protection_command & 3;
 			if (rombank == new_rombank)	break;
 			rombank = new_rombank;
-			rom = memory_region(machine, RGNCLASS_CPU, "main");
+			rom = memory_region(machine, "main");
 			memory_set_bankptr(1, rom + 0x10000 + rombank * 0x4000);
 			/* there's code which falls through from the fixed ROM to bank #1, I have to */
 			/* copy it there otherwise the CPU bank switching support will not catch it. */
@@ -117,7 +117,7 @@ static WRITE8_HANDLER( thedeep_protection_w )
 // d166-d174:   hl = (hl + 2*a)
 // d175-d181:   hl *= e (e must be non zero)
 // d182-d19a:   hl /= de
-				protection_data = memory_region(machine, RGNCLASS_CPU, "main")[0x185+protection_index++];
+				protection_data = memory_region(machine, "main")[0x185+protection_index++];
 			else
 				protection_data = 0xc9;
 
@@ -436,64 +436,64 @@ Visit The ROMLiST Homepage: Http://hem.passagen.se/ogg/
 ***************************************************************************/
 
 ROM_START( thedeep )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )		/* Z80 Code */
+	ROM_REGION( 0x20000, "main", 0 )		/* Z80 Code */
 	ROM_LOAD( "dp-10.rom", 0x00000, 0x08000, CRC(7480b7a5) SHA1(ac6f121873a70c8077576322c201b7089c7b8a91) )
 	ROM_LOAD( "dp-09.rom", 0x10000, 0x10000, CRC(c630aece) SHA1(809916a1ba1c8e0af4c228b0f26ac638e2abf81e) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )		/* 65C02 Code */
+	ROM_REGION( 0x10000, "audio", 0 )		/* 65C02 Code */
 	ROM_LOAD( "dp-12.rom", 0x8000, 0x8000, CRC(c4e848c4) SHA1(d2dec5c8d7d59703f5485cab9124bf4f835fe728) )
 
-	ROM_REGION( 0x1000, RGNCLASS_CPU, "cpu2", 0 )		/* i8751 Code */
+	ROM_REGION( 0x1000, "cpu2", 0 )		/* i8751 Code */
 	ROM_LOAD( "dp-14", 0x0000, 0x1000, CRC(0b886dad) SHA1(487192764342f8b0a320d20a378bf94f84592da9) )	// 1xxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "dp-08.rom", 0x00000, 0x10000, CRC(c5624f6b) SHA1(a3c0b13cddae760f30c7344d718cd69cad990054) )
 	ROM_LOAD( "dp-07.rom", 0x10000, 0x10000, CRC(c76768c1) SHA1(e41ace1cb06ebe7f676b3b179b7dd01d00cf4d6a) )
 	ROM_LOAD( "dp-06.rom", 0x20000, 0x10000, CRC(98adea78) SHA1(6a1af70de995a0a5e42fd395dd9454b7e2d9cb82) )
 	ROM_LOAD( "dp-05.rom", 0x30000, 0x10000, CRC(76ea7dd1) SHA1(c29abb44a1182b47da749eeeb2db025ae3f28ea7) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* 16x16x4 Background Layer */
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )	/* 16x16x4 Background Layer */
 	ROM_LOAD( "dp-03.rom", 0x00000, 0x10000, CRC(6bf5d819) SHA1(74079632d7c88ec22010c1a5bece0e36847fdab9) )
 	ROM_LOAD( "dp-01.rom", 0x10000, 0x10000, CRC(e56be2fe) SHA1(25acc0f6d9cb5a727c9bac3e80aeb85a4727ddb0) )
 	ROM_LOAD( "dp-04.rom", 0x20000, 0x10000, CRC(4db02c3c) SHA1(6284541372dec1113570cef31ca3c1a202fb4add) )
 	ROM_LOAD( "dp-02.rom", 0x30000, 0x10000, CRC(1add423b) SHA1(b565340d719044ba2c428aab74f43f5a7cf7e2a3) )
 
-	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )	/* 8x8x2 Text Layer */
+	ROM_REGION( 0x4000, "gfx3", ROMREGION_DISPOSE )	/* 8x8x2 Text Layer */
 	ROM_LOAD( "dp-11.rom", 0x0000, 0x4000, CRC(196e23d1) SHA1(ed14e63fccb3e5dce462d9b8155e78749eaf9b3b) )
 
-	ROM_REGION( 0x600, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )	/* Colors */
+	ROM_REGION( 0x600, "proms", ROMREGION_DISPOSE )	/* Colors */
 	ROM_LOAD( "fi-1", 0x000, 0x200, CRC(f31efe09) SHA1(808c90fe02ed7b4000967c331b8773c4168b8a97) )	// FIXED BITS (xxxxxx0xxxxxx0x0)
 	ROM_LOAD( "fi-2", 0x200, 0x200, CRC(f305c8d5) SHA1(f82c709dc75a3c681d6f0ebf2702cb90110b1f0c) )	// FIXED BITS (0000xxxx)
 	ROM_LOAD( "fi-3", 0x400, 0x200, CRC(f61a9686) SHA1(24082f60b72268d240ceca6999bdf18872625cd2) )
 ROM_END
 
 ROM_START( rundeep )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )		/* Z80 Code */
+	ROM_REGION( 0x20000, "main", 0 )		/* Z80 Code */
 	ROM_LOAD( "3", 0x00000, 0x08000, CRC(c9c9e194) SHA1(e9552c3321585f0902f29b55a7de8e2316885713) )
 	ROM_LOAD( "9", 0x10000, 0x10000, CRC(931f4e67) SHA1(f4942c5f0fdbcd6cdb96ddbbf2015f938b56b466) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )		/* 65C02 Code */
+	ROM_REGION( 0x10000, "audio", 0 )		/* 65C02 Code */
 	ROM_LOAD( "dp-12.rom", 0x8000, 0x8000, CRC(c4e848c4) SHA1(d2dec5c8d7d59703f5485cab9124bf4f835fe728) )
 
-	ROM_REGION( 0x1000, RGNCLASS_CPU, "cpu2", 0 )		/* i8751 Code */
+	ROM_REGION( 0x1000, "cpu2", 0 )		/* i8751 Code */
 	ROM_LOAD( "dp-14", 0x0000, 0x1000, CRC(0b886dad) SHA1(487192764342f8b0a320d20a378bf94f84592da9) )	// 1xxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "dp-08.rom", 0x00000, 0x10000, CRC(c5624f6b) SHA1(a3c0b13cddae760f30c7344d718cd69cad990054) )
 	ROM_LOAD( "dp-07.rom", 0x10000, 0x10000, CRC(c76768c1) SHA1(e41ace1cb06ebe7f676b3b179b7dd01d00cf4d6a) )
 	ROM_LOAD( "dp-06.rom", 0x20000, 0x10000, CRC(98adea78) SHA1(6a1af70de995a0a5e42fd395dd9454b7e2d9cb82) )
 	ROM_LOAD( "dp-05.rom", 0x30000, 0x10000, CRC(76ea7dd1) SHA1(c29abb44a1182b47da749eeeb2db025ae3f28ea7) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* 16x16x4 Background Layer */
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )	/* 16x16x4 Background Layer */
 	ROM_LOAD( "dp-03.rom", 0x00000, 0x10000, CRC(6bf5d819) SHA1(74079632d7c88ec22010c1a5bece0e36847fdab9) )
 	ROM_LOAD( "dp-01.rom", 0x10000, 0x10000, CRC(e56be2fe) SHA1(25acc0f6d9cb5a727c9bac3e80aeb85a4727ddb0) )
 	ROM_LOAD( "dp-04.rom", 0x20000, 0x10000, CRC(4db02c3c) SHA1(6284541372dec1113570cef31ca3c1a202fb4add) )
 	ROM_LOAD( "dp-02.rom", 0x30000, 0x10000, CRC(1add423b) SHA1(b565340d719044ba2c428aab74f43f5a7cf7e2a3) )
 
-	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )	/* 8x8x2 Text Layer */
+	ROM_REGION( 0x4000, "gfx3", ROMREGION_DISPOSE )	/* 8x8x2 Text Layer */
 	ROM_LOAD( "11", 0x0000, 0x4000, CRC(5d29e4b9) SHA1(608345291062e9ce329ebe9a8c1e65d52e358785) )
 
-	ROM_REGION( 0x600, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )	/* Colors */
+	ROM_REGION( 0x600, "proms", ROMREGION_DISPOSE )	/* Colors */
 	ROM_LOAD( "fi-1", 0x000, 0x200, CRC(f31efe09) SHA1(808c90fe02ed7b4000967c331b8773c4168b8a97) )	// FIXED BITS (xxxxxx0xxxxxx0x0)
 	ROM_LOAD( "fi-2", 0x200, 0x200, CRC(f305c8d5) SHA1(f82c709dc75a3c681d6f0ebf2702cb90110b1f0c) )	// FIXED BITS (0000xxxx)
 	ROM_LOAD( "fi-3", 0x400, 0x200, CRC(f61a9686) SHA1(24082f60b72268d240ceca6999bdf18872625cd2) )

@@ -77,7 +77,7 @@ VIDEO_START( gradius3 )
 	/* re-decode the sprites because the ROMs are connected to the custom IC differently
        from how they are connected to the CPU. */
 	for (i = 0;i < TOTAL_SPRITES;i++)
-		decodechar(machine->gfx[1],i,memory_region(machine, RGNCLASS_GFX, "gfx2"));
+		decodechar(machine->gfx[1],i,memory_region(machine, "gfx2"));
 
 	dirtychar = auto_malloc(TOTAL_CHARS);
 	memset(dirtychar,1,TOTAL_CHARS);
@@ -93,7 +93,7 @@ VIDEO_START( gradius3 )
 
 READ16_HANDLER( gradius3_gfxrom_r )
 {
-	UINT8 *gfxdata = memory_region(machine, RGNCLASS_GFX, "gfx2");
+	UINT8 *gfxdata = memory_region(machine, "gfx2");
 
 	return (gfxdata[2*offset+1] << 8) | gfxdata[2*offset];
 }

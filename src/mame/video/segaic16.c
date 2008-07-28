@@ -1498,9 +1498,9 @@ WRITE16_HANDLER( segaic16_textram_0_w )
 
 static void segaic16_sprites_hangon_draw(running_machine *machine, struct sprite_info *info, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 numbanks = memory_region_length(machine, RGNCLASS_GFX, "gfx2") / 0x10000;
-	const UINT16 *spritebase = (const UINT16 *)memory_region(machine, RGNCLASS_GFX, "gfx2");
-	const UINT8 *zoom = (const UINT8 *)memory_region(machine, RGNCLASS_PROMS, "proms");
+	UINT8 numbanks = memory_region_length(machine, "gfx2") / 0x10000;
+	const UINT16 *spritebase = (const UINT16 *)memory_region(machine, "gfx2");
+	const UINT8 *zoom = (const UINT8 *)memory_region(machine, "proms");
 	UINT16 *data;
 
 	/* first scan forward to find the end of the list */
@@ -1662,9 +1662,9 @@ static void segaic16_sprites_hangon_draw(running_machine *machine, struct sprite
 
 static void segaic16_sprites_sharrier_draw(running_machine *machine, struct sprite_info *info, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 numbanks = memory_region_length(machine, RGNCLASS_GFX, "gfx2") / 0x20000;
-	const UINT32 *spritebase = (const UINT32 *)memory_region(machine, RGNCLASS_GFX, "gfx2");
-	const UINT8 *zoom = (const UINT8 *)memory_region(machine, RGNCLASS_PROMS, "proms");
+	UINT8 numbanks = memory_region_length(machine, "gfx2") / 0x20000;
+	const UINT32 *spritebase = (const UINT32 *)memory_region(machine, "gfx2");
+	const UINT8 *zoom = (const UINT8 *)memory_region(machine, "proms");
 	UINT16 *data;
 
 	/* first scan forward to find the end of the list */
@@ -1832,8 +1832,8 @@ static void segaic16_sprites_sharrier_draw(running_machine *machine, struct spri
 
 static void segaic16_sprites_16a_draw(running_machine *machine, struct sprite_info *info, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 numbanks = memory_region_length(machine, RGNCLASS_GFX, "gfx2") / 0x10000;
-	const UINT16 *spritebase = (const UINT16 *)memory_region(machine, RGNCLASS_GFX, "gfx2");
+	UINT8 numbanks = memory_region_length(machine, "gfx2") / 0x10000;
+	const UINT16 *spritebase = (const UINT16 *)memory_region(machine, "gfx2");
 	UINT16 *data;
 
 	/* first scan forward to find the end of the list */
@@ -1991,11 +1991,11 @@ static void segaic16_sprites_16b_draw(running_machine *machine, struct sprite_in
 	const UINT16 *spritebase;
   	UINT16 *data;
 
-	spritebase = (const UINT16 *)memory_region(machine, RGNCLASS_GFX, "gfx2");
+	spritebase = (const UINT16 *)memory_region(machine, "gfx2");
 	if (!spritebase)
 		return;
 
-	numbanks = memory_region_length(machine, RGNCLASS_GFX, "gfx2") / 0x20000;
+	numbanks = memory_region_length(machine, "gfx2") / 0x20000;
 
 	/* first scan forward to find the end of the list */
 	for (data = info->spriteram; data < info->spriteram + info->ramsize/2; data += 8)
@@ -2145,8 +2145,8 @@ static void segaic16_sprites_16b_draw(running_machine *machine, struct sprite_in
 
 static void segaic16_sprites_yboard_16b_draw(running_machine *machine, struct sprite_info *info, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 numbanks = memory_region_length(machine, RGNCLASS_GFX, "gfx2") / 0x20000;
-	const UINT16 *spritebase = (const UINT16 *)memory_region(machine, RGNCLASS_GFX, "gfx2");
+	UINT8 numbanks = memory_region_length(machine, "gfx2") / 0x20000;
+	const UINT16 *spritebase = (const UINT16 *)memory_region(machine, "gfx2");
 	UINT16 *data;
 
 	/* first scan forward to find the end of the list */
@@ -2322,8 +2322,8 @@ static void segaic16_sprites_yboard_16b_draw(running_machine *machine, struct sp
 
 static void segaic16_sprites_outrun_draw(running_machine *machine, struct sprite_info *info, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 numbanks = memory_region_length(machine, RGNCLASS_GFX, "gfx2") / 0x40000;
-	const UINT32 *spritebase = (const UINT32 *)memory_region(machine, RGNCLASS_GFX, "gfx2");
+	UINT8 numbanks = memory_region_length(machine, "gfx2") / 0x40000;
+	const UINT32 *spritebase = (const UINT32 *)memory_region(machine, "gfx2");
 	UINT16 *data;
 
 	/* first scan forward to find the end of the list */
@@ -2483,8 +2483,8 @@ static void segaic16_sprites_outrun_draw(running_machine *machine, struct sprite
 
 static void segaic16_sprites_yboard_draw(running_machine *machine, struct sprite_info *info, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 numbanks = memory_region_length(machine, RGNCLASS_GFX, "gfx1") / 0x80000;
-	const UINT64 *spritebase = (const UINT64 *)memory_region(machine, RGNCLASS_GFX, "gfx1");
+	UINT8 numbanks = memory_region_length(machine, "gfx1") / 0x80000;
+	const UINT64 *spritebase = (const UINT64 *)memory_region(machine, "gfx1");
 	const UINT16 *rotatebase = rotate[0].buffer ? rotate[0].buffer : rotate[0].rotateram;
 	UINT8 visited[0x1000];
 	UINT16 *data;
@@ -2895,8 +2895,8 @@ WRITE16_HANDLER( segaic16_sprites_draw_1_w )
 static void segaic16_road_hangon_decode(running_machine *machine, struct road_info *info)
 {
 	int x, y;
-	const UINT8 *gfx = memory_region(machine, RGNCLASS_GFX, "gfx3");
-	int len = memory_region_length(machine, RGNCLASS_GFX, "gfx3");
+	const UINT8 *gfx = memory_region(machine, "gfx3");
+	int len = memory_region_length(machine, "gfx3");
 
 	/* allocate memory for the unpacked road data */
 	info->gfx = auto_malloc(256 * 512);
@@ -3156,8 +3156,8 @@ static void segaic16_road_hangon_draw(struct road_info *info, bitmap_t *bitmap, 
 static void segaic16_road_outrun_decode(running_machine *machine, struct road_info *info)
 {
 	int x, y;
-	const UINT8 *gfx = memory_region(machine, RGNCLASS_GFX, "gfx3");
-	int len = memory_region_length(machine, RGNCLASS_GFX, "gfx3");
+	const UINT8 *gfx = memory_region(machine, "gfx3");
+	int len = memory_region_length(machine, "gfx3");
 
 	/* allocate memory for the unpacked road data */
 	info->gfx = auto_malloc((256 * 2 + 1) * 512);

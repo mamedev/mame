@@ -375,7 +375,7 @@ MACHINE_DRIVER_END
 /* There is a photo of the PCB with blurry IC locations and labels.  Comments reflect what I can (barely) see. */
 ROM_START( istellar )
 	/* Main program CPU */
-	ROM_REGION( 0xa000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0xa000, "main", 0 )
 	ROM_LOAD( "rom2.top", 0x0000, 0x2000, CRC(5d643381) SHA1(75ca52c28a52f534eda00c18b0db97e9923ff670) )	/* At IC location C63 (top board) - label ? */
 	ROM_LOAD( "rom3.top", 0x2000, 0x2000, CRC(ce5a2b09) SHA1(2de6a6e993c3411577ac0c834db8aaf16fb007ed) )	/* At IC location C64 (top board) - label ? */
 	ROM_LOAD( "rom4.top", 0x4000, 0x2000, CRC(7c2cb1f1) SHA1(ffd92510c03c2d35a59d233883c2b9f57394a51c) )	/* At IC location C65 (top board) - label ? */
@@ -383,21 +383,21 @@ ROM_START( istellar )
 	ROM_LOAD( "rom6.top", 0x8000, 0x2000, CRC(0319bf40) SHA1(f324626e457c3eb7d6b74bc6afbfcc3aab2b3c72) )	/* At IC location C67 (top board) - label ? */
 
 	/* Sound CPU */
-	ROM_REGION( 0x2000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x2000, "audio", 0 )
 	ROM_LOAD( "rom1.top", 0x0000, 0x2000, CRC(4f34fb1d) SHA1(56ca19344c84c5989d0be797e2759f84760310be) )	/* At IC location C62 (top board) - label ? */
 
 	/* LDP Communications CPU */
-	ROM_REGION( 0x2000, RGNCLASS_CPU, "sub", 0 )
+	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "rom11.bot", 0x0000, 0x2000, CRC(165cbc57) SHA1(39463888f22ec3125f0686066d923a9aae79a8f7) )	/* At IC location C12 (bottom board) - label IS11 */
 
 	/* Tiles */
-	ROM_REGION( 0x6000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rom9.bot", 0x0000, 0x2000, CRC(9d79acb6) SHA1(72af972695face0016afce8a26c629d963e86d48) )	/* At IC location C47? (bottom board) - label ? */
 	ROM_LOAD( "rom8.bot", 0x2000, 0x2000, CRC(e9c9e490) SHA1(79aa35552b984018bc723adece5c40a0833a313c) )	/* At IC location C48? (bottom board) - label ? */
 	ROM_LOAD( "rom7.bot", 0x4000, 0x2000, CRC(1447ce3a) SHA1(8545cec108df6adab303802b1407c89b2dceba21) )	/* At IC location C49? (bottom board) - label ? */
 
 	/* Color PROMs */
-	ROM_REGION( 0x300, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x300, "proms", 0 )
 	ROM_LOAD( "red6b.bot",   0x000, 0x100, CRC(5c52f844) SHA1(a8a3d91f3247ad13c805d8d8288b07f3cdaf1189) )	/* At IC location C63? (bottom board) - label ? */
 	ROM_LOAD( "green6c.bot", 0x100, 0x100, CRC(7d8c845c) SHA1(04ae2ca0cc6679e21346ce34e9e01aa5bf4e2067) )	/* At IC location C62? (bottom board) - label ? */
 	ROM_LOAD( "blue6d.bot",  0x200, 0x100, CRC(5ebb81f9) SHA1(285d60f2894c524ca80fc68ad7c2dfd9093a67ea) )	/* At IC location C61? (bottom board) - label ? */

@@ -130,7 +130,7 @@ WRITE8_HANDLER( beezer_bankswitch_w )
 	}
 	else
 	{
-		UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main") + 0x10000;
+		UINT8 *rom = memory_region(machine, "main") + 0x10000;
 		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_BANK1);
 		memory_set_bankptr(1, rom + (data & 0x07) * 0x2000 + ((data & 0x08) ? 0x1000: 0));
 	}

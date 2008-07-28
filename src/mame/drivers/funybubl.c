@@ -70,7 +70,7 @@ static WRITE8_HANDLER ( funybubl_vidram_bank_w )
 
 static WRITE8_HANDLER ( funybubl_cpurombank_w )
 {
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *rom = memory_region(machine, "main");
 
 		memory_set_bankptr(2,&rom[0x10000+0x4000*(data&0x3f)]);
 }
@@ -278,11 +278,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( funybubl )
-	ROM_REGION( 0x50000, RGNCLASS_CPU, "main", 0 ) /* main z80, lots of banked data */
+	ROM_REGION( 0x50000, "main", 0 ) /* main z80, lots of banked data */
 	ROM_LOAD( "a.ub16", 0x00000, 0x40000, CRC(4e799cdd) SHA1(c6474fd2f621c27224e847ecb88a1ae17a0dbaf9)  )
 	ROM_RELOAD ( 0x10000, 0x40000 )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT  ) // bg gfx 8x8x8
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT  ) // bg gfx 8x8x8
 	ROM_LOAD( "f.ug13", 0x000000, 0x40000, CRC(64d7163d) SHA1(2619ac96e05779ea23c7f0f71665d284c79ba72f) )
 	ROM_LOAD( "g.uh13", 0x040000, 0x40000, CRC(6891e2b8) SHA1(ca711019e5c330759d2a90024dbc0e6731b6227f) )
 	ROM_LOAD( "h.ug15", 0x080000, 0x40000, CRC(ca7f7528) SHA1(6becfe8fabd19443a13b948838f41e10e5c9dc87) )
@@ -292,16 +292,16 @@ ROM_START( funybubl )
 	ROM_LOAD( "n.ug17", 0x180000, 0x40000, CRC(52398b68) SHA1(522baa8123998e9161fa1ccaf760ac006c5be2dd) )
 	ROM_LOAD( "o.uh17", 0x1c0000, 0x40000, CRC(446e31b2) SHA1(7f37a7090c83f2c9b07f1993707540fb32bbed35) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE | ROMREGION_INVERT )
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE | ROMREGION_INVERT )
 	ROM_LOAD( "d.ug1", 0x000000, 0x80000, CRC(b7ebbc00) SHA1(92520fda2f8f242b8cd49aeaac21b279f48276bf) ) /* Same as below, different labels */
 	ROM_LOAD( "e.ug2", 0x080000, 0x80000, CRC(28afc396) SHA1(555d51948ffb237311112dcfd0516a43f603ff03) )
 	ROM_LOAD( "j.ug3", 0x100000, 0x80000, CRC(9e8687cd) SHA1(42fcba2532ae5028fcfc1df50750d99ad2586820) )
 	ROM_LOAD( "k.ug4", 0x180000, 0x80000, CRC(63f0e810) SHA1(5c7ed32ee8dc1d9aabc8d136ec370471096356c2) )
 
-	ROM_REGION( 0x08000, RGNCLASS_CPU, "audio", 0 ) /* sound z80 (not much code here ..) */
+	ROM_REGION( 0x08000, "audio", 0 ) /* sound z80 (not much code here ..) */
 	ROM_LOAD( "p.su6", 0x00000,  0x08000, CRC(33169d4d) SHA1(0ebc932d15b6df022c7e1f44df884e64b25ba745) ) /* Same as below, different label */
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "b.su12", 0x00000,  0x20000, CRC(a2d780f4) SHA1(bebba3db21ab9ddde8c6f19db3b67c869df582eb) ) /* Same as below, different label */
 	ROM_RELOAD(         0x40000,  0x20000 )
 	ROM_LOAD( "c.su13", 0x20000,  0x20000, CRC(1f7e9269) SHA1(5c16b49a4e94aec7606d088c2d45a77842ab565b) ) /* Same as below, different label */
@@ -309,11 +309,11 @@ ROM_START( funybubl )
 ROM_END
 
 ROM_START( funybubc )
-	ROM_REGION( 0x50000, RGNCLASS_CPU, "main", 0 ) /* main z80, lots of banked data */
+	ROM_REGION( 0x50000, "main", 0 ) /* main z80, lots of banked data */
 	ROM_LOAD( "2.ub16", 0x00000, 0x40000, CRC(d684c13f) SHA1(6a58b44dd775f374d6fd476a8fd175c28a83a495)  )
 	ROM_RELOAD ( 0x10000, 0x40000 )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT  ) // bg gfx 8x8x8
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT  ) // bg gfx 8x8x8
 	ROM_LOAD( "7.ug12",  0x000000, 0x40000, CRC(87603d7b) SHA1(21aec4cd011691f8608c3ddab83697bd89634fc8) )
 	ROM_LOAD( "8.uh13",  0x040000, 0x40000, CRC(ab6031bd) SHA1(557793817f98c07c82caab4293aed7dffa4dbf7b) )
 	ROM_LOAD( "9.ug15",  0x080000, 0x40000, CRC(0e8352ff) SHA1(29679a7ece2585e1a66296439b68bd56c937e313) )
@@ -323,16 +323,16 @@ ROM_START( funybubc )
 	ROM_LOAD( "15.ug17", 0x180000, 0x40000, CRC(9a5e66a6) SHA1(cbe727e4f1e9a7072520d2e30eb0047cc67bff1b) )
 	ROM_LOAD( "16.uh17", 0x1c0000, 0x40000, CRC(218060b3) SHA1(35124afce7f0f998b5c4761bbc888235de4e56ef) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE | ROMREGION_INVERT )
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE | ROMREGION_INVERT )
 	ROM_LOAD( "5.ug1",  0x000000, 0x80000, CRC(b7ebbc00) SHA1(92520fda2f8f242b8cd49aeaac21b279f48276bf) )
 	ROM_LOAD( "6.ug2",  0x080000, 0x80000, CRC(28afc396) SHA1(555d51948ffb237311112dcfd0516a43f603ff03) )
 	ROM_LOAD( "11.ug3", 0x100000, 0x80000, CRC(9e8687cd) SHA1(42fcba2532ae5028fcfc1df50750d99ad2586820) )
 	ROM_LOAD( "12.ug4", 0x180000, 0x80000, CRC(63f0e810) SHA1(5c7ed32ee8dc1d9aabc8d136ec370471096356c2) )
 
-	ROM_REGION( 0x08000, RGNCLASS_CPU, "audio", 0 ) /* sound z80 (not much code here ..) */
+	ROM_REGION( 0x08000, "audio", 0 ) /* sound z80 (not much code here ..) */
 	ROM_LOAD( "1.su6", 0x00000,  0x08000, CRC(33169d4d) SHA1(0ebc932d15b6df022c7e1f44df884e64b25ba745) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "3.su12", 0x00000,  0x20000, CRC(a2d780f4) SHA1(bebba3db21ab9ddde8c6f19db3b67c869df582eb) )
 	ROM_RELOAD(         0x40000,  0x20000 )
 	ROM_LOAD( "4.su13", 0x20000,  0x20000, CRC(1f7e9269) SHA1(5c16b49a4e94aec7606d088c2d45a77842ab565b) )

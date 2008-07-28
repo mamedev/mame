@@ -882,7 +882,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( berzerk )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "1c-0",         0x0000, 0x0800, CRC(ca566dbc) SHA1(fae2647f12f1cd82826db61b53b116a5e0c9f995) )
 	ROM_LOAD( "1d-1",         0x1000, 0x0800, CRC(7ba69fde) SHA1(69af170c4a39a3494dcd180737e5c87b455f9203) )
 	ROM_LOAD( "3d-2",         0x1800, 0x0800, CRC(a1d5248b) SHA1(a0b7842f6a5f86c16d80d78e7012c78b3ea11d1d) )
@@ -891,13 +891,13 @@ ROM_START( berzerk )
 	ROM_LOAD( "5c-5",         0x3000, 0x0800, CRC(c8c665e5) SHA1(e9eca4b119549e0061384abf52327c14b0d56624) )
 	ROM_FILL( 0x3800, 0x0800, 0xff )
 
-	ROM_REGION( 0x01000, RGNCLASS_SOUND, "speech", 0 ) /* voice data */
+	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
 	ROM_LOAD( "1c",           0x0000, 0x0800, CRC(2cfe825d) SHA1(f12fed8712f20fa8213f606c4049a8144bfea42e) )	/* VSU-1000 board */
 	ROM_LOAD( "2c",           0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )
 ROM_END
 
 ROM_START( berzerk1 )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "rom0.1c",      0x0000, 0x0800, CRC(5b7eb77d) SHA1(8de488e279036fe40d6fb4c0dde16075309342fd) )
 	ROM_LOAD( "rom1.1d",      0x1000, 0x0800, CRC(e58c8678) SHA1(a11f08448b457d690b270512c9f02fcf1e41d9e0) )
 	ROM_LOAD( "rom2.3d",      0x1800, 0x0800, CRC(705bb339) SHA1(845191df90cd7d80f8fed3d2b69305301d921549) )
@@ -906,25 +906,25 @@ ROM_START( berzerk1 )
 	ROM_LOAD( "rom5.5c",      0x3000, 0x0800, CRC(2579b9f4) SHA1(890f0237afbb194166eae88c98de81989f408548) )
 	ROM_FILL( 0x3800, 0x0800, 0xff )
 
-	ROM_REGION( 0x01000, RGNCLASS_SOUND, "speech", 0 ) /* voice data */
+	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
 	ROM_LOAD( "1c",           0x0000, 0x0800, CRC(2cfe825d) SHA1(f12fed8712f20fa8213f606c4049a8144bfea42e) )	/* VSU-1000 board */
 	ROM_LOAD( "2c",           0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )
 ROM_END
 
 
 ROM_START( frenzy )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "1c-0",         0x0000, 0x1000, CRC(abdd25b8) SHA1(e6a3ab826b51b2c6ddd63d55681848fccad800dd) )
 	ROM_LOAD( "1d-1",         0x1000, 0x1000, CRC(536e4ae8) SHA1(913385c43b8902d3d3ad2194a3137e19e61c6573) )
 	ROM_LOAD( "3d-2",         0x2000, 0x1000, CRC(3eb9bc9b) SHA1(1e43e76ae0606a6d41d9006005d6001bdee48694) )
 	ROM_LOAD( "5d-3",         0x3000, 0x1000, CRC(e1d3133c) SHA1(2af4a9bc2b29735a548ae770f872127bc009cc42) )
 	ROM_LOAD( "6d-4",         0xc000, 0x1000, CRC(5581a7b1) SHA1(1f633c1c29d3b64f701c601feba26da66a6c6f23) )
 
-	ROM_REGION( 0x01000, RGNCLASS_SOUND, "speech", 0 ) /* voice data */
+	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
 	ROM_LOAD( "1c",           0x0000, 0x0800, CRC(2cfe825d) SHA1(f12fed8712f20fa8213f606c4049a8144bfea42e) )	/* VSU-1000 board */
 	ROM_LOAD( "2c",           0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )        /* ditto */
 
-	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0020, "proms", ROMREGION_DISPOSE )
 	ROM_LOAD( "prom.6e",      0x0000, 0x0020, CRC(4471ca5d) SHA1(ba8dca2ec076818f8ad8c17b15c77965e36fa05e) ) /* address decoder/rom select prom (N82S123N) */
 ROM_END
 
@@ -937,7 +937,7 @@ ROM_END
    'Moon War 2' because it is the second version, and many of the PCBs are labeled as such
 */
 ROM_START( moonwarp )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "1c",         0x0000, 0x1000, NO_DUMP )
 	/*ROM_LOAD( "3c",         0x?000, 0x?000, NO_DUMP ) */ /* likely unused */
 	ROM_LOAD( "1d",         0x1000, 0x1000, NO_DUMP )
@@ -945,11 +945,11 @@ ROM_START( moonwarp )
 	ROM_LOAD( "5d",         0x3000, 0x1000, NO_DUMP )
 	ROM_LOAD( "6d",         0xc000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x01000, RGNCLASS_SOUND, "speech", 0 ) /* voice data */
+	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
 	ROM_LOAD( "moonwar.1c.bin",           0x0000, 0x0800, CRC(9e9a653f) SHA1(cf49a38ef343ace271ba1e5dde38bd8b9c0bd876) )	/* VSU-1000 board */
 	ROM_LOAD( "moonwar.2c.bin",           0x0800, 0x0800, CRC(73fd988d) SHA1(08a2aeb4d87eee58e38e4e3f749a95f2308aceb0) )    /* ditto */
 
-	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0020, "proms", ROMREGION_DISPOSE )
 	ROM_LOAD( "prom.6e",        0x0000, 0x0020, CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/rom select prom */
 ROM_END
 

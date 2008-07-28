@@ -35,7 +35,7 @@ static UINT32 dac_adr,dac_bank,dac_adr_s,dac_adr_e,dac_busy;
 
 static TIMER_CALLBACK( dac_callback )
 {
-	UINT8 *DACROM = memory_region(machine, RGNCLASS_SOUND, "samples");
+	UINT8 *DACROM = memory_region(machine, "samples");
 
 	DAC_data_w(0,DACROM[(dac_bank * 0x10000 + dac_adr++) & 0x1ffff]);
 
@@ -68,7 +68,7 @@ static MACHINE_RESET( mjsister )
 
 static WRITE8_HANDLER( mjsister_banksel1_w )
 {
-	UINT8 *BANKROM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *BANKROM = memory_region(machine, "main");
 	int tmp = mjsister_colorbank;
 
 	switch (data)
@@ -104,7 +104,7 @@ static WRITE8_HANDLER( mjsister_banksel1_w )
 
 static WRITE8_HANDLER( mjsister_banksel2_w )
 {
-	UINT8 *BANKROM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *BANKROM = memory_region(machine, "main");
 
 	switch (data)
 	{
@@ -350,16 +350,16 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( mjsister )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )   /* CPU */
+	ROM_REGION( 0x30000, "main", 0 )   /* CPU */
 	ROM_LOAD( "ms00.bin",  0x00000, 0x08000, CRC(9468c33b) SHA1(63aecdcaa8493d58549dfd1d217743210cf953bc) )
 	ROM_LOAD( "ms01t.bin", 0x10000, 0x10000, CRC(a7b6e530) SHA1(fda9bea214968a8814d2c43226b3b32316581050) ) /* banked */
 	ROM_LOAD( "ms02t.bin", 0x20000, 0x10000, CRC(7752b5ba) SHA1(84dcf27a62eb290ba07c85af155897ec72f320a8) ) /* banked */
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "samples", 0 ) /* samples */
+	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
 	ROM_LOAD( "ms03.bin", 0x00000,  0x10000, CRC(10a68e5e) SHA1(a0e2fa34c1c4f34642f65fbf17e9da9c2554a0c6) )
 	ROM_LOAD( "ms04.bin", 0x10000,  0x10000, CRC(641b09c1) SHA1(15cde906175bcb5190d36cc91cbef003ef91e425) )
 
-	ROM_REGION( 0x00400, RGNCLASS_PROMS, "proms", 0 ) /* color PROMs */
+	ROM_REGION( 0x00400, "proms", 0 ) /* color PROMs */
 	ROM_LOAD( "ms05.bpr", 0x0000,  0x0100, CRC(dd231a5f) SHA1(be008593ac8ba8f5a1dd5b188dc7dc4c03016805) ) // R
 	ROM_LOAD( "ms06.bpr", 0x0100,  0x0100, CRC(df8e8852) SHA1(842a891440aef55a560d24c96f249618b9f4b97f) ) // G
 	ROM_LOAD( "ms07.bpr", 0x0200,  0x0100, CRC(6cb3a735) SHA1(468ae3d40552dc2ec24f5f2988850093d73948a6) ) // B

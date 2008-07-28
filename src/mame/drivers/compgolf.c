@@ -42,7 +42,7 @@ static WRITE8_HANDLER( compgolf_ctrl_w )
 	if( bank != new_bank )
 	{
 		bank = new_bank;
-		memory_set_bankptr(1, memory_region(machine, RGNCLASS_USER, "user1") + 0x4000 * bank);
+		memory_set_bankptr(1, memory_region(machine, "user1") + 0x4000 * bank);
 	}
 
 	compgolf_scrollx_hi = (data & 1) << 8;
@@ -241,61 +241,61 @@ MACHINE_DRIVER_END
 /***************************************************************************/
 
 ROM_START( compgolf )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "cv05-3.bin",   0x08000, 0x8000, CRC(af9805bf) SHA1(bdde482906bb267e76317067785ac0ab7816df63) )
 
-	ROM_REGION( 0x8000, RGNCLASS_USER, "user1", 0 ) // background data
+	ROM_REGION( 0x8000, "user1", 0 ) // background data
 	ROM_LOAD( "cv06.bin",     0x00000, 0x8000, CRC(8f76979d) SHA1(432f6a1402fd3276669f5f45f03fd12380900178) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) // Sprites
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE ) // Sprites
 	ROM_LOAD( "cv00.bin",     0x00000, 0x8000, CRC(aa3d3b99) SHA1(eb968e40bcc7e7dd1acc0bbe885fd3f7d70d4bb5) )
 	ROM_LOAD( "cv01.bin",     0x08000, 0x8000, CRC(f68c2ff6) SHA1(dda9159fb59d3855025b98c272722b031617c89a) )
 	ROM_LOAD( "cv02.bin",     0x10000, 0x8000, CRC(979cdb5a) SHA1(25c1f3e6ddf50168c7e1a967bfa2753bea6106ec) )
 
-	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "cv03.bin",     0x00000, 0x8000, CRC(cc7ed6d8) SHA1(4ffcfa3f720414e1b7e929bdf29359ebcd8717c3) )
 	/* we expand rom cv04.bin to 0x8000 - 0xffff */
 
-	ROM_REGION( 0x8000,  RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x8000,  "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "cv07.bin",     0x00000, 0x8000, CRC(ed5441ba) SHA1(69d50695e8b92544f9857c6f3de0efb399899a2c) )
 
-	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "cv04.bin",     0x00000, 0x4000, CRC(df693a04) SHA1(45bef98c7e66881f8c62affecc1ab90dd2707240) )
 
-	ROM_REGION( 0x100, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cv08-1.bpr",   0x00000, 0x0100, CRC(b7c43db9) SHA1(418b11e4c8a9bce6873b0624ac53a5011c5807d0) )
 ROM_END
 
 ROM_START( compglfo )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "cv05.bin",     0x08000, 0x8000, CRC(3cef62c9) SHA1(c4827b45faf7aa4c80ddd3c57f1ed6ba76b5c49b) )
 
-	ROM_REGION( 0x8000, RGNCLASS_USER, "user1", 0 ) // background data
+	ROM_REGION( 0x8000, "user1", 0 ) // background data
 	ROM_LOAD( "cv06.bin",     0x00000, 0x8000, CRC(8f76979d) SHA1(432f6a1402fd3276669f5f45f03fd12380900178) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) // Sprites
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE ) // Sprites
 	ROM_LOAD( "cv00.bin",     0x00000, 0x8000, CRC(aa3d3b99) SHA1(eb968e40bcc7e7dd1acc0bbe885fd3f7d70d4bb5) )
 	ROM_LOAD( "cv01.bin",     0x08000, 0x8000, CRC(f68c2ff6) SHA1(dda9159fb59d3855025b98c272722b031617c89a) )
 	ROM_LOAD( "cv02.bin",     0x10000, 0x8000, CRC(979cdb5a) SHA1(25c1f3e6ddf50168c7e1a967bfa2753bea6106ec) )
 
-	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "cv03.bin",     0x00000, 0x8000, CRC(cc7ed6d8) SHA1(4ffcfa3f720414e1b7e929bdf29359ebcd8717c3) )
 	/* we expand rom cv04.bin to 0x8000 - 0xffff */
 
-	ROM_REGION( 0x8000,  RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x8000,  "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "cv07.bin",     0x00000, 0x8000, CRC(ed5441ba) SHA1(69d50695e8b92544f9857c6f3de0efb399899a2c) )
 
-	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "cv04.bin",     0x00000, 0x4000, CRC(df693a04) SHA1(45bef98c7e66881f8c62affecc1ab90dd2707240) )
 
-	ROM_REGION( 0x100, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cv08-1.bpr",   0x00000, 0x0100, CRC(b7c43db9) SHA1(418b11e4c8a9bce6873b0624ac53a5011c5807d0) )
 ROM_END
 
 static void compgolf_expand_bg(running_machine *machine)
 {
-	UINT8 *GFXDST = memory_region(machine, RGNCLASS_GFX, "gfx2");
-	UINT8 *GFXSRC = memory_region(machine, RGNCLASS_GFX, "gfx4");
+	UINT8 *GFXDST = memory_region(machine, "gfx2");
+	UINT8 *GFXSRC = memory_region(machine, "gfx4");
 
 	int x;
 

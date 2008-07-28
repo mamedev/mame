@@ -374,15 +374,15 @@ Info by f205v (26/03/2008)
 ***************************************************************************/
 
 ROM_START( victor5 )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "1.u1", 0x00000, 0x10000, CRC(e3ada2fc) SHA1(eddb460dcb80a29fbbe3ed6c4733c75b892baf52) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "2.u24", 0x00000, 0x8000, CRC(1229e951) SHA1(1e548625bb60e2d6f52a376a0dea9e5709f94135) )
 	ROM_LOAD( "3.u23", 0x08000, 0x8000, CRC(2d89bbf1) SHA1(d7fda0174a835e88b330dfd09bdb604bfe4c2e44) )
 	ROM_LOAD( "4.u22", 0x10000, 0x8000, CRC(ecf840a1) SHA1(9ecf522afb23e3557d37effc3c8568e8a14dad1a) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", ROMREGION_ERASE )
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE )
 	// rom socket is empty
 ROM_END
 
@@ -423,18 +423,18 @@ Info by f205v, Corrado Tomaselli (20/04/2008)
 ***************************************************************************/
 
 ROM_START( victor21 )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "1.u1", 0x00000, 0x10000, CRC(43999b2d) SHA1(7ce26fd332ffe35fd826a1a6166b228d4bc370b8) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "2.u24", 0x00000, 0x8000, CRC(f1181b93) SHA1(53cd4d2ce13973495b51d911a4745a69a9784983) )
 	ROM_LOAD( "3.u25", 0x08000, 0x8000, CRC(437abb27) SHA1(bd3790807d60a41d58e07f60fb990553076d6e96) )
 	ROM_LOAD( "4.u26", 0x10000, 0x8000, CRC(e2f66eee) SHA1(ece924fe626f21fd7d31faabf19225d80e2bcfd3) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", ROMREGION_ERASE )
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE )
 	// rom socket is empty
 
-	ROM_REGION( 0x200, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200, "proms", ROMREGION_DISPOSE )
 	ROM_LOAD( "74s287.u35", 0x000, 0x100, CRC(40094bed) SHA1(b25d96126b3f7bd06bf76dc9958f8669f83abdb7) )
 	ROM_LOAD( "74s287.u36", 0x100, 0x100, CRC(9ca021c5) SHA1(6a1d8d4f958d36e4a676dc4f4aee83d637933bc3) )
 ROM_END
@@ -480,10 +480,10 @@ Info by f205v (25/03/2008)
 ***************************************************************************/
 
 ROM_START( sharkpy )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "shark_n.1.u18", 0x00000, 0x10000, CRC(25aeac2f) SHA1(d94e3e5cfffd150ac48e1463493a8323f42e7a89) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "shark_n.2.u17", 0x00000, 0x08000, CRC(c27f3d0a) SHA1(77c8eb0322c5b9c89777cb080d26ecf9abe01ae7) )
 	ROM_CONTINUE(              0x10000, 0x08000 )
 	ROM_CONTINUE(              0x08000, 0x08000 )
@@ -493,10 +493,10 @@ ROM_START( sharkpy )
 	ROM_CONTINUE(              0x28000, 0x08000 )
 	ROM_CONTINUE(              0x38000, 0x08000 )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x20000, "oki", 0 )
 	ROM_LOAD( "shark(ii)-italy_4_ver1.0.u54", 0x00000, 0x20000, CRC(9f384c59) SHA1(d2b087b8370b40b6f0944de661ea6aebaebea06f) )
 
-	ROM_REGION( 0x300, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )
+	ROM_REGION( 0x300, "proms", ROMREGION_DISPOSE )
 	ROM_LOAD( "n82s129an.u11", 0x000, 0x100, CRC(daf3657a) SHA1(93005938e2d60d54e7bbf1e234bba3802ee1af21) )
 	ROM_LOAD( "n82s129an.u12", 0x100, 0x100, CRC(5a7a25ed) SHA1(eebd679195e6ea50f64f3c46cd06ee21a1550491) )
 	ROM_LOAD( "n82s129an.u13", 0x200, 0x100, CRC(0ef5f218) SHA1(a02cf266661385aa078563bd83240d36549c1cf0) )
@@ -543,10 +543,10 @@ Info by f205v (25/03/2008)
 ***************************************************************************/
 
 ROM_START( sharkpya )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "shark1.6.u18", 0x00000, 0x10000, CRC(365312a0) SHA1(de8370b1f35e8d071185d2e5f2fbd2fdf74c55ac) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "shark_n.2.u17", 0x00000, 0x08000, CRC(c27f3d0a) SHA1(77c8eb0322c5b9c89777cb080d26ecf9abe01ae7) )
 	ROM_CONTINUE(              0x10000, 0x08000 )
 	ROM_CONTINUE(              0x08000, 0x08000 )
@@ -556,10 +556,10 @@ ROM_START( sharkpya )
 	ROM_CONTINUE(              0x28000, 0x08000 )
 	ROM_CONTINUE(              0x38000, 0x08000 )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x20000, "oki", 0 )
 	ROM_LOAD( "shark(ii)-italy_4_ver1.0.u54", 0x00000, 0x20000, CRC(9f384c59) SHA1(d2b087b8370b40b6f0944de661ea6aebaebea06f) )
 
-	ROM_REGION( 0x300, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )
+	ROM_REGION( 0x300, "proms", ROMREGION_DISPOSE )
 	ROM_LOAD( "sn82s129an.u11", 0x000, 0x100, CRC(daf3657a) SHA1(93005938e2d60d54e7bbf1e234bba3802ee1af21) )
 	ROM_LOAD( "sn82s129an.u12", 0x100, 0x100, CRC(5a7a25ed) SHA1(eebd679195e6ea50f64f3c46cd06ee21a1550491) )
 	ROM_LOAD( "sn82s129an.u13", 0x200, 0x100, CRC(0ef5f218) SHA1(a02cf266661385aa078563bd83240d36549c1cf0) )
@@ -605,10 +605,10 @@ Info by f205v (29/12/2005)
 ***************************************************************************/
 
 ROM_START( smoto16 )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "rideritaly_1ver1.6.u18", 0x0000, 0x10000, CRC(c7c0c3e8) SHA1(5dc80bc775f370653135a7b3ea9c8d3c92263804) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rideritaly_3ver1.6.u16", 0x00000, 0x08000, CRC(998a8feb) SHA1(27f08b23f2dd3736f4f12f489d9a3aa096c99e8a) )
 	ROM_CONTINUE(                       0x10000, 0x08000 )
 	ROM_CONTINUE(                       0x08000, 0x08000 )
@@ -618,10 +618,10 @@ ROM_START( smoto16 )
 	ROM_CONTINUE(                       0x28000, 0x08000 )
 	ROM_CONTINUE(                       0x38000, 0x08000 )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x20000, "oki", 0 )
 	ROM_LOAD( "rideritaly_4ver1.6.u54", 0x00000, 0x20000, CRC(df828563) SHA1(f39324c5c37486ed9512e0ff934394556dd182ae) )
 
-	ROM_REGION( 0x300, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )
+	ROM_REGION( 0x300, "proms", ROMREGION_DISPOSE )
 	ROM_LOAD( "prom-n82s129an.u11", 0x000, 0x100, CRC(e17730a6) SHA1(50c730b24e1d3d205c70f9381e4136e2ba6e499a) )
 	ROM_LOAD( "prom-n82s129an.u12", 0x100, 0x100, CRC(df848861) SHA1(f7e382f8b56d6b9f2af6c7a48a19e3631a64bb6d) )
 	ROM_LOAD( "prom-n82s129an.u13", 0x200, 0x100, CRC(9cb4a5c0) SHA1(0e0a368329c6d1cb685ed655d699a4894988fdb1) )
@@ -669,10 +669,10 @@ Info by f205v, Corrado Tomaselli (20/04/2008)
 ***************************************************************************/
 
 ROM_START( smoto20 )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "italyv2.0-25.u18", 0x00000, 0x10000, CRC(91abc76e) SHA1(b0eb3afda1d94111056559017802b16b2e72a9a5) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "3.u16", 0x00000, 0x08000, CRC(44b44385) SHA1(27c2865e52ab67aa8e077e8e1202cbf2addc0dfc) )
 	ROM_CONTINUE(      0x10000, 0x08000 )
 	ROM_CONTINUE(      0x08000, 0x08000 )
@@ -682,10 +682,10 @@ ROM_START( smoto20 )
 	ROM_CONTINUE(      0x28000, 0x08000 )
 	ROM_CONTINUE(      0x38000, 0x08000 )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x20000, "oki", 0 )
 	ROM_LOAD( "rom4ver1.0.u54", 0x00000, 0x20000, CRC(df828563) SHA1(f39324c5c37486ed9512e0ff934394556dd182ae) )
 
-	ROM_REGION( 0x300, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )
+	ROM_REGION( 0x300, "proms", ROMREGION_DISPOSE )
 	ROM_LOAD( "82s129.u11", 0x000, 0x100, CRC(e17730a6) SHA1(50c730b24e1d3d205c70f9381e4136e2ba6e499a) )
 	ROM_LOAD( "82s129.u12", 0x100, 0x100, CRC(df848861) SHA1(f7e382f8b56d6b9f2af6c7a48a19e3631a64bb6d) )
 	ROM_LOAD( "82s129.u13", 0x200, 0x100, CRC(9cb4a5c0) SHA1(0e0a368329c6d1cb685ed655d699a4894988fdb1) )
@@ -693,12 +693,12 @@ ROM_END
 
 static DRIVER_INIT( smoto20 )
 {
-	UINT8 *rom = memory_region( machine, RGNCLASS_CPU, "main" );
+	UINT8 *rom = memory_region( machine, "main" );
 	rom[0x12e1] = 0x20;	// "ERROR 951010"
 }
 static DRIVER_INIT( smoto16 )
 {
-	UINT8 *rom = memory_region( machine, RGNCLASS_CPU, "main" );
+	UINT8 *rom = memory_region( machine, "main" );
 	rom[0x12d0] = 0x20;	// "ERROR 951010"
 }
 

@@ -644,7 +644,7 @@ static void *ymz280b_start(const char *tag, int sndindex, int clock, const void 
 
 	/* initialize the rest of the structure */
 	chip->master_clock = (double)clock / 384.0;
-	chip->region_base = memory_region(Machine, RGNCLASS_SOUND, tag);
+	chip->region_base = memory_region(Machine, tag);
 	chip->irq_callback = intf->irq_callback;
 
 	/* create the stream */

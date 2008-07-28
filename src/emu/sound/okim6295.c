@@ -330,7 +330,7 @@ static void *okim6295_start(const char *tag, int sndindex, int clock, const void
 
 	info->command = -1;
 	info->bank_offset = 0;
-	info->region_base = memory_region(Machine, RGNCLASS_SOUND, (intf->rgnoverride != NULL) ? intf->rgnoverride : tag);
+	info->region_base = memory_region(Machine, (intf->rgnoverride != NULL) ? intf->rgnoverride : tag);
 
 	info->master_clock = clock;
 

@@ -298,8 +298,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 	UINT16 *spritelist	=	(UINT16 *)(spritebuf2 + 0x1800/4);
 
-	UINT8 *TILES	=	memory_region(machine, RGNCLASS_USER, "user1");	// Sprites LUT
-	int TILES_LEN			=	memory_region_length(machine, RGNCLASS_USER, "user1");
+	UINT8 *TILES	=	memory_region(machine, "user1");	// Sprites LUT
+	int TILES_LEN			=	memory_region_length(machine, "user1");
 
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);

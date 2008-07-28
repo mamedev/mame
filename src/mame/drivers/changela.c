@@ -530,37 +530,37 @@ MACHINE_DRIVER_END
 
 
 ROM_START( changela )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )	/* Z80 code */
+	ROM_REGION( 0x10000, "main", 0 )	/* Z80 code */
 	ROM_LOAD( "cl25a",	0x0000, 0x2000, CRC(38530a60) SHA1(0b0ef1abe11c5271fcd1671322b77165217553c3) )
 	ROM_LOAD( "cl24a",	0x2000, 0x2000, CRC(2fcf4a82) SHA1(c33355e2d4d3fab32c8d713a680ec0fceedab341) )
 	ROM_LOAD( "cl23",	0x4000, 0x2000, CRC(08385891) SHA1(d8d66664ec25db067d5a4a6c35ec0ac65b9e0c6a) )
 	ROM_LOAD( "cl22",	0x6000, 0x2000, CRC(796e0abd) SHA1(64dd9fc1f9bc44519a253ef0c02e181dd13904bf) )
 	ROM_LOAD( "cl27",	0xb000, 0x1000, CRC(3668afb8) SHA1(bcfb788baf806edcb129ea9f9dcb1d4260684773) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "mcu", 0 )	/* 68705U3 */
+	ROM_REGION( 0x10000, "mcu", 0 )	/* 68705U3 */
 	ROM_LOAD( "cl38a",	0x0000, 0x800, CRC(b70156ce) SHA1(c5eab8bbd65c4f587426298da4e22f991ce01dde) )
 
-	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx1", 0 )	/* tile data */
+	ROM_REGION( 0x4000, "gfx1", 0 )	/* tile data */
 	ROM_LOAD( "cl111",	0x0000, 0x2000, CRC(41c0149d) SHA1(3ea53a3821b044b3d0451fec1b4ee2c28da393ca) )
 	ROM_LOAD( "cl113",	0x2000, 0x2000, CRC(ddf99926) SHA1(e816b88302c5639c7284f4845d450f232d63a10c) )
 
-	ROM_REGION( 0x1000, RGNCLASS_GFX, "gfx2", 0 )	/* obj 1 data */
+	ROM_REGION( 0x1000, "gfx2", 0 )	/* obj 1 data */
 	ROM_LOAD( "cl46",	0x0000, 0x1000, CRC(9c0a7d28) SHA1(fac9180ea0d9aeea56a84b35cc0958f0dd86a801) )
 
-	ROM_REGION( 0x8000, RGNCLASS_USER, "user1", 0 )	/* obj 0 data */
+	ROM_REGION( 0x8000, "user1", 0 )	/* obj 0 data */
 	ROM_LOAD( "cl100",	0x0000, 0x2000, CRC(3fa9e4fa) SHA1(9abd7df5fcf143a0c476bd8c8753c5ea294b9f74) )
 	ROM_LOAD( "cl99",	0x2000, 0x2000, CRC(67b27b9e) SHA1(7df0f93851959359218c8d2272e30d242a77039d) )
 	ROM_LOAD( "cl98",	0x4000, 0x2000, CRC(bffe4149) SHA1(5cf0b98f9d342bd06d575c565ea01bbd79f5e04b) )
 	ROM_LOAD( "cl97",	0x6000, 0x2000, CRC(5abab8f9) SHA1(f5156855bbcdf0740fd44520386318ee53ebbf9a) )
 
-	ROM_REGION( 0x1000, RGNCLASS_USER, "user2", 0 )	/* math tables: SLOPE ROM (river-tree schematic page 1/3) */
+	ROM_REGION( 0x1000, "user2", 0 )	/* math tables: SLOPE ROM (river-tree schematic page 1/3) */
 	ROM_LOAD( "cl44",	0x0000, 0x1000, CRC(160d2bc7) SHA1(2609208c2bd4618ea340923ee01af69278980c36) ) /* first and 2nd half identical */
 
-	ROM_REGION( 0x3000, RGNCLASS_USER, "user3", 0 )	/* math tables: TREE ROM (river-tree schematic page 3/3)*/
+	ROM_REGION( 0x3000, "user3", 0 )	/* math tables: TREE ROM (river-tree schematic page 3/3)*/
 	ROM_LOAD( "cl7",	0x0000, 0x0800, CRC(01e3efca) SHA1(b26203787f105ba32773e37035c39253050f9c82) ) /* fixed bits: 0xxxxxxx */
 	ROM_LOAD( "cl9",	0x1000, 0x2000, CRC(4e53cdd0) SHA1(6255411cfdccbe2c581c83f9127d582623453c3a) )
 
-	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "cl88",	0x0000, 0x0020, CRC(da4d6625) SHA1(2d9a268973518252eb36f479ab650af8c16c885c) ) /* math train state machine */
 ROM_END
 

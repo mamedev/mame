@@ -649,11 +649,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( hnayayoi )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "021.4a",     0x00000, 0x08000, CRC(d9734da4) SHA1(a2c8f5113c8136bea990c282d60f67b2793f9a2c) )
 	ROM_LOAD( "022.3a",     0x08000, 0x08000, CRC(e6be5af4) SHA1(cdc56705ba0d191930f892618512cb687975ecbb) )
 
-	ROM_REGION( 0x38000, RGNCLASS_GFX, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x38000, "gfx1", 0 )	/* blitter data */
 	ROM_LOAD( "023.8f",     0x00000, 0x08000, CRC(81ae7317) SHA1(9e37dad046420138b4655d0692fe4bac3a8e09de) )
 	ROM_LOAD( "024.9f",     0x08000, 0x08000, CRC(413ab77a) SHA1(4b44d2a76c37f25f126e3759ab61fadba02e2b55) )
 	ROM_LOAD( "025.10f",    0x10000, 0x08000, CRC(56d16426) SHA1(38162f2a240ce6828232d4280120acc576f71200) )
@@ -662,33 +662,33 @@ ROM_START( hnayayoi )
 	ROM_LOAD( "028.9d",     0x28000, 0x08000, CRC(6981b043) SHA1(9d8f54945bce4ef149290ff34ef6e4532f4e6e8f) )
 	ROM_LOAD( "029.10d",    0x30000, 0x08000, CRC(a266f1eb) SHA1(525d8c350cdad2461cb814e4eaa785e84b6fc529) )
 
-	ROM_REGION( 0x0300, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "r.16b",      0x0000, 0x0100, CRC(b6e9ac04) SHA1(f3ec1c285d40e6189ad8722fab202d2b877f7f75) )
 	ROM_LOAD( "g.17b",      0x0100, 0x0100, CRC(a595f310) SHA1(6bd16897d3abcceae76a613a1296992c2e9e1a37) )
 	ROM_LOAD( "b.17c",      0x0200, 0x0100, CRC(e33bd9ea) SHA1(47395511d7bd44a27fa55d43094c67c5551cdfbf) )
 ROM_END
 
 ROM_START( hnfubuki )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "s1.s2c",     0x00000, 0x10000, CRC(afe3179c) SHA1(fdfba1e7073318f9782d628f3c7dd0d9c84cbeea) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x40000, "gfx1", 0 )	/* blitter data */
 	ROM_LOAD( "062.8f",     0x00000, 0x10000, CRC(0d96a540) SHA1(1cadf19d8fd48962acb0e45a50431fabd6f13672) )
 	ROM_LOAD( "063.9f",     0x10000, 0x10000, CRC(14250093) SHA1(8459024ebe5f8c3fa146e3303a155c2cf5c487b3) )
 	ROM_LOAD( "064.10f",    0x20000, 0x10000, CRC(41546fb9) SHA1(3c6028c19aa65dcb7ccfc01c223c2cba36cc9bb4) )
 	ROM_LOAD( "0652.12f",   0x30000, 0x10000, CRC(e7b54ea3) SHA1(157306db5f3e3cc652fcdb7b42d33f0b93eda07b) )
 
-	ROM_REGION( 0x0300, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "r-16b",      0x0000, 0x0100, CRC(e6fd8f5d) SHA1(fb9dedd46c4aaa707d4f7d2614227435eea0bca3) )
 	ROM_LOAD( "g-17b",      0x0100, 0x0100, CRC(3f425f67) SHA1(3b0c6585d74871638681749f7162b0780318645c) )
 	ROM_LOAD( "b-17c",      0x0200, 0x0100, CRC(d1f912e5) SHA1(0e0b61498ef5e4685754c0786b7288156b8a56ce) )
 ROM_END
 
 ROM_START( untoucha )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "b4.10b",     0x00000, 0x10000, CRC(4df04e41) SHA1(4d5232c2f383640394d85417aa973f92c78184c9) )
 
-	ROM_REGION( 0x90000, RGNCLASS_GFX, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x90000, "gfx1", 0 )	/* blitter data */
 	ROM_LOAD( "081.10f",    0x00000, 0x10000, CRC(36ba990d) SHA1(10b2865f1d19c01cc898029a23489f47ade2ce86) )
 	ROM_LOAD( "082.12f",    0x10000, 0x10000, CRC(2beb6277) SHA1(ea57970051c674800a9bedd581d734bd9beaa894) )
 	ROM_LOAD( "083.13f",    0x20000, 0x10000, CRC(c3fed8ff) SHA1(405a6563ff7420686063e04fb99dfe6f0f7378dc) )
@@ -699,7 +699,7 @@ ROM_START( untoucha )
 	ROM_LOAD( "088.13h",    0x70000, 0x10000, CRC(742cf3c0) SHA1(542fe62feea752e57895c20932865d53953e4945) )
 	ROM_LOAD( "089.14h",    0x80000, 0x10000, CRC(ff497db1) SHA1(c786d1b6d07c889e6fc1f812d7dac50674eae356) )
 
-	ROM_REGION( 0x0300, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "08r.9f",     0x0000, 0x0100, CRC(308e65b4) SHA1(73ec6df141502270148d898376f0ed3211436f04) )
 	ROM_LOAD( "08g.8f",     0x0100, 0x0100, CRC(349c3de3) SHA1(ffbbc3a049a749cea5867f575ac77cfd8f5299b1) )
 	ROM_LOAD( "08b.7f",     0x0200, 0x0100, CRC(2007435a) SHA1(2fae6f349b36f700e65ae9b980adce691bdc6dde) )
@@ -708,8 +708,8 @@ ROM_END
 
 static DRIVER_INIT( hnfubuki )
 {
-	UINT8 *rom = memory_region(machine, RGNCLASS_GFX, "gfx1");
-	int len = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
+	UINT8 *rom = memory_region(machine, "gfx1");
+	int len = memory_region_length(machine, "gfx1");
 	int i,j;
 
 	/* interestingly, the blitter data has a slight encryption */

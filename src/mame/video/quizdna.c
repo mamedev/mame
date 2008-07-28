@@ -37,7 +37,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code,col,x,y;
-	UINT8 *FG = memory_region(machine, RGNCLASS_USER, "user1");
+	UINT8 *FG = memory_region(machine, "user1");
 
 	x = tile_index & 0x1f;
 	y = FG[(tile_index >> 5) & 0x1f] & 0x3f;
@@ -67,7 +67,7 @@ VIDEO_START( quizdna )
 
 WRITE8_HANDLER( quizdna_bg_ram_w )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 	quizdna_bg_ram[offset] = data;
 	RAM[0x12000+offset] = data;
 
@@ -78,7 +78,7 @@ WRITE8_HANDLER( quizdna_fg_ram_w )
 {
 	int i;
 	int offs = offset & 0xfff;
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 
 	RAM[0x10000+offs] = data;
 	RAM[0x11000+offs] = data; /* mirror */

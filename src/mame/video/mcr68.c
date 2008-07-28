@@ -70,7 +70,7 @@ VIDEO_START( mcr68 )
 
 VIDEO_START( zwackery )
 {
-	const UINT8 *colordatabase = (const UINT8 *)memory_region(machine, RGNCLASS_GFX, "gfx3");
+	const UINT8 *colordatabase = (const UINT8 *)memory_region(machine, "gfx3");
 	gfx_element *gfx0 = machine->gfx[0];
 	gfx_element *gfx2 = machine->gfx[2];
 	int code, y, x;

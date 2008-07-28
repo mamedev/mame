@@ -1018,7 +1018,7 @@ static const gfx_layout wecleman_road_layout =
 };
 
 static GFXDECODE_START( wecleman )
-	// RGNCLASS_GFX, "gfx1" holds sprite, which are not decoded here
+	// "gfx1" holds sprite, which are not decoded here
 	GFXDECODE_ENTRY( "gfx2", 0, wecleman_bg_layout,   0, 2048/8 )	// [0] bg + fg + txt
 	GFXDECODE_ENTRY( "gfx3", 0, wecleman_road_layout, 0, 2048/8 )	// [1] road
 GFXDECODE_END
@@ -1052,8 +1052,8 @@ static const gfx_layout hotchase_road_layout =
 };
 
 static GFXDECODE_START( hotchase )
-	// RGNCLASS_GFX, "gfx1" holds sprite, which are not decoded here
-	// RGNCLASS_GFX, "gfx2" and 3 are for the 051316
+	// "gfx1" holds sprite, which are not decoded here
+	// "gfx2" and 3 are for the 051316
 	GFXDECODE_ENTRY( "gfx4", 0, hotchase_road_layout, 0x70*16, 16 )	// road
 GFXDECODE_END
 
@@ -1185,20 +1185,20 @@ MACHINE_DRIVER_END
 
 ROM_START( wecleman )
 
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )	/* Main CPU Code */
+	ROM_REGION( 0x40000, "main", 0 )	/* Main CPU Code */
 	ROM_LOAD16_BYTE( "602f08.17h", 0x00000, 0x10000, CRC(493b79d3) SHA1(9625e3b65c211d5081d8ed8977de287eff100842) )
 	ROM_LOAD16_BYTE( "602f11.23h", 0x00001, 0x10000, CRC(6bb4f1fa) SHA1(2cfb7885b42b49dab9892e8dfd54914b64eeab06) )
 	ROM_LOAD16_BYTE( "602a09.18h", 0x20000, 0x10000, CRC(8a9d756f) SHA1(12605e86ce29e6300b5400720baac7b0293d9e66) )
 	ROM_LOAD16_BYTE( "602a10.22h", 0x20001, 0x10000, CRC(569f5001) SHA1(ec2dd331a279083cf847fbbe71c017038a1d562a) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "sub", 0 )	/* Sub CPU Code */
+	ROM_REGION( 0x10000, "sub", 0 )	/* Sub CPU Code */
 	ROM_LOAD16_BYTE( "602a06.18a", 0x00000, 0x08000, CRC(e12c0d11) SHA1(991afd48bf1b2c303b975ce80c754e5972c39111) )
 	ROM_LOAD16_BYTE( "602a07.20a", 0x00001, 0x08000, CRC(47968e51) SHA1(9b01b2c6a14dd80327a8f66a7f1994471a4bc38e) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )	/* Sound CPU Code */
+	ROM_REGION( 0x10000, "audio", 0 )	/* Sound CPU Code */
 	ROM_LOAD( "602a01.6d",  0x00000, 0x08000, CRC(deafe5f1) SHA1(4cfbe2841233b1222c22160af7287b7a7821c3a0) )
 
-	ROM_REGION( 0x200000 * 2, RGNCLASS_GFX, "gfx1", 0 )	/* x2, do not dispose, zooming sprites */
+	ROM_REGION( 0x200000 * 2, "gfx1", 0 )	/* x2, do not dispose, zooming sprites */
 	ROM_LOAD( "602a25.12e", 0x000000, 0x20000, CRC(0eacf1f9) SHA1(b4dcd457e68175ffee3da4aff23a241fe33eb500) )
 	ROM_LOAD( "602a26.14e", 0x020000, 0x20000, CRC(2182edaf) SHA1(5ae4223a76b3c0be8f66458707f2e6f63fba0b13) )
 	ROM_LOAD( "602a27.15e", 0x040000, 0x20000, CRC(b22f08e9) SHA1(1ba99bc4e00e206507e9bfafc989208d6ae6f8a3) )
@@ -1216,20 +1216,20 @@ ROM_START( wecleman )
 	ROM_LOAD( "602a15.9c",  0x1c0000, 0x20000, CRC(0d493c9f) SHA1(02690a1963cadd469bd67cb362384923916900a1) )
 	ROM_LOAD( "602a16.10c", 0x1e0000, 0x20000, CRC(b08770b3) SHA1(41871e9261d08fd372b7deb72d939973fb694b54) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "602a31.26g", 0x000000, 0x08000, CRC(01fa40dd) SHA1(2b8aa97f5116f39ae6a8e46f109853d70e370884) )	// layers
 	ROM_LOAD( "602a30.24g", 0x008000, 0x08000, CRC(be5c4138) SHA1(7aee2ee17ef3e37399a60d9b019cfa733acbf07b) )
 	ROM_LOAD( "602a29.23g", 0x010000, 0x08000, CRC(f1a8d33e) SHA1(ed6531f2fd4ad6835a879e9a5600387d8cad6d17) )
 
-	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )	/* road */
+	ROM_REGION( 0x0c000, "gfx3", ROMREGION_DISPOSE )	/* road */
 	ROM_LOAD( "602a04.11e", 0x000000, 0x08000, CRC(ade9f359) SHA1(58db6be6217ed697827015e50e99e58602042a4c) )
 	ROM_LOAD( "602a05.13e", 0x008000, 0x04000, CRC(f22b7f2b) SHA1(857389c57552c4e2237cb599f4c68c381430475e) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "konami", 0 )	/* Samples (Channel A 0x20000=Channel B) */
+	ROM_REGION( 0x40000, "konami", 0 )	/* Samples (Channel A 0x20000=Channel B) */
 	ROM_LOAD( "602a03.10a", 0x00000, 0x20000, CRC(31392b01) SHA1(0424747bc2015c9c93afd20e6a23083c0dcc4fb7) )
 	ROM_LOAD( "602a02.8a",  0x20000, 0x20000, CRC(e2be10ae) SHA1(109c31bf7252c83a062d259143cd8299681db778) )
 
-	ROM_REGION( 0x04000, RGNCLASS_USER, "user1", 0 )	/* extra data for road effects? */
+	ROM_REGION( 0x04000, "user1", 0 )	/* extra data for road effects? */
 	ROM_LOAD( "602a12.1a",  0x000000, 0x04000, CRC(77b9383d) SHA1(7cb970889677704d6324bb64aafc05326c4503ad) )
 
 ROM_END
@@ -1238,9 +1238,9 @@ static void wecleman_unpack_sprites(running_machine *machine)
 {
 	const char *region       = "gfx1";	// sprites
 
-	const UINT32 len = memory_region_length(machine, RGNCLASS_GFX, region);
-	UINT8 *src     = memory_region(machine, RGNCLASS_GFX, region) + len / 2 - 1;
-	UINT8 *dst     = memory_region(machine, RGNCLASS_GFX, region) + len - 1;
+	const UINT32 len = memory_region_length(machine, region);
+	UINT8 *src     = memory_region(machine, region) + len / 2 - 1;
+	UINT8 *dst     = memory_region(machine, region) + len - 1;
 
 	while(dst > src)
 	{
@@ -1272,7 +1272,7 @@ static DRIVER_INIT( wecleman )
 {
 	int i, len;
 	UINT8 *RAM;
-//  UINT16 *RAM1 = (UINT16 *) memory_region(machine, RGNCLASS_CPU, "main");   /* Main CPU patches */
+//  UINT16 *RAM1 = (UINT16 *) memory_region(machine, "main");   /* Main CPU patches */
 //  RAM1[0x08c2/2] = 0x601e;    // faster self test
 
 	/* Decode GFX Roms - Compensate for the address lines scrambling */
@@ -1282,8 +1282,8 @@ static DRIVER_INIT( wecleman )
         I hope you'll appreciate this effort!  */
 
 	/* let's swap even and odd *pixels* of the sprites */
-	RAM = memory_region(machine, RGNCLASS_GFX, "gfx1");
-	len = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
+	RAM = memory_region(machine, "gfx1");
+	len = memory_region_length(machine, "gfx1");
 	for (i = 0; i < len; i ++)
 	{
 		/* TODO: could be wrong, colors have to be fixed.       */
@@ -1292,18 +1292,18 @@ static DRIVER_INIT( wecleman )
 		RAM[i] = BITSWAP8(RAM[i],7,0,1,2,3,4,5,6);
 	}
 
-	bitswap(memory_region(machine, RGNCLASS_GFX, "gfx1"), memory_region_length(machine, RGNCLASS_GFX, "gfx1"),
+	bitswap(memory_region(machine, "gfx1"), memory_region_length(machine, "gfx1"),
 			0,1,20,19,18,17,14,9,16,6,4,7,8,15,10,11,13,5,12,3,2);
 
 	/* Now we can unpack each nibble of the sprites into a pixel (one byte) */
 	wecleman_unpack_sprites(machine);
 
 	/* Bg & Fg & Txt */
-	bitswap(memory_region(machine, RGNCLASS_GFX, "gfx2"), memory_region_length(machine, RGNCLASS_GFX, "gfx2"),
+	bitswap(memory_region(machine, "gfx2"), memory_region_length(machine, "gfx2"),
 			20,19,18,17,16,15,12,7,14,4,2,5,6,13,8,9,11,3,10,1,0);
 
 	/* Road */
-	bitswap(memory_region(machine, RGNCLASS_GFX, "gfx3"), memory_region_length(machine, RGNCLASS_GFX, "gfx3"),
+	bitswap(memory_region(machine, "gfx3"), memory_region_length(machine, "gfx3"),
 			20,19,18,17,16,15,14,7,12,4,2,5,6,13,8,9,11,3,10,1,0);
 
 	spr_color_offs = 0x40;
@@ -1315,20 +1315,20 @@ static DRIVER_INIT( wecleman )
 ***************************************************************************/
 
 ROM_START( hotchase )
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )	/* Main Code */
+	ROM_REGION( 0x40000, "main", 0 )	/* Main Code */
 	ROM_LOAD16_BYTE( "763k05", 0x000000, 0x010000, CRC(f34fef0b) SHA1(9edaf6da988348cb32d5686fe7a67fb92b1c9777) )
 	ROM_LOAD16_BYTE( "763k04", 0x000001, 0x010000, CRC(60f73178) SHA1(49c919d09fa464b205d7eccce337349e3a633a14) )
 	ROM_LOAD16_BYTE( "763k03", 0x020000, 0x010000, CRC(28e3a444) SHA1(106b22a3cbe8301eac2e46674a267b96e72ac72f) )
 	ROM_LOAD16_BYTE( "763k02", 0x020001, 0x010000, CRC(9510f961) SHA1(45b1920cab08a0dacd044c851d4e7f0cb5772b46) )
 
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "sub", 0 )	/* Sub Code */
+	ROM_REGION( 0x20000, "sub", 0 )	/* Sub Code */
 	ROM_LOAD16_BYTE( "763k07", 0x000000, 0x010000, CRC(ae12fa90) SHA1(7f76f09916fe152411b5af3c504ee7be07497ef4) )
 	ROM_LOAD16_BYTE( "763k06", 0x000001, 0x010000, CRC(b77e0c07) SHA1(98bf492ac889d31419df706029fdf3d51b85c936) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )	/* Sound Code */
+	ROM_REGION( 0x10000, "audio", 0 )	/* Sound Code */
 	ROM_LOAD( "763f01", 0x8000, 0x8000, CRC(4fddd061) SHA1(ff0aa18605612f6102107a6be1f93ae4c5edc84f) )
 
-	ROM_REGION( 0x300000 * 2, RGNCLASS_GFX, "gfx1", 0 )	/* x2, do not dispose, zooming sprites */
+	ROM_REGION( 0x300000 * 2, "gfx1", 0 )	/* x2, do not dispose, zooming sprites */
 	ROM_LOAD16_WORD_SWAP( "763e17", 0x000000, 0x080000, CRC(8db4e0aa) SHA1(376cb3cae110998f2f9df7e6cdd35c06732fea69) )
 	ROM_LOAD16_WORD_SWAP( "763e20", 0x080000, 0x080000, CRC(a22c6fce) SHA1(174fb9c1706c092947bcce386831acd33a237046) )
 	ROM_LOAD16_WORD_SWAP( "763e18", 0x100000, 0x080000, CRC(50920d01) SHA1(313c7ecbd154b3f4c96f25c29a7734a9b3facea4) )
@@ -1336,26 +1336,26 @@ ROM_START( hotchase )
 	ROM_LOAD16_WORD_SWAP( "763e19", 0x200000, 0x080000, CRC(a2622e56) SHA1(0a0ed9713882b987518e6f06a02dba417c1f4f32) )
 	ROM_LOAD16_WORD_SWAP( "763e22", 0x280000, 0x080000, CRC(967c49d1) SHA1(01979d216a9fd8085298445ac5f7870d1598db74) )
 
-	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx2", 0 )	/* bg */
+	ROM_REGION( 0x20000, "gfx2", 0 )	/* bg */
 	ROM_LOAD( "763e14", 0x000000, 0x020000, CRC(60392aa1) SHA1(8499eb40a246587e24f6fd00af2eaa6d75ee6363) )
 
-	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx3", 0 )	/* fg (patched) */
+	ROM_REGION( 0x10000, "gfx3", 0 )	/* fg (patched) */
 	ROM_LOAD( "763a13", 0x000000, 0x010000, CRC(8bed8e0d) SHA1(ccff330abc23fe499e76c16cab5783c3daf155dd) )
 
-	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE )	/* road */
+	ROM_REGION( 0x20000, "gfx4", ROMREGION_DISPOSE )	/* road */
 	ROM_LOAD( "763e15", 0x000000, 0x020000, CRC(7110aa43) SHA1(639dc002cc1580f0530bb5bb17f574e2258d5954) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "konami1", 0 )	/* Samples, 2 banks */
+	ROM_REGION( 0x40000, "konami1", 0 )	/* Samples, 2 banks */
 	ROM_LOAD( "763e11", 0x000000, 0x040000, CRC(9d99a5a7) SHA1(96e37bbb259e0a91d124c26b6b1a9b70de2e19a4) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "konami2", 0 )	/* Samples, 2 banks */
+	ROM_REGION( 0x40000, "konami2", 0 )	/* Samples, 2 banks */
 	ROM_LOAD( "763e10", 0x000000, 0x040000, CRC(ca409210) SHA1(703d7619c4bd33d2ff5fad127d98c82906fede33) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "konami3", 0 )	/* Samples, 4 banks for each ROM */
+	ROM_REGION( 0x100000, "konami3", 0 )	/* Samples, 4 banks for each ROM */
 	ROM_LOAD( "763e08", 0x000000, 0x080000, CRC(054a9a63) SHA1(45d7926c9e7af47c041ba9b733e334bccd730a6d) )
 	ROM_LOAD( "763e09", 0x080000, 0x080000, CRC(c39857db) SHA1(64b135a9ccf9e1dd50789cdd5c6bc03da8decfd0) )
 
-	ROM_REGION( 0x08000, RGNCLASS_USER, "user1", 0 )	/* extra data for road effects? */
+	ROM_REGION( 0x08000, "user1", 0 )	/* extra data for road effects? */
 	ROM_LOAD( "763a12", 0x000000, 0x008000, CRC(05f1e553) SHA1(8aaeb7374bd93038c24e6470398936f22cabb0fe) )
 ROM_END
 
@@ -1368,7 +1368,7 @@ static void hotchase_sprite_decode( running_machine *machine, int num16_banks, i
 	UINT8 *base, *temp;
 	int i;
 
-	base = memory_region(machine, RGNCLASS_GFX, "gfx1");	// sprites
+	base = memory_region(machine, "gfx1");	// sprites
 	temp = malloc_or_die( bank_size );
 
 	for( i = num16_banks; i >0; i-- ){
@@ -1413,7 +1413,7 @@ static void hotchase_sprite_decode( running_machine *machine, int num16_banks, i
 /* Unpack sprites data and do some patching */
 static DRIVER_INIT( hotchase )
 {
-//  UINT16 *RAM1 = (UINT16) memory_region(machine, RGNCLASS_CPU, "main"); /* Main CPU patches */
+//  UINT16 *RAM1 = (UINT16) memory_region(machine, "main"); /* Main CPU patches */
 //  RAM[0x1140/2] = 0x0015; RAM[0x195c/2] = 0x601A; // faster self test
 
 	UINT8 *RAM;
@@ -1421,13 +1421,13 @@ static DRIVER_INIT( hotchase )
 	/* Decode GFX Roms */
 
 	/* Let's swap even and odd bytes of the sprites gfx roms */
-	RAM = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	RAM = memory_region(machine, "gfx1");
 
 	/* Now we can unpack each nibble of the sprites into a pixel (one byte) */
 	hotchase_sprite_decode(machine,3,0x80000*2);	// num banks, bank len
 
 	/* Let's copy the second half of the fg layer gfx (charset) over the first */
-	RAM = memory_region(machine, RGNCLASS_GFX, "gfx3");
+	RAM = memory_region(machine, "gfx3");
 	memcpy(&RAM[0], &RAM[0x10000/2], 0x10000/2);
 
 	spr_color_offs = 0;

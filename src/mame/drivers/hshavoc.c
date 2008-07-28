@@ -179,21 +179,21 @@ static MACHINE_DRIVER_START( hshavoc )
 MACHINE_DRIVER_END
 
 ROM_START( hshavoc )
-	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x200000, "main", 0 )
 	ROM_LOAD16_BYTE( "d-25.11a", 0x000000, 0x080000, CRC(6a155060) SHA1(ecb47bd428786e50e300a062b5038f943419a389) )
 	ROM_LOAD16_BYTE( "d-26.9a",  0x000001, 0x080000, CRC(1afa84fe) SHA1(041296e0360b7747aedc2d948c39e06ba03a7d08) )
 
-	ROM_REGION( 0x200000, RGNCLASS_USER, "user1", 0 ) // other
+	ROM_REGION( 0x200000, "user1", 0 ) // other
 	ROM_LOAD( "peel18cv8s.4b.bin",  0x000, 0x155, CRC(b5fb1d5f) SHA1(f0ac80471d97f77f415b5a1f153e1fce66720963) )
 	ROM_LOAD( "peel18cv8s.5b.bin",  0x000, 0x155, CRC(efc7ceea) SHA1(1c31a56bc4b83bfa708048b7de4cee7a24537500) )
 
-	ROM_REGION( 0x200000, RGNCLASS_USER, "user2", 0 ) // other
+	ROM_REGION( 0x200000, "user2", 0 ) // other
 	ROM_LOAD( "pic16c57",  0x00, 0x01, NO_DUMP ) // protected
 ROM_END
 
 #ifdef UNUSED_DEFINITION
 ROM_START( hshavoc2 ) /* Genesis Version, for reference */
-	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x200000, "main", 0 )
 	ROM_LOAD( "hsh.rom", 0x000000, 0x100000, CRC(17be551c) SHA1(0dc1969098716ba332978b89356f62961417682b) )
 ROM_END
 #endif
@@ -208,7 +208,7 @@ static DRIVER_INIT(genesis)
 	/* hack -- fix vdp emulation instead */
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xC00004, 0xC00005, 0, 0, vdp_fake_r);
 
-	memory_set_bankptr(3, memory_region(machine, RGNCLASS_CPU, "main") );
+	memory_set_bankptr(3, memory_region(machine, "main") );
 	memory_set_bankptr(4, genesis_68k_ram );
 }
 
@@ -216,7 +216,7 @@ static DRIVER_INIT(hshavoc)
 {
 
 	int x;
-	UINT16 *src = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
+	UINT16 *src = (UINT16 *)memory_region(machine, "main");
 
 	static const UINT16 typedat[16] = {
 		1,1,1,1, 1,1,1,1,

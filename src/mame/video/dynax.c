@@ -361,8 +361,8 @@ static int blitter_drawgfx( running_machine *machine, int layer, int mask, const
 {
 	UINT8 cmd;
 
-	UINT8 *ROM		=	memory_region( machine, RGNCLASS_GFX, gfx );
-	size_t ROM_size	=	memory_region_length( machine, RGNCLASS_GFX, gfx );
+	UINT8 *ROM		=	memory_region( machine, gfx );
+	size_t ROM_size	=	memory_region_length( machine, gfx );
 
 	int sx;
 
@@ -1085,8 +1085,8 @@ static int debug_viewer(running_machine *machine, bitmap_t *bitmap,const rectang
 	static int toggle;
 	if (input_code_pressed_once(KEYCODE_T))	toggle = 1-toggle;
 	if (toggle)	{
-		UINT8 *RAM	=	memory_region( machine, RGNCLASS_GFX, "gfx1" );
-		size_t size		=	memory_region_length( machine, RGNCLASS_GFX, "gfx1" );
+		UINT8 *RAM	=	memory_region( machine, "gfx1" );
+		size_t size		=	memory_region_length( machine, "gfx1" );
 		static int i = 0, c = 0, r = 0;
 
 		if (input_code_pressed_once(KEYCODE_I))	c = (c-1) & 0x1f;

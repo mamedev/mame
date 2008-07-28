@@ -36,7 +36,7 @@ VIDEO_UPDATE( bublbobl )
 
 	sx = 0;
 
-	prom = memory_region(screen->machine, RGNCLASS_PROMS, "proms");
+	prom = memory_region(screen->machine, "proms");
 	for (offs = 0;offs < bublbobl_objectram_size;offs += 4)
 	{
 		/* skip empty sprites */

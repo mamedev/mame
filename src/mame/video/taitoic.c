@@ -4121,7 +4121,7 @@ void TC0150ROD_draw(running_machine *machine, bitmap_t *bitmap,const rectangle *
 	UINT16 roada_line[512],roadb_line[512];
 	UINT16 *dst16;
 	UINT16 *roada,*roadb;
-	UINT16 *roadgfx = (UINT16 *)memory_region(machine, RGNCLASS_GFX, "gfx3");
+	UINT16 *roadgfx = (UINT16 *)memory_region(machine, "gfx3");
 
 	UINT16 pixel,color,gfx_word;
 	UINT16 roada_clipl,roada_clipr,roada_bodyctrl;

@@ -589,179 +589,179 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( vendetta )
-	ROM_REGION( 0x49000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x49000, "main", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081t01", 0x10000, 0x38000, CRC(e76267f5) SHA1(efef6c2edb4c181374661f358dad09123741b63d) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
 	ROM_LOAD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) ) /* characters */
 	ROM_LOAD( "081a08", 0x080000, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) ) /* characters */
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
 	ROM_LOAD( "081a04", 0x000000, 0x100000, CRC(464b9aa4) SHA1(28066ff0a07c3e56e7192918a882778c1b316b37) ) /* sprites */
 	ROM_LOAD( "081a05", 0x100000, 0x100000, CRC(4e173759) SHA1(ce803f2aca7d7dedad00ab30e112443848747bd2) ) /* sprites */
 	ROM_LOAD( "081a06", 0x200000, 0x100000, CRC(e9fe6d80) SHA1(2b7fc9d7fe43cd85dc8b975fe639c273cb0d9256) ) /* sprites */
 	ROM_LOAD( "081a07", 0x300000, 0x100000, CRC(8a22b29a) SHA1(be539f21518e13038ab1d4cc2b2a901dd3e621f4) ) /* sprites */
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "konami", 0 ) /* 053260 samples */
+	ROM_REGION( 0x100000, "konami", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 ROM_END
 
 ROM_START( vendetao )
-	ROM_REGION( 0x49000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x49000, "main", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081r01", 0x10000, 0x38000, CRC(84796281) SHA1(e4330c6eaa17adda5b4bd3eb824388c89fb07918) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
 	ROM_LOAD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) ) /* characters */
 	ROM_LOAD( "081a08", 0x080000, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) ) /* characters */
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
 	ROM_LOAD( "081a04", 0x000000, 0x100000, CRC(464b9aa4) SHA1(28066ff0a07c3e56e7192918a882778c1b316b37) ) /* sprites */
 	ROM_LOAD( "081a05", 0x100000, 0x100000, CRC(4e173759) SHA1(ce803f2aca7d7dedad00ab30e112443848747bd2) ) /* sprites */
 	ROM_LOAD( "081a06", 0x200000, 0x100000, CRC(e9fe6d80) SHA1(2b7fc9d7fe43cd85dc8b975fe639c273cb0d9256) ) /* sprites */
 	ROM_LOAD( "081a07", 0x300000, 0x100000, CRC(8a22b29a) SHA1(be539f21518e13038ab1d4cc2b2a901dd3e621f4) ) /* sprites */
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "konami", 0 ) /* 053260 samples */
+	ROM_REGION( 0x100000, "konami", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 ROM_END
 
 ROM_START( vendet2p )
-	ROM_REGION( 0x49000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x49000, "main", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081w01", 0x10000, 0x38000, CRC(cee57132) SHA1(8b6413877e127511daa76278910c2ee3247d613a) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
 	ROM_LOAD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) ) /* characters */
 	ROM_LOAD( "081a08", 0x080000, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) ) /* characters */
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
 	ROM_LOAD( "081a04", 0x000000, 0x100000, CRC(464b9aa4) SHA1(28066ff0a07c3e56e7192918a882778c1b316b37) ) /* sprites */
 	ROM_LOAD( "081a05", 0x100000, 0x100000, CRC(4e173759) SHA1(ce803f2aca7d7dedad00ab30e112443848747bd2) ) /* sprites */
 	ROM_LOAD( "081a06", 0x200000, 0x100000, CRC(e9fe6d80) SHA1(2b7fc9d7fe43cd85dc8b975fe639c273cb0d9256) ) /* sprites */
 	ROM_LOAD( "081a07", 0x300000, 0x100000, CRC(8a22b29a) SHA1(be539f21518e13038ab1d4cc2b2a901dd3e621f4) ) /* sprites */
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "konami", 0 ) /* 053260 samples */
+	ROM_REGION( 0x100000, "konami", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 ROM_END
 
 ROM_START( vendetas )
-	ROM_REGION( 0x49000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x49000, "main", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081u01", 0x10000, 0x38000, CRC(b4d9ade5) SHA1(fbd543738cb0b68c80ff05eed7849b608de03395) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
 	ROM_LOAD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) ) /* characters */
 	ROM_LOAD( "081a08", 0x080000, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) ) /* characters */
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
 	ROM_LOAD( "081a04", 0x000000, 0x100000, CRC(464b9aa4) SHA1(28066ff0a07c3e56e7192918a882778c1b316b37) ) /* sprites */
 	ROM_LOAD( "081a05", 0x100000, 0x100000, CRC(4e173759) SHA1(ce803f2aca7d7dedad00ab30e112443848747bd2) ) /* sprites */
 	ROM_LOAD( "081a06", 0x200000, 0x100000, CRC(e9fe6d80) SHA1(2b7fc9d7fe43cd85dc8b975fe639c273cb0d9256) ) /* sprites */
 	ROM_LOAD( "081a07", 0x300000, 0x100000, CRC(8a22b29a) SHA1(be539f21518e13038ab1d4cc2b2a901dd3e621f4) ) /* sprites */
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "konami", 0 ) /* 053260 samples */
+	ROM_REGION( 0x100000, "konami", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 ROM_END
 
 ROM_START( vendtaso )
-	ROM_REGION( 0x49000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x49000, "main", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081d01", 0x10000, 0x38000, CRC(335da495) SHA1(ea74680eb898aeecf9f1eec95f151bcf66e6b6cb) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
 	ROM_LOAD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) ) /* characters */
 	ROM_LOAD( "081a08", 0x080000, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) ) /* characters */
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
 	ROM_LOAD( "081a04", 0x000000, 0x100000, CRC(464b9aa4) SHA1(28066ff0a07c3e56e7192918a882778c1b316b37) ) /* sprites */
 	ROM_LOAD( "081a05", 0x100000, 0x100000, CRC(4e173759) SHA1(ce803f2aca7d7dedad00ab30e112443848747bd2) ) /* sprites */
 	ROM_LOAD( "081a06", 0x200000, 0x100000, CRC(e9fe6d80) SHA1(2b7fc9d7fe43cd85dc8b975fe639c273cb0d9256) ) /* sprites */
 	ROM_LOAD( "081a07", 0x300000, 0x100000, CRC(8a22b29a) SHA1(be539f21518e13038ab1d4cc2b2a901dd3e621f4) ) /* sprites */
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "konami", 0 ) /* 053260 samples */
+	ROM_REGION( 0x100000, "konami", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 ROM_END
 
 ROM_START( vendettj )
-	ROM_REGION( 0x49000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x49000, "main", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081p01", 0x10000, 0x38000, CRC(5fe30242) SHA1(2ea98e66637fa2ad60044b1a2b0dd158a82403a2) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
 	ROM_LOAD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) ) /* characters */
 	ROM_LOAD( "081a08", 0x080000, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) ) /* characters */
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
 	ROM_LOAD( "081a04", 0x000000, 0x100000, CRC(464b9aa4) SHA1(28066ff0a07c3e56e7192918a882778c1b316b37) ) /* sprites */
 	ROM_LOAD( "081a05", 0x100000, 0x100000, CRC(4e173759) SHA1(ce803f2aca7d7dedad00ab30e112443848747bd2) ) /* sprites */
 	ROM_LOAD( "081a06", 0x200000, 0x100000, CRC(e9fe6d80) SHA1(2b7fc9d7fe43cd85dc8b975fe639c273cb0d9256) ) /* sprites */
 	ROM_LOAD( "081a07", 0x300000, 0x100000, CRC(8a22b29a) SHA1(be539f21518e13038ab1d4cc2b2a901dd3e621f4) ) /* sprites */
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "konami", 0 ) /* 053260 samples */
+	ROM_REGION( 0x100000, "konami", 0 ) /* 053260 samples */
 	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
 ROM_END
 
 ROM_START( esckids )
-	ROM_REGION( 0x049000, RGNCLASS_CPU, "main", 0 )		// Main CPU (053248) Code & Banked (1M x 1)
+	ROM_REGION( 0x049000, "main", 0 )		// Main CPU (053248) Code & Banked (1M x 1)
 	ROM_LOAD( "17c.bin", 0x010000, 0x018000, CRC(9dfba99c) SHA1(dbcb89aad5a9addaf7200b2524be999877313a6e) )
 	ROM_CONTINUE(		0x008000, 0x008000 )
 
-	ROM_REGION( 0x010000, RGNCLASS_CPU, "audio", 0 )		// Sound CPU (Z80) Code (512K x 1)
+	ROM_REGION( 0x010000, "audio", 0 )		// Sound CPU (Z80) Code (512K x 1)
 	ROM_LOAD( "975f02", 0x000000, 0x010000, CRC(994fb229) SHA1(bf194ae91240225b8edb647b1a62cd83abfa215e) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )		// Tilemap MASK-ROM (4M x 2)
+	ROM_REGION( 0x100000, "gfx1", 0 )		// Tilemap MASK-ROM (4M x 2)
 	ROM_LOAD( "975c09", 0x000000, 0x080000, CRC(bc52210e) SHA1(301a3892d250495c2e849d67fea5f01fb0196bed) )
 	ROM_LOAD( "975c08", 0x080000, 0x080000, CRC(fcff9256) SHA1(b60d29f4d04f074120d4bb7f2a71b9e9bf252d33) )
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx2", 0 )		// Sprite MASK-ROM (8M x 4)
+	ROM_REGION( 0x400000, "gfx2", 0 )		// Sprite MASK-ROM (8M x 4)
 	ROM_LOAD( "975c04", 0x000000, 0x100000, CRC(15688a6f) SHA1(a445237a11e5f98f0f9b2573a7ef0583366a137e) )
 	ROM_LOAD( "975c05", 0x100000, 0x100000, CRC(1ff33bb7) SHA1(eb17da33ba2769ea02f91fece27de2e61705e75a) )
 	ROM_LOAD( "975c06", 0x200000, 0x100000, CRC(36d410f9) SHA1(2b1fd93c11839480aa05a8bf27feef7591704f3d) )
 	ROM_LOAD( "975c07", 0x300000, 0x100000, CRC(97ec541e) SHA1(d1aa186b17cfe6e505f5b305703319299fa54518) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "konami", 0 )	// Samples MASK-ROM (4M x 1)
+	ROM_REGION( 0x100000, "konami", 0 )	// Samples MASK-ROM (4M x 1)
 	ROM_LOAD( "975c03", 0x000000, 0x080000, CRC(dc4a1707) SHA1(f252d08483fd664f8fc03bf8f174efd452b4cdc5) )
 ROM_END
 
 
 ROM_START( esckidsj )
-	ROM_REGION( 0x049000, RGNCLASS_CPU, "main", 0 )		// Main CPU (053248) Code & Banked (1M x 1)
+	ROM_REGION( 0x049000, "main", 0 )		// Main CPU (053248) Code & Banked (1M x 1)
 	ROM_LOAD( "975r01", 0x010000, 0x018000, CRC(7b5c5572) SHA1(b94b58c010539926d112c2dfd80bcbad76acc986) )
 	ROM_CONTINUE(		0x008000, 0x008000 )
 
-	ROM_REGION( 0x010000, RGNCLASS_CPU, "audio", 0 )		// Sound CPU (Z80) Code (512K x 1)
+	ROM_REGION( 0x010000, "audio", 0 )		// Sound CPU (Z80) Code (512K x 1)
 	ROM_LOAD( "975f02", 0x000000, 0x010000, CRC(994fb229) SHA1(bf194ae91240225b8edb647b1a62cd83abfa215e) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )		// Tilemap MASK-ROM (4M x 2)
+	ROM_REGION( 0x100000, "gfx1", 0 )		// Tilemap MASK-ROM (4M x 2)
 	ROM_LOAD( "975c09", 0x000000, 0x080000, CRC(bc52210e) SHA1(301a3892d250495c2e849d67fea5f01fb0196bed) )
 	ROM_LOAD( "975c08", 0x080000, 0x080000, CRC(fcff9256) SHA1(b60d29f4d04f074120d4bb7f2a71b9e9bf252d33) )
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx2", 0 )		// Sprite MASK-ROM (8M x 4)
+	ROM_REGION( 0x400000, "gfx2", 0 )		// Sprite MASK-ROM (8M x 4)
 	ROM_LOAD( "975c04", 0x000000, 0x100000, CRC(15688a6f) SHA1(a445237a11e5f98f0f9b2573a7ef0583366a137e) )
 	ROM_LOAD( "975c05", 0x100000, 0x100000, CRC(1ff33bb7) SHA1(eb17da33ba2769ea02f91fece27de2e61705e75a) )
 	ROM_LOAD( "975c06", 0x200000, 0x100000, CRC(36d410f9) SHA1(2b1fd93c11839480aa05a8bf27feef7591704f3d) )
 	ROM_LOAD( "975c07", 0x300000, 0x100000, CRC(97ec541e) SHA1(d1aa186b17cfe6e505f5b305703319299fa54518) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "konami", 0 )	// Samples MASK-ROM (4M x 1)
+	ROM_REGION( 0x100000, "konami", 0 )	// Samples MASK-ROM (4M x 1)
 	ROM_LOAD( "975c03", 0x000000, 0x080000, CRC(dc4a1707) SHA1(f252d08483fd664f8fc03bf8f174efd452b4cdc5) )
 ROM_END
 
@@ -774,7 +774,7 @@ ROM_END
 
 static void vendetta_banking( int lines )
 {
-	UINT8 *RAM = memory_region(Machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(Machine, "main");
 
 	if ( lines >= 0x1c )
 	{
@@ -788,11 +788,11 @@ static MACHINE_RESET( vendetta )
 {
 	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)vendetta_banking);
 
-	paletteram = &memory_region(machine, RGNCLASS_CPU, "main")[0x48000];
+	paletteram = &memory_region(machine, "main")[0x48000];
 	irq_enabled = 0;
 
 	/* init banks */
-	memory_set_bankptr( 1, &memory_region(machine, RGNCLASS_CPU, "main")[0x10000] );
+	memory_set_bankptr( 1, &memory_region(machine, "main")[0x10000] );
 	vendetta_video_banking( machine, 0 );
 }
 

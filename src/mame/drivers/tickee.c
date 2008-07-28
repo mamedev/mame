@@ -210,7 +210,7 @@ static WRITE16_HANDLER( tickee_control_w )
 
 static ADDRESS_MAP_START( tickee_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(&tickee_vram)
-	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0)
+	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x04100000, 0x041000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)
 	AM_RANGE(0x04200000, 0x0420000f) AM_READWRITE(AY8910_read_port_0_lsb_r, AY8910_control_port_0_lsb_w)
@@ -221,14 +221,14 @@ static ADDRESS_MAP_START( tickee_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x04400040, 0x0440004f) AM_READ_PORT("IN2")
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP		/* seems to be a bug in their code */
-	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0)
+	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 
 /* addreses in the 04x range shifted slightly...*/
 static ADDRESS_MAP_START( ghoshunt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(&tickee_vram)
-	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0)
+	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04100000, 0x04103fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x04200000, 0x042000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)
 	AM_RANGE(0x04300000, 0x0430000f) AM_READWRITE(AY8910_read_port_0_lsb_r, AY8910_control_port_0_lsb_w)
@@ -238,7 +238,7 @@ static ADDRESS_MAP_START( ghoshunt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x04500000, 0x0450007f) AM_WRITE(tickee_control_w) AM_BASE(&tickee_control)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP		/* seems to be a bug in their code */
-	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0)
+	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 
@@ -470,7 +470,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( tickee )
-	ROM_REGION16_LE( 0x200000, RGNCLASS_USER, "user1", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x200000, "user1", 0 )	/* 34010 code */
 	ROM_LOAD16_BYTE( "3.ic4",  0x000000, 0x80000, CRC(5b1e399c) SHA1(681608f06bbaf3d258e9f4768a8a6c5047ad08ec) )
 	ROM_LOAD16_BYTE( "2.ic3",  0x000001, 0x80000, CRC(1b26d4bb) SHA1(40266ec0fe5897eba85072e5bb39973d34f97546) )
 	ROM_LOAD16_BYTE( "1.ic2",  0x100000, 0x80000, CRC(f7f0309e) SHA1(4a93e0e203f5a340a56b770a40b9ab00e131644d) )
@@ -533,7 +533,7 @@ Notes:
 */
 
 ROM_START( ghoshunt )
-	ROM_REGION16_LE( 0x200000, RGNCLASS_USER, "user1", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x200000, "user1", 0 )	/* 34010 code */
 	ROM_LOAD16_BYTE( "ghosthun.7g",  0x000001, 0x80000, CRC(d59716c2) SHA1(717a1a1c5c559569f9e7bc4ae4356d112f0cf4eb) )
 	ROM_LOAD16_BYTE( "ghosthun.7h",  0x000000, 0x80000, CRC(ef38bfc8) SHA1(12b8f29f4da120f14126cbcdf4019bedd97063c3) )
 	ROM_LOAD16_BYTE( "ghosthun.7j",  0x100001, 0x80000, CRC(763d7c79) SHA1(f0dec99feeeefeddda6a88276dc306a30a58f4e4) )
@@ -542,7 +542,7 @@ ROM_END
 
 
 ROM_START( tutstomb )
-	ROM_REGION16_LE( 0x200000, RGNCLASS_USER, "user1", 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x200000, "user1", 0 )	/* 34010 code */
 	ROM_LOAD16_BYTE( "tutstomb.7g",  0x000001, 0x80000, CRC(b74d3cf2) SHA1(2221b565362183a97a959389e8a0a026ca89e0ce) )
 	ROM_LOAD16_BYTE( "tutstomb.7h",  0x000000, 0x80000, CRC(177f3afb) SHA1(845f982a66a8b69b0ea0045399102e8bb33f7fbf) )
 	ROM_LOAD16_BYTE( "tutstomb.7j",  0x100001, 0x80000, CRC(69094f31) SHA1(eadae8847d0ff1568e63f71bf09a84dc443fdc1c))

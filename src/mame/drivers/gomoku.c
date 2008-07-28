@@ -197,33 +197,33 @@ MACHINE_DRIVER_END
 
 
 ROM_START( gomoku )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )	// program
+	ROM_REGION( 0x10000, "main", 0 )	// program
 	ROM_LOAD( "rj_1.7a",    0x0000, 0x1000, CRC(ed20d539) SHA1(7cbbc678cbe5c85b914ca44f82bdbd452cf694a0) )
 	ROM_LOAD( "rj_2.7c",    0x1000, 0x1000, CRC(26a28516) SHA1(53d5d134cd91020fa06e380d355deb1df6b9cb6e) )
 	ROM_LOAD( "rj_3.7d",    0x2000, 0x1000, CRC(d05db072) SHA1(9697c932c6dcee6f8536c9f0b3c84a719a7d3dee) )
 	ROM_LOAD( "rj_4.7f",    0x3000, 0x1000, CRC(6e3d1c18) SHA1(e2f7e4c0de3c78d1b8e686152458972f996b023a) )
 	ROM_LOAD( "rj_5.4e",    0x4000, 0x0800, CRC(eaf541b4) SHA1(bc7e7ec1ba68f71ab9ac86f9ae77971ddb9ce3a4) )
 
-	ROM_REGION( 0x1000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	// text char
+	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )	// text char
 	ROM_LOAD( "rj_6.4r",    0x0000, 0x1000, CRC(ed26ae36) SHA1(61cb73d7f2568e88e1c2981e7af3e9a3b26797d3) )
 
-	ROM_REGION( 0x1000, RGNCLASS_SOUND, "gomoku", 0 )	// sound
+	ROM_REGION( 0x1000, "gomoku", 0 )	// sound
 	ROM_LOAD( "rj_7.3c",    0x0000, 0x1000, CRC(d1ed1365) SHA1(4ef08f26fe7df4c400f72e09e56d8825d584f55f) )
 
-	ROM_REGION( 0x0040, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "rj_prom.1m", 0x0000, 0x0020, CRC(5da2f2bd) SHA1(4355ccf06cb09ec3240dc92bda19b1f707a010ef) )	// TEXT color
 	ROM_LOAD( "rj_prom.1l", 0x0020, 0x0020, CRC(fe4ef393) SHA1(d4c63f8645afeadd13ff82087bcc497d8936d90b) )	// BG color
 
-	ROM_REGION( 0x0100, RGNCLASS_USER, "user1", 0 )	// BG draw data X
+	ROM_REGION( 0x0100, "user1", 0 )	// BG draw data X
 	ROM_LOAD( "rj_prom.8n", 0x0000, 0x0100, CRC(9ba43222) SHA1(a443df49d7ee9dbfd258b09731d392bf1249cbfa) )
 
-	ROM_REGION( 0x0100, RGNCLASS_USER, "user2", 0 )	// BG draw data Y
+	ROM_REGION( 0x0100, "user2", 0 )	// BG draw data Y
 	ROM_LOAD( "rj_prom.7p", 0x0000, 0x0100, CRC(5b5464f8) SHA1(b945efb8a7233f501d67f6b1be4e9d4967dc6719) )
 
-	ROM_REGION( 0x0100, RGNCLASS_USER, "user3", 0 )	// BG character data
+	ROM_REGION( 0x0100, "user3", 0 )	// BG character data
 	ROM_LOAD( "rj_prom.7r", 0x0000, 0x0100, CRC(3004585a) SHA1(711b68140827f0f3dc71f2576fcf9b905c999e8d) )
 
-	ROM_REGION( 0x0020, RGNCLASS_USER, "user4", 0 )	// unknown
+	ROM_REGION( 0x0020, "user4", 0 )	// unknown
 	ROM_LOAD( "rj_prom.9k", 0x0000, 0x0020, CRC(cff72923) SHA1(4f61375028ab62da46ed119bc81052f5f98c28d4) )
 ROM_END
 

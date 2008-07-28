@@ -225,9 +225,8 @@ struct _address_map_entry
 	size_t *				sizeptr;			/* receives size of area in bytes (optional) */
 	UINT32					baseptroffs_plus1;	/* offset of base pointer within driver_data, plus 1 */
 	UINT32					sizeptroffs_plus1;	/* offset of size pointer within driver_data, plus 1 */
-	UINT32					rgnclass;			/* class of region containing the memory backing this entry */
-	const char *			rgntag;				/* tag of region containing the memory backing this entry */
-	offs_t					rgnoffs;		/* offset within the region */
+	const char *			region;				/* tag of region containing the memory backing this entry */
+	offs_t					rgnoffs;			/* offset within the region */
 
 	void *					memory;				/* pointer to memory backing this entry */
 	offs_t					bytestart;			/* byte-adjusted start address */
@@ -765,8 +764,8 @@ union _addrmap64_token
 	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ_PORT, 8, 0, 8, 0, 8), \
 	TOKEN_STRING(_tag),
 
-#define AM_REGION(_class, _tag, _offs) \
-	TOKEN_UINT64_PACK3(ADDRMAP_TOKEN_REGION, 8, _class, 24, _offs, 32), \
+#define AM_REGION(_tag, _offs) \
+	TOKEN_UINT64_PACK2(ADDRMAP_TOKEN_REGION, 8, _offs, 32), \
 	TOKEN_STRING(_tag),
 
 #define AM_SHARE(_index) \

@@ -1760,8 +1760,8 @@ static void memory_determine_combo_items(running_machine *machine)
 {
 	memorycombo_item **tail = &memorycombo;
 	UINT32 cpunum, spacenum;
-	int rgnclass, itemnum;
 	const char *rgntag;
+	int itemnum;
 
 	// first add all the CPUs' address spaces
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
@@ -1793,31 +1793,28 @@ static void memory_determine_combo_items(running_machine *machine)
 	}
 
 	// then add all the memory regions
-	for (rgnclass = 0; rgnclass < RGNCLASS_COUNT; rgnclass++)
-		for (rgntag = memory_region_next(machine, rgnclass, NULL); rgntag != NULL; rgntag = memory_region_next(machine, rgnclass, rgntag))
-		{
-			memorycombo_item *ci = malloc_or_die(sizeof(*ci));
-			UINT32 flags = memory_region_flags(machine, rgnclass, rgntag);
-			UINT8 little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
-			UINT8 width = 1 << ((flags & ROMREGION_WIDTHMASK) >> 8);
-			TCHAR *t_tag, *t_class;
-			
-			memset(ci, 0, sizeof(*ci));
-			ci->base = memory_region(machine, rgnclass, rgntag);
-			ci->length = memory_region_length(machine, rgnclass, rgntag);
-			ci->prefsize = MIN(width, 8);
-			ci->offset_xor = width - 1;
-			ci->little_endian = little_endian;
+	for (rgntag = memory_region_next(machine, NULL); rgntag != NULL; rgntag = memory_region_next(machine, rgntag))
+	{
+		memorycombo_item *ci = malloc_or_die(sizeof(*ci));
+		UINT32 flags = memory_region_flags(machine, rgntag);
+		UINT8 little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
+		UINT8 width = 1 << ((flags & ROMREGION_WIDTHMASK) >> 8);
+		TCHAR *t_tag;
+		
+		memset(ci, 0, sizeof(*ci));
+		ci->base = memory_region(machine, rgntag);
+		ci->length = memory_region_length(machine, rgntag);
+		ci->prefsize = MIN(width, 8);
+		ci->offset_xor = width - 1;
+		ci->little_endian = little_endian;
 
-			t_class = tstring_from_utf8(memory_region_class_name(rgnclass, FALSE));
-			t_tag = tstring_from_utf8(rgntag);
-			_sntprintf(ci->name, ARRAY_LENGTH(ci->name), TEXT("%s region \"%s\""), t_class, t_tag);
-			free(t_tag);
-			free(t_class);
+		t_tag = tstring_from_utf8(rgntag);
+		_sntprintf(ci->name, ARRAY_LENGTH(ci->name), TEXT("Region \"%s\""), t_tag);
+		free(t_tag);
 
-			*tail = ci;
-			tail = &ci->next;
-		}
+		*tail = ci;
+		tail = &ci->next;
+	}
 
 	// finally add all global array symbols
 	for (itemnum = 0; itemnum < 10000; itemnum++)

@@ -56,7 +56,7 @@ void namcoc7x_sound_write16(UINT16 command, UINT32 offset)
 
 void namcoc7x_on_driver_init(running_machine *machine)
 {
-	UINT8 *pROM = (UINT8 *)memory_region(machine, RGNCLASS_USER, "user4");
+	UINT8 *pROM = (UINT8 *)memory_region(machine, "user4");
 	int cpunum;
 
 	// clear the first page of the data ROM
@@ -105,10 +105,10 @@ static WRITE16_HANDLER( c7x_shared_w )
 ADDRESS_MAP_START( namcoc7x_mcu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x002000, 0x002fff) AM_READWRITE( c352_0_r, c352_0_w )
 	AM_RANGE(0x004000, 0x00bfff) AM_RAM AM_BASE(&namcoc7x_mcuram)
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION(RGNCLASS_USER, "user4", 0x8c000)
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION(RGNCLASS_USER, "user4", 0)
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION(RGNCLASS_USER, "user4", 0)
-	AM_RANGE(0x280000, 0x2fffff) AM_ROM AM_REGION(RGNCLASS_USER, "user4", 0)
+	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("user4", 0x8c000)
+	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("user4", 0)
+	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("user4", 0)
+	AM_RANGE(0x280000, 0x2fffff) AM_ROM AM_REGION("user4", 0)
 	AM_RANGE(0x301000, 0x301001) AM_NOP	// watchdog? LEDs?
 	AM_RANGE(0x308000, 0x308003) AM_NOP	// volume control IC?
 ADDRESS_MAP_END
@@ -116,10 +116,10 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START( namcoc7x_mcu_share_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x002000, 0x002fff) AM_READWRITE( c352_0_r, c352_0_w )
 	AM_RANGE(0x004000, 0x00bfff) AM_RAM AM_READWRITE( c7x_shared_r, c7x_shared_w ) AM_BASE(&namcoc7x_mcuram)
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION(RGNCLASS_USER, "user4", 0x8c000)
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION(RGNCLASS_USER, "user4", 0)
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION(RGNCLASS_USER, "user4", 0)
-	AM_RANGE(0x280000, 0x2fffff) AM_ROM AM_REGION(RGNCLASS_USER, "user4", 0)
+	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("user4", 0x8c000)
+	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("user4", 0)
+	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("user4", 0)
+	AM_RANGE(0x280000, 0x2fffff) AM_ROM AM_REGION("user4", 0)
 	AM_RANGE(0x301000, 0x301001) AM_NOP	// watchdog? LEDs?
 	AM_RANGE(0x308000, 0x308003) AM_NOP	// volume control IC?
 ADDRESS_MAP_END

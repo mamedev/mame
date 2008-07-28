@@ -839,7 +839,7 @@ static ADDRESS_MAP_START( mediagx_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x40008300, 0x400083ff) AM_READWRITE(disp_ctrl_r, disp_ctrl_w)
 	AM_RANGE(0x40008400, 0x400084ff) AM_READWRITE(memory_ctrl_r, memory_ctrl_w)
 	AM_RANGE(0x40800000, 0x40bfffff) AM_RAM AM_BASE(&vram)
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0)	/* System BIOS */
+	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user1", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mediagx_io, ADDRESS_SPACE_IO, 32)
@@ -961,7 +961,7 @@ static MACHINE_START(mediagx)
 
 static MACHINE_RESET(mediagx)
 {
-	UINT8 *rom = memory_region(machine, RGNCLASS_USER, "user1");
+	UINT8 *rom = memory_region(machine, "user1");
 
 	cpunum_set_irq_callback(0, irq_callback);
 
@@ -1229,13 +1229,13 @@ static DRIVER_INIT( a51site4 )
 /*****************************************************************************/
 
 ROM_START(a51site4)
-	ROM_REGION32_LE(0x40000, RGNCLASS_USER, "user1", 0)
+	ROM_REGION32_LE(0x40000, "user1", 0)
 	ROM_LOAD("tinybios.rom", 0x00000, 0x40000, CRC(5ee189cc) SHA1(0b0d9321a4c59b1deea6854923e655a4d8c4fcfe))
 
-	ROM_REGION(0x08100, RGNCLASS_GFX, "gfx1", 0)
+	ROM_REGION(0x08100, "gfx1", 0)
     ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE( "a51site4", 0, MD5(be0dd1a6f0bba175c25da3d056fa426d) SHA1(49dee1b903a37b99266cc3e19227942c3cf75821) )
 ROM_END
 

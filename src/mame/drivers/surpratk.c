@@ -275,46 +275,46 @@ MACHINE_DRIVER_END
 
 
 ROM_START( suratk )
-	ROM_REGION( 0x51000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms + palette RAM */
+	ROM_REGION( 0x51000, "main", 0 ) /* code + banked roms + palette RAM */
 	ROM_LOAD( "911j01.f5", 0x10000, 0x20000, CRC(1e647881) SHA1(241e421d5599ebd9fcfb8be9c48dfd3b4c671958) )
 	ROM_LOAD( "911k02.h5", 0x30000, 0x18000, CRC(ef10e7b6) SHA1(0b41a929c0c579d688653a8d90dd6b40db12cfb3) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "911d05.bin", 0x000000, 0x040000, CRC(308d2319) SHA1(521d2a72fecb094e2c2f23b535f0b527886b4d3a) ) /* characters */
 	ROM_LOAD( "911d06.bin", 0x040000, 0x040000, CRC(91cc9b32) SHA1(e05b7bbff30f24fe6f009560410f5e90bb118692) ) /* characters */
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "911d03.bin", 0x000000, 0x040000, CRC(e34ff182) SHA1(075ca7a91c843bdac7da21ddfcd43f7a043a09b6) )	/* sprites */
 	ROM_LOAD( "911d04.bin", 0x040000, 0x040000, CRC(20700bd2) SHA1(a2fa4a3ee28c1542cdd798907a9ece249aadff0a) )	/* sprites */
 ROM_END
 
 ROM_START( suratka )
-	ROM_REGION( 0x51000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms + palette RAM */
+	ROM_REGION( 0x51000, "main", 0 ) /* code + banked roms + palette RAM */
 	ROM_LOAD( "911j01.f5", 0x10000, 0x20000, CRC(1e647881) SHA1(241e421d5599ebd9fcfb8be9c48dfd3b4c671958) )
 	ROM_LOAD( "911l02.h5", 0x30000, 0x18000, CRC(11db8288) SHA1(09fe187855172ebf0c57f561cce7f41e47f53114) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "911d05.bin", 0x000000, 0x040000, CRC(308d2319) SHA1(521d2a72fecb094e2c2f23b535f0b527886b4d3a) ) /* characters */
 	ROM_LOAD( "911d06.bin", 0x040000, 0x040000, CRC(91cc9b32) SHA1(e05b7bbff30f24fe6f009560410f5e90bb118692) ) /* characters */
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "911d03.bin", 0x000000, 0x040000, CRC(e34ff182) SHA1(075ca7a91c843bdac7da21ddfcd43f7a043a09b6) )	/* sprites */
 	ROM_LOAD( "911d04.bin", 0x040000, 0x040000, CRC(20700bd2) SHA1(a2fa4a3ee28c1542cdd798907a9ece249aadff0a) )	/* sprites */
 ROM_END
 
 ROM_START( suratkj )
-	ROM_REGION( 0x51000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms + palette RAM */
+	ROM_REGION( 0x51000, "main", 0 ) /* code + banked roms + palette RAM */
 	ROM_LOAD( "911m01.f5", 0x10000, 0x20000, CRC(ee5b2cc8) SHA1(4b05f7ba4e804a3bccb41fe9d3258cbcfe5324aa) )
 	ROM_LOAD( "911m02.h5", 0x30000, 0x18000, CRC(5d4148a8) SHA1(4fa5947db777b4c742775d588dea38758812a916) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "911d05.bin", 0x000000, 0x040000, CRC(308d2319) SHA1(521d2a72fecb094e2c2f23b535f0b527886b4d3a) ) /* characters */
 	ROM_LOAD( "911d06.bin", 0x040000, 0x040000, CRC(91cc9b32) SHA1(e05b7bbff30f24fe6f009560410f5e90bb118692) ) /* characters */
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "911d03.bin", 0x000000, 0x040000, CRC(e34ff182) SHA1(075ca7a91c843bdac7da21ddfcd43f7a043a09b6) )	/* sprites */
 	ROM_LOAD( "911d04.bin", 0x040000, 0x040000, CRC(20700bd2) SHA1(a2fa4a3ee28c1542cdd798907a9ece249aadff0a) )	/* sprites */
 ROM_END
@@ -327,7 +327,7 @@ ROM_END
 
 static void surpratk_banking(int lines)
 {
-	UINT8 *RAM = memory_region(Machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(Machine, "main");
 	int offs = 0;
 
 logerror("%04x: setlines %02x\n",activecpu_get_pc(),lines);
@@ -341,7 +341,7 @@ static MACHINE_RESET( surpratk )
 {
 	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)surpratk_banking);
 
-	paletteram = &memory_region(machine, RGNCLASS_CPU, "main")[0x48000];
+	paletteram = &memory_region(machine, "main")[0x48000];
 }
 
 static DRIVER_INIT( surpratk )

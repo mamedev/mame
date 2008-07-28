@@ -198,11 +198,11 @@ WRITE8_HANDLER( poundfor_sample_addr_w )
 
 READ8_HANDLER( m72_sample_r )
 {
-	return memory_region(machine, RGNCLASS_SOUND, "samples")[sample_addr];
+	return memory_region(machine, "samples")[sample_addr];
 }
 
 WRITE8_HANDLER( m72_sample_w )
 {
 	DAC_signed_data_w(0,data);
-	sample_addr = (sample_addr + 1) & (memory_region_length(machine, RGNCLASS_SOUND, "samples") - 1);
+	sample_addr = (sample_addr + 1) & (memory_region_length(machine, "samples") - 1);
 }

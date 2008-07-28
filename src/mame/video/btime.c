@@ -408,7 +408,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8* tmap, UINT8 color)
 {
     int i;
-    const UINT8 *gfx = memory_region(machine, RGNCLASS_GFX, "gfx3");
+    const UINT8 *gfx = memory_region(machine, "gfx3");
     int scroll = -(bnj_scroll2 | ((bnj_scroll1 & 0x03) << 8));
 
     // One extra iteration for wrap around

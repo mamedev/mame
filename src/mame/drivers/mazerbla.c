@@ -605,13 +605,13 @@ static WRITE8_HANDLER(cfb_rom_bank_sel_w)	/* mazer blazer */
 {
 	gfx_rom_bank = data;
 
-	memory_set_bankptr( 1, memory_region(machine, RGNCLASS_CPU, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000 );
+	memory_set_bankptr( 1, memory_region(machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000 );
 }
 static WRITE8_HANDLER(cfb_rom_bank_sel_w_gg)	/* great guns */
 {
 	gfx_rom_bank = data>>1;
 
-	memory_set_bankptr( 1, memory_region(machine, RGNCLASS_CPU, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000 );
+	memory_set_bankptr( 1, memory_region(machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000 );
 }
 
 
@@ -688,7 +688,7 @@ int bits = 0;
 
 UINT8 color_base=0;
 
-UINT8 * rom = memory_region(machine, RGNCLASS_CPU, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000;
+UINT8 * rom = memory_region(machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000;
 
 /*
     if ((mode<=0x07) || (mode>=0x10))
@@ -853,7 +853,7 @@ int bits = 0;
 
 UINT8 color_base=0;
 
-UINT8 * rom = memory_region(machine, RGNCLASS_CPU, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000;
+UINT8 * rom = memory_region(machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000;
 
 /*
     //if (0) //(mode != 0x07)
@@ -1453,7 +1453,7 @@ static MACHINE_RESET( mazerbla )
 
 static MACHINE_RESET( greatgun )
 {
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "sub2");
+	UINT8 *rom = memory_region(machine, "sub2");
 	game_id = GREATGUN;
 	zpu_int_vector = 0xff;
 	cpunum_set_irq_callback(0, irq_callback);
@@ -1589,17 +1589,17 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( mazerbla )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )     /* 64k for main CPU (ZPU board) */
+	ROM_REGION( 0x10000, "main", 0 )     /* 64k for main CPU (ZPU board) */
 	ROM_LOAD( "mblzpu0.bin",0x0000, 0x2000, CRC(82766187) SHA1(cfc425c87cccb84180f1091998eafeaede126d9d) )
 	ROM_LOAD( "mblzpu1.bin",0x2000, 0x2000, CRC(8ba2b3f9) SHA1(1d203332e434d1d9821f98c6ac959ae65dcc51ef) )
 	ROM_LOAD( "mblzpu2.bin",0x4000, 0x2000, CRC(48e5306c) SHA1(d27cc85d24c7b6c23c5c96be4dad5cae6e8069be) )
 	ROM_LOAD( "mblzpu3.bin",0x6000, 0x2000, CRC(eba91546) SHA1(8c1da4e0d9b562dbbf7c7583dbf567c804eb670f) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "sub", 0 )     /* 64k for sound CPU (VSB board) */
+	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for sound CPU (VSB board) */
 	ROM_LOAD( "mblvsb0.bin",0x0000, 0x1000, CRC(0cf7a1c3) SHA1(af27e3a3b51d03d46c62c2797268744d0577d075) )
 	ROM_LOAD( "mblvsb1.bin",0x1000, 0x1000, CRC(0b8d0e43) SHA1(b3ddb7561e715a58ca512fe76e53cda39402a8e4) )
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub2", 0 )     /* 64k for video CPU (CFB board) */
+	ROM_REGION( 0x18000, "sub2", 0 )     /* 64k for video CPU (CFB board) */
 	ROM_LOAD( "mblrom0.bin",0x0000, 0x2000, CRC(948a2c5e) SHA1(d693f1b96caf31649f600c5038bb79b0d1d16133) )
 
 	ROM_LOAD( "mblrom2.bin",0x10000,0x2000, CRC(36237058) SHA1(9db8fced37a3d40c4ea5b87ea18ac8e75d71e586) )/*banked at 0x4000 (select=0)*/
@@ -1607,7 +1607,7 @@ ROM_START( mazerbla )
 	/* empty socket??? (the *name* of next rom seems good ?) or wrong schematics ?*/
 	ROM_LOAD( "mblrom4.bin",0x16000,0x2000, CRC(1805acdc) SHA1(40b8e70e6ba69ac864af0b276e81218e63e48deb) )/*banked at 0x4000 (select=3)*/
 
-	ROM_REGION( 0x00240, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x00240, "proms", 0 )
 	ROM_LOAD( "sndprom.8b", 0x0000, 0x0020, CRC(d558af5a) SHA1(060556beeb1f6732c4520dcfb0086c428f7b9ce3) )
 	ROM_LOAD( "sndprom.9b", 0x0020, 0x0020, CRC(0390d748) SHA1(df0f750c1df45cc7bfb9dbabfa2b94563d19172a) )
 	ROM_LOAD( "sndprom.8g", 0x0040, 0x0100, CRC(19680615) SHA1(c309eb83e66b202bae9174dc2ffce231fca40644) )
@@ -1615,17 +1615,17 @@ ROM_START( mazerbla )
 ROM_END
 
 ROM_START( mzrblzra )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )     /* 64k for main CPU (ZPU board) */
+	ROM_REGION( 0x10000, "main", 0 )     /* 64k for main CPU (ZPU board) */
 	ROM_LOAD( "zpu0",       0x0000, 0x2000, CRC(aa77705c) SHA1(ef93c3eaa66591bef495caa101ef2aff93f2de8c) )
 	ROM_LOAD( "zpu1",       0x2000, 0x2000, CRC(599e1b97) SHA1(ceeb3017d6130d4d54ff4436261f2d3f2a29f8ab) )
 	ROM_LOAD( "zpu2",       0x4000, 0x2000, CRC(e1504613) SHA1(815b56e067d60dda6c5ebed97ef8da3f6c2927ad) )
 	ROM_LOAD( "zpu3",       0x6000, 0x2000, CRC(fd27f409) SHA1(e3d49b931325c75cc0c1075944095bb48501501f) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "sub", 0 )     /* 64k for sound CPU (VSB board) */
+	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for sound CPU (VSB board) */
 	ROM_LOAD( "mblvsb0.bin",0x0000, 0x1000, CRC(0cf7a1c3) SHA1(af27e3a3b51d03d46c62c2797268744d0577d075) )
 	ROM_LOAD( "mblvsb1.bin",0x1000, 0x1000, CRC(0b8d0e43) SHA1(b3ddb7561e715a58ca512fe76e53cda39402a8e4) )
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub2", 0 )     /* 64k for video CPU (CFB board) */
+	ROM_REGION( 0x18000, "sub2", 0 )     /* 64k for video CPU (CFB board) */
 	ROM_LOAD( "mblrom0.bin",0x0000, 0x2000, CRC(948a2c5e) SHA1(d693f1b96caf31649f600c5038bb79b0d1d16133) )
 
 	ROM_LOAD( "mblrom2.bin",0x10000,0x2000, CRC(36237058) SHA1(9db8fced37a3d40c4ea5b87ea18ac8e75d71e586) )/*banked at 0x4000 (select=0)*/
@@ -1633,7 +1633,7 @@ ROM_START( mzrblzra )
 	/* empty socket??? (the *name* of next rom seems good ?) or wrong schematics ?*/
 	ROM_LOAD( "mblrom4.bin",0x16000,0x2000, CRC(1805acdc) SHA1(40b8e70e6ba69ac864af0b276e81218e63e48deb) )/*banked at 0x4000 (select=3)*/
 
-	ROM_REGION( 0x00240, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x00240, "proms", 0 )
 	ROM_LOAD( "sndprom.8b", 0x0000, 0x0020, CRC(d558af5a) SHA1(060556beeb1f6732c4520dcfb0086c428f7b9ce3) )
 	ROM_LOAD( "sndprom.9b", 0x0020, 0x0020, CRC(0390d748) SHA1(df0f750c1df45cc7bfb9dbabfa2b94563d19172a) )
 	ROM_LOAD( "sndprom.8g", 0x0040, 0x0100, CRC(19680615) SHA1(c309eb83e66b202bae9174dc2ffce231fca40644) )
@@ -1642,16 +1642,16 @@ ROM_END
 
 
 ROM_START( greatgun )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )     /* 64k for main CPU (ZPU board) */
+	ROM_REGION( 0x10000, "main", 0 )     /* 64k for main CPU (ZPU board) */
 	ROM_LOAD( "zpu0",0x0000, 0x2000, CRC(80cf2cbf) SHA1(ea24b844ea6d8fc54adb2e28be68e1f3e1184b8b) )
 	ROM_LOAD( "zpu1",0x2000, 0x2000, CRC(fc12af94) SHA1(65f5bca2853271c232bd02dfc3467e6a4f7f0a6f) )
 	ROM_LOAD( "zpu2",0x4000, 0x2000, CRC(b34cfa26) SHA1(903adc6de0d34e5bc8fb0f8d3e74ff53204d8c68) )
 	ROM_LOAD( "zpu3",0x6000, 0x2000, CRC(c142ebdf) SHA1(0b87740d26b19a05f65b811225ee0053ddb27d22) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "sub", 0 )     /* 64k for sound CPU (PSB board) */
+	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for sound CPU (PSB board) */
 	ROM_LOAD( "psba4",0x0000, 0x2000, CRC(172a793e) SHA1(3618a778af1f4a6267bf7e0786529be731ac9b76) )
 
-	ROM_REGION( 0x38000, RGNCLASS_CPU, "sub2", 0 )     /* 64k for video CPU (CFB board) */
+	ROM_REGION( 0x38000, "sub2", 0 )     /* 64k for video CPU (CFB board) */
 	ROM_LOAD( "cfb0",0x0000, 0x2000, CRC(ee372b1f) SHA1(b630fd659d59eb8c2540f18d91ae0d72e859fc4f) )
 	ROM_LOAD( "cfb1",0x2000, 0x2000, CRC(b76d9527) SHA1(8f16b850bd67d553aaaf7e176754e36aba581445) )
 

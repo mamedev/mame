@@ -147,7 +147,7 @@ void a600xl_mmu(running_machine *machine, UINT8 new_mmu)
 	}
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
 	if (rbank2 == SMH_BANK2)
-		memory_set_bankptr(2, memory_region(machine, RGNCLASS_CPU, "main")+0x5000);
+		memory_set_bankptr(2, memory_region(machine, "main")+0x5000);
 }
 
 void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
@@ -162,20 +162,20 @@ void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 		logerror("%s MMU BIOS ROM\n", machine->gamedrv->name);
 		rbank3 = SMH_BANK3;
 		wbank3 = SMH_UNMAP;
-		base3 = memory_region(machine, RGNCLASS_CPU, "main")+0x14000;  /* 8K lo BIOS */
+		base3 = memory_region(machine, "main")+0x14000;  /* 8K lo BIOS */
 		rbank4 = SMH_BANK4;
 		wbank4 = SMH_UNMAP;
-		base4 = memory_region(machine, RGNCLASS_CPU, "main")+0x15800;  /* 4K FP ROM + 8K hi BIOS */
+		base4 = memory_region(machine, "main")+0x15800;  /* 4K FP ROM + 8K hi BIOS */
 	}
 	else
 	{
 		logerror("%s MMU BIOS RAM\n", machine->gamedrv->name);
 		rbank3 = SMH_BANK3;
 		wbank3 = SMH_BANK3;
-		base3 = memory_region(machine, RGNCLASS_CPU, "main")+0x0c000;  /* 8K RAM */
+		base3 = memory_region(machine, "main")+0x0c000;  /* 8K RAM */
 		rbank4 = SMH_BANK4;
 		wbank4 = SMH_BANK4;
-		base4 = memory_region(machine, RGNCLASS_CPU, "main")+0x0d800;  /* 4K RAM + 8K RAM */
+		base4 = memory_region(machine, "main")+0x0d800;  /* 4K RAM + 8K RAM */
 	}
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, rbank3, wbank3);
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd800, 0xffff, 0, 0, rbank4, wbank4);
@@ -188,14 +188,14 @@ void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 		logerror("%s MMU BASIC RAM\n", machine->gamedrv->name);
 		rbank1 = SMH_BANK1;
 		wbank1 = SMH_BANK1;
-		base1 = memory_region(machine, RGNCLASS_CPU, "main")+0x0a000;  /* 8K RAM */
+		base1 = memory_region(machine, "main")+0x0a000;  /* 8K RAM */
 	}
 	else
 	{
 		logerror("%s MMU BASIC ROM\n", machine->gamedrv->name);
 		rbank1 = SMH_BANK1;
 		wbank1 = SMH_UNMAP;
-		base1 = memory_region(machine, RGNCLASS_CPU, "main")+0x10000;  /* 8K BASIC */
+		base1 = memory_region(machine, "main")+0x10000;  /* 8K BASIC */
 	}
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, rbank1, wbank1);
 	memory_set_bankptr(1, base1);
@@ -206,14 +206,14 @@ void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 		logerror("%s MMU SELFTEST RAM\n", machine->gamedrv->name);
 		rbank2 = SMH_BANK2;
 		wbank2 = SMH_BANK2;
-		base2 = memory_region(machine, RGNCLASS_CPU, "main")+0x05000;  /* 0x0800 bytes */
+		base2 = memory_region(machine, "main")+0x05000;  /* 0x0800 bytes */
 	}
 	else
 	{
 		logerror("%s MMU SELFTEST ROM\n", machine->gamedrv->name);
 		rbank2 = SMH_BANK2;
 		wbank2 = SMH_UNMAP;
-		base2 = memory_region(machine, RGNCLASS_CPU, "main")+0x15000;  /* 0x0800 bytes */
+		base2 = memory_region(machine, "main")+0x15000;  /* 0x0800 bytes */
 	}
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
 	memory_set_bankptr(2, base2);
@@ -654,7 +654,7 @@ static void a800_setbank(running_machine *machine, int n)
 {
 	void *read_addr;
 	void *write_addr;
-	UINT8 *mem = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *mem = memory_region(machine, "main");
 
 	switch (n)
 	{
@@ -835,7 +835,7 @@ MACHINE_START( a800 )
 #ifdef MESS
 DEVICE_IMAGE_LOAD( a800_cart )
 {
-	UINT8 *mem = memory_region(image->machine, RGNCLASS_CPU, "main");
+	UINT8 *mem = memory_region(image->machine, "main");
 	int size;
 
 	/* load an optional (dual) cartridge (e.g. basic.rom) */
@@ -889,7 +889,7 @@ MACHINE_START( a800xl )
 #ifdef MESS
 DEVICE_IMAGE_LOAD( a800xl_cart )
 {
-	UINT8 *mem = memory_region(image->machine, RGNCLASS_CPU, "main");
+	UINT8 *mem = memory_region(image->machine, "main");
 	astring *fname;
 	mame_file *basic_fp;
 	file_error filerr;
@@ -946,7 +946,7 @@ MACHINE_START( a5200 )
 #ifdef MESS
 DEVICE_IMAGE_LOAD( a5200_cart )
 {
-	UINT8 *mem = memory_region(image->machine, RGNCLASS_CPU, "main");
+	UINT8 *mem = memory_region(image->machine, "main");
 	int size;
 
 	/* load an optional (dual) cartidge */
@@ -973,7 +973,7 @@ DEVICE_IMAGE_LOAD( a5200_cart )
 
 DEVICE_IMAGE_UNLOAD( a5200_cart )
 {
-	UINT8 *mem = memory_region(image->machine, RGNCLASS_CPU, "main");
+	UINT8 *mem = memory_region(image->machine, "main");
 	/* zap the cartridge memory (again) */
 	memset(&mem[0x4000], 0x00, 0x8000);
 }

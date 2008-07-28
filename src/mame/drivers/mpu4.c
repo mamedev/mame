@@ -429,7 +429,7 @@ static MACHINE_RESET( mpu4 )
 
 /* init rom bank, some games don't set this */
 	{
-		UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+		UINT8 *rom = memory_region(machine, "main");
 
 		memory_configure_bank(1, 0, 8, &rom[0x01000], 0x10000);
 

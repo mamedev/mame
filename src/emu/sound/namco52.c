@@ -139,8 +139,8 @@ static void *namco_52xx_start(const char *tag, int sndindex, int clock, const vo
 	memset(chip, 0, sizeof(*chip));
 
 	chip->intf = config;
-	chip->rom     = memory_region(Machine, RGNCLASS_SOUND, tag);
-	chip->rom_len = memory_region_length(Machine, RGNCLASS_SOUND, tag);
+	chip->rom     = memory_region(Machine, tag);
+	chip->rom_len = memory_region_length(Machine, tag);
 
 	if (chip->intf->play_rate == 0)
 	{

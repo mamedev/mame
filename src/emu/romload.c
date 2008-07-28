@@ -422,15 +422,13 @@ static void display_rom_load_results(rom_load_data *romdata)
 	if (romdata->errors != 0)
 	{
 		const char *rgntag, *nextrgntag;
-		int rgnclass;
 		
 		/* clean up any regions */
-		for (rgnclass = 0; rgnclass < RGNCLASS_COUNT; rgnclass++)
-			for (rgntag = memory_region_next(Machine, rgnclass, NULL); rgntag != NULL; rgntag = nextrgntag)
-			{
-				nextrgntag = memory_region_next(Machine, rgnclass, rgntag);
-				memory_region_free(Machine, rgnclass, rgntag);
-			}
+		for (rgntag = memory_region_next(Machine, NULL); rgntag != NULL; rgntag = nextrgntag)
+		{
+			nextrgntag = memory_region_next(Machine, rgntag);
+			memory_region_free(Machine, rgntag);
+		}
 
 		/* create the error message and exit fatally */
 		strcat(romdata->errorbuf, "ERROR: required files are missing, the game cannot be run.");
@@ -451,11 +449,11 @@ static void display_rom_load_results(rom_load_data *romdata)
     byte swapping and inverting data as necessary
 -------------------------------------------------*/
 
-static void region_post_process(running_machine *machine, rom_load_data *romdata, int rgnclass, const char *rgntag)
+static void region_post_process(running_machine *machine, rom_load_data *romdata, const char *rgntag)
 {
-	UINT32 regionlength = memory_region_length(machine, rgnclass, rgntag);
-	UINT32 regionflags = memory_region_flags(machine, rgnclass, rgntag);
-	UINT8 *regionbase = memory_region(machine, rgnclass, rgntag);
+	UINT32 regionlength = memory_region_length(machine, rgntag);
+	UINT32 regionflags = memory_region_flags(machine, rgntag);
+	UINT8 *regionbase = memory_region(machine, rgntag);
 	int littleendian = ((regionflags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
 	int datawidth = 1 << ((regionflags & ROMREGION_WIDTHMASK) >> 8);
 	UINT8 *base;
@@ -688,7 +686,6 @@ static void fill_rom_data(rom_load_data *romdata, const rom_entry *romp)
 static void copy_rom_data(rom_load_data *romdata, const rom_entry *romp)
 {
 	UINT8 *base = romdata->regionbase + ROM_GETOFFSET(romp);
-	int srcrgnclass = (ROM_GETFLAGS(romp) >> 4) & 0x0f;
 	const char *srcrgntag = ROM_GETNAME(romp);
 	UINT32 numbytes = ROM_GETLENGTH(romp);
 	UINT32 srcoffs = (FPTR)ROM_GETHASHDATA(romp);  /* srcoffset in place of hashdata */
@@ -703,12 +700,12 @@ static void copy_rom_data(rom_load_data *romdata, const rom_entry *romp)
 		fatalerror("Error in RomModule definition: COPY has an invalid length\n");
 
 	/* make sure the source was valid */
-	srcbase = memory_region(Machine, srcrgnclass, srcrgntag);
+	srcbase = memory_region(Machine, srcrgntag);
 	if (srcbase == NULL)
 		fatalerror("Error in RomModule definition: COPY from an invalid region\n");
 
 	/* make sure we find within the region space */
-	if (srcoffs + numbytes > memory_region_length(Machine, srcrgnclass, srcrgntag))
+	if (srcoffs + numbytes > memory_region_length(Machine, srcrgntag))
 		fatalerror("Error in RomModule definition: COPY out of source memory region space\n");
 
 	/* fill the data */
@@ -1118,19 +1115,18 @@ void rom_init(running_machine *machine, const rom_entry *romp)
 		UINT32 regionlength = ROMREGION_GETLENGTH(region);
 		UINT32 regionflags = ROMREGION_GETFLAGS(region);
 		const char *regiontag = ROMREGION_GETTAG(region);
-		int regionclass = ROMREGION_GETCLASS(region);
 
-		LOG(("Processing region %d,\"%s\" (length=%X)\n", regionclass, regiontag, regionlength));
+		LOG(("Processing region \"%s\" (length=%X)\n", regiontag, regionlength));
 
 		/* the first entry must be a region */
 		assert(ROMENTRY_ISREGION(region));
 
 		/* if this is a CPU region, override with the CPU width and endianness */
-		if (regionclass == RGNCLASS_CPU)
+		if (mame_find_cpu_index(machine, regiontag) >= 0)
 			regionflags = normalize_flags_for_cpu(machine, regionflags, regiontag);
 
 		/* remember the base and length */
-		romdata.regionbase = memory_region_alloc(machine, regionclass, regiontag, regionlength, regionflags);
+		romdata.regionbase = memory_region_alloc(machine, regiontag, regionlength, regionflags);
 		romdata.regionlength = regionlength;
 		LOG(("Allocated %X bytes @ %p\n", romdata.regionlength, romdata.regionbase));
 
@@ -1155,7 +1151,7 @@ void rom_init(running_machine *machine, const rom_entry *romp)
 			process_disk_entries(&romdata, region + 1);
 
 		/* finally, post-process for endianness and inversion */
-		region_post_process(machine, &romdata, regionclass, regiontag);
+		region_post_process(machine, &romdata, regiontag);
 	}
 
 	/* display the results and exit */
@@ -1173,15 +1169,13 @@ static void rom_exit(running_machine *machine)
 {
 	const char *rgntag, *nextrgntag;
 	open_chd *curchd;
-	int rgnclass;
 
 	/* free the memory allocated for various regions */
-	for (rgnclass = 0; rgnclass < RGNCLASS_COUNT; rgnclass++)
-		for (rgntag = memory_region_next(machine, rgnclass, NULL); rgntag != NULL; rgntag = nextrgntag)
-		{
-			nextrgntag = memory_region_next(machine, rgnclass, rgntag);
-			memory_region_free(machine, rgnclass, rgntag);
-		}
+	for (rgntag = memory_region_next(machine, NULL); rgntag != NULL; rgntag = nextrgntag)
+	{
+		nextrgntag = memory_region_next(machine, rgntag);
+		memory_region_free(machine, rgntag);
+	}
 
 	/* close all hard drives */
 	for (curchd = chd_list; curchd != NULL; curchd = curchd->next)

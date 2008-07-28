@@ -75,7 +75,7 @@ static WRITE8_HANDLER(speedspn_banked_rom_change)
 {
 	/* is this weird banking some form of protection? */
 
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *rom = memory_region(machine, "main");
 	int addr;
 
 	switch (data)
@@ -335,36 +335,36 @@ MACHINE_DRIVER_END
 /*** ROM LOADING *************************************************************/
 
 ROM_START( speedspn )
-	ROM_REGION( 0x088000, RGNCLASS_CPU, "main", 0 )	/* CPU1 code */
+	ROM_REGION( 0x088000, "main", 0 )	/* CPU1 code */
 	/* most of this is probably actually banked */
 	ROM_LOAD( "tch-ss1.u78", 0x00000, 0x008000, CRC(41b6b45b) SHA1(d969119959db4cc3be50f188bfa41e4b4896eaca) ) /* fixed code */
 	ROM_CONTINUE(            0x10000, 0x078000 ) /* banked data */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )	/* CPU2 code */
+	ROM_REGION( 0x10000, "audio", 0 )	/* CPU2 code */
 	ROM_LOAD( "tch-ss2.u96", 0x00000, 0x10000, CRC(4611fd0c) SHA1(b49ad6a8be6ccfef0b2ed187fb3b008fb7eeb2b5) ) // FIRST AND SECOND HALF IDENTICAL
 
-	ROM_REGION( 0x080000, RGNCLASS_USER, "user1", 0 )	/* Samples */
+	ROM_REGION( 0x080000, "user1", 0 )	/* Samples */
 	ROM_LOAD( "tch-ss3.u95", 0x00000, 0x080000, CRC(1c9deb5e) SHA1(89f01a8e8bdb0eee47e9195b312d2e65d41d3548) )
 
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 ) /* Samples */
-	ROM_COPY( RGNCLASS_USER, "user1", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( RGNCLASS_USER, "user1", 0x000000, 0x020000, 0x020000)
-	ROM_COPY( RGNCLASS_USER, "user1", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( RGNCLASS_USER, "user1", 0x020000, 0x060000, 0x020000)
-	ROM_COPY( RGNCLASS_USER, "user1", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( RGNCLASS_USER, "user1", 0x040000, 0x0a0000, 0x020000)
-	ROM_COPY( RGNCLASS_USER, "user1", 0x000000, 0x0c0000, 0x020000)
-	ROM_COPY( RGNCLASS_USER, "user1", 0x060000, 0x0e0000, 0x020000)
+	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
+	ROM_COPY( "user1", 0x000000, 0x000000, 0x020000)
+	ROM_COPY( "user1", 0x000000, 0x020000, 0x020000)
+	ROM_COPY( "user1", 0x000000, 0x040000, 0x020000)
+	ROM_COPY( "user1", 0x020000, 0x060000, 0x020000)
+	ROM_COPY( "user1", 0x000000, 0x080000, 0x020000)
+	ROM_COPY( "user1", 0x040000, 0x0a0000, 0x020000)
+	ROM_COPY( "user1", 0x000000, 0x0c0000, 0x020000)
+	ROM_COPY( "user1", 0x060000, 0x0e0000, 0x020000)
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT )	/* GFX */
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT )	/* GFX */
 	ROM_LOAD( "tch-ss4.u70", 0x00000, 0x020000, CRC(41517859) SHA1(3c5102e41c5a70e02ed88ea43ca63edf13f4c1b9) )
 	ROM_LOAD( "tch-ss5.u69", 0x20000, 0x020000, CRC(832b2f34) SHA1(7a3060869a9698c9ed4187b239a70e273de64e3c) )
 	ROM_LOAD( "tch-ss6.u60", 0x40000, 0x020000, CRC(f1fd7289) SHA1(8950ef58efdffc45d68152257ca36aedf5ddf677) )
 	ROM_LOAD( "tch-ss7.u59", 0x60000, 0x020000, CRC(c4958543) SHA1(c959b440801707c30a8968a1f44abe5442d03eff) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE | ROMREGION_INVERT )	/* GFX */
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE | ROMREGION_INVERT )	/* GFX */
 	ROM_LOAD( "tch-ss8.u39", 0x00000, 0x020000, CRC(2f27b16d) SHA1(7cc017fa08573f8a9d94d017abb987f8288bcd29) )
 	ROM_LOAD( "tch-ss9.u34", 0x20000, 0x020000, CRC(c372f8ec) SHA1(514bef0859c0adfd9cdd22864230fc83e9b1962d) )
 ROM_END

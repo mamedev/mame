@@ -64,7 +64,7 @@ VIDEO_UPDATE( rollrace )
 	int sx, sy;
 	int scroll;
 	int col;
-	const UINT8 *mem = memory_region(screen->machine, RGNCLASS_USER, "user1");
+	const UINT8 *mem = memory_region(screen->machine, "user1");
 
 	/* fill in background colour*/
 	fillbitmap(bitmap,ra_bkgpen,cliprect);

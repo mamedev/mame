@@ -86,7 +86,7 @@ static void *segapcm_start(const char *tag, int sndindex, int clock, const void 
 	spcm = auto_malloc(sizeof(*spcm));
 	memset(spcm, 0, sizeof(*spcm));
 
-	spcm->rom = (const UINT8 *)memory_region(Machine, RGNCLASS_SOUND, tag);
+	spcm->rom = (const UINT8 *)memory_region(Machine, tag);
 	spcm->ram = auto_malloc(0x800);
 
 	memset(spcm->ram, 0xff, 0x800);
@@ -96,7 +96,7 @@ static void *segapcm_start(const char *tag, int sndindex, int clock, const void 
 	if(!mask)
 		mask = BANK_MASK7>>16;
 
-	len = memory_region_length(Machine, RGNCLASS_SOUND, tag);
+	len = memory_region_length(Machine, tag);
 	for(rom_mask = 1; rom_mask < len; rom_mask *= 2);
 	rom_mask--;
 

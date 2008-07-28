@@ -231,8 +231,8 @@ static void rf5c400_init_chip(const char *tag, struct rf5c400_info *info, int sn
 {
 	int i;
 
-	info->rom = (INT16*)memory_region(Machine, RGNCLASS_SOUND, tag);
-	info->rom_length = memory_region_length(Machine, RGNCLASS_SOUND, tag) / 2;
+	info->rom = (INT16*)memory_region(Machine, tag);
+	info->rom_length = memory_region_length(Machine, tag) / 2;
 
 	// init volume table
 	{

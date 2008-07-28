@@ -204,7 +204,7 @@ WRITE16_HANDLER( deniam_coinctrl_w )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
-	UINT8 *gfx = memory_region(machine, RGNCLASS_GFX, "gfx2");
+	UINT8 *gfx = memory_region(machine, "gfx2");
 
 	for (offs = spriteram_size/2-8;offs >= 0;offs -= 8)
 	{

@@ -282,7 +282,7 @@ static const struct AY8910interface ay8910_interface =
 static PALETTE_INIT(carrera)
 {
 	int x;
-	UINT8 *src = memory_region ( machine, RGNCLASS_PROMS, "proms" );
+	UINT8 *src = memory_region ( machine, "proms" );
 
 	for (x=0;x<32;x++)
 		palette_set_color_rgb(machine, x, pal3bit(src[x] >> 0), pal3bit(src[x] >> 3), pal2bit(src[x] >> 6));
@@ -324,17 +324,17 @@ MACHINE_DRIVER_END
 
 
 ROM_START( carrera )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "27512.ic22", 0x00000, 0x10000, CRC(2385b9c8) SHA1(12d4397779e074096fbb23b114985f104366b79c) )
 
-	ROM_REGION( 0x50000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x50000, "gfx1", 0 )
 	ROM_LOAD( "27512.ic1", 0x00000, 0x10000, CRC(a16e914e) SHA1(09f2271f193a7bffd62ef6e428ecbf9aa1154860) )
 	ROM_LOAD( "27512.ic2", 0x10000, 0x10000, CRC(147036a5) SHA1(34b4818fe61c5b13220b0a2001987b68b655b2cb) )
 	ROM_LOAD( "27512.ic3", 0x20000, 0x10000, CRC(920eee0e) SHA1(85e6d5292b751c57c64d17858bd00292356599e3) )
 	ROM_LOAD( "27512.ic4", 0x30000, 0x10000, CRC(97433f36) SHA1(39f3c6b76ad540693682832aba6e4fc400ca3753) )
 	ROM_LOAD( "27512.ic5", 0x40000, 0x10000, CRC(ffa75920) SHA1(aa5619f5aabcdfa250bb24bcad101a8c512a1776) )
 
-	ROM_REGION( 0x20, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "82s123.ic39", 0x00, 0x20, CRC(af16359f) SHA1(1ff5c9d7807e52be09c0ded56fb68a47e41b3fcf) )
 ROM_END
 

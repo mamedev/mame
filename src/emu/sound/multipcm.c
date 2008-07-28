@@ -495,7 +495,7 @@ static void *multipcm_start(const char *tag, int sndindex, int clock, const void
 
 	ptChip=(struct _MultiPCM *)auto_malloc(sizeof(struct _MultiPCM));
 
-	ptChip->ROM=(INT8 *)memory_region(Machine, RGNCLASS_SOUND, tag);
+	ptChip->ROM=(INT8 *)memory_region(Machine, tag);
 	ptChip->Rate=(float) clock / MULTIPCM_CLOCKDIV;
 
 	ptChip->stream = stream_create(0, 2, ptChip->Rate, ptChip, MultiPCM_update);

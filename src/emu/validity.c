@@ -63,7 +63,7 @@ struct _region_entry
 typedef struct _region_info region_info;
 struct _region_info
 {
-	region_entry entries[RGNCLASS_COUNT][32];
+	region_entry entries[256];
 };
 
 
@@ -522,8 +522,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 		/* if this is a region, make sure it's valid, and record the length */
 		if (ROMENTRY_ISREGION(romp))
 		{
-			const char *rgntag = ROMREGION_GETTAG(romp);
-			int rgnclass = ROMREGION_GETCLASS(romp);
+			const char *region = ROMREGION_GETTAG(romp);
 
 			/* if we haven't seen any items since the last region, print a warning */
 			if (items_since_region == 0)
@@ -531,17 +530,10 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 			items_since_region = (ROMREGION_ISERASE(romp) || ROMREGION_ISDISPOSE(romp)) ? 1 : 0;
 			currgn = NULL;
 
-			/* check for an invalid region */
-			if (rgnclass >= RGNCLASS_COUNT || rgnclass <= RGNCLASS_INVALID)
-			{
-				mame_printf_error("%s: %s has invalid ROM_REGION class %d\n", driver->source_file, driver->name, rgnclass);
-				error = TRUE;
-			}
-
 			/* check for an invalid tag */
-			else if (rgntag == NULL || rgntag[0] == 0)
+			if (region == NULL || region[0] == 0)
 			{
-				mame_printf_error("%s: %s has duplicate ROM_REGION tag \"%s\"\n", driver->source_file, driver->name, rgntag);
+				mame_printf_error("%s: %s has duplicate ROM_REGION tag \"%s\"\n", driver->source_file, driver->name, region);
 				error = TRUE;
 			}
 
@@ -551,21 +543,21 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 				int rgnnum;
 				
 				/* iterate over all regions found so far */
-				for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries[rgnclass]); rgnnum++)
+				for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries); rgnnum++)
 				{
 					/* stop when we hit an empty */
-					if (rgninfo->entries[rgnclass][rgnnum].tag == NULL)
+					if (rgninfo->entries[rgnnum].tag == NULL)
 					{
-						currgn = &rgninfo->entries[rgnclass][rgnnum];
-						currgn->tag = rgntag;
+						currgn = &rgninfo->entries[rgnnum];
+						currgn->tag = region;
 						currgn->length = ROMREGION_GETLENGTH(romp);
 						break;
 					}
 					
 					/* fail if we hit a duplicate */
-					if (strcmp(rgninfo->entries[rgnclass][rgnnum].tag, rgntag) == 0)
+					if (strcmp(rgninfo->entries[rgnnum].tag, region) == 0)
 					{
-						mame_printf_error("%s: %s has duplicate ROM_REGION type %d,\"%s\"\n", driver->source_file, driver->name, rgnclass, rgntag);
+						mame_printf_error("%s: %s has duplicate ROM_REGION type \"%s\"\n", driver->source_file, driver->name, region);
 						error = TRUE;
 						break;
 					}
@@ -775,36 +767,35 @@ static int validate_cpu(int drivnum, const machine_config *config, region_info *
 				}
 
 				/* if this is a program space, auto-assign implicit ROM entries */
-				if ((FPTR)entry->read.generic == STATIC_ROM && entry->rgntag == NULL)
+				if ((FPTR)entry->read.generic == STATIC_ROM && entry->region == NULL)
 				{
-					entry->rgnclass = RGNCLASS_CPU;
-					entry->rgntag = config->cpu[cpunum].tag;
+					entry->region = config->cpu[cpunum].tag;
 					entry->rgnoffs = entry->addrstart;
 				}
 
 				/* if this entry references a memory region, validate it */
-				if (entry->rgntag != NULL && entry->share == 0)
+				if (entry->region != NULL && entry->share == 0)
 				{
 					int rgnnum;
 					
 					/* loop over entries in the class */
-					for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries[entry->rgnclass]); rgnnum++)
+					for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries); rgnnum++)
 					{
 						/* stop if we hit an empty */
-						if (rgninfo->entries[entry->rgnclass][rgnnum].tag == NULL)
+						if (rgninfo->entries[rgnnum].tag == NULL)
 						{
-							mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X references non-existant region %d,\"%s\"\n", driver->source_file, driver->name, cpunum, spacenum, entry->addrstart, entry->addrend, entry->rgnclass, entry->rgntag);
+							mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X references non-existant region \"%s\"\n", driver->source_file, driver->name, cpunum, spacenum, entry->addrstart, entry->addrend, entry->region);
 							error = TRUE;
 							break;
 						}
 						
 						/* if we hit a match, check against the length */
-						if (strcmp(rgninfo->entries[entry->rgnclass][rgnnum].tag, entry->rgntag) == 0)
+						if (strcmp(rgninfo->entries[rgnnum].tag, entry->region) == 0)
 						{
-							offs_t length = rgninfo->entries[entry->rgnclass][rgnnum].length;
+							offs_t length = rgninfo->entries[rgnnum].length;
 							if (entry->rgnoffs + (byteend - bytestart + 1) > length)
 							{
-								mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X extends beyond region %d,\"%s\" size (%X)\n", driver->source_file, driver->name, cpunum, spacenum, entry->addrstart, entry->addrend, entry->rgnclass, entry->rgntag, length);
+								mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X extends beyond region \"%s\" size (%X)\n", driver->source_file, driver->name, cpunum, spacenum, entry->addrstart, entry->addrend, entry->region, length);
 								error = TRUE;
 							}
 							break;
@@ -980,10 +971,10 @@ static int validate_gfx(int drivnum, const machine_config *config, region_info *
 			int rgnnum;
 
 			/* loop over gfx regions */
-			for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries[RGNCLASS_GFX]); rgnnum++)
+			for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries); rgnnum++)
 			{
 				/* stop if we hit an empty */
-				if (rgninfo->entries[RGNCLASS_GFX][rgnnum].tag == NULL)
+				if (rgninfo->entries[rgnnum].tag == NULL)
 				{
 					mame_printf_error("%s: %s has gfx[%d] referencing non-existent region \"%s\"\n", driver->source_file, driver->name, gfxnum, region);
 					error = TRUE;
@@ -991,7 +982,7 @@ static int validate_gfx(int drivnum, const machine_config *config, region_info *
 				}
 				
 				/* if we hit a match, check against the length */
-				if (strcmp(rgninfo->entries[RGNCLASS_GFX][rgnnum].tag, region) == 0)
+				if (strcmp(rgninfo->entries[rgnnum].tag, region) == 0)
 				{
 					/* if we have a valid region, and we're not using auto-sizing, check the decode against the region length */
 					if (!IS_FRAC(total))
@@ -1011,7 +1002,7 @@ static int validate_gfx(int drivnum, const machine_config *config, region_info *
 						len = total * charincrement;
 
 						/* do we have enough space in the region to cover the whole decode? */
-						avail = rgninfo->entries[RGNCLASS_GFX][rgnnum].length - (gfx->start & ~(charincrement/8-1));
+						avail = rgninfo->entries[rgnnum].length - (gfx->start & ~(charincrement/8-1));
 
 						/* if not, this is an error */
 						if ((start + len) / 8 > avail)

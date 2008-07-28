@@ -494,7 +494,7 @@ static void matrix_rotz(void)
 
 static void track_read_quad(void)
 {
-	const UINT32 *tgp_data = (const UINT32 *)memory_region(Machine, RGNCLASS_USER, "user2");
+	const UINT32 *tgp_data = (const UINT32 *)memory_region(Machine, "user2");
 	UINT32 a = fifoin_pop();
 	int offd;
 
@@ -859,7 +859,7 @@ static void f47(void)
 
 static void track_read_info(void)
 {
-	const UINT32 *tgp_data = (const UINT32 *)memory_region(Machine, RGNCLASS_USER, "user2");
+	const UINT32 *tgp_data = (const UINT32 *)memory_region(Machine, "user2");
     UINT16 a = fifoin_pop();
 	int offd;
 
@@ -1006,7 +1006,7 @@ static void tri_calc_pq(float ax, float ay, float bx, float by, float cx, float 
 
 static void track_lookup(void)
 {
-	const UINT32 *tgp_data = (const UINT32 *)memory_region(Machine, RGNCLASS_USER, "user2");
+	const UINT32 *tgp_data = (const UINT32 *)memory_region(Machine, "user2");
 	float a = fifoin_pop_f();
 	UINT32 b = fifoin_pop();
 	float c = fifoin_pop_f();
@@ -2163,7 +2163,7 @@ const struct mb86233_config model1_vr_tgp_config =
 
 /* TGP memory map */
 ADDRESS_MAP_START( model1_vr_tgp_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x000007ff) AM_RAM AM_REGION(RGNCLASS_CPU, "tgp", 0)
+	AM_RANGE(0x00000000, 0x000007ff) AM_RAM AM_REGION("tgp", 0)
 	AM_RANGE(0x00400000, 0x00407fff) AM_READWRITE(copro_ram_r, copro_ram_w)
-	AM_RANGE(0xff800000, 0xff87ffff) AM_ROM AM_REGION(RGNCLASS_USER, "user2", 0)
+	AM_RANGE(0xff800000, 0xff87ffff) AM_ROM AM_REGION("user2", 0)
 ADDRESS_MAP_END

@@ -64,14 +64,14 @@ static ADDRESS_MAP_START( eolith16_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
 	AM_RANGE(0x50000000, 0x5000ffff) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0x90000000, 0x9000002f) AM_WRITENOP //?
-	AM_RANGE(0xff000000, 0xff1fffff) AM_ROM AM_REGION(RGNCLASS_USER, "user2", 0)
+	AM_RANGE(0xff000000, 0xff1fffff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0xffe40000, 0xffe40001) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
 	AM_RANGE(0xffe80000, 0xffe80001) AM_WRITE(eeprom_w)
 	AM_RANGE(0xffea0000, 0xffea0001) AM_READ(eolith16_custom_r)
 	AM_RANGE(0xffea0002, 0xffea0003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0xffec0000, 0xffec0001) AM_READNOP // not used?
 	AM_RANGE(0xffec0002, 0xffec0003) AM_READ(input_port_2_word_r)
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0)
+	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( eolith16 )
@@ -241,13 +241,13 @@ Notes:
 */
 
 ROM_START( klondkp )
-	ROM_REGION16_BE( 0x80000, RGNCLASS_USER, "user1", 0 ) /* E1-16T program code */
+	ROM_REGION16_BE( 0x80000, "user1", 0 ) /* E1-16T program code */
 	ROM_LOAD( "kd.u5",  0x000000, 0x080000, CRC(591f0c73) SHA1(a9f338204c77a724fa6a6e08d78ca89bd5191aba) )
 
-	ROM_REGION16_BE( 0x200000, RGNCLASS_USER, "user2", 0 ) /* gfx data */
+	ROM_REGION16_BE( 0x200000, "user2", 0 ) /* gfx data */
 	ROM_LOAD16_WORD_SWAP( "kd.u31", 0x000000, 0x200000, CRC(e5dd12b5) SHA1(0a0cd75cbcdccce3575e5a58ba09c88452e1a5ee) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 ) /* oki samples */
+	ROM_REGION( 0x80000, "oki", 0 ) /* oki samples */
 	ROM_LOAD( "kd.u28", 0x000000, 0x080000, CRC(c12112a1) SHA1(729bbaca6db933a730099a4a560a10ed99cae1c3) )
 ROM_END
 

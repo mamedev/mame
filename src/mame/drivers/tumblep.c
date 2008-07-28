@@ -340,40 +340,40 @@ MACHINE_DRIVER_END
 /******************************************************************************/
 
 ROM_START( tumblep )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE("hl00-1.f12", 0x00000, 0x40000, CRC(fd697c1b) SHA1(1a3dee4c7383f2bc2d73037e80f8f5d8297e7433) )
 	ROM_LOAD16_BYTE("hl01-1.f13", 0x00001, 0x40000, CRC(d5a62a3f) SHA1(7249563993fa8e1f19ddae51306d4a576b5cb206) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* Sound cpu */
+	ROM_REGION( 0x10000, "audio", 0 ) /* Sound cpu */
 	ROM_LOAD( "hl02-.f16",    0x00000, 0x10000, CRC(a5cab888) SHA1(622f6adb01e31b8f3adbaed2b9900b54c5922c57) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "map-02.rom",   0x00000, 0x80000, CRC(dfceaa26) SHA1(83e391ff39efda71e5fa368ac68ba7d6134bac21) )	// encrypted
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "map-01.rom",   0x00000, 0x80000, CRC(e81ffa09) SHA1(01ada9557ead91eb76cf00db118d6c432104a398) )
 	ROM_LOAD16_BYTE( "map-00.rom",   0x00001, 0x80000, CRC(8c879cfe) SHA1(a53ef7811f14a8b105749b1cf29fe8a3a33bab5e) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 ) /* Oki samples */
+	ROM_REGION( 0x20000, "oki", 0 ) /* Oki samples */
 	ROM_LOAD( "hl03-.j15",    0x00000, 0x20000, CRC(01b81da0) SHA1(914802f3206dc59a720af9d57eb2285bc8ba822b) )
 ROM_END
 
 ROM_START( tumblepj )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE("hk00-1.f12", 0x00000, 0x40000, CRC(2d3e4d3d) SHA1(0acc8b93bd49395904dff11c582bdbaccdbd3eef) )
 	ROM_LOAD16_BYTE("hk01-1.f13", 0x00001, 0x40000, CRC(56912a00) SHA1(0545f6bff2a0aa2f36adda0f9d73b165387abc3a) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* Sound cpu */
+	ROM_REGION( 0x10000, "audio", 0 ) /* Sound cpu */
 	ROM_LOAD( "hl02-.f16",    0x00000, 0x10000, CRC(a5cab888) SHA1(622f6adb01e31b8f3adbaed2b9900b54c5922c57) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "map-02.rom",   0x00000, 0x80000, CRC(dfceaa26) SHA1(83e391ff39efda71e5fa368ac68ba7d6134bac21) )	// encrypted
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "map-01.rom",   0x00000, 0x80000, CRC(e81ffa09) SHA1(01ada9557ead91eb76cf00db118d6c432104a398) )
 	ROM_LOAD16_BYTE( "map-00.rom",   0x00001, 0x80000, CRC(8c879cfe) SHA1(a53ef7811f14a8b105749b1cf29fe8a3a33bab5e) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 ) /* Oki samples */
+	ROM_REGION( 0x20000, "oki", 0 ) /* Oki samples */
 	ROM_LOAD( "hl03-.j15",    0x00000, 0x20000, CRC(01b81da0) SHA1(914802f3206dc59a720af9d57eb2285bc8ba822b) )
 ROM_END
 
@@ -383,7 +383,7 @@ ROM_END
 void tumblep_patch_code(UINT16 offset)
 {
 	/* A hack which enables all Dip Switches effects */
-	UINT16 *RAM = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
 	RAM[(offset + 0)/2] = 0x0240;
 	RAM[(offset + 2)/2] = 0xffff;	// andi.w  #$f3ff, D0
 }

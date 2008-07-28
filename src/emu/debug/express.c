@@ -87,10 +87,7 @@ enum
 	TIN_MEMORY_OPCODE		= (EXPSPACE_OPCODE    << TIN_MEMORY_SPACE_SHIFT),
 	TIN_MEMORY_RAMWRITE		= (EXPSPACE_RAMWRITE  << TIN_MEMORY_SPACE_SHIFT),
 	TIN_MEMORY_EEPROM		= (EXPSPACE_EEPROM	  << TIN_MEMORY_SPACE_SHIFT),
-	TIN_MEMORY_CPU			= (EXPSPACE_CPU       << TIN_MEMORY_SPACE_SHIFT),
-	TIN_MEMORY_USER			= (EXPSPACE_USER      << TIN_MEMORY_SPACE_SHIFT),
-	TIN_MEMORY_GFX			= (EXPSPACE_GFX       << TIN_MEMORY_SPACE_SHIFT),
-	TIN_MEMORY_SOUND		= (EXPSPACE_SOUND     << TIN_MEMORY_SPACE_SHIFT),
+	TIN_MEMORY_REGION		= (EXPSPACE_REGION    << TIN_MEMORY_SPACE_SHIFT),
 
 	TIN_MEMORY_INDEX_SHIFT	= 16,
 	TIN_MEMORY_INDEX_MASK	= (0xffff << TIN_MEMORY_INDEX_SHIFT)
@@ -565,10 +562,7 @@ static int parse_memory_operator(parsed_expression *expr, const char *buffer, to
 		case 'o':	*flags |= TIN_MEMORY_OPCODE;	break;
 		case 'r':	*flags |= TIN_MEMORY_RAMWRITE;	break;
 		case 'e':	*flags |= TIN_MEMORY_EEPROM;	break;
-		case 'c':	*flags |= TIN_MEMORY_CPU;		break;
-		case 'u':	*flags |= TIN_MEMORY_USER;		break;
-		case 'g':	*flags |= TIN_MEMORY_GFX;		break;
-		case 's':	*flags |= TIN_MEMORY_SOUND;		break;
+		case 'g':	*flags |= TIN_MEMORY_REGION;	break;
 		default:	return 0;
 	}
 

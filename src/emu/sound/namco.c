@@ -108,7 +108,7 @@ static void update_namco_waveform(struct namco_sound *chip, int offset, UINT8 da
 /* build the decoded waveform table */
 static int build_decoded_waveform(struct namco_sound *chip, const char *region)
 {
-	UINT8 *rgnbase = memory_region(Machine, RGNCLASS_SOUND, region);
+	UINT8 *rgnbase = memory_region(Machine, region);
 	INT16 *p;
 	int size;
 	int offset;

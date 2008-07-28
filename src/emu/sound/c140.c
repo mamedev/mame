@@ -469,7 +469,7 @@ static void *c140_start(const char *tag, int sndindex, int clock, const void *co
 
 	info->stream = stream_create(0,2,info->sample_rate,info,update_stereo);
 
-	info->pRom=memory_region(Machine, RGNCLASS_SOUND, tag);
+	info->pRom=memory_region(Machine, tag);
 
 	/* make decompress pcm table */		//2000.06.26 CAB
 	{

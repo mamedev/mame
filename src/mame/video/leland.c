@@ -391,9 +391,9 @@ static VIDEO_UPDATE( leland )
 {
 	int y;
 
-	const UINT8 *bg_prom = memory_region(screen->machine, RGNCLASS_USER, "user1");
-	const UINT8 *bg_gfx = memory_region(screen->machine, RGNCLASS_GFX, "gfx1");
-	offs_t bg_gfx_bank_page_size = memory_region_length(screen->machine, RGNCLASS_GFX, "gfx1") / 3;
+	const UINT8 *bg_prom = memory_region(screen->machine, "user1");
+	const UINT8 *bg_gfx = memory_region(screen->machine, "gfx1");
+	offs_t bg_gfx_bank_page_size = memory_region_length(screen->machine, "gfx1") / 3;
 	offs_t char_bank = (((gfxbank >> 4) & 0x03) * 0x2000) & (bg_gfx_bank_page_size - 1);
 	offs_t prom_bank = ((gfxbank >> 3) & 0x01) * 0x2000;
 
@@ -469,8 +469,8 @@ static VIDEO_UPDATE( ataxx )
 {
 	int y;
 
-	const UINT8 *bg_gfx = memory_region(screen->machine, RGNCLASS_GFX, "gfx1");
-	offs_t bg_gfx_bank_page_size = memory_region_length(screen->machine, RGNCLASS_GFX, "gfx1") / 6;
+	const UINT8 *bg_gfx = memory_region(screen->machine, "gfx1");
+	offs_t bg_gfx_bank_page_size = memory_region_length(screen->machine, "gfx1") / 6;
 	offs_t bg_gfx_offs_mask = bg_gfx_bank_page_size - 1;
 
 	/* for each scanline in the visible region */

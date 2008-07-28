@@ -83,7 +83,7 @@ extern WRITE8_HANDLER( nbmj8891_taiwanmb_mcu_w );
 
 static DRIVER_INIT( gionbana )
 {
-	UINT8 *prot = memory_region(machine, RGNCLASS_USER, "protection");
+	UINT8 *prot = memory_region(machine, "protection");
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -107,7 +107,7 @@ static DRIVER_INIT( mgion )
 static DRIVER_INIT( omotesnd )
 {
 #if 0
-	UINT8 *prot = memory_region(machine, RGNCLASS_USER, "protection");
+	UINT8 *prot = memory_region(machine, "protection");
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -122,7 +122,7 @@ static DRIVER_INIT( omotesnd )
 #endif
 
 #if 1
-	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *ROM = memory_region(machine, "main");
 
 	// Protection ROM check skip
 	ROM[0x0106] = 0x00;
@@ -157,7 +157,7 @@ static DRIVER_INIT( msjiken )
 
 static DRIVER_INIT( telmahjn )
 {
-	UINT8 *prot = memory_region(machine, RGNCLASS_USER, "protection");
+	UINT8 *prot = memory_region(machine, "protection");
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -175,7 +175,7 @@ static DRIVER_INIT( telmahjn )
 
 static DRIVER_INIT( mgmen89 )
 {
-	UINT8 *prot = memory_region(machine, RGNCLASS_USER, "protection");
+	UINT8 *prot = memory_region(machine, "protection");
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -193,8 +193,8 @@ static DRIVER_INIT( mgmen89 )
 
 static DRIVER_INIT( mjfocus )
 {
-	UINT8 *prot = memory_region(machine, RGNCLASS_USER, "protection");
-	UINT8 *ram = memory_region(machine, RGNCLASS_CPU, "main") + 0xf800;
+	UINT8 *prot = memory_region(machine, "protection");
+	UINT8 *ram = memory_region(machine, "main") + 0xf800;
 	int i;
 
 	/* need to clear RAM otherwise it doesn't boot... */
@@ -216,7 +216,7 @@ static DRIVER_INIT( mjfocus )
 static DRIVER_INIT( mjfocusm )
 {
 #if 1
-	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *ROM = memory_region(machine, "main");
 
 	// Protection ROM check skip
 	ROM[0x014e] = 0x00;
@@ -228,7 +228,7 @@ static DRIVER_INIT( mjfocusm )
 
 static DRIVER_INIT( scandal )
 {
-	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *ROM = memory_region(machine, "main");
 	int i;
 
 	for (i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
@@ -245,10 +245,10 @@ static DRIVER_INIT( mjnanpas )
 {
 	/* they forgot to enable the protection check in this game... */
 #if 0
-	UINT8 *prot = memory_region(machine, RGNCLASS_USER, "protection");
+	UINT8 *prot = memory_region(machine, "protection");
 	int i;
 
-	memory_region(machine, RGNCLASS_CPU, "main")[0x003d] = 0x01;	// force the protection check to be executed
+	memory_region(machine, "main")[0x003d] = 0x01;	// force the protection check to be executed
 
 	/* this is one possible way to rearrange the protection ROM data to get the
        expected 0xfe1a checksum. It's probably completely wrong! But since the
@@ -306,7 +306,7 @@ static DRIVER_INIT( hanaoji )
 
 static DRIVER_INIT( pairsnb )
 {
-	UINT8 *prot = memory_region(machine, RGNCLASS_USER, "protection");
+	UINT8 *prot = memory_region(machine, "protection");
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -324,7 +324,7 @@ static DRIVER_INIT( pairsnb )
 
 static DRIVER_INIT( pairsten )
 {
-	UINT8 *prot = memory_region(machine, RGNCLASS_USER, "protection");
+	UINT8 *prot = memory_region(machine, "protection");
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -3005,14 +3005,14 @@ MACHINE_DRIVER_END
 
 
 ROM_START( gionbana )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "gion_03.bin", 0x00000, 0x10000, CRC(615e993b) SHA1(6efda8d1f0d5be6418a73dd86b898bb518de3f8b) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
 	ROM_LOAD( "gion_02.bin", 0x00000, 0x10000, CRC(c392eacc) SHA1(0f9da8ebaeb4468218123e4c5b8ceee08695ce63) )
 	ROM_LOAD( "gion_01.bin", 0x10000, 0x10000, CRC(c253eff7) SHA1(ed0e7e83726c82547bb4f2d0aabdadae9bcc68bf) )
 
-	ROM_REGION( 0x0c0000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x0c0000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "gion_04.bin", 0x000000, 0x10000, CRC(0a1398d2) SHA1(f03d272a8b3fe10a77630632a60ae5832d75e016) )
 	ROM_LOAD( "gion_05.bin", 0x010000, 0x10000, CRC(75b2c2e3) SHA1(2e6720d9910dd1c0e4696e489a33ac1833e0d9a0) )
 	ROM_LOAD( "gion_06.bin", 0x020000, 0x10000, CRC(cb743f16) SHA1(72abf5658a3e0b49ba5adab372dff0970558c651) )
@@ -3026,19 +3026,19 @@ ROM_START( gionbana )
 	ROM_LOAD( "gion_14.bin", 0x0a0000, 0x10000, CRC(a4e8b6a0) SHA1(55289f136a08a4b6b25f87d35e12c4ed4a4790e4) )
 	ROM_LOAD( "gion_15.bin", 0x0b0000, 0x10000, CRC(d36445e4) SHA1(1922f7327bfe0389fdefd85312e605955c5ccd10) )
 
-	ROM_REGION( 0x40000, RGNCLASS_USER, "protection", 0 ) /* protection data */
+	ROM_REGION( 0x40000, "protection", 0 ) /* protection data */
 	ROM_LOAD( "gion_m1.bin", 0x00000, 0x40000, CRC(f730ea47) SHA1(f969fa85a91a337ba3fc89e9c458ef116088075e) )	// same as housemnq/2i.bin gfx data
 ROM_END
 
 ROM_START( mgion )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "3.3h",   0x00000, 0x10000, CRC(ec8f5b5f) SHA1(895ea15a1d8fe88d94932273d1df2e535b5d1d58) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
 	ROM_LOAD( "2.2k",   0x00000, 0x10000, CRC(c392eacc) SHA1(0f9da8ebaeb4468218123e4c5b8ceee08695ce63) )	// gionbana/gion_02.bin
 	ROM_LOAD( "1.2h",   0x10000, 0x10000, CRC(c253eff7) SHA1(ed0e7e83726c82547bb4f2d0aabdadae9bcc68bf) )	// gionbana/gion_01.bin
 
-	ROM_REGION( 0x0d0000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x0d0000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "4.10p",  0x000000, 0x10000, CRC(0a1398d2) SHA1(f03d272a8b3fe10a77630632a60ae5832d75e016) )	// gionbana/gion_04.bin
 	ROM_LOAD( "5.10n",  0x010000, 0x10000, CRC(75b2c2e3) SHA1(2e6720d9910dd1c0e4696e489a33ac1833e0d9a0) )	// gionbana/gion_05.bin
 	ROM_LOAD( "6.10m",  0x020000, 0x10000, CRC(cb743f16) SHA1(72abf5658a3e0b49ba5adab372dff0970558c651) )	// gionbana/gion_06.bin
@@ -3053,18 +3053,18 @@ ROM_START( mgion )
 	ROM_LOAD( "15.9n",  0x0b0000, 0x10000, CRC(d36445e4) SHA1(1922f7327bfe0389fdefd85312e605955c5ccd10) )	// gionbana/gion_15.bin
 	ROM_LOAD( "16.9m" , 0x0c0000, 0x10000, CRC(dd833801) SHA1(541309854834a4578ece0d9683bb7440d7a6208d) )
 
-	ROM_REGION( 0x40000, RGNCLASS_USER, "protection", ROMREGION_ERASE00 ) /* protection data */
+	ROM_REGION( 0x40000, "protection", ROMREGION_ERASE00 ) /* protection data */
 	// not used
 ROM_END
 
 ROM_START( omotesnd )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "10.4h", 0x00000, 0x10000, CRC(8b9856f6) SHA1(f2687ec47e2006af97e1119d9504eb505d3f9e42) )
 
-	ROM_REGION( 0x10000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x10000, "voice", 0 ) /* voice */
 	ROM_LOAD( "9.4j",  0x00000, 0x10000, CRC(5b55faa7) SHA1(8f55dcd756d93f89fb713d030eae4543b69b6a9d) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x080000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "1.11p", 0x000000, 0x10000, CRC(0a1398d2) SHA1(f03d272a8b3fe10a77630632a60ae5832d75e016) )	// gionbana/gion_04.bin
 	ROM_LOAD( "2.11n", 0x010000, 0x10000, CRC(75b2c2e3) SHA1(2e6720d9910dd1c0e4696e489a33ac1833e0d9a0) )	// gionbana/gion_05.bin
 	ROM_LOAD( "3.11m", 0x020000, 0x10000, CRC(877d16ac) SHA1(9d9b663f2f4fab8f36b77aef7d148654f5320e96) )
@@ -3074,18 +3074,18 @@ ROM_START( omotesnd )
 	ROM_LOAD( "7.11e", 0x060000, 0x10000, CRC(f0adeea1) SHA1(6b9893baca74cd0bd01ddadbd62030def8205655) )
 	ROM_LOAD( "8.11d", 0x070000, 0x10000, CRC(f0e81c0b) SHA1(a2fc84a22df3e4073842258fdf425200a8a64a73) )	// gionbana/gion_11.bin
 
-	ROM_REGION( 0x40000, RGNCLASS_USER, "protection", 0 ) /* protection data */
+	ROM_REGION( 0x40000, "protection", 0 ) /* protection data */
 	ROM_LOAD( "ic6n.bin", 0x00000, 0x40000, CRC(da46163e) SHA1(c6e5f59fe813915f94d81ff28526614c943b7082) )	// same as orangec/ic2.bin gfx data
 ROM_END
 
 ROM_START( abunai )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "1.3h",   0x00000, 0x10000, CRC(8ed2119f) SHA1(e77ad936657dc733a2ab5ed69e5ec387cb7e8b23) )
 
-	ROM_REGION( 0x10000, RGNCLASS_SOUND, "voice", ROMREGION_ERASE00 ) /* voice */
+	ROM_REGION( 0x10000, "voice", ROMREGION_ERASE00 ) /* voice */
 	// not used
 
-	ROM_REGION( 0x0e0000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x0e0000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "2.8c",   0x00000, 0x10000, CRC(35c9c449) SHA1(5628eeb256991e1efd9478180141218594b9052d) )
 	ROM_LOAD( "3.8d",   0x10000, 0x10000, CRC(1e3e2036) SHA1(fc84839d6b3a6e52197b0ec365fb6c9c8ebc85d3) )
 	ROM_LOAD( "4.8e",   0x20000, 0x10000, CRC(893d5a5a) SHA1(6a64a7fcecdec046e9fcdab495926582a8dabd66) )
@@ -3103,14 +3103,14 @@ ROM_START( abunai )
 ROM_END
 
 ROM_START( hanamomo )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "hmog_21.bin", 0x00000, 0x10000, CRC(5b59d413) SHA1(9f7b7fe9f50a88958f8f7d819fb7fb4275f43260) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
 	ROM_LOAD( "hmog_22.bin", 0x00000, 0x10000, CRC(ccc15b78) SHA1(f2ca6e8ad4f44aedbfe328273fa106852b8463f4) )
 	ROM_LOAD( "hmog_23.bin", 0x10000, 0x10000, CRC(3b166358) SHA1(50967d3202407f9964224807ac474da7da179c41) )
 
-	ROM_REGION( 0x140000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x140000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "hmog_01.bin", 0x000000, 0x10000, CRC(52e7bf1f) SHA1(055c4906534bf50c7b387a018932c8056ea1b9ed) )
 	ROM_LOAD( "hmog_02.bin", 0x010000, 0x10000, CRC(bfe11acc) SHA1(2ab240d6565f3687023a9495a8bdb721a90195d4) )
 	ROM_LOAD( "hmog_03.bin", 0x020000, 0x10000, CRC(3b28db4c) SHA1(fc4f6557ba92d92ae5a9e1a3e121a723c01d61df) )
@@ -3134,14 +3134,14 @@ ROM_START( hanamomo )
 ROM_END
 
 ROM_START( hanamomb )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "21.bin",      0x00000, 0x10000, CRC(d75920b9) SHA1(7504c5d1774c8c98513ada881472145e4dd23a98) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
 	ROM_LOAD( "hmog_22.bin", 0x00000, 0x10000, CRC(ccc15b78) SHA1(f2ca6e8ad4f44aedbfe328273fa106852b8463f4) )
 	ROM_LOAD( "hmog_23.bin", 0x10000, 0x10000, CRC(3b166358) SHA1(50967d3202407f9964224807ac474da7da179c41) )
 
-	ROM_REGION( 0x140000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x140000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "hmog_01.bin", 0x000000, 0x10000, CRC(52e7bf1f) SHA1(055c4906534bf50c7b387a018932c8056ea1b9ed) )
 	ROM_LOAD( "hmog_02.bin", 0x010000, 0x10000, CRC(bfe11acc) SHA1(2ab240d6565f3687023a9495a8bdb721a90195d4) )
 	ROM_LOAD( "hmog_03.bin", 0x020000, 0x10000, CRC(3b28db4c) SHA1(fc4f6557ba92d92ae5a9e1a3e121a723c01d61df) )
@@ -3165,13 +3165,13 @@ ROM_START( hanamomb )
 ROM_END
 
 ROM_START( msjiken )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "msjn_11.bin",  0x00000, 0x10000, CRC(723499ef) SHA1(ae709e992372c00791e50932ba59456d3dcbc84b) )
 
-	ROM_REGION( 0x10000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x10000, "voice", 0 ) /* voice */
 	ROM_LOAD( "msjn_12.bin",  0x00000, 0x10000, CRC(810e299e) SHA1(b9997226e624fbf3ad7ee99d7901acbd190f31be) )
 
-	ROM_REGION( 0x110000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x110000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "msjn_01.bin",  0x000000, 0x10000, CRC(42dc6211) SHA1(6cfd77277cf128be7cc91d8c4ad7564a98a4c5e5) )
 	ROM_LOAD( "msjn_02.bin",  0x010000, 0x10000, CRC(3bc29b14) SHA1(e9e490859a713e97158d9b60dfed9338f0c3f1ce) )
 	ROM_LOAD( "msjn_03.bin",  0x020000, 0x10000, CRC(442c838d) SHA1(7f037ec7de6e1677a5bdecfd19981a3ecf5b8a63) )
@@ -3192,14 +3192,14 @@ ROM_START( msjiken )
 ROM_END
 
 ROM_START( telmahjn )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "telm_03.bin", 0x00000, 0x10000, CRC(851bff09) SHA1(850c0cf58646dfe49df68e607e8461a6e98c2137) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
 	ROM_LOAD( "telm_02.bin", 0x00000, 0x10000, CRC(5b278b68) SHA1(72010d5f39a5d9089fa28418f21e468fef17e516) )
 	ROM_LOAD( "telm_01.bin", 0x10000, 0x10000, CRC(06f00282) SHA1(66aa44eac3dced06858a84a7749c045ee9d2bc34) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "telm_04.bin", 0x000000, 0x10000, CRC(54114564) SHA1(d917b9ed3de45236e2a11a52a62da6caff150856) )
 	ROM_LOAD( "telm_05.bin", 0x010000, 0x10000, CRC(369b2c83) SHA1(6df47312d01c9ce821b60a78be92c230e7cad262) )
 	ROM_LOAD( "telm_06.bin", 0x020000, 0x10000, CRC(790e8016) SHA1(2d5c2dad9602f89306f8df84aa729dafec0a4fc8) )
@@ -3217,19 +3217,19 @@ ROM_START( telmahjn )
 	ROM_LOAD( "telm_18.bin", 0x0e0000, 0x10000, CRC(8ca01f4e) SHA1(5fba3af68d0a95d5a30866f9689867ea3758b235) )
 	ROM_LOAD( "telm_19.bin", 0x0f0000, 0x10000, CRC(07362f98) SHA1(21b8cfb776a5a6359d0059b296c7d7154c814981) )
 
-	ROM_REGION( 0x40000, RGNCLASS_USER, "protection", 0 ) /* protection data */
+	ROM_REGION( 0x40000, "protection", 0 ) /* protection data */
 	ROM_LOAD( "telm_m1.bin", 0x00000, 0x40000, CRC(2199e3e9) SHA1(965af4a29db4ff909dbeeebab1b828eb4f23f57e) )	// same as housemnq/1i.bin gfx data
 ROM_END
 
 ROM_START( mgmen89 )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "mg89_03.bin", 0x00000, 0x10000, CRC(1ac5cd84) SHA1(15cdfb95b586bd037c9584808911c6f38ed5eace) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
 	ROM_LOAD( "mg89_02.bin", 0x00000, 0x10000, CRC(1ca17bda) SHA1(61022ed38fa666a3dafefb30558fefc0d38836ad) )
 	ROM_LOAD( "mg89_01.bin", 0x10000, 0x10000, CRC(9a8c1ac5) SHA1(a2c5666c3d1a77a0a30852474e2eb788a1bdc05b) )
 
-	ROM_REGION( 0x0e0000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x0e0000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "mg89_04.bin", 0x000000, 0x10000, CRC(4c7d3afb) SHA1(057fdf4a0aac3bb8cea4f92a04b7e05d0a21a634) )
 	ROM_LOAD( "mg89_05.bin", 0x010000, 0x10000, CRC(a0b9e4b7) SHA1(4aa29e15488db4423945147191cab11a6739782d) )
 	ROM_LOAD( "mg89_06.bin", 0x020000, 0x10000, CRC(7adb3527) SHA1(02ebeaf953a9f7224e806a61083f36b16bb2f29b) )
@@ -3245,18 +3245,18 @@ ROM_START( mgmen89 )
 	ROM_LOAD( "mg89_16.bin", 0x0c0000, 0x10000, CRC(b66c3b87) SHA1(b0964d87e4b9c59357dde550d6671fd9e3750c21) )
 	ROM_LOAD( "mg89_17.bin", 0x0d0000, 0x10000, CRC(3bd5c16b) SHA1(7759e4695f9a7ad40eed69dd3bb96daaeef22fd9) )
 
-	ROM_REGION( 0x40000, RGNCLASS_USER, "protection", 0 ) /* protection data */
+	ROM_REGION( 0x40000, "protection", 0 ) /* protection data */
 	ROM_LOAD( "mg89_m1.bin", 0x00000, 0x40000, CRC(77ba1eaf) SHA1(bde55b4d2938f44fd07ff7d5b5a845f2ea64b4fc) )	// same as housemnq/5i.bin gfx data
 ROM_END
 
 ROM_START( mjfocus )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "2_3h",   0x00000, 0x10000, CRC(fd88b3e6) SHA1(3cb47cfaba421d8539268db353735174809d1506) )
 
-	ROM_REGION( 0x10000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x10000, "voice", 0 ) /* voice */
 	ROM_LOAD( "1.2k",   0x00000, 0x10000, CRC(e933d3c8) SHA1(d13687ea61d141c0300e73033723ac0c7a322dc0) )
 
-	ROM_REGION( 0x130000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x130000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "3_8c",   0x000000, 0x10000, CRC(4177d71f) SHA1(bdec569fe3352397392ff91785fcae353d2d8dcf) )
 	ROM_LOAD( "4_8d",   0x010000, 0x10000, CRC(aba5d761) SHA1(a1156ee91cc9ed22272a5d86f78ca7625490e957) )
 	ROM_LOAD( "5_8e",   0x020000, 0x10000, CRC(59c9680e) SHA1(739facc8f6e23bb8da0c1e0d31c90a1ac9812d7c) )
@@ -3277,20 +3277,20 @@ ROM_START( mjfocus )
 	ROM_LOAD( "20_10l", 0x110000, 0x10000, CRC(53f33c46) SHA1(39249f7b37c2162a484ef3e439f1f513ce13a17f) )
 	ROM_LOAD( "21_10n", 0x120000, 0x10000, CRC(68c5b271) SHA1(6b387c9e5cb33f2896033cadb91259fcdba1fe2f) )
 
-	ROM_REGION( 0x40000, RGNCLASS_USER, "protection", 0 ) /* protection data */
+	ROM_REGION( 0x40000, "protection", 0 ) /* protection data */
 	/* this ROM was not dumped, but the program expects the same checksum
        as peepshow, so it's a safe assumption that it's the same. */
 	ROM_LOAD( "mask",   0x00000, 0x40000, CRC(2199e3e9) SHA1(965af4a29db4ff909dbeeebab1b828eb4f23f57e) )	// same as housemnq/1i.bin gfx data
 ROM_END
 
 ROM_START( mjfocusm )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "mfcs_02m.bin", 0x00000, 0x10000, CRC(409d4f0b) SHA1(c19196e8315337a075d44f0814630fb820688788) )
 
-	ROM_REGION( 0x10000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x10000, "voice", 0 ) /* voice */
 	ROM_LOAD( "1.2k",         0x00000, 0x10000, CRC(e933d3c8) SHA1(d13687ea61d141c0300e73033723ac0c7a322dc0) )
 
-	ROM_REGION( 0x110000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x110000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "3.8c",         0x000000, 0x10000, CRC(4c8d6ca9) SHA1(68f0b676ddadf4eb8c073c1723dee84b4fb18de7) )
 	ROM_LOAD( "mfcs_04m.bin", 0x010000, 0x10000, CRC(e73d7804) SHA1(2579739540c27d679a34f0499e10124d6d719e74) )
 	ROM_LOAD( "5.8e",         0x020000, 0x10000, CRC(f4d7e344) SHA1(690711684d8bec17db11f2ccd48232d1fe865174) )
@@ -3309,18 +3309,18 @@ ROM_START( mjfocusm )
 	ROM_LOAD( "18.10j",       0x0f0000, 0x10000, CRC(b2cc3586) SHA1(e2629303726f8f135bee10c4f72b283123e3c85d) )
 	ROM_LOAD( "mfcs_19m.bin", 0x100000, 0x10000, CRC(45c08364) SHA1(ff83c1c4f6a0623691d3a35b14439387918a7108) )
 
-	ROM_REGION( 0x40000, RGNCLASS_USER, "protection", 0 ) /* protection data */
+	ROM_REGION( 0x40000, "protection", 0 ) /* protection data */
 	ROM_LOAD( "mfcs_m1m.bin", 0x00000, 0x40000, CRC(da46163e) SHA1(c6e5f59fe813915f94d81ff28526614c943b7082) )	// same as orangec/ic2.bin gfx data
 ROM_END
 
 ROM_START( peepshow )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "2.3h",   0x00000, 0x10000, CRC(8db1746c) SHA1(2735988352a831537efeb369a52f041c6c2d47b0) )
 
-	ROM_REGION( 0x10000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x10000, "voice", 0 ) /* voice */
 	ROM_LOAD( "1.2k",   0x00000, 0x10000, CRC(e933d3c8) SHA1(d13687ea61d141c0300e73033723ac0c7a322dc0) )
 
-	ROM_REGION( 0x110000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x110000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "3.8c",   0x000000, 0x10000, CRC(4c8d6ca9) SHA1(68f0b676ddadf4eb8c073c1723dee84b4fb18de7) )
 	ROM_LOAD( "4.8d",   0x010000, 0x10000, CRC(9e80455f) SHA1(4169ebeeb32870d01ea68a31daee7644b04ce0f6) )
 	ROM_LOAD( "5.8e",   0x020000, 0x10000, CRC(f4d7e344) SHA1(690711684d8bec17db11f2ccd48232d1fe865174) )
@@ -3339,7 +3339,7 @@ ROM_START( peepshow )
 	ROM_LOAD( "18.10j", 0x0f0000, 0x10000, CRC(b2cc3586) SHA1(e2629303726f8f135bee10c4f72b283123e3c85d) )
 	ROM_LOAD( "19.10k", 0x100000, 0x10000, CRC(b6b40e4d) SHA1(4d6f641d08f2c9814510fe1d01f66af4f19ca88a) )
 
-	ROM_REGION( 0x40000, RGNCLASS_USER, "protection", 0 ) /* protection data */
+	ROM_REGION( 0x40000, "protection", 0 ) /* protection data */
 	/* this ROM was not dumped correctly - FIXED BITS (xxxxxxxx11111111).
        However, what's in there matches the telmahjn one, and the program expects
        the same checksum, so it's a safe assumption that it's the same. */
@@ -3347,13 +3347,13 @@ ROM_START( peepshow )
 ROM_END
 
 ROM_START( scandal )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "1.3h",   0x00000, 0x10000, CRC(97e73a9c) SHA1(53d2cecb30b146da55674ea6bdde1b687597cf98) )
 
-	ROM_REGION( 0x10000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x10000, "voice", 0 ) /* voice */
 	ROM_LOAD( "2.3j",   0x00000, 0x10000, CRC(9a5f7907) SHA1(939e2dd2765a922aaf3c6a104caf459f1478863f) )
 
-	ROM_REGION( 0x0d0000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x0d0000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "15.11p", 0x000000, 0x10000, CRC(4677f0d0) SHA1(e2fc7dfdb1e4d85964937a1a0deaa4e7e2ef40db) )
 	ROM_LOAD( "14.11n", 0x010000, 0x10000, CRC(f935a681) SHA1(764d69ca149cfcc42676c0a3c2f347f723b22f3f) )
 	ROM_LOAD( "13.11m", 0x020000, 0x10000, CRC(80c5109e) SHA1(85f99c76ecc177bca628f307baeaa59dc3ef9bc0) )
@@ -3370,13 +3370,13 @@ ROM_START( scandal )
 ROM_END
 
 ROM_START( scandalm )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "scmm_01.bin", 0x00000, 0x10000, CRC(9811bab6) SHA1(05a0d9e2f038d5bf0588a66f71ac55a7c0386dac) )
 
-	ROM_REGION( 0x10000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x10000, "voice", 0 ) /* voice */
 	ROM_LOAD( "2.3j",        0x00000, 0x10000, CRC(9a5f7907) SHA1(939e2dd2765a922aaf3c6a104caf459f1478863f) )
 
-	ROM_REGION( 0x0d0000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x0d0000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "15.11p",      0x000000, 0x10000, CRC(4677f0d0) SHA1(e2fc7dfdb1e4d85964937a1a0deaa4e7e2ef40db) )
 	ROM_LOAD( "14.11n",      0x010000, 0x10000, CRC(f935a681) SHA1(764d69ca149cfcc42676c0a3c2f347f723b22f3f) )
 	ROM_LOAD( "13.11m",      0x020000, 0x10000, CRC(80c5109e) SHA1(85f99c76ecc177bca628f307baeaa59dc3ef9bc0) )
@@ -3393,14 +3393,14 @@ ROM_START( scandalm )
 ROM_END
 
 ROM_START( mjnanpas )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "mnst_03.bin", 0x00000, 0x10000, CRC(ece14e07) SHA1(de952a69fb9ecc676a43f5d4f0fd6159420fcc4f) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
 	ROM_LOAD( "mnst_02.bin", 0x00000, 0x10000, CRC(22c7ddce) SHA1(bc7106622592b6d7ccb839e0ce7a1760068209b7) )
 	ROM_LOAD( "mnst_01.bin", 0x10000, 0x10000, CRC(13b79c41) SHA1(0e2446e04510f1ec0f0ed8d4f0239d3029341afe) )
 
-	ROM_REGION( 0x140000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x140000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "mnst_04.bin", 0x000000, 0x10000, CRC(7b8fb5f2) SHA1(5a6024d2a42046268cefa565a5f3c2fa5af8d74f) )
 	ROM_LOAD( "mnst_05.bin", 0x010000, 0x10000, CRC(6e48b612) SHA1(09704181204ed5b3e24d47c743b6115edf4bd312) )
 	ROM_LOAD( "mnst_06.bin", 0x020000, 0x10000, CRC(1ea7db2e) SHA1(6b80b9c31900568c44afd4b4fe225d12ce9071b1) )
@@ -3422,21 +3422,21 @@ ROM_START( mjnanpas )
 	ROM_LOAD( "mnst_22.bin", 0x120000, 0x10000, CRC(3468f36f) SHA1(5723b6ba22268b6eca310e97fe19e4b8e4c57ca9) )
 	ROM_LOAD( "mnst_23.bin", 0x130000, 0x10000, CRC(8d1a64a6) SHA1(01dd8bf26d166a058fe771cafe4cee14eb5f813c) )
 
-	ROM_REGION( 0x40000, RGNCLASS_USER, "protection", 0 ) /* protection data */
+	ROM_REGION( 0x40000, "protection", 0 ) /* protection data */
 	/* the protection data is not used at all! They forgot a debug flag set in the
        code which skips the protection check. */
 	ROM_LOAD( "mnst_m1.bin", 0x00000, 0x40000, CRC(77ba1eaf) SHA1(bde55b4d2938f44fd07ff7d5b5a845f2ea64b4fc) )	// same as housemnq/5i.bin gfx data
 ROM_END
 
 ROM_START( mjnanpaa )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "mnst_03.old", 0x00000, 0x10000, CRC(a105b2b8) SHA1(3aa9a41fc8a1ffd37f89b660a986f0c8e48d61f8) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
 	ROM_LOAD( "mnst_02.bin", 0x00000, 0x10000, CRC(22c7ddce) SHA1(bc7106622592b6d7ccb839e0ce7a1760068209b7) )
 	ROM_LOAD( "mnst_01.bin", 0x10000, 0x10000, CRC(13b79c41) SHA1(0e2446e04510f1ec0f0ed8d4f0239d3029341afe) )
 
-	ROM_REGION( 0x140000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x140000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "mnst_04.bin", 0x000000, 0x10000, CRC(7b8fb5f2) SHA1(5a6024d2a42046268cefa565a5f3c2fa5af8d74f) )
 	ROM_LOAD( "mnst_05.bin", 0x010000, 0x10000, CRC(6e48b612) SHA1(09704181204ed5b3e24d47c743b6115edf4bd312) )
 	ROM_LOAD( "mnst_06.bin", 0x020000, 0x10000, CRC(1ea7db2e) SHA1(6b80b9c31900568c44afd4b4fe225d12ce9071b1) )
@@ -3458,21 +3458,21 @@ ROM_START( mjnanpaa )
 	ROM_LOAD( "mnst_22.bin", 0x120000, 0x10000, CRC(3468f36f) SHA1(5723b6ba22268b6eca310e97fe19e4b8e4c57ca9) )
 	ROM_LOAD( "mnst_23.bin", 0x130000, 0x10000, CRC(8d1a64a6) SHA1(01dd8bf26d166a058fe771cafe4cee14eb5f813c) )
 
-	ROM_REGION( 0x40000, RGNCLASS_USER, "protection", 0 ) /* protection data */
+	ROM_REGION( 0x40000, "protection", 0 ) /* protection data */
 	/* the protection data is not used at all! They forgot a debug flag set in the
        code which skips the protection check. */
 	ROM_LOAD( "mnst_m1.bin", 0x00000, 0x40000, CRC(77ba1eaf) SHA1(bde55b4d2938f44fd07ff7d5b5a845f2ea64b4fc) )	// same as housemnq/5i.bin gfx data
 ROM_END
 
 ROM_START( mjnanpau )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "03.bin",      0x00000, 0x10000, CRC(f96bdda7) SHA1(cea176ef11db0607137da70479ccde575bf7524a) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
 	ROM_LOAD( "mnst_02.bin", 0x00000, 0x10000, CRC(22c7ddce) SHA1(bc7106622592b6d7ccb839e0ce7a1760068209b7) )
 	ROM_LOAD( "mnst_01.bin", 0x10000, 0x10000, CRC(13b79c41) SHA1(0e2446e04510f1ec0f0ed8d4f0239d3029341afe) )
 
-	ROM_REGION( 0x140000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x140000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "mnst_04.bin", 0x000000, 0x10000, CRC(7b8fb5f2) SHA1(5a6024d2a42046268cefa565a5f3c2fa5af8d74f) )
 	ROM_LOAD( "05.bin",      0x010000, 0x10000, CRC(98219498) SHA1(76e2408d7b5e5d2cf0000d3a7f8e436917311268) )
 	ROM_LOAD( "mnst_06.bin", 0x020000, 0x10000, CRC(1ea7db2e) SHA1(6b80b9c31900568c44afd4b4fe225d12ce9071b1) )
@@ -3494,21 +3494,21 @@ ROM_START( mjnanpau )
 	ROM_LOAD( "mnst_22.bin", 0x120000, 0x10000, CRC(3468f36f) SHA1(5723b6ba22268b6eca310e97fe19e4b8e4c57ca9) )
 	ROM_LOAD( "23.bin",      0x130000, 0x10000, CRC(def886e1) SHA1(25a10ea8cf5905262197661dd6a22c0bd7d5ac6e) )
 
-	ROM_REGION( 0x40000, RGNCLASS_USER, "protection", 0 ) /* protection data */
+	ROM_REGION( 0x40000, "protection", 0 ) /* protection data */
 	/* the protection data is not used at all! They forgot a debug flag set in the
        code which skips the protection check. */
 	ROM_LOAD( "mnst_m1.bin", 0x00000, 0x40000, CRC(77ba1eaf) SHA1(bde55b4d2938f44fd07ff7d5b5a845f2ea64b4fc) )	// same as housemnq/5i.bin gfx data
 ROM_END
 
 ROM_START( pairsnb )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "3.bin",   0x00000, 0x10000, CRC(86cb9301) SHA1(ab0c1d01aac9a6e689ebf7a45e6cfae6e47bec85) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 )
+	ROM_REGION( 0x20000, "voice", 0 )
 	ROM_LOAD( "2.bin",   0x00000, 0x10000, CRC(f44ec73a) SHA1(9f13ea340ebc8affe47f43b8b831e9cdf9878823) )
 	ROM_LOAD( "1.bin",   0x10000, 0x10000, CRC(5ca5bd18) SHA1(ac12a64a402c2d57062099e239bf26f00f7104f0) )
 
-	ROM_REGION( 0xf0000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0xf0000, "gfx1", 0 )
 	ROM_LOAD( "4.bin",   0x00000, 0x10000, CRC(dd13e9ec) SHA1(a3797ab372d6e5d375aeaa82c58a787d53b45852) )
 	ROM_LOAD( "5.bin",   0x10000, 0x10000, CRC(42b55fa6) SHA1(7f9687fa6115a21d659a7d0d1c5ea8572d4cee23) )
 	ROM_LOAD( "6.bin",   0x20000, 0x10000, CRC(5f901bf2) SHA1(923467860e1f446f2d0cde5104e3f34579776fbc) )
@@ -3525,19 +3525,19 @@ ROM_START( pairsnb )
 	ROM_LOAD( "17.bin",  0xd0000, 0x10000, CRC(c8d79e7f) SHA1(cec37d71ea47d8a30be6d91866f7c05fc8195716) )
 	ROM_LOAD( "18.bin",  0xe0000, 0x10000, CRC(e3138cbc) SHA1(61c6fe7d6e77b68873891388186122f75a6fe7e6) )
 
-	ROM_REGION( 0x40000, RGNCLASS_USER, "protection", 0 ) /* protection data */
+	ROM_REGION( 0x40000, "protection", 0 ) /* protection data */
 	ROM_LOAD( "mask.f2", 0x00000, 0x40000, CRC(77ba1eaf) SHA1(bde55b4d2938f44fd07ff7d5b5a845f2ea64b4fc) )	// same as housemnq/5i.bin gfx data
 ROM_END
 
 ROM_START( pairsten )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "3.j3",    0x00000, 0x10000, CRC(037d6acb) SHA1(9a01f9765fd4cd459e22fc639b23306e50d2f051) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 )
+	ROM_REGION( 0x20000, "voice", 0 )
 	ROM_LOAD( "2.k2",    0x00000, 0x10000, CRC(f44ec73a) SHA1(9f13ea340ebc8affe47f43b8b831e9cdf9878823) )
 	ROM_LOAD( "1.j2",    0x10000, 0x10000, CRC(5ca5bd18) SHA1(ac12a64a402c2d57062099e239bf26f00f7104f0) )
 
-	ROM_REGION( 0xf0000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0xf0000, "gfx1", 0 )
 	ROM_LOAD( "4.c8",    0x00000, 0x10000, CRC(dd13e9ec) SHA1(a3797ab372d6e5d375aeaa82c58a787d53b45852) )
 	ROM_LOAD( "5.d8",    0x10000, 0x10000, CRC(42b55fa6) SHA1(7f9687fa6115a21d659a7d0d1c5ea8572d4cee23) )
 	ROM_LOAD( "6.e8",    0x20000, 0x10000, CRC(5f901bf2) SHA1(923467860e1f446f2d0cde5104e3f34579776fbc) )
@@ -3554,18 +3554,18 @@ ROM_START( pairsten )
 	ROM_LOAD( "17.f10",  0xd0000, 0x10000, CRC(c8d79e7f) SHA1(cec37d71ea47d8a30be6d91866f7c05fc8195716) )
 	ROM_LOAD( "18.h10",  0xe0000, 0x10000, CRC(e3138cbc) SHA1(61c6fe7d6e77b68873891388186122f75a6fe7e6) )
 
-	ROM_REGION( 0x40000, RGNCLASS_USER, "protection", 0 ) /* protection data */
+	ROM_REGION( 0x40000, "protection", 0 ) /* protection data */
 	ROM_LOAD( "mask.f2", 0x00000, 0x40000, CRC(77ba1eaf) SHA1(bde55b4d2938f44fd07ff7d5b5a845f2ea64b4fc) )	// same as housemnq/5i.bin gfx data
 ROM_END
 
 ROM_START( bananadr )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "1.4h",   0x00000, 0x10000, CRC(a6344e0d) SHA1(ee8df28fb2f579d3eb10d8aa454c6289de4a9239) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
 	ROM_LOAD( "2.4j",   0x00000, 0x20000, CRC(d6f24371) SHA1(4d99fa3fcbf3719975a0fe17a317e6e456d44326) )
 
-	ROM_REGION( 0x140000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x140000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "3.11p",  0x000000, 0x10000, CRC(bcb94d00) SHA1(9261bd976094dd36e39f100b82a331919c79c0fa) )
 	ROM_LOAD( "4.11n",  0x010000, 0x10000, CRC(90642607) SHA1(07f68572e7aef140e56ebb18e4bed56ce48a206a) )
 	ROM_LOAD( "5.11m",  0x020000, 0x10000, CRC(1ea7db2e) SHA1(6b80b9c31900568c44afd4b4fe225d12ce9071b1) )
@@ -3589,14 +3589,14 @@ ROM_START( bananadr )
 ROM_END
 
 ROM_START( club90s )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "c90s_03.bin", 0x00000, 0x10000, CRC(f8148ba5) SHA1(befff52276c369d4a8f2cc78ae88ecb6d90e7543) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
 	ROM_LOAD( "c90s_02.bin", 0x00000, 0x10000, CRC(b7938ed8) SHA1(b40a6e0baa94673c4ff61faf0c724355fdfb53bc) )
 	ROM_LOAD( "c90s_01.bin", 0x10000, 0x10000, CRC(baaf17bd) SHA1(6579c841912087604ae328ce8bf80159f43622a3) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "c90s_04.bin", 0x080000, 0x20000, CRC(2c7d74ef) SHA1(953c84e4a7e2d296b0576434c4a39c3ea59f54f2) )
 	ROM_LOAD( "c90s_05.bin", 0x0a0000, 0x20000, CRC(98d1f969) SHA1(577d33fd95b8f5767a0f9801ff8fc7c44cdf795e) )
 	ROM_LOAD( "c90s_06.bin", 0x0c0000, 0x20000, CRC(509c1499) SHA1(a271c30660bdf74c822335f9742182ac19f5af53) )
@@ -3608,14 +3608,14 @@ ROM_START( club90s )
 ROM_END
 
 ROM_START( club90sa )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "c90s_23.bin", 0x00000, 0x10000, CRC(60433c11) SHA1(58a07271d1c7c3578cd4857bfaf9c9568b22a049) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
 	ROM_LOAD( "c90s_02.bin", 0x00000, 0x10000, CRC(b7938ed8) SHA1(b40a6e0baa94673c4ff61faf0c724355fdfb53bc) )
 	ROM_LOAD( "c90s_01.bin", 0x10000, 0x10000, CRC(baaf17bd) SHA1(6579c841912087604ae328ce8bf80159f43622a3) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "c90s_04.bin", 0x080000, 0x20000, CRC(2c7d74ef) SHA1(953c84e4a7e2d296b0576434c4a39c3ea59f54f2) )
 	ROM_LOAD( "c90s_05.bin", 0x0a0000, 0x20000, CRC(98d1f969) SHA1(577d33fd95b8f5767a0f9801ff8fc7c44cdf795e) )
 	ROM_LOAD( "c90s_06.bin", 0x0c0000, 0x20000, CRC(509c1499) SHA1(a271c30660bdf74c822335f9742182ac19f5af53) )
@@ -3627,13 +3627,13 @@ ROM_START( club90sa )
 ROM_END
 
 ROM_START( lovehous )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "2.3f",        0x00000, 0x10000, CRC(c3a0ed85) SHA1(93cc83f50e151fdf1a179f049604a02b590d4ec3) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
 	ROM_LOAD( "1.4c",        0x00000, 0x20000, CRC(afe8ce67) SHA1(facd7eb09fa326387b833db51bd1647abe8e38dd) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* gfx */
 
 	ROM_LOAD( "c90s_04.bin", 0x000000, 0x20000, CRC(2c7d74ef) SHA1(953c84e4a7e2d296b0576434c4a39c3ea59f54f2) )
 	ROM_LOAD( "4.10c",       0x020000, 0x20000, CRC(08bf9719) SHA1(302d50d4d6d98abb0eddc8277dc54825040d112b) )
@@ -3647,14 +3647,14 @@ ROM_START( lovehous )
 ROM_END
 
 ROM_START( mladyhtr )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "mlht_03.bin", 0x00000, 0x10000, CRC(bda76c24) SHA1(c779b9420162c5b077a16e2a20a592a56b088b2e) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
 	ROM_LOAD( "mlht_02.bin", 0x00000, 0x10000, CRC(e841696d) SHA1(bf1862b458f4363a53933959ddb28a52e617e051) )
 	ROM_LOAD( "mlht_01.bin", 0x10000, 0x10000, CRC(75c35c62) SHA1(0b15abfa1f07f22e5116b06405a15c1b85f296cb) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "mj-1802.bin", 0x000000, 0x80000, CRC(e6213f10) SHA1(377399e9cd20fc2055b680eb28d024824161b2ff) )
 	ROM_LOAD( "mlht_04.bin", 0x080000, 0x20000, CRC(5896f484) SHA1(5eca71bacaed3cdde2554f43b565e7dd5a14e71e) )
 	ROM_LOAD( "mlht_05.bin", 0x0a0000, 0x20000, CRC(bc26f689) SHA1(671e5261168c107d0f233a6079c5d14540552ad7) )
@@ -3677,14 +3677,14 @@ ROM_START( mladyhtr )
 ROM_END
 
 ROM_START( chinmoku )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "3.3h",   0x00000, 0x10000, CRC(eddff33e) SHA1(b16ff69466463eeda01dc16ba7e62eac23bc8348) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
 	ROM_LOAD( "2.2k",   0x00000, 0x10000, CRC(0d6306e3) SHA1(a1d526ff5164ce527baf783f86545ac7596315f1) )
 	ROM_LOAD( "1.2h",   0x10000, 0x10000, CRC(a85e681c) SHA1(c1b49f52216c8971e04b7848b03fecf585560ef6) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "4.8d",   0x020000, 0x20000, CRC(5b5234f6) SHA1(e3c5a358b7c766a974988a9be82df5a75d676918) )
 	ROM_LOAD( "5.8e",   0x040000, 0x20000, CRC(56bf9a23) SHA1(e81ff1c2e931cbd8bb9861f9d490915886680ac4) )
 	ROM_LOAD( "6.8f",   0x060000, 0x20000, CRC(188bdbd6) SHA1(5e0c205e94ba6a509e2942b8e9ec336610b924e1) )
@@ -3707,13 +3707,13 @@ ROM_START( chinmoku )
 ROM_END
 
 ROM_START( maiko )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "mikb_02.bin", 0x00000, 0x10000, CRC(fbf68ebd) SHA1(0ddc9fc39bc362563462c57a728f1fc4ce3f682b) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
 	ROM_LOAD( "mikb_01.bin", 0x00000, 0x20000, CRC(713b3f8f) SHA1(460e9dcfc4a31f8e6d3f40ba77d6639257d9762f) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "mikb_03.bin", 0x000000, 0x20000, CRC(0c949a6f) SHA1(c8d0011e22d62e46be20d1ac8328f5b2c47f3d31) )
 	ROM_LOAD( "mikb_04.bin", 0x020000, 0x20000, CRC(8c841482) SHA1(94d7fe911ebfa8b19c65b56c774b29897df6bae8) )
 	ROM_LOAD( "mikb_05.bin", 0x040000, 0x20000, CRC(7c61b4f7) SHA1(e23bb0f051d53846c70b298ca50f38f12585f958) )
@@ -3724,13 +3724,13 @@ ROM_START( maiko )
 ROM_END
 
 ROM_START( mmaiko )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "2.3f",        0x00000, 0x10000, CRC(82b63476) SHA1(98c120b82953782f532c09b9305a8e6b5dedb374) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
 	ROM_LOAD( "1.4c",        0x00000, 0x20000, CRC(05fc906c) SHA1(d9979de8656cb43e1cd39d79e902662686bd19b0) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "3.10a",       0x000000, 0x20000, CRC(26ba1686) SHA1(565e7ee0e75c635bd6801efce136a4bc4bf72229) )
 	ROM_LOAD( "4.10c",       0x020000, 0x20000, CRC(6ce799cb) SHA1(b06c83533f129544b9d70e3c1dda48a7f1404ebc) )
 	ROM_LOAD( "mikb_05.bin", 0x040000, 0x20000, CRC(7c61b4f7) SHA1(e23bb0f051d53846c70b298ca50f38f12585f958) )
@@ -3741,13 +3741,13 @@ ROM_START( mmaiko )
 ROM_END
 
 ROM_START( hanaoji )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "hnoj_02.bin", 0x00000, 0x10000, CRC(580cd095) SHA1(e798e9db64072d14c46840235c88dcdcc3d3ec6a) )
 
-	ROM_REGION( 0x10000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x10000, "voice", 0 ) /* voice */
 	ROM_LOAD( "hnoj_01.bin", 0x00000, 0x10000, CRC(3f7fcb94) SHA1(7bb0bc3a8c34b1b707b39ba52be40900cca0f015) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "hnoj_03.bin", 0x000000, 0x20000, CRC(fbbe1dce) SHA1(f742bb8e06a1e71e7c586d0a821f96238bdbc6ac) )
 	ROM_LOAD( "hnoj_04.bin", 0x020000, 0x20000, CRC(2074b04f) SHA1(e759e49474bcb1caeea5a60708844ec53aed64c6) )
 	ROM_LOAD( "hnoj_05.bin", 0x040000, 0x20000, CRC(84d20ba6) SHA1(0f270d43cdb390492f349b3680978e2e36a6a5d4) )
@@ -3760,14 +3760,14 @@ ROM_START( hanaoji )
 ROM_END
 
 ROM_START( mjcamerb )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "2.3h",        0x00000, 0x10000, CRC(3a0f110b) SHA1(8923136ed25ed91c90f93c3f75f5532ff8f9d420) )
 
-	ROM_REGION( 0x30000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x30000, "voice", 0 ) /* voice */
 	ROM_LOAD( "1.2k",        0x00000, 0x10000, CRC(fe8e975e) SHA1(7287f5654aebc1f27c957d4af997480fa380b15a) )
 	/* protection data is mapped at 20000-2ffff */
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "3.8c",        0x000000, 0x10000, CRC(273fb8bc) SHA1(d5aa20570a1ad7a97d2b4eb12039c51d85288a96) )
 	ROM_LOAD( "4.8d",        0x010000, 0x10000, CRC(82995399) SHA1(0aa4dcbed01f6a4893c31487469989035fd791c3) )
 	ROM_LOAD( "5.8e",        0x020000, 0x10000, CRC(a7c51d54) SHA1(b553136a1e2bf3e6cd61a0b0ebd0341a389ac65f) )
@@ -3785,18 +3785,18 @@ ROM_START( mjcamerb )
 	ROM_LOAD( "17.10h",      0x0e0000, 0x10000, CRC(78cef468) SHA1(aedd94d3fcf097587e77f52d03a50a63606bdab6) )
 	ROM_LOAD( "18.10k",      0x0f0000, 0x10000, CRC(3a3da341) SHA1(198ea75aedff187b02a740d5a1cc49c76340831f) )
 
-	ROM_REGION( 0x40000, RGNCLASS_USER, "protection", 0 ) /* protection data */
+	ROM_REGION( 0x40000, "protection", 0 ) /* protection data */
 	ROM_LOAD( "mcam_m1.bin", 0x00000, 0x40000, CRC(f85c5b07) SHA1(0fc55e9b60ccc630a0d77862eb5e64a3ba366947) )	// same as housemnq/3i.bin gfx data
 ROM_END
 
 ROM_START( mmcamera )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "2.3ha",  0x00000, 0x10000, CRC(b6eed2cf) SHA1(87171ba9ba247e54244867f720738f9b88a1213e) )
 
-	ROM_REGION( 0x10000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x10000, "voice", 0 ) /* voice */
 	ROM_LOAD( "1.2k",   0x00000, 0x10000, CRC(fe8e975e) SHA1(7287f5654aebc1f27c957d4af997480fa380b15a) )
 
-	ROM_REGION( 0x110000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x110000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "3.8c",   0x000000, 0x10000, CRC(273fb8bc) SHA1(d5aa20570a1ad7a97d2b4eb12039c51d85288a96) )
 	ROM_LOAD( "4.8d",   0x010000, 0x10000, CRC(82995399) SHA1(0aa4dcbed01f6a4893c31487469989035fd791c3) )
 	ROM_LOAD( "5.8e",   0x020000, 0x10000, CRC(a7c51d54) SHA1(b553136a1e2bf3e6cd61a0b0ebd0341a389ac65f) )
@@ -3817,13 +3817,13 @@ ROM_START( mmcamera )
 ROM_END
 
 ROM_START( taiwanmb )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
 	ROM_LOAD( "1.3d",        0x00000, 0x10000, CRC(2165310e) SHA1(18151e849fede6f7e5275ab27e50ce8e4c227332) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
 	ROM_LOAD( "3.7n",        0x00000, 0x20000, CRC(1890902f) SHA1(1ef66fd70fefa09d31f77d0834a406fcc70e0261) )
 
-	ROM_REGION( 0x0a0000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x0a0000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "4.10a",       0x000000, 0x10000, CRC(6ccaab80) SHA1(7751012d555d7179f1e28244bf30240dbd1c0b38) )
 	ROM_LOAD( "5.10c",       0x010000, 0x10000, CRC(ef29a87e) SHA1(f6af16ffd49009b18cefe50e937c1901a37daa3c) )
 	ROM_LOAD( "6.10d",       0x020000, 0x10000, CRC(539c2443) SHA1(accb2f58a97f91e7e5c378d2f4887a78a055e1b7) )
@@ -3835,7 +3835,7 @@ ROM_START( taiwanmb )
 	ROM_LOAD( "12.10n",      0x080000, 0x10000, CRC(ec59b720) SHA1(fd4eb63337885d7fa58ea2f3507d32fda4dee343) )
 	ROM_LOAD( "13.10p",      0x090000, 0x10000, CRC(6542e7da) SHA1(be6db10178f532ac273599808c52126037ac78a0) )
 
-	ROM_REGION( 0x00800, RGNCLASS_USER, "protection", 0 ) /* protection (Intel D87??; mcu data that is extracted from the real board!) */
+	ROM_REGION( 0x00800, "protection", 0 ) /* protection (Intel D87??; mcu data that is extracted from the real board!) */
 	ROM_LOAD( "clut_ram.8f", 0x000000, 0x00800, CRC(bd80fa09) SHA1(896421e1e01beef0de6acebbbc255224e4e0438b) )
 ROM_END
 

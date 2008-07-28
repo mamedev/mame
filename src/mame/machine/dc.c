@@ -681,7 +681,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 	UINT64 shift;
 	UINT32 old,dat;
 	struct sh4_ddt_dma ddtdata;
-	UINT8 *ROM = (UINT8 *)memory_region(machine, RGNCLASS_USER, "user1");
+	UINT8 *ROM = (UINT8 *)memory_region(machine, "user1");
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);

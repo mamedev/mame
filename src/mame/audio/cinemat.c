@@ -1602,7 +1602,7 @@ static MACHINE_RESET( qb3_sound )
 
 	/* this patch prevents the sound ROM from eating itself when command $0A is sent */
 	/* on a cube rotate */
-	memory_region(machine, RGNCLASS_CPU, "audio")[0x11dc] = 0x09;
+	memory_region(machine, "audio")[0x11dc] = 0x09;
 }
 
 

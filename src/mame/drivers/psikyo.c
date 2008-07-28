@@ -391,7 +391,7 @@ static WRITE8_HANDLER( psikyo_clear_nmi_w )
 
 static WRITE8_HANDLER( sngkace_sound_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "audio");
+	UINT8 *RAM = memory_region(machine, "audio");
 	int bank = data & 3;
 	memory_set_bankptr(1, &RAM[bank * 0x8000 + 0x10000]);
 }
@@ -433,7 +433,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( gunbird_sound_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "audio");
+	UINT8 *RAM = memory_region(machine, "audio");
 	int bank = (data >> 4) & 3;
 
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes
@@ -1737,52 +1737,52 @@ OSC:    32.000, 14.31818 MHz
 
 ROM_START( samuraia )
 
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "4-u127.bin", 0x000000, 0x040000, CRC(8c9911ca) SHA1(821ba648b9a1d495c600cbf4606f2dbddc6f9e6f) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "5-u126.bin", 0x000002, 0x040000, CRC(d20c3ef0) SHA1(264e5a7e45e130a9e7152468733337668dc5b65f) ) // 3&2
 
-	ROM_REGION( 0x030000, RGNCLASS_CPU, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u58.bin", 0x00000, 0x20000, CRC(310f5c76) SHA1(dbfd1c5a7a514bccd89fc4f7191744cf76bb745d) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "u14.bin",  0x000000, 0x200000, CRC(00a546cb) SHA1(30a8679b49928d5fcbe58b5eecc2ebd08173adf8) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Layers 0 + 1 */
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layers 0 + 1 */
 	ROM_LOAD( "u34.bin",  0x000000, 0x100000, CRC(e6a75bd8) SHA1(1aa84ea54584b6c8b2846194b48bf6d2afa67fee) )
 	ROM_LOAD( "u35.bin",  0x100000, 0x100000, CRC(c4ca0164) SHA1(c75422de2e0127cdc23d8c223b674a5bd85b00fb) )
 
-//  ROM_REGION( 0x100000, RGNCLASS_SOUND, "ymf", 0 )  /* Samples */
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "ymf", 0 )	/* Samples */
+//  ROM_REGION( 0x100000, "ymf", 0 )  /* Samples */
+	ROM_REGION( 0x100000, "ymf", 0 )	/* Samples */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
 
-	ROM_REGION( 0x040000, RGNCLASS_USER, "user1", 0 )	/* Sprites LUT */
+	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
 	ROM_LOAD( "u11.bin",  0x000000, 0x040000, CRC(11a04d91) SHA1(5d146a9a39a70f2ee212ceab9a5469598432449e) ) // x1xxxxxxxxxxxxxxxx = 0xFF
 
 ROM_END
 
 ROM_START( sngkace )
 
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "1-u127.bin", 0x000000, 0x040000, CRC(6c45b2f8) SHA1(08473297e174f3a6d67043f3b16f4e6b9c68b826) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "2-u126.bin", 0x000002, 0x040000, CRC(845a6760) SHA1(3b8fed294e28d9d8ef5cb5ec88b9ade396146a48) ) // 3&2
 
-	ROM_REGION( 0x030000, RGNCLASS_CPU, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u58.bin", 0x00000, 0x20000, CRC(310f5c76) SHA1(dbfd1c5a7a514bccd89fc4f7191744cf76bb745d) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "u14.bin",  0x000000, 0x200000, CRC(00a546cb) SHA1(30a8679b49928d5fcbe58b5eecc2ebd08173adf8) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Layers 0 + 1 */
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layers 0 + 1 */
 	ROM_LOAD( "u34.bin",  0x000000, 0x100000, CRC(e6a75bd8) SHA1(1aa84ea54584b6c8b2846194b48bf6d2afa67fee) )
 	ROM_LOAD( "u35.bin",  0x100000, 0x100000, CRC(c4ca0164) SHA1(c75422de2e0127cdc23d8c223b674a5bd85b00fb) )
 
-//  ROM_REGION( 0x100000, RGNCLASS_SOUND, "ymf", 0 )  /* Samples */
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "ymf", 0 )	/* Samples */
+//  ROM_REGION( 0x100000, "ymf", 0 )  /* Samples */
+	ROM_REGION( 0x100000, "ymf", 0 )	/* Samples */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
 
-	ROM_REGION( 0x040000, RGNCLASS_USER, "user1", 0 )	/* Sprites LUT */
+	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
 	ROM_LOAD( "u11.bin",  0x000000, 0x040000, CRC(11a04d91) SHA1(5d146a9a39a70f2ee212ceab9a5469598432449e) ) // x1xxxxxxxxxxxxxxxx = 0xFF
 
 ROM_END
@@ -1790,8 +1790,8 @@ ROM_END
 static DRIVER_INIT( sngkace )
 {
 	{
-		UINT8 *RAM	=	memory_region(machine, RGNCLASS_SOUND, "ymf");
-		int len				=	memory_region_length(machine, RGNCLASS_SOUND, "ymf");
+		UINT8 *RAM	=	memory_region(machine, "ymf");
+		int len				=	memory_region_length(machine, "ymf");
 		int i;
 
 		/* Bit 6&7 of the samples are swapped. Naughty, naughty... */
@@ -1810,13 +1810,13 @@ static DRIVER_INIT( sngkace )
 
 	psikyo_ka302c_banking = 0; // SH201B doesn't have any gfx banking
 	psikyo_switch_banks(0, 0); // sngkace / samuraia don't use banking
-	psikyo_switch_banks(1, 1); // They share RGNCLASS_GFX, "gfx2" to save memory on other boards
+	psikyo_switch_banks(1, 1); // They share "gfx2" to save memory on other boards
 
 	/* Enable other regions */
 #if 0
 	if (!strcmp(machine->gamedrv->name,"sngkace"))
 	{
-		UINT8 *ROM	=	memory_region(machine, RGNCLASS_CPU, "main");
+		UINT8 *ROM	=	memory_region(machine, "main");
 		ROM[0x995] = 0x4e;
 		ROM[0x994] = 0x71;
 		ROM[0x997] = 0x4e;
@@ -1847,90 +1847,90 @@ Chips:  PS2001B
 
 ROM_START( gunbird )
 
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "4-u46.bin", 0x000000, 0x040000, CRC(b78ec99d) SHA1(399b79931652d9df1632cd4d7ec3d214e473a5c3) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "5-u39.bin", 0x000002, 0x040000, CRC(925f095d) SHA1(301a536119a0320a756e9c6e51fb10e36b90ef16) ) // 3&2
 
-	ROM_REGION( 0x030000, RGNCLASS_CPU, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u71.bin", 0x00000, 0x20000, CRC(2168e4ba) SHA1(ca7ad6acb5f806ce2528e7b52c19e8cceecb8543) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
-	ROM_REGION( 0x700000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x700000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "u14.bin",  0x000000, 0x200000, CRC(7d7e8a00) SHA1(9f35f5b54ae928e9bf2aa6ad4604f669857955ec) )
 	ROM_LOAD( "u24.bin",  0x200000, 0x200000, CRC(5e3ffc9d) SHA1(c284eb9ef56c8e6261fe11f91a10c5c5a56c9803) )
 	ROM_LOAD( "u15.bin",  0x400000, 0x200000, CRC(a827bfb5) SHA1(6e02436e12085016cf1982c9ae07b6c6dec82f1b) )
 	ROM_LOAD( "u25.bin",  0x600000, 0x100000, CRC(ef652e0c) SHA1(6dd994a15ced31d1bbd1a3b0e9d8d86eca33e217) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Layers 0 + 1 */
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layers 0 + 1 */
 	ROM_LOAD( "u33.bin",  0x000000, 0x200000, CRC(54494e6b) SHA1(f5d090d2d34d908b56b53a246def194929eba990) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "ym", 0 )	/* ADPCM Samples */
+	ROM_REGION( 0x100000, "ym", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(9e07104d) SHA1(3bc54cb755bb3194197706965b532d62b48c4d12) )
 
-	ROM_REGION( 0x080000, RGNCLASS_SOUND, "ym.deltat", 0 )	/* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
-	ROM_REGION( 0x040000, RGNCLASS_USER, "user1", 0 )	/* Sprites LUT */
+	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
 	ROM_LOAD( "u3.bin",  0x000000, 0x040000, CRC(0905aeb2) SHA1(8cca09f7dfe3f804e77515f7b1b1bdbeb7bb3d80) )
 
 ROM_END
 
 ROM_START( gunbirdk )
 
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "1k-u46.bin", 0x000000, 0x080000, CRC(745cee52) SHA1(6c5bb92c92c55f882484417bc1aa580684019610) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "2k-u39.bin", 0x000002, 0x080000, CRC(669632fb) SHA1(885dea42e6da35e9166a208b18dbd930642c26cd) ) // 3&2
 
-	ROM_REGION( 0x030000, RGNCLASS_CPU, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "k3-u71.bin", 0x00000, 0x20000, CRC(11994055) SHA1(619776c178361f23de37ff14e87284ec0f1f4f10) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
-	ROM_REGION( 0x700000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x700000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "u14.bin",  0x000000, 0x200000, CRC(7d7e8a00) SHA1(9f35f5b54ae928e9bf2aa6ad4604f669857955ec) )
 	ROM_LOAD( "u24.bin",  0x200000, 0x200000, CRC(5e3ffc9d) SHA1(c284eb9ef56c8e6261fe11f91a10c5c5a56c9803) )
 	ROM_LOAD( "u15.bin",  0x400000, 0x200000, CRC(a827bfb5) SHA1(6e02436e12085016cf1982c9ae07b6c6dec82f1b) )
 	ROM_LOAD( "u25.bin",  0x600000, 0x100000, CRC(ef652e0c) SHA1(6dd994a15ced31d1bbd1a3b0e9d8d86eca33e217) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Layers 0 + 1 */
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layers 0 + 1 */
 	ROM_LOAD( "u33.bin",  0x000000, 0x200000, CRC(54494e6b) SHA1(f5d090d2d34d908b56b53a246def194929eba990) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "ym", 0 )	/* ADPCM Samples */
+	ROM_REGION( 0x100000, "ym", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(9e07104d) SHA1(3bc54cb755bb3194197706965b532d62b48c4d12) )
 
-	ROM_REGION( 0x080000, RGNCLASS_SOUND, "ym.deltat", 0 )	/* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
-	ROM_REGION( 0x040000, RGNCLASS_USER, "user1", 0 )	/* Sprites LUT */
+	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
 	ROM_LOAD( "u3.bin",  0x000000, 0x040000, CRC(0905aeb2) SHA1(8cca09f7dfe3f804e77515f7b1b1bdbeb7bb3d80) )
 
 ROM_END
 
 ROM_START( gunbirdj )
 
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "1-u46.bin", 0x000000, 0x040000, CRC(474abd69) SHA1(27f37333075f9c92849101aad4875e69004d747b) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "2-u39.bin", 0x000002, 0x040000, CRC(3e3e661f) SHA1(b5648546f390539b0f727a9a62d1b9516254ae21) ) // 3&2
 
-	ROM_REGION( 0x030000, RGNCLASS_CPU, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u71.bin", 0x00000, 0x20000, CRC(2168e4ba) SHA1(ca7ad6acb5f806ce2528e7b52c19e8cceecb8543) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
-	ROM_REGION( 0x700000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x700000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "u14.bin",  0x000000, 0x200000, CRC(7d7e8a00) SHA1(9f35f5b54ae928e9bf2aa6ad4604f669857955ec) )
 	ROM_LOAD( "u24.bin",  0x200000, 0x200000, CRC(5e3ffc9d) SHA1(c284eb9ef56c8e6261fe11f91a10c5c5a56c9803) )
 	ROM_LOAD( "u15.bin",  0x400000, 0x200000, CRC(a827bfb5) SHA1(6e02436e12085016cf1982c9ae07b6c6dec82f1b) )
 	ROM_LOAD( "u25.bin",  0x600000, 0x100000, CRC(ef652e0c) SHA1(6dd994a15ced31d1bbd1a3b0e9d8d86eca33e217) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Layers 0 + 1 */
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layers 0 + 1 */
 	ROM_LOAD( "u33.bin",  0x000000, 0x200000, CRC(54494e6b) SHA1(f5d090d2d34d908b56b53a246def194929eba990) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "ym", 0 )	/* ADPCM Samples */
+	ROM_REGION( 0x100000, "ym", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(9e07104d) SHA1(3bc54cb755bb3194197706965b532d62b48c4d12) )
 
-	ROM_REGION( 0x080000, RGNCLASS_SOUND, "ym.deltat", 0 )	/* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
-	ROM_REGION( 0x040000, RGNCLASS_USER, "user1", 0 )	/* Sprites LUT */
+	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
 	ROM_LOAD( "u3.bin",  0x000000, 0x040000, CRC(0905aeb2) SHA1(8cca09f7dfe3f804e77515f7b1b1bdbeb7bb3d80) )
 
 ROM_END
@@ -1938,33 +1938,33 @@ ROM_END
 
 ROM_START( btlkroad )
 
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "4-u46.bin", 0x000000, 0x040000, CRC(8a7a28b4) SHA1(f7197be673dfd0ddf46998af81792b81d8fe9fbf) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "5-u39.bin", 0x000002, 0x040000, CRC(933561fa) SHA1(f6f3b1e14b1cfeca26ef8260ac4771dc1531c357) ) // 3&2
 
-	ROM_REGION( 0x030000, RGNCLASS_CPU, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u71.bin", 0x00000, 0x20000, CRC(22411fab) SHA1(1094cb51712e40ae65d0082b408572bdec06ae8b) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
-	ROM_REGION( 0x700000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x700000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "u14.bin",  0x000000, 0x200000, CRC(282d89c3) SHA1(3b4b17f4a37efa2f7e232488aaba7c77d10c84d2) )
 	ROM_LOAD( "u24.bin",  0x200000, 0x200000, CRC(bbe9d3d1) SHA1(9da0b0b993e8271a8119e9c2f602e52325983f79) )
 	ROM_LOAD( "u15.bin",  0x400000, 0x200000, CRC(d4d1b07c) SHA1(232109db8f6e137fbc8826f38a96057067cb19dc) )
 //  ROM_LOAD( "u25.bin",  CRC(00600000) , 0x100000  NOT PRESENT
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Layers 0 + 1 */
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layers 0 + 1 */
 	ROM_LOAD( "u33.bin",  0x000000, 0x200000, CRC(4c8577f1) SHA1(d27043514632954a06667ac63f4a4e4a31870511) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "ym", 0 )	/* ADPCM Samples */
+	ROM_REGION( 0x100000, "ym", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(51d73682) SHA1(562038d08e9a4389ffa39f3a659b2a29b94dc156) )
 
-	ROM_REGION( 0x080000, RGNCLASS_SOUND, "ym.deltat", 0 )	/* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(0f33049f) SHA1(ca4fd5f3906685ace1af40b75f5678231d7324e8) )
 
-	ROM_REGION( 0x040000, RGNCLASS_USER, "user1", 0 )	/* Sprites LUT */
+	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
 	ROM_LOAD( "u3.bin",  0x000000, 0x040000, CRC(30d541ed) SHA1(6f7fb5f5ecbce7c086185392de164ebb6887e780) )
 
-	ROM_REGION( 0x0400, RGNCLASS_PLDS, "plds", 0 )
+	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "tibpal16l8.u69", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "tibpal16l8.u19", 0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
 
@@ -2002,30 +2002,30 @@ Chips:  PS2001B
 
 ROM_START( s1945jn )
 
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "1-u46.bin", 0x000000, 0x080000, CRC(45fa8086) SHA1(f1753b9420596f4b828c77e877a044ba5fb01b28) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "2-u39.bin", 0x000002, 0x080000, CRC(0152ab8c) SHA1(2aef4cb88341b35f20bb551716f1e5ac2731e9ba) ) // 3&2
 
-	ROM_REGION( 0x030000, RGNCLASS_CPU, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u71.bin", 0x00000, 0x20000, CRC(e3e366bd) SHA1(1f5b5909745802e263a896265ea365df76d3eaa5) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
-	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "u20.bin",  0x000000, 0x200000, CRC(28a27fee) SHA1(913f3bc4d0c6fb6b776a020c8099bf96f16fd06f) )
 	ROM_LOAD( "u22.bin",  0x200000, 0x200000, CRC(ca152a32) SHA1(63efee83cb5982c77ca473288b3d1a96b89e6388) )
 	ROM_LOAD( "u21.bin",  0x400000, 0x200000, CRC(c5d60ea9) SHA1(e5ce90788211c856172e5323b01b2c7ab3d3fe50) )
 	ROM_LOAD( "u23.bin",  0x600000, 0x200000, CRC(48710332) SHA1(db38b732a09b31ce55a96ec62987baae9b7a00c1) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 + 1 */
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 + 1 */
 	ROM_LOAD( "u34.bin",  0x000000, 0x200000, CRC(aaf83e23) SHA1(1c75d09ff42c0c215f8c66c699ca75688c95a05e) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "ym", 0 )	/* ADPCM Samples */
+	ROM_REGION( 0x100000, "ym", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(fe1312c2) SHA1(8339a96a0885518d6e22cb3bdb9c2f82d011d86d) )
 
-	ROM_REGION( 0x080000, RGNCLASS_SOUND, "ym.deltat", 0 )	/* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(a44a4a9b) SHA1(5378256752d709daed0b5f4199deebbcffe84e10) )
 
-	ROM_REGION( 0x040000, RGNCLASS_USER, "user1", 0 )	/* */
+	ROM_REGION( 0x040000, "user1", 0 )	/* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
 
 ROM_END
@@ -2067,120 +2067,120 @@ Chips:  PS2001B
 
 ROM_START( s1945 )
 
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "2s.u40", 0x000000, 0x040000, CRC(9b10062a) SHA1(cf963bba157422b659d8d64b4493eb7d69cd07b7) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "3s.u41", 0x000002, 0x040000, CRC(f87e871a) SHA1(567167c7fcfb622f78e211d74b04060c3d29d6b7) ) // 3&2
 
-	ROM_REGION( 0x030000, RGNCLASS_CPU, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
-	ROM_REGION( 0x000100, RGNCLASS_CPU, "cpu2", 0 )		/* MCU? */
+	ROM_REGION( 0x000100, "cpu2", 0 )		/* MCU? */
 	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
 
-	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "u20.bin",  0x000000, 0x200000, CRC(28a27fee) SHA1(913f3bc4d0c6fb6b776a020c8099bf96f16fd06f) )
 	ROM_LOAD( "u22.bin",  0x200000, 0x200000, CRC(ca152a32) SHA1(63efee83cb5982c77ca473288b3d1a96b89e6388) )
 	ROM_LOAD( "u21.bin",  0x400000, 0x200000, CRC(c5d60ea9) SHA1(e5ce90788211c856172e5323b01b2c7ab3d3fe50) )
 	ROM_LOAD( "u23.bin",  0x600000, 0x200000, CRC(48710332) SHA1(db38b732a09b31ce55a96ec62987baae9b7a00c1) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 + 1 */
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 + 1 */
 	ROM_LOAD( "u34.bin",  0x000000, 0x200000, CRC(aaf83e23) SHA1(1c75d09ff42c0c215f8c66c699ca75688c95a05e) )
 
-	ROM_REGION( 0x200000, RGNCLASS_SOUND, "ymf", 0 )	/* Samples */
+	ROM_REGION( 0x200000, "ymf", 0 )	/* Samples */
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a839cf47) SHA1(e179eb505c80d5bb3ccd9e228f2cf428c62b72ee) )	// 8 bit signed pcm (16KHz)
 
-	ROM_REGION( 0x040000, RGNCLASS_USER, "user1", 0 )	/* */
+	ROM_REGION( 0x040000, "user1", 0 )	/* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
 
 ROM_END
 
 ROM_START( s1945a )
 
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "4-u40.bin", 0x000000, 0x040000, CRC(29ffc217) SHA1(12dc3cb32253c3908f4c440c627a0e1b32ee7cac) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "5-u41.bin", 0x000002, 0x040000, CRC(c3d3fb64) SHA1(4388586bc0a6f3d62366b3c38b8b23f8a03dbf15) ) // 3&2
 
-	ROM_REGION( 0x030000, RGNCLASS_CPU, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
-	ROM_REGION( 0x000100, RGNCLASS_CPU, "cpu2", 0 )		/* MCU? */
+	ROM_REGION( 0x000100, "cpu2", 0 )		/* MCU? */
 	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
 
-	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "u20.bin",  0x000000, 0x200000, CRC(28a27fee) SHA1(913f3bc4d0c6fb6b776a020c8099bf96f16fd06f) )
 	ROM_LOAD( "u22.bin",  0x200000, 0x200000, CRC(ca152a32) SHA1(63efee83cb5982c77ca473288b3d1a96b89e6388) )
 	ROM_LOAD( "u21.bin",  0x400000, 0x200000, CRC(c5d60ea9) SHA1(e5ce90788211c856172e5323b01b2c7ab3d3fe50) )
 	ROM_LOAD( "u23.bin",  0x600000, 0x200000, CRC(48710332) SHA1(db38b732a09b31ce55a96ec62987baae9b7a00c1) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 + 1 */
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 + 1 */
 	ROM_LOAD( "u34.bin",  0x000000, 0x200000, CRC(aaf83e23) SHA1(1c75d09ff42c0c215f8c66c699ca75688c95a05e) )
 
-	ROM_REGION( 0x200000, RGNCLASS_SOUND, "ymf", 0 )	/* Samples */
+	ROM_REGION( 0x200000, "ymf", 0 )	/* Samples */
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a839cf47) SHA1(e179eb505c80d5bb3ccd9e228f2cf428c62b72ee) )	// 8 bit signed pcm (16KHz)
 
-	ROM_REGION( 0x040000, RGNCLASS_USER, "user1", 0 )	/* */
+	ROM_REGION( 0x040000, "user1", 0 )	/* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
 
 ROM_END
 
 ROM_START( s1945j )
 
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "1-u40.bin", 0x000000, 0x040000, CRC(c00eb012) SHA1(080dae010ca83548ebdb3324585d15e48baf0541) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "2-u41.bin", 0x000002, 0x040000, CRC(3f5a134b) SHA1(18bb3bb1e1adadcf522795f5cf7d4dc5a5dd1f30) ) // 3&2
 
-	ROM_REGION( 0x030000, RGNCLASS_CPU, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
-	ROM_REGION( 0x000100, RGNCLASS_CPU, "cpu2", 0 )		/* MCU */
+	ROM_REGION( 0x000100, "cpu2", 0 )		/* MCU */
 	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
 
-	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "u20.bin",  0x000000, 0x200000, CRC(28a27fee) SHA1(913f3bc4d0c6fb6b776a020c8099bf96f16fd06f) )
 	ROM_LOAD( "u22.bin",  0x200000, 0x200000, CRC(ca152a32) SHA1(63efee83cb5982c77ca473288b3d1a96b89e6388) )
 	ROM_LOAD( "u21.bin",  0x400000, 0x200000, CRC(c5d60ea9) SHA1(e5ce90788211c856172e5323b01b2c7ab3d3fe50) )
 	ROM_LOAD( "u23.bin",  0x600000, 0x200000, CRC(48710332) SHA1(db38b732a09b31ce55a96ec62987baae9b7a00c1) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 + 1 */
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 + 1 */
 	ROM_LOAD( "u34.bin",  0x000000, 0x200000, CRC(aaf83e23) SHA1(1c75d09ff42c0c215f8c66c699ca75688c95a05e) )
 
-	ROM_REGION( 0x200000, RGNCLASS_SOUND, "ymf", 0 )	/* Samples */
+	ROM_REGION( 0x200000, "ymf", 0 )	/* Samples */
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a839cf47) SHA1(e179eb505c80d5bb3ccd9e228f2cf428c62b72ee) )	// 8 bit signed pcm (16KHz)
 
-	ROM_REGION( 0x040000, RGNCLASS_USER, "user1", 0 )	/* */
+	ROM_REGION( 0x040000, "user1", 0 )	/* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
 
 ROM_END
 
 ROM_START( s1945k ) /* Same MCU as the current parent set, region dip has no effect on this set */
 
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "10.u40", 0x000000, 0x040000, CRC(5a32af36) SHA1(2eada37fd043c097a11bcf4e3e0bebb473bbc0df) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "9.u41",  0x000002, 0x040000, CRC(29cc6d7d) SHA1(aeee9e88922c25c75885483d115e064c6b71540b) ) // 3&2
 
-	ROM_REGION( 0x030000, RGNCLASS_CPU, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
-	ROM_REGION( 0x000100, RGNCLASS_CPU, "cpu2", 0 )		/* MCU */
+	ROM_REGION( 0x000100, "cpu2", 0 )		/* MCU */
 	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
 
-	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "u20.bin",  0x000000, 0x200000, CRC(28a27fee) SHA1(913f3bc4d0c6fb6b776a020c8099bf96f16fd06f) )
 	ROM_LOAD( "u22.bin",  0x200000, 0x200000, CRC(ca152a32) SHA1(63efee83cb5982c77ca473288b3d1a96b89e6388) )
 	ROM_LOAD( "u21.bin",  0x400000, 0x200000, CRC(c5d60ea9) SHA1(e5ce90788211c856172e5323b01b2c7ab3d3fe50) )
 	ROM_LOAD( "u23.bin",  0x600000, 0x200000, CRC(48710332) SHA1(db38b732a09b31ce55a96ec62987baae9b7a00c1) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 + 1 */
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 + 1 */
 	ROM_LOAD( "u34.bin",  0x000000, 0x200000, CRC(aaf83e23) SHA1(1c75d09ff42c0c215f8c66c699ca75688c95a05e) )
 
-	ROM_REGION( 0x200000, RGNCLASS_SOUND, "ymf", 0 )	/* Samples */
+	ROM_REGION( 0x200000, "ymf", 0 )	/* Samples */
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a839cf47) SHA1(e179eb505c80d5bb3ccd9e228f2cf428c62b72ee) )	// 8 bit signed pcm (16KHz)
 
-	ROM_REGION( 0x040000, RGNCLASS_USER, "user1", 0 )	/* */
+	ROM_REGION( 0x040000, "user1", 0 )	/* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
 
 ROM_END
@@ -2254,30 +2254,30 @@ Chips:  PS2001B
 
 ROM_START( tengai )
 
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "2-u40.bin", 0x000000, 0x080000, CRC(ab6fe58a) SHA1(6687a3af192b3eab60d75ca286ebb8e0636297b5) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "3-u41.bin", 0x000002, 0x080000, CRC(02e42e39) SHA1(6cdb7b1cebab50c0a44cd60cd437f0e878ccac5c) ) // 3&2
 
-	ROM_REGION( 0x030000, RGNCLASS_CPU, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "1-u63.bin", 0x00000, 0x20000, CRC(2025e387) SHA1(334b0eb3b416d46ccaadff3eee6f1abba63285fb) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
-	ROM_REGION( 0x000100, RGNCLASS_CPU, "cpu2", 0 )		/* MCU */
+	ROM_REGION( 0x000100, "cpu2", 0 )		/* MCU */
 	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
 
-	ROM_REGION( 0x600000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x600000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD16_WORD_SWAP( "u20.bin",  0x000000, 0x200000, CRC(ed42ef73) SHA1(74693fcc83a2654ddb18fd513d528033863d6116) )
 	ROM_LOAD16_WORD_SWAP( "u22.bin",  0x200000, 0x200000, CRC(8d21caee) SHA1(2a68af8b2be2158dcb152c434e91a75871478d41) )
 	ROM_LOAD16_WORD_SWAP( "u21.bin",  0x400000, 0x200000, CRC(efe34eed) SHA1(7891495b443a5acc7b2f17fe694584f6cb0afacc) )
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 + 1 */
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 + 1 */
 	ROM_LOAD16_WORD_SWAP( "u34.bin",  0x000000, 0x400000, CRC(2a2e2eeb) SHA1(f1d99353c0affc5c908985e6f2a5724e5223cccc) ) /* four banks of 0x100000 */
 
-	ROM_REGION( 0x400000, RGNCLASS_SOUND, "ymf", 0 )	/* Samples */
+	ROM_REGION( 0x400000, "ymf", 0 )	/* Samples */
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a63633c5) SHA1(89e75a40518926ebcc7d88dea86c01ba0bb496e5) )	// 8 bit signed pcm (16KHz)
 	ROM_LOAD( "u62.bin",  0x200000, 0x200000, CRC(3ad0c357) SHA1(35f78cfa2eafa93ab96b24e336f569ee84af06b6) )
 
-	ROM_REGION( 0x040000, RGNCLASS_USER, "user1", 0 )	/* Sprites LUT */
+	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(681d7d55) SHA1(b0b28471440d747adbc4d22d1918f89f6ede1615) )
 
 ROM_END

@@ -129,13 +129,13 @@ static WRITE8_HANDLER( chinagat_video_ctrl_w )
 
 static WRITE8_HANDLER( chinagat_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 	memory_set_bankptr( 1,&RAM[ 0x10000 + (0x4000 * (data & 7)) ] );
 }
 
 static WRITE8_HANDLER( chinagat_sub_bankswitch_w )
 {
-	UINT8 *RAM = memory_region( machine, RGNCLASS_CPU, "sub" );
+	UINT8 *RAM = memory_region( machine, "sub" );
 	memory_set_bankptr( 4,&RAM[ 0x10000 + (0x4000 * (data & 7)) ] );
 }
 
@@ -182,7 +182,7 @@ static WRITE8_HANDLER( saiyugb1_adpcm_control_w )
 {
 	/* i8748 Port 2 write */
 
-	UINT8 *saiyugb1_adpcm_rom = memory_region(machine, RGNCLASS_SOUND, "adpcm");
+	UINT8 *saiyugb1_adpcm_rom = memory_region(machine, "adpcm");
 
 	if (data & 0x80)	/* Reset m5205 and disable ADPCM ROM outputs */
 	{
@@ -639,80 +639,80 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( chinagat )
-	ROM_REGION( 0x28000, RGNCLASS_CPU, "main", 0 )	/* Main CPU: 128KB for code (bankswitched using $3F01) */
+	ROM_REGION( 0x28000, "main", 0 )	/* Main CPU: 128KB for code (bankswitched using $3F01) */
 	ROM_LOAD( "cgate51.bin", 0x10000, 0x18000, CRC(439a3b19) SHA1(01393b4302ac7a66390270b01e2757582240f6b8) )	/* Banks 0x4000 long @ 0x4000 */
 	ROM_CONTINUE(            0x08000, 0x08000 )				/* Static code */
 
-	ROM_REGION( 0x28000, RGNCLASS_CPU, "sub", 0 )	/* Slave CPU: 128KB for code (bankswitched using $2000) */
+	ROM_REGION( 0x28000, "sub", 0 )	/* Slave CPU: 128KB for code (bankswitched using $2000) */
 	ROM_LOAD( "23j4-0.48",   0x10000, 0x18000, CRC(2914af38) SHA1(3d690fa50b7d36a22de82c026d59a16126a7b73c) ) /* Banks 0x4000 long @ 0x4000 */
 	ROM_CONTINUE(            0x08000, 0x08000 )				/* Static code */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )	/* Music CPU, 64KB */
+	ROM_REGION( 0x10000, "audio", 0 )	/* Music CPU, 64KB */
 	ROM_LOAD( "23j0-0.40",   0x00000, 0x08000, CRC(9ffcadb6) SHA1(606dbdd73aee3cabb2142200ac6f8c96169e4b19) )
 
-	ROM_REGION(0x20000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Text */
+	ROM_REGION(0x20000, "gfx1", ROMREGION_DISPOSE )	/* Text */
 	ROM_LOAD( "cgate18.bin", 0x00000, 0x20000, CRC(8d88d64d) SHA1(57265138ebb0c6419542cce5953aee7335bfa2bd) )	/* 0,1,2,3 */
 
-	ROM_REGION(0x80000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION(0x80000, "gfx2", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "23j7-0.103",  0x00000, 0x20000, CRC(2f445030) SHA1(3fcf32097e655e963d952d01a30396dc195269ca) )	/* 2,3 */
 	ROM_LOAD( "23j8-0.102",  0x20000, 0x20000, CRC(237f725a) SHA1(47bebe5b9878ca10fe6efd4f353717e53a372416) )	/* 2,3 */
 	ROM_LOAD( "23j9-0.101",  0x40000, 0x20000, CRC(8caf6097) SHA1(50ad192f831b055586a4a9974f8c6c2f2063ede5) )	/* 0,1 */
 	ROM_LOAD( "23ja-0.100",  0x60000, 0x20000, CRC(f678594f) SHA1(4bdcf9407543925f4630a8c7f1f48b85f76343a9) )	/* 0,1 */
 
-	ROM_REGION(0x40000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )	/* Background */
+	ROM_REGION(0x40000, "gfx3", ROMREGION_DISPOSE )	/* Background */
 	ROM_LOAD( "a-13", 0x00000, 0x10000, NO_DUMP )		/* Where are    */
 	ROM_LOAD( "a-12", 0x10000, 0x10000, NO_DUMP )		/* these on the */
 	ROM_LOAD( "a-15", 0x20000, 0x10000, NO_DUMP )		/* real board ? */
 	ROM_LOAD( "a-14", 0x30000, 0x10000, NO_DUMP )
 
-	ROM_REGION(0x40000, RGNCLASS_SOUND, "oki", 0 )	/* ADPCM */
+	ROM_REGION(0x40000, "oki", 0 )	/* ADPCM */
 	ROM_LOAD( "23j1-0.53", 0x00000, 0x20000, CRC(f91f1001) SHA1(378402a3c966cabd61e9662ae5decd66672a228b) )
 	ROM_LOAD( "23j2-0.52", 0x20000, 0x20000, CRC(8b6f26e9) SHA1(7da26ae846814b3957b19c38b6bf7e83617dc6cc) )
 
-	ROM_REGION(0x300, RGNCLASS_USER, "user1", 0 )	/* Unknown Bipolar PROMs */
+	ROM_REGION(0x300, "user1", 0 )	/* Unknown Bipolar PROMs */
 	ROM_LOAD( "23jb-0.16", 0x000, 0x200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* 82S131 on video board */
 	ROM_LOAD( "23j5-0.45", 0x200, 0x100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )	/* 82S129 on main board */
 ROM_END
 
 
 ROM_START( saiyugou )
-	ROM_REGION( 0x28000, RGNCLASS_CPU, "main", 0 )	/* Main CPU: 128KB for code (bankswitched using $3F01) */
+	ROM_REGION( 0x28000, "main", 0 )	/* Main CPU: 128KB for code (bankswitched using $3F01) */
 	ROM_LOAD( "23j3-0.51",  0x10000, 0x18000, CRC(aa8132a2) SHA1(87c3bd447767f263113c4865afc905a0e484a625) )	/* Banks 0x4000 long @ 0x4000 */
 	ROM_CONTINUE(           0x08000, 0x08000)				/* Static code */
 
-	ROM_REGION( 0x28000, RGNCLASS_CPU, "sub", 0 )	/* Slave CPU: 128KB for code (bankswitched using $2000) */
+	ROM_REGION( 0x28000, "sub", 0 )	/* Slave CPU: 128KB for code (bankswitched using $2000) */
 	ROM_LOAD( "23j4-0.48",  0x10000, 0x18000, CRC(2914af38) SHA1(3d690fa50b7d36a22de82c026d59a16126a7b73c) )	/* Banks 0x4000 long @ 0x4000 */
 	ROM_CONTINUE(           0x08000, 0x08000)				/* Static code */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )	/* Music CPU, 64KB */
+	ROM_REGION( 0x10000, "audio", 0 )	/* Music CPU, 64KB */
 	ROM_LOAD( "23j0-0.40",  0x00000, 0x8000, CRC(9ffcadb6) SHA1(606dbdd73aee3cabb2142200ac6f8c96169e4b19) )
 
-	ROM_REGION(0x20000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Text */
+	ROM_REGION(0x20000, "gfx1", ROMREGION_DISPOSE )	/* Text */
 	ROM_LOAD( "23j6-0.18",  0x00000, 0x20000, CRC(86d33df0) SHA1(3419959c28703c5177de9c11b61e1dba9e76aca5) )	/* 0,1,2,3 */
 
-	ROM_REGION(0x80000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION(0x80000, "gfx2", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "23j7-0.103", 0x00000, 0x20000, CRC(2f445030) SHA1(3fcf32097e655e963d952d01a30396dc195269ca) )	/* 2,3 */
 	ROM_LOAD( "23j8-0.102", 0x20000, 0x20000, CRC(237f725a) SHA1(47bebe5b9878ca10fe6efd4f353717e53a372416) )	/* 2,3 */
 	ROM_LOAD( "23j9-0.101", 0x40000, 0x20000, CRC(8caf6097) SHA1(50ad192f831b055586a4a9974f8c6c2f2063ede5) )	/* 0,1 */
 	ROM_LOAD( "23ja-0.100", 0x60000, 0x20000, CRC(f678594f) SHA1(4bdcf9407543925f4630a8c7f1f48b85f76343a9) )	/* 0,1 */
 
-	ROM_REGION(0x40000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )	/* Background */
+	ROM_REGION(0x40000, "gfx3", ROMREGION_DISPOSE )	/* Background */
 	ROM_LOAD( "a-13", 0x00000, 0x10000, NO_DUMP )
 	ROM_LOAD( "a-12", 0x10000, 0x10000, NO_DUMP )
 	ROM_LOAD( "a-15", 0x20000, 0x10000, NO_DUMP )
 	ROM_LOAD( "a-14", 0x30000, 0x10000, NO_DUMP )
 
-	ROM_REGION(0x40000, RGNCLASS_SOUND, "oki", 0 )	/* ADPCM */
+	ROM_REGION(0x40000, "oki", 0 )	/* ADPCM */
 	ROM_LOAD( "23j1-0.53", 0x00000, 0x20000, CRC(f91f1001) SHA1(378402a3c966cabd61e9662ae5decd66672a228b) )
 	ROM_LOAD( "23j2-0.52", 0x20000, 0x20000, CRC(8b6f26e9) SHA1(7da26ae846814b3957b19c38b6bf7e83617dc6cc) )
 
-	ROM_REGION(0x300, RGNCLASS_USER, "user1", 0 )	/* Unknown Bipolar PROMs */
+	ROM_REGION(0x300, "user1", 0 )	/* Unknown Bipolar PROMs */
 	ROM_LOAD( "23jb-0.16", 0x000, 0x200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* 82S131 on video board */
 	ROM_LOAD( "23j5-0.45", 0x200, 0x100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )	/* 82S129 on main board */
 ROM_END
 
 ROM_START( saiyugb1 )
-	ROM_REGION( 0x28000, RGNCLASS_CPU, "main", 0 )	/* Main CPU: 128KB for code (bankswitched using $3F01) */
+	ROM_REGION( 0x28000, "main", 0 )	/* Main CPU: 128KB for code (bankswitched using $3F01) */
 	ROM_LOAD( "23j3-0.51",  0x10000, 0x18000, CRC(aa8132a2) SHA1(87c3bd447767f263113c4865afc905a0e484a625) )	/* Banks 0x4000 long @ 0x4000 */
 	/* Orientation of bootleg ROMs which are split, but otherwise the same.
        ROM_LOAD( "a-5.bin", 0x10000, 0x10000, CRC(39795aa5) )      Banks 0x4000 long @ 0x4000
@@ -720,7 +720,7 @@ ROM_START( saiyugb1 )
     */
 	ROM_CONTINUE(           0x08000, 0x08000 )				/* Static code */
 
-	ROM_REGION( 0x28000, RGNCLASS_CPU, "sub", 0 )	/* Slave CPU: 128KB for code (bankswitched using $2000) */
+	ROM_REGION( 0x28000, "sub", 0 )	/* Slave CPU: 128KB for code (bankswitched using $2000) */
 	ROM_LOAD( "23j4-0.48",  0x10000, 0x18000, CRC(2914af38) SHA1(3d690fa50b7d36a22de82c026d59a16126a7b73c) )	/* Banks 0x4000 long @ 0x4000 */
 	/* Orientation of bootleg ROMs which are split, but otherwise the same.
        ROM_LOAD( "a-4.bin", 0x10000, 0x10000, CRC(9effddc1) )      Banks 0x4000 long @ 0x4000
@@ -728,20 +728,20 @@ ROM_START( saiyugb1 )
     */
 	ROM_CONTINUE(           0x08000, 0x08000 )				/* Static code */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )	/* Music CPU, 64KB */
+	ROM_REGION( 0x10000, "audio", 0 )	/* Music CPU, 64KB */
 	ROM_LOAD( "a-1.bin",  0x00000, 0x8000,  CRC(46e5a6d4) SHA1(965ed7bdb727ab32ce3322ca49f1a4e3786e8051) )
 
-	ROM_REGION( 0x800, RGNCLASS_CPU, "mcu", 0 )		/* ADPCM CPU, 1KB */
+	ROM_REGION( 0x800, "mcu", 0 )		/* ADPCM CPU, 1KB */
 	ROM_LOAD( "mcu8748.bin", 0x000, 0x400, CRC(6d28d6c5) SHA1(20582c62a72545e68c2e155b063ee7e95e1228ce) )
 
-	ROM_REGION(0x20000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Text */
+	ROM_REGION(0x20000, "gfx1", ROMREGION_DISPOSE )	/* Text */
 	ROM_LOAD( "23j6-0.18",  0x00000, 0x20000, CRC(86d33df0) SHA1(3419959c28703c5177de9c11b61e1dba9e76aca5) )	/* 0,1,2,3 */
 	/* Orientation of bootleg ROMs which are split, but otherwise the same.
        ROM_LOAD( "a-2.bin", 0x00000, 0x10000, CRC(baa5a3b9) )      0,1
        ROM_LOAD( "a-3.bin", 0x10000, 0x10000, CRC(532d59be) )      2,3
     */
 
-	ROM_REGION(0x80000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION(0x80000, "gfx2", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "23j7-0.103",  0x00000, 0x20000, CRC(2f445030) SHA1(3fcf32097e655e963d952d01a30396dc195269ca) )	/* 2,3 */
 	ROM_LOAD( "23j8-0.102",  0x20000, 0x20000, CRC(237f725a) SHA1(47bebe5b9878ca10fe6efd4f353717e53a372416) )	/* 2,3 */
 	ROM_LOAD( "23j9-0.101",  0x40000, 0x20000, CRC(8caf6097) SHA1(50ad192f831b055586a4a9974f8c6c2f2063ede5) )	/* 0,1 */
@@ -757,7 +757,7 @@ ROM_START( saiyugb1 )
        ROM_LOAD( "a-16.bin", 0x70000, 0x10000, CRC(f196818b) )     0,1
     */
 
-	ROM_REGION(0x40000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )	/* Background */
+	ROM_REGION(0x40000, "gfx3", ROMREGION_DISPOSE )	/* Background */
 	ROM_LOAD( "a-13", 0x00000, 0x10000, CRC(b745cac4) SHA1(759767ca7c5123b03b9e1a42bb105d194cb76400) )
 	ROM_LOAD( "a-12", 0x10000, 0x10000, CRC(3c864299) SHA1(cb12616e4d6c53a82beb4cd51510a632894b359c) )
 	ROM_LOAD( "a-15", 0x20000, 0x10000, CRC(2f268f37) SHA1(f82cfe3b2001d5ed2a709ca9c51febcf624bb627) )
@@ -765,19 +765,19 @@ ROM_START( saiyugb1 )
 
 	/* Some bootlegs have incorrectly halved the ADPCM data ! */
 	/* These are same as the 128k sample except nibble-swapped */
-	ROM_REGION(0x40000, RGNCLASS_SOUND, "adpcm", 0 )	/* ADPCM */		/* Bootleggers wrong data */
+	ROM_REGION(0x40000, "adpcm", 0 )	/* ADPCM */		/* Bootleggers wrong data */
 	ROM_LOAD ( "a-6.bin",   0x00000, 0x10000, CRC(4da4e935) SHA1(235a1589165a23cfad29e07cf66d7c3a777fc904) )	/* 0x8000, 0x7cd47f01 */
 	ROM_LOAD ( "a-7.bin",   0x10000, 0x10000, CRC(6284c254) SHA1(e01be1bd4768ae0ccb1cec65b3a6bc80ed7a4b00) )	/* 0x8000, 0x7091959c */
 	ROM_LOAD ( "a-10.bin",  0x20000, 0x10000, CRC(b728ec6e) SHA1(433b5f907e4918e89b79bd927e2993ad3030017b) )	/* 0x8000, 0x78349cb6 */
 	ROM_LOAD ( "a-11.bin",  0x30000, 0x10000, CRC(a50d1895) SHA1(0c2c1f8a2e945d6c53ce43413f0e63ced45bae17) )	/* 0x8000, 0xaa5b6834 */
 
-	ROM_REGION(0x300, RGNCLASS_USER, "user1", 0 )	/* Unknown Bipolar PROMs */
+	ROM_REGION(0x300, "user1", 0 )	/* Unknown Bipolar PROMs */
 	ROM_LOAD( "23jb-0.16", 0x000, 0x200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* 82S131 on video board */
 	ROM_LOAD( "23j5-0.45", 0x200, 0x100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )	/* 82S129 on main board */
 ROM_END
 
 ROM_START( saiyugb2 )
-	ROM_REGION( 0x28000, RGNCLASS_CPU, "main", 0 )	/* Main CPU: 128KB for code (bankswitched using $3F01) */
+	ROM_REGION( 0x28000, "main", 0 )	/* Main CPU: 128KB for code (bankswitched using $3F01) */
 	ROM_LOAD( "23j3-0.51",   0x10000, 0x18000, CRC(aa8132a2) SHA1(87c3bd447767f263113c4865afc905a0e484a625) )	/* Banks 0x4000 long @ 0x4000 */
 	/* Orientation of bootleg ROMs which are split, but otherwise the same.
        ROM_LOAD( "sai5.bin", 0x10000, 0x10000, CRC(39795aa5) )     Banks 0x4000 long @ 0x4000
@@ -785,7 +785,7 @@ ROM_START( saiyugb2 )
     */
 	ROM_CONTINUE(            0x08000, 0x08000 )				/* Static code */
 
-	ROM_REGION( 0x28000, RGNCLASS_CPU, "sub", 0 )	/* Slave CPU: 128KB for code (bankswitched using $2000) */
+	ROM_REGION( 0x28000, "sub", 0 )	/* Slave CPU: 128KB for code (bankswitched using $2000) */
 	ROM_LOAD( "23j4-0.48", 0x10000, 0x18000, CRC(2914af38) SHA1(3d690fa50b7d36a22de82c026d59a16126a7b73c) )	/* Banks 0x4000 long @ 0x4000 */
 	/* Orientation of bootleg ROMs which are split, but otherwise the same.
        ROM_LOAD( "sai4.bin", 0x10000, 0x10000, CRC(9effddc1) )     Banks 0x4000 long @ 0x4000
@@ -793,20 +793,20 @@ ROM_START( saiyugb2 )
     */
 	ROM_CONTINUE(         0x08000, 0x08000 )				/* Static code */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )	/* Music CPU, 64KB */
+	ROM_REGION( 0x10000, "audio", 0 )	/* Music CPU, 64KB */
 	ROM_LOAD( "sai-alt1.bin", 0x00000, 0x8000, CRC(8d397a8d) SHA1(52599521c3dbcecc1ae56bb80dc855e76d700134) )
 
-//  ROM_REGION( 0x800, RGNCLASS_CPU, "cpu3", 0 )     /* ADPCM CPU, 1KB */
+//  ROM_REGION( 0x800, "cpu3", 0 )     /* ADPCM CPU, 1KB */
 //  ROM_LOAD( "sgr-8749.bin", 0x000, 0x800, CRC(9237e8c5) ) /* same as above but padded with 00 for different mcu */
 
-	ROM_REGION(0x20000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Text */
+	ROM_REGION(0x20000, "gfx1", ROMREGION_DISPOSE )	/* Text */
 	ROM_LOAD( "23j6-0.18", 0x00000, 0x20000, CRC(86d33df0) SHA1(3419959c28703c5177de9c11b61e1dba9e76aca5) )	/* 0,1,2,3 */
 	/* Orientation of bootleg ROMs which are split, but otherwise the same.
        ROM_LOAD( "sai2.bin", 0x00000, 0x10000, CRC(baa5a3b9) )     0,1
        ROM_LOAD( "sai3.bin", 0x10000, 0x10000, CRC(532d59be) )     2,3
     */
 
-	ROM_REGION(0x80000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION(0x80000, "gfx2", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "23j7-0.103",   0x00000, 0x20000, CRC(2f445030) SHA1(3fcf32097e655e963d952d01a30396dc195269ca) )	/* 2,3 */
 	ROM_LOAD( "23j8-0.102",   0x20000, 0x20000, CRC(237f725a) SHA1(47bebe5b9878ca10fe6efd4f353717e53a372416) )	/* 2,3 */
 	ROM_LOAD( "23j9-0.101",   0x40000, 0x20000, CRC(8caf6097) SHA1(50ad192f831b055586a4a9974f8c6c2f2063ede5) )	/* 0,1 */
@@ -822,13 +822,13 @@ ROM_START( saiyugb2 )
        ROM_LOAD( "sai16.bin", 0x70000, 0x10000, CRC(f196818b) )    0,1
     */
 
-	ROM_REGION(0x40000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )	/* Background */
+	ROM_REGION(0x40000, "gfx3", ROMREGION_DISPOSE )	/* Background */
 	ROM_LOAD( "a-13", 0x00000, 0x10000, CRC(b745cac4) SHA1(759767ca7c5123b03b9e1a42bb105d194cb76400) )
 	ROM_LOAD( "a-12", 0x10000, 0x10000, CRC(3c864299) SHA1(cb12616e4d6c53a82beb4cd51510a632894b359c) )
 	ROM_LOAD( "a-15", 0x20000, 0x10000, CRC(2f268f37) SHA1(f82cfe3b2001d5ed2a709ca9c51febcf624bb627) )
 	ROM_LOAD( "a-14", 0x30000, 0x10000, CRC(aef814c8) SHA1(f6b9229ca7beb9a0e47d1f6a1083c6102fdd20c8) )
 
-	ROM_REGION(0x40000, RGNCLASS_SOUND, "adpcm", 0 )	/* ADPCM */
+	ROM_REGION(0x40000, "adpcm", 0 )	/* ADPCM */
 	/* These are same as the 128k sample except nibble-swapped */
 	/* Some bootlegs have incorrectly halved the ADPCM data !  Bootleggers wrong data */
 	ROM_LOAD ( "a-6.bin",   0x00000, 0x10000, CRC(4da4e935) SHA1(235a1589165a23cfad29e07cf66d7c3a777fc904) )	/* 0x8000, 0x7cd47f01 */
@@ -836,7 +836,7 @@ ROM_START( saiyugb2 )
 	ROM_LOAD ( "a-10.bin",  0x20000, 0x10000, CRC(b728ec6e) SHA1(433b5f907e4918e89b79bd927e2993ad3030017b) )	/* 0x8000, 0x78349cb6 */
 	ROM_LOAD ( "a-11.bin",  0x30000, 0x10000, CRC(a50d1895) SHA1(0c2c1f8a2e945d6c53ce43413f0e63ced45bae17) )	/* 0x8000, 0xaa5b6834 */
 
-	ROM_REGION(0x300, RGNCLASS_USER, "user1", 0 )	/* Unknown Bipolar PROMs */
+	ROM_REGION(0x300, "user1", 0 )	/* Unknown Bipolar PROMs */
 	ROM_LOAD( "23jb-0.16", 0x000, 0x200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* 82S131 on video board */
 	ROM_LOAD( "23j5-0.45", 0x200, 0x100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )	/* 82S129 on main board */
 ROM_END

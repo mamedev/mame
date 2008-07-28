@@ -111,7 +111,7 @@ static void seta_update( void *param, stream_sample_t **inputs, stream_sample_t 
 	register INT8	*start, *end, data;
 	register UINT8	*env;
 	register UINT32	smp_offs, smp_step, env_offs, env_step, delta;
-	UINT8 *snd1 = memory_region(Machine, RGNCLASS_SOUND, info->region);
+	UINT8 *snd1 = memory_region(Machine, info->region);
 
 	// mixer buffer zero clear
 	memset( buffer[0], 0, length*sizeof(*buffer[0]) );

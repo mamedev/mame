@@ -171,7 +171,7 @@ static WRITE8_HANDLER( rom_bank_select_w )
 
 	if (state->game_selected == 0)
 	{
-		UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+		UINT8 *rom = memory_region(machine, "main");
 		memcpy(rom+0x48000, rom+0x8000, 0x2000);
 	}
 }
@@ -186,7 +186,7 @@ static WRITE8_HANDLER( rom_48000_w )
 		if (offset < 0x0800)
 			state->video_ram[offset & 0x07ff] = data;
 
-		memory_region(machine, RGNCLASS_CPU, "main")[0x48000 + offset] = data;
+		memory_region(machine, "main")[0x48000 + offset] = data;
 	}
 }
 
@@ -325,10 +325,10 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( 20pacgal ) /* Version 1.01 */
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD( "20th_101.u13", 0x00000, 0x40000, CRC(77159582) SHA1(c05e005a941cbdc806dcd76b315069362c792a72) )
 
-	ROM_REGION( 0x8000, RGNCLASS_PROMS, "proms", 0 )	/* palette */
+	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
 	ROM_LOAD( "20th_101.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
 ROM_END
 

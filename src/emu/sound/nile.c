@@ -224,7 +224,7 @@ static void *nile_start(const char *tag, int sndindex, int clock, const void *co
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
-	info->sound_ram = (UINT8 *)memory_region(Machine, RGNCLASS_SOUND, tag);
+	info->sound_ram = (UINT8 *)memory_region(Machine, tag);
 
 	info->stream = stream_create(0, 2, 44100, info, nile_update);
 

@@ -183,7 +183,7 @@ void *gomoku_sh_start(int clock, const struct CustomSound_interface *config)
 	num_voices = MAX_VOICES;
 	last_channel = channel_list + num_voices;
 
-	sound_rom = memory_region(Machine, RGNCLASS_SOUND, "gomoku");
+	sound_rom = memory_region(Machine, "gomoku");
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	sound_enable = 1;

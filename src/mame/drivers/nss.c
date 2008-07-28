@@ -447,148 +447,148 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 #define NSS_BIOS \
-	ROM_REGION(0x100,           RGNCLASS_USER, "user5", 0)		/* IPL ROM */ \
+	ROM_REGION(0x100,           "user5", 0)		/* IPL ROM */ \
 	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) \
-	ROM_REGION(0x800,           RGNCLASS_USER, "user6", 0)		/* add-on chip ROMs (DSP, SFX, etc) */\
+	ROM_REGION(0x800,           "user6", 0)		/* add-on chip ROMs (DSP, SFX, etc) */\
 	ROM_LOAD("dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1))\
-	ROM_REGION(0x10000,         RGNCLASS_CPU, "bios",  0)		/* Bios CPU (what is it?) */ \
+	ROM_REGION(0x10000,         "bios",  0)		/* Bios CPU (what is it?) */ \
 	ROM_LOAD("nss-c.dat"  , 0, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2) )	/* bios */ \
 	ROM_LOAD("nss-ic14.02", 0, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477) )	/* bios */ \
 
 ROM_START( nss )
 	NSS_BIOS
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user3", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "user3", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, RGNCLASS_USER, "user4", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000, "user4", ROMREGION_ERASEFF )
 ROM_END
 
 
 ROM_START( nss_actr )
 	NSS_BIOS
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "user3", ROMREGION_DISPOSE )
 	ROM_LOAD( "act-rais.ic3", 0x00000, 0x80000, CRC(c9f788c2) SHA1(fba2331fd5bcbe51d74115528fd3a9becf072e8d) )
 	ROM_LOAD( "act-rais.ic2", 0x80000, 0x80000, CRC(4df9cc63) SHA1(3e98d9693d60d125a1257ba79701f27bda688261) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, RGNCLASS_USER, "user4", 0 )
+	ROM_REGION( 0x8000, "user4", 0 )
 	ROM_LOAD( "act-rais.ic8", 0x0000, 0x8000, CRC(08b38ce6) SHA1(4cbb7fd28d98ffef0f17747201625883af954e3a) )
 ROM_END
 
 ROM_START( nss_con3 )
 	NSS_BIOS
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "user3", ROMREGION_DISPOSE )
 	ROM_LOAD( "contra3.ic3", 0x00000, 0x80000, CRC(33b03501) SHA1(c7f4835d5ec4983e487b00f0b4c49fede2f03b9c) )
 	ROM_LOAD( "contra3.ic2", 0x80000, 0x80000, CRC(2f3e3b5b) SHA1(0186b92f022701f6ae29984252e6d346acf6550b) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, RGNCLASS_USER, "user4", 0 )
+	ROM_REGION( 0x8000, "user4", 0 )
 	ROM_LOAD( "contra3.ic8", 0x0000, 0x8000, CRC(0fbfa23b) SHA1(e7a1a78a58c64297e7b9623350ec57aed8035a4f) )
 ROM_END
 
 ROM_START( nss_adam )
 	NSS_BIOS
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "user3", ROMREGION_DISPOSE )
 	ROM_LOAD( "addams.ic3", 0x00000, 0x80000, CRC(44643930) SHA1(a45204b2eb13c6befca30d130061b5b8ba054270) )
 	ROM_LOAD( "addams.ic2", 0x80000, 0x80000, CRC(6196adcf) SHA1(a450f278a37d5822f607aa3631831a461e8b147e) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, RGNCLASS_USER, "user4", 0 )
+	ROM_REGION( 0x8000, "user4", 0 )
 	ROM_LOAD( "addams.ic8", 0x0000, 0x8000, CRC(57c7f72c) SHA1(2e3642b4b5438f6c535d6d1eb668e1663062cf78) )
 ROM_END
 
 ROM_START( nss_aten )
 	NSS_BIOS
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "user3", ROMREGION_DISPOSE )
 	ROM_LOAD( "amtennis.ic3", 0x00000, 0x80000, CRC(aeabaf2a) SHA1(b355e0a322b57454e767785a49c14d4c7f492488) )
 	ROM_LOAD( "amtennis.ic2", 0x80000, 0x80000, CRC(7738c5f2) SHA1(eb0089e9724c7b3834d9f6c47b92f5a1bb26fc77) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, RGNCLASS_USER, "user4", 0 )
+	ROM_REGION( 0x8000, "user4", 0 )
 	ROM_LOAD( "amtennis.ic8", 0x0000, 0x8000, CRC(d2cd3926) SHA1(49fc253b1b9497ef1374c7db0bd72c163ffb07e7) )
 ROM_END
 
 ROM_START( nss_rob3 )
 	NSS_BIOS
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "user3", ROMREGION_DISPOSE )
 	ROM_LOAD( "robocop3.ic3", 0x00000, 0x80000, CRC(60916c42) SHA1(462d9645210a58bfd5204bd209eae2cdadb4493e) )
 	ROM_LOAD( "robocop3.ic2", 0x80000, 0x80000, CRC(a94e1b56) SHA1(7403d70504310ad5949a3b45b4a1e71e7d2bce77) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, RGNCLASS_USER, "user4", 0 )
+	ROM_REGION( 0x8000, "user4", 0 )
 	ROM_LOAD( "robocop3.ic8", 0x0000, 0x8000, CRC(90d13c51) SHA1(6751dab14b7d178350ac333f07dd2c3852e4ae23) )
 ROM_END
 
 ROM_START( nss_ncaa )
 	NSS_BIOS
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "user3", ROMREGION_DISPOSE )
 	ROM_LOAD( "ncaa.ic3", 0x00000, 0x80000, CRC(ef49ad8c) SHA1(4c40f3746b995b53f006434b9ccec06d8fe16e1f) )
 	ROM_LOAD( "ncaa.ic2", 0x80000, 0x80000, CRC(83ef6936) SHA1(8e0f38c763861e33684c6ddb742385b0522af78a) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, RGNCLASS_USER, "user4", 0 )
+	ROM_REGION( 0x8000, "user4", 0 )
 	ROM_LOAD( "ncaa.ic8", 0x0000, 0x8000, CRC(b9fa28d5) SHA1(bc538bcff5c19eae4becc6582b5c111d287b76fa) )
 ROM_END
 
 ROM_START( nss_skin )
 	NSS_BIOS
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "user3", ROMREGION_DISPOSE )
 	ROM_LOAD( "skins.ic3", 0x00000, 0x80000, CRC(ee1bb84d) SHA1(549ad9319e94a5d75cd4af017e63ea93ab407c87) )
 	ROM_LOAD( "skins.ic2", 0x80000, 0x80000, CRC(365fd19e) SHA1(f60d7ac39fe83fb98730e73fbef410c90a4ff35b) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, RGNCLASS_USER, "user4", 0 )
+	ROM_REGION( 0x8000, "user4", 0 )
 	ROM_LOAD( "skins.ic8", 0x0000, 0x8000, CRC(9f33d5ce) SHA1(4d279ad3665bd94c7ca9cb2778572bed42c5b298) )
 ROM_END
 
 ROM_START( nss_lwep )
 	NSS_BIOS
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "user3", ROMREGION_DISPOSE )
 	ROM_LOAD( "nss-lw.ic3", 0x00000, 0x80000, CRC(32564666) SHA1(bf371218fa303ce95eab09fb6017a522071dcd7e) )
 	ROM_LOAD( "nss-lw.ic2", 0x80000, 0x80000, CRC(86365042) SHA1(f818024c6f858fd2780396b6c83d3a37a97fa08a) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, RGNCLASS_USER, "user4", 0 )
+	ROM_REGION( 0x8000, "user4", 0 )
 	ROM_LOAD( "nss-lw.ic8", 0x0000, 0x8000, CRC(1acc1d5d) SHA1(4c8b100ac5847915aaf3b5bfbcb4f632606c97de) )
 ROM_END
 
 ROM_START( nss_ssoc )
 	NSS_BIOS
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "user3", ROMREGION_DISPOSE )
 	ROM_LOAD( "s-soccer.ic1", 0x00000, 0x80000,  CRC(70b7f50e) SHA1(92856118528995e3a0b7d22340d440bef5fd61ac) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, RGNCLASS_USER, "user4", 0 )
+	ROM_REGION( 0x8000, "user4", 0 )
 	ROM_LOAD( "s-soccer.ic3", 0x0000, 0x8000, CRC(c09211c3) SHA1(b274a57f93ae0a8774664df3d3615fb7dbecfa2e) )
 ROM_END
 
 ROM_START( nss_smw )
 	NSS_BIOS
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "user3", ROMREGION_DISPOSE )
 	ROM_LOAD( "nss-mw-0_prg.ic1", 0x000000, 0x80000, CRC(c46766f2) SHA1(06a6efc246c6fdb83efab1d402d61d2179a84494) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, RGNCLASS_USER, "user4", 0 )
+	ROM_REGION( 0x8000, "user4", 0 )
 	ROM_LOAD( "mw.ic3", 0x0000, 0x8000, CRC(f2c5466e) SHA1(e116f01342fcf359498ed8750741c139093b1fb2) )
 ROM_END
 
 ROM_START( nss_fzer )
 	NSS_BIOS
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "user3", ROMREGION_DISPOSE )
 	ROM_LOAD( "nss-fz-0.ic2", 0x000000, 0x100000, CRC(e9b3cdf1) SHA1(ab616eecd292b94ca74c55446bddd23e9dc3e3bb) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, RGNCLASS_USER, "user4", 0 )
+	ROM_REGION( 0x8000, "user4", 0 )
 	ROM_LOAD( "fz.ic7", 0x0000, 0x8000, CRC(48ae570d) SHA1(934f9fec47dcf9e49936388968d2db50c69950da) )
 ROM_END
 
 ROM_START( nss_sten )
 	NSS_BIOS
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "user3", ROMREGION_DISPOSE )
 	ROM_LOAD( "nss-st-0.ic1", 0x000000, 0x100000, CRC(f131611f) SHA1(0797936e1fc9e705cd7e029097fc013a58e69002) )
 
 	/* instruction / data rom for bios */
-	ROM_REGION( 0x8000, RGNCLASS_USER, "user4", 0 )
+	ROM_REGION( 0x8000, "user4", 0 )
 	ROM_LOAD( "st.ic3", 0x0000, 0x8000, CRC(8880596e) SHA1(ec6d68fc2f51f7d94f496cd72cf898db65324542) )
 ROM_END
 

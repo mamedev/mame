@@ -1756,7 +1756,7 @@ static void *ymf271_start(const char *tag, int sndindex, int clock, const void *
 
 	intf = (config != NULL) ? config : &defintrf;
 
-	ymf271_init(chip, memory_region(Machine, RGNCLASS_SOUND, tag), intf->irq_callback, intf->ext_read, intf->ext_write);
+	ymf271_init(chip, memory_region(Machine, tag), intf->irq_callback, intf->ext_read, intf->ext_write);
 	chip->stream = stream_create(0, 2, clock/384, chip, ymf271_update);
 
 	for (i = 0; i < 256; i++)

@@ -190,43 +190,43 @@ static WRITE8_HANDLER( nmi_w )
 
 static WRITE8_HANDLER( banksel_1_1_w )
 {
-	memory_set_bankptr(1,memory_region(machine, RGNCLASS_CPU, "cpu") + 0x10000);
+	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x10000);
 }
 static WRITE8_HANDLER( banksel_2_1_w )
 {
-	memory_set_bankptr(1,memory_region(machine, RGNCLASS_CPU, "cpu") + 0x14000);
+	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x14000);
 }
 static WRITE8_HANDLER( banksel_3_1_w )
 {
-	memory_set_bankptr(1,memory_region(machine, RGNCLASS_CPU, "cpu") + 0x18000);
+	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x18000);
 }
 static WRITE8_HANDLER( banksel_4_1_w )
 {
-	memory_set_bankptr(1,memory_region(machine, RGNCLASS_CPU, "cpu") + 0x1c000);
+	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x1c000);
 }
 static WRITE8_HANDLER( banksel_5_1_w )
 {
-	memory_set_bankptr(1,memory_region(machine, RGNCLASS_CPU, "cpu") + 0x20000);
+	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x20000);
 }
 static WRITE8_HANDLER( banksel_1_2_w )
 {
-	memory_set_bankptr(1,memory_region(machine, RGNCLASS_CPU, "cpu") + 0x12000);
+	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x12000);
 }
 static WRITE8_HANDLER( banksel_2_2_w )
 {
-	memory_set_bankptr(1,memory_region(machine, RGNCLASS_CPU, "cpu") + 0x16000);
+	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x16000);
 }
 static WRITE8_HANDLER( banksel_3_2_w )
 {
-	memory_set_bankptr(1,memory_region(machine, RGNCLASS_CPU, "cpu") + 0x1a000);
+	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x1a000);
 }
 static WRITE8_HANDLER( banksel_4_2_w )
 {
-	memory_set_bankptr(1,memory_region(machine, RGNCLASS_CPU, "cpu") + 0x1e000);
+	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x1e000);
 }
 static WRITE8_HANDLER( banksel_5_2_w )
 {
-	memory_set_bankptr(1,memory_region(machine, RGNCLASS_CPU, "cpu") + 0x22000);
+	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x22000);
 }
 
 static ADDRESS_MAP_START( getrivia_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -549,7 +549,7 @@ PCB labeled M075
 ****************************************************/
 
 ROM_START( jokpoker )
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "cpu", 0 )
+	ROM_REGION( 0x24000, "cpu", 0 )
 	ROM_LOAD( "m075.1", 0x00000, 0x1000, CRC(ad42465b) SHA1(3f06847a9aecb0592f99419dba9be5f18005d57b) ) /* rom board UMV-1A */
 	ROM_LOAD( "m075.2", 0x01000, 0x1000, CRC(bd129fc2) SHA1(2e05ba34922c16d127be32941447013efea05bcd) )
 	ROM_LOAD( "m075.3", 0x02000, 0x1000, CRC(45725bc9) SHA1(9e6dcbec955ef8190f2307ddb367b24b7f34338d) )
@@ -566,7 +566,7 @@ Contains:
 ****************************************************/
 
 ROM_START( superbwl )
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "cpu", 0 )
+	ROM_REGION( 0x24000, "cpu", 0 )
 	ROM_LOAD( "super_bowl.1", 0x00000, 0x1000, CRC(82edf064) SHA1(8a26377590282f51fb39d013452ba11252e7dd05) ) /* rom board UMV-1B */
 	ROM_LOAD( "super_bowl.2", 0x01000, 0x1000, CRC(2438dd1f) SHA1(26bbd1cb3d0d5b93f61b92ff95948ac9de060715) )
 	ROM_LOAD( "super_bowl.3", 0x02000, 0x1000, CRC(9b111430) SHA1(9aaa755f3e4b369477c1a0525c994a19fe0f6107) )
@@ -596,7 +596,7 @@ Note: Question roms that contain "#1" (or 2 ect)
 ****************************************************/
 
 ROM_START( gtsers1 ) /* Series 1 (Complete) */
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "cpu", 0 )
+	ROM_REGION( 0x24000, "cpu", 0 )
 	ROM_LOAD( "prog101c_right", 0x00000, 0x2000, CRC(767f0e46) SHA1(5de7b54876fcbfb2328174ffe6b656ffea886fcb) ) /* rom board UMV 10 B */
 	ROM_LOAD( "prog101c_left",  0x0a000, 0x2000, CRC(24c0a097) SHA1(b8de58baecb92775e0882cd6eca3b9e07cf7c5a5) )
 	/* Question roms */
@@ -608,7 +608,7 @@ ROM_START( gtsers1 ) /* Series 1 (Complete) */
 ROM_END
 
 ROM_START( gtsers2 ) /* Series 2 (Complete - question roms dated 2/9) */
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "cpu", 0 )
+	ROM_REGION( 0x24000, "cpu", 0 )
 	ROM_LOAD( "prog101c_right", 0x00000, 0x2000, CRC(767f0e46) SHA1(5de7b54876fcbfb2328174ffe6b656ffea886fcb) ) /* rom board UMV 10 B */
 	ROM_LOAD( "prog101c_left",  0x0a000, 0x2000, CRC(24c0a097) SHA1(b8de58baecb92775e0882cd6eca3b9e07cf7c5a5) )
 	/* Question roms */
@@ -620,7 +620,7 @@ ROM_START( gtsers2 ) /* Series 2 (Complete - question roms dated 2/9) */
 ROM_END
 
 ROM_START( gtsers3 ) /* Series 3 (Complete - question roms dated 3/9) */
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "cpu", 0 )
+	ROM_REGION( 0x24000, "cpu", 0 )
 	ROM_LOAD( "prog102b_right",   0x00000, 0x2000, CRC(e8391f71) SHA1(a955eff87d622d4fcfd25f6d888c48ff82556879) )
 	ROM_LOAD( "prog102b_left",    0x0a000, 0x2000, CRC(cc7b45a7) SHA1(c708f56feb36c1241358a42bb7dce25b799f1f0b) )
 	/* Question roms */
@@ -632,7 +632,7 @@ ROM_START( gtsers3 ) /* Series 3 (Complete - question roms dated 3/9) */
 ROM_END
 
 ROM_START( gtsers4 ) /* Series 4 (Incomplete - question roms dated 4/9) */
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "cpu", 0 )
+	ROM_REGION( 0x24000, "cpu", 0 )
 	ROM_LOAD( "prog102c_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
 	ROM_LOAD( "prog102c_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
 	/* Question roms */
@@ -644,7 +644,7 @@ ROM_START( gtsers4 ) /* Series 4 (Incomplete - question roms dated 4/9) */
 ROM_END
 
 ROM_START( gtsers5 ) /* Series 5 (Incomplete - question roms dated 5/9) */
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "cpu", 0 )
+	ROM_REGION( 0x24000, "cpu", 0 )
 	ROM_LOAD( "prog102c_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
 	ROM_LOAD( "prog102c_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
 	/* Question roms */
@@ -656,7 +656,7 @@ ROM_START( gtsers5 ) /* Series 5 (Incomplete - question roms dated 5/9) */
 ROM_END
 
 ROM_START( gtsers7 ) /* Series 7 (Incomplete - question roms dated 7/9?) */
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "cpu", 0 )
+	ROM_REGION( 0x24000, "cpu", 0 )
 	ROM_LOAD( "prog102c_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
 	ROM_LOAD( "prog102c_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
 	/* Question roms */
@@ -668,7 +668,7 @@ ROM_START( gtsers7 ) /* Series 7 (Incomplete - question roms dated 7/9?) */
 ROM_END
 
 ROM_START( gtsersa ) /* alt or older version questions */
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "cpu", 0 )
+	ROM_REGION( 0x24000, "cpu", 0 )
 	ROM_LOAD( "prog102c_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
 	ROM_LOAD( "prog102c_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
 	/* Question roms */
@@ -680,7 +680,7 @@ ROM_START( gtsersa ) /* alt or older version questions */
 ROM_END
 
 ROM_START( gtsersb ) /* alt or older version questions */
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "cpu", 0 )
+	ROM_REGION( 0x24000, "cpu", 0 )
 	ROM_LOAD( "prog102c_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
 	ROM_LOAD( "prog102c_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
 	/* Question roms */
@@ -692,7 +692,7 @@ ROM_START( gtsersb ) /* alt or older version questions */
 ROM_END
 
 ROM_START( sextriv1 )
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "cpu", 0 )
+	ROM_REGION( 0x24000, "cpu", 0 )
 	ROM_LOAD( "prog1_right",   0x00000, 0x2000, CRC(73abcd12) SHA1(3b985f25a11507878cef6d11420e215065fb0906) )
 	ROM_LOAD( "prog1_left",    0x0a000, 0x2000, CRC(04ee6ecd) SHA1(28342fcdcf36b34fa93f1a985163ca5aab03defe) )
 	/* Question roms */
@@ -703,7 +703,7 @@ ROM_START( sextriv1 )
 ROM_END
 
 ROM_START( sextriv2 )
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "cpu", 0 )
+	ROM_REGION( 0x24000, "cpu", 0 )
 	ROM_LOAD( "prog1_right",     0x00000, 0x2000, CRC(73abcd12) SHA1(3b985f25a11507878cef6d11420e215065fb0906) )
 	ROM_LOAD( "prog1_left",      0x0a000, 0x2000, CRC(04ee6ecd) SHA1(28342fcdcf36b34fa93f1a985163ca5aab03defe) )
 	/* Question roms */
@@ -735,7 +735,7 @@ sets as the alt set also included that name on the labels
 ****************************************************/
 
 ROM_START( gs4002 )
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu", 0 )
+	ROM_REGION( 0x18000, "cpu", 0 )
 	ROM_LOAD( "4-1.1",          0x00000, 0x2000, CRC(a456e456) SHA1(f36b96ac31ce0f128ecb94f94d1dbdd88ee03c77) ) /* V16M 5-4-84 */
 	/* Banked roms */
 	ROM_LOAD( "bljk_3-16-84.2", 0x10000, 0x2000, CRC(c3785523) SHA1(090f324fc7adb0a36b189cf04086f0e050895ee4) )
@@ -745,7 +745,7 @@ ROM_START( gs4002 )
 ROM_END
 
 ROM_START( gs4002a )
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu", 0 )
+	ROM_REGION( 0x18000, "cpu", 0 )
 	ROM_LOAD( "4-1.1",          0x00000, 0x2000, CRC(a456e456) SHA1(f36b96ac31ce0f128ecb94f94d1dbdd88ee03c77) ) /* V16M 5-4-84 */
 	/* Banked roms */
 	ROM_LOAD( "bljk_3-16-84.2", 0x10000, 0x2000, CRC(c3785523) SHA1(090f324fc7adb0a36b189cf04086f0e050895ee4) )
@@ -795,7 +795,7 @@ The ICB set is known as the M105 set as some label sets included that name.
 */
 
 ROM_START( gepoker ) /* v50.02 with most roms for ICB dated 8-16-84 */
-	ROM_REGION( 0x1b000, RGNCLASS_CPU, "cpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1b000, "cpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "control_icb_8-16",    0x00000, 0x2000, CRC(0103963d) SHA1(9bc646e721048b84111e0686eaca23bc24eee3e2) )
 	ROM_LOAD( "high_icb_6-25-85-5",  0x0e000, 0x2000, CRC(dfb6592e) SHA1(d68de9f537d3c14279dc576424d195bb266e3897) )
 	/* Banked roms */
@@ -807,7 +807,7 @@ ROM_START( gepoker ) /* v50.02 with most roms for ICB dated 8-16-84 */
 ROM_END
 
 ROM_START( gepoker1 ) /* v50.02 with roms for ICB dated 9-30-86 */
-	ROM_REGION( 0x1b000, RGNCLASS_CPU, "cpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1b000, "cpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "control_icb_9-30",    0x00000, 0x2000, CRC(08b996f2) SHA1(5f5efb5015ec9571cc94734c18debfadaa28f585) )
 	ROM_LOAD( "high_icb_6-25-85-5a", 0x0e000, 0x2000, CRC(6ddc1750) SHA1(ee19206b7f4a98e3e7647414127f4e09b3e9134f) )
 	/* Banked roms */
@@ -818,7 +818,7 @@ ROM_START( gepoker1 ) /* v50.02 with roms for ICB dated 9-30-86 */
 ROM_END
 
 ROM_START( gepoker2 ) /* v50.02 with control dated 9-30-84 */
-	ROM_REGION( 0x1b000, RGNCLASS_CPU, "cpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1b000, "cpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "control_icb_9-30",  0x00000, 0x2000, CRC(08b996f2) SHA1(5f5efb5015ec9571cc94734c18debfadaa28f585) )
 	ROM_LOAD( "high_icb_6-25a",    0x0e000, 0x2000, CRC(6ddc1750) SHA1(ee19206b7f4a98e3e7647414127f4e09b3e9134f) )
 	/* Banked roms */
@@ -827,7 +827,7 @@ ROM_START( gepoker2 ) /* v50.02 with control dated 9-30-84 */
 ROM_END
 
 ROM_START( amuse ) /* v50.08 with most roms for IAM dated 8-16-84 */
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "cpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x24000, "cpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "control_iam_8-16",  0x00000, 0x4000, CRC(345434b9) SHA1(ec880f6f5e90aa971937e0270701e323f6a83671) ) /* all roms were 27128, twice the size of other sets */
 	ROM_LOAD( "high_iam_8-16",     0x08000, 0x4000, CRC(57000fb7) SHA1(144723eb528c4816b9aa4b0ba77d2723c6442546) ) /* Is only the 1st half used by the board / program? */
 	/* Banked roms */
@@ -840,7 +840,7 @@ ROM_END
 
 static DRIVER_INIT( setbank )
 {
-	memory_set_bankptr(1,memory_region(machine, RGNCLASS_CPU, "cpu") + 0x2000);
+	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x2000);
 }
 
 GAME( 1982, jokpoker, 0,        gselect,  gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03B)",            GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

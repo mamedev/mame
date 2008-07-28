@@ -305,27 +305,27 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( chaknpop )
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "main", 0 )			/* Main CPU */
+	ROM_REGION( 0x18000, "main", 0 )			/* Main CPU */
 	ROM_LOAD( "a04-01.28",    0x00000, 0x2000, CRC(386fe1c8) SHA1(cca24abfb8a7f439251e7936036475c694002561) )
 	ROM_LOAD( "a04-02.27",    0x02000, 0x2000, CRC(5562a6a7) SHA1(0c5d81f9aaf858f88007a6bca7f83dc3ef59c5b5) )
 	ROM_LOAD( "a04-03.26",    0x04000, 0x2000, CRC(3e2f0a9c) SHA1(f1cf87a4cb07f77104d4a4d369807dac522e052c) )
 	ROM_LOAD( "a04-04.25",    0x06000, 0x2000, CRC(5209c7d4) SHA1(dcba785a697df55d84d65735de38365869a1da9d) )
 	ROM_LOAD( "a04-05.3",     0x0a000, 0x2000, CRC(8720e024) SHA1(99e445c117d1501a245f9eb8d014abc4712b4963) )
 
-	ROM_REGION( 0x0800, RGNCLASS_CPU, "cpu1", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "cpu1", 0 )	/* 2k for the microcontroller */
 	/* MCU isn't dumped (its protected) however we simulate it using data
        extracted with a trojan, see machine/chaknpop.c */
 	ROM_LOAD( "68705.mcu",   0x0000, 0x0800, NO_DUMP )
 
-	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprite */
+	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )	/* Sprite */
 	ROM_LOAD( "a04-08.14",     0x0000, 0x2000, CRC(5575a021) SHA1(c2fad53fe6a12c19cec69d27c13fce6aea2502f2) )
 	ROM_LOAD( "a04-07.15",     0x2000, 0x2000, CRC(ae687c18) SHA1(65b25263da88d30cbc0dad94511869596e5c975a) )
 
-	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Text */
+	ROM_REGION( 0x4000, "gfx2", ROMREGION_DISPOSE )	/* Text */
 	ROM_LOAD( "a04-09.98",     0x0000, 0x2000, CRC(757a723a) SHA1(62ab84d2aaa9bc1ea5aa9df8155aa3b5a1e93889) )
 	ROM_LOAD( "a04-10.97",     0x2000, 0x2000, CRC(3e3fd608) SHA1(053a8fbdb35bf1c142349f78a63e8cd1adb41ef6) )
 
-	ROM_REGION( 0x0800, RGNCLASS_PROMS, "proms", 0 )			/* Palette */
+	ROM_REGION( 0x0800, "proms", 0 )			/* Palette */
 	ROM_LOAD( "a04-11.bin",    0x0000, 0x0400, CRC(9bf0e85f) SHA1(44f0a4712c99a715dec54060afb0b27dc48998b4) )
 	ROM_LOAD( "a04-12.bin",    0x0400, 0x0400, CRC(954ce8fc) SHA1(e187f9e2cb754264d149c2896ca949dea3bcf2eb) )
 ROM_END

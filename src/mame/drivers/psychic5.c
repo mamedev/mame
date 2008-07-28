@@ -336,7 +336,7 @@ static READ8_HANDLER( psychic5_bankselect_r )
 
 static WRITE8_HANDLER( psychic5_bankselect_w )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 	int bankaddress;
 
 	if (data != psychic5_bank_latch)
@@ -604,22 +604,22 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( psychic5 )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) 				/* 2*64K for main CPU, Z80 */
+	ROM_REGION( 0x20000, "main", 0 ) 				/* 2*64K for main CPU, Z80 */
 	ROM_LOAD( "p5d",          0x00000, 0x08000, CRC(90259249) SHA1(ac2d8dd95f6c04b6ad726136931e37dcd537e977) )
 	ROM_LOAD( "p5e",          0x10000, 0x10000, CRC(72298f34) SHA1(725be2fbf5f3622f646c0fb8e6677cbddf0b1fc2) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) 				/*64K for 2nd z80 CPU*/
+	ROM_REGION( 0x10000, "audio", 0 ) 				/*64K for 2nd z80 CPU*/
 	ROM_LOAD( "p5a",          0x00000, 0x08000, CRC(50060ecd) SHA1(e6051fb4a1fa9429cfb6084e8a5dfe994a08280b) )
 
-	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "p5b",          0x00000, 0x10000, CRC(7e3f87d4) SHA1(b8e7fa3f96d2e3937e4cb530f105bb84d5743b43) )	/* sprite tiles */
 	ROM_LOAD( "p5c",          0x10000, 0x10000, CRC(8710fedb) SHA1(c7e8dc6b733e4ecce37d56fc429c00ade8736ff3) )
 
-	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "p5g",          0x00000, 0x10000, CRC(f9262f32) SHA1(bae2dc77be7024bd85f213e4da746c5903db6ea5) )	/* background tiles */
 	ROM_LOAD( "p5h",          0x10000, 0x10000, CRC(c411171a) SHA1(d5893563715ba231e42b084b88f5176bb94a4da9) )
 
-	ROM_REGION( 0x08000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "p5f",          0x00000, 0x08000, CRC(04d7e21c) SHA1(6046c506bdedc233e3730f90c7897e847bec8758) )	/* foreground tiles */
 ROM_END
 

@@ -237,7 +237,7 @@ MACHINE_DRIVER_END
 /*** ROM LOADING *************************************************************/
 
 ROM_START( battlex )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "p-rom1.6",    0x0000, 0x1000, CRC(b00ae551) SHA1(32a963fea23ea58fc3aab93cc814784a932f045e) )
 	ROM_LOAD( "p-rom2.5",    0x1000, 0x1000, CRC(e765bb11) SHA1(99671e63f4c7d3d8754277451f0b35cba03b532d) )
 	ROM_LOAD( "p-rom3.4",    0x2000, 0x1000, CRC(21675a91) SHA1(5bbd5b53b1a1b7aaed5d8c7b09b57f35e4a774dc) )
@@ -245,27 +245,27 @@ ROM_START( battlex )
 	ROM_LOAD( "p-rom5.2",    0x4000, 0x1000, CRC(ceb63d38) SHA1(92cab905d009c59115f52172ba7d01c8ff8991d7) )
 	ROM_LOAD( "p-rom6.1",    0x5000, 0x1000, CRC(6923f601) SHA1(e6c33cbd8d8679299d7b2c568d56f96ed3073971) )
 
-	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x4000, "gfx1", ROMREGION_ERASE00 )
 	/* filled in later */
 //  ROM_LOAD( "2732.e",    0x0000, 0x1000, CRC(126842b7) SHA1(2da4f64e077232c1dd0853d07d801f9781517850) )
 
-	ROM_REGION( 0x3000, RGNCLASS_GFX, "gfx2", 0 )
+	ROM_REGION( 0x3000, "gfx2", 0 )
 	ROM_LOAD( "2732.f",    0x0000, 0x1000, CRC(2b69287a) SHA1(30c0edaec44118b95ec390bd41c1bd49a2802451) )
 	ROM_LOAD( "2732.h",    0x1000, 0x1000, CRC(9f4c3bdd) SHA1(e921ecafefe54c033d05d9cd289808e971ac7940) )
 	ROM_LOAD( "2732.j",    0x2000, 0x1000, CRC(c1345b05) SHA1(17194c8ec961990222bd295ff1d036a64f497b0e) )
 
-	ROM_REGION( 0x1000, RGNCLASS_USER, "user1", 0 ) /* line colours? or bad? */
+	ROM_REGION( 0x1000, "user1", 0 ) /* line colours? or bad? */
 	ROM_LOAD( "2732.d",    0x0000, 0x1000, CRC(750a46ef) SHA1(b6ab93e084ab0b7c6ad90ee6431bc1b7ab9ed46d) )
 
-	ROM_REGION( 0x1000, RGNCLASS_USER, "user2", 0 )
+	ROM_REGION( 0x1000, "user2", 0 )
 	ROM_LOAD( "2732.e",    0x0000, 0x1000, CRC(126842b7) SHA1(2da4f64e077232c1dd0853d07d801f9781517850) )
 ROM_END
 
 static DRIVER_INIT( battlex )
 {
-	UINT8 *cold    = memory_region       ( machine, RGNCLASS_USER, "user1" );
-	UINT8 *mskd    = memory_region       ( machine, RGNCLASS_USER, "user2" );
-	UINT8 *dest    = memory_region       ( machine, RGNCLASS_GFX, "gfx1" );
+	UINT8 *cold    = memory_region       ( machine, "user1" );
+	UINT8 *mskd    = memory_region       ( machine, "user2" );
+	UINT8 *dest    = memory_region       ( machine, "gfx1" );
 
 	int outcount;
 

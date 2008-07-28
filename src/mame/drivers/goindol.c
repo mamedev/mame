@@ -38,7 +38,7 @@ extern int goindol_char_bank;
 static WRITE8_HANDLER( goindol_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 
 	bankaddress = 0x10000 + ((data & 3) * 0x4000);
 	memory_set_bankptr(1,&RAM[bankaddress]);
@@ -310,100 +310,100 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( goindol )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "r1w", 0x00000, 0x8000, CRC(df77c502) SHA1(15d111e38d63a8a800fbf5f15c4fb72efb0e5cf4) ) /* Code 0000-7fff */
 	ROM_LOAD( "r2",  0x10000, 0x8000, CRC(1ff6e3a2) SHA1(321d32b5236f8fadc55b00412081cd17fbdb42bf) ) /* Paged data */
 	ROM_LOAD( "r3",  0x18000, 0x8000, CRC(e9eec24a) SHA1(d193dd23b8bee3a788114e6bb86902dddf6fdd99) ) /* Paged data */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "r10", 0x00000, 0x8000, CRC(72e1add1) SHA1(e8bdaffbbbf8ed22eb161cb8d7945ff09420f68f) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "r4", 0x00000, 0x8000, CRC(1ab84225) SHA1(47494d03fb8d153335203155e61d90108db62961) ) /* Characters */
 	ROM_LOAD( "r5", 0x08000, 0x8000, CRC(4997d469) SHA1(60c482b2408079bc8b2ffb86bc01927d5cad66ea) )
 	ROM_LOAD( "r6", 0x10000, 0x8000, CRC(752904b0) SHA1(6ff44bd45b000bccae4fd67eefce936aacd971fc) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "r7", 0x00000, 0x8000, CRC(362f2a27) SHA1(9b8232a9ce7d752a749897fb2231a005c734239d) )
 	ROM_LOAD( "r8", 0x08000, 0x8000, CRC(9fc7946e) SHA1(89100fae14826ad4f6735770827cbfe97562038c) )
 	ROM_LOAD( "r9", 0x10000, 0x8000, CRC(e6212fe4) SHA1(f42b5ddbdb6599ba4ff5e6ef7d86e55f58a671b6) )
 
-	ROM_REGION( 0x0300, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "am27s21.pr1", 0x0000, 0x0100, CRC(361f0868) SHA1(aea681a2e168aca327a998db7b537c7b82dbc433) )	/* palette red bits   */
 	ROM_LOAD( "am27s21.pr2", 0x0100, 0x0100, CRC(e355da4d) SHA1(40ebdbf6519b2817402ea716aae838c315da4fcb) )	/* palette green bits */
 	ROM_LOAD( "am27s21.pr3", 0x0200, 0x0100, CRC(8534cfb5) SHA1(337b6d5e9ceb2116aea73a7a4ac7e70716460323) )	/* palette blue bits  */
 ROM_END
 
 ROM_START( goindolu )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "r1", 0x00000, 0x8000, CRC(3111c61b) SHA1(6cc3834f946566646f06efe0b65c4704574ec6f1) ) /* Code 0000-7fff */
 	ROM_LOAD( "r2", 0x10000, 0x8000, CRC(1ff6e3a2) SHA1(321d32b5236f8fadc55b00412081cd17fbdb42bf) ) /* Paged data */
 	ROM_LOAD( "r3", 0x18000, 0x8000, CRC(e9eec24a) SHA1(d193dd23b8bee3a788114e6bb86902dddf6fdd99) ) /* Paged data */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "r10", 0x00000, 0x8000, CRC(72e1add1) SHA1(e8bdaffbbbf8ed22eb161cb8d7945ff09420f68f) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "r4", 0x00000, 0x8000, CRC(1ab84225) SHA1(47494d03fb8d153335203155e61d90108db62961) ) /* Characters */
 	ROM_LOAD( "r5", 0x08000, 0x8000, CRC(4997d469) SHA1(60c482b2408079bc8b2ffb86bc01927d5cad66ea) )
 	ROM_LOAD( "r6", 0x10000, 0x8000, CRC(752904b0) SHA1(6ff44bd45b000bccae4fd67eefce936aacd971fc) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "r7", 0x00000, 0x8000, CRC(362f2a27) SHA1(9b8232a9ce7d752a749897fb2231a005c734239d) )
 	ROM_LOAD( "r8", 0x08000, 0x8000, CRC(9fc7946e) SHA1(89100fae14826ad4f6735770827cbfe97562038c) )
 	ROM_LOAD( "r9", 0x10000, 0x8000, CRC(e6212fe4) SHA1(f42b5ddbdb6599ba4ff5e6ef7d86e55f58a671b6) )
 
-	ROM_REGION( 0x0300, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "am27s21.pr1", 0x0000, 0x0100, CRC(361f0868) SHA1(aea681a2e168aca327a998db7b537c7b82dbc433) )	/* palette red bits   */
 	ROM_LOAD( "am27s21.pr2", 0x0100, 0x0100, CRC(e355da4d) SHA1(40ebdbf6519b2817402ea716aae838c315da4fcb) )	/* palette green bits */
 	ROM_LOAD( "am27s21.pr3", 0x0200, 0x0100, CRC(8534cfb5) SHA1(337b6d5e9ceb2116aea73a7a4ac7e70716460323) )	/* palette blue bits  */
 ROM_END
 
 ROM_START( goindolk )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "r1j", 0x00000, 0x8000, CRC(dde33ad3) SHA1(23cdb3494f5eeaeae2657a0101d5827aa32c526d) ) /* Code 0000-7fff */
 	ROM_LOAD( "r2",  0x10000, 0x8000, CRC(1ff6e3a2) SHA1(321d32b5236f8fadc55b00412081cd17fbdb42bf) ) /* Paged data */
 	ROM_LOAD( "r3",  0x18000, 0x8000, CRC(e9eec24a) SHA1(d193dd23b8bee3a788114e6bb86902dddf6fdd99) ) /* Paged data */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "r10", 0x00000, 0x8000, CRC(72e1add1) SHA1(e8bdaffbbbf8ed22eb161cb8d7945ff09420f68f) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "r4", 0x00000, 0x8000, CRC(1ab84225) SHA1(47494d03fb8d153335203155e61d90108db62961) ) /* Characters */
 	ROM_LOAD( "r5", 0x08000, 0x8000, CRC(4997d469) SHA1(60c482b2408079bc8b2ffb86bc01927d5cad66ea) )
 	ROM_LOAD( "r6", 0x10000, 0x8000, CRC(752904b0) SHA1(6ff44bd45b000bccae4fd67eefce936aacd971fc) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "r7", 0x00000, 0x8000, CRC(362f2a27) SHA1(9b8232a9ce7d752a749897fb2231a005c734239d) )
 	ROM_LOAD( "r8", 0x08000, 0x8000, CRC(9fc7946e) SHA1(89100fae14826ad4f6735770827cbfe97562038c) )
 	ROM_LOAD( "r9", 0x10000, 0x8000, CRC(e6212fe4) SHA1(f42b5ddbdb6599ba4ff5e6ef7d86e55f58a671b6) )
 
-	ROM_REGION( 0x0300, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "am27s21.pr1", 0x0000, 0x0100, CRC(361f0868) SHA1(aea681a2e168aca327a998db7b537c7b82dbc433) )	/* palette red bits   */
 	ROM_LOAD( "am27s21.pr2", 0x0100, 0x0100, CRC(e355da4d) SHA1(40ebdbf6519b2817402ea716aae838c315da4fcb) )	/* palette green bits */
 	ROM_LOAD( "am27s21.pr3", 0x0200, 0x0100, CRC(8534cfb5) SHA1(337b6d5e9ceb2116aea73a7a4ac7e70716460323) )	/* palette blue bits  */
 ROM_END
 
 ROM_START( homo )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "homo.01", 0x00000, 0x8000, CRC(28c539ad) SHA1(64e950a4238a5656a9e0d0a699a6545da8c59548) ) /* Code 0000-7fff */
 	ROM_LOAD( "r2", 0x10000, 0x8000, CRC(1ff6e3a2) SHA1(321d32b5236f8fadc55b00412081cd17fbdb42bf) ) /* Paged data */
 	ROM_LOAD( "r3", 0x18000, 0x8000, CRC(e9eec24a) SHA1(d193dd23b8bee3a788114e6bb86902dddf6fdd99) ) /* Paged data */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "r10", 0x00000, 0x8000, CRC(72e1add1) SHA1(e8bdaffbbbf8ed22eb161cb8d7945ff09420f68f) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "r4", 0x00000, 0x8000, CRC(1ab84225) SHA1(47494d03fb8d153335203155e61d90108db62961) ) /* Characters */
 	ROM_LOAD( "r5", 0x08000, 0x8000, CRC(4997d469) SHA1(60c482b2408079bc8b2ffb86bc01927d5cad66ea) )
 	ROM_LOAD( "r6", 0x10000, 0x8000, CRC(752904b0) SHA1(6ff44bd45b000bccae4fd67eefce936aacd971fc) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "r7", 0x00000, 0x8000, CRC(362f2a27) SHA1(9b8232a9ce7d752a749897fb2231a005c734239d) )
 	ROM_LOAD( "r8", 0x08000, 0x8000, CRC(9fc7946e) SHA1(89100fae14826ad4f6735770827cbfe97562038c) )
 	ROM_LOAD( "r9", 0x10000, 0x8000, CRC(e6212fe4) SHA1(f42b5ddbdb6599ba4ff5e6ef7d86e55f58a671b6) )
 
-	ROM_REGION( 0x0300, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "am27s21.pr1", 0x0000, 0x0100, CRC(361f0868) SHA1(aea681a2e168aca327a998db7b537c7b82dbc433) )	/* palette red bits   */
 	ROM_LOAD( "am27s21.pr2", 0x0100, 0x0100, CRC(e355da4d) SHA1(40ebdbf6519b2817402ea716aae838c315da4fcb) )	/* palette green bits */
 	ROM_LOAD( "am27s21.pr3", 0x0200, 0x0100, CRC(8534cfb5) SHA1(337b6d5e9ceb2116aea73a7a4ac7e70716460323) )	/* palette blue bits  */
@@ -413,7 +413,7 @@ ROM_END
 
 static DRIVER_INIT( goindol )
 {
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *rom = memory_region(machine, "main");
 
 
 	/* I hope that's all patches to avoid protection */

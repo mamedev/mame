@@ -195,7 +195,7 @@ WRITE8_HANDLER( appoooh_out_w )
 
 	/* bit 6 ROM bank select */
 	{
-		UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+		UINT8 *RAM = memory_region(machine, "main");
 
 		memory_set_bankptr(1,&RAM[data&0x40 ? 0x10000 : 0x0a000]);
 	}

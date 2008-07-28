@@ -167,7 +167,7 @@ WRITE8_HANDLER( pc10_prot_w )
 		/* is the actual protection memory area                     */
 		/* setting the whole 0x2000 region every time is a waste    */
 		/* so we just set $ffff with the current value              */
-		memory_region( machine, RGNCLASS_CPU, "main" )[0xffff] = pc10_prot_r(machine,0);
+		memory_region( machine, "main" )[0xffff] = pc10_prot_r(machine,0);
 	}
 }
 
@@ -398,7 +398,7 @@ static WRITE8_HANDLER( mmc1_rom_switch_w )
 			case 3:	/* program banking */
 				{
 					int bank = ( mmc1_shiftreg & mmc1_rom_mask ) * 0x4000;
-					UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "cart" );
+					UINT8 *prg = memory_region( machine, "cart" );
 
 					if ( !size16k )
 					{
@@ -453,14 +453,14 @@ DRIVER_INIT( pcaboard )
 static WRITE8_HANDLER( bboard_rom_switch_w )
 {
 	int bankoffset = 0x10000 + ( ( data & 7 ) * 0x4000 );
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "cart" );
+	UINT8 *prg = memory_region( machine, "cart" );
 
 	memcpy( &prg[0x08000], &prg[bankoffset], 0x4000 );
 }
 
 DRIVER_INIT( pcbboard )
 {
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "cart" );
+	UINT8 *prg = memory_region( machine, "cart" );
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
@@ -500,7 +500,7 @@ DRIVER_INIT( pccboard )
 
 DRIVER_INIT( pcdboard )
 {
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "cart" );
+	UINT8 *prg = memory_region( machine, "cart" );
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
@@ -564,7 +564,7 @@ static WRITE8_HANDLER( eboard_rom_switch_w )
 		case 0x2000: /* code bank switching */
 			{
 				int bankoffset = 0x10000 + ( data & 0x0f ) * 0x2000;
-				UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "cart" );
+				UINT8 *prg = memory_region( machine, "cart" );
 				memcpy( &prg[0x08000], &prg[bankoffset], 0x2000 );
 			}
 		break;
@@ -602,7 +602,7 @@ static WRITE8_HANDLER( eboard_rom_switch_w )
 
 DRIVER_INIT( pceboard )
 {
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "cart" );
+	UINT8 *prg = memory_region( machine, "cart" );
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
@@ -628,7 +628,7 @@ DRIVER_INIT( pceboard )
 
 DRIVER_INIT( pcfboard )
 {
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "cart" );
+	UINT8 *prg = memory_region( machine, "cart" );
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
@@ -690,7 +690,7 @@ static WRITE8_HANDLER( gboard_rom_switch_w )
 			if ( gboard_last_bank != ( data & 0xc0 ) )
 			{
 				int bank;
-				UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "cart" );
+				UINT8 *prg = memory_region( machine, "cart" );
 
 				/* reset the banks */
 				if ( gboard_command & 0x40 )
@@ -743,7 +743,7 @@ static WRITE8_HANDLER( gboard_rom_switch_w )
 
 					case 6: /* program banking */
 					{
-						UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "cart" );
+						UINT8 *prg = memory_region( machine, "cart" );
 						if ( gboard_command & 0x40 )
 						{
 							/* high bank */
@@ -768,7 +768,7 @@ static WRITE8_HANDLER( gboard_rom_switch_w )
 					case 7: /* program banking */
 						{
 							/* mid bank */
-							UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "cart" );
+							UINT8 *prg = memory_region( machine, "cart" );
 							gboard_banks[1] = data & 0x1f;
 							bank = gboard_banks[1] * 0x2000 + 0x10000;
 
@@ -813,7 +813,7 @@ static WRITE8_HANDLER( gboard_rom_switch_w )
 
 DRIVER_INIT( pcgboard )
 {
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "cart" );
+	UINT8 *prg = memory_region( machine, "cart" );
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
@@ -853,7 +853,7 @@ DRIVER_INIT( pcgboard_type2 )
 static WRITE8_HANDLER( iboard_rom_switch_w )
 {
 	int bank = data & 7;
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "cart" );
+	UINT8 *prg = memory_region( machine, "cart" );
 
 	if ( data & 0x10 )
 		ppu2c0x_set_mirroring( 0, PPU_MIRROR_HIGH );
@@ -865,7 +865,7 @@ static WRITE8_HANDLER( iboard_rom_switch_w )
 
 DRIVER_INIT( pciboard )
 {
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "cart" );
+	UINT8 *prg = memory_region( machine, "cart" );
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
@@ -930,7 +930,7 @@ static WRITE8_HANDLER( hboard_rom_switch_w )
 
 DRIVER_INIT( pchboard )
 {
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "cart" );
+	UINT8 *prg = memory_region( machine, "cart" );
 	memcpy( &prg[0x08000], &prg[0x4c000], 0x4000 );
 	memcpy( &prg[0x0c000], &prg[0x4c000], 0x4000 );
 
@@ -956,7 +956,7 @@ DRIVER_INIT( pchboard )
 
 DRIVER_INIT( pckboard )
 {
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "cart" );
+	UINT8 *prg = memory_region( machine, "cart" );
 
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */

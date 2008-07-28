@@ -642,7 +642,7 @@ static void *upd7759_start(const char *tag, int sndindex, int clock, const void 
 	chip->state = STATE_IDLE;
 
 	/* compute the ROM base or allocate a timer */
-	chip->rom = chip->rombase = memory_region(Machine, RGNCLASS_SOUND, tag);
+	chip->rom = chip->rombase = memory_region(Machine, tag);
 	if (chip->rom == NULL)
 		chip->timer = timer_alloc(upd7759_slave_update, chip);
 

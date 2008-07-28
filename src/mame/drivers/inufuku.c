@@ -120,7 +120,7 @@ static WRITE8_HANDLER( pending_command_clear_w )
 
 static WRITE8_HANDLER( inufuku_soundrombank_w )
 {
-	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "audio") + 0x10000;
+	UINT8 *ROM = memory_region(machine, "audio") + 0x10000;
 
 	memory_set_bankptr(1, ROM + (data & 0x03) * 0x8000);
 }
@@ -440,27 +440,27 @@ MACHINE_DRIVER_END
 ******************************************************************************/
 
 ROM_START( inufuku )
-	ROM_REGION( 0x1000000, RGNCLASS_CPU, "main", 0 )	// main cpu + data
+	ROM_REGION( 0x1000000, "main", 0 )	// main cpu + data
 	ROM_LOAD16_WORD_SWAP( "u147.bin",     0x0000000, 0x080000, CRC(ab72398c) SHA1(f5dc266ffa936ea6528b46a34113f5e2f8141d71) )
 	ROM_LOAD16_WORD_SWAP( "u146.bin",     0x0080000, 0x080000, CRC(e05e9bd4) SHA1(af0fdf31c2bdf851bf15c9de725dcbbb58464d54) )
 	ROM_LOAD16_WORD_SWAP( "lhmn5l28.148", 0x0800000, 0x400000, CRC(802d17e7) SHA1(43b26efea65fd051c094d19784cb977ced39a1a0) )
 
-	ROM_REGION( 0x0030000, RGNCLASS_CPU, "audio", 0 )	// sound cpu
+	ROM_REGION( 0x0030000, "audio", 0 )	// sound cpu
 	ROM_LOAD( "u107.bin", 0x0000000, 0x020000, CRC(1744ef90) SHA1(e019f4ca83e21aa25710cc0ca40ffe765c7486c9) )
 	ROM_RELOAD( 0x010000, 0x020000 )
 
-	ROM_REGION( 0x0400000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	// bg
+	ROM_REGION( 0x0400000, "gfx1", ROMREGION_DISPOSE )	// bg
 	ROM_LOAD16_WORD_SWAP( "lhmn5ku8.u40", 0x0000000, 0x400000, CRC(8cbca80a) SHA1(063e9be97f5a1f021f8326f2994b51f9af5e1eaf) )
 
-	ROM_REGION( 0x0400000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	// text
+	ROM_REGION( 0x0400000, "gfx2", ROMREGION_DISPOSE )	// text
 	ROM_LOAD16_WORD_SWAP( "lhmn5ku7.u8",  0x0000000, 0x400000, CRC(a6c0f07f) SHA1(971803d1933d8296767d8766ea9f04dcd6ab065c) )
 
-	ROM_REGION( 0x0c00000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )	// sprite
+	ROM_REGION( 0x0c00000, "gfx3", ROMREGION_DISPOSE )	// sprite
 	ROM_LOAD16_WORD_SWAP( "lhmn5kub.u34", 0x0000000, 0x400000, CRC(7753a7b6) SHA1(a2e8747ce83ea5a57e2fe62f2452de355d7f48b6) )
 	ROM_LOAD16_WORD_SWAP( "lhmn5kua.u36", 0x0400000, 0x400000, CRC(1ac4402a) SHA1(c15acc6fce4fe0b54e92d14c31a1bd78acf2c8fc) )
 	ROM_LOAD16_WORD_SWAP( "lhmn5ku9.u38", 0x0800000, 0x400000, CRC(e4e9b1b6) SHA1(4d4ad85fbe6a442d4f8cafad748bcae4af6245b7) )
 
-	ROM_REGION( 0x0400000, RGNCLASS_SOUND, "ym", 0 )	// adpcm data
+	ROM_REGION( 0x0400000, "ym", 0 )	// adpcm data
 	ROM_LOAD( "lhmn5ku6.u53", 0x0000000, 0x400000, CRC(b320c5c9) SHA1(7c99da2d85597a3c008ed61a3aa5f47ad36186ec) )
 ROM_END
 

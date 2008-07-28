@@ -1010,25 +1010,25 @@ MACHINE_DRIVER_END
 /***************************************************************************/
 
 ROM_START( apache3 )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, "main", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "ap-25f.125",   0x0a0001, 0x10000, CRC(3c7530f4) SHA1(9f7b58a3abddbdc3081ba9dfc1732406eb8c1752) )
 	ROM_LOAD16_BYTE( "ap-26f.133",   0x0a0000, 0x10000, CRC(2955997f) SHA1(86e37def923d9cf4eb33e7979118ec6f1ef62678) )
 	ROM_LOAD16_BYTE( "ap-23f.110",   0x0e0001, 0x10000, CRC(d7077149) SHA1(b08f5a9ee03641c20bdd5e5c9671a22c740150c6) )
 	ROM_LOAD16_BYTE( "ap-24f.118",   0x0e0000, 0x10000, CRC(0bdef11b) SHA1(ed687600962ed2ca3a8e67cbd84fa5486778eade) )
 
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "sub", 0 ) /* 68000 sub cpu */
+	ROM_REGION( 0x80000, "sub", 0 ) /* 68000 sub cpu */
 	ROM_LOAD16_BYTE( "ap-19c.80",   0x000001, 0x10000, CRC(0908e468) SHA1(a2d725993bd4cd5425468736154fd3dd9dd7b060) )
 	ROM_LOAD16_BYTE( "ap-21c.97",   0x000000, 0x10000, CRC(38a056fb) SHA1(67c8ae58670cebde0771854e1fb5fc2eb2543ecc) )
 	ROM_LOAD16_BYTE( "ap-20a.89",   0x040001, 0x20000, CRC(92d24b5e) SHA1(1ea270d46a607e47b7e0961b532316aa05dc8f4e) )
 	ROM_LOAD16_BYTE( "ap-22a.105",  0x040000, 0x20000, CRC(a8458a92) SHA1(43674731c2e9962c2bfbb73a85484cf03d6be223) )
 
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "audio", 0 ) /* 64k code for sound V20 */
+	ROM_REGION( 0x100000, "audio", 0 ) /* 64k code for sound V20 */
 	ROM_LOAD( "ap-27d.151",   0x0f0000, 0x10000, CRC(294b4d79) SHA1(2b03418a12a2aaf3919b98161d8d0ce6ae29a2bb) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
 	/* Filled in by both regions below */
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0)
+	ROM_REGION( 0x100000, "gfx2", 0)
 	ROM_LOAD32_BYTE( "ap-00c.15",   0x000000, 0x20000, CRC(ad1ddc2b) SHA1(81f64663c4892ab5fb0e2dc99513dbfee73f15b8) )
 	ROM_LOAD32_BYTE( "ap-01c.22",   0x000001, 0x20000, CRC(6286ff00) SHA1(920da4a3a441dbf54ad86c0f4fb6f47a867e9cda) )
 	ROM_LOAD32_BYTE( "ap-04c.58",   0x000002, 0x20000, CRC(dc6d55e4) SHA1(9f48f8d6aa1a329a71913139a8d5a50d95a9b9e5) )
@@ -1038,7 +1038,7 @@ ROM_START( apache3 )
 	ROM_LOAD32_BYTE( "ap-06c.71",   0x080002, 0x20000, CRC(0ea90e55) SHA1(b16d6b8be4853797507d3e5c933a9dd1d451308e) )
 	ROM_LOAD32_BYTE( "ap-07c.75",   0x080003, 0x20000, CRC(ba685543) SHA1(140a2b708d4e4de4d207fc2c4a96a5cab8639988) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx3", 0)
+	ROM_REGION( 0x100000, "gfx3", 0)
 	ROM_LOAD32_BYTE( "ap-08c.14",   0x000000, 0x20000, CRC(6437b580) SHA1(2b2ba42add18bbec04fbcf53645a8d44b972e26a) )
 	ROM_LOAD32_BYTE( "ap-09c.21",   0x000001, 0x20000, CRC(54d18ef9) SHA1(40ebc6ea49b2a501fe843d60bec8c32d07f2d25d) )
 	ROM_LOAD32_BYTE( "ap-12c.57",   0x000002, 0x20000, CRC(f95cf5cf) SHA1(ce373c648cbf3e4863bbc3a1175efe065c75eb13) )
@@ -1048,36 +1048,36 @@ ROM_START( apache3 )
 	ROM_LOAD32_BYTE( "ap-14c.70",   0x080002, 0x20000, CRC(58f7fe16) SHA1(a5b87b42b85808c226df0d2a7b7cdde12d474a41) )
 	ROM_LOAD32_BYTE( "ap-15c.74",   0x080003, 0x20000, CRC(1ffd5496) SHA1(25efb568957fc9441a40a7d64cc6afe1a14b392b) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "ap-18d.73",   0x000000, 0x8000, CRC(55e664bf) SHA1(505bec8b5ff3f9fa2c5fb1213d54683347905be1) )
 	ROM_LOAD( "ap-17d.68",   0x008000, 0x8000, CRC(6199afe4) SHA1(ad8c0ed6c33d984bb29c89f2e7fc7e5a923cefe3) )
 	ROM_LOAD( "ap-16d.63",   0x010000, 0x8000, CRC(f115656d) SHA1(61798858dc0172192d89e666696b2c7642756899) )
 
-	ROM_REGION( 0x30000, RGNCLASS_SOUND, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x30000, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "ap-28c.171",   0x000000, 0x20000, CRC(b349f0c2) SHA1(cb1ff1c0e784f669c87ab1eccd3b358950761b74) )
 	ROM_LOAD( "ap-29c.176",   0x020000, 0x10000, CRC(b38fced3) SHA1(72f61a719f393957bcccf14687bfbb2e7a5f7aee) )
 ROM_END
 
 ROM_START( roundup5 )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, "main", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "ru-23s",   0x080000, 0x20000, CRC(2dc8c521) SHA1(b78de101db3ef00fc4375ae32a7871e0da2dac6c) )
 	ROM_LOAD16_BYTE( "ru-26s",   0x080001, 0x20000, CRC(1e16b531) SHA1(d7badef29cf1c4a9bd262933ecd1ca3343ea94bd) )
 	ROM_LOAD16_BYTE( "ru-22t",   0x0c0000, 0x20000, CRC(9611382e) SHA1(c99258782dbad6d69ba7f54115ee3aa218f9b6ee) )
 	ROM_LOAD16_BYTE( "ru-25t",   0x0c0001, 0x20000, CRC(b6cd0f2d) SHA1(61925c2346d79baaf9bce3d19a7dfc45b8232f92) )
 
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "sub", 0 ) /* 68000 sub cpu */
+	ROM_REGION( 0x80000, "sub", 0 ) /* 68000 sub cpu */
 	ROM_LOAD16_BYTE( "ru-20s",   0x000000, 0x20000, CRC(c5524558) SHA1(a94e7e4548148c83a332524ab4e06607732e13d5) )
 	ROM_LOAD16_BYTE( "ru-18s",   0x000001, 0x20000, CRC(163ef03d) SHA1(099ac2d74164bdc6402b08efb521f49275780858) )
 	ROM_LOAD16_BYTE( "ru-24s",   0x040000, 0x20000, CRC(b9f91b70) SHA1(43c5d9dafb60ed3e5c3eb0e612c2dbc5497f8a6c) )
 	ROM_LOAD16_BYTE( "ru-19s",   0x040001, 0x20000, CRC(e3953800) SHA1(28fbc6bf154b512fcefeb04fe12db598b1b20cfe) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x10000, "audio", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "ru-28d",   0x000000, 0x10000, CRC(df36c6c5) SHA1(c046482043f6b54c55696ba3d339ffb11d78f674) )
 
-	ROM_REGION( 0x180000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE )
 	/* Filled in by both regions below */
 
-	ROM_REGION( 0x0c0000, RGNCLASS_GFX, "gfx2", 0)
+	ROM_REGION( 0x0c0000, "gfx2", 0)
 	ROM_LOAD32_BYTE( "ru-00b",   0x000000, 0x20000, CRC(388a0647) SHA1(e4ab43832872f44c0fe1aaede4372cc00ca7d32b) )
 	ROM_LOAD32_BYTE( "ru-02b",   0x000001, 0x20000, CRC(eff33945) SHA1(3f4c3aaa11ccf945c2f898dfdf815705d8539e21) )
 	ROM_LOAD32_BYTE( "ru-04b",   0x000002, 0x20000, CRC(40fda247) SHA1(f5fbc07fda024baedf35ac209210e94df9f15065) )
@@ -1087,7 +1087,7 @@ ROM_START( roundup5 )
 	ROM_LOAD32_BYTE( "ru-05b",   0x080002, 0x10000, CRC(23dd10e1) SHA1(f30ff1a8c7ed9bc567b901cbdd202028fffb9f80) )
 	ROM_LOAD32_BYTE( "ru-07b",   0x080003, 0x10000, CRC(bb40f46e) SHA1(da694e16d19f60a0dee47551f00f3e50b2d5dcaf) )
 
-	ROM_REGION( 0x0c0000, RGNCLASS_GFX, "gfx3", 0)
+	ROM_REGION( 0x0c0000, "gfx3", 0)
 	ROM_LOAD32_BYTE( "ru-08b",   0x000000, 0x20000, CRC(01729e3c) SHA1(1445287fde0b993d053aab73efafc902a6b7e2cc) )
 	ROM_LOAD32_BYTE( "ru-10b",   0x000001, 0x20000, CRC(cd2357a7) SHA1(313460a74244325ce2c659816f2b738f3dc5358a) )
 	ROM_LOAD32_BYTE( "ru-12b",   0x000002, 0x20000, CRC(ca63b1f8) SHA1(a50ef8259745dc166eb0a1b2c812ff620818a755) )
@@ -1097,31 +1097,31 @@ ROM_START( roundup5 )
 	ROM_LOAD32_BYTE( "ru-13b",   0x080002, 0x10000, CRC(d0f6e747) SHA1(ef15ed41124b2d37bc6e92254138690dd644e50f) )
 	ROM_LOAD32_BYTE( "ru-15b",   0x080003, 0x10000, CRC(6ee6b22e) SHA1(a28edaf23ca6c7231264de962d5ea37bad39f996) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "ru-17b",   0x000000, 0x20000, CRC(82391b47) SHA1(6b1977522c6e906503abc50bdd24c4c38cdc9bdb) )
 	ROM_LOAD( "ru-16e",   0x020000, 0x10000, CRC(374fe170) SHA1(5d190a2735698b0384948bfdb1a900f56f0d7ebc) )
 ROM_END
 
 ROM_START( cyclwarr )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 ) /* 68000 main cpu */
+	ROM_REGION( 0x80000, "main", 0 ) /* 68000 main cpu */
 	ROM_LOAD16_BYTE( "cw16b",   0x000000, 0x20000, CRC(cb1a737a) SHA1(a603ee1256be5641d00a72f64efaaacb65ed9d7d) )
 	ROM_LOAD16_BYTE( "cw18b",   0x000001, 0x20000, CRC(0633ddcb) SHA1(1196ab17065352ec5b37f2f6b383a43a2d0fa3a6) )
 	ROM_LOAD16_BYTE( "cw17a",   0x040000, 0x20000, CRC(2ad6f836) SHA1(5fa4275b433013943ba1d1b64a3c725097f946f9) )
 	ROM_LOAD16_BYTE( "cw19a",   0x040001, 0x20000, CRC(d3853658) SHA1(c9338083a04f55bd22285176831f4b0bdb78564f) )
 
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "sub", 0 ) /* 68000 sub cpu */
+	ROM_REGION( 0x80000, "sub", 0 ) /* 68000 sub cpu */
 	ROM_LOAD16_BYTE( "cw20a",   0x000000, 0x20000, CRC(c3578ac1) SHA1(21d369da874f01922d0f0b757a42b4321df891d4) )
 	ROM_LOAD16_BYTE( "cw22a",   0x000001, 0x20000, CRC(5339ed24) SHA1(5b0a54c2442dcf7373ff8b55b91af9772473ff77) )
 	ROM_LOAD16_BYTE( "cw21",    0x040000, 0x20000, CRC(ed90d956) SHA1(f533f93da31ac6eb631fb506357717e7cac8e186) )
 	ROM_LOAD16_BYTE( "cw23",    0x040001, 0x20000, CRC(009cdc78) SHA1(a77933a7736546397e8c69226703d6f9be7b55e5) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x10000, "audio", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "cw26a",   0x000000, 0x10000, CRC(f7a70e3a) SHA1(5581633bf1f15d7f5c1e03de897d65d60f9f1e33) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
 	/* Filled in by both regions below */
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0)
+	ROM_REGION( 0x100000, "gfx2", 0)
 	ROM_LOAD32_BYTE( "cw00a",   0x000000, 0x20000, CRC(058a77f1) SHA1(93f99fcf6ce6714d76af6f6e930115516f0379d3) )
 	ROM_LOAD32_BYTE( "cw08a",   0x000001, 0x20000, CRC(f53993e7) SHA1(ef2d502ab180d2bc0bdb698c2878fdee9a2c33a8) )
 	ROM_LOAD32_BYTE( "cw02a",   0x000002, 0x20000, CRC(4dadf3cb) SHA1(e42c56e295a443cb605d48eba23a16fab3c86525) )
@@ -1131,7 +1131,7 @@ ROM_START( cyclwarr )
 	ROM_LOAD32_BYTE( "cw03a",   0x080002, 0x20000, CRC(3ca6f98e) SHA1(8526fe38d3b4c66e09049ba18651a9e7255d85d6) )
 	ROM_LOAD32_BYTE( "cw11a",   0x080003, 0x20000, CRC(5d760392) SHA1(7bbda2880af4659c267193ce10ed887a1b54a981) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx3", 0)
+	ROM_REGION( 0x100000, "gfx3", 0)
 	ROM_LOAD32_BYTE( "cw04a",   0x000000, 0x20000, CRC(f05f594d) SHA1(80effaa517b2154c013419e0bc05fd0797b74c8d) )
 	ROM_LOAD32_BYTE( "cw12a",   0x000001, 0x20000, CRC(4ac07e8b) SHA1(f9de96fba39d5752d61b8f6be87fb605694624ed) )
 	ROM_LOAD32_BYTE( "cw06a",   0x000002, 0x20000, CRC(f628edc9) SHA1(473f7ec28000e6bf72782c1c3f4afb5e021bd430) )
@@ -1141,55 +1141,55 @@ ROM_START( cyclwarr )
 	ROM_LOAD32_BYTE( "cw07a",   0x080002, 0x20000, CRC(314579b5) SHA1(3c10ec490f7821a5b5412295232bbb104d0e4b83) )
 	ROM_LOAD32_BYTE( "cw15a",   0x080003, 0x20000, CRC(7ed4b721) SHA1(b87865effeff77a9ea74354ef2b5911a5102a647) )
 
-	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx4", 0 )
+	ROM_REGION( 0x20000, "gfx4", 0 )
 	ROM_LOAD( "cw27",   0x000000, 0x20000, CRC(2db48a9e) SHA1(16c307340d17cd3b5455ebcee681fbe0335dec58) )
 
-	ROM_REGION( 0x60000, RGNCLASS_GFX, "gfx5", ROMREGION_DISPOSE )
+	ROM_REGION( 0x60000, "gfx5", ROMREGION_DISPOSE )
 	ROM_LOAD( "cw30",   0x000000, 0x20000, CRC(331d0711) SHA1(82251fe1f1d36f079080943ab1fd04a60077c353) )
 	ROM_LOAD( "cw29",   0x020000, 0x20000, CRC(64dd519c) SHA1(e23611fc2be896861997063546c3eb03527eaf8e) )
 	ROM_LOAD( "cw28",   0x040000, 0x20000, CRC(3fc568ed) SHA1(91125c9deddc659449ca6791a847fe908c2818b2) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "cw24a",   0x000000, 0x20000, CRC(22600cba) SHA1(a1514fbe037942f1493a17eb0b7986949470cb22) )
 	ROM_LOAD( "cw25a",   0x020000, 0x20000, CRC(372c6bc8) SHA1(d4875bf3bffecf338bebba3b8d6a791585556a06) )
 ROM_END
 
 ROM_START( bigfight )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 ) /* 68000 main cpu */
+	ROM_REGION( 0x80000, "main", 0 ) /* 68000 main cpu */
 	ROM_LOAD16_BYTE( "rom16.ic77",   0x000000, 0x40000, CRC(e7304ec8) SHA1(31a37e96bf963b349d36534bc5ebbf45e19ad00e) )
 	ROM_LOAD16_BYTE( "rom17.ic98",   0x000001, 0x40000, CRC(4cf090f6) SHA1(9ae0274c890e829a90108ce316aff9665128c982) )
 
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "sub", 0 ) /* 68000 sub cpu */
+	ROM_REGION( 0x80000, "sub", 0 ) /* 68000 sub cpu */
 	ROM_LOAD16_BYTE( "rom18.ic100",   0x000000, 0x40000, CRC(49df6207) SHA1(c4126f4542add11a3a3d236311c8787c24c98440) )
 	ROM_LOAD16_BYTE( "rom19.ic102",   0x000001, 0x40000, CRC(c12aa9e9) SHA1(19cc7feaa97c6f5148ae8c0077174f96be684f05) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x10000, "audio", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rom20.ic91",   0x000000, 0x10000, CRC(b3add091) SHA1(8a67bfff75c13fe4d9b89d30449199200d11cea7) )
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )
 	/* Filled in by both regions below */
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", 0 )
+	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "rom0.ic26",   0x000000, 0x80000, CRC(a4a3c8d6) SHA1(b5365d9bc6068260c23ba9d5971c7c7d7cc07a97) )
 	ROM_LOAD32_BYTE( "rom8.ic45",   0x000001, 0x80000, CRC(220956ed) SHA1(68e0ba1e850101b4cc2778819dfa76f04d88d2d6) )
 	ROM_LOAD32_BYTE( "rom2.ic28",   0x000002, 0x80000, CRC(c4f6d243) SHA1(e23b241b5a40b332165a34e2f1bc4366973b2070) )
 	ROM_LOAD32_BYTE( "rom10.ic47",  0x000003, 0x80000, CRC(0212d472) SHA1(5549461195fd7b6b43c0174462d7fe1a1bac24e9) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx3", 0 )
+	ROM_REGION( 0x200000, "gfx3", 0 )
 	ROM_LOAD32_BYTE( "rom4.ic30",   0x000000, 0x80000, CRC(999ff7e9) SHA1(a53b06ad084722d7a52fcf01c52967f68620e609) )
 	ROM_LOAD32_BYTE( "rom12.ic49",  0x000001, 0x80000, CRC(cb4c1f0b) SHA1(32d64b78ed3d5971eb5d25be2c38e6f2c9048f74) )
 	ROM_LOAD32_BYTE( "rom6.ic32",   0x000002, 0x80000, CRC(f70e2d47) SHA1(00517b5f3b2deb6f3f3bd12df421e63884c22b2e) )
 	ROM_LOAD32_BYTE( "rom14.ic51",  0x000003, 0x80000, CRC(77430bc9) SHA1(0b1fd54ace84a9fb5b44d5600de8089a20bcbd47) )
 
-	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx4", 0 )
+	ROM_REGION( 0x20000, "gfx4", 0 )
 	ROM_LOAD( "rom21.ic128",   0x000000, 0x20000, CRC(da027dcf) SHA1(47d18a8a273fea72cb3ad3d58166fe38ca28a860) )
 
-	ROM_REGION( 0x60000, RGNCLASS_GFX, "gfx5", ROMREGION_DISPOSE )
+	ROM_REGION( 0x60000, "gfx5", ROMREGION_DISPOSE )
 	ROM_LOAD( "rom24.ic73",   0x000000, 0x20000, CRC(c564185d) SHA1(e9b5fc10a5a5014735852c22db2a054d5787d8cb) )
 	ROM_LOAD( "rom23.ic72",   0x020000, 0x20000, CRC(f8bb340b) SHA1(905a1ec778d6ed5c6f53d9d08cd105eed7e307ca) )
 	ROM_LOAD( "rom22.ic71",   0x040000, 0x20000, CRC(fb505074) SHA1(b6d9b20be7c3e971e5a4392736f087e807b9c850) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "rom15.ic39",   0x000000, 0x40000, CRC(58d136e8) SHA1(4aa063c4b9b057cba4655ecbe44a87c8c411e3aa) )
 ROM_END
 
@@ -1197,9 +1197,9 @@ ROM_END
 
 static DRIVER_INIT( apache3 )
 {
-	UINT8 *dst = memory_region(machine, RGNCLASS_GFX, "gfx1");
-	UINT8 *src1 = memory_region(machine, RGNCLASS_GFX, "gfx2");
-	UINT8 *src2 = memory_region(machine, RGNCLASS_GFX, "gfx3");
+	UINT8 *dst = memory_region(machine, "gfx1");
+	UINT8 *src1 = memory_region(machine, "gfx2");
+	UINT8 *src2 = memory_region(machine, "gfx3");
 	int i;
 
 	cpunum_set_input_line(machine, 3, INPUT_LINE_HALT, ASSERT_LINE); // ?
@@ -1214,19 +1214,19 @@ static DRIVER_INIT( apache3 )
 	}
 
 	// Copy sprite & palette data out of GFX rom area
-	tatsumi_rom_sprite_lookup1 = memory_region(machine, RGNCLASS_GFX, "gfx2");
-	tatsumi_rom_sprite_lookup2 = memory_region(machine, RGNCLASS_GFX, "gfx3");
-	tatsumi_rom_clut0 = memory_region(machine, RGNCLASS_GFX, "gfx2")+ 0x100000 - 0x800;
-	tatsumi_rom_clut1 = memory_region(machine, RGNCLASS_GFX, "gfx3")+ 0x100000 - 0x800;
+	tatsumi_rom_sprite_lookup1 = memory_region(machine, "gfx2");
+	tatsumi_rom_sprite_lookup2 = memory_region(machine, "gfx3");
+	tatsumi_rom_clut0 = memory_region(machine, "gfx2")+ 0x100000 - 0x800;
+	tatsumi_rom_clut1 = memory_region(machine, "gfx3")+ 0x100000 - 0x800;
 
 	tatsumi_reset();
 }
 
 static DRIVER_INIT( roundup5 )
 {
-	UINT8 *dst = memory_region(machine, RGNCLASS_GFX, "gfx1");
-	UINT8 *src1 = memory_region(machine, RGNCLASS_GFX, "gfx2");
-	UINT8 *src2 = memory_region(machine, RGNCLASS_GFX, "gfx3");
+	UINT8 *dst = memory_region(machine, "gfx1");
+	UINT8 *src1 = memory_region(machine, "gfx2");
+	UINT8 *src2 = memory_region(machine, "gfx3");
 	int i;
 
 	for (i=0; i<0xc0000; i+=32) {
@@ -1239,21 +1239,21 @@ static DRIVER_INIT( roundup5 )
 	}
 
 	// Copy sprite & palette data out of GFX rom area
-	tatsumi_rom_sprite_lookup1 = memory_region(machine, RGNCLASS_GFX, "gfx2");
-	tatsumi_rom_sprite_lookup2 = memory_region(machine, RGNCLASS_GFX, "gfx3");
-	tatsumi_rom_clut0 = memory_region(machine, RGNCLASS_GFX, "gfx2")+ 0xc0000 - 0x800;
-	tatsumi_rom_clut1 = memory_region(machine, RGNCLASS_GFX, "gfx3")+ 0xc0000 - 0x800;
+	tatsumi_rom_sprite_lookup1 = memory_region(machine, "gfx2");
+	tatsumi_rom_sprite_lookup2 = memory_region(machine, "gfx3");
+	tatsumi_rom_clut0 = memory_region(machine, "gfx2")+ 0xc0000 - 0x800;
+	tatsumi_rom_clut1 = memory_region(machine, "gfx3")+ 0xc0000 - 0x800;
 
 	tatsumi_reset();
 }
 
 static DRIVER_INIT( cyclwarr )
 {
-	UINT8 *dst = memory_region(machine, RGNCLASS_GFX, "gfx1");
-	UINT8 *src1 = memory_region(machine, RGNCLASS_GFX, "gfx2");
-	int len1 = memory_region_length(machine, RGNCLASS_GFX, "gfx2");
-	UINT8 *src2 = memory_region(machine, RGNCLASS_GFX, "gfx3");
-	int len2 = memory_region_length(machine, RGNCLASS_GFX, "gfx3");
+	UINT8 *dst = memory_region(machine, "gfx1");
+	UINT8 *src1 = memory_region(machine, "gfx2");
+	int len1 = memory_region_length(machine, "gfx2");
+	UINT8 *src2 = memory_region(machine, "gfx3");
+	int len2 = memory_region_length(machine, "gfx3");
 	int i;
 	for (i=0; i<len1; i+=32) {
 		memcpy(dst,src1,32);
@@ -1264,19 +1264,19 @@ static DRIVER_INIT( cyclwarr )
 		src2+=32;
 	}
 
-	dst = memory_region(machine, RGNCLASS_CPU, "main");
+	dst = memory_region(machine, "main");
 	memcpy(cyclwarr_cpua_ram,dst,8);
 	memory_set_bankptr(1, dst);
 
-	dst = memory_region(machine, RGNCLASS_CPU, "sub");
+	dst = memory_region(machine, "sub");
 	memcpy(cyclwarr_cpub_ram,dst,8);
 	memory_set_bankptr(2, dst);
 
 	// Copy sprite & palette data out of GFX rom area
-	tatsumi_rom_sprite_lookup1 = memory_region(machine, RGNCLASS_GFX, "gfx2");
-	tatsumi_rom_sprite_lookup2 = memory_region(machine, RGNCLASS_GFX, "gfx3");
-	tatsumi_rom_clut0 = memory_region(machine, RGNCLASS_GFX, "gfx2") + len1 - 0x1000;
-	tatsumi_rom_clut1 = memory_region(machine, RGNCLASS_GFX, "gfx3") + len2 - 0x1000;
+	tatsumi_rom_sprite_lookup1 = memory_region(machine, "gfx2");
+	tatsumi_rom_sprite_lookup2 = memory_region(machine, "gfx3");
+	tatsumi_rom_clut0 = memory_region(machine, "gfx2") + len1 - 0x1000;
+	tatsumi_rom_clut1 = memory_region(machine, "gfx3") + len2 - 0x1000;
 
 	tatsumi_reset();
 }

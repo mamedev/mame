@@ -325,7 +325,7 @@ static WRITE32_HANDLER( coin_count_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE(&ram_base)
-	AM_RANGE(0x01800000, 0x01bfffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0) AM_BASE(&rom_base)
+	AM_RANGE(0x01800000, 0x01bfffff) AM_ROM AM_REGION("user1", 0) AM_BASE(&rom_base)
 	AM_RANGE(0x40000000, 0x400007ff) AM_RAM_WRITE(eeprom_data_w) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x41000000, 0x41000003) AM_READWRITE(sound_data_r, sound_data_w)
 	AM_RANGE(0x41000100, 0x41000103) AM_READ(interrupt_control_r)
@@ -441,11 +441,11 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( beathead )
-	ROM_REGION( 0x14000, RGNCLASS_CPU, "jsa", 0 )			/* 64k + 16k for 6502 code */
+	ROM_REGION( 0x14000, "jsa", 0 )			/* 64k + 16k for 6502 code */
 	ROM_LOAD( "bhsnd.bin",  0x10000, 0x4000, CRC(dfd33f02) SHA1(479a4838c89691d5a4654a4cd84b6433a9e86109) )
 	ROM_CONTINUE(           0x04000, 0xc000 )
 
-	ROM_REGION32_LE( 0x400000, RGNCLASS_USER, "user1", 0 )	/* 4MB for ASAP code */
+	ROM_REGION32_LE( 0x400000, "user1", 0 )	/* 4MB for ASAP code */
 	ROM_LOAD32_BYTE( "bhprog0.bin", 0x000000, 0x80000, CRC(87975721) SHA1(862cb3a290c829aedea26ee7100c50a12e9517e7) )
 	ROM_LOAD32_BYTE( "bhprog1.bin", 0x000001, 0x80000, CRC(25d89743) SHA1(9ff9a41355aa6914efc4a44909026e648a3c40f3) )
 	ROM_LOAD32_BYTE( "bhprog2.bin", 0x000002, 0x80000, CRC(87722609) SHA1(dbd766fa57f4528702a98db28ae48fb5d2a7f7df) )
@@ -455,7 +455,7 @@ ROM_START( beathead )
 	ROM_LOAD32_BYTE( "bhpics2.bin", 0x200002, 0x80000, CRC(00b96481) SHA1(39daa46321c1d4f8bce8c25d0450b97f1f19dedb) )
 	ROM_LOAD32_BYTE( "bhpics3.bin", 0x200003, 0x80000, CRC(99c4f1db) SHA1(aba4440c5cdf413f970a0c65457e2d1b37caf2d6) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "adpcm", 0 )		/* 1MB for ADPCM */
+	ROM_REGION( 0x100000, "adpcm", 0 )		/* 1MB for ADPCM */
 	ROM_LOAD( "bhpcm0.bin",  0x80000, 0x20000, CRC(609ca626) SHA1(9bfc913fc4c3453b132595f8553245376bce3a51) )
 	ROM_LOAD( "bhpcm1.bin",  0xa0000, 0x20000, CRC(35511509) SHA1(41294b81e253db5d2f30f8589dd59729a31bb2bb) )
 	ROM_LOAD( "bhpcm2.bin",  0xc0000, 0x20000, CRC(f71a840a) SHA1(09d045552704cd1434307f9a36ce03c5c06a8ff6) )

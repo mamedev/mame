@@ -100,7 +100,7 @@ VIDEO_START( namcos1 )
 {
 	int i;
 
-	tilemap_maskdata = (UINT8 *)memory_region(machine, RGNCLASS_GFX, "gfx1");
+	tilemap_maskdata = (UINT8 *)memory_region(machine, "gfx1");
 
 	/* allocate videoram */
 	namcos1_videoram = auto_malloc(0x8000);

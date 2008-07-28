@@ -334,7 +334,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( ace )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "ace.a1",		0x0000, 0x0200, CRC(16811834) SHA1(5502812dd161908eea3fa8851d7e5c1e22b0f8ff) )
 	ROM_LOAD( "ace.a2",		0x0200, 0x0200, CRC(f9eae80e) SHA1(8865b86c7b5d57c76312c16f8a614bf35ffaf532) )
 	ROM_LOAD( "ace.a3",		0x0400, 0x0200, CRC(c5c63b8c) SHA1(2079dd12ff0c4aafec19aeb9baa70fc9b6788356) )
@@ -342,7 +342,7 @@ ROM_START( ace )
 	ROM_LOAD( "ace.a5",		0x0800, 0x0200, CRC(623c58e7) SHA1(a92418bc323a1ae76eae8e094e4d6ebd1e8da14e) )
 
 	/* not used - I couldn't guess when this should be displayed */
-	ROM_REGION( 0x0200, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x0200, "gfx1", 0 )
 	ROM_LOAD( "ace.k4",		0x0000, 0x0200, CRC(daa05ec6) SHA1(8b71ffb802293dc93f6b492ff128a704e676a5fd) )
 
 ROM_END

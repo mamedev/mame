@@ -97,7 +97,7 @@ static TILEMAP_MAPPER( tilemap_scan )
 
 static TILE_GET_INFO( bg_get_tile_info )
 {
-	UINT8 *rom = memory_region(machine, RGNCLASS_GFX, "gfx4");
+	UINT8 *rom = memory_region(machine, "gfx4");
 	int code = rom[tile_index | (bg_select << 10)];
 	/* when the background is "disabled", it is actually still drawn, but using
        a color code that makes all pixels black. There are pullups setting the

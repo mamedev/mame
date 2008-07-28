@@ -374,19 +374,19 @@ MACHINE_DRIVER_END
 
 
 ROM_START( shootout )
-	ROM_REGION( 2*0x20000, RGNCLASS_CPU, "main", 0 )	/* 128k for code + 128k for decrypted opcodes */
+	ROM_REGION( 2*0x20000, "main", 0 )	/* 128k for code + 128k for decrypted opcodes */
 	ROM_LOAD( "cu00.b1",        0x08000, 0x8000, CRC(090edeb6) SHA1(ab849d123dacf3947b1ebd29b70a20e066911a60) ) /* opcodes encrypted */
 	/* banked at 0x4000-0x8000 */
 	ROM_LOAD( "cu02.c3",        0x10000, 0x8000, CRC(2a913730) SHA1(584488278d58c4d34a2eebeaf39518f87cf5eecd) ) /* opcodes encrypted */
 	ROM_LOAD( "cu01.c1",        0x18000, 0x4000, CRC(8843c3ae) SHA1(c58ed4acac566f890cadf62bcbcced07a59243fc) ) /* opcodes encrypted */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "cu09.j1",        0x0c000, 0x4000, CRC(c4cbd558) SHA1(0e940ae99febc1161e5f35550aa75afca88cb5e9) ) /* Sound CPU */
 
-	ROM_REGION( 0x04000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "cu11.h19",       0x00000, 0x4000, CRC(eff00460) SHA1(15daaa3d3125a981a26f31d43283faa5be26e96b) ) /* foreground characters */
 
-	ROM_REGION( 0x30000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x30000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "cu04.c7",        0x00000, 0x8000, CRC(ceea6b20) SHA1(9fe363668db2e2759b3c531b4d7f23c65f2e8035) )   /* sprites */
 	ROM_LOAD( "cu03.c5",        0x08000, 0x8000, CRC(b786bb3e) SHA1(5a209f01914ca4b206138d738a34640e0bcb3185) )
 	ROM_LOAD( "cu06.c10",       0x10000, 0x8000, CRC(2ec1d17f) SHA1(74f0579a5ab3daf5d1290d3c15459f0f9b67bf79) )
@@ -394,63 +394,63 @@ ROM_START( shootout )
 	ROM_LOAD( "cu08.c13",       0x20000, 0x8000, CRC(91290933) SHA1(60487f4eaf2e6c50b24c0f8fbd7abf92c04a342a) )
 	ROM_LOAD( "cu07.c12",       0x28000, 0x8000, CRC(19b6b94f) SHA1(292264811206916af41d133f81dfd93c44f59a96) )
 
-	ROM_REGION( 0x08000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "cu10.h17",       0x00000, 0x2000, CRC(3854c877) SHA1(2c8fe4591553ce798c907849e3dbd410e4fe424c) ) /* background tiles */
 	ROM_CONTINUE(				0x04000, 0x2000 )
 	ROM_CONTINUE(				0x02000, 0x2000 )
 	ROM_CONTINUE(				0x06000, 0x2000 )
 
-	ROM_REGION( 0x0200, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "gb08.k10",       0x0000, 0x0100, CRC(509c65b6) SHA1(4cec37065a799ced4e7b6552f267aacc7f54ffe3) )
 	ROM_LOAD( "gb09.k6",        0x0100, 0x0100, CRC(aa090565) SHA1(e289e77ec3402e86d93b873c0fa064f3e6277a62) )	/* priority encoder? (not used) */
 ROM_END
 
 ROM_START( shootouj )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )	/* 128k for code  */
+	ROM_REGION( 0x20000, "main", 0 )	/* 128k for code  */
 	ROM_LOAD( "cg02.bin",    0x08000, 0x8000, CRC(8fc5d632) SHA1(809ac4eba09972229fe741c96fa8036d7139b6a8) )
 	ROM_LOAD( "cg00.bin",    0x10000, 0x8000, CRC(ef6ced1e) SHA1(feea508c7a60fc6cde1efee52cba628accd26028) )
 	ROM_LOAD( "cg01.bin",    0x18000, 0x4000, CRC(74cf11ca) SHA1(59edbc4633cd560e7b928b33e4c42d0125332a1b) )
 
-	ROM_REGION( 0x04000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "cu11.h19",       0x00000, 0x4000, CRC(eff00460) SHA1(15daaa3d3125a981a26f31d43283faa5be26e96b) ) /* foreground characters */
 
-	ROM_REGION( 0x30000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x30000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "cg03.bin",    0x00000, 0x8000, CRC(5252ec19) SHA1(c6848a815badd8845f91e898b0a52b7f12ed8a39) )  /* sprites */
 	ROM_LOAD( "cg04.bin",    0x10000, 0x8000, CRC(db06cfe9) SHA1(e13c16232f54fe8467c21e0218c87606a19dd25c) )
 	ROM_LOAD( "cg05.bin",    0x20000, 0x8000, CRC(d634d6b8) SHA1(e2ddd12b1b3fb0063104d414f0574b94dbfa0403) )
 
-	ROM_REGION( 0x08000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "cu10.h17",       0x00000, 0x2000, CRC(3854c877) SHA1(2c8fe4591553ce798c907849e3dbd410e4fe424c) ) /* background tiles */
 	ROM_CONTINUE(				0x04000, 0x2000 )
 	ROM_CONTINUE(				0x02000, 0x2000 )
 	ROM_CONTINUE(				0x06000, 0x2000 )
 
-	ROM_REGION( 0x0200, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "gb08.k10",       0x0000, 0x0100, CRC(509c65b6) SHA1(4cec37065a799ced4e7b6552f267aacc7f54ffe3) )
 	ROM_LOAD( "gb09.k6",        0x0100, 0x0100, CRC(aa090565) SHA1(e289e77ec3402e86d93b873c0fa064f3e6277a62) )	/* priority encoder? (not used) */
 ROM_END
 
 ROM_START( shootoub )
-	ROM_REGION( 2*0x20000, RGNCLASS_CPU, "main", 0 )	/* 128k for code + 128k for decrypted opcodes */
+	ROM_REGION( 2*0x20000, "main", 0 )	/* 128k for code + 128k for decrypted opcodes */
 	ROM_LOAD( "shootout.006", 0x08000, 0x8000, CRC(2c054888) SHA1(cb0de2f7d743506789626304e6bcbbc292fbe8bc) )
 	ROM_LOAD( "shootout.008", 0x10000, 0x8000, CRC(9651b656) SHA1(e90eddf2833ef36fa73b7b8d81d28443d2f60220) )
 	ROM_LOAD( "cg01.bin",     0x18000, 0x4000, CRC(74cf11ca) SHA1(59edbc4633cd560e7b928b33e4c42d0125332a1b) )
 
-	ROM_REGION( 0x04000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "cu11.h19",       0x00000, 0x4000, CRC(eff00460) SHA1(15daaa3d3125a981a26f31d43283faa5be26e96b) ) /* foreground characters */
 
-	ROM_REGION( 0x30000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x30000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "shootout.005",   0x00000, 0x8000, CRC(e6357ba3) SHA1(1ceb46450a0c4f6f7f7109601ad6617f08364df5) )   /* sprites */
 	ROM_LOAD( "shootout.004",   0x10000, 0x8000, CRC(7f422c93) SHA1(97d9a17956e838801c416461b020876c780bf260) )
 	ROM_LOAD( "shootout.003",   0x20000, 0x8000, CRC(eea94535) SHA1(65819b7925ecd9ae6e62decb3b0164f627b73fe5) )
 
-	ROM_REGION( 0x08000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "cu10.h17",       0x00000, 0x2000, CRC(3854c877) SHA1(2c8fe4591553ce798c907849e3dbd410e4fe424c) ) /* background tiles */
 	ROM_CONTINUE(				0x04000, 0x2000 )
 	ROM_CONTINUE(				0x02000, 0x2000 )
 	ROM_CONTINUE(				0x06000, 0x2000 )
 
-	ROM_REGION( 0x0220, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0220, "proms", 0 )
 	ROM_LOAD( "gb08.k10",       0x0000, 0x0100, CRC(509c65b6) SHA1(4cec37065a799ced4e7b6552f267aacc7f54ffe3) )
 	ROM_LOAD( "gb09.k6",        0x0100, 0x0100, CRC(aa090565) SHA1(e289e77ec3402e86d93b873c0fa064f3e6277a62) )	/* priority encoder? (not used) */
 	ROM_LOAD( "shootclr.003",   0x0200, 0x0020, CRC(6b0c2942) SHA1(7d25acc753923b265792fc78f8fc70175c0e0ec2) )	/* opcode decrypt table (bootleg only) */
@@ -459,9 +459,9 @@ ROM_END
 
 static DRIVER_INIT( shootout )
 {
-	int length = memory_region_length(machine, RGNCLASS_CPU, "main");
+	int length = memory_region_length(machine, "main");
 	UINT8 *decrypt = auto_malloc(length - 0x8000);
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *rom = memory_region(machine, "main");
 	int A;
 
 	memory_set_decrypted_region(0, 0x8000, 0xffff, decrypt);
@@ -469,13 +469,13 @@ static DRIVER_INIT( shootout )
 	for (A = 0x8000;A < length;A++)
 		decrypt[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x40) >> 1) | ((rom[A] & 0x20) << 1);
 
-	memory_configure_bank(1, 0, 16, memory_region(machine, RGNCLASS_CPU, "main") + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
 	memory_configure_bank_decrypted(1, 0, 16, decrypt + 0x8000, 0x4000);
 }
 
 static DRIVER_INIT( shootouj )
 {
-	memory_configure_bank(1, 0, 16, memory_region(machine, RGNCLASS_CPU, "main") + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 

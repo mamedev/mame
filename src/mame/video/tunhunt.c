@@ -140,7 +140,7 @@ Color Array Ram Assignments:
 */
 static void set_pens(colortable_t *colortable)
 {
-//  const UINT8 *color_prom = memory_region( machine, RGNCLASS_PROMS, "proms" );
+//  const UINT8 *color_prom = memory_region( machine, "proms" );
 /*
     The actual contents of the color proms (unused by this driver)
     are as follows:

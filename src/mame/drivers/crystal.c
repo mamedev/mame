@@ -230,9 +230,9 @@ static WRITE32_HANDLER(Banksw_w)
 {
 	Bank=(data>>1)&7;
 	if(Bank<=2)
-		memory_set_bankptr(1,memory_region(machine, RGNCLASS_USER, "user1")+Bank*0x1000000);
+		memory_set_bankptr(1,memory_region(machine, "user1")+Bank*0x1000000);
 	else
-		memory_set_bankptr(1,memory_region(machine, RGNCLASS_USER, "user2"));
+		memory_set_bankptr(1,memory_region(machine, "user2"));
 }
 
 static TIMER_CALLBACK( Timer0cb )
@@ -353,7 +353,7 @@ static READ32_HANDLER(FlashCmd_r)
 	{
 		if(Bank<=2)
 		{
-			UINT32 *ptr=(UINT32*)(memory_region(machine, RGNCLASS_USER, "user1")+Bank*0x1000000);
+			UINT32 *ptr=(UINT32*)(memory_region(machine, "user1")+Bank*0x1000000);
 			return ptr[0];
 		}
 		else
@@ -580,7 +580,7 @@ static MACHINE_RESET(crystal)
 	IntHigh=0;
 	cpunum_set_irq_callback(0,icallback);
 	Bank=0;
-	memory_set_bankptr(1,memory_region(machine, RGNCLASS_USER, "user1")+0);
+	memory_set_bankptr(1,memory_region(machine, "user1")+0);
 	FlashCmd=0xff;
 	OldPort4=0;
 
@@ -847,64 +847,64 @@ static MACHINE_DRIVER_START( topbladv )
 MACHINE_DRIVER_END
 
 ROM_START( crysbios )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) // bios
+	ROM_REGION( 0x20000, "main", 0 ) // bios
 	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(BEFF39A9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb) )
 
-	ROM_REGION32_LE( 0x3000000, RGNCLASS_USER, "user1", ROMREGION_ERASEFF ) // Flash
+	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF ) // Flash
 
-	ROM_REGION( 0x10000, RGNCLASS_USER, "user2",	ROMREGION_ERASEFF )	//Unmapped flash
+	ROM_REGION( 0x10000, "user2",	ROMREGION_ERASEFF )	//Unmapped flash
 ROM_END
 
 ROM_START( crysking )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) // bios
+	ROM_REGION( 0x20000, "main", 0 ) // bios
 	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(BEFF39A9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
 
-	ROM_REGION32_LE( 0x3000000, RGNCLASS_USER, "user1", 0 ) // Flash
+	ROM_REGION32_LE( 0x3000000, "user1", 0 ) // Flash
 	ROM_LOAD("bcsv0004f01.u1",  0x0000000, 0x1000000, CRC(8FEFF120) SHA1(2ea42fa893bff845b5b855e2556789f8354e9066) )
 	ROM_LOAD("bcsv0004f02.u2",  0x1000000, 0x1000000, CRC(0E799845) SHA1(419674ce043cb1efb18303f4cb7fdbbae642ee39) )
 	ROM_LOAD("bcsv0004f03.u3",  0x2000000, 0x1000000, CRC(659E2D17) SHA1(342c98f3f695ef4dea8b533612451c4d2fb58809) )
 
-	ROM_REGION( 0x10000, RGNCLASS_USER, "user2",	ROMREGION_ERASEFF )	//Unmapped flash
+	ROM_REGION( 0x10000, "user2",	ROMREGION_ERASEFF )	//Unmapped flash
 ROM_END
 
 ROM_START( evosocc )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) // bios
+	ROM_REGION( 0x20000, "main", 0 ) // bios
 	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(BEFF39A9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
 
-	ROM_REGION32_LE( 0x3000000, RGNCLASS_USER, "user1", 0 ) // Flash
+	ROM_REGION32_LE( 0x3000000, "user1", 0 ) // Flash
 	ROM_LOAD("bcsv0001u01",  0x0000000, 0x1000000, CRC(2581A0EA) SHA1(ee483ac60a3ed00a21cb515974cec4af19916a7d) )
 	ROM_LOAD("bcsv0001u02",  0x1000000, 0x1000000, CRC(47EF1794) SHA1(f573706c17d1342b9b7aed9b40b8b648f0bf58db) )
 	ROM_LOAD("bcsv0001u03",  0x2000000, 0x1000000, CRC(F396A2EC) SHA1(f305eb10856fb5d4c229a6b09d6a2fb21b24ce66) )
 
-	ROM_REGION( 0x10000, RGNCLASS_USER, "user2",	ROMREGION_ERASEFF )	//Unmapped flash
+	ROM_REGION( 0x10000, "user2",	ROMREGION_ERASEFF )	//Unmapped flash
 ROM_END
 
 ROM_START( topbladv )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) // bios
+	ROM_REGION( 0x20000, "main", 0 ) // bios
 	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(BEFF39A9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
 
-	ROM_REGION32_LE( 0x1000000, RGNCLASS_USER, "user1", 0 ) // Flash
+	ROM_REGION32_LE( 0x1000000, "user1", 0 ) // Flash
 	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(bd23f640) SHA1(1d22aa2c828642bb7c1dfea4e13f777f95acc701) )
 
-	ROM_REGION( 0x10000, RGNCLASS_USER, "user2",	ROMREGION_ERASEFF )	//Unmapped flash
+	ROM_REGION( 0x10000, "user2",	ROMREGION_ERASEFF )	//Unmapped flash
 ROM_END
 
 
 ROM_START( officeye )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) // bios (not the standard one)
+	ROM_REGION( 0x20000, "main", 0 ) // bios (not the standard one)
 	ROM_LOAD("bios.u14",  0x000000, 0x020000, CRC(ffc57e90) SHA1(6b6a17fd4798dea9c7b880f3063be8494e7db302) )
 
-	ROM_REGION32_LE( 0x2000000, RGNCLASS_USER, "user1", 0 ) // Flash
+	ROM_REGION32_LE( 0x2000000, "user1", 0 ) // Flash
 	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(d3f3eec4) SHA1(ea728415bd4906964b7d37f4379a8a3bd42a1c2d) )
 	ROM_LOAD("flash.u2",  0x1000000, 0x1000000, CRC(e4f85d0a) SHA1(2ddfa6b3a30e69754aa9d96434ff3d37784bfa57) )
 
-	ROM_REGION( 0x10000, RGNCLASS_USER, "user2",	ROMREGION_ERASEFF )	//Unmapped flash
+	ROM_REGION( 0x10000, "user2",	ROMREGION_ERASEFF )	//Unmapped flash
 ROM_END
 
 
 static DRIVER_INIT(crysking)
 {
-	UINT16 *Rom=(UINT16*) memory_region(machine, RGNCLASS_USER, "user1");
+	UINT16 *Rom=(UINT16*) memory_region(machine, "user1");
 
 	//patch the data feed by the protection
 
@@ -923,7 +923,7 @@ static DRIVER_INIT(crysking)
 
 static DRIVER_INIT(evosocc)
 {
-	UINT16 *Rom=(UINT16*) memory_region(machine, RGNCLASS_USER, "user1");
+	UINT16 *Rom=(UINT16*) memory_region(machine, "user1");
 	Rom+=0x1000000*2/2;
 
 	Rom[WORD_XOR_LE(0x97388E/2)]=0x90FC;	//PUSH R2..R7
@@ -941,7 +941,7 @@ static DRIVER_INIT(evosocc)
 
 static DRIVER_INIT(topbladv)
 {
-	UINT16 *Rom=(UINT16*) memory_region(machine, RGNCLASS_USER, "user1");
+	UINT16 *Rom=(UINT16*) memory_region(machine, "user1");
 
 	Rom[WORD_XOR_LE(0x12d7a/2)]=0x90FC;	//PUSH R7-R6-R5-R4-R3-R2
 	Rom[WORD_XOR_LE(0x12d7c/2)]=0x9001;	//PUSH R0
@@ -959,7 +959,7 @@ static DRIVER_INIT(topbladv)
 
 static DRIVER_INIT(officeye)
 {
-	UINT16 *Rom=(UINT16*) memory_region(machine, RGNCLASS_USER, "user1");
+	UINT16 *Rom=(UINT16*) memory_region(machine, "user1");
 
 	Rom[WORD_XOR_LE(0x9c9e/2)]=0x901C;	//PUSH R4-R3-R2
 	Rom[WORD_XOR_LE(0x9ca0/2)]=0x9001;	//PUSH R0

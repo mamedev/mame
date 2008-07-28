@@ -312,7 +312,7 @@ static void set_indicator_leds(int data, const char *output_name, int base_index
 static void update_artwork(running_machine *machine, stactics_state *state)
 {
 	int i;
-	UINT8 *beam_region = memory_region(machine, RGNCLASS_USER, "user1");
+	UINT8 *beam_region = memory_region(machine, "user1");
 
 	/* set the lamps first */
 	output_set_indexed_value("base_lamp", 4, state->lamps[0] & 0x01);

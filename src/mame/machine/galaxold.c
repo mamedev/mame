@@ -159,7 +159,7 @@ WRITE8_HANDLER( zigzag_sillyprotection_w )
 
 DRIVER_INIT( zigzag )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 	memory_configure_bank(1, 0, 2, &RAM[0x2000], 0x1000);
 	memory_configure_bank(2, 0, 2, &RAM[0x2000], 0x1000);
 	memory_set_bank(1, 0);
@@ -187,7 +187,7 @@ static READ8_HANDLER( dingoe_3001_r )
 DRIVER_INIT( dingoe )
 {
 	offs_t i;
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *rom = memory_region(machine, "main");
 
 	for (i = 0; i < 0x3000; i++)
 	{
@@ -299,8 +299,8 @@ DRIVER_INIT( mooncrsu )
 
 DRIVER_INIT( mooncrst )
 {
-	offs_t i, len = memory_region_length(machine, RGNCLASS_CPU, "main");
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+	offs_t i, len = memory_region_length(machine, "main");
+	UINT8 *rom = memory_region(machine, "main");
 
 
 	for (i = 0;i < len;i++)
@@ -317,7 +317,7 @@ DRIVER_INIT( mooncrgx )
 DRIVER_INIT( moonqsr )
 {
 	offs_t i;
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *rom = memory_region(machine, "main");
 	UINT8 *decrypt = auto_malloc(0x8000);
 
 	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypt);
@@ -375,8 +375,8 @@ Pin layout is such that links can replace the PAL if encryption is not used.
 		{ 1,4,1,4 }
 	};
 
-	offs_t i, len = memory_region_length(machine, RGNCLASS_CPU, "main");
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+	offs_t i, len = memory_region_length(machine, "main");
+	UINT8 *rom = memory_region(machine, "main");
 
 
 	for (i = 0; i < len; i++)
@@ -393,8 +393,8 @@ Pin layout is such that links can replace the PAL if encryption is not used.
 
 DRIVER_INIT( 4in1 )
 {
-	offs_t i, len = memory_region_length(machine, RGNCLASS_CPU, "main");
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	offs_t i, len = memory_region_length(machine, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 
 	/* Decrypt Program Roms */
 	for (i = 0; i < len; i++)

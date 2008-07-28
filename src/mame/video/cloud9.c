@@ -42,9 +42,9 @@ VIDEO_START( cloud9 )
 	memory_set_bankptr(1, videoram);
 
 	/* get pointers to our PROMs */
-	syncprom = memory_region(machine, RGNCLASS_PROMS, "proms") + 0x000;
-	wpprom = memory_region(machine, RGNCLASS_PROMS, "proms") + 0x200;
-	priprom = memory_region(machine, RGNCLASS_PROMS, "proms") + 0x300;
+	syncprom = memory_region(machine, "proms") + 0x000;
+	wpprom = memory_region(machine, "proms") + 0x200;
+	priprom = memory_region(machine, "proms") + 0x300;
 
 	/* compute the color output resistor weights at startup */
 	compute_resistor_weights(0,	255, -1.0,

@@ -260,8 +260,8 @@ static WRITE16_HANDLER( bishjan_coin_w )
 static ADDRESS_MAP_START( bishjan_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 
-	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION(RGNCLASS_CPU, "main", 0)
-	AM_RANGE( 0x080000, 0x0fffff ) AM_ROM AM_REGION(RGNCLASS_CPU, "main", 0)
+	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("main", 0)
+	AM_RANGE( 0x080000, 0x0fffff ) AM_ROM AM_REGION("main", 0)
 
 	AM_RANGE( 0x200000, 0x207fff ) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	// battery
 
@@ -466,22 +466,22 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( bishjan )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )		// H8/3044 program
+	ROM_REGION( 0x100000, "main", 0 )		// H8/3044 program
 	ROM_LOAD( "1-v203.u21", 0x000000, 0x080000, CRC(1f891d48) SHA1(0b6a5aa8b781ba8fc133289790419aa8ea21c400) )
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx1", 0 )		// Tiles
+	ROM_REGION( 0x400000, "gfx1", 0 )		// Tiles
 	ROM_LOAD32_BYTE( "3-v201.u25", 0x000000, 0x100000, CRC(e013e647) SHA1(a5b0f82f3454393c1ea5e635b0d37735a25e2ea5) )
 	ROM_LOAD32_BYTE( "4-v201.u26", 0x000001, 0x100000, CRC(e0d40ef1) SHA1(95f80889103a7b93080b46387274cb1ffe0c8768) )
 	ROM_LOAD32_BYTE( "5-v201.u27", 0x000002, 0x100000, CRC(85067d40) SHA1(3ecf7851311a77a0dfca90775fcbf6faabe9c2ab) )
 	ROM_LOAD32_BYTE( "6-v201.u28", 0x000003, 0x100000, CRC(430bd9d7) SHA1(dadf5a7eb90cf2dc20f97dbf20a4b6c8e7734fb1) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "samples", 0 )	// Samples
+	ROM_REGION( 0x100000, "samples", 0 )	// Samples
 	ROM_LOAD( "2-v201.u9", 0x000000, 0x100000, CRC(ea42764d) SHA1(13fe1cd30e474f4b092949c440068e9ddca79976) )
 ROM_END
 
 static DRIVER_INIT(bishjan)
 {
-	UINT16 *rom = (UINT16*)memory_region(machine, RGNCLASS_CPU, "main");
+	UINT16 *rom = (UINT16*)memory_region(machine, "main");
 
 	// check
 	rom[0x042EA/2] = 0x4008;

@@ -116,7 +116,7 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 	test_mask = testmask;
 
 	/* predetermine the bank base */
-	rgn = memory_region(machine, RGNCLASS_CPU, "jsa");
+	rgn = memory_region(machine, "jsa");
 	bank_base = &rgn[0x03000];
 	bank_source_data = &rgn[0x10000];
 
@@ -159,8 +159,8 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 		/* the upper 128k is fixed, the lower 128k is bankswitched */
 		for (rgn = 0; rgn < ARRAY_LENGTH(regions); rgn++)
 		{
-			UINT8 *base = memory_region(machine, RGNCLASS_SOUND, regions[rgn]);
-			if (base != NULL && memory_region_length(machine, RGNCLASS_SOUND, regions[rgn]) >= 0x100000)
+			UINT8 *base = memory_region(machine, regions[rgn]);
+			if (base != NULL && memory_region_length(machine, regions[rgn]) >= 0x100000)
 			{
 				memcpy(&base[0x00000], &base[0x80000], 0x20000);
 				memcpy(&base[0x40000], &base[0x80000], 0x20000);

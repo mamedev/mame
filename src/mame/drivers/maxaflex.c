@@ -238,7 +238,7 @@ int atari_input_disabled(void)
 
 static ADDRESS_MAP_START(a600xl_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0x5000, 0x57ff) AM_ROM AM_REGION(RGNCLASS_CPU, "main", 0x5000)	/* self test */
+	AM_RANGE(0x5000, 0x57ff) AM_ROM AM_REGION("main", 0x5000)	/* self test */
 	AM_RANGE(0x8000, 0xbfff) AM_ROM	/* game cartridge */
 	AM_RANGE(0xc000, 0xcfff) AM_ROM /* OS */
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
@@ -470,68 +470,68 @@ static MACHINE_DRIVER_START( maxaflex )
 MACHINE_DRIVER_END
 
 ROM_START(maxaflex)
-	ROM_REGION(0x10000,RGNCLASS_CPU, "main",0) /* 64K for the CPU */
+	ROM_REGION(0x10000,"main",0) /* 64K for the CPU */
     ROM_LOAD("atarixl.rom", 0xc000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55))
 
-	ROM_REGION( 0x0800, RGNCLASS_CPU, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
 	ROM_LOAD("maxaflex.uc",  0x0000, 0x0800, CRC(fe9cf53c) SHA1(4b02bc2f0c8a1eab799814fac82d5812c0160206))
 
-	ROM_REGION( 0x200, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD("maxprom.prm", 0x0000, 0x0200, CRC(edf5c950) SHA1(9ad046ea41a61585dd8d2f2d4167a3cc39d2928f))	/* for simulating keystrokes ?*/
 ROM_END
 
 ROM_START(mf_bdash)
-	ROM_REGION(0x10000,RGNCLASS_CPU, "main",0) /* 64K for the CPU */
+	ROM_REGION(0x10000,"main",0) /* 64K for the CPU */
 	ROM_LOAD("bd-acs-1.rom",	0x8000, 0x2000, CRC(2b11750e) SHA1(43e9ae44eb1767621920bb94a4370ed602d81056))
 	ROM_LOAD("bd-acs-2.rom",	0xa000, 0x2000, CRC(e9ea2658) SHA1(189ede7201ef122cf2b72fc847a896b9dbe007e5))
     ROM_LOAD("atarixl.rom",		0xc000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55))
 
-	ROM_REGION( 0x0800, RGNCLASS_CPU, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
 	ROM_LOAD("maxaflex.uc",  0x0000, 0x0800, CRC(fe9cf53c) SHA1(4b02bc2f0c8a1eab799814fac82d5812c0160206))
 
-	ROM_REGION( 0x200, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD("maxprom.prm", 0x0000, 0x0200, CRC(edf5c950) SHA1(9ad046ea41a61585dd8d2f2d4167a3cc39d2928f))	/* for simulating keystrokes ?*/
 ROM_END
 
 ROM_START(mf_achas)
-	ROM_REGION(0x10000,RGNCLASS_CPU, "main",0) /* 64K for the CPU */
+	ROM_REGION(0x10000,"main",0) /* 64K for the CPU */
 	ROM_LOAD("ac.rom",			0x8000, 0x4000, CRC(18752991) SHA1(f508b89d2251c53d017cff6cb23b8e9880a0cc0b))
     ROM_LOAD("atarixl.rom",		0xc000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55))
 
-	ROM_REGION( 0x0800, RGNCLASS_CPU, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
 	ROM_LOAD("maxaflex.uc",  0x0000, 0x0800, CRC(fe9cf53c) SHA1(4b02bc2f0c8a1eab799814fac82d5812c0160206))
 
-	ROM_REGION( 0x200, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD("maxprom.prm", 0x0000, 0x0200, CRC(edf5c950) SHA1(9ad046ea41a61585dd8d2f2d4167a3cc39d2928f))	/* for simulating keystrokes ?*/
 ROM_END
 
 ROM_START(mf_brist)
-	ROM_REGION(0x10000,RGNCLASS_CPU, "main",0) /* 64K for the CPU */
+	ROM_REGION(0x10000,"main",0) /* 64K for the CPU */
 	ROM_LOAD("brist.rom",		0x8000, 0x4000, CRC(4263d64d) SHA1(80a041bceb499e1466516488013aa4439b3db6f2))
     ROM_LOAD("atarixl.rom",		0xc000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55))
 
-	ROM_REGION( 0x0800, RGNCLASS_CPU, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
 	ROM_LOAD("maxaflex.uc",  0x0000, 0x0800, CRC(fe9cf53c) SHA1(4b02bc2f0c8a1eab799814fac82d5812c0160206))
 
-	ROM_REGION( 0x200, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD("maxprom.prm", 0x0000, 0x0200, CRC(edf5c950) SHA1(9ad046ea41a61585dd8d2f2d4167a3cc39d2928f))	/* for simulating keystrokes ?*/
 ROM_END
 
 ROM_START(mf_flip)
-	ROM_REGION(0x10000,RGNCLASS_CPU, "main",0) /* 64K for the CPU */
+	ROM_REGION(0x10000,"main",0) /* 64K for the CPU */
 	ROM_LOAD("flipflop.rom",	0x8000, 0x4000, CRC(8ae057be) SHA1(ba26d6a3790ebdb754c1192b2c28f0fe93aca377))
     ROM_LOAD("atarixl.rom",		0xc000, 0x4000, CRC(1f9cd270) SHA1(ae4f523ba08b6fd59f3cae515a2b2410bbd98f55))
 
-	ROM_REGION( 0x0800, RGNCLASS_CPU, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
 	ROM_LOAD("maxaflex.uc",  0x0000, 0x0800, CRC(fe9cf53c) SHA1(4b02bc2f0c8a1eab799814fac82d5812c0160206))
 
-	ROM_REGION( 0x200, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD("maxprom.prm", 0x0000, 0x0200, CRC(edf5c950) SHA1(9ad046ea41a61585dd8d2f2d4167a3cc39d2928f))	/* for simulating keystrokes ?*/
 ROM_END
 
 static DRIVER_INIT( a600xl )
 {
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *rom = memory_region(machine, "main");
 	memcpy( rom + 0x5000, rom + 0xd000, 0x800 );
 }
 

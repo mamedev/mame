@@ -460,7 +460,7 @@ static void print_game_rom(FILE *out, const game_driver *game)
 				}
 
 				/* append a region name */
-				fprintf(out, " regionclass=\"%s\" regiontag=\"%s\"", memory_region_class_name(ROMREGION_GETCLASS(region), TRUE), ROMREGION_GETTAG(region));
+				fprintf(out, " region=\"%s\"", ROMREGION_GETTAG(region));
 
 				/* add nodump/baddump flags */
 				if (hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))
@@ -906,8 +906,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t<!ATTLIST rom md5 CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST rom sha1 CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST rom merge CDATA #IMPLIED>\n"
-		"\t\t\t<!ATTLIST rom regionclass CDATA #IMPLIED>\n"
-		"\t\t\t<!ATTLIST rom regiontag CDATA #IMPLIED>\n"
+		"\t\t\t<!ATTLIST rom region CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST rom offset CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST rom status (baddump|nodump|good) \"good\">\n"
 		"\t\t\t<!ATTLIST rom dispose (yes|no) \"no\">\n"
@@ -916,8 +915,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t<!ATTLIST disk md5 CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST disk sha1 CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST disk merge CDATA #IMPLIED>\n"
-		"\t\t\t<!ATTLIST disk regionclass CDATA #IMPLIED>\n"
-		"\t\t\t<!ATTLIST disk regiontag CDATA #IMPLIED>\n"
+		"\t\t\t<!ATTLIST disk region CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST disk index CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST disk status (baddump|nodump|good) \"good\">\n"
 		"\t\t<!ELEMENT sample EMPTY>\n"

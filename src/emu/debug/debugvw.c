@@ -2380,7 +2380,7 @@ static void memory_write_byte(debug_view_memory *memdata, offs_t offs, UINT8 dat
 
 /* hack for FD1094 editing */
 #ifdef FD1094_HACK
-	if (memdata->raw_base == memory_region(machine, RGNCLASS_USER, "user2"))
+	if (memdata->raw_base == memory_region(machine, "user2"))
 	{
 		extern void fd1094_regenerate_key(void);
 		fd1094_regenerate_key();

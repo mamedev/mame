@@ -272,7 +272,7 @@ static void kageki_init_samples(void)
 	int start, size;
 	int i, n;
 
-	src = memory_region(Machine, RGNCLASS_SOUND, "samples") + 0x0090;
+	src = memory_region(Machine, "samples") + 0x0090;
 	for (i = 0; i < MAX_SAMPLES; i++)
 	{
 		start = (src[(i * 2) + 1] * 256) + src[(i * 2)];
@@ -364,7 +364,7 @@ static WRITE8_HANDLER( kabukiz_sound_bank_w )
 	// to avoid the write when the sound chip is initialized
 	if(data != 0xff)
 	{
-		UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "cpu2");
+		UINT8 *ROM = memory_region(machine, "cpu2");
 		memory_set_bankptr(3, &ROM[0x10000 + 0x4000 * (data & 0x07)]);
 	}
 }
@@ -591,7 +591,7 @@ READ8_HANDLER( bbb_r )
 
 static WRITE8_HANDLER( jpopnics_subbankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "sub");
+	UINT8 *RAM = memory_region(machine, "sub");
 
 	/* bits 0-1 select ROM bank */
 	memory_set_bankptr (2, &RAM[0x10000 + 0x2000 * (data & 3)]);
@@ -1694,19 +1694,19 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( plumppop )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "a98-09.bin", 0x00000, 0x08000, CRC(107f9e06) SHA1(0aa7f32721c3cab96eccc7c831b9f57877c4e1dc) )
 	ROM_CONTINUE(           0x18000, 0x08000 )				/* banked at 8000-bfff */
 	ROM_LOAD( "a98-10.bin", 0x20000, 0x10000, CRC(df6e6af2) SHA1(792f97f587e84cdd67f0d1efe1fd13ea904d7e20) )	/* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x18000, "sub", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "a98-11.bin", 0x00000, 0x08000, CRC(bc56775c) SHA1(0c22c22c0e9d7ec0e34f8ab4bfe61068f65e8759) )
 	ROM_CONTINUE(           0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "plmp8742.bin", 0x0000, 0x0800, NO_DUMP )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "a98-01.bin", 0x00000, 0x10000, CRC(f3033dca) SHA1(130744998f0531a82de2814231dddea3ad710f60) )
 	ROM_RELOAD(             0x10000, 0x10000 )
 	ROM_LOAD( "a98-02.bin", 0x20000, 0x10000, CRC(f2d17b0c) SHA1(418c8e383b8d4d54d723ae3512829a95e6897ee1) )
@@ -1724,22 +1724,22 @@ ROM_START( plumppop )
 	ROM_LOAD( "a98-08.bin", 0xe0000, 0x10000, CRC(bfa7609a) SHA1(0b9aa89b5954334f40dda1f14b1691852c74fc37) )
 	ROM_RELOAD(             0xf0000, 0x10000 )
 
-	ROM_REGION( 0x0400, RGNCLASS_PROMS, "proms", 0 )		/* color proms */
+	ROM_REGION( 0x0400, "proms", 0 )		/* color proms */
 	ROM_LOAD( "a98-13.bpr", 0x0000, 0x200, CRC(7cde2da5) SHA1(0cccfc35fb716ebb4cffa85c75681f33ca80a56e) )	/* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "a98-12.bpr", 0x0200, 0x200, CRC(90dc9da7) SHA1(f719dead7f4597e5ee6f1103599505b98cb58299) )	/* lo bytes, AM27S29 or compatible like MB7124 */
 ROM_END
 
 ROM_START( jpopnics )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "u96cpu2", 0x00000, 0x08000, CRC(649e951c) SHA1(b26bb157da9fcf5d3eddbb637a4cb2cb1b0fedac) )
 	ROM_CONTINUE(           0x18000, 0x08000 )	/* banked at 8000-bfff */
 	ROM_CONTINUE(           0x20000, 0x10000 )	/* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x18000, "sub", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "u124cpu1", 0x00000, 0x08000,  CRC(8453e8e4) SHA1(aac1bd501a15f79e3ed566c949504169b2aa762d) )
 	ROM_CONTINUE(           0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "u94gfx", 0x00000, 0x10000, CRC(e49f2fdd) SHA1(6824c6520d0039c062f028e69cbfa7b3790ea756) )
 	ROM_CONTINUE(       0x20000, 0x10000 )
 	ROM_LOAD( "u93gfx", 0x40000, 0x10000, CRC(a7791b5b) SHA1(4abfe9b2612ed0d17f1282a60879cf1d0620ae4c) )
@@ -1751,139 +1751,139 @@ ROM_START( jpopnics )
 ROM_END
 
 ROM_START( extrmatn )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )				/* Region 0 - main cpu */
+	ROM_REGION( 0x30000, "main", 0 )				/* Region 0 - main cpu */
 	ROM_LOAD( "b06-20.11c", 0x00000, 0x08000, CRC(04e3fc1f) SHA1(b1cf2f79f43fa33d6175368c897f84ec6aa6e746) )
 	ROM_CONTINUE(           0x18000, 0x08000 )				/* banked at 8000-bfff */
 	ROM_LOAD( "b06-21.9c",  0x20000, 0x10000, CRC(1614d6a2) SHA1(f23d465af231ab5653c55748f686d8f25f52394b) )	/* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )				/* Region 2 - sound cpu */
+	ROM_REGION( 0x18000, "sub", 0 )				/* Region 2 - sound cpu */
 	ROM_LOAD( "b06-06.4e", 0x00000, 0x08000, CRC(744f2c84) SHA1(7565c1594c2a3bae1ae45afcbf93363fe2b12d58) ) /* This is likely the wrong rom ID # */
 	ROM_CONTINUE(          0x10000, 0x08000 )	/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "extr8742.4f", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14 */
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b06-01.13a", 0x00000, 0x20000, CRC(d2afbf7e) SHA1(28b4cf94798f049a9f8375464741dbef208d7290) )
 	ROM_LOAD( "b06-02.10a", 0x20000, 0x20000, CRC(e0c2757a) SHA1(3c89044caa28b10b4d1bef1515881810c23d312a) )
 	ROM_LOAD( "b06-03.7a",  0x40000, 0x20000, CRC(ee80ab9d) SHA1(f4e4833cadff7d856b5a8075a61d902427653e16) )
 	ROM_LOAD( "b06-04.4a",  0x60000, 0x20000, CRC(3697ace4) SHA1(6d6e4e64147365bcfcf74a84eb7ae84dffedd304) )
 
-	ROM_REGION( 0x0400, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "b06-09.15f", 0x00000, 0x200, CRC(f388b361) SHA1(f00db6ad6994cfe9b7ad76e30b7049b11f8c16e4) )	/* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "b06-08.17f", 0x00200, 0x200, CRC(10c9aac3) SHA1(09d6f791dea358e78099af7a370b00b8504ffc97) )	/* lo bytes, AM27S29 or compatible like MB7124 */
 ROM_END
 
 ROM_START( extrmatj )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )				/* Region 0 - main cpu */
+	ROM_REGION( 0x30000, "main", 0 )				/* Region 0 - main cpu */
 	ROM_LOAD( "b06-05.11c", 0x00000, 0x08000, CRC(918e1fe3) SHA1(1aa69e7ae393f275d440b3d5bf817475e443045d) )
 	ROM_CONTINUE(           0x18000, 0x08000 )				/* banked at 8000-bfff */
 	ROM_LOAD( "b06-06.9c",  0x20000, 0x10000, CRC(8842e105) SHA1(68675e77801504c5f67f82fae42f55152ffadebe) )	/* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )				/* Region 2 - sound cpu */
+	ROM_REGION( 0x18000, "sub", 0 )				/* Region 2 - sound cpu */
 	ROM_LOAD( "b06-07.4e", 0x00000, 0x08000, CRC(b37fb8b3) SHA1(10696914b9e39d34d56069a69b9d641339ea2309) )
 	ROM_CONTINUE(          0x10000, 0x08000 )	/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "extr8742.4f", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14 */
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b06-01.13a", 0x00000, 0x20000, CRC(d2afbf7e) SHA1(28b4cf94798f049a9f8375464741dbef208d7290) )
 	ROM_LOAD( "b06-02.10a", 0x20000, 0x20000, CRC(e0c2757a) SHA1(3c89044caa28b10b4d1bef1515881810c23d312a) )
 	ROM_LOAD( "b06-03.7a",  0x40000, 0x20000, CRC(ee80ab9d) SHA1(f4e4833cadff7d856b5a8075a61d902427653e16) )
 	ROM_LOAD( "b06-04.4a",  0x60000, 0x20000, CRC(3697ace4) SHA1(6d6e4e64147365bcfcf74a84eb7ae84dffedd304) )
 
-	ROM_REGION( 0x0400, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "b06-09.15f", 0x00000, 0x200, CRC(f388b361) SHA1(f00db6ad6994cfe9b7ad76e30b7049b11f8c16e4) )	/* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "b06-08.17f", 0x00200, 0x200, CRC(10c9aac3) SHA1(09d6f791dea358e78099af7a370b00b8504ffc97) )	/* lo bytes, AM27S29 or compatible like MB7124 */
 ROM_END
 
 ROM_START( arknoid2 )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )				/* Region 0 - main cpu */
+	ROM_REGION( 0x30000, "main", 0 )				/* Region 0 - main cpu */
 	ROM_LOAD( "b08_05.11c",	0x00000, 0x08000, CRC(136edf9d) SHA1(f632321650897eee585511a84f451a205d1f7704) )
 	ROM_CONTINUE(           0x18000, 0x08000 )			/* banked at 8000-bfff */
 	/* 20000-2ffff empty */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )				/* Region 2 - sound cpu */
+	ROM_REGION( 0x18000, "sub", 0 )				/* Region 2 - sound cpu */
 	ROM_LOAD( "b08_13.3e", 0x00000, 0x08000, CRC(e8035ef1) SHA1(9a54e952cff0036c4b6affd9ffb1097cdccbe255) )
 	ROM_CONTINUE(          0x10000, 0x08000 )			/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "ark28742.3g", 0x0000, 0x0800, NO_DUMP )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b08-01.13a",	0x00000, 0x20000, CRC(2ccc86b4) SHA1(eced1d7e687db0331507726946b6a19a690a7604) )
 	ROM_LOAD( "b08-02.10a",	0x20000, 0x20000, CRC(056a985f) SHA1(6333b71c631d3307929aae633760870451830e10) )
 	ROM_LOAD( "b08-03.7a",	0x40000, 0x20000, CRC(274a795f) SHA1(49353590e1a418843f57c715185e407a20021936) )
 	ROM_LOAD( "b08-04.4a",	0x60000, 0x20000, CRC(9754f703) SHA1(0018ebf7da3f501345f3f5085d98d7614f8ce1b6) )
 
-	ROM_REGION( 0x0400, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "b08-08.15f",	0x00000, 0x200, CRC(a4f7ebd9) SHA1(094eb63c18898c6ee8d722492bdfd28091c61773) )	/* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "b08-07.16f",	0x00200, 0x200, CRC(ea34d9f7) SHA1(9a46edc64f961bd96908419cabd92445d300fc19) )	/* lo bytes, AM27S29 or compatible like MB7124 */
 ROM_END
 
 ROM_START( arknid2u )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )				/* Region 0 - main cpu */
+	ROM_REGION( 0x30000, "main", 0 )				/* Region 0 - main cpu */
 	ROM_LOAD( "b08_11.11c", 0x00000, 0x08000, CRC(99555231) SHA1(2798f3f5b3f1fa27598fe7a6e95c75d9142c8d34) )
 	ROM_CONTINUE(           0x18000, 0x08000 )			/* banked at 8000-bfff */
 	/* 20000-2ffff empty */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )				/* Region 2 - sound cpu */
+	ROM_REGION( 0x18000, "sub", 0 )				/* Region 2 - sound cpu */
 	ROM_LOAD( "b08_12.3e", 0x00000, 0x08000, CRC(dc84e27d) SHA1(d549d8c9fbec0521517f0c5f5cee763e27d48633) )
 	ROM_CONTINUE(          0x10000, 0x08000 )			/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "ark28742.3g", 0x0000, 0x0800, NO_DUMP )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b08-01.13a",	0x00000, 0x20000, CRC(2ccc86b4) SHA1(eced1d7e687db0331507726946b6a19a690a7604) )
 	ROM_LOAD( "b08-02.10a",	0x20000, 0x20000, CRC(056a985f) SHA1(6333b71c631d3307929aae633760870451830e10) )
 	ROM_LOAD( "b08-03.7a",	0x40000, 0x20000, CRC(274a795f) SHA1(49353590e1a418843f57c715185e407a20021936) )
 	ROM_LOAD( "b08-04.4a",	0x60000, 0x20000, CRC(9754f703) SHA1(0018ebf7da3f501345f3f5085d98d7614f8ce1b6) )
 
-	ROM_REGION( 0x0400, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "b08-08.15f",	0x00000, 0x200, CRC(a4f7ebd9) SHA1(094eb63c18898c6ee8d722492bdfd28091c61773) )	/* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "b08-07.16f",	0x00200, 0x200, CRC(ea34d9f7) SHA1(9a46edc64f961bd96908419cabd92445d300fc19) )	/* lo bytes, AM27S29 or compatible like MB7124 */
 ROM_END
 
 ROM_START( arknid2j )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )				/* Region 0 - main cpu */
+	ROM_REGION( 0x30000, "main", 0 )				/* Region 0 - main cpu */
 	ROM_LOAD( "b08_05.11c", 0x00000, 0x08000, CRC(136edf9d) SHA1(f632321650897eee585511a84f451a205d1f7704) )
 	ROM_CONTINUE(           0x18000, 0x08000 )			/* banked at 8000-bfff */
 	/* 20000-2ffff empty */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )				/* Region 2 - sound cpu */
+	ROM_REGION( 0x18000, "sub", 0 )				/* Region 2 - sound cpu */
 	ROM_LOAD( "b08_06.3e", 0x00000, 0x08000, CRC(adfcd40c) SHA1(f91299407ed21e2dd244c9b1a315b27ed32f5514) )
 	ROM_CONTINUE(          0x10000, 0x08000 )			/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "ark28742.3g", 0x0000, 0x0800, NO_DUMP )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b08-01.13a",	0x00000, 0x20000, CRC(2ccc86b4) SHA1(eced1d7e687db0331507726946b6a19a690a7604) )
 	ROM_LOAD( "b08-02.10a",	0x20000, 0x20000, CRC(056a985f) SHA1(6333b71c631d3307929aae633760870451830e10) )
 	ROM_LOAD( "b08-03.7a",	0x40000, 0x20000, CRC(274a795f) SHA1(49353590e1a418843f57c715185e407a20021936) )
 	ROM_LOAD( "b08-04.4a",	0x60000, 0x20000, CRC(9754f703) SHA1(0018ebf7da3f501345f3f5085d98d7614f8ce1b6) )
 
-	ROM_REGION( 0x0400, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "b08-08.15f",	0x00000, 0x200, CRC(a4f7ebd9) SHA1(094eb63c18898c6ee8d722492bdfd28091c61773) )	/* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "b08-07.16f",	0x00200, 0x200, CRC(ea34d9f7) SHA1(9a46edc64f961bd96908419cabd92445d300fc19) )	/* lo bytes, AM27S29 or compatible like MB7124 */
 ROM_END
 
 ROM_START( drtoppel )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b19-09.11c", 0x00000, 0x08000, CRC(3e654f82) SHA1(d9e351d82546b08eb7887ea1d976fa97a259db6e) )
 	ROM_CONTINUE(           0x18000, 0x08000 )				/* banked at 8000-bfff */
 	ROM_LOAD( "b19-10.9c",  0x20000, 0x10000, CRC(7e72fd25) SHA1(6035e4db75e6dc57b13bb6e92217d1c2d0ffdfd2) )	/* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x18000, "sub", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "b19-11w.3e", 0x00000, 0x08000, CRC(37a0d3fb) SHA1(f65fb9382af5f5b09725c39b660c5138b3912f53) ) /* Hacked??, need correct Taito rom number */
 	ROM_CONTINUE(           0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "drt8742.3g", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14, reused from Extermination, under printed label "Taito M-001, 128P, 720100" */
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b19-01.13a", 0x00000, 0x20000, CRC(a7e8a0c1) SHA1(a2f017ae5b6472d4202f126d0247b3fe4b1321d1) )
 	ROM_LOAD( "b19-02.12a", 0x20000, 0x20000, CRC(790ae654) SHA1(5fd6b89918e1539e00c918959b96d2a9394c8abe) )
 	ROM_LOAD( "b19-03.10a", 0x40000, 0x20000, CRC(495c4c5a) SHA1(a23b512cda4c0c535df5508a52faebe401c1797d) )
@@ -1893,25 +1893,25 @@ ROM_START( drtoppel )
 	ROM_LOAD( "b19-07.4a",  0xc0000, 0x20000, CRC(8bb06f41) SHA1(a0c182d473317f2cdb31bdf39a2593c032002305) )
 	ROM_LOAD( "b19-08.2a",  0xe0000, 0x20000, CRC(3584b491) SHA1(d0aca90708be241bbd3a1097220a85083337a4bc) )
 
-	ROM_REGION( 0x0400, RGNCLASS_PROMS, "proms", 0 )		/* color proms */
+	ROM_REGION( 0x0400, "proms", 0 )		/* color proms */
 	ROM_LOAD( "b19-13.15f", 0x0000, 0x200, CRC(6a547980) SHA1(c82f8dfad028565b4b4e5be1167f2f290c929090) )	/* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "b19-12.16f", 0x0200, 0x200, CRC(5754e9d8) SHA1(8c7d29e22c90b1f72929b95675dc15e431aae044) )	/* lo bytes, AM27S29 or compatible like MB7124 */
 ROM_END
 
 ROM_START( drtopplu )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b19-09.11c", 0x00000, 0x08000, CRC(3e654f82) SHA1(d9e351d82546b08eb7887ea1d976fa97a259db6e) )
 	ROM_CONTINUE(           0x18000, 0x08000 )				/* banked at 8000-bfff */
 	ROM_LOAD( "b19-10.9c",  0x20000, 0x10000, CRC(7e72fd25) SHA1(6035e4db75e6dc57b13bb6e92217d1c2d0ffdfd2) )	/* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x18000, "sub", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "b19-11u.3e", 0x00000, 0x08000, CRC(05565b22) SHA1(d1aa47b438d3b44c5177337809e38b50f6445c36) ) /* Hacked??, need correct Taito rom number */
 	ROM_CONTINUE(           0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "drt8742.3g", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14, reused from Extermination, under printed label "Taito M-001, 128P, 720100" */
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b19-01.13a", 0x00000, 0x20000, CRC(a7e8a0c1) SHA1(a2f017ae5b6472d4202f126d0247b3fe4b1321d1) )
 	ROM_LOAD( "b19-02.12a", 0x20000, 0x20000, CRC(790ae654) SHA1(5fd6b89918e1539e00c918959b96d2a9394c8abe) )
 	ROM_LOAD( "b19-03.10a", 0x40000, 0x20000, CRC(495c4c5a) SHA1(a23b512cda4c0c535df5508a52faebe401c1797d) )
@@ -1921,25 +1921,25 @@ ROM_START( drtopplu )
 	ROM_LOAD( "b19-07.4a",  0xc0000, 0x20000, CRC(8bb06f41) SHA1(a0c182d473317f2cdb31bdf39a2593c032002305) )
 	ROM_LOAD( "b19-08.2a",  0xe0000, 0x20000, CRC(3584b491) SHA1(d0aca90708be241bbd3a1097220a85083337a4bc) )
 
-	ROM_REGION( 0x0400, RGNCLASS_PROMS, "proms", 0 )		/* color proms */
+	ROM_REGION( 0x0400, "proms", 0 )		/* color proms */
 	ROM_LOAD( "b19-13.15f", 0x0000, 0x200, CRC(6a547980) SHA1(c82f8dfad028565b4b4e5be1167f2f290c929090) )	/* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "b19-12.16f", 0x0200, 0x200, CRC(5754e9d8) SHA1(8c7d29e22c90b1f72929b95675dc15e431aae044) )	/* lo bytes, AM27S29 or compatible like MB7124 */
 ROM_END
 
 ROM_START( drtopplj )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b19-09.11c", 0x00000, 0x08000, CRC(3e654f82) SHA1(d9e351d82546b08eb7887ea1d976fa97a259db6e) )
 	ROM_CONTINUE(           0x18000, 0x08000 )				/* banked at 8000-bfff */
 	ROM_LOAD( "b19-10.9c",  0x20000, 0x10000, CRC(7e72fd25) SHA1(6035e4db75e6dc57b13bb6e92217d1c2d0ffdfd2) )	/* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x18000, "sub", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "b19-11.3e", 0x00000, 0x08000, CRC(524dc249) SHA1(158b2de0fcd17ad16ba72bb24888122bf704e216) )
 	ROM_CONTINUE(          0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "drt8742.3g", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14, reused from Extermination, under printed label "Taito M-001, 128P, 720100" */
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b19-01.13a", 0x00000, 0x20000, CRC(a7e8a0c1) SHA1(a2f017ae5b6472d4202f126d0247b3fe4b1321d1) )
 	ROM_LOAD( "b19-02.12a", 0x20000, 0x20000, CRC(790ae654) SHA1(5fd6b89918e1539e00c918959b96d2a9394c8abe) )
 	ROM_LOAD( "b19-03.10a", 0x40000, 0x20000, CRC(495c4c5a) SHA1(a23b512cda4c0c535df5508a52faebe401c1797d) )
@@ -1949,22 +1949,22 @@ ROM_START( drtopplj )
 	ROM_LOAD( "b19-07.4a",  0xc0000, 0x20000, CRC(8bb06f41) SHA1(a0c182d473317f2cdb31bdf39a2593c032002305) )
 	ROM_LOAD( "b19-08.2a",  0xe0000, 0x20000, CRC(3584b491) SHA1(d0aca90708be241bbd3a1097220a85083337a4bc) )
 
-	ROM_REGION( 0x0400, RGNCLASS_PROMS, "proms", 0 )		/* color proms */
+	ROM_REGION( 0x0400, "proms", 0 )		/* color proms */
 	ROM_LOAD( "b19-13.15f", 0x0000, 0x200, CRC(6a547980) SHA1(c82f8dfad028565b4b4e5be1167f2f290c929090) )	/* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "b19-12.16f", 0x0200, 0x200, CRC(5754e9d8) SHA1(8c7d29e22c90b1f72929b95675dc15e431aae044) )	/* lo bytes, AM27S29 or compatible like MB7124 */
 ROM_END
 
 ROM_START( kageki )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x30000, "main", 0 )
 	ROM_LOAD( "b35-16.11c", 0x00000, 0x08000, CRC(a4e6fd58) SHA1(7cfe5b3fa6c88cdab45719f5b58541270825ad30) )	/* US ver */
 	ROM_CONTINUE(           0x18000, 0x08000 )
 	ROM_LOAD( "b35-10.9c",  0x20000, 0x10000, CRC(b150457d) SHA1(a58e46e7dfdc93c2cc7c04d623d7754f85ba693b) )
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )
+	ROM_REGION( 0x18000, "sub", 0 )
 	ROM_LOAD( "b35-17.43e", 0x00000, 0x08000, CRC(fdd9c246) SHA1(ac7a59ed19d0d81748cabd8b77a6ba3937e3cc99) )	/* US ver */
 	ROM_CONTINUE(           0x10000, 0x08000 )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b35-01.13a",  0x00000, 0x20000, CRC(01d83a69) SHA1(92a84329306b58a45f7bb443a8642eeaeb04d553) )
 	ROM_LOAD( "b35-02.12a",  0x20000, 0x20000, CRC(d8af47ac) SHA1(2ef9ca991bf55ed6c12bf3a7dc4aa904d7749d5c) )
 	ROM_LOAD( "b35-03.10a",  0x40000, 0x20000, CRC(3cb68797) SHA1(e7669b1a9a26dede560cc87695004d29510bc1f5) )
@@ -1974,21 +1974,21 @@ ROM_START( kageki )
 	ROM_LOAD( "b35-07.4a",   0xc0000, 0x20000, CRC(1b4af049) SHA1(09783816d5076219d241538e2711402eb8c4cd03) )
 	ROM_LOAD( "b35-08.2a",   0xe0000, 0x20000, CRC(deb2268c) SHA1(318bf3da6cbe20758397d5f78caf3cda02f322d7) )
 
-	ROM_REGION( 0x10000, RGNCLASS_SOUND, "samples", 0 )	/* samples */
+	ROM_REGION( 0x10000, "samples", 0 )	/* samples */
 	ROM_LOAD( "b35-15.98g",  0x00000, 0x10000, CRC(e6212a0f) SHA1(43891f4fd141b00ed458be47a107a2550a0534c2) )	/* US ver */
 ROM_END
 
 ROM_START( kagekij )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x30000, "main", 0 )
 	ROM_LOAD( "b35-09.11c", 0x00000, 0x08000, CRC(829637d5) SHA1(0239ae925968336a90cbe16e23519773b6f2f2ac) )	/* JP ver */
 	ROM_CONTINUE(            0x18000, 0x08000 )
 	ROM_LOAD( "b35-10.9c",   0x20000, 0x10000, CRC(b150457d) SHA1(a58e46e7dfdc93c2cc7c04d623d7754f85ba693b) )
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )
+	ROM_REGION( 0x18000, "sub", 0 )
 	ROM_LOAD( "b35-11.43e", 0x00000, 0x08000, CRC(64d093fc) SHA1(3ca3f69d8946c453c0edb8586b92e2948a2d0b6c) )	/* JP ver */
 	ROM_CONTINUE(            0x10000, 0x08000 )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b35-01.13a",  0x00000, 0x20000, CRC(01d83a69) SHA1(92a84329306b58a45f7bb443a8642eeaeb04d553) )
 	ROM_LOAD( "b35-02.12a",  0x20000, 0x20000, CRC(d8af47ac) SHA1(2ef9ca991bf55ed6c12bf3a7dc4aa904d7749d5c) )
 	ROM_LOAD( "b35-03.10a",  0x40000, 0x20000, CRC(3cb68797) SHA1(e7669b1a9a26dede560cc87695004d29510bc1f5) )
@@ -1998,7 +1998,7 @@ ROM_START( kagekij )
 	ROM_LOAD( "b35-07.4a",   0xc0000, 0x20000, CRC(1b4af049) SHA1(09783816d5076219d241538e2711402eb8c4cd03) )
 	ROM_LOAD( "b35-08.2a",   0xe0000, 0x20000, CRC(deb2268c) SHA1(318bf3da6cbe20758397d5f78caf3cda02f322d7) )
 
-	ROM_REGION( 0x10000, RGNCLASS_SOUND, "samples", 0 )	/* samples */
+	ROM_REGION( 0x10000, "samples", 0 )	/* samples */
 	ROM_LOAD( "b35-12.98g", 0x00000, 0x10000, CRC(184409f1) SHA1(711bdd499670e86630ebb6820262b1d8d651c987) )	/* JP ver */
 ROM_END
 
@@ -2007,16 +2007,16 @@ ROM_END
 */
 
 ROM_START( kagekia )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x30000, "main", 0 )
 	ROM_LOAD( "b35_16.11c", 0x00000, 0x08000, CRC(1cf67603) SHA1(0627285ac69e44312d7694c64b96a81489d8663c) )	/* World? (hacked) ver */
 	ROM_CONTINUE(           0x18000, 0x08000 )
 	ROM_LOAD( "b35-10.9c",  0x20000, 0x10000, CRC(b150457d) SHA1(a58e46e7dfdc93c2cc7c04d623d7754f85ba693b) )
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )
+	ROM_REGION( 0x18000, "sub", 0 )
 	ROM_LOAD( "b35-11.43e", 0x00000, 0x08000, CRC(64d093fc) SHA1(3ca3f69d8946c453c0edb8586b92e2948a2d0b6c) )	/* JP ver */
 	ROM_CONTINUE(            0x10000, 0x08000 )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b35-01.13a",  0x00000, 0x20000, CRC(01d83a69) SHA1(92a84329306b58a45f7bb443a8642eeaeb04d553) )
 	ROM_LOAD( "b35-02.12a",  0x20000, 0x20000, CRC(d8af47ac) SHA1(2ef9ca991bf55ed6c12bf3a7dc4aa904d7749d5c) )
 	ROM_LOAD( "b35-03.10a",  0x40000, 0x20000, CRC(3cb68797) SHA1(e7669b1a9a26dede560cc87695004d29510bc1f5) )
@@ -2026,25 +2026,25 @@ ROM_START( kagekia )
 	ROM_LOAD( "b35-07.4a",   0xc0000, 0x20000, CRC(1b4af049) SHA1(09783816d5076219d241538e2711402eb8c4cd03) )
 	ROM_LOAD( "b35-08.2a",   0xe0000, 0x20000, CRC(deb2268c) SHA1(318bf3da6cbe20758397d5f78caf3cda02f322d7) )
 
-	ROM_REGION( 0x10000, RGNCLASS_SOUND, "samples", 0 )	/* samples */
+	ROM_REGION( 0x10000, "samples", 0 )	/* samples */
 	ROM_LOAD( "b35-12.98g", 0x00000, 0x10000, CRC(184409f1) SHA1(711bdd499670e86630ebb6820262b1d8d651c987) )	/* JP ver */
 ROM_END
 
 
 ROM_START( chukatai )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b44-10", 0x00000, 0x08000, CRC(8c69e008) SHA1(7825965f517f3562a508345b7c0d32b8a57bd38a) )
 	ROM_CONTINUE(       0x18000, 0x08000 )				/* banked at 8000-bfff */
 	ROM_LOAD( "b44-11", 0x20000, 0x10000, CRC(32484094) SHA1(f320fea2910816b5085ca9aa37e30af665fb6be1) )	/* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x18000, "sub", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "b44-12w", 0x00000, 0x08000, CRC(e80ecdca) SHA1(cd96403ca97f18f630118dcb3dc2179c01147213) ) /* Hacked??, need correct Taito rom number */
 	ROM_CONTINUE(        0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "mcu", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "mcu", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "b44-8742.mcu", 0x0000, 0x0800, CRC(7dff3f9f) SHA1(bbf4e036d025fe8179b053d639f9b8ad401e6e68) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b44-01.a13", 0x00000, 0x20000, CRC(aae7b3d5) SHA1(52809ea22d98811ece2fb27e80db6ddf4fbacb07) )
 	ROM_LOAD( "b44-02.a12", 0x20000, 0x20000, CRC(7f0b9568) SHA1(415d2638d1b0eb36b2e2f63219cbc0dbebe02dc6) )
 	ROM_LOAD( "b44-03.a10", 0x40000, 0x20000, CRC(5a54a3b9) SHA1(6b219f1c3570f16eb4a06221d7e527c735437bac) )
@@ -2056,19 +2056,19 @@ ROM_START( chukatai )
 ROM_END
 
 ROM_START( chukatau )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b44-10", 0x00000, 0x08000, CRC(8c69e008) SHA1(7825965f517f3562a508345b7c0d32b8a57bd38a) )
 	ROM_CONTINUE(       0x18000, 0x08000 )				/* banked at 8000-bfff */
 	ROM_LOAD( "b44-11", 0x20000, 0x10000, CRC(32484094) SHA1(f320fea2910816b5085ca9aa37e30af665fb6be1) )  /* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x18000, "sub", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "b44-12u", 0x00000, 0x08000, CRC(9f09fd5c) SHA1(ae92f2e893e1e666dcabbd793f1a778c5e3d7bab) ) /* Hacked??, need correct Taito rom number */
 	ROM_CONTINUE(        0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x1000, RGNCLASS_CPU, "mcu", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x1000, "mcu", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "b44-8742.mcu", 0x0000, 0x0800, CRC(7dff3f9f) SHA1(bbf4e036d025fe8179b053d639f9b8ad401e6e68) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b44-01.a13", 0x00000, 0x20000, CRC(aae7b3d5) SHA1(52809ea22d98811ece2fb27e80db6ddf4fbacb07) )
 	ROM_LOAD( "b44-02.a12", 0x20000, 0x20000, CRC(7f0b9568) SHA1(415d2638d1b0eb36b2e2f63219cbc0dbebe02dc6) )
 	ROM_LOAD( "b44-03.a10", 0x40000, 0x20000, CRC(5a54a3b9) SHA1(6b219f1c3570f16eb4a06221d7e527c735437bac) )
@@ -2080,19 +2080,19 @@ ROM_START( chukatau )
 ROM_END
 
 ROM_START( chukataj )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b44-10", 0x00000, 0x08000, CRC(8c69e008) SHA1(7825965f517f3562a508345b7c0d32b8a57bd38a) )
 	ROM_CONTINUE(       0x18000, 0x08000 )				/* banked at 8000-bfff */
 	ROM_LOAD( "b44-11", 0x20000, 0x10000, CRC(32484094) SHA1(f320fea2910816b5085ca9aa37e30af665fb6be1) )  /* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x18000, "sub", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "b44-12", 0x00000, 0x08000, CRC(0600ace6) SHA1(3d5767b91ea63128bfbff3527ddcf90fcf43af2e) )
 	ROM_CONTINUE(       0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "mcu", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "mcu", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "b44-8742.mcu", 0x0000, 0x0800, CRC(7dff3f9f) SHA1(bbf4e036d025fe8179b053d639f9b8ad401e6e68) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b44-01.a13", 0x00000, 0x20000, CRC(aae7b3d5) SHA1(52809ea22d98811ece2fb27e80db6ddf4fbacb07) )
 	ROM_LOAD( "b44-02.a12", 0x20000, 0x20000, CRC(7f0b9568) SHA1(415d2638d1b0eb36b2e2f63219cbc0dbebe02dc6) )
 	ROM_LOAD( "b44-03.a10", 0x40000, 0x20000, CRC(5a54a3b9) SHA1(6b219f1c3570f16eb4a06221d7e527c735437bac) )
@@ -2104,18 +2104,18 @@ ROM_START( chukataj )
 ROM_END
 
 ROM_START( tnzs )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "cpu0", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_REGION( 0x30000, "cpu0", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b53-24.1",   0x00000, 0x08000, CRC(d66824c6) SHA1(fd381ac0dc52ce670c3fde320ea60a209e288a52) )
 	ROM_CONTINUE(           0x18000, 0x18000 )		/* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu1", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x18000, "cpu1", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "b53-25.3",   0x00000, 0x08000, CRC(d6ac4e71) SHA1(f3e71624a8a5e4e4c8a6aa01711ed26bdd5abf5a) )
 	ROM_CONTINUE(           0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu2", 0 )	/* 64k for the third CPU */
+	ROM_REGION( 0x10000, "cpu2", 0 )	/* 64k for the third CPU */
 	ROM_LOAD( "b53-26.34",  0x00000, 0x10000, CRC(cfd5649c) SHA1(4f6afccd535d39b41661dc3ccd17af125bfac015) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b53-08.8",	0x00000, 0x20000, CRC(c3519c2a) SHA1(30fe7946fbc95ab6b3ccb6944fb24bf47bf3d743) )	// b53-16
 	ROM_LOAD( "b53-07.7",	0x20000, 0x20000, CRC(2bf199e8) SHA1(4ed73e4f00ae2f5f4028a0ea5ae3cd238863a370) )	// b53-17
 	ROM_LOAD( "b53-06.6",	0x40000, 0x20000, CRC(92f35ed9) SHA1(5fdd8d6ddbb7be9887af3c8dea9ad3b58c4e86f9) )	// b53-18
@@ -2127,18 +2127,18 @@ ROM_START( tnzs )
 ROM_END
 
 ROM_START( tnzsj )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b53-10.32", 0x00000, 0x08000, CRC(a73745c6) SHA1(73eb38e75e08312d752332f988dc655084b4a86d) )
 	ROM_CONTINUE(          0x18000, 0x18000 )		/* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x18000, "sub", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "b53-11.38", 0x00000, 0x08000, CRC(9784d443) SHA1(bc3647aac9974031dbe4898417fbaa99841f9548) )
 	ROM_CONTINUE(          0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "mcu", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "mcu", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "b53-06.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	/* ROMs taken from another set (the ones from this set were read incorrectly) */
 	ROM_LOAD( "b53-08.8",	0x00000, 0x20000, CRC(c3519c2a) SHA1(30fe7946fbc95ab6b3ccb6944fb24bf47bf3d743) )
 	ROM_LOAD( "b53-07.7",	0x20000, 0x20000, CRC(2bf199e8) SHA1(4ed73e4f00ae2f5f4028a0ea5ae3cd238863a370) )
@@ -2151,18 +2151,18 @@ ROM_START( tnzsj )
 ROM_END
 
 ROM_START( tnzso )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "ns_c-11.rom", 0x00000, 0x08000, CRC(3c1dae7b) SHA1(0004fccc171714c80565326f8690f9662c5b75d9) )
 	ROM_CONTINUE(            0x18000, 0x18000 )		/* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x18000, "sub", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "ns_e-3.rom", 0x00000, 0x08000, CRC(c7662e96) SHA1(be28298bfde4e3867cfe75633ffb0f8611dbbd8b) )
 	ROM_CONTINUE(           0x10000, 0x08000 )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "mcu", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "mcu", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "b53-06.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "ns_a13.rom",   0x00000, 0x20000, CRC(7e0bd5bb) SHA1(95dfb00ec915778e02d8bfa996735ab817191adc) )
 	ROM_LOAD( "ns_a12.rom",   0x20000, 0x20000, CRC(95880726) SHA1(f4fdedd23e80a6ccf32f737ab4bc57f9fc0925be) )
 	ROM_LOAD( "ns_a10.rom",   0x40000, 0x20000, CRC(2bc4c053) SHA1(cd7668a7733e5e80c2c566d0cf63c4310e5743b4) )
@@ -2219,19 +2219,19 @@ Notes:
 */
 
 ROM_START( kabukiz )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "cpu0", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_REGION( 0x30000, "cpu0", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b50-05.u1",  0x00000, 0x08000, CRC(9cccb129) SHA1(054faf7657bad7237182e36bcc4388b1748af935) )
 	ROM_CONTINUE(           0x18000, 0x18000 )		/* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu1", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x18000, "cpu1", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "b50-08.1e",  0x00000, 0x08000, CRC(cb92d34c) SHA1(3a666f0e3ff9d3daa599123edee228d94eeae754) )
 	ROM_CONTINUE(           0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "cpu2", 0 )	/* 64k + bankswitch areas for the third CPU */
+	ROM_REGION( 0x30000, "cpu2", 0 )	/* 64k + bankswitch areas for the third CPU */
 	ROM_LOAD( "b50-07.u34", 0x00000, 0x08000, CRC(bf7fc2ed) SHA1(77008d12d9bdbfa100dcd87cd6ca7de3748408c5) )
 	ROM_CONTINUE(           0x18000, 0x18000 )		/* banked at 8000-bfff */
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b50-04.u35", 0x000000, 0x80000, CRC(04829aa9) SHA1(a501ec7c802478fc41ec8ef4270b1a6872bcbf34) )
 	ROM_LOAD( "b50-03.u39", 0x080000, 0x80000, CRC(31489a4c) SHA1(a4b7e00e2074287b47c7e16add963c1470534376) )
 	ROM_LOAD( "b50-02.u43", 0x100000, 0x80000, CRC(90b8a8e7) SHA1(a55e327307606142fbb9d500e757655b35e1f252) )
@@ -2239,19 +2239,19 @@ ROM_START( kabukiz )
 ROM_END
 
 ROM_START( kabukizj )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "cpu0", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_REGION( 0x30000, "cpu0", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b50-05.u1",  0x00000, 0x08000, CRC(9cccb129) SHA1(054faf7657bad7237182e36bcc4388b1748af935) )
 	ROM_CONTINUE(           0x18000, 0x18000 )		/* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu1", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x18000, "cpu1", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "b50-06.u3",  0x00000, 0x08000, CRC(45650aab) SHA1(00d1fc6044a6ad1e82476ccbe730907b4d780cb9) )
 	ROM_CONTINUE(           0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "cpu2", 0 )	/* 64k + bankswitch areas for the third CPU */
+	ROM_REGION( 0x30000, "cpu2", 0 )	/* 64k + bankswitch areas for the third CPU */
 	ROM_LOAD( "b50-07.u34", 0x00000, 0x08000, CRC(bf7fc2ed) SHA1(77008d12d9bdbfa100dcd87cd6ca7de3748408c5) )
 	ROM_CONTINUE(           0x18000, 0x18000 )		/* banked at 8000-bfff */
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b50-04.u35", 0x000000, 0x80000, CRC(04829aa9) SHA1(a501ec7c802478fc41ec8ef4270b1a6872bcbf34) )
 	ROM_LOAD( "b50-03.u39", 0x080000, 0x80000, CRC(31489a4c) SHA1(a4b7e00e2074287b47c7e16add963c1470534376) )
 	ROM_LOAD( "b50-02.u43", 0x100000, 0x80000, CRC(90b8a8e7) SHA1(a55e327307606142fbb9d500e757655b35e1f252) )
@@ -2259,15 +2259,15 @@ ROM_START( kabukizj )
 ROM_END
 
 ROM_START( insectx )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b97-03.u32", 0x00000, 0x08000, CRC(18eef387) SHA1(b22633930d39be1e72fbd5b080972122da3cb3ef) )
 	ROM_CONTINUE(           0x18000, 0x18000 )		/* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "sub", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x18000, "sub", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "b97-07.u38", 0x00000, 0x08000, CRC(324b28c9) SHA1(db77a4ac60196d0f0f35dbc5c951ec29d6392463) )
 	ROM_CONTINUE(           0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* Mask roms */
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE ) /* Mask roms */
 	ROM_LOAD( "b97-01.u1", 0x00000, 0x80000, CRC(d00294b1) SHA1(f43a4f7d13193ddbbcdef71a5085c1db0fc062d4) )
 	ROM_LOAD( "b97-02.u2", 0x80000, 0x80000, CRC(db5a7434) SHA1(71fac872b19a13a7ad25c8ad895c322ec9573fdc) )
 ROM_END

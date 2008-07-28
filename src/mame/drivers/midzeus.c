@@ -98,7 +98,7 @@ static MACHINE_START( midzeus2 )
 
 static MACHINE_RESET( midzeus )
 {
-	memcpy(ram_base, memory_region(machine, RGNCLASS_USER, "user1"), 0x40000*4);
+	memcpy(ram_base, memory_region(machine, "user1"), 0x40000*4);
 	*ram_base <<= 1;
 
 	cmos_protected = TRUE;
@@ -596,7 +596,7 @@ static ADDRESS_MAP_START( zeus_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
 	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(cmos_r, cmos_w) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
-	AM_RANGE(0xa00000, 0xffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0)
+	AM_RANGE(0xa00000, 0xffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 
@@ -614,8 +614,8 @@ static ADDRESS_MAP_START( zeus2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
 	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(timekeeper_r, timekeeper_w)
 	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
-	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0)
-	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK(1) AM_REGION(RGNCLASS_USER, "user2", 0)
+	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("user1", 0)
+	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK(1) AM_REGION("user2", 0)
 ADDRESS_MAP_END
 
 /*
@@ -1168,13 +1168,13 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( mk4 )
-	ROM_REGION16_LE( 0x1000000, RGNCLASS_SOUND, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
 	ROM_LOAD16_BYTE( "mk4_l2.u2", 0x000000, 0x200000, CRC(4c01b493) SHA1(dcd6da9ee30d0f6645bfdb1762d926be0a26090a) )
 	ROM_LOAD16_BYTE( "mk4_l2.u3", 0x400000, 0x200000, CRC(8fbcf0ac) SHA1(c53704e72cfcba800c7af3a03267041f1e29a784) )
 	ROM_LOAD16_BYTE( "mk4_l2.u4", 0x800000, 0x200000, CRC(dee91696) SHA1(00a182a36a414744cd014fcfc53c2e1a66ab5189) )
 	ROM_LOAD16_BYTE( "mk4_l2.u5", 0xc00000, 0x200000, CRC(44d072be) SHA1(8a636c2801d799dfb84e69607ade76d2b49cf09f) )
 
-	ROM_REGION32_LE( 0x1800000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x1800000, "user1", 0 )
 	ROM_LOAD32_WORD( "mk4_l3.u10", 0x0000000, 0x200000, CRC(84efe5a9) SHA1(e2a9bf6fab971691017371a87ab87b1bf66f96d0) )
 	ROM_LOAD32_WORD( "mk4_l3.u11", 0x0000002, 0x200000, CRC(0c026ccb) SHA1(7531fe81ff8d8dd9ec3cd915acaf14cbe6bdc90a) )
 	ROM_LOAD32_WORD( "mk4_l3.u12", 0x0400000, 0x200000, CRC(7816c07f) SHA1(da94b4391e671f915c61b5eb9bece4acb3382e31) )
@@ -1186,13 +1186,13 @@ ROM_START( mk4 )
 ROM_END
 
 ROM_START( mk4a )
-	ROM_REGION16_LE( 0x1000000, RGNCLASS_SOUND, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
 	ROM_LOAD16_BYTE( "mk4_l2.2", 0x000000, 0x200000, CRC(4c01b493) SHA1(dcd6da9ee30d0f6645bfdb1762d926be0a26090a) )
 	ROM_LOAD16_BYTE( "mk4_l2.3", 0x400000, 0x200000, CRC(8fbcf0ac) SHA1(c53704e72cfcba800c7af3a03267041f1e29a784) )
 	ROM_LOAD16_BYTE( "mk4_l2.4", 0x800000, 0x200000, CRC(dee91696) SHA1(00a182a36a414744cd014fcfc53c2e1a66ab5189) )
 	ROM_LOAD16_BYTE( "mk4_l2.5", 0xc00000, 0x200000, CRC(44d072be) SHA1(8a636c2801d799dfb84e69607ade76d2b49cf09f) )
 
-	ROM_REGION32_LE( 0x1800000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x1800000, "user1", 0 )
 	ROM_LOAD32_WORD( "mk4_l2.1.u10", 0x000000, 0x200000, CRC(42d0f1c9) SHA1(5ac0ded8bf6e756319be2691e3b555eac079ebdc) )
 	ROM_LOAD32_WORD( "mk4_l2.1.u11", 0x000002, 0x200000, CRC(6e21b243) SHA1(6d4768a5972db05c1409e0d16e79df9eff8918a0) )
 	ROM_LOAD32_WORD( "mk4_l3.u12", 0x0400000, 0x200000, CRC(7816c07f) SHA1(da94b4391e671f915c61b5eb9bece4acb3382e31) )
@@ -1204,13 +1204,13 @@ ROM_START( mk4a )
 ROM_END
 
 ROM_START( invasnab ) /* Version 5.0 Program roms, v4.0 Graphics roms, v2.0 Sound roms */
-	ROM_REGION16_LE( 0x1000000, RGNCLASS_SOUND, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
 	ROM_LOAD16_BYTE( "invasion2.u2", 0x000000, 0x200000, CRC(59d2e1d6) SHA1(994a4311ac4841d4341449c0c7480952b6f3855d) ) /* These four sound roms were labeled as v2.0 */
 	ROM_LOAD16_BYTE( "invasion2.u3", 0x400000, 0x200000, CRC(86b956ae) SHA1(f7fd4601a2ce3e7e9b67e7d77908bfa206ee7e62) )
 	ROM_LOAD16_BYTE( "invasion2.u4", 0x800000, 0x200000, CRC(5ef1fab5) SHA1(987afa0672fa89b18cf20d28644848a9e5ee9b17) )
 	ROM_LOAD16_BYTE( "invasion2.u5", 0xc00000, 0x200000, CRC(e42805c9) SHA1(e5b71eb1852809a649ac43a82168b3bdaf4b1526) )
 
-	ROM_REGION32_LE( 0x1800000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x1800000, "user1", 0 )
 	ROM_LOAD32_WORD( "invasion5.u10", 0x0000000, 0x200000, CRC(8c7785d9) SHA1(701602314cd4eba4215c47ea0ae75fd4eddad43b) ) /* Roms U10 & U11 were labeled as v5.0 */
 	ROM_LOAD32_WORD( "invasion5.u11", 0x0000002, 0x200000, CRC(8ceb1f32) SHA1(82d01f25cba25d77b11c347632e8b72776e12984) )
 	ROM_LOAD32_WORD( "invasion4.u12", 0x0400000, 0x200000, CRC(ce1eb06a) SHA1(ff17690a0cbca6dcccccde70e2c5812ae03db5bb) ) /* Roms U12 through U19 were all labeled as v4.0 */
@@ -1224,13 +1224,13 @@ ROM_START( invasnab ) /* Version 5.0 Program roms, v4.0 Graphics roms, v2.0 Soun
 ROM_END
 
 ROM_START( invasnv4 ) /* Version 4.0 Program roms & Graphics roms, v2.0 Sound roms */
-	ROM_REGION16_LE( 0x1000000, RGNCLASS_SOUND, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
 	ROM_LOAD16_BYTE( "invasion2.u2", 0x000000, 0x200000, CRC(59d2e1d6) SHA1(994a4311ac4841d4341449c0c7480952b6f3855d) ) /* These four sound roms were labeled as v2.0 */
 	ROM_LOAD16_BYTE( "invasion2.u3", 0x400000, 0x200000, CRC(86b956ae) SHA1(f7fd4601a2ce3e7e9b67e7d77908bfa206ee7e62) )
 	ROM_LOAD16_BYTE( "invasion2.u4", 0x800000, 0x200000, CRC(5ef1fab5) SHA1(987afa0672fa89b18cf20d28644848a9e5ee9b17) )
 	ROM_LOAD16_BYTE( "invasion2.u5", 0xc00000, 0x200000, CRC(e42805c9) SHA1(e5b71eb1852809a649ac43a82168b3bdaf4b1526) )
 
-	ROM_REGION32_LE( 0x1800000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x1800000, "user1", 0 )
 	ROM_LOAD32_WORD( "invasion4.u10", 0x0000000, 0x200000, CRC(b3ce958b) SHA1(ed51c167d85bc5f6155b8046ec056a4f4ad5cf9d) ) /* These rom were all labeled as v4.0 */
 	ROM_LOAD32_WORD( "invasion4.u11", 0x0000002, 0x200000, CRC(0bd09359) SHA1(f40886bd2e5f5fbf506580e5baa2f733be200852) )
 	ROM_LOAD32_WORD( "invasion4.u12", 0x0400000, 0x200000, CRC(ce1eb06a) SHA1(ff17690a0cbca6dcccccde70e2c5812ae03db5bb) )
@@ -1244,19 +1244,19 @@ ROM_START( invasnv4 ) /* Version 4.0 Program roms & Graphics roms, v2.0 Sound ro
 ROM_END
 
 ROM_START( crusnexo )
-	ROM_REGION16_LE( 0xc00000, RGNCLASS_SOUND, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0xc00000, "dcs", ROMREGION_ERASEFF )	/* sound data */
 	ROM_LOAD( "exotica.u2", 0x000000, 0x200000, CRC(d2d54acf) SHA1(2b4d6fda30af807228bb281335939dfb6df9b530) )
 	ROM_RELOAD(             0x200000, 0x200000 )
 	ROM_LOAD( "exotica.u3", 0x400000, 0x400000, CRC(28a3a13d) SHA1(8d7d641b883df089adefdd144229afef79db9e8a) )
 	ROM_LOAD( "exotica.u4", 0x800000, 0x400000, CRC(213f7fd8) SHA1(8528d524a62bc41a8e3b39f0dbeeba33c862ee27) )
 
-	ROM_REGION32_LE( 0x0800000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x0800000, "user1", 0 )
 	ROM_LOAD32_WORD( "exotica.u10", 0x0000000, 0x200000, CRC(65450140) SHA1(cad41a2cad48426de01feb78d3f71f768e3fc872) )
 	ROM_LOAD32_WORD( "exotica.u11", 0x0000002, 0x200000, CRC(e994891f) SHA1(bb088729b665864c7f3b79b97c3c86f9c8f68770) )
 	ROM_LOAD32_WORD( "exotica.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) )
 	ROM_LOAD32_WORD( "exotica.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) )
 
-	ROM_REGION32_LE( 0x3000000, RGNCLASS_USER, "user2", 0 )
+	ROM_REGION32_LE( 0x3000000, "user2", 0 )
 	ROM_LOAD32_WORD( "exotica.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
 	ROM_LOAD32_WORD( "exotica.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
 	ROM_LOAD32_WORD( "exotica.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
@@ -1273,18 +1273,18 @@ ROM_END
 
 
 ROM_START( thegrid ) /* Version 1.2 Program roms */
-	ROM_REGION16_LE( 0xc00000, RGNCLASS_SOUND, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0xc00000, "dcs", ROMREGION_ERASEFF )	/* sound data */
 	ROM_LOAD( "the_grid.u2", 0x000000, 0x400000, CRC(e6a39ee9) SHA1(4ddc62f5d278ea9791205098fa5f018ab1e698b4) )
 	ROM_LOAD( "the_grid.u3", 0x400000, 0x400000, CRC(40be7585) SHA1(e481081edffa07945412a6eab17b4d3e7b42cfd3) )
 	ROM_LOAD( "the_grid.u4", 0x800000, 0x400000, CRC(7a15c203) SHA1(a0a49dd08bba92402640ed2d1fb4fee112c4ab5f) )
 
-	ROM_REGION32_LE( 0x0800000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x0800000, "user1", 0 )
  	ROM_LOAD32_WORD( "thegrid-12.u10", 0x0000000, 0x100000, CRC(eb6c2d54) SHA1(ddd32757a9be011988b7add3c091e93292a0867c) )
 	ROM_LOAD32_WORD( "thegrid-12.u11", 0x0000002, 0x100000, CRC(b9b5f92b) SHA1(36e16f109af9a5172869344f09b337b67e0b3e11) )
 	ROM_LOAD32_WORD( "thegrid-12.u12", 0x0200000, 0x100000, CRC(2810c207) SHA1(d244eaf85473ed49442a906d437af1a9f91a2f9d) )
 	ROM_LOAD32_WORD( "thegrid-12.u13", 0x0200002, 0x100000, CRC(8b721848) SHA1(d82f39045437ada2061587176e24f558a5e203fe) )
 
-	ROM_REGION32_LE( 0x3000000, RGNCLASS_USER, "user2", 0 )
+	ROM_REGION32_LE( 0x3000000, "user2", 0 )
 	ROM_LOAD32_WORD( "the_grid.u18",   0x0000000, 0x400000, CRC(3a3460be) SHA1(e719dae8a2e54584cb6a074ed42e35e3debef2f6) )
 	ROM_LOAD32_WORD( "the_grid.u19",   0x0000002, 0x400000, CRC(af262d5b) SHA1(3eb3980fa81a360a70aa74e793b2bc3028f68cf2) )
 	ROM_LOAD32_WORD( "the_grid.u20",   0x0800000, 0x400000, CRC(e6ad1917) SHA1(acab25e1251fd07b374badebe79f6ec1772b3589) )
@@ -1295,18 +1295,18 @@ ROM_END
 
 
 ROM_START( thegrida ) /* Version 1.1 Program roms */
-	ROM_REGION16_LE( 0xc00000, RGNCLASS_SOUND, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_REGION16_LE( 0xc00000, "dcs", ROMREGION_ERASEFF )	/* sound data */
 	ROM_LOAD( "the_grid.u2", 0x000000, 0x400000, CRC(e6a39ee9) SHA1(4ddc62f5d278ea9791205098fa5f018ab1e698b4) )
 	ROM_LOAD( "the_grid.u3", 0x400000, 0x400000, CRC(40be7585) SHA1(e481081edffa07945412a6eab17b4d3e7b42cfd3) )
 	ROM_LOAD( "the_grid.u4", 0x800000, 0x400000, CRC(7a15c203) SHA1(a0a49dd08bba92402640ed2d1fb4fee112c4ab5f) )
 
-	ROM_REGION32_LE( 0x0800000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x0800000, "user1", 0 )
  	ROM_LOAD32_WORD( "thegrid-11.u10", 0x0000000, 0x100000, CRC(87ea0e9e) SHA1(618de2ca87b7a3e0225d1f7e65f8fc1356de1421) )
 	ROM_LOAD32_WORD( "thegrid-11.u11", 0x0000002, 0x100000, CRC(73d84b1a) SHA1(8dcfcab5ff64f46f8486e6439a10d91ad26fd48a) )
 	ROM_LOAD32_WORD( "thegrid-11.u12", 0x0200000, 0x100000, CRC(78d16ca1) SHA1(7b893ec8af2f44d8bc293861fd8622d68d41ccbe) )
 	ROM_LOAD32_WORD( "thegrid-11.u13", 0x0200002, 0x100000, CRC(8e00b400) SHA1(96581c5da62afc19e6d69b2352b3166665cb9918) )
 
-	ROM_REGION32_LE( 0x3000000, RGNCLASS_USER, "user2", 0 )
+	ROM_REGION32_LE( 0x3000000, "user2", 0 )
 	ROM_LOAD32_WORD( "the_grid.u18",   0x0000000, 0x400000, CRC(3a3460be) SHA1(e719dae8a2e54584cb6a074ed42e35e3debef2f6) )
 	ROM_LOAD32_WORD( "the_grid.u19",   0x0000002, 0x400000, CRC(af262d5b) SHA1(3eb3980fa81a360a70aa74e793b2bc3028f68cf2) )
 	ROM_LOAD32_WORD( "the_grid.u20",   0x0800000, 0x400000, CRC(e6ad1917) SHA1(acab25e1251fd07b374badebe79f6ec1772b3589) )
@@ -1343,7 +1343,7 @@ static DRIVER_INIT( crusnexo )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 472/* or 476,477,478,110 */, 99, NULL);
-	memory_configure_bank(1, 0, 3, memory_region(machine, RGNCLASS_USER, "user2"), 0x400000*4);
+	memory_configure_bank(1, 0, 3, memory_region(machine, "user2"), 0x400000*4);
 
 	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9b0004, 0x9b0007, 0, 0, crusnexo_leds_r, crusnexo_leds_w);
 	memory_install_write32_handler    (machine, 0, ADDRESS_SPACE_PROGRAM, 0x8d0009, 0x8d000a, 0, 0, keypad_select_w);
@@ -1354,7 +1354,7 @@ static DRIVER_INIT( thegrid )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 474/* or 491 */, 99, NULL);
-	memory_configure_bank(1, 0, 3, memory_region(machine, RGNCLASS_USER, "user2"), 0x400000*4);
+	memory_configure_bank(1, 0, 3, memory_region(machine, "user2"), 0x400000*4);
 }
 
 

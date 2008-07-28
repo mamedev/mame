@@ -266,7 +266,7 @@ static ADDRESS_MAP_START( alpha_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x17c0, 0x17c0) AM_WRITE(mhavoc_gamma_w)		  /* Gamma Communication Write Port */
 	AM_RANGE(0x1800, 0x1fff) AM_RAM			                  /* Shared Beta Ram */
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(2)			          /* Paged Program ROM (32K) */
-	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION(RGNCLASS_CPU, "alpha", 0x4000)/* Vector Generator RAM */
+	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("alpha", 0x4000)/* Vector Generator RAM */
 	AM_RANGE(0x5000, 0x7fff) AM_ROM			                  /* Vector ROM */
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)			      /* Program ROM (32K) */
 ADDRESS_MAP_END
@@ -321,7 +321,7 @@ static ADDRESS_MAP_START( alphaone_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x10e0, 0x10ff) AM_WRITE(SMH_RAM) AM_BASE(&mhavoc_colorram)	/* ColorRAM */
 	AM_RANGE(0x1800, 0x18ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* EEROM */
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(2)						/* Paged Program ROM (32K) */
-	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION(RGNCLASS_CPU, "alpha", 0x4000) /* Vector Generator RAM */
+	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("alpha", 0x4000) /* Vector Generator RAM */
 	AM_RANGE(0x5000, 0x7fff) AM_ROM								/* Vector ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* Program ROM (32K) */
 ADDRESS_MAP_END
@@ -604,7 +604,7 @@ MACHINE_DRIVER_END
 
 ROM_START( mhavoc )
 	/* Alpha Processor ROMs */
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "alpha", 0 )	/* 152KB for ROMs */
+	ROM_REGION( 0x20000, "alpha", 0 )	/* 152KB for ROMs */
 	/* Vector Generator ROM */
 	ROM_LOAD( "136025.210",   0x05000, 0x2000, CRC(c67284ca) SHA1(d9adad80c266d36429444f483cac4ebcf1fec7b8) )
 
@@ -621,19 +621,19 @@ ROM_START( mhavoc )
 	ROM_LOAD( "136025.107",   0x1c000, 0x4000, CRC(5f81c5f3) SHA1(be4055727a2d4536e37ec20150deffdb5af5b01f) ) /* page 2+3 */
 
 	/* Gamma Processor ROM */
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "gamma", 0 )
+	ROM_REGION( 0x10000, "gamma", 0 )
 	ROM_LOAD( "136025.108",   0x08000, 0x4000, CRC(93faf210) SHA1(7744368a1d520f986d1c4246113a7e24fcdd6d04) )
 	ROM_RELOAD(               0x0c000, 0x4000 ) /* reset+interrupt vectors */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "036408-01.b1",	0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 
 ROM_START( mhavoc2 )
 	/* Alpha Processor ROMs */
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "alpha", 0 )
+	ROM_REGION( 0x20000, "alpha", 0 )
 	/* Vector Generator ROM */
 	ROM_LOAD( "136025.110",   0x05000, 0x2000, CRC(16eef583) SHA1(277252bd716dd96d5b98ec5e33a3a6a3bc1a9abf) )
 
@@ -652,19 +652,19 @@ ROM_START( mhavoc2 )
 	/* the last 0x1000 is used for the 2 RAM pages */
 
 	/* Gamma Processor ROM */
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "gamma", 0 )
+	ROM_REGION( 0x10000, "gamma", 0 )
 	ROM_LOAD( "136025.108",   0x08000, 0x4000, CRC(93faf210) SHA1(7744368a1d520f986d1c4246113a7e24fcdd6d04) )
 	ROM_RELOAD(               0x0c000, 0x4000 ) /* reset+interrupt vectors */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "036408-01.b1",	0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 
 ROM_START( mhavocrv )
 	/* Alpha Processor ROMs */
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "alpha", 0 )	/* 152KB for ROMs */
+	ROM_REGION( 0x20000, "alpha", 0 )	/* 152KB for ROMs */
 	/* Vector Generator ROM */
 	ROM_LOAD( "136025.210",   0x05000, 0x2000, CRC(c67284ca) SHA1(d9adad80c266d36429444f483cac4ebcf1fec7b8) )
 
@@ -681,19 +681,19 @@ ROM_START( mhavocrv )
 	ROM_LOAD( "136025.907",   0x1c000, 0x4000, CRC(4deea2c9) SHA1(c4107581748a3f2d2084de2a4f120abd67a52189) ) /* page 2+3 */
 
 	/* Gamma Processor ROM */
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "gamma", 0 )
+	ROM_REGION( 0x10000, "gamma", 0 )
 	ROM_LOAD( "136025.908",   0x08000, 0x4000, CRC(c52ec664) SHA1(08120a385f71b17ec02a3c2ef856ff835a91773e) )
 	ROM_RELOAD(               0x0c000, 0x4000 ) /* reset+interrupt vectors */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "036408-01.b1",	0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 
 ROM_START( mhavocp )
 	/* Alpha Processor ROMs */
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "alpha", 0 )
+	ROM_REGION( 0x20000, "alpha", 0 )
 	/* Vector Generator ROM */
 	ROM_LOAD( "136025.010",   0x05000, 0x2000, CRC(3050c0e6) SHA1(f19a9538996d949cdca7e6abd4f04e8ff6e0e2c1) )
 
@@ -712,18 +712,18 @@ ROM_START( mhavocp )
 	/* the last 0x1000 is used for the 2 RAM pages */
 
 	/* Gamma Processor ROM */
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "gamma", 0 )
+	ROM_REGION( 0x10000, "gamma", 0 )
 	ROM_LOAD( "136025.008",   0x8000, 0x4000, CRC(22ea7399) SHA1(eeda8cc40089506063835a62c3273e7dd3918fd5) )
 	ROM_RELOAD(               0xc000, 0x4000 )/* reset+interrupt vectors */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "036408-01.b1",	0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 
 ROM_START( alphaone )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "alpha", 0 )
+	ROM_REGION( 0x20000, "alpha", 0 )
 	/* Vector Generator ROM */
 	ROM_LOAD( "vec5000.tw",   0x05000, 0x1000, CRC(2a4c149f) SHA1(b60a0b29958bee9b5f7c1d88163680b626bb76dd) )
 
@@ -744,13 +744,13 @@ ROM_START( alphaone )
 	/* the last 0x1000 is used for the 2 RAM pages */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "036408-01.b1",	0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 
 ROM_START( alphaona )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "alpha", 0 )
+	ROM_REGION( 0x20000, "alpha", 0 )
 	/* Vector Generator ROM */
 	ROM_LOAD( "vec5000.tw",   0x05000, 0x1000, CRC(2a4c149f) SHA1(b60a0b29958bee9b5f7c1d88163680b626bb76dd) )
 
@@ -771,7 +771,7 @@ ROM_START( alphaona )
 	/* the last 0x1000 is used for the 2 RAM pages */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.6c",	 0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 

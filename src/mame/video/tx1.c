@@ -229,17 +229,17 @@ static void tx1_draw_objects(running_machine *machine, bitmap_t *bitmap, const r
 	UINT32 offs;
 
 	/* The many lookup table ROMs */
-	const UINT8 *const ic48  = (UINT8*)memory_region(machine, RGNCLASS_USER, "user3");
-	const UINT8 *const ic281 = (UINT8*)memory_region(machine, RGNCLASS_USER, "user3") + 0x2000;
-	const UINT8 *const ic25  = (UINT8*)memory_region(machine, RGNCLASS_PROMS, "proms") + 0x1000;
+	const UINT8 *const ic48  = (UINT8*)memory_region(machine, "user3");
+	const UINT8 *const ic281 = (UINT8*)memory_region(machine, "user3") + 0x2000;
+	const UINT8 *const ic25  = (UINT8*)memory_region(machine, "proms") + 0x1000;
 
-	const UINT8 *const ic106 = (UINT8*)memory_region(machine, RGNCLASS_USER, "user2");
-	const UINT8 *const ic73  = (UINT8*)memory_region(machine, RGNCLASS_USER, "user2") + 0x4000;
+	const UINT8 *const ic106 = (UINT8*)memory_region(machine, "user2");
+	const UINT8 *const ic73  = (UINT8*)memory_region(machine, "user2") + 0x4000;
 
-	const UINT8 *const ic190 = (UINT8*)memory_region(machine, RGNCLASS_PROMS, "proms") + 0xc00;
-	const UINT8 *const ic162 = (UINT8*)memory_region(machine, RGNCLASS_PROMS, "proms") + 0xe00;
+	const UINT8 *const ic190 = (UINT8*)memory_region(machine, "proms") + 0xc00;
+	const UINT8 *const ic162 = (UINT8*)memory_region(machine, "proms") + 0xe00;
 
-	const UINT8 *const pixdata_rgn = (UINT8*)memory_region(machine, RGNCLASS_GFX, "gfx2");
+	const UINT8 *const pixdata_rgn = (UINT8*)memory_region(machine, "gfx2");
 
 	for (offs = 0x0; offs <= tx1_objram_size; offs += 8)
 	{
@@ -769,8 +769,8 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap)
 	UINT32 rva20_6;
 
 	/* ROM/PROM lookup tables */
-	const UINT8 *rcols = (UINT8*)(memory_region(machine, RGNCLASS_PROMS, "proms") + 0x1500);
-	const UINT8 *rom   = memory_region(machine, RGNCLASS_GFX, "gfx6");
+	const UINT8 *rcols = (UINT8*)(memory_region(machine, "proms") + 0x1500);
+	const UINT8 *rom   = memory_region(machine, "gfx6");
 	const UINT8 *prom0 = rom + 0x4000;
 	const UINT8 *prom1 = rom + 0x4200;
 	const UINT8 *prom2 = rom + 0x4400;
@@ -1262,17 +1262,17 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap)
 	UINT32 offs;
 
 	/* The many lookup table ROMs */
-	const UINT8 *const bug13  = (UINT8*)memory_region(machine, RGNCLASS_USER, "user3");
-	const UINT8 *const bug18s = (UINT8*)memory_region(machine, RGNCLASS_USER, "user3") + 0x2000;
-	const UINT8 *const bb8    = (UINT8*)memory_region(machine, RGNCLASS_PROMS, "proms") + 0x1600;
+	const UINT8 *const bug13  = (UINT8*)memory_region(machine, "user3");
+	const UINT8 *const bug18s = (UINT8*)memory_region(machine, "user3") + 0x2000;
+	const UINT8 *const bb8    = (UINT8*)memory_region(machine, "proms") + 0x1600;
 
-	const UINT8 *const bug16s = (UINT8*)memory_region(machine, RGNCLASS_USER, "user2");
-	const UINT8 *const bug17s = (UINT8*)memory_region(machine, RGNCLASS_USER, "user2") + 0x8000;
+	const UINT8 *const bug16s = (UINT8*)memory_region(machine, "user2");
+	const UINT8 *const bug17s = (UINT8*)memory_region(machine, "user2") + 0x8000;
 
-	const UINT8 *const bb9o = (UINT8*)memory_region(machine, RGNCLASS_PROMS, "proms") + 0x500;
-	const UINT8 *const bb9e = (UINT8*)memory_region(machine, RGNCLASS_PROMS, "proms") + 0xd00;
+	const UINT8 *const bb9o = (UINT8*)memory_region(machine, "proms") + 0x500;
+	const UINT8 *const bb9e = (UINT8*)memory_region(machine, "proms") + 0xd00;
 
-	const UINT8 *const pixdata_rgn = (UINT8*)memory_region(machine, RGNCLASS_GFX, "gfx2");
+	const UINT8 *const pixdata_rgn = (UINT8*)memory_region(machine, "gfx2");
 
 	profiler_mark(PROFILER_USER1);
 
@@ -1668,8 +1668,8 @@ static void buggyboy_draw_char(running_machine *machine, UINT8 *bitmap)
 	profiler_mark(PROFILER_USER3);
 
 	/* 2bpp characters */
-	gfx1 = memory_region(machine, RGNCLASS_GFX, "gfx1");
-	gfx2 = memory_region(machine, RGNCLASS_GFX, "gfx1") + 0x4000;
+	gfx1 = memory_region(machine, "gfx1");
+	gfx2 = memory_region(machine, "gfx1") + 0x4000;
 
 	/* X/Y scroll values are the last word in char RAM */
 	scroll_y = (buggybjr_vram[0x7ff] >> 10) & 0x3f;
@@ -1744,7 +1744,7 @@ static void buggyboy_draw_char(running_machine *machine, UINT8 *bitmap)
 VIDEO_UPDATE( buggybjr )
 {
 	int x, y;
-	UINT8 *chr_pal = (memory_region(screen->machine, RGNCLASS_PROMS, "proms") + 0x400);
+	UINT8 *chr_pal = (memory_region(screen->machine, "proms") + 0x400);
 
 	memset(obj_bmp, 0, 256*240);
 

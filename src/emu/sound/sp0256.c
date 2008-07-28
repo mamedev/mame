@@ -1206,7 +1206,7 @@ static void *sp0256_start(const char *tag, int sndindex, int clock, const void *
     /* -------------------------------------------------------------------- */
     /*  Setup the ROM.                                                      */
     /* -------------------------------------------------------------------- */
-	sp->rom = memory_region(Machine, RGNCLASS_SOUND, tag);
+	sp->rom = memory_region(Machine, tag);
 	sp0256_bitrevbuff(sp->rom, 0, 0xffff);
 
 	return sp;

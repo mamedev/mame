@@ -1845,7 +1845,7 @@ INPUT_PORTS_END
 
 
 ROM_START( hangonjr )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "z80", 0 )
+	ROM_REGION( 0x30000, "z80", 0 )
 	ROM_LOAD( "rom5.ic7",	0x00000, 0x08000, CRC(d63925a7) SHA1(699f222d9712fa42651c753fe75d7b60e016d3ad) ) /* Fixed Code */
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
@@ -1856,7 +1856,7 @@ ROM_START( hangonjr )
 ROM_END
 
 ROM_START( ridleofp )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "z80", 0 )
+	ROM_REGION( 0x30000, "z80", 0 )
 	ROM_LOAD( "epr10426.bin",	0x00000, 0x08000, CRC(4404c7e7) SHA1(555f44786976a009d96a6395c9173929ad6138a7) ) /* Fixed Code */
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
@@ -1867,7 +1867,7 @@ ROM_START( ridleofp )
 ROM_END
 
 ROM_START( transfrm )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "z80", 0 )
+	ROM_REGION( 0x30000, "z80", 0 )
 	ROM_LOAD( "ic7.top",	0x00000, 0x08000, CRC(ccf1d123) SHA1(5ade9b00e2a36d034fafdf1902d47a9a00e96fc4) ) /* Fixed Code */
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
@@ -1878,7 +1878,7 @@ ROM_START( transfrm )
 ROM_END
 
 ROM_START( astrofl )
-	ROM_REGION( 0x50000, RGNCLASS_CPU, "z80", 0 )
+	ROM_REGION( 0x50000, "z80", 0 )
 	ROM_LOAD( "epr-7723.ic7",	0x00000, 0x08000, CRC(66061137) SHA1(cb6a2c7864f9f87bbedfd4b1448ad6c2de65d6ca) ) /* encrypted */
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
@@ -1890,7 +1890,7 @@ ROM_END
 
 
 ROM_START( tetrisse )
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "z80", 0 )
+	ROM_REGION( 0x30000, "z80", 0 )
 	ROM_LOAD( "epr12213.7",	0x00000, 0x08000, CRC(ef3c7a38) SHA1(cbb91aef330ab1a37d3e21ecf1d008143d0dd7ec) ) /* Fixed Code */
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
@@ -1902,7 +1902,7 @@ ROM_END
 
 
 ROM_START( fantzn2 )
-	ROM_REGION( 0x50000, RGNCLASS_CPU, "z80", 0 )
+	ROM_REGION( 0x50000, "z80", 0 )
 	ROM_LOAD( "epr-11416.ic7",	0x00000, 0x08000, CRC(76db7b7b) SHA1(d60e2961fc893dcb4445aed5f67515cbd25b610f) )	/* encrypted */
 
 	ROM_LOAD( "epr-11415.ic5",	0x10000, 0x10000, CRC(57b45681) SHA1(1ae6d0d58352e246a4ec4e1ce02b0417257d5d20) )
@@ -1910,12 +1910,12 @@ ROM_START( fantzn2 )
 	ROM_LOAD( "epr-11414.ic4",	0x30000, 0x10000, CRC(6f7a9f5f) SHA1(b53aa2eded781c80466a79b7d81383b9a875d0be) )
 	ROM_LOAD( "epr-11412.ic2",	0x40000, 0x10000, CRC(b14db5af) SHA1(04c7fb659385438b3d8f9fb66800eb7b6373bda9) )
 
-	ROM_REGION( 0x2000, RGNCLASS_USER, "user1", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0057.key",  0x0000, 0x2000, CRC(ee43d0f0) SHA1(72cb75a4d8352fe372db12046a59ea044360d5c3) )
 ROM_END
 
 ROM_START( opaopa )
-	ROM_REGION( 0x50000, RGNCLASS_CPU, "z80", 0 )
+	ROM_REGION( 0x50000, "z80", 0 )
 	ROM_LOAD( "epr11224.ic7",	0x00000, 0x08000, CRC(024b1244) SHA1(59a522ac3d98982cc4ddb1c81f9584d3da453649) ) /* encrypted */
 
 	/* The following are 8 0x4000 banks that get mapped to reads from 0x8000 - 0xbfff */
@@ -1924,7 +1924,7 @@ ROM_START( opaopa )
 	ROM_LOAD( "epr11221.ic3",	0x20000, 0x08000, CRC(4ca132a2) SHA1(cb4e4c01b6ab070eef37c0603190caafe6236ccd) ) /* encrypted */
 	ROM_LOAD( "epr11220.ic2",	0x28000, 0x08000, CRC(a165e2ef) SHA1(498ff4c5d3a2658567393378c56be6ed86ac0384) ) /* encrypted */
 
-	ROM_REGION( 0x2000, RGNCLASS_USER, "user1", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0042.key",  0x0000, 0x2000, CRC(d6312538) SHA1(494ac7f080775c21dc7d369e6ea78f3299e6975a) )
 ROM_END
 
@@ -2146,7 +2146,7 @@ static WRITE8_HANDLER( systeme_bank_w )
 		vdp2->vram = vdp2_vram_bank0;
 	}
 
-	//memcpy(sms_rom+0x8000, memory_region(machine, RGNCLASS_USER, "user1")+0x10000+rombank*0x4000, 0x4000);
+	//memcpy(sms_rom+0x8000, memory_region(machine, "user1")+0x10000+rombank*0x4000, 0x4000);
 	memory_set_bank(1, rombank);
 
 }
@@ -2193,13 +2193,13 @@ static void init_systeme_map(running_machine *machine)
 //  memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, SMH_BANK1, SMH_UNMAP);
 //  memory_set_bankptr( 1, sms_rom );
 
-	memory_configure_bank(1, 0, 16, memory_region(machine, RGNCLASS_CPU, "z80") + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 16, memory_region(machine, "z80") + 0x10000, 0x4000);
 
 	/* alternate way of accessing video ram */
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, segasyse_videoram_w);
 
 
-//  memcpy(sms_rom, memory_region(machine, RGNCLASS_USER, "user1"), 0x8000);
+//  memcpy(sms_rom, memory_region(machine, "user1"), 0x8000);
 
 	/* main ram area */
 	sms_mainram = auto_malloc(0x4000);

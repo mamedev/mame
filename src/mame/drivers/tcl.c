@@ -147,21 +147,21 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( tcl )
-	ROM_REGION( 0x10000*2, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000*2, "main", 0 )
 	ROM_LOAD( "tcl.16f",   0x00000, 0x20000, CRC(8e694a58) SHA1(7a3c20a7c740065b71fe66ec581edce0dd32f145) )
 
-	ROM_REGION( 0x8000*3, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x8000*3, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "tcl.1e",   0x00000, 0x8000, CRC(37edf9b8) SHA1(9225728116d6edfe8476e565a12e1f1e59766d26) )
 	ROM_LOAD( "tcl.3e",   0x08000, 0x8000, CRC(396298cf) SHA1(0ee306179a9d3dd84f7e5799527e6825d2979ddb) )
 	ROM_LOAD( "tcl.4e",   0x10000, 0x8000, CRC(f880101c) SHA1(8417410a7dcb304a88e98f9199f44a4df1ee3fb7) )
 
-	ROM_REGION( 0x2000*4, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) /* ??? */
+	ROM_REGION( 0x2000*4, "gfx2", ROMREGION_DISPOSE ) /* ??? */
 	ROM_LOAD( "tcl.3f",   0x0000, 0x2000, CRC(c290c1eb) SHA1(00eb5ff46affe01f240081211b7f9a40e9f76bd8) )
 	ROM_LOAD( "tcl.4f",   0x2000, 0x2000, CRC(225e0148) SHA1(26d8db263b1957fc6b2204765c8aa1f10f44b591) )
 	ROM_LOAD( "tcl.3h",   0x4000, 0x2000, CRC(ee63d380) SHA1(c1d9ca4584bb2ef0fa85e2afb0876040b473a924) )
 	ROM_LOAD( "tcl.4h",   0x6000, 0x2000, CRC(6afa36a1) SHA1(a87423f01dbf9b1e69feb049d6ae3fd63321ee1a) )
 
-	ROM_REGION( 0x100*3, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x100*3, "proms", 0 )
 	ROM_LOAD( "tcl_pr1.15c",   0x000, 0x100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
 	ROM_LOAD( "tcl_pr2.16c",   0x100, 0x100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
 	ROM_LOAD( "tcl_pr3.9e",    0x200, 0x100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
@@ -178,8 +178,8 @@ static DRIVER_INIT(tcl)
 {
 	/* only the first part is decrypted (and verified)*/
 
-	UINT8 *dest = memory_region(machine, RGNCLASS_CPU, "main");
-	int len = memory_region_length(machine, RGNCLASS_CPU, "main");
+	UINT8 *dest = memory_region(machine, "main");
+	int len = memory_region_length(machine, "main");
 	UINT8 *src = malloc_or_die(len);
 
 	int i,idx=0;

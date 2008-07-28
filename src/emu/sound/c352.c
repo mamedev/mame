@@ -551,8 +551,8 @@ static void *c352_start(const char *tag, int sndindex, int clock, const void *co
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
-	info->c352_rom_samples = memory_region(Machine, RGNCLASS_SOUND, tag);
-	info->c352_rom_length = memory_region_length(Machine, RGNCLASS_SOUND, tag);
+	info->c352_rom_samples = memory_region(Machine, tag);
+	info->c352_rom_length = memory_region_length(Machine, tag);
 
 	info->sample_rate_base = clock / 192;
 

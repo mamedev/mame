@@ -80,7 +80,7 @@ static VIDEO_UPDATE( sstrngr2 )
 
 	get_pens(pens);
 
-	color_map_base = &memory_region(screen->machine, RGNCLASS_PROMS, "proms")[sstrngr_flip_screen ? 0x0000 : 0x0200];
+	color_map_base = &memory_region(screen->machine, "proms")[sstrngr_flip_screen ? 0x0000 : 0x0200];
 
 	for (offs = 0; offs < sstrngr_ram_size; offs++)
 	{
@@ -263,7 +263,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( sstrangr )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "hss-01.58",     0x0000, 0x0400, CRC(feec7600) SHA1(787a6be4e24ce931e7678e777699b9f6789bc199) )
 	ROM_LOAD( "hss-02.59",     0x0400, 0x0400, CRC(7281ff0b) SHA1(56649d1362be1b9f517cb8616cbf9e4f955e9a2d) )
 	ROM_LOAD( "hss-03.60",     0x0800, 0x0400, CRC(a09ec572) SHA1(9c4ad811a6c0460403f9cdc9fe5381c460249ff5) )
@@ -275,11 +275,11 @@ ROM_START( sstrangr )
 ROM_END
 
 ROM_START( sstrngr2 )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "4764.09",      0x0000, 0x2000, CRC(d88f86cc) SHA1(9f284ee50caf3c64bd04a79a798de620348881bc) )
 	ROM_LOAD( "2708.10",      0x6000, 0x0400, CRC(eba304c1) SHA1(3fa6fbb29fa46c146283f69a712bfc51cbb2a43c) )
 
-	ROM_REGION( 0x0400, RGNCLASS_PROMS, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_REGION( 0x0400, "proms", 0 )		/* color maps player 1/player 2 */
 	ROM_LOAD( "2708.15",      0x0000, 0x0400, CRC(c176a89d) SHA1(955dd540dc3787091c3f34ae122a13e6b7523414) )
 ROM_END
 

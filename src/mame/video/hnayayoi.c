@@ -121,8 +121,8 @@ static void copy_pixel(int x,int y,int pen)
 
 WRITE8_HANDLER( dynax_blitter_rev1_start_w )
 {
-	UINT8 *rom = memory_region(machine, RGNCLASS_GFX, "gfx1");
-	int romlen = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
+	UINT8 *rom = memory_region(machine, "gfx1");
+	int romlen = memory_region_length(machine, "gfx1");
 	int sx = blit_dest & 0xff;
 	int sy = blit_dest >> 8;
 	int x,y;

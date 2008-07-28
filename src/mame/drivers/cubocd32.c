@@ -139,9 +139,9 @@ static ADDRESS_MAP_START( cd32_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16(amiga_cia_r, amiga_cia_w, 0xffffffff)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE((UINT32**)&amiga_custom_regs)
-	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0x80000)	/* CD32 Extended ROM */
+	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM AM_REGION("user1", 0x80000)	/* CD32 Extended ROM */
 	AM_RANGE(0xa00000, 0xf7ffff) AM_NOP
-	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0x0)		/* Kickstart */
+	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0x0)		/* Kickstart */
 ADDRESS_MAP_END
 
 
@@ -269,7 +269,7 @@ MACHINE_DRIVER_END
 #define ROM_LOAD16_WORD_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1))
 
 #define CD32_BIOS \
-	ROM_REGION32_BE(0x100000, RGNCLASS_USER, "user1", 0 ) \
+	ROM_REGION32_BE(0x100000, "user1", 0 ) \
 	ROM_SYSTEM_BIOS(0, "cd32", "Kickstart v3.1 rev 40.60 with CD32 Extended-ROM" ) \
 	ROM_LOAD16_WORD_BIOS(0, "391640-03.u6a", 0x000000, 0x100000, CRC(d3837ae4) SHA1(06807db3181637455f4d46582d9972afec8956d9) ) \
 
@@ -281,42 +281,42 @@ ROM_END
 ROM_START( cndypuzl )
 	CD32_BIOS
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "cndypuzl", 0, SHA1(21093753a1875dc4fb97f23232ed3d8776b48c06) MD5(dcb6cdd7d81d5468c1290a3baf4265cb) )
 ROM_END
 
 ROM_START( haremchl )
 	CD32_BIOS
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "haremchl", 0, SHA1(4d5df2b64b376e8d0574100110f3471d3190765c) MD5(00adbd944c05747e9445446306f904be) )
 ROM_END
 
 ROM_START( lsrquiz )
 	CD32_BIOS
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "lsrquiz", 0, SHA1(4250c94ab77504104005229b28f24cfabe7c9e48) MD5(12a94f573fe5d218db510166b86fdda5) )
 ROM_END
 
 ROM_START( lsrquiz2 )
 	CD32_BIOS
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "lsrquiz2", 0, SHA1(ea92df0e53bf36bb86d99ad19fca21c6129e61d7) MD5(df63c32aca815f6c97889e08c10b77bc) )
 ROM_END
 
 ROM_START( mgprem11 )
 	CD32_BIOS
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "mgprem11", 0, SHA1(a8a32d10148ba968b57b8186fdf4d4cd378fb0d5) MD5(e0e4d00c6f981c19a1d20d5e7090b0db) )
 ROM_END
 
 ROM_START( lasstixx )
 	CD32_BIOS
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "lasstixx", 0, SHA1(29c2525d43a696da54648caffac9952cec85fd37) MD5(6242dd8a3c0b15ef9eafb930b7a7e87f) )
 ROM_END
 
@@ -343,7 +343,7 @@ static DRIVER_INIT( cd32 )
 
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram32, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, RGNCLASS_USER, "user1"), 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, "user1"), 0);
 
 	/* intialize akiko */
 	amiga_akiko_init(machine);

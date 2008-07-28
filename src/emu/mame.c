@@ -163,7 +163,7 @@ struct _mame_private
 	attotime		saveload_schedule_time;
 
 	/* array of memory regions */
-	region_info	*	regions[RGNCLASS_COUNT];
+	region_info	*	regions;
 
 	/* error recovery and exiting */
 	jmp_buf			fatal_error_jmpbuf;
@@ -759,27 +759,25 @@ int mame_is_paused(running_machine *machine)
     region
 -------------------------------------------------*/
 
-UINT8 *memory_region_alloc(running_machine *machine, int rgnclass, const char *name, UINT32 length, UINT32 flags)
+UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 length, UINT32 flags)
 {
 	mame_private *mame = machine->mame_data;
 	region_info *info;
     
-    assert(rgnclass < RGNCLASS_COUNT);
-
     /* make sure we don't have a region of the same name */
-    for (info = mame->regions[rgnclass]; info != NULL; info = info->next)
+    for (info = mame->regions; info != NULL; info = info->next)
     	if (astring_cmpc(info->name, name) == 0)
-    		fatalerror("memory_region_alloc called with duplicate region type %d name \"%s\"\n", rgnclass, name);
+    		fatalerror("memory_region_alloc called with duplicate region name \"%s\"\n", name);
 
 	/* allocate the region */
 	info = malloc_or_die(sizeof(*info) + length);
-	info->next = mame->regions[rgnclass];
+	info->next = mame->regions;
 	info->name = astring_dupc(name);
 	info->length = length;
 	info->flags = flags;
 	
 	/* hook us into the list */
-	mame->regions[rgnclass] = info;
+	mame->regions = info;
 	return info->base;
 }
 
@@ -789,15 +787,13 @@ UINT8 *memory_region_alloc(running_machine *machine, int rgnclass, const char *n
     region
 -------------------------------------------------*/
 
-void memory_region_free(running_machine *machine, int rgnclass, const char *name)
+void memory_region_free(running_machine *machine, const char *name)
 {
 	mame_private *mame = machine->mame_data;
 	region_info **infoptr;
 	
-    assert(rgnclass < RGNCLASS_COUNT);
-
 	/* find the region */
-	for (infoptr = &mame->regions[rgnclass]; *infoptr != NULL; infoptr = &(*infoptr)->next)
+	for (infoptr = &mame->regions; *infoptr != NULL; infoptr = &(*infoptr)->next)
 		if (astring_cmpc((*infoptr)->name, name) == 0)
 		{
 			region_info *deleteme = *infoptr;
@@ -818,19 +814,17 @@ void memory_region_free(running_machine *machine, int rgnclass, const char *name
     region
 -------------------------------------------------*/
 
-UINT8 *memory_region(running_machine *machine, int rgnclass, const char *name)
+UINT8 *memory_region(running_machine *machine, const char *name)
 {
 	mame_private *mame = machine->mame_data;
 	region_info *info;
-    
-    assert(rgnclass < RGNCLASS_COUNT);
     
     /* NULL tag always fails */
     if (name == NULL)
     	return NULL;
 
     /* make sure we don't have a region of the same name */
-    for (info = mame->regions[rgnclass]; info != NULL; info = info->next)
+    for (info = mame->regions; info != NULL; info = info->next)
     	if (astring_cmpc(info->name, name) == 0)
     		return info->base;
     
@@ -843,19 +837,17 @@ UINT8 *memory_region(running_machine *machine, int rgnclass, const char *name)
     memory region
 -------------------------------------------------*/
 
-UINT32 memory_region_length(running_machine *machine, int rgnclass, const char *name)
+UINT32 memory_region_length(running_machine *machine, const char *name)
 {
 	mame_private *mame = machine->mame_data;
 	region_info *info;
     
-    assert(rgnclass < RGNCLASS_COUNT);
-
     /* NULL tag always fails */
     if (name == NULL)
     	return 0;
 
     /* make sure we don't have a region of the same name */
-    for (info = mame->regions[rgnclass]; info != NULL; info = info->next)
+    for (info = mame->regions; info != NULL; info = info->next)
     	if (astring_cmpc(info->name, name) == 0)
     		return info->length;
     
@@ -868,19 +860,17 @@ UINT32 memory_region_length(running_machine *machine, int rgnclass, const char *
     memory region
 -------------------------------------------------*/
 
-UINT32 memory_region_flags(running_machine *machine, int rgnclass, const char *name)
+UINT32 memory_region_flags(running_machine *machine, const char *name)
 {
 	mame_private *mame = machine->mame_data;
 	region_info *info;
     
-    assert(rgnclass < RGNCLASS_COUNT);
-
     /* NULL tag always fails */
     if (name == NULL)
     	return 0;
 
     /* make sure we don't have a region of the same name */
-    for (info = mame->regions[rgnclass]; info != NULL; info = info->next)
+    for (info = mame->regions; info != NULL; info = info->next)
     	if (astring_cmpc(info->name, name) == 0)
     		return info->flags;
     
@@ -890,19 +880,16 @@ UINT32 memory_region_flags(running_machine *machine, int rgnclass, const char *n
 
 /*-------------------------------------------------
     memory_region_next - the name of the next 
-    memory region of the same class (or the first 
-    if name == NULL)
+    memory region (or the first if name == NULL)
 -------------------------------------------------*/
 
-const char *memory_region_next(running_machine *machine, int rgnclass, const char *name)
+const char *memory_region_next(running_machine *machine, const char *name)
 {
 	mame_private *mame = machine->mame_data;
 	region_info *info;
     
-    assert(rgnclass < RGNCLASS_COUNT);
-
 	/* if there's nothing in this class, fail immediately */
-    info = mame->regions[rgnclass];
+    info = mame->regions;
 	if (info == NULL)
 		return NULL;
 
@@ -916,28 +903,6 @@ const char *memory_region_next(running_machine *machine, int rgnclass, const cha
     		return (info->next != NULL) ? astring_c(info->next->name) : NULL;
     
     return NULL;
-}
-
-
-/*-------------------------------------------------
-    memory_region_class_name - return the name of
-    the given memory region class
--------------------------------------------------*/
-
-const char *memory_region_class_name(int rgnclass, int lowercase)
-{
-	switch (rgnclass)
-	{
-		default:				return lowercase ? "unknown" : "Unknown";
-		case RGNCLASS_CPU:		return lowercase ? "cpu" : "CPU";
-		case RGNCLASS_GFX:		return lowercase ? "gfx" : "Gfx";
-		case RGNCLASS_SOUND:	return lowercase ? "sound" : "Sound";
-		case RGNCLASS_USER:		return lowercase ? "user" : "User";
-		case RGNCLASS_DISKS:	return lowercase ? "disk" : "Disk";
-		case RGNCLASS_PROMS:	return lowercase ? "prom" : "PROM";
-		case RGNCLASS_PLDS:		return lowercase ? "pld" : "PLD";
-	}
-	return NULL;
 }
 
 
@@ -1529,7 +1494,6 @@ static void init_machine(running_machine *machine)
 	mame_private *mame = machine->mame_data;
 	const char *rgntag, *nextrgntag;
 	time_t newbase;
-	int rgnclass;
 
 	/* initialize basic can't-fail systems here */
 	cpuintrf_init(machine);
@@ -1621,13 +1585,12 @@ static void init_machine(running_machine *machine)
 		(*machine->config->video_start)(machine);
 
 	/* free memory regions allocated with REGIONFLAG_DISPOSE (typically gfx roms) */
-	for (rgnclass = 0; rgnclass < RGNCLASS_COUNT; rgnclass++)
-		for (rgntag = memory_region_next(machine, rgnclass, NULL); rgntag != NULL; rgntag = nextrgntag)
-		{
-			nextrgntag = memory_region_next(machine, rgnclass, rgntag);
-			if (memory_region_flags(machine, rgnclass, rgntag) & ROMREGION_DISPOSE)
-				memory_region_free(machine, rgnclass, rgntag);
-		}
+	for (rgntag = memory_region_next(machine, NULL); rgntag != NULL; rgntag = nextrgntag)
+	{
+		nextrgntag = memory_region_next(machine, rgntag);
+		if (memory_region_flags(machine, rgntag) & ROMREGION_DISPOSE)
+			memory_region_free(machine, rgntag);
+	}
 
 	/* initialize miscellaneous systems */
 	saveload_init(machine);

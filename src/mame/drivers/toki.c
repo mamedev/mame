@@ -87,7 +87,7 @@ static void toki_adpcm_int (running_machine *machine, int data)
 static WRITE8_HANDLER( toki_adpcm_control_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "audio");
+	UINT8 *RAM = memory_region(machine, "audio");
 
 
 	/* the code writes either 2 or 3 in the bottom two bits */
@@ -510,124 +510,124 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( toki )
-	ROM_REGION( 0x60000, RGNCLASS_CPU, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "main", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "l10_6.bin",    0x00000, 0x20000, CRC(94015d91) SHA1(8b8d7c589eff038467f55e81ffd450f726c5a8b5) )
 	ROM_LOAD16_BYTE( "k10_4e.bin",   0x00001, 0x20000, CRC(531bd3ef) SHA1(2e561f92f5c5f2da16c4791274ccbd421b9b0a05) )
 	ROM_LOAD16_BYTE( "tokijp.005",   0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
 	ROM_LOAD16_BYTE( "tokijp.003",   0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
 
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "audio", 0 )	/* Z80 code, banked data */
+	ROM_REGION( 0x20000, "audio", 0 )	/* Z80 code, banked data */
 	ROM_LOAD( "tokijp.008",   0x00000, 0x02000, CRC(6c87c4c5) SHA1(d76822bcde3d42afae72a0945b6acbf3c6a1d955) )	/* encrypted */
 	ROM_LOAD( "tokijp.007",   0x10000, 0x10000, CRC(a67969c4) SHA1(99781fbb005b6ba4a19a9cc83c8b257a3b425fa6) )	/* banked stuff */
 
-	ROM_REGION( 0x020000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "tokijp.001",   0x000000, 0x10000, CRC(8aa964a2) SHA1(875129bdd5f699ee30a98160718603a3bc958d84) )   /* chars */
 	ROM_LOAD( "tokijp.002",   0x010000, 0x10000, CRC(86e87e48) SHA1(29634d8c58ef7195cd0ce166f1b7fae01bbc110b) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.ob1",     0x000000, 0x80000, CRC(a27a80ba) SHA1(3dd3b6b0ace6ca6653603bea952b828b154a2223) )   /* sprites */
 	ROM_LOAD( "toki.ob2",     0x080000, 0x80000, CRC(fa687718) SHA1(f194b742399d8124d97cfa3d59beb980c36cfb3c) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.bk1",     0x000000, 0x80000, CRC(fdaa5f4b) SHA1(ea850361bc8274639e8433bd2a5307fd3a0c9a24) )   /* tiles 1 */
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.bk2",     0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "tokijp.009",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
 ROM_END
 
 
 ROM_START( tokia )
-	ROM_REGION( 0x60000, RGNCLASS_CPU, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "main", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "tokijp.006",   0x00000, 0x20000, CRC(03d726b1) SHA1(bbe3a1ea1943cd73b821b3de4d5bf3dfbffd2168) )
 	ROM_LOAD16_BYTE( "4c.10k",       0x00001, 0x20000, CRC(b2c345c5) SHA1(ff8ff31551e835e29192d7ddd3e1601968b3e2c5) )
 	ROM_LOAD16_BYTE( "tokijp.005",   0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
 	ROM_LOAD16_BYTE( "tokijp.003",   0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
 
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "audio", 0 )	/* Z80 code, banked data */
+	ROM_REGION( 0x20000, "audio", 0 )	/* Z80 code, banked data */
 	ROM_LOAD( "tokijp.008",   0x00000, 0x02000, CRC(6c87c4c5) SHA1(d76822bcde3d42afae72a0945b6acbf3c6a1d955) )	/* encrypted */
 	ROM_LOAD( "tokijp.007",   0x10000, 0x10000, CRC(a67969c4) SHA1(99781fbb005b6ba4a19a9cc83c8b257a3b425fa6) )	/* banked stuff */
 
-	ROM_REGION( 0x020000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "tokijp.001",   0x000000, 0x10000, CRC(8aa964a2) SHA1(875129bdd5f699ee30a98160718603a3bc958d84) )   /* chars */
 	ROM_LOAD( "tokijp.002",   0x010000, 0x10000, CRC(86e87e48) SHA1(29634d8c58ef7195cd0ce166f1b7fae01bbc110b) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.ob1",     0x000000, 0x80000, CRC(a27a80ba) SHA1(3dd3b6b0ace6ca6653603bea952b828b154a2223) )   /* sprites */
 	ROM_LOAD( "toki.ob2",     0x080000, 0x80000, CRC(fa687718) SHA1(f194b742399d8124d97cfa3d59beb980c36cfb3c) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.bk1",     0x000000, 0x80000, CRC(fdaa5f4b) SHA1(ea850361bc8274639e8433bd2a5307fd3a0c9a24) )   /* tiles 1 */
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.bk2",     0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "tokijp.009",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
 ROM_END
 
 ROM_START( tokiu )
-	ROM_REGION( 0x60000, RGNCLASS_CPU, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "main", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "6b.10m",       0x00000, 0x20000, CRC(3674d9fe) SHA1(7c610bee23b0f7e6a9e3d5d72d6084e025eb89ec) )
 	ROM_LOAD16_BYTE( "14.10k",       0x00001, 0x20000, CRC(bfdd48af) SHA1(3e48375019471a51f0c00d3444b0c1d37d2f8e92) )
 	ROM_LOAD16_BYTE( "tokijp.005",   0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
 	ROM_LOAD16_BYTE( "tokijp.003",   0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
 
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "audio", 0 )	/* Z80 code, banked data */
+	ROM_REGION( 0x20000, "audio", 0 )	/* Z80 code, banked data */
 	ROM_LOAD( "tokijp.008",   0x00000, 0x02000, CRC(6c87c4c5) SHA1(d76822bcde3d42afae72a0945b6acbf3c6a1d955) )	/* encrypted */
 	ROM_LOAD( "tokijp.007",   0x10000, 0x10000, CRC(a67969c4) SHA1(99781fbb005b6ba4a19a9cc83c8b257a3b425fa6) )	/* banked stuff */
 
-	ROM_REGION( 0x020000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "tokijp.001",   0x000000, 0x10000, CRC(8aa964a2) SHA1(875129bdd5f699ee30a98160718603a3bc958d84) )   /* chars */
 	ROM_LOAD( "tokijp.002",   0x010000, 0x10000, CRC(86e87e48) SHA1(29634d8c58ef7195cd0ce166f1b7fae01bbc110b) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.ob1",     0x000000, 0x80000, CRC(a27a80ba) SHA1(3dd3b6b0ace6ca6653603bea952b828b154a2223) )   /* sprites */
 	ROM_LOAD( "toki.ob2",     0x080000, 0x80000, CRC(fa687718) SHA1(f194b742399d8124d97cfa3d59beb980c36cfb3c) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.bk1",     0x000000, 0x80000, CRC(fdaa5f4b) SHA1(ea850361bc8274639e8433bd2a5307fd3a0c9a24) )   /* tiles 1 */
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.bk2",     0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "tokijp.009",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
 ROM_END
 
 ROM_START( juju )
-	ROM_REGION( 0x60000, RGNCLASS_CPU, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "main", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "tokijp.006",   0x00000, 0x20000, CRC(03d726b1) SHA1(bbe3a1ea1943cd73b821b3de4d5bf3dfbffd2168) )
 	ROM_LOAD16_BYTE( "tokijp.004",   0x00001, 0x20000, CRC(54a45e12) SHA1(240538c8b010bb6e1e7fea2ed2fb1d5f9bc64b2b) )
 	ROM_LOAD16_BYTE( "tokijp.005",   0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
 	ROM_LOAD16_BYTE( "tokijp.003",   0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
 
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "audio", 0 )	/* Z80 code, banked data */
+	ROM_REGION( 0x20000, "audio", 0 )	/* Z80 code, banked data */
 	ROM_LOAD( "tokijp.008",   0x00000, 0x02000, CRC(6c87c4c5) SHA1(d76822bcde3d42afae72a0945b6acbf3c6a1d955) )	/* encrypted */
 	ROM_LOAD( "tokijp.007",   0x10000, 0x10000, CRC(a67969c4) SHA1(99781fbb005b6ba4a19a9cc83c8b257a3b425fa6) )	/* banked stuff */
 
-	ROM_REGION( 0x020000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "tokijp.001",   0x000000, 0x10000, CRC(8aa964a2) SHA1(875129bdd5f699ee30a98160718603a3bc958d84) )   /* chars */
 	ROM_LOAD( "tokijp.002",   0x010000, 0x10000, CRC(86e87e48) SHA1(29634d8c58ef7195cd0ce166f1b7fae01bbc110b) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.ob1",     0x000000, 0x80000, CRC(a27a80ba) SHA1(3dd3b6b0ace6ca6653603bea952b828b154a2223) )   /* sprites */
 	ROM_LOAD( "toki.ob2",     0x080000, 0x80000, CRC(fa687718) SHA1(f194b742399d8124d97cfa3d59beb980c36cfb3c) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.bk1",     0x000000, 0x80000, CRC(fdaa5f4b) SHA1(ea850361bc8274639e8433bd2a5307fd3a0c9a24) )   /* tiles 1 */
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.bk2",     0x000000, 0x80000, CRC(d86ac664) SHA1(bcb64d8e7ad29b8201ebbada1f858075eb8a0f1d) )   /* tiles 2 */
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "tokijp.009",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
 ROM_END
 
 ROM_START( jujub )
-	ROM_REGION( 0x60000, RGNCLASS_CPU, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "main", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "8.19g",   0x20000, 0x10000,  CRC(208fb08a) SHA1(113d3924d738705cb73d137712a23fa25cd4c78c) )
 	ROM_LOAD16_BYTE( "5.19e",   0x20001, 0x10000,  CRC(722e5183) SHA1(87b813e818670bad45043db7f692619052987ce8) )
 	ROM_LOAD16_BYTE( "9.20g",   0x00000, 0x10000,  CRC(cb82cc33) SHA1(1c774b72d12e84e9e159f66fc151f779dabbdfbd) )
@@ -635,16 +635,16 @@ ROM_START( jujub )
 	ROM_LOAD16_BYTE( "10.21g",  0x40000, 0x10000,  CRC(6c7a3ffe) SHA1(c9a266ef7a5aeaa78b4d645c4df28068bcab96d0) )
 	ROM_LOAD16_BYTE( "7.21e",   0x40001, 0x10000,  CRC(b0628230) SHA1(f8ed24ee53efc595e4dae13e2563021322c049e1) )
 
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "audio", 0 )	/* Z80 code, banked data */
+	ROM_REGION( 0x20000, "audio", 0 )	/* Z80 code, banked data */
 	ROM_LOAD( "3.9c",    0x00000, 0x02000, CRC(808f5e44) SHA1(a72d04367adf428b8f0955ef6269c39eb47eee14) ) /* first 0x2000 is empty */
 	ROM_CONTINUE(0x0000,0x6000)
 	ROM_LOAD( "4.11c",   0x10000, 0x10000, CRC(a67969c4) SHA1(99781fbb005b6ba4a19a9cc83c8b257a3b425fa6) )	/* banked stuff */
 
-	ROM_REGION( 0x020000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "5.19h",   0x000000, 0x10000, CRC(8aa964a2) SHA1(875129bdd5f699ee30a98160718603a3bc958d84) )   /* chars */
 	ROM_LOAD( "6.20h",   0x010000, 0x10000, CRC(86e87e48) SHA1(29634d8c58ef7195cd0ce166f1b7fae01bbc110b) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "1.17d",  0x00000, 0x20000, CRC(a027bd8e) SHA1(33cc4ae75332ab35df1c03f74db8cb17f2749ead) )
 	ROM_LOAD16_BYTE( "27.17b", 0x00001, 0x20000, CRC(43a767ea) SHA1(bfc879ff714828f7a1b8f784db8728c91287ed20) )
 	ROM_LOAD16_BYTE( "2.18d",  0x40000, 0x20000, CRC(1aecc9d8) SHA1(e7a79783e71de472f07761f9dc71f2a78e629676) )
@@ -654,7 +654,7 @@ ROM_START( jujub )
 	ROM_LOAD16_BYTE( "4.21d",  0xc0000, 0x20000, CRC(6a8e6e22) SHA1(a6144201e9a18aa46f65957694653a40071d92d4) )
 	ROM_LOAD16_BYTE( "30.21b", 0xc0001, 0x20000, CRC(25d9a16c) SHA1(059d1e2e874bb41f8ef576e0cf33bdbffb57ddc0) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "11.1j",        0x00001, 0x10000, CRC(6ad15560) SHA1(707a05ac0c61a66ac65c8c3718e5d2b958da9142) )
 	ROM_LOAD16_BYTE( "12.2j",        0x20001, 0x10000, CRC(68534844) SHA1(ff4aa635e2221a552f844e30db93c73107a70cf2) )
 	ROM_LOAD16_BYTE( "13.4j",        0x40001, 0x10000, CRC(f271be5a) SHA1(c9847439f0c48f6bb710999acc172a2d6fc8d58b) )
@@ -664,7 +664,7 @@ ROM_START( jujub )
 	ROM_LOAD16_BYTE( "21.4l",        0x40000, 0x10000, CRC(946862a3) SHA1(398913ccef8bd5242987c516194752ac38e10918) )
 	ROM_LOAD16_BYTE( "22.5l",        0x60000, 0x10000, CRC(b45f5608) SHA1(fbf9f748db285f8693e0493d9b449c23cf02748b) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "15.18j",        0x00001, 0x10000, CRC(cb8b1d31) SHA1(8dc858c4a096d71ee66541d04f8a3acb97565ac8) )
 	ROM_LOAD16_BYTE( "16.19j",        0x20001, 0x10000, CRC(81594e0a) SHA1(6390798f0829d69a70a05dbb169b0eb9183cc9a9) )
 	ROM_LOAD16_BYTE( "17.20j",        0x40001, 0x10000, CRC(4acd44ce) SHA1(517444d22f252784ad0cb2b8948d86d4db186ae4) )
@@ -674,29 +674,29 @@ ROM_START( jujub )
 	ROM_LOAD16_BYTE( "25.20l",        0x40000, 0x10000, CRC(be064c4b) SHA1(d777b560942e9f6300aed1bf22a07b381c27a479) )
 	ROM_LOAD16_BYTE( "26.21l",        0x60000, 0x10000, CRC(f8b5b38d) SHA1(6ec60cf5259469cc9c4bdd9ffc6c63bc2785b708) )
 
-	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 )	/* OKI samples */
+	ROM_REGION( 0x20000, "oki", 0 )	/* OKI samples */
 	ROM_LOAD( "1.6a",   0x00000, 0x10000, CRC(377153ad) SHA1(1c184197b344c2b65b5842f9ba99fab776a9577b) )
 	ROM_LOAD( "2.7a",   0x10000, 0x10000, CRC(093ca15d) SHA1(1b298146c9eea93c22c03e63513200b483b86a3f) )
 ROM_END
 
 ROM_START( tokib )
-	ROM_REGION( 0x60000, RGNCLASS_CPU, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "main", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "toki.e3",      0x00000, 0x20000, CRC(ae9b3da4) SHA1(14eabbd0b3596528e96e4399dde03f5817eddbaa) )
 	ROM_LOAD16_BYTE( "toki.e5",      0x00001, 0x20000, CRC(66a5a1d6) SHA1(9a8330d19234863952b0a5dce3f5ad28fcabaa31) )
 	ROM_LOAD16_BYTE( "tokijp.005",   0x40000, 0x10000, CRC(d6a82808) SHA1(9fcd3e97f7eaada5374347383dc8a6cea2378f7f) )
 	ROM_LOAD16_BYTE( "tokijp.003",   0x40001, 0x10000, CRC(a01a5b10) SHA1(76d6da114105402aab9dd5167c0c00a0bddc3bba) )
 
-	ROM_REGION( 0x18000, RGNCLASS_CPU, "audio", 0 )	/* 64k for code + 32k for banked data */
+	ROM_REGION( 0x18000, "audio", 0 )	/* 64k for code + 32k for banked data */
 	ROM_LOAD( "toki.e1",      0x00000, 0x8000, CRC(2832ef75) SHA1(c15dc67a1251230fe79625b582c255678f3714d8) )
 	ROM_CONTINUE(             0x10000, 0x8000 ) /* banked at 8000-bfff */
 
-	ROM_REGION( 0x020000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.e21",     0x000000, 0x08000, CRC(bb8cacbd) SHA1(05cdd2efe63de30dec2e5d2948567cee22e82a63) )   /* chars */
 	ROM_LOAD( "toki.e13",     0x008000, 0x08000, CRC(052ad275) SHA1(0f4a9c752348cf5fb43d706bacbcd3e5937441e7) )
 	ROM_LOAD( "toki.e22",     0x010000, 0x08000, CRC(04dcdc21) SHA1(3b74019d764a13ffc155f154522c6fe60cf1c5ea) )
 	ROM_LOAD( "toki.e7",      0x018000, 0x08000, CRC(70729106) SHA1(e343c02d139d20a54e837e65b6a964e202f5811e) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.e26",     0x000000, 0x20000, CRC(a8ba71fc) SHA1(331d7396b6e862e32bb6a0d62c25fc201203b951) )   /* sprites */
 	ROM_LOAD( "toki.e28",     0x020000, 0x20000, CRC(29784948) SHA1(9e17e57e2cb65a0aff61385c6d3a97b52474b6e7) )
 	ROM_LOAD( "toki.e34",     0x040000, 0x20000, CRC(e5f6e19b) SHA1(77dc5cf961c8062b86ebeb896ad2075c3bfa2205) )
@@ -706,7 +706,7 @@ ROM_START( tokib )
 	ROM_LOAD( "toki.e38",     0x0c0000, 0x20000, CRC(87f4e7fb) SHA1(07d6bf00b1145a11f3d3f0af4425a3c5baeca3db) )
 	ROM_LOAD( "toki.e40",     0x0e0000, 0x20000, CRC(96e87350) SHA1(754947f71261d8358e158fa9c8fcfd242cd58bc3) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.e23",     0x000000, 0x10000, CRC(feb13d35) SHA1(1b78ce1e48d16e58ad0721b30ab87765ded7d24e) )   /* tiles 1 */
 	ROM_LOAD( "toki.e24",     0x010000, 0x10000, CRC(5b365637) SHA1(434775b0614d904beaf40d7e00c1eaf59b704cb1) )
 	ROM_LOAD( "toki.e15",     0x020000, 0x10000, CRC(617c32e6) SHA1(a80f93c83a06acf836e638e4ad2453692622015d) )
@@ -716,7 +716,7 @@ ROM_START( tokib )
 	ROM_LOAD( "toki.e8",      0x060000, 0x10000, CRC(46a1b821) SHA1(74d9762aef3891463dc100d1bc2d4fdc3c1d163f) )
 	ROM_LOAD( "toki.e9",      0x070000, 0x10000, CRC(82ce27f6) SHA1(db29396a336098664f48e3c04930b973a6ffe969) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "toki.e25",     0x000000, 0x10000, CRC(63026cad) SHA1(c8f3898985d99f2a61d4e17eba66b5989a23d0d7) )   /* tiles 2 */
 	ROM_LOAD( "toki.e20",     0x010000, 0x10000, CRC(a7f2ce26) SHA1(6b12b3bd872112b42d91ce3c0d5bc95c0fc0f5b5) )
 	ROM_LOAD( "toki.e11",     0x020000, 0x10000, CRC(48989aa0) SHA1(109c68c9f0966862194226cecc8b269d9307dd25) )
@@ -730,7 +730,7 @@ ROM_END
 
 static DRIVER_INIT( toki )
 {
-	UINT8 *ROM = memory_region(machine, RGNCLASS_SOUND, "oki");
+	UINT8 *ROM = memory_region(machine, "oki");
 	UINT8 *buffer = malloc_or_die(0x20000);
 	int i;
 
@@ -753,14 +753,14 @@ static DRIVER_INIT( tokib )
 	UINT8 *rom;
 
 	/* invert the sprite data in the ROMs */
-	len = memory_region_length(machine, RGNCLASS_GFX, "gfx2");
-	rom = memory_region(machine, RGNCLASS_GFX, "gfx2");
+	len = memory_region_length(machine, "gfx2");
+	rom = memory_region(machine, "gfx2");
 	for (i = 0; i < len; i++)
 		rom[i] ^= 0xff;
 
 	/* merge background tile graphics together */
-		len = memory_region_length(machine, RGNCLASS_GFX, "gfx3");
-		rom = memory_region(machine, RGNCLASS_GFX, "gfx3");
+		len = memory_region_length(machine, "gfx3");
+		rom = memory_region(machine, "gfx3");
 		for (offs = 0; offs < len; offs += 0x20000)
 		{
 			UINT8 *base = &rom[offs];
@@ -773,8 +773,8 @@ static DRIVER_INIT( tokib )
 				memcpy (&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
 			}
 		}
-		len = memory_region_length(machine, RGNCLASS_GFX, "gfx4");
-		rom = memory_region(machine, RGNCLASS_GFX, "gfx4");
+		len = memory_region_length(machine, "gfx4");
+		rom = memory_region(machine, "gfx4");
 		for (offs = 0; offs < len; offs += 0x20000)
 		{
 			UINT8 *base = &rom[offs];
@@ -796,7 +796,7 @@ static DRIVER_INIT(jujub)
 	/* Program ROMs are bitswapped */
 	{
 		int i;
-		UINT16 *prgrom = (UINT16*)memory_region(machine, RGNCLASS_CPU, "main");
+		UINT16 *prgrom = (UINT16*)memory_region(machine, "main");
 
 		for (i = 0; i < 0x60000/2; i++)
 		{
@@ -810,7 +810,7 @@ static DRIVER_INIT(jujub)
 	/* Decrypt data for z80 program */
 	{
 		UINT8 *decrypt = auto_malloc(0x20000);
-		UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "audio");
+		UINT8 *rom = memory_region(machine, "audio");
 		int i;
 
 		memcpy(decrypt,rom,0x20000);
@@ -825,7 +825,7 @@ static DRIVER_INIT(jujub)
 	}
 
 	{
-		UINT8 *ROM = memory_region(machine, RGNCLASS_SOUND, "oki");
+		UINT8 *ROM = memory_region(machine, "oki");
 		UINT8 *buffer = malloc_or_die(0x20000);
 		int i;
 

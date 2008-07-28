@@ -167,7 +167,7 @@ static void oki_play_sample(running_machine *machine, int sample_no)
 
 		if (sample != 0)
 		{
-			UINT8 *rom = memory_region(machine, RGNCLASS_SOUND, (chip == 0) ? "oki1" : "oki2");
+			UINT8 *rom = memory_region(machine, (chip == 0) ? "oki1" : "oki2");
 			int bank = (byte2 & 0x0c) >> 2;
 			int vol = (byte2 & 0x70) >> 4;
 
@@ -1029,7 +1029,7 @@ static TIMER_CALLBACK( real_nmk004_init )
 
 	memset(&NMK004_state, 0, sizeof(NMK004_state));
 
-	NMK004_state.rom = memory_region(machine, RGNCLASS_CPU, "audio");
+	NMK004_state.rom = memory_region(machine, "audio");
 
 	YM2203_control_port_0_w(machine, 0, 0x2f);
 

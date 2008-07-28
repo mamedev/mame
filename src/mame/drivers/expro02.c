@@ -223,15 +223,15 @@ static WRITE16_HANDLER( galsnew_6295_bankswitch_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = memory_region(machine, RGNCLASS_SOUND, "oki");
+		UINT8 *rom = memory_region(machine, "oki");
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 	}
 }
 
 static ADDRESS_MAP_START( galsnew, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM // main program
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION(RGNCLASS_USER, "user2",0) // other data
-	AM_RANGE(0x100000, 0x3fffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1",0) // main data
+	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("user2",0) // other data
+	AM_RANGE(0x100000, 0x3fffff) AM_ROM AM_REGION("user1",0) // main data
 	AM_RANGE(0x400000, 0x400001) AM_READWRITE(OKIM6295_status_0_lsb_r,OKIM6295_data_0_lsb_w)
 
 
@@ -344,8 +344,8 @@ MACHINE_DRIVER_END
 /* the tile roms seem lineswapped.. but I don't know how to descramble them yet */
 static DRIVER_INIT(galsnew)
 {
-	UINT8 *src    = memory_region       ( machine, RGNCLASS_GFX, "gfx3" );
-	UINT8 *dst    = memory_region       ( machine, RGNCLASS_GFX, "gfx2" );
+	UINT8 *src    = memory_region       ( machine, "gfx3" );
+	UINT8 *dst    = memory_region       ( machine, "gfx2" );
 	int x;
 
 	for (x=0; x<0x200000;x++)
@@ -362,11 +362,11 @@ static DRIVER_INIT(galsnew)
 
 
 ROM_START( galsnew ) /* EXPRO-02 PCB */
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x40000, "main", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "pm110u_u87-01.u87", 0x000000, 0x20000, CRC(b793a57d) SHA1(12d57b2b4add532f0d0453c25b30d34b3449d717) ) /* US region */
 	ROM_LOAD16_BYTE( "pm109u_u88-01.u88", 0x000001, 0x20000, CRC(35b936f8) SHA1(d272067f10542d511a777802cafa4d72b93fa5e8) )
 
-	ROM_REGION16_BE( 0x300000, RGNCLASS_USER, "user1", 0 )	/* 68000 data */
+	ROM_REGION16_BE( 0x300000, "user1", 0 )	/* 68000 data */
 	ROM_LOAD16_BYTE( "pm004e.u86", 0x000001, 0x80000, CRC(d3af52bc) SHA1(46be057106388578defecab1cdd1793ec76ebe92) )
 	ROM_LOAD16_BYTE( "pm005e.u85", 0x000000, 0x80000, CRC(d7ec650c) SHA1(6c2250c74381497154bf516e0cf1db6bb56bb446) )
 	ROM_LOAD16_BYTE( "pm000e.u74", 0x100001, 0x80000, CRC(5d220f3f) SHA1(7ff373e01027c8832712f7a2d732f8e49b875878) )
@@ -374,26 +374,26 @@ ROM_START( galsnew ) /* EXPRO-02 PCB */
 	ROM_LOAD16_BYTE( "pm002e.u76", 0x200001, 0x80000, CRC(713ee898) SHA1(c9f608a57fb90e5ee15eb76a74a7afcc406d5b4e) )
 	ROM_LOAD16_BYTE( "pm003e.u75", 0x200000, 0x80000, CRC(6bb060fd) SHA1(4fc3946866c5a55e8340b62b5ad9beae723ce0da) )
 
-	ROM_REGION16_BE( 0x80000, RGNCLASS_USER, "user2", 0 )	/* contains real (non-cartoon) women, used after each 3rd round */
+	ROM_REGION16_BE( 0x80000, "user2", 0 )	/* contains real (non-cartoon) women, used after each 3rd round */
 	ROM_LOAD16_WORD_SWAP( "pm017e.u84", 0x00000, 0x80000, CRC(bc41b6ca) SHA1(0aeaf024dd7c84550e7df27230a1d4f04cc1d61c) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_ERASEFF )	/* sprites */
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASEFF )	/* sprites */
 	/* the 06e rom from the other type gals panic board ends up split across 2 roms here */
 	ROM_LOAD( "pm006e.u83",        0x000000, 0x080000, CRC(a7555d9a) SHA1(f95821b3358d9ab03ca9ead38fd358062259d89d) )
 	ROM_LOAD( "pm206e.u82",        0x080000, 0x080000, CRC(cc978baa) SHA1(59a95bcbaeca9d356f61ea42af4da116afbb1491) )
 	ROM_LOAD( "pm018e.u94",        0x100000, 0x080000, CRC(f542d708) SHA1(f515cca9e96401303ed45b4372f6079f29b7a999) )
 	ROM_LOAD( "pm019u_u93-01.u93", 0x180000, 0x010000, CRC(3cb79005) SHA1(05a0b993b9071467265067c3762644f46343d8de) ) // ?? seems to be an extra / replacement enemy?, not sure where it maps, or when it's used, it might load over another rom
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )	/* sprites - encrypted? */
+	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* sprites - encrypted? */
 	ROM_LOAD( "pm013e.u89", 0x180000, 0x080000, CRC(10f27b05) SHA1(0f8ade713f6b430b5a23370a17326d53229951de) )
 	ROM_LOAD( "pm014e.u90", 0x100000, 0x080000, CRC(2f367106) SHA1(1cd16e286e77e8e1b7668bbb6f2978101656b720) )
 	ROM_LOAD( "pm015e.u91", 0x080000, 0x080000, CRC(a563f8ef) SHA1(6e4171746e4d401992bf3a7619d5bed0063d57e5) )
 	ROM_LOAD( "pm016e.u92", 0x000000, 0x080000, CRC(c0b9494c) SHA1(f0b066dd78eb9fcf947da90ddb6c7b62299c5743) )
 
 
-	ROM_REGION( 0x140000, RGNCLASS_SOUND, "oki", 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x140000, "oki", 0 )	/* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
 	ROM_LOAD( "pm008e.u46", 0x00000, 0x80000, CRC(d9379ba8) SHA1(5ae7c743319b1a12f2b101a9f0f8fe0728ed1476) )
 	ROM_RELOAD(             0x40000, 0x80000 )
@@ -401,12 +401,12 @@ ROM_START( galsnew ) /* EXPRO-02 PCB */
 ROM_END
 
 ROM_START( galsnewa ) /* EXPRO-02 PCB */
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x40000, "main", 0 )
 	/* 68000 code */
 	ROM_LOAD16_BYTE( "pm110e.u87-01",  0x000000, 0x20000, CRC(34e1ee0d) SHA1(567df65b04667a6d35725c4a131fb174acb3ad0a) ) /* Export region */
 	ROM_LOAD16_BYTE( "pm109e.u88-01",  0x000001, 0x20000, CRC(c694255a) SHA1(16faf5ea5ff69a0e7a981021ea5fc09a0aefd7cf) )
 
-	ROM_REGION16_BE( 0x300000, RGNCLASS_USER, "user1", 0 )	/* 68000 data */
+	ROM_REGION16_BE( 0x300000, "user1", 0 )	/* 68000 data */
 	ROM_LOAD16_BYTE( "pm004e.u86", 0x000001, 0x80000, CRC(d3af52bc) SHA1(46be057106388578defecab1cdd1793ec76ebe92) )
 	ROM_LOAD16_BYTE( "pm005e.u85", 0x000000, 0x80000, CRC(d7ec650c) SHA1(6c2250c74381497154bf516e0cf1db6bb56bb446) )
 	ROM_LOAD16_BYTE( "pm000e.u74", 0x100001, 0x80000, CRC(5d220f3f) SHA1(7ff373e01027c8832712f7a2d732f8e49b875878) )
@@ -414,25 +414,25 @@ ROM_START( galsnewa ) /* EXPRO-02 PCB */
 	ROM_LOAD16_BYTE( "pm002e.u76", 0x200001, 0x80000, CRC(713ee898) SHA1(c9f608a57fb90e5ee15eb76a74a7afcc406d5b4e) )
 	ROM_LOAD16_BYTE( "pm003e.u75", 0x200000, 0x80000, CRC(6bb060fd) SHA1(4fc3946866c5a55e8340b62b5ad9beae723ce0da) )
 
-	ROM_REGION16_BE( 0x80000, RGNCLASS_USER, "user2", 0 )	/* contains real (non-cartoon) women, used after each 3rd round */
+	ROM_REGION16_BE( 0x80000, "user2", 0 )	/* contains real (non-cartoon) women, used after each 3rd round */
 	ROM_LOAD16_WORD_SWAP( "pm017e.u84", 0x00000, 0x80000, CRC(bc41b6ca) SHA1(0aeaf024dd7c84550e7df27230a1d4f04cc1d61c) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_ERASEFF )	/* sprites */
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASEFF )	/* sprites */
 	/* the 06e rom from the other type gals panic board ends up split across 2 roms here */
 	ROM_LOAD( "pm006e.u83", 0x000000, 0x080000, CRC(a7555d9a) SHA1(f95821b3358d9ab03ca9ead38fd358062259d89d) )
 	ROM_LOAD( "pm206e.u82", 0x080000, 0x080000, CRC(cc978baa) SHA1(59a95bcbaeca9d356f61ea42af4da116afbb1491) )
 	ROM_LOAD( "pm018e.u94", 0x100000, 0x080000, CRC(f542d708) SHA1(f515cca9e96401303ed45b4372f6079f29b7a999) )
 	/* U93 is an empty socket and not used with this set */
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )	/* tiles - encrypted? */
+	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* tiles - encrypted? */
 	ROM_LOAD( "pm013e.u89", 0x180000, 0x080000, CRC(10f27b05) SHA1(0f8ade713f6b430b5a23370a17326d53229951de) )
 	ROM_LOAD( "pm014e.u90", 0x100000, 0x080000, CRC(2f367106) SHA1(1cd16e286e77e8e1b7668bbb6f2978101656b720) )
 	ROM_LOAD( "pm015e.u91", 0x080000, 0x080000, CRC(a563f8ef) SHA1(6e4171746e4d401992bf3a7619d5bed0063d57e5) )
 	ROM_LOAD( "pm016e.u92", 0x000000, 0x080000, CRC(c0b9494c) SHA1(f0b066dd78eb9fcf947da90ddb6c7b62299c5743) )
 
-	ROM_REGION( 0x140000, RGNCLASS_SOUND, "oki", 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x140000, "oki", 0 )	/* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
 	ROM_LOAD( "pm008e.u46", 0x00000, 0x80000, CRC(d9379ba8) SHA1(5ae7c743319b1a12f2b101a9f0f8fe0728ed1476) )
 	ROM_RELOAD(             0x40000, 0x80000 )
@@ -440,12 +440,12 @@ ROM_START( galsnewa ) /* EXPRO-02 PCB */
 ROM_END
 
 ROM_START( galsnewj ) /* EXPRO-02 PCB */
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x40000, "main", 0 )
 	/* 68000 code */
 	ROM_LOAD16_BYTE( "pm110j.u87", 0x000000, 0x20000, CRC(220b6df5) SHA1(d653b67bc66ca341bc660c2bb39b05dcf186fcb7) ) /* Japan region */
 	ROM_LOAD16_BYTE( "pm109j.u88", 0x000001, 0x20000, CRC(17721444) SHA1(9d97fe1ddac99105798fc22375a0b89ab316459a) )
 
-	ROM_REGION16_BE( 0x300000, RGNCLASS_USER, "user1", 0 )	/* 68000 data */
+	ROM_REGION16_BE( 0x300000, "user1", 0 )	/* 68000 data */
 	ROM_LOAD16_BYTE( "pm004e.u86", 0x000001, 0x80000, CRC(d3af52bc) SHA1(46be057106388578defecab1cdd1793ec76ebe92) )
 	ROM_LOAD16_BYTE( "pm005e.u85", 0x000000, 0x80000, CRC(d7ec650c) SHA1(6c2250c74381497154bf516e0cf1db6bb56bb446) )
 	ROM_LOAD16_BYTE( "pm000e.u74", 0x100001, 0x80000, CRC(5d220f3f) SHA1(7ff373e01027c8832712f7a2d732f8e49b875878) )
@@ -453,25 +453,25 @@ ROM_START( galsnewj ) /* EXPRO-02 PCB */
 	ROM_LOAD16_BYTE( "pm002e.u76", 0x200001, 0x80000, CRC(713ee898) SHA1(c9f608a57fb90e5ee15eb76a74a7afcc406d5b4e) )
 	ROM_LOAD16_BYTE( "pm003e.u75", 0x200000, 0x80000, CRC(6bb060fd) SHA1(4fc3946866c5a55e8340b62b5ad9beae723ce0da) )
 
-	ROM_REGION16_BE( 0x80000, RGNCLASS_USER, "user2", ROMREGION_ERASEFF )	/* contains real (non-cartoon) women, used after each 3rd round */
+	ROM_REGION16_BE( 0x80000, "user2", ROMREGION_ERASEFF )	/* contains real (non-cartoon) women, used after each 3rd round */
 	/* U84 is an empty socket and not used with this set */
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_ERASEFF )	/* sprites */
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASEFF )	/* sprites */
 	/* the 06e rom from the other type gals panic board ends up split across 2 roms here */
 	ROM_LOAD( "pm006e.u83", 0x000000, 0x080000, CRC(a7555d9a) SHA1(f95821b3358d9ab03ca9ead38fd358062259d89d) )
 	ROM_LOAD( "pm206e.u82", 0x080000, 0x080000, CRC(cc978baa) SHA1(59a95bcbaeca9d356f61ea42af4da116afbb1491) )
 	ROM_LOAD( "pm018e.u94", 0x100000, 0x080000, CRC(f542d708) SHA1(f515cca9e96401303ed45b4372f6079f29b7a999) )
 	/* U93 is an empty socket and not used with this set */
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )	/* tiles - encrypted? */
+	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* tiles - encrypted? */
 	ROM_LOAD( "pm013e.u89", 0x180000, 0x080000, CRC(10f27b05) SHA1(0f8ade713f6b430b5a23370a17326d53229951de) )
 	ROM_LOAD( "pm014e.u90", 0x100000, 0x080000, CRC(2f367106) SHA1(1cd16e286e77e8e1b7668bbb6f2978101656b720) )
 	ROM_LOAD( "pm015e.u91", 0x080000, 0x080000, CRC(a563f8ef) SHA1(6e4171746e4d401992bf3a7619d5bed0063d57e5) )
 	ROM_LOAD( "pm016e.u92", 0x000000, 0x080000, CRC(c0b9494c) SHA1(f0b066dd78eb9fcf947da90ddb6c7b62299c5743) )
 
-	ROM_REGION( 0x140000, RGNCLASS_SOUND, "oki", 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x140000, "oki", 0 )	/* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
 	ROM_LOAD( "pm008j.u46", 0x00000, 0x80000, CRC(f394670e) SHA1(171f8dc519a13f352e6440aaadebe490c82361f0) )
 	ROM_RELOAD(             0x40000, 0x80000 )

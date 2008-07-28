@@ -59,8 +59,8 @@ INLINE UINT16 *address_to_vram(offs_t *address)
 
 VIDEO_START( artmagic )
 {
-	blitter_base = (UINT16 *)memory_region(machine, RGNCLASS_GFX, "gfx1");
-	blitter_mask = memory_region_length(machine, RGNCLASS_GFX, "gfx1")/2 - 1;
+	blitter_base = (UINT16 *)memory_region(machine, "gfx1");
+	blitter_mask = memory_region_length(machine, "gfx1")/2 - 1;
 }
 
 

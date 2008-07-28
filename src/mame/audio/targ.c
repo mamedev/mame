@@ -112,7 +112,7 @@ WRITE8_HANDLER( targ_audio_2_w )
 {
 	if ((data & 0x01) && !(port_2_last & 0x01))
 	{
-		UINT8 *prom = memory_region(machine, RGNCLASS_SOUND, "targ");
+		UINT8 *prom = memory_region(machine, "targ");
 
 		tone_pointer = (tone_pointer + 1) & 0x0f;
 

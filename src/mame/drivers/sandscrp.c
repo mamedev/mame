@@ -232,7 +232,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sandscrp_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 	int bank = data & 0x07;
 
 	if ( bank != data )	logerror("CPU #1 - PC %04X: Bank %02X\n",activecpu_get_pc(),data);
@@ -486,64 +486,64 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( sandscrp ) /* Z03VA-003 PCB */
-	ROM_REGION( 0x080000, RGNCLASS_CPU, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "11.bin", 0x000000, 0x040000, CRC(9b24ab40) SHA1(3187422dbe8b15d8053be4cb20e56d3e6afbd5f2) ) /* Location is IC4 */
 	ROM_LOAD16_BYTE( "12.bin", 0x000001, 0x040000, CRC(ad12caee) SHA1(83267445b89c3cf4dc317106aa68763d2f29eff7) ) /* Location is IC5 */
 
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x24000, "audio", 0 )		/* Z80 Code */
 	ROM_LOAD( "8.ic51", 0x00000, 0x0c000, CRC(6f3e9db1) SHA1(06a04fa17f44319986913bff70433510c89e38f1) )
 	ROM_CONTINUE(       0x10000, 0x14000 )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "5.ic16", 0x000000, 0x080000, CRC(9bb675f6) SHA1(c3f6768cfd99a0e19ca2224fff9aa4e27ec0da24) )
 	ROM_LOAD( "6.ic17", 0x080000, 0x080000, CRC(7df2f219) SHA1(e2a59e201bfededa92d6c86f8dc1b212527ef66f) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Layers */
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Layers */
 	ROM_LOAD16_BYTE( "4.ic32", 0x000000, 0x080000, CRC(b9222ff2) SHA1(a445da3f7f5dea5ff64bb0b048f624f947875a39) )
 	ROM_LOAD16_BYTE( "3.ic33", 0x000001, 0x080000, CRC(adf20fa0) SHA1(67a7a2be774c86916cbb97e4c9b16c2e48125780) )
 
-	ROM_REGION( 0x040000, RGNCLASS_SOUND, "oki", 0 )	/* Samples */
+	ROM_REGION( 0x040000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "7.ic55", 0x000000, 0x040000, CRC(9870ab12) SHA1(5ea3412cbc57bfaa32a1e2552b2eb46f4ceb5fa8) )
 ROM_END
 
 ROM_START( sandscra ) /* Z03VA-003 PCB, earlier program version */
-	ROM_REGION( 0x080000, RGNCLASS_CPU, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "1.ic4", 0x000000, 0x040000, CRC(c0943ae2) SHA1(04dac4e1f116cd96d6292daa61ef40efc7eba919) )
 	ROM_LOAD16_BYTE( "2.ic5", 0x000001, 0x040000, CRC(6a8e0012) SHA1(2350b11c9bd545c8ba4b3c25cd6547ba2ad474b5) )
 
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x24000, "audio", 0 )		/* Z80 Code */
 	ROM_LOAD( "8.ic51", 0x00000, 0x0c000, CRC(6f3e9db1) SHA1(06a04fa17f44319986913bff70433510c89e38f1) )
 	ROM_CONTINUE(       0x10000, 0x14000 )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "5.ic16", 0x000000, 0x080000, CRC(9bb675f6) SHA1(c3f6768cfd99a0e19ca2224fff9aa4e27ec0da24) )
 	ROM_LOAD( "6.ic17", 0x080000, 0x080000, CRC(7df2f219) SHA1(e2a59e201bfededa92d6c86f8dc1b212527ef66f) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Layers */
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Layers */
 	ROM_LOAD16_BYTE( "4.ic32", 0x000000, 0x080000, CRC(b9222ff2) SHA1(a445da3f7f5dea5ff64bb0b048f624f947875a39) )
 	ROM_LOAD16_BYTE( "3.ic33", 0x000001, 0x080000, CRC(adf20fa0) SHA1(67a7a2be774c86916cbb97e4c9b16c2e48125780) )
 
-	ROM_REGION( 0x040000, RGNCLASS_SOUND, "oki", 0 )	/* Samples */
+	ROM_REGION( 0x040000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "7.ic55", 0x000000, 0x040000, CRC(9870ab12) SHA1(5ea3412cbc57bfaa32a1e2552b2eb46f4ceb5fa8) )
 ROM_END
 
 
 ROM_START( sandscrb ) /* Different rev PCB */
-	ROM_REGION( 0x080000, RGNCLASS_CPU, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "11.ic4", 0x000000, 0x040000, CRC(80020cab) SHA1(4f1f4d8ea07ad745f2d6d3f800686f07fe4bf20f) )
 	ROM_LOAD16_BYTE( "12.ic5", 0x000001, 0x040000, CRC(8df1d42f) SHA1(2a9db5c4b99a8a3f62bffa9ddd96a95e2042602b) )
 
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x24000, "audio", 0 )		/* Z80 Code */
 	ROM_LOAD( "8.ic51", 0x00000, 0x0c000, CRC(6f3e9db1) SHA1(06a04fa17f44319986913bff70433510c89e38f1) )
 	ROM_CONTINUE(       0x10000, 0x14000 )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "ss502.ic16", 0x000000, 0x100000, CRC(d8012ebb) SHA1(975bbb3b57a09e41d2257d4fa3a64097144de554) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* Layers */
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Layers */
 	ROM_LOAD16_WORD_SWAP( "ss501.ic30", 0x000000, 0x100000, CRC(0cf9f99d) SHA1(47f7f120d2bc075bedaff0a44306a8f46a1d848c) )
 
-	ROM_REGION( 0x040000, RGNCLASS_SOUND, "oki", 0 )	/* Samples */
+	ROM_REGION( 0x040000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "7.ic55", 0x000000, 0x040000, CRC(9870ab12) SHA1(5ea3412cbc57bfaa32a1e2552b2eb46f4ceb5fa8) )
 ROM_END
 

@@ -163,7 +163,7 @@ void segaic16_memory_mapper_config(running_machine *machine, const UINT8 *map_da
 void segaic16_memory_mapper_set_decrypted(running_machine *machine, UINT8 *decrypted)
 {
 	struct memory_mapper_chip *chip = &memory_mapper;
-	offs_t romsize = memory_region_length(machine, RGNCLASS_CPU, chip->cpu);
+	offs_t romsize = memory_region_length(machine, chip->cpu);
 	int rgnum;
 
 	/* loop over the regions */
@@ -352,7 +352,7 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 		/* ROM areas need extra clamping */
 		if (rgn->romoffset != ~0)
 		{
-			offs_t romsize = memory_region_length(machine, RGNCLASS_CPU, chip->cpu);
+			offs_t romsize = memory_region_length(machine, chip->cpu);
 			if (region_start >= romsize)
 				read = NULL;
 			else if (region_start + rgn->length > romsize)
@@ -381,7 +381,7 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 				if (!decrypted)
 					decrypted = fd1089_get_decrypted_base();
 
-				memory_configure_bank(banknum, 0, 1, memory_region(machine, RGNCLASS_CPU, chip->cpu) + region_start, 0);
+				memory_configure_bank(banknum, 0, 1, memory_region(machine, chip->cpu) + region_start, 0);
 				if (decrypted)
 					memory_configure_bank_decrypted(banknum, 0, 1, decrypted ? (decrypted + region_start) : 0, 0);
 				memory_set_bank(banknum, 0);

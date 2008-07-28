@@ -490,7 +490,7 @@ static NVRAM_HANDLER( syf )
 		}
 		else
 		{
-			eeprom_set_data(memory_region(machine, RGNCLASS_USER, "user2"),128);
+			eeprom_set_data(memory_region(machine, "user2"),128);
 		}
 	}
 }
@@ -529,25 +529,25 @@ static MACHINE_DRIVER_START( rbmk )
 MACHINE_DRIVER_END
 
 ROM_START( rbmk )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
 	ROM_LOAD( "p1.u64", 0x00000, 0x80000, CRC(83b3c505) SHA1(b943d7312dacdf46d4a55f9dc3cf92e291c40ce7) )
 
-	ROM_REGION( 0x2, RGNCLASS_CPU, "cpu1", 0 ) /* protected MCU? */
+	ROM_REGION( 0x2, "cpu1", 0 ) /* protected MCU? */
 	ROM_LOAD( "89c51.mcu", 0x0, 0x2, NO_DUMP ) // unless it has external rom only?
 
-	ROM_REGION( 0x20000, RGNCLASS_USER, "user1", 0 ) /* ??? mcu data / code */
+	ROM_REGION( 0x20000, "user1", 0 ) /* ??? mcu data / code */
 	ROM_LOAD( "b1.u72", 0x00000, 0x20000,  CRC(1a4991ac) SHA1(523b58caa21b4a073c664c076d2d7bb07a4253cd) )
 
-	ROM_REGION( 0x040000, RGNCLASS_SOUND, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "s1.u83", 0x00000, 0x40000, CRC(44b20e47) SHA1(54691af73aa5d20f9a9afe145447ef1cf34c9a0c) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 ) /* 8x32 tiles, lots of girls etc. */
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* 8x32 tiles, lots of girls etc. */
 	ROM_LOAD( "a1.u41", 0x00000, 0x100000,  CRC(1924de6b) SHA1(1a72ee2fd0abca51893f0985a591573bfd429389) )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", 0 ) /* 8x8 tiles? cards etc */
+	ROM_REGION( 0x80000, "gfx2", 0 ) /* 8x8 tiles? cards etc */
 	ROM_LOAD( "t1.u39", 0x00000, 0x80000, CRC(adf67429) SHA1(ab03c7f68403545f9e86a069581dc3fc3fa6b9c4) )
 
-	ROM_REGION( 0x80, RGNCLASS_USER, "user2", 0 ) /* eeprom */
+	ROM_REGION( 0x80, "user2", 0 ) /* eeprom */
 	ROM_LOAD16_WORD_SWAP( "93c46.u51", 0x00, 0x080, CRC(4ca6ff01) SHA1(66c456eac5b0d1176ef9130baf2e746efdf30152) )
 ROM_END
 

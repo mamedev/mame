@@ -135,7 +135,7 @@ static WRITE8_HANDLER( pending_command_clear_w )
 
 static WRITE8_HANDLER( taotaido_sh_bankswitch_w )
 {
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "audio") + 0x10000;
+	UINT8 *rom = memory_region(machine, "audio") + 0x10000;
 
 	memory_set_bankptr(1,rom + (data & 0x03) * 0x8000);
 }
@@ -367,50 +367,50 @@ MACHINE_DRIVER_END
 
 
 ROM_START( taotaido )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "1-u90.bin", 0x00000, 0x80000, CRC(a3ee30da) SHA1(920a83ce9192bf785bffdc041e280f1a420de4c9) )
 	ROM_LOAD16_WORD_SWAP( "2-u91.bin", 0x80000, 0x80000, CRC(30b7e4fb) SHA1(15e1f6d252c736fdee33b691a0a1a45f0307bffb) )
 
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "audio", 0 ) /* z80 Code */
+	ROM_REGION( 0x30000, "audio", 0 ) /* z80 Code */
 	ROM_LOAD( "3-u113.bin", 0x000000, 0x20000, CRC(a167c4e4) SHA1(d32184e7040935cd440d4d82c66491b710ec87a8) )
 	ROM_RELOAD ( 0x10000, 0x20000 )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "u104.bin",     0x000000, 0x100000, CRC(e89387a9) SHA1(1deeee056af367d1a5aa0722dd3d6c68a82d0489) )
 
-	ROM_REGION( 0x200000, RGNCLASS_SOUND, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x200000, "ym", 0 ) /* sound samples */
 	ROM_LOAD( "u127.bin",     0x00000, 0x200000, CRC(0cf0cb23) SHA1(a87e7159db2fa0d50446cbf45ec9fbf585b8f396) )
 
-	ROM_REGION( 0x600000, RGNCLASS_GFX, "gfx1", 0 ) /* Sprites */
+	ROM_REGION( 0x600000, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD( "u86.bin", 0x000000, 0x200000, CRC(908e251e) SHA1(5a135787f3263bfb195f8fd1e814c580d840531f) )
 	ROM_LOAD( "u87.bin", 0x200000, 0x200000, CRC(c4290ba6) SHA1(4132ffad4668f1dd3f708f009e18435e7dd60120) )
 	ROM_LOAD( "u88.bin", 0x400000, 0x200000, CRC(407d9aeb) SHA1(d532c7b80f6c192dba86542fb6eb3ef24fbbbdb9) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", 0 ) /* BG Tiles */
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles */
 	ROM_LOAD( "u15.bin", 0x000000, 0x200000, CRC(e95823e9) SHA1(362583944ad4fdde4f9e29928cf34376c7ad931f) )
 ROM_END
 
 ROM_START( taotaida )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "tt0-u90.bin", 0x00000, 0x80000, CRC(69d4cca7) SHA1(f1aba74fef8fe4271d19763f428fc0e2674d08b3) )
 	ROM_LOAD16_WORD_SWAP( "tt1-u91.bin", 0x80000, 0x80000, CRC(41025469) SHA1(fa3a424ca3ecb513f418e436e4191ff76f6a0de1) )
 
-	ROM_REGION( 0x30000, RGNCLASS_CPU, "audio", 0 ) /* z80 Code */
+	ROM_REGION( 0x30000, "audio", 0 ) /* z80 Code */
 	ROM_LOAD( "3-u113.bin", 0x000000, 0x20000, CRC(a167c4e4) SHA1(d32184e7040935cd440d4d82c66491b710ec87a8) )
 	ROM_RELOAD ( 0x10000, 0x20000 )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "u104.bin",     0x000000, 0x100000, CRC(e89387a9) SHA1(1deeee056af367d1a5aa0722dd3d6c68a82d0489) )
 
-	ROM_REGION( 0x200000, RGNCLASS_SOUND, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x200000, "ym", 0 ) /* sound samples */
 	ROM_LOAD( "u127.bin",     0x00000, 0x200000, CRC(0cf0cb23) SHA1(a87e7159db2fa0d50446cbf45ec9fbf585b8f396) )
 
-	ROM_REGION( 0x600000, RGNCLASS_GFX, "gfx1", 0 ) /* Sprites */
+	ROM_REGION( 0x600000, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD( "u86.bin", 0x000000, 0x200000, CRC(908e251e) SHA1(5a135787f3263bfb195f8fd1e814c580d840531f) )
 	ROM_LOAD( "u87.bin", 0x200000, 0x200000, CRC(c4290ba6) SHA1(4132ffad4668f1dd3f708f009e18435e7dd60120) )
 	ROM_LOAD( "u88.bin", 0x400000, 0x200000, CRC(407d9aeb) SHA1(d532c7b80f6c192dba86542fb6eb3ef24fbbbdb9) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", 0 ) /* BG Tiles */
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles */
 	ROM_LOAD( "u15.bin", 0x000000, 0x200000, CRC(e95823e9) SHA1(362583944ad4fdde4f9e29928cf34376c7ad931f) )
 ROM_END
 

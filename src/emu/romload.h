@@ -41,8 +41,6 @@ enum
 };
 
 /* ----- per-region constants ----- */
-#define ROMREGION_CLASSMASK			0x000000f0			/* class of region */
-
 #define ROMREGION_WIDTHMASK			0x00000300			/* native width of region, as power of 2 */
 #define		ROMREGION_8BIT			0x00000000			/*    (non-CPU regions only) */
 #define		ROMREGION_16BIT			0x00000100
@@ -176,7 +174,6 @@ struct _rom_load_data
 #define ROMREGION_GETTAG(r)			((r)->_name)
 #define ROMREGION_GETLENGTH(r)		((r)->_length)
 #define ROMREGION_GETFLAGS(r)		((r)->_flags)
-#define ROMREGION_GETCLASS(r)		((ROMREGION_GETFLAGS(r) & ROMREGION_CLASSMASK) >> 4)
 #define ROMREGION_GETWIDTH(r)		(8 << ((ROMREGION_GETFLAGS(r) & ROMREGION_WIDTHMASK) >> 8))
 #define ROMREGION_ISLITTLEENDIAN(r)	((ROMREGION_GETFLAGS(r) & ROMREGION_ENDIANMASK) == ROMREGION_LE)
 #define ROMREGION_ISBIGENDIAN(r)	((ROMREGION_GETFLAGS(r) & ROMREGION_ENDIANMASK) == ROMREGION_BE)
@@ -218,13 +215,13 @@ struct _rom_load_data
 
 
 /* ----- ROM region macros ----- */
-#define ROM_REGION(length,rclass,rtag,flags)		{ rtag, NULL, 0, length, ROMENTRYTYPE_REGION | ((rclass) << 4) | (flags) },
-#define ROM_REGION16_LE(length,rclass,rtag,flags)	ROM_REGION(length, rclass, rtag, (flags) | ROMREGION_16BIT | ROMREGION_LE)
-#define ROM_REGION16_BE(length,rclass,rtag,flags)	ROM_REGION(length, rclass, rtag, (flags) | ROMREGION_16BIT | ROMREGION_BE)
-#define ROM_REGION32_LE(length,rclass,rtag,flags)	ROM_REGION(length, rclass, rtag, (flags) | ROMREGION_32BIT | ROMREGION_LE)
-#define ROM_REGION32_BE(length,rclass,rtag,flags)	ROM_REGION(length, rclass, rtag, (flags) | ROMREGION_32BIT | ROMREGION_BE)
-#define ROM_REGION64_LE(length,rclass,rtag,flags)	ROM_REGION(length, rclass, rtag, (flags) | ROMREGION_64BIT | ROMREGION_LE)
-#define ROM_REGION64_BE(length,rclass,rtag,flags)	ROM_REGION(length, rclass, rtag, (flags) | ROMREGION_64BIT | ROMREGION_BE)
+#define ROM_REGION(length,tag,flags)				{ tag, NULL, 0, length, ROMENTRYTYPE_REGION | (flags) },
+#define ROM_REGION16_LE(length,tag,flags)			ROM_REGION(length, tag, (flags) | ROMREGION_16BIT | ROMREGION_LE)
+#define ROM_REGION16_BE(length,tag,flags)			ROM_REGION(length, tag, (flags) | ROMREGION_16BIT | ROMREGION_BE)
+#define ROM_REGION32_LE(length,tag,flags)			ROM_REGION(length, tag, (flags) | ROMREGION_32BIT | ROMREGION_LE)
+#define ROM_REGION32_BE(length,tag,flags)			ROM_REGION(length, tag, (flags) | ROMREGION_32BIT | ROMREGION_BE)
+#define ROM_REGION64_LE(length,tag,flags)			ROM_REGION(length, tag, (flags) | ROMREGION_64BIT | ROMREGION_LE)
+#define ROM_REGION64_BE(length,tag,flags)			ROM_REGION(length, tag, (flags) | ROMREGION_64BIT | ROMREGION_BE)
 
 
 /* ----- core ROM loading macros ----- */
@@ -250,7 +247,7 @@ struct _rom_load_data
 #define ROM_RELOAD(offset,length)					{ NULL, NULL, offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS },
 #define ROM_IGNORE(length)							{ NULL, NULL, 0,      length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS },
 #define ROM_FILL(offset,length,value)				{ NULL, (const char *)value, offset, length, ROMENTRYTYPE_FILL },
-#define ROM_COPY(rclass,rtag,srcoffs,offset,length) { rtag, (const char *)srcoffs, offset, length, ROMENTRYTYPE_COPY | ((rclass) << 4) },
+#define ROM_COPY(srctag,srcoffs,offset,length) 		{ srctag, (const char *)srcoffs, offset, length, ROMENTRYTYPE_COPY },
 
 
 /* ----- system BIOS macros ----- */
@@ -258,7 +255,7 @@ struct _rom_load_data
 
 
 /* ----- disk loading macros ----- */
-#define DISK_REGION(type, tag)						ROM_REGION(1, type, tag, ROMREGION_DATATYPEDISK)
+#define DISK_REGION(tag)							ROM_REGION(1, tag, ROMREGION_DATATYPEDISK)
 #define DISK_IMAGE(name,idx,hash)					ROMX_LOAD(name, idx, 0, hash, DISK_READWRITE)
 #define DISK_IMAGE_READONLY(name,idx,hash)			ROMX_LOAD(name, idx, 0, hash, DISK_READONLY)
 

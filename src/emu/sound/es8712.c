@@ -226,7 +226,7 @@ static void *es8712_start(const char *tag, int sndindex, int clock, const void *
 	chip->repeat = 0;
 
 	chip->bank_offset = 0;
-	chip->region_base = memory_region(Machine, RGNCLASS_SOUND, tag);
+	chip->region_base = memory_region(Machine, tag);
 
 	/* generate the name and create the stream */
 	chip->stream = stream_create(0, 1, clock, chip, es8712_update);

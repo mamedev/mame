@@ -54,7 +54,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( empty )
-	ROM_REGION( 0x10, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x10, "user1", 0 )
 ROM_END
 
 

@@ -105,7 +105,7 @@ static void gpworld_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 	int i;
 
-	UINT8 *GFX = memory_region(machine, RGNCLASS_GFX, "gfx2");
+	UINT8 *GFX = memory_region(machine, "gfx2");
 
 	/* Heisted from Daphne which heisted it from MAME */
 	for (i = 0; i < 0x800; i += 8)
@@ -461,17 +461,17 @@ MACHINE_DRIVER_END
 
 
 ROM_START( gpworld )
-	ROM_REGION( 0xc000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0xc000, "main", 0 )
 	ROM_LOAD( "epr6162a.ic51", 0x0000, 0x4000, CRC(70e42574) SHA1(2fa50c7a67a2efb6b2c313850ace40e42d18b0a8) )
 	ROM_LOAD( "epr6163.ic67",  0x4000, 0x4000, CRC(49539e46) SHA1(7cfd5b6b356c3fa5439e6fe3ac2e6a097b722a2c) )
 	ROM_LOAD( "epr6164.ic83",  0x8000, 0x4000, CRC(7f0e6853) SHA1(c255ac6e4b61faa8da9b5aa70f12c868b81acfe1) )
 
 	/* Tiles */
-	ROM_REGION( 0x1000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "epr6148.ic18", 0x0000, 0x1000, CRC(a4b11cf5) SHA1(9697494335089b13071d773812eec373ef5b358c) )
 
 	/* Sprites */
-	ROM_REGION( 0x30000, RGNCLASS_GFX, "gfx2", 0 )
+	ROM_REGION( 0x30000, "gfx2", 0 )
 	ROM_LOAD( "epr6149.ic111", 0x00000, 0x4000, CRC(7e6c4797) SHA1(acf934e1f3f55a0d1cd1630f6a78f9954f1ec53f) )
 	ROM_LOAD( "epr6151.ic110", 0x04000, 0x4000, CRC(26d72b96) SHA1(759ef85877edfc37f2a1a242bf1c9b0e8d5e9a88) )
 	ROM_LOAD( "epr6150.ic128", 0x08000, 0x4000, CRC(6837e095) SHA1(b2ac8341fcf0037d186b0759227597643ca0336d) )
@@ -486,7 +486,7 @@ ROM_START( gpworld )
 	/*                 ic123 Unpopulated? */
 
 	/* Misc PROMs */
-	ROM_REGION( 0x0220, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0220, "proms", 0 )
 	ROM_LOAD( "pr6146.ic2",  0x000, 0x020, CRC(d10801a0) SHA1(89e9ac0d9c9eee6efd5455a3416c436ceda8f632) )
 	ROM_LOAD( "pr6147.ic28", 0x020, 0x100, CRC(b7173df9) SHA1(044beda43cb1793033021a08b3ee3441d5ffe6c3) )
 	ROM_LOAD( "pr5501.ic14", 0x120, 0x100, CRC(1bdf71d4) SHA1(ac52e948cce6df4abb7543c08e2c6454efd63e79) )

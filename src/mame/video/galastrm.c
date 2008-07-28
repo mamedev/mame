@@ -107,7 +107,7 @@ static struct tempsprite *sprite_ptr_pre;
 
 static void draw_sprites_pre(running_machine *machine, int x_offs, int y_offs)
 {
-	UINT16 *spritemap = (UINT16 *)memory_region(machine, RGNCLASS_USER, "user1");
+	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;

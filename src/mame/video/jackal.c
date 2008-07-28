@@ -66,7 +66,7 @@ void jackal_mark_tile_dirty(int offset)
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "master");
+	UINT8 *RAM = memory_region(machine, "master");
 
 	int attr = RAM[0x2000 + tile_index];
 	int code = RAM[0x2400 + tile_index] + ((attr & 0xc0) << 2) + ((attr & 0x30) << 6);
@@ -83,7 +83,7 @@ VIDEO_START( jackal )
 
 static void draw_background( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "master");
+	UINT8 *RAM = memory_region(machine, "master");
 	int i;
 
 	jackal_scrollram = &RAM[0x0020];
@@ -204,7 +204,7 @@ static void draw_sprites_region(running_machine *machine, bitmap_t *bitmap, cons
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "master");
+	UINT8 *RAM = memory_region(machine, "master");
 	UINT8 *sr, *ss;
 
 	if (jackal_videoctrl[0x03] & 0x08)

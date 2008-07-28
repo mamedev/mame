@@ -332,7 +332,7 @@ static void drawbs2(running_machine *machine, bitmap_t *bitmap, const rectangle 
 static void punchout_copy_top_palette(running_machine *machine, int bank)
 {
 	int i;
-	const UINT8 *color_prom = memory_region(machine, RGNCLASS_PROMS, "proms");
+	const UINT8 *color_prom = memory_region(machine, "proms");
 
 	// top monitor palette
 	for (i = 0; i < 0x100; i++)
@@ -351,7 +351,7 @@ static void punchout_copy_top_palette(running_machine *machine, int bank)
 static void punchout_copy_bot_palette(running_machine *machine, int bank)
 {
 	int i;
-	const UINT8 *color_prom = memory_region(machine, RGNCLASS_PROMS, "proms") + 0x600;
+	const UINT8 *color_prom = memory_region(machine, "proms") + 0x600;
 
 	// bottom monitor palette
 	for (i = 0; i < 0x100; i++)

@@ -539,7 +539,7 @@ GFXDECODE_END
 
 static WRITE8_HANDLER( deroon_bankswitch_w )
 {
-	memory_set_bankptr( 1, memory_region(machine, RGNCLASS_CPU, "audio") + ((data-2) & 0x0f) * 0x4000 + 0x10000 );
+	memory_set_bankptr( 1, memory_region(machine, "audio") + ((data-2) & 0x0f) * 0x4000 + 0x10000 );
 }
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -565,7 +565,7 @@ static WRITE8_HANDLER( tecmosys_oki_bank_w )
 {
 	UINT8 upperbank = (data & 0x30) >> 4;
 	UINT8 lowerbank = (data & 0x03) >> 0;
-	UINT8* region = memory_region(machine, RGNCLASS_SOUND, "oki");
+	UINT8* region = memory_region(machine, "oki");
 
 	memcpy( region+0x00000, region+0x80000 + lowerbank * 0x20000, 0x20000  );
 	memcpy( region+0x20000, region+0x80000 + upperbank * 0x20000, 0x20000  );
@@ -617,7 +617,7 @@ static VIDEO_START(deroon)
 
 static void tecmosys_render_sprites_to_bitmap(running_machine *machine, bitmap_t *bitmap, UINT16 extrax, UINT16 extray )
 {
-	UINT8 *gfxsrc    = memory_region       ( machine, RGNCLASS_GFX, "gfx1" );
+	UINT8 *gfxsrc    = memory_region       ( machine, "gfx1" );
 	int i;
 
 	/* render sprites (with priority information) to temp bitmap */
@@ -962,19 +962,19 @@ MACHINE_DRIVER_END
 
 
 ROM_START( deroon )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) // Main Program
+	ROM_REGION( 0x100000, "main", 0 ) // Main Program
 	ROM_LOAD16_BYTE( "t001.upau1", 0x00000, 0x80000, CRC(14b92c18) SHA1(b47b8c828222a3f7c0fe9271899bd38171d972fb) )
 	ROM_LOAD16_BYTE( "t002.upal1", 0x00001, 0x80000, CRC(0fb05c68) SHA1(5140592e15414770fb46d5ac9ba8f76e3d4ab323) )
 
-	ROM_REGION( 0x048000, RGNCLASS_CPU, "audio", 0 ) // Sound Porgram
+	ROM_REGION( 0x048000, "audio", 0 ) // Sound Porgram
 	ROM_LOAD( "t003.uz1", 0x000000, 0x008000, CRC(8bdfafa0) SHA1(c0cf3eb7a65d967958fe2aace171859b0faf7753) )
 	ROM_CONTINUE(         0x010000, 0x038000 ) /* banked part */
 
-	ROM_REGION( 0x2200, RGNCLASS_CPU, "cpu2", 0 ) // MCU is a 68HC11A8 with 8k ROM, 512 bytes EEPROM
+	ROM_REGION( 0x2200, "cpu2", 0 ) // MCU is a 68HC11A8 with 8k ROM, 512 bytes EEPROM
 	ROM_LOAD( "deroon_68hc11a8.rom",    0x0000, 0x2000, NO_DUMP )
 	ROM_LOAD( "deroon_68hc11a8.eeprom", 0x2000, 0x0200, NO_DUMP )
 
-	ROM_REGION( 0x2000000, RGNCLASS_GFX, "gfx1", ROMREGION_ERASE00 ) // Sprites (non-tile based)
+	ROM_REGION( 0x2000000, "gfx1", ROMREGION_ERASE00 ) // Sprites (non-tile based)
 	/* all these roms need verifying, they could be half size */
 
 	ROM_LOAD16_BYTE( "t101.uah1", 0x0000000, 0x200000, CRC(74baf845) SHA1(935d2954ba227a894542be492654a2750198e1bc) )
@@ -984,39 +984,39 @@ ROM_START( deroon )
 	/*                            0x1000000, 0x400000 - no rom loaded here, these gfx are 4bpp */
 	ROM_LOAD16_BYTE( "t104.ucl1", 0x1000001, 0x200000, CRC(66eb611a) SHA1(64435d35677fea3c06fdb03c670f3f63ee481c02) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) // 8x8 4bpp tiles
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE ) // 8x8 4bpp tiles
 	ROM_LOAD( "t301.ubd1", 0x000000, 0x100000, CRC(8b026177) SHA1(3887856bdaec4d9d3669fe3bc958ef186fbe9adb) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx3", ROMREGION_ERASE00) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_ERASE00) // 16x16 4bpp tiles
 	/* not used? */
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx4", ROMREGION_ERASE00 ) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, "gfx4", ROMREGION_ERASE00 ) // 16x16 4bpp tiles
 	ROM_LOAD( "t201.ubb1", 0x000000, 0x100000, CRC(d5a087ac) SHA1(5098160ce7719d93e3edae05f6edd317d4c61f0d) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx5", ROMREGION_ERASE00 ) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, "gfx5", ROMREGION_ERASE00 ) // 16x16 4bpp tiles
 	ROM_LOAD( "t202.ubc1", 0x000000, 0x100000, CRC(f051dae1) SHA1(f5677c07fe644b3838657370f0309fb09244c619) )
 
-	ROM_REGION( 0x200000, RGNCLASS_SOUND, "ymz", 0 ) // YMZ280B Samples
+	ROM_REGION( 0x200000, "ymz", 0 ) // YMZ280B Samples
 	ROM_LOAD( "t401.uya1", 0x000000, 0x200000, CRC(92111992) SHA1(ae27e11ae76dec0b9892ad32e1a8bf6ab11f2e6c) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 ) // M6295 Samples
+	ROM_REGION( 0x100000, "oki", 0 ) // M6295 Samples
 	ROM_LOAD( "t501.uad1", 0x080000, 0x080000, CRC(2fbcfe27) SHA1(f25c830322423f0959a36955edb563a6150f2142) )
 ROM_END
 
 ROM_START( tkdensho )
-	ROM_REGION( 0x600000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x600000, "main", 0 )
 	ROM_LOAD16_BYTE( "aeprge-2.pal", 0x00000, 0x80000, CRC(25e453d6) SHA1(9c84e2af42eff5cc9b14c1759d5bab42fa7bb663) )
 	ROM_LOAD16_BYTE( "aeprgo-2.pau", 0x00001, 0x80000, CRC(22d59510) SHA1(5ade482d6ab9a22df2ee8337458c22cfa9045c73) )
 
-	ROM_REGION( 0x038000, RGNCLASS_CPU, "audio", 0 ) // Sound Porgram
+	ROM_REGION( 0x038000, "audio", 0 ) // Sound Porgram
 	ROM_LOAD( "aesprg-2.z1", 0x000000, 0x008000, CRC(43550ab6) SHA1(2580129ef8ebd9295249175de4ba985c752e06fe) )
 	ROM_CONTINUE(            0x010000, 0x018000 ) /* banked part */
 
-	ROM_REGION( 0x2200, RGNCLASS_CPU, "cpu2", 0 ) // MCU is a 68HC11A8 with 8k ROM, 512 bytes EEPROM
+	ROM_REGION( 0x2200, "cpu2", 0 ) // MCU is a 68HC11A8 with 8k ROM, 512 bytes EEPROM
 	ROM_LOAD( "tkdensho_68hc11a8.rom",    0x0000, 0x2000, NO_DUMP )
 	ROM_LOAD( "tkdensho_68hc11a8.eeprom", 0x2000, 0x0200, NO_DUMP )
 
-	ROM_REGION( 0x4000000, RGNCLASS_GFX, "gfx1", ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
+	ROM_REGION( 0x4000000, "gfx1", ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
 	ROM_LOAD16_BYTE( "ae100h.ah1",    0x0000000, 0x0400000, CRC(06be252b) SHA1(08d1bb569fd2e66e2c2f47da7780b31945232e62) )
 	ROM_LOAD16_BYTE( "ae100.al1",     0x0000001, 0x0400000, CRC(009cdff4) SHA1(fd88f07313d14fd4429b09a1e8d6b595df3b98e5) )
 	ROM_LOAD16_BYTE( "ae101h.bh1",    0x0800000, 0x0400000, CRC(f2469eff) SHA1(ba49d15cc7949437ba9f56d9b425a5f0e62137df) )
@@ -1027,40 +1027,40 @@ ROM_START( tkdensho )
 	ROM_LOAD16_BYTE( "ae105.fl1",     0x2800001, 0x0400000, CRC(b7f9ebc1) SHA1(987f664072b43a578b39fa6132aaaccc5fe5bfc2) )
 	ROM_LOAD16_BYTE( "ae106.gl1",     0x3000001, 0x0200000, CRC(7c50374b) SHA1(40865913125230122072bb13f46fb5fb60c088ea) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) // 8x8 4bpp tiles
+	ROM_REGION( 0x080000, "gfx2", ROMREGION_DISPOSE ) // 8x8 4bpp tiles
 	ROM_LOAD( "ae300w36.bd1",  0x000000, 0x0080000, CRC(e829f29e) SHA1(e56bfe2669ed1d1ae394c644def426db129d97e3) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE ) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE ) // 16x16 4bpp tiles
 	ROM_LOAD( "ae200w74.ba1",  0x000000, 0x0100000, CRC(c1645041) SHA1(323670a6aa2a4524eb968cc0b4d688098ffeeb12) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE ) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, "gfx4", ROMREGION_DISPOSE ) // 16x16 4bpp tiles
 	ROM_LOAD( "ae201w75.bb1",  0x000000, 0x0100000, CRC(3f63bdff) SHA1(0d3d57fdc0ec4bceef27c11403b3631d23abadbf) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx5", ROMREGION_DISPOSE ) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, "gfx5", ROMREGION_DISPOSE ) // 16x16 4bpp tiles
 	ROM_LOAD( "ae202w76.bc1",  0x000000, 0x0100000, CRC(5cc857ca) SHA1(2553fb5220433acc15dfb726dc064fe333e51d88) )
 
-	ROM_REGION( 0x800000, RGNCLASS_SOUND, "ymz", 0 ) // YMZ280B Samples
+	ROM_REGION( 0x800000, "ymz", 0 ) // YMZ280B Samples
 	ROM_LOAD( "ae400t23.ya1", 0x000000, 0x200000, CRC(c6ffb043) SHA1(e0c6c5f6b840f63c9a685a2c3be66efa4935cbeb) )
 	ROM_LOAD( "ae401t24.yb1", 0x200000, 0x200000, CRC(d83f1a73) SHA1(412b7ac9ff09a984c28b7d195330d78c4aac3dc5) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 ) // M6295 Samples
+	ROM_REGION( 0x100000, "oki", 0 ) // M6295 Samples
 	ROM_LOAD( "ae500w07.ad1", 0x080000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
 ROM_END
 
 ROM_START( tkdensha )
-	ROM_REGION( 0x600000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x600000, "main", 0 )
 	ROM_LOAD16_BYTE( "aeprge.pal", 0x00000, 0x80000, CRC(17a209ff) SHA1(b5dbea9868cbb89d4e27bf19fdb616ac256985b4) )
 	ROM_LOAD16_BYTE( "aeprgo.pau", 0x00001, 0x80000, CRC(d265e6a1) SHA1(f39d8ce115f197a660f5210b2483108854eb12a9) )
 
-	ROM_REGION( 0x038000, RGNCLASS_CPU, "audio", 0 ) // Sound Porgram
+	ROM_REGION( 0x038000, "audio", 0 ) // Sound Porgram
 	ROM_LOAD( "aesprg-2.z1", 0x000000, 0x008000, CRC(43550ab6) SHA1(2580129ef8ebd9295249175de4ba985c752e06fe) )
 	ROM_CONTINUE(            0x010000, 0x018000 ) /* banked part */
 
-	ROM_REGION( 0x2200, RGNCLASS_CPU, "cpu2", 0 ) // MCU is a 68HC11A8 with 8k ROM, 512 bytes EEPROM
+	ROM_REGION( 0x2200, "cpu2", 0 ) // MCU is a 68HC11A8 with 8k ROM, 512 bytes EEPROM
 	ROM_LOAD( "tkdensho_68hc11a8.rom",    0x0000, 0x2000, NO_DUMP )
 	ROM_LOAD( "tkdensho_68hc11a8.eeprom", 0x2000, 0x0200, NO_DUMP )
 
-	ROM_REGION( 0x4000000, RGNCLASS_GFX, "gfx1", ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
+	ROM_REGION( 0x4000000, "gfx1", ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
 	ROM_LOAD16_BYTE( "ae100h.ah1",    0x0000000, 0x0400000, CRC(06be252b) SHA1(08d1bb569fd2e66e2c2f47da7780b31945232e62) )
 	ROM_LOAD16_BYTE( "ae100.al1",     0x0000001, 0x0400000, CRC(009cdff4) SHA1(fd88f07313d14fd4429b09a1e8d6b595df3b98e5) )
 	ROM_LOAD16_BYTE( "ae101h.bh1",    0x0800000, 0x0400000, CRC(f2469eff) SHA1(ba49d15cc7949437ba9f56d9b425a5f0e62137df) )
@@ -1071,23 +1071,23 @@ ROM_START( tkdensha )
 	ROM_LOAD16_BYTE( "ae105.fl1",     0x2800001, 0x0400000, CRC(b7f9ebc1) SHA1(987f664072b43a578b39fa6132aaaccc5fe5bfc2) )
 	ROM_LOAD16_BYTE( "ae106.gl1",     0x3000001, 0x0200000, CRC(7c50374b) SHA1(40865913125230122072bb13f46fb5fb60c088ea) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) // 8x8 4bpp tiles
+	ROM_REGION( 0x080000, "gfx2", ROMREGION_DISPOSE ) // 8x8 4bpp tiles
 	ROM_LOAD( "ae300w36.bd1",  0x000000, 0x0080000, CRC(e829f29e) SHA1(e56bfe2669ed1d1ae394c644def426db129d97e3) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE ) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE ) // 16x16 4bpp tiles
 	ROM_LOAD( "ae200w74.ba1",  0x000000, 0x0100000, CRC(c1645041) SHA1(323670a6aa2a4524eb968cc0b4d688098ffeeb12) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE ) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, "gfx4", ROMREGION_DISPOSE ) // 16x16 4bpp tiles
 	ROM_LOAD( "ae201w75.bb1",  0x000000, 0x0100000, CRC(3f63bdff) SHA1(0d3d57fdc0ec4bceef27c11403b3631d23abadbf) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx5", ROMREGION_DISPOSE ) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, "gfx5", ROMREGION_DISPOSE ) // 16x16 4bpp tiles
 	ROM_LOAD( "ae202w76.bc1",  0x000000, 0x0100000, CRC(5cc857ca) SHA1(2553fb5220433acc15dfb726dc064fe333e51d88) )
 
-	ROM_REGION( 0x800000, RGNCLASS_SOUND, "ymz", 0 ) // YMZ280B Samples
+	ROM_REGION( 0x800000, "ymz", 0 ) // YMZ280B Samples
 	ROM_LOAD( "ae400t23.ya1", 0x000000, 0x200000, CRC(c6ffb043) SHA1(e0c6c5f6b840f63c9a685a2c3be66efa4935cbeb) )
 	ROM_LOAD( "ae401t24.yb1", 0x200000, 0x200000, CRC(d83f1a73) SHA1(412b7ac9ff09a984c28b7d195330d78c4aac3dc5) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 ) // M6295 Samples
+	ROM_REGION( 0x100000, "oki", 0 ) // M6295 Samples
 	ROM_LOAD( "ae500w07.ad1", 0x080000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
 ROM_END
 
@@ -1099,8 +1099,8 @@ static MACHINE_RESET( deroon )
 
 static void tecmosys_decramble(running_machine *machine)
 {
-	UINT8 *gfxsrc    = memory_region       ( machine, RGNCLASS_GFX, "gfx1" );
-	size_t  srcsize = memory_region_length( machine, RGNCLASS_GFX, "gfx1" );
+	UINT8 *gfxsrc    = memory_region       ( machine, "gfx1" );
+	size_t  srcsize = memory_region_length( machine, "gfx1" );
 	int i;
 
 	for (i=0; i < srcsize; i+=4)

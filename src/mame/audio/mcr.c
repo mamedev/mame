@@ -269,7 +269,7 @@ void mcr_sound_reset(void)
 */
 static void ssio_compute_ay8910_modulation(void)
 {
-	UINT8 *prom = memory_region(Machine, RGNCLASS_PROMS, "proms");
+	UINT8 *prom = memory_region(Machine, "proms");
 	int volval;
 
 	/* loop over all possible values of the duty cycle */

@@ -16,7 +16,7 @@ static void draw_boxer(running_machine *machine, bitmap_t* bitmap, const rectang
 
 	for (n = 0; n < 2; n++)
 	{
-		const UINT8* p = memory_region(machine, RGNCLASS_USER, n == 0 ? "user1" : "user2");
+		const UINT8* p = memory_region(machine, n == 0 ? "user1" : "user2");
 
 		int i;
 		int j;

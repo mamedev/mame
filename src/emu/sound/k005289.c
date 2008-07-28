@@ -172,7 +172,7 @@ static void *k005289_start(const char *tag, int sndindex, int clock, const void 
 	if (make_mixer_table(info, 2))
 		return NULL;
 
-	info->sound_prom = memory_region(Machine, RGNCLASS_SOUND, tag);
+	info->sound_prom = memory_region(Machine, tag);
 
 	/* reset all the voices */
 	voice[0].frequency = 0;

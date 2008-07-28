@@ -43,7 +43,7 @@ static READ8_HANDLER( trvquest_question_r )
 {
 	gameplan_state *state = machine->driver_data;
 
-	return memory_region(machine, RGNCLASS_USER, "user1")[*state->trvquest_question * 0x2000 + offset];
+	return memory_region(machine, "user1")[*state->trvquest_question * 0x2000 + offset];
 }
 
 static WRITE8_HANDLER( trvquest_coin_w )
@@ -225,14 +225,14 @@ static MACHINE_DRIVER_START( trvquest )
 MACHINE_DRIVER_END
 
 ROM_START( trvquest )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "rom3", 0xb000, 0x1000, CRC(2ff7f370) SHA1(66f40426ed02ee44235e17a49d9054ede42b83b9) )
 	ROM_LOAD( "rom4", 0xc000, 0x1000, CRC(b1adebcb) SHA1(661cabc92b1defce5c2edb8e873a80d5032084d0) )
 	ROM_LOAD( "rom5", 0xd000, 0x1000, CRC(2fc10a15) SHA1(8ecce32a5a167056c8fb48554a8907ae6299921e) )
 	ROM_LOAD( "rom6", 0xe000, 0x1000, CRC(fabf4846) SHA1(862cac32de78f2ff4afef398b864d5533d302a4f) )
 	ROM_LOAD( "rom7", 0xf000, 0x1000, CRC(a9f56551) SHA1(fb6fc3b17a6e66571a5ba837befbfac1ac26cc39) )
 
-	ROM_REGION( 0x18000, RGNCLASS_USER, "user1", ROMREGION_ERASEFF ) /* Question roms */
+	ROM_REGION( 0x18000, "user1", ROMREGION_ERASEFF ) /* Question roms */
 	/* 0x00000 - 0x07fff empty */
 	ROM_LOAD( "romi", 0x06000, 0x2000, CRC(c8368f69) SHA1(c1dfb701482c5ae922df0a93665a519995a2f4f1) )
 	ROM_LOAD( "romh", 0x08000, 0x2000, CRC(f3aa8a08) SHA1(2bf8f878cc1df84806a6fb8e7be2656c422d61b9) )

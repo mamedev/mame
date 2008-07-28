@@ -378,8 +378,8 @@ void mc8123_decrypt_rom(running_machine *machine, const char *cpu, const char *k
 {
 	UINT8 *decrypted1 = auto_malloc(numbanks == 1 ? 0xc000 : 0x8000);
 	UINT8 *decrypted2 = numbanks > 1 ? auto_malloc(0x4000 * numbanks) : decrypted1 + 0x8000;
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, cpu);
-	UINT8 *key = memory_region(machine, RGNCLASS_USER, keyrgn);
+	UINT8 *rom = memory_region(machine, cpu);
+	UINT8 *key = memory_region(machine, keyrgn);
 	int A, bank;
 
 	memory_set_decrypted_region(mame_find_cpu_index(machine, cpu), 0x0000, 0x7fff, decrypted1);

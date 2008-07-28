@@ -23,14 +23,14 @@ static int bg1_bank = 0, bg2_bank = 0;
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	UINT8 *region = memory_region(machine, RGNCLASS_GFX, "gfx3") + 0x200000 + 0x80000 * bg1_bank;
+	UINT8 *region = memory_region(machine, "gfx3") + 0x200000 + 0x80000 * bg1_bank;
 	int code = region[tile_index*2] + (region[tile_index*2+1] << 8);
 	SET_TILE_INFO(2, code, 0, 0);
 }
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	UINT8 *region = memory_region(machine, RGNCLASS_GFX, "gfx2") + 0x200000 + 0x80000 * bg2_bank;
+	UINT8 *region = memory_region(machine, "gfx2") + 0x200000 + 0x80000 * bg2_bank;
 	int code = region[tile_index*2] + (region[tile_index*2+1] << 8);
 	SET_TILE_INFO(1, code, 0, 0);
 }
@@ -98,7 +98,7 @@ static VIDEO_UPDATE( cultures )
 
 static WRITE8_HANDLER( cpu_bankswitch_w )
 {
-	memory_set_bankptr(1, memory_region(machine, RGNCLASS_CPU, "main") + 0x4000 * (data & 0xf));
+	memory_set_bankptr(1, memory_region(machine, "main") + 0x4000 * (data & 0xf));
 	video_enable = ~data & 0x20;
 }
 
@@ -116,8 +116,8 @@ static WRITE8_HANDLER( misc_w )
 	if(old_bank != new_bank)
 	{
 		// oki banking
-		UINT8 *src = memory_region(machine, RGNCLASS_SOUND, "oki") + 0x40000 + 0x20000 * new_bank;
-		UINT8 *dst = memory_region(machine, RGNCLASS_SOUND, "oki") + 0x20000;
+		UINT8 *src = memory_region(machine, "oki") + 0x40000 + 0x20000 * new_bank;
+		UINT8 *dst = memory_region(machine, "oki") + 0x20000;
 		memcpy(dst, src, 0x20000);
 
 		old_bank = new_bank;
@@ -427,24 +427,24 @@ P custom      custom
 */
 
 ROM_START( cultures )
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x40000, "main", 0 )
 	ROM_LOAD( "ma01.u12",     0x000000, 0x040000, CRC(f57417b3) SHA1(9a2a50222f54e5da9bc5c66863b8be16e33b171f) )
 
-	ROM_REGION( 0x300000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x300000, "gfx1", 0 )
 	ROM_LOAD( "bg0c.u45",     0x000000, 0x200000, CRC(ad2e1263) SHA1(b28a3d82aaa0421a7b4df837814147b109e7d1a5) )
 	ROM_LOAD( "bg0c2.u46",    0x200000, 0x100000, CRC(97c71c09) SHA1(ffbcee1d9cb39d0824f3aa652c3a24579113cf2e) )
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )
 	ROM_LOAD( "bg1c.u80",     0x000000, 0x200000, CRC(9ab99bd9) SHA1(bce41b6f5d83c8262ba8d37b2dfcd5d7a5e7ace7) )
 	ROM_LOAD( "bg2t.u79",     0x200000, 0x100000, CRC(0610a79f) SHA1(9fc6b2e5c573ed682b2f7fa462c8f42ff99da5ba) )
 	/* 0x300000 - 0x3fffff empty */
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx3", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASE00 )
 	ROM_LOAD( "bg2c.u68",     0x000000, 0x200000, CRC(fa598644) SHA1(532249e456c34f18a787d5a028df82f2170f604d) )
 	ROM_LOAD( "bg1t.u67",     0x200000, 0x100000, CRC(d2e594ee) SHA1(a84b5ab62dec1867d433ccaeb1381e7593958cf0) )
 	/* 0x300000 - 0x3fffff empty */
 
-	ROM_REGION( 0x240000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x240000, "oki", 0 )
 	ROM_LOAD( "pcm.u87",      0x040000, 0x200000, CRC(84206475) SHA1(d1423bd5c7425e121fb4e7845cf57801e9afa7b3) )
 	ROM_RELOAD(               0x000000, 0x020000 )
 ROM_END

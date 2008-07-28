@@ -409,7 +409,7 @@ static WRITE8_HANDLER( goonies_rom_banking )
 		case 2: /* code bank 1 */
 		case 4: /* code bank 2 */
 		{
-			UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "main" );
+			UINT8 *prg = memory_region( machine, "main" );
 			memcpy( &prg[0x08000 + reg*0x1000], &prg[bankoffset], 0x2000 );
 		}
 		break;
@@ -428,7 +428,7 @@ DRIVER_INIT( goonies )
 {
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "main" );
+	UINT8 *prg = memory_region( machine, "main" );
 	memcpy( &prg[0x08000], &prg[0x18000], 0x8000 );
 
 	/* banking is done with writes to the $8000-$ffff area */
@@ -445,7 +445,7 @@ DRIVER_INIT( vsgradus )
 {
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "main" );
+	UINT8 *prg = memory_region( machine, "main" );
 	memcpy( &prg[0x08000], &prg[0x18000], 0x8000 );
 
 	/* banking is done with writes to the $8000-$ffff area */
@@ -504,7 +504,7 @@ static WRITE8_HANDLER( vsgshoe_gun_in0_w )
 	int addr;
 	if((data & 0x04) != old_bank)
 	{
-		UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "main" );
+		UINT8 *prg = memory_region( machine, "main" );
 		old_bank = data & 0x04;
 		addr = old_bank ? 0x12000: 0x10000;
 		memcpy (&prg[0x08000], &prg[addr], 0x2000);
@@ -516,7 +516,7 @@ static WRITE8_HANDLER( vsgshoe_gun_in0_w )
 DRIVER_INIT( vsgshoe )
 {
 	/* set up the default bank */
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "main" );
+	UINT8 *prg = memory_region( machine, "main" );
 	memcpy (&prg[0x08000], &prg[0x12000], 0x2000);
 
 	/* Protection */
@@ -622,7 +622,7 @@ static WRITE8_HANDLER( drmario_rom_banking )
 			case 3:	/* program banking */
 				{
 					int bank = ( drmario_shiftreg & 0x03 ) * 0x4000;
-					UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "main" );
+					UINT8 *prg = memory_region( machine, "main" );
 
 					if ( !size16k )
 					{
@@ -655,7 +655,7 @@ DRIVER_INIT( drmario )
 {
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "main" );
+	UINT8 *prg = memory_region( machine, "main" );
 	memcpy( &prg[0x08000], &prg[0x10000], 0x4000 );
 	memcpy( &prg[0x0c000], &prg[0x1c000], 0x4000 );
 
@@ -745,7 +745,7 @@ DRIVER_INIT( vsslalom )
 static WRITE8_HANDLER( castlevania_rom_banking )
 {
 	int rombank = 0x10000 + ( data & 7 ) * 0x4000;
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "main" );
+	UINT8 *prg = memory_region( machine, "main" );
 
 	memcpy( &prg[0x08000], &prg[rombank], 0x4000 );
 }
@@ -753,7 +753,7 @@ static WRITE8_HANDLER( castlevania_rom_banking )
 DRIVER_INIT( cstlevna )
 {
 	/* when starting the game, the 1st 16k and the last 16k are loaded into the 2 banks */
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "main" );
+	UINT8 *prg = memory_region( machine, "main" );
 	memcpy( &prg[0x08000], &prg[0x28000], 0x8000 );
 
    	/* banking is done with writes to the $8000-$ffff area */
@@ -781,7 +781,7 @@ static READ8_HANDLER( topgun_security_r )
 DRIVER_INIT( topgun )
 {
 	/* when starting the game, the 1st 16k and the last 16k are loaded into the 2 banks */
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "main" );
+	UINT8 *prg = memory_region( machine, "main" );
 	memcpy( &prg[0x08000], &prg[0x28000], 0x8000 );
 
    	/* banking is done with writes to the $8000-$ffff area */
@@ -804,7 +804,7 @@ static int IRQ_enable, IRQ_count, IRQ_count_latch;
 
 static void mapper4_set_prg (void)
 {
-	UINT8 *prg = memory_region( Machine, RGNCLASS_CPU, "main" );
+	UINT8 *prg = memory_region( Machine, "main" );
 	MMC3_prg0 &= MMC3_prg_mask;
 	MMC3_prg1 &= MMC3_prg_mask;
 
@@ -953,13 +953,13 @@ static WRITE8_HANDLER( mapper4_w )
 
 DRIVER_INIT( MMC3 )
 {
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "main" );
+	UINT8 *prg = memory_region( machine, "main" );
 	IRQ_enable = IRQ_count = IRQ_count_latch = 0;
 	MMC3_prg0 = 0xfe;
 	MMC3_prg1 = 0xff;
 	MMC3_cmd = 0;
 
-	MMC3_prg_chunks = (memory_region_length(machine, RGNCLASS_CPU, "main") - 0x10000) / 0x4000;
+	MMC3_prg_chunks = (memory_region_length(machine, "main") - 0x10000) / 0x4000;
 
 	MMC3_prg_mask = ((MMC3_prg_chunks << 1) - 1);
 
@@ -1150,7 +1150,7 @@ static WRITE8_HANDLER( mapper68_rom_banking ){
 
 		case 0x7000:
 		{
-			UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "main" );
+			UINT8 *prg = memory_region( machine, "main" );
 			memcpy( &prg[0x08000], &prg[0x10000 +data*0x4000], 0x4000 );
 		}
 		break;
@@ -1165,7 +1165,7 @@ DRIVER_INIT( platoon )
 	/* when starting a mapper 68 game  the first 16K ROM bank in the cart is loaded into $8000
     the LAST 16K ROM bank is loaded into $C000. The last 16K of ROM cannot be swapped. */
 
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "main" );
+	UINT8 *prg = memory_region( machine, "main" );
 	memcpy( &prg[0x08000], &prg[0x10000], 0x4000 );
 	memcpy( &prg[0x0c000], &prg[0x2c000], 0x4000 );
 
@@ -1281,7 +1281,7 @@ static WRITE8_HANDLER( vstennis_vrom_banking )
 
 DRIVER_INIT( vstennis )
 {
-	UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "main" );
+	UINT8 *prg = memory_region( machine, "main" );
 
 	/* vrom switching is enabled with bit 2 of $4016 */
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4016, 0x4016, 0, 0, vstennis_vrom_banking );

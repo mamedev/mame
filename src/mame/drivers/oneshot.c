@@ -413,14 +413,14 @@ MACHINE_DRIVER_END
 
 
 ROM_START( oneshot )
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "1shot-u.a24", 0x00000, 0x20000, CRC(0ecd33da) SHA1(d050e9a1900cd9f629818034b1445e034b6cf81c) )
 	ROM_LOAD16_BYTE( "1shot-u.a22", 0x00001, 0x20000, CRC(26c3ae2d) SHA1(47e479abe06d508a9d9fe677d34d6a485bde5533) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
 	ROM_LOAD( "1shot.ua2", 0x00000, 0x010000, CRC(f655b80e) SHA1(2574a812c35801755c187a47f46ccdb0983c5feb) )
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx1", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD( "1shot-ui.16a",0x000000, 0x080000, CRC(f765f9a2) SHA1(f6c386e0421fcb0e420585dd27d9dad951bb2556) )
 	ROM_LOAD( "1shot-ui.13a",0x080000, 0x080000, CRC(3361b5d8) SHA1(f7db674d479765d4e58fb663aa5e13dde2abcce7) )
 	ROM_LOAD( "1shot-ui.11a",0x100000, 0x080000, CRC(8f8bd027) SHA1(fbec952ab5604c8e20c5e7cfd2844f4fe5441186) )
@@ -430,23 +430,23 @@ ROM_START( oneshot )
 	ROM_LOAD( "1shot-ui.11", 0x300000, 0x080000, CRC(b8938345) SHA1(318cf0d070db786680a45811bbd765fa37caaf62) )
 	ROM_LOAD( "1shot-ui.08", 0x380000, 0x080000, CRC(c9953bef) SHA1(21917a9dcc0afaeec20672ad863d0c9d583369e3) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 ) /* Samples */
+	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "1shot.u15", 0x000000, 0x080000, CRC(e3759a47) SHA1(1159335924a6d68a0a24bfbe0c9182107f3f05f8) )
 	ROM_LOAD( "1shot.u14", 0x080000, 0x080000, CRC(222e33f8) SHA1(2665afdf4cb1a29325df62efc1843a4b2cf34a4e) )
 
-	ROM_REGION( 0x10000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "1shot.mb", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, zooming?
 ROM_END
 
 ROM_START( maddonna )
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "maddonna.b16", 0x00000, 0x20000, CRC(643f9054) SHA1(77907ecdb02a525f9beed7fee203431eda16c831) )
 	ROM_LOAD16_BYTE( "maddonna.b15", 0x00001, 0x20000, CRC(e36c0e26) SHA1(f261b2c74eeca05df302aa4956f5d02121d42054) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
 	ROM_LOAD( "x13.ua2", 0x00000, 0x010000, CRC(f2080071) SHA1(68cbae9559879b2dc19c41a7efbd13ab4a569d3f) ) // b13
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx1", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD( "maddonna.b5",  0x000000, 0x080000, CRC(838d3244) SHA1(7339143481ec043219825f282450ff53bb718f8c) )
 	ROM_LOAD( "maddonna.b7",  0x080000, 0x080000, CRC(4920d2ec) SHA1(e72a374bca81ffa4f925326455e007df7227ae08) )
 	ROM_LOAD( "maddonna.b9",  0x100000, 0x080000, CRC(3a8a3feb) SHA1(832654902963c163644134431fd1221e1895cfec) )
@@ -456,23 +456,23 @@ ROM_START( maddonna )
 	ROM_LOAD( "maddonna.b10",  0x300000, 0x080000, CRC(87936423) SHA1(dda42f3685427edad7686d9712ff07d2fd9bf57e) )
 	ROM_LOAD( "maddonna.b12",  0x380000, 0x080000, CRC(879ab23c) SHA1(5288016542a10e60ccb28a930d8dfe4db41c6fc6) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	/* no samples for this game */
 
-	ROM_REGION( 0x10000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x1", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, zooming?
 ROM_END
 
 ROM_START( maddonnb )
-	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, "main", 0 ) /* 68000 Code */
 	/* program roms missing in this dump, gfx don't seem 100% correct for other ones */
 	ROM_LOAD16_BYTE( "maddonnb.b16", 0x00000, 0x20000, NO_DUMP )
 	ROM_LOAD16_BYTE( "maddonnb.b15", 0x00001, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
 	ROM_LOAD( "x13.ua2", 0x00000, 0x010000, CRC(f2080071) SHA1(68cbae9559879b2dc19c41a7efbd13ab4a569d3f) )
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx1", 0 ) /* Sprites */
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD( "x5.16a",  0x000000, 0x080000, CRC(1aae0ad3) SHA1(a5afe699c66dcc5e7928807ae1c8be7ffdda798c) )
 	ROM_LOAD( "x7.13a",  0x080000, 0x080000, CRC(39d13e25) SHA1(bfe8b187c7fc9dc1ac2cc3f840a686a25ec55340) )
 	ROM_LOAD( "x9.11a",  0x100000, 0x080000, CRC(2027faeb) SHA1(cb8c697705ac70ec3cf74901a2becf6abd8be63d) )
@@ -482,10 +482,10 @@ ROM_START( maddonnb )
 	ROM_LOAD( "x10.11",  0x300000, 0x080000, CRC(479d718c) SHA1(4fbc2568744cf78b15c6e0f3caba4d7109743cdd) )
 	ROM_LOAD( "x12.08",  0x380000, 0x080000, CRC(d56ca9f8) SHA1(49bca5dbc048e7b7efa34e1c08ee1b76767ffe38) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	/* no samples for this game */
 
-	ROM_REGION( 0x10000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x1", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, zooming?
 ROM_END
 

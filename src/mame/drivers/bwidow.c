@@ -341,7 +341,7 @@ static WRITE8_HANDLER( irq_ack_w )
 
 static ADDRESS_MAP_START( bwidow_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION(RGNCLASS_CPU, "main", 0x2000)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x2000)
 	AM_RANGE(0x2800, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_READWRITE(pokey1_r, pokey1_w)
 	AM_RANGE(0x6800, 0x6fff) AM_READWRITE(pokey2_r, pokey2_w)
@@ -375,7 +375,7 @@ static ADDRESS_MAP_START( spacduel_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0f00, 0x0f3f) AM_WRITE(atari_vg_earom_w)
 	AM_RANGE(0x1000, 0x100f) AM_READWRITE(pokey1_r, pokey1_w)
 	AM_RANGE(0x1400, 0x140f) AM_READWRITE(pokey2_r, pokey2_w)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION(RGNCLASS_CPU, "main", 0x2000)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x2000)
 	AM_RANGE(0x2800, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -761,7 +761,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( bwidow )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	/* Vector ROM */
 	ROM_LOAD( "136017.107",   0x2800, 0x0800, CRC(97f6000c) SHA1(bbae93058228820ee67b05f23e45fb54ee0963ff) )
 	ROM_LOAD( "136017.108",   0x3000, 0x1000, CRC(3da354ed) SHA1(935295d66ad40ad702eb7a694296e836f53d22ec) )
@@ -776,12 +776,12 @@ ROM_START( bwidow )
 	ROM_LOAD( "136017.106",   0xe000, 0x1000, CRC(ccc9b26c) SHA1(f1398e3ff2b62af1509bc117028845b671ff1ca2) )
 	ROM_RELOAD(               0xf000, 0x1000 )	/* for reset/interrupt vectors */
 	/* AVG PROM */
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.n4",	 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 ROM_START( gravitar )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	/* Vector ROM */
 	ROM_LOAD( "136010.210",   0x2800, 0x0800, CRC(debcb243) SHA1(2c50cd38d60739c126f1d0d8e7fbd46a0bde6e1c) )
 	ROM_LOAD( "136010.207",   0x3000, 0x1000, CRC(4135629a) SHA1(301ddb7a34b38140a1fdffc060cb08ff57f10cf1) )
@@ -796,12 +796,12 @@ ROM_START( gravitar )
 	ROM_LOAD( "136010.306",   0xe000, 0x1000, CRC(3f3805ad) SHA1(baf080deaa8eea43af2f3be71dacc63e4666c453) )
 	ROM_RELOAD(              0xf000, 0x1000 )	/* for reset/interrupt vectors */
 	/* AVG PROM */
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.n4",	 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 ROM_START( gravitr2 )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	/* Vector ROM */
 	ROM_LOAD( "136010.210",   0x2800, 0x0800, CRC(debcb243) SHA1(2c50cd38d60739c126f1d0d8e7fbd46a0bde6e1c) )
 	ROM_LOAD( "136010.207",   0x3000, 0x1000, CRC(4135629a) SHA1(301ddb7a34b38140a1fdffc060cb08ff57f10cf1) )
@@ -816,12 +816,12 @@ ROM_START( gravitr2 )
 	ROM_LOAD( "136010.206",   0xe000, 0x1000, CRC(4521ca48) SHA1(5770cb46c4ac28d632ad5910723a9edda8283ce5) )
 	ROM_RELOAD(              0xf000, 0x1000 )	/* for reset/interrupt vectors */
 	/* AVG PROM */
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.n4",	 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 ROM_START( gravp )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	/* Vector ROM */
 	ROM_LOAD( "l7.bin",   0x2800, 0x0800, CRC(1da0d845) SHA1(99bccae0521c105388784175c475035bf19270a7) )
 	ROM_LOAD( "mn7.bin",  0x3000, 0x1000, CRC(650ba31e) SHA1(7f855ea13e2041a87b64fdff4b7ee0d7d97e4401) )
@@ -836,12 +836,12 @@ ROM_START( gravp )
 	ROM_LOAD( "m1.bin",   0xe000, 0x1000, CRC(47fe97a0) SHA1(7cbde4b59abde679c28d7547700b342f25762e4a) )
 	ROM_RELOAD(           0xf000, 0x1000 )	/* for reset/interrupt vectors */
 	/* AVG PROM */
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.n4",	 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 ROM_START( lunarbat )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	/* Vector ROM */
 	ROM_LOAD( "010.010",      0x2800, 0x0800, CRC(48fd38aa) SHA1(e6ec31e784c2965369161c33d00903ba027f7f20) )
 	ROM_LOAD( "007.010",      0x3000, 0x1000, CRC(9754830e) SHA1(2e6885155a93d4eaf9a405f3eb740f2f4b30bc23) )
@@ -855,12 +855,12 @@ ROM_START( lunarbat )
 	ROM_LOAD( "006.010",      0xe000, 0x1000, CRC(f8ad139d) SHA1(e9e0dcb0872b19af09825a979f8b3747c9632091) )
 	ROM_RELOAD(               0xf000, 0x1000 )	/* for reset/interrupt vectors */
 	/* AVG PROM */
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.n4",	 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 ROM_START( lunarba1 )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	/* Vector ROM */
 	ROM_LOAD( "vrom1.bin",   0x2800, 0x0800, CRC(c60634d9) SHA1(b94f056b5e73a2e015ba9a4be66dc2abee325016) )
 	ROM_LOAD( "vrom2.bin",   0x3000, 0x1000, CRC(53d9a8a2) SHA1(c33766658dd3523e99e664ef42a4ba4ab884fa80) )
@@ -878,12 +878,12 @@ ROM_START( lunarba1 )
 	ROM_RELOAD(              0xe000, 0x1000 )
 	ROM_RELOAD(              0xf000, 0x1000 )	/* for reset/interrupt vectors */
 	/* AVG PROM */
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.n4",	 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
 ROM_START( spacduel )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	/* Vector ROM */
 	ROM_LOAD( "136006.106",   0x2800, 0x0800, CRC(691122fe) SHA1(f53be76a49dba319050ca7767de3441521910e83) )
 	ROM_LOAD( "136006.107",   0x3000, 0x1000, CRC(d8dd0461) SHA1(58060b20b2511d30d2ec06479d21840bdd0b53c6) )
@@ -902,7 +902,7 @@ ROM_START( spacduel )
 
 	ROM_RELOAD(              0xf000, 0x1000 )	/* for reset/interrupt vectors */
 	/* AVG PROM */
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.n4",	 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 

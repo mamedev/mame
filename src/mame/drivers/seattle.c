@@ -1744,7 +1744,7 @@ static ADDRESS_MAP_START( seattle_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x17800000, 0x17800003) AM_NOP
 	AM_RANGE(0x17900000, 0x17900003) AM_READWRITE(status_leds_r, status_leds_w)
 	AM_RANGE(0x17f00000, 0x17f00003) AM_RAM_WRITE(asic_reset_w) AM_BASE(&asic_reset)
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0) AM_BASE(&rombase)
+	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_BASE(&rombase)
 ADDRESS_MAP_END
 
 
@@ -2539,205 +2539,205 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( wg3dh )
-	ROM_REGION32_LE( 0x80000, RGNCLASS_USER, "user1", 0 )	/* Boot Code Version L1.2 (10/8/96) */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version L1.2 (10/8/96) */
 	ROM_LOAD( "wg3dh_12.u32", 0x000000, 0x80000, CRC(15e4cea2) SHA1(72c0db7dc53ce645ba27a5311b5ce803ad39f131) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )	/* Hard Drive Version 1.3 (Guts 10/15/96, Main 10/15/96) */
+	DISK_REGION( "disks" )	/* Hard Drive Version 1.3 (Guts 10/15/96, Main 10/15/96) */
 	DISK_IMAGE( "wg3dh", 0, MD5(424dbda376e8c45ec873b79194bdb924) SHA1(c12875036487a9324734012e601d1f234d2e783e) )
 
-	ROM_REGION16_LE( 0x10000, RGNCLASS_SOUND, "dcs", 0 )	/* ADSP-2115 data Version L1.1 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version L1.1 */
 	ROM_LOAD16_BYTE( "soundl11.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
 ROM_END
 
 
 ROM_START( mace )
-	ROM_REGION32_LE( 0x80000, RGNCLASS_USER, "user1", 0 )	/* Boot Code Version 1.0ce 7/2/97 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version 1.0ce 7/2/97 */
 	ROM_LOAD( "mace10ce.u32", 0x000000, 0x80000, CRC(7a50b37e) SHA1(33788835f84a9443566c80bee9f20a1691490c6d) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )	/* Hard Drive Version 1.0B 6/10/97 (Guts 7/2/97, Main 7/2/97) */
+	DISK_REGION( "disks" )	/* Hard Drive Version 1.0B 6/10/97 (Guts 7/2/97, Main 7/2/97) */
 	DISK_IMAGE( "mace", 0, MD5(668f6216114fe4c7c265b3d13398e71e) SHA1(6761c9a3da1f0b6b82b146ff2debd04986b8f460) )
 
-	ROM_REGION16_LE( 0x10000, RGNCLASS_SOUND, "dcs", 0 )	/* ADSP-2115 data Version L1.1, Labeled as Version 1.0 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version L1.1, Labeled as Version 1.0 */
 	ROM_LOAD16_BYTE( "soundl11.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
 ROM_END
 
 
 ROM_START( macea )
-	ROM_REGION32_LE( 0x80000, RGNCLASS_USER, "user1", 0 )	/* Boot Code Version ??? 5/7/97 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version ??? 5/7/97 */
 	ROM_LOAD( "maceboot.u32", 0x000000, 0x80000, CRC(effe3ebc) SHA1(7af3ca3580d6276ffa7ab8b4c57274e15ee6bcbb) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )	/* Hard Drive Version 1.0a (Guts 6/9/97, Main 5/12/97) */
+	DISK_REGION( "disks" )	/* Hard Drive Version 1.0a (Guts 6/9/97, Main 5/12/97) */
 	DISK_IMAGE( "macea", 0, BAD_DUMP MD5(276577faa5632eb23dc5a97c11c0a1b1) SHA1(e2cce4ff2e15267b7008422252bdf62b188cf743) )
 
-	ROM_REGION16_LE( 0x10000, RGNCLASS_SOUND, "dcs", 0 )	/* ADSP-2115 data Version L1.1 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version L1.1 */
 	ROM_LOAD16_BYTE( "soundl11.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
 ROM_END
 
 
 ROM_START( sfrush )
-	ROM_REGION32_LE( 0x80000, RGNCLASS_USER, "user1", 0 )	/* Boot Code Version L1.0 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version L1.0 */
 	ROM_LOAD( "hdboot.u32", 0x000000, 0x80000, CRC(39a35f1b) SHA1(c46d83448399205d38e6e41dd56abbc362254254) )
 
-	ROM_REGION32_LE( 0x200000, RGNCLASS_USER, "cageboot", 0 )	/* TMS320C31 boot ROM  Version L1.0 */
+	ROM_REGION32_LE( 0x200000, "cageboot", 0 )	/* TMS320C31 boot ROM  Version L1.0 */
 	ROM_LOAD32_BYTE( "sndboot.u69", 0x000000, 0x080000, CRC(7e52cdc7) SHA1(f735063e19d2ca672cef6d761a2a47df272e8c59) )
 
-	ROM_REGION32_LE( 0x1000000, RGNCLASS_SOUND, "cage", 0 )	/* TMS320C31 sound ROMs */
+	ROM_REGION32_LE( 0x1000000, "cage", 0 )	/* TMS320C31 sound ROMs */
 	ROM_LOAD32_WORD( "sfrush.u62",  0x400000, 0x200000, CRC(5d66490e) SHA1(bd39ea3b45d44cae6ca5890f365653326bbecd2d) )
 	ROM_LOAD32_WORD( "sfrush.u61",  0x400002, 0x200000, CRC(f3a00ee8) SHA1(c1ac780efc32b2e30522d7cc3e6d92e7daaadddd) )
 	ROM_LOAD32_WORD( "sfrush.u53",  0x800000, 0x200000, CRC(71f8ddb0) SHA1(c24bef801f43bae68fda043c4356e8cf1298ca97) )
 	ROM_LOAD32_WORD( "sfrush.u49",  0x800002, 0x200000, CRC(dfb0a54c) SHA1(ed34f9485f7a7e5bb73bf5c6428b27548e12db12) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )	/* Hard Drive Version L1.06 */
+	DISK_REGION( "disks" )	/* Hard Drive Version L1.06 */
 	DISK_IMAGE( "sfrush", 0, MD5(7a77addb141fc11fd5ca63850382e0d1) SHA1(0e5805e255e91f08c9802a04b42056d61ba5eb41) )
 ROM_END
 
 
 ROM_START( sfrushrk )
-	ROM_REGION32_LE( 0x80000, RGNCLASS_USER, "user1", 0 )	/* Boot Code */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code */
 	ROM_LOAD( "boot.bin",   0x000000, 0x080000, CRC(0555b3cf) SHA1(a48abd6d06a26f4f9b6c52d8c0af6095b6be57fd) )
 
-	ROM_REGION32_LE( 0x200000, RGNCLASS_USER, "cageboot", 0 )	/* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cageboot", 0 )	/* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "audboot.bin",    0x000000, 0x080000, CRC(c70c060d) SHA1(dd014bd13efdf5adc5450836bd4650351abefc46) )
 
-	ROM_REGION32_LE( 0x1000000, RGNCLASS_SOUND, "cage", 0 )	/* TMS320C31 sound ROMs */
+	ROM_REGION32_LE( 0x1000000, "cage", 0 )	/* TMS320C31 sound ROMs */
 	ROM_LOAD32_WORD( "audio.u62",  0x400000, 0x200000, CRC(cacf09e3) SHA1(349af1767cb0ee2a0eb9d7c2ab078fcae5fec8e7) )
 	ROM_LOAD32_WORD( "audio.u61",  0x400002, 0x200000, CRC(ea895d29) SHA1(1edde0497f2abd1636c5d7bcfbc03bcff321261c) )
 	ROM_LOAD32_WORD( "audio.u53",  0x800000, 0x200000, CRC(51c89a14) SHA1(6bc62bcda224040a4596d795132874828011a038) )
 	ROM_LOAD32_WORD( "audio.u49",  0x800002, 0x200000, CRC(e6b684d3) SHA1(1f5bab7fae974cecc8756dd23e3c7aa2cf6e7dc7) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )	/* Hard Drive Version 1.2 */
+	DISK_REGION( "disks" )	/* Hard Drive Version 1.2 */
 	DISK_IMAGE( "sfrushrk", 0, MD5(425c83a4fd389d820aceabf2c72e6107) SHA1(75aba7be869996ff522163466c97f88f78904fe0) )
 ROM_END
 
 
 ROM_START( calspeed )
-	ROM_REGION32_LE( 0x80000, RGNCLASS_USER, "user1", 0 )	/* Boot Code Version 1.2 (2/18/98) */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version 1.2 (2/18/98) */
 	ROM_LOAD( "caspd1_2.u32", 0x000000, 0x80000, CRC(0a235e4e) SHA1(b352f10fad786260b58bd344b5002b6ea7aaf76d) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )	/* Release version 2.1a (4/17/98) (Guts 1.25 4/17/98, Main 4/17/98) */
+	DISK_REGION( "disks" )	/* Release version 2.1a (4/17/98) (Guts 1.25 4/17/98, Main 4/17/98) */
 	DISK_IMAGE( "calspeed", 0, MD5(1b79ff4ecaa52693bdb19c720332dd59) SHA1(94af22d5797dbbaf6178fba1194257a603fda9ee) )
 
-	ROM_REGION16_LE( 0x10000, RGNCLASS_SOUND, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 ROM_END
 
 
 ROM_START( calspeda )
-	ROM_REGION32_LE( 0x80000, RGNCLASS_USER, "user1", 0 )	/* Boot Code Version 1.2 (2/18/98) */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version 1.2 (2/18/98) */
 	ROM_LOAD( "caspd1_2.u32", 0x000000, 0x80000, CRC(0a235e4e) SHA1(b352f10fad786260b58bd344b5002b6ea7aaf76d) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )	/* Release version 1.0r7a (3/4/98) (Guts 3/3/98, Main 1/19/98) */
+	DISK_REGION( "disks" )	/* Release version 1.0r7a (3/4/98) (Guts 3/3/98, Main 1/19/98) */
 	DISK_IMAGE( "calspeda", 0, MD5(dc8c919af86a1ab88a0b05ea2b6c74b3) SHA1(e6cbc8290af2df9704838a925cb43b6972b80d95) )
 
-	ROM_REGION16_LE( 0x10000, RGNCLASS_SOUND, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 ROM_END
 
 
 ROM_START( vaportrx )
-	ROM_REGION32_LE( 0x80000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x80000, "user1", 0 )
 	ROM_LOAD( "vtrxboot.bin", 0x000000, 0x80000, CRC(ee487a6c) SHA1(fb9efda85047cf615f24f7276a9af9fd542f3354) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE( "vaportrx", 0, MD5(eb8dcf83fe8b7122481d24ad8fbc8a9a) SHA1(f6ddb8eb66d979d49799e39fa4d749636693a1b0) )
 
-	ROM_REGION16_LE( 0x10000, RGNCLASS_SOUND, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "vaportrx.snd", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 ROM_END
 
 
 ROM_START( vaportrp )
-	ROM_REGION32_LE( 0x80000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x80000, "user1", 0 )
 	ROM_LOAD( "vtrxboot.bin", 0x000000, 0x80000, CRC(ee487a6c) SHA1(fb9efda85047cf615f24f7276a9af9fd542f3354) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" ) /* Guts: Apr 10 1998 11:03:14  Main: Apr 10 1998 11:27:44 */
+	DISK_REGION( "disks" ) /* Guts: Apr 10 1998 11:03:14  Main: Apr 10 1998 11:27:44 */
 	DISK_IMAGE( "vaportrp", 0, MD5(fac4d37e049bc649696f4834044860e6) SHA1(75e2eaf81c69d2a337736dbead804ac339fd0675) )
 
-	ROM_REGION16_LE( 0x10000, RGNCLASS_SOUND, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "vaportrx.snd", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 ROM_END
 
 
 ROM_START( biofreak )
-	ROM_REGION16_LE( 0x10000, RGNCLASS_SOUND, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x80000, RGNCLASS_USER, "user1", 0 ) /* Seattle System Boot ROM Version 0.1i Apr 14 1997  14:52:53 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) /* Seattle System Boot ROM Version 0.1i Apr 14 1997  14:52:53 */
 	ROM_LOAD( "biofreak.u32", 0x000000, 0x80000, CRC(cefa00bb) SHA1(7e171610ede1e8a448fb8d175f9cb9e7d549de28) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" ) /* Build Date 12/11/97 */
+	DISK_REGION( "disks" ) /* Build Date 12/11/97 */
 	DISK_IMAGE( "biofreak", 0, MD5(f4663a3fd0ceed436756710b97d283e4) SHA1(88b87cb651b97eac117c9342127938e30dc8c138) )
 ROM_END
 
 
 ROM_START( blitz )
-	ROM_REGION16_LE( 0x10000, RGNCLASS_SOUND, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x80000, RGNCLASS_USER, "user1", 0 )	/* Boot Code Version 1.2 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version 1.2 */
 	ROM_LOAD( "blitz1_2.u32", 0x000000, 0x80000, CRC(38dbecf5) SHA1(7dd5a5b3baf83a7f8f877ff4cd3f5e8b5201b36f) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )	/* Hard Drive Version 1.21 */
+	DISK_REGION( "disks" )	/* Hard Drive Version 1.21 */
 	DISK_IMAGE( "blitz", 0, MD5(9cec59456c4d239ba05c7802082489e4) SHA1(0f001488b3709d40cee5e278603df2bbae1116b8) )
 ROM_END
 
 
 ROM_START( blitz11 )
-	ROM_REGION16_LE( 0x10000, RGNCLASS_SOUND, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x80000, RGNCLASS_USER, "user1", 0 )	/* Boot Code Version 1.1 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version 1.1 */
 	ROM_LOAD( "blitz1_1.u32", 0x000000, 0x80000, CRC(8163ce02) SHA1(89b432d8879052f6c5534ee49599f667f50a010f) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )	/* Hard Drive Version 1.21 */
+	DISK_REGION( "disks" )	/* Hard Drive Version 1.21 */
 	DISK_IMAGE( "blitz", 0, MD5(9cec59456c4d239ba05c7802082489e4) SHA1(0f001488b3709d40cee5e278603df2bbae1116b8) )
 ROM_END
 
 
 ROM_START( blitz99 )
-	ROM_REGION16_LE( 0x10000, RGNCLASS_SOUND, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x80000, RGNCLASS_USER, "user1", 0 )	/* Boot Code Version 1.0 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version 1.0 */
 	ROM_LOAD( "bltz9910.u32", 0x000000, 0x80000, CRC(777119b2) SHA1(40d255181c2f3a787919c339e83593fd506779a5) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )	/* Hard Drive Version 1.30 */
+	DISK_REGION( "disks" )	/* Hard Drive Version 1.30 */
 	DISK_IMAGE( "blitz99", 0, MD5(4bb6caf8f985e90d99989eede5504188) SHA1(4675751875943b756c8db6997fd288938a7999bb) )
 ROM_END
 
 
 ROM_START( blitz2k )
-	ROM_REGION16_LE( 0x10000, RGNCLASS_SOUND, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x80000, RGNCLASS_USER, "user1", 0 )	/* Boot Code Version 1.4 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )	/* Boot Code Version 1.4 */
 	ROM_LOAD( "bltz2k14.u32", 0x000000, 0x80000, CRC(ac4f0051) SHA1(b8125c17370db7bfd9b783230b4ef3d5b22a2025) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )	/* Hard Drive Version 1.5 */
+	DISK_REGION( "disks" )	/* Hard Drive Version 1.5 */
 	DISK_IMAGE( "blitz2k", 0, MD5(7778a82f35c05ed797b315439843246c) SHA1(153a7df368833cd5f5a52c3fe17045c5549a0c17) )
 ROM_END
 
 
 ROM_START( carnevil )
-	ROM_REGION16_LE( 0x10000, RGNCLASS_SOUND, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x80000, RGNCLASS_USER, "user1", 0 ) /* Boot Rom Version 1.9 */
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) /* Boot Rom Version 1.9 */
 	ROM_LOAD( "carnevil1_9.u32", 0x000000, 0x80000, CRC(82c07f2e) SHA1(fa51c58022ce251c53bad12fc6ffadb35adb8162) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )	/* Hard Drive v1.0.1  12/11/99 */
+	DISK_REGION( "disks" )	/* Hard Drive v1.0.1  12/11/99 */
 	DISK_IMAGE( "carnevil", 0, BAD_DUMP MD5(6eafae86091c0a915cf8cfdc3d73adc2) SHA1(5e6524d4b97de141c38e301a17e8af15661cb5d6) )
 ROM_END
 
 
 ROM_START( hyprdriv )
-	ROM_REGION16_LE( 0x10000, RGNCLASS_SOUND, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "seattle.snd", 0x000000, 0x8000, BAD_DUMP CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
-	ROM_REGION32_LE( 0x80000, RGNCLASS_USER, "user1", 0 ) /* Boot Rom Version 9. */
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) /* Boot Rom Version 9. */
 	ROM_LOAD( "hyprdrve.u32", 0x000000, 0x80000, CRC(3e18cb80) SHA1(b18cc4253090ee1d65d72a7ec0c426ed08c4f238) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )	/* Version 1.40  Oct 23 1998  15:16:00 */
+	DISK_REGION( "disks" )	/* Version 1.40  Oct 23 1998  15:16:00 */
 	DISK_IMAGE( "hyprdriv", 0, MD5(480c43735b0b83eb10c0223283d4226c) SHA1(2e42fecbb8722c736cccdca7ed3b21fbc75e345a) )
 ROM_END
 

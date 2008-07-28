@@ -156,7 +156,7 @@ static OPBASE_HANDLER( esb_setopbase )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION(RGNCLASS_CPU, "main", 0)
+	AM_RANGE(0x0000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0)
 	AM_RANGE(0x3000, 0x3fff) AM_ROM								/* vector_rom */
 	AM_RANGE(0x4300, 0x431f) AM_READ_PORT("IN0")				/* Memory mapped input port 0 */
 	AM_RANGE(0x4320, 0x433f) AM_READ(starwars_input_1_r)		/* Memory mapped input port 1 */
@@ -426,7 +426,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( starwar1 )
-	ROM_REGION( 0x12000, RGNCLASS_CPU, "main", 0 )     /* 2 64k ROM spaces */
+	ROM_REGION( 0x12000, "main", 0 )     /* 2 64k ROM spaces */
 	ROM_LOAD( "136021.105",   0x3000, 0x1000, CRC(538e7d2f) SHA1(032c933fd94a6b0b294beee29159a24494ae969b) ) /* 3000-3fff is 4k vector rom */
 	ROM_LOAD( "136021.114",   0x6000, 0x2000, CRC(e75ff867) SHA1(3a40de920c31ffa3c3e67f3edf653b79fcc5ddd7) )   /* ROM 0 bank pages 0 and 1 */
 	ROM_CONTINUE(            0x10000, 0x2000 )
@@ -436,17 +436,17 @@ ROM_START( starwar1 )
 	ROM_LOAD( "136021.206",   0xe000, 0x2000, CRC(c7e51237) SHA1(4960f4446271316e3f730eeb2531dbc702947395) ) /*  8k ROM 4 bank */
 
 	/* Sound ROMS */
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "136021.107",   0x4000, 0x2000, CRC(dbf3aea2) SHA1(c38661b2b846fe93487eef09ca3cda19c44f08a0) ) /* Sound ROM 0 */
 	ROM_RELOAD(               0xc000, 0x2000 )
 	ROM_LOAD( "136021.208",   0x6000, 0x2000, CRC(e38070a8) SHA1(c858ae1702efdd48615453ab46e488848891d139) ) /* Sound ROM 0 */
 	ROM_RELOAD(               0xe000, 0x2000 )
 
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0)
+	ROM_REGION( 0x100, "user1", 0)
 	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */
-	ROM_REGION( 0x1000, RGNCLASS_USER, "user2", 0)
+	ROM_REGION( 0x1000, "user2", 0)
 	ROM_LOAD( "136021.110",   0x0000, 0x0400, CRC(01061762) SHA1(199549ead9ff9a5d5db75a2d15aef0240feb1aca) ) /* PROM 0 */
 	ROM_LOAD( "136021.111",   0x0400, 0x0400, CRC(2e619b70) SHA1(f76132b884ffdf3a4fe58637238c5235aab50408) ) /* PROM 1 */
 	ROM_LOAD( "136021.112",   0x0800, 0x0400, CRC(6cfa3544) SHA1(be059bfffe6b5bfcb4af78e9e7a98870ccf21985) ) /* PROM 2 */
@@ -455,7 +455,7 @@ ROM_END
 
 
 ROM_START( starwars )
-	ROM_REGION( 0x12000, RGNCLASS_CPU, "main", 0 )     /* 2 64k ROM spaces */
+	ROM_REGION( 0x12000, "main", 0 )     /* 2 64k ROM spaces */
 	ROM_LOAD( "136021.105",   0x3000, 0x1000, CRC(538e7d2f) SHA1(032c933fd94a6b0b294beee29159a24494ae969b) ) /* 3000-3fff is 4k vector rom */
 	ROM_LOAD( "136021.214",   0x6000, 0x2000, CRC(04f1876e) SHA1(c1d3637cb31ece0890c25f6122d6bcd27e6ffe0c) )   /* ROM 0 bank pages 0 and 1 */
 	ROM_CONTINUE(            0x10000, 0x2000 )
@@ -465,17 +465,17 @@ ROM_START( starwars )
 	ROM_LOAD( "136021.206",   0xe000, 0x2000, CRC(c7e51237) SHA1(4960f4446271316e3f730eeb2531dbc702947395) ) /*  8k ROM 4 bank */
 
 	/* Sound ROMS */
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "136021.107",   0x4000, 0x2000, CRC(dbf3aea2) SHA1(c38661b2b846fe93487eef09ca3cda19c44f08a0) ) /* Sound ROM 0 */
 	ROM_RELOAD(               0xc000, 0x2000 )
 	ROM_LOAD( "136021.208",   0x6000, 0x2000, CRC(e38070a8) SHA1(c858ae1702efdd48615453ab46e488848891d139) ) /* Sound ROM 0 */
 	ROM_RELOAD(               0xe000, 0x2000 )
 
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0)
+	ROM_REGION( 0x100, "user1", 0)
 	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */
-	ROM_REGION( 0x1000, RGNCLASS_USER, "user2", 0 )
+	ROM_REGION( 0x1000, "user2", 0 )
 	ROM_LOAD( "136021.110",   0x0000, 0x0400, CRC(01061762) SHA1(199549ead9ff9a5d5db75a2d15aef0240feb1aca) ) /* PROM 0 */
 	ROM_LOAD( "136021.111",   0x0400, 0x0400, CRC(2e619b70) SHA1(f76132b884ffdf3a4fe58637238c5235aab50408) ) /* PROM 1 */
 	ROM_LOAD( "136021.112",   0x0800, 0x0400, CRC(6cfa3544) SHA1(be059bfffe6b5bfcb4af78e9e7a98870ccf21985) ) /* PROM 2 */
@@ -483,7 +483,7 @@ ROM_START( starwars )
 ROM_END
 
 ROM_START( tomcatsw )
-	ROM_REGION( 0x12000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x12000, "main", 0 )
 	ROM_LOAD( "tcavg3.1l",    0x3000, 0x1000, CRC(27188aa9) SHA1(5d9a978a7ac1913b57586e81045a1b955db27b48) )
 	ROM_LOAD( "tc6.1f",       0x6000, 0x2000, CRC(56e284ff) SHA1(a5fda9db0f6b8f7d28a4a607976fe978e62158cf) )
 	ROM_LOAD( "tc8.1hj",      0x8000, 0x2000, CRC(7b7575e3) SHA1(bdb838603ffb12195966d0ce454900253bc0f43f) )
@@ -491,17 +491,17 @@ ROM_START( tomcatsw )
 	ROM_LOAD( "tce.1m",       0xe000, 0x2000, CRC(4a3de8a3) SHA1(e48fc17201326358317f6b428e583ecaa3ecb881) )
 
 	/* Sound ROMS */
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "136021.107",   0x4000, 0x2000, NO_DUMP ) /* Sound ROM 0 */
 	ROM_RELOAD(               0xc000, 0x2000 )
 	ROM_LOAD( "136021.208",   0x6000, 0x2000, NO_DUMP ) /* Sound ROM 0 */
 	ROM_RELOAD(               0xe000, 0x2000 )
 
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0)
+	ROM_REGION( 0x100, "user1", 0)
 	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */
-	ROM_REGION( 0x1000, RGNCLASS_USER, "user2", 0 )
+	ROM_REGION( 0x1000, "user2", 0 )
 	ROM_LOAD( "136021.110",   0x0000, 0x0400, CRC(01061762) SHA1(199549ead9ff9a5d5db75a2d15aef0240feb1aca) ) /* PROM 0 */
 	ROM_LOAD( "136021.111",   0x0400, 0x0400, CRC(2e619b70) SHA1(f76132b884ffdf3a4fe58637238c5235aab50408) ) /* PROM 1 */
 	ROM_LOAD( "136021.112",   0x0800, 0x0400, CRC(6cfa3544) SHA1(be059bfffe6b5bfcb4af78e9e7a98870ccf21985) ) /* PROM 2 */
@@ -510,7 +510,7 @@ ROM_END
 
 
 ROM_START( esb )
-	ROM_REGION( 0x22000, RGNCLASS_CPU, "main", 0 )     /* 64k for code and a buttload for the banked ROMs */
+	ROM_REGION( 0x22000, "main", 0 )     /* 64k for code and a buttload for the banked ROMs */
 	ROM_LOAD( "136031.111",   0x03000, 0x1000, CRC(b1f9bd12) SHA1(76f15395c9fdcd80dd241307a377031a1f44e150) )    /* 3000-3fff is 4k vector rom */
 	ROM_LOAD( "136031.101",   0x06000, 0x2000, CRC(ef1e3ae5) SHA1(d228ff076faa7f9605badeee3b827adb62593e0a) )
 	ROM_CONTINUE(             0x10000, 0x2000 )
@@ -526,17 +526,17 @@ ROM_START( esb )
 	ROM_LOAD( "136031.106",   0x18000, 0x4000, CRC(76d07f59) SHA1(44dd018b406f95e1512ce92923c2c87f1458844f) ) /* slapstic 2, 3 */
 
 	/* Sound ROMS */
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "136031.113",   0x4000, 0x2000, CRC(24ae3815) SHA1(b1a93af76de79b902317eebbc50b400b1f8c1e3c) ) /* Sound ROM 0 */
 	ROM_CONTINUE(             0xc000, 0x2000 )
 	ROM_LOAD( "136031.112",   0x6000, 0x2000, CRC(ca72d341) SHA1(52de5b82bb85d7c9caad2047e540d0748aa93ba5) ) /* Sound ROM 1 */
 	ROM_CONTINUE(             0xe000, 0x2000 )
 
-	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0)
+	ROM_REGION( 0x100, "user1", 0)
 	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 
 	/* Mathbox PROMs */
-	ROM_REGION( 0x1000, RGNCLASS_USER, "user2", 0 )
+	ROM_REGION( 0x1000, "user2", 0 )
 	ROM_LOAD( "136031.110",   0x0000, 0x0400, CRC(b8d0f69d) SHA1(c196f1a592bd1ac482a81e23efa224d9dfaefc0a) ) /* PROM 0 */
 	ROM_LOAD( "136031.109",   0x0400, 0x0400, CRC(6a2a4d98) SHA1(cefca71f025f92a193c5a7d8b5ab8be10db2fd44) ) /* PROM 1 */
 	ROM_LOAD( "136031.108",   0x0800, 0x0400, CRC(6a76138f) SHA1(9ef7af898a3e29d03f35045901023615a6a55205) ) /* PROM 2 */
@@ -561,14 +561,14 @@ static DRIVER_INIT( starwars )
 	starwars_mproc_init(machine);
 
 	/* initialize banking */
-	memory_configure_bank(1, 0, 2, memory_region(machine, RGNCLASS_CPU, "main") + 0x6000, 0x10000 - 0x6000);
+	memory_configure_bank(1, 0, 2, memory_region(machine, "main") + 0x6000, 0x10000 - 0x6000);
 	memory_set_bank(1, 0);
 }
 
 
 static DRIVER_INIT( esb )
 {
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *rom = memory_region(machine, "main");
 
 	/* X2212 nvram */
 	generic_nvram = auto_malloc(generic_nvram_size);

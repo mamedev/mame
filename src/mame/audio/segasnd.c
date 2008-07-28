@@ -171,7 +171,7 @@ static READ8_HANDLER( speech_p1_r )
 
 static READ8_HANDLER( speech_rom_r )
 {
-	return memory_region(machine, RGNCLASS_SOUND, "speech")[0x100 * (speech_p2 & 0x3f) + offset];
+	return memory_region(machine, "speech")[0x100 * (speech_p2 & 0x3f) + offset];
 }
 
 static WRITE8_HANDLER( speech_p1_w )

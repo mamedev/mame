@@ -208,8 +208,8 @@ static void *k053260_start(const char *tag, int sndindex, int clock, const void 
 	ic->intf = (config != NULL) ? config : &defintrf;
 
 	ic->mode = 0;
-	ic->rom = memory_region(Machine, RGNCLASS_SOUND, (ic->intf->rgnoverride != NULL) ? ic->intf->rgnoverride : tag);
-	ic->rom_size = memory_region_length(Machine, RGNCLASS_SOUND, (ic->intf->rgnoverride != NULL) ? ic->intf->rgnoverride : tag) - 1;
+	ic->rom = memory_region(Machine, (ic->intf->rgnoverride != NULL) ? ic->intf->rgnoverride : tag);
+	ic->rom_size = memory_region_length(Machine, (ic->intf->rgnoverride != NULL) ? ic->intf->rgnoverride : tag) - 1;
 
 	K053260_reset( ic );
 

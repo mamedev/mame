@@ -440,155 +440,155 @@ MACHINE_DRIVER_END
 
 ROM_START( bwings )
 	// Top Board(SCU-01)
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) // main CPU
+	ROM_REGION( 0x10000, "main", 0 ) // main CPU
 	ROM_LOAD( "bw_bv-02-.10a",0x04000, 0x04000, CRC(6074a86b) SHA1(0ce1bd74450144fd3c6556787d6c5c5d4531d830) )  // different
 	ROM_LOAD( "bw_bv-01.7a",  0x08000, 0x04000, CRC(b960c707) SHA1(086cb0f22fb59922bf0369bf6b382a241d979ec3) )
 	ROM_LOAD( "bw_bv-00-.4a", 0x0c000, 0x04000, CRC(1f83804c) SHA1(afd5eb0822db4fd982062945ca27e66ed9680645) )  // different
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "sub", 0 ) // sub CPU
+	ROM_REGION( 0x10000, "sub", 0 ) // sub CPU
 	ROM_LOAD( "bw_bv-06-.10d",0x0a000, 0x02000, CRC(ECA00FCB) SHA1(C7AFFBB900E3940257F8CEBC91266328A4A5DCA3) )  // different
 	ROM_LOAD( "bw_bv-05-.9d", 0x0c000, 0x02000, CRC(1e393300) SHA1(8d847256eb5dbccf5f524ec3aa836073d70b4edc) )  // different
 	ROM_LOAD( "bw_bv-04-.7d", 0x0e000, 0x02000, CRC(6548c5bb) SHA1(d12cc8d0d5692c3de766f5c42c818dd8f685760a) )  // different
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) // sound CPU(encrypted)
+	ROM_REGION( 0x10000, "audio", 0 ) // sound CPU(encrypted)
 	ROM_LOAD( "bw_bv-03.13a", 0x0e000, 0x02000, CRC(e8ac9379) SHA1(aaf5c20aa33ed05747a8a27739e9d09e094a518d) )
 
 	// Bottom Board(CCU-01)
-	ROM_REGION( 0x01000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) // chars
+	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) // chars
 	ROM_LOAD( "bw_bv-10.5c",  0x00000, 0x01000, CRC(edca6901) SHA1(402c80e7519cf3a43b9fef52c9923961220a48b6) )
 
 	// Middle Board(MCU-01)
-	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) // sprites
+	ROM_REGION( 0x0c000, "gfx2", ROMREGION_DISPOSE ) // sprites
 	ROM_LOAD( "bw_bv-07.1l",  0x00000, 0x04000, CRC(3d5ab2be) SHA1(2b3a039914ebfcc3993da74853a67546fc22c191) )
 	ROM_LOAD( "bw_bv-08.1k",  0x04000, 0x04000, CRC(7a585f1e) SHA1(99e5d947b6b1fa96b90c676a282376d67fc377f0) )
 	ROM_LOAD( "bw_bv-09.1h",  0x08000, 0x04000, CRC(a14c0b57) SHA1(5033354793d77922f5ef7f268cbe212e551efadf) )
 
 	// GPU Banks
-	ROM_REGION( 0x08000, RGNCLASS_GFX, "gpu", 0 )
+	ROM_REGION( 0x08000, "gpu", 0 )
 	ROM_FILL(0x00000, 0x08000, 0)
 ROM_END
 
 
 ROM_START( bwingso )
 	// Top Board(SCU-01)
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) // main CPU
+	ROM_REGION( 0x10000, "main", 0 ) // main CPU
 	ROM_LOAD( "bw_bv-02.10a", 0x04000, 0x04000, CRC(5ce74ab5) SHA1(b414f0bbe1c4c5b4c810bb4b9fba16aaf86520ff) )
 	ROM_LOAD( "bw_bv-01.7a",  0x08000, 0x04000, CRC(b960c707) SHA1(086cb0f22fb59922bf0369bf6b382a241d979ec3) )
 	ROM_LOAD( "bw_bv-00.4a",  0x0c000, 0x04000, CRC(926bef63) SHA1(d4bd2e91fa0abc5e9472d4b684c076bdc3c29f5b) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "sub", 0 ) // sub CPU
+	ROM_REGION( 0x10000, "sub", 0 ) // sub CPU
 	ROM_LOAD( "bw_bv-06.10d", 0x0a000, 0x02000, CRC(91a21a4c) SHA1(042eed60119a861f6b3ccfbe68d880f182a8a8e1) )
 	ROM_LOAD( "bw_bv-05.9d",  0x0c000, 0x02000, CRC(f283f39a) SHA1(9f7f4c39d49f4dfff73fe74cd457480e8a43a3c5) )
 	ROM_LOAD( "bw_bv-04.7d",  0x0e000, 0x02000, CRC(29ae75b6) SHA1(48c94e996857f2ac995bcd25f0e67b9f7c17d807) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) // sound CPU(encrypted)
+	ROM_REGION( 0x10000, "audio", 0 ) // sound CPU(encrypted)
 	ROM_LOAD( "bw_bv-03.13a", 0x0e000, 0x02000, CRC(e8ac9379) SHA1(aaf5c20aa33ed05747a8a27739e9d09e094a518d) )
 
 	// Bottom Board(CCU-01)
-	ROM_REGION( 0x01000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) // chars
+	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) // chars
 	ROM_LOAD( "bw_bv-10.5c",  0x00000, 0x01000, CRC(edca6901) SHA1(402c80e7519cf3a43b9fef52c9923961220a48b6) )
 
 	// Middle Board(MCU-01)
-	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) // sprites
+	ROM_REGION( 0x0c000, "gfx2", ROMREGION_DISPOSE ) // sprites
 	ROM_LOAD( "bw_bv-07.1l",  0x00000, 0x04000, CRC(3d5ab2be) SHA1(2b3a039914ebfcc3993da74853a67546fc22c191) )
 	ROM_LOAD( "bw_bv-08.1k",  0x04000, 0x04000, CRC(7a585f1e) SHA1(99e5d947b6b1fa96b90c676a282376d67fc377f0) )
 	ROM_LOAD( "bw_bv-09.1h",  0x08000, 0x04000, CRC(a14c0b57) SHA1(5033354793d77922f5ef7f268cbe212e551efadf) )
 
 	// GPU Banks
-	ROM_REGION( 0x08000, RGNCLASS_GFX, "gpu", 0 )
+	ROM_REGION( 0x08000, "gpu", 0 )
 	ROM_FILL(0x00000, 0x08000, 0)
 ROM_END
 
 
 ROM_START( bwingsa )
 	// Top Board(SCU-01)
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) // main CPU
+	ROM_REGION( 0x10000, "main", 0 ) // main CPU
 	ROM_LOAD( "bw_bv-02.10a", 0x04000, 0x04000, CRC(5ce74ab5) SHA1(b414f0bbe1c4c5b4c810bb4b9fba16aaf86520ff) )
 	ROM_LOAD( "bv02.bin",     0x06000, 0x02000, CRC(2f84654e) SHA1(11b5343219b46d03f686ea348181c509121b9e3c) ) // only the lower 8k is different
 	ROM_LOAD( "bw_bv-01.7a",  0x08000, 0x04000, CRC(b960c707) SHA1(086cb0f22fb59922bf0369bf6b382a241d979ec3) )
 	ROM_LOAD( "bv00.bin",     0x0c000, 0x04000, CRC(0bbc1222) SHA1(cfdf621a423a5ce4ba44a980e683d2abf044d6b9) ) // different
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "sub", 0 ) // sub CPU
+	ROM_REGION( 0x10000, "sub", 0 ) // sub CPU
 	ROM_LOAD( "bw_bv-06.10d", 0x0a000, 0x02000, CRC(91a21a4c) SHA1(042eed60119a861f6b3ccfbe68d880f182a8a8e1) )
 	ROM_LOAD( "bw_bv-05.9d",  0x0c000, 0x02000, CRC(f283f39a) SHA1(9f7f4c39d49f4dfff73fe74cd457480e8a43a3c5) )
 	ROM_LOAD( "bw_bv-04.7d",  0x0e000, 0x02000, CRC(29ae75b6) SHA1(48c94e996857f2ac995bcd25f0e67b9f7c17d807) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) // sound CPU(encrypted)
+	ROM_REGION( 0x10000, "audio", 0 ) // sound CPU(encrypted)
 	ROM_LOAD( "bw_bv-03.13a", 0x0e000, 0x02000, CRC(e8ac9379) SHA1(aaf5c20aa33ed05747a8a27739e9d09e094a518d) )
 
 	// Bottom Board(CCU-01)
-	ROM_REGION( 0x01000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) // chars
+	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) // chars
 	ROM_LOAD( "bw_bv-10.5c",  0x00000, 0x01000, CRC(edca6901) SHA1(402c80e7519cf3a43b9fef52c9923961220a48b6) )
 
 	// Middle Board(MCU-01)
-	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) // sprites
+	ROM_REGION( 0x0c000, "gfx2", ROMREGION_DISPOSE ) // sprites
 	ROM_LOAD( "bw_bv-07.1l",  0x00000, 0x04000, CRC(3d5ab2be) SHA1(2b3a039914ebfcc3993da74853a67546fc22c191) )
 	ROM_LOAD( "bw_bv-08.1k",  0x04000, 0x04000, CRC(7a585f1e) SHA1(99e5d947b6b1fa96b90c676a282376d67fc377f0) )
 	ROM_LOAD( "bw_bv-09.1h",  0x08000, 0x04000, CRC(a14c0b57) SHA1(5033354793d77922f5ef7f268cbe212e551efadf) )
 
 	// GPU Banks
-	ROM_REGION( 0x08000, RGNCLASS_GFX, "gpu", 0 )
+	ROM_REGION( 0x08000, "gpu", 0 )
 	ROM_FILL(0x00000, 0x08000, 0)
 ROM_END
 
 ROM_START( zaviga )
 	// Top Board(DE-0169-0)
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) // main CPU
+	ROM_REGION( 0x10000, "main", 0 ) // main CPU
 	ROM_LOAD( "as04", 0x04000, 0x04000, CRC(b79f5da2) SHA1(b39748666d3f7fb1ac46d282cce09fe9531df6b1) )
 	ROM_LOAD( "as02", 0x08000, 0x04000, CRC(6addd16a) SHA1(940637c49bf9f38c77176ed2ae212048e9e7fd8f) )
 	ROM_LOAD( "as00", 0x0c000, 0x04000, CRC(c6ae4af0) SHA1(6f6f14385b20f9c9c312f816036c608fe8514b00) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "sub", 0 ) // sub CPU
+	ROM_REGION( 0x10000, "sub", 0 ) // sub CPU
 	ROM_LOAD( "as08", 0x0a000, 0x02000, CRC(b6187b3a) SHA1(d2d7c5b185f59986f45d8ec3ddf9b95364e57d96) )
 	ROM_LOAD( "as07", 0x0c000, 0x02000, CRC(dc1170e3) SHA1(c8e4d1564fd272d726d0e4ffd4f33f67f1b37cd7) )
 	ROM_LOAD( "as06", 0x0e000, 0x02000, CRC(ba888f84) SHA1(f94de8553cd4704d9b3349ded881a7cc62fa9b57) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) // sound CPU(encrypted)
+	ROM_REGION( 0x10000, "audio", 0 ) // sound CPU(encrypted)
 	ROM_LOAD( "as05", 0x0e000, 0x02000, CRC(afe9b0ac) SHA1(3c653cd4fff7f4e00971249900b5a810b6e74dfe) )
 
 	// Bottom Board(DE-0170-0)
-	ROM_REGION( 0x01000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) // chars
+	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) // chars
 	ROM_LOAD( "as14", 0x00000, 0x01000, CRC(62132c1d) SHA1(6b101e220a440488da17de8446f4e2c8ec7c7de9) )
 
 	// Middle Board(DE-0171-0)
-	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) // sprites
+	ROM_REGION( 0x0c000, "gfx2", ROMREGION_DISPOSE ) // sprites
 	ROM_LOAD( "as11", 0x00000, 0x04000, CRC(aa84af24) SHA1(af4ff085dc44b3d1493ec1c8b4a8d18dccecc872) )
 	ROM_LOAD( "as12", 0x04000, 0x04000, CRC(84af9041) SHA1(8fbd5995ca8e708cd7fb9cdfcdb174e12084f526) )
 	ROM_LOAD( "as13", 0x08000, 0x04000, CRC(15d0922b) SHA1(b8d715a9e610531472d516c19f6035adbce93c84) )
 
 	// GPU Banks
-	ROM_REGION( 0x08000, RGNCLASS_GFX, "gpu", 0 )
+	ROM_REGION( 0x08000, "gpu", 0 )
 	ROM_FILL(0x00000, 0x08000, 0)
 ROM_END
 
 
 ROM_START( zavigaj )
 	// Top Board(DE-0169-0)
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) // main CPU
+	ROM_REGION( 0x10000, "main", 0 ) // main CPU
 	ROM_LOAD( "as04", 0x04000, 0x04000, CRC(b79f5da2) SHA1(b39748666d3f7fb1ac46d282cce09fe9531df6b1) )
 	ROM_LOAD( "as02", 0x08000, 0x04000, CRC(6addd16a) SHA1(940637c49bf9f38c77176ed2ae212048e9e7fd8f) )
 	ROM_LOAD( "as00", 0x0c000, 0x04000, CRC(c6ae4af0) SHA1(6f6f14385b20f9c9c312f816036c608fe8514b00) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "sub", 0 ) // sub CPU
+	ROM_REGION( 0x10000, "sub", 0 ) // sub CPU
 	ROM_LOAD( "as08",     0x0a000, 0x02000, CRC(b6187b3a) SHA1(d2d7c5b185f59986f45d8ec3ddf9b95364e57d96) )
 	ROM_LOAD( "as07",     0x0c000, 0x02000, CRC(dc1170e3) SHA1(c8e4d1564fd272d726d0e4ffd4f33f67f1b37cd7) )
 	ROM_LOAD( "as06-.7d", 0x0e000, 0x02000, CRC(b02d270c) SHA1(beea3d44d367543b5b5075c5892580e690691e75) )  // different
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) // sound CPU(encrypted)
+	ROM_REGION( 0x10000, "audio", 0 ) // sound CPU(encrypted)
 	ROM_LOAD( "as05", 0x0e000, 0x02000, CRC(afe9b0ac) SHA1(3c653cd4fff7f4e00971249900b5a810b6e74dfe) )
 
 	// Bottom Board(DE-0170-0)
-	ROM_REGION( 0x01000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) // chars
+	ROM_REGION( 0x01000, "gfx1", ROMREGION_DISPOSE ) // chars
 	ROM_LOAD( "as14", 0x00000, 0x01000, CRC(62132c1d) SHA1(6b101e220a440488da17de8446f4e2c8ec7c7de9) )
 
 	// Middle Board(DE-0171-0)
-	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) // sprites
+	ROM_REGION( 0x0c000, "gfx2", ROMREGION_DISPOSE ) // sprites
 	ROM_LOAD( "as11", 0x00000, 0x04000, CRC(aa84af24) SHA1(af4ff085dc44b3d1493ec1c8b4a8d18dccecc872) )
 	ROM_LOAD( "as12", 0x04000, 0x04000, CRC(84af9041) SHA1(8fbd5995ca8e708cd7fb9cdfcdb174e12084f526) )
 	ROM_LOAD( "as13", 0x08000, 0x04000, CRC(15d0922b) SHA1(b8d715a9e610531472d516c19f6035adbce93c84) )
 
 	// GPU Banks
-	ROM_REGION( 0x08000, RGNCLASS_GFX, "gpu", 0 )
+	ROM_REGION( 0x08000, "gpu", 0 )
 	ROM_FILL(0x00000, 0x08000, 0)
 ROM_END
 
@@ -612,9 +612,9 @@ static void fix_bwp3(void)
 
 static DRIVER_INIT( bwing )
 {
-	bwp123_membase[0] = memory_region(machine, RGNCLASS_CPU, "main");
-	bwp123_membase[1] = memory_region(machine, RGNCLASS_CPU, "sub");
-	bwp123_membase[2] = memory_region(machine, RGNCLASS_CPU, "audio");
+	bwp123_membase[0] = memory_region(machine, "main");
+	bwp123_membase[1] = memory_region(machine, "sub");
+	bwp123_membase[2] = memory_region(machine, "audio");
 
 	fix_bwp3();
 }

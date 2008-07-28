@@ -39,7 +39,7 @@ static READ8_HANDLER( rom_bank_select_r )
 */
 static WRITE8_HANDLER( rom_bank_select_w )
 {
-	UINT8 *region_base = memory_region(machine, RGNCLASS_USER, "user1");
+	UINT8 *region_base = memory_region(machine, "user1");
 
 	suprgolf_rom_bank = data;
 
@@ -49,7 +49,7 @@ static WRITE8_HANDLER( rom_bank_select_w )
 
 static WRITE8_HANDLER( rom2_bank_select_w )
 {
-	UINT8 *region_base = memory_region(machine, RGNCLASS_USER, "user2");
+	UINT8 *region_base = memory_region(machine, "user2");
 	mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,activecpu_get_previouspc());
 	memory_set_bankptr(1, region_base + (data&0x3f ) * 0x4000);
 }
@@ -350,10 +350,10 @@ CG23     7F         "
 */
 
 ROM_START( suprgolf )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "cg24.6k",0x000000, 0x08000, CRC(de548044) SHA1(f96b4cfcfca4dffabfaf205eb903cbc70972626b) )
 
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "cg1.6j", 0x000000, 0x10000, CRC(ee545c71) SHA1(8ee459a85e52257d3f9a2aa7263b641aad87bafd) )
 	ROM_LOAD( "cg2.6g", 0x010000, 0x10000, CRC(a2ed2159) SHA1(5e13b6c4eaba8146a4c6c2ff24197f3ffca29b92) )
 	ROM_LOAD( "cg3.6f", 0x020000, 0x10000, CRC(4543334d) SHA1(7ee268ed6d02c78db8c222418313593df37cde4b) )
@@ -367,13 +367,13 @@ ROM_START( suprgolf )
 	/* no 5c? */
 	ROM_LOAD( "cg11.5a",0x0b0000, 0x10000, CRC(cfec1a0f) SHA1(c09ece059cb3c456b66c016c6fab3139d3f61c6a) )
 
-	ROM_REGION( 0x100000, RGNCLASS_USER, "user2", ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "user2", ROMREGION_ERASEFF )
 	ROM_LOAD( "cg20.7k",0x000000, 0x10000, CRC(1e3fa2fd) SHA1(4771b90e40ebfbae4a98ff7ce6db50f635232597) )
 	ROM_LOAD( "cg21.7j",0x010000, 0x10000, CRC(0323a2cd) SHA1(d7d4b35ad451acb2fa3d117bb0ae2f8fbd883f17) )
 	ROM_LOAD( "cg22.7g",0x020000, 0x10000, CRC(83bcbefd) SHA1(77f29cfd1583d2506e95b8513cb9f87569c31821) )
 	ROM_LOAD( "cg23.7f",0x030000, 0x10000, CRC(50191b4d) SHA1(8f74cba2a2b5fd2a03eaf13a6d6b39af8833a4ab) )
 
-	ROM_REGION( 0x70000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x70000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "cg18.3k",0x60000, 0x10000, CRC(36edd88e) SHA1(374c95721198a88831d6f7e0b71d05e2f8465271) )
 	ROM_LOAD( "cg17.5f",0x50000, 0x10000, CRC(d27f87b5) SHA1(5b2927e89615589540e3853593aeff517584b6a0))
 	ROM_LOAD( "cg16.5g",0x40000, 0x10000, CRC(0498aa2e) SHA1(988965c3a584dac17ad8c7e504fa1f1e49775611) )

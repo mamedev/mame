@@ -13,7 +13,7 @@ static int protection_ret = 0;
 
 READ8_HANDLER( mmonkey_protection_r )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 
 	int ret = 0;
 
@@ -29,7 +29,7 @@ READ8_HANDLER( mmonkey_protection_r )
 
 WRITE8_HANDLER( mmonkey_protection_w )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 
 
 	if (offset == 0)

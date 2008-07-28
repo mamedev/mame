@@ -131,7 +131,7 @@ static ADDRESS_MAP_START( lethalj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x04700000, 0x0470007f) AM_WRITE(lethalj_blitter_w)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP	/* seems to be a bug in their code, one of many. */
-	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0)
+	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 
@@ -570,11 +570,11 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( lethalj )
-	ROM_REGION16_LE( 0x100000, RGNCLASS_USER, "user1", 0 )		/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
 	ROM_LOAD16_BYTE( "vc8",  0x000000, 0x080000, CRC(8d568e1d) SHA1(e4dd3794789f9ccd7be8374978a3336f2b79136f) )
 	ROM_LOAD16_BYTE( "vc9",  0x000001, 0x080000, CRC(8f22add4) SHA1(e773d3ae9cf512810fc266e784d21ed115c8830c) )
 
-	ROM_REGION16_LE( 0x600000, RGNCLASS_GFX, "gfx1", 0 )			/* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
 	ROM_LOAD16_BYTE( "gr1",  0x000000, 0x100000, CRC(27f7b244) SHA1(628b29c066e217e1fe54553ea3ed98f86735e262) )
 	ROM_LOAD16_BYTE( "gr2",  0x000001, 0x100000, CRC(1f25d3ab) SHA1(bdb8a3c546cdee9a5630c47b9c5079a956e8a093) )
 	ROM_LOAD16_BYTE( "gr4",  0x200000, 0x100000, CRC(c5838b4c) SHA1(9ad03d0f316eb31fdf0ca6f65c02a27d3406d072) )
@@ -582,25 +582,25 @@ ROM_START( lethalj )
 	ROM_LOAD16_BYTE( "gr6",  0x400000, 0x100000, CRC(51c99b85) SHA1(9a23bf21a73d2884b49c64a8f42c288534c79dc5) )
 	ROM_LOAD16_BYTE( "gr5",  0x400001, 0x100000, CRC(80dda9b5) SHA1(d8a79cad112bc7d9e4ba31a950e4807581f3bf46) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki1", 0 )				/* sound data */
+	ROM_REGION( 0x40000, "oki1", 0 )				/* sound data */
 	ROM_LOAD( "sound1.u20", 0x00000, 0x40000, CRC(7d93ca66) SHA1(9e1dc0efa5d0f770c7e1f10de56fbf5620dea437) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki2", 0 )				/* sound data */
+	ROM_REGION( 0x40000, "oki2", 0 )				/* sound data */
 	ROM_LOAD( "sound1.u21",    0x00000, 0x40000, CRC(7d3beae0) SHA1(5ec753c5fd5ca0f9492c9e274703a1aa758062a7) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki3", 0 )				/* sound data */
+	ROM_REGION( 0x40000, "oki3", 0 )				/* sound data */
 	ROM_LOAD( "sound1.u18", 0x00000, 0x40000, CRC(7d93ca66) SHA1(9e1dc0efa5d0f770c7e1f10de56fbf5620dea437) )
 ROM_END
 
 
 ROM_START( eggventr )
-	ROM_REGION16_LE( 0x100000, RGNCLASS_USER, "user1", 0 )		/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
 	ROM_LOAD16_BYTE( "eggvc8.10", 0x000000, 0x020000, CRC(225d1164) SHA1(b0dc55f2e8ded1fe7874de05987fcf879772289e) )
 	ROM_LOAD16_BYTE( "eggvc9.10", 0x000001, 0x020000, CRC(42f6e904) SHA1(11be8e7383a218aac0e1a63236bbdb7cca0993bf) )
-	ROM_COPY( RGNCLASS_USER, "user1", 0x000000, 0x040000, 0x040000 )
-	ROM_COPY( RGNCLASS_USER, "user1", 0x000000, 0x080000, 0x080000 )
+	ROM_COPY( "user1", 0x000000, 0x040000, 0x040000 )
+	ROM_COPY( "user1", 0x000000, 0x080000, 0x080000 )
 
-	ROM_REGION16_LE( 0x600000, RGNCLASS_GFX, "gfx1", 0 )			/* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
 	ROM_LOAD16_BYTE( "egr1.bin",  0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
 	ROM_LOAD16_BYTE( "egr2.bin",  0x000001, 0x100000, CRC(3a9ba910) SHA1(465aa3119af103aa65b25042b3572fdcb9c1887a) )
 	ROM_LOAD16_BYTE( "egr4.bin",  0x200000, 0x100000, CRC(4ea5900e) SHA1(20341337ee3c6c22580c52312156b818f4187693) )
@@ -608,25 +608,25 @@ ROM_START( eggventr )
 	ROM_LOAD16_BYTE( "egr6.3",    0x400000, 0x100000, CRC(f299d818) SHA1(abbb333c43675d34c59201b5d297779cfea8b092) )
 	ROM_LOAD16_BYTE( "egr5.3",    0x400001, 0x100000, CRC(ebfca07b) SHA1(20465d14b41d99651166f221057737d7b3cc770c) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki1", 0 )				/* sound data */
+	ROM_REGION( 0x40000, "oki1", 0 )				/* sound data */
 	ROM_LOAD( "eu20.bin", 0x00000, 0x40000, CRC(3760b1db) SHA1(70e258a6036f9ce26b354c4df57e0e4d2c871bcb) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki2", 0 )				/* sound data */
+	ROM_REGION( 0x40000, "oki2", 0 )				/* sound data */
 	ROM_LOAD( "eu21.bin", 0x00000, 0x40000, CRC(3760b1db) SHA1(70e258a6036f9ce26b354c4df57e0e4d2c871bcb) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki3", 0 )				/* sound data */
+	ROM_REGION( 0x40000, "oki3", 0 )				/* sound data */
 	ROM_LOAD( "eu18.bin", 0x00000, 0x40000, CRC(3760b1db) SHA1(70e258a6036f9ce26b354c4df57e0e4d2c871bcb) )
 ROM_END
 
 
 ROM_START( eggvent7 )
-	ROM_REGION16_LE( 0x100000, RGNCLASS_USER, "user1", 0 )		/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
 	ROM_LOAD16_BYTE( "eggvc8.7", 0x000000, 0x020000, CRC(99999899) SHA1(e3908600fa711baa7f7562f86498ec7e988a5bea) )
 	ROM_LOAD16_BYTE( "eggvc9.7", 0x000001, 0x020000, CRC(1b608155) SHA1(256dd981515d57f806a3770bdc6ff46b9000f7f3) )
-	ROM_COPY( RGNCLASS_USER, "user1", 0x000000, 0x040000, 0x040000 )
-	ROM_COPY( RGNCLASS_USER, "user1", 0x000000, 0x080000, 0x080000 )
+	ROM_COPY( "user1", 0x000000, 0x040000, 0x040000 )
+	ROM_COPY( "user1", 0x000000, 0x080000, 0x080000 )
 
-	ROM_REGION16_LE( 0x600000, RGNCLASS_GFX, "gfx1", 0 )			/* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
 	ROM_LOAD16_BYTE( "egr1.bin",  0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
 	ROM_LOAD16_BYTE( "egr2.bin",  0x000001, 0x100000, CRC(3a9ba910) SHA1(465aa3119af103aa65b25042b3572fdcb9c1887a) )
 	ROM_LOAD16_BYTE( "egr4.bin",  0x200000, 0x100000, CRC(4ea5900e) SHA1(20341337ee3c6c22580c52312156b818f4187693) )
@@ -634,23 +634,23 @@ ROM_START( eggvent7 )
 	ROM_LOAD16_BYTE( "egr6.3",    0x400000, 0x100000, CRC(f299d818) SHA1(abbb333c43675d34c59201b5d297779cfea8b092) )
 	ROM_LOAD16_BYTE( "egr5.3",    0x400001, 0x100000, CRC(ebfca07b) SHA1(20465d14b41d99651166f221057737d7b3cc770c) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki1", 0 )				/* sound data */
+	ROM_REGION( 0x40000, "oki1", 0 )				/* sound data */
 	ROM_LOAD( "eu20.bin", 0x00000, 0x40000, CRC(3760b1db) SHA1(70e258a6036f9ce26b354c4df57e0e4d2c871bcb) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki2", 0 )				/* sound data */
+	ROM_REGION( 0x40000, "oki2", 0 )				/* sound data */
 	ROM_LOAD( "eu21.bin", 0x00000, 0x40000, CRC(3760b1db) SHA1(70e258a6036f9ce26b354c4df57e0e4d2c871bcb) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki3", 0 )				/* sound data */
+	ROM_REGION( 0x40000, "oki3", 0 )				/* sound data */
 	ROM_LOAD( "eu18.bin", 0x00000, 0x40000, CRC(3760b1db) SHA1(70e258a6036f9ce26b354c4df57e0e4d2c871bcb) )
 ROM_END
 
 
 ROM_START( eggvntdx )
-	ROM_REGION16_LE( 0x100000, RGNCLASS_USER, "user1", 0 )		/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
 	ROM_LOAD16_BYTE( "eggdlx.vc8", 0x000000, 0x080000, CRC(d7f56141) SHA1(3c16b509fd1c763e452c27084fb0e90cde3947f7) )
 	ROM_LOAD16_BYTE( "eggdlx.vc9", 0x000001, 0x080000, CRC(cc5f122e) SHA1(e719a3937378df605cdb86c59a534808473c8f90) )
 
-	ROM_REGION16_LE( 0x600000, RGNCLASS_GFX, "gfx1", 0 )			/* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
 	ROM_LOAD16_BYTE( "egr1.bin",     0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
 	ROM_LOAD16_BYTE( "egr2.bin",     0x000001, 0x100000, CRC(3a9ba910) SHA1(465aa3119af103aa65b25042b3572fdcb9c1887a) )
 	ROM_LOAD16_BYTE( "eggdlx.gr4",   0x200000, 0x100000, CRC(cfb1e28b) SHA1(8d535a27158acee893233cf2012b4ab0ffc8dc03) )
@@ -658,23 +658,23 @@ ROM_START( eggvntdx )
 	ROM_LOAD16_BYTE( "eggdlx.gr6",   0x400000, 0x100000, CRC(97d02e8a) SHA1(6f9532fb031953c1187782b4fce5a0cfaf9461b3) )
 	ROM_LOAD16_BYTE( "eggdlx.gr5",   0x400001, 0x100000, CRC(387d9176) SHA1(9f26f97cab8baeea1d5e4860a8a35a55bdc601e8) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki1", 0 )				/* sound data */
+	ROM_REGION( 0x40000, "oki1", 0 )				/* sound data */
 	ROM_LOAD( "eu20.bin", 0x00000, 0x40000, CRC(3760b1db) SHA1(70e258a6036f9ce26b354c4df57e0e4d2c871bcb) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki2", 0 )				/* sound data */
+	ROM_REGION( 0x40000, "oki2", 0 )				/* sound data */
 	ROM_LOAD( "eu21.bin", 0x00000, 0x40000, CRC(3760b1db) SHA1(70e258a6036f9ce26b354c4df57e0e4d2c871bcb) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki3", 0 )				/* sound data */
+	ROM_REGION( 0x40000, "oki3", 0 )				/* sound data */
 	ROM_LOAD( "eu18.bin", 0x00000, 0x40000, CRC(3760b1db) SHA1(70e258a6036f9ce26b354c4df57e0e4d2c871bcb) )
 ROM_END
 
 
 ROM_START( cclownz )
-	ROM_REGION16_LE( 0x100000, RGNCLASS_USER, "user1", 0 )		/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
 	ROM_LOAD16_BYTE( "cc-v1-vc8.bin", 0x000000, 0x080000, CRC(433fe6ac) SHA1(dea7aede9882ee52be88927418b7395418757d12) )
 	ROM_LOAD16_BYTE( "cc-v1-vc9.bin", 0x000001, 0x080000, CRC(9d1b3dae) SHA1(44a97c38bc9685e97721722c67505832fa06b44d) )
 
-	ROM_REGION16_LE( 0x600000, RGNCLASS_GFX, "gfx1", 0 )			/* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
 	ROM_LOAD16_BYTE( "cc-gr1.bin",   0x000000, 0x100000, CRC(17c0ab2a) SHA1(f5ec66f4ac3292ef74f6434fe3ef17f9e977e8f6) )
 	ROM_LOAD16_BYTE( "cc-gr2.bin",   0x000001, 0x100000, CRC(dead9528) SHA1(195ad9f7da61ecb5a364da92ba837aa3fcb3a347) )
 	ROM_LOAD16_BYTE( "cc-gr4.bin",   0x200000, 0x100000, CRC(78cceed8) SHA1(bc8e5bb625072b17a5711402b07a39ea4a87a0f8) )
@@ -682,16 +682,16 @@ ROM_START( cclownz )
 	ROM_LOAD16_BYTE( "cc-gr6.bin",   0x400000, 0x100000, CRC(889d2771) SHA1(3222d7105c3a68e2050f00b07e8d84d57a9f7a19) )
 	ROM_LOAD16_BYTE( "cc-gr5.bin",   0x400001, 0x100000, CRC(2a15ef8f) SHA1(3e33cff2657bb1371acf25641080aff2d8da6c05) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki1", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki1", 0 )				/* sound data */
 	ROM_LOAD( "cc-s-u20.bin", 0x00000, 0x80000, CRC(252fc4b5) SHA1(bbc6c3599869f3f46d3df4f3f8d0a8d88d8e0132) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki2", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki2", 0 )				/* sound data */
 	ROM_LOAD( "cc-s-u21.bin", 0x00000, 0x80000, CRC(6c3da4ed) SHA1(f10cbea6e03ada5ac1535041636e96b6224967fa) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki3", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki3", 0 )				/* sound data */
 	ROM_LOAD( "cc-s-u18.bin", 0x00000, 0x80000, CRC(9cdf87af) SHA1(77dfc0bc1d535b5d585071dd4e9deb367003ab2d) )
 
-	ROM_REGION( 0x80000, RGNCLASS_USER, "user2", 0 ) /* convert these */
+	ROM_REGION( 0x80000, "user2", 0 ) /* convert these */
 	ROM_LOAD( "vc-12.jed", 0x0000, 0x3f03, CRC(6947ea9e) SHA1(5a418cd04851841a49beeeea274c1441fefde173) )
 	ROM_LOAD( "vc-16.jed", 0x0000, 0x3efb, CRC(e535b16a) SHA1(e2c17c2a42386be957b603d2c2da4f1ac28a4074) )
 	ROM_LOAD( "vc-22.jed", 0x0000, 0x3efb, CRC(e535b16a) SHA1(e2c17c2a42386be957b603d2c2da4f1ac28a4074) )
@@ -702,11 +702,11 @@ ROM_END
 
 
 ROM_START( ripribit )
-	ROM_REGION16_LE( 0x100000, RGNCLASS_USER, "user1", 0 )		/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
 	ROM_LOAD16_BYTE( "rr_v2-84-vc8.bin", 0x000000, 0x080000, CRC(5ecc432d) SHA1(073062528fbcf63be7e3c6695d60d048430f6e4b) )
 	ROM_LOAD16_BYTE( "rr_v2-84-vc9.bin", 0x000001, 0x080000, CRC(d9bae3f8) SHA1(fcf8099ebe170ad5778aaa533bcfd1e5ead46e6b) )
 
-	ROM_REGION16_LE( 0x600000, RGNCLASS_GFX, "gfx1", 0 )			/* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
 	ROM_LOAD16_BYTE( "rr-gr1.bin",   0x000000, 0x100000, CRC(e02c79b7) SHA1(75e352424c449cd5cba1057555928d7ee13ab113) )
 	ROM_LOAD16_BYTE( "rr-gr2.bin",   0x000001, 0x100000, CRC(09f48db7) SHA1(d0156c6e3d05ff81540c0eeb66e9a5e7fc4d053c) )
 	ROM_LOAD16_BYTE( "rr-gr4.bin",   0x200000, 0x100000, CRC(94d0db81) SHA1(aa46c2e5a627cf01c1d57002204ec3419f0d4503) )
@@ -714,16 +714,16 @@ ROM_START( ripribit )
 	ROM_LOAD16_BYTE( "rr-gr6.bin",   0x400000, 0x100000, CRC(c9ac211b) SHA1(75cbfa0f875da82d510d75ad28b9db0892b3da85) )
 	ROM_LOAD16_BYTE( "rr-gr5.bin",   0x400001, 0x100000, CRC(84ae466a) SHA1(4e7b3dc27a46f735ff13a753806b3688f34a64fe) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki1", 0 )  /* sound data (music) */
+	ROM_REGION( 0x80000, "oki1", 0 )  /* sound data (music) */
 	ROM_LOAD( "rr-s-u20.bin", 0x00000, 0x80000, CRC(c345b779) SHA1(418058bbda74727ec99ac375982c9cd2c8bc5c86) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki2", ROMREGION_ERASE00 )				/* sound data */
+	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 )				/* sound data */
 //  ROM_LOAD( "rr-s-u21.bin", 0x00000, 0x80000 ) // not populated
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki3", 0 ) /* sound data (effects) */
+	ROM_REGION( 0x80000, "oki3", 0 ) /* sound data (effects) */
 	ROM_LOAD( "rr-s-u18.bin", 0x00000, 0x80000, CRC(badb9cb6) SHA1(716d65b5ff8d3f8ff25ae70426ce318af9a92b7e) )
 
-	ROM_REGION( 0x80000, RGNCLASS_USER, "user2", 0 ) /* convert these */
+	ROM_REGION( 0x80000, "user2", 0 ) /* convert these */
 	ROM_LOAD( "vc-12.jed", 0x0000, 0x3f03, CRC(6947ea9e) SHA1(5a418cd04851841a49beeeea274c1441fefde173) )
 	ROM_LOAD( "vc-16.jed", 0x0000, 0x3efb, CRC(e535b16a) SHA1(e2c17c2a42386be957b603d2c2da4f1ac28a4074) )
 	ROM_LOAD( "vc-22.jed", 0x0000, 0x3efb, CRC(e535b16a) SHA1(e2c17c2a42386be957b603d2c2da4f1ac28a4074) )
@@ -734,11 +734,11 @@ ROM_END
 
 
 ROM_START( cfarm )
-	ROM_REGION16_LE( 0x100000, RGNCLASS_USER, "user1", 0 )		/* 34010 code */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
 	ROM_LOAD16_BYTE( "cf-v2-vc8.bin", 0x000000, 0x080000, CRC(93bcf145) SHA1(134ac3ee4fd837f56fb0b338289cf03108346539) )
 	ROM_LOAD16_BYTE( "cf-v2-vc9.bin", 0x000001, 0x080000, CRC(954421f9) SHA1(bf1faa9b085f066d1e2ff6ee01c468b1c1d945e9) )
 
-	ROM_REGION16_LE( 0x600000, RGNCLASS_GFX, "gfx1", 0 )			/* graphics data */
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
 	ROM_LOAD16_BYTE( "cf-gr1.bin",   0x000000, 0x100000, CRC(2241a06e) SHA1(f07a99372bb951dd345378da212b41cb8204e782) )
 	ROM_LOAD16_BYTE( "cf-gr2.bin",   0x000001, 0x100000, CRC(31182263) SHA1(d5d36f9b5d612f681e6aa563831b6704bc05489e) )
 	ROM_LOAD16_BYTE( "cf-gr4.bin",   0x200000, 0x100000, CRC(0883a6f2) SHA1(ef259dcdc7b1325f15a98f6c97ecb965b2b6f9b1) )
@@ -746,16 +746,16 @@ ROM_START( cfarm )
 	ROM_LOAD16_BYTE( "cf-gr6.bin",   0x400000, 0x100000, CRC(8709a62c) SHA1(3691fb055155ae339c78ec8b7f485aa7d576556b) )
 	ROM_LOAD16_BYTE( "cf-gr5.bin",   0x400001, 0x100000, CRC(6de18621) SHA1(9e83f8ed3a2999ee4fdca389c5e792c5b1293717) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki1", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki1", 0 )				/* sound data */
 	ROM_LOAD( "cf-s-u20.bin", 0x00000, 0x80000, CRC(715a12dd) SHA1(374185b062853f3e2ea069ea53494cbe3d8dd511) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki2", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki2", 0 )				/* sound data */
 	ROM_LOAD( "cf-s-u21.bin", 0x00000, 0x80000, CRC(bc27e3d5) SHA1(a25215b8314fe44974e9efe78cdc10de34f7bfba) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki3", 0 )				/* sound data */
+	ROM_REGION( 0x80000, "oki3", 0 )				/* sound data */
 	ROM_LOAD( "cf-s-u18.bin", 0x00000, 0x80000, CRC(63984658) SHA1(5594965c9304850187859ba730aff26001782f0f) )
 
-	ROM_REGION( 0x80000, RGNCLASS_USER, "user2", 0 ) /* convert these */
+	ROM_REGION( 0x80000, "user2", 0 ) /* convert these */
 	ROM_LOAD( "vc-12.jed", 0x0000, 0x3f03, CRC(6947ea9e) SHA1(5a418cd04851841a49beeeea274c1441fefde173) )
 	ROM_LOAD( "vc-16.jed", 0x0000, 0x3efb, CRC(e535b16a) SHA1(e2c17c2a42386be957b603d2c2da4f1ac28a4074) )
 	ROM_LOAD( "vc-22.jed", 0x0000, 0x3efb, CRC(e535b16a) SHA1(e2c17c2a42386be957b603d2c2da4f1ac28a4074) )

@@ -1316,7 +1316,7 @@ static ADDRESS_MAP_START( konami573_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE(psx_spu_r, psx_spu_w)
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE(2) AM_REGION(RGNCLASS_USER, "user1", 0) /* bios */
+	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE(2) AM_REGION("user1", 0) /* bios */
 	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE(1) /* ram mirror */
 	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE(2) /* bios mirror */
 	AM_RANGE(0xa0000000, 0xa03fffff) AM_RAM AM_SHARE(1) /* ram mirror */
@@ -1334,7 +1334,6 @@ static void flash_init( running_machine *machine )
 	static const struct
 	{
 		int *start;
-		int rgnclass;
 		const char *rgntag;
 		int chips;
 		int type;
@@ -1342,11 +1341,11 @@ static void flash_init( running_machine *machine )
 	}
 	flash_init[] =
 	{
-		{ &onboard_flash_start, RGNCLASS_USER, "user3",  8, FLASH_FUJITSU_29F016A, 0x200000 },
-		{ &pccard1_flash_start, RGNCLASS_USER, "user4", 16, FLASH_FUJITSU_29F016A, 0x200000 },
-		{ &pccard2_flash_start, RGNCLASS_USER, "user5", 16, FLASH_FUJITSU_29F016A, 0x200000 },
-		{ &pccard3_flash_start, RGNCLASS_USER, "user6", 16, FLASH_FUJITSU_29F016A, 0x200000 },
-		{ &pccard4_flash_start, RGNCLASS_USER, "user7", 16, FLASH_FUJITSU_29F016A, 0x200000 },
+		{ &onboard_flash_start, "user3",  8, FLASH_FUJITSU_29F016A, 0x200000 },
+		{ &pccard1_flash_start, "user4", 16, FLASH_FUJITSU_29F016A, 0x200000 },
+		{ &pccard2_flash_start, "user5", 16, FLASH_FUJITSU_29F016A, 0x200000 },
+		{ &pccard3_flash_start, "user6", 16, FLASH_FUJITSU_29F016A, 0x200000 },
+		{ &pccard4_flash_start, "user7", 16, FLASH_FUJITSU_29F016A, 0x200000 },
 		{ NULL, 0, 0, 0, 0 },
 	};
 
@@ -1355,7 +1354,7 @@ static void flash_init( running_machine *machine )
 	i = 0;
 	while( flash_init[ i ].start != NULL )
 	{
-		data = memory_region( machine, flash_init[ i ].rgnclass, flash_init[ i ].rgntag );
+		data = memory_region( machine, flash_init[ i ].rgntag );
 		if( data != NULL )
 		{
 			size = 0;
@@ -1366,7 +1365,7 @@ static void flash_init( running_machine *machine )
 				size += flash_init[ i ].size;
 				flash_chips++;
 			}
-			if( size != memory_region_length( machine, flash_init[ i ].rgnclass, flash_init[ i ].rgntag ) )
+			if( size != memory_region_length( machine, flash_init[ i ].rgntag ) )
 			{
 				fatalerror( "flash_init %d incorrect region length\n", i );
 			}
@@ -1411,9 +1410,9 @@ static void *atapi_get_device(void)
 
 static void security_cart_init( running_machine *machine, int cart, const char *eeprom_region, const char *ds2401_region )
 {
-	UINT8 *eeprom_rom = memory_region( machine, RGNCLASS_USER, eeprom_region );
-	int eeprom_length = memory_region_length( machine, RGNCLASS_USER, eeprom_region );
-	UINT8 *ds2401_rom = memory_region( machine, RGNCLASS_USER, ds2401_region );
+	UINT8 *eeprom_rom = memory_region( machine, eeprom_region );
+	int eeprom_length = memory_region_length( machine, eeprom_region );
+	UINT8 *ds2401_rom = memory_region( machine, ds2401_region );
 
 	if( eeprom_rom != NULL )
 	{
@@ -1502,7 +1501,7 @@ static DRIVER_INIT( konami573 )
 		m_p_timer_root[i] = timer_alloc(root_finished, NULL);
 	}
 
-	timekeeper_init( machine, 0, TIMEKEEPER_M48T58, memory_region( machine, RGNCLASS_USER, "user11" ) );
+	timekeeper_init( machine, 0, TIMEKEEPER_M48T58, memory_region( machine, "user11" ) );
 
 	state_save_register_global( m_n_security_control );
 
@@ -3010,120 +3009,120 @@ INPUT_PORTS_END
 
 // BIOS
 ROM_START( sys573 )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 ROM_END
 
 // Games
 ROM_START( bassangl )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "ge765ja.u1", 0x000000, 0x000224, BAD_DUMP CRC(ee1b32a7) SHA1(c0f6b14b054f5a95ce474e794a3e0ca78faac681) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "765jaa02", 0, MD5(11693b1234458c238ed613ef37f71245) SHA1(d820f8166b7d5ffcf41e7a70c8c4c4d1c207c1bd) )
 ROM_END
 
 ROM_START( cr589fw )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "700b04", 0, MD5(4847e008189b7c700f2129ecb362b924) SHA1(13ac92eb242de48317924b9c725f9f693a263cf5) )
 ROM_END
 
 ROM_START( cr589fwa )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "700a04", 0, MD5(211850ed73d05ccbf5951f1fe19a6767) SHA1(bf7865629775a34a8f8b628053e97f25b51ade2e) )
 ROM_END
 
 ROM_START( darkhleg )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gx706ja.u1", 0x000000, 0x000224, BAD_DUMP CRC(72b42574) SHA1(79dc959f0ce95ccb9ac0dbf0a72aec973e91bc56) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "706jaa02", 0, MD5(4f096051df039b0d104d4c0fff5dadb8) SHA1(4c8d976096c2da6d01804a44957daf9b50103c90) )
 ROM_END
 
 ROM_START( ddrextrm )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gcc36ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(c1601287) SHA1(929691a78f7bb6dd830f832f301116df0da1619b) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gcc36ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "c36jaa02", 0, MD5(83fa51031d826d603c0371b18180aeda) SHA1(a1591cb4f1da7e460de57afb17a85592719243e0) )
 ROM_END
 
 ROM_START( ddru )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gn845ua.u1",   0x000000, 0x000224, BAD_DUMP CRC(c9e7fced) SHA1(aac4dde100091bc64d397f53484a0ffbf68b8101) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "845uaa02", 0, MD5(32d52ee2b37559d7413788c87085f37c) SHA1(e82610e1a34fba144499f9ee892ac882d1e96853) )
 ROM_END
 
 ROM_START( ddrj )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc845jb.u1",   0x000000, 0x000224, BAD_DUMP CRC(a16f42b8) SHA1(da4f1eb3eb2b28cb3a0bc74bb9b9945970f56ac2) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "845jba02", 0, MD5(314f64301c3429312770ecdeb975d285) SHA1(8ebd9a68bbea3d9947a95d896347b0fea2145e4a) )
 ROM_END
 
 ROM_START( ddrja )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc845ja.u1",   0x000000, 0x000224, NO_DUMP )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jaa.31m",  0x000000, 0x200000, NO_DUMP )
 	ROM_LOAD( "gc845jaa.27m",  0x200000, 0x200000, NO_DUMP )
 	ROM_LOAD( "gc845jaa.31l",  0x400000, 0x200000, NO_DUMP )
@@ -3133,19 +3132,19 @@ ROM_START( ddrja )
 	ROM_LOAD( "gc845jaa.31h",  0xc00000, 0x200000, NO_DUMP )
 	ROM_LOAD( "gc845jaa.27h",  0xe00000, 0x200000, NO_DUMP )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "845jaa02", 0, MD5(045237b7ba76f393f69dd95eae14b61a) SHA1(eb59d00300424be89817ce3f8d7e68b8cf0f7943) )
 	DISK_IMAGE_READONLY( "845jaa01", 1, NO_DUMP ) // if this even exists
 ROM_END
 
 ROM_START( ddrjb )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc845ja.u1",   0x000000, 0x000224, NO_DUMP )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jab.31m",  0x000000, 0x200000, NO_DUMP )
 	ROM_LOAD( "gc845jab.27m",  0x200000, 0x200000, NO_DUMP )
 	ROM_LOAD( "gc845jab.31l",  0x400000, 0x200000, NO_DUMP )
@@ -3155,1263 +3154,1263 @@ ROM_START( ddrjb )
 	ROM_LOAD( "gc845jab.31h",  0xc00000, 0x200000, NO_DUMP )
 	ROM_LOAD( "gc845jab.27h",  0xe00000, 0x200000, NO_DUMP )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "845jab02", 0, MD5(ebaaf265a1a7efae93cd745a67ea2cb2) SHA1(10ee3081065ebf5a814abbd30c8dee91b384a849) )
 	DISK_IMAGE_READONLY( "845jab01", 1, NO_DUMP ) // if this even exists
 ROM_END
 
 ROM_START( ddra )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gn845aa.u1",   0x000000, 0x000224, BAD_DUMP CRC(327c4851) SHA1(f0939224af706fd103a67aae9c96518c1db90ac9) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "845aaa02", 0, MD5(2ab58fc647d35673861788a78df2afba) SHA1(fe2d18cdab7a3088f7c876ce531d64a2f3ae9294) )
 ROM_END
 
 ROM_START( ddr2m )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gn895jaa.u1",  0x000000, 0x000224, BAD_DUMP CRC(363f427e) SHA1(adec886a07b9bd91f142f286b04fc6582205f037) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "895jaa02", 0, MD5(f83ea1459c51aba2e16830b775444db3) SHA1(f1d47440ec7ba902f0fc5cad241729613f24fce1) )
 ROM_END
 
 ROM_START( ddr2mc )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gn896ja.u1",  0x000000, 0x000224, BAD_DUMP CRC(cbc984c5) SHA1(6c0cd78a41000999b4ffbd9fb3707738b50a9b50) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "896jaa01", 0, MD5(3cab3bc6d9459360da8f6784dd861067) SHA1(cb99e52eac5223509e914648d9b5dec59ed242f8) )
 	DISK_IMAGE_READONLY( "895jaa02", 1, MD5(f83ea1459c51aba2e16830b775444db3) SHA1(f1d47440ec7ba902f0fc5cad241729613f24fce1) )
 ROM_END
 
 ROM_START( ddr2mc2 )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "ge984ja.u1",  0x000000, 0x000224, BAD_DUMP CRC(cbc984c5) SHA1(6c0cd78a41000999b4ffbd9fb3707738b50a9b50) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "984jaa01", 0, MD5(945de47f526007f7c607c398b9b6275a) SHA1(da257e5a553a75439970393bdafc581f6971f946) )
 	DISK_IMAGE_READONLY( "895jaa02", 1, MD5(f83ea1459c51aba2e16830b775444db3) SHA1(f1d47440ec7ba902f0fc5cad241729613f24fce1) )
 ROM_END
 
 ROM_START( ddr2ml )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "ge885jaa.u1",  0x000000, 0x000224, BAD_DUMP CRC(cbc984c5) SHA1(6c0cd78a41000999b4ffbd9fb3707738b50a9b50) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user4", 0 ) /* PCCARD1 */
+	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "885jaa02", 0, MD5(696e39fa7113f61181875bffca13a1b4) SHA1(ece1d34a3bdbe07b608429abe30802bc7327a94a) )
 ROM_END
 
 ROM_START( ddr3ma )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "ge887aa.u1",   0x000000, 0x000084, BAD_DUMP CRC(4ce86d32) SHA1(94cdb9873a7f7503acc3b763e9b49ec6af53533f) )
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0000084, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gn887aa.u1",   0x000000, 0x000084, BAD_DUMP CRC(bb14f9bd) SHA1(9d0adf5a32d8bbcaaea2f701f5c7a5d51ee0b8bf) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge887aa.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gn887aa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "887aaa02", 0, MD5(20a95a94413dfba836fd1b0d7923dbfc) SHA1(75500b4393519f1f9bce7c9bdfd45ef365a8672c) )
 ROM_END
 
 ROM_START( ddr3mj )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "ge887ja.u1",   0x000000, 0x000084, BAD_DUMP CRC(3a377cec) SHA1(5bf3107a89547bd7697d9f0ab8f67240e101a559) )
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0000084, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gn887ja.u1",   0x000000, 0x000084, BAD_DUMP CRC(2f633432) SHA1(bce44f20a5a7318af6aea4fdfa8af64ddb76047c) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge887ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gn887ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "887jaa02", 0, MD5(c2241d1277a98d6a8cafd3aed0c9b9da) SHA1(04f639c3e72aa6dd546ea5b5b84fb3fcb10acc46) )
 ROM_END
 
 ROM_START( ddr3mk )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "ge887kb.u1",   0x000000, 0x000084, BAD_DUMP CRC(4ce86d32) SHA1(94cdb9873a7f7503acc3b763e9b49ec6af53533f) )
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0000084, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gn887kb.u1",   0x000000, 0x000084, BAD_DUMP CRC(bb14f9bd) SHA1(9d0adf5a32d8bbcaaea2f701f5c7a5d51ee0b8bf) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge887kb.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gn887kb.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "887kba02", 0, MD5(3ebd603c800158697c968caf187a7cc6) SHA1(8feb5dcada45e6f6aa0695439dc718fafb978b4d) )
 ROM_END
 
 ROM_START( ddr3mka )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "ge887ka.u1",   0x000000, 0x000084, BAD_DUMP CRC(4ce86d32) SHA1(94cdb9873a7f7503acc3b763e9b49ec6af53533f) )
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0000084, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gn887ka.u1",   0x000000, 0x000084, BAD_DUMP CRC(bb14f9bd) SHA1(9d0adf5a32d8bbcaaea2f701f5c7a5d51ee0b8bf) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge887ka.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gn887ka.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "887kaa02", 0, MD5(9ecee52213411d4a518f4724c87ee9d3) SHA1(10af2af753c5a54d1d3ac40a9ccc3e0324183f4d) )
 ROM_END
 
 ROM_START( ddr3mp )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "gea22ja.u1",   0x000000, 0x000224, BAD_DUMP CRC(ef370ff7) SHA1(cb7a043f8bfa535e54ae9af728031d1018ed0734) )
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gca22ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(6291defc) SHA1(bb9dad69896826aeb42dafa91cb99599467c31ff) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gea22ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gca22ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "a22jaa02", 0, MD5(b386ecc1d54e2ac73c16057af9220aa6) SHA1(cc4fba48dfff96f0ac85a438dab95e00891aeac5) )
 ROM_END
 
 ROM_START( ddr4m )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "gea33aa.u1",   0x000000, 0x000224, BAD_DUMP CRC(7bd2a24f) SHA1(62c73a54c4ed7697cf81ddbf3d13d4b0ca827be5) )
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gca33aa.u1",   0x000000, 0x001014, BAD_DUMP CRC(f6feb2bd) SHA1(dfd5bd532338849289e2e4c155c0ca86e79b9ae5) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gea33aa.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gca33aa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "a33aaa02", 0, BAD_DUMP MD5(d843cba35726f3b0af357f712b8870a4) SHA1(40456e772c39c339828dd4726766ef2e0981d3a1) )
 ROM_END
 
 ROM_START( ddr4mj )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "a33jaa.u1",    0x000000, 0x000224, BAD_DUMP CRC(10f1e9b8) SHA1(985bd26638964beebba5de4c7cda772b402d2e59) )
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gca33ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(e5230867) SHA1(44aea9ccc90d81e7f41e5e9a62b28fcbdd75363b) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "a33jaa.u6",    0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gca33ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "a33jaa02", 0, MD5(855456931374d1c99dfd44c52a0a3178) SHA1(ad7672bf30becc9030c4fa097cc60deecad6f36d) )
 ROM_END
 
 ROM_START( ddr4ms )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "gea33ab.u1",   0x000000, 0x000224, BAD_DUMP CRC(32fb3d13) SHA1(3ca6c77438f96b13d2c05f13a10fcff89a1403a2) )
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gca33ab.u1",   0x000000, 0x001014, BAD_DUMP CRC(312ac13f) SHA1(05d733edc03cfc5ea03db6c683f59ed6ff860b5a) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gea33ab.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gca33ab.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "a33aba02", 0, MD5(d843cba35726f3b0af357f712b8870a4) SHA1(40456e772c39c339828dd4726766ef2e0981d3a1) )
 ROM_END
 
 ROM_START( ddr4msj )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "a33jba.u1",    0x000000, 0x000224, BAD_DUMP CRC(babf6fdb) SHA1(a2ef6b855d42072f0d3c72c8de9aff1f867de3f7) )
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gca33jb.u1",   0x000000, 0x001014, BAD_DUMP CRC(00e4b531) SHA1(f421fc33642c5a3cd89fb14dc8cd601bdddd1f55) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "a33jba.u6",    0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gca33jb.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "a33jba02", 0, BAD_DUMP MD5(855456931374d1c99dfd44c52a0a3178) SHA1(ad7672bf30becc9030c4fa097cc60deecad6f36d) )
 ROM_END
 
 ROM_START( ddr4mp )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "gea34ja.u1",   0x000000, 0x000224, BAD_DUMP CRC(10f1e9b8) SHA1(985bd26638964beebba5de4c7cda772b402d2e59) )
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gca34ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(e9b6ce56) SHA1(f040fba2b2b446baa840026dcd10f9785f8cc0a3) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gea34ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gca34ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	ROM_REGION( 0x002000, RGNCLASS_USER, "user11", 0 ) /* timekeeper */
+	ROM_REGION( 0x002000, "user11", 0 ) /* timekeeper */
 	ROM_LOAD( "gca34ja.22h",  0x000000, 0x002000, CRC(80575c1f) SHA1(a0594ca0f75bc7d49b645e835e9fa48a73c3c9c7) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "a34jaa02", 0, MD5(d8292d7f1e359d308b779e44fd0809ef) SHA1(23aadca5274bff5f130357701c1ab269943b387d) )
 ROM_END
 
 ROM_START( ddr4mps )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "gea34jb.u1",   0x000000, 0x000224, BAD_DUMP CRC(babf6fdb) SHA1(a2ef6b855d42072f0d3c72c8de9aff1f867de3f7) )
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gca34jb.u1",   0x000000, 0x001014, BAD_DUMP CRC(0c717300) SHA1(00d21f39fe90494ffec2f8799767cc46a9cd2b00) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gea34jb.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gca34jb.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	ROM_REGION( 0x002000, RGNCLASS_USER, "user11", 0 ) /* timekeeper */
+	ROM_REGION( 0x002000, "user11", 0 ) /* timekeeper */
 	ROM_LOAD( "gca34jb.22h",  0x000000, 0x002000, CRC(bc6c8bd7) SHA1(10ceec5c7bc5ca9fca88f3c083a7d97012982079) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "a34jba02", 0, BAD_DUMP MD5(d8292d7f1e359d308b779e44fd0809ef) SHA1(23aadca5274bff5f130357701c1ab269943b387d) )
 ROM_END
 
 ROM_START( ddr5m )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gca27ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(ec526036) SHA1(f47d94d19268fdfa3ae9d42db9f2e2f9be318f2b) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gca27ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "a27jaa02", 0, MD5(502ecebf4d2e931f6b75b6a22b7d620c) SHA1(2edb3a0160c2783db6b0ddfce0f7c9ebb35b481f) )
 ROM_END
 
 ROM_START( ddrbocd )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gn895jaa.u1",  0x000000, 0x000224, BAD_DUMP CRC(363f427e) SHA1(adec886a07b9bd91f142f286b04fc6582205f037) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user4", 0 ) /* PCCARD1 */
+	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "892jaa01", 0, MD5(b29b63bafdd35f38662ff8daf5fc59f7) SHA1(c929c488d206e055e756ca506c3b1ff430a46aaa) )
 	DISK_IMAGE_READONLY( "895jaa02", 1, MD5(f83ea1459c51aba2e16830b775444db3) SHA1(f1d47440ec7ba902f0fc5cad241729613f24fce1) )
 ROM_END
 
 ROM_START( ddrs2k )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "ge905aa.u1",   0x000000, 0x000084, BAD_DUMP CRC(36d18e2f) SHA1(e976047dfbee62de9ad9e5de8e7629a24c29d581) )
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0000084, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gc905aa.u1",   0x000000, 0x000084, BAD_DUMP CRC(21073a3e) SHA1(afa12404ceb462b9016a41c40775da87aa09cfeb) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge905aa.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gc905aa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "905aaa02", 0, MD5(8b753bae1b4cbd5c8b641eb723b660a1) SHA1(cfd40cee9380588dc2ced107ace2a7486d91944d) )
 ROM_END
 
 ROM_START( ddrs2kj )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "ge905ja.u1",   0x000000, 0x000084, BAD_DUMP CRC(a077b0a1) SHA1(8f247b38c933a104a325ebf1f1691ef260480e1a) )
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0000084, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gc905ja.u1",   0x000000, 0x000084, BAD_DUMP CRC(b7a104b0) SHA1(0f6901e41640f729f8a084a33148a9b900475594) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge905ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gc905aa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "905jaa02", 0, MD5(098496f8d9b5ac0357f093a62d6d59f0) SHA1(37f9aff936a51b3482ae4717227993106be8b476) )
 ROM_END
 
 ROM_START( ddrmax )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gcb19ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(2255626a) SHA1(cb70c4b551265ffc6cc41f7bd2678696e8067060) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gcb19ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "b19jaa02", 0, MD5(0f080892f7e5ad0d83e6db70e4cb80d7) SHA1(59361e85641f2deda88ccbc2cd1634523f1c1a3b) )
 ROM_END
 
 ROM_START( ddrmax2 )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gcb20ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(fb7e0f58) SHA1(e6da23257a2a2ba7c69e817a91a0a8864f009386) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gcb20ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "b20jaa02", 0, MD5(2d57e32a263b355391a94f45c145d0fe) SHA1(e43c34bd113ef20e579ce7c6248288a257a5ccde) )
 ROM_END
 
 ROM_START( ddrsbm )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gq894ja.u1",   0x000000, 0x000084, BAD_DUMP CRC(cc3a47de) SHA1(f6e2e101870370b1e295a4a9ed546aa2d8bc2010) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gq894ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "894jaa02", 0, MD5(05f3cd86796f41353528999ac3fbd26b) SHA1(5b65ac6bc2497b3ab99542f5acae3a64895f221d) )
 ROM_END
 
 ROM_START( ddrusa )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gka44ua.u1",   0x000000, 0x001014, BAD_DUMP CRC(2ef7c4f1) SHA1(9004d27179ece86883d01b3e6bbfeebc1b478d57) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gka44ua.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "a44uaa02", 0, MD5(f9694956bab44593784fa728c6b53712) SHA1(e40b52ce3b1e90e3ec9190b83ba875c4ab1b0f2f) )
 ROM_END
 
 ROM_START( drmn )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gq881ja.u1",   0x000000, 0x000224, BAD_DUMP CRC(7dca0b3f) SHA1(db6d5c527e2a99133b516e01433024d3173848c6) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x0c00000, 0xff )
 	ROM_LOAD( "gq881ja.31h",  0xc00000, 0x200000, CRC(a5b86ece) SHA1(9696f0c512501574bae6e436306675894bb2352e) )
 	ROM_LOAD( "gq881ja.27h",  0xe00000, 0x200000, CRC(fc0b94c1) SHA1(967d374288db757d161d0e9e8e396a1176071c5f) )
 
-	ROM_REGION( 0x002000, RGNCLASS_USER, "user11", 0 ) /* timekeeper */
+	ROM_REGION( 0x002000, "user11", 0 ) /* timekeeper */
 	ROM_LOAD( "gq881ja.22h",  0x000000, 0x002000, CRC(e834d5ec) SHA1(1c845811e43d7dfec657da288b5a38b8bc9c8366) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "881jad01", 0, MD5(8191ad7747f5ac87a40534f53a2a6cd4) SHA1(61bfd356d262f53f1ab55654aba2981fb8eb1420) ) // upgrade or bootleg?
 	DISK_IMAGE_READONLY( "881jaa02", 1, NO_DUMP )
 ROM_END
 
 ROM_START( drmn2m )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "ge912ja.u1",   0x000000, 0x000224, BAD_DUMP CRC(1246fe5b) SHA1(b58d4f4c95e13abf639d645223565544bd79a58a) )
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gn912ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(34deea99) SHA1(f179e22eaf30453bb94177ed9c25d7996f020c99) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge912ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gn912ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "912jab", 0, BAD_DUMP MD5(60dadc836f00f22d50b5b634250aa624) SHA1(5316b2e2e89af7bc038a3febc91525edac91fe7e) )
 ROM_END
 
 ROM_START( drmn2mpu )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "ge912ja.u1",   0x000000, 0x000224, BAD_DUMP CRC(1246fe5b) SHA1(b58d4f4c95e13abf639d645223565544bd79a58a) )
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gn912ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(34deea99) SHA1(f179e22eaf30453bb94177ed9c25d7996f020c99) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge912ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gn912ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "912jab",  0, BAD_DUMP MD5(60dadc836f00f22d50b5b634250aa624) SHA1(5316b2e2e89af7bc038a3febc91525edac91fe7e) )
 	DISK_IMAGE_READONLY( "912za01", 1, BAD_DUMP MD5(1d3fa130a3a6c8433c276e609b373e4f) SHA1(121ca6df16084a01c88ef26167b13053c9adc7ce) )
 ROM_END
 
 ROM_START( drmn3m )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "a23jaa.u1",    0x000000, 0x000224, BAD_DUMP CRC(90e544fa) SHA1(1feb617c36bad41aa720a6e5d3ec9e5cb2030567) )
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gca23ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(5af1b5da) SHA1(cf862ef9ab60e8da89af96266943137827e4a261) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "a23jaa.u6",    0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gca23ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "a23jaa02", 0, MD5(3b6477be8e66e447cc3f94047c28a2a2) SHA1(4c607eb2b212785520d1c6dc21d013fe6f489741) )
 ROM_END
 
 ROM_START( dmx )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "ge874ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(c5536373) SHA1(1492221f7dd9485f7745ecb0a982a88c8e768e53) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "ge874ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "874jaa", 0, BAD_DUMP MD5(457f6e55aec68537ae47c6045de1ee26) SHA1(ff6332e032b1528691a87c5001bf808d6a8f5ef7) )
 ROM_END
 
 ROM_START( dmx2m )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gca39ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(ecc75eb7) SHA1(af66ced28ba5e79ae32ae0ef12d2ebe4207f3822) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gca39ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "a39jaa02", 0, MD5(3106d45c868ad30e47f7873ea1dffc8a) SHA1(20df1b5636622d8c0e45623bd1af6bc1249fec65) )
 ROM_END
 
 ROM_START( dmx2majp )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gca38ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(99a746b8) SHA1(333236e59a707ecaf840a66f9b947ceade2cf2c9) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_LOAD( "gca38ja.31m",  0x000000, 0x200000, CRC(a0f54ab5) SHA1(a5ae67d7619393779c79a2e227cac0675eeef538) )
 	ROM_LOAD( "gca38ja.27m",  0x200000, 0x200000, CRC(6c3934b8) SHA1(f0e4a692b6caaf60fefaec87fd23da577439f69d) )
 	ROM_FILL( 0x400000, 0x0c00000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gca38ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "a38jaa02", 0, MD5(3c4070547d17605db68a3db333865eb0) SHA1(e9fe714bb0a5354b199b1fb7b33f366db502c03a) )
 ROM_END
 
 ROM_START( dncfrks )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gk874ka.u1",   0x000000, 0x001014, BAD_DUMP CRC(7a6f4672) SHA1(2e009e57760e92f48070a69cff5597c37a4783a2) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gk874ka.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "874kaa", 0, BAD_DUMP MD5(5e02c8dba12f949ce99834e597d8d08d) SHA1(659281e1b63c5ff0616b27d7f87a4e7f1c493372) )
 ROM_END
 
 ROM_START( dsem2 )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gkc23ea.u1",   0x000000, 0x001014, BAD_DUMP CRC(aec2421a) SHA1(5ea9e9ce6161ebc99a50db0b7304385511bd4553) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gkc23ea.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "c23eaa02", 0, MD5(e7275ba9f53334ac528afaa278df7153) SHA1(661f0b53ab64fc746b8e3b7ff3dd32d2bed852ac) )
 ROM_END
 
 ROM_START( dsfdct )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "ge887ja_gn887ja.u1",   0x000000, 0x000084, BAD_DUMP CRC(08a60147) SHA1(0d39dca5e9e17fff0e64f296c8416e4ca23fdc1b) )
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0000084, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gc910jc.u1",   0x000000, 0x000084, BAD_DUMP CRC(3c1ca973) SHA1(32211a72e3ac88b2723f82dac0b26f93031b3a9c) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge887ja_gn887ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gc910jc.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "910jca02", 0, MD5(c909982a234dbd59388892bd627a466e) SHA1(687ce1d480eb13e78289171b6c56fd5b1e7d5d9e) )
 ROM_END
 
 ROM_START( dsfdcta )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000084, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "gn884ja.u1",  0x000000, 0x000084, BAD_DUMP CRC(ce6b98ce) SHA1(75549d9470345ce06d2706d373b19416d97e5b9a) )
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0000084, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gc910ja.u1",   0x000000, 0x000084, BAD_DUMP CRC(59a23808) SHA1(fcff1c68ff6cfbd391ac997a40fb5253fc62de82) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user5", 0 ) /* PCCARD2 */
+	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gn884ja.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gc910ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "910jaa02", 0, MD5(e5380280b5cbb10822391f74866f8bee) SHA1(3d17320f56be7edb1be6b1bd53269d452f71123d) )
 ROM_END
 
 ROM_START( dsftkd )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gn884ja.u1",  0x000000, 0x000084, BAD_DUMP CRC(ce6b98ce) SHA1(75549d9470345ce06d2706d373b19416d97e5b9a) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gn884ja.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "884jaa02", 0, MD5(d73444ab74efb8587c2bf455e3ec0d13) SHA1(92522380b92333b10d401fda4f81592073f3e601) )
 ROM_END
 
 ROM_START( dstage )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gn845ea.u1",   0x000000, 0x000224, BAD_DUMP CRC(db643af7) SHA1(881221da640b883302e657b906ea0a4e74555679) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "845ea", 0, BAD_DUMP MD5(32d52ee2b37559d7413788c87085f37c) SHA1(e82610e1a34fba144499f9ee892ac882d1e96853) )
 ROM_END
 
 ROM_START( fbait2bc )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc865ua.u1", 0x000000, 0x000224, BAD_DUMP CRC(ea8f0b4b) SHA1(363b1ea1a520b239ba8bca867366bbe8a9977a43) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "865uab02", 0, MD5(5a253a58417539f9b0cb9726311f73d5) SHA1(86ccbaac30e9e2d7d0ad6ae65a4f53f606f50525) )
 ROM_END
 
 ROM_START( fbaitbc )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "ge765ua.u1", 0x000000, 0x000224, BAD_DUMP CRC(588748c6) SHA1(ea1ead61e0dcb324ef7b6106cae00bcf6702d6c4) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "765uab02", 0, MD5(56d8a23bb592932631f8f81b9797fce6) SHA1(dda131b8655e3c4394e50749fe3a1e468f9df353) )
 ROM_END
 
 ROM_START( fbaitmc )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gx889ea.u1", 0x000000, 0x000224, BAD_DUMP CRC(753ad84e) SHA1(e024cefaaee7c9945ccc1f9a3d896b8560adce2e) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "889ea", 0, BAD_DUMP MD5(43eae52edd38019f0836897ea8def527) SHA1(2e6937c265c222ac2cea50fbf32201ade425ee30) )
 ROM_END
 
 ROM_START( fbaitmca )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gx889aa.u1", 0x000000, 0x000224, BAD_DUMP CRC(9c22aae8) SHA1(c107b0bf7fa76708f2d4f6aaf2cf27b3858378a3) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "889aa", 0, BAD_DUMP MD5(43eae52edd38019f0836897ea8def527) SHA1(2e6937c265c222ac2cea50fbf32201ade425ee30) )
 ROM_END
 
 ROM_START( fbaitmcj )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gx889ja.u1", 0x000000, 0x000224, BAD_DUMP CRC(6278603c) SHA1(d6b59e270cfe4016e12565aedec8a4f0702e1a6f) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "889ja", 0, BAD_DUMP MD5(43eae52edd38019f0836897ea8def527) SHA1(2e6937c265c222ac2cea50fbf32201ade425ee30) )
 ROM_END
 
 ROM_START( fbaitmcu )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gx889ua.u1", 0x000000, 0x000224, BAD_DUMP CRC(67b91e54) SHA1(4d94bfab08e2bf6e34ee606dd3c4e345d8e5d158) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "889ua", 0, BAD_DUMP MD5(43eae52edd38019f0836897ea8def527) SHA1(2e6937c265c222ac2cea50fbf32201ade425ee30) )
 ROM_END
 
 ROM_START( gtrfrks )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gq886eac.u1",  0x000000, 0x000224, BAD_DUMP CRC(06bd6c4f) SHA1(61930e467ad135e2f31393ff5af981ed52f3bef9) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "886ea", 0, BAD_DUMP MD5(b8b39a6e48867fdad640bd256273bdfc) SHA1(2277c6268b8327be8d7636d4812920e5d3b353cd) )
 ROM_END
 
 ROM_START( gtrfrksu )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gq886uac.u1",  0x000000, 0x000224, BAD_DUMP CRC(143eaa55) SHA1(51a4fa3693f1cb1646a8986003f9b6cc1ae8b630) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "886ua", 0, BAD_DUMP MD5(b8b39a6e48867fdad640bd256273bdfc) SHA1(2277c6268b8327be8d7636d4812920e5d3b353cd) )
 ROM_END
 
 ROM_START( gtrfrksj )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gq886jac.u1",  0x000000, 0x000224, BAD_DUMP CRC(11ffd43d) SHA1(27f4f4d782604379254fb98c3c57e547aa4b321f) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "886ja", 0, BAD_DUMP MD5(b8b39a6e48867fdad640bd256273bdfc) SHA1(2277c6268b8327be8d7636d4812920e5d3b353cd) )
 ROM_END
 
 ROM_START( gtrfrksa )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gq886aac.u1",  0x000000, 0x000224, BAD_DUMP CRC(efa51ee9) SHA1(3374d936de69c287e0161bc526546441c2943555) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "886aa", 0, BAD_DUMP MD5(b8b39a6e48867fdad640bd256273bdfc) SHA1(2277c6268b8327be8d7636d4812920e5d3b353cd) )
 ROM_END
 
 ROM_START( gtrfrk2m )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gq883jad.u1",  0x000000, 0x000084, BAD_DUMP CRC(687868c4) SHA1(1230e74e4cf17953febe501df56d8bbec1de9356) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user4", 0 ) /* PCCARD1 */
+	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gq883jad.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "929jbb02", 0, BAD_DUMP MD5(dfe595184dd55046da6fe93bb14b83be) SHA1(c76d5c11422b2ef1750e92a1edac2812666aadae) )
 ROM_END
 
 ROM_START( gtrfrk3m )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "949jaa.u1",    0x000000, 0x000224, BAD_DUMP CRC(96c21d71) SHA1(871f1f0429154a486e547e182534db1557008dd6) )
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "ge949jab.u1",  0x000000, 0x001014, BAD_DUMP CRC(8645e17f) SHA1(e8a833384cb6bdb05870fcd44e7c8ed48a03c852) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user4", 0 ) /* PCCARD1 */
+	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "949jaa.u6",    0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "ge949jab.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "949jac01", 0, MD5(0f78f8e06edd3b8fa0abed22155d06d9) SHA1(3e43a5018aa88ed78c9e2fb50f65489a6c7de093) )
 	DISK_IMAGE_READONLY( "949jab02", 1, MD5(331a7516a33d9cf9f04b8c9aa5de5fc1) SHA1(9aae90c6b0f5c31f47a420f876c0dbc81d43b756) )
 ROM_END
 
 ROM_START( gtfrk3ma )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "949jaa.u1",    0x000000, 0x000224, BAD_DUMP CRC(96c21d71) SHA1(871f1f0429154a486e547e182534db1557008dd6) )
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "ge949jab.u1",  0x000000, 0x001014, BAD_DUMP CRC(8645e17f) SHA1(e8a833384cb6bdb05870fcd44e7c8ed48a03c852) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user4", 0 ) /* PCCARD1 */
+	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "949jaa.u6",    0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "ge949jab.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "949jab02", 0, MD5(331a7516a33d9cf9f04b8c9aa5de5fc1) SHA1(9aae90c6b0f5c31f47a420f876c0dbc81d43b756) )
 ROM_END
 
 ROM_START( gtfrk3mb )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user2", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0001014, "user2", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "ge949jaa.u1",  0x000000, 0x001014, BAD_DUMP CRC(61f35ee1) SHA1(0a2b66742364d76ec18647b2761590bd49229625) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user4", 0 ) /* PCCARD1 */
+	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* game security cart id */
 	ROM_LOAD( "ge949jaa.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "949jaz02", 0, MD5(22f7e1e61ea5f627e28c32f2209b5138) SHA1(62bd62cafb4bd4a1e393071f5e55d5ab57e3a880) )
 ROM_END
 
 ROM_START( gtrfrk4m )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "a24jaa.u1",    0x000000, 0x000224, BAD_DUMP CRC(29e326fe) SHA1(41a600105b08accc9d7ebd2b8ae08c0863758aa0) )
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gea24ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(d1fccf11) SHA1(6dcd79f3171d6e4bd7e1149901638f8ea58ff623) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user4", 0 ) /* PCCARD1 */
+	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "a24jaa.u6",    0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gea24ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "a24jaa02", 0, MD5(1e113d8f5601b0b4f38852894717e486) SHA1(f0748312663a9683fd5a115c16f135cb58b993b1) )
 ROM_END
 
 ROM_START( gtrfrk5m )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gea26jaa.u1",  0x000000, 0x001014, BAD_DUMP CRC(c2725fca) SHA1(b70a3266c61af5cbe0478a6f3dd850ebcab980dc) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_LOAD( "gea26jaa.31m", 0x000000, 0x200000, CRC(1a25e660) SHA1(dbd8fad0bac307723c70d00763cadf4261a7ed73) )
 	ROM_LOAD( "gea26jaa.27m", 0x200000, 0x200000, CRC(345dc5f2) SHA1(61af3fcfe6119c1e8e18b92693855ab4fe708b30) )
 	ROM_FILL( 0x400000, 0x0c00000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user4", 0 ) /* PCCARD1 */
+	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gea26jaa.u6",    0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "a26jaa02", 0, MD5(885b18ce273770330aefa0276911c046) SHA1(635aee062df45c83b080612d29101fe70c14979d) )
 ROM_END
 
 ROM_START( gtrfrk6m )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0001014, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "gcb06ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(673c98ab) SHA1(b1d889bf4fc5e425056acb6b72b2c563966fb7d7) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user4", 0 ) /* PCCARD1 */
+	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gcb06ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "b06jaa02", 0, MD5(8191da2660bb645fcfee9fb60baef242) SHA1(e8be8bdc0cbfb95a0a56ab89f39de3089d31f305) )
 ROM_END
 
 ROM_START( gtrfrk7m )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0001014, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "gcb17jaa.u1",   0x000000, 0x001014, BAD_DUMP CRC(5a338c31) SHA1(0fd9ee306335858dd6bef680a62557a8bf055cc3) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_LOAD( "gcb17jaa.31m", 0x000000, 0x200000, CRC(1e1cbfe3) SHA1(6c942820f915ea0e01f0e736d70780ad8408aa69) )
 	ROM_LOAD( "gcb17jaa.27m", 0x200000, 0x200000, CRC(7e7da9a9) SHA1(1882418779a48b5aefd113895756116379a6a4f7) )
 	ROM_FILL( 0x400000, 0x0c00000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user4", 0 ) /* PCCARD1 */
+	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gcb17jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "b17jaa02", 0, MD5(65b47fbf7d682e8dc8b2a3137aaab9b7) SHA1(bf8eb8f857c08595bb1c19f470ac689400ee0cab) )
 ROM_END
 
 ROM_START( gtfrk11m )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gcd39ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(9bd81d0a) SHA1(c95f6d7317bf88177f7217de4ba4376485d5cdbf) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x2000000, RGNCLASS_USER, "user4", 0 ) /* PCCARD1 */
+	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gcd39ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "d39jaa02", 0, MD5(4730dd81132cdac6f0cb7cc4c9753329) SHA1(b9425ab6bc7305eac2fef9799b7d46b18462ea84) )
 ROM_END
 
 ROM_START( konam80a )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc826aa.u1", 0x000000, 0x000224, BAD_DUMP CRC(9b38b959) SHA1(6b4fca340a9b1c2ae21ad3903c1ac1e39ab08b1a) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "826aaa01", 0, BAD_DUMP MD5(456f683c5d47dd73cfb73ce80b8a7351) SHA1(452c94088ffefe42e61c978b48d425e7094a5af6) )
 ROM_END
 
 ROM_START( konam80j )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc826ja.u1", 0x000000, 0x000224, BAD_DUMP CRC(e9e861e8) SHA1(45841db0b42d096213d9539a8d076d39391dca6d) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "826jaa01", 0, MD5(456f683c5d47dd73cfb73ce80b8a7351) SHA1(452c94088ffefe42e61c978b48d425e7094a5af6) )
 ROM_END
 
 ROM_START( konam80k )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc826ka.u1", 0x000000, 0x000224, BAD_DUMP CRC(d41f7e38) SHA1(73e2bb132e23be72e72ea5b0686ccad28e47574a) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "826kaa01", 0, BAD_DUMP MD5(456f683c5d47dd73cfb73ce80b8a7351) SHA1(452c94088ffefe42e61c978b48d425e7094a5af6) )
 ROM_END
 
 ROM_START( konam80s )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc826ea.u1", 0x000000, 0x000224, BAD_DUMP CRC(6ce4c619) SHA1(d2be08c213c0a74e30b7ebdd93946374cc64457f) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "826eaa01", 0, BAD_DUMP MD5(456f683c5d47dd73cfb73ce80b8a7351) SHA1(452c94088ffefe42e61c978b48d425e7094a5af6) )
 ROM_END
 
 ROM_START( konam80u )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc826ua.u1", 0x000000, 0x000224, BAD_DUMP CRC(0577379b) SHA1(3988a2a5ef1f1d5981c4767cbed05b73351be903) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "826uaa01", 0, MD5(456f683c5d47dd73cfb73ce80b8a7351) SHA1(452c94088ffefe42e61c978b48d425e7094a5af6) )
 ROM_END
 
 ROM_START( pbballex )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gx802ja.u1", 0x000000, 0x000224, BAD_DUMP CRC(ea8bdda3) SHA1(780034ab08871631ef0e3e9b779ca89e016c26a8) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "802jab02", 0, MD5(52bb53327ba48f87dcb030d5e50fe94f) SHA1(67ddce1ad7e436c18e08d5a8c77f3259dbf30572) )
 ROM_END
 
 ROM_START( pcnfrk3m )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000224, RGNCLASS_USER, "user2", 0 ) /* install security cart eeprom */
+	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "a23kaa.u1",    0x000000, 0x000224, BAD_DUMP CRC(d71c4b5c) SHA1(3911c5dd933c30e6e44c8cf417bb4c284ecb4b80) )
 
-	ROM_REGION( 0x0001014, RGNCLASS_USER, "user8", 0 ) /* game security cart eeprom */
+	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gca23ka.u1",   0x000000, 0x001014, BAD_DUMP CRC(f392349c) SHA1(e7eb7979db276de560d5820163a70d97e6c023d8) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* install security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "a23kaa.u6",    0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user10", 0 ) /* game security cart id */
+	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gca23ka.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "a23kaa02", 0, MD5(26a270851944d86d0b00db5a302de5ce) SHA1(5feaedf614c68932accc441f77c05c7bce67b2f3) )
 ROM_END
 
 ROM_START( salarymc )
-	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x0000084, RGNCLASS_USER, "user2", 0 ) /* security cart eeprom */
+	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gca18jaa.u1",  0x000000, 0x000084, CRC(c9197f67) SHA1(8e95a89008f756a79295f2cb557c39efca1351e7) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_USER, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	ROM_REGION( 0x000008, RGNCLASS_USER, "user9", 0 ) /* security cart id */
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gca18jaa.u6",  0x000000, 0x000008, CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( RGNCLASS_DISKS, "disks" )
+	DISK_REGION( "disks" )
 	DISK_IMAGE_READONLY( "a18ja", 0, BAD_DUMP MD5(51d6cd5e34b6ee5601d8519a50be5cdc) SHA1(364a927a45ff83ee3cac66637359d6cfb44ea2fc) )
 ROM_END
 

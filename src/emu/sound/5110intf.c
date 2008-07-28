@@ -39,7 +39,7 @@ static void tms5110_update(void *param, stream_sample_t **inputs, stream_sample_
 static int speech_rom_read_bit(void)
 {
 	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
-	const UINT8 *table = memory_region(Machine, RGNCLASS_SOUND, info->tag);
+	const UINT8 *table = memory_region(Machine, info->tag);
 
 	int r;
 
@@ -84,7 +84,7 @@ static void *tms5110_start(const char *tag, int sndindex, int clock, const void 
 	/* initialize a stream */
 	info->stream = stream_create(0, 1, clock / 80, info, tms5110_update);
 
-	if (memory_region(Machine, RGNCLASS_SOUND, tag) == NULL)
+	if (memory_region(Machine, tag) == NULL)
 	{
 	    if (info->intf->M0_callback==NULL)
 	    {

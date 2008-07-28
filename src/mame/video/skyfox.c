@@ -245,7 +245,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 *RAM	=	memory_region(machine, RGNCLASS_GFX, "gfx2");
+	UINT8 *RAM	=	memory_region(machine, "gfx2");
 	int x,y,i;
 
 	/* The foreground stars (sprites) move at twice this speed when

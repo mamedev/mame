@@ -534,11 +534,11 @@ static void AICA_Init(const char *tag, struct _AICA *AICA, const struct AICAinte
 			AICA->Master=0;
 		}
 
-		AICA->AICARAM = memory_region(Machine, RGNCLASS_SOUND, tag);
+		AICA->AICARAM = memory_region(Machine, tag);
 		if (AICA->AICARAM)
 		{
 			AICA->AICARAM += intf->roffset;
-			AICA->AICARAM_LENGTH = memory_region_length(Machine, RGNCLASS_SOUND, tag);
+			AICA->AICARAM_LENGTH = memory_region_length(Machine, tag);
 			AICA->RAM_MASK = AICA->AICARAM_LENGTH-1;
 			AICA->RAM_MASK16 = AICA->RAM_MASK & 0x7ffffe;
 			AICA->DSP.AICARAM = (UINT16 *)AICA->AICARAM;

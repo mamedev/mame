@@ -152,11 +152,11 @@ static void *ym2610_start(const char *tag, int sndindex, int clock, const void *
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2610_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = (void *)(memory_region(Machine, RGNCLASS_SOUND, tag));
-	pcmsizea = memory_region_length(Machine, RGNCLASS_SOUND, tag);
+	pcmbufa  = (void *)(memory_region(Machine, tag));
+	pcmsizea = memory_region_length(Machine, tag);
 	astring_printf(name, "%s.deltat", tag);
-	pcmbufb  = (void *)(memory_region(Machine, RGNCLASS_SOUND, astring_c(name)));
-	pcmsizeb = memory_region_length(Machine, RGNCLASS_SOUND, astring_c(name));
+	pcmbufb  = (void *)(memory_region(Machine, astring_c(name)));
+	pcmsizeb = memory_region_length(Machine, astring_c(name));
 	astring_free(name);
 	if (pcmbufb == NULL || pcmsizeb == 0)
 	{
@@ -218,11 +218,11 @@ static void *ym2610b_start(const char *tag, int sndindex, int clock, const void 
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2610b_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = (void *)(memory_region(Machine, RGNCLASS_SOUND, tag));
-	pcmsizea = memory_region_length(Machine, RGNCLASS_SOUND, tag);
+	pcmbufa  = (void *)(memory_region(Machine, tag));
+	pcmsizea = memory_region_length(Machine, tag);
 	astring_printf(name, "%s.deltat", tag);
-	pcmbufb  = (void *)(memory_region(Machine, RGNCLASS_SOUND, astring_c(name)));
-	pcmsizeb = memory_region_length(Machine, RGNCLASS_SOUND, astring_c(name));
+	pcmbufb  = (void *)(memory_region(Machine, astring_c(name)));
+	pcmsizeb = memory_region_length(Machine, astring_c(name));
 	astring_free(name);
 	if (pcmbufb == NULL || pcmsizeb == 0)
 	{

@@ -48,10 +48,7 @@
 #define EXPSPACE_OPCODE						(3)
 #define EXPSPACE_RAMWRITE					(4)
 #define EXPSPACE_EEPROM						(5)
-#define EXPSPACE_CPU						(6)
-#define EXPSPACE_USER						(7)
-#define EXPSPACE_GFX						(8)
-#define EXPSPACE_SOUND						(9)
+#define EXPSPACE_REGION						(6)
 
 
 

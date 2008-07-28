@@ -36,8 +36,8 @@ WRITE8_HANDLER( suna8_samples_number_w )
 
 void suna8_sh_start(void)
 {
-	int i, len = memory_region_length(Machine, RGNCLASS_SOUND, "samples");
-	UINT8 *ROM = memory_region(Machine, RGNCLASS_SOUND, "samples");
+	int i, len = memory_region_length(Machine, "samples");
+	UINT8 *ROM = memory_region(Machine, "samples");
 
 	samplebuf = auto_malloc(len * sizeof(samplebuf[0]));
 

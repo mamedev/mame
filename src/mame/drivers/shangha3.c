@@ -67,7 +67,7 @@ logerror("PC %04x: write %02x to 20004e\n",activecpu_get_pc(),data);
 
 static READ16_HANDLER( heberpop_gfxrom_r )
 {
-	UINT8 *ROM = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	UINT8 *ROM = memory_region(machine, "gfx1");
 
 	return ROM[2*offset] | (ROM[2*offset+1] << 8);
 }
@@ -625,26 +625,26 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( shangha3 )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x80000, "main", 0 )
 	ROM_LOAD16_BYTE( "s3j_ic3.v11",  0x0000, 0x40000, CRC(e98ce9c8) SHA1(359e117aebb644d7b235add7e71ed6891243d451) )
 	ROM_LOAD16_BYTE( "s3j_ic2.v11",  0x0001, 0x40000, CRC(09174620) SHA1(1d1639c07895f715facfe153fbdb6ae0f3cdd876) )
 
-	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "s3j_ic43.chr", 0x0000, 0x200000, CRC(2dbf9d17) SHA1(dd94ddc4bb02ab544aa3f89b614afc46678cc48d) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )	/* samples for M6295 */
+	ROM_REGION( 0x40000, "oki", 0 )	/* samples for M6295 */
 	ROM_LOAD( "s3j_ic75.v10", 0x0000, 0x40000, CRC(f0cdc86a) SHA1(b1017a9841a56e0f5d2714f550f64ed1f4e238e6) )
 ROM_END
 
 ROM_START( heberpop )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_BYTE( "hbpic31.bin",  0x0000, 0x80000, CRC(c430d264) SHA1(4be12b1fa90da09047db3a31171ffda8ab8bd851) )
 	ROM_LOAD16_BYTE( "hbpic32.bin",  0x0001, 0x80000, CRC(bfa555a8) SHA1(754f581554022b98ba8e78ee96f846faa2cedc69) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "hbpic34.bin",  0x0000, 0x10000, CRC(0cf056c6) SHA1(9992cd3879d9a57fcb784fc1e11d6b6d87e5a366) )
 
-	ROM_REGION( 0x380000, RGNCLASS_GFX, "gfx1", 0 )	/* don't dispose, read during tests */
+	ROM_REGION( 0x380000, "gfx1", 0 )	/* don't dispose, read during tests */
 	ROM_LOAD( "hbpic98.bin",  0x000000, 0x80000, CRC(a599100a) SHA1(f2e517256a42b3fa4a047bbe742d714f568cc117) )
 	ROM_LOAD( "hbpic99.bin",  0x080000, 0x80000, CRC(fb8bb12f) SHA1(78c1fec1371d312e113d92803dd59acc36604989) )
 	ROM_LOAD( "hbpic100.bin", 0x100000, 0x80000, CRC(05a0f765) SHA1(4f44cf367c3697eb6c245297c9d05160d7d94e24) )
@@ -653,26 +653,26 @@ ROM_START( heberpop )
 	ROM_LOAD( "hbpic103.bin", 0x280000, 0x80000, CRC(efa0e745) SHA1(fc1d52d35b3c902d8b25403b0e13f86a04039bc4) )
 	ROM_LOAD( "hbpic104.bin", 0x300000, 0x80000, CRC(bb896bbb) SHA1(4311876628beb82cbacdab4d055c3738e74241b0) )
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 )	/* samples for M6295 */
+	ROM_REGION( 0x80000, "oki", 0 )	/* samples for M6295 */
 	ROM_LOAD( "hbpic53.bin",  0x0000, 0x80000, CRC(a4483aa0) SHA1(be301d8ac6d69f5c3fdbcb85bd557090e46da1ff) )
 ROM_END
 
 ROM_START( blocken )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_BYTE( "ic31j.bin",    0x0000, 0x20000, CRC(ec8de2a3) SHA1(09a6b8c1b656b17ab3d1fc057902487e4f94cf02) )
 	ROM_LOAD16_BYTE( "ic32j.bin",    0x0001, 0x20000, CRC(79b96240) SHA1(c1246bd4b91fa45c581a8fdf90cc6beb85adf8ec) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "ic34.bin",     0x0000, 0x10000, CRC(23e446ff) SHA1(82c03b45b337696b0f8293c446544d7ee080d415) )
 
-	ROM_REGION( 0x380000, RGNCLASS_GFX, "gfx1", 0 )	/* don't dispose, read during tests */
+	ROM_REGION( 0x380000, "gfx1", 0 )	/* don't dispose, read during tests */
 	ROM_LOAD( "ic98j.bin",    0x000000, 0x80000, CRC(35dda273) SHA1(95850d12ca1557c14bc471ddf925aaf423313ff0) )
 	ROM_LOAD( "ic99j.bin",    0x080000, 0x80000, CRC(ce43762b) SHA1(e1c51ea0b54b5febdee127619e15f1cda650cb4c) )
 	/* 100000-1fffff empty */
 	ROM_LOAD( "ic100j.bin",   0x200000, 0x80000, CRC(a34786fd) SHA1(7d4879cbaa055c2ddbe6d20dd946bf0e3e069d4d) )
 	/* 280000-37ffff empty */
 
-	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 )	/* samples for M6295 */
+	ROM_REGION( 0x80000, "oki", 0 )	/* samples for M6295 */
 	ROM_LOAD( "ic53.bin",     0x0000, 0x80000, CRC(86108c56) SHA1(aa405fa2eec5cc178ef6226f229a12dac09504f0) )
 ROM_END
 

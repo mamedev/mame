@@ -333,7 +333,7 @@ VIDEO_EOF( bking )
 
 	if (latch != 0)
 	{
-		const UINT8* MASK = memory_region(machine, RGNCLASS_USER, "user1") + 8 * hit;
+		const UINT8* MASK = memory_region(machine, "user1") + 8 * hit;
 
 		int x;
 		int y;

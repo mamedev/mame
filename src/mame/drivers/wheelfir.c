@@ -182,7 +182,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 
 		int x,y;
 		int xsize,ysize;
-		UINT8 *rom = memory_region(machine, RGNCLASS_GFX, "gfx1");
+		UINT8 *rom = memory_region(machine, "gfx1");
 		int dir=0;
 
 
@@ -306,7 +306,7 @@ static VIDEO_UPDATE(wheelfir)
 
     if ( input_code_pressed(KEYCODE_R) )
     {
-        const UINT8 *gfx = memory_region(machine, RGNCLASS_GFX, "gfx1");
+        const UINT8 *gfx = memory_region(machine, "gfx1");
         for (y=0;y<128;y++)
         {
             for (x=0;x<512;x++)
@@ -655,15 +655,15 @@ MACHINE_DRIVER_END
 
 
 ROM_START( wheelfir )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "tch1.u19", 0x00001, 0x80000, CRC(33bbbc67) SHA1(c2ecc0ab522ee442076ea7b9536aee6e1fad0540) )
 	ROM_LOAD16_BYTE( "tch2.u21", 0x00000, 0x80000, CRC(ed6b9e8a) SHA1(214c5aaf55963a219db33dd5d530492e09ad5e07) )
 
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "sub", 0 ) /* 68000 Code + sound samples */
+	ROM_REGION( 0x100000, "sub", 0 ) /* 68000 Code + sound samples */
 	ROM_LOAD16_BYTE( "tch3.u83",  0x00001, 0x80000, CRC(43c014a6) SHA1(6c01a08dda204f36e8768795dd5d405576a49140) )
 	ROM_LOAD16_BYTE( "tch11.u65", 0x00000, 0x80000, CRC(fc894b2e) SHA1(ebe6d1adf889731fb6f53b4ce5f09c60e2aefb97) )
 
-	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx1", 0 ) // 512x512 gfx pages
+	ROM_REGION( 0x400000, "gfx1", 0 ) // 512x512 gfx pages
 	ROM_LOAD( "tch4.u52", 0x000000, 0x80000, CRC(fe4bc2c7) SHA1(33a2ef79cb13f9e7e7d513915c6e13c4e7fe0188) )
 	ROM_LOAD( "tch5.u53", 0x080000, 0x80000, CRC(a38b9ca5) SHA1(083c9f700b9df1039fb553e918e205c6d32057ad) )
 	ROM_LOAD( "tch6.u54", 0x100000, 0x80000, CRC(2733ae6b) SHA1(ebd91e123b670159f79be19a552d1ae0c8a0faff) )
@@ -676,7 +676,7 @@ ROM_END
 
 static DRIVER_INIT(wheelfir)
 {
-	UINT16 *RAM = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
 	RAM[0xdd3da/2] = 0x4e71; // hack!
 }
 

@@ -842,10 +842,10 @@ static void *es5506_start_common(sound_type sndtype, const char *tag, int sndind
 	chip->stream = stream_create(0, 2, clock / (16*32), chip, es5506_update);
 
 	/* initialize the regions */
-	chip->region_base[0] = intf->region0 ? (UINT16 *)memory_region(Machine, RGNCLASS_SOUND, intf->region0) : NULL;
-	chip->region_base[1] = intf->region1 ? (UINT16 *)memory_region(Machine, RGNCLASS_SOUND, intf->region1) : NULL;
-	chip->region_base[2] = intf->region2 ? (UINT16 *)memory_region(Machine, RGNCLASS_SOUND, intf->region2) : NULL;
-	chip->region_base[3] = intf->region3 ? (UINT16 *)memory_region(Machine, RGNCLASS_SOUND, intf->region3) : NULL;
+	chip->region_base[0] = intf->region0 ? (UINT16 *)memory_region(Machine, intf->region0) : NULL;
+	chip->region_base[1] = intf->region1 ? (UINT16 *)memory_region(Machine, intf->region1) : NULL;
+	chip->region_base[2] = intf->region2 ? (UINT16 *)memory_region(Machine, intf->region2) : NULL;
+	chip->region_base[3] = intf->region3 ? (UINT16 *)memory_region(Machine, intf->region3) : NULL;
 
 	/* initialize the rest of the structure */
 	chip->master_clock = clock;

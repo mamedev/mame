@@ -101,8 +101,8 @@ static void *qsound_start(const char *tag, int sndindex, int clock, const void *
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(chip));
 
-	chip->sample_rom = (QSOUND_SRC_SAMPLE *)memory_region(Machine, RGNCLASS_SOUND, tag);
-	chip->sample_rom_length = memory_region_length(Machine, RGNCLASS_SOUND, tag);
+	chip->sample_rom = (QSOUND_SRC_SAMPLE *)memory_region(Machine, tag);
+	chip->sample_rom_length = memory_region_length(Machine, tag);
 
 	memset(chip->channel, 0, sizeof(chip->channel));
 

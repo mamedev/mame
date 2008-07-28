@@ -171,7 +171,7 @@ static void spaceod_bg_init_palette(running_machine *machine)
 
 static TILE_GET_INFO( spaceod_get_tile_info )
 {
-	int code = memory_region(machine, RGNCLASS_GFX, "gfx2")[tile_index + 0x1000 * (spaceod_bg_control >> 6)];
+	int code = memory_region(machine, "gfx2")[tile_index + 0x1000 * (spaceod_bg_control >> 6)];
 	SET_TILE_INFO(1, code + 0x100 * ((spaceod_bg_control >> 2) & 1), 0, 0);
 }
 
@@ -186,7 +186,7 @@ static TILEMAP_MAPPER( spaceod_scan_rows )
 
 static TILE_GET_INFO( bg_get_tile_info )
 {
-	int code = memory_region(machine, RGNCLASS_GFX, "gfx2")[tile_index];
+	int code = memory_region(machine, "gfx2")[tile_index];
 	SET_TILE_INFO(1, code + 0x100 * bg_char_bank, code >> 4, 0);
 }
 
@@ -233,13 +233,13 @@ VIDEO_START( segag80r )
 
 		/* background tilemap is effectively 1 screen x n screens */
 		case G80_BACKGROUND_MONSTERB:
-			bg_tilemap = tilemap_create(bg_get_tile_info, tilemap_scan_rows,  8,8, 32,memory_region_length(machine, RGNCLASS_GFX, "gfx2") / 32);
+			bg_tilemap = tilemap_create(bg_get_tile_info, tilemap_scan_rows,  8,8, 32,memory_region_length(machine, "gfx2") / 32);
 			break;
 
 		/* background tilemap is effectively 4 screens x n screens */
 		case G80_BACKGROUND_PIGNEWT:
 		case G80_BACKGROUND_SINDBADM:
-			bg_tilemap = tilemap_create(bg_get_tile_info, tilemap_scan_rows,  8,8, 128,memory_region_length(machine, RGNCLASS_GFX, "gfx2") / 128);
+			bg_tilemap = tilemap_create(bg_get_tile_info, tilemap_scan_rows,  8,8, 128,memory_region_length(machine, "gfx2") / 128);
 			break;
 	}
 

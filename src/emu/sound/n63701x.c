@@ -107,7 +107,7 @@ static void *namco_63701x_start(const char *tag, int sndindex, int clock, const 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
-	chip->rom = memory_region(Machine, RGNCLASS_SOUND, tag);
+	chip->rom = memory_region(Machine, tag);
 
 	chip->stream = stream_create(0, 2, clock/1000, chip, namco_63701x_update);
 

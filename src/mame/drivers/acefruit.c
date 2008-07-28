@@ -571,7 +571,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( sidewndr )
 {
-	UINT8 *ROM = memory_region( machine, RGNCLASS_CPU, "main" );
+	UINT8 *ROM = memory_region( machine, "main" );
 	/* replace "ret nc" ( 0xd0 ) with "di" */
 	ROM[ 0 ] = 0xf3;
 	/* this is either a bad dump or the cpu core should set the carry flag on reset */
@@ -584,13 +584,13 @@ static DRIVER_INIT( sidewndr )
 ***************************************************************************/
 
 ROM_START( sidewndr )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "2_h09.bin",    0x000000, 0x000800, BAD_DUMP CRC(141f3b0c) SHA1(1704feba950fe7aa939b9ed54c37264d10527d11) )
 	ROM_LOAD( "2_h10.bin",    0x000800, 0x000800, CRC(36a2d4af) SHA1(2388e22245497240e5721895d94d2ccd1f579eff) )
 	ROM_LOAD( "2_h11.bin",    0x001000, 0x000800, CRC(e2932643) SHA1(e1c0cd5d0cd332519432cbefa8718362a6cd1ccc) )
 	ROM_LOAD( "2_h12.bin",    0x001800, 0x000800, CRC(26af0b1f) SHA1(36f0e54982688b9d5a24a6986a847ac69ee0a355) )
 
-	ROM_REGION( 0x2000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* 8k for graphics */
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )	/* 8k for graphics */
 	ROM_LOAD( "2_h05.bin",    0x000000, 0x000800, CRC(64b64cff) SHA1(c11f2bd2af68ae7f104b711deb7f6509fdbaeb8f) )
 	ROM_LOAD( "2_h06.bin",    0x000800, 0x000800, CRC(6b96a586) SHA1(6d5ab8fefe37ca4dbc5057ebf31f12b33dbdf5c0) )
 	ROM_LOAD( "2_h07.bin",    0x001000, 0x000800, CRC(3a8e68a2) SHA1(2ffe07360f57f0f11ecf326f00905747d9b66811) )
@@ -598,13 +598,13 @@ ROM_START( sidewndr )
 ROM_END
 
 ROM_START( spellbnd )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "h9.bin",       0x000000, 0x000800, CRC(9919fcfa) SHA1(04167b12ee9e60ef891893a305a35d3f2eccb0bb) )
 	ROM_LOAD( "h10.bin",      0x000800, 0x000800, CRC(90502d00) SHA1(3bdd859d9146df2eb97b4517c446182569a55a46) )
 	ROM_LOAD( "h11.bin",      0x001000, 0x000800, CRC(7375166c) SHA1(f05b01941423fd36e0a5d3aa913a594e4e7aa5d4) )
 	ROM_LOAD( "h12.bin",      0x001800, 0x000800, CRC(4546c68c) SHA1(92104e2005fc772ea9f70451d9d674f95d3f0ba9) )
 
-	ROM_REGION( 0x2000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* 8k for graphics */
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )	/* 8k for graphics */
 	ROM_LOAD( "h5.bin",       0x000000, 0x000800, CRC(198da32c) SHA1(bf6c4ddcda0503095d310e08057dd88154952ef4) )
 	ROM_LOAD( "h6.bin",       0x000800, 0x000800, CRC(e777130f) SHA1(3421c6f399e5ec749f1908f6b4ebff7761c6c5d9) )
 	ROM_LOAD( "h7.bin",       0x001000, 0x000800, CRC(bfed5b8f) SHA1(f95074e8809297eec67da9d7e33ae1dd1c5eabc0) )
@@ -661,7 +661,7 @@ Notes:
 */
 
 ROM_START( starspnr )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "h9.h9",        0x00e000, 0x0800, CRC(083068aa) SHA1(160a5f3bf33d0a53354f98295cd67022762928b6) )
 	ROM_CONTINUE(             0x000000, 0x0800 )
 	ROM_LOAD( "h10.h10",      0x00e800, 0x0800, CRC(a0a96e55) SHA1(de4dc0da5a1f358085817690cc6bdc8d94a849f8) )
@@ -671,13 +671,13 @@ ROM_START( starspnr )
 	ROM_LOAD( "h12.h12",      0x00f800, 0x0800, CRC(8571f3f5) SHA1(e8b60a604a4a0368b6063b15b328c68f351cb740) ) /* bad dump ? nothing of interest 0xf800-0xffff */
 	ROM_CONTINUE(             0x001800, 0x0800 )
 
-	ROM_REGION( 0x2000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* 8k for graphics */
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE ) /* 8k for graphics */
 	ROM_LOAD( "5.h5",         0x000000, 0x000800, CRC(df49876f) SHA1(68077304f096491baeddc1d6b4dc62f90de71903) )
 	ROM_LOAD( "6.h6",         0x000800, 0x000800, CRC(d992e2f6) SHA1(7841efec7d81689c82b8da501cce743436e7e8d4) )
 	ROM_LOAD( "7.h7",         0x001000, 0x000800, CRC(d5a40e88) SHA1(5cac8d85123720cdbb8b4630b14a27cf0ceef33f) )
 	ROM_LOAD( "8.h8",         0x001800, 0x000800, CRC(0dd38c3c) SHA1(4da0cd00c76d3be2164f141ccd8c72dd9578ee61) )
 
-	ROM_REGION( 0x300, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x300, "proms", 0 )
 	ROM_LOAD( "16-1-101.b9",  0x0000, 0x0100, NO_DUMP )
 	ROM_LOAD( "16-1-101.b10", 0x0100, 0x0100, NO_DUMP )
 	ROM_LOAD( "16-1-101.b11", 0x0200, 0x0100, NO_DUMP )

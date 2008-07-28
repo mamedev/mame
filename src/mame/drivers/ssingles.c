@@ -52,7 +52,7 @@ static MC6845_UPDATE_ROW( update_row )
 	UINT32 tile_address;
 	UINT16 cell,palette;
 	UINT8 b0,b1;
-	const UINT8 *gfx = memory_region(device->machine, RGNCLASS_GFX, "gfx1");
+	const UINT8 *gfx = memory_region(device->machine, "gfx1");
 
 	for(cx=0;cx<x_count;++cx)
 	{
@@ -284,19 +284,19 @@ static MACHINE_DRIVER_START( ssingles )
 MACHINE_DRIVER_END
 
 ROM_START( ssingles )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* Z80 main CPU  */
+	ROM_REGION( 0x10000, "main", 0 ) /* Z80 main CPU  */
 	ROM_LOAD( "1.bin", 0x00000, 0x2000, CRC(43f02215) SHA1(9f04a7d4671ff39fd2bd8ec7afced4981ee7be05) )
 	ROM_LOAD( "2.bin", 0x06000, 0x2000, CRC(281f27e4) SHA1(cef28717ab2ed991a5709464c01490f0ab1dc17c) )
 	ROM_LOAD( "3.bin", 0x08000, 0x2000, CRC(14fdcb65) SHA1(70f7fcb46e74937de0e4037c9fe79349a30d0d07) )
 	ROM_LOAD( "4.bin", 0x0a000, 0x2000, CRC(acb44685) SHA1(d68aab8b7e68d842a350d3fb76985ac857b1d972) )
 
-	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "9.bin",  0x0000, 0x4000, CRC(57fac6f9) SHA1(12f6695c9831399e599a95008ebf9db943725437) )
 	ROM_LOAD( "10.bin", 0x4000, 0x4000, CRC(cd3ba260) SHA1(2499ad9982cc6356e2eb3a0f10d77886872a0c9f) )
 	ROM_LOAD( "11.bin", 0x8000, 0x4000, CRC(f7107b29) SHA1(a405926fd3cb4b3d2a1c705dcde25d961dba5884) )
 	ROM_LOAD( "12.bin", 0xc000, 0x4000, CRC(e5585a93) SHA1(04d55699b56d869066f2be2c6ac48042aa6c3108) )
 
-	ROM_REGION( 0x08000, RGNCLASS_USER, "user1", 0) /* samples ? data ?*/
+	ROM_REGION( 0x08000, "user1", 0) /* samples ? data ?*/
 	ROM_LOAD( "5.bin", 0x00000, 0x2000, CRC(242a8dda) SHA1(e140893cc05fb8cee75904d98b02626f2565ed1b) )
 	ROM_LOAD( "6.bin", 0x02000, 0x2000, CRC(85ab8aab) SHA1(566f034e1ba23382442f27457447133a0e0f1cfc) )
 	ROM_LOAD( "7.bin", 0x04000, 0x2000, CRC(57cc112d) SHA1(fc861c58ae39503497f04d302a9f16fca19b37fb) )

@@ -112,7 +112,7 @@ static WRITE8_HANDLER(port60_w)
 		data=0;
 	}
 	port60=data;
-	memory_set_bankptr( 1, &memory_region(machine, RGNCLASS_USER, "user1")[rombankLookup[data]*0x4000] );
+	memory_set_bankptr( 1, &memory_region(machine, "user1")[rombankLookup[data]*0x4000] );
 }
 
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
@@ -213,24 +213,24 @@ MACHINE_DRIVER_END
 
 
 ROM_START( quizo )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "rom1",   0x0000, 0x4000, CRC(6731735f) SHA1(7dbf48f833c7b7cde77df2a10781e5a8b6ae0533) )
 	ROM_CONTINUE(             0x0000, 0x04000 )
 
-	ROM_REGION( 0x18000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x18000, "user1", 0 )
 	ROM_LOAD( "rom2",   0x00000, 0x8000, CRC(a700eb30) SHA1(7800b3d2b7992c67c91cfb7e02c7cfc313b0ed5d) )
 	ROM_LOAD( "rom3",   0x08000, 0x8000, CRC(d344f97e) SHA1(3d669a56f084f2a7a50d7d211b84a50d35de66ac) )
 	ROM_LOAD( "rom4",   0x10000, 0x8000, CRC(ab1eb174) SHA1(7d7a935aa7196a814c15f13444b88e770678b672) )
 
-	ROM_REGION( 0x0020,  RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0020,  "proms", 0 )
 	ROM_LOAD( "82s123",   0x0000, 0x0020, CRC(c3f15914) SHA1(19fd8e6f2a1256ae51c500a3bf1d7358810ef97e) )
 ROM_END
 
 ROM_START( quizoa )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "7.bin",   0x0000, 0x4000, CRC(1579ae31) SHA1(b23539413d108223001a9fe827ea151d20682b7b) )
 
-	ROM_REGION( 0x18000, RGNCLASS_USER, "user1", 0 )
+	ROM_REGION( 0x18000, "user1", 0 )
 	ROM_LOAD( "6.bin",   0x00000, 0x4000, CRC(f00f6356) SHA1(f306ec26ddbb503214e266cc9b74304af86bdbc6) )
 	ROM_LOAD( "5.bin",   0x04000, 0x4000, CRC(39e577e3) SHA1(430d9fe916dfeecdb94c23be89f79a6408ff444e) )
 	ROM_LOAD( "4.bin",   0x08000, 0x4000, CRC(a977bd3a) SHA1(22f1158253a31cf5513eed3537a6096b993b0919) )
@@ -238,7 +238,7 @@ ROM_START( quizoa )
 	ROM_LOAD( "2.bin",   0x10000, 0x4000, CRC(4a0df776) SHA1(4a7dc2347b33843c0a6bb497be56ccae1af1dae0) )
 	ROM_LOAD( "1.bin",   0x14000, 0x4000, CRC(d9566c1a) SHA1(2495c071d077e5a359c2d7541d8b7c175b398b56) )
 
-	ROM_REGION( 0x0020,  RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0020,  "proms", 0 )
 	ROM_LOAD( "82s123",   0x0000, 0x0020, CRC(c3f15914) SHA1(19fd8e6f2a1256ae51c500a3bf1d7358810ef97e) )
 ROM_END
 

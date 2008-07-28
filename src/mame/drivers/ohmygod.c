@@ -31,7 +31,7 @@ static int nosound_kludge_step;
 
 static MACHINE_RESET( ohmygod )
 {
-	UINT8 *rom = memory_region(machine, RGNCLASS_SOUND, "oki");
+	UINT8 *rom = memory_region(machine, "oki");
 
 	sndbank = 0;
 	memcpy(rom + 0x20000,rom + 0x40000 + 0x20000 * sndbank,0x20000);
@@ -43,7 +43,7 @@ static WRITE16_HANDLER( ohmygod_ctrl_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *rom = memory_region(machine, RGNCLASS_SOUND, "oki");
+		UINT8 *rom = memory_region(machine, "oki");
 
 		/* ADPCM bank switch */
 		if (sndbank != ((data >> adpcm_bank_shift) & 0x0f))
@@ -367,32 +367,32 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( ohmygod )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x80000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "omg-p.114", 0x00000, 0x80000, CRC(48fa40ca) SHA1(b1d91e1a4a888526febbe53a12b73e375f604f2b) )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "omg-b.117",    0x00000, 0x80000, CRC(73621fa6) SHA1(de28c123eeaab78af83ab673431f90c97569450b) )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "omg-s.120",    0x00000, 0x80000, CRC(6413bd36) SHA1(52c455d727496eae80bfab9460127c4c5a874e32) )
 
-	ROM_REGION( 0x240000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x240000, "oki", 0 )
 	ROM_LOAD( "omg-g.107",    0x00000, 0x200000, CRC(7405573c) SHA1(f4e7318c0a58f43d3c6370490637aea53b28547e) )
 	/* 00000-1ffff is fixed, 20000-3ffff is banked */
 	ROM_RELOAD(               0x40000, 0x200000 )
 ROM_END
 
 ROM_START( naname )
-	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x80000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "036-prg.114", 0x00000, 0x80000, CRC(3b7362f7) SHA1(ba16ec9df8569bacd387561ef2b3ea5b17cb650c) )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "036-bg.117",    0x00000, 0x80000, CRC(f53e8da5) SHA1(efaec4bb90cad75380ac6eb6859379cdefd187ac) )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "036-spr.120",   0x00000, 0x80000, CRC(e36d8731) SHA1(652709d7884d40459c95761c8abcb394c4b712bf) )
 
-	ROM_REGION( 0x240000, RGNCLASS_SOUND, "oki", 0 )
+	ROM_REGION( 0x240000, "oki", 0 )
 	ROM_LOAD( "036-snd.107",  0x00000, 0x200000, CRC(a3e0caf4) SHA1(35b0eb4ae5b9df1b7c99ec2476a6d834ea50d2e3) )
 	/* 00000-1ffff is fixed, 20000-3ffff is banked */
 	ROM_RELOAD(               0x40000, 0x200000 )

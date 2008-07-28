@@ -92,7 +92,7 @@ static VIDEO_UPDATE( lastfght )
 	int x, y, count = 0;
 	static unsigned base = 0;
 	static int view_roms = 0;
-	UINT8 *gfxdata = memory_region( screen->machine, RGNCLASS_GFX, "gfx1" );
+	UINT8 *gfxdata = memory_region( screen->machine, "gfx1" );
 	UINT8 data;
 
 	if ( input_code_pressed_once(KEYCODE_ENTER) )	view_roms ^= 1;
@@ -100,7 +100,7 @@ static VIDEO_UPDATE( lastfght )
 	{
 		if ( input_code_pressed_once(KEYCODE_PGDN) )	base += 512 * 256;
 		if ( input_code_pressed_once(KEYCODE_PGUP) )	base -= 512 * 256;
-		base %= memory_region_length( screen->machine, RGNCLASS_GFX, "gfx1" );
+		base %= memory_region_length( screen->machine, "gfx1" );
 
 		count = base;
 
@@ -257,7 +257,7 @@ static WRITE16_HANDLER( lastfght_blit_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		int x,y, addr;
-		UINT8 *gfxdata = memory_region( machine, RGNCLASS_GFX, "gfx1" );
+		UINT8 *gfxdata = memory_region( machine, "gfx1" );
 		bitmap_t *dest = lastfght_bitmap[lastfght_dest];
 
 #if 0
@@ -349,8 +349,8 @@ static WRITE16_HANDLER( lastfght_sound_w )
 static ADDRESS_MAP_START( lastfght_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 
-	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION(RGNCLASS_CPU, "main", 0)
-	AM_RANGE( 0x080000, 0x0fffff ) AM_ROM AM_REGION(RGNCLASS_CPU, "main", 0)
+	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("main", 0)
+	AM_RANGE( 0x080000, 0x0fffff ) AM_ROM AM_REGION("main", 0)
 
 	AM_RANGE( 0x200000, 0x20ffff ) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	// battery
 
@@ -486,22 +486,22 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( lastfght )
-	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )		// H8/3044 program
+	ROM_REGION( 0x100000, "main", 0 )		// H8/3044 program
 	ROM_LOAD( "v106.u16", 0x000000, 0x080000, CRC(7aec89f4) SHA1(7cff00844ad82a0f8d19b1bd07ba3a2bced69d66) )
 
-	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", 0 )		// Blitter data
+	ROM_REGION( 0x800000, "gfx1", 0 )		// Blitter data
 	ROM_LOAD( "1.b1", 0x000000, 0x200000, CRC(6c438136) SHA1(138934e948bbd6bd80f354f037badedef6cd8cb1) )
 	ROM_LOAD( "2.b2", 0x200000, 0x200000, CRC(9710bcff) SHA1(0291385489a065ed895c99ae7197fdeac0a0e2a0) )
 	ROM_LOAD( "3.b3", 0x400000, 0x200000, CRC(4236c79a) SHA1(94f093d12c096d38d1e7278796f6d58e4ba14e2e) )
 	ROM_LOAD( "4.b4", 0x600000, 0x200000, CRC(68153b0f) SHA1(46ddf37d5885f411e0e6de9c7e8969ba3a00f17f) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "samples", 0 )	// Samples
+	ROM_REGION( 0x100000, "samples", 0 )	// Samples
 	ROM_LOAD( "v100.u7", 0x000000, 0x100000, CRC(c134378c) SHA1(999c75f3a7890421cfd904a926ca377ee43a6825) )
 ROM_END
 
 static DRIVER_INIT(lastfght)
 {
-	UINT16 *rom = (UINT16*)memory_region(machine, RGNCLASS_CPU, "main");
+	UINT16 *rom = (UINT16*)memory_region(machine, "main");
 
 	// pass initial check (protection ? hw?)
 	rom[0x00354/2] = 0x403e;

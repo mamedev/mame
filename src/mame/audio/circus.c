@@ -175,7 +175,7 @@ DISCRETE_SOUND_END
 WRITE8_HANDLER( circus_clown_z_w )
 {
 	clown_z = (data & 0x0f);
-	*(memory_region(machine, RGNCLASS_CPU, "main")+0x8000)=data; logerror("Z:%02x\n",data); //DEBUG
+	*(memory_region(machine, "main")+0x8000)=data; logerror("Z:%02x\n",data); //DEBUG
 	/* Bits 4-6 enable/disable trigger different events */
 
 	switch (circus_game)

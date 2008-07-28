@@ -282,7 +282,7 @@ static WRITE8_HANDLER( master_nmi_trigger_w )
 
 static void airbustr_bankswitch(running_machine *machine, const char *cpu, int bank, int data)
 {
-	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, cpu);
+	UINT8 *ROM = memory_region(machine, cpu);
 
 	if ((data & 0x07) <  3)
 		ROM = &ROM[0x4000 * (data & 0x07)];
@@ -662,50 +662,50 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( airbustr )
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "master", 0 )
+	ROM_REGION( 0x24000, "master", 0 )
 	ROM_LOAD( "pr12.h19",   0x00000, 0x0c000, CRC(91362eb2) SHA1(cd85acfa6542af68dd1cad46f9426a95cfc9432e) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
 
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "slave", 0 )
+	ROM_REGION( 0x24000, "slave", 0 )
 	ROM_LOAD( "pr13.l15",   0x00000, 0x0c000, CRC(13b2257b) SHA1(325efa54e757a1f08caf81801930d61ea4e7b6d4) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
 
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x24000, "audio", 0 )
 	ROM_LOAD( "pr-21.bin",  0x00000, 0x0c000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "pr-000.bin", 0x00000, 0x80000, CRC(8ca68f0d) SHA1(d60389e7e63e9850bcddecb486558de1414f1276) ) // scrolling layers
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "pr-001.bin", 0x00000, 0x80000, CRC(7e6cb377) SHA1(005290f9f53a0c3a6a9d04486b16b7fd52cc94b6) ) // sprites
 	ROM_LOAD( "pr-02.bin",  0x80000, 0x10000, CRC(6bbd5e46) SHA1(26563737f3f91ee0a056d35ce42217bb57d8a081) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )	/* OKI-M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* OKI-M6295 samples */
 	ROM_LOAD( "pr-200.bin", 0x00000, 0x40000, CRC(a4dd3390) SHA1(2d72b46b4979857f6b66489bebda9f48799f59cf) )
 ROM_END
 
 ROM_START( airbustj )
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "master", 0 )
+	ROM_REGION( 0x24000, "master", 0 )
 	ROM_LOAD( "pr-14j.bin", 0x00000, 0x0c000, CRC(6b9805bd) SHA1(db6df33cf17316a4b81d7731dca9fe8bbf81f014) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
 
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "slave", 0 )
+	ROM_REGION( 0x24000, "slave", 0 )
 	ROM_LOAD( "pr-11j.bin", 0x00000, 0x0c000, CRC(85464124) SHA1(8cce8dfdede48032c40d5f155fd58061866668de) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
 
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x24000, "audio", 0 )
 	ROM_LOAD( "pr-21.bin",  0x00000, 0x0c000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "pr-000.bin", 0x00000, 0x80000, CRC(8ca68f0d) SHA1(d60389e7e63e9850bcddecb486558de1414f1276) ) // scrolling layers
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "pr-001.bin", 0x000000, 0x80000, CRC(7e6cb377) SHA1(005290f9f53a0c3a6a9d04486b16b7fd52cc94b6) ) // sprites
 	ROM_LOAD( "pr-02.bin",  0x080000, 0x10000, CRC(6bbd5e46) SHA1(26563737f3f91ee0a056d35ce42217bb57d8a081) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )	/* OKI-M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* OKI-M6295 samples */
 	ROM_LOAD( "pr-200.bin", 0x00000, 0x40000, CRC(a4dd3390) SHA1(2d72b46b4979857f6b66489bebda9f48799f59cf) )
 ROM_END
 
@@ -723,26 +723,26 @@ Rom 5 is on a piggyback daughterboard with a z80 and a PAL
 */
 
 ROM_START( airbusb )
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "master", 0 )
+	ROM_REGION( 0x24000, "master", 0 )
 	ROM_LOAD( "5.bin",   0x00000, 0x0c000, CRC(9e4216a2) SHA1(46572da4df5a67b10cc3ee21bdc0ec4bcecaaf93) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
 
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "slave", 0 )
+	ROM_REGION( 0x24000, "slave", 0 )
 	ROM_LOAD( "1.bin",   0x00000, 0x0c000, CRC(85464124) SHA1(8cce8dfdede48032c40d5f155fd58061866668de) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
 
-	ROM_REGION( 0x24000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x24000, "audio", 0 )
 	ROM_LOAD( "2.bin",  0x00000, 0x0c000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	/* Same content as airbusj, pr-001.bin, different sized roms / interleave */
 	ROM_LOAD16_BYTE( "7.bin", 0x00000, 0x20000, CRC(2e3bf0a2) SHA1(84cabc753e5fd1164f0a8a9a9dee7d339a5607c5) )
 	ROM_LOAD16_BYTE( "9.bin", 0x00001, 0x20000, CRC(2c23c646) SHA1(41c0f8788c9715918b4138f076415f8640adc483) )
 	ROM_LOAD16_BYTE( "6.bin", 0x40000, 0x20000, CRC(0d6cd470) SHA1(329286bc6c9d1eccc74735d1c155a0f5f98f1444) )
 	ROM_LOAD16_BYTE( "8.bin", 0x40001, 0x20000, CRC(b3372e51) SHA1(aa8dcbb84c829994ae04ceecbef795ac53e72493) )
 
-	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
 	/* Same content as airbusj, pr-001.bin, different sized roms */
 	ROM_LOAD( "13.bin", 0x00000, 0x20000, CRC(75dee86d) SHA1(fe342fed5bb84ee6f35d3f91987141c559e94d5a) )
 	ROM_LOAD( "12.bin", 0x20000, 0x20000, CRC(c98a8333) SHA1(3a990460e232ee07a9297fcffdb02451406f5bf1) )
@@ -751,7 +751,7 @@ ROM_START( airbusb )
 
 	ROM_LOAD( "14.bin", 0x80000, 0x10000, CRC(6bbd5e46) SHA1(26563737f3f91ee0a056d35ce42217bb57d8a081) )
 
-	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )	/* OKI-M6295 samples */
+	ROM_REGION( 0x40000, "oki", 0 )	/* OKI-M6295 samples */
 	/* Same content as airbusj, pr-200.bin, different sized roms */
 	ROM_LOAD( "4.bin", 0x00000, 0x20000, CRC(21d9bfe3) SHA1(4a69458cd2a6309e389c9e7593ae29d3ef0f8daf) )
 	ROM_LOAD( "3.bin", 0x20000, 0x20000, CRC(58cd19e2) SHA1(479f22241bf29f7af67d9679fc6c20f10004fdd8) )

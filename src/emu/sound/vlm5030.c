@@ -650,10 +650,10 @@ static void *vlm5030_start(const char *tag, int sndindex, int clock, const void 
 	VLM5030_reset(chip);
 	chip->phase = PH_IDLE;
 
-	chip->rom = memory_region(Machine, RGNCLASS_SOUND, tag);
+	chip->rom = memory_region(Machine, tag);
 	/* memory size */
 	if( chip->intf->memory_size == 0)
-		chip->address_mask = memory_region_length(Machine, RGNCLASS_SOUND, tag)-1;
+		chip->address_mask = memory_region_length(Machine, tag)-1;
 	else
 		chip->address_mask = chip->intf->memory_size-1;
 

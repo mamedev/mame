@@ -114,21 +114,6 @@ enum _output_channel
 typedef enum _output_channel output_channel;
 
 
-/* memory region classes */
-enum
-{
-	RGNCLASS_INVALID = 0x00,
-	RGNCLASS_CPU,
-	RGNCLASS_GFX,
-	RGNCLASS_SOUND,
-	RGNCLASS_USER,
-	RGNCLASS_DISKS,
-	RGNCLASS_PROMS,
-	RGNCLASS_PLDS,
-	RGNCLASS_COUNT
-};
-
-
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -298,25 +283,22 @@ int mame_is_paused(running_machine *machine);
 /* ----- memory region management ----- */
 
 /* allocate a new memory region */
-UINT8 *memory_region_alloc(running_machine *machine, int rgnclass, const char *name, UINT32 length, UINT32 flags);
+UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 length, UINT32 flags);
 
 /* free an allocated memory region */
-void memory_region_free(running_machine *machine, int rgnclass, const char *name);
+void memory_region_free(running_machine *machine, const char *name);
 
 /* return a pointer to a specified memory region */
-UINT8 *memory_region(running_machine *machine, int rgnclass, const char *name);
+UINT8 *memory_region(running_machine *machine, const char *name);
 
 /* return the size (in bytes) of a specified memory region */
-UINT32 memory_region_length(running_machine *machine, int rgnclass, const char *name);
+UINT32 memory_region_length(running_machine *machine, const char *name);
 
 /* return the flags (defined in romload.h) for a specified memory region */
-UINT32 memory_region_flags(running_machine *machine, int rgnclass, const char *name);
+UINT32 memory_region_flags(running_machine *machine, const char *name);
 
 /* return the name of the next memory region of the same class (or the first if name == NULL) */
-const char *memory_region_next(running_machine *machine, int rgnclass, const char *name);
-
-/* return the name of the given memory region class */
-const char *memory_region_class_name(int rgnclass, int lowercase);
+const char *memory_region_next(running_machine *machine, const char *name);
 
 
 

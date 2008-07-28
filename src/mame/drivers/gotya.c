@@ -232,27 +232,27 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( thehand )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "hand6.bin",	0x0000, 0x1000, CRC(a33b806c) SHA1(1e552af5362e7b003f55e78bb59589e1db55557c) )
 	ROM_LOAD( "hand5.bin",	0x1000, 0x1000, CRC(89bcde82) SHA1(d074bb6a1975160eb533d5fd9289170a68209046) )
 	ROM_LOAD( "hand4.bin",	0x2000, 0x1000, CRC(c6844a83) SHA1(84e220dce3f5ddee9dd0377f3bebdd4027fc9108) )
 	ROM_LOAD( "gb-03.bin",	0x3000, 0x1000, CRC(f34d90ab) SHA1(bec5f6a34a273f308083a280f2b425d9c273c69b) )
 
-	ROM_REGION( 0x1000,  RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* characters */
+	ROM_REGION( 0x1000,  "gfx1", ROMREGION_DISPOSE )	/* characters */
 	ROM_LOAD( "hand12.bin",	0x0000, 0x1000, CRC(95773b46) SHA1(db8d7ace4eafd4c72edfeff6003ca6e96e0239b5) )
 
-	ROM_REGION( 0x1000,  RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x1000,  "gfx2", ROMREGION_DISPOSE )	/* sprites */
 	ROM_LOAD( "gb-11.bin",	0x0000, 0x1000, CRC(5d5eca1b) SHA1(d7c6b5f4d398d5e33cc411ed593d6f53a9979493) )
 
-	ROM_REGION( 0x0120,  RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0120,  "proms", 0 )
 	ROM_LOAD( "prom.1a",    0x0000, 0x0020, CRC(4864a5a0) SHA1(5b49f60b085fa026d4e8d4a5ad28ee7037a8ff9c) )    /* color PROM */
 	ROM_LOAD( "prom.4c",    0x0020, 0x0100, CRC(4745b5f6) SHA1(02a7f759e9bc8089cbd9213a71bbe671f9641638) )    /* lookup table */
 
-	ROM_REGION( 0x1000,  RGNCLASS_USER, "user1", 0 )		/* no idea what these are */
+	ROM_REGION( 0x1000,  "user1", 0 )		/* no idea what these are */
 	ROM_LOAD( "hand1.bin",	0x0000, 0x0800, CRC(ccc537e0) SHA1(471fd49225aa14b91d085178e1b58b6c4ae76481) )
 	ROM_LOAD( "gb-02.bin",	0x0800, 0x0800, CRC(65a7e284) SHA1(91e9c34dcf20608863ad5475dc0c4309971c8eee) )
 
-	ROM_REGION( 0x4000,  RGNCLASS_USER, "user2", 0 )		/* HD38880 code? */
+	ROM_REGION( 0x4000,  "user2", 0 )		/* HD38880 code? */
 	ROM_LOAD( "gb-10.bin",	0x0000, 0x1000, CRC(8101915f) SHA1(c4d21b1938ea7e0d47c48e74037f005280ac101b) )
 	ROM_LOAD( "gb-09.bin",	0x1000, 0x1000, CRC(619bba76) SHA1(2a2deffe6f058fc840329fbfffbc0c70a0147c14) )
 	ROM_LOAD( "gb-08.bin",	0x2000, 0x1000, CRC(82f59528) SHA1(6bfa2329eb291040bfc229c56420865253b0132a) )
@@ -260,27 +260,27 @@ ROM_START( thehand )
 ROM_END
 
 ROM_START( gotya )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "gb-06.bin",	0x0000, 0x1000, CRC(7793985a) SHA1(23aa8bd161e700bea59b92075423cdf55e9a26c3) )
 	ROM_LOAD( "gb-05.bin",	0x1000, 0x1000, CRC(683d188b) SHA1(5341c62f5cf384c73be0d7a0a230bb8cebfbe709) )
 	ROM_LOAD( "gb-04.bin",	0x2000, 0x1000, CRC(15b72f09) SHA1(bd941722ed1310d5c8ca8a44899368cba3815f3b) )
 	ROM_LOAD( "gb-03.bin",	0x3000, 0x1000, CRC(f34d90ab) SHA1(bec5f6a34a273f308083a280f2b425d9c273c69b) )    /* this is the only ROM that passes the ROM test */
 
-	ROM_REGION( 0x1000,  RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* characters */
+	ROM_REGION( 0x1000,  "gfx1", ROMREGION_DISPOSE )	/* characters */
 	ROM_LOAD( "gb-12.bin",	0x0000, 0x1000, CRC(4993d735) SHA1(9e47876238a8af3659721191a5f75c33507ed1a5) )
 
-	ROM_REGION( 0x1000,  RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x1000,  "gfx2", ROMREGION_DISPOSE )	/* sprites */
 	ROM_LOAD( "gb-11.bin",	0x0000, 0x1000, CRC(5d5eca1b) SHA1(d7c6b5f4d398d5e33cc411ed593d6f53a9979493) )
 
-	ROM_REGION( 0x0120,  RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0120,  "proms", 0 )
 	ROM_LOAD( "prom.1a",    0x0000, 0x0020, CRC(4864a5a0) SHA1(5b49f60b085fa026d4e8d4a5ad28ee7037a8ff9c) )    /* color PROM */
 	ROM_LOAD( "prom.4c",    0x0020, 0x0100, CRC(4745b5f6) SHA1(02a7f759e9bc8089cbd9213a71bbe671f9641638) )    /* lookup table */
 
-	ROM_REGION( 0x1000,  RGNCLASS_USER, "user1", 0 )		/* no idea what these are */
+	ROM_REGION( 0x1000,  "user1", 0 )		/* no idea what these are */
 	ROM_LOAD( "gb-01.bin",	0x0000, 0x0800, CRC(c31dba64) SHA1(15ae54b7d475ca3f0a3acc45cd8da2916c5fdef2) )
 	ROM_LOAD( "gb-02.bin",	0x0800, 0x0800, CRC(65a7e284) SHA1(91e9c34dcf20608863ad5475dc0c4309971c8eee) )
 
-	ROM_REGION( 0x4000,  RGNCLASS_USER, "user2", 0 )		/* HD38880 code? */
+	ROM_REGION( 0x4000,  "user2", 0 )		/* HD38880 code? */
 	ROM_LOAD( "gb-10.bin",	0x0000, 0x1000, CRC(8101915f) SHA1(c4d21b1938ea7e0d47c48e74037f005280ac101b) )
 	ROM_LOAD( "gb-09.bin",	0x1000, 0x1000, CRC(619bba76) SHA1(2a2deffe6f058fc840329fbfffbc0c70a0147c14) )
 	ROM_LOAD( "gb-08.bin",	0x2000, 0x1000, CRC(82f59528) SHA1(6bfa2329eb291040bfc229c56420865253b0132a) )

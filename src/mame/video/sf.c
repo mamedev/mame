@@ -16,7 +16,7 @@ static tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *base = memory_region(machine, RGNCLASS_GFX, "gfx5") + 2*tile_index;
+	UINT8 *base = memory_region(machine, "gfx5") + 2*tile_index;
 	int attr = base[0x10000];
 	int color = base[0];
 	int code = (base[0x10000+1]<<8) | base[1];
@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	UINT8 *base = memory_region(machine, RGNCLASS_GFX, "gfx5") + 0x20000 + 2*tile_index;
+	UINT8 *base = memory_region(machine, "gfx5") + 0x20000 + 2*tile_index;
 	int attr = base[0x10000];
 	int color = base[0];
 	int code = (base[0x10000+1]<<8) | base[1];

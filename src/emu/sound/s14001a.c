@@ -479,7 +479,7 @@ static void *s14001a_start(const char *tag, int sndindex, int clock, const void 
 		chip->filtervals[i] = SILENCE;
 	}
 
-	chip->SpeechRom = memory_region(Machine, RGNCLASS_SOUND, tag);
+	chip->SpeechRom = memory_region(Machine, tag);
 
 	chip->stream = stream_create(0, 1, clock ? clock : Machine->sample_rate, chip, s14001a_pcm_update);
 

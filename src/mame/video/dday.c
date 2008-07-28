@@ -190,7 +190,7 @@ static TILE_GET_INFO( get_sl_tile_info )
 	int code, sl_flipx, flipx;
 	UINT8* sl_map;
 
-	sl_map = &memory_region(machine, RGNCLASS_USER, "user1")[(sl_image & 0x07) * 0x0200];
+	sl_map = &memory_region(machine, "user1")[(sl_image & 0x07) * 0x0200];
 
 	flipx = (tile_index >> 4) & 0x01;
 	sl_flipx = (sl_image >> 3) & 0x01;

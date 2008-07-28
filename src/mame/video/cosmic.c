@@ -26,7 +26,7 @@ WRITE8_HANDLER( cosmic_color_register_w )
 static pen_t panic_map_color(running_machine *machine, UINT8 x, UINT8 y)
 {
 	offs_t offs = (color_registers[0] << 9) | (color_registers[2] << 10) | ((x >> 4) << 5) | (y >> 3);
-	pen_t pen = memory_region(machine, RGNCLASS_USER, "user1")[offs];
+	pen_t pen = memory_region(machine, "user1")[offs];
 
 	if (color_registers[1])
 		pen >>= 4;
@@ -37,7 +37,7 @@ static pen_t panic_map_color(running_machine *machine, UINT8 x, UINT8 y)
 static pen_t cosmica_map_color(running_machine *machine, UINT8 x, UINT8 y)
 {
 	offs_t offs = (color_registers[0] << 9) | ((x >> 4) << 5) | (y >> 3);
-	pen_t pen = memory_region(machine, RGNCLASS_USER, "user1")[offs];
+	pen_t pen = memory_region(machine, "user1")[offs];
 
 	if (color_registers[0])		/* yes, 0 again according to the schematics */
 		pen >>= 4;
@@ -48,7 +48,7 @@ static pen_t cosmica_map_color(running_machine *machine, UINT8 x, UINT8 y)
 static pen_t cosmicg_map_color(running_machine *machine, UINT8 x, UINT8 y)
 {
 	offs_t offs = (color_registers[0] << 8) | (color_registers[1] << 9) | ((y >> 4) << 4) | (x >> 4);
-	pen_t pen = memory_region(machine, RGNCLASS_USER, "user1")[offs];
+	pen_t pen = memory_region(machine, "user1")[offs];
 
 	/* the upper 4 bits are for cocktail mode support */
 
@@ -58,7 +58,7 @@ static pen_t cosmicg_map_color(running_machine *machine, UINT8 x, UINT8 y)
 static pen_t magspot_map_color(running_machine *machine, UINT8 x, UINT8 y)
 {
 	offs_t offs = (color_registers[0] << 9) | ((x >> 3) << 4) | (y >> 4);
-	pen_t pen = memory_region(machine, RGNCLASS_USER, "user1")[offs];
+	pen_t pen = memory_region(machine, "user1")[offs];
 
 	if (color_registers[1])
 		pen >>= 4;
@@ -318,7 +318,7 @@ static void cosmica_draw_starfield(const device_config *screen, bitmap_t *bitmap
 {
 	UINT8 y = 0;
 	UINT8 map = 0;
-	UINT8 *PROM = memory_region(screen->machine, RGNCLASS_USER, "user2");
+	UINT8 *PROM = memory_region(screen->machine, "user2");
 
 	while (1)
 	{
@@ -366,8 +366,8 @@ static void cosmica_draw_starfield(const device_config *screen, bitmap_t *bitmap
 static void devzone_draw_grid(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 y;
-	UINT8 *horz_PROM = memory_region(machine, RGNCLASS_USER, "user2");
-	UINT8 *vert_PROM = memory_region(machine, RGNCLASS_USER, "user3");
+	UINT8 *horz_PROM = memory_region(machine, "user2");
+	UINT8 *vert_PROM = memory_region(machine, "user3");
 	offs_t horz_addr = 0;
 
 	UINT8 count = 0;
@@ -425,7 +425,7 @@ static void nomnlnd_draw_background(const device_config *screen, bitmap_t *bitma
 {
 	UINT8 y = 0;
 	UINT8 water = video_screen_get_frame_number(screen);
-	UINT8 *PROM = memory_region(screen->machine, RGNCLASS_USER, "user2");
+	UINT8 *PROM = memory_region(screen->machine, "user2");
 
 	/* all positioning is via logic gates:
 

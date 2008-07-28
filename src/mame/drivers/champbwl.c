@@ -178,7 +178,7 @@ static WRITE8_HANDLER( champbwl_misc_w )
 	coin_lockout_w(0, ~data & 8);
 	coin_lockout_w(1, ~data & 4);
 
-	memory_set_bankptr(1, memory_region(machine, RGNCLASS_CPU, "main") + 0x10000 + 0x4000 * ((data & 0x30)>>4));
+	memory_set_bankptr(1, memory_region(machine, "main") + 0x10000 + 0x4000 * ((data & 0x30)>>4));
 }
 
 static WRITE8_HANDLER( champbwl_objctrl_w )
@@ -190,7 +190,7 @@ static WRITE8_HANDLER( champbwl_objctrl_w )
 }
 
 static ADDRESS_MAP_START( champbwl_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION(RGNCLASS_CPU, "main", 0x10000)
+	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("main", 0x10000)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(&tnzs_objram)
@@ -362,20 +362,20 @@ static MACHINE_DRIVER_START( champbwl )
 MACHINE_DRIVER_END
 
 ROM_START( champbwl )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )		/* Z80 Code */
+	ROM_REGION( 0x20000, "main", 0 )		/* Z80 Code */
 	ROM_LOAD( "ab001001.u1",  0x10000, 0x10000, CRC(6c6f7675) SHA1(19834f25f2644ae5d156c1e1bbb3fc50cae10fd2) )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "ab001007.u22", 0x00000, 0x20000, CRC(1ee9f6b1) SHA1(1a67e969b1f471ec7ada294b89185c15cde8c1ab) )
 	ROM_LOAD( "ab001006.u15", 0x20000, 0x20000, CRC(37baf753) SHA1(efa57d915a9e14393b62b161e1ac807b8fcb8501) )
 	ROM_LOAD( "ab001005.u9",  0x40000, 0x20000, CRC(b80a9ed6) SHA1(ac7a31ad82a60c4d2034770c59cf383b8a036e6a) )
 	ROM_LOAD( "ab001004.u7",  0x60000, 0x20000, CRC(584477b1) SHA1(296f96526044e9bd13673e5d817260e3f98f696c) )
 
-	ROM_REGION( 0x0400, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "ab001008.u26", 0x0000, 0x0200, CRC(30ac8d48) SHA1(af034de3f3b8548534effdf4e3717fe3838b7754) )
 	ROM_LOAD( "ab001009.u27", 0x0200, 0x0200, CRC(3bbd4bcd) SHA1(8c87ccc42ece2432b8ad25f8679cdf886e12a43c) )
 
-	ROM_REGION( 0x100000, RGNCLASS_SOUND, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
 	ROM_LOAD( "ab003003.3-3", 0x00000, 0x40000, CRC(ad40ad10) SHA1(db0e5744ea3fcda87345b545031f82fcb3fec175) )
 	ROM_LOAD( "ab003002.3-2", 0x40000, 0x40000, CRC(7ede8f28) SHA1(b5519c09b4f0019dc76cadca725da1d581912540) )
 	ROM_LOAD( "ab002003.2-3", 0x80000, 0x40000, CRC(3051b8c3) SHA1(5f53596d7af1c79db1dde4bdca3878e07c67b5d1) )

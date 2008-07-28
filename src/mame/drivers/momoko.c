@@ -37,7 +37,7 @@ WRITE8_HANDLER( momoko_bg_priority_w);
 
 static WRITE8_HANDLER( momoko_bg_read_bank_w )
 {
-	UINT8 *BG_MAP = memory_region(machine, RGNCLASS_USER, "user1");
+	UINT8 *BG_MAP = memory_region(machine, "user1");
 	int bank_address = (data & 0x1f) * 0x1000;
 	memory_set_bankptr(1, &BG_MAP[bank_address]);
 }
@@ -299,42 +299,42 @@ MACHINE_DRIVER_END
 /****************************************************************************/
 
 ROM_START( momoko )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* main CPU */
+	ROM_REGION( 0x10000, "main", 0 ) /* main CPU */
 	ROM_LOAD( "momoko03.bin", 0x0000,  0x8000, CRC(386e26ed) SHA1(ad746ed1b87bafc5b4df9a28aade58cf894f4e7b) )
 	ROM_LOAD( "momoko02.bin", 0x8000,  0x4000, CRC(4255e351) SHA1(27a0e8d8aea223d2128139582e3b66106f3608ef) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "audio", 0 ) /* sound CPU */
 	ROM_LOAD( "momoko01.bin", 0x0000,  0x8000, CRC(e8a6673c) SHA1(f8984b063929305c9058801202405e6d45254b5b) )
 
-	ROM_REGION( 0x2000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* text */
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE ) /* text */
 	ROM_LOAD( "momoko13.bin", 0x0000,  0x2000, CRC(2745cf5a) SHA1(3db7c6319cac63df1620ef25508c5c45eaa4b141) )
 
-	ROM_REGION( 0x2000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE ) /* FG */
+	ROM_REGION( 0x2000, "gfx3", ROMREGION_DISPOSE ) /* FG */
 	ROM_LOAD( "momoko14.bin", 0x0000,  0x2000, CRC(cfccca05) SHA1(4ecff488a37ac76ecb9ecf8980bea30dcc9c9951) )
 
-	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE ) /* sprite */
+	ROM_REGION( 0x10000, "gfx4", ROMREGION_DISPOSE ) /* sprite */
 	ROM_LOAD16_BYTE( "momoko16.bin", 0x0000,  0x8000, CRC(fc6876fc) SHA1(b2d06bc01ef9f4db9bf8902d67f31ccbb0fea61a) )
 	ROM_LOAD16_BYTE( "momoko17.bin", 0x0001,  0x8000, CRC(45dc0247) SHA1(1b2bd4197ab7d237966e037c249b5bd623646c0b) )
 
-	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx2", 0 ) /* BG */
+	ROM_REGION( 0x20000, "gfx2", 0 ) /* BG */
 	ROM_LOAD16_BYTE( "momoko09.bin", 0x00000, 0x8000, CRC(9f5847c7) SHA1(6bc9a00622d8a23446294a8d5d467375c5719125) )
 	ROM_LOAD16_BYTE( "momoko11.bin", 0x00001, 0x8000, CRC(9c9fbd43) SHA1(7adfd7ea3dd6745c14e719883f1a86e0a3b3c0ff) )
 	ROM_LOAD16_BYTE( "momoko10.bin", 0x10000, 0x8000, CRC(ae17e74b) SHA1(f52657ea6b6ac518b70fd7b811d9699da27f67d9) )
 	ROM_LOAD16_BYTE( "momoko12.bin", 0x10001, 0x8000, CRC(1e29c9c4) SHA1(d78f102cefc9852b529dd317a76c7003ec2ad3d5) )
 
-	ROM_REGION( 0x20000, RGNCLASS_USER, "user1", 0 ) /* BG map */
+	ROM_REGION( 0x20000, "user1", 0 ) /* BG map */
 	ROM_LOAD( "momoko04.bin", 0x0000,  0x8000, CRC(3ab3c2c3) SHA1(d4a0d7f83bf64769e90a2c264c6114ac308cb8b5) )
 	ROM_LOAD( "momoko05.bin", 0x8000,  0x8000, CRC(757cdd2b) SHA1(3471b42dc6458a18894dbd0638f4fe43c86dd70d) )
 	ROM_LOAD( "momoko06.bin", 0x10000, 0x8000, CRC(20cacf8b) SHA1(e2b39abfc960e1c472e2bcf0cf06825c39941c03) )
 	ROM_LOAD( "momoko07.bin", 0x18000, 0x8000, CRC(b94b38db) SHA1(9c9e45bbeca7b6b8b0051b144fb31fceaf5d6906) )
 
-	ROM_REGION( 0x2000, RGNCLASS_USER, "user2", 0 ) /* BG color/priority table */
+	ROM_REGION( 0x2000, "user2", 0 ) /* BG color/priority table */
 	ROM_LOAD( "momoko08.bin", 0x0000,  0x2000, CRC(69b41702) SHA1(21b33b243dd6eaec8d41d9fd4d9e7faf2bd7f4d2) )
 
-	ROM_REGION( 0x4000, RGNCLASS_USER, "user3", 0 ) /* FG map */
+	ROM_REGION( 0x4000, "user3", 0 ) /* FG map */
 	ROM_LOAD( "momoko15.bin", 0x0000,  0x4000, CRC(8028f806) SHA1(c7450d48803082f64af67fe752b6f49b71b6ff48) )
 
-	ROM_REGION( 0x0120, RGNCLASS_PROMS, "proms", 0 ) /* TEXT color */
+	ROM_REGION( 0x0120, "proms", 0 ) /* TEXT color */
 	ROM_LOAD( "momoko-c.bin", 0x0000,  0x0100, CRC(f35ccae0) SHA1(60b99dd3c96637dacba7e96a143b1a2d6ffd28b9) )
 	ROM_LOAD( "momoko-b.bin", 0x0100,  0x0020, CRC(427b0e5c) SHA1(aa2797b899571527cc96013fd3420b841954ee67) )
 ROM_END

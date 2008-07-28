@@ -135,7 +135,7 @@ VIDEO_UPDATE( invadpt2 )
 
 	invadpt2_get_pens(pens);
 
-	prom = memory_region(screen->machine, RGNCLASS_PROMS, "proms");
+	prom = memory_region(screen->machine, "proms");
 	color_map_base = color_map ? &prom[0x0400] : &prom[0x0000];
 
 	for (offs = 0; offs < mw8080bw_ram_size; offs++)
@@ -166,7 +166,7 @@ VIDEO_UPDATE( ballbomb )
 
 	invadpt2_get_pens(pens);
 
-	prom = memory_region(screen->machine, RGNCLASS_PROMS, "proms");
+	prom = memory_region(screen->machine, "proms");
 	color_map_base = color_map ? &prom[0x0400] : &prom[0x0000];
 
 	for (offs = 0; offs < mw8080bw_ram_size; offs++)
@@ -197,7 +197,7 @@ VIDEO_UPDATE( schaser )
 
 	invadpt2_get_pens(pens);
 
-	background_map_base = memory_region(screen->machine, RGNCLASS_PROMS, "proms");
+	background_map_base = memory_region(screen->machine, "proms");
 
 	for (offs = 0; offs < mw8080bw_ram_size; offs++)
 	{
@@ -287,8 +287,8 @@ VIDEO_UPDATE( polaris )
 
 	invadpt2_get_pens(pens);
 
-	color_map_base = memory_region(screen->machine, RGNCLASS_PROMS, "proms");
-	cloud_gfx = memory_region(screen->machine, RGNCLASS_USER, "user1");
+	color_map_base = memory_region(screen->machine, "proms");
+	cloud_gfx = memory_region(screen->machine, "user1");
 
 	for (offs = 0; offs < mw8080bw_ram_size; offs++)
 	{
@@ -408,7 +408,7 @@ VIDEO_UPDATE( indianbt )
 
 	cosmo_get_pens(pens);
 
-	prom = memory_region(screen->machine, RGNCLASS_PROMS, "proms");
+	prom = memory_region(screen->machine, "proms");
 	color_map_base = color_map ? &prom[0x0400] : &prom[0x0000];
 
 	for (offs = 0; offs < mw8080bw_ram_size; offs++)

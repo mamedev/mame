@@ -147,7 +147,7 @@ static TILE_GET_INFO( lasso_get_bg_tile_info )
 
 static TILE_GET_INFO( wwjgtin_get_track_tile_info )
 {
-	UINT8 *ROM = memory_region(machine, RGNCLASS_USER, "user1");
+	UINT8 *ROM = memory_region(machine, "user1");
 	int code  = ROM[tile_index];
 	int color = ROM[tile_index + 0x2000];
 

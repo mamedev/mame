@@ -209,7 +209,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( roldf_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_REGION(RGNCLASS_CPU, "audio", 0x8000)	/* wrong, probably banked somehow */
+	AM_RANGE(0x8000, 0xffff) AM_REGION("audio", 0x8000)	/* wrong, probably banked somehow */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roldf_sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -600,7 +600,7 @@ The z80 rom (used for sound) is a hack of the main program from dynax's
 ***************************************************************************/
 
 ROM_START( roldfrog )
-	ROM_REGION( 0x408000, RGNCLASS_CPU, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x408000, "main", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "roldfrog.002",	0x000000, 0x080000, CRC(724cf022) SHA1(f8cddfb785ae7900cb95b854811ec3fb250fa7fe) )
 	ROM_LOAD16_BYTE( "roldfrog.006",	0x000001, 0x080000, CRC(e52a7ae2) SHA1(5c6ecbc2711376afdd7b8da11f84d36ffc464c8a) )
 	ROM_LOAD16_BYTE( "roldfrog.003",	0x100000, 0x080000, CRC(a1d49967) SHA1(54d73c1db1090b7d5109906525ce95ee8c00ad1f) )
@@ -612,11 +612,11 @@ ROM_START( roldfrog )
 	/* 68000 code - supplied by protection device? */
 	ROM_LOAD16_WORD_SWAP( "protdata.bin", 0x400000, 0x8000, CRC(ecaa8dd1) SHA1(b15f583d1a96b6b7ce50bcdca8cb28508f92b6a5) )
 
-	ROM_REGION( 0x90000, RGNCLASS_CPU, "audio", 0 )	/* Z80 Code */
+	ROM_REGION( 0x90000, "audio", 0 )	/* Z80 Code */
 	ROM_LOAD( "roldfrog.001", 0x00000, 0x20000, CRC(ba9eb1c6) SHA1(649d1103f3188554eaa3fc87a1f52c53233932b2) )
 	ROM_RELOAD(               0x20000, 0x20000 )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "roldfrog.010",       0x00000, 0x20000, CRC(51fd0e1a) SHA1(940c4231b21d16c62cad47c22fe735b18662af4a) )
 	ROM_LOAD( "roldfrog.011",       0x20000, 0x20000, CRC(610bf6f3) SHA1(04a7efac2e83c6747d4bd480b1f3118eb44a1f76) )
 	ROM_LOAD( "roldfrog.012",       0x40000, 0x20000, CRC(466ede67) SHA1(2d44dba1e76e5ceebf33fa6fc148ed665701a7ff) )
@@ -624,7 +624,7 @@ ROM_START( roldfrog )
 ROM_END
 
 ROM_START( roldfrga )
-	ROM_REGION( 0x408000, RGNCLASS_CPU, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x408000, "main", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "roldfrog.002",	0x000000, 0x080000, CRC(724cf022) SHA1(f8cddfb785ae7900cb95b854811ec3fb250fa7fe) )
 	ROM_LOAD16_BYTE( "roldfrog.006",	0x000001, 0x080000, CRC(e52a7ae2) SHA1(5c6ecbc2711376afdd7b8da11f84d36ffc464c8a) )
 	ROM_LOAD16_BYTE( "roldfrog.003",	0x100000, 0x080000, CRC(a1d49967) SHA1(54d73c1db1090b7d5109906525ce95ee8c00ad1f) )
@@ -636,11 +636,11 @@ ROM_START( roldfrga )
 	/* 68000 code - supplied by protection device? */
 	ROM_LOAD16_WORD_SWAP( "protdata.bin", 0x400000, 0x8000, CRC(ecaa8dd1) SHA1(b15f583d1a96b6b7ce50bcdca8cb28508f92b6a5) )
 
-	ROM_REGION( 0x90000, RGNCLASS_CPU, "audio", 0 )	/* Z80 Code */
+	ROM_REGION( 0x90000, "audio", 0 )	/* Z80 Code */
 	ROM_LOAD( "roldfrog.001", 0x00000, 0x20000, CRC(ba9eb1c6) SHA1(649d1103f3188554eaa3fc87a1f52c53233932b2) )
 	ROM_RELOAD(               0x20000, 0x20000 )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "roldfrog.010",       0x00000, 0x20000, CRC(51fd0e1a) SHA1(940c4231b21d16c62cad47c22fe735b18662af4a) )
 	ROM_LOAD( "roldfrog.011",       0x20000, 0x20000, CRC(610bf6f3) SHA1(04a7efac2e83c6747d4bd480b1f3118eb44a1f76) )
 	ROM_LOAD( "roldfrog.012",       0x40000, 0x20000, CRC(466ede67) SHA1(2d44dba1e76e5ceebf33fa6fc148ed665701a7ff) )
@@ -682,7 +682,7 @@ Note
 */
 
 ROM_START( rebus )
-	ROM_REGION( 0x408000, RGNCLASS_CPU, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x408000, "main", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "2.u16", 0x000000, 0x080000, CRC(7c8a717f) SHA1(00b1e7986046a7705fc65a5c7d4701a002b2ea6f) )
 	ROM_LOAD16_BYTE( "6.u12", 0x000001, 0x080000, CRC(8f73d548) SHA1(210d95dc0db41da3252a09e598719d98bca41983) )
 	ROM_LOAD16_BYTE( "3.u17", 0x100000, 0x080000, CRC(7495409b) SHA1(b4d75713d31c0b01d7cb7d50a2a89fb3ea4ea42b) )
@@ -692,11 +692,11 @@ ROM_START( rebus )
 	ROM_LOAD16_BYTE( "5.u19", 0x300000, 0x080000, CRC(2702f341) SHA1(de862cacbb3e8e322128315d87a22c7cdfe4fcb9) )
 	ROM_LOAD16_BYTE( "9.u15", 0x300001, 0x080000, CRC(f5ae3d73) SHA1(6a9d955023c704023b722cf863ba19ccb9b34ee1) )
 
-	ROM_REGION( 0x90000, RGNCLASS_CPU, "audio", 0 )	/* Z80 Code */
+	ROM_REGION( 0x90000, "audio", 0 )	/* Z80 Code */
 	ROM_LOAD( "1.u163", 0x00000, 0x10000,  CRC(88a7b1f8) SHA1(b34fa26dbc613bf3b525d19df90fa3ba4efb6e5d) )
 	ROM_RELOAD(               0x20000, 0x10000 )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "10.u102", 0x00000, 0x20000, CRC(6f75a28b) SHA1(75f0bd6bd8c04ea9f832c22fbe1d17b0351f1102) )
 	ROM_LOAD( "11.u103", 0x20000, 0x20000, CRC(0af65b78) SHA1(9522ad17d26d866e5b11b4fec47781a00a297977) )
 	ROM_LOAD( "12.u104", 0x40000, 0x20000, CRC(3ed6ce19) SHA1(0d574071053157e4ef973a844795e48ec69dc7c4) )
@@ -705,7 +705,7 @@ ROM_END
 
 
 ROM_START( splash )
-	ROM_REGION( 0x400000, RGNCLASS_CPU, "main", 0 )	/* 68000 code + gfx */
+	ROM_REGION( 0x400000, "main", 0 )	/* 68000 code + gfx */
 	ROM_LOAD16_BYTE( "4g", 0x000000, 0x020000, CRC(b38fda40) SHA1(37ddf4b6f9f2f6cc58efefc277bc3ae9dc71e6d0) )
 	ROM_LOAD16_BYTE( "4i", 0x000001, 0x020000, CRC(02359c47) SHA1(6817424b2b1afffa99cec5b8fae4fb8436db2bb5) )
 	ROM_LOAD16_BYTE( "5g", 0x100000, 0x080000, CRC(a4e8ed18) SHA1(64ce47193ee4bb3a8014d7c14c559b4ebb3af083) )
@@ -715,10 +715,10 @@ ROM_START( splash )
 	ROM_LOAD16_BYTE( "8g", 0x300000, 0x080000, CRC(dc3a3172) SHA1(2b322b52e3e8da00f26dd276cb72bd2d48c2deaa) )
 	ROM_LOAD16_BYTE( "8i", 0x300001, 0x080000, CRC(2e23e6c3) SHA1(baf9ab4c3261c3f06f5e43c1e50aba9222acb71d) )
 
-	ROM_REGION( 0x010000, RGNCLASS_CPU, "audio", 0 )	/* Z80 code + sound data */
+	ROM_REGION( 0x010000, "audio", 0 )	/* Z80 code + sound data */
 	ROM_LOAD( "5c",	0x00000, 0x10000, CRC(0ed7ebc9) SHA1(28ef16e20d754deef49be6a5c9f63311e9ec94a3) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "18i", 0x000000, 0x020000, CRC(028a4a68) SHA1(19384988e3690886ed55886ecdc4e4c566dbe4ba) )
 	ROM_LOAD( "15i", 0x020000, 0x020000, CRC(2a8cb830) SHA1(bc54dfb03fade154085aa2f66784e07664a7a3d8) )
 	ROM_LOAD( "16i", 0x040000, 0x020000, CRC(21aeff2c) SHA1(0c307e94f4a814c674ba0ab471a6bdd57e43c265) )
@@ -726,7 +726,7 @@ ROM_START( splash )
 ROM_END
 
 ROM_START( splash10 )
-	ROM_REGION( 0x400000, RGNCLASS_CPU, "main", 0 )	/* 68000 code + gfx */
+	ROM_REGION( 0x400000, "main", 0 )	/* 68000 code + gfx */
 	ROM_LOAD16_BYTE( "splash10.g4", 0x000000, 0x020000, CRC(38ba6632) SHA1(ca1425120fcb427e1b2c83eb3bf104363d9571be) )
 	ROM_LOAD16_BYTE( "splash10.i4", 0x000001, 0x020000, CRC(0edc3373) SHA1(edf28baa6ef2442a37eb81a51ab66485d89f802e) )
 	ROM_LOAD16_BYTE( "5g",          0x100000, 0x080000, CRC(a4e8ed18) SHA1(64ce47193ee4bb3a8014d7c14c559b4ebb3af083) )
@@ -736,10 +736,10 @@ ROM_START( splash10 )
 	ROM_LOAD16_BYTE( "8g",          0x300000, 0x080000, CRC(dc3a3172) SHA1(2b322b52e3e8da00f26dd276cb72bd2d48c2deaa) )
 	ROM_LOAD16_BYTE( "8i",          0x300001, 0x080000, CRC(2e23e6c3) SHA1(baf9ab4c3261c3f06f5e43c1e50aba9222acb71d) )
 
-	ROM_REGION( 0x010000, RGNCLASS_CPU, "audio", 0 )	/* Z80 code + sound data */
+	ROM_REGION( 0x010000, "audio", 0 )	/* Z80 code + sound data */
 	ROM_LOAD( "5c",	0x00000, 0x10000, CRC(0ed7ebc9) SHA1(28ef16e20d754deef49be6a5c9f63311e9ec94a3) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "18i", 0x000000, 0x020000, CRC(028a4a68) SHA1(19384988e3690886ed55886ecdc4e4c566dbe4ba) )
 	ROM_LOAD( "15i", 0x020000, 0x020000, CRC(2a8cb830) SHA1(bc54dfb03fade154085aa2f66784e07664a7a3d8) )
 	ROM_LOAD( "16i", 0x040000, 0x020000, CRC(21aeff2c) SHA1(0c307e94f4a814c674ba0ab471a6bdd57e43c265) )
@@ -789,7 +789,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( paintlad )
-	ROM_REGION( 0x400000, RGNCLASS_CPU, "main", 0 )	/* 68000 code + gfx */
+	ROM_REGION( 0x400000, "main", 0 )	/* 68000 code + gfx */
 	ROM_LOAD16_BYTE( "2.4g", 0x000000, 0x020000, CRC(cd00864a) SHA1(24cbcf43b7237d1e5374a684aac89dad7e7bb75b) )
 	ROM_LOAD16_BYTE( "6.4i", 0x000001, 0x020000, CRC(0f19d830) SHA1(3bfb4c98c87f0bf8d9dc7c7f468e1c58b16356e5) )
 	ROM_LOAD16_BYTE( "5g",   0x100000, 0x080000, CRC(a4e8ed18) SHA1(64ce47193ee4bb3a8014d7c14c559b4ebb3af083) )
@@ -799,10 +799,10 @@ ROM_START( paintlad )
 	ROM_LOAD16_BYTE( "8g",   0x300000, 0x080000, CRC(dc3a3172) SHA1(2b322b52e3e8da00f26dd276cb72bd2d48c2deaa) )
 	ROM_LOAD16_BYTE( "8i",   0x300001, 0x080000, CRC(2e23e6c3) SHA1(baf9ab4c3261c3f06f5e43c1e50aba9222acb71d) )
 
-	ROM_REGION( 0x010000, RGNCLASS_CPU, "audio", 0 )	/* Z80 code + sound data */
+	ROM_REGION( 0x010000, "audio", 0 )	/* Z80 code + sound data */
 	ROM_LOAD( "5c", 0x00000, 0x10000, CRC(0ed7ebc9) SHA1(28ef16e20d754deef49be6a5c9f63311e9ec94a3) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "13.18i", 0x000000, 0x020000, CRC(262ee31f) SHA1(1756dfd482c3e889df393d37a5c680aa283702ee) )
 	ROM_LOAD( "11.15i", 0x020000, 0x020000, CRC(6e4d598f) SHA1(b5b0d65c50ec469b5ffcd6187ca3aacddd97a477) )
 	ROM_LOAD( "12.16i", 0x040000, 0x020000, CRC(15761eb5) SHA1(61a47dad0e70ff4f1ae7f56ee529d2987eab1997) )
@@ -846,15 +846,15 @@ Notes:
 */
 
 ROM_START( funystrp )
-	ROM_REGION( 0x400000, RGNCLASS_CPU, "main", 0 )	/* 68000 code + gfx */
+	ROM_REGION( 0x400000, "main", 0 )	/* 68000 code + gfx */
 	ROM_LOAD16_BYTE( "12.u87",  0x000000, 0x010000, CRC(4ac173f3) SHA1(c211bc8528d26d5a96fce4b0ebfddf2aa6a257ef) )
 	ROM_LOAD16_BYTE( "13.u111", 0x000001, 0x010000, CRC(1358c60c) SHA1(7142aa6f94cfdfb1b70b37742201b2c213f85137) )
 
-	ROM_REGION( 0x080000, RGNCLASS_CPU, "cpu1", 0 )	/* Z80 code + sound data */
+	ROM_REGION( 0x080000, "cpu1", 0 )	/* Z80 code + sound data */
 	ROM_LOAD( "11.u130", 0x000000, 0x040000, CRC(e969ea2b) SHA1(54d5bb59e9909a6b7e66764f91e2f98f8f8832c5) )
 	ROM_LOAD( "10.u118", 0x040000, 0x040000, CRC(0894b936) SHA1(cd01eb86e403e20c56492185ecd9bb0f4f27867a) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "17.u54", 0x000000, 0x020000, CRC(e72fd9e9) SHA1(d433e082c27e7c0a1f24cd25a803864834e9affe) )
 	ROM_LOAD( "16.u53", 0x020000, 0x020000, CRC(cc793c1c) SHA1(d0798b07d6e6449ad6fa84a95181ec5c75647277) )
 	ROM_LOAD( "15.u52", 0x040000, 0x020000, CRC(60f8f305) SHA1(7223c8e02c3d1cc573843c572d286b469ff6f33b) )
@@ -862,15 +862,15 @@ ROM_START( funystrp )
 ROM_END
 
 ROM_START( puckpepl )
-	ROM_REGION( 0x400000, RGNCLASS_CPU, "main", 0 )	/* 68000 code + gfx */
+	ROM_REGION( 0x400000, "main", 0 )	/* 68000 code + gfx */
 	ROM_LOAD16_BYTE( "pp22.u87", 0x000000, 0x010000, CRC(1ceb522d) SHA1(216cd24bc2cc3fbd389ab96bc8b729c4d919faab) )
 	ROM_LOAD16_BYTE( "pp23.111", 0x000001, 0x010000, CRC(84336569) SHA1(4358c48bf65dfdb6f52326ec5f026e1b9614a108) )
 
-	ROM_REGION( 0x080000, RGNCLASS_CPU, "cpu1", 0 )	/* Z80 code + sound data */
+	ROM_REGION( 0x080000, "cpu1", 0 )	/* Z80 code + sound data */
 	ROM_LOAD( "pp31.130", 0x000000, 0x040000, CRC(9b6c302f) SHA1(349e5cf16dd2e8b6c0f56ca1b9ce81475c442435) )
 	ROM_LOAD( "pp30.181", 0x040000, 0x040000, CRC(a5697b3d) SHA1(28ef3cfea82b3016c7c042a18509ba2bf83048e5) )
 
-	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "pp37.u54", 0x000000, 0x020000, CRC(23c136b0) SHA1(bf3a6379934e205dcb6c0389d9dd5d0ffb92bdd4) )
 	ROM_LOAD( "pp36.u53", 0x020000, 0x020000, CRC(210e7579) SHA1(1a2d175a83f5ad933961a3c8b26cd8786527ea7f) )
 	ROM_LOAD( "pp35.u52", 0x040000, 0x020000, CRC(cd4cc5df) SHA1(b4dd9e97bdad46340e79e9c7747484aae49680a2) )
@@ -900,7 +900,7 @@ static DRIVER_INIT( roldfrog )
 
 static DRIVER_INIT( rebus )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
+	UINT16 *ROM = (UINT16 *)memory_region(machine, "main");
 	splash_bitmap_type = 1;
 	splash_sprite_attr2_shift = 0;
 
@@ -928,7 +928,7 @@ static DRIVER_INIT( rebus )
 
 static DRIVER_INIT( funystrp )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
+	UINT16 *ROM = (UINT16 *)memory_region(machine, "main");
 
 	splash_bitmap_type = 0;
 	splash_sprite_attr2_shift = 0;

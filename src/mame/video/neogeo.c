@@ -283,8 +283,8 @@ static void draw_fixed_layer(running_machine *machine, bitmap_t *bitmap, int sca
 {
 	int x;
 
-	UINT8* gfx_base = memory_region(machine, RGNCLASS_GFX, fixed_layer_source ? "fixed" : "fixedbios");
-	UINT32 addr_mask = memory_region_length(machine, RGNCLASS_GFX, fixed_layer_source ? "fixed" : "fixedbios") - 1;
+	UINT8* gfx_base = memory_region(machine, fixed_layer_source ? "fixed" : "fixedbios");
+	UINT32 addr_mask = memory_region_length(machine, fixed_layer_source ? "fixed" : "fixedbios") - 1;
 	UINT16 *video_data = &neogeo_videoram[0x7000 | (scanline >> 3)];
 	UINT32 *pixel_addr = BITMAP_ADDR32(bitmap, scanline, NEOGEO_HBEND);
 
@@ -504,7 +504,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int scanlin
 				}
 			}
 
-			sprite_y_and_tile = memory_region(machine, RGNCLASS_GFX, "zoomy")[(zoom_y << 8) | zoom_line];
+			sprite_y_and_tile = memory_region(machine, "zoomy")[(zoom_y << 8) | zoom_line];
 			sprite_y = sprite_y_and_tile & 0x0f;
 			tile = sprite_y_and_tile >> 4;
 
@@ -702,7 +702,7 @@ static void optimize_sprite_data(running_machine *machine)
        power of 2 */
 	sprite_gfx_address_mask = 0xffffffff;
 
-	len = memory_region_length(machine, RGNCLASS_GFX, "sprites");
+	len = memory_region_length(machine, "sprites");
 	for (bit = 0x80000000; bit != 0; bit >>= 1)
 	{
 		if (((len * 2) - 1) & bit)
@@ -714,7 +714,7 @@ static void optimize_sprite_data(running_machine *machine)
 	sprite_gfx = auto_malloc(sprite_gfx_address_mask + 1);
 	memset(sprite_gfx, 0, sprite_gfx_address_mask + 1);
 
-	src = memory_region(machine, RGNCLASS_GFX, "sprites");
+	src = memory_region(machine, "sprites");
 	dest = sprite_gfx;
 
 	for (i = 0; i < len; i += 0x80, src += 0x80)

@@ -73,7 +73,7 @@ static VIDEO_UPDATE(chinsan)
 
 static MACHINE_RESET( chinsan )
 {
-	memory_configure_bank(1, 0, 4, memory_region(machine, RGNCLASS_CPU, "main") + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 
@@ -496,26 +496,26 @@ MACHINE_DRIVER_END
 
 
 ROM_START( chinsan )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) /* encrypted code / data */
+	ROM_REGION( 0x20000, "main", 0 ) /* encrypted code / data */
 	ROM_LOAD( "mm00.7d", 0x00000, 0x08000, CRC(f7a4414f) SHA1(f65223b2928f610ab97fda2f2c008806cf2420e5) )
 	ROM_CONTINUE(        0x00000, 0x08000 )	// first half is blank
 	ROM_LOAD( "mm01.8d", 0x10000, 0x10000, CRC(c69ddbf5) SHA1(9533365c1761b113174d53a2e23ce6a7baca7dfe) )
 
-	ROM_REGION( 0x2000, RGNCLASS_USER, "user1", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-5012.key",  0x0000, 0x2000, CRC(2ecfb132) SHA1(3110ef82080dd7d908cc6bf34c6643f187f90b29) )
 
-	ROM_REGION( 0x30000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "mm20.7k", 0x00000, 0x10000, CRC(54efb409) SHA1(333adadd7f3dc3393dbe334303bae544b3d26c00) )
 	ROM_LOAD( "mm21.8k", 0x10000, 0x10000, CRC(25f6c827) SHA1(add72a3cfa2f24105e36d0464c2db6a6bedd4139) )
 	ROM_LOAD( "mm22.9k", 0x20000, 0x10000, CRC(6092f6e1) SHA1(32f53027dc954e314d7c5d04ff53f17358bbcf77) )
 
-	ROM_REGION( 0x10000, RGNCLASS_SOUND, "adpcm", 0 ) /* M5205 samples */
+	ROM_REGION( 0x10000, "adpcm", 0 ) /* M5205 samples */
 	ROM_LOAD( "mm40.13d", 0x00000, 0x10000, CRC(a408b8f7) SHA1(60a2644922cb60c0a1a3409761c7e50924360313) )
 
-	ROM_REGION( 0x20, RGNCLASS_USER, "user2", 0 )
+	ROM_REGION( 0x20, "user2", 0 )
 	ROM_LOAD( "mm60.2c", 0x000, 0x020, CRC(88477178) SHA1(03c1c9e3e88a5ae9970cb4b872ad4b6e4d77a6da) )
 
-	ROM_REGION( 0x300, RGNCLASS_USER, "user3", 0 )
+	ROM_REGION( 0x300, "user3", 0 )
 	ROM_LOAD( "mm61.9m",  0x000, 0x100, CRC(57024262) SHA1(e084e6baa3c529217f6f8e37c9dd5f0687ba2fc4) ) // b
 	ROM_LOAD( "mm62.9n",  0x100, 0x100, CRC(b5a1dbe5) SHA1(770a791c061ce422f860bb8d32f82bbbf9b4d12a) ) // g
 	ROM_LOAD( "mm63.10n", 0x200, 0x100, CRC(b65e3567) SHA1(f146af51dfaa5b4bf44c4e27f1a0292f8fd07ce9) ) // r
@@ -526,7 +526,7 @@ static DRIVER_INIT( chinsan )
 {
 
 	int i;
-	UINT8 *src = memory_region( machine, RGNCLASS_USER, "user3" );
+	UINT8 *src = memory_region( machine, "user3" );
 
 	mc8123_decrypt_rom(machine, "main", "user1", 1, 4);
 

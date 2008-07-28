@@ -1031,8 +1031,8 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 
 			case ADDRMAP_TOKEN_REGION:
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, entry->rgnclass, 24, entry->rgnoffs, 32);
-				entry->rgntag = TOKEN_GET_STRING(tokens);
+				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->rgnoffs, 32);
+				entry->region = TOKEN_GET_STRING(tokens);
 				break;
 
 			case ADDRMAP_TOKEN_SHARE:
@@ -1618,8 +1618,8 @@ static void memory_init_cpudata(running_machine *machine)
 
 		/* get pointers to the CPU's memory region */
 		cpu->tag = config->cpu[cpunum].tag;
-		cpu->region = memory_region(machine, RGNCLASS_CPU, cpu->tag);
-		cpu->regionsize = memory_region_length(machine, RGNCLASS_CPU, cpu->tag);
+		cpu->region = memory_region(machine, cpu->tag);
+		cpu->regionsize = memory_region_length(machine, cpu->tag);
 
 		/* initialize each address space, and build up a mask of spaces */
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
@@ -1727,33 +1727,32 @@ static void memory_init_preflight(running_machine *machine)
 					adjust_addresses(space, &entry->bytestart, &entry->byteend, &entry->bytemask, &entry->bytemirror);
 
 					/* if this is a ROM handler without a specified region, attach it to the implicit region */
-					if (spacenum == ADDRESS_SPACE_PROGRAM && HANDLER_IS_ROM(entry->read.generic) && entry->rgntag == NULL)
+					if (spacenum == ADDRESS_SPACE_PROGRAM && HANDLER_IS_ROM(entry->read.generic) && entry->region == NULL)
 					{
 						/* make sure it fits within the memory region before doing so, however */
 						if (entry->byteend < cpu->regionsize)
 						{
-							entry->rgnclass = RGNCLASS_CPU;
-							entry->rgntag = cpu->tag;
+							entry->region = cpu->tag;
 							entry->rgnoffs = entry->bytestart;
 						}
 					}
 
 					/* validate adjusted addresses against implicit regions */
-					if (entry->rgntag != NULL && entry->share == 0 && entry->baseptr == NULL)
+					if (entry->region != NULL && entry->share == 0 && entry->baseptr == NULL)
 					{
-						UINT8 *base = memory_region(machine, entry->rgnclass, entry->rgntag);
-						offs_t length = memory_region_length(machine, entry->rgnclass, entry->rgntag);
+						UINT8 *base = memory_region(machine, entry->region);
+						offs_t length = memory_region_length(machine, entry->region);
 
 						/* validate the region */
 						if (base == NULL)
-							fatalerror("Error: CPU %d space %d memory map entry %X-%X references non-existant region %d,\"%s\"", cpunum, spacenum, entry->addrstart, entry->addrend, entry->rgnclass, entry->rgntag);
+							fatalerror("Error: CPU %d space %d memory map entry %X-%X references non-existant region \"%s\"", cpunum, spacenum, entry->addrstart, entry->addrend, entry->region);
 						if (entry->rgnoffs + (entry->byteend - entry->bytestart + 1) > length)
-							fatalerror("Error: CPU %d space %d memory map entry %X-%X extends beyond region %d,\"%s\" size (%X)", cpunum, spacenum, entry->addrstart, entry->addrend, entry->rgnclass, entry->rgntag, length);
+							fatalerror("Error: CPU %d space %d memory map entry %X-%X extends beyond region \"%s\" size (%X)", cpunum, spacenum, entry->addrstart, entry->addrend, entry->region, length);
 					}
 
 					/* convert any region-relative entries to their memory pointers */
-					if (entry->rgntag != NULL)
-						entry->memory = memory_region(machine, entry->rgnclass, entry->rgntag) + entry->rgnoffs;
+					if (entry->region != NULL)
+						entry->memory = memory_region(machine, entry->region) + entry->rgnoffs;
 
 					/* assign static banks for explicitly specified entries */
 					if (HANDLER_IS_BANK(entry->read.generic))
@@ -2560,9 +2559,7 @@ static void *allocate_memory_block(running_machine *machine, int cpunum, int spa
 	int allocatemem = (memory == NULL);
 	memory_block *block;
 	size_t bytestoalloc;
-	const char *rgntag;
-	int foundit = FALSE;
-	int rgnclass;
+	const char *region;
 
 	VPRINTF(("allocate_memory_block(%d,%d,%08X,%08X,%p)\n", cpunum, spacenum, bytestart, byteend, memory));
 
@@ -2578,19 +2575,17 @@ static void *allocate_memory_block(running_machine *machine, int cpunum, int spa
 		memory = block + 1;
 
 	/* register for saving, but only if we're not part of a memory region */
-	for (rgnclass = 0; rgnclass < RGNCLASS_COUNT; rgnclass++)
-		for (rgntag = memory_region_next(machine, rgnclass, NULL); !foundit && rgntag != NULL; rgntag = memory_region_next(machine, rgnclass, rgntag))
+	for (region = memory_region_next(machine, NULL); region != NULL; region = memory_region_next(machine, region))
+	{
+		UINT8 *region_base = memory_region(Machine, region);
+		UINT32 region_length = memory_region_length(Machine, region);
+		if (region_base != NULL && region_length != 0 && (UINT8 *)memory >= region_base && ((UINT8 *)memory + (byteend - bytestart + 1)) < region_base + region_length)
 		{
-			UINT8 *region_base = memory_region(Machine, rgnclass, rgntag);
-			UINT32 region_length = memory_region_length(Machine, rgnclass, rgntag);
-			if (region_base != NULL && region_length != 0 && (UINT8 *)memory >= region_base && ((UINT8 *)memory + (byteend - bytestart + 1)) < region_base + region_length)
-			{
-				VPRINTF(("skipping save of this memory block as it is covered by a memory region\n"));
-				foundit = TRUE;
-				break;
-			}
+			VPRINTF(("skipping save of this memory block as it is covered by a memory region\n"));
+			break;
 		}
-	if (rgnclass == RGNCLASS_COUNT)
+	}
+	if (region == NULL)
 		register_for_save(cpunum, spacenum, bytestart, memory, byteend - bytestart + 1);
 
 	/* fill in the tracking block */

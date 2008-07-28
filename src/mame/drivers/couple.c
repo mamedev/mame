@@ -470,19 +470,19 @@ static MACHINE_DRIVER_START( couple )
 MACHINE_DRIVER_END
 
 ROM_START( couple )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "1.1d",  0x00000, 0x8000, CRC(bc70337a) SHA1(ffc484bc3965f0780d3fa5d8801af27a7164a417) )
 	ROM_LOAD( "2.1e",  0x10000, 0x8000, CRC(17372a93) SHA1(e0f0980003473555c2543d98d1494f82afa49f1a) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "3.9c",  0x00000, 0x8000, CRC(f017399a) SHA1(baf4c1bea6a12b1d4c8838552503fbdb81378411) )
 	ROM_LOAD( "4.9d",  0x08000, 0x8000, CRC(66da76c1) SHA1(8cdcec008d0d51704544069246e9eabb5d5958ea) )
 	ROM_LOAD( "5.10c", 0x10000, 0x8000, CRC(fc22bcf4) SHA1(cf3f6872965cb264d56d3a0b5ab998541b9af4ef) )
 
-	ROM_REGION( 0x08000, RGNCLASS_GFX, "gfx2", 0 )
+	ROM_REGION( 0x08000, "gfx2", 0 )
 	ROM_LOAD( "6.10d", 0x00000, 0x8000, CRC(a6a9a73d) SHA1(f3cb1d434d730f6e00f48079eaf8b88f57779fa0) )
 
-	ROM_REGION( 0x0800, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0800, "proms", 0 )
 	/*Only 0x00-0xff data seems color prom*/
 	ROM_LOAD( "7.7a",  0x00000, 0x0800, CRC(6c36361e) SHA1(7a018eecf3d8b7cf8845dcfcf8067feb292933b2) )
 ROM_END
@@ -491,19 +491,19 @@ ROM_END
 it doesn't jump to the backup ram area and it gives an extra play if you reach a certain
 amount of points (there is a dip switch to select the trigger: 150.000 or 200.000*/
 ROM_START( couplep )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "1.1d",  0x00000, 0x8000, CRC(4601ace6) SHA1(a824ceebf8b9ce77ef2c8e92636e4261f2ae0420) )
 	ROM_LOAD( "2.1e",  0x10000, 0x8000, CRC(17372a93) SHA1(e0f0980003473555c2543d98d1494f82afa49f1a) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "3.9c",  0x00000, 0x8000, CRC(f017399a) SHA1(baf4c1bea6a12b1d4c8838552503fbdb81378411) )
 	ROM_LOAD( "4.9d",  0x08000, 0x8000, CRC(66da76c1) SHA1(8cdcec008d0d51704544069246e9eabb5d5958ea) )
 	ROM_LOAD( "5.10c", 0x10000, 0x8000, CRC(fc22bcf4) SHA1(cf3f6872965cb264d56d3a0b5ab998541b9af4ef) )
 
-	ROM_REGION( 0x08000, RGNCLASS_GFX, "gfx2", 0 )
+	ROM_REGION( 0x08000, "gfx2", 0 )
 	ROM_LOAD( "6.10d", 0x00000, 0x8000, CRC(a6a9a73d) SHA1(f3cb1d434d730f6e00f48079eaf8b88f57779fa0) )
 
-	ROM_REGION( 0x0800, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0800, "proms", 0 )
 	/*Only 0x00-0xff data seems color prom*/
 	ROM_LOAD( "7.7a",  0x00000, 0x0800, CRC(6c36361e) SHA1(7a018eecf3d8b7cf8845dcfcf8067feb292933b2) )
 ROM_END
@@ -511,26 +511,26 @@ ROM_END
 /*f205v's dump,this one looks like an intermediate release between set1 and set2;
 it has same dips as set1, but remaining machine code is the same as set2*/
 ROM_START( couplei )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "1.1d",  0x00000, 0x8000, CRC(760fa29e) SHA1(a37a1562028d9615adff3d2ef88e0156354c720a) )
 	ROM_LOAD( "2.1e",  0x10000, 0x8000, CRC(17372a93) SHA1(e0f0980003473555c2543d98d1494f82afa49f1a) )
 
-	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx1", 0 )
+	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "3.9c",  0x00000, 0x8000, CRC(f017399a) SHA1(baf4c1bea6a12b1d4c8838552503fbdb81378411) )
 	ROM_LOAD( "4.9d",  0x08000, 0x8000, CRC(66da76c1) SHA1(8cdcec008d0d51704544069246e9eabb5d5958ea) )
 	ROM_LOAD( "5.10c", 0x10000, 0x8000, CRC(fc22bcf4) SHA1(cf3f6872965cb264d56d3a0b5ab998541b9af4ef) )
 
-	ROM_REGION( 0x08000, RGNCLASS_GFX, "gfx2", 0 )
+	ROM_REGION( 0x08000, "gfx2", 0 )
 	ROM_LOAD( "6.10d", 0x00000, 0x8000, CRC(a6a9a73d) SHA1(f3cb1d434d730f6e00f48079eaf8b88f57779fa0) )
 
-	ROM_REGION( 0x0800, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0800, "proms", 0 )
 	/*Only 0x00-0xff data seems color prom*/
 	ROM_LOAD( "7.7a",  0x00000, 0x0800, CRC(6c36361e) SHA1(7a018eecf3d8b7cf8845dcfcf8067feb292933b2) )
 ROM_END
 
 static DRIVER_INIT( couple )
 {
-	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *ROM = memory_region(machine, "main");
 
 	#if 0 //quick rom compare test
 	{

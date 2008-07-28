@@ -235,8 +235,8 @@ static void *iremga20_start(const char *tag, int sndindex, int clock, const void
 	memset(chip, 0, sizeof(*chip));
 
 	/* Initialize our chip structure */
-	chip->rom = memory_region(Machine, RGNCLASS_SOUND, tag);
-	chip->rom_size = memory_region_length(Machine, RGNCLASS_SOUND, tag);
+	chip->rom = memory_region(Machine, tag);
+	chip->rom_size = memory_region_length(Machine, tag);
 
 	iremga20_reset(chip);
 

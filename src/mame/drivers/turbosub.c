@@ -71,7 +71,7 @@ static VIDEO_UPDATE( turbosub )
 static MACHINE_RESET( turbosub )
 {
 #if ROM_PATCHES
-	UINT8 *rom = (UINT8 *)memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *rom = (UINT8 *)memory_region(machine, "main");
 
 	rom[0xf564]=0;		/* Display test status */
 	rom[0xf60a]=0x20;	/* Skip on error */
@@ -121,7 +121,7 @@ static READ8_HANDLER( G_STATUS_R )
 static WRITE8_HANDLER( G_STATUS_W )
 {
 	int bankaddress;
-	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *ROM = memory_region(machine, "main");
 	bankaddress = 0x10000 + (data & 0x03) * 0x10000;
 	memory_set_bankptr(1,&ROM[bankaddress]);
 
@@ -357,10 +357,10 @@ static MACHINE_DRIVER_START( turbosub )
 MACHINE_DRIVER_END
 
 ROM_START( turbosub )
-	ROM_REGION( 0xc0000, RGNCLASS_USER, "user1", 0) /* Non-bankswitched, 6809 #0 code */
+	ROM_REGION( 0xc0000, "user1", 0) /* Non-bankswitched, 6809 #0 code */
 	ROM_LOAD( "turbosub.u85",    0x18000, 0x4000, CRC(eabb9509) SHA1(cbfb6c5becb3fe1b4ed729e92a0f4029a5df7d67) )
 
-	ROM_REGION( 0x48000, RGNCLASS_CPU, "main", 0 ) /* Bankswitched 6809 code */
+	ROM_REGION( 0x48000, "main", 0 ) /* Bankswitched 6809 code */
 	ROM_LOAD( "turbosub.u82",    0x10000, 0x2000, CRC(de32eb6f) SHA1(90bf31a5adf261d47b4f52e93b5e97f343b7ebf0) )
 		ROM_CONTINUE(                0x20000, 0x2000 )
 	ROM_LOAD( "turbosub.u81",    0x12000, 0x2000, CRC(9ae09613) SHA1(9b5ada4a21473b30be98bcc461129b6ed4e0bb11) )
@@ -380,20 +380,20 @@ ROM_START( turbosub )
 		ROM_CONTINUE(                0x46000, 0x2000 )
 
 	/* e000 - ffff = Upper half of U85 (lower half is blank) */
-	ROM_COPY( RGNCLASS_USER, "user1", 0x18000+0x2000, 0xe000, 0x2000 )
+	ROM_COPY( "user1", 0x18000+0x2000, 0xe000, 0x2000 )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "frame", 0 )
+	ROM_REGION( 0x10000, "frame", 0 )
 	ROM_LOAD( "turbosub.u63",    0xc000, 0x4000, CRC(35701532) SHA1(77d957682aab10ee902c1e47c468b9ab8fe6a512) )
 
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "turbosub.u66",   0xc000, 0x4000, CRC(5091bf3d) SHA1(7ab872cef1562a45f7533c16bbbae8772673465b) )
 
-	ROM_REGION( 0xc0000, RGNCLASS_USER, "user2", 0) /* Unknown */
+	ROM_REGION( 0xc0000, "user2", 0) /* Unknown */
 	ROM_LOAD( "turbosub.u67",    0x00000, 0x4000, CRC(f8ae82e9) SHA1(fd27b9fe7872c3c680a1f71a4a5d5eeaa12e4a19) )
 	ROM_LOAD( "turbosub.u68",    0x04000, 0x4000, CRC(72e3d09b) SHA1(eefdfcd0c4c32e465f18d40f46cb5bc022c22bfd) )
 	ROM_LOAD( "turbosub.u69",    0x00000, 0x4000, CRC(ad04193b) SHA1(2f660302e60a7e68e079a8dd13266a77c077f939) )
 
-	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", 0 ) /* Incorrect */
+	ROM_REGION( 0x80000, "gfx1", 0 ) /* Incorrect */
 	ROMX_LOAD( "turbosub.u4",    0x00000, 0x4000, CRC(08303604) SHA1(f075b645d89a2d91bd9b621748906a9f9890ee60), ROM_SKIP(3) )
 	ROMX_LOAD( "turbosub.u14",   0x00001, 0x4000, CRC(83b26c8d) SHA1(2dfa3b45c44652d255c402511bb3810fffb0731d), ROM_SKIP(3) )
 	ROMX_LOAD( "turbosub.u24",   0x00002, 0x4000, CRC(6bbb6cb3) SHA1(d513e547a05b34076bb8261abd51301ac5f3f5d4), ROM_SKIP(3) )
@@ -434,7 +434,7 @@ ROM_START( turbosub )
 	ROMX_LOAD( "turbosub.u26",   0x70002, 0x4000, CRC(867cfe32) SHA1(549e4e557d63dfab8e8c463916512a1b422ce425), ROM_SKIP(3) )
 	ROMX_LOAD( "turbosub.u36",   0x70003, 0x4000, CRC(0d8ebc21) SHA1(7ae65edae05869376caa975ff2c778a08e8ad8a2), ROM_SKIP(3) )
 
-	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", 0) /* Incorrect */
+	ROM_REGION( 0x40000, "gfx2", 0) /* Incorrect */
 	ROMX_LOAD( "turbosub.u44",   0x00000, 0x4000, CRC(eaa05860) SHA1(f649891dae9354b7f2e46e6a380b52a569229d64), ROM_SKIP(3) )
 	ROMX_LOAD( "turbosub.u54",   0x00001, 0x4000, CRC(bebf98d8) SHA1(170502bb44fc6d6bf14d8dac4778b37888c14a7b), ROM_SKIP(3) )
 

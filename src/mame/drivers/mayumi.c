@@ -30,7 +30,7 @@ static INTERRUPT_GEN( mayumi_interrupt )
 
 static WRITE8_HANDLER( bank_sel_w )
 {
-	UINT8 *BANKROM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *BANKROM = memory_region(machine, "main");
 	int bank = ((data & 0x80)) >> 7 | ((data & 0x40) >> 5);
 	memory_set_bankptr(1, &BANKROM[0x10000+bank*0x4000]);
 
@@ -321,17 +321,17 @@ MACHINE_DRIVER_END
 /****************************************************************************/
 
 ROM_START( mayumi )
-	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) /* CPU */
+	ROM_REGION( 0x20000, "main", 0 ) /* CPU */
 	ROM_LOAD( "my00.bin",  0x00000, 0x08000, CRC(33189e37) SHA1(cbf75f56360ef7da5b7b1207b58cd0d72bcaf207) )
 	ROM_LOAD( "my01.bin",  0x10000, 0x10000, CRC(5280fb39) SHA1(cee7653f4353031701ec1608881b37073b178d9f) ) // Banked
-	ROM_COPY( RGNCLASS_CPU, "main", 0x10000, 0x08000, 0x4000 )
+	ROM_COPY( "main", 0x10000, 0x08000, 0x4000 )
 
-	ROM_REGION( 0x30000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* gfx */
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_DISPOSE ) /* gfx */
 	ROM_LOAD( "my10.bin", 0x00000, 0x10000, CRC(3b4f4f97) SHA1(50bda1484e965f15630bd2e05861d74ddeb0d88e) )
 	ROM_LOAD( "my20.bin", 0x10000, 0x10000, CRC(18544029) SHA1(74bd8bb422db33bd7af08afbf9b801bd31a3f199) )
 	ROM_LOAD( "my30.bin", 0x20000, 0x10000, CRC(7f22d53f) SHA1(f8e5874ba0fa003ba0d6a504b2169acdf1491484) )
 
-	ROM_REGION( 0x0300, RGNCLASS_PROMS, "proms", 0 ) /* color PROMs */
+	ROM_REGION( 0x0300, "proms", 0 ) /* color PROMs */
 	ROM_LOAD( "my-9m.bin", 0x0000,  0x0100, CRC(b18fd669) SHA1(e2b1477c1bc49994b0b652d63a2205363aab9a74) ) // R
 	ROM_LOAD( "my-9l.bin", 0x0100,  0x0100, CRC(f3fef561) SHA1(247f579fe91ad7e516c93a873b2ecca780bf6da0) ) // G
 	ROM_LOAD( "my-9k.bin", 0x0200,  0x0100, CRC(3e7a8012) SHA1(24129586a1c39f68dad274b5afbdd6c027ab0901) ) // B

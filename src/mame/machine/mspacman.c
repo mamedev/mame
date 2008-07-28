@@ -103,7 +103,7 @@ static void mspacman_decode(running_machine *machine)
 
 	/* CPU ROMs */
 
-	RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	RAM = memory_region(machine, "main");
 	for (i = 0; i < 0x1000; i++)
 	{
 	RAM[0x10000+i] = RAM[0x0000+i];
@@ -179,7 +179,7 @@ static void mspacman_decode(running_machine *machine)
 
 MACHINE_RESET( mspacman )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 	mspacman_decode(machine);
 
 	memory_configure_bank(1, 0, 2, &RAM[0x00000], 0x10000);

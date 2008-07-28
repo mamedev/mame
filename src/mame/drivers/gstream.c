@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( gstream_32bit_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_BASE(&gstream_workram) // work ram
 //  AM_RANGE(0x40000000, 0x40FFFFFF) AM_RAM // ?? lots of data gets copied here if present, but game runs without it??
 	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE(gstream_vram_w) AM_BASE(&gstream_vram) // video ram
-	AM_RANGE(0x4E000000, 0x4E1FFFFF) AM_ROM AM_REGION(RGNCLASS_USER, "user2",0) // main game rom
+	AM_RANGE(0x4E000000, 0x4E1FFFFF) AM_ROM AM_REGION("user2",0) // main game rom
 	AM_RANGE(0x4F000000, 0x4F000003) AM_WRITE(gstream_tilemap3_scrollx_w)
 	AM_RANGE(0x4F200000, 0x4F200003) AM_WRITE(gstream_tilemap3_scrolly_w)
 	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_WRITE(gstream_palette_w) AM_BASE(&paletteram32)
@@ -191,7 +191,7 @@ static ADDRESS_MAP_START( gstream_32bit_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x4FC00000, 0x4FC00003) AM_WRITE(gstream_tilemap2_scrollx_w)
 	AM_RANGE(0x4FE00000, 0x4FE00003) AM_WRITE(gstream_tilemap2_scrolly_w)
 	AM_RANGE(0xFFC00000, 0xFFC01FFF) AM_RAM AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size) // Backup RAM
-	AM_RANGE(0xFFF80000, 0xFFFFFFFF) AM_ROM AM_REGION(RGNCLASS_USER, "user1",0) // boot rom
+	AM_RANGE(0xFFF80000, 0xFFFFFFFF) AM_ROM AM_REGION("user1",0) // boot rom
 ADDRESS_MAP_END
 
 static READ32_HANDLER( gstream_oki_0_r ) { return OKIM6295_status_0_r(machine, 0); }
@@ -443,13 +443,13 @@ static MACHINE_DRIVER_START( gstream )
 MACHINE_DRIVER_END
 
 ROM_START( gstream )
-	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "u56.bin", 0x000000, 0x080000, CRC(0d0c6a38) SHA1(a810bfc1c9158cccc37710d0ea7268e26e520cc2) )
 
-	ROM_REGION32_BE( 0x200000, RGNCLASS_USER, "user2", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x200000, "user2", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD16_WORD_SWAP( "gs_prg_02.bin", 0x000000, 0x200000, CRC(2f8a6bea) SHA1(c0a32838f4bd8599f09002139f87562db625c1c5) )
 
-	ROM_REGION( 0x1000000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )  /* sprite tiles (16x16x8) */
+	ROM_REGION( 0x1000000, "gfx1", ROMREGION_DISPOSE )  /* sprite tiles (16x16x8) */
 	ROM_LOAD32_WORD( "gs_gr_07.bin", 0x000000, 0x200000, CRC(84e66fe1) SHA1(73d828714f9ed9baffdc06998f5bf3298396fe9c) )
 	ROM_LOAD32_WORD( "gs_gr_11.bin", 0x000002, 0x200000, CRC(946d71d1) SHA1(516bd3f4d7f5bce59f0593ed6565114dbd5a4ef0) )
 	ROM_LOAD32_WORD( "gs_gr_08.bin", 0x400000, 0x200000, CRC(abd0d6aa) SHA1(dd294bbdda05697df84247257f735ab51bc26ca3) )
@@ -459,7 +459,7 @@ ROM_START( gstream )
 	ROM_LOAD32_WORD( "gs_gr_10.bin", 0xc00000, 0x200000, CRC(d696d15d) SHA1(85aaa5cdb35f3a8d3266bb8debec0558c860cb53) )
 	ROM_LOAD32_WORD( "gs_gr_14.bin", 0xc00002, 0x200000, CRC(6bd2a1e1) SHA1(aedca91643f14ececc101a7708255ce9b1d70f68) )
 
-	ROM_REGION( 0xc00000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )  /* bg tiles (32x32x8) */
+	ROM_REGION( 0xc00000, "gfx2", ROMREGION_DISPOSE )  /* bg tiles (32x32x8) */
 	ROM_LOAD( "gs_gr_01.bin", 0x000000, 0x200000, CRC(b82cfab8) SHA1(08f0eaef5c927fb056c6cc9342e39f445aae9062) )
 	ROM_LOAD( "gs_gr_02.bin", 0x200000, 0x200000, CRC(37e19cbd) SHA1(490ebb037fce09100ec4bba3f73ecdf101526641) )
 	ROM_LOAD( "gs_gr_03.bin", 0x400000, 0x200000, CRC(1a3b2b11) SHA1(a4b1dc1a9709f8f8f2ab2190d7badc246caa540f) )
@@ -467,14 +467,14 @@ ROM_START( gstream )
 	ROM_LOAD( "gs_gr_05.bin", 0x800000, 0x200000, CRC(ef283a73) SHA1(8b598facb344eac33138611abc141a2acb375983) )
 	ROM_LOAD( "gs_gr_06.bin", 0xa00000, 0x200000, CRC(d4e3a2b2) SHA1(4577c007172c718bf7ca55a8ccee5455c281026c) )
 
-	ROM_REGION( 0x200000, RGNCLASS_SOUND, "oki1", 0 )
+	ROM_REGION( 0x200000, "oki1", 0 )
 	ROM_LOAD( "gs_snd_01.bin", 0x000000, 0x080000, CRC(79b64d3f) SHA1(b2166210d3a3b85b9ace90749a444c881f69d551) )
 	ROM_LOAD( "gs_snd_02.bin", 0x080000, 0x080000, CRC(e49ed92c) SHA1(a3d7b3fe93a786a246acf2657d9056398c793078) )
 	ROM_LOAD( "gs_snd_03.bin", 0x100000, 0x080000, CRC(2bfff4ac) SHA1(cce1bb3c78b86722c926854c737f9589806012ba) )
 	ROM_LOAD( "gs_snd_04.bin", 0x180000, 0x080000, CRC(b259de3b) SHA1(1a64f41d4344fefad5832332f1a7655e23f6b017) )
 
-	ROM_REGION( 0x200000, RGNCLASS_SOUND, "oki2", 0 )
-	ROM_COPY( RGNCLASS_SOUND, "oki1", 0, 0, 0x200000 )
+	ROM_REGION( 0x200000, "oki2", 0 )
+	ROM_COPY( "oki1", 0, 0, 0x200000 )
 ROM_END
 
 static READ32_HANDLER( gstream_speedup_r )

@@ -13,8 +13,8 @@ static UINT16 *sprite_temp_render;
 /* this decodes one of the funky sprites to a bitmap so we can draw it more easily -- slow but easier to use*/
 static void pgm_prepare_sprite(running_machine *machine, int wide, int high,int palt, int boffset)
 {
-	UINT8 *bdata    = memory_region       ( machine, RGNCLASS_GFX, "gfx4" );
-	size_t  bdatasize = memory_region_length( machine, RGNCLASS_GFX, "gfx4" )-1;
+	UINT8 *bdata    = memory_region       ( machine, "gfx4" );
+	size_t  bdatasize = memory_region_length( machine, "gfx4" )-1;
 	UINT8 *adata    = pgm_sprite_a_region;
 	size_t  adatasize = pgm_sprite_a_region_allocate-1;
 	int xcnt, ycnt;

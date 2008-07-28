@@ -196,16 +196,16 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( kopunch )
-	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
+	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "epr1105.x",    0x0000, 0x1000, CRC(34ef5e79) SHA1(2827c68f4c902f447a304d3ab0258c7819a0e4ca) )
 	ROM_LOAD( "epr1106.x",    0x1000, 0x1000, CRC(25a5c68b) SHA1(9761418c6f3903f8aaceece658739fe5bf5c0803) )
 
-	ROM_REGION( 0x1800, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x1800, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "epr1102",      0x0000, 0x0800, CRC(8a52de96) SHA1(5abdaa83c6bfea81395cb190f5364b72811927ba) )
 	ROM_LOAD( "epr1103",      0x0800, 0x0800, CRC(bae5e054) SHA1(95373123ab64543cdffb7ee9e02d0613c5c494bf) )
 	ROM_LOAD( "epr1104",      0x1000, 0x0800, CRC(7b119a0e) SHA1(454f01355fa9512a7442990cc92da7bc7a8d6b68) )
 
-	ROM_REGION( 0x6000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "epr1107",      0x0000, 0x1000, CRC(ca00244d) SHA1(690931ea1bef9d80dcd7bd2ea2462b083c884a89) )
 	ROM_LOAD( "epr1108",      0x1000, 0x1000, CRC(cc17c5ed) SHA1(693df076e16cc3a3dd54f6680691e658da3942fe) )
 	ROM_LOAD( "epr1110",      0x2000, 0x1000, CRC(ae0aff15) SHA1(7f71c94bacdb444e5ed4f917c5a7de17012027a9) )
@@ -213,7 +213,7 @@ ROM_START( kopunch )
 	ROM_LOAD( "epr1112",      0x4000, 0x1000, CRC(ef6994df) SHA1(2d68650b6b875bcfdc9f977f96044c6867aa40a6) )
 	ROM_LOAD( "epr1111",      0x5000, 0x1000, CRC(28530ec9) SHA1(1a8782d37128cdb43133fc891cde93d2bdd5476b) )
 
-	ROM_REGION( 0x0060, RGNCLASS_PROMS, "proms", 0 )
+	ROM_REGION( 0x0060, "proms", 0 )
 	ROM_LOAD( "epr1101",      0x0000, 0x0020, CRC(15600f5d) SHA1(130179f79761cb16316c544e3c689bc10431db30) )	/* palette */
 	ROM_LOAD( "epr1099",      0x0020, 0x0020, CRC(fc58c456) SHA1(f27c3ad669dfdc33bcd7e0481fa01bf34973e816) )	/* unknown */
 	ROM_LOAD( "epr1100",      0x0040, 0x0020, CRC(bedb66b1) SHA1(8e78bb205d900075b761e1baa5f5813174ff28ba) )	/* unknown */
@@ -222,7 +222,7 @@ ROM_END
 
 static DRIVER_INIT( kopunch )
 {
-//  UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+//  UINT8 *rom = memory_region(machine, "main");
 
 	/* It looks like there is a security chip, that changes instruction of the form:
         0334: 3E 0C       ld   a,$0C

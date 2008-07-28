@@ -41,7 +41,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *rom = memory_region(machine, RGNCLASS_GFX, "gfx4");
+	UINT8 *rom = memory_region(machine, "gfx4");
 	int code = rom[0x1000 * bg_image + tile_index];
 	SET_TILE_INFO(
 			3 + bg_image,

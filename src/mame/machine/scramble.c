@@ -40,7 +40,7 @@ MACHINE_RESET( monsterz )
 {
 /*
 // patch rom crc
-    UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
+    UINT8 *ROM = memory_region(machine, "main");
     ROM[0x363f] = 0;
     ROM[0x3640] = 0;
     ROM[0x3641] = 0;
@@ -56,7 +56,7 @@ MACHINE_RESET( monsterz )
 
 MACHINE_RESET( explorer )
 {
-	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *RAM = memory_region(machine, "main");
 	RAM[0x47ff] = 0; /* If not set, it doesn't reset after the 1st time */
 
 	MACHINE_RESET_CALL(galaxold);
@@ -388,7 +388,7 @@ DRIVER_INIT( mariner )
 {
 	/* extra ROM */
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5800, 0x67ff, 0, 0, SMH_BANK1, SMH_UNMAP);
-	memory_set_bankptr(1, memory_region(machine, RGNCLASS_CPU, "main") + 0x5800);
+	memory_set_bankptr(1, memory_region(machine, "main") + 0x5800);
 
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9008, 0x9008, 0, 0, mariner_protection_2_r);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb401, 0xb401, 0, 0, mariner_protection_1_r);
@@ -403,12 +403,12 @@ DRIVER_INIT( frogger )
 	UINT8 *ROM;
 
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
-	ROM = memory_region(machine, RGNCLASS_CPU, "audio");
+	ROM = memory_region(machine, "audio");
 	for (A = 0;A < 0x0800;A++)
 		ROM[A] = BITSWAP8(ROM[A],7,6,5,4,3,2,0,1);
 
 	/* likewise, the 2nd gfx ROM has data lines D0 and D1 swapped. Decode it. */
-	ROM = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	ROM = memory_region(machine, "gfx1");
 	for (A = 0x0800;A < 0x1000;A++)
 		ROM[A] = BITSWAP8(ROM[A],7,6,5,4,3,2,0,1);
 }
@@ -419,7 +419,7 @@ DRIVER_INIT( froggers )
 	UINT8 *ROM;
 
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
-	ROM = memory_region(machine, RGNCLASS_CPU, "audio");
+	ROM = memory_region(machine, "audio");
 	for (A = 0;A < 0x0800;A++)
 		ROM[A] = BITSWAP8(ROM[A],7,6,5,4,3,2,0,1);
 }
@@ -436,7 +436,7 @@ DRIVER_INIT( devilfsh )
 	/* A2 -> A3 */
 	/* A3 -> A1 */
 
-	RAM = memory_region(machine, RGNCLASS_CPU, "main");
+	RAM = memory_region(machine, "main");
 	for (i = 0; i < 0x10000; i += 16)
 	{
 		offs_t j;
@@ -462,12 +462,12 @@ DRIVER_INIT( hotshock )
 {
 	/* protection??? The game jumps into never-neverland here. I think
        it just expects a RET there */
-	memory_region(machine, RGNCLASS_CPU, "main")[0x2ef9] = 0xc9;
+	memory_region(machine, "main")[0x2ef9] = 0xc9;
 }
 
 DRIVER_INIT( cavelon )
 {
-	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *ROM = memory_region(machine, "main");
 
 	/* banked ROM */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
@@ -512,7 +512,7 @@ DRIVER_INIT( mimonkey )
 		{ 0x80,0x87,0x81,0x87,0x83,0x00,0x84,0x01,0x01,0x86,0x86,0x80,0x86,0x00,0x86,0x86 }
 	};
 
-	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *ROM = memory_region(machine, "main");
 	int A, ctr = 0, line, col;
 
 	for( A = 0; A < 0x4000; A++ )
@@ -557,8 +557,8 @@ DRIVER_INIT( anteater )
     *   Optimizations done by Fabio Buffoni
     */
 
-	RAM = memory_region(machine, RGNCLASS_GFX, "gfx1");
-	len = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
+	RAM = memory_region(machine, "gfx1");
+	len = memory_region_length(machine, "gfx1");
 
 	scratch = malloc_or_die(len);
 
@@ -594,8 +594,8 @@ DRIVER_INIT( rescue )
     *   Optimizations done by Fabio Buffoni
     */
 
-	RAM = memory_region(machine, RGNCLASS_GFX, "gfx1");
-	len = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
+	RAM = memory_region(machine, "gfx1");
+	len = memory_region_length(machine, "gfx1");
 
 	scratch = malloc_or_die(len);
 
@@ -630,8 +630,8 @@ DRIVER_INIT( minefld )
     *   Code To Decode Minefield by Mike Balfour and Nicola Salmoria
     */
 
-	RAM = memory_region(machine, RGNCLASS_GFX, "gfx1");
-	len = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
+	RAM = memory_region(machine, "gfx1");
+	len = memory_region_length(machine, "gfx1");
 
 	scratch = malloc_or_die(len);
 
@@ -668,8 +668,8 @@ DRIVER_INIT( losttomb )
     *   Optimizations done by Fabio Buffoni
     */
 
-	RAM = memory_region(machine, RGNCLASS_GFX, "gfx1");
-	len = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
+	RAM = memory_region(machine, "gfx1");
+	len = memory_region_length(machine, "gfx1");
 
 	scratch = malloc_or_die(len);
 
@@ -695,7 +695,7 @@ DRIVER_INIT( losttomb )
 DRIVER_INIT( hustler )
 {
 	offs_t A;
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *rom = memory_region(machine, "main");
 
 
 	for (A = 0;A < 0x4000;A++)
@@ -723,7 +723,7 @@ DRIVER_INIT( hustler )
 
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
 	{
-		rom = memory_region(machine, RGNCLASS_CPU, "audio");
+		rom = memory_region(machine, "audio");
 
 
 		for (A = 0;A < 0x0800;A++)
@@ -734,7 +734,7 @@ DRIVER_INIT( hustler )
 DRIVER_INIT( billiard )
 {
 	offs_t A;
-	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *rom = memory_region(machine, "main");
 
 
 	for (A = 0;A < 0x4000;A++)
@@ -764,7 +764,7 @@ DRIVER_INIT( billiard )
 
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
 	{
-		rom = memory_region(machine, RGNCLASS_CPU, "audio");
+		rom = memory_region(machine, "audio");
 
 
 		for (A = 0;A < 0x0800;A++)
@@ -792,8 +792,8 @@ DRIVER_INIT( mrkougb )
 DRIVER_INIT( ad2083 )
 {
 	UINT8 c;
-	int i, len = memory_region_length(machine, RGNCLASS_CPU, "main");
-	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
+	int i, len = memory_region_length(machine, "main");
+	UINT8 *ROM = memory_region(machine, "main");
 
 	for (i=0; i<len; i++)
 	{

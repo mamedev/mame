@@ -151,8 +151,8 @@ static void *ym2608_start(const char *tag, int sndindex, int clock, const void *
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2608_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = (void *)(memory_region(Machine, RGNCLASS_SOUND, tag));
-	pcmsizea = memory_region_length(Machine, RGNCLASS_SOUND, tag);
+	pcmbufa  = (void *)(memory_region(Machine, tag));
+	pcmsizea = memory_region_length(Machine, tag);
 
 	/* initialize YM2608 */
 	info->chip = YM2608Init(info,sndindex,clock,rate,
