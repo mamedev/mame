@@ -6867,6 +6867,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( vivdolls )	/* (c) 1998 Visco */
 	DRIVER( srmvs )		/* (c) 1999 Seta */
 	DRIVER( twrshaft )	/* (c) 2003 Aruze */
+	DRIVER( hipai )
+	DRIVER( doncdoon )
+	DRIVER( kurufev )
+	DRIVER( mayjin3 )
 
 	/* Atlus games */
 	DRIVER( powerins )	/* (c) 1993 Atlus (Japan) */

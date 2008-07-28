@@ -536,8 +536,58 @@ ROM_START( twrshaft )
 
 	ROM_REGION32_BE( 0x800000, "user3", 0 )
 	ROM_LOAD16_WORD_SWAP( "nus-zsij-0.u1", 0x000000, 0x800000,  CRC(2389576f) SHA1(dc22b2eab4d7a02cb918827a62e6c120b3a84e6c) )
+ROM_END
+
+
+ROM_START( hipai )
+	ROM_REGION32_BE( 0x800, "user1", ROMREGION_ERASE00 )
+	PIF_BOOTROM
+
+	ROM_REGION32_BE( 0x4000000, "user2", 0 )
+	ROM_LOAD16_WORD_SWAP( "ua2011-all02.u3", 0x0000000, 0x1000000,  CRC(eb4b96d0) SHA1(e909ea5b71b81087da07821c4f57244576363678) )
+	ROM_LOAD16_WORD_SWAP( "ua2011-alh02.u4", 0x1000000, 0x1000000,  CRC(b8e35ddf) SHA1(7c3e59f6520dc3f0aa592e682fa82e30ffd1f4d0) )
+
+	ROM_REGION32_BE( 0x800000, "user3", 0 )
+	ROM_LOAD16_WORD_SWAP( "nus-nsij-0.u1", 0x000000, 0x800000,  CRC(94cf9f8d) SHA1(cd624d1f5de2be3bec3ece06556a2e39bef66d77) )
+ROM_END
+
+
+ROM_START( doncdoon )
+	ROM_REGION32_BE( 0x800, "user1", ROMREGION_ERASE00 )
+	PIF_BOOTROM
+
+	ROM_REGION32_BE( 0x4000000, "user2", 0 )
+	ROM_LOAD16_WORD_SWAP( "ua3088-all01.u3", 0x0000000, 0x1000000,  CRC(00db4dbc) SHA1(824fdce01fffdfcbcc9b1fbda4ab389a10b2b418) )
+	ROM_LOAD16_WORD_SWAP( "ua3088-alh04.u4", 0x1000000, 0x1000000,  CRC(c96bc7c0) SHA1(2b6ca1a769dee74e112c2b287dacd0bf46dda091) )
+
+	ROM_REGION32_BE( 0x800000, "user3", 0 )
+	ROM_LOAD16_WORD_SWAP( "nus-zsij-0.u1", 0x000000, 0x800000,   CRC(2389576f) SHA1(dc22b2eab4d7a02cb918827a62e6c120b3a84e6c) ) // same as tower & shaft
+ROM_END
+
+ROM_START( kurufev )
+	ROM_REGION32_BE( 0x800, "user1", ROMREGION_ERASE00 )
+	PIF_BOOTROM
+
+	ROM_REGION32_BE( 0x4000000, "user2", 0 )
+	ROM_LOAD16_WORD_SWAP( "ua3003-all01.u3", 0x0000000, 0x1000000,  CRC(f362fa82) SHA1(4f41ee23edc18110be1218ba333d1c58376ab175) )
+	ROM_LOAD16_WORD_SWAP( "ua3003-alh01.u4", 0x1000000, 0x1000000,  CRC(47c56387) SHA1(c8cc6c0a456b593aef711d0a75b2342ba2f8203f) )
+
+	ROM_REGION32_BE( 0x800000, "user3", 0 )
+	ROM_LOAD16_WORD_SWAP( "nus-zsij-0.u1", 0x000000, 0x800000, CRC(547d8122) SHA1(347f0785767265acb0f0c21646e06cbe6f561821) )
+ROM_END
+
+
+ROM_START( mayjin3 )
+	ROM_REGION32_BE( 0x800, "user1", ROMREGION_ERASE00 )
+	PIF_BOOTROM
+
+	ROM_REGION32_BE( 0x4000000, "user2", 0 )
+	ROM_LOAD16_WORD_SWAP( "nus-zscj.u3", 0x000000, 0x800000,  CRC(8b36eb91) SHA1(179745625c16c6813d5f8d29bfd7628783d55806) )
 
 ROM_END
+
+
+
 
 // BIOS
 GAME( 1998, aleck64,        0,  aleck64, aleck64,  aleck64, ROT0, "Nintendo/Seta", "Aleck64 PIF BIOS", GAME_IS_BIOS_ROOT)
@@ -549,3 +599,8 @@ GAME( 1998, starsldr, aleck64,  aleck64, starsldr, aleck64, ROT0, "Hudson/Seta",
 GAME( 1998, vivdolls, aleck64,  aleck64, aleck64,  aleck64, ROT0, "Visco", "Vivid Dolls", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, srmvs,    aleck64,  aleck64, aleck64,  aleck64, ROT0, "Seta", "Super Real Mahjong VS", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2003, twrshaft, aleck64,  aleck64, aleck64,  aleck64, ROT0, "Aruze", "Tower & Shaft", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, hipai,    aleck64,  aleck64, aleck64,  aleck64, ROT0, "Aruze?", "Hi Pai Paradise", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, doncdoon, aleck64,  aleck64, aleck64,  aleck64, ROT0, "Aruze?", "Donchan no Hanabi de Doon", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, kurufev,  aleck64,  aleck64, aleck64,  aleck64, ROT0, "Aruze?", "Kurukuru Fever", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, mayjin3,  aleck64,  aleck64, aleck64,  aleck64, ROT0, "Seta?", "Mayjinsen 3", GAME_NOT_WORKING|GAME_NO_SOUND )
+
