@@ -14,33 +14,19 @@
 #include "includes/beezer.h"
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_BANK1)
-	AM_RANGE(0xd000, 0xffff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK(1)
+	AM_RANGE(0xd000, 0xffff) AM_ROM AM_WRITE(beezer_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_BANK1)
-	AM_RANGE(0xd000, 0xffff) AM_WRITE(beezer_bankswitch_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-//  AM_RANGE(0x1000, 0x10ff) AM_READ(beezer_6840_r)
-	AM_RANGE(0x1800, 0x18ff) AM_READ(via_1_r)
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-//  AM_RANGE(0x1000, 0x10ff) AM_WRITE(beezer_6840_w)
-	AM_RANGE(0x1800, 0x18ff) AM_WRITE(via_1_w)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+//  AM_RANGE(0x1000, 0x10ff) AM_READWRITE(beezer_6840_r, beezer_6840_w)
+	AM_RANGE(0x1800, 0x18ff) AM_READWRITE(via_1_r, via_1_w)
 //  AM_RANGE(0x8000, 0x9fff) AM_WRITE(beezer_dac_w)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( beezer )
@@ -90,11 +76,11 @@ static MACHINE_DRIVER_START( beezer )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6809, 1000000)        /* 1 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(beezer_interrupt,128)
 
 	MDRV_CPU_ADD("audio", M6809, 1000000)        /* 1 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -104,55 +104,37 @@ static WRITE8_HANDLER( bladestl_speech_ctrl_w ){
 	upd7759_start_w(0, data & 2);
 }
 
-static ADDRESS_MAP_START( bladestl_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(K007342_r)			/* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_READ(K007420_r)			/* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_READ(K007342_scroll_r)	/* Scroll RAM */
-	AM_RANGE(0x2400, 0x245f) AM_READ(SMH_RAM)			/* Palette */
-	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P1")			/* 1P controls */
-	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P2")			/* 2P controls */
-	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW2")		/* DISPW #2 */
-	AM_RANGE(0x2e40, 0x2e40) AM_READ_PORT("DSW1")		/* DIPSW #1 */
-	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("COINSW")		/* DIPSW #3, coinsw, startsw */
-	AM_RANGE(0x2f00, 0x2f03) AM_READ(trackball_r)		/* Trackballs */
-	AM_RANGE(0x2f80, 0x2f9f) AM_READ(K051733_r)			/* Protection: 051733 */
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)			/* Work RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK1)			/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)			/* ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( bladestl_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(K007342_w)				/* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_WRITE(K007420_w)				/* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_WRITE(K007342_scroll_w)		/* Scroll RAM */
-	AM_RANGE(0x2400, 0x245f) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)/* palette */
-	AM_RANGE(0x2600, 0x2607) AM_WRITE(K007342_vreg_w)			/* Video Registers */
-	AM_RANGE(0x2e80, 0x2e80) AM_WRITE(bladestl_sh_irqtrigger_w)/* cause interrupt on audio CPU */
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(K007342_r, K007342_w)	/* Color RAM + Video RAM */
+	AM_RANGE(0x2000, 0x21ff) AM_READWRITE(K007420_r, K007420_w)	/* Sprite RAM */
+	AM_RANGE(0x2200, 0x23ff) AM_READWRITE(K007342_scroll_r, K007342_scroll_w)	/* Scroll RAM */
+	AM_RANGE(0x2400, 0x245f) AM_RAM AM_BASE(&paletteram)	/* palette */
+	AM_RANGE(0x2600, 0x2607) AM_WRITE(K007342_vreg_w)		/* Video Registers */
+	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("COINSW")			/* DIPSW #3, coinsw, startsw */
+	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P1")				/* 1P controls */
+	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P2")				/* 2P controls */
+	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW2")			/* DISPW #2 */
+	AM_RANGE(0x2e40, 0x2e40) AM_READ_PORT("DSW1")			/* DIPSW #1 */
+	AM_RANGE(0x2e80, 0x2e80) AM_WRITE(bladestl_sh_irqtrigger_w)	/* cause interrupt on audio CPU */
 	AM_RANGE(0x2ec0, 0x2ec0) AM_WRITE(watchdog_reset_w)		/* watchdog reset */
+	AM_RANGE(0x2f00, 0x2f03) AM_READ(trackball_r)			/* Trackballs */
 	AM_RANGE(0x2f40, 0x2f40) AM_WRITE(bladestl_bankswitch_w)	/* bankswitch control */
-	AM_RANGE(0x2f80, 0x2f9f) AM_WRITE(K051733_w)				/* Protection: 051733 */
+	AM_RANGE(0x2f80, 0x2f9f) AM_READWRITE(K051733_r, K051733_w)	/* Protection: 051733 */
 	AM_RANGE(0x2fc0, 0x2fc0) AM_WRITE(SMH_NOP)				/* ??? */
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(SMH_RAM)				/* Work RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(SMH_RAM)				/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)				/* ROM */
+	AM_RANGE(0x4000, 0x5fff) AM_RAM							/* Work RAM */
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_RAM)	/* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bladestl_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)				/* RAM */
-	AM_RANGE(0x1000, 0x1000) AM_READ(YM2203_status_port_0_r)	/* YM2203 */
-	AM_RANGE(0x1001, 0x1001) AM_READ(YM2203_read_port_0_r)	/* YM2203 */
-	AM_RANGE(0x4000, 0x4000) AM_READ(upd7759_0_busy_r)		/* UPD7759 */
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)				/* ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( bladestl_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)				/* RAM */
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(YM2203_control_port_0_w)/* YM2203 */
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(YM2203_write_port_0_w)	/* YM2203 */
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x1000, 0x1000) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)	/* YM2203 */
+	AM_RANGE(0x1001, 0x1001) AM_READWRITE(YM2203_read_port_0_r, YM2203_write_port_0_w)		/* YM2203 */
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(bladestl_speech_ctrl_w)	/* UPD7759 */
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(SMH_NOP)				/* ??? */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)				/* ROM */
+	AM_RANGE(0x4000, 0x4000) AM_READ(upd7759_0_busy_r)			/* UPD7759 */
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(SMH_NOP)					/* ??? */
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)				/* soundlatch_r */
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -339,11 +321,11 @@ static MACHINE_DRIVER_START( bladestl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", HD6309, 24000000/2)		/* 24MHz/2 (?) */
-	MDRV_CPU_PROGRAM_MAP(bladestl_readmem,bladestl_writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(bladestl_interrupt,2) /* (1 IRQ + 1 NMI) */
 
 	MDRV_CPU_ADD("audio", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(bladestl_readmem_sound,bladestl_writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 
 	MDRV_INTERLEAVE(10)
 
