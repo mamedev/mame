@@ -18,10 +18,10 @@
 
 // IRQ Lines
 // MODA and MODB are also known as IRQA and IRQB
-#define DSP56K_IRQ_MODA		0
-#define DSP56K_IRQ_MODB		1
-#define DSP56K_IRQ_MODC		2
-#define DSP56K_IRQ_RESET	3
+#define DSP56K_IRQ_MODA  0
+#define DSP56K_IRQ_MODB  1
+#define DSP56K_IRQ_MODC  2
+#define DSP56K_IRQ_RESET 3	/* Is this needed? */
 
 enum
 {
@@ -38,9 +38,9 @@ enum
 	DSP56K_A, DSP56K_B,
 
 	// AGU
-	DSP56K_R0,DSP56K_R1,DSP56K_R2,DSP56K_R3,DSP56K_R4,DSP56K_R5,DSP56K_R6,DSP56K_R7,
-	DSP56K_N0,DSP56K_N1,DSP56K_N2,DSP56K_N3,DSP56K_N4,DSP56K_N5,DSP56K_N6,DSP56K_N7,
-	DSP56K_M0,DSP56K_M1,DSP56K_M2,DSP56K_M3,DSP56K_M4,DSP56K_M5,DSP56K_M6,DSP56K_M7,
+	DSP56K_R0,DSP56K_R1,DSP56K_R2,DSP56K_R3,
+	DSP56K_N0,DSP56K_N1,DSP56K_N2,DSP56K_N3,
+	DSP56K_M0,DSP56K_M1,DSP56K_M2,DSP56K_M3,
 	DSP56K_TEMP,
 	DSP56K_STATUS,
 
@@ -63,20 +63,21 @@ enum
 	DSP56K_ST15
 };
 
+// For Debugger and opcodes
+enum parallelMoveType
+{ 
+	PARALLEL_TYPE_XMDM, 
+	PARALLEL_TYPE_XMDM_SPECIAL, 
+	PARALLEL_TYPE_NODM, 
+	PARALLEL_TYPE_ARU, 
+	PARALLEL_TYPE_RRDM
+};
 
+extern void dsp56k_get_info(UINT32 state, cpuinfo *info);
 
-extern void dsp56k_get_info(UINT32 state, cpuinfo *info) ;
-
-void  dsp56k_host_interface_write(UINT8 addr, UINT8 data);
-UINT8 dsp56k_host_interface_read(UINT8 addr);
-
-void dsp56k_reset_dma_offset(void);
+void  dsp56k_host_interface_write(UINT8 offset, UINT8 data);
+UINT8 dsp56k_host_interface_read(UINT8 offset);
 
 UINT16 dsp56k_get_peripheral_memory(UINT16 addr);
-
-
-// For Debugger and opcodes
-enum parallelMoveType { PARALLEL_TYPE_XMDM, PARALLEL_TYPE_XMDM_SPECIAL, PARALLEL_TYPE_NODM, PARALLEL_TYPE_ARU, PARALLEL_TYPE_RRDM } ;
-
 
 #endif  // _DSP56K_H

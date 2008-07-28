@@ -11,6 +11,9 @@
 /* Main opcode categories */
 static unsigned assemble_x_memory_data_move_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
 static unsigned assemble_dual_x_memory_data_read_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
+static unsigned assemble_no_parallel_move_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
+static unsigned assemble_parallel_register_to_register_moveALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
+static unsigned assemble_coorperative_x_memory_data_move_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
 static unsigned assemble_TCC_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
 static unsigned assemble_bitfield_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
 static unsigned assemble_no_parallel_move_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
@@ -20,7 +23,7 @@ static unsigned assemble_misc_opcode(char* buffer, const UINT16 op, const UINT16
 static unsigned assemble_unique_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
 
 /* Sub-opcode decoding */
-static void decode_data_ALU_opcode(const UINT16 op_byte, char* opcode_str, char* arg_str);
+static void decode_data_ALU_opcode(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
 static void decode_data_ALU_opcode_dual_move(const UINT16 op_byte, char* opcode_str, char* arg_str);
 
 /* Direct opcode decoding */
@@ -35,11 +38,14 @@ static unsigned decode_unique_opcode(const UINT16 op, const UINT16 op2, const UI
 /* Parallel operation decoding */
 static void decode_x_memory_data_move(const UINT16 op_byte, char* parallel_move_str);
 static void decode_dual_x_memory_data_read(const UINT16 op, char* parallel_move_str, char* parallel_move_str2);
+static void decode_register_to_register_data_move(const UINT16 op_byte, char* parallel_move_str, char* d_register);
+static void decode_parallel_cooperative_x_memory_data_move(const UINT16 op_byte, char* parallel_move_str, char* d_register);
 
 
 /* Helper functions */
 #define BITS(CUR,MASK) (dsp56k_op_mask(CUR,MASK))
 static UINT16 dsp56k_op_mask(UINT16 op, UINT16 mask);
+static void pad_string(const int dest_length, char* string);
 
 enum bbbType  { BBB_UPPER, BBB_MIDDLE, BBB_LOWER };
 
@@ -54,7 +60,7 @@ static void decode_F_table    (UINT16 F, char *SD);
 static void decode_h0hF_table (UINT16 h0h, UINT16 F, char *S, char *D);
 static void decode_HH_table   (UINT16 HH, char *SD);
 static void decode_HHH_table  (UINT16 HHH, char *SD);
-/* static void decode_IIII_table (UINT16 IIII, char *S, char *D); */
+static void decode_IIII_table (UINT16 IIII, char *S, char *D);
 static void decode_JJJF_table (UINT16 JJJ, UINT16 F, char *S, char *D);
 static void decode_JJF_table  (UINT16 JJ, UINT16 F, char *S, char *D);
 static void decode_JF_table   (UINT16 J, UINT16 F, char *S, char *D);
@@ -107,17 +113,15 @@ offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 		/* ALU opcode with two parallel data moves */
 		size = assemble_dual_x_memory_data_read_ALU_opcode(buffer, op, op2, pc);
 	}
-	else if (BITS(op,0xff00) == 0x4a)	/* TODO */
+	else if (BITS(op,0xff00) == 0x4a)
 	{
 		/* ALU opcode without any parallel data move */
-		sprintf(buffer, "No parallel data move unimplemented.");
-		size = 1;
+		size = assemble_no_parallel_move_ALU_opcode(buffer, op, op2, pc);
 	}
 	else if (BITS(op,0xf000) == 0x4)	/* TODO */
 	{
 		/* ALU opcode with a parallel register to register move */
-		sprintf(buffer, "Parallel register to register data move unimplemented.");
-		size = 1;
+		size = assemble_parallel_register_to_register_moveALU_opcode(buffer, op, op2, pc);
 	}
 	else if (BITS(op,0xf800) == 0x6)	/* TODO */
 	{
@@ -125,11 +129,10 @@ offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 		sprintf(buffer, "Parallel address register update unimplemented.");
 		size = 1;
 	}
-	else if (BITS(op,0xf000) == 0x5)	/* TODO */
+	else if (BITS(op,0xf000) == 0x5)
 	{
 		/* ALU opcode with an cooperative x data memory move */
-		sprintf(buffer, "Parallel coorperative x data memory move unimplemented.");
-		size = 1;
+		size = assemble_coorperative_x_memory_data_move_ALU_opcode(buffer, op, op2, pc);
 	}
 	else if (BITS(op,0xff00) == 0x05)	/* TODO */
 	{
@@ -190,7 +193,6 @@ offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 	return size | DASMFLAG_SUPPORTED;
 }
 
-
 static unsigned assemble_x_memory_data_move_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
 {
 	/* All operations are of length 1 */
@@ -200,23 +202,25 @@ static unsigned assemble_x_memory_data_move_ALU_opcode(char* buffer, const UINT1
 	char arg_str[128] = "";
 	char opcode_str[128] = "";
 	char parallel_move_str[128] = "";
+	char d_register[128] = "";
 
 	/* Init */
 	sprintf(buffer, " ");
 
 	/* First, decode the Data ALU opcode */
-	decode_data_ALU_opcode(BITS(op,0x00ff), opcode_str, arg_str);
+	decode_data_ALU_opcode(BITS(op,0x00ff), opcode_str, arg_str, d_register);
 
 	/* Next, decode the X Memory Data Move */
 	decode_x_memory_data_move(BITS(op,0xff00), parallel_move_str);
 
 	/* Finally, assemble the full opcode */
-	sprintf(buffer, "%s    %s    %s", opcode_str, arg_str, parallel_move_str);
+	pad_string(11, opcode_str);
+	pad_string(15, arg_str);
+	sprintf(buffer, "%s%s%s", opcode_str, arg_str, parallel_move_str);
 
 	return opSize;
 }
 
-/* Working save for a couple of opcode oddities */
 static unsigned assemble_dual_x_memory_data_read_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
 {
 	/* All operations are of length 1 */
@@ -238,8 +242,89 @@ static unsigned assemble_dual_x_memory_data_read_ALU_opcode(char* buffer, const 
 	decode_dual_x_memory_data_read(op, parallel_move_str, parallel_move_str2);
 
 	/* Finally, assemble the full opcode */
-	sprintf(buffer, "%s    %s    %s %s", opcode_str, arg_str, parallel_move_str, parallel_move_str2);
+	pad_string(11, opcode_str);
+	pad_string(15, arg_str);
+	sprintf(buffer, "%s%s%s %s", opcode_str, arg_str, parallel_move_str, parallel_move_str2);
 
+	return opSize;
+}
+
+static unsigned assemble_no_parallel_move_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
+{
+	/* All operations are of length 1 */
+	unsigned opSize = 1;
+	
+	/* Recovered strings */
+	char arg_str[128] = "";
+	char opcode_str[128] = "";
+	char d_register[128] = "";
+
+	/* Init */
+	sprintf(buffer, " ");
+
+	/* First, decode the Data ALU opcode */
+	decode_data_ALU_opcode(BITS(op,0x00ff), opcode_str, arg_str, d_register);
+	
+	/* Finally, assemble the full opcode */
+	pad_string(11, opcode_str);
+	sprintf(buffer, "%s%s", opcode_str, arg_str);
+
+	return opSize;
+}
+
+static unsigned assemble_parallel_register_to_register_moveALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
+{
+	/* All operations are of length 1 */
+	unsigned opSize = 1;
+	
+	/* Recovered strings */
+	char arg_str[128] = "";
+	char opcode_str[128] = "";
+	char d_register[128] = "";
+	char parallel_move_str[128] = "";
+
+	/* Init */
+	sprintf(buffer, " ");
+
+	/* First, decode the Data ALU opcode */
+	decode_data_ALU_opcode(BITS(op,0x00ff), opcode_str, arg_str, d_register);
+	
+	/* Next, decode the X Memory Data Move */
+	decode_register_to_register_data_move(BITS(op,0xff00), parallel_move_str, d_register);
+
+	/* Finally, assemble the full opcode */
+	pad_string(11, opcode_str);
+	pad_string(15, arg_str);
+	sprintf(buffer, "%s%s%s", opcode_str, arg_str, parallel_move_str);
+
+	return opSize;
+}
+
+static unsigned assemble_coorperative_x_memory_data_move_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
+{
+	/* All operations are of length 1 */
+	unsigned opSize = 1;
+
+	/* Recovered strings */
+	char arg_str[128] = "";
+	char opcode_str[128] = "";
+	char parallel_move_str[128] = "";
+	char d_register[128] = "";
+	
+	/* Init */
+	sprintf(buffer, " ");
+
+	/* First, decode the Data ALU opcode */
+	decode_data_ALU_opcode(BITS(op,0x00ff), opcode_str, arg_str, d_register);
+	
+	/* Next, decode the X Memory Data Move */
+	decode_parallel_cooperative_x_memory_data_move(BITS(op,0xff00), parallel_move_str, d_register);
+	
+	/* Finally, assemble the full opcode */
+	pad_string(11, opcode_str);
+	pad_string(15, arg_str);
+	sprintf(buffer, "%s%s%s", opcode_str, arg_str, parallel_move_str);
+	
 	return opSize;
 }
 
@@ -259,7 +344,8 @@ static unsigned assemble_TCC_opcode(char* buffer, const UINT16 op, const UINT16 
 	opSize = decode_TCC_opcode(op, opcode_str, arg_str);
 
 	/* Finally, assemble the full opcode */
-	sprintf(buffer, "%s    %s", opcode_str, arg_str);
+	pad_string(11, opcode_str);
+	sprintf(buffer, "%s%s", opcode_str, arg_str);
 
 	return opSize;
 }
@@ -280,7 +366,8 @@ static unsigned assemble_bitfield_opcode(char* buffer, const UINT16 op, const UI
 	opSize = decode_bitfield_opcode(op, op2, opcode_str, arg_str);
 
 	/* Finally, assemble the full opcode */
-	sprintf(buffer, "%s    %s", opcode_str, arg_str);
+	pad_string(11, opcode_str);
+	sprintf(buffer, "%s%s", opcode_str, arg_str);
 
 	return opSize;
 }
@@ -301,7 +388,8 @@ static unsigned assemble_no_parallel_move_opcode(char* buffer, const UINT16 op, 
 	opSize = decode_no_parallel_move_opcode(op, op2, pc, opcode_str, arg_str);
 
 	/* Finally, assemble the full opcode */
-	sprintf(buffer, "%s    %s", opcode_str, arg_str);
+	pad_string(11, opcode_str);
+	sprintf(buffer, "%s%s", opcode_str, arg_str);
 
 	return opSize;
 }
@@ -322,7 +410,8 @@ static unsigned assemble_immediate_opcode(char* buffer, const UINT16 op, const U
 	opSize = decode_immediate_opcode(op, pc, opcode_str, arg_str);
 
 	/* Finally, assemble the full opcode */
-	sprintf(buffer, "%s    %s", opcode_str, arg_str);
+	pad_string(11, opcode_str);
+	sprintf(buffer, "%s%s", opcode_str, arg_str);
 
 	return opSize;
 }
@@ -343,7 +432,8 @@ static unsigned assemble_movec_opcodes(char* buffer, const UINT16 op, const UINT
 	opSize = decode_movec_opcodes(op, op2, pc, opcode_str, arg_str);
 
 	/* Finally, assemble the full opcode */
-	sprintf(buffer, "%s    %s", opcode_str, arg_str);
+	pad_string(11, opcode_str);
+	sprintf(buffer, "%s%s", opcode_str, arg_str);
 
 	return opSize;
 }
@@ -364,7 +454,8 @@ static unsigned assemble_misc_opcode(char* buffer, const UINT16 op, const UINT16
 	opSize = decode_misc_opcode(op, pc, opcode_str, arg_str);
 
 	/* Finally, assemble the full opcode */
-	sprintf(buffer, "%s    %s", opcode_str, arg_str);
+	pad_string(11, opcode_str);
+	sprintf(buffer, "%s%s", opcode_str, arg_str);
 
 	return opSize;
 }
@@ -386,7 +477,8 @@ static unsigned assemble_unique_opcode(char* buffer, const UINT16 op, const UINT
 	opSize = decode_unique_opcode(op, op2, pc, opcode_str, arg_str);
 
 	/* Finally, assemble the full opcode */
-	sprintf(buffer, "%s    %s", opcode_str, arg_str);
+	pad_string(11, opcode_str);
+	sprintf(buffer, "%s%s", opcode_str, arg_str);
 
 	return opSize;
 }
@@ -395,7 +487,7 @@ static unsigned assemble_unique_opcode(char* buffer, const UINT16 op, const UINT
 /**************************/
 /* Actual opcode decoding */
 /**************************/
-static void decode_data_ALU_opcode(const UINT16 op_byte, char* opcode_str, char* arg_str)
+static void decode_data_ALU_opcode(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
 {
 	char D[128];
 	char S1[128];
@@ -667,6 +759,9 @@ static void decode_data_ALU_opcode(const UINT16 op_byte, char* opcode_str, char*
 				break;
         }
 	}
+	
+	/* For the cooperative x data memory move */
+	sprintf(d_register, "%s", D);
 }
 
 /* TODO: Triple-check these.  There's weirdness around TFR & MOVE */
@@ -1314,7 +1409,7 @@ static unsigned decode_unique_opcode(const UINT16 op, const UINT16 op2, const UI
 				/* BSR - 0000 0001 0011 10-- xxxx xxxx xxxx xxxx */
 				case 0x2:
 					sprintf(opcode_str, "bsr");
-					sprintf(arg_str, "%d (0x%04x)", op2, op2);
+					sprintf(arg_str, "%d (0x%04x)", (INT16)op2, pc + (INT16)op2);
 					retSize = 2;
 					retSize |= DASMFLAG_STEP_OVER;
 					break;
@@ -1594,6 +1689,8 @@ static void decode_dual_x_memory_data_read(const UINT16 op, char* parallel_move_
 	decode_KKK_table(BITS(op,0x0700), D1, D2);
 	assemble_eas_from_m_table(BITS(op,0x1800), Rnum, 3, ea1, ea2);
 
+	/* TODO : Should the ^F's be replaced? */
+	
 	if (Rnum == -1)
 	{
 		sprintf(ea1, "(!!)!");
@@ -1603,6 +1700,44 @@ static void decode_dual_x_memory_data_read(const UINT16 op, char* parallel_move_
 	sprintf(parallel_move_str2, "X:%s,%s", ea2, D2);
 }
 
+static void decode_register_to_register_data_move(const UINT16 op_byte, char* parallel_move_str, char* d_register)
+{
+	char S[32];
+	char D[32];
+
+	decode_IIII_table(BITS(op_byte,0x0f), S, D);
+
+	if (D[0] == '^' && D[1] == 'F')
+	{
+		if (d_register[0] == 'B')
+			sprintf(D, "A");
+		else if (d_register[0] == 'A')
+			sprintf(D, "B");
+		else
+			sprintf(D, "A");
+	}
+	
+	sprintf(parallel_move_str, "%s,%s", S, D);
+}
+
+static void decode_parallel_cooperative_x_memory_data_move(const UINT16 op_byte, char* parallel_move_str, char* d_register)
+{
+	char SD[32] ;
+	char args[32] ;
+	char dest[32] ;
+
+	if (d_register[0] == 'B')
+		sprintf(dest, "(A1)");
+	else if (d_register[0] == 'A')
+		sprintf(dest, "(B1)");
+	else
+		sprintf(dest, "(A1)");
+
+	decode_HHH_table(BITS(op_byte,0x0e), SD) ;
+	assemble_arguments_from_W_table(BITS(op_byte,0x01), args, 'X', SD, dest) ;
+
+	sprintf(parallel_move_str, "%s", args);
+}
 
 /* MISSING MPY */
 /*
@@ -1804,7 +1939,6 @@ static void decode_HHH_table(UINT16 HHH, char *SD)
 	}
 }
 
-#ifdef UNUSED_FUNCTION
 static void decode_IIII_table(UINT16 IIII, char *S, char *D)
 {
 	switch(IIII)
@@ -1819,13 +1953,14 @@ static void decode_IIII_table(UINT16 IIII, char *S, char *D)
 		case 0x7: sprintf(S, "B0"); sprintf(D, "Y0"); break;
 		case 0x8: sprintf(S, "F");  sprintf(D, "^F"); break;
 		case 0x9: sprintf(S, "F");  sprintf(D, "^F"); break;
+		case 0xa: sprintf(S, "?");  sprintf(D, "?");  break;
+		case 0xb: sprintf(S, "?");  sprintf(D, "?");  break;
 		case 0xc: sprintf(S, "A");  sprintf(D, "X1"); break;
 		case 0xd: sprintf(S, "B");  sprintf(D, "Y1"); break;
 		case 0xe: sprintf(S, "A0"); sprintf(D, "X1"); break;
 		case 0xf: sprintf(S, "B0"); sprintf(D, "Y1"); break;
 	}
 }
-#endif
 
 static void decode_JJJF_table(UINT16 JJJ, UINT16 F, char *S, char *D)
 {
@@ -2195,6 +2330,15 @@ static UINT16 dsp56k_op_mask(UINT16 cur, UINT16 mask)
 
 	return temp;
 }
+
+static void pad_string(const int dest_length, char* string)
+{
+	while (strlen(string) < dest_length)
+	{
+		strcat(string, " ");
+	}
+}
+
 
 
 

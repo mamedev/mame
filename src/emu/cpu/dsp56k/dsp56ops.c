@@ -170,7 +170,7 @@ static void execute_one(void)
 	change_pc(PC) ;
 
 	// Loop processing
-	if (lfBIT)
+	if (LF_bit())
 	{
 		if (PC == LA)
 		{
@@ -189,9 +189,9 @@ static void execute_one(void)
 	}
 
 	// Rep processing
-	if (dsp56k.repFlag)
+	if (core.repFlag)
 	{
-		if (PC == dsp56k.repAddr)
+		if (PC == core.repAddr)
 		{
 			if (LC != 1)
 			{
@@ -848,8 +848,8 @@ static int BitfieldOperation(void)
 	{
 		// bfchg
 		case 0x12:
-			if ((iVal & opVal) == iVal)   SET_cBIT() ;		// test
-			else					    CLEAR_cBIT() ;
+			if ((iVal & opVal) == iVal)   C_bit_set(1);		// test
+			else					      C_bit_set(0) ;
 
 			opVal ^= iVal ;									// and change
 			break ;
@@ -871,8 +871,8 @@ static int BitfieldOperation(void)
 
 		// bftstl
 		case 0x00:
-			if ((iVal & opVal) == 0)   SET_cBIT() ;
-			else				     CLEAR_cBIT() ;
+			if ((iVal & opVal) == 0)   C_bit_set(1);
+			else				       C_bit_set(0);
 			retSize = 2; return retSize;				/* It's just a test - no need to go on */
 			break ;
 	}
@@ -1199,7 +1199,7 @@ static int JmpOperation(void)
 {
 	int retSize = 0 ;
 
-	dsp56k.ppc = PC;
+	core.ppc = PC;
 
 	if (BITS(OP,0x0010))
 	{
@@ -1230,7 +1230,7 @@ static int BsrOperation(void)
 
 	// "The PC Contains the address of the next instruction"
 	PC += 2 ;
-	dsp56k.ppc = PC ;
+	core.ppc = PC ;
 
 	// Push the PC to the stack...
 	SP++ ;					// !!! I'm not so sure about this 'pre-increment'
@@ -1259,7 +1259,7 @@ static int JsrOperation(void)
 
 	// The docs say nothing of this, but I swear it *must* be true
 	PC += 2 ;
-	dsp56k.ppc = PC ;
+	core.ppc = PC ;
 
 	// See bsr operation
 	SP++;
@@ -1297,7 +1297,7 @@ static int BraOperation(void)
 		retSize = 666 ;
 	}
 
-	dsp56k.ppc = PC ;
+	core.ppc = PC ;
 	PC += branchOffset ;
 
 	change_pc(PC) ;
@@ -1353,7 +1353,7 @@ static int DoOperation(void)
 
 
 	// Third instruction cycle
-	SET_lfBIT() ;
+	LF_bit_set(1);
 
 	return retSize ;
 }
@@ -1665,16 +1665,16 @@ static int TstOperation(void **wd, UINT64 *pa)
 	// E - set if signed integer portion is in use
 	// U - set according to the standard definition of the U bit
 	// N - set if bit 39 is set
-	if (*((UINT64*)destinationReg) & (UINT64)U64(0x8000000000)) SET_nBIT();
-	else										   CLEAR_nBIT();
+	if (*((UINT64*)destinationReg) & (UINT64)U64(0x8000000000)) N_bit_set(1);
+	else										                N_bit_set(0);
 
 	// Z - set if == 0
-	if (*((UINT64*)destinationReg) == 0) SET_zBIT();
-	else								 CLEAR_zBIT();
+	if (*((UINT64*)destinationReg) == 0) Z_bit_set(1);
+	else								 Z_bit_set(0);
 
 	// V&C - always cleared
-	CLEAR_vBIT();
-	CLEAR_cBIT();
+	V_bit_set(0);
+	C_bit_set(0);
 
 	*pa = *((UINT64*)destinationReg) ;	// backup the previous value (no change here)
 	*wd = destinationReg;
@@ -1750,9 +1750,9 @@ static int CmpOperation(void **wd, UINT64 *pa)
 	result = *((UINT64*)D) - cmpVal ;
 
 	if (result == 0)
-		SET_zBIT() ;
+		Z_bit_set(1) ;
 	else
-		CLEAR_zBIT() ;
+		Z_bit_set(0) ;
 
     *wd = D ;
 	return retSize ;
@@ -1778,7 +1778,7 @@ static int BsccOperation(void)
 
 			// "The PC Contains the address of the next instruction"
 			PC += 2 ;
-			dsp56k.ppc = PC ;
+			core.ppc = PC ;
 
 			SP++ ;
 			SSH = PC ;
@@ -1823,7 +1823,7 @@ static int BccOperation(void)
 
 				// The PC contains the address of the next instruction
 				PC += 2 ;
-    			dsp56k.ppc = PC ;
+    			core.ppc = PC ;
 				PC += op2 ;
 
 				change_pc(PC) ;
@@ -1851,7 +1851,7 @@ static int BccOperation(void)
 			INT16 offset = (INT16)AssembleAddressFrom6BitSignedRelativeShortAddress(BITS(OP,0x003f)) ;
 
 			PC += 1 ;
-			dsp56k.ppc = PC ;
+			core.ppc = PC ;
 			PC += offset ;
 
 			change_pc(PC) ;
@@ -1881,12 +1881,12 @@ static int Tst2Operation(void)
 
 	// zero
 	if ( (*((UINT16*)destinationReg)) == 0)
-		SET_zBIT() ;
+		Z_bit_set(1);
 	else
-		CLEAR_zBIT() ;
+		Z_bit_set(0);
 
 	// always clear C flag
-	CLEAR_cBIT() ;
+	C_bit_set(0) ;
 
 	return retSize ;
 }
@@ -1949,8 +1949,8 @@ static int RepOperation(void)
 	TEMP = LC ;
 	LC = count ;
 
-	dsp56k.repFlag = 1 ;
-	dsp56k.repAddr = PC + (retSize<<1) ;
+	core.repFlag = 1 ;
+	core.repAddr = PC + (retSize<<1) ;
 
 	return retSize ;
 }
@@ -1959,8 +1959,8 @@ static void EndOfRepProcessing(void)
 {
 	LC = TEMP ;
 
-	dsp56k.repFlag = 0 ;
-	dsp56k.repAddr = 0x0000 ;
+	core.repFlag = 0 ;
+	core.repAddr = 0x0000 ;
 }
 
 
@@ -2230,22 +2230,22 @@ static int DecodeccccTable(UINT16 cccc)
 	switch (cccc)
 	{
 		// Arranged according to mnemonic table - not decoding table...
-		case 0x0: if( cBIT == 0)                        retVal = 1 ; break ; // cc(hs)
-		case 0x8: if( cBIT == 1)                        retVal = 1 ; break ; // cs(lo)
-		case 0x5: if( eBIT == 0)                        retVal = 1 ; break ; // ec
-		case 0xa: if( zBIT == 1)                        retVal = 1 ; break ; // eq
-		case 0xd: if( eBIT == 1)                        retVal = 1 ; break ; // es
-		case 0x1: if((nBIT ^ vBIT) == 0)                retVal = 1 ; break ; // ge
-		case 0x7: if((zBIT + (nBIT ^ vBIT)) == 0)       retVal = 1 ; break ; // gt
-		case 0x6: if( lBIT == 0)                        retVal = 1 ; break ; // lc
-		case 0xf: if((zBIT + (nBIT ^ vBIT)) == 1)       retVal = 1 ; break ; // le
-		case 0xe: if( lBIT == 1)                        retVal = 1 ; break ; // ls
-		case 0x9: if((nBIT ^ vBIT) == 1)                retVal = 1 ; break ; // lt
-		case 0xb: if( nBIT == 1)                        retVal = 1 ; break ; // mi
-		case 0x2: if( zBIT == 0)                        retVal = 1 ; break ; // ne
-		case 0xc: if((zBIT + ((!uBIT) & (!eBIT))) == 1) retVal = 1 ; break ; // nr
-		case 0x3: if( nBIT == 0)                        retVal = 1 ; break ; // pl
-		case 0x4: if((zBIT + ((!uBIT) & (!eBIT))) == 0) retVal = 1 ; break ; // nn
+		case 0x0: if( C_bit() == 0)                              retVal = 1 ; break ; // cc(hs)
+		case 0x8: if( C_bit() == 1)                              retVal = 1 ; break ; // cs(lo)
+		case 0x5: if( E_bit() == 0)                              retVal = 1 ; break ; // ec
+		case 0xa: if( Z_bit() == 1)                              retVal = 1 ; break ; // eq
+		case 0xd: if( E_bit() == 1)                              retVal = 1 ; break ; // es
+		case 0x1: if((N_bit() ^ V_bit()) == 0)                   retVal = 1 ; break ; // ge
+		case 0x7: if((Z_bit() + (N_bit() ^ V_bit())) == 0)       retVal = 1 ; break ; // gt
+		case 0x6: if( L_bit() == 0)                              retVal = 1 ; break ; // lc
+		case 0xf: if((Z_bit() + (N_bit() ^ V_bit())) == 1)       retVal = 1 ; break ; // le
+		case 0xe: if( L_bit() == 1)                              retVal = 1 ; break ; // ls
+		case 0x9: if((N_bit() ^ V_bit()) == 1)                   retVal = 1 ; break ; // lt
+		case 0xb: if( N_bit() == 1)                              retVal = 1 ; break ; // mi
+		case 0x2: if( Z_bit() == 0)                              retVal = 1 ; break ; // ne
+		case 0xc: if((Z_bit() + ((!U_bit()) & (!E_bit()))) == 1) retVal = 1 ; break ; // nr
+		case 0x3: if( N_bit() == 0)                              retVal = 1 ; break ; // pl
+		case 0x4: if((Z_bit() + ((!U_bit()) & (!E_bit()))) == 0) retVal = 1 ; break ; // nn
 	}
 
 	return retVal ;
