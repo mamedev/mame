@@ -1509,10 +1509,19 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case  9: 	// MOVWI
 			scratch = (desc->pc + 2) + ((opcode & 0xff) * 2) + 2;
-			UML_MOV(block, IREG(0), IMM(scratch));			// mov r0, scratch
-			SETEA(0);						// set ea for debug
-			UML_CALLH(block, sh2->read16);				// read16(r0, r1)
-			UML_SEXT(block, R32(Rn), IREG(0), WORD);      		// sext Rn, r0, WORD
+
+			if (sh2->drcoptions & SH2DRC_STRICT_PCREL)
+			{
+				UML_MOV(block, IREG(0), IMM(scratch));			// mov r0, scratch
+				SETEA(0);						// set ea for debug
+				UML_CALLH(block, sh2->read16);				// read16(r0, r1)
+				UML_SEXT(block, R32(Rn), IREG(0), WORD);      		// sext Rn, r0, WORD
+			}
+			else
+			{
+				scratch2 = (UINT32)(INT32)(INT16) RW(scratch);
+				UML_MOV(block, R32(Rn), IMM(scratch2));			// mov Rn, scratch2
+			}
 
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 2), TRUE);
@@ -1550,9 +1559,18 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case 13: 	// MOVLI
 			scratch = ((desc->pc + 4) & ~3) + ((opcode & 0xff) * 4);
-			UML_MOV(block, IREG(0), IMM(scratch));			// mov r0, scratch
-			UML_CALLH(block, sh2->read32);				// read32(r0, r1)
-			UML_MOV(block, R32(Rn), IREG(0));			// mov Rn, r0
+
+			if (sh2->drcoptions & SH2DRC_STRICT_PCREL)
+			{
+				UML_MOV(block, IREG(0), IMM(scratch));			// mov r0, scratch
+				UML_CALLH(block, sh2->read32);				// read32(r0, r1)
+				UML_MOV(block, R32(Rn), IREG(0));			// mov Rn, r0
+			}
+			else
+			{
+				scratch2 = RL(scratch);
+				UML_MOV(block, R32(Rn), IMM(scratch2));			// mov Rn, scratch2
+			}
 
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 2), TRUE);
