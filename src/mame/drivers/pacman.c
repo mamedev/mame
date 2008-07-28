@@ -781,7 +781,10 @@ static READ8_HANDLER( pacman_read_nop )
 	// until it hits a 0 for a delimiter, including empty areas.  It writes to "random"
 	// addresses each time. This causes the maze to invert sometimes.  See code at $95c3 where
 	// level($4e13)=134. DW
-	return 0xff;
+	// tests on exactly what determines the value returned have thus far proved inconclusive
+	//return 0xff;
+	return 0xbf;
+
 }
 
 
