@@ -434,11 +434,11 @@ static WRITE8_HANDLER( cvs_tms5110_pdc_w )
 
 static int speech_rom_read_bit(void)
 {
-	UINT8 *ROM = memory_region(Machine, RGNCLASS_SOUND, "speech");
+	UINT8 *ROM = memory_region(Machine, RGNCLASS_SOUND, "speechdata");
     int bit;
 
 	/* before reading the bit, clamp the address to the region length */
-	speech_rom_bit_address = speech_rom_bit_address & ((memory_region_length(Machine, RGNCLASS_SOUND, "speech") * 8) - 1);
+	speech_rom_bit_address = speech_rom_bit_address & ((memory_region_length(Machine, RGNCLASS_SOUND, "speechdata") * 8) - 1);
 	bit = (ROM[speech_rom_bit_address >> 3] >> (speech_rom_bit_address & 0x07)) & 0x01;
 
 	/* prepare for next bit */
@@ -1071,7 +1071,7 @@ MACHINE_DRIVER_END
 	ROM_LOAD( "82s123.10k", 0x0800, 0x0020, CRC(b5221cec) SHA1(71d9830b33b1a8140b0fe1a2ba8024ba8e6e48e0) )	\
 
 #define CVS_ROM_REGION_SPEECH_DATA(name, len, hash)	\
-	ROM_REGION( 0x1000, RGNCLASS_SOUND, "speech", 0 )	\
+	ROM_REGION( 0x1000, RGNCLASS_SOUND, "speechdata", 0 )	\
 	ROM_LOAD( name, 0x0000, len, hash )
 
 #define ROM_LOAD_STAGGERED(name, offs, hash)		\

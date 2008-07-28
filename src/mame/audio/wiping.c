@@ -182,7 +182,7 @@ void *wiping_sh_start(int clock, const struct CustomSound_interface *config)
 	last_channel = channel_list + num_voices;
 
 	sound_rom = memory_region(Machine, RGNCLASS_SOUND, "samples");
-	sound_prom = memory_region(Machine, RGNCLASS_SOUND, "proms");
+	sound_prom = memory_region(Machine, RGNCLASS_SOUND, "soundproms");
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	sound_enable = 1;

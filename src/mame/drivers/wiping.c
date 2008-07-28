@@ -359,7 +359,7 @@ ROM_START( wiping )
 	ROM_LOAD( "rugr5c8",	  0x0000, 0x2000, CRC(67bafbbf) SHA1(2085492b58ce44f61a42320c54595b79fdf7a91c) )
 	ROM_LOAD( "rugr6c9",	  0x2000, 0x2000, CRC(cac84a87) SHA1(90f6c514d0cdbeb4c8c979597db79ebcdf443df4) )
 
-	ROM_REGION( 0x0200, RGNCLASS_SOUND, "proms", 0 )	/* 4bit->8bit sample expansion PROMs */
+	ROM_REGION( 0x0200, RGNCLASS_SOUND, "soundproms", 0 )	/* 4bit->8bit sample expansion PROMs */
 	ROM_LOAD( "wip-e8.bin",   0x0000, 0x0100, CRC(bd2c080b) SHA1(9782bb5001e96db56bc29df398187f700bce4f8e) )	/* low 4 bits */
 	ROM_LOAD( "wip-e9.bin",   0x0100, 0x0100, CRC(4017a2a6) SHA1(dadef2de7a1119758c8e6d397aa42815b0218889) )	/* high 4 bits */
 ROM_END
@@ -388,7 +388,7 @@ ROM_START( rugrats )
 	ROM_LOAD( "rugr5c8",	  0x0000, 0x2000, CRC(67bafbbf) SHA1(2085492b58ce44f61a42320c54595b79fdf7a91c) )
 	ROM_LOAD( "rugr6c9",	  0x2000, 0x2000, CRC(cac84a87) SHA1(90f6c514d0cdbeb4c8c979597db79ebcdf443df4) )
 
-	ROM_REGION( 0x0200, RGNCLASS_SOUND, "proms", 0 )	/* 4bit->8bit sample expansion PROMs */
+	ROM_REGION( 0x0200, RGNCLASS_SOUND, "soundproms", 0 )	/* 4bit->8bit sample expansion PROMs */
 	ROM_LOAD( "wip-e8.bin",   0x0000, 0x0100, CRC(bd2c080b) SHA1(9782bb5001e96db56bc29df398187f700bce4f8e) )	/* low 4 bits */
 	ROM_LOAD( "wip-e9.bin",   0x0100, 0x0100, CRC(4017a2a6) SHA1(dadef2de7a1119758c8e6d397aa42815b0218889) )	/* high 4 bits */
 ROM_END

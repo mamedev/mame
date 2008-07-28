@@ -248,7 +248,7 @@ MACHINE_DRIVER_START( williams_adpcm_sound )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("adpcm", OKIM6295, ADPCM_MASTER_CLOCK/8)
+	MDRV_SOUND_ADD("oki", OKIM6295, ADPCM_MASTER_CLOCK/8)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -354,7 +354,7 @@ void williams_adpcm_init(void)
 
 	/* expand ADPCM data */
 	/* it is assumed that U12 is loaded @ 0x00000 and U13 is loaded @ 0x40000 */
-	ROM = memory_region(Machine, RGNCLASS_SOUND, "adpcm");
+	ROM = memory_region(Machine, RGNCLASS_SOUND, "oki");
 	memcpy(ROM + 0x1c0000, ROM + 0x080000, 0x20000);	/* expand individual banks */
 	memcpy(ROM + 0x180000, ROM + 0x0a0000, 0x20000);
 	memcpy(ROM + 0x140000, ROM + 0x0c0000, 0x20000);

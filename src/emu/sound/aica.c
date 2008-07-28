@@ -440,7 +440,7 @@ static void InitADPCM(int *PrevSignal, int *PrevQuant)
 	*PrevQuant=0x7f;
 }
 
-signed short DecodeADPCM(int *PrevSignal, unsigned char Delta, int *PrevQuant)
+INLINE signed short DecodeADPCM(int *PrevSignal, unsigned char Delta, int *PrevQuant)
 {
 	int x = *PrevQuant * quant_mul [Delta & 15];
         x = *PrevSignal + ((int)(x + ((UINT32)x >> 29)) >> 3);
