@@ -1055,9 +1055,8 @@ static void dinput_init(running_machine *machine)
 	int didevtype_mouse = DI8DEVCLASS_POINTER;
 	int didevtype_joystick = DI8DEVCLASS_GAMECTRL;
 
-	// first attempt to initialize DirectInput at the current version
 	dinput_version = DIRECTINPUT_VERSION;
-	result = DirectInput8Create(GetModuleHandle(NULL), dinput_version, &IID_IDirectInput8, &dinput, NULL);
+	result = DirectInput8Create(GetModuleHandle(NULL), dinput_version, &IID_IDirectInput8, (void *)&dinput, NULL);
 	if (result != DI_OK)
 	{
 		dinput_version = 0;
