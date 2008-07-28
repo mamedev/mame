@@ -244,7 +244,7 @@ static const gfx_layout tile_layout =
 };
 
 static GFXDECODE_START( portrait )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, tile_layout, 0, 0x100 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, tile_layout, 0, 0x100 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( portrait )
@@ -281,17 +281,17 @@ MACHINE_DRIVER_END
 
 
 ROM_START( portrait )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for the cpu */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )     /* 64k for the cpu */
 	ROM_LOAD( "prt-p0.bin",  0x0000, 0x2000, CRC(a21874fa) SHA1(3db863f465a35d7d14dd71b47aa7dfe7b39fccf0) )
 	ROM_LOAD( "prt-p1.bin",  0x2000, 0x2000, CRC(4d4d7793) SHA1(f828950ebbf285fc92c65f24421a20ceacef1cb9) )
 	ROM_LOAD( "prt-p2.bin",  0x4000, 0x2000, CRC(83d88c9c) SHA1(c876f72b66537a49620fa27a5cb8a4aecd378f0a) )
 	ROM_LOAD( "prt-p3.bin",  0x6000, 0x2000, CRC(bd32d007) SHA1(cdf814b00c22f9a4503fa54d43fb5781251b67a7) )
 
-	ROM_REGION( 0x1000, REGION_CPU2, 0 )
+	ROM_REGION( 0x1000, RGNCLASS_CPU, "audio", 0 )
 	ROM_LOAD( "port_w.bin",  0x0000, 0x0800, CRC(d3a4e950) SHA1(0a399d43c7690d568874f3b1d55135f803fc223f) )
 	ROM_LOAD( "port_ma.bin", 0x0800, 0x0800, CRC(ee242e4f) SHA1(fb67e0d136927e04f4fa819f684c97b0d52ee48c) )
 
-	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_INVERT )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT )
 	ROM_LOAD( "port_00.a1", 0x00000, 0x2000, CRC(eb3e1c12) SHA1(2d38b66f52546b40553244c8a5c961279559f5b6) )	/*bit plane 1*/
 	ROM_LOAD( "port_10.b1", 0x02000, 0x2000, CRC(0f44e377) SHA1(1955f9f4deab2166f637f43c1f326bd65fc90f6a) )	/*bit plane 1*/
 	ROM_LOAD( "port_02.d1", 0x04000, 0x2000, CRC(bd93a3f9) SHA1(9cb479b8840cafd6043ff0cb9d5ca031dcd332ba) )	/*bit plane 2*/
@@ -306,10 +306,10 @@ ROM_START( portrait )
 	ROM_LOAD( "port_05.g2", 0x18000, 0x2000, CRC(43ea7951) SHA1(df0ae7fa802365979514063e1d67cdd45ecada90) )	/*bit plane 3*/
 	ROM_LOAD( "port_15.h2", 0x1a000, 0x2000, CRC(ab20b438) SHA1(ea5d60f6a9f06397bd0c6ee028b463c684090c01) )	/*bit plane 3*/
 
-	ROM_REGION( 0x0800, REGION_USER1, 0 ) // sound related?
+	ROM_REGION( 0x0800, RGNCLASS_USER, "user1", 0 ) // sound related?
 	ROM_LOAD( "port_sa.bin", 0x0000, 0x0800, CRC(50510897) SHA1(8af0f42699602a5b33500968c958e3784e03377f) )
 
-	ROM_REGION( 0x840, REGION_PROMS, 0 )
+	ROM_REGION( 0x840, RGNCLASS_PROMS, "proms", 0 )
 	/* color prom? */
 	ROM_LOAD( "93z511.bin",   0x0000, 0x0800, CRC(d66d9036) SHA1(7a25efbd8f2f94a01aad9e2be9cb18da7b9ec1d1) )
 	ROM_LOAD( "port_pr1.bin", 0x0800, 0x0020, CRC(1e2deabb) SHA1(8357e53dba26bca9bc5d7a25c715836f0b3700b9) )
@@ -317,17 +317,17 @@ ROM_START( portrait )
 ROM_END
 
 ROM_START( portrata )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for the cpu */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )     /* 64k for the cpu */
 	ROM_LOAD( "portp0f.m1",   0x0000, 0x2000, CRC(333eace3) SHA1(8f02df09d8b50d7e37d5abf7d539624c59a7201e) )
 	ROM_LOAD( "portp0f.p1",   0x2000, 0x2000, CRC(fe258052) SHA1(f453eb05c68d61dfd644688732ff5c07366c68c0) )
 	ROM_LOAD( "portp2f.r1",   0x4000, 0x2000, CRC(bc0104d5) SHA1(7707b85cde2dc9bd95391d4e1dbed219c52618cd) )
 	ROM_LOAD( "portp3f.s1",   0x6000, 0x2000, CRC(3f5a3bdf) SHA1(cc4b5d24d0df0962b0cfd4d5c66baac5e4718237) )
 
-	ROM_REGION( 0x1000, REGION_CPU2, 0 )
+	ROM_REGION( 0x1000, RGNCLASS_CPU, "audio", 0 )
 	ROM_LOAD( "port_w.bin",  0x0000, 0x0800, CRC(d3a4e950) SHA1(0a399d43c7690d568874f3b1d55135f803fc223f) )
 	ROM_LOAD( "port_ma.bin", 0x0800, 0x0800, CRC(ee242e4f) SHA1(fb67e0d136927e04f4fa819f684c97b0d52ee48c) )
 
-	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_INVERT )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT )
 	ROM_LOAD( "port_00.a1", 0x00000, 0x2000, CRC(eb3e1c12) SHA1(2d38b66f52546b40553244c8a5c961279559f5b6) )	/*bit plane 1*/
 	ROM_LOAD( "port_10.b1", 0x02000, 0x2000, CRC(0f44e377) SHA1(1955f9f4deab2166f637f43c1f326bd65fc90f6a) )	/*bit plane 1*/
 	ROM_LOAD( "port_02.d1", 0x04000, 0x2000, CRC(bd93a3f9) SHA1(9cb479b8840cafd6043ff0cb9d5ca031dcd332ba) )	/*bit plane 2*/
@@ -342,10 +342,10 @@ ROM_START( portrata )
 	ROM_LOAD( "port_05.g2", 0x18000, 0x2000, CRC(43ea7951) SHA1(df0ae7fa802365979514063e1d67cdd45ecada90) )	/*bit plane 3*/
 	ROM_LOAD( "port_15.h2", 0x1a000, 0x2000, CRC(ab20b438) SHA1(ea5d60f6a9f06397bd0c6ee028b463c684090c01) )	/*bit plane 3*/
 
-	ROM_REGION( 0x0800, REGION_USER1, 0 ) // sound related?
+	ROM_REGION( 0x0800, RGNCLASS_USER, "user1", 0 ) // sound related?
 	ROM_LOAD( "port_sa.bin", 0x0000, 0x0800, CRC(50510897) SHA1(8af0f42699602a5b33500968c958e3784e03377f) )
 
-	ROM_REGION( 0x840, REGION_PROMS, 0 )
+	ROM_REGION( 0x840, RGNCLASS_PROMS, "proms", 0 )
 	/* color prom? */
 	ROM_LOAD( "93z511.bin",   0x0000, 0x0800, CRC(d66d9036) SHA1(7a25efbd8f2f94a01aad9e2be9cb18da7b9ec1d1) )
 	ROM_LOAD( "port_pr1.bin", 0x0800, 0x0020, CRC(1e2deabb) SHA1(8357e53dba26bca9bc5d7a25c715836f0b3700b9) )

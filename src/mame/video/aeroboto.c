@@ -53,8 +53,8 @@ VIDEO_START( aeroboto )
 		UINT8 *rom, *temp;
 		int i, length;
 
-		rom = memory_region(machine, REGION_GFX2);
-		length = memory_region_length(machine, REGION_GFX2);
+		rom = memory_region(machine, RGNCLASS_GFX, "gfx2");
+		length = memory_region_length(machine, RGNCLASS_GFX, "gfx2");
 		temp = malloc_or_die(length);
 		memcpy(temp, rom, length);
 
@@ -170,7 +170,7 @@ VIDEO_UPDATE( aeroboto )
 		oy = *aeroboto_stary;
 		y = sy / SCROLL_SPEED;
 
-		src_base = memory_region(screen->machine, REGION_GFX2);
+		src_base = memory_region(screen->machine, RGNCLASS_GFX, "gfx2");
 
 		for (i=0; i<256; i++)
 		{

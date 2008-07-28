@@ -652,7 +652,7 @@ static VIDEO_UPDATE( ss23 )
 #if 0
 	static int bNew = 1;
 	static int code = 0x80;
-	const UINT32 *pSource = (UINT32 *)memory_region(machine, REGION_GFX4);
+	const UINT32 *pSource = (UINT32 *)memory_region(machine, RGNCLASS_GFX, "pointrom");
 
 	pSource = pSource + pSource[code];
 
@@ -808,8 +808,8 @@ static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x06820008, 0x0682000f) AM_READ( ss23_vstat_r )	// vblank status?
 	AM_RANGE(0x08000000, 0x08017fff) AM_RAM
 	AM_RANGE(0x0d000000, 0x0d000007) AM_READ(sysctl_stat_r)
-	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION(REGION_USER1, 0)
-	AM_RANGE(0x1fc00000, 0x1fffffff) AM_WRITENOP AM_ROM AM_REGION(REGION_USER1, 0)
+	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0)
+	AM_RANGE(0x1fc00000, 0x1fffffff) AM_WRITENOP AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0)
 ADDRESS_MAP_END
 
 static WRITE16_HANDLER( sharedram_sub_w )
@@ -1006,7 +1006,7 @@ static const gfx_layout sprite_layout =
 #endif
 
 static GFXDECODE_START( namcos23 )
-	GFXDECODE_ENTRY( 0, 0, namcos23_cg_layout,  0, 0x80 )
+	GFXDECODE_ENTRY( NULL, 0, namcos23_cg_layout,  0, 0x80 )
 GFXDECODE_END
 
 static const mips3_config config =
@@ -1018,11 +1018,6 @@ static const mips3_config config =
 static INTERRUPT_GEN( namcos23_interrupt )
 {
 }
-
-static const struct C352interface c352_interface =
-{
-	REGION_SOUND1
-};
 
 static MACHINE_DRIVER_START( s23 )
 
@@ -1054,8 +1049,7 @@ static MACHINE_DRIVER_START( s23 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("namco", C352, 14745600)
-	MDRV_SOUND_CONFIG(c352_interface)
+	MDRV_SOUND_ADD("c352", C352, 14745600)
 	MDRV_SOUND_ROUTE(0, "right", 1.00)
 	MDRV_SOUND_ROUTE(1, "left", 1.00)
 	MDRV_SOUND_ROUTE(2, "right", 1.00)
@@ -1094,7 +1088,6 @@ static MACHINE_DRIVER_START( ss23 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("namco", C352, 14745600)
-	MDRV_SOUND_CONFIG(c352_interface)
 	MDRV_SOUND_ROUTE(0, "right", 1.00)
 	MDRV_SOUND_ROUTE(1, "left", 1.00)
 	MDRV_SOUND_ROUTE(2, "right", 1.00)
@@ -1102,30 +1095,30 @@ static MACHINE_DRIVER_START( ss23 )
 MACHINE_DRIVER_END
 
 ROM_START( timecrs2 )
-	ROM_REGION32_BE( 0x400000, REGION_USER1, 0 ) /* 4 megs for main R4650 code */
+	ROM_REGION32_BE( 0x400000, RGNCLASS_USER, "user1", 0 ) /* 4 megs for main R4650 code */
         ROM_LOAD16_BYTE( "tss3verb.2",   0x000000, 0x200000, CRC(c7be691f) SHA1(5e2e7a0db3d8ce6dfeb6c0d99e9fe6a9f9cab467) )
         ROM_LOAD16_BYTE( "tss3verb.1",   0x000001, 0x200000, CRC(6e3f232b) SHA1(8007d8f31a605a5df89938d7c9f9d3d209c934be) )
 
-	ROM_REGION( 0x80000, REGION_CPU2, 0 )	/* Hitachi H8/3002 MCU code */
+	ROM_REGION( 0x80000, RGNCLASS_CPU, "audio", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "tss3verb.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) )
 
-	ROM_REGION( 0x2000000, REGION_GFX1, 0 )	/* sprite? tilemap? tiles */
+	ROM_REGION( 0x2000000, RGNCLASS_GFX, "sprite", 0 )	/* sprite? tilemap? tiles */
         ROM_LOAD16_BYTE( "tss1mtal.2h",  0x0000000, 0x800000, CRC(bfc79190) SHA1(04bda00c4cc5660d27af4f3b0ee3550dea8d3805) )
         ROM_LOAD16_BYTE( "tss1mtah.2j",  0x0000001, 0x800000, CRC(697c26ed) SHA1(72f6f69e89496ba0c6183b35c3bde71f5a3c721f) )
         ROM_LOAD16_BYTE( "tss1mtbl.2f",  0x1000000, 0x800000, CRC(e648bea4) SHA1(3803d03e72b25fbcc124d5b25066d25629b76b94) )
         ROM_LOAD16_BYTE( "tss1mtbh.2m",  0x1000001, 0x800000, CRC(82582776) SHA1(7c790d09bac660ea1c62da3ffb21ab43f2461594) )
 
-	ROM_REGION( 0x2000000, REGION_GFX2, 0 )	/* texture tiles */
+	ROM_REGION( 0x2000000, RGNCLASS_GFX, "textile", 0 )	/* texture tiles */
         ROM_LOAD( "tss1cguu.4f",  0x0000000, 0x800000, CRC(76924e04) SHA1(751065d6ce658cbbcd88f854f6937ebd2204ec68) )
         ROM_LOAD( "tss1cgum.4j",  0x0800000, 0x800000, CRC(c22739e1) SHA1(8671ee047bb248033656c50befd1c35e5e478e1a) )
         ROM_LOAD( "tss1cgll.4m",  0x1000000, 0x800000, CRC(18433aaa) SHA1(08539beb2e66ec4e41062621fc098b121c669546) )
         ROM_LOAD( "tss1cglm.4k",  0x1800000, 0x800000, CRC(669974c2) SHA1(cfebe199631e38f547b38fcd35f1645b74e8dd0a) )
 
-	ROM_REGION( 0x600000, REGION_GFX3, 0 )	/* texture tilemap */
+	ROM_REGION( 0x600000, RGNCLASS_GFX, "textilemap", 0 )	/* texture tilemap */
         ROM_LOAD( "tss1ccrl.7f",  0x000000, 0x400000, CRC(3a325fe7) SHA1(882735dce7aeb36f9e88a983498360f5de901e9d) )
         ROM_LOAD( "tss1ccrh.7e",  0x400000, 0x200000, CRC(f998de1a) SHA1(371f540f505608297c5ffcfb623b983ca8310afb) )
 
-	ROM_REGION32_LE( 0x2000000, REGION_GFX4, 0 )	/* 3D model data */
+	ROM_REGION32_LE( 0x2000000, RGNCLASS_GFX, "pointrom", 0 )	/* 3D model data */
         ROM_LOAD32_WORD( "tss1pt0l.7c",  0x0000000, 0x400000, CRC(896f0fb4) SHA1(bdfa99eb21ce4fc8021f9d95a5558a34f9942c57) )
         ROM_LOAD32_WORD( "tss1pt0h.7a",  0x0000002, 0x400000, CRC(cdbe0ba8) SHA1(f8c6da31654c0a2a8024888ffb7fc1c783b2d629) )
         ROM_LOAD32_WORD( "tss1pt1l.5c",  0x0800000, 0x400000, CRC(5a09921f) SHA1(c23885708c7adf0b81c2c9346e21b869634a5b35) )
@@ -1133,21 +1126,21 @@ ROM_START( timecrs2 )
         ROM_LOAD32_WORD( "tss1pt2l.4c",  0x1000000, 0x400000, CRC(4b230d79) SHA1(794cee0a19993e90913f58507c53224f361e9663) )
         ROM_LOAD32_WORD( "tss1pt2h.4a",  0x1000002, 0x400000, CRC(9b06e22d) SHA1(cff5ed098112a4f0a2bc8937e226f50066e605b1) )
 
-	ROM_REGION( 0x1000000, REGION_SOUND1, 0 ) /* C352 PCM samples */
+	ROM_REGION( 0x1000000, RGNCLASS_SOUND, "c352", 0 ) /* C352 PCM samples */
         ROM_LOAD( "tss1wavel.2c", 0x000000, 0x800000, CRC(deaead26) SHA1(72dac0c3f41d4c3c290f9eb1b50236ae3040a472) )
         ROM_LOAD( "tss1waveh.2a", 0x800000, 0x800000, CRC(5c8758b4) SHA1(b85c8f6869900224ef83a2340b17f5bbb2801af9) )
 ROM_END
 
 ROM_START( gp500 )
 	/* r4650-generic-xrom-generic: NMON 1.0.8-sys23-19990105 P for SYSTEM23 P1 */
-	ROM_REGION32_BE( 0x400000, REGION_USER1, 0 ) /* 4 megs for main R4650 code */
+	ROM_REGION32_BE( 0x400000, RGNCLASS_USER, "user1", 0 ) /* 4 megs for main R4650 code */
         ROM_LOAD16_BYTE( "5gp3verc.2",   0x000000, 0x200000, CRC(e2d43468) SHA1(5e861dd223c7fa177febed9803ac353cba18e19d) )
         ROM_LOAD16_BYTE( "5gp3verc.1",   0x000001, 0x200000, CRC(f6efc94a) SHA1(785eee2bec5080d4e8ef836f28d446328c942b0e) )
 
-	ROM_REGION( 0x80000, REGION_CPU2, 0 )	/* Hitachi H8/3002 MCU code */
+	ROM_REGION( 0x80000, RGNCLASS_CPU, "audio", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "5gp3verc.3",   0x000000, 0x080000, CRC(b323abdf) SHA1(8962e39b48a7074a2d492afb5db3f5f3e5ae2389) )
 
-	ROM_REGION( 0x2000000, REGION_GFX1, 0 )	/* sprite? tilemap? tiles */
+	ROM_REGION( 0x2000000, RGNCLASS_GFX, "sprite", 0 )	/* sprite? tilemap? tiles */
 		ROM_LOAD16_BYTE( "5gp1mtal.2h",  0x0000000, 0x800000, CRC(1bb00c7b) SHA1(922be45d57330c31853b2dc1642c589952b09188) )
         ROM_LOAD16_BYTE( "5gp1mtah.2j",  0x0000001, 0x800000, CRC(246e4b7a) SHA1(75743294b8f48bffb84f062febfbc02230d49ce9) )
 
@@ -1157,17 +1150,17 @@ ROM_START( gp500 )
         ROM_LOAD16_BYTE( "5gp1mtbl.2f",  0x1000000, 0x800000, CRC(66640606) SHA1(c69a0219748241c49315d7464f8156f8068e9cf5) )
         ROM_LOAD16_BYTE( "5gp1mtbh.2m",  0x1000001, 0x800000, CRC(352360e8) SHA1(d621dfac3385059c52d215f6623901589a8658a3) )
 
-	ROM_REGION( 0x2000000, REGION_GFX2, 0 )	/* texture tiles */
+	ROM_REGION( 0x2000000, RGNCLASS_GFX, "textile", 0 )	/* texture tiles */
         ROM_LOAD( "5gp1cguu.4f",  0x0000000, 0x800000, CRC(c411163b) SHA1(ae644d62357b8b806b160774043e41908fba5d05) )
         ROM_LOAD( "5gp1cgum.4j",  0x0800000, 0x800000, CRC(0265b701) SHA1(497a4c33311d3bb315100a78400cf2fa726f1483) )
         ROM_LOAD( "5gp1cgll.4m",  0x1000000, 0x800000, CRC(0cc5bf35) SHA1(b75510a94fa6b6d2ed43566e6e84c7ae62f68194) )
         ROM_LOAD( "5gp1cglm.4k",  0x1800000, 0x800000, CRC(31557d48) SHA1(b85c3db20b101ba6bdd77487af67c3324bea29d5) )
 
-	ROM_REGION( 0x600000, REGION_GFX3, 0 )	/* texture tilemap */
+	ROM_REGION( 0x600000, RGNCLASS_GFX, "textilemap", 0 )	/* texture tilemap */
         ROM_LOAD( "5gp1ccrl.7f",  0x000000, 0x400000, CRC(e7c77e1f) SHA1(0231ddbe2afb880099dfe2657c41236c74c730bb) )
         ROM_LOAD( "5gp1ccrh.7e",  0x400000, 0x200000, CRC(b2eba764) SHA1(5e09d1171f0afdeb9ed7337df1dbc924f23d3a0b) )
 
-	ROM_REGION32_LE( 0x2000000, REGION_GFX4, 0 )	/* 3D model data */
+	ROM_REGION32_LE( 0x2000000, RGNCLASS_GFX, "pointrom", 0 )	/* 3D model data */
         ROM_LOAD32_WORD( "5gp1pt0l.7c",  0x0000000, 0x400000, CRC(a0ece0a1) SHA1(b7aab2d78e1525f865214c7de387ccd585de5d34) )
         ROM_LOAD32_WORD( "5gp1pt0h.7a",  0x0000002, 0x400000, CRC(5746a8cd) SHA1(e70fc596ab9360f474f716c73d76cb9851370c76) )
         ROM_LOAD32_WORD( "5gp1pt1l.5c",  0x0800000, 0x400000, CRC(80b25ad2) SHA1(e9a03fe5bb4ce925f7218ab426ed2a1ca1a26a62) )
@@ -1177,36 +1170,36 @@ ROM_START( gp500 )
 		ROM_LOAD32_WORD( "5gp1pt3l.3c",  0x1800000, 0x400000, CRC(480b120d) SHA1(6c703550faa412095d9633cf508050614e15fbae) )
         ROM_LOAD32_WORD( "5gp1pt3h.3a",  0x1800002, 0x400000, CRC(26eaa400) SHA1(0157b76fffe81b40eb970e84c98398807ced92c4) )
 
-	ROM_REGION( 0x1000000, REGION_SOUND1, 0 ) /* C352 PCM samples */
+	ROM_REGION( 0x1000000, RGNCLASS_SOUND, "c352", 0 ) /* C352 PCM samples */
         ROM_LOAD( "5gp1wavel.2c", 0x000000, 0x800000, CRC(aa634cc2) SHA1(e96f5c682039bc6ef22bf90e98f4da78486bd2b1) )
         ROM_LOAD( "5gp1waveh.2a", 0x800000, 0x800000, CRC(1e3523e8) SHA1(cb3d0d389fcbfb728fad29cfc36ef654d28d553a) )
 ROM_END
 
 ROM_START( finfurl2 )
-	ROM_REGION32_BE( 0x400000, REGION_USER1, 0 ) /* 4 megs for main R4650 code */
+	ROM_REGION32_BE( 0x400000, RGNCLASS_USER, "user1", 0 ) /* 4 megs for main R4650 code */
         ROM_LOAD16_BYTE( "29f016.ic2",   0x000000, 0x200000, CRC(13cbc545) SHA1(3e67a7bfbb1c1374e8e3996a0c09e4861b0dca14) )
         ROM_LOAD16_BYTE( "29f016.ic1",   0x000001, 0x200000, CRC(5b04e4f2) SHA1(8099fc3deab9ed14a2484a774666fbd928330de8) )
 
-	ROM_REGION( 0x80000, REGION_CPU2, 0 )	/* Hitachi H8/3002 MCU code */
+	ROM_REGION( 0x80000, RGNCLASS_CPU, "audio", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "m29f400.ic3",  0x000000, 0x080000, CRC(9fd69bbd) SHA1(53a9bf505de70495dcccc43fdc722b3381aad97c) )
 
-	ROM_REGION( 0x2000000, REGION_GFX1, 0 )	/* sprite? tilemap? tiles */
+	ROM_REGION( 0x2000000, RGNCLASS_GFX, "sprite", 0 )	/* sprite? tilemap? tiles */
         ROM_LOAD16_BYTE( "ffs1mtal.2h",  0x0000000, 0x800000, CRC(98730ad5) SHA1(9ba276ad88ec8730edbacab80cdacc34a99593e4) )
         ROM_LOAD16_BYTE( "ffs1mtah.2j",  0x0000001, 0x800000, CRC(f336d81d) SHA1(a9177091e1412dea1b6ea6c53530ae31361b32d0) )
         ROM_LOAD16_BYTE( "ffs1mtbl.2f",  0x1000000, 0x800000, CRC(0abc9e50) SHA1(be5e5e2b637811c59804ef9442c6da5a5a1315e2) )
         ROM_LOAD16_BYTE( "ffs1mtbh.2m",  0x1000001, 0x800000, CRC(0f42c93b) SHA1(26b313fc5c33afb0a1ee42243486e38f052c95c2) )
 
-	ROM_REGION( 0x2000000, REGION_GFX2, 0 )	/* texture tiles */
+	ROM_REGION( 0x2000000, RGNCLASS_GFX, "textile", 0 )	/* texture tiles */
         ROM_LOAD( "ffs1cguu.4f",  0x0000000, 0x800000, CRC(52c0a19f) SHA1(e6b4b90ff88da09cb2e653e450e7ae66942a719e) )
         ROM_LOAD( "ffs1cgum.4j",  0x0800000, 0x800000, CRC(77447199) SHA1(1eeae30b3dd1ac467bdbbdfe4be36ca0f0816496) )
         ROM_LOAD( "ffs1cgll.4m",  0x1000000, 0x800000, CRC(171bba76) SHA1(4a63a1f34de8f341a0ef9b499a21e8fec758e1cd) )
         ROM_LOAD( "ffs1cglm.4k",  0x1800000, 0x800000, CRC(48acf207) SHA1(ea902efdd94aba34dadb20762219d2d25441d199) )
 
-	ROM_REGION( 0x400000, REGION_GFX3, 0 )	/* texture tilemap */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "textilemap", 0 )	/* texture tilemap */
         ROM_LOAD( "ffs1ccrl.7f",  0x000000, 0x200000, CRC(ffbcfec1) SHA1(9ab25f1543da4b72784eec93985abaa2e1dafc83) )
         ROM_LOAD( "ffs1ccrh.7e",  0x200000, 0x200000, CRC(8be4aeb4) SHA1(ec344f6fba42092083e737e436451f5d7be12c15) )
 
-	ROM_REGION32_LE( 0x2000000, REGION_GFX4, 0 )	/* 3D model data */
+	ROM_REGION32_LE( 0x2000000, RGNCLASS_GFX, "pointrom", 0 )	/* 3D model data */
         ROM_LOAD32_WORD( "ffs1pt0l.7c",  0x0000000, 0x400000, CRC(383cbfba) SHA1(0784ac2d709bee6653c95f80fedf7f98ca79357f) )
         ROM_LOAD32_WORD( "ffs1pt0h.7a",  0x0000002, 0x400000, CRC(79b9b019) SHA1(ca2bbabd949fec91001a30b63f7343520028cde0) )
         ROM_LOAD32_WORD( "ffs1pt1l.5c",  0x0800000, 0x400000, CRC(ba0fff5b) SHA1(d5a6db4de60657d46228e85ed09ed7f0ecbc7975) )
@@ -1216,36 +1209,36 @@ ROM_START( finfurl2 )
         ROM_LOAD32_WORD( "ffs1pt3l.3c",  0x1800000, 0x400000, CRC(2381611a) SHA1(a3d948bf910dcfd9f47c65c56b9920f58c42fed5) )
         ROM_LOAD32_WORD( "ffs1pt3h.3a",  0x1800002, 0x400000, CRC(48226e9f) SHA1(f099b2929d49903a33b4dab80972c3ce0ddb6ca2) )
 
-	ROM_REGION( 0x1000000, REGION_SOUND1, 0 ) /* C352 PCM samples */
+	ROM_REGION( 0x1000000, RGNCLASS_SOUND, "c352", 0 ) /* C352 PCM samples */
         ROM_LOAD( "ffs1wavel.2c", 0x000000, 0x800000, CRC(67ba16cf) SHA1(00b38617c2185b9a3bf279962ad0c21a7287256f) )
         ROM_LOAD( "ffs1waveh.2a", 0x800000, 0x800000, CRC(178e8bd3) SHA1(8ab1a97003914f70b09e96c5924f3a839fe634c7) )
 ROM_END
 
 ROM_START( finfrl2j )
-	ROM_REGION32_BE( 0x400000, REGION_USER1, 0 ) /* 4 megs for main R4650 code */
+	ROM_REGION32_BE( 0x400000, RGNCLASS_USER, "user1", 0 ) /* 4 megs for main R4650 code */
         ROM_LOAD16_BYTE( "29f016_jap1.ic2", 0x000000, 0x200000, CRC(0215125d) SHA1(a99f601441c152b0b00f4811e5752c71897b1ed4) )
         ROM_LOAD16_BYTE( "29f016_jap1.ic1", 0x000001, 0x200000, CRC(38c9ae96) SHA1(b50afc7276662267ff6460f82d0e5e8b00b341ea) )
 
-	ROM_REGION( 0x80000, REGION_CPU2, 0 )	/* Hitachi H8/3002 MCU code */
+	ROM_REGION( 0x80000, RGNCLASS_CPU, "audio", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "m29f400.ic3",  0x000000, 0x080000, CRC(9fd69bbd) SHA1(53a9bf505de70495dcccc43fdc722b3381aad97c) )
 
-	ROM_REGION( 0x2000000, REGION_GFX1, 0 )	/* sprite? tilemap? tiles */
+	ROM_REGION( 0x2000000, RGNCLASS_GFX, "sprite", 0 )	/* sprite? tilemap? tiles */
         ROM_LOAD16_BYTE( "ffs1mtal.2h",  0x0000000, 0x800000, CRC(98730ad5) SHA1(9ba276ad88ec8730edbacab80cdacc34a99593e4) )
         ROM_LOAD16_BYTE( "ffs1mtah.2j",  0x0000001, 0x800000, CRC(f336d81d) SHA1(a9177091e1412dea1b6ea6c53530ae31361b32d0) )
         ROM_LOAD16_BYTE( "ffs1mtbl.2f",  0x1000000, 0x800000, CRC(0abc9e50) SHA1(be5e5e2b637811c59804ef9442c6da5a5a1315e2) )
         ROM_LOAD16_BYTE( "ffs1mtbh.2m",  0x1000001, 0x800000, CRC(0f42c93b) SHA1(26b313fc5c33afb0a1ee42243486e38f052c95c2) )
 
-	ROM_REGION( 0x2000000, REGION_GFX2, 0 )	/* texture tiles */
+	ROM_REGION( 0x2000000, RGNCLASS_GFX, "textile", 0 )	/* texture tiles */
         ROM_LOAD( "ffs1cguu.4f",  0x0000000, 0x800000, CRC(52c0a19f) SHA1(e6b4b90ff88da09cb2e653e450e7ae66942a719e) )
         ROM_LOAD( "ffs1cgum.4j",  0x0800000, 0x800000, CRC(77447199) SHA1(1eeae30b3dd1ac467bdbbdfe4be36ca0f0816496) )
         ROM_LOAD( "ffs1cgll.4m",  0x1000000, 0x800000, CRC(171bba76) SHA1(4a63a1f34de8f341a0ef9b499a21e8fec758e1cd) )
         ROM_LOAD( "ffs1cglm.4k",  0x1800000, 0x800000, CRC(48acf207) SHA1(ea902efdd94aba34dadb20762219d2d25441d199) )
 
-	ROM_REGION( 0x400000, REGION_GFX3, 0 )	/* texture tilemap */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "textilemap", 0 )	/* texture tilemap */
         ROM_LOAD( "ffs1ccrl.7f",  0x000000, 0x200000, CRC(ffbcfec1) SHA1(9ab25f1543da4b72784eec93985abaa2e1dafc83) )
         ROM_LOAD( "ffs1ccrh.7e",  0x200000, 0x200000, CRC(8be4aeb4) SHA1(ec344f6fba42092083e737e436451f5d7be12c15) )
 
-	ROM_REGION32_LE( 0x2000000, REGION_GFX4, 0 )	/* 3D model data */
+	ROM_REGION32_LE( 0x2000000, RGNCLASS_GFX, "pointrom", 0 )	/* 3D model data */
         ROM_LOAD32_WORD( "ffs1pt0l.7c",  0x0000000, 0x400000, CRC(383cbfba) SHA1(0784ac2d709bee6653c95f80fedf7f98ca79357f) )
         ROM_LOAD32_WORD( "ffs1pt0h.7a",  0x0000002, 0x400000, CRC(79b9b019) SHA1(ca2bbabd949fec91001a30b63f7343520028cde0) )
         ROM_LOAD32_WORD( "ffs1pt1l.5c",  0x0800000, 0x400000, CRC(ba0fff5b) SHA1(d5a6db4de60657d46228e85ed09ed7f0ecbc7975) )
@@ -1255,7 +1248,7 @@ ROM_START( finfrl2j )
         ROM_LOAD32_WORD( "ffs1pt3l.3c",  0x1800000, 0x400000, CRC(2381611a) SHA1(a3d948bf910dcfd9f47c65c56b9920f58c42fed5) )
         ROM_LOAD32_WORD( "ffs1pt3h.3a",  0x1800002, 0x400000, CRC(48226e9f) SHA1(f099b2929d49903a33b4dab80972c3ce0ddb6ca2) )
 
-	ROM_REGION( 0x1000000, REGION_SOUND1, 0 ) /* C352 PCM samples */
+	ROM_REGION( 0x1000000, RGNCLASS_SOUND, "c352", 0 ) /* C352 PCM samples */
         ROM_LOAD( "ffs1wavel.2c", 0x000000, 0x800000, CRC(67ba16cf) SHA1(00b38617c2185b9a3bf279962ad0c21a7287256f) )
         ROM_LOAD( "ffs1waveh.2a", 0x800000, 0x800000, CRC(178e8bd3) SHA1(8ab1a97003914f70b09e96c5924f3a839fe634c7) )
 ROM_END

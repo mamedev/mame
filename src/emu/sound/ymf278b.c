@@ -667,8 +667,9 @@ static void ymf278b_init(YMF278BChip *chip, UINT8 *rom, void (*cb)(running_machi
 	mix = auto_malloc(44100*2*sizeof(*mix));
 }
 
-static void *ymf278b_start(int sndindex, int clock, const void *config)
+static void *ymf278b_start(const char *tag, int sndindex, int clock, const void *config)
 {
+	static const struct YMF278B_interface defintrf = { 0 };
 	const struct YMF278B_interface *intf;
 	int i;
 	YMF278BChip *chip;
@@ -677,9 +678,9 @@ static void *ymf278b_start(int sndindex, int clock, const void *config)
 	memset(chip, 0, sizeof(*chip));
 	chip->index = sndindex;
 
-	intf = config;
+	intf = (config != NULL) ? config : &defintrf;
 
-	ymf278b_init(chip, memory_region(Machine, intf->region), intf->irq_callback, clock);
+	ymf278b_init(chip, memory_region(Machine, RGNCLASS_SOUND, tag), intf->irq_callback, clock);
 	chip->stream = stream_create(0, 2, clock/768, chip, ymf278b_pcm_update);
 
 	// Volume table, 1 = -0.375dB, 8 = -3dB, 256 = -96dB

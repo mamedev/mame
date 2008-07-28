@@ -35,15 +35,15 @@ VIDEO_START( balsente )
 {
 	/* reset the system */
 	palettebank_vis = 0;
-	sprite_bank[0] = memory_region(machine, REGION_GFX1);
-	sprite_bank[1] = memory_region(machine, REGION_GFX1) + 0x10000;
+	sprite_bank[0] = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	sprite_bank[1] = memory_region(machine, RGNCLASS_GFX, "gfx1") + 0x10000;
 
 	/* allocate a local copy of video RAM */
 	local_videoram = auto_malloc(256 * 256);
 
 	/* determine sprite size */
-	sprite_data = memory_region(machine, REGION_GFX1);
-	sprite_mask = memory_region_length(machine, REGION_GFX1) - 1;
+	sprite_data = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	sprite_mask = memory_region_length(machine, RGNCLASS_GFX, "gfx1") - 1;
 
 	/* register for saving */
 	state_save_register_global_pointer(local_videoram, 256 * 256);

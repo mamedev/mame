@@ -95,7 +95,7 @@ VIDEO_START( atarig42 )
 {
 	static const atarirle_desc modesc =
 	{
-		REGION_GFX3,/* region where the GFX data lives */
+		"gfx3",		/* region where the GFX data lives */
 		256,		/* number of entries in sprite RAM */
 		0,			/* left clip coordinate */
 		0,			/* right clip coordinate */

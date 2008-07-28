@@ -456,7 +456,7 @@ static void tape_update(running_machine *machine)
 		else
 		if (tape_byte < TAPE_BLOCK)
 		{
-			UINT8 *ptr = memory_region(machine, REGION_USER2) + tape_block * 256 + tape_byte - TAPE_HEADER;
+			UINT8 *ptr = memory_region(machine, RGNCLASS_USER, "user2") + tape_block * 256 + tape_byte - TAPE_HEADER;
 			rdata = (*ptr >> tape_bit) & 1;
 			if (tape_byte != last_byte)
 				LOG(4,("tape %5.4fs: DATA(%02x) $%02x\n", attotime_to_double(tape_time), tape_byte - TAPE_HEADER, *ptr));
@@ -607,7 +607,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = memory_region(machine, REGION_USER1);
+		UINT8 *prom = memory_region(machine, RGNCLASS_USER, "user1");
 
 		if (firsttime)
 		{
@@ -686,7 +686,7 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = memory_region(machine, REGION_USER1);
+		UINT8 *prom = memory_region(machine, RGNCLASS_USER, "user1");
 
 		if (firsttime)
 		{
@@ -765,7 +765,7 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = memory_region(machine, REGION_USER1);
+		UINT8 *prom = memory_region(machine, RGNCLASS_USER, "user1");
 
 		if (firsttime)
 		{
@@ -844,7 +844,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = memory_region(machine, REGION_USER1);
+		UINT8 *prom = memory_region(machine, RGNCLASS_USER, "user1");
 
 		if (firsttime)
 		{
@@ -925,7 +925,7 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = memory_region(machine, REGION_USER1);
+		UINT8 *prom = memory_region(machine, RGNCLASS_USER, "user1");
 
 		if (firsttime)
 		{
@@ -992,7 +992,7 @@ static READ8_HANDLER( decocass_type2_r )
 	{
 		if (1 == (offset & 1))
 		{
-			UINT8 *prom = memory_region(machine, REGION_USER1);
+			UINT8 *prom = memory_region(machine, RGNCLASS_USER, "user1");
 			data = prom[256 * type2_d2_latch + type2_promaddr];
 			LOG(3,("%9.7f 6502-PC: %04x decocass_type2_r(%02x): $%02x <- prom[%03x]\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, 256 * type2_d2_latch + type2_promaddr));
 		}
@@ -1072,7 +1072,7 @@ static READ8_HANDLER( decocass_type3_r )
 	{
 		if (1 == type3_pal_19)
 		{
-			UINT8 *prom = memory_region(machine, REGION_USER1);
+			UINT8 *prom = memory_region(machine, RGNCLASS_USER, "user1");
 			data = prom[type3_ctrs];
 			LOG(3,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x <- prom[$%03x]\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, type3_ctrs));
 			if (++type3_ctrs == 4096)
@@ -1311,7 +1311,7 @@ static READ8_HANDLER( decocass_type4_r )
 	{
 		if (type4_latch)
 		{
-			UINT8 *prom = memory_region(machine, REGION_USER1);
+			UINT8 *prom = memory_region(machine, RGNCLASS_USER, "user1");
 
 			data = prom[type4_ctrs];
 			LOG(3,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- PROM[%04x]\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.', type4_ctrs));
@@ -1648,7 +1648,7 @@ void decocass_machine_state_save_init(running_machine *machine)
 
 static void decocass_init_common(running_machine *machine)
 {
-	UINT8 *image = memory_region(machine, REGION_USER2);
+	UINT8 *image = memory_region(machine, RGNCLASS_USER, "user2");
 	int i, offs;
 
 	tape_dir = 0;
@@ -1659,7 +1659,7 @@ static void decocass_init_common(running_machine *machine)
 	latch1 = 0;
 	tape_present = 1;
 	tape_blocks = 0;
-	for (i = memory_region_length(machine, REGION_USER2) / 256 - 1; !tape_blocks && i > 0; i--)
+	for (i = memory_region_length(machine, RGNCLASS_USER, "user2") / 256 - 1; !tape_blocks && i > 0; i--)
 		for (offs = 256 * i; !tape_blocks && offs < 256 * i + 256; offs++)
 			if (image[offs])
 				tape_blocks = i+1;
@@ -1954,7 +1954,7 @@ MACHINE_RESET( cflyball )
 
 MACHINE_RESET( czeroize )
 {
-	UINT8 *mem = memory_region(machine, REGION_USER1);
+	UINT8 *mem = memory_region(machine, RGNCLASS_USER, "user1");
 	decocass_init_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	decocass_dongle_r = decocass_type3_r;

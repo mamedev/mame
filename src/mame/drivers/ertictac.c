@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( ertictac_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x033c0018, 0x033c001b) AM_READ(input_port_1_dword_r)
 
 	AM_RANGE(0x03400000, 0x03400003) AM_WRITE(video_fifo_w)
-	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION(REGION_USER1, 0)
+	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ertictac )
@@ -399,7 +399,7 @@ static MACHINE_DRIVER_START( ertictac )
 MACHINE_DRIVER_END
 
 ROM_START( ertictac )
-	ROM_REGION(0x800000, REGION_USER1, 0 )
+	ROM_REGION(0x800000, RGNCLASS_USER, "user1", 0 )
 	ROM_LOAD32_BYTE( "01", 0x00000, 0x10000, CRC(8dce677c) SHA1(9f12b1febe796038caa1ecad1d17864dc546cfd8) )
 	ROM_LOAD32_BYTE( "02", 0x00001, 0x10000, CRC(7c5c916c) SHA1(d4ed5fc3a7b27253551e7d9176ed9e6513092e60) )
 	ROM_LOAD32_BYTE( "03", 0x00002, 0x10000, CRC(edca5ac6) SHA1(f6c4b8030f3c1c93922c5f7232f2159e0471b93a) )
@@ -419,7 +419,7 @@ ROM_START( ertictac )
 ROM_END
 
 ROM_START( poizone )
-	ROM_REGION(0x800000, REGION_USER1, 0 )
+	ROM_REGION(0x800000, RGNCLASS_USER, "user1", 0 )
 	ROM_LOAD32_BYTE( "p_son01.bin", 0x00000, 0x10000, CRC(28793c9f) SHA1(2d9f7d667203e745b47cd2cc97501ae961ae1a66) )
 	ROM_LOAD32_BYTE( "p_son02.bin", 0x00001, 0x10000, CRC(2d4b6f4b) SHA1(8df2680d6e5dc41787b3a72e594f01f5e732d0ec) )
 	ROM_LOAD32_BYTE( "p_son03.bin", 0x00002, 0x10000, CRC(0834d46e) SHA1(bf1cc9b47759ef39ed8fd8f334ed8f2902be3bf8) )
@@ -441,13 +441,13 @@ ROM_END
 
 static DRIVER_INIT( ertictac )
 {
-	((UINT32 *)memory_region(machine, REGION_USER1))[0x55]=0;// patched TSTS r11,r15,lsl #32  @ $3800154
+	((UINT32 *)memory_region(machine, RGNCLASS_USER, "user1"))[0x55]=0;// patched TSTS r11,r15,lsl #32  @ $3800154
 }
 
 
 static DRIVER_INIT( poizone )
 {
-	((UINT32 *)memory_region(machine, REGION_USER1))[0x21C/4]=0;// patched TSTS r11,r15,lsl #32  @ $380021C
+	((UINT32 *)memory_region(machine, RGNCLASS_USER, "user1"))[0x21C/4]=0;// patched TSTS r11,r15,lsl #32  @ $380021C
 }
 
 

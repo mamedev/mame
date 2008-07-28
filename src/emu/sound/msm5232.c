@@ -774,7 +774,7 @@ static void MSM5232_update_one(void *param, stream_sample_t **inputs, stream_sam
 
 /* MAME Interface */
 
-static void *msm5232_start(int sndindex, int clock, const void *config)
+static void *msm5232_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	const struct MSM5232interface *intf = config;
 	int rate = clock/CLOCK_RATE_DIVIDER;

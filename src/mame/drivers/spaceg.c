@@ -404,7 +404,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( spaceg )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "1.9a",  0x0000, 0x0400, CRC(d6f80b0e) SHA1(503e832c065bb302ec60ed239c4d99a605cb931a) )
 	ROM_LOAD( "2.8a",  0x0400, 0x0400, CRC(708b8eec) SHA1(70f9b1506a653985d9d3eacba220f0a4eb241318) )
 	ROM_LOAD( "3.9b",  0x0800, 0x0400, CRC(7f0b5cb4) SHA1(97a7125d046e7191b5d3be8f203d1bbb6f988209) )

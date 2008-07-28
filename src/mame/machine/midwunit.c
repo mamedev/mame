@@ -382,8 +382,8 @@ static void init_wunit_generic(void)
 	register_state_saving();
 
 	/* load the graphics ROMs -- quadruples */
-	midyunit_gfx_rom = base = memory_region(Machine, REGION_GFX1);
-	len = memory_region_length(Machine, REGION_GFX1);
+	midyunit_gfx_rom = base = memory_region(Machine, RGNCLASS_GFX, "gfx1");
+	len = memory_region_length(Machine, RGNCLASS_GFX, "gfx1");
 	for (i = 0; i < len / 0x400000; i++)
 	{
 		memcpy(midwunit_decode_memory, base, 0x400000);
@@ -588,8 +588,8 @@ DRIVER_INIT( revx )
 	register_state_saving();
 
 	/* load the graphics ROMs -- quadruples */
-	midyunit_gfx_rom = base = memory_region(machine, REGION_GFX1);
-	len = memory_region_length(Machine, REGION_GFX1);
+	midyunit_gfx_rom = base = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	len = memory_region_length(Machine, RGNCLASS_GFX, "gfx1");
 	for (i = 0; i < len / 0x200000; i++)
 	{
 		memcpy(midwunit_decode_memory, base, 0x200000);

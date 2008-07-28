@@ -15,8 +15,8 @@ UINT8 *exedexes_nbg_xscroll;
 
 static int chon,objon,sc1on,sc2on;
 
-#define TileMap(offs) (memory_region(machine, REGION_GFX5)[offs])
-#define BackTileMap(offs) (memory_region(machine, REGION_GFX5)[offs+0x4000])
+#define TileMap(offs) (memory_region(machine, RGNCLASS_GFX, "gfx5")[offs])
+#define BackTileMap(offs) (memory_region(machine, RGNCLASS_GFX, "gfx5")[offs+0x4000])
 
 static tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;
 
@@ -129,7 +129,7 @@ WRITE8_HANDLER( exedexes_gfxctrl_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *tilerom = memory_region(machine, REGION_GFX5);
+	UINT8 *tilerom = memory_region(machine, RGNCLASS_GFX, "gfx5");
 
 	int attr = tilerom[tile_index];
 	int code = attr & 0x3f;
@@ -141,7 +141,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code = memory_region(machine, REGION_GFX5)[tile_index];
+	int code = memory_region(machine, RGNCLASS_GFX, "gfx5")[tile_index];
 
 	SET_TILE_INFO(2, code, 0, 0);
 }

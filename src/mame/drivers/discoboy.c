@@ -167,7 +167,7 @@ static VIDEO_UPDATE( discoboy )
 #ifdef UNUSED_FUNCTION
 void discoboy_setrombank(UINT8 data)
 {
-	UINT8 *ROM = memory_region(machine, REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
 	data &=0x2f;
 	memory_set_bankptr(1, &ROM[0x6000+(data*0x1000)] );
 }
@@ -187,7 +187,7 @@ static WRITE8_HANDLER( discoboy_port_00_w )
 
 static WRITE8_HANDLER( discoboy_port_01_w )
 {
-	UINT8 *ROM = memory_region(machine, REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
 	int rombank;
 
 	// 00 10 20 30 during gameplay  1,2,3 other times?? title screen bit 0x40 toggle
@@ -458,8 +458,8 @@ static const gfx_layout tiles8x8_layout2 =
 };
 
 static GFXDECODE_START( discoboy )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0x000, 128 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout2, 0x000, 128 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0x000, 128 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout2, 0x000, 128 )
 
 GFXDECODE_END
 
@@ -514,7 +514,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( discoboy )
 {
-	UINT8 *ROM = memory_region(machine, REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	discoboy_ram_part1 = auto_malloc(0x800);
 	discoboy_ram_part2 = auto_malloc(0x800);
@@ -542,21 +542,21 @@ static DRIVER_INIT( discoboy )
 }
 
 ROM_START( discoboy )
-	ROM_REGION( 0x30000, REGION_CPU1, 0 )
+	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "u2",  0x00000, 0x10000, CRC(44a4fefa) SHA1(29b74bb739afffb7baefb5ed4da09cdb1559b011) )
 	ROM_LOAD( "u18", 0x10000, 0x20000, CRC(88d1282d) SHA1(1f11dad0f577198c54a1dc182ba7502e398b998f) )
 
-	ROM_REGION( 0x20000, REGION_CPU2, 0 )
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "audio", 0 )
 	ROM_LOAD( "2.u28",  0x00000, 0x10000, CRC(7c2ed174) SHA1(ace209dc4cc7a4ffca062842defd84cefc5b10d2))
 	ROM_LOAD( "1.u45",  0x10000, 0x10000, CRC(c266c6df) SHA1(f76e38ded43f56a486cf6569c679ddb57a4165fb) )
 
-	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_INVERT )
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "5.u94",   0x00000, 0x10000, CRC(dbd20836) SHA1(d97651626b1dc16b93f8aed28bac19fd177e626f) )
 	ROM_LOAD( "6.u124",  0x10000, 0x40000, CRC(e20d41f8) SHA1(792294a34840867072bc484d6f3cae3502c8bc28) )
 	ROM_LOAD( "7.u95",   0x80000, 0x10000, CRC(1d5617a2) SHA1(6b6bd50c1984748dc8bf6600431d9bb6fe443873) )
 	ROM_LOAD( "8.u125",  0x90000, 0x40000, CRC(30be1340) SHA1(e4765b75c8f774c6f7f7b5496a50c33ee3950550) )
 
-	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_INVERT )
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "u80",   0x00000, 0x10000, CRC(4cc642ae) SHA1(2a59ebc8ab27bf7c3c1aa389ea32fb01d5cfdce8) )
 	ROM_LOAD( "u50",   0x10000, 0x20000, CRC(1557ca92) SHA1(5a0afbeede6f0ae1c75bdec446132c673aeb0fe7) )
 	ROM_LOAD( "u81",   0x40000, 0x10000, CRC(9e04274e) SHA1(70c28212b242335353e6dd48b7eb176146bec457) )

@@ -53,7 +53,7 @@ static WRITE16_HANDLER( fcrash_soundlatch_w )
 
 static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "sound");
 	int bankaddr;
 
 	sndti_set_output_gain(SOUND_MSM5205, 0, 0, (data & 0x08) ? 0.0 : 1.0);
@@ -715,8 +715,7 @@ static MACHINE_DRIVER_START( kodb )
 	MDRV_CPU_PROGRAM_MAP(kodb_map,0)
 	MDRV_CPU_VBLANK_INT("main", cps1_interrupt)
 
-//  MDRV_CPU_ADD("sound", Z80, 3579545)
-	/* audio CPU */
+//  MDRV_CPU_ADD("audio", Z80, 3579545)
 //  MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
 	/* video hardware */
@@ -742,15 +741,15 @@ static MACHINE_DRIVER_START( kodb )
 //  MDRV_SOUND_ROUTE(0, "mono", 0.35)
 //  MDRV_SOUND_ROUTE(1, "mono", 0.35)
 
-//  MDRV_SOUND_ADD("okim", OKIM6295, 1000000)
-//  MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // pin 7 can be changed by the game code, see f006 on z80
+//  MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
+//  MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // pin 7 can be changed by the game code, see f006 on z80
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
 
 
 ROM_START( fcrash )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 )      /* 68000 code */
+	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "9.bin",  0x00000, 0x20000, CRC(c6854c91) SHA1(29f01cc65be5eaa3f86e99eebdd284104623abb0) )
 	ROM_LOAD16_BYTE( "5.bin",  0x00001, 0x20000, CRC(77f7c2b3) SHA1(feea48d9555824a2e5bf5e99ce159edc015f0792) )
 	ROM_LOAD16_BYTE( "8.bin",  0x40000, 0x20000, CRC(1895b3df) SHA1(415a26050c50ed79a7ee5ddd1b8d61593b1ce876) )
@@ -760,7 +759,11 @@ ROM_START( fcrash )
 	ROM_LOAD16_BYTE( "6.bin",  0xc0000, 0x20000, CRC(d4bf37f6) SHA1(f47e1cc9aa3b3019ee57f59715e3a611acf9fe3e) )
 	ROM_LOAD16_BYTE( "2.bin",  0xc0001, 0x20000, CRC(07ac8f43) SHA1(7a41b003c76adaabd3f94929cc163461b70e0ed9) )
 
-	ROM_REGION( 0x200000, REGION_GFX1, 0 )
+	ROM_REGION( 0x30000, RGNCLASS_CPU, "sound", 0 ) /* Audio CPU + Sample Data */
+	ROM_LOAD( "1.bin",   0x00000, 0x20000, CRC(5b276c14) SHA1(73e53c077d4e3c1b919eee28b29e34176ee204f8) )
+	ROM_RELOAD(          0x10000, 0x20000 )
+
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 )
 	ROMX_LOAD( "18.bin",     0x000000, 0x20000, CRC(f1eee6d9) SHA1(bee95efbff49c582cff1cc6d9bb5ef4ea5c4a074) , ROM_SKIP(3) )
 	ROMX_LOAD( "20.bin",     0x000001, 0x20000, CRC(675f4537) SHA1(acc68822da3aafbb62f76cbffa5f3389fcc91447) , ROM_SKIP(3) )
 	ROMX_LOAD( "22.bin",     0x000002, 0x20000, CRC(db8a32ac) SHA1(b95f73dff291acee239e22e5fd7efe15d0de23be) , ROM_SKIP(3) )
@@ -778,12 +781,8 @@ ROM_START( fcrash )
 	ROMX_LOAD( "15.bin",     0x180002, 0x20000, CRC(6d837e09) SHA1(b4a133ab96c35b689ee692bfcc04981791099b6f) , ROM_SKIP(3) )
 	ROMX_LOAD( "17.bin",     0x180003, 0x20000, CRC(c59a4d6c) SHA1(59e49c7d24dd333007de4bb621050011a5392bcc) , ROM_SKIP(3) )
 
-	ROM_REGION( 0x8000, REGION_GFX2, 0 )
-	ROM_COPY( REGION_GFX1, 0x000000, 0x000000, 0x8000 )	/* stars */
-
-	ROM_REGION( 0x30000, REGION_CPU2, 0 ) /* Audio CPU + Sample Data */
-	ROM_LOAD( "1.bin",   0x00000, 0x20000, CRC(5b276c14) SHA1(73e53c077d4e3c1b919eee28b29e34176ee204f8) )
-	ROM_RELOAD(          0x10000, 0x20000 )
+	ROM_REGION( 0x8000, RGNCLASS_GFX, "gfx2", 0 )
+	ROM_COPY( RGNCLASS_GFX, "gfx1", 0x000000, 0x000000, 0x8000 )	/* stars */
 ROM_END
 
 /*
@@ -821,11 +820,15 @@ Note
 */
 
 ROM_START( kodb )
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )      /* 68000 code */
+	ROM_REGION( 0x400000, RGNCLASS_CPU, "main", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "3.ic172",    0x00000, 0x080000, CRC(036dd74c) SHA1(489344e56863429e86b4c362b82d89819c1d6afb) )
 	ROM_LOAD16_BYTE( "4.ic171",    0x00001, 0x080000, CRC(3e4b7295) SHA1(3245640bae7d141238051dfe5c7683d05c6d3848) )
 
-	ROM_REGION( 0x400000, REGION_GFX1, 0 )
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "sound", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "1.ic28",        0x00000, 0x08000, CRC(01cae60c) SHA1(b2cdd883fd859f0b701230831aca1f1a74ad6087) )
+	ROM_CONTINUE(              0x10000, 0x08000 )
+
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx1", 0 )
 	ROMX_LOAD( "cp.ic90",   0x000000, 0x80000, CRC(e3b8589e) SHA1(775f97e43cb995b93da40063a1f1e4d73b34437c), ROM_SKIP(7) )
 	ROMX_LOAD( "dp.ic89",   0x000001, 0x80000, CRC(3eec9580) SHA1(3d8d0cfbeae077544e514a5eb96cc83f716e494f), ROM_SKIP(7) )
 	ROMX_LOAD( "ap.ic88",   0x000002, 0x80000, CRC(fdf5f163) SHA1(271ee96886c958accaca9a82484ab80fe32bd38e), ROM_SKIP(7) )
@@ -835,14 +838,10 @@ ROM_START( kodb )
 	ROMX_LOAD( "ai.ic93",   0x000006, 0x80000, CRC(cffbf4be) SHA1(f805bafc855d4a656c055a76eaeb26e36835541e), ROM_SKIP(7) )
 	ROMX_LOAD( "bi.ic94",   0x000007, 0x80000, CRC(4a1b43fe) SHA1(7957f45b2862825c9509043c63c7da7108bd251b), ROM_SKIP(7) )
 
-	ROM_REGION( 0x8000, REGION_GFX2, 0 )
-	ROM_COPY( REGION_GFX1, 0x000000, 0x000000, 0x8000 )	/* stars */
+	ROM_REGION( 0x8000, RGNCLASS_GFX, "gfx2", 0 )
+	ROM_COPY( RGNCLASS_GFX, "gfx1", 0x000000, 0x000000, 0x8000 )	/* stars */
 
-	ROM_REGION( 0x18000, REGION_CPU2, 0 ) /* 64k for the audio CPU (+banks) */
-	ROM_LOAD( "1.ic28",        0x00000, 0x08000, CRC(01cae60c) SHA1(b2cdd883fd859f0b701230831aca1f1a74ad6087) )
-	ROM_CONTINUE(              0x10000, 0x08000 )
-
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )	/* Samples */
 	ROM_LOAD( "2.ic19",      0x00000, 0x40000, CRC(a2db1575) SHA1(1a4a29e4b045af50700adf1665697feab12cc234) )
 ROM_END
 

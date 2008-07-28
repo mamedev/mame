@@ -147,9 +147,9 @@ static READ32_HANDLER( flash_reg_r )
 
 static READ32_HANDLER( flash_r )
 {
-	UINT8 *flash = (UINT8 *)memory_region(machine, REGION_USER1);
+	UINT8 *flash = (UINT8 *)memory_region(machine, RGNCLASS_USER, "user1");
 	UINT8 value = flash[flash_addr];
-	flash_addr = (flash_addr + 1) % memory_region_length(machine, REGION_USER1);
+	flash_addr = (flash_addr + 1) % memory_region_length(machine, RGNCLASS_USER, "user1");
 	return value;
 }
 
@@ -353,9 +353,9 @@ static WRITE32_HANDLER( io_port_w )
 
 
 static ADDRESS_MAP_START( bballoon_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x00000fff) AM_ROM AM_REGION(REGION_USER1, 0)
+	AM_RANGE(0x00000000, 0x00000fff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0)
 	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_BASE(&system_memory)
-	AM_RANGE(0x40000000, 0x40000fff) AM_ROM AM_REGION(REGION_USER1, 0) // mirror? seems so
+	AM_RANGE(0x40000000, 0x40000fff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0) // mirror? seems so
 	AM_RANGE(0x48000000, 0x48000033) AM_RAM // memory controller
 
 	AM_RANGE(0x4d000000, 0x4d00001f) AM_READWRITE(lcd_control_r,lcd_control_w) AM_BASE(&lcd_control)
@@ -541,20 +541,20 @@ Notes:
 */
 
 ROM_START( bballoon )
-	ROM_REGION( 0x2000000, REGION_USER1, 0 ) /* ARM 32 bit code */
+	ROM_REGION( 0x2000000, RGNCLASS_USER, "user1", 0 ) /* ARM 32 bit code */
 	ROM_LOAD( "flash.u1",     0x000000, 0x2000000, CRC(73285634) SHA1(4d0210c1bebdf3113a99978ffbcd77d6ee854168) )
 
 	// banked every 0x10000 bytes ?
-	ROM_REGION( 0x080000, REGION_USER2, 0 )
+	ROM_REGION( 0x080000, RGNCLASS_USER, "user2", 0 )
 	ROM_LOAD( "b2.u20",       0x000000, 0x080000, CRC(0a12334c) SHA1(535b5b34f28435517218100d70147d87809f485a) )
 
-	ROM_REGION( 0x100000, REGION_SOUND2, 0 ) // sound wave
+	ROM_REGION( 0x100000, RGNCLASS_SOUND, "unknown", 0 ) // sound wave
 	ROM_LOAD( "b1.u16",       0x000000, 0x100000, CRC(c42c1c85) SHA1(e1f49d556ffd6bc27142a7784c3bb8e37999857d) )
 ROM_END
 
 static DRIVER_INIT( bballoon )
 {
-	UINT8 *flash = (UINT8 *)memory_region(machine, REGION_USER1);
+	UINT8 *flash = (UINT8 *)memory_region(machine, RGNCLASS_USER, "user1");
 
 	// nop flash ECC checks
 

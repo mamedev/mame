@@ -9,21 +9,12 @@
 */
 struct OKIM6295interface
 {
-	int region;		/* memory region where the sample ROM lives */
 	int pin7;
+	const char *rgnoverride;
 };
 
-extern const struct OKIM6295interface okim6295_interface_region_1_pin7high;
-extern const struct OKIM6295interface okim6295_interface_region_2_pin7high;
-extern const struct OKIM6295interface okim6295_interface_region_3_pin7high;
-extern const struct OKIM6295interface okim6295_interface_region_4_pin7high;
-
-extern const struct OKIM6295interface okim6295_interface_region_1_pin7low;
-extern const struct OKIM6295interface okim6295_interface_region_2_pin7low;
-extern const struct OKIM6295interface okim6295_interface_region_3_pin7low;
-extern const struct OKIM6295interface okim6295_interface_region_4_pin7low;
-
-
+extern const struct OKIM6295interface okim6295_interface_pin7high;
+extern const struct OKIM6295interface okim6295_interface_pin7low;
 
 
 

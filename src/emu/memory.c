@@ -90,7 +90,7 @@
         through the given callback handler. Special static values representing
         RAM, ROM, or BANKs are also allowed here.
 
-    AM_REGION(region, offs)
+    AM_REGION(class, tag, offs)
         Only useful if AM_READ/WRITE point to RAM, ROM, or BANK memory. By
         default, memory is allocated to back each bucket. By specifying
         AM_REGION, you can tell the memory system to point the base of the
@@ -280,6 +280,7 @@ struct _addrspace_data
 typedef struct _cpu_data cpu_data;
 struct _cpu_data
 {
+	const char *			tag;					/* CPU's tag */
 	UINT8 *					region;					/* pointer to memory region */
 	size_t					regionsize;				/* size of region, in bytes */
 
@@ -375,7 +376,7 @@ const char *const address_space_names[ADDRESS_SPACES] = { "program", "data", "I/
 static void address_map_detokenize(address_map *map, const addrmap_token *tokens);
 
 static void memory_init_cpudata(running_machine *machine);
-static void memory_init_preflight(const machine_config *config);
+static void memory_init_preflight(running_machine *machine);
 static void memory_init_populate(running_machine *machine);
 static void space_map_range_private(addrspace_data *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name);
 static void space_map_range(addrspace_data *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name);
@@ -391,8 +392,8 @@ static int subtable_merge(table_data *tabledata);
 static void subtable_release(table_data *tabledata, UINT8 subentry);
 static UINT8 *subtable_open(table_data *tabledata, offs_t l1index);
 static void subtable_close(table_data *tabledata, offs_t l1index);
-static void memory_init_allocate(const machine_config *config);
-static void *allocate_memory_block(int cpunum, int spacenum, offs_t bytestart, offs_t byteend, void *memory);
+static void memory_init_allocate(running_machine *machine);
+static void *allocate_memory_block(running_machine *machine, int cpunum, int spacenum, offs_t bytestart, offs_t byteend, void *memory);
 static void register_for_save(int cpunum, int spacenum, offs_t bytestart, void *base, size_t numbytes);
 static address_map_entry *assign_intersecting_blocks(addrspace_data *space, offs_t bytestart, offs_t byteend, UINT8 *base);
 static void memory_init_locate(running_machine *machine);
@@ -729,13 +730,13 @@ void memory_init(running_machine *machine)
 	memory_init_cpudata(machine);
 
 	/* preflight the memory handlers and check banks */
-	memory_init_preflight(machine->config);
+	memory_init_preflight(machine);
 
 	/* then fill in the tables */
 	memory_init_populate(machine);
 
 	/* allocate any necessary memory */
-	memory_init_allocate(machine->config);
+	memory_init_allocate(machine);
 
 	/* find all the allocated pointers */
 	memory_init_locate(machine);
@@ -1030,7 +1031,8 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 
 			case ADDRMAP_TOKEN_REGION:
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, entry->region, 24, entry->region_offs, 32);
+				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, entry->rgnclass, 24, entry->rgnoffs, 32);
+				entry->rgntag = TOKEN_GET_STRING(tokens);
 				break;
 
 			case ADDRMAP_TOKEN_SHARE:
@@ -1615,8 +1617,9 @@ static void memory_init_cpudata(running_machine *machine)
 		cpu_data *cpu = &cpudata[cpunum];
 
 		/* get pointers to the CPU's memory region */
-		cpu->region = memory_region(Machine, REGION_CPU1 + cpunum);
-		cpu->regionsize = memory_region_length(Machine, REGION_CPU1 + cpunum);
+		cpu->tag = config->cpu[cpunum].tag;
+		cpu->region = memory_region(machine, RGNCLASS_CPU, cpu->tag);
+		cpu->regionsize = memory_region_length(machine, RGNCLASS_CPU, cpu->tag);
 
 		/* initialize each address space, and build up a mask of spaces */
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
@@ -1666,10 +1669,10 @@ static void memory_init_cpudata(running_machine *machine)
 		}
 
 		/* set the RAM/ROM base */
-		cpu->opbase.ram = cpu->opbase.rom = memory_region(Machine, REGION_CPU1 + cpunum);
+		cpu->opbase.ram = cpu->opbase.rom = cpu->region;
 		cpu->opbase.mask = cpu->space[ADDRESS_SPACE_PROGRAM].bytemask;
 		cpu->opbase.mem_min = 0;
-		cpu->opbase.mem_max = memory_region_length(Machine, REGION_CPU1 + cpunum);
+		cpu->opbase.mem_max = cpu->regionsize;
 		cpu->opbase.entry = STATIC_UNMAP;
 		cpu->opbase_handler = NULL;
 	}
@@ -1681,7 +1684,7 @@ static void memory_init_cpudata(running_machine *machine)
     and track which banks are referenced
 -------------------------------------------------*/
 
-static void memory_init_preflight(const machine_config *config)
+static void memory_init_preflight(running_machine *machine)
 {
 	int cpunum;
 
@@ -1703,7 +1706,7 @@ static void memory_init_preflight(const machine_config *config)
 				int entrynum;
 
 				/* allocate the address map */
-				space->map = address_map_alloc(config, cpunum, spacenum);
+				space->map = address_map_alloc(machine->config, cpunum, spacenum);
 
 				/* extract global parameters specified by the map */
 				space->unmap = (space->map->unmapval == 0) ? 0 : ~0;
@@ -1724,32 +1727,33 @@ static void memory_init_preflight(const machine_config *config)
 					adjust_addresses(space, &entry->bytestart, &entry->byteend, &entry->bytemask, &entry->bytemirror);
 
 					/* if this is a ROM handler without a specified region, attach it to the implicit region */
-					if (spacenum == ADDRESS_SPACE_PROGRAM && HANDLER_IS_ROM(entry->read.generic) && entry->region == 0)
+					if (spacenum == ADDRESS_SPACE_PROGRAM && HANDLER_IS_ROM(entry->read.generic) && entry->rgntag == NULL)
 					{
 						/* make sure it fits within the memory region before doing so, however */
 						if (entry->byteend < cpu->regionsize)
 						{
-							entry->region = REGION_CPU1 + cpunum;
-							entry->region_offs = entry->bytestart;
+							entry->rgnclass = RGNCLASS_CPU;
+							entry->rgntag = cpu->tag;
+							entry->rgnoffs = entry->bytestart;
 						}
 					}
 
 					/* validate adjusted addresses against implicit regions */
-					if (entry->region != 0 && entry->share == 0 && entry->baseptr == NULL)
+					if (entry->rgntag != NULL && entry->share == 0 && entry->baseptr == NULL)
 					{
-						UINT8 *base = memory_region(Machine, entry->region);
-						offs_t length = memory_region_length(Machine, entry->region);
+						UINT8 *base = memory_region(machine, entry->rgnclass, entry->rgntag);
+						offs_t length = memory_region_length(machine, entry->rgnclass, entry->rgntag);
 
 						/* validate the region */
 						if (base == NULL)
-							fatalerror("Error: CPU %d space %d memory map entry %X-%X references non-existant region %d", cpunum, spacenum, entry->addrstart, entry->addrend, entry->region);
-						if (entry->region_offs + (entry->byteend - entry->bytestart + 1) > length)
-							fatalerror("Error: CPU %d space %d memory map entry %X-%X extends beyond region %d size (%X)", cpunum, spacenum, entry->addrstart, entry->addrend, entry->region, length);
+							fatalerror("Error: CPU %d space %d memory map entry %X-%X references non-existant region %d,\"%s\"", cpunum, spacenum, entry->addrstart, entry->addrend, entry->rgnclass, entry->rgntag);
+						if (entry->rgnoffs + (entry->byteend - entry->bytestart + 1) > length)
+							fatalerror("Error: CPU %d space %d memory map entry %X-%X extends beyond region %d,\"%s\" size (%X)", cpunum, spacenum, entry->addrstart, entry->addrend, entry->rgnclass, entry->rgntag, length);
 					}
 
 					/* convert any region-relative entries to their memory pointers */
-					if (entry->region != 0)
-						entry->memory = memory_region(Machine, entry->region) + entry->region_offs;
+					if (entry->rgntag != NULL)
+						entry->memory = memory_region(machine, entry->rgnclass, entry->rgntag) + entry->rgnoffs;
 
 					/* assign static banks for explicitly specified entries */
 					if (HANDLER_IS_BANK(entry->read.generic))
@@ -2436,7 +2440,7 @@ static int amentry_needs_backing_store(int cpunum, int spacenum, const address_m
 	FPTR handler;
 
 	if (entry->baseptr != NULL || entry->baseptroffs_plus1 != 0)
-		return 1;
+		return TRUE;
 
 	handler = (FPTR)entry->write.generic;
 	if (handler < STATIC_COUNT)
@@ -2445,7 +2449,7 @@ static int amentry_needs_backing_store(int cpunum, int spacenum, const address_m
 			handler != STATIC_ROM &&
 			handler != STATIC_NOP &&
 			handler != STATIC_UNMAP)
-			return 1;
+			return TRUE;
 	}
 
 	handler = (FPTR)entry->read.generic;
@@ -2453,13 +2457,13 @@ static int amentry_needs_backing_store(int cpunum, int spacenum, const address_m
 	{
 		if (handler != STATIC_INVALID &&
 			(handler < STATIC_BANK1 || handler > STATIC_BANK1 + MAX_BANKS - 1) &&
-			(handler != STATIC_ROM || spacenum != ADDRESS_SPACE_PROGRAM || entry->addrstart >= memory_region_length(Machine, REGION_CPU1 + cpunum)) &&
+			(handler != STATIC_ROM || spacenum != ADDRESS_SPACE_PROGRAM || entry->addrstart >= cpudata[cpunum].regionsize) &&
 			handler != STATIC_NOP &&
 			handler != STATIC_UNMAP)
-			return 1;
+			return TRUE;
 	}
 
-	return 0;
+	return FALSE;
 }
 
 
@@ -2468,7 +2472,7 @@ static int amentry_needs_backing_store(int cpunum, int spacenum, const address_m
     CPU address spaces
 -------------------------------------------------*/
 
-static void memory_init_allocate(const machine_config *config)
+static void memory_init_allocate(running_machine *machine)
 {
 	int cpunum, spacenum;
 
@@ -2487,7 +2491,7 @@ static void memory_init_allocate(const machine_config *config)
 				/* we do this to make sure they are found by memory_find_base first */
 				for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
 					if (entry->memory != NULL)
-						allocate_memory_block(cpunum, spacenum, entry->bytestart, entry->byteend, entry->memory);
+						allocate_memory_block(machine, cpunum, spacenum, entry->bytestart, entry->byteend, entry->memory);
 
 				/* loop over all blocks just allocated and assign pointers from them */
 				for (memblock = memory_block_list; memblock != prev_memblock_head; memblock = memblock->next)
@@ -2537,7 +2541,7 @@ static void memory_init_allocate(const machine_config *config)
 					/* we now have a block to allocate; do it */
 					curbytestart = curblockstart * MEMORY_BLOCK_CHUNK;
 					curbyteend = curblockend * MEMORY_BLOCK_CHUNK + (MEMORY_BLOCK_CHUNK - 1);
-					block = allocate_memory_block(cpunum, spacenum, curbytestart, curbyteend, NULL);
+					block = allocate_memory_block(machine, cpunum, spacenum, curbytestart, curbyteend, NULL);
 
 					/* assign memory that intersected the new block */
 					unassigned = assign_intersecting_blocks(space, curbytestart, curbyteend, block);
@@ -2551,12 +2555,14 @@ static void memory_init_allocate(const machine_config *config)
     memory block of data
 -------------------------------------------------*/
 
-static void *allocate_memory_block(int cpunum, int spacenum, offs_t bytestart, offs_t byteend, void *memory)
+static void *allocate_memory_block(running_machine *machine, int cpunum, int spacenum, offs_t bytestart, offs_t byteend, void *memory)
 {
 	int allocatemem = (memory == NULL);
 	memory_block *block;
 	size_t bytestoalloc;
-	int region;
+	const char *rgntag;
+	int foundit = FALSE;
+	int rgnclass;
 
 	VPRINTF(("allocate_memory_block(%d,%d,%08X,%08X,%p)\n", cpunum, spacenum, bytestart, byteend, memory));
 
@@ -2572,17 +2578,19 @@ static void *allocate_memory_block(int cpunum, int spacenum, offs_t bytestart, o
 		memory = block + 1;
 
 	/* register for saving, but only if we're not part of a memory region */
-	for (region = 0; region < MAX_MEMORY_REGIONS; region++)
-	{
-		UINT8 *region_base = memory_region(Machine, region);
-		UINT32 region_length = memory_region_length(Machine, region);
-		if (region_base != NULL && region_length != 0 && (UINT8 *)memory >= region_base && ((UINT8 *)memory + (byteend - bytestart + 1)) < region_base + region_length)
+	for (rgnclass = 0; rgnclass < RGNCLASS_COUNT; rgnclass++)
+		for (rgntag = memory_region_next(machine, rgnclass, NULL); !foundit && rgntag != NULL; rgntag = memory_region_next(machine, rgnclass, rgntag))
 		{
-			VPRINTF(("skipping save of this memory block as it is covered by a memory region\n"));
-			break;
+			UINT8 *region_base = memory_region(Machine, rgnclass, rgntag);
+			UINT32 region_length = memory_region_length(Machine, rgnclass, rgntag);
+			if (region_base != NULL && region_length != 0 && (UINT8 *)memory >= region_base && ((UINT8 *)memory + (byteend - bytestart + 1)) < region_base + region_length)
+			{
+				VPRINTF(("skipping save of this memory block as it is covered by a memory region\n"));
+				foundit = TRUE;
+				break;
+			}
 		}
-	}
-	if (region == MAX_MEMORY_REGIONS)
+	if (rgnclass == RGNCLASS_COUNT)
 		register_for_save(cpunum, spacenum, bytestart, memory, byteend - bytestart + 1);
 
 	/* fill in the tracking block */

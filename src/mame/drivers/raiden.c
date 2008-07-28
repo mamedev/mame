@@ -214,10 +214,10 @@ static const gfx_layout raiden_spritelayout =
 };
 
 static GFXDECODE_START( raiden )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, raiden_charlayout,   768, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, raiden_spritelayout,   0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX3, 0, raiden_spritelayout, 256, 16 )
-	GFXDECODE_ENTRY( REGION_GFX4, 0, raiden_spritelayout, 512, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, raiden_charlayout,   768, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, raiden_spritelayout,   0, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, raiden_spritelayout, 256, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, raiden_spritelayout, 512, 16 )
 GFXDECODE_END
 
 /******************************************************************************/
@@ -247,7 +247,7 @@ static MACHINE_DRIVER_START( raiden )
 
 	MDRV_INTERLEAVE(200)
 
-	MDRV_MACHINE_RESET(seibu_sound_2)
+	MDRV_MACHINE_RESET(seibu_sound)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -267,7 +267,7 @@ static MACHINE_DRIVER_START( raiden )
 	MDRV_VIDEO_UPDATE(raiden)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12,1) // frequency and pin 7 verified (pin set in audio\seibu.h)
+	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12) // frequency and pin 7 verified (pin set in audio\seibu.h)
 MACHINE_DRIVER_END
 
 
@@ -286,7 +286,7 @@ static MACHINE_DRIVER_START( raidena )
 
 	MDRV_INTERLEAVE(120)
 
-	MDRV_MACHINE_RESET(seibu_sound_2)
+	MDRV_MACHINE_RESET(seibu_sound)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -306,144 +306,144 @@ static MACHINE_DRIVER_START( raidena )
 	MDRV_VIDEO_UPDATE(raiden)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12,1) /* frequency and pin 7 verified on pcb */
+	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12) /* frequency and pin 7 verified on pcb */
 MACHINE_DRIVER_END
 
 /***************************************************************************/
 
 ROM_START( raiden )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "rai1.bin",   0x0a0000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "rai2.bin",   0x0a0001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
 	ROM_LOAD16_BYTE( "rai3.bin",   0x0c0000, 0x20000, CRC(9d735bf5) SHA1(531981eac2ef0c0635f067a649899f98738d5c67) )
 	ROM_LOAD16_BYTE( "rai4.bin",   0x0c0001, 0x20000, CRC(8d184b99) SHA1(71cd4179aa2341d2ceecbb6a9c26f5919d46ca4c) )
 
-	ROM_REGION( 0x100000, REGION_CPU2, 0 ) /* v30 sub cpu */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "sub", 0 ) /* v30 sub cpu */
 	ROM_LOAD16_BYTE( "rai5.bin",   0x0c0000, 0x20000, CRC(7aca6d61) SHA1(4d80ec87e54d7495b9bdf819b9985b1c8183c80d) )
 	ROM_LOAD16_BYTE( "rai6a.bin",  0x0c0001, 0x20000, CRC(e3d35cc2) SHA1(4329865985aaf3fb524618e2e958563c8fa6ead5) )
 
-	ROM_REGION( 0x20000, REGION_CPU3, 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "audio", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rai6.bin",     0x000000, 0x08000, CRC(723a483b) SHA1(50e67945e83ea1748fb748de3287d26446d4e0a0) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( REGION_CPU3, 0, 0x018000, 0x08000 )
+	ROM_COPY( RGNCLASS_CPU, "audio", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x010000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x010000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rai9.bin",     0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* chars */
 	ROM_LOAD( "rai10.bin",    0x08000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) )
 
-	ROM_REGION( 0x080000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "raiu0919.bin", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) /* tiles */
 
-	ROM_REGION( 0x080000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "raiu0920.bin", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) /* tiles */
 
-	ROM_REGION( 0x090000, REGION_GFX4, ROMREGION_DISPOSE )
+	ROM_REGION( 0x090000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "raiu165.bin",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) /* sprites */
 
-	ROM_REGION( 0x10000, REGION_SOUND1, 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x10000, RGNCLASS_SOUND, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "rai7.bin", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 
-	ROM_REGION( 0x2000, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, RGNCLASS_PLDS, "plds", ROMREGION_DISPOSE )
 	ROM_LOAD( "ep910pc-1.bin", 0x0000, 0x0884, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "ep910pc-2.bin", 0x1000, 0x0884, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
 ROM_START( raidena )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "rai1.bin",     0x0a0000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "rai2.bin",     0x0a0001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
 	ROM_LOAD16_BYTE( "raiden03.rom", 0x0c0000, 0x20000, CRC(f6af09d0) SHA1(ecd49f3351359ea2d5cbd140c9962d45c5544ecd) )
 	ROM_LOAD16_BYTE( "raiden04.rom", 0x0c0001, 0x20000, CRC(6bdfd416) SHA1(7c3692d0c46c0fd360b9b2b5a8dc55d9217be357) )
 
-	ROM_REGION( 0x100000, REGION_CPU2, 0 ) /* v30 sub cpu */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "sub", 0 ) /* v30 sub cpu */
 	ROM_LOAD16_BYTE( "raiden05.rom",   0x0c0000, 0x20000, CRC(ed03562e) SHA1(bf6b44fb53fa2321cd52c00fcb43b8ceb6ceffff) )
 	ROM_LOAD16_BYTE( "raiden06.rom",   0x0c0001, 0x20000, CRC(a19d5b5d) SHA1(aa5e5be60b737913e5677f88ebc218302245e5af) )
 
-	ROM_REGION( 0x20000, REGION_CPU3, 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "audio", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "raiden08.rom", 0x000000, 0x08000, CRC(731adb43) SHA1(d460ffc5dbec25482c695e6c4ac7b66655a67304) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( REGION_CPU3, 0, 0x018000, 0x08000 )
+	ROM_COPY( RGNCLASS_CPU, "audio", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x010000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x010000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rai9.bin",     0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* chars */
 	ROM_LOAD( "rai10.bin",    0x08000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) )
 
-	ROM_REGION( 0x080000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "raiu0919.bin", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) /* tiles */
 
-	ROM_REGION( 0x080000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "raiu0920.bin", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) /* tiles */
 
-	ROM_REGION( 0x090000, REGION_GFX4, ROMREGION_DISPOSE )
+	ROM_REGION( 0x090000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "raiu165.bin",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) /* sprites */
 
-	ROM_REGION( 0x10000, REGION_SOUND1, 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x10000, RGNCLASS_SOUND, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "rai7.bin", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 ROM_END
 
 ROM_START( raidenk )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "rai1.bin",     0x0a0000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "rai2.bin",     0x0a0001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
 	ROM_LOAD16_BYTE( "raiden03.rom", 0x0c0000, 0x20000, CRC(f6af09d0) SHA1(ecd49f3351359ea2d5cbd140c9962d45c5544ecd) )
 	ROM_LOAD16_BYTE( "1i",           0x0c0001, 0x20000, CRC(fddf24da) SHA1(ececed0b0b96d070d85bfb6174029142bc96d5f0) )
 
-	ROM_REGION( 0x100000, REGION_CPU2, 0 ) /* v30 sub cpu */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "sub", 0 ) /* v30 sub cpu */
 	ROM_LOAD16_BYTE( "raiden05.rom",   0x0c0000, 0x20000, CRC(ed03562e) SHA1(bf6b44fb53fa2321cd52c00fcb43b8ceb6ceffff) )
 	ROM_LOAD16_BYTE( "raiden06.rom",   0x0c0001, 0x20000, CRC(a19d5b5d) SHA1(aa5e5be60b737913e5677f88ebc218302245e5af) )
 
-	ROM_REGION( 0x20000, REGION_CPU3, 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "audio", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "8b",           0x000000, 0x08000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( REGION_CPU3, 0, 0x018000, 0x08000 )
+	ROM_COPY( RGNCLASS_CPU, "audio", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x010000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x010000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rai9.bin",     0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* chars */
 	ROM_LOAD( "rai10.bin",    0x08000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) )
 
-	ROM_REGION( 0x080000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "raiu0919.bin", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) /* tiles */
 
-	ROM_REGION( 0x080000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "raiu0920.bin", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) /* tiles */
 
-	ROM_REGION( 0x090000, REGION_GFX4, ROMREGION_DISPOSE )
+	ROM_REGION( 0x090000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "raiu165.bin",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) /* sprites */
 
-	ROM_REGION( 0x10000, REGION_SOUND1, 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x10000, RGNCLASS_SOUND, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "rai7.bin", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 ROM_END
 
 ROM_START( raident )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "rai1.bin",     0x0a0000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "rai2.bin",     0x0a0001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
 	ROM_LOAD16_BYTE( "raiden03.rom", 0x0c0000, 0x20000, CRC(f6af09d0) SHA1(ecd49f3351359ea2d5cbd140c9962d45c5544ecd) )
 	ROM_LOAD16_BYTE( "raid04t.023",  0x0c0001, 0x20000, CRC(61eefab1) SHA1(a886ce1eb1c6451b1cf9eb8dbdc2d484d9881ced) )
 
-	ROM_REGION( 0x100000, REGION_CPU2, 0 ) /* v30 sub cpu */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "sub", 0 ) /* v30 sub cpu */
 	ROM_LOAD16_BYTE( "raiden05.rom",   0x0c0000, 0x20000, CRC(ed03562e) SHA1(bf6b44fb53fa2321cd52c00fcb43b8ceb6ceffff) )
 	ROM_LOAD16_BYTE( "raiden06.rom",   0x0c0001, 0x20000, CRC(a19d5b5d) SHA1(aa5e5be60b737913e5677f88ebc218302245e5af) )
 
-	ROM_REGION( 0x20000, REGION_CPU3, 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "audio", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "raid08.212",   0x000000, 0x08000, CRC(cbe055c7) SHA1(34a06a541d059c621d87fdf41546c9d052a61963) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( REGION_CPU3, 0, 0x018000, 0x08000 )
+	ROM_COPY( RGNCLASS_CPU, "audio", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x010000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x010000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rai9.bin",     0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* chars */
 	ROM_LOAD( "rai10.bin",    0x08000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) )
 
-	ROM_REGION( 0x080000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "raiu0919.bin", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) /* tiles */
 
-	ROM_REGION( 0x080000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "raiu0920.bin", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) /* tiles */
 
-	ROM_REGION( 0x090000, REGION_GFX4, ROMREGION_DISPOSE )
+	ROM_REGION( 0x090000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "raiu165.bin",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) /* sprites */
 
-	ROM_REGION( 0x10000, REGION_SOUND1, 0 )	 /* ADPCM samples */
+	ROM_REGION( 0x10000, RGNCLASS_SOUND, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "rai7.bin", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 ROM_END
 
@@ -487,7 +487,7 @@ encryption method! The technique is a combination of a XOR table plus
 bit-swapping */
 static void common_decrypt(running_machine *machine)
 {
-	UINT16 *RAM = (UINT16 *)memory_region(machine, REGION_CPU1);
+	UINT16 *RAM = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
 	int i;
 
 	for (i = 0; i < 0x20000; i++)
@@ -499,7 +499,7 @@ static void common_decrypt(running_machine *machine)
 		RAM[0xc0000/2 + i] = data;
 	}
 
-	RAM = (UINT16 *)memory_region(machine, REGION_CPU2);
+	RAM = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "sub");
 
 	for (i = 0; i < 0x20000; i++)
 	{
@@ -521,7 +521,7 @@ static DRIVER_INIT( raidena )
 {
 	memory_patcha(machine);
 	common_decrypt(machine);
-	seibu_sound_decrypt(machine,REGION_CPU3,0x20000);
+	seibu_sound_decrypt(machine,"audio",0x20000);
 }
 
 /***************************************************************************/

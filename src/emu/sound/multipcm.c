@@ -487,16 +487,15 @@ unsigned char MultiPCM_reg_r(int chip, int offset)
 	return 0;
 }
 
-static void *multipcm_start(int sndindex, int clock, const void *config)
+static void *multipcm_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct _MultiPCM *ptChip;
 	int i;
-	const struct MultiPCM_interface *intf = config;
 	char mname[20];
 
 	ptChip=(struct _MultiPCM *)auto_malloc(sizeof(struct _MultiPCM));
 
-	ptChip->ROM=(INT8 *)memory_region(Machine, intf->region);
+	ptChip->ROM=(INT8 *)memory_region(Machine, RGNCLASS_SOUND, tag);
 	ptChip->Rate=(float) clock / MULTIPCM_CLOCKDIV;
 
 	ptChip->stream = stream_create(0, 2, ptChip->Rate, ptChip, MultiPCM_update);

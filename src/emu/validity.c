@@ -52,6 +52,21 @@ UINT8 your_ptr64_flag_is_wrong[(int)(5 - sizeof(void *))];
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef struct _region_entry region_entry;
+struct _region_entry
+{
+	const char *tag;
+	UINT32 length;
+};
+
+
+typedef struct _region_info region_info;
+struct _region_info
+{
+	region_entry entries[RGNCLASS_COUNT][32];
+};
+
+
 typedef struct _quark_entry quark_entry;
 struct _quark_entry
 {
@@ -488,18 +503,18 @@ static int validate_driver(int drivnum, const machine_config *config)
     validate_roms - validate ROM definitions
 -------------------------------------------------*/
 
-static int validate_roms(int drivnum, const machine_config *config, UINT32 *region_length)
+static int validate_roms(int drivnum, const machine_config *config, region_info *rgninfo)
 {
 	const game_driver *driver = drivers[drivnum];
 	const rom_entry *romp;
 	const char *last_name = "???";
-	int cur_region = -1;
 	int error = FALSE;
 	int items_since_region = 1;
 	int bios_flags = 0, last_bios = 0;
+	region_entry *currgn = NULL;
 
 	/* reset region info */
-	memset(region_length, 0, REGION_MAX * sizeof(*region_length));
+	memset(rgninfo, 0, sizeof(*rgninfo));
 
 	/* scan the ROM entries */
 	for (romp = driver->rom; romp && !ROMENTRY_ISEND(romp); romp++)
@@ -507,34 +522,54 @@ static int validate_roms(int drivnum, const machine_config *config, UINT32 *regi
 		/* if this is a region, make sure it's valid, and record the length */
 		if (ROMENTRY_ISREGION(romp))
 		{
-			int type = ROMREGION_GETTYPE(romp);
+			const char *rgntag = ROMREGION_GETTAG(romp);
+			int rgnclass = ROMREGION_GETCLASS(romp);
 
 			/* if we haven't seen any items since the last region, print a warning */
 			if (items_since_region == 0)
 				mame_printf_warning("%s: %s has empty ROM region (warning)\n", driver->source_file, driver->name);
 			items_since_region = (ROMREGION_ISERASE(romp) || ROMREGION_ISDISPOSE(romp)) ? 1 : 0;
+			currgn = NULL;
 
 			/* check for an invalid region */
-			if (type >= REGION_MAX || type <= REGION_INVALID)
+			if (rgnclass >= RGNCLASS_COUNT || rgnclass <= RGNCLASS_INVALID)
 			{
-				mame_printf_error("%s: %s has invalid ROM_REGION type %x\n", driver->source_file, driver->name, type);
+				mame_printf_error("%s: %s has invalid ROM_REGION class %d\n", driver->source_file, driver->name, rgnclass);
 				error = TRUE;
-				cur_region = -1;
 			}
 
-			/* check for a duplicate */
-			else if (region_length[type] != 0)
+			/* check for an invalid tag */
+			else if (rgntag == NULL || rgntag[0] == 0)
 			{
-				mame_printf_error("%s: %s has duplicate ROM_REGION type %x\n", driver->source_file, driver->name, type);
+				mame_printf_error("%s: %s has duplicate ROM_REGION tag \"%s\"\n", driver->source_file, driver->name, rgntag);
 				error = TRUE;
-				cur_region = -1;
 			}
 
-			/* if all looks good, remember the length and note the region */
+			/* find any empty entry, checking for duplicates */
 			else
 			{
-				cur_region = type;
-				region_length[type] = ROMREGION_GETLENGTH(romp);
+				int rgnnum;
+				
+				/* iterate over all regions found so far */
+				for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries[rgnclass]); rgnnum++)
+				{
+					/* stop when we hit an empty */
+					if (rgninfo->entries[rgnclass][rgnnum].tag == NULL)
+					{
+						currgn = &rgninfo->entries[rgnclass][rgnnum];
+						currgn->tag = rgntag;
+						currgn->length = ROMREGION_GETLENGTH(romp);
+						break;
+					}
+					
+					/* fail if we hit a duplicate */
+					if (strcmp(rgninfo->entries[rgnclass][rgnnum].tag, rgntag) == 0)
+					{
+						mame_printf_error("%s: %s has duplicate ROM_REGION type %d,\"%s\"\n", driver->source_file, driver->name, rgnclass, rgntag);
+						error = TRUE;
+						break;
+					}
+				}
 			}
 		}
 
@@ -544,7 +579,7 @@ static int validate_roms(int drivnum, const machine_config *config, UINT32 *regi
 			bios_flags = ROM_GETBIOSFLAGS(romp);
 			if (last_bios+1 != bios_flags)
 			{
-				const char *name = ROM_GETHASHDATA(romp);
+				const char *name = ROM_GETNAME(romp);
 				mame_printf_error("%s: %s has non-sequential bios %s\n", driver->source_file, driver->name, name);
 				error = TRUE;
 			}
@@ -592,11 +627,11 @@ static int validate_roms(int drivnum, const machine_config *config, UINT32 *regi
 		}
 
 		/* for any non-region ending entries, make sure they don't extend past the end */
-		if (!ROMENTRY_ISREGIONEND(romp) && cur_region != -1)
+		if (!ROMENTRY_ISREGIONEND(romp) && currgn != NULL)
 		{
 			items_since_region++;
 
-			if (ROM_GETOFFSET(romp) + ROM_GETLENGTH(romp) > region_length[cur_region])
+			if (ROM_GETOFFSET(romp) + ROM_GETLENGTH(romp) > currgn->length)
 			{
 				mame_printf_error("%s: %s has ROM %s extending past the defined memory region\n", driver->source_file, driver->name, last_name);
 				error = TRUE;
@@ -616,12 +651,12 @@ static int validate_roms(int drivnum, const machine_config *config, UINT32 *regi
     validate_cpu - validate CPUs and memory maps
 -------------------------------------------------*/
 
-static int validate_cpu(int drivnum, const machine_config *config, const UINT32 *region_length)
+static int validate_cpu(int drivnum, const machine_config *config, region_info *rgninfo)
 {
 	const game_driver *driver = drivers[drivnum];
+	cpu_validity_check_func cpu_validity_check;
 	int error = FALSE;
 	int cpunum;
-	cpu_validity_check_func cpu_validity_check;
 
 	/* loop over all the CPUs */
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
@@ -633,15 +668,24 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 		/* skip empty entries */
 		if (cpu->type == CPU_DUMMY)
 			continue;
+		
+		/* check for valid tag */
+		if (cpu->tag == NULL || cpu->tag[0] == 0)
+		{
+			mame_printf_error("%s: %s has NULL or empty CPU tag\n", driver->source_file, driver->name);
+			error = TRUE;
+		}
 
 		/* check for duplicate tags */
-		if (cpu->tag != NULL)
+		else
+		{
 			for (checknum = 0; checknum < cpunum; checknum++)
 				if (config->cpu[checknum].tag != NULL && strcmp(cpu->tag, config->cpu[checknum].tag) == 0)
 				{
 					mame_printf_error("%s: %s has multiple CPUs tagged as '%s'\n", driver->source_file, driver->name, cpu->tag);
 					error = TRUE;
 				}
+		}
 
 		/* checks to see if this driver is using a dummy CPU */
 		if (cputype_get_interface(cpu->type)->get_info == dummy_get_info)
@@ -652,10 +696,10 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 		}
 
 		/* check the CPU for incompleteness */
-		if (!cputype_get_info_fct(cpu->type, CPUINFO_PTR_GET_CONTEXT)
-			|| !cputype_get_info_fct(cpu->type, CPUINFO_PTR_SET_CONTEXT)
-			|| !cputype_get_info_fct(cpu->type, CPUINFO_PTR_RESET)
-			|| !cputype_get_info_fct(cpu->type, CPUINFO_PTR_EXECUTE))
+		if (cputype_get_info_fct(cpu->type, CPUINFO_PTR_GET_CONTEXT) == NULL ||
+			cputype_get_info_fct(cpu->type, CPUINFO_PTR_SET_CONTEXT) == NULL ||
+			cputype_get_info_fct(cpu->type, CPUINFO_PTR_RESET) == NULL ||
+			cputype_get_info_fct(cpu->type, CPUINFO_PTR_EXECUTE) == NULL)
 		{
 			mame_printf_error("%s: %s uses an incomplete CPU\n", driver->source_file, driver->name);
 			error = TRUE;
@@ -731,26 +775,40 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 				}
 
 				/* if this is a program space, auto-assign implicit ROM entries */
-				if ((FPTR)entry->read.generic == STATIC_ROM && !entry->region)
+				if ((FPTR)entry->read.generic == STATIC_ROM && entry->rgntag == NULL)
 				{
-					entry->region = REGION_CPU1 + cpunum;
-					entry->region_offs = entry->addrstart;
+					entry->rgnclass = RGNCLASS_CPU;
+					entry->rgntag = config->cpu[cpunum].tag;
+					entry->rgnoffs = entry->addrstart;
 				}
 
 				/* if this entry references a memory region, validate it */
-				if (entry->region && entry->share == 0)
+				if (entry->rgntag != NULL && entry->share == 0)
 				{
-					offs_t length = region_length[entry->region];
-
-					if (length == 0)
+					int rgnnum;
+					
+					/* loop over entries in the class */
+					for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries[entry->rgnclass]); rgnnum++)
 					{
-						mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X references non-existant region %d\n", driver->source_file, driver->name, cpunum, spacenum, entry->addrstart, entry->addrend, entry->region);
-						error = TRUE;
-					}
-					else if (entry->region_offs + (byteend - bytestart + 1) > length)
-					{
-						mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X extends beyond region %d size (%X)\n", driver->source_file, driver->name, cpunum, spacenum, entry->addrstart, entry->addrend, entry->region, length);
-						error = TRUE;
+						/* stop if we hit an empty */
+						if (rgninfo->entries[entry->rgnclass][rgnnum].tag == NULL)
+						{
+							mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X references non-existant region %d,\"%s\"\n", driver->source_file, driver->name, cpunum, spacenum, entry->addrstart, entry->addrend, entry->rgnclass, entry->rgntag);
+							error = TRUE;
+							break;
+						}
+						
+						/* if we hit a match, check against the length */
+						if (strcmp(rgninfo->entries[entry->rgnclass][rgnnum].tag, entry->rgntag) == 0)
+						{
+							offs_t length = rgninfo->entries[entry->rgnclass][rgnnum].length;
+							if (entry->rgnoffs + (byteend - bytestart + 1) > length)
+							{
+								mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X extends beyond region %d,\"%s\" size (%X)\n", driver->source_file, driver->name, cpunum, spacenum, entry->addrstart, entry->addrend, entry->rgnclass, entry->rgntag, length);
+								error = TRUE;
+							}
+							break;
+						}
 					}
 				}
 
@@ -892,7 +950,7 @@ static int validate_display(int drivnum, const machine_config *config)
     configuration
 -------------------------------------------------*/
 
-static int validate_gfx(int drivnum, const machine_config *config, const UINT32 *region_length)
+static int validate_gfx(int drivnum, const machine_config *config, region_info *rgninfo)
 {
 	const game_driver *driver = drivers[drivnum];
 	int error = FALSE;
@@ -903,10 +961,10 @@ static int validate_gfx(int drivnum, const machine_config *config, const UINT32 
 		return FALSE;
 
 	/* iterate over graphics decoding entries */
-	for (gfxnum = 0; gfxnum < MAX_GFX_ELEMENTS && config->gfxdecodeinfo[gfxnum].memory_region != -1; gfxnum++)
+	for (gfxnum = 0; gfxnum < MAX_GFX_ELEMENTS && config->gfxdecodeinfo[gfxnum].gfxlayout != NULL; gfxnum++)
 	{
 		const gfx_decode_entry *gfx = &config->gfxdecodeinfo[gfxnum];
-		int region = gfx->memory_region;
+		const char *region = gfx->memory_region;
 		int xscale = (config->gfxdecodeinfo[gfxnum].xscale == 0) ? 1 : config->gfxdecodeinfo[gfxnum].xscale;
 		int yscale = (config->gfxdecodeinfo[gfxnum].yscale == 0) ? 1 : config->gfxdecodeinfo[gfxnum].yscale;
 		const gfx_layout *gl = gfx->gfxlayout;
@@ -916,33 +974,57 @@ static int validate_gfx(int drivnum, const machine_config *config, const UINT32 
 		UINT16 height = gl->height;
 		UINT32 total = gl->total;
 
-		/* if we have a valid region, and we're not using auto-sizing, check the decode against the region length */
-		if (region && !IS_FRAC(total))
+		/* make sure the region exists */
+		if (region != NULL)
 		{
-			int len, avail, plane, start;
-			UINT32 charincrement = gl->charincrement;
-			const UINT32 *poffset = gl->planeoffset;
+			int rgnnum;
 
-			/* determine which plane is the largest */
-			start = 0;
-			for (plane = 0; plane < planes; plane++)
-				if (poffset[plane] > start)
-					start = poffset[plane];
-			start &= ~(charincrement - 1);
-
-			/* determine the total length based on this info */
-			len = total * charincrement;
-
-			/* do we have enough space in the region to cover the whole decode? */
-			avail = region_length[region] - (gfx->start & ~(charincrement/8-1));
-
-			/* if not, this is an error */
-			if ((start + len) / 8 > avail)
+			/* loop over gfx regions */
+			for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries[RGNCLASS_GFX]); rgnnum++)
 			{
-				mame_printf_error("%s: %s has gfx[%d] extending past allocated memory\n", driver->source_file, driver->name, gfxnum);
-				error = TRUE;
+				/* stop if we hit an empty */
+				if (rgninfo->entries[RGNCLASS_GFX][rgnnum].tag == NULL)
+				{
+					mame_printf_error("%s: %s has gfx[%d] referencing non-existent region \"%s\"\n", driver->source_file, driver->name, gfxnum, region);
+					error = TRUE;
+					break;
+				}
+				
+				/* if we hit a match, check against the length */
+				if (strcmp(rgninfo->entries[RGNCLASS_GFX][rgnnum].tag, region) == 0)
+				{
+					/* if we have a valid region, and we're not using auto-sizing, check the decode against the region length */
+					if (!IS_FRAC(total))
+					{
+						int len, avail, plane, start;
+						UINT32 charincrement = gl->charincrement;
+						const UINT32 *poffset = gl->planeoffset;
+
+						/* determine which plane is the largest */
+						start = 0;
+						for (plane = 0; plane < planes; plane++)
+							if (poffset[plane] > start)
+								start = poffset[plane];
+						start &= ~(charincrement - 1);
+
+						/* determine the total length based on this info */
+						len = total * charincrement;
+
+						/* do we have enough space in the region to cover the whole decode? */
+						avail = rgninfo->entries[RGNCLASS_GFX][rgnnum].length - (gfx->start & ~(charincrement/8-1));
+
+						/* if not, this is an error */
+						if ((start + len) / 8 > avail)
+						{
+							mame_printf_error("%s: %s has gfx[%d] extending past allocated memory of region \"%s\"\n", driver->source_file, driver->name, gfxnum, region);
+							error = TRUE;
+						}
+					}
+					break;
+				}
 			}
 		}
+
 		if (israw)
 		{
 			if (total != RGN_FRAC(1,1))
@@ -1502,8 +1584,8 @@ int mame_validitychecks(const game_driver *curdriver)
 	for (drivnum = 0; drivers[drivnum]; drivnum++)
 	{
 		const game_driver *driver = drivers[drivnum];
-		UINT32 region_length[REGION_MAX];
 		machine_config *config;
+		region_info rgninfo;
 
 /* ASG -- trying this for a while to see if submission failures increase */
 #if 1
@@ -1524,12 +1606,12 @@ int mame_validitychecks(const game_driver *curdriver)
 
 		/* validate the ROM information */
 		rom_checks -= osd_profiling_ticks();
-		error = validate_roms(drivnum, config, region_length) || error;
+		error = validate_roms(drivnum, config, &rgninfo) || error;
 		rom_checks += osd_profiling_ticks();
 
 		/* validate the CPU information */
 		cpu_checks -= osd_profiling_ticks();
-		error = validate_cpu(drivnum, config, region_length) || error;
+		error = validate_cpu(drivnum, config, &rgninfo) || error;
 		cpu_checks += osd_profiling_ticks();
 
 		/* validate the display */
@@ -1539,7 +1621,7 @@ int mame_validitychecks(const game_driver *curdriver)
 
 		/* validate the graphics decoding */
 		gfx_checks -= osd_profiling_ticks();
-		error = validate_gfx(drivnum, config, region_length) || error;
+		error = validate_gfx(drivnum, config, &rgninfo) || error;
 		gfx_checks += osd_profiling_ticks();
 
 		/* validate input ports */

@@ -165,7 +165,7 @@ static void msm5205_reset(void *chip)
  *    Start emulation of an MSM5205-compatible chip
  */
 
-static void *msm5205_start(int sndindex, int clock, const void *config)
+static void *msm5205_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct MSM5205Voice *voice;
 

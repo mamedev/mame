@@ -218,9 +218,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( speedbal )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,	 256, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,	 512, 16 )
-	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,   0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,	 256, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,	 512, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0, 16 )
 GFXDECODE_END
 
 
@@ -268,23 +268,23 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( speedbal )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64K for code: main */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )     /* 64K for code: main */
 	ROM_LOAD( "sb1.bin",  0x0000,  0x8000, CRC(1c242e34) SHA1(8b2e8983e0834c99761ce2b5ea765dba56e77964) )
 	ROM_LOAD( "sb3.bin",  0x8000,  0x8000, CRC(7682326a) SHA1(15a72bf088a9adfaa50c11202b4970e07c309a21) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64K for second CPU: sound */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )     /* 64K for second CPU: sound */
 	ROM_LOAD( "sb2.bin",  0x0000, 0x8000, CRC(e6a6d9b7) SHA1(35d228d13d4305f606fdd84adad1d6e435f4b7ce) )
 
-	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD("sb10.bin",  0x00000, 0x08000, CRC(36dea4bf) SHA1(60095f482af4595a39be5ae6def8cd30298c1ef8) )    /* chars */
 
-	ROM_REGION( 0x20000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "sb9.bin",  0x00000, 0x08000, CRC(b567e85e) SHA1(7036792ea70ad48384f348399ed9b136272fedb6) )    /* bg tiles */
 	ROM_LOAD( "sb5.bin",  0x08000, 0x08000, CRC(b0eae4ba) SHA1(baee3fcb1399c56efaa5f97912de324d7b38f286) )
 	ROM_LOAD( "sb8.bin",  0x10000, 0x08000, CRC(d2bfbdb6) SHA1(b552b055450f438729c83337f561d05b6518ae75) )
 	ROM_LOAD( "sb4.bin",  0x18000, 0x08000, CRC(1d23a130) SHA1(aabf7c46f9299ffb8b8ca92839622d000a470a0b) )
 
-	ROM_REGION( 0x10000, REGION_GFX3, ROMREGION_INVERT | ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx3", ROMREGION_INVERT | ROMREGION_DISPOSE )
 	ROM_LOAD( "sb7.bin",  0x00000, 0x08000, CRC(9f1b33d1) SHA1(1f8be8f8e6a2ee99a7dafeead142ccc629fa792d) )   /* sprites */
 	ROM_LOAD( "sb6.bin",  0x08000, 0x08000, CRC(0e2506eb) SHA1(56f779266b977819063c475b84ca246fc6d8d6a7) )
 ROM_END

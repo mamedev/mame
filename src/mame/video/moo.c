@@ -50,7 +50,7 @@ VIDEO_START(moo)
 	K053251_vh_start(machine);
 	K054338_vh_start();
 
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_4, 1, NULL, moo_tile_callback, 0);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_4, 1, NULL, moo_tile_callback, 0);
 
 	if (!strcmp(machine->gamedrv->name, "bucky") || !strcmp(machine->gamedrv->name, "buckyua"))
 	{
@@ -77,7 +77,7 @@ VIDEO_START(moo)
 		offsy =  23;
 	}
 
-	K053247_vh_start(machine, REGION_GFX2, offsx, offsy, NORMAL_PLANE_ORDER, moo_sprite_callback);
+	K053247_vh_start(machine, "gfx2", offsx, offsy, NORMAL_PLANE_ORDER, moo_sprite_callback);
 
 	K054338_invert_alpha(0);
 }

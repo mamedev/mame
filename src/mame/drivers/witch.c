@@ -27,7 +27,7 @@ GFX
 
     In (assumed) order of priority :
         - Top layer @0xc000-0xc3ff(vram) + 0xc400-0xc7ff(cram) apparently not scrollable (gfx0)
-            Uses tiles from REGION_GFX2
+            Uses tiles from RGNCLASS_GFX, "gfx2"
 
             tileno =    vram | ((cram & 0xe0) << 3)
             color  =    cram & 0x0f
@@ -36,7 +36,7 @@ GFX
         - Sprites @0xd000-0xd7ff + 0xd800-0xdfff
                 One sprite every 0x20 bytes
                 0x40 sprites
-                Tiles are from REGION_GFX2
+                Tiles are from RGNCLASS_GFX, "gfx2"
                 Seems to be only 16x16 sprites (2x2 tiles)
                 xflip and yflip available
 
@@ -46,7 +46,7 @@ GFX
                 flags+colors    = sprite_ram[i*0x20+3];
 
         - Background layer @0xc800-0xcbff(vram) + 0xcc00-0xcfff(cram) (gfx1)
-                Uses tiles from REGION_GFX1
+                Uses tiles from RGNCLASS_GFX, "gfx1"
                     tileno = vram | ((cram & 0xf0) << 4),
                     color  = cram & 0x0f
 
@@ -353,7 +353,7 @@ static WRITE8_HANDLER(write_a00x)
 
 			if(newbank != bank)
 			{
-				UINT8 *ROM = memory_region(machine, REGION_CPU1);
+				UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
 				bank = newbank;
 				ROM = &ROM[0x10000+0x8000 * newbank + UNBANKED_SIZE];
 				memory_set_bankptr(1,ROM);
@@ -392,7 +392,7 @@ static READ8_HANDLER(prot_read_700x)
   	case 0x25e:
 		return offset;//enough to pass...
    }
-  return memory_region(machine, REGION_CPU2)[0x7000+offset];
+  return memory_region(machine, RGNCLASS_CPU, "sub")[0x7000+offset];
 }
 
 /*
@@ -662,12 +662,6 @@ F180 kkkbbppp ; Read onPORT 0xA005
 	PORT_DIPSETTING(    0x00, DEF_STR(High) )
 INPUT_PORTS_END
 
-static const struct ES8712interface es8712_interface =
-{
-	REGION_SOUND1
-};
-
-
 static const gfx_layout tiles8x8_layout =
 {
 	8,8,
@@ -680,8 +674,8 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( witch )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 static VIDEO_START(witch)
@@ -803,7 +797,6 @@ static MACHINE_DRIVER_START( witch )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("es", ES8712, 8000)
-	MDRV_SOUND_CONFIG(es8712_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("ym1", YM2203, 1500000)
@@ -818,45 +811,45 @@ MACHINE_DRIVER_END
 
 /* this set has (c)1992 Sega / Vic Tokai in the roms? */
 ROM_START( witch )
-	ROM_REGION( 0x30000, REGION_CPU1, 0 )
+	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "rom.u5", 0x10000, 0x20000, CRC(348fccb8) SHA1(947defd86c4a597fbfb9327eec4903aa779b3788)  )
-	ROM_COPY( REGION_CPU1 , 0x10000, 0x0000, 0x8000 )
+	ROM_COPY( RGNCLASS_CPU, "main" , 0x10000, 0x0000, 0x8000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "sub", 0 )
 	ROM_LOAD( "rom.s6", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0)  )
 
-	ROM_REGION( 0x20000, REGION_GFX1, 0 )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD( "rom.u3", 0x00000, 0x20000,  CRC(7007ced4) SHA1(6a0aac3ff9a4d5360c8ba1142f010add1b430ada)  )
 
-	ROM_REGION( 0x40000, REGION_GFX2, 0 )
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", 0 )
 	ROM_LOAD( "rom.a1", 0x00000, 0x40000,  CRC(512300a5) SHA1(1e9ba58d1ddbfb8276c68f6d5c3591e6b77abf21)  )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "es", 0 )
 	ROM_LOAD( "rom.v10", 0x00000, 0x40000, CRC(62e42371) SHA1(5042abc2176d0c35fd6b698eca4145f93b0a3944) )
 ROM_END
 
 /* no sega logo? a bootleg? */
 ROM_START( pbchmp95 )
-	ROM_REGION( 0x30000, REGION_CPU1, 0 )
+	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "3.bin", 0x10000, 0x20000, CRC(e881aa05) SHA1(10d259396cac4b9a1b72c262c11ffa5efbdac433)  )
-	ROM_COPY( REGION_CPU1 , 0x10000, 0x0000, 0x8000 )
+	ROM_COPY( RGNCLASS_CPU, "main" , 0x10000, 0x0000, 0x8000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "sub", 0 )
 	ROM_LOAD( "4.bin", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0)  )
 
-	ROM_REGION( 0x20000, REGION_GFX1, 0 )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD( "2.bin", 0x00000, 0x20000,  CRC(7007ced4) SHA1(6a0aac3ff9a4d5360c8ba1142f010add1b430ada)  )
 
-	ROM_REGION( 0x40000, REGION_GFX2, 0 )
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", 0 )
 	ROM_LOAD( "1.bin", 0x00000, 0x40000,  CRC(f6cf7ed6) SHA1(327580a17eb2740fad974a01d97dad0a4bef9881)  )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "es", 0 )
 	ROM_LOAD( "5.bin", 0x00000, 0x40000, CRC(62e42371) SHA1(5042abc2176d0c35fd6b698eca4145f93b0a3944) )
 ROM_END
 
 static DRIVER_INIT(witch)
 {
- 	UINT8 *ROM = (UINT8 *)memory_region(machine, REGION_CPU1);
+ 	UINT8 *ROM = (UINT8 *)memory_region(machine, RGNCLASS_CPU, "main");
 	memory_set_bankptr(1,&ROM[0x10000+UNBANKED_SIZE]);
 
 	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x7000, 0x700f, 0, 0, prot_read_700x);

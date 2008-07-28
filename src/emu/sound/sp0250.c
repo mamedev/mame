@@ -190,7 +190,7 @@ static void sp0250_update(void *param, stream_sample_t **inputs, stream_sample_t
 }
 
 
-static void *sp0250_start(int sndindex, int clock, const void *config)
+static void *sp0250_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	const struct sp0250_interface *intf = config;
 	struct sp0250 *sp;

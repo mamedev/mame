@@ -394,9 +394,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( finalizr )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,        0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,  16*16, 16 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,    16*16, 16 )  /* to handle 8x8 sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  16*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    16*16, 16 )  /* to handle 8x8 sprites */
 GFXDECODE_END
 
 
@@ -446,16 +446,16 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( finalizr )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "523k01.9c",    0x4000, 0x4000, CRC(716633cb) SHA1(9c21e608b6a73967688fa6aeb5995c20c1b48c74) )
 	ROM_LOAD( "523k02.12c",   0x8000, 0x4000, CRC(1bccc696) SHA1(3c29f4a030e76660b5a25347e042e344b0653343) )
 	ROM_LOAD( "523k03.13c",   0xc000, 0x4000, CRC(c48927c6) SHA1(9cf6b285034670370ba0246c33e1fe0a057457e7) )
 
-	ROM_REGION( 0x1000, REGION_CPU2, 0 )	/* 8039 */
+	ROM_REGION( 0x1000, RGNCLASS_CPU, "audio", 0 )	/* 8039 */
 	ROM_LOAD( "d8749hd.bin",  0x0000, 0x0800, CRC(978dfc33) SHA1(13d24ce577b88bf6ec2e970d36dc67a7ec691c55) )	/* this comes from the bootleg, */
 															/* the original has a custom IC */
 
-	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "523h04.5e",    0x00000, 0x4000, CRC(c056d710) SHA1(3fe0ab7ef3bce7298c2a073d0985c33f9dc40062) )
 	ROM_LOAD16_BYTE( "523h07.5f",    0x00001, 0x4000, CRC(50e512ba) SHA1(f916afb9df1872f9de571d20b9045b20d9172eaa) )
 	ROM_LOAD16_BYTE( "523h05.6e",    0x08000, 0x4000, CRC(ae0d0f76) SHA1(6dd0119e4ba7ebb32ba1ca6395f80d18f1617ce8) )
@@ -464,7 +464,7 @@ ROM_START( finalizr )
 	ROM_LOAD16_BYTE( "523h09.7f",    0x10001, 0x4000, CRC(8896dc85) SHA1(91493c6b69655de482f0c2a0cb3662fc0d1b6e45) )
 	/* 18000-1ffff empty */
 
-	ROM_REGION( 0x0240, REGION_PROMS, 0 )
+	ROM_REGION( 0x0240, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "523h10.2f",    0x0000, 0x0020, CRC(ec15dd15) SHA1(710384b154a9363fdc88edffda252f1d60e000dc) ) /* palette */
 	ROM_LOAD( "523h11.3f",    0x0020, 0x0020, CRC(54be2e83) SHA1(3200abc7f2238d62d7204ef57a6daa2df150538d) ) /* palette */
 	ROM_LOAD( "523h13.11f",   0x0040, 0x0100, CRC(4e0647a0) SHA1(fb87f878456b8b76bb2c028cb890d2a5c1c3e388) ) /* characters */
@@ -472,14 +472,14 @@ ROM_START( finalizr )
 ROM_END
 
 ROM_START( finalizb )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "finalizr.5",   0x4000, 0x8000, CRC(a55e3f14) SHA1(47f6da214b36cc56be547fa4313afcc5572508a2) )
 	ROM_LOAD( "finalizr.6",   0xc000, 0x4000, CRC(ce177f6e) SHA1(034cbe0c1e2baf9577741b3c222a8b4a8ac8c919) )
 
-	ROM_REGION( 0x1000, REGION_CPU2, 0 )	/* 8039 */
+	ROM_REGION( 0x1000, RGNCLASS_CPU, "audio", 0 )	/* 8039 */
 	ROM_LOAD( "d8749hd.bin",  0x0000, 0x0800, CRC(978dfc33) SHA1(13d24ce577b88bf6ec2e970d36dc67a7ec691c55) )
 
-	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "523h04.5e",    0x00000, 0x4000, CRC(c056d710) SHA1(3fe0ab7ef3bce7298c2a073d0985c33f9dc40062) )
 	ROM_LOAD16_BYTE( "523h07.5f",    0x00001, 0x4000, CRC(50e512ba) SHA1(f916afb9df1872f9de571d20b9045b20d9172eaa) )
 	ROM_LOAD16_BYTE( "523h05.6e",    0x08000, 0x4000, CRC(ae0d0f76) SHA1(6dd0119e4ba7ebb32ba1ca6395f80d18f1617ce8) )
@@ -488,7 +488,7 @@ ROM_START( finalizb )
 	ROM_LOAD16_BYTE( "523h09.7f",    0x10001, 0x4000, CRC(8896dc85) SHA1(91493c6b69655de482f0c2a0cb3662fc0d1b6e45) )
 	/* 18000-1ffff empty */
 
-	ROM_REGION( 0x0240, REGION_PROMS, 0 )
+	ROM_REGION( 0x0240, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "523h10.2f",    0x0000, 0x0020, CRC(ec15dd15) SHA1(710384b154a9363fdc88edffda252f1d60e000dc) ) /* palette */
 	ROM_LOAD( "523h11.3f",    0x0020, 0x0020, CRC(54be2e83) SHA1(3200abc7f2238d62d7204ef57a6daa2df150538d) ) /* palette */
 	ROM_LOAD( "523h13.11f",   0x0040, 0x0100, CRC(4e0647a0) SHA1(fb87f878456b8b76bb2c028cb890d2a5c1c3e388) ) /* characters */
@@ -498,7 +498,7 @@ ROM_END
 
 static DRIVER_INIT( finalizr )
 {
-	konami1_decode(machine, 0);
+	konami1_decode(machine, "main");
 }
 
 

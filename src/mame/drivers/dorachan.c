@@ -75,7 +75,7 @@ static VIDEO_UPDATE( dorachan )
 
 	get_pens(pens);
 
-	color_map_base = memory_region(screen->machine, REGION_PROMS);
+	color_map_base = memory_region(screen->machine, RGNCLASS_PROMS, "proms");
 
 	for (offs = 0; offs < dorachan_videoram_size; offs++)
 	{
@@ -236,7 +236,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( dorachan )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "c1.e1",      0x0000, 0x0400, CRC(29d66a96) SHA1(a0297d87574af65c6ded99aeb377ac407f6f163f) )
 	ROM_LOAD( "d2.e2",      0x0400, 0x0400, CRC(144b6cd1) SHA1(195ce86e912a4b395097008c6d812fd75a1a2482) )
 	ROM_LOAD( "d3.e3",      0x0800, 0x0400, CRC(a9a1bed7) SHA1(98af6f851c4477f770b6bd67e5465b5a271311ee) )
@@ -251,7 +251,7 @@ ROM_START( dorachan )
 	ROM_LOAD( "d12.rom",    0x7000, 0x0400, CRC(275e5dc1) SHA1(ac07db4b428daa49a52c679de95ddedbea0076b9) )
 	ROM_LOAD( "d13.rom",    0x7400, 0x0400, CRC(24ccfcf9) SHA1(85e5052ee657f518b0509eb64e494bc3a74e651e) )
 
-	ROM_REGION( 0x0400, REGION_PROMS, 0 )  /* color map */
+	ROM_REGION( 0x0400, RGNCLASS_PROMS, "proms", 0 )  /* color map */
 	ROM_LOAD( "d14.rom",    0x0000, 0x0400, CRC(c0d3ee84) SHA1(f2207c685ce8d5144a373c28f11d2cebf9518b65) )
 ROM_END
 

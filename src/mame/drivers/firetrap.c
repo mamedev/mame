@@ -90,7 +90,7 @@ static WRITE8_HANDLER( firetrap_nmi_disable_w )
 static WRITE8_HANDLER( firetrap_bankselect_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x4000;
 	memory_set_bankptr(1,&RAM[bankaddress]);
@@ -212,7 +212,7 @@ static WRITE8_HANDLER( firetrap_sound_2400_w )
 static WRITE8_HANDLER( firetrap_sound_bankselect_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "audio");
 
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
 	memory_set_bankptr(2,&RAM[bankaddress]);
@@ -524,10 +524,10 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( firetrap )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x00, 16 )	/* colors 0x00-0x3f */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,   0x80,  4 )	/* colors 0x80-0xbf */
-	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout,   0xc0,  4 )	/* colors 0xc0-0xff */
-	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout, 0x40,  4 )	/* colors 0x40-0x7f */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 16 )	/* colors 0x00-0x3f */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0x80,  4 )	/* colors 0x80-0xbf */
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0xc0,  4 )	/* colors 0xc0-0xff */
+	GFXDECODE_ENTRY( "gfx4", 0, spritelayout, 0x40,  4 )	/* colors 0x40-0x7f */
 GFXDECODE_END
 
 
@@ -659,21 +659,21 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( firetrap )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 64k for code + 64k for banked ROMs */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )	/* 64k for code + 64k for banked ROMs */
 	ROM_LOAD( "di02.bin",     0x00000, 0x8000, CRC(3d1e4bf7) SHA1(ee903b469619f49edb1727fb545c9a6085f50746) )
 	ROM_LOAD( "di01.bin",     0x10000, 0x8000, CRC(9bbae38b) SHA1(dc1d3ed5da71bfb104fd54fc70c56833f31d281f) )
 	ROM_LOAD( "di00.bin",     0x18000, 0x8000, CRC(d0dad7de) SHA1(8783ebf6ddfef32f6036913d403f76c1545b813d) )
 
-	ROM_REGION( 0x18000, REGION_CPU2, 0 )	/* 64k for the sound CPU + 32k for banked ROMs */
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "audio", 0 )	/* 64k for the sound CPU + 32k for banked ROMs */
 	ROM_LOAD( "di17.bin",     0x08000, 0x8000, CRC(8605f6b9) SHA1(4fba88f34afd91d2cbc578b3b70f5399b8844390) )
 	ROM_LOAD( "di18.bin",     0x10000, 0x8000, CRC(49508c93) SHA1(3812b0b1a33a1506d2896d2b676ed6aabb29dac0) )
 
 	/* there's also a protected 8751 microcontroller with ROM onboard */
 
-	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE )	/* characters */
+	ROM_REGION( 0x02000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* characters */
 	ROM_LOAD( "di03.bin",     0x00000, 0x2000, CRC(46721930) SHA1(a605fe993166e95c1602a35b548649ceae77bff2) )
 
-	ROM_REGION( 0x20000, REGION_GFX2, ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* tiles */
 	ROM_LOAD( "di06.bin",     0x00000, 0x2000, CRC(441d9154) SHA1(340804e82d4aba8e9fcdd08cce0cfecefd2f77a9) )
 	ROM_CONTINUE(             0x08000, 0x2000 )
 	ROM_CONTINUE(             0x02000, 0x2000 )
@@ -691,7 +691,7 @@ ROM_START( firetrap )
 	ROM_CONTINUE(             0x16000, 0x2000 )
 	ROM_CONTINUE(             0x1e000, 0x2000 )
 
-	ROM_REGION( 0x20000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "di09.bin",     0x00000, 0x2000, CRC(d11e28e8) SHA1(3e91764f74d551e0984bac92daeab4e094e8dc13) )
 	ROM_CONTINUE(             0x08000, 0x2000 )
 	ROM_CONTINUE(             0x02000, 0x2000 )
@@ -709,32 +709,32 @@ ROM_START( firetrap )
 	ROM_CONTINUE(             0x16000, 0x2000 )
 	ROM_CONTINUE(             0x1e000, 0x2000 )
 
-	ROM_REGION( 0x20000, REGION_GFX4, ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE )	/* sprites */
 	ROM_LOAD( "di16.bin",     0x00000, 0x8000, CRC(0de055d7) SHA1(ef763237c317545520c659f438b572b11c342d5a) )
 	ROM_LOAD( "di13.bin",     0x08000, 0x8000, CRC(869219da) SHA1(9ab2439d6d1c62fce24c4f78ac7887f34c86cd75) )
 	ROM_LOAD( "di14.bin",     0x10000, 0x8000, CRC(6b65812e) SHA1(209e07b2fced6b033c6d5398a998374588a35f46) )
 	ROM_LOAD( "di15.bin",     0x18000, 0x8000, CRC(3e27f77d) SHA1(9ceccb1f56a8d0e05f6dea45d102690a1370624e) )
 
-	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_REGION( 0x0200, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "firetrap.3b",  0x0000,  0x0100, CRC(8bb45337) SHA1(deaf6ea53eb3955230db1fdcb870079758a0c996) ) /* palette red and green component */
 	ROM_LOAD( "firetrap.4b",  0x0100,  0x0100, CRC(d5abfc64) SHA1(6c808c1d6087804214dc29d35280f42382c40b18) ) /* palette blue component */
 ROM_END
 
 ROM_START( firetpbl )
-	ROM_REGION( 0x28000, REGION_CPU1, 0 )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x28000, RGNCLASS_CPU, "main", 0 )	/* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "ft0d.bin",     0x00000, 0x8000, CRC(793ef849) SHA1(5a2c587370733d43484ba0a38a357260cdde8357) )
 	ROM_LOAD( "ft0a.bin",     0x08000, 0x8000, CRC(613313ee) SHA1(54e386b2b1faada3441e3e0bb7822a63eab36930) )	/* unprotection code */
 	ROM_LOAD( "ft0c.bin",     0x10000, 0x8000, CRC(5c8a0562) SHA1(856766851faa4353445d944b7705e348fd1379e4) )
 	ROM_LOAD( "ft0b.bin",     0x18000, 0x8000, CRC(f2412fe8) SHA1(28a9143e36c31fe34f40888dc848aed3d572d801) )
 
-	ROM_REGION( 0x18000, REGION_CPU2, 0 )	/* 64k for the sound CPU + 32k for banked ROMs */
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "audio", 0 )	/* 64k for the sound CPU + 32k for banked ROMs */
 	ROM_LOAD( "di17.bin",     0x08000, 0x8000, CRC(8605f6b9) SHA1(4fba88f34afd91d2cbc578b3b70f5399b8844390) )
 	ROM_LOAD( "di18.bin",     0x10000, 0x8000, CRC(49508c93) SHA1(3812b0b1a33a1506d2896d2b676ed6aabb29dac0) )
 
-	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE )	/* characters */
+	ROM_REGION( 0x02000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* characters */
 	ROM_LOAD( "ft0e.bin",     0x00000, 0x2000, CRC(a584fc16) SHA1(6ac3692a14cb7c70799c23f8f6726fa5be1ac0d8) )
 
-	ROM_REGION( 0x20000, REGION_GFX2, ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* tiles */
 	ROM_LOAD( "di06.bin",     0x00000, 0x2000, CRC(441d9154) SHA1(340804e82d4aba8e9fcdd08cce0cfecefd2f77a9) )
 	ROM_CONTINUE(             0x08000, 0x2000 )
 	ROM_CONTINUE(             0x02000, 0x2000 )
@@ -752,7 +752,7 @@ ROM_START( firetpbl )
 	ROM_CONTINUE(             0x16000, 0x2000 )
 	ROM_CONTINUE(             0x1e000, 0x2000 )
 
-	ROM_REGION( 0x20000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "di09.bin",     0x00000, 0x2000, CRC(d11e28e8) SHA1(3e91764f74d551e0984bac92daeab4e094e8dc13) )
 	ROM_CONTINUE(             0x08000, 0x2000 )
 	ROM_CONTINUE(             0x02000, 0x2000 )
@@ -770,13 +770,13 @@ ROM_START( firetpbl )
 	ROM_CONTINUE(             0x16000, 0x2000 )
 	ROM_CONTINUE(             0x1e000, 0x2000 )
 
-	ROM_REGION( 0x20000, REGION_GFX4, ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE )	/* sprites */
 	ROM_LOAD( "di16.bin",     0x00000, 0x8000, CRC(0de055d7) SHA1(ef763237c317545520c659f438b572b11c342d5a) )
 	ROM_LOAD( "di13.bin",     0x08000, 0x8000, CRC(869219da) SHA1(9ab2439d6d1c62fce24c4f78ac7887f34c86cd75) )
 	ROM_LOAD( "di14.bin",     0x10000, 0x8000, CRC(6b65812e) SHA1(209e07b2fced6b033c6d5398a998374588a35f46) )
 	ROM_LOAD( "di15.bin",     0x18000, 0x8000, CRC(3e27f77d) SHA1(9ceccb1f56a8d0e05f6dea45d102690a1370624e) )
 
-	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_REGION( 0x0200, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "firetrap.3b",  0x0000,  0x0100, CRC(8bb45337) SHA1(deaf6ea53eb3955230db1fdcb870079758a0c996) ) /* palette red and green component */
 	ROM_LOAD( "firetrap.4b",  0x0100,  0x0100, CRC(d5abfc64) SHA1(6c808c1d6087804214dc29d35280f42382c40b18) ) /* palette blue component */
 ROM_END

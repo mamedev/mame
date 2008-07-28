@@ -98,7 +98,7 @@ static READ16_HANDLER ( varia_crom_read )
 {
 	/* game reads the cgrom, result is 7772, verified to be correct on the real board */
 
-	UINT8 *cgrom = memory_region(machine, REGION_GFX1);
+	UINT8 *cgrom = memory_region(machine, RGNCLASS_GFX, "gfx1");
 	UINT16 retdat;
 	offset = offset << 1;
 	offset |= (vmetal_videoregs[0x0ab/2]&0x7f) << 16;
@@ -360,8 +360,8 @@ static const gfx_layout char8x8layout =
 };
 
 static GFXDECODE_START( vmetal )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, char16x16layout,   0x1000, 512  ) /* bg tiles */
-	GFXDECODE_ENTRY( REGION_GFX1, 0, char8x8layout,   0x1000, 512  ) /* bg tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, char16x16layout,   0x1000, 512  ) /* bg tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, char8x8layout,   0x1000, 512  ) /* bg tiles */
 GFXDECODE_END
 
 
@@ -445,52 +445,51 @@ static MACHINE_DRIVER_START( varia )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1320000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.75)
 
 	MDRV_SOUND_ADD("es", ES8712, 12000)
-	MDRV_SOUND_CONFIG(es8712_interface_region_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 MACHINE_DRIVER_END
 
 
 ROM_START( vmetal )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "5b.u19", 0x00001, 0x80000, CRC(4933ac6c) SHA1(1a3303e32fcb08854d4d6e13f36ca99d92aed4cc) )
 	ROM_LOAD16_BYTE( "6b.u18", 0x00000, 0x80000, CRC(4eb939d5) SHA1(741ab05043fc3bd886162d878630e45da9359718) )
 
-	ROM_REGION( 0x800000, REGION_GFX1, 0 )
+	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", 0 )
 	ROMX_LOAD( "1.u29", 0x000004, 0x200000, CRC(b470c168) SHA1(c30462dc134da1e71a94b36ef96ecd65c325b07e) , ROM_GROUPWORD | ROM_SKIP(6))
 	ROMX_LOAD( "2.u31", 0x000000, 0x200000, CRC(b36f8d60) SHA1(1676859d0fee4eb9897ce1601a2c9fd9a6dc4a43) , ROM_GROUPWORD | ROM_SKIP(6))
 	ROMX_LOAD( "3.u28", 0x000006, 0x200000, CRC(00fca765) SHA1(ca9010bd7f59367e483868018db9a9abf871386e) , ROM_GROUPWORD | ROM_SKIP(6))
 	ROMX_LOAD( "4.u30", 0x000002, 0x200000, CRC(5a25a49c) SHA1(c30781202ec882e1ec6adfb560b0a1075b3cce55) , ROM_GROUPWORD | ROM_SKIP(6))
 
-	ROM_REGION( 0x080000, REGION_SOUND1, 0 ) /* OKI6295 Samples */
+	ROM_REGION( 0x080000, RGNCLASS_SOUND, "oki", 0 ) /* OKI6295 Samples */
 	/* Second half is junk */
 	ROM_LOAD( "8.u9", 0x00000, 0x80000, CRC(c14c001c) SHA1(bad96b5cd40d1c34ef8b702262168ecab8192fb6) )
 
-	ROM_REGION( 0x200000, REGION_SOUND2, 0 ) /* Samples */
+	ROM_REGION( 0x200000, RGNCLASS_SOUND, "es", 0 ) /* Samples */
 	ROM_LOAD( "7.u12", 0x00000, 0x200000, CRC(a88c52f1) SHA1(d74a5a11f84ba6b1042b33a2c156a1071b6fbfe1) )
 ROM_END
 
 ROM_START( vmetaln )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "vm5.bin", 0x00001, 0x80000, CRC(43ef844e) SHA1(c673f34fcc9e406282c9008795b52d01a240099a) )
 	ROM_LOAD16_BYTE( "vm6.bin", 0x00000, 0x80000, CRC(cb292ab1) SHA1(41fdfe67e6cb848542fd5aa0dfde3b1936bb3a28) )
 
-	ROM_REGION( 0x800000, REGION_GFX1, 0 )
+	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", 0 )
 	ROMX_LOAD( "1.u29", 0x000004, 0x200000, CRC(b470c168) SHA1(c30462dc134da1e71a94b36ef96ecd65c325b07e) , ROM_GROUPWORD | ROM_SKIP(6))
 	ROMX_LOAD( "2.u31", 0x000000, 0x200000, CRC(b36f8d60) SHA1(1676859d0fee4eb9897ce1601a2c9fd9a6dc4a43) , ROM_GROUPWORD | ROM_SKIP(6))
 	ROMX_LOAD( "3.u28", 0x000006, 0x200000, CRC(00fca765) SHA1(ca9010bd7f59367e483868018db9a9abf871386e) , ROM_GROUPWORD | ROM_SKIP(6))
 	ROMX_LOAD( "4.u30", 0x000002, 0x200000, CRC(5a25a49c) SHA1(c30781202ec882e1ec6adfb560b0a1075b3cce55) , ROM_GROUPWORD | ROM_SKIP(6))
 
-	ROM_REGION( 0x080000, REGION_SOUND1, 0 ) /* OKI6295 Samples */
+	ROM_REGION( 0x080000, RGNCLASS_SOUND, "oki", 0 ) /* OKI6295 Samples */
 	/* Second half is junk */
 	ROM_LOAD( "8.u9", 0x00000, 0x80000, CRC(c14c001c) SHA1(bad96b5cd40d1c34ef8b702262168ecab8192fb6) )
 
-	ROM_REGION( 0x200000, REGION_SOUND2, 0 ) /* Samples */
+	ROM_REGION( 0x200000, RGNCLASS_SOUND, "es", 0 ) /* Samples */
 	ROM_LOAD( "7.u12", 0x00000, 0x200000, CRC(a88c52f1) SHA1(d74a5a11f84ba6b1042b33a2c156a1071b6fbfe1) )
 ROM_END
 

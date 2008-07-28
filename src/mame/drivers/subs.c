@@ -170,8 +170,8 @@ static const gfx_layout motion_layout =
 
 
 static GFXDECODE_START( subs )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, playfield_layout, 0, 2 ) 	/* playfield graphics */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, motion_layout,    0, 2 ) 	/* motion graphics */
+	GFXDECODE_ENTRY( "gfx1", 0, playfield_layout, 0, 2 ) 	/* playfield graphics */
+	GFXDECODE_ENTRY( "gfx2", 0, motion_layout,    0, 2 ) 	/* motion graphics */
 GFXDECODE_END
 
 
@@ -234,7 +234,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( subs )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "34190.p1",     0x2800, 0x0800, CRC(a88aef21) SHA1(3811c137041ca43a6e49fbaf7d9d8ef37ba190a2) )
 	ROM_LOAD( "34191.p2",     0x3000, 0x0800, CRC(2c652e72) SHA1(097b665e803cbc57b5a828403a8d9a258c19e97f) )
 	ROM_LOAD( "34192.n2",     0x3800, 0x0800, CRC(3ce63d33) SHA1(a413cb3e0d03dc40a50f5b03b76a4edbe7906f3e) )
@@ -246,10 +246,10 @@ ROM_START( subs )
 	ROM_LOAD( "34196.e2",     0x8000, 0x0100, CRC(7c7a04c3) SHA1(269d9f7573cc5da4412f53d647127c4884435353) )	/* ROM 0 D4-D7 */
 	ROM_LOAD( "34194.e1",     0x9000, 0x0100, CRC(6b1c4acc) SHA1(3a743b721d9e7e9bdc4533aeeab294eb0ea27500) )	/* ROM 0 D0-D3 */
 
-	ROM_REGION( 0x0800, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0800, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "34211.m4",     0x0000, 0x0800, CRC(fa8d4409) SHA1(a83b7a835212d31fe421d537fa0d78f234c26f5b) )	/* Playfield */
 
-	ROM_REGION( 0x0800, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0800, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "34216.d7",     0x0000, 0x0200, CRC(941d28b4) SHA1(89388ec06546dc567aa5dbc6a7898974f2871ecc) )	/* Motion */
 	ROM_LOAD( "34218.e7",     0x0200, 0x0200, CRC(f4f4d874) SHA1(d99ad9a74611f9851f6bfa6000ebd70e1a364f5d) )	/* Motion */
 	ROM_LOAD( "34217.d8",     0x0400, 0x0200, CRC(a7a60da3) SHA1(34fc21cc1ca69d58d3907094dc0a3faaf6f461b3) )	/* Motion */
@@ -266,7 +266,7 @@ ROM_END
 
 static DRIVER_INIT( subs )
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 	int i;
 
 	/* Merge nibble-wide roms together,

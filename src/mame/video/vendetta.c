@@ -56,16 +56,16 @@ VIDEO_START( vendetta )
 {
 	K053251_vh_start(machine);
 
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,vendetta_tile_callback);
-	K053247_vh_start(machine,REGION_GFX2,53,6,NORMAL_PLANE_ORDER,sprite_callback);
+	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,vendetta_tile_callback);
+	K053247_vh_start(machine,"gfx2",53,6,NORMAL_PLANE_ORDER,sprite_callback);
 }
 
 VIDEO_START( esckids )
 {
     K053251_vh_start(machine);
 
-    K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,esckids_tile_callback);
-	K053247_vh_start(machine,REGION_GFX2,101,6,NORMAL_PLANE_ORDER,sprite_callback);
+    K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,esckids_tile_callback);
+	K053247_vh_start(machine,"gfx2",101,6,NORMAL_PLANE_ORDER,sprite_callback);
 }
 
 

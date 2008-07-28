@@ -68,15 +68,10 @@ static UINT32 volume_table[16];
 static int tables_computed = 0;
 
 /* useful interfaces */
-const struct OKIM6295interface okim6295_interface_region_1_pin7high = { REGION_SOUND1, 1 };
-const struct OKIM6295interface okim6295_interface_region_2_pin7high = { REGION_SOUND2, 1 };
-const struct OKIM6295interface okim6295_interface_region_3_pin7high = { REGION_SOUND3, 1 };
-const struct OKIM6295interface okim6295_interface_region_4_pin7high = { REGION_SOUND4, 1 };
+const struct OKIM6295interface okim6295_interface_pin7high = { 1 };
+const struct OKIM6295interface okim6295_interface_pin7low = { 0 };
 
-const struct OKIM6295interface okim6295_interface_region_1_pin7low = { REGION_SOUND1, 0 };
-const struct OKIM6295interface okim6295_interface_region_2_pin7low = { REGION_SOUND2, 0 };
-const struct OKIM6295interface okim6295_interface_region_3_pin7low = { REGION_SOUND3, 0 };
-const struct OKIM6295interface okim6295_interface_region_4_pin7low = { REGION_SOUND4, 0 };
+
 
 /**********************************************************************************************
 
@@ -321,7 +316,7 @@ static void okim6295_state_save_register(struct okim6295 *info, int sndindex)
 
 ***********************************************************************************************/
 
-static void *okim6295_start(int sndindex, int clock, const void *config)
+static void *okim6295_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	const struct OKIM6295interface *intf = config;
 	struct okim6295 *info;
@@ -335,7 +330,7 @@ static void *okim6295_start(int sndindex, int clock, const void *config)
 
 	info->command = -1;
 	info->bank_offset = 0;
-	info->region_base = memory_region(Machine, intf->region);
+	info->region_base = memory_region(Machine, RGNCLASS_SOUND, (intf->rgnoverride != NULL) ? intf->rgnoverride : tag);
 
 	info->master_clock = clock;
 

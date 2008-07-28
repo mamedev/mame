@@ -6,7 +6,6 @@
 
 struct K007232_interface
 {
-	int bank;	/* memory regions */
 	void (*portwritehandler)(int);
 };
 

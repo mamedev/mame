@@ -54,7 +54,7 @@ VIDEO_START( tail2nos )
 {
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,8,8,64,32);
 
-	K051316_vh_start_0(machine,REGION_GFX3,-4,TRUE,0,zoom_callback);
+	K051316_vh_start_0(machine,"gfx3",-4,TRUE,0,zoom_callback);
 
 	dirtychar = auto_malloc(TOTAL_CHARS);
 	memset(dirtychar,1,TOTAL_CHARS);
@@ -63,7 +63,7 @@ VIDEO_START( tail2nos )
 
 	K051316_wraparound_enable(0,1);
 	K051316_set_offset(0,-89,-14);
-	zoomdata = (UINT16 *)memory_region(machine, REGION_GFX3);
+	zoomdata = (UINT16 *)memory_region(machine, RGNCLASS_GFX, "gfx3");
 }
 
 

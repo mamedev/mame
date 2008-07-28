@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( ultrsprt_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x7f700000, 0x7f703fff) AM_RAM_WRITE(palette_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x7fa00000, 0x7fbfffff) AM_ROM AM_SHARE(1)
 	AM_RANGE(0x7fc00000, 0x7fdfffff) AM_ROM AM_SHARE(1)
-	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION(REGION_USER1, 0) AM_SHARE(1)
+	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0) AM_SHARE(1)
 ADDRESS_MAP_END
 
 
@@ -226,11 +226,6 @@ static NVRAM_HANDLER(ultrsprt)
 	eeprom_handler(file, read_or_write);
 }
 
-static const struct K054539interface k054539_interface =
-{
-	REGION_SOUND1
-};
-
 static INTERRUPT_GEN( ultrsprt_vblank )
 {
 	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
@@ -268,7 +263,6 @@ static MACHINE_DRIVER_START( ultrsprt )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("konami", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -291,16 +285,16 @@ static DRIVER_INIT( ultrsprt )
 /*****************************************************************************/
 
 ROM_START( fiveside )
-	ROM_REGION(0x200000, REGION_USER1, 0)	/* PowerPC program roms */
+	ROM_REGION(0x200000, RGNCLASS_USER, "user1", 0)	/* PowerPC program roms */
 	ROM_LOAD32_BYTE("479uaa01.bin", 0x000003, 0x80000, CRC(1bc4893d) SHA1(2c9df38ecb7efa7b686221ee98fa3aad9a63e152))
 	ROM_LOAD32_BYTE("479uaa02.bin", 0x000002, 0x80000, CRC(ae74a6d0) SHA1(6113c2eea1628b22737c7b87af0e673d94984e88))
 	ROM_LOAD32_BYTE("479uaa03.bin", 0x000001, 0x80000, CRC(5c0b176f) SHA1(9560259bc081d4cfd72eb485c3fdcecf484ba7a8))
 	ROM_LOAD32_BYTE("479uaa04.bin", 0x000000, 0x80000, CRC(01a3e4cb) SHA1(819df79909d57fa12481698ffdb32b00586131d8))
 
-	ROM_REGION(0x20000, REGION_CPU2, 0)		/* M68K program */
+	ROM_REGION(0x20000, RGNCLASS_CPU, "audio", 0)		/* M68K program */
 	ROM_LOAD("479_a05.bin", 0x000000, 0x20000, CRC(251ae299) SHA1(5ffd74357e3c6ddb3a208c39a3b32b53fea90282))
 
-	ROM_REGION(0x100000, REGION_SOUND1, 0)	/* Sound roms */
+	ROM_REGION(0x100000, RGNCLASS_SOUND, "konami", 0)	/* Sound roms */
 	ROM_LOAD("479_a06.bin", 0x000000, 0x80000, CRC(8d6ac8a2) SHA1(7c4b8bd47cddc766cbdb6a486acc9221be55b579))
 	ROM_LOAD("479_a07.bin", 0x080000, 0x80000, CRC(75835df8) SHA1(105b95c16f2ce6902c2e4c9c2fd9f2f7a848c546))
 ROM_END

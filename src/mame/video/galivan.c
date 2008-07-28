@@ -127,7 +127,7 @@ PALETTE_INIT( galivan )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *BGROM = memory_region(machine, REGION_GFX4);
+	UINT8 *BGROM = memory_region(machine, RGNCLASS_GFX, "gfx4");
 	int attr = BGROM[tile_index + 0x4000];
 	int code = BGROM[tile_index] | ((attr & 0x03) << 8);
 	SET_TILE_INFO(
@@ -151,7 +151,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 static TILE_GET_INFO( ninjemak_get_bg_tile_info )
 {
-	UINT8 *BGROM = memory_region(machine, REGION_GFX4);
+	UINT8 *BGROM = memory_region(machine, RGNCLASS_GFX, "gfx4");
 	int attr = BGROM[tile_index + 0x4000];
 	int code = BGROM[tile_index] | ((attr & 0x03) << 8);
 	SET_TILE_INFO(
@@ -183,7 +183,7 @@ static TILE_GET_INFO( ninjemak_get_tx_tile_info )
 VIDEO_START( galivan )
 {
 	/* configure ROM banking */
-	UINT8 *rombase = memory_region(machine, REGION_CPU1);
+	UINT8 *rombase = memory_region(machine, RGNCLASS_CPU, "main");
 	memory_configure_bank(1, 0, 2, &rombase[0x10000], 0x2000);
 
 	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,   16,16,128,128);
@@ -202,7 +202,7 @@ VIDEO_START( galivan )
 VIDEO_START( ninjemak )
 {
 	/* configure ROM banking */
-	UINT8 *rombase = memory_region(machine, REGION_CPU1);
+	UINT8 *rombase = memory_region(machine, RGNCLASS_CPU, "main");
 	memory_configure_bank(1, 0, 4, &rombase[0x10000], 0x2000);
 
 	bg_tilemap = tilemap_create(ninjemak_get_bg_tile_info,tilemap_scan_cols,   16,16,512,32);
@@ -350,7 +350,7 @@ WRITE8_HANDLER( ninjemak_scrolly_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	const UINT8 *spritepalettebank = memory_region(machine, REGION_USER1);
+	const UINT8 *spritepalettebank = memory_region(machine, RGNCLASS_USER, "user1");
 	int offs;
 
 	/* draw the sprites */

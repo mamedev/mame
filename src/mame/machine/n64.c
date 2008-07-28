@@ -1577,8 +1577,8 @@ WRITE32_HANDLER( n64_pif_ram_w )
 void n64_machine_reset(running_machine *machine)
 {
 	int i;
-	//UINT32 *pif_rom   = (UINT32*)memory_region(machine, REGION_USER1);
-	UINT32 *cart = (UINT32*)memory_region(machine, REGION_USER2);
+	//UINT32 *pif_rom   = (UINT32*)memory_region(machine, RGNCLASS_USER, "user1");
+	UINT32 *cart = (UINT32*)memory_region(machine, RGNCLASS_USER, "user2");
 	UINT64 boot_checksum;
 
 	mi_version = 0;

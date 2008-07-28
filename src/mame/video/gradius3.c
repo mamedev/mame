@@ -68,8 +68,8 @@ VIDEO_START( gradius3 )
 	layer_colorbase[1] = 32;
 	layer_colorbase[2] = 48;
 	sprite_colorbase = 16;
-	K052109_vh_start(machine,REGION_GFX1,GRADIUS3_PLANE_ORDER,gradius3_tile_callback);
-	K051960_vh_start(machine,REGION_GFX2,GRADIUS3_PLANE_ORDER,gradius3_sprite_callback);
+	K052109_vh_start(machine,"gfx1",GRADIUS3_PLANE_ORDER,gradius3_tile_callback);
+	K051960_vh_start(machine,"gfx2",GRADIUS3_PLANE_ORDER,gradius3_sprite_callback);
 
 	K052109_set_layer_offsets(2, -2, 0);
 	K051960_set_sprite_offsets(2, 0);
@@ -77,7 +77,7 @@ VIDEO_START( gradius3 )
 	/* re-decode the sprites because the ROMs are connected to the custom IC differently
        from how they are connected to the CPU. */
 	for (i = 0;i < TOTAL_SPRITES;i++)
-		decodechar(machine->gfx[1],i,memory_region(machine, REGION_GFX2));
+		decodechar(machine->gfx[1],i,memory_region(machine, RGNCLASS_GFX, "gfx2"));
 
 	dirtychar = auto_malloc(TOTAL_CHARS);
 	memset(dirtychar,1,TOTAL_CHARS);
@@ -93,7 +93,7 @@ VIDEO_START( gradius3 )
 
 READ16_HANDLER( gradius3_gfxrom_r )
 {
-	UINT8 *gfxdata = memory_region(machine, REGION_GFX2);
+	UINT8 *gfxdata = memory_region(machine, RGNCLASS_GFX, "gfx2");
 
 	return (gfxdata[2*offset+1] << 8) | gfxdata[2*offset];
 }

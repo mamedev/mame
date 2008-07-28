@@ -10,9 +10,9 @@
 #include "video/konamiic.h"
 #include "cpu/z80/z80.h"
 
-#define SPRITEROM_MEM_REGION REGION_GFX1
-#define ZOOMROM0_MEM_REGION REGION_GFX2
-#define ZOOMROM1_MEM_REGION REGION_GFX3
+#define SPRITEROM_MEM_REGION "gfx1"
+#define ZOOMROM0_MEM_REGION "gfx2"
+#define ZOOMROM1_MEM_REGION "gfx3"
 
 static int sprite_colorbase,zoom_colorbase[2];
 

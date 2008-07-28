@@ -79,8 +79,8 @@ static int sprites_gfx_size;
 // This routine expands each word into three bytes.
 static void expand_sprites(running_machine *machine)
 {
-	UINT8 *rom	=	memory_region(machine, REGION_GFX1);
-	int size	=	memory_region_length(machine, REGION_GFX1);
+	UINT8 *rom	=	memory_region(machine, RGNCLASS_GFX, "gfx1");
+	int size	=	memory_region_length(machine, RGNCLASS_GFX, "gfx1");
 	int i;
 
 	sprites_gfx_size	=	size / 2 * 3;
@@ -264,8 +264,8 @@ static VIDEO_UPDATE(igs_180)
 
 static void decrypt_program_rom(int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0)
 {
-	int length = memory_region_length(Machine, REGION_CPU1);
-	UINT8 *rom = memory_region(Machine, REGION_CPU1);
+	int length = memory_region_length(Machine, RGNCLASS_CPU, "main");
+	UINT8 *rom = memory_region(Machine, RGNCLASS_CPU, "main");
 	UINT8 *tmp = auto_malloc(length);
 	int i;
 
@@ -317,7 +317,7 @@ static void decrypt_program_rom(int mask, int a7, int a6, int a5, int a4, int a3
 
 static void iqblocka_patch_rom(running_machine *machine)
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 
 //  rom[0x7b64] = 0xc9;
 
@@ -362,8 +362,8 @@ static DRIVER_INIT( iqblockf )
 
 static void tjsb_decrypt_sprites(running_machine *machine)
 {
-	int length = memory_region_length(machine, REGION_GFX1);
-	UINT8 *rom = memory_region(machine, REGION_GFX1);
+	int length = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
+	UINT8 *rom = memory_region(machine, RGNCLASS_GFX, "gfx1");
 	UINT8 *tmp = auto_malloc(length);
 	int i;
 
@@ -392,7 +392,7 @@ static void tjsb_decrypt_sprites(running_machine *machine)
 
 static void tjsb_patch_rom(running_machine *machine)
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 	rom[0x011df] = 0x18;
 }
 
@@ -644,7 +644,7 @@ static const gfx_layout layout_8x8x4 =
 };
 
 static GFXDECODE_START( igs_180 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x4, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4, 0, 16 )
 GFXDECODE_END
 
 
@@ -716,7 +716,7 @@ static MACHINE_DRIVER_START( igs_180 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz / 16)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
 
@@ -766,30 +766,30 @@ Notes:
 */
 
 ROM_START( iqblocka )
-	ROM_REGION( 0x40000, REGION_CPU1, 0 )
+	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "v.u18", 0x00000, 0x40000, CRC(2e2b7d43) SHA1(cc73f4c8f9a6e2219ee04c9910725558a80b4eb2) )
 
-	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "cg.u7", 0x000000, 0x080000, CRC(cb48a66e) SHA1(6d597193d1333a97957d5ceec8179a24bedfd928) )	// FIXED BITS (xxxxxxxx0xxxxxxx)
 
-	ROM_REGION( 0x80000, REGION_GFX2, ROMREGION_DISPOSE)
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE)
 	ROM_LOAD( "text.u8", 0x000000, 0x080000, CRC(48c4f4e6) SHA1(b1e1ca62cf6a99c11a5cc56705eef7e22a3b2740) )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )
 	ROM_LOAD( "speech.u17", 0x00000, 0x40000, CRC(d9e3d39f) SHA1(bec85d1ac2dfca77453cbca0e7dd53fee8fb438b) )
 ROM_END
 
 ROM_START( iqblockf )
-	ROM_REGION( 0x40000, REGION_CPU1, 0 )
+	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "v113fr.u18", 0x00000, 0x40000, CRC(346c68af) SHA1(ceae4c0143c288dc9c1dd1e8a51f1e3371ffa439) )
 
-	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "cg.u7", 0x000000, 0x080000, CRC(cb48a66e) SHA1(6d597193d1333a97957d5ceec8179a24bedfd928) )	// FIXED BITS (xxxxxxxx0xxxxxxx)
 
-	ROM_REGION( 0x80000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "text.u8", 0x000000, 0x080000, CRC(48c4f4e6) SHA1(b1e1ca62cf6a99c11a5cc56705eef7e22a3b2740) )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )
 	ROM_LOAD( "sp.u17", 0x00000, 0x40000, CRC(71357845) SHA1(25f4f7aebdcc0706018f041d3696322df569b0a3) )
 ROM_END
 
@@ -842,16 +842,16 @@ Notes:
 */
 
 ROM_START( tjsb )
-	ROM_REGION( 0x40000, REGION_CPU1, 0 )
+	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "p0700.u16", 0x00000, 0x40000,CRC(1b2a50df) SHA1(95a272e624f727df9523667864f933118d9e633c) )
 
-	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "a0701.u3", 0x000000, 0x200000, CRC(aa182140) SHA1(37c2053386c183ff726ba417d13f2063cf9a22df) )	// FIXED BITS (xxxxxxxx0xxxxxxx)
 
-	ROM_REGION( 0x80000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "text.u6", 0x000000, 0x080000,  CRC(3be886b8) SHA1(15b3624ed076640c1828d065b01306a8656f5a9b) )	// BADADDR     --xxxxxxxxxxxxxxxxx
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 )
 	ROM_LOAD( "s0703.u15", 0x00000, 0x80000,  CRC(c6f94d29) SHA1(ec413580240711fc4977dd3c96c288501aa7ef6c) )
 ROM_END
 

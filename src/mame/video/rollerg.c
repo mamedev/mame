@@ -52,8 +52,8 @@ VIDEO_START( rollerg )
 	sprite_colorbase = 16;
 	zoom_colorbase = 0;
 
-	K053245_vh_start(machine,0,REGION_GFX1,NORMAL_PLANE_ORDER,sprite_callback);
-	K051316_vh_start_0(machine,REGION_GFX2,4,FALSE,0,zoom_callback);
+	K053245_vh_start(machine,0,"gfx1",NORMAL_PLANE_ORDER,sprite_callback);
+	K051316_vh_start_0(machine,"gfx2",4,FALSE,0,zoom_callback);
 
 	K051316_set_offset(0, 22, 1);
 }

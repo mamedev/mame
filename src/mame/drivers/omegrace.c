@@ -337,7 +337,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4bff) AM_RAM
 	AM_RANGE(0x5c00, 0x5cff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) /* NVRAM */
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION(REGION_CPU1, 0x8000) /* vector ram */
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION(RGNCLASS_CPU, "main", 0x8000) /* vector ram */
 	AM_RANGE(0x9000, 0x9fff) AM_ROM /* vector rom */
 ADDRESS_MAP_END
 
@@ -526,7 +526,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( omegrace )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "omega.m7",     0x0000, 0x1000, CRC(0424d46e) SHA1(cc1ac6c06ba6f6e8466fa08286a0c70b5335af33) )
 	ROM_LOAD( "omega.l7",     0x1000, 0x1000, CRC(edcd7a7d) SHA1(5d142de2f48b01d563578a54fd5540e5d0ac8f4c) )
 	ROM_LOAD( "omega.k7",     0x2000, 0x1000, CRC(6d10f197) SHA1(9609a0cbeeef2efa10d49cde9f0afdca96e9c2f8) )
@@ -534,16 +534,16 @@ ROM_START( omegrace )
 	ROM_LOAD( "omega.e1",     0x9000, 0x0800, CRC(1d0fdf3a) SHA1(3333397a9745874cea1dd6a1bda783cc59393b55) )
 	ROM_LOAD( "omega.f1",     0x9800, 0x0800, CRC(d44c0814) SHA1(2f216ee6de88bbe09775619003aee2d5aa8c554d) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
 	ROM_LOAD( "sound.k5",     0x0000, 0x0800, CRC(7d426017) SHA1(370f0fb5608819de873c845f6010cbde75a9818e) )
 
 	/* DVG PROM */
-	ROM_REGION( 0x100, REGION_USER1, 0 )
+	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0 )
 	ROM_LOAD( "dvgprom.bin",	0x0000, 0x0100, CRC(d481e958) SHA1(d8790547dc539e25984807573097b61ec3ffe614) )
 ROM_END
 
 ROM_START( deltrace )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "omega.m7",     0x0000, 0x1000, CRC(0424d46e) SHA1(cc1ac6c06ba6f6e8466fa08286a0c70b5335af33) )
 	ROM_LOAD( "omega.l7",     0x1000, 0x1000, CRC(edcd7a7d) SHA1(5d142de2f48b01d563578a54fd5540e5d0ac8f4c) )
 	ROM_LOAD( "omega.k7",     0x2000, 0x1000, CRC(6d10f197) SHA1(9609a0cbeeef2efa10d49cde9f0afdca96e9c2f8) )
@@ -551,11 +551,11 @@ ROM_START( deltrace )
 	ROM_LOAD( "omega.e1",     0x9000, 0x0800, CRC(1d0fdf3a) SHA1(3333397a9745874cea1dd6a1bda783cc59393b55) )
 	ROM_LOAD( "omega.f1",     0x9800, 0x0800, CRC(d44c0814) SHA1(2f216ee6de88bbe09775619003aee2d5aa8c554d) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
 	ROM_LOAD( "sound.k5",     0x0000, 0x0800, CRC(7d426017) SHA1(370f0fb5608819de873c845f6010cbde75a9818e) )
 
 	/* DVG PROM */
-	ROM_REGION( 0x100, REGION_USER1, 0 )
+	ROM_REGION( 0x100, RGNCLASS_USER, "user1", 0 )
 	ROM_LOAD( "dvgprom.bin",	0x0000, 0x0100, CRC(d481e958) SHA1(d8790547dc539e25984807573097b61ec3ffe614) )
 ROM_END
 
@@ -568,8 +568,8 @@ ROM_END
 
 static DRIVER_INIT( omegrace )
 {
-	int i, len = memory_region_length(machine, REGION_USER1);
-	UINT8 *prom = memory_region(machine, REGION_USER1);
+	int i, len = memory_region_length(machine, RGNCLASS_USER, "user1");
+	UINT8 *prom = memory_region(machine, RGNCLASS_USER, "user1");
 
 	/* Omega Race has two pairs of the state PROM output
      * lines swapped before going into the decoder.

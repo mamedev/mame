@@ -477,17 +477,17 @@ INLINE int addr_is_valid(UINT32 addr, UINT32 flags)
     fd1094_init_debugging - set up debugging
 -----------------------------------------------*/
 
-void fd1094_init_debugging(running_machine *machine, int cpureg, int keyreg, int statreg, void (*changed)(void))
+void fd1094_init_debugging(running_machine *machine, const char *cpureg, const char *keyreg, const char *statreg, void (*changed)(void))
 {
 	/* set the key changed callback */
 	key_changed = changed;
 
 	/* set up the regions */
-	coderegion = (UINT16 *)memory_region(machine, cpureg);
-	coderegion_words = memory_region_length(machine, cpureg) / 2;
-	keyregion = (UINT8 *)memory_region(machine, keyreg);
-	keystatus = (UINT16 *)memory_region(machine, statreg);
-	keystatus_words = memory_region_length(machine, statreg) / 2;
+	coderegion = (UINT16 *)memory_region(machine, RGNCLASS_CPU, cpureg);
+	coderegion_words = memory_region_length(machine, RGNCLASS_CPU, cpureg) / 2;
+	keyregion = (UINT8 *)memory_region(machine, RGNCLASS_USER, keyreg);
+	keystatus = (UINT16 *)memory_region(machine, RGNCLASS_USER, statreg);
+	keystatus_words = memory_region_length(machine, RGNCLASS_USER, statreg) / 2;
 	assert(coderegion_words == keystatus_words);
 
 	/* allocate memory for the ignore table */

@@ -294,43 +294,44 @@ static void KDAC_A_update(void *param, stream_sample_t **inputs, stream_sample_t
 /************************************************/
 /*    Konami PCM start                          */
 /************************************************/
-static void *k007232_start(int sndindex, int clock, const void *config)
+static void *k007232_start(const char *tag, int sndindex, int clock, const void *config)
 {
-  int i;
-  struct kdacApcm *info;
+	static const struct K007232_interface defintrf = { 0 };
+	int i;
+	struct kdacApcm *info;
 
-  info = auto_malloc(sizeof(*info));
-  memset(info, 0, sizeof(*info));
+	info = auto_malloc(sizeof(*info));
+	memset(info, 0, sizeof(*info));
 
-  info->intf = config;
+	info->intf = (config != NULL) ? config : &defintrf;
 
-  /* Set up the chips */
+	/* Set up the chips */
 
-      info->pcmbuf[0] = (unsigned char *)memory_region(Machine, info->intf->bank);
-      info->pcmbuf[1] = (unsigned char *)memory_region(Machine, info->intf->bank);
-      info->pcmlimit  = (unsigned int)memory_region_length(Machine, info->intf->bank);
+	info->pcmbuf[0] = (unsigned char *)memory_region(Machine, RGNCLASS_SOUND, tag);
+	info->pcmbuf[1] = (unsigned char *)memory_region(Machine, RGNCLASS_SOUND, tag);
+	info->pcmlimit  = (unsigned int)memory_region_length(Machine, RGNCLASS_SOUND, tag);
 
 	info->clock = clock;
 
-      for( i = 0; i < KDAC_A_PCM_MAX; i++ )
+	for( i = 0; i < KDAC_A_PCM_MAX; i++ )
 	{
-	  info->start[i] = 0;
-	  info->step[i] = 0;
-	  info->play[i] = 0;
-	  info->bank[i] = 0;
+		info->start[i] = 0;
+		info->step[i] = 0;
+		info->play[i] = 0;
+		info->bank[i] = 0;
 	}
-      info->vol[0][0] = 255;	/* channel A output to output A */
-      info->vol[0][1] = 0;
-      info->vol[1][0] = 0;
-      info->vol[1][1] = 255;	/* channel B output to output B */
+	info->vol[0][0] = 255;	/* channel A output to output A */
+	info->vol[0][1] = 0;
+	info->vol[1][0] = 0;
+	info->vol[1][1] = 255;	/* channel B output to output B */
 
-      for( i = 0; i < 0x10; i++ )  info->wreg[i] = 0;
+	for( i = 0; i < 0x10; i++ )  info->wreg[i] = 0;
 
-      info->stream = stream_create(0,2,clock/128,info,KDAC_A_update);
+	info->stream = stream_create(0,2,clock/128,info,KDAC_A_update);
 
-  KDAC_A_make_fncode(info);
+	KDAC_A_make_fncode(info);
 
-  return info;
+	return info;
 }
 
 /************************************************/

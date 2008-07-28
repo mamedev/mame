@@ -102,8 +102,8 @@ WRITE8_HANDLER( kangaroo_video_control_w )
 
 static void blitter_execute(running_machine *machine)
 {
-	UINT32 gfxhalfsize = memory_region_length(machine, REGION_GFX1) / 2;
-	const UINT8 *gfxbase = memory_region(machine, REGION_GFX1);
+	UINT32 gfxhalfsize = memory_region_length(machine, RGNCLASS_GFX, "gfx1") / 2;
+	const UINT8 *gfxbase = memory_region(machine, RGNCLASS_GFX, "gfx1");
 	UINT16 src = kangaroo_video_control[0] + 256 * kangaroo_video_control[1];
 	UINT16 dst = kangaroo_video_control[2] + 256 * kangaroo_video_control[3];
 	UINT8 height = kangaroo_video_control[5];

@@ -226,7 +226,7 @@ static NVRAM_HANDLER( darkhors )
 		else
 		{
 			// Set the EEPROM to Factory Defaults
-			eeprom_set_data(memory_region(machine, REGION_USER1),(1<<7));
+			eeprom_set_data(memory_region(machine, RGNCLASS_USER, "user1"),(1<<7));
 		}
 	}
 }
@@ -571,7 +571,7 @@ static const gfx_layout layout_16x16x8 =
 };
 
 static GFXDECODE_START( darkhors )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x8, 0, 0x10000/64 )	// color codes should be doubled
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0, 0x10000/64 )	// color codes should be doubled
 GFXDECODE_END
 
 /***************************************************************************
@@ -617,7 +617,7 @@ static MACHINE_DRIVER_START( darkhors )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 528000)	// ??
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -630,11 +630,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( darkhors )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 )	// 68EC020 code
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )	// 68EC020 code
 	ROM_LOAD32_WORD_SWAP( "prg2", 0x00000, 0x80000, CRC(f2ec5818) SHA1(326937a331496880f517f41b0b8ab54e55fd7af7) )
 	ROM_LOAD32_WORD_SWAP( "prg1", 0x00002, 0x80000, CRC(b80f8f59) SHA1(abc26dd8b36da0d510978364febe385f69fb317f) )
 
-	ROM_REGION( 0x400000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "gfx1", 0x000000, 0x80000, CRC(e9fe9967) SHA1(a79d75c09f0eac6372de8d6e98c5eecf38ef750c) )
 	ROM_LOAD( "gfx2", 0x080000, 0x80000, CRC(0853c5c5) SHA1(2b49ffe607278817f1f8219a79f5906be53ee6f4) )
 	ROM_LOAD( "gfx3", 0x100000, 0x80000, CRC(6e89278f) SHA1(044c15e00ea95fd3f108fa916000a1000789c8e8) )
@@ -645,10 +645,10 @@ ROM_START( darkhors )
 	ROM_FILL(         0x300000, 0x80000, 0 ) // a zero-fill seems fine
 	ROM_LOAD( "gfx8", 0x380000, 0x80000, CRC(590bec2a) SHA1(7fdbb21f1a3eccde65e91eb2443a0e01487c59c3) ) // 000xxxxxxxxxxxxxxxx = 0x00
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 )	// Samples
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 )	// Samples
 	ROM_LOAD( "snd", 0x00000, 0x80000, CRC(7aeb12d3) SHA1(3e81725fc206baa7559da87552a0cd73b7616155) )
 
-	ROM_REGION( 0x80000, REGION_USER1, ROMREGION_BE )	// EEPROM
+	ROM_REGION( 0x80000, RGNCLASS_USER, "user1", ROMREGION_BE )	// EEPROM
 	ROM_LOAD( "eeprom", 0x00000, 0x80000, CRC(45314fdb) SHA1(c4bd5508e5b51a6e0356c049f1ccf2b5d94caee9) )
 ROM_END
 
@@ -662,8 +662,8 @@ ROM_END
 
 static DRIVER_INIT( darkhors )
 {
-	UINT32 *rom    = (UINT32 *) memory_region(machine, REGION_CPU1);
-	UINT8  *eeprom = (UINT8 *)  memory_region(machine, REGION_USER1);
+	UINT32 *rom    = (UINT32 *) memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8  *eeprom = (UINT8 *)  memory_region(machine, RGNCLASS_USER, "user1");
 	int i;
 
 #if 1

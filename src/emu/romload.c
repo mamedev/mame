@@ -195,7 +195,7 @@ static int determine_bios_rom(rom_load_data *romdata, const rom_entry *romp)
 	for (rom = romp; !ROMENTRY_ISEND(rom); rom++)
 		if (ROMENTRY_ISSYSTEM_BIOS(rom))
 		{
-			const char *biosname = ROM_GETHASHDATA(rom);
+			const char *biosname = ROM_GETNAME(rom);
 			int bios_flags = ROM_GETBIOSFLAGS(rom);
 			char bios_number[20];
 
@@ -415,17 +415,22 @@ static void display_loading_rom_message(const char *name, rom_load_data *romdata
 
 static void display_rom_load_results(rom_load_data *romdata)
 {
-	int region;
-
 	/* final status display */
 	display_loading_rom_message(NULL, romdata);
 
 	/* if we had errors, they are fatal */
 	if (romdata->errors != 0)
 	{
+		const char *rgntag, *nextrgntag;
+		int rgnclass;
+		
 		/* clean up any regions */
-		for (region = 0; region < MAX_MEMORY_REGIONS; region++)
-			free_memory_region(Machine, region);
+		for (rgnclass = 0; rgnclass < RGNCLASS_COUNT; rgnclass++)
+			for (rgntag = memory_region_next(Machine, rgnclass, NULL); rgntag != NULL; rgntag = nextrgntag)
+			{
+				nextrgntag = memory_region_next(Machine, rgnclass, rgntag);
+				memory_region_free(Machine, rgnclass, rgntag);
+			}
 
 		/* create the error message and exit fatally */
 		strcat(romdata->errorbuf, "ERROR: required files are missing, the game cannot be run.");
@@ -446,13 +451,13 @@ static void display_rom_load_results(rom_load_data *romdata)
     byte swapping and inverting data as necessary
 -------------------------------------------------*/
 
-static void region_post_process(running_machine *machine, rom_load_data *romdata, int regnum)
+static void region_post_process(running_machine *machine, rom_load_data *romdata, int rgnclass, const char *rgntag)
 {
-	UINT32 regionlength = memory_region_length(machine, regnum);
-	UINT32 regionflags = memory_region_flags(machine, regnum);
-	UINT8 *regionbase = memory_region(machine, regnum);
+	UINT32 regionlength = memory_region_length(machine, rgnclass, rgntag);
+	UINT32 regionflags = memory_region_flags(machine, rgnclass, rgntag);
+	UINT8 *regionbase = memory_region(machine, rgnclass, rgntag);
 	int littleendian = ((regionflags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
-	int datawidth = 1 << (regionflags & ROMREGION_WIDTHMASK);
+	int datawidth = 1 << ((regionflags & ROMREGION_WIDTHMASK) >> 8);
 	UINT8 *base;
 	int i, j;
 
@@ -683,7 +688,8 @@ static void fill_rom_data(rom_load_data *romdata, const rom_entry *romp)
 static void copy_rom_data(rom_load_data *romdata, const rom_entry *romp)
 {
 	UINT8 *base = romdata->regionbase + ROM_GETOFFSET(romp);
-	int srcregion = ROM_GETFLAGS(romp) >> 24;
+	int srcrgnclass = (ROM_GETFLAGS(romp) >> 4) & 0x0f;
+	const char *srcrgntag = ROM_GETNAME(romp);
 	UINT32 numbytes = ROM_GETLENGTH(romp);
 	UINT32 srcoffs = (FPTR)ROM_GETHASHDATA(romp);  /* srcoffset in place of hashdata */
 	UINT8 *srcbase;
@@ -697,12 +703,12 @@ static void copy_rom_data(rom_load_data *romdata, const rom_entry *romp)
 		fatalerror("Error in RomModule definition: COPY has an invalid length\n");
 
 	/* make sure the source was valid */
-	srcbase = memory_region(Machine, srcregion);
-	if (!srcbase)
+	srcbase = memory_region(Machine, srcrgnclass, srcrgntag);
+	if (srcbase == NULL)
 		fatalerror("Error in RomModule definition: COPY from an invalid region\n");
 
 	/* make sure we find within the region space */
-	if (srcoffs + numbytes > memory_region_length(Machine, srcregion))
+	if (srcoffs + numbytes > memory_region_length(Machine, srcrgnclass, srcrgntag))
 		fatalerror("Error in RomModule definition: COPY out of source memory region space\n");
 
 	/* fill the data */
@@ -1046,30 +1052,33 @@ next:
     flags for the given CPU index
 -------------------------------------------------*/
 
-static UINT32 normalize_flags_for_cpu(running_machine *machine, UINT32 startflags, int cpunum)
+static UINT32 normalize_flags_for_cpu(running_machine *machine, UINT32 startflags, const char *rgntag)
 {
-	int cputype = machine->config->cpu[cpunum].type;
-	int buswidth;
+	int cpunum = mame_find_cpu_index(machine, rgntag);
+	if (cpunum >= 0)
+	{
+		int cputype = machine->config->cpu[cpunum].type;
+		int buswidth;
 
-	/* set the endianness */
-	startflags &= ~ROMREGION_ENDIANMASK;
-	if (cputype_endianness(cputype) == CPU_IS_LE)
-		startflags |= ROMREGION_LE;
-	else
-		startflags |= ROMREGION_BE;
+		/* set the endianness */
+		startflags &= ~ROMREGION_ENDIANMASK;
+		if (cputype_endianness(cputype) == CPU_IS_LE)
+			startflags |= ROMREGION_LE;
+		else
+			startflags |= ROMREGION_BE;
 
-	/* set the width */
-	startflags &= ~ROMREGION_WIDTHMASK;
-	buswidth = cputype_databus_width(cputype, ADDRESS_SPACE_PROGRAM);
-	if (buswidth <= 8)
-		startflags |= ROMREGION_8BIT;
-	else if (buswidth <= 16)
-		startflags |= ROMREGION_16BIT;
-	else if (buswidth <= 32)
-		startflags |= ROMREGION_32BIT;
-	else
-		startflags |= ROMREGION_64BIT;
-
+		/* set the width */
+		startflags &= ~ROMREGION_WIDTHMASK;
+		buswidth = cputype_databus_width(cputype, ADDRESS_SPACE_PROGRAM);
+		if (buswidth <= 8)
+			startflags |= ROMREGION_8BIT;
+		else if (buswidth <= 16)
+			startflags |= ROMREGION_16BIT;
+		else if (buswidth <= 32)
+			startflags |= ROMREGION_32BIT;
+		else
+			startflags |= ROMREGION_64BIT;
+	}
 	return startflags;
 }
 
@@ -1081,10 +1090,8 @@ static UINT32 normalize_flags_for_cpu(running_machine *machine, UINT32 startflag
 
 void rom_init(running_machine *machine, const rom_entry *romp)
 {
-	const rom_entry *regionlist[REGION_MAX];
-	const rom_entry *region;
 	static rom_load_data romdata;
-	int regnum;
+	const rom_entry *region;
 
 	/* if no roms, bail */
 	if (romp == NULL)
@@ -1092,9 +1099,6 @@ void rom_init(running_machine *machine, const rom_entry *romp)
 
 	/* make sure we get called back on the way out */
 	add_exit_callback(machine, rom_exit);
-
-	/* reset the region list */
-	memset((void *)regionlist, 0, sizeof(regionlist));
 
 	/* reset the romdata struct */
 	memset(&romdata, 0, sizeof(romdata));
@@ -1109,23 +1113,24 @@ void rom_init(running_machine *machine, const rom_entry *romp)
 	chd_list_tailptr = &chd_list;
 
 	/* loop until we hit the end */
-	for (region = romp, regnum = 0; region; region = rom_next_region(region), regnum++)
+	for (region = romp; region; region = rom_next_region(region))
 	{
 		UINT32 regionlength = ROMREGION_GETLENGTH(region);
 		UINT32 regionflags = ROMREGION_GETFLAGS(region);
-		int regiontype = ROMREGION_GETTYPE(region);
+		const char *regiontag = ROMREGION_GETTAG(region);
+		int regionclass = ROMREGION_GETCLASS(region);
 
-		LOG(("Processing region %02X (length=%X)\n", regiontype, regionlength));
+		LOG(("Processing region %d,\"%s\" (length=%X)\n", regionclass, regiontag, regionlength));
 
 		/* the first entry must be a region */
 		assert(ROMENTRY_ISREGION(region));
 
 		/* if this is a CPU region, override with the CPU width and endianness */
-		if (regiontype >= REGION_CPU1 && regiontype < REGION_CPU1 + MAX_CPU)
-			regionflags = normalize_flags_for_cpu(machine, regionflags, regiontype - REGION_CPU1);
+		if (regionclass == RGNCLASS_CPU)
+			regionflags = normalize_flags_for_cpu(machine, regionflags, regiontag);
 
 		/* remember the base and length */
-		romdata.regionbase = new_memory_region(machine, regiontype, regionlength, regionflags);
+		romdata.regionbase = memory_region_alloc(machine, regionclass, regiontag, regionlength, regionflags);
 		romdata.regionlength = regionlength;
 		LOG(("Allocated %X bytes @ %p\n", romdata.regionlength, romdata.regionbase));
 
@@ -1149,18 +1154,9 @@ void rom_init(running_machine *machine, const rom_entry *romp)
 		else if (ROMREGION_ISDISKDATA(region))
 			process_disk_entries(&romdata, region + 1);
 
-		/* add this region to the list */
-		if (regiontype < REGION_MAX)
-			regionlist[regiontype] = region;
+		/* finally, post-process for endianness and inversion */
+		region_post_process(machine, &romdata, regionclass, regiontag);
 	}
-
-	/* post-process the regions */
-	for (regnum = 0; regnum < REGION_MAX; regnum++)
-		if (regionlist[regnum])
-		{
-			LOG(("Post-processing region %02X\n", regnum));
-			region_post_process(machine, &romdata, regnum);
-		}
 
 	/* display the results and exit */
 	total_rom_load_warnings = romdata.warnings;
@@ -1175,12 +1171,17 @@ void rom_init(running_machine *machine, const rom_entry *romp)
 
 static void rom_exit(running_machine *machine)
 {
+	const char *rgntag, *nextrgntag;
 	open_chd *curchd;
-	int i;
+	int rgnclass;
 
 	/* free the memory allocated for various regions */
-	for (i = 0; i < MAX_MEMORY_REGIONS; i++)
-		free_memory_region(machine, i);
+	for (rgnclass = 0; rgnclass < RGNCLASS_COUNT; rgnclass++)
+		for (rgntag = memory_region_next(machine, rgnclass, NULL); rgntag != NULL; rgntag = nextrgntag)
+		{
+			nextrgntag = memory_region_next(machine, rgnclass, rgntag);
+			memory_region_free(machine, rgnclass, rgntag);
+		}
 
 	/* close all hard drives */
 	for (curchd = chd_list; curchd != NULL; curchd = curchd->next)

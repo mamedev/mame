@@ -96,7 +96,7 @@ WRITE8_HANDLER( ataxx_slave_banksw_w );
 
 READ8_HANDLER( leland_raster_r );
 
-void leland_rotate_memory(running_machine *machine, int cpunum);
+void leland_rotate_memory(running_machine *machine, const char *cpuname);
 
 
 /*----------- defined in audio/leland.c -----------*/

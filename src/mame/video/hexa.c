@@ -19,7 +19,7 @@ WRITE8_HANDLER( hexa_videoram_w )
 
 WRITE8_HANDLER( hexa_d008_w )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 	int bankaddress;
 
 	/* bit 0 = flipx (or y?) */

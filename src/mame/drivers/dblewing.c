@@ -386,9 +386,9 @@ static const gfx_layout spritelayout =
 
 
 static GFXDECODE_START( dblewing )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_8x8_layout,     0x000, 32 )	/* Tiles (8x8) */
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_16x16_layout,   0x000, 32 )	/* Tiles (16x16) */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,        0x200, 32 )	/* Sprites (16x16) */
+	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0x000, 32 )	/* Tiles (8x8) */
+	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0x000, 32 )	/* Tiles (16x16) */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,        0x200, 32 )	/* Sprites (16x16) */
 GFXDECODE_END
 
 static INPUT_PORTS_START( dblewing )
@@ -568,7 +568,7 @@ static MACHINE_DRIVER_START( dblewing )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 32220000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 
@@ -616,28 +616,28 @@ MBE-02.8H    [5a6d3ac5]
 */
 
 ROM_START( dblewing )
-	ROM_REGION( 0x80000, REGION_CPU1, 0 ) /* DE102 code (encrypted) */
+	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 ) /* DE102 code (encrypted) */
 	ROM_LOAD16_BYTE( "kp_00-.3d",    0x000001, 0x040000, CRC(547dc83e) SHA1(f6f96bd4338d366f06df718093f035afabc073d1) )
 	ROM_LOAD16_BYTE( "kp_01-.5d",    0x000000, 0x040000, CRC(7a210c33) SHA1(ced89140af6d6a1bc0ffb7728afca428ed007165) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) // sound cpu?
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) // sound cpu?
 	ROM_LOAD( "kp_02-.10h",    0x00000, 0x10000, CRC(def035fa) SHA1(fd50314e5c94c25df109ee52c0ce701b0ff2140c) )
 
-	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mbe-02.8h",    0x00000, 0x100000, CRC(5a6d3ac5) SHA1(738bb833e2c5d929ac75fe4e69ee0af88197d8a6) )
 
-	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "mbe-00.14a",    0x000000, 0x100000, CRC(e33f5c93) SHA1(720904b54d02dace2310ac6bd07d5ed4bc4fd69c) )
 	ROM_LOAD16_BYTE( "mbe-01.16a",    0x000001, 0x100000, CRC(ef452ad7) SHA1(7fe49123b5c2778e46104eaa3a2104ce09e05705) )
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 ) /* Oki samples */
 	ROM_LOAD( "kp_03-.16h",    0x00000, 0x20000, CRC(5d7f930d) SHA1(ad23aa804ea3ccbd7630ade9b53fc3ea2718a6ec) )
 ROM_END
 
 static DRIVER_INIT( dblewing )
 {
-	deco56_decrypt(machine, REGION_GFX1);
-	deco102_decrypt(machine, REGION_CPU1, 0x399d, 0x25, 0x3d);
+	deco56_decrypt_gfx(machine, "gfx1");
+	deco102_decrypt_cpu(machine, "main", 0x399d, 0x25, 0x3d);
 }
 
 

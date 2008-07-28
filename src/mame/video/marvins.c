@@ -34,7 +34,7 @@ WRITE8_HANDLER( marvins_palette_bank_w )
 
 static void stuff_palette( running_machine *machine, int source_index, int dest_index, int num_colors )
 {
-	UINT8 *color_prom = memory_region(machine, REGION_PROMS) + source_index;
+	UINT8 *color_prom = memory_region(machine, RGNCLASS_PROMS, "proms") + source_index;
 	int i;
 	for( i=0; i<num_colors; i++ )
 	{

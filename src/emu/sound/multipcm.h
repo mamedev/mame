@@ -1,12 +1,6 @@
 #ifndef __MultiPCM_H__
 #define __MultiPCM_H__
 
-struct MultiPCM_interface
-{
-	int region;
-};
-
-
 WRITE8_HANDLER( MultiPCM_reg_0_w );
 READ8_HANDLER( MultiPCM_reg_0_r);
 WRITE8_HANDLER( MultiPCM_reg_1_w );

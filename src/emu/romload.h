@@ -23,10 +23,12 @@
     CONSTANTS
 ***************************************************************************/
 
-/* ----- per-entry constants ----- */
+/* ----- type constants ----- */
+#define ROMENTRY_TYPEMASK			0x0000000f			/* type of entry */
 enum
 {
-	ROMENTRYTYPE_REGION = 1,	/* this entry marks the start of a region */
+	ROMENTRYTYPE_ROM = 0,		/* this entry is an actual ROM definition */
+	ROMENTRYTYPE_REGION,		/* this entry marks the start of a region */
 	ROMENTRYTYPE_END,			/* this entry marks the end of a region */
 	ROMENTRYTYPE_RELOAD,		/* this entry reloads the previous ROM */
 	ROMENTRYTYPE_CONTINUE,		/* this entry continues loading the previous ROM */
@@ -39,81 +41,79 @@ enum
 };
 
 /* ----- per-region constants ----- */
-#define ROMREGION_WIDTHMASK			0x00000003			/* native width of region, as power of 2 */
+#define ROMREGION_CLASSMASK			0x000000f0			/* class of region */
+
+#define ROMREGION_WIDTHMASK			0x00000300			/* native width of region, as power of 2 */
 #define		ROMREGION_8BIT			0x00000000			/*    (non-CPU regions only) */
-#define		ROMREGION_16BIT			0x00000001
-#define		ROMREGION_32BIT			0x00000002
-#define		ROMREGION_64BIT			0x00000003
+#define		ROMREGION_16BIT			0x00000100
+#define		ROMREGION_32BIT			0x00000200
+#define		ROMREGION_64BIT			0x00000300
 
-#define ROMREGION_ENDIANMASK		0x00000004			/* endianness of the region */
+#define ROMREGION_ENDIANMASK		0x00000400			/* endianness of the region */
 #define		ROMREGION_LE			0x00000000			/*    (non-CPU regions only) */
-#define		ROMREGION_BE			0x00000004
+#define		ROMREGION_BE			0x00000400
 
-#define ROMREGION_INVERTMASK		0x00000008			/* invert the bits of the region */
+#define ROMREGION_INVERTMASK		0x00000800			/* invert the bits of the region */
 #define		ROMREGION_NOINVERT		0x00000000
-#define		ROMREGION_INVERT		0x00000008
+#define		ROMREGION_INVERT		0x00000800
 
-#define ROMREGION_DISPOSEMASK		0x00000010			/* dispose of the region after init */
+#define ROMREGION_DISPOSEMASK		0x00001000			/* dispose of the region after init */
 #define		ROMREGION_NODISPOSE		0x00000000
-#define		ROMREGION_DISPOSE		0x00000010
+#define		ROMREGION_DISPOSE		0x00001000
 
-#define ROMREGION_LOADUPPERMASK		0x00000040			/* load into the upper part of CPU space */
-#define		ROMREGION_LOADLOWER		0x00000000			/*     (CPU regions only) */
-#define		ROMREGION_LOADUPPER		0x00000040
-
-#define ROMREGION_ERASEMASK			0x00000080			/* erase the region before loading */
+#define ROMREGION_ERASEMASK			0x00002000			/* erase the region before loading */
 #define		ROMREGION_NOERASE		0x00000000
-#define		ROMREGION_ERASE			0x00000080
+#define		ROMREGION_ERASE			0x00002000
 
-#define ROMREGION_ERASEVALMASK		0x0000ff00			/* value to erase the region to */
-#define		ROMREGION_ERASEVAL(x)	((((x) & 0xff) << 8) | ROMREGION_ERASE)
+#define ROMREGION_DATATYPEMASK		0x00004000			/* type of region (ROM versus disk) */
+#define		ROMREGION_DATATYPEROM	0x00000000
+#define		ROMREGION_DATATYPEDISK	0x00004000
+
+#define ROMREGION_ERASEVALMASK		0x00ff0000			/* value to erase the region to */
+#define		ROMREGION_ERASEVAL(x)	((((x) & 0xff) << 16) | ROMREGION_ERASE)
 #define		ROMREGION_ERASE00		ROMREGION_ERASEVAL(0)
 #define		ROMREGION_ERASEFF		ROMREGION_ERASEVAL(0xff)
 
-#define ROMREGION_DATATYPEMASK		0x00010000			/* inherit all flags from previous definition */
-#define		ROMREGION_DATATYPEROM	0x00000000
-#define		ROMREGION_DATATYPEDISK	0x00010000
-
 
 /* ----- per-ROM constants ----- */
-#define DISK_READONLYMASK			0x00000400			/* is the disk read-only? */
+#define DISK_READONLYMASK			0x00000010			/* is the disk read-only? */
 #define		DISK_READWRITE			0x00000000
-#define		DISK_READONLY			0x00000400
+#define		DISK_READONLY			0x00000010
 
-#define ROM_OPTIONALMASK			0x00000800			/* optional - won't hurt if it's not there */
+#define ROM_OPTIONALMASK			0x00000020			/* optional - won't hurt if it's not there */
 #define		ROM_REQUIRED			0x00000000
-#define		ROM_OPTIONAL			0x00000800
+#define		ROM_OPTIONAL			0x00000020
 
-#define ROM_GROUPMASK				0x0000f000			/* load data in groups of this size + 1 */
-#define		ROM_GROUPSIZE(n)		((((n) - 1) & 15) << 12)
+#define ROM_REVERSEMASK				0x00000040			/* reverse the byte order within a group */
+#define		ROM_NOREVERSE			0x00000000
+#define		ROM_REVERSE				0x00000040
+
+#define ROM_INHERITFLAGSMASK		0x00000080			/* inherit all flags from previous definition */
+#define		ROM_INHERITFLAGS		0x00000080
+
+#define ROM_GROUPMASK				0x00000f00			/* load data in groups of this size + 1 */
+#define		ROM_GROUPSIZE(n)		((((n) - 1) & 15) << 8)
 #define		ROM_GROUPBYTE			ROM_GROUPSIZE(1)
 #define		ROM_GROUPWORD			ROM_GROUPSIZE(2)
 #define		ROM_GROUPDWORD			ROM_GROUPSIZE(4)
 
-#define ROM_SKIPMASK				0x000f0000			/* skip this many bytes after each group */
-#define		ROM_SKIP(n)				(((n) & 15) << 16)
+#define ROM_SKIPMASK				0x0000f000			/* skip this many bytes after each group */
+#define		ROM_SKIP(n)				(((n) & 15) << 12)
 #define		ROM_NOSKIP				ROM_SKIP(0)
 
-#define ROM_REVERSEMASK				0x00100000			/* reverse the byte order within a group */
-#define		ROM_NOREVERSE			0x00000000
-#define		ROM_REVERSE				0x00100000
-
-#define ROM_BITWIDTHMASK			0x00e00000			/* width of data in bits */
-#define		ROM_BITWIDTH(n)			(((n) & 7) << 21)
+#define ROM_BITWIDTHMASK			0x000f0000			/* width of data in bits */
+#define		ROM_BITWIDTH(n)			(((n) & 15) << 16)
 #define		ROM_NIBBLE				ROM_BITWIDTH(4)
 #define		ROM_FULLBYTE			ROM_BITWIDTH(8)
 
-#define ROM_BITSHIFTMASK			0x07000000			/* left-shift count for the bits */
-#define		ROM_BITSHIFT(n)			(((n) & 7) << 24)
+#define ROM_BITSHIFTMASK			0x00f00000			/* left-shift count for the bits */
+#define		ROM_BITSHIFT(n)			(((n) & 15) << 20)
 #define		ROM_NOSHIFT				ROM_BITSHIFT(0)
 #define		ROM_SHIFT_NIBBLE_LO		ROM_BITSHIFT(0)
 #define		ROM_SHIFT_NIBBLE_HI		ROM_BITSHIFT(4)
 
-#define ROM_INHERITFLAGSMASK		0x08000000			/* inherit all flags from previous definition */
-#define		ROM_INHERITFLAGS		0x08000000
-
-#define ROM_BIOSFLAGSMASK			0xf0000000			/* only loaded if value matches global bios value */
-#define 	ROM_BIOS(n)				(((n) & 15) << 28)
+#define ROM_BIOSFLAGSMASK			0xff000000			/* only loaded if value matches global bios value */
+#define 	ROM_BIOS(n)				(((n) & 255) << 24)
 
 #define ROM_INHERITEDFLAGS			(ROM_GROUPMASK | ROM_SKIPMASK | ROM_REVERSEMASK | ROM_BITWIDTHMASK | ROM_BITSHIFTMASK | ROM_BIOSFLAGSMASK)
 
@@ -127,10 +127,10 @@ typedef struct _rom_entry rom_entry;
 struct _rom_entry
 {
 	const char *	_name;				/* name of the file to load */
+	const char *	_hashdata;			/* hashing informations (checksums) */
 	UINT32			_offset;			/* offset to load it to */
 	UINT32			_length;			/* length of the file */
 	UINT32			_flags;				/* flags */
-	const char *	_hashdata;			/* hashing informations (checksums) */
 };
 
 
@@ -159,41 +159,31 @@ struct _rom_load_data
 ***************************************************************************/
 
 /* ----- per-entry macros ----- */
-#define ROMENTRY_REGION				((const char *)ROMENTRYTYPE_REGION)
-#define ROMENTRY_END				((const char *)ROMENTRYTYPE_END)
-#define ROMENTRY_RELOAD				((const char *)ROMENTRYTYPE_RELOAD)
-#define ROMENTRY_CONTINUE			((const char *)ROMENTRYTYPE_CONTINUE)
-#define ROMENTRY_FILL				((const char *)ROMENTRYTYPE_FILL)
-#define ROMENTRY_COPY				((const char *)ROMENTRYTYPE_COPY)
-#define ROMENTRY_CARTRIDGE			((const char *)ROMENTRYTYPE_CARTRIDGE)
-#define ROMENTRY_IGNORE				((const char *)ROMENTRYTYPE_IGNORE)
-#define ROMENTRY_SYSTEM_BIOS		((const char *)ROMENTRYTYPE_SYSTEM_BIOS)
-
-#define ROMENTRY_GETTYPE(r)			((FPTR)(r)->_name)
-#define ROMENTRY_ISSPECIAL(r)		(ROMENTRY_GETTYPE(r) < ROMENTRYTYPE_COUNT)
-#define ROMENTRY_ISFILE(r)			(!ROMENTRY_ISSPECIAL(r))
-#define ROMENTRY_ISREGION(r)		((r)->_name == ROMENTRY_REGION)
-#define ROMENTRY_ISEND(r)			((r)->_name == ROMENTRY_END)
-#define ROMENTRY_ISRELOAD(r)		((r)->_name == ROMENTRY_RELOAD)
-#define ROMENTRY_ISCONTINUE(r)		((r)->_name == ROMENTRY_CONTINUE)
-#define ROMENTRY_ISFILL(r)			((r)->_name == ROMENTRY_FILL)
-#define ROMENTRY_ISCOPY(r)			((r)->_name == ROMENTRY_COPY)
-#define ROMENTRY_ISIGNORE(r)		((r)->_name == ROMENTRY_IGNORE)
-#define ROMENTRY_ISSYSTEM_BIOS(r)	((r)->_name == ROMENTRY_SYSTEM_BIOS)
+#define ROMENTRY_GETTYPE(r)			((r)->_flags & ROMENTRY_TYPEMASK)
+#define ROMENTRY_ISSPECIAL(r)		(ROMENTRY_GETTYPE(r) != ROMENTRYTYPE_ROM)
+#define ROMENTRY_ISFILE(r)			(ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_ROM)
+#define ROMENTRY_ISREGION(r)		(ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_REGION)
+#define ROMENTRY_ISEND(r)			(ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_END)
+#define ROMENTRY_ISRELOAD(r)		(ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_RELOAD)
+#define ROMENTRY_ISCONTINUE(r)		(ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_CONTINUE)
+#define ROMENTRY_ISFILL(r)			(ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_FILL)
+#define ROMENTRY_ISCOPY(r)			(ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_COPY)
+#define ROMENTRY_ISIGNORE(r)		(ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_IGNORE)
+#define ROMENTRY_ISSYSTEM_BIOS(r)	(ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_SYSTEM_BIOS)
 #define ROMENTRY_ISREGIONEND(r)		(ROMENTRY_ISREGION(r) || ROMENTRY_ISEND(r))
 
 /* ----- per-region macros ----- */
-#define ROMREGION_GETTYPE(r)		((FPTR)(r)->_hashdata)
+#define ROMREGION_GETTAG(r)			((r)->_name)
 #define ROMREGION_GETLENGTH(r)		((r)->_length)
 #define ROMREGION_GETFLAGS(r)		((r)->_flags)
-#define ROMREGION_GETWIDTH(r)		(8 << (ROMREGION_GETFLAGS(r) & ROMREGION_WIDTHMASK))
+#define ROMREGION_GETCLASS(r)		((ROMREGION_GETFLAGS(r) & ROMREGION_CLASSMASK) >> 4)
+#define ROMREGION_GETWIDTH(r)		(8 << ((ROMREGION_GETFLAGS(r) & ROMREGION_WIDTHMASK) >> 8))
 #define ROMREGION_ISLITTLEENDIAN(r)	((ROMREGION_GETFLAGS(r) & ROMREGION_ENDIANMASK) == ROMREGION_LE)
 #define ROMREGION_ISBIGENDIAN(r)	((ROMREGION_GETFLAGS(r) & ROMREGION_ENDIANMASK) == ROMREGION_BE)
 #define ROMREGION_ISINVERTED(r)		((ROMREGION_GETFLAGS(r) & ROMREGION_INVERTMASK) == ROMREGION_INVERT)
 #define ROMREGION_ISDISPOSE(r)		((ROMREGION_GETFLAGS(r) & ROMREGION_DISPOSEMASK) == ROMREGION_DISPOSE)
-#define ROMREGION_ISLOADUPPER(r)	((ROMREGION_GETFLAGS(r) & ROMREGION_LOADUPPERMASK) == ROMREGION_LOADUPPER)
 #define ROMREGION_ISERASE(r)		((ROMREGION_GETFLAGS(r) & ROMREGION_ERASEMASK) == ROMREGION_ERASE)
-#define ROMREGION_GETERASEVAL(r)	((ROMREGION_GETFLAGS(r) & ROMREGION_ERASEVALMASK) >> 8)
+#define ROMREGION_GETERASEVAL(r)	((ROMREGION_GETFLAGS(r) & ROMREGION_ERASEVALMASK) >> 16)
 #define ROMREGION_GETDATATYPE(r)	(ROMREGION_GETFLAGS(r) & ROMREGION_DATATYPEMASK)
 #define ROMREGION_ISROMDATA(r)		(ROMREGION_GETDATATYPE(r) == ROMREGION_DATATYPEROM)
 #define ROMREGION_ISDISKDATA(r)		(ROMREGION_GETDATATYPE(r) == ROMREGION_DATATYPEDISK)
@@ -207,13 +197,13 @@ struct _rom_load_data
 #define ROM_GETFLAGS(r)				((r)->_flags)
 #define ROM_GETHASHDATA(r)          ((r)->_hashdata)
 #define ROM_ISOPTIONAL(r)			((ROM_GETFLAGS(r) & ROM_OPTIONALMASK) == ROM_OPTIONAL)
-#define ROM_GETGROUPSIZE(r)			(((ROM_GETFLAGS(r) & ROM_GROUPMASK) >> 12) + 1)
-#define ROM_GETSKIPCOUNT(r)			((ROM_GETFLAGS(r) & ROM_SKIPMASK) >> 16)
+#define ROM_GETGROUPSIZE(r)			(((ROM_GETFLAGS(r) & ROM_GROUPMASK) >> 8) + 1)
+#define ROM_GETSKIPCOUNT(r)			((ROM_GETFLAGS(r) & ROM_SKIPMASK) >> 12)
 #define ROM_ISREVERSED(r)			((ROM_GETFLAGS(r) & ROM_REVERSEMASK) == ROM_REVERSE)
-#define ROM_GETBITWIDTH(r)			(((ROM_GETFLAGS(r) & ROM_BITWIDTHMASK) >> 21) + 8 * ((ROM_GETFLAGS(r) & ROM_BITWIDTHMASK) == 0))
-#define ROM_GETBITSHIFT(r)			((ROM_GETFLAGS(r) & ROM_BITSHIFTMASK) >> 24)
+#define ROM_GETBITWIDTH(r)			(((ROM_GETFLAGS(r) & ROM_BITWIDTHMASK) >> 16) + 8 * ((ROM_GETFLAGS(r) & ROM_BITWIDTHMASK) == 0))
+#define ROM_GETBITSHIFT(r)			((ROM_GETFLAGS(r) & ROM_BITSHIFTMASK) >> 20)
 #define ROM_INHERITSFLAGS(r)		((ROM_GETFLAGS(r) & ROM_INHERITFLAGSMASK) == ROM_INHERITFLAGS)
-#define ROM_GETBIOSFLAGS(r)			((ROM_GETFLAGS(r) & ROM_BIOSFLAGSMASK) >> 28)
+#define ROM_GETBIOSFLAGS(r)			((ROM_GETFLAGS(r) & ROM_BIOSFLAGSMASK) >> 24)
 #define ROM_NOGOODDUMP(r)			(hash_data_has_info((r)->_hashdata, HASH_INFO_NO_DUMP))
 
 
@@ -224,29 +214,23 @@ struct _rom_load_data
 
 /* ----- start/stop macros ----- */
 #define ROM_START(name)								static const rom_entry rom_##name[] = {
-#define ROM_END										{ ROMENTRY_END, 0, 0, 0, NULL } };
+#define ROM_END										{ NULL, NULL, 0, 0, ROMENTRYTYPE_END } };
 
 
 /* ----- ROM region macros ----- */
-#define ROM_REGION(length,type,flags)				{ ROMENTRY_REGION, 0, length, flags, (const char*)type },
-#define ROM_REGION16_LE(length,type,flags)			ROM_REGION(length, type, (flags) | ROMREGION_16BIT | ROMREGION_LE)
-#define ROM_REGION16_BE(length,type,flags)			ROM_REGION(length, type, (flags) | ROMREGION_16BIT | ROMREGION_BE)
-#define ROM_REGION32_LE(length,type,flags)			ROM_REGION(length, type, (flags) | ROMREGION_32BIT | ROMREGION_LE)
-#define ROM_REGION32_BE(length,type,flags)			ROM_REGION(length, type, (flags) | ROMREGION_32BIT | ROMREGION_BE)
-#define ROM_REGION64_LE(length,type,flags)			ROM_REGION(length, type, (flags) | ROMREGION_64BIT | ROMREGION_LE)
-#define ROM_REGION64_BE(length,type,flags)			ROM_REGION(length, type, (flags) | ROMREGION_64BIT | ROMREGION_BE)
+#define ROM_REGION(length,rclass,rtag,flags)		{ rtag, NULL, 0, length, ROMENTRYTYPE_REGION | ((rclass) << 4) | (flags) },
+#define ROM_REGION16_LE(length,rclass,rtag,flags)	ROM_REGION(length, rclass, rtag, (flags) | ROMREGION_16BIT | ROMREGION_LE)
+#define ROM_REGION16_BE(length,rclass,rtag,flags)	ROM_REGION(length, rclass, rtag, (flags) | ROMREGION_16BIT | ROMREGION_BE)
+#define ROM_REGION32_LE(length,rclass,rtag,flags)	ROM_REGION(length, rclass, rtag, (flags) | ROMREGION_32BIT | ROMREGION_LE)
+#define ROM_REGION32_BE(length,rclass,rtag,flags)	ROM_REGION(length, rclass, rtag, (flags) | ROMREGION_32BIT | ROMREGION_BE)
+#define ROM_REGION64_LE(length,rclass,rtag,flags)	ROM_REGION(length, rclass, rtag, (flags) | ROMREGION_64BIT | ROMREGION_LE)
+#define ROM_REGION64_BE(length,rclass,rtag,flags)	ROM_REGION(length, rclass, rtag, (flags) | ROMREGION_64BIT | ROMREGION_BE)
 
 
 /* ----- core ROM loading macros ----- */
-#define ROMMD5_LOAD(name,offset,length,hash,flags)	{ name, offset, length, flags, hash },
-#define ROMX_LOAD(name,offset,length,hash,flags)	{ name, offset, length, flags, hash },
+#define ROMX_LOAD(name,offset,length,hash,flags)	{ name, hash, offset, length, ROMENTRYTYPE_ROM | (flags) },
 #define ROM_LOAD(name,offset,length,hash)			ROMX_LOAD(name, offset, length, hash, 0)
 #define ROM_LOAD_OPTIONAL(name,offset,length,hash)	ROMX_LOAD(name, offset, length, hash, ROM_OPTIONAL)
-#define ROM_CONTINUE(offset,length)					ROMX_LOAD(ROMENTRY_CONTINUE, offset, length, 0, ROM_INHERITFLAGS)
-#define ROM_RELOAD(offset,length)					ROMX_LOAD(ROMENTRY_RELOAD, offset, length, 0, ROM_INHERITFLAGS)
-#define ROM_FILL(offset,length,value)				ROM_LOAD(ROMENTRY_FILL, offset, length, (const char*)value)
-#define ROM_COPY(rgn,srcoffset,offset,length)		ROMX_LOAD(ROMENTRY_COPY, offset, length, (const char*)srcoffset, (rgn) << 24)
-#define ROM_IGNORE(length)							ROMX_LOAD(ROMENTRY_IGNORE, 0, length, 0, ROM_INHERITFLAGS)
 
 
 /* ----- specialized loading macros ----- */
@@ -261,13 +245,22 @@ struct _rom_load_data
 #define ROM_LOAD32_DWORD(name,offset,length,hash)	ROMX_LOAD(name, offset, length, hash, ROM_GROUPDWORD)
 
 
+/* ----- additional ROM-related macros ----- */
+#define ROM_CONTINUE(offset,length)					{ NULL, NULL, offset, length, ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS },
+#define ROM_RELOAD(offset,length)					{ NULL, NULL, offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS },
+#define ROM_IGNORE(length)							{ NULL, NULL, 0,      length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS },
+#define ROM_FILL(offset,length,value)				{ NULL, (const char *)value, offset, length, ROMENTRYTYPE_FILL },
+#define ROM_COPY(rclass,rtag,srcoffs,offset,length) { rtag, (const char *)srcoffs, offset, length, ROMENTRYTYPE_COPY | ((rclass) << 4) },
+
+
 /* ----- system BIOS macros ----- */
-#define ROM_SYSTEM_BIOS(value,name,description) ROMX_LOAD(ROMENTRY_SYSTEM_BIOS, 0, 0, name "\0" description, ROM_BIOS(value+1))
+#define ROM_SYSTEM_BIOS(value,name,description)		{ name, description, 0, 0, ROMENTRYTYPE_SYSTEM_BIOS | ROM_BIOS(value+1) },
+
 
 /* ----- disk loading macros ----- */
-#define DISK_REGION(type)							ROM_REGION(1, type, ROMREGION_DATATYPEDISK)
-#define DISK_IMAGE(name,idx,hash)					ROMMD5_LOAD(name, idx, 0, hash, DISK_READWRITE)
-#define DISK_IMAGE_READONLY(name,idx,hash)			ROMMD5_LOAD(name, idx, 0, hash, DISK_READONLY)
+#define DISK_REGION(type, tag)						ROM_REGION(1, type, tag, ROMREGION_DATATYPEDISK)
+#define DISK_IMAGE(name,idx,hash)					ROMX_LOAD(name, idx, 0, hash, DISK_READWRITE)
+#define DISK_IMAGE_READONLY(name,idx,hash)			ROMX_LOAD(name, idx, 0, hash, DISK_READONLY)
 
 
 /* ----- hash macros ----- */

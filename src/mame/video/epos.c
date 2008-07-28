@@ -29,8 +29,8 @@ static UINT8 palette;
 static void get_pens(running_machine *machine, pen_t *pens)
 {
 	offs_t i;
-	const UINT8 *prom = memory_region(machine, REGION_PROMS);
-	int len = memory_region_length(machine, REGION_PROMS);
+	const UINT8 *prom = memory_region(machine, RGNCLASS_PROMS, "proms");
+	int len = memory_region_length(machine, RGNCLASS_PROMS, "proms");
 
 	for (i = 0; i < len; i++)
 	{

@@ -330,7 +330,7 @@ static const gfx_layout molayout =
 
 
 static GFXDECODE_START( arcadecl )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, molayout,  256, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, molayout,  256, 16 )
 GFXDECODE_END
 
 
@@ -369,7 +369,7 @@ static MACHINE_DRIVER_START( arcadecl )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, MASTER_CLOCK/4/3)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -382,27 +382,27 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( arcadecl )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 )
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD16_BYTE( "pgm0",  0x00000, 0x80000, CRC(b5b93623) SHA1(a2e96c0c6eceb3d8f205e28d6b8197055aeb8cc4) )
 	ROM_LOAD16_BYTE( "prog1", 0x00001, 0x80000, CRC(e7efef85) SHA1(05f2119d8ecc27f6efea85f5174ea7da404d7e9b) )
 
-	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_INVERT )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT )
 	ROM_LOAD( "atcl_mob",   0x00000, 0x80000, CRC(0e9b3930) SHA1(51a449b79235d6ca5189e671399acff72a2d3dc8) )
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 )
 	ROM_LOAD( "adpcm",      0x00000, 0x80000, CRC(03ca7f03) SHA1(87ff53599b6f0cdfa5a1779773e09cc5cfe3c2a8) )
 ROM_END
 
 
 ROM_START( sparkz )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 )
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD16_BYTE( "sparkzpg.0", 0x00000, 0x80000, CRC(a75c331c) SHA1(855ed44bd23c1dd0ca64926cacc8be62aca82fe2) )
 	ROM_LOAD16_BYTE( "sparkzpg.1", 0x00001, 0x80000, CRC(1af1fc04) SHA1(6d92edb1a881ba6b63e0144c9c3e631b654bf8ae) )
 
-	ROM_REGION( 0x20, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	/* empty */
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 )
 	ROM_LOAD( "sparkzsn",      0x00000, 0x80000, CRC(87097ce2) SHA1(dc4d199b5af692d111c087af3edc01e2ac0287a8) )
 ROM_END
 
@@ -423,7 +423,7 @@ static DRIVER_INIT( arcadecl )
 static DRIVER_INIT( sparkz )
 {
 	atarigen_eeprom_default = NULL;
-	memset(memory_region(machine, REGION_GFX1), 0, memory_region_length(machine, REGION_GFX1));
+	memset(memory_region(machine, RGNCLASS_GFX, "gfx1"), 0, memory_region_length(machine, RGNCLASS_GFX, "gfx1"));
 }
 
 

@@ -186,7 +186,7 @@ VIDEO_RESET( adder2 )
 	adder2_data_to_sc2       = 0;
 
 	{
-		UINT8 *rom = memory_region(machine, REGION_CPU2);
+		UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "adder2");
 
 		memory_configure_bank(2, 0, 4, &rom[0x00000], 0x08000);
 
@@ -426,7 +426,7 @@ void adder2_decode_char_roms(running_machine *machine)
 {
 	UINT8 *p;
 
-	p = memory_region(machine, REGION_GFX1);
+	p = memory_region(machine, RGNCLASS_GFX, "gfx1");
 
 	if ( p )
 	{
@@ -506,7 +506,7 @@ static const gfx_layout charlayout =
 // there are max 128 of these groups
 
 GFXDECODE_START( adder2 )
-	GFXDECODE_ENTRY( REGION_GFX1,  0, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1",  0, charlayout, 0, 16 )
 GFXDECODE_END
 
 ///////////////////////////////////////////////////////////////////////////

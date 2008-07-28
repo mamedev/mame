@@ -127,7 +127,7 @@ static void K051649_update(void *param, stream_sample_t **inputs, stream_sample_
 		*buffer++ = info->mixer_lookup[*mix++];
 }
 
-static void *k051649_start(int sndindex, int clock, const void *config)
+static void *k051649_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct k051649_info *info;
 

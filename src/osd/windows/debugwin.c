@@ -1760,8 +1760,8 @@ static void memory_determine_combo_items(running_machine *machine)
 {
 	memorycombo_item **tail = &memorycombo;
 	UINT32 cpunum, spacenum;
-	int rgnnum, itemnum;
-	TCHAR *t_cpunum_name, *t_address_space_names;
+	int rgnclass, itemnum;
+	const char *rgntag;
 
 	// first add all the CPUs' address spaces
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
@@ -1769,61 +1769,55 @@ static void memory_determine_combo_items(running_machine *machine)
 		const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
 		if (cpuinfo->valid)
 			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-				if (cpuinfo->space[spacenum].databytes)
+				if (cpuinfo->space[spacenum].databytes != 0)
 				{
 					memorycombo_item *ci = malloc_or_die(sizeof(*ci));
+					TCHAR *t_tag, *t_name, *t_space;
+
 					memset(ci, 0, sizeof(*ci));
 					ci->cpunum = cpunum;
 					ci->spacenum = spacenum;
 					ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 8);
-					t_cpunum_name = tstring_from_utf8(cpunum_name(cpunum));
-					t_address_space_names = tstring_from_utf8(address_space_names[spacenum]);
-					_sntprintf(ci->name, ARRAY_LENGTH(ci->name), TEXT("CPU #%d (%s) %s memory"), cpunum, t_cpunum_name, t_address_space_names);
-					free(t_address_space_names),
-					t_address_space_names = NULL;
-					free(t_cpunum_name);
-					t_cpunum_name = NULL;
+					
+					t_tag = tstring_from_utf8(machine->config->cpu[cpunum].tag);
+					t_name = tstring_from_utf8(cpunum_name(cpunum));
+					t_space = tstring_from_utf8(address_space_names[spacenum]);
+					_sntprintf(ci->name, ARRAY_LENGTH(ci->name), TEXT("CPU #%d \"%s\" (%s) %s memory"), cpunum, t_tag, t_name, t_space);
+					free(t_space),
+					free(t_name);
+					free(t_tag);
+					
 					*tail = ci;
 					tail = &ci->next;
 				}
 	}
 
 	// then add all the memory regions
-	for (rgnnum = 0; rgnnum < MAX_MEMORY_REGIONS; rgnnum++)
-	{
-		TCHAR* t_memory_region_name;
-		UINT8 *base = memory_region(machine, rgnnum);
-		UINT32 type = memory_region_type(machine, rgnnum);
-		if (base != NULL && type > REGION_INVALID && (type - REGION_INVALID) < ARRAY_LENGTH(memory_region_names))
+	for (rgnclass = 0; rgnclass < RGNCLASS_COUNT; rgnclass++)
+		for (rgntag = memory_region_next(machine, rgnclass, NULL); rgntag != NULL; rgntag = memory_region_next(machine, rgnclass, rgntag))
 		{
 			memorycombo_item *ci = malloc_or_die(sizeof(*ci));
-			UINT32 flags = memory_region_flags(machine, rgnnum);
-			UINT8 width, little_endian;
+			UINT32 flags = memory_region_flags(machine, rgnclass, rgntag);
+			UINT8 little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
+			UINT8 width = 1 << ((flags & ROMREGION_WIDTHMASK) >> 8);
+			TCHAR *t_tag, *t_class;
+			
 			memset(ci, 0, sizeof(*ci));
-			ci->base = base;
-			ci->length = memory_region_length(machine, rgnnum);
-			width = 1 << (flags & ROMREGION_WIDTHMASK);
-			little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
-			if (type >= REGION_CPU1 && type <= REGION_CPU8)
-			{
-				const debug_cpu_info *cpuinfo = debug_get_cpu_info(type - REGION_CPU1);
-				if (cpuinfo)
-				{
-					width = cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes;
-					little_endian = (cpuinfo->endianness == CPU_IS_LE);
-				}
-			}
+			ci->base = memory_region(machine, rgnclass, rgntag);
+			ci->length = memory_region_length(machine, rgnclass, rgntag);
 			ci->prefsize = MIN(width, 8);
 			ci->offset_xor = width - 1;
 			ci->little_endian = little_endian;
-			t_memory_region_name = tstring_from_utf8(memory_region_names[type - REGION_INVALID]);
-			_tcscpy(ci->name, t_memory_region_name);
-			free(t_memory_region_name);
-			t_memory_region_name = NULL;
+
+			t_class = tstring_from_utf8(memory_region_class_name(rgnclass, FALSE));
+			t_tag = tstring_from_utf8(rgntag);
+			_sntprintf(ci->name, ARRAY_LENGTH(ci->name), TEXT("%s region \"%s\""), t_class, t_tag);
+			free(t_tag);
+			free(t_class);
+
 			*tail = ci;
 			tail = &ci->next;
 		}
-	}
 
 	// finally add all global array symbols
 	for (itemnum = 0; itemnum < 10000; itemnum++)
@@ -1831,7 +1825,6 @@ static void memory_determine_combo_items(running_machine *machine)
 		UINT32 valsize, valcount;
 		const char *name;
 		void *base;
-		TCHAR* t_name;
 
 		/* stop when we run out of items */
 		name = state_save_get_indexed_item(itemnum, &base, &valsize, &valcount);
@@ -1842,15 +1835,18 @@ static void memory_determine_combo_items(running_machine *machine)
 		if (valcount > 1 && strstr(name, "/globals/"))
 		{
 			memorycombo_item *ci = malloc_or_die(sizeof(*ci));
+			TCHAR *t_name;
+
 			memset(ci, 0, sizeof(*ci));
 			ci->base = base;
 			ci->length = valcount * valsize;
 			ci->prefsize = MIN(valsize, 8);
 			ci->little_endian = TRUE;
+
 			t_name = tstring_from_utf8(name);
 			_tcscpy(ci->name, _tcsrchr(t_name, TEXT('/')) + 1);
 			free(t_name);
-			t_name = NULL;
+
 			*tail = ci;
 			tail = &ci->next;
 		}
@@ -2575,7 +2571,7 @@ static void disasm_update_caption(HWND wnd)
 	cpunum = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM);
 
 	// then update the caption
-	sprintf(title, "Disassembly: %s (%d)", cpunum_name(cpunum), cpunum);
+	sprintf(title, "Disassembly: CPU #%d \"%s\" (%s)", cpunum, Machine->config->cpu[cpunum].tag, cpunum_name(cpunum));
 	win_set_window_text_utf8(wnd, title);
 }
 
@@ -2798,7 +2794,7 @@ static void console_set_cpunum(running_machine *machine, int cpunum)
 		debug_view_set_property_UINT32(main_console->view[1].view, DVP_REGS_CPUNUM, cpunum);
 
 	// then update the caption
-	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - CPU %d (%s)", machine->gamedrv->name, cpu_getactivecpu(), activecpu_name());
+	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - CPU #%d \"%s\" (%s)", machine->gamedrv->name, cpu_getactivecpu(), Machine->config->cpu[cpu_getactivecpu()].tag, activecpu_name());
 	win_get_window_text_utf8(main_console->wnd, curtitle, ARRAY_LENGTH(curtitle));
 	if (strcmp(title, curtitle))
 		win_set_window_text_utf8(main_console->wnd, title);

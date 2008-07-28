@@ -107,8 +107,8 @@ static struct sprite *sprite_list_create(int num_sprites)
 static void get_sprite_info(running_machine *machine)
 {
 	const pen_t *base_pal = machine->pens;
-	UINT8 *base_gfx = memory_region(machine, REGION_GFX1);
-	int gfx_max     = memory_region_length(machine, REGION_GFX1);
+	UINT8 *base_gfx = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	int gfx_max     = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
 
 	UINT16 *source = spriteram16;
 
@@ -986,8 +986,8 @@ VIDEO_START( wecleman )
 }
 
 //  Callbacks for the K051316
-#define ZOOMROM0_MEM_REGION REGION_GFX2
-#define ZOOMROM1_MEM_REGION REGION_GFX3
+#define ZOOMROM0_MEM_REGION "gfx2"
+#define ZOOMROM1_MEM_REGION "gfx3"
 
 static void zoom_callback_0(int *code,int *color,int *flags)
 {

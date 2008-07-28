@@ -20,9 +20,9 @@ WRITE8_HANDLER(homerun_banking_w)
 
 	data>>=5;
 	if(!data)
-		memory_set_bankptr(1, memory_region(machine, REGION_CPU1) );
+		memory_set_bankptr(1, memory_region(machine, RGNCLASS_CPU, "main") );
 	else
-		memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x10000 + (((data-1)&0x7)*0x4000 ));
+		memory_set_bankptr(1, memory_region(machine, RGNCLASS_CPU, "main") + 0x10000 + (((data-1)&0x7)*0x4000 ));
 }
 
 WRITE8_HANDLER( homerun_videoram_w )

@@ -521,7 +521,7 @@ ADDRESS_MAP_END
 /* rom bank is used when testing roms, not currently hooked up */
 static WRITE32_HANDLER ( rabbit_rombank_w )
 {
-	UINT8 *dataroms = memory_region(machine, REGION_USER1);
+	UINT8 *dataroms = memory_region(machine, RGNCLASS_GFX, "gfx1");
 	int bank;
 //  mame_printf_debug("rabbit rombank %08x\n",data&0x3ff);
 	bank = data & 0x3ff;
@@ -616,7 +616,7 @@ static TIMER_CALLBACK( rabbit_blit_done )
 
 static void rabbit_do_blit(running_machine *machine)
 {
-	UINT8 *blt_data = memory_region(machine, REGION_USER1);
+	UINT8 *blt_data = memory_region(machine, RGNCLASS_GFX, "gfx1");
 	int blt_source = (rabbit_blitterregs[0]&0x000fffff)>>0;
 	int blt_column = (rabbit_blitterregs[1]&0x00ff0000)>>16;
 	int blt_line   = (rabbit_blitterregs[1]&0x000000ff);
@@ -1028,16 +1028,16 @@ static const gfx_layout rabbit_16x16x8_layout =
 
 static GFXDECODE_START( rabbit )
 	/* this seems to be sprites */
-	GFXDECODE_ENTRY( REGION_USER1, 0, rabbit_sprite_8x8x4_layout,   0x0, 0x1000  )
-	GFXDECODE_ENTRY( REGION_USER1, 0, rabbit_sprite_16x16x4_layout, 0x0, 0x1000  )
-	GFXDECODE_ENTRY( REGION_USER1, 0, rabbit_sprite_8x8x8_layout,   0x0, 0x1000  ) // wrong
-	GFXDECODE_ENTRY( REGION_USER1, 0, rabbit_sprite_16x16x8_layout, 0x0, 0x1000  ) // wrong
+	GFXDECODE_ENTRY( "gfx1", 0, rabbit_sprite_8x8x4_layout,   0x0, 0x1000  )
+	GFXDECODE_ENTRY( "gfx1", 0, rabbit_sprite_16x16x4_layout, 0x0, 0x1000  )
+	GFXDECODE_ENTRY( "gfx1", 0, rabbit_sprite_8x8x8_layout,   0x0, 0x1000  ) // wrong
+	GFXDECODE_ENTRY( "gfx1", 0, rabbit_sprite_16x16x8_layout, 0x0, 0x1000  ) // wrong
 
 	/* this seems to be backgrounds and tilemap gfx */
-	GFXDECODE_ENTRY( REGION_USER2, 0, rabbit_8x8x4_layout,   0x0, 0x1000  )
-	GFXDECODE_ENTRY( REGION_USER2, 0, rabbit_16x16x4_layout, 0x0, 0x1000  )
-	GFXDECODE_ENTRY( REGION_USER2, 0, rabbit_8x8x8_layout,   0x0, 0x1000  )
-	GFXDECODE_ENTRY( REGION_USER2, 0, rabbit_16x16x8_layout, 0x0, 0x1000  )
+	GFXDECODE_ENTRY( "gfx2", 0, rabbit_8x8x4_layout,   0x0, 0x1000  )
+	GFXDECODE_ENTRY( "gfx2", 0, rabbit_16x16x4_layout, 0x0, 0x1000  )
+	GFXDECODE_ENTRY( "gfx2", 0, rabbit_8x8x8_layout,   0x0, 0x1000  )
+	GFXDECODE_ENTRY( "gfx2", 0, rabbit_16x16x8_layout, 0x0, 0x1000  )
 
 GFXDECODE_END
 
@@ -1223,13 +1223,13 @@ static DRIVER_INIT(tmmjprd)
 
 
 ROM_START( rabbit )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 ) /* 68020 Code */
+	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 ) /* 68020 Code */
 	ROM_LOAD32_BYTE( "jpr0.0", 0x000000, 0x080000, CRC(52bb18c0) SHA1(625bc8a4daa6d08cacd92d9110cf67a95a91325a) )
 	ROM_LOAD32_BYTE( "jpr1.1", 0x000001, 0x080000, CRC(38299d0d) SHA1(72ccd51781b47636bb16ac18037cb3121d17199f) )
 	ROM_LOAD32_BYTE( "jpr2.2", 0x000002, 0x080000, CRC(fa3fd91a) SHA1(ac0e658af30b37b752ede833b44ff5423b93bdb1) )
 	ROM_LOAD32_BYTE( "jpr3.3", 0x000003, 0x080000, CRC(d22727ca) SHA1(8415cb2d3864b11fe5623ac65f2e28fd62c61bd1) )
 
-//  ROM_REGION( 0x9000000, REGION_USER1, ROMREGION_ERASE ) /* Other Roms probably accessable by cpu / blitter, order is no doubt wrong */
+//  ROM_REGION( 0x9000000, RGNCLASS_GFX, "gfx1", ROMREGION_ERASE ) /* Other Roms probably accessable by cpu / blitter, order is no doubt wrong */
 	/* this seems to be how it tests them? weird ... */
 //  ROM_LOAD32_WORD( "jfv0.00", 0x0000000, 0x400000, CRC(b2a4d3d3) SHA1(0ab71d82a37ff94442b91712a28d3470619ba575) )
 //  ROM_LOAD32_WORD( "jfv1.01", 0x0000002, 0x400000, CRC(83f3926e) SHA1(b1c479e675d35fc08c9a7648ff40348a24654e7e) )
@@ -1240,31 +1240,31 @@ ROM_START( rabbit )
 //  ROM_LOAD16_BYTE( "jbg1.50", 0x6000000, 0x200000, CRC(1fc7f6e0) SHA1(b36062d2a9683683ffffd3003d5244a185f53280) )
 //  ROM_LOAD16_BYTE( "jbg2.60", 0x8000001, 0x200000, CRC(aee265fc) SHA1(ec420ab30b9b5141162223fc1fbf663ad9f211e6) )
 
-	ROM_REGION( 0x1000000, REGION_USER1, ROMREGION_INVERT ) /* Sprite Roms (and Blitter Data) */
+	ROM_REGION( 0x1000000, RGNCLASS_GFX, "gfx1", ROMREGION_INVERT ) /* Sprite Roms (and Blitter Data) */
 	ROM_LOAD32_WORD( "jfv0.00", 0x0000002, 0x400000, CRC(b2a4d3d3) SHA1(0ab71d82a37ff94442b91712a28d3470619ba575) )
 	ROM_LOAD32_WORD( "jfv1.01", 0x0000000, 0x400000, CRC(83f3926e) SHA1(b1c479e675d35fc08c9a7648ff40348a24654e7e) )
 	ROM_LOAD32_WORD( "jfv2.02", 0x0800002, 0x400000, CRC(b264bfb5) SHA1(8fafedb6af74150465b1773e80aef0edc3da4678) )
 	ROM_LOAD32_WORD( "jfv3.03", 0x0800000, 0x400000, CRC(3e1a9be2) SHA1(2082a4ae8cda84cec5ea0fc08753db387bb70d41) )
 
 
-	ROM_REGION( 0x600000, REGION_USER2, ROMREGION_INVERT ) /* BG Roms */
+	ROM_REGION( 0x600000, RGNCLASS_GFX, "gfx2", ROMREGION_INVERT ) /* BG Roms */
 	ROM_LOAD( "jbg0.40", 0x000000, 0x200000, CRC(89662944) SHA1(ca916ba38480fa588af19fc9682603f5195ad6c7) )
 	ROM_LOAD( "jbg1.50", 0x200000, 0x200000, CRC(1fc7f6e0) SHA1(b36062d2a9683683ffffd3003d5244a185f53280) )
 	ROM_LOAD( "jbg2.60", 0x400000, 0x200000, CRC(aee265fc) SHA1(ec420ab30b9b5141162223fc1fbf663ad9f211e6) )
 
-	ROM_REGION( 0x400000, REGION_USER3, 0 ) /* sound rom */
+	ROM_REGION( 0x400000, RGNCLASS_SOUND, "unknown", 0 ) /* sound rom */
 	ROM_LOAD( "jsn0.11", 0x0000000, 0x400000, CRC(e1f726e8) SHA1(598d75f3ff9e43ec8ce6131ed37f4345bf2f2d8e) )
 
 ROM_END
 
 ROM_START( tmmjprd )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 ) /* 68020 Code - doesn't seem to dsam quite right, bitswap? */
+	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 ) /* 68020 Code - doesn't seem to dsam quite right, bitswap? */
 	ROM_LOAD32_BYTE( "p00.bin", 0x000000, 0x080000, CRC(a1efd960) SHA1(7f41ab58de32777bccbfe28e6e5a1f2dca35bb90) )
 	ROM_LOAD32_BYTE( "p01.bin", 0x000001, 0x080000, CRC(9c325374) SHA1(1ddf1c292fc1bcf4dcefb5d4aa3abdeb1489c020) )
  	ROM_LOAD32_BYTE( "p02.bin", 0x000002, 0x080000, CRC(729a5f12) SHA1(615704d36afdceb4b1ff2e5dc34856e614181e16) )
 	ROM_LOAD32_BYTE( "p03.bin", 0x000003, 0x080000, CRC(595615ab) SHA1(aca746d74aa6e7e856eb5c9b740d884778743b27) )
 
-	ROM_REGION( 0x2000000, REGION_USER1, ROMREGION_INVERT ) /* Sprite Roms */
+	ROM_REGION( 0x2000000, RGNCLASS_GFX, "gfx1", ROMREGION_INVERT ) /* Sprite Roms */
 	ROM_LOAD16_WORD_SWAP( "00.bin", 0x1000000, 0x400000, CRC(303e91a1) SHA1(c29a22061ab8af8b72e0e6bdb36915a0cb5b2a5c) )
 	ROM_LOAD16_WORD_SWAP( "01.bin", 0x1400000, 0x400000, CRC(3371b775) SHA1(131dd850bd01dac52fa82c41948d900c4833db3c) )
 	ROM_LOAD16_WORD_SWAP( "10.bin", 0x1800000, 0x400000, CRC(5ab6af41) SHA1(e29cee23c84e17dd8dabd2ec71e622c25418646e) )
@@ -1274,7 +1274,7 @@ ROM_START( tmmjprd )
 	ROM_LOAD16_WORD_SWAP( "12.bin", 0x0800000, 0x400000, CRC(5b8bb9d6) SHA1(ee93774077d8a2ddcf70869a9c2f4961219a85b4) )
 	ROM_LOAD16_WORD_SWAP( "13.bin", 0x0c00000, 0x400000, CRC(d950df0a) SHA1(3b109341ab4ad87005113fb481b5d1ed9a82f50f) )
 
-	ROM_REGION( 0x2000000, REGION_USER2, ROMREGION_INVERT ) /* BG Roms */
+	ROM_REGION( 0x2000000, RGNCLASS_GFX, "gfx2", ROMREGION_INVERT ) /* BG Roms */
 	ROM_LOAD32_WORD( "40.bin", 0x0000000, 0x400000, CRC(8bedc606) SHA1(7159c8b86e8d7d5ae202c239638483ccdc7dfc25) )
 	ROM_LOAD32_WORD( "41.bin", 0x0000002, 0x400000, CRC(e19713dd) SHA1(a8f1b716913f2e391abf277e5bf0e9986cc75898) )
 	ROM_LOAD32_WORD( "50.bin", 0x0800000, 0x400000, CRC(85ca9ce9) SHA1(c5a7270507522e11e9485196be325508846fda90) )
@@ -1284,7 +1284,7 @@ ROM_START( tmmjprd )
 	ROM_LOAD32_WORD( "70.bin", 0x1800000, 0x400000, CRC(9b737ae4) SHA1(0b62a90d42ace81ee32db073a57731a55a32f989) )
 	ROM_LOAD32_WORD( "71.bin", 0x1800002, 0x400000, CRC(189f694e) SHA1(ad0799d4aadade51be38d824910d299257a758a3) )
 
-	ROM_REGION( 0x800000, REGION_USER3, 0 ) /* Sound Roms? */
+	ROM_REGION( 0x800000, RGNCLASS_SOUND, "unknown", 0 ) /* Sound Roms? */
 	ROM_LOAD16_BYTE( "21.bin", 0x0000001, 0x400000, CRC(bb5fa8da) SHA1(620e609b3e2524d06d58844625f186fd4682205f))
 ROM_END
 

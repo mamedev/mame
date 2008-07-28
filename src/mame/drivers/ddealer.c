@@ -169,7 +169,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( jalmah )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
 static MACHINE_RESET (ddealer)
@@ -254,14 +254,14 @@ static DRIVER_INIT( ddealer )
 }
 
 ROM_START( ddealer )
-	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "1.ic6", 0x00001, 0x20000, CRC(ce0dff50) SHA1(2d7a03f6b9609aea7511a4dc49560a901b0b9f19) )
 	ROM_LOAD16_BYTE( "2.ic28", 0x00000, 0x20000, CRC(f00c346f) SHA1(bd73efb19d5f9efc88210d92a82a3f4595b41097) )
 
-	ROM_REGION( 0x20000, REGION_GFX1, 0 ) /* BG0 */
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", 0 ) /* BG0 */
 	ROM_LOAD( "4.ic65", 0x00000, 0x20000, CRC(4939ff1b) SHA1(af2f2feeef5520d775731a58cbfc8fcc913b7348) )
 
-	ROM_REGION( 0x200, REGION_USER1, 0 ) /* Proms */
+	ROM_REGION( 0x200, RGNCLASS_USER, "user1", 0 ) /* Proms */
 	ROM_LOAD( "5.ic67", 0x000, 0x100, NO_DUMP )
 	ROM_LOAD( "6.ic86", 0x100, 0x100, NO_DUMP )
 ROM_END

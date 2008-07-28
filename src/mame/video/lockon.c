@@ -217,7 +217,7 @@ static void scene_draw(running_machine *machine)
 	UINT32 y;
 
 	/* 3bpp characters */
-	const UINT8 *const gfx1 = memory_region(machine, REGION_GFX2);
+	const UINT8 *const gfx1 = memory_region(machine, RGNCLASS_GFX, "gfx2");
 	const UINT8 *const gfx2 = gfx1 + 0x10000;
 	const UINT8 *const gfx3 = gfx1 + 0x20000;
 	const UINT8 *const clut = gfx1 + 0x30000;
@@ -350,7 +350,7 @@ static TIMER_CALLBACK( bufend_callback )
 static void ground_draw(running_machine *machine)
 {
 	/* ROM pointers */
-	const UINT8 *const gfx_rom  = memory_region(machine, REGION_GFX4);
+	const UINT8 *const gfx_rom  = memory_region(machine, RGNCLASS_GFX, "gfx4");
 	const UINT8 *const lut_rom  = gfx_rom + 0x30000 + ((ground_ctrl >> 2) & 0x3 ? 0x10000 : 0);
 	const UINT8 *const clut_rom = gfx_rom + 0x50000;
 
@@ -476,10 +476,10 @@ static void objects_draw(running_machine *machine)
 {
 	UINT32 offs;
 
-	const UINT8  *const romlut = memory_region(machine, REGION_USER1);
-	const UINT16 *const chklut = (UINT16*)memory_region(machine, REGION_USER2);
-	const UINT8  *const gfxrom = memory_region(machine, REGION_GFX5);
-	const UINT8  *const sproms = memory_region(machine, REGION_PROMS) + 0x800;
+	const UINT8  *const romlut = memory_region(machine, RGNCLASS_USER, "user1");
+	const UINT16 *const chklut = (UINT16*)memory_region(machine, RGNCLASS_USER, "user2");
+	const UINT8  *const gfxrom = memory_region(machine, RGNCLASS_GFX, "gfx5");
+	const UINT8  *const sproms = memory_region(machine, RGNCLASS_PROMS, "proms") + 0x800;
 
 	for (offs = 0; offs < lockon_objectram_size; offs += 4)
 	{
@@ -835,7 +835,7 @@ static void rotate_draw(bitmap_t *bitmap, const rectangle *cliprect)
 
 static void hud_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8	*tile_rom = memory_region(machine, REGION_GFX3);
+	UINT8	*tile_rom = memory_region(machine, RGNCLASS_GFX, "gfx3");
 	UINT32	offs;
 
 	for (offs = 0x0; offs <= lockon_hudram_size; offs += 2)

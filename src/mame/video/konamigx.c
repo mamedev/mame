@@ -34,7 +34,7 @@ static TILE_GET_INFO( get_gx_psac_tile_info )
 static TILE_GET_INFO( get_gx_psac3_tile_info )
 {
 	int tileno, colour, flip;
-	UINT8 *tmap = memory_region(machine, REGION_GFX4);
+	UINT8 *tmap = memory_region(machine, RGNCLASS_GFX, "gfx4");
 
 	tileno = tmap[tile_index*2] | ((tmap[(tile_index*2)+1] & 0x0f)<<8);
 	colour = (psac_colorbase << 8);
@@ -172,7 +172,7 @@ static void _gxcommoninitnosprites(running_machine *machine)
 static void _gxcommoninit(running_machine *machine)
 {
 	// (+ve values move objects to the right and -ve values move objects to the left)
-	K055673_vh_start(machine, REGION_GFX2, K055673_LAYOUT_GX, -26, -23, konamigx_type2_sprite_callback);
+	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX, -26, -23, konamigx_type2_sprite_callback);
 
 	gx_rozenable = 0;
 
@@ -187,7 +187,7 @@ VIDEO_START(konamigx_5bpp)
 	else
 		game_tile_callback = konamigx_type2_tile_callback;
 
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_5, 0, NULL, game_tile_callback, 0);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, game_tile_callback, 0);
 
 	_gxcommoninit(machine);
 
@@ -224,16 +224,16 @@ VIDEO_START(konamigx_5bpp)
 
 VIDEO_START(winspike)
 {
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_8, 0, NULL, konamigx_alpha_tile_callback, 0);
-	K055673_vh_start(machine, REGION_GFX2, K055673_LAYOUT_LE2, -53, -23, konamigx_type2_sprite_callback);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 0, NULL, konamigx_alpha_tile_callback, 0);
+	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_LE2, -53, -23, konamigx_type2_sprite_callback);
 
 	_gxcommoninitnosprites(machine);
 }
 
 VIDEO_START(dragoonj)
 {
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_5, 1, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(machine, REGION_GFX2, K055673_LAYOUT_RNG, -53, -23, konamigx_dragoonj_sprite_callback);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 1, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_RNG, -53, -23, konamigx_dragoonj_sprite_callback);
 
 	_gxcommoninitnosprites(machine);
 
@@ -245,8 +245,8 @@ VIDEO_START(dragoonj)
 
 VIDEO_START(le2)
 {
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_8, 1, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(machine, REGION_GFX2, K055673_LAYOUT_LE2, -46, -23, konamigx_le2_sprite_callback);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 1, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_LE2, -46, -23, konamigx_le2_sprite_callback);
 
 	_gxcommoninitnosprites(machine);
 
@@ -255,7 +255,7 @@ VIDEO_START(le2)
 
 VIDEO_START(konamigx_6bpp)
 {
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
 
 	_gxcommoninit(machine);
 
@@ -268,7 +268,7 @@ VIDEO_START(konamigx_6bpp)
 
 VIDEO_START(konamigx_type3)
 {
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
 
 	_gxcommoninit(machine);
 
@@ -281,7 +281,7 @@ VIDEO_START(konamigx_type3)
 
 VIDEO_START(konamigx_type4)
 {
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
 
 	_gxcommoninit(machine);
 
@@ -294,11 +294,11 @@ VIDEO_START(konamigx_type4)
 
 VIDEO_START(konamigx_6bpp_2)
 {
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_6, 1, NULL, konamigx_type2_tile_callback, 0);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_6, 1, NULL, konamigx_type2_tile_callback, 0);
 
 	if (!strcmp(machine->gamedrv->name,"salmndr2"))
 	{
-		K055673_vh_start(machine, REGION_GFX2, K055673_LAYOUT_GX6, -48, -23, konamigx_salmndr2_sprite_callback);
+		K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -48, -23, konamigx_salmndr2_sprite_callback);
 
 		_gxcommoninitnosprites(machine);
 	}
@@ -310,8 +310,8 @@ VIDEO_START(konamigx_6bpp_2)
 
 VIDEO_START(opengolf)
 {
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_5, 0, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(machine, REGION_GFX2, K055673_LAYOUT_GX6, -53, -23, konamigx_type2_sprite_callback);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -53, -23, konamigx_type2_sprite_callback);
 
 	_gxcommoninitnosprites(machine);
 
@@ -330,8 +330,8 @@ VIDEO_START(opengolf)
 
 VIDEO_START(racinfrc)
 {
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(machine, REGION_GFX2, K055673_LAYOUT_GX, -53, -23, konamigx_type2_sprite_callback);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX, -53, -23, konamigx_type2_sprite_callback);
 
 	_gxcommoninitnosprites(machine);
 

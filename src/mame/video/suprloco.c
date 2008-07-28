@@ -206,7 +206,7 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectang
 		dy = -1;
 	}
 
-	gfx2 = memory_region(machine, REGION_GFX2);
+	gfx2 = memory_region(machine, RGNCLASS_GFX, "gfx2");
 	for (row = 0;row < height;row++,adjy+=dy)
 	{
 		int color1,color2,flipx;

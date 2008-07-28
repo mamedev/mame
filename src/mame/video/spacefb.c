@@ -218,7 +218,7 @@ static void draw_starfield(const device_config *screen, bitmap_t *bitmap, const 
 static void get_sprite_pens(running_machine *machine, pen_t *pens)
 {
 	static const double fade_weights[] = { 1.0, 1.5, 2.5, 4.0 };
-	const UINT8 *prom = memory_region(machine, REGION_PROMS);
+	const UINT8 *prom = memory_region(machine, RGNCLASS_PROMS, "proms");
 	int i;
 
 	for (i = 0; i < NUM_SPRITE_PENS; i++)
@@ -259,7 +259,7 @@ static void draw_bullet(running_machine *machine, offs_t offs, pen_t pen, bitmap
 {
 	UINT8 sy;
 
-	UINT8 *gfx = memory_region(machine, REGION_GFX2);
+	UINT8 *gfx = memory_region(machine, RGNCLASS_GFX, "gfx2");
 
 	UINT8 code = spacefb_videoram[offs + 0x0200] & 0x3f;
 	UINT8 y = ~spacefb_videoram[offs + 0x0100] - 2;
@@ -310,7 +310,7 @@ static void draw_sprite(running_machine *machine, offs_t offs, pen_t *pens, bitm
 {
 	UINT8 sy;
 
-	UINT8 *gfx = memory_region(machine, REGION_GFX1);
+	UINT8 *gfx = memory_region(machine, RGNCLASS_GFX, "gfx1");
 
 	UINT8 code = ~spacefb_videoram[offs + 0x0200];
 	UINT8 color_base = (~spacefb_videoram[offs + 0x0300] & 0x0f) << 2;

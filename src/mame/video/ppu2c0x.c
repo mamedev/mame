@@ -330,13 +330,13 @@ void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 		}
 
 		/* initialize the video ROM portion, if available */
-		if ( ( intf->vrom_region[i] != REGION_INVALID ) && ( memory_region( machine, intf->vrom_region[i] ) != 0 ) )
+		if ( ( intf->vrom_region[i] != NULL ) && ( memory_region( machine, RGNCLASS_GFX, intf->vrom_region[i] ) != 0 ) )
 		{
 			/* mark that we have a videorom */
 			chips[i].has_videorom = 1;
 
 			/* find out how many banks */
-			chips[i].videorom_banks = memory_region_length( machine, intf->vrom_region[i] ) / 0x2000;
+			chips[i].videorom_banks = memory_region_length( machine, RGNCLASS_GFX, intf->vrom_region[i] ) / 0x2000;
 
 			/* tweak the layout accordingly */
 			if ( chips[i].has_videoram )
@@ -359,7 +359,7 @@ void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 		/* now create the gfx region */
 		{
 			gfx_layout gl;
-			UINT8 *src = (chips[i].has_videorom && !chips[i].has_videoram) ? memory_region( machine, intf->vrom_region[i] ) : chips[i].videomem;
+			UINT8 *src = (chips[i].has_videorom && !chips[i].has_videoram) ? memory_region( machine, RGNCLASS_GFX, intf->vrom_region[i] ) : chips[i].videomem;
 
 			memcpy(&gl, &ppu_charlayout, sizeof(gl));
 			gl.total = total;
@@ -1415,7 +1415,7 @@ void ppu2c0x_set_videorom_bank( int num, int start_page, int num_pages, int bank
 		int count = num_pages * 0x400;
 		int rom_start = bank * bank_size * 16;
 
-		memcpy( &chips[num].videomem[vram_start], &memory_region( Machine, intf->vrom_region[num] )[rom_start], count );
+		memcpy( &chips[num].videomem[vram_start], &memory_region( Machine, RGNCLASS_GFX, intf->vrom_region[num] )[rom_start], count );
 	}
 }
 

@@ -22,7 +22,7 @@
 
 static ADDRESS_MAP_START( 39in1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION(REGION_CPU1, 0)	// mirror to prevent crashing
+	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION(RGNCLASS_CPU, "main", 0)	// mirror to prevent crashing
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( 39in1 )
@@ -50,11 +50,11 @@ MACHINE_DRIVER_END
 
 ROM_START( 39in1 )
 	// main program, appears to be encrypted
-	ROM_REGION( 0x80000, REGION_CPU1, 0 )
+	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
         ROM_LOAD( "27c4096_plz-v001_ver.300.bin", 0x000000, 0x080000, CRC(9149dbc4) SHA1(40efe1f654f11474f75ae7fee1613f435dbede38) )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
-	ROM_REGION32_LE( 0x200000, REGION_USER1, 0 )
+	ROM_REGION32_LE( 0x200000, RGNCLASS_USER, "user1", 0 )
         ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
 ROM_END
 

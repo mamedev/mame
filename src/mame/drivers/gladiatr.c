@@ -207,7 +207,7 @@ VIDEO_UPDATE( gladiatr );
 /*Rom bankswitching*/
 static WRITE8_HANDLER( gladiatr_bankswitch_w )
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU1) + 0x10000;
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main") + 0x10000;
 
 	memory_set_bankptr(1, rom + 0x6000 * (data & 0x01));
 }
@@ -269,7 +269,7 @@ static MACHINE_RESET( gladiator )
 	TAITO8741_start(&gsword_8741interface);
 	/* 6809 bank memory set */
 	{
-		UINT8 *rom = memory_region(machine, REGION_CPU3) + 0x10000;
+		UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "audio") + 0x10000;
 		memory_set_bankptr(2,rom);
 	}
 }
@@ -296,7 +296,7 @@ static void gladiator_ym_irq(running_machine *machine, int irq)
 /*Sound Functions*/
 static WRITE8_HANDLER( glad_adpcm_w )
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU3) + 0x10000;
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "audio") + 0x10000;
 
 	/* bit6 = bank offset */
 	memory_set_bankptr(2,rom + ((data & 0x40) ? 0xc000 : 0));
@@ -635,15 +635,15 @@ static const gfx_layout spritelayout  =
 };
 
 static GFXDECODE_START( ppking )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 1 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout, 0, 32 )
-	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 0x100, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x100, 32 )
 GFXDECODE_END
 
 static GFXDECODE_START( gladiatr )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x200, 1 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,   0x000, 32 )
-	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 0x100, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x200, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0x000, 32 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x100, 32 )
 GFXDECODE_END
 
 
@@ -793,31 +793,31 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( ppking )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "q1_1.a1",        0x00000, 0x2000, CRC(b74b2718) SHA1(29833439211076873324ccfa5897eb1e6aa9d134) )
 	ROM_LOAD( "q1_2.b1",        0x02000, 0x2000, CRC(1b1e4cd4) SHA1(34c6cf5e0775c0c834dda34a3a2a4685465daa8e) )
 	ROM_LOAD( "q0_3.c1",        0x04000, 0x2000, CRC(6a7acf8e) SHA1(06d37e813605f507ea1c720764fc554e58defdf8) )
 	ROM_LOAD( "q0_4.d1",        0x06000, 0x2000, CRC(b83eb6d5) SHA1(f112d3c0d701977dcc5c312ad74d78b44882201b) )
 	ROM_LOAD( "q0_5.e1",        0x08000, 0x4000, CRC(4d2007e2) SHA1(973ef0e6ff6065b753402489a3d10a9b68164969) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "sub", 0 )
 	ROM_LOAD( "q0_17.6f",       0x0000, 0x2000, CRC(f7fe0d24) SHA1(6dcb23aa7fc08fc892a8b3843ccb982997c20571) )
 	ROM_LOAD( "q0_16.6e",       0x4000, 0x2000, CRC(b1e32588) SHA1(13c74479238a34a08e249f9120b42a52d80f8274) )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
 	ROM_LOAD( "q0_19.5n",       0x0c000, 0x2000, CRC(4bcf896d) SHA1(f587a66fcc63e989742ce2d5f4cf2bb464987038) )
 	ROM_LOAD( "q0_18.5m",       0x0e000, 0x2000, CRC(89ba64f8) SHA1(fa01316ea744b4277ee64d5f14cb6d7e3a949f2b) )
 
-	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x02000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "q0_15.1r",       0x00000, 0x2000, CRC(fbd33219) SHA1(78b9bb327ededaa818d26c41c5e8fd1c041ef142) )
 
-	ROM_REGION( 0x8000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x8000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "q0_12.1j",       0x00000, 0x2000, CRC(b1a44482) SHA1(84cc40976aa9b015a9f970a878bbde753651b3ba) )	/* plane 3 */
 	/* space to unpack plane 3 */
 	ROM_LOAD( "q0_13.1k",       0x04000, 0x2000, CRC(468f35e6) SHA1(8e28481910663fe525cefd4ad406468b7736900e) ) /* planes 1,2 */
 	ROM_LOAD( "q0_14.1m",       0x06000, 0x2000, CRC(eed04a7f) SHA1(d139920889653c33ded38a85510789380dd0aa9e) ) /* planes 1,2 */
 
-	ROM_REGION( 0x10000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "q0_6.k1",        0x00000, 0x2000, CRC(bb3d666c) SHA1(a689c7a1e75b916d69f396db7c4688ac355c2aff) )	/* plane 3 */
 	ROM_LOAD( "q0_7.l1",        0x02000, 0x2000, CRC(16a2550e) SHA1(adb54b70a6db660b5f29ad66da02afd8e99884bb) )	/* plane 3 */
 	/* space to unpack plane 3 */
@@ -826,14 +826,14 @@ ROM_START( ppking )
 	ROM_LOAD( "q0_10.r1",       0x0c000, 0x2000, CRC(af438cc6) SHA1(cf79c8d3f2a0c489a756b341f8df747f6654764b) ) /* planes 1,2 */
 	/* empty! */
 
-	ROM_REGION( 0x040, REGION_PROMS, 0 )
+	ROM_REGION( 0x040, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "q1",             0x0000, 0x0020, CRC(cca9ae7b) SHA1(e18416fbe2a5b09db749cc9a14fa89186ed8f4ba) )
 	ROM_LOAD( "q2",             0x0020, 0x0020, CRC(da952b5e) SHA1(0863ad8fdcf69435a7455cd345d3d0af0b0c0a0a) )
 ROM_END
 
 
 ROM_START( gladiatr )
-	ROM_REGION( 0x1c000, REGION_CPU1, 0 )
+	ROM_REGION( 0x1c000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "qb0-5",          0x00000, 0x4000, CRC(25b19efb) SHA1(c41344278f6c7f3d6527aced3e459ed1ba86dea5) )
 	ROM_LOAD( "qb0-4",          0x04000, 0x2000, CRC(347ec794) SHA1(51100f9fef2e96f00e94fce709eed6583b01a2eb) )
 	ROM_LOAD( "qb0-1",          0x10000, 0x2000, CRC(040c9839) SHA1(8c0d9a246847461a59eb5e6a53a94218e701d6c3) )
@@ -841,10 +841,10 @@ ROM_START( gladiatr )
 	ROM_LOAD( "qc0-3",          0x12000, 0x4000, CRC(8d182326) SHA1(f0af3757c2cf9e1e8035272567adee6efc733319) )
 	ROM_CONTINUE(               0x18000, 0x4000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Code for the 2nd CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "sub", 0 ) /* Code for the 2nd CPU */
 	ROM_LOAD( "qb0-17",       	0x0000, 0x4000, CRC(e78be010) SHA1(157231d858d13a006b57a4ab419368168e64edb7) )
 
-	ROM_REGION( 0x28000, REGION_CPU3, 0 )  /* 6809 Code & ADPCM data */
+	ROM_REGION( 0x28000, RGNCLASS_CPU, "audio", 0 )  /* 6809 Code & ADPCM data */
 	ROM_LOAD( "qb0-20",         0x10000, 0x4000, CRC(15916eda) SHA1(6558bd2ae6f14d630ae93e66ce7d09be33870cce) )
 	ROM_CONTINUE(               0x1c000, 0x4000 )
 	ROM_LOAD( "qb0-19",         0x14000, 0x4000, CRC(79caa7ed) SHA1(57adc8429ad016c4da41deda6b7b6fe36de5a225) )
@@ -852,16 +852,16 @@ ROM_START( gladiatr )
 	ROM_LOAD( "qb0-18",         0x18000, 0x4000, CRC(e9591260) SHA1(e427aa10c683fbeb98171f6d1820781d21075a24) )
 	ROM_CONTINUE(               0x24000, 0x4000 )
 
-	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x02000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "qc0-15",       	0x00000, 0x2000, CRC(a7efa340) SHA1(f87e061b8e4d8cd0834fab301779a8493549419b) ) /* (monochrome) */
 
-	ROM_REGION( 0x20000, REGION_GFX2, ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* tiles */
 	ROM_LOAD( "qb0-12",       	0x00000, 0x8000, CRC(0585d9ac) SHA1(e3cb07e9dc5ec2fcfa0c90294d32f0b751f67752) ) /* plane 3 */
 	/* space to unpack plane 3 */
 	ROM_LOAD( "qb0-13",       	0x10000, 0x8000, CRC(a6bb797b) SHA1(852e9993270e5557c1a0350007d0beaec5ca6286) ) /* planes 1,2 */
 	ROM_LOAD( "qb0-14",       	0x18000, 0x8000, CRC(85b71211) SHA1(81545cd168da4a707e263fdf0ee9902e3a13ba93) ) /* planes 1,2 */
 
-	ROM_REGION( 0x30000, REGION_GFX3, ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x30000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )	/* sprites */
 	ROM_LOAD( "qc1-6",        	0x00000, 0x4000, CRC(651e6e44) SHA1(78ce576e6c29e43d590c42f0d4926cff82fd0268) ) /* plane 3 */
 	ROM_LOAD( "qc2-7",        	0x04000, 0x8000, CRC(c992c4f7) SHA1(3263973474af07c8b93c4ec97924568848cb7201) ) /* plane 3 */
 	/* space to unpack plane 3 */
@@ -870,13 +870,13 @@ ROM_START( gladiatr )
 	ROM_LOAD( "qc1-10",       	0x20000, 0x8000, CRC(364cdb58) SHA1(4d8548f9dfa9d105dd277c61cf3d56583a5ebbcb) ) /* planes 1,2 */
 	ROM_LOAD( "qc2-11",       	0x28000, 0x8000, CRC(c9fecfff) SHA1(7c13ace4293fbfab7fe924b7b24c498d8cefc7ac) ) /* planes 1,2 */
 
-	ROM_REGION( 0x00040, REGION_PROMS, 0 )	/* unused */
+	ROM_REGION( 0x00040, RGNCLASS_PROMS, "proms", 0 )	/* unused */
 	ROM_LOAD( "q3.2b",          0x00000, 0x0020, CRC(6a7c3c60) SHA1(5125bfeb03752c8d76b140a4e74d5cac29dcdaa6) )	/* address decoding */
 	ROM_LOAD( "q4.5s",          0x00020, 0x0020, CRC(e325808e) SHA1(5fd92ad4eff24f6ccf2df19d268a6cafba72202e) )
 ROM_END
 
 ROM_START( ogonsiro )
-	ROM_REGION( 0x1c000, REGION_CPU1, 0 )
+	ROM_REGION( 0x1c000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "qb0-5",          0x00000, 0x4000, CRC(25b19efb) SHA1(c41344278f6c7f3d6527aced3e459ed1ba86dea5) )
 	ROM_LOAD( "qb0-4",          0x04000, 0x2000, CRC(347ec794) SHA1(51100f9fef2e96f00e94fce709eed6583b01a2eb) )
 	ROM_LOAD( "qb0-1",          0x10000, 0x2000, CRC(040c9839) SHA1(8c0d9a246847461a59eb5e6a53a94218e701d6c3) )
@@ -884,10 +884,10 @@ ROM_START( ogonsiro )
 	ROM_LOAD( "qb0_3",          0x12000, 0x4000, CRC(d6a342e7) SHA1(96274ae3bda4679108a25fcc514b625552abda30) )
 	ROM_CONTINUE(               0x18000, 0x4000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Code for the 2nd CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "sub", 0 ) /* Code for the 2nd CPU */
 	ROM_LOAD( "qb0-17",       	0x0000, 0x4000, CRC(e78be010) SHA1(157231d858d13a006b57a4ab419368168e64edb7) )
 
-	ROM_REGION( 0x28000, REGION_CPU3, 0 )  /* 6809 Code & ADPCM data */
+	ROM_REGION( 0x28000, RGNCLASS_CPU, "audio", 0 )  /* 6809 Code & ADPCM data */
 	ROM_LOAD( "qb0-20",         0x10000, 0x4000, CRC(15916eda) SHA1(6558bd2ae6f14d630ae93e66ce7d09be33870cce) )
 	ROM_CONTINUE(               0x1c000, 0x4000 )
 	ROM_LOAD( "qb0-19",         0x14000, 0x4000, CRC(79caa7ed) SHA1(57adc8429ad016c4da41deda6b7b6fe36de5a225) )
@@ -895,16 +895,16 @@ ROM_START( ogonsiro )
 	ROM_LOAD( "qb0-18",         0x18000, 0x4000, CRC(e9591260) SHA1(e427aa10c683fbeb98171f6d1820781d21075a24) )
 	ROM_CONTINUE(               0x24000, 0x4000 )
 
-	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x02000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "qb0_15",       	0x00000, 0x2000, CRC(5e1332b8) SHA1(fab6e2c7ea9bc94c1245bf759b4004a70c57d666) ) /* (monochrome) */
 
-	ROM_REGION( 0x20000, REGION_GFX2, ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* tiles */
 	ROM_LOAD( "qb0-12",       	0x00000, 0x8000, CRC(0585d9ac) SHA1(e3cb07e9dc5ec2fcfa0c90294d32f0b751f67752) ) /* plane 3 */
 	/* space to unpack plane 3 */
 	ROM_LOAD( "qb0-13",       	0x10000, 0x8000, CRC(a6bb797b) SHA1(852e9993270e5557c1a0350007d0beaec5ca6286) ) /* planes 1,2 */
 	ROM_LOAD( "qb0-14",       	0x18000, 0x8000, CRC(85b71211) SHA1(81545cd168da4a707e263fdf0ee9902e3a13ba93) ) /* planes 1,2 */
 
-	ROM_REGION( 0x30000, REGION_GFX3, ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x30000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )	/* sprites */
 	ROM_LOAD( "qb0_6",        	0x00000, 0x4000, CRC(1a2bc769) SHA1(498861f4d0cffeaff90609c8000c921a114756b6) ) /* plane 3 */
 	ROM_LOAD( "qb0_7",        	0x04000, 0x8000, CRC(4b677bd9) SHA1(3314ef58ff5307faf0ecd8f99950d43d571c91a6) ) /* plane 3 */
 	/* space to unpack plane 3 */
@@ -913,13 +913,13 @@ ROM_START( ogonsiro )
 	ROM_LOAD( "qb0_10",       	0x20000, 0x8000, CRC(87ab6cc4) SHA1(50bc1108ff5609c0e7dad615e92e16eb72b7bc03) ) /* planes 1,2 */
 	ROM_LOAD( "qb0_11",       	0x28000, 0x8000, CRC(25eaa4ff) SHA1(3547fc600a617ba7fe5240a7830edb90230b6c51) ) /* planes 1,2 */
 
-	ROM_REGION( 0x00040, REGION_PROMS, 0 ) /* unused */
+	ROM_REGION( 0x00040, RGNCLASS_PROMS, "proms", 0 ) /* unused */
 	ROM_LOAD( "q3.2b",          0x00000, 0x0020, CRC(6a7c3c60) SHA1(5125bfeb03752c8d76b140a4e74d5cac29dcdaa6) )	/* address decoding */
 	ROM_LOAD( "q4.5s",          0x00020, 0x0020, CRC(e325808e) SHA1(5fd92ad4eff24f6ccf2df19d268a6cafba72202e) )
 ROM_END
 
 ROM_START( greatgur )
-	ROM_REGION( 0x1c000, REGION_CPU1, 0 )
+	ROM_REGION( 0x1c000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "qb0-5",          0x00000, 0x4000, CRC(25b19efb) SHA1(c41344278f6c7f3d6527aced3e459ed1ba86dea5) )
 	ROM_LOAD( "qb0-4",          0x04000, 0x2000, CRC(347ec794) SHA1(51100f9fef2e96f00e94fce709eed6583b01a2eb) )
 	ROM_LOAD( "qb0-1",          0x10000, 0x2000, CRC(040c9839) SHA1(8c0d9a246847461a59eb5e6a53a94218e701d6c3) )
@@ -927,10 +927,10 @@ ROM_START( greatgur )
 	ROM_LOAD( "qb0_3",          0x12000, 0x4000, CRC(d6a342e7) SHA1(96274ae3bda4679108a25fcc514b625552abda30) )
 	ROM_CONTINUE(               0x18000, 0x4000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Code for the 2nd CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "sub", 0 ) /* Code for the 2nd CPU */
 	ROM_LOAD( "qb0-17",         0x0000, 0x4000, CRC(e78be010) SHA1(157231d858d13a006b57a4ab419368168e64edb7) )
 
-	ROM_REGION( 0x28000, REGION_CPU3, 0 )  /* 6809 Code & ADPCM data */
+	ROM_REGION( 0x28000, RGNCLASS_CPU, "audio", 0 )  /* 6809 Code & ADPCM data */
 	ROM_LOAD( "qb0-20",         0x10000, 0x4000, CRC(15916eda) SHA1(6558bd2ae6f14d630ae93e66ce7d09be33870cce) )
 	ROM_CONTINUE(               0x1c000, 0x4000 )
 	ROM_LOAD( "qb0-19",         0x14000, 0x4000, CRC(79caa7ed) SHA1(57adc8429ad016c4da41deda6b7b6fe36de5a225) )
@@ -938,16 +938,16 @@ ROM_START( greatgur )
 	ROM_LOAD( "qb0-18",         0x18000, 0x4000, CRC(e9591260) SHA1(e427aa10c683fbeb98171f6d1820781d21075a24) )
 	ROM_CONTINUE(               0x24000, 0x4000 )
 
-	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x02000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "qb0_15",         0x00000, 0x2000, CRC(5e1332b8) SHA1(fab6e2c7ea9bc94c1245bf759b4004a70c57d666) ) /* (monochrome) */
 
-	ROM_REGION( 0x20000, REGION_GFX2, ROMREGION_DISPOSE )	/* tiles */
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )	/* tiles */
 	ROM_LOAD( "qb0-12",       	0x00000, 0x8000, CRC(0585d9ac) SHA1(e3cb07e9dc5ec2fcfa0c90294d32f0b751f67752) ) /* plane 3 */
 	/* space to unpack plane 3 */
 	ROM_LOAD( "qb0-13",       	0x10000, 0x8000, CRC(a6bb797b) SHA1(852e9993270e5557c1a0350007d0beaec5ca6286) ) /* planes 1,2 */
 	ROM_LOAD( "qb0-14",       	0x18000, 0x8000, CRC(85b71211) SHA1(81545cd168da4a707e263fdf0ee9902e3a13ba93) ) /* planes 1,2 */
 
-	ROM_REGION( 0x30000, REGION_GFX3, ROMREGION_DISPOSE )	/* sprites */
+	ROM_REGION( 0x30000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )	/* sprites */
 	ROM_LOAD( "qc0-06.bin",     0x00000, 0x4000, CRC(96b20201) SHA1(212270d3ba72974f22e96744c752860cc5ffba5b) ) /* plane 3 */
 	ROM_LOAD( "qc0-07.bin",     0x04000, 0x8000, CRC(9e89fa8f) SHA1(b133ae2ac62f43a7a51fa0d1a023a4f95fef2996) ) /* plane 3 */
 	/* space to unpack plane 3 */
@@ -956,11 +956,11 @@ ROM_START( greatgur )
 	ROM_LOAD( "qc1-10",         0x20000, 0x8000, CRC(364cdb58) SHA1(4d8548f9dfa9d105dd277c61cf3d56583a5ebbcb) ) /* planes 1,2 */
 	ROM_LOAD( "qc1-11.bin",     0x28000, 0x8000, CRC(b2aabbf5) SHA1(9eb4d80f38a30f6e45231a9bfd1aff7a124c6ee9) ) /* planes 1,2 */
 
-	ROM_REGION( 0x00040, REGION_PROMS, 0 ) /* unused */
+	ROM_REGION( 0x00040, RGNCLASS_PROMS, "proms", 0 ) /* unused */
 	ROM_LOAD( "q3.2b",          0x00000, 0x0020, CRC(6a7c3c60) SHA1(5125bfeb03752c8d76b140a4e74d5cac29dcdaa6) )	/* address decoding */
 	ROM_LOAD( "q4.5s",          0x00020, 0x0020, CRC(e325808e) SHA1(5fd92ad4eff24f6ccf2df19d268a6cafba72202e) )
 
-	ROM_REGION( 0x0400, REGION_USER1, 0 ) /* ROMs for the four 8741 (not emulated yet) */
+	ROM_REGION( 0x0400, RGNCLASS_USER, "user1", 0 ) /* ROMs for the four 8741 (not emulated yet) */
 	ROM_LOAD( "gladcctl.1",     0x00000, 0x0400, CRC(b30d225f) SHA1(f383286530975c440589c276aa8c46fdfe5292b6) )
 	ROM_LOAD( "gladccpu.2",     0x00000, 0x0400, CRC(1d02cd5f) SHA1(f7242039788c66a1d91b01852d7d447330b847c4) )
 	ROM_LOAD( "gladucpu.17",    0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) )
@@ -985,7 +985,7 @@ static DRIVER_INIT( gladiatr )
 	UINT8 *rom;
 	int i,j;
 
-	rom = memory_region(machine, REGION_GFX2);
+	rom = memory_region(machine, RGNCLASS_GFX, "gfx2");
 	// unpack 3bpp graphics
 	for (j = 3; j >= 0; j--)
 	{
@@ -999,7 +999,7 @@ static DRIVER_INIT( gladiatr )
 	swap_block(rom + 0x14000, rom + 0x18000, 0x4000);
 
 
-	rom = memory_region(machine, REGION_GFX3);
+	rom = memory_region(machine, RGNCLASS_GFX, "gfx3");
 	// unpack 3bpp graphics
 	for (j = 5; j >= 0; j--)
 	{
@@ -1030,14 +1030,14 @@ static DRIVER_INIT(ppking)
 	UINT8 *rom;
 	int i,j;
 
-	rom = memory_region(machine, REGION_GFX2);
+	rom = memory_region(machine, RGNCLASS_GFX, "gfx2");
 	// unpack 3bpp graphics
 	for (i = 0; i < 0x2000; i++)
 	{
 		rom[i+0x2000] = rom[i] >> 4;
 	}
 
-	rom = memory_region(machine, REGION_GFX3);
+	rom = memory_region(machine, RGNCLASS_GFX, "gfx3");
 	// unpack 3bpp graphics
 	for (j = 1; j >= 0; j--)
 	{

@@ -55,7 +55,7 @@ static int dynax_blit_scroll_y,		dynax_blit2_scroll_y;
 static int dynax_blit_wrap_enable,	dynax_blit2_wrap_enable;
 static int blit_x,blit_y,			blit2_x,blit2_y;
 static int blit_src,				blit2_src;
-static int dynax_blit_romregion,	dynax_blit2_romregion;
+static const char * dynax_blit_romregion, *dynax_blit2_romregion;
 static int dynax_blit_dest,			dynax_blit2_dest;
 static int dynax_blit_pen,			dynax_blit2_pen;
 static int dynax_blit_palbank,		dynax_blit2_palbank;
@@ -250,15 +250,19 @@ WRITE8_HANDLER( dynax_flipscreen_w )
 }
 
 
+static const char *gfxregions[] = { "gfx1", "gfx2", "gfx3", "gfx4", "gfx5", "gfx6", "gfx7", "gfx8" };
+
 WRITE8_HANDLER( dynax_blit_romregion_w )
 {
-	dynax_blit_romregion = REGION_GFX1 + data;
+	if (data < ARRAY_LENGTH(gfxregions))
+		dynax_blit_romregion = gfxregions[data];
 	LOG(("GFX%X ",data+1));
 }
 
 WRITE8_HANDLER( dynax_blit2_romregion_w )
 {
-	dynax_blit2_romregion = REGION_GFX2 + data;
+	if (data < ARRAY_LENGTH(gfxregions))
+		dynax_blit2_romregion = gfxregions[data];
 	LOG(("GFX%X' ",data+2));
 }
 
@@ -353,12 +357,12 @@ INLINE void blitter_plot_pixel(int layer,int mask, int x, int y, int pen, int wr
 }
 
 
-static int blitter_drawgfx( running_machine *machine, int layer, int mask, int gfx, int src, int pen, int x, int y, int wrap, int flags )
+static int blitter_drawgfx( running_machine *machine, int layer, int mask, const char *gfx, int src, int pen, int x, int y, int wrap, int flags )
 {
 	UINT8 cmd;
 
-	UINT8 *ROM		=	memory_region( machine, gfx );
-	size_t ROM_size	=	memory_region_length( machine, gfx );
+	UINT8 *ROM		=	memory_region( machine, RGNCLASS_GFX, gfx );
+	size_t ROM_size	=	memory_region_length( machine, RGNCLASS_GFX, gfx );
 
 	int sx;
 
@@ -724,7 +728,7 @@ static const int priority_mjelctrn[8] = { 0x0231, 0x0321, 0x2031, 0x2301, 0x3021
 
 static void Video_Reset(void)
 {
-	dynax_blit_romregion = REGION_GFX1;		dynax_blit2_romregion = REGION_GFX1;
+	dynax_blit_romregion = "gfx1";			dynax_blit2_romregion = "gfx1";
 	dynax_blit_dest = -1;					dynax_blit2_dest = -1;
 	dynax_blit_pen = 0x7;					dynax_blit2_pen = 0x7;
 	dynax_blit_palbank = 0;					dynax_blit2_palbank = 0;
@@ -1081,8 +1085,8 @@ static int debug_viewer(running_machine *machine, bitmap_t *bitmap,const rectang
 	static int toggle;
 	if (input_code_pressed_once(KEYCODE_T))	toggle = 1-toggle;
 	if (toggle)	{
-		UINT8 *RAM	=	memory_region( machine, REGION_GFX1 );
-		size_t size		=	memory_region_length( machine, REGION_GFX1 );
+		UINT8 *RAM	=	memory_region( machine, RGNCLASS_GFX, "gfx1" );
+		size_t size		=	memory_region_length( machine, RGNCLASS_GFX, "gfx1" );
 		static int i = 0, c = 0, r = 0;
 
 		if (input_code_pressed_once(KEYCODE_I))	c = (c-1) & 0x1f;
@@ -1101,7 +1105,7 @@ static int debug_viewer(running_machine *machine, bitmap_t *bitmap,const rectang
 		if (layer_layout != LAYOUT_MJDIALQ2)
 			memset(dynax_pixmap[0][1],0,sizeof(UINT8)*0x100*0x100);
 		for (hanamai_layer_half = 0; hanamai_layer_half < 2; hanamai_layer_half++)
-			blitter_drawgfx(machine,0,1,REGION_GFX1,i,0,cliprect->min_x,cliprect->min_y,3,0);
+			blitter_drawgfx(machine,0,1,"gfx1",i,0,cliprect->min_x,cliprect->min_y,3,0);
 		if (layer_layout != LAYOUT_MJDIALQ2)	hanamai_copylayer(bitmap, cliprect, 0);
 		else									mjdialq2_copylayer(bitmap,cliprect, 0);
 		popmessage("%06X C%02X",i,c);

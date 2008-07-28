@@ -48,7 +48,7 @@ struct atarirle_entry
 typedef struct atarirle_desc atarirle_desc;
 struct atarirle_desc
 {
-	UINT8			region;				/* region where the GFX data lives */
+	const char *	region;				/* region where the GFX data lives */
 	UINT16			spriteramentries;	/* number of entries in sprite RAM */
 	UINT16			leftclip;			/* left clip coordinate */
 	UINT16			rightclip;			/* right clip coordinate */

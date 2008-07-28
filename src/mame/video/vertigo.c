@@ -215,8 +215,8 @@ void vertigo_vproc_init(running_machine *machine)
 	int i;
 	UINT64 *mcode;
 
-	vertigo_vectorrom = (UINT16 *)memory_region(machine, REGION_USER1);
-	mcode = (UINT64 *)memory_region(machine, REGION_PROMS);
+	vertigo_vectorrom = (UINT16 *)memory_region(machine, RGNCLASS_USER, "user1");
+	mcode = (UINT64 *)memory_region(machine, RGNCLASS_PROMS, "proms");
 
 	/* Decode microcode */
 	for (i = 0; i < MC_LENGTH; i++)

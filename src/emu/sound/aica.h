@@ -10,7 +10,6 @@
 
 struct AICAinterface
 {
-	int region;				/* region of 2M/8M RAM */
 	int roffset;				/* offset in the region */
 	void (*irq_callback)(running_machine *machine, int state);	/* irq callback */
 };

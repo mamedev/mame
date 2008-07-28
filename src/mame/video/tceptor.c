@@ -244,7 +244,7 @@ WRITE8_HANDLER( tceptor_bg_scroll_w )
 
 /*******************************************************************/
 
-static void decode_bg(running_machine *machine, int region)
+static void decode_bg(running_machine *machine, const char * region)
 {
 	static const gfx_layout bg_layout =
 	{
@@ -258,7 +258,7 @@ static void decode_bg(running_machine *machine, int region)
 	};
 
 	int gfx_index = bg;
-	UINT8 *src = memory_region(machine, region) + 0x8000;
+	UINT8 *src = memory_region(machine, RGNCLASS_GFX, region) + 0x8000;
 	UINT8 *buffer;
 	int len = 0x8000;
 	int i;
@@ -277,7 +277,7 @@ static void decode_bg(running_machine *machine, int region)
 
 	/* decode the graphics */
 	machine->gfx[gfx_index] = allocgfx(&bg_layout);
-	decodegfx(machine->gfx[gfx_index], memory_region(machine, region), 0, machine->gfx[gfx_index]->total_elements);
+	decodegfx(machine->gfx[gfx_index], memory_region(machine, RGNCLASS_GFX, region), 0, machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */
 	machine->gfx[gfx_index]->color_base = 2048;
@@ -296,7 +296,7 @@ static void decode_sprite(running_machine *machine, int gfx_index, const gfx_lay
 }
 
 // fix sprite order
-static void decode_sprite16(running_machine *machine, int region)
+static void decode_sprite16(running_machine *machine, const char * region)
 {
 	static const gfx_layout spr16_layout =
 	{
@@ -315,8 +315,8 @@ static void decode_sprite16(running_machine *machine, int region)
 		2*16*16
 	};
 
-	UINT8 *src = memory_region(machine, region);
-	int len = memory_region_length(machine, region);
+	UINT8 *src = memory_region(machine, RGNCLASS_GFX, region);
+	int len = memory_region_length(machine, RGNCLASS_GFX, region);
 	UINT8 *dst;
 	int i, y;
 
@@ -345,7 +345,7 @@ static void decode_sprite16(running_machine *machine, int region)
 }
 
 // fix sprite order
-static void decode_sprite32(running_machine *machine, int region)
+static void decode_sprite32(running_machine *machine, const char * region)
 {
 	static const gfx_layout spr32_layout =
 	{
@@ -368,8 +368,8 @@ static void decode_sprite32(running_machine *machine, int region)
 		2*32*32
 	};
 
-	UINT8 *src = memory_region(machine, region);
-	int len = memory_region_length(machine, region);
+	UINT8 *src = memory_region(machine, RGNCLASS_GFX, region);
+	int len = memory_region_length(machine, RGNCLASS_GFX, region);
 	int total = spr32_layout.total;
 	int size = spr32_layout.charincrement / 8;
 	UINT8 *dst;
@@ -409,13 +409,13 @@ VIDEO_START( tceptor )
 	assert(gfx_index + 4 <= MAX_GFX_ELEMENTS);
 
 	bg = gfx_index++;
-	decode_bg(machine, REGION_GFX2);
+	decode_bg(machine, "gfx2");
 
 	sprite16 = gfx_index++;
-	decode_sprite16(machine, REGION_GFX3);
+	decode_sprite16(machine, "gfx3");
 
 	sprite32 = gfx_index++;
-	decode_sprite32(machine, REGION_GFX4);
+	decode_sprite32(machine, "gfx4");
 
 	/* allocate temp bitmaps */
 	temp_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);

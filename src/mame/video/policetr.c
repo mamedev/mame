@@ -42,10 +42,10 @@ static UINT32 srcbitmap_height_mask;
 VIDEO_START( policetr )
 {
 	/* the source bitmap is in ROM */
-	srcbitmap = memory_region(machine, REGION_GFX1);
+	srcbitmap = memory_region(machine, RGNCLASS_GFX, "gfx1");
 
 	/* compute the height */
-	srcbitmap_height_mask = (memory_region_length(machine, REGION_GFX1) / SRCBITMAP_WIDTH) - 1;
+	srcbitmap_height_mask = (memory_region_length(machine, RGNCLASS_GFX, "gfx1") / SRCBITMAP_WIDTH) - 1;
 
 	/* the destination bitmap is not directly accessible to the CPU */
 	dstbitmap = auto_malloc(DSTBITMAP_WIDTH * DSTBITMAP_HEIGHT);

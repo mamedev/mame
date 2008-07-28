@@ -24,7 +24,6 @@
 struct sp0256_interface {
 	void (*lrq_callback)(int state);
 	void (*sby_callback)(int state);
-	int	memory_region;
 };
 
 void sp0256_bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length);

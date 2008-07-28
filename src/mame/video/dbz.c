@@ -94,8 +94,8 @@ static void sortlayers(int *layer, int *pri)
 VIDEO_START( dbz )
 {
 	K053251_vh_start(machine);
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_4, 1, NULL, dbz_tile_callback, 1);
-	K053247_vh_start(machine, REGION_GFX2, -52, 16, NORMAL_PLANE_ORDER, dbz_sprite_callback);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_4, 1, NULL, dbz_tile_callback, 1);
+	K053247_vh_start(machine, "gfx2", -52, 16, NORMAL_PLANE_ORDER, dbz_sprite_callback);
 
 	dbz_bg1_tilemap = tilemap_create(get_dbz_bg1_tile_info,tilemap_scan_rows, 16, 16,64,32);
 	dbz_bg2_tilemap = tilemap_create(get_dbz_bg2_tile_info,tilemap_scan_rows, 16, 16,64,32);

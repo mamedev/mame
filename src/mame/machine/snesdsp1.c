@@ -156,7 +156,7 @@ void DSP1_setDr(UINT8 iDr)
 void DSP1_reset(running_machine *machine)
 {
 	UINT32 i;
-	UINT8 *dspin = memory_region(machine, REGION_USER6);
+	UINT8 *dspin = memory_region(machine, RGNCLASS_USER, "user6");
 
 	mSr = DRC|RQM;
 	mSrLowByteAccess = FALSE;

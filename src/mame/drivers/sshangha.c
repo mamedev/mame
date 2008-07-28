@@ -319,9 +319,9 @@ static const gfx_layout tilelayout =
 };
 
 static GFXDECODE_START( sshangha )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,  256, 64 ) /* Characters 8x8 */
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,  256, 64 ) /* Tiles 16x16 */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,    0, 32 ) /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  256, 64 ) /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  256, 64 ) /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 32 ) /* Sprites 16x16 */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -378,7 +378,7 @@ static MACHINE_DRIVER_START( sshangha )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.33)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.27)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.27)
 MACHINE_DRIVER_END
@@ -386,42 +386,42 @@ MACHINE_DRIVER_END
 /******************************************************************************/
 
 ROM_START( sshangha )
-	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "ss007-1.u28", 0x00000, 0x20000, CRC(bc466edf) SHA1(b96525b2c879d15b46a7753fa6ebf12a851cd019) )
 	ROM_LOAD16_BYTE( "ss006-1.u27", 0x00001, 0x20000, CRC(872a2a2d) SHA1(42d7a01465d5c403354aaf0f2dab8adb9afe61b0) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )	/* Sound CPU */
 	ROM_LOAD( "ss008.u82", 0x000000, 0x010000, CRC(04dc3647) SHA1(c06a7e8932c03de5759a9b69da0d761006b49517) )
 
-	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "ss001.u8",  0x000000, 0x100000, CRC(ebeca5b7) SHA1(1746e757ad9bbef2aa9028c54f25d4aa4dedf79e) )
 	ROM_LOAD( "ss002.u7",  0x100000, 0x100000, CRC(67659f29) SHA1(50944877665b7b848b3f7063892bd39a96a847cf) )
 
-	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "ss003.u39", 0x000000, 0x100000, CRC(fbecde72) SHA1(2fe32b28e77ec390c534d276261eefac3fbe21fd) ) /* Copy of rom at u47 */
 	ROM_LOAD( "ss004.u37", 0x100000, 0x100000, CRC(98b82c5e) SHA1(af1b52d4b36b1776c148478b5a5581e6a57256b8) ) /* Copy of rom at u46 */
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ss005.u86", 0x000000, 0x040000, CRC(c53a82ad) SHA1(756e453c8b5ce8e47f93fbda3a9e48bb73e93e2e) )
 ROM_END
 
 ROM_START( sshanghb )
-	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "sshanb_2.010", 0x00000, 0x20000, CRC(bc7ed254) SHA1(aeee4b8a8265902bb41575cc143738ecf3aff57d) )
 	ROM_LOAD16_BYTE( "sshanb_1.010", 0x00001, 0x20000, CRC(7b049f49) SHA1(2570077c67dbd35053d475a18c3f10813bf914f7) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )	/* Sound CPU */
 	ROM_LOAD( "ss008.u82", 0x000000, 0x010000, CRC(04dc3647) SHA1(c06a7e8932c03de5759a9b69da0d761006b49517) )
 
-	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "ss001.u8",  0x000000, 0x100000, CRC(ebeca5b7) SHA1(1746e757ad9bbef2aa9028c54f25d4aa4dedf79e) )
 	ROM_LOAD( "ss002.u7",  0x100000, 0x100000, CRC(67659f29) SHA1(50944877665b7b848b3f7063892bd39a96a847cf) )
 
-	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "ss003.u39", 0x000000, 0x100000, CRC(fbecde72) SHA1(2fe32b28e77ec390c534d276261eefac3fbe21fd) ) /* Copy of rom at u47 */
 	ROM_LOAD( "ss004.u37", 0x100000, 0x100000, CRC(98b82c5e) SHA1(af1b52d4b36b1776c148478b5a5581e6a57256b8) ) /* Copy of rom at u46 */
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* ADPCM samples */
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ss005.u86", 0x000000, 0x040000, CRC(c53a82ad) SHA1(756e453c8b5ce8e47f93fbda3a9e48bb73e93e2e) )
 ROM_END
 
@@ -431,7 +431,7 @@ static DRIVER_INIT( sshangha )
 #if SSHANGHA_HACK
 	/* This is a hack to allow you to use the extra features
          of the first "Unused" Dip Switch (see notes above). */
-	UINT16 *RAM = (UINT16 *)memory_region(machine, REGION_CPU1);
+	UINT16 *RAM = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
 	RAM[0x000384/2] = 0x4e71;
 	RAM[0x000386/2] = 0x4e71;
 	RAM[0x000388/2] = 0x4e71;

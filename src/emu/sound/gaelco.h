@@ -3,7 +3,7 @@
 
 struct gaelcosnd_interface
 {
-	int region;				/* memory region */
+	const char *gfxregion;	/* shared gfx region name */
 	int banks[4];			/* start of each ROM bank */
 };
 

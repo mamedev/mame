@@ -224,7 +224,7 @@ static void es5503_pcm_update(void *param, stream_sample_t **inputs, stream_samp
 }
 
 
-static void *es5503_start(int sndindex, int clock, const void *config)
+static void *es5503_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	const struct ES5503interface *intf;
 	int osc;

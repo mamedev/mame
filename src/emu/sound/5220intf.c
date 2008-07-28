@@ -41,7 +41,7 @@ static void tms5220_update(void *param, stream_sample_t **inputs, stream_sample_
 
 ***********************************************************************************************/
 
-static void *tms5220_start(int sndindex, int clock, const void *config)
+static void *tms5220_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	static const struct TMS5220interface dummy = { 0 };
 	struct tms5220_info *info;
@@ -74,9 +74,9 @@ static void *tms5220_start(int sndindex, int clock, const void *config)
 
 
 #if (HAS_TMC0285 || HAS_TMS5200)
-static void *tms5200_start(int sndindex, int clock, const void *config)
+static void *tms5200_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	struct tms5220_info *info = tms5220_start(sndindex, clock, config);
+	struct tms5220_info *info = tms5220_start(tag, sndindex, clock, config);
 	tms5220_set_variant(info->chip, variant_tmc0285);
 	return info;
 }

@@ -118,7 +118,7 @@ static STATE_POSTLOAD( ym2608_postload )
 }
 
 
-static void *ym2608_start(int sndindex, int clock, const void *config)
+static void *ym2608_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	static const struct YM2608interface generic_2608 =
 	{
@@ -127,8 +127,7 @@ static void *ym2608_start(int sndindex, int clock, const void *config)
 			AY8910_DEFAULT_LOADS,
 			NULL, NULL, NULL, NULL
 		},
-		NULL,
-		0,
+		NULL
 	};
 	const struct YM2608interface *intf = config ? config : &generic_2608;
 	int rate = clock/72;
@@ -152,8 +151,8 @@ static void *ym2608_start(int sndindex, int clock, const void *config)
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2608_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = (void *)(memory_region(Machine, info->intf->pcmrom));
-	pcmsizea = memory_region_length(Machine, info->intf->pcmrom);
+	pcmbufa  = (void *)(memory_region(Machine, RGNCLASS_SOUND, tag));
+	pcmsizea = memory_region_length(Machine, RGNCLASS_SOUND, tag);
 
 	/* initialize YM2608 */
 	info->chip = YM2608Init(info,sndindex,clock,rate,

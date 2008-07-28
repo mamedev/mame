@@ -50,7 +50,7 @@ static WRITE8_HANDLER( k007121_registers_w )
 static WRITE8_HANDLER( fastlane_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	/* bits 0 & 1 coin counters */
 	coin_counter_w(0,data & 0x01);
@@ -241,7 +241,7 @@ static const gfx_layout gfxlayout =
 };
 
 static GFXDECODE_START( fastlane )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout, 0, 64*16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0, 64*16 )
 GFXDECODE_END
 
 /***************************************************************************
@@ -264,13 +264,11 @@ static void volume_callback1(int v)
 
 static const struct K007232_interface k007232_interface_1 =
 {
-	REGION_SOUND1,
 	volume_callback0
 };
 
 static const struct K007232_interface k007232_interface_2 =
 {
-	REGION_SOUND2,
 	volume_callback1
 };
 
@@ -318,20 +316,20 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( fastlane )
-	ROM_REGION( 0x21000, REGION_CPU1, 0 ) /* code + banked roms */
+	ROM_REGION( 0x21000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms */
 	ROM_LOAD( "752_m02.9h",  0x08000, 0x08000, CRC(e1004489) SHA1(615b608d22abc3611f1620503cd6a8c9a6218db8) )  /* fixed ROM */
 	ROM_LOAD( "752_e01.10h", 0x10000, 0x10000, CRC(ff4d6029) SHA1(b5c5d8654ce728300d268628bd3dd878570ba7b8) )  /* banked ROM */
 
-	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "752e04.2i",   0x00000, 0x80000, CRC(a126e82d) SHA1(6663230c2c36dec563969bccad8c62e3d454d240) )  /* tiles + sprites */
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "752e03.6h",   0x0000, 0x0100, CRC(44300aeb) SHA1(580c6e88cbb3b6d8156ea0b9103834f199ec2747) )
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 )	/* 007232 data */
+	ROM_REGION( 0x20000, RGNCLASS_SOUND, "konami1", 0 )	/* 007232 data */
 	ROM_LOAD( "752e06.4c",   0x00000, 0x20000, CRC(85d691ed) SHA1(7f8d05562a68c75672141fc80ce7e7acb80588b9) ) /* chip 1 */
 
-	ROM_REGION( 0x80000, REGION_SOUND2, 0 )	/* 007232 data */
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "konami2", 0 )	/* 007232 data */
 	ROM_LOAD( "752e05.12b",  0x00000, 0x80000, CRC(119e9cbf) SHA1(21e3def9ab10b210632df11b6df4699140c473db) ) /* chip 2 */
 ROM_END
 

@@ -193,7 +193,7 @@ static void bbusters_draw_block(running_machine *machine, bitmap_t *dest,int x,i
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const UINT16 *source, int bank, int colval, int colmask)
 {
-	const UINT8 *scale_table=memory_region(machine, REGION_USER1);
+	const UINT8 *scale_table=memory_region(machine, RGNCLASS_USER, "user1");
 	int offs;
 
 	for (offs = 0;offs <0x800 ;offs += 4) {

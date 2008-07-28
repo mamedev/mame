@@ -415,7 +415,7 @@ VIDEO_UPDATE( suna8 )
 #if TILEMAPS
 	if (input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X))
 	{
-		int max_tiles = memory_region_length(machine, REGION_GFX1) / (0x400 * 0x20);
+		int max_tiles = memory_region_length(machine, RGNCLASS_GFX, "gfx1") / (0x400 * 0x20);
 
 		if (input_code_pressed_once(KEYCODE_Q))	{ page--;	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);	}
 		if (input_code_pressed_once(KEYCODE_W))	{ page++;	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);	}

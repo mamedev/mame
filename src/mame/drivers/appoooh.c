@@ -78,7 +78,7 @@ static void appoooh_adpcm_int(running_machine *machine, int num)
 /* adpcm address write */
 static WRITE8_HANDLER( appoooh_adpcm_w )
 {
-	UINT8 *RAM = memory_region(machine, REGION_SOUND1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_SOUND, "adpcm");
 	adpcmptr  = &RAM[data*256];
 	MSM5205_reset_w(0,0);
 	appoooh_adpcm_data=-1;
@@ -194,10 +194,10 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( appoooh )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,        0, 32 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout,     32*8, 32 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,      0, 32 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,   32*8, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     32*8, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,      0, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   32*8, 32 )
 GFXDECODE_END
 
 
@@ -406,10 +406,10 @@ static const gfx_layout robowres_spritelayout =
 
 
 static GFXDECODE_START( robowres )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, robowres_charlayout,        0, 32 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, robowres_charlayout,     	 0, 32 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, robowres_spritelayout,      0, 32 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, robowres_spritelayout,   	 0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, robowres_charlayout,        0, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, robowres_charlayout,     	 0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, robowres_spritelayout,      0, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, robowres_spritelayout,   	 0, 32 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( robowres )
@@ -458,7 +458,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( appoooh )
-	ROM_REGION( 0x14000, REGION_CPU1, 0 )	/* 64k for code + 16k bank */
+	ROM_REGION( 0x14000, RGNCLASS_CPU, "main", 0 )	/* 64k for code + 16k bank */
 	ROM_LOAD( "epr-5906.bin", 0x00000, 0x2000, CRC(fffae7fe) SHA1(b4bb60eb6331e503759bd963eafefa69331d6b86) )
 	ROM_LOAD( "epr-5907.bin", 0x02000, 0x2000, CRC(57696cd6) SHA1(74a005d18d55fed9ece9b579d2e7e6619a47538b) )
 	ROM_LOAD( "epr-5908.bin", 0x04000, 0x2000, CRC(4537cddc) SHA1(ecb71cab7b9269d713399987cbc45ff54735019f) )
@@ -469,22 +469,22 @@ ROM_START( appoooh )
 	ROM_LOAD( "epr-5912.bin", 0x10000, 0x2000, CRC(3c3915ab) SHA1(28b501bda992ac06b10dbb5f1f7d6009f2f5f48c) ) /* bank1     */
 	ROM_LOAD( "epr-5914.bin", 0x12000, 0x2000, CRC(58792d4a) SHA1(8acdb0ebee5faadadd64bd64db1fdf881ee70333) ) /* a000-dfff */
 
-	ROM_REGION( 0x0c000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "epr-5895.bin", 0x00000, 0x4000, CRC(4b0d4294) SHA1(f9f4d928c76b32cbcbaf7bfd0ebec2d4dfc37566) )	/* playfield #1 chars */
 	ROM_LOAD( "epr-5896.bin", 0x04000, 0x4000, CRC(7bc84d75) SHA1(36e98eaac1ba23ab842080205bdb5b76b888ddc2) )
 	ROM_LOAD( "epr-5897.bin", 0x08000, 0x4000, CRC(745f3ffa) SHA1(03f5d1d567e786e7835defc6995d1b39aee2c28d) )
 
-	ROM_REGION( 0x0c000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "epr-5898.bin", 0x00000, 0x4000, CRC(cf01644d) SHA1(0cc1b7f7a3b33b0edf4e277e320467b19dfc5bc8) )	/* playfield #2 chars */
 	ROM_LOAD( "epr-5899.bin", 0x04000, 0x4000, CRC(885ad636) SHA1(d040948f7cf030e4ab0f0509df23cb855e9c920c) )
 	ROM_LOAD( "epr-5900.bin", 0x08000, 0x4000, CRC(a8ed13f3) SHA1(31c4a52fea8f26b4a79564c7e8443a88d43aee12) )
 
-	ROM_REGION( 0x0220, REGION_PROMS, 0 )
+	ROM_REGION( 0x0220, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "pr5921.prm",   0x0000, 0x020, CRC(f2437229) SHA1(8fb4240142f4c77f820d7c153c22ff82f66aa7b1) ) 	/* palette */
 	ROM_LOAD( "pr5922.prm",   0x0020, 0x100, CRC(85c542bf) SHA1(371d92fca2ae609a47d3a2ea349f14f30b846da8) ) 	/* charset #1 lookup table */
 	ROM_LOAD( "pr5923.prm",   0x0120, 0x100, CRC(16acbd53) SHA1(e5791646730c6232efa2c0327b484472c47baf21) ) 	/* charset #2 lookup table */
 
-	ROM_REGION( 0xa000, REGION_SOUND1, 0 )	/* adpcm voice data */
+	ROM_REGION( 0xa000, RGNCLASS_SOUND, "adpcm", 0 )	/* adpcm voice data */
 	ROM_LOAD( "epr-5901.bin", 0x0000, 0x2000, CRC(170a10a4) SHA1(7b0c8427c69525cbcbe9f88b22b12aafb6949bfd) )
 	ROM_LOAD( "epr-5902.bin", 0x2000, 0x2000, CRC(f6981640) SHA1(1a93913ecb64d1c459e5bbcc28c4ca3ea90f21e1) )
 	ROM_LOAD( "epr-5903.bin", 0x4000, 0x2000, CRC(0439df50) SHA1(1f981c1867366fa57de25ff8f421c121d82d7321) )
@@ -493,57 +493,57 @@ ROM_START( appoooh )
 ROM_END
 
 ROM_START( robowres )
-	ROM_REGION( 0x1c000, REGION_CPU1, 0 )	/* 64k for code + 16k bank */
+	ROM_REGION( 0x1c000, RGNCLASS_CPU, "main", 0 )	/* 64k for code + 16k bank */
 	ROM_LOAD( "epr-7540.13d", 0x00000, 0x8000, CRC(a2a54237) SHA1(06c80fe6725582d19aa957728977e871e79e79e1) )
 	ROM_LOAD( "epr-7541.14d", 0x08000, 0x6000, CRC(cbf7d1a8) SHA1(5eb6d2130d4e5401a332df6db5cad07f3131e8e4) )
 	ROM_CONTINUE(             0x10000, 0x2000 )
 	ROM_LOAD( "epr-7542.15d", 0x14000, 0x8000, CRC(3475fbd4) SHA1(96b28d6492d2e6e8ca9c57abdc5ad4df3777894b) )
-	ROM_COPY( REGION_CPU1, 0x16000, 0x10000, 0x4000 )
+	ROM_COPY( RGNCLASS_CPU, "main", 0x16000, 0x10000, 0x4000 )
 
-	ROM_REGION( 0x18000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "epr-7544.7h", 0x000000, 0x8000, CRC(07b846ce) SHA1(6d214fbb43003d2ab35340d5b9fece5f637cadc6) )
 	ROM_LOAD( "epr-7545.6h", 0x008000, 0x8000, CRC(e99897be) SHA1(663f32b5290db7ab273e32510583f1aa8d8d4f46) )
 	ROM_LOAD( "epr-7546.5h", 0x010000, 0x8000, CRC(1559235a) SHA1(eb0384248f900dcde2d2ca29c58344781dd20500) )
 
-	ROM_REGION( 0x18000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "epr-7547.7d", 0x00000, 0x8000, CRC(b87ad4a4) SHA1(6e886a4939de19e0dc3ce702cc70701efd28ddf2) )
 	ROM_LOAD( "epr-7548.6d", 0x08000, 0x8000, CRC(8b9c75b3) SHA1(ebc026374aac83b24bf5f6a241d8f15c1e682513) )
 	ROM_LOAD( "epr-7549.5d", 0x10000, 0x8000, CRC(f640afbb) SHA1(3aa563866f7160038ce6b1aa3204bd9d286e0a46) )
 
-	ROM_REGION( 0x0220, REGION_PROMS, 0 )
+	ROM_REGION( 0x0220, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "pr7571.10a",   0x00000, 0x0020, CRC(e82c6d5c) SHA1(de3090bf922171abd1c30f20ca163f387adc60e1) )
 	ROM_LOAD( "pr7572.7f",   0x00020, 0x0100, CRC(2b083d0c) SHA1(5b39bd4297bec788caac9e9de5128d43932a24e2) )
 	ROM_LOAD( "pr7573.7g",   0x00120, 0x0100, CRC(2b083d0c) SHA1(5b39bd4297bec788caac9e9de5128d43932a24e2) )
 
-	ROM_REGION( 0x8000, REGION_SOUND1, 0 )	/* adpcm voice data */
+	ROM_REGION( 0x8000, RGNCLASS_SOUND, "adpcm", 0 )	/* adpcm voice data */
 	ROM_LOAD( "epr-7543.12b", 0x00000, 0x8000, CRC(4d108c49) SHA1(a7c3c5a5ad36917ea7f6d917377c2392fa9beea3) )
 ROM_END
 
 ROM_START( robowrb )
-	ROM_REGION( 0x1c000+0x8000, REGION_CPU1, 0 )	/* 64k for code + 16k bank */
+	ROM_REGION( 0x1c000+0x8000, RGNCLASS_CPU, "main", 0 )	/* 64k for code + 16k bank */
 	ROM_LOAD( "dg4.e13",      0x00000, 0x8000, CRC(f7585d4f) SHA1(718879f8262681b6b66968eb49a0fb04fda5160b) )
 	ROM_LOAD( "epr-7541.14d", 0x08000, 0x6000, CRC(cbf7d1a8) SHA1(5eb6d2130d4e5401a332df6db5cad07f3131e8e4) )
 	ROM_CONTINUE(             0x10000, 0x2000 )
 	ROM_LOAD( "epr-7542.15d", 0x14000, 0x8000, CRC(3475fbd4) SHA1(96b28d6492d2e6e8ca9c57abdc5ad4df3777894b) )
-	ROM_COPY( REGION_CPU1, 0x16000, 0x10000, 0x4000 )
+	ROM_COPY( RGNCLASS_CPU, "main", 0x16000, 0x10000, 0x4000 )
 	ROM_LOAD( "dg1.f13",      0x1c000, 0x8000, CRC(b724968d) SHA1(36618fb81da919d578c2aa1c62d964871903c49f) )
 
-	ROM_REGION( 0x18000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "epr-7544.7h", 0x000000, 0x8000, CRC(07b846ce) SHA1(6d214fbb43003d2ab35340d5b9fece5f637cadc6) )
 	ROM_LOAD( "epr-7545.6h", 0x008000, 0x8000, CRC(e99897be) SHA1(663f32b5290db7ab273e32510583f1aa8d8d4f46) )
 	ROM_LOAD( "epr-7546.5h", 0x010000, 0x8000, CRC(1559235a) SHA1(eb0384248f900dcde2d2ca29c58344781dd20500) )
 
-	ROM_REGION( 0x18000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "epr-7547.7d", 0x00000, 0x8000, CRC(b87ad4a4) SHA1(6e886a4939de19e0dc3ce702cc70701efd28ddf2) )
 	ROM_LOAD( "epr-7548.6d", 0x08000, 0x8000, CRC(8b9c75b3) SHA1(ebc026374aac83b24bf5f6a241d8f15c1e682513) )
 	ROM_LOAD( "epr-7549.5d", 0x10000, 0x8000, CRC(f640afbb) SHA1(3aa563866f7160038ce6b1aa3204bd9d286e0a46) )
 
-	ROM_REGION( 0x0220, REGION_PROMS, 0 )
+	ROM_REGION( 0x0220, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "pr7571.10a",   0x00000, 0x0020, CRC(e82c6d5c) SHA1(de3090bf922171abd1c30f20ca163f387adc60e1) )
 	ROM_LOAD( "pr7572.7f",   0x00020, 0x0100, CRC(2b083d0c) SHA1(5b39bd4297bec788caac9e9de5128d43932a24e2) )
 	ROM_LOAD( "pr7573.7g",   0x00120, 0x0100, CRC(2b083d0c) SHA1(5b39bd4297bec788caac9e9de5128d43932a24e2) )
 
-	ROM_REGION( 0x8000, REGION_SOUND1, 0 )	/* adpcm voice data */
+	ROM_REGION( 0x8000, RGNCLASS_SOUND, "adpcm", 0 )	/* adpcm voice data */
 	ROM_LOAD( "epr-7543.12b", 0x00000, 0x8000, CRC(4d108c49) SHA1(a7c3c5a5ad36917ea7f6d917377c2392fa9beea3) )
 ROM_END
 
@@ -554,7 +554,7 @@ static DRIVER_INIT(robowres){
 }
 
 static DRIVER_INIT(robowrb){
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, REGION_CPU1) + 0x1c000);
+	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, RGNCLASS_CPU, "main") + 0x1c000);
 }
 
 

@@ -25,7 +25,7 @@ static const ppu2c0x_interface ppu_interface =
 {
 	PPU_2C04,				/* type */
 	1,						/* num */
-	{ REGION_GFX1 },		/* vrom gfx region */
+	{ "gfx1" },				/* vrom gfx region */
 	{ 0 },					/* gfxlayout num */
 	{ 0 },					/* color base */
 	{ PPU_MIRROR_NONE },	/* mirroring */
@@ -37,7 +37,7 @@ static const ppu2c0x_interface ppu_dual_interface =
 {
 	PPU_2C04,								/* type */
 	2,										/* num */
-	{ REGION_GFX1, REGION_GFX2 },			/* vrom gfx region */
+	{ "gfx1", "gfx2" },						/* vrom gfx region */
 	{ 0, 1 },								/* gfxlayout num */
 	{ 0, 64 },								/* color base */
 	{ PPU_MIRROR_NONE, PPU_MIRROR_NONE },	/* mirroring */

@@ -20,8 +20,8 @@ static TILE_GET_INFO( get_bgtile_info )
 {
 	int code,attr,pal;
 
-	code=memory_region(machine, REGION_USER1)[tile_index]; /* TTTTTTTT */
-	attr=memory_region(machine, REGION_USER2)[tile_index]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
+	code=memory_region(machine, RGNCLASS_USER, "user1")[tile_index]; /* TTTTTTTT */
+	attr=memory_region(machine, RGNCLASS_USER, "user2")[tile_index]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
 	code+=(attr&3)<<8;
 	pal=(attr>>4);
 
@@ -36,8 +36,8 @@ static TILE_GET_INFO( get_fgtile_info )
 {
 	int code,attr,pal;
 
-	code=memory_region(machine, REGION_USER3)[tile_index]; /* TTTTTTTT */
-	attr=memory_region(machine, REGION_USER4)[tile_index]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
+	code=memory_region(machine, RGNCLASS_USER, "user3")[tile_index]; /* TTTTTTTT */
+	attr=memory_region(machine, RGNCLASS_USER, "user4")[tile_index]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
 	pal=attr>>4;
 
 	code+=(attr&3)<<8;

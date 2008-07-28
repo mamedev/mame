@@ -70,8 +70,8 @@ ADDRESS_MAP_END
 /* Wrong ! */
 static WRITE8_HANDLER(pzlestar_bank_w)
 {
-	memory_set_bankptr(2,&memory_region(machine, REGION_USER1)[0x20000+ ( ((0x8000*data)^0x10000))  ]);
-	memory_set_bankptr(3,&memory_region(machine, REGION_USER1)[  0x18000  ]);
+	memory_set_bankptr(2,&memory_region(machine, RGNCLASS_USER, "user1")[0x20000+ ( ((0x8000*data)^0x10000))  ]);
+	memory_set_bankptr(3,&memory_region(machine, RGNCLASS_USER, "user1")[  0x18000  ]);
 }
 
 /* Puzzle Star Ports */
@@ -192,7 +192,7 @@ static void sangho_common_machine_reset(void)
 static MACHINE_RESET(pzlestar)
 {
 	/* give it some code to run, note this isn't at 0 in the rom! */
-	memcpy(sangho_ram,&memory_region(machine, REGION_USER1)[0x10000],0x8000);
+	memcpy(sangho_ram,&memory_region(machine, RGNCLASS_USER, "user1")[0x10000],0x8000);
 
 	/* patch out rom check (it fails, due to bad banking) */
 	sangho_ram[0x25c1]=0xaf;
@@ -204,7 +204,7 @@ static MACHINE_RESET(pzlestar)
 static MACHINE_RESET(sexyboom)
 {
 	/* give it some code to run */
-	memcpy(sangho_ram,memory_region(machine, REGION_USER1),0x8000);
+	memcpy(sangho_ram,memory_region(machine, RGNCLASS_USER, "user1"),0x8000);
 	/* patch out rom check */
 	sangho_ram[0x022e]=0xc9;
 	sangho_ram[0x4604]=0xc9;
@@ -296,7 +296,7 @@ static MACHINE_DRIVER_START(sexyboom )
 MACHINE_DRIVER_END
 
 ROM_START( pzlestar )
-	ROM_REGION( 0x20000*16, REGION_USER1, 0 ) // 15 sockets, 13 used
+	ROM_REGION( 0x20000*16, RGNCLASS_USER, "user1", 0 ) // 15 sockets, 13 used
 	ROM_LOAD( "rom01.bin", 0x000000, 0x20000, CRC(0b327a3b) SHA1(450fd27f9844b9f0b710c1886985bd67cac2716f) ) // seems to be some code at 0x10000
 	ROM_LOAD( "rom02.bin", 0x020000, 0x20000, CRC(dc859437) SHA1(e9fe5aab48d80e8857fc679ff7e35298ce4d47c8) )
 	ROM_LOAD( "rom03.bin", 0x040000, 0x20000, CRC(f92b5624) SHA1(80be9000fc4326d790801d02959550aada111548) )
@@ -315,7 +315,7 @@ ROM_START( pzlestar )
 ROM_END
 
 ROM_START( sexyboom )
-	ROM_REGION( 0x20000*16, REGION_USER1, 0 ) // 15 sockets, 12 used
+	ROM_REGION( 0x20000*16, RGNCLASS_USER, "user1", 0 ) // 15 sockets, 12 used
 	ROM_LOAD( "rom1.bin",  0x000000, 0x20000, CRC(7827a079) SHA1(a48e7c7d16e50de24c8bf77883230075c1fad858) )
 	ROM_LOAD( "rom2.bin",  0x020000, 0x20000, CRC(7028aa61) SHA1(77d5e5945b90d3e15ba2c1364b76f6643247592d) )
 	ROM_LOAD( "rom3.bin",  0x040000, 0x20000, CRC(340edac9) SHA1(47ffc4553cb34ff932d3d54d5cefe82571c6ddbf) )

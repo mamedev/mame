@@ -242,10 +242,10 @@ static UINT16 *hyprduel_rombank;
 
 static READ16_HANDLER( hyprduel_bankedrom_r )
 {
-	const int region = REGION_GFX1;
+	const char *region = "gfx1";
 
-	UINT8 *ROM = memory_region( machine, region );
-	size_t  len  = memory_region_length( machine, region );
+	UINT8 *ROM = memory_region( machine, RGNCLASS_GFX, region );
+	size_t  len  = memory_region_length( machine, RGNCLASS_GFX, region );
 
 	offset = offset * 2 + 0x10000 * (*hyprduel_rombank);
 
@@ -328,10 +328,10 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 
 	if (offset == 0xC/2)
 	{
-		const int region = REGION_GFX1;
+		const char *region = "gfx1";
 
-		UINT8 *src	=	memory_region(machine, region);
-		size_t  src_len	=	memory_region_length(machine, region);
+		UINT8 *src	=	memory_region(machine, RGNCLASS_GFX, region);
+		size_t  src_len	=	memory_region_length(machine, RGNCLASS_GFX, region);
 
 		UINT32 tmap		=	(hyprduel_blitter_regs[ 0x00 / 2 ] << 16 ) +
 							 hyprduel_blitter_regs[ 0x02 / 2 ];
@@ -694,8 +694,8 @@ static GFXLAYOUT_RAW( layout_8x8x4, 4, 8, 8, 4*8, 32*8 )
 static GFXLAYOUT_RAW( layout_8x8x8h, 8, 8, 8, 8*8, 32*8 )
 
 static GFXDECODE_START( 14220 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_8x8x4,    0x0, 0x200 ) // [0] 4 Bit Tiles
-	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_8x8x8h,   0x0,  0x20 ) // [1] 8 Bit Tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x200 ) // [0] 4 Bit Tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8h,   0x0,  0x20 ) // [1] 8 Bit Tiles
 GFXDECODE_END
 
 /***************************************************************************
@@ -751,7 +751,7 @@ static MACHINE_DRIVER_START( hyprduel )
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 4000000/16/16*132)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.57)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.57)
 MACHINE_DRIVER_END
@@ -791,7 +791,7 @@ static MACHINE_DRIVER_START( magerror )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.57)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 4000000/16/16*132)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.57)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.57)
 MACHINE_DRIVER_END
@@ -802,8 +802,8 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( hyprduel )
 {
-	int i, len = memory_region_length(machine, REGION_GFX1);
-	UINT8 *ROM = memory_region(machine, REGION_GFX1);
+	int i, len = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
+	UINT8 *ROM = memory_region(machine, RGNCLASS_GFX, "gfx1");
 
 	/*
       Tiles can be either 4-bit or 8-bit, and both depths can be used at the same
@@ -833,47 +833,47 @@ static DRIVER_INIT( hyprduel )
 
 
 ROM_START( hyprduel )
-	ROM_REGION( 0x80000, REGION_CPU1, 0 )
+	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD16_BYTE( "24.u24", 0x000000, 0x40000, CRC(c7402722) SHA1(e385676cdcee65a3ddf07791d82a1fe83ba1b3e2) ) /* Also silk screened as position 10 */
 	ROM_LOAD16_BYTE( "23.u23", 0x000001, 0x40000, CRC(d8297c2b) SHA1(2e23c5b1784d0a465c0c0dc3ca28505689a8b16c) ) /* Also silk screened as position  9 */
 
-	ROM_REGION( 0x400000, REGION_GFX1, 0 )	/* Gfx + Prg + Data (Addressable by CPU & Blitter) */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx1", 0 )	/* Gfx + Prg + Data (Addressable by CPU & Blitter) */
 	ROMX_LOAD( "ts_hyper-1.u74", 0x000000, 0x100000, CRC(4b3b2d3c) SHA1(5e9e8ec853f71aeff3910b93dadbaeae2b61717b) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "ts_hyper-2.u75", 0x000002, 0x100000, CRC(dc230116) SHA1(a3c447657d8499764f52c81382961f425c56037b) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "ts_hyper-3.u76", 0x000004, 0x100000, CRC(2d770dd0) SHA1(27f9e7f67e96210d3710ab4f940c5d7ae13f8bbf) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "ts_hyper-4.u77", 0x000006, 0x100000, CRC(f88c6d33) SHA1(277b56df40a17d7dd9f1071b0d498635a5b783cd) , ROM_GROUPWORD | ROM_SKIP(6) )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )	/* Samples */
 	ROM_LOAD( "97.u97", 0x00000, 0x40000, CRC(bf3f8574) SHA1(9e743f05e53256c886d43e1f0c43d7417134b9b3) ) /* Also silk screened as position 11 */
 ROM_END
 
 ROM_START( hyprdelj )
-	ROM_REGION( 0x80000, REGION_CPU1, 0 )
+	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD16_BYTE( "24a.u24", 0x000000, 0x40000, CRC(2458f91d) SHA1(c75c7bccc84738e29b35667793491a1213aea1da) ) /* Also silk screened as position 10 */
 	ROM_LOAD16_BYTE( "23a.u23", 0x000001, 0x40000, CRC(98aedfca) SHA1(42028e57ac79473cde683be2100b953ff3b2b345) ) /* Also silk screened as position  9 */
 
-	ROM_REGION( 0x400000, REGION_GFX1, 0 )	/* Gfx + Prg + Data (Addressable by CPU & Blitter) */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx1", 0 )	/* Gfx + Prg + Data (Addressable by CPU & Blitter) */
 	ROMX_LOAD( "ts_hyper-1.u74", 0x000000, 0x100000, CRC(4b3b2d3c) SHA1(5e9e8ec853f71aeff3910b93dadbaeae2b61717b) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "ts_hyper-2.u75", 0x000002, 0x100000, CRC(dc230116) SHA1(a3c447657d8499764f52c81382961f425c56037b) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "ts_hyper-3.u76", 0x000004, 0x100000, CRC(2d770dd0) SHA1(27f9e7f67e96210d3710ab4f940c5d7ae13f8bbf) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "ts_hyper-4.u77", 0x000006, 0x100000, CRC(f88c6d33) SHA1(277b56df40a17d7dd9f1071b0d498635a5b783cd) , ROM_GROUPWORD | ROM_SKIP(6) )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )	/* Samples */
 	ROM_LOAD( "97.u97", 0x00000, 0x40000, CRC(bf3f8574) SHA1(9e743f05e53256c886d43e1f0c43d7417134b9b3) ) /* Also silk screened as position 11 */
 ROM_END
 
 ROM_START( magerror )
-	ROM_REGION( 0x80000, REGION_CPU1, 0 )
+	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD16_BYTE( "24.u24", 0x000000, 0x40000, CRC(5e78027f) SHA1(053374942bc545a92cc6f6ab6784c4626e4ec9e1) ) /* Also silk screened as position 10 */
 	ROM_LOAD16_BYTE( "23.u23", 0x000001, 0x40000, CRC(7271ec70) SHA1(bd7666390b70821f90ba976a3afe3194fb119478) ) /* Also silk screened as position  9 */
 
-	ROM_REGION( 0x400000, REGION_GFX1, 0 )	/* Gfx + Prg + Data (Addressable by CPU & Blitter) */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx1", 0 )	/* Gfx + Prg + Data (Addressable by CPU & Blitter) */
 	ROMX_LOAD( "mr93046-02.u74", 0x000000, 0x100000, CRC(f7ba06fb) SHA1(e1407b0d03863f434b68183c01e8547612e5c5fd) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "mr93046-04.u75", 0x000002, 0x100000, CRC(8c114d15) SHA1(4eb1f82e7992deb126633287cb4fd2a6d215346c) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "mr93046-01.u76", 0x000004, 0x100000, CRC(6cc3b928) SHA1(f19d0add314867bfb7dcefe8e7a2d50a84530df7) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "mr93046-03.u77", 0x000006, 0x100000, CRC(6b1eb0ea) SHA1(6167a61562ef28147a7917c692f181f3fc2d5be6) , ROM_GROUPWORD | ROM_SKIP(6) )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )	/* Samples */
 	ROM_LOAD( "97.u97", 0x00000, 0x40000, CRC(2e62bca8) SHA1(191fff11186dbbc1d9d9f3ba1b6e17c38a7d2d1d) ) /* Also silk screened as position 11 */
 ROM_END
 

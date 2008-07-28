@@ -501,10 +501,10 @@ static const gfx_layout tile_layout =
 };
 
 static GFXDECODE_START( msisaac )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, char_layout, 0, 64 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, char_layout, 0, 64 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout, 0, 64 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_layout, 0, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0, char_layout, 0, 64 )
+	GFXDECODE_ENTRY( "gfx2", 0, char_layout, 0, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0, 64 )
+	GFXDECODE_ENTRY( "gfx2", 0, tile_layout, 0, 64 )
 GFXDECODE_END
 
 static const struct MSM5232interface msm5232_interface =
@@ -575,16 +575,16 @@ MACHINE_DRIVER_END
 /*******************************************************************************/
 
 ROM_START( msisaac )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 ) /* Z80 main CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* Z80 main CPU */
 	ROM_LOAD( "a34_11.bin", 0x0000, 0x4000, CRC(40819334) SHA1(65352607165043909a09e96c07f7060f6ce087e6) )
 	ROM_LOAD( "a34_12.bin", 0x4000, 0x4000, CRC(4c50b298) SHA1(5962882ad37ba6990ba2a6312b570f214cd4c103) )
 	ROM_LOAD( "a34_13.bin", 0x8000, 0x4000, CRC(2e2b09b3) SHA1(daa715282ed9ef2e519e252a684ef28085becabd) )
 	ROM_LOAD( "a34_10.bin", 0xc000, 0x2000, CRC(a2c53dc1) SHA1(14f23511f92bcfc94447dabe2826555d68bc1caa) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 sound CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* Z80 sound CPU */
 	ROM_LOAD( "a34_01.bin", 0x0000, 0x4000, CRC(545e45e7) SHA1(18ddb1ec8809bb62ae1c1068cd16cd3c933bf6ba) )
 
-	ROM_REGION( 0x0800,  REGION_CPU3, 0 )	/* 2k for the microcontroller */
+	ROM_REGION( 0x0800,  RGNCLASS_CPU, "cpu2", 0 )	/* 2k for the microcontroller */
 	ROM_LOAD( "a34.mcu"       , 0x0000, 0x0800, NO_DUMP )
 
 // I tried following MCUs; none of them work with this game:
@@ -593,13 +593,13 @@ ROM_START( msisaac )
 //  ROM_LOAD( "a45-19",     0x0000, 0x0800, CRC(5378253c) )     //flstory
 //  ROM_LOAD( "a54-19",     0x0000, 0x0800, CRC(e08b8846) )     //lkage
 
-	ROM_REGION( 0x8000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x8000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "a34_02.bin", 0x0000, 0x2000, CRC(50da1a81) SHA1(8aa5a896f3e1173155d4574f5e1c2703e334cf44) )
 	ROM_LOAD( "a34_03.bin", 0x2000, 0x2000, CRC(728a549e) SHA1(8969569d4b7a3ba7b740dbd236c047a46b723617) )
 	ROM_LOAD( "a34_04.bin", 0x4000, 0x2000, CRC(e7d19f1c) SHA1(d55ee8085256c1f6a254d3249997326eebba7d88) )
 	ROM_LOAD( "a34_05.bin", 0x6000, 0x2000, CRC(bed2107d) SHA1(83b16ca8a1b131aa6a2976cdbe907109750eaf71) )
 
-	ROM_REGION( 0x8000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x8000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "a34_06.bin", 0x0000, 0x2000, CRC(4ec71687) SHA1(e88f0c61a172fbca1784c95246776bf64c071bf7) )
 	ROM_LOAD( "a34_07.bin", 0x2000, 0x2000, CRC(24922abf) SHA1(e42b4947b8c84bdf62990205308b8c187352d001) )
 	ROM_LOAD( "a34_08.bin", 0x4000, 0x2000, CRC(3ddbf4c0) SHA1(7dd82aba661addd0a905bc185c1a6d7f2e21e0c6) )

@@ -130,14 +130,14 @@ MACHINE_DRIVER_END
 
 
 ROM_START(pangofun)
-	ROM_REGION32_LE(0x20000, REGION_CPU1, 0)	/* motherboard bios */
+	ROM_REGION32_LE(0x20000, RGNCLASS_CPU, "main", 0)	/* motherboard bios */
 	ROM_LOAD("bios.bin", 0x000000, 0x10000, CRC(e70168ff) SHA1(4a0d985c218209b7db2b2d33f606068aae539020) )
 
-	ROM_REGION32_LE(0x20000, REGION_USER1, 0)	/* gfx card bios */
+	ROM_REGION32_LE(0x20000, RGNCLASS_USER, "user1", 0)	/* gfx card bios */
 	ROM_LOAD("vgabios.bin", 0x000000, 0x20000, NO_DUMP ) // 1x maskrom (28pin)
 
 	/* this is what was on the rom board, mapping unknown */
-	ROM_REGION32_LE(0xa00000, REGION_USER2, 0)	/* rom board */
+	ROM_REGION32_LE(0xa00000, RGNCLASS_USER, "user2", 0)	/* rom board */
 	ROM_LOAD32_WORD("bank0.u11", 0x000000, 0x80000, CRC(6ce951d7) SHA1(1dd09491c651920a8a507bdc6584400367e5a292) )
 	ROM_LOAD32_WORD("bank0.u31", 0x000002, 0x80000, CRC(b6c06baf) SHA1(79074b086d24737d629272d98f17de6e1e650485) )
 	ROM_LOAD32_WORD("bank1.u12", 0x100000, 0x80000, CRC(5adc1f2e) SHA1(17abde7a2836d042a698661339eefe242dd9af0d) )

@@ -45,8 +45,8 @@ static void asterix_tile_callback(int layer, int *code, int *color, int *flags)
 VIDEO_START( asterix )
 {
 	K053251_vh_start(machine);
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_4, 1, NULL, asterix_tile_callback, 1);
-	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER, asterix_sprite_callback);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_4, 1, NULL, asterix_tile_callback, 1);
+	K053245_vh_start(machine,0, "gfx2",NORMAL_PLANE_ORDER, asterix_sprite_callback);
 
 	K053245_set_SpriteOffset(0,-3,-1);
 }

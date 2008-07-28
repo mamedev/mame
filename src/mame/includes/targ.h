@@ -5,9 +5,6 @@
 *************************************************************************/
 
 
-#define TARG_TONE_REGION	(REGION_USER1)
-
-
 /*----------- defined in audio/targ.c -----------*/
 
 WRITE8_HANDLER( targ_audio_1_w );

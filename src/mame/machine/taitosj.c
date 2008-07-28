@@ -28,8 +28,8 @@ void taitosj_register_main_savestate(void);
 
 MACHINE_START( taitosj )
 {
-	memory_configure_bank(1, 0, 1, memory_region(machine, REGION_CPU1) + 0x6000, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, REGION_CPU1) + 0x10000, 0);
+	memory_configure_bank(1, 0, 1, memory_region(machine, RGNCLASS_CPU, "main") + 0x6000, 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, RGNCLASS_CPU, "main") + 0x10000, 0);
 
 	taitosj_register_main_savestate();
 

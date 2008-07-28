@@ -50,8 +50,8 @@ VIDEO_START( xmen )
 {
 	K053251_vh_start(machine);
 
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,xmen_tile_callback);
-	K053247_vh_start(machine,REGION_GFX2,53,-2,NORMAL_PLANE_ORDER,xmen_sprite_callback);
+	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,xmen_tile_callback);
+	K053247_vh_start(machine,"gfx2",53,-2,NORMAL_PLANE_ORDER,xmen_sprite_callback);
 }
 
 static bitmap_t * screen_right;
@@ -62,8 +62,8 @@ VIDEO_START( xmen6p )
 {
 	K053251_vh_start(machine);
 
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,xmen_tile_callback);
-	K053247_vh_start(machine,REGION_GFX2,53,-2,NORMAL_PLANE_ORDER,xmen_sprite_callback);
+	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,xmen_tile_callback);
+	K053247_vh_start(machine,"gfx2",53,-2,NORMAL_PLANE_ORDER,xmen_sprite_callback);
 	K053247_export_config(&K053247_ram, NULL, NULL, NULL, NULL);
 
 	screen_left = auto_bitmap_alloc(64*8, 32*8, BITMAP_FORMAT_INDEXED16);

@@ -14,8 +14,8 @@ static int poolshrk_da_latch;
 
 static DRIVER_INIT( poolshrk )
 {
-	UINT8* pSprite = memory_region(machine, REGION_GFX1);
-	UINT8* pOffset = memory_region(machine, REGION_PROMS);
+	UINT8* pSprite = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	UINT8* pOffset = memory_region(machine, RGNCLASS_PROMS, "proms");
 
 	int i;
 	int j;
@@ -197,8 +197,8 @@ static const gfx_layout poolshrk_tile_layout =
 
 
 static GFXDECODE_START( poolshrk )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, poolshrk_sprite_layout, 0, 2 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, poolshrk_tile_layout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, poolshrk_sprite_layout, 0, 2 )
+	GFXDECODE_ENTRY( "gfx2", 0, poolshrk_tile_layout, 0, 1 )
 GFXDECODE_END
 
 
@@ -241,18 +241,18 @@ MACHINE_DRIVER_END
 
 
 ROM_START( poolshrk )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "7329.k1", 0x7000, 0x800, CRC(88152245) SHA1(c7c5e43ea488a197e92a1dc2231578f8ed86c98d) )
 	ROM_LOAD( "7330.l1", 0x7800, 0x800, CRC(fb41d3e9) SHA1(c17994179362da13acfcd36a28f45e328428c031) )
 
-	ROM_REGION( 0x400, REGION_GFX1, ROMREGION_DISPOSE )   /* sprites */
+	ROM_REGION( 0x400, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )   /* sprites */
 	ROM_LOAD( "7325.j5", 0x0000, 0x200, CRC(fae87eed) SHA1(8891d0ea60f72f826d71dc6b064a2ba81b298914) )
 	ROM_LOAD( "7326.h5", 0x0200, 0x200, CRC(05ec9762) SHA1(6119c4529334c98a0a42ca13a98a8661fc594d80) )
 
-	ROM_REGION( 0x200, REGION_GFX2, ROMREGION_DISPOSE )   /* tiles */
+	ROM_REGION( 0x200, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )   /* tiles */
 	ROM_LOAD( "7328.n6", 0x0000, 0x200, CRC(64bcbf3a) SHA1(a4e3ce6b4734234359e3ef784a771e40580c2a2a) )
 
-	ROM_REGION( 0x20, REGION_PROMS, 0 )                   /* line offsets */
+	ROM_REGION( 0x20, RGNCLASS_PROMS, "proms", 0 )                   /* line offsets */
 	ROM_LOAD( "7327.k6", 0x0000, 0x020, CRC(f74cef5b) SHA1(f470bf5b193dae4b44e89bc4c4476cf8d98e7cfd) )
 ROM_END
 

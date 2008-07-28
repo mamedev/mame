@@ -51,8 +51,8 @@ static UINT64 last_bio_cycles;
 
 void hdsnd_init(running_machine *machine)
 {
-	rombase = (UINT8 *)memory_region(machine, REGION_SOUND1);
-	romsize = memory_region_length(machine, REGION_SOUND1);
+	rombase = (UINT8 *)memory_region(machine, RGNCLASS_SOUND, "serialroms");
+	romsize = memory_region_length(machine, RGNCLASS_SOUND, "serialroms");
 	comram = (UINT16 *)auto_malloc(0x400);
 	last_bio_cycles = 0;
 }

@@ -84,7 +84,7 @@ static WRITE16_HANDLER(ml_subreset_w)
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	data=0;
-	memory_set_bankptr( 1, memory_region(machine, REGION_CPU2) + ((data) & 0x03) * 0x4000 + 0x10000 );
+	memory_set_bankptr( 1, memory_region(machine, RGNCLASS_CPU, "z80") + ((data) & 0x03) * 0x4000 + 0x10000 );
 }
 
 static int adpcm_pos;
@@ -100,7 +100,7 @@ static void ml_msm5205_vck(running_machine *machine, int chip)
 	}
 	else
 	{
-		adpcm_data = memory_region(machine, REGION_SOUND1)[adpcm_pos];
+		adpcm_data = memory_region(machine, RGNCLASS_SOUND, "adpcm")[adpcm_pos];
 		adpcm_pos = (adpcm_pos + 1) & 0xffff;
 		MSM5205_data_w(0, adpcm_data >> 4);
 	}
@@ -342,7 +342,7 @@ static void irq_handler(running_machine *machine, int irq)
 }
 
 static GFXDECODE_START( mlanding )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 static const struct MSM5205interface msm5205_interface =
@@ -404,7 +404,7 @@ static MACHINE_DRIVER_START( mlanding )
 MACHINE_DRIVER_END
 
 ROM_START( mlanding )
-	ROM_REGION( 0x60000, REGION_CPU1, 0 )	/* 68000 */
+	ROM_REGION( 0x60000, RGNCLASS_CPU, "main", 0 )	/* 68000 */
 	ROM_LOAD16_BYTE( "ml_b0929.epr", 0x00000, 0x10000, CRC(ab3f38f3) SHA1(4357112ca11a8e7bfe08ba99ac3bddac046c230a))
 	ROM_LOAD16_BYTE( "ml_b0928.epr", 0x00001, 0x10000, CRC(21e7a8f6) SHA1(860d3861d4375866cd27d426d546ddb2894a6629) )
 	ROM_LOAD16_BYTE( "ml_b0927.epr", 0x20000, 0x10000, CRC(b02f1805) SHA1(b8050f955c7070dc9b962db329b5b0ee8b2acb70) )
@@ -412,21 +412,21 @@ ROM_START( mlanding )
 	ROM_LOAD16_BYTE( "ml_b0925.epr", 0x40000, 0x10000, CRC(ff59f049) SHA1(aba490a28aba03728415f34d321fd599c31a5fde) )
 	ROM_LOAD16_BYTE( "ml_b0924.epr", 0x40001, 0x10000, CRC(9bc3e1b0) SHA1(6d86804327df11a513a0f06dceb57b83b34ac007) )
 
-	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* z80 */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "z80", 0 )	/* z80 */
 	ROM_LOAD( "ml_b0935.epr", 0x00000, 0x4000, CRC(b85915c5) SHA1(656e97035ae304f84e90758d0dd6f0616c40f1db) )
 	ROM_CONTINUE(             0x10000, 0x04000 )	/* banked stuff */
 	ROM_LOAD( "ml_b0936.epr", 0x14000, 0x02000, CRC(51fd3a77) SHA1(1fcbadf1877e25848a1d1017322751560a4823c0) )
 
-	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_ERASE00 )
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x20000, REGION_CPU3, 0 )	/* 68000 */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "sub", 0 )	/* 68000 */
 	ROM_LOAD16_BYTE( "ml_b0923.epr", 0x00000, 0x10000, CRC(81b2c871) SHA1(a085bc528c63834079469db6ae263a5b9b984a7c) )
 	ROM_LOAD16_BYTE( "ml_b0922.epr", 0x00001, 0x10000, CRC(36923b42) SHA1(c31d7c45a563cfc4533379f69f32889c79562534) )
 
-	ROM_REGION( 0x10000, REGION_CPU4, 0 )	/* z80 */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "z80sub", 0 )	/* z80 */
 	ROM_LOAD( "ml_b0937.epr", 0x00000, 0x08000, CRC(4bdf15ed) SHA1(b960208e63cede116925e064279a6cf107aef81c) )
 
-	ROM_REGION( 0x50000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x50000, RGNCLASS_SOUND, "adpcm", 0 )
 	ROM_LOAD( "ml_b0930.epr", 0x00000, 0x10000, CRC(214a30e2) SHA1(3dcc3a89ed52e4dbf232d2a92a3e64975b46c2dd) )
 	ROM_LOAD( "ml_b0931.epr", 0x10000, 0x10000, CRC(9c4a82bf) SHA1(daeac620c636013a36595ce9f37e84e807f88977) )
 	ROM_LOAD( "ml_b0932.epr", 0x20000, 0x10000, CRC(4721dc59) SHA1(faad75d577344e9ba495059040a2cf0647567426) )
@@ -436,7 +436,7 @@ ROM_END
 
 static DRIVER_INIT(mlanding)
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU3);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "sub");
 	rom[0x88b]=0x4e;
 	rom[0x88a]=0x71;
 }

@@ -4,7 +4,6 @@
 struct namco_interface
 {
 	int voices;		/* number of voices */
-	int region;		/* memory region; -1 to use RAM (pointed to by namco_wavedata) */
 	int stereo;		/* set to 1 to indicate stereo (e.g., System 1) */
 };
 

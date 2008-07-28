@@ -529,7 +529,7 @@ static STATE_POSTLOAD( samples_postload )
 }
 
 
-static void *samples_start(int sndindex, int clock, const void *config)
+static void *samples_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	int i;
 	const struct Samplesinterface *intf = config;

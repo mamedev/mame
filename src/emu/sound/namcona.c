@@ -1124,7 +1124,7 @@ UpdateSound( void *param, stream_sample_t **inputs, stream_sample_t **buffer, in
 	RenderSamples(chip, buffer, chip->mpMixerBuffer, length );
 } /* UpdateSound */
 
-static void *namcona_start(int sndindex, int clock, const void *config)
+static void *namcona_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	const struct NAMCONAinterface *intf = config;
 	struct namcona *chip;

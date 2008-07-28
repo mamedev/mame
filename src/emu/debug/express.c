@@ -31,7 +31,6 @@
 #define MAX_TOKENS				128
 #define MAX_STACK_DEPTH			128
 #define MAX_STRING_LENGTH		256
-#define MAX_EXPRESSION_STRINGS	64
 #define MAX_SYMBOL_LENGTH		64
 
 #define SYM_TABLE_HASH_SIZE		97
@@ -94,7 +93,7 @@ enum
 	TIN_MEMORY_SOUND		= (EXPSPACE_SOUND     << TIN_MEMORY_SPACE_SHIFT),
 
 	TIN_MEMORY_INDEX_SHIFT	= 16,
-	TIN_MEMORY_INDEX_MASK	= (0xf << TIN_MEMORY_INDEX_SHIFT)
+	TIN_MEMORY_INDEX_MASK	= (0xffff << TIN_MEMORY_INDEX_SHIFT)
 };
 
 
@@ -192,17 +191,36 @@ struct _symbol_table
 };
 
 
+typedef struct _expression_string expression_string;
+struct _expression_string
+{
+	expression_string *		next;							/* pointer to next string */
+	UINT16					index;							/* index of this string */
+	char					string[1];						/* string data */
+};
+
+
 /* typedef struct _parsed_expression parsed_expression -- defined in express.h */
 struct _parsed_expression
 {
 	const symbol_table *	table; 							/* symbol table */
 	char *					original_string;				/* original string (prior to parsing) */
 	express_callbacks 		callbacks;						/* callbacks */
-	char *					string[MAX_EXPRESSION_STRINGS]; /* string table */
+	expression_string *		stringlist; 					/* string list */
+	UINT16					stringcount;					/* number of strings allocated so far */
 	parse_token				token[MAX_TOKENS];				/* array of tokens */
 	int						token_stack_ptr;				/* stack poointer */
 	parse_token				token_stack[MAX_STACK_DEPTH];	/* token stack */
 };
+
+
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
+
+static char *add_expression_string(parsed_expression *expr, const char *string, int length, UINT16 *index);
+static const char *get_expression_string(parsed_expression *expr, UINT16 index);
 
 
 
@@ -328,14 +346,12 @@ INLINE EXPRERR pop_token_rval(parsed_expression *expr, parse_token *token, const
 	/* memory tokens get resolved down to number tokens */
 	else if (token->type == TOK_MEMORY)
 	{
-		int index = (token->info & TIN_MEMORY_INDEX_MASK) >> TIN_MEMORY_INDEX_SHIFT;
+		const char *name = get_expression_string(expr, (token->info & TIN_MEMORY_INDEX_MASK) >> TIN_MEMORY_INDEX_SHIFT);
 		int space = (token->info & TIN_MEMORY_SPACE_MASK) >> TIN_MEMORY_SPACE_SHIFT;
 		int size = (token->info & TIN_MEMORY_SIZE_MASK) >> TIN_MEMORY_SIZE_SHIFT;
-		if ((token->info & TIN_MEMORY_INDEX_MASK) == TIN_MEMORY_INDEX_MASK)
-			index = -1;
 		token->type = TOK_NUMBER;
 		if (expr->callbacks.read != NULL)
-			token->value.i = (*expr->callbacks.read)(space, index, token->value.i, 1 << size);
+			token->value.i = (*expr->callbacks.read)(name, space, token->value.i, 1 << size);
 		else
 			token->value.i = 0;
 	}
@@ -362,13 +378,11 @@ INLINE UINT64 get_lval_value(parsed_expression *expr, parse_token *token, const 
 	}
 	else if (token->type == TOK_MEMORY)
 	{
-		int index = (token->info & TIN_MEMORY_INDEX_MASK) >> TIN_MEMORY_INDEX_SHIFT;
+		const char *name = get_expression_string(expr, (token->info & TIN_MEMORY_INDEX_MASK) >> TIN_MEMORY_INDEX_SHIFT);
 		int space = (token->info & TIN_MEMORY_SPACE_MASK) >> TIN_MEMORY_SPACE_SHIFT;
 		int size = (token->info & TIN_MEMORY_SIZE_MASK) >> TIN_MEMORY_SIZE_SHIFT;
-		if ((token->info & TIN_MEMORY_INDEX_MASK) == TIN_MEMORY_INDEX_MASK)
-			index = -1;
 		if (expr->callbacks.read != NULL)
-			return (*expr->callbacks.read)(space, index, token->value.i, 1 << size);
+			return (*expr->callbacks.read)(name, space, token->value.i, 1 << size);
 	}
 	return 0;
 }
@@ -389,13 +403,11 @@ INLINE void set_lval_value(parsed_expression *expr, parse_token *token, const sy
 	}
 	else if (token->type == TOK_MEMORY)
 	{
-		int index = (token->info & TIN_MEMORY_INDEX_MASK) >> TIN_MEMORY_INDEX_SHIFT;
+		const char *name = get_expression_string(expr, (token->info & TIN_MEMORY_INDEX_MASK) >> TIN_MEMORY_INDEX_SHIFT);
 		int space = (token->info & TIN_MEMORY_SPACE_MASK) >> TIN_MEMORY_SPACE_SHIFT;
 		int size = (token->info & TIN_MEMORY_SIZE_MASK) >> TIN_MEMORY_SIZE_SHIFT;
-		if ((token->info & TIN_MEMORY_INDEX_MASK) == TIN_MEMORY_INDEX_MASK)
-			index = -1;
 		if (expr->callbacks.write != NULL)
-			(*expr->callbacks.write)(space, index, token->value.i, 1 << size, value);
+			(*expr->callbacks.write)(name, space, token->value.i, 1 << size, value);
 	}
 }
 
@@ -509,21 +521,31 @@ static void print_tokens(FILE *out, parsed_expression *expr)
     forms of memory operators
 -------------------------------------------------*/
 
-static int parse_memory_operator(const char *buffer, token_info *flags)
+static int parse_memory_operator(parsed_expression *expr, const char *buffer, token_info *flags)
 {
-	int length = (int)strlen(buffer);
 	int space = 'p', size;
-	int index = -1;
+	const char *dot;
+	int length;
 
 	*flags = 0;
-
-	/* length 2 or more means space, optional index, then size */
-	if (length >= 2)
+	
+	/* if there is a '.', it means we have a name */
+	dot = strrchr(buffer, '.');
+	if (dot != NULL)
+	{
+		UINT16 index;
+		if (!add_expression_string(expr, buffer, dot - buffer, &index))
+			return 0;
+		*flags |= index << TIN_MEMORY_INDEX_SHIFT;
+		buffer = dot + 1;
+	}
+	
+	/* length 2 means space then size */
+	length = (int)strlen(buffer);
+	if (length == 2)
 	{
 		space = buffer[0];
-		if (length >= 3)
-			sscanf(&buffer[1], "%d", &index);
-		size = buffer[length - 1];
+		size = buffer[1];
 	}
 
 	/* length 1 means size */
@@ -559,9 +581,6 @@ static int parse_memory_operator(const char *buffer, token_info *flags)
 		case 'q':	*flags |= TIN_MEMORY_QWORD;		break;
 		default:	return 0;
 	}
-
-	/* add the index to flags */
-	*flags |= index << TIN_MEMORY_INDEX_SHIFT;
 
 	return 1;
 }
@@ -732,14 +751,7 @@ static EXPRERR parse_string_into_tokens(const char *stringstart, parsed_expressi
 			case '"':
 			{
 				char buffer[MAX_STRING_LENGTH];
-				int bufindex = 0, strindex;
-
-				/* find a free string entry */
-				for (strindex = 0; strindex < MAX_EXPRESSION_STRINGS; strindex++)
-					if (expr->string[strindex] == NULL)
-						break;
-				if (strindex == MAX_EXPRESSION_STRINGS)
-					return MAKE_EXPRERR_TOO_MANY_STRINGS(token->offset);
+				int bufindex = 0;
 
 				/* accumulate a copy of the string */
 				string++;
@@ -760,16 +772,11 @@ static EXPRERR parse_string_into_tokens(const char *stringstart, parsed_expressi
 					return MAKE_EXPRERR_UNBALANCED_QUOTES(token->offset);
 				string++;
 
-				/* terminate the string and allocate memory */
-				buffer[bufindex++] = 0;
-				expr->string[strindex] = malloc(bufindex);
-				if (!expr->string[strindex])
+				/* make the token */
+				token->value.p = add_expression_string(expr, buffer, bufindex, NULL);
+				if (token->value.p == NULL)
 					return MAKE_EXPRERR_OUT_OF_MEMORY(token->offset);
-
-				/* copy the string in and make the token */
-				strcpy(expr->string[strindex], buffer);
 				token->type = TOK_STRING;
-				token->value.p = expr->string[strindex];
 				break;
 			}
 
@@ -825,7 +832,7 @@ static EXPRERR parse_string_into_tokens(const char *stringstart, parsed_expressi
 				if (string[0] == '@')
 				{
 					token_info info;
-					if (parse_memory_operator(buffer, &info))
+					if (parse_memory_operator(expr, buffer, &info))
 					{
 						SET_TOKEN_INFO(1, TOK_OPERATOR, TVL_MEMORYAT, TIN_PRECEDENCE_2 | info);
 						break;
@@ -1599,26 +1606,73 @@ static EXPRERR execute_tokens(parsed_expression *expr, UINT64 *result)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    add_expression_string - add a string to the
+    list of expression strings
+-------------------------------------------------*/
+
+static char *add_expression_string(parsed_expression *expr, const char *string, int length, UINT16 *index)
+{
+	expression_string *expstring;
+
+	/* allocate memory */
+	expstring = malloc(sizeof(expression_string) + length);
+	if (expstring == NULL)
+		return NULL;
+
+	/* make the new string and link it in; we guarantee tha the index is never 0 */
+	expstring->next = expr->stringlist;
+	expstring->index = ++expr->stringcount;
+	memcpy(expstring->string, string, length);
+	expstring->string[length] = 0;
+	expr->stringlist = expstring;
+	
+	/* return a pointer to the copied string */
+	if (index != NULL)
+		*index = expstring->index;
+	return expstring->string;
+}
+
+
+/*-------------------------------------------------
+    get_expression_string - return an indexed
+    expression string
+-------------------------------------------------*/
+
+static const char *get_expression_string(parsed_expression *expr, UINT16 index)
+{
+	expression_string *expstring;
+	
+	/* a 0 index is always invalid */
+	if (index == 0)
+		return NULL;
+	
+	/* scan for the string with the matching index */
+	for (expstring = expr->stringlist; expstring != NULL; expstring = expstring->next)
+		if (expstring->index == index)
+			return expstring->string;
+	return NULL;
+}
+
+
+/*-------------------------------------------------
     free_expression_strings - free all strings
     allocated to an expression
 -------------------------------------------------*/
 
 static void free_expression_strings(parsed_expression *expr)
 {
-	int strindex;
-
 	/* free the original expression */
 	if (expr->original_string != NULL)
 		free(expr->original_string);
 	expr->original_string = NULL;
 
 	/* free all strings */
-	for (strindex = 0; strindex < MAX_EXPRESSION_STRINGS; strindex++)
-		if (expr->string[strindex] != NULL)
-		{
-			free(expr->string[strindex]);
-			expr->string[strindex] = NULL;
-		}
+	while (expr->stringlist != NULL)
+	{
+		expression_string *string = expr->stringlist;
+		expr->stringlist = string->next;
+		free(string);
+	}
 }
 
 
@@ -1727,7 +1781,7 @@ EXPRERR expression_execute(parsed_expression *expr, UINT64 *result)
 
 void expression_free(parsed_expression *expr)
 {
-	if (expr)
+	if (expr != NULL)
 	{
 		free_expression_strings(expr);
 		free(expr);

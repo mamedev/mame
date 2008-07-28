@@ -170,12 +170,12 @@ static const gfx_layout progolf_spritelayout2 =
 };
 #endif
 static GFXDECODE_START( progolf )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, progolf_charlayout, 0, 8 ) /* sprites */
-	GFXDECODE_ENTRY( 0,           0x2000, charlayout,           0, 4 ) /* char set #1 */
-	GFXDECODE_ENTRY( 0,           0x2000, spritelayout,         0, 4 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0x0000, progolf_charlayout, 0, 8 ) /* sprites */
+	GFXDECODE_ENTRY( NULL,           0x2000, charlayout,           0, 4 ) /* char set #1 */
+	GFXDECODE_ENTRY( NULL,           0x2000, spritelayout,         0, 4 ) /* sprites */
 
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, progolf_charlayout2, 0, 8 ) /* sprites */
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, progolf_spritelayout2, 0, 8 ) /* sprites */
+//	GFXDECODE_ENTRY( "gfx2", 0x0000, progolf_charlayout2, 0, 8 ) /* sprites */
+//	GFXDECODE_ENTRY( "gfx2", 0x0000, progolf_spritelayout2, 0, 8 ) /* sprites */
 GFXDECODE_END
 
 
@@ -225,44 +225,44 @@ MACHINE_DRIVER_END
 
 
 ROM_START( progolf )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "g4-m.2a",      0xb000, 0x1000, CRC(8f06ebc0) SHA1(c012dcaf06cbd9e49f3ae819d9cbed4df8751cec) )
 	ROM_LOAD( "g3-m.4a",      0xc000, 0x1000, CRC(8101b231) SHA1(d933992c93b3cd9a052ac40ec1fa92a181b28691) )
 	ROM_LOAD( "g2-m.6a",      0xd000, 0x1000, CRC(a4a0d8dc) SHA1(04db60d5cfca4834ac2cc7661f772704489cb329) )
 	ROM_LOAD( "g1-m.8a",      0xe000, 0x1000, CRC(749032eb) SHA1(daa356b2c70bcd8cdd0c4df4268b6158bc8aae8e) )
 	ROM_LOAD( "g0-m.9a",      0xf000, 0x1000, CRC(8f8b1e8e) SHA1(fc877a8f2b26ea48c5ba2324678d6077f3432a79) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu1", 0 )
 	ROM_LOAD( "g6-m.1b",      0xf000, 0x1000, CRC(0c6fadf5) SHA1(9af2c2152b339cadab7aff0b0164d4431d2558bd) )
 
-	ROM_REGION( 0x3000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x3000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "g7-m.7a",      0x0000, 0x1000, CRC(16b42975) SHA1(29268a8a660781ff0de77b3b1bfc16edff7be134) )
 	ROM_LOAD( "g8-m.9a",      0x1000, 0x1000, CRC(cf3f35da) SHA1(06acc29a5e282b5a9960eabebdb1a529910286b6) )
 	ROM_LOAD( "g9-m.10a",     0x2000, 0x1000, CRC(7712e248) SHA1(4e7dd12d323cf8378adb1e32a763a1799e2b4bdc) )
 
-	ROM_REGION( 0x60, REGION_PROMS, 0 )
+	ROM_REGION( 0x60, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "gcm.a14",      0x0000, 0x0020, CRC(8259e7db) SHA1(f98db5ebf8182eb0359fa372fa664cb6d3b09437) )
 	ROM_LOAD( "gbm.k4",       0x0020, 0x0020, CRC(1ea3319f) SHA1(809af38e73fa1f30410e7d6b4504fe360ee9b091) )
 	ROM_LOAD( "gam.k11",      0x0040, 0x0020, CRC(b9665de3) SHA1(4c5aba5f6589f4bce4692c0d5bb2811ab8e14aed) )
 ROM_END
 
 ROM_START( progolfa )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "g4-m.a3",      0xb000, 0x1000, CRC(015a08d9) SHA1(671d5cd708e098dbda3e495a8b4ce3393c6971da) )
 	ROM_LOAD( "g3-m.a4",      0xc000, 0x1000, CRC(c1339da5) SHA1(e9728dcc5f67fbe79eea818ba48421c46d9e63e9) )
 	ROM_LOAD( "g2-m.a6",      0xd000, 0x1000, CRC(fafec36e) SHA1(70880d6f9b11505d466f36c12a43361ee2639fed) )
 	ROM_LOAD( "g1-m.a8",      0xe000, 0x1000, CRC(749032eb) SHA1(daa356b2c70bcd8cdd0c4df4268b6158bc8aae8e) )
 	ROM_LOAD( "g0-m.a9",      0xf000, 0x1000, CRC(a03c533f) SHA1(2e0006be40e32b64b1490bd339d9fc9302eee7c4) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu1", 0 )
 	ROM_LOAD( "g5-m.b1",      0xf000, 0x1000, CRC(0c6fadf5) SHA1(9af2c2152b339cadab7aff0b0164d4431d2558bd) )
 
-	ROM_REGION( 0x3000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x3000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "g7-m.a8",      0x0000, 0x1000, CRC(16b42975) SHA1(29268a8a660781ff0de77b3b1bfc16edff7be134) )
 	ROM_LOAD( "g8-m.a9",      0x1000, 0x1000, CRC(cf3f35da) SHA1(06acc29a5e282b5a9960eabebdb1a529910286b6) )
 	ROM_LOAD( "g9-m.a10",     0x2000, 0x1000, CRC(7712e248) SHA1(4e7dd12d323cf8378adb1e32a763a1799e2b4bdc) )
 
-	ROM_REGION( 0x60, REGION_PROMS, 0 )
+	ROM_REGION( 0x60, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "gcm.a14",      0x0000, 0x0020, CRC(8259e7db) SHA1(f98db5ebf8182eb0359fa372fa664cb6d3b09437) )
 	ROM_LOAD( "gbm.k4",       0x0020, 0x0020, CRC(1ea3319f) SHA1(809af38e73fa1f30410e7d6b4504fe360ee9b091) )
 	ROM_LOAD( "gam.k11",      0x0040, 0x0020, CRC(b9665de3) SHA1(4c5aba5f6589f4bce4692c0d5bb2811ab8e14aed) )
@@ -272,7 +272,7 @@ ROM_END
 static DRIVER_INIT( progolf )
 {
 	int A;
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 	UINT8* decrypted = auto_malloc(0x10000);
 
 	memory_set_decrypted_region(0,0x0000,0xffff, decrypted);

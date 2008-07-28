@@ -13,8 +13,6 @@ struct Y8950interface
 {
 	void (*handler)(running_machine *machine, int linestate);
 
-	int rom_region; /* delta-T ADPCM ROM/RAM region */
-
 	read8_machine_func keyboardread;
 	write8_machine_func keyboardwrite;
 	read8_machine_func portread;

@@ -67,7 +67,7 @@ static void _stream_update(void *param, int interval)
 }
 
 
-static void *ymf262_start(int sndindex, int clock, const void *config)
+static void *ymf262_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	static const struct YMF262interface dummy = { 0 };
 	struct ymf262_info *info;

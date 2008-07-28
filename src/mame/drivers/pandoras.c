@@ -341,8 +341,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( pandoras )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,     0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout,   16*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   16*16, 16 )
 GFXDECODE_END
 
 /***************************************************************************
@@ -433,31 +433,31 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( pandoras )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 ) /* 64K for the CPU A */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* 64K for the CPU A */
 	ROM_LOAD( "pand_j13.cpu",	0x08000, 0x02000, CRC(7a0fe9c5) SHA1(e68c8d76d1abb69ac72b0e2cd8c1dfc540064ee3) )
 	ROM_LOAD( "pand_j12.cpu",	0x0a000, 0x02000, CRC(7dc4bfe1) SHA1(359c3051e5d7a34d0e49578e4c168fd19c73e202) )
 	ROM_LOAD( "pand_j10.cpu",	0x0c000, 0x02000, CRC(be3af3b7) SHA1(91321b53e17e58b674104cb95b1c35ee8fecae22) )
 	ROM_LOAD( "pand_j9.cpu",	0x0e000, 0x02000, CRC(e674a17a) SHA1(a4b096dc455425dd60298acf2203659ef6f8d857) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64K for the CPU B */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "sub", 0 ) /* 64K for the CPU B */
 	ROM_LOAD( "pand_j5.cpu",	0x0e000, 0x02000, CRC(4aab190b) SHA1(d2204953d6b6b34cea851bfc9c2b31426e75f90b) )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* 64K for the Sound CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64K for the Sound CPU */
 	ROM_LOAD( "pand_6c.snd",	0x00000, 0x02000, CRC(0c1f109d) SHA1(4e6cdee99261764bd2fea5abbd49d800baba0dc5) )
 
-	ROM_REGION( 0x1000, REGION_CPU4, 0 ) /* 4K for the Sound CPU 2 */
+	ROM_REGION( 0x1000, RGNCLASS_CPU, "mcu", 0 ) /* 4K for the Sound CPU 2 */
 	ROM_LOAD( "pand_7e.snd",	0x00000, 0x01000, CRC(18b0f9d0) SHA1(2a6119423222577a4c2b99ed78f61ba387eec7f8) )
 
-	ROM_REGION( 0x6000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "pand_j18.cpu",	0x00000, 0x02000, CRC(99a696c5) SHA1(35a27cd5ecc51a9a1acf01eb8078a1028f03be32) )	/* sprites */
 	ROM_LOAD( "pand_j17.cpu",	0x02000, 0x02000, CRC(38a03c21) SHA1(b0c8f642787bab3cd1d76657e56f07f4f6f9073c) )
 	ROM_LOAD( "pand_j16.cpu",	0x04000, 0x02000, CRC(e0708a78) SHA1(9dbd08b6ca8a66a61e128d1806888696273de848) )
 
-	ROM_REGION( 0x4000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "pand_a18.cpu",	0x00000, 0x02000, CRC(23706d4a) SHA1(cca92e6ff90e3006a79a214f1211fd659771de53) )	/* tiles */
 	ROM_LOAD( "pand_a19.cpu",	0x02000, 0x02000, CRC(a463b3f9) SHA1(549b7ee6e47325b80186441da11879fb8b1b47be) )
 
-	ROM_REGION( 0x0220, REGION_PROMS, 0 )
+	ROM_REGION( 0x0220, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "pandora.2a",		0x0000, 0x020, CRC(4d56f939) SHA1(a8dac604bfdaf4b153b75dbf165de113152b6daa) ) /* palette */
 	ROM_LOAD( "pandora.17g",	0x0020, 0x100, CRC(c1a90cfc) SHA1(c6581f2d543e38f1de399774183cf0698e61dab5) ) /* sprite lookup table */
 	ROM_LOAD( "pandora.16b",	0x0120, 0x100, CRC(c89af0c3) SHA1(4072c8d61521b34ce4dbce1d48f546402e9539cd) ) /* character lookup table */

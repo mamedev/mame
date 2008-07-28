@@ -72,7 +72,7 @@ static const ppu2c0x_interface ppu_interface =
 {
 	PPU_2C03B,				/* type */
 	1,						/* num */
-	{ REGION_GFX2 },		/* vrom gfx region */
+	{ "gfx2" },				/* vrom gfx region */
 	{ 1 },					/* gfxlayout num */
 	{ 256 },				/* color base */
 	{ PPU_MIRROR_NONE },	/* mirroring */
@@ -84,7 +84,7 @@ static const ppu2c0x_interface ppu_interface_hboard =
 {
 	PPU_2C03B,				/* type */
 	1,						/* num */
-	{ REGION_GFX2 },		/* vrom gfx region */
+	{ "gfx2" },				/* vrom gfx region */
 	{ 1 },					/* gfxlayout num */
 	{ 256 },				/* color base */
 	{ PPU_MIRROR_NONE },	/* mirroring */
@@ -103,7 +103,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( playch10 )
 {
-	const UINT8 *bios = memory_region(machine, REGION_CPU1);
+	const UINT8 *bios = memory_region(machine, RGNCLASS_CPU, "main");
 	pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
 
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
@@ -114,7 +114,7 @@ VIDEO_START( playch10 )
 
 VIDEO_START( playch10_hboard )
 {
-	const UINT8 *bios = memory_region(machine, REGION_CPU1);
+	const UINT8 *bios = memory_region(machine, RGNCLASS_CPU, "main");
 	pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
 
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,

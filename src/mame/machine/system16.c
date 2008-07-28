@@ -9,9 +9,9 @@ UINT16 *sys16_extraram;
 UINT16 *sys16_extraram2;
 UINT16 *sys16_extraram3;
 
-static void patch_codeX( int offset, int data, int cpu ){
+static void patch_codeX( int offset, int data, const char *cpu ){
 	int aligned_offset = offset&0xfffffe;
-	UINT16 *mem = (UINT16 *)memory_region(Machine, REGION_CPU1+cpu);
+	UINT16 *mem = (UINT16 *)memory_region(Machine, RGNCLASS_CPU, cpu);
 	int old_word = mem[aligned_offset/2];
 
 	if( offset&1 )
@@ -23,7 +23,7 @@ static void patch_codeX( int offset, int data, int cpu ){
 }
 
 void sys16_patch_code( int offset, int data ){
-	patch_codeX(offset,data,0);
+	patch_codeX(offset,data,"main");
 }
 
 
@@ -48,7 +48,7 @@ static const gfx_layout charlayout =
 };
 
 GFXDECODE_START( sys16 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,	0, 1024 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,	0, 1024 )
 GFXDECODE_END
 
 
@@ -62,7 +62,6 @@ static void sound_cause_nmi( int chip ){
 
 const struct upd7759_interface sys16_upd7759_interface =
 {
-	0,			/* memory region 3 contains the sample data */
 	sound_cause_nmi
 };
 

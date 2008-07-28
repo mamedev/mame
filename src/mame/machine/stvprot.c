@@ -120,7 +120,7 @@ static const UINT32 vector_prot[] = { 0x0603B1B2,0x234 };
 
 static READ32_HANDLER( a_bus_ctrl_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_USER1);
+	UINT32 *ROM = (UINT32 *)memory_region(machine, RGNCLASS_USER, "user1");
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
@@ -294,11 +294,11 @@ static READ32_HANDLER(astrass_prot_r)
 	if ( offset == 3 && ctrl_index != -1 )
 	{
 		UINT32 data = 0;
-		UINT32 *prot_data = (UINT32 *)memory_region(machine, REGION_USER2);
+		UINT32 *prot_data = (UINT32 *)memory_region(machine, RGNCLASS_USER, "user2");
 
 		data = prot_data[ctrl_index++];
 
-		if ( ctrl_index >= memory_region_length(machine, REGION_USER2)/4 )
+		if ( ctrl_index >= memory_region_length(machine, RGNCLASS_USER, "user2")/4 )
 		{
 			ctrl_index = -1;
 		}
@@ -335,7 +335,7 @@ static UINT16 decathlt_prottable2[128];
 
 static READ32_HANDLER( decathlt_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, REGION_USER1);
+	UINT32 *ROM = (UINT32 *)memory_region(machine, RGNCLASS_USER, "user1");
 
 	if (offset==2)
 	{

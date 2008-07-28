@@ -248,8 +248,8 @@ static const gfx_layout bulletlayout =
 
 
 static GFXDECODE_START( tankbatt )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 256 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, bulletlayout, 0, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0, bulletlayout, 0, 256 )
 GFXDECODE_END
 
 
@@ -311,17 +311,17 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( tankbatt )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "tb1-1.1a",  0x6000, 0x0800, CRC(278a0b8c) SHA1(11ea8fe8401b3cd986616a30a759c0ac1a5ce73b) )
 	ROM_LOAD( "tb1-2.1b",  0x6800, 0x0800, CRC(e0923370) SHA1(8d3dbea877bed9f9c267d8002dc180f6eb1e5a8f) )
 	ROM_LOAD( "tb1-3.1c",  0x7000, 0x0800, CRC(85005ea4) SHA1(91583081803a5ef600fb90bee34be9edd87f157e) )
 	ROM_LOAD( "tb1-4.1d",  0x7800, 0x0800, CRC(3dfb5bcf) SHA1(aa24bf74f4d5dc81baf3843196c837e0b731077b) )
 	ROM_RELOAD(            0xf800, 0x0800 )	/* for the reset and interrupt vectors */
 
-	ROM_REGION( 0x0800, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0800, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "tb1-5.2k",  0x0000, 0x0800, CRC(aabd4fb1) SHA1(5cff659b531d0f1b6faa503f7c06045c3a209a84) )
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "bct1-1.l3", 0x0000, 0x0100, CRC(d17518bc) SHA1(f3b0deffa586808bc59e9a24ec1699c54ebe84cc) ) /* prom is a Fujitsu MB7052 or equivalent */
 ROM_END
 

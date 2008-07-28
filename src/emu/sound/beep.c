@@ -81,7 +81,7 @@ static void beep_sound_update(void *param,stream_sample_t **inputs, stream_sampl
  *
  *************************************/
 
-static void *beep_start(int sndindex, int clock, const void *config)
+static void *beep_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct beep_sound *pBeep;
 

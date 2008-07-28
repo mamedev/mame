@@ -59,8 +59,8 @@ VIDEO_START( aliens )
 	layer_colorbase[1] = 4;
 	layer_colorbase[2] = 8;
 	sprite_colorbase = 16;
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tile_callback);
-	K051960_vh_start(machine,REGION_GFX2,NORMAL_PLANE_ORDER,sprite_callback);
+	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tile_callback);
+	K051960_vh_start(machine,"gfx2",NORMAL_PLANE_ORDER,sprite_callback);
 }
 
 

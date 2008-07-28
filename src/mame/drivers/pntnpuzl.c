@@ -473,7 +473,7 @@ static MACHINE_DRIVER_START( pntnpuzl )
 MACHINE_DRIVER_END
 
 ROM_START( pntnpuzl )
-	ROM_REGION( 0x80000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "pntnpuzl.u2", 0x00001, 0x40000, CRC(dfda3f73) SHA1(cca8ccdd501a26cba07365b1238d7b434559bbc6) )
 	ROM_LOAD16_BYTE( "pntnpuzl.u3", 0x00000, 0x40000, CRC(4173f250) SHA1(516fe6f91b925f71c36b97532608b82e63bda436) )
 ROM_END
@@ -481,7 +481,7 @@ ROM_END
 
 static DRIVER_INIT(pip)
 {
-//  UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
+//  UINT16 *rom = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
 //  rom[0x2696/2] = 0x4e71;
 //  rom[0x26a0/2] = 0x4e71;
 }

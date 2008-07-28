@@ -310,7 +310,7 @@ static void c6280_update(void *param, stream_sample_t **inputs, stream_sample_t 
 /* MAME specific code                                                       */
 /*--------------------------------------------------------------------------*/
 
-static void *c6280_start(int sndindex, int clock, const void *config)
+static void *c6280_start(const char *tag, int sndindex, int clock, const void *config)
 {
     int rate = clock/16;
     c6280_t *info;

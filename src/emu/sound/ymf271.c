@@ -1742,8 +1742,9 @@ static void ymf271_init(YMF271Chip *chip, UINT8 *rom, void (*cb)(running_machine
 	init_state(chip);
 }
 
-static void *ymf271_start(int sndindex, int clock, const void *config)
+static void *ymf271_start(const char *tag, int sndindex, int clock, const void *config)
 {
+	static const struct YMF271interface defintrf = { 0 };
 	const struct YMF271interface *intf;
 	int i;
 	YMF271Chip *chip;
@@ -1753,9 +1754,9 @@ static void *ymf271_start(int sndindex, int clock, const void *config)
 	chip->index = sndindex;
 	chip->clock = clock;
 
-	intf = config;
+	intf = (config != NULL) ? config : &defintrf;
 
-	ymf271_init(chip, memory_region(Machine, intf->region), intf->irq_callback, intf->ext_read, intf->ext_write);
+	ymf271_init(chip, memory_region(Machine, RGNCLASS_SOUND, tag), intf->irq_callback, intf->ext_read, intf->ext_write);
 	chip->stream = stream_create(0, 2, clock/384, chip, ymf271_update);
 
 	for (i = 0; i < 256; i++)

@@ -46,7 +46,7 @@ WRITE8_HANDLER( exprraid_scrolly_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *tilerom = memory_region(machine, REGION_GFX4);
+	UINT8 *tilerom = memory_region(machine, RGNCLASS_GFX, "gfx4");
 
 	int data, attr, bank, code, color, flags;
 	int quadrant = 0, offs;

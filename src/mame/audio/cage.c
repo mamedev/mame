@@ -152,14 +152,14 @@ static WRITE32_HANDLER( speedup_w );
  *
  *************************************/
 
-void cage_init(running_machine *machine, int boot_region, offs_t speedup)
+void cage_init(running_machine *machine, offs_t speedup)
 {
 	attotime cage_cpu_clock_period;
 
 	cage_irqhandler = NULL;
 
-	memory_set_bankptr(10, memory_region(machine, boot_region));
-	memory_set_bankptr(11, memory_region(machine, boot_region + 1));
+	memory_set_bankptr(10, memory_region(machine, RGNCLASS_USER, "cageboot"));
+	memory_set_bankptr(11, memory_region(machine, RGNCLASS_SOUND, "cage"));
 
 	cage_cpu = mame_find_cpu_index(machine, "cage");
 	cage_cpu_clock_period = ATTOTIME_IN_HZ(cpunum_get_clock(cage_cpu));

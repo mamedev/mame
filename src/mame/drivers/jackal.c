@@ -279,11 +279,11 @@ static const gfx_layout spritelayout8 =
 /* Graphics Decode Information */
 
 static GFXDECODE_START( jackal )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout,        0,  1 )	// colors 256-511 without lookup
-	GFXDECODE_ENTRY( REGION_GFX1, 0x20000, spritelayout,  0x100, 16 )	// colors   0- 15 with lookup
-	GFXDECODE_ENTRY( REGION_GFX1, 0x20000, spritelayout8, 0x100, 16 )	// to handle 8x8 sprites
-	GFXDECODE_ENTRY( REGION_GFX1, 0x60000, spritelayout,  0x200, 16 )	// colors  16- 31 with lookup
-	GFXDECODE_ENTRY( REGION_GFX1, 0x60000, spritelayout8, 0x200, 16 )	// to handle 8x8 sprites
+	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,        0,  1 )	// colors 256-511 without lookup
+	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout,  0x100, 16 )	// colors   0- 15 with lookup
+	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout8, 0x100, 16 )	// to handle 8x8 sprites
+	GFXDECODE_ENTRY( "gfx1", 0x60000, spritelayout,  0x200, 16 )	// colors  16- 31 with lookup
+	GFXDECODE_ENTRY( "gfx1", 0x60000, spritelayout8, 0x200, 16 )	// to handle 8x8 sprites
 GFXDECODE_END
 
 /* Interrupt Generator */
@@ -301,7 +301,7 @@ static INTERRUPT_GEN( jackal_interrupt )
 
 static MACHINE_DRIVER_START( jackal )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", M6809, MASTER_CLOCK/12) // verified on pcb
+	MDRV_CPU_ADD("master", M6809, MASTER_CLOCK/12) // verified on pcb
 	MDRV_CPU_PROGRAM_MAP(master_map, 0)
 	MDRV_CPU_VBLANK_INT("main", jackal_interrupt)
 
@@ -339,75 +339,75 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( jackal )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* Banked 64k for 1st CPU */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "master", 0 )	/* Banked 64k for 1st CPU */
 	ROM_LOAD( "j-v02.rom",    0x04000, 0x8000, CRC(0b7e0584) SHA1(e4019463345a4c020d5a004c9a400aca4bdae07b) )
 	ROM_CONTINUE(             0x14000, 0x8000 )
 	ROM_LOAD( "j-v03.rom",    0x0c000, 0x4000, CRC(3e0dfb83) SHA1(5ba7073751eee33180e51143b348256597909516) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for 2nd cpu (Graphics & Sound)*/
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "slave", 0 )     /* 64k for 2nd cpu (Graphics & Sound)*/
 	ROM_LOAD( "631t01.bin",   0x8000, 0x8000, CRC(b189af6a) SHA1(f7df996c394fdd6f2ce128a8df38d7838f7ec6d6) )
 
-	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "631t04.bin",   0x00000, 0x20000, CRC(457f42f0) SHA1(08413a13d128875dddcf4f6ad302363096bf1d41) )
 	ROM_LOAD16_BYTE( "631t05.bin",   0x00001, 0x20000, CRC(732b3fc1) SHA1(7e89650b9e5e2b7ae82f8c55ac9995740f6fdfe1) )
 	ROM_LOAD16_BYTE( "631t06.bin",   0x40000, 0x20000, CRC(2d10e56e) SHA1(447b464ea725fb9ef87da067a41bcf463b427cce) )
 	ROM_LOAD16_BYTE( "631t07.bin",   0x40001, 0x20000, CRC(4961c397) SHA1(b430df58fc3bb722d6fb23bed7d04afdb7e5d9c1) )
 
-	ROM_REGION( 0x0200, REGION_PROMS, 0 )	/* color lookup tables */
+	ROM_REGION( 0x0200, RGNCLASS_PROMS, "proms", 0 )	/* color lookup tables */
 	ROM_LOAD( "631r08.bpr",   0x0000, 0x0100, CRC(7553a172) SHA1(eadf1b4157f62c3af4602da764268df954aa0018) )
 	ROM_LOAD( "631r09.bpr",   0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) )
 ROM_END
 
 ROM_START( topgunr )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* Banked 64k for 1st CPU */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "master", 0 )	/* Banked 64k for 1st CPU */
 	ROM_LOAD( "tgnr15d.bin",  0x04000, 0x8000, CRC(f7e28426) SHA1(db2d5f252a574b8aa4d8406a8e93b423fd2a7fef) )
 	ROM_CONTINUE(             0x14000, 0x8000 )
 	ROM_LOAD( "tgnr16d.bin",  0x0c000, 0x4000, CRC(c086844e) SHA1(4d6f27ac3aabb4b2d673aa619e407e417ad89337) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for 2nd cpu (Graphics & Sound)*/
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "slave", 0 )     /* 64k for 2nd cpu (Graphics & Sound)*/
 	ROM_LOAD( "631t01.bin",   0x8000, 0x8000, CRC(b189af6a) SHA1(f7df996c394fdd6f2ce128a8df38d7838f7ec6d6) )
 
-	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "tgnr7h.bin",   0x00000, 0x20000, CRC(50122a12) SHA1(c9e0132a3a40d9d28685c867c70231947d8a9cb7) )
 	ROM_LOAD16_BYTE( "tgnr8h.bin",   0x00001, 0x20000, CRC(6943b1a4) SHA1(40de2b434600ea4c8fb42e6b21be2c3705a55d67) )
 	ROM_LOAD16_BYTE( "tgnr12h.bin",  0x40000, 0x20000, CRC(37dbbdb0) SHA1(f94db780d69e7dd40231a75629af79469d957378) )
 	ROM_LOAD16_BYTE( "tgnr13h.bin",  0x40001, 0x20000, CRC(22effcc8) SHA1(4d174b0ce64def32050f87343c4b1424e0fef6f7) )
 
-	ROM_REGION( 0x0200, REGION_PROMS, 0 )	/* color lookup tables */
+	ROM_REGION( 0x0200, RGNCLASS_PROMS, "proms", 0 )	/* color lookup tables */
 	ROM_LOAD( "631r08.bpr",   0x0000, 0x0100, CRC(7553a172) SHA1(eadf1b4157f62c3af4602da764268df954aa0018) )
 	ROM_LOAD( "631r09.bpr",   0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) )
 ROM_END
 
 ROM_START( jackalj )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* Banked 64k for 1st CPU */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "master", 0 )	/* Banked 64k for 1st CPU */
 	ROM_LOAD( "631t02.bin",   0x04000, 0x8000, CRC(14db6b1a) SHA1(b469ea50aa94a2bda3bd0442300aa1272e5f30c4) )
 	ROM_CONTINUE(             0x14000, 0x8000 )
 	ROM_LOAD( "631t03.bin",   0x0c000, 0x4000, CRC(fd5f9624) SHA1(2520c1ff54410ef498ecbf52877f011900baed4c) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for 2nd cpu (Graphics & Sound)*/
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "slave", 0 )     /* 64k for 2nd cpu (Graphics & Sound)*/
 	ROM_LOAD( "631t01.bin",   0x8000, 0x8000, CRC(b189af6a) SHA1(f7df996c394fdd6f2ce128a8df38d7838f7ec6d6) )
 
-	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "631t04.bin",   0x00000, 0x20000, CRC(457f42f0) SHA1(08413a13d128875dddcf4f6ad302363096bf1d41) )
 	ROM_LOAD16_BYTE( "631t05.bin",   0x00001, 0x20000, CRC(732b3fc1) SHA1(7e89650b9e5e2b7ae82f8c55ac9995740f6fdfe1) )
 	ROM_LOAD16_BYTE( "631t06.bin",   0x40000, 0x20000, CRC(2d10e56e) SHA1(447b464ea725fb9ef87da067a41bcf463b427cce) )
 	ROM_LOAD16_BYTE( "631t07.bin",   0x40001, 0x20000, CRC(4961c397) SHA1(b430df58fc3bb722d6fb23bed7d04afdb7e5d9c1) )
 
-	ROM_REGION( 0x0200, REGION_PROMS, 0 )	/* color lookup tables */
+	ROM_REGION( 0x0200, RGNCLASS_PROMS, "proms", 0 )	/* color lookup tables */
 	ROM_LOAD( "631r08.bpr",   0x0000, 0x0100, CRC(7553a172) SHA1(eadf1b4157f62c3af4602da764268df954aa0018) )
 	ROM_LOAD( "631r09.bpr",   0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) )
 ROM_END
 
 ROM_START( topgunbl )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* Banked 64k for 1st CPU */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "master", 0 )	/* Banked 64k for 1st CPU */
 	ROM_LOAD( "t-3.c5",       0x04000, 0x8000, CRC(7826ad38) SHA1(875e87867924905b9b83bc203eb7ffe81cf72233) )
 	ROM_LOAD( "t-4.c4",       0x14000, 0x8000, CRC(976c8431) SHA1(c199f57c25380d741aec85b0e0bfb6acf383e6a6) )
 	ROM_LOAD( "t-2.c6",       0x0c000, 0x4000, CRC(d53172e5) SHA1(44b7f180c17f9a121a2f06f2d3471920a8989e21) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for 2nd cpu (Graphics & Sound)*/
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "slave", 0 )     /* 64k for 2nd cpu (Graphics & Sound)*/
 	ROM_LOAD( "t-1.c14",      0x8000, 0x8000, CRC(54aa2d29) SHA1(ebc6b3a5db5120cc33d62e3213d0e881f658282d) )
 
-	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "tgnr7h.bin",   0x00000, 0x20000, CRC(50122a12) SHA1(c9e0132a3a40d9d28685c867c70231947d8a9cb7) )
 	ROM_LOAD16_BYTE( "tgnr8h.bin",   0x00001, 0x20000, CRC(6943b1a4) SHA1(40de2b434600ea4c8fb42e6b21be2c3705a55d67) )
 	ROM_LOAD16_BYTE( "tgnr12h.bin",  0x40000, 0x20000, CRC(37dbbdb0) SHA1(f94db780d69e7dd40231a75629af79469d957378) )
@@ -433,7 +433,7 @@ ROM_START( topgunbl )
 	ROM_LOAD16_WORD_SWAP( "t-12.n7",      0x78000, 0x08000, CRC(15606dfc) )
 #endif
 
-	ROM_REGION( 0x0200, REGION_PROMS, 0 )	/* color lookup tables */
+	ROM_REGION( 0x0200, RGNCLASS_PROMS, "proms", 0 )	/* color lookup tables */
 	ROM_LOAD( "631r08.bpr",   0x0000, 0x0100, CRC(7553a172) SHA1(eadf1b4157f62c3af4602da764268df954aa0018) )
 	ROM_LOAD( "631r09.bpr",   0x0100, 0x0100, CRC(a74dd86c) SHA1(571f606f8fc0fd3d98d26761de79ccb4cc9ab044) )
 ROM_END

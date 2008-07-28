@@ -374,14 +374,15 @@ static UINT8 mc8123_decrypt(offs_t addr,UINT8 val,const UINT8 *key,int opcode)
 }
 
 
-void mc8123_decrypt_rom(running_machine *machine, int cpunum, const UINT8* key, int banknum, int numbanks)
+void mc8123_decrypt_rom(running_machine *machine, const char *cpu, const char *keyrgn, int banknum, int numbanks)
 {
 	UINT8 *decrypted1 = auto_malloc(numbanks == 1 ? 0xc000 : 0x8000);
 	UINT8 *decrypted2 = numbanks > 1 ? auto_malloc(0x4000 * numbanks) : decrypted1 + 0x8000;
-	UINT8 *rom = memory_region(machine, REGION_CPU1 + cpunum);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, cpu);
+	UINT8 *key = memory_region(machine, RGNCLASS_USER, keyrgn);
 	int A, bank;
 
-	memory_set_decrypted_region(cpunum, 0x0000, 0x7fff, decrypted1);
+	memory_set_decrypted_region(mame_find_cpu_index(machine, cpu), 0x0000, 0x7fff, decrypted1);
 	if (numbanks > 1)
 		memory_configure_bank_decrypted(banknum, 0, numbanks, decrypted2, 0x4000);
 

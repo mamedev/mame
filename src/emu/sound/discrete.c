@@ -288,7 +288,7 @@ node_description *discrete_find_node(void *chip, int node)
  *
  *************************************/
 
-static void *discrete_start(int sndindex, int clock, const void *config)
+static void *discrete_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	discrete_sound_block *intf = (discrete_sound_block *)config;
 	discrete_info *info;

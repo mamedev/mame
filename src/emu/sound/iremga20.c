@@ -49,7 +49,6 @@ struct IremGA20_channel_def
 
 struct IremGA20_chip_def
 {
-	const struct IremGA20_interface *intf;
 	UINT8 *rom;
 	INT32 rom_size;
 	sound_stream * stream;
@@ -227,7 +226,7 @@ static void iremga20_reset( void *_chip )
 }
 
 
-static void *iremga20_start(int sndindex, int clock, const void *config)
+static void *iremga20_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct IremGA20_chip_def *chip;
 	int i;
@@ -236,9 +235,8 @@ static void *iremga20_start(int sndindex, int clock, const void *config)
 	memset(chip, 0, sizeof(*chip));
 
 	/* Initialize our chip structure */
-	chip->intf = config;
-	chip->rom = memory_region(Machine, chip->intf->region);
-	chip->rom_size = memory_region_length(Machine, chip->intf->region);
+	chip->rom = memory_region(Machine, RGNCLASS_SOUND, tag);
+	chip->rom_size = memory_region_length(Machine, RGNCLASS_SOUND, tag);
 
 	iremga20_reset(chip);
 

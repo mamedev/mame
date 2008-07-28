@@ -202,18 +202,18 @@ WRITE8_HANDLER( rthunder_spriteram_w );
 
 static WRITE8_HANDLER( bankswitch1_w )
 {
-	UINT8 *base = memory_region(machine, REGION_CPU1) + 0x10000;
+	UINT8 *base = memory_region(machine, RGNCLASS_CPU, "cpu1") + 0x10000;
 
 	/* if the ROM expansion module is available, don't do anything. This avoids conflict */
 	/* with bankswitch1_ext_w() in wndrmomo */
-	if (memory_region(machine, REGION_USER1)) return;
+	if (memory_region(machine, RGNCLASS_USER, "user1")) return;
 
 	memory_set_bankptr(1,base + ((data & 0x03) * 0x2000));
 }
 
 static WRITE8_HANDLER( bankswitch1_ext_w )
 {
-	UINT8 *base = memory_region(machine, REGION_USER1);
+	UINT8 *base = memory_region(machine, RGNCLASS_USER, "user1");
 
 	if (base == 0) return;
 
@@ -222,7 +222,7 @@ static WRITE8_HANDLER( bankswitch1_ext_w )
 
 static WRITE8_HANDLER( bankswitch2_w )
 {
-	UINT8 *base = memory_region(machine, REGION_CPU2) + 0x10000;
+	UINT8 *base = memory_region(machine, RGNCLASS_CPU, "cpu2") + 0x10000;
 
 	memory_set_bankptr(2,base + ((data & 0x03) * 0x2000));
 }
@@ -314,7 +314,7 @@ static WRITE8_HANDLER( namcos86_led_w )
 static WRITE8_HANDLER( cus115_w )
 {
 	/* make sure the expansion board is present */
-	if (!memory_region(machine, REGION_USER1))
+	if (!memory_region(machine, RGNCLASS_USER, "user1"))
 	{
 		popmessage("expansion board not present");
 		return;
@@ -344,7 +344,7 @@ static WRITE8_HANDLER( cus115_w )
 
 static MACHINE_RESET( namco86 )
 {
-	UINT8 *base = memory_region(machine, REGION_CPU1) + 0x10000;
+	UINT8 *base = memory_region(machine, RGNCLASS_CPU, "cpu1") + 0x10000;
 
 	memory_set_bankptr(1,base);
 }
@@ -1039,9 +1039,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( namcos86 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,   2048*0, 256 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,   2048*0, 256 )
-	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 2048*1, 128 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   2048*0, 256 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   2048*0, 256 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 2048*1, 128 )
 GFXDECODE_END
 
 /*******************************************************************/
@@ -1049,15 +1049,8 @@ GFXDECODE_END
 static const struct namco_interface namco_interface =
 {
 	8,		/* number of voices */
-	-1,		/* memory region */
 	0		/* stereo */
 };
-
-static const struct namco_63701x_interface namco_63701x_interface =
-{
-	REGION_SOUND1	/* memory region */
-};
-
 
 
 static MACHINE_DRIVER_START( hopmappy )
@@ -1145,7 +1138,6 @@ static MACHINE_DRIVER_START( genpeitd )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("namco2", NAMCO_63701X, 6000000)
-	MDRV_SOUND_CONFIG(namco_63701x_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1162,7 +1154,6 @@ static MACHINE_DRIVER_START( rthunder )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("namco2", NAMCO_63701X, 6000000)
-	MDRV_SOUND_CONFIG(namco_63701x_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1179,7 +1170,6 @@ static MACHINE_DRIVER_START( wndrmomo )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("namco2", NAMCO_63701X, 6000000)
-	MDRV_SOUND_CONFIG(namco_63701x_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1192,35 +1182,35 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( skykiddx )
-	ROM_REGION( 0x18000, REGION_CPU1, 0 )
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu1", 0 )
 	ROM_LOAD( "sk3_1b.9c",    0x08000, 0x8000, CRC(767b3514) SHA1(7b85e520e56924235d1f4987333f183c914fafc1) )
 	ROM_LOAD( "sk3_2.9d",     0x10000, 0x8000, CRC(74b8f8e2) SHA1(0c9f0a283c764d5db59abea17a7f3285718b4501) )
 
-	ROM_REGION( 0x18000, REGION_CPU2, 0 )
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu2", 0 )
 	ROM_LOAD( "sk3_3.12c",    0x8000, 0x8000, CRC(6d1084c4) SHA1(0045e01cbeb750c50a561420f1577de8cd881894) )
 	/* 12d empty */
 
-	ROM_REGION( 0x0c000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "sk3_9.7r",     0x00000, 0x08000, CRC(48675b17) SHA1(434babcf5454364a17e529daae16e6f623ca75dd) )	/* plane 1,2 */
 	ROM_LOAD( "sk3_10.7s",    0x08000, 0x04000, CRC(7418465a) SHA1(e8236c3d077af147a7d5f8f9cd519d030c073aaf) )	/* plane 3 */
 
-	ROM_REGION( 0x0c000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "sk3_7.4r",     0x00000, 0x08000, CRC(4036b735) SHA1(4177f3f37feb83fab63a1160a939c8d566bbe16c) )	/* plane 1,2 */
 	ROM_LOAD( "sk3_8.4s",     0x08000, 0x04000, CRC(044bfd21) SHA1(4fbb72fbf041cb256377952d860147376fc1d05b) )	/* plane 3 */
 
-	ROM_REGION( 0x40000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "sk3_5.12h",    0x00000, 0x8000, CRC(5c7d4399) SHA1(9c57e2510b1a01f618364ddaa9b9fa0ce9ae7340) )
 	ROM_LOAD( "sk3_6.12k",    0x08000, 0x8000, CRC(c908a3b2) SHA1(5fd5304c314443fb3351e7a2d50a72a0fede7e6d) )
 	/* 12l/m/p/r/t/u empty */
 
-	ROM_REGION( 0x1420, REGION_PROMS, 0 )
+	ROM_REGION( 0x1420, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "sk3-1.3r",     0x0000, 0x0200, CRC(9e81dedd) SHA1(9d2ddf51788d22ed65db9070684e586b2f64f99e) )	/* red & green components */
 	ROM_LOAD( "sk3-2.3s",     0x0200, 0x0200, CRC(cbfec4dd) SHA1(98adf5db270a853ab2a2e1cdd9edfd5657287a96) )	/* blue component */
 	ROM_LOAD( "sk3-3.4v",     0x0400, 0x0800, CRC(81714109) SHA1(577e513369a4368b7dd29dff80904eb0ac2004ff) )	/* tiles color table */
 	ROM_LOAD( "sk3-4.5v",     0x0c00, 0x0800, CRC(1bf25acc) SHA1(a8db254ba4cbb85efc232a5bf9b268534455ad4a) )	/* sprites color table */
 	ROM_LOAD( "sk3-5.6u",     0x1400, 0x0020, CRC(e4130804) SHA1(e1a3e1383186d036fba6dc8a8681f48f24f59281) )	/* tile address decoder (used at runtime) */
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "mcu", 0 )
 	ROM_LOAD( "sk3_4.6b",       0x8000, 0x4000, CRC(e6cae2d6) SHA1(b6598aaee0136b0980e13326cb2835aadadd9543) )	/* subprogram for the MCU */
 	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )	/* MCU internal code */
 
@@ -1228,35 +1218,35 @@ ROM_START( skykiddx )
 ROM_END
 
 ROM_START( skykiddo )
-	ROM_REGION( 0x18000, REGION_CPU1, 0 )
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu1", 0 )
 	ROM_LOAD( "sk3_1.9c",     0x08000, 0x8000, CRC(5722a291) SHA1(0b3ca2585bf5c18214c1337dce8f92027e9d78c2) )
 	ROM_LOAD( "sk3_2.9d",     0x10000, 0x8000, CRC(74b8f8e2) SHA1(0c9f0a283c764d5db59abea17a7f3285718b4501) )
 
-	ROM_REGION( 0x18000, REGION_CPU2, 0 )
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu2", 0 )
 	ROM_LOAD( "sk3_3.12c",    0x8000, 0x8000, CRC(6d1084c4) SHA1(0045e01cbeb750c50a561420f1577de8cd881894) )
 	/* 12d empty */
 
-	ROM_REGION( 0x0c000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "sk3_9.7r",     0x00000, 0x08000, CRC(48675b17) SHA1(434babcf5454364a17e529daae16e6f623ca75dd) )	/* plane 1,2 */
 	ROM_LOAD( "sk3_10.7s",    0x08000, 0x04000, CRC(7418465a) SHA1(e8236c3d077af147a7d5f8f9cd519d030c073aaf) )	/* plane 3 */
 
-	ROM_REGION( 0x0c000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "sk3_7.4r",     0x00000, 0x08000, CRC(4036b735) SHA1(4177f3f37feb83fab63a1160a939c8d566bbe16c) )	/* plane 1,2 */
 	ROM_LOAD( "sk3_8.4s",     0x08000, 0x04000, CRC(044bfd21) SHA1(4fbb72fbf041cb256377952d860147376fc1d05b) )	/* plane 3 */
 
-	ROM_REGION( 0x40000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "sk3_5.12h",    0x00000, 0x8000, CRC(5c7d4399) SHA1(9c57e2510b1a01f618364ddaa9b9fa0ce9ae7340) )
 	ROM_LOAD( "sk3_6.12k",    0x08000, 0x8000, CRC(c908a3b2) SHA1(5fd5304c314443fb3351e7a2d50a72a0fede7e6d) )
 	/* 12l/m/p/r/t/u empty */
 
-	ROM_REGION( 0x1420, REGION_PROMS, 0 )
+	ROM_REGION( 0x1420, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "sk3-1.3r",     0x0000, 0x0200, CRC(9e81dedd) SHA1(9d2ddf51788d22ed65db9070684e586b2f64f99e) )	/* red & green components */
 	ROM_LOAD( "sk3-2.3s",     0x0200, 0x0200, CRC(cbfec4dd) SHA1(98adf5db270a853ab2a2e1cdd9edfd5657287a96) )	/* blue component */
 	ROM_LOAD( "sk3-3.4v",     0x0400, 0x0800, CRC(81714109) SHA1(577e513369a4368b7dd29dff80904eb0ac2004ff) )	/* tiles color table */
 	ROM_LOAD( "sk3-4.5v",     0x0c00, 0x0800, CRC(1bf25acc) SHA1(a8db254ba4cbb85efc232a5bf9b268534455ad4a) )	/* sprites color table */
 	ROM_LOAD( "sk3-5.6u",     0x1400, 0x0020, CRC(e4130804) SHA1(e1a3e1383186d036fba6dc8a8681f48f24f59281) )	/* tile address decoder (used at runtime) */
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "mcu", 0 )
 	ROM_LOAD( "sk3_4.6b",       0x8000, 0x4000, CRC(e6cae2d6) SHA1(b6598aaee0136b0980e13326cb2835aadadd9543) )	/* subprogram for the MCU */
 	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )	/* MCU internal code */
 
@@ -1264,34 +1254,34 @@ ROM_START( skykiddo )
 ROM_END
 
 ROM_START( hopmappy )
-	ROM_REGION( 0x18000, REGION_CPU1, 0 )
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu1", 0 )
 	ROM_LOAD( "hm1_1.9c",     0x08000, 0x8000, CRC(1a83914e) SHA1(6cb96b2518f4b867e20bd5d31ac6913d09c95f06) )
 	/* 9d empty */
 
-	ROM_REGION( 0x18000, REGION_CPU2, 0 )
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu2", 0 )
 	ROM_LOAD( "hm1_2.12c",    0xc000, 0x4000, CRC(c46cda65) SHA1(1131b4aa0a446569e1eb9f59964548058c7993e2) )
 	/* 12d empty */
 
-	ROM_REGION( 0x06000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "hm1_6.7r",     0x00000, 0x04000, CRC(fd0e8887) SHA1(b76737d22bb1c1ae4d700ea6796e8d91f6ffa275) )	/* plane 1,2 */
 	ROM_FILL(                 0x04000, 0x02000, 0 )			/* no plane 3 */
 
-	ROM_REGION( 0x06000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "hm1_5.4r",     0x00000, 0x04000, CRC(9c4f31ae) SHA1(1c7072355d6f98b8e8554da19eab0512fdd9e2e1) )	/* plane 1,2 */
 	ROM_FILL(                 0x04000, 0x02000, 0 )			/* no plane 3 */
 
-	ROM_REGION( 0x40000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "hm1_4.12h",    0x00000, 0x8000, CRC(78719c52) SHA1(06d7bb9f29ccdbf563b3bf13c0290510b26e186f) )
 	/* 12k/l/m/p/r/t/u empty */
 
-	ROM_REGION( 0x1420, REGION_PROMS, 0 )
+	ROM_REGION( 0x1420, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "hm1-1.3r",     0x0000, 0x0200, CRC(cc801088) SHA1(d2c39ac1694d9b8c426e253702ecd096e68c6db9) )	/* red & green components */
 	ROM_LOAD( "hm1-2.3s",     0x0200, 0x0200, CRC(a1cb71c5) SHA1(d8c33c2e52d64ebf4a07d8a26453e7b872cae413) )	/* blue component */
 	ROM_LOAD( "hm1-3.4v",     0x0400, 0x0800, CRC(e362d613) SHA1(16d87711c1ac4ac2b649a32a5627cbd62cc5031f) )	/* tiles color table */
 	ROM_LOAD( "hm1-4.5v",     0x0c00, 0x0800, CRC(678252b4) SHA1(9e2f7328532be3ac4b48bd5d52cd993108558452) )	/* sprites color table */
 	ROM_LOAD( "hm1-5.6u",     0x1400, 0x0020, CRC(475bf500) SHA1(7e6a91e57d3709a5c70786c8e3ed545ee6026d03) )	/* tile address decoder (used at runtime) */
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "mcu", 0 )
 	ROM_LOAD( "hm1_3.6b",       0x8000, 0x2000, CRC(6496e1db) SHA1(f990fb3b2f93295282e8dee4488a4c3fc5ef83d1) )	/* subprogram for the MCU */
 	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )	/* MCU internal code */
 
@@ -1299,23 +1289,23 @@ ROM_START( hopmappy )
 ROM_END
 
 ROM_START( roishtar )
-	ROM_REGION( 0x18000, REGION_CPU1, 0 )
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu1", 0 )
 	ROM_LOAD( "ri1_1c.9c",    0x08000, 0x8000, CRC(14acbacb) SHA1(3c6130f9e5a4ba84be0cc3547c1086707ee3b8e9) )
 	ROM_LOAD( "ri1_2.9d",     0x14000, 0x2000, CRC(fcd58d91) SHA1(e7b6d7afd7cf6c374ee90d6499ea0f205e742b21) )
 
-	ROM_REGION( 0x18000, REGION_CPU2, 0 )
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu2", 0 )
 	ROM_LOAD( "ri1_3.12c",    0x8000, 0x8000, CRC(a39829f7) SHA1(e08114d5154367a3cc36f1485253f18044a1888d) )
 	/* 12d empty */
 
-	ROM_REGION( 0x06000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "ri1_14.7r",    0x00000, 0x04000, CRC(de8154b4) SHA1(70a65e4656cf9fcf5c54e84c628ec95393e856fb) )	/* plane 1,2 */
 	ROM_LOAD( "ri1_15.7s",    0x04000, 0x02000, CRC(4298822b) SHA1(5aad41fd719c2f310ae485caaacda129c9f2ac94) )	/* plane 3 */
 
-	ROM_REGION( 0x06000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "ri1_12.4r",    0x00000, 0x04000, CRC(557e54d3) SHA1(d22969deefcb3c3443d08a215f1ec2e874650b19) )	/* plane 1,2 */
 	ROM_LOAD( "ri1_13.4s",    0x04000, 0x02000, CRC(9ebe8e32) SHA1(5990a86bfbf2669e512e8ca875c69b4c60c4d108) )	/* plane 3 */
 
-	ROM_REGION( 0x40000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "ri1_5.12h",    0x00000, 0x8000, CRC(46b59239) SHA1(bb08e57cd5864f41e27a07dcf449896570d2203d) )
 	ROM_LOAD( "ri1_6.12k",    0x08000, 0x8000, CRC(94d9ef48) SHA1(a13b345b8fe30dea8e85698782674859c385e79a) )
 	ROM_LOAD( "ri1_7.12l",    0x10000, 0x8000, CRC(da802b59) SHA1(b6551db5cd9c3d674cdf1dc59f581ee435a7eeb7) )
@@ -1325,14 +1315,14 @@ ROM_START( roishtar )
 	ROM_LOAD( "ri1_11.12t",   0x30000, 0x8000, CRC(fb6bc533) SHA1(a840af58d6db66518520bc7d88867a09a2e502c2) )
 	/* 12u empty */
 
-	ROM_REGION( 0x1420, REGION_PROMS, 0 )
+	ROM_REGION( 0x1420, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "ri1-1.3r",     0x0000, 0x0200, CRC(29cd0400) SHA1(a9b0d09492710e72e34155cd6a7b7c1a34c56b20) )	/* red & green components */
 	ROM_LOAD( "ri1-2.3s",     0x0200, 0x0200, CRC(02fd278d) SHA1(db104fc7acf2739def902180981eb7ba10ec3dda) )	/* blue component */
 	ROM_LOAD( "ri1-3.4v",     0x0400, 0x0800, CRC(cbd7e53f) SHA1(77ef70be4e8a21948d697649352a5e3527086cf2) )	/* tiles color table */
 	ROM_LOAD( "ri1-4.5v",     0x0c00, 0x0800, CRC(22921617) SHA1(7304cb5a86f524f912feb8b58801393cce5d3b09) )	/* sprites color table */
 	ROM_LOAD( "ri1-5.6u",     0x1400, 0x0020, CRC(e2188075) SHA1(be079ace2070433d4d90c757aef3e415b4e21455) )	/* tile address decoder (used at runtime) */
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "mcu", 0 )
 	ROM_LOAD( "ri1_4.6b",       0x0000, 0x4000, CRC(552172b8) SHA1(18b35cb116baba362831fc046241895198b07a53) )	/* subprogram for the MCU */
 	ROM_CONTINUE(               0x8000, 0x4000 )
 	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )	/* MCU internal code */
@@ -1341,23 +1331,23 @@ ROM_START( roishtar )
 ROM_END
 
 ROM_START( genpeitd )
-	ROM_REGION( 0x18000, REGION_CPU1, 0 )
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu1", 0 )
 	ROM_LOAD( "gt1_1b.9c",    0x08000, 0x8000, CRC(75396194) SHA1(2a526064fb91b2796c913f3050867352ac63e643) )
 	/* 9d empty */
 
-	ROM_REGION( 0x18000, REGION_CPU2, 0 )
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu2", 0 )
 	ROM_LOAD( "gt1_2.12c",    0xc000, 0x4000, CRC(302f2cb6) SHA1(19c39afb7d49d80aeaaf67a837cd02bfd3d64fbd) )
 	/* 12d empty */
 
-	ROM_REGION( 0x18000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "gt1_7.7r",     0x00000, 0x10000, CRC(ea77a211) SHA1(32b8ae11723b6223b42225805acd0dcab65516a5) )	/* plane 1,2 */
 	ROM_LOAD( "gt1_6.7s",     0x10000, 0x08000, CRC(1b128a2e) SHA1(6d7b95326919420538b509a119c26e9109e5539e) )	/* plane 3 */
 
-	ROM_REGION( 0x0c000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "gt1_5.4r",     0x00000, 0x08000, CRC(44d58b06) SHA1(9663f026092484a4041e486bad23e8e58a4dbf95) )	/* plane 1,2 */
 	ROM_LOAD( "gt1_4.4s",     0x08000, 0x04000, CRC(db8d45b0) SHA1(fd4ebdf442e8b9ccc026079c29a975b1fa6e8dd6) )	/* plane 3 */
 
-	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "gt1_11.12h",   0x00000, 0x20000, CRC(3181a5fe) SHA1(a98b8609afe3a41ed7b1432b3c2850e8de2c428b) )
 	ROM_LOAD( "gt1_12.12k",   0x20000, 0x20000, CRC(76b729ab) SHA1(d75aeca1ddbb690ff7442dee3b1d44331d220758) )
 	ROM_LOAD( "gt1_13.12l",   0x40000, 0x20000, CRC(e332a36e) SHA1(fa06da1e4f7ef3adf8e87d8d4d95aa7e0eb2d7b2) )
@@ -1367,24 +1357,24 @@ ROM_START( genpeitd )
 	ROM_LOAD( "gt1_8.12t",    0xc0000, 0x10000, CRC(ad7bc770) SHA1(babce324189b9380e1a71b63499362e276c99ea8) )
 	ROM_LOAD( "gt1_9.12u",    0xe0000, 0x10000, CRC(d95a5fd7) SHA1(819ac376ac0eb6ffa69153d579a9c11ae5feb6a4) )
 
-	ROM_REGION( 0x1420, REGION_PROMS, 0 )
+	ROM_REGION( 0x1420, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "gt1-1.3r",     0x0000, 0x0200, CRC(2f0ddddb) SHA1(27fa45c0baf9a48002db11be9b3c0472ecfd986c) )	/* red & green components */
 	ROM_LOAD( "gt1-2.3s",     0x0200, 0x0200, CRC(87d27025) SHA1(a50f969d48a99c6d29141458fb3e34b23cf5e67c) )	/* blue component */
 	ROM_LOAD( "gt1-3.4v",     0x0400, 0x0800, CRC(c178de99) SHA1(67289ef9e5068636023316560f9f1690a8384bfb) )	/* tiles color table */
 	ROM_LOAD( "gt1-4.5v",     0x0c00, 0x0800, CRC(9f48ef17) SHA1(78c813dd57326f3f5ab785005ef89ba96303adeb) )	/* sprites color table */
 	ROM_LOAD( "gt1-5.6u",     0x1400, 0x0020, CRC(e4130804) SHA1(e1a3e1383186d036fba6dc8a8681f48f24f59281) )	/* tile address decoder (used at runtime) */
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "mcu", 0 )
 	ROM_LOAD( "gt1_3.6b",       0x4000, 0x8000, CRC(315cd988) SHA1(87b1a90b2a53571f7d8f9a475125f3f31ed3cb5d) )	/* subprogram for the MCU */
 	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )	/* MCU internal code */
 
-	ROM_REGION( 0x40000, REGION_USER1, 0 ) /* bank switched data for CPU1 */
+	ROM_REGION( 0x40000, RGNCLASS_USER, "user1", 0 ) /* bank switched data for CPU1 */
 	ROM_LOAD( "gt1_10b.f1",   0x00000, 0x10000, CRC(5721ad0d) SHA1(f16afb3f468957a9de270366605592e14837b8c2) )
 	/* h1 empty */
 	/* k1 empty */
 	/* m1 empty */
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 ) /* PCM samples for Hitachi CPU */
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "namco2", 0 ) /* PCM samples for Hitachi CPU */
 	ROM_LOAD( "gt1_17.f3",    0x00000, 0x20000, CRC(26181ff8) SHA1(c97a0e6282b2af88d960c71e3af5283608493d31) )
 	ROM_LOAD( "gt1_18.h3",    0x20000, 0x20000, CRC(7ef9e5ea) SHA1(0464d43b39903ce373d70854bbcd5da05896ecae) )
 	ROM_LOAD( "gt1_19.k3",    0x40000, 0x20000, CRC(38e11f6c) SHA1(52dea9d444d5a0421db4a8bf5c79a9d901b6f005) )
@@ -1392,23 +1382,23 @@ ROM_START( genpeitd )
 ROM_END
 
 ROM_START( rthunder )
-	ROM_REGION( 0x18000, REGION_CPU1, 0 )
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu1", 0 )
 	ROM_LOAD( "rt3_1b.9c",    0x8000, 0x8000, CRC(7d252a1b) SHA1(cb92709e94eb273b3ce44c55cd252170ad1017f4) )
 	/* 9d empty */
 
-	ROM_REGION( 0x18000, REGION_CPU2, 0 )
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu2", 0 )
 	ROM_LOAD( "rt3_2b.12c",   0x08000, 0x8000, CRC(a7ea46ee) SHA1(52e8757aacb4e01f8432125729e2323c48ebc4f5) )
 	ROM_LOAD( "rt3_3.12d",    0x10000, 0x8000, CRC(a13f601c) SHA1(8987174e364d20eeab706c3e0d4e0d3c2b96723c) )
 
-	ROM_REGION( 0x18000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rt1_7.7r",     0x00000, 0x10000, CRC(a85efa39) SHA1(1ed63b421a93960668cb4558c1ca1b3c86b1f6be) )	/* plane 1,2 */
 	ROM_LOAD( "rt1_8.7s",     0x10000, 0x08000, CRC(f7a95820) SHA1(82fe0adf6c5b3abef19031646e1eca1585dcc481) )	/* plane 3 */
 
-	ROM_REGION( 0x0c000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "rt1_5.4r",     0x00000, 0x08000, CRC(d0fc470b) SHA1(70f7f1e29527044eae405f58af08bad3097990bd) )	/* plane 1,2 */
 	ROM_LOAD( "rt1_6.4s",     0x08000, 0x04000, CRC(6b57edb2) SHA1(4a8f1e024e5be4d76f2c99d506ae7da86af3d1f5) )	/* plane 3 */
 
-	ROM_REGION( 0x80000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "rt1_9.12h",    0x00000, 0x10000, CRC(8e070561) SHA1(483b4de79f2429236f45c32ec56b97a9a90574a3) )
 	ROM_LOAD( "rt1_10.12k",   0x10000, 0x10000, CRC(cb8fb607) SHA1(ba9400fb19d29a285897cc3a2d4d739ce845f897) )
 	ROM_LOAD( "rt1_11.12l",   0x20000, 0x10000, CRC(2bdf5ed9) SHA1(a771e922ad868ca1e008d08a8ff5fdf28aa315fc) )
@@ -1418,24 +1408,24 @@ ROM_START( rthunder )
 	ROM_LOAD( "rt1_15.12t",   0x60000, 0x10000, CRC(1d8bf2ca) SHA1(949ae8b00b94bfa5bc2d07888aafbaaaea559b06) )
 	ROM_LOAD( "rt1_16.12u",   0x70000, 0x10000, CRC(1bbcf37b) SHA1(8d27c49b36d5e23dd446c150ada3853eec75e4c1) )
 
-	ROM_REGION( 0x1420, REGION_PROMS, 0 )
+	ROM_REGION( 0x1420, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "rt1-1.3r",     0x0000, 0x0200, CRC(8ef3bb9d) SHA1(4636d6b8ba7611b11d4863fab02475dc4a619eaf) )	/* red & green components */
 	ROM_LOAD( "rt1-2.3s",     0x0200, 0x0200, CRC(6510a8f2) SHA1(935f140bfa7e6f8cebafa7f1b0de99dd319273d4) )	/* blue component */
 	ROM_LOAD( "rt1-3.4v",     0x0400, 0x0800, CRC(95c7d944) SHA1(ca5fea028674882a61507ac7c89ada96f5b2674d) )	/* tiles color table */
 	ROM_LOAD( "rt1-4.5v",     0x0c00, 0x0800, CRC(1391fec9) SHA1(8ca94e22110b20d2ecdf03610bcc89ff4245920f) )	/* sprites color table */
 	ROM_LOAD( "rt1-5.6u",     0x1400, 0x0020, CRC(e4130804) SHA1(e1a3e1383186d036fba6dc8a8681f48f24f59281) )	/* tile address decoder (used at runtime) */
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "mcu", 0 )
 	ROM_LOAD( "rt3_4.6b",       0x4000, 0x8000, CRC(00cf293f) SHA1(bc441d21bb4c54a01d2393fbe99201714cd4439d) )	/* subprogram for the MCU */
 	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )	/* MCU internal code */
 
-	ROM_REGION( 0x40000, REGION_USER1, 0 ) /* bank switched data for CPU1 */
+	ROM_REGION( 0x40000, RGNCLASS_USER, "user1", 0 ) /* bank switched data for CPU1 */
 	ROM_LOAD( "rt1_17.f1",    0x00000, 0x10000, CRC(766af455) SHA1(8c71772795e783d6c4b88af9a311d55e363c298a) )
 	ROM_LOAD( "rt1_18.h1",    0x10000, 0x10000, CRC(3f9f2f5d) SHA1(541b8f80800cb55e4b81ac48771d00fe10c90743) )
 	ROM_LOAD( "rt3_19.k1",    0x20000, 0x10000, CRC(c16675e9) SHA1(e31c28cb95ffa85392c74e1d81bfa89acbaefeb9) )
 	ROM_LOAD( "rt3_20.m1",    0x30000, 0x10000, CRC(c470681b) SHA1(87f8d8509c3e8207f34c6001aaf4d0afdad82d0d) )
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 ) /* PCM samples for Hitachi CPU */
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "namco2", 0 ) /* PCM samples for Hitachi CPU */
 	ROM_LOAD( "rt1_21.f3",    0x00000, 0x10000, CRC(454968f3) SHA1(e0a679353491190b6d4f0355324456a1bd7c8a7a) )
 	ROM_LOAD( "rt2_22.h3",    0x20000, 0x10000, CRC(fe963e72) SHA1(4c9ce4e4c8e756a743c541f670a6741b520125e3) )
 	/* k3 empty */
@@ -1443,23 +1433,23 @@ ROM_START( rthunder )
 ROM_END
 
 ROM_START( rthundro )
-	ROM_REGION( 0x18000, REGION_CPU1, 0 )
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu1", 0 )
 	ROM_LOAD( "r1",           0x8000, 0x8000, CRC(6f8c1252) SHA1(586f2e33dd16f31131e4ae9423d639fdc6555c9c) )
 	/* 9d empty */
 
-	ROM_REGION( 0x18000, REGION_CPU2, 0 )
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu2", 0 )
 	ROM_LOAD( "r2",           0x08000, 0x8000, CRC(f22a03d8) SHA1(5b81fc82813978d5cb69402be72b9ccc585fa1d0) )
 	ROM_LOAD( "r3",           0x10000, 0x8000, CRC(aaa82885) SHA1(fc2bec3cf7e2de5f90174a2ed3bacfa94b6819f4) )
 
-	ROM_REGION( 0x18000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rt1_7.7r",     0x00000, 0x10000, CRC(a85efa39) SHA1(1ed63b421a93960668cb4558c1ca1b3c86b1f6be) )	/* plane 1,2 */
 	ROM_LOAD( "rt1_8.7s",     0x10000, 0x08000, CRC(f7a95820) SHA1(82fe0adf6c5b3abef19031646e1eca1585dcc481) )	/* plane 3 */
 
-	ROM_REGION( 0x0c000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "rt1_5.4r",     0x00000, 0x08000, CRC(d0fc470b) SHA1(70f7f1e29527044eae405f58af08bad3097990bd) )	/* plane 1,2 */
 	ROM_LOAD( "rt1_6.4s",     0x08000, 0x04000, CRC(6b57edb2) SHA1(4a8f1e024e5be4d76f2c99d506ae7da86af3d1f5) )	/* plane 3 */
 
-	ROM_REGION( 0x80000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "rt1_9.12h",    0x00000, 0x10000, CRC(8e070561) SHA1(483b4de79f2429236f45c32ec56b97a9a90574a3) )
 	ROM_LOAD( "rt1_10.12k",   0x10000, 0x10000, CRC(cb8fb607) SHA1(ba9400fb19d29a285897cc3a2d4d739ce845f897) )
 	ROM_LOAD( "rt1_11.12l",   0x20000, 0x10000, CRC(2bdf5ed9) SHA1(a771e922ad868ca1e008d08a8ff5fdf28aa315fc) )
@@ -1469,24 +1459,24 @@ ROM_START( rthundro )
 	ROM_LOAD( "rt1_15.12t",   0x60000, 0x10000, CRC(1d8bf2ca) SHA1(949ae8b00b94bfa5bc2d07888aafbaaaea559b06) )
 	ROM_LOAD( "rt1_16.12u",   0x70000, 0x10000, CRC(1bbcf37b) SHA1(8d27c49b36d5e23dd446c150ada3853eec75e4c1) )
 
-	ROM_REGION( 0x1420, REGION_PROMS, 0 )
+	ROM_REGION( 0x1420, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "rt1-1.3r",     0x0000, 0x0200, CRC(8ef3bb9d) SHA1(4636d6b8ba7611b11d4863fab02475dc4a619eaf) )	/* red & green components */
 	ROM_LOAD( "rt1-2.3s",     0x0200, 0x0200, CRC(6510a8f2) SHA1(935f140bfa7e6f8cebafa7f1b0de99dd319273d4) )	/* blue component */
 	ROM_LOAD( "rt1-3.4v",     0x0400, 0x0800, CRC(95c7d944) SHA1(ca5fea028674882a61507ac7c89ada96f5b2674d) )	/* tiles color table */
 	ROM_LOAD( "rt1-4.5v",     0x0c00, 0x0800, CRC(1391fec9) SHA1(8ca94e22110b20d2ecdf03610bcc89ff4245920f) )	/* sprites color table */
 	ROM_LOAD( "rt1-5.6u",     0x1400, 0x0020, CRC(e4130804) SHA1(e1a3e1383186d036fba6dc8a8681f48f24f59281) )	/* tile address decoder (used at runtime) */
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "mcu", 0 )
 	ROM_LOAD( "r4",             0x4000, 0x8000, CRC(0387464f) SHA1(ce7f521bc2ecc6525880da2551daf595a394a275) )	/* subprogram for the MCU */
 	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )	/* MCU internal code */
 
-	ROM_REGION( 0x40000, REGION_USER1, 0 ) /* bank switched data for CPU1 */
+	ROM_REGION( 0x40000, RGNCLASS_USER, "user1", 0 ) /* bank switched data for CPU1 */
 	ROM_LOAD( "rt1_17.f1",    0x00000, 0x10000, CRC(766af455) SHA1(8c71772795e783d6c4b88af9a311d55e363c298a) )
 	ROM_LOAD( "rt1_18.h1",    0x10000, 0x10000, CRC(3f9f2f5d) SHA1(541b8f80800cb55e4b81ac48771d00fe10c90743) )
 	ROM_LOAD( "r19",          0x20000, 0x10000, CRC(fe9343b0) SHA1(ae8e5ee11eaf7dc1e8f814b0a0beef97731f042b) )
 	ROM_LOAD( "r20",          0x30000, 0x10000, CRC(f8518d4f) SHA1(3a8551d46ffdf82844b2eb1b2c01cf2d8423a49e) )
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 ) /* PCM samples for Hitachi CPU */
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "namco2", 0 ) /* PCM samples for Hitachi CPU */
 	ROM_LOAD( "rt1_21.f3",    0x00000, 0x10000, CRC(454968f3) SHA1(e0a679353491190b6d4f0355324456a1bd7c8a7a) )
 	ROM_LOAD( "rt2_22.h3",    0x20000, 0x10000, CRC(fe963e72) SHA1(4c9ce4e4c8e756a743c541f670a6741b520125e3) )
 	/* k3 empty */
@@ -1494,23 +1484,23 @@ ROM_START( rthundro )
 ROM_END
 
 ROM_START( wndrmomo )
-	ROM_REGION( 0x18000, REGION_CPU1, 0 )
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu1", 0 )
 	ROM_LOAD( "wm1_1.9c",     0x8000, 0x8000, CRC(34b50bf0) SHA1(112c8c8a0a16382008cacd2e484f91fa9338d10a) )
 	/* 9d empty */
 
-	ROM_REGION( 0x18000, REGION_CPU2, 0 )
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "cpu2", 0 )
 	ROM_LOAD( "wm1_2.12c",    0x8000, 0x8000, CRC(3181efd0) SHA1(01a2e0e4c8ced6f48b6e70393a3c4152b079e9b0) )
 	/* 12d empty */
 
-	ROM_REGION( 0x0c000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "wm1_6.7r",     0x00000, 0x08000, CRC(93955fbb) SHA1(cffd457886c40bf709b573237165ae8fa9784e32) )	/* plane 1,2 */
 	ROM_LOAD( "wm1_7.7s",     0x08000, 0x04000, CRC(7d662527) SHA1(09d1dc46a402c67dddcdd4cc90f32948c7a28795) )	/* plane 3 */
 
-	ROM_REGION( 0x0c000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "wm1_4.4r",     0x00000, 0x08000, CRC(bbe67836) SHA1(bc998c2ddc2664db614e7c487f77073a5be69e89) )	/* plane 1,2 */
 	ROM_LOAD( "wm1_5.4s",     0x08000, 0x04000, CRC(a81b481f) SHA1(b5a029e432b29e157505b975ea57cd4b5da361a7) )	/* plane 3 */
 
-	ROM_REGION( 0x80000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "wm1_8.12h",    0x00000, 0x10000, CRC(14f52e72) SHA1(0f8f58cd13e3393a113817593816f53a218f3ce4) )
 	ROM_LOAD( "wm1_9.12k",    0x10000, 0x10000, CRC(16f8cdae) SHA1(8281b4c66157580f34aec7c035d06f721f77b3d5) )
 	ROM_LOAD( "wm1_10.12l",   0x20000, 0x10000, CRC(bfbc1896) SHA1(0308cf907c77417ad3f84326b074567a00245998) )
@@ -1520,24 +1510,24 @@ ROM_START( wndrmomo )
 	ROM_LOAD( "wm1_14.12t",   0x60000, 0x10000, CRC(2ae21a53) SHA1(ef3e5e4fa8580f7891d9e1825d2eda4c387db732) )
 	ROM_LOAD( "wm1_15.12u",   0x70000, 0x10000, CRC(b5c98be0) SHA1(bdd6e0e02632866eea60a6bdeff3af8b6cd08d68) )
 
-	ROM_REGION( 0x1420, REGION_PROMS, 0 )
+	ROM_REGION( 0x1420, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "wm1-1.3r",     0x0000, 0x0200, CRC(1af8ade8) SHA1(1aa0d314c34abc4154092d4b588214afb0b21e22) )	/* red & green components */
 	ROM_LOAD( "wm1-2.3s",     0x0200, 0x0200, CRC(8694e213) SHA1(f00d692e587c3706e71b6eeef21e1ea87c9dd921) )	/* blue component */
 	ROM_LOAD( "wm1-3.4v",     0x0400, 0x0800, CRC(2ffaf9a4) SHA1(2002df3cc38e05f3e127d05c244cb101d1f1d85f) )	/* tiles color table */
 	ROM_LOAD( "wm1-4.5v",     0x0c00, 0x0800, CRC(f4e83e0b) SHA1(b000d884c6e0373b0403bc9d63eb0452c1197491) )	/* sprites color table */
 	ROM_LOAD( "wm1-5.6u",     0x1400, 0x0020, CRC(e4130804) SHA1(e1a3e1383186d036fba6dc8a8681f48f24f59281) )	/* tile address decoder (used at runtime) */
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "mcu", 0 )
 	ROM_LOAD( "wm1_3.6b",       0x4000, 0x8000, CRC(55f01df7) SHA1(c11574a8b51bf965790b97895452e9fa9ab6b752) )	/* subprogram for the MCU */
 	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )	/* MCU internal code */
 
-	ROM_REGION( 0x40000, REGION_USER1, 0 ) /* bank switched data for CPU1 */
+	ROM_REGION( 0x40000, RGNCLASS_USER, "user1", 0 ) /* bank switched data for CPU1 */
 	ROM_LOAD( "wm1_16.f1",    0x00000, 0x10000, CRC(e565f8f3) SHA1(e1f417003ef9f700f9d5ed091484463c704c8b9f) )
 	/* h1 empty */
 	/* k1 empty */
 	/* m1 empty */
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 ) /* PCM samples for Hitachi CPU */
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "namco2", 0 ) /* PCM samples for Hitachi CPU */
 	ROM_LOAD( "wm1_17.f3",    0x00000, 0x10000, CRC(bea3c318) SHA1(50b6e4c546ce056d68fbb2e52cb88397daa615aa) )
 	ROM_LOAD( "wm1_18.h3",    0x20000, 0x10000, CRC(6d73bcc5) SHA1(fccd83bb3a872b4cd8bd9f11f5cdf5926cb9b74e) )
 	ROM_LOAD( "wm1_19.k3",    0x40000, 0x10000, CRC(d288e912) SHA1(d0db58d7ed3d8cf895e031901f91f810f0e18709) )
@@ -1553,8 +1543,8 @@ static DRIVER_INIT( namco86 )
 	UINT8 *buffer;
 
 	/* shuffle tile ROMs so regular gfx unpack routines can be used */
-	gfx = memory_region(machine, REGION_GFX1);
-	size = memory_region_length(machine, REGION_GFX1) * 2 / 3;
+	gfx = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	size = memory_region_length(machine, RGNCLASS_GFX, "gfx1") * 2 / 3;
 	buffer = malloc_or_die( size );
 
 	{
@@ -1578,8 +1568,8 @@ static DRIVER_INIT( namco86 )
 		free( buffer );
 	}
 
-	gfx = memory_region(machine, REGION_GFX2);
-	size = memory_region_length(machine, REGION_GFX2) * 2 / 3;
+	gfx = memory_region(machine, RGNCLASS_GFX, "gfx2");
+	size = memory_region_length(machine, RGNCLASS_GFX, "gfx2") * 2 / 3;
 	buffer = malloc_or_die( size );
 
 	{

@@ -111,7 +111,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( fortecar )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 static VIDEO_START(fortecar)
@@ -164,10 +164,10 @@ static MACHINE_DRIVER_START( fortecar )
 MACHINE_DRIVER_END
 
 ROM_START( fortecar )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "fortecar.u7", 0x00000, 0x10000, CRC(2a4b3429) SHA1(8fa630dac949e758678a1a36b05b3412abe8ae16)  )
 
-	ROM_REGION( 0x30000, REGION_GFX1, 0 )
+	ROM_REGION( 0x30000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD( "fortecar.u38", 0x00000, 0x10000, CRC(c2090690) SHA1(f0aa8935b90a2ab6043555ece69f926372246648) )
 	ROM_LOAD( "fortecar.u39", 0x10000, 0x10000, CRC(fc3ddf4f) SHA1(4a95b24c4edb67f6d59f795f86dfbd12899e01b0) )
 	ROM_LOAD( "fortecar.u40", 0x20000, 0x10000, CRC(9693bb83) SHA1(e3e3bc750c89a1edd1072ce3890b2ce498dec633) )

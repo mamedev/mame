@@ -455,7 +455,7 @@ static void update_stereo(void *param, stream_sample_t **inputs, stream_sample_t
 	}
 }
 
-static void *c140_start(int sndindex, int clock, const void *config)
+static void *c140_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	const struct C140interface *intf = config;
 	struct c140_info *info;
@@ -469,8 +469,7 @@ static void *c140_start(int sndindex, int clock, const void *config)
 
 	info->stream = stream_create(0,2,info->sample_rate,info,update_stereo);
 
-	if (intf->region)
-		info->pRom=memory_region(Machine, intf->region);
+	info->pRom=memory_region(Machine, RGNCLASS_SOUND, tag);
 
 	/* make decompress pcm table */		//2000.06.26 CAB
 	{

@@ -42,7 +42,7 @@ static INTERRUPT_GEN( chqflag_interrupt )
 static WRITE8_HANDLER( chqflag_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	/* bits 0-4 = ROM bank # (0x00-0x11) */
 	bankaddress = 0x10000 + (data & 0x1f)*0x4000;
@@ -347,13 +347,11 @@ static void volume_callback1(int v)
 
 static const struct K007232_interface k007232_interface_1 =
 {
-	REGION_SOUND1,
 	volume_callback0
 };
 
 static const struct K007232_interface k007232_interface_2 =
 {
-	REGION_SOUND2,
 	volume_callback1
 };
 
@@ -406,62 +404,62 @@ static MACHINE_DRIVER_START( chqflag )
 MACHINE_DRIVER_END
 
 ROM_START( chqflag )
-	ROM_REGION( 0x58800, REGION_CPU1, 0 )	/* 052001 code */
+	ROM_REGION( 0x58800, RGNCLASS_CPU, "main", 0 )	/* 052001 code */
 	ROM_LOAD( "717h02",		0x050000, 0x008000, CRC(f5bd4e78) SHA1(7bab02152d055a6c3a322c88e7ee0b85a39d8ef2) )	/* banked ROM */
 	ROM_CONTINUE(			0x008000, 0x008000 )				/* fixed ROM */
 	ROM_LOAD( "717e10",		0x010000, 0x040000, CRC(72fc56f6) SHA1(433ea9a33f0230e046c731c70060f6a38db14ac7) )	/* banked ROM */
 	/* extra memory for banked RAM */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the SOUND CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )	/* 64k for the SOUND CPU */
 	ROM_LOAD( "717e01",		0x000000, 0x008000, CRC(966b8ba8) SHA1(ab7448cb61fa5922b1d8ae5f0d0f42d734ed4f93) )
 
-    ROM_REGION( 0x100000, REGION_GFX1, 0 )	/* graphics (addressable by the main CPU) */
+    ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD( "717e04",		0x000000, 0x080000, CRC(1a50a1cc) SHA1(bc16fab84c637ed124e37b115ddc0149560b727d) )	/* sprites */
 	ROM_LOAD( "717e05",		0x080000, 0x080000, CRC(46ccb506) SHA1(3ed1f54744fc5cdc0f48e42f250c366267a8199a) )	/* sprites */
 
-	ROM_REGION( 0x020000, REGION_GFX2, 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x020000, RGNCLASS_GFX, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD( "717e06",		0x000000, 0x020000, CRC(1ec26c7a) SHA1(05b5b522c5ebf5d0a71a7fc39ec9382008ef33c8) )	/* zoom/rotate (N16) */
 
-	ROM_REGION( 0x100000, REGION_GFX3, 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx3", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD( "717e07",		0x000000, 0x040000, CRC(b9a565a8) SHA1(a11782f7336e5ad58a4c6ea81f2eeac35d5e7d0a) )	/* zoom/rotate (L20) */
 	ROM_LOAD( "717e08",		0x040000, 0x040000, CRC(b68a212e) SHA1(b2bd121a43552c3ade528ac763a0df40c3e648e0) )	/* zoom/rotate (L22) */
 	ROM_LOAD( "717e11",		0x080000, 0x040000, CRC(ebb171ec) SHA1(d65d4a6b169ce03e4427b2a397484634f938236b) )	/* zoom/rotate (N20) */
 	ROM_LOAD( "717e12",		0x0c0000, 0x040000, CRC(9269335d) SHA1(af298c8cff50d707d6abc806065f8e931f975dc0) )	/* zoom/rotate (N22) */
 
-	ROM_REGION( 0x080000, REGION_SOUND1, 0 )	/* 007232 data (chip 1) */
+	ROM_REGION( 0x080000, RGNCLASS_SOUND, "konami1", 0 )	/* 007232 data (chip 1) */
 	ROM_LOAD( "717e03",		0x000000, 0x080000, CRC(ebe73c22) SHA1(fad3334e5e91bf8d11b74ffdbbfd57567e6f6f8c) )
 
-	ROM_REGION( 0x080000, REGION_SOUND2, 0 )	/* 007232 data (chip 2) */
+	ROM_REGION( 0x080000, RGNCLASS_SOUND, "konami2", 0 )	/* 007232 data (chip 2) */
 	ROM_LOAD( "717e09",		0x000000, 0x080000, CRC(d74e857d) SHA1(00c851c857650d67fc4caccea4461d99be4acb3c) )
 ROM_END
 
 ROM_START( chqflagj )
-	ROM_REGION( 0x58800, REGION_CPU1, 0 )	/* 052001 code */
+	ROM_REGION( 0x58800, RGNCLASS_CPU, "main", 0 )	/* 052001 code */
 	ROM_LOAD( "717j02.bin",	0x050000, 0x008000, CRC(05355daa) SHA1(130ddbc289c077565e44f33c63a63963e6417e19) )	/* banked ROM */
 	ROM_CONTINUE(			0x008000, 0x008000 )				/* fixed ROM */
 	ROM_LOAD( "717e10",		0x010000, 0x040000, CRC(72fc56f6) SHA1(433ea9a33f0230e046c731c70060f6a38db14ac7) )	/* banked ROM */
 	/* extra memory for banked RAM */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the SOUND CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )	/* 64k for the SOUND CPU */
 	ROM_LOAD( "717e01",		0x000000, 0x008000, CRC(966b8ba8) SHA1(ab7448cb61fa5922b1d8ae5f0d0f42d734ed4f93) )
 
-    ROM_REGION( 0x100000, REGION_GFX1, 0 )	/* graphics (addressable by the main CPU) */
+    ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD( "717e04",		0x000000, 0x080000, CRC(1a50a1cc) SHA1(bc16fab84c637ed124e37b115ddc0149560b727d) )	/* sprites */
 	ROM_LOAD( "717e05",		0x080000, 0x080000, CRC(46ccb506) SHA1(3ed1f54744fc5cdc0f48e42f250c366267a8199a) )	/* sprites */
 
-	ROM_REGION( 0x020000, REGION_GFX2, 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x020000, RGNCLASS_GFX, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD( "717e06",		0x000000, 0x020000, CRC(1ec26c7a) SHA1(05b5b522c5ebf5d0a71a7fc39ec9382008ef33c8) )	/* zoom/rotate (N16) */
 
-	ROM_REGION( 0x100000, REGION_GFX3, 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx3", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD( "717e07",		0x000000, 0x040000, CRC(b9a565a8) SHA1(a11782f7336e5ad58a4c6ea81f2eeac35d5e7d0a) )	/* zoom/rotate (L20) */
 	ROM_LOAD( "717e08",		0x040000, 0x040000, CRC(b68a212e) SHA1(b2bd121a43552c3ade528ac763a0df40c3e648e0) )	/* zoom/rotate (L22) */
 	ROM_LOAD( "717e11",		0x080000, 0x040000, CRC(ebb171ec) SHA1(d65d4a6b169ce03e4427b2a397484634f938236b) )	/* zoom/rotate (N20) */
 	ROM_LOAD( "717e12",		0x0c0000, 0x040000, CRC(9269335d) SHA1(af298c8cff50d707d6abc806065f8e931f975dc0) )	/* zoom/rotate (N22) */
 
-	ROM_REGION( 0x080000, REGION_SOUND1, 0 )	/* 007232 data (chip 1) */
+	ROM_REGION( 0x080000, RGNCLASS_SOUND, "konami1", 0 )	/* 007232 data (chip 1) */
 	ROM_LOAD( "717e03",		0x000000, 0x080000, CRC(ebe73c22) SHA1(fad3334e5e91bf8d11b74ffdbbfd57567e6f6f8c) )
 
-	ROM_REGION( 0x080000, REGION_SOUND2, 0 )	/* 007232 data (chip 2) */
+	ROM_REGION( 0x080000, RGNCLASS_SOUND, "konami2", 0 )	/* 007232 data (chip 2) */
 	ROM_LOAD( "717e09",		0x000000, 0x080000, CRC(d74e857d) SHA1(00c851c857650d67fc4caccea4461d99be4acb3c) )
 ROM_END
 
@@ -469,9 +467,9 @@ ROM_END
 
 static DRIVER_INIT( chqflag )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
-	konami_rom_deinterleave_2(REGION_GFX1);
+	konami_rom_deinterleave_2("gfx1");
 	paletteram = &RAM[0x58000];
 }
 

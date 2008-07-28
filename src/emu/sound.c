@@ -295,7 +295,7 @@ static void start_sound_chips(void)
 		VPRINTF(("sndnum = %d -- sound_type = %d\n", sndnum, msound->type));
 		num_regs = state_save_get_reg_count();
 		streams_set_tag(Machine, info);
-		if (sndintrf_init_sound(sndnum, msound->type, msound->clock, msound->config) != 0)
+		if (sndintrf_init_sound(sndnum, msound->tag, msound->type, msound->clock, msound->config) != 0)
 			fatalerror("Sound chip #%d (%s) failed to initialize!", sndnum, sndnum_name(sndnum));
 
 		/* if no state registered for saving, we can't save */

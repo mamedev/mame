@@ -191,9 +191,9 @@ static const gfx_layout spritelayout =
 
 
 static GFXDECODE_START( mouser )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,       0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, spritelayout,     0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x1800, spritelayout,     0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,       0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x1000, spritelayout,     0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x1800, spritelayout,     0, 16 )
 GFXDECODE_END
 
 
@@ -235,48 +235,48 @@ MACHINE_DRIVER_END
 
 
 ROM_START( mouser )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 ) /* 64K for data, 64K for encrypted opcodes */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) /* 64K for data, 64K for encrypted opcodes */
 	ROM_LOAD( "m0.5e",         0x0000, 0x2000, CRC(b56e00bc) SHA1(f3b23212590d91f1d19b1c7a98c560fbe5943185) )
 	ROM_LOAD( "m1.5f",         0x2000, 0x2000, CRC(ae375d49) SHA1(8422f5a4d8560425f0c8612cf6f76029fcfe267c) )
 	ROM_LOAD( "m2.5j",         0x4000, 0x2000, CRC(ef5817e4) SHA1(5cadc19f20fadf97c95852b280305fe4c75f1d19) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
 	ROM_LOAD( "m5.3v",         0x0000, 0x1000, CRC(50705eec) SHA1(252cea3498722318638f0c98ae929463ffd7d0d6) )
 
-	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "m3.11h",        0x0000, 0x2000, CRC(aca2834e) SHA1(c4f457fd8ea46386431ef8dffe54a232631870be) )
 	ROM_LOAD( "m4.11k",        0x2000, 0x2000, CRC(943ab2e2) SHA1(ef9fc31dc8fe7a62f7bc6c817ce0d65091cb9a03) )
 
 	/* Opcode Decryption PROMS */
-	ROM_REGION( 0x0100, REGION_USER1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0100, RGNCLASS_USER, "user1", ROMREGION_DISPOSE )
 	ROM_LOAD_NIB_HIGH( "bprom.4b",0x0000,0x0100,CRC(dd233851) SHA1(25eab1ec2227910c6fcd2803986f1cf206624da7) )
 	ROM_LOAD_NIB_LOW(  "bprom.4c",0x0000,0x0100,CRC(60aaa686) SHA1(bb2ad555da51f6b30ab8b55833fe8d461a1e67f4) )
 
-	ROM_REGION( 0x0040, REGION_PROMS, 0 )
+	ROM_REGION( 0x0040, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "bprom.5v", 0x0000, 0x0020, CRC(7f8930b2) SHA1(8d0fe14b770fcf7088696d7b80d64507c6ee7364) )
 	ROM_LOAD( "bprom.5u", 0x0020, 0x0020, CRC(0086feed) SHA1(b0b368e5fb7380cf09abd60c0933b405daf1c36a) )
 ROM_END
 
 
 ROM_START( mouserc )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 ) /* 64K for data, 64K for encrypted opcodes */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) /* 64K for data, 64K for encrypted opcodes */
 	ROM_LOAD( "83001.0",       0x0000, 0x2000, CRC(e20f9601) SHA1(f559a470784bda0bee9cab257a548238365acaa6) )
 	ROM_LOAD( "m1.5f",         0x2000, 0x2000, CRC(ae375d49) SHA1(8422f5a4d8560425f0c8612cf6f76029fcfe267c) )	// 83001.1
 	ROM_LOAD( "m2.5j",         0x4000, 0x2000, CRC(ef5817e4) SHA1(5cadc19f20fadf97c95852b280305fe4c75f1d19) )	// 83001.2
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
 	ROM_LOAD( "m5.3v",         0x0000, 0x1000, CRC(50705eec) SHA1(252cea3498722318638f0c98ae929463ffd7d0d6) )	// 83001.5
 
-	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "m3.11h",        0x0000, 0x2000, CRC(aca2834e) SHA1(c4f457fd8ea46386431ef8dffe54a232631870be) )	// 83001.3
 	ROM_LOAD( "m4.11k",        0x2000, 0x2000, CRC(943ab2e2) SHA1(ef9fc31dc8fe7a62f7bc6c817ce0d65091cb9a03) )	// 83001.4
 
 	/* Opcode Decryption PROMS (originally from the UPL romset!) */
-	ROM_REGION( 0x0100, REGION_USER1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0100, RGNCLASS_USER, "user1", ROMREGION_DISPOSE )
 	ROM_LOAD_NIB_HIGH( "bprom.4b",0x0000,0x0100,CRC(dd233851) SHA1(25eab1ec2227910c6fcd2803986f1cf206624da7) )
 	ROM_LOAD_NIB_LOW(  "bprom.4c",0x0000,0x0100,CRC(60aaa686) SHA1(bb2ad555da51f6b30ab8b55833fe8d461a1e67f4) )
 
-	ROM_REGION( 0x0040, REGION_PROMS, 0 )
+	ROM_REGION( 0x0040, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "bprom.5v", 0x0000, 0x0020, CRC(7f8930b2) SHA1(8d0fe14b770fcf7088696d7b80d64507c6ee7364) )	// clr.5v
 	ROM_LOAD( "bprom.5u", 0x0020, 0x0020, CRC(0086feed) SHA1(b0b368e5fb7380cf09abd60c0933b405daf1c36a) )	// clr.5u
 ROM_END
@@ -287,9 +287,9 @@ static DRIVER_INIT( mouser )
 	/* Decode the opcodes */
 
 	offs_t i;
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 	UINT8 *decrypted = auto_malloc(0x6000);
-	UINT8 *table = memory_region(machine, REGION_USER1);
+	UINT8 *table = memory_region(machine, RGNCLASS_USER, "user1");
 
 	memory_set_decrypted_region(0, 0x0000, 0x5fff, decrypted);
 

@@ -51,7 +51,7 @@ static INTERRUPT_GEN( ddrible_interrupt_1 )
 static WRITE8_HANDLER( ddrible_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	bankaddress = 0x10000 + (data & 0x0f)*0x2000;
 	memory_set_bankptr(1,&RAM[bankaddress]);
@@ -100,7 +100,7 @@ static READ8_HANDLER( ddrible_vlm5030_busy_r )
 
 static WRITE8_HANDLER( ddrible_vlm5030_ctrl_w )
 {
-	UINT8 *SPEECH_ROM = memory_region(machine, REGION_SOUND1);
+	UINT8 *SPEECH_ROM = memory_region(machine, RGNCLASS_SOUND, "vlm");
 	/* b7 : vlm data bus OE   */
 	/* b6 : VLM5030-RST       */
 	/* b5 : VLM5030-ST        */
@@ -319,10 +319,10 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( ddrible )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout,    48,  1 )	/* colors 48-63 */
-	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, charlayout,    16,  1 )	/* colors 16-31 */
-	GFXDECODE_ENTRY( REGION_GFX1, 0x20000, spritelayout,  32,  1 )	/* colors 32-47 */
-	GFXDECODE_ENTRY( REGION_GFX2, 0x40000, spritelayout,  64, 16 )	/* colors  0-15 but using lookup table */
+	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,    48,  1 )	/* colors 48-63 */
+	GFXDECODE_ENTRY( "gfx2", 0x00000, charlayout,    16,  1 )	/* colors 16-31 */
+	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout,  32,  1 )	/* colors 32-47 */
+	GFXDECODE_ENTRY( "gfx2", 0x40000, spritelayout,  64, 16 )	/* colors  0-15 but using lookup table */
 GFXDECODE_END
 
 static const struct YM2203interface ym2203_interface =
@@ -340,7 +340,6 @@ static const struct YM2203interface ym2203_interface =
 
 static const struct VLM5030interface vlm5030_interface =
 {
-	REGION_SOUND1,/* memory region of speech rom */
 	0x10000     /* memory size 64Kbyte * 2 bank */
 };
 
@@ -401,33 +400,33 @@ MACHINE_DRIVER_END
 
 
 ROM_START( ddribble )
-	ROM_REGION( 0x1a000, REGION_CPU1, 0 ) /* 64K CPU #0 + 40K for Banked ROMS */
+	ROM_REGION( 0x1a000, RGNCLASS_CPU, "main", 0 ) /* 64K CPU #0 + 40K for Banked ROMS */
 	ROM_LOAD( "690c03.bin",	0x10000, 0x0a000, CRC(07975a58) SHA1(96fd1b2348bbdf560067d8ee3cd4c0514e263d7a) )
 	ROM_CONTINUE(			0x0a000, 0x06000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64 for the CPU #1 */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu1", 0 ) /* 64 for the CPU #1 */
 	ROM_LOAD( "690c02.bin", 0x08000, 0x08000, CRC(f07c030a) SHA1(db96a10f8bb657bf285266db9e775fa6af82f38c) )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the SOUND CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu2", 0 )	/* 64k for the SOUND CPU */
 	ROM_LOAD( "690b01.bin", 0x08000, 0x08000, CRC(806b8453) SHA1(3184772c5e5181438a17ac72129070bf164b2965) )
 
-	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "690a05.bin",	0x00000, 0x20000, CRC(6a816d0d) SHA1(73f2527d5f2b9d51b784be36e07e0d0c566a28d9) )	/* characters & objects */
 	ROM_LOAD16_BYTE( "690a06.bin",	0x00001, 0x20000, CRC(46300cd0) SHA1(07197a546fff452a41575fcd481da64ac6bf601e) )
 
-	ROM_REGION( 0x80000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "690a10.bin", 0x00000, 0x20000, CRC(61efa222) SHA1(bd7b993ad1c06d8f6ac29fbc07c4a987abe1ab42) )	/* characters */
 	ROM_LOAD16_BYTE( "690a09.bin", 0x00001, 0x20000, CRC(ab682186) SHA1(a28982835042a07354557e1539b097cdf93fc466) )
 	ROM_LOAD16_BYTE( "690a08.bin", 0x40000, 0x20000, CRC(9a889944) SHA1(ca96815aefb1e336bd2288841b00a5c21cacf90f) )	/* objects */
 	ROM_LOAD16_BYTE( "690a07.bin", 0x40001, 0x20000, CRC(faf81b3f) SHA1(0bd647b4cdd3f2209472e303fd22eedd5533d1b1) )
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "690a11.i15", 0x0000, 0x0100, CRC(f34617ad) SHA1(79ceba6fe204472a5a659641ac4f14bb1f0ee3f6) )	/* sprite lookup table */
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 )	/* 128k for the VLM5030 data */
+	ROM_REGION( 0x20000, RGNCLASS_SOUND, "vlm", 0 )	/* 128k for the VLM5030 data */
 	ROM_LOAD( "690a04.bin", 0x00000, 0x20000, CRC(1bfeb763) SHA1(f3e9acb2a7a9b4c8dee6838c1344a7a65c27ff77) )
 
-	ROM_REGION( 0x0100, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0100, RGNCLASS_PLDS, "plds", ROMREGION_DISPOSE )
 	ROM_LOAD( "pal10l8-007553.bin", 0x0000, 0x002c, CRC(0ae5a161) SHA1(87571addf434b332019ea0e22372eb24b4fd0197) )
 ROM_END
 

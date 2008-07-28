@@ -412,8 +412,8 @@ static const gfx_layout mugsmash2_layout =
 };
 
 static GFXDECODE_START( mugsmash )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, mugsmash_layout,   0x00, 16  ) /* sprites */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, mugsmash2_layout,  0x100, 256  ) /* bg tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, mugsmash_layout,   0x00, 16  ) /* sprites */
+	GFXDECODE_ENTRY( "gfx2", 0, mugsmash2_layout,  0x100, 256  ) /* bg tiles */
 GFXDECODE_END
 
 static void irq_handler(running_machine *machine, int irq)
@@ -457,24 +457,24 @@ static MACHINE_DRIVER_START( mugsmash )
 	MDRV_SOUND_ROUTE(1, "right", 1.00)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1122000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)	/* sound fx */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 MACHINE_DRIVER_END
 
 ROM_START( mugsmash )
-	ROM_REGION( 0x80000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "mugs_04.bin", 0x00000, 0x40000, CRC(2498fd27) SHA1(7b746efe8aaf346e4489118ac2a3fc9929a55b83) )
 	ROM_LOAD16_BYTE( "mugs_05.bin", 0x00001, 0x40000, CRC(95efb40b) SHA1(878c0a3754aa728f58044c6a7f243724b718fe1b) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* Z80 Code */
 	ROM_LOAD( "mugs_03.bin", 0x00000, 0x10000 , CRC(0101df2d) SHA1(35e1efa4a11c0f9d9db5ee057926e5de29c3a4c1) )
 
-	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_REGION( 0x040000, RGNCLASS_SOUND, "oki", 0 ) /* Samples */
 	ROM_LOAD( "mugs_02.bin", 0x00000, 0x20000, CRC(f92a7f4a) SHA1(3717ef64876be9ada378b449749918ce9072073a) )
 	ROM_LOAD( "mugs_01.bin", 0x20000, 0x20000, CRC(1a3a0b39) SHA1(8847530027cf4be03ffbc6d78dee97b459d03a04) )
 
-	ROM_REGION( 0x300000, REGION_GFX1, 0 ) /* Sprites */
+	ROM_REGION( 0x300000, RGNCLASS_GFX, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD16_BYTE( "mugs_11.bin", 0x000000, 0x080000, CRC(1c9f5acf) SHA1(dd8329ed05a3467844c26d3f89ffb6213aba2034) )
 	ROM_LOAD16_BYTE( "mugs_10.bin", 0x000001, 0x080000, CRC(6b3c22d9) SHA1(7ba6d754c08ed5b2be282ffd6a674c3a4aa0e9b2) )
 	ROM_LOAD16_BYTE( "mugs_09.bin", 0x100000, 0x080000, CRC(4e9490f3) SHA1(e5f195c9bee3b92c559d1100c1019473a30ba28e) )
@@ -482,7 +482,7 @@ ROM_START( mugsmash )
 	ROM_LOAD16_BYTE( "mugs_07.bin", 0x200000, 0x080000, CRC(9e3167fd) SHA1(8c73c26e8e50e8f2ee3307f5aef23caba90c22eb) )
 	ROM_LOAD16_BYTE( "mugs_06.bin", 0x200001, 0x080000, CRC(8df75d29) SHA1(d0add24ac974da4636d2631f5590516de0f8df4a) )
 
-	ROM_REGION( 0x200000, REGION_GFX2, 0 ) /* BG Tiles */
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", 0 ) /* BG Tiles */
 	ROM_LOAD( "mugs_12.bin", 0x000000, 0x080000, CRC(c0a6ed98) SHA1(13850c6bcca65bdc782040c470c4966aee19551d) )
 	ROM_LOAD( "mugs_13.bin", 0x080000, 0x080000, CRC(e2be8595) SHA1(077b1a262c54acf74e6ec37702bcfed41bc31000) )
 	ROM_LOAD( "mugs_14.bin", 0x100000, 0x080000, CRC(24e81068) SHA1(1e33aa7d2b873dd13d5823880c46d3d3e867d6b6) )

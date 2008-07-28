@@ -17,16 +17,16 @@ static INT16 *samplebuf;	/* buffer to decode samples at run time */
 static void cclimber_sh_start(void)
 {
 	samplebuf = 0;
-	if (memory_region(Machine, REGION_SOUND1))
-		samplebuf = auto_malloc(sizeof(*samplebuf)*2*memory_region_length(Machine, REGION_SOUND1));
+	if (memory_region(Machine, RGNCLASS_SOUND, "samples"))
+		samplebuf = auto_malloc(sizeof(*samplebuf)*2*memory_region_length(Machine, RGNCLASS_SOUND, "samples"));
 }
 
 
 static void cclimber_play_sample(int start,int freq,int volume)
 {
 	int len;
-	int romlen = memory_region_length(Machine, REGION_SOUND1);
-	const UINT8 *rom = memory_region(Machine, REGION_SOUND1);
+	int romlen = memory_region_length(Machine, RGNCLASS_SOUND, "samples");
+	const UINT8 *rom = memory_region(Machine, RGNCLASS_SOUND, "samples");
 
 
 	if (!rom) return;

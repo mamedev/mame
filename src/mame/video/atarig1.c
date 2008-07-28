@@ -70,7 +70,7 @@ VIDEO_START( atarig1 )
 {
 	static const atarirle_desc modesc_hydra =
 	{
-		REGION_GFX3,/* region where the GFX data lives */
+		"gfx3",		/* region where the GFX data lives */
 		256,		/* number of entries in sprite RAM */
 		0,			/* left clip coordinate */
 		255,		/* right clip coordinate */
@@ -91,7 +91,7 @@ VIDEO_START( atarig1 )
 
 	static const atarirle_desc modesc_pitfight =
 	{
-		REGION_GFX3,/* region where the GFX data lives */
+		"gfx3",		/* region where the GFX data lives */
 		256,		/* number of entries in sprite RAM */
 		40,			/* left clip coordinate */
 		295,		/* right clip coordinate */

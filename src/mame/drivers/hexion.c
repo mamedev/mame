@@ -265,7 +265,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( hexion )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
 
@@ -305,7 +305,7 @@ static MACHINE_DRIVER_START( hexion )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("konami", K051649, 24000000/16)
@@ -321,18 +321,18 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( hexion )
-	ROM_REGION( 0x34800, REGION_CPU1, 0 )	/* ROMs + space for additional RAM */
+	ROM_REGION( 0x34800, RGNCLASS_CPU, "main", 0 )	/* ROMs + space for additional RAM */
 	ROM_LOAD( "122jab01.bin", 0x00000, 0x20000, CRC(eabc6dd1) SHA1(e74c1f1f2fcf8973f0741a2d544f25c8639448bf) )
 	ROM_RELOAD(               0x10000, 0x20000 )	/* banked at 8000-9fff */
 
-	ROM_REGION( 0x80000, REGION_GFX1, 0 )	/* addressable by the main CPU */
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", 0 )	/* addressable by the main CPU */
 	ROM_LOAD( "122a07.bin",   0x00000, 0x40000, CRC(22ae55e3) SHA1(41bdc990f69416b639542e2186a3610c16389063) )
 	ROM_LOAD( "122a06.bin",   0x40000, 0x40000, CRC(438f4388) SHA1(9e23805c9642a237daeaf106187d1e1e0692434d) )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )	/* OKIM6295 samples */
 	ROM_LOAD( "122a05.bin",   0x0000, 0x40000, CRC(bcc831bf) SHA1(c3382065dd0069a4dc0bde2d9931ec85b0bffc73) )
 
-	ROM_REGION( 0x0300, REGION_PROMS, 0 )
+	ROM_REGION( 0x0300, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "122a04.10b",   0x0000, 0x0100, CRC(506eb8c6) SHA1(3bff7cf286942d8bdbc3998245c3de20981fbecb) )
 	ROM_LOAD( "122a03.11b",   0x0100, 0x0100, CRC(590c4f64) SHA1(db4b34f8c5fdfea034a94d65873f6fb842f123e9) )
 	ROM_LOAD( "122a02.13b",   0x0200, 0x0100, CRC(5734305c) SHA1(c72e59acf79a4db1a5a9d827eef899c0675336f2) )

@@ -18,8 +18,8 @@ WRITE8_HANDLER( fghtbskt_samples_w )
 
 void fghtbskt_sh_start(void)
 {
-	int i, len = memory_region_length(Machine, REGION_SOUND1);
-	UINT8 *ROM = memory_region(Machine, REGION_SOUND1);
+	int i, len = memory_region_length(Machine, RGNCLASS_SOUND, "samples");
+	UINT8 *ROM = memory_region(Machine, RGNCLASS_SOUND, "samples");
 
 	samplebuf = auto_malloc(len * 2);
 

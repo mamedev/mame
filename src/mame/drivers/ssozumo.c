@@ -224,9 +224,9 @@ static const gfx_layout spritelayout =
 
 
 static GFXDECODE_START( ssozumo )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 4 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,   4*8, 4 )
-	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 8*8, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 4 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   4*8, 4 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 8*8, 2 )
 GFXDECODE_END
 
 
@@ -272,7 +272,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( ssozumo )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	/* Main Program ROMs */
 	ROM_LOAD( "ic61.g01",	0x06000, 0x2000, CRC(86968f46) SHA1(6acd111b71fbb4ef00ae03be4fb93d305a6564e7) )	// m1
 	ROM_LOAD( "ic60.g11",	0x08000, 0x2000, CRC(1a5143dd) SHA1(19e36afcd0827f14f4360b55d952cc1af38327fd) )	// m2
@@ -280,7 +280,7 @@ ROM_START( ssozumo )
 	ROM_LOAD( "ic58.g31",	0x0c000, 0x2000, CRC(0ee43a78) SHA1(383a29a2dfdbd600dacf3885039759efab718a45) )	// m4
 	ROM_LOAD( "ic57.g41",	0x0e000, 0x2000, CRC(ac77aa4c) SHA1(36ee826327e4433bcdcb8d770fc6176f53d3eed0) )	// m5
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
 	/* Sound Program & Voice Sample ROMs*/
 	ROM_LOAD( "ic47.g50",	0x04000, 0x2000, CRC(b64ec829) SHA1(684f1c37c05fc3812f11e040fb96789c8abb987f) )	// a1
 	ROM_LOAD( "ic46.g60",	0x06000, 0x2000, CRC(630d7380) SHA1(aab3f034417a9712c8fa922946eda02751c9e319) )	// a2
@@ -289,19 +289,19 @@ ROM_START( ssozumo )
 	ROM_LOAD( "ic43.g90",	0x0c000, 0x2000, CRC(20262064) SHA1(2845efa458f4fd873b8559489bcee4b9d8e437c1) )	// a5
 	ROM_LOAD( "ic42.ga0",	0x0e000, 0x2000, CRC(98d7e998) SHA1(16bb3315db7d52531a3297e1255478aa1ebc32c2) )	// a6
 
-	ROM_REGION( 0x06000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	/* Character ROMs */
 	ROM_LOAD( "ic22.gq0",	0x00000, 0x2000, CRC(b4c7e612) SHA1(2d4f6f79b65aa27e00f173777959ec07e81ff15e) )	// c1
 	ROM_LOAD( "ic23.gr0",	0x02000, 0x2000, CRC(90bb9fda) SHA1(9c065a54330133e5afadcb2ae29add5e1005d977) )	// c2
 	ROM_LOAD( "ic21.gs0",	0x04000, 0x2000, CRC(d8cd5c78) SHA1(f1567850db649d2b7a029a5f71bbade25bb0393f) )	// c3
 
-	ROM_REGION( 0x06000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	/* tile set ROMs */
 	ROM_LOAD( "ic69.gt0",	0x00000, 0x2000, CRC(771116ca) SHA1(2d1c656315f57e1a142725e2d2034543cb3917ea) )	// t1
 	ROM_LOAD( "ic59.gu0",	0x02000, 0x2000, CRC(68035bfd) SHA1(da535ff6860f71c1780d4d9dfd1944e355234c5b) )	// t2
 	ROM_LOAD( "ic81.gv0",	0x04000, 0x2000, CRC(cdda1f9f) SHA1(d1f1b3e0578fd991c74d4a85313c5d37f08f1eee) )	// t3
 
-	ROM_REGION( 0x1e000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x1e000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	/* sprites ROMs */
 	ROM_LOAD( "ic06.gg0",	0x00000, 0x2000, CRC(d2342c50) SHA1(f502b716d659d9fd3119dbb454296fe9e280fa5d) )	// s1a
 	ROM_LOAD( "ic05.gh0",	0x02000, 0x2000, CRC(14a3cb10) SHA1(7b6d63f43ebbe3c3aea7f2e04789cdb78cdd8495) )	// s1b
@@ -319,7 +319,7 @@ ROM_START( ssozumo )
 	ROM_LOAD( "ic41.ge0",	0x1a000, 0x2000, CRC(935578d0) SHA1(e9a9f439e0781627df076c454b16f5796ac991bc) )	// s3d
 	ROM_LOAD( "ic40.gf0",	0x1c000, 0x2000, CRC(5a3bf1ba) SHA1(6beebb7ac9c8baa3bbb5b0ebf6a6da768e52d1d3) )	// s3e
 
-	ROM_REGION( 0x0080, REGION_PROMS, 0 )
+	ROM_REGION( 0x0080, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "ic33.gz0",	0x00000, 0x0020, CRC(523d29ad) SHA1(48d0ae83a07e4409a1def56772c5156e8d505749) )	/* char palette red and green components */
 	ROM_LOAD( "ic30.gz2",	0x00020, 0x0020, CRC(0de202e1) SHA1(ca1aa66c1d3d4724d322ec0346860c37729ddaed) )	/* tile palette red and green components */
 	ROM_LOAD( "ic32.gz1",	0x00040, 0x0020, CRC(6fbff4d2) SHA1(b2cd38fa8e9a74539b96d6e8e0375fff2dd77a20) )	/* char palette blue component */

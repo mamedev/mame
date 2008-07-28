@@ -51,8 +51,8 @@ static UINT16 data_9a0000, data_998000, data_9b0000, data_9a8000, data_990000, d
 
 static WRITE16_HANDLER(blitter_9b8000_w)
 {
-	UINT8 *rom = memory_region(machine, REGION_GFX1);
-	int len=memory_region_length(machine, REGION_GFX1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	int len=memory_region_length(machine, RGNCLASS_GFX, "gfx1");
 	int w = video_screen_get_width(machine->primary_screen);
 	int h = video_screen_get_height(machine->primary_screen);
 	int x,y;
@@ -248,20 +248,20 @@ MACHINE_DRIVER_END
 
 
 ROM_START( steaser )
-	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u31.1", 0x00001, 0x20000, CRC(7963e960) SHA1(2a1c68265e0a3909ccd097ea784e3e179f528844) )
 	ROM_LOAD16_BYTE( "u32.6", 0x00000, 0x20000, CRC(c0ab5fb1) SHA1(15b3dbf0242e885b7009c21479544a821d4e5a7d) )
 
-	ROM_REGION( 0x1000, REGION_CPU2, 0 ) /* 68705 */
+	ROM_REGION( 0x1000, RGNCLASS_CPU, "cpu1", 0 ) /* 68705 */
 	ROM_LOAD( "mc68hc705c8p_main.mcu", 0x00000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x1000, REGION_CPU3, 0 ) /* 68705 */
+	ROM_REGION( 0x1000, RGNCLASS_CPU, "cpu2", 0 ) /* 68705 */
 	ROM_LOAD( "mc68hc705c8p_sub.mcu", 0x00000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 ) /* Sound Samples */
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "samples", 0 ) /* Sound Samples */
 	ROM_LOAD( "u18.7", 0x00000, 0x80000, CRC(ee942232) SHA1(b9c1fc73c6006bcad0dd177e0f30a96f1063a993) )
 
-	ROM_REGION( 0x200000, REGION_GFX1, 0 ) /* GFX */
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 ) /* GFX */
 	ROM_LOAD( "u46.2", 0x000000, 0x80000, CRC(c4a5e47b) SHA1(9f3d3124c76c0bdf8cdca849e1d921a335e433b6) )
 	ROM_LOAD( "u51.3", 0x080000, 0x80000, CRC(4dc57435) SHA1(7dfa6f9e35986dd48869786abbe70103f336bcb1) )
 	ROM_LOAD( "u61.4", 0x100000, 0x80000, CRC(d8d8dc6f) SHA1(5a76b1fd1a3a532e5ff2de127286ace7d3567c58) )

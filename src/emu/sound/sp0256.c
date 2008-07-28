@@ -1169,7 +1169,7 @@ static void sp0256_update(void *param, stream_sample_t **inputs, stream_sample_t
 	}
 }
 
-static void *sp0256_start(int sndindex, int clock, const void *config)
+static void *sp0256_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	const struct sp0256_interface *intf = config;
 	struct sp0256 *sp;
@@ -1206,7 +1206,7 @@ static void *sp0256_start(int sndindex, int clock, const void *config)
     /* -------------------------------------------------------------------- */
     /*  Setup the ROM.                                                      */
     /* -------------------------------------------------------------------- */
-	sp->rom = memory_region(Machine, intf->memory_region);
+	sp->rom = memory_region(Machine, RGNCLASS_SOUND, tag);
 	sp0256_bitrevbuff(sp->rom, 0, 0xffff);
 
 	return sp;

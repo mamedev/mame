@@ -43,7 +43,7 @@ static void cdda_update(void *param, stream_sample_t **inputs, stream_sample_t *
     cdda_start - audio start callback
 -------------------------------------------------*/
 
-static void *cdda_start(int sndindex, int clock, const void *config)
+static void *cdda_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	const struct CDDAinterface *intf;
 	cdda_info *info;

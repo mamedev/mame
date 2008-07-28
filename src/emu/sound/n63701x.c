@@ -33,7 +33,6 @@ struct namco_63701x
 {
 	voice voices[2];
 	sound_stream * stream;		/* channel assigned by the mixer */
-	const struct namco_63701x_interface *intf;	/* pointer to our config data */
 	UINT8 *rom;		/* pointer to sample ROM */
 };
 
@@ -101,15 +100,14 @@ static void namco_63701x_update(void *param, stream_sample_t **inputs, stream_sa
 }
 
 
-static void *namco_63701x_start(int sndindex, int clock, const void *config)
+static void *namco_63701x_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct namco_63701x *chip;
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
-	chip->intf = config;
-	chip->rom = memory_region(Machine, chip->intf->region);
+	chip->rom = memory_region(Machine, RGNCLASS_SOUND, tag);
 
 	chip->stream = stream_create(0, 2, clock/1000, chip, namco_63701x_update);
 

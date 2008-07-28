@@ -566,8 +566,8 @@ VIDEO_UPDATE( atarisy1 )
 
 static void decode_gfx(running_machine *machine, UINT16 *pflookup, UINT16 *molookup)
 {
-	UINT8 *prom1 = &memory_region(machine, REGION_PROMS)[0x000];
-	UINT8 *prom2 = &memory_region(machine, REGION_PROMS)[0x200];
+	UINT8 *prom1 = &memory_region(machine, RGNCLASS_PROMS, "proms")[0x000];
+	UINT8 *prom2 = &memory_region(machine, RGNCLASS_PROMS, "proms")[0x200];
 	int obj, i;
 
 	/* reset the globals */
@@ -656,7 +656,7 @@ static int get_bank(running_machine *machine, UINT8 prom1, UINT8 prom2, int bpp)
 		return bank_gfx[bpp - 4][bank_index];
 
 	/* if the bank is out of range, call it 0 */
-	if (0x80000 * (bank_index - 1) >= memory_region_length(machine, REGION_GFX2))
+	if (0x80000 * (bank_index - 1) >= memory_region_length(machine, RGNCLASS_GFX, "gfx2"))
 		return 0;
 
 	/* don't have one? let's make it ... first find any empty slot */
@@ -683,7 +683,7 @@ static int get_bank(running_machine *machine, UINT8 prom1, UINT8 prom2, int bpp)
 	default:
 		fatalerror("Unsupported bpp");
 	}
-	decodegfx(machine->gfx[gfx_index], &memory_region(machine, REGION_GFX2)[0x80000 * (bank_index - 1)], 0, machine->gfx[gfx_index]->total_elements);
+	decodegfx(machine->gfx[gfx_index], &memory_region(machine, RGNCLASS_GFX, "gfx2")[0x80000 * (bank_index - 1)], 0, machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */
 	machine->gfx[gfx_index]->color_base = 256;

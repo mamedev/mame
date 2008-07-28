@@ -13,8 +13,6 @@ WRITE16_HANDLER( cps1_eeprom_port_w );
 
 INTERRUPT_GEN( cps1_qsound_interrupt );
 
-extern const struct QSound_interface qsound_interface;
-
 READ16_HANDLER( cps1_dsw_r );
 READ16_HANDLER( cps1_in1_r );
 READ16_HANDLER( cps1_in2_r );

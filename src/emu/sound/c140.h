@@ -18,7 +18,6 @@ enum
 
 struct C140interface {
     int banking_type;
-    int region;
 };
 
 #endif

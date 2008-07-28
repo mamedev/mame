@@ -294,9 +294,9 @@ static const gfx_layout triplhnt_tile_layout =
 
 
 static GFXDECODE_START( triplhnt )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, triplhnt_small_sprite_layout, 0, 1 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, triplhnt_large_sprite_layout, 0, 1 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, triplhnt_tile_layout, 4, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0, triplhnt_small_sprite_layout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, triplhnt_large_sprite_layout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, triplhnt_tile_layout, 4, 2 )
 GFXDECODE_END
 
 
@@ -349,7 +349,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( triplhnt )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD_NIB_HIGH( "8404.f1", 0x7000, 0x400, CRC(abc8acd5) SHA1(bcef2abc5829829a01aa21776c3deb2e1bf1d4ac) )
 	ROM_LOAD_NIB_LOW ( "8408.f2", 0x7000, 0x400, CRC(77fcdd3f) SHA1(ce0196abb8d6510aa9a5308f8efd6442e94272c4) )
 	ROM_LOAD_NIB_HIGH( "8403.e1", 0x7400, 0x400, CRC(8d756fa1) SHA1(48a74f710b130d9af0c866483d6fc4ecce4a3ac5) )
@@ -361,11 +361,11 @@ ROM_START( triplhnt )
 	ROM_LOAD_NIB_LOW ( "8405.c2", 0x7C00, 0x400, CRC(ba370b97) SHA1(5d799ce6ae56c315ff0abedea7ad9204bacc266b) )
 	ROM_RELOAD(                   0xFC00, 0x400 )
 
-	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )  /* sprites */
+	ROM_REGION( 0x1000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )  /* sprites */
 	ROM_LOAD( "8423.n1", 0x0000, 0x800, CRC(9937d0da) SHA1(abb906c2d9869b09be5172cc7639bb9cda38831b) )
 	ROM_LOAD( "8422.r1", 0x0800, 0x800, CRC(803621dd) SHA1(ffbd7f87a86477e5eb94f12fc20a837128a02442) )
 
-	ROM_REGION( 0x200, REGION_GFX2, ROMREGION_DISPOSE )   /* tiles */
+	ROM_REGION( 0x200, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )   /* tiles */
 	ROM_LOAD_NIB_HIGH( "8409.l3", 0x0000, 0x200, CRC(ec304172) SHA1(ccbf7e117fef7fa4288e3bf68f1a150b3a492ce6) )
 	ROM_LOAD_NIB_LOW ( "8410.m3", 0x0000, 0x200, CRC(f75a1b08) SHA1(81b4733194462cd4cef7f4221ecb7abd1556b871) )
 ROM_END

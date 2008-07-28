@@ -130,7 +130,7 @@ logerror("%04x: keyboard_w %02x\n",activecpu_get_pc(),data);
 
 static READ8_HANDLER( samples_r )
 {
-	return memory_region(machine, REGION_SOUND1)[offset];
+	return memory_region(machine, RGNCLASS_SOUND, "adpcm")[offset];
 }
 
 static WRITE8_HANDLER( adpcm_w )
@@ -156,7 +156,7 @@ static WRITE8_HANDLER( ctrl_w )
 
 static WRITE8_HANDLER( themj_rombank_w )
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU1) + 0x10000;
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main") + 0x10000;
 	int bank = data & 0x03;
 logerror("banksw %d\n",bank);
 	memory_set_bankptr(1, rom + bank*0x4000);
@@ -421,11 +421,11 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( 1 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
 static GFXDECODE_START( 2 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 64 )
 GFXDECODE_END
 
 
@@ -516,7 +516,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( rmhaihai )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "s3-6.11g",     0x00000, 0x2000, CRC(e7af7ba2) SHA1(1b0f87a16006a96e5b59e055966addac3e2ca926) )
 	ROM_CONTINUE(             0x06000, 0x2000 )
 	ROM_LOAD( "s3-4.8g",      0x04000, 0x2000, CRC(f849e75c) SHA1(4636bcaa7cddb9bc012212098a25f3c57cfc6b51) )
@@ -524,7 +524,7 @@ ROM_START( rmhaihai )
 	ROM_LOAD( "s3-2.6g",      0x08000, 0x2000, CRC(d614532b) SHA1(99911c679ff6f990ae493bfc0b71a2fff0ef1796) )
 	ROM_CONTINUE(             0x0c000, 0x2000 )
 
-	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "s0-10.8a",     0x00000, 0x4000, CRC(797c63d1) SHA1(2ff9c3c61b28c34de97c0117b7eadb409d79df46) )
 	ROM_LOAD( "s0-9.7a",      0x04000, 0x4000, CRC(b2526747) SHA1(73d0a19a5bb83e8977e94a47abbb65f9c7788c78) )
 	ROM_LOAD( "s0-8.6a",      0x08000, 0x4000, CRC(146eaa31) SHA1(0e38aab52ff9bf0d42fea24caeee6ca90d63ace2) )
@@ -533,17 +533,17 @@ ROM_START( rmhaihai )
 	ROM_LOAD( "s1-11.10a",    0x14000, 0x4000, CRC(029ef909) SHA1(fd867b8e1ccd5b88f18409ff17939ec8420c6131) )
 	/* 0x18000-0x1ffff empty space filled by the init function */
 
-	ROM_REGION( 0x0300, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0300, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )
 	ROM_LOAD( "s2.13b",       0x0000, 0x0100, CRC(911d32a5) SHA1(36f2b62009918862c13f3eda05a21403b4d9607f) )
 	ROM_LOAD( "s1.13a",       0x0100, 0x0100, CRC(e9be978a) SHA1(50c7ca7a7496cb6fe5e8ce0db693ccb82dbbb8c6) )
 	ROM_LOAD( "s3.13c",       0x0200, 0x0100, CRC(609775a6) SHA1(70a787aec0852e106216a4ca9891d36aef60b189) )
 
-	ROM_REGION( 0x8000, REGION_SOUND1, 0 )	/* ADPCM samples, read directly by the main CPU */
+	ROM_REGION( 0x8000, RGNCLASS_SOUND, "adpcm", 0 )	/* ADPCM samples, read directly by the main CPU */
 	ROM_LOAD( "s0-1.5g",      0x00000, 0x8000, CRC(65e55b7e) SHA1(3852fb3b37eccdcddff05d8ef4a742fcb8b63473) )
 ROM_END
 
 ROM_START( rmhaihib )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "s-30-6.11g",   0x00000,  0x2000, CRC(f3e13cc8) SHA1(7eb9b17ea9efb5b2891ec40a9ff9744e84c0511c) )
 	ROM_CONTINUE(             0x06000,  0x2000 )
 	ROM_LOAD( "s-30-4.8g",    0x04000,  0x2000, CRC(f6642584) SHA1(5160baf267fd5dd8385ea5a9ff82e9c220fee342) )
@@ -551,7 +551,7 @@ ROM_START( rmhaihib )
 	ROM_LOAD( "s-30-2.6g",    0x08000,  0x2000, CRC(e5959703) SHA1(15552d90296d0b6790642f554d08e79e827a16ee) )
 	ROM_CONTINUE(             0x0c000,  0x2000 )
 
-	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "s0-10.8a",     0x00000, 0x4000, CRC(797c63d1) SHA1(2ff9c3c61b28c34de97c0117b7eadb409d79df46) )
 	ROM_LOAD( "s0-9.7a",      0x04000, 0x4000, CRC(b2526747) SHA1(73d0a19a5bb83e8977e94a47abbb65f9c7788c78) )
 	ROM_LOAD( "s0-8.6a",      0x08000, 0x4000, CRC(146eaa31) SHA1(0e38aab52ff9bf0d42fea24caeee6ca90d63ace2) )
@@ -560,17 +560,17 @@ ROM_START( rmhaihib )
 	ROM_LOAD( "s1-11.10a",    0x14000, 0x4000, CRC(029ef909) SHA1(fd867b8e1ccd5b88f18409ff17939ec8420c6131) )
 	/* 0x18000-0x1ffff empty space filled by the init function */
 
-	ROM_REGION( 0x0300, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0300, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )
 	ROM_LOAD( "s2.13b",       0x0000, 0x0100, CRC(911d32a5) SHA1(36f2b62009918862c13f3eda05a21403b4d9607f) )
 	ROM_LOAD( "s1.13a",       0x0100, 0x0100, CRC(e9be978a) SHA1(50c7ca7a7496cb6fe5e8ce0db693ccb82dbbb8c6) )
 	ROM_LOAD( "s3.13c",       0x0200, 0x0100, CRC(609775a6) SHA1(70a787aec0852e106216a4ca9891d36aef60b189) )
 
-	ROM_REGION( 0x8000, REGION_SOUND1, 0 )	/* ADPCM samples, read directly by the main CPU */
+	ROM_REGION( 0x8000, RGNCLASS_SOUND, "adpcm", 0 )	/* ADPCM samples, read directly by the main CPU */
 	ROM_LOAD( "s0-1.5g",      0x00000, 0x8000, CRC(65e55b7e) SHA1(3852fb3b37eccdcddff05d8ef4a742fcb8b63473) )
 ROM_END
 
 ROM_START( rmhaijin )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "s-4-6.11g",    0x00000, 0x2000, CRC(474c9ace) SHA1(9161a5c64054f079d57676f3d7f61ca149018f61) )
 	ROM_CONTINUE(             0x06000, 0x2000 )
 	ROM_LOAD( "s-4-4.8g",     0x04000, 0x2000, CRC(c76ab584) SHA1(7d76fa6166108d6a511d5311c0d34b55364afec1) )
@@ -578,7 +578,7 @@ ROM_START( rmhaijin )
 	ROM_LOAD( "s-4-2.6g",     0x08000, 0x2000, CRC(77b16f5b) SHA1(5e91b6b34ab8196a246c428b98f47a5b167dca76) )
 	ROM_CONTINUE(             0x0c000, 0x2000 )
 
-	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "s-1-10.8a",    0x00000, 0x4000, CRC(797c63d1) SHA1(2ff9c3c61b28c34de97c0117b7eadb409d79df46) )
 	ROM_LOAD( "s-1-9.7a",     0x04000, 0x4000, CRC(5d3793d4) SHA1(43665d44ab2db42a28243c269ca451c90fe60abc) )
 	ROM_LOAD( "s-1-8.6a",     0x08000, 0x4000, CRC(6fcd990b) SHA1(c7e35c6d9d75cd743d23a78de5dab63e034e33a8) )
@@ -587,17 +587,17 @@ ROM_START( rmhaijin )
 	ROM_LOAD( "s-2-11.10a",   0x14000, 0x4000, CRC(9ebbc607) SHA1(8ab707f2a197772bae94e9129eb3f40d408c88bf) )
 	/* 0x18000-0x1ffff empty space filled by the init function */
 
-	ROM_REGION( 0x0300, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0300, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )
 	ROM_LOAD( "s5.13b",       0x0000, 0x0100, CRC(153aa7bf) SHA1(945db334e27be431a34670b2d94de639f67038d1) )
 	ROM_LOAD( "s4.13a",       0x0100, 0x0100, CRC(5d643e6e) SHA1(df34be9d4cb0129069c2ed40c916c84674b62bb3) )
 	ROM_LOAD( "s6.13c",       0x0200, 0x0100, CRC(fd6ff344) SHA1(cd00985f8bbff1ab5a149a00320d861ac8655bf8) )
 
-	ROM_REGION( 0x8000, REGION_SOUND1, 0 )	/* ADPCM samples, read directly by the main CPU */
+	ROM_REGION( 0x8000, RGNCLASS_SOUND, "adpcm", 0 )	/* ADPCM samples, read directly by the main CPU */
 	ROM_LOAD( "s-0-1.5g",     0x00000, 0x8000, CRC(65e55b7e) SHA1(3852fb3b37eccdcddff05d8ef4a742fcb8b63473) )
 ROM_END
 
 ROM_START( rmhaisei )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "sei-11.h11",   0x00000, 0x2000, CRC(7c35692b) SHA1(8890ca90ae84c63bfd2b4857bbdd02bd9a2f29a9) )
 	ROM_CONTINUE(             0x06000, 0x2000 )
 	ROM_LOAD( "sei-10.h8",    0x04000, 0x2000, CRC(cbd58124) SHA1(562eb13c2dc441294b1b7dafe37ac27a9b7bba2b) )
@@ -606,7 +606,7 @@ ROM_START( rmhaisei )
 	ROM_CONTINUE(             0x0c000, 0x2000 )
 	ROM_LOAD( "sei-9.h7",     0x0e000, 0x2000, CRC(9132368d) SHA1(ca0924399cdd1554fc0407719c74d492743db156) )
 
-	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "sei-4.a8",     0x00000, 0x8000, CRC(6a0234bf) SHA1(ad6642aa6fca84a22625265a7c82f50e307ba2f9) )
 	ROM_LOAD( "sei-3.a7",     0x08000, 0x8000, CRC(c48bc39f) SHA1(de5aca9f72b437b7e7559bbd4b22c1b3ab70e450) )
 	ROM_LOAD( "sei-2.a6",     0x10000, 0x8000, CRC(e479ba47) SHA1(b2bda054cd70181e223fe33d63924b029d196676) )
@@ -615,17 +615,17 @@ ROM_START( rmhaisei )
 	ROM_LOAD( "sei-5.a9",     0x28000, 0x8000, CRC(8bf780bc) SHA1(5ef72ee3f45f1cdde06131797faf26a9776f6a13) )
 	/* 0x30000-0x3ffff empty space filled by the init function */
 
-	ROM_REGION( 0x0600, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0600, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )
 	ROM_LOAD( "2.bpr",        0x0000, 0x0200, CRC(9ad2afcd) SHA1(6cd4cd5f693ee882a98598e8f86ee2baf3b105bf) )
 	ROM_LOAD( "1.bpr",        0x0200, 0x0200, CRC(9b036f82) SHA1(4b14084e5a6674e69bd4bbc3a483c277bfc73808) )
 	ROM_LOAD( "3.bpr",        0x0400, 0x0200, CRC(0fa1a50a) SHA1(9e8a2c9554a61bfdacb434f8c22c1085b1c93aa1) )
 
-	ROM_REGION( 0x8000, REGION_SOUND1, 0 )	/* ADPCM samples, read directly by the main CPU */
+	ROM_REGION( 0x8000, RGNCLASS_SOUND, "adpcm", 0 )	/* ADPCM samples, read directly by the main CPU */
 	ROM_LOAD( "sei-7.h5",     0x00000, 0x8000, CRC(3e412c1a) SHA1(bc5e324ea26b8dd1e37c4e8b0d7ba712c1222bc7) )
 ROM_END
 
 ROM_START( themj )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 ) /* CPU */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) /* CPU */
 	ROM_LOAD( "t7.bin",       0x00000,  0x02000, CRC(a58563c3) SHA1(53faeb66606214eb97ef8ff9affe68705e18a0b3) )
 	ROM_CONTINUE(             0x06000,  0x02000 )
 	ROM_LOAD( "t8.bin",       0x04000,  0x02000, CRC(bdf29475) SHA1(6296561da9c3a299d69bba8a98362c40b677ea9a) )
@@ -633,7 +633,7 @@ ROM_START( themj )
 	ROM_LOAD( "t9.bin",       0x0e000,  0x02000, CRC(d5537d03) SHA1(ba27e83fcc9b6962373e2f723fc681481ec76864) )
 	ROM_LOAD( "no1.bin",      0x10000,  0x10000, CRC(a67dd977) SHA1(835648c5df51053c883d90d7309e53232b945ceb) ) /* banked */
 
-	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE ) /* gfx */
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* gfx */
 	ROM_LOAD( "t3.bin",       0x00000,  0x8000, CRC(f0735c62) SHA1(5ff0da7fc72512797ec59ee57467fa81abcfdb8b) )
 	ROM_LOAD( "t4.bin",       0x08000,  0x8000, CRC(952227fa) SHA1(7c2b5fe18bbaa482d93ab99a8f886838b596df8d) )
 	ROM_LOAD( "t5.bin",       0x10000,  0x8000, CRC(3deea9b4) SHA1(e445b545a8d293f6a5724e6c484cb1062c631bcc) )
@@ -642,20 +642,20 @@ ROM_START( themj )
 	ROM_LOAD( "t2.bin",       0x28000,  0x8000, CRC(4702375f) SHA1(9e824007e3e26ad6fb2ccbbcf35aa7cfdf5c469e) )
 	/* 0x30000-0x3ffff empty space filled by the init function */
 
-	ROM_REGION( 0x0600, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0600, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )
 	ROM_LOAD( "5.bin",        0x0000,  0x0200, CRC(062fb055) SHA1(20a6d236e3ab1df8c471cccca31ec05442595c82) )
 	ROM_LOAD( "4.bin",        0x0200,  0x0200, CRC(9f81a6d7) SHA1(2735815c0c922d0c81559d792fcaa39bd9615536) )
 	ROM_LOAD( "6.bin",        0x0400,  0x0200, CRC(61373ec7) SHA1(73861914aae29e3996f9991f324c358a29c46969) )
 
-	ROM_REGION( 0x8000, REGION_SOUND1, 0 )	/* ADPCM samples, read directly by the main CPU */
+	ROM_REGION( 0x8000, RGNCLASS_SOUND, "adpcm", 0 )	/* ADPCM samples, read directly by the main CPU */
 	ROM_LOAD( "t0.bin",       0x00000,  0x8000, CRC(3e412c1a) SHA1(bc5e324ea26b8dd1e37c4e8b0d7ba712c1222bc7) )
 ROM_END
 
 
 static DRIVER_INIT( rmhaihai )
 {
-	UINT8 *rom = memory_region(machine, REGION_GFX1);
-	int size = memory_region_length(machine, REGION_GFX1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	int size = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
 	int a,b;
 
 	size /= 2;

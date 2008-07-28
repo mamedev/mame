@@ -169,7 +169,7 @@ static const gfx_layout charlayout =
 
 
 static GFXDECODE_START( zerozone )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 256 )         /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 256 )         /* sprites & playfield */
 GFXDECODE_END
 
 
@@ -203,7 +203,7 @@ static MACHINE_DRIVER_START( zerozone )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -216,34 +216,34 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( zerozone )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )     /* 128k for 68000 code */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )     /* 128k for 68000 code */
 	ROM_LOAD16_BYTE( "zz-4.rom", 0x0000, 0x10000, CRC(83718b9b) SHA1(b3fc6da5816142b9c92a7b8615eb5bcb2c78ea46) )
 	ROM_LOAD16_BYTE( "zz-5.rom", 0x0001, 0x10000, CRC(18557f41) SHA1(6ef908732b7775c1ea2b33f799635075db5756de) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )      /* sound cpu */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )      /* sound cpu */
 	ROM_LOAD( "zz-1.rom", 0x00000, 0x08000, CRC(223ccce5) SHA1(3aa25ca914960b929dc853d07a958ed874e42fee) )
 
-	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "zz-6.rom", 0x00000, 0x80000, CRC(c8b906b9) SHA1(1775d69df6397d6772b20c65751d44556d76c033) )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )      /* ADPCM samples */
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )      /* ADPCM samples */
 	ROM_LOAD( "zz-2.rom", 0x00000, 0x20000, CRC(c7551e81) SHA1(520de3074fa6a71fef10d5a76cba5580fd1cbbae) )
 	ROM_LOAD( "zz-3.rom", 0x20000, 0x20000, CRC(e348ff5e) SHA1(6d2755d9b31366f4c2ddd296790234deb8f821c8) )
 ROM_END
 
 ROM_START( lvgirl94 )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )     /* 128k for 68000 code */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )     /* 128k for 68000 code */
 	ROM_LOAD16_BYTE( "rom4", 0x0000, 0x10000, CRC(c4fb449e) SHA1(dd1c567ba2cf951267dd622e2e9af265e742f246) )
 	ROM_LOAD16_BYTE( "rom5", 0x0001, 0x10000, CRC(5d446a1a) SHA1(2d7ea25e5b86e7cf4eb7f10daa1eaaaed6830a53) )
 
-	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rom6", 0x00000, 0x40000, CRC(eeeb94ba) SHA1(9da09312c090ef2d40f596247d9a7decf3724e54) )
 
 	/* sound roms are the same as zerozone */
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )      /* sound cpu */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )      /* sound cpu */
 	ROM_LOAD( "rom1", 0x00000, 0x08000, CRC(223ccce5) SHA1(3aa25ca914960b929dc853d07a958ed874e42fee) )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )      /* ADPCM samples */
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )      /* ADPCM samples */
 	ROM_LOAD( "rom2", 0x00000, 0x20000, CRC(c7551e81) SHA1(520de3074fa6a71fef10d5a76cba5580fd1cbbae) )
 	ROM_LOAD( "rom3", 0x20000, 0x20000, CRC(e348ff5e) SHA1(6d2755d9b31366f4c2ddd296790234deb8f821c8) )
 ROM_END

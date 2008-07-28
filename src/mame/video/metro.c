@@ -599,10 +599,8 @@ VIDEO_START( gstrik2 )
 
 void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	const int region		=	REGION_GFX1;
-
-	UINT8 *base_gfx	=	memory_region(machine, region);
-	UINT8 *gfx_max	=	base_gfx + memory_region_length(machine, region);
+	UINT8 *base_gfx	=	memory_region(machine, RGNCLASS_GFX, "gfx1");
+	UINT8 *gfx_max	=	base_gfx + memory_region_length(machine, RGNCLASS_GFX, "gfx1");
 
 	int max_x = video_screen_get_width(machine->primary_screen);
 	int max_y = video_screen_get_height(machine->primary_screen);

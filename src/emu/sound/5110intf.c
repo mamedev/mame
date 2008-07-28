@@ -26,6 +26,7 @@
 struct tms5110_info
 {
 	const struct TMS5110interface *intf;
+	const char *tag;
 	sound_stream *stream;
 	void *chip;
 	INT32 speech_rom_bitnum;
@@ -38,7 +39,7 @@ static void tms5110_update(void *param, stream_sample_t **inputs, stream_sample_
 static int speech_rom_read_bit(void)
 {
 	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
-	const UINT8 *table = memory_region(Machine, info->intf->rom_region);
+	const UINT8 *table = memory_region(Machine, RGNCLASS_SOUND, info->tag);
 
 	int r;
 
@@ -65,14 +66,15 @@ static void speech_rom_set_addr(int addr)
 
 ******************************************************************************/
 
-static void *tms5110_start(int sndindex, int clock, const void *config)
+static void *tms5110_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const struct TMS5110interface dummy = { -1 };
+	static const struct TMS5110interface dummy = { 0 };
 	struct tms5110_info *info;
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 	info->intf = config ? config : &dummy;
+	info->tag = tag;
 
 	info->chip = tms5110_create(sndindex, TMS5110_IS_5110A);
 	if (!info->chip)
@@ -82,7 +84,7 @@ static void *tms5110_start(int sndindex, int clock, const void *config)
 	/* initialize a stream */
 	info->stream = stream_create(0, 1, clock / 80, info, tms5110_update);
 
-	if (info->intf->rom_region == -1 )
+	if (memory_region(Machine, RGNCLASS_SOUND, tag) == NULL)
 	{
 	    if (info->intf->M0_callback==NULL)
 	    {
@@ -105,44 +107,44 @@ static void *tms5110_start(int sndindex, int clock, const void *config)
     return info;
 }
 
-static void *tms5100_start(int sndindex, int clock, const void *config)
+static void *tms5100_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	struct tms5110_info *info = tms5110_start(sndindex, clock, config);
+	struct tms5110_info *info = tms5110_start(tag, sndindex, clock, config);
 	tms5110_set_variant(info->chip, TMS5110_IS_5100);
 	return info;
 }
 
-static void *tms5110a_start(int sndindex, int clock, const void *config)
+static void *tms5110a_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	struct tms5110_info *info = tms5110_start(sndindex, clock, config);
+	struct tms5110_info *info = tms5110_start(tag, sndindex, clock, config);
 	tms5110_set_variant(info->chip, TMS5110_IS_5110A);
 	return info;
 }
 
-static void *cd2801_start(int sndindex, int clock, const void *config)
+static void *cd2801_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	struct tms5110_info *info = tms5110_start(sndindex, clock, config);
+	struct tms5110_info *info = tms5110_start(tag, sndindex, clock, config);
 	tms5110_set_variant(info->chip, TMS5110_IS_CD2801);
 	return info;
 }
 
-static void *tmc0281_start(int sndindex, int clock, const void *config)
+static void *tmc0281_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	struct tms5110_info *info = tms5110_start(sndindex, clock, config);
+	struct tms5110_info *info = tms5110_start(tag, sndindex, clock, config);
 	tms5110_set_variant(info->chip, TMS5110_IS_TMC0281);
 	return info;
 }
 
-static void *cd2802_start(int sndindex, int clock, const void *config)
+static void *cd2802_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	struct tms5110_info *info = tms5110_start(sndindex, clock, config);
+	struct tms5110_info *info = tms5110_start(tag, sndindex, clock, config);
 	tms5110_set_variant(info->chip, TMS5110_IS_CD2802);
 	return info;
 }
 
-static void *m58817_start(int sndindex, int clock, const void *config)
+static void *m58817_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	struct tms5110_info *info = tms5110_start(sndindex, clock, config);
+	struct tms5110_info *info = tms5110_start(tag, sndindex, clock, config);
 	tms5110_set_variant(info->chip, TMS5110_IS_M58817);
 	return info;
 }

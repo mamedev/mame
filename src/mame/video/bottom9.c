@@ -63,9 +63,9 @@ VIDEO_START( bottom9 )
 	layer_colorbase[2] = 16;
 	sprite_colorbase = 32;
 	zoom_colorbase = 48;
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tile_callback);
-	K051960_vh_start(machine,REGION_GFX2,NORMAL_PLANE_ORDER,sprite_callback);
-	K051316_vh_start_0(machine,REGION_GFX3,4,FALSE,0,zoom_callback);
+	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tile_callback);
+	K051960_vh_start(machine,"gfx2",NORMAL_PLANE_ORDER,sprite_callback);
+	K051316_vh_start_0(machine,"gfx3",4,FALSE,0,zoom_callback);
 }
 
 

@@ -127,7 +127,7 @@ static WRITE16_HANDLER( gp2_control_w )
 
 static READ16_HANDLER( v_rom_r )
 {
-	UINT8 *mem8 = memory_region(machine, REGION_GFX1);
+	UINT8 *mem8 = memory_region(machine, RGNCLASS_GFX, "gfx1");
 	int bank = K056832_word_r(machine, 0x34/2, 0xffff);
 
 	offset += bank * 0x800 * 4;
@@ -601,14 +601,9 @@ static void sound_irq(running_machine *machine)
 
 static const struct K054539interface k054539_interface =
 {
-	REGION_SOUND1,
+	NULL,
 	NULL,
 	sound_irq
-};
-
-static const struct K054539interface gp2_k054539_interface =
-{
-	REGION_SOUND1
 };
 
 
@@ -627,7 +622,7 @@ static MACHINE_START( qdrmfgp )
 
 static MACHINE_RESET( qdrmfgp )
 {
-	sndram = memory_region(machine, REGION_SOUND1) + 0x100000;
+	sndram = memory_region(machine, RGNCLASS_SOUND, "konami") + 0x100000;
 
 	/* reset the IDE controller */
 	gp2_irq_control = 0;
@@ -636,7 +631,7 @@ static MACHINE_RESET( qdrmfgp )
 
 static MACHINE_RESET( qdrmfgp2 )
 {
-	sndram = memory_region(machine, REGION_SOUND1) + 0x100000;
+	sndram = memory_region(machine, RGNCLASS_SOUND, "konami") + 0x100000;
 
 	/* sound irq (CCU? 240Hz) */
 	timer_pulse(ATTOTIME_IN_HZ(18432000/76800), NULL, 0, gp2_timer_callback);
@@ -718,7 +713,6 @@ static MACHINE_DRIVER_START( qdrmfgp2 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("konami", K054539, 18432000/384)
-	MDRV_SOUND_CONFIG(gp2_k054539_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -731,36 +725,36 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( qdrmfgp )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 )
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "gq_460_b04.20e", 0x000000, 0x80000, CRC(293d8174) SHA1(cf507d0b29dab161190f0160c05c640f16306bae) )
 	ROM_LOAD16_WORD_SWAP( "gq_460_a05.22e", 0x080000, 0x80000, CRC(4128cb3c) SHA1(4a16d85a66934a20afd074546de362c40a1ea785) )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 )		/* TILEMAP */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )		/* TILEMAP */
 	ROM_LOAD( "gq_460_a01.15e", 0x000000, 0x80000, CRC(6536b700) SHA1(47ffe0cfbf80810179560150b23d825fe1a5c5ca) )
 	ROM_LOAD( "gq_460_a02.17e", 0x080000, 0x80000, CRC(ac01d675) SHA1(bf66433ace95f4ef14699d03add7cbc2e5d90eea) )
 
-	ROM_REGION( 0x460000, REGION_SOUND1, 0)		/* SE SAMPLES + space for additional RAM */
+	ROM_REGION( 0x460000, RGNCLASS_SOUND, "konami", 0)		/* SE SAMPLES + space for additional RAM */
 	ROM_LOAD( "gq_460_a07.14h", 0x000000, 0x80000, CRC(67d8ea6b) SHA1(11af1b5a33de2a6e24823964d210bef193ecefe4) )
 	ROM_LOAD( "gq_460_a06.12h", 0x080000, 0x80000, CRC(97ed5a77) SHA1(68600fd8d914451284cf181fb4bd5872860fb9ad) )
 
-	DISK_REGION( REGION_DISKS )			/* IDE HARD DRIVE */
+	DISK_REGION( RGNCLASS_DISKS, "disks" )			/* IDE HARD DRIVE */
 	DISK_IMAGE( "gq460a08", 0, MD5(b79eebad38782e6713ab0bd7560817a2) SHA1(0cae7769fbb603d3c3e3627dde84a6c5a9b1062d) )
 ROM_END
 
 ROM_START( qdrmfgp2 )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 )
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "ge_557_c05.20e", 0x000000, 0x80000, CRC(336df99f) SHA1(46fb36d40371761be0cfa17b34f28cc893a44a22) )
 	ROM_LOAD16_WORD_SWAP( "ge_557_a06.22e", 0x080000, 0x80000, CRC(ad77e10f) SHA1(4a762a59fe3096d48e3cbf0da3bb0d75c5087e78) )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 )		/* TILEMAP */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )		/* TILEMAP */
 	ROM_LOAD( "ge_557_a01.13e", 0x000000, 0x80000, CRC(c301d406) SHA1(5fad8cc611edd83380972abf37ec80561b9317a6) )
 	ROM_LOAD( "ge_557_a02.15e", 0x080000, 0x80000, CRC(3bfe1e56) SHA1(9e4df512a804a96fcb545d4e0eb58b5421d65ea4) )
 
-	ROM_REGION( 0x460000, REGION_SOUND1, 0)		/* SE SAMPLES + space for additional RAM */
+	ROM_REGION( 0x460000, RGNCLASS_SOUND, "konami", 0)		/* SE SAMPLES + space for additional RAM */
 	ROM_LOAD( "ge_557_a07.19h", 0x000000, 0x80000, CRC(7491e0c8) SHA1(6459ab5e7af052ef7a1c4ce01cd844c0f4319f2e) )
 	ROM_LOAD( "ge_557_a08.19k", 0x080000, 0x80000, CRC(3da2b20c) SHA1(fdc2cdc27f3299f541944a78ce36ed33a7926056) )
 
-	DISK_REGION( REGION_DISKS )			/* IDE HARD DRIVE */
+	DISK_REGION( RGNCLASS_DISKS, "disks" )			/* IDE HARD DRIVE */
 	DISK_IMAGE( "ge557a09", 0, MD5(df5039dc4e9dbb1f02ec408d839a42db) SHA1(5e836dbace34c9c1b107cce6a50071a4205a1534) )
 ROM_END
 

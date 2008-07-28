@@ -262,8 +262,8 @@ static const gfx_layout charlayout_3bpp =
 
 
 static GFXDECODE_START( speedatk )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_1bpp,   0, 32 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout_3bpp,   0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout_1bpp,   0, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, charlayout_3bpp,   0, 32 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( speedatk )
@@ -295,22 +295,22 @@ static MACHINE_DRIVER_START( speedatk )
 MACHINE_DRIVER_END
 
 ROM_START( speedatk )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "cb1-1",        0x0000, 0x2000, CRC(df988e05) SHA1(0ec91c5f2e1adf952a4fe7aede591e763773a75b) )
 	ROM_LOAD( "cb0-2",        0x2000, 0x2000, CRC(be949154) SHA1(8a594a7ebdc8456290919163f7ea4ccb0d1f4edb) )
 	ROM_LOAD( "cb1-3",        0x4000, 0x2000, CRC(741a5949) SHA1(7f7bebd4fb73fef9aa28549d100f632c442ac9b3) )
 	ROM_LOAD( "cb0-4",        0x6000, 0x2000, CRC(53a9c0c8) SHA1(cd0fd94411dabf09828c1f629891158c40794127) )
 
-	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "cb0-7",        0x0000, 0x2000, CRC(a86007b5) SHA1(8e5cab76c37a8d53e1355000cd1a0a85ffae0e8c) )
 
-	ROM_REGION( 0x6000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "cb0-5",        0x0000, 0x2000, CRC(47a966e7) SHA1(fdaa0f88656afc431bae367679ce6298fa962e0f) )
 	ROM_LOAD( "cb0-6",        0x2000, 0x2000, CRC(cc1da937) SHA1(1697bb008bfa5c33a282bd470ac39c324eea7509) )
-	ROM_COPY( REGION_GFX2,    0x0000, 0x4000, 0x1000 ) /* Fill the blank space with cards gfx */
-	ROM_COPY( REGION_GFX1,    0x1000, 0x5000, 0x1000 ) /* Gfx from cb0-7 */
+	ROM_COPY( RGNCLASS_GFX, "gfx2",    0x0000, 0x4000, 0x1000 ) /* Fill the blank space with cards gfx */
+	ROM_COPY( RGNCLASS_GFX, "gfx1",    0x1000, 0x5000, 0x1000 ) /* Gfx from cb0-7 */
 
-	ROM_REGION( 0x0120, REGION_PROMS, 0 )
+	ROM_REGION( 0x0120, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "cb1.bpr",      0x0000, 0x0020, CRC(a0176c23) SHA1(133fb9eef8a6595cac2dcd7edce4789899a59e84) ) /* color PROM */
 	ROM_LOAD( "cb2.bpr",      0x0020, 0x0100, CRC(a604cf96) SHA1(a4ef6e77dcd3abe4c27e8e636222a5ee711a51f5) ) /* lookup table */
 ROM_END

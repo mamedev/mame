@@ -17,7 +17,6 @@
 
 struct namco_52xx_interface
 {
-	int		region;			/* memory region */
 	double	play_rate;		/* Playback frequency */
 	double	hp_filt_fc;
 	double	hp_filt_q;

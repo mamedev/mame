@@ -245,8 +245,8 @@ static const gfx_layout tiles16x16_layout =
 
 
 static GFXDECODE_START( sderby )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout,   0x000, 256  ) /* sprites */
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles16x16_layout,   0x000, 256  ) /* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0x000, 256  ) /* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout,   0x000, 256  ) /* sprites */
 
 GFXDECODE_END
 
@@ -273,7 +273,7 @@ static MACHINE_DRIVER_START( sderby )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_DRIVER_END
@@ -301,21 +301,21 @@ static MACHINE_DRIVER_START( pmroulet )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_DRIVER_END
 
 
 ROM_START( sderby )
-	ROM_REGION( 0x80000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "22.bin", 0x00000, 0x20000, CRC(a319f1e0) SHA1(d932cc7e990aa87308dcd9ffa5af2aaea333aa9a) )
 	ROM_LOAD16_BYTE( "23.bin", 0x00001, 0x20000, CRC(1d6e2321) SHA1(3bb32021cc9ee6bd6d1fd79a89159fef70f34f41) )
 
-	ROM_REGION( 0x080000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_REGION( 0x080000, RGNCLASS_SOUND, "oki", 0 ) /* Samples */
 	ROM_LOAD( "21.bin", 0x00000, 0x80000, CRC(6f9f2f2b) SHA1(9778439979bc21b3e49f0c16353488a33b93c01b) )
 
-	ROM_REGION( 0xa0000, REGION_GFX1, 0 ) /* Sprites */
+	ROM_REGION( 0xa0000, RGNCLASS_GFX, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD( "24.bin", 0x00000, 0x20000, CRC(93c917df) SHA1(dc2fa5e29749ec92871c66146c0412a23f47e316) )
 	ROM_LOAD( "25.bin", 0x20000, 0x20000, CRC(7ba485cd) SHA1(b0170614d713af9d1556251c76ae762de872abe6) )
 	ROM_LOAD( "26.bin", 0x40000, 0x20000, CRC(beabe4f7) SHA1(a5615450fae930cb2408f201a9faa12551de0d70) )
@@ -325,14 +325,14 @@ ROM_END
 
 
 ROM_START( pmroulet )
-	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
     ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x20000, CRC(1677a2de) SHA1(4dcbb3c1ce9b65e06ba7e0cffa00c0c8016538f5))
 	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x20000, CRC(11acaac2) SHA1(19e7bbbf4356fc9a866f9f36d0568c42d6a36c07))
 
-	ROM_REGION( 0x080000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_REGION( 0x080000, RGNCLASS_SOUND, "oki", 0 ) /* Samples */
 	ROM_LOAD( "1.bin", 0x00000, 0x40000, CRC(6673de85) SHA1(df390cd6268efc0e743a9020f19bc0cbeb757cfa))
 
-	ROM_REGION( 0x280000, REGION_GFX1, 0 ) /* Sprites */
+	ROM_REGION( 0x280000, RGNCLASS_GFX, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD( "4.bin", 0x000000, 0x80000, CRC(efcddac9) SHA1(72435ec478b70a067d47f3daf7c224169ee5827a))
 	ROM_LOAD( "5.bin", 0x080000, 0x80000, CRC(bc75ef8f) SHA1(1f3dc457e5ae143d53cfef0e1fcb4586dceefb67))
 	ROM_LOAD( "6.bin", 0x100000, 0x80000, CRC(e47d5f55) SHA1(a341e24f98125265cb3986f8c7ce84eedd056b71))

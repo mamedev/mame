@@ -46,10 +46,6 @@ Registers:
 
     *1 : when 0 is specified, hardware interrupt is caused(allways return soon)
 
-Hardcoded Values:
-
-    PCM ROM region:     REGION_SOUND1
-
 ***************************************************************************/
 
 #include "sndintrf.h"
@@ -90,6 +86,7 @@ struct x1_010_info
 	int	rate;								// Output sampling rate (Hz)
 	sound_stream *	stream;					// Stream handle
 	int	address;							// address eor data
+	const char *region;						// region name
 	int	sound_enable;						// sound output enable/disable
 	UINT8	reg[0x2000];				// X1-010 Register & wave form area
 	UINT8	HI_WORD_BUF[0x2000];			// X1-010 16bit access ram check avoidance work
@@ -114,7 +111,7 @@ static void seta_update( void *param, stream_sample_t **inputs, stream_sample_t 
 	register INT8	*start, *end, data;
 	register UINT8	*env;
 	register UINT32	smp_offs, smp_step, env_offs, env_step, delta;
-	UINT8 *snd1 = memory_region(Machine, REGION_SOUND1);
+	UINT8 *snd1 = memory_region(Machine, RGNCLASS_SOUND, info->region);
 
 	// mixer buffer zero clear
 	memset( buffer[0], 0, length*sizeof(*buffer[0]) );
@@ -195,7 +192,7 @@ static void seta_update( void *param, stream_sample_t **inputs, stream_sample_t 
 
 
 
-static void *x1_010_start(int sndindex, int clock, const void *config)
+static void *x1_010_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	int i;
 	const struct x1_010_interface *intf = config;
@@ -204,6 +201,7 @@ static void *x1_010_start(int sndindex, int clock, const void *config)
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
+	info->region		= tag;
 	info->base_clock	= clock;
 	info->rate			= clock / 1024;
 	info->address		= intf->adr;

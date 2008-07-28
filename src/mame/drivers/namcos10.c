@@ -285,7 +285,7 @@ static ADDRESS_MAP_START( namcos10_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801c00, 0x1f801dff) AM_NOP
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
-	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_SHARE(2) AM_REGION(REGION_USER1, 0) /* bios */
+	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_SHARE(2) AM_REGION(RGNCLASS_USER, "user1", 0) /* bios */
 	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE(1) /* ram mirror */
 	AM_RANGE(0x9fc00000, 0x9fffffff) AM_ROM AM_SHARE(2) /* bios mirror */
 	AM_RANGE(0xa0000000, 0xa03fffff) AM_RAM AM_SHARE(1) /* ram mirror */
@@ -311,8 +311,8 @@ static void memm_driver_init( running_machine *machine )
 
 static void memn_driver_init( running_machine *machine )
 {
-	UINT8 *BIOS = (UINT8 *)memory_region( machine, REGION_USER1 );
-	UINT8 *ROM = (UINT8 *)memory_region( machine, REGION_USER2 );
+	UINT8 *BIOS = (UINT8 *)memory_region( machine, RGNCLASS_USER, "user1" );
+	UINT8 *ROM = (UINT8 *)memory_region( machine, RGNCLASS_USER, "user2" );
 
 	memcpy32le( (UINT32 *)( BIOS + 0x0000000 ), ROM + 0x08000, 0x001c000 );
 	memcpy32le( (UINT32 *)( BIOS + 0x0020000 ), ROM + 0x24000, 0x03dffff );
@@ -323,8 +323,8 @@ static void memn_driver_init( running_machine *machine )
 static void decrypt_bios( running_machine *machine, int b15, int b14, int b13, int b12, int b11, int b10, int b9, int b8,
 	int b7, int b6, int b5, int b4, int b3, int b2, int b1, int b0 )
 {
-	UINT16 *BIOS = (UINT16 *)memory_region( machine, REGION_USER1 );
-	int len = memory_region_length( machine, REGION_USER1 ) / 2;
+	UINT16 *BIOS = (UINT16 *)memory_region( machine, RGNCLASS_USER, "user1" );
+	int len = memory_region_length( machine, RGNCLASS_USER, "user1" ) / 2;
 	int i;
 
 	for( i = 0; i < len; i++ )
@@ -454,15 +454,15 @@ static INPUT_PORTS_START( namcos10 )
 INPUT_PORTS_END
 
 ROM_START( mrdrilr2 )
-	ROM_REGION32_LE( 0x800000, REGION_USER1, 0 ) /* main prg */
+	ROM_REGION32_LE( 0x800000, RGNCLASS_USER, "user1", 0 ) /* main prg */
 	ROM_LOAD( "dr21vera.1a",  0x000000, 0x800000, CRC(f93532a2) SHA1(8b72f2868978be1f0e0abd11425a3c8b2b0c4e99) )
 ROM_END
 
 ROM_START( gjspace )
-	ROM_REGION32_LE( 0x400000, REGION_USER1, 0 ) /* bios */
+	ROM_REGION32_LE( 0x400000, RGNCLASS_USER, "user1", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
-	ROM_REGION( 0x4000000, REGION_USER2, 0 ) /* main prg */
+	ROM_REGION( 0x4000000, RGNCLASS_USER, "user2", 0 ) /* main prg */
 	ROM_LOAD( "10011a_0.bin", 0x0000000, 0x1000000, CRC(853e329e) SHA1(dd272ab2de9052c5aeee9e0ead4ee3d14347593e) )
 	ROM_LOAD( "10011a_1.bin", 0x1000000, 0x1000000, CRC(7d4e96f7) SHA1(41b0d27b93662f15547311c8723ac5141e129cab) )
 	ROM_LOAD( "10011a_2.bin", 0x2000000, 0x1000000, CRC(83111de6) SHA1(d760fd41644104f6d3a2806ab4664df2c77bdc42) )
@@ -470,39 +470,39 @@ ROM_START( gjspace )
 ROM_END
 
 ROM_START( mrdrilrg )
-	ROM_REGION32_LE( 0x400000, REGION_USER1, 0 ) /* bios */
+	ROM_REGION32_LE( 0x400000, RGNCLASS_USER, "user1", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
-	ROM_REGION( 0x3000000, REGION_USER2, 0 ) /* main prg */
+	ROM_REGION( 0x3000000, RGNCLASS_USER, "user2", 0 ) /* main prg */
 	ROM_LOAD( "drg1a_0.bin",  0x0000000, 0x1000000, CRC(1e5595f1) SHA1(0373ccb6e4b6fe96010afbb9657c3c0b2b02dd57) )
 	ROM_LOAD( "drg1a_1.bin",  0x1000000, 0x1000000, CRC(4db3a361) SHA1(d6a4fb682ab75cd98a9a960c244e94cacd367f12) )
 	ROM_LOAD( "drg1a_2.bin",  0x2000000, 0x1000000, CRC(c99ffa30) SHA1(fdcc0a348fe705c5ed1611170570f2fd9068525a) )
 ROM_END
 
 ROM_START( knpuzzle )
-	ROM_REGION32_LE( 0x400000, REGION_USER1, 0 ) /* bios */
+	ROM_REGION32_LE( 0x400000, RGNCLASS_USER, "user1", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
-	ROM_REGION( 0x3000000, REGION_USER2, 0 ) /* main prg */
+	ROM_REGION( 0x3000000, RGNCLASS_USER, "user2", 0 ) /* main prg */
 	ROM_LOAD( "kpm1a_0.bin",  0x0000000, 0x1000000, CRC(606d001b) SHA1(5a94e56a164a9132af7f9bd51cae0674dbe0e036) )
 	ROM_LOAD( "kpm1a_1.bin",  0x1000000, 0x1000000, CRC(a506d767) SHA1(f4830edc8eaa42ff80e83aca2fa38a4d2807c667) )
 	ROM_LOAD( "kpm1a_2.bin",  0x2000000, 0x1000000, CRC(5f40c402) SHA1(2a56421c0f0c9cc5b7b93ddacfc6f3d214a946d9) )
 ROM_END
 
 ROM_START( startrgn )
-	ROM_REGION32_LE( 0x400000, REGION_USER1, 0 ) /* bios */
+	ROM_REGION32_LE( 0x400000, RGNCLASS_USER, "user1", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
-	ROM_REGION( 0x2000000, REGION_USER2, 0 ) /* main prg */
+	ROM_REGION( 0x2000000, RGNCLASS_USER, "user2", 0 ) /* main prg */
 	ROM_LOAD( "stt1a_0.bin",  0x0000000, 0x1000000, CRC(07513d66) SHA1(baed445ff81e7f687e39b26648b3fe2ff601826b) )
 	ROM_LOAD( "stt1a_1.bin",  0x1000000, 0x1000000, CRC(f6e8e641) SHA1(37c8c1482d652b46a744252721299448b15e1027) )
 ROM_END
 
 ROM_START( gamshara )
-	ROM_REGION32_LE( 0x400000, REGION_USER1, 0 ) /* bios */
+	ROM_REGION32_LE( 0x400000, RGNCLASS_USER, "user1", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
-	ROM_REGION( 0x2000000, REGION_USER2, 0 ) /* main prg */
+	ROM_REGION( 0x2000000, RGNCLASS_USER, "user2", 0 ) /* main prg */
 	ROM_LOAD( "10021a.8e",    0x0000000, 0x1000000, CRC(db0a3687) SHA1(757360c43fba247e6c0c0fc66bb089575e19d646) )
 	ROM_LOAD( "10021a.8d",    0x1000000, 0x1000000, CRC(bebafef6) SHA1(6c965c09f3186523d27c50894a15b9c1dd02a794) )
 ROM_END

@@ -1058,7 +1058,7 @@ static READ8_HANDLER( dkong_voice_status_r )
 static READ8_HANDLER( dkong_sh_tune_r )
 {
 	dkong_state *state = machine->driver_data;
-	UINT8 *SND = memory_region(machine, REGION_CPU2);
+	UINT8 *SND = memory_region(machine, RGNCLASS_CPU, "sound");
 
 	if ( state->page & 0x40 )
 	{
@@ -1287,15 +1287,8 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static const struct NESinterface nes_interface_1 = { REGION_CPU2 };
-static const struct NESinterface nes_interface_2 = { REGION_CPU3 };
-
-static const struct TMS5110interface tms5110_interface =
-{
-	REGION_SOUND1,		/* Sample Rom */
-	NULL,
-	NULL
-};
+static const struct NESinterface nes_interface_1 = { "n2a03a" };
+static const struct NESinterface nes_interface_2 = { "n2a03b" };
 
 /*************************************
  *
@@ -1336,7 +1329,6 @@ MACHINE_DRIVER_START( radarsc1_audio )
 	MDRV_CPU_IO_MAP(radarsc1_sound_io_map, 0)
 
 	MDRV_SOUND_ADD("tms", M58817, XTAL_640kHz)
-	MDRV_SOUND_CONFIG(tms5110_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_DRIVER_END

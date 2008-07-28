@@ -48,7 +48,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( gtipoker )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 
@@ -76,11 +76,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( gtipoker )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "u12.rom", 0x0000, 0x1000, CRC(abaa257a) SHA1(f830213ae0aaad5a9a44ec77c5a186e9e02fa041) )
 	ROM_LOAD( "u18.rom", 0x1000, 0x1000, CRC(1b7e2877) SHA1(717fb70889804baa468203f20b1e7f73b55cc21e) )
 
-	ROM_REGION( 0x1000, REGION_GFX1, 0 )
+	ROM_REGION( 0x1000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD( "u31.rom", 0x0000, 0x1000, CRC(2028db2c) SHA1(0f81bb71e88c60df3817f58c28715ce2ea01ad4d) )
 ROM_END
 

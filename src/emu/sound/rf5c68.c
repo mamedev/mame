@@ -121,7 +121,7 @@ static void rf5c68_update(void *param, stream_sample_t **inputs, stream_sample_t
 /*    RF5C68 start                              */
 /************************************************/
 
-static void *rf5c68_start(int sndindex, int clock, const void *config)
+static void *rf5c68_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	/* allocate memory for the chip */
 	struct rf5c68pcm *chip = auto_malloc(sizeof(*chip));

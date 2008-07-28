@@ -245,7 +245,7 @@ static void init_generic(running_machine *machine, int bpp, int sound, int prot_
 	int i;
 
 	/* load graphics ROMs */
-	base = memory_region(machine, REGION_GFX1);
+	base = memory_region(machine, RGNCLASS_GFX, "gfx1");
 	switch (bpp)
 	{
 		case 4:
@@ -294,7 +294,7 @@ static void init_generic(running_machine *machine, int bpp, int sound, int prot_
 		case SOUND_CVSD_SMALL:
 			williams_cvsd_init(0);
 			memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, cvsd_protection_w);
-			cvsd_protection_base = memory_region(machine, REGION_CPU2) + 0x10000 + (prot_start - 0x8000);
+			cvsd_protection_base = memory_region(machine, RGNCLASS_CPU, "cvsd") + 0x10000 + (prot_start - 0x8000);
 			break;
 
 		case SOUND_CVSD:

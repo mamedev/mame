@@ -99,7 +99,7 @@ static void DAC_build_voltable(struct dac_info *info)
 }
 
 
-static void *dac_start(int sndindex, int clock, const void *config)
+static void *dac_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct dac_info *info;
 

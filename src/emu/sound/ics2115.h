@@ -2,7 +2,6 @@
 #define __ICS2115_H__
 
 struct ics2115_interface {
-	int region;
 	void (*irq_cb)(running_machine *, int);
 };
 

@@ -141,7 +141,7 @@ READ32_HANDLER( namco_spritepos32_r );
 /***********************************************************************************/
 /* C169 ROZ Layer Emulation */
 
-void namco_roz_init( int gfxbank, int maskregion );
+void namco_roz_init( int gfxbank, const char *maskregion );
 void namco_roz_draw( bitmap_t *bitmap, const rectangle *cliprect, int pri );
 
 READ16_HANDLER( namco_rozcontrol16_r );

@@ -28,13 +28,13 @@ WRITE8_HANDLER( paletteram_xBGR_RRRR_GGGG_BBBB_w );
 
 static WRITE8_HANDLER( quizdna_rombank_w )
 {
-	UINT8 *ROM = memory_region(machine, REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
 	memory_set_bankptr(1,&ROM[0x10000+0x4000*(data & 0x3f)]);
 }
 
 static WRITE8_HANDLER( gekiretu_rombank_w )
 {
-	UINT8 *ROM = memory_region(machine, REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
 	memory_set_bankptr(1,&ROM[0x10000+0x4000*((data & 0x3f) ^ 0x0a)]);
 }
 
@@ -437,9 +437,9 @@ static const gfx_layout objlayout =
 };
 
 static GFXDECODE_START( quizdna )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, fglayout,  0x7e0,  16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, bglayout,  0x000, 128 )
-	GFXDECODE_ENTRY( REGION_GFX3, 0x0000, objlayout, 0x600,  32 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, fglayout,  0x7e0,  16 )
+	GFXDECODE_ENTRY( "gfx2", 0x0000, bglayout,  0x000, 128 )
+	GFXDECODE_ENTRY( "gfx3", 0x0000, objlayout, 0x600,  32 )
 GFXDECODE_END
 
 
@@ -490,7 +490,7 @@ static MACHINE_DRIVER_START( quizdna )
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, (MCLK/1024)*132)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
@@ -519,79 +519,79 @@ MACHINE_DRIVER_END
 /****************************************************************************/
 
 ROM_START( quizdna )
-	ROM_REGION( 0xd0000, REGION_CPU1, 0 ) /* CPU */
+	ROM_REGION( 0xd0000, RGNCLASS_CPU, "main", 0 ) /* CPU */
 	ROM_LOAD( "quiz2-pr.28",  0x00000,  0x08000, CRC(a428ede4) SHA1(cdca3bd84b2ea421fb05502ea29e9eb605e574eb) )
 	ROM_CONTINUE(             0x18000,  0x78000 ) /* banked */
 	/* empty */
 
-	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE ) /* fg */
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* fg */
 	ROM_LOAD( "quiz2.102",    0x00000,  0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
 	/* empty */
 
-	ROM_REGION( 0x108000, REGION_GFX2, ROMREGION_DISPOSE ) /* bg */
+	ROM_REGION( 0x108000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) /* bg */
 	ROM_LOAD( "quiz2-bg.100", 0x000000,  0x100000, CRC(f1d0cac2) SHA1(26d25c1157d1916dfe4496c6cf119c4a9339e31c) )
 	/* empty */
 
-	ROM_REGION( 0x108000, REGION_GFX3, ROMREGION_DISPOSE ) /* obj */
+	ROM_REGION( 0x108000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE ) /* obj */
 	ROM_LOAD( "quiz2-ob.98",  0x000000,  0x100000, CRC(682f19a6) SHA1(6b8e6e583f423cf8ef9095f2c300201db7d7b8b3) )
 	ROM_LOAD( "quiz2ob2.97",  0x100000,  0x008000, CRC(03736b1a) SHA1(bc42ac293260f58a8a138702d890f69aec99c05e) )
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 ) /* samples */
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 ) /* samples */
 	ROM_LOAD( "quiz2-sn.32",  0x000000,  0x040000, CRC(1c044637) SHA1(dc749295e149f968495272f1a3ec27c6b719be8e) )
 
-	ROM_REGION( 0x00020, REGION_USER1, 0 ) /* fg control */
+	ROM_REGION( 0x00020, RGNCLASS_USER, "user1", 0 ) /* fg control */
 	ROM_LOAD( "quiz2.148",    0x000000,  0x000020, CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
 
 ROM_END
 
 ROM_START( gakupara )
-	ROM_REGION( 0xd0000, REGION_CPU1, 0 ) /* CPU */
+	ROM_REGION( 0xd0000, RGNCLASS_CPU, "main", 0 ) /* CPU */
 	ROM_LOAD( "u28.bin",  0x00000,  0x08000, CRC(72124bb8) SHA1(e734acff7e9d6b8c6a95c76860732320a2e3a828) )
 	ROM_CONTINUE(         0x18000,  0x78000 )             /* banked */
 	ROM_LOAD( "u29.bin",  0x90000,  0x40000, CRC(09f4948e) SHA1(21ccf5af6935cf40c0cf73fbee14bff3c4e1d23d) ) /* banked */
 
-	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE ) /* fg */
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* fg */
 	ROM_LOAD( "u102.bin", 0x00000,  0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
 	ROM_LOAD( "u103.bin", 0x20000,  0x20000, CRC(38644251) SHA1(ebfdc43c38e1380709ed08575c346b2467ad1592) )
 
-	ROM_REGION( 0x108000, REGION_GFX2, ROMREGION_DISPOSE ) /* bg */
+	ROM_REGION( 0x108000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) /* bg */
 	ROM_LOAD( "u100.bin", 0x000000,  0x100000, CRC(f9d886ea) SHA1(d7763f54a165af720216b96e601a66fbc59e3568) )
 	ROM_LOAD( "u99.bin",  0x100000,  0x008000, CRC(ac224d0a) SHA1(f187c3b74bc18606d0fe638f6a829f71c109998d) )
 
-	ROM_REGION( 0x108000, REGION_GFX3, ROMREGION_DISPOSE ) /* obj */
+	ROM_REGION( 0x108000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE ) /* obj */
 	ROM_LOAD( "u98.bin",  0x000000,  0x100000, CRC(a6e8cb56) SHA1(2fc85c1769513cc7aa5e23afaf0c99c38de9b855) )
 	ROM_LOAD( "u97.bin",  0x100000,  0x008000, CRC(9dacd5c9) SHA1(e40211059e71408be3d67807463304f4d4ecae37) )
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 ) /* samples */
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 ) /* samples */
 	ROM_LOAD( "u32.bin",  0x000000,  0x040000, CRC(eb03c535) SHA1(4d6c749ccab4681eee0a1fb243e9f3dbe61b9f94) )
 
-	ROM_REGION( 0x00020, REGION_USER1, 0 ) /* fg control */
+	ROM_REGION( 0x00020, RGNCLASS_USER, "user1", 0 ) /* fg control */
 	ROM_LOAD( "u148.bin", 0x000000,  0x000020, CRC(971df9d2) SHA1(280f5b386922b9902ca9211c719642c2bd0ba899) )
 
 ROM_END
 
 ROM_START( gekiretu )
-	ROM_REGION( 0xd0000, REGION_CPU1, 0 ) /* CPU */
+	ROM_REGION( 0xd0000, RGNCLASS_CPU, "main", 0 ) /* CPU */
 	ROM_LOAD( "quiz3-pr.28",  0x00000,  0x08000, CRC(a761e86f) SHA1(85331ef53598491e78c2d123b1ebd358aff46436) )
 	ROM_CONTINUE(             0x18000,  0x78000 ) /* banked */
 	/* empty */
 
-	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE ) /* fg */
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* fg */
 	ROM_LOAD( "quiz3.102",    0x00000,  0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
 	/* empty */
 
-	ROM_REGION( 0x108000, REGION_GFX2, ROMREGION_DISPOSE ) /* bg */
+	ROM_REGION( 0x108000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) /* bg */
 	ROM_LOAD( "quiz3-bg.100", 0x000000,  0x100000, CRC(cb9272fd) SHA1(cfc1ff93d1fdc7d144e161a77e534cea75d7f181) )
 	/* empty */
 
-	ROM_REGION( 0x108000, REGION_GFX3, ROMREGION_DISPOSE ) /* obj */
+	ROM_REGION( 0x108000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE ) /* obj */
 	ROM_LOAD( "quiz3-ob.98",  0x000000,  0x100000, CRC(01bed020) SHA1(5cc56c8823ee5e538371debe1cbeb57c4976677b) )
 	/* empty */
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 ) /* samples */
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 ) /* samples */
 	ROM_LOAD( "quiz3-sn.32",  0x000000,  0x040000, CRC(36dca582) SHA1(2607602e942244cfaae931da2ad36da9a8f855f7) )
 
-	ROM_REGION( 0x00020, REGION_USER1, 0 ) /* fg control */
+	ROM_REGION( 0x00020, RGNCLASS_USER, "user1", 0 ) /* fg control */
 	ROM_LOAD( "quiz3.148",    0x000000,  0x000020, CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
 
 ROM_END

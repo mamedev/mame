@@ -56,7 +56,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( intrscti )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 static VIDEO_START(intrscti)
@@ -110,15 +110,15 @@ MACHINE_DRIVER_END
 
 
 ROM_START( intrscti )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "1911_1.7g", 0x0000, 0x1000, CRC(8940e6ee) SHA1(50da11a6fab8f31c72c08dbf374268fff18a74e3) )
 	ROM_LOAD( "1911_2.8g", 0x1000, 0x1000, CRC(a461031e) SHA1(338c8cd79b98c666edd204150dea65ce4b9ec288) )
 	ROM_LOAD( "epoxy_block", 0x8000,0x1000, NO_DUMP )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu1", 0 )
 	ROM_LOAD( "ok.13b", 0x00000, 0x800, CRC(cbfa3eba) SHA1(b5a81a4535e7883a3ff8fb4021ddd7dbfaf3c7ae) )
 
-	ROM_REGION( 0x3000, REGION_GFX1, 0 )
+	ROM_REGION( 0x3000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD( "r.5c", 0x0000, 0x1000, CRC(092cc8f2) SHA1(f0c717128e0ac6adc032616a8cafaec88aa0fb90) )
 	ROM_LOAD( "g.5b", 0x1000, 0x1000, CRC(2d7cf465) SHA1(70fcb5818f2dfe499bb52501403449660837557d) )
 	ROM_LOAD( "b.5a", 0x2000, 0x1000, CRC(8951fb7e) SHA1(c423bf0536e3a09453814172e31b47f9c3c3324c) )
@@ -126,7 +126,7 @@ ROM_END
 
 static DRIVER_INIT( intrscti )
 {
-	UINT8 *cpu = memory_region( machine, REGION_CPU1 );
+	UINT8 *cpu = memory_region( machine, RGNCLASS_CPU, "main" );
 	int i;
 	for (i=0x8000;i<0x8fff;i++)
 	{

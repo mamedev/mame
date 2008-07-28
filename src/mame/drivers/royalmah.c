@@ -98,8 +98,8 @@ static int palette_base;
 static PALETTE_INIT( royalmah )
 {
 	offs_t i;
-	const UINT8 *prom = memory_region(machine, REGION_PROMS);
-	int len = memory_region_length(machine, REGION_PROMS);
+	const UINT8 *prom = memory_region(machine, RGNCLASS_PROMS, "proms");
+	int len = memory_region_length(machine, RGNCLASS_PROMS, "proms");
 
 	for (i = 0; i < len; i++)
 	{
@@ -133,8 +133,8 @@ static PALETTE_INIT( royalmah )
 static PALETTE_INIT( mjderngr )
 {
 	offs_t i;
-	const UINT8 *prom = memory_region(machine, REGION_PROMS);
-	int len = memory_region_length(machine, REGION_PROMS);
+	const UINT8 *prom = memory_region(machine, RGNCLASS_PROMS, "proms");
+	int len = memory_region_length(machine, RGNCLASS_PROMS, "proms");
 
 	for (i = 0; i < len / 2; i++)
 	{
@@ -285,7 +285,7 @@ static READ8_HANDLER ( suzume_dsw_r )
 
 static WRITE8_HANDLER ( suzume_bank_w )
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 	int address;
 
 	suzume_bank = data;
@@ -301,7 +301,7 @@ logerror("%04x: bank %02x\n",activecpu_get_pc(),data);
 
 static WRITE8_HANDLER ( mjapinky_bank_w )
 {
-	UINT8 *ROM = memory_region(machine, REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
 	rombank = data;
 	memory_set_bankptr(1,ROM + 0x10000 + 0x8000 * data);
 }
@@ -317,12 +317,12 @@ static WRITE8_HANDLER( mjapinky_palbank_w )
 static READ8_HANDLER( mjapinky_dsw_r )
 {
 	if (rombank == 0x0e)	return input_port_read(machine, "DSW3");
-	else					return *(memory_region(machine, REGION_CPU1) + 0x10000 + 0x8000 * rombank);
+	else					return *(memory_region(machine, RGNCLASS_CPU, "main") + 0x10000 + 0x8000 * rombank);
 }
 
 static WRITE8_HANDLER ( tontonb_bank_w )
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 	int address;
 
 logerror("%04x: bank %02x\n",activecpu_get_pc(),data);
@@ -340,7 +340,7 @@ logerror("%04x: bank %02x\n",activecpu_get_pc(),data);
 /* bits 5 and 6 seem to affect which Dip Switch to read in 'majs101b' */
 static WRITE8_HANDLER ( dynax_bank_w )
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 	int address;
 
 //logerror("%04x: bank %02x\n",activecpu_get_pc(),data);
@@ -516,7 +516,7 @@ static READ8_HANDLER( janptr96_dsw_r )
 
 static WRITE8_HANDLER( janptr96_rombank_w )
 {
-	UINT8 *ROM = memory_region(machine, REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
 	memory_set_bankptr(1,ROM + 0x10000 + 0x8000 * data);
 }
 
@@ -570,7 +570,7 @@ static WRITE8_HANDLER( mjifb_coin_counter_w )
 static READ8_HANDLER( mjifb_rom_io_r )
 {
 	if (mjifb_rom_enable)
-		return ((UINT8*)(memory_region(machine, REGION_CPU1) + 0x10000 + rombank * 0x4000))[offset];
+		return ((UINT8*)(memory_region(machine, RGNCLASS_CPU, "main") + 0x10000 + rombank * 0x4000))[offset];
 
 	offset += 0x8000;
 
@@ -677,7 +677,7 @@ ADDRESS_MAP_END
 static READ8_HANDLER( mjdejavu_rom_io_r )
 {
 	if (mjifb_rom_enable)
-		return ((UINT8*)(memory_region(machine, REGION_CPU1) + 0x10000 + rombank * 0x4000))[offset];
+		return ((UINT8*)(memory_region(machine, RGNCLASS_CPU, "main") + 0x10000 + rombank * 0x4000))[offset];
 
 	offset += 0x8000;
 
@@ -736,7 +736,7 @@ static READ8_HANDLER( mjtensin_p3_r )
 
 static void mjtensin_update_rombank(void)
 {
-	memory_set_bankptr( 1, memory_region(Machine, REGION_CPU1) + 0x10000 + rombank * 0x8000 );
+	memory_set_bankptr( 1, memory_region(Machine, RGNCLASS_CPU, "main") + 0x10000 + rombank * 0x8000 );
 }
 static WRITE8_HANDLER( mjtensin_p4_w )
 {
@@ -778,7 +778,7 @@ ADDRESS_MAP_END
 
 static void cafetime_update_rombank(void)
 {
-	memory_set_bankptr( 1, memory_region(Machine, REGION_CPU1) + 0x10000 + rombank * 0x8000 );
+	memory_set_bankptr( 1, memory_region(Machine, RGNCLASS_CPU, "main") + 0x10000 + rombank * 0x8000 );
 }
 static WRITE8_HANDLER( cafetime_p4_w )
 {
@@ -2408,7 +2408,7 @@ OSC: 18.432MHz
 ***************************************************************************/
 
 ROM_START( royalmj )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "1.p1", 0x0000, 0x1000, CRC(549544bb) SHA1(dfb221572c7bfd267a22c0a944830d5f127f9942) )
 	ROM_LOAD( "2.p2", 0x1000, 0x1000, CRC(afc8a61e) SHA1(4134f6404f955838fc48fd0f87b83ebc75c1a021) )
 	ROM_LOAD( "3.p3", 0x2000, 0x1000, CRC(5d33e54d) SHA1(bf5e0ad5177c086f1cea5c90d7273a841db941bc) )
@@ -2416,12 +2416,12 @@ ROM_START( royalmj )
 	ROM_LOAD( "5.p5", 0x4000, 0x1000, CRC(cc9123a3) SHA1(75276045247a0c9ac5810be01f3b58ad63101f9b) )
 	ROM_LOAD( "6.p6", 0x5000, 0x1000, CRC(92150a0f) SHA1(5c97ba5014abdba4afc78e02e7d90e6ca4d777ac) )
 
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "18s030n.6k", 0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
 ROM_END
 
 ROM_START( royalmah )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "rom1",       0x0000, 0x1000, CRC(69b37a62) SHA1(7792528754b0df4e11f4ebe33380b713ac7351a3) )
 	ROM_LOAD( "rom2",       0x1000, 0x1000, CRC(0c8351b6) SHA1(9e6b48fd39dd98478d1e3557df839b09652c4349) )
 	ROM_LOAD( "rom3",       0x2000, 0x1000, CRC(b7736596) SHA1(4b8bc175d945e695b767b9fb2227ffc1cd4b0547) )
@@ -2429,17 +2429,17 @@ ROM_START( royalmah )
 	ROM_LOAD( "rom5",       0x4000, 0x1000, CRC(16c09c73) SHA1(ea712f9ca3200ca27434e4200187b488e24f4c65) )
 	ROM_LOAD( "rom6",       0x5000, 0x1000, CRC(92687327) SHA1(4fafba5881dca2a147616d94dd055eba6aa3c653) )
 
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "f-rom.bpr",  0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
 ROM_END
 
 ROM_START( openmj )
-	ROM_REGION( 0x7000, REGION_CPU1, ROMREGION_ERASEFF )
+	ROM_REGION( 0x7000, RGNCLASS_CPU, "main", ROMREGION_ERASEFF )
 	ROM_LOAD( "10", 0x0000, 0x2000, CRC(4042920e) SHA1(19753bcb27ebf391ab824a45c6e41d956826a263) )
 	ROM_LOAD( "20", 0x2000, 0x2000, CRC(8fa0f735) SHA1(645154d51c0679b953b9ffc2f1d3b8f2752a0796) )
 	ROM_LOAD( "30", 0x4000, 0x2000, CRC(00045cd7) SHA1(0c32995753c1da14dacc8bc6c12dbcbdcae4e1b0) )
 
-	ROM_REGION( 0x20, REGION_PROMS, 0 )
+	ROM_REGION( 0x20, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "82s123.prm", 0x00, 0x20, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
 ROM_END
 
@@ -2467,13 +2467,13 @@ empty socket for MC68705
 ***************************************************************************/
 
 ROM_START( janyoup2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "1.c110",       0x0000, 0x2000, CRC(36ebb3d0) SHA1(39c0cdd1dc5878539768074dad3c39aac4ace8bf) )
 	ROM_LOAD( "2.c109",       0x2000, 0x2000, CRC(324426d4) SHA1(409244c8458d9bafa325746c37de9e7b955b3787) )
 	ROM_LOAD( "3.c108",       0x4000, 0x2000, CRC(e98b6d34) SHA1(e27ab9a03aff750df78c5db52a112247bdd31328) )
 	ROM_LOAD( "4.c107",       0x6000, 0x1000, CRC(377b8ce9) SHA1(a5efc517ae975e54af5325b8b3f4867e9f449d4c) )
 
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "n82s123n.c98", 0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
 ROM_END
 
@@ -2497,17 +2497,17 @@ dumped by sayu
 ****************************************************************************/
 
 ROM_START( ippatsu )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "11", 0x0000, 0x8000, CRC(5f563be7) SHA1(2ce486777bd61a2de789683cd0c8abeefe31775b) )
 	ROM_LOAD( "12", 0x8000, 0x4000, CRC(a09a43b0) SHA1(da12e669ccd036da817a69bd549e8668e6a45730) )
 	ROM_RELOAD(     0xc000, 0x4000 )
 
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "82s123an", 0x00, 0x20, CRC(3bde1bbd) SHA1(729498483943f960e38c4ada992b099b698b497a) )
 ROM_END
 
 ROM_START( suzume )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 )
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "p1.bin",     0x00000, 0x1000, CRC(e9706967) SHA1(2e3d78178623de6552c9036da90e02f240d94055) )
 	ROM_LOAD( "p2.bin",     0x01000, 0x1000, CRC(dd48cd62) SHA1(1ce7b515fabae5054f0ac284a9ed5760f59d18fa) )
 	ROM_LOAD( "p3.bin",     0x02000, 0x1000, CRC(10a05c23) SHA1(f13ba660bc5eff9057b1ab46f564f586c76e945d) )
@@ -2521,12 +2521,12 @@ ROM_START( suzume )
 	ROM_LOAD( "4.1e",       0x28000, 0x08000, CRC(9da8952e) SHA1(956d16b82ff8fe733a7b3135d082e18ea5167dfe) )	// 3
 	ROM_LOAD( "5.1h",       0x30000, 0x08000, CRC(04a6f41a) SHA1(37117faf6bc823770413faa7618387ca6f16fa34) )	// 4
 
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(97e1defe) SHA1(b5002218b2292f7623dd9a205ce183dedeec03f1) )
 ROM_END
 
 ROM_START( dondenmj )
-	ROM_REGION( 0x90000, REGION_CPU1, 0 )
+	ROM_REGION( 0x90000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "dn5.1h",     0x00000, 0x08000, CRC(3080252e) SHA1(e039087afc36a0c594da093ea599b81a1d757139) )
 	/* bank switched ROMs follow */
 	ROM_LOAD( "dn1.1e",     0x18000, 0x08000, CRC(1cd9c48a) SHA1(12bc519889dacea59ae49672ad5313fff3a99f12) )	// 1
@@ -2534,12 +2534,12 @@ ROM_START( dondenmj )
 	ROM_LOAD( "dn3.2h",     0x30000, 0x08000, CRC(b09d2897) SHA1(0cde3e16ca333be01a5ab3a232f2ea602faec7a2) )	// 4
 	ROM_LOAD( "dn4.2e",     0x50000, 0x08000, CRC(67d7dcd6) SHA1(6b708a29de1f4738eb2d4e667327d9433ff7216c) )	// 8
 
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(97e1defe) SHA1(b5002218b2292f7623dd9a205ce183dedeec03f1) )
 ROM_END
 
 ROM_START( mjdiplob )
-	ROM_REGION( 0x90000, REGION_CPU1, 0 )
+	ROM_REGION( 0x90000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "071.4l",     0x00000, 0x10000, CRC(81a6d6b0) SHA1(c6169e6d5f35304a0c3efcc2175c3213650f179c) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(             0x10000, 0x10000 )				// 0,1
@@ -2547,12 +2547,12 @@ ROM_START( mjdiplob )
 	ROM_LOAD( "073.4j",     0x30000, 0x10000, CRC(562ed64f) SHA1(42b4a7e5a8de4dde83c12d7b9facf561bc872978) )	// 4,5
 	ROM_LOAD( "074.4h",     0x40000, 0x10000, CRC(1eba0140) SHA1(0d0b95be338d7450ad3b24cc47e24e94f86dcefe) )	// 6,7
 
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(c1e427df) SHA1(9a9980d93dff4b87a940398b18277acaf946eeab) )
 ROM_END
 
 ROM_START( tontonb )
-	ROM_REGION( 0x90000, REGION_CPU1, 0 )
+	ROM_REGION( 0x90000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "091.5e",   	0x00000, 0x10000, CRC(d8d67b59) SHA1(7e7a85df738f80fc031cda8a104ac9c7b3e24785) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(             0x10000, 0x10000 )				// 0,1
@@ -2561,12 +2561,12 @@ ROM_START( tontonb )
 	/**/													// 6,7 unused
 	ROM_LOAD( "092.5c",   	0x50000, 0x10000, CRC(7ff2738b) SHA1(89a49f89705f499439dc024fc70c87141a84780b) )	// 8,9
 
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(97e1defe) SHA1(b5002218b2292f7623dd9a205ce183dedeec03f1) )
 ROM_END
 
 ROM_START( majs101b )
-	ROM_REGION( 0x90000, REGION_CPU1, 0 )
+	ROM_REGION( 0x90000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "171.3e",     0x00000, 0x10000, CRC(fa3c553b) SHA1(fda212559c4d55610a12ad2927afe21f9069c7b6) )
 	/* bank switched ROMs follow */
 	/**/													// 0,1 unused
@@ -2575,12 +2575,12 @@ ROM_START( majs101b )
 	ROM_LOAD( "173.3h",     0x50000, 0x20000, CRC(7a9e71ae) SHA1(ce1bde6e05f81b7dbb14015514397ed72f8dd92a) )	// 8,9,a,b
 	ROM_LOAD( "174.3j",     0x70000, 0x10000, CRC(972c2cc9) SHA1(ba78d29d1723783dbd0e8c754d2422caad5ab367) )	// c,d
 
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(c1e427df) SHA1(9a9980d93dff4b87a940398b18277acaf946eeab) )
 ROM_END
 
 ROM_START( mjderngr )
-	ROM_REGION( 0xb0000, REGION_CPU1, 0 )
+	ROM_REGION( 0xb0000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "2201.1a",    0x00000, 0x08000, CRC(54ec531d) SHA1(c5d9c575f6bdc499bae35123d7ad5bd4869b6ed9) )
 	/* bank switched ROMs follow */
 	ROM_CONTINUE(           0x10000, 0x08000 )				// 0
@@ -2589,7 +2589,7 @@ ROM_START( mjderngr )
 	ROM_LOAD( "2204.1e",    0x70000, 0x20000, CRC(ed5fde4b) SHA1(d55487ae1007d43b71f06ae5c407c75db7054515) )	// c,d,e,f
 	ROM_LOAD( "2205.1f",    0x90000, 0x20000, CRC(cfb8075d) SHA1(31f613a1a9b5f4295b552aeeddb760605ce2ac70) )	// 0x10,0x11,0x12,0x13
 
-	ROM_REGION( 0x400, REGION_PROMS, 0 )
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "ic3g.bin",   0x000, 0x200, CRC(d43f4c7c) SHA1(117d2e4e8d5bea3e5dc903a4b87bd71786ae009c) )
 	ROM_LOAD( "ic4g.bin",   0x200, 0x200, CRC(30cf7831) SHA1(b4593d51c6ceb301279a01a98665e4be8a3c403d) )
 ROM_END
@@ -2618,7 +2618,7 @@ D29-2.4D
 ***************************************************************************/
 
 ROM_START( mjifb )
-	ROM_REGION( 0xd0000, REGION_CPU1, 0 )
+	ROM_REGION( 0xd0000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "2911.1b",    0x00000, 0x10000, CRC(138a31a1) SHA1(7e77c63a968206b8e61aaa423e19a766e4142554) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(             0x10000, 0x08000 )	// bank 0 = 8000-bfff
@@ -2630,7 +2630,7 @@ ROM_START( mjifb )
 	ROM_LOAD( "2902.1c",    0xb0000, 0x10000, CRC(0ce02a98) SHA1(69f6bca9af8548038401839047a304a4aa97cfe6) )
 	ROM_RELOAD(             0xc0000, 0x10000 )
 
-	ROM_REGION( 0x400, REGION_PROMS, 0 )
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "d29-2.4d",   0x000, 0x200, CRC(78252f6a) SHA1(1869147bc6b7573c2543bdf6b17d6c3c1debdddb) )
 	ROM_LOAD( "d29-1.4c",   0x200, 0x200, CRC(4aaec8cf) SHA1(fbe1c3729d078a422ffe68dfde495fcb9f329cdd) )
 ROM_END
@@ -2642,7 +2642,7 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( janptr96 )
-	ROM_REGION( 0x210000, REGION_CPU1, 0 )
+	ROM_REGION( 0x210000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "503x-1.1h", 0x000000, 0x40000, CRC(39914ecd) SHA1(e5796a95a7e3e7b61da63d50fa089be2946ba611) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(            0x010000, 0x40000 )
@@ -2651,7 +2651,7 @@ ROM_START( janptr96 )
 	ROM_LOAD( "503x-3.1f", 0x110000, 0x80000, CRC(9ba4deb0) SHA1(e9d44a6ed849ff90c0b1f9321cdd62e18c3fd35c) )
 	ROM_LOAD( "503x-4.1e", 0x190000, 0x80000, CRC(e266ca0b) SHA1(d84608e7b474061a680510a266842e667bf2eab5) )
 
-	ROM_REGION( 0x400, REGION_PROMS, 0 )
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "ns503b.3h", 0x000, 0x200, CRC(3b2a6b12) SHA1(ebd2929e6acbde989964bfef602b81f2f2fe04eb) )
 	ROM_LOAD( "ns503a.3j", 0x200, 0x200, CRC(fe49b2f0) SHA1(a36ca005380cc92dfe473254c26be2cef2ced9b4) )
 ROM_END
@@ -2736,7 +2736,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjtensin )
-	ROM_REGION( 0x290000, REGION_CPU1, 0 )
+	ROM_REGION( 0x290000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "1001.5e", 0x000000, 0x80000, CRC(960e1fe9) SHA1(11f5164b2c75c0e684e910ee8e09de978bdaff2f) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(          0x010000, 0x80000 )
@@ -2746,7 +2746,7 @@ ROM_START( mjtensin )
 
 	ROM_LOAD( "1003.3e", 0x210000, 0x80000, CRC(876081bf) SHA1(fe962cfa9318a9444123bcaf3406e22fb08e8c4e) )
 
-	ROM_REGION( 0x400, REGION_PROMS, 0 )
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "d100-2.7e",  0x000, 0x200, CRC(6edeed23) SHA1(f4420c473ebbe3df92b0f5b1f0e4d5495fcb9fda) )
 	ROM_LOAD( "d100-1.6e",  0x200, 0x200, CRC(88befd59) SHA1(cbcb437f9f6b5e542dc69f5c9e85ccbae47080af) )
 ROM_END
@@ -2828,7 +2828,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjapinky )
-	ROM_REGION( 0x90000, REGION_CPU1, 0 )
+	ROM_REGION( 0x90000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "141.4d",     0x00000, 0x10000, CRC(0c4fb83a) SHA1(5d467e8fae715ca4acf88f8e9437c7cdf9f876bd) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(             0x10000, 0x10000 )
@@ -2838,7 +2838,7 @@ ROM_START( mjapinky )
 	ROM_LOAD( "145.4j",     0x50000, 0x10000, CRC(fea3375a) SHA1(cbb89b72cfba9c0448d152dfdbedb20b9896516e) )
 	ROM_LOAD( "146.4k",     0x60000, 0x10000, CRC(be27a9b9) SHA1(f12402182f598391e445245b345f49084a69620a) )
 
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "18s030n.clr",   0x0000, 0x0020, CRC(5736d0aa) SHA1(298b51340d2697347842cfaa5921f31c7b7f9748) )
 ROM_END
 
@@ -2865,7 +2865,7 @@ D63-2.8F     [af735b42] /
 ***************************************************************************/
 
 ROM_START( cafetime )
-	ROM_REGION( 0x210000, REGION_CPU1, 0 )
+	ROM_REGION( 0x210000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "6301.2e", 0x000000, 0x40000, CRC(1fc10e7c) SHA1(0ed6bfd4cc6fc64bbf55bd3c6bde2d8ba9da2afb) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(          0x010000, 0x40000 )
@@ -2874,7 +2874,7 @@ ROM_START( cafetime )
 	ROM_LOAD( "6303.5e", 0x110000, 0x80000, CRC(0e71eea8) SHA1(f95c3b7acee6deabff4aca83b490e255648e2f19) )
 	ROM_LOAD( "6304.6e", 0x190000, 0x80000, CRC(53c581d6) SHA1(d9cfda63a8f2e92873f69c673d3efe5c22cfa0de) )
 
-	ROM_REGION( 0x400, REGION_PROMS, 0 )
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "d63-2.8f", 0x000, 0x200, CRC(af735b42) SHA1(deddde3e276d5b9de72e267f65399d80783c6244) )
 	ROM_LOAD( "d63-1.7f", 0x200, 0x200, CRC(e7410136) SHA1(54d3aec0d11485d4f419e76f9c4071ab9b817937) )
 ROM_END
@@ -2948,7 +2948,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( cafedoll )
-	ROM_REGION( 0x190000, REGION_CPU1, 0 )
+	ROM_REGION( 0x190000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "76xx.tmp90841", 0x00000, 0x02000, NO_DUMP )
 	ROM_LOAD( "7601", 0x000000, 0x80000, CRC(20c80ad9) SHA1(e45edd101c6e26c0fa3c3f15f4a4152a853e41bd) )
 	/* bank switched ROMs follow */
@@ -2956,7 +2956,7 @@ ROM_START( cafedoll )
 	ROM_LOAD( "7602", 0x090000, 0x80000, CRC(f472960c) SHA1(cc2feb4374ba94035101114c73e1690cfeac9b91) )
 	ROM_LOAD( "7603", 0x110000, 0x80000, CRC(c4293019) SHA1(afd717844e9e681ada14e80cd10dce0ed60d4259) )
 
-	ROM_REGION( 0x400, REGION_PROMS, 0 )
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "d76-2_82s147.9f", 0x000, 0x200, CRC(9c1d0512) SHA1(3ca82d4271badc890701ecc76b97e80b16509b50) )
 	ROM_LOAD( "d76-1_82s147.7f", 0x200, 0x200, CRC(9a75349c) SHA1(2071132267aafd8facf1d7841093d9a45c30a8d3) )
 ROM_END
@@ -3035,7 +3035,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjvegas )
-	ROM_REGION( 0xd0000, REGION_CPU1, 0 )
+	ROM_REGION( 0xd0000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "50xx.tmp90841", 0x00000, 0x02000, NO_DUMP )
 	ROM_LOAD( "5001a.1b", 0x00000, 0x20000, CRC(91859a47) SHA1(3c452405bf28f5e7302eaccdf472e91b64629a67) )
 	/* bank switched ROMs follow */
@@ -3043,7 +3043,7 @@ ROM_START( mjvegas )
 	ROM_LOAD( "5002.1d",  0x30000, 0x80000, CRC(016c0a32) SHA1(5c5fdd631eacb36a0ee7dba9e070c2d3d3d8fd5b) )
 	ROM_LOAD( "5003.1e",  0xb0000, 0x20000, CRC(5323cc85) SHA1(58b75ba560f05a0568024f52ee89f54713219452) )
 
-	ROM_REGION( 0x400, REGION_PROMS, 0 )
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "d50-2_82s147.4h", 0x000, 0x200, CRC(3c960ea2) SHA1(65e05e3f129e9e6fcb14b7d44a75a76919c54d52) )
 	ROM_LOAD( "d50-1_82s147.4g", 0x200, 0x200, CRC(50c0d0ec) SHA1(222899456cd2e15391d8d0f771bbd5e5333d6ba3) )
 ROM_END
@@ -3115,7 +3115,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjdejavu )
-	ROM_REGION( 0xd0000, REGION_CPU1, 0 )
+	ROM_REGION( 0xd0000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "2101.1b", 0x00000, 0x10000, CRC(b0426ea7) SHA1(ac39cbf5d78acdaa4b01d948917965c3aa2761b8) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(          0x10000, 0x08000 )
@@ -3127,14 +3127,14 @@ ROM_START( mjdejavu )
 	// unused
 	ROM_LOAD( "2102.1c", 0xb0000, 0x20000, CRC(f461e422) SHA1(c3505feb32650fdd5c0d7f30faed69b65d94937a) )	// 28
 
-	ROM_REGION( 0x400, REGION_PROMS, 0 )
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "82s147.4d", 0x000, 0x200, CRC(d43f4c7c) SHA1(117d2e4e8d5bea3e5dc903a4b87bd71786ae009c) )
 	ROM_LOAD( "82s147.4c", 0x200, 0x200, CRC(30cf7831) SHA1(b4593d51c6ceb301279a01a98665e4be8a3c403d) )
 ROM_END
 
 // Incomplete romset (missing rom7 at $6000): "Jan Oh" by Toaplan, on royalmah hardware (try pc=64f).
 ROM_START( janoh )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "rom1.p1",  0x0000, 0x1000, CRC(8fc19963) SHA1(309e941c059a97b117090fd9dd69a00031aa6109) )	// "1984 JAN OH"
 	ROM_LOAD( "rom2.p12", 0x1000, 0x1000, CRC(e1141ae1) SHA1(38f7a71b367a607bb20a5cbe62e7c87c96c6997c) )
 	ROM_LOAD( "rom3.p2",  0x2000, 0x1000, CRC(66e6d2f4) SHA1(d7e00e5bfee60daf844c46d36b1f4860fba70759) )	// "JANOH TOAPLAN 84"
@@ -3143,12 +3143,12 @@ ROM_START( janoh )
 	ROM_LOAD( "rom6.p5",  0x5000, 0x1000, CRC(92687327) SHA1(4fafba5881dca2a147616d94dd055eba6aa3c653) )
 	ROM_LOAD( "rom7.p6",  0x6000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x20, REGION_PROMS, 0 )
+	ROM_REGION( 0x20, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "janho.color", 0x00, 0x20, NO_DUMP )
 ROM_END
 
 
-static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x8000 );	}
+static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(1, memory_region(machine, RGNCLASS_CPU, "main") + 0x8000 );	}
 
 static DRIVER_INIT( janptr96 )
 {

@@ -123,7 +123,7 @@ WRITE8_HANDLER( irobot_statwr_w )
 
 WRITE8_HANDLER( irobot_out0_w )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	irobot_out0 = data;
 	switch (data & 0x60)
@@ -145,7 +145,7 @@ WRITE8_HANDLER( irobot_out0_w )
 
 WRITE8_HANDLER( irobot_rom_banksel_w )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	switch ((data & 0x0E) >> 1)
 	{
@@ -191,7 +191,7 @@ static TIMER_CALLBACK( scanline_callback )
 static TIMER_CALLBACK( irmb_done_callback );
 MACHINE_RESET( irobot )
 {
-	UINT8 *MB = memory_region(machine, REGION_CPU2);
+	UINT8 *MB = memory_region(machine, RGNCLASS_CPU, "mathbox");
 
 	/* initialize the memory regions */
 	mbROM 		= MB + 0x00000;
@@ -371,7 +371,7 @@ static void irmb_dout(const irmb_ops *curop, UINT32 d)
 /* Convert microcode roms to a more usable form */
 static void load_oproms(running_machine *machine)
 {
-	UINT8 *MB = memory_region(machine, REGION_PROMS) + 0x20;
+	UINT8 *MB = memory_region(machine, RGNCLASS_PROMS, "proms") + 0x20;
 	int i;
 
 	/* allocate RAM */

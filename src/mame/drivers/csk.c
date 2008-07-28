@@ -188,7 +188,7 @@ static WRITE8_HANDLER( custom_io_w )
 
 static ADDRESS_MAP_START( map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION(REGION_CPU1, 0xf000)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION(RGNCLASS_CPU, "main", 0xf000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpoker_map, ADDRESS_SPACE_IO, 8 )
@@ -722,15 +722,15 @@ static const gfx_layout charlayout2 =
 };
 
 static GFXDECODE_START( cpoker )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout,   0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( csk )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout,   0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x04000, charlayout2,  0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x08000, charlayout2,  0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0c000, charlayout2,  0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, charlayout2,  0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x04000, charlayout2,  0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x08000, charlayout2,  0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x0c000, charlayout2,  0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, charlayout2,  0, 16 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( cpoker )
@@ -790,52 +790,52 @@ MACHINE_DRIVER_END
  */
 
 ROM_START( cpoker )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "v220i1.bin",  0x0000, 0x8000, CRC(b7cae556) SHA1(bb43ee48634879029ed1a7cd4133d7f12413e2ac) )
 	ROM_LOAD( "v220i2.bin",  0x8000, 0x8000, CRC(8245e42c) SHA1(b7e7b9f643e6dc2f4d5aaf7d50d0a9154ed9a4e7) )
 
-	ROM_REGION( 0x60000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x60000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "220i1.bin",  0x40000, 0x20000, CRC(9c4c0af1) SHA1(7a9808b3093b23bde7ecc7405689b2a28ae34e61) )
 	ROM_LOAD( "220i2.bin",  0x20000, 0x20000, CRC(331fa4b8) SHA1(ddac57251fa5dfecc0988a2ca01eec016ef47f20) )
 	ROM_LOAD( "220i3.bin",  0x00000, 0x20000, CRC(bd2f797c) SHA1(5ca5adae44490dd109f630213a09a68c12f9bd1a) )
 
-	ROM_REGION( 0x10000, REGION_GFX3, 0 )	/* expansion rom - contains backgrounds and pictures charmaps */
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx3", 0 )	/* expansion rom - contains backgrounds and pictures charmaps */
 	ROM_LOAD( "220i7.bin",   0x0000, 0x8000, CRC(8a2ff310) SHA1(a415a99dbb1448b4b2b94e17a3973e6347e3be18) )
 ROM_END
 
 ROM_START( csk227it )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "v227i.bin",   0x0000, 0x10000, CRC(df1ebf49) SHA1(829c7575d3d3780557405b3a61859901df6dbe4f) )
 
-	ROM_REGION( 0x60000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x60000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "6.227",  0x00000, 0x20000, CRC(e9aad93b) SHA1(72116759cd8ddd9828f534e8f8a3f9f96ad2e002) )
 	ROM_LOAD( "5.227",  0x20000, 0x20000, CRC(e4c4c8da) SHA1(0442b0de68f3b69e613506348e00c3cf9139edcf) )
 	ROM_LOAD( "4.227",  0x40000, 0x20000, CRC(afb365dd) SHA1(930a4cd516258e703a75afc25ef6b2655b8b696a) )
 
-	ROM_REGION( 0x30000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x30000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "3.bin",  0x00000, 0x10000, CRC(fcb115ac) SHA1(a9f2b9762413840669cd44f8e54b47a7c4350d11) )	/* extension charset, used for ability game */
 	ROM_LOAD( "2.bin",  0x10000, 0x10000, CRC(848343a3) SHA1(b12f9bc2feb470d2fa8b085621fa60c0895109d4) )
 	ROM_LOAD( "1.bin",  0x20000, 0x10000, CRC(921ad5de) SHA1(b06ab2e63b31361dcb0367110f47bf2453ecdca6) )
 
-	ROM_REGION( 0x10000, REGION_GFX3, 0 )	/* expansion rom - contains backgrounds and pictures charmaps */
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx3", 0 )	/* expansion rom - contains backgrounds and pictures charmaps */
 	ROM_LOAD( "7.227",   0x0000, 0x10000, CRC(a10786ad) SHA1(82f5f81808ca70d67a2710cc66fbbf78588b33b5) )
 ROM_END
 
 ROM_START( csk234it )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "v234it.bin",   0x0000, 0x10000, CRC(344b7059)  SHA1(990cb84e35c0c50d3be9fbb76a11395114dc6c9b) )
 
-	ROM_REGION( 0x60000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x60000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "6.234",  0x00000, 0x20000, CRC(23b855a4) SHA1(8217bac61ad09483d8789113cf394d0e525ab28a) )
 	ROM_LOAD( "5.234",  0x20000, 0x20000, CRC(189039d7) SHA1(146fd1ddb23ceaa4192e0382b0ab82f5cfbdabfe) )
 	ROM_LOAD( "4.234",  0x40000, 0x20000, CRC(c82b0ffc) SHA1(5ebd7da76d402b7111cbe9012cfa3b8a8ff1a86e) )
 
-	ROM_REGION( 0x30000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x30000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "3.bin",  0x00000, 0x10000, CRC(fcb115ac) SHA1(a9f2b9762413840669cd44f8e54b47a7c4350d11) )	/* extension charset, used for ability game */
 	ROM_LOAD( "2.bin",  0x10000, 0x10000, CRC(848343a3) SHA1(b12f9bc2feb470d2fa8b085621fa60c0895109d4) )
 	ROM_LOAD( "1.bin",  0x20000, 0x10000, CRC(921ad5de) SHA1(b06ab2e63b31361dcb0367110f47bf2453ecdca6) )
 
-	ROM_REGION( 0x10000, REGION_GFX3, 0 )	/* expansion rom - contains backgrounds and pictures charmaps */
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx3", 0 )	/* expansion rom - contains backgrounds and pictures charmaps */
 	ROM_LOAD( "7.234",   0x0000, 0x10000, CRC(ae6dd4ad) SHA1(4772d5c150d64d1ef3b68e16214f594eea0b3c1b) )
 ROM_END
 
@@ -862,21 +862,21 @@ This doesn't attempt to decode the gfx.
 
 */
 ROM_START( stellecu )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
 	/* there is data at 0x18000 which is probably mapped somewhere */
 	ROM_LOAD( "u35.bin",   0x0000, 0x20000, CRC(914b7c59) SHA1(3275b5016524467199f32d653c757bfe4f9cfc60) )
 
-	ROM_REGION( 0x60000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x60000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	/* seems to be missing half the gfx */
 	ROM_LOAD( "u23.bin",   0x0000, 0x40000, BAD_DUMP CRC(9d95757d) SHA1(f7f44d684f1f3a5b1e9c0a82f4377c6d79eb4214) )
 
-	ROM_REGION( 0x40000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	/* seems to be missing half the gfx */
 	ROM_LOAD( "u25.bin",   0x0000, 0x40000, BAD_DUMP CRC(63094010) SHA1(a781f1c529167dd0ab411c66b72105fc19e32f02) )
 
-	ROM_REGION( 0x10000, REGION_GFX3, ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx3", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 ) /* Oki Samples */
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 ) /* Oki Samples */
 	/* missing sample tables at start of rom */
 	ROM_LOAD( "u15.bin",   0x0000, 0x40000, BAD_DUMP CRC(72e3e9c1) SHA1(6a8fb93059bee5a4e4b4deb9fee4b5869e53983b) )
 ROM_END
@@ -887,7 +887,7 @@ ROM_END
 static DRIVER_INIT( cpoker )
 {
 	int A;
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -902,7 +902,7 @@ static DRIVER_INIT( cpoker )
 static DRIVER_INIT( cska )
 {
 	int A;
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 
 
 	for (A = 0;A < 0x10000;A++)

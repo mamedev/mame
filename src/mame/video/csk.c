@@ -48,7 +48,7 @@ WRITE8_HANDLER( cpk_palette2_w )
 
 READ8_HANDLER( cpk_expansion_r )
 {
-	UINT8 * RAM = memory_region(machine, REGION_GFX3);
+	UINT8 * RAM = memory_region(machine, RGNCLASS_GFX, "gfx3");
 	return RAM[offset];
 }
 
@@ -120,7 +120,7 @@ INTERRUPT_GEN( cpoker_interrupt )
 
 INTERRUPT_GEN( cska_interrupt )
 {
-	UINT8 * RAM = memory_region(machine, REGION_CPU1);
+	UINT8 * RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	RAM[ hopperOK ] = 1;	/* simulate hopper working! */
 

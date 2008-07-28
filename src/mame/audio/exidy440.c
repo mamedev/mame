@@ -164,7 +164,7 @@ static void *exidy440_sh_start(int clock, const struct CustomSound_interface *co
 	stream = stream_create(0, 2, clock, NULL, channel_update);
 
 	/* allocate the sample cache */
-	length = memory_region_length(Machine, REGION_SOUND1) * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
+	length = memory_region_length(Machine, RGNCLASS_SOUND, "cvsd") * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
 	sound_cache = auto_malloc(length);
 
 	/* determine the hard end of the cache and reset */
@@ -653,7 +653,7 @@ static INT16 *find_or_add_to_sound_cache(int address, int length, int bits, int 
 		if (current->address == address && current->length == length && current->bits == bits && current->frequency == frequency)
 			return current->data;
 
-	return add_to_sound_cache(&memory_region(Machine, REGION_SOUND1)[address], address, length, bits, frequency);
+	return add_to_sound_cache(&memory_region(Machine, RGNCLASS_SOUND, "cvsd")[address], address, length, bits, frequency);
 }
 
 

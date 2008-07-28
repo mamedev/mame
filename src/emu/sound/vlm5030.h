@@ -3,7 +3,6 @@
 
 struct VLM5030interface
 {
-	int memory_region;  /* memory region of speech rom    */
 	int memory_size;    /* memory size of speech rom (0=memory region length) */
 };
 

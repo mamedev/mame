@@ -162,7 +162,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( cardline )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 2 )
 GFXDECODE_END
 
 static PALETTE_INIT(cardline)
@@ -219,7 +219,7 @@ static MACHINE_DRIVER_START( cardline )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
@@ -232,17 +232,17 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( cardline )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "dns0401.u23",   0x0000, 0x10000, CRC(5bbaf5c1) SHA1(70972a744c5981b01a46799a7fd1b0a600489264) )
 
-	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "u38cll01.u38",   0x000001, 0x80000, CRC(12f62496) SHA1(b89eaf09e76c5c42588bf9c8c23190347635cc83) )
 	ROM_LOAD16_BYTE( "u39cll01.u39",   0x000000, 0x80000, CRC(fcfa703e) SHA1(9230ad9df02140f3a6c38b24558548a888b23412) )
 
-	ROM_REGION( 0x40000,  REGION_SOUND1, 0 ) // OKI samples
+	ROM_REGION( 0x40000,  RGNCLASS_SOUND, "oki", 0 ) // OKI samples
 	ROM_LOAD( "3a.u3",   0x0000, 0x40000, CRC(9fa543c5) SHA1(a22396cb341ca4a3f0dd23719620a219c91e0e9d) )
 
-	ROM_REGION( 0x0200,  REGION_PROMS, 0 )
+	ROM_REGION( 0x0200,  RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "82s147.u33",   0x0000, 0x0200, CRC(a3b95911) SHA1(46850ea38950cdccbc2ad91d968218ac964c0eb5) )
 
 ROM_END

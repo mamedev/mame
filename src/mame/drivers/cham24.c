@@ -124,8 +124,8 @@ static WRITE8_HANDLER( cham24_mapper_w )
 	UINT32 prg_bank_page_size = (offset >> 12) & 0x01;
 	UINT32 gfx_mirroring = (offset >> 13) & 0x01;
 
-	UINT8* dst = memory_region( machine, REGION_CPU1 );
-	UINT8* src = memory_region( machine, REGION_USER1 );
+	UINT8* dst = memory_region( machine, RGNCLASS_CPU, "main" );
+	UINT8* src = memory_region( machine, RGNCLASS_USER, "user1" );
 
 	// switch PPU VROM bank
 	ppu2c0x_set_videorom_bank( 0, 0, 8, gfx_bank, 512 );
@@ -192,14 +192,14 @@ INPUT_PORTS_END
 
 static const struct NESinterface cham24_interface_1 =
 {
-	REGION_CPU1
+	"main"
 };
 
 static MACHINE_RESET( cham24 )
 {
 	/* switch PRG rom */
-	UINT8* dst = memory_region( machine, REGION_CPU1 );
-	UINT8* src = memory_region( machine, REGION_USER1 );
+	UINT8* dst = memory_region( machine, RGNCLASS_CPU, "main" );
+	UINT8* src = memory_region( machine, RGNCLASS_USER, "user1" );
 
 	memcpy( &dst[0x8000], &src[0x0f8000], 0x4000 );
 	memcpy( &dst[0xc000], &src[0x0f8000], 0x4000 );
@@ -223,7 +223,7 @@ static const ppu2c0x_interface ppu_interface =
 {
 	PPU_2C04,				/* type */
 	1,						/* num */
-	{ REGION_GFX1 },		/* vrom gfx region */
+	{ "gfx1" },				/* vrom gfx region */
 	{ 0 },					/* gfxlayout num */
 	{ 0 },					/* color base */
 	{ PPU_MIRROR_NONE },	/* mirroring */
@@ -283,15 +283,15 @@ static MACHINE_DRIVER_START( cham24 )
 MACHINE_DRIVER_END
 
 ROM_START( cham24 )
-	ROM_REGION(0x10000, REGION_CPU1, ROMREGION_ERASE00)
+	ROM_REGION(0x10000, RGNCLASS_CPU, "main", ROMREGION_ERASE00)
 
-	ROM_REGION(0x100000, REGION_USER1, 0)
+	ROM_REGION(0x100000, RGNCLASS_USER, "user1", 0)
 	ROM_LOAD( "24-2.u2", 0x000000, 0x100000, CRC(686e9d05) SHA1(a55b9850a4b47f1b4495710e71534ca0287b05ee) )
 
-	ROM_REGION(0x080000, REGION_GFX1, 0)
+	ROM_REGION(0x080000, RGNCLASS_GFX, "gfx1", 0)
 	ROM_LOAD( "24-1.u1", 0x000000, 0x080000, CRC(43c43d58) SHA1(3171befaca28acc80fb70226748d9abde76a1b56) )
 
-	ROM_REGION(0x10000, REGION_USER2, 0)
+	ROM_REGION(0x10000, RGNCLASS_USER, "user2", 0)
 	ROM_LOAD( "24-3.u3", 0x0000, 0x10000, CRC(e97955fa) SHA1(6d686c5d0967c9c2f40dbd8e6a0c0907606f2c7d) ) // unknown rom
 ROM_END
 

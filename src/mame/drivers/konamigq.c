@@ -202,7 +202,7 @@ static ADDRESS_MAP_START( konamigq_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801c00, 0x1f801dff) AM_NOP
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE(2) AM_REGION(REGION_USER1, 0) /* bios */
+	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE(2) AM_REGION(RGNCLASS_USER, "user1", 0) /* bios */
 	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE(1) /* ram mirror */
 	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE(2) /* bios mirror */
 	AM_RANGE(0xa0000000, 0xa03fffff) AM_RAM AM_SHARE(1) /* ram mirror */
@@ -271,7 +271,7 @@ ADDRESS_MAP_END
 
 static const struct K054539interface k054539_interface =
 {
-	REGION_SOUND1
+	"shared"
 };
 
 /* SCSI */
@@ -338,7 +338,7 @@ static DRIVER_INIT( konamigq )
 {
 	psx_driver_init(machine);
 
-	m_p_n_pcmram = memory_region( machine, REGION_SOUND1 ) + 0x80000;
+	m_p_n_pcmram = memory_region( machine, RGNCLASS_SOUND, "shared" ) + 0x80000;
 }
 
 static void konamigq_exit(running_machine *machine)
@@ -498,16 +498,16 @@ static INPUT_PORTS_START( konamigq )
 INPUT_PORTS_END
 
 ROM_START( cryptklr )
-	ROM_REGION( 0x80000, REGION_CPU2, 0 ) /* 68000 sound program */
+	ROM_REGION( 0x80000, RGNCLASS_CPU, "sound", 0 ) /* 68000 sound program */
 	ROM_LOAD16_WORD_SWAP( "420a01.2g", 0x000000, 0x080000, CRC(84fc2613) SHA1(e06f4284614d33c76529eb43b168d095200a9eac) )
 
-	ROM_REGION( 0x400000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x400000, RGNCLASS_SOUND, "shared", 0 )
 	ROM_LOAD( "420a02.3m",    0x000000, 0x080000, CRC(2169c3c4) SHA1(6d525f10385791e19eb1897d18f0bab319640162) )
 
-	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 ) /* bios */
+	ROM_REGION32_LE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios */
 	ROM_LOAD( "420b03.27p",   0x0000000, 0x080000, CRC(aab391b1) SHA1(bf9dc7c0c8168c22a4be266fe6a66d3738df916b) )
 
-	DISK_REGION( REGION_DISKS )
+	DISK_REGION( RGNCLASS_DISKS, "disks" )
 	DISK_IMAGE( "420uaa04", 0, MD5(179464886f58a2e14b284e3813227a86) SHA1(18fe867c44982bacf0d3ff8453487cd06425a6b7) )
 ROM_END
 

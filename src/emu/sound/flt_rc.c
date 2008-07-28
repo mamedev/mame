@@ -80,7 +80,7 @@ static void set_RC_info(struct filter_rc_info *info, int type, double R1, double
 }
 
 
-static void *filter_rc_start(int sndindex, int clock, const void *config)
+static void *filter_rc_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct filter_rc_info *info;
 	const flt_rc_config *conf = config;

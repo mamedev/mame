@@ -108,7 +108,7 @@ static TILEMAP_MAPPER( scan_mode3 )
 
 static TILE_GET_INFO( get_tile_info_BG_1 )
 {
-	UINT8 *map = memory_region(machine, REGION_USER1) + ((*madalien_video_flags & 0x08) << 6);
+	UINT8 *map = memory_region(machine, RGNCLASS_USER, "user1") + ((*madalien_video_flags & 0x08) << 6);
 
 	SET_TILE_INFO(1, map[tile_index], BIT(*madalien_video_flags, 2) ? 2 : 0, 0);
 }
@@ -116,7 +116,7 @@ static TILE_GET_INFO( get_tile_info_BG_1 )
 
 static TILE_GET_INFO( get_tile_info_BG_2 )
 {
-	UINT8 *map = memory_region(machine, REGION_USER1) + ((*madalien_video_flags & 0x08) << 6) + 0x80;
+	UINT8 *map = memory_region(machine, RGNCLASS_USER, "user1") + ((*madalien_video_flags & 0x08) << 6) + 0x80;
 
 	SET_TILE_INFO(1, map[tile_index], BIT(*madalien_video_flags, 2) ? 2 : 0, 0);
 }
@@ -370,9 +370,9 @@ static const gfx_layout tilelayout =
 
 
 static GFXDECODE_START( madalien )
-	GFXDECODE_ENTRY( 0,           0, charlayout,     0x20, 2 ) /* foreground characters, stored in RAM */
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,        0, 4 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, headlightlayout,   0, 1 )
+	GFXDECODE_ENTRY( NULL,   0, charlayout,     0x20, 2 ) /* foreground characters, stored in RAM */
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0, 4 )
+	GFXDECODE_ENTRY( "gfx2", 0, headlightlayout,   0, 1 )
 GFXDECODE_END
 
 

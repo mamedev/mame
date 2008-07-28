@@ -187,8 +187,8 @@ static const gfx_layout spritelayout =
 
 
 static GFXDECODE_START( xorworld )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, tilelayout,	0, 64 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, spritelayout, 0, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout,	0, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0x000000, spritelayout, 0, 64 )
 GFXDECODE_END
 
 
@@ -239,15 +239,15 @@ MACHINE_DRIVER_END
 
 
 ROM_START( xorworld )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "c13.bin", 0x000000, 0x010000, CRC(615a864d) SHA1(db07eef19d26a4daa0bcc17ac24d237483f93bf6) )
 	ROM_LOAD16_BYTE( "b13.bin", 0x000001, 0x010000, CRC(632e8ee5) SHA1(ec53e632c762f72ad1fe3fab85111bdcc1e818ae) )
 
-	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "d9.bin",	0x000000, 0x010000, CRC(da8d4d65) SHA1(41bcc15f26066bd820b44c0f258e70d0102953c9) )
 	ROM_LOAD( "d10.bin",	0x010000, 0x010000, CRC(3b1d6f24) SHA1(bedf60a4cbf20492b8a846b6a7b578f8fe8dbde9) )
 
-	ROM_REGION( 0x0300, REGION_PROMS, 0 )
+	ROM_REGION( 0x0300, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "b4.bin",   0x0000, 0x0100, CRC(75e468af) SHA1(b5fd1a086c27ca2e837cbbf1b7e57dfdd369b0d0) )  /* Red palette ROM (4 bits) */
 	ROM_LOAD( "b7.bin",   0x0100, 0x0100, CRC(7e1cd146) SHA1(fd26a28f90c50ffcb0fe7718820c81eb9fe79e66) )  /* Green palette ROM (4 bits) */
 	ROM_LOAD( "b5.bin",   0x0200, 0x0100, CRC(c1b9d9f9) SHA1(c4b02bf60db449fb308a5eb3e41c43299ad8e3e3) )  /* Blue palette ROM (4 bits) */
@@ -261,7 +261,7 @@ static DRIVER_INIT( xorworld )
 	/*  patch some strange protection (without this, strange characters appear
         after level 5 and some pieces don't rotate properly some times) */
 
-	UINT16 *rom = (UINT16 *)(memory_region(machine, REGION_CPU1) + 0x1390);
+	UINT16 *rom = (UINT16 *)(memory_region(machine, RGNCLASS_CPU, "main") + 0x1390);
 
 	PATCH(0x4239); PATCH(0x00ff); PATCH(0xe196);	/* clr.b $ffe196 */
 	PATCH(0x4239); PATCH(0x00ff); PATCH(0xe197);	/* clr.b $ffe197 */

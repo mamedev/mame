@@ -75,7 +75,7 @@ static void set_palette(running_machine *machine, mystston_state *state)
 	static const int resistances_b [2] = { 3300, 1500 };
 	double weights_rg[3], weights_b[2];
 
-	UINT8 *color_prom = memory_region(machine, REGION_PROMS);
+	UINT8 *color_prom = memory_region(machine, RGNCLASS_PROMS, "proms");
 
 	compute_resistor_weights(0,	255, -1.0,
 			3, resistances_rg, weights_rg, 0, 1000,
@@ -307,9 +307,9 @@ static const gfx_layout spritelayout =
 
 
 static GFXDECODE_START( mystston )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   4*8, 4 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 2*8, 1 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 0*8, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   4*8, 4 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 2*8, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0*8, 2 )
 GFXDECODE_END
 
 

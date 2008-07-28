@@ -124,7 +124,7 @@ static WRITE8_HANDLER( pending_command_clear_w )
 
 static WRITE8_HANDLER( suprslam_sh_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "audio");
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x8000;
@@ -304,9 +304,9 @@ static const gfx_layout suprslam_16x16x4_layout =
 };
 
 static GFXDECODE_START( suprslam )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, suprslam_8x8x4_layout,   0x000, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, suprslam_16x16x4_layout, 0x200, 16 )
-	GFXDECODE_ENTRY( REGION_GFX3, 0, suprslam_16x16x4_layout, 0x100, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, suprslam_8x8x4_layout,   0x000, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, suprslam_16x16x4_layout, 0x200, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, suprslam_16x16x4_layout, 0x100, 16 )
 GFXDECODE_END
 
 /*** MORE SOUND **************************************************************/
@@ -318,9 +318,7 @@ static void irqhandler(running_machine *machine, int irq)
 
 static const struct YM2610interface ym2610_interface =
 {
-	irqhandler,
-	REGION_SOUND1,
-	REGION_SOUND2
+	irqhandler
 };
 
 /*** MACHINE DRIVER **********************************************************/
@@ -363,30 +361,30 @@ MACHINE_DRIVER_END
 /*** ROM LOADING *************************************************************/
 
 ROM_START( suprslam )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "eb26ic47.bin", 0x000000, 0x080000, CRC(8d051fd8) SHA1(1820209306116e5b09cc10a8b3661d232c688b24) )
 	ROM_LOAD16_WORD_SWAP( "eb26ic73.bin", 0x080000, 0x080000, CRC(ca4ad383) SHA1(143ee475761fa54d5b3a9f4e3fb3acc8408972fd) )
 
-	ROM_REGION( 0x030000, REGION_CPU2, 0 ) /* Z80 Code */
+	ROM_REGION( 0x030000, RGNCLASS_CPU, "audio", 0 ) /* Z80 Code */
 	ROM_LOAD( "eb26ic38.bin", 0x000000, 0x020000, CRC(153f2c50) SHA1(b70f248cfb18239fcd26e36fb36159f219debf2c) )
 	ROM_RELOAD(               0x010000, 0x020000 )
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) /* Samples */
-	ROM_LOAD( "eb26ic59.bin", 0x000000, 0x100000, CRC(4ae4095b) SHA1(62b0600b18febb6cecb6370b03a2d6b7756840a2) )
-
-	ROM_REGION( 0x200000, REGION_SOUND2, 0 ) /* Samples */
+	ROM_REGION( 0x200000, RGNCLASS_SOUND, "ym", 0 ) /* Samples */
 	ROM_LOAD( "eb26ic66.bin", 0x000000, 0x200000, CRC(8cb33682) SHA1(0e6189ef0673227d35b9a154e333cc6cf9b65df6) )
 
-	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE ) /* 8x8x4 'Screen' Layer GFX */
+	ROM_REGION( 0x100000, RGNCLASS_SOUND, "ym.deltat", 0 ) /* Samples */
+	ROM_LOAD( "eb26ic59.bin", 0x000000, 0x100000, CRC(4ae4095b) SHA1(62b0600b18febb6cecb6370b03a2d6b7756840a2) )
+
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* 8x8x4 'Screen' Layer GFX */
 	ROM_LOAD( "eb26ic43.bin", 0x000000, 0x200000, CRC(9dfb0959) SHA1(ba479192a422a55efcf8aa7ff995c914525b4a56) )
 
-	ROM_REGION( 0x800000, REGION_GFX2, ROMREGION_DISPOSE ) /* 16x16x4 Sprites GFX */
+	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) /* 16x16x4 Sprites GFX */
 	ROM_LOAD( "eb26ic09.bin", 0x000000, 0x200000, CRC(5a415365) SHA1(a59a4ab231980b0540e9a8356a02530217779dbd) )
 	ROM_LOAD( "eb26ic10.bin", 0x200000, 0x200000, CRC(a04f3140) SHA1(621ff823d93fecdde801912064ac951727b71677) )
 	ROM_LOAD( "eb26_100.bin", 0x400000, 0x200000, CRC(c2ee5eb6) SHA1(4b61e77a0d0f38b542d5e32fa25799a4c85bf651) )
 	ROM_LOAD( "eb26_101.bin", 0x600000, 0x200000, CRC(7df654b7) SHA1(3a5ed6ee7cc31566e908b835a065e9bce60389fb) )
 
-	ROM_REGION( 0x400000, REGION_GFX3, ROMREGION_DISPOSE ) /* 16x16x4 BG GFX */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE ) /* 16x16x4 BG GFX */
 	ROM_LOAD( "eb26ic12.bin", 0x000000, 0x200000, CRC(14561bd7) SHA1(5f69f68a305aba9acb21b844c8aa5b1de60f89ff) )
 	ROM_LOAD( "eb26ic36.bin", 0x200000, 0x200000, CRC(92019d89) SHA1(dbf6f8384341707996e4b9e07a3d4f536cf4905b) )
 ROM_END

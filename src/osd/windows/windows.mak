@@ -34,6 +34,12 @@
 # uncomment next line to enable a Unicode build
 # UNICODE = 1
 
+# set this to the minimum Direct3D version to support (8 or 9)
+DIRECT3D = 8
+
+# set this to the minimum DirectInput version to support (7 or 8)
+DIRECTINPUT = 7
+
 
 
 ###########################################################################

@@ -565,7 +565,7 @@ INPUT_PORTS_END
 static PALETTE_INIT(jongkyo)
 {
 	int i;
-	UINT8* proms = memory_region(machine, REGION_PROMS);
+	UINT8* proms = memory_region(machine, RGNCLASS_PROMS, "proms");
 	for (i=0;i<0x40;i++)
 	{
 		int data = proms[i];
@@ -618,14 +618,14 @@ MACHINE_DRIVER_END
 
 
 ROM_START( jongkyo )
-	ROM_REGION( 0x9000, REGION_CPU1, 0 )
+	ROM_REGION( 0x9000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "epr-6258", 0x00000, 0x02000, CRC(fb8b7bcc) SHA1(8ece7c2c82c237b4b51829d412b2109b96ccd0e7) )
 	ROM_LOAD( "epr-6259", 0x02000, 0x02000, CRC(e46cde5d) SHA1(1cbe1677cfb3fa9f76ad90d5b1446ce9cefee6b7) )
 	ROM_LOAD( "epr-6260", 0x04000, 0x02000, CRC(369a5365) SHA1(037a2971a59ab339595b333cbdfd4cbb104de2be) )
 	ROM_LOAD( "epr-6262", 0x06000, 0x01000, CRC(ecf50f34) SHA1(ecfa1a9360d8fbcbed457d46e53bae77f6d78c1d) )
 	ROM_LOAD( "epr-6261", 0x07000, 0x02000, CRC(9c475ae1) SHA1(b993c2636dafed9f80fa87e71921c3c85c039e45) )	// banked at 6c00-6fff
 
-	ROM_REGION( 0x300, REGION_PROMS, 0 )
+	ROM_REGION( 0x300, RGNCLASS_PROMS, "proms", 0 )
 	/* colours */
 	ROM_LOAD( "pr-6263.6j", 0x00000, 0x00020, CRC(468134d9) SHA1(bb633929df17e448882ee80613fc1dfac3c35d7a) )
 	ROM_LOAD( "pr-6264.0h", 0x00020, 0x00020, CRC(46014727) SHA1(eec451f292ee319fa6bfbbf223aaa12b231692c1) )
@@ -639,7 +639,7 @@ ROM_END
 static DRIVER_INIT( jongkyo )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 
 	/* first of all, do a simple bitswap */
 	for (i = 0x6000; i < 0x9000; ++i)

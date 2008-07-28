@@ -94,7 +94,7 @@ static INTERRUPT_GEN( xxmissio_interrupt_s )
 
 static MACHINE_START( xxmissio )
 {
-	memory_configure_bank(1, 0, 8, memory_region(machine, REGION_USER1), 0x4000);
+	memory_configure_bank(1, 0, 8, memory_region(machine, RGNCLASS_USER, "user1"), 0x4000);
 	memory_set_bank(1, 0);
 }
 
@@ -266,9 +266,9 @@ static const gfx_layout bglayout =
 };
 
 static GFXDECODE_START( xxmissio )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,   256,  8 ) /* FG */
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout,   0,  8 ) /* sprite */
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, bglayout,     512, 16 ) /* BG */
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   256,  8 ) /* FG */
+	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout,   0,  8 ) /* sprite */
+	GFXDECODE_ENTRY( "gfx2", 0x0000, bglayout,     512, 16 ) /* BG */
 GFXDECODE_END
 
 /****************************************************************************/
@@ -349,24 +349,24 @@ MACHINE_DRIVER_END
 /****************************************************************************/
 
 ROM_START( xxmissio )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 ) /* CPU1 */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* CPU1 */
 	ROM_LOAD( "xx1.4l", 0x0000,  0x8000, CRC(86e07709) SHA1(7bfb7540b6509f07a6388ca2da6b3892f5b1df74) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* CPU2 */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "sub", 0 ) /* CPU2 */
 	ROM_LOAD( "xx2.4b", 0x0000,  0x4000, CRC(13fa7049) SHA1(e8974d9f271a966611b523496ba8cd910e227a23) )
 
-	ROM_REGION( 0x18000, REGION_USER1, 0 ) /* BANK */
+	ROM_REGION( 0x18000, RGNCLASS_USER, "user1", 0 ) /* BANK */
 	ROM_LOAD( "xx3.6a", 0x00000,  0x8000, CRC(16fdacab) SHA1(2158ca9b14c52bc1cd5ef0f4c0180f0519224403) )
 	ROM_LOAD( "xx4.6b", 0x08000,  0x8000, CRC(274bd4d2) SHA1(2ddf9b953584e26f221b1c86181d827bdc3dc81b) )
 	ROM_LOAD( "xx5.6d", 0x10000,  0x8000, CRC(c5f35535) SHA1(6812b70beb73fc80cf20d2d51f747952ed106887) )
 
-	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE ) /* FG/sprites */
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* FG/sprites */
 	ROM_LOAD16_BYTE( "xx6.8j", 0x00001, 0x8000, CRC(dc954d01) SHA1(73ecbbc859da9db9fead91cd03bb90e5779916e2) )
 	ROM_LOAD16_BYTE( "xx8.8f", 0x00000, 0x8000, CRC(a9587cc6) SHA1(5fbcb88505f89c4d8a2a228489612ff66fc5d3af) )
 	ROM_LOAD16_BYTE( "xx7.8h", 0x10001, 0x8000, CRC(abe9cd68) SHA1(f3ce9b40e3d9cdc9b77a43f9d5d0411338d88833) )
 	ROM_LOAD16_BYTE( "xx9.8e", 0x10000, 0x8000, CRC(854e0e5f) SHA1(b01d6a735b175c2f7ac3fc4053702c9da62c6a4e) )
 
-	ROM_REGION( 0x10000, REGION_GFX2, ROMREGION_DISPOSE ) /* BG */
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) /* BG */
 	ROM_LOAD16_BYTE( "xx10.4c", 0x0000,  0x8000, CRC(d27d7834) SHA1(60c24dc2ab7e2a33da4002f1f07eaf7898cf387f) )
 	ROM_LOAD16_BYTE( "xx11.4b", 0x0001,  0x8000, CRC(d9dd827c) SHA1(aea3a5abd871adf7f75ad4d6cc57eff0833135c7) )
 ROM_END

@@ -76,7 +76,6 @@ struct QSOUND_CHANNEL
 struct qsound_info
 {
 	/* Private variables */
-	const struct QSound_interface *intf;	/* Interface  */
 	sound_stream * stream;				/* Audio stream */
 	struct QSOUND_CHANNEL channel[QSOUND_CHANNELS];
 	int data;				  /* register latch data */
@@ -94,7 +93,7 @@ struct qsound_info
 static void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length );
 static void qsound_set_command(struct qsound_info *chip, int data, int value);
 
-static void *qsound_start(int sndindex, int clock, const void *config)
+static void *qsound_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct qsound_info *chip;
 	int i;
@@ -102,10 +101,8 @@ static void *qsound_start(int sndindex, int clock, const void *config)
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(chip));
 
-	chip->intf = config;
-
-	chip->sample_rom = (QSOUND_SRC_SAMPLE *)memory_region(Machine, chip->intf->region);
-	chip->sample_rom_length = memory_region_length(Machine, chip->intf->region);
+	chip->sample_rom = (QSOUND_SRC_SAMPLE *)memory_region(Machine, RGNCLASS_SOUND, tag);
+	chip->sample_rom_length = memory_region_length(Machine, RGNCLASS_SOUND, tag);
 
 	memset(chip->channel, 0, sizeof(chip->channel));
 

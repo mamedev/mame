@@ -454,11 +454,11 @@ static const gfx_layout tilelayout =
 
 
 static GFXDECODE_START( backfire )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,      0, 128 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,      0, 128 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,      0, 128 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,    0x200, 32 )	/* Sprites 16x16 (screen 1) */
-	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout,    0x600, 32 )	/* Sprites 16x16 (screen 2) */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 128 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,      0, 128 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,      0, 128 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,    0x200, 32 )	/* Sprites 16x16 (screen 1) */
+	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,    0x600, 32 )	/* Sprites 16x16 (screen 2) */
 GFXDECODE_END
 
 
@@ -469,7 +469,6 @@ static void sound_irq_gen(running_machine *machine, int state)
 
 static const struct YMZ280Binterface ymz280b_intf =
 {
-	REGION_SOUND1,
 	sound_irq_gen
 };
 
@@ -576,11 +575,11 @@ TSW1: Push Button TEST switch to access options menu (coins/lives etc).
 */
 
 ROM_START( backfire )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD32_WORD( "ra00-0.2j",    0x000002, 0x080000, CRC(790da069) SHA1(84fd90fb1833b97459cb337fdb92f7b6e93b5936) )
 	ROM_LOAD32_WORD( "ra01-0.3j",    0x000000, 0x080000, CRC(447cb57b) SHA1(1d503b9cf1cadd3fdd7c9d6d59d4c40a59fa25ab))
 
-	ROM_REGION( 0x400000, REGION_GFX1, ROMREGION_DISPOSE ) /* Tiles 1 */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* Tiles 1 */
 	ROM_LOAD( "mbz-00.9a",    0x000000, 0x080000, CRC(1098d504) SHA1(1fecd26b92faffce0b59a8a9646bfd457c17c87c) )
 	ROM_CONTINUE( 0x200000, 0x080000)
 	ROM_CONTINUE( 0x100000, 0x080000)
@@ -590,33 +589,33 @@ ROM_START( backfire )
 	ROM_CONTINUE( 0x180000, 0x080000)
 	ROM_CONTINUE( 0x380000, 0x080000)
 
-	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE ) /* Tiles 2 */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) /* Tiles 2 */
 	ROM_LOAD( "mbz-02.12a",    0x000000, 0x100000, CRC(2bd2b0a1) SHA1(8fcb37728f3248ad55e48f2d398b014b36c9ec05) )
 
-	ROM_REGION( 0x400000, REGION_GFX3, ROMREGION_DISPOSE ) /* Sprites 1 */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE ) /* Sprites 1 */
 	ROM_LOAD16_BYTE( "mbz-03.15a",    0x000001, 0x200000, CRC(2e818569) SHA1(457c1cad25d9b21459262be8b5788969f566a996) )
 	ROM_LOAD16_BYTE( "mbz-04.16a",    0x000000, 0x200000, CRC(67bdafb1) SHA1(9729c18f3153e4bba703a6f46ad0b886c52d84e2) )
 
-	ROM_REGION( 0x400000, REGION_GFX4, ROMREGION_DISPOSE ) /* Sprites 2 */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE ) /* Sprites 2 */
 	ROM_LOAD16_BYTE( "mbz-03.18a",    0x000001, 0x200000, CRC(2e818569) SHA1(457c1cad25d9b21459262be8b5788969f566a996) )
 	ROM_LOAD16_BYTE( "mbz-04.19a",    0x000000, 0x200000, CRC(67bdafb1) SHA1(9729c18f3153e4bba703a6f46ad0b886c52d84e2) )
 
-	ROM_REGION( 0x400000, REGION_SOUND1, ROMREGION_ERASEFF ) /* samples */
+	ROM_REGION( 0x400000, RGNCLASS_SOUND, "ymz", ROMREGION_ERASEFF ) /* samples */
 	ROM_LOAD( "mbz-05.17l",    0x000000, 0x200000,  CRC(947c1da6) SHA1(ac36006e04dc5e3990f76539763cc76facd08376) )
 	ROM_LOAD( "mbz-06.19l",    0x200000, 0x080000,  CRC(4a38c635) SHA1(7f0fb6a7a4aa6774c04fa38e53ceff8744fe1e9f) )
 
-	ROM_REGION( 0x0600, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0600, RGNCLASS_PLDS, "plds", ROMREGION_DISPOSE )
 	ROM_LOAD( "gal16v8b.6b",  0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "gal16v8b.6d",  0x0200, 0x0117, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "gal16v8b.12n", 0x0400, 0x0117, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
 ROM_START( backfira )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD32_WORD( "rb-00h.h2",    0x000002, 0x080000, CRC(60973046) SHA1(e70d9be9cb172920da2a2ac9d317768b1438c59d) )
 	ROM_LOAD32_WORD( "rb-01l.h3",    0x000000, 0x080000, CRC(27472f60) SHA1(d73b1e68dc51e28b1148db39ce22bd2e93f6fd0a) )
 
-	ROM_REGION( 0x400000, REGION_GFX1, ROMREGION_DISPOSE ) /* Tiles 1 */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* Tiles 1 */
 	ROM_LOAD( "mbz-00.9a",    0x000000, 0x080000, CRC(1098d504) SHA1(1fecd26b92faffce0b59a8a9646bfd457c17c87c) )
 	ROM_CONTINUE( 0x200000, 0x080000)
 	ROM_CONTINUE( 0x100000, 0x080000)
@@ -626,25 +625,25 @@ ROM_START( backfira )
 	ROM_CONTINUE( 0x180000, 0x080000)
 	ROM_CONTINUE( 0x380000, 0x080000)
 
-	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE ) /* Tiles 2 */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) /* Tiles 2 */
 	ROM_LOAD( "mbz-02.12a",    0x000000, 0x100000, CRC(2bd2b0a1) SHA1(8fcb37728f3248ad55e48f2d398b014b36c9ec05) )
 
-	ROM_REGION( 0x400000, REGION_GFX3, ROMREGION_DISPOSE ) /* Sprites 1 */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE ) /* Sprites 1 */
 	ROM_LOAD16_BYTE( "mbz-03.15a",    0x000001, 0x200000, CRC(2e818569) SHA1(457c1cad25d9b21459262be8b5788969f566a996) )
 	ROM_LOAD16_BYTE( "mbz-04.16a",    0x000000, 0x200000, CRC(67bdafb1) SHA1(9729c18f3153e4bba703a6f46ad0b886c52d84e2) )
 
-	ROM_REGION( 0x400000, REGION_GFX4, ROMREGION_DISPOSE ) /* Sprites 2 */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE ) /* Sprites 2 */
 	ROM_LOAD16_BYTE( "mbz-03.18a",    0x000001, 0x200000, CRC(2e818569) SHA1(457c1cad25d9b21459262be8b5788969f566a996) )
 	ROM_LOAD16_BYTE( "mbz-04.19a",    0x000000, 0x200000, CRC(67bdafb1) SHA1(9729c18f3153e4bba703a6f46ad0b886c52d84e2) )
 
-	ROM_REGION( 0x400000, REGION_SOUND1, ROMREGION_ERASEFF ) /* samples */
+	ROM_REGION( 0x400000, RGNCLASS_SOUND, "ymz", ROMREGION_ERASEFF ) /* samples */
 	ROM_LOAD( "mbz-05.17l",    0x000000, 0x200000,  CRC(947c1da6) SHA1(ac36006e04dc5e3990f76539763cc76facd08376) )
 	ROM_LOAD( "mbz-06.19l",    0x200000, 0x080000,  CRC(4a38c635) SHA1(7f0fb6a7a4aa6774c04fa38e53ceff8744fe1e9f) )
 ROM_END
 
 static void descramble_sound( running_machine *machine )
 {
-	UINT8 *rom = memory_region(machine, REGION_SOUND1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_SOUND, "ymz");
 	int length = 0x200000; // only the first rom is swapped on backfire!
 	UINT8 *buf1 = malloc_or_die(length);
 	UINT32 x;
@@ -681,8 +680,8 @@ static READ32_HANDLER( backfire_speedup_r )
 
 static DRIVER_INIT( backfire )
 {
-	deco56_decrypt(machine, REGION_GFX1); /* 141 */
-	deco56_decrypt(machine, REGION_GFX2); /* 141 */
+	deco56_decrypt_gfx(machine, "gfx1"); /* 141 */
+	deco56_decrypt_gfx(machine, "gfx2"); /* 141 */
 	deco156_decrypt(machine);
 	cpunum_set_clockscale(machine, 0, 4.0f); /* core timings aren't accurate */
 	descramble_sound(machine);

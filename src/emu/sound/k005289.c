@@ -151,10 +151,9 @@ static void K005289_update(void *param, stream_sample_t **inputs, stream_sample_
 		*buffer++ = info->mixer_lookup[*mix++];
 }
 
-static void *k005289_start(int sndindex, int clock, const void *config)
+static void *k005289_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	k005289_sound_channel *voice;
-	const struct k005289_interface *intf = config;
 	struct k005289_info *info;
 
 	info = auto_malloc(sizeof(*info));
@@ -173,7 +172,7 @@ static void *k005289_start(int sndindex, int clock, const void *config)
 	if (make_mixer_table(info, 2))
 		return NULL;
 
-	info->sound_prom = memory_region(Machine, intf->region);
+	info->sound_prom = memory_region(Machine, RGNCLASS_SOUND, tag);
 
 	/* reset all the voices */
 	voice[0].frequency = 0;

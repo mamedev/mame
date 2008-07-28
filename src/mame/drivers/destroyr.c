@@ -316,10 +316,10 @@ static const gfx_layout destroyr_waves_layout =
 
 
 static GFXDECODE_START( destroyr )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, destroyr_alpha_num_layout, 4, 1 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, destroyr_minor_object_layout, 4, 1 )
-	GFXDECODE_ENTRY( REGION_GFX3, 0, destroyr_major_object_layout, 0, 1 )
-	GFXDECODE_ENTRY( REGION_GFX4, 0, destroyr_waves_layout, 4, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, destroyr_alpha_num_layout, 4, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, destroyr_minor_object_layout, 4, 1 )
+	GFXDECODE_ENTRY( "gfx3", 0, destroyr_major_object_layout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx4", 0, destroyr_waves_layout, 4, 1 )
 GFXDECODE_END
 
 
@@ -362,23 +362,23 @@ MACHINE_DRIVER_END
 
 
 ROM_START( destroyr )
-	ROM_REGION( 0x8000, REGION_CPU1, 0 )                  /* program code */
+	ROM_REGION( 0x8000, RGNCLASS_CPU, "main", 0 )                  /* program code */
 	ROM_LOAD( "30146-01.c3", 0x7800, 0x0800, CRC(e560c712) SHA1(0505ab57eee5421b4ff4e87d14505e02b18fd54c) )
 
-	ROM_REGION( 0x0400, REGION_GFX1, ROMREGION_DISPOSE )   /* alpha numerics */
+	ROM_REGION( 0x0400, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )   /* alpha numerics */
 	ROM_LOAD( "30135-01.p4", 0x0000, 0x0400, CRC(184824cf) SHA1(713cfd1d41ef7b1c345ea0038b652c4ba3f08301) )
 
-	ROM_REGION( 0x0400, REGION_GFX2, ROMREGION_DISPOSE )   /* minor objects */
+	ROM_REGION( 0x0400, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )   /* minor objects */
 	ROM_LOAD( "30132-01.f4", 0x0000, 0x0400, CRC(e09d3d55) SHA1(b26013397ef2cb32d0416ecb118387b9c2dffa9a) )
 
-	ROM_REGION( 0x0400, REGION_GFX3, ROMREGION_DISPOSE )   /* major objects */
+	ROM_REGION( 0x0400, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )   /* major objects */
 	ROM_LOAD_NIB_HIGH( "30134-01.p8", 0x0000, 0x0400, CRC(6259e007) SHA1(049f5f7160305cb4f4b499dd113cb11eea73fc95) )
 	ROM_LOAD_NIB_LOW ( "30133-01.n8", 0x0000, 0x0400, CRC(108d3e2c) SHA1(8c993369d37c6713670483af78e6d04d38f4b4fc) )
 
-	ROM_REGION( 0x0020, REGION_GFX4, ROMREGION_DISPOSE )   /* waves */
+	ROM_REGION( 0x0020, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE )   /* waves */
 	ROM_LOAD( "30136-01.k2", 0x0000, 0x0020, CRC(532c11b1) SHA1(18ab5369a3f2cfcc9a44f38fa8649524bea5b203) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 )                  /* sync (unused) */
+	ROM_REGION( 0x0100, RGNCLASS_USER, "user1", 0 )                  /* sync (unused) */
 	ROM_LOAD( "30131-01.m1", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )
 ROM_END
 

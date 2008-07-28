@@ -86,7 +86,7 @@ static VIDEO_UPDATE(tetriunk)
 {
 	int x,y,z;
 	int count = 0;
-	UINT8 *region = memory_region(screen->machine, REGION_USER1);
+	UINT8 *region = memory_region(screen->machine, RGNCLASS_USER, "user1");
 
 	if(input_code_pressed_once(KEYCODE_Z))
 	{
@@ -168,7 +168,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( tetriunk )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 static INPUT_PORTS_START( tetriunk )
@@ -197,13 +197,13 @@ static MACHINE_DRIVER_START( tetriunk )
 MACHINE_DRIVER_END
 
 ROM_START( tetriunk )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* code */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* code */
 	ROM_LOAD( "b-10.u10", 0xf0000, 0x10000, CRC(efc2a0f6) SHA1(5f0f1e90237bee9b78184035a32055b059a91eb3) )
 
-	ROM_REGION( 0x10000, REGION_GFX1,0 ) /* gfx - 1bpp font*/
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx1",0 ) /* gfx - 1bpp font*/
 	ROM_LOAD( "b-3.u36", 0x00000, 0x2000, CRC(1a636f9a) SHA1(a356cc57914d0c9b9127670b55d1f340e64b1ac9) )
 
-	ROM_REGION( 0x80000, REGION_GFX2,ROMREGION_INVERT )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2",ROMREGION_INVERT )
 	ROM_LOAD( "b-1.u59", 0x00000, 0x10000, CRC(4719d986) SHA1(6e0499944b968d96fbbfa3ead6237d69c769d634))
 	ROM_LOAD( "b-2.u58", 0x10000, 0x10000, CRC(599e1154) SHA1(14d99f90b4fedeab0ac24ffa9b1fd9ad0f0ba699))
 	ROM_LOAD( "b-4.u54", 0x20000, 0x10000, CRC(e112c450) SHA1(dfdecfc6bd617ec520b7563b7caf44b79d498bd3))
@@ -213,15 +213,15 @@ ROM_START( tetriunk )
 	ROM_LOAD( "b-8.u44", 0x60000, 0x10000, CRC(1f82121a) SHA1(106da0f39f1260d0761217ed0a24c1611bfd7f05))
 	ROM_LOAD( "b-9.u43", 0x70000, 0x10000, CRC(4ea22349) SHA1(14dfd3dbd51f8bd6f3290293b8ea1c165e8cf7fd))
 
-	ROM_REGION( 0x180000, REGION_USER1, ROMREGION_ERASEFF )
+	ROM_REGION( 0x180000, RGNCLASS_USER, "user1", ROMREGION_ERASEFF )
 ROM_END
 
 static DRIVER_INIT (tetriunk)
 {
 	int i,j,k;
 	int index=0;
-	UINT8 *region = memory_region(machine, REGION_USER1);
-	UINT8 *gfx = memory_region(machine, REGION_GFX2);
+	UINT8 *region = memory_region(machine, RGNCLASS_USER, "user1");
+	UINT8 *gfx = memory_region(machine, RGNCLASS_GFX, "gfx2");
 
 	for(i=0;i<0x20000;i++)
 	{

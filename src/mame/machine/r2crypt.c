@@ -251,7 +251,7 @@ static UINT32 trans(UINT32 v, UINT32 x)
 void raiden2_decrypt_sprites(running_machine *machine)
 {
   int i;
-  UINT32 *data = (UINT32 *)memory_region(machine, REGION_GFX3);
+  UINT32 *data = (UINT32 *)memory_region(machine, RGNCLASS_GFX, "gfx3");
   for(i=0; i<0x800000/4; i++) {
     UINT32 x1, v1, y1;
 

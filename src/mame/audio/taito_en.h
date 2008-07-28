@@ -18,7 +18,7 @@ void taito_f3_soundsystem_reset(running_machine *machine);
 
 #define TAITO_F3_SOUND_SYSTEM_ES5505(freq)							\
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")					\
-	MDRV_SOUND_ADD("es", ES5505, freq)							\
+	MDRV_SOUND_ADD("ensoniq", ES5505, freq)							\
 	MDRV_SOUND_CONFIG(es5505_interface)								\
 	MDRV_SOUND_ROUTE(0, "left", 1.0)								\
 	MDRV_SOUND_ROUTE(1, "right", 1.0)								\

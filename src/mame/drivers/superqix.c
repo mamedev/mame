@@ -135,8 +135,8 @@ static INT16 *samplebuf;
 
 static void pbillian_sh_start(void)
 {
-	UINT8 *src = memory_region(Machine, REGION_SOUND1);
-	int i, len = memory_region_length(Machine, REGION_SOUND1);
+	UINT8 *src = memory_region(Machine, RGNCLASS_SOUND, "samples");
+	int i, len = memory_region_length(Machine, RGNCLASS_SOUND, "samples");
 
 	/* convert 8-bit unsigned samples to 8-bit signed */
 	samplebuf = auto_malloc(len * 2);
@@ -510,7 +510,7 @@ static void machine_init_common(void)
 static MACHINE_START( superqix )
 {
 	/* configure the banks */
-	memory_configure_bank(1, 0, 4, memory_region(machine, REGION_CPU1) + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 4, memory_region(machine, RGNCLASS_CPU, "main") + 0x10000, 0x4000);
 
 	machine_init_common();
 }
@@ -518,7 +518,7 @@ static MACHINE_START( superqix )
 static MACHINE_START( pbillian )
 {
 	/* configure the banks */
-	memory_configure_bank(1, 0, 2, memory_region(machine, REGION_CPU1) + 0x10000, 0x4000);
+	memory_configure_bank(1, 0, 2, memory_region(machine, RGNCLASS_CPU, "main") + 0x10000, 0x4000);
 
 	machine_init_common();
 }
@@ -604,7 +604,7 @@ ADDRESS_MAP_END
 
 /* I8751 memory handlers */
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM	AM_REGION(REGION_CPU2, 0) // AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_RAM	AM_REGION(RGNCLASS_CPU, "mcu", 0) // AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
@@ -884,14 +884,14 @@ static const gfx_layout spritelayout =
 
 
 static GFXDECODE_START( pbillian )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, pbillian_charlayout, 16*16, 16 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,            0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, pbillian_charlayout, 16*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,            0, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( sqix )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, sqix_charlayout,   0, 16 )	/* Chars */
-	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, sqix_charlayout,   0, 16 )	/* Background tiles */
-	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, spritelayout,      0, 16 )	/* Sprites */
+	GFXDECODE_ENTRY( "gfx1", 0x00000, sqix_charlayout,   0, 16 )	/* Chars */
+	GFXDECODE_ENTRY( "gfx2", 0x00000, sqix_charlayout,   0, 16 )	/* Background tiles */
+	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout,      0, 16 )	/* Sprites */
 GFXDECODE_END
 
 
@@ -1138,139 +1138,139 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( pbillian )
-	ROM_REGION( 0x018000, REGION_CPU1, 0 )
+	ROM_REGION( 0x018000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "1.6c",  0x00000, 0x08000, CRC(d379fe23) SHA1(e147a9151b1cdeacb126d9713687bd0aa92980ac) )
 	ROM_LOAD( "2.6d",  0x14000, 0x04000, CRC(1af522bc) SHA1(83e002dc831bfcedbd7096b350c9b34418b79674) )
 
-	ROM_REGION( 0x0800, REGION_CPU2, 0 )
+	ROM_REGION( 0x0800, RGNCLASS_CPU, "cpu1", 0 )
 	ROM_LOAD( "pbillian.mcu", 0x0000, 0x0800, NO_DUMP )
 
-	ROM_REGION( 0x8000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x8000, RGNCLASS_SOUND, "samples", 0 )
 	ROM_LOAD( "3.7j",  0x0000, 0x08000, CRC(3f9bc7f1) SHA1(0b0c2ec3bea6a7f3fc6c0c8b750318f3f9ec3d1f) )
 
-	ROM_REGION( 0x018000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x018000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "4.1n",  0x00000, 0x08000, CRC(9c08a072) SHA1(25f31fcf72216cf42528b07ad8c09113aa69861a) )
 	ROM_LOAD( "5.1r",  0x08000, 0x08000, CRC(2dd5b83f) SHA1(b05e3a008050359d0207757b9cbd8cee87abc697) )
 	ROM_LOAD( "6.1t",  0x10000, 0x08000, CRC(33b855b0) SHA1(5a1df4f82fc0d6f78883b759fd61f395942645eb) )
 ROM_END
 
 ROM_START( hotsmash )
-	ROM_REGION( 0x018000, REGION_CPU1, 0 )
+	ROM_REGION( 0x018000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "b18-04",  0x00000, 0x08000, CRC(981bde2c) SHA1(ebcc901a036cde16b33d534d423500d74523b781) )
 
-	ROM_REGION( 0x0800, REGION_CPU2, 0 )
+	ROM_REGION( 0x0800, RGNCLASS_CPU, "mcu", 0 )
 	ROM_LOAD( "b18-06.mcu", 0x0000, 0x0800, CRC(67c0920a) SHA1(23a294892823d1d9216ea8ddfa9df1c8af149477) )
 
-	ROM_REGION( 0x8000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x8000, RGNCLASS_SOUND, "samples", 0 )
 	ROM_LOAD( "b18-05",  0x0000, 0x08000, CRC(dab5e718) SHA1(6cf6486f283f5177dfdc657b1627fbfa3f0743e8) )
 
-	ROM_REGION( 0x018000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x018000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b18-01",  0x00000, 0x08000, CRC(870a4c04) SHA1(a029108bcda40755c8320d2ee297f42d816aa7c0) )
 	ROM_LOAD( "b18-02",  0x08000, 0x08000, CRC(4e625cac) SHA1(2c21b32240eaada9a5f909a2ec5b335372c8c994) )
 	ROM_LOAD( "b18-03",  0x14000, 0x04000, CRC(1c82717d) SHA1(6942c8877e24ac51ed71036e771a1655d82f3491) )
 ROM_END
 
 ROM_START( sqix )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "b03-01-1",     0x00000, 0x08000, CRC(ad614117) SHA1(c461f00a2aecde1bc3860c15a3c31091b14665a2) )
 	ROM_LOAD( "b03-02",       0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
-	ROM_REGION( 0x1000, REGION_CPU2, 0 )	/* I8751 code */
+	ROM_REGION( 0x1000, RGNCLASS_CPU, "mcu", 0 )	/* I8751 code */
 	ROM_LOAD( "sq07.108",     0x00000, 0x1000, BAD_DUMP CRC(8be4d2a8) SHA1(a0c72cd87b2cddc67070b0a533fca111dbb9a984) )	// from sqixa
 
-	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b03-04",       0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
 
-	ROM_REGION( 0x20000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) )
 	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) )
 
-	ROM_REGION( 0x10000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "b03-05",       0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
 ROM_END
 
 ROM_START( sqixu )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "b03-06.f3",     0x00000, 0x08000, CRC(4f59f7af) SHA1(6ea627ea8505cf8d1a5a1350258180c61fbd1ed9) )
 	ROM_LOAD( "b03-07.h3",     0x10000, 0x10000, CRC(4c417d4a) SHA1(de46551da1b27312dca40240a210e77595cf9dbd) )
 
-	ROM_REGION( 0x1000, REGION_CPU2, 0 )	/* I8751 code */
+	ROM_REGION( 0x1000, RGNCLASS_CPU, "mcu", 0 )	/* I8751 code */
 	ROM_LOAD( "b03-08",     0x00000, 0x1000, BAD_DUMP CRC(8be4d2a8) SHA1(a0c72cd87b2cddc67070b0a533fca111dbb9a984) )	// from sqixa
 
-	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b03-04",       0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
 
-	ROM_REGION( 0x20000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) )
 	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) )
 
-	ROM_REGION( 0x10000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "b03-09.t8",    0x00000, 0x10000, CRC(69d2a84a) SHA1(b461d8a01f73c6aaa4aac85602c688c111bdca5d) )
 ROM_END
 
 /* this was probably a bootleg */
 ROM_START( sqixa )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "sq01.97",      0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) )
 	ROM_LOAD( "b03-02",       0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* I8751 code */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "mcu", 0 )	/* I8751 code */
 	ROM_LOAD( "sq07.108",     0x00000, 0x1000, BAD_DUMP CRC(8be4d2a8) SHA1(a0c72cd87b2cddc67070b0a533fca111dbb9a984) )
 
-	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b03-04",       0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
 
-	ROM_REGION( 0x20000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) )
 	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) )
 
-	ROM_REGION( 0x10000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "b03-05",       0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
 ROM_END
 
 ROM_START( sqixbl )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "cpu.2",        0x00000, 0x08000, CRC(682e28e3) SHA1(fe9221d26d7397be5a0fc8fdc51672b5924f3cf2) )
 	ROM_LOAD( "b03-02",       0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
-	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b03-04",       0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
 
-	ROM_REGION( 0x20000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "b03-03",       0x00000, 0x10000, CRC(6e8b6a67) SHA1(c71117cc880a124c46397c446d1edc1cbf681200) )
 	ROM_LOAD( "b03-06",       0x10000, 0x10000, CRC(38154517) SHA1(703ad4cfe54a4786c67aedcca5998b57f39fd857) )
 
-	ROM_REGION( 0x10000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "b03-05",       0x00000, 0x10000, CRC(df326540) SHA1(1fe025edcd38202e24c4e1005f478b6a88533453) )
 ROM_END
 
 ROM_START( perestrf )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
 	/* 0x8000 - 0x10000 in the rom is empty anyway */
 	ROM_LOAD( "rom1.bin",        0x00000, 0x20000, CRC(0cbf96c1) SHA1(cf2b1367887d1b8812a56aa55593e742578f220c) )
 
-	ROM_REGION( 0x10000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rom4.bin",       0x00000, 0x10000, CRC(c56122a8) SHA1(1d24b2f0358e14aca5681f92175869224584a6ea) ) /* both halves identical */
 
-	ROM_REGION( 0x20000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "rom2.bin",       0x00000, 0x20000, CRC(36f93701) SHA1(452cb23efd955c6c155cef2b1b650e253e195738) )
 
-	ROM_REGION( 0x10000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "rom3.bin",       0x00000, 0x10000, CRC(00c91d5a) SHA1(fdde56d3689a47e6bfb296e442207b93b887ec7a) )
 ROM_END
 
 ROM_START( perestro )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
 	/* 0x8000 - 0x10000 in the rom is empty anyway */
 	ROM_LOAD( "rom1.bin",        0x00000, 0x20000, CRC(0cbf96c1) SHA1(cf2b1367887d1b8812a56aa55593e742578f220c) )
 
-	ROM_REGION( 0x10000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rom4.bin",       0x00000, 0x10000, CRC(c56122a8) SHA1(1d24b2f0358e14aca5681f92175869224584a6ea) ) /* both halves identical */
 
-	ROM_REGION( 0x20000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "rom2.bin",       0x00000, 0x20000, CRC(36f93701) SHA1(452cb23efd955c6c155cef2b1b650e253e195738) )
 
-	ROM_REGION( 0x10000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "rom3a.bin",       0x00000, 0x10000, CRC(7a2a563f) SHA1(e3654091b858cc80ec1991281447fc3622a0d4f9) )
 ROM_END
 
@@ -1304,8 +1304,8 @@ static DRIVER_INIT( perestro )
 	int i,j;
 
 	/* decrypt program code; the address lines are shuffled around in a non-trivial way */
-	src = memory_region(machine, REGION_CPU1);
-	len = memory_region_length(machine, REGION_CPU1);
+	src = memory_region(machine, RGNCLASS_CPU, "main");
+	len = memory_region_length(machine, RGNCLASS_CPU, "main");
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1324,8 +1324,8 @@ static DRIVER_INIT( perestro )
 	}
 
 	/* decrypt gfx ROMs; simple bit swap on the address lines */
-	src = memory_region(machine, REGION_GFX1);
-	len = memory_region_length(machine, REGION_GFX1);
+	src = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	len = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1335,8 +1335,8 @@ static DRIVER_INIT( perestro )
 		}
 	}
 
-	src = memory_region(machine, REGION_GFX2);
-	len = memory_region_length(machine, REGION_GFX2);
+	src = memory_region(machine, RGNCLASS_GFX, "gfx2");
+	len = memory_region_length(machine, RGNCLASS_GFX, "gfx2");
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1346,8 +1346,8 @@ static DRIVER_INIT( perestro )
 		}
 	}
 
-	src = memory_region(machine, REGION_GFX3);
-	len = memory_region_length(machine, REGION_GFX3);
+	src = memory_region(machine, RGNCLASS_GFX, "gfx3");
+	len = memory_region_length(machine, RGNCLASS_GFX, "gfx3");
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);

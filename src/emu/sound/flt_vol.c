@@ -23,7 +23,7 @@ static void filter_volume_update(void *param, stream_sample_t **inputs, stream_s
 }
 
 
-static void *filter_volume_start(int sndindex, int clock, const void *config)
+static void *filter_volume_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct filter_volume_info *info;
 

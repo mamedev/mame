@@ -35,7 +35,7 @@
  */
 struct NESinterface
 {
-   int region;  /* DMC regions */
+	const char *region;  /* DMC regions */
 };
 
 READ8_HANDLER( NESPSG_0_r );

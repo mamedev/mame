@@ -237,11 +237,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const struct K053260_interface k053260_interface =
-{
-	REGION_SOUND1 /* memory region */
-};
-
 static MACHINE_DRIVER_START( rollerg )
 
 	/* basic machine hardware */
@@ -276,7 +271,6 @@ static MACHINE_DRIVER_START( rollerg )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("konami", K053260, 3579545)
-	MDRV_SOUND_CONFIG(k053260_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
@@ -289,42 +283,42 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( rollerg )
-	ROM_REGION( 0x28000, REGION_CPU1, 0 ) /* code + banked roms */
+	ROM_REGION( 0x28000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms */
 	ROM_LOAD( "999m02.g7",  0x10000, 0x18000, CRC(3df8db93) SHA1(10c46d53d11b12b8f7cc6417601baef4638c1efe) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "999m01.e11", 0x0000, 0x8000, CRC(1fcfb22f) SHA1(ef058a7de6ba7cf310b91975345113acc6078f8a) )
 
-	ROM_REGION( 0x200000, REGION_GFX1, 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "999h06.k2",  0x000000, 0x100000, CRC(eda05130) SHA1(b52073a4a4651035d5f1e112601ceb2d004b2143) ) /* sprites */
 	ROM_LOAD( "999h05.k8",  0x100000, 0x100000, CRC(5f321c7d) SHA1(d60a3480891b83ac109f2fecfe2b958bac310c15) )
 
-	ROM_REGION( 0x080000, REGION_GFX2, 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "999h03.d23", 0x000000, 0x040000, CRC(ea1edbd2) SHA1(a17d19f873384287e1e47222d46274e7408b40d4) ) /* zoom */
 	ROM_LOAD( "999h04.f23", 0x040000, 0x040000, CRC(c1a35355) SHA1(615606d30500a8f2be19171893e985b085fff2fc) )
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 )	/* samples for 053260 */
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "konami", 0 )	/* samples for 053260 */
 	ROM_LOAD( "999h09.c5",  0x000000, 0x080000, CRC(c5188783) SHA1(d9ab69e4197ba2b42e3b0bb713236c8037fc2ab3) )
 ROM_END
 
 ROM_START( rollergj )
-	ROM_REGION( 0x28000, REGION_CPU1, 0 ) /* code + banked roms */
+	ROM_REGION( 0x28000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms */
 	ROM_LOAD( "999v02.bin", 0x10000, 0x18000, CRC(0dd8c3ac) SHA1(4c3d5514dec317c6640ceaaa06411766632f4412) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "999m01.e11", 0x0000, 0x8000, CRC(1fcfb22f) SHA1(ef058a7de6ba7cf310b91975345113acc6078f8a) )
 
-	ROM_REGION( 0x200000, REGION_GFX1, 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "999h06.k2",  0x000000, 0x100000, CRC(eda05130) SHA1(b52073a4a4651035d5f1e112601ceb2d004b2143) ) /* sprites */
 	ROM_LOAD( "999h05.k8",  0x100000, 0x100000, CRC(5f321c7d) SHA1(d60a3480891b83ac109f2fecfe2b958bac310c15) )
 
-	ROM_REGION( 0x080000, REGION_GFX2, 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "999h03.d23", 0x000000, 0x040000, CRC(ea1edbd2) SHA1(a17d19f873384287e1e47222d46274e7408b40d4) ) /* zoom */
 	ROM_LOAD( "999h04.f23", 0x040000, 0x040000, CRC(c1a35355) SHA1(615606d30500a8f2be19171893e985b085fff2fc) )
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 )	/* samples for 053260 */
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "konami", 0 )	/* samples for 053260 */
 	ROM_LOAD( "999h09.c5",  0x000000, 0x080000, CRC(c5188783) SHA1(d9ab69e4197ba2b42e3b0bb713236c8037fc2ab3) )
 ROM_END
 
@@ -338,7 +332,7 @@ ROM_END
 
 static void rollerg_banking( int lines )
 {
-	UINT8 *RAM = memory_region(Machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(Machine, RGNCLASS_CPU, "main");
 	int offs = 0;
 
 
@@ -356,7 +350,7 @@ static MACHINE_RESET( rollerg )
 
 static DRIVER_INIT( rollerg )
 {
-	konami_rom_deinterleave_2(REGION_GFX1);
+	konami_rom_deinterleave_2("gfx1");
 }
 
 

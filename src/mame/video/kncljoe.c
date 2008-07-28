@@ -157,7 +157,7 @@ WRITE8_HANDLER( kncljoe_control_w )
 	if (sprite_bank != i)
 	{
 		sprite_bank = i;
-		memset(memory_region(machine, REGION_CPU1)+0xf100, 0, 0x180);
+		memset(memory_region(machine, RGNCLASS_CPU, "main")+0xf100, 0, 0x180);
 	}
 }
 

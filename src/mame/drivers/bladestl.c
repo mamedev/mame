@@ -65,7 +65,7 @@ static READ8_HANDLER( trackball_r )
 
 static WRITE8_HANDLER( bladestl_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 	int bankaddress;
 
 	/* bits 0 & 1 = coin counters */
@@ -289,8 +289,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( bladestl )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, charlayout,     0,	2 )	/* colors 00..31 */
-	GFXDECODE_ENTRY( REGION_GFX1, 0x040000, spritelayout,   32,	16 )	/* colors 32..47 but using lookup table */
+	GFXDECODE_ENTRY( "gfx1", 0x000000, charlayout,     0,	2 )	/* colors 00..31 */
+	GFXDECODE_ENTRY( "gfx1", 0x040000, spritelayout,   32,	16 )	/* colors 32..47 but using lookup table */
 GFXDECODE_END
 
 /***************************************************************************
@@ -310,11 +310,6 @@ static const struct YM2203interface ym2203_interface =
 		bladestl_port_B_w
 	},
 	NULL
-};
-
-static const struct upd7759_interface upd7759_interface =
-{
-	REGION_SOUND1					/* memory regions */
 };
 
 static MACHINE_DRIVER_START( bladestl )
@@ -350,7 +345,6 @@ static MACHINE_DRIVER_START( bladestl )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
-	MDRV_SOUND_CONFIG(upd7759_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 	MDRV_SOUND_ADD("ym", YM2203, 3579545)
@@ -365,41 +359,41 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( bladestl )
-	ROM_REGION( 0x18000, REGION_CPU1, 0 ) /* code + banked roms */
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms */
 	ROM_LOAD( "797t01.bin", 0x10000, 0x08000, CRC(89d7185d) SHA1(0d2f346d9515cab0389106c0e227fb0bd84a2c9c) )	/* fixed ROM */
 	ROM_CONTINUE(			0x08000, 0x08000 )				/* banked ROM */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "797c02", 0x08000, 0x08000, CRC(65a331ea) SHA1(f206f6c5f0474542a5b7686b2f4d2cc7077dd5b9) )
 
-	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "797a05",	0x000000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )	/* tiles */
 	ROM_LOAD( "797a06",	0x040000, 0x40000, CRC(d055f5cc) SHA1(3723b39b2a3e6dd8e7fc66bbfe1eef9f80818774) )	/* sprites */
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "797a07", 0x0000, 0x0100, CRC(7aecad4e) SHA1(05150a8dd25bdd6ab0c5b350e6ffd272f040e46a) ) /* sprites lookup table */
 
-	ROM_REGION( 0xc0000, REGION_SOUND1, 0 ) /* uPD7759 data (chip 1) */
+	ROM_REGION( 0xc0000, RGNCLASS_SOUND, "upd", 0 ) /* uPD7759 data (chip 1) */
 	ROM_LOAD( "797a03", 0x00000, 0x80000, CRC(9ee1a542) SHA1(c9a142a326875a50f03e49e83a84af8bb423a467) )
 	ROM_LOAD( "797a04",	0x80000, 0x40000, CRC(9ac8ea4e) SHA1(9f81eff970c9e8aea6f67d8a7d89805fae044ae1) )
 ROM_END
 
 ROM_START( bladstle )
-	ROM_REGION( 0x18000, REGION_CPU1, 0 ) /* code + banked roms */
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms */
 	ROM_LOAD( "797e01", 0x10000, 0x08000, CRC(f8472e95) SHA1(8b6caa905fb1642300dd9da508871b00429872c3) )	/* fixed ROM */
 	ROM_CONTINUE(		0x08000, 0x08000 )				/* banked ROM */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "797c02", 0x08000, 0x08000, CRC(65a331ea) SHA1(f206f6c5f0474542a5b7686b2f4d2cc7077dd5b9) )
 
-	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "797a05",	0x000000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )	/* tiles */
 	ROM_LOAD( "797a06",	0x040000, 0x40000, CRC(d055f5cc) SHA1(3723b39b2a3e6dd8e7fc66bbfe1eef9f80818774) )	/* sprites */
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "797a07", 0x0000, 0x0100, CRC(7aecad4e) SHA1(05150a8dd25bdd6ab0c5b350e6ffd272f040e46a) ) /* sprites lookup table */
 
-	ROM_REGION( 0xc0000, REGION_SOUND1, 0 ) /* uPD7759 data */
+	ROM_REGION( 0xc0000, RGNCLASS_SOUND, "upd", 0 ) /* uPD7759 data */
 	ROM_LOAD( "797a03", 0x00000, 0x80000, CRC(9ee1a542) SHA1(c9a142a326875a50f03e49e83a84af8bb423a467) )
 	ROM_LOAD( "797a04",	0x80000, 0x40000, CRC(9ac8ea4e) SHA1(9f81eff970c9e8aea6f67d8a7d89805fae044ae1) )
 ROM_END

@@ -4,7 +4,6 @@
 #define YMF278B_STD_CLOCK (33868800)			/* standard clock for OPL4 */
 
 struct YMF278B_interface {
-	int region;			/* memory region of sample ROMs */
 	void (*irq_callback)(running_machine *machine, int state);	/* irq callback */
 };
 

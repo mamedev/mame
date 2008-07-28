@@ -13376,7 +13376,7 @@ static void build_cpu_region_info_list(running_machine *machine)
 				UINT8 region_type = ROMREGION_GETTYPE(traverse);
 
 				/* non-cpu region */
-				if(region_type >= REGION_GFX1 && region_type <= REGION_PLDS)
+				if(region_type >= RGNCLASS_GFX, "gfx1" && region_type <= REGION_PLDS)
 				{
 					UINT8	bit_state		= 0;
 					UINT32	length			= memory_region_length(machine, region_type);

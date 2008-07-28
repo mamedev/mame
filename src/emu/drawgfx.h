@@ -97,7 +97,7 @@ enum
 #define GFXDECODE_START( name ) const gfx_decode_entry gfxdecodeinfo_##name[] = {
 #define GFXDECODE_ENTRY(region,offset,layout,start,colors) { region, offset, &layout, start, colors, 0, 0 },
 #define GFXDECODE_SCALE(region,offset,layout,start,colors,xscale,yscale) { region, offset, &layout, start, colors, xscale, yscale },
-#define GFXDECODE_END { -1 } };
+#define GFXDECODE_END { 0 } };
 
 /* these macros are used for declaring gfx_layout structures. */
 #define GFXLAYOUT_RAW( name, planes, width, height, linemod, charmod ) \
@@ -149,9 +149,9 @@ struct _gfx_element
 typedef struct _gfx_decode_entry gfx_decode_entry;
 struct _gfx_decode_entry
 {
-	int				memory_region;		/* memory region where the data resides; -1 marks the end of array */
+	const char *	memory_region;		/* RGNCLASS_GFX memory region where the data resides */
 	UINT32 			start;				/* offset of beginning of data to decode */
-	const gfx_layout *gfxlayout;		/* pointer to gfx_layout describing the layout */
+	const gfx_layout *gfxlayout;		/* pointer to gfx_layout describing the layout; NULL marks the end of the array */
 	UINT16 			color_codes_start;	/* offset in the color lookup table where color codes start */
 	UINT16 			total_color_codes;	/* total number of color codes */
 	UINT8 			xscale;				/* optional horizontal scaling factor; 0 means 1x */

@@ -689,9 +689,9 @@ static const struct game_keys2 keys_table2[] =
 static void cps3_decrypt_bios(running_machine *machine)
 {
 	int i;
-	UINT32 *coderegion = (UINT32*)memory_region(machine, REGION_USER1);
+	UINT32 *coderegion = (UINT32*)memory_region(machine, RGNCLASS_USER, "user1");
 
-	decrypted_bios = (UINT32*)memory_region(machine, REGION_USER1);
+	decrypted_bios = (UINT32*)memory_region(machine, RGNCLASS_USER, "user1");
 
 	for (i=0;i<0x80000;i+=4)
 	{
@@ -1355,7 +1355,7 @@ static OPBASE_HANDLER( cps3_opbase_handler )
 	/* BIOS ROM */
 	if (address < 0x80000)
 	{
-		opbase->rom = opbase->ram = memory_region(machine, REGION_USER1);
+		opbase->rom = opbase->ram = memory_region(machine, RGNCLASS_USER, "user1");
 		return ~0;
 	}
 	/* RAM */
@@ -1364,7 +1364,7 @@ static OPBASE_HANDLER( cps3_opbase_handler )
 		opbase->rom = (UINT8*)decrypted_gamerom-0x06000000;
 		opbase->ram = (UINT8*)decrypted_gamerom-0x06000000;
 
-		if (cps3_isSpecial) opbase->ram = (UINT8*) memory_region(machine, REGION_USER4)-0x06000000;
+		if (cps3_isSpecial) opbase->ram = (UINT8*) memory_region(machine, RGNCLASS_USER, "user4")-0x06000000;
 
 
 		return ~0;
@@ -1512,7 +1512,7 @@ static WRITE32_HANDLER( cps3_gfxflash_w )
 
 	/* make a copy in the linear memory region we actually use for drawing etc.  having it stored in interleaved flash roms isnt' very useful */
 	{
-		UINT32* romdata = (UINT32*)memory_region(machine, REGION_USER5);
+		UINT32* romdata = (UINT32*)memory_region(machine, RGNCLASS_USER, "user5");
 		int real_offset = 0;
 		UINT32 newdata;
 		UINT8* ptr1 = intelflash_getmemptr(flash1);
@@ -1682,7 +1682,7 @@ static void cps3_flashmain_w(running_machine *machine, int base, UINT32 offset, 
 
 	/* copy data into regions to execute from */
 	{
-		UINT32* romdata =  (UINT32*)memory_region(machine, REGION_USER4);
+		UINT32* romdata =  (UINT32*)memory_region(machine, RGNCLASS_USER, "user4");
 		UINT32* romdata2 = (UINT32*)decrypted_gamerom;
 		int real_offset = 0;
 		UINT32 newdata;
@@ -1957,7 +1957,7 @@ static WRITE32_HANDLER( cps3_palettedma_w )
 			if (data & 0x0002)
 			{
 				int i;
-				UINT16* src = (UINT16*)memory_region(machine, REGION_USER5);
+				UINT16* src = (UINT16*)memory_region(machine, RGNCLASS_USER, "user5");
 			//  if(DEBUG_PRINTF) printf("CPS3 pal dma start %08x (real: %08x) dest %08x fade %08x other2 %08x (length %04x)\n", paldma_source, paldma_realsource, paldma_dest, paldma_fade, paldma_other2, paldma_length);
 
 				for (i=0;i<paldma_length;i++)
@@ -2038,7 +2038,7 @@ static UINT32 process_byte( UINT8 real_byte, UINT32 destination, int max_length 
 
 static void cps3_do_char_dma( running_machine *machine, UINT32 real_source, UINT32 real_destination, UINT32 real_length )
 {
-	UINT8* sourcedata = (UINT8*)memory_region(machine, REGION_USER5);
+	UINT8* sourcedata = (UINT8*)memory_region(machine, RGNCLASS_USER, "user5");
 	int length_remaining;
 
 	last_normal_byte = 0;
@@ -2125,7 +2125,7 @@ static UINT32 ProcessByte8(UINT8 b,UINT32 dst_offset)
 
 static void cps3_do_alt_char_dma( running_machine *machine, UINT32 src, UINT32 real_dest, UINT32 real_length )
 {
-	UINT8* px = (UINT8*)memory_region(machine, REGION_USER5);
+	UINT8* px = (UINT8*)memory_region(machine, RGNCLASS_USER, "user5");
 	UINT32 start = real_dest;
 	UINT32 ds = real_dest;
 
@@ -2302,7 +2302,7 @@ static UINT32* cps3_mainram;
 
 /* there are more unknown writes, but you get the idea */
 static ADDRESS_MAP_START( cps3_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION(REGION_USER1, 0) // Bios ROM
+	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0) // Bios ROM
 	AM_RANGE(0x02000000, 0x0207ffff) AM_RAM AM_BASE(&cps3_mainram) // Main RAM
 
 	AM_RANGE(0x03000000, 0x030003ff) AM_RAM // 'FRAM' (SFIII memory test mode ONLY)
@@ -2435,8 +2435,8 @@ static emu_timer* fastboot_timer;
 
 static TIMER_CALLBACK( fastboot_timer_callback )
 {
-	UINT32 *rom =  (UINT32*)decrypted_gamerom;//memory_region ( machine, REGION_USER4 );
-	if (cps3_isSpecial) rom = (UINT32*)memory_region(machine, REGION_USER4);
+	UINT32 *rom =  (UINT32*)decrypted_gamerom;//memory_region ( machine, RGNCLASS_USER, "user4" );
+	if (cps3_isSpecial) rom = (UINT32*)memory_region(machine, RGNCLASS_USER, "user4");
 
 //  printf("fastboot callback %08x %08x", rom[0], rom[1]);
 	cpunum_set_reg(0,SH2_PC, rom[0]);
@@ -2483,7 +2483,7 @@ static MACHINE_RESET( cps3 )
 
 static void precopy_to_flash(running_machine *machine)
 {
-	UINT32* romdata = (UINT32*)memory_region(machine, REGION_USER4);
+	UINT32* romdata = (UINT32*)memory_region(machine, RGNCLASS_USER, "user4");
 	int i;
 	/* precopy program roms, ok, sfiii2 tests pass, others fail because of how the decryption affects testing */
 	for (i=0;i<0x800000;i+=4)
@@ -2520,10 +2520,10 @@ static void precopy_to_flash(running_machine *machine)
 
 	/* precopy gfx roms, good, tests pass */
 	{
-		UINT32 thebase, len = memory_region_length(machine, REGION_USER5);
+		UINT32 thebase, len = memory_region_length(machine, RGNCLASS_USER, "user5");
 		int flashnum = 8;
 
-		romdata = (UINT32*)memory_region(machine, REGION_USER5);
+		romdata = (UINT32*)memory_region(machine, RGNCLASS_USER, "user5");
 		for (thebase = 0;thebase < len/2; thebase+=0x200000)
 		{
 		//  printf("flashnums %d. %d\n",flashnum, flashnum+1);
@@ -2549,7 +2549,7 @@ static void precopy_to_flash(running_machine *machine)
 // make a copy in the regions we execute code / draw gfx from
 static void copy_from_nvram(running_machine *machine)
 {
-	UINT32* romdata = (UINT32*)memory_region(machine, REGION_USER4);
+	UINT32* romdata = (UINT32*)memory_region(machine, RGNCLASS_USER, "user4");
 	UINT32* romdata2 = (UINT32*)decrypted_gamerom;
 	int i;
 	/* copy + decrypt program roms which have been loaded from flashroms/nvram */
@@ -2589,11 +2589,11 @@ static void copy_from_nvram(running_machine *machine)
 
 	/* copy gfx from loaded flashroms to user reigon 5, where it's used */
 	{
-		UINT32 thebase, len = memory_region_length(machine, REGION_USER5);
+		UINT32 thebase, len = memory_region_length(machine, RGNCLASS_USER, "user5");
 		int flashnum = 8;
 		int countoffset = 0;
 
-		romdata = (UINT32*)memory_region(machine, REGION_USER5);
+		romdata = (UINT32*)memory_region(machine, RGNCLASS_USER, "user5");
 		for (thebase = 0;thebase < len/2; thebase+=0x200000)
 		{
 		//  printf("flashnums %d. %d\n",flashnum, flashnum+1);
@@ -2703,124 +2703,124 @@ MACHINE_DRIVER_END
 
 
 ROM_START( sfiii )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "sfiii_japan.29f400.u2", 0x000000, 0x080000, CRC(74205250) SHA1(c3e83ace7121d32da729162662ec6b5285a31211) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* Program Code Region */
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* GFX Region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( REGION_DISKS )
+	DISK_REGION( RGNCLASS_DISKS, "disks" )
 	DISK_IMAGE_READONLY( "sf3000", 0, MD5(cdc5c5423bd8c053de7cdd927dc60da7) SHA1(cc72c9eb2096f4d51f2cf6df18f29fd79d05067c) )
 ROM_END
 
 ROM_START( sfiiiu )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "sfiii_usa.29f400.u2", 0x000000, 0x080000, CRC(fb172a8e) SHA1(48ebf59910f246835f7dc0c588da30f7a908072f) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* Program Code Region */
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* GFX Region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( REGION_DISKS )
+	DISK_REGION( RGNCLASS_DISKS, "disks" )
 	DISK_IMAGE_READONLY( "sf3000", 0, MD5(cdc5c5423bd8c053de7cdd927dc60da7) SHA1(cc72c9eb2096f4d51f2cf6df18f29fd79d05067c) )
 ROM_END
 
 ROM_START( sfiii2 )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "sfiii2_japan.29f400.u2", 0x000000, 0x080000, CRC(faea0a3e) SHA1(a03cd63bcf52e4d57f7a598c8bc8e243694624ec) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* Program Code Region */
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* GFX Region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( REGION_DISKS )
+	DISK_REGION( RGNCLASS_DISKS, "disks" )
 	DISK_IMAGE_READONLY( "3ga000", 0, MD5(941c7e8d0838db9880ea7bf169ad310d) SHA1(76e9fdef020c4b85a10aa8828a63e67c7dca22bd) )
 ROM_END
 
 ROM_START( sfiii2u )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "sfiii2_usa.29f400.u2", 0x000000, 0x080000, CRC(75dd72e0) SHA1(5a12d6ea6734df5de00ecee6f9ef470749d2f242) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* Program Code Region */
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* GFX Region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( REGION_DISKS )
+	DISK_REGION( RGNCLASS_DISKS, "disks" )
 	DISK_IMAGE_READONLY( "3ga000", 0, MD5(941c7e8d0838db9880ea7bf169ad310d) SHA1(76e9fdef020c4b85a10aa8828a63e67c7dca22bd) )
 ROM_END
 
 ROM_START( sfiii3 )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "sfiii3_usa.29f400.u2", 0x000000, 0x080000, CRC(ecc545c1) SHA1(e39083820aae914fd8b80c9765129bedb745ceba) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* Program Code Region */
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* GFX Region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( REGION_DISKS )
+	DISK_REGION( RGNCLASS_DISKS, "disks" )
 	DISK_IMAGE_READONLY( "33s000", 0, MD5(f159ad85cc94ced3ddb9ef5e92173a9f) SHA1(47c7ae0f2dc47c7d28bdf66d378a3aaba4c99c75) )
 ROM_END
 
 ROM_START( sfiii3a )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "sfiii3_usa.29f400.u2", 0x000000, 0x080000, CRC(ecc545c1) SHA1(e39083820aae914fd8b80c9765129bedb745ceba) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* Program Code Region */
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* GFX Region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( REGION_DISKS )
+	DISK_REGION( RGNCLASS_DISKS, "disks" )
 	DISK_IMAGE_READONLY( "cap-33s-2", 0, SHA1(24e78b8c66fb1573ffd642ee51607f3b53ed40b7) MD5(cf63f3dbcc2653b95709133fe79c7225) )
 ROM_END
 
 ROM_START( redearth )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "warzard_euro.29f400.u2", 0x000000, 0x080000, CRC(02e0f336) SHA1(acc37e830dfeb9674f5a0fb24f4cc23217ae4ff5) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* Program Code Region */
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* GFX Region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( REGION_DISKS )
+	DISK_REGION( RGNCLASS_DISKS, "disks" )
 	DISK_IMAGE_READONLY( "wzd000", 0, MD5(028ff12a4ce34118dd0091e87c8cdd08) SHA1(6d4e6b7fff4ff3f04e349479fa5a1cbe63e673b8) )
 ROM_END
 
 ROM_START( warzard )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "warzard_japan.29f400.u2", 0x000000, 0x080000, CRC(f8e2f0c6) SHA1(93d6a986f44c211fff014e55681eca4d2a2774d6) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* Program Code Region */
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* GFX Region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( REGION_DISKS )
+	DISK_REGION( RGNCLASS_DISKS, "disks" )
 	DISK_IMAGE_READONLY( "wzd000", 0, MD5(028ff12a4ce34118dd0091e87c8cdd08) SHA1(6d4e6b7fff4ff3f04e349479fa5a1cbe63e673b8) )
 ROM_END
 
 
 ROM_START( jojo )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "jojo_japan.29f400.u2", 0x000000, 0x080000, CRC(02778f60) SHA1(a167f9ebe030592a0cdb0c6a3c75835c6a43be4c) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* Program Code Region */
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* GFX Region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( REGION_DISKS )
+	DISK_REGION( RGNCLASS_DISKS, "disks" )
 	DISK_IMAGE_READONLY( "jjk000", 0, MD5(05440ecf90e836207a27a99c817a3328) SHA1(d5a11315ac21e573ffe78e63602ec2cb420f361f) )
 ROM_END
 
 ROM_START( jojoalt )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "jojo_japan.29f400.u2", 0x000000, 0x080000, CRC(02778f60) SHA1(a167f9ebe030592a0cdb0c6a3c75835c6a43be4c) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* Program Code Region */
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* GFX Region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( REGION_DISKS )
+	DISK_REGION( RGNCLASS_DISKS, "disks" )
 	DISK_IMAGE_READONLY( "cap-jjk-160", 0, SHA1(74fb14d838d98c3e10baa08e6f7b2464d840dcf0) MD5(93cc16f11a88c8f5268cb96baebc0a13) )
 ROM_END
 
 ROM_START( jojoba )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "jojoba_japan.29f400.u2",  0x000000, 0x080000,  CRC(3085478c) SHA1(055eab1fc42816f370a44b17fd7e87ffcb10e8b7) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* Program Code Region */
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* GFX Region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( REGION_DISKS )
+	DISK_REGION( RGNCLASS_DISKS, "disks" )
 	DISK_IMAGE_READONLY( "jjm000", 0, MD5(bf6b90334bf1f6bd8dbfed737face2d6) SHA1(688520bb83ccbf4b31c3bfe26bd0cc8292a8c558) )
 ROM_END
 
@@ -2828,12 +2828,12 @@ ROM_END
 /* NO CD sets - use NO CD BIOS roms */
 
 ROM_START( sfiiin )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "sfiii_asia_nocd.29f400.u2", 0x000000, 0x080000, CRC(73e32463) SHA1(45d144e533e4b20cc5a744ca4f618e288430c601) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* cd content region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "10",  0x0000000, 0x800000, CRC(e896dc27) SHA1(47623820c64b72e69417afcafaacdd2c318cde1c) )
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* cd content region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "30",  0x0000000, 0x800000, CRC(98c2d07c) SHA1(604ce4a16170847c10bc233a47a47a119ce170f7) )
 	ROM_LOAD( "31",  0x0800000, 0x800000, CRC(7115a396) SHA1(b60a74259e3c223138e66e68a3f6457694a0c639) )
 	ROM_LOAD( "40",  0x1000000, 0x800000, CRC(839f0972) SHA1(844e43fcc157b7c774044408bfe918c49e174cdb) )
@@ -2843,13 +2843,13 @@ ROM_END
 
 
 ROM_START( sfiii2n )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "sfiii2_asia_nocd.29f400.u2", 0x000000, 0x080000, CRC(fd297c0d) SHA1(4323deda2789f104b53f32a663196ec16de73215) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* cd content region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "10",  0x0000000, 0x800000, CRC(682b014a) SHA1(abd5785f4b7c89584d6d1cf6fb61a77d7224f81f) )
 	ROM_LOAD( "20",  0x0800000, 0x800000, CRC(38090460) SHA1(aaade89b8ccdc9154f97442ca35703ec538fe8be) )
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* cd content region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "30",  0x0000000, 0x800000, CRC(77c197c0) SHA1(944381161462e65de7ae63a656658f3fbe44727a) )
 	ROM_LOAD( "31",  0x0800000, 0x800000, CRC(7470a6f2) SHA1(850b2e20afe8a5a1f0d212d9abe002cb5cf14d22) )
 	ROM_LOAD( "40",  0x1000000, 0x800000, CRC(01a85ced) SHA1(802df3274d5f767636b2785606e0558f6d3b9f13) )
@@ -2860,13 +2860,13 @@ ROM_END
 
 
 ROM_START( sfiii3n )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "sfiii3_japan_nocd.29f400.u2", 0x000000, 0x080000, CRC(1edc6366) SHA1(60b4b9adeb030a33059d74fdf03873029e465b52) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* cd content region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "10",  0x0000000, 0x800000, CRC(77233d39) SHA1(59c3f890fdc33a7d8dc91e5f9c4e7b7019acfb00) )
 	ROM_LOAD( "20",  0x0800000, 0x800000, CRC(5ca8faba) SHA1(71c12638ae7fa38b362d68c3ccb4bb3ccd67f0e9) )
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* cd content region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "30",  0x0000000, 0x800000, CRC(b37cf960) SHA1(60310f95e4ecedee85846c08ccba71e286cda73b) )
 	ROM_LOAD( "31",  0x0800000, 0x800000, CRC(450ec982) SHA1(1cb3626b8479997c4f1b29c41c81cac038fac31b) )
 	ROM_LOAD( "40",  0x1000000, 0x800000, CRC(632c965f) SHA1(9a46b759f5dee35411fd6446c2457c084a6dfcd8) )
@@ -2878,13 +2878,13 @@ ROM_START( sfiii3n )
 ROM_END
 
 ROM_START( sfiii3an )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "sfiii3_japan_nocd.29f400.u2", 0x000000, 0x080000, CRC(1edc6366) SHA1(60b4b9adeb030a33059d74fdf03873029e465b52) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* cd content region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "10",  0x0000000, 0x800000,  CRC(ba7f76b2) SHA1(6b396596dea009b34af17484919ae37eda53ec65) )
 	ROM_LOAD( "20",  0x0800000, 0x800000, CRC(5ca8faba) SHA1(71c12638ae7fa38b362d68c3ccb4bb3ccd67f0e9) )
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* cd content region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "30",  0x0000000, 0x800000, CRC(b37cf960) SHA1(60310f95e4ecedee85846c08ccba71e286cda73b) )
 	ROM_LOAD( "31",  0x0800000, 0x800000, CRC(450ec982) SHA1(1cb3626b8479997c4f1b29c41c81cac038fac31b) )
 	ROM_LOAD( "40",  0x1000000, 0x800000, CRC(632c965f) SHA1(9a46b759f5dee35411fd6446c2457c084a6dfcd8) )
@@ -2896,13 +2896,13 @@ ROM_START( sfiii3an )
 ROM_END
 
 ROM_START( jojon )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "jojo_asia_nocd.29f400.u2", 0x000000, 0x080000, CRC(05b4f953) SHA1(c746c7bb5359acc9adced817cb4870b1912eaefd) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* cd content region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "10",  0x0000000, 0x800000, CRC(e40dc123) SHA1(517e7006349b5a8fd6c30910362583f48d009355) )
 	ROM_LOAD( "20",  0x0800000, 0x800000, CRC(0571e37c) SHA1(1aa28ef6ea1b606a55d0766480b3ee156f0bca5a) )
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* cd content region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "30",  0x0000000, 0x800000, CRC(1d99181b) SHA1(25c216de16cefac2d5892039ad23d07848a457e6) )
 	ROM_LOAD( "31",  0x0800000, 0x800000, CRC(6889fbda) SHA1(53a51b993d319d81a604cdf70b224955eacb617e) )
 	ROM_LOAD( "40",  0x1000000, 0x800000, CRC(8069f9de) SHA1(7862ee104a2e9034910dd592687b40ebe75fa9ce) )
@@ -2911,13 +2911,13 @@ ROM_START( jojon )
 ROM_END
 
 ROM_START( jojoaltn )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "jojo_asia_nocd.29f400.u2", 0x000000, 0x080000, CRC(05b4f953) SHA1(c746c7bb5359acc9adced817cb4870b1912eaefd) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* cd content region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "10",  0x0000000, 0x800000, CRC(bc612872) SHA1(18930f2906176b54a9b8bec56f06dda3362eb418) )
 	ROM_LOAD( "20",  0x0800000, 0x800000, CRC(0e1daddf) SHA1(34bb4e0fb86258095a7b20f60174453195f3735a) )
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* cd content region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "30",  0x0000000, 0x800000, CRC(1d99181b) SHA1(25c216de16cefac2d5892039ad23d07848a457e6) )
 	ROM_LOAD( "31",  0x0800000, 0x800000, CRC(6889fbda) SHA1(53a51b993d319d81a604cdf70b224955eacb617e) )
 	ROM_LOAD( "40",  0x1000000, 0x800000, CRC(8069f9de) SHA1(7862ee104a2e9034910dd592687b40ebe75fa9ce) )
@@ -2926,13 +2926,13 @@ ROM_START( jojoaltn )
 ROM_END
 
 ROM_START( jojoban )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "jojoba_japan_nocd.29f400.u2", 0x000000, 0x080000, CRC(4dab19f5) SHA1(ba07190e7662937fc267f07285c51e99a45c061e) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* cd content region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "10",  0x000000, 0x800000, CRC(6e2490f6) SHA1(75cbf1e39ad6362a21c937c827e492d927b7cf39) )
 	ROM_LOAD( "20",  0x800000, 0x800000, CRC(1293892b) SHA1(b1beafac1a9c4b6d0640658af8a3eb359e76eb25) )
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* cd content region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "30",  0x0000000, 0x800000, CRC(d25c5005) SHA1(93a19a14783d604bb42feffbe23eb370d11281e8) )
 	ROM_LOAD( "31",  0x0800000, 0x800000, CRC(51bb3dba) SHA1(39e95a05882909820b3efa6a3b457b8574012638) )
 	ROM_LOAD( "40",  0x1000000, 0x800000, CRC(94dc26d4) SHA1(5ae2815142972f322886eea4885baf2b82563ab1) )
@@ -2942,13 +2942,13 @@ ROM_START( jojoban )
 ROM_END
 
 ROM_START( jojobane )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "jojoba_euro_nocd.29f400.u2", 0x000000, 0x080000,  CRC(1ee2d679) SHA1(9e129b454a376606b3f7e8aec64de425cf9c635c) )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* cd content region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "10",  0x000000, 0x800000, CRC(6e2490f6) SHA1(75cbf1e39ad6362a21c937c827e492d927b7cf39) )
 	ROM_LOAD( "20",  0x800000, 0x800000, CRC(1293892b) SHA1(b1beafac1a9c4b6d0640658af8a3eb359e76eb25) )
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* cd content region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "30",  0x0000000, 0x800000, CRC(d25c5005) SHA1(93a19a14783d604bb42feffbe23eb370d11281e8) )
 	ROM_LOAD( "31",  0x0800000, 0x800000, CRC(51bb3dba) SHA1(39e95a05882909820b3efa6a3b457b8574012638) )
 	ROM_LOAD( "40",  0x1000000, 0x800000, CRC(94dc26d4) SHA1(5ae2815142972f322886eea4885baf2b82563ab1) )
@@ -2959,12 +2959,12 @@ ROM_END
 
 
 ROM_START( redeartn )
-	ROM_REGION32_BE( 0x080000, REGION_USER1, 0 ) /* bios region */
+	ROM_REGION32_BE( 0x080000, RGNCLASS_USER, "user1", 0 ) /* bios region */
 	ROM_LOAD( "redearth_nocd.bios", 0x000000, 0x080000, NO_DUMP )
 
-	ROM_REGION32_BE( 0x800000*2, REGION_USER4, ROMREGION_ERASEFF ) /* cd content region */
+	ROM_REGION32_BE( 0x800000*2, RGNCLASS_USER, "user4", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "10",  0x000000, 0x800000, CRC(68188016) SHA1(93aaac08cb5566c33aabc16457085b0a36048019) )
-	ROM_REGION16_BE( 0x800000*10, REGION_USER5, ROMREGION_ERASEFF ) /* cd content region */
+	ROM_REGION16_BE( 0x800000*10, RGNCLASS_USER, "user5", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "30",  0x0000000, 0x800000, CRC(074cab4d) SHA1(4cb6cc9cce3b1a932b07058a5d723b3effa23fcf) )
 	ROM_LOAD( "31",  0x0800000, 0x800000, CRC(14e2cad4) SHA1(9958a4e315e4476e4791a6219b93495413c7b751) )
 	ROM_LOAD( "40",  0x1000000, 0x800000, CRC(72d98890) SHA1(f40926c52cb7a71b0ef0027a0ea38bbc7e8b31b0) )
@@ -3064,7 +3064,7 @@ static DRIVER_INIT( jojo )
 
 	// DEVELOPMENT VERSION add 0x70 mask!
 
-//  UINT32 *rom =  (UINT32*)memory_region ( machine, REGION_USER1 );
+//  UINT32 *rom =  (UINT32*)memory_region ( machine, RGNCLASS_USER, "user1" );
 //  rom[0x1fec8/4]^=0x00000001; // region hack (clear jpn)
 
 //  rom[0x1fec8/4]^=0x00000004; // region
@@ -3092,7 +3092,7 @@ static DRIVER_INIT (jojoba)
 
 	// DEVELOPMENT VERSION add 0x70 mask!
 
-//  UINT32 *rom =  (UINT32*)memory_region ( machine, REGION_USER1 );
+//  UINT32 *rom =  (UINT32*)memory_region ( machine, RGNCLASS_USER, "user1" );
 //  rom[0x1fec8/4]^=0x00000001; // region (clear jpn)
 //  rom[0x1fec8/4]^=0x00000002; // region
 //  rom[0x1fec8/4]^=0x00000070; // DEV mode
@@ -3117,7 +3117,7 @@ static DRIVER_INIT( warzard )
 	// OCEANIA 7
 	// ASIA NCD 8
 
-//  UINT32 *rom =  (UINT32*)memory_region ( machine, REGION_USER1 );
+//  UINT32 *rom =  (UINT32*)memory_region ( machine, RGNCLASS_USER, "user1" );
 //  rom[0x1fed8/4]^=0x00000001; // clear region to 0 (invalid)
 //  rom[0x1fed8/4]^=0x00000008; // region 8 - ASIA NO CD - doesn't actually skip the CD test on startup,
 	                            // only during game, must be another flag somewhere too, and we don't have
@@ -3145,7 +3145,7 @@ static DRIVER_INIT( sfiii )
 
 	// bios rom also lists korea, but game rom does not.
 
-//  UINT32 *rom =  (UINT32*)memory_region ( machine, REGION_USER1 );
+//  UINT32 *rom =  (UINT32*)memory_region ( machine, RGNCLASS_USER, "user1" );
 //  rom[0x1fec8/4]^=0x00000001; // region (clear region)
 //  rom[0x1fec8/4]^=0x00000008; // region
 //  rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test menu is region is ASIA NCD, otherwise it will report NG, Asia was probably the only NCD region for this
@@ -3169,7 +3169,7 @@ static DRIVER_INIT( sfiii2 )
 	// OCEANIA 7
 	// ASIA 8
 
-//  UINT32 *rom =  (UINT32*)memory_region ( machine, REGION_USER1 );
+//  UINT32 *rom =  (UINT32*)memory_region ( machine, RGNCLASS_USER, "user1" );
 //  rom[0x1fec8/4]^=0x00000001; // region (clear region)
 //  rom[0x1fec8/4]^=0x00000008; // region
 //  rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test menu is region is ASIA NCD, otherwise it will report NG, Asia was probably the only NCD region for this
@@ -3192,7 +3192,7 @@ static DRIVER_INIT( sfiii3 )
 	// BRAZIL 6
 	// OCEANIA 7
 
-//  UINT32 *rom =  (UINT32*)memory_region ( machine, REGION_USER1 );
+//  UINT32 *rom =  (UINT32*)memory_region ( machine, RGNCLASS_USER, "user1" );
 
 //  rom[0x1fec8/4]^=0x00000004; // region (clear region)
 //  rom[0x1fec8/4]^=0x00000001; // region

@@ -517,7 +517,7 @@ static READ8_HANDLER(banked_ram_r)
 
 		if (bank>0x3) // ROM access
 		{
-			UINT8 *src    = memory_region( machine, REGION_GFX1 );
+			UINT8 *src    = memory_region( machine, RGNCLASS_GFX, "gfx1" );
 			bank &=0x3;
 			return src[offset+(bank*0x4000)];
 		}
@@ -533,7 +533,7 @@ static READ8_HANDLER(banked_ram_r)
 		UINT8 *src;
 		int bank;
 		bank = mastboy_bank & 0x7f;
-		src = memory_region       ( machine, REGION_USER1 ) + bank * 0x4000;
+		src = memory_region       ( machine, RGNCLASS_USER, "user1" ) + bank * 0x4000;
 		return src[offset];
 	}
 }
@@ -836,8 +836,8 @@ static const gfx_layout tiles8x8_layout_2 =
 
 
 static GFXDECODE_START( mastboy )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2,  0, tiles8x8_layout_2, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2",  0, tiles8x8_layout_2, 0, 16 )
 GFXDECODE_END
 
 /* Machine Functions / Driver */
@@ -894,20 +894,20 @@ MACHINE_DRIVER_END
 /* Romsets */
 
 ROM_START( mastboy )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x4000, CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
 	ROM_LOAD( "03.bin",       0x04000, 0x4000, CRC(5020a37f) SHA1(8bc75623232f3ab457b47d5af6cd1c3fb24c0d0e) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
 	ROM_CONTINUE(             0x04000, 0x4000 )
 	ROM_CONTINUE(             0x04000, 0x4000 )
 	ROM_CONTINUE(             0x04000, 0x4000 ) // only the last 16kb matters
 
-	ROM_REGION( 0x10000, REGION_GFX1, ROMREGION_ERASE00 ) /* RAM accessed by the video chip */
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx1", ROMREGION_ERASE00 ) /* RAM accessed by the video chip */
 	/* 0x00000 - 0x0ffff = banked ram */
 
-	ROM_REGION( 0x10000, REGION_GFX2, ROMREGION_INVERT ) /* ROM accessed by the video chip */
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx2", ROMREGION_INVERT ) /* ROM accessed by the video chip */
 	ROM_LOAD( "04.bin", 0x00000, 0x10000, CRC(565932f4) SHA1(4b184aa445b5671072031ad4a2ccb13868d6d3a4) )
 
-	ROM_REGION( 0x200000, REGION_USER1, 0 ) /* banked data - 8 banks, 6 'question' slots */
+	ROM_REGION( 0x200000, RGNCLASS_USER, "user1", 0 ) /* banked data - 8 banks, 6 'question' slots */
 	ROM_LOAD( "01.bin", 0x000000,   0x040000, CRC(36755831) SHA1(706fba5fc765502774643bfef8a3c9d2c01eb01b) ) // 99% gfx
 	ROM_LOAD( "02.bin", 0x040000,   0x020000, CRC(69cf6b7c) SHA1(a7bdc62051d09636dcd54db102706a9b42465e63) ) // data
 	ROM_RELOAD(         0x060000,   0x020000) // 128kb roms are mirrored
@@ -934,20 +934,20 @@ ROM_END
 
 /* Is this actually official, or a hack? */
 ROM_START( mastboyi )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x4000, CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
 	ROM_LOAD( "3-mem-a.ic77", 0x04000, 0x4000, CRC(3ee33282) SHA1(26371e3bb436869461e9870409b69aa9fb1845d6) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
 	ROM_CONTINUE(             0x04000, 0x4000 )
 	ROM_CONTINUE(             0x04000, 0x4000 )
 	ROM_CONTINUE(             0x04000, 0x4000 ) // only the last 16kb matters
 
-	ROM_REGION( 0x10000, REGION_GFX1, ROMREGION_ERASE00 ) /* RAM accessed by the video chip */
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx1", ROMREGION_ERASE00 ) /* RAM accessed by the video chip */
 	/* 0x00000 - 0x0ffff = banked ram */
 
-	ROM_REGION( 0x10000, REGION_GFX2, ROMREGION_INVERT ) /* ROM accessed by the video chip */
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx2", ROMREGION_INVERT ) /* ROM accessed by the video chip */
 	ROM_LOAD( "4.ic91", 0x00000, 0x10000, CRC(858d7b27) SHA1(b0ddf49df5665003f3616d67f7fc27408433483b) )
 
-	ROM_REGION( 0x200000, REGION_USER1, 0 ) /* question data - 6 sockets */
+	ROM_REGION( 0x200000, RGNCLASS_USER, "user1", 0 ) /* question data - 6 sockets */
 	ROM_LOAD( "1-mem-c.ic75", 0x000000, 0x040000, CRC(7c7b1cc5) SHA1(73ad7bdb61d1f99ce09ef3a5a3ae0f1e72364eee) ) // 99% gfx
 	ROM_LOAD( "2-mem-b.ic76", 0x040000, 0x020000, CRC(87015c18) SHA1(a16bf2707ce847da0923662796195b75719a6d77) ) // data
 	ROM_RELOAD(               0x060000, 0x020000) // 128kb roms are mirrored
@@ -972,7 +972,7 @@ ROM_END
 
 static DRIVER_INIT( mastboy )
 {
-	mastboy_vram = memory_region( machine, REGION_GFX1 ); // makes decoding the RAM based tiles easier this way
+	mastboy_vram = memory_region( machine, RGNCLASS_GFX, "gfx1" ); // makes decoding the RAM based tiles easier this way
 }
 
 GAME( 1991, mastboy,  0,          mastboy, mastboy, mastboy, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", 0 )

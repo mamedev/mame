@@ -194,8 +194,9 @@ static void K053260_update( void * param, stream_sample_t **inputs, stream_sampl
 	}
 }
 
-static void *k053260_start(int sndindex, int clock, const void *config)
+static void *k053260_start(const char *tag, int sndindex, int clock, const void *config)
 {
+	static const struct K053260_interface defintrf = { 0 };
 	struct K053260_chip_def *ic;
 	int rate = clock / 32;
 	int i;
@@ -204,11 +205,11 @@ static void *k053260_start(int sndindex, int clock, const void *config)
 	memset(ic, 0, sizeof(*ic));
 
 	/* Initialize our chip structure */
-	ic->intf = config;
+	ic->intf = (config != NULL) ? config : &defintrf;
 
 	ic->mode = 0;
-	ic->rom = memory_region(Machine, ic->intf->region);
-	ic->rom_size = memory_region_length(Machine, ic->intf->region) - 1;
+	ic->rom = memory_region(Machine, RGNCLASS_SOUND, (ic->intf->rgnoverride != NULL) ? ic->intf->rgnoverride : tag);
+	ic->rom_size = memory_region_length(Machine, RGNCLASS_SOUND, (ic->intf->rgnoverride != NULL) ? ic->intf->rgnoverride : tag) - 1;
 
 	K053260_reset( ic );
 

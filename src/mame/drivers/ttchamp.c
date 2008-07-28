@@ -92,7 +92,7 @@ static WRITE16_HANDLER( paloff_w )
 static WRITE16_HANDLER( pcup_prgbank_w )
 {
     int bank;
-    UINT8 *ROM1 = memory_region(machine, REGION_USER1);
+    UINT8 *ROM1 = memory_region(machine, RGNCLASS_USER, "user1");
 
     if (ACCESSING_BITS_0_7)
     {
@@ -246,7 +246,7 @@ ROM_START( ttchamp )
 
 	/* hopefully this is a good dump */
 
-	ROM_REGION16_LE( 0x200000, REGION_USER1, 0 )
+	ROM_REGION16_LE( 0x200000, RGNCLASS_USER, "user1", 0 )
 	ROM_LOAD16_BYTE( "2.bin", 0x000000, 0x080000,  CRC(6a6c6d75) SHA1(3742b82462176d77732a69e142db9e6f61f25dc5) )
 	ROM_LOAD16_BYTE( "3.bin", 0x000001, 0x080000,  CRC(6062c0b2) SHA1(c5f0ac58c847ce2588c805f40180f2586a6477b7) )
 	ROM_LOAD16_BYTE( "4.bin", 0x100000, 0x080000,  CRC(4388dead) SHA1(1965e4b84452b244e32c8d218aace8d287c67ec2) )
@@ -255,31 +255,31 @@ ROM_START( ttchamp )
 	/* dumps below are bad dumps */
 
 	/* dump a */
-//  ROM_REGION( 0x200000, REGION_USER1, 0 )
+//  ROM_REGION( 0x200000, RGNCLASS_USER, "user1", 0 )
 //  ROM_LOAD16_BYTE( "27c040_dump_a.2", 0x000000, 0x080000, BAD_DUMP CRC(791d68c8) SHA1(641c989d50e95ac3ff7c87d148cfab44abbdc774) )
 //  ROM_LOAD16_BYTE( "27c040_dump_a.3", 0x000001, 0x080000, BAD_DUMP CRC(00c81241) SHA1(899d4d1566f5f5d2967b6a8ec7dca60833846bbe) )
 //  ROM_LOAD16_BYTE( "27c040_dump_a.4", 0x100000, 0x080000, BAD_DUMP CRC(11af50f6) SHA1(1e5b6cc5c5a6c1ec302b2de7ce40c9ebfb349b46) )
 //  ROM_LOAD16_BYTE( "27c040_dump_a.5", 0x100001, 0x080000, BAD_DUMP CRC(f6b87231) SHA1(3db461c0858c207e8a3dfd822c99d28e3a26b4ee) )
 
 	/* dump b */
-//  ROM_REGION( 0x200000, REGION_USER2, 0 )
+//  ROM_REGION( 0x200000, RGNCLASS_USER, "user2", 0 )
 //  ROM_LOAD16_BYTE( "27c040_dump_b.2", 0x000000, 0x080000, BAD_DUMP CRC(df1f2618) SHA1(7c6abb7a6ec55c49b95809f003d217f1ea758729) )
 //  ROM_LOAD16_BYTE( "27c040_dump_b.3", 0x000001, 0x080000, BAD_DUMP CRC(0292ca69) SHA1(fe3b0e78d9e946d8f8a86e8246e5a94483f44ce1) )
 //  ROM_LOAD16_BYTE( "27c040_dump_b.4", 0x100000, 0x080000, BAD_DUMP CRC(f6bcadc6) SHA1(d8c61c207175d67f4229103696dc2a4447af2ba4) )
 //  ROM_LOAD16_BYTE( "27c040_dump_b.5", 0x100001, 0x080000, BAD_DUMP CRC(b872747c) SHA1(24d2aa2603a71cdfd3d45608177bb60ab7cfe8a2) )
 
 	/* dump c */
-//  ROM_REGION( 0x200000, REGION_USER3, 0 )
+//  ROM_REGION( 0x200000, RGNCLASS_USER, "user3", 0 )
 //  ROM_LOAD16_BYTE( "27c040_dump_c.2", 0x000000, 0x080000, BAD_DUMP CRC(be70adc7) SHA1(fe439caa54856c75ef310e456a7e61b15321031d) )
 //  ROM_LOAD16_BYTE( "27c040_dump_c.3", 0x000001, 0x080000, BAD_DUMP CRC(8e3b3396) SHA1(f47243041b9283712e34ea58fa2456c35785c5ee) )
 //  ROM_LOAD16_BYTE( "27c040_dump_c.4", 0x100000, 0x080000, BAD_DUMP CRC(34ab75e9) SHA1(779f03139b336cdc46f4d00bf3fd9e6de79942e2) )
 //  ROM_LOAD16_BYTE( "27c040_dump_c.5", 0x100001, 0x080000, BAD_DUMP CRC(3e7b3533) SHA1(433439c2b8a8e54bb20fc3c1690d3f183c6fa6f6) )
 
 	/* these were the same in each dump..*/
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* not verified if this is correct yet, seems very empty, maybe protected */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu1", 0 ) /* not verified if this is correct yet, seems very empty, maybe protected */
 	ROM_LOAD( "pic16c84.rom", 0x000000, 0x4280,  CRC(900f2ef8) SHA1(08f206fe52f413437436e4b0d2b4ec310767446c) )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "samples", 0 )
 	ROM_LOAD( "27c020.1", 0x000000, 0x040000,  CRC(e2c4fe95) SHA1(da349035cc348db220a1e12b4c2a6021e2168425) )
 ROM_END
 
@@ -306,22 +306,22 @@ Dumped by tirino73 >isolani (at) interfree.it<
 ROM_START( ttchampa )
 	/* this is from a different board */
 
-	ROM_REGION16_BE( 0x200000, REGION_USER1, 0 )
+	ROM_REGION16_BE( 0x200000, RGNCLASS_USER, "user1", 0 )
 	ROM_LOAD16_BYTE( "ttennis2.bin", 0x000000, 0x080000,  CRC(b060e72c) SHA1(376e71bb4b1687fec4b719cbc5a7b25b64d159ac) )
 	ROM_LOAD16_BYTE( "ttennis3.bin", 0x000001, 0x080000,  CRC(33e085a8) SHA1(ea6af05690b4b0803c303a3c858df10e4d907fb1) )
 	ROM_LOAD16_BYTE( "4.bin", 0x100000, 0x080000,  CRC(4388dead) SHA1(1965e4b84452b244e32c8d218aace8d287c67ec2) )
 	ROM_LOAD16_BYTE( "5.bin", 0x100001, 0x080000,  CRC(fdbf9b28) SHA1(2d260555586097c8a396f65111f55ace801c7a5d) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* not verified if this is correct yet, seems very empty, maybe protected */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu1", 0 ) /* not verified if this is correct yet, seems very empty, maybe protected */
 	ROM_LOAD( "pic16c84.rom", 0x000000, 0x4280,  CRC(900f2ef8) SHA1(08f206fe52f413437436e4b0d2b4ec310767446c) )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "samples", 0 )
 	ROM_LOAD( "27c020.1", 0x000000, 0x040000,  CRC(e2c4fe95) SHA1(da349035cc348db220a1e12b4c2a6021e2168425) )
 ROM_END
 
 static DRIVER_INIT (ttchamp)
 {
-	UINT8 *ROM1 = memory_region(machine, REGION_USER1);
+	UINT8 *ROM1 = memory_region(machine, RGNCLASS_USER, "user1");
 	memory_set_bankptr(1,&ROM1[0x120000]);
 	memory_set_bankptr(2,&ROM1[0x180000]);
 }

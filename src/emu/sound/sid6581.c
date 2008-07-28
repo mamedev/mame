@@ -30,7 +30,7 @@ static void sid_update(void *token,stream_sample_t **inputs, stream_sample_t **_
 
 
 
-static void *sid_start(int sndindex, int clock, const void *config, SIDTYPE sidtype)
+static void *sid_start(const char *tag, int sndindex, int clock, const void *config, SIDTYPE sidtype)
 {
 	SID6581 *sid;
 	const SID6581_interface *iface = (const SID6581_interface*) config;
@@ -59,14 +59,14 @@ static void sid_reset(void *token)
 
 
 
-static void *sid6581_start(int sndindex, int clock, const void *config)
+static void *sid6581_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	return sid_start(sndindex, clock, config, MOS6581);
 }
 
 
 
-static void *sid8580_start(int sndindex, int clock, const void *config)
+static void *sid8580_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	return sid_start(sndindex, clock, config, MOS8580);
 }

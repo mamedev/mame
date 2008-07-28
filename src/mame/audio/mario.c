@@ -237,7 +237,7 @@ static SOUND_START( mario )
 {
 	mario_state	*state = machine->driver_data;
 #if USE_8039
-	UINT8 *SND = memory_region(machine, REGION_CPU2);
+	UINT8 *SND = memory_region(machine, RGNCLASS_CPU, "audio");
 
 	SND[1] = 0x01;
 #endif
@@ -298,8 +298,8 @@ static READ8_HANDLER( mario_sh_ea_r )
 
 static READ8_HANDLER( mario_sh_tune_r )
 {
-	UINT8 *SND = memory_region(machine, REGION_CPU2);
-	UINT16 mask = memory_region_length(machine, REGION_CPU2)-1;
+	UINT8 *SND = memory_region(machine, RGNCLASS_CPU, "audio");
+	UINT16 mask = memory_region_length(machine, RGNCLASS_CPU, "audio")-1;
 	UINT8 p2 = I8035_P2_R(machine);
 
 	if ((p2 >> 7) & 1)

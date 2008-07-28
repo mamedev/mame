@@ -919,8 +919,8 @@ void dcs_init(void)
 	cpunum_set_info_fct(dcs.cpunum, CPUINFO_PTR_ADSP2100_TIMER_HANDLER, (genf *)timer_enable_callback);
 
 	/* configure boot and sound ROMs */
-	dcs.bootrom = (UINT16 *)memory_region(Machine, REGION_SOUND1);
-	dcs.bootrom_words = memory_region_length(Machine, REGION_SOUND1) / 2;
+	dcs.bootrom = (UINT16 *)memory_region(Machine, RGNCLASS_SOUND, "dcs");
+	dcs.bootrom_words = memory_region_length(Machine, RGNCLASS_SOUND, "dcs") / 2;
 	dcs.sounddata = dcs.bootrom;
 	dcs.sounddata_words = dcs.bootrom_words;
 	dcs.sounddata_banks = dcs.sounddata_words / 0x1000;
@@ -969,9 +969,9 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	cpunum_set_info_fct(dcs.cpunum, CPUINFO_PTR_ADSP2100_TX_HANDLER, (genf *)sound_tx_callback);
 	cpunum_set_info_fct(dcs.cpunum, CPUINFO_PTR_ADSP2100_TIMER_HANDLER, (genf *)timer_enable_callback);
 
-	/* always boot from the base of REGION_SOUND1 */
-	dcs.bootrom = (UINT16 *)memory_region(machine, REGION_SOUND1);
-	dcs.bootrom_words = memory_region_length(machine, REGION_SOUND1) / 2;
+	/* always boot from the base of "dcs" */
+	dcs.bootrom = (UINT16 *)memory_region(machine, RGNCLASS_SOUND, "dcs");
+	dcs.bootrom_words = memory_region_length(machine, RGNCLASS_SOUND, "dcs") / 2;
 
 	/* supports both RAM and ROM variants */
 	if (dram_in_mb != 0)

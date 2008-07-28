@@ -64,7 +64,7 @@ static WRITE8_HANDLER( onetwo_fgram_w )
 
 static WRITE8_HANDLER( onetwo_cpubank_w )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU1) + 0x10000;
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main") + 0x10000;
 
 	memory_set_bankptr(1,&RAM[data * 0x4000]);
 }
@@ -106,7 +106,7 @@ static WRITE8_HANDLER(palette2_w)
 /* Main CPU */
 
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION(REGION_CPU1, 0x10000)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION(RGNCLASS_CPU, "main", 0x10000)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc800, 0xc87f) AM_RAM_WRITE(palette1_w) AM_BASE(&paletteram)
 	AM_RANGE(0xc900, 0xc97f) AM_RAM_WRITE(palette2_w) AM_BASE(&paletteram_2)
@@ -249,7 +249,7 @@ static const gfx_layout tiles8x8x6_layout =
 };
 
 static GFXDECODE_START( onetwo )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8x6_layout, 0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x6_layout, 0, 2 )
 GFXDECODE_END
 
 static VIDEO_START( onetwo )
@@ -306,39 +306,39 @@ static MACHINE_DRIVER_START( onetwo )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000*2)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7low) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 ROM_START( onetwo )
-	ROM_REGION( 0x30000, REGION_CPU1, 0 ) /* main z80 */
+	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 ) /* main z80 */
 	ROM_LOAD( "main", 0x10000,  0x20000, CRC(83431e6e) SHA1(61ab386a1d0af050f091f5df28c55ad5ad1a0d4b) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* sound z80 */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* sound z80 */
 	ROM_LOAD( "sound_prog",  0x00000,  0x10000, CRC(90aba4f3) SHA1(914b1c8684993ddc7200a3d61e07f4f6d59e9d02) )
 
-	ROM_REGION( 0x180000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x180000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "3_graphics", 0x000000, 0x80000, CRC(c72ff3a0) SHA1(17394d8a8b5ef4aee9522d87ba92ef1285f4d76a) )
 	ROM_LOAD( "4_graphics", 0x080000, 0x80000, CRC(0ca40557) SHA1(ca2db57d64ece90f2066f15b276c8d5827dcb4fa) )
 	ROM_LOAD( "5_graphics",   0x100000, 0x80000, CRC(664b6679) SHA1(f9f78bd34fb58e24f890a540382392e1c9d01220) )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )
 	ROM_LOAD( "sample", 0x000000, 0x40000, CRC(b10d3132) SHA1(42613e17b6a1300063b8355596a2dc7bcd903777) )
 ROM_END
 
 ROM_START( onetwoe )
-	ROM_REGION( 0x30000, REGION_CPU1, 0 ) /* main z80 */
+	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 ) /* main z80 */
 	ROM_LOAD( "main_prog", 0x10000,  0x20000, CRC(6c1936e9) SHA1(d8fb3056299c9b45e0b537e77dc0d633882705dd) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* sound z80 */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* sound z80 */
 	ROM_LOAD( "sound_prog",  0x00000,  0x10000, CRC(90aba4f3) SHA1(914b1c8684993ddc7200a3d61e07f4f6d59e9d02) )
 
-	ROM_REGION( 0x180000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x180000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "3_grfx", 0x000000, 0x80000, CRC(0f9f39ff) SHA1(85d107306c8c5718da3b751221791404cfe12a3d) )
 	ROM_LOAD( "4_grfx", 0x080000, 0x80000, CRC(2b0e0564) SHA1(092bf0bb7be12ed1aa8a4ed1e88143ea88819497) )
 	ROM_LOAD( "5_grfx", 0x100000, 0x80000, CRC(69807a9b) SHA1(6c1d79e86e3575da29bc299670e38019eef53493) )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )
 	ROM_LOAD( "sample", 0x000000, 0x40000, CRC(b10d3132) SHA1(42613e17b6a1300063b8355596a2dc7bcd903777) )
 ROM_END
 

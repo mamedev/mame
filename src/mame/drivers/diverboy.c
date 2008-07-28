@@ -185,8 +185,8 @@ static const gfx_layout diverboy_spritelayout =
 };
 
 static GFXDECODE_START( diverboy )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, diverboy_spritelayout, 0, 4*16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, diverboy_spritelayout, 0, 4*16 )
+	GFXDECODE_ENTRY( "gfx1", 0, diverboy_spritelayout, 0, 4*16 )
+	GFXDECODE_ENTRY( "gfx2", 0, diverboy_spritelayout, 0, 4*16 )
 GFXDECODE_END
 
 
@@ -217,32 +217,32 @@ static MACHINE_DRIVER_START( diverboy )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1320000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 
 
 ROM_START( diverboy )
-	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "db_01.bin", 0x00000, 0x20000, CRC(6aa11366) SHA1(714c8a4a64c18632825a734a76a2d1b031106d76) )
 	ROM_LOAD16_BYTE( "db_02.bin", 0x00001, 0x20000, CRC(45f8a673) SHA1(4eea1374cafacb4a2e0b623fcb802deb5fca1b3a) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* z80 */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* z80 */
 	ROM_LOAD( "db_05.bin", 0x00000, 0x8000, CRC(ffeb49ec) SHA1(911b13897ff4ace3940bfff4ab88584a93796c24) ) /* this part is empty */
 	ROM_CONTINUE( 0x0000, 0x8000 ) /* this part contains the code */
 
-	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE ) /* GFX */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* GFX */
 	ROM_LOAD16_BYTE( "db_08.bin", 0x000000, 0x80000, CRC(7bb96220) SHA1(671b3f218106e594b13ae5f2e680cf2e2cfc5501) )
 	ROM_LOAD16_BYTE( "db_09.bin", 0x000001, 0x80000, CRC(12b15476) SHA1(400a5b846f70567de137e0b95586dd9cfc27becb) )
 
-	ROM_REGION( 0x180000, REGION_GFX2, ROMREGION_DISPOSE ) /* GFX */
+	ROM_REGION( 0x180000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) /* GFX */
 	ROM_LOAD16_BYTE( "db_07.bin", 0x000000, 0x20000, CRC(18485741) SHA1(a8edceaf34a98f2aa2bfada9d6e06fb82639a4e0) )
 	ROM_LOAD16_BYTE( "db_10.bin", 0x000001, 0x20000, CRC(c381d1cc) SHA1(88b97d8893c500951cfe8e7e7f0b547b36bbe2c0) )
 	ROM_LOAD16_BYTE( "db_06.bin", 0x040000, 0x20000, CRC(21b4e352) SHA1(a553de67e5dc751ea81ec4739724e0e46e8c5fab) )
 	ROM_LOAD16_BYTE( "db_11.bin", 0x040001, 0x20000, CRC(41d29c81) SHA1(448fd5c1b16159d03436b8bd71ffe871c8daf7fa) )
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) /* Sound */
+	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 ) /* Sound */
 	ROM_LOAD( "db_03.bin", 0x00000, 0x20000, CRC(50457505) SHA1(faf1c055ec56d2ed7f5e6993cc04d3317bf1c3cc) )
 	ROM_CONTINUE(          0x40000, 0x20000 )
 	ROM_CONTINUE(          0x80000, 0x20000 )

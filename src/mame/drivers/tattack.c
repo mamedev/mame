@@ -155,7 +155,7 @@ static const gfx_layout charlayout =
 
 
 static GFXDECODE_START( tattack )
-	GFXDECODE_ENTRY( REGION_GFX1, 0     , charlayout,  0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0     , charlayout,  0, 1 )
 GFXDECODE_END
 
 static PALETTE_INIT( tattack  )
@@ -212,10 +212,10 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( tattack )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "rom.9a",		0x0000, 0x1000, CRC(47120994) SHA1(b6e90abbc50cba77df4c0aaf50d1f97b99e33b6d) )
 
-	ROM_REGION( 0x1000, REGION_GFX1, 0 )
+	ROM_REGION( 0x1000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD( "rom.6c",		0x0000, 0x1000, CRC(88ce45cf) SHA1(c7a43bfc9e9c2aeb75a98f723558bc88e53401a7) )
 
 ROM_END
@@ -223,7 +223,7 @@ ROM_END
 static DRIVER_INIT(tattack)
 {
 
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 
 	rom[0x1b4]=0;
 	rom[0x1b5]=0;

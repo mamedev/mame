@@ -59,7 +59,7 @@ extern VIDEO_UPDATE( pokechmp );
 
 static WRITE8_HANDLER( pokechmp_bank_w )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	if (data == 0x00)
 	{
@@ -238,8 +238,8 @@ static const gfx_layout pokechmp_spritelayout =
 
 
 static GFXDECODE_START( pokechmp )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, pokechmp_charlayout,   0x100, 32 ) /* chars */
-	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, pokechmp_spritelayout,   0,  32 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0x00000, pokechmp_charlayout,   0x100, 32 ) /* chars */
+	GFXDECODE_ENTRY( "gfx2", 0x00000, pokechmp_spritelayout,   0,  32 ) /* sprites */
 GFXDECODE_END
 
 
@@ -278,41 +278,41 @@ static MACHINE_DRIVER_START( pokechmp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 4000000/4) // ?? unknown frequency
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)	/* sound fx */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 static DRIVER_INIT( pokechmp )
 {
-	memory_configure_bank(3, 0, 2, memory_region(machine, REGION_CPU2) + 0x10000, 0x4000);
+	memory_configure_bank(3, 0, 2, memory_region(machine, RGNCLASS_CPU, "audio") + 0x10000, 0x4000);
 }
 
 
 ROM_START( pokechmp )
-	ROM_REGION( 0x24000, REGION_CPU1, 0 )	 /* 64k for code + 16k for banks */
+	ROM_REGION( 0x24000, RGNCLASS_CPU, "main", 0 )	 /* 64k for code + 16k for banks */
 	ROM_LOAD( "pokechamp_11_27010.bin",	   0x10000, 0x14000, CRC(9afb6912) SHA1(e45da9524e3bb6f64a68200b70d0f83afe6e4379) )
 	ROM_CONTINUE(			   0x04000, 0xc000)
 
-	ROM_REGION( 0x18000, REGION_CPU2, 0 )	 /* 96k for code + 96k for decrypted opcodes */
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "audio", 0 )	 /* 96k for code + 96k for decrypted opcodes */
 	ROM_LOAD( "pokechamp_09_27c512.bin",	   0x10000, 0x8000, CRC(c78f6483) SHA1(a0d063effd8d1850f674edccb6e7a285b2311d21) )
 	ROM_CONTINUE(			   0x08000, 0x8000 )
 
-	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE)
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE)
 	/* Seems to be 8bpp */
 	ROM_LOAD( "pokechamp_05_27c020.bin",	   0x00000, 0x40000, CRC(554cfa42) SHA1(862d0dd83697da7bd52dc640c34926c62691afea) )
 	ROM_LOAD( "pokechamp_06_27c020.bin",	   0x40000, 0x40000, CRC(00bb9536) SHA1(1a5584297ebb425d6ce331955e0c6a4f467cd1e6) )
 	ROM_LOAD( "pokechamp_07_27c020.bin",	   0x80000, 0x40000, CRC(4b15ab5e) SHA1(5523134853b9ea1c81fd5aeb58061376d94e9298) )
 	ROM_LOAD( "pokechamp_08_27c020.bin",	   0xc0000, 0x40000, CRC(e9db54d6) SHA1(ac3b7c06d0f61847bf9bc6147f2f88d712f2b4b3) )
 
-	ROM_REGION( 0x40000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	/* the first half of all these roms is identical... for rom 3 both halves match, is the first half unused? 4bpp gfx? */
 	ROM_LOAD( "pokechamp_01_27c512.bin",	   0x00000, 0x10000, CRC(338fc412) SHA1(bb8ae99ee6a399a8c67bedb88d0837fd0a4a426c) )
 	ROM_LOAD( "pokechamp_02_27c512.bin",	   0x10000, 0x10000, CRC(1ff44545) SHA1(2eee44484accce7b0ba21babf6e8344b234a4e87) )
 	ROM_LOAD( "pokechamp_03_27c512.bin",	   0x20000, 0x10000, CRC(99f9884a) SHA1(096d6ce70dc51fb9142e80e1ec45d6d7225481f5) )
 	ROM_LOAD( "pokechamp_04_27c512.bin",	   0x30000, 0x10000, CRC(ee6991af) SHA1(8eca3cdfd2eb74257253957a87b245b7f85bd038) )
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 )
 	ROM_LOAD( "pokechamp_10_27c040.bin",	   0x00000, 0x80000, CRC(b54806ed) SHA1(c6e1485c263ebd9102ff1e8c09b4c4ca5f63c3da) )
 ROM_END
 

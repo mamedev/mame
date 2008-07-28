@@ -106,15 +106,19 @@ static void update_namco_waveform(struct namco_sound *chip, int offset, UINT8 da
 
 
 /* build the decoded waveform table */
-static int build_decoded_waveform(struct namco_sound *chip, int region)
+static int build_decoded_waveform(struct namco_sound *chip, const char *region)
 {
+	UINT8 *rgnbase = memory_region(Machine, RGNCLASS_SOUND, region);
 	INT16 *p;
 	int size;
 	int offset;
 	int v;
 
+	if (rgnbase != NULL)
+		namco_wavedata = rgnbase;
+
 	/* 20pacgal has waves in RAM but old sound system */
-	if (region == -1 && chip->num_voices != 3)
+	if (namco_wavedata == NULL && chip->num_voices != 3)
 	{
 		chip->wave_size = 1;
 		size = 32 * 16;		/* 32 samples, 16 waveforms */
@@ -132,9 +136,6 @@ static int build_decoded_waveform(struct namco_sound *chip, int region)
 		chip->waveform[v] = p;
 		p += size;
 	}
-
-	if (region != -1)
-		namco_wavedata = memory_region(Machine, region);
 
 	/* We need waveform data. It fails if region is not specified. */
 	if (namco_wavedata)
@@ -354,7 +355,7 @@ static void namco_update_stereo(void *param, stream_sample_t **inputs, stream_sa
 }
 
 
-static void *namco_start(int sndindex, int clock, const void *config)
+static void *namco_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	sound_channel *voice;
 	const struct namco_interface *intf = config;
@@ -382,7 +383,7 @@ static void *namco_start(int sndindex, int clock, const void *config)
 	logerror("Namco: freq fractional bits = %d: internal freq = %d, output freq = %d\n", chip->f_fracbits, chip->namco_clock, chip->sample_rate);
 
 	/* build the waveform table */
-	if (build_decoded_waveform(chip, intf->region))
+	if (build_decoded_waveform(chip, tag))
 		return NULL;
 
 	/* get stream channels */

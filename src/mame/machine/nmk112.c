@@ -18,9 +18,12 @@
 static UINT8 page_mask;
 
 static UINT8 current_bank[8];
+static const char *region[2];
 
-void NMK112_init(UINT8 disable_page_mask)
+void NMK112_init(UINT8 disable_page_mask, const char *rgn0, const char *rgn1)
 {
+	region[0] = rgn0;
+	region[1] = rgn1;
 	memset(current_bank, ~0, sizeof(current_bank));
 	page_mask = ~disable_page_mask;
 }
@@ -31,8 +34,8 @@ WRITE8_HANDLER( NMK112_okibank_w )
 	int banknum	=	offset & 3;
 	int paged	=	(page_mask & (1 << chip));
 
-	UINT8 *rom	=	memory_region(machine, REGION_SOUND1 + chip);
-	int size			=	memory_region_length(machine, REGION_SOUND1 + chip) - 0x40000;
+	UINT8 *rom	=	memory_region(machine, RGNCLASS_SOUND, region[chip]);
+	int size			=	memory_region_length(machine, RGNCLASS_SOUND, region[chip]) - 0x40000;
 	int bankaddr		=	(data * BANKSIZE) % size;
 
 	if (current_bank[offset] == data) return;

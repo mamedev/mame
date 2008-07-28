@@ -126,7 +126,7 @@ static WRITE8_HANDLER( supertnk_bankswitch_0_w )
 
 	bank_address = 0x10000 + (supertnk_rom_bank * 0x1000);
 
-	memory_set_bankptr(1, &memory_region(machine, REGION_CPU1)[bank_address]);
+	memory_set_bankptr(1, &memory_region(machine, RGNCLASS_CPU, "main")[bank_address]);
 }
 
 
@@ -138,7 +138,7 @@ static WRITE8_HANDLER( supertnk_bankswitch_1_w )
 
 	bank_address = 0x10000 + (supertnk_rom_bank * 0x1000);
 
-	memory_set_bankptr(1, &memory_region(machine, REGION_CPU1)[bank_address]);
+	memory_set_bankptr(1, &memory_region(machine, RGNCLASS_CPU, "main")[bank_address]);
 }
 
 
@@ -218,7 +218,7 @@ static WRITE8_HANDLER( supertnk_bitplane_select_1_w )
 static void get_pens(running_machine *machine, pen_t *pens)
 {
 	offs_t i;
-	const UINT8 *prom = memory_region(machine, REGION_PROMS);
+	const UINT8 *prom = memory_region(machine, RGNCLASS_PROMS, "proms");
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
@@ -444,7 +444,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( supertnk )
-	ROM_REGION( 0x14000, REGION_CPU1, 0 ) /* 64k for TMS9980 code + 16k of ROM */
+	ROM_REGION( 0x14000, RGNCLASS_CPU, "main", 0 ) /* 64k for TMS9980 code + 16k of ROM */
 	ROM_LOAD( "supertan.2d",  0x00000, 0x0800, CRC(1656a2c1) SHA1(1d49945aed105003a051cfbf646af7a4be1b7e86) )
 	ROM_LOAD( "supertnk.3d",  0x10800, 0x0800, CRC(8b023a9a) SHA1(1afdc8d75f2ca04153bac20c0e3e123e2a7acdb7) )
 	ROM_CONTINUE(			  0x10000, 0x0800)
@@ -455,7 +455,7 @@ ROM_START( supertnk )
 	ROM_LOAD( "supertnk.9d",  0x13800, 0x0800, CRC(a34a494a) SHA1(9b7f0560e9d569ee25eae56f31886d50a3153dcc) )
 	ROM_CONTINUE(			  0x13000, 0x0800)
 
-	ROM_REGION( 0x0060, REGION_PROMS, 0 )
+	ROM_REGION( 0x0060, RGNCLASS_PROMS, "proms", 0 )
 	 /* color PROM */
 	ROM_LOAD( "supertnk.clr",  0x0000, 0x0020, CRC(9ae1faee) SHA1(19de4bb8bc389d98c8f8e35c755fad96e1a6a0cd) )
  	/* unknown - sync? */
@@ -476,8 +476,8 @@ static DRIVER_INIT( supertnk )
 {
 	/* decode the TMS9980 ROMs */
 	offs_t offs;
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
-	size_t len = memory_region_length(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+	size_t len = memory_region_length(machine, RGNCLASS_CPU, "main");
 
 	for (offs = 0; offs < len; offs++)
 	{

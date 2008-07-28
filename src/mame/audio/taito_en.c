@@ -36,7 +36,7 @@ WRITE16_HANDLER(f3_68000_share_w)
 
 WRITE16_HANDLER( f3_es5505_bank_w )
 {
-	UINT32 max_banks_this_game=(memory_region_length(machine, REGION_SOUND1)/0x200000)-1;
+	UINT32 max_banks_this_game=(memory_region_length(machine, RGNCLASS_SOUND, "ensoniq.0")/0x200000)-1;
 
 #if 0
 {
@@ -190,7 +190,7 @@ READ16_HANDLER(es5510_dsp_r)
 
 WRITE16_HANDLER(es5510_dsp_w)
 {
-	UINT8 *snd_mem = (UINT8 *)memory_region(machine, REGION_SOUND1);
+	UINT8 *snd_mem = (UINT8 *)memory_region(machine, RGNCLASS_SOUND, "ensoniq.0");
 
 //  if (offset>4 && offset!=0x80  && offset!=0xa0  && offset!=0xc0  && offset!=0xe0)
 //      logerror("%06x: DSP write offset %04x %04x\n",activecpu_get_pc(),offset,data);
@@ -248,7 +248,7 @@ ADDRESS_MAP_END
 void taito_f3_soundsystem_reset(running_machine *machine)
 {
 	/* Sound cpu program loads to 0xc00000 so we use a bank */
-	UINT16 *ROM = (UINT16 *)memory_region(machine, REGION_CPU2);
+	UINT16 *ROM = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "audio");
 	memory_set_bankptr(1,&ROM[0x80000]);
 	memory_set_bankptr(2,&ROM[0x90000]);
 	memory_set_bankptr(3,&ROM[0xa0000]);
@@ -263,8 +263,8 @@ void taito_f3_soundsystem_reset(running_machine *machine)
 
 const struct ES5505interface es5505_interface =
 {
-	REGION_SOUND1,	/* Bank 0: Unused by F3 games? */
-	REGION_SOUND1,	/* Bank 1: All games seem to use this */
+	"ensoniq.0",	/* Bank 0: Unused by F3 games? */
+	"ensoniq.1",	/* Bank 1: All games seem to use this */
 	0 /* irq */
 };
 

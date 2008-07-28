@@ -336,9 +336,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( mirage )
-	GFXDECODE_ENTRY(REGION_GFX1, 0, tile_8x8_layout,     0x000, 32)	/* Tiles (8x8) */
-	GFXDECODE_ENTRY(REGION_GFX1, 0, tile_16x16_layout,   0x000, 32)	/* Tiles (16x16) */
-	GFXDECODE_ENTRY(REGION_GFX2, 0, spritelayout,        0x200, 32)	/* Sprites (16x16) */
+	GFXDECODE_ENTRY("gfx1", 0, tile_8x8_layout,     0x000, 32)	/* Tiles (8x8) */
+	GFXDECODE_ENTRY("gfx1", 0, tile_16x16_layout,   0x000, 32)	/* Tiles (16x16) */
+	GFXDECODE_ENTRY("gfx2", 0, spritelayout,        0x200, 32)	/* Sprites (16x16) */
 GFXDECODE_END
 
 
@@ -368,38 +368,38 @@ static MACHINE_DRIVER_START( mirage )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("oki2", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 
 ROM_START( mirage )
-	ROM_REGION( 0x80000, REGION_CPU1, 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "mr_00-.2a", 0x00000, 0x40000, CRC(3a53f33d) SHA1(0f654021dcd64202b41e0ef5ef3cdf5dd274f8a5) )
 	ROM_LOAD16_BYTE( "mr_01-.3a", 0x00001, 0x40000, CRC(a0b758aa) SHA1(7fb5faf6fb57cd72a3ac24b8af1f33e504ac8398) )
 
-	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE ) /* Tiles - Encrypted */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* Tiles - Encrypted */
 	ROM_LOAD( "mbl-00.7a", 0x000000, 0x100000, CRC(2e258b7b) SHA1(2dbd7d16a1eda97ae3de149b67e80e511aa9d0ba) )
 
-	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) /* Sprites */
   	ROM_LOAD16_BYTE( "mbl-01.11a", 0x000001, 0x200000, CRC(895be69a) SHA1(541d8f37fb4cf99312b80a0eb0d729fbbeab5f4f) )
 	ROM_LOAD16_BYTE( "mbl-02.12a", 0x000000, 0x200000, CRC(474f6104) SHA1(ff81b32b90192c3d5f27c436a9246aa6caaeeeee) )
 
-	ROM_REGION( 0x200000, REGION_SOUND1, 0 )	/* M6295 samples */
+	ROM_REGION( 0x200000, RGNCLASS_SOUND, "oki1", 0 )	/* M6295 samples */
 	ROM_LOAD( "mbl-03.10a", 0x000000, 0x200000, CRC(4a599703) SHA1(b49e84faa2d6acca952740d30fc8d1a33ac47e79) )
 
-	ROM_REGION( 0x200000, REGION_SOUND2, 0 )	/* M6295 samples */
+	ROM_REGION( 0x200000, RGNCLASS_SOUND, "oki2", 0 )	/* M6295 samples */
 	ROM_LOAD( "mbl-04.12k", 0x000000, 0x100000, CRC(b533123d) SHA1(2cb2f11331d00c2d282113932ed2836805f4fc6e) )
 ROM_END
 
-static void descramble_sound( running_machine *machine, int region )
+static void descramble_sound( running_machine *machine, const char *region )
 {
-	UINT8 *rom = memory_region(machine, region);
-	int length = memory_region_length(machine, region);
+	UINT8 *rom = memory_region(machine, RGNCLASS_SOUND, region);
+	int length = memory_region_length(machine, RGNCLASS_SOUND, region);
 	UINT8 *buf1 = malloc_or_die(length);
 	UINT32 x;
 
@@ -438,8 +438,8 @@ static void descramble_sound( running_machine *machine, int region )
 
 static DRIVER_INIT( mirage )
 {
-	deco56_decrypt(machine, REGION_GFX1);
-	descramble_sound(machine, REGION_SOUND1);
+	deco56_decrypt_gfx(machine, "gfx1");
+	descramble_sound(machine, "oki1");
 }
 
 GAME( 1994, mirage, 0,        mirage, mirage, mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", GAME_NOT_WORKING )

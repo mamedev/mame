@@ -40,14 +40,14 @@ static UINT8 konami1_decodebyte( UINT8 opcode, UINT16 address )
 
 
 
-UINT8 *konami1_decode(running_machine *machine, int cpu)
+UINT8 *konami1_decode(running_machine *machine, const char *cpu)
 {
-	const UINT8 *rom = memory_region(machine, REGION_CPU1+cpu);
-	int size = memory_region_length(machine, REGION_CPU1+cpu);
+	const UINT8 *rom = memory_region(machine, RGNCLASS_CPU, cpu);
+	int size = memory_region_length(machine, RGNCLASS_CPU, cpu);
 	int A;
 
 	UINT8 *decrypted = auto_malloc(size);
-	memory_set_decrypted_region(cpu, 0x0000, 0xffff, decrypted);
+	memory_set_decrypted_region(mame_find_cpu_index(machine, cpu), 0x0000, 0xffff, decrypted);
 
 	for (A = 0;A < size;A++)
 	{

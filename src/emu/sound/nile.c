@@ -217,16 +217,14 @@ static void nile_update(void *param, stream_sample_t **inputs, stream_sample_t *
 	}
 }
 
-static void *nile_start(int sndindex, int clock, const void *config)
+static void *nile_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct NiLe_interface *intf = config;
 	struct nile_info *info;
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
-	info->sound_ram = (UINT8 *)memory_region(Machine, intf->region);
-
+	info->sound_ram = (UINT8 *)memory_region(Machine, RGNCLASS_SOUND, tag);
 
 	info->stream = stream_create(0, 2, 44100, info, nile_update);
 

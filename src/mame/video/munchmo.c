@@ -95,7 +95,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
     ROM B1.2C contains 256 tilemaps defining 4x4 configurations of
     the tiles in ROM B2.2B
 */
-	UINT8 *rom = memory_region(machine, REGION_GFX2);
+	UINT8 *rom = memory_region(machine, RGNCLASS_GFX, "gfx2");
 	const gfx_element *gfx = machine->gfx[1];
 	int offs;
 

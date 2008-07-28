@@ -22,8 +22,6 @@
 
 struct rf5c400_info
 {
-	const struct RF5C400interface *intf;
-
 	INT16 *rom;
 	UINT32 rom_length;
 
@@ -229,12 +227,12 @@ static void rf5c400_update(void *param, stream_sample_t **inputs, stream_sample_
 	}
 }
 
-static void rf5c400_init_chip(struct rf5c400_info *info, int sndindex, int clock)
+static void rf5c400_init_chip(const char *tag, struct rf5c400_info *info, int sndindex, int clock)
 {
 	int i;
 
-	info->rom = (INT16*)memory_region(Machine, info->intf->region);
-	info->rom_length = memory_region_length(Machine, info->intf->region) / 2;
+	info->rom = (INT16*)memory_region(Machine, RGNCLASS_SOUND, tag);
+	info->rom_length = memory_region_length(Machine, RGNCLASS_SOUND, tag) / 2;
 
 	// init volume table
 	{
@@ -341,16 +339,14 @@ static void rf5c400_init_chip(struct rf5c400_info *info, int sndindex, int clock
 }
 
 
-static void *rf5c400_start(int sndindex, int clock, const void *config)
+static void *rf5c400_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct rf5c400_info *info;
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
-	info->intf = config;
-
-	rf5c400_init_chip(info, sndindex, clock);
+	rf5c400_init_chip(tag, info, sndindex, clock);
 
 	return info;
 }

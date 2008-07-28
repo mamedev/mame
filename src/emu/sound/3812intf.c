@@ -79,7 +79,7 @@ static void _stream_update_3812(void * param, int interval)
 }
 
 
-static void *ym3812_start(int sndindex, int clock, const void *config)
+static void *ym3812_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	static const struct YM3812interface dummy = { 0 };
 	struct ym3812_info *info;
@@ -248,7 +248,7 @@ static void _stream_update_3526(void *param, int interval)
 }
 
 
-static void *ym3526_start(int sndindex, int clock, const void *config)
+static void *ym3526_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	static const struct YM3526interface dummy = { 0 };
 	struct ym3526_info *info;
@@ -443,7 +443,7 @@ static void _stream_update_8950(void *param, int interval)
 }
 
 
-static void *y8950_start(int sndindex, int clock, const void *config)
+static void *y8950_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	static const struct Y8950interface dummy = { 0 };
 	struct y8950_info *info;
@@ -462,8 +462,8 @@ static void *y8950_start(int sndindex, int clock, const void *config)
 
 	/* ADPCM ROM data */
 	Y8950SetDeltaTMemory(info->chip,
-		(void *)(memory_region(Machine, info->intf->rom_region)),
-			memory_region_length(Machine, info->intf->rom_region) );
+		(void *)(memory_region(Machine, RGNCLASS_SOUND, tag)),
+			memory_region_length(Machine, RGNCLASS_SOUND, tag) );
 
 	info->stream = stream_create(0,1,rate,info,y8950_stream_update);
 

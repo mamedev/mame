@@ -343,32 +343,32 @@ static void *generic_start(int sndindex, int clock, int feedbackmask, int noiset
 }
 
 
-static void *sn76489_start(int sndindex, int clock, const void *config)
+static void *sn76489_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	return generic_start(sndindex, clock, 0x4000, 0x03, TRUE);
 }
 
-static void *sn76489a_start(int sndindex, int clock, const void *config)
+static void *sn76489a_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	return generic_start(sndindex, clock, 0x8000, 0x06, FALSE);
 }
 
-static void *sn76494_start(int sndindex, int clock, const void *config)
+static void *sn76494_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	return generic_start(sndindex, clock, 0x8000, 0x06, FALSE);
 }
 
-static void *sn76496_start(int sndindex, int clock, const void *config)
+static void *sn76496_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	return generic_start(sndindex, clock, 0x8000, 0x06, FALSE);
 }
 
-static void *gamegear_start(int sndindex, int clock, const void *config)
+static void *gamegear_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	return generic_start(sndindex, clock, 0x8000, 0x09, FALSE);
 }
 
-static void *smsiii_start(int sndindex, int clock, const void *config)
+static void *smsiii_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	return generic_start(sndindex, clock, 0x8000, 0x09, FALSE);
 }

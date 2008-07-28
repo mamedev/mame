@@ -94,7 +94,7 @@ void VR0_Snd_Set_Areas(UINT32 *Texture,UINT32 *Frame)
 	VR0->FBBase=Frame;
 }
 
-static void *vrender0_start(int sndindex, int clock, const void *config)
+static void *vrender0_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	const struct VR0Interface *intf;
 	struct _VR0Chip *VR0;

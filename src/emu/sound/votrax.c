@@ -101,7 +101,7 @@ static void votrax_update_sound(void *param, stream_sample_t **inputs, stream_sa
 }
 
 
-static void *votrax_start(int sndindex, int clock, const void *config)
+static void *votrax_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct votrax_info *votrax;
 

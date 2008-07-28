@@ -562,7 +562,7 @@ static UINT16 vdp_get_word_from_68k_mem_default(UINT32 source)
 {
 	if (( source >= 0x000000 ) && ( source <= 0x3fffff ))
 	{
-		UINT16 *rom = (UINT16*)memory_region(Machine, REGION_CPU1);
+		UINT16 *rom = (UINT16*)memory_region(Machine, RGNCLASS_CPU, "main");
 		return rom[(source&0x3fffff)>>1];
 	}
 	else if (( source >= 0xe00000 ) && ( source <= 0xffffff ))
@@ -2366,7 +2366,7 @@ static READ8_HANDLER( z80_read_68k_banked_data )
 		UINT32 fulladdress;
 		fulladdress = genz80.z80_bank_addr + offset;
 
-		return memory_region(machine, REGION_CPU1)[fulladdress^1]; // ^1? better..
+		return memory_region(machine, RGNCLASS_CPU, "main")[fulladdress^1]; // ^1? better..
 
 
 	}
@@ -2682,7 +2682,7 @@ static UINT32 pm_io(int reg, int write, UINT32 d)
 			int addr = svp.pmac_read[reg]&0xffff;
 			if      ((mode & 0xfff0) == 0x0800) // ROM, inc 1, verified to be correct
 			{
-				UINT16 *ROM = (UINT16 *) memory_region(Machine, REGION_CPU1);
+				UINT16 *ROM = (UINT16 *) memory_region(Machine, RGNCLASS_CPU, "main");
 				svp.pmac_read[reg] += 1;
 				d = ROM[addr|((mode&0xf)<<16)];
 			}
@@ -2884,7 +2884,7 @@ static UINT16 vdp_get_word_from_68k_mem_svp(UINT32 source)
 {
 	if ((source & 0xe00000) == 0x000000)
 	{
-		UINT16 *rom = (UINT16*)memory_region(Machine, REGION_CPU1);
+		UINT16 *rom = (UINT16*)memory_region(Machine, RGNCLASS_CPU, "main");
 		source -= 2; // DMA latency
 		return rom[source >> 1];
 	}
@@ -2934,7 +2934,7 @@ static void svp_init(running_machine *machine)
 	svp.iram = auto_malloc(0x800);
 	memory_set_bankptr( 3, svp.iram );
 	/* SVP ROM just shares m68k region.. */
-	ROM = memory_region(machine, REGION_CPU1);
+	ROM = memory_region(machine, RGNCLASS_CPU, "main");
 	memory_set_bankptr( 4, ROM + 0x800 );
 
 	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_svp;
@@ -5146,7 +5146,7 @@ static void megadriv_init_common(running_machine *machine)
           some games specify a single address, (start 200001, end 200001)
           this usually means there is serial eeprom instead */
 		int i;
-		UINT16 *rom = (UINT16*)memory_region(machine, REGION_CPU1);
+		UINT16 *rom = (UINT16*)memory_region(machine, RGNCLASS_CPU, "main");
 
 		mame_printf_debug("DEBUG:: Header: Backup RAM string (ignore for games without)\n");
 		for (i=0;i<12;i++)

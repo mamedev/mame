@@ -103,7 +103,7 @@ static void cdp1869_update(void *param, stream_sample_t **inputs, stream_sample_
  *
  *************************************/
 
-static void *cdp1869_start(int sndindex, int clock, const void *config)
+static void *cdp1869_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct CDP1869 *info;
 

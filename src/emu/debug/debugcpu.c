@@ -98,15 +98,15 @@ static void watchpoint_check(int cpunum, int spacenum, int type, offs_t address,
 static void check_hotspots(int cpunum, int spacenum, offs_t address);
 
 /* expression handlers */
-static UINT64 expression_read_memory(int space, int index, UINT32 address, int size);
+static UINT64 expression_read_memory(const char *name, int space, UINT32 address, int size);
 static UINT64 expression_read_address_space(int cpuindex, int space, offs_t address, int size);
 static UINT64 expression_read_program_direct(int cpuindex, int opcode, offs_t address, int size);
-static UINT64 expression_read_memory_region(int rgnindex, int rgntype, offs_t address, int size);
+static UINT64 expression_read_memory_region(int rgnclass, const char *rgntag, offs_t address, int size);
 static UINT64 expression_read_eeprom(offs_t address, int size);
-static void expression_write_memory(int space, int index, UINT32 address, int size, UINT64 data);
+static void expression_write_memory(const char *name, int space, UINT32 address, int size, UINT64 data);
 static void expression_write_address_space(int cpuindex, int space, offs_t address, int size, UINT64 data);
 static void expression_write_program_direct(int cpuindex, int opcode, offs_t address, int size, UINT64 data);
-static void expression_write_memory_region(int rgnindex, int rgntype, offs_t address, int size, UINT64 data);
+static void expression_write_memory_region(int rgnclass, const char *rgntag, offs_t address, int size, UINT64 data);
 static void expression_write_eeprom(offs_t address, int size, UINT64 data);
 
 /* variable getters/setters */
@@ -2137,7 +2137,7 @@ UINT64 debug_read_opcode(offs_t address, int size, int arg)
     space
 -------------------------------------------------*/
 
-static UINT64 expression_read_memory(int space, int index, UINT32 address, int size)
+static UINT64 expression_read_memory(const char *name, int space, UINT32 address, int size)
 {
 	int cpuindex;
 
@@ -2146,26 +2146,42 @@ static UINT64 expression_read_memory(int space, int index, UINT32 address, int s
 		case EXPSPACE_PROGRAM:
 		case EXPSPACE_DATA:
 		case EXPSPACE_IO:
-			cpuindex = (index == -1) ? cpu_getactivecpu() : index;
-			space = ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM);
-			return expression_read_address_space(cpuindex, space, address, size);
+			cpuindex = (name != NULL) ? mame_find_cpu_index(Machine, name) : cpu_getactivecpu();
+			if (cpuindex < 0)
+				break;
+			return expression_read_address_space(cpuindex, ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM), address, size);
 
 		case EXPSPACE_OPCODE:
 		case EXPSPACE_RAMWRITE:
-			cpuindex = (index == -1) ? cpu_getactivecpu() : index;
+			cpuindex = (name != NULL) ? mame_find_cpu_index(Machine, name) : cpu_getactivecpu();
+			if (cpuindex < 0)
+				break;
+			if (name == NULL)
+				name = Machine->config->cpu[cpu_getactivecpu()].tag;
 			return expression_read_program_direct(cpuindex, (space == EXPSPACE_OPCODE), address, size);
 
 		case EXPSPACE_EEPROM:
 			return expression_read_eeprom(address, size);
 
 		case EXPSPACE_CPU:
-		case EXPSPACE_USER:
-		case EXPSPACE_GFX:
-		case EXPSPACE_SOUND:
-			if (index < 1)
+			if (name == NULL)
 				break;
-			space = ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM);
-			return expression_read_memory_region(index, space, address, size);
+			return expression_read_memory_region(RGNCLASS_CPU, name, address, size);
+
+		case EXPSPACE_USER:
+			if (name == NULL)
+				break;
+			return expression_read_memory_region(RGNCLASS_USER, name, address, size);
+
+		case EXPSPACE_GFX:
+			if (name == NULL)
+				break;
+			return expression_read_memory_region(RGNCLASS_GFX, name, address, size);
+
+		case EXPSPACE_SOUND:
+			if (name == NULL)
+				break;
+			return expression_read_memory_region(RGNCLASS_SOUND, name, address, size);
 	}
 	return ~(UINT64)0 >> (64 - 8*size);
 }
@@ -2268,61 +2284,46 @@ static UINT64 expression_read_program_direct(int cpuindex, int opcode, offs_t ad
     from a memory region
 -------------------------------------------------*/
 
-static UINT64 expression_read_memory_region(int rgnindex, int rgntype, offs_t address, int size)
+static UINT64 expression_read_memory_region(int rgnclass, const char *rgntag, offs_t address, int size)
 {
+	UINT8 *base = memory_region(Machine, rgnclass, rgntag);
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
-	int rgnnum = -1;
 
-	/* convert to a region number */
-	switch (rgntype)
+	/* make sure we get a valid base before proceeding */
+	if (base != NULL)
 	{
-		case EXPSPACE_CPU:		rgnnum = REGION_CPU1 + (rgnindex - 1);		break;
-		case EXPSPACE_USER:		rgnnum = REGION_USER1 + (rgnindex - 1);		break;
-		case EXPSPACE_GFX:		rgnnum = REGION_GFX1 + (rgnindex - 1);		break;
-		case EXPSPACE_SOUND:	rgnnum = REGION_SOUND1 + (rgnindex - 1);	break;
-	}
+		UINT32 length = memory_region_length(Machine, rgnclass, rgntag);
+		UINT32 flags = memory_region_flags(Machine, rgnclass, rgntag);
 
-	/* process if it exists */
-	if (rgnnum != -1)
-	{
-		UINT8 *base = memory_region(Machine, rgnnum);
-
-		/* make sure we get a valid base before proceeding */
-		if (base != NULL)
+		/* call ourself recursively until we are byte-sized */
+		if (size > 1)
 		{
-			UINT32 length = memory_region_length(Machine, rgnnum);
-			UINT32 flags = memory_region_flags(Machine, rgnnum);
+			int halfsize = size / 2;
+			UINT64 r0, r1;
 
-			/* call ourself recursively until we are byte-sized */
-			if (size > 1)
-			{
-				int halfsize = size / 2;
-				UINT64 r0, r1;
+			/* read each half, from lower address to upper address */
+			r0 = expression_read_memory_region(rgnclass, rgntag, address + 0, halfsize);
+			r1 = expression_read_memory_region(rgnclass, rgntag, address + halfsize, halfsize);
 
-				/* read each half, from lower address to upper address */
-				r0 = expression_read_memory_region(rgnindex, rgntype, address + 0, halfsize);
-				r1 = expression_read_memory_region(rgnindex, rgntype, address + halfsize, halfsize);
+			/* assemble based on the target endianness */
+			if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
+				result = r0 | (r1 << (8 * halfsize));
+			else
+				result = r1 | (r0 << (8 * halfsize));
+		}
 
-				/* assemble based on the target endianness */
-				if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
-					result = r0 | (r1 << (8 * halfsize));
-				else
-					result = r1 | (r0 << (8 * halfsize));
-			}
+		/* only process if we're within range */
+		else if (address < length)
+		{
+			/* lowmask specified which address bits are within the databus width */
+			UINT32 lowmask = (1 << ((flags & ROMREGION_WIDTHMASK) >> 8)) - 1;
+			base += address & ~lowmask;
 
-			/* only process if we're within range */
-			else if (address < length)
-			{
-				/* lowmask specified which address bits are within the databus width */
-				UINT32 lowmask = (1 << (flags & ROMREGION_WIDTHMASK)) - 1;
-				base += address & ~lowmask;
-
-				/* if we have a valid base, return the appropriate byte */
-				if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
-					result = base[BYTE8_XOR_LE(address) & lowmask];
-				else
-					result = base[BYTE8_XOR_BE(address) & lowmask];
-			}
+			/* if we have a valid base, return the appropriate byte */
+			if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
+				result = base[BYTE8_XOR_LE(address) & lowmask];
+			else
+				result = base[BYTE8_XOR_BE(address) & lowmask];
 		}
 	}
 	return result;
@@ -2360,7 +2361,7 @@ static UINT64 expression_read_eeprom(offs_t address, int size)
     space
 -------------------------------------------------*/
 
-static void expression_write_memory(int space, int index, UINT32 address, int size, UINT64 data)
+static void expression_write_memory(const char *name, int space, UINT32 address, int size, UINT64 data)
 {
 	int cpuindex;
 
@@ -2369,14 +2370,17 @@ static void expression_write_memory(int space, int index, UINT32 address, int si
 		case EXPSPACE_PROGRAM:
 		case EXPSPACE_DATA:
 		case EXPSPACE_IO:
-			cpuindex = (index == -1) ? cpu_getactivecpu() : index;
-			space = ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM);
-			expression_write_address_space(cpuindex, space, address, size, data);
+			cpuindex = (name != NULL) ? mame_find_cpu_index(Machine, name) : cpu_getactivecpu();
+			if (cpuindex < 0)
+				break;
+			expression_write_address_space(cpuindex, ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM), address, size, data);
 			break;
 
 		case EXPSPACE_OPCODE:
 		case EXPSPACE_RAMWRITE:
-			cpuindex = (index == -1) ? cpu_getactivecpu() : index;
+			cpuindex = (name != NULL) ? mame_find_cpu_index(Machine, name) : cpu_getactivecpu();
+			if (cpuindex < 0)
+				break;
 			expression_write_program_direct(cpuindex, (space == EXPSPACE_OPCODE), address, size, data);
 			break;
 
@@ -2385,13 +2389,27 @@ static void expression_write_memory(int space, int index, UINT32 address, int si
 			break;
 
 		case EXPSPACE_CPU:
-		case EXPSPACE_USER:
-		case EXPSPACE_GFX:
-		case EXPSPACE_SOUND:
-			if (index < 1)
+			if (name == NULL)
 				break;
-			space = ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM);
-			expression_write_memory_region(index, space, address, size, data);
+			expression_write_memory_region(RGNCLASS_CPU, name, address, size, data);
+			break;
+			 
+		case EXPSPACE_USER:
+			if (name == NULL)
+				break;
+			expression_write_memory_region(RGNCLASS_USER, name, address, size, data);
+			break;
+			 
+		case EXPSPACE_GFX:
+			if (name == NULL)
+				break;
+			expression_write_memory_region(RGNCLASS_GFX, name, address, size, data);
+			break;
+			 
+		case EXPSPACE_SOUND:
+			if (name == NULL)
+				break;
+			expression_write_memory_region(RGNCLASS_SOUND, name, address, size, data);
 			break;
 	}
 }
@@ -2498,68 +2516,53 @@ static void expression_write_program_direct(int cpuindex, int opcode, offs_t add
     from a memory region
 -------------------------------------------------*/
 
-static void expression_write_memory_region(int rgnindex, int rgntype, offs_t address, int size, UINT64 data)
+static void expression_write_memory_region(int rgnclass, const char *rgntag, offs_t address, int size, UINT64 data)
 {
-	int rgnnum = -1;
+	UINT8 *base = memory_region(Machine, rgnclass, rgntag);
 
-	/* convert to a region number */
-	switch (rgntype)
+	/* make sure we get a valid base before proceeding */
+	if (base != NULL)
 	{
-		case EXPSPACE_CPU:		rgnnum = REGION_CPU1 + (rgnindex - 1);		break;
-		case EXPSPACE_USER:		rgnnum = REGION_USER1 + (rgnindex - 1);		break;
-		case EXPSPACE_GFX:		rgnnum = REGION_GFX1 + (rgnindex - 1);		break;
-		case EXPSPACE_SOUND:	rgnnum = REGION_SOUND1 + (rgnindex - 1);	break;
-	}
+		UINT32 length = memory_region_length(Machine, rgnclass, rgntag);
+		UINT32 flags = memory_region_flags(Machine, rgnclass, rgntag);
 
-	/* process if it exists */
-	if (rgnnum != -1)
-	{
-		UINT8 *base = memory_region(Machine, rgnnum);
-
-		/* make sure we get a valid base before proceeding */
-		if (base != NULL)
+		/* call ourself recursively until we are byte-sized */
+		if (size > 1)
 		{
-			UINT32 length = memory_region_length(Machine, rgnnum);
-			UINT32 flags = memory_region_flags(Machine, rgnnum);
+			int halfsize = size / 2;
+			UINT64 r0, r1, halfmask;
 
-			/* call ourself recursively until we are byte-sized */
-			if (size > 1)
+			/* break apart based on the target endianness */
+			halfmask = ~(UINT64)0 >> (64 - 8 * halfsize);
+			if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
 			{
-				int halfsize = size / 2;
-				UINT64 r0, r1, halfmask;
-
-				/* break apart based on the target endianness */
-				halfmask = ~(UINT64)0 >> (64 - 8 * halfsize);
-				if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
-				{
-					r0 = data & halfmask;
-					r1 = (data >> (8 * halfsize)) & halfmask;
-				}
-				else
-				{
-					r0 = (data >> (8 * halfsize)) & halfmask;
-					r1 = data & halfmask;
-				}
-
-				/* write each half, from lower address to upper address */
-				expression_write_memory_region(rgnindex, rgntype, address + 0, halfsize, r0);
-				expression_write_memory_region(rgnindex, rgntype, address + halfsize, halfsize, r1);
+				r0 = data & halfmask;
+				r1 = (data >> (8 * halfsize)) & halfmask;
+			}
+			else
+			{
+				r0 = (data >> (8 * halfsize)) & halfmask;
+				r1 = data & halfmask;
 			}
 
-			/* only process if we're within range */
-			else if (address < length)
-			{
-				/* lowmask specified which address bits are within the databus width */
-				UINT32 lowmask = (1 << (flags & ROMREGION_WIDTHMASK)) - 1;
-				base += address & ~lowmask;
+			/* write each half, from lower address to upper address */
+			expression_write_memory_region(rgnclass, rgntag, address + 0, halfsize, r0);
+			expression_write_memory_region(rgnclass, rgntag, address + halfsize, halfsize, r1);
+		}
 
-				/* if we have a valid base, set the appropriate byte */
-				if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
-					base[BYTE8_XOR_LE(address) & lowmask] = data;
-				else
-					base[BYTE8_XOR_BE(address) & lowmask] = data;
-				global.memory_modified = TRUE;
-			}
+		/* only process if we're within range */
+		else if (address < length)
+		{
+			/* lowmask specified which address bits are within the databus width */
+			UINT32 lowmask = (1 << ((flags & ROMREGION_WIDTHMASK) >> 8)) - 1;
+			base += address & ~lowmask;
+
+			/* if we have a valid base, set the appropriate byte */
+			if ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE)
+				base[BYTE8_XOR_LE(address) & lowmask] = data;
+			else
+				base[BYTE8_XOR_BE(address) & lowmask] = data;
+			global.memory_modified = TRUE;
 		}
 	}
 }

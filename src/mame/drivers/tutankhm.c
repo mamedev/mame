@@ -56,7 +56,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 static MACHINE_START( tutankhm )
 {
-	memory_configure_bank(1, 0, 16, memory_region(machine, REGION_CPU1) + 0x10000, 0x1000);
+	memory_configure_bank(1, 0, 16, memory_region(machine, RGNCLASS_CPU, "main") + 0x10000, 0x1000);
 	state_save_register_global(irq_toggle);
 	state_save_register_global(irq_enable);
 }
@@ -259,7 +259,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( tutankhm )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )      /* 64k for M6809 CPU code + 64k for ROM banks */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )      /* 64k for M6809 CPU code + 64k for ROM banks */
 	ROM_LOAD( "h1.bin",       0x0a000, 0x1000, CRC(da18679f) SHA1(8d2a3665db937d0e1d19300ae22277d9db61fcbc) ) /* program ROMs */
 	ROM_LOAD( "h2.bin",       0x0b000, 0x1000, CRC(a0f02c85) SHA1(29a78b3ffd6b597772953543b02dd59acf5af38c) )
 	ROM_LOAD( "h3.bin",       0x0c000, 0x1000, CRC(ea03a1ab) SHA1(27a3cca0595bac642caaf9ee2f276814442c8721) )
@@ -277,14 +277,14 @@ ROM_START( tutankhm )
 	ROM_LOAD( "j9.bin",       0x18000, 0x1000, CRC(8ea9c6a6) SHA1(fe1b299f8760fc5418179d3569932ee2c4dff461) )
 	/* the other banks (1900-1fff) are empty */
 
-	ROM_REGION(  0x10000 , REGION_CPU2, 0 ) /* 64k for Z80 sound CPU code */
+	ROM_REGION(  0x10000 , RGNCLASS_CPU, "tpsound", 0 ) /* 64k for Z80 sound CPU code */
 	ROM_LOAD( "11-7a.bin",    0x0000, 0x1000, CRC(b52d01fa) SHA1(9b6cf9ea51d3a87c174f34d42a4b1b5f38b48723) )
 	ROM_LOAD( "10-8a.bin",    0x1000, 0x1000, CRC(9db5c0ce) SHA1(b5bc1d89a7f7d7a0baae64390c37ee11f69a0e76) )
 ROM_END
 
 
 ROM_START( tutankst )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )      /* 64k for M6809 CPU code + 64k for ROM banks */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )      /* 64k for M6809 CPU code + 64k for ROM banks */
 	ROM_LOAD( "h1.bin",       0x0a000, 0x1000, CRC(da18679f) SHA1(8d2a3665db937d0e1d19300ae22277d9db61fcbc) ) /* program ROMs */
 	ROM_LOAD( "h2.bin",       0x0b000, 0x1000, CRC(a0f02c85) SHA1(29a78b3ffd6b597772953543b02dd59acf5af38c) )
 	ROM_LOAD( "ra1_3h.cpu",   0x0c000, 0x1000, CRC(2d62d7b1) SHA1(910718f36735f2614cda0c3a1abdfa995d82dbd2) )
@@ -302,7 +302,7 @@ ROM_START( tutankst )
 	ROM_LOAD( "j9.bin",       0x18000, 0x1000, CRC(8ea9c6a6) SHA1(fe1b299f8760fc5418179d3569932ee2c4dff461) )
 	/* the other banks (1900-1fff) are empty */
 
-	ROM_REGION(  0x10000 , REGION_CPU2, 0 ) /* 64k for Z80 sound CPU code */
+	ROM_REGION(  0x10000 , RGNCLASS_CPU, "tpsound", 0 ) /* 64k for Z80 sound CPU code */
 	ROM_LOAD( "11-7a.bin",    0x0000, 0x1000, CRC(b52d01fa) SHA1(9b6cf9ea51d3a87c174f34d42a4b1b5f38b48723) )
 	ROM_LOAD( "10-8a.bin",    0x1000, 0x1000, CRC(9db5c0ce) SHA1(b5bc1d89a7f7d7a0baae64390c37ee11f69a0e76) )
 ROM_END

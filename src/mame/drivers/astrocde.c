@@ -422,14 +422,14 @@ static WRITE8_HANDLER( profpac_banksw_w )
 
 	/* set the main banking */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xbfff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(1, memory_region(machine, REGION_USER1) + 0x8000 * bank);
+	memory_set_bankptr(1, memory_region(machine, RGNCLASS_USER, "user1") + 0x8000 * bank);
 
 	/* bank 0 reads video RAM in the 4000-7FFF range */
 	if (bank == 0)
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, profpac_videoram_r);
 
 	/* if we have a 640k EPROM board, map that on top of the 4000-7FFF range if specified */
-	if ((data & 0x80) && memory_region(machine, REGION_USER2) != NULL)
+	if ((data & 0x80) && memory_region(machine, RGNCLASS_USER, "user2") != NULL)
 	{
 		/* Note: There is a jumper which could change the base offset to 0xa8 instead */
 		bank = data - 0x80;
@@ -438,7 +438,7 @@ static WRITE8_HANDLER( profpac_banksw_w )
 		if (bank < 0x28)
 		{
 			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK2);
-			memory_set_bankptr(2, memory_region(machine, REGION_USER2) + 0x4000 * bank);
+			memory_set_bankptr(2, memory_region(machine, RGNCLASS_USER, "user2") + 0x4000 * bank);
 		}
 		else
 			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
@@ -1488,7 +1488,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( seawolf2 )
-	ROM_REGION( 0x2000, REGION_CPU1, 0 )
+	ROM_REGION( 0x2000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "sw2x1.bin",    0x0000, 0x0800, CRC(ad0103f6) SHA1(c6e411444a824ce54b0eee10f7dc15e4229ec070) )
 	ROM_LOAD( "sw2x2.bin",    0x0800, 0x0800, CRC(e0430f0a) SHA1(63d8c6b77e0aa536b4f5bb774bc9285f736d4265) )
 	ROM_LOAD( "sw2x3.bin",    0x1000, 0x0800, CRC(05ad1619) SHA1(c9dbeaa4540dc95f98970f501a420b18b9898c91) )
@@ -1497,7 +1497,7 @@ ROM_END
 
 
 ROM_START( spacezap )
-	ROM_REGION( 0x4000, REGION_CPU1, 0 )
+	ROM_REGION( 0x4000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "0662.01",      0x0000, 0x1000, CRC(a92de312) SHA1(784ac67c75c7c101f97ebfd39b2b3f7bf7fa470a) )
 	ROM_LOAD( "0663.xx",      0x1000, 0x1000, CRC(4836ebf1) SHA1(ad0e8c34a209c827c1336f0250cc61fee667fb03) )
 	ROM_LOAD( "0664.xx",      0x2000, 0x1000, CRC(d8193a80) SHA1(72151e773562da62acd2c1d9638711711cbc13a3) )
@@ -1506,7 +1506,7 @@ ROM_END
 
 
 ROM_START( ebases )
-	ROM_REGION( 0x4000, REGION_CPU1, 0 )
+	ROM_REGION( 0x4000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "m761a",        0x0000, 0x1000, CRC(34422147) SHA1(6483ca1359b675b0dd739605db2a1dbd4b7fb8cb) )
 	ROM_LOAD( "m761b",        0x1000, 0x1000, CRC(4f28dfd6) SHA1(52e571e671fa61b0f9ab397a5947094c24f6c388) )
 	ROM_LOAD( "m761c",        0x2000, 0x1000, CRC(bff6c97e) SHA1(e41fb9db919039c8a48b4caebf80821a066d7ccf) )
@@ -1515,7 +1515,7 @@ ROM_END
 
 
 ROM_START( wow )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "wow.x1",       0x0000, 0x1000, CRC(c1295786) SHA1(1e4f30cc15537aed6603b4e664e6e60f4bccb5c5) )
 	ROM_LOAD( "wow.x2",       0x1000, 0x1000, CRC(9be93215) SHA1(0bc8ee6d8391104eb217b612f32856b105946682) )
 	ROM_LOAD( "wow.x3",       0x2000, 0x1000, CRC(75e5a22e) SHA1(50a8ca11909ce49412c47de4da69e39a083ce5af) )
@@ -1528,7 +1528,7 @@ ROM_END
 
 
 ROM_START( gorf )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "gorf-a.bin",   0x0000, 0x1000, CRC(5b348321) SHA1(76e2e3ad1a66755f1a369167fdb157690fd44a52) )
 	ROM_LOAD( "gorf-b.bin",   0x1000, 0x1000, CRC(62d6de77) SHA1(2601faf12d0ab4972c5535ffd722b03ecd8c097c) )
 	ROM_LOAD( "gorf-c.bin",   0x2000, 0x1000, CRC(1d3bc9c9) SHA1(0b363a71d7585a4828e08668ebb2999c55e02721) )
@@ -1540,7 +1540,7 @@ ROM_START( gorf )
 ROM_END
 
 ROM_START( gorfpgm1 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "873a",         0x0000, 0x1000, CRC(97cb4a6a) SHA1(efdae9a437c665fb861665a38c6cb13fd848ad91) )
 	ROM_LOAD( "873b",         0x1000, 0x1000, CRC(257236f8) SHA1(d1e8555fe5e6705ef88535bcd6071d1072b01386) )
 	ROM_LOAD( "873c",         0x2000, 0x1000, CRC(16b0638b) SHA1(65e1e2e4df80140976915e0982ce3219b14beece) )
@@ -1553,7 +1553,7 @@ ROM_END
 
 
 ROM_START( robby )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "rotox1.bin",   0x0000, 0x1000, CRC(a431b85a) SHA1(3478da56addba1cdd98cbef7a15b17fca9aed2cd) )
 	ROM_LOAD( "rotox2.bin",   0x1000, 0x1000, CRC(33cdda83) SHA1(ccbc741a2fc0b7385ca42afe5b377432249b44cb) )
 	ROM_LOAD( "rotox3.bin",   0x2000, 0x1000, CRC(dbf97491) SHA1(11574baf04af02b38ae147be8409de7c34e87611) )
@@ -1568,12 +1568,12 @@ ROM_END
 
 
 ROM_START( profpac )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "pps1",         0x0000, 0x2000, CRC(a244a62d) SHA1(f7a9606ce6d66c3e6d210cc25572904aeab2b6c8) )
 	ROM_LOAD( "pps2",         0x2000, 0x2000, CRC(8a9a6653) SHA1(b730b24088dcfddbe954670ff9212b7383c923f6) )
 	ROM_LOAD( "pps9",         0xc000, 0x2000, CRC(17a0b418) SHA1(8b7ed84090dbc5181deef6f55ec755c05d4c0d5e) )
 
-	ROM_REGION( 0x20000, REGION_USER1, ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, RGNCLASS_USER, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "pps3",         0x04000, 0x2000, CRC(15717fd8) SHA1(ffbb156f417d20478117b39de28a15680993b528) )
 	ROM_LOAD( "pps4",         0x06000, 0x2000, CRC(36540598) SHA1(33c797c690801afded45091d822347e1ecc72b54) )
 	ROM_LOAD( "pps5",         0x08000, 0x2000, CRC(8dc89a59) SHA1(fb4d3ba40697425d69ee19bfdcf00aea1df5fa80) )
@@ -1581,7 +1581,7 @@ ROM_START( profpac )
 	ROM_LOAD( "pps7",         0x0c000, 0x2000, CRC(f9c26aba) SHA1(201b930cca9669114ffc97978cade69587e34a0f) )
 	ROM_LOAD( "pps8",         0x0e000, 0x2000, CRC(4d201e41) SHA1(786b30cd7a7db55bdde05909d7a1a7f122b6e546) )
 
-	ROM_REGION( 0xa0000, REGION_USER2, ROMREGION_ERASEFF )
+	ROM_REGION( 0xa0000, RGNCLASS_USER, "user2", ROMREGION_ERASEFF )
 	ROM_LOAD( "ppq1",         0x00000, 0x4000, CRC(dddc2ccc) SHA1(d81caaa639f63d971a0d3199b9da6359211edf3d) )
 	ROM_LOAD( "ppq2",         0x04000, 0x4000, CRC(33bbcabe) SHA1(f9455868c70f479ede0e0621f21f69da165d9b7a) )
 	ROM_LOAD( "ppq3",         0x08000, 0x4000, CRC(3534d895) SHA1(24fb14c6b31b7f27e0737605cfbf963d29dd3fc5) )
@@ -1597,7 +1597,7 @@ ROM_START( profpac )
 	ROM_LOAD( "ppq13",        0x30000, 0x4000, CRC(87165d4f) SHA1(d47655300c8747698a46f30deb65fe762073e869) )
 	ROM_LOAD( "ppq14",        0x34000, 0x4000, CRC(ecb861de) SHA1(73d28a79b76795d3016dd608f9ab3d255f40e477) )
 
-	ROM_REGION( 0xa00, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_REGION( 0xa00, RGNCLASS_PLDS, "plds", ROMREGION_DISPOSE )
     ROM_LOAD( "pls153a_cpu.u12",  0x00000, 0x00eb, CRC(499a6fc5) SHA1(633d647bcae2f762847a2abe8069741ac33b15b8) )
 	ROM_LOAD( "pls153a_cpu.u16",  0x00100, 0x00eb, CRC(9a5ea540) SHA1(8619c7626e58eac09a4d91f5ad49742240f5f71e) )
 	ROM_LOAD( "pls153a_epr.u6",   0x00200, 0x00eb, CRC(d8454bf7) SHA1(5e074a2cbac99ebbf02bc4cd331679ede30eea3f) )
@@ -1612,12 +1612,12 @@ ROM_END
 
 
 ROM_START( demndrgn )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "dd-x1.bin",     0x0000, 0x2000, CRC(9aeaf79e) SHA1(c70aa1a31bc085cca904d497c34e55d49fef49b7) )
 	ROM_LOAD( "dd-x2.bin",     0x2000, 0x2000, CRC(0c63b624) SHA1(3eaeb4e0820e9dda7233a13bb146acc44402addd) )
 	ROM_LOAD( "dd-x9.bin",     0xc000, 0x2000, CRC(3792d632) SHA1(da053df344f39a8f25a2c57fb1a908131c10f248) )
 
-	ROM_REGION( 0x20000, REGION_USER1, ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, RGNCLASS_USER, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "dd-x5.bin",     0x08000, 0x2000, CRC(e377e831) SHA1(f53e74b3138611f9385845d6bdeab891b5d15931) )
 	ROM_LOAD( "dd-x6.bin",     0x0a000, 0x2000, CRC(0fcb46ad) SHA1(5611135f9e341bd394d6da7912167b05fff17a93) )
 	ROM_LOAD( "dd-x7.bin",     0x0c000, 0x2000, CRC(0675e4fa) SHA1(59668e32271ff9bac0b4411cc0c541d2825ee145) )
@@ -1632,15 +1632,15 @@ ROM_END
 
 
 ROM_START( tenpindx )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "tpd_x1.bin",     0x0000, 0x2000, CRC(ef424484) SHA1(d70f8491059e24775ee05140c8c3b0afa6c1107c) )
 	ROM_LOAD( "tpd_x2.bin",     0x2000, 0x2000, CRC(a0f53af2) SHA1(966a98f73bdd358601f105ca97c823575b33bab3) )
 	ROM_LOAD( "tpd_x9.bin",     0xc000, 0x2000, CRC(ce9a9bd4) SHA1(fcc48a66b6079c56992afef2ca8ab95c66f8f431) )
 
-	ROM_REGION( 0x4000, REGION_CPU2, 0 )
+	ROM_REGION( 0x4000, RGNCLASS_CPU, "sub", 0 )
 	ROM_LOAD( "tpd_axfd.bin",   0x0000, 0x4000, CRC(0aed11f3) SHA1(09575cceda38178a77c6753074be82825d368334) )
 
-	ROM_REGION( 0x20000, REGION_USER1, ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, RGNCLASS_USER, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "tpd_x3.bin",     0x04000, 0x2000, CRC(d4645f6d) SHA1(185bcd58f1ba69e26274475c57219de0353267e1) )
 	ROM_LOAD( "tpd_x4.bin",     0x06000, 0x2000, CRC(acf474ba) SHA1(b324dccac0991660f8ba2a70cbbdb06c9d25c361) )
 	ROM_LOAD( "tpd_x5.bin",     0x08000, 0x2000, CRC(e206913f) SHA1(bb9476516bca7bf7066df058db36e4fdd52a6ed2) )
@@ -1654,7 +1654,7 @@ ROM_START( tenpindx )
 	ROM_LOAD( "tpd_x15.bin",    0x1a000, 0x2000, CRC(2ae98fb2) SHA1(a8b4058189bf23fec281da3ff73393346bfead6f) )
 	ROM_LOAD( "tpd_x16.bin",    0x1c000, 0x2000, CRC(8839d0e1) SHA1(5f1e581066d1851ee996f152ebec83db40aa7073) )
 
-	ROM_REGION( 0xa00, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_REGION( 0xa00, RGNCLASS_PLDS, "plds", ROMREGION_DISPOSE )
     ROM_LOAD( "pls153a_cpu.u12",  0x00000, 0x00eb, CRC(499a6fc5) SHA1(633d647bcae2f762847a2abe8069741ac33b15b8) )
 	ROM_LOAD( "pls153a_cpu.u16",  0x00100, 0x00eb, CRC(9a5ea540) SHA1(8619c7626e58eac09a4d91f5ad49742240f5f71e) )
 	ROM_LOAD( "pls153a_epr.u6",   0x00200, 0x00eb, CRC(d8454bf7) SHA1(5e074a2cbac99ebbf02bc4cd331679ede30eea3f) )

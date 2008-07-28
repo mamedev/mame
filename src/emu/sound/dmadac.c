@@ -91,7 +91,7 @@ static void dmadac_update(void *param, stream_sample_t **inputs, stream_sample_t
  *
  *************************************/
 
-static void *dmadac_start(int sndindex, int clock, const void *config)
+static void *dmadac_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct dmadac_channel_data *info;
 

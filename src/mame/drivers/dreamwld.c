@@ -55,7 +55,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	const gfx_element *gfx = machine->gfx[0];
 	UINT32 *source = spriteram32;
 	UINT32 *finish = spriteram32 + 0x1000/4;
-	UINT16 *redirect = (UINT16 *)memory_region(machine, REGION_GFX3);
+	UINT16 *redirect = (UINT16 *)memory_region(machine, RGNCLASS_GFX, "gfx3");
 
 	while( source<finish )
 	{
@@ -183,8 +183,8 @@ static VIDEO_UPDATE(dreamwld)
 static READ32_HANDLER( dreamwld_protdata_r )
 {
 	static int protindex = 0;
-	UINT8 *protdata    = memory_region( machine, REGION_USER1 );
-	size_t  protsize = memory_region_length( machine, REGION_USER1 );
+	UINT8 *protdata    = memory_region( machine, RGNCLASS_USER, "user1" );
+	size_t  protsize = memory_region_length( machine, RGNCLASS_USER, "user1" );
 	UINT8 dat = protdata[(protindex++)%protsize];
 	return dat<<24;
 }
@@ -239,7 +239,7 @@ static void dreamwld_oki_setbank( running_machine *machine, UINT8 chip, UINT8 ba
 {
 	/* 0x30000-0x3ffff is banked.
         banks are at 0x30000,0x40000,0x50000 and 0x60000 in rom */
-	UINT8 *sound = memory_region(machine, chip ? REGION_SOUND1 : REGION_SOUND2);
+	UINT8 *sound = memory_region(machine, RGNCLASS_SOUND, chip ? "oki1" : "oki2");
 	logerror("OKI%d: set bank %02x\n",chip,bank);
 	memcpy(sound+0x30000, sound+0xb0000+0x10000*bank, 0x10000);
 }
@@ -439,8 +439,8 @@ static const gfx_layout tiles16x16_layout =
 
 
 static GFXDECODE_START( dreamwld )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles16x16_layout, 0, 0x100 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles16x16_layout, 0, 0x100 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 0x100 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( dreamwld )
@@ -466,12 +466,12 @@ static MACHINE_DRIVER_START( dreamwld )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, MASTER_CLOCK/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 
 	MDRV_SOUND_ADD("oki2", OKIM6295, MASTER_CLOCK/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 MACHINE_DRIVER_END
@@ -479,16 +479,16 @@ MACHINE_DRIVER_END
 
 
 ROM_START( dreamwld )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 )
+	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD32_BYTE( "1.bin", 0x000002, 0x040000, CRC(35c94ee5) SHA1(3440a65a807622b619c97bc2a88fd7d875c26f66) )
 	ROM_LOAD32_BYTE( "2.bin", 0x000003, 0x040000, CRC(5409e7fc) SHA1(2f94a6a8e4c94b36b43f0b94d58525f594339a9d) )
 	ROM_LOAD32_BYTE( "3.bin", 0x000000, 0x040000, CRC(e8f7ae78) SHA1(cfd393cec6dec967c82e1131547b7e7fdc5d814f) )
 	ROM_LOAD32_BYTE( "4.bin", 0x000001, 0x040000, CRC(3ef5d51b) SHA1(82a00b4ff7155f6d5553870dfd510fed9469d9b5) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 87C52 MCU Code */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu1", 0 ) /* 87C52 MCU Code */
 	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
 
-	ROM_REGION( 0x6c9, REGION_USER1, 0 ) /* Protection data  */
+	ROM_REGION( 0x6c9, RGNCLASS_USER, "user1", 0 ) /* Protection data  */
 	/* The MCU supplies this data.
       The 68k reads it through a port, taking the size and destination write address from the level 1
       and level 2 irq positions in the 68k vector table (there is code to check that they haven't been
@@ -497,25 +497,25 @@ ROM_START( dreamwld )
 	ROM_LOAD( "protdata.bin", 0x000, 0x6c9 ,  CRC(f284b2fd) SHA1(9e8096c8aa8a288683f002311b38787b120748d1) ) /* extracted */
 
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) /* OKI Samples - 1st chip*/
+	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki1", 0 ) /* OKI Samples - 1st chip*/
 	ROM_LOAD( "5.bin", 0x000000, 0x80000, CRC(9689570a) SHA1(4414233da8f46214ca7e9022df70953922a63aa4) )
 	ROM_RELOAD(0x80000,0x80000) // fot the banks
 
-	ROM_REGION( 0x100000, REGION_SOUND2, 0 ) /* OKI Samples - 2nd chip*/
+	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki2", 0 ) /* OKI Samples - 2nd chip*/
 	ROM_LOAD( "6.bin", 0x000000, 0x80000, CRC(c8b91f30) SHA1(706004ca56d0a74bc7a3dfd73a21cdc09eb90f05) )
 	ROM_RELOAD(0x80000,0x80000) // fot the banks
 
-	ROM_REGION( 0x400000, REGION_GFX1, 0 ) /* Sprite Tiles - decoded */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx1", 0 ) /* Sprite Tiles - decoded */
 	ROM_LOAD( "9.bin", 0x000000, 0x200000, CRC(fa84e3af) SHA1(5978737d348fd382f4ec004d29870656c864d137) )
 
-	ROM_REGION( 0x200000, REGION_GFX2, 0 ) /* BG Tiles - decoded */
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", 0 ) /* BG Tiles - decoded */
 	ROM_LOAD( "10.bin",0x000000, 0x200000, CRC(3553e4f5) SHA1(c335494f4a12a01a88e7cd578cae922954303cfd) )
 
-	ROM_REGION( 0x040000, REGION_GFX3, 0 ) /* Sprite Code Lookup ... */
+	ROM_REGION( 0x040000, RGNCLASS_GFX, "gfx3", 0 ) /* Sprite Code Lookup ... */
 	ROM_LOAD16_BYTE( "8.bin", 0x000000, 0x020000, CRC(8d570df6) SHA1(e53e4b099c64eca11d027e0083caa101fcd99959) )
 	ROM_LOAD16_BYTE( "7.bin", 0x000001, 0x020000, CRC(a68bf35f) SHA1(f48540a5415a7d9723ca6e7e03cab039751dce17) )
 
-	ROM_REGION( 0x10000, REGION_GFX4, 0 ) /* ???? - not decoded seems to be in blocks of 0x41 bytes.. */
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx4", 0 ) /* ???? - not decoded seems to be in blocks of 0x41 bytes.. */
 	ROM_LOAD( "11.bin", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
 ROM_END
 

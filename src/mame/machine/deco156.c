@@ -124,8 +124,8 @@ static void decrypt(UINT32 *src, UINT32 *dst, int length)
 
 void deco156_decrypt(running_machine *machine)
 {
-	UINT32 *rom = (UINT32 *)memory_region(machine, REGION_CPU1);
-	int length = memory_region_length(machine, REGION_CPU1);
+	UINT32 *rom = (UINT32 *)memory_region(machine, RGNCLASS_CPU, "main");
+	int length = memory_region_length(machine, RGNCLASS_CPU, "main");
 	UINT32 *buf = malloc_or_die(length);
 
 		memcpy(buf, rom, length);

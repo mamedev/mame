@@ -161,8 +161,8 @@ static const gfx_layout charlayout2 =
 
 
 static GFXDECODE_START( dynadice )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 1 ) /* 1bpp */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout2,  0, 1 ) /* 3bpp */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 1 ) /* 1bpp */
+	GFXDECODE_ENTRY( "gfx2", 0, charlayout2,  0, 1 ) /* 3bpp */
 GFXDECODE_END
 
 static TILE_GET_INFO( get_tile_info )
@@ -228,31 +228,31 @@ static MACHINE_DRIVER_START( dynadice )
 MACHINE_DRIVER_END
 
 ROM_START( dynadice )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "dy_1.bin",     0x0000, 0x1000, CRC(4ad18724) SHA1(78151b02a727f4272eff72765883df9ca09606c3) )
 	ROM_LOAD( "dy_2.bin",     0x1000, 0x0800, CRC(82cb1873) SHA1(661f33af4a536b7929d432d755ab44f9280f82db) )
 	ROM_LOAD( "dy_3.bin",     0x1800, 0x0800, CRC(a8edad20) SHA1(b812141f216355c986047969326bd1e036be71e6) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
 	ROM_LOAD( "dy_6.bin",     0x0000, 0x0800, CRC(d4e6e6a3) SHA1(84c0fcfd8326a4301accbd192df6e372b98ae537) )
 
-	ROM_REGION( 0x0800, REGION_GFX1, 0 )
+	ROM_REGION( 0x0800, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD( "dy_4.bin",     0x0000, 0x0800, CRC(306b851b) SHA1(bf69ed126d32b31e1711ff23c5a75b8a8bd28207) )
 
-	ROM_REGION( 0x0800*8, REGION_GFX2, ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800*8, RGNCLASS_GFX, "gfx2", ROMREGION_ERASE00 )
 	/* gfx data will be rearranged here for 8x8 3bpp tiles */
 
-	ROM_REGION( 0x0800, REGION_USER1,0 )
+	ROM_REGION( 0x0800, RGNCLASS_USER, "user1",0 )
 	ROM_LOAD( "dy_5.bin",     0x0000, 0x0800, CRC(e4799462) SHA1(5cd0f003572540522d72706bc5a8fa6588553031) )
 ROM_END
 
 static DRIVER_INIT( dynadice )
 {
 	int i,j;
-	UINT8 *usr1 = memory_region(machine, REGION_USER1);
-	UINT8 *cpu2 = memory_region(machine, REGION_CPU2);
-	UINT8 *gfx1 = memory_region(machine, REGION_GFX1);
-	UINT8 *gfx2 = memory_region(machine, REGION_GFX2);
+	UINT8 *usr1 = memory_region(machine, RGNCLASS_USER, "user1");
+	UINT8 *cpu2 = memory_region(machine, RGNCLASS_CPU, "audio");
+	UINT8 *gfx1 = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	UINT8 *gfx2 = memory_region(machine, RGNCLASS_GFX, "gfx2");
 
 	cpu2[0x0b]=0x23;	/* bug in game code  Dec HL -> Inc HL*/
 

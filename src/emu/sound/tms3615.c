@@ -77,7 +77,7 @@ void tms3615_enable_w(int chip, int enable)
 	tms->enable = enable;
 }
 
-static void *tms3615_start(int sndindex, int clock, const void *config)
+static void *tms3615_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct TMS3615 *tms;
 

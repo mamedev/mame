@@ -620,9 +620,10 @@ static void register_for_save(struct upd7759_chip *chip, int index)
 }
 
 
-static void *upd7759_start(int sndindex, int clock, const void *config)
+static void *upd7759_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct upd7759_interface *intf = config;
+	static const struct upd7759_interface defintrf = { 0 };
+	const struct upd7759_interface *intf = (config != NULL) ? config : &defintrf;
 	struct upd7759_chip *chip;
 
 	chip = auto_malloc(sizeof(*chip));
@@ -641,9 +642,8 @@ static void *upd7759_start(int sndindex, int clock, const void *config)
 	chip->state = STATE_IDLE;
 
 	/* compute the ROM base or allocate a timer */
-	if (intf->region != 0)
-		chip->rom = chip->rombase = memory_region(Machine, intf->region);
-	else
+	chip->rom = chip->rombase = memory_region(Machine, RGNCLASS_SOUND, tag);
+	if (chip->rom == NULL)
 		chip->timer = timer_alloc(upd7759_slave_update, chip);
 
 	/* set the DRQ callback */

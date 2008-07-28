@@ -356,7 +356,6 @@ static void volume_callback(int v)
 
 static const struct K007232_interface k007232_interface =
 {
-	REGION_SOUND1,	/* memory regions */
 	volume_callback	/* external port callback */
 };
 
@@ -412,71 +411,71 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( crimfght )
-	ROM_REGION( 0x28000, REGION_CPU1, 0 ) /* code + banked roms */
+	ROM_REGION( 0x28000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms */
 	ROM_LOAD( "821l02.f24", 0x10000, 0x18000, CRC(588e7da6) SHA1(285febb3bcca31f82b34af3695a59eafae01cd30) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "821l01.h4",  0x0000, 0x8000, CRC(0faca89e) SHA1(21c9c6d736b398a29e8709e1187c5bf3cacdc99d) )
 
-	ROM_REGION( 0x080000, REGION_GFX1, 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "821k06.k13", 0x000000, 0x040000, CRC(a1eadb24) SHA1(ca305b904b34e03918ad07281fda86ad63caa44f) )	/* characters */
 	ROM_LOAD( "821k07.k19", 0x040000, 0x040000, CRC(060019fa) SHA1(c3bca007aaa5f1c534d2a75fe4f96d01a740dd58) )
 
-	ROM_REGION( 0x100000, REGION_GFX2, 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "821k04.k2",  0x000000, 0x080000, CRC(00e0291b) SHA1(39d5db6cf36826e47cdf5308eff9bfa8afc82050) )	/* sprites */
 	ROM_LOAD( "821k05.k8",  0x080000, 0x080000, CRC(e09ea05d) SHA1(50ac9a2117ce63fe774c48d769ec445a83f1269e) )
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "821a08.i15", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* data for the 007232 */
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "konami", 0 )	/* data for the 007232 */
 	ROM_LOAD( "821k03.e5",  0x00000, 0x40000, CRC(fef8505a) SHA1(5c5121609f69001838963e961cb227d6b64e4f5f) )
 ROM_END
 
 ROM_START( crimfgtj )
-	ROM_REGION( 0x28000, REGION_CPU1, 0 ) /* code + banked roms */
+	ROM_REGION( 0x28000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms */
 	ROM_LOAD( "821p02.bin", 0x10000, 0x18000, CRC(f33fa2e1) SHA1(00fc9e8250fa51386f3af2fca0f137bec9e1c220) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "821l01.h4",  0x0000, 0x8000, CRC(0faca89e) SHA1(21c9c6d736b398a29e8709e1187c5bf3cacdc99d) )
 
-	ROM_REGION( 0x080000, REGION_GFX1, 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "821k06.k13", 0x000000, 0x040000, CRC(a1eadb24) SHA1(ca305b904b34e03918ad07281fda86ad63caa44f) )	/* characters */
 	ROM_LOAD( "821k07.k19", 0x040000, 0x040000, CRC(060019fa) SHA1(c3bca007aaa5f1c534d2a75fe4f96d01a740dd58) )
 
-	ROM_REGION( 0x100000, REGION_GFX2, 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "821k04.k2",  0x000000, 0x080000, CRC(00e0291b) SHA1(39d5db6cf36826e47cdf5308eff9bfa8afc82050) )	/* sprites */
 	ROM_LOAD( "821k05.k8",  0x080000, 0x080000, CRC(e09ea05d) SHA1(50ac9a2117ce63fe774c48d769ec445a83f1269e) )
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "821a08.i15", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* data for the 007232 */
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "konami", 0 )	/* data for the 007232 */
 	ROM_LOAD( "821k03.e5",  0x00000, 0x40000, CRC(fef8505a) SHA1(5c5121609f69001838963e961cb227d6b64e4f5f) )
 ROM_END
 
 ROM_START( crimfgt2 )
-ROM_REGION( 0x28000, REGION_CPU1, 0 ) /* code + banked roms */
+ROM_REGION( 0x28000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms */
 	ROM_LOAD( "crimefb.r02", 0x10000, 0x18000, CRC(4ecdd923) SHA1(78e5260c4bb9b18d7818fb6300d7e1d3a577fb63) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "821l01.h4",  0x0000, 0x8000, CRC(0faca89e) SHA1(21c9c6d736b398a29e8709e1187c5bf3cacdc99d) )
 
-	ROM_REGION( 0x080000, REGION_GFX1, 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "821k06.k13", 0x000000, 0x040000, CRC(a1eadb24) SHA1(ca305b904b34e03918ad07281fda86ad63caa44f) )	/* characters */
 	ROM_LOAD( "821k07.k19", 0x040000, 0x040000, CRC(060019fa) SHA1(c3bca007aaa5f1c534d2a75fe4f96d01a740dd58) )
 
-	ROM_REGION( 0x100000, REGION_GFX2, 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "821k04.k2",  0x000000, 0x080000, CRC(00e0291b) SHA1(39d5db6cf36826e47cdf5308eff9bfa8afc82050) )	/* sprites */
 	ROM_LOAD( "821k05.k8",  0x080000, 0x080000, CRC(e09ea05d) SHA1(50ac9a2117ce63fe774c48d769ec445a83f1269e) )
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "821a08.i15", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* data for the 007232 */
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "konami", 0 )	/* data for the 007232 */
 	ROM_LOAD( "821k03.e5",  0x00000, 0x40000, CRC(fef8505a) SHA1(5c5121609f69001838963e961cb227d6b64e4f5f) )
 ROM_END
 
@@ -488,7 +487,7 @@ ROM_END
 
 static void crimfght_banking( int lines )
 {
-	UINT8 *RAM = memory_region(Machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(Machine, RGNCLASS_CPU, "main");
 	int offs = 0;
 
 	/* bit 5 = select work RAM or palette */
@@ -509,7 +508,7 @@ static void crimfght_banking( int lines )
 
 static MACHINE_RESET( crimfght )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)crimfght_banking);
 
@@ -519,8 +518,8 @@ static MACHINE_RESET( crimfght )
 
 static DRIVER_INIT( crimfght )
 {
-	konami_rom_deinterleave_2(REGION_GFX1);
-	konami_rom_deinterleave_2(REGION_GFX2);
+	konami_rom_deinterleave_2("gfx1");
+	konami_rom_deinterleave_2("gfx2");
 }
 
 

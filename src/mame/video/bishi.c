@@ -30,7 +30,7 @@ VIDEO_START(bishi)
 	K055555_vh_start();
 	K054338_vh_start();
 
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_8, 1, NULL, bishi_tile_callback, 0);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 1, NULL, bishi_tile_callback, 0);
 
 	K056832_set_LayerAssociation(0);
 

@@ -60,7 +60,7 @@ static WRITE8_HANDLER( quizmstr_attr2_w )
 static READ8_HANDLER( question_r )
 {
 	int address;
-	UINT8 *questions = memory_region(machine, REGION_USER1);
+	UINT8 *questions = memory_region(machine, RGNCLASS_USER, "user1");
 
 	switch(question_adr[2])
 	{
@@ -519,7 +519,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( coinmstr )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -728,16 +728,16 @@ CN1/2 is connector for top ROM board                    * - unpopulated socket
 */
 
 ROM_START( quizmstr )
-	ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "nm_qm4_11.ic9", 0x0000, 0x4000, CRC(3a233bf0) SHA1(7b91b6f19093e67dd5513a000138421d4ef6f0af) )
 	ROM_LOAD( "np_qm4_21.ic6", 0x4000, 0x4000, CRC(a1cd39e4) SHA1(420b0726577471c762ae470bc2138c035f295ad9) )
 	/* 0x8000 - 0xbfff empty */
 
-	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "npc_qm4_11.ic45", 0x0000, 0x2000, CRC(ed48582a) SHA1(0aa2434a43af2990b8ad1cd3fc9f2e5e962f99c7) )
 	ROM_LOAD( "npc_qm4_21.ic41", 0x2000, 0x2000, CRC(b67b0183) SHA1(018cabace593e795edfe914cdaedb9ebdf158567) )
 
-	ROM_REGION( 0xa0000, REGION_USER1, ROMREGION_ERASEFF ) /* Question roms */
+	ROM_REGION( 0xa0000, RGNCLASS_USER, "user1", ROMREGION_ERASEFF ) /* Question roms */
 	/* empty ic1 */
 	ROM_LOAD( "allgeme3.ic2",   0x08000, 0x8000, CRC(e9ead7f0) SHA1(c0b8e4e7905f31b74c8d217f0afc91f73d52927b) )
 	ROM_LOAD( "allgeme2.ic3",   0x10000, 0x8000, CRC(ac4d2ee8) SHA1(3a64fba8a24ae2e8bfd9d1c27804342e1779bcf6) )
@@ -762,30 +762,30 @@ ROM_END
 
 
 ROM_START( trailblz )
-	ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "1-4.09",       0x0000, 0x4000, CRC(7c34749c) SHA1(3847188a734b32979f376f51f74dff050b610dfb) )
 	ROM_LOAD( "2-4.06",       0x4000, 0x4000, CRC(81a9809b) SHA1(4d2bfd5223713a9e2e15130a3176118d400ee63e) )
 	/* 0x8000 - 0xbfff empty */
 
-	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "1-2.45",       0x0000, 0x2000, CRC(b4a807b1) SHA1(f00a4790adb0c25917a0dc8c98c9b65526304fd3) )
 	ROM_LOAD( "2-2.41",       0x2000, 0x2000, CRC(756dd230) SHA1(6d6f440bf1f48cc33d5e46cfc645809d5f8b1f3a) )
 
-	ROM_REGION( 0xa0000, REGION_USER1, ROMREGION_ERASEFF ) /* Question roms */
+	ROM_REGION( 0xa0000, RGNCLASS_USER, "user1", ROMREGION_ERASEFF ) /* Question roms */
 	ROM_LOAD( "questions.bin", 0x00000, 0xa0000, NO_DUMP )
 ROM_END
 
 
 ROM_START( supnudg2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "cpu", 0 )
 	ROM_LOAD( "u3.bin",       0x0000, 0x8000, CRC(ed04e2cc) SHA1(7d90a588cca2d113487710e897771f9d99e37e62) )
 	ROM_LOAD( "u4.bin",       0x8000, 0x8000, CRC(0551e859) SHA1(b71640097cc75b78f3013f0e77de328bf1a205b1) )
 
-	ROM_REGION( 0x10000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "u23.bin",      0x0000, 0x8000, CRC(726a48ac) SHA1(cd17840067294812edf5bfa88d71fc967388df8e) )
 	ROM_LOAD( "u25.bin",      0x8000, 0x8000, CRC(1f7cef5e) SHA1(3abc31d400a0f5dc29c70d8aac42fd6302290cc9) )
 
-	ROM_REGION( 0xa0000, REGION_USER1, 0 ) /* Question roms */
+	ROM_REGION( 0xa0000, RGNCLASS_USER, "user1", 0 ) /* Question roms */
 	ROM_LOAD( "q1.bin",       0x00000, 0x8000, CRC(245d679a) SHA1(2d3fbed8c1b3d0bffe7f3bd9088e0a5d207654c7) )
 	ROM_LOAD( "q2.bin",       0x08000, 0x8000, CRC(e41ae8fb) SHA1(526c7b60e6ee4dfe05bbabf0e1e986e04ac2f544) )
 	ROM_LOAD( "q3.bin",       0x10000, 0x8000, CRC(692218a2) SHA1(b9548dd835d9f3fb3e09bd018c7f9cbecafaee28) )
@@ -810,8 +810,8 @@ ROM_END
 
 static DRIVER_INIT( coinmstr )
 {
-	UINT8 *rom = memory_region(machine, REGION_USER1);
-	int length = memory_region_length(machine, REGION_USER1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_USER, "user1");
+	int length = memory_region_length(machine, RGNCLASS_USER, "user1");
 	UINT8 *buf = malloc_or_die(length);
 	int i;
 

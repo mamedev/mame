@@ -21,7 +21,7 @@ We need to remove this and add the whole thing into the ROM loading structure...
 */
 static void ic13_shifter(running_machine *machine)
 {
-	UINT32 *rom = (UINT32 *)memory_region(machine, REGION_USER1);
+	UINT32 *rom = (UINT32 *)memory_region(machine, RGNCLASS_USER, "user1");
 	UINT32 i;
 	UINT32 *tmp = malloc_or_die(0x80000*2);
 

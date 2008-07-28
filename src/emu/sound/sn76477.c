@@ -2387,7 +2387,7 @@ static void state_save_register(struct SN76477 *sn)
  *
  *****************************************************************************/
 
-static void *sn76477_start(int sndindex, int clock, const void *config)
+static void *sn76477_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct SN76477 *sn;
 	struct SN76477interface *intf;

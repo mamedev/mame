@@ -339,7 +339,7 @@ void video_init(running_machine *machine)
 
 	/* call the PALETTE_INIT function */
 	if (machine->config->init_palette != NULL)
-		(*machine->config->init_palette)(machine, memory_region(machine, REGION_PROMS));
+		(*machine->config->init_palette)(machine, memory_region(machine, RGNCLASS_PROMS, "proms"));
 
 	/* actually decode the graphics */
 	if (machine->config->gfxdecodeinfo != NULL)
@@ -476,9 +476,9 @@ static void allocate_graphics(running_machine *machine, const gfx_decode_entry *
 	int i;
 
 	/* loop over all elements */
-	for (i = 0; i < MAX_GFX_ELEMENTS && gfxdecodeinfo[i].memory_region != -1; i++)
+	for (i = 0; i < MAX_GFX_ELEMENTS && gfxdecodeinfo[i].gfxlayout != NULL; i++)
 	{
-		int region_length = 8 * memory_region_length(machine, gfxdecodeinfo[i].memory_region);
+		int region_length = 8 * memory_region_length(machine, RGNCLASS_GFX, gfxdecodeinfo[i].memory_region);
 		int xscale = (gfxdecodeinfo[i].xscale == 0) ? 1 : gfxdecodeinfo[i].xscale;
 		int yscale = (gfxdecodeinfo[i].yscale == 0) ? 1 : gfxdecodeinfo[i].yscale;
 		UINT32 *extpoffs, extxoffs[MAX_ABS_GFX_SIZE], extyoffs[MAX_ABS_GFX_SIZE];
@@ -610,9 +610,9 @@ static void decode_graphics(running_machine *machine, const gfx_decode_entry *gf
 		if (machine->gfx[i] != NULL)
 		{
 			/* if we have a valid region, decode it now */
-			if (gfxdecodeinfo[i].memory_region > REGION_INVALID)
+			if (gfxdecodeinfo[i].memory_region != NULL)
 			{
-				UINT8 *region_base = memory_region(machine, gfxdecodeinfo[i].memory_region);
+				UINT8 *region_base = memory_region(machine, RGNCLASS_GFX, gfxdecodeinfo[i].memory_region);
 				gfx_element *gfx = machine->gfx[i];
 				int j;
 

@@ -475,7 +475,7 @@ static void mhavoc_data(vgdata *vg)
 
 	if (vg->pc & 0x2000)
 	{
-		bank = &memory_region(Machine, REGION_CPU1)[0x18000];
+		bank = &memory_region(Machine, RGNCLASS_CPU, "main")[0x18000];
 		vg->data = bank[(vg->map << 13) | ((vg->pc ^ 1) & 0x1fff)];
 	}
 	else
@@ -1182,7 +1182,7 @@ static TIMER_CALLBACK( vg_set_halt_callback )
 static TIMER_CALLBACK( run_state_machine )
 {
 	int cycles = 0;
-	UINT8 *state_prom = memory_region(machine, REGION_USER1);
+	UINT8 *state_prom = memory_region(machine, RGNCLASS_USER, "user1");
 
   	while (cycles < VGSLICE)
 	{

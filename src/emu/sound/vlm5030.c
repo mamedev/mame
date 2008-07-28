@@ -631,7 +631,7 @@ if( chip->interp_step != 1)
 
 /* start VLM5030 with sound rom              */
 /* speech_rom == 0 -> use sampling data mode */
-static void *vlm5030_start(int sndindex, int clock, const void *config)
+static void *vlm5030_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	int emulation_rate;
 	struct vlm5030_info *chip;
@@ -650,10 +650,10 @@ static void *vlm5030_start(int sndindex, int clock, const void *config)
 	VLM5030_reset(chip);
 	chip->phase = PH_IDLE;
 
-	chip->rom = memory_region(Machine, chip->intf->memory_region);
+	chip->rom = memory_region(Machine, RGNCLASS_SOUND, tag);
 	/* memory size */
 	if( chip->intf->memory_size == 0)
-		chip->address_mask = memory_region_length(Machine, chip->intf->memory_region)-1;
+		chip->address_mask = memory_region_length(Machine, RGNCLASS_SOUND, tag)-1;
 	else
 		chip->address_mask = chip->intf->memory_size-1;
 

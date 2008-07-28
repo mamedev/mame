@@ -649,11 +649,11 @@ static const gfx_layout tiles8x8_layout =
 */
 
 static GFXDECODE_START( dwarfd )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout0, 0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout1, 0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout2, 0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tiles8x8_layout3, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout0, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout1, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout2, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout3, 0, 16 )
 GFXDECODE_END
 
 static PALETTE_INIT(dwarfd)
@@ -718,22 +718,22 @@ static MACHINE_DRIVER_START( dwarfd )
 MACHINE_DRIVER_END
 
 ROM_START( dwarfd )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "9l_pd_50-3196_m5l2732k.bin", 0x0000, 0x1000, CRC(34e942ae) SHA1(d4f0ee7f29e1c1a93b4b30b950023dbf60596100) )
 	ROM_LOAD( "9k_pd_50-3193_hn462732g.bin",0x1000, 0x1000, CRC(78f0c260) SHA1(d6c3b8b3ef4ce99a811e291f1396a47106683df9) )
 	ROM_LOAD( "9j_pd_50-3192_mbm2732.bin",  0x2000, 0x1000, CRC(9c66ee6e) SHA1(49c20fa276508b3c7b0134909295ae04ee46890f) )
 	ROM_LOAD( "9h_pd_50-3375_2732.bin",     0x3000, 0x1000, CRC(daf5551d) SHA1(933e3453c9e74ca6695137c9f6b1abc1569ad019) )
 
-	ROM_REGION( 0x4000, REGION_GFX1, 0 )
+	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "6a_pd_50_1991_2732.bin"      ,0x0000, 0x1000, CRC(6da494bc) SHA1(0323eaa5f81e3b8561225ccdd4654c9a11f2167c) )
 	ROM_LOAD16_BYTE( "6b_pd_50-1992_tms2732ajl.bin",0x2000, 0x1000, CRC(69208e1a) SHA1(8706f8f0d2dfeba5cebc71985ea46a67de13bc7d) )
 	ROM_LOAD16_BYTE( "6c_pd_50-1993_tms2732ajl.bin",0x0001, 0x1000, CRC(cd8e5e54) SHA1(0961739d72d80e0ac00e6cbf9643bcebfe74830d) )
 	ROM_LOAD16_BYTE( "6d_pd_50-1994_tms2732ajl.bin",0x2001, 0x1000, CRC(ef52b88c) SHA1(3405152da3194a71f6dac6492f275c746e781ee7) )
 
-	ROM_REGION( 0x4000*2, REGION_GFX2, 0 )
+	ROM_REGION( 0x4000*2, RGNCLASS_GFX, "gfx2", 0 )
 	ROM_FILL(0,  0x4000*2, 0)
 
-	ROM_REGION( 0x40, REGION_PROMS, 0 )
+	ROM_REGION( 0x40, RGNCLASS_PROMS, "proms", 0 )
 	/* ??? colors */
 	ROM_LOAD( "3a_50-1381_63s080n.bin",0x00, 0x20, CRC(451d0a72) SHA1(9ff6e2c5bd2b57bd607cb33e60e7ed25bea164b3) )
 	/* memory map */
@@ -746,8 +746,8 @@ static DRIVER_INIT(dwarfd)
 	UINT8 *src, *dst;
 
 	/* expand gfx roms */
-	src    = memory_region       ( machine, REGION_GFX1 );
-	dst    = memory_region       ( machine, REGION_GFX2 );
+	src    = memory_region       ( machine, RGNCLASS_GFX, "gfx1" );
+	dst    = memory_region       ( machine, RGNCLASS_GFX, "gfx2" );
 	for (i=0;i<0x4000;i++)
 	{
 		UINT8 dat;
@@ -759,7 +759,7 @@ static DRIVER_INIT(dwarfd)
 	}
 
 	/* use low bit as 'interpolation' bit */
-	src    = memory_region       ( machine, REGION_GFX2 );
+	src    = memory_region       ( machine, RGNCLASS_GFX, "gfx2" );
 	for (i=0;i<0x8000;i++)
 	{
 		if (src[i]&0x10)

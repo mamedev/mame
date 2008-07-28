@@ -64,7 +64,7 @@ static READ8_HANDLER( exerion_porta_r )
 static WRITE8_HANDLER( exerion_portb_w )
 {
 	/* pull the expected value from the ROM */
-	porta = memory_region(machine, REGION_CPU1)[0x5f76];
+	porta = memory_region(machine, RGNCLASS_CPU, "main")[0x5f76];
 	portb = data;
 
 	logerror("Port B = %02X\n", data);
@@ -74,7 +74,7 @@ static WRITE8_HANDLER( exerion_portb_w )
 static READ8_HANDLER( exerion_protection_r )
 {
 	if (activecpu_get_pc() == 0x4143)
-		return memory_region(machine, REGION_CPU1)[0x33c0 + (exerion_ram[0xd] << 2) + offset];
+		return memory_region(machine, RGNCLASS_CPU, "main")[0x33c0 + (exerion_ram[0xd] << 2) + offset];
 	else
 		return exerion_ram[0x8 + offset];
 }
@@ -245,9 +245,9 @@ static const gfx_layout bigspritelayout =
 
 
 static GFXDECODE_START( exerion )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,         0, 64 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,     256, 64 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, bigspritelayout,  256, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0, 64 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     256, 64 )
+	GFXDECODE_ENTRY( "gfx2", 0, bigspritelayout,  256, 64 )
 GFXDECODE_END
 
 
@@ -316,28 +316,28 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( exerion )
-	ROM_REGION( 0x6000, REGION_CPU1, 0 )
+	ROM_REGION( 0x6000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "exerion.07",   0x0000, 0x2000, CRC(4c78d57d) SHA1(ac702e9ad2bc05493fb1355858667c31c36acfe4) )
 	ROM_LOAD( "exerion.08",   0x2000, 0x2000, CRC(dcadc1df) SHA1(91388f617cfaa4289ca1c84c697fcfdd8834ae15) )
 	ROM_LOAD( "exerion.09",   0x4000, 0x2000, CRC(34cc4d14) SHA1(511c9de038f7bcaf6f7c96f2cbbe50a80673fa72) )
 
-	ROM_REGION( 0x2000, REGION_CPU2, 0 )     /* 64k for the second CPU */
+	ROM_REGION( 0x2000, RGNCLASS_CPU, "sub", 0 )     /* 64k for the second CPU */
 	ROM_LOAD( "exerion.05",   0x0000, 0x2000, CRC(32f6bff5) SHA1(a4d0289f9d1d9eea7ca9a32a0616af48da74b401) )
 
-	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x02000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "exerion.06",   0x00000, 0x2000, CRC(435a85a4) SHA1(f6846bfee11df754405d4d796e7d8ac0321b6eb6) ) /* fg chars */
 
-	ROM_REGION( 0x04000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x04000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "exerion.11",   0x00000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) ) /* sprites */
 	ROM_LOAD( "exerion.10",   0x02000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
 
-	ROM_REGION( 0x08000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "exerion.03",   0x00000, 0x2000, CRC(790595b8) SHA1(8016ac2394b25db38e962bcff4805380082f6683) ) /* bg data */
 	ROM_LOAD( "exerion.04",   0x02000, 0x2000, CRC(d7abd0b9) SHA1(ca6413ecd324cf84e11b703a4eda2c1e6d28ff15) )
 	ROM_LOAD( "exerion.01",   0x04000, 0x2000, CRC(5bb755cb) SHA1(ec92c518c116a78dbb23381468cefb3f930212cc) )
 	ROM_LOAD( "exerion.02",   0x06000, 0x2000, CRC(a7ecbb70) SHA1(3c359d5bb21290a45d3eb18fea2b1f9439b931be) )
 
-	ROM_REGION( 0x0420, REGION_PROMS, 0 )
+	ROM_REGION( 0x0420, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "exerion.e1",   0x0000, 0x0020, CRC(2befcc20) SHA1(a24d3f691413378fde545a6ddcef7e5118e74019) ) /* palette */
 	ROM_LOAD( "exerion.i8",   0x0020, 0x0100, CRC(31db0e08) SHA1(1041a778e86d3fe6f057cf40a0a08b30760f3887) ) /* fg char lookup table */
 	ROM_LOAD( "exerion.h10",  0x0120, 0x0100, CRC(63b4c555) SHA1(30243041be4fa77ada71e8b29d721cad51640c29) ) /* sprite lookup table */
@@ -347,27 +347,27 @@ ROM_END
 
 
 ROM_START( exeriont )
-	ROM_REGION( 0x6000, REGION_CPU1, 0 )
+	ROM_REGION( 0x6000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "prom5.4p",     0x0000, 0x4000, CRC(58b4dc1b) SHA1(3e34d1eda0b0537dac1062e96259d4cc7c64049c) )
 	ROM_LOAD( "prom6.4s",     0x4000, 0x2000, CRC(fca18c2d) SHA1(31077dada3ed4aa2e26af933f589e01e0c71e5cd) )
 
-	ROM_REGION( 0x2000, REGION_CPU2, 0 )     /* 64k for the second CPU */
+	ROM_REGION( 0x2000, RGNCLASS_CPU, "sub", 0 )     /* 64k for the second CPU */
 	ROM_LOAD( "exerion.05",   0x0000, 0x2000, CRC(32f6bff5) SHA1(a4d0289f9d1d9eea7ca9a32a0616af48da74b401) )
 
-	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x02000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "exerion.06",   0x00000, 0x2000, CRC(435a85a4) SHA1(f6846bfee11df754405d4d796e7d8ac0321b6eb6) ) /* fg chars */
 
-	ROM_REGION( 0x04000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x04000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "exerion.11",   0x00000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) ) /* sprites */
 	ROM_LOAD( "exerion.10",   0x02000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
 
-	ROM_REGION( 0x08000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "exerion.03",   0x00000, 0x2000, CRC(790595b8) SHA1(8016ac2394b25db38e962bcff4805380082f6683) ) /* bg data */
 	ROM_LOAD( "exerion.04",   0x02000, 0x2000, CRC(d7abd0b9) SHA1(ca6413ecd324cf84e11b703a4eda2c1e6d28ff15) )
 	ROM_LOAD( "exerion.01",   0x04000, 0x2000, CRC(5bb755cb) SHA1(ec92c518c116a78dbb23381468cefb3f930212cc) )
 	ROM_LOAD( "exerion.02",   0x06000, 0x2000, CRC(a7ecbb70) SHA1(3c359d5bb21290a45d3eb18fea2b1f9439b931be) )
 
-	ROM_REGION( 0x0420, REGION_PROMS, 0 )
+	ROM_REGION( 0x0420, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "exerion.e1",   0x0000, 0x0020, CRC(2befcc20) SHA1(a24d3f691413378fde545a6ddcef7e5118e74019) ) /* palette */
 	ROM_LOAD( "exerion.i8",   0x0020, 0x0100, CRC(31db0e08) SHA1(1041a778e86d3fe6f057cf40a0a08b30760f3887) ) /* fg char lookup table */
 	ROM_LOAD( "exerion.h10",  0x0120, 0x0100, CRC(63b4c555) SHA1(30243041be4fa77ada71e8b29d721cad51640c29) ) /* sprite lookup table */
@@ -377,27 +377,27 @@ ROM_END
 
 
 ROM_START( exerionb )
-	ROM_REGION( 0x6000, REGION_CPU1, 0 )
+	ROM_REGION( 0x6000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "eb5.bin",      0x0000, 0x4000, CRC(da175855) SHA1(11ea46fd1d504e16e5ffc604d74c1ce210d6be1c) )
 	ROM_LOAD( "eb6.bin",      0x4000, 0x2000, CRC(0dbe2eff) SHA1(5b0e5e8453619beec46c4350d1b2ed571fe3dc24) )
 
-	ROM_REGION( 0x2000, REGION_CPU2, 0 )     /* 64k for the second CPU */
+	ROM_REGION( 0x2000, RGNCLASS_CPU, "sub", 0 )     /* 64k for the second CPU */
 	ROM_LOAD( "exerion.05",   0x0000, 0x2000, CRC(32f6bff5) SHA1(a4d0289f9d1d9eea7ca9a32a0616af48da74b401) )
 
-	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x02000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "exerion.06",   0x00000, 0x2000, CRC(435a85a4) SHA1(f6846bfee11df754405d4d796e7d8ac0321b6eb6) ) /* fg chars */
 
-	ROM_REGION( 0x04000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x04000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "exerion.11",   0x00000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) ) /* sprites */
 	ROM_LOAD( "exerion.10",   0x02000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
 
-	ROM_REGION( 0x08000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "exerion.03",   0x00000, 0x2000, CRC(790595b8) SHA1(8016ac2394b25db38e962bcff4805380082f6683) ) /* bg data */
 	ROM_LOAD( "exerion.04",   0x02000, 0x2000, CRC(d7abd0b9) SHA1(ca6413ecd324cf84e11b703a4eda2c1e6d28ff15) )
 	ROM_LOAD( "exerion.01",   0x04000, 0x2000, CRC(5bb755cb) SHA1(ec92c518c116a78dbb23381468cefb3f930212cc) )
 	ROM_LOAD( "exerion.02",   0x06000, 0x2000, CRC(a7ecbb70) SHA1(3c359d5bb21290a45d3eb18fea2b1f9439b931be) )
 
-	ROM_REGION( 0x0420, REGION_PROMS, 0 )
+	ROM_REGION( 0x0420, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "exerion.e1",   0x0000, 0x0020, CRC(2befcc20) SHA1(a24d3f691413378fde545a6ddcef7e5118e74019) ) /* palette */
 	ROM_LOAD( "exerion.i8",   0x0020, 0x0100, CRC(31db0e08) SHA1(1041a778e86d3fe6f057cf40a0a08b30760f3887) ) /* fg char lookup table */
 	ROM_LOAD( "exerion.h10",  0x0120, 0x0100, CRC(63b4c555) SHA1(30243041be4fa77ada71e8b29d721cad51640c29) ) /* sprite lookup table */
@@ -422,8 +422,8 @@ static DRIVER_INIT( exerion )
 
 	/* make a temporary copy of the character data */
 	src = temp;
-	dst = memory_region(machine, REGION_GFX1);
-	length = memory_region_length(machine, REGION_GFX1);
+	dst = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	length = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
 	memcpy(src, dst, length);
 
 	/* decode the characters */
@@ -440,8 +440,8 @@ static DRIVER_INIT( exerion )
 
 	/* make a temporary copy of the sprite data */
 	src = temp;
-	dst = memory_region(machine, REGION_GFX2);
-	length = memory_region_length(machine, REGION_GFX2);
+	dst = memory_region(machine, RGNCLASS_GFX, "gfx2");
+	length = memory_region_length(machine, RGNCLASS_GFX, "gfx2");
 	memcpy(src, dst, length);
 
 	/* decode the sprites */
@@ -463,7 +463,7 @@ static DRIVER_INIT( exerion )
 
 static DRIVER_INIT( exerionb )
 {
-	UINT8 *ram = memory_region(machine, REGION_CPU1);
+	UINT8 *ram = memory_region(machine, RGNCLASS_CPU, "main");
 	int addr;
 
 	/* the program ROMs have data lines D1 and D2 swapped. Decode them. */

@@ -95,7 +95,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( minivadr )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "d26-01.bin",	0x0000, 0x2000, CRC(a96c823d) SHA1(aa9969ff80e94b0fff0f3530863f6b300510162e) )
 ROM_END
 

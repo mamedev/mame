@@ -338,7 +338,7 @@ static MACHINE_RESET( ssv )
 {
 	requested_int = 0;
 	cpunum_set_irq_callback(0, ssv_irq_callback);
-	memory_set_bankptr(1, memory_region(machine, REGION_USER1));
+	memory_set_bankptr(1, memory_region(machine, RGNCLASS_USER, "user1"));
 }
 
 
@@ -581,8 +581,8 @@ static WRITE16_HANDLER( gdfs_blitram_w )
 			UINT32 dst	=	(gdfs_blitram[0xc4/2] + (gdfs_blitram[0xc6/2] << 16)) << 4;
 			UINT32 len	=	(gdfs_blitram[0xc8/2]) << 4;
 
-			UINT8 *rom	=	memory_region(machine, REGION_GFX2);
-			size_t size	=	memory_region_length(machine, REGION_GFX2);
+			UINT8 *rom	=	memory_region(machine, RGNCLASS_GFX, "gfx2");
+			size_t size	=	memory_region_length(machine, RGNCLASS_GFX, "gfx2");
 
 			if ( (src+len <= size) && (dst+len <= 4 * 0x100000) )
 			{
@@ -1040,7 +1040,7 @@ static ADDRESS_MAP_START( jsk_v810_mem,ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x80000000, 0x8001ffff) AM_RAM
 	AM_RANGE(0xc0000000, 0xc001ffff) AM_RAM
 	AM_RANGE(0x40000000, 0x4000000f) AM_READ(latch32_r) AM_WRITE(latch32_w)
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION(REGION_CPU2, 0)
+	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION(RGNCLASS_CPU, "sub", 0)
 ADDRESS_MAP_END
 
 
@@ -1052,8 +1052,8 @@ static UINT8 trackball_select, gfxrom_select;
 
 static READ16_HANDLER( eaglshot_gfxrom_r )
 {
-	UINT8 *rom	=	memory_region(machine, REGION_GFX1);
-	size_t size	=	memory_region_length(machine, REGION_GFX1);
+	UINT8 *rom	=	memory_region(machine, RGNCLASS_GFX, "gfx1");
+	size_t size	=	memory_region_length(machine, RGNCLASS_GFX, "gfx1");
 
 	offset = offset * 2 + gfxrom_select * 0x200000;
 
@@ -2624,8 +2624,8 @@ static const gfx_layout layout_16x8x6 =
 };
 
 static GFXDECODE_START( ssv )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x8x8, 0, 0x8000/64 ) // [0] Sprites (256 colors)
-	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x8x6, 0, 0x8000/64 ) // [1] Sprites (64 colors)
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x8x8, 0, 0x8000/64 ) // [0] Sprites (256 colors)
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x8x6, 0, 0x8000/64 ) // [1] Sprites (64 colors)
 GFXDECODE_END
 
 static const gfx_layout layout_16x8x8_2 =
@@ -2651,8 +2651,8 @@ static const gfx_layout layout_16x8x6_2 =
 };
 
 static GFXDECODE_START( eaglshot )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x8x8_2, 0, 0x8000/64 ) // [0] Sprites (256 colors, decoded from ram)
-	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x8x6_2, 0, 0x8000/64 ) // [1] Sprites (64 colors, decoded from ram)
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x8x8_2, 0, 0x8000/64 ) // [0] Sprites (256 colors, decoded from ram)
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x8x6_2, 0, 0x8000/64 ) // [1] Sprites (64 colors, decoded from ram)
 GFXDECODE_END
 
 static const gfx_layout layout_16x16x8 =
@@ -2667,10 +2667,10 @@ static const gfx_layout layout_16x16x8 =
 };
 
 static GFXDECODE_START( gdfs )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x8x8,   0, 0x8000/64  ) // [0] Sprites (256 colors)
-	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x8x6,   0, 0x8000/64  ) // [1] Sprites (64 colors)
-	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x8x8_2, 0, 0x8000/64  ) // [2] Zooming Sprites (256 colors, decoded from ram)
-	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_16x16x8,  0, 0x8000/256 ) // [3] Tilemap
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x8x8,   0, 0x8000/64  ) // [0] Sprites (256 colors)
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x8x6,   0, 0x8000/64  ) // [1] Sprites (64 colors)
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x8x8_2, 0, 0x8000/64  ) // [2] Zooming Sprites (256 colors, decoded from ram)
+	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8,  0, 0x8000/256 ) // [3] Tilemap
 GFXDECODE_END
 
 /***************************************************************************
@@ -2683,10 +2683,10 @@ GFXDECODE_END
 
 static const struct ES5506interface es5506_interface =
 {
-	REGION_SOUND1,
-	REGION_SOUND2,
-	REGION_SOUND3,
-	REGION_SOUND4
+	"ensoniq.0",
+	"ensoniq.1",
+	"ensoniq.2",
+	"ensoniq.3"
 };
 
 /***************************************************************************
@@ -2758,7 +2758,7 @@ static DRIVER_INIT( ryorioh )		{	init_ssv();
 static DRIVER_INIT( srmp4 )		{	init_ssv();
 								ssv_sprites_offsx = -8;	ssv_sprites_offsy = +0xf0;
 								ssv_tilemap_offsx = +0;	ssv_tilemap_offsy = -0xf0;
-//  ((UINT16 *)memory_region(machine, REGION_USER1))[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
+//  ((UINT16 *)memory_region(machine, RGNCLASS_USER, "user1"))[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 							}
 static DRIVER_INIT( srmp7 )		{	init_ssv();
 								ssv_sprites_offsx = +0;	ssv_sprites_offsy = -0xf;
@@ -2815,7 +2815,7 @@ static MACHINE_DRIVER_START( ssv )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("es", ES5506, 16000000)
+	MDRV_SOUND_ADD("ensoniq", ES5506, 16000000)
 	MDRV_SOUND_CONFIG(es5506_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -3130,10 +3130,10 @@ AC1810E01.U32   27C160
 ***************************************************************************/
 
 ROM_START( cairblad )
-	ROM_REGION16_LE( 0x200000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x200000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_WORD( "ac1810e0.u32",  0x000000, 0x200000, CRC(13a0b4c2) SHA1(3498303e9b186ab329ee761cee9d4cb8ed552455) ) // AC1810E01.U32    27C160
 
-	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x2000000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "ac1801m0.u6",  0x0000000, 0x400000, CRC(1b2b6943) SHA1(95c5dc0ed1d533b2285452c8546346d96a90d097) ) // AC1801M01.U6    32M Mask
 	ROM_LOAD( "ac1802m0.u9",  0x0400000, 0x400000, CRC(e053b087) SHA1(9569e79c6363e8f97c27aacaa29d25cf32c4b4c1) ) // AC1802M01.U9    32M Mask
 
@@ -3145,7 +3145,7 @@ ROM_START( cairblad )
 
 	ROM_FILL(                 0x1800000, 0x800000, 0          )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", 0 )	/* Samples */
 	ROM_LOAD16_WORD_SWAP( "ac1410m0.u41", 0x000000, 0x400000, CRC(ecf1f255) SHA1(984b1529b8f0c7d94ea713c85d71df00f54eba79) ) // AC1807M01.U41   32M Mask
 ROM_END
 
@@ -3212,14 +3212,14 @@ Lithium battery + MB3790 + LH5168D-10L
 ***************************************************************************/
 
 ROM_START( drifto94 )
-	ROM_REGION16_LE( 0x400000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x400000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_WORD( "vg003-19.u26", 0x000000, 0x200000, CRC(238e5e2b) SHA1(fe58f571857804263642d7d089df962327a007b6) )	// "SoundDriverV1.1a"
 	ROM_LOAD16_BYTE( "visco-37.bin", 0x200000, 0x080000, CRC(78fa3ccb) SHA1(0c79ff1aa31e7ca1eeb14fbef7774278fa83ba44) )
 	ROM_RELOAD(                      0x300000, 0x080000             )
 	ROM_LOAD16_BYTE( "visco-33.bin", 0x200001, 0x080000, CRC(88351146) SHA1(1decce44b5d244b57676177f417e4937d7088124) )
 	ROM_RELOAD(                      0x300001, 0x080000             )
 
-	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x2000000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "vg003-01.a0", 0x0000000, 0x200000, CRC(2812aa1a) SHA1(5046fe51a4ea50051a19cfeeb091c87f0f217fb8) )
 	ROM_LOAD( "vg003-05.a1", 0x0200000, 0x200000, CRC(1a1dd910) SHA1(f2252e4cd1b6269036ed02cec9d5a224736c1bce) )
 	ROM_LOAD( "vg003-09.a2", 0x0400000, 0x200000, CRC(198f1c06) SHA1(7df5d51aa62f0b609cd1d296a3cfeeb38fbcd9d0) )
@@ -3240,10 +3240,10 @@ ROM_START( drifto94 )
 	ROM_LOAD( "vg003-12.d2", 0x1c00000, 0x200000, CRC(ac0fd855) SHA1(992ae0d02bcefaa2fad7462b211a49fbd1338b62) )
 	ROM_LOAD( "vg003-16.d3", 0x1e00000, 0x200000, CRC(1a5fd312) SHA1(1e67ffa51408de107be75c9c63df6fd1bb6ce6b1) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "vg003-17.u22", 0x000000, 0x200000, CRC(6f9294ce) SHA1(b097defd95eb1d8f00e107d7669f9d33148e75c1) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND2, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.1", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "vg003-18.u15", 0x000000, 0x200000, CRC(511b3e93) SHA1(09eda175c8f1b21c18645519cc6e89c6ca1fc5de) )
 ROM_END
 
@@ -3328,11 +3328,11 @@ This chip is used for the trackball trigger / reading / converting values
 ***************************************************************************/
 
 ROM_START( eaglshot )
-	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x100000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_BYTE( "si003-09.u18",  0x000000, 0x080000, CRC(219c71ce) SHA1(4f8996b4c5b267a90073d67857358147732f8c0d) )
 	ROM_LOAD16_BYTE( "si003-10.u20",  0x000001, 0x080000, CRC(c8872e48) SHA1(c8e1e712d5fa380f8fc1447502f21d2ae592811a) )
 
-	ROM_REGION( 0x0c00000, REGION_GFX1, /*ROMREGION_DISPOSE*/0 )	/* Sprites - Read by the CPU */
+	ROM_REGION( 0x0c00000, RGNCLASS_GFX, "gfx1", /*ROMREGION_DISPOSE*/0 )	/* Sprites - Read by the CPU */
 	ROM_LOAD( "si003-01.u13", 0x0000000, 0x200000, CRC(d7df0d52) SHA1(d7b79a186f4272334c2297666c52f32c05787c29) )
 	ROM_LOAD( "si003-02.u12", 0x0200000, 0x200000, CRC(92b4d50d) SHA1(9dc2f2961b088824d8370ac83dff796345fe4158) )
 	ROM_LOAD( "si003-03.u11", 0x0400000, 0x200000, CRC(6ede4012) SHA1(6663990c6ee8e500cb8c51ad2102761ee0b3351d) )
@@ -3340,18 +3340,18 @@ ROM_START( eaglshot )
 	ROM_LOAD( "si003-05.u30", 0x0800000, 0x200000, CRC(daf52d56) SHA1(108419ef7d3716a3890b0d8bcbfddc1585daaae8) )
 	ROM_LOAD( "si003-06.u31", 0x0a00000, 0x200000, CRC(449f9ae5) SHA1(b3e664eb88d14d1e25a0cfc8dcccc8270ca778c9) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", 0 )	/* Samples */
 	ROM_LOAD16_WORD_SWAP( "si003-07.u23", 0x000000, 0x200000, CRC(81679fd6) SHA1(ca3b07a87781278b5c7c85951728bbe5dfcbe042) )
 	ROM_LOAD16_WORD_SWAP( "si003-08.u24", 0x200000, 0x200000, CRC(d0122ba2) SHA1(96230fb690cf144cd873f7d51c0304736a698316) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND2, 0 )	/* Samples */
-	ROM_COPY( REGION_SOUND1, 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.1", 0 )	/* Samples */
+	ROM_COPY( RGNCLASS_SOUND, "ensoniq.0", 0x000000, 0x000000, 0x400000 )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND3, 0 ) /* Samples */
-	ROM_COPY( REGION_SOUND1, 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.2", 0 ) /* Samples */
+	ROM_COPY( RGNCLASS_SOUND, "ensoniq.0", 0x000000, 0x000000, 0x400000 )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND4, 0 ) /* Samples */
-	ROM_COPY( REGION_SOUND1, 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.3", 0 ) /* Samples */
+	ROM_COPY( RGNCLASS_SOUND, "ensoniq.0", 0x000000, 0x000000, 0x400000 )
 ROM_END
 
 
@@ -3366,11 +3366,11 @@ P1-102A (ROM board)
 ***************************************************************************/
 
 ROM_START( hypreact )
-	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x100000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_BYTE( "s14-1-02.u2", 0x000000, 0x080000, CRC(d90a383c) SHA1(9945f60ce6e1f50c24c2ae3c2c5d0df9ec3b8926) )
 	ROM_LOAD16_BYTE( "s14-1-01.u1", 0x000001, 0x080000, CRC(80481401) SHA1(4b1b7050893b6659762297d0f6496c7193ea6c4e) )
 
-	ROM_REGION( 0x1800000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x1800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "s14-1-07.u7",  0x0000000, 0x200000, CRC(6c429fd0) SHA1(de1bbcd4a20410328d88a3b246afa8e1a6a6f232) )
 	ROM_LOAD( "s14-1-05.u13", 0x0200000, 0x200000, CRC(2ff72f98) SHA1(92bd5042e19e1dae1252305413684f9cff4bd0ac) )
 	ROM_LOAD( "s14-1-06.u10", 0x0400000, 0x200000, CRC(f470ec42) SHA1(f31e9c3f3daa212226b9eea14aa1d01367fa348f) )
@@ -3387,7 +3387,7 @@ ROM_START( hypreact )
 
 //  The chip seems to use REGION1 too, but produces no sound from there.
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND3, 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.2", 0 )	/* Samples */
 	ROM_LOAD16_WORD_SWAP( "s14-1-04.u4", 0x000000, 0x200000, CRC(a5955336) SHA1(1ac0f5d27224e93acfe449d8ca5c3ab3b7f5dd8c) )
 	ROM_LOAD16_WORD_SWAP( "s14-1-03.u5", 0x200000, 0x200000, CRC(283a6ec2) SHA1(766c685384ea8d801c53a2ae36b4980318aff06b) )
 ROM_END
@@ -3404,13 +3404,13 @@ P1-112A (ROM board)
 ***************************************************************************/
 
 ROM_START( hypreac2 )
-	ROM_REGION16_LE( 0x200000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x200000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_BYTE( "u2.bin",  0x000000, 0x080000, CRC(05c93266) SHA1(0833e80f67ccb4ac17e771fa04dc6f433554a34f) )
 	ROM_LOAD16_BYTE( "u1.bin",  0x000001, 0x080000, CRC(80cf9e59) SHA1(7025321539891e1a3354ca233255f5395d716933) )
 	ROM_LOAD16_BYTE( "u47.bin", 0x100000, 0x080000, CRC(a3e9bfee) SHA1(1e897646bafd07ab48eda2883926506c6bedab87) )
 	ROM_LOAD16_BYTE( "u46.bin", 0x100001, 0x080000, CRC(68c41235) SHA1(6ec32aa6ab6074a8db63a76a3d1a0ec2dc8f8aae) )
 
-	ROM_REGION( 0x2800000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x2800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "s16-1-16.u6",  0x0000000, 0x400000, CRC(b308ac34) SHA1(409652bc5a537650cab1f3709a2c2be206f72a78) )
 	ROM_LOAD( "s16-1-15.u9",  0x0400000, 0x400000, CRC(2c8e381e) SHA1(a8681620809d3d9dc62b443232b6e4c4c4209248) )
 	ROM_LOAD( "s16-1-14.u12", 0x0800000, 0x200000, CRC(afe9d187) SHA1(802df8b1bbb94e4451a6b97c852fa555a6cf5837) )
@@ -3425,13 +3425,13 @@ ROM_START( hypreac2 )
 
 	ROM_FILL(                 0x1e00000,0x0a00000, 0          )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", 0 )	/* Samples */
 	ROM_LOAD16_WORD_SWAP( "s16-1-06.u41", 0x000000, 0x400000, CRC(626e8a81) SHA1(45ef5b630aed575acd160ede1413e0370f4f9761) )
 
-	ROM_REGION16_BE( 0x600000, REGION_SOUND2, 0 )	/* Samples */
+	ROM_REGION16_BE( 0x600000, RGNCLASS_SOUND, "ensoniq.1", 0 )	/* Samples */
 	ROM_LOAD16_WORD_SWAP( "s16-1-07.u42", 0x200000, 0x400000, CRC(42bcb41b) SHA1(060312b19bd52770410cec1f77e5d8d6478d80eb) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND3, 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.2", 0 )	/* Samples */
 	ROM_LOAD16_WORD_SWAP( "s16-1-07.u42", 0x000000, 0x400000, CRC(42bcb41b) SHA1(060312b19bd52770410cec1f77e5d8d6478d80eb) )
 ROM_END
 
@@ -3445,14 +3445,14 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( janjans1 )
-	ROM_REGION16_LE( 0x400000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x400000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_WORD( "jj1-data.bin", 0x000000, 0x200000, CRC(6734537e) SHA1(a40f84479141a6f33ce465e66ba9313b54915002) )
 	ROM_LOAD16_BYTE( "jj1-prol.bin", 0x200000, 0x080000, CRC(4231d928) SHA1(820d1233cd1a8d0c4ece15b94bd9be976b383fe2) )
 	ROM_RELOAD(                      0x300000, 0x080000             )
 	ROM_LOAD16_BYTE( "jj1-proh.bin", 0x200001, 0x080000, CRC(651383c6) SHA1(8291f86b230eee3a2ebcc926a8370777ee21ec47) )
 	ROM_RELOAD(                      0x300001, 0x080000             )
 
-	ROM_REGION( 0x2800000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x2800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "jj1-a0.bin", 0x0000000, 0x400000, CRC(39bbbc46) SHA1(77c6b5e9d4315671ea79ec838baa7ae043bcd8c4) )
 	ROM_LOAD( "jj1-a1.bin", 0x0400000, 0x400000, CRC(26020133) SHA1(32c834655d885431d466f25a729aee2d589ade1b) )
 	ROM_LOAD( "jj1-a2.bin", 0x0800000, 0x200000, CRC(e993251e) SHA1(6cea12bbfc170ad4ecdc09c1728f88ec7534270a) )
@@ -3469,10 +3469,10 @@ ROM_START( janjans1 )
 	ROM_LOAD( "jj1-d1.bin", 0x2200000, 0x400000, CRC(f24c0d36) SHA1(212969b456bfd7cc00081f65c03c1e167186891a) )
 	ROM_LOAD( "jj1-d2.bin", 0x2600000, 0x200000, CRC(481b3be8) SHA1(cd1bcaca8c236cebba72d315e759b2e9d243aca8) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "jj1-snd0.bin", 0x000000, 0x200000, CRC(4f7d620a) SHA1(edded130ce7bb0f37e1f59b2771ae6a10a061f9e) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND2, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.1", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "jj1-snd1.bin", 0x000000, 0x200000, CRC(9b3a7ae5) SHA1(193743fcce779c4a8a73a44c54b5391d08116331) )
 ROM_END
 
@@ -3492,14 +3492,14 @@ NEC D71051 (DIP28)
 ***************************************************************************/
 
 ROM_START( janjans2 )
-    ROM_REGION16_LE( 0x400000, REGION_USER1, 0 )        /* V60 Code */
+    ROM_REGION16_LE( 0x400000, RGNCLASS_USER, "user1", 0 )        /* V60 Code */
     ROM_LOAD16_WORD( "jan2-dat.u28",  0x000000, 0x200000, CRC(0c9c62bf) SHA1(17c6eea7cec05860c238cc22706fec1a8e3d9263) )
     ROM_LOAD16_BYTE( "jan2-prol.u26", 0x200000, 0x080000, CRC(758a7249) SHA1(1126e8527bad000bdfbd59da46d72ed256cb0fa9) )
     ROM_RELOAD(                       0x300000, 0x080000             )
     ROM_LOAD16_BYTE( "jan2-proh.u27", 0x200001, 0x080000, CRC(fcd5da62) SHA1(e0243e41e4ec25e82b0316f1189ed069c369e7b1) )
     ROM_RELOAD(                       0x300001, 0x080000             )
 
-    ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_DISPOSE )    /* Sprites */
+    ROM_REGION( 0x2000000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )    /* Sprites */
     ROM_LOAD( "jan2-a0.u13", 0x0000000, 0x400000, CRC(37869bea) SHA1(6259e8584775ca702ef4e9e460c6d874980ffecb) )
     ROM_LOAD( "jan2-a1.u14", 0x0400000, 0x400000, CRC(8189e74f) SHA1(ea083a7ef0858dac59e14a77f10a9900b20447f3) )
 
@@ -3512,10 +3512,10 @@ ROM_START( janjans2 )
     ROM_LOAD( "jan2-d0.u34", 0x1800000, 0x400000, CRC(479fdb54) SHA1(667d89518877a3b501a87c9c765b85b9a0b23517) )
     ROM_LOAD( "jan2-d1.u35", 0x1c00000, 0x400000, CRC(c0148895) SHA1(f89482a6ef475ca44d570332d05201b34887afbb) )
 
-    ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE | 0 )    /* Samples */
+    ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", ROMREGION_ERASE | 0 )    /* Samples */
     ROM_LOAD16_BYTE( "jan2-snd0.u29", 0x000000, 0x200000, CRC(22cc054e) SHA1(4926dd9f8f85880d6c1d14f93d68f330898b473a) )
 
-    ROM_REGION16_BE( 0x400000, REGION_SOUND2, ROMREGION_ERASE | 0 )    /* Samples */
+    ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.1", ROMREGION_ERASE | 0 )    /* Samples */
     ROM_LOAD16_BYTE( "jan2-snd1.u33", 0x000000, 0x200000, CRC(cbcac4a6) SHA1(f0c57fa6784e910bdb94f046d09e58e26921773b) )
 ROM_END
 
@@ -3565,33 +3565,33 @@ addr   old  this
 ***************************************************************************/
 
 ROM_START( jsk )
-	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )
+	ROM_REGION16_LE( 0x100000, RGNCLASS_USER, "user1", 0 )
 	ROM_LOAD16_BYTE( "jsk-u72.bin", 0x00000, 0x80000, CRC(db6b2554) SHA1(c4c6617461e1d3f8660a2b97fd2c38ef245f0d4a) )
 	ROM_LOAD16_BYTE( "jsk-u71.bin", 0x00001, 0x80000, CRC(f6774fba) SHA1(3a74e5091d9d72e4f92c7c637cfe5c0dcc60bbe1) )
 
-	ROM_REGION( 0x20000*4, REGION_CPU2, 0 )
+	ROM_REGION( 0x20000*4, RGNCLASS_CPU, "sub", 0 )
 	ROM_LOAD32_BYTE( "jsk-u52.bin", 0x00000, 0x20000, CRC(b11aef0c) SHA1(37c0fedd6454a05b647513600f1b0998c572c7a5) )
 	ROM_LOAD32_BYTE( "jsk-u38.bin", 0x00001, 0x20000, CRC(8e5c0de3) SHA1(54c5dfd858086b0eb7ffa82c19fb1dfd7752d50e) )
 	ROM_LOAD32_BYTE( "jsk-u24.bin", 0x00002, 0x20000, CRC(1fa6e156) SHA1(4daedf660d89c185c945d4a526312f6528fe7b17) )
 	ROM_LOAD32_BYTE( "jsk-u4.bin",  0x00003, 0x20000, CRC(ec22fb41) SHA1(c0d6b0a92075214a91da78be52d273771cb9f646) )
 
-	ROM_REGION( 0x1000000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x1000000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "jsk-a0.bin", 0x0000000, 0x400000, CRC(18981a19) SHA1(b4bf93f38099963350b9e5e64890ce7adc1bc983) )
 	ROM_LOAD( "jsk-b0.bin", 0x0400000, 0x400000, CRC(f6df0ff9) SHA1(d7736e4ae6e099aef320a59668d7f17590c346b9) )
 	ROM_LOAD( "jsk-c0.bin", 0x0800000, 0x400000, CRC(b8282939) SHA1(d041fb013e5011bf6b9d9bc2c816b2f3969723b7) )
 	ROM_LOAD( "jsk-d0.bin", 0x0c00000, 0x400000, CRC(fc733e0c) SHA1(951060f6600b8b677ad2f41f59071c375ea9d4cf) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", ROMREGION_ERASE )	/* Samples */
 	ROM_LOAD16_BYTE( "jsk-s0.u65", 0x000000, 0x200000, CRC(8d1a9aeb) SHA1(37316bd3e8cbe2a84239e1a11a56d4fe4723ae1a) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND2, 0 )	/* Samples */
-	ROM_COPY( REGION_SOUND1, 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.1", 0 )	/* Samples */
+	ROM_COPY( RGNCLASS_SOUND, "ensoniq.0", 0x000000, 0x000000, 0x400000 )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND3, 0 ) /* Samples */
-	ROM_COPY( REGION_SOUND1, 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.2", 0 ) /* Samples */
+	ROM_COPY( RGNCLASS_SOUND, "ensoniq.0", 0x000000, 0x000000, 0x400000 )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND4, 0 ) /* Samples */
-	ROM_COPY( REGION_SOUND1, 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.3", 0 ) /* Samples */
+	ROM_COPY( RGNCLASS_SOUND, "ensoniq.0", 0x000000, 0x000000, 0x400000 )
 ROM_END
 
 
@@ -3606,18 +3606,18 @@ STS-0001 (ROM board)
 ***************************************************************************/
 
 ROM_START( keithlcy )
-	ROM_REGION16_LE( 0x200000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x200000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_WORD( "vg002-07.u28", 0x000000, 0x100000, CRC(57f80ff5) SHA1(9dcc35a79d3799407190d113e0f1b57864d6c56a) )	// "SETA SoundDriver"
 	ROM_LOAD16_BYTE( "kl-p0l.u26",   0x100000, 0x080000, CRC(d7b177fb) SHA1(2a3533b952a7b2404720916662743c144e870c0b) )
 	ROM_LOAD16_BYTE( "kl-p0h.u27",   0x100001, 0x080000, CRC(9de7add4) SHA1(16f4405b12734cb6a83cff8be21d03bb3c2e2266) )
 
-	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "vg002-01.u13", 0x000000, 0x200000, CRC(b44d85b2) SHA1(cf78d46f9f2594a23af08a898afbf5dd609abcec) )
 	ROM_LOAD( "vg002-02.u16", 0x200000, 0x200000, CRC(aa05fd14) SHA1(9144e9668788fcd45bd6c8464f9b4f865397f783) )
 	ROM_LOAD( "vg002-03.u21", 0x400000, 0x200000, CRC(299a8a7d) SHA1(b24d8ffba01d345f48f47f92e58e9b2a9ec62526) )
 	ROM_LOAD( "vg002-04.u34", 0x600000, 0x200000, CRC(d3633f9b) SHA1(250a25b75a4810a676a02c390bb597b6f1cd7494) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", 0 )	/* Samples */
 	ROM_LOAD16_WORD_SWAP( "vg002-05.u29", 0x000000, 0x200000, CRC(66aecd79) SHA1(7735034b8fb35ad5e7916acd0c2e224a7c62e195) )
 	ROM_LOAD16_WORD_SWAP( "vg002-06.u33", 0x200000, 0x200000, CRC(75d8c8ea) SHA1(545768ac6d8953cd3044680953476276337a94b9) )
 ROM_END
@@ -3653,14 +3653,14 @@ KK2_SND1.BIN [e5a963e1] /
 ***************************************************************************/
 
 ROM_START( koikois2 )
-	ROM_REGION16_LE( 0x400000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x400000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 //  socket for DATA ROM is empty
 	ROM_LOAD16_BYTE( "u26.bin", 0x200000, 0x080000, CRC(4be937a1) SHA1(b2c22ec12fc110984bd1914f8e3e16a8cb866816) )
 	ROM_RELOAD(                 0x300000, 0x080000             )
 	ROM_LOAD16_BYTE( "u27.bin", 0x200001, 0x080000, CRC(25f39d93) SHA1(a36bc2fe5657f6ceada724fd42843e19408b39b8) )
 	ROM_RELOAD(                 0x300001, 0x080000             )
 
-	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_REGION( 0x2000000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* Sprites */
  	ROM_LOAD( "kk2-a0.bin", 0x0000000, 0x400000, CRC(b94b76c2) SHA1(07ce3e3946669c1bd2f022da9861164625be9c1b) )
  	ROM_LOAD( "kk2-a1.bin", 0x0400000, 0x200000, CRC(a7c99f56) SHA1(de341e99f76446fab4d7f09c2d8a6f18554b5d2f) )
 
@@ -3673,17 +3673,17 @@ ROM_START( koikois2 )
  	ROM_LOAD( "kk2-d0.bin", 0x1800000, 0x400000, CRC(0e3005a4) SHA1(fa8da58308d58bb6b2e8beb8ee8f7ea08b18f4d9) )
  	ROM_LOAD( "kk2-d1.bin", 0x1c00000, 0x200000, CRC(17a02252) SHA1(c7aa61e27f197b3c497a65a9369e3a6a20c9f82a) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "kk2_snd0.bin", 0x000000, 0x200000, CRC(b27eaa94) SHA1(05baaef683a1fcd9eb8a7cfd5b280c05108e832f) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND2, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.1", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "kk2_snd1.bin", 0x000000, 0x200000, CRC(e5a963e1) SHA1(464ffd53ac2e6db62225b18d12bfea93160771ec) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND3, 0 ) /* Samples */
-	ROM_COPY( REGION_SOUND1, 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.2", 0 ) /* Samples */
+	ROM_COPY( RGNCLASS_SOUND, "ensoniq.0", 0x000000, 0x000000, 0x400000 )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND4, 0 ) /* Samples */
-	ROM_COPY( REGION_SOUND2, 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.3", 0 ) /* Samples */
+	ROM_COPY( RGNCLASS_SOUND, "ensoniq.1", 0x000000, 0x000000, 0x400000 )
 ROM_END
 
 
@@ -3703,11 +3703,11 @@ Others:     M62X42B (RTC?)
 ***************************************************************************/
 
 ROM_START( meosism )
-	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x100000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_BYTE( "s15-2-2.u47", 0x000000, 0x080000, CRC(2ab0373f) SHA1(826aec3b9698ec5db5d7a72c3a24b1ef779fb227) )
 	ROM_LOAD16_BYTE( "s15-2-1.u46", 0x000001, 0x080000, CRC(a4bce148) SHA1(17ec4d91e215bd38258329b1a71e7f135c5733ad) )
 
-	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "s15-1-7.u7", 0x000000, 0x200000, CRC(ec5023cb) SHA1(3406f5143a40c8dcd2d45b44ea91c737810ab05b) )
 	ROM_LOAD( "s15-1-8.u6", 0x200000, 0x200000, CRC(f04b0836) SHA1(83678427cd0ed0d68ff770baa2693226b391f6c8) )
 	ROM_LOAD( "s15-1-5.u9", 0x400000, 0x200000, CRC(c0414b97) SHA1(3ca8423e04f606981d158065e38431f2509e1daa) )
@@ -3715,7 +3715,7 @@ ROM_START( meosism )
 
 //  The chip seems to use REGION1 too, but produces no sound from there.
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND3, 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.2", 0 )	/* Samples */
 	ROM_LOAD16_WORD_SWAP( "s15-1-4.u45", 0x000000, 0x200000, CRC(0c6738a7) SHA1(acf9056bb052db7a11cf903d77ab16425d813835) )
 	ROM_LOAD16_WORD_SWAP( "s15-1-3.u43", 0x200000, 0x200000, CRC(d7e83178) SHA1(74e5c09f6d3b2c8e1c1cc2b0eab0490b5bbc9099) )
 ROM_END
@@ -3752,11 +3752,11 @@ Other parts:    uPD71051
 ***************************************************************************/
 
 ROM_START( mslider )
-	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x100000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_BYTE( "ms-pl.bin", 0x000000, 0x080000, CRC(70b2a05d) SHA1(387cf67e3e505c4cc1b5cd0b6c9fb3bc27d07e24) )
 	ROM_LOAD16_BYTE( "ms-ph.bin", 0x000001, 0x080000, CRC(34a64e9f) SHA1(acf3d8490f3ec99b6171e71328a991fcc9c5a8b1) )
 
-	ROM_REGION( 0xa00000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0xa00000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "ms-a0.bin", 0x000000, 0x200000, CRC(7ed38ccc) SHA1(9c584a5f6b3aad8646d155a56e4070cfed4af540) )
 	ROM_LOAD( "ms-a1.bin", 0x200000, 0x080000, CRC(83f5995f) SHA1(33ae99a96702d4aba422eaf454b86c96aaf88426) )
 
@@ -3768,7 +3768,7 @@ ROM_START( mslider )
 
 	ROM_FILL(              0x780000, 0x280000, 0          )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", 0 )	/* Samples */
 	ROM_LOAD16_WORD_SWAP( "ms-snd0.bin", 0x000000, 0x200000, CRC(cda6e3a5) SHA1(28ad8f34bc4f907654582f3522b377b97234eba8) )
 	ROM_LOAD16_WORD_SWAP( "ms-snd1.bin", 0x200000, 0x200000, CRC(8f484b35) SHA1(cbf3ee7ec6337915f9d90a5b43d2de1eaa5537d0) )
 ROM_END
@@ -3783,14 +3783,14 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( ryorioh )
-	ROM_REGION16_LE( 0x400000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x400000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD( "ryorioh.dat",      0x000000, 0x200000, CRC(d1335a6a) SHA1(a5670ab3c399736232baaabc59573bdb3bf762da) )
 	ROM_LOAD16_BYTE( "ryorioh.l", 0x200000, 0x080000, CRC(9ad60e7d) SHA1(572b84bab08eb8293d93e03182d9871d8973b7dd) )
 	ROM_RELOAD(                   0x300000, 0x080000             )
 	ROM_LOAD16_BYTE( "ryorioh.h", 0x200001, 0x080000, CRC(0655fcff) SHA1(2c088e42323f87e01b65f9f523e258f881d4e773) )
 	ROM_RELOAD(                   0x300001, 0x080000             )
 
-	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x2000000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "ryorioh.a0", 0x0000000, 0x400000, CRC(f76ee003) SHA1(04022238dcfd5cf0e4f97c3c3b24df574ec6b609) )
 	ROM_LOAD( "ryorioh.a1", 0x0400000, 0x400000, CRC(ca44d66d) SHA1(d5ed2bbc9831182b212533bd67bb3831f655110a) )
 
@@ -3803,7 +3803,7 @@ ROM_START( ryorioh )
 	ROM_LOAD( "ryorioh.d0", 0x1800000, 0x400000, CRC(ffa14ef1) SHA1(22a6992f6217d8ef2140e72063290fa34cb45683) )
 	ROM_LOAD( "ryorioh.d1", 0x1c00000, 0x400000, CRC(ae6055e8) SHA1(ee20a7b3c4f899404ca259991509728d3a0f96b9) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "ryorioh.snd", 0x000000, 0x200000, CRC(7bd38b76) SHA1(d8490b4af839ef0802b8b2a47277fcd4091e4d37) )
 ROM_END
 
@@ -3844,11 +3844,11 @@ ST-0007 (System controller)
 ***************************************************************************/
 
 ROM_START( srmp4 )
-	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x100000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_BYTE( "sx001-14.prl", 0x000000, 0x080000, CRC(19aaf46e) SHA1(0c0f5acc1880971c56e7e2c2e3ad7c2932b82d4b) )
 	ROM_LOAD16_BYTE( "sx001-15.prh", 0x000001, 0x080000, CRC(dbd31399) SHA1(a77dc85f481454b10223d7f4e0395e07d2f8d4f3) )
 
-	ROM_REGION( 0x1800000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x1800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "sx001-01.a0", 0x0000000, 0x200000, CRC(94ee9203) SHA1(a0e944a375f94e9dd668b06f15580384902d0fe1) )
 	ROM_LOAD( "sx001-04.a1", 0x0200000, 0x200000, CRC(38c9c49a) SHA1(c392d1cf5d16a348bdaa7222f2420a61a831a50a) )
 	ROM_LOAD( "sx001-07.a2", 0x0400000, 0x200000, CRC(ee66021e) SHA1(f4df2bdf8100a3bd39bb61f9bb4807ca9e13537a) )
@@ -3863,17 +3863,17 @@ ROM_START( srmp4 )
 
 	ROM_FILL(                0x1200000, 0x600000, 0          )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", 0 )	/* Samples */
 	ROM_LOAD16_WORD_SWAP( "sx001-10.sd0", 0x000000, 0x200000, CRC(45409ef1) SHA1(327d0a63deac6f0f8b9a408a321c03dd4e965569) )
 	ROM_RELOAD(                           0x200000, 0x200000             )
 ROM_END
 
 ROM_START( srmp4o )
-	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x100000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_BYTE( "sx001-11.prl", 0x000000, 0x080000, CRC(dede3e64) SHA1(6fe998babfd2ad8f268c59bd365115a2d7cfc8f9) )
 	ROM_LOAD16_BYTE( "sx001-12.prh", 0x000001, 0x080000, CRC(739c53c3) SHA1(68f12cf42177df208ff6499ccc7ccc1423e3ad5f) )
 
-	ROM_REGION( 0x1800000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x1800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "sx001-01.a0", 0x0000000, 0x200000, CRC(94ee9203) SHA1(a0e944a375f94e9dd668b06f15580384902d0fe1) )
 	ROM_LOAD( "sx001-04.a1", 0x0200000, 0x200000, CRC(38c9c49a) SHA1(c392d1cf5d16a348bdaa7222f2420a61a831a50a) )
 	ROM_LOAD( "sx001-07.a2", 0x0400000, 0x200000, CRC(ee66021e) SHA1(f4df2bdf8100a3bd39bb61f9bb4807ca9e13537a) )
@@ -3888,7 +3888,7 @@ ROM_START( srmp4o )
 
 	ROM_FILL(                0x1200000, 0x600000, 0          )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", 0 )	/* Samples */
 	ROM_LOAD16_WORD_SWAP( "sx001-10.sd0", 0x000000, 0x200000, CRC(45409ef1) SHA1(327d0a63deac6f0f8b9a408a321c03dd4e965569) )
 	ROM_RELOAD(                           0x200000, 0x200000             )
 ROM_END
@@ -3903,14 +3903,14 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( srmp7 )
-	ROM_REGION16_LE( 0x400000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x400000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_WORD( "sx015-10.dat", 0x000000, 0x200000, CRC(fad3ac6a) SHA1(9a4695c06bc74ca4de0c1a83bdf38f6651c0e2a1) )
 	ROM_LOAD16_BYTE( "sx015-07.pr0", 0x200000, 0x080000, CRC(08d7f841) SHA1(67567acff0ce278576290a896005de0397605eef) )
 	ROM_RELOAD(                      0x300000, 0x080000             )
 	ROM_LOAD16_BYTE( "sx015-08.pr1", 0x200001, 0x080000, CRC(90307825) SHA1(13b3f82c8854808684bd41deb0bbd442efe7b685) )
 	ROM_RELOAD(                      0x300001, 0x080000             )
 
-	ROM_REGION( 0x4000000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x4000000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "sx015-26.a0", 0x0000000, 0x400000, CRC(a997be9d) SHA1(37470af24531557113f953f727f6b8cab602a7d3) )
 	ROM_LOAD( "sx015-25.a1", 0x0400000, 0x400000, CRC(29ac4211) SHA1(32edf3982b0e27077cc17cd38b67a27d36dc3ad8) )
 	ROM_LOAD( "sx015-24.a2", 0x0800000, 0x400000, CRC(b8fea3da) SHA1(9c3a53348f72f39d84d078068c62b10920854cd0) )
@@ -3931,19 +3931,19 @@ ROM_START( srmp7 )
 	ROM_LOAD( "sx015-12.d2", 0x3800000, 0x400000, CRC(80336523) SHA1(ec66e21fe1401fdb438e03657542a7b6b0cbc5ce) )
 	ROM_LOAD( "sx015-11.d3", 0x3c00000, 0x400000, CRC(134c8e28) SHA1(669118b58f27d5e2e08052debe904f95d9ab32a3) )
 
-	ROM_REGION16_BE( 0x800000, REGION_SOUND1, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x800000, RGNCLASS_SOUND, "ensoniq.0", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "sx015-06.s0", 0x000000, 0x200000, CRC(0d5a206c) SHA1(2fdaf2a56b6608f20a788eb79a8426102ff33e14) )
 	ROM_RELOAD(                     0x400000, 0x200000             )
 
-	ROM_REGION16_BE( 0x800000, REGION_SOUND2, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x800000, RGNCLASS_SOUND, "ensoniq.1", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "sx015-05.s1", 0x000000, 0x200000, CRC(bb8cebe2) SHA1(3691e5fb4e963f69c1fe01cb5d968433029c4833) )
 	ROM_RELOAD(                     0x400000, 0x200000             )
 
-	ROM_REGION16_BE( 0x800000, REGION_SOUND3, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x800000, RGNCLASS_SOUND, "ensoniq.2", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "sx015-04.s2", 0x000000, 0x200000, CRC(f6e933df) SHA1(7cb69515a0ffc62fbac2be3a5fb322538560bd38) )
 	ROM_LOAD16_BYTE( "sx015-02.s4", 0x400000, 0x200000, CRC(6567bc3e) SHA1(e902f22f1499edc6a0e2c8b6cc26460d66a3bdbe) )
 
-	ROM_REGION16_BE( 0x800000, REGION_SOUND4, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x800000, RGNCLASS_SOUND, "ensoniq.3", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "sx015-03.s3", 0x000000, 0x200000, CRC(5b51ab21) SHA1(cf3e86e41f7984208984d6486b04cec117dadc18) )
 	ROM_LOAD16_BYTE( "sx015-01.s5", 0x400000, 0x200000, CRC(481b00ed) SHA1(2c3d158dd5be9af0ee57fd5dd94d2ec75e28b182) )
 ROM_END
@@ -4052,11 +4052,11 @@ SAM-5127
 ***************************************************************************/
 
 ROM_START( survarts )
-	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x100000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_BYTE( "prl-r6.u4", 0x000000, 0x080000, CRC(ef5f6e17) SHA1(1857beb15d2214c7ecb60b59e696ba24b2791734) )
 	ROM_LOAD16_BYTE( "prh-r5.u3", 0x000001, 0x080000, CRC(d446f010) SHA1(fb6c349edb2e6d1fcf8ed360dbe82be6d74f91d2) )
 
-	ROM_REGION( 0x1800000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x1800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "si001-01.u27", 0x0000000, 0x200000, CRC(8b38fbab) SHA1(c4a67b24b33d4eef7b0f885bd69cae6c67bd3981) ) /* A0 */
 	ROM_LOAD( "si001-04.u26", 0x0200000, 0x200000, CRC(34248b54) SHA1(077198f8de1622b71c580e34d5ad1b6bf3229fe9) ) /* A1 */
 	ROM_LOAD( "si001-07.u25", 0x0400000, 0x200000, CRC(497d6151) SHA1(a9860c75943c0fd2991660ce2a9505edc6c2fa46) ) /* A2 */
@@ -4073,22 +4073,22 @@ ROM_START( survarts )
 
 //  The chip seems to use REGION1 too, but produces no sound from there.
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND3, 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.2", 0 )	/* Samples */
 	ROM_LOAD16_WORD_SWAP( "si001-10.u9", 0x000000, 0x100000, CRC(5642b333) SHA1(84936af8b3882e116b279e422075f35aabdd232f) ) /* S0 */
 	ROM_LOAD16_WORD_SWAP( "si001-11.u8", 0x100000, 0x100000, CRC(a81e6ea6) SHA1(499f070500895ed7b6785b42fb6bbf973fc6dc04) ) /* S1 */
 	ROM_LOAD16_WORD_SWAP( "si001-12.u7", 0x200000, 0x100000, CRC(e9b2b45b) SHA1(17fd27cdb8a0b9932cb1e71e0547c0d9d6fc7d06) ) /* S2 */
 	ROM_LOAD16_WORD_SWAP( "si001-13.u6", 0x300000, 0x100000, CRC(d66a7e26) SHA1(57b659daef00421b6742963f792bd5e020f625c9) ) /* S3 */
 
-	ROM_REGION( 0x0200, REGION_PLDS, 0 )
+	ROM_REGION( 0x0200, RGNCLASS_PLDS, "plds", 0 )
 	ROM_LOAD( "gal16v8b.u5",   0x0000, 0x0117, CRC(378ce368) SHA1(cc068c9b63e6f91165f9caec581645ad45b2d3d0) )
 ROM_END
 
 ROM_START( survartu )
-	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x100000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_BYTE( "usa-pr-l.u4", 0x000000, 0x080000, CRC(fa328673) SHA1(f7217eaa2a8d3fb7f706fa1aecaaa5b1b8d5e32c) )
 	ROM_LOAD16_BYTE( "usa-pr-h.u3", 0x000001, 0x080000, CRC(6bee2635) SHA1(a2d0517bf599331ef47beb8a902589039e4502e0) )
 
-	ROM_REGION( 0x1800000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x1800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "si001-01.u27", 0x0000000, 0x200000, CRC(8b38fbab) SHA1(c4a67b24b33d4eef7b0f885bd69cae6c67bd3981) ) /* A0 */
 	ROM_LOAD( "si001-04.u26", 0x0200000, 0x200000, CRC(34248b54) SHA1(077198f8de1622b71c580e34d5ad1b6bf3229fe9) ) /* A1 */
 	ROM_LOAD( "si001-07.u25", 0x0400000, 0x200000, CRC(497d6151) SHA1(a9860c75943c0fd2991660ce2a9505edc6c2fa46) ) /* A2 */
@@ -4105,7 +4105,7 @@ ROM_START( survartu )
 
 //  The chip seems to use REGION1 too, but produces no sound from there.
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND3, 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.2", 0 )	/* Samples */
 	ROM_LOAD16_WORD_SWAP( "si001-10.u9", 0x000000, 0x100000, CRC(5642b333) SHA1(84936af8b3882e116b279e422075f35aabdd232f) ) /* S0 */
 	ROM_LOAD16_WORD_SWAP( "si001-11.u8", 0x100000, 0x100000, CRC(a81e6ea6) SHA1(499f070500895ed7b6785b42fb6bbf973fc6dc04) ) /* S1 */
 	ROM_LOAD16_WORD_SWAP( "si001-12.u7", 0x200000, 0x100000, CRC(e9b2b45b) SHA1(17fd27cdb8a0b9932cb1e71e0547c0d9d6fc7d06) ) /* S2 */
@@ -4157,11 +4157,11 @@ SAM-5127
 ***************************************************************************/
 
 ROM_START( dynagear )
-	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x100000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_BYTE( "si002-prl.u4", 0x000000, 0x080000, CRC(71ba29c6) SHA1(ef43ab665daa4fc9ee01996d03f2f0b4c74c8435) )
 	ROM_LOAD16_BYTE( "si002-prh.u3", 0x000001, 0x080000, CRC(d0947a12) SHA1(95b54ed9dc51c952ad123103b8633a821cde05e9) )
 
-	ROM_REGION( 0x1000000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x1000000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "si002-01.u27", 0x0000000, 0x200000, CRC(0060a521) SHA1(10cdb967e6cb4fc7c23c1ac40b24e35262060f5c) )
 	ROM_LOAD( "si002-04.u26", 0x0200000, 0x200000, CRC(6140f47d) SHA1(49dcebe724990acdac76746886efe88b68ce956f) )
 
@@ -4175,7 +4175,7 @@ ROM_START( dynagear )
 
 //  The chip seems to use REGION1 too, but produces no sound from there.
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND3, 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.2", 0 )	/* Samples */
 	ROM_LOAD16_WORD_SWAP( "si002-07.u9", 0x000000, 0x100000, CRC(30d2bf11) SHA1(263e9a4e6a77aa451daf6d1225071cc1147a6541) )
 	ROM_LOAD16_WORD_SWAP( "si002-08.u8", 0x100000, 0x100000, CRC(253704ee) SHA1(887ebca2af497fc59b274838cdf284223cc92c97) )
 	ROM_LOAD16_WORD_SWAP( "si002-09.u7", 0x200000, 0x100000, CRC(1ea86db7) SHA1(e887ea5be99f753e73355a45e37dfddb2a1d6cf6) )
@@ -4198,13 +4198,13 @@ Chips:  DX-102 x2
 ***************************************************************************/
 
 ROM_START( sxyreact )
-	ROM_REGION16_LE( 0x200000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x200000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_BYTE( "ac414e00.u2",  0x000000, 0x080000, CRC(d5dd7593) SHA1(ad1c7c2f27e0423ab346172a5c91316c9c0b3620) )
 	ROM_LOAD16_BYTE( "ac413e00.u1",  0x000001, 0x080000, CRC(f46aee4a) SHA1(8336304797987321903977373dec027cfca2e211) )
 	ROM_LOAD16_BYTE( "ac416e00.u47", 0x100000, 0x080000, CRC(e0f7bba9) SHA1(5eafd72c9fa4588f18fa02113a93abdcaf8d8693) )
 	ROM_LOAD16_BYTE( "ac415e00.u46", 0x100001, 0x080000, CRC(92de1b5f) SHA1(69e30ffc0c59e7dafe3f9c76bfee782028dab042) )
 
-	ROM_REGION( 0x2800000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x2800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "ac1401m0.u6",  0x0000000, 0x400000, CRC(0b7b693c) SHA1(1e65c3f55cf3aa63d4229d30b5894c89b83cdf3e) )
 	ROM_LOAD( "ac1402m0.u9",  0x0400000, 0x400000, CRC(9d593303) SHA1(c02037fabe8a74f01a25357ffdd3ce01b930008b) )
 	ROM_LOAD( "ac1403m0.u12", 0x0800000, 0x200000, CRC(af433eca) SHA1(dfd83eba390171d93bc6888cc1d24a9a38d900bd) )
@@ -4219,16 +4219,16 @@ ROM_START( sxyreact )
 
 	ROM_FILL(                 0x1e00000, 0xa00000, 0          )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", 0 )	/* Samples */
 	ROM_LOAD16_WORD_SWAP( "ac1410m0.u41", 0x000000, 0x400000, CRC(2a880afc) SHA1(193235bccde28a7d693a1a1f0159260a3a63a7d5) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND2, 0 ) /* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.1", 0 ) /* Samples */
 	ROM_LOAD16_WORD_SWAP( "ac1411m0.u42", 0x200000, 0x200000, CRC(2ba4ca43) SHA1(9cddf57094e68d3840a37f44fbdf2f43f539ba11) )
 	ROM_CONTINUE( 0x000000, 0x200000 )	// this will go in region 3
 
 	// a few sparse samples are played from here
-	ROM_REGION16_BE( 0x400000, REGION_SOUND3, 0 )	/* Samples */
-	ROM_COPY( REGION_SOUND2, 0x000000,    0x200000, 0x200000 )
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.2", 0 )	/* Samples */
+	ROM_COPY( RGNCLASS_SOUND, "ensoniq.1", 0x000000,    0x200000, 0x200000 )
 ROM_END
 
 /***************************************************************************
@@ -4286,10 +4286,10 @@ Notes:
 ***************************************************************************/
 
 ROM_START( sxyreac2 )
-	ROM_REGION16_LE( 0x200000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x200000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_WORD( "ac1714e00.u32",  0x000000, 0x200000, CRC(78075d70) SHA1(05c84bb32c6f97fceb5436d192c14cac79d9ab07) )
 
-	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x2000000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "ac1701t00.u6",  0x0000000, 0x400000, CRC(e14611c2) SHA1(0eaf28b27b879b6ce99bea03b286717a2d6f60f4) )
 	ROM_LOAD( "ac1702t00.u9",  0x0400000, 0x400000, CRC(2c8b07f8) SHA1(e4128075c207d03206085f58b5aa8ebd28d3c2a9) )
 
@@ -4301,15 +4301,15 @@ ROM_START( sxyreac2 )
 
 	ROM_FILL(                 0x1800000, 0x800000, 0         )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", 0 )	/* Samples */
 	ROM_LOAD16_WORD_SWAP( "ac1707t00.u41", 0x000000, 0x400000, CRC(28999bc4) SHA1(4cddaa4a155cc03d456e6edb20dd207f7ff3d9c4) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND2, 0 ) /* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.1", 0 ) /* Samples */
 	ROM_LOAD16_WORD_SWAP( "ac1708t00.u42", 0x200000, 0x200000, CRC(7001eec0) SHA1(cc568ef90ec7201a73e9dc217d72cfbc3860e6b8) )
 	ROM_CONTINUE( 0x000000, 0x200000 )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND3, 0 )	/* Samples */
-	ROM_COPY( REGION_SOUND2, 0x000000,    0x200000, 0x200000 )
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.2", 0 )	/* Samples */
+	ROM_COPY( RGNCLASS_SOUND, "ensoniq.1", 0x000000,    0x200000, 0x200000 )
 ROM_END
 
 
@@ -4333,14 +4333,14 @@ There is a battery on the rom board @ BT1 (battery # CR2032 - 3 volts)
 ***************************************************************************/
 
 ROM_START( stmblade )
-	ROM_REGION16_LE( 0x400000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x400000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_WORD( "sb-pd0.u26",  0x000000, 0x100000, CRC(91c4fbf7) SHA1(68e57ea2a9756a95a81c6688905352d631e9f2de) )
 	ROM_LOAD16_BYTE( "s-blade.u37", 0x200000, 0x080000, CRC(a6a42cc7) SHA1(4bff79ff03b81a7ed96d3ad285242580146976be) )
 	ROM_RELOAD(                     0x300000, 0x080000             )
 	ROM_LOAD16_BYTE( "s-blade.u33", 0x200001, 0x080000, CRC(16104ca6) SHA1(63835051c358dce33d92974d1de911b98835a3d9) )
 	ROM_RELOAD(                     0x300001, 0x080000             )
 
-	ROM_REGION( 0x1800000, REGION_GFX1, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_REGION( 0x1800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* Sprites */
 	ROM_LOAD( "sb-a0.u41", 0x0000000, 0x200000, CRC(2a327b51) SHA1(fb1e92b7f740a80cb0c977e106d0c4bfee092dad) )
 	ROM_LOAD( "sb-a1.u35", 0x0200000, 0x200000, CRC(246f6f28) SHA1(09171f04452fbcf9e3333c135288fd6e5b8244f7) )
 	ROM_LOAD( "sb-a2.u32", 0x0400000, 0x080000, CRC(2049acf3) SHA1(3982b4650921da0563336060887767627f8679ab) )
@@ -4352,7 +4352,7 @@ ROM_START( stmblade )
 	ROM_LOAD( "sb-c2.u4",  0x1000000, 0x080000, CRC(fd1d2a92) SHA1(957a8a52b79e252c7f1a4b6383107ae609dce5ef) )
 	ROM_FILL(              0x1200000, 0x600000, 0          )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "sb-snd0.u22", 0x000000, 0x200000, CRC(4efd605b) SHA1(9c97be105c923c7db847d9b9aea37025edb685a0) )
 ROM_END
 
@@ -4395,10 +4395,10 @@ All roms are 16M Mask roms
 ***************************************************************************/
 
 ROM_START( twineag2 )
-	ROM_REGION16_LE( 0x200000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x200000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_WORD( "sx002-12.u22", 0x000000, 0x200000, CRC(846044dc) SHA1(c1c85de1c466fb7c3580824baa1571cd0fed6ec6) )
 
-	ROM_REGION( 0x1800000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x1800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "sx002-01.u32", 0x0000000, 0x200000, CRC(6d6896b5) SHA1(e8efd29b9f951bff6664e47cb5fd67f1d8f40608) ) /* A0 */
 	ROM_LOAD( "sx002-02.u28", 0x0200000, 0x200000, CRC(3f47e97a) SHA1(5b0fdc762cf704c8bd92c4a4a42dba4a127b3d49) ) /* A1 */
 	ROM_LOAD( "sx002-03.u25", 0x0400000, 0x200000, CRC(544f18bf) SHA1(539e6df1ded4e9ac8974c697215cc1e5c5a40cda) ) /* A2, A3 is unpopulated */
@@ -4413,17 +4413,17 @@ ROM_START( twineag2 )
 
 	ROM_FILL(             0x1200000, 0x600000, 0          )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE | 0 ) /* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", ROMREGION_ERASE | 0 ) /* Samples */
 	ROM_LOAD16_BYTE( "sx002-10.u14", 0x000000, 0x200000, CRC(b0669dfa) SHA1(ff805f59864ac4ccee3e249c06804d844d3df59c) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND2, ROMREGION_ERASE | 0 ) /* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.1", ROMREGION_ERASE | 0 ) /* Samples */
 	ROM_LOAD16_BYTE( "sx002-11.u7",  0x000000, 0x200000, CRC(b8dd621a) SHA1(f9b43e018f2bb121e4f4e9554419cd32b870556b) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND3, 0 ) /* Samples */
-	ROM_COPY( REGION_SOUND1, 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.2", 0 ) /* Samples */
+	ROM_COPY( RGNCLASS_SOUND, "ensoniq.0", 0x000000, 0x000000, 0x400000 )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND4, 0 ) /* Samples */
-	ROM_COPY( REGION_SOUND2, 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.3", 0 ) /* Samples */
+	ROM_COPY( RGNCLASS_SOUND, "ensoniq.1", 0x000000, 0x000000, 0x400000 )
 ROM_END
 
 
@@ -4437,13 +4437,13 @@ Hardware is almost identical to SSV system
 ****************************************************************************/
 
 ROM_START( ultrax )
-	ROM_REGION16_LE( 0x200000, REGION_USER1, 0 )  /* V60 Code */
+	ROM_REGION16_LE( 0x200000, RGNCLASS_USER, "user1", 0 )  /* V60 Code */
 	ROM_LOAD16_BYTE( "71047-11.u64", 0x000000, 0x080000, CRC(593b2678) SHA1(3b24b59a21386a4688502c5f0a2dd4eb0ec92544) )
 	ROM_LOAD16_BYTE( "71047-09.u65", 0x000001, 0x080000, CRC(08ea8d91) SHA1(5d2672f6c96fbbe9d80bd6539c1400b62745892a) )
 	ROM_LOAD16_BYTE( "71047-12.u62", 0x100000, 0x080000, CRC(76a77ab2) SHA1(0cf2f293defc23c807556ff92ea99f963fafed40) )
 	ROM_LOAD16_BYTE( "71047-10.u63", 0x100001, 0x080000, CRC(7c79faf9) SHA1(40c1420eeae355efa628bbcfd69e0dd18d343fd9) )
 
-	ROM_REGION( 0xc00000, REGION_GFX1, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_REGION( 0xc00000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* Sprites */
 	ROM_LOAD( "71047-01.u73", 0x0000000, 0x200000, CRC(66662b08) SHA1(0cb683e5f85ffe21bd3367af4d3e48a484dbd4c3) )
 	ROM_LOAD( "71047-02.u74", 0x0200000, 0x100000, CRC(6b00dc0c) SHA1(6af8ceed72d13f9979175c0d907a4a8c127ca1ad) )
 	ROM_LOAD( "71047-03.u76", 0x0300000, 0x200000, CRC(00fcd6c2) SHA1(61d13cbafbc0fd6ff62cd08aa88591ed0fd0b182) )
@@ -4452,17 +4452,17 @@ ROM_START( ultrax )
 	ROM_LOAD( "71047-06.u88", 0x0800000, 0x100000, CRC(b8ac2942) SHA1(3e85e8f5669d469dd3114455248546d32a642315) )
 	ROM_FILL(                 0x0900000, 0x300000, 0 )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE | 0 ) /* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", ROMREGION_ERASE | 0 ) /* Samples */
 	ROM_LOAD16_BYTE( "71047-07.u59", 0x000000, 0x200000, CRC(d9828b62) SHA1(f66a388d7a00b3a45d386671c061f5b840453451) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND2, ROMREGION_ERASE | 0 ) /* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.1", ROMREGION_ERASE | 0 ) /* Samples */
 	ROM_LOAD16_BYTE( "71047-08.u60", 0x000000, 0x200000, CRC(30ebff6d) SHA1(53824c1fc37e22b545fd68b59722f7968f0ca1e2) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND3, 0 ) /* Samples */
-	ROM_COPY( REGION_SOUND1, 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.2", 0 ) /* Samples */
+	ROM_COPY( RGNCLASS_SOUND, "ensoniq.0", 0x000000, 0x000000, 0x400000 )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND4, 0 ) /* Samples */
-	ROM_COPY( REGION_SOUND2, 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.3", 0 ) /* Samples */
+	ROM_COPY( RGNCLASS_SOUND, "ensoniq.1", 0x000000, 0x000000, 0x400000 )
 ROM_END
 
 
@@ -4553,65 +4553,65 @@ Vasara 2 has a secret character code like the Raizing games:
 ****************************************************************************/
 
 ROM_START( vasara )
-	ROM_REGION16_LE( 0x400000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x400000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_WORD( "data.u34",  0x000000, 0x200000, CRC(7704cc7e) SHA1(62bb018b7f0c7ee67fee37de17bb22a73bb9e420) )
 	ROM_LOAD16_BYTE( "prg-l.u30", 0x200000, 0x080000, CRC(f0547886) SHA1(6a3717f8b89575d3cb4c7d56dd9df5052faa3c7f) )
 	ROM_RELOAD(                   0x300000, 0x080000             )
 	ROM_LOAD16_BYTE( "prg-h.u31", 0x200001, 0x080000, CRC(6a39bba9) SHA1(05ede167150307d7bf59037f264b1d140f6646da) )
 	ROM_RELOAD(                   0x300001, 0x080000             )
 
-	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_REGION( 0x2000000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* Sprites */
 	ROM_LOAD( "a0.u1", 0x0000000, 0x800000, CRC(673230a6) SHA1(a9d1a108c0737b709854bae199499577f5ae359e) )
 	ROM_LOAD( "b0.u2", 0x0800000, 0x800000, CRC(31a2da7f) SHA1(5efec60affb2ed2b73a6694ac794d41375220609) )
 	ROM_LOAD( "c0.u3", 0x1000000, 0x800000, CRC(d110dacf) SHA1(6f33bf6ce8c06f0b823b5478a56dc95095385181) )
 	ROM_LOAD( "d0.u4", 0x1800000, 0x800000, CRC(82d0ca55) SHA1(5ac07df713504329fbc8e8b5374c04e53745230e) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "s0.u36", 0x000000, 0x200000, CRC(754fca02) SHA1(5b2810a36183e0d4f42f0fb4a09be033ad0db40d) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND2, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.1", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "s1.u37", 0x000000, 0x200000, CRC(5f303698) SHA1(bd6495f912aa9d761d245ef0a1566d9d7bdbb2ad) )
 ROM_END
 
 ROM_START( vasara2 )
-	ROM_REGION16_LE( 0x400000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x400000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_WORD( "data.u34",  0x000000, 0x200000, CRC(493d0103) SHA1(fda68fb089328cabb3bbd52f8703b445a9509bf1) )
 	ROM_LOAD16_BYTE( "prg-l.u30", 0x200000, 0x080000, CRC(40e6f5f6) SHA1(05fee4535ffe8403e86ba92a58e5f2d040489c8e) )
 	ROM_RELOAD(                   0x300000, 0x080000             )
 	ROM_LOAD16_BYTE( "prg-h.u31", 0x200001, 0x080000, CRC(c958e146) SHA1(568878526cef76ac0ce4feeaa46e7039291e5f77) )
 	ROM_RELOAD(                   0x300001, 0x080000             )
 
-	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_REGION( 0x2000000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* Sprites */
 	ROM_LOAD( "a0.u1", 0x0000000, 0x800000, CRC(a6306c75) SHA1(bad715e53426a295d3571c025e0539d5f81ce5ab) )
 	ROM_LOAD( "b0.u2", 0x0800000, 0x800000, CRC(227cbd9f) SHA1(a02787943b659508ce1589cdc7a372cc02826a10) )
 	ROM_LOAD( "c0.u3", 0x1000000, 0x800000, CRC(54ede017) SHA1(4a7ff7ff8ec5843837016f35a588983b5ace06ff) )
 	ROM_LOAD( "d0.u4", 0x1800000, 0x800000, CRC(4be8479d) SHA1(cbb5943dfae86f4d571459263199a63399dedc20) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "s0.u36", 0x000000, 0x200000, CRC(2b381b33) SHA1(b9dd13651e4b8d0b9e3bc4c592022f31ea634d19) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND2, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.1", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "s1.u37", 0x000000, 0x200000, CRC(11cd7098) SHA1(f75288b5c89df039dfb41d66bd275cda8605e75a) )
 ROM_END
 
 ROM_START( vasara2a )
-	ROM_REGION16_LE( 0x400000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x400000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_WORD( "data.u34",     0x000000, 0x200000, CRC(493d0103) SHA1(fda68fb089328cabb3bbd52f8703b445a9509bf1) )
 	ROM_LOAD16_BYTE( "basara-l.u30", 0x200000, 0x080000, CRC(fd88b068) SHA1(a86e3ffc870e6f6f7f18273428b24d938d6b9c3d) )
 	ROM_RELOAD(                      0x300000, 0x080000             )
 	ROM_LOAD16_BYTE( "basara-h.u31", 0x200001, 0x080000, CRC(91d641e6) SHA1(4987d1771a90c9f1ce45c2dd2de5b2922d5d19c5) )
 	ROM_RELOAD(                      0x300001, 0x080000             )
 
-	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_REGION( 0x2000000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* Sprites */
 	ROM_LOAD( "a0.u1", 0x0000000, 0x800000, CRC(a6306c75) SHA1(bad715e53426a295d3571c025e0539d5f81ce5ab) )
 	ROM_LOAD( "b0.u2", 0x0800000, 0x800000, CRC(227cbd9f) SHA1(a02787943b659508ce1589cdc7a372cc02826a10) )
 	ROM_LOAD( "c0.u3", 0x1000000, 0x800000, CRC(54ede017) SHA1(4a7ff7ff8ec5843837016f35a588983b5ace06ff) )
 	ROM_LOAD( "d0.u4", 0x1800000, 0x800000, CRC(4be8479d) SHA1(cbb5943dfae86f4d571459263199a63399dedc20) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "s0.u36", 0x000000, 0x200000, CRC(2b381b33) SHA1(b9dd13651e4b8d0b9e3bc4c592022f31ea634d19) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND2, ROMREGION_ERASE | 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.1", ROMREGION_ERASE | 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "s1.u37", 0x000000, 0x200000, CRC(11cd7098) SHA1(f75288b5c89df039dfb41d66bd275cda8605e75a) )
 ROM_END
 
@@ -4671,7 +4671,7 @@ Notes:
 ****************************************************************************/
 
 ROM_START( gdfs )
-	ROM_REGION16_LE( 0x400000, REGION_USER1, 0 )		/* V60 Code */
+	ROM_REGION16_LE( 0x400000, RGNCLASS_USER, "user1", 0 )		/* V60 Code */
 	ROM_LOAD16_WORD( "vg004-14.u3",   0x000000, 0x100000, CRC(d88254df) SHA1(ccdfd42e4ce3941018f83e300da8bf7a5950f65c) )
 	ROM_RELOAD(0x100000,0x100000)
 	ROM_LOAD16_BYTE( "ssv2set0.u1",   0x200000, 0x080000, CRC(c23b9e2c) SHA1(9026e065252981fb403255ddc5782359c0088e8a) )
@@ -4679,12 +4679,12 @@ ROM_START( gdfs )
 	ROM_LOAD16_BYTE( "ssv2set1.u2",   0x200001, 0x080000, CRC(d7d52570) SHA1(12e7531519a0a4331e409991265908fb518286ef) )
 	ROM_RELOAD(0x300001,0x80000)
 
-	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "vg004-09.u43", 0x000000, 0x200000, CRC(b7382cfa) SHA1(df735470181c16f8aac0e3be76e1ed53a32dbb9c) )
 	ROM_LOAD( "vg004-10.u45", 0x200000, 0x200000, CRC(b3c6b1cb) SHA1(c601213e35d8dfd1244921da5c093f82145706d2) )
 	ROM_LOAD( "vg004-11.u48", 0x400000, 0x200000, CRC(1491def1) SHA1(344043302c81b4118cac4f692375b8af7ea68570) )
 
-	ROM_REGION( 0x1000000, REGION_GFX2, /*ROMREGION_DISPOSE*/0 )	// Zooming Sprites, read by a blitter
+	ROM_REGION( 0x1000000, RGNCLASS_GFX, "gfx2", /*ROMREGION_DISPOSE*/0 )	// Zooming Sprites, read by a blitter
 	ROM_LOAD( "vg004-01.u33", 0x0000000, 0x200000, CRC(aa9a81c2) SHA1(a7d005f9be199e317aa4c6aed8a2ab322fe82119) )
 	ROM_LOAD( "vg004-02.u34", 0x0200000, 0x200000, CRC(fa40ecb4) SHA1(0513f3b6879dc7d207646d949d6ddb7251f77bcc) )
 	ROM_LOAD( "vg004-03.u35", 0x0400000, 0x200000, CRC(90004023) SHA1(041edb77b34e6677ac5b85ce542d87a9bb1baf31) )
@@ -4694,21 +4694,21 @@ ROM_START( gdfs )
 	ROM_LOAD( "vg004-07.u39", 0x0c00000, 0x200000, CRC(5e89fcf9) SHA1(db727ec8117e84c98037c756715e28fd5e39972a) )
 	ROM_LOAD( "vg004-08.u40", 0x0e00000, 0x200000, CRC(6b1746dc) SHA1(35e5ee02975474985a4a611dcc439fc3050b7f94) )
 
-	ROM_REGION( 0x80000, REGION_GFX3, ROMREGION_DISPOSE )	// Tilemap
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE )	// Tilemap
 	ROM_LOAD( "ssvv7.u16",    0x0000000, 0x080000, CRC(f1c3ab6f) SHA1(b7f54f7ae60650fee7570aa4dd4266c629149673) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.0", 0 )	/* Samples */
 	ROM_LOAD16_BYTE( "vg004-12.u4", 0x000000, 0x200000, CRC(eb41a4ef) SHA1(f4d0844a3c00cf90faa59ae982744b7f0bcbe218) )
 	ROM_LOAD16_BYTE( "vg004-13.u5", 0x000001, 0x200000, CRC(a4ed3977) SHA1(5843d56f69789e70ce0201a693ffae322b628459) )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND2, 0 )	/* Samples */
-	ROM_COPY( REGION_SOUND1, 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.1", 0 )	/* Samples */
+	ROM_COPY( RGNCLASS_SOUND, "ensoniq.0", 0x000000, 0x000000, 0x400000 )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND3, 0 ) /* Samples */
-	ROM_COPY( REGION_SOUND1, 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.2", 0 ) /* Samples */
+	ROM_COPY( RGNCLASS_SOUND, "ensoniq.0", 0x000000, 0x000000, 0x400000 )
 
-	ROM_REGION16_BE( 0x400000, REGION_SOUND4, 0 ) /* Samples */
-	ROM_COPY( REGION_SOUND1, 0x000000, 0x000000, 0x400000 )
+	ROM_REGION16_BE( 0x400000, RGNCLASS_SOUND, "ensoniq.3", 0 ) /* Samples */
+	ROM_COPY( RGNCLASS_SOUND, "ensoniq.0", 0x000000, 0x000000, 0x400000 )
 ROM_END
 
 /***************************************************************************

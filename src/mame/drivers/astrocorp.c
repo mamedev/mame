@@ -223,7 +223,7 @@ static const gfx_layout layout_16x16x8 =
 };
 
 static GFXDECODE_START( astrocorp )
-	{ REGION_GFX1, 0, &layout_16x16x8, 0, 1 },
+	GFXDECODE_ENTRY("gfx1", 0, layout_16x16x8, 0, 1)
 GFXDECODE_END
 
 
@@ -275,7 +275,7 @@ static MACHINE_DRIVER_START( astrocorp )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_20MHz/16)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -316,22 +316,22 @@ Hardware info by f205v
 ***************************************************************************/
 
 ROM_START( showhand )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD16_BYTE( "1-8.even.u16", 0x00000, 0x10000, CRC(cf34bf0d) SHA1(72ad7ca63ef89451b2572d64cccfa764b9d9b353) )
 	ROM_LOAD16_BYTE( "2-8.odd.u17",  0x00001, 0x10000, CRC(dd031c36) SHA1(198d0e685dd2d824a04c787f8a17c173efa272d9) )
 
-	ROM_REGION( 0x200000, REGION_GFX1, 0 )
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "4.even.u26", 0x000000, 0x100000, CRC(8a706e42) SHA1(989688ee3a5e4fc11fb502e43c9d6012488982ee) )
 	ROM_LOAD16_BYTE( "3.odd.u26",  0x000001, 0x100000, CRC(a624b750) SHA1(fc5b09f8a10cba5fb2474e1edd62a0400177a5ad) )
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 )
 	ROM_LOAD( "5", 0x00000, 0x80000, CRC(e6987122) SHA1(fb3e7c2399057c64b5c496a393f6f22a1e54c844) )
 ROM_END
 
 static DRIVER_INIT( showhand )
 {
 /*
-    UINT16 *rom = (UINT16*)memory_region(machine, REGION_CPU1);
+    UINT16 *rom = (UINT16*)memory_region(machine, RGNCLASS_CPU, "main");
 
     rom[0x0a1a/2] = 0x6000; // hopper jam
 

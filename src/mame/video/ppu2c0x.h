@@ -89,7 +89,7 @@ struct _ppu2c0x_interface
 {
 	ppu_t			type;							// model/version of the PPU
 	int				num;							/* number of chips ( 1 to MAX_PPU ) */
-	int				vrom_region[MAX_PPU];			/* region id of gfx vrom (or REGION_INVALID if none) */
+	const char *	vrom_region[MAX_PPU];			/* region id of gfx vrom (or REGION_INVALID if none) */
 	int				gfx_layout_number[MAX_PPU];		/* gfx layout number used by each chip */
 	int				color_base[MAX_PPU];			/* color base to use per ppu */
 	int				mirroring[MAX_PPU];				/* mirroring options (PPU_MIRROR_* flag) */

@@ -7,7 +7,7 @@
 #define __K054539_H__
 
 struct K054539interface {
-	int region;						/* memory regions of sample ROM(s) */
+	const char *rgnoverride;
 	void (*apan)(double, double);	/* Callback for analog output mixing levels (0..1 for each channel) */
 	void (*irq)(running_machine *);
 };

@@ -268,13 +268,13 @@ static WRITE8_HANDLER( hanamai_keyboard_w )
 
 static WRITE8_HANDLER( dynax_rombank_w )
 {
-	UINT8 *ROM = memory_region(machine, REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
 	memory_set_bankptr(1,&ROM[0x08000+0x8000*(data & 0x0f)]);
 }
 
 static WRITE8_HANDLER( jantouki_sound_rombank_w )
 {
-	UINT8 *ROM = memory_region(machine, REGION_CPU2);
+	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "sound");
 	memory_set_bankptr(2,&ROM[0x08000+0x8000*data]);
 }
 
@@ -283,7 +283,7 @@ static int hnoridur_bank;
 
 static WRITE8_HANDLER( hnoridur_rombank_w )
 {
-	UINT8 *ROM = memory_region(machine, REGION_CPU1) + 0x10000 + 0x8000*data;
+	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main") + 0x10000 + 0x8000*data;
 //logerror("%04x: rom bank = %02x\n",activecpu_get_pc(),data);
 	memory_set_bankptr(1,ROM);
 	hnoridur_bank = data;
@@ -315,7 +315,7 @@ static WRITE8_HANDLER( hnoridur_palette_w )
 		// hnoridur: R/W RAM
 		case 0x18:
 		{
-			UINT8 *RAM = memory_region(machine, REGION_CPU1) + 0x10000 + hnoridur_bank * 0x8000;
+			UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main") + 0x10000 + hnoridur_bank * 0x8000;
 			RAM[offset] = data;
 			return;
 		}
@@ -654,7 +654,7 @@ static READ8_HANDLER( yarunara_input_r )
 
 static WRITE8_HANDLER( yarunara_rombank_w )
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU1) + 0x10000 + 0x8000 * data;
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main") + 0x10000 + 0x8000 * data;
 	memory_set_bankptr(1, rom);
 
 	hnoridur_bank = data;
@@ -876,7 +876,7 @@ static READ8_HANDLER( jantouki_blitter_busy_r )
 
 static WRITE8_HANDLER( jantouki_rombank_w )
 {
-	UINT8 *ROM = memory_region(machine, REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
 	memory_set_bankptr(1,&ROM[0x8000 + 0x8000*(data&0x0f)]);
 	set_led_status(0,data & 0x10);	// maybe
 }
@@ -1097,7 +1097,7 @@ static READ8_HANDLER( htengoku_coin_r )
 
 static WRITE8_HANDLER( htengoku_rombank_w )
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU1) + 0x10000 + 0x8000 * (data & 0x7);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main") + 0x10000 + 0x8000 * (data & 0x7);
 	memory_set_bankptr(1, rom);
 
 	hnoridur_bank = data;
@@ -1282,7 +1282,7 @@ static WRITE8_HANDLER( tenkai_palette_w )
 
 static void tenkai_update_rombank(void)
 {
-	romptr = memory_region(Machine, REGION_CPU1) + 0x10000 + 0x8000 * rombank;
+	romptr = memory_region(Machine, RGNCLASS_CPU, "main") + 0x10000 + 0x8000 * rombank;
 //  logerror("rombank = %02x\n",rombank);
 }
 
@@ -4218,11 +4218,11 @@ Custom: (TC17G032AP-0246)
 ***************************************************************************/
 
 ROM_START( hanamai )
-	ROM_REGION( 0x90000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x90000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "1611.13a", 0x00000, 0x10000, CRC(5ca0b073) SHA1(56b64077e7967fdbb87a7685ca9662cc7881b5ec) )
 	ROM_LOAD( "1610.14a", 0x48000, 0x10000, CRC(b20024aa) SHA1(bb6ce9821c1edbf7d4cfadc58a2b257755856937) )
 
-	ROM_REGION( 0xf0000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0xf0000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "1604.12e", 0x000000, 0x20000, CRC(3b8362f7) SHA1(166ce1fe5c48b02b728cf9b90f3dfae4461a3e2c) )
 	ROM_LOAD( "1609.12c", 0x020000, 0x20000, CRC(91c5d211) SHA1(343ee4273e8075ba9c2f545c1ee2e403623e3185) )
 	ROM_LOAD( "1603.13e", 0x040000, 0x20000, CRC(16a2a680) SHA1(7cd5de9a36fd05261d23f0a0e90d871b132368f0) )
@@ -4232,11 +4232,11 @@ ROM_START( hanamai )
 	ROM_LOAD( "1601.15e", 0x0c0000, 0x20000, CRC(84ff07af) SHA1(d7259056c4e09171aa8b9342ebaf3b8a3490613a) )
 	ROM_LOAD( "1606.15c", 0x0e0000, 0x10000, CRC(ce7146c1) SHA1(dc2e202a67d1618538eb04248c1b2c7d7f62151e) )
 
-	ROM_REGION( 0x30000, REGION_GFX2, 0 )	// blitter data
+	ROM_REGION( 0x30000, RGNCLASS_GFX, "gfx2", 0 )	// blitter data
 	ROM_LOAD( "1605.10e", 0x00000, 0x10000, CRC(0f4fd9e4) SHA1(8bdc8b46bf4dafead25a5adaebb74d547386ce23) )
 	ROM_LOAD( "1612.10c", 0x20000, 0x10000, CRC(8d9fb6e1) SHA1(2763f73069147d62fd46bb961b64cc9598687a28) )
 
-	ROM_REGION( 0x400, REGION_PROMS, ROMREGION_DISPOSE )	// Color PROMs
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )	// Color PROMs
 	ROM_LOAD( "2.3j",  0x000, 0x200, CRC(7b0618a5) SHA1(df3aadcc7d54fab0c07f85d20c138a45798644e4) )	// FIXED BITS (0xxxxxxx)
 	ROM_LOAD( "1.4j",  0x200, 0x200, CRC(9cfcdd2d) SHA1(a649e9381754c4a19ccecc6e558067cc3ff27f91) )
 ROM_END
@@ -4261,11 +4261,11 @@ Custom: (TC17G032AP-0246)
 ***************************************************************************/
 
 ROM_START( hnkochou )
-	ROM_REGION( 0x90000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x90000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "2009.s4a", 0x00000, 0x10000, CRC(b3657123) SHA1(3385edb2055abc7be3abb030509c6ac71907a5f3) )
 	ROM_LOAD( "2008.s3a", 0x18000, 0x10000, CRC(1c009be0) SHA1(0f950d2685f8b67f37065e19deae0cf0cb9594f1) )
 
-	ROM_REGION( 0x0e0000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x0e0000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "2004.12e", 0x000000, 0x20000, CRC(178aa996) SHA1(0bc8b7c093ed46a91c5781c03ae707d3dafaeef4) )
 	ROM_LOAD( "2005.12c", 0x020000, 0x20000, CRC(ca57cac5) SHA1(7a55e1cb5cee5a38c67199f589e0c7ae5cd907a0) )
 	ROM_LOAD( "2003.13e", 0x040000, 0x20000, CRC(092edf8d) SHA1(3d030462f96edbb0fa4efcc2a5302c17661dce54) )
@@ -4274,7 +4274,7 @@ ROM_START( hnkochou )
 	ROM_LOAD( "2007.14c", 0x0a0000, 0x20000, CRC(d0f22355) SHA1(7b027930624ff1f883d620a8e78f962e821f4b23) )
 	ROM_LOAD( "2001.15e", 0x0c0000, 0x20000, CRC(09ace2b5) SHA1(1756e3a52523557aa481c6bd6cdf168567af82ff) )
 
-	ROM_REGION( 0x400, REGION_PROMS, ROMREGION_DISPOSE )	// Color PROMs
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )	// Color PROMs
 	ROM_LOAD( "2.3j",  0x000, 0x200, CRC(7b0618a5) SHA1(df3aadcc7d54fab0c07f85d20c138a45798644e4) )	// FIXED BITS (0xxxxxxx)
 	ROM_LOAD( "1.4j",  0x200, 0x200, CRC(9cfcdd2d) SHA1(a649e9381754c4a19ccecc6e558067cc3ff27f91) )
 ROM_END
@@ -4298,11 +4298,11 @@ Custom chip: DYNAX TC17G032AP-0246 JAPAN 8929EAI
 ***************************************************************************/
 
 ROM_START( hnoridur )
-	ROM_REGION( 0x10000 + 0x19*0x8000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x10000 + 0x19*0x8000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "2309.12",  0x00000, 0x20000, CRC(5517dd68) SHA1(3da27032a412b51b67e852b61166c2fdc138a370) )
 	ROM_RELOAD(           0x10000, 0x20000 )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "2302.21",  0x000000, 0x20000, CRC(9dde2d59) SHA1(96df4ba97ee9611d9a3c7bcaae9cd97815a7b8a5) )
 	ROM_LOAD( "2303.22",  0x020000, 0x20000, CRC(1ac59443) SHA1(e70fe6184e7090cf7229d83b87db65f7715de2a8) )
 	ROM_LOAD( "2301.20",  0x040000, 0x20000, CRC(24391ddc) SHA1(6a2e3fae4b6d0b1d8073306f37c9fdaa04b69eb8) )
@@ -4340,11 +4340,11 @@ Dynax 1989
 ***************************************************************************/
 
 ROM_START( drgpunch )
-	ROM_REGION( 0x90000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x90000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "2401.3d", 0x00000, 0x10000, CRC(b310709c) SHA1(6ad6cfb54856f65a888ac44e694890f32f26e049) )
 	ROM_LOAD( "2402.6d", 0x28000, 0x10000, CRC(d21ed237) SHA1(7e1c7b40c300578132ebd79cbad9f7976cc85947) )
 
-	ROM_REGION( 0xc0000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0xc0000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "2403.6c", 0x00000, 0x20000, CRC(b936f202) SHA1(4920d29a814ebdd74ce6f780cf821c8cb8142d9f) )
 	ROM_LOAD( "2404.5c", 0x20000, 0x20000, CRC(2ee0683a) SHA1(e29225e08be11f6971fa04ce2715be914d29976b) )
 	ROM_LOAD( "2405.3c", 0x40000, 0x20000, CRC(aefbe192) SHA1(9ed0ec7d6357eedec80a90364f196e43a5bfee03) )
@@ -4352,21 +4352,21 @@ ROM_START( drgpunch )
 	ROM_LOAD( "2407.6a", 0x80000, 0x20000, CRC(f3f1b065) SHA1(531317e4d1ab5db60595ca3327234a6bdea79ce9) )
 	ROM_LOAD( "2408.5a", 0xa0000, 0x20000, CRC(3a91e2b9) SHA1(b762c38ff2ebbd4ed832ca772973a15dd4a4ad73) )
 
-	ROM_REGION( 0x400, REGION_PROMS, ROMREGION_DISPOSE )	// Color PROMs
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )	// Color PROMs
 	ROM_LOAD( "2.18g", 0x000, 0x200, CRC(9adccc33) SHA1(acf4d5a28430378dbccc1b9fa0b6391cc8149fee) )	// FIXED BITS (0xxxxxxx)
 	ROM_LOAD( "1.17g", 0x200, 0x200, CRC(324fa9cf) SHA1(a03e23d9a9687dec4c23a8e41254a3f4b70c7e25) )
 ROM_END
 
 ROM_START( sprtmtch )
-	ROM_REGION( 0x90000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x90000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "3101.3d", 0x00000, 0x08000, CRC(d8fa9638) SHA1(9851d38b6b3f56cf3cc101419c24f8d5f97950a9) )
 	ROM_CONTINUE(        0x28000, 0x08000 )
 
-	ROM_REGION( 0x40000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "3102.6c", 0x00000, 0x20000, CRC(46f90e59) SHA1(be4411c3cfa8c8ab26eba935289df0f0fd545b62) )
 	ROM_LOAD( "3103.5c", 0x20000, 0x20000, CRC(ad29d7bd) SHA1(09ab84164e5cd14b595f33d129863735901aa922) )
 
-	ROM_REGION( 0x400, REGION_PROMS, ROMREGION_DISPOSE )	// Color PROMs
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )	// Color PROMs
 	ROM_LOAD( "18g", 0x000, 0x200, CRC(dcc4e0dd) SHA1(4e0fb8fd7192bf32247966742df4b80585f32c37) )	// FIXED BITS (0xxxxxxx)
 	ROM_LOAD( "17g", 0x200, 0x200, CRC(5443ebfb) SHA1(5b63220a3f6520e353db99b06e645640d1cfde2f) )
 ROM_END
@@ -4388,17 +4388,17 @@ Custom chip: DYNAX TC17G032AP-0246 JAPAN 8828EAI
 ***************************************************************************/
 
 ROM_START( mjfriday )
-	ROM_REGION( 0x90000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x90000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "2606.2b",  0x00000, 0x10000, CRC(00e0e0d3) SHA1(89fa4d684ec36d5e974e39294efd65a9fd832517) )
 	ROM_LOAD( "2605.2c",  0x28000, 0x10000, CRC(5459ebda) SHA1(86e51f0c120de87be8f51b498a562360e6b242b8) )
 
-	ROM_REGION( 0x80000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "2601.2h",  0x000000, 0x20000, CRC(70a01fc7) SHA1(0ed2f7c258f3cd82229bea7514d262fca57bd925) )
 	ROM_LOAD( "2602.2g",  0x020000, 0x20000, CRC(d9167c10) SHA1(0fa34a065b3ffd5d35d03275bdcdf753045d6491) )
 	ROM_LOAD( "2603.2f",  0x040000, 0x20000, CRC(11892916) SHA1(0680ab77fc1a2cdb78637bf0c506f03ca514014b) )
 	ROM_LOAD( "2604.2e",  0x060000, 0x20000, CRC(3cc1a65d) SHA1(221dc17042e46e58dc4634eef798568747aef3a2) )
 
-	ROM_REGION( 0x400, REGION_PROMS, ROMREGION_DISPOSE )	// Color PROMs
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )	// Color PROMs
 	ROM_LOAD( "d26_2.9e", 0x000, 0x200, CRC(d6db5c60) SHA1(89ee10d092011c2c4eaab2c097aa88f5bb98bb97) )	// FIXED BITS (0xxxxxxx)
 	ROM_LOAD( "d26_1.8e", 0x200, 0x200, CRC(af5edf32) SHA1(7202e0aa1ee3f22e3c5fb69a88db455a241929c5) )
 ROM_END
@@ -4433,31 +4433,31 @@ Notes:
 ***************************************************************************/
 
 ROM_START( maya )
-	ROM_REGION( 0x90000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x90000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "1.17e", 0x00000, 0x10000, CRC(5aaa015e) SHA1(b84d02b1b6c07636176f226fef09a034d00445f0) )
 	ROM_LOAD( "2.15e", 0x28000, 0x10000, CRC(7ea5b49a) SHA1(aaae848669d9f88c0660f46cc801e4eb0f5e3b89) )
 
-	ROM_REGION( 0xc0000, REGION_GFX1, 0 )
+	ROM_REGION( 0xc0000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD( "3.18g", 0x00000, 0x40000, CRC(8534af04) SHA1(b9bc94541776b5c0c6bf0ecc63ffef914756376e) )
 	ROM_LOAD( "4.17g", 0x40000, 0x40000, CRC(ab85ce5e) SHA1(845b846e0fb8c9fcd1540960cda006fdac364fea) )
 	ROM_LOAD( "5.15g", 0x80000, 0x40000, CRC(c4316dec) SHA1(2e727a491a71eb1f4d9f338cc6ec76e03f7b46fd) )
 
-	ROM_REGION( 0x400, REGION_PROMS, ROMREGION_DISPOSE )	// Color PROMs
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )	// Color PROMs
 	ROM_LOAD( "prom2.5b",  0x000, 0x200, CRC(d276bf61) SHA1(987058b37182a54a360a80a2f073b000606a11c9) )	// FIXED BITS (0xxxxxxx)
 	ROM_LOAD( "prom1.6b",  0x200, 0x200, CRC(e38eb360) SHA1(739960dd57ec3305edd57aa63816a81ddfbebf3e) )
 ROM_END
 
 ROM_START( inca )
-	ROM_REGION( 0x90000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x90000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "am27c512.1", 0x00000, 0x10000, CRC(b0d513f7) SHA1(65ef4702302bbfc7c7a77f7353120ee3f5c94b31) )
 	ROM_LOAD( "2.15e", 0x28000, 0x10000, CRC(7ea5b49a) SHA1(aaae848669d9f88c0660f46cc801e4eb0f5e3b89) )
 
-	ROM_REGION( 0xc0000, REGION_GFX1, 0 )
+	ROM_REGION( 0xc0000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD( "m27c2001.3", 0x00000, 0x40000, CRC(3a3c54ea) SHA1(2743c6a66d3eff60080c9183fa2bf9081207ac6b) )
 	ROM_LOAD( "am27c020.4", 0x40000, 0x40000, CRC(d3571d63) SHA1(5f0abb0da19af34bbd3eb93270311e824839deb4) )
 	ROM_LOAD( "m27c2001.5", 0x80000, 0x40000, CRC(bde60c29) SHA1(3ff7fbd5978bec27ff2ecf5977f640c66058e45d) )
 
-	ROM_REGION( 0x400, REGION_PROMS, ROMREGION_DISPOSE )	// Color PROMs
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )	// Color PROMs
 	ROM_LOAD( "n82s147n.2",  0x000, 0x200, CRC(268bd9d3) SHA1(1f77d9dc58ab29f013ee21d7ec521b90be72610d) )	// FIXED BITS (0xxxxxxx)
 	ROM_LOAD( "n82s147n.1",  0x200, 0x200, CRC(618dbeb3) SHA1(10c8a558430fd1c2cabf9133d3e4f0a5f80eab83) )
 ROM_END
@@ -4499,16 +4499,16 @@ Notes:
  */
 
 ROM_START( blktouch )
-	ROM_REGION( 0x90000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x90000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "u43_d8",  0x00000, 0x10000, CRC(0972ab8c) SHA1(ff751fbb37562f216a4fddebd9190acee1f357c8) )
 	ROM_LOAD( "u45_d10", 0x28000, 0x10000, CRC(5745424a) SHA1(d244d9a9b4c49d255f114842147ba0a795a3e9ac) )
 
-	ROM_REGION( 0xc0000, REGION_GFX1, 0 )
+	ROM_REGION( 0xc0000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD( "u33_g1", 0x80000, 0x40000, CRC(88737a8b) SHA1(9d812ee732f6cc43c78d8585dabf1b51ed4b89ba) )
 	ROM_LOAD( "u34_h1", 0x40000, 0x40000, CRC(07216e11) SHA1(402b201c665503a2c9bb1b2f74da0c3db5c3f660) )
 	ROM_LOAD( "u35_i1", 0x00000, 0x40000, CRC(4ae52ccb) SHA1(84c9466e6f574ec99947084a2e8a336935ad4186) )
 
-	ROM_REGION( 0x400, REGION_PROMS, ROMREGION_DISPOSE )	// Color PROMs
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )	// Color PROMs
 	ROM_LOAD( "u12",  0x200, 0x200, CRC(80d282ff) SHA1(3ad8dc61fe098ceac3a4be8742c1b360dfa7223a) )
 	ROM_LOAD( "u13",  0x000, 0x200, CRC(6984aaa9) SHA1(91645cd944cb21266edd13e55a8dc846f6edc419) )
 ROM_END
@@ -4516,7 +4516,7 @@ ROM_END
 static DRIVER_INIT( blktouch )
 {
 	// fearsome encryption ;-)
-	UINT8	*src = (UINT8 *)memory_region(machine, REGION_CPU1);
+	UINT8	*src = (UINT8 *)memory_region(machine, RGNCLASS_CPU, "main");
 	int i;
 
 	for (i=0;i<0x90000;i++)
@@ -4525,7 +4525,7 @@ static DRIVER_INIT( blktouch )
 
 	}
 
-	src = (UINT8 *)memory_region(machine, REGION_GFX1);
+	src = (UINT8 *)memory_region(machine, RGNCLASS_GFX, "gfx1");
 
 	for (i=0;i<0xc0000;i++)
 	{
@@ -4538,8 +4538,8 @@ static DRIVER_INIT( maya )
 {
 	/* Address lines scrambling on 1 z80 rom */
 	int i;
-	UINT8	*gfx = (UINT8 *)memory_region(machine, REGION_GFX1);
-	UINT8	*rom = memory_region(machine, REGION_CPU1) + 0x28000,
+	UINT8	*gfx = (UINT8 *)memory_region(machine, RGNCLASS_GFX, "gfx1");
+	UINT8	*rom = memory_region(machine, RGNCLASS_CPU, "main") + 0x28000,
 			*end = rom + 0x10000;
 	for (;rom < end; rom+=8)
 	{
@@ -4575,21 +4575,21 @@ CRT Controller: HD46505SP (6845)
 ***************************************************************************/
 
 ROM_START( mjdialq2 )
-	ROM_REGION( 0x78000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x78000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "5201.2b", 0x00000, 0x10000, CRC(5186c2df) SHA1(f05ae3fd5e6c39f3bf2263eaba645d89c454bd70) )
 	ROM_RELOAD(          0x10000, 0x08000 )				// 1
 	ROM_CONTINUE(        0x20000, 0x08000 )				// 3
 	ROM_LOAD( "5202.2c", 0x30000, 0x08000, CRC(8e8b0038) SHA1(44130bb29b569610826e1fc7e4b2822f0e1034b1) )	// 5
 	ROM_CONTINUE(        0x70000, 0x08000 )				// d
 
-	ROM_REGION( 0xa0000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0xa0000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "5207.2h", 0x00000, 0x20000, CRC(7794cd62) SHA1(7fa2fd50d7c975c381dda36f505df0e152196bb5) )
 	ROM_LOAD( "5206.2g", 0x20000, 0x20000, CRC(9e810021) SHA1(cf1052c96b9da3abb263be1ce8481aeded2c5d00) )
 	ROM_LOAD( "5205.2f", 0x40000, 0x20000, CRC(8c05572f) SHA1(544a5eb8b989fb1195986ed856da04350941ef59) )
 	ROM_LOAD( "5204.2e", 0x60000, 0x20000, CRC(958ef9ab) SHA1(ec768c587dc9e6b691564b6b35abbece252bcd28) )
 	ROM_LOAD( "5203.2d", 0x80000, 0x20000, CRC(706072d7) SHA1(d4692296d234b824961a94390e6d646ed9a7d5fd) )
 
-	ROM_REGION( 0x400, REGION_PROMS, ROMREGION_DISPOSE )	// Color PROMs
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )	// Color PROMs
 	ROM_LOAD( "d52-2.9e", 0x000, 0x200, CRC(18585ce3) SHA1(7f2e20bb09c1d810910094a6b19e5151666d74ac) )	// FIXED BITS (0xxxxxxx)
 	ROM_LOAD( "d52-1.8e", 0x200, 0x200, CRC(8868247a) SHA1(97652025c411b379dfab576dc7f2d8d0d61d0828) )
 ROM_END
@@ -4645,15 +4645,15 @@ DYNAX NL-001 WD10100
 ***************************************************************************/
 
 ROM_START( yarunara )
-	ROM_REGION( 0x10000 + 0x1d*0x8000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x10000 + 0x1d*0x8000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "5501m.2d",  0x00000, 0x20000, CRC(d86fade5) SHA1(4ae5e22972eb4ead9aa4a455ff1a18e128c33ed6) )
 	ROM_RELOAD(            0x10000, 0x20000 )
 	ROM_LOAD( "5502m.4d",  0x30000, 0x20000, CRC(1ef09ff0) SHA1(bbedcc1c0f5b43c78e0c3ce0fc1a3c28025562ec) )
 
-	ROM_REGION( 0x80000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "5507m.13c", 0x000000, 0x80000, CRC(7de17b26) SHA1(326667063ab045ac50e850f2f7821a65317879ad) )
 
-	ROM_REGION( 0xc0000, REGION_GFX2, 0 )	// blitter data
+	ROM_REGION( 0xc0000, RGNCLASS_GFX, "gfx2", 0 )	// blitter data
 	ROM_LOAD( "5508m.16c", 0x00000, 0x20000, CRC(ced3155b) SHA1(658e3947781f1be2ee87b43952999281c66683a6) )
 	ROM_LOAD( "5509m.17c", 0x20000, 0x20000, CRC(ca46ed48) SHA1(0769ac0b211181b7b57033f09f72828c885186cc) )
 	ROM_LOAD( "5506m.11c", 0x40000, 0x20000, CRC(161058fd) SHA1(cfc21abdc036e874d34bfa3c60486a5ab87cf9cd) )
@@ -4661,10 +4661,10 @@ ROM_START( yarunara )
 	ROM_LOAD( "5504m.9c",  0x80000, 0x20000, CRC(6ac42304) SHA1(ce822da6d61e68578c08c9f1d0af1557c64ac5ae) )
 	ROM_LOAD( "5503m.8c",  0xa0000, 0x20000, CRC(9276a10a) SHA1(5a68fff20631a2002509d6cace06b5a9fa0e75d2) )
 
-	ROM_REGION( 0x80000, REGION_GFX3, 0 )	// blitter data
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx3", 0 )	// blitter data
 	ROM_LOAD( "5515m.4b",  0x00000, 0x80000, CRC(ef130237) SHA1(2c8f7a15249115b2cdcb3a8e0896ea8601e323d9) )
 
-	ROM_REGION( 0xa0000, REGION_GFX4, 0 )	// blitter data
+	ROM_REGION( 0xa0000, RGNCLASS_GFX, "gfx4", 0 )	// blitter data
 	ROM_LOAD( "5514m.2b",  0x00000, 0x20000, CRC(ac714bb7) SHA1(64056cbed9d0c4f68611921754c3e6a9bb14f7cc) )
 	ROM_LOAD( "5513m.1b",  0x20000, 0x20000, CRC(32b7bcbd) SHA1(13277ae3f158da332e69c6f4f8828dfabbf3ea0a) )
 	ROM_LOAD( "5512m.4a",  0x40000, 0x20000, CRC(b4220316) SHA1(b0797c9c6ab226520d29c780ea709f62e02dd268) )
@@ -4712,15 +4712,15 @@ dumped by sayu
 ***************************************************************************/
 
 ROM_START( hanayara )
-	ROM_REGION( 0x50000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x50000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "5501h.2d", 0x00000, 0x20000, CRC(124860b7) SHA1(205459d95f876433a9ca329fe31cfe9b08023baf) )
 	ROM_RELOAD(           0x10000, 0x20000 )
 	ROM_LOAD( "5502h.4d", 0x30000, 0x20000, CRC(93407801) SHA1(63dc3419f97d86221dbdd67b5be41d713364496b) )
 
-	ROM_REGION( 0xd0000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0xd0000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "5507h.13c", 0x00000, 0x80000, CRC(7de17b26) SHA1(326667063ab045ac50e850f2f7821a65317879ad) )
 
-	ROM_REGION( 0xc0000, REGION_GFX2, 0 )	// blitter data
+	ROM_REGION( 0xc0000, RGNCLASS_GFX, "gfx2", 0 )	// blitter data
 	ROM_LOAD( "5508h.16c", 0x00000, 0x20000, CRC(ced3155b) SHA1(658e3947781f1be2ee87b43952999281c66683a6) )
 	ROM_LOAD( "5509h.17c", 0x20000, 0x20000, CRC(ca46ed48) SHA1(0769ac0b211181b7b57033f09f72828c885186cc) )
 	ROM_LOAD( "5506h.11c", 0x40000, 0x20000, CRC(161058fd) SHA1(cfc21abdc036e874d34bfa3c60486a5ab87cf9cd) )
@@ -4728,10 +4728,10 @@ ROM_START( hanayara )
 	ROM_LOAD( "5504h.9c",  0x80000, 0x20000, CRC(6ac42304) SHA1(ce822da6d61e68578c08c9f1d0af1557c64ac5ae) )
 	ROM_LOAD( "5503h.8c",  0xa0000, 0x20000, CRC(9276a10a) SHA1(5a68fff20631a2002509d6cace06b5a9fa0e75d2) )
 
-	ROM_REGION( 0x80000, REGION_GFX3, 0 )	// blitter data
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx3", 0 )	// blitter data
 	ROM_LOAD( "5515h.4b",  0x00000, 0x80000, CRC(ca742acc) SHA1(0aab6b3bbd0a229a0d6843849704f4faf27c8f72) )
 
-	ROM_REGION( 0xa0000, REGION_GFX4, 0 )	// blitter data
+	ROM_REGION( 0xa0000, RGNCLASS_GFX, "gfx4", 0 )	// blitter data
 	ROM_LOAD( "5514h.2b",  0x00000, 0x20000, CRC(ac714bb7) SHA1(64056cbed9d0c4f68611921754c3e6a9bb14f7cc) )
 	ROM_LOAD( "5513h.1b",  0x20000, 0x20000, CRC(32b7bcbd) SHA1(13277ae3f158da332e69c6f4f8828dfabbf3ea0a) )
 	ROM_LOAD( "5512h.4a",  0x40000, 0x20000, CRC(b4220316) SHA1(b0797c9c6ab226520d29c780ea709f62e02dd268) )
@@ -4766,7 +4766,7 @@ D6410288L-1 (SUB)
 ***************************************************************************/
 
 ROM_START( quiztvqq )
-	ROM_REGION( 0x10000 + 0x28*0x8000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x10000 + 0x28*0x8000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "6401.2d",  0x000000, 0x020000, CRC(ce0e237c) SHA1(fd94a45052e3a68ef8cda2853b911a9993675fa6) )
 	// 14-17
 	ROM_RELOAD(           0x0b0000, 0x020000 )
@@ -4777,20 +4777,20 @@ ROM_START( quiztvqq )
 	// 08-0b
 	ROM_LOAD( "6403.5d",  0x050000, 0x020000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
 
-//  ROM_REGION( 0x00000, REGION_GFX1, 0 )   // blitter data
+//  ROM_REGION( 0x00000, RGNCLASS_GFX, "gfx1", 0 )   // blitter data
 //  unused
 
-//  ROM_REGION( 0x00000, REGION_GFX2, 0 )   // blitter data
+//  ROM_REGION( 0x00000, RGNCLASS_GFX, "gfx2", 0 )   // blitter data
 //  unused
 
-	ROM_REGION( 0x100000, REGION_GFX3, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx3", 0 )	// blitter data
 	ROM_LOAD( "6404.s2a", 0x00000, 0x80000, CRC(996ebe0f) SHA1(6492644aa14b0c2859add31878b5a8d7870981c8) )
 	ROM_LOAD( "6405.s2b", 0x80000, 0x20000, CRC(666bfb03) SHA1(e345a198d3e1bc69f22c6f43869ffa2b1501c4ad) )
 	ROM_LOAD( "6406.s2c", 0xa0000, 0x20000, CRC(006871ef) SHA1(ebf78b2e46e26d98a7d8952bd29e78c893243c7a) )
 	ROM_LOAD( "6407.s2d", 0xc0000, 0x20000, CRC(9cc61541) SHA1(a3c0e06c6ad77cb7b2e86a70c2e27e6a74c35f12) )
 	ROM_LOAD( "6408.s2e", 0xe0000, 0x20000, CRC(65a98946) SHA1(4528b300fa3b01d992cf50e87430105463ea3fbd) )
 
-	ROM_REGION( 0xa0000, REGION_GFX4, 0 )	// blitter data
+	ROM_REGION( 0xa0000, RGNCLASS_GFX, "gfx4", 0 )	// blitter data
 	ROM_LOAD( "6409.s2f", 0x00000, 0x20000, CRC(d5d11061) SHA1(c7ab5aedde6998d62427cc7c4bcf767e9b832a60) )
 	ROM_LOAD( "6410.s2g", 0x20000, 0x20000, CRC(bd769d46) SHA1(46f1f9e36f7b5f8deec5f7cce8c0992178ad3be0) )
 	ROM_LOAD( "6411.s2h", 0x40000, 0x20000, CRC(7bd43065) SHA1(13b4fcc4155f555ec0c7fbb2f3bb6c19c2788cf5) )
@@ -4823,7 +4823,7 @@ D6107068L-1 (SUB)
 ***************************************************************************/
 
 ROM_START( mjangels )
-	ROM_REGION( 0x10000 + 0x28*0x8000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x10000 + 0x28*0x8000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "612-01.2d",    0x000000, 0x020000, CRC(cd353ba9) SHA1(8344dc5dd482ad6d36aa1e6b5824a09a3627dc65) )
 	// 00-03
 	ROM_RELOAD(               0x010000, 0x20000 )
@@ -4836,17 +4836,17 @@ ROM_START( mjangels )
 	// 08-0b
 	ROM_LOAD( "612-03.5d",    0x050000, 0x020000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
 
-//  ROM_REGION( 0x00000, REGION_GFX1, 0 )   // blitter data
+//  ROM_REGION( 0x00000, RGNCLASS_GFX, "gfx1", 0 )   // blitter data
 //  unused
 
-//  ROM_REGION( 0x00000, REGION_GFX2, 0 )   // blitter data
+//  ROM_REGION( 0x00000, RGNCLASS_GFX, "gfx2", 0 )   // blitter data
 //  unused
 
-	ROM_REGION( 0xc0000, REGION_GFX3, 0 )	// blitter data
+	ROM_REGION( 0xc0000, RGNCLASS_GFX, "gfx3", 0 )	// blitter data
 	ROM_LOAD( "612-04.s1a",   0x00000, 0x80000, CRC(c9b568a0) SHA1(e6c68ee4871020ded48e8a92546a8183a25f331f) )
 	ROM_LOAD( "612-05.s2a",   0x80000, 0x40000, CRC(2ed51c5d) SHA1(0d912f8dc64f8fae35ca61cc0a938187a13ab328) )
 
-	ROM_REGION( 0xc0000, REGION_GFX4, 0 )	// blitter data
+	ROM_REGION( 0xc0000, RGNCLASS_GFX, "gfx4", 0 )	// blitter data
 	ROM_LOAD( "612-06.s1b",   0x00000, 0x20000, CRC(8612904d) SHA1(5386e93ad16146ce4e48e81df304e8bf9d2db199) )
 	ROM_LOAD( "612-07.s2b",   0x20000, 0x20000, CRC(0828c59d) SHA1(60c451de062c9e0000875022329450a55e913a3c) )
 	ROM_LOAD( "612-11.s6c",   0x40000, 0x20000, CRC(473b6fcd) SHA1(1b99b1370bc739f0f00671c6b6cbb3255d581b55) )
@@ -4905,13 +4905,13 @@ DYNAX TC17G032AP-0246 JAPAN 8951EAY
 ***************************************************************************/
 
 ROM_START( mcnpshnt )
-	ROM_REGION( 0x10000 + 0xc*0x8000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x10000 + 0xc*0x8000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "3318.12", 0x000000, 0x020000, CRC(e3b457a8) SHA1(b768895797157cad029ac1f652a838ecf6587d4f) )
 	ROM_RELOAD(          0x010000, 0x020000 )
 	ROM_LOAD( "3317.11", 0x030000, 0x020000, CRC(4bb62bb4) SHA1(0de5605cecb1e729a5b5b866274395945cf88aa3) )
 	ROM_LOAD( "3316.10", 0x050000, 0x020000, CRC(44006ee5) SHA1(287ffd095755dc2a1e40e667723985c9052fdcdf) )
 
-	ROM_REGION( 0xe0000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0xe0000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "3310.21", 0x00000, 0x20000, CRC(28f5f194) SHA1(ceb4605b25c49b6e6087e2e2f5db608d7e3ed0b2) )
 	ROM_LOAD( "3311.22", 0x20000, 0x20000, CRC(cddbf667) SHA1(fbf94b8fdbe09cec5469c5f09d28e4d206763f90) )
 	ROM_LOAD( "3309.20", 0x40000, 0x20000, CRC(0c7d72f0) SHA1(cbd0f29a31eab565b0e31fe1612e73164e6c61b4) )
@@ -4920,10 +4920,10 @@ ROM_START( mcnpshnt )
 	ROM_LOAD( "3314.3",  0xa0000, 0x20000, CRC(f1cf01bc) SHA1(fb02593d8b772b5e0128017998a0e15fc0708898) )
 	ROM_LOAD( "3315.4",  0xc0000, 0x20000, CRC(7cac01c7) SHA1(cee5f157a23087b97709ff860078572b389e60cb) )
 
-//  ROM_REGION( 0x00000, REGION_GFX2, 0 )   // blitter data
+//  ROM_REGION( 0x00000, RGNCLASS_GFX, "gfx2", 0 )   // blitter data
 //  unused
 
-	ROM_REGION( 0x100000, REGION_GFX3, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx3", 0 )	// blitter data
 	ROM_LOAD( "3301.1b", 0x00000, 0x20000, CRC(8ec98d60) SHA1(e98d947096abb78e91c3013ede9eae7719b1d7b9) )
 	ROM_LOAD( "3302.2b", 0x20000, 0x20000, CRC(d7024f2d) SHA1(49dfc26dc91a8632459852968766a5263be138eb) )
 	ROM_LOAD( "3303.3b", 0x40000, 0x20000, CRC(01548edc) SHA1(a64b509a744dd010997d5b2cd4d12d2767dde6c8) )
@@ -4977,13 +4977,13 @@ Custom: (TC17G032AP-0246)
 ***************************************************************************/
 
 ROM_START( 7jigen )
-	ROM_REGION( 0x10000 + 0xc*0x8000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x10000 + 0xc*0x8000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "3701.1a",  0x00000, 0x20000, CRC(ee8ab3c4) SHA1(9ccc9e9697dd452cd28e38c81cebea0b862f0642) )
 	ROM_RELOAD(           0x10000, 0x20000 )
 	ROM_LOAD( "3702.3a",  0x30000, 0x20000, CRC(4e43a0bb) SHA1(d98a1ab43dcfab3d2a17f99db797f7bfa17e5ecc) )
 	ROM_LOAD( "3703.4a",  0x50000, 0x20000, CRC(ec77b564) SHA1(5e9d5540b300e88c3ecdb53bca38830621eb0382) )
 
-	ROM_REGION( 0xc0000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0xc0000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "3713.16a", 0x00000, 0x20000, CRC(f3a745d2) SHA1(37b55e2c290b165a5afaf4c7b8539bb57dd0d927) )
 	ROM_LOAD( "3712.14a", 0x20000, 0x20000, CRC(88786680) SHA1(34a31448a9f3e287d7c7fe478736771c5ef259e2) )
 	ROM_LOAD( "3715.18a", 0x40000, 0x20000, CRC(19f7ab13) SHA1(ac11e43981e8667c2637b66d93ac052fb27e521d) )
@@ -4991,10 +4991,10 @@ ROM_START( 7jigen )
 	ROM_LOAD( "3717.17b", 0x80000, 0x20000, CRC(960cfd62) SHA1(df8ee9eb8617a5e8605170d404872e1c6f0987f0) )
 	ROM_LOAD( "3714.17a", 0xa0000, 0x20000, CRC(44ba5e35) SHA1(0c5c2b2a78aa397ea3d1264821ff717d093b81ae) )
 
-//  ROM_REGION( 0x00000, REGION_GFX2, 0 )   // blitter data
+//  ROM_REGION( 0x00000, RGNCLASS_GFX, "gfx2", 0 )   // blitter data
 //  unused
 
-	ROM_REGION( 0x100000, REGION_GFX3, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx3", 0 )	// blitter data
 	ROM_LOAD( "3704.s1b", 0x00000, 0x20000, CRC(26348ae4) SHA1(3659d18608848c58ad980a79bc1c29da238a5604) )
 	ROM_LOAD( "3705.s2b", 0x20000, 0x20000, CRC(5b5ea036) SHA1(187a7f6356ead05d8e3d9f5efa82554004429780) )
 	ROM_LOAD( "3706.s3b", 0x40000, 0x20000, CRC(7fdfb600) SHA1(ce4485e43ee6bf63b4e8e3bb91267295995c736f) )
@@ -5055,17 +5055,17 @@ Custom: (TC17G032AP-0246) x2
 ***************************************************************************/
 
 ROM_START( jantouki )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "2702.6d", 0x000000, 0x010000, CRC(9e9bea93) SHA1(c8b1a0621d3dae37d809bdbaa4ed4af73847b714) )
 	ROM_LOAD( "2701.6c", 0x010000, 0x010000, CRC(a58bc982) SHA1(5cdea3cdf3eaacb6bdf6ddb68e3d57fe53d70bb9) )
 
-	ROM_REGION( 0x68000, REGION_CPU2, 0 )	// Z80 Code
+	ROM_REGION( 0x68000, RGNCLASS_CPU, "sound", 0 )	// Z80 Code
 	ROM_LOAD( "2705.6g", 0x000000, 0x010000, CRC(9d21e4af) SHA1(454601f4cb89da53c6881f4d8109d3c0babcfe5e) )
 	// banks 4-b:
 	ROM_LOAD( "2704.6f", 0x028000, 0x020000, CRC(4bb62bb4) SHA1(0de5605cecb1e729a5b5b866274395945cf88aa3) )
 	ROM_LOAD( "2703.6e", 0x048000, 0x020000, CRC(44006ee5) SHA1(287ffd095755dc2a1e40e667723985c9052fdcdf) )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "2709.3g", 0x00000, 0x20000, CRC(e6dd4853) SHA1(85394e34eee95cd4430d062b3dbdfbe066c661b6) )
 	ROM_LOAD( "2710.3f", 0x20000, 0x20000, CRC(7ef4d92f) SHA1(414e26242e824f5d4c40a039a3f3486f84338325) )
 	ROM_LOAD( "2711.3e", 0x40000, 0x20000, CRC(8bfee4c2) SHA1(7c0e7535f7d7cd7f665e7925ff0cdab6b96a4b83) )
@@ -5075,7 +5075,7 @@ ROM_START( jantouki )
 	ROM_LOAD( "2707.5f", 0xc0000, 0x20000, CRC(4ec7a81e) SHA1(a6227ca2b648ebc1a5a5f6fbfc6412c44752b77d) )
 	ROM_LOAD( "2708.5e", 0xe0000, 0x20000, CRC(45845dc9) SHA1(cec3f82e3440f724f59d8386c8d2b0e030703ed5) )
 
-	ROM_REGION( 0x100000, REGION_GFX2, 0 )	// blitter 2 data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 )	// blitter 2 data
 	ROM_LOAD( "2718.1g", 0x00000, 0x20000, CRC(65608d7e) SHA1(28a960450d2d1cfb314c574123c2fbc61f2ded51) )
 	ROM_LOAD( "2719.1f", 0x20000, 0x20000, CRC(4cbc9361) SHA1(320d3ce504ad2e27937e7e3a761c672a22749658) )
 	ROM_LOAD( "2720.1e", 0x40000, 0x20000, CRC(4c9a25e5) SHA1(0298a5dad034b1ac113f6e07f4e9334ed6e0e89b) )
@@ -5085,10 +5085,10 @@ ROM_START( jantouki )
 	ROM_LOAD( "2715.2f", 0xc0000, 0x20000, CRC(486b7138) SHA1(623ddb0e9a9444cf0e920b78562a4748fa1c54d9) )
 	ROM_LOAD( "2716.2e", 0xe0000, 0x20000, CRC(f388b0da) SHA1(4c04509eeda3f82bf6f8940a406e17423d0210a0) )
 
-	ROM_REGION( 0x20000, REGION_GFX3, 0 )	// blitter 2 data
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx3", 0 )	// blitter 2 data
 	ROM_LOAD( "2717.2d", 0x00000, 0x20000, CRC(3666bead) SHA1(2067bb894b76be2b51649bb1144e84e6ff0ab378) )
 
-	ROM_REGION( 0x400, REGION_PROMS, ROMREGION_DISPOSE )	// Color PROMs
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )	// Color PROMs
 	ROM_LOAD( "27-2_20h.19g", 0x000000, 0x000200, CRC(32d3f091) SHA1(ab9e8f467fc85357fb900bceae32909ce1f2d9c1) )
 	ROM_LOAD( "27-1_19h.18g", 0x000200, 0x000200, CRC(9382a2a1) SHA1(0d14eb85017f87ddbe66e4f6443028e91540b36e) )
 ROM_END
@@ -5101,7 +5101,7 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( mjelctrn )
-	ROM_REGION( 0x30000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "u27b-020", 0x00000, 0x20000, CRC(7773d382) SHA1(1d2ae799677e99c7cba09b0a2c49bb9310232e80) )
 	ROM_CONTINUE(         0x00000, 0x20000 )
 	ROM_RELOAD(           0x10000, 0x20000 )
@@ -5110,43 +5110,43 @@ ROM_START( mjelctrn )
 	ROM_CONTINUE(         0x18000, 0x08000 )
 	ROM_CONTINUE(         0x10000, 0x08000 )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "eb-01.rom", 0x000000, 0x100000, CRC(e5c41448) SHA1(b8322e32b0cb3d771316c9c4f7be91de6e422a24) )
 
-	ROM_REGION( 0x080000, REGION_GFX2, 0 )	// blitter data
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx2", 0 )	// blitter data
 	ROM_LOAD( "eb-02.rom", 0x000000, 0x080000, CRC(e1f1b431) SHA1(04a612aff4c30cb8ea741f228bfa7e4289acfee8) )
 
-	ROM_REGION( 0x040000, REGION_GFX3, 0 )	// blitter data
+	ROM_REGION( 0x040000, RGNCLASS_GFX, "gfx3", 0 )	// blitter data
 	ROM_LOAD( "mj-1c020",  0x000000, 0x040000, CRC(f8e8d91b) SHA1(409e276157b328e7bbba5dda6a4c7adc020d519a) )
 ROM_END
 
 ROM_START( mjelct3 )
-	ROM_REGION( 0x30000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "se-3010", 0x00000, 0x20000, CRC(370347e7) SHA1(2dc9f1fde4efaaff887722aae6507d7e9fac8eb6) )
 	ROM_RELOAD(          0x10000, 0x08000 )
 	ROM_CONTINUE(        0x28000, 0x08000 )
 	ROM_CONTINUE(        0x20000, 0x08000 )
 	ROM_CONTINUE(        0x18000, 0x08000 )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "eb-01.rom", 0x000000, 0x100000, CRC(e5c41448) SHA1(b8322e32b0cb3d771316c9c4f7be91de6e422a24) )
 
-	ROM_REGION( 0x80000, REGION_GFX2, 0 )	// blitter data
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", 0 )	// blitter data
 	ROM_LOAD( "eb-02.rom", 0x00000, 0x80000, CRC(e1f1b431) SHA1(04a612aff4c30cb8ea741f228bfa7e4289acfee8) )
 ROM_END
 
 ROM_START( mjelct3a )
-	ROM_REGION( 0x30000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "dz-00.rom", 0x00000, 0x20000, CRC(d28358f7) SHA1(995c16e0865048069f79411574256a88d58c6be9) )
 	ROM_RELOAD(            0x10000, 0x08000 )
 	ROM_CONTINUE(          0x28000, 0x08000 )
 	ROM_CONTINUE(          0x20000, 0x08000 )
 	ROM_CONTINUE(          0x18000, 0x08000 )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "eb-01.rom", 0x000000, 0x100000, CRC(e5c41448) SHA1(b8322e32b0cb3d771316c9c4f7be91de6e422a24) )
 
-	ROM_REGION( 0x80000, REGION_GFX2, 0 )	// blitter data
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", 0 )	// blitter data
 	ROM_LOAD( "eb-02.rom", 0x00000, 0x80000, CRC(e1f1b431) SHA1(04a612aff4c30cb8ea741f228bfa7e4289acfee8) )
 ROM_END
 
@@ -5189,17 +5189,17 @@ Z84C015 - Toshiba TMPZ84C015BF-6 Z80 compatible CPU
 ***************************************************************************/
 
 ROM_START( mjelctrb )
-	ROM_REGION( 0x30000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "prog.u27", 0x00000, 0x20000, CRC(688990ca) SHA1(34825cee8f76de93f12ccf2a1021f9c5369da46a) )
 	ROM_RELOAD(          0x28000, 0x08000 )
 	ROM_CONTINUE(        0x20000, 0x08000 )
 	ROM_CONTINUE(        0x18000, 0x08000 )
 	ROM_CONTINUE(        0x10000, 0x08000 )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "eb-01.rom", 0x000000, 0x100000, CRC(e5c41448) SHA1(b8322e32b0cb3d771316c9c4f7be91de6e422a24) )
 
-	ROM_REGION( 0x80000, REGION_GFX2, 0 )	// blitter data
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", 0 )	// blitter data
 	ROM_LOAD( "eb-02.rom", 0x00000, 0x80000, CRC(e1f1b431) SHA1(04a612aff4c30cb8ea741f228bfa7e4289acfee8) )
 ROM_END
 
@@ -5230,11 +5230,11 @@ VER:1.30
 */
 
 ROM_START( shpeng )
-	ROM_REGION( 0x90000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x90000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "u43.8d", 0x00000, 0x10000, CRC(6b993f68) SHA1(4d3ad750e23be93342c61c454498d432e40587bb) )
 	ROM_LOAD( "u45.9d", 0x28000, 0x10000, CRC(6e79a1d1) SHA1(a72706425bcbd0faee4cf0220942fdcf510d4e89) )
 
-	ROM_REGION( 0xc0000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0xc0000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "u110.1j", 0x00000, 0x20000, CRC(31abac75) SHA1(20e91496ccb379d9449925b5aaca3532caaf9522) ) // ok! - main sprites etc.
 	ROM_LOAD( "u111.0j", 0x20000, 0x20000, CRC(0672bfc9) SHA1(ea35af45cdfa72ae1e7dc13a09ed1db09c0062ec) ) // ok?
 	ROM_LOAD( "u84.1h",  0x40000, 0x20000, CRC(7b476fac) SHA1(6b61b675fbfcc17a77b9757ea330f8d3e8751633) )
@@ -5242,7 +5242,7 @@ ROM_START( shpeng )
 	ROM_LOAD( "u74.1g",  0x80000, 0x20000, CRC(2ac46b6e) SHA1(0046ee7ede1acff45e64c85a9fca8fc8efa31026) )
 	ROM_LOAD( "u704.0g", 0xa0000, 0x20000, CRC(b062c928) SHA1(8c43689a1b8c444f91acbc7371eda744874eb538) )
 
-	ROM_REGION( 0x400, REGION_PROMS, ROMREGION_DISPOSE )	// Color PROMs
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )	// Color PROMs
 	ROM_LOAD( "n82s147n.u13", 0x000, 0x200, CRC(29b6415b) SHA1(8085ff3265cda2d564da3dff609eb05ff02fae49) ) // FIXED BITS (0xxxxxxx)  (Ok)
 	ROM_LOAD( "n82s147n.u12", 0x200, 0x200, BAD_DUMP CRC(7b940daa) SHA1(3903ebef644b2519aebbbb6d16872441b283c780) ) // BADADDR xxx-xxxxx  (Bad Read, Prom has a broken leg!)
 
@@ -5257,8 +5257,8 @@ ROM_END
 static DRIVER_INIT( mjelct3 )
 {
 	int i;
-	UINT8	*rom = memory_region(machine, REGION_CPU1);
-	size_t  size = memory_region_length(machine, REGION_CPU1);
+	UINT8	*rom = memory_region(machine, RGNCLASS_CPU, "main");
+	size_t  size = memory_region_length(machine, RGNCLASS_CPU, "main");
 	UINT8	*rom1 = malloc_or_die(size);
 
 		memcpy(rom1,rom,size);
@@ -5270,8 +5270,8 @@ static DRIVER_INIT( mjelct3 )
 static DRIVER_INIT( mjelct3a )
 {
 	int i,j;
-	UINT8	*rom = memory_region(machine, REGION_CPU1);
-	size_t  size = memory_region_length(machine, REGION_CPU1);
+	UINT8	*rom = memory_region(machine, RGNCLASS_CPU, "main");
+	size_t  size = memory_region_length(machine, RGNCLASS_CPU, "main");
 	UINT8	*rom1 = malloc_or_die(size);
 
 		memcpy(rom1,rom,size);
@@ -5356,12 +5356,12 @@ HD46505SP (6845)
 ***************************************************************************/
 
 ROM_START( neruton )
-	ROM_REGION( 0x50000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x50000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "4501b.1a", 0x000000, 0x020000, CRC(0e53eeee) SHA1(883138618a11295bfac148da4a092e01d92229b3) )
 	ROM_RELOAD(           0x010000, 0x020000 )
 	ROM_LOAD( "4502.3a",  0x030000, 0x020000, CRC(c296293f) SHA1(466e87f7eca102568f1f00c6ba77dacc3df300dd) )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "4511.11a", 0x00000, 0x20000, CRC(c4a96b6e) SHA1(15a6776509e0d30929f6a261798afe7dc0401d4e) )
 	ROM_LOAD( "4512.13a", 0x20000, 0x20000, CRC(d7ebbcb9) SHA1(b8edd8b93eca8d36056c02f8b69ff8313c9ab120) )
 	ROM_LOAD( "4513.14a", 0x40000, 0x20000, CRC(e3bed454) SHA1(03a66d31b8f41abc4ce83ebe22f8d14414d92152) )
@@ -5371,11 +5371,11 @@ ROM_START( neruton )
 	ROM_LOAD( "4517.19a", 0xc0000, 0x20000, CRC(b31f9694) SHA1(f22fc44908be4f1ef8dada57860f95ee74495605) )
 	ROM_LOAD( "4519.18c", 0xe0000, 0x20000, CRC(68aca5f3) SHA1(f03328362777e6d536f730bc3b52371d5daca54e) )
 
-	ROM_REGION( 0x40000, REGION_GFX2, 0 )	// blitter data
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", 0 )	// blitter data
 	ROM_LOAD( "4520.19c", 0x00000, 0x20000, CRC(7bb2b298) SHA1(643d21f6a45640bad5ec84af9745339487a7408c) )
 	ROM_LOAD( "4518.17c", 0x20000, 0x20000, CRC(fa88668e) SHA1(fce80a8badacf39f30c36952cbe0a1491b8faef1) )
 
-	ROM_REGION( 0x100000, REGION_GFX3, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx3", 0 )	// blitter data
 	ROM_LOAD( "4510.4b",  0x00000, 0x20000, CRC(455305a1) SHA1(103e1eaac485b37786a1d1d411819788ed385467) )
 	ROM_LOAD( "4509.3b",  0x20000, 0x20000, CRC(4e1e6a2d) SHA1(04c71dd11594921142b6aa9554c0fe1b40254463) )
 	ROM_LOAD( "4508.2b",  0x40000, 0x20000, CRC(5c451ed4) SHA1(59a27ddfae541cb61dafb32bdb5de8ddbc5abb8d) )
@@ -5437,22 +5437,22 @@ Notes:
 ***************************************************************************/
 
 ROM_START( majxtal7 )
-	ROM_REGION( 0x50000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x50000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "4001.1a",  0x00000, 0x20000, CRC(82fc6dd5) SHA1(3c6e58d4c302a0f305c67c31fce6a1d4cbfe5f78) )
 	ROM_RELOAD(           0x10000, 0x20000 )
 	ROM_LOAD( "4002.3a",  0x30000, 0x10000, CRC(b5fec88f) SHA1(bc3a2404150edd570ea7d320b2d43735fbdce195) )
 	ROM_RELOAD(           0x40000, 0x10000 )
 
-	ROM_REGION( 0x80000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "4011.11a", 0x00000, 0x20000, CRC(63551c37) SHA1(338f62125d217ab7a928476d36dd2797480ef3c1) )
 	ROM_LOAD( "4012.13a", 0x20000, 0x20000, CRC(51a431d5) SHA1(df2327b61154f5c8eddc7572c08e714daa1498b4) )
 	ROM_LOAD( "4013.14a", 0x40000, 0x20000, CRC(cdbb24f8) SHA1(6bec3931ceaed75bfee9079e095786b088b95e70) )
 	ROM_LOAD( "4014.15a", 0x60000, 0x20000, CRC(f2677938) SHA1(778ce4a6bebef934749f65acd0b6472fd314ce7a) )
 
-//  ROM_REGION( 0x00000, REGION_GFX2, 0 )   // blitter data
+//  ROM_REGION( 0x00000, RGNCLASS_GFX, "gfx2", 0 )   // blitter data
 //  unused
 
-	ROM_REGION( 0x100000, REGION_GFX3, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx3", 0 )	// blitter data
 	ROM_LOAD( "4003.1b",  0x00000, 0x20000, CRC(26348ae4) SHA1(3659d18608848c58ad980a79bc1c29da238a5604) )
 	ROM_LOAD( "4004.2b",  0x20000, 0x20000, CRC(5b5ea036) SHA1(187a7f6356ead05d8e3d9f5efa82554004429780) )
 	ROM_LOAD( "4005.3b",  0x40000, 0x20000, CRC(7fdfb600) SHA1(ce4485e43ee6bf63b4e8e3bb91267295995c736f) )
@@ -5545,16 +5545,16 @@ Notes:
 ***************************************************************************/
 
 ROM_START( majrjhdx )
-	ROM_REGION( 0x50000, REGION_CPU1, 0 )
+	ROM_REGION( 0x50000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "1051d.5e",         0x00000, 0x40000, CRC(54c31732) SHA1(049e76c42fd248f975c7cce7e74b1f79e2a96bea) )
 	ROM_RELOAD(                   0x10000, 0x40000 )	// the first 0x4000 bytes are Z80 code from "MAHJONG THE MYSTERIOUS ORIENT"!
 	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "1053d.3e",  0x00000, 0x80000, CRC(10bf7f0f) SHA1(c042240296ac7202da14e809bff36c9b0f97a3df) )
 	ROM_LOAD( "1052d.4e",  0x80000, 0x80000, CRC(7200599c) SHA1(32e7caad9a9ea756b699f601fab90a419a437f57) )
 
-	ROM_REGION( 0x400, REGION_PROMS, ROMREGION_DISPOSE )	// Color PROMs
+	ROM_REGION( 0x400, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )	// Color PROMs
 	ROM_LOAD( "d105-2.7e", 0x000, 0x200, CRC(587bca5a) SHA1(327f7bfa035f652bbbfba3f74715515236322c09) )
 	ROM_LOAD( "d105-1.6e", 0x200, 0x200, CRC(6d0ce028) SHA1(35f70000a850782356734323fa93b150a77f807c) )
 ROM_END
@@ -5593,16 +5593,16 @@ PCB Layout
 ***************************************************************************/
 
 ROM_START( mjreach )
-	ROM_REGION( 0x50000, REGION_CPU1, 0 )
+	ROM_REGION( 0x50000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "rom.u15", 0x00000, 0x40000, CRC(d914ac92) SHA1(f3284d2a74380b33fd5fe8f73fe88c8360a9b783) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "rom.u13", 0x00000, 0x80000, CRC(c4c7c2fc) SHA1(adb33a8f0ff99c9574bd91fc570f82882d1381f9) )
 	ROM_LOAD( "rom.u12", 0x80000, 0x40000, CRC(87f47db6) SHA1(e9e9aae2b7b8dcb7d873a1b715ad4c9629c8936b) )
 	ROM_RELOAD(          0xc0000, 0x40000 )
 
-	ROM_REGION( 0x100000, REGION_GFX2, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 )	// blitter data
 	ROM_LOAD( "rom.u13", 0x00000, 0x80000, CRC(c4c7c2fc) SHA1(adb33a8f0ff99c9574bd91fc570f82882d1381f9) )
 	ROM_RELOAD(          0x80000, 0x80000 )
 ROM_END
@@ -5676,7 +5676,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( tenkai )
-	ROM_REGION( 0x50000, REGION_CPU1, 0 )
+	ROM_REGION( 0x50000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "taicom00.2c",      0x00000, 0x40000, CRC(a35e54db) SHA1(247c856e19989fb834e8ed135393927bbd9c0277) )
 	ROM_RELOAD(                   0x10000, 0x40000 )
 	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, CRC(509f1c97) SHA1(08557bea2e924053fd5bc9de5e306f3ecf8e98e6) )
@@ -5684,10 +5684,10 @@ ROM_START( tenkai )
 	// Note by Whistler:
 	// It appears that the first half of lzc-01.u6 in tenkaibb (as well as the same data in other bootleg versions)
 	// does not exist _anywhere_ in this rom dump, and in this way some girls won't show correctly (such as the 3rd one)
-	ROM_REGION( 0x80000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "taicom01.15b", 0x000000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) )
 
-	ROM_REGION( 0x100000, REGION_GFX2, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 )	// blitter data
 	ROM_LOAD( "taicom02.11b", 0x000000, 0x80000, CRC(aae8cfb7) SHA1(736c6148aa6e7b22ca19615a27e9a10d41778aa7) )
 	ROM_LOAD( "taicom03.13b", 0x080000, 0x80000, CRC(68cb730a) SHA1(7ce90e34fa51d50a7668ac1c5ccbc18bebe8ad84) )
 ROM_END
@@ -5739,18 +5739,18 @@ mc3.u15      [2/2]      taicom00.2c  [4/4]      IDENTICAL
 ***************************************************************************/
 
 ROM_START( tenkai2b )
-	ROM_REGION( 0x50000, REGION_CPU1, 0 )
+	ROM_REGION( 0x50000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
 	ROM_LOAD( "mc0.u11",          0x10000, 0x40000, CRC(8488a3ab) SHA1(f367a2dcc65410929db595b3c442d310d50a4940) )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "mc1.u8",  0x000000, 0x100000, CRC(786698e3) SHA1(9ddf4e31f454fb3c7969b1433771e95a976de741) )
 
-	ROM_REGION( 0x100000, REGION_GFX2, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 )	// blitter data
 	ROM_LOAD( "mc2.u21", 0x000000, 0x100000, CRC(713f79d7) SHA1(6e518b3127b232cc280b172dedbbc708987f9325) )
 
-	ROM_REGION( 0x100000, REGION_GFX3, 0 )	// blitter data
-	ROM_COPY( REGION_GFX1, 0, 0, 0x100000 )
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx3", 0 )	// blitter data
+	ROM_COPY( RGNCLASS_GFX, "gfx1", 0, 0, 0x100000 )
 	ROM_LOAD( "mc3.u15", 0x00000, 0x20000, CRC(5b552cdf) SHA1(86aaa02dcf8dab670d818287c91c8cb296362401) )	// 1xxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
@@ -5811,18 +5811,18 @@ tdh-12m.u11  [4/4]      taicom00.2c  [4/4]      IDENTICAL
 ***************************************************************************/
 
 ROM_START( tenkaibb )
-	ROM_REGION( 0x50000, REGION_CPU1, 0 )
+	ROM_REGION( 0x50000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "tdh-12m.u11", 0x00000, 0x40000, CRC(7b877721) SHA1(41bba10ffb3d72af84d6577d4785225fe1ecc640) )
 	ROM_RELOAD(              0x10000, 0x40000 )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "lzc-01.u6", 0x000000, 0x100000, CRC(786698e3) SHA1(9ddf4e31f454fb3c7969b1433771e95a976de741) )
 
-	ROM_REGION( 0x100000, REGION_GFX2, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 )	// blitter data
 	ROM_LOAD( "lzc-02.u19", 0x000000, 0x100000, CRC(90a19443) SHA1(8f593c00e39dd5acc76b058591019d117967a17b) )
 
-	ROM_REGION( 0x100000, REGION_GFX3, 0 )	// blitter data
-	ROM_COPY( REGION_GFX1, 0, 0, 0x100000 )
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx3", 0 )	// blitter data
+	ROM_COPY( RGNCLASS_GFX, "gfx1", 0, 0, 0x100000 )
 	ROM_LOAD( "lzc-03.u15", 0x000000, 0x020000, CRC(5b552cdf) SHA1(86aaa02dcf8dab670d818287c91c8cb296362401) )	// 1xxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
@@ -5869,15 +5869,15 @@ taicom03.13b            rom.u13                 IDENTICAL
 ***************************************************************************/
 
 ROM_START( tenkaicb )
-	ROM_REGION( 0x50000, REGION_CPU1, 0 )
+	ROM_REGION( 0x50000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "rom.u15", 0x00000, 0x40000, CRC(7b877721) SHA1(41bba10ffb3d72af84d6577d4785225fe1ecc640) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "rom.u13", 0x00000, 0x80000, CRC(68cb730a) SHA1(7ce90e34fa51d50a7668ac1c5ccbc18bebe8ad84) )
 	ROM_LOAD( "rom.u12", 0x80000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) )
 
-	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_ERASEFF )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", ROMREGION_ERASEFF )	// blitter data
 
 	ROM_LOAD( "rom.u13", 0x80000, 0x80000, CRC(68cb730a) SHA1(7ce90e34fa51d50a7668ac1c5ccbc18bebe8ad84) )//ok
 ROM_END
@@ -5950,11 +5950,11 @@ tydg004.u21  [4/4]      taicom03.13b [4/4]      24.230194%
 ***************************************************************************/
 
 ROM_START( tenkaid )
-	ROM_REGION( 0x50000, REGION_CPU1, 0 )
+	ROM_REGION( 0x50000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
 	ROM_LOAD( "tydg001.u11",      0x10000, 0x40000, CRC(4ffa543c) SHA1(ab6ec7bd735358643f5186c6c983fa8b599fe84b) )
 
-	ROM_REGION( 0x200000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "tydg002.u8",  0x000000, 0x80000, CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) )
 	ROM_LOAD( "tydg005.u19", 0x080000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) )
 	ROM_LOAD( "tydg003.u6",  0x100000, 0x80000, CRC(60717d91) SHA1(85dbb510d33b36d2255b740ccc4917216dd21497) )
@@ -5977,14 +5977,14 @@ lzc-02.rom   [2/2]      taicom03.13b            IDENTICAL
 ***************************************************************************/
 
 ROM_START( tenkaie )
-	ROM_REGION( 0x50000, REGION_CPU1, 0 )
+	ROM_REGION( 0x50000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
 	ROM_LOAD( "epr-a01.rom",      0x10000, 0x40000, CRC(a35e54db) SHA1(247c856e19989fb834e8ed135393927bbd9c0277) )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "lzc-01.rom", 0x000000, 0x100000, CRC(786698e3) SHA1(9ddf4e31f454fb3c7969b1433771e95a976de741) )
 
-	ROM_REGION( 0x100000, REGION_GFX2, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 )	// blitter data
 	ROM_LOAD( "lzc-02.rom", 0x000000, 0x100000, CRC(90a19443) SHA1(8f593c00e39dd5acc76b058591019d117967a17b) )
 ROM_END
 
@@ -6030,7 +6030,7 @@ d61b.7b -- PAL16CEV8 (not dumped)
 ***************************************************************************/
 
 ROM_START( mjcomv1 )
-	ROM_REGION( 0x10000 + 0x28*0x8000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x10000 + 0x28*0x8000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "6101.2d", 0x000000, 0x20000, CRC(60552776) SHA1(9876f1aece8f25b7e495c6fac24ebb5028916f73) )
 	// 00-03
 	ROM_RELOAD(          0x010000, 0x20000 )
@@ -6043,13 +6043,13 @@ ROM_START( mjcomv1 )
 	// 08-0b
 	ROM_LOAD( "6103.5d", 0x050000, 0x20000, CRC(6d56e5c1) SHA1(2c02a400d21e442cdd68bf6210b397b770cde3b5) )	// 1ST AND 2ND HALF IDENTICAL
 
-//  ROM_REGION( 0x00000, REGION_GFX1, 0 )   // blitter data
+//  ROM_REGION( 0x00000, RGNCLASS_GFX, "gfx1", 0 )   // blitter data
 //  unused
 
-//  ROM_REGION( 0x00000, REGION_GFX2, 0 )   // blitter data
+//  ROM_REGION( 0x00000, RGNCLASS_GFX, "gfx2", 0 )   // blitter data
 //  unused
 
-	ROM_REGION( 0x100000, REGION_GFX3, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx3", 0 )	// blitter data
 	//                   0x00000, 0x20000
 	ROM_LOAD( "6105.2a", 0x20000, 0x20000, CRC(54115f33) SHA1(ed7d00c9b5c8aad066cf92c627b36c3a5e982d9f) )
 	ROM_LOAD( "6106.3a", 0x40000, 0x20000, CRC(093faddb) SHA1(ac8ee5abcd8a7b28f28407f5488c21a4bbff305a) )
@@ -6059,12 +6059,12 @@ ROM_START( mjcomv1 )
 	ROM_LOAD( "6110.2b", 0xc0000, 0x20000, CRC(2865eae4) SHA1(dd945a2a531a08e654f13c135bb9cb799589d513) )
 	ROM_LOAD( "6111.3b", 0xe0000, 0x20000, CRC(581edcc0) SHA1(d52de6ca199f03e0d88c8e4275fe2b37b3ef6016) )
 
-	ROM_REGION( 0x60000, REGION_GFX4, 0 )	// blitter data
+	ROM_REGION( 0x60000, RGNCLASS_GFX, "gfx4", 0 )	// blitter data
 	ROM_LOAD( "6112.4b", 0x00000, 0x20000, CRC(3083c0cf) SHA1(24465e2d01cb0f0646644a3a5d57d9c0f456cf96) )
 	ROM_LOAD( "6113.5b", 0x20000, 0x20000, CRC(e34e9541) SHA1(fbe457b4107730f3d633536e82b9271dcbc71559) )
 	ROM_LOAD( "6114.1c", 0x40000, 0x20000, CRC(1aa9a1d7) SHA1(67991ff4968443e596fd2fadb097e32d2e6802c3) )
 
-	ROM_REGION( 0x80000, REGION_GFX5, 0 )	// blitter data
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx5", 0 )	// blitter data
 	ROM_LOAD( "6104.1a", 0x00000, 0x80000, CRC(04eb1ce0) SHA1(670b213db190bb845c0a99e0a8b166ebff8a7ea1) )
 ROM_END
 
@@ -6112,11 +6112,11 @@ H10B.4A             = 5509m.17c             Mahjong Yarunara (Japan)
 ***************************************************************************/
 
 ROM_START( hjingi )
-	ROM_REGION( 0x30000, REGION_CPU1, 0 )
+	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "hanajngi.code",  0x00000, 0x20000, NO_DUMP )
 	ROM_RELOAD(                 0x10000, 0x20000 )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "h02.21", 0x00000, 0x20000, CRC(9dde2d59) SHA1(96df4ba97ee9611d9a3c7bcaae9cd97815a7b8a5) )
 	ROM_LOAD( "h03.22", 0x20000, 0x20000, CRC(1ac59443) SHA1(e70fe6184e7090cf7229d83b87db65f7715de2a8) )
 	ROM_LOAD( "h01.20", 0x40000, 0x20000, CRC(24391ddc) SHA1(6a2e3fae4b6d0b1d8073306f37c9fdaa04b69eb8) )
@@ -6126,7 +6126,7 @@ ROM_START( hjingi )
 	ROM_LOAD( "h07.4",  0xc0000, 0x20000, CRC(8b6f8a2d) SHA1(c5f3ec64a7ea3edc556182f42e6da4842d88e0ba) )
 	ROM_LOAD( "h08.5",  0xe0000, 0x20000, CRC(6f996e6e) SHA1(c2b916afbfd257417f0383ad261f3720a027fdd9) )
 
-	ROM_REGION( 0x40000, REGION_GFX2, 0 )	// blitter data
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", 0 )	// blitter data
 	ROM_LOAD( "h09.6",  0x00000, 0x20000, CRC(86bde64d) SHA1(d9b79184697044ae8a4d04ea22deca2e14162065) )
 	ROM_LOAD( "h10b.4a",0x20000, 0x20000, CRC(ca46ed48) SHA1(0769ac0b211181b7b57033f09f72828c885186cc) )
 ROM_END
@@ -6185,14 +6185,14 @@ DSWs - 4x 10-position, 1x 4-position
 ***************************************************************************/
 
 ROM_START( htengoku )
-	ROM_REGION( 0x50000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_REGION( 0x50000, RGNCLASS_CPU, "main", 0 )	// Z80 Code
 	ROM_LOAD( "6501.4b", 0x00000, 0x40000, CRC(29a7fc83) SHA1(5d3cf0a72918e58b5b60f7c978e559c7c1306bce) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
-	ROM_REGION( 0x80000, REGION_GFX1, 0 )	// blitter data
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "6506.4c",  0x00000, 0x80000, CRC(7de17b26) SHA1(326667063ab045ac50e850f2f7821a65317879ad) )
 
-	ROM_REGION( 0xc0000, REGION_GFX2, 0 )	// blitter data
+	ROM_REGION( 0xc0000, RGNCLASS_GFX, "gfx2", 0 )	// blitter data
 	ROM_LOAD( "6507.5c", 0x00000, 0x20000, CRC(ced3155b) SHA1(658e3947781f1be2ee87b43952999281c66683a6) )
 	ROM_LOAD( "6508.6c", 0x20000, 0x20000, CRC(ca46ed48) SHA1(0769ac0b211181b7b57033f09f72828c885186cc) )
 	ROM_LOAD( "6505.2b", 0x40000, 0x20000, CRC(161058fd) SHA1(cfc21abdc036e874d34bfa3c60486a5ab87cf9cd) )
@@ -6200,7 +6200,7 @@ ROM_START( htengoku )
 	ROM_LOAD( "6503.2a", 0x80000, 0x20000, CRC(6ac42304) SHA1(ce822da6d61e68578c08c9f1d0af1557c64ac5ae) )
 	ROM_LOAD( "6502.1a", 0xa0000, 0x20000, CRC(9276a10a) SHA1(5a68fff20631a2002509d6cace06b5a9fa0e75d2) )
 
-	ROM_REGION( 0xa0000, REGION_GFX3, 0 )	// blitter data
+	ROM_REGION( 0xa0000, RGNCLASS_GFX, "gfx3", 0 )	// blitter data
 	ROM_LOAD( "6509.10b", 0x00000, 0x80000, CRC(f8524c28) SHA1(d50b99664c9f0735838adb55aa7db53e58a43f99) )
 	ROM_LOAD( "6510.11b", 0x80000, 0x20000, CRC(0fdd6edf) SHA1(c6870ab538987110337e6e154cba98391c68fb98) )
 ROM_END

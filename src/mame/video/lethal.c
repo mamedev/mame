@@ -49,9 +49,9 @@ VIDEO_START(lethalen)
 
 	K053251_vh_start(machine);
 
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_8LE, 1, NULL, lethalen_tile_callback, 0);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_8LE, 1, NULL, lethalen_tile_callback, 0);
 
-	K053245_vh_start(machine, 0, REGION_GFX3,NORMAL_PLANE_ORDER, lethalen_sprite_callback);
+	K053245_vh_start(machine, 0, "gfx3",NORMAL_PLANE_ORDER, lethalen_sprite_callback);
 
 	/* the default drawmode table is no good for 6bpp, create a new one */
 	gfx_drawmode_table[0] = DRAWMODE_NONE;

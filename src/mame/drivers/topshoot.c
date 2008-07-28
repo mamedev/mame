@@ -289,7 +289,7 @@ static MACHINE_DRIVER_START( topshoot )
 MACHINE_DRIVER_END
 
 ROM_START( topshoot ) /* Top Shooter (c)1995 Sun Mixing */
-	ROM_REGION( 0x200000, REGION_CPU1, 0 )
+	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD16_BYTE( "tc574000ad_u11_2.bin", 0x000000, 0x080000, CRC(b235c4d9) SHA1(fbb308a5f6e769f3277824cb6a3b50c308969ac2) )
 	ROM_LOAD16_BYTE( "tc574000ad_u12_1.bin", 0x000001, 0x080000, CRC(e826f6ad) SHA1(23ec8bb608f954d3b915f061e7076c0c63b8259e) )
 ROM_END
@@ -304,7 +304,7 @@ static DRIVER_INIT(topshoot)
 	/* hack -- fix vdp emulation instead */
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xC00004, 0xC00005, 0, 0, vdp_fake_r);
 
-	memory_set_bankptr(3, memory_region(machine, REGION_CPU1) );
+	memory_set_bankptr(3, memory_region(machine, RGNCLASS_CPU, "main") );
 	memory_set_bankptr(4, genesis_68k_ram );
 }
 

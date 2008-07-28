@@ -287,13 +287,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const struct K053260_interface k053260_interface =
-{
-	REGION_SOUND1 /* memory region */
-};
-
-
-
 static MACHINE_DRIVER_START( parodius )
 
 	/* basic machine hardware */
@@ -330,7 +323,6 @@ static MACHINE_DRIVER_START( parodius )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
 	MDRV_SOUND_ADD("konami", K053260, 3579545)
-	MDRV_SOUND_CONFIG(k053260_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.70)
 	MDRV_SOUND_ROUTE(1, "right", 0.70)
 MACHINE_DRIVER_END
@@ -342,44 +334,44 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( parodius )
-	ROM_REGION( 0x51000, REGION_CPU1, 0 ) /* code + banked roms + palette RAM */
+	ROM_REGION( 0x51000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms + palette RAM */
 	ROM_LOAD( "955l01.bin", 0x10000, 0x20000, CRC(49a658eb) SHA1(dd53060c4da99b8e1f896ebfec572296ef2b5665) )
 	ROM_LOAD( "955l02.bin", 0x30000, 0x18000, CRC(161d7322) SHA1(a752f28c19c58263680221ad1119f2fd57df4723) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "955e03.bin", 0x0000, 0x10000, CRC(940aa356) SHA1(e7466f049be48861fd2d929eed786bd48782b5bb) )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "955d07.bin", 0x000000, 0x080000, CRC(89473fec) SHA1(0da18c4b078c3a30233a6f5c2b90032168136f58) ) /* characters */
 	ROM_LOAD( "955d08.bin", 0x080000, 0x080000, CRC(43d5cda1) SHA1(2c51bad4857d1d31456c6dc1e7d41326ea35468b) ) /* characters */
 
-	ROM_REGION( 0x100000, REGION_GFX2, 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "955d05.bin", 0x000000, 0x080000, CRC(7a1e55e0) SHA1(7a0e04ebde28d1e7b60aef3de926dc0e78662b1e) )	/* sprites */
 	ROM_LOAD( "955d06.bin", 0x080000, 0x080000, CRC(f4252875) SHA1(490f2e19b30cf8724e4b03b8d9f089c470ec13bd) )	/* sprites */
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 ) /* 053260 samples */
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "konami", 0 ) /* 053260 samples */
 	ROM_LOAD( "955d04.bin", 0x00000, 0x80000, CRC(e671491a) SHA1(79e71cb5212eb7d14d3479b0734ea0270473a66d) )
 ROM_END
 
 ROM_START( parodisj )
-	ROM_REGION( 0x51000, REGION_CPU1, 0 ) /* code + banked roms + palette RAM */
+	ROM_REGION( 0x51000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms + palette RAM */
 	ROM_LOAD( "955e01.bin", 0x10000, 0x20000, CRC(49baa334) SHA1(8902fbb2228111b15de6537bd168241933df134d) )
 	ROM_LOAD( "955e02.bin", 0x30000, 0x18000, CRC(14010d6f) SHA1(69fe162ea08c3bd4b3e78e9d10d278bd15444af4) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "955e03.bin", 0x0000, 0x10000, CRC(940aa356) SHA1(e7466f049be48861fd2d929eed786bd48782b5bb) )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "955d07.bin", 0x000000, 0x080000, CRC(89473fec) SHA1(0da18c4b078c3a30233a6f5c2b90032168136f58) ) /* characters */
 	ROM_LOAD( "955d08.bin", 0x080000, 0x080000, CRC(43d5cda1) SHA1(2c51bad4857d1d31456c6dc1e7d41326ea35468b) ) /* characters */
 
-	ROM_REGION( 0x100000, REGION_GFX2, 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
 	ROM_LOAD( "955d05.bin", 0x000000, 0x080000, CRC(7a1e55e0) SHA1(7a0e04ebde28d1e7b60aef3de926dc0e78662b1e) )	/* sprites */
 	ROM_LOAD( "955d06.bin", 0x080000, 0x080000, CRC(f4252875) SHA1(490f2e19b30cf8724e4b03b8d9f089c470ec13bd) )	/* sprites */
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 ) /* 053260 samples */
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "konami", 0 ) /* 053260 samples */
 	ROM_LOAD( "955d04.bin", 0x00000, 0x80000, CRC(e671491a) SHA1(79e71cb5212eb7d14d3479b0734ea0270473a66d) )
 ROM_END
 
@@ -391,7 +383,7 @@ ROM_END
 
 static void parodius_banking(int lines)
 {
-	UINT8 *RAM = memory_region(Machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(Machine, RGNCLASS_CPU, "main");
 	int offs = 0;
 
 	if (lines & 0xf0) logerror("%04x: setlines %02x\n",activecpu_get_pc(),lines);
@@ -403,11 +395,11 @@ static void parodius_banking(int lines)
 
 static MACHINE_RESET( parodius )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)parodius_banking);
 
-	paletteram = &memory_region(machine, REGION_CPU1)[0x48000];
+	paletteram = &memory_region(machine, RGNCLASS_CPU, "main")[0x48000];
 
 	videobank = 0;
 
@@ -418,8 +410,8 @@ static MACHINE_RESET( parodius )
 
 static DRIVER_INIT( parodius )
 {
-	konami_rom_deinterleave_2(REGION_GFX1);
-	konami_rom_deinterleave_2(REGION_GFX2);
+	konami_rom_deinterleave_2("gfx1");
+	konami_rom_deinterleave_2("gfx2");
 }
 
 

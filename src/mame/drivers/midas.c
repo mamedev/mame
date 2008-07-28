@@ -286,8 +286,8 @@ static const gfx_layout layout8x8_2 =
 };
 
 static GFXDECODE_START( midas )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, layout16x16,  0, 0x100 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x000000, layout8x8_2,  0, 0x80 )
+	GFXDECODE_ENTRY( "gfx1", 0x000000, layout16x16,  0, 0x100 )
+	GFXDECODE_ENTRY( "gfx2", 0x000000, layout8x8_2,  0, 0x80 )
 GFXDECODE_END
 
 
@@ -433,7 +433,6 @@ static void livequiz_irqhandler(running_machine *machine, int state)
 
 static const struct YMZ280Binterface ymz280b_interface =
 {
-	REGION_SOUND1,
 	livequiz_irqhandler
 };
 
@@ -558,29 +557,29 @@ Notes:
 ***************************************************************************************/
 
 ROM_START( livequiz )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 )
+	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "flash.u1", 0x000000, 0x200000, CRC(8ec44493) SHA1(a987886cb87ac0a744f01f2e4a7cc6d12efeaa04) )
 
-	ROM_REGION( 0x200000, REGION_USER1, 0 )
+	ROM_REGION( 0x200000, RGNCLASS_USER, "user1", 0 )
 	ROM_LOAD( "main_pic12c508a.u27", 0x000000, 0x000400, CRC(a84f0a7e) SHA1(fb27c05fb27b98ca603697e1be214dc6c8d5f884) )
 	ROM_LOAD( "sub_pic12c508a.u4",   0x000000, 0x000400, CRC(e52ebdc4) SHA1(0f3af66b5ea184e49188e74a873699324a3930f1) )
 
-	ROM_REGION( 0x800000, REGION_GFX1, 0 )
+	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD( "flash.u15", 0x000000, 0x200000, CRC(d6eb56f1) SHA1(52d67bb25dd968c79eccb05159a578516b27e557) )
 	ROM_LOAD( "flash.u16", 0x200000, 0x200000, CRC(4c9fd873) SHA1(6e185304ce29771265d3c48b0ef0e840d8bed02d) )
 	ROM_LOAD( "flash.u19", 0x400000, 0x200000, CRC(daa81532) SHA1(9e66bb4639b92c3d76b7918535f55883f22f24b2) )
 	ROM_LOAD( "flash.u20", 0x600000, 0x200000, CRC(b540a8c7) SHA1(25b9b30c7d5ff1e410ea30580017e45590542561) )
 
-	ROM_REGION( 0x080000, REGION_GFX2, 0 )
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx2", 0 )
 	ROM_LOAD( "27c4096.u23", 0x000000, 0x080000, CRC(25121de8) SHA1(edf24d87551639b871baf3243b452a4e2ba84107) )
 
-	ROM_REGION( 0x200000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x200000, RGNCLASS_SOUND, "ymz", 0 )
 	ROM_LOAD( "flash.u5", 0x000000, 0x200000, CRC(dc062792) SHA1(ec415c918c47ce9d181f014cde317af5717600e4) )
 ROM_END
 
 static DRIVER_INIT( livequiz )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, REGION_CPU1);
+	UINT16 *rom = (UINT16 *) memory_region(machine, RGNCLASS_CPU, "main");
 
 	// PROTECTION CHECKS
 	rom[0x13345a/2]	=	0x4e75;

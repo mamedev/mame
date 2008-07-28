@@ -79,7 +79,7 @@ static void *mjkjidai_adpcm_start (int clock, const struct CustomSound_interface
 	struct mjkjidai_adpcm_state *state = &mjkjidai_adpcm;
 	state->playing = 0;
 	state->stream = stream_create(0, 1, clock, state, mjkjidai_adpcm_callback);
-	state->base = memory_region(Machine, REGION_SOUND1);
+	state->base = memory_region(Machine, RGNCLASS_SOUND, "adpcm");
 	reset_adpcm(&state->adpcm);
 	return state;
 }
@@ -340,8 +340,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( mjkjidai )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 32 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 16 )
 GFXDECODE_END
 
 
@@ -400,13 +400,13 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( mjkjidai )
-	ROM_REGION( 0x1c000, REGION_CPU1, 0 )
+	ROM_REGION( 0x1c000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "mkj-00.14g",   0x00000, 0x8000, CRC(188a27e9) SHA1(2306ad112aaf8d9ac77a89d0e4c3a17f36945130) )
 	ROM_LOAD( "mkj-01.15g",   0x08000, 0x4000, CRC(a6a5e9c7) SHA1(974f4343f4347a0065f833c1fdcc47e96d42932d) )	/* banked, there is code flowing from 7fff to this bank */
 	ROM_CONTINUE(             0x10000, 0x4000 )
 	ROM_LOAD( "mkj-02.16g",   0x14000, 0x8000, CRC(fb312927) SHA1(b71db72ba881474f9c2523d0617757889af9f28e) )
 
-	ROM_REGION( 0x30000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x30000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mkj-20.4e",    0x00000, 0x8000, CRC(8fc66bce) SHA1(4f1006bc5168e39eb7a1f6a4b3c3f5aaa3c1c7dd) )
 	ROM_LOAD( "mkj-21.5e",    0x08000, 0x8000, CRC(4dd41a9b) SHA1(780f9e5bbf9dc47e931cebd67d89122209f573a2) )
 	ROM_LOAD( "mkj-22.6e",    0x10000, 0x8000, CRC(70ac2bd7) SHA1(8ddb00a24f2b49b9eb1a70ae95fcd6bb0820be50) )
@@ -414,12 +414,12 @@ ROM_START( mjkjidai )
 	ROM_LOAD( "mkj-24.8e",    0x20000, 0x8000, CRC(aa5130d0) SHA1(1dbaf2ba9ed97c22dc74d12471fc54b0f7ce2f25) )
 	ROM_LOAD( "mkj-25.9e",    0x28000, 0x8000, CRC(c12c3fe0) SHA1(0acd3f8e8d849a09b187cd83852593a64aa87451) )
 
-	ROM_REGION( 0x0300, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0300, RGNCLASS_PROMS, "proms", ROMREGION_DISPOSE )
 	ROM_LOAD( "mkj-60.13a",   0x0000, 0x0100, CRC(5dfaba60) SHA1(7c821a5e951ccf9d86d98aa8dc75d847ab579496) )
 	ROM_LOAD( "mkj-61.14a",   0x0100, 0x0100, CRC(e9e90d55) SHA1(a14177df3bab59e0f9ce41094e03ef3593329149) )
 	ROM_LOAD( "mkj-62.15a",   0x0200, 0x0100, CRC(934f1d53) SHA1(2b3b2dc77789b814810b25cda3f5adcfd7e0e57e) )
 
-	ROM_REGION( 0x8000, REGION_SOUND1, 0 )	/* ADPCM samples */
+	ROM_REGION( 0x8000, RGNCLASS_SOUND, "adpcm", 0 )	/* ADPCM samples */
 	ROM_LOAD( "mkj-40.14c",   0x00000, 0x8000, CRC(4d8fcc4a) SHA1(24c2b8031367035c89c6649a084bce0714f3e8d4) )
 ROM_END
 

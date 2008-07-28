@@ -310,7 +310,7 @@ static void saa1099_update(void *param, stream_sample_t **inputs, stream_sample_
 
 
 
-static void *saa1099_start(int sndindex, int clock, const void *config)
+static void *saa1099_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct SAA1099 *saa;
 

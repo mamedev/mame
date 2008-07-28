@@ -116,7 +116,7 @@ static const gfx_layout charlayout =
 
 
 static GFXDECODE_START( hexa )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,  0 , 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,  0 , 32 )
 GFXDECODE_END
 
 
@@ -170,16 +170,16 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( hexa )
-	ROM_REGION( 0x18000, REGION_CPU1, 0 )		/* 64k for code + 32k for banked ROM */
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "main", 0 )		/* 64k for code + 32k for banked ROM */
 	ROM_LOAD( "hexa.20",      0x00000, 0x8000, CRC(98b00586) SHA1(3591a3b0486d720f0aaa9f0bf4be352cd0ffcbc7) )
 	ROM_LOAD( "hexa.21",      0x10000, 0x8000, CRC(3d5d006c) SHA1(ad4eadab82024b122182eacb5a322cfd6e476a70) )
 
-	ROM_REGION( 0x18000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x18000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "hexa.17",      0x00000, 0x8000, CRC(f6911dd6) SHA1(b12ea27ecddd60820a32d4346afab0cc9d06fa57) )
 	ROM_LOAD( "hexa.18",      0x08000, 0x8000, CRC(6e3d95d2) SHA1(6399b7b5d088ceda08fdea9cf650f6b405f038e7) )
 	ROM_LOAD( "hexa.19",      0x10000, 0x8000, CRC(ffe97a31) SHA1(f16b5d2b9ace09bcbbfe3dfb73db7fa377d1af7f) )
 
-	ROM_REGION( 0x0300, REGION_PROMS, 0 )
+	ROM_REGION( 0x0300, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "hexa.001",     0x0000, 0x0100, CRC(88a055b4) SHA1(eee86a7930d0a251f3e5c2134532cd1dede2026c) )
 	ROM_LOAD( "hexa.003",     0x0100, 0x0100, CRC(3e9d4932) SHA1(9a336dba7134400312985b9902c77b4141105853) )
 	ROM_LOAD( "hexa.002",     0x0200, 0x0100, CRC(ff15366c) SHA1(7feaf1c768bfe76432fb80991585e13d95960b34) )
@@ -190,7 +190,7 @@ ROM_END
 static DRIVER_INIT( hexa )
 {
 #if 0
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 
 	/* Hexa is not protected or anything, but it keeps writing 0x3f to register */

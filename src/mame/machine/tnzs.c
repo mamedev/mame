@@ -520,7 +520,7 @@ DRIVER_INIT( plumpop )
 
 DRIVER_INIT( extrmatn )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	mcu_type = MCU_EXTRMATN;
 
@@ -531,7 +531,7 @@ DRIVER_INIT( extrmatn )
 
 DRIVER_INIT( arknoid2 )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	mcu_type = MCU_ARKANOID;
 
@@ -542,7 +542,7 @@ DRIVER_INIT( arknoid2 )
 
 DRIVER_INIT( drtoppel )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	mcu_type = MCU_DRTOPPEL;
 
@@ -561,7 +561,7 @@ DRIVER_INIT( chukatai )
 
 DRIVER_INIT( tnzs )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 	mcu_type = MCU_TNZS;
 
 	/* there's code which falls through from the fixed ROM to bank #7, I have to */
@@ -574,7 +574,7 @@ DRIVER_INIT( tnzs )
 
 DRIVER_INIT( tnzsb )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 	mcu_type = MCU_NONE_TNZSB;
 
 	/* there's code which falls through from the fixed ROM to bank #7, I have to */
@@ -692,10 +692,10 @@ MACHINE_RESET( tnzs )
 	{
 		UINT8 *RAM;
 
-		RAM = memory_region(machine, REGION_CPU1);
+		RAM = memory_region(machine, RGNCLASS_CPU, "main");
 		memory_set_bankptr(1,&RAM[0x18000]);
 
-		RAM = memory_region(machine, REGION_CPU2);
+		RAM = memory_region(machine, RGNCLASS_CPU, "sub");
 		memory_set_bankptr(2,&RAM[0x10000]);
 	}
 }
@@ -715,7 +715,7 @@ WRITE8_HANDLER( tnzs_sharedram_w )
 
 WRITE8_HANDLER( tnzs_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 //  logerror("PC %04x: writing %02x to bankswitch\n", activecpu_get_pc(),data);
 
@@ -731,7 +731,7 @@ WRITE8_HANDLER( tnzs_bankswitch_w )
 
 WRITE8_HANDLER( tnzs_bankswitch1_w )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "sub");
 
 //  logerror("PC %04x: writing %02x to bankswitch 1\n", activecpu_get_pc(),data);
 

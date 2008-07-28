@@ -6,7 +6,7 @@
 
 struct RP5H01_interface {
 	int num;					/* number of chips */
-	int region[MAX_RP5H01];		/* memory region where data resides */
+	const char *region[MAX_RP5H01];		/* memory region where data resides */
 	int offset[MAX_RP5H01];		/* memory offset within the above region where data resides */
 };
 

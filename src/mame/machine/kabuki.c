@@ -161,9 +161,9 @@ static void kabuki_decode(UINT8 *src,UINT8 *dest_op,UINT8 *dest_data,
 
 static void mitchell_decode(running_machine *machine, int swap_key1,int swap_key2,int addr_key,int xor_key)
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
-	UINT8 *decrypt = auto_malloc(memory_region_length(machine, REGION_CPU1));
-	int numbanks = (memory_region_length(machine, REGION_CPU1) - 0x10000) / 0x4000;
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *decrypt = auto_malloc(memory_region_length(machine, RGNCLASS_CPU, "main"));
+	int numbanks = (memory_region_length(machine, RGNCLASS_CPU, "main") - 0x10000) / 0x4000;
 	int i;
 
 	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypt);
@@ -202,7 +202,7 @@ void block_decode(running_machine *machine)    { mitchell_decode(machine,0x02461
 static void cps1_decode(running_machine *machine,int swap_key1,int swap_key2,int addr_key,int xor_key)
 {
 	UINT8 *decrypt = auto_malloc(0x8000);
-	UINT8 *rom = memory_region(machine, REGION_CPU2);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "audio");
 
 	memory_set_decrypted_region(1, 0x0000, 0x7fff, decrypt);
 	kabuki_decode(rom,decrypt,rom,0x0000,0x8000, swap_key1,swap_key2,addr_key,xor_key);

@@ -249,7 +249,7 @@ static void spu_write( UINT32 n_address, INT32 n_size )
 	}
 }
 
-static void *psxspu_start(int sndindex, int clock, const void *config)
+static void *psxspu_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct psxinfo *chip;
 	int n_effect;

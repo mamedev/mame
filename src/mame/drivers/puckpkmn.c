@@ -189,7 +189,7 @@ static MACHINE_DRIVER_START( puckpkmn )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -269,25 +269,25 @@ Screenshots available on my site at http://unemulated.emuunlim.com (under PCB Sh
 
 static DRIVER_INIT( puckpkmn )
 {
-	UINT8 *rom	=	memory_region(machine, REGION_CPU1);
-	size_t len		=	memory_region_length(machine, REGION_CPU1);
+	UINT8 *rom	=	memory_region(machine, RGNCLASS_CPU, "main");
+	size_t len		=	memory_region_length(machine, RGNCLASS_CPU, "main");
 	int i;
 
 	for (i = 0; i < len; i++)
 		rom[i] = BITSWAP8(rom[i],1,4,2,0,7,5,3,6);
 
-	memory_set_bankptr(1, memory_region(machine, REGION_CPU1) );	// VDP reads the roms from here
+	memory_set_bankptr(1, memory_region(machine, RGNCLASS_CPU, "main") );	// VDP reads the roms from here
 	memory_set_bankptr(2, main_ram );						// VDP reads the ram from here
 }
 
 ROM_START( puckpkmn ) /* Puckman Pockimon  (c)2000 Genie */
-	ROM_REGION( 0x200000, REGION_CPU1, 0 )
+	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD16_BYTE( "puckpoke.u5", 0x000000, 0x080000, CRC(fd334b91) SHA1(cf8bf6645a4082ea4392937e169b1686c9c7e246) )
 	ROM_LOAD16_BYTE( "puckpoke.u4", 0x000001, 0x080000, CRC(839cc76b) SHA1(e15662a7175db7a8e222dda176a8ed92e0d56e9d) )
 	ROM_LOAD16_BYTE( "puckpoke.u8", 0x100000, 0x080000, CRC(7936bec8) SHA1(4b350105abe514fbfeabae1c6f3aeee695c3d07a) )
 	ROM_LOAD16_BYTE( "puckpoke.u7", 0x100001, 0x080000, CRC(96b66bdf) SHA1(3cc2861ad9bc232cbe683e01b58090f832d03db5) )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )
 	ROM_LOAD( "puckpoke.u3", 0x00000, 0x40000, CRC(7b066bac) SHA1(429616e21c672b07e0705bc63234249cac3af56f) )
 ROM_END
 

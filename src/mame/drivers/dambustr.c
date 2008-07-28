@@ -133,8 +133,8 @@ static const gfx_layout dambustr_spritelayout =
 
 
 static GFXDECODE_START( dambustr )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, dambustr_charlayout,   0, 8 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, dambustr_spritelayout, 0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, dambustr_charlayout,   0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, dambustr_spritelayout, 0, 8 )
 GFXDECODE_END
 
 
@@ -142,9 +142,9 @@ static DRIVER_INIT(dambustr)
 {
 	int i, j, tmp;
 	int tmpram[16];
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
-	UINT8 *usr = memory_region(machine, REGION_USER1);
-	UINT8 *gfx = memory_region(machine, REGION_GFX1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
+	UINT8 *usr = memory_region(machine, RGNCLASS_USER, "user1");
+	UINT8 *gfx = memory_region(machine, RGNCLASS_GFX, "gfx1");
 
 	// Bit swap addresses
 	for(i=0; i<4096*4; i++) {
@@ -211,51 +211,51 @@ MACHINE_DRIVER_END
 
 
 ROM_START( dambustr )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "db8a",   0x4000, 0x1000, CRC(fd041ff4) SHA1(8d27da7bf0c655633711b960cbc23950c8a371ae) )
 	ROM_LOAD( "db6a",   0x5000, 0x1000, CRC(448db54b) SHA1(c9afbf02bf4d4ac2972ab7ac6adfa4e951ae79c2) )
 	ROM_LOAD( "db7a",   0x6000, 0x1000, CRC(675b1f5e) SHA1(6a386212a640fb467b6956a4dc5a68476af1cf97) )
 	ROM_LOAD( "db5a",   0x7000, 0x1000, CRC(75659ecc) SHA1(b61254fb12f3999607abd88d1cc649dcfbf0384c) )
 
-	ROM_REGION( 0x10000,REGION_USER1,0)
+	ROM_REGION( 0x10000,RGNCLASS_USER, "user1",0)
  	ROM_LOAD( "db11a",   0x0000, 0x1000, CRC(427bd3fb) SHA1(cdbaef4040fa2e0598a086e320d51ecb26a591dd) )
 	ROM_LOAD( "db9a",    0x1000, 0x1000, CRC(57164563) SHA1(8471d0660f39511d0afa3cdd63a1e84b0ea80fd0) )
 	ROM_LOAD( "db10a",   0x2000, 0x1000, CRC(075b9c5e) SHA1(ff6ce873897004c0e796813725e260df85a520f9) )
 	ROM_LOAD( "db12a",   0x3000, 0x1000, CRC(ed01a68b) SHA1(9dd37c2a25865717a7acdd7e2a3bef26a4cef3d9) )
 
-	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "db1a",   0x1000, 0x1000, CRC(4cb964cd) SHA1(1c90b14deb201a64b8ed4378b022e9e4574aed94) )
 	ROM_LOAD( "db2a",   0x3000, 0x1000, CRC(0a0a6af5) SHA1(ecd2a6696ce9154f030c830ccb45690787881a73) )
 	ROM_LOAD( "db3a",   0x0000, 0x1000, CRC(9e9a9710) SHA1(a9f67a05a2882b9f6f3378cc73e90539de4b8ca4) )
 	ROM_LOAD( "db4a",   0x2000, 0x1000, CRC(d9d2df33) SHA1(97057fe33c146898755b556558ff707b9f4551ec) )
 
 	// This ROM needs to be dumped, only a guess at the moment:
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "dambustr.clr", 0x0000, 0x0020, BAD_DUMP CRC(cda7b558) SHA1(2977967917970dffa91e69db19c62ba8ff6c3053) )
 ROM_END
 
 
 ROM_START( dambust )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "db08.bin",   0x4000, 0x1000, CRC(fd041ff4) SHA1(8d27da7bf0c655633711b960cbc23950c8a371ae) )
 	ROM_LOAD( "db06p.bin",  0x5000, 0x1000, CRC(35dcee01) SHA1(2c23c727d9b38322a6d0548dfe6a2a254f3530af) )
 	ROM_LOAD( "db07.bin",   0x6000, 0x1000, CRC(675b1f5e) SHA1(6a386212a640fb467b6956a4dc5a68476af1cf97) )
 	ROM_LOAD( "db05.bin",   0x7000, 0x1000, CRC(75659ecc) SHA1(b61254fb12f3999607abd88d1cc649dcfbf0384c) )
 
-	ROM_REGION( 0x10000,REGION_USER1,0)
+	ROM_REGION( 0x10000,RGNCLASS_USER, "user1",0)
  	ROM_LOAD( "db11.bin",   0x0000, 0x1000, CRC(9e6b34fe) SHA1(5cf47f5a5280ac53490240df220edf6178e87f4f) )
 	ROM_LOAD( "db09.bin",   0x1000, 0x1000, CRC(57164563) SHA1(8471d0660f39511d0afa3cdd63a1e84b0ea80fd0) )
 	ROM_LOAD( "db10p.bin",  0x2000, 0x1000, CRC(c129c57b) SHA1(c25abd7ee97b71941d9fa6acd0d92c116f1ff408) )
 	ROM_LOAD( "db12.bin",   0x3000, 0x1000, CRC(ea4c65f5) SHA1(cb761e0543cacd6b437c6e88615f97df83245a34) )
 
-	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "db1ap.bin",  0x1000, 0x1000, CRC(4cb964cd) SHA1(1c90b14deb201a64b8ed4378b022e9e4574aed94) )
 	ROM_LOAD( "db02.bin",   0x3000, 0x1000, CRC(0a0a6af5) SHA1(ecd2a6696ce9154f030c830ccb45690787881a73) )
 	ROM_LOAD( "db03.bin",   0x0000, 0x1000, CRC(9e9a9710) SHA1(a9f67a05a2882b9f6f3378cc73e90539de4b8ca4) )
 	ROM_LOAD( "db04.bin",   0x2000, 0x1000, CRC(d9d2df33) SHA1(97057fe33c146898755b556558ff707b9f4551ec) )
 
 	// This ROM needs to be dumped, only a guess at the moment:
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_REGION( 0x0020, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "dambustr.clr", 0x0000, 0x0020, BAD_DUMP CRC(cda7b558) SHA1(2977967917970dffa91e69db19c62ba8ff6c3053) )
 ROM_END
 

@@ -28,7 +28,7 @@ static struct
 static void cps3_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
 {
 	int i;
-	INT8 *base = (INT8*)memory_region(Machine, REGION_USER5);
+	INT8 *base = (INT8*)memory_region(Machine, RGNCLASS_USER, "user5");
 
 	/* Clear the buffers */
 	memset(buffer[0], 0, length*sizeof(*buffer[0]));

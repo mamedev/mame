@@ -627,9 +627,10 @@ static void ymz280b_update(void *param, stream_sample_t **inputs, stream_sample_
 
 ***********************************************************************************************/
 
-static void *ymz280b_start(int sndindex, int clock, const void *config)
+static void *ymz280b_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct YMZ280Binterface *intf = config;
+	static const struct YMZ280Binterface defintrf = { 0 };
+	const struct YMZ280Binterface *intf = (config != NULL) ? config : &defintrf;
 	struct YMZ280BChip *chip;
 
 	chip = auto_malloc(sizeof(*chip));
@@ -643,7 +644,7 @@ static void *ymz280b_start(int sndindex, int clock, const void *config)
 
 	/* initialize the rest of the structure */
 	chip->master_clock = (double)clock / 384.0;
-	chip->region_base = memory_region(Machine, intf->region);
+	chip->region_base = memory_region(Machine, RGNCLASS_SOUND, tag);
 	chip->irq_callback = intf->irq_callback;
 
 	/* create the stream */

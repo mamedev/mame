@@ -102,7 +102,7 @@ static WRITE32_HANDLER( spotty_soundlatch_w )
 
 static ADDRESS_MAP_START( limenko_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE(&mainram)
-	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION(REGION_USER2,0)
+	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION(RGNCLASS_USER, "user2",0)
 	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
 	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_BASE(&md_videoram)
 	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( limenko_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
 	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE(&limenko_videoreg)
 	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITENOP // video reg? background pen?
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1,0)
+	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( limenko_io_map, ADDRESS_SPACE_IO, 32 )
@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( spotty_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
 	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE(&limenko_videoreg)
 	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITENOP // video reg? background pen?
-	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1,0)
+	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spotty_io_map, ADDRESS_SPACE_IO, 32 )
@@ -193,8 +193,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	int i;
 	int sprites_on_screen = (limenko_videoreg[0] & 0x1ff0000) >> 16;
 
-	UINT8 *base_gfx	= memory_region(machine, REGION_GFX1);
-	UINT8 *gfx_max	= base_gfx + memory_region_length(machine, REGION_GFX1);
+	UINT8 *base_gfx	= memory_region(machine, RGNCLASS_GFX, "gfx1");
+	UINT8 *gfx_max	= base_gfx + memory_region_length(machine, RGNCLASS_GFX, "gfx1");
 
 	UINT8 *gfxdata;
 	gfx_element gfx;
@@ -465,7 +465,7 @@ static const gfx_layout tile_layout =
 };
 
 static GFXDECODE_START( limenko )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout, 0, 16 ) /* tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0, 16 ) /* tiles */
 GFXDECODE_END
 
 
@@ -530,7 +530,7 @@ static MACHINE_DRIVER_START( spotty )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 4000000 / 4 ) //?
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -572,75 +572,75 @@ Notes:
 */
 
 ROM_START( dynabomb )
-	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x200000, RGNCLASS_USER, "user1", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD16_WORD_SWAP( "rom.u6", 0x000000, 0x200000, CRC(457e015d) SHA1(3afb56cdf903c9084c1f283dc50ec504ce3e199f) )
 
-	ROM_REGION32_BE( 0x400000, REGION_USER2, ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x400000, RGNCLASS_USER, "user2", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "rom.u5", 0x000000, 0x200000, CRC(7e837adf) SHA1(8613fa187b8d4574b3935aa439aec2515033d64c) )
 
-	ROM_REGION( 0x220000, REGION_CPU2, 0 ) /* sound cpu + data */
+	ROM_REGION( 0x220000, RGNCLASS_CPU, "cpu1", 0 ) /* sound cpu + data */
 	ROM_LOAD( "rom.u16", 0x000000, 0x020000, CRC(f66d7e4d) SHA1(44f1851405ba525f1ed53521f4de12545ea9c46a) )
 	ROM_LOAD( "rom.u17", 0x020000, 0x080000, CRC(20f2417c) SHA1(1bdc0b03215f5002eed4c25d670bbb5411189907) )
 	ROM_LOAD( "rom.u18", 0x020000, 0x080000, CRC(50d76732) SHA1(6179c7365b62df620a10a1253d524807408821de) )
 	// u19 empty
 
-	ROM_REGION( 0x800000, REGION_GFX1, 0 )
+	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "rom.u1", 0x000000, 0x200000, CRC(bf33eff6) SHA1(089b6d88d6d744bcfa036c6869f0444d6ceb26c9) )
 	ROM_LOAD32_BYTE( "rom.u2", 0x000001, 0x200000, CRC(790bbcd5) SHA1(fc52c15fffc77dc3b3bc89a9606223c4fbaa578c) )
 	ROM_LOAD32_BYTE( "rom.u3", 0x000002, 0x200000, CRC(ec094b12) SHA1(13c105df066ff308cc7e1842907644790946e5b5) )
 	ROM_LOAD32_BYTE( "rom.u4", 0x000003, 0x200000, CRC(88b24e3c) SHA1(5f267f08144b413b55ef5e15c52e9cda096b80e7) )
 
-	ROM_REGION( 0x200000, REGION_SOUND2, 0 ) /* QDSP wavetable rom */
+	ROM_REGION( 0x200000, RGNCLASS_SOUND, "wavetable", 0 ) /* QDSP wavetable rom */
 	ROM_LOAD( "qs1003.u4",    0x000000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
 
 	// u20 empty
 ROM_END
 
 ROM_START( sb2003 ) /* No specific Country/Region */
-	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x200000, RGNCLASS_USER, "user1", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD16_WORD_SWAP( "sb2003_05.u6", 0x00000000, 0x200000, CRC(8aec4554) SHA1(57a12b142eb7bf08dd1e78d3c79222001bbaa636) )
 
-	ROM_REGION32_BE( 0x400000, REGION_USER2, ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x400000, RGNCLASS_USER, "user2", ROMREGION_ERASEFF )
 	// u5 empty
 
-	ROM_REGION( 0x220000, REGION_CPU2, 0 ) /* sound cpu + data */
+	ROM_REGION( 0x220000, RGNCLASS_CPU, "cpu1", 0 ) /* sound cpu + data */
 	ROM_LOAD( "07.u16", 0x000000, 0x020000, CRC(78acc607) SHA1(30a1aed40d45233dce88c6114989c71aa0f99ff7) )
 	// u17 empty
 	ROM_LOAD( "06.u18", 0x020000, 0x200000, CRC(b6ad0d32) SHA1(33e73963ea25e131801dc11f25be6ab18bef03ed) )
 	// u19 empty
 
-	ROM_REGION( 0x800000, REGION_GFX1, 0 )
+	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "01.u1", 0x000000, 0x200000, CRC(d2c7091a) SHA1(deff050eb0aee89f60d5ad13053e4f1bd4d35961) )
 	ROM_LOAD32_BYTE( "02.u2", 0x000001, 0x200000, CRC(a0734195) SHA1(8947f351434e2f750c4bdf936238815baaeb8402) )
 	ROM_LOAD32_BYTE( "03.u3", 0x000002, 0x200000, CRC(0f020280) SHA1(2c10baec8dbb201ee5e1c4c9d6b962e2ed02df7d) )
 	ROM_LOAD32_BYTE( "04.u4", 0x000003, 0x200000, CRC(fc2222b9) SHA1(c7ee8cffbbee1673a9f107f3f163d029c3900230) )
 
-	ROM_REGION( 0x200000, REGION_SOUND2, 0 ) /* QDSP wavetable rom */
+	ROM_REGION( 0x200000, RGNCLASS_SOUND, "wavetable", 0 ) /* QDSP wavetable rom */
 	ROM_LOAD( "qs1003.u4",    0x000000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
 
 	// u20 (S-ROM) empty
 ROM_END
 
 ROM_START( sb2003a ) /* Asia Region */
-	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x200000, RGNCLASS_USER, "user1", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD16_WORD_SWAP( "sb2003a_05.u6", 0x000000, 0x200000, CRC(265e45a7) SHA1(b9c8b63aa89c08f3d9d404621e301b122f85389a) )
 
-	ROM_REGION32_BE( 0x400000, REGION_USER2, ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x400000, RGNCLASS_USER, "user2", ROMREGION_ERASEFF )
 	// u5 empty
 
-	ROM_REGION( 0x220000, REGION_CPU2, 0 ) /* sound cpu + data */
+	ROM_REGION( 0x220000, RGNCLASS_CPU, "cpu1", 0 ) /* sound cpu + data */
 	ROM_LOAD( "07.u16", 0x000000, 0x020000, CRC(78acc607) SHA1(30a1aed40d45233dce88c6114989c71aa0f99ff7) )
 	// u17 empty
 	ROM_LOAD( "06.u18", 0x020000, 0x200000, CRC(b6ad0d32) SHA1(33e73963ea25e131801dc11f25be6ab18bef03ed) )
 	// u19 empty
 
-	ROM_REGION( 0x800000, REGION_GFX1, 0 )
+	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "01.u1", 0x000000, 0x200000, CRC(d2c7091a) SHA1(deff050eb0aee89f60d5ad13053e4f1bd4d35961) )
 	ROM_LOAD32_BYTE( "02.u2", 0x000001, 0x200000, CRC(a0734195) SHA1(8947f351434e2f750c4bdf936238815baaeb8402) )
 	ROM_LOAD32_BYTE( "03.u3", 0x000002, 0x200000, CRC(0f020280) SHA1(2c10baec8dbb201ee5e1c4c9d6b962e2ed02df7d) )
 	ROM_LOAD32_BYTE( "04.u4", 0x000003, 0x200000, CRC(fc2222b9) SHA1(c7ee8cffbbee1673a9f107f3f163d029c3900230) )
 
-	ROM_REGION( 0x200000, REGION_SOUND2, 0 ) /* QDSP wavetable rom */
+	ROM_REGION( 0x200000, RGNCLASS_SOUND, "wavetable", 0 ) /* QDSP wavetable rom */
 	ROM_LOAD( "qs1003.u4",    0x000000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
 
 	// u20 (S-ROM) empty
@@ -719,19 +719,19 @@ Link up 2 cabinets, up to 4 players can play at a time as a team
 */
 
 ROM_START( legendoh )
-	ROM_REGION32_BE( 0x200000, REGION_USER1, ROMREGION_ERASEFF ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x200000, RGNCLASS_USER, "user1", ROMREGION_ERASEFF ) /* Hyperstone CPU Code */
 	/* sys_rom1 empty */
 	/* sys_rom2 empty */
 	/* sys_rom3 empty */
 	ROM_LOAD16_WORD_SWAP( "01.sys_rom4", 0x180000, 0x80000, CRC(49b4a91f) SHA1(21619e8cd0b2fba8c2e08158497575a1760f52c5) )
 
-	ROM_REGION32_BE( 0x400000, REGION_USER2, 0 )
+	ROM_REGION32_BE( 0x400000, RGNCLASS_USER, "user2", 0 )
 	ROM_LOAD16_WORD_SWAP( "sys_rom6", 0x000000, 0x200000, CRC(5c13d467) SHA1(ed07b7e1b22293e256787ab079d00c2fb070bf4f) )
 	ROM_LOAD16_WORD_SWAP( "sys_rom5", 0x200000, 0x200000, CRC(19dc8d23) SHA1(433687c6aa24b9456436eecb1dcb57814af3009d) )
 	/* sys_rom8 empty */
 	/* sys_rom7 empty */
 
-	ROM_REGION( 0x1200000, REGION_GFX1, 0 )
+	ROM_REGION( 0x1200000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "cg_rom10",     0x0000000, 0x200000, CRC(93a48489) SHA1(a14157d31b4e9c8eb7ebe1b2f1b707ec8c8561a0) )
 	ROM_LOAD32_BYTE( "cg_rom20",     0x0000001, 0x200000, CRC(1a6c0258) SHA1(ac7c3b8c2fdfb542103032144a30293d44759fd1) )
 	ROM_LOAD32_BYTE( "cg_rom30",     0x0000002, 0x200000, CRC(a0559ef4) SHA1(6622f7107b374c9da816b9814fe93347e7422190) )
@@ -745,12 +745,12 @@ ROM_START( legendoh )
 	ROM_LOAD32_BYTE( "04.cg_rom32",  0x1000002, 0x080000, CRC(3f486cab) SHA1(6507d4bb9b4aa7d43f1026e932c82629d4fa44dd) )
 	ROM_LOAD32_BYTE( "05.cg_rom42",  0x1000003, 0x080000, CRC(5d807bec) SHA1(c72c77ed0478f705018519cf68a54d22524d05fd) )
 
-	ROM_REGION( 0x200000, REGION_SOUND1, 0 ) /* sounds */
+	ROM_REGION( 0x200000, RGNCLASS_SOUND, "sfx", 0 ) /* sounds */
 	ROM_LOAD( "sou_prg.06",   0x000000, 0x80000, CRC(bfafe7aa) SHA1(3e65869fe0970bafb59a0225642834042fdedfa6) )
 	ROM_LOAD( "sou_rom.07",   0x000000, 0x80000, CRC(4c6eb6d2) SHA1(58bced7bd944e03b0e3dfe1107c01819a33b2b31) )
 	ROM_LOAD( "sou_rom.08",   0x000000, 0x80000, CRC(42c32dd5) SHA1(4702771288ba40119de63feb67eed85667235d81) )
 
-	ROM_REGION( 0x200000, REGION_SOUND2, 0 ) /* QDSP wavetable rom */
+	ROM_REGION( 0x200000, RGNCLASS_SOUND, "wavetable", 0 ) /* QDSP wavetable rom */
 	ROM_LOAD( "qs1003.u4",    0x000000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
 ROM_END
 
@@ -781,22 +781,22 @@ SW2 = Reset
 */
 
 ROM_START( spotty )
-	ROM_REGION32_BE( 0x100000, REGION_USER1, ROMREGION_ERASEFF ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x100000, RGNCLASS_USER, "user1", ROMREGION_ERASEFF ) /* Hyperstone CPU Code */
 	/* sys_rom1 empty */
 	ROM_LOAD16_WORD_SWAP( "sys_rom2",     0x080000, 0x80000, CRC(6ded8d9b) SHA1(547c532f4014d818c4412244b60dbc439496de20) )
 
-	ROM_REGION( 0x01000, REGION_CPU2, 0 )
+	ROM_REGION( 0x01000, RGNCLASS_CPU, "audio", 0 )
 	ROM_LOAD( "at89c4051.mcu", 0x000000, 0x01000, CRC(82ceab26) SHA1(9bbc454bdcbc70dc01f10a13c9fc01c884918fe8) )
 
 	/* Expand the gfx roms here */
-	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x200000, REGION_USER2, ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, RGNCLASS_USER, "user2", ROMREGION_ERASE00 )
 	ROM_LOAD32_BYTE( "gc_rom1",      0x000000, 0x80000, CRC(ea03f9c5) SHA1(5038c03c519c774da253f9ae4fa205e7eeaa2780) )
 	ROM_LOAD32_BYTE( "gc_rom3",      0x000001, 0x80000, CRC(0ddac0b9) SHA1(f4ac8e6dd7f1cbdeb97139008982e6c17a3d18b9) )
 	/* gc_rom2 empty */
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", 0 )
 	ROM_LOAD( "sou_rom1",     0x000000, 0x40000, CRC(5791195b) SHA1(de0df8f89f395cbf3508b01aeea05675e110ad04) )
 ROM_END
 
@@ -859,8 +859,8 @@ static DRIVER_INIT( sb2003 )
 
 static DRIVER_INIT( spotty )
 {
-	UINT8 *dst    = memory_region(machine, REGION_GFX1);
-	UINT8 *src    = memory_region(machine, REGION_USER2);
+	UINT8 *dst    = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	UINT8 *src    = memory_region(machine, RGNCLASS_USER, "user2");
 	int x;
 
 	/* expand 4bpp roms to 8bpp space */

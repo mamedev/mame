@@ -1,10 +1,10 @@
 #include "driver.h"
 #include "video/konamiic.h"
 
-#define SPRITEROM_MEM_REGION REGION_GFX1
-#define ZOOMROM0_MEM_REGION REGION_GFX2
-#define ZOOMROM1_MEM_REGION REGION_GFX3
-#define ZOOMROM2_MEM_REGION REGION_GFX4
+#define SPRITEROM_MEM_REGION "gfx1"
+#define ZOOMROM0_MEM_REGION "gfx2"
+#define ZOOMROM1_MEM_REGION "gfx3"
+#define ZOOMROM2_MEM_REGION "gfx4"
 
 static int sprite_colorbase, zoom_colorbase[3];
 static int bank0,bank1,bank2;

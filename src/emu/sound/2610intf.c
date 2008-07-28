@@ -120,7 +120,7 @@ static STATE_POSTLOAD( ym2610_postload )
 }
 
 
-static void *ym2610_start(int sndindex, int clock, const void *config)
+static void *ym2610_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	static const struct YM2610interface generic_2610 = { 0 };
 	static const struct AY8910interface generic_ay8910 =
@@ -134,6 +134,7 @@ static void *ym2610_start(int sndindex, int clock, const void *config)
 	void *pcmbufa,*pcmbufb;
 	int  pcmsizea,pcmsizeb;
 	struct ym2610_info *info;
+	astring *name = astring_alloc();
 
 	chip_type = SOUND_YM2610;
 
@@ -151,10 +152,17 @@ static void *ym2610_start(int sndindex, int clock, const void *config)
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2610_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = (void *)(memory_region(Machine, info->intf->pcmroma));
-	pcmsizea = memory_region_length(Machine, info->intf->pcmroma);
-	pcmbufb  = (void *)(memory_region(Machine, info->intf->pcmromb));
-	pcmsizeb = memory_region_length(Machine, info->intf->pcmromb);
+	pcmbufa  = (void *)(memory_region(Machine, RGNCLASS_SOUND, tag));
+	pcmsizea = memory_region_length(Machine, RGNCLASS_SOUND, tag);
+	astring_printf(name, "%s.deltat", tag);
+	pcmbufb  = (void *)(memory_region(Machine, RGNCLASS_SOUND, astring_c(name)));
+	pcmsizeb = memory_region_length(Machine, RGNCLASS_SOUND, astring_c(name));
+	astring_free(name);
+	if (pcmbufb == NULL || pcmsizeb == 0)
+	{
+		pcmbufb = pcmbufa;
+		pcmsizeb = pcmsizea;
+	}
 
 	/**** initialize YM2610 ****/
 	info->chip = YM2610Init(info,sndindex,clock,rate,
@@ -178,7 +186,7 @@ static void ym2610b_stream_update(void *param, stream_sample_t **inputs, stream_
 	YM2610BUpdateOne(info->chip, buffers, length);
 }
 
-static void *ym2610b_start(int sndindex, int clock, const void *config)
+static void *ym2610b_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	static const struct YM2610interface generic_2610 = { 0 };
 	static const struct AY8910interface generic_ay8910 =
@@ -192,6 +200,7 @@ static void *ym2610b_start(int sndindex, int clock, const void *config)
 	void *pcmbufa,*pcmbufb;
 	int  pcmsizea,pcmsizeb;
 	struct ym2610_info *info;
+	astring *name = astring_alloc();
 
 	chip_type = SOUND_YM2610B;
 
@@ -209,10 +218,17 @@ static void *ym2610b_start(int sndindex, int clock, const void *config)
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2610b_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = (void *)(memory_region(Machine, info->intf->pcmroma));
-	pcmsizea = memory_region_length(Machine, info->intf->pcmroma);
-	pcmbufb  = (void *)(memory_region(Machine, info->intf->pcmromb));
-	pcmsizeb = memory_region_length(Machine, info->intf->pcmromb);
+	pcmbufa  = (void *)(memory_region(Machine, RGNCLASS_SOUND, tag));
+	pcmsizea = memory_region_length(Machine, RGNCLASS_SOUND, tag);
+	astring_printf(name, "%s.deltat", tag);
+	pcmbufb  = (void *)(memory_region(Machine, RGNCLASS_SOUND, astring_c(name)));
+	pcmsizeb = memory_region_length(Machine, RGNCLASS_SOUND, astring_c(name));
+	astring_free(name);
+	if (pcmbufb == NULL || pcmsizeb == 0)
+	{
+		pcmbufb = pcmbufa;
+		pcmsizeb = pcmsizea;
+	}
 
 	/**** initialize YM2610 ****/
 	info->chip = YM2610Init(info,sndindex,clock,rate,

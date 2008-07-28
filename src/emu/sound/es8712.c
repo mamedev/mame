@@ -49,12 +49,6 @@ static const int index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
 /* lookup table for the precomputed difference */
 static int diff_lookup[49*16];
 
-/* useful interfaces */
-const struct ES8712interface es8712_interface_region_1 = { REGION_SOUND1 };
-const struct ES8712interface es8712_interface_region_2 = { REGION_SOUND2 };
-const struct ES8712interface es8712_interface_region_3 = { REGION_SOUND3 };
-const struct ES8712interface es8712_interface_region_4 = { REGION_SOUND4 };
-
 
 /**********************************************************************************************
 
@@ -218,9 +212,8 @@ static void es8712_state_save_register(struct es8712 *chip, int sndindex)
 
 ***********************************************************************************************/
 
-static void *es8712_start(int sndindex, int clock, const void *config)
+static void *es8712_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct ES8712interface *intf = config;
 	struct es8712 *chip;
 
 	chip = auto_malloc(sizeof(*chip));
@@ -233,7 +226,7 @@ static void *es8712_start(int sndindex, int clock, const void *config)
 	chip->repeat = 0;
 
 	chip->bank_offset = 0;
-	chip->region_base = memory_region(Machine, intf->region);
+	chip->region_base = memory_region(Machine, RGNCLASS_SOUND, tag);
 
 	/* generate the name and create the stream */
 	chip->stream = stream_create(0, 1, clock, chip, es8712_update);

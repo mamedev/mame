@@ -274,10 +274,10 @@ static const gfx_layout orbit_tile_layout =
 
 
 static GFXDECODE_START( orbit )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, orbit_full_sprite_layout, 0, 1 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, orbit_upper_sprite_layout, 0, 1 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, orbit_lower_sprite_layout, 0, 1 )
-	GFXDECODE_SCALE( REGION_GFX2, 0, orbit_tile_layout, 0, 1, 2, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0, orbit_full_sprite_layout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, orbit_upper_sprite_layout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, orbit_lower_sprite_layout, 0, 1 )
+	GFXDECODE_SCALE( "gfx2", 0, orbit_tile_layout, 0, 1, 2, 2 )
 GFXDECODE_END
 
 
@@ -328,7 +328,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( orbit )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD_NIB_LOW ( "033701.h2", 0x6800, 0x400, CRC(6de43b85) SHA1(1643972f45d3a0dd6540158c575cd84cee2b0c9a) )
 	ROM_LOAD_NIB_HIGH( "033693.l2", 0x6800, 0x400, CRC(8878409e) SHA1(a14e0161705bbc230f0aec1837ebc41d62178368) )
 	ROM_LOAD_NIB_LOW ( "033702.h1", 0x6C00, 0x400, CRC(8166bdcb) SHA1(b7ae6cd46b4aff6e1e1ec9273cf068dec4a8cd46) )
@@ -344,14 +344,14 @@ ROM_START( orbit )
 	ROM_LOAD_NIB_HIGH( "033690.n1", 0x7C00, 0x400, CRC(f756ebd4) SHA1(4e473541b712078c6a81901714a6243de348e543) )
 	ROM_RELOAD(                     0xFC00, 0x400 )
 
-	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )  /* sprites */
+	ROM_REGION( 0x1000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )  /* sprites */
 	ROM_LOAD( "033712.b7", 0x0000, 0x800, CRC(cfd43bf2) SHA1(dbca0da6ed355aac921bae5adeef2f384f5fa2c3) )
 	ROM_LOAD( "033713.d7", 0x0800, 0x800, CRC(5ac89f4d) SHA1(747889b33cd83510a640e68fb4581a3e881c43a3) )
 
-	ROM_REGION( 0x200, REGION_GFX2, ROMREGION_DISPOSE )   /* tiles */
+	ROM_REGION( 0x200, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )   /* tiles */
 	ROM_LOAD( "033711.a7", 0x0000, 0x200, CRC(9987174a) SHA1(d2117b6e6d64c29aef8ad8c94256baea493bce5c) )
 
-	ROM_REGION( 0x100, REGION_PROMS, 0 )                  /* sync, unused */
+	ROM_REGION( 0x100, RGNCLASS_PROMS, "proms", 0 )                  /* sync, unused */
 	ROM_LOAD( "033688.p6", 0x0000, 0x100, CRC(ee66ddba) SHA1(5b9ae4cbf019375c8d54528b69280413c641c4f2) )
 ROM_END
 

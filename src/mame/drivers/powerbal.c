@@ -99,7 +99,7 @@ static WRITE16_HANDLER( oki_banking )
 	{
 		int addr = 0x40000 * ((data & 3) - 1);
 
-		if(addr < memory_region_length(machine, REGION_SOUND1))
+		if(addr < memory_region_length(machine, RGNCLASS_SOUND, "oki"))
 			OKIM6295_set_bank_base(0, addr);
 	}
 }
@@ -405,8 +405,8 @@ static const gfx_layout tilelayout =
 
 
 static GFXDECODE_START( powerbal )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout,          0x100, 16 )	/* colors 0x100-0x1ff */
-	GFXDECODE_ENTRY( REGION_GFX1, 0, magicstk_charlayout, 0x000, 16 )	/* colors 0x000-0x0ff */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0x100, 16 )	/* colors 0x100-0x1ff */
+	GFXDECODE_ENTRY( "gfx1", 0, magicstk_charlayout, 0x000, 16 )	/* colors 0x000-0x0ff */
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( powerbal )
@@ -433,7 +433,7 @@ static MACHINE_DRIVER_START( powerbal )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -463,7 +463,7 @@ static MACHINE_DRIVER_START( magicstk )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -518,17 +518,17 @@ Notes:
 */
 
 ROM_START( powerbal )
-	ROM_REGION( 0x80000, REGION_CPU1, 0 )	/* 68000 code */
+	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "3.u67",  0x00000, 0x40000, CRC(3aecdde4) SHA1(e78373246d55f120e8d94f4606da874df439b823) )
 	ROM_LOAD16_BYTE( "2.u66",  0x00001, 0x40000, CRC(a4552a19) SHA1(88b84daa1fd36d5c683cf0d6dce341aedbc360d1) )
 
-	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "4.u38",        0x000000, 0x80000, CRC(a60aa981) SHA1(46a5d2d2a353a45127a03a104e877ffd150daa92) )
 	ROM_LOAD( "5.u42",        0x080000, 0x80000, CRC(966c71df) SHA1(daf4bcf3d2ef10ea9a5e2e7ea71b3783b9f5b1f0) )
 	ROM_LOAD( "6.u39",        0x100000, 0x80000, CRC(668957b9) SHA1(31fc9328ff6044e17834b6d61a886a8ef2e6570c) )
 	ROM_LOAD( "7.u45",        0x180000, 0x80000, CRC(f5721c66) SHA1(1e8b3a8e82da60378dad7727af21157c4059b071) )
 
-	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "8.u86",        0x000000, 0x80000, CRC(4130694c) SHA1(581d0035ce1624568f635bd79290be6c587a2533) )
 	ROM_LOAD( "9.u85",        0x080000, 0x80000, CRC(e7bcd2e7) SHA1(01a5e5ac5da2fd79a0c9088f775096b9915bae92) )
 	ROM_LOAD( "10.u84",       0x100000, 0x80000, CRC(90412135) SHA1(499619c72613a1dd63a6504e39b159a18a71f4fa) )
@@ -536,14 +536,14 @@ ROM_START( powerbal )
 
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is the area that gets switched */
-	ROM_REGION( 0xc0000, REGION_SOUND1, 0 ) /* OKI Samples */
+	ROM_REGION( 0xc0000, RGNCLASS_SOUND, "oki", 0 ) /* OKI Samples */
 	ROM_LOAD( "1.u16",        0x00000, 0x40000, CRC(12776dbc) SHA1(9ab9930fd581296642834d2cb4ba65264a588af3) )
 	ROM_CONTINUE(             0x60000, 0x20000 )
 	ROM_CONTINUE(             0xa0000, 0x20000 )
-	ROM_COPY( REGION_SOUND1,  0x00000, 0x40000, 0x20000)
-	ROM_COPY( REGION_SOUND1,  0x00000, 0x80000, 0x20000)
+	ROM_COPY( RGNCLASS_SOUND, "oki",  0x00000, 0x40000, 0x20000)
+	ROM_COPY( RGNCLASS_SOUND, "oki",  0x00000, 0x80000, 0x20000)
 
-	ROM_REGION( 0x1200, REGION_PLDS, 0 )
+	ROM_REGION( 0x1200, RGNCLASS_PLDS, "plds", 0 )
 	ROM_LOAD( "palce16v8h.u102",  0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "palce22v10h.u183", 0x0200, 0x02dd, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "palce22v10h.u211", 0x0600, 0x02dd, NO_DUMP ) /* PAL is read protected */
@@ -552,26 +552,26 @@ ROM_START( powerbal )
 ROM_END
 
 ROM_START( magicstk )
-	ROM_REGION( 0x80000, REGION_CPU1, 0 )	/* 68000 code */
+	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "12.u67", 0x00000, 0x20000, CRC(70a9c66f) SHA1(0cf4b2d0f796e35881d68adc69eca4360d6ad693) )
 	ROM_LOAD16_BYTE( "11.u66", 0x00001, 0x20000, CRC(a9d7c90e) SHA1(e12517776dc14747b4bbe49f93c4d7e83e8eae01) )
 
-	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "13.u36",       0x00000, 0x20000, CRC(31e52562) SHA1(18ee5ba990d97690ece81e4066a9f0395ddc6f3e) )
 	ROM_LOAD( "14.u42",       0x20000, 0x20000, CRC(b0d35eda) SHA1(a85d45d3b4fbacecf5aa2af9a18ba0ac9f1f9a26) )
 	ROM_LOAD( "15.u39",       0x40000, 0x20000, CRC(af27004b) SHA1(b022020e6bd6fc9ec95f23b6a37911df0768856e) )
 	ROM_LOAD( "16.u45",       0x60000, 0x20000, CRC(0c980db3) SHA1(212129bf86cdc73752be184e579299e03ba6862e) )
 
-	ROM_REGION( 0x80000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "17.u86",       0x00000, 0x20000, CRC(ce238006) SHA1(3425a8125d56139fe5d220b0d9d5c9a4af1f4d58) )
 	ROM_LOAD( "18.u85",       0x20000, 0x20000, CRC(3dc88bf6) SHA1(f9c04bca32bae4aa6df38635d73c6a4b8742fbd3) )
 	ROM_LOAD( "19.u84",       0x40000, 0x20000, CRC(ee12d5b2) SHA1(872edff5a35d2725e3dd752a5f609aca995bfeff) )
 	ROM_LOAD( "20.u83",       0x60000, 0x20000, CRC(a07f542b) SHA1(0c17629142a90687460b4c951f2062f5c7de8921) )
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) /* OKI Samples */
+	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 ) /* OKI Samples */
 	ROM_LOAD( "10.u16",       0x00000, 0x20000, CRC(1e4a03ef) SHA1(6a134daa9a6d8dbda51cab348627f078c3dde8c7) )
 
-	ROM_REGION( 0x0800, REGION_PLDS, 0 )
+	ROM_REGION( 0x0800, RGNCLASS_PLDS, "plds", 0 )
 	ROM_LOAD( "palce16v8.u33", 0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "palce16v8.u58", 0x0200, 0x0117, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "gal22v10b.bin", 0x0400, 0x02e5, NO_DUMP ) /* GAL is soldered */

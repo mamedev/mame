@@ -461,9 +461,8 @@ static void s14001a_pcm_update(void *param, stream_sample_t **inputs, stream_sam
 	}
 }
 
-static void *s14001a_start(int sndindex, int clock, const void *config)
+static void *s14001a_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct S14001A_interface *intf;
 	S14001AChip *chip;
 	int i;
 
@@ -480,9 +479,7 @@ static void *s14001a_start(int sndindex, int clock, const void *config)
 		chip->filtervals[i] = SILENCE;
 	}
 
-	intf = config;
-
-	chip->SpeechRom = memory_region(Machine, intf->region);
+	chip->SpeechRom = memory_region(Machine, RGNCLASS_SOUND, tag);
 
 	chip->stream = stream_create(0, 1, clock ? clock : Machine->sample_rate, chip, s14001a_pcm_update);
 

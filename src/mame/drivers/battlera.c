@@ -227,9 +227,9 @@ static const gfx_layout sprites =
 };
 
 static GFXDECODE_START( battlera )
-	GFXDECODE_ENTRY( 0, 0, tiles,       0,  16 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( 0, 0, sprites,   256,  16 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( 0, 0, tiles  ,   256,  16 ) /* Blank tile */
+	GFXDECODE_ENTRY( NULL, 0, tiles,       0,  16 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( NULL, 0, sprites,   256,  16 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( NULL, 0, tiles  ,   256,  16 ) /* Blank tile */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -286,7 +286,7 @@ MACHINE_DRIVER_END
 /******************************************************************************/
 
 ROM_START( battlera )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* Main cpu code */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* Main cpu code */
 	ROM_LOAD( "00_e1.bin", 0x00000, 0x10000, CRC(aa1cbe69) SHA1(982530f3202bc7b8d94d2b818873b71f02c0e8de) ) /* ET00 */
 	ROM_LOAD( "es01.rom",  0x10000, 0x10000, CRC(9fea3189) SHA1(0692df6df533dfe55f61df8aa0c5c11944ba3ae3) ) /* ET01 */
 	ROM_LOAD( "02_e4.bin", 0x20000, 0x10000, CRC(cd72f580) SHA1(43b476c8f554348b02aa9558c0773f47cdb47fe0) ) /* ET02, etc */
@@ -299,12 +299,12 @@ ROM_START( battlera )
 	ROM_LOAD( "es10-1.rom",0xd0000, 0x10000, CRC(d3cddc02) SHA1(d212127a9d7aff384171d79c563f1516c0bd46ae) )
 	/* Rom sockets 0xe0000 - 0x100000 are unused */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Sound CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* Sound CPU */
 	ROM_LOAD( "es11.rom",  0x00000, 0x10000, CRC(f5b29c9c) SHA1(44dcdf96f8deb9a29aa9d94a8b9cf91a0ed808d4) )
 ROM_END
 
 ROM_START( bldwolf )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* Main cpu code */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* Main cpu code */
 	ROM_LOAD( "es00-1.rom", 0x00000, 0x10000, CRC(ff4aa252) SHA1(3c190e49020bb6923abb3f3c2632d3c86443c292) )
 	ROM_LOAD( "es01.rom",   0x10000, 0x10000, CRC(9fea3189) SHA1(0692df6df533dfe55f61df8aa0c5c11944ba3ae3) )
 	ROM_LOAD( "es02-1.rom", 0x20000, 0x10000, CRC(49792753) SHA1(4f3fb6912607d373fc0c1096ac0a8cc939e33617) )
@@ -317,12 +317,12 @@ ROM_START( bldwolf )
 	ROM_LOAD( "es10-1.rom", 0xd0000, 0x10000, CRC(d3cddc02) SHA1(d212127a9d7aff384171d79c563f1516c0bd46ae) )
 	/* Rom sockets 0xe0000 - 0x100000 are unused */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Sound CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* Sound CPU */
 	ROM_LOAD( "es11.rom",   0x00000, 0x10000, CRC(f5b29c9c) SHA1(44dcdf96f8deb9a29aa9d94a8b9cf91a0ed808d4) )
 ROM_END
 
 ROM_START( bldwolfj ) /* note, rom codes are ER not ES even if the content of some roms is identical */
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* Main cpu code */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* Main cpu code */
 	ROM_LOAD( "er00-.0-0", 0x00000, 0x10000, CRC(3819a14e) SHA1(0222051e0b5ec87a18f2e6e9155034f91898c14f) )
 	ROM_LOAD( "er01-.0-1", 0x10000, 0x10000, CRC(763cf206) SHA1(0f1c0f80a6aaad0c987c2ba3fdd01db1f5ceb7e6) )
 	ROM_LOAD( "er02-.0-2", 0x20000, 0x10000, CRC(bcad8a0f) SHA1(e7c69d2c894eaedd10ce02f6bceaa43bb060afb9) )
@@ -335,7 +335,7 @@ ROM_START( bldwolfj ) /* note, rom codes are ER not ES even if the content of so
 	ROM_LOAD( "er10-.1-5", 0xd0000, 0x10000, CRC(d3cddc02) SHA1(d212127a9d7aff384171d79c563f1516c0bd46ae) )
 	/* Rom sockets 0xe0000 - 0x100000 are unused */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Sound CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* Sound CPU */
 	ROM_LOAD( "er11-.tpg",   0x00000, 0x10000, CRC(f5b29c9c) SHA1(44dcdf96f8deb9a29aa9d94a8b9cf91a0ed808d4) )
 ROM_END
 

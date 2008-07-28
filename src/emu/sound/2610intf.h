@@ -6,8 +6,6 @@
 struct YM2610interface
 {
 	void ( *handler )( running_machine *machine, int irq );	/* IRQ handler for the YM2610 */
-	int pcmromb;		/* Delta-T rom region */
-	int pcmroma;		/* ADPCM   rom region */
 };
 
 /************************************************/

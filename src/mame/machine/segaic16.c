@@ -33,7 +33,7 @@
 struct memory_mapper_chip
 {
 	UINT8	regs[0x20];
-	int		cpunum;
+	const char *cpu;
 	const struct segaic16_memory_map_entry *map;
 	void	(*sound_w)(UINT8);
 	UINT8	(*sound_r)(void);
@@ -124,13 +124,13 @@ READ16_HANDLER( segaic16_open_bus_r )
  *
  *************************************/
 
-void segaic16_memory_mapper_init(running_machine *machine, int cpunum, const struct segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(UINT8), UINT8 (*sound_r_callback)(void))
+void segaic16_memory_mapper_init(running_machine *machine, const char *cpu, const struct segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(UINT8), UINT8 (*sound_r_callback)(void))
 {
 	struct memory_mapper_chip *chip = &memory_mapper;
 
 	/* reset the chip structure */
 	memset(chip, 0, sizeof(*chip));
-	chip->cpunum = cpunum;
+	chip->cpu = cpu;
 	chip->map = entrylist;
 	chip->sound_w = sound_w_callback;
 	chip->sound_r = sound_r_callback;
@@ -163,7 +163,7 @@ void segaic16_memory_mapper_config(running_machine *machine, const UINT8 *map_da
 void segaic16_memory_mapper_set_decrypted(running_machine *machine, UINT8 *decrypted)
 {
 	struct memory_mapper_chip *chip = &memory_mapper;
-	offs_t romsize = memory_region_length(machine, REGION_CPU1 + chip->cpunum);
+	offs_t romsize = memory_region_length(machine, RGNCLASS_CPU, chip->cpu);
 	int rgnum;
 
 	/* loop over the regions */
@@ -215,7 +215,7 @@ static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip 
 			/*   03 - maybe controls halt and reset lines together? */
 			if ((oldval ^ chip->regs[offset]) & 3)
 			{
-				cpunum_set_input_line(machine, chip->cpunum, INPUT_LINE_RESET, (chip->regs[offset] & 3) == 3 ? ASSERT_LINE : CLEAR_LINE);
+				cpunum_set_input_line(machine, mame_find_cpu_index(machine, chip->cpu), INPUT_LINE_RESET, (chip->regs[offset] & 3) == 3 ? ASSERT_LINE : CLEAR_LINE);
 				if ((chip->regs[offset] & 3) == 3)
 					fd1094_machine_init();
 			}
@@ -229,7 +229,7 @@ static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip 
 		case 0x04:
 			/* controls IRQ lines to 68000, negative logic -- write $B to signal IRQ4 */
 			if ((chip->regs[offset] & 7) != 7)
-				cpunum_set_input_line(machine, chip->cpunum, (~chip->regs[offset] & 7), HOLD_LINE);
+				cpunum_set_input_line(machine, mame_find_cpu_index(machine, chip->cpu), (~chip->regs[offset] & 7), HOLD_LINE);
 			break;
 
 		case 0x05:
@@ -239,7 +239,7 @@ static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip 
 			if (data == 0x01)
 			{
 				offs_t addr = (chip->regs[0x0a] << 17) | (chip->regs[0x0b] << 9) | (chip->regs[0x0c] << 1);
-				cpuintrf_push_context(chip->cpunum);
+				cpuintrf_push_context(mame_find_cpu_index(machine, chip->cpu));
 				program_write_word_16be(addr, (chip->regs[0x00] << 8) | chip->regs[0x01]);
 				cpuintrf_pop_context();
 			}
@@ -247,7 +247,7 @@ static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip 
 			{
 				offs_t addr = (chip->regs[0x07] << 17) | (chip->regs[0x08] << 9) | (chip->regs[0x09] << 1);
 				UINT16 result;
-				cpuintrf_push_context(chip->cpunum);
+				cpuintrf_push_context(mame_find_cpu_index(machine, chip->cpu));
 				result = program_read_word_16be(addr);
 				cpuintrf_pop_context();
 				chip->regs[0x00] = result >> 8;
@@ -327,7 +327,7 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 	if (LOG_MEMORY_MAP) mame_printf_debug("----\nRemapping:\n");
 
 	/* first reset everything back to the beginning */
-	memory_install_readwrite16_handler(machine, chip->cpunum, ADDRESS_SPACE_PROGRAM, 0x000000, 0xffffff, 0, 0, segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w);
+	memory_install_readwrite16_handler(machine, mame_find_cpu_index(machine, chip->cpu), ADDRESS_SPACE_PROGRAM, 0x000000, 0xffffff, 0, 0, segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w);
 
 	/* loop over the regions */
 	for (rgnum = 0; chip->map[rgnum].regbase != 0; rgnum++)
@@ -352,7 +352,7 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 		/* ROM areas need extra clamping */
 		if (rgn->romoffset != ~0)
 		{
-			offs_t romsize = memory_region_length(machine, REGION_CPU1 + chip->cpunum);
+			offs_t romsize = memory_region_length(machine, RGNCLASS_CPU, chip->cpu);
 			if (region_start >= romsize)
 				read = NULL;
 			else if (region_start + rgn->length > romsize)
@@ -361,9 +361,9 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 
 		/* map it */
 		if (read)
-			memory_install_read16_handler(machine, chip->cpunum, ADDRESS_SPACE_PROGRAM, region_start, region_end, 0, region_mirror, read);
+			memory_install_read16_handler(machine, mame_find_cpu_index(machine, chip->cpu), ADDRESS_SPACE_PROGRAM, region_start, region_end, 0, region_mirror, read);
 		if (write)
-			memory_install_write16_handler(machine, chip->cpunum, ADDRESS_SPACE_PROGRAM, region_start, region_end, 0, region_mirror, write);
+			memory_install_write16_handler(machine, mame_find_cpu_index(machine, chip->cpu), ADDRESS_SPACE_PROGRAM, region_start, region_end, 0, region_mirror, write);
 
 		/* set the bank pointer */
 		if (banknum && read)
@@ -381,7 +381,7 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 				if (!decrypted)
 					decrypted = fd1089_get_decrypted_base();
 
-				memory_configure_bank(banknum, 0, 1, memory_region(machine, REGION_CPU1 + chip->cpunum) + region_start, 0);
+				memory_configure_bank(banknum, 0, 1, memory_region(machine, RGNCLASS_CPU, chip->cpu) + region_start, 0);
 				if (decrypted)
 					memory_configure_bank_decrypted(banknum, 0, 1, decrypted ? (decrypted + region_start) : 0, 0);
 				memory_set_bank(banknum, 0);

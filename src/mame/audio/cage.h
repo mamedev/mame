@@ -10,7 +10,7 @@
 MACHINE_DRIVER_EXTERN( cage );
 MACHINE_DRIVER_EXTERN( cage_seattle );
 
-void cage_init(running_machine *machine, int boot_region, offs_t speedup);
+void cage_init(running_machine *machine, offs_t speedup);
 void cage_set_irq_handler(void (*irqhandler)(running_machine *, int));
 void cage_reset_w(int state);
 

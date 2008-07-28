@@ -632,8 +632,8 @@ static void optimise_sboxes(struct optimised_sbox* out, const struct sbox* in)
 
 static void cps2_decrypt(running_machine *machine, const UINT32 *master_key, UINT32 upper_limit)
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
-	int length = memory_region_length(machine, REGION_CPU1);
+	UINT16 *rom = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
+	int length = memory_region_length(machine, RGNCLASS_CPU, "main");
 	UINT16 *dec = auto_malloc(length);
 	int i;
 	UINT32 key1[4];

@@ -85,7 +85,7 @@ spriteram is being tested, take no notice of that.]
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,const int *primasks,int y_offs)
 {
-	UINT16 *spritemap = (UINT16 *)memory_region(machine, REGION_USER1);
+	UINT16 *spritemap = (UINT16 *)memory_region(machine, RGNCLASS_USER, "user1");
 	UINT16 tile_mask = (machine->gfx[0]->total_elements) - 1;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;

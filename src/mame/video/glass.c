@@ -91,7 +91,7 @@ WRITE16_HANDLER( glass_blitter_w )
 		/* fill the screen bitmap with the current picture */
 		{
 			int i, j;
-			UINT8 *gfx = (UINT8 *)memory_region(machine, REGION_GFX3);
+			UINT8 *gfx = (UINT8 *)memory_region(machine, RGNCLASS_GFX, "gfx3");
 
 			gfx = gfx + (current_command & 0x07)*0x10000 + (current_command & 0x08)*0x10000 + 0x140;
 

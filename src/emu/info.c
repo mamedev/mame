@@ -338,8 +338,8 @@ static void print_game_bios(FILE *out, const game_driver *game)
 	for (rom = game->rom; !ROMENTRY_ISEND(rom); rom++)
 		if (ROMENTRY_ISSYSTEM_BIOS(rom))
 		{
-			const char *name = ROM_GETHASHDATA(rom);
-			const char *description = name + strlen(name) + 1;
+			const char *name = ROM_GETNAME(rom);
+			const char *description = ROM_GETHASHDATA(rom);
 
 			/* output extracted name and descriptions */
 			fprintf(out, "\t\t<biosset");
@@ -426,7 +426,7 @@ static void print_game_rom(FILE *out, const game_driver *game)
 					for (brom = rom - 1; brom != game->rom; brom--)
 						if (ROMENTRY_ISSYSTEM_BIOS(brom))
 						{
-							strcpy(bios_name, ROM_GETHASHDATA(brom));
+							strcpy(bios_name, ROM_GETNAME(brom));
 							break;
 						}
 				}
@@ -460,57 +460,7 @@ static void print_game_rom(FILE *out, const game_driver *game)
 				}
 
 				/* append a region name */
-				switch (ROMREGION_GETTYPE(region))
-				{
-					case REGION_CPU1: 	fprintf(out, " region=\"cpu1\"");	break;
-					case REGION_CPU2: 	fprintf(out, " region=\"cpu2\"");	break;
-					case REGION_CPU3: 	fprintf(out, " region=\"cpu3\"");	break;
-					case REGION_CPU4: 	fprintf(out, " region=\"cpu4\"");	break;
-					case REGION_CPU5: 	fprintf(out, " region=\"cpu5\"");	break;
-					case REGION_CPU6: 	fprintf(out, " region=\"cpu6\"");	break;
-					case REGION_CPU7: 	fprintf(out, " region=\"cpu7\"");	break;
-					case REGION_CPU8: 	fprintf(out, " region=\"cpu8\"");	break;
-					case REGION_GFX1: 	fprintf(out, " region=\"gfx1\"");	break;
-					case REGION_GFX2: 	fprintf(out, " region=\"gfx2\"");	break;
-					case REGION_GFX3: 	fprintf(out, " region=\"gfx3\"");	break;
-					case REGION_GFX4: 	fprintf(out, " region=\"gfx4\"");	break;
-					case REGION_GFX5: 	fprintf(out, " region=\"gfx5\"");	break;
-					case REGION_GFX6: 	fprintf(out, " region=\"gfx6\"");	break;
-					case REGION_GFX7: 	fprintf(out, " region=\"gfx7\"");	break;
-					case REGION_GFX8: 	fprintf(out, " region=\"gfx8\"");	break;
-					case REGION_PROMS: 	fprintf(out, " region=\"proms\"");	break;
-					case REGION_PLDS: 	fprintf(out, " region=\"plds\"");	break;
-					case REGION_SOUND1: fprintf(out, " region=\"sound1\"");	break;
-					case REGION_SOUND2: fprintf(out, " region=\"sound2\"");	break;
-					case REGION_SOUND3: fprintf(out, " region=\"sound3\"");	break;
-					case REGION_SOUND4: fprintf(out, " region=\"sound4\"");	break;
-					case REGION_SOUND5: fprintf(out, " region=\"sound5\"");	break;
-					case REGION_SOUND6: fprintf(out, " region=\"sound6\"");	break;
-					case REGION_SOUND7: fprintf(out, " region=\"sound7\"");	break;
-					case REGION_SOUND8: fprintf(out, " region=\"sound8\"");	break;
-					case REGION_USER1: 	fprintf(out, " region=\"user1\"");	break;
-					case REGION_USER2: 	fprintf(out, " region=\"user2\"");	break;
-					case REGION_USER3: 	fprintf(out, " region=\"user3\"");	break;
-					case REGION_USER4: 	fprintf(out, " region=\"user4\"");	break;
-					case REGION_USER5: 	fprintf(out, " region=\"user5\"");	break;
-					case REGION_USER6: 	fprintf(out, " region=\"user6\"");	break;
-					case REGION_USER7: 	fprintf(out, " region=\"user7\"");	break;
-					case REGION_USER8: 	fprintf(out, " region=\"user8\"");	break;
-					case REGION_USER9: 	fprintf(out, " region=\"user9\"");	break;
-					case REGION_USER10: fprintf(out, " region=\"user10\"");	break;
-					case REGION_USER11: fprintf(out, " region=\"user11\"");	break;
-					case REGION_USER12: fprintf(out, " region=\"user12\"");	break;
-					case REGION_USER13: fprintf(out, " region=\"user13\"");	break;
-					case REGION_USER14: fprintf(out, " region=\"user14\"");	break;
-					case REGION_USER15: fprintf(out, " region=\"user15\"");	break;
-					case REGION_USER16: fprintf(out, " region=\"user16\"");	break;
-					case REGION_USER17: fprintf(out, " region=\"user17\"");	break;
-					case REGION_USER18: fprintf(out, " region=\"user18\"");	break;
-					case REGION_USER19: fprintf(out, " region=\"user19\"");	break;
-					case REGION_USER20: fprintf(out, " region=\"user20\"");	break;
-					case REGION_DISKS: 	fprintf(out, " region=\"disks\"");	break;
-					default:	 		fprintf(out, " region=\"0x%x\"", (int)ROMREGION_GETTYPE(region)); break;
-				}
+				fprintf(out, " regionclass=\"%s\" regiontag=\"%s\"", memory_region_class_name(ROMREGION_GETCLASS(region), TRUE), ROMREGION_GETTAG(region));
 
 				/* add nodump/baddump flags */
 				if (hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))
@@ -956,7 +906,8 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t<!ATTLIST rom md5 CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST rom sha1 CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST rom merge CDATA #IMPLIED>\n"
-		"\t\t\t<!ATTLIST rom region CDATA #IMPLIED>\n"
+		"\t\t\t<!ATTLIST rom regionclass CDATA #IMPLIED>\n"
+		"\t\t\t<!ATTLIST rom regiontag CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST rom offset CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST rom status (baddump|nodump|good) \"good\">\n"
 		"\t\t\t<!ATTLIST rom dispose (yes|no) \"no\">\n"
@@ -965,7 +916,8 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t<!ATTLIST disk md5 CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST disk sha1 CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST disk merge CDATA #IMPLIED>\n"
-		"\t\t\t<!ATTLIST disk region CDATA #IMPLIED>\n"
+		"\t\t\t<!ATTLIST disk regionclass CDATA #IMPLIED>\n"
+		"\t\t\t<!ATTLIST disk regiontag CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST disk index CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST disk status (baddump|nodump|good) \"good\">\n"
 		"\t\t<!ELEMENT sample EMPTY>\n"

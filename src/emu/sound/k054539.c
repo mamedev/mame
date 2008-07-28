@@ -433,7 +433,7 @@ static TIMER_CALLBACK( K054539_irq )
 		info->intf->irq(machine);
 }
 
-static void K054539_init_chip(struct k054539_info *info, int clock, int sndindex)
+static void K054539_init_chip(const char *tag, struct k054539_info *info, int clock, int sndindex)
 {
 	int i;
 
@@ -447,8 +447,8 @@ static void K054539_init_chip(struct k054539_info *info, int clock, int sndindex
 	info->cur_ptr = 0;
 	memset(info->ram, 0, 0x4000*2+clock/50*2);
 
-	info->rom = memory_region(Machine, info->intf->region);
-	info->rom_size = memory_region_length(Machine, info->intf->region);
+	info->rom = memory_region(Machine, RGNCLASS_SOUND, (info->intf->rgnoverride != NULL) ? info->intf->rgnoverride : tag);
+	info->rom_size = memory_region_length(Machine, RGNCLASS_SOUND, (info->intf->rgnoverride != NULL) ? info->intf->rgnoverride : tag);
 	info->rom_mask = 0xffffffffU;
 	for(i=0; i<32; i++)
 		if((1U<<i) >= info->rom_size) {
@@ -625,8 +625,9 @@ static UINT8 K054539_r(int chip, offs_t offset)
 	return info->regs[offset];
 }
 
-static void *k054539_start(int sndindex, int clock, const void *config)
+static void *k054539_start(const char *tag, int sndindex, int clock, const void *config)
 {
+	static const struct K054539interface defintrf = { 0 };
 	int i;
 	struct k054539_info *info;
 
@@ -637,7 +638,7 @@ static void *k054539_start(int sndindex, int clock, const void *config)
 		info->K054539_gain[i] = 1.0;
 	info->K054539_flags = K054539_RESET_FLAGS;
 
-	info->intf = config;
+	info->intf = (config != NULL) ? config : &defintrf;
 
 	/*
         I've tried various equations on volume control but none worked consistently.
@@ -661,7 +662,7 @@ static void *k054539_start(int sndindex, int clock, const void *config)
 	for(i=0; i<0xf; i++)
 		info->pantab[i] = sqrt(i) / sqrt(0xe);
 
-	K054539_init_chip(info, clock, sndindex);
+	K054539_init_chip(tag, info, clock, sndindex);
 
 	state_save_register_postload(Machine, reset_zones, info);
 	return info;

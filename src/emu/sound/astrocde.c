@@ -256,7 +256,7 @@ static void astrocade_state_save_register(struct astrocade_info *chip, int sndin
  *
  *************************************/
 
-static void *astrocade_start(int sndindex, int clock, const void *config)
+static void *astrocade_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct astrocade_info *chip;
 	int i;

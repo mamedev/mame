@@ -153,7 +153,7 @@ VIDEO_UPDATE( gridlee )
 	}
 
 	/* draw the sprite images */
-	gfx = memory_region(screen->machine, REGION_GFX1);
+	gfx = memory_region(screen->machine, RGNCLASS_GFX, "gfx1");
 	for (i = 0; i < 32; i++)
 	{
 		UINT8 *sprite = spriteram + i * 4;

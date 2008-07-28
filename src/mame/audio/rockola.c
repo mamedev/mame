@@ -119,7 +119,7 @@ INLINE void validate_tone_channel(running_machine *machine, int channel)
 {
 	if (!tone_channels[channel].mute)
 	{
-		UINT8 *ROM = memory_region(machine, REGION_SOUND1);
+		UINT8 *ROM = memory_region(machine, RGNCLASS_SOUND, "rockola");
 		UINT8 romdata = ROM[tone_channels[channel].base + tone_channels[channel].offset];
 
 		if (romdata != 0xff)

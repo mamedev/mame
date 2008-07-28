@@ -622,9 +622,9 @@ static const gfx_layout bg3264_charlayout =
 
 
 static GFXDECODE_START( kickgoal )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, fg816_charlayout,   0x000, 0x40 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, bg1632_charlayout,  0x000, 0x40 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, bg3264_charlayout,  0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, fg816_charlayout,   0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, bg1632_charlayout,  0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, bg3264_charlayout,  0x000, 0x40 )
 GFXDECODE_END
 
 static const gfx_layout actionhw_fg88_alt_charlayout =
@@ -654,8 +654,8 @@ static const gfx_layout actionhw_bg1616_charlayout =
 
 
 static GFXDECODE_START( actionhw )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, actionhw_fg88_alt_charlayout,   0x000, 0x40 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, actionhw_bg1616_charlayout,  0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, actionhw_fg88_alt_charlayout,   0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, actionhw_bg1616_charlayout,  0x000, 0x40 )
 GFXDECODE_END
 
 /* MACHINE drivers ***********************************************************/
@@ -694,7 +694,7 @@ static MACHINE_DRIVER_START( kickgoal )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("oki", OKIM6295, 12000000/8)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
@@ -729,7 +729,7 @@ static MACHINE_DRIVER_START( actionhw )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_12MHz/12) /* verified on pcb */
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
@@ -738,15 +738,15 @@ MACHINE_DRIVER_END
 /* Rom Loading ***************************************************************/
 
 ROM_START( kickgoal )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "ic6",   0x000000, 0x40000, CRC(498ca792) SHA1(c638c3a1755870010c5961b58bcb02458ff4e238) )
 	ROM_LOAD16_BYTE( "ic5",   0x000001, 0x40000, CRC(d528740a) SHA1(d56a71004aabc839b0833a6bf383e5ef9d4948fa) )
 
-	ROM_REGION( 0x1000, REGION_CPU2, 0 )	/* sound? (missing) */
+	ROM_REGION( 0x1000, RGNCLASS_CPU, "audio", 0 )	/* sound? (missing) */
 	/* Remove the CPU_DISABLED flag in MACHINE_DRIVER when the rom is dumped */
 	ROM_LOAD( "pic16c57",     0x0000, 0x0800, NO_DUMP )
 
-	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "ic33",   0x000000, 0x80000, CRC(5038f52a) SHA1(22ed0e2c8a99056e73cff912731626689996a276) )
 	ROM_LOAD( "ic34",   0x080000, 0x80000, CRC(06e7094f) SHA1(e41b893ef91d541d2623d76ce6c69ecf4218c16d) )
 	ROM_LOAD( "ic35",   0x100000, 0x80000, CRC(ea010563) SHA1(5e474db372550e9d33f933ab00881a9b29a712d1) )
@@ -754,25 +754,25 @@ ROM_START( kickgoal )
 
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is the area that gets switched */
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 )	/* OKIM6295 samples */
 	ROM_LOAD( "ic13",        0x00000, 0x40000, BAD_DUMP CRC(c6cb56e9) SHA1(835773b3f0647d3c553180bcf10e57ad44d68353) ) // BAD ADDRESS LINES (mask=010000)
 	ROM_CONTINUE(            0x60000, 0x20000 )
 	ROM_CONTINUE(            0xa0000, 0x20000 )
-	ROM_COPY( REGION_SOUND1, 0x00000, 0x40000, 0x20000)
-	ROM_COPY( REGION_SOUND1, 0x00000, 0x80000, 0x20000)
-	ROM_COPY( REGION_SOUND1, 0x00000, 0xc0000, 0x20000)
+	ROM_COPY( RGNCLASS_SOUND, "oki", 0x00000, 0x40000, 0x20000)
+	ROM_COPY( RGNCLASS_SOUND, "oki", 0x00000, 0x80000, 0x20000)
+	ROM_COPY( RGNCLASS_SOUND, "oki", 0x00000, 0xc0000, 0x20000)
 ROM_END
 
 ROM_START( actionhw )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "2.ic6",  0x000000, 0x80000, CRC(2b71d58c) SHA1(3e58531fa56d41a3c7944e3beab4850907564a89) )
 	ROM_LOAD16_BYTE( "1.ic5",  0x000001, 0x80000, CRC(136b9711) SHA1(553f9fdd99bb9ce2e1492d0755633075e59ba587) )
 
-	ROM_REGION( 0x1000, REGION_CPU2, 0 )	/* sound? (missing) */
+	ROM_REGION( 0x1000, RGNCLASS_CPU, "audio", 0 )	/* sound? (missing) */
 	/* Remove the CPU_DISABLED flag in MACHINE_DRIVER when the rom is dumped */
 	ROM_LOAD( "pic16c57",     0x0000, 0x0800, NO_DUMP )
 
-	ROM_REGION( 0x400000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "4.ic29",  0x000000, 0x80000, CRC(df076744) SHA1(4b2c8e21a201e1491e4ba3cda8d71b51e0943431) )
 	ROM_LOAD( "5.ic33",  0x080000, 0x80000, CRC(8551fdd4) SHA1(f29bdfb75af7607534de171d7b3927419c00377c) )
 	ROM_LOAD( "6.ic30",  0x100000, 0x80000, CRC(5cb005a5) SHA1(d3a5ab8f9a520bfaa53fdf6145142ccba416fbb8) )
@@ -784,13 +784,13 @@ ROM_START( actionhw )
 
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is the area that gets switched */
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 )    /* OKIM6295 samples */
+	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 )    /* OKIM6295 samples */
 	ROM_LOAD( "3.ic13",      0x00000, 0x40000, CRC(b8f6705d) SHA1(55116e14aba6dac7334e26f704b3e6b0b9f856c2) )
 	ROM_CONTINUE(            0x60000, 0x20000 )
 	ROM_CONTINUE(            0xa0000, 0x20000 )
-	ROM_COPY( REGION_SOUND1, 0x00000, 0x40000, 0x20000)
-	ROM_COPY( REGION_SOUND1, 0x00000, 0x80000, 0x20000)
-	ROM_COPY( REGION_SOUND1, 0x00000, 0xc0000, 0x20000) /* Last bank used in Test Mode */
+	ROM_COPY( RGNCLASS_SOUND, "oki", 0x00000, 0x40000, 0x20000)
+	ROM_COPY( RGNCLASS_SOUND, "oki", 0x00000, 0x80000, 0x20000)
+	ROM_COPY( RGNCLASS_SOUND, "oki", 0x00000, 0xc0000, 0x20000) /* Last bank used in Test Mode */
 ROM_END
 
 /* GAME drivers **************************************************************/
@@ -798,7 +798,7 @@ ROM_END
 static DRIVER_INIT( kickgoal )
 {
 #if 0 /* we should find a real fix instead  */
-	UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
+	UINT16 *rom = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
 
 	/* fix "bug" that prevents game from writing to EEPROM */
 	rom[0x12b0/2] = 0x0001;

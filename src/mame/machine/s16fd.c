@@ -197,9 +197,9 @@ void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(running_
 {
 	int i;
 
-	fd1094_cpuregion = (UINT16*)memory_region(machine, REGION_CPU1);
-	fd1094_cpuregionsize = memory_region_length(machine, REGION_CPU1);
-	fd1094_key = memory_region(machine, REGION_USER1);
+	fd1094_cpuregion = (UINT16*)memory_region(machine, RGNCLASS_CPU, "main");
+	fd1094_cpuregionsize = memory_region_length(machine, RGNCLASS_CPU, "main");
+	fd1094_key = memory_region(machine, RGNCLASS_USER, "user1");
 	fd1094_set_decrypted = set_decrypted;
 
 	/* punt if no key; this allows us to be called even for non-FD1094 games */
@@ -215,10 +215,10 @@ void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(running_
 	fd1094_state = -1;
 
 	/* key debugging */
-	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0 && memory_region(machine, REGION_USER2) != NULL)
+	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0 && memory_region(machine, RGNCLASS_USER, "user2") != NULL)
 	{
-		void fd1094_init_debugging(running_machine *, int, int, int, void (*changed)(void));
-		fd1094_init_debugging(machine, REGION_CPU1, REGION_USER1, REGION_USER2, key_changed);
+		void fd1094_init_debugging(running_machine *machine, const char *cpureg, const char *keyreg, const char *statreg, void (*changed)(void));
+		fd1094_init_debugging(machine, "main", "user1", "user2", key_changed);
 	}
 
 	state_save_register_global(fd1094_selected_state);

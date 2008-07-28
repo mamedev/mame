@@ -153,7 +153,7 @@ this is the data written to internal ram on startup:
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 	int offs;
 
 	/* bit 0 = RAM bank? */
@@ -510,13 +510,11 @@ static void volume_callback1(int v)
 
 static const struct K007232_interface k007232_interface_1 =
 {
-	REGION_SOUND1,
 	volume_callback0
 };
 
 static const struct K007232_interface k007232_interface_2 =
 {
-	REGION_SOUND2,
 	volume_callback1
 };
 
@@ -585,56 +583,56 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( spy )
-	ROM_REGION( 0x29000, REGION_CPU1, 0 ) /* code + banked roms + space for banked ram */
+	ROM_REGION( 0x29000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms + space for banked ram */
 	ROM_LOAD( "857n03.bin",   0x10000, 0x10000, CRC(97993b38) SHA1(0afd561bc85fcbfe30f2d16807424ceec7188ce7) )
 	ROM_LOAD( "857n02.bin",   0x20000, 0x08000, CRC(31a97efe) SHA1(6c9ec3954e4d16634bf95835b8b404d3a6ef6e24) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 code */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* Z80 code */
 	ROM_LOAD( "857d01.bin",   0x0000, 0x8000, CRC(aad4210f) SHA1(bb40b8673939b5ce51012606da86b4dcbfc52a57) )
 
-	ROM_REGION( 0x080000, REGION_GFX1, 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
 	ROM_LOAD( "857b09.bin",   0x00000, 0x40000, CRC(b8780966) SHA1(6c255f1e4d1398fa9010a1ae0f5172dc524df109) )	/* characters */
 	ROM_LOAD( "857b08.bin",   0x40000, 0x40000, CRC(3e4d8d50) SHA1(70f45a725bf1e9d15285ffb6b280945f7ce7faf0) )
 
-	ROM_REGION( 0x100000, REGION_GFX2, 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
 	ROM_LOAD( "857b06.bin",   0x00000, 0x80000, CRC(7b515fb1) SHA1(3830649d47964940023760b76e2bf94bb9163f23) )	/* sprites */
 	ROM_LOAD( "857b05.bin",   0x80000, 0x80000, CRC(27b0f73b) SHA1(6b6a3da11c3005e3a62e6280818c18ae2ea31800) )
 
-	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_REGION( 0x0200, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "857a10.bin",   0x0000, 0x0100, CRC(32758507) SHA1(c21f89ad253502968a755fb0d23da98319f9cd93) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 ) /* samples for 007232 #0 */
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "konami1", 0 ) /* samples for 007232 #0 */
 	ROM_LOAD( "857b07.bin",   0x00000, 0x40000, CRC(ce3512d4) SHA1(1e7c3feabfc3ac89056982b76de39e283cf5894d) )
 
-	ROM_REGION( 0x40000, REGION_SOUND2, 0 ) /* samples for 007232 #1 */
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "konami2", 0 ) /* samples for 007232 #1 */
 	ROM_LOAD( "857b04.bin",   0x00000, 0x40000, CRC(20b83c13) SHA1(63062f1c0a9adbbced3d3d73682a2cd1217bee7d) )
 ROM_END
 
 ROM_START( spyu )
-	ROM_REGION( 0x29000, REGION_CPU1, 0 ) /* code + banked roms + space for banked ram */
+	ROM_REGION( 0x29000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms + space for banked ram */
 	ROM_LOAD( "857m03.bin",   0x10000, 0x10000, CRC(3bd87fa4) SHA1(257371ef31c8adcdc04f46e989b7a2f3531c2ab1) )
 	ROM_LOAD( "857m02.bin",   0x20000, 0x08000, CRC(306cc659) SHA1(91d150b8d320bf19c12bc46103ffdffacf4387c3) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 code */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* Z80 code */
 	ROM_LOAD( "857d01.bin",   0x0000, 0x8000, CRC(aad4210f) SHA1(bb40b8673939b5ce51012606da86b4dcbfc52a57) )
 
-	ROM_REGION( 0x080000, REGION_GFX1, 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx1", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
 	ROM_LOAD( "857b09.bin",   0x00000, 0x40000, CRC(b8780966) SHA1(6c255f1e4d1398fa9010a1ae0f5172dc524df109) )	/* characters */
 	ROM_LOAD( "857b08.bin",   0x40000, 0x40000, CRC(3e4d8d50) SHA1(70f45a725bf1e9d15285ffb6b280945f7ce7faf0) )
 
-	ROM_REGION( 0x100000, REGION_GFX2, 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx2", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
 	ROM_LOAD( "857b06.bin",   0x00000, 0x80000, CRC(7b515fb1) SHA1(3830649d47964940023760b76e2bf94bb9163f23) )	/* sprites */
 	ROM_LOAD( "857b05.bin",   0x80000, 0x80000, CRC(27b0f73b) SHA1(6b6a3da11c3005e3a62e6280818c18ae2ea31800) )
 
-	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_REGION( 0x0200, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "857a10.bin",   0x0000, 0x0100, CRC(32758507) SHA1(c21f89ad253502968a755fb0d23da98319f9cd93) )	/* priority encoder (not used) */
 
-	ROM_REGION( 0x40000, REGION_SOUND1, 0 ) /* samples for 007232 #0 */
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "konami1", 0 ) /* samples for 007232 #0 */
 	ROM_LOAD( "857b07.bin",   0x00000, 0x40000, CRC(ce3512d4) SHA1(1e7c3feabfc3ac89056982b76de39e283cf5894d) )
 
-	ROM_REGION( 0x40000, REGION_SOUND2, 0 ) /* samples for 007232 #1 */
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "konami2", 0 ) /* samples for 007232 #1 */
 	ROM_LOAD( "857b04.bin",   0x00000, 0x40000, CRC(20b83c13) SHA1(63062f1c0a9adbbced3d3d73682a2cd1217bee7d) )
 ROM_END
 
@@ -642,14 +640,14 @@ ROM_END
 
 static void gfx_untangle(void)
 {
-	konami_rom_deinterleave_2(REGION_GFX1);
-	konami_rom_deinterleave_2(REGION_GFX2);
+	konami_rom_deinterleave_2("gfx1");
+	konami_rom_deinterleave_2("gfx2");
 }
 
 static DRIVER_INIT( spy )
 {
-	paletteram = &memory_region(machine, REGION_CPU1)[0x28000];
-	pmcram =     &memory_region(machine, REGION_CPU1)[0x28800];
+	paletteram = &memory_region(machine, RGNCLASS_CPU, "main")[0x28000];
+	pmcram =     &memory_region(machine, RGNCLASS_CPU, "main")[0x28800];
 	gfx_untangle();
 }
 

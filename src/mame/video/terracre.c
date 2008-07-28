@@ -34,7 +34,7 @@ TILE_GET_INFO( get_fg_tile_info )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	const UINT8 *spritepalettebank = memory_region(machine, REGION_USER1);
+	const UINT8 *spritepalettebank = memory_region(machine, RGNCLASS_USER, "user1");
 	const gfx_element *pGfx = machine->gfx[2];
 	const UINT16 *pSource = spriteram16;
 	int i;

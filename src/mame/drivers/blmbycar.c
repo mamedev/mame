@@ -56,7 +56,7 @@ static WRITE16_HANDLER( blmbycar_okibank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *RAM = memory_region(machine, REGION_SOUND1);
+		UINT8 *RAM = memory_region(machine, RGNCLASS_SOUND, "oki");
 		memcpy(&RAM[0x30000],&RAM[0x40000 + 0x10000*(data & 0xf)],0x10000);
 	}
 }
@@ -367,7 +367,7 @@ static const gfx_layout layout_16x16x4 =
 
 /* Layers both use the first $20 color codes. Sprites the next $10 */
 static GFXDECODE_START( blmbycar )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4, 0x0, 0x30 ) // [0] Layers + Sprites
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x0, 0x30 ) // [0] Layers + Sprites
 GFXDECODE_END
 
 
@@ -405,7 +405,7 @@ static MACHINE_DRIVER_START( blmbycar )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END
@@ -435,7 +435,7 @@ static MACHINE_DRIVER_START( watrball )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END
@@ -463,37 +463,37 @@ GFX : TI TPC1020AFN-084
 ***************************************************************************/
 
 ROM_START( blmbycar )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "bcrom4.bin", 0x000000, 0x080000, CRC(06d490ba) SHA1(6d113561b474bf613c6b91c9525a52025ae65ab7) )
 	ROM_LOAD16_BYTE( "bcrom6.bin", 0x000001, 0x080000, CRC(33aca664) SHA1(04fff492654d3edac62e9d35808e5946bcc78cbb) )
 
-	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "bc_rom7",   0x000000, 0x080000, CRC(e55ca79b) SHA1(4453a6ae0518832f437ab701c28cb2f32920f8ba) )
 	ROM_LOAD( "bc_rom8",   0x080000, 0x080000, CRC(cdf38c96) SHA1(3273c29b6a01a7296d06fc653120f8c615195d2c) )
 	ROM_LOAD( "bc_rom9",   0x100000, 0x080000, CRC(0337ab3d) SHA1(18c72cd640c7b599390dffaeb670f5832202bf06) )
 	ROM_LOAD( "bc_rom10",  0x180000, 0x080000, CRC(5458917e) SHA1(c8dd5a391cc20a573e27a140b185893a8c04859e) )
 
-	ROM_REGION( 0x140000, REGION_SOUND1, 0 )	/* 8 bit adpcm (banked) */
+	ROM_REGION( 0x140000, RGNCLASS_SOUND, "oki", 0 )	/* 8 bit adpcm (banked) */
 	ROM_LOAD( "bc_rom1",     0x040000, 0x080000, CRC(ac6f8ba1) SHA1(69d2d47cdd331bde5a8973d29659b3f8520452e7) )
 	ROM_LOAD( "bc_rom2",     0x0c0000, 0x080000, CRC(a4bc31bf) SHA1(f3d60141a91449a73f6cec9f4bc5d95ca7911e19) )
-	ROM_COPY( REGION_SOUND1, 0x040000, 0x000000,   0x040000 )
+	ROM_COPY( RGNCLASS_SOUND, "oki", 0x040000, 0x000000,   0x040000 )
 ROM_END
 
 ROM_START( blmbycau )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "bc_rom4", 0x000000, 0x080000, CRC(76f054a2) SHA1(198efd152b13033e5249119ca48b9e0f6351b0b9) )
 	ROM_LOAD16_BYTE( "bc_rom6", 0x000001, 0x080000, CRC(2570b4c5) SHA1(706465950023a6ef7c85ceb9c76246d7556b3859) )
 
-	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "bc_rom7",   0x000000, 0x080000, CRC(e55ca79b) SHA1(4453a6ae0518832f437ab701c28cb2f32920f8ba) )
 	ROM_LOAD( "bc_rom8",   0x080000, 0x080000, CRC(cdf38c96) SHA1(3273c29b6a01a7296d06fc653120f8c615195d2c) )
 	ROM_LOAD( "bc_rom9",   0x100000, 0x080000, CRC(0337ab3d) SHA1(18c72cd640c7b599390dffaeb670f5832202bf06) )
 	ROM_LOAD( "bc_rom10",  0x180000, 0x080000, CRC(5458917e) SHA1(c8dd5a391cc20a573e27a140b185893a8c04859e) )
 
-	ROM_REGION( 0x140000, REGION_SOUND1, 0 )	/* 8 bit adpcm (banked) */
+	ROM_REGION( 0x140000, RGNCLASS_SOUND, "oki", 0 )	/* 8 bit adpcm (banked) */
 	ROM_LOAD( "bc_rom1",     0x040000, 0x080000, CRC(ac6f8ba1) SHA1(69d2d47cdd331bde5a8973d29659b3f8520452e7) )
 	ROM_LOAD( "bc_rom2",     0x0c0000, 0x080000, CRC(a4bc31bf) SHA1(f3d60141a91449a73f6cec9f4bc5d95ca7911e19) )
-	ROM_COPY( REGION_SOUND1, 0x040000, 0x000000,   0x040000 )
+	ROM_COPY( RGNCLASS_SOUND, "oki", 0x040000, 0x000000,   0x040000 )
 ROM_END
 
 /*
@@ -513,27 +513,27 @@ The game has fonts identical to World rally and obiviously Blomby car ;)
 */
 
 ROM_START( watrball )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rom4.bin", 0x000000, 0x020000, CRC(bfbfa720) SHA1(d6d14c0ba545eb7adee7190da2d3db1c6dd00d75) )
 	ROM_LOAD16_BYTE( "rom6.bin", 0x000001, 0x020000, CRC(acff9b01) SHA1(b85671bcc4f03fdf05eb1c9b5d4143e33ec1d7db) )
 
-	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "rom7.bin",   0x000000, 0x080000, CRC(e7e5c311) SHA1(5af1a666bf23c5505d120d81fb942f5c49341861) )
 	ROM_LOAD( "rom8.bin",   0x080000, 0x080000, CRC(fd27ce6e) SHA1(a472a8cc25818427d2870518649780146e51835b) )
 	ROM_LOAD( "rom9.bin",   0x100000, 0x080000, CRC(122cc0ad) SHA1(27cdb19fa082089e47c5cdb44742cfd93aa23a00) )
 	ROM_LOAD( "rom10.bin",  0x180000, 0x080000, CRC(22a2a706) SHA1(c7350a94a857e0007d7fc0076b44a3d62693cb6c) )
 
-	ROM_REGION( 0x140000, REGION_SOUND1, 0 )	/* 8 bit adpcm (banked) */
+	ROM_REGION( 0x140000, RGNCLASS_SOUND, "oki", 0 )	/* 8 bit adpcm (banked) */
 	ROM_LOAD( "rom1.bin",     0x040000, 0x080000, CRC(7f88dee7) SHA1(d493b961fa4631185a33faee7f61786430707209))
 //  ROM_LOAD( "rom2.bin",     0x0c0000, 0x080000, /* not populated for this game */ )
-	ROM_COPY( REGION_SOUND1, 0x040000, 0x000000,   0x040000 )
+	ROM_COPY( RGNCLASS_SOUND, "oki", 0x040000, 0x000000,   0x040000 )
 ROM_END
 
 
 static DRIVER_INIT( blmbycar )
 {
-	UINT16 *RAM  = (UINT16 *) memory_region(machine, REGION_CPU1);
-	size_t    size = memory_region_length(machine, REGION_CPU1) / 2;
+	UINT16 *RAM  = (UINT16 *) memory_region(machine, RGNCLASS_CPU, "main");
+	size_t    size = memory_region_length(machine, RGNCLASS_CPU, "main") / 2;
 	int i;
 
 	for (i = 0; i < size; i++)

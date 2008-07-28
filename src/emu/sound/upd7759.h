@@ -10,7 +10,6 @@
 
 struct upd7759_interface
 {
-	int region; 	/* memory region (per chip, standalone mode only) */
 	void (*drqcallback)(int param);	/* drq callback (per chip, slave mode only) */
 };
 

@@ -254,7 +254,7 @@ static const gfx_layout tiles8x8_layout =
 
 
 static GFXDECODE_START( pkscram )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 0x80 )
 GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int irq)
@@ -318,11 +318,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( pkscram )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 ) /* 68k */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "pk1.6e", 0x00000, 0x10000, CRC(80e972e5) SHA1(cbbc6e1e3fbb65b40164e140f368d8fff85c1521) )
 	ROM_LOAD16_BYTE( "pk2.6j", 0x00001, 0x10000, CRC(752c86d1) SHA1(2e0c669307bed6f9eab957b0e1316416e653a72f) )
 
-	ROM_REGION( 0x40000, REGION_GFX1, 0 ) /* gfx */
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
 	ROM_LOAD16_BYTE( "pk3.1c", 0x00000, 0x20000, CRC(0b18f2bc) SHA1(32892589442884ba02a1c6059ecb94e4ef516b86) )
 	ROM_LOAD16_BYTE( "pk4.1e", 0x00001, 0x20000, CRC(a232d993) SHA1(1b7b15cf0fabf3b2b2e429506a78ff4c08f4f7a5) )
 ROM_END

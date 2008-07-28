@@ -112,7 +112,7 @@ INLINE int adjust_xy(int rawx, int rawy, int *outx, int *outy)
 
 static void sega_generate_vector_list(running_machine *machine)
 {
-	UINT8 *sintable = memory_region(machine, REGION_PROMS);
+	UINT8 *sintable = memory_region(machine, RGNCLASS_PROMS, "proms");
 	double total_time = 1.0 / (double)IRQ_CLOCK;
 	UINT16 symaddr = 0;
 

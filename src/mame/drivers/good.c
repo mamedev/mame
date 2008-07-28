@@ -265,8 +265,8 @@ static const gfx_layout good_layout2 =
 
 
 static GFXDECODE_START( good )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, good_layout2,  0x100, 16  ) /* fg tiles */
-	GFXDECODE_ENTRY( REGION_GFX1, 0, good_layout2,  0x200, 16  ) /* fg tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, good_layout2,  0x100, 16  ) /* fg tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, good_layout2,  0x200, 16  ) /* fg tiles */
 GFXDECODE_END
 
 
@@ -293,21 +293,21 @@ static MACHINE_DRIVER_START( good )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.47)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.47)
 MACHINE_DRIVER_END
 
 
 ROM_START( good )
-	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "system1", 0x00001, 0x10000, CRC(128374cb) SHA1(a6521f506a6e4f8e62936ec0e66b080106a43f36) )
 	ROM_LOAD16_BYTE( "system2", 0x00000, 0x10000, CRC(c4eada4e) SHA1(2d9875487626796db8633520625ad6ad642723ef) )
 
-	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_REGION( 0x040000, RGNCLASS_SOUND, "oki", 0 ) /* Samples */
 	ROM_LOAD( "voice.rom", 0x00000, 0x40000, CRC(a5a23482) SHA1(51ca69589086c1da44d64575ee9a4da7b88ba669) )
 
-	ROM_REGION( 0x80000, REGION_GFX1, 0 )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "grp-01", 0x00000, 0x20000, CRC(33f8458e) SHA1(7f0c5fb44e3350c579f2dea82f0ec1d2ac5967ff) )
 	ROM_LOAD16_BYTE( "grp-02", 0x00001, 0x20000, CRC(c0b98e6c) SHA1(fdafced2418feeec0ed3d87bbbc88d5aa28f380a) )
 	ROM_LOAD16_BYTE( "grp-03", 0x40000, 0x20000, CRC(41da3bf4) SHA1(e7d1973951d4470fd2e0fa3c4690633219b71c06) )

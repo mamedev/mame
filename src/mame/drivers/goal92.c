@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( adpcm_control_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "audio");
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
@@ -303,11 +303,11 @@ static const gfx_layout layout_16x16x4_2 =
 #endif
 
 static GFXDECODE_START( goal92 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4,		   0*16, 8*16 ) // Sprites
-	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x8x4,		  48*16,   16 ) // Text Layer
-	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4,		   0*16,   16 ) // BG Layer
-	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4,		  16*16,   16 ) // Mid Layer
-	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4,		  32*16,   16 ) // FG Layer
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,		   0*16, 8*16 ) // Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,		  48*16,   16 ) // Text Layer
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,		   0*16,   16 ) // BG Layer
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,		  16*16,   16 ) // Mid Layer
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,		  32*16,   16 ) // FG Layer
 GFXDECODE_END
 
 
@@ -392,21 +392,21 @@ Z80 clock: 2.51MHz
 */
 
 ROM_START( goal92 )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x80000, CRC(db0a6c7c) SHA1(b609db7806b99bc921806d8b3e5e515b4651c375) )
 	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x80000, CRC(e4c45dee) SHA1(542749bd1ff51220a151fe66acdadac83df8f0ee) )
 
-	ROM_REGION( 0x18000, REGION_CPU2, 0 )	/* Z80 code */
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "audio", 0 )	/* Z80 code */
 	ROM_LOAD( "1.bin",        0x00000, 0x8000, CRC(3d317622) SHA1(ae4e8c5247bc215a2769786cb8639bce2f80db22) )
 	ROM_CONTINUE(             0x10000, 0x8000 ) /* banked at 8000-bfff */
 
-	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "6.bin",        0x000000, 0x040000, CRC(83cadc8f) SHA1(1d3309750347c5d6d661f5cf452235e5a83a7483) )
 	ROM_LOAD( "7.bin",        0x040000, 0x040000, CRC(067e10fc) SHA1(9831b8dc9b8efa6f7797b2946ee5be03fb36de7b) )
 	ROM_LOAD( "5.bin",        0x080000, 0x040000, CRC(9a390af2) SHA1(8bc46f8cc7823b8caf381866bea016ebfad9d5d3) )
 	ROM_LOAD( "4.bin",        0x0c0000, 0x040000, CRC(69b118d5) SHA1(80ab6f03e1254ba47c27299ce11559b244a024ad) )
 
-	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "11.bin",       0x000000, 0x080000, CRC(5701e626) SHA1(e6915714e9ca90be8fa8ab1bf7fd1f23a83fb82c) )
 	ROM_LOAD( "10.bin",       0x080000, 0x080000, CRC(ebb359cc) SHA1(b2f724ef7a91fca0ff0b7d7abe1c37816464b37d) )
 	ROM_LOAD( "9.bin",        0x100000, 0x080000, CRC(c9f0dd07) SHA1(d70cdb24b7df521255b5841f01dd9e8344ab7bdb) )

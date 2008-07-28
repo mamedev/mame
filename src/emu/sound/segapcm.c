@@ -77,7 +77,7 @@ static void SEGAPCM_update(void *param, stream_sample_t **inputs, stream_sample_
 		}
 }
 
-static void *segapcm_start(int sndindex, int clock, const void *config)
+static void *segapcm_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	const struct SEGAPCMinterface *intf = config;
 	int mask, rom_mask, len;
@@ -86,7 +86,7 @@ static void *segapcm_start(int sndindex, int clock, const void *config)
 	spcm = auto_malloc(sizeof(*spcm));
 	memset(spcm, 0, sizeof(*spcm));
 
-	spcm->rom = (const UINT8 *)memory_region(Machine, intf->region);
+	spcm->rom = (const UINT8 *)memory_region(Machine, RGNCLASS_SOUND, tag);
 	spcm->ram = auto_malloc(0x800);
 
 	memset(spcm->ram, 0xff, 0x800);
@@ -96,7 +96,7 @@ static void *segapcm_start(int sndindex, int clock, const void *config)
 	if(!mask)
 		mask = BANK_MASK7>>16;
 
-	len = memory_region_length(Machine, intf->region);
+	len = memory_region_length(Machine, RGNCLASS_SOUND, tag);
 	for(rom_mask = 1; rom_mask < len; rom_mask *= 2);
 	rom_mask--;
 

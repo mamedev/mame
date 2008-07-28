@@ -381,8 +381,8 @@ static READ16_HANDLER( dsp_hold_line_r )
 
 static READ16_HANDLER( dsp_rom_r )
 {
-	UINT8 *rom = memory_region(machine, REGION_USER2);
-	return rom[iop_romaddr & (memory_region_length(machine, REGION_USER2) - 1)];
+	UINT8 *rom = memory_region(machine, RGNCLASS_USER, "user2");
+	return rom[iop_romaddr & (memory_region_length(machine, RGNCLASS_USER, "user2") - 1)];
 }
 
 
@@ -491,7 +491,7 @@ static ADDRESS_MAP_START( amerdart_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x05000000, 0x0500000f) AM_READWRITE(coolpool_iop_r, amerdart_iop_w)
 	AM_RANGE(0x06000000, 0x06007fff) AM_RAM_WRITE(nvram_thrash_data_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
-	AM_RANGE(0xffb00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1, 0)
+	AM_RANGE(0xffb00000, 0xffffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0)
 ADDRESS_MAP_END
 
 
@@ -500,10 +500,10 @@ static ADDRESS_MAP_START( coolpool_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)	// IMSG176P-40
 	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
 	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
-	AM_RANGE(0x03000000, 0x03ffffff) AM_ROM AM_REGION(REGION_GFX1, 0)
+	AM_RANGE(0x03000000, 0x03ffffff) AM_ROM AM_REGION(RGNCLASS_GFX, "gfx1", 0)
 	AM_RANGE(0x06000000, 0x06007fff) AM_RAM_WRITE(nvram_thrash_data_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1, 0)
+	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0)
 ADDRESS_MAP_END
 
 
@@ -514,8 +514,8 @@ static ADDRESS_MAP_START( nballsht_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x04000000, 0x040000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)	// IMSG176P-40
 	AM_RANGE(0x06000000, 0x0601ffff) AM_MIRROR(0x00020000) AM_RAM_WRITE(nvram_thrash_data_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
-	AM_RANGE(0xff000000, 0xff7fffff) AM_ROM AM_REGION(REGION_GFX1, 0)
-	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1, 0)
+	AM_RANGE(0xff000000, 0xff7fffff) AM_ROM AM_REGION(RGNCLASS_GFX, "gfx1", 0)
+	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0)
 ADDRESS_MAP_END
 
 
@@ -755,7 +755,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( amerdart )
-	ROM_REGION16_LE( 0x0a0000, REGION_USER1, 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x0a0000, RGNCLASS_USER, "user1", 0 )	/* 34010 code */
 	ROM_LOAD16_BYTE( "u31",  0x000001, 0x10000, CRC(9628c422) SHA1(46b71acc746760962e34e9d7876f9499ea7d5c7c) )
 	ROM_LOAD16_BYTE( "u32",  0x000000, 0x10000, CRC(2d651ed0) SHA1(e2da2c3d8f25c17e26fd435c75983b2db8691993) )
 	ROM_LOAD16_BYTE( "u38",  0x020001, 0x10000, CRC(1eb8c887) SHA1(220f566043535c54ad1cf2216966c7f42099e50b) )
@@ -767,11 +767,11 @@ ROM_START( amerdart )
 	ROM_LOAD16_BYTE( "u57",  0x080001, 0x10000, CRC(f620f935) SHA1(bf891fce1f04f3ad5b8b72d43d041ceacb0b65bc) )
 	ROM_LOAD16_BYTE( "u58",  0x080000, 0x10000, CRC(f1b3d7c4) SHA1(7b897230d110be7a5eb05eda927d00561ebb9ce3) )
 
-	ROM_REGION( 0x18000, REGION_CPU2, 0 )	/* 32015 code (missing) */
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "dsp", 0 )	/* 32015 code (missing) */
 	ROM_LOAD16_BYTE( "dspl",         0x00000, 0x08000, NO_DUMP )
 	ROM_LOAD16_BYTE( "dsph",         0x00001, 0x08000, NO_DUMP )
 
-	ROM_REGION( 0x100000, REGION_USER2, 0 )				/* 32015 data? (incl. samples?) */
+	ROM_REGION( 0x100000, RGNCLASS_USER, "user2", 0 )				/* 32015 data? (incl. samples?) */
 	ROM_LOAD16_WORD( "u1",   0x000000, 0x10000, CRC(3f459482) SHA1(d9d489efd0d9217fceb3bf1a3b37a78d6823b4d9) )
 	ROM_LOAD16_WORD( "u2",   0x010000, 0x10000, CRC(a587fffd) SHA1(f33f511d1bf1d6eb3c42535593a9718571174c4b) )
 	ROM_LOAD16_WORD( "u3",   0x020000, 0x10000, CRC(984d343a) SHA1(ee214830de4cb22d2d8e9d3ca335eff05af4abb6) )
@@ -791,7 +791,7 @@ ROM_START( amerdart )
 ROM_END
 
 ROM_START( amerdar2 )
-	ROM_REGION16_LE( 0x0a0000, REGION_USER1, 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x0a0000, RGNCLASS_USER, "user1", 0 )	/* 34010 code */
 	ROM_LOAD16_BYTE( "u31",     0x000001, 0x10000, CRC(9628c422) SHA1(46b71acc746760962e34e9d7876f9499ea7d5c7c) )
 	ROM_LOAD16_BYTE( "u32",     0x000000, 0x10000, CRC(2d651ed0) SHA1(e2da2c3d8f25c17e26fd435c75983b2db8691993) )
 	ROM_LOAD16_BYTE( "u38",     0x020001, 0x10000, CRC(1eb8c887) SHA1(220f566043535c54ad1cf2216966c7f42099e50b) )
@@ -803,11 +803,11 @@ ROM_START( amerdar2 )
 	ROM_LOAD16_BYTE( "u57.bin", 0x080001, 0x10000, CRC(8a70f849) SHA1(dfd4cf90de2ab8cbeff458f0fd20110c1ed009e9) )
 	ROM_LOAD16_BYTE( "u58.bin", 0x080000, 0x10000, CRC(8bb81975) SHA1(b7666572ab543991c7deaa0ebefb8b4526a7e386) )
 
-	ROM_REGION( 0x18000, REGION_CPU2, 0 )	/* 32015 code (missing) */
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "dsp", 0 )	/* 32015 code (missing) */
 	ROM_LOAD16_BYTE( "dspl",         0x00000, 0x08000, NO_DUMP )
 	ROM_LOAD16_BYTE( "dsph",         0x00001, 0x08000, NO_DUMP )
 
-	ROM_REGION( 0x100000, REGION_USER2, 0 )				/* 32015 data? (incl. samples?) */
+	ROM_REGION( 0x100000, RGNCLASS_USER, "user2", 0 )				/* 32015 data? (incl. samples?) */
 	ROM_LOAD16_WORD( "u1.bin",   0x000000, 0x10000, CRC(e2bb7f54) SHA1(39eeb61a852b93331f445cc1c993727e52959660) )
 	ROM_LOAD16_WORD( "u2",      0x010000, 0x10000, CRC(a587fffd) SHA1(f33f511d1bf1d6eb3c42535593a9718571174c4b) )
 	ROM_LOAD16_WORD( "u3",      0x020000, 0x10000, CRC(984d343a) SHA1(ee214830de4cb22d2d8e9d3ca335eff05af4abb6) )
@@ -828,11 +828,11 @@ ROM_END
 
 
 ROM_START( coolpool )
-	ROM_REGION16_LE( 0x40000, REGION_USER1, 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x40000, RGNCLASS_USER, "user1", 0 )	/* 34010 code */
 	ROM_LOAD16_BYTE( "u112b",        0x00000, 0x20000, CRC(aa227769) SHA1(488e357a7aad07369cade3110cde14ba8562c66c) )
 	ROM_LOAD16_BYTE( "u113b",        0x00001, 0x20000, CRC(5b5f82f1) SHA1(82afb6a8d94cf09960b962d5208aab451b56feae) )
 
-	ROM_REGION16_LE( 0x200000, REGION_GFX1, 0 )	/* gfx data read by main CPU */
+	ROM_REGION16_LE( 0x200000, RGNCLASS_GFX, "gfx1", 0 )	/* gfx data read by main CPU */
 	ROM_LOAD16_BYTE( "u04",          0x000000, 0x20000, CRC(66a9940e) SHA1(7fa587280ecfad6b06194868de09cbdd57cf517f) )
 	ROM_CONTINUE(                    0x100000, 0x20000 )
 	ROM_LOAD16_BYTE( "u08",          0x000001, 0x20000, CRC(56789cf4) SHA1(5ad867d5029fdac9dccd01a6979171aa30d9a6eb) )
@@ -850,11 +850,11 @@ ROM_START( coolpool )
 	ROM_LOAD16_BYTE( "u05",          0x0c0001, 0x20000, CRC(616965e2) SHA1(588ea3c5c7838c50b2157ff1074f629d9d85791c) )
 	ROM_CONTINUE(                    0x1c0001, 0x20000 )
 
-	ROM_REGION( 0x40000, REGION_CPU2, 0 )	/* TMS320C26 */
+	ROM_REGION( 0x40000, RGNCLASS_CPU, "dsp", 0 )	/* TMS320C26 */
 	ROM_LOAD16_BYTE( "u34",          0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
 	ROM_LOAD16_BYTE( "u35",          0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
 
-	ROM_REGION( 0x200000, REGION_USER2, 0 )	/* TMS32026 data */
+	ROM_REGION( 0x200000, RGNCLASS_USER, "user2", 0 )	/* TMS32026 data */
 	ROM_LOAD( "u17c",         0x000000, 0x40000, CRC(ea3cc41d) SHA1(e703e789dfbcfaec878a990031ce839164c51253) )
 	ROM_LOAD( "u16c",         0x040000, 0x40000, CRC(2e6680ea) SHA1(cb30dc789039aab491428d075fee9e0bc04fd2ce) )
 	ROM_LOAD( "u15c",         0x080000, 0x40000, CRC(8e5f248e) SHA1(a954d3c20dc0b70f83c4c238db30a33285fcb353) )
@@ -867,19 +867,19 @@ ROM_END
 
 
 ROM_START( 9ballsht )
-	ROM_REGION16_LE( 0x80000, REGION_USER1, 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x80000, RGNCLASS_USER, "user1", 0 )	/* 34010 code */
 	ROM_LOAD16_BYTE( "u112",         0x00000, 0x40000, CRC(b3855e59) SHA1(c3175df24b85897783169bcaccd61630e512f7f6) )
 	ROM_LOAD16_BYTE( "u113",         0x00001, 0x40000, CRC(30cbf462) SHA1(64b2e2d40c2a92c4f4823dc866e5464792954ac3) )
 
-	ROM_REGION16_LE( 0x100000, REGION_GFX1, 0 )	/* gfx data read by main CPU */
+	ROM_REGION16_LE( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	/* gfx data read by main CPU */
 	ROM_LOAD16_BYTE( "u110",         0x00000, 0x80000, CRC(890ed5c0) SHA1(eaf06ee5b6c5ed0103b535396b4517012818a416) )
 	ROM_LOAD16_BYTE( "u111",         0x00001, 0x80000, CRC(1a9f1145) SHA1(ba52a6d1aca26484c320518f69c66ce3ceb4adcf) )
 
-	ROM_REGION( 0x40000, REGION_CPU2, 0 )	/* TMS320C26 */
+	ROM_REGION( 0x40000, RGNCLASS_CPU, "dsp", 0 )	/* TMS320C26 */
 	ROM_LOAD16_BYTE( "u34",          0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
 	ROM_LOAD16_BYTE( "u35",          0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
 
-	ROM_REGION( 0x100000, REGION_USER2, 0 )	/* TMS32026 data */
+	ROM_REGION( 0x100000, RGNCLASS_USER, "user2", 0 )	/* TMS32026 data */
 	ROM_LOAD( "u54",          0x00000, 0x80000, CRC(1be5819c) SHA1(308b5b1fe05634419d03956ae1b2e5a61206900f) )
 	ROM_LOAD( "u53",          0x80000, 0x80000, CRC(d401805d) SHA1(f4bcb2bdc45c3bc5ca423e518cdea8b3a7e8d60e) )
 ROM_END
@@ -889,37 +889,37 @@ ROM_END
   I assume the others are the same.
  */
 ROM_START( 9ballsh2 )
-	ROM_REGION16_LE( 0x80000, REGION_USER1, 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x80000, RGNCLASS_USER, "user1", 0 )	/* 34010 code */
 	ROM_LOAD16_BYTE( "e-scape.112",  0x00000, 0x40000, CRC(aee8114f) SHA1(a0d0e9e3a879393585b85ac6d04e31a7d4221179) )
 	ROM_LOAD16_BYTE( "e-scape.113",  0x00001, 0x40000, CRC(ccd472a7) SHA1(d074080e987c233b26b3c72248411c575f7a2293) )
 
-	ROM_REGION16_LE( 0x100000, REGION_GFX1, 0 )	/* gfx data read by main CPU */
+	ROM_REGION16_LE( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	/* gfx data read by main CPU */
 	ROM_LOAD16_BYTE( "u110",         0x00000, 0x80000, CRC(890ed5c0) SHA1(eaf06ee5b6c5ed0103b535396b4517012818a416) )
 	ROM_LOAD16_BYTE( "u111",         0x00001, 0x80000, CRC(1a9f1145) SHA1(ba52a6d1aca26484c320518f69c66ce3ceb4adcf) )
 
-	ROM_REGION( 0x40000, REGION_CPU2, 0 )	/* TMS320C26 */
+	ROM_REGION( 0x40000, RGNCLASS_CPU, "dsp", 0 )	/* TMS320C26 */
 	ROM_LOAD16_BYTE( "u34",          0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
 	ROM_LOAD16_BYTE( "u35",          0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
 
-	ROM_REGION( 0x100000, REGION_USER2, 0 )	/* TMS32026 data */
+	ROM_REGION( 0x100000, RGNCLASS_USER, "user2", 0 )	/* TMS32026 data */
 	ROM_LOAD( "u54",          0x00000, 0x80000, CRC(1be5819c) SHA1(308b5b1fe05634419d03956ae1b2e5a61206900f) )
 	ROM_LOAD( "u53",          0x80000, 0x80000, CRC(d401805d) SHA1(f4bcb2bdc45c3bc5ca423e518cdea8b3a7e8d60e) )
 ROM_END
 
 ROM_START( 9ballsh3 )
-	ROM_REGION16_LE( 0x80000, REGION_USER1, 0 )	/* 34010 code */
+	ROM_REGION16_LE( 0x80000, RGNCLASS_USER, "user1", 0 )	/* 34010 code */
 	ROM_LOAD16_BYTE( "8e_1826.112",  0x00000, 0x40000, CRC(486f7a8b) SHA1(635e3b1e7a21a86dd3d0ea994e9b923b06df587e) )
 	ROM_LOAD16_BYTE( "8e_6166.113",  0x00001, 0x40000, CRC(c41db70a) SHA1(162112f9f5bb6345920a45c41da6a249796bd21f) )
 
-	ROM_REGION16_LE( 0x100000, REGION_GFX1, 0 )	/* gfx data read by main CPU */
+	ROM_REGION16_LE( 0x100000, RGNCLASS_GFX, "gfx1", 0 )	/* gfx data read by main CPU */
 	ROM_LOAD16_BYTE( "u110",         0x00000, 0x80000, CRC(890ed5c0) SHA1(eaf06ee5b6c5ed0103b535396b4517012818a416) )
 	ROM_LOAD16_BYTE( "u111",         0x00001, 0x80000, CRC(1a9f1145) SHA1(ba52a6d1aca26484c320518f69c66ce3ceb4adcf) )
 
-	ROM_REGION( 0x40000, REGION_CPU2, 0 )	/* TMS320C26 */
+	ROM_REGION( 0x40000, RGNCLASS_CPU, "dsp", 0 )	/* TMS320C26 */
 	ROM_LOAD16_BYTE( "u34",          0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
 	ROM_LOAD16_BYTE( "u35",          0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
 
-	ROM_REGION( 0x100000, REGION_USER2, 0 )	/* TMS32026 data */
+	ROM_REGION( 0x100000, RGNCLASS_USER, "user2", 0 )	/* TMS32026 data */
 	ROM_LOAD( "u54",          0x00000, 0x80000, CRC(1be5819c) SHA1(308b5b1fe05634419d03956ae1b2e5a61206900f) )
 	ROM_LOAD( "u53",          0x80000, 0x80000, CRC(d401805d) SHA1(f4bcb2bdc45c3bc5ca423e518cdea8b3a7e8d60e) )
 ROM_END
@@ -944,8 +944,8 @@ static DRIVER_INIT( 9ballsht )
 	UINT16 *rom;
 
 	/* decrypt the main program ROMs */
-	rom = (UINT16 *)memory_region(machine, REGION_USER1);
-	len = memory_region_length(machine, REGION_USER1);
+	rom = (UINT16 *)memory_region(machine, RGNCLASS_USER, "user1");
+	len = memory_region_length(machine, RGNCLASS_USER, "user1");
 	for (a = 0;a < len/2;a++)
 	{
 		int hi,lo,nhi,nlo;
@@ -968,8 +968,8 @@ static DRIVER_INIT( 9ballsht )
 	}
 
 	/* decrypt the sub data ROMs */
-	rom = (UINT16 *)memory_region(machine, REGION_USER2);
-	len = memory_region_length(machine, REGION_USER2);
+	rom = (UINT16 *)memory_region(machine, RGNCLASS_USER, "user2");
+	len = memory_region_length(machine, RGNCLASS_USER, "user2");
 	for (a = 1;a < len/2;a+=4)
 	{
 		/* just swap bits 1 and 2 of the address */

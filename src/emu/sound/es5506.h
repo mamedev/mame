@@ -10,8 +10,8 @@
 
 struct ES5505interface
 {
-	int region0;						/* memory region where the sample ROM lives */
-	int region1;						/* memory region where the sample ROM lives */
+	const char * region0;						/* memory region where the sample ROM lives */
+	const char * region1;						/* memory region where the sample ROM lives */
 	void (*irq_callback)(running_machine *machine, int state);	/* irq callback */
 	UINT16 (*read_port)(void);			/* input port read */
 };
@@ -29,10 +29,10 @@ void ES5505_voice_bank_1_w(int voice, int bank);
 
 struct ES5506interface
 {
-	int region0;						/* memory region where the sample ROM lives */
-	int region1;						/* memory region where the sample ROM lives */
-	int region2;						/* memory region where the sample ROM lives */
-	int region3;						/* memory region where the sample ROM lives */
+	const char * region0;						/* memory region where the sample ROM lives */
+	const char * region1;						/* memory region where the sample ROM lives */
+	const char * region2;						/* memory region where the sample ROM lives */
+	const char * region3;						/* memory region where the sample ROM lives */
 	void (*irq_callback)(running_machine *machine, int state);	/* irq callback */
 	UINT16 (*read_port)(void);			/* input port read */
 };

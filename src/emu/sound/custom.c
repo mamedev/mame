@@ -10,7 +10,7 @@ struct custom_info
 
 
 
-static void *custom_start(int sndindex, int clock, const void *config)
+static void *custom_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct custom_info *info;
 

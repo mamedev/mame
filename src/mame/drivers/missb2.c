@@ -54,7 +54,7 @@ static VIDEO_UPDATE( missb2 )
 
 	sx = 0;
 
-	prom = memory_region(screen->machine, REGION_PROMS);
+	prom = memory_region(screen->machine, RGNCLASS_PROMS, "proms");
 	for (offs = 0;offs < bublbobl_objectram_size;offs += 4)
 	{
 		/* skip empty sprites */
@@ -132,7 +132,7 @@ static WRITE8_HANDLER( bg_paletteram_RRRRGGGGBBBBxxxx_be_w )
 static WRITE8_HANDLER( missb2_bg_bank_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, REGION_CPU2);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "slave");
 
 	// I don't know how this is really connected,bit 1 is always high afaik...
 	bankaddress = ((data & 2) ? 0x1000 : 0x0000) | ((data & 1) ? 0x4000 : 0x0000) | (0x8000);
@@ -323,8 +323,8 @@ static const gfx_layout bglayout =
 /* Graphics Decode Information */
 
 static GFXDECODE_START( missb2 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout, 0, 1 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, bglayout,   0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, bglayout,   0, 2 )
 GFXDECODE_END
 
 
@@ -392,41 +392,41 @@ static MACHINE_DRIVER_START( missb2 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 MACHINE_DRIVER_END
 
 /* ROMs */
 
 ROM_START( missb2 )
-	ROM_REGION( 0x30000, REGION_CPU1, 0 )
+	ROM_REGION( 0x30000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "msbub2-u.204", 0x00000, 0x10000, CRC(b633bdde) SHA1(29a389c52ff06718f1c4c39f6a854856c237356b) ) /* FIRST AND SECOND HALF IDENTICAL */
 	/* ROMs banked at 8000-bfff */
 	ROM_LOAD( "msbub2-u.203", 0x10000, 0x10000, CRC(29fd8afe) SHA1(94ead80d20cd3974dd4fb0358915e3bd8b793158) )
 	/* 20000-2ffff empty */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for the second CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "slave", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "msbub2-u.11",  0x0000, 0x10000, CRC(003dc092) SHA1(dff3c2b31d0804a308e5c42cf9705cd3d6144ad7) )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* 64k for the third CPU */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 ) /* 64k for the third CPU */
 	ROM_LOAD( "msbub2-u.211", 0x0000, 0x08000, CRC(08e5d846) SHA1(8509a71df984f0348bdc6ab60eb2ba7ceb9b1246) )
 
-	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_INVERT )
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT )
 	ROM_LOAD( "msbub2-u.14",  0x00000, 0x40000, CRC(b3164b47) SHA1(083a63010515b0aa43b482938ae302b2df985312) )
 	ROM_LOAD( "msbub2-u.126", 0x40000, 0x40000, CRC(b0a9a353) SHA1(40d7f4c970d8571de319231c295fa0d2836efcf7) )
 	ROM_LOAD( "msbub2-u.124", 0x80000, 0x40000, CRC(4b0d8e5b) SHA1(218da3edcfea228e6df1ac59bc24217713d79410) )
 	ROM_LOAD( "msbub2-u.125", 0xc0000, 0x40000, CRC(77b710e2) SHA1(f6f46804a23de6c930bc40a3f45ac70e160f0645) )
 
-	ROM_REGION( 0x200000, REGION_GFX2, 0 ) /* background images */
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", 0 ) /* background images */
 	ROM_LOAD16_BYTE( "msbub2-u.ic1", 0x100001, 0x80000, CRC(d621cbc3) SHA1(36343d85bdde0e40dfe0f0e4e646546f175903f8) )
 	ROM_LOAD16_BYTE( "msbub2-u.ic3", 0x100000, 0x80000, CRC(90e56035) SHA1(8fa18d97a05890178c52b97ff75aed300344a93e) )
 	ROM_LOAD16_BYTE( "msbub2-u.ic2", 0x000001, 0x80000, CRC(694c2783) SHA1(401dc8713a02130289f364786c38e70c4c4f9b2e) )
 	ROM_LOAD16_BYTE( "msbub2-u.ic4", 0x000000, 0x80000, CRC(be71c9f0) SHA1(1961e931017f644486cea0ce431d50973679c848) )
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) /* samples */
+	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 ) /* samples */
 	ROM_LOAD( "msbub2-u.13", 0x00000, 0x20000, BAD_DUMP CRC(14f07386) SHA1(097897d92226f900e11dbbdd853aff3ac46ff016) )
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "a71-25.bin",  0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )	/* video timing - taken from bublbobl */
 ROM_END
 
@@ -434,7 +434,7 @@ ROM_END
 
 static DRIVER_INIT( missb2 )
 {
-	UINT8 *ROM = memory_region(machine, REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	/* in Bubble Bobble, bank 0 has code falling from 7fff to 8000,
        so I have to copy it there because bank switching wouldn't catch it */

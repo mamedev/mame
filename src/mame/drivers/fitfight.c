@@ -733,18 +733,18 @@ static const gfx_layout bbprot_sprite_layout =
 };
 
 static GFXDECODE_START( fitfight )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, fof_tile_layout,   0x000, 256  ) /* tx tiles */
-	GFXDECODE_ENTRY( REGION_GFX1, 0, fof_tile_layout,   0x200, 256  ) /* mid tiles */
-	GFXDECODE_ENTRY( REGION_GFX1, 0, fof_tile_layout,   0x400, 256  ) /* bg tiles */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, fof_sprite_layout, 0x600, 256  ) /* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, fof_tile_layout,   0x000, 256  ) /* tx tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, fof_tile_layout,   0x200, 256  ) /* mid tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, fof_tile_layout,   0x400, 256  ) /* bg tiles */
+	GFXDECODE_ENTRY( "gfx2", 0, fof_sprite_layout, 0x600, 256  ) /* sprites */
 
 GFXDECODE_END
 
 static GFXDECODE_START( prot )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, fof_tile_layout,     0x0000, 256  ) /* tx tiles */
-	GFXDECODE_ENTRY( REGION_GFX1, 0, fof_tile_layout,     0x0800, 256  ) /* mid tiles */
-	GFXDECODE_ENTRY( REGION_GFX1, 0, fof_tile_layout,     0x1000, 256  ) /* bg tiles */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, bbprot_sprite_layout,0x1800, 256  ) /* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, fof_tile_layout,     0x0000, 256  ) /* tx tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, fof_tile_layout,     0x0800, 256  ) /* mid tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, fof_tile_layout,     0x1000, 256  ) /* bg tiles */
+	GFXDECODE_ENTRY( "gfx2", 0, bbprot_sprite_layout,0x1800, 256  ) /* sprites */
 
 GFXDECODE_END
 
@@ -778,7 +778,7 @@ static MACHINE_DRIVER_START( fitfight )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1333333) // ~8080Hz ??? TODO: find out the real frequency
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -805,7 +805,7 @@ static MACHINE_DRIVER_START( bbprot )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1333333) // ~8080Hz ??? TODO: find out the real frequency
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -832,25 +832,25 @@ running!), but incredibly fun to see such a thing :) Hope you enjoy it!
 ***/
 
 ROM_START( fitfight )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u138_ff1.bin", 0x000001, 0x080000, CRC(165600fe) SHA1(b1987dbf34abdb6d08bdf7f71b256b62125e6517) )
 	ROM_LOAD16_BYTE( "u125_ff1.bin", 0x000000, 0x080000, CRC(2f9bdb66) SHA1(4c1ade349f1219d448453b27d4a7517966912ffa) )
 
-	ROM_REGION( 0x01c000, REGION_CPU2, 0 ) /* Sound Program */
+	ROM_REGION( 0x01c000, RGNCLASS_CPU, "audio", 0 ) /* Sound Program */
 	ROM_LOAD( "u23_ff1.bin",  0x000000, 0x004000, CRC(e2d6d768) SHA1(233e5501ffda8db48341fa66f16b630544803a89) )
 	ROM_CONTINUE(          0x010000, 0x00c000 )
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) /* OKI Samples? */
+	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 ) /* OKI Samples? */
 	ROM_LOAD( "h7e_ff1.bin",  0x000000, 0x080000, CRC(3e12dfd8) SHA1(8f21abfc6a6aac9ad3fafe97d0279739c7b9fab9) ) //seems to be a merge of 2 0x040000 roms
 	ROM_LOAD( "h18e_ff1.bin", 0x080000, 0x080000, CRC(a7f36dbe) SHA1(206efb7f32d6123ed3e22790ff38dd0a8e1626d7) ) //seems to be a merge of 2 0x040000 roms
 
-	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE ) /* GFX */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* GFX */
 	ROM_LOAD( "p1_ff1.bin",   0x0c0000, 0x040000, CRC(542593b3) SHA1(068d9b5dc98a8353462705c64d2d287f270510a9) )
 	ROM_LOAD( "p2_ff1.bin",   0x080000, 0x040000, CRC(fc517470) SHA1(45f33de393a89301051ec865ba665ad3366e29f7) )
 	ROM_LOAD( "p4_ff1.bin",   0x040000, 0x040000, CRC(a8754268) SHA1(c03ea06ba79ff799399d17dc0eb86f5a7e2e3f8e) )
 	ROM_LOAD( "p8_ff1.bin",   0x000000, 0x040000, CRC(bd55182a) SHA1(5253565fc2b73c70d9cbc8dbc9b0a201b21efa91) )
 
-	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) /* Sprites */
 	ROM_LOAD( "s1_ff1.bin",   0x300000, 0x080000, CRC(90a57445) SHA1(44a88de1377d685c2bc185187b5ba151d900792d) )
 	ROM_LOAD( "s1_ff1h.bin",  0x380000, 0x080000, CRC(07e23f95) SHA1(c2af437199f352264e5238547f9d14639cb6f329) )
 
@@ -886,25 +886,25 @@ It was dumped from a faulty board, wich doesn't boot, but with intact eproms :)
 ***/
 
 ROM_START( histryma )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "l_th.bin", 0x000001, 0x080000, CRC(5af9356a) SHA1(f3d797dcc528a3a2a4f0ebbf07d59bd2cc868622) )
 	ROM_LOAD16_BYTE( "r_th.bin", 0x000000, 0x080000, CRC(1a44b504) SHA1(621d95b67d413da3e8a90c0cde494b2529b92407) )
 
-	ROM_REGION( 0x01c000, REGION_CPU2, 0 ) /* Sound Program */
+	ROM_REGION( 0x01c000, RGNCLASS_CPU, "audio", 0 ) /* Sound Program */
 	ROM_LOAD( "y61f.bin",  0x000000, 0x004000, CRC(b588525a) SHA1(b768bd75d6351430f9656289146119e9c0308554) )
 	ROM_CONTINUE(          0x010000, 0x00c000 )
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) /* OKI Samples? */
+	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 ) /* OKI Samples? */
 	ROM_LOAD( "u7_th.bin",  0x000000, 0x080000, CRC(88b41ef5) SHA1(565e2c4554dde79cd2da8b8a181b3378818223cc) ) //seems to be a merge of 2 0x040000 roms
 	ROM_LOAD( "u18_th.bin", 0x080000, 0x080000, CRC(a734cd77) SHA1(3fe4cba6f6d691dfc4775de634e6e39bf4bb08b8) ) //seems to be a merge of 2 0x040000 roms
 
-	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE ) /* GFX */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* GFX */
 	ROM_LOAD( "p1_th.bin",   0x0c0000, 0x040000, CRC(501c5336) SHA1(1743221d73d59ba40ddad3f69bc4aa1a51c29962) )
 	ROM_LOAD( "p2_th.bin",   0x080000, 0x040000, CRC(f50666c7) SHA1(46856e70426388c9704eed94d4dbbbe5674b9be6) )
 	ROM_LOAD( "p4_th.bin",   0x040000, 0x040000, CRC(c70223cf) SHA1(d3ee1b73a22a0aaab909141b32696c6b48f2b7ee) )
 	ROM_LOAD( "p8_th.bin",   0x000000, 0x040000, CRC(8104b963) SHA1(ed02c3be16b8e94d9316391fe0f9fcf39679c1de) )
 
-	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) /* Sprites */
 	ROM_LOAD( "s1_th.bin",   0x300000, 0x080000, CRC(e9c2d27a) SHA1(f47cc318f4a3db84858b4d302be4063f3bb1b071) )
 	ROM_LOAD( "s1h_th.bin",  0x380000, 0x080000, CRC(d806c92e) SHA1(4781dd08755cd91f3d09ff418a9d13744d888922) )
 
@@ -951,17 +951,17 @@ but with a different date wrote on the stickers, those are the ??_DD_MM.bin file
 ***/
 
 ROM_START( bbprot )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "l_bb.bin", 0x000001, 0x080000, CRC(2b7b9a9a) SHA1(51088358814cc337af150526ac7fd6216c102299) )
 	ROM_LOAD16_BYTE( "r_bb.bin", 0x000000, 0x080000, CRC(28480f3e) SHA1(b89533fd01781e1b83c98b0b61a77f554fbdb4f3) )
 
-	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE ) /* BG GFX */
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* BG GFX */
 	ROM_LOAD( "p1_29_11.bin",   0x180000, 0x080000, CRC(e7da36c1) SHA1(c7ea40b57088145019c1be3e34ba9e94c60bef78) )
 	ROM_LOAD( "p2_29_11.bin",   0x100000, 0x080000, CRC(0411e1aa) SHA1(99ae1a45848f8227899989334f3035222bd5da39) )
 	ROM_LOAD( "p4_29_11.bin",   0x080000, 0x080000, CRC(885942bf) SHA1(d9bde8c12be7d02dde442873e0852c7c85478254) )
 	ROM_LOAD( "p8_29_11.bin",   0x000000, 0x080000, CRC(44f94575) SHA1(90c1a97e70d312b4475ce2d333e110e027c377b9) )
 
-	ROM_REGION( 0x780000, REGION_GFX2, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_REGION( 0x780000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) /* Sprites */
 	ROM_LOAD( "s1_21_12.bin",  0x600000, 0x080000, CRC(0b396256) SHA1(6e69641cd012e60618a68386342108d04e826e3c) )
 	ROM_LOAD( "s1_x.bin",      0x700000, 0x080000, CRC(b95dfbb8) SHA1(b37452900b07bc13bc9d1702ef1ff737ff0f393c) )
 	ROM_LOAD( "s1_h.bin",      0x680000, 0x080000, CRC(d20b6ac3) SHA1(8b6a5f1da47be456da528ddaaf18e2321261683e) )
@@ -987,7 +987,7 @@ ROM_END
 
 static DRIVER_INIT( fitfight )
 {
-//  UINT16 *mem16 = (UINT16 *)memory_region(machine, REGION_CPU1);
+//  UINT16 *mem16 = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
 //  mem16[0x0165B2/2]=0x4e71; // for now so it boots
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x700000, 0x700001, 0, 0, fitfight_700000_r);
 	bbprot_kludge = 0;
@@ -995,7 +995,7 @@ static DRIVER_INIT( fitfight )
 
 static DRIVER_INIT( histryma )
 {
-//  UINT16 *mem16 = (UINT16 *)memory_region(machine, REGION_CPU1);
+//  UINT16 *mem16 = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
 //  mem16[0x017FDC/2]=0x4e71; // for now so it boots
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x700000, 0x700001, 0, 0, histryma_700000_r);
 	bbprot_kludge = 0;

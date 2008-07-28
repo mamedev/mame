@@ -8,7 +8,6 @@ struct YM2608interface
 {
 	const struct AY8910interface ay8910_intf;
 	void ( *handler )( running_machine *machine, int irq );	/* IRQ handler for the YM2608 */
-	int pcmrom;		/* Delta-T memory region ram/rom */
 };
 
 /************************************************/

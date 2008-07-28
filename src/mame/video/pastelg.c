@@ -97,7 +97,7 @@ WRITE8_HANDLER( pastelg_blitter_w )
 
 WRITE8_HANDLER( pastelg_romsel_w )
 {
-	int gfxlen = memory_region_length(machine, REGION_GFX1);
+	int gfxlen = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
 	pastelg_gfxrom = ((data & 0xc0) >> 6);
 	pastelg_palbank = ((data & 0x10) >> 4);
 	nb1413m3_sndrombank1_w(machine, 0, data);
@@ -146,7 +146,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 
 static void pastelg_gfxdraw(running_machine *machine)
 {
-	UINT8 *GFX = memory_region(machine, REGION_GFX1);
+	UINT8 *GFX = memory_region(machine, RGNCLASS_GFX, "gfx1");
 	int width = video_screen_get_width(machine->primary_screen);
 
 	int x, y;
@@ -186,7 +186,7 @@ static void pastelg_gfxdraw(running_machine *machine)
 		skipy = -1;
 	}
 
-	gfxlen = memory_region_length(machine, REGION_GFX1);
+	gfxlen = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
 	gfxaddr = (pastelg_gfxrom << 16) + blitter_src_addr;
 
 	readflag = 0;

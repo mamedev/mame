@@ -332,7 +332,7 @@ static TIMER_CALLBACK( ad2083_step )
 
 static int ad2083_speech_rom_read_bit(void)
 {
-	UINT8 *ROM = memory_region(Machine, REGION_SOUND1);
+	UINT8 *ROM = memory_region(Machine, RGNCLASS_SOUND, "tms5110");
 	int bit;
 
 	speech_rom_address %= 4096;
@@ -370,7 +370,6 @@ static WRITE8_HANDLER( ad2083_tms5110_ctrl_w )
 
 static const struct TMS5110interface ad2083_tms5110_interface =
 {
-	-1,							/* rom_region */
 	ad2083_speech_rom_read_bit	/* M0 callback function. Called whenever chip requests a single bit of data */
 };
 

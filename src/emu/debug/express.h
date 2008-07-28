@@ -94,8 +94,8 @@ typedef void (*symbol_setter_func)(UINT32 ref, UINT64 value);
 typedef UINT64 (*function_execute_func)(UINT32 ref, UINT32 numparams, const UINT64 *paramlist);
 
 /* callback function for memory reads/writes */
-typedef UINT64 (*express_read_func)(int space, int index, UINT32 offset, int size);
-typedef void (*express_write_func)(int space, int index, UINT32 offset, int size, UINT64 value);
+typedef UINT64 (*express_read_func)(const char *name, int space, UINT32 offset, int size);
+typedef void (*express_write_func)(const char *name, int space, UINT32 offset, int size, UINT64 value);
 
 
 /* callback parameter for executing expressions */

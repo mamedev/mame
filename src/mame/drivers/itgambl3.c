@@ -150,7 +150,7 @@ static const gfx_layout gfxlayout_8x8x8 =
 ******************************/
 
 static GFXDECODE_START( itgambl3 )
-    GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout_8x8x8,   0, 16  )
+    GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x8,   0, 16  )
 GFXDECODE_END
 
 
@@ -192,7 +192,7 @@ static MACHINE_DRIVER_START( itgambl3 )
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("oki", OKIM6295, MAIN_CLOCK/16)	/* 1MHz */
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -245,15 +245,15 @@ Note:
 */
 
 ROM_START( ejollyx5 )	/* CPU and clock should be changed for this game */
-	ROM_REGION( 0x1000000, REGION_CPU1, 0 )	/* all the program code is in here */
+	ROM_REGION( 0x1000000, RGNCLASS_CPU, "main", 0 )	/* all the program code is in here */
 	ROM_LOAD( "ejollyx5_m30624fgafp.mcu", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x180000, REGION_GFX1, 0 )	/* different encoded gfx */
+	ROM_REGION( 0x180000, RGNCLASS_GFX, "gfx1", 0 )	/* different encoded gfx */
 	ROM_LOAD( "eurojolly5-ep01.u15", 0x000000, 0x80000, CRC(feb4ef88) SHA1(5a86e92326096e4e0619a8aa6b491553eb46839d) )
 	ROM_LOAD( "eurojolly5-ep02.u17", 0x080000, 0x80000, CRC(83b2dab0) SHA1(a65cae227a444fe7474f8f821dbb6a8b506e4ae6) )
 	ROM_LOAD( "eurojolly5-ep03.u16", 0x100000, 0x80000, CRC(a0599d3c) SHA1(f52928cd75b4374a45fad37b7a7c1d39ea31b5f2) )
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 ) /* M6295 samples, identical halves */
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 ) /* M6295 samples, identical halves */
 	ROM_LOAD( "eurojolly5-msg0.u21", 0x00000, 0x80000, CRC(edc157bc) SHA1(8400251ca7a74a4a0f2d443ae2c0254f1de955ac) )
 ROM_END
 
@@ -302,13 +302,13 @@ PCB N? KGS0243-DF070283/03 made in Italy
 */
 
 ROM_START( grandprx )	/* CPU and clock should be changed for this game */
-	ROM_REGION( 0x1000000, REGION_CPU1, 0 )	/* all the program code is in here */
+	ROM_REGION( 0x1000000, RGNCLASS_CPU, "main", 0 )	/* all the program code is in here */
 	ROM_LOAD( "grandprx_m30624fgafp.mcu", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x200000, REGION_GFX1, 0 )	/* different encoded gfx */
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 )	/* different encoded gfx */
 	ROM_LOAD( "u22.bin", 0x000000, 0x200000, CRC(e8ec804f) SHA1(84e647f693e0273b9b09d7726b814516496121a9) )
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 ) /* M6295 samples, identical halves */
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki", 0 ) /* M6295 samples, identical halves */
 	ROM_LOAD( "u3.bin", 0x00000, 0x80000, CRC(c9bb5858) SHA1(c154df7c7dfe394fc1963dc0c73f1d909f5b62ee) )
 ROM_END
 

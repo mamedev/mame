@@ -162,7 +162,7 @@ static VIDEO_UPDATE(jackpool)
 
 
 static GFXDECODE_START( jackpool )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout,   0x000, 256  ) /* sprites */
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0x000, 256  ) /* sprites */
 GFXDECODE_END
 
 /* verify */
@@ -195,21 +195,21 @@ static MACHINE_DRIVER_START( jackpool )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_DRIVER_END
 
 
 ROM_START( jackpool )
-	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "jpc2", 0x00001, 0x20000,CRC(5aad51ff) SHA1(af504d15c356c241efb6410a5dad09494d693eca) )
 	ROM_LOAD16_BYTE( "jpc3", 0x00000, 0x20000,CRC(249c7073) SHA1(e654232d5f454932a108591deacadc9da9fd8055) )
 
-	ROM_REGION( 0x080000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_REGION( 0x080000, RGNCLASS_SOUND, "oki", 0 ) /* Samples */
 	ROM_LOAD( "jpc1", 0x00000, 0x40000, CRC(0f1372a1) SHA1(cec8a9bfb03945af4e1e2d2b916b9ded52a8d0bd) )
 
-	ROM_REGION( 0x100000, REGION_GFX1, 0 ) /* Sprites */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", 0 ) /* Sprites */
 	ROM_LOAD( "jpc4", 0x00000, 0x40000,  CRC(b719f138) SHA1(82799cbccab4e39627e48855f6003917602b42c7) )
 	ROM_LOAD( "jpc5", 0x40000, 0x40000,  CRC(09661ed9) SHA1(fb298252c95a9040441c12c9d0e9280843d56a0d) )
 	ROM_LOAD( "jpc6", 0x80000, 0x40000,  CRC(c3117411) SHA1(8ed044beb1d6ab7ac48595f7d6bf879f1264454a) )

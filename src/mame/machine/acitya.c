@@ -24,7 +24,7 @@ static void acitya_decrypt_rom_8(running_machine *machine)
 	int mem;
 	UINT8 *RAM;
 
-	RAM = memory_region(machine, REGION_CPU1);
+	RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 
 	for (mem=0;mem<0x4000;mem++)
@@ -60,7 +60,7 @@ static void acitya_decrypt_rom_9(running_machine *machine)
 	int mem;
 	UINT8 *RAM;
 
-	RAM = memory_region(machine, REGION_CPU1);
+	RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -93,7 +93,7 @@ static void acitya_decrypt_rom_A(running_machine *machine)
 	int mem;
 	UINT8 *RAM;
 
-	RAM = memory_region(machine, REGION_CPU1);
+	RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -126,7 +126,7 @@ static void acitya_decrypt_rom_B(running_machine *machine)
 	int mem;
 	UINT8 *RAM;
 
-	RAM = memory_region(machine, REGION_CPU1);
+	RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -186,7 +186,7 @@ READ8_HANDLER( acitya_decrypt_rom )
 
 MACHINE_RESET( acitya )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	/* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little

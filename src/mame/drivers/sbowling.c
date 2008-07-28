@@ -54,7 +54,7 @@ static UINT8 pix[2] = {0, 0};
 
 static TILE_GET_INFO( get_sb_tile_info )
 {
-	UINT8 *rom = memory_region(machine, REGION_USER1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_USER, "user1");
 	int tileno = rom[tile_index + bgmap * 1024];
 
 	SET_TILE_INFO(0, tileno, 0, 0);
@@ -283,7 +283,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( sbowling )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x18, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x18, 1 )
 GFXDECODE_END
 
 
@@ -354,20 +354,20 @@ static MACHINE_DRIVER_START( sbowling )
 MACHINE_DRIVER_END
 
 ROM_START( sbowling )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "kb01.6h",        0x0000, 0x1000, CRC(dd5d411a) SHA1(ca15676d234353bc47f642be13d58f3d6d880126))
 	ROM_LOAD( "kb02.5h",        0x1000, 0x1000, CRC(75d3c45f) SHA1(af6e6237b7b28efaac258e6ddd85518c3406b24a))
 	ROM_LOAD( "kb03.3h",        0x2000, 0x1000, CRC(955fbfb8) SHA1(05d501f924adc5b816670f6f5e58a98a0c1bc962))
 
-	ROM_REGION( 0x1800, REGION_GFX1, 0 )
+	ROM_REGION( 0x1800, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD( "kb05.9k",        0x0000, 0x800,  CRC(4b4d9569) SHA1(d69e69add69ec11724090e34838ec8c61de81f4e))
 	ROM_LOAD( "kb06.7k",        0x0800, 0x800,  CRC(d89ba78b) SHA1(9e01be976e1e14feb8f7bd9f699a977a15a72e0d))
 	ROM_LOAD( "kb07.6k",        0x1000, 0x800,  CRC(9fb5db1a) SHA1(0b28ca5277ebe0d78d1a3f2d414efb5fd7c6e9ee))
 
-	ROM_REGION( 0x01000, REGION_USER1, 0 )
+	ROM_REGION( 0x01000, RGNCLASS_USER, "user1", 0 )
 	ROM_LOAD( "kb04.10k",       0x0000, 0x1000, CRC(1c27adc1) SHA1(a68748fbdbd8fb48f20b3675d793e5c156d1bd02))
 
-	ROM_REGION( 0x0800, REGION_PROMS, 0 )
+	ROM_REGION( 0x0800, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "kb08.7m",        0x0000, 0x0400, CRC(e949e441) SHA1(8e0fe71ed6d4e6f94a703c27a8364da27b443730))
 	ROM_LOAD( "kb09.6m",        0x0400, 0x0400, CRC(e29191a6) SHA1(9a2c78a96ef6d118f4dacbea0b7d454b66a452ae))
 ROM_END

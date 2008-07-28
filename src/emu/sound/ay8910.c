@@ -816,7 +816,7 @@ int ay8910_read_ym(void *chip)
  *
  *************************************/
 
-static void *ay8910_start(int sndindex, int clock, const void *config)
+static void *ay8910_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	static const struct AY8910interface generic_ay8910 =
 	{
@@ -828,7 +828,7 @@ static void *ay8910_start(int sndindex, int clock, const void *config)
 	return ay8910_start_ym(SOUND_AY8910, sndindex+16, clock, intf);
 }
 
-static void *ym2149_start(int sndindex, int clock, const void *config)
+static void *ym2149_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	static const struct AY8910interface generic_ay8910 =
 	{

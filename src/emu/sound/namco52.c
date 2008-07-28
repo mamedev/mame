@@ -130,7 +130,7 @@ static void namco_52xx_reset(void *_chip)
 	filter2_reset(&chip->n52_lp_filter);
 }
 
-static void *namco_52xx_start(int sndindex, int clock, const void *config)
+static void *namco_52xx_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct namco_52xx *chip;
 	int rate = clock/32;
@@ -139,8 +139,8 @@ static void *namco_52xx_start(int sndindex, int clock, const void *config)
 	memset(chip, 0, sizeof(*chip));
 
 	chip->intf = config;
-	chip->rom     = memory_region(Machine, chip->intf->region);
-	chip->rom_len = memory_region_length(Machine, chip->intf->region);
+	chip->rom     = memory_region(Machine, RGNCLASS_SOUND, tag);
+	chip->rom_len = memory_region_length(Machine, RGNCLASS_SOUND, tag);
 
 	if (chip->intf->play_rate == 0)
 	{

@@ -98,7 +98,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( yumefuda )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,   0, 0x10 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 0x10 )
 GFXDECODE_END
 
 
@@ -184,7 +184,7 @@ static WRITE8_HANDLER( mux_w )
 	//0x14000 bonus game
 	//0x16000 ?
 	if(bank!=new_bank) {
-		UINT8 *ROM = memory_region(machine, REGION_CPU1);
+		UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
 		UINT32 bankaddress;
 
 		bank = new_bank;
@@ -421,11 +421,11 @@ INPUT_PORTS_END
 
 
 ROM_START( yumefuda )
-	ROM_REGION( 0x18000, REGION_CPU1, 0 ) /* code */
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "main", 0 ) /* code */
 	ROM_LOAD("zg004y02.u43", 0x00000, 0x8000, CRC(974c543c) SHA1(56aeb318cb00445f133246dfddc8c24bb0c23f2d))
 	ROM_LOAD("zg004y01.u42", 0x10000, 0x8000, CRC(ae99126b) SHA1(4ae2c1c804bbc505a013f5e3d98c0bfbb51b747a))
 
-	ROM_REGION( 0x10000, REGION_GFX1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD("zg001006.u6", 0x0000, 0x4000, CRC(a5df443c) SHA1(a6c088a463c05e43a7b559c5d0afceddc88ef476))
 	ROM_LOAD("zg001005.u5", 0x4000, 0x4000, CRC(158b6cde) SHA1(3e335b7dc1bbae2edb02722025180f32ab91f69f))
 	ROM_LOAD("zg001004.u4", 0x8000, 0x4000, CRC(d8676435) SHA1(9b6df5378948f492717e1a4d9c833ddc5a9e8225))

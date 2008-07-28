@@ -40,7 +40,7 @@ struct _sound_interface
 	/* table of core functions */
 	void		(*get_info)(void *token, UINT32 state, sndinfo *info);
 	void		(*set_info)(void *token, UINT32 state, sndinfo *info);
-	void * 		(*start)(int index, int clock, const void *config);
+	void * 		(*start)(const char *tag, int index, int clock, const void *config);
 	void		(*stop)(void *token);
 	void		(*reset)(void *token);
 };
@@ -52,9 +52,10 @@ struct _sndintrf_data
 	sound_interface	intf;	 		/* copy of the interface data */
 	sound_type		sndtype; 		/* type index of this sound chip */
 	sound_type		aliastype;		/* aliased type index of this sound chip */
+	void *			token;			/* dynamically allocated token data */
+	const char *	tag; 			/* tag this sound chip */
 	int				index; 			/* index of this sound chip */
 	int				clock; 			/* clock for this sound chip */
-	void *			token;			/* dynamically allocated token data */
 };
 
 
@@ -582,13 +583,14 @@ void sndintrf_init(running_machine *machine)
     particular sndnum
 -------------------------------------------------*/
 
-int sndintrf_init_sound(int sndnum, sound_type sndtype, int clock, const void *config)
+int sndintrf_init_sound(int sndnum, const char *tag, sound_type sndtype, int clock, const void *config)
 {
 	sndintrf_data *info = &sound[sndnum];
 	int index;
 
 	/* fill in the type and interface */
 	info->intf = sndintrf[sndtype];
+	info->tag = tag;
 	info->sndtype = sndtype;
 	info->aliastype = sndtype_get_info_int(sndtype, SNDINFO_INT_ALIAS);
 	if (info->aliastype == 0)
@@ -607,7 +609,7 @@ int sndintrf_init_sound(int sndnum, sound_type sndtype, int clock, const void *c
 
 	/* start the chip, tagging all its streams */
 	current_sound_start = &sound[sndnum];
-	info->token = (*info->intf.start)(index, clock, config);
+	info->token = (*info->intf.start)(info->tag, index, clock, config);
 	current_sound_start = NULL;
 	VPRINTF(("  token = %p\n", info->token));
 
@@ -987,7 +989,7 @@ const char *sndtype_get_info_string(sound_type sndtype, UINT32 state)
     DUMMY INTERFACES
 ***************************************************************************/
 
-static void *dummy_sound_start(int index, int clock, const void *config)
+static void *dummy_sound_start(const char *tag, int index, int clock, const void *config)
 {
 	logerror("Warning: starting a dummy sound core -- you are missing a hookup in sndintrf.c!\n");
 	return auto_malloc(1);

@@ -231,8 +231,8 @@ static const gfx_layout tilelayout =
 };
 
 static GFXDECODE_START( othldrby )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 0, 0x80 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,   0, 0x80 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,   0, 0x80 )
 GFXDECODE_END
 
 
@@ -263,7 +263,7 @@ static MACHINE_DRIVER_START( othldrby )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1584000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -276,14 +276,14 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( othldrby )
-	ROM_REGION( 0x080000, REGION_CPU1, 0 )
+	ROM_REGION( 0x080000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "db0.1",        0x00000, 0x80000, CRC(6b4008d3) SHA1(4cf838c47563ba482be8364b2e115569a4a06c83) )
 
-	ROM_REGION( 0x400000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "db0-r2",       0x000000, 0x200000, CRC(4efff265) SHA1(4cd239ff42f532495946cb52bd1fee412f84e192) )
 	ROM_LOAD( "db0-r3",       0x200000, 0x200000, CRC(5c142b38) SHA1(5466a8b061a0f2545493de0f96fd4387beea276a) )
 
-	ROM_REGION( 0x080000, REGION_SOUND1, 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x080000, RGNCLASS_SOUND, "oki", 0 )	/* OKIM6295 samples */
 	ROM_LOAD( "db0.4",        0x00000, 0x80000, CRC(a9701868) SHA1(9ee89556666d358e8d3915622573b3ba660048b8) )
 ROM_END
 

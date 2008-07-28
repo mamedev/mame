@@ -51,7 +51,7 @@ static DRIVER_INIT( pastelg )
 
 static READ8_HANDLER( pastelg_sndrom_r )
 {
-	UINT8 *ROM = memory_region(machine, REGION_SOUND1);
+	UINT8 *ROM = memory_region(machine, RGNCLASS_SOUND, "voice");
 
 	return ROM[pastelg_blitter_src_addr_r() & 0x7fff];
 }
@@ -231,15 +231,15 @@ MACHINE_DRIVER_END
 
 
 ROM_START( pastelg )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 ) /* program */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 ) /* program */
 	ROM_LOAD( "pgal_09.bin",  0x00000, 0x04000, CRC(1e494af3) SHA1(1597a7da22ecfbb1df83cf9d0acc7a8be461bc2c) )
 	ROM_LOAD( "pgal_10.bin",  0x04000, 0x04000, CRC(677cccea) SHA1(a294bf4e3c5e74291160a0858371961868afc1d1) )
 	ROM_LOAD( "pgal_11.bin",  0x08000, 0x04000, CRC(c2ccea38) SHA1(0374e8aa0e7961426e417ffe6e1a0d8dc7fd9ecf) )
 
-	ROM_REGION( 0x08000, REGION_SOUND1, 0 ) /* voice */
+	ROM_REGION( 0x08000, RGNCLASS_SOUND, "voice", 0 ) /* voice */
 	ROM_LOAD( "pgal_08.bin",  0x00000, 0x08000, CRC(895961a1) SHA1(f02d517f46cc490db02c4feb369e2a386c764297) )
 
-	ROM_REGION( 0x38000, REGION_GFX1, 0 ) /* gfx */
+	ROM_REGION( 0x38000, RGNCLASS_GFX, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "pgal_01.bin",  0x00000, 0x08000, CRC(1bb14d52) SHA1(b3974e3c9b56a752ddcb206f7bb2bc658b0e77f1) )
 	ROM_LOAD( "pgal_02.bin",  0x08000, 0x08000, CRC(ea85673a) SHA1(85ef2bb736fe5229ce4153197db8a57bca982a8b) )
 	ROM_LOAD( "pgal_03.bin",  0x10000, 0x08000, CRC(40011248) SHA1(935f442a47e02bf8c6ccb324c7fad1b481b8b19a) )
@@ -248,7 +248,7 @@ ROM_START( pastelg )
 	ROM_LOAD( "pgal_06.bin",  0x28000, 0x08000, CRC(f56acfe8) SHA1(2f4ad3990f2d4d4a9fcec7adab119459423b308b) )
 	ROM_LOAD( "pgal_07.bin",  0x30000, 0x08000, CRC(fa4226dc) SHA1(2313449521f81a191e87f1e4c0f3473f3c27dd9d) )
 
-	ROM_REGION( 0x0040, REGION_PROMS, 0 ) /* color */
+	ROM_REGION( 0x0040, RGNCLASS_PROMS, "proms", 0 ) /* color */
 	ROM_LOAD( "pgal_bp1.bin", 0x0000, 0x0020, CRC(2b7fc61a) SHA1(278830e8728ea143208376feb20fff56de88ae1c) )
 	ROM_LOAD( "pgal_bp2.bin", 0x0020, 0x0020, CRC(4433021e) SHA1(e0d6619a193d26ad24788d4af5ef01ee89cffacd) )
 ROM_END

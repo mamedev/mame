@@ -19,7 +19,7 @@ static UINT8 *jackal_spritebank = 0;
 
 MACHINE_RESET( jackal )
 {
-	UINT8 *rgn = memory_region(machine, REGION_CPU1);
+	UINT8 *rgn = memory_region(machine, RGNCLASS_CPU, "master");
 
 	// HACK: running at the nominal clock rate, music stops working
 	// at the beginning of the game. This fixes it.
@@ -52,7 +52,7 @@ READ8_HANDLER( jackal_spriteram_r )
 
 WRITE8_HANDLER( jackal_rambank_w )
 {
-	UINT8 *rgn = memory_region(machine, REGION_CPU1);
+	UINT8 *rgn = memory_region(machine, RGNCLASS_CPU, "master");
 
 	if (data & 0x04) popmessage("jackal_rambank_w %02x",data);
 	coin_counter_w(0,data & 0x01);

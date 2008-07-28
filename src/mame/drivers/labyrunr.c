@@ -40,7 +40,7 @@ static INTERRUPT_GEN( labyrunr_interrupt )
 static WRITE8_HANDLER( labyrunr_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 if (data & 0xe0) popmessage("bankswitch %02x",data);
 
@@ -213,7 +213,7 @@ static const gfx_layout gfxlayout =
 };
 
 static GFXDECODE_START( labyrunr )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout, 0, 8*16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0, 8*16 )
 GFXDECODE_END
 
 /***************************************************************************
@@ -298,49 +298,49 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( tricktrp )
-	ROM_REGION( 0x28000, REGION_CPU1, 0 ) /* code + banked roms */
+	ROM_REGION( 0x28000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms */
 	ROM_LOAD( "771e04",     0x10000, 0x08000, CRC(ba2c7e20) SHA1(713dcc0e65bf9431f2c0df9db1210346a9476a52) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 	ROM_LOAD( "771e03",     0x18000, 0x10000, CRC(d0d68036) SHA1(8589ee07e229259341a4cc22bc64de8f06536472) )
 
-	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "771e01a",	0x00000, 0x10000, CRC(103ffa0d) SHA1(1949c49ca3b243e4cfb5fb19ecd3a1e1492cfddd) )	/* tiles + sprites */
 	ROM_LOAD16_BYTE( "771e01c",	0x00001, 0x10000, CRC(cfec5be9) SHA1(2b6a32e2608a70c47d1ec9b4de38b5c3a0898cde) )
 	ROM_LOAD16_BYTE( "771d01b",	0x20000, 0x10000, CRC(07f2a71c) SHA1(63c79e75e71539e69d4d9d35e629a6021124f6d0) )
 	ROM_LOAD16_BYTE( "771d01d",	0x20001, 0x10000, CRC(f6810a49) SHA1(b40e9f0d0919188a05c1990347da8dc8ff12d65a) )
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "771d02.08d", 0x0000, 0x0100, CRC(3d34bb5a) SHA1(3f3c845f1197457244e7c7e4f9b2a03c278613e4) )	/* sprite lookup table */
 															/* there is no char lookup table */
 ROM_END
 
 ROM_START( labyrunr )
-	ROM_REGION( 0x28000, REGION_CPU1, 0 ) /* code + banked roms */
+	ROM_REGION( 0x28000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms */
 	ROM_LOAD( "771j04.10f", 0x10000, 0x08000, CRC(354a41d0) SHA1(302e8f5c469ad3f615aeca8005ebde6b6051aaae) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 	ROM_LOAD( "771j03.08f", 0x18000, 0x10000, CRC(12b49044) SHA1(e9b22fb093cfb746a9767e94ef5deef98bed5b7a) )
 
-	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "771d01.14a",	0x00000, 0x40000, CRC(15c8f5f9) SHA1(e4235e1315d0331f3ce5047834a68764ed43aa4b) )	/* tiles + sprites */
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "771d02.08d", 0x0000, 0x0100, CRC(3d34bb5a) SHA1(3f3c845f1197457244e7c7e4f9b2a03c278613e4) )	/* sprite lookup table */
 															/* there is no char lookup table */
 ROM_END
 
 ROM_START( labyrunk )
-	ROM_REGION( 0x28000, REGION_CPU1, 0 ) /* code + banked roms */
+	ROM_REGION( 0x28000, RGNCLASS_CPU, "main", 0 ) /* code + banked roms */
 	ROM_LOAD( "771k04.10f", 0x10000, 0x08000, CRC(9816ab35) SHA1(6efb0332f4a62f20889f212682ee7225e4a182a9) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 	ROM_LOAD( "771k03.8f",  0x18000, 0x10000, CRC(48d732ae) SHA1(8bc7917397f32cf5f995b3763ae921725e27de05) )
 
-	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "771d01a.13a",	0x00000, 0x10000, CRC(0cd1ed1a) SHA1(eac6c106de28acc54535ae1fb99f778c1ed4013e) )	/* tiles + sprites */
 	ROM_LOAD16_BYTE( "771d01c.13a",	0x00001, 0x10000, CRC(d75521fe) SHA1(72f0c4d9511bc70d77415f50be93293026305bd5) )
 	ROM_LOAD16_BYTE( "771d01b",	    0x20000, 0x10000, CRC(07f2a71c) SHA1(63c79e75e71539e69d4d9d35e629a6021124f6d0) )
 	ROM_LOAD16_BYTE( "771d01d",	    0x20001, 0x10000, CRC(f6810a49) SHA1(b40e9f0d0919188a05c1990347da8dc8ff12d65a) )
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0100, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "771d02.08d", 0x0000, 0x0100, CRC(3d34bb5a) SHA1(3f3c845f1197457244e7c7e4f9b2a03c278613e4) )	/* sprite lookup table */
 															/* there is no char lookup table */
 ROM_END

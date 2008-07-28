@@ -93,7 +93,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( amspdwy_port_r )
 {
-	UINT8 *Tracks = memory_region(machine, REGION_CPU1)+0x10000;
+	UINT8 *Tracks = memory_region(machine, RGNCLASS_CPU, "main")+0x10000;
 	return Tracks[offset];
 }
 
@@ -225,7 +225,7 @@ static const gfx_layout layout_8x8x2 =
 };
 
 static GFXDECODE_START( amspdwy )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_8x8x2,   0, 8 ) // [0] Layer & Sprites
+	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x2,   0, 8 ) // [0] Layer & Sprites
 GFXDECODE_END
 
 
@@ -343,14 +343,14 @@ HILO.5A     5A    2732   9B3C
 ***************************************************************************/
 
 ROM_START( amspdwy )
-	ROM_REGION( 0x18000, REGION_CPU1, 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "main", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "game5807.u33", 0x00000, 0x8000, CRC(88233b59) SHA1(bfdf10dde1731cde5c579a9a5173cafe9295a80c) )
 	ROM_LOAD( "trks6092.u34", 0x10000, 0x8000, CRC(74a4e7b7) SHA1(b4f6e3faaf048351c6671205f52378a64b81bcb1) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "audi9463.u2", 0x00000, 0x8000, CRC(61b0467e) SHA1(74509e7712838dd760919893aeda9241d308d0c3) )
 
-	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )	/* Layer + Sprites */
+	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Layer + Sprites */
 	ROM_LOAD( "hilo9b3c.5a", 0x0000, 0x1000, CRC(f50f864c) SHA1(5b2412c1558b30a04523fcdf1d5cf6fdae1ba88d) )
 	ROM_LOAD( "hihie12a.4a", 0x1000, 0x1000, CRC(3d7497f3) SHA1(34820ba42d9c9dab1d6fdda15795450ce08392c1) )
 	ROM_LOAD( "lolo1d51.1a", 0x2000, 0x1000, CRC(58701c1c) SHA1(67b476e697652a6b684bd76ae6c0078ed4b3e3a2) )
@@ -358,14 +358,14 @@ ROM_START( amspdwy )
 ROM_END
 
 ROM_START( amspdwya )
-	ROM_REGION( 0x18000, REGION_CPU1, 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x18000, RGNCLASS_CPU, "main", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "game.u33",     0x00000, 0x8000, CRC(facab102) SHA1(e232969eaaad8b89ac8e28ee0a7996107a7de9a2) )
 	ROM_LOAD( "trks6092.u34", 0x10000, 0x8000, CRC(74a4e7b7) SHA1(b4f6e3faaf048351c6671205f52378a64b81bcb1) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "audi9463.u2", 0x00000, 0x8000, CRC(61b0467e) SHA1(74509e7712838dd760919893aeda9241d308d0c3) )
 
-	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )	/* Layer + Sprites */
+	ROM_REGION( 0x4000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )	/* Layer + Sprites */
 	ROM_LOAD( "hilo9b3c.5a", 0x0000, 0x1000, CRC(f50f864c) SHA1(5b2412c1558b30a04523fcdf1d5cf6fdae1ba88d) )
 	ROM_LOAD( "hihie12a.4a", 0x1000, 0x1000, CRC(3d7497f3) SHA1(34820ba42d9c9dab1d6fdda15795450ce08392c1) )
 	ROM_LOAD( "lolo1d51.1a", 0x2000, 0x1000, CRC(58701c1c) SHA1(67b476e697652a6b684bd76ae6c0078ed4b3e3a2) )

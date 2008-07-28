@@ -121,7 +121,7 @@ static void simpsons_banking( int lines )
 
 MACHINE_RESET( simpsons )
 {
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)simpsons_banking);
 
@@ -132,11 +132,11 @@ MACHINE_RESET( simpsons )
 	simpsons_firq_enabled = 0;
 
 	/* init the default banks */
-	memory_configure_bank(1, 0, 64, memory_region(machine, REGION_CPU1) + 0x10000, 0x2000);
+	memory_configure_bank(1, 0, 64, memory_region(machine, RGNCLASS_CPU, "main") + 0x10000, 0x2000);
 	memory_set_bank(1, 0);
 
-	memory_configure_bank(2, 0, 2, memory_region(machine, REGION_CPU2) + 0x10000, 0);
-	memory_configure_bank(2, 2, 6, memory_region(machine, REGION_CPU2) + 0x10000, 0x4000);
+	memory_configure_bank(2, 0, 2, memory_region(machine, RGNCLASS_CPU, "audio") + 0x10000, 0);
+	memory_configure_bank(2, 2, 6, memory_region(machine, RGNCLASS_CPU, "audio") + 0x10000, 0x4000);
 	memory_set_bank(2, 0);
 
 	simpsons_video_banking( machine, 0 );

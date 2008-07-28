@@ -1,8 +1,8 @@
 /* helper function to join two 16-bit ROMs and form a 32-bit data stream */
-void konami_rom_deinterleave_2(int mem_region);
-void konami_rom_deinterleave_2_half(int mem_region);
+void konami_rom_deinterleave_2(const char *mem_region);
+void konami_rom_deinterleave_2_half(const char *mem_region);
 /* helper function to join four 16-bit ROMs and form a 64-bit data stream */
-void konami_rom_deinterleave_4(int mem_region);
+void konami_rom_deinterleave_4(const char *mem_region);
 
 
 #define MAX_K007121 2
@@ -65,7 +65,7 @@ The callback must put:
 */
 extern tilemap *K052109_tilemap[3];
 
-void K052109_vh_start(running_machine *machine,int gfx_memory_region,int plane_order,
+void K052109_vh_start(running_machine *machine,const char *gfx_memory_region,int plane_order,
 		void (*callback)(int layer,int bank,int *code,int *color,int *flags,int *priority));
 /* plain 8-bit access */
 READ8_HANDLER( K052109_r );
@@ -94,7 +94,7 @@ The callback must put:
   shadow is preloaded with color & 0x80 so it doesn't need to be changed unless
   the game has special treatment (Aliens)
 */
-void K051960_vh_start(running_machine *machine,int gfx_memory_region,int plane_order,
+void K051960_vh_start(running_machine *machine,const char *gfx_memory_region,int plane_order,
 		void (*callback)(int *code,int *color,int *priority,int *shadow));
 READ8_HANDLER( K051960_r );
 WRITE8_HANDLER( K051960_w );
@@ -114,7 +114,7 @@ READ8_HANDLER( K052109_051960_r );
 WRITE8_HANDLER( K052109_051960_w );
 
 
-void K053245_vh_start(running_machine *machine,int chip, int gfx_memory_region,int plane_order,
+void K053245_vh_start(running_machine *machine,int chip, const char *gfx_memory_region,int plane_order,
 		void (*callback)(int *code,int *color,int *priority_mask));
 READ16_HANDLER( K053245_word_r );
 WRITE16_HANDLER( K053245_word_w );
@@ -139,7 +139,7 @@ void K053245_set_SpriteOffset(int chip,int offsx, int offsy);
 #define K055673_LAYOUT_LE2 2
 #define K055673_LAYOUT_GX6 3
 
-void K055673_vh_start(running_machine *machine, int gfx_memory_region, int alt_layout, int dx, int dy,
+void K055673_vh_start(running_machine *machine, const char *gfx_memory_region, int alt_layout, int dx, int dy,
 		void (*callback)(int *code,int *color,int *priority));
 READ16_HANDLER( K055673_rom_word_r );
 READ16_HANDLER( K055673_GX6bpp_rom_word_r );
@@ -154,7 +154,7 @@ Callback procedures for non-standard shadows:
 #define K053247_CUSTOMSHADOW	0x20000000
 #define K053247_SHDSHIFT		20
 
-void K053247_vh_start(running_machine *machine, int gfx_memory_region,int dx,int dy,int plane_order,
+void K053247_vh_start(running_machine *machine, const char *gfx_memory_region,int dx,int dy,int plane_order,
 		void (*callback)(int *code,int *color,int *priority_mask));
 READ8_HANDLER( K053247_r );
 WRITE8_HANDLER( K053247_w );
@@ -193,13 +193,13 @@ The callback must put:
 - if necessary, put flags for the TileMap code in the tile_info
   structure (e.g. TILE_FLIPX)
 */
-void K051316_vh_start_0(running_machine *machine,int gfx_memory_region,int bpp,
+void K051316_vh_start_0(running_machine *machine,const char *gfx_memory_region,int bpp,
 		int tilemap_type,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags));
-void K051316_vh_start_1(running_machine *machine,int gfx_memory_region,int bpp,
+void K051316_vh_start_1(running_machine *machine,const char *gfx_memory_region,int bpp,
 		int tilemap_type,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags));
-void K051316_vh_start_2(running_machine *machine,int gfx_memory_region,int bpp,
+void K051316_vh_start_2(running_machine *machine,const char *gfx_memory_region,int bpp,
 		int tilemap_type,int transparent_pen,
 		void (*callback)(int *code,int *color,int *flags));
 READ8_HANDLER( K051316_0_r );
@@ -254,7 +254,7 @@ READ8_HANDLER( K051733_r );
 
 void K056832_SetExtLinescroll(void);	/* Lethal Enforcers */
 
-void K056832_vh_start(running_machine *machine, int gfx_memory_region, int bpp, int big,
+void K056832_vh_start(running_machine *machine, const char *gfx_memory_region, int bpp, int big,
 			int (*scrolld)[4][2],
 			void (*callback)(int layer, int *code, int *color, int *flags),
 			int djmain_hack);
@@ -411,7 +411,7 @@ void K054338_export_config(int **shdRGB);
 #define K338_CTL_WAILSL		0x10
 #define K338_CTL_CLIPSL		0x20
 
-void K053250_vh_start(int chips, int *region);
+void K053250_vh_start(int chips, const char **region);
 WRITE16_HANDLER( K053250_0_w );
 READ16_HANDLER( K053250_0_r );
 WRITE16_HANDLER( K053250_0_ram_w );
@@ -429,7 +429,7 @@ READ16_HANDLER( K053250_1_rom_r );
 
 void K053250_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int colorbase, int flags, int pri);
 void K053250_set_LayerOffset(int chip, int offsx, int offsy);
-void K053250_unpack_pixels(int region);
+void K053250_unpack_pixels(const char *region);
 void K053250_dma(running_machine *machine, int chip, int limiter);
 
 

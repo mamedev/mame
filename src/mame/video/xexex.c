@@ -34,7 +34,7 @@ static void xexex_tile_callback(int layer, int *code, int *color, int *flags)
 
 VIDEO_START( xexex )
 {
-	int region = REGION_GFX3;
+	const char * region = "gfx3";
 
 	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_RGB32);
 
@@ -44,8 +44,8 @@ VIDEO_START( xexex )
 	K054338_vh_start();
 	K053250_vh_start(1, &region);
 
-	K056832_vh_start(machine,REGION_GFX1, K056832_BPP_4, 1, NULL, xexex_tile_callback, 0);
-	K053247_vh_start(machine,REGION_GFX2, -48, 32, NORMAL_PLANE_ORDER, xexex_sprite_callback);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_4, 1, NULL, xexex_tile_callback, 0);
+	K053247_vh_start(machine, "gfx2", -48, 32, NORMAL_PLANE_ORDER, xexex_sprite_callback);
 
 	// Xexex has relative plane offsets of -2,2,4,6 vs. -2,0,2,3 in MW and GX.
 	K056832_set_LayerOffset(0, -2, 16);

@@ -99,7 +99,7 @@ static WRITE16_HANDLER( pasha2_misc_w )
 					case 0xb000:
 					case 0xc000:
 					case 0xd000:
-						memory_set_bankptr(1, memory_region(machine, REGION_USER2) + 0x400 * (bank - 0x8000)); break;
+						memory_set_bankptr(1, memory_region(machine, RGNCLASS_USER, "user2") + 0x400 * (bank - 0x8000)); break;
 				}
 			}
 		}
@@ -227,7 +227,7 @@ static ADDRESS_MAP_START( pasha2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x40078000, 0x40078001) AM_WRITENOP //once at startup -> to disable the eeprom?
 	AM_RANGE(0x80000000, 0x803fffff) AM_ROMBANK(1)
 	AM_RANGE(0xe0000000, 0xe00003ff) AM_RAM_WRITE(pasha2_palette_w) AM_BASE(&paletteram16) //tilemap? palette?
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1,0)
+	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pasha2_io, ADDRESS_SPACE_IO, 16 )
@@ -411,37 +411,37 @@ static MACHINE_DRIVER_START( pasha2 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki2", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	//and ATMEL DREAM SAM9773
 MACHINE_DRIVER_END
 
 ROM_START( pasha2 )
-	ROM_REGION16_BE( 0x80000, REGION_USER1, 0 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x80000, RGNCLASS_USER, "user1", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "pp2.u3",       0x00000, 0x80000, CRC(1c701273) SHA1(f465323a1d3f2fd752c51c178fafe4cc866e28d6) )
 
-	ROM_REGION16_BE( 0x400000*6, REGION_USER2, ROMREGION_ERASEFF ) /* data roms */
+	ROM_REGION16_BE( 0x400000*6, RGNCLASS_USER, "user2", ROMREGION_ERASEFF ) /* data roms */
 	ROM_LOAD16_BYTE( "pp2-u2.u101",  0x000000, 0x200000, CRC(85c4a2d0) SHA1(452b24b74bd0b65d2d6852486e2917f94e21ecc8) )
 	ROM_LOAD16_BYTE( "pp2-u1.u101",  0x000001, 0x200000, CRC(96cbd04e) SHA1(a4e7dd61194584b3c4217674d78ab2fd96b7b2e0) )
 	ROM_LOAD16_BYTE( "pp2-u2.u102",  0x400000, 0x200000, CRC(2097d88c) SHA1(7597578e6ddca00909feac35d9d7331f783b2bd6) )
 	ROM_LOAD16_BYTE( "pp2-u1.u102",  0x400001, 0x200000, CRC(7a3492fb) SHA1(de72c4d10e17eaf2b7531f637b42cbb3d07819b5) )
 	// empty space, but no empty sockets on the pcb
 
-	ROM_REGION( 0x0800, REGION_CPU2, 0 ) /* AT89C52 (protected) */
+	ROM_REGION( 0x0800, RGNCLASS_CPU, "cpu1", 0 ) /* AT89C52 (protected) */
 	ROM_LOAD( "pasha2_at89c52",  0x0000, 0x0800, NO_DUMP ) /* MCU internal 8K flash */
 
-	ROM_REGION( 0x80000, REGION_USER3, 0 ) /* SAM9773 sound data */
+	ROM_REGION( 0x80000, RGNCLASS_USER, "user3", 0 ) /* SAM9773 sound data */
 	ROM_LOAD( "pp2.um2",      0x00000, 0x80000, CRC(86814b37) SHA1(70f8a94410e362669570c39e00492c0d69de6b17) )
 
-	ROM_REGION( 0x80000, REGION_SOUND1, 0 ) /* Oki Samples */
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "pp2.um51",     0x00000, 0x80000, CRC(3b1b1a30) SHA1(1ea1266d280a2b96ac4ef9fe8ee7b1a5f7861672) )
 
-	ROM_REGION( 0x80000, REGION_SOUND2, 0 ) /* Oki Samples */
+	ROM_REGION( 0x80000, RGNCLASS_SOUND, "oki2", 0 ) /* Oki Samples */
 	ROM_LOAD( "pp2.um53",     0x00000, 0x80000, CRC(8a29ad03) SHA1(3e9b0c86d8e3bb0b7691f68ad45431f6f9e8edbd) )
 ROM_END
 
@@ -459,7 +459,7 @@ static DRIVER_INIT( pasha2 )
 {
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x95744, 0x95747, 0, 0, pasha2_speedup_r );
 
-	memory_set_bankptr(1, memory_region(machine, REGION_USER2));
+	memory_set_bankptr(1, memory_region(machine, RGNCLASS_USER, "user2"));
 }
 
 GAME( 1998, pasha2, 0, pasha2, pasha2, pasha2, ROT0, "Dong Sung", "Pasha Pasha 2", GAME_IMPERFECT_SOUND )

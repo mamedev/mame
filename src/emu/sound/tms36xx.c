@@ -485,7 +485,7 @@ void tms3617_enable_w(int chip, int enable)
 	tms3617_enable(tms, enable);
 }
 
-static void *tms36xx_start(int sndindex, int clock, const void *config)
+static void *tms36xx_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	int j;
 	struct TMS36XX *tms;

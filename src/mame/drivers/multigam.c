@@ -132,8 +132,8 @@ static int multigam_game_gfx_bank = 0;
 static WRITE8_HANDLER(multigam_switch_prg_rom)
 {
 	/* switch PRG rom */
-	UINT8* dst = memory_region( machine, REGION_CPU1 );
-	UINT8* src = memory_region( machine, REGION_USER1 );
+	UINT8* dst = memory_region( machine, RGNCLASS_CPU, "main" );
+	UINT8* src = memory_region( machine, RGNCLASS_USER, "user1" );
 
 	if ( data & 0x80 )
 	{
@@ -232,7 +232,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 			if ( multigam3_mmc3_last_bank != ( data & 0xc0 ) )
 			{
 				int bank;
-				UINT8 *prg = memory_region( machine, REGION_CPU1 );
+				UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "main" );
 
 				/* reset the banks */
 				if ( multigam3_mmc3_command & 0x40 )
@@ -285,7 +285,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 
 					case 6: /* program banking */
 					{
-						UINT8 *prg = memory_region( machine, REGION_CPU1 );
+						UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "main" );
 						if ( multigam3_mmc3_command & 0x40 )
 						{
 							/* high bank */
@@ -310,7 +310,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 					case 7: /* program banking */
 						{
 							/* mid bank */
-							UINT8 *prg = memory_region( machine, REGION_CPU1 );
+							UINT8 *prg = memory_region( machine, RGNCLASS_CPU, "main" );
 							multigam3_mmc3_banks[1] = data & 0x1f;
 							bank = multigam3_mmc3_banks[1] * 0x2000 + 0xa0000;
 
@@ -355,8 +355,8 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 
 static void multigam_init_smb3(running_machine *machine)
 {
-	UINT8* dst = memory_region( machine, REGION_CPU1 );
-	UINT8* src = memory_region( machine, REGION_USER1 );
+	UINT8* dst = memory_region( machine, RGNCLASS_CPU, "main" );
+	UINT8* src = memory_region( machine, RGNCLASS_USER, "user1" );
 
 	memcpy(&dst[0x8000], &src[0xa0000 + 0x3c000], 0x4000);
 	memcpy(&dst[0xc000], &src[0xa0000 + 0x3c000], 0x4000);
@@ -389,8 +389,8 @@ static WRITE8_HANDLER(multigm3_mapper2_w)
 static WRITE8_HANDLER(multigm3_switch_prg_rom)
 {
 	/* switch PRG rom */
-	UINT8* dst = memory_region( machine, REGION_CPU1 );
-	UINT8* src = memory_region( machine, REGION_USER1 );
+	UINT8* dst = memory_region( machine, RGNCLASS_CPU, "main" );
+	UINT8* src = memory_region( machine, RGNCLASS_USER, "user1" );
 
 	if ( data == 0xa8 )
 	{
@@ -400,7 +400,7 @@ static WRITE8_HANDLER(multigm3_switch_prg_rom)
 	else
 	{
 		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, multigm3_mapper2_w );
-		memory_set_bankptr(1, memory_region(machine, REGION_CPU1) + 0x6000);
+		memory_set_bankptr(1, memory_region(machine, RGNCLASS_CPU, "main") + 0x6000);
 	}
 
 	if ( data & 0x80 )
@@ -505,7 +505,7 @@ INPUT_PORTS_END
 
 static const struct NESinterface multigam_interface_1 =
 {
-	REGION_CPU1
+	"main"
 };
 
 static PALETTE_INIT( multigam )
@@ -523,7 +523,7 @@ static const ppu2c0x_interface ppu_interface =
 {
 	PPU_2C04,				/* type */
 	1,						/* num */
-	{ REGION_GFX1 },		/* vrom gfx region */
+	{ "gfx1" },				/* vrom gfx region */
 	{ 0 },					/* gfxlayout num */
 	{ 0 },					/* color base */
 	{ PPU_MIRROR_NONE },	/* mirroring */
@@ -607,10 +607,10 @@ static MACHINE_DRIVER_START( multigm3 )
 MACHINE_DRIVER_END
 
 ROM_START( multigam )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "7.bin", 0x0000, 0x8000, CRC(f0fa7cf2) SHA1(7f3b3dca796b964893197aef7f0f31dfd7a2c1a4) )
 
-	ROM_REGION( 0xC0000, REGION_USER1, 0 )
+	ROM_REGION( 0xC0000, RGNCLASS_USER, "user1", 0 )
 	ROM_LOAD( "1.bin", 0x00000, 0x20000, CRC(e0bb14a5) SHA1(74026f59dfb08456183adaaf381bb28830212a1c) )
 	ROM_LOAD( "2.bin", 0x20000, 0x20000, CRC(f52c07ad) SHA1(51be288bcf5aeab5bdd95ee93a6d807867e30e97) )
 	ROM_LOAD( "3.bin", 0x40000, 0x20000, CRC(92e8303e) SHA1(4a735fce22cdea65801aa7e4e00fa8c15a022ea4) )
@@ -618,7 +618,7 @@ ROM_START( multigam )
 	ROM_LOAD( "5.bin", 0x80000, 0x20000, CRC(e1232243) SHA1(fa864b255b7f3cb195d3789f8a2a7b3848b255a2) )
 	ROM_LOAD( "6.bin", 0xa0000, 0x20000, CRC(fb129b09) SHA1(b677937d6cf7800359dc6d35dd2de3ec27919d71) )
 
-	ROM_REGION( 0x80000, REGION_GFX1, 0 )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD( "8.bin", 0x00000, 0x20000, CRC(509c0e94) SHA1(9e87c74e76afe6c3a7ba194439434f54e2c879eb) )
 	ROM_LOAD( "9.bin", 0x20000, 0x20000, CRC(48416f20) SHA1(f461fcbff6d2fa4774d64c26475089d1aeea7fb5) )
 	ROM_LOAD( "10.bin", 0x40000, 0x20000, CRC(869d1661) SHA1(ac155bd24ebfea8e064859e1a05317001286f9ae) )
@@ -626,10 +626,10 @@ ROM_START( multigam )
 ROM_END
 
 ROM_START( multigmb )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "mg_4.bin", 0x0000, 0x8000, CRC(079226c1) SHA1(f4ceedd9b6cc3454550be7421dc75904ad664545) )
 
-	ROM_REGION( 0xC0000, REGION_USER1, 0 )
+	ROM_REGION( 0xC0000, RGNCLASS_USER, "user1", 0 )
 	ROM_LOAD( "1.bin",    0x00000, 0x20000, CRC(e0bb14a5) SHA1(74026f59dfb08456183adaaf381bb28830212a1c) )
 	ROM_LOAD( "2.bin",    0x20000, 0x20000, CRC(f52c07ad) SHA1(51be288bcf5aeab5bdd95ee93a6d807867e30e97) )
 	ROM_LOAD( "3.bin",    0x40000, 0x20000, CRC(92e8303e) SHA1(4a735fce22cdea65801aa7e4e00fa8c15a022ea4) )
@@ -637,7 +637,7 @@ ROM_START( multigmb )
 	ROM_LOAD( "mg_9.bin", 0x80000, 0x20000, CRC(47f968af) SHA1(ed60bda060984e5acc2c6b6cac5b36eafbb2b631) )
 	ROM_LOAD( "6.bin",    0xa0000, 0x20000, CRC(fb129b09) SHA1(b677937d6cf7800359dc6d35dd2de3ec27919d71) )
 
-	ROM_REGION( 0x80000, REGION_GFX1, 0 )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD( "8.bin", 0x00000, 0x20000, CRC(509c0e94) SHA1(9e87c74e76afe6c3a7ba194439434f54e2c879eb) )
 	ROM_LOAD( "9.bin", 0x20000, 0x20000, CRC(48416f20) SHA1(f461fcbff6d2fa4774d64c26475089d1aeea7fb5) )
 	ROM_LOAD( "10.bin", 0x40000, 0x20000, CRC(869d1661) SHA1(ac155bd24ebfea8e064859e1a05317001286f9ae) )
@@ -645,10 +645,10 @@ ROM_START( multigmb )
 ROM_END
 
 ROM_START( multigm3 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "mg3-6.bin", 0x0000, 0x8000, CRC(3c1e53f1) SHA1(2eaf84e592db58cd268738da2642c716895e4eaa) )
 
-	ROM_REGION( 0x100000, REGION_USER1, 0 )
+	ROM_REGION( 0x100000, RGNCLASS_USER, "user1", 0 )
 	ROM_LOAD( "mg3-2.bin", 0x00000, 0x20000, CRC(de6d2232) SHA1(30a5e6cd44cfbce2c5186dbc45c0c14c8b1510c4) )
 	ROM_LOAD( "mg3-1.bin", 0x40000, 0x20000, CRC(b0dc8136) SHA1(6d7334aae9047ec2028790bd3b326458b5cdc737) )
 	ROM_LOAD( "mg3-3.bin", 0x60000, 0x20000, CRC(6e96d642) SHA1(45eb954a0a905ad48ebc04ee3ed8858a1077817a) )
@@ -656,7 +656,7 @@ ROM_START( multigm3 )
 	ROM_LOAD( "mg3-4.bin", 0xe0000, 0x20000, CRC(9b022e13) SHA1(96ad9c49cf72fe19a3e9944f8102d2d905266e92) )
 
 
-	ROM_REGION( 0x80000, REGION_GFX1, 0 )
+	ROM_REGION( 0x80000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD( "mg3-7.bin", 0x00000, 0x20000, CRC(d8308cdb) SHA1(7bfb864611c32cf3740cfd650bfe275513d511d7) )
 	ROM_LOAD( "mg3-8.bin", 0x20000, 0x20000, CRC(b4a53b9d) SHA1(63d8901149d0d9b69f28bfc096f7932448542032) )
 	ROM_LOAD( "mg3-9.bin", 0x40000, 0x20000, CRC(a0ae2b4b) SHA1(5e026ad8a6b2a8120e386471d5178625bda04525) )
@@ -681,8 +681,8 @@ static DRIVER_INIT(multigm3)
 {
 	const UINT8 decode[16]  = { 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a };
 
-	multigm3_decrypt(memory_region(machine, REGION_CPU1), memory_region_length(machine, REGION_CPU1), decode );
-	multigm3_decrypt(memory_region(machine, REGION_USER1), memory_region_length(machine, REGION_USER1), decode );
+	multigm3_decrypt(memory_region(machine, RGNCLASS_CPU, "main"), memory_region_length(machine, RGNCLASS_CPU, "main"), decode );
+	multigm3_decrypt(memory_region(machine, RGNCLASS_USER, "user1"), memory_region_length(machine, RGNCLASS_USER, "user1"), decode );
 
 	multigmc_mmc3_6000_ram = auto_malloc(0x2000);
 }

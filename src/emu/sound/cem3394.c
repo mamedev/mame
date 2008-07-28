@@ -315,7 +315,7 @@ static void cem3394_update(void *param, stream_sample_t **inputs, stream_sample_
 }
 
 
-static void *cem3394_start(int sndindex, int clock, const void *config)
+static void *cem3394_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	const struct cem3394_interface *intf = config;
 	sound_chip *chip;

@@ -382,15 +382,15 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( overdriv )
-	GFXDECODE_ENTRY( REGION_GFX4, 0, charlayout, 0, 0x80 )
-	GFXDECODE_ENTRY( REGION_GFX5, 0, charlayout, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx4", 0, charlayout, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx5", 0, charlayout, 0, 0x80 )
 GFXDECODE_END
 
 
 
 static const struct K053260_interface k053260_interface =
 {
-	REGION_SOUND1
+	"shared"
 };
 
 
@@ -460,39 +460,39 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( overdriv )
-	ROM_REGION( 0x40000, REGION_CPU1, 0 )
+	ROM_REGION( 0x40000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD16_BYTE( "789.2",        0x00000, 0x20000, CRC(77f18f3f) SHA1(a8c91435573c7851a7864d07eeacfb2f142abbe2) )
 	ROM_LOAD16_BYTE( "789.1",        0x00001, 0x20000, CRC(4f44e6ad) SHA1(9fa871f55e6b2ec353dd979ded568cd9da83f5d6) )
 
-	ROM_REGION( 0x40000, REGION_CPU2, 0 )
+	ROM_REGION( 0x40000, RGNCLASS_CPU, "sub", 0 )
 	ROM_LOAD16_BYTE( "789.4",        0x00000, 0x20000, CRC(46fb7e88) SHA1(f706a76aff9bec64abe6da325cba0715d6e6ed0a) )
 	ROM_LOAD16_BYTE( "789.3",        0x00001, 0x20000, CRC(24427195) SHA1(48f4f81729acc0e497b40fddbde11242c5c4c573) )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )
 	ROM_LOAD( "789.5",        0x00000, 0x10000, CRC(1085f069) SHA1(27228cedb357ff2e130a4bd6d8aa01cf537e034f) )
 
-	ROM_REGION( 0x400000, REGION_GFX1, 0 )	/* graphics (addressable by the CPU) */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx1", 0 )	/* graphics (addressable by the CPU) */
 	ROM_LOAD( "e12.r1",       0x000000, 0x100000, CRC(14a10fb2) SHA1(03fb9c15514c5ecc2d9ae4a53961c4bbb49cec73) )	/* sprites */
 	ROM_LOAD( "e13.r4",       0x100000, 0x100000, CRC(6314a628) SHA1(f8a8918998c266109348c77427a7696b503daeb3) )
 	ROM_LOAD( "e14.r10",      0x200000, 0x100000, CRC(b5eca14b) SHA1(a1c5f5e9cd8bbcfc875e2acb33be024724da63aa) )
 	ROM_LOAD( "e15.r15",      0x300000, 0x100000, CRC(5d93e0c3) SHA1(d5cb7666c0c28fd465c860c7f9dbb18a7f739a93) )
 
-	ROM_REGION( 0x020000, REGION_GFX2, 0 )	/* graphics (addressable by the CPU) */
+	ROM_REGION( 0x020000, RGNCLASS_GFX, "gfx2", 0 )	/* graphics (addressable by the CPU) */
 	ROM_LOAD( "e06.a21",      0x000000, 0x020000, CRC(14a085e6) SHA1(86dad6f223e13ff8af7075c3d99bb0a83784c384) )	/* zoom/rotate */
 
-	ROM_REGION( 0x020000, REGION_GFX3, 0 )	/* graphics (addressable by the CPU) */
+	ROM_REGION( 0x020000, RGNCLASS_GFX, "gfx3", 0 )	/* graphics (addressable by the CPU) */
 	ROM_LOAD( "e07.c23",      0x000000, 0x020000, CRC(8a6ceab9) SHA1(1a52b7361f71a6126cd648a76af00223d5b25c7a) )	/* zoom/rotate */
 
-	ROM_REGION( 0x0c0000, REGION_GFX4, 0 )	/* graphics (addressable by the CPU) */
+	ROM_REGION( 0x0c0000, RGNCLASS_GFX, "gfx4", 0 )	/* graphics (addressable by the CPU) */
 	ROM_LOAD( "e18.p22",      0x000000, 0x040000, CRC(985a4a75) SHA1(b726166c295be6fbec38a9d11098cc4a4a5de456) )	/* 053250 #0 */
 	ROM_LOAD( "e19.r22",      0x040000, 0x040000, CRC(15c54ea2) SHA1(5b10bd28e48e51613359820ba8c75d4a91c2d322) )
 	ROM_LOAD( "e20.s22",      0x080000, 0x040000, CRC(ea204acd) SHA1(52b8c30234eaefcba1074496028a4ac2bca48e95) )
 
-	ROM_REGION( 0x080000, REGION_GFX5, 0 )	/* unknown (053250?) */
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx5", 0 )	/* unknown (053250?) */
 	ROM_LOAD( "e16.p12",      0x000000, 0x040000, CRC(9348dee1) SHA1(367193373e28962b5b0e54cc15d68ed88ab83f12) )	/* 053250 #1 */
 	ROM_LOAD( "e17.p17",      0x040000, 0x040000, CRC(04c07248) SHA1(873445002cbf90c9fc5a35bf4a8f6c43193ee342) )
 
-	ROM_REGION( 0x200000, REGION_SOUND1, 0 )	/* 053260 samples */
+	ROM_REGION( 0x200000, RGNCLASS_SOUND, "shared", 0 )	/* 053260 samples */
 	ROM_LOAD( "e03.j1",       0x000000, 0x100000, CRC(51ebfebe) SHA1(17f0c23189258e801f48d5833fe934e7a48d071b) )
 	ROM_LOAD( "e02.f1",       0x100000, 0x100000, CRC(bdd3b5c6) SHA1(412332d64052c0a3714f4002c944b0e7d32980a4) )
 ROM_END
@@ -501,7 +501,7 @@ ROM_END
 
 static DRIVER_INIT( overdriv )
 {
-	konami_rom_deinterleave_4(REGION_GFX1);
+	konami_rom_deinterleave_4("gfx1");
 }
 
 

@@ -606,7 +606,7 @@ static void register_for_save(struct POKEYregisters *chip, int index)
 }
 
 
-static void *pokey_start(int sndindex, int clock, const void *config)
+static void *pokey_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct POKEYregisters *chip;
 	int sample_rate = clock;

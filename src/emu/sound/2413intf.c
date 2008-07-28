@@ -48,7 +48,7 @@ static void _stream_update(void *param, int interval)
 	stream_update(info->stream);
 }
 
-static void *ym2413_start(int sndindex, int clock, const void *config)
+static void *ym2413_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	int rate = clock/72;
 	struct ym2413_info *info;

@@ -281,8 +281,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( wiping )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,      0, 64 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 64*4, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 64 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 64*4, 64 )
 GFXDECODE_END
 
 
@@ -336,59 +336,59 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( wiping )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* main cpu code */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )	/* main cpu code */
 	ROM_LOAD( "1",            0x0000, 0x2000, CRC(b55d0d19) SHA1(dac6096d3ee9dd8b1b6da5c2c613b54ce303cb7b) )
 	ROM_LOAD( "2",            0x2000, 0x2000, CRC(b1f96e47) SHA1(8f3f882a3c366e6a2d2682603d425eb0491b5487) )
 	ROM_LOAD( "3",            0x4000, 0x2000, CRC(c67bab5a) SHA1(3d74ed4be5a6bdc02cf1feb3ce3f4b1607ec6b80) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* sound cpu */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )	/* sound cpu */
 	ROM_LOAD( "4",            0x0000, 0x1000, CRC(a1547e18) SHA1(1f86d770e42ff1d94bf1f8b12f9b74accc3bb193) )
 
-	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "8",            0x0000, 0x1000, CRC(601160f6) SHA1(2465a1319d442a96d3b1b5e3ad544b0a0126762c) ) /* chars */
 
-	ROM_REGION( 0x2000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "7",            0x0000, 0x2000, CRC(2c2cc054) SHA1(31851983de61bb8616856b0067c4e237819df5fb) ) /* sprites */
 
-	ROM_REGION( 0x0220, REGION_PROMS, 0 )
+	ROM_REGION( 0x0220, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "wip-g13.bin",  0x0000, 0x0020, CRC(b858b897) SHA1(5fc87e210bdaa675fdf8c6762526c345bd451eab) )	/* palette */
 	ROM_LOAD( "wip-f4.bin",   0x0020, 0x0100, CRC(3f56c8d5) SHA1(7d279b2f29911c44b4136068770accf7196057d7) )	/* char lookup table */
 	ROM_LOAD( "wip-e11.bin",  0x0120, 0x0100, CRC(e7400715) SHA1(c67193e5f0a43942ddf03058a0bb8b3275308459) )	/* sprite lookup table */
 
-	ROM_REGION( 0x4000, REGION_SOUND1, 0 )	/* samples */
+	ROM_REGION( 0x4000, RGNCLASS_SOUND, "samples", 0 )	/* samples */
 	ROM_LOAD( "rugr5c8",	  0x0000, 0x2000, CRC(67bafbbf) SHA1(2085492b58ce44f61a42320c54595b79fdf7a91c) )
 	ROM_LOAD( "rugr6c9",	  0x2000, 0x2000, CRC(cac84a87) SHA1(90f6c514d0cdbeb4c8c979597db79ebcdf443df4) )
 
-	ROM_REGION( 0x0200, REGION_SOUND2, 0 )	/* 4bit->8bit sample expansion PROMs */
+	ROM_REGION( 0x0200, RGNCLASS_SOUND, "proms", 0 )	/* 4bit->8bit sample expansion PROMs */
 	ROM_LOAD( "wip-e8.bin",   0x0000, 0x0100, CRC(bd2c080b) SHA1(9782bb5001e96db56bc29df398187f700bce4f8e) )	/* low 4 bits */
 	ROM_LOAD( "wip-e9.bin",   0x0100, 0x0100, CRC(4017a2a6) SHA1(dadef2de7a1119758c8e6d397aa42815b0218889) )	/* high 4 bits */
 ROM_END
 
 ROM_START( rugrats )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* main cpu code */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )	/* main cpu code */
 	ROM_LOAD( "rugr1d1",      0x0000, 0x2000, CRC(e7e1bd6d) SHA1(985799b1bfd001c6304e6166180745cb019f834e) )
 	ROM_LOAD( "rugr2d2",      0x2000, 0x2000, CRC(5f47b9ad) SHA1(2d3eb737ea8e86691293e432e866d2623d6b6b1b) )
 	ROM_LOAD( "rugr3d3",      0x4000, 0x2000, CRC(3d748d1a) SHA1(2b301119b6eb3f0f9bb2ad734cff1d25365dfe99) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* sound cpu */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "audio", 0 )	/* sound cpu */
 	ROM_LOAD( "rugr4c4",      0x0000, 0x2000, CRC(d4a92c38) SHA1(4a31cfef9f084b4d2934595155bf0f3dd589efb3) )
 
-	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rugr8d2",      0x0000, 0x1000, CRC(a3dcaca5) SHA1(d71f9090bf95dfd035ee0e0619a1cce575033cf3) ) /* chars */
 
-	ROM_REGION( 0x2000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "rugr7c13",     0x0000, 0x2000, CRC(fe1191dd) SHA1(80ebf093f7a32f4cc9dc89dcc44cab6e3db4fca1) ) /* sprites */
 
-	ROM_REGION( 0x0220, REGION_PROMS, 0 )
+	ROM_REGION( 0x0220, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "prom.13g",     0x0000, 0x0020, CRC(f21238f0) SHA1(944627d1551453c7f828d96b83fd4eeb038b20ad) )	/* palette */
 	ROM_LOAD( "prom.4f",      0x0020, 0x0100, CRC(cfc90f3d) SHA1(99f7dc0d14c62d4c676c96310c219c696c9a7897) )	/* char lookup table */
 	ROM_LOAD( "prom.11e",     0x0120, 0x0100, CRC(cfc90f3d) SHA1(99f7dc0d14c62d4c676c96310c219c696c9a7897) )	/* sprite lookup table */
 
-	ROM_REGION( 0x4000, REGION_SOUND1, 0 )	/* samples */
+	ROM_REGION( 0x4000, RGNCLASS_SOUND, "samples", 0 )	/* samples */
 	ROM_LOAD( "rugr5c8",	  0x0000, 0x2000, CRC(67bafbbf) SHA1(2085492b58ce44f61a42320c54595b79fdf7a91c) )
 	ROM_LOAD( "rugr6c9",	  0x2000, 0x2000, CRC(cac84a87) SHA1(90f6c514d0cdbeb4c8c979597db79ebcdf443df4) )
 
-	ROM_REGION( 0x0200, REGION_SOUND2, 0 )	/* 4bit->8bit sample expansion PROMs */
+	ROM_REGION( 0x0200, RGNCLASS_SOUND, "proms", 0 )	/* 4bit->8bit sample expansion PROMs */
 	ROM_LOAD( "wip-e8.bin",   0x0000, 0x0100, CRC(bd2c080b) SHA1(9782bb5001e96db56bc29df398187f700bce4f8e) )	/* low 4 bits */
 	ROM_LOAD( "wip-e9.bin",   0x0100, 0x0100, CRC(4017a2a6) SHA1(dadef2de7a1119758c8e6d397aa42815b0218889) )	/* high 4 bits */
 ROM_END

@@ -116,7 +116,7 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 	test_mask = testmask;
 
 	/* predetermine the bank base */
-	rgn = memory_region(machine, REGION_CPU1+cpu_num);
+	rgn = memory_region(machine, RGNCLASS_CPU, "jsa");
 	bank_base = &rgn[0x03000];
 	bank_source_data = &rgn[0x10000];
 
@@ -149,22 +149,29 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 
 	init_save_state();
 	atarijsa_reset();
-}
+	
+	/* initialize JSA III ADPCM */
+	{
+		static const char *regions[] = { "adpcm", "adcpml", "adpcmr" };
+		int rgn;
 
+		/* expand the ADPCM data to avoid lots of memcpy's during gameplay */
+		/* the upper 128k is fixed, the lower 128k is bankswitched */
+		for (rgn = 0; rgn < ARRAY_LENGTH(regions); rgn++)
+		{
+			UINT8 *base = memory_region(machine, RGNCLASS_SOUND, regions[rgn]);
+			if (base != NULL && memory_region_length(machine, RGNCLASS_SOUND, regions[rgn]) >= 0x100000)
+			{
+				memcpy(&base[0x00000], &base[0x80000], 0x20000);
+				memcpy(&base[0x40000], &base[0x80000], 0x20000);
+				memcpy(&base[0x80000], &base[0xa0000], 0x20000);
 
-void atarijsa3_init_adpcm(running_machine *machine, int region)
-{
-	UINT8 *base = memory_region(machine, region);
-
-	/* expand the ADPCM data to avoid lots of memcpy's during gameplay */
-	/* the upper 128k is fixed, the lower 128k is bankswitched */
-	memcpy(&base[0x00000], &base[0x80000], 0x20000);
-	memcpy(&base[0x40000], &base[0x80000], 0x20000);
-	memcpy(&base[0x80000], &base[0xa0000], 0x20000);
-
-	memcpy(&base[0x20000], &base[0xe0000], 0x20000);
-	memcpy(&base[0x60000], &base[0xe0000], 0x20000);
-	memcpy(&base[0xa0000], &base[0xe0000], 0x20000);
+				memcpy(&base[0x20000], &base[0xe0000], 0x20000);
+				memcpy(&base[0x60000], &base[0xe0000], 0x20000);
+				memcpy(&base[0xa0000], &base[0xe0000], 0x20000);
+			}
+		}
+	}
 }
 
 
@@ -875,7 +882,7 @@ MACHINE_DRIVER_START( jsa_ii_mono )
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 
 	MDRV_SOUND_ADD("adpcm", OKIM6295, JSA_MASTER_CLOCK/3)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 
@@ -917,12 +924,12 @@ MACHINE_DRIVER_START( jsa_iiis_stereo )
 	MDRV_SOUND_ROUTE(0, "left", 0.60)
 	MDRV_SOUND_ROUTE(1, "right", 0.60)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, JSA_MASTER_CLOCK/3)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_ADD("adpcml", OKIM6295, JSA_MASTER_CLOCK/3)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.75)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, JSA_MASTER_CLOCK/3)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_ADD("adpcmr", OKIM6295, JSA_MASTER_CLOCK/3)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.75)
 MACHINE_DRIVER_END
 

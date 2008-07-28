@@ -18,7 +18,7 @@ UINT8 *bublbobl_mcu_sharedram;
 
 WRITE8_HANDLER( bublbobl_bankswitch_w )
 {
-	UINT8 *ROM = memory_region(machine, REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	/* bits 0-2 select ROM bank */
 	memory_set_bankptr(1,&ROM[0x10000 + 0x4000 * ((data ^ 4) & 7)]);
@@ -41,7 +41,7 @@ WRITE8_HANDLER( bublbobl_bankswitch_w )
 
 WRITE8_HANDLER( tokio_bankswitch_w )
 {
-	UINT8 *ROM = memory_region(machine, REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
 
 	/* bits 0-2 select ROM bank */
 	memory_set_bankptr(1,&ROM[0x10000 + 0x4000 * (data & 7)]);

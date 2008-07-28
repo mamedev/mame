@@ -1426,13 +1426,13 @@ static MACHINE_RESET( cps )
 	if (strcmp(gamename, "sf2rb" )==0)
 	{
 		/* Patch out protection check */
-		UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
+		UINT16 *rom = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
 		rom[0xe5464/2] = 0x6012;
 	}
 	if (strcmp(gamename, "sf2rb2" )==0)
 	{
 		/* Patch out protection check */
-		UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
+		UINT16 *rom = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
 		rom[0xe5332/2] = 0x6014;
 	}
 
@@ -1443,13 +1443,13 @@ static MACHINE_RESET( cps )
            by the cpu core as a 32-bit branch. This branch would make the
            game crash (address error, since it would branch to an odd address)
            if location 180ca6 (outside ROM space) isn't 0. Protection check? */
-		UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
+		UINT16 *rom = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
 		rom[0x11756/2] = 0x4e71;
 	}
 	else if (strcmp(gamename, "ghouls" )==0)
 	{
 		/* Patch out self-test... it takes forever */
-		UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
+		UINT16 *rom = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
 		rom[0x61964/2] = 0x4ef9;
 		rom[0x61966/2] = 0x0000;
 		rom[0x61968/2] = 0x0400;
@@ -1623,9 +1623,9 @@ INLINE int cps2_port(int offset)
 
 static void cps1_gfx_decode(running_machine *machine)
 {
-	int size=memory_region_length(machine, REGION_GFX1);
+	int size=memory_region_length(machine, RGNCLASS_GFX, "gfx1");
 	int i,j,gfxsize;
-	UINT8 *cps1_gfx = memory_region(machine, REGION_GFX1);
+	UINT8 *cps1_gfx = memory_region(machine, RGNCLASS_GFX, "gfx1");
 
 
 	gfxsize=size/4;
@@ -1679,11 +1679,11 @@ static void unshuffle(UINT64 *buf,int len)
 static void cps2_gfx_decode(running_machine *machine)
 {
 	const int banksize=0x200000;
-	int size=memory_region_length(machine, REGION_GFX1);
+	int size=memory_region_length(machine, RGNCLASS_GFX, "gfx1");
 	int i;
 
 	for (i = 0;i < size;i += banksize)
-		unshuffle((UINT64 *)(memory_region(machine, REGION_GFX1) + i),banksize/8);
+		unshuffle((UINT64 *)(memory_region(machine, RGNCLASS_GFX, "gfx1") + i),banksize/8);
 
 	cps1_gfx_decode(machine);
 }
@@ -2521,7 +2521,7 @@ static void cps2_render_sprites(running_machine *machine, bitmap_t *bitmap,const
 static void cps1_render_stars(const device_config *screen, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
-	UINT8 *stars_rom = memory_region(screen->machine, REGION_GFX2);
+	UINT8 *stars_rom = memory_region(screen->machine, RGNCLASS_GFX, "gfx2");
 
 	if (!stars_rom && (cps1_stars_enabled[0] || cps1_stars_enabled[1]))
 	{

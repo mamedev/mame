@@ -46,8 +46,8 @@ VIDEO_START( surpratk )
 {
 	K053251_vh_start(machine);
 
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tile_callback);
-	K053245_vh_start(machine,0,REGION_GFX2,NORMAL_PLANE_ORDER,sprite_callback);
+	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tile_callback);
+	K053245_vh_start(machine,0,"gfx2",NORMAL_PLANE_ORDER,sprite_callback);
 }
 
 /* useful function to sort the three tile layers by priority order */

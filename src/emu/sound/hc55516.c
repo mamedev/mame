@@ -89,19 +89,19 @@ static void *start_common(int sndindex, int clock, const void *config,
 }
 
 
-static void *hc55516_start(int sndindex, int clock, const void *config)
+static void *hc55516_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	return start_common(sndindex, clock, config, 0x07, TRUE);
 }
 
 
-static void *mc3417_start(int sndindex, int clock, const void *config)
+static void *mc3417_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	return start_common(sndindex, clock, config, 0x07, FALSE);
 }
 
 
-static void *mc3418_start(int sndindex, int clock, const void *config)
+static void *mc3418_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	return start_common(sndindex, clock, config, 0x0f, FALSE);
 }

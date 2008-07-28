@@ -1,11 +1,5 @@
 #define USE_NAMCOS22_SPEED_HACK
 
-#define REGION_CGRAM           REGION_GFX1
-#define REGION_TEXTURE_TILE    REGION_GFX2
-#define REGION_TEXTURE_TILEMAP REGION_GFX3
-#define REGION_POINTROM        REGION_GFX4
-#define REGION_SPRITE          REGION_GFX5
-
 #define GFX_CHAR               0
 #define GFX_TEXTURE_TILE       1
 #define GFX_SPRITE             2

@@ -73,7 +73,7 @@ VIDEO_UPDATE(aquarium);
 #if AQUARIUS_HACK
 static MACHINE_RESET( aquarium )
 {
-	UINT16 *RAM = (UINT16 *)memory_region(machine, REGION_CPU1);
+	UINT16 *RAM = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
 	int data = input_port_read(machine, "FAKE");
 
 	/* Language : 0x0000 = Japanese - Other value = English */
@@ -108,7 +108,7 @@ static WRITE16_HANDLER( aquarium_sound_w )
 static WRITE8_HANDLER( aquarium_z80_bank_w )
 {
 	int soundbank = ((data & 0x7) + 1) * 0x8000;
-	UINT8 *Z80 = (UINT8 *)memory_region(machine, REGION_CPU2);
+	UINT8 *Z80 = (UINT8 *)memory_region(machine, RGNCLASS_CPU, "audio");
 
 	memory_set_bankptr(1, &Z80[soundbank + 0x10000]);
 }
@@ -291,8 +291,8 @@ static DRIVER_INIT( aquarium )
        the roms containing the 1bpp data so we can decode it
        correctly */
 
-	UINT8 *DAT2 = memory_region(machine, REGION_GFX1)+0x080000;
-	UINT8 *DAT = memory_region(machine, REGION_USER1);
+	UINT8 *DAT2 = memory_region(machine, RGNCLASS_GFX, "gfx1")+0x080000;
+	UINT8 *DAT = memory_region(machine, RGNCLASS_USER, "user1");
 	int len = 0x0200000;
 
 	for (len = 0 ; len < 0x020000 ; len ++ )
@@ -307,8 +307,8 @@ static DRIVER_INIT( aquarium )
 		DAT2[len*4+2] |= (DAT[len] & 0x01) << 3;
 	}
 
-	DAT2 = memory_region(machine, REGION_GFX4)+0x080000;
-	DAT = memory_region(machine, REGION_USER2);
+	DAT2 = memory_region(machine, RGNCLASS_GFX, "gfx4")+0x080000;
+	DAT = memory_region(machine, RGNCLASS_USER, "user2");
 
 	for (len = 0 ; len < 0x020000 ; len ++ )
 	{
@@ -328,10 +328,10 @@ static DRIVER_INIT( aquarium )
 
 
 static GFXDECODE_START( aquarium )
-	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout,       0x300, 32 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, char5bpplayout,   0x400, 32 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, char_8x8_layout,  0x200, 32 )
-	GFXDECODE_ENTRY( REGION_GFX4, 0, char5bpplayout,   0x400, 32 )
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,       0x300, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, char5bpplayout,   0x400, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, char_8x8_layout,  0x200, 32 )
+	GFXDECODE_ENTRY( "gfx4", 0, char5bpplayout,   0x400, 32 )
 GFXDECODE_END
 
 static void irq_handler(running_machine *machine, int irq)
@@ -382,38 +382,38 @@ static MACHINE_DRIVER_START( aquarium )
 	MDRV_SOUND_ROUTE(1, "right", 0.45)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1122000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.47)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.47)
 MACHINE_DRIVER_END
 
 ROM_START( aquarium )
-	ROM_REGION( 0x080000, REGION_CPU1, 0 )     /* 68000 code */
+	ROM_REGION( 0x080000, RGNCLASS_CPU, "main", 0 )     /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "aquar3",  0x000000, 0x080000, CRC(344509a1) SHA1(9deb610732dee5066b3225cd7b1929b767579235) )
 
-	ROM_REGION( 0x50000, REGION_CPU2, 0 ) /* z80 (sound) code */
+	ROM_REGION( 0x50000, RGNCLASS_CPU, "audio", 0 ) /* z80 (sound) code */
 	ROM_LOAD( "aquar5",  0x000000, 0x40000, CRC(fa555be1) SHA1(07236f2b2ba67e92984b9ddf4a8154221d535245) )
 	ROM_RELOAD( 		0x010000, 0x40000 )
 
-	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE ) /* BG Tiles */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE ) /* BG Tiles */
 	ROM_LOAD( "aquar1",      0x000000, 0x080000, CRC(575df6ac) SHA1(071394273e512666fe124facdd8591a767ad0819) ) // 4bpp
 	/* data is expanded here from USER1 */
-	ROM_REGION( 0x100000, REGION_USER1, ROMREGION_DISPOSE ) /* BG Tiles */
+	ROM_REGION( 0x100000, RGNCLASS_USER, "user1", ROMREGION_DISPOSE ) /* BG Tiles */
 	ROM_LOAD( "aquar6",      0x000000, 0x020000, CRC(9065b146) SHA1(befc218bbcd63453ea7eb8f976796d36f2b2d552) ) // 1bpp
 
-	ROM_REGION( 0x100000, REGION_GFX4, ROMREGION_DISPOSE ) /* BG Tiles */
+	ROM_REGION( 0x100000, RGNCLASS_GFX, "gfx4", ROMREGION_DISPOSE ) /* BG Tiles */
 	ROM_LOAD( "aquar8",      0x000000, 0x080000, CRC(915520c4) SHA1(308207cb20f1ed6df365710c808644a6e4f07614) ) // 4bpp
 	/* data is expanded here from USER2 */
-	ROM_REGION( 0x100000, REGION_USER2, ROMREGION_DISPOSE ) /* BG Tiles */
+	ROM_REGION( 0x100000, RGNCLASS_USER, "user2", ROMREGION_DISPOSE ) /* BG Tiles */
 	ROM_LOAD( "aquar7",      0x000000, 0x020000, CRC(b96b2b82) SHA1(2b719d0c185d1eca4cd9ea66bed7842b74062288) ) // 1bpp
 
-	ROM_REGION( 0x060000, REGION_GFX2, ROMREGION_DISPOSE ) /* FG Tiles */
+	ROM_REGION( 0x060000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE ) /* FG Tiles */
 	ROM_LOAD( "aquar2",   0x000000, 0x020000, CRC(aa071b05) SHA1(517415bfd8e4dd51c6eb03a25c706f8613d34a09) )
 
-	ROM_REGION( 0x200000, REGION_GFX3, ROMREGION_DISPOSE ) /* Sprites? */
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx3", ROMREGION_DISPOSE ) /* Sprites? */
 	ROM_LOAD( "aquarf1",     0x000000, 0x0100000, CRC(14758b3c) SHA1(b372ccb42acb55a3dd15352a9d4ed576878a6731) )
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 ) /* Samples */
 	ROM_LOAD( "aquar4",  0x000000, 0x80000, CRC(9a4af531) SHA1(bb201b7a6c9fd5924a0d79090257efffd8d4aba1) )
 ROM_END
 

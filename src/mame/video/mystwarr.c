@@ -20,8 +20,8 @@ static char *orig_roms;
 // and we want the original data
 static void mystwarr_save_orig_tiles(running_machine *machine)
 {
-	UINT8 *s = memory_region(machine, REGION_GFX1);
-	int len = memory_region_length(machine, REGION_GFX1);
+	UINT8 *s = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	int len = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
 	UINT8 *pFinish = s+len-3;
 
 	orig_roms = malloc_or_die(len);
@@ -54,8 +54,8 @@ static void mystwarr_save_orig_tiles(running_machine *machine)
 
 static void mystwarr_rest_orig_tiles(running_machine *machine)
 {
-	UINT8 *s = memory_region(machine, REGION_GFX1);
-	int len = memory_region_length(machine, REGION_GFX1);
+	UINT8 *s = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	int len = memory_region_length(machine, RGNCLASS_GFX, "gfx1");
 
 	// restore the original data so the ROM test can pass
 	memcpy(s, orig_roms, len);
@@ -140,7 +140,7 @@ static void martchmp_sprite_callback(int *code, int *color, int *priority)
 static TILE_GET_INFO( get_gai_936_tile_info )
 {
 	int tileno, colour;
-	UINT8 *ROM = memory_region(machine, REGION_GFX4);
+	UINT8 *ROM = memory_region(machine, RGNCLASS_GFX, "gfx4");
 	UINT8 *dat1 = ROM, *dat2 = ROM + 0x20000, *dat3 = ROM + 0x60000;
 
 	tileno = dat3[tile_index] | ((dat2[tile_index]&0x3f)<<8);
@@ -166,11 +166,11 @@ VIDEO_START(gaiapols)
 
 	mystwarr_save_orig_tiles(machine);
 
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
 	mystwarr_rest_orig_tiles(machine);
 
-	K055673_vh_start(machine, REGION_GFX2, 1, -61, -22, gaiapols_sprite_callback); // stage2 brick walls
+	K055673_vh_start(machine, "gfx2", 1, -61, -22, gaiapols_sprite_callback); // stage2 brick walls
 
 	konamigx_mixer_init(machine, 0);
 
@@ -189,7 +189,7 @@ VIDEO_START(gaiapols)
 static TILE_GET_INFO( get_ult_936_tile_info )
 {
 	int tileno, colour;
-	UINT8 *ROM = memory_region(machine, REGION_GFX4);
+	UINT8 *ROM = memory_region(machine, RGNCLASS_GFX, "gfx4");
 	UINT8 *dat1 = ROM, *dat2 = ROM + 0x40000;
 
 	tileno = dat2[tile_index] | ((dat1[tile_index]&0x1f)<<8);
@@ -208,11 +208,11 @@ VIDEO_START(dadandrn)
 
 	mystwarr_save_orig_tiles(machine);
 
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
 
 	mystwarr_rest_orig_tiles(machine);
 
-	K055673_vh_start(machine, REGION_GFX2, 0, -42, -22, gaiapols_sprite_callback);
+	K055673_vh_start(machine, "gfx2", 0, -42, -22, gaiapols_sprite_callback);
 
 	konamigx_mixer_init(machine, 0);
 
@@ -239,11 +239,11 @@ VIDEO_START(mystwarr)
 
 	mystwarr_save_orig_tiles(machine);
 
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_5, 0, NULL, mystwarr_tile_callback, 0);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, mystwarr_tile_callback, 0);
 
 	mystwarr_rest_orig_tiles(machine);
 
-	K055673_vh_start(machine, REGION_GFX2, 0, -48, -24, mystwarr_sprite_callback);
+	K055673_vh_start(machine, "gfx2", 0, -48, -24, mystwarr_sprite_callback);
 
 	konamigx_mixer_init(machine, 0);
 
@@ -257,7 +257,7 @@ VIDEO_START(mystwarr)
 
 VIDEO_START(metamrph)
 {
-	int rgn_250 = REGION_GFX3;
+	const char * rgn_250 = "gfx3";
 
 	gametype = 0;
 
@@ -267,11 +267,11 @@ VIDEO_START(metamrph)
 
 	mystwarr_save_orig_tiles(machine);
 
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
 	mystwarr_rest_orig_tiles(machine);
 
-	K055673_vh_start(machine, REGION_GFX2, 1, -51, -22, metamrph_sprite_callback);
+	K055673_vh_start(machine, "gfx2", 1, -51, -22, metamrph_sprite_callback);
 
 	konamigx_mixer_init(machine, 0);
 
@@ -293,11 +293,11 @@ VIDEO_START(viostorm)
 
 	mystwarr_save_orig_tiles(machine);
 
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
 	mystwarr_rest_orig_tiles(machine);
 
-	K055673_vh_start(machine, REGION_GFX2, 1, -62, -23, metamrph_sprite_callback);
+	K055673_vh_start(machine, "gfx2", 1, -62, -23, metamrph_sprite_callback);
 
 	konamigx_mixer_init(machine, 0);
 
@@ -316,11 +316,11 @@ VIDEO_START(martchmp)
 
 	mystwarr_save_orig_tiles(machine);
 
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
 
 	mystwarr_rest_orig_tiles(machine);
 
-	K055673_vh_start(machine, REGION_GFX2, 0, -58, -23, martchmp_sprite_callback);
+	K055673_vh_start(machine, "gfx2", 0, -58, -23, martchmp_sprite_callback);
 
 	konamigx_mixer_init(machine, 0);
 
@@ -452,8 +452,8 @@ WRITE16_HANDLER(ddd_053936_clip_w)
 // reference: 223e5c in gaiapolis (ROMs 34j and 36m)
 READ16_HANDLER(gai_053936_tilerom_0_r)
 {
-	UINT8 *ROM1 = (UINT8 *)memory_region(machine, REGION_GFX4);
-	UINT8 *ROM2 = (UINT8 *)memory_region(machine, REGION_GFX4);
+	UINT8 *ROM1 = (UINT8 *)memory_region(machine, RGNCLASS_GFX, "gfx4");
+	UINT8 *ROM2 = (UINT8 *)memory_region(machine, RGNCLASS_GFX, "gfx4");
 
 	ROM1 += 0x20000;
 	ROM2 += 0x20000+0x40000;
@@ -463,8 +463,8 @@ READ16_HANDLER(gai_053936_tilerom_0_r)
 
 READ16_HANDLER(ddd_053936_tilerom_0_r)
 {
-	UINT8 *ROM1 = (UINT8 *)memory_region(machine, REGION_GFX4);
-	UINT8 *ROM2 = (UINT8 *)memory_region(machine, REGION_GFX4);
+	UINT8 *ROM1 = (UINT8 *)memory_region(machine, RGNCLASS_GFX, "gfx4");
+	UINT8 *ROM2 = (UINT8 *)memory_region(machine, RGNCLASS_GFX, "gfx4");
 
 	ROM2 += 0x40000;
 
@@ -474,7 +474,7 @@ READ16_HANDLER(ddd_053936_tilerom_0_r)
 // reference: 223e1a in gaiapolis (ROM 36j)
 READ16_HANDLER(ddd_053936_tilerom_1_r)
 {
-	UINT8 *ROM = (UINT8 *)memory_region(machine, REGION_GFX4);
+	UINT8 *ROM = (UINT8 *)memory_region(machine, RGNCLASS_GFX, "gfx4");
 
 	return ROM[offset/2];
 }
@@ -482,7 +482,7 @@ READ16_HANDLER(ddd_053936_tilerom_1_r)
 // reference: 223db0 in gaiapolis (ROMs 32n, 29n, 26n)
 READ16_HANDLER(gai_053936_tilerom_2_r)
 {
-	UINT8 *ROM = (UINT8 *)memory_region(machine, REGION_GFX3);
+	UINT8 *ROM = (UINT8 *)memory_region(machine, RGNCLASS_GFX, "gfx3");
 
 	offset += (roz_rombank * 0x100000);
 
@@ -491,7 +491,7 @@ READ16_HANDLER(gai_053936_tilerom_2_r)
 
 READ16_HANDLER(ddd_053936_tilerom_2_r)
 {
-	UINT8 *ROM = (UINT8 *)memory_region(machine, REGION_GFX3);
+	UINT8 *ROM = (UINT8 *)memory_region(machine, RGNCLASS_GFX, "gfx3");
 
 	offset += (roz_rombank * 0x100000);
 

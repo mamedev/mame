@@ -169,8 +169,8 @@ static const gfx_layout vramlayout=
 };
 
 static GFXDECODE_START( 2mindril )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, drill_layout,  0, 256  )
-	GFXDECODE_ENTRY( 0,		   	0, vramlayout,   0, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0, drill_layout,  0, 256  )
+	GFXDECODE_ENTRY( NULL,		   	0, vramlayout,   0, 256 )
 GFXDECODE_END
 
 
@@ -186,9 +186,7 @@ static void irqhandler(running_machine *machine, int irq)
 
 static const struct YM2610interface ym2610_interface =
 {
-	irqhandler,
-	0,
-	REGION_SOUND1
+	irqhandler
 };
 
 static MACHINE_DRIVER_START( drill )
@@ -220,27 +218,27 @@ MACHINE_DRIVER_END
 
 
 ROM_START( 2mindril )
-	ROM_REGION( 0x80000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "d58-38.ic11", 0x00000, 0x40000, CRC(c58e8e4f) SHA1(648db679c3bfb5de1cd6c1b1217773a2fe56f11b) )
 	ROM_LOAD16_BYTE( "d58-37.ic9",  0x00001, 0x40000, CRC(19e5cc3c) SHA1(04ac0eef893c579fe90d91d7fd55c5741a2b7460) )
 
-	ROM_REGION( 0x200000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_REGION( 0x200000, RGNCLASS_SOUND, "ym", 0 ) /* Samples */
 	ROM_LOAD( "d58-11.ic31", 0x000000, 0x200000,  CRC(dc26d58d) SHA1(cffb18667da18f5367b02af85a2f7674dd61ae97) )
 
-	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD32_WORD( "d58-09.ic28", 0x000000, 0x200000, CRC(d8f6a86a) SHA1(d6b2ec309e21064574ee63e025ae4716b1982a98) )
 	ROM_LOAD32_WORD( "d58-08.ic27", 0x000002, 0x200000, CRC(9f5a3f52) SHA1(7b696bd823819965b974c853cebc1660750db61e) )
 
-	ROM_REGION( 0x400000, REGION_GFX2, 0 )
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx2", 0 )
 	ROM_LOAD32_WORD( "d58-10.ic29", 0x000000, 0x200000, CRC(74c87e08) SHA1(f39b3a64f8338ccf5ca6eb76cee92a10fe0aad8f) )
 ROM_END
 
 static DRIVER_INIT( drill )
 {
 	// rearrange gfx roms to something we can decode, two of the roms form 4bpp of the graphics, the third forms another 2bpp but is in a different format
-	UINT32 *src = (UINT32*)memory_region( machine, REGION_GFX2 );
-	UINT32 *dst = (UINT32*)memory_region( machine, REGION_GFX1 );// + 0x400000;
-	UINT8 *rom = memory_region( machine, REGION_CPU1 );
+	UINT32 *src = (UINT32*)memory_region( machine, RGNCLASS_GFX, "gfx2" );
+	UINT32 *dst = (UINT32*)memory_region( machine, RGNCLASS_GFX, "gfx1" );// + 0x400000;
+	UINT8 *rom = memory_region( machine, RGNCLASS_CPU, "main" );
 	int i;
 
 	for (i=0; i< 0x400000/4; i++)

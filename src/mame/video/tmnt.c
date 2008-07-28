@@ -18,7 +18,7 @@ static int glfgreat_roz_rom_bank,glfgreat_roz_char_bank,glfgreat_roz_rom_mode;
 
 static TILE_GET_INFO( glfgreat_get_roz_tile_info )
 {
-	UINT8 *rom = memory_region(machine, REGION_USER1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_USER, "user1");
 	int code;
 
 	tile_index += 0x40000 * glfgreat_roz_rom_bank;
@@ -30,7 +30,7 @@ static TILE_GET_INFO( glfgreat_get_roz_tile_info )
 
 static TILE_GET_INFO( prmrsocr_get_roz_tile_info )
 {
-	UINT8 *rom = memory_region(machine, REGION_USER1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_USER, "user1");
 	int code = rom[tile_index+0x20000] + 256*rom[tile_index];
 
 	SET_TILE_INFO(0,code & 0x1fff,code >> 13,0);
@@ -212,8 +212,8 @@ VIDEO_START( mia )
 	layer_colorbase[1] = 32;
 	layer_colorbase[2] = 40;
 	sprite_colorbase = 16;
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,mia_tile_callback);
-	K051960_vh_start(machine,REGION_GFX2,REVERSE_PLANE_ORDER,mia_sprite_callback);
+	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,mia_tile_callback);
+	K051960_vh_start(machine,"gfx2",REVERSE_PLANE_ORDER,mia_sprite_callback);
 }
 
 VIDEO_START( cuebrick )
@@ -222,8 +222,8 @@ VIDEO_START( cuebrick )
 	layer_colorbase[1] = 32;
 	layer_colorbase[2] = 40;
 	sprite_colorbase = 16;
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,cuebrick_tile_callback);
-	K051960_vh_start(machine,REGION_GFX2,REVERSE_PLANE_ORDER,mia_sprite_callback);
+	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,cuebrick_tile_callback);
+	K051960_vh_start(machine,"gfx2",REVERSE_PLANE_ORDER,mia_sprite_callback);
 }
 
 VIDEO_START( tmnt )
@@ -232,22 +232,22 @@ VIDEO_START( tmnt )
 	layer_colorbase[1] = 32;
 	layer_colorbase[2] = 40;
 	sprite_colorbase = 16;
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
-	K051960_vh_start(machine,REGION_GFX2,REVERSE_PLANE_ORDER,tmnt_sprite_callback);
+	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tmnt_tile_callback);
+	K051960_vh_start(machine,"gfx2",REVERSE_PLANE_ORDER,tmnt_sprite_callback);
 }
 
 VIDEO_START( punkshot )
 {
 	K053251_vh_start(machine);
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
-	K051960_vh_start(machine,REGION_GFX2,NORMAL_PLANE_ORDER,punkshot_sprite_callback);
+	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tmnt_tile_callback);
+	K051960_vh_start(machine,"gfx2",NORMAL_PLANE_ORDER,punkshot_sprite_callback);
 }
 
 VIDEO_START( lgtnfght )	/* also tmnt2, ssriders */
 {
 	K053251_vh_start(machine);
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
-	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
+	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tmnt_tile_callback);
+	K053245_vh_start(machine,0, "gfx2",NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
 
 	K05324x_set_z_rejection(0);
 
@@ -262,22 +262,22 @@ VIDEO_START( lgtnfght )	/* also tmnt2, ssriders */
 VIDEO_START( sunsetbl )
 {
 	K053251_vh_start(machine);
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,ssbl_tile_callback);
-	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
+	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,ssbl_tile_callback);
+	K053245_vh_start(machine,0, "gfx2",NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
 }
 
 VIDEO_START( blswhstl )
 {
 	K053251_vh_start(machine);
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,blswhstl_tile_callback);
-	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,blswhstl_sprite_callback);
+	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,blswhstl_tile_callback);
+	K053245_vh_start(machine,0, "gfx2",NORMAL_PLANE_ORDER,blswhstl_sprite_callback);
 }
 
 VIDEO_START( glfgreat )
 {
 	K053251_vh_start(machine);
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
-	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
+	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tmnt_tile_callback);
+	K053245_vh_start(machine,0, "gfx2",NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
 
 	roz_tilemap = tilemap_create(glfgreat_get_roz_tile_info,tilemap_scan_rows,16,16,512,512);
 
@@ -290,15 +290,15 @@ VIDEO_START( glfgreat )
 VIDEO_START( thndrx2 )
 {
 	K053251_vh_start(machine);
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
-	K051960_vh_start(machine,REGION_GFX2,NORMAL_PLANE_ORDER,thndrx2_sprite_callback);
+	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tmnt_tile_callback);
+	K051960_vh_start(machine,"gfx2",NORMAL_PLANE_ORDER,thndrx2_sprite_callback);
 }
 
 VIDEO_START( prmrsocr )
 {
 	K053251_vh_start(machine);
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
-	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,prmrsocr_sprite_callback);
+	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tmnt_tile_callback);
+	K053245_vh_start(machine,0, "gfx2",NORMAL_PLANE_ORDER,prmrsocr_sprite_callback);
 
 	roz_tilemap = tilemap_create(prmrsocr_get_roz_tile_info,tilemap_scan_rows,16,16,512,256);
 
@@ -422,15 +422,15 @@ WRITE16_HANDLER( blswhstl_700300_w )
 READ16_HANDLER( glfgreat_rom_r )
 {
 	if (glfgreat_roz_rom_mode)
-		return memory_region(machine, REGION_GFX3)[glfgreat_roz_char_bank * 0x80000 + offset];
+		return memory_region(machine, RGNCLASS_GFX, "gfx3")[glfgreat_roz_char_bank * 0x80000 + offset];
 	else if (offset < 0x40000)
 	{
-		UINT8 *usr = memory_region(machine, REGION_USER1);
+		UINT8 *usr = memory_region(machine, RGNCLASS_USER, "user1");
 		return usr[offset + 0x80000 + glfgreat_roz_rom_bank * 0x40000] +
 				256 * usr[offset + glfgreat_roz_rom_bank * 0x40000];
 	}
 	else
-		return memory_region(machine, REGION_USER1)[((offset & 0x3ffff) >> 2) + 0x100000 + glfgreat_roz_rom_bank * 0x10000];
+		return memory_region(machine, RGNCLASS_USER, "user1")[((offset & 0x3ffff) >> 2) + 0x100000 + glfgreat_roz_rom_bank * 0x10000];
 }
 
 WRITE16_HANDLER( glfgreat_122000_w )
@@ -526,10 +526,10 @@ WRITE16_HANDLER( prmrsocr_122000_w )
 READ16_HANDLER( prmrsocr_rom_r )
 {
 	if(glfgreat_roz_char_bank)
-		return memory_region(machine, REGION_GFX3)[offset];
+		return memory_region(machine, RGNCLASS_GFX, "gfx3")[offset];
 	else
 	{
-		UINT8 *usr = memory_region(machine, REGION_USER1);
+		UINT8 *usr = memory_region(machine, RGNCLASS_USER, "user1");
 		return 256 * usr[offset] + usr[offset + 0x020000];
 	}
 }

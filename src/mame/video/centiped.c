@@ -396,7 +396,7 @@ WRITE8_HANDLER( mazeinv_paletteram_w )
 	paletteram[offset] = data;
 
 	/* the value passed in is a look-up index into the color PROM */
-	melliped_mazeinv_set_color(machine, offset, ~memory_region(machine, REGION_PROMS)[~data & 0x0f]);
+	melliped_mazeinv_set_color(machine, offset, ~memory_region(machine, RGNCLASS_PROMS, "proms")[~data & 0x0f]);
 }
 
 

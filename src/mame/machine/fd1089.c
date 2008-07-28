@@ -7573,8 +7573,8 @@ static UINT16 *decrypted;
 
 static void sys16_decrypt(running_machine *machine, const UINT8 *key,int cputype)
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, REGION_CPU1);
-	int size = memory_region_length(machine, REGION_CPU1);
+	UINT16 *rom = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "main");
+	int size = memory_region_length(machine, RGNCLASS_CPU, "main");
 	int A;
 	decrypted = (UINT16 *)auto_malloc(size);
 

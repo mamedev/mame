@@ -133,7 +133,7 @@ static void mb86233_init(int index, int clock, const void *config, int (*irqcall
 	memset( mb86233.RAM, 0, 2 * 0x200 * sizeof(UINT32) );
 	mb86233.ARAM = &mb86233.RAM[0];
 	mb86233.BRAM = &mb86233.RAM[0x200];
-	mb86233.Tables = (UINT32*) memory_region(Machine, _config->Tables);
+	mb86233.Tables = (UINT32*) memory_region(Machine, RGNCLASS_USER, _config->tablergn);
 
 	state_save_register_global_pointer(mb86233.RAM,2 * 0x200 * sizeof(UINT32));
 }

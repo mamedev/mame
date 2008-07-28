@@ -177,8 +177,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( mustache )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x00, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0x80, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x80, 8 )
 GFXDECODE_END
 
 static TIMER_CALLBACK( clear_irq_cb )
@@ -237,26 +237,26 @@ static MACHINE_DRIVER_START( mustache )
 MACHINE_DRIVER_END
 
 ROM_START( mustache )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "mustache.h18", 0x0000, 0x8000, CRC(123bd9b8) SHA1(33a7cba5c3a54b0b1a15dd1e24d298b6f7274321) )
 	ROM_LOAD( "mustache.h16", 0x8000, 0x4000, CRC(62552beb) SHA1(ee10991d7de0596608fa1db48805781cbfbbdb9f) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Toshiba T5182 module */
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "T5182", 0 ) /* Toshiba T5182 module */
 	ROM_LOAD( "t5182.rom",   0x0000, 0x2000, CRC(d354c8fc) SHA1(a1c9e1ac293f107f69cc5788cf6abc3db1646e33) )
 	ROM_LOAD( "mustache.e5", 0x8000, 0x8000, CRC(efbb1943) SHA1(3320e9eaeb776d09ed63f7dedc79e720674e6718) )
 
-	ROM_REGION( 0x0c000, REGION_GFX1,0)	/* BG tiles  */
+	ROM_REGION( 0x0c000, RGNCLASS_GFX, "gfx1",0)	/* BG tiles  */
 	ROM_LOAD( "mustache.a13", 0x0000,  0x4000, CRC(9baee4a7) SHA1(31bcec838789462e67e54ebe7256db9fc4e51b69) )
 	ROM_LOAD( "mustache.a14", 0x4000,  0x4000, CRC(8155387d) SHA1(5f0a394c7671442519a831b0eeeaba4eecd5a406) )
 	ROM_LOAD( "mustache.a16", 0x8000,  0x4000, CRC(4db4448d) SHA1(50a94fd65c263d95fd24b4009dbb87707929fdcb) )
 
-	ROM_REGION( 0x20000, REGION_GFX2,0 )	/* sprites */
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx2",0 )	/* sprites */
 	ROM_LOAD( "mustache.a4", 0x00000,  0x8000, CRC(d5c3bbbf) SHA1(914e3feea54246476701f492c31bd094ad9cea10) )
 	ROM_LOAD( "mustache.a7", 0x08000,  0x8000, CRC(e2a6012d) SHA1(4e4cd1a186870c8a88924d5bff917c6889da953d) )
 	ROM_LOAD( "mustache.a5", 0x10000,  0x8000, CRC(c975fb06) SHA1(4d166bd79e19c7cae422673de3e095ad8101e013) )
 	ROM_LOAD( "mustache.a8", 0x18000,  0x8000, CRC(2e180ee4) SHA1(a5684a25c337aeb4effeda7982164d35bc190af9) )
 
-	ROM_REGION( 0x1300, REGION_PROMS,0 )	/* proms */
+	ROM_REGION( 0x1300, RGNCLASS_PROMS, "proms",0 )	/* proms */
 	ROM_LOAD( "mustache.c3",0x0000, 0x0100, CRC(68575300) SHA1(bc93a38df91ad8c2f335f9bccc98b52376f9b483) )
 	ROM_LOAD( "mustache.c2",0x0100, 0x0100, CRC(eb008d62) SHA1(a370fbd1affaa489210ea36eb9e365263fb4e232) )
 	ROM_LOAD( "mustache.c1",0x0200, 0x0100, CRC(65da3604) SHA1(e4874d4152a57944d4e47306250833ea5cd0d89b) )
@@ -268,10 +268,10 @@ static DRIVER_INIT( mustache )
 {
 	int i;
 
-	int G1 = memory_region_length(machine, REGION_GFX1)/3;
-	int G2 = memory_region_length(machine, REGION_GFX2)/2;
-	UINT8 *gfx1 = memory_region(machine, REGION_GFX1);
-	UINT8 *gfx2 = memory_region(machine, REGION_GFX2);
+	int G1 = memory_region_length(machine, RGNCLASS_GFX, "gfx1")/3;
+	int G2 = memory_region_length(machine, RGNCLASS_GFX, "gfx2")/2;
+	UINT8 *gfx1 = memory_region(machine, RGNCLASS_GFX, "gfx1");
+	UINT8 *gfx2 = memory_region(machine, RGNCLASS_GFX, "gfx2");
 	UINT8 *buf=malloc_or_die(G2*2);
 
 	/* BG data lines */
@@ -309,7 +309,7 @@ static DRIVER_INIT( mustache )
 		gfx2[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,12,11,10,9,8,7,6,5,4,13,14,3,2,1,0)];
 
 	free(buf);
-	seibu_sound_decrypt(machine,REGION_CPU1,0x8000);
+	seibu_sound_decrypt(machine,"main",0x8000);
 }
 
 

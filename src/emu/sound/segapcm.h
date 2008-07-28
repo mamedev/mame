@@ -15,7 +15,6 @@
 struct SEGAPCMinterface
 {
 	int  bank;
-	int  region;
 };
 
 WRITE8_HANDLER( SegaPCM_w );

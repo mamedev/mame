@@ -9,10 +9,6 @@
 
 #define QSOUND_CLOCK    4000000   /* default 4MHz clock */
 
-struct QSound_interface {
-	int region;					/* memory region of sample ROM(s) */
-};
-
 WRITE8_HANDLER( qsound_data_h_w );
 WRITE8_HANDLER( qsound_data_l_w );
 WRITE8_HANDLER( qsound_cmd_w );

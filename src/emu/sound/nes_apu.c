@@ -666,7 +666,7 @@ static void NESPSG_update_sound(void *param, stream_sample_t **inputs, stream_sa
 
 
 /* INITIALIZE APU SYSTEM */
-static void *nesapu_start(int sndindex, int clock, const void *config)
+static void *nesapu_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	const struct NESinterface *intf = config;
 	struct nesapu_info *info;
@@ -691,7 +691,7 @@ static void *nesapu_start(int sndindex, int clock, const void *config)
 	info->buffer_size+=info->samps_per_sync;
 
 	/* Initialize individual chips */
-	(info->APU.dpcm).cpu_mem=memory_region(Machine, intf->region);
+	(info->APU.dpcm).cpu_mem=memory_region(Machine, RGNCLASS_CPU, intf->region);
 
 	info->stream = stream_create(0, 1, rate, info, NESPSG_update_sound);
 

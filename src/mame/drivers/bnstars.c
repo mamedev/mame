@@ -1180,15 +1180,15 @@ static GFXLAYOUT_RAW( bglayout, 8, 16, 16, 16*8, 16*16*8 )
 static GFXLAYOUT_RAW( txlayout, 8, 8, 8, 8*8, 8*8*8 )
 
 static GFXDECODE_START( bnstars )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 0x0000, 0x10 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, bglayout,     0x5000, 0x10 ) /* Roz scr1 */
-	GFXDECODE_ENTRY( REGION_GFX4, 0, bglayout,     0x1000, 0x10 ) /* Bg scr1 */
-	GFXDECODE_ENTRY( REGION_GFX5, 0, txlayout,     0x6000, 0x10 ) /* Tx scr1 */
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x0000, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x5000, 0x10 ) /* Roz scr1 */
+	GFXDECODE_ENTRY( "gfx4", 0, bglayout,     0x1000, 0x10 ) /* Bg scr1 */
+	GFXDECODE_ENTRY( "gfx5", 0, txlayout,     0x6000, 0x10 ) /* Tx scr1 */
 
-	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 0x8000+0x0000, 0x10 )
-	GFXDECODE_ENTRY( REGION_GFX3, 0, bglayout,     0x8000+0x5000, 0x10 ) /* Roz scr2 */
-	GFXDECODE_ENTRY( REGION_GFX6, 0, bglayout,     0x8000+0x1000, 0x10 ) /* Bg scr2 */
-	GFXDECODE_ENTRY( REGION_GFX7, 0, txlayout,     0x8000+0x6000, 0x10 ) /* Tx scr2 */
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x8000+0x0000, 0x10 )
+	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     0x8000+0x5000, 0x10 ) /* Roz scr2 */
+	GFXDECODE_ENTRY( "gfx6", 0, bglayout,     0x8000+0x1000, 0x10 ) /* Bg scr2 */
+	GFXDECODE_ENTRY( "gfx7", 0, txlayout,     0x8000+0x6000, 0x10 ) /* Tx scr2 */
 
 GFXDECODE_END
 
@@ -1275,16 +1275,6 @@ static ADDRESS_MAP_START( bnstars_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 #endif
-
-static const struct YMF271interface ymf271_interface1 =
-{
-	REGION_SOUND1
-};
-
-static const struct YMF271interface ymf271_interface2 =
-{
-	REGION_SOUND2
-};
 
 static UINT16 irqreq;
 
@@ -1373,12 +1363,10 @@ static MACHINE_DRIVER_START( bnstars )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ymf1", YMF271, 16934400)
-	MDRV_SOUND_CONFIG(ymf271_interface1)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
 	MDRV_SOUND_ADD("ymf2", YMF271, 16934400)
-	MDRV_SOUND_CONFIG(ymf271_interface2)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
@@ -1386,14 +1374,14 @@ MACHINE_DRIVER_END
 
 
 ROM_START( bnstars1 )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 ) /* V70 code */
+	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 ) /* V70 code */
 	ROM_LOAD32_BYTE( "mb-93142.36", 0x000003, 0x80000, CRC(2eb6a503) SHA1(27c02ab1b4321924fd4499844467ea4dc97de25d) )
 	ROM_LOAD32_BYTE( "mb-93142.37", 0x000002, 0x80000, CRC(49f60882) SHA1(2ff5b0989aaf970103304a453773e0b9517ebb8d) )
 	ROM_LOAD32_BYTE( "mb-93142.38", 0x000001, 0x80000, CRC(6e1312cd) SHA1(4c22f8f9f1574eefd96147453cf240f50c17f5dc) )
 	ROM_LOAD32_BYTE( "mb-93142.39", 0x000000, 0x80000, CRC(56b98539) SHA1(5eb0e77729b31e6a100c1b43813a39fea57bedee) )
 
 	/* Sprites - shared by both screens? */
-	ROM_REGION( 0x1000000, REGION_GFX1, 0 ) /* sprites, don't dispose since we use GFX_RAW */
+	ROM_REGION( 0x1000000, RGNCLASS_GFX, "gfx1", 0 ) /* sprites, don't dispose since we use GFX_RAW */
 	ROM_LOAD32_WORD( "mr96004-01.20",   0x0000000, 0x200000, CRC(3366d104) SHA1(2de0cabe2ead777b5b02cade7f2003ef7f90b75b) )
 	ROM_LOAD32_WORD( "mr96004-02.28",   0x0000002, 0x200000, CRC(ad556664) SHA1(4b36f8d8d9efa37cf515af41d14433e7eafa27a2) )
 	ROM_LOAD32_WORD( "mr96004-03.21",   0x0400000, 0x200000, CRC(b399e2b1) SHA1(9b6a00a219db8d66dcf592160b7b5f7a86b8f0c9) )
@@ -1404,40 +1392,40 @@ ROM_START( bnstars1 )
 	ROM_LOAD32_WORD( "mr96004-08.31",   0x0c00002, 0x200000, CRC(f6df27b2) SHA1(60590976020d86bdccd4eaf57b349ea31bec6830) )
 
 	/* Roz Tiles #1 (Screen 1) */
-	ROM_REGION( 0x400000, REGION_GFX2, 0 ) /* roz tiles, don't dispose since we use GFX_RAW */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx2", 0 ) /* roz tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "mr96004-09.1", 0x000000, 0x400000, CRC(7f8ea9f0) SHA1(f1fe682dcb884f1aa4a5536e17ab94157a99f519) )
 
 	/* Roz Tiles #2 (Screen 2) */
-	ROM_REGION( 0x400000, REGION_GFX3, 0 ) /* roz tiles, don't dispose since we use GFX_RAW */
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx3", 0 ) /* roz tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "mr96004-09.7", 0x000000, 0x400000, CRC(7f8ea9f0) SHA1(f1fe682dcb884f1aa4a5536e17ab94157a99f519) )
 
 	/* BG Tiles #1 (Screen 1?) */
-	ROM_REGION( 0x200000, REGION_GFX4, 0 ) /* bg tiles, don't dispose since we use GFX_RAW */
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx4", 0 ) /* bg tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "mr96004-11.11", 0x000000, 0x200000,  CRC(e6da552c) SHA1(69a5af3015883793c7d1343243ccae23db9ef77c) )
 
 	/* TX Tiles #1 (Screen 1?) */
-	ROM_REGION( 0x080000, REGION_GFX5, 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx5", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "vsjanshi6.5", 0x000000, 0x080000, CRC(fdbbac21) SHA1(c77d852e53126cc8ebfe1e79d1134e42b54d1aab) )
 
 	/* BG Tiles #2 (Screen 2?) */
-	ROM_REGION( 0x200000, REGION_GFX6, 0 ) /* bg tiles, don't dispose since we use GFX_RAW */
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx6", 0 ) /* bg tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "mr96004-11.13", 0x000000, 0x200000, CRC(e6da552c) SHA1(69a5af3015883793c7d1343243ccae23db9ef77c) )
 
 	/* TX Tiles #2 (Screen 2?) */
-	ROM_REGION( 0x080000, REGION_GFX7, 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
+	ROM_REGION( 0x080000, RGNCLASS_GFX, "gfx7", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "vsjanshi5.6", 0x000000, 0x080000, CRC(fdbbac21) SHA1(c77d852e53126cc8ebfe1e79d1134e42b54d1aab) )
 
 	/* Sound Program (one, driving both screen sound) */
-	ROM_REGION( 0x50000, REGION_CPU2, 0 ) /* z80 program */
+	ROM_REGION( 0x50000, RGNCLASS_CPU, "cpu1", 0 ) /* z80 program */
 	ROM_LOAD( "sb93145.5",  0x000000, 0x040000, CRC(0424e899) SHA1(fbcdebfa3d5f52b10cf30f7e416f5f53994e4d55) )
 	ROM_RELOAD(              0x010000, 0x40000 )
 
 	/* Samples #1 (Screen 1?) */
-	ROM_REGION( 0x400000, REGION_SOUND1, 0 ) /* samples - 8-bit signed PCM */
+	ROM_REGION( 0x400000, RGNCLASS_SOUND, "ymf1", 0 ) /* samples - 8-bit signed PCM */
 	ROM_LOAD( "mr96004-10.1",  0x000000, 0x400000, CRC(83f4303a) SHA1(90ee010591afe1d35744925ef0e8d9a7e2ef3378) )
 
 	/* Samples #2 (Screen 2?) */
-	ROM_REGION( 0x400000, REGION_SOUND2, 0 ) /* samples - 8-bit signed PCM */
+	ROM_REGION( 0x400000, RGNCLASS_SOUND, "ymf2", 0 ) /* samples - 8-bit signed PCM */
 	ROM_LOAD( "mr96004-10.1",  0x000000, 0x400000, CRC(83f4303a) SHA1(90ee010591afe1d35744925ef0e8d9a7e2ef3378) )
 ROM_END
 
@@ -1445,14 +1433,14 @@ ROM_END
 /* SS92046_01: bbbxing, f1superb, tetrisp, hayaosi1 */
 static DRIVER_INIT (bnstars)
 {
-	ms32_rearrange_sprites(machine, REGION_GFX1);
+	ms32_rearrange_sprites(machine, "gfx1");
 
-	decrypt_ms32_tx(machine, 0x00020,0x7e, REGION_GFX5);
-	decrypt_ms32_bg(machine, 0x00001,0x9b, REGION_GFX4);
-	decrypt_ms32_tx(machine, 0x00020,0x7e, REGION_GFX7);
-	decrypt_ms32_bg(machine, 0x00001,0x9b, REGION_GFX6);
+	decrypt_ms32_tx(machine, 0x00020,0x7e, "gfx5");
+	decrypt_ms32_bg(machine, 0x00001,0x9b, "gfx4");
+	decrypt_ms32_tx(machine, 0x00020,0x7e, "gfx7");
+	decrypt_ms32_bg(machine, 0x00001,0x9b, "gfx6");
 
-	memory_set_bankptr(1, memory_region(machine, REGION_CPU1));
+	memory_set_bankptr(1, memory_region(machine, RGNCLASS_CPU, "main"));
 }
 
 GAME( 1997, bnstars1, 0,        bnstars, bnstars, bnstars, ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars", GAME_NO_SOUND )

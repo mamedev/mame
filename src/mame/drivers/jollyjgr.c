@@ -387,8 +387,8 @@ static const gfx_layout jollyjgr_spritelayout =
 };
 
 static GFXDECODE_START( jollyjgr )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, jollyjgr_charlayout,   0, 8 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, jollyjgr_spritelayout, 0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0, jollyjgr_charlayout,   0, 8 )
+	GFXDECODE_ENTRY( "gfx2", 0, jollyjgr_spritelayout, 0, 8 )
 GFXDECODE_END
 
 static INTERRUPT_GEN( jollyjgr_interrupt )
@@ -425,7 +425,7 @@ static MACHINE_DRIVER_START( jollyjgr )
 MACHINE_DRIVER_END
 
 ROM_START( jollyjgr )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "kd14.8a",      0x0000, 0x1000, CRC(404cfa2b) SHA1(023abecbc614d1deb6a239906f62e25bb688ac14) )
 	ROM_LOAD( "kd15.8b",      0x1000, 0x1000, CRC(4cdc4c8b) SHA1(07257863a2de3a0e6bc1b41b8dcaae8c89bc4720) )
 	ROM_LOAD( "kd16.8c",      0x2000, 0x1000, CRC(a2fa3500) SHA1(b85439e43a31c3445420896c231ac59f95331226) )
@@ -435,16 +435,16 @@ ROM_START( jollyjgr )
 	ROM_LOAD( "kd20.8h",      0x6000, 0x1000, CRC(017a0e5a) SHA1(23e066fea44690279ff7b3b65b03e4096e4d2984) )
 	ROM_LOAD( "kd21.8j",      0x7000, 0x1000, CRC(e4faed01) SHA1(9b9afaff6cc4addfed7c1929a0d845bfbe9d18cc) )
 
-	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "kd09.1c",      0x0000, 0x0800, CRC(ecafd535) SHA1(a1f0bee247e6ab4f9fc3578560b62f5913b4ece2) )
 	ROM_LOAD( "kd10.2c",      0x0800, 0x0800, CRC(e40fc594) SHA1(1a9bd670dda0405600e4c4d0107b881906969991) )
 
-	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "kd11.5h",      0x0000, 0x0800, CRC(d686245c) SHA1(73567b15d9399e450121ad01ad2dcb91bedc1099) )
 	ROM_LOAD( "kd12.7h",      0x0800, 0x0800, CRC(d69cbb4e) SHA1(f33cc161f93cae9cc314067fa2453838fa8ac3ba) )
 
 	/* it's identical to kd14.8a, except for the first 32 bytes which are palette bytes */
-	ROM_REGION( 0x1000, REGION_PROMS, 0 )
+	ROM_REGION( 0x1000, RGNCLASS_PROMS, "proms", 0 )
 	ROM_LOAD( "kd13.1f",      0x0000, 0x1000, CRC(4f4e4e13) SHA1(a8fe0e1fd354e6cc2cf65eab66882c3b98c82100) )
 ROM_END
 

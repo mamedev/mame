@@ -79,7 +79,7 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 	}
 	else if((data & 0xf0) == 0x80 || (data & 0xf0) == 0x90)
 	{
-		rom = memory_region(machine, REGION_USER2);
+		rom = memory_region(machine, RGNCLASS_USER, "user2");
 
 		switch(data & 0xf)
 		{
@@ -106,7 +106,7 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 		//      logerror("port80 = %02X\n",old=data);
 			}
 
-		rom = memory_region(machine, REGION_USER1);
+		rom = memory_region(machine, RGNCLASS_USER, "user1");
 
 		/*
         7
@@ -240,7 +240,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( trvmadns )
-	GFXDECODE_ENTRY( REGION_CPU1, 0x6000, charlayout, 0, 4 ) // doesn't matter where we point this, all the tiles are decoded while the game runs
+	GFXDECODE_ENTRY( NULL, 0x6000, charlayout, 0, 4 ) // doesn't matter where we point this, all the tiles are decoded while the game runs
 GFXDECODE_END
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -306,12 +306,12 @@ MACHINE_DRIVER_END
 
 
 ROM_START( trvmadns )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "u5f lat la trivia.bin", 0x0000, 0x2000, CRC(a8fb07ea) SHA1(dcf2cccd8b98087d30b3347e69b1bf8565f95ad6) )
 	ROM_LOAD( "u6f lat green.bin",     0x2000, 0x2000, CRC(40f816f1) SHA1(a1a6a9af99edb1860bc4c8eb51859bbfbf91cae2) )
 	ROM_LOAD( "u7f lat green.bin",     0x4000, 0x2000, CRC(3e45feb0) SHA1(5ffc18ab3f6ace844242d4be52b3946c1469944a) )
 
-	ROM_REGION( 0x40000, REGION_USER1, ROMREGION_ERASEFF ) /* Question roms 1st set */
+	ROM_REGION( 0x40000, RGNCLASS_USER, "user1", ROMREGION_ERASEFF ) /* Question roms 1st set */
 	ROM_LOAD( "row d-e 2 rebel a1.bin",   0x00000, 0x8000, CRC(92e6dcf8) SHA1(e8429fe60fadfc841ed0d69b4a815765e82723db) )
 	ROM_LOAD( "row c-d 2 rebel a2.bin",   0x08000, 0x8000, CRC(b45429be) SHA1(9285f12bc0bceb0a91fc1f2f2941825b73bdb02c) )
 	ROM_LOAD( "row d-e 2 str trk a1.bin", 0x10000, 0x8000, CRC(dc6fc7e1) SHA1(86ba730123bbb06d8290d68c042dd215bddf7629) )
@@ -325,7 +325,7 @@ ROM_START( trvmadns )
 	ROM_LOAD( "row b-c sex a3.bin",       0x38000, 0x4000, CRC(3fea2c2a) SHA1(fa403e14b057f0e6d607871adcaba85a6c77f1f9) )
 	ROM_LOAD( "row a sex a4.bin",         0x3c000, 0x4000, CRC(2d179c7b) SHA1(153240f1fcc4f53b6840eafdd9ce0fb3e52ec1aa) )
 
-	ROM_REGION( 0x20000, REGION_USER2, ROMREGION_ERASEFF ) /* Question roms 2nd set */
+	ROM_REGION( 0x20000, RGNCLASS_USER, "user2", ROMREGION_ERASEFF ) /* Question roms 2nd set */
 	ROM_LOAD( "trivia madness.bin",       0x00000, 0x2000, CRC(5aec7cfa) SHA1(09e4eac78d975aef3af224b42b60499d759e7749) )
 	ROM_CONTINUE(                         0x0e000, 0x2000 )
 	// empty space, for 3 roms (each one max 0x8000 bytes long)

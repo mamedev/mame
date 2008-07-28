@@ -65,7 +65,7 @@ static UINT32 K001006_r(running_machine *machine, int chip, int offset, UINT32 m
 		{
 			case 0x0b:		// CG Board ROM read
 			{
-				UINT16 *rom = (UINT16*)memory_region(machine, REGION_GFX1);
+				UINT16 *rom = (UINT16*)memory_region(machine, RGNCLASS_GFX, "gfx1");
 				return rom[K001006_addr[chip] / 2] << 16;
 			}
 			case 0x0d:		// Palette RAM read
@@ -498,7 +498,7 @@ static void draw_scanline_tex(void *dest, INT32 scanline, const poly_extent *ext
 {
 	const poly_extra_data *extra = extradata;
 	bitmap_t *destmap = dest;
-	UINT8 *texrom = memory_region(Machine, REGION_GFX1) + (extra->texture_page * 0x40000);
+	UINT8 *texrom = memory_region(Machine, RGNCLASS_GFX, "gfx1") + (extra->texture_page * 0x40000);
 	int pal_chip = (extra->texture_palette & 0x8) ? 1 : 0;
 	int palette_index = (extra->texture_palette & 0x7) * 256;
 	float z = extent->param[0].start;
@@ -1039,7 +1039,7 @@ VIDEO_UPDATE( gticlub )
         int index = (debug_tex_page - 1) * 0x40000;
         int pal = debug_tex_palette & 7;
         int tp = (debug_tex_palette >> 3) & 1;
-        UINT8 *rom = memory_region(machine, REGION_GFX1);
+        UINT8 *rom = memory_region(machine, RGNCLASS_GFX, "gfx1");
 
         for (y=0; y < 384; y++)
         {

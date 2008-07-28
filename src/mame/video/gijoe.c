@@ -42,11 +42,11 @@ VIDEO_START( gijoe )
 	int i;
 
 	K053251_vh_start(machine);
-	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_4, 1, NULL, gijoe_tile_callback, 0);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_4, 1, NULL, gijoe_tile_callback, 0);
 
 	K056832_linemap_enable(1);
 
-	K053247_vh_start(machine, REGION_GFX2, -37, 20, NORMAL_PLANE_ORDER, gijoe_sprite_callback);
+	K053247_vh_start(machine, "gfx2", -37, 20, NORMAL_PLANE_ORDER, gijoe_sprite_callback);
 
 	for (i=0; i<4; i++) AVAC_occupancy[i] = 0;
 	AVAC_vrc = 0xffff;

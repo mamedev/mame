@@ -259,16 +259,16 @@ static const gfx_layout tilelayoutbl =
 
 
 static GFXDECODE_START( goldstar )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout, 128,  8 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 128,  8 )
 GFXDECODE_END
 static GFXDECODE_START( bl )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayoutbl, 128,  8 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayoutbl, 128,  8 )
 GFXDECODE_END
 static GFXDECODE_START( ml )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x18000, tilelayout, 128,  8 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x18000, tilelayout, 128,  8 )
 GFXDECODE_END
 
 
@@ -313,7 +313,7 @@ static MACHINE_DRIVER_START( goldstar )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)//all sound goes to the 'mono' speaker, at 0.50 X maximum
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)//clock
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified //REGION_SOUND1
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified //RGNCLASS_SOUND, "oki"
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)//all sound goes to the 'mono' speaker, at 1.0 X maximum
 
 MACHINE_DRIVER_END
@@ -349,7 +349,7 @@ static MACHINE_DRIVER_START( goldstbl )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)//all sound goes to the 'mono' speaker, at 0.50 X maximum
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)//clock
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified //REGION_SOUND1
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified //RGNCLASS_SOUND, "oki"
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)//all sound goes to the 'mono' speaker, at 1.0 X maximum
 MACHINE_DRIVER_END
 
@@ -384,7 +384,7 @@ static MACHINE_DRIVER_START( moonlght )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)//all sound goes to the 'mono' speaker, at 0.50 X maximum
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)//clock
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)// clock frequency & pin 7 not verified //REGION_SOUND1
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)// clock frequency & pin 7 not verified //RGNCLASS_SOUND, "oki"
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)//all sound goes to the 'mono' speaker, at 1.0 X maximum
 MACHINE_DRIVER_END
 
@@ -397,46 +397,46 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( goldstar )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "gs4-cpu.bin",  0x0000, 0x10000, CRC(73e47d4d) SHA1(df2d8233572dc12e8a4b56e5d4f6c566e4ababc9) )
 
-	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "gs2.bin",      0x00000, 0x20000, CRC(a2d5b898) SHA1(84cca22c91628cfefb67013652b151f034a06159) )
 
-	ROM_REGION( 0x08000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "gs3.bin",      0x00000, 0x08000, CRC(8454ce3c) SHA1(74686ebb91f191db8cbc3d0417a5e8112c5b67b1) )
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 )	/* Audio ADPCM */
+	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 )	/* Audio ADPCM */
 	ROM_LOAD( "gs1-snd.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
 ROM_END
 
 
 ROM_START( goldstbl )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "gsb-cpu.bin",  0x0000, 0x10000, CRC(82b238c3) SHA1(1306e700e213f423bdd79b182aa11335796f7f38) )
 
-	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "gs2.bin",      0x00000, 0x20000, CRC(a2d5b898) SHA1(84cca22c91628cfefb67013652b151f034a06159) )
 
-	ROM_REGION( 0x08000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x08000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "gsb-spr.bin",  0x00000, 0x08000, CRC(52ecd4c7) SHA1(7ef013020521a0c19ecd67db1c00047e78a3c736) )
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 )	/* Audio ADPCM */
+	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 )	/* Audio ADPCM */
 	ROM_LOAD( "gs1-snd.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
 ROM_END
 
 
 ROM_START( moonlght )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "4.bin",  	  0x0000, 0x20000, CRC(ecb06cfb) SHA1(e32613cac5583a0fecf04fca98796b91698e530c) )
 
-	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "28.bin",      0x00000, 0x20000, CRC(76915c0f) SHA1(3f6d1c0dd3d9bf29538181a0e930291b822dad8c) )
 
-	ROM_REGION( 0x20000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "29.bin",      0x00000, 0x20000, CRC(8a5f274d) SHA1(0f2ad61b00e220fc509c01c11c1a8f4e47b54f2a) )
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 )	/* Audio ADPCM */
+	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 )	/* Audio ADPCM */
 	ROM_LOAD( "gs1-snd.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
 ROM_END
 
@@ -444,7 +444,7 @@ ROM_END
 static DRIVER_INIT(goldstar)
 {
 	int A;
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 
 	for (A = 0;A < 0x10000;A++)

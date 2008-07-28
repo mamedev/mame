@@ -137,7 +137,7 @@ WRITE8_HANDLER( junofrst_blitter_w )
 	if (offset == 3)
 	{
 		int i;
-		UINT8 *gfx_rom = memory_region(machine, REGION_GFX1);
+		UINT8 *gfx_rom = memory_region(machine, RGNCLASS_GFX, "gfx1");
 
 		offs_t src = ((junofrst_blitterdata[2] << 8) | junofrst_blitterdata[3]) & 0xfffc;
 		offs_t dest = (junofrst_blitterdata[0] << 8) | junofrst_blitterdata[1];

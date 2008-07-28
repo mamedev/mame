@@ -321,8 +321,8 @@ static void tmaster_draw(running_machine *machine)
 {
 	int x,y,x0,x1,y0,y1,dx,dy,flipx,flipy,sx,sy,sw,sh, addr, mode, layer,buffer, color;
 
-	UINT8 *gfxdata	=	memory_region( machine, REGION_GFX1 );
-	size_t size		=	memory_region_length( machine, REGION_GFX1 );
+	UINT8 *gfxdata	=	memory_region( machine, RGNCLASS_GFX, "gfx1" );
+	size_t size		=	memory_region_length( machine, RGNCLASS_GFX, "gfx1" );
 
 	UINT16 data;
 
@@ -539,12 +539,12 @@ static WRITE16_HANDLER( galgames_palette_data_w )
 // Sound
 static READ16_HANDLER( galgames_okiram_r )
 {
-	return memory_region(machine, REGION_SOUND1)[offset] | 0xff00;
+	return memory_region(machine, RGNCLASS_SOUND, "oki")[offset] | 0xff00;
 }
 static WRITE16_HANDLER( galgames_okiram_w )
 {
 	if (ACCESSING_BITS_0_7)
-		memory_region(machine, REGION_SOUND1)[offset] = data & 0xff;
+		memory_region(machine, RGNCLASS_SOUND, "oki")[offset] = data & 0xff;
 }
 
 
@@ -602,9 +602,9 @@ static READ16_HANDLER( dummy_read_01 )
 static ADDRESS_MAP_START( galgames_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE( 0x000000, 0x03ffff ) AM_READWRITE(SMH_BANK1, SMH_BANK2)
-	AM_RANGE( 0x040000, 0x1fffff ) AM_ROM AM_REGION( REGION_CPU1, 0 )
+	AM_RANGE( 0x040000, 0x1fffff ) AM_ROM AM_REGION( RGNCLASS_CPU, "main", 0 )
 	AM_RANGE( 0x200000, 0x23ffff ) AM_READWRITE(SMH_BANK3, SMH_BANK4)
-	AM_RANGE( 0x240000, 0x3fffff ) AM_ROM AM_REGION( REGION_CPU1, 0 )
+	AM_RANGE( 0x240000, 0x3fffff ) AM_ROM AM_REGION( RGNCLASS_CPU, "main", 0 )
 
 	AM_RANGE( 0x400000, 0x400011 ) AM_WRITE( tmaster_blitter_w ) AM_BASE( &tmaster_regs )
 	AM_RANGE( 0x400012, 0x400013 ) AM_WRITE( tmaster_addr_w )
@@ -799,8 +799,8 @@ static MACHINE_DRIVER_START( tm3k )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("OKI",OKIM6295, XTAL_32MHz / 16) /* 2MHz */
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD("oki",OKIM6295, XTAL_32MHz / 16) /* 2MHz */
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -808,8 +808,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tm )
 	MDRV_IMPORT_FROM(tm3k)
 
-	MDRV_SOUND_REPLACE("OKI",OKIM6295, 1122000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_REPLACE("oki",OKIM6295, 1122000)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -858,7 +858,7 @@ static MACHINE_DRIVER_START( galgames )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_24MHz / 8)	// ??
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7low) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -885,18 +885,18 @@ Xlinx XC3042a
 ***************************************************************************/
 
 ROM_START( tm )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // 68000 Code
+	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tmaster.u51", 0x000000, 0x080000, CRC(edaa5874) SHA1(48b99bc7f5a6453def265967ca7d8eefdf9dc97b) ) /* Ver: 3.00 Euro 11-25-96 */
 	ROM_LOAD16_BYTE( "tmaster.u52", 0x000001, 0x080000, CRC(e9fd30fc) SHA1(d91ea05d5f574603883336729fb9df705688945d) ) /* Ver: 3.00 Euro 11-25-96 */
 
-	ROM_REGION( 0x400000, REGION_GFX1, ROMREGION_ERASE )	// Blitter gfx
+	ROM_REGION( 0x400000, RGNCLASS_GFX, "gfx1", ROMREGION_ERASE )	// Blitter gfx
 	ROM_LOAD16_BYTE( "tmaster.u38", 0x100000, 0x080000, CRC(68885ef6) SHA1(010602b59c33c3e490491a296ddaf8952e315b83) )
 	ROM_LOAD16_BYTE( "tmaster.u36", 0x100001, 0x080000, CRC(204096ec) SHA1(9239923b7eedb6003c63ef2e8ff224edee657bbc) )
 	// unused gap
 	ROM_LOAD16_BYTE( "tmaster.u39", 0x300000, 0x080000, CRC(cbb716cb) SHA1(4e8d8f6cbfb25a8161ff8fe7505d6b209650dd2b) )
 	ROM_LOAD16_BYTE( "tmaster.u37", 0x300001, 0x080000, CRC(e0b6a9f7) SHA1(7e057ca87833c682e5be03668469259bbdefbf20) )
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) // Samples
+	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 ) // Samples
 	ROM_LOAD( "tmaster.u8", 0x40000, 0x040000, CRC(f39ad4cf) SHA1(9bcb9a5dd3636d6541eeb3e737c7253ab0ed4e8d) )
 	ROM_CONTINUE(           0xc0000, 0x040000 )
 ROM_END
@@ -942,11 +942,11 @@ xc3042A      www.xilinx.com
 ***************************************************************************/
 
 ROM_START( tm3k )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // 68000 Code
+	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tm3k_v502.u51", 0x000000, 0x100000, CRC(6267e2bd) SHA1(c81e5cd059a9ad2f6a36261738e39740a1a3a03f) ) /* TOUCHMASTER 3000 U51 DOMESTIC 5.02 (Standard 11-17-97) (yellow label) */
 	ROM_LOAD16_BYTE( "tm3k_v502.u52", 0x000001, 0x100000, CRC(836fdf1e) SHA1(2ee9c0929950afb72f172b253d6c392e9a698037) ) /* TOUCHMASTER 3000 U52 DOMESTIC 5.02 (Standard 11-17-97) (yellow label) */
 
-	ROM_REGION( 0x600000, REGION_GFX1, 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, RGNCLASS_GFX, "gfx1", 0 )	// Blitter gfx
 	ROM_LOAD16_BYTE( "tm3k_graphic.u38", 0x000000, 0x100000, CRC(a6683899) SHA1(d05024390917cdb1871d030996da8e1eb6460918) ) /* Labeled TOUCHMASTER U38 STANDARD 5.0 (pink label) */
 	ROM_LOAD16_BYTE( "tm3k_graphic.u36", 0x000001, 0x100000, CRC(7bde520d) SHA1(77750b689e2f0d47804042456e54bbd9c28deeac) ) /* Labeled TOUCHMASTER U36 STANDARD 5.0 (pink label) */
 	ROM_LOAD16_BYTE( "tm3k_graphic.u39", 0x200000, 0x100000, CRC(206b56a6) SHA1(09e5e05bffd0a09abd24d668e2c59b56f2c79134) ) /* Labeled TOUCHMASTER U39 STANDARD 5.0 (pink label) */
@@ -954,16 +954,16 @@ ROM_START( tm3k )
 	ROM_LOAD16_BYTE( "tm3k_graphic.u41", 0x400000, 0x100000, CRC(c35c0536) SHA1(a29fd88e8f3e124f6e84012c3573616f6447eeaa) ) /* Labeled TOUCHMASTER U41 STANDARD 5.0 (pink label) */
 	ROM_LOAD16_BYTE( "tm3k_graphic.u40", 0x400001, 0x100000, CRC(353df7ca) SHA1(d6c5d5449af6b6a3acee219778583904c5b554b4) ) /* Labeled TOUCHMASTER U40 STANDARD 5.0 (pink label) */
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) // Samples
+	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 ) // Samples
 	ROM_LOAD( "tm3k_sound.u8", 0x00000, 0x100000, CRC(d0ae33c1) SHA1(a079def9a086a091fcc4493a44fec756d2470415) ) /* Labeled TOUCHMASTER U8 5.0 (green label) */
 ROM_END
 
 ROM_START( tm3ka )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // 68000 Code
+	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tm3k_v501.u51", 0x000000, 0x100000, CRC(c9522279) SHA1(e613b791f831271722f05b7e96c35519fa9fc174) ) /* TOUCHMASTER 3000 U51 DOMESTIC 5.01 (Standard 11-4-97) (yellow label) */
 	ROM_LOAD16_BYTE( "tm3k_v501.u52", 0x000001, 0x100000, CRC(8c6a0db7) SHA1(6b0eae60ea471cd8c4001749ac2677d8d4532567) ) /* TOUCHMASTER 3000 U52 DOMESTIC 5.01 (Standard 11-4-97) (yellow label) */
 
-	ROM_REGION( 0x600000, REGION_GFX1, 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, RGNCLASS_GFX, "gfx1", 0 )	// Blitter gfx
 	ROM_LOAD16_BYTE( "tm3k_graphic.u38", 0x000000, 0x100000, CRC(a6683899) SHA1(d05024390917cdb1871d030996da8e1eb6460918) ) /* Labeled TOUCHMASTER U38 STANDARD 5.0 (pink label) */
 	ROM_LOAD16_BYTE( "tm3k_graphic.u36", 0x000001, 0x100000, CRC(7bde520d) SHA1(77750b689e2f0d47804042456e54bbd9c28deeac) ) /* Labeled TOUCHMASTER U36 STANDARD 5.0 (pink label) */
 	ROM_LOAD16_BYTE( "tm3k_graphic.u39", 0x200000, 0x100000, CRC(206b56a6) SHA1(09e5e05bffd0a09abd24d668e2c59b56f2c79134) ) /* Labeled TOUCHMASTER U39 STANDARD 5.0 (pink label) */
@@ -971,7 +971,7 @@ ROM_START( tm3ka )
 	ROM_LOAD16_BYTE( "tm3k_graphic.u41", 0x400000, 0x100000, CRC(c35c0536) SHA1(a29fd88e8f3e124f6e84012c3573616f6447eeaa) ) /* Labeled TOUCHMASTER U41 STANDARD 5.0 (pink label) */
 	ROM_LOAD16_BYTE( "tm3k_graphic.u40", 0x400001, 0x100000, CRC(353df7ca) SHA1(d6c5d5449af6b6a3acee219778583904c5b554b4) ) /* Labeled TOUCHMASTER U40 STANDARD 5.0 (pink label) */
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) // Samples
+	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 ) // Samples
 	ROM_LOAD( "tm3k_sound.u8", 0x00000, 0x100000, CRC(d0ae33c1) SHA1(a079def9a086a091fcc4493a44fec756d2470415) ) /* Labeled TOUCHMASTER U8 5.0 (green label) */
 ROM_END
 
@@ -1005,11 +1005,11 @@ xc3042A      www.xilinx.com
 ***************************************************************************/
 
 ROM_START( tm4k )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // 68000 Code
+	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tm4k_v602.u51", 0x000000, 0x100000, CRC(3d8d7848) SHA1(31638f23cdd5e6cfbb2270e953f84fe1bd437950) ) /* TOUCHMASTER 4000 U51 DOMESTIC  6.02 (Standard 4-14-98) */
 	ROM_LOAD16_BYTE( "tm4k_v602.u52", 0x000001, 0x100000, CRC(6d412871) SHA1(ae27c7723b292daf6682c53bafac22e4a3cd1ece) ) /* TOUCHMASTER 4000 U52 DOMESTIC  6.02 (Standard 4-14-98) */
 
-	ROM_REGION( 0x600000, REGION_GFX1, 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, RGNCLASS_GFX, "gfx1", 0 )	// Blitter gfx
 	ROM_LOAD16_BYTE( "tm4k_graphic.u38", 0x000000, 0x100000, CRC(a6683899) SHA1(d05024390917cdb1871d030996da8e1eb6460918) ) /* Mask rom labeled 5341-15746-03 U38 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm4k_graphic.u36", 0x000001, 0x100000, CRC(7bde520d) SHA1(77750b689e2f0d47804042456e54bbd9c28deeac) ) /* Mask rom labeled 5341-15746-01 U36 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm4k_graphic.u39", 0x200000, 0x100000, CRC(bac88cfb) SHA1(26ed169296b890c5f5b50c418c15299355a6592f) ) /* Mask rom labeled 5341-15746-04 U39 VIDEO IMAGE */
@@ -1017,7 +1017,7 @@ ROM_START( tm4k )
 	ROM_LOAD16_BYTE( "tm4k_graphic.u41", 0x400000, 0x100000, CRC(e97edb1e) SHA1(75510676cf1692ad03efd4ccd57d25af1cc8ef2a) ) /* Mask rom labeled 5341-15746-06 U41 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm4k_graphic.u40", 0x400001, 0x100000, CRC(f6771a09) SHA1(74f71d5e910006c83a38170f24aa811c38a3e020) ) /* Mask rom labeled 5341-15746-05 U40 VIDEO IMAGE */
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) // Samples
+	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 ) // Samples
 	ROM_LOAD( "tm4k_sound.u8", 0x00000, 0x100000, CRC(48c3782b) SHA1(bfe105ddbde8bbbd84665dfdd565d6d41926834a) ) /* Mask rom labeled 5341-15746-07 U8 SOUND IMAGE */
 ROM_END
 
@@ -1050,11 +1050,11 @@ J12 DALLAS DS1204V         N/A  Security Key (required for this Version) - Label
 ***************************************************************************/
 
 ROM_START( tm5k )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // 68000 Code
+	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tm5k_v7_10.u51", 0x000000, 0x100000, CRC(df0bd25e) SHA1(db1a197ed4c868743397f3823f3f1d42b9329f80) ) /* TOUCHMASTER 5000 U51 DOMESTIC 7.10 (Standard 10-9-98) (tan label) */
 	ROM_LOAD16_BYTE( "tm5k_v7_10.u52", 0x000001, 0x100000, CRC(ddf9e8dc) SHA1(3228f2eba067bdf1bd639116bffc589585ea3e72) ) /* TOUCHMASTER 5000 U52 DOMESTIC 7.10 (Standard 10-9-98) (tan label) */
 
-	ROM_REGION( 0x600000, REGION_GFX1, 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, RGNCLASS_GFX, "gfx1", 0 )	// Blitter gfx
 	ROM_LOAD16_BYTE( "tm5k_graphic.u38", 0x000000, 0x100000, CRC(93038e7c) SHA1(448f69bf51ac992f6b35b471cba9675c67984cd7) ) /* Mask rom labeled 5341-15951-07 U38 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm5k_graphic.u36", 0x000001, 0x100000, CRC(5453a44a) SHA1(094439a56336ca933b0b7ede8c057546d1d490b2) ) /* Mask rom labeled 5341-15951-06 U36 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm5k_graphic.u39", 0x200000, 0x100000, CRC(1349fdc7) SHA1(5118983be584455320f0d6006133f38e6a8ee0d8) ) /* Mask rom labeled 5341-15951-05 U39 VIDEO IMAGE */
@@ -1062,7 +1062,7 @@ ROM_START( tm5k )
 	ROM_LOAD16_BYTE( "tm5k_graphic.u41", 0x400000, 0x100000, CRC(c8717fef) SHA1(fbd13321db0f35b7bdf207468f28792a7666bb2e) ) /* Mask rom labeled 5341-15951-09 U41 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm5k_graphic.u40", 0x400001, 0x100000, CRC(cff3f962) SHA1(2389d94ffa0eaf2d2f62315822273db031eea033) ) /* Mask rom labeled 5341-15951-08 U40 VIDEO IMAGE */
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) // Samples
+	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 ) // Samples
 	ROM_LOAD( "tm5k_sound.u8", 0x00000, 0x100000, CRC(c6070a60) SHA1(2dc20bf2217a36374b5a691133ad43f53dbe29ca) ) /* Mask rom labeled 5341-15951-03 U8 VIDEO IMAGE */
 ROM_END
 
@@ -1098,11 +1098,11 @@ J12 DALLAS DS1204V         N/A  Security Key (required for this Version) - Label
 ***************************************************************************/
 
 ROM_START( tm7k )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // 68000 Code
+	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tm7k_v804.u51", 0x000000, 0x100000, CRC(2461af04) SHA1(9cf37c04db0297ff8f9f316fd476d6d5d1c39acf) ) /* TOUCHMASTER 7000 U51 DOMESTIC 8.04 (Standard 06/02/99) (orange label) */
 	ROM_LOAD16_BYTE( "tm7k_v804.u52", 0x000001, 0x100000, CRC(5d39fad2) SHA1(85e8d110b88e1099117ab7963eaee47dc86ec7c5) ) /* TOUCHMASTER 7000 U52 DOMESTIC 8.04 (Standard 06/02/99) (orange label) */
 
-	ROM_REGION( 0x600000, REGION_GFX1, 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, RGNCLASS_GFX, "gfx1", 0 )	// Blitter gfx
 	ROM_LOAD16_BYTE( "tm7k_graphic.u38", 0x000000, 0x100000, CRC(93038e7c) SHA1(448f69bf51ac992f6b35b471cba9675c67984cd7) ) /* Mask rom labeled 5341-16262-07 U38 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm7k_graphic.u36", 0x000001, 0x100000, CRC(5453a44a) SHA1(094439a56336ca933b0b7ede8c057546d1d490b2) ) /* Mask rom labeled 5341-16262-06 U36 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm7k_graphic.u39", 0x200000, 0x100000, CRC(26af8da8) SHA1(02555b1597a4962f1fd0c3ffc89e5c8338aa3085) ) /* Mask rom labeled 5341-16262-05 U39 VIDEO IMAGE */
@@ -1110,16 +1110,16 @@ ROM_START( tm7k )
 	ROM_LOAD16_BYTE( "tm7k_graphic.u41", 0x400000, 0x100000, CRC(99b6edda) SHA1(c0ee2834fdbfbc1159a6d08c45552d4d9c1c4ea4) ) /* Mask rom labeled 5341-16262-09 U41 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm7k_graphic.u40", 0x400001, 0x100000, CRC(a3925379) SHA1(74836325ab10466e23105a3b54fc706c0dd5f06c) ) /* Mask rom labeled 5341-16262-08 U40 VIDEO IMAGE */
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) // Samples
+	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 ) // Samples
 	ROM_LOAD( "tm7k_sound.u8", 0x00000, 0x100000, CRC(c6070a60) SHA1(2dc20bf2217a36374b5a691133ad43f53dbe29ca) ) /* Mask rom labeled 5341-16262-03 U8 SOUND */
 ROM_END
 
 ROM_START( tm7ka )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // 68000 Code
+	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tm7k_v800.u51", 0x000000, 0x100000, CRC(83ec3da7) SHA1(37fa7183e7acc2eab35ac431d99cbbfe4862979e) ) /* TOUCHMASTER 7000 U51 DOMESTIC 8.00 (Standard 03/26/99) (orange label) */
 	ROM_LOAD16_BYTE( "tm7k_v800.u52", 0x000001, 0x100000, CRC(e2004282) SHA1(aa73029f31e2062cabedfcd778db97b314624ae8) ) /* TOUCHMASTER 7000 U52 DOMESTIC 8.00 (Standard 03/26/99) (orange label) */
 
-	ROM_REGION( 0x600000, REGION_GFX1, 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, RGNCLASS_GFX, "gfx1", 0 )	// Blitter gfx
 	ROM_LOAD16_BYTE( "tm7k_graphic.u38", 0x000000, 0x100000, CRC(93038e7c) SHA1(448f69bf51ac992f6b35b471cba9675c67984cd7) ) /* Labeled GRAPHIC U38  8.0 (orange label) */
 	ROM_LOAD16_BYTE( "tm7k_graphic.u36", 0x000001, 0x100000, CRC(5453a44a) SHA1(094439a56336ca933b0b7ede8c057546d1d490b2) ) /* Labeled GRAPHIC U36  8.0 (orange label) */
 	ROM_LOAD16_BYTE( "tm7k_graphic.u39", 0x200000, 0x100000, CRC(26af8da8) SHA1(02555b1597a4962f1fd0c3ffc89e5c8338aa3085) ) /* Labeled GRAPHIC U39  8.0 (orange label) */
@@ -1127,7 +1127,7 @@ ROM_START( tm7ka )
 	ROM_LOAD16_BYTE( "tm7k_graphic.u41", 0x400000, 0x100000, CRC(99b6edda) SHA1(c0ee2834fdbfbc1159a6d08c45552d4d9c1c4ea4) ) /* Labeled GRAPHIC U41  8.0 (orange label) */
 	ROM_LOAD16_BYTE( "tm7k_graphic.u40", 0x400001, 0x100000, CRC(a3925379) SHA1(74836325ab10466e23105a3b54fc706c0dd5f06c) ) /* Labeled GRAPHIC U40  8.0 (orange label) */
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) // Samples
+	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 ) // Samples
 	ROM_LOAD( "tm7k_sound.u8", 0x00000, 0x100000, CRC(c6070a60) SHA1(2dc20bf2217a36374b5a691133ad43f53dbe29ca) ) /* Labeled SOUND U8  8.0 (orange label) */
 ROM_END
 
@@ -1160,11 +1160,11 @@ J12 DALLAS DS1204V         N/A  Security Key (required for this Version) - Label
 ***************************************************************************/
 
 ROM_START( tm8k )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // 68000 Code
+	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tm8k_v904.u51", 0x000000, 0x100000, CRC(28864ec8) SHA1(e703f9ee350dd915102e784bbd04445a95b7d0a5) ) /* TOUCHMASTER 8000 U51 DOMESTIC 9.04 (Standard 04/25/00) */
 	ROM_LOAD16_BYTE( "tm8k_v904.u52", 0x000001, 0x100000, CRC(c123eec2) SHA1(3e9c84755b18a4fd900068f385ee47107771391d) ) /* TOUCHMASTER 8000 U52 DOMESTIC 9.04 (Standard 04/25/00) */
 
-	ROM_REGION( 0x600000, REGION_GFX1, 0 )	// Blitter gfx
+	ROM_REGION( 0x600000, RGNCLASS_GFX, "gfx1", 0 )	// Blitter gfx
 	ROM_LOAD16_BYTE( "tm8k_graphic.u38", 0x000000, 0x100000, CRC(2a971d46) SHA1(6ca4067e9fa40053df415e670b2e853915319dbb) ) /* Mask rom labeled 5341-16513-07 U38 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm8k_graphic.u36", 0x000001, 0x100000, CRC(3bde285e) SHA1(87bf60034665542fb0240b7479adfffb7ba9fad7) ) /* Mask rom labeled 5341-16513-06 U36 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm8k_graphic.u39", 0x200000, 0x100000, CRC(58c6c1d8) SHA1(cc11863c4ea46bde7ea4775075f4328be6d6c6d1) ) /* Mask rom labeled 5341-16513-05 U39 VIDEO IMAGE */
@@ -1172,7 +1172,7 @@ ROM_START( tm8k )
 	ROM_LOAD16_BYTE( "tm8k_graphic.u41", 0x400000, 0x100000, CRC(d8bdb82e) SHA1(9bdee261591ccff8a57c5454644f84f8992f614f) ) /* Mask rom labeled 5341-16513-09 U41 VIDEO IMAGE */
 	ROM_LOAD16_BYTE( "tm8k_graphic.u40", 0x400001, 0x100000, CRC(0c3d6347) SHA1(7ef19018c180abf412a8ff9f278b00c2b4321cc2) ) /* Mask rom labeled 5341-16513-08 U40 VIDEO IMAGE */
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) // Samples
+	ROM_REGION( 0x100000, RGNCLASS_SOUND, "oki", 0 ) // Samples
 	ROM_LOAD( "tm8k_sound.u8", 0x00000, 0x100000, CRC(c6070a60) SHA1(2dc20bf2217a36374b5a691133ad43f53dbe29ca) ) /* Mask rom labeled 5341-16513-03 U8 SOUND */
 ROM_END
 
@@ -1217,25 +1217,25 @@ PAL16V8H-15 @ U45   red dot on it
 ***************************************************************************/
 
 ROM_START( galgbios )
-	ROM_REGION( 0x200000 + 0x40000, REGION_CPU1, 0 )
+	ROM_REGION( 0x200000 + 0x40000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD16_BYTE( "galaxy.u2", 0x1c0000, 0x020000, CRC(e51ff184) SHA1(aaa795f2c15ec29b3ceeb5c917b643db0dbb7083) )
 	ROM_CONTINUE(                 0x000000, 0x0e0000 )
 	ROM_LOAD16_BYTE( "galaxy.u1", 0x1c0001, 0x020000, CRC(c6d7bc6d) SHA1(93c032f9aa38cbbdda59a8a25ff9f38f7ad9c760) )
 	ROM_CONTINUE(                 0x000001, 0x0e0000 )
 	ROM_FILL(                     0x200000, 0x040000, 0)	// RAM
 
-	ROM_REGION( 0x200000, REGION_GFX1, 0 )
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "galaxy.u2", 0x000000, 0x100000, CRC(e51ff184) SHA1(aaa795f2c15ec29b3ceeb5c917b643db0dbb7083) )
 	ROM_LOAD16_BYTE( "galaxy.u1", 0x000001, 0x100000, CRC(c6d7bc6d) SHA1(93c032f9aa38cbbdda59a8a25ff9f38f7ad9c760) )
 
-	ROM_REGION( 0x40000, REGION_SOUND1, ROMREGION_ERASE )
+	ROM_REGION( 0x40000, RGNCLASS_SOUND, "oki", ROMREGION_ERASE )
 	// RAM, filled by the 68000 and fed to the OKI
 ROM_END
 
 
 static DRIVER_INIT( tm4k )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( machine, REGION_CPU1 );
+	UINT16 *ROM = (UINT16 *)memory_region( machine, RGNCLASS_CPU, "main" );
 
 	// protection
 	ROM[0x83476/2] = 0x4e75;
@@ -1256,7 +1256,7 @@ Protection starts:
 
 static DRIVER_INIT( tm5k )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( machine, REGION_CPU1 );
+	UINT16 *ROM = (UINT16 *)memory_region( machine, RGNCLASS_CPU, "main" );
 
 	// protection
 	ROM[0x96002/2] = 0x4e75;
@@ -1279,7 +1279,7 @@ Protection starts:
 
 static DRIVER_INIT( tm7k )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( machine, REGION_CPU1 );
+	UINT16 *ROM = (UINT16 *)memory_region( machine, RGNCLASS_CPU, "main" );
 
 	// protection
 	ROM[0x81730/2] = 0x4e75;
@@ -1302,7 +1302,7 @@ Protection starts:
 
 static DRIVER_INIT( tm7ka )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( machine, REGION_CPU1 );
+	UINT16 *ROM = (UINT16 *)memory_region( machine, RGNCLASS_CPU, "main" );
 
 	// protection
 	ROM[0x81594/2] = 0x4e75;
@@ -1325,7 +1325,7 @@ Protection starts:
 
 static DRIVER_INIT( tm8k )
 {
-	UINT16 *ROM = (UINT16 *)memory_region( machine, REGION_CPU1 );
+	UINT16 *ROM = (UINT16 *)memory_region( machine, RGNCLASS_CPU, "main" );
 
 	// protection
 	ROM[0x78b70/2] = 0x4e75;
@@ -1348,7 +1348,7 @@ Protection starts:
 
 static DRIVER_INIT( galgames )
 {
-	UINT8 *ROM = memory_region(machine, REGION_CPU1);
+	UINT8 *ROM = memory_region(machine, RGNCLASS_CPU, "main");
 	// configure memory banks
 	memory_configure_bank(1, 0, 2, ROM+0x1c0000, 0x40000);
 	memory_configure_bank(3, 0, 2, ROM+0x1c0000, 0x40000);

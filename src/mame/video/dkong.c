@@ -769,7 +769,7 @@ static void radarscp_draw_background(running_machine *machine, dkong_state *stat
 	UINT16 			*pixel;
 
 	if (state->hardware_type == HARDWARE_TRS01)
-		htable = memory_region(machine, REGION_GFX4);
+		htable = memory_region(machine, RGNCLASS_GFX, "gfx4");
 
 	y = cliprect->min_y;
 	while (y <= cliprect->max_y)
@@ -793,8 +793,8 @@ static void radarscp_draw_background(running_machine *machine, dkong_state *stat
 static TIMER_CALLBACK( scanline_callback )
 {
 	dkong_state *state = machine->driver_data;
-	const UINT8 *table = memory_region(machine, REGION_GFX3);
-	int 		table_len = memory_region_length(machine, REGION_GFX3);
+	const UINT8 *table = memory_region(machine, RGNCLASS_GFX, "gfx3");
+	int 		table_len = memory_region_length(machine, RGNCLASS_GFX, "gfx3");
 	int 			x,y,offset;
 	UINT16 			*pixel;
 	static int		counter=0;
@@ -847,10 +847,10 @@ static void check_palette(running_machine *machine)
 			switch (newset)
 			{
 				case 0x00:
-					palette_init_radarscp(machine, memory_region(machine, REGION_PROMS));
+					palette_init_radarscp(machine, memory_region(machine, RGNCLASS_PROMS, "proms"));
 					break;
 				case 0x01:
-					palette_init_dkong2b(machine, memory_region(machine, REGION_PROMS));
+					palette_init_dkong2b(machine, memory_region(machine, RGNCLASS_PROMS, "proms"));
 					break;
 			}
 		}

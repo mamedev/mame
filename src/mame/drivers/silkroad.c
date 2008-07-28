@@ -364,7 +364,7 @@ static const gfx_layout tiles16x16x6_layout =
 };
 
 static GFXDECODE_START( silkroad )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles16x16x6_layout,  0x0000, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x6_layout,  0x0000, 256 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( silkroad )
@@ -396,12 +396,12 @@ static MACHINE_DRIVER_START( silkroad )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.45)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.45)
 
 	MDRV_SOUND_ADD("oki2", OKIM6295, 2112000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.45)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.45)
 MACHINE_DRIVER_END
@@ -419,7 +419,7 @@ static DRIVER_INIT( silkroad )
        verified as correct... problem with the original which the gfx
        hardware didn't care about? */
 
-	UINT8 *src = memory_region(machine, REGION_GFX1)+0x1000000;
+	UINT8 *src = memory_region(machine, RGNCLASS_GFX, "gfx1")+0x1000000;
 	int len = 0x0200000;
 	UINT8 *buffer;
 
@@ -438,11 +438,11 @@ static DRIVER_INIT( silkroad )
 }
 
 ROM_START( silkroad )
-	ROM_REGION( 0x200000, REGION_CPU1, 0 )
+	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD32_WORD_SWAP( "rom02.bin", 0x000000, 0x100000, CRC(4e5200fc) SHA1(4d4cab03a6ec4ad825001e1e92193940646141e5) )
 	ROM_LOAD32_WORD_SWAP( "rom03.bin", 0x000002, 0x100000, CRC(73ccc78c) SHA1(2ac17aa8d7dac8636d29a4e4228a556334b51f1a) )
 
-	ROM_REGION( 0x1800000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_INVERT )
+	ROM_REGION( 0x1800000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT )
 	/* Sprites */
 	ROM_LOAD( "rom12.bin",	0x0000000, 0x0200000, CRC(96393d04) SHA1(f512bb8603510d39e649f4ec1c5e2d0e4bf3a2cc) ) // 0
 	ROM_LOAD( "rom08.bin",	0x0800000, 0x0200000, CRC(23f1d462) SHA1(6ca8052b16ccc1fe59716e03f66bd33af5145b37) ) // 0
@@ -459,10 +459,10 @@ ROM_START( silkroad )
 	ROM_LOAD( "rom11.bin",	0x0e00000, 0x0200000, CRC(11abaf1c) SHA1(19e86f3ebfec518a96c0520f36cfc1b525e7e55c) ) // 3
 	ROM_LOAD( "rom15.bin",	0x1600000, 0x0200000, CRC(26a3b168) SHA1(a4b7955cc4d4fbec7c975a9456f2219ef33f1166) ) // 3
 
-	ROM_REGION( 0x080000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x080000, RGNCLASS_SOUND, "oki1", 0 )
 	ROM_LOAD( "rom00.bin", 0x000000, 0x080000, CRC(b10ba7ab) SHA1(a6a3ae71b803af9c31d7e97dc86cfcc123ee9a40) )
 
-	ROM_REGION( 0x080000, REGION_SOUND2, 0 )
+	ROM_REGION( 0x080000, RGNCLASS_SOUND, "oki2", 0 )
 	ROM_LOAD( "rom01.bin", 0x000000, 0x040000, CRC(db8cb455) SHA1(6723b4018208d554bd1bf1e0640b72d2f4f47302) )
 ROM_END
 

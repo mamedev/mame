@@ -262,7 +262,7 @@ static WRITE8_HANDLER( dunhuang_block_h_w )
 
 	dunhuang_block_h = data;
 
-	tile_addr = memory_region(machine, REGION_GFX2) + ((dunhuang_block_addr_hi << 8) + dunhuang_block_addr_lo)*4;
+	tile_addr = memory_region(machine, RGNCLASS_GFX, "gfx2") + ((dunhuang_block_addr_hi << 8) + dunhuang_block_addr_lo)*4;
 
 	switch (dunhuang_block_dest)
 	{
@@ -373,7 +373,7 @@ static READ8_HANDLER( dunhuang_input_r )
 
 static WRITE8_HANDLER( dunhuang_rombank_w )
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 	memory_set_bankptr( 1, rom + 0x10000 + 0x8000 * ((data >> 2) & 0x7) );
 
 	// ?                data & 0x01
@@ -654,8 +654,8 @@ static const gfx_layout layout_8x32 =
 };
 
 static GFXDECODE_START( dunhuang )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_8x8,  0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_8x32, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8,  0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout_8x32, 0, 16 )
 GFXDECODE_END
 
 
@@ -706,7 +706,7 @@ static MACHINE_DRIVER_START( dunhuang )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 12000000/8)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
@@ -716,19 +716,19 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( dunhuang )
-	ROM_REGION( 0x50000, REGION_CPU1, 0 )
+	ROM_REGION( 0x50000, RGNCLASS_CPU, "main", 0 )
 	ROM_LOAD( "rom1.u9", 0x00000, 0x40000, CRC(843a0117) SHA1(26a838cb3552ea6a9ec55940fcbf83b06c068743) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
-	ROM_REGION( 0xc0000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0xc0000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rom3.u4", 0x00000, 0x80000, CRC(1ff5d35e) SHA1(b808eb4f81be8fc77a58dadd661a9cc2b376a509) )
 	ROM_LOAD( "rom2.u5", 0x80000, 0x40000, CRC(384fa1d3) SHA1(f329db17aacacf1768ebd6ca2cc612503db93fac) )
 
-	ROM_REGION( 0xc0000, REGION_GFX2, 0 )	// do not dispose
+	ROM_REGION( 0xc0000, RGNCLASS_GFX, "gfx2", 0 )	// do not dispose
 	ROM_LOAD( "rom4.u3", 0x00000, 0x40000, CRC(7db45227) SHA1(2a12a2b8a1e58946ce3e7c770b3ca4803c3c3ccd) )
 	ROM_LOAD( "rom5.u2", 0x40000, 0x80000, CRC(d609880e) SHA1(3d69800e959e8f24ef950fea4312610c4407f6ba) )
 
-	ROM_REGION( 0x20000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x20000, RGNCLASS_SOUND, "oki", 0 )
 	ROM_LOAD( "rom6.u1", 0x00000, 0x20000, CRC(31cfdc29) SHA1(725249eae9227eadf05418b799e0da0254bb2f51) )
 ROM_END
 

@@ -147,7 +147,8 @@ WRITE8_HANDLER( nb1413m3_vcrctrl_w );
 INPUT_PORTS_EXTERN( nbmjcontrols );
 
 extern int nb1413m3_type;
-extern int nb1413m3_sndromregion;
+extern int nb1413m3_sndromrgnclass;
+extern const char * nb1413m3_sndromrgntag;
 extern int nb1413m3_sndrombank1;
 extern int nb1413m3_sndrombank2;
 extern int nb1413m3_busyctr;

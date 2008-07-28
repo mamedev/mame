@@ -350,10 +350,10 @@ static const gfx_layout drgnmst_char32x32_layout =
 
 
 static GFXDECODE_START( drgnmst )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, drgnmst_char16x16_layout,   0,      0x200  ) /* sprite tiles */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, drgnmst_char8x8_layout,     0x200,  0x200  ) /* fg tiles */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, drgnmst_char16x16_layout,   0x0400, 0x200  ) /* md tiles */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, drgnmst_char32x32_layout,   0x0600, 0x200  ) /* bg tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, drgnmst_char16x16_layout,   0,      0x200  ) /* sprite tiles */
+	GFXDECODE_ENTRY( "gfx2", 0, drgnmst_char8x8_layout,     0x200,  0x200  ) /* fg tiles */
+	GFXDECODE_ENTRY( "gfx2", 0, drgnmst_char16x16_layout,   0x0400, 0x200  ) /* md tiles */
+	GFXDECODE_ENTRY( "gfx2", 0, drgnmst_char32x32_layout,   0x0600, 0x200  ) /* bg tiles */
 GFXDECODE_END
 
 
@@ -385,36 +385,36 @@ static MACHINE_DRIVER_START( drgnmst )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, 32000000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 
 	MDRV_SOUND_ADD("oki2", OKIM6295, 32000000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 MACHINE_DRIVER_END
 
 
 ROM_START( drgnmst )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, RGNCLASS_CPU, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "dm1000e", 0x00000, 0x80000, CRC(29467dac) SHA1(42ca42340ffd9b04be23853ca4e936d0528a66ee) )
 	ROM_LOAD16_BYTE( "dm1000o", 0x00001, 0x80000, CRC(ba48e9cf) SHA1(1107f927424107918bb10ff23f40c50579b23836) )
 
-	ROM_REGION( 0x400, REGION_CPU2, ROMREGION_ERASE00 ) /* PIC16C55 Code */
+	ROM_REGION( 0x400, RGNCLASS_CPU, "audio", ROMREGION_ERASE00 ) /* PIC16C55 Code */
 //  ROM_LOAD( "pic16c55", 0x0000, 0x400, CRC(531c9f8d) SHA1(8ec180b0566f2ce1e08f0347e5ad402c73b44049) )
 	/* ROM will be copied here by the init code from the USER1 region */
 
-	ROM_REGION( 0x1000, REGION_USER1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x1000, RGNCLASS_USER, "user1", ROMREGION_DISPOSE )
 	ROM_LOAD( "pic16c55.hex", 0x000, 0x0b7b, CRC(f17011e7) SHA1(8f3bd94ffb528f661eed77d89e5b772442d2f5a6) )
 
-	ROM_REGION( 0x140000, REGION_SOUND1, 0 ) /* OKI-0 Samples */
+	ROM_REGION( 0x140000, RGNCLASS_SOUND, "oki1", 0 ) /* OKI-0 Samples */
 	ROM_LOAD( "dm1001", 0x00000, 0x100000, CRC(63566f7f) SHA1(0fe6cb67a5d99cd54e46e9889ea121097756b9ef) )
 
-	ROM_REGION( 0x200000, REGION_SOUND2, 0 ) /* OKI-1 Samples */
+	ROM_REGION( 0x200000, RGNCLASS_SOUND, "oki2", 0 ) /* OKI-1 Samples */
 	ROM_LOAD( "dm1002", 0x00000, 0x200000, CRC(0f1a874e) SHA1(8efc39f8ff7e6e7138b19959bd083b9df002acca) )
 
-	ROM_REGION( 0x800000, REGION_GFX1, 0 ) /* Sprites (16x16x4) */
+	ROM_REGION( 0x800000, RGNCLASS_GFX, "gfx1", 0 ) /* Sprites (16x16x4) */
 	ROM_LOAD16_BYTE( "dm1003", 0x000000, 0x080000, CRC(0ca10e81) SHA1(abebd8437764110278c8b7e583d846db27e205ec) )
 	ROM_CONTINUE(0x400000, 0x080000)
 	ROM_CONTINUE(0x100000, 0x080000)
@@ -428,7 +428,7 @@ ROM_START( drgnmst )
 	ROM_LOAD16_BYTE( "dm1006", 0x200001, 0x040000, CRC(c46da6fc) SHA1(f2256f02c833bc1074681729bd2b95fa6f3350cf) )
 	ROM_CONTINUE(0x600001, 0x040000)
 
-	ROM_REGION( 0x200000, REGION_GFX2, 0 ) /* BG Tiles (8x8x4, 16x16x4 and 32x32x4) */
+	ROM_REGION( 0x200000, RGNCLASS_GFX, "gfx2", 0 ) /* BG Tiles (8x8x4, 16x16x4 and 32x32x4) */
 	ROM_LOAD16_BYTE( "dm1007", 0x000001, 0x100000, CRC(d5ad81c4) SHA1(03df467b218682a02245a6e8f500ab83de382448) )
 	ROM_LOAD16_BYTE( "dm1008", 0x000000, 0x100000, CRC(b8572be3) SHA1(29aab76821e0a56033cf06b0a1890b11804da8d8) )
 ROM_END
@@ -448,9 +448,9 @@ static UINT8 drgnmst_asciitohex(UINT8 data)
 
 static DRIVER_INIT( drgnmst )
 {
-	UINT8 *drgnmst_PICROM_HEX = memory_region(machine, REGION_USER1);
-	UINT16 *drgnmst_PICROM = (UINT16 *)memory_region(machine, REGION_CPU2);
-	UINT8 *drgnmst_PCM = memory_region(machine, REGION_SOUND1);
+	UINT8 *drgnmst_PICROM_HEX = memory_region(machine, RGNCLASS_USER, "user1");
+	UINT16 *drgnmst_PICROM = (UINT16 *)memory_region(machine, RGNCLASS_CPU, "audio");
+	UINT8 *drgnmst_PCM = memory_region(machine, RGNCLASS_SOUND, "oki1");
 	INT32   offs, data;
 	UINT16  src_pos = 0;
 	UINT16  dst_pos = 0;

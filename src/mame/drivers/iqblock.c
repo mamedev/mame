@@ -94,7 +94,7 @@ static READ8_HANDLER( iqblock_irqack_r )
 
 static READ8_HANDLER( extrarom_r )
 {
-	return memory_region(machine, REGION_USER1)[offset];
+	return memory_region(machine, RGNCLASS_USER, "user1")[offset];
 }
 
 
@@ -283,13 +283,13 @@ static const gfx_layout tilelayout3 =
 };
 
 static GFXDECODE_START( iqblock )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout1, 0, 16 )	/* only odd color codes are used */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout2, 0,  4 )	/* only color codes 0 and 3 used */
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout1, 0, 16 )	/* only odd color codes are used */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout2, 0,  4 )	/* only color codes 0 and 3 used */
 GFXDECODE_END
 
 static GFXDECODE_START( cabaret )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout1, 0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tilelayout3, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout1, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout3, 0, 16 )
 GFXDECODE_END
 
 
@@ -398,52 +398,52 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( iqblock )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 64k for code + 64K for extra RAM */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )	/* 64k for code + 64K for extra RAM */
 	ROM_LOAD( "u7.v5",        0x0000, 0x10000, CRC(811f306e) SHA1(d0aef80f1624002d05721276358f26a3ef69a3f6) )
 
-	ROM_REGION( 0x8000, REGION_USER1, 0 )
+	ROM_REGION( 0x8000, RGNCLASS_USER, "user1", 0 )
 	ROM_LOAD( "u8.6",         0x0000, 0x8000, CRC(2651bc27) SHA1(53e1d6ffd78c8a612863b29b0f8734e740d563c7) )	/* background maps, read by the CPU */
 
-	ROM_REGION( 0x60000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x60000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "u28.1",        0x00000, 0x20000, CRC(ec4b64b4) SHA1(000e9df0c0b5fcde5ead218dfcdc156bc4be909d) )
 	ROM_LOAD( "u27.2",        0x20000, 0x20000, CRC(74aa3de3) SHA1(16757c24765d22026793a0c53d3f24c106951a18) )
 	ROM_LOAD( "u26.3",        0x40000, 0x20000, CRC(2896331b) SHA1(51eba9f9f653a11cb96c461ab495d943d34cedc6) )
 
-	ROM_REGION( 0x8000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x8000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "u25.4",        0x0000, 0x4000, CRC(8fc222af) SHA1(ac1fb5e6caec391a76e3af51e133aecc65cd5aed) )
 	ROM_LOAD( "u24.5",        0x4000, 0x4000, CRC(61050e1e) SHA1(1f7185b2a5a2e237120276c95344744b146b4bf6) )
 ROM_END
 
 ROM_START( grndtour )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 64k for code + 64K for extra RAM */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )	/* 64k for code + 64K for extra RAM */
 	ROM_LOAD( "grand7.u7",        0x0000, 0x10000, CRC(95cac31e) SHA1(47bbcce6981ea3d38e0aa49ccd3762a4529f3c96) )
 
-	ROM_REGION( 0x8000, REGION_USER1, 0 )
+	ROM_REGION( 0x8000, RGNCLASS_USER, "user1", 0 )
 	ROM_LOAD( "grand6.u8",         0x0000, 0x8000, CRC(4c634b86) SHA1(c36df147187bc526f2348bc2f4d4c4e35bb45f38) )	/* background maps, read by the CPU */
 
-	ROM_REGION( 0xc0000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0xc0000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "grand1.u28",        0x00000, 0x40000, CRC(de85c664) SHA1(3a4b0cac88a0fea1c80541fe49c799e3550bedee) )
 	ROM_LOAD( "grand2.u27",        0x40000, 0x40000, CRC(8456204e) SHA1(b604d501f360670f57b937ad96af64c1c2038ef7) )
 	ROM_LOAD( "grand3.u26",        0x80000, 0x40000, CRC(77632917) SHA1(d91eadec2e0fb3082299362d18814b8ec4c5e068) )
 
-	ROM_REGION( 0x8000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x8000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "grand4.u25",        0x0000, 0x4000, CRC(48d09746) SHA1(64669f572b9a98b078ee1ea0b614c117e5dfbec9) )
 	ROM_LOAD( "grand5.u24",        0x4000, 0x4000, CRC(f896efb2) SHA1(8dc8546e363b4ff80983e3b8e2a19ebb7ff30c7b) )
 ROM_END
 
 ROM_START( cabaret )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 64k for code + 64K for extra RAM */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 )	/* 64k for code + 64K for extra RAM */
 	ROM_LOAD( "cg-8v204.u97",  0x0000, 0x10000, CRC(44cebf77) SHA1(e3f4e4abf41388f0eed50cf9a0fd0b14aa2f8b93) )
 
-	ROM_REGION( 0x8000, REGION_USER1, 0 )
+	ROM_REGION( 0x8000, RGNCLASS_USER, "user1", 0 )
 	ROM_LOAD( "cg-7.u98",  0x0000, 0x8000, CRC(b93ae6f8) SHA1(accb87045c278d5d79fff65bb763aa6e8025a945) )	/* background maps, read by the CPU */
 
-	ROM_REGION( 0x60000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x60000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "cg-4.u43",  0x00000, 0x20000, CRC(e509f50a) SHA1(7e68ca54642c92cdb348d5cf9466065938d0e027) )
 	ROM_LOAD( "cg-5.u44",  0x20000, 0x20000, CRC(e2cbf489) SHA1(3a15ed7efd5696656e6d55b54ec0ff779bdb0d98) )
 	ROM_LOAD( "cg-6.u45",  0x40000, 0x20000, CRC(4f2fced7) SHA1(b954856ffdc97fbc99fd3ec087376fbf466d2d5a) )
 
-	ROM_REGION( 0xc000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0xc000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "cg-1.u40",  0x0000, 0x4000, CRC(7dee8b1f) SHA1(80dbdf6aab9b02cc000956b7894023552428e6a1) )
 	ROM_LOAD( "cg-2.u41",  0x4000, 0x4000, CRC(ce8dea39) SHA1(b30d1678a7b98cd821d2ce7383a83cb7c9f31b5f) )
 	ROM_LOAD( "cg-3.u42",  0x8000, 0x4000, CRC(7e1f821f) SHA1(b709d49f9d1890fe3b8ca7f90affc0017a0ad95e) )
@@ -479,23 +479,23 @@ IGS PCB NO-T0039-8
 
 ROM_START( pokerigs )
 	// code at 0xf000 looks like startup code
-	ROM_REGION( 0x20000, REGION_CPU1, 0 ) /* DIP28 Code */
+	ROM_REGION( 0x20000, RGNCLASS_CPU, "main", 0 ) /* DIP28 Code */
 	ROM_LOAD( "champingv-200g.u23", 0x00000, 0x10000, CRC(696cb684) SHA1(ce9e5bed83d0bd3b115f556cc89e3293ac6b69c3) )
 
-	ROM_REGION( 0x60000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x60000, RGNCLASS_GFX, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "cpoker4.u4",   0x00000, 0x20000, CRC(860be7c9) SHA1(41bc58713076276aeefc44c7ea903549692b0224) )
 	ROM_LOAD( "cpoker5.u5",   0x20000, 0x20000, CRC(a68b305f) SHA1(f872d2bf7ab194145dffe6b254ae0ad66aa6a497) )
 	ROM_LOAD( "cpoker6.u6",   0x40000, 0x20000, CRC(f3e61b24) SHA1(b18998defb6e51daef4ac5a5865674565ffb9029) )
 
 	//copy?
-	ROM_REGION( 0x60000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_COPY( REGION_GFX1, 0, 0, 0x60000 )
+	ROM_REGION( 0x60000, RGNCLASS_GFX, "gfx2", ROMREGION_DISPOSE )
+	ROM_COPY( RGNCLASS_GFX, "gfx1", 0, 0, 0x60000 )
 
-	ROM_REGION( 0x8000, REGION_USER1, 0 )
+	ROM_REGION( 0x8000, RGNCLASS_USER, "user1", 0 )
 	ROM_LOAD( "cpoker7.u22",  0x00000, 0x8000, CRC(dae3ecda) SHA1(c881e143ec600c5a931f26cd097da6353e1da7c3) )
 
 	// convert them to the pld format
-	ROM_REGION( 0x2000, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x2000, RGNCLASS_PLDS, "plds", ROMREGION_DISPOSE )
 	ROM_LOAD( "ag-u31.u31",   0x00000, 0x000b60, CRC(fd36baf2) SHA1(caac8bf47bc958395f97b6191569196efe3b3eaa) )
 	ROM_LOAD( "ag-u8.u8",     0x00000, 0x0015e2, CRC(c0308c63) SHA1(16819a5c147fef38a235675fa4442da9fa8a6618) )
 	ROM_LOAD( "ag-u9.u9",     0x00000, 0x0015e2, CRC(2e8039a3) SHA1(e39635ee9485a5ccd28526f1af7ec2e3294b0aec) )
@@ -503,7 +503,7 @@ ROM_END
 
 static DRIVER_INIT( iqblock )
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 	int i;
 
 	/* decrypt the program ROM */
@@ -525,7 +525,7 @@ static DRIVER_INIT( iqblock )
 
 static DRIVER_INIT( grndtour )
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 	int i;
 
 	/* decrypt the program ROM */
@@ -548,7 +548,7 @@ static DRIVER_INIT( grndtour )
 
 static DRIVER_INIT( cabaret )
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 	int i;
 
 	/* decrypt the program ROM */
@@ -567,7 +567,7 @@ static DRIVER_INIT( cabaret )
 
 static DRIVER_INIT( pokerigs )
 {
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 	int i;
 
 	/* decrypt the program ROM */

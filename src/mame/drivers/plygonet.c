@@ -125,7 +125,7 @@ static WRITE32_HANDLER( polygonet_eeprom_w )
 static READ32_HANDLER( ttl_rom_r )
 {
 	UINT32 *ROM;
-	ROM = (UINT32 *)memory_region(machine, REGION_GFX1);
+	ROM = (UINT32 *)memory_region(machine, RGNCLASS_GFX, "gfx1");
 
 	return ROM[offset];
 }
@@ -134,7 +134,7 @@ static READ32_HANDLER( ttl_rom_r )
 static READ32_HANDLER( psac_rom_r )
 {
 	UINT32 *ROM;
-	ROM = (UINT32 *)memory_region(machine, REGION_GFX2);
+	ROM = (UINT32 *)memory_region(machine, RGNCLASS_GFX, "gfx2");
 
 	return ROM[offset];
 }
@@ -401,7 +401,7 @@ static int cur_sound_region;
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(2, memory_region(machine, REGION_CPU3) + 0x10000 + cur_sound_region*0x4000);
+	memory_set_bankptr(2, memory_region(machine, RGNCLASS_CPU, "sound") + 0x10000 + cur_sound_region*0x4000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -433,7 +433,7 @@ ADDRESS_MAP_END
 
 static const struct K054539interface k054539_interface =
 {
-	REGION_SOUND1
+	"shared"
 };
 
 /**********************************************************************************/
@@ -452,7 +452,7 @@ static const gfx_layout bglayout =
 };
 
 static GFXDECODE_START( plygonet )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, bglayout, 0x0000, 64 )
+	GFXDECODE_ENTRY( "gfx2", 0, bglayout, 0x0000, 64 )
 GFXDECODE_END
 
 static MACHINE_START(polygonet)
@@ -574,27 +574,27 @@ static DRIVER_INIT(polygonet)
 
 ROM_START( plygonet )
 	/* main program */
-	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	ROM_REGION( 0x200000, RGNCLASS_CPU, "main", 0)
 	ROM_LOAD32_BYTE( "305a01.4k", 0x000003, 512*1024, CRC(8bdb6c95) SHA1(e981833842f8fd89b9726901fbe2058444204792) )
 	ROM_LOAD32_BYTE( "305a02.2k", 0x000002, 512*1024, CRC(4d7e32b3) SHA1(25731526535036972577637d186f02ae467296bd) )
 	ROM_LOAD32_BYTE( "305a03.2h", 0x000001, 512*1024, CRC(36e4e3fe) SHA1(e8fcad4f196c9b225a0fbe70791493ff07c648a9) )
 	ROM_LOAD32_BYTE( "305a04.4h", 0x000000, 512*1024, CRC(d8394e72) SHA1(eb6bcf8aedb9ba5843204ab8aacb735cbaafb74d) )
 
 	/* Z80 sound program */
-	ROM_REGION( 0x30000, REGION_CPU3, 0 )
+	ROM_REGION( 0x30000, RGNCLASS_CPU, "sound", 0 )
 	ROM_LOAD("305b05.7b", 0x000000, 0x20000, CRC(2d3d9654) SHA1(784a409df47cee877e507b8bbd3610d161d63753) )
 	ROM_RELOAD( 0x10000, 0x20000)
 
 	/* TTL text plane tiles */
-	ROM_REGION( 0x20000, REGION_GFX1, 0 )
+	ROM_REGION( 0x20000, RGNCLASS_GFX, "gfx1", 0 )
 	ROM_LOAD( "305b06.18g", 0x000000, 0x20000, CRC(decd6e42) SHA1(4c23dcb1d68132d3381007096e014ee4b6007086) )
 
 	/* '936 tiles */
- 	ROM_REGION( 0x40000, REGION_GFX2, 0 )
+ 	ROM_REGION( 0x40000, RGNCLASS_GFX, "gfx2", 0 )
 	ROM_LOAD( "305b07.20d", 0x000000, 0x40000, CRC(e4320bc3) SHA1(b0bb2dac40d42f97da94516d4ebe29b1c3d77c37) )
 
 	/* sound data */
-	ROM_REGION( 0x200000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x200000, RGNCLASS_SOUND, "shared", 0 )
 	ROM_LOAD( "305b08.2e", 0x000000, 0x200000, CRC(874607df) SHA1(763b44a80abfbc355bcb9be8bf44373254976019) )
 ROM_END
 

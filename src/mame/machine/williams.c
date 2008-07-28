@@ -371,7 +371,7 @@ MACHINE_RESET( williams )
 
 	/* configure the memory bank */
 	memory_configure_bank(1, 0, 1, williams_videoram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, REGION_CPU1) + 0x10000, 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, RGNCLASS_CPU, "main") + 0x10000, 0);
 }
 
 
@@ -437,7 +437,7 @@ MACHINE_RESET( williams2 )
 
 	/* configure memory banks */
 	memory_configure_bank(1, 0, 1, williams_videoram, 0);
-	memory_configure_bank(1, 1, 4, memory_region(machine, REGION_CPU1) + 0x10000, 0x10000);
+	memory_configure_bank(1, 1, 4, memory_region(machine, RGNCLASS_CPU, "main") + 0x10000, 0x10000);
 
 	/* make sure our banking is reset */
 	williams2_bank_select_w(machine, 0, 0);
@@ -709,7 +709,7 @@ MACHINE_RESET( defender )
 	MACHINE_RESET_CALL(williams_common);
 
 	/* configure the banking and make sure it is reset to 0 */
-	memory_configure_bank(1, 0, 9, &memory_region(machine, REGION_CPU1)[0x10000], 0x1000);
+	memory_configure_bank(1, 0, 9, &memory_region(machine, RGNCLASS_CPU, "main")[0x10000], 0x1000);
 	defender_bank_select_w(machine, 0, 0);
 
 	state_save_register_postload(machine, defender_postload, NULL);
@@ -804,10 +804,10 @@ MACHINE_RESET( blaster )
 
 	/* banking is different for blaster */
 	memory_configure_bank(1, 0, 1, williams_videoram, 0);
-	memory_configure_bank(1, 1, 16, memory_region(machine, REGION_CPU1) + 0x18000, 0x4000);
+	memory_configure_bank(1, 1, 16, memory_region(machine, RGNCLASS_CPU, "main") + 0x18000, 0x4000);
 
 	memory_configure_bank(2, 0, 1, williams_videoram + 0x4000, 0);
-	memory_configure_bank(2, 1, 16, memory_region(machine, REGION_CPU1) + 0x10000, 0x0000);
+	memory_configure_bank(2, 1, 16, memory_region(machine, RGNCLASS_CPU, "main") + 0x10000, 0x0000);
 
 	state_save_register_global(blaster_bank);
 }

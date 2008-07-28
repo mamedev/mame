@@ -176,7 +176,7 @@ static void mxtc_config_w(int function, int reg, UINT8 data)
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				memory_set_bankptr(1, memory_region(Machine, REGION_USER1) + 0x30000);
+				memory_set_bankptr(1, memory_region(Machine, RGNCLASS_USER, "user1") + 0x30000);
 			}
 			break;
 		}
@@ -472,7 +472,7 @@ static ADDRESS_MAP_START( gamecstl_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK(1)
 	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
 	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1, 0)	/* System BIOS */
+	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION(RGNCLASS_USER, "user1", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(gamecstl_io, ADDRESS_SPACE_IO, 32)
@@ -512,10 +512,10 @@ static const gfx_layout CGA_charlayout =
 
 static GFXDECODE_START( CGA )
 /* Support up to four CGA fonts */
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, CGA_charlayout,              0, 256 )   /* Font 0 */
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0800, CGA_charlayout,              0, 256 )   /* Font 1 */
-	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, CGA_charlayout,              0, 256 )   /* Font 2 */
-	GFXDECODE_ENTRY( REGION_GFX1, 0x1800, CGA_charlayout,              0, 256 )   /* Font 3*/
+	GFXDECODE_ENTRY( "gfx1", 0x0000, CGA_charlayout,              0, 256 )   /* Font 0 */
+	GFXDECODE_ENTRY( "gfx1", 0x0800, CGA_charlayout,              0, 256 )   /* Font 1 */
+	GFXDECODE_ENTRY( "gfx1", 0x1000, CGA_charlayout,              0, 256 )   /* Font 2 */
+	GFXDECODE_ENTRY( "gfx1", 0x1800, CGA_charlayout,              0, 256 )   /* Font 3*/
 GFXDECODE_END
 
 #define AT_KEYB_HELPER(bit, text, key1) \
@@ -565,7 +565,7 @@ static IRQ_CALLBACK(irq_callback)
 
 static MACHINE_RESET(gamecstl)
 {
-	memory_set_bankptr(1, memory_region(machine, REGION_USER1) + 0x30000);
+	memory_set_bankptr(1, memory_region(machine, RGNCLASS_USER, "user1") + 0x30000);
 
 	cpunum_set_irq_callback(0, irq_callback);
 
@@ -734,13 +734,13 @@ static DRIVER_INIT( gamecstl )
 
 // not the correct BIOS, f205v owes me a dump of it...
 ROM_START(gamecstl)
-	ROM_REGION32_LE(0x40000, REGION_USER1, 0)
+	ROM_REGION32_LE(0x40000, RGNCLASS_USER, "user1", 0)
 	ROM_LOAD("p5tx-la.bin", 0x00000, 0x40000, BAD_DUMP CRC(072e6d51) SHA1(70414349b37e478fc28ecbaba47ad1033ae583b7))
 
-	ROM_REGION(0x08100, REGION_GFX1, 0)
+	ROM_REGION(0x08100, RGNCLASS_GFX, "gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
-	DISK_REGION( REGION_DISKS )
+	DISK_REGION( RGNCLASS_DISKS, "disks" )
 	DISK_IMAGE( "gamecstl", 0, MD5(501ddbebb530b8fd67eb64a4a2de3e35) SHA1(2477468ef1c1d4529057064a319ebfe9fd8facd7) )
 ROM_END
 

@@ -507,7 +507,7 @@ static void SCSP_StopSlot(struct _SLOT *slot,int keyoff)
 
 #define log_base_2(n) (log((double)(n))/log(2.0))
 
-static void SCSP_Init(struct _SCSP *SCSP, const struct SCSPinterface *intf, int sndindex)
+static void SCSP_Init(const char *tag, struct _SCSP *SCSP, const struct SCSPinterface *intf, int sndindex)
 {
 	int i;
 
@@ -528,10 +528,10 @@ static void SCSP_Init(struct _SCSP *SCSP, const struct SCSPinterface *intf, int 
 			SCSP->Master=0;
 		}
 
-		if (intf->region)
+		SCSP->SCSPRAM = memory_region(Machine, RGNCLASS_SOUND, tag);
+		if (SCSP->SCSPRAM)
 		{
-			SCSP->SCSPRAM = memory_region(Machine, intf->region);
-			SCSP->SCSPRAM_LENGTH = memory_region_length(Machine, intf->region);
+			SCSP->SCSPRAM_LENGTH = memory_region_length(Machine, RGNCLASS_SOUND, tag);
 			SCSP->DSP.SCSPRAM = (UINT16 *)SCSP->SCSPRAM;
 			SCSP->DSP.SCSPRAM_LENGTH = SCSP->SCSPRAM_LENGTH/2;
 			SCSP->SCSPRAM += intf->roffset;
@@ -1218,7 +1218,7 @@ static void SCSP_Update(void *param, stream_sample_t **inputs, stream_sample_t *
 	SCSP_DoMasterSamples(SCSP, samples);
 }
 
-static void *scsp_start(int sndindex, int clock, const void *config)
+static void *scsp_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	const struct SCSPinterface *intf;
 
@@ -1230,7 +1230,7 @@ static void *scsp_start(int sndindex, int clock, const void *config)
 	intf = config;
 
 	// init the emulation
-	SCSP_Init(SCSP, intf, sndindex);
+	SCSP_Init(tag, SCSP, intf, sndindex);
 
 	// set up the IRQ callbacks
 	{

@@ -467,8 +467,8 @@ static void argus_write_dummy_rams( running_machine *machine, int dramoffs, int 
 	int voffs;
 	int offs;
 
-	UINT8 *VROM1 = memory_region( machine, REGION_USER1 );		/* "ag_15.bin" */
-	UINT8 *VROM2 = memory_region( machine, REGION_USER2 );		/* "ag_16.bin" */
+	UINT8 *VROM1 = memory_region( machine, RGNCLASS_USER, "user1" );		/* "ag_15.bin" */
+	UINT8 *VROM2 = memory_region( machine, RGNCLASS_USER, "user2" );		/* "ag_16.bin" */
 
 	/* offset in pattern data */
 	offs = VROM1[ vromoffs ] | ( VROM1[ vromoffs + 1 ] << 8 );

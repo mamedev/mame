@@ -179,7 +179,7 @@
 static void lfkp(int mask)
 {
 	int A;
-	UINT8 *RAM = memory_region(machine, REGION_CPU1);
+	UINT8 *RAM = memory_region(machine, RGNCLASS_CPU, "main");
 
 
 	for (A = 0x0000;A < 0x8000-14;A++)
@@ -237,9 +237,9 @@ static void sega_decode(running_machine *machine, const UINT8 convtable[32][4])
 {
 	int A;
 
-	int length = memory_region_length(machine, REGION_CPU1);
+	int length = memory_region_length(machine, RGNCLASS_CPU, "main");
 	int cryptlen = MIN(length, 0x8000);
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 	UINT8 *decrypted = auto_malloc(0xc000);
 
 	memory_set_decrypted_region(0, 0x0000, cryptlen - 1, decrypted);
@@ -458,7 +458,7 @@ void toprollr_decode(running_machine *machine)
 
 	int A;
 
-	UINT8 *rom = memory_region(machine, REGION_USER1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_USER, "user1");
 	int bankstart;
 	decrypted = auto_malloc(0x6000*3);
 
@@ -489,7 +489,7 @@ void toprollr_decode(running_machine *machine)
 		rom[A+bankstart] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xor);
 	}
 
-	memory_configure_bank(1,0,3, memory_region(machine, REGION_USER1),0x6000);
+	memory_configure_bank(1,0,3, memory_region(machine, RGNCLASS_USER, "user1"),0x6000);
 	memory_configure_bank_decrypted(1,0,3,decrypted,0x6000);
 	memory_set_decrypted_region(0, 0x0000, 0x5fff, decrypted);
 	memory_set_bank(1, 0);
@@ -815,7 +815,7 @@ void jongkyo_decode(running_machine *machine)
 
 	int A;
 
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 	decrypted = auto_malloc(0x9000);
 
 	for (A = 0x0000;A < 0x9000;A++)
@@ -847,7 +847,7 @@ void jongkyo_decode(running_machine *machine)
 		rom[A] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xor);
 	}
 
-	memory_configure_bank(1,0,8, memory_region(machine, REGION_CPU1)+0x7000,0x0400);
+	memory_configure_bank(1,0,8, memory_region(machine, RGNCLASS_CPU, "main")+0x7000,0x0400);
 	memory_configure_bank_decrypted(1,0,8,decrypted+0x7000,0x0400);
 	memory_set_decrypted_region(0, 0x0000, 0x6bff, decrypted);
 	memory_set_bank(1, 0);
@@ -1114,7 +1114,7 @@ static void sega_decode_2(running_machine *machine,
 	};
 
 
-	UINT8 *rom = memory_region(machine, REGION_CPU1);
+	UINT8 *rom = memory_region(machine, RGNCLASS_CPU, "main");
 	UINT8 *decrypted = auto_malloc(0x8000);
 
 	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypted);
