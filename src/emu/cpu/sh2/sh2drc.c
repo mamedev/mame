@@ -540,6 +540,92 @@ static void cfunc_DIV1(void *param)
 }
 
 /*-------------------------------------------------
+    cfunc_ADDV - implementation of ADDV Rm,Rn
+-------------------------------------------------*/
+static void cfunc_ADDV(void *param)
+{
+	INT32 dest, src, ans;
+	UINT16 *opptr, opcode;
+	int n, m;
+
+	// recover the opcode
+	opptr = (UINT16 *)param;
+	opcode = *opptr;
+
+	// extract the operands
+	n = Rn;
+	m = Rm;
+
+	if ((INT32) sh2->r[n] >= 0)
+		dest = 0;
+	else
+		dest = 1;
+	if ((INT32) sh2->r[m] >= 0)
+		src = 0;
+	else
+		src = 1;
+	src += dest;
+	sh2->r[n] += sh2->r[m];
+	if ((INT32) sh2->r[n] >= 0)
+		ans = 0;
+	else
+		ans = 1;
+	ans += dest;
+	if (src == 0 || src == 2)
+	{
+		if (ans == 1)
+			sh2->sr |= T;
+		else
+			sh2->sr &= ~T;
+	}
+	else
+		sh2->sr &= ~T;
+}
+
+/*-------------------------------------------------
+    cfunc_SUBV - implementation of SUBV Rm,Rn
+-------------------------------------------------*/
+static void cfunc_SUBV(void *param)
+{
+	INT32 dest, src, ans;
+	UINT16 *opptr, opcode;
+	int n, m;
+
+	// recover the opcode
+	opptr = (UINT16 *)param;
+	opcode = *opptr;
+
+	// extract the operands
+	n = Rn;
+	m = Rm;
+
+	if ((INT32) sh2->r[n] >= 0)
+		dest = 0;
+	else
+		dest = 1;
+	if ((INT32) sh2->r[m] >= 0)
+		src = 0;
+	else
+		src = 1;
+	src += dest;
+	sh2->r[n] -= sh2->r[m];
+	if ((INT32) sh2->r[n] >= 0)
+		ans = 0;
+	else
+		ans = 1;
+	ans += dest;
+	if (src == 1)
+	{
+		if (ans == 1)
+			sh2->sr |= T;
+		else
+			sh2->sr &= ~T;
+	}
+	else
+		sh2->sr &= ~T;
+}
+
+/*-------------------------------------------------
     sh2_init - initialize the processor
 -------------------------------------------------*/
 
@@ -2139,6 +2225,11 @@ static int generate_group_3(drcuml_block *block, compiler_state *compiler, const
 		break;
 
 	case 11: // SUBV(Rm, Rn);
+		save_fast_iregs(block);
+		UML_CALLC(block, cfunc_SUBV, desc->opptr.w);
+		load_fast_iregs(block);
+		
+		return TRUE;
 		break;
 
 	case 14: // ADDC(Rm, Rn);
@@ -2155,13 +2246,10 @@ static int generate_group_3(drcuml_block *block, compiler_state *compiler, const
 		break;
 
 	case 15: // ADDV(Rm, Rn);
-		UML_AND(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(~T));	// and sr, sr, ~T (clear the T bit)
-		UML_ADD(block, R32(Rn), R32(Rn), R32(Rm));		// add Rn, Rn, Rm
-		UML_JMPc(block, IF_NV, compiler->labelnum);		// jnc labelnum
-
-		UML_OR(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(T));	// or sr, sr, T
-
-		UML_LABEL(block, compiler->labelnum++);		// labelnum:
+		save_fast_iregs(block);
+		UML_CALLC(block, cfunc_ADDV, desc->opptr.w);
+		load_fast_iregs(block);
+		
 		return TRUE;
 		break;
 	}
