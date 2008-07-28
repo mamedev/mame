@@ -123,12 +123,10 @@ struct _SLOT
 	struct _LFO ALFO;		//Amplitude LFO
 	int slot;
 	int cur_sample;       //current ADPCM sample
-	int nxt_sample;       //next ADPCM sample
 	int cur_quant;        //current ADPCM step
-	int nxt_quant;        //next ADPCM step
-	int curstep, nxtstep;
+	int curstep;
 	int cur_lpquant, cur_lpsample, cur_lpstep;
-	UINT8 *adbase, *nxtbase, *adlpbase;
+	UINT8 *adbase, *adlpbase;
 	UINT8 mslc;			// monitored?
 };
 
@@ -442,10 +440,11 @@ static void InitADPCM(int *PrevSignal, int *PrevQuant)
 	*PrevQuant=0x7f;
 }
 
-INLINE signed short DecodeADPCM(int *PrevSignal, unsigned char Delta, int *PrevQuant)
+INLINE signed short inline DecodeADPCM(int *PrevSignal, unsigned char Delta, int *PrevQuant)
 {
-	*PrevSignal+=(*PrevQuant*quant_mul[Delta&15])>>(3);
-	*PrevSignal=ICLIP16(*PrevSignal);
+	int x = *PrevQuant * quant_mul [Delta & 15];
+        x = *PrevSignal + ((int)(x + ((UINT32)x >> 29)) >> 3);
+	*PrevSignal=ICLIP16(x);
 	*PrevQuant=(*PrevQuant*TableQuant[Delta&7])>>ADPCMSHIFT;
 	*PrevQuant=(*PrevQuant<0x7f)?0x7f:((*PrevQuant>0x6000)?0x6000:*PrevQuant);
 	return *PrevSignal;
@@ -471,10 +470,9 @@ static void AICA_StartSlot(struct _AICA *AICA, struct _SLOT *slot)
 		UINT8 *base;
 		UINT32 curstep, steps_to_go;
 
-		slot->curstep = slot->nxtstep = 0;
-		slot->adbase = slot->nxtbase = (unsigned char *) (AICA->AICARAM+((SA(slot))&0x7fffff));
+		slot->curstep = 0;
+		slot->adbase = (unsigned char *) (AICA->AICARAM+((SA(slot))&0x7fffff));
 		InitADPCM(&(slot->cur_sample), &(slot->cur_quant));
-		InitADPCM(&(slot->nxt_sample), &(slot->nxt_quant));
 		InitADPCM(&(slot->cur_lpsample), &(slot->cur_lpquant));
 
 		// walk to the ADPCM state at LSA
@@ -1085,12 +1083,16 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 	{
 		UINT8 *base= slot->adbase;
 		INT32 s;
+		int cur_sample;       //current ADPCM sample
+		int nxt_sample;       //next ADPCM sample
 		INT32 fpart=slot->cur_addr&((1<<SHIFT)-1);
-		UINT32 steps_to_go = addr1, curstep = slot->curstep;
+		UINT32 steps_to_go = addr2, curstep = slot->curstep;
 
 		if (slot->adbase)
 		{
-			// seek to the current sample
+			cur_sample = slot->cur_sample; // may already contains current decoded sample 
+
+			// seek to the interpolation sample
 			while (curstep < steps_to_go)
 			{
 				int shift1, delta1;
@@ -1102,33 +1104,15 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 				{
 					base++;
 				}
+				if (curstep == addr1)
+					cur_sample = slot->cur_sample;
 			}
+			nxt_sample = slot->cur_sample;
 
 			slot->adbase = base;
 			slot->curstep = curstep;
 
-			base = slot->nxtbase;
-			curstep = slot->nxtstep;
-			steps_to_go = addr2;
-
-			// seek to the interpolation sample
-			while (curstep < steps_to_go)
-			{
-				int shift1, delta1;
-				shift1 = 4*((curstep&1));
-				delta1 = (*base>>shift1)&0xf;
-				DecodeADPCM(&(slot->nxt_sample),delta1,&(slot->nxt_quant));
-				curstep++;
-				if (!(curstep & 1))
-				{
-					base++;
-				}
-			}
-
-			slot->nxtbase = base;
-			slot->nxtstep = curstep;
-
-			s=(int) slot->cur_sample*((1<<SHIFT)-fpart)+(int) slot->nxt_sample*fpart;
+			s=(int)cur_sample*((1<<SHIFT)-fpart)+(int)nxt_sample*fpart;
 		}
 		else
 		{
@@ -1171,7 +1155,7 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 				rem_addr = *slot_addr[addr_select] - (LEA(slot)<<SHIFT);
 				*slot_addr[addr_select]=(LSA(slot)<<SHIFT) + rem_addr;
 
-				if(PCMS(slot)>=2 && addr_select==0)
+				if(PCMS(slot)>=2)
 				{
 					// restore the state @ LSA - the sampler will naturally walk to (LSA + remainder)
 					slot->adbase = &AICA->AICARAM[SA(slot)+(LSA(slot)/2)];
@@ -1183,16 +1167,6 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 					}
 
 //                  printf("Looping: slot_addr %x LSA %x LEA %x step %x base %x\n", *slot_addr[addr_select]>>SHIFT, LSA(slot), LEA(slot), slot->curstep, slot->adbase);
-				}
-				else if(PCMS(slot)>=2 && addr_select==1)
-				{
-					slot->nxtbase = &AICA->AICARAM[SA(slot)+(LSA(slot)/2)];
-					slot->nxtstep = LSA(slot);
-					if (PCMS(slot) == 2)
-					{
-						slot->nxt_sample = slot->cur_lpsample;
-						slot->nxt_quant = slot->cur_lpquant;
-					}
 				}
 			}
 			break;
@@ -1212,7 +1186,7 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 
 	if(slot->mslc)
 	{
-		AICA->udata.data[0x12/2] = addr1;
+		AICA->udata.data[0x14/2] = addr1;
 		if (!(AFSEL(AICA)))
 		{
 			AICA->udata.data[0x10/2] |= slot->EG.state<<13;
