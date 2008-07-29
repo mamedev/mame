@@ -99,7 +99,7 @@ static void *qsound_start(const char *tag, int sndindex, int clock, const void *
 	int i;
 
 	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(chip));
+	memset(chip, 0, sizeof(*chip));
 
 	chip->sample_rom = (QSOUND_SRC_SAMPLE *)memory_region(Machine, tag);
 	chip->sample_rom_length = memory_region_length(Machine, tag);
