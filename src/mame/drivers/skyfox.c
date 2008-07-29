@@ -12,6 +12,9 @@ Other:  2 HM6116LP-3 (one on each board)
 
 To Do:  The background rendering is entirely guesswork
 
+2008-07
+Verified Dip locations and recommended settings with manual
+
 ***************************************************************************/
 #include "driver.h"
 #include "sound/2203intf.h"
@@ -45,12 +48,12 @@ VIDEO_UPDATE( skyfox );
 ***************************************************************************/
 
 static ADDRESS_MAP_START( skyfox_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM				)	// ROM
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM				)	// RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_0_r		)	// Input Ports
-	AM_RANGE(0xe001, 0xe001) AM_READ(input_port_1_r		)	//
-	AM_RANGE(0xe002, 0xe002) AM_READ(input_port_2_r		)	//
-	AM_RANGE(0xf001, 0xf001) AM_READ(input_port_3_r		)	//
+	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM			)	// ROM
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM			)	// RAM
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("INPUTS")			// Input Ports
+	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW0")			//
+	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("DSW1")			//
+	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSW2")			//
 //  AM_RANGE(0xff00, 0xff07) AM_READ(skyfox_vregs_r     )   // fake to read the vregs
 ADDRESS_MAP_END
 
@@ -112,19 +115,17 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( skyfox )
+	PORT_START_TAG("INPUTS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("IN0")	// Player 1
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON2        )
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_BUTTON1        )
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_START1         )
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START2         )
-
-
-	PORT_START_TAG("IN1")	// DSW
+	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 1-0" )		// rest unused?
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -134,38 +135,40 @@ static INPUT_PORTS_START( skyfox )
 	PORT_DIPNAME( 0x04, 0x04, "Unknown 1-2" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x00, "20K" )
 	PORT_DIPSETTING(    0x08, "30K" )
 	PORT_DIPSETTING(    0x10, "40K" )
 	PORT_DIPSETTING(    0x18, "50K" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
+	PORT_START_TAG("DSW1")	// Coins, DSW + Vblank
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VBLANK  )
+	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPSETTING(    0x0e, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	/* According to manual, there is also "SW2:4" which has to be always OFF */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")	// Coins, DSW + Vblank
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_VBLANK  )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNUSED   )			// was IPT_COIN1, but does not trigger coin
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/1 Credit  2C/1C" )	// coin A & B
-	PORT_DIPSETTING(    0x04, "1 Coin/2 Credits 3C/1C" )
-	PORT_DIPSETTING(    0x08, "1 Coin/3 Credits 4C/1C" )
-	PORT_DIPSETTING(    0x0c, "1 Coin/4 Credits 5C/1C" )
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-
-	PORT_START_TAG("IN3")	// DSW
-	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Lives ) )
+	PORT_START_TAG("DSW2")	// DSW
+	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
@@ -174,17 +177,15 @@ static INPUT_PORTS_START( skyfox )
 //  PORT_DIPSETTING(    0x05, "5" )
 //  PORT_DIPSETTING(    0x06, "5" )
 	PORT_DIPSETTING( 	0x07, "Infinite (Cheat)")
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN4")	// Fake input port, polled every VBLANK to generate an NMI upon coin insertion
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
-
-
+	PORT_START_TAG("COINS")	// Fake input port, polled every VBLANK to generate an NMI upon coin insertion
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
 
@@ -248,7 +249,7 @@ static INTERRUPT_GEN( skyfox_interrupt )
 	skyfox_bg_pos += (skyfox_bg_ctrl >> 1) & 0x7;	// maybe..
 
 	/* Check coin 1 & 2 */
-	if ((input_port_read(machine, "IN4") & 3) != 3) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if ((input_port_read(machine, "COINS") & 3) != 3) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( skyfox )

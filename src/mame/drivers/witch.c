@@ -50,7 +50,7 @@ GFX
                     tileno = vram | ((cram & 0xf0) << 4),
                     color  = cram & 0x0f
 
-                The background is scrolled via 2 registers accessed through one of the ym2203,PORT A&B
+                The background is scrolled via 2 registers accessed through one of the ym2203, port A&B
                 The scrolling is set by CPU2 in its interrupt handler.
                 CPU1 doesn't seem to offset vram accesses for the scrolling, so it's assumed to be done
                 in hardware.
@@ -80,13 +80,13 @@ Sound
 
     Mapped @0x8010-0x8016
     Had to patch es8712.c to start playing on 0x8016 write and to prevent continuous looping.
-    There's a test on bit1 at offset 0 (0x8010), so this may be a "read status" kind ofPORT.
+    There's a test on bit1 at offset 0 (0x8010), so this may be a "read status" kind of port.
     For now reading at 8010 always reports ready.
 
 
 Ports
 
-    0xA000-0xA00f : VariousPORTs yet to figure out...
+    0xA000-0xA00f : Various ports yet to figure out...
 
       - 0xA000 : unknown ; seems muxed with a002
       - 0xA002 : banking?
@@ -94,7 +94,7 @@ Ports
                  mapped 0x0800-0x7fff?
                  0x0000-0x07ff ignored?
                  see code @ 61d
-                 lower bits seems to muxPORT A000 reads
+                 lower bits seems to mux port A000 reads
       - 0xA003 : ?
       - 0xA004 : dipswitches
       - 0xA005 : dipswitches
@@ -122,7 +122,7 @@ Memory
         we may suppose that this memory range (0xf000-0xf0ff) is shared too.
 
         Moreover, range 0xf100-0xf17f is checked after reset without prior initialization and
-        is being reset ONLY by changing a particularPORT bit whose modification ends up with
+        is being reset ONLY by changing a particular port bit whose modification ends up with
         a soft reboot. This looks like a good candidate for an NVRAM segment.
         Whether CPU2 can access the NVRAM or not is still a mystery considering that it never
         attempts to do so.
@@ -133,7 +133,7 @@ Memory
   CPU1:
       The ROM segment (0x0000-0x7fff) is banked, but the 0x0000-0x07ff region does not look
       like being affected (the SEGA Master System did something similar IIRC). A particular
-      bank is selected by changing the two most significant bits ofPORT 0xa002 (swapped?).
+      bank is selected by changing the two most significant bits of port 0xa002 (swapped?).
 
   CPU2:
             No banking
@@ -153,12 +153,12 @@ Interesting memory locations
                              d    = DOUBLE UP | ON ; OFF
                              cccc = COIN IN1 | 1-1 ; 1-2 ; 1-3 ; 1-4 ; 1-5 ; 1-6 ; 1-7 ; 1-8 ; 1-9 ; 1-10 ; 1-15 ; 1-20 ; 1-25 ; 1-30 ; 1-40 ; 1-50
 
-            *f182   : sttpcccc /PORTA
+            *f182   : sttpcccc / portA
                              cccc = COIN IN2 | 1-1 ; 1-2 ; 1-3 ; 1-4 ; 1-5 ; 1-6 ; 1-7 ; 1-8 ; 1-9 ; 1-10 ; 2-1 ; 3-1 ; 4-1 ; 5-1 ; 6-1 ; 10-1
                              p    = PAYOUT SWITCH | ON ; OFF
                              tt   = TIME | 40 ; 45 ; 50 ; 55
                              s    = DEMO SOUND | ON ; OFF
-            *f183 : xxxxhllb /PORTB
+            *f183 : xxxxhllb / portB
                              b    = AUTO BET | ON ; OFF
                              ll   = GAME LIMIT | 500 ; 1000 ; 5000 ; 990000
                              h    = HOPPER ACTIVE | LOW ; HIGH
@@ -175,7 +175,7 @@ Interesting memory locations
         +f192-f194 : credits (bcd)
 
         +fd00 = cpu2 ready
-        +f211 = inputPORT cache?
+        +f211 = input port cache?
 
     CPU2 Commands :
         -0xfd01 start music
@@ -186,7 +186,7 @@ Interesting memory locations
 
 
 TODO :
-    - Figure out thePORTs for the "PayOut" stuff (a006/a00c?)
+    - Figure out the ports for the "PayOut" stuff (a006/a00c?)
 */
 
 #include "driver.h"

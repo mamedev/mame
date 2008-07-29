@@ -291,6 +291,7 @@ VIDEO_START( combascb )
 
 		tilemap_set_transparent_pen(bg_tilemap[0],0);
 		tilemap_set_transparent_pen(bg_tilemap[1],0);
+		tilemap_set_transparent_pen(textlayer,0);
 
 		tilemap_set_scroll_rows(bg_tilemap[0],32);
 		tilemap_set_scroll_rows(bg_tilemap[1],32);
@@ -659,14 +660,16 @@ VIDEO_UPDATE( combascb )
 	if (priority == 0)
 	{
 		tilemap_draw( bitmap,cliprect,bg_tilemap[1],TILEMAP_DRAW_OPAQUE,0);
-		bootleg_draw_sprites(screen->machine, bitmap,cliprect, combasc_page[0], 0 );
-		tilemap_draw( bitmap,cliprect,bg_tilemap[0],0 ,0);
 		bootleg_draw_sprites(screen->machine, bitmap,cliprect, combasc_page[1], 1 );
+
+		tilemap_draw( bitmap,cliprect,bg_tilemap[0],0 ,0);
+		bootleg_draw_sprites(screen->machine, bitmap,cliprect, combasc_page[0], 0 );
 	}
 	else
 	{
 		tilemap_draw( bitmap,cliprect,bg_tilemap[0],TILEMAP_DRAW_OPAQUE,0);
 		bootleg_draw_sprites(screen->machine, bitmap,cliprect, combasc_page[0], 0 );
+
 		tilemap_draw( bitmap,cliprect,bg_tilemap[1],0 ,0);
 		bootleg_draw_sprites(screen->machine, bitmap,cliprect, combasc_page[1], 1 );
 	}
