@@ -199,7 +199,7 @@ static ADDRESS_MAP_START( pktgaldb_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(SMH_RAM)
 
-	AM_RANGE(0x330000, 0x330bff) AM_WRITE(SMH_RAM) AM_WRITE(paletteram16_xRGB_w) AM_BASE(&paletteram16) // extra colours?
+	AM_RANGE(0x330000, 0x330bff) AM_WRITE(paletteram16_xRGB_w) AM_BASE(&paletteram16) // extra colours?
 ADDRESS_MAP_END
 
 /**********************************************************************************/

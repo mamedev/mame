@@ -115,7 +115,7 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START( namcoc7x_mcu_share_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x002000, 0x002fff) AM_READWRITE( c352_0_r, c352_0_w )
-	AM_RANGE(0x004000, 0x00bfff) AM_RAM AM_READWRITE( c7x_shared_r, c7x_shared_w ) AM_BASE(&namcoc7x_mcuram)
+	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE( c7x_shared_r, c7x_shared_w ) AM_BASE(&namcoc7x_mcuram)
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("user4", 0x8c000)
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("user4", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("user4", 0)

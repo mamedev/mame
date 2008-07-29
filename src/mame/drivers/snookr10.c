@@ -480,7 +480,7 @@ static ADDRESS_MAP_START( snookr10_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(output_port_0_w)	/* OUT0 */
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(output_port_1_w)	/* OUT1 */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(snookr10_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x7000, 0x7fff) AM_RAM	AM_WRITE(snookr10_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(snookr10_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -494,7 +494,7 @@ static ADDRESS_MAP_START( tenballs_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(output_port_0_w)	/* OUT0 */
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(output_port_1_w)	/* OUT1 */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(snookr10_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x7000, 0x7fff) AM_RAM	AM_WRITE(snookr10_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(snookr10_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

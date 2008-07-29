@@ -844,7 +844,7 @@ const data_accessors *memory_get_accessors(int spacenum, int databits, int endia
 /* ----- address maps ----- */
 
 /* build and allocate an address map for a CPU's address space */
-address_map *address_map_alloc(const machine_config *drv, int cpunum, int spacenum);
+address_map *address_map_alloc(const machine_config *drv, const game_driver *driver, int cpunum, int spacenum);
 
 /* release allocated memory for an address map */
 void address_map_free(address_map *map);

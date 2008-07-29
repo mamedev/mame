@@ -574,7 +574,7 @@ static ADDRESS_MAP_START( jpopnics_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITE(SMH_RAM) AM_BASE(&tnzs_objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(SMH_RAM) AM_BASE(&tnzs_bg_flag)	/* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_READWRITE(SMH_NOP, tnzs_bankswitch_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_WRITE(jpopnics_palette_w) AM_BASE(&paletteram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(jpopnics_palette_w) AM_BASE(&paletteram)
 ADDRESS_MAP_END
 
 #ifdef UNUSED_FUNCTION

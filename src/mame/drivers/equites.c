@@ -706,7 +706,7 @@ static WRITE16_HANDLER( mcu_halt_clear_w )
 
 static ADDRESS_MAP_START( equites_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM	// ROM area is written several times (dev system?)
-	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE(&equites_workram) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	// nvram is for gekisou only
+	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	// nvram is for gekisou only
 	AM_RANGE(0x080000, 0x080fff) AM_READWRITE(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
 	AM_RANGE(0x0c0000, 0x0c01ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_BASE(&equites_bg_videoram)
 	AM_RANGE(0x0c0200, 0x0c0fff) AM_RAM

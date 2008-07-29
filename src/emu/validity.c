@@ -725,7 +725,7 @@ static int validate_cpu(int drivnum, const machine_config *config, region_info *
 			}
 
 			/* construct the maps */
-			map = address_map_alloc(config, cpunum, spacenum);
+			map = address_map_alloc(config, driver, cpunum, spacenum);
 
 			/* if this is an empty map, just skip it */
 			if (map->entrylist == NULL)

@@ -373,7 +373,7 @@ const char *const address_space_names[ADDRESS_SPACES] = { "program", "data", "I/
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void address_map_detokenize(address_map *map, const addrmap_token *tokens);
+static void address_map_detokenize(address_map *map, const game_driver *driver, const addrmap_token *tokens);
 
 static void memory_init_cpudata(running_machine *machine);
 static void memory_init_preflight(running_machine *machine);
@@ -858,7 +858,7 @@ const data_accessors *memory_get_accessors(int spacenum, int databits, int endia
     address map for a CPU's address space
 -------------------------------------------------*/
 
-address_map *address_map_alloc(const machine_config *config, int cpunum, int spacenum)
+address_map *address_map_alloc(const machine_config *config, const game_driver *driver, int cpunum, int spacenum)
 {
 	int cputype = config->cpu[cpunum].type;
 	const addrmap_token *internal_map = (const addrmap_token *)cputype_get_info_ptr(cputype, CPUINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
@@ -869,13 +869,13 @@ address_map *address_map_alloc(const machine_config *config, int cpunum, int spa
 
 	/* start by constructing the internal CPU map */
 	if (internal_map != NULL)
-		address_map_detokenize(map, internal_map);
+		address_map_detokenize(map, driver, internal_map);
 
 	/* construct the standard map */
 	if (config->cpu[cpunum].address_map[spacenum][0] != NULL)
-		address_map_detokenize(map, config->cpu[cpunum].address_map[spacenum][0]);
+		address_map_detokenize(map, driver, config->cpu[cpunum].address_map[spacenum][0]);
 	if (config->cpu[cpunum].address_map[spacenum][1] != NULL)
-		address_map_detokenize(map, config->cpu[cpunum].address_map[spacenum][1]);
+		address_map_detokenize(map, driver, config->cpu[cpunum].address_map[spacenum][1]);
 
 	return map;
 }
@@ -918,29 +918,43 @@ const address_map *memory_get_address_map(int cpunum, int spacenum)
     of address map tokens
 -------------------------------------------------*/
 
-static void address_map_detokenize(address_map *map, const addrmap_token *tokens)
+#define check_map(field) do { \
+	if (map->field != 0 && map->field != tmap.field) \
+		fatalerror("%s: %s included a mismatched address map (%s %d) for an existing map with %s %d!\n", driver->source_file, driver->name, #field, tmap.field, #field, map->field); \
+	} while (0)
+		
+
+#define check_entry_handler(handler) do { \
+	if (entry->handler.generic != NULL && entry->handler.generic != SMH_RAM) \
+		fatalerror("%s: %s AM_RANGE(0x%x, 0x%x) %s handler already set!\n", driver->source_file, driver->name, entry->addrstart, entry->addrend, #handler); \
+	} while (0)
+
+#define check_entry_field(field) do { \
+	if (entry->field != 0) \
+		fatalerror("%s: %s AM_RANGE(0x%x, 0x%x) setting %s already set!\n", driver->source_file, driver->name, entry->addrstart, entry->addrend, #field); \
+	} while (0)
+
+static void address_map_detokenize(address_map *map, const game_driver *driver, const addrmap_token *tokens)
 {
 	address_map_entry **entryptr;
 	address_map_entry *entry;
-	UINT8 spacenum, databits;
+	address_map tmap = {0};
 	UINT32 entrytype;
 
 	/* check the first token */
-	TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, spacenum, 8, databits, 8);
+	TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, tmap.spacenum, 8, tmap.databits, 8);
 	if (entrytype != ADDRMAP_TOKEN_START)
-		fatalerror("Address map missing ADDRMAP_TOKEN_START!");
-	if (spacenum >= ADDRESS_SPACES)
-		fatalerror("Invalid address space %d for memory map!", spacenum);
-	if (databits != 8 && databits != 16 && databits != 32 && databits != 64)
-		fatalerror("Invalid data bits %d for memory map!", databits);
-	if (map->spacenum != 0 && map->spacenum != spacenum)
-		fatalerror("Included a mismatched address map (space %d) for an existing map of type %d!\n", spacenum, map->spacenum);
-	if (map->databits != 0 && map->databits != databits)
-		fatalerror("Included a mismatched address map (databits %d) for an existing map with databits %d!\n", databits, map->databits);
+		fatalerror("%s: %s Address map missing ADDRMAP_TOKEN_START!\n", driver->source_file, driver->name);
+	if (tmap.spacenum >= ADDRESS_SPACES)
+		fatalerror("%s: %s Invalid address space %d for memory map!\n", driver->source_file, driver->name, tmap.spacenum);
+	if (tmap.databits != 8 && tmap.databits != 16 && tmap.databits != 32 && tmap.databits != 64)
+		fatalerror("%s: %s Invalid data bits %d for memory map!\n", driver->source_file, driver->name, tmap.databits);
+	check_map(spacenum);
+	check_map(databits);
 
 	/* fill in the map values */
-	map->spacenum = spacenum;
-	map->databits = databits;
+	map->spacenum = tmap.spacenum;
+	map->databits = tmap.databits;
 
 	/* find the end of the list */
 	for (entryptr = &map->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next) ;
@@ -959,7 +973,7 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 
 			/* including */
 			case ADDRMAP_TOKEN_INCLUDE:
-				address_map_detokenize(map, TOKEN_GET_PTR(tokens, tokenptr));
+				address_map_detokenize(map, driver, TOKEN_GET_PTR(tokens, tokenptr));
 				for (entryptr = &map->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next) ;
 				entry = NULL;
 				break;
@@ -967,12 +981,16 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 			/* global flags */
 			case ADDRMAP_TOKEN_GLOBAL_MASK:
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, map->globalmask, 32);
+				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, tmap.globalmask, 32);
+				check_map(globalmask);
+				map->globalmask = tmap.globalmask;
 				break;
 
 			case ADDRMAP_TOKEN_UNMAP_VALUE:
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, map->unmapval, 1);
+				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, tmap.unmapval, 1);
+				check_map(unmapval);
+				map->unmapval = tmap.unmapval;
 				break;
 
 			/* start a new range */
@@ -984,16 +1002,19 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 				break;
 
 			case ADDRMAP_TOKEN_MASK:
+				check_entry_field(addrmask);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->addrmask, 32);
 				break;
 
 			case ADDRMAP_TOKEN_MIRROR:
+				check_entry_field(addrmirror);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->addrmirror, 32);
 				break;
 
 			case ADDRMAP_TOKEN_READ:
+				check_entry_handler(read);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->read_bits, 8, entry->read_mask, 8);
 				entry->read = TOKEN_GET_PTR(tokens, read);
@@ -1001,6 +1022,7 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 				break;
 
 			case ADDRMAP_TOKEN_WRITE:
+				check_entry_handler(write);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->write_bits, 8, entry->write_mask, 8);
 				entry->write = TOKEN_GET_PTR(tokens, write);
@@ -1008,6 +1030,7 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 				break;
 
 			case ADDRMAP_TOKEN_DEVICE_READ:
+				check_entry_handler(read);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->read_bits, 8, entry->read_mask, 8);
 				entry->read = TOKEN_GET_PTR(tokens, read);
@@ -1017,6 +1040,7 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 				break;
 
 			case ADDRMAP_TOKEN_DEVICE_WRITE:
+				check_entry_handler(write);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->write_bits, 8, entry->write_mask, 8);
 				entry->write = TOKEN_GET_PTR(tokens, write);
@@ -1026,35 +1050,42 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 				break;
 
 			case ADDRMAP_TOKEN_READ_PORT:
+				check_entry_field(read_porttag);
 				entry->read_porttag = TOKEN_GET_STRING(tokens);
 				break;
 
 			case ADDRMAP_TOKEN_REGION:
+				check_entry_field(region);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->rgnoffs, 32);
 				entry->region = TOKEN_GET_STRING(tokens);
 				break;
 
 			case ADDRMAP_TOKEN_SHARE:
+				check_entry_field(share);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->share, 24);
 				break;
 
 			case ADDRMAP_TOKEN_BASEPTR:
+				check_entry_field(baseptr);
 				entry->baseptr = (void **)TOKEN_GET_PTR(tokens, voidptr);
 				break;
 
 			case ADDRMAP_TOKEN_BASE_MEMBER:
+				check_entry_field(baseptroffs_plus1);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->baseptroffs_plus1, 24);
 				entry->baseptroffs_plus1++;
 				break;
 
 			case ADDRMAP_TOKEN_SIZEPTR:
+				check_entry_field(sizeptr);
 				entry->sizeptr = TOKEN_GET_PTR(tokens, sizeptr);
 				break;
 
 			case ADDRMAP_TOKEN_SIZE_MEMBER:
+				check_entry_field(sizeptroffs_plus1);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->sizeptroffs_plus1, 24);
 				entry->sizeptroffs_plus1++;
@@ -1706,7 +1737,7 @@ static void memory_init_preflight(running_machine *machine)
 				int entrynum;
 
 				/* allocate the address map */
-				space->map = address_map_alloc(machine->config, cpunum, spacenum);
+				space->map = address_map_alloc(machine->config, machine->gamedrv, cpunum, spacenum);
 
 				/* extract global parameters specified by the map */
 				space->unmap = (space->map->unmapval == 0) ? 0 : ~0;

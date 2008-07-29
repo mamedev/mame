@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( lucky8_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(lucky8_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM	AM_WRITE(lucky8_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(lucky8_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x9800, 0x99ff) AM_RAM
 	AM_RANGE(0xa000, 0xa1ff) AM_RAM
 	AM_RANGE(0xa800, 0xa9ff) AM_RAM

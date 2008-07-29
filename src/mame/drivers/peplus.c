@@ -707,7 +707,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( peplus_datamap, ADDRESS_SPACE_DATA, 8 )
 	// Battery-backed RAM (0x1000-0x01fff Extended RAM for Superboards Only)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_READWRITE(peplus_cmos_r, peplus_cmos_w) AM_BASE(&cmos_ram)
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(peplus_cmos_r, peplus_cmos_w) AM_BASE(&cmos_ram)
 
 	// CRT Controller
 	AM_RANGE(0x2008, 0x2008) AM_WRITE(peplus_crtc_mode_w)
@@ -716,14 +716,14 @@ static ADDRESS_MAP_START( peplus_datamap, ADDRESS_SPACE_DATA, 8 )
 	AM_RANGE(0x2083, 0x2083) AM_READ(peplus_crtc_display_r) AM_WRITE(peplus_crtc_display_w)
 
     // Superboard Data
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_READWRITE(peplus_s3000_r, peplus_s3000_w) AM_BASE(&s3000_ram)
+	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(peplus_s3000_r, peplus_s3000_w) AM_BASE(&s3000_ram)
 
 	// Sound and Dipswitches
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("SW1") AM_WRITE(AY8910_write_port_0_w)
 
     // Superboard Data
-	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_READWRITE(peplus_s5000_r, peplus_s5000_w) AM_BASE(&s5000_ram)
+	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(peplus_s5000_r, peplus_s5000_w) AM_BASE(&s5000_ram)
 
 	// Background Color Latch
 	AM_RANGE(0x6000, 0x6000) AM_READ(peplus_bgcolor_r) AM_WRITE(peplus_bgcolor_w)
@@ -732,7 +732,7 @@ static ADDRESS_MAP_START( peplus_datamap, ADDRESS_SPACE_DATA, 8 )
 	AM_RANGE(0x06001, 0x06400) AM_RAM AM_BASE(&videoram)
 
     // Superboard Data
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_READWRITE(peplus_s7000_r, peplus_s7000_w) AM_BASE(&s7000_ram)
+	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(peplus_s7000_r, peplus_s7000_w) AM_BASE(&s7000_ram)
 
 	// Input Bank A, Output Bank C
 	AM_RANGE(0x8000, 0x8000) AM_READ(peplus_input_bank_a_r) AM_WRITE(peplus_output_bank_c_w)
@@ -744,19 +744,19 @@ static ADDRESS_MAP_START( peplus_datamap, ADDRESS_SPACE_DATA, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0") AM_WRITE(peplus_output_bank_b_w)
 
     // Superboard Data
-	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_READWRITE(peplus_sb000_r, peplus_sb000_w) AM_BASE(&sb000_ram)
+	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(peplus_sb000_r, peplus_sb000_w) AM_BASE(&sb000_ram)
 
 	// Output Bank A
 	AM_RANGE(0xc000, 0xc000) AM_READ(peplus_watchdog_r) AM_WRITE(peplus_output_bank_a_w)
 
     // Superboard Data
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_READWRITE(peplus_sd000_r, peplus_sd000_w) AM_BASE(&sd000_ram)
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(peplus_sd000_r, peplus_sd000_w) AM_BASE(&sd000_ram)
 
 	// DUART
 	AM_RANGE(0xe000, 0xe00f) AM_READWRITE(peplus_duart_r, peplus_duart_w)
 
     // Superboard Data
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_READWRITE(peplus_sf000_r, peplus_sf000_w) AM_BASE(&sf000_ram)
+	AM_RANGE(0xf000, 0xffff) AM_READWRITE(peplus_sf000_r, peplus_sf000_w) AM_BASE(&sf000_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )

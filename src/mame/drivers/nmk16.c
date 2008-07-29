@@ -865,7 +865,7 @@ static ADDRESS_MAP_START( tdragon_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x0b0000, 0x0b7fff) AM_WRITE(SMH_RAM)    /* Work RAM */
 //  AM_RANGE(0x0b8000, 0x0b8fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size) /* Sprite RAM */
 //  AM_RANGE(0x0b9000, 0x0bdfff) AM_WRITE(SMH_RAM) AM_BASE(&nmk16_mcu_work_ram)   /* Work RAM */
-//  AM_RANGE(0x0be000, 0x0befff) AM_RAM AM_READWRITE(mcu_shared_r,tdragon_mcu_shared_w) AM_BASE(&nmk16_mcu_shared_ram)  /* Work RAM */
+//  AM_RANGE(0x0be000, 0x0befff) AM_READWRITE(mcu_shared_r,tdragon_mcu_shared_w) AM_BASE(&nmk16_mcu_shared_ram)  /* Work RAM */
 //  AM_RANGE(0x0bf000, 0x0bffff) AM_WRITE(SMH_RAM)    /* Work RAM */
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(nmk_flipscreen_w) /* Maybe */
 	AM_RANGE(0x0c0018, 0x0c0019) AM_WRITE(nmk_tilebank_w) /* Tile Bank ? */
@@ -4670,8 +4670,8 @@ static ADDRESS_MAP_START( afega, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0x092000, 0x093fff) AM_RAM								// ?
 /**/AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(afega_vram_1_w) AM_BASE(&afega_vram_1)	// Layer 1
 
-	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE(1) AM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE(1) AM_WRITE(nmk16_mainram_strange_w)
+	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_SHARE(1) AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_SHARE(1)
 ADDRESS_MAP_END
 
 #if 0

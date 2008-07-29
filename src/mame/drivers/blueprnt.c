@@ -100,7 +100,7 @@ static WRITE8_HANDLER( blueprnt_coin_counter_w )
 static ADDRESS_MAP_START( blueprnt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM // service mode checks for 8 chips = 64K
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_MIRROR(0x400) AM_WRITE(blueprnt_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(blueprnt_videoram_w) AM_MIRROR(0x400) AM_BASE(&videoram)
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE(&blueprnt_scrollram)
 	AM_RANGE(0xb000, 0xb0ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1") AM_WRITE(blueprnt_coin_counter_w)

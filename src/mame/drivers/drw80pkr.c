@@ -198,12 +198,12 @@ static ADDRESS_MAP_START( drw80pkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drw80pkr_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff) AM_RAM AM_READWRITE(drw80pkr_cmos_r, drw80pkr_cmos_w) AM_BASE(&pkr_cmos_ram)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(drw80pkr_cmos_r, drw80pkr_cmos_w) AM_BASE(&pkr_cmos_ram)
 	AM_RANGE(I8039_t1, I8039_t1) AM_RAM
-	AM_RANGE(I8039_p1, I8039_p1) AM_RAM AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(I8039_p2, I8039_p2) AM_RAM AM_READWRITE(p2_r, p2_w)
+	AM_RANGE(I8039_p1, I8039_p1) AM_READWRITE(p1_r, p1_w)
+	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(p2_r, p2_w)
     AM_RANGE(I8039_p4, I8039_p4) AM_RAM_WRITE(p4_w)
-    AM_RANGE(I8039_bus, I8039_bus) AM_RAM AM_READWRITE(bus_r, bus_w)
+    AM_RANGE(I8039_bus, I8039_bus) AM_READWRITE(bus_r, bus_w)
 ADDRESS_MAP_END
 
 /*************************
