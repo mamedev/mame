@@ -334,7 +334,7 @@ static WRITE8_HANDLER( rombankswitch_w )
 
 //      logerror("robs %d, %02x (%04x)\n", offset, data, activecpu_get_pc());
 		cur_rombank = data;
-		memory_set_bankptr(1, memory_region(machine, "main")+0x10000+0x2000*cur_rombank);
+		memory_set_bankptr(1, memory_region(machine, "cpu1")+0x10000+0x2000*cur_rombank);
 	}
 }
 
@@ -2968,7 +2968,7 @@ static DRIVER_INIT( plottina )
 				v |= 1<<(7-j);
 		tab[i] = v;
 	}
-	p = memory_region(machine, "main");
+	p = memory_region(machine, "cpu1");
 	for(i=0;i<0x20000;i++)
 	{
 		*p = tab[*p];
