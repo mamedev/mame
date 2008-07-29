@@ -2410,6 +2410,9 @@ Bkeycode          ->4.\0\0\0\0\0\0             (low byte of des key, then \0 fil
 #..               ->2DIMMID2                   (last 2 bytes)
 
 
+default session key is
+"NAOMIGDROMSYSTEM"
+
 info from Elsemi:
 
 it sends bsec_ver, and if it's ok, then the next commands are the session key changes
@@ -2429,6 +2432,77 @@ time to go to sleep
 
 */
 
+// rather crude function to write out a key file
+void naomi_write_keyfile(void)
+{
+	// default key structure
+	UINT8 response[10][8] = {
+	{ ':', 0x70, 0x1f, 0x71, 0x1f, 0x00, 0x00, 0x00 }, // response to kayjyo!?
+	{ '8', 'V',  'E',  'R',  '0',  '0',  '0',  '1'  }, // response to bsec_ver
+	{ '7', 'T',  'E',  'S',  'T',  '_',  'O',  'K'  }, // response to atestpic
+	{ '6', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // response to D1strdf1 (upper part of filename)
+	{ '5', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // response to C1strdf0 (lower part of filename)
+	{ '4', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // response to Bkeycode (lower byte of DES key)
+	{ '3', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, // response to AKEYCODE (high 7 bytes of DES key)
+	{ '2', 'D',  'I',  'M',  'M',  'I',  'D',  '2'  }, // response to #..      (rewrite low 2 bytes of session key)
+	{ '1', 'D',  'I',  'M',  'M',  'I',  'D',  '1'  }, // response to "....... (rewrite middle 7 bytes of session key)
+	{ '0', 'D',  'I',  'M',  'M',  'I',  'D',  '0'  }, // response to !....... (rewrite upper 7 bytes of session key)
+	};
+
+	int i;
+	char bootname[256];
+	char picname[256];
+
+	// ######### edit this ###########
+	UINT64 key = 0x4FF16D1A9E0BFBCDULL;
+
+	memset(bootname,0x00,14);
+	memset(picname,0x00,256);
+
+	// ######### edit this ###########
+	strcpy(picname,"317-5072-com.data");
+	strcpy(bootname,"BCY.BIN");
+
+	for (i=0;i<14;i++)
+	{
+		if (i<7)
+		{
+			response[4][i+1] = bootname[i];
+		}
+		else
+		{
+			response[3][i-6] = bootname[i];
+		}
+	}
+
+	for (i=0;i<8;i++)
+	{
+		UINT8 keybyte = (key>>(7-i)*8)&0xff;
+
+		if (i<7)
+		{
+			response[6][i+1] = keybyte;
+		}
+		else
+		{
+			response[5][1] = keybyte;
+		}
+	}
+
+
+	{
+		FILE *fp;
+		fp=fopen(picname, "w+b");
+		if (fp)
+		{
+			fwrite(response, 10*8, 1, fp);
+			fclose(fp);
+		}
+	}
+
+
+}
+
 ROM_START( sfz3ugd )
 	NAOMIGD_BIOS
 
@@ -2442,20 +2516,24 @@ ROM_START( sfz3ugd )
 	ROM_LOAD("track02.raw",0x0000000, 0x004c8cf0, CRC(c5628df6) SHA1(0d1a24e6271c3b0ef92c55ec9d63e2326892f1d8) )
 	ROM_LOAD("track03.iso",0x0000000, 0x3d8ab000, CRC(195f0d93) SHA1(183412704bd90750355e7af019b78541328fe633) )
 
+
+	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
+	ROM_LOAD("317-5072-com.data", 0x00, 0x50, CRC(6d2992b9) SHA1(88e6dc6711f9f883362ba1217a3350d452a70896) )
 ROM_END
 
 extern void naomi_game_decrypt(UINT64 key, UINT8* region, int length);
 
 DRIVER_INIT( cvs2gd )
 {
-	// move key to game.key file?
+	// get from key file instead
 	naomi_game_decrypt( 0x2f3226165b9e407cULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
 }
 
 DRIVER_INIT( sfz3ugd )
 {
-	// move key to game.key file?
+	// get from key file instead
 	naomi_game_decrypt( 0x4FF16D1A9E0BFBCDULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
+//	naomi_write_keyfile();
 }
 
 
@@ -2473,6 +2551,9 @@ ROM_START( cvs2gd )
 	ROM_LOAD("track02.raw",0x0000000, 0x004c8cf0, CRC(3b3a2e7b) SHA1(fd8e5cac5bd387229f4ffbe05d1bf2fabf7ea3f9) )
 	ROM_LOAD("track03.bin",0x0000000, 0x26ad4620, CRC(670d2182) SHA1(a99ceb7bb74e4a0fe6ae80b33cd2963465ae9d14) )
 	ROM_CONTINUE(0x0000000, 0x20000000)
+
+	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
+	ROM_LOAD("317-5078-com.data", 0x00, 0x50, CRC(1c8d94ee) SHA1(bec4a6901f62dc8f76f7b9d72284b3eaac340bf3) )
 ROM_END
 
 
