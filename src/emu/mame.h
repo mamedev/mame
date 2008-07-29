@@ -297,7 +297,7 @@ UINT32 memory_region_length(running_machine *machine, const char *name);
 /* return the flags (defined in romload.h) for a specified memory region */
 UINT32 memory_region_flags(running_machine *machine, const char *name);
 
-/* return the name of the next memory region of the same class (or the first if name == NULL) */
+/* return the name of the next memory region (or the first if name == NULL) */
 const char *memory_region_next(running_machine *machine, const char *name);
 
 
