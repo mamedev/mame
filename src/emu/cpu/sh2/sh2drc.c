@@ -2215,7 +2215,7 @@ static int generate_group_3(drcuml_block *block, compiler_state *compiler, const
 	case 10: // SUBC(Rm, Rn);
 		UML_CARRY(block, MEM(&sh2->sr), IMM(0));	// carry = T (T is bit 0 of SR)
 		UML_SUBB(block, R32(Rn), R32(Rn), R32(Rm));	// addc Rn, Rn, Rm
-		UML_GETFLGS(block, IREG(0), DRCUML_FLAG_C); // getflgs i0, C
+		UML_SETc(block, IF_C, IREG(0));				// setc    i0, C
 		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins sr,i0,0,T
 		return TRUE;
 		break;
@@ -2223,7 +2223,7 @@ static int generate_group_3(drcuml_block *block, compiler_state *compiler, const
 	case 11: // SUBV(Rm, Rn);
 #if ADDSUBV_DIRECT
 		UML_SUB(block, R32(Rn), R32(Rn), R32(Rm));		// sub Rn, Rn, Rm
-		UML_GETFLGS(block, IREG(0), DRCUML_FLAG_V);		// getflgs i0,V
+		UML_SETc(block, IF_V, IREG(0));					// setc    i0, V
 		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins [sr],i0,0,T
 #else
 		save_fast_iregs(block);
@@ -2236,7 +2236,7 @@ static int generate_group_3(drcuml_block *block, compiler_state *compiler, const
 	case 14: // ADDC(Rm, Rn);
 		UML_CARRY(block, MEM(&sh2->sr), IMM(0));	// carry = T (T is bit 0 of SR)
 		UML_ADDC(block, R32(Rn), R32(Rn), R32(Rm));	// addc Rn, Rn, Rm
-		UML_GETFLGS(block, IREG(0), DRCUML_FLAG_C); // getflgs i0, C
+		UML_SETc(block, IF_C, IREG(0));				// setc    i0, C
 		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins sr,i0,0,T
 		return TRUE;
 		break;
@@ -2244,7 +2244,7 @@ static int generate_group_3(drcuml_block *block, compiler_state *compiler, const
 	case 15: // ADDV(Rm, Rn);
 #if ADDSUBV_DIRECT
 		UML_ADD(block, R32(Rn), R32(Rn), R32(Rm));		// add Rn, Rn, Rm
-		UML_GETFLGS(block, IREG(0), DRCUML_FLAG_V);		// getflgs i0,V
+		UML_SETc(block, IF_V, IREG(0));					// setc    i0, V
 		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins [sr],i0,0,T
 #else
 		save_fast_iregs(block);
