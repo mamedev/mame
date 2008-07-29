@@ -1149,10 +1149,11 @@ void rom_init(running_machine *machine, const rom_entry *romp)
 			process_rom_entries(&romdata, region + 1);
 		else if (ROMREGION_ISDISKDATA(region))
 			process_disk_entries(&romdata, region + 1);
-
-		/* finally, post-process for endianness and inversion */
-		region_post_process(machine, &romdata, regiontag);
 	}
+
+	/* now go back and post-process all the regions */
+	for (region = romp; region != NULL; region = rom_next_region(region))
+		region_post_process(machine, &romdata, ROMREGION_GETTAG(region));
 
 	/* display the results and exit */
 	total_rom_load_warnings = romdata.warnings;

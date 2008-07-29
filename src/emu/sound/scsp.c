@@ -185,7 +185,7 @@ struct _SCSP
 		UINT8 datab[0x30];
 	} udata;
 	struct _SLOT Slots[32];
-	signed short RINGBUF[64];
+	signed short RINGBUF[128];
 	unsigned char BUFPTR;
 #if FM_DELAY
 	signed short DELAYBUF[FM_DELAY];
@@ -1250,6 +1250,8 @@ void SCSP_set_ram_base(int which, void *base)
 	{
 		SCSP->SCSPRAM = base;
 		SCSP->DSP.SCSPRAM = base;
+		SCSP->SCSPRAM_LENGTH = 0x80000;
+		SCSP->DSP.SCSPRAM_LENGTH = 0x80000/2;
 	}
 }
 
