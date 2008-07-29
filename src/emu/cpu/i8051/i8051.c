@@ -1975,198 +1975,210 @@ INLINE void update_timer(int cyc)
 
 	//Note: Counting modes increment on 1 machine cycle (12 oscilator periods) - except Timer 2 in certain modes
 
-	//Update Timer 0
+	/* Update Timer 0 */
 	if(GET_TR0) {
 		//Determine Mode
 		int mode = (GET_M0_1<<1) | GET_M0_0;
-		int overflow;
-		UINT16 count = 0;
+		UINT32 count = 0;
 		switch(mode) {
-			case 0:			//13 Bit Timer Mode
-				count = ((R_TH0<<8) | R_TL0);
-				overflow = 0x3fff;
-				//Todo - really, we update HI counter when LO counter hits 0x20
-			case 1:			//16 Bit Timer Mode
-				count = ((R_TH0<<8) | R_TL0);
-				overflow = 0xffff;
-				//Check for overflow
-				if((UINT32)(count+(cyc/12))>overflow) {
-					//Any overflow from cycles?
-					cyc-= (overflow-count)*12;
-					count = 0;
-                    SET_TF0(1);
+			case 0:			/* 13 Bit Timer Mode */
+				count = ((R_TH0<<5) | ( R_TL0 & 0x1F ) );
+				/* Update the timer */
+				/* Gate Bit Set? Timer only incremented if Int0 is set! */
+				if(GET_GATE0 && GET_IE0)
+					count += (cyc/12);
+				/* Counter Mode? Only increment on 1-0 transition of the Port 3's T0 Line */
+				if(GET_CT0)
+				{
+					/* Not supported */
 				}
-				//Update the timer
-				if(cyc) {
-					int inctimer = 0;
-					//Gate Bit Set? Timer only incremented if Int0 is set!
-					if(GET_GATE0 && GET_IE0)
-						inctimer = (cyc/12);
-					//Counter Mode? Only increment on 1-0 transition of the Port 3's T0 Line
-					if(GET_CT0) {
-						//Not supported
-					}
-					//Neither, regular timer mode
-					if(!GET_GATE0 && !GET_CT0)
-						inctimer = (cyc/12);
+				/* Neither, regular timer mode */
+				if(!GET_GATE0 && !GET_CT0)
+					count += (cyc/12);
 
-					count+=inctimer;		//Increment counter
+				/*  Check for overflow */
+				if ( count & 0xffffe000 )
+				{
+					SET_TF0(1);
 				}
-				//Update new values of the counter
+				/* Update new values of the counter */
+				R_TH0 = (count>>5) & 0xff;
+				R_TL0 = count & 0x1f;
+				break;
+			case 1:			/* 16 Bit Timer Mode */
+				count = ((R_TH0<<8) | R_TL0);
+				/* Update the timer */
+				/* Gate Bit Set? Timer only incremented if Int0 is set! */
+				if(GET_GATE0 && GET_IE0)
+					count += (cyc/12);
+				/* Counter Mode? Only increment on 1-0 transition of the Port 3's T0 Line */
+				if(GET_CT0)
+				{
+					/* Not supported */
+				}
+				/* Neither, regular timer mode */
+				if(!GET_GATE0 && !GET_CT0)
+					count += (cyc/12);
+
+				/* Check for overflow */
+				if ( count & 0xffff0000 )
+				{
+					SET_TF0(1);
+				}
+				/* Update new values of the counter */
 				R_TH0 = (count>>8) & 0xff;
 				R_TL0 = count & 0xff;
 				break;
-			case 2:			//8 Bit Autoreload
-				overflow = 0xff;
+			case 2:			/* 8 Bit Autoreload */
 				count = R_TL0;
-				//Check for overflow
-				if(count+(cyc/12)>overflow) {
-                    SET_TF0(1);
-					//Reload
-					count = R_TH0+(overflow-count);
+				count += (cyc/12);
+				/* Check for overflow */
+				if ( count & 0xffffff00 )
+				{
+					SET_TF0(1);
+					/* Reload timer */
+					count += R_TH0;
 				}
-				else
-					count+=(cyc/12);
-				//Update new values of the counter
+				/* Update new values of the counter */
 				R_TL0 = count & 0xff;
 				break;
-			case 3:			//Split Timer
-                //Split Timer 1
-				overflow = 0xff;
+			case 3:			/* Split Timer */
+				/* Split Timer 1 */
 				count = R_TL0;
-				//Check for overflow
-                if(count+(cyc/12)>overflow) {
-					count = overflow-count;
-                    SET_TF0(1);
-                }
-				else
-					count+=(cyc/12);
-				//Update new values of the counter
+				count += (cyc/12);
+				/* Check for overflow */
+				if ( count & 0xffffff00 )
+				{
+					SET_TF0(1);
+				}
+				/* Update new values of the counter */
 				R_TL0 = count & 0xff;
 
-                //Split Timer 2
-			    overflow = 0xff;
-			    count = R_TH0;
-			    //Check for overflow
-                if(count+(cyc/12)>overflow) {
-				    count = overflow-count;
-                    SET_TF1(1);
-                }
-			    else
-                    count+=(cyc/12);
-			    //Update new values of the counter
-			    R_TH0 = count & 0xff;
+				/* Split Timer 2 */
+				count = R_TH0;
+				count += (cyc/12);
+				/* Check for overflow */
+				if ( count & 0xffffff00 )
+				{
+					SET_TF1(1);
+				}
+				/* Update new values of the counter */
+				R_TH0 = count & 0xff;
 				break;
 		}
 	}
 
-	//Update Timer 1
+	/* Update Timer 1 */
 	if(GET_TR1) {
-		//Determine Mode
+		/* Determine Mode */
 		int mode = (GET_M1_1<<1) | GET_M1_0;
-		int overflow;
-		UINT16 count = 0;
+		UINT32 count = 0;
 		switch(mode) {
-			case 0:			//13 Bit Timer Mode
-				count = ((R_TH1<<8) | R_TL1);
-				overflow = 0x3fff;
-				//Todo - really, we update HI counter when LO counter hits 0x20
-			case 1:			//16 Bit Timer Mode
-				count = ((R_TH1<<8) | R_TL1);
-				overflow = 0xffff;
-				//Check for overflow
-				if((UINT32)(count+(cyc/12))>overflow) {
+			case 0:			/* 13 Bit Timer Mode */
+				count = ((R_TH1<<5) | ( R_TL1 & 0x1F ) );
+				/* Update the timer */
+				/* Gate Bit Set? Timer only incremented if Int0 is set! */
+				if(GET_GATE1 && GET_IE1)
+					count += (cyc/12);
+				/* Counter Mode? Only increment on 1-0 transition of the Port 3's T1 Line */
+				if(GET_CT1)
+				{
+					/* Not supported */
+				}
+				/* Neither, regular timer mode */
+				if(!GET_GATE1 && !GET_CT1)
+					count += (cyc/12);
 
+				/*  Check for overflow */
+				if ( count & 0xffffe000 )
+				{
+					SET_TF1(1);
+				}
+				/* Update new values of the counter */
+				R_TH1 = (count>>5) & 0xff;
+				R_TL1 = count & 0x1f;
+				break;
+			case 1:			/* 16 Bit Timer Mode */
+				count = ((R_TH1<<8) | R_TL1);
+				/* Update the timer */
+				/* Gate Bit Set? Timer only incremented if Int1 is set! */
+				if(GET_GATE1 && GET_IE1)
+					count += (cyc/12);
+				/* Counter Mode? Only increment on 1-0 transition of the Port 3's T1 Line */
+				if(GET_CT1)
+				{
+					/* Not supported */
+				}
+				/* Neither, regular timer mode */
+				if(!GET_GATE1 && !GET_CT1)
+					count += (cyc/12);
+
+				/* Check for overflow */
+				if ( count & 0xffff0000 )
+				{
 					//TODO: Timer 1 can be set as Serial Baud Rate in the 8051 only... process bits here..
-
-					//Any overflow from cycles?
-					cyc-= (overflow-count)*12;
-					count = 0;
-                    SET_TF1(1);
+					SET_TF1(1);
 				}
-				//Update the timer
-				if(cyc) {
-					int inctimer = 0;
-					//Gate Bit Set? Timer only incremented if Int0 is set!
-					if(GET_GATE1 && GET_IE1)
-						inctimer = (cyc/12);
-					//Counter Mode? Only increment on 1-0 transition of the Port 3's T0 Line
-					if(GET_CT1) {
-						//Not supported
-					}
-					//Neither, regular timer mode
-					if(!GET_GATE1 && !GET_CT1)
-						inctimer = (cyc/12);
-
-					count+=inctimer;		//Increment counter
-				}
-				//Update new values of the counter
+				/* Update new values of the counter */
 				R_TH1 = (count>>8) & 0xff;
 				R_TL1 = count & 0xff;
 				break;
-			case 2:			//8 Bit Autoreload
-				overflow = 0xff;
+			case 2:			/* 8 Bit Autoreload */
 				count = R_TL1;
-				//Check for overflow
-				if(count+(cyc/12)>overflow) {
-                    SET_TF1(1);
-					//Reload
-					count = R_TH1+(overflow-count);
+				count += (cyc/12);
+				/* Check for overflow */
+				if ( count & 0xffffff00 )
+				{
+					SET_TF1(1);
+					/* Reload timer */
+					count += R_TH1;
 				}
-				else
-					count+=(cyc/12);
-				//Update new values of the counter
+				/* Update new values of the counter */
 				R_TL1 = count & 0xff;
-				break;
-			case 3:			//Split Timer
 				break;
 		}
 	}
 
 #if (HAS_I8052 || HAS_I8752)
-	//Update Timer 2
+	/* Update Timer 2 */
 	if(GET_TR2) {
-		int timerinc, overflow;
-		UINT16 count = ((R_TH2<<8) | R_TL2);
-		timerinc = overflow = 0;
+		UINT32 count = ((R_TH2<<8) | R_TL2);
 
-		//Are we in counter mode?
-		if(GET_CT2)		{
-			//Not supported
+		/* Are we in counter mode? */
+		if(GET_CT2)
+		{
+			/* Not supported */
 		}
-		//Are we in timer mode?
-		else {
-			//16 Bit Timer Mode
-			overflow = 0xffff;
-			//Timer 2 Used as Baud Generator? (For now, only *same* send/receive rates supported)
+		/* Are we in timer mode? */
+		else
+		{
+			/* 16 Bit Timer Mode */
+			/* Timer 2 Used as Baud Generator? (For now, only *same* send/receive rates supported) */
 			if(GET_TCLK || GET_RCLK)
-				timerinc = cyc/2;						//Timer increments ever 1/2 cycle in baud mode
+				count += cyc/2;						/* Timer increments every cycles/2 in baud mode */
 			else
-			//REGULAR TIMER -
-				timerinc = cyc/12;						//Timer increments ever 1/12 cycles in normal mode
+			/* REGULAR TIMER - */
+				count += cyc/12;					/* Timer increments every cycles/12 in normal mode */
 
-			//Check for overflow
-			if((UINT32)(count+timerinc)>overflow) {
-				//Set Interrupt flag *unless* used as baud generator
-				if(!GET_TCLK && !GET_RCLK) {
+			/* Check for overflow */
+			if ( count & 0xffff0000 )
+			{
+				/* Set Interrupt flag *unless* used as baud generator */
+				if(!GET_TCLK && !GET_RCLK)
+				{
 					SET_TF2(1);
 				}
-				else {
-				//Update bits sent if sending & bits left to send!
+				else
+				{
+					/* Update bits sent if sending & bits left to send! */
 					if(uart.sending && uart.bits_to_send && uart.timerbaud)
 						uart.bits_to_send-=1;
 				}
-				//Auto reload?
+				/* Auto reload? */
 				if(!GET_CP)
-					count = ((R_RCAP2H<<8) | R_RCAP2L); //+(overflow-count);
-				else
-					count = overflow-count;
+					count += ((R_RCAP2H<<8) | R_RCAP2L);
 			}
-			else {
-			//No overflow, just increment timer
-				count+=timerinc;
-			}
-			//Update flags
+			/* Update new values of the counter */
 			R_TH2 = (count>>8) & 0xff;
 			R_TL2 = count & 0xff;
 		}
