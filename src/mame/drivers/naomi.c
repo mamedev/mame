@@ -563,6 +563,21 @@ static WRITE64_HANDLER( naomi_unknown1_w )
     the BOARDID regs access the password protected eeprom in the game board. the main board eeprom is read through port 0x1F800030
 
     To access the board using DMA, use the DMA_OFFSETL/H. DMA_COUNT is in units of 0x20 bytes. Then trigger a GDROM DMA request.
+
+    Dimm board registers (add more information if you find it):
+
+    NAOMI_DIMM_COMMAND = 5f703c (16 bit):
+        if bits all 1 no dimm board present and other registers not used
+        bit 15: during an interrupt is 1 if the dimm board has a command to be executed
+        bit 14-9: 6 bit command number (naomi bios understands 0 1 3 4 5 6 8 9 a)
+        bit 8-0: higher 9 bits of 25 bit offset parameter
+    NAOMI_DIMM_OFFSETL = 5f7040 (16 bit):
+        bit 15-0: lower 16 bits of 25 bit offset parameter
+    NAOMI_DIMM_PARAMETERL = 5f7044 (16 bit)
+    NAOMI_DIMM_PARAMETERH = 5f7048 (16 bit)
+    NAOMI_DIMM_STATUS = 5f704c (16 bit):
+        bit 0: when read as 1 means something has happened write it to 0 to clear
+        bit 8: written to 1 at the end of the interrupt routine (signals command response available to dimm board ?)
 */
 
 // NOTE: all accesses are 16 or 32 bits wide but only 16 bits are valid
@@ -581,6 +596,36 @@ static READ64_HANDLER( naomi_rom_board_r )
 		rom_offset += 2;
 
 		return ret;
+	}
+	else if ((offset == 7) && ACCESSING_BITS_32_47)
+	{
+		// 5f703c
+		mame_printf_verbose("ROM: read 5f703c\n");
+		return (UINT64)0xffff << 32;
+	}
+	else if ((offset == 8) && ACCESSING_BITS_0_15)
+	{
+		// 5f7040
+		mame_printf_verbose("ROM: read 5f7040\n");
+		return 0;
+	}
+	else if ((offset == 8) && ACCESSING_BITS_32_47)
+	{
+		// 5f7044
+		mame_printf_verbose("ROM: read 5f7044\n");
+		return 0;
+	}
+	else if ((offset == 9) && ACCESSING_BITS_0_15)
+	{
+		// 5f7048
+		mame_printf_verbose("ROM: read 5f7048\n");
+		return 0;
+	}
+	else if ((offset == 9) && ACCESSING_BITS_32_47)
+	{
+		// 5f704c
+		mame_printf_verbose("ROM: read 5f704c\n");
+		return (UINT64)1 << 32;
 	}
 	else if ((offset == 15) && ACCESSING_BITS_32_47) // boardid read
 	{
@@ -622,7 +667,7 @@ static WRITE64_HANDLER( naomi_rom_board_w )
 	{
 		// ROM_OFFSETL
 		rom_offset &= 0xffff0000;
-		rom_offset |= (data & 0xffff);
+		rom_offset |= ((data >> 32) & 0xffff);
 	}
 	else if ((offset == 15) && ACCESSING_BITS_0_15)
 	{
@@ -636,6 +681,26 @@ static WRITE64_HANDLER( naomi_rom_board_w )
 	{
 		// NAOMI_DMA_COUNT
 		dma_count = data >> 32;
+	}
+	else if ((offset == 7) && ACCESSING_BITS_32_47)
+	{
+		mame_printf_verbose("ROM: write 5f703c\n");
+	}
+	else if ((offset == 8) && ACCESSING_BITS_0_15)
+	{
+		mame_printf_verbose("ROM: write 5f7040\n");
+	}
+	else if ((offset == 8) && ACCESSING_BITS_32_47)
+	{
+		mame_printf_verbose("ROM: write 5f7044\n");
+	}
+	else if ((offset == 9) && ACCESSING_BITS_0_15)
+	{
+		mame_printf_verbose("ROM: write 5f7048\n");
+	}
+	else if ((offset == 9) && ACCESSING_BITS_32_47)
+	{
+		mame_printf_verbose("ROM: write 5f704c\n");
 	}
 	else
 	{
@@ -2329,10 +2394,38 @@ ROM_END
 
 /* GD-ROM titles - a PIC supplies a decryption key
 
-(information based on forum post)
-The PIC supplies an 8 byte key, this gets written to a hardware register.
-DES keys are 56-bit, not 64-bit. Each byte of the key provided by the PIC contains
-a parity byte for verification (8*7 = 56, 8*8 = 64)
+PIC stuff
+
+command             response                   comment
+
+kayjyo!?          ->:\x70\x1f\x71\x1f\0\0\0    (unlock gdrom)
+C1strdf0          ->5BDA.BIN                   (lower part of boot filename string, BDA.BIN in this example)
+D1strdf1          ->6\0\0\0\0\0\0\0            (upper part of filename string)
+bsec_ver          ->8VER0001                   (always the same? )
+atestpic          ->7TEST_OK                   (always the same? )
+AKEYCODE          ->3.......                   (high 7 bytes of des key)
+Bkeycode          ->4.\0\0\0\0\0\0             (low byte of des key, then \0 fill)
+!.......          ->0DIMMID0                   (redefine upper 7 bytes of session key)
+".......          ->1DIMMID1                   (redefine next 7 bytes)
+#..               ->2DIMMID2                   (last 2 bytes)
+
+
+info from Elsemi:
+
+it sends bsec_ver, and if it's ok, then the next commands are the session key changes
+if you want to have the encryption described somewhere so it's not lost. it's simple:
+unsigned char Enc(unsigned char val,unsigned char n)
+{
+	val^=Key[8+n];
+	val+=Key[n];
+
+	return val;
+}
+
+do for each value in the message to send
+that will encrypt the char in the nth position in the packet to send
+time to go to sleep
+
 
 */
 
@@ -2358,6 +2451,13 @@ DRIVER_INIT( cvs2gd )
 	// move key to game.key file?
 	naomi_game_decrypt( 0x2f3226165b9e407cULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
 }
+
+DRIVER_INIT( sfz3ugd )
+{
+	// move key to game.key file?
+	naomi_game_decrypt( 0x4FF16D1A9E0BFBCDULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
+}
+
 
 
 ROM_START( cvs2gd )
@@ -2434,7 +2534,7 @@ GAME( 2001, hod2bios, 0,        naomi,    naomi,    0, ROT0, "Sega",            
 
 /* No GD-Rom Sets Supported */
 GAME( 2001, naomigd,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
-GAME( 2001, sfz3ugd,   naomigd,  naomi,    naomi,    0, ROT0, "Capcom",          "Street Fighter Zero 3 Upper", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, sfz3ugd,   naomigd,  naomi,    naomi,    sfz3ugd, ROT0, "Capcom",          "Street Fighter Zero 3 Upper", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, cvs2gd,    naomigd,  naomi,    naomi,    cvs2gd, ROT0, "Capcom",          "Capcom Vs. SNK 2", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 

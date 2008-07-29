@@ -12,6 +12,7 @@
 #define DEBUG_PVRTA	(0)
 #define DEBUG_PVRTA_REGS (0)
 #define DEBUG_PVRDLIST	(0)
+#define DEBUG_VERTICES	(0)
 
 static UINT32 pvrctrl_regs[0x100/4];
 static UINT32 pvrta_regs[0x2000/4];
@@ -19,29 +20,48 @@ static const int pvr_parconfseq[] = {1,2,3,2,3,4,5,6,5,6,7,8,9,10,11,12,13,14,13
 static const int pvr_wordsvertex[24]  = {8,8,8,8,8,16,16,8,8,8, 8, 8,8,8,8,8,16,16, 8,16,16,8,16,16};
 static const int pvr_wordspolygon[24] = {8,8,8,8,8, 8, 8,8,8,8,16,16,8,8,8,8, 8, 8,16,16,16,8, 8, 8};
 static int pvr_parameterconfig[64];
+static UINT32 dilated0[15][1024];
+static UINT32 dilated1[15][1024];
+static int dilatechose[64];
 
 UINT64 *dc_texture_ram;
 static UINT32 tafifo_buff[32];
-static int tafifo_pos, tafifo_mask, tafifo_vertexwords, tafifo_listtype;
-static int start_render_received;
-static int alloc_ctrl_OPB_Mode, alloc_ctrl_PT_OPB, alloc_ctrl_TM_OPB, alloc_ctrl_T_OPB, alloc_ctrl_ZM_OPB, alloc_ctrl_O_OPB;
 
 static emu_timer *vbout_timer;
 
-static struct testsprites
-{
-	int positionx, positiony;
-	int sizex, sizey;
-	UINT32 textureaddress;
-	float u, v, du, dv;
-	int texturemode;
-	int texturesizex, texturesizey, texturesizes, texturepf;
-} showsprites[2048];
+typedef struct {
+	int tafifo_pos, tafifo_mask, tafifo_vertexwords, tafifo_listtype;
+	int start_render_received;
+	int listtype_used;
+	int alloc_ctrl_OPB_Mode, alloc_ctrl_PT_OPB, alloc_ctrl_TM_OPB, alloc_ctrl_T_OPB, alloc_ctrl_OM_OPB, alloc_ctrl_O_OPB;
+	struct testsprites
+	{
+		int positionx, positiony;
+		int sizex, sizey;
+		UINT32 textureaddress;
+		float u, v, du, dv;
+		int texturemode;
+		int texturesizex, texturesizey, texturesizes, texturepf, texturepalette;
+	} showsprites[2048];
+#if DEBUG_VERTICES
+	struct testvertices
+	{
+		int x;
+		int y;
+		int endofstrip;
+	} showvertices[65536];
+#endif
+	int testsprites_size, toerasesprites, testvertices_size;
+	UINT32 paracontrol,paratype,endofstrip,listtype,global_paratype,parameterconfig;
+	UINT32 groupcontrol,groupen,striplen,userclip;
+	UINT32 objcontrol,shadow,volume,coltype,texture,offfset,gouraud,uv16bit;
+	UINT32 textureusize,texturevsize,texturesizes,textureaddress,scanorder,pixelformat;
+	UINT32 srcalphainstr,dstalphainstr,srcselect,dstselect,fogcontrol,colorclamp,usealpha;
+	UINT32 ignoretexalpha,flipuv,clampuv,filtermode,sstexture,mmdadjust,tsinstruction;
+	UINT32 depthcomparemode,cullingmode,zwritedisable,cachebypass,dcalcctrl,volumeinstruction,mipmapped,vqcompressed,strideselect,paletteselector;
+} pvrta_state;
 
-static int testsprites_size, toerasesprites;
-static UINT32 dilated0[11][1024];
-static UINT32 dilated1[11][1024];
-static int dilatechose[64];
+pvrta_state state_ta;
 
 // register decode helper
 INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
@@ -133,14 +153,15 @@ WRITE64_HANDLER( pvr_ta_w )
 			#if DEBUG_PVRTA
 			mame_printf_verbose("pvr_ta_w:  TA soft reset\n");
 			#endif
+			state_ta.listtype_used=0;
 		}
 		if (dat & 2)
 		{
 			#if DEBUG_PVRTA
 			mame_printf_verbose("pvr_ta_w:  Core Pipeline soft reset\n");
 			#endif
-			if (start_render_received == 1)
-				start_render_received = 0;
+			if (state_ta.start_render_received == 1)
+				state_ta.start_render_received = 0;
 		}
 		if (dat & 4)
 		{
@@ -155,22 +176,14 @@ WRITE64_HANDLER( pvr_ta_w )
 		mame_printf_verbose("  Region Array at %08x\n",pvrta_regs[REGION_BASE]);
 		mame_printf_verbose("  ISP/TSP Parameters at %08x\n",pvrta_regs[PARAM_BASE]);
 		#endif
-		start_render_received=1;
-		break;
-	case TA_ALLOC_CTRL:
-		alloc_ctrl_OPB_Mode = dat & 0x100000; // 0 up 1 down
-		alloc_ctrl_PT_OPB = (4 << ((dat >> 16) & 3)) & 0x38; // number of 32 bit words (0,8,16,32)
-		alloc_ctrl_TM_OPB = (4 << ((dat >> 12) & 3)) & 0x38;
-		alloc_ctrl_T_OPB = (4 << ((dat >> 8) & 3)) & 0x38;
-		alloc_ctrl_ZM_OPB = (4 << ((dat >> 4) & 3)) & 0x38;
-		alloc_ctrl_O_OPB = (4 << ((dat >> 0) & 3)) & 0x38;
+		state_ta.start_render_received=1;
 		break;
 	case TA_LIST_INIT:
-		tafifo_pos=0;
-		tafifo_mask=7;
-		tafifo_vertexwords=8;
-		tafifo_listtype= -1;
-		toerasesprites=1;
+		state_ta.tafifo_pos=0;
+		state_ta.tafifo_mask=7;
+		state_ta.tafifo_vertexwords=8;
+		state_ta.tafifo_listtype= -1;
+		state_ta.toerasesprites=1;
 	#if DEBUG_PVRTA
 		mame_printf_verbose("TA_OL_BASE       %08x TA_OL_LIMIT  %08x\n", pvrta_regs[TA_OL_BASE], pvrta_regs[TA_OL_LIMIT]);
 		mame_printf_verbose("TA_ISP_BASE      %08x TA_ISP_LIMIT %08x\n", pvrta_regs[TA_ISP_BASE], pvrta_regs[TA_ISP_LIMIT]);
@@ -179,6 +192,20 @@ WRITE64_HANDLER( pvr_ta_w )
 	#endif
 		pvrta_regs[TA_NEXT_OPB] = pvrta_regs[TA_NEXT_OPB_INIT];
 		pvrta_regs[TA_ITP_CURRENT] = pvrta_regs[TA_ISP_BASE];
+		state_ta.alloc_ctrl_OPB_Mode = pvrta_regs[TA_ALLOC_CTRL] & 0x100000; // 0 up 1 down
+		state_ta.alloc_ctrl_PT_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 16) & 3)) & 0x38; // number of 32 bit words (0,8,16,32)
+		state_ta.alloc_ctrl_TM_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 12) & 3)) & 0x38;
+		state_ta.alloc_ctrl_T_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 8) & 3)) & 0x38;
+		state_ta.alloc_ctrl_OM_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 4) & 3)) & 0x38;
+		state_ta.alloc_ctrl_O_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 0) & 3)) & 0x38;
+		state_ta.listtype_used |= (1+4);
+		break;
+	case TA_LIST_CONT:
+	#if DEBUG_PVRTA
+		mame_printf_verbose("List continuation processing\n");
+	#endif
+		state_ta.tafifo_listtype= -1; // no list being received
+		state_ta.listtype_used |= (1+4);
 		break;
 	}
 
@@ -190,32 +217,25 @@ WRITE64_HANDLER( pvr_ta_w )
 WRITE64_HANDLER( ta_fifo_poly_w )
 {
 	UINT32 a;
-	static UINT32 paracontrol,paratype,endofstrip,listtype,global_paratype,parameterconfig;
-	static UINT32 groupcontrol,groupen,striplen,userclip;
-	static UINT32 objcontrol,shadow,volume,coltype,texture,offfset,gouraud,uv16bit;
-	static UINT32 textureusize,texturevsize,texturesizes,textureaddress,scanorder,pixelformat;
-	static UINT32 srcalphainstr,dstalphainstr,srcselect,dstselect,fogcontrol,colorclamp,usealpha;
-	static UINT32 ignoretexalpha,flipuv,clampuv,filtermode,sstexture,mmdadjust,tsinstruction;
-	static UINT32 depthcomparemode,cullingmode,zwritedisable,cachebypass,dcalcctrl,volumeinstruction,mipmapped,vqcompressed,strideselect;
 
 	if (mem_mask == U64(0xffffffffffffffff)) 	// 64 bit
 	{
-		tafifo_buff[tafifo_pos]=(UINT32)data;
-		tafifo_buff[tafifo_pos+1]=(UINT32)(data >> 32);
+		tafifo_buff[state_ta.tafifo_pos]=(UINT32)data;
+		tafifo_buff[state_ta.tafifo_pos+1]=(UINT32)(data >> 32);
 		#if DEBUG_FIFO_POLY
 		mame_printf_debug("ta_fifo_poly_w:  Unmapped write64 %08x = %llx -> %08x %08x\n", 0x10000000+offset*8, data, tafifo_buff[tafifo_pos], tafifo_buff[tafifo_pos+1]);
 		#endif
-		tafifo_pos += 2;
+		state_ta.tafifo_pos += 2;
 	}
 	else
 	{
 		mame_printf_debug("ta_fifo_poly_w:  Only 64 bit writes supported!\n");
 	}
 
-	tafifo_pos &= tafifo_mask;
-	if (tafifo_pos == 0)
+	state_ta.tafifo_pos &= state_ta.tafifo_mask;
+	if (state_ta.tafifo_pos == 0)
 	{
-		paracontrol=(tafifo_buff[0] >> 24) & 0xff;
+		state_ta.paracontrol=(tafifo_buff[0] >> 24) & 0xff;
 		// 0 end of list
 		// 1 user tile clip
 		// 2 object list set
@@ -224,68 +244,74 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 		// 5 sprite
 		// 6 reserved
 		// 7 vertex
-		paratype=(paracontrol >> 5) & 7;
-		endofstrip=(paracontrol >> 4) & 1;
-		listtype=(paracontrol >> 0) & 7;
-		if ((paratype >= 4) && (paratype <= 6))
+		state_ta.paratype=(state_ta.paracontrol >> 5) & 7;
+		state_ta.endofstrip=(state_ta.paracontrol >> 4) & 1;
+		state_ta.listtype=(state_ta.paracontrol >> 0) & 7;
+		if ((state_ta.paratype >= 4) && (state_ta.paratype <= 6))
 		{
-			global_paratype = paratype;
-			groupcontrol=(tafifo_buff[0] >> 16) & 0xff;
-			groupen=(groupcontrol >> 7) & 1;
-			striplen=(groupcontrol >> 2) & 3;
-			userclip=(groupcontrol >> 0) & 3;
-			objcontrol=(tafifo_buff[0] >> 0) & 0xffff;
-			shadow=(objcontrol >> 7) & 1;
-			volume=(objcontrol >> 6) & 1;
-			coltype=(objcontrol >> 4) & 3;
-			texture=(objcontrol >> 3) & 1;
-			offfset=(objcontrol >> 2) & 1;
-			gouraud=(objcontrol >> 1) & 1;
-			uv16bit=(objcontrol >> 0) & 1;
+			state_ta.global_paratype = state_ta.paratype;
+			state_ta.groupcontrol=(tafifo_buff[0] >> 16) & 0xff;
+			state_ta.groupen=(state_ta.groupcontrol >> 7) & 1;
+			state_ta.striplen=(state_ta.groupcontrol >> 2) & 3;
+			state_ta.userclip=(state_ta.groupcontrol >> 0) & 3;
+			state_ta.objcontrol=(tafifo_buff[0] >> 0) & 0xffff;
+			state_ta.shadow=(state_ta.objcontrol >> 7) & 1;
+			state_ta.volume=(state_ta.objcontrol >> 6) & 1;
+			state_ta.coltype=(state_ta.objcontrol >> 4) & 3;
+			state_ta.texture=(state_ta.objcontrol >> 3) & 1;
+			state_ta.offfset=(state_ta.objcontrol >> 2) & 1;
+			state_ta.gouraud=(state_ta.objcontrol >> 1) & 1;
+			state_ta.uv16bit=(state_ta.objcontrol >> 0) & 1;
 		}
 
-		if (toerasesprites == 1)
+		if (state_ta.toerasesprites == 1)
 		{
-			toerasesprites=0;
-			testsprites_size=0;
+			state_ta.toerasesprites=0;
+			state_ta.testsprites_size=0;
+#if DEBUG_VERTICES
+			state_ta.testvertices_size=0;
+#endif
 		}
 
 		// check if we need 8 words more
-		if (tafifo_mask == 7)
+		if (state_ta.tafifo_mask == 7)
 		{
-			parameterconfig = pvr_parameterconfig[objcontrol & 0x3d];
+			state_ta.parameterconfig = pvr_parameterconfig[state_ta.objcontrol & 0x3d];
 			// decide number of words per vertex
-			if (paratype == 7)
+			if (state_ta.paratype == 7)
 			{
-				if ((global_paratype == 5) || (tafifo_listtype == 1) || (tafifo_listtype == 3))
-					tafifo_vertexwords = 16;
-				if (tafifo_vertexwords == 16)
+				if ((state_ta.global_paratype == 5) || (state_ta.tafifo_listtype == 1) || (state_ta.tafifo_listtype == 3))
+					state_ta.tafifo_vertexwords = 16;
+				if (state_ta.tafifo_vertexwords == 16)
 				{
-					tafifo_mask = 15;
-					tafifo_pos = 8;
+					state_ta.tafifo_mask = 15;
+					state_ta.tafifo_pos = 8;
 					return;
 				}
 			}
-			tafifo_vertexwords=pvr_wordsvertex[parameterconfig];
-			if ((paratype == 4) && ((listtype != 1) && (listtype != 3)))
-				if (pvr_wordspolygon[parameterconfig] == 16)
+			state_ta.tafifo_vertexwords=pvr_wordsvertex[state_ta.parameterconfig];
+			if ((state_ta.paratype == 4) && ((state_ta.listtype != 1) && (state_ta.listtype != 3)))
+				if (pvr_wordspolygon[state_ta.parameterconfig] == 16)
 				{
-					tafifo_mask = 15;
-					tafifo_pos = 8;
+					state_ta.tafifo_mask = 15;
+					state_ta.tafifo_pos = 8;
 					return;
 				}
 		}
 		else
 		{
-			tafifo_mask = 7;
+			state_ta.tafifo_mask = 7;
 		}
 
 		// now we heve all the needed words
 		// interpret their meaning
-		if (paratype == 0)
+		if (state_ta.paratype == 0)
 		{ // end of list
+			#if DEBUG_PVRDLIST
+			mame_printf_verbose("Para Type 0 End of List\n");
+			#endif
 			a=0; // 6-10 0-3
-			switch (tafifo_listtype)
+			switch (state_ta.tafifo_listtype)
 			{
 			case 0:
 				a = 1 << 7;
@@ -305,23 +331,24 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 			}
 			dc_sysctrl_regs[SB_ISTNRM] |= a;
 			update_interrupt_status();
-			tafifo_listtype= -1; // no list being received
+			state_ta.tafifo_listtype= -1; // no list being received
+			state_ta.listtype_used |= (2+8);
 		}
-		else if (paratype == 1)
+		else if (state_ta.paratype == 1)
 		{
 			#if DEBUG_PVRDLIST
 			mame_printf_verbose("Para Type 1 User Tile Clip\n");
 			mame_printf_verbose(" (%d , %d)-(%d , %d)\n", tafifo_buff[4], tafifo_buff[5], tafifo_buff[6], tafifo_buff[7]);
 			#endif
 		}
-		else if (paratype == 2)
+		else if (state_ta.paratype == 2)
 		{
 			#if DEBUG_PVRDLIST
 			mame_printf_verbose("Para Type 2 Object List Set at %08x\n", tafifo_buff[1]);
 			mame_printf_verbose(" (%d , %d)-(%d , %d)\n", tafifo_buff[4], tafifo_buff[5], tafifo_buff[6], tafifo_buff[7]);
 			#endif
 		}
-		else if (paratype == 3)
+		else if (state_ta.paratype == 3)
 		{
 			#if DEBUG_PVRDLIST
 			mame_printf_verbose("Para Type %x Unknown!\n", tafifo_buff[0]);
@@ -330,126 +357,149 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 		else
 		{
 			#if DEBUG_PVRDLIST
-			mame_printf_verbose("Para Type %d End of Strip %d List Type %d\n", paratype, endofstrip, listtype);
+			mame_printf_verbose("Para Type %d End of Strip %d", state_ta.paratype, state_ta.endofstrip);
+			if (state_ta.listtype_used & 3)
+				mame_printf_verbose(" List Type %d", state_ta.listtype);
+			mame_printf_verbose("\n");
 			#endif
 
 			// set type of list currently being recieved
-			if ((paratype == 4) || (paratype == 5) || (paratype == 6))
+			if ((state_ta.paratype == 4) || (state_ta.paratype == 5) || (state_ta.paratype == 6))
 			{
-				if (tafifo_listtype < 0)
+				if (state_ta.tafifo_listtype < 0)
 				{
-					tafifo_listtype = listtype;
+					state_ta.tafifo_listtype = state_ta.listtype;
 				}
 			}
+			state_ta.listtype_used = state_ta.listtype_used ^ (state_ta.listtype_used & 3);
 
-			if ((paratype == 4) || (paratype == 5))
+			if ((state_ta.paratype == 4) || (state_ta.paratype == 5))
 			{ // quad or polygon
-				depthcomparemode=(tafifo_buff[1] >> 29) & 7;
-				cullingmode=(tafifo_buff[1] >> 27) & 3;
-				zwritedisable=(tafifo_buff[1] >> 26) & 1;
-				cachebypass=(tafifo_buff[1] >> 21) & 1;
-				dcalcctrl=(tafifo_buff[1] >> 20) & 1;
-				volumeinstruction=(tafifo_buff[1] >> 29) & 7;
-				textureusize=1 << (3+((tafifo_buff[2] >> 3) & 7));
-				texturevsize=1 << (3+(tafifo_buff[2] & 7));
-				texturesizes=tafifo_buff[2] & 0x3f;
-				srcalphainstr=(tafifo_buff[2] >> 29) & 7;
-				dstalphainstr=(tafifo_buff[2] >> 26) & 7;
-				srcselect=(tafifo_buff[2] >> 25) & 1;
-				dstselect=(tafifo_buff[2] >> 24) & 1;
-				fogcontrol=(tafifo_buff[2] >> 22) & 3;
-				colorclamp=(tafifo_buff[2] >> 21) & 1;
-				usealpha=(tafifo_buff[2] >> 20) & 1;
-				ignoretexalpha=(tafifo_buff[2] >> 19) & 1;
-				flipuv=(tafifo_buff[2] >> 17) & 3;
-				clampuv=(tafifo_buff[2] >> 15) & 3;
-				filtermode=(tafifo_buff[2] >> 13) & 3;
-				sstexture=(tafifo_buff[2] >> 12) & 1;
-				mmdadjust=(tafifo_buff[2] >> 8) & 1;
-				tsinstruction=(tafifo_buff[2] >> 6) & 3;
-				if (texture == 1)
+				state_ta.depthcomparemode=(tafifo_buff[1] >> 29) & 7;
+				state_ta.cullingmode=(tafifo_buff[1] >> 27) & 3;
+				state_ta.zwritedisable=(tafifo_buff[1] >> 26) & 1;
+				state_ta.cachebypass=(tafifo_buff[1] >> 21) & 1;
+				state_ta.dcalcctrl=(tafifo_buff[1] >> 20) & 1;
+				state_ta.volumeinstruction=(tafifo_buff[1] >> 29) & 7;
+				state_ta.textureusize=1 << (3+((tafifo_buff[2] >> 3) & 7));
+				state_ta.texturevsize=1 << (3+(tafifo_buff[2] & 7));
+				state_ta.texturesizes=tafifo_buff[2] & 0x3f;
+				state_ta.srcalphainstr=(tafifo_buff[2] >> 29) & 7;
+				state_ta.dstalphainstr=(tafifo_buff[2] >> 26) & 7;
+				state_ta.srcselect=(tafifo_buff[2] >> 25) & 1;
+				state_ta.dstselect=(tafifo_buff[2] >> 24) & 1;
+				state_ta.fogcontrol=(tafifo_buff[2] >> 22) & 3;
+				state_ta.colorclamp=(tafifo_buff[2] >> 21) & 1;
+				state_ta.usealpha=(tafifo_buff[2] >> 20) & 1;
+				state_ta.ignoretexalpha=(tafifo_buff[2] >> 19) & 1;
+				state_ta.flipuv=(tafifo_buff[2] >> 17) & 3;
+				state_ta.clampuv=(tafifo_buff[2] >> 15) & 3;
+				state_ta.filtermode=(tafifo_buff[2] >> 13) & 3;
+				state_ta.sstexture=(tafifo_buff[2] >> 12) & 1;
+				state_ta.mmdadjust=(tafifo_buff[2] >> 8) & 1;
+				state_ta.tsinstruction=(tafifo_buff[2] >> 6) & 3;
+				if (state_ta.texture == 1)
 				{
-					textureaddress=(tafifo_buff[3] & 0x1FFFFF) << 3;
-					scanorder=(tafifo_buff[3] >> 26) & 1;
-					pixelformat=(tafifo_buff[3] >> 27) & 7;
-					mipmapped=(tafifo_buff[3] >> 31) & 1;
-					vqcompressed=(tafifo_buff[3] >> 30) & 1;
-					strideselect=(tafifo_buff[3] >> 25) & 1;
+					state_ta.textureaddress=(tafifo_buff[3] & 0x1FFFFF) << 3;
+					state_ta.scanorder=(tafifo_buff[3] >> 26) & 1;
+					state_ta.pixelformat=(tafifo_buff[3] >> 27) & 7;
+					state_ta.mipmapped=(tafifo_buff[3] >> 31) & 1;
+					state_ta.vqcompressed=(tafifo_buff[3] >> 30) & 1;
+					state_ta.strideselect=(tafifo_buff[3] >> 25) & 1;
+					state_ta.paletteselector=(tafifo_buff[3] >> 21) & 0x3F;
 					#if DEBUG_PVRDLIST
-					mame_printf_verbose(" Texture %d x %d at %08x format %d\n", textureusize, texturevsize, (tafifo_buff[3] & 0x1FFFFF) << 3, pixelformat);
+					mame_printf_verbose(" Texture %d x %d at %08x format %d\n", state_ta.textureusize, state_ta.texturevsize, (tafifo_buff[3] & 0x1FFFFF) << 3, state_ta.pixelformat);
 					#endif
 				}
-				if (paratype == 4)
-				{
+				if (state_ta.paratype == 4)
+				{ // polygon or mv
+					if ((state_ta.tafifo_listtype == 1) || (state_ta.tafifo_listtype == 3))
+					{
+					#if DEBUG_PVRDLIST
+						mame_printf_verbose(" Modifier Volume\n");
+					#endif
+					}
+					else
+					{
+					#if DEBUG_PVRDLIST
+						mame_printf_verbose(" Polygon\n");
+					#endif
+					}
+				}
+				if (state_ta.paratype == 5)
+				{ // quad
 					#if DEBUG_PVRDLIST
 					mame_printf_verbose(" Sprite\n");
 					#endif
 				}
-				if (paratype == 5)
-				{
-					#if DEBUG_PVRDLIST
-					mame_printf_verbose(" Polygon\n");
-					#endif
-				}
 			}
 
-			if (paratype == 7)
+			if (state_ta.paratype == 7)
 			{ // vertex
-				if (global_paratype == 5)
-				{
-					#if DEBUG_PVRDLIST
-					mame_printf_verbose(" Vertex sprite");
-					for (a=1; a <= 11; a++)
-					{
-						mame_printf_verbose(" %f", u2f(tafifo_buff[a]));
-					}
-					mame_printf_verbose("\n");
-					#endif
-					if (texture == 1)
-					{
-						#if DEBUG_PVRDLIST
-						mame_printf_verbose(" %f %f %f %f %f %f\n",u2f(tafifo_buff[13] & 0xffff0000),u2f((tafifo_buff[13] & 0xffff) << 16),u2f(tafifo_buff[14] & 0xffff0000),u2f((tafifo_buff[14] & 0xffff) << 16),u2f(tafifo_buff[15] & 0xffff0000),u2f((tafifo_buff[15] & 0xffff) << 16));
-						#endif
-/* test video start */
-						showsprites[testsprites_size].positionx=u2f(tafifo_buff[1]);
-						showsprites[testsprites_size].positiony=u2f(tafifo_buff[2]);
-						showsprites[testsprites_size].sizex=u2f(tafifo_buff[4])-u2f(tafifo_buff[1]);
-						showsprites[testsprites_size].sizey=u2f(tafifo_buff[8])-u2f(tafifo_buff[2]);
-						showsprites[testsprites_size].u=u2f(tafifo_buff[13] & 0xffff0000);
-						showsprites[testsprites_size].v=u2f((tafifo_buff[13] & 0xffff) << 16);
-						showsprites[testsprites_size].du=u2f(tafifo_buff[14] & 0xffff0000)-showsprites[testsprites_size].u;
-						showsprites[testsprites_size].dv=u2f((tafifo_buff[15] & 0xffff) << 16)-showsprites[testsprites_size].v;
-						showsprites[testsprites_size].textureaddress=textureaddress;
-						showsprites[testsprites_size].texturesizex=textureusize;
-						showsprites[testsprites_size].texturesizey=texturevsize;
-						showsprites[testsprites_size].texturemode=scanorder+vqcompressed*2;
-						showsprites[testsprites_size].texturesizes=texturesizes;
-						showsprites[testsprites_size].texturepf=pixelformat;
-						testsprites_size=testsprites_size+1;
-/* test video end */
-					}
-				}
-				if ((tafifo_listtype == 1) || (tafifo_listtype == 3))
+				if ((state_ta.tafifo_listtype == 1) || (state_ta.tafifo_listtype == 3))
 				{
 					#if DEBUG_PVRDLIST
 					mame_printf_verbose(" Vertex modifier volume");
-					for (a=1; a <= 11; a++)
-					{
-						mame_printf_verbose(" %f", u2f(tafifo_buff[a]));
-					}
+					mame_printf_verbose(" A(%f,%f,%f) B(%f,%f,%f) C(%f,%f,%f)", u2f(tafifo_buff[1]), u2f(tafifo_buff[2]),
+						u2f(tafifo_buff[3]), u2f(tafifo_buff[4]), u2f(tafifo_buff[5]), u2f(tafifo_buff[6]), u2f(tafifo_buff[7]),
+						u2f(tafifo_buff[8]), u2f(tafifo_buff[9]));
 					mame_printf_verbose("\n");
 					#endif
+				} 
+				else if (state_ta.global_paratype == 5)
+				{
+					#if DEBUG_PVRDLIST
+					mame_printf_verbose(" Vertex sprite");
+					mame_printf_verbose(" A(%f,%f,%f) B(%f,%f,%f) C(%f,%f,%f) D(%f,%f,)", u2f(tafifo_buff[1]), u2f(tafifo_buff[2]),
+						u2f(tafifo_buff[3]), u2f(tafifo_buff[4]), u2f(tafifo_buff[5]), u2f(tafifo_buff[6]), u2f(tafifo_buff[7]),
+						u2f(tafifo_buff[8]), u2f(tafifo_buff[9]), u2f(tafifo_buff[10]), u2f(tafifo_buff[11]));
+					mame_printf_verbose("\n");
+					#endif
+					if (state_ta.texture == 1)
+					{
+						#if DEBUG_PVRDLIST
+						mame_printf_verbose(" A(%f,%f) B(%f,%f) C(%f,%f)\n",u2f(tafifo_buff[13] & 0xffff0000),u2f((tafifo_buff[13] & 0xffff) << 16),u2f(tafifo_buff[14] & 0xffff0000),u2f((tafifo_buff[14] & 0xffff) << 16),u2f(tafifo_buff[15] & 0xffff0000),u2f((tafifo_buff[15] & 0xffff) << 16));
+						#endif
+/* test video start */
+						state_ta.showsprites[state_ta.testsprites_size].positionx=u2f(tafifo_buff[1]);
+						state_ta.showsprites[state_ta.testsprites_size].positiony=u2f(tafifo_buff[2]);
+						state_ta.showsprites[state_ta.testsprites_size].sizex=u2f(tafifo_buff[4])-u2f(tafifo_buff[1]);
+						state_ta.showsprites[state_ta.testsprites_size].sizey=u2f(tafifo_buff[8])-u2f(tafifo_buff[2]);
+						state_ta.showsprites[state_ta.testsprites_size].u=u2f(tafifo_buff[13] & 0xffff0000);
+						state_ta.showsprites[state_ta.testsprites_size].v=u2f((tafifo_buff[13] & 0xffff) << 16);
+						state_ta.showsprites[state_ta.testsprites_size].du=u2f(tafifo_buff[14] & 0xffff0000)-state_ta.showsprites[state_ta.testsprites_size].u;
+						state_ta.showsprites[state_ta.testsprites_size].dv=u2f((tafifo_buff[15] & 0xffff) << 16)-state_ta.showsprites[state_ta.testsprites_size].v;
+						state_ta.showsprites[state_ta.testsprites_size].textureaddress=state_ta.textureaddress;
+						state_ta.showsprites[state_ta.testsprites_size].texturesizex=state_ta.textureusize;
+						state_ta.showsprites[state_ta.testsprites_size].texturesizey=state_ta.texturevsize;
+						state_ta.showsprites[state_ta.testsprites_size].texturemode=state_ta.scanorder+state_ta.vqcompressed*2;
+						state_ta.showsprites[state_ta.testsprites_size].texturesizes=state_ta.texturesizes;
+						state_ta.showsprites[state_ta.testsprites_size].texturepf=state_ta.pixelformat;
+						state_ta.showsprites[state_ta.testsprites_size].texturepalette=state_ta.paletteselector;
+						state_ta.testsprites_size=state_ta.testsprites_size+1;
+/* test video end */
+					}
 				}
-				if (global_paratype == 4)
+				else if (state_ta.global_paratype == 4)
 				{
 					#if DEBUG_PVRDLIST
 					mame_printf_verbose(" Vertex polygon");
+					mame_printf_verbose(" V(%f,%f,%f)", u2f(tafifo_buff[1]), u2f(tafifo_buff[2]), u2f(tafifo_buff[3]));
 					mame_printf_verbose("\n");
 					#endif
+#if DEBUG_VERTICES
+					if (state_ta.testvertices_size < 65530)
+					{
+						state_ta.showvertices[state_ta.testvertices_size].x=u2f(tafifo_buff[1]);
+						state_ta.showvertices[state_ta.testvertices_size].y=u2f(tafifo_buff[2]);
+						state_ta.showvertices[state_ta.testvertices_size].endofstrip=state_ta.endofstrip;
+					}
+					state_ta.testvertices_size=state_ta.testvertices_size+1;
+#endif
 				}
 			}
 		}
-	} // if (tafifo_pos == 0)
+	} // if (state_ta.tafifo_pos == 0)
 }
 
 WRITE64_HANDLER( ta_fifo_yuv_w )
@@ -501,7 +551,7 @@ static void computedilated(void)
 {
 	int a,b;
 
-	for (b=0;b <= 10;b++)
+	for (b=0;b <= 14;b++)
 		for (a=0;a < 1024;a++) {
 			dilated0[b][a]=dilate0(a,b);
 			dilated1[b][a]=dilate1(a,b);
@@ -511,71 +561,176 @@ static void computedilated(void)
 			dilatechose[(b << 3) + a]=3+(a < b ? a : b);
 }
 
+#if DEBUG_VERTICES
+static void testdrawline(bitmap_t *bitmap,int from,int to)
+{
+}
+#endif
+
 static void testdrawscreen(bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int cs,x,y,dx,dy,xi,yi,a;
 	float iu,iv,u,v;
 	UINT32 addrp;
 	UINT32 *bmpaddr;
-	int c,xt,yt,cd;
+	int xt,yt,cd;
+	UINT32 c;
 
-	fillbitmap(bitmap,program_read_dword_64le(0x05000000+6*4),cliprect);
-	for (cs=0;cs < testsprites_size;cs++)
+	c=pvrta_regs[ISP_BACKGND_T];
+	fillbitmap(bitmap,program_read_dword_64le(0x05000000+((c&0xfffff8)>>1)+(3+3)*4),cliprect);
+
+	for (cs=0;cs < state_ta.testsprites_size;cs++)
 	{
-		dx=showsprites[cs].sizex;
-		dy=showsprites[cs].sizey;
-		iu=showsprites[cs].du/dx;
-		iv=showsprites[cs].dv/dy;
-		cd=dilatechose[showsprites[cs].texturesizes];
+		dx=state_ta.showsprites[cs].sizex;
+		dy=state_ta.showsprites[cs].sizey;
+		iu=state_ta.showsprites[cs].du/dx;
+		iv=state_ta.showsprites[cs].dv/dy;
+		cd=dilatechose[state_ta.showsprites[cs].texturesizes];
 
-		if ((showsprites[cs].positionx+dx) > 640)
-			dx=640-showsprites[cs].positionx;
-		if ((showsprites[cs].positiony+dy) > 480)
-			dy=480-showsprites[cs].positiony;
+		if ((state_ta.showsprites[cs].positionx+dx) > 640)
+			dx=640-state_ta.showsprites[cs].positionx;
+		if ((state_ta.showsprites[cs].positiony+dy) > 480)
+			dy=480-state_ta.showsprites[cs].positiony;
 		xi=0;
 		yi=0;
 
-		if (showsprites[cs].positionx < 0)
-			xi=-showsprites[cs].positionx;
-		if (showsprites[cs].positiony < 0)
-			yi=-showsprites[cs].positiony;
+		if (state_ta.showsprites[cs].positionx < 0)
+			xi=-state_ta.showsprites[cs].positionx;
+		if (state_ta.showsprites[cs].positiony < 0)
+			yi=-state_ta.showsprites[cs].positiony;
 
 		for (y = yi;y < dy;y++)
 		{
 			for (x = xi;x < dx;x++)
 			{
-				u=showsprites[cs].u+iu*x;
-				v=showsprites[cs].v+iv*y;
-				yt=v*(showsprites[cs].texturesizey-1);
-				xt=u*(showsprites[cs].texturesizex-1);
+				// find the coordinates
+				u=state_ta.showsprites[cs].u+iu*x;
+				v=state_ta.showsprites[cs].v+iv*y;
+				yt=v*(state_ta.showsprites[cs].texturesizey-1);
+				xt=u*(state_ta.showsprites[cs].texturesizex-1);
 
-				if (showsprites[cs].texturemode == 1)
-					addrp=showsprites[cs].textureaddress+(showsprites[cs].texturesizex*yt+xt)*2;
-				else if (showsprites[cs].texturemode == 0)
-					addrp=showsprites[cs].textureaddress+(dilated1[cd][xt] + dilated0[cd][yt])*2;
-				else
+				switch (state_ta.showsprites[cs].texturepf)
 				{
-					c=0x800+(dilated1[cd][xt >> 1] + dilated0[cd][yt >> 1]);
-					c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(showsprites[cs].textureaddress+c));
-					addrp=showsprites[cs].textureaddress+c*8+(dilated1[cd][xt & 1] + dilated0[cd][yt & 1])*2;
-				}
-
-				c=*(((UINT16 *)dc_texture_ram) + (WORD2_XOR_LE(addrp) >> 1));
-				if (showsprites[cs].texturepf == 2)
-				{
-					a=(c & 0xf000) >> 8;
-					bmpaddr=BITMAP_ADDR32(bitmap,showsprites[cs].positiony+y,showsprites[cs].positionx+x);
-					*bmpaddr = alpha_blend_r32(*bmpaddr, MAKE_RGB((c&0xf00) >> 4, c&0xf0, (c&0xf) << 4), a);
-				}
-				else
-				{
-					a=(c & 0x7000) >> 7;
-					bmpaddr=BITMAP_ADDR32(bitmap,showsprites[cs].positiony+y,showsprites[cs].positionx+x);
+				case 0: // 1555
+					// find the address
+					if (state_ta.showsprites[cs].texturemode == 1)
+						addrp=state_ta.showsprites[cs].textureaddress+(state_ta.showsprites[cs].texturesizex*yt+xt)*2;
+					else if (state_ta.showsprites[cs].texturemode == 0) // twiddled
+						addrp=state_ta.showsprites[cs].textureaddress+(dilated1[cd][xt] + dilated0[cd][yt])*2;
+					else // vq-compressed
+					{
+						c=0x800+(dilated1[cd][xt >> 1] + dilated0[cd][yt >> 1]);
+						c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(state_ta.showsprites[cs].textureaddress+c));
+						addrp=state_ta.showsprites[cs].textureaddress+c*8+(dilated1[cd][xt & 1] + dilated0[cd][yt & 1])*2;
+					}
+					// read datum
+					c=*(((UINT16 *)dc_texture_ram) + (WORD2_XOR_LE(addrp) >> 1));
+					// find the color and draw
+					a=(((c & 0x8000) >> 8)*255)/0x80;
+					bmpaddr=BITMAP_ADDR32(bitmap,state_ta.showsprites[cs].positiony+y,state_ta.showsprites[cs].positionx+x);
 					*bmpaddr = alpha_blend_r32(*bmpaddr, MAKE_RGB((c&0x7c00) >> 7, (c&0x3e0) >> 2, (c&0x1f) << 3), a);
+					break;
+				case 1: // 565
+					// find the address
+					if (state_ta.showsprites[cs].texturemode == 1)
+						addrp=state_ta.showsprites[cs].textureaddress+(state_ta.showsprites[cs].texturesizex*yt+xt)*2;
+					else if (state_ta.showsprites[cs].texturemode == 0) // twiddled
+						addrp=state_ta.showsprites[cs].textureaddress+(dilated1[cd][xt] + dilated0[cd][yt])*2;
+					else // vq-compressed
+					{
+						c=0x800+(dilated1[cd][xt >> 1] + dilated0[cd][yt >> 1]);
+						c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(state_ta.showsprites[cs].textureaddress+c));
+						addrp=state_ta.showsprites[cs].textureaddress+c*8+(dilated1[cd][xt & 1] + dilated0[cd][yt & 1])*2;
+					}
+					// read datum
+					c=*(((UINT16 *)dc_texture_ram) + (WORD2_XOR_LE(addrp) >> 1));
+					// find the color and draw
+					bmpaddr=BITMAP_ADDR32(bitmap,state_ta.showsprites[cs].positiony+y,state_ta.showsprites[cs].positionx+x);
+					*bmpaddr = alpha_blend_r32(*bmpaddr, MAKE_RGB((c&0xf800) >> 8, (c&0x7e0) >> 3, (c&0x1f) << 3), 255);
+					break;
+				case 2: // 4444
+					// find the address
+					if (state_ta.showsprites[cs].texturemode == 1)
+						addrp=state_ta.showsprites[cs].textureaddress+(state_ta.showsprites[cs].texturesizex*yt+xt)*2;
+					else if (state_ta.showsprites[cs].texturemode == 0) // twiddled
+						addrp=state_ta.showsprites[cs].textureaddress+(dilated1[cd][xt] + dilated0[cd][yt])*2;
+					else // vq-compressed
+					{
+						c=0x800+(dilated1[cd][xt >> 1] + dilated0[cd][yt >> 1]);
+						c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(state_ta.showsprites[cs].textureaddress+c));
+						addrp=state_ta.showsprites[cs].textureaddress+c*8+(dilated1[cd][xt & 1] + dilated0[cd][yt & 1])*2;
+					}
+					// read datum
+					c=*(((UINT16 *)dc_texture_ram) + (WORD2_XOR_LE(addrp) >> 1));
+					// find the color and draw
+					a=(((c & 0xf000) >> 8)*255)/0xf0;
+					bmpaddr=BITMAP_ADDR32(bitmap,state_ta.showsprites[cs].positiony+y,state_ta.showsprites[cs].positionx+x);
+					*bmpaddr = alpha_blend_r32(*bmpaddr, MAKE_RGB((c&0xf00) >> 4, c&0xf0, (c&0xf) << 4), a);
+					break;
+				case 3: // yuv422
+					break;
+				case 4: // bumpmap
+					break;
+				case 5: // 4 bpp palette
+					break;
+				case 6: // 8 bpp palette
+					if (state_ta.showsprites[cs].texturemode & 2) // vq-compressed
+					{
+						c=0x800+(dilated1[cd][xt >> 1] + dilated0[cd][yt >> 2]);
+						c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(state_ta.showsprites[cs].textureaddress+c));
+						addrp=state_ta.showsprites[cs].textureaddress+c*8+(dilated1[cd][xt & 1] + dilated0[cd][yt & 3]);
+					}
+					else
+					{
+						addrp=state_ta.showsprites[cs].textureaddress+(dilated1[cd][xt] + dilated0[cd][yt]);
+					}
+					c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(addrp));
+					c=((state_ta.showsprites[cs].texturepalette & 0x30) << 4) | c;
+					c=pvrta_regs[0x1000/4+c];
+					switch (pvrta_regs[PAL_RAM_CTRL])
+					{
+					case 0: // argb1555
+						a=(((c & 0x8000) >> 8)*255)/0x80;
+						bmpaddr=BITMAP_ADDR32(bitmap,state_ta.showsprites[cs].positiony+y,state_ta.showsprites[cs].positionx+x);
+						*bmpaddr = alpha_blend_r32(*bmpaddr, MAKE_RGB((c&0x7c00) >> 7, (c&0x3e0) >> 2, (c&0x1f) << 3), a);
+						break;
+					case 1: // rgb565
+						bmpaddr=BITMAP_ADDR32(bitmap,state_ta.showsprites[cs].positiony+y,state_ta.showsprites[cs].positionx+x);
+						*bmpaddr = alpha_blend_r32(*bmpaddr, MAKE_RGB((c&0xf800) >> 8, (c&0x7e0) >> 3, (c&0x1f) << 3), 255);
+						break;
+					case 2: // argb4444
+						a=(((c & 0xf000) >> 8)*255)/0xf0;
+						bmpaddr=BITMAP_ADDR32(bitmap,state_ta.showsprites[cs].positiony+y,state_ta.showsprites[cs].positionx+x);
+						*bmpaddr = alpha_blend_r32(*bmpaddr, MAKE_RGB((c&0xf00) >> 4, c&0xf0, (c&0xf) << 4), a);
+						break;
+					case 3: // argb8888
+						a=(c & 0xff000000) >> 24;
+						bmpaddr=BITMAP_ADDR32(bitmap,state_ta.showsprites[cs].positiony+y,state_ta.showsprites[cs].positionx+x);
+						*bmpaddr = alpha_blend_r32(*bmpaddr, MAKE_RGB((c&0xff0000) >> 16, (c&0xff00) >> 8, c&0xff), a);
+						break;
+					}
+					break;
+				case 7: // reserved
+					break;
 				}
 			}
 		}
 	}
+#if DEBUG_VERTICES
+	xi = yi = -1;
+	a = state_ta.testvertices_size;
+	if (a > 65535)
+		a = 65535;
+	for (cs=0;cs < a;cs++)
+	{
+		xi=yi;
+		yi=cs;
+		if (xi >= 0)
+			testdrawline(bitmap,xi,yi);  // draw a segment from vertex xi to vertex yi
+		if (state_ta.showvertices[cs].endofstrip == 1)
+			xi = yi = -1;
+	}
+#endif
 }
 /* test video end */
 
@@ -628,14 +783,15 @@ VIDEO_START(dc)
 	pvrta_regs[REVISION]=0x11;
 	pvrta_regs[VO_CONTROL]=0xC;
 	pvrta_regs[SOFTRESET]=0x7;
-	tafifo_pos=0;
-	tafifo_mask=7;
-	tafifo_vertexwords=8;
-	tafifo_listtype= -1;
-	start_render_received=0;
+	state_ta.tafifo_pos=0;
+	state_ta.tafifo_mask=7;
+	state_ta.tafifo_vertexwords=8;
+	state_ta.tafifo_listtype= -1;
+	state_ta.start_render_received=0;
 
-	testsprites_size=0;
-	toerasesprites=0;
+	state_ta.testsprites_size=0;
+	state_ta.toerasesprites=0;
+	state_ta.testvertices_size=0;
 	computedilated();
 
 	vbout_timer = timer_alloc(vbout, 0);
@@ -652,9 +808,9 @@ VIDEO_UPDATE(dc)
 
 	testdrawscreen(bitmap,cliprect);
 
-	if (start_render_received)
+	if (state_ta.start_render_received)
 	{
-		start_render_received=0;
+		state_ta.start_render_received=0;
 		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render
 		update_interrupt_status();
 	}
