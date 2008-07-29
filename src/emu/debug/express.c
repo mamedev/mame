@@ -562,7 +562,7 @@ static int parse_memory_operator(parsed_expression *expr, const char *buffer, to
 		case 'o':	*flags |= TIN_MEMORY_OPCODE;	break;
 		case 'r':	*flags |= TIN_MEMORY_RAMWRITE;	break;
 		case 'e':	*flags |= TIN_MEMORY_EEPROM;	break;
-		case 'g':	*flags |= TIN_MEMORY_REGION;	break;
+		case 'm':	*flags |= TIN_MEMORY_REGION;	break;
 		default:	return 0;
 	}
 
