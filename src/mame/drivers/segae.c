@@ -2345,14 +2345,14 @@ static DRIVER_INIT( opaopa )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	mc8123_decrypt_rom(machine, "main", "user1", 1, 8);
+	mc8123_decrypt_rom(machine, "z80", "user1", 1, 8);
 }
 
 static DRIVER_INIT( fantzn2 )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	mc8123_decrypt_rom(machine, "main", "user1", 0, 0);
+	mc8123_decrypt_rom(machine, "z80", "user1", 0, 0);
 }
 
 static DRIVER_INIT( astrofl )

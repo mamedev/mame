@@ -618,6 +618,7 @@ WRITE8_HANDLER ( genesis_z80_w )
 READ8_HANDLER ( genesis_z80_bank_r )
 {
 	int address = (z80_68000_latch) + (offset & 0x7fff);
+	const UINT8 *base = memory_region(machine, "sound");
 
 	if (!z80running) logerror("undead Z80->68000 read!\n");
 
@@ -626,7 +627,7 @@ READ8_HANDLER ( genesis_z80_bank_r )
 	logerror("z80 read from address %x\n", address);
 
 	/* Read the data out of the 68k ROM */
-	if (address < 0x400000) return memory_region(machine, "sound")[BYTE_XOR(address)];
+	if (base != NULL && address < 0x400000) return base[BYTE_XOR(address)];
 	/* else read the data out of the 68k RAM */
 //  else if (address > 0xff0000) return genesis_68k_ram[BYTE_XOR(offset)];
 

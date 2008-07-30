@@ -438,7 +438,10 @@ static MACHINE_RESET( bgaregga )
 	current_bank = 2;
 	memory_set_bankptr(1, &Z80[0x10000]);
 
-	NMK112_init(0, "oki1", "oki2");
+	if (memory_region(machine, "oki1") != NULL)
+		NMK112_init(0, "oki1", "oki2");
+	else
+		NMK112_init(0, "oki", "oki");
 	MACHINE_RESET_CALL(toaplan2);
 }
 

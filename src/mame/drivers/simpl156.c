@@ -479,7 +479,7 @@ static INTERRUPT_GEN( simpl156_vbl_interrupt )
 static MACHINE_DRIVER_START( chainrec )
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD("DE156", ARM, 28000000 /* /4 */)	/*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
+	MDRV_CPU_ADD("main", ARM, 28000000 /* /4 */)	/*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
 	MDRV_CPU_PROGRAM_MAP(chainrec_map,0)
 	MDRV_CPU_VBLANK_INT("main", simpl156_vbl_interrupt)
 
@@ -515,28 +515,28 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( magdrop )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(chainrec)
-	MDRV_CPU_MODIFY("DE156")
+	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(magdrop_map,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( magdropp )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(chainrec)
-	MDRV_CPU_MODIFY("DE156")
+	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(magdropp_map,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( joemacr )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(chainrec)
-	MDRV_CPU_MODIFY("DE156")
+	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(joemacr_map,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mitchell156 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(chainrec)
-	MDRV_CPU_MODIFY("DE156")
+	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(mitchell156_map,0)
 
 	MDRV_SOUND_REPLACE("OKIM6295_MUSIC", OKIM6295, 32220000/32)
@@ -612,7 +612,7 @@ All roms are socketted eproms, no labels, just a number in pencel.
 */
 
 ROM_START( joemacr )
-	ROM_REGION( 0x80000, "DE156", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x80000, "main", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "05.u29",    0x000000, 0x080000,  CRC(74e9a158) SHA1(eee447303ac0884e152b89f59a9694afade87336) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -649,7 +649,7 @@ DE-0491-1
 */
 
 ROM_START( joemacra )
-	ROM_REGION( 0x80000, "DE156", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x80000, "main", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "mw00",    0x000000, 0x080000,  CRC(e1b78f40) SHA1(e611c317ada5a049a5e05d69c051e22a43fa2845) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE ) // rebuilt with roms from other set
@@ -693,7 +693,7 @@ DE-0409-1
 */
 
 ROM_START( chainrec )
-	ROM_REGION( 0x80000, "DE156", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x80000, "main", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "e1",    0x000000, 0x080000, CRC(8a8340ef) SHA1(4aaee56127b73453b862ff2a33dc241eeabf5658) ) /* No DECO ID number on label */
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -737,7 +737,7 @@ DE-0409-1
 */
 
 ROM_START( magdrop )
-	ROM_REGION( 0x80000, "DE156", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x80000, "main", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "re00-2.e1",    0x000000, 0x080000,  CRC(7138f10f) SHA1(ca93c3c2dc9a7dd6901c8429a6bf6883076a9b8f) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -758,7 +758,7 @@ ROM_START( magdrop )
 ROM_END
 
 ROM_START( magdropp )
-	ROM_REGION( 0x80000, "DE156", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x80000, "main", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "rz00-1.e1",    0x000000, 0x080000,  CRC(28caf639) SHA1(a17e792c82e65009e21680094acf093c0c4f1021) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -821,7 +821,7 @@ maskrom 9a   27c160  labeled MBR-00
 */
 
 ROM_START( charlien )
-	ROM_REGION( 0x80000, "DE156", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x80000, "main", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "nd00-1.1e",    0x000000, 0x080000,  CRC(f18f4b23) SHA1(cb0c159b4dde3a3c5f295f270485996811e5e4d2) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -837,7 +837,7 @@ ROM_START( charlien )
 	ROM_REGION( 0x80000, "OKIM6295_EFFECTS", 0 ) /* Oki samples */
 	ROM_LOAD( "nd01-0.13h",    0x00000, 0x40000,  CRC(635a100a) SHA1(f6ec70890892e7557097ccd519de37247bb8c98d) )
 
-	ROM_REGION( 0x200000, "OKIM6295_MUSIC_SLOWER", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "OKIM6295_MUSIC", 0 ) /* samples? (banked?) */
 	ROM_LOAD( "mbr-02.12f",    0x00000, 0x100000, CRC(4f67d333) SHA1(608f921bfa6b7020c0ce72e5229b3f1489208b23) ) // 00, 01, 04, 05
 ROM_END
 
@@ -902,7 +902,7 @@ vz-02.8f
 */
 
 ROM_START( prtytime )
-	ROM_REGION( 0x80000, "DE156", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x80000, "main", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "pz_00-0.1e",    0x000000, 0x080000, CRC(ec715c87) SHA1(c9f28399d59b37977f31a5c67cb97af6c58947ae) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -920,12 +920,12 @@ ROM_START( prtytime )
 	ROM_REGION( 0x80000, "OKIM6295_EFFECTS", 0 ) /* Oki samples */
 	ROM_LOAD( "pz_01-0.13h",    0x00000, 0x40000,  CRC(8925bce2) SHA1(0ff2d5db7a24a2af30bd753eba274572c32cc2e7) )
 
-	ROM_REGION( 0x200000, "OKIM6295_MUSIC_SLOWER", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "OKIM6295_MUSIC", 0 ) /* samples? (banked?) */
 	ROM_LOAD( "mcb-04.12f",    0x00000, 0x200000, CRC(e23d3590) SHA1(dc8418edc525f56e84f26e9334d5576000b14e5f) )
 ROM_END
 
 ROM_START( gangonta )
-	ROM_REGION( 0x80000, "DE156", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x80000, "main", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "rd_00-0.1e",    0x000000, 0x080000, CRC(f80f43bb) SHA1(f9d26829eb90d41a6c410d4d673fe9595f814868) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -943,7 +943,7 @@ ROM_START( gangonta )
 	ROM_REGION( 0x80000, "OKIM6295_EFFECTS", 0 ) /* Oki samples */
 	ROM_LOAD( "rd_01-0.13h",    0x00000, 0x40000,  CRC(70fd18c6) SHA1(368cd8e10c5f5a13eb3813974a7e6b46a4fa6b6c) )
 
-	ROM_REGION( 0x200000, "OKIM6295_MUSIC_SLOWER", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "OKIM6295_MUSIC", 0 ) /* samples? (banked?) */
 	ROM_LOAD( "mcb-04.12f",    0x00000, 0x200000, CRC(e23d3590) SHA1(dc8418edc525f56e84f26e9334d5576000b14e5f) )
 ROM_END
 
@@ -987,7 +987,7 @@ MT5601-0
 */
 
 ROM_START( osman )
-	ROM_REGION( 0x80000, "DE156", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x80000, "main", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "sa00-0.1e",    0x000000, 0x080000, CRC(ec6b3257) SHA1(10a42a680ce122ab030eaa2ccd99d302cb77854e) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1005,14 +1005,14 @@ ROM_START( osman )
 	ROM_REGION( 0x80000, "OKIM6295_EFFECTS", 0 ) /* Oki samples */
 	ROM_LOAD( "sa01-0.13h",    0x00000, 0x40000,  CRC(cea8368e) SHA1(1fcc641381fdc29bd50d3a4b23e67647f79e505a))
 
-	ROM_REGION( 0x200000, "OKIM6295_MUSIC_SLOWER", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "OKIM6295_MUSIC", 0 ) /* samples? (banked?) */
 	ROM_LOAD( "mcf-05.12f",    0x00000, 0x200000, CRC(f007d376) SHA1(4ba20e5dabeacc3278b7f30c4462864cbe8f6984) )
 ROM_END
 
 /* NOTE: Cannon Dancer uses IDENTICAL roms to Osman. Region is contained in the eeprom settings which we set in the INIT function */
 
 ROM_START( candance )
-	ROM_REGION( 0x80000, "DE156", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x80000, "main", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD( "sa00-0.1e",    0x000000, 0x080000, CRC(ec6b3257) SHA1(10a42a680ce122ab030eaa2ccd99d302cb77854e) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1030,7 +1030,7 @@ ROM_START( candance )
 	ROM_REGION( 0x80000, "OKIM6295_EFFECTS", 0 ) /* Oki samples */
 	ROM_LOAD( "sa01-0.13h",    0x00000, 0x40000,  CRC(cea8368e) SHA1(1fcc641381fdc29bd50d3a4b23e67647f79e505a))
 
-	ROM_REGION( 0x200000, "OKIM6295_MUSIC_SLOWER", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "OKIM6295_MUSIC", 0 ) /* samples? (banked?) */
 	ROM_LOAD( "mcf-05.12f",    0x00000, 0x200000, CRC(f007d376) SHA1(4ba20e5dabeacc3278b7f30c4462864cbe8f6984) )
 ROM_END
 

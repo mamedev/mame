@@ -364,7 +364,7 @@ static WRITE8_HANDLER( kabukiz_sound_bank_w )
 	// to avoid the write when the sound chip is initialized
 	if(data != 0xff)
 	{
-		UINT8 *ROM = memory_region(machine, "cpu2");
+		UINT8 *ROM = memory_region(machine, "audio");
 		memory_set_bankptr(3, &ROM[0x10000 + 0x4000 * (data & 0x07)]);
 	}
 }
@@ -1587,15 +1587,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tnzsb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("cpu0", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("main", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu0_type2,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD("cpu1", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tnzsb_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD("cpu2", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("audio", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tnzsb_cpu2_map,0)
 	MDRV_CPU_IO_MAP(tnzsb_readport,tnzsb_writeport)
 
@@ -1634,10 +1634,10 @@ static MACHINE_DRIVER_START( kabukiz )
 	MDRV_IMPORT_FROM(tnzsb)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("cpu1")
+	MDRV_CPU_MODIFY("sub")
 	MDRV_CPU_PROGRAM_MAP(kabukiz_cpu1_map,0)
 
-	MDRV_CPU_MODIFY("cpu2")
+	MDRV_CPU_MODIFY("audio")
 	MDRV_CPU_PROGRAM_MAP(kabukiz_cpu2_map,0)
 
 	MDRV_SOUND_MODIFY("ym2203")
@@ -1703,7 +1703,7 @@ ROM_START( plumppop )
 	ROM_LOAD( "a98-11.bin", 0x00000, 0x08000, CRC(bc56775c) SHA1(0c22c22c0e9d7ec0e34f8ab4bfe61068f65e8759) )
 	ROM_CONTINUE(           0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "audio", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "plmp8742.bin", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -1760,7 +1760,7 @@ ROM_START( extrmatn )
 	ROM_LOAD( "b06-06.4e", 0x00000, 0x08000, CRC(744f2c84) SHA1(7565c1594c2a3bae1ae45afcbf93363fe2b12d58) ) /* This is likely the wrong rom ID # */
 	ROM_CONTINUE(          0x10000, 0x08000 )	/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "audio", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "extr8742.4f", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14 */
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -1784,7 +1784,7 @@ ROM_START( extrmatj )
 	ROM_LOAD( "b06-07.4e", 0x00000, 0x08000, CRC(b37fb8b3) SHA1(10696914b9e39d34d56069a69b9d641339ea2309) )
 	ROM_CONTINUE(          0x10000, 0x08000 )	/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "audio", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "extr8742.4f", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14 */
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -1808,7 +1808,7 @@ ROM_START( arknoid2 )
 	ROM_LOAD( "b08_13.3e", 0x00000, 0x08000, CRC(e8035ef1) SHA1(9a54e952cff0036c4b6affd9ffb1097cdccbe255) )
 	ROM_CONTINUE(          0x10000, 0x08000 )			/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "audio", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "ark28742.3g", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -1832,7 +1832,7 @@ ROM_START( arknid2u )
 	ROM_LOAD( "b08_12.3e", 0x00000, 0x08000, CRC(dc84e27d) SHA1(d549d8c9fbec0521517f0c5f5cee763e27d48633) )
 	ROM_CONTINUE(          0x10000, 0x08000 )			/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "audio", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "ark28742.3g", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -1856,7 +1856,7 @@ ROM_START( arknid2j )
 	ROM_LOAD( "b08_06.3e", 0x00000, 0x08000, CRC(adfcd40c) SHA1(f91299407ed21e2dd244c9b1a315b27ed32f5514) )
 	ROM_CONTINUE(          0x10000, 0x08000 )			/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "audio", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "ark28742.3g", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -1880,7 +1880,7 @@ ROM_START( drtoppel )
 	ROM_LOAD( "b19-11w.3e", 0x00000, 0x08000, CRC(37a0d3fb) SHA1(f65fb9382af5f5b09725c39b660c5138b3912f53) ) /* Hacked??, need correct Taito rom number */
 	ROM_CONTINUE(           0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "audio", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "drt8742.3g", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14, reused from Extermination, under printed label "Taito M-001, 128P, 720100" */
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -1908,7 +1908,7 @@ ROM_START( drtopplu )
 	ROM_LOAD( "b19-11u.3e", 0x00000, 0x08000, CRC(05565b22) SHA1(d1aa47b438d3b44c5177337809e38b50f6445c36) ) /* Hacked??, need correct Taito rom number */
 	ROM_CONTINUE(           0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "audio", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "drt8742.3g", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14, reused from Extermination, under printed label "Taito M-001, 128P, 720100" */
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -1936,7 +1936,7 @@ ROM_START( drtopplj )
 	ROM_LOAD( "b19-11.3e", 0x00000, 0x08000, CRC(524dc249) SHA1(158b2de0fcd17ad16ba72bb24888122bf704e216) )
 	ROM_CONTINUE(          0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, "cpu2", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "audio", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "drt8742.3g", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14, reused from Extermination, under printed label "Taito M-001, 128P, 720100" */
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -2104,15 +2104,15 @@ ROM_START( chukataj )
 ROM_END
 
 ROM_START( tnzs )
-	ROM_REGION( 0x30000, "cpu0", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b53-24.1",   0x00000, 0x08000, CRC(d66824c6) SHA1(fd381ac0dc52ce670c3fde320ea60a209e288a52) )
 	ROM_CONTINUE(           0x18000, 0x18000 )		/* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, "cpu1", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x18000, "sub", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "b53-25.3",   0x00000, 0x08000, CRC(d6ac4e71) SHA1(f3e71624a8a5e4e4c8a6aa01711ed26bdd5abf5a) )
 	ROM_CONTINUE(           0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x10000, "cpu2", 0 )	/* 64k for the third CPU */
+	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the third CPU */
 	ROM_LOAD( "b53-26.34",  0x00000, 0x10000, CRC(cfd5649c) SHA1(4f6afccd535d39b41661dc3ccd17af125bfac015) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -2219,15 +2219,15 @@ Notes:
 */
 
 ROM_START( kabukiz )
-	ROM_REGION( 0x30000, "cpu0", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b50-05.u1",  0x00000, 0x08000, CRC(9cccb129) SHA1(054faf7657bad7237182e36bcc4388b1748af935) )
 	ROM_CONTINUE(           0x18000, 0x18000 )		/* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, "cpu1", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x18000, "sub", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "b50-08.1e",  0x00000, 0x08000, CRC(cb92d34c) SHA1(3a666f0e3ff9d3daa599123edee228d94eeae754) )
 	ROM_CONTINUE(           0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x30000, "cpu2", 0 )	/* 64k + bankswitch areas for the third CPU */
+	ROM_REGION( 0x30000, "audio", 0 )	/* 64k + bankswitch areas for the third CPU */
 	ROM_LOAD( "b50-07.u34", 0x00000, 0x08000, CRC(bf7fc2ed) SHA1(77008d12d9bdbfa100dcd87cd6ca7de3748408c5) )
 	ROM_CONTINUE(           0x18000, 0x18000 )		/* banked at 8000-bfff */
 
@@ -2239,15 +2239,15 @@ ROM_START( kabukiz )
 ROM_END
 
 ROM_START( kabukizj )
-	ROM_REGION( 0x30000, "cpu0", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b50-05.u1",  0x00000, 0x08000, CRC(9cccb129) SHA1(054faf7657bad7237182e36bcc4388b1748af935) )
 	ROM_CONTINUE(           0x18000, 0x18000 )		/* banked at 8000-bfff */
 
-	ROM_REGION( 0x18000, "cpu1", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x18000, "sub", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "b50-06.u3",  0x00000, 0x08000, CRC(45650aab) SHA1(00d1fc6044a6ad1e82476ccbe730907b4d780cb9) )
 	ROM_CONTINUE(           0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x30000, "cpu2", 0 )	/* 64k + bankswitch areas for the third CPU */
+	ROM_REGION( 0x30000, "audio", 0 )	/* 64k + bankswitch areas for the third CPU */
 	ROM_LOAD( "b50-07.u34", 0x00000, 0x08000, CRC(bf7fc2ed) SHA1(77008d12d9bdbfa100dcd87cd6ca7de3748408c5) )
 	ROM_CONTINUE(           0x18000, 0x18000 )		/* banked at 8000-bfff */
 
