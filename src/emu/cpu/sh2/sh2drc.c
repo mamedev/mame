@@ -2262,47 +2262,30 @@ static int generate_group_4(drcuml_block *block, compiler_state *compiler, const
 	switch (opcode & 0x3F)
 	{
 	case 0x00: // SHLL(Rn);
-		UML_AND(block, IREG(0), MEM(&sh2->sr), IMM(~T));	// and r0, sr, ~T (clear the T bit)
-		UML_SHR(block, IREG(1), R32(Rn), IMM(31));		// shr r1, Rn, 31
-		UML_AND(block, IREG(1), IREG(1), IMM(T));		// and r1, r1, T
-		UML_OR(block, MEM(&sh2->sr), IREG(1), IREG(0));		// or sr, r1, r0
 		UML_SHL(block, R32(Rn), R32(Rn), IMM(1));		// shl Rn, Rn, 1
+		UML_SETc(block, IF_C, IREG(0));					// set i0,C
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins [sr],i0,0,T
 		return TRUE;
 		break;
 
 	case 0x01: // SHLR(Rn);
-		UML_AND(block, IREG(0), MEM(&sh2->sr), IMM(~T));	// and r0, sr, ~T (clear the T bit)
-		UML_AND(block, IREG(1), R32(Rn), IMM(T));		// and r1, Rn, T
-		UML_OR(block, MEM(&sh2->sr), IREG(0), IREG(1));		// or sr, r0, r1
 		UML_SHR(block, R32(Rn), R32(Rn), IMM(1));		// shr Rn, Rn, 1
+		UML_SETc(block, IF_C, IREG(0));					// set i0,C
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins [sr],i0,0,T
 		return TRUE;
 		break;
 
 	case 0x04: // ROTL(Rn);
-		UML_AND(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(~T));	// and sr, sr, ~T (clear the T bit)
-		UML_CARRY(block, R32(Rn), IMM(31));	// carry = high bit of source
-		UML_ROLC(block, R32(Rn), R32(Rn), IMM(1));	// rolc Rn, Rn, #1
-
-		UML_JMPc(block, IF_NC, compiler->labelnum);	// jnc labelnum
-
-		UML_OR(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(T));	// or sr, sr, T
-
-		UML_LABEL(block, compiler->labelnum++);		// labelnum:
-
+		UML_ROL(block, R32(Rn), R32(Rn), IMM(1));		// rol Rn, Rn, 1
+		UML_SETc(block, IF_C, IREG(0));					// set i0,C
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins [sr],i0,0,T
 		return TRUE;
 		break;
 
 	case 0x05: // ROTR(Rn);
-		UML_AND(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(~T));	// and sr, sr, ~T (clear the T bit)
-		UML_CARRY(block, R32(Rn), IMM(0));	// carry = low bit of source
-		UML_RORC(block, R32(Rn), R32(Rn), IMM(1));	// rorc Rn, Rn, #1
-
-		UML_JMPc(block, IF_NC, compiler->labelnum);	// jnc labelnum
-
-		UML_OR(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(T));	// or sr, sr, T
-
-		UML_LABEL(block, compiler->labelnum++);		// labelnum:
-
+		UML_ROR(block, R32(Rn), R32(Rn), IMM(1));		// ror Rn, Rn, 1
+		UML_SETc(block, IF_C, IREG(0));					// set i0,C
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins [sr],i0,0,T
 		return TRUE;
 		break;
 
@@ -2585,36 +2568,18 @@ static int generate_group_4(drcuml_block *block, compiler_state *compiler, const
 		break;
 
 	case 0x24: // ROTCL(Rn);
-		UML_SHR(block, IREG(0), R32(Rn), IMM(31));		// shr r0, Rn, 31
-		UML_AND(block, IREG(0), IREG(0), IMM(T));		// and r0, r0, T
-
-		UML_AND(block, IREG(1), MEM(&sh2->sr), IMM(T));		// and r1, sr, T
-
-		UML_SHL(block, R32(Rn), R32(Rn), IMM(1));		// shl Rn, Rn, 1
-		UML_OR(block, R32(Rn), R32(Rn), IREG(1));		// or Rn, Rn, r1
-
-		UML_AND(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(~T));	// and sr, sr, ~T
-		UML_OR(block, MEM(&sh2->sr), MEM(&sh2->sr), IREG(0));	// or sr, sr, r0
+		UML_CARRY(block, MEM(&sh2->sr), IMM(0));			// carry sr,0
+		UML_ROLC(block, R32(Rn), R32(Rn), IMM(1));			// rolc  Rn,Rn,1
+		UML_SETc(block, IF_C, IREG(0));						// set   i0,C
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins sr,i0,0,T
 		return TRUE;
 		break;
 
 	case 0x25: // ROTCR(Rn);
-		UML_AND(block, IREG(0), MEM(&sh2->sr), IMM(T));		// and r0, sr, T
-		UML_SHL(block, IREG(0), IREG(0), IMM(31));		// shl r0, r0, #31 (r0 = temp)
-
-		UML_AND(block, IREG(1), R32(Rn), IMM(T));		// and r1, Rn, T  (r1 = Rn & T)
-
-		UML_AND(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(~T));	// and sr, sr, ~T
-
-		UML_CMP(block, IREG(1), IMM(0));			// cmp r1, #0
-		UML_JMPc(block, IF_Z, compiler->labelnum);		// jz labelnum
-
-		UML_OR(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(T));	// or sr, sr, T
-
-		UML_LABEL(block, compiler->labelnum++);			// labelnum:
-
-		UML_SHR(block, R32(Rn), R32(Rn), IMM(1));		// shr Rn, Rn, #1
-		UML_OR(block, R32(Rn), R32(Rn), IREG(0));		// or Rn, Rn, r0
+		UML_CARRY(block, MEM(&sh2->sr), IMM(0));			// carry sr,0
+		UML_RORC(block, R32(Rn), R32(Rn), IMM(1));			// rorc  Rn,Rn,1
+		UML_SETc(block, IF_C, IREG(0));						// set   i0,C
+		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins sr,i0,0,T
 		return TRUE;
 		break;
 
