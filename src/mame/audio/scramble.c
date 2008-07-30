@@ -6,7 +6,7 @@
   There are two types, one has 2 AY8910's and the other one has one of the
   AY8910's removed.  Interestingly, it appears that the one AY8910 version
   came after the 2 AY8910 one.  This is supported by the fact that in the
-  one 8190 version, the filter system uses "audio" 6-11, while "audio" 0-5 are
+  one 8190 version, the filter system uses bits 6-11, while bits 0-5 are
   left unused.
 
 ***************************************************************************/
@@ -23,7 +23,7 @@
 
 #define AD2083_TMS5110_CLOCK 		XTAL_640kHz
 
-/* The timer clock in Scramble which feeds the upper 4 "audio" of          */
+/* The timer clock in Scramble which feeds the upper 4 bits of          */
 /* AY-3-8910 port A is based on the same clock                          */
 /* feeding the sound CPU Z80.  It is a divide by                        */
 /* 5120, formed by a standard divide by 512,                            */
@@ -52,7 +52,7 @@ READ8_HANDLER( scramble_portB_r )
 
 
 
-/* The timer clock in Frogger which feeds the upper 4 "audio" of           */
+/* The timer clock in Frogger which feeds the upper 4 bits of           */
 /* AY-3-8910 port A is based on the same clock                          */
 /* feeding the sound CPU Z80.  It is a divide by                        */
 /* 5120, formed by a standard divide by 512,                            */
@@ -259,7 +259,7 @@ void sfx_sh_init(void)
     1x 74S288  32x8 Prom
 
     The prom obviously is used to provide the right timing when
-    fetching data "audio". This circuit should be comparable to bagman.
+    fetching data bits. This circuit should be comparable to bagman.
 
     Prom
     Q0      ==> NC
