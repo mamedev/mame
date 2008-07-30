@@ -1200,7 +1200,7 @@ static void ui_menu_handle_keys(ui_menu *menu, UINT32 flags)
 	if (menu->event.iptkey == IPT_INVALID)
 		for (code = __ipt_ui_start; code <= __ipt_ui_end; code++)
 		{
-			if ((code == IPT_UI_LEFT && ignoreleft) || (code == IPT_UI_RIGHT && ignoreright) || (code == IPT_UI_PAUSE && ignorepause))
+			if (code == IPT_UI_CONFIGURE || (code == IPT_UI_LEFT && ignoreleft) || (code == IPT_UI_RIGHT && ignoreright) || (code == IPT_UI_PAUSE && ignorepause))
 				continue;
 			if (exclusive_input_pressed(menu, code, 0))
 				break;
