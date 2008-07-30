@@ -5022,7 +5022,7 @@ ROM_START( vandyke )
 	ROM_LOAD16_BYTE( "vdk-1.16",  0x00000, 0x20000, CRC(c1d01c59) SHA1(04a7fd31ca4d87d078070390660edf08bf1d96b5) )
 	ROM_LOAD16_BYTE( "vdk-2.15",  0x00001, 0x20000, CRC(9d741cc2) SHA1(2d101044fba5fc5b7d63869a0a053c42fdc2598b) )
 
-	ROM_REGION(0x10000, "cpu1", 0 ) /* 64k for sound cpu code */
+	ROM_REGION(0x10000, "audio", 0 ) /* 64k for sound cpu code */
 	ROM_LOAD( "vdk-4.127",    0x00000, 0x10000, CRC(eba544f0) SHA1(36f6d048d15a392542a9220a244d8a7049aaff8b) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
@@ -5055,7 +5055,7 @@ ROM_START( vandyjal )
 	ROM_LOAD16_BYTE( "vdk-1.16",   0x00000, 0x20000, CRC(c1d01c59) SHA1(04a7fd31ca4d87d078070390660edf08bf1d96b5) )
 	ROM_LOAD16_BYTE( "jaleco2.15", 0x00001, 0x20000, CRC(170e4d2e) SHA1(6009d19d30e345fea93e039d165061e2b20ff058) )
 
-	ROM_REGION(0x10000, "cpu1", 0 ) /* 64k for sound cpu code */
+	ROM_REGION(0x10000, "audio", 0 ) /* 64k for sound cpu code */
 	ROM_LOAD( "vdk-4.127",    0x00000, 0x10000, CRC(eba544f0) SHA1(36f6d048d15a392542a9220a244d8a7049aaff8b) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
@@ -5088,7 +5088,7 @@ ROM_START( vandyja2 )
 	ROM_LOAD16_BYTE( "vdk-even.16",  0x00000, 0x20000, CRC(cde05a84) SHA1(dab5981d7dad9abe86cfe011da8ca0b11d484a3f) ) /* Hand written labels, dated 2/12 */
 	ROM_LOAD16_BYTE( "vdk-odd.15",   0x00001, 0x20000, CRC(0f6fea40) SHA1(3acbe72c251d51b028d8c66274263a2b39b042ea) )
 
-	ROM_REGION(0x10000, "cpu1", 0 ) /* 64k for sound cpu code */
+	ROM_REGION(0x10000, "audio", 0 ) /* 64k for sound cpu code */
 	ROM_LOAD( "vdk-4.127",    0x00000, 0x10000, CRC(eba544f0) SHA1(36f6d048d15a392542a9220a244d8a7049aaff8b) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
@@ -5223,7 +5223,7 @@ ROM_START( mustang )
 	ROM_LOAD16_BYTE( "2.bin",    0x00000, 0x20000, CRC(bd9f7c89) SHA1(a0af46a8ff82b90bece2515e1bd74e7a7ddf5379) )
 	ROM_LOAD16_BYTE( "3.bin",    0x00001, 0x20000, CRC(0eec36a5) SHA1(c549fbcd3e2741a6d0f2633ded6a85909d37f633) )
 
-	ROM_REGION(0x10000, "cpu1", 0 )	/* 64k for sound cpu code */
+	ROM_REGION(0x10000, "audio", 0 )	/* 64k for sound cpu code */
 	ROM_LOAD( "90058-7",    0x00000, 0x10000, CRC(920a93c8) SHA1(7660ca419e2fd98848ae7f5994994eaed023151e) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -5254,7 +5254,7 @@ ROM_START( mustangs )
 	ROM_LOAD16_BYTE( "90058-2",    0x00000, 0x20000, CRC(833aa458) SHA1(a9924f7044397e3a36c674b064173ffae80a79ec) )
 	ROM_LOAD16_BYTE( "90058-3",    0x00001, 0x20000, CRC(e4b80f06) SHA1(ce589cebb5ea85c89eb44796b821a4bd0c44b9a8) )
 
-	ROM_REGION(0x10000, "cpu1", 0 )	/* 64k for sound cpu code */
+	ROM_REGION(0x10000, "audio", 0 )	/* 64k for sound cpu code */
 	ROM_LOAD( "90058-7",    0x00000, 0x10000, CRC(920a93c8) SHA1(7660ca419e2fd98848ae7f5994994eaed023151e) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -5319,7 +5319,7 @@ ROM_START( acrobatm )
 	ROM_LOAD( "07_ic42.bin",  0x000000, 0x100000, CRC(5672bdaa) SHA1(5401a104d72904de19b73125451767bc63d36809) ) /* Sprites */
 	ROM_LOAD( "08_ic29.bin",  0x100000, 0x080000, CRC(b4c0ace3) SHA1(5d638781d588cfbf4025d002d5a2309049fe1ee5) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "04_ic74.bin",    0x00000, 0x10000, CRC(176905fb) SHA1(135a184f44bedd93b293b9124fa0bd725e0ee93b) )
 
 	ROM_REGION( 0xa0000, "oki1", 0 )	/* OKIM6295 samples */
@@ -5356,7 +5356,7 @@ ROM_START( bioship )
 	ROM_LOAD16_BYTE( "8.ic27",    0x00000, 0x10000, CRC(75a46fea) SHA1(3d78cfc482b42779bb5aedb722c4a39cbc71bd10) )
 	ROM_LOAD16_BYTE( "9.ic26",    0x00001, 0x10000, CRC(d91448ee) SHA1(7f84ca3605edcab4bf226dab8dd7218cd5c3e5a4) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "6.ic120",    0x00000, 0x10000, CRC(5f39a980) SHA1(2a440f86685249f9c317634cad8cdedc8a8f1491) )
 
 	ROM_REGION(0xa0000, "oki1", 0 )	/* Oki sample data */
@@ -5394,7 +5394,7 @@ ROM_START( sbsgomo )
 	ROM_LOAD16_BYTE( "8.ic27",    0x00000, 0x10000, CRC(75a46fea) SHA1(3d78cfc482b42779bb5aedb722c4a39cbc71bd10) )
 	ROM_LOAD16_BYTE( "9.ic26",    0x00001, 0x10000, CRC(d91448ee) SHA1(7f84ca3605edcab4bf226dab8dd7218cd5c3e5a4) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "6.ic120",    0x00000, 0x10000, CRC(5f39a980) SHA1(2a440f86685249f9c317634cad8cdedc8a8f1491) )
 
 	ROM_REGION(0xa0000, "oki1", 0 )	/* Oki sample data */
@@ -5416,7 +5416,7 @@ ROM_START( blkheart )
 	ROM_LOAD16_BYTE( "blkhrt.7",  0x00000, 0x20000, CRC(5bd248c0) SHA1(0649f4f8682404aeb3fc80643fcabc2d7836bb23) )
 	ROM_LOAD16_BYTE( "blkhrt.6",  0x00001, 0x20000, CRC(6449e50d) SHA1(d8cd126d921c95478346da96c20da01212395d77) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )		/* Code for (unknown?) CPU */
+	ROM_REGION( 0x10000, "audio", 0 )		/* Code for (unknown?) CPU */
 	ROM_LOAD( "4.bin",      0x00000, 0x10000, CRC(7cefa295) SHA1(408f46613b3620cee31dec43281688d231b47ddd) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -5446,7 +5446,7 @@ ROM_START( blkhearj )
 	ROM_LOAD16_BYTE( "7.bin",  0x00000, 0x20000, CRC(e0a5c667) SHA1(3ef39b2dc1f7ffdddf586f0b3080ecd1f362ec37) )
 	ROM_LOAD16_BYTE( "6.bin",  0x00001, 0x20000, CRC(7cce45e8) SHA1(72491e30d1f9be2eede21fdde5a7484d4f65cfbf) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )		/* Code for (unknown?) CPU */
+	ROM_REGION( 0x10000, "audio", 0 )		/* Code for (unknown?) CPU */
 	ROM_LOAD( "4.bin",      0x00000, 0x10000, CRC(7cefa295) SHA1(408f46613b3620cee31dec43281688d231b47ddd) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -5485,7 +5485,7 @@ ROM_START( tdragon )
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD16_WORD_SWAP( "91070.4",	0x000000, 0x100000, CRC(3eedc2fe) SHA1(9f48986c231a8fbc07f2b39b2017d1e967b2ed3c) )	/* Sprites */
 
-	ROM_REGION( 0x010000, "cpu1", 0 )		/* Code for (unknown?) CPU */
+	ROM_REGION( 0x010000, "audio", 0 )		/* Code for (unknown?) CPU */
 	ROM_LOAD( "91070.1",      0x00000, 0x10000, CRC(bf493d74) SHA1(6f8f5eff4b71fb6cabda10075cfa88a3f607859e) )
 
 	ROM_REGION( 0x0a0000, "oki1", 0 )	/* OKIM6295 samples */
@@ -5515,7 +5515,7 @@ ROM_START( tdragon1 )
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD16_WORD_SWAP( "91070.4",	0x000000, 0x100000, CRC(3eedc2fe) SHA1(9f48986c231a8fbc07f2b39b2017d1e967b2ed3c) )	/* Sprites */
 
-	ROM_REGION( 0x010000, "cpu1", 0 )		/* Code for (unknown?) CPU */
+	ROM_REGION( 0x010000, "audio", 0 )		/* Code for (unknown?) CPU */
 	ROM_LOAD( "91070.1",      0x00000, 0x10000, CRC(bf493d74) SHA1(6f8f5eff4b71fb6cabda10075cfa88a3f607859e) )
 
 	ROM_REGION( 0x0a0000, "oki1", 0 )	/* OKIM6295 samples */
@@ -5682,7 +5682,7 @@ ROM_START( strahl )
 	ROM_REGION( 0x80000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "str6b1w1.776", 0x000000, 0x80000, CRC(bb1bb155) SHA1(83a02e89180e15f0e7817e0e92b4bf4e209bb69a) ) /* Tiles */
 
-	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "strahl-4.66",    0x00000, 0x10000, CRC(60a799c4) SHA1(8ade3cf827a389f7cb4080957dc4d67077ea4166) )
 
 	ROM_REGION( 0xa0000, "oki1", 0 )	/* Oki sample data */
@@ -5713,7 +5713,7 @@ ROM_START( strahla )
 	ROM_REGION( 0x80000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "str6b1w1.776", 0x000000, 0x80000, CRC(bb1bb155) SHA1(83a02e89180e15f0e7817e0e92b4bf4e209bb69a) ) /* Tiles */
 
-	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "strahl-4.66",    0x00000, 0x10000, CRC(60a799c4) SHA1(8ade3cf827a389f7cb4080957dc4d67077ea4166) )
 
 	ROM_REGION( 0xa0000, "oki1", 0 )	/* Oki sample data */
@@ -5730,7 +5730,7 @@ ROM_START( hachamf )
 	ROM_LOAD16_BYTE( "hmf_07.rom",  0x00000, 0x20000, CRC(9d847c31) SHA1(1d370d8db9cadadb9c2cb213e32f681947d81b7f) )
 	ROM_LOAD16_BYTE( "hmf_06.rom",  0x00001, 0x20000, CRC(de6408a0) SHA1(2df77fecd44d2d8b0444abd4545923213ed76b2d) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )		/* unknown  - sound cpu ?????? */
+	ROM_REGION( 0x10000, "audio", 0 )		/* unknown  - sound cpu ?????? */
 	ROM_LOAD( "hmf_01.rom",  0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -5756,7 +5756,7 @@ ROM_START( macross )
 	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "921a03",        0x00000, 0x80000, CRC(33318d55) SHA1(c99f85e09bd334dc8ce138b08cbed2331b0d67dd) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )		/* sound program (unknown CPU) */
+	ROM_REGION( 0x10000, "audio", 0 )		/* sound program (unknown CPU) */
 	ROM_LOAD( "921a02",      0x00000, 0x10000, CRC(77c082c7) SHA1(be07aa14d0116f830f98e11a19f1debb48a5230e) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -5797,7 +5797,7 @@ ROM_START( gunnail )
 	ROM_LOAD16_BYTE( "3e.bin",  0x00000, 0x40000, CRC(61d985b2) SHA1(96daca603f18accb47f98a3e584b2c84fc5a2ca4) )
 	ROM_LOAD16_BYTE( "3o.bin",  0x00001, 0x40000, CRC(f114e89c) SHA1(a12f5278167f446bb5277e87289c41b5aa365c86) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )		/* Code for (unknown?) CPU */
+	ROM_REGION( 0x10000, "audio", 0 )		/* Code for (unknown?) CPU */
 	ROM_LOAD( "92077_2.bin",      0x00000, 0x10000, CRC(cd4e55f8) SHA1(92182767ca0ec37ec4949bd1a88c2efdcdcb60ed) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )

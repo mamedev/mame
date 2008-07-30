@@ -243,7 +243,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( quizpani )
 {
-	NMK112_init(0, "oki1", "oki2");
+	NMK112_init(0, "oki", "oki");
 }
 
 static MACHINE_DRIVER_START( quizpani )

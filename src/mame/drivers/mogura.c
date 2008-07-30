@@ -198,7 +198,7 @@ INPUT_PORTS_END
 static const gfx_layout tiles8x8_layout =
 {
 	8,8,
-	RGN_FRAC(1,1),
+	0x1000*8/(16*8),
 	2,
 	{ 0, 1 },
 	{ 0, 2, 4, 6, 8, 10, 12, 14 },

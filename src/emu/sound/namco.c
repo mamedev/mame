@@ -118,7 +118,7 @@ static int build_decoded_waveform(struct namco_sound *chip, const char *region)
 		namco_wavedata = rgnbase;
 
 	/* 20pacgal has waves in RAM but old sound system */
-	if (namco_wavedata == NULL && chip->num_voices != 3)
+	if (rgnbase == NULL && chip->num_voices != 3)
 	{
 		chip->wave_size = 1;
 		size = 32 * 16;		/* 32 samples, 16 waveforms */

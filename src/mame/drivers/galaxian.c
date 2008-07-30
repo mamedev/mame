@@ -1797,7 +1797,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( konami_sound_1x_ay8910 )
 
 	/* 2nd CPU to drive sound */
-	MDRV_CPU_ADD("sound", Z80, KONAMI_SOUND_CLOCK/8)
+	MDRV_CPU_ADD("audio", Z80, KONAMI_SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(frogger_sound_map,0)
 	MDRV_CPU_IO_MAP(frogger_sound_portmap,0)
 
@@ -1817,7 +1817,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( konami_sound_2x_ay8910 )
 
 	/* 2nd CPU to drive sound */
-	MDRV_CPU_ADD("sound", Z80, KONAMI_SOUND_CLOCK/8)
+	MDRV_CPU_ADD("audio", Z80, KONAMI_SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(konami_sound_map,0)
 	MDRV_CPU_IO_MAP(konami_sound_portmap,0)
 
@@ -2102,7 +2102,7 @@ static MACHINE_DRIVER_START( sfx )
 	MDRV_CPU_PROGRAM_MAP(sfx_map,0)
 
 	/* 3rd CPU for the sample player */
-	MDRV_CPU_ADD("audio", Z80, KONAMI_SOUND_CLOCK/8)
+	MDRV_CPU_ADD("audio2", Z80, KONAMI_SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(sfx_sample_map,0)
 	MDRV_CPU_IO_MAP(sfx_sample_portmap,0)
 

@@ -2105,7 +2105,7 @@ static DRIVER_INIT( samplebank )
 {
 	kaneko16_unscramble_tiles(machine, "gfx2");
 	kaneko16_unscramble_tiles(machine, "gfx3");
-	kaneko16_expand_sample_banks(machine, "ok1");
+	kaneko16_expand_sample_banks(machine, "oki1");
 }
 
 

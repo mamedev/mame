@@ -1087,7 +1087,7 @@ static MACHINE_DRIVER_START( ss23 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("namco", C352, 14745600)
+	MDRV_SOUND_ADD("c352", C352, 14745600)
 	MDRV_SOUND_ROUTE(0, "right", 1.00)
 	MDRV_SOUND_ROUTE(1, "left", 1.00)
 	MDRV_SOUND_ROUTE(2, "right", 1.00)

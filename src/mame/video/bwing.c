@@ -208,7 +208,7 @@ VIDEO_START( bwing )
 
 	fill_srxlat(srxlat);
 
-	fgdata = memory_region(machine, "user1");
+	fgdata = memory_region(machine, "gpu");
 	bgdata = fgdata + 0x1000;
 
 	for (i=0; i<4; i++) srbase[i] = fgdata + i * 0x2000;

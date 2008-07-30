@@ -494,7 +494,7 @@ static void nbmj8891_gfxdraw(running_machine *machine)
 ******************************************************************************/
 VIDEO_START( nbmj8891_1layer )
 {
-	UINT8 *CLUT = memory_region(machine, "user1");
+	UINT8 *CLUT = memory_region(machine, "protection");
 	int i;
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);

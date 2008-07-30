@@ -3407,7 +3407,7 @@ static DRIVER_INIT( deco222 )
 	if (machine->config->cpu[2].type != CPU_DUMMY) sound_cpu = 2;
 
 	/* bits 5 and 6 of the opcodes are swapped */
-	rom = memory_region(machine, "main"+sound_cpu);
+	rom = memory_region(machine, "audio");
 	decrypt = auto_malloc(0x8000);
 
 	memory_set_decrypted_region(sound_cpu, 0x8000, 0xffff, decrypt);

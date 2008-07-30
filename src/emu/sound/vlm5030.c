@@ -633,13 +633,14 @@ if( chip->interp_step != 1)
 /* speech_rom == 0 -> use sampling data mode */
 static void *vlm5030_start(const char *tag, int sndindex, int clock, const void *config)
 {
+	const struct VLM5030interface defintrf = { 0 };
 	int emulation_rate;
 	struct vlm5030_info *chip;
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
-	chip->intf = config;
+	chip->intf = (config != NULL) ? config : &defintrf;
 
 	emulation_rate = clock / 440;
 

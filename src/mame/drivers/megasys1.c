@@ -3738,10 +3738,10 @@ void rodland_rom_decode(int cpu)
 }
 
 
-static void rodlandj_gfx_unmangle(int region)
+static void rodlandj_gfx_unmangle(const char *region)
 {
-	UINT8 *rom = memory_region(Machine, "gfx1"+region);
-	int size = memory_region_length(Machine, "gfx1"+region);
+	UINT8 *rom = memory_region(Machine, region);
+	int size = memory_region_length(Machine, region);
 	UINT8 *buffer;
 	int i;
 
@@ -3770,10 +3770,10 @@ static void rodlandj_gfx_unmangle(int region)
 	free(buffer);
 }
 
-static void jitsupro_gfx_unmangle(int region)
+static void jitsupro_gfx_unmangle(const char *region)
 {
-	UINT8 *rom = memory_region(Machine, "gfx1"+region);
-	int size = memory_region_length(Machine, "gfx1"+region);
+	UINT8 *rom = memory_region(Machine, region);
+	int size = memory_region_length(Machine, region);
 	UINT8 *buffer;
 	int i;
 
@@ -3923,8 +3923,8 @@ static DRIVER_INIT( jitsupro )
 
 	astyanax_rom_decode(0);		// Code
 
-	jitsupro_gfx_unmangle(0);	// Gfx
-	jitsupro_gfx_unmangle(3);
+	jitsupro_gfx_unmangle("gfx1");	// Gfx
+	jitsupro_gfx_unmangle("gfx4");
 
 	RAM[0x436/2] = 0x4e71;	// protection
 	RAM[0x438/2] = 0x4e71;	//
@@ -3961,8 +3961,8 @@ static DRIVER_INIT( rodland )
 
 static DRIVER_INIT( rodlandj )
 {
-	rodlandj_gfx_unmangle(0);
-	rodlandj_gfx_unmangle(3);
+	rodlandj_gfx_unmangle("gfx1");
+	rodlandj_gfx_unmangle("gfx4");
 
 	astyanax_rom_decode(0);
 }
