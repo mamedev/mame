@@ -8008,6 +8008,7 @@ Other Sun games
 	DRIVER( magic10a )	/* (c) 1995 A.W.P. Games */
 	DRIVER( magic102 )	/* (c) 1997 ABM Games */
 	DRIVER( suprpool )	/* (c) 1997 Nazionale Elettronica Giochi S.A.S. */
+	DRIVER( galaxi )	/* (c) 2000 BRL S.R.L. Bologna */
 	DRIVER( dwarfd )	/* (c) 198? Electro-Sports */
 	DRIVER( trvquest )	/* (c) 1984 Sunn / Techstar */
 	DRIVER( wheelfir )	/* (c) 199? TCH */
