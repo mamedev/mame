@@ -159,7 +159,7 @@ static void machine_init(running_machine *machine)
 		memory_set_bankptr(2+i, current_base[i]);
 	}
 	cur_rombank = cur_rombank2 = 0;
-	memory_set_bankptr(1, memory_region(machine, "cpu1") + 0x10000);
+	memory_set_bankptr(1, memory_region(machine, "main") + 0x10000);
 
 	for(i=0;i<512;i++)
 	{
@@ -334,7 +334,7 @@ static WRITE8_HANDLER( rombankswitch_w )
 
 //      logerror("robs %d, %02x (%04x)\n", offset, data, activecpu_get_pc());
 		cur_rombank = data;
-		memory_set_bankptr(1, memory_region(machine, "cpu1")+0x10000+0x2000*cur_rombank);
+		memory_set_bankptr(1, memory_region(machine, "main")+0x10000+0x2000*cur_rombank);
 	}
 }
 
@@ -355,7 +355,7 @@ static WRITE8_HANDLER( rombank2switch_w )
 //      logerror("robs2 %02x (%04x)\n", data, activecpu_get_pc());
 
 		cur_rombank2 = data;
-		memory_set_bankptr(6, memory_region(machine, "cpu2")+0x10000+0x4000*cur_rombank2);
+		memory_set_bankptr(6, memory_region(machine, "slave")+0x10000+0x4000*cur_rombank2);
 	}
 }
 
@@ -2174,14 +2174,14 @@ static const struct YM2203interface ym2203_interface_single =
 static MACHINE_DRIVER_START( fhawk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("cpu1", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
+	MDRV_CPU_ADD("main", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
 	MDRV_CPU_PROGRAM_MAP(fhawk_readmem,fhawk_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(fhawk_3_readmem,fhawk_3_writemem)
 
-	MDRV_CPU_ADD("cpu2", Z80, 12000000/3) 	/* verified on pcb */
+	MDRV_CPU_ADD("slave", Z80, 12000000/3) 	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(fhawk_2_readmem,fhawk_2_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,3) /* fixes slow down problems */
 
@@ -2190,7 +2190,7 @@ static MACHINE_DRIVER_START( fhawk )
 	MDRV_MACHINE_RESET(fhawk)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("cpu1", RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2220,13 +2220,13 @@ static MACHINE_DRIVER_START( champwr )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(fhawk)
-	MDRV_CPU_MODIFY("cpu1")
+	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(champwr_readmem,champwr_writemem)
 
 	MDRV_CPU_MODIFY("audio")
 	MDRV_CPU_PROGRAM_MAP(champwr_3_readmem,champwr_3_writemem)
 
-	MDRV_CPU_MODIFY("cpu2")
+	MDRV_CPU_MODIFY("slave")
 	MDRV_CPU_PROGRAM_MAP(champwr_2_readmem,champwr_2_writemem)
 
 	MDRV_MACHINE_RESET(champwr)
@@ -2250,13 +2250,13 @@ static MACHINE_DRIVER_START( raimais )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(fhawk)
-	MDRV_CPU_MODIFY("cpu1")
+	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(raimais_readmem,raimais_writemem)
 
 	MDRV_CPU_MODIFY("audio")
 	MDRV_CPU_PROGRAM_MAP(raimais_3_readmem,raimais_3_writemem)
 
-	MDRV_CPU_MODIFY("cpu2")
+	MDRV_CPU_MODIFY("slave")
 	MDRV_CPU_PROGRAM_MAP(raimais_2_readmem,raimais_2_writemem)
 
 	MDRV_MACHINE_RESET(raimais)
@@ -2273,20 +2273,20 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kurikint )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("cpu1", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
+	MDRV_CPU_ADD("main", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
 	MDRV_CPU_PROGRAM_MAP(kurikint_readmem,kurikint_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
 	MDRV_CPU_ADD("audio",  Z80, 12000000/3) 	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(kurikint_2_readmem,kurikint_2_writemem)
-	MDRV_CPU_VBLANK_INT("cpu1", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_INTERLEAVE(100)
 
 	MDRV_MACHINE_RESET(kurikint)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("cpu1", RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2324,14 +2324,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( plotting )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("cpu1", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
+	MDRV_CPU_ADD("main", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
 	MDRV_CPU_PROGRAM_MAP(plotting_readmem,plotting_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
 	MDRV_MACHINE_RESET(plotting)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("cpu1", RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2361,7 +2361,7 @@ static MACHINE_DRIVER_START( puzznic )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(plotting)
-	MDRV_CPU_MODIFY("cpu1")
+	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(puzznic_readmem,puzznic_writemem)
 
 	MDRV_MACHINE_RESET(puzznic)
@@ -2371,7 +2371,7 @@ static MACHINE_DRIVER_START( puzznici )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(plotting)
-	MDRV_CPU_MODIFY("cpu1")
+	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(puzznici_readmem,puzznici_writemem)
 
 	MDRV_MACHINE_RESET(puzznic)
@@ -2382,7 +2382,7 @@ static MACHINE_DRIVER_START( horshoes )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(plotting)
-	MDRV_CPU_MODIFY("cpu1")
+	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(horshoes_readmem,horshoes_writemem)
 
 	MDRV_MACHINE_RESET(horshoes)
@@ -2393,7 +2393,7 @@ static MACHINE_DRIVER_START( palamed )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(plotting)
-	MDRV_CPU_MODIFY("cpu1")
+	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(palamed_readmem,palamed_writemem)
 
 	MDRV_MACHINE_RESET(palamed)
@@ -2404,7 +2404,7 @@ static MACHINE_DRIVER_START( cachat )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(plotting)
-	MDRV_CPU_MODIFY("cpu1")
+	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(cachat_readmem,cachat_writemem)
 
 	MDRV_MACHINE_RESET(cachat)
@@ -2413,20 +2413,20 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( evilston )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("cpu1", Z80, 13330560/2) 	/* not verfied */
+	MDRV_CPU_ADD("main", Z80, 13330560/2) 	/* not verfied */
 	MDRV_CPU_PROGRAM_MAP(evilston_readmem,evilston_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
 	MDRV_CPU_ADD("audio", Z80, 12000000/3) 	/* not verified */
 	MDRV_CPU_PROGRAM_MAP(evilston_2_readmem,evilston_2_writemem)
-	MDRV_CPU_VBLANK_INT("cpu1", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_INTERLEAVE(100)
 
 	MDRV_MACHINE_RESET(evilston)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("cpu1", RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2454,7 +2454,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( raimais )
-	ROM_REGION( 0xb0000, "cpu1", 0 )
+	ROM_REGION( 0xb0000, "main", 0 )
 	ROM_LOAD( "b36-11-1.bin", 0x00000, 0x20000, CRC(f19fb0d5) SHA1(ba7187dfa5b4a08cebf236913a80066dafbbc59f) )
 	ROM_RELOAD(               0x10000, 0x20000 )
 	ROM_LOAD( "b36-09.bin",   0x30000, 0x20000, CRC(9c466e43) SHA1(2466a3f1f8124323008c9925f90e9a1d2edf1564) )
@@ -2463,7 +2463,7 @@ ROM_START( raimais )
 	ROM_LOAD( "b36-06.bin",   0x00000, 0x4000, CRC(29bbc4f8) SHA1(39a68729c6180c5f6cdf604e692018e7d6bf5591) )
 	ROM_CONTINUE(             0x10000, 0xc000 )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_REGION( 0x10000, "slave", 0 )
 	ROM_LOAD( "b36-07.bin",   0x00000, 0x10000, CRC(4f3737e6) SHA1(ff5f5d4ca5485441d03c8cb01a6a096941ab02eb) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -2475,7 +2475,7 @@ ROM_START( raimais )
 ROM_END
 
 ROM_START( raimaisj )
-	ROM_REGION( 0xb0000, "cpu1", 0 )
+	ROM_REGION( 0xb0000, "main", 0 )
 	ROM_LOAD( "b36-08-1.bin", 0x00000, 0x20000, CRC(6cc8f79f) SHA1(17b4903f87e6d5447c8557c2baca1728f86245dc) )
 	ROM_RELOAD(               0x10000, 0x20000 )
 	ROM_LOAD( "b36-09.bin",   0x30000, 0x20000, CRC(9c466e43) SHA1(2466a3f1f8124323008c9925f90e9a1d2edf1564) )
@@ -2484,7 +2484,7 @@ ROM_START( raimaisj )
 	ROM_LOAD( "b36-06.bin",   0x00000, 0x4000, CRC(29bbc4f8) SHA1(39a68729c6180c5f6cdf604e692018e7d6bf5591) )
 	ROM_CONTINUE(             0x10000, 0xc000 )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_REGION( 0x10000, "slave", 0 )
 	ROM_LOAD( "b36-07.bin",   0x00000, 0x10000, CRC(4f3737e6) SHA1(ff5f5d4ca5485441d03c8cb01a6a096941ab02eb) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -2496,7 +2496,7 @@ ROM_START( raimaisj )
 ROM_END
 
 ROM_START( raimaijo )
-	ROM_REGION( 0xb0000, "cpu1", 0 )
+	ROM_REGION( 0xb0000, "main", 0 )
 	ROM_LOAD( "b36-08.bin", 0x00000, 0x20000, CRC(f40b9178) SHA1(ccf5afcf08cac0d5b2d6ba74abd62d35412f0265) )
 	ROM_RELOAD(               0x10000, 0x20000 )
 	ROM_LOAD( "b36-09.bin",   0x30000, 0x20000, CRC(9c466e43) SHA1(2466a3f1f8124323008c9925f90e9a1d2edf1564) )
@@ -2505,7 +2505,7 @@ ROM_START( raimaijo )
 	ROM_LOAD( "b36-06.bin",   0x00000, 0x4000, CRC(29bbc4f8) SHA1(39a68729c6180c5f6cdf604e692018e7d6bf5591) )
 	ROM_CONTINUE(             0x10000, 0xc000 )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_REGION( 0x10000, "slave", 0 )
 	ROM_LOAD( "b36-07.bin",   0x00000, 0x10000, CRC(4f3737e6) SHA1(ff5f5d4ca5485441d03c8cb01a6a096941ab02eb) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -2517,7 +2517,7 @@ ROM_START( raimaijo )
 ROM_END
 
 ROM_START( fhawk )
-	ROM_REGION( 0xb0000, "cpu1", 0 )
+	ROM_REGION( 0xb0000, "main", 0 )
 	ROM_LOAD( "b70-11.bin", 0x00000, 0x20000, CRC(7d9f7583) SHA1(d8fa7c66a81fb356fa9c72f377bfc31b1837eafb) )
 	ROM_RELOAD(             0x10000, 0x20000 )
 	ROM_LOAD( "b70-03.bin", 0x30000, 0x80000, CRC(42d5a9b8) SHA1(10714fe95c372cec12376e615a9abe213aff12bc) )
@@ -2526,7 +2526,7 @@ ROM_START( fhawk )
 	ROM_LOAD( "b70-09.bin", 0x00000, 0x4000, CRC(85cccaa2) SHA1(5459cd8df9d94e1938008cfc17d4ebac98004bfc) )
 	ROM_CONTINUE(           0x10000, 0xc000 )
 
-	ROM_REGION( 0x30000, "cpu2", 0 )
+	ROM_REGION( 0x30000, "slave", 0 )
 	ROM_LOAD( "b70-08.bin", 0x00000, 0x20000, CRC(4d795f48) SHA1(58040d8ccbd0572cf6aef6ea9dd646b9338a03a0) )
 	ROM_RELOAD(             0x10000, 0x20000 )
 
@@ -2536,7 +2536,7 @@ ROM_START( fhawk )
 ROM_END
 
 ROM_START( fhawkj )
-	ROM_REGION( 0xb0000, "cpu1", 0 )
+	ROM_REGION( 0xb0000, "main", 0 )
 	ROM_LOAD( "b70-07.bin", 0x00000, 0x20000, CRC(939114af) SHA1(66218536dcb3b34ffa01d3c9c2fee365d91cfe00) )
 	ROM_RELOAD(             0x10000, 0x20000 )
 	ROM_LOAD( "b70-03.bin", 0x30000, 0x80000, CRC(42d5a9b8) SHA1(10714fe95c372cec12376e615a9abe213aff12bc) )
@@ -2545,7 +2545,7 @@ ROM_START( fhawkj )
 	ROM_LOAD( "b70-09.bin", 0x00000, 0x4000, CRC(85cccaa2) SHA1(5459cd8df9d94e1938008cfc17d4ebac98004bfc) )
 	ROM_CONTINUE(           0x10000, 0xc000 )
 
-	ROM_REGION( 0x30000, "cpu2", 0 )
+	ROM_REGION( 0x30000, "slave", 0 )
 	ROM_LOAD( "b70-08.bin", 0x00000, 0x20000, CRC(4d795f48) SHA1(58040d8ccbd0572cf6aef6ea9dd646b9338a03a0) )
 	ROM_RELOAD(             0x10000, 0x20000 )
 
@@ -2555,7 +2555,7 @@ ROM_START( fhawkj )
 ROM_END
 
 ROM_START( champwr )
-	ROM_REGION( 0xf0000, "cpu1", 0 )
+	ROM_REGION( 0xf0000, "main", 0 )
 	ROM_LOAD( "c01-13.rom", 0x00000, 0x20000, CRC(7ef47525) SHA1(79789fa3bcaeb6666c108d2e4b69a1f9341b2f4a) )
 	ROM_RELOAD(             0x10000, 0x20000 )
 	ROM_LOAD( "c01-04.rom", 0x30000, 0x20000, CRC(358bd076) SHA1(beb20a09370d05de719dde596eadca8fecb14ce5) )
@@ -2564,7 +2564,7 @@ ROM_START( champwr )
 	ROM_LOAD( "c01-08.rom", 0x00000, 0x4000, CRC(810efff8) SHA1(dd4fc046095e0e815e8e1fd96d258da0d6bba298) )
 	ROM_CONTINUE(           0x10000, 0xc000 )
 
-	ROM_REGION( 0x30000, "cpu2", 0 )
+	ROM_REGION( 0x30000, "slave", 0 )
 	ROM_LOAD( "c01-07.rom", 0x00000, 0x20000, CRC(5117c98f) SHA1(16b3a443eb113d2591833884a1b0ff297d8c00a4) )
 	ROM_RELOAD(             0x10000, 0x20000 )
 
@@ -2578,7 +2578,7 @@ ROM_START( champwr )
 ROM_END
 
 ROM_START( champwru )
-	ROM_REGION( 0xf0000, "cpu1", 0 )
+	ROM_REGION( 0xf0000, "main", 0 )
 	ROM_LOAD( "c01-12.rom", 0x00000, 0x20000, CRC(09f345b3) SHA1(f3f9a7dab0b3f87b6919a7b37cb52245e112cb08) )
 	ROM_RELOAD(             0x10000, 0x20000 )
 	ROM_LOAD( "c01-04.rom", 0x30000, 0x20000, CRC(358bd076) SHA1(beb20a09370d05de719dde596eadca8fecb14ce5) )
@@ -2587,7 +2587,7 @@ ROM_START( champwru )
 	ROM_LOAD( "c01-08.rom", 0x00000, 0x4000, CRC(810efff8) SHA1(dd4fc046095e0e815e8e1fd96d258da0d6bba298) )
 	ROM_CONTINUE(           0x10000, 0xc000 )
 
-	ROM_REGION( 0x30000, "cpu2", 0 )
+	ROM_REGION( 0x30000, "slave", 0 )
 	ROM_LOAD( "c01-07.rom", 0x00000, 0x20000, CRC(5117c98f) SHA1(16b3a443eb113d2591833884a1b0ff297d8c00a4) )
 	ROM_RELOAD(             0x10000, 0x20000 )
 
@@ -2601,7 +2601,7 @@ ROM_START( champwru )
 ROM_END
 
 ROM_START( champwrj )
-	ROM_REGION( 0xf0000, "cpu1", 0 )
+	ROM_REGION( 0xf0000, "main", 0 )
 	ROM_LOAD( "c01-06.bin", 0x00000, 0x20000, CRC(90fa1409) SHA1(7904488d567ce5d8705b2d2c8a4b4aae310cc28b) )
 	ROM_RELOAD(             0x10000, 0x20000 )
 	ROM_LOAD( "c01-04.rom", 0x30000, 0x20000, CRC(358bd076) SHA1(beb20a09370d05de719dde596eadca8fecb14ce5) )
@@ -2610,7 +2610,7 @@ ROM_START( champwrj )
 	ROM_LOAD( "c01-08.rom", 0x00000, 0x4000, CRC(810efff8) SHA1(dd4fc046095e0e815e8e1fd96d258da0d6bba298) )
 	ROM_CONTINUE(           0x10000, 0xc000 )
 
-	ROM_REGION( 0x30000, "cpu2", 0 )
+	ROM_REGION( 0x30000, "slave", 0 )
 	ROM_LOAD( "c01-07.rom", 0x00000, 0x20000, CRC(5117c98f) SHA1(16b3a443eb113d2591833884a1b0ff297d8c00a4) )
 	ROM_RELOAD(             0x10000, 0x20000 )
 
@@ -2624,11 +2624,8 @@ ROM_START( champwrj )
 ROM_END
 
 
-
-
-
 ROM_START( kurikint )
-	ROM_REGION( 0xb0000, "cpu1", 0 )
+	ROM_REGION( 0xb0000, "main", 0 )
 	ROM_LOAD( "b42-09.ic2",  0x00000, 0x20000, CRC(e97c4394) SHA1(fdeb15315166f7615d4039d5dc9c28d53cee86f2) )
 	ROM_RELOAD(              0x10000, 0x20000 )
 	ROM_LOAD( "b42-06.ic6",  0x30000, 0x20000, CRC(fa15fd65) SHA1(a810d7315878212e4e5344a24addf117ea6baeab) )
@@ -2642,7 +2639,7 @@ ROM_START( kurikint )
 ROM_END
 
 ROM_START( kurikinu )
-	ROM_REGION( 0xb0000, "cpu1", 0 )
+	ROM_REGION( 0xb0000, "main", 0 )
 	ROM_LOAD( "b42-08.ic2",  0x00000, 0x20000, CRC(7075122e) SHA1(55f5f0cf3b91b7b408f9c05c91f9839c43b49c5f) )
 	ROM_RELOAD(              0x10000, 0x20000 )
 	ROM_LOAD( "b42-06.ic6",  0x30000, 0x20000, CRC(fa15fd65) SHA1(a810d7315878212e4e5344a24addf117ea6baeab) )
@@ -2656,7 +2653,7 @@ ROM_START( kurikinu )
 ROM_END
 
 ROM_START( kurikinj )
-	ROM_REGION( 0xb0000, "cpu1", 0 )
+	ROM_REGION( 0xb0000, "main", 0 )
 	ROM_LOAD( "b42-05.ic2",  0x00000, 0x20000, CRC(077222b8) SHA1(953fb3444f6bb0dbe0323a0fd8fc3067b106a4f6) )
 	ROM_RELOAD(              0x10000, 0x20000 )
 	ROM_LOAD( "b42-06.ic6",  0x30000, 0x20000, CRC(fa15fd65) SHA1(a810d7315878212e4e5344a24addf117ea6baeab) )
@@ -2670,7 +2667,7 @@ ROM_START( kurikinj )
 ROM_END
 
 ROM_START( kurikina )
-	ROM_REGION( 0xb0000, "cpu1", 0 )
+	ROM_REGION( 0xb0000, "main", 0 )
 	ROM_LOAD( "kk_ic2.ic2",  0x00000, 0x20000, CRC(908603f2) SHA1(f810f2501458224e9264a984f22547cc8ccc2b0e) )
 	ROM_RELOAD(              0x10000, 0x20000 )
 	ROM_LOAD( "kk_ic6.ic6",  0x30000, 0x20000, CRC(a4a957b1) SHA1(bbdb5b71ab613a8c89f7a0300abd85408951dc7e) )
@@ -2738,7 +2735,7 @@ CPU TC0090LVC (All in one Z80 & system controller??)
 ************************************************************************/
 
 ROM_START( plotting ) /* Likely B96-10 or higher by Taito's rom numbering system, demo mode is 1 player */
-	ROM_REGION( 0x20000, "cpu1", 0 )
+	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "ic10",       0x00000, 0x10000, CRC(be240921) SHA1(f29f3a49b563f24aa6e3187ac4da1a8100cb02b5) )
 	ROM_RELOAD(             0x10000, 0x10000 )
 
@@ -2752,7 +2749,7 @@ ROM_END
 
 
 ROM_START( plottina ) /* B96-09 or higher by Taito's rom numbering system, demo mode is 2 players */
-	ROM_REGION( 0x20000, "cpu1", 0 )
+	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "plot01.ic10", 0x00000, 0x10000, CRC(5b30bc25) SHA1(df8839a90da9e5122d75b6faaf97f59499dbd316) )
 	ROM_RELOAD(              0x10000, 0x10000 )
 
@@ -2765,7 +2762,7 @@ ROM_START( plottina ) /* B96-09 or higher by Taito's rom numbering system, demo 
 ROM_END
 
 ROM_START( plottinb ) /* The first (earliest) "World" version by Taito's rom numbering system, demo mode is 2 players */
-	ROM_REGION( 0x20000, "cpu1", 0 )
+	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "b96-06.ic10",0x00000, 0x10000, CRC(f89a54b1) SHA1(19757b5fb61acdd6f5ae8e32a38ae54bfda0c522) )
 	ROM_RELOAD(             0x10000, 0x10000 )
 
@@ -2778,7 +2775,7 @@ ROM_START( plottinb ) /* The first (earliest) "World" version by Taito's rom num
 ROM_END
 
 ROM_START( plottinu ) /* The demo mode is 2 players */
-	ROM_REGION( 0x20000, "cpu1", 0 )
+	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "b96-05.ic10",0x00000, 0x10000, CRC(afb99d1f) SHA1(a5cabc182d4f1d5709e6835d8b0a481dd0f9a563) )
 	ROM_RELOAD(             0x10000, 0x10000 )
 
@@ -2791,7 +2788,7 @@ ROM_START( plottinu ) /* The demo mode is 2 players */
 ROM_END
 
 ROM_START( flipull ) /* The demo mode is 1 player */
-	ROM_REGION( 0x20000, "cpu1", 0 )
+	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "b96-01.ic10",0x00000, 0x10000, CRC(65993978) SHA1(d14dc70f1b5e72b96ccc3fab61d7740f627bfea2) )
 	ROM_RELOAD(             0x10000, 0x10000 )
 
@@ -2801,7 +2798,7 @@ ROM_START( flipull ) /* The demo mode is 1 player */
 ROM_END
 
 ROM_START( puzznic )
-	ROM_REGION( 0x30000, "cpu1", 0 )
+	ROM_REGION( 0x30000, "main", 0 )
 	ROM_LOAD( "c20-09.ic11", 0x00000, 0x20000, CRC(156d6de1) SHA1(c247936b62ef354851c9bace76a7a0aa14194d5f) )
 	ROM_RELOAD(              0x10000, 0x20000 )
 
@@ -2814,7 +2811,7 @@ ROM_START( puzznic )
 ROM_END
 
 ROM_START( puzznicj )
-	ROM_REGION( 0x30000, "cpu1", 0 )
+	ROM_REGION( 0x30000, "main", 0 )
 	ROM_LOAD( "u11.ic11",  0x00000, 0x20000, CRC(a4150b6c) SHA1(27719b8993735532cd59f4ed5693ff3143ee2336) )
 	ROM_RELOAD(            0x10000, 0x20000 )
 
@@ -2827,7 +2824,7 @@ ROM_START( puzznicj )
 ROM_END
 
 ROM_START( puzznici ) /* bootleg */
-	ROM_REGION( 0x30000, "cpu1", 0 )
+	ROM_REGION( 0x30000, "main", 0 )
 	ROM_LOAD( "1.ic11",  0x00000, 0x20000, CRC(4612f5e0) SHA1(dc07a365414666568537d31ef01b58f2362cadaf) )
 	ROM_RELOAD(          0x10000, 0x20000 )
 
@@ -2857,7 +2854,7 @@ SUB PCB (K9100282A / J9100220A)
 */
 
 ROM_START( horshoes )
-	ROM_REGION( 0x30000, "cpu1", 0 )
+	ROM_REGION( 0x30000, "main", 0 )
 	ROM_LOAD( "c47-03.ic6",  0x00000, 0x20000, CRC(37e15b20) SHA1(85baa0ee553e4c9fed38294ba8912f18f519e62f) )
 	ROM_RELOAD(              0x10000, 0x20000 )
 
@@ -2873,7 +2870,7 @@ ROM_START( horshoes )
 ROM_END
 
 ROM_START( palamed )
-	ROM_REGION( 0x30000, "cpu1", 0 )
+	ROM_REGION( 0x30000, "main", 0 )
 	ROM_LOAD( "c63.02", 0x00000, 0x20000, CRC(55a82bb2) SHA1(f157ad770351d4b8d8f8c061c4e330d6391fc624) )
 	ROM_RELOAD(         0x10000, 0x20000 )
 
@@ -2883,7 +2880,7 @@ ROM_START( palamed )
 ROM_END
 
 ROM_START( cachat )
-	ROM_REGION( 0x30000, "cpu1", 0 )
+	ROM_REGION( 0x30000, "main", 0 )
 	ROM_LOAD( "cac6",  0x00000, 0x20000, CRC(8105cf5f) SHA1(e6dd22165436c247db887a04c3e69c9e2505bb33) )
 	ROM_RELOAD(        0x10000, 0x20000 )
 
@@ -2898,7 +2895,7 @@ ROM_START( cachat )
 ROM_END
 
 ROM_START( tubeit )
-	ROM_REGION( 0x30000, "cpu1", 0 )
+	ROM_REGION( 0x30000, "main", 0 )
 	ROM_LOAD( "t-i_02.6", 0x00000, 0x20000, CRC(54730669) SHA1(a44ebd31a8588a133a7552a39fa8d52ba1985e45) )
 	ROM_RELOAD(           0x10000, 0x20000 )
 
@@ -2911,7 +2908,7 @@ ROM_START( tubeit )
 ROM_END
 
 ROM_START( cubybop )
-	ROM_REGION( 0x50000, "cpu1", 0 )
+	ROM_REGION( 0x50000, "main", 0 )
 	ROM_LOAD( "cb06.6", 0x00000, 0x40000, CRC(66b89a85) SHA1(2ba26d71fd1aa8e64584a5908a1d797666718d49) )
 	ROM_RELOAD(         0x10000, 0x40000 )
 
@@ -2923,7 +2920,7 @@ ROM_START( cubybop )
 ROM_END
 
 ROM_START( plgirls )
-	ROM_REGION( 0x50000, "cpu1", 0 )
+	ROM_REGION( 0x50000, "main", 0 )
 	ROM_LOAD( "pg03.ic6", 0x00000, 0x40000, CRC(6ca73092) SHA1(f5679f047a29b936046c0d3677489df553ad7b41) )
 	ROM_RELOAD(           0x10000, 0x40000 )
 
@@ -2933,7 +2930,7 @@ ROM_START( plgirls )
 ROM_END
 
 ROM_START( plgirls2 )
-	ROM_REGION( 0x50000, "cpu1", 0 )
+	ROM_REGION( 0x50000, "main", 0 )
 	ROM_LOAD( "pg2_1j.ic6", 0x00000, 0x40000, CRC(f924197a) SHA1(ecaaefd1b3715ba60608e05d58be67e3c71f653a) )
 	ROM_RELOAD(             0x10000, 0x40000 )
 
@@ -2943,7 +2940,7 @@ ROM_START( plgirls2 )
 ROM_END
 
 ROM_START( evilston )
-	ROM_REGION( 0xb0000, "cpu1", 0 )
+	ROM_REGION( 0xb0000, "main", 0 )
 	ROM_LOAD( "c67-03.ic2",  0x00000, 0x20000, CRC(53419982) SHA1(ecc338e2237d26c5ff25b756d371b26b23beed1e) )
 	ROM_RELOAD(              0x10000, 0x20000 )
 	ROM_LOAD( "c67-04.ic6",  0x30000, 0x20000, CRC(55d57e19) SHA1(8815bcaafe7ee056314b4131e3fb7963854dd6ba) )
@@ -2974,7 +2971,7 @@ static DRIVER_INIT( plottina )
 				v |= 1<<(7-j);
 		tab[i] = v;
 	}
-	p = memory_region(machine, "cpu1");
+	p = memory_region(machine, "main");
 	for(i=0;i<0x20000;i++)
 	{
 		*p = tab[*p];
