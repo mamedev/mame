@@ -28,6 +28,7 @@
     * Elephant Family (italian, old),                   C.M.C.,             1996.
     * Pool 10 (italian, set 1),                         C.M.C.,             1996.
     * Pool 10 (italian, set 2),                         C.M.C.,             1996.
+    * Pool 10 (italian, set 3),                         C.M.C.,             1996.
     * Tortuga Family (italian),                         C.M.C.,             1997.
     * Pot Game (italian),                               C.M.C.,             1996.
     * Royal Card (austrian, set 1),                     TAB-Austria,        1991.
@@ -171,6 +172,9 @@
 
     There is another set of Cuore 1. I didn't include it because the only difference with
     the supported set is the program rom that is double sized, having identical halves.
+
+    There is at least one missing game in the family... 'Hippo Family', also from C.M.C.
+    This game should be located and dumped.
 
 
     --- Super Game ---
@@ -862,6 +866,10 @@
     [2008/05/13]
     - Found the proper algorithm to decrypt the blue TAB PCB.
     - Replaced the old decryption tables with the proper decryption scheme.
+    - Updated technical notes.
+
+    [2008/07/30]
+    - Added new clone: Pool 10 (italian, set 3).
     - Updated technical notes.
 
 
@@ -1989,7 +1997,7 @@ ROM_START( pool10 )
 	ROM_LOAD( "gal20v8b_p10.u23", 0x0400, 0x0157, NO_DUMP ) /* GAL is read protected */
 ROM_END
 
-ROM_START( pool10b )
+ROM_START( pool10b )	/* this set should be the parent */
 	ROM_REGION( 0x18000, "main", 0 )
 	ROM_LOAD( "u2.bin", 0x8000, 0x10000, CRC(64fee38e) SHA1(8a624a0b6eb4a3ba09e5b396dc5a01994dfdf294) )
 
@@ -2006,6 +2014,23 @@ ROM_START( pool10b )
 	ROM_LOAD( "palce16v8h_p10b.u5",  0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "palce20v8h_p10b.u22", 0x0200, 0x0157, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "palce20v8h_p10b.u23", 0x0400, 0x0157, NO_DUMP ) /* PAL is read protected */
+ROM_END
+
+ROM_START( pool10c )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "a.u2", 0x8000, 0x8000, CRC(ac157b17) SHA1(f2b7eb940273bc404d3e0d8dd0f00ca757cebf69) )
+
+	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "b.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
+	ROM_LOAD( "c.u20", 0x8000, 0x8000, CRC(9abedd0c) SHA1(f184a82e8ec2387069d631bcb77e890acd44b3f5) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "n82s147an_p10.u25",    0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "palce16v8h_p10.u5",  0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "gal20v8b_p10.u22", 0x0200, 0x0157, NO_DUMP ) /* GAL is read protected */
+	ROM_LOAD( "gal20v8b_p10.u23", 0x0400, 0x0157, NO_DUMP ) /* GAL is read protected */
 ROM_END
 
 ROM_START( tortufam )
@@ -2491,6 +2516,7 @@ GAME( 1997, elephfam, 0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",   
 GAME( 1996, elephfmb, elephfam, cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Elephant Family (italian, old)",                  0 )
 GAME( 1996, pool10,   0,        cuoreuno, pool10,   funworld, ROT0, "C.M.C.",          "Pool 10 (italian, set 1)",                        0 )
 GAME( 1996, pool10b,  pool10,   cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pool 10 (italian, set 2)",                        0 )
+GAME( 1996, pool10c,  pool10,   cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pool 10 (italian, set 3)",                        0 )
 GAME( 1997, tortufam, 0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Tortuga Family (italian)",                        0 )
 GAME( 1996, potgame,  0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pot Game (italian)",                              0 )
 GAME( 1991, royalcrd, 0,        royalcrd, royalcrd, funworld, ROT0, "TAB-Austria",     "Royal Card (austrian, set 1)",                    0 )
