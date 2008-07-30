@@ -471,8 +471,12 @@ void device_list_start(running_machine *machine)
 		device->token = malloc_or_die(tokenlen);
 		memset(device->token, 0, tokenlen);
 
-		/* call the start function */
+		/* fill in the remaining runtime fields */
 		device->machine = machine;
+		device->region = memory_region(machine, device->tag);
+		device->regionbytes = memory_region_length(machine, device->tag);
+
+		/* call the start function */
 		(*device->start)(device);
 	}
 }
@@ -502,8 +506,12 @@ static void device_list_stop(running_machine *machine)
 		/* free allocated memory for the token */
 		if (device->token != NULL)
 			free(device->token);
+			
+		/* reset all runtime fields */
 		device->token = NULL;
 		device->machine = NULL;
+		device->region = NULL;
+		device->regionbytes = 0;
 	}
 }
 

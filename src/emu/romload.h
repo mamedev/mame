@@ -16,6 +16,7 @@
 
 #include "mamecore.h"
 #include "chd.h"
+#include "options.h"
 
 
 

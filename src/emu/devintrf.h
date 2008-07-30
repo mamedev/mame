@@ -15,6 +15,7 @@
 #define __DEVINTRF_H__
 
 #include "mamecore.h"
+#include "romload.h"
 
 
 /***************************************************************************
@@ -46,45 +47,43 @@ enum
 	/* --- the following bits of info are returned as 64-bit signed integers --- */
 	DEVINFO_INT_FIRST = 0x00000,
 
-	DEVINFO_INT_TOKEN_BYTES = DEVINFO_INT_FIRST,		/* R/O: bytes to allocate for the token */
-	DEVINFO_INT_INLINE_CONFIG_BYTES,					/* R/O: bytes to allocate for the inline configuration */
-	DEVINFO_INT_CLASS,									/* R/O: the device's class */
+		DEVINFO_INT_TOKEN_BYTES = DEVINFO_INT_FIRST,	/* R/O: bytes to allocate for the token */
+		DEVINFO_INT_INLINE_CONFIG_BYTES,				/* R/O: bytes to allocate for the inline configuration */
+		DEVINFO_INT_CLASS,								/* R/O: the device's class */
 
 	DEVINFO_INT_DEVICE_SPECIFIC = 0x08000,				/* R/W: device-specific values start here */
-
 	DEVINFO_INT_LAST = 0x0ffff,
 
 	/* --- the following bits of info are returned as pointers --- */
 	DEVINFO_PTR_FIRST = 0x10000,
+	
+		DEVINFO_PTR_ROM_REGION = DEVINFO_PTR_FIRST,		/* R/O: pointer to device-specific ROM region */
 
 	DEVINFO_PTR_DEVICE_SPECIFIC = 0x18000,				/* R/W: device-specific values start here */
-
 	DEVINFO_PTR_LAST = 0x1ffff,
 
 	/* --- the following bits of info are returned as pointers to functions --- */
 	DEVINFO_FCT_FIRST = 0x20000,
 
-	DEVINFO_FCT_SET_INFO = DEVINFO_FCT_FIRST,			/* R/O: device_set_info_func */
-	DEVINFO_FCT_START,									/* R/O: device_start_func */
-	DEVINFO_FCT_STOP,									/* R/O: device_stop_func */
-	DEVINFO_FCT_RESET,									/* R/O: device_reset_func */
-	DEVINFO_FCT_VALIDITY_CHECK,							/* R/O: device_validity_check_func */
+		DEVINFO_FCT_SET_INFO = DEVINFO_FCT_FIRST,		/* R/O: device_set_info_func */
+		DEVINFO_FCT_START,								/* R/O: device_start_func */
+		DEVINFO_FCT_STOP,								/* R/O: device_stop_func */
+		DEVINFO_FCT_RESET,								/* R/O: device_reset_func */
+		DEVINFO_FCT_VALIDITY_CHECK,						/* R/O: device_validity_check_func */
 
 	DEVINFO_FCT_DEVICE_SPECIFIC = 0x28000,				/* R/W: device-specific values start here */
-
 	DEVINFO_FCT_LAST = 0x2ffff,
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
 	DEVINFO_STR_FIRST = 0x30000,
 
-	DEVINFO_STR_NAME = DEVINFO_STR_FIRST,				/* R/O: name of the device */
-	DEVINFO_STR_FAMILY,									/* R/O: family of the device */
-	DEVINFO_STR_VERSION,								/* R/O: version of the device */
-	DEVINFO_STR_SOURCE_FILE,							/* R/O: file containing the device implementation */
-	DEVINFO_STR_CREDITS,								/* R/O: credits for the device implementation */
+		DEVINFO_STR_NAME = DEVINFO_STR_FIRST,			/* R/O: name of the device */
+		DEVINFO_STR_FAMILY,								/* R/O: family of the device */
+		DEVINFO_STR_VERSION,							/* R/O: version of the device */
+		DEVINFO_STR_SOURCE_FILE,						/* R/O: file containing the device implementation */
+		DEVINFO_STR_CREDITS,							/* R/O: credits for the device implementation */
 
 	DEVINFO_STR_DEVICE_SPECIFIC = 0x38000,				/* R/W: device-specific values start here */
-
 	DEVINFO_STR_LAST = 0x3ffff
 };
 
@@ -155,6 +154,7 @@ union _deviceinfo
 	device_stop_func		stop;					/* DEVINFO_FCT_STOP */
 	device_reset_func		reset;					/* DEVINFO_FCT_RESET */
 	device_validity_check_func validity_check;		/* DEVINFO_FCT_VALIDITY_CHECK */
+	const rom_entry *		romregion;				/* DEVINFO_PTR_ROM_REGION */
 };
 
 
@@ -171,9 +171,11 @@ struct _device_config
 	const void *			static_config;			/* static device configuration */
 	void *					inline_config;			/* inline device configuration */
 
-	/* these two fields are only valid if the device is live */
+	/* these four fields are only valid if the device is live */
 	void *					token;					/* token if device is live */
 	running_machine *		machine;				/* machine if device is live */
+	UINT8 *					region;					/* pointer to region with the device's tag, or NULL */
+	UINT32					regionbytes;			/* size of the region, in bytes */
 
 	char					tag[1];					/* tag for this instance */
 };
