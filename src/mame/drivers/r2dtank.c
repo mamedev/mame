@@ -539,7 +539,6 @@ static MACHINE_DRIVER_START( r2dtank )
 	MDRV_CPU_ADD("main", M6809,3000000)		 /* ?? too fast ? */
 	MDRV_CPU_PROGRAM_MAP(r2dtank_main_map,0)
 
-	/* audio CPU */
 	MDRV_CPU_ADD("audio", M6802,3000000)			/* ?? */
 	MDRV_CPU_PROGRAM_MAP(r2dtank_audio_map,0)
 

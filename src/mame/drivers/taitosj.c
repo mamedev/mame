@@ -1824,8 +1824,7 @@ static MACHINE_DRIVER_START( nomcu )
 	MDRV_CPU_PROGRAM_MAP(taitosj_main_nomcu_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	/* audio CPU */      /* 3 MHz */
-	MDRV_CPU_ADD("audio", Z80,6000000/2)
+	MDRV_CPU_ADD("audio", Z80,6000000/2)    /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(taitosj_audio_map,0)
 			/* interrupts: */
 			/* - no interrupts synced with vblank */

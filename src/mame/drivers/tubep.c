@@ -910,7 +910,6 @@ static MACHINE_DRIVER_START( tubep )
 	MDRV_CPU_PROGRAM_MAP(tubep_second_map,0)
 	MDRV_CPU_IO_MAP(tubep_second_portmap,0)
 
-	/* audio CPU */
 	MDRV_CPU_ADD("sound",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
 	MDRV_CPU_PROGRAM_MAP(tubep_sound_map,0)
 	MDRV_CPU_IO_MAP(tubep_sound_portmap,0)
@@ -976,7 +975,6 @@ static MACHINE_DRIVER_START( rjammer )
 	MDRV_CPU_PROGRAM_MAP(rjammer_second_map,0)
 	MDRV_CPU_IO_MAP(rjammer_second_portmap,0)
 
-	/* audio CPU */
 	MDRV_CPU_ADD("sound",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
 	MDRV_CPU_PROGRAM_MAP(rjammer_sound_map,0)
 	MDRV_CPU_IO_MAP(rjammer_sound_portmap,0)

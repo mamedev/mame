@@ -355,7 +355,6 @@ static MACHINE_DRIVER_START( powerins )
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD("sound", Z80, 6000000) /* 6 MHz */
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(readmem_snd,writemem_snd)
 	MDRV_CPU_IO_MAP(powerins_io_snd,0)
 
@@ -418,7 +417,6 @@ static MACHINE_DRIVER_START( powerinb )
 	MDRV_SCREEN_REFRESH_RATE(60)
 
 	MDRV_CPU_MODIFY("sound") /* 6 MHz */
-	/* audio CPU */
 	MDRV_CPU_IO_MAP(powerinb_io_snd,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 120)	// YM2203 rate is at 150??
 

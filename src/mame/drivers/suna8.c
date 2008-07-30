@@ -1670,12 +1670,10 @@ static MACHINE_DRIVER_START( brickzn )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	// nmi breaks ramtest but is needed!
 
 	MDRV_CPU_ADD("sound", Z80, 24000000 / 4)	/* Z0840006PSC */
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(brickzn_sound_readmem,brickzn_sound_writemem)
 	MDRV_CPU_IO_MAP(brickzn_sound_readport,brickzn_sound_writeport)
 
 	MDRV_CPU_ADD("pcm", Z80, 24000000 / 4)	/* Z0840006PSC */
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(brickzn_pcm_readmem,brickzn_pcm_writemem)
 	MDRV_CPU_IO_MAP(brickzn_pcm_readport,brickzn_pcm_writeport)
 

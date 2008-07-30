@@ -1255,8 +1255,7 @@ static MACHINE_DRIVER_START( hustler )
 	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(hustler_readmem,hustler_writemem)
 
-	MDRV_CPU_ADD("sound",Z80,14318000/8)
-	/* audio CPU */	/* 1.78975 MHz */
+	MDRV_CPU_ADD("sound",Z80,14318000/8)	/* 1.78975 MHz */
 	MDRV_CPU_PROGRAM_MAP(hustler_sound_readmem,hustler_sound_writemem)
 	MDRV_CPU_IO_MAP(hustler_sound_readport,hustler_sound_writeport)
 

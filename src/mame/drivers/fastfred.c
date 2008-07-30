@@ -561,8 +561,7 @@ static MACHINE_DRIVER_START( fastfred )
 	MDRV_CPU_PROGRAM_MAP(fastfred_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audio", Z80, CLOCK/12)
-	/* audio CPU */    /* 1.536 MHz */
+	MDRV_CPU_ADD("audio", Z80, CLOCK/12)	 /* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)
 

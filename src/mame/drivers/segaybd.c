@@ -970,7 +970,6 @@ static MACHINE_DRIVER_START( yboard )
 	MDRV_CPU_PROGRAM_MAP(suby_map,0)
 
 	MDRV_CPU_ADD("sound", Z80, SOUND_CLOCK/8)
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 

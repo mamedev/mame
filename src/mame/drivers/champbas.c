@@ -649,7 +649,6 @@ static MACHINE_DRIVER_START( champbas )
 	MDRV_CPU_PROGRAM_MAP(champbas_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	/* audio CPU */
 	MDRV_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
 	MDRV_CPU_PROGRAM_MAP(champbas_sub_map,0)
 

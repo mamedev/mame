@@ -939,7 +939,6 @@ static MACHINE_DRIVER_START( mystwarr )
 	MDRV_CPU_VBLANK_INT_HACK(mystwarr_interrupt, 3)
 
 	MDRV_CPU_ADD("sound", Z80, 8000000)
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 480)
 

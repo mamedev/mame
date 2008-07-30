@@ -1558,7 +1558,6 @@ static MACHINE_DRIVER_START( snowbros )
 	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
 	MDRV_CPU_ADD("sound", Z80, 6000000) /* 6 MHz - confirmed */
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 
@@ -1607,7 +1606,6 @@ static MACHINE_DRIVER_START( semicom )
 	MDRV_CPU_PROGRAM_MAP(hyperpac_readmem,hyperpac_writemem)
 
 	MDRV_CPU_REPLACE("sound", Z80, 4000000) /* 4.0 MHz ??? */
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(hyperpac_sound_readmem,hyperpac_sound_writemem)
 
 	MDRV_GFXDECODE(hyperpac)
@@ -1656,7 +1654,6 @@ static MACHINE_DRIVER_START( honeydol )
 	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
 	MDRV_CPU_ADD("sound", Z80, 4000000)
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(honeydol_sound_readmem,honeydol_sound_writemem)
 	MDRV_CPU_IO_MAP(honeydol_sound_readport,honeydol_sound_writeport)
 
@@ -1696,7 +1693,6 @@ static MACHINE_DRIVER_START( twinadv )
 	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
 	MDRV_CPU_ADD("sound", Z80, 4000000)
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(twinadv_sound_readmem,twinadv_sound_writemem)
 	MDRV_CPU_IO_MAP(twinadv_sound_readport,twinadv_sound_writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)

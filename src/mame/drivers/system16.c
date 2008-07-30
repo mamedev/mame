@@ -447,7 +447,6 @@ static MACHINE_DRIVER_START( system16 )
 	MDRV_CPU_VBLANK_INT("main", sys16_interrupt)
 
 	MDRV_CPU_ADD("sound", Z80, 4000000)
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 
@@ -2021,7 +2020,6 @@ static MACHINE_DRIVER_START( tturfbl )
 	MDRV_CPU_PROGRAM_MAP(tturfbl_readmem,tturfbl_writemem)
 
 	MDRV_CPU_MODIFY("sound")
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(tturfbl_sound_readmem,tturfbl_sound_writemem)
 	MDRV_CPU_IO_MAP(tturfbl_sound_readport,tturfbl_sound_writeport)
 

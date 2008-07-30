@@ -1315,7 +1315,6 @@ static MACHINE_DRIVER_START( konamigx )
 	MDRV_CPU_VBLANK_INT("main", konamigx_vbinterrupt)
 
 	MDRV_CPU_ADD("sound", M68000, 8000000)
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(gxsndmap, 0)
 	MDRV_CPU_PERIODIC_INT(irq2_line_hold, 480)
 

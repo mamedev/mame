@@ -1969,7 +1969,7 @@ static MACHINE_DRIVER_START( fghthsta )
 	MDRV_CPU_PROGRAM_MAP(fghthsta_memmap,0)
 	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
-	MDRV_CPU_ADD("audio", H6280, 32220000/8) /* audio CPU */
+	MDRV_CPU_ADD("audio", H6280, 32220000/8)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_NVRAM_HANDLER(93C46)

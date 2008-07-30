@@ -761,7 +761,6 @@ static MACHINE_DRIVER_START( lwings )
 	MDRV_CPU_VBLANK_INT("main", lwings_interrupt)
 
 	MDRV_CPU_ADD("sound", Z80, 4000000)
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
@@ -805,7 +804,6 @@ static MACHINE_DRIVER_START( trojan )
 	MDRV_CPU_PROGRAM_MAP(readmem,trojan_writemem)
 
 	MDRV_CPU_ADD("adpcm", Z80, 4000000) // 3.579545 Mhz (?)
-	/* audio CPU */	/* ? */
 	MDRV_CPU_PROGRAM_MAP(adpcm_readmem,adpcm_writemem)
 	MDRV_CPU_IO_MAP(adpcm_readport,adpcm_writeport)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 4000)

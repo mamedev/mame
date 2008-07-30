@@ -446,8 +446,7 @@ static MACHINE_DRIVER_START( ironhors )
 	MDRV_CPU_PROGRAM_MAP(master_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(ironhors_interrupt,8)
 
-	MDRV_CPU_ADD("sound",Z80,18432000/6)
-	/* audio CPU */        /* 3.072 MHz */
+	MDRV_CPU_ADD("sound",Z80,18432000/6)		 /* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(slave_map, 0)
 	MDRV_CPU_IO_MAP(slave_io_map, 0)
 

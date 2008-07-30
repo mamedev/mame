@@ -1911,7 +1911,6 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( coh1002e )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
-	/* audio CPU */
 	MDRV_CPU_ADD("audio", M68000, 12000000 )
 	MDRV_CPU_PROGRAM_MAP( psarc_snd_map, 0 )
 
@@ -2373,7 +2372,6 @@ static MACHINE_RESET( coh1001l )
 static MACHINE_DRIVER_START( coh1001l )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
-//  /* audio CPU */
 //  MDRV_CPU_ADD("audio", M68000, 10000000 )
 //  MDRV_CPU_PROGRAM_MAP( atlus_snd_map, 0 )
 
@@ -2685,7 +2683,6 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( coh1002msnd )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
-	/* audio CPU */
 	MDRV_CPU_ADD("audio", Z80, 32000000/8 )
 	MDRV_CPU_PROGRAM_MAP( cbaj_z80_map, 0 )
 	MDRV_CPU_IO_MAP( cbaj_z80_port_map, 0 )

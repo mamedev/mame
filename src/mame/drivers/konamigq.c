@@ -373,7 +373,6 @@ static MACHINE_DRIVER_START( konamigq )
 	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
 	MDRV_CPU_ADD( "sound", M68000, 8000000 )
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP( sndreadmem, sndwritemem )
 	MDRV_CPU_PERIODIC_INT( irq2_line_hold, 480 )
 

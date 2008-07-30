@@ -1088,11 +1088,9 @@ static MACHINE_DRIVER_START( ds4 )
 	MDRV_CPU_DATA_MAP(ds3_data_map,0)
 
 //  MDRV_CPU_ADD("sound", ADSP2105, 10000000)
-//  /* audio CPU */
 //  MDRV_CPU_PROGRAM_MAP(ds3snd_program_map,0)
 
 //  MDRV_CPU_ADD("sounddsp", ADSP2105, 10000000)
-//  /* audio CPU */
 //  MDRV_CPU_PROGRAM_MAP(ds3snd_program_map,0)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")

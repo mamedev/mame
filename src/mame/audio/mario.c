@@ -448,9 +448,9 @@ static const struct AY8910interface ay8910_interface =
 MACHINE_DRIVER_START( mario_audio )
 
 #if USE_8039
-	MDRV_CPU_ADD("audio", I8039, I8035_CLOCK)  /* audio CPU */         /* 730 kHz */
+	MDRV_CPU_ADD("audio", I8039, I8035_CLOCK)         /* 730 kHz */
 #else
-	MDRV_CPU_ADD("audio", M58715, I8035_CLOCK)  /* audio CPU */         /* 730 kHz */
+	MDRV_CPU_ADD("audio", M58715, I8035_CLOCK)        /* 730 kHz */
 #endif
 	MDRV_CPU_PROGRAM_MAP(mario_sound_map, 0)
 	MDRV_CPU_IO_MAP(mario_sound_io_map, 0)
@@ -467,7 +467,7 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( masao_audio )
 
-	MDRV_CPU_ADD("audio", Z80,24576000/16) /* audio CPU */	/* ???? */
+	MDRV_CPU_ADD("audio", Z80,24576000/16)	/* ???? */
 	MDRV_CPU_PROGRAM_MAP(masao_sound_map,0)
 
 	MDRV_SOUND_START(mario)

@@ -447,8 +447,7 @@ static MACHINE_DRIVER_START( darius2d )
 	MDRV_CPU_PROGRAM_MAP(darius2d_map,0)
 	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
-	/* audio CPU */	/* 4 MHz ? */
-	MDRV_CPU_ADD("audio", Z80,16000000/4)
+	MDRV_CPU_ADD("audio", Z80,16000000/4)	/* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
 
 	MDRV_MACHINE_START( warriorb )
@@ -506,8 +505,7 @@ static MACHINE_DRIVER_START( warriorb )
 	MDRV_CPU_PROGRAM_MAP(warriorb_map,0)
 	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
-	/* audio CPU */	/* 4 MHz ? */
-	MDRV_CPU_ADD("audio", Z80,16000000/4)
+	MDRV_CPU_ADD("audio", Z80,16000000/4)	/* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
 
 	MDRV_MACHINE_START( warriorb )

@@ -574,7 +574,6 @@ static MACHINE_DRIVER_START( moo )
 	MDRV_CPU_VBLANK_INT("main", moo_interrupt)
 
 	MDRV_CPU_ADD("sound", Z80, 8000000)
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_START(moo)

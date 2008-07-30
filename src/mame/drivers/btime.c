@@ -1159,7 +1159,6 @@ static MACHINE_DRIVER_START( btime )
 	MDRV_CPU_ADD("main", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(btime_map,0)
 
-	/* audio CPU */
 	MDRV_CPU_ADD("audio", M6502, 500000)
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)

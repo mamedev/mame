@@ -489,7 +489,6 @@ static MACHINE_DRIVER_START( ddragon3 )
 	MDRV_CPU_VBLANK_INT_HACK(ddragon3_cpu_interrupt, 2)
 
 	MDRV_CPU_ADD("audio", Z80, 3579545) // Guess (confirmed on bootleg)
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound, writemem_sound)
 
 	/* video hardware */

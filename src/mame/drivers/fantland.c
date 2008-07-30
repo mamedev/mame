@@ -812,7 +812,6 @@ static MACHINE_DRIVER_START( fantland )
 	MDRV_CPU_PROGRAM_MAP(fantland_map, 0)
 	MDRV_CPU_VBLANK_INT("main", fantland_irq)
 
-	/* audio CPU */
 	MDRV_CPU_ADD("audio", I8088, 8000000)        // ?
 	MDRV_CPU_PROGRAM_MAP(fantland_sound_map, 0)
 	MDRV_CPU_IO_MAP(fantland_sound_iomap, 0)
@@ -864,7 +863,6 @@ static MACHINE_DRIVER_START( galaxygn )
 	MDRV_CPU_PROGRAM_MAP(galaxygn_map, 0)
 	MDRV_CPU_VBLANK_INT("main", fantland_irq)
 
-	/* audio CPU */
 	MDRV_CPU_ADD("audio", I8088, 8000000)        // ?
 	MDRV_CPU_PROGRAM_MAP(fantland_sound_map, 0)
 	MDRV_CPU_IO_MAP(fantland_sound_iomap, 0)
@@ -918,7 +916,6 @@ static MACHINE_DRIVER_START( borntofi )
 	MDRV_CPU_PROGRAM_MAP(borntofi_map, 0)
 	MDRV_CPU_VBLANK_INT("main", fantland_irq)
 
-	/* audio CPU */
 	MDRV_CPU_ADD("audio", I8088, 18432000/3)        // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
 	MDRV_CPU_PROGRAM_MAP(borntofi_sound_map, 0)
 
@@ -964,7 +961,6 @@ static MACHINE_DRIVER_START( wheelrun )
 	MDRV_CPU_PROGRAM_MAP(wheelrun_map, 0)
 	MDRV_CPU_VBLANK_INT("main", fantland_irq)
 
-	/* audio CPU */
 	MDRV_CPU_ADD("audio", Z80, XTAL_18MHz/2)		// Z8400BB1 (Z80B)
 	MDRV_CPU_PROGRAM_MAP(wheelrun_sound_map, 0)
 	// IRQ by YM3526, NMI when soundlatch is written

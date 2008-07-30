@@ -916,7 +916,6 @@ static MACHINE_DRIVER_START( deroon )
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 	MDRV_WATCHDOG_VBLANK_INIT(400) // guess
 
-	/* audio CPU */
 	MDRV_CPU_ADD("audio", Z80, 16000000/2 )	/* 8 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)

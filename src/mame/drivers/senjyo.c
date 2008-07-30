@@ -651,9 +651,8 @@ static MACHINE_DRIVER_START( senjyo )
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", senjyo_interrupt)
 
-	MDRV_CPU_ADD("sub", Z80, 2000000)
+	MDRV_CPU_ADD("sub", Z80, 2000000)	/* 2 MHz? */
 	MDRV_CPU_CONFIG(daisy_chain)
-	/* audio CPU */	/* 2 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 

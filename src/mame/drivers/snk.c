@@ -1198,7 +1198,6 @@ static MACHINE_DRIVER_START( tdfever )
 //  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 

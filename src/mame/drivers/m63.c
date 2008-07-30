@@ -629,7 +629,6 @@ static MACHINE_DRIVER_START( m63 )
 	MDRV_CPU_PROGRAM_MAP(m63_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	/* audio CPU */
 	MDRV_CPU_ADD("soundcpu",I8039,XTAL_12MHz/4)	/* ????? */
 	MDRV_CPU_PROGRAM_MAP(i8039_map,0)
 	MDRV_CPU_IO_MAP(i8039_port_map,0)
@@ -674,7 +673,6 @@ static MACHINE_DRIVER_START( fghtbskt )
 	MDRV_CPU_PROGRAM_MAP(fghtbskt_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	/* audio CPU */
 	MDRV_CPU_ADD("audio", I8039,XTAL_12MHz/4)	/* ????? */
 	MDRV_CPU_PROGRAM_MAP(i8039_map,0)
 	MDRV_CPU_IO_MAP(i8039_port_map,0)

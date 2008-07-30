@@ -1271,7 +1271,6 @@ static MACHINE_DRIVER_START( system18 )
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD("sound", Z80, 8000000)
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 

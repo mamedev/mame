@@ -316,7 +316,6 @@ static MACHINE_DRIVER_START( ataxx )
 	MDRV_CPU_IO_MAP(slave_map_io,0)
 
 	MDRV_CPU_ADD("sound", I80186, XTAL_16MHz)
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(leland_80186_map_program,0)
 	MDRV_CPU_IO_MAP(ataxx_80186_map_io,0)
 

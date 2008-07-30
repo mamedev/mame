@@ -1760,7 +1760,6 @@ static MACHINE_DRIVER_START( bigrun )
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD("sound", M68000, 6000000)
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(bigrun_sound_readmem,bigrun_sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq4_line_hold,CISCHEAT_SOUND_INTERRUPT_NUM)
 

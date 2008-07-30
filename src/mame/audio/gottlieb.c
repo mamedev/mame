@@ -393,7 +393,6 @@ MACHINE_DRIVER_START( gottlieb_soundrev1 )
 
 	MDRV_RIOT6532_ADD("riot", SOUND1_CLOCK/4, gottlieb_riot6532_intf)
 
-	/* audio CPU */
 	MDRV_CPU_ADD("audio", M6502, SOUND1_CLOCK/4)	/* the board can be set to /2 as well */
 	MDRV_CPU_PROGRAM_MAP(sound1_map,0)
 

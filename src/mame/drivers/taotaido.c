@@ -333,7 +333,6 @@ static MACHINE_DRIVER_START( taotaido )
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	/* audio CPU */
 	MDRV_CPU_ADD("audio", Z80,20000000/4) // ??
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_port_map,0)

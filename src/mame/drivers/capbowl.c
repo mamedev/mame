@@ -357,7 +357,6 @@ static MACHINE_DRIVER_START( capbowl )
 	MDRV_CPU_PROGRAM_MAP(capbowl_map,0)
 	MDRV_CPU_VBLANK_INT("main", capbowl_interrupt)
 
-	/* audio CPU */
 	MDRV_CPU_ADD("audio", M6809E, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 

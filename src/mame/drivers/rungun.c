@@ -333,7 +333,6 @@ static MACHINE_DRIVER_START( rng )
 	MDRV_CPU_VBLANK_INT("main", rng_interrupt)
 
 	MDRV_CPU_ADD("sound", Z80, 10000000) // 8Mhz (10Mhz is much safer in self-test due to heavy sync)
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_PERIODIC_INT(audio_interrupt, 480)
 

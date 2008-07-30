@@ -570,7 +570,6 @@ static MACHINE_DRIVER_START( rygar )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("sound", Z80, XTAL_4MHz) /* verified on pcb */
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(rygar_sound_readmem,rygar_sound_writemem)
 
 	/* video hardware */

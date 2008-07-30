@@ -1859,7 +1859,6 @@ static MACHINE_DRIVER_START( scramble )
 	MDRV_CPU_PROGRAM_MAP(scramble_readmem,scramble_writemem)
 
 	MDRV_CPU_ADD("audio", Z80, 14318000/8)	/* 1.78975 MHz */
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(scramble_sound_readmem,scramble_sound_writemem)
 	MDRV_CPU_IO_MAP(scramble_sound_readport,scramble_sound_writeport)
 
