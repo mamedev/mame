@@ -740,13 +740,14 @@ static READ32_HANDLER( groovef_speedup_r )
 
 	return stv_workram_h[0x0c64ec/4];
 }
-/*
+
+#ifdef UNUSED_FUNCTION
 static READ32_HANDLER( groovef_second_cpu_off_r )
 {
     if (activecpu_get_pc()==0x060060c2)     cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
     return 0;
 }
-*/
+#endif
 
 static void groovef_slave_speedup( UINT32 data )
 {

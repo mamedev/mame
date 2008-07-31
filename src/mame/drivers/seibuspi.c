@@ -1918,7 +1918,7 @@ static READ32_HANDLER ( viprp1o_speedup_r )
 	return spimainram[(0x001d49c-0x800)/4];
 }
 
-/*
+#ifdef UNUSED_FUNCTION
 // causes input problems?
 READ32_HANDLER ( ejanhs_speedup_r )
 {
@@ -1926,7 +1926,7 @@ READ32_HANDLER ( ejanhs_speedup_r )
  if (activecpu_get_pc()==0x03032c7) cpu_spinuntil_int(); // idle
  return spimainram[(0x002d224-0x800)/4];
 }
-*/
+#endif
 
 static READ32_HANDLER ( rf2_speedup_r )
 {

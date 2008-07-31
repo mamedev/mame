@@ -460,12 +460,12 @@ static WRITE16_HANDLER( cpua_ctrl_w )	/* assumes Z80 sandwiched between 68Ks */
 
 /* 68000 A */
 
-/*
+#ifdef UNUSED_FUNCTION
 static TIMER_CALLBACK( wgp_interrupt4 )
 {
     cpunum_set_input_line(machine, 0,4,HOLD_LINE);
 }
-*/
+#endif
 
 static TIMER_CALLBACK( wgp_interrupt6 )
 {

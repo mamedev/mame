@@ -22,7 +22,7 @@ struct ym2413_info
 	void *			chip;
 };
 
-/*
+#ifdef UNUSED_FUNCTION
 void YM2413DAC_update(int chip,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
 {
     INT16 *buffer = _buffer[0];
@@ -34,7 +34,7 @@ void YM2413DAC_update(int chip,stream_sample_t **inputs, stream_sample_t **_buff
     }
     while (length--) *(buffer++) = out;
 }
-*/
+#endif
 
 static void ym2413_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
 {

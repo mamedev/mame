@@ -440,12 +440,12 @@ ADDRESS_MAP_END
 static int sample_buffer = 0;
 static int sample_select = 0;
 
-/*
+#ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER( spangbl_msm5205_data_w )
 {
     sample_buffer = data;
 }
-*/
+#endif
 
 static ADDRESS_MAP_START( spangb_sound_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM

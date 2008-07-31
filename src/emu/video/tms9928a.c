@@ -377,9 +377,11 @@ static void change_register (running_machine *machine, int reg, UINT8 val) {
 ** Interface functions
 */
 
-/*void TMS9928A_int_callback (void (*callback)(int)) {
+#ifdef UNUSED_FUNCTION
+void TMS9928A_int_callback (void (*callback)(int)) {
     tms.INTCallback = callback;
-}*/
+}
+#endif
 
 void TMS9928A_set_spriteslimit (int limit) {
     tms.LimitSprites = limit;

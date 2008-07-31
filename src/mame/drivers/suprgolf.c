@@ -31,12 +31,13 @@ static TILE_GET_INFO( get_tile_info )
 		0);
 }
 
-/*
+#ifdef UNUSED_FUNCTION
 static READ8_HANDLER( rom_bank_select_r )
 {
     return suprgolf_rom_bank;
 }
-*/
+#endif
+
 static WRITE8_HANDLER( rom_bank_select_w )
 {
 	UINT8 *region_base = memory_region(machine, "user1");

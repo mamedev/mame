@@ -84,12 +84,12 @@ static WRITE16_HANDLER( quizf1_bankswitch_w )
 	}
 }
 
-/*
+#ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( unknown_w )
 {
     printf("%04x    ",data);
 }
-*/
+#endif
 
 /***************************************************************************/
 

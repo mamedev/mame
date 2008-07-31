@@ -804,12 +804,14 @@ WRITE64_HANDLER( dc_rtc_w )
 	mame_printf_verbose("RTC: [%08x=%x] write %llx to %x, mask %llx\n", 0x710000 + reg*4, dat, data, offset, mem_mask);
 }
 
-/*static void dc_rtc_increment(void)
+#ifdef UNUSED_FUNCTION
+static void dc_rtc_increment(void)
 {
     dc_rtcregister[RTC2] = (dc_rtcregister[RTC2] + 1) & 0xFFFF;
     if (dc_rtcregister[RTC2] == 0)
         dc_rtcregister[RTC1] = (dc_rtcregister[RTC1] + 1) & 0xFFFF;
-}*/
+}
+#endif
 
 MACHINE_START( dc )
 {

@@ -656,7 +656,7 @@ static WRITE32_HANDLER( geo_ctl1_w )
 }
 
 
-/*
+#ifdef UNUSED_FUNCTION
 static WRITE32_HANDLER( geo_sharc_ctl1_w )
 {
     // did hi bit change?
@@ -733,7 +733,7 @@ static WRITE32_HANDLER(geo_sharc_iop_w)
         geo_iop_write_num++;
     }
 }
-*/
+#endif
 
 
 static void push_geo_data(UINT32 data)
@@ -860,11 +860,13 @@ static READ32_HANDLER(hotd_unk_r)
 	return 0x000c0000;
 }
 
-/*static READ32_HANDLER(sonic_unk_r)
+#ifdef UNUSED_FUNCTION
+static READ32_HANDLER(sonic_unk_r)
 {
     return 0x001a0000;
 }
-*/
+#endif
+
 static READ32_HANDLER(daytona_unk_r)
 {
 	return 0x00400000;

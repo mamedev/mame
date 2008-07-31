@@ -379,10 +379,12 @@ static void lr35902_set_irq_line (int irqline, int state)
      }
 }
 
-/*static void lr35902_clear_pending_interrupts (void)
+#ifdef UNUSED_FUNCTION
+static void lr35902_clear_pending_interrupts (void)
 {
     Regs.w.IF = 0;
-}*/
+}
+#endif
 
 static void lr35902_set_info(UINT32 state, cpuinfo *info)
 {

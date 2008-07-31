@@ -804,12 +804,12 @@ static const z80pio_interface meritm_io_pio_intf =
 	0
 };
 
-/*
+#ifdef UNUSED_FUNCTION
 static void meritm_pio1_portb_input_changed_callback(void *param, UINT32 oldval, UINT32 newval)
 {
     z80pio_p_w(1, 1, (UINT8)newval);
 }
-*/
+#endif
 
 static const struct z80_irq_daisy_chain meritm_daisy_chain[] =
 {

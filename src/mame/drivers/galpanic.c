@@ -342,12 +342,13 @@ static ADDRESS_MAP_START( galhustl_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe80000, 0xe8ffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-/*
+#ifdef UNUSED_FUNCTION
 READ16_HANDLER( zipzap_random_read )
 {
     return mame_rand(machine);
 }
-*/
+#endif
+
 static ADDRESS_MAP_START( zipzap_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x4fffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x500000, 0x51ffff) AM_READ(SMH_RAM)

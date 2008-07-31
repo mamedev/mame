@@ -634,12 +634,12 @@ anything to compare,infact
 		nmk16_mainram[_protinput_+1] = (_input_ & 0x0000ffff);\
 	}
 
-/*
+#ifdef UNUSED_FUNCTION
 static READ16_HANDLER( mcu_shared_r )
 {
     return nmk16_mcu_shared_ram[offset];
 }
-*/
+#endif
 
 //td     - hmf
 //008D9E - 00796e

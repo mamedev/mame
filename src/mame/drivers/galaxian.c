@@ -2849,7 +2849,7 @@ static DRIVER_INIT( turtles )
 }
 
 
-#ifdef UNUSED_CODE
+#ifdef UNUSED_FUNCTION
 static DRIVER_INIT( amidar )
 {
 	/* no existing amidar sets run on Amidar hardware as described by Amidar schematics! */

@@ -169,7 +169,7 @@ static VIDEO_UPDATE(pturn)
 	return 0;
 }
 
-/*
+#ifdef UNUSED_FUNCTION
 READ8_HANDLER (pturn_protection_r)
 {
     return 0x66;
@@ -179,7 +179,7 @@ READ8_HANDLER (pturn_protection2_r)
 {
     return 0xfe;
 }
-*/
+#endif
 
 static WRITE8_HANDLER( pturn_videoram_w )
 {

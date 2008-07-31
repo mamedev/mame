@@ -120,7 +120,7 @@ WRITE16_HANDLER( gcpinbal_tilemaps_word_w )
 }
 
 
-/*
+#ifdef UNUSED_FUNCTION
 
 READ16_HANDLER( gcpinbal_ctrl_word_r )
 {
@@ -169,7 +169,7 @@ WRITE16_HANDLER( gcpinbal_ctrl_word_w )
     }
 }
 
-*/
+#endif
 
 
 /****************************************************************

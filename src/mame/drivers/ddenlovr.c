@@ -6646,12 +6646,12 @@ static INTERRUPT_GEN( quizchq_irq )
 		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xee);
 }
 
-/*
+#ifdef UNUSED_FUNCTION
 static INTERRUPT_GEN( rtc_irq )
 {
     cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xfc);
 }
-*/
+#endif
 
 static MACHINE_DRIVER_START( quizchq )
 

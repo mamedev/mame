@@ -505,12 +505,12 @@ static UINT8 *hng64_com_mmu_mem;
 extern UINT32 hng64_hackTilemap3, hng64_hackTm3Count, hng64_rowScrollOffset;
 
 
-/*
+#ifdef UNUSED_FUNCTION
 WRITE32_HANDLER( trap_write )
 {
     logerror("Remapped write... %08x %08x\n",offset,data);
 }
-*/
+#endif
 
 
 static WRITE32_HANDLER( hng64_videoram_w )
@@ -818,13 +818,13 @@ static READ32_HANDLER( dl_r )
 	return hng64_dl[offset] ;
 }
 
-/*
+#ifdef UNUSED_FUNCTION
 WRITE32_HANDLER( activate_3d_buffer )
 {
     COMBINE_DATA (&active_3d_buffer[offset]) ;
     mame_printf_debug("COMBINED %d\n", active_3d_buffer[offset]) ;
 }
-*/
+#endif
 
 // Transition Control memory.
 static WRITE32_HANDLER( tcram_w )
@@ -1184,7 +1184,7 @@ static WRITE8_HANDLER( hng64_comm_io_mmu )
 	KL5C80_virtual_mem_sync();
 }
 
-/*
+#ifdef UNUSED_FUNCTION
 READ8_HANDLER( hng64_comm_shared_r )
 {
     // I'm thinking 0x54 comes from an interrupt on the MIPS CPU?  Or maybe the Toshiba one?
@@ -1211,7 +1211,7 @@ WRITE8_HANDLER( hng64_comm_shared_w )
 
     logerror("COM CPU wrote to com_shared_a : %08x\n", hng64_com_shared_a);
 }
-*/
+#endif
 
 static ADDRESS_MAP_START( hng_comm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000,0xffff) AM_READWRITE( hng64_comm_memory_r, hng64_comm_memory_w )
