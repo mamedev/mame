@@ -891,8 +891,7 @@ void debug_cpu_trace(int cpunum, FILE *file, int trace_over, const char *action)
 	if (action != NULL)
 	{
 		info->trace.action = malloc_or_die(strlen(action) + 1);
-		if (info->trace.action != NULL)
-			strcpy(info->trace.action, action);
+		strcpy(info->trace.action, action);
 	}
 
 	/* update flags */

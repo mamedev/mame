@@ -95,7 +95,7 @@ static UINT32 op0000(char *buffer, UINT32 pc, UINT16 opcode)
 			sprintf(buffer, "MOV.L   %s,@(R0,%s)", regname[Rm], regname[Rn]);
 			break;
 		case  7:
-			sprintf(buffer, "MUL.L   %s,%s\n", regname[Rm], regname[Rn]);
+			sprintf(buffer, "MUL.L   %s,%s", regname[Rm], regname[Rn]);
 			break;
 		case  8:
 			sprintf(buffer, "??????  $%04X", opcode);
@@ -375,7 +375,7 @@ static UINT32 op0100(char *buffer, UINT32 pc, UINT16 opcode)
 
 static UINT32 op0101(char *buffer, UINT32 pc, UINT16 opcode)
 {
-	sprintf(buffer, "MOV.L   @($%02X,%s),%s\n", (opcode & 15) * 4, regname[Rm], regname[Rn]);
+	sprintf(buffer, "MOV.L   @($%02X,%s),%s", (opcode & 15) * 4, regname[Rm], regname[Rn]);
 	return 0;
 }
 
@@ -474,7 +474,7 @@ static UINT32 op1000(char *buffer, UINT32 pc, UINT16 opcode)
 		sprintf(buffer, "BFS     $%08X", pc + SIGNX8(opcode & 0xff) * 2 + 2);
 		break;
 	default :
-		sprintf(buffer, "invalid $%04X\n", opcode);
+		sprintf(buffer, "invalid $%04X", opcode);
 	}
 	return 0;
 }

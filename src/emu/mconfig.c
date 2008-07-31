@@ -38,8 +38,6 @@ machine_config *machine_config_alloc(const machine_config_token *tokens)
 
 	/* allocate a new configuration object */
 	config = malloc_or_die(sizeof(*config));
-	if (config == NULL)
-		return NULL;
 	memset(config, 0, sizeof(*config));
 
 	/* parse tokens into the config */

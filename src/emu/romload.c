@@ -431,14 +431,14 @@ static void display_rom_load_results(rom_load_data *romdata)
 		}
 
 		/* create the error message and exit fatally */
-		strcat(romdata->errorbuf, "ERROR: required files are missing, the game cannot be run.");
+		strcat(romdata->errorbuf, "ERROR: required files are missing, the "GAMENOUN" cannot be run.");
 		fatalerror_exitcode(MAMERR_MISSING_FILES, "%s", romdata->errorbuf);
 	}
 
 	/* if we had warnings, output them, but continue */
 	if (romdata->warnings)
 	{
-		strcat(romdata->errorbuf, "WARNING: the game might not run correctly.");
+		strcat(romdata->errorbuf, "WARNING: the "GAMENOUN" might not run correctly.");
 		mame_printf_warning("%s\n", romdata->errorbuf);
 	}
 }
