@@ -815,8 +815,8 @@ VIDEO_UPDATE( spinlbrk )
 	/* we use the priority buffer so sprites are drawn front to back */
 	turbofrc_draw_sprites(screen->machine,bitmap,cliprect,0,-1);
 	turbofrc_draw_sprites(screen->machine,bitmap,cliprect,0, 0);
-	turbofrc_draw_sprites(screen->machine,bitmap,cliprect,1,-1);
 	turbofrc_draw_sprites(screen->machine,bitmap,cliprect,1, 0);
+	turbofrc_draw_sprites(screen->machine,bitmap,cliprect,1,-1);
 	return 0;
 }
 
