@@ -57,6 +57,7 @@ struct _xml_data_node
 	const char *			name;			/* pointer to copy of tag name */
 	const char *			value;			/* pointer to copy of value string */
 	xml_attribute_node *	attribute;		/* pointer to array of attribute nodes */
+	int						line;			/* line number for this node's start */
 };
 
 

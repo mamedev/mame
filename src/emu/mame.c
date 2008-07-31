@@ -1594,8 +1594,8 @@ static void init_machine(running_machine *machine)
 
 	/* initialize miscellaneous systems */
 	saveload_init(machine);
-//  if (options_get_bool(mame_options(), OPTION_CHEAT))
-//      cheat_init(machine);
+	if (options_get_bool(mame_options(), OPTION_CHEAT))
+		cheat_init(machine);
 }
 
 

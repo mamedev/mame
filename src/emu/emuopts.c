@@ -42,6 +42,7 @@ const options_entry mame_core_options[] =
 	{ "ctrlrpath;ctrlr_directory",   "ctrlr",     0,                 "path to controller definitions" },
 	{ "inipath",                     ".;ini",     0,                 "path to ini files" },
 	{ "fontpath",                    ".",         0,                 "path to font files" },
+	{ "cheatpath",                   "cheat",     0,                 "path to cheat files" },
 
 	/* output directory options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE OUTPUT DIRECTORY OPTIONS" },
@@ -53,10 +54,6 @@ const options_entry mame_core_options[] =
 	{ "snapshot_directory",          "snap",      0,                 "directory to save screenshots" },
 	{ "diff_directory",              "diff",      0,                 "directory to save hard drive image difference files" },
 	{ "comment_directory",           "comments",  0,                 "directory to save debugger comments" },
-
-	/* filename options */
-	{ NULL,                          NULL,        OPTION_HEADER,     "CORE FILENAME OPTIONS" },
-	{ "cheat_file",                  "cheat.dat", 0,                 "cheat filename" },
 
 	/* state/playback options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE STATE/PLAYBACK OPTIONS" },

@@ -44,6 +44,7 @@
 #define OPTION_CTRLRPATH			"ctrlrpath"
 #define OPTION_INIPATH				"inipath"
 #define OPTION_FONTPATH				"fontpath"
+#define OPTION_CHEATPATH			"cheatpath"
 
 /* core directory options */
 #define OPTION_CFG_DIRECTORY		"cfg_directory"
@@ -54,9 +55,6 @@
 #define OPTION_SNAPSHOT_DIRECTORY	"snapshot_directory"
 #define OPTION_DIFF_DIRECTORY		"diff_directory"
 #define OPTION_COMMENT_DIRECTORY	"comment_directory"
-
-/* core filename options */
-#define OPTION_CHEAT_FILE			"cheat_file"
 
 /* core state/playback options */
 #define OPTION_STATE				"state"
