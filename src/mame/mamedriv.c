@@ -7398,8 +7398,9 @@ Other Sun games
 	DRIVER( kinst13 )	/* (c) 1994 Rare */
 	DRIVER( kinstp )	/* (c) 1994 Rare */
 	DRIVER( kinst2 )	/* (c) 1995 Rare */
-	DRIVER( kinst2k )	/* (c) 1995 Rare */
+	DRIVER( kinst2k4 )	/* (c) 1995 Rare */
 	DRIVER( kinst213 )	/* (c) 1995 Rare */
+	DRIVER( kinst2k3 )	/* (c) 1995 Rare */
 	DRIVER( kinst211 )	/* (c) 1995 Rare */
 	DRIVER( kinst210 )	/* (c) 1995 Rare */
 
