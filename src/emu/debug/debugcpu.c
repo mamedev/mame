@@ -259,7 +259,7 @@ void debug_cpu_init(running_machine *machine)
 			symname[charnum] = 0;
 
 			/* add the symbol to the table */
-			symtable_add_register(info->symtable, symname, (void *)regnum, get_cpu_reg, set_cpu_reg);
+			symtable_add_register(info->symtable, symname, (void *)(FPTR)regnum, get_cpu_reg, set_cpu_reg);
 		}
 
 		/* loop over address spaces and get info */
