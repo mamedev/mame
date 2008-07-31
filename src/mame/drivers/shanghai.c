@@ -13,9 +13,6 @@ to a NOP to jump to it immediately at the beginning of a round.
 I'm not sure about the refresh rate, 60Hz makes time match the dip switch
 settings, but music runs too fast.
 
-TS 20050212:
-- added Kyuukyoku no Othello - problems with gfx
-  (wrong data copied to HD63484 ?)
 
 ***************************************************************************/
 
@@ -144,16 +141,15 @@ static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 	switch (opcode & 0x0700)
 	{
 		default:
-		case 0x0000: dstep1 =  1; dstep2 = -384; break;
-		case 0x0100: dstep1 =  1; dstep2 =  384; break;
-		case 0x0200: dstep1 = -1; dstep2 = -384; break;
-		case 0x0300: dstep1 = -1; dstep2 =  384; break;
-		case 0x0400: dstep1 = -384; dstep2 =  1; break;
-		case 0x0500: dstep1 =  384; dstep2 =  1; break;
-		case 0x0600: dstep1 = -384; dstep2 = -1; break;
-		case 0x0700: dstep1 =  384; dstep2 = -1; break;
+		case 0x0000: dstep1 =  1; dstep2 = -384 - ax * dstep1; break;
+		case 0x0100: dstep1 =  1; dstep2 =  384 - ax * dstep1; break;
+		case 0x0200: dstep1 = -1; dstep2 = -384 - ax * dstep1; break;
+		case 0x0300: dstep1 = -1; dstep2 =  384 - ax * dstep1; break;
+		case 0x0400: dstep1 = -384; dstep2 =  1 - ay * dstep1; break;
+		case 0x0500: dstep1 =  384; dstep2 =  1 - ay * dstep1; break;
+		case 0x0600: dstep1 = -384; dstep2 = -1 - ay * dstep1; break;
+		case 0x0700: dstep1 =  384; dstep2 = -1 + ay * dstep1; break; // used by kothello
 	}
-	dstep2 -= ax * dstep1;
 
 	for (;;)
 	{
@@ -226,14 +222,14 @@ static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 			ay = _ay;
 			if (_ax < 0)
 			{
-				src = (src - 1 - ay) & (HD63484_RAM_SIZE-1);
+				src = (src + dstep2) & (HD63484_RAM_SIZE-1);
 				*dst = (*dst + dstep2) & (HD63484_RAM_SIZE-1);
 				if (ax == 0) break;
 				ax++;
 			}
 			else
 			{
-				src = (src + 1 - ay) & (HD63484_RAM_SIZE-1);
+				src = (src - dstep2) & (HD63484_RAM_SIZE-1);
 				*dst = (*dst + dstep2) & (HD63484_RAM_SIZE-1);
 				if (ax == 0) break;
 				ax--;
@@ -1067,7 +1063,7 @@ static MACHINE_DRIVER_START( kothello )
 	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 384)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
+	MDRV_SCREEN_VISIBLE_AREA(8, 384-4-1, 0, 250-1)
 
 	MDRV_PALETTE_LENGTH(256)
 
