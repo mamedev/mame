@@ -1958,7 +1958,7 @@ MTR-BAM* - DIP42 32MBit maskROMs
      SEC - CAT702 security IC
  CN3/CN5 - Connectors for ? (controls?)
   IDE-40 - 40 Pin flat cable connector for IDE HDD
-           HDD is 3.5" Quantum Fireball CR 4.3AT 
+           HDD is 3.5" Quantum Fireball CR 4.3AT
 
 */
 
@@ -1967,19 +1967,19 @@ static WRITE32_HANDLER( bam2_sec_w )
 	znsecsel_w( machine, offset, data, mem_mask );
 }
 
-/* 
-	H8/3644 MCU comms: there are 4 16-bit read/write ports
+/*
+    H8/3644 MCU comms: there are 4 16-bit read/write ports
 
-	Port 0: (R) unknown
-	Port 0: (W) bank for mask ROMs
-	Port 1: (R) MCU status: bit 3 = busy, bit 2 = command successful, bits 1 & 0 = error
-	Port 1: (W) MCU command (0x0000 = execute)
-	Port 2: (R) unknown
-	Port 2: (W) MIPS writes alternating 0xffff/0xfffe, possibly to watchdog the H8?
-	Port 3: (R) unknown
-	Port 3: (W) unknown
+    Port 0: (R) unknown
+    Port 0: (W) bank for mask ROMs
+    Port 1: (R) MCU status: bit 3 = busy, bit 2 = command successful, bits 1 & 0 = error
+    Port 1: (W) MCU command (0x0000 = execute)
+    Port 2: (R) unknown
+    Port 2: (W) MIPS writes alternating 0xffff/0xfffe, possibly to watchdog the H8?
+    Port 3: (R) unknown
+    Port 3: (W) unknown
 
-	8007f538 = detected device type.  0 = CDROM, 1 = HDD.
+    8007f538 = detected device type.  0 = CDROM, 1 = HDD.
 */
 
 static UINT32 bam2_mcu_command;
@@ -2010,7 +2010,7 @@ static READ32_HANDLER( bam2_mcu_r )
 
 		case 1:
 			logerror("MCU status read @ PC %08x mask %08x\n", activecpu_get_pc(), mem_mask);
-			
+
 			switch (bam2_mcu_command)
 			{
 				case 0x7f:		// first drive check
@@ -2022,7 +2022,7 @@ static READ32_HANDLER( bam2_mcu_r )
 			return 4;			// return OK
 			break;
 	}
-	
+
 	return 0;
 }
 
@@ -2030,7 +2030,7 @@ static READ32_HANDLER( bam2_unk_r )
 {
 	return 0;
 }
-							       
+
 static DRIVER_INIT( bam2 )
 {
 	memory_install_read32_handler ( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f3fffff, 0, 0, SMH_BANK1 );

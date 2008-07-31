@@ -5,28 +5,28 @@
     Written by Andrew Gardner
 
 ****************************************************************************
- 
+
     Note:
     This CPU emulator is very much a work-in-progress.
 
-	DONE:
-	1:  1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-	   11,  ,  ,  ,  ,  ,  ,18,  ,   ,
-	
-	TODO:
-	X 1-6 Explore CORE naming scheme.
-	- 1-9 paragraph 1 : memory access timings
-	- 1-9 Data ALU arithmetic operations generally use fractional two's complement arithmetic
-	      (Unsigned numbers are only supported by the multiply and multiply-accumulate instruction)
-	- 1-9 For fractional arithmetic, the 31-bit product is added to the 40-bit contents of A or B.  No pipeline!
-	- 1-10 Two types of rounding: convergent rounding and two's complement rounding.  See status register bit R.
-	- 1-10 Logic unit is 16-bits wide and works on MSP portion of accum register
-	- 1-10 The AGU can implement three types of arithmetic: linear, modulo, and reverse carry.
-	- 1-12 "Two external interrupt pins!!!"
-	- 1-12 Take care of all interrupt priority (IPR) stuff!
-	- 1-19 Memory WAIT states
-	- 1-20 The timer's interesting!
-	- 1-21 Vectored exception requests on the Host Interface!
+    DONE:
+    1:  1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+       11,  ,  ,  ,  ,  ,  ,18,  ,   ,
+
+    TODO:
+    X 1-6 Explore CORE naming scheme.
+    - 1-9 paragraph 1 : memory access timings
+    - 1-9 Data ALU arithmetic operations generally use fractional two's complement arithmetic
+          (Unsigned numbers are only supported by the multiply and multiply-accumulate instruction)
+    - 1-9 For fractional arithmetic, the 31-bit product is added to the 40-bit contents of A or B.  No pipeline!
+    - 1-10 Two types of rounding: convergent rounding and two's complement rounding.  See status register bit R.
+    - 1-10 Logic unit is 16-bits wide and works on MSP portion of accum register
+    - 1-10 The AGU can implement three types of arithmetic: linear, modulo, and reverse carry.
+    - 1-12 "Two external interrupt pins!!!"
+    - 1-12 Take care of all interrupt priority (IPR) stuff!
+    - 1-19 Memory WAIT states
+    - 1-20 The timer's interesting!
+    - 1-21 Vectored exception requests on the Host Interface!
 ***************************************************************************/
 
 #include "debugger.h"
@@ -54,33 +54,33 @@ typedef struct
 	// **** Dsp56k side **** //
 	// Host Control Register
 	UINT16* hcr;
-	
+
 	// Host Status Register
 	UINT16* hsr;
-	
+
 	// Host Transmit/Receive Data
 	UINT16* htrx;
-	
+
 	// **** Host CPU side **** //
 	// Interrupt Control Register
 	UINT8 icr;
-	
+
 	// Command Vector Register
 	UINT8 cvr;
-	
+
 	// Interrupt Status Register
 	UINT8 isr;
-	
+
 	// Interrupt Vector Register
 	UINT8 ivr;
-	
+
 	// Transmit / Receive Registers
 	UINT8 trxh;
 	UINT8 trxl;
-	
+
 	// HACK - Host interface bootstrap write offset
 	UINT16 bootstrap_offset;
-	
+
 } dsp56k_host_interface;
 
 // 1-9 ALU
@@ -89,11 +89,11 @@ typedef struct
 	// Four 16-bit input registers (can be accessed as 2 32-bit registers)
 	PAIR x;
 	PAIR y;
-	
+
 	// Two 32-bit accumulator registers + 8-bit accumulator extension registers
 	PAIR64 a;
 	PAIR64 b;
-	
+
 	// An accumulation shifter
 	// One data bus shifter/limiter
 	// A parallel, single cycle, non-pipelined Multiply-Accumulator (MAC) unit
@@ -108,22 +108,22 @@ typedef struct
 	UINT16 r1;
 	UINT16 r2;
 	UINT16 r3;
-	
+
 	// Four offset registers
 	UINT16 n0;
 	UINT16 n1;
 	UINT16 n2;
 	UINT16 n3;
-	
+
 	// Four modifier registers
 	UINT16 m0;
 	UINT16 m1;
 	UINT16 m2;
 	UINT16 m3;
-	
+
 	// Used in loop processing
 	UINT16 temp;
-	
+
 	// Basics
 } dsp56k_agu;
 
@@ -135,30 +135,30 @@ typedef struct
 
 	// Loop Address
 	UINT16 la;
-	
+
 	// Loop Counter
 	UINT16 lc;
-	
+
 	// Status Register
 	UINT16 sr;
-	
+
 	// Operating Mode Register
 	UINT16 omr;
-	
+
 	// Stack Pointer
 	UINT16 sp;
-	
+
 	// Stack (TODO: 15-level?)
 	PAIR ss[16];
-	
+
 	// Controls IRQ processing
 	void (*service_interrupts)(void);
 
 	// A list of pending interrupts (indices into dsp56k_interrupt_sources array)
 	INT8 pending_interrupts[32];
-	
+
 	// Basics
-	
+
 	// Other PCU internals
 	UINT16 reset_vector;
 
@@ -169,36 +169,36 @@ typedef struct
 {
 	// PROGRAM CONTROLLER
 	dsp56k_pcu PCU;
-	
+
 	// ADR ALU (AGU)
 	dsp56k_agu AGU;
-	
+
 	// CLOCK GEN
-	//static emu_timer *dsp56k_timer;	// 1-5, 1-8 - Clock gen
+	//static emu_timer *dsp56k_timer;   // 1-5, 1-8 - Clock gen
 
 	// DATA ALU
 	dsp56k_data_alu ALU;
-	
+
 	// OnCE
 
 	// IBS and BITFIELD UNIT
-	
+
 	// Host Interface
 	dsp56k_host_interface HI;
-	
+
 	// IRQ line states
 	UINT8 modA_state;
 	UINT8 modB_state;
 	UINT8 modC_state;
 	UINT8 reset_state;
-	
+
 	// HACK - Bootstrap mode state variable.
 	UINT8 bootstrap_mode;
-	
+
 	UINT8	repFlag;	// Knowing if we're in a 'repeat' state (dunno how the processor does this)
 	UINT32	repAddr;	// The address of the instruction to repeat...
 
-	
+
 	/* MAME internal stuff */
 	UINT32			ppc;
 	UINT32			op;
@@ -289,7 +289,7 @@ static void set_irq_line(int irqline, int state)
 			// TODO: 1-12 Get this triggering right
 			if (irqa_trigger())
 				logerror("DSP56k IRQA is set to fire on the \"Negative Edge\".\n");
-				
+
 			if (state != CLEAR_LINE)
 				core.modA_state = TRUE;
 			else
@@ -298,12 +298,12 @@ static void set_irq_line(int irqline, int state)
 			if (core.reset_state != TRUE)
 				dsp56k_add_pending_interrupt("IRQA");
 			break;
-		
+
 		case DSP56K_IRQ_MODB:
 			// TODO: 1-12 Get this triggering right
 			if (irqb_trigger())
 				logerror("DSP56k IRQB is set to fire on the \"Negative Edge\".\n");
-				
+
 			if (state != CLEAR_LINE)
 				core.modB_state = TRUE;
 			else
@@ -312,36 +312,36 @@ static void set_irq_line(int irqline, int state)
 			if (core.reset_state != TRUE)
 				dsp56k_add_pending_interrupt("IRQB");
 			break;
-		
+
 		case DSP56K_IRQ_MODC:
 			if (state != CLEAR_LINE)
 				core.modC_state = TRUE;
 			else
 				core.modC_state = FALSE;
-			
+
 			// TODO : Set bus mode or whatever
 			break;
-		
+
 		case DSP56K_IRQ_RESET:
 			if (state != CLEAR_LINE)
 				core.reset_state = TRUE;
 			else
 			{
 				/* If it changes state from asserted to cleared.  Call the reset function. */
-				if (core.reset_state == TRUE) 
+				if (core.reset_state == TRUE)
 					dsp56k_reset();
-				
+
 				core.reset_state = FALSE;
 			}
 
 			// dsp56k_add_pending_interrupt("Hardware RESET");
 			break;
-		
+
 		default:
 			logerror("DSP56k setting some weird irq line : %d", irqline);
 			break;
 	}
-	
+
 	// If the reset line isn't asserted, service interrupts
 	// TODO: Is it right to immediately service interrupts?
 	if (core.reset_state != TRUE)
@@ -382,17 +382,17 @@ static void dsp56k_init(int index, int clock, const void *_config, int (*irqcall
 
 	// HACK - You're not in bootstrap mode upon bootup
 	core.bootstrap_mode = BOOTSTRAP_OFF;
-	
+
 	// Clear the irq states
 	core.modA_state = FALSE;
 	core.modB_state = FALSE;
 	core.modC_state = FALSE;
 	core.reset_state = FALSE;
-	
+
 	/* Save the core's state */
 	// state_save_register_item("dsp56k", index, modA_state);
 	// ...
-	
+
 	//core.config = _config;
 	//core.irq_callback = irqcallback;
 }
@@ -403,10 +403,10 @@ static void dsp56k_reset(void)
 
 	core.interrupt_cycles = 0;
 	core.ppc = 0x0000;
-	
+
 	core.repFlag = 0;
 	core.repAddr = 0x0000;
-	
+
 	pcu_reset();
 	mem_reset();
 	//agu_reset();
@@ -472,7 +472,7 @@ extern offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UIN
  ****************************************************************************/
 static ADDRESS_MAP_START( dsp56156_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0000,0x07ff) AM_RAM AM_BASE(&dsp56k_program_ram)	// 1-5
-//	AM_RANGE(0x2f00,0x2fff) AM_ROM								// 1-5 PROM reserved memory.  Is this the right spot for it?
+//  AM_RANGE(0x2f00,0x2fff) AM_ROM                              // 1-5 PROM reserved memory.  Is this the right spot for it?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp56156_x_data_map, ADDRESS_SPACE_DATA, 16 )
@@ -493,10 +493,10 @@ static void dsp56k_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODB:   set_irq_line(DSP56K_IRQ_MODB, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODC:   set_irq_line(DSP56K_IRQ_MODC, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_RESET:  set_irq_line(DSP56K_IRQ_RESET, info->i);	break;
-		
+
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + DSP56K_PC:			PC  = info->i & 0xffff;					break;
-		
+
 		case CPUINFO_INT_REGISTER + DSP56K_SR:			SR  = info->i & 0xffff;					break;
 		case CPUINFO_INT_REGISTER + DSP56K_LC:			LC  = info->i & 0xffff;					break;
 		case CPUINFO_INT_REGISTER + DSP56K_LA:			LA  = info->i & 0xffff;					break;
@@ -527,8 +527,8 @@ static void dsp56k_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + DSP56K_M2:			M2  = info->i & 0xffff;					break;
 		case CPUINFO_INT_REGISTER + DSP56K_M3:			M3  = info->i & 0xffff;					break;
 
-		/*	case CPUINFO_INT_REGISTER + DSP56K_TEMP:		TEMP   = info->i & 0xffff;			break;	*/
-		/*	case CPUINFO_INT_REGISTER + DSP56K_STATUS:		STATUS = info->i & 0xff;			break;	*/
+		/*  case CPUINFO_INT_REGISTER + DSP56K_TEMP:        TEMP   = info->i & 0xffff;          break;  */
+		/*  case CPUINFO_INT_REGISTER + DSP56K_STATUS:      STATUS = info->i & 0xff;            break;  */
 
 		/* The CPU stack */
 		case CPUINFO_INT_REGISTER + DSP56K_ST0:			ST0 = info->i  & 0xffffffff;			break;
@@ -573,7 +573,7 @@ void dsp56k_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = -1;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;	
+		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
@@ -615,8 +615,8 @@ void dsp56k_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + DSP56K_M2:			info->i = M2;							break;
 		case CPUINFO_INT_REGISTER + DSP56K_M3:			info->i = M3;							break;
 
-		/*	case CPUINFO_INT_REGISTER + DSP56K_TEMP:	info->i = TEMP;							break;	*/
-		/*	case CPUINFO_INT_REGISTER + DSP56K_STATUS:	info->i = STATUS;						break;	*/
+		/*  case CPUINFO_INT_REGISTER + DSP56K_TEMP:    info->i = TEMP;                         break;  */
+		/*  case CPUINFO_INT_REGISTER + DSP56K_STATUS:  info->i = STATUS;                       break;  */
 
 		// The CPU stack
 		case CPUINFO_INT_REGISTER + DSP56K_ST0:			info->i = ST0;							break;
@@ -669,7 +669,7 @@ void dsp56k_get_info(UINT32 state, cpuinfo *info)
 				/* Status Register */
 				LF_bit() ? "L" : ".",
 				FV_bit() ? "F" : ".",
-			
+
 				S_bit() ? "S" : ".",
 				L_bit() ? "L" : ".",
 				E_bit() ? "E" : ".",
@@ -678,7 +678,7 @@ void dsp56k_get_info(UINT32 state, cpuinfo *info)
 				Z_bit() ? "Z" : ".",
 				V_bit() ? "V" : ".",
 				C_bit() ? "C" : ".",
-				
+
 				/* Stack Pointer */
 				UF_bit() ? "U" : ".",
 				SE_bit() ? "S" : ".");
@@ -712,8 +712,8 @@ void dsp56k_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + DSP56K_M2:			sprintf(info->s, "M2 : %04x", M2);		break;
 		case CPUINFO_STR_REGISTER + DSP56K_M3:			sprintf(info->s, "M3 : %04x", M3);		break;
 
-		/*	case CPUINFO_STR_REGISTER + DSP56K_TEMP:	sprintf(info->s, "TMP: %04x", TEMP);	break;	*/
-		/*	case CPUINFO_STR_REGISTER + DSP56K_STATUS:	sprintf(info->s, "STS: %02x", STATUS);	break;	*/
+		/*  case CPUINFO_STR_REGISTER + DSP56K_TEMP:    sprintf(info->s, "TMP: %04x", TEMP);    break;  */
+		/*  case CPUINFO_STR_REGISTER + DSP56K_STATUS:  sprintf(info->s, "STS: %02x", STATUS);  break;  */
 
 		// The CPU stack
 		case CPUINFO_STR_REGISTER + DSP56K_ST0:			sprintf(info->s, "ST0 : %08x", ST0);	break;

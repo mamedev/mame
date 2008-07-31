@@ -1090,7 +1090,7 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 
 		if (slot->adbase)
 		{
-			cur_sample = slot->cur_sample; // may already contains current decoded sample 
+			cur_sample = slot->cur_sample; // may already contains current decoded sample
 
 			// seek to the interpolation sample
 			while (curstep < steps_to_go)

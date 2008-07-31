@@ -445,7 +445,7 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 						u2f(tafifo_buff[8]), u2f(tafifo_buff[9]));
 					mame_printf_verbose("\n");
 					#endif
-				} 
+				}
 				else if (state_ta.global_paratype == 5)
 				{
 					#if DEBUG_PVRDLIST

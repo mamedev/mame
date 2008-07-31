@@ -525,7 +525,7 @@ static int parse_memory_operator(parsed_expression *expr, const char *buffer, to
 	int length;
 
 	*flags = 0;
-	
+
 	/* if there is a '.', it means we have a name */
 	dot = strrchr(buffer, '.');
 	if (dot != NULL)
@@ -536,7 +536,7 @@ static int parse_memory_operator(parsed_expression *expr, const char *buffer, to
 		*flags |= index << TIN_MEMORY_INDEX_SHIFT;
 		buffer = dot + 1;
 	}
-	
+
 	/* length 2 means space then size */
 	length = (int)strlen(buffer);
 	if (length == 2)
@@ -1619,7 +1619,7 @@ static char *add_expression_string(parsed_expression *expr, const char *string, 
 	memcpy(expstring->string, string, length);
 	expstring->string[length] = 0;
 	expr->stringlist = expstring;
-	
+
 	/* return a pointer to the copied string */
 	if (index != NULL)
 		*index = expstring->index;
@@ -1635,11 +1635,11 @@ static char *add_expression_string(parsed_expression *expr, const char *string, 
 static const char *get_expression_string(parsed_expression *expr, UINT16 index)
 {
 	expression_string *expstring;
-	
+
 	/* a 0 index is always invalid */
 	if (index == 0)
 		return NULL;
-	
+
 	/* scan for the string with the matching index */
 	for (expstring = expr->stringlist; expstring != NULL; expstring = expstring->next)
 		if (expstring->index == index)

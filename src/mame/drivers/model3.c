@@ -1811,7 +1811,7 @@ INPUT_PORTS_END
 #define ROM_LOAD64_WORD(name,offset,length,hash)      ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(6))
 #define ROM_LOAD64_WORD_SWAP(name,offset,length,hash) ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE| ROM_SKIP(6))
 #define ROM_LOAD_VROM(name, offset, length, hash)     ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(14) )
-//#define ROM_REGION64_BE(length,rclass,rtag,flags) 	  ROM_REGION(length, rclass, rtype, (flags) | ROMREGION_64BIT | ROMREGION_BE)
+//#define ROM_REGION64_BE(length,rclass,rtag,flags)       ROM_REGION(length, rclass, rtype, (flags) | ROMREGION_64BIT | ROMREGION_BE)
 
 ROM_START( lemans24 )	/* step 1.5 */
 	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
@@ -4404,7 +4404,7 @@ static MACHINE_DRIVER_START( model3_15 )
 	MDRV_SOUND_CONFIG(scsp_interface)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
-	
+
 	MDRV_SOUND_ADD("scsp2", SCSP, 0)
 	MDRV_SOUND_CONFIG(scsp2_interface)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
@@ -4442,7 +4442,7 @@ static MACHINE_DRIVER_START( model3_20 )
 	MDRV_SOUND_CONFIG(scsp_interface)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
-	
+
 	MDRV_SOUND_ADD("scsp2", SCSP, 0)
 	MDRV_SOUND_CONFIG(scsp2_interface)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
@@ -4481,7 +4481,7 @@ static MACHINE_DRIVER_START( model3_21 )
 	MDRV_SOUND_CONFIG(scsp_interface)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
-	
+
 	MDRV_SOUND_ADD("scsp2", SCSP, 0)
 	MDRV_SOUND_CONFIG(scsp2_interface)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)

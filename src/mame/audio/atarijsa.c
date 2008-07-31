@@ -149,7 +149,7 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 
 	init_save_state();
 	atarijsa_reset();
-	
+
 	/* initialize JSA III ADPCM */
 	{
 		static const char *regions[] = { "adpcm", "adcpml", "adpcmr" };

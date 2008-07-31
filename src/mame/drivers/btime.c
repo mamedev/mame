@@ -46,18 +46,18 @@ can take. Should the game reset????
 
 
 2008-07:
-Verified dip locations for: btime (manual), bnj (dips listing), lnc (manual), 
+Verified dip locations for: btime (manual), bnj (dips listing), lnc (manual),
 zoar (manual), disco (dips listing). Names of disco switches in DIPLOC are
 not confirmed (manual needed, in the meanwhile I put generic SW1 & SW2).
 
 A few notes:
-* all the documents says that DSW1 bit 7 is related to the cocktail mode 
-	(either flipping the screen or changing the control panel)
-* according to manuals, btime & bnj Service dips should have a different 
-	effect, using 2 bits to access different tests (see commented out 
-	settings below)
-* how do country codes affect disco? are there other values other than 
-	the ones in the manual?
+* all the documents says that DSW1 bit 7 is related to the cocktail mode
+    (either flipping the screen or changing the control panel)
+* according to manuals, btime & bnj Service dips should have a different
+    effect, using 2 bits to access different tests (see commented out
+    settings below)
+* how do country codes affect disco? are there other values other than
+    the ones in the manual?
 
 ***************************************************************************/
 
@@ -416,11 +416,11 @@ static INPUT_PORTS_START( btime )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
 	/* Manual gives the following Test settings, but they don't seem to correspond to the actual effect */
-//	PORT_DIPNAME( 0x30, 0x30, "Test Mode" ) PORT_DIPLOCATION("15D:5,6")
-//	PORT_DIPSETTING(    0x30, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, "Sound I/O Board Only" )
-//	PORT_DIPSETTING(    0x10, "Normal Test" )
-//	PORT_DIPSETTING(    0x20, "Cross Hatch Only" )
+//  PORT_DIPNAME( 0x30, 0x30, "Test Mode" ) PORT_DIPLOCATION("15D:5,6")
+//  PORT_DIPSETTING(    0x30, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, "Sound I/O Board Only" )
+//  PORT_DIPSETTING(    0x10, "Normal Test" )
+//  PORT_DIPSETTING(    0x20, "Cross Hatch Only" )
 	PORT_SERVICE_DIPLOC( 0x10, IP_ACTIVE_LOW, "15D:5" )
 	PORT_DIPNAME( 0x20, 0x20, "Cross Hatch Pattern" ) PORT_DIPLOCATION("15D:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
@@ -428,9 +428,9 @@ static INPUT_PORTS_START( btime )
 	PORT_DIPNAME( 0x40, 0x00, "Control Panel" ) PORT_DIPLOCATION("15D:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-//	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("15D:8")
-//	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-//	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+//  PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("15D:8")
+//  PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+//  PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK  )
 
 	PORT_START_TAG("DSW2")
@@ -578,9 +578,9 @@ static INPUT_PORTS_START( zoar )
 	PORT_DIPNAME( 0x40, 0x00, "Control Panel" ) PORT_DIPLOCATION("SW I:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-//	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW I:8")
-//	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-//	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+//  PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW I:8")
+//  PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+//  PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK  )
 
 	PORT_START_TAG("DSW2")
@@ -655,9 +655,9 @@ static INPUT_PORTS_START( lnc )
 	PORT_DIPNAME( 0x40, 0x00, "Control Panel" ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-//	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:8")
-//	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-//	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+//  PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:8")
+//  PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+//  PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK  )
 
 	PORT_START_TAG("DSW2")
@@ -794,9 +794,9 @@ static INPUT_PORTS_START( mmonkey )
 	PORT_DIPNAME( 0x40, 0x00, "Control Panel" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-//	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-//	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+//  PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+//  PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK  )
 
 	PORT_START_TAG("DSW2")
@@ -861,20 +861,20 @@ static INPUT_PORTS_START( bnj )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
 	/* Manual gives the following Test settings, but they don't seem to correspond to the actual effect */
-//	PORT_DIPNAME( 0x30, 0x30, "Test Mode" ) PORT_DIPLOCATION("8D:5,6")
-//	PORT_DIPSETTING(    0x30, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, "Video PC Board Only" )
-//	PORT_DIPSETTING(    0x10, "Normal Test" )
-//	PORT_DIPSETTING(    0x20, "No Effect" )
+//  PORT_DIPNAME( 0x30, 0x30, "Test Mode" ) PORT_DIPLOCATION("8D:5,6")
+//  PORT_DIPSETTING(    0x30, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, "Video PC Board Only" )
+//  PORT_DIPSETTING(    0x10, "Normal Test" )
+//  PORT_DIPSETTING(    0x20, "No Effect" )
 	PORT_SERVICE_DIPLOC( 0x10, IP_ACTIVE_LOW, "8D:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "8D:6" )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("8D:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
 	/* According to crazykong.com dips this should change the control layout  */
-//	PORT_DIPNAME( 0x80, 0x00, "Control Panel" ) PORT_DIPLOCATION("8D:8")
-//	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-//	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+//  PORT_DIPNAME( 0x80, 0x00, "Control Panel" ) PORT_DIPLOCATION("8D:8")
+//  PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+//  PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK  )
 
 	PORT_START_TAG("DSW2")
@@ -956,7 +956,7 @@ static INPUT_PORTS_START( disco )
 	PORT_DIPNAME( 0x10, 0x00, "Game Speed" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x10, "Fast" )
-	PORT_DIPNAME( 0xe0, 0x00, "Country Code" ) PORT_DIPLOCATION("SW2:6,7,8") 
+	PORT_DIPNAME( 0xe0, 0x00, "Country Code" ) PORT_DIPLOCATION("SW2:6,7,8")
 	PORT_DIPSETTING(    0x00, "A" )
 	PORT_DIPSETTING(    0x20, "B" )
 	PORT_DIPSETTING(    0x40, "C" )

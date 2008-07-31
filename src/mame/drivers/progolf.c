@@ -174,8 +174,8 @@ static GFXDECODE_START( progolf )
 	GFXDECODE_ENTRY( NULL,           0x2000, charlayout,           0, 4 ) /* char set #1 */
 	GFXDECODE_ENTRY( NULL,           0x2000, spritelayout,         0, 4 ) /* sprites */
 
-//	GFXDECODE_ENTRY( "gfx2", 0x0000, progolf_charlayout2, 0, 8 ) /* sprites */
-//	GFXDECODE_ENTRY( "gfx2", 0x0000, progolf_spritelayout2, 0, 8 ) /* sprites */
+//  GFXDECODE_ENTRY( "gfx2", 0x0000, progolf_charlayout2, 0, 8 ) /* sprites */
+//  GFXDECODE_ENTRY( "gfx2", 0x0000, progolf_spritelayout2, 0, 8 ) /* sprites */
 GFXDECODE_END
 
 

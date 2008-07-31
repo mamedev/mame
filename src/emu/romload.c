@@ -422,7 +422,7 @@ static void display_rom_load_results(rom_load_data *romdata)
 	if (romdata->errors != 0)
 	{
 		const char *rgntag, *nextrgntag;
-		
+
 		/* clean up any regions */
 		for (rgntag = memory_region_next(Machine, NULL); rgntag != NULL; rgntag = nextrgntag)
 		{

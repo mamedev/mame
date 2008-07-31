@@ -207,12 +207,12 @@ READ32_HANDLER( dsp_host_interface_r )
 	if (mem_mask == 0xff000000) {}				/* High byte */
 
 	value = dsp56k_host_interface_read(hi_addr);
-	
+
 	if (mem_mask == 0x0000ff00)	{ value <<= 8;  }
 	if (mem_mask == 0xff000000) { value <<= 24; }
-	
+
 	logerror("Dsp HI Read %08x (HI %04x) = %08x\n", mem_mask, hi_addr, value);
-	
+
 	return value;
 }
 
@@ -226,7 +226,7 @@ static WRITE32_HANDLER( shared_ram_write )
 																              0xc000 +((offset<<1)+1),
 																		      mem_mask,
 																		      activecpu_get_pc());
-																			  
+
 	/* write to the current dsp56k word */
 	if (mem_mask | (0xffff0000))
 	{
@@ -245,23 +245,23 @@ static WRITE32_HANDLER( dsp_w_lines )
 	logerror("2w %08x %08x %08x\n", offset, mem_mask, data);
 
 	/* 0x01000000 is the reset line - 0 is high, 1 is low */
-	if ((data >> 24) & 0x01) 
+	if ((data >> 24) & 0x01)
 	{
-		logerror("RESET CLEARED\n"); 
+		logerror("RESET CLEARED\n");
 		cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_RESET, CLEAR_LINE);
 	}
 	else
 	{
 		logerror("RESET ASSERTED\n");
 		cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_RESET, ASSERT_LINE);
-		
+
 		/* A little hacky - I can't seem to set these lines anywhere else where reset is asserted, so i do it here */
 		cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_MODA, ASSERT_LINE);
 		cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_MODB, CLEAR_LINE);
 	}
-	
+
 	/* 0x04000000 is the ??? line */
-	
+
 }
 
 static WRITE32_HANDLER( dsp_host_interface_w )
@@ -271,10 +271,10 @@ static WRITE32_HANDLER( dsp_host_interface_w )
 
 	if (mem_mask == 0x0000ff00)	{ hi_addr++; }	/* Low byte */
 	if (mem_mask == 0xff000000) {}				/* High byte */
-	
+
 	if (mem_mask == 0x0000ff00)	{ hi_data = (data & 0x0000ff00) >> 8;  }
 	if (mem_mask == 0xff000000) { hi_data = (data & 0xff000000) >> 24; }
-	
+
 	logerror("write %08x %08x %08x (HI %04x)\n", offset, mem_mask, data, hi_addr);
 	dsp56k_host_interface_write(hi_addr, hi_data);
 }

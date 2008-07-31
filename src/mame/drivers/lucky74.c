@@ -209,23 +209,23 @@
 
       A) Hold Type: (DIP SW 3-8 OFF)
 
-         The game selects and holds automatically favorable cards after DEAL button is pressed. 
-	     Selects can be cancelled pressing the CANCEL button.
+         The game selects and holds automatically favorable cards after DEAL button is pressed.
+         Selects can be cancelled pressing the CANCEL button.
 
-	  B) Discard type: (DIP SW 3-8 ON)
-	     Starts game as Hold type, however Non-Held card(s) will be 
-	     automatically recalled by pressing DEAL button. Also even one 
-	     card is discarded, all HELD cards are disappeared and returns 
-	     to normal game.
+      B) Discard type: (DIP SW 3-8 ON)
+         Starts game as Hold type, however Non-Held card(s) will be
+         automatically recalled by pressing DEAL button. Also even one
+         card is discarded, all HELD cards are disappeared and returns
+         to normal game.
 
     Note 2: Always reset memory when JACKPOT points are changed.
-    
+
     Note 3: Always reset memory when BONUS points are changed.
-    
+
     Note 4: Always reset memory FOR PERCENTAGE changes.
-    
+
     Note 5: COIN B is 5 times COIN A. KEY IN is 10 times coin A.
-    
+
     Note 6: Each time a game is won, the woman will take one of her clothes off.
             When all the clothes are taken off, a bonus point ten times the BET number
             will be scored. This bonus cannot be scored if there is no woman's figure.
@@ -235,18 +235,18 @@
             This card will change by pressing the DOUBLE UP SW. Anticipate the
             number of the next card which will turned up and stop. When the
             game is won by pressing BIG or SMALL, and the anticipated card and
-            the turned up card happens to be the same number, then the scored 
+            the turned up card happens to be the same number, then the scored
             points will be four times greater.
 
 
-    * During FEVER, BET greater than the BET points achieved during FEVER cannot 
+    * During FEVER, BET greater than the BET points achieved during FEVER cannot
       be scored.
-    
+
     * The KEY OUT consists of two steps. During first OUT, points over 100 will
-      become cleared and during the second OUT, points below 100 will become 
+      become cleared and during the second OUT, points below 100 will become
       cleared.
 
-  
+
 
 *****************************************************************************************
 
@@ -382,7 +382,7 @@ static WRITE8_HANDLER( ym2149_portb_w )
 
 //static WRITE8_HANDLER( debug_w )
 //{
-//	popmessage("written : %02X", data);
+//  popmessage("written : %02X", data);
 //}
 
 static WRITE8_HANDLER(lamps_a_w)
@@ -452,7 +452,7 @@ static ADDRESS_MAP_START( lucky74_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports 0 & 1 */
 	AM_RANGE(0xf080, 0xf083) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)	/* DSW 1, 2 & 3 */
 	AM_RANGE(0xf0c0, 0xf0c3) AM_DEVREADWRITE(PPI8255, "ppi8255_3", ppi8255_r, ppi8255_w)	/* DSW 4 */
-//	AM_RANGE(0xf100, 0xf100) AM_WRITE(debug_w)	/* seems to be sounds commands */
+//  AM_RANGE(0xf100, 0xf100) AM_WRITE(debug_w)  /* seems to be sounds commands */
 	AM_RANGE(0xf200, 0xf203) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports 2 & 4 */
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xf600, 0xf600) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)		/* YM2149 (Input Port 1) */
@@ -823,7 +823,7 @@ static MACHINE_DRIVER_START( lucky74 )
 	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(lucky74_map, 0)
 	MDRV_CPU_IO_MAP(lucky74_portmap,0)
-//	MDRV_CPU_VBLANK_INT("main", nmi_interrupt)
+//  MDRV_CPU_VBLANK_INT("main", nmi_interrupt)
 	MDRV_CPU_PERIODIC_INT(nmi_interrupt,120)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

@@ -23,7 +23,7 @@ static void mem_reset(void)
 {
 	// Reset the HI registers
 	dsp56k_host_interface_reset();
-	
+
 	// Reset the IO registers
 	dsp56k_io_reset();
 }
@@ -37,58 +37,58 @@ static READ16_HANDLER( peripheral_register_r )
 	{
 		// Port B Control Register (PBC)
 		case 0xffc0: break;
-			
+
 		// Port C Control Register (PCC)
 		case 0xffc1: break;
-		
+
 		// Port B Data Direction Register (PBDDR)
 		case 0xffc2: break;
-		
+
 		// Port C Data Direction Register (PCDDR)
 		case 0xffc3: break;
-		
+
 		// HCR: Host Control Register
 		case 0xffc4: break;
-		
+
 		// COCR
 		case 0xffc8: break;
-		
+
 		// reserved for test
 		case 0xffc9: break;
-		
+
 		// CRA-SSI0 Control Register A
 		case 0xffd0: break;
-		
+
 		// CRB-SSI0 Control Register B
 		case 0xffd1: break;
-		
+
 		// CRA-SSI1 Control Register A
 		case 0xffd8: break;
-		
+
 		// CRB-SSI1 Control Register B
 		case 0xffd9: break;
-		
+
 		// PLCR
 		case 0xffdc: break;
-		
+
 		// reserved for future use
 		case 0xffdd: break;
-		
+
 		// BCR: Bus Control Register
 		case 0xffde: break;
-		
+
 		// IPR: Interrupt Priority Register
 		case 0xffdf: break;
-		
+
 		// Port B Data Register (PBD)
 		case 0xffe2: break;
-		
+
 		// Port C Data Register (PCD)
 		case 0xffe3: break;
-		
+
 		// HSR: Host Status Register
 		case 0xffe4: break;
-		
+
 		// HTX/HRX: Host TX/RX Register
 		case 0xffe5:
 			// 5-5
@@ -103,62 +103,62 @@ static READ16_HANDLER( peripheral_register_r )
 			break;
 		// COSR
 		case 0xffe8: break;
-		
+
 		// CRX/CTX
 		case 0xffe9: break;
-		
+
 		// Timer Control Register (TCR)
 		case 0xffec: break;
-		
+
 		// Timer Count Register (TCTR)
 		case 0xffed: break;
-		
+
 		// Timer Compare Register (TCPR)
 		case 0xffee: break;
-		
+
 		// Timer Preload Register (TPR)
 		case 0xffef: break;
-		
+
 		// SR/TSR SSI0 Status Register
 		case 0xfff0: break;
-		
+
 		// TX/RX SSI0 Tx/RX Registers
 		case 0xfff1: break;
-		
+
 		// RSMA0 SSI0 Register
 		case 0xfff2: break;
-		
+
 		// RSMB0 SSI0 Register
 		case 0xfff3: break;
-		
+
 		// TSMA0 SSI0 Register
 		case 0xfff4: break;
-		
+
 		// TSMB0 SSI0 Register
 		case 0xfff5: break;
-		
+
 		// SR/TSR SSI1 Status Register
 		case 0xfff8: break;
-		
+
 		// TX/RX SSI1 TX/RX Registers
 		case 0xfff9: break;
-		
+
 		// RSMA1 SSI1 Register
 		case 0xfffa: break;
-		
+
 		// RSMB1 SSI1 Register
 		case 0xfffb: break;
-		
+
 		// TSMA1 SSI1 Register
 		case 0xfffc: break;
-		
+
 		// TSMB1 SSI1 Register
 		case 0xfffd: break;
-		
+
 		// Reserved for on-chip emulation
 		case 0xffff: break;
 	}
-	
+
 	// Its primary behavior is RAM
 	return dsp56k_peripheral_ram[offset];
 }
@@ -177,140 +177,140 @@ static WRITE16_HANDLER( peripheral_register_w )
 		case 0xffc0:
 			PBC_set(data);
 			break;
-			
+
 		// Port C Control Register (PCC)
 		case 0xffc1:
 			PCC_set(data);
 			break;
-		
+
 		// Port B Data Direction Register (PBDDR)
-		case 0xffc2: 
+		case 0xffc2:
 			PBDDR_set(data);
 			break;
-		
+
 		// Port C Data Direction Register (PCDDR)
-		case 0xffc3: 
+		case 0xffc3:
 			PCDDR_set(data);
 			break;
-		
+
 		// HCR: Host Control Register
 		case 0xffc4:
 			HCR_set(data);
 			break;
-		
+
 		// COCR
 		case 0xffc8: break;
-		
+
 		// reserved for test
 		case 0xffc9:
 			logerror("DSP56k : Warning write to 0xffc9 reserved for test.\n");
 			break;
-		
+
 		// CRA-SSI0 Control Register A
 		case 0xffd0: break;
-		
+
 		// CRB-SSI0 Control Register B
 		case 0xffd1: break;
-		
+
 		// CRA-SSI1 Control Register A
 		case 0xffd8: break;
-		
+
 		// CRB-SSI1 Control Register B
 		case 0xffd9: break;
-		
+
 		// PLCR
 		case 0xffdc: break;
-		
+
 		// reserved for future use
-		case 0xffdd: 
+		case 0xffdd:
 			logerror("DSP56k : Warning write to 0xffdd reserved for future use.\n");
 			break;
-		
+
 		// BCR: Bus Control Register
 		case 0xffde:
 			BCR_set(data);
 			break;
-		
+
 		// IPR: Interrupt Priority Register
-		case 0xffdf: 
+		case 0xffdf:
 			IPR_set(data);
 			break;
-		
+
 		// Port B Data Register (PBD)
-		case 0xffe2: 
+		case 0xffe2:
 			PBD_set(data);
 			break;
-		
+
 		// Port C Data Register (PCD)
-		case 0xffe3: 
+		case 0xffe3:
 			PCD_set(data);
 			break;
-		
+
 		// HSR: Host Status Register
 		case 0xffe4: break;
-		
+
 		// HTX/HRX: Host TX/RX Register
 		case 0xffe5:
 			HTX = data;
 			HTDE_bit_set(0);	// 5-5
 			break;
-		
+
 		// COSR
 		case 0xffe8: break;
-		
+
 		// CRX/CTX
 		case 0xffe9: break;
-		
+
 		// Timer Control Register (TCR)
 		case 0xffec: break;
-		
+
 		// Timer Count Register (TCTR)
 		case 0xffed: break;
-		
+
 		// Timer Compare Register (TCPR)
 		case 0xffee: break;
-		
+
 		// Timer Preload Register (TPR)
 		case 0xffef: break;
-		
+
 		// SR/TSR SSI0 Status Register
 		case 0xfff0: break;
-		
+
 		// TX/RX SSI0 Tx/RX Registers
 		case 0xfff1: break;
-		
+
 		// RSMA0 SSI0 Register
 		case 0xfff2: break;
-		
+
 		// RSMB0 SSI0 Register
 		case 0xfff3: break;
-		
+
 		// TSMA0 SSI0 Register
 		case 0xfff4: break;
-		
+
 		// TSMB0 SSI0 Register
 		case 0xfff5: break;
-		
+
 		// SR/TSR SSI1 Status Register
 		case 0xfff8: break;
-		
+
 		// TX/RX SSI1 TX/RX Registers
 		case 0xfff9: break;
-		
+
 		// RSMA1 SSI1 Register
 		case 0xfffa: break;
-		
+
 		// RSMB1 SSI1 Register
 		case 0xfffb: break;
-		
+
 		// TSMA1 SSI1 Register
 		case 0xfffc: break;
-		
+
 		// TSMB1 SSI1 Register
 		case 0xfffd: break;
-		
+
 		// Reserved for on-chip emulation
-		case 0xffff: 
+		case 0xffff:
 			logerror("DSP56k : Warning write to 0xffff reserved for on-chip emulation.\n");
 			break;
 	}
@@ -344,7 +344,7 @@ static void HF3_bit_set(UINT16 value)
 	value = value & 0x01;
 	HCR &= ~(0x0010);
 	HCR |=  (value << 4);
-	
+
 	HF3_bit_host_set(value);
 }
 static void HF2_bit_set(UINT16 value)
@@ -352,7 +352,7 @@ static void HF2_bit_set(UINT16 value)
 	value = value & 0x01;
 	HCR &= ~(0x0008);
 	HCR |=  (value << 3);
-	
+
 	HF2_bit_host_set(value);
 }
 static void HCIE_bit_set(UINT16 value)
@@ -404,11 +404,11 @@ static void HF0_bit_set(UINT16 value)
 	HSR |= (value << 3);
 }
 static void HCP_bit_set(UINT16 value)
-{ 
+{
 	value = value & 0x01;
-	HSR &= ~(0x0004); 
+	HSR &= ~(0x0004);
 	HSR |=  (value << 2);
-	
+
 	// TODO: Define Host Command through the IRQ structure
 	if (value && HCIE_bit())
 		dsp56k_add_pending_interrupt("Host Command");
@@ -422,11 +422,11 @@ static void HTDE_bit_set(UINT16 value)
 	// 5-10 If HTIE bit is set, whip out a Host Transmit Data interrupt
 	if (value && HTIE_bit())
 		dsp56k_add_pending_interrupt("Host Transmit Data");
-	
+
 	// 5-5 If both me and RXDF are cleared, transmit data to the host
 	if (!value && !RXDF_bit())
 		dsp56k_host_interface_HTX_to_host();
-}	
+}
 static void HRDF_bit_set(UINT16 value)
 {
 	value = value & 0x01;
@@ -436,7 +436,7 @@ static void HRDF_bit_set(UINT16 value)
 	// 5-10 If HRIE is set, whip out a Host Receive Data interrupt
 	if (value && HRIE_bit())
 		dsp56k_add_pending_interrupt("Host Receive Data");
-	
+
 	// 5-5 If both me and TXDE are cleared, transmit data to the dsp56k
 	if (!value && !TXDE_bit())
 		dsp56k_host_interface_host_to_HTX();
@@ -472,7 +472,7 @@ static void ICR_set(UINT8 value)
 static void HF1_bit_host_set(UINT8 value)
 {
 	value = value & 0x01;
-	ICR &= ~(0x10); 
+	ICR &= ~(0x10);
 	ICR |=  (value << 4);
 
 	HF1_bit_set(value);		// 5-14
@@ -480,7 +480,7 @@ static void HF1_bit_host_set(UINT8 value)
 static void HF0_bit_host_set(UINT8 value)
 {
 	value = value & 0x01;
-	ICR &= ~(0x08); 
+	ICR &= ~(0x08);
 	ICR |=  (value << 3);
 
 	HF0_bit_set(value);		// 5-13
@@ -488,13 +488,13 @@ static void HF0_bit_host_set(UINT8 value)
 static void TREQ_bit_set(UINT8 value)
 {
 	value = value & 0x01;
-	ICR &= ~(0x02); 
+	ICR &= ~(0x02);
 	ICR |=  (value << 1);
 }
 static void RREQ_bit_set(UINT8 value)
 {
 	value = value & 0x01;
-	ICR &= ~(0x01); 
+	ICR &= ~(0x01);
 	ICR |=  (value << 0);
 
 	// 5-12
@@ -517,14 +517,14 @@ static void CVR_set(UINT8 value)
 }
 
 static void HC_bit_set(UINT8 value)
-{ 
+{
 	value = value & 0x01;
-	CVR &= ~(0x80); 
+	CVR &= ~(0x80);
 	CVR |=  (value << 7);
-	
+
 	// TODO: 5-9 Do I push a host-command interrupt here?  Doesn't seem like it, but maybe i'll have to poll for it somewhere else?
 	// TODO: 5-9 The exception routine clears this bit after it executes.
-	
+
 	HCP_bit_set(value);	// 5-9 & 5-11
 }
 static void HV_bits_set(UINT8 value)
@@ -559,7 +559,7 @@ static void TXDE_bit_set(UINT8 value)
 	value = value & 0x01;
 	ISR &= ~(0x0002);
 	ISR |=  (value << 1);
-	
+
 	// If both me and the HRDF are cleared, transmit data to the dsp56k
 	if (!value && !HRDF_bit())
 		dsp56k_host_interface_host_to_HTX();
@@ -574,7 +574,7 @@ static void RXDF_bit_set(UINT8 value)
 	// If both me and HTDE are cleared, transmit data to the host
 	if (!value && !HTDE_bit())
 		dsp56k_host_interface_HTX_to_host();
-}	
+}
 
 
 // TODO: 5-11 What is the host processor Initialize function?
@@ -585,13 +585,13 @@ static void dsp56k_host_interface_reset(void)
 	core.HI.hcr = &dsp56k_peripheral_ram[A2O(0xffc4)];
 	core.HI.hsr = &dsp56k_peripheral_ram[A2O(0xffe4)];
 	core.HI.htrx = &dsp56k_peripheral_ram[A2O(0xffe5)];
-	
+
 	// The Bootstrap hack is initialized to write to address 0x0000
 	core.HI.bootstrap_offset = 0x0000;
 
 	/* HCR */
 	HCR_set(0x0000);	// 5-10
-	
+
 	/* HSR */
 	HRDF_bit_set(0);	// 5-11
 	HTDE_bit_set(1);	// 5-11
@@ -603,7 +603,7 @@ static void dsp56k_host_interface_reset(void)
 	/* CVR*/
 	HV_bits_set(0x16);	// 5-7
 	HC_bit_set(0);		// 5-9
-	
+
 	/* TODO: ISR (at least) */
 }
 
@@ -613,10 +613,10 @@ void dsp56k_host_interface_write(UINT8 offset, UINT8 data)
 {
 	/* Not exactly correct since the bootstrap hack doesn't need this to be true */
 	/*
-	if (!host_interface_active())
-		logerror("Dsp56k : Host interface write called without HI being set active by the PBC.\n");
-	*/
-		
+    if (!host_interface_active())
+        logerror("Dsp56k : Host interface write called without HI being set active by the PBC.\n");
+    */
+
 	switch (offset)
 	{
 		// Interrupt Control Register (ICR)
@@ -636,30 +636,30 @@ void dsp56k_host_interface_write(UINT8 offset, UINT8 data)
 			}
 			ICR_set(data);
 			break;
-		
+
 		// Command Vector Register (CVR)
 		case 0x01:
 			CVR_set(data);
 			break;
-		
+
 		// Interrupt status register (ISR) - Read only!
 		case 0x02:
-			logerror("DSP56k : Interrupt status register is read only.\n"); 
+			logerror("DSP56k : Interrupt status register is read only.\n");
 			break;
-		
+
 		// Interrupt vector register (IVR)
 		case 0x03: break;
 
 		// Not used
 		case 0x04:
-			logerror("DSP56k : Address 0x4 on the host side of the host interface is not used.\n"); 
+			logerror("DSP56k : Address 0x4 on the host side of the host interface is not used.\n");
 			break;
-		
+
 		// Reserved
 		case 0x05: break;
 			logerror("DSP56k : Address 0x5 on the host side of the host interface is reserved.\n");
 			break;
-		
+
 		// Transmit byte register - high byte (TXH)
 		case 0x06:
 			// HACK
@@ -669,13 +669,13 @@ void dsp56k_host_interface_write(UINT8 offset, UINT8 data)
 				dsp56k_program_ram[core.HI.bootstrap_offset] |= (data << 8);
 				break;	/* Probably the right thing to do, given this is a hack */
 			}
-		
+
 			if (TXDE_bit())	// 5-5
 			{
 				TXH = data;
 			}
 			break;
-		
+
 		// Transmit byte register - low byte (TXL)
 		case 0x07:
 			// HACK
@@ -684,7 +684,7 @@ void dsp56k_host_interface_write(UINT8 offset, UINT8 data)
 				dsp56k_program_ram[core.HI.bootstrap_offset] &= 0xff00;
 				dsp56k_program_ram[core.HI.bootstrap_offset] |= data;
 				core.HI.bootstrap_offset++;
-				
+
 				if (core.HI.bootstrap_offset == 0x800)
 				{
 					core.bootstrap_mode = BOOTSTRAP_OFF;
@@ -698,7 +698,7 @@ void dsp56k_host_interface_write(UINT8 offset, UINT8 data)
 				TXDE_bit_set(0);
 			}
 			break;
-		
+
 		default: logerror("DSP56k : dsp56k_host_interface_write called with invalid address 0x%02x.\n", offset);
 	}
 }
@@ -707,37 +707,37 @@ UINT8 dsp56k_host_interface_read(UINT8 offset)
 {
 	/* Not exactly correct since the bootstrap hack doesn't need this to be true */
 	/*
-	if (!host_interface_active())
-		logerror("Dsp56k : Host interface write called without HI being set active by the PBC.\n");
-	*/
+    if (!host_interface_active())
+        logerror("Dsp56k : Host interface write called without HI being set active by the PBC.\n");
+    */
 
 	switch (offset)
 	{
 		// Interrupt Control Register (ICR)
-		case 0x00: 
+		case 0x00:
 			return ICR;
 			break;
-		
+
 		// Command Vector Register (CVR)
-		case 0x01: 
+		case 0x01:
 			return CVR;
 			break;
-		
+
 		// Interrupt status register (ISR)
-		case 0x02: 
+		case 0x02:
 			return ISR;
 			break;
-		
+
 		// Interrupt vector register (IVR)
-		case 0x03: 
+		case 0x03:
 			return IVR;
 			break;
-		
+
 		// Read zeroes
 		case 0x04:
 			return 0x00;
 			break;
-		
+
 		// Reserved
 		case 0x05:
 			logerror("DSP56k : Address 0x5 on the host side of the host interface is reserved.\n");
@@ -751,7 +751,7 @@ UINT8 dsp56k_host_interface_read(UINT8 offset)
 			else
 				return RXH;
 			break;
-		
+
 		// Receive byte register - low byte (RXL)
 		case 0x07:
 			// 5-5
@@ -764,10 +764,10 @@ UINT8 dsp56k_host_interface_read(UINT8 offset)
 				return value;
 			}
 			break;
-		
+
 		default: logerror("DSP56k : dsp56k_host_interface_read called with invalid address 0x%02x.\n", offset);
 	}
-	
+
 	/* Shouldn't get here */
 	return 0xff;
 }
@@ -813,7 +813,7 @@ static void RH_bit_set(UINT16 value)
 	value = value & 0x0001;
 	BCR &= ~(0x8000);
 	BCR |= (value << 15);
-	
+
 	// TODO: 4-6 Assert BR pin?
 }
 static void BS_bit_set(UINT16 value)
@@ -821,7 +821,7 @@ static void BS_bit_set(UINT16 value)
 	value = value & 0x0001;
 	BCR &= ~(0x4000);
 	BCR |= (value << 14);
-	
+
 	// TODO: 4-6 Respond to BR pin?
 }
 static void external_x_wait_states_set(UINT16 value)
@@ -843,7 +843,7 @@ static void PBC_set(UINT16 value)
 {
 	if (value & 0xfffe)
 		logerror("Dsp56k : Attempting to set reserved bits in the PBC.  Ignoring.\n");
-	
+
 	value = value & 0x0001;
 	PBC &= ~(0x0001);
 	PBC |= (value << 0);

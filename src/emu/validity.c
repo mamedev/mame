@@ -541,7 +541,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 			else
 			{
 				int rgnnum;
-				
+
 				/* iterate over all regions found so far */
 				for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries); rgnnum++)
 				{
@@ -553,7 +553,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 						currgn->length = ROMREGION_GETLENGTH(romp);
 						break;
 					}
-					
+
 					/* fail if we hit a duplicate */
 					if (strcmp(rgninfo->entries[rgnnum].tag, region) == 0)
 					{
@@ -660,7 +660,7 @@ static int validate_cpu(int drivnum, const machine_config *config, region_info *
 		/* skip empty entries */
 		if (cpu->type == CPU_DUMMY)
 			continue;
-		
+
 		/* check for valid tag */
 		if (cpu->tag == NULL || cpu->tag[0] == 0)
 		{
@@ -777,7 +777,7 @@ static int validate_cpu(int drivnum, const machine_config *config, region_info *
 				if (entry->region != NULL && entry->share == 0)
 				{
 					int rgnnum;
-					
+
 					/* loop over entries in the class */
 					for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries); rgnnum++)
 					{
@@ -788,7 +788,7 @@ static int validate_cpu(int drivnum, const machine_config *config, region_info *
 							error = TRUE;
 							break;
 						}
-						
+
 						/* if we hit a match, check against the length */
 						if (strcmp(rgninfo->entries[rgnnum].tag, entry->region) == 0)
 						{
@@ -980,7 +980,7 @@ static int validate_gfx(int drivnum, const machine_config *config, region_info *
 					error = TRUE;
 					break;
 				}
-				
+
 				/* if we hit a match, check against the length */
 				if (strcmp(rgninfo->entries[rgnnum].tag, region) == 0)
 				{

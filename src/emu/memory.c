@@ -922,7 +922,7 @@ const address_map *memory_get_address_map(int cpunum, int spacenum)
 	if (map->field != 0 && map->field != tmap.field) \
 		fatalerror("%s: %s included a mismatched address map (%s %d) for an existing map with %s %d!\n", driver->source_file, driver->name, #field, tmap.field, #field, map->field); \
 	} while (0)
-		
+
 
 #define check_entry_handler(handler) do { \
 	if (entry->handler.generic != NULL && entry->handler.generic != SMH_RAM) \

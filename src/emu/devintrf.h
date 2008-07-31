@@ -56,7 +56,7 @@ enum
 
 	/* --- the following bits of info are returned as pointers --- */
 	DEVINFO_PTR_FIRST = 0x10000,
-	
+
 		DEVINFO_PTR_ROM_REGION = DEVINFO_PTR_FIRST,		/* R/O: pointer to device-specific ROM region */
 
 	DEVINFO_PTR_DEVICE_SPECIFIC = 0x18000,				/* R/W: device-specific values start here */

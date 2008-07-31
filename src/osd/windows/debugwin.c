@@ -1778,7 +1778,7 @@ static void memory_determine_combo_items(running_machine *machine)
 					ci->cpunum = cpunum;
 					ci->spacenum = spacenum;
 					ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 8);
-					
+
 					t_tag = tstring_from_utf8(machine->config->cpu[cpunum].tag);
 					t_name = tstring_from_utf8(cpunum_name(cpunum));
 					t_space = tstring_from_utf8(address_space_names[spacenum]);
@@ -1786,7 +1786,7 @@ static void memory_determine_combo_items(running_machine *machine)
 					free(t_space),
 					free(t_name);
 					free(t_tag);
-					
+
 					*tail = ci;
 					tail = &ci->next;
 				}
@@ -1800,7 +1800,7 @@ static void memory_determine_combo_items(running_machine *machine)
 		UINT8 little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
 		UINT8 width = 1 << ((flags & ROMREGION_WIDTHMASK) >> 8);
 		TCHAR *t_tag;
-		
+
 		memset(ci, 0, sizeof(*ci));
 		ci->base = memory_region(machine, rgntag);
 		ci->length = memory_region_length(machine, rgntag);

@@ -3672,7 +3672,7 @@ static MACHINE_DRIVER_START( qsound )
 	/* sound hardware */
 	MDRV_SPEAKER_REMOVE("mono")
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	
+
 	MDRV_SOUND_REMOVE("2151")
 	MDRV_SOUND_REMOVE("oki")
 

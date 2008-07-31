@@ -129,7 +129,7 @@ WRITE8_HANDLER( bg_colorram_w )
 
 //WRITE8_HANDLER( flip_scrn_w )
 //{
-//		flip_screen_set(data & 0x40);
+//      flip_screen_set(data & 0x40);
 //}
 
 

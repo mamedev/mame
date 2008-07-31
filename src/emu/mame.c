@@ -763,7 +763,7 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
 {
 	mame_private *mame = machine->mame_data;
 	region_info *info;
-    
+
     /* make sure we don't have a region of the same name */
     for (info = mame->regions; info != NULL; info = info->next)
     	if (astring_cmpc(info->name, name) == 0)
@@ -775,7 +775,7 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
 	info->name = astring_dupc(name);
 	info->length = length;
 	info->flags = flags;
-	
+
 	/* hook us into the list */
 	mame->regions = info;
 	return info->base;
@@ -791,16 +791,16 @@ void memory_region_free(running_machine *machine, const char *name)
 {
 	mame_private *mame = machine->mame_data;
 	region_info **infoptr;
-	
+
 	/* find the region */
 	for (infoptr = &mame->regions; *infoptr != NULL; infoptr = &(*infoptr)->next)
 		if (astring_cmpc((*infoptr)->name, name) == 0)
 		{
 			region_info *deleteme = *infoptr;
-			
+
 			/* remove us from the list */
 			*infoptr = deleteme->next;
-			
+
 			/* free the region */
 			astring_free(deleteme->name);
 			free(deleteme);
@@ -818,7 +818,7 @@ UINT8 *memory_region(running_machine *machine, const char *name)
 {
 	mame_private *mame = machine->mame_data;
 	region_info *info;
-    
+
     /* NULL tag always fails */
     if (name == NULL)
     	return NULL;
@@ -827,7 +827,7 @@ UINT8 *memory_region(running_machine *machine, const char *name)
     for (info = mame->regions; info != NULL; info = info->next)
     	if (astring_cmpc(info->name, name) == 0)
     		return info->base;
-    
+
     return NULL;
 }
 
@@ -841,7 +841,7 @@ UINT32 memory_region_length(running_machine *machine, const char *name)
 {
 	mame_private *mame = machine->mame_data;
 	region_info *info;
-    
+
     /* NULL tag always fails */
     if (name == NULL)
     	return 0;
@@ -850,7 +850,7 @@ UINT32 memory_region_length(running_machine *machine, const char *name)
     for (info = mame->regions; info != NULL; info = info->next)
     	if (astring_cmpc(info->name, name) == 0)
     		return info->length;
-    
+
     return 0;
 }
 
@@ -864,7 +864,7 @@ UINT32 memory_region_flags(running_machine *machine, const char *name)
 {
 	mame_private *mame = machine->mame_data;
 	region_info *info;
-    
+
     /* NULL tag always fails */
     if (name == NULL)
     	return 0;
@@ -873,13 +873,13 @@ UINT32 memory_region_flags(running_machine *machine, const char *name)
     for (info = mame->regions; info != NULL; info = info->next)
     	if (astring_cmpc(info->name, name) == 0)
     		return info->flags;
-    
+
     return 0;
 }
 
 
 /*-------------------------------------------------
-    memory_region_next - the name of the next 
+    memory_region_next - the name of the next
     memory region (or the first if name == NULL)
 -------------------------------------------------*/
 
@@ -887,7 +887,7 @@ const char *memory_region_next(running_machine *machine, const char *name)
 {
 	mame_private *mame = machine->mame_data;
 	region_info *info;
-    
+
 	/* if there's nothing in this class, fail immediately */
     info = mame->regions;
 	if (info == NULL)
@@ -901,7 +901,7 @@ const char *memory_region_next(running_machine *machine, const char *name)
     for ( ; info != NULL; info = info->next)
     	if (astring_cmpc(info->name, name) == 0)
     		return (info->next != NULL) ? astring_c(info->next->name) : NULL;
-    
+
     return NULL;
 }
 

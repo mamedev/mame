@@ -47,7 +47,7 @@ static void trigger_sample(running_machine *machine, UINT8 data);
 WRITE8_HANDLER( gottlieb_sh_w )
 {
 	const device_config *riot = device_list_find_by_tag(machine->config->devicelist, RIOT6532, "riot");
-	
+
 	/* identify rev1 boards by the presence of a 6532 RIOT device */
 	if (riot != NULL)
 		gottlieb1_sh_w(riot, data);
@@ -201,7 +201,7 @@ static void play_sample(const char *phonemes)
 // 71 + 146 + 121 + 103 = 441 @ nominal (720kHz)
 //
 // B + AH1 + I3 + Y1
-// 71 + 146 + 55 + 80 = 
+// 71 + 146 + 55 + 80 =
 //
 	if (strcmp(phonemes, " HEH3LOOW     AH1EH3I3YMTERI2NDAHN") == 0)	  /* Q-Bert - Hello, I am turned on */
 		sample_start(0, 42, 0);

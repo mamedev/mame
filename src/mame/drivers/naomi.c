@@ -2419,10 +2419,10 @@ it sends bsec_ver, and if it's ok, then the next commands are the session key ch
 if you want to have the encryption described somewhere so it's not lost. it's simple:
 unsigned char Enc(unsigned char val,unsigned char n)
 {
-	val^=Key[8+n];
-	val+=Key[n];
+    val^=Key[8+n];
+    val+=Key[n];
 
-	return val;
+    return val;
 }
 
 do for each value in the message to send
@@ -2533,7 +2533,7 @@ DRIVER_INIT( sfz3ugd )
 {
 	// get from key file instead
 	naomi_game_decrypt( 0x4FF16D1A9E0BFBCDULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-//	naomi_write_keyfile();
+//  naomi_write_keyfile();
 }
 
 

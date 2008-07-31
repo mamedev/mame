@@ -7,21 +7,21 @@ driver by Luca Elia
 Hardware info (29/07/2008 f205v):
 
 Chips:
-	1x missing main CPU (u1)(from the socket I would say it's a 68000)
-	1x A40MX04-PL84 (u29)
-	1x AD-65 (equivalent to M6295) (u9)(sound)
-	1x MC1458P (u10)(sound)
-	1x TDA2003 (u8)(sound)
-	1x oscillator 10.000MHz (QZ1)
-	1x oscillator 16.000000 (QZ2)
+    1x missing main CPU (u1)(from the socket I would say it's a 68000)
+    1x A40MX04-PL84 (u29)
+    1x AD-65 (equivalent to M6295) (u9)(sound)
+    1x MC1458P (u10)(sound)
+    1x TDA2003 (u8)(sound)
+    1x oscillator 10.000MHz (QZ1)
+    1x oscillator 16.000000 (QZ2)
 ROMs:
-	1x AT27C020 (1)
-	2x M27C4001 (2,3)
-	2x AT49F010 (4,5)
-	2x DS1230Y (non volatile SRAM)
+    1x AT27C020 (1)
+    2x M27C4001 (2,3)
+    2x AT49F010 (4,5)
+    2x DS1230Y (non volatile SRAM)
 Notes:
-	1x 28x2 edge connector
-	1x trimmer (volume)
+    1x 28x2 edge connector
+    1x trimmer (volume)
 
 - This hardware is almost identical to that in magic10.c
 
@@ -150,7 +150,7 @@ static UINT16 out[3];
 
 static void show_out(void)
 {
-//	popmessage("%04x %04x %04x", out[0], out[1], out[2]);
+//  popmessage("%04x %04x %04x", out[0], out[1], out[2]);
 }
 
 static WRITE16_HANDLER( galaxi_500000_w )

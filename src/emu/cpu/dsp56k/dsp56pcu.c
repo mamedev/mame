@@ -18,7 +18,7 @@ static void LF_bit_set(UINT8 value)
 	SR &= ~(0x8000);
 	SR |=  (value << 15);
 }
-//static UINT8 I_bits_set(void) {	 }
+//static UINT8 I_bits_set(void) {    }
 static void N_bit_set(UINT8 value)
 {
 	value = value & 0x01;
@@ -40,7 +40,7 @@ static void V_bit_set(UINT8 value)
 static void C_bit_set(UINT8 value)
 {
 	value = value & 0x01;
-	SR &= ~(0x0001); 
+	SR &= ~(0x0001);
 	SR |=  (value << 0);
 }
 
@@ -89,10 +89,10 @@ static void pcu_reset(void)
 		case 0x00:
 			logerror("Dsp56k in Special Bootstrap Mode 1\n");
 
-			// HACK - We don't need to put the bootstrap mode on here since 
+			// HACK - We don't need to put the bootstrap mode on here since
 			//        we'll simulate it entirely in this function
 			core.bootstrap_mode = BOOTSTRAP_OFF;
-			
+
 			// HACK - Simply copy over 0x1000 bytes of data located at program memory 0xc000.
 			//        This, in actuality, is handled with the internal boot ROM.
 			for (i = 0; i < 0x800; i++)
@@ -109,10 +109,10 @@ static void pcu_reset(void)
 				UINT8 mem_value_high = program_read_byte_16be(mem_offset);
 				dsp56k_program_ram[i] = (mem_value_high << 8) || mem_value_low;
 			}
-			
+
 			// HACK - Set the PC to 0x0000 as per the boot ROM.
 			PC = 0x0000;
-			
+
 			// HACK - All done!  Set the Operating Mode to 2 as per the boot ROM.
 			MB_bit_set(1);
 			MA_bit_set(0);
@@ -137,7 +137,7 @@ static void pcu_reset(void)
 				core.bootstrap_mode = BOOTSTRAP_HI;
 				logerror("DSP56k : Currently in (hacked) bootstrap mode - reading from Host Interface.\n");
 			}
-			
+
 			// HACK - Set the PC to 0x0000 as per the boot ROM.
 			PC = 0x0000;
 
@@ -164,7 +164,7 @@ static void pcu_reset(void)
 	// Set registers properly
 	// 1-17 Clear Interrupt Priority Register (IPR)
 	IPR = 0x0000;
-	
+
 	// Clear out the pending interrupt list
 	dsp56k_clear_pending_interrupts();
 }
@@ -180,9 +180,9 @@ static void pcu_service_interrupts(void)
 
 	// Count list of pending interrupts
 	int num_servicable = dsp56k_count_pending_interrupts();
-	
+
 	if (num_servicable == 0) return;
-	
+
 	// Sort list
 	dsp56k_sort_pending_interrupts(num_servicable);
 
@@ -191,12 +191,12 @@ static void pcu_service_interrupts(void)
 	{
 		// Get the priority of the interrupt - a return value of -1 means disabled!
 		INT8 priority = dsp56k_get_irq_priority(core.PCU.pending_interrupts[i]);
-		
+
 		// 1-12 Make sure you're not masked out against the Interrupt Mask Bits (disabled is handled for free here)
 		if (priority >= I_bits())
 		{
 			// If you're acceptable to go, execute the interrupt
-			
+
 			// TODO: 5-7 Remember the host command input has a floating vector.  Do it up right.
 			// TODO: 5-9 5-11 Gotta' Clear HI (HCP & HC) when taking this exception too!
 		}
@@ -212,7 +212,7 @@ static void dsp56k_add_pending_interrupt(const char* name)
 {
 	int i;
 	int irq_index = dsp56k_get_irq_index_by_tag(name);
-	
+
 	for (i = 0; i < 32; i++)
 	{
 		if (core.PCU.pending_interrupts[i] == -1)
@@ -291,21 +291,21 @@ static int dsp56k_count_pending_interrupts(void)
 	{
 		numI++;
 	}
-	
+
 	return numI;
 }
 
 static void dsp56k_sort_pending_interrupts(int num)
 {
 	int i, j;
-	
+
 	// We're going to be sorting the priorities
 	int priority_list[32];
 	for (i = 0; i < num; i++)
 	{
 		priority_list[i] = dsp56k_get_irq_priority(core.PCU.pending_interrupts[i]);
 	}
-	
+
 	// Bubble sort should be good enough for us
 	for (i = 0; i < num; i++)
 	{
@@ -314,12 +314,12 @@ static void dsp56k_sort_pending_interrupts(int num)
 			if (priority_list[j] > priority_list[j+1])
 			{
 				int holder;
-				
+
 				// Swap priorities
 				holder = priority_list[j+1];
 				priority_list[j+1] = priority_list[j];
 				priority_list[j] = holder;
-				
+
 				// Swap irq indices.
 				holder = core.PCU.pending_interrupts[j+1];
 				core.PCU.pending_interrupts[j+1] = core.PCU.pending_interrupts[j];
@@ -327,7 +327,7 @@ static void dsp56k_sort_pending_interrupts(int num)
 			}
 		}
 	}
-	
+
 	// TODO: 1-17 Now sort each of the priority levels within their categories.
 }
 
@@ -342,7 +342,7 @@ static INT8 dsp56k_get_irq_priority(int index)
 		case 2:  return 3; // Stack Error
 		case 3:  return 3; // Reserved
 		case 4:  return 3; // SWI
-		
+
 		// Poll the IPR for these guys.
 		case 5:  return irqa_ipl();  // IRQA
 		case 6:  return irqb_ipl();  // IRQB
@@ -363,7 +363,7 @@ static INT8 dsp56k_get_irq_priority(int index)
 		case 21: return host_ipl();  // Host Transmit Data
 		case 22: return host_ipl();  // Host Command 0 (Default)
 		case 23: return codec_ipl(); // Codec Receive/Transmit
-		case 24: return host_ipl();  // Host Command 1				// TODO: Are all host ipl's the same?
+		case 24: return host_ipl();  // Host Command 1              // TODO: Are all host ipl's the same?
 		case 25: return host_ipl();  // Host Command 2
 		case 26: return host_ipl();  // Host Command 3
 		case 27: return host_ipl();  // Host Command 4
@@ -371,10 +371,10 @@ static INT8 dsp56k_get_irq_priority(int index)
 		case 29: return host_ipl();  // Host Command 6
 		case 30: return host_ipl();  // Host Command 7
 		case 31: return host_ipl();  // Host Command 8
-		
+
 		default: break;
 	}
-	
+
 	return -1;
 }
 

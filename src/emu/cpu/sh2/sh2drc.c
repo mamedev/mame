@@ -2229,7 +2229,7 @@ static int generate_group_3(drcuml_block *block, compiler_state *compiler, const
 		save_fast_iregs(block);
 		UML_CALLC(block, cfunc_SUBV, desc->opptr.w);
 		load_fast_iregs(block);
-#endif		
+#endif
 		return TRUE;
 		break;
 
@@ -2250,7 +2250,7 @@ static int generate_group_3(drcuml_block *block, compiler_state *compiler, const
 		save_fast_iregs(block);
 		UML_CALLC(block, cfunc_ADDV, desc->opptr.w);
 		load_fast_iregs(block);
-#endif		
+#endif
 		return TRUE;
 		break;
 	}

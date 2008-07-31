@@ -619,7 +619,7 @@ static void expat_element_start(void *data, const XML_Char *name, const XML_Char
 	newnode = add_child(*curnode, name, NULL);
 	if (newnode == NULL)
 		return;
-	
+
 	/* remember the line number */
 	newnode->line = XML_GetCurrentLineNumber(parse_info->parser);
 

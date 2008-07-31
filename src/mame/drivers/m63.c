@@ -95,7 +95,7 @@ Notes:
 
 TS 2008.06.14:
 - Addedd sound emulation - atomboy and fghtbskt req different interrupt (T1)
-  timing than wilytowr, otherwise music/fx tempo is too fast. 
+  timing than wilytowr, otherwise music/fx tempo is too fast.
   Music tempo and pitch verified on real pcb.
 - Extra space in atomboy 2764 eproms is filled with garbage z80 code
   (taken from one of code roms, but from different offset)

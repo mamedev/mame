@@ -506,7 +506,7 @@ static void device_list_stop(running_machine *machine)
 		/* free allocated memory for the token */
 		if (device->token != NULL)
 			free(device->token);
-			
+
 		/* reset all runtime fields */
 		device->token = NULL;
 		device->machine = NULL;
