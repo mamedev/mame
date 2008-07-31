@@ -7272,6 +7272,7 @@ Other Sun games
 	DRIVER( iqblock )	/* (c) 1993 */
 	DRIVER( grndtour )	/* (c) 1993 */
 	DRIVER( cabaret )
+	DRIVER( jingbell )	/* (c) 1995? */
 	DRIVER( pokerigs )	/* (c) 1995 */
 	DRIVER( lhb )		/* (c) 1995 */
 	DRIVER( lhba )		/* (c) 1995 */

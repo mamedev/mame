@@ -755,6 +755,7 @@ $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/ddz.o \
 	$(DRIVERS)/dunhuang.o \
 	$(DRIVERS)/goldstar.o $(VIDEO)/goldstar.o \
+	$(DRIVERS)/igs009.o \
 	$(DRIVERS)/igs_blit.o \
 	$(DRIVERS)/igs_180.o \
 	$(DRIVERS)/igs_m027.o \

@@ -1551,6 +1551,7 @@ src/mame/drivers/hshavoc.c svneol=native#text/plain
 src/mame/drivers/hyhoo.c svneol=native#text/plain
 src/mame/drivers/hyperspt.c svneol=native#text/plain
 src/mame/drivers/hyprduel.c svneol=native#text/plain
+src/mame/drivers/igs009.c svneol=native#text/plain
 src/mame/drivers/igs_180.c svneol=native#text/plain
 src/mame/drivers/igs_blit.c svneol=native#text/plain
 src/mame/drivers/igs_m027.c svneol=native#text/plain
