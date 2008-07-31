@@ -2805,6 +2805,7 @@ V-V                           TP-027
 	DRIVER( beastrzb )	/* Beastorizer (USA Bootleg) */
 	DRIVER( bldyror2 )	/* Bloody Roar 2 (JAPAN) */
 	DRIVER( brvblade )	/* Brave Blade (JAPAN) */
+	DRIVER( bam2 )		/* Bust a Move 2 (JAPANESE ROM ver. 1999/07/17 10:00:00) */
 
 	/* Atari PSX */
 	DRIVER( atpsx )

@@ -78,6 +78,7 @@ static const UINT8 cp13[ 8 ] = { 0x02, 0x70, 0x08, 0x04, 0x3c, 0x20, 0xe1, 0x01 
 static const UINT8 et01[ 8 ] = { 0x02, 0x08, 0x18, 0x1c, 0xfd, 0xc1, 0x40, 0x80 };
 static const UINT8 et02[ 8 ] = { 0xc0, 0xe1, 0xe2, 0xfe, 0x7c, 0x70, 0x08, 0xf8 };
 static const UINT8 et03[ 8 ] = { 0xc0, 0x08, 0xfa, 0xe2, 0xe1, 0xfd, 0x7c, 0x80 };
+static const UINT8 et05[ 8 ] = { 0xf0, 0x03, 0xe2, 0x18, 0x78, 0x7c, 0x3c, 0xc0 };
 static const UINT8 mg01[ 8 ] = { 0x80, 0xf2, 0x30, 0x38, 0xf9, 0xfd, 0x1c, 0xe0 };
 static const UINT8 mg02[ 8 ] = { 0xe0, 0x7c, 0x40, 0xc1, 0xf9, 0xfa, 0xf2, 0xf0 };
 static const UINT8 mg03[ 8 ] = { 0xc0, 0x04, 0x78, 0x82, 0x03, 0xf1, 0x10, 0xe0 };
@@ -148,6 +149,7 @@ static const struct
 	{ "beastrzr", et01, et02 }, /* OK */
 	{ "beastrzb", et01, et02 }, /* OK */
 	{ "bldyror2", et01, et03 }, /* OK ( bad dump? ) */
+	{ "bam2",     et01, et05 },
 	{ "glpracr2", mg01, mg02 }, /* locks up when starting a game/entering test mode */
 	{ "glprac2j", mg01, mg02 }, /* locks up when starting a game/entering test mode */
 	{ "glprac2l", mg01, mg02 }, /* locks up when starting a game/entering test mode */
@@ -1920,6 +1922,140 @@ static MACHINE_DRIVER_START( coh1002e )
 	MDRV_SOUND_ADD( "ymf", YMF271, 16934400 )
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
+MACHINE_DRIVER_END
+
+
+/*
+
+Bust A Move 2
+
+Runs on ZN1 hardware
+Lower PCB is common ZN1 with COH-1002E bios and ET01 sec chip
+Top PCB is unique for this game....
+
+MTR990601-(A)
+|----------------------------------------------|
+|  ALTERA-MAX   CN5  H8/3644       IDE-40      |
+|  EPM7128STC100                               |
+|                                              |
+|            MTR-BAM-A01.U23   MTR-BAM-A06.U28 |
+|   FLASH.U19                                  |
+|            MTR-BAM-A02.U24   MTR-BAM-A07.U29 |
+|   FLASH.U20                                  |
+|            MTR-BAM-A03.U25   MTR-BAM-A08.U30 |
+|  *FLASH.U21                                  |
+|            MTR-BAM-A04.U26   MTR-BAM-A09.U31 |
+|  *FLASH.U22                                  |
+|SEC         MTR-BAM-A05.U27   MTR-BAM-A10.U32 |
+|    CN3       4560   4560       TC9293        |
+|----------------------------------------------|
+Notes:
+       * - Not populated
+   FLASH - MX29F1610 SOP44 flashROMs
+MTR-BAM* - DIP42 32MBit maskROMs
+  TC9293 - Toshiba TC9293 Modulation System DAC with Analog Filter
+    4560 - JRC 4560 Op Amp
+     SEC - CAT702 security IC
+ CN3/CN5 - Connectors for ? (controls?)
+  IDE-40 - 40 Pin flat cable connector for IDE HDD
+           HDD is 3.5" Quantum Fireball CR 4.3AT 
+
+*/
+
+static WRITE32_HANDLER( bam2_sec_w )
+{
+	znsecsel_w( machine, offset, data, mem_mask );
+}
+
+/* 
+	H8/3644 MCU comms: there are 4 16-bit read/write ports
+
+	Port 0: (R) unknown
+	Port 0: (W) bank for mask ROMs
+	Port 1: (R) MCU status: bit 3 = busy, bit 2 = command successful, bits 1 & 0 = error
+	Port 1: (W) MCU command (0x0000 = execute)
+	Port 2: (R) unknown
+	Port 2: (W) MIPS writes alternating 0xffff/0xfffe, possibly to watchdog the H8?
+	Port 3: (R) unknown
+	Port 3: (W) unknown
+
+	8007f538 = detected device type.  0 = CDROM, 1 = HDD.
+*/
+
+static UINT32 bam2_mcu_command;
+
+static WRITE32_HANDLER( bam2_mcu_w )
+{
+	if (offset == 0)
+	{
+		if (ACCESSING_BITS_0_15)
+		{
+			memory_set_bankptr( 2, memory_region( machine, "user2" ) + ( ( data & 0xf ) * 0x400000 ) );
+		}
+		else if (ACCESSING_BITS_16_31)
+		{
+			bam2_mcu_command = data>>16;
+			logerror("MCU command: %04x (PC %08x)\n", bam2_mcu_command, activecpu_get_pc());
+		}
+	}
+}
+
+static READ32_HANDLER( bam2_mcu_r )
+{
+	switch (offset)
+	{
+		case 0:
+			logerror("MCU port 0 read @ PC %08x mask %08x\n", activecpu_get_pc(), mem_mask);
+			break;
+
+		case 1:
+			logerror("MCU status read @ PC %08x mask %08x\n", activecpu_get_pc(), mem_mask);
+			
+			switch (bam2_mcu_command)
+			{
+				case 0x7f:		// first drive check
+				case 0x1c:		// second drive check (causes HDD detected)
+					return 1;	// return error
+					break;
+			}
+
+			return 4;			// return OK
+			break;
+	}
+	
+	return 0;
+}
+
+static READ32_HANDLER( bam2_unk_r )
+{
+	return 0;
+}
+							       
+static DRIVER_INIT( bam2 )
+{
+	memory_install_read32_handler ( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f3fffff, 0, 0, SMH_BANK1 );
+	memory_install_read32_handler ( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f400000, 0x1f7fffff, 0, 0, SMH_BANK2 );
+	memory_install_read32_handler ( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fb00007, 0, 0, bam2_mcu_r );
+	memory_install_read32_handler ( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fa20000, 0x1fa20003, 0, 0, bam2_unk_r );
+	memory_install_write32_handler( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fa10300, 0x1fa10303, 0, 0, bam2_sec_w );
+	memory_install_write32_handler( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fb00007, 0, 0, bam2_mcu_w );
+
+	zn_driver_init(machine);
+}
+
+static MACHINE_RESET( bam2 )
+{
+	memory_set_bankptr( 1, memory_region( machine, "user2" ) ); /* fixed game rom */
+	memory_set_bankptr( 2, memory_region( machine, "user2" ) + 0x400000 ); /* banked game rom */
+
+	zn_machine_init(machine);
+}
+
+static MACHINE_DRIVER_START( bam2 )
+	MDRV_IMPORT_FROM( zn1_2mb_vram )
+
+	MDRV_MACHINE_RESET( bam2 )
+	MDRV_NVRAM_HANDLER( at28c16_0 )
 MACHINE_DRIVER_END
 
 /*
@@ -4096,6 +4232,29 @@ ROM_START( bldyror2 )
 	ROM_LOAD( "rom-3.336",       0x000000, 0x400000, CRC(b74cc4d1) SHA1(eb5485582a12959ae06927a2f1d8a7e63e0f956f) )
 ROM_END
 
+ROM_START( bam2 )
+	PSARC95_BIOS
+
+	ROM_REGION32_LE( 0x2c00000, "user2", 0 )
+        ROM_LOAD( "u19",             0x0000000, 0x200000, CRC(4d9f2337) SHA1(b156fd461d9d5141c60dbcd9ecd26b4f277b7919) )
+        ROM_LOAD( "u20",             0x0200000, 0x200000, CRC(1efb3c55) SHA1(d86e21a10fbcbcc759ba78b200dc2a10cb945b4c) )
+        ROM_LOAD( "mtr-bam-a01.u23", 0x0400000, 0x400000, CRC(5ed9e2dd) SHA1(85ac746735ec2fd89cd9082a3ab4ac6b4d9e8f4a) )
+        ROM_LOAD( "mtr-bam-a02.u24", 0x0800000, 0x400000, CRC(be335265) SHA1(7e09a166fe6d0e9e96c99fd472afb4db023ad217) )
+        ROM_LOAD( "mtr-bam-a03.u25", 0x0c00000, 0x400000, CRC(bf71791b) SHA1(b3eb791770838fc74e3535340610164166b63af8) )
+        ROM_LOAD( "mtr-bam-a04.u26", 0x1000000, 0x400000, CRC(d3aa62b5) SHA1(958b34fa2fa21c25f34972d4c288ef46e088d6e3) )
+        ROM_LOAD( "mtr-bam-a05.u27", 0x1400000, 0x400000, CRC(bd94d0ae) SHA1(97fe7b25768be2f57d8e823ec445c0ee92f07c02) )
+        ROM_LOAD( "mtr-bam-a06.u28", 0x1800000, 0x400000, CRC(b972c0b4) SHA1(e5ef170d0e71b7e02463462e1ea31c21ae890d14) )
+        ROM_LOAD( "mtr-bam-a07.u29", 0x1c00000, 0x400000, CRC(e8f716c1) SHA1(b15aafb0c9f3484a7ee41b5e6728af08d6a7bd8b) )
+        ROM_LOAD( "mtr-bam-a08.u30", 0x2000000, 0x400000, CRC(6e691ff1) SHA1(3fdcf3403e9ffd99b98e789930fc805dc2bc7692) )
+        ROM_LOAD( "mtr-bam-a09.u31", 0x2400000, 0x400000, CRC(e4bd7cec) SHA1(794d10b15a22aeed89082f4db2f3cb94aa7d807d) )
+        ROM_LOAD( "mtr-bam-a10.u32", 0x2800000, 0x400000, CRC(37fd1fa0) SHA1(afe846a817e499c405a5fd4ad83094270640faf3) )
+
+	ROM_REGION32_LE( 0x0400000, "user3", ROMREGION_ERASE00 )
+
+	DISK_REGION( "disks" )
+	DISK_IMAGE("bam2", 0, MD5(bda5db36e18a41183dfb2459abfd3f3b) SHA1(cc4662f0eb988807b74a71d6c95eb54c81d672ed) )
+ROM_END
+
 /* Atari PSX */
 
 #define TW_BIOS \
@@ -4343,6 +4502,9 @@ GAME( 1997, beastrzr, psarc95,  coh1002e, zn, coh1002e, ROT0, "Eighting/Raizing"
 GAME( 1997, beastrzb, psarc95,  coh1002e, zn, coh1002e, ROT0, "Eighting/Raizing", "Beastorizer (USA Bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1998, bldyror2, psarc95,  coh1002e, zn, coh1002e, ROT0, "Eighting/Raizing", "Bloody Roar 2 (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 2000, brvblade, tps,      coh1002e, zn, coh1002e, ROT270, "Eighting/Raizing", "Brave Blade (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+
+/* Bust a Move 2 uses the PSARC95 bios and ET series security but the top board is completely different */
+GAME( 1999, bam2,     psarc95,  bam2,     zn, bam2,     ROT0, "Metro/Enix/Namco", "Bust a Move 2 (JAPANESE ROM ver. 1999/07/17 10:00:00)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 /* Atlus */
 
