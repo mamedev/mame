@@ -84,11 +84,11 @@
 ***************************************************************************/
 
 /* callback functions for getting/setting a symbol value */
-typedef UINT64 (*symbol_getter_func)(UINT32 ref);
-typedef void (*symbol_setter_func)(UINT32 ref, UINT64 value);
+typedef UINT64 (*symbol_getter_func)(void *ref);
+typedef void (*symbol_setter_func)(void *ref, UINT64 value);
 
 /* callback function for execution a function */
-typedef UINT64 (*function_execute_func)(UINT32 ref, UINT32 numparams, const UINT64 *paramlist);
+typedef UINT64 (*function_execute_func)(void *ref, UINT32 numparams, const UINT64 *paramlist);
 
 /* callback function for memory reads/writes */
 typedef UINT64 (*express_read_func)(const char *name, int space, UINT32 offset, int size);
@@ -108,7 +108,7 @@ struct _express_callbacks
 typedef struct _symbol_entry symbol_entry;
 struct _symbol_entry
 {
-	UINT32			ref;						/* internal reference */
+	void *			ref;						/* internal reference */
 	UINT32			type;						/* type of symbol */
 	union
 	{
@@ -165,8 +165,8 @@ const char *				exprerr_to_string(EXPRERR error);
 /* symbol table manipulation */
 symbol_table *				symtable_alloc(symbol_table *parent);
 int 						symtable_add(symbol_table *table, const char *name, const symbol_entry *entry);
-int 						symtable_add_register(symbol_table *table, const char *name, UINT32 ref, symbol_getter_func getter, symbol_setter_func setter);
-int 						symtable_add_function(symbol_table *table, const char *name, UINT32 ref, UINT16 minparams, UINT16 maxparams, function_execute_func execute);
+int 						symtable_add_register(symbol_table *table, const char *name, void *ref, symbol_getter_func getter, symbol_setter_func setter);
+int 						symtable_add_function(symbol_table *table, const char *name, void *ref, UINT16 minparams, UINT16 maxparams, function_execute_func execute);
 int							symtable_add_value(symbol_table *table, const char *name, UINT64 value);
 const symbol_entry *		symtable_find(const symbol_table *table, const char *name);
 const char *				symtable_find_indexed(const symbol_table *table, int index, const symbol_entry **entry);

@@ -32,14 +32,23 @@
 
 
 /***************************************************************************
-    GLOBAL VARIABLES
+    TYPE DEFINITIONS
 ***************************************************************************/
 
-static struct
+typedef struct _global_entry global_entry;
+struct _global_entry
 {
 	void *		base;
 	UINT32		size;
-} global_array[MAX_GLOBALS];
+};
+
+
+
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
+
+static global_entry global_array[MAX_GLOBALS];
 
 
 
@@ -49,12 +58,12 @@ static struct
 
 static void debug_command_exit(running_machine *machine);
 
-static UINT64 execute_min(UINT32 ref, UINT32 params, const UINT64 *param);
-static UINT64 execute_max(UINT32 ref, UINT32 params, const UINT64 *param);
-static UINT64 execute_if(UINT32 ref, UINT32 params, const UINT64 *param);
+static UINT64 execute_min(void *ref, UINT32 params, const UINT64 *param);
+static UINT64 execute_max(void *ref, UINT32 params, const UINT64 *param);
+static UINT64 execute_if(void *ref, UINT32 params, const UINT64 *param);
 
-static UINT64 global_get(UINT32 ref);
-static void global_set(UINT32 ref, UINT64 value);
+static UINT64 global_get(void *ref);
+static void global_set(void *ref, UINT64 value);
 
 static void execute_help(int ref, int params, const char **param);
 static void execute_print(int ref, int params, const char **param);
@@ -121,9 +130,9 @@ void debug_command_init(running_machine *machine)
 	const char *name;
 
 	/* add a few simple global functions */
-	symtable_add_function(global_symtable, "min", 0, 2, 2, execute_min);
-	symtable_add_function(global_symtable, "max", 0, 2, 2, execute_max);
-	symtable_add_function(global_symtable, "if", 0, 3, 3, execute_if);
+	symtable_add_function(global_symtable, "min", NULL, 2, 2, execute_min);
+	symtable_add_function(global_symtable, "max", NULL, 2, 2, execute_max);
+	symtable_add_function(global_symtable, "if", NULL, 3, 3, execute_if);
 
 	/* add all single-entry save state globals */
 	for (itemnum = 0; itemnum < MAX_GLOBALS; itemnum++)
@@ -143,7 +152,7 @@ void debug_command_init(running_machine *machine)
 			sprintf(symname, ".%s", strrchr(name, '/') + 1);
 			global_array[itemnum].base = base;
 			global_array[itemnum].size = valsize;
-			symtable_add_register(global_symtable, symname, itemnum, global_get, global_set);
+			symtable_add_register(global_symtable, symname, &global_array, global_get, global_set);
 		}
 	}
 
@@ -279,7 +288,7 @@ static void debug_command_exit(running_machine *machine)
     execute_min - return the minimum of two values
 -------------------------------------------------*/
 
-static UINT64 execute_min(UINT32 ref, UINT32 params, const UINT64 *param)
+static UINT64 execute_min(void *ref, UINT32 params, const UINT64 *param)
 {
 	return (param[0] < param[1]) ? param[0] : param[1];
 }
@@ -289,7 +298,7 @@ static UINT64 execute_min(UINT32 ref, UINT32 params, const UINT64 *param)
     execute_max - return the maximum of two values
 -------------------------------------------------*/
 
-static UINT64 execute_max(UINT32 ref, UINT32 params, const UINT64 *param)
+static UINT64 execute_max(void *ref, UINT32 params, const UINT64 *param)
 {
 	return (param[0] > param[1]) ? param[0] : param[1];
 }
@@ -299,7 +308,7 @@ static UINT64 execute_max(UINT32 ref, UINT32 params, const UINT64 *param)
     execute_if - if (a) return b; else return c;
 -------------------------------------------------*/
 
-static UINT64 execute_if(UINT32 ref, UINT32 params, const UINT64 *param)
+static UINT64 execute_if(void *ref, UINT32 params, const UINT64 *param)
 {
 	return param[0] ? param[1] : param[2];
 }
@@ -316,15 +325,15 @@ static UINT64 execute_if(UINT32 ref, UINT32 params, const UINT64 *param)
     global_get - symbol table getter for globals
 -------------------------------------------------*/
 
-static UINT64 global_get(UINT32 ref)
+static UINT64 global_get(void *ref)
 {
-	assert(ref < MAX_GLOBALS);
-	switch (global_array[ref].size)
+	global_entry *global = ref;
+	switch (global->size)
 	{
-		case 1:		return *(UINT8 *)global_array[ref].base;
-		case 2:		return *(UINT16 *)global_array[ref].base;
-		case 4:		return *(UINT32 *)global_array[ref].base;
-		case 8:		return *(UINT64 *)global_array[ref].base;
+		case 1:		return *(UINT8 *)global->base;
+		case 2:		return *(UINT16 *)global->base;
+		case 4:		return *(UINT32 *)global->base;
+		case 8:		return *(UINT64 *)global->base;
 	}
 	return ~0;
 }
@@ -334,15 +343,15 @@ static UINT64 global_get(UINT32 ref)
     global_set - symbol table setter for globals
 -------------------------------------------------*/
 
-static void global_set(UINT32 ref, UINT64 value)
+static void global_set(void *ref, UINT64 value)
 {
-	assert(ref < MAX_GLOBALS);
-	switch (global_array[ref].size)
+	global_entry *global = ref;
+	switch (global->size)
 	{
-		case 1:		*(UINT8 *)global_array[ref].base = value;	break;
-		case 2:		*(UINT16 *)global_array[ref].base = value;	break;
-		case 4:		*(UINT32 *)global_array[ref].base = value;	break;
-		case 8:		*(UINT64 *)global_array[ref].base = value;	break;
+		case 1:		*(UINT8 *)global->base = value;	break;
+		case 2:		*(UINT16 *)global->base = value;	break;
+		case 4:		*(UINT32 *)global->base = value;	break;
+		case 8:		*(UINT64 *)global->base = value;	break;
 	}
 }
 

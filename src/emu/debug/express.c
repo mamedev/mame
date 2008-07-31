@@ -1935,7 +1935,7 @@ int symtable_add(symbol_table *table, const char *name, const symbol_entry *entr
     register symbol to a symbol table
 -------------------------------------------------*/
 
-int	symtable_add_register(symbol_table *table, const char *name, UINT32 ref, UINT64 (*getter)(UINT32), void (*setter)(UINT32, UINT64))
+int	symtable_add_register(symbol_table *table, const char *name, void *ref, symbol_getter_func getter, symbol_setter_func setter)
 {
 	symbol_entry symbol;
 
@@ -1952,7 +1952,7 @@ int	symtable_add_register(symbol_table *table, const char *name, UINT32 ref, UIN
     function symbol to a symbol table
 -------------------------------------------------*/
 
-int symtable_add_function(symbol_table *table, const char *name, UINT32 ref, UINT16 minparams, UINT16 maxparams, function_execute_func execute)
+int symtable_add_function(symbol_table *table, const char *name, void *ref, UINT16 minparams, UINT16 maxparams, function_execute_func execute)
 {
 	symbol_entry symbol;
 
@@ -1974,7 +1974,7 @@ int symtable_add_value(symbol_table *table, const char *name, UINT64 value)
 {
 	symbol_entry symbol;
 
-	symbol.ref = 0;
+	symbol.ref = NULL;
 	symbol.type = SMT_VALUE;
 	symbol.info.gen.value = value;
 	return symtable_add(table, name, &symbol);
