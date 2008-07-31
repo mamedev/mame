@@ -1614,6 +1614,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/policetr.o $(VIDEO)/policetr.o \
 	$(DRIVERS)/polyplay.o $(AUDIO)/polyplay.o $(VIDEO)/polyplay.o \
 	$(DRIVERS)/quizo.o \
+	$(DRIVERS)/quizpun2.o \
 	$(DRIVERS)/rbmk.o \
 	$(DRIVERS)/rcorsair.o \
 	$(DRIVERS)/sfkick.o \

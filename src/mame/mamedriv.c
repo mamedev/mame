@@ -7661,6 +7661,7 @@ Other Sun games
 	DRIVER( amspdwy )	/* no copyright notice, but (c) 1987 Enerdyne Technologies, Inc. */
 	DRIVER( amspdwya )	/* no copyright notice, but (c) 1987 Enerdyne Technologies, Inc. */
 	DRIVER( othldrby )	/* (c) 1995 Sunwise */
+	DRIVER( quizpun2 )	/* (c) 1989 Space Computer System of Korea */
 	DRIVER( mosaic )	/* (c) 1990 Space */
 	DRIVER( mosaica )	/* (c) 1990 Space + Fuuki license */
 	DRIVER( gfire2 )	/* (c) 1992 Topis Corp */
