@@ -827,13 +827,13 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dlair_pr7820 )
 	MDRV_IMPORT_FROM(dlair_base)
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR7820, 0, "laserdisc")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR7820)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( dlair_ldv1000 )
 	MDRV_IMPORT_FROM(dlair_base)
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, 0, "laserdisc")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000)
 MACHINE_DRIVER_END
 
 
@@ -851,7 +851,7 @@ static MACHINE_DRIVER_START( dleuro )
 	MDRV_MACHINE_START(dleuro)
 	MDRV_MACHINE_RESET(dlair)
 
-	MDRV_LASERDISC_ADD("laserdisc", PHILLIPS_22VP932, 0, "laserdisc")
+	MDRV_LASERDISC_ADD("laserdisc", PHILLIPS_22VP932)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -896,7 +896,7 @@ ROM_START( dlair )		/* revision F2 */
 	ROM_LOAD( "dl_f2_u3.bin", 0x4000, 0x2000,  CRC(ab514e5b) SHA1(29d1015b951f0f2d4e5257497f3bf007c5e2262c) )
 	ROM_LOAD( "dl_f2_u4.bin", 0x6000, 0x2000,  CRC(f5ec23d2) SHA1(71149e2d359cc5944fbbb53dd7d0c2b42fbc9bb4) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
@@ -908,7 +908,7 @@ ROM_START( dlaira )		/* revision A */
 	ROM_LOAD( "dl_a_u4.bin", 0x6000, 0x2000,  CRC(924d12f2) SHA1(05b487e651a4817991dfc2308834b8f2fae918b4) )
 	ROM_LOAD( "dl_a_u5.bin", 0x8000, 0x2000,  CRC(6ec2f9c1) SHA1(0b8026927697a99fe8fa0dd4bd643418779a1d45) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
@@ -920,7 +920,7 @@ ROM_START( dlairb )		/* revision B */
 	ROM_LOAD( "dl_b_u4.bin", 0x6000, 0x2000,  CRC(924d12f2) SHA1(05b487e651a4817991dfc2308834b8f2fae918b4) )
 	ROM_LOAD( "dl_b_u5.bin", 0x8000, 0x2000,  CRC(6ec2f9c1) SHA1(0b8026927697a99fe8fa0dd4bd643418779a1d45) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
@@ -932,7 +932,7 @@ ROM_START( dlairc )		/* revision C */
 	ROM_LOAD( "dl_c_u4.bin", 0x6000, 0x2000,  CRC(924d12f2) SHA1(05b487e651a4817991dfc2308834b8f2fae918b4) )
 	ROM_LOAD( "dl_c_u5.bin", 0x8000, 0x2000,  CRC(6ec2f9c1) SHA1(0b8026927697a99fe8fa0dd4bd643418779a1d45) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
@@ -944,7 +944,7 @@ ROM_START( dlaird )		/* revision D */
 	ROM_LOAD( "dl_d_u4.bin", 0x6000, 0x2000,  CRC(5f7212cb) SHA1(69c34de1bb44b6cd2adc2947d00d8823d3e87130) )
 	ROM_LOAD( "dl_d_u5.bin", 0x8000, 0x2000,  CRC(2b469c89) SHA1(646394b51325ca9163221a43b5af64a8067eb80b) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
@@ -955,7 +955,7 @@ ROM_START( dlaire )		/* revision E */
 	ROM_LOAD( "dl_e_u3.bin", 0x4000, 0x2000,  CRC(897bf075) SHA1(d2ff9c2fec37544cfe8fb60273524c6610488502) )
 	ROM_LOAD( "dl_e_u4.bin", 0x6000, 0x2000,  CRC(4ebffba5) SHA1(d04711247ffa88e371ec461465dd75a8158d90bc) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
@@ -966,7 +966,7 @@ ROM_START( dlairf )		/* revision F */
 	ROM_LOAD( "dl_f_u3.bin", 0x4000, 0x2000,  CRC(ab514e5b) SHA1(29d1015b951f0f2d4e5257497f3bf007c5e2262c) )
 	ROM_LOAD( "dl_f_u4.bin", 0x6000, 0x2000,  CRC(a817324e) SHA1(1299c83342fc70932f67bda8ae60bace91d66429) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "dlair", 0, NO_DUMP )
 ROM_END
 
@@ -980,7 +980,7 @@ ROM_START( dleuro )		/* European Atari version */
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "elu33.bin", 0x0000, 0x2000, CRC(e7506d96) SHA1(610ae25bd8db13b18b9e681e855ffa978043255b) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "dleuro", 0, NO_DUMP )
 ROM_END
 
@@ -994,7 +994,7 @@ ROM_START( dlital )		/* Italian Sidam version */
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "dlita33.bin", 0x0000, 0x2000, CRC(e7506d96) SHA1(610ae25bd8db13b18b9e681e855ffa978043255b) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "dleuro", 0, NO_DUMP )
 ROM_END
 
@@ -1007,7 +1007,7 @@ ROM_START( spaceace )		/* revision A3 */
 	ROM_LOAD( "sa_a3_u4.bin", 0x6000, 0x2000,  CRC(57db2a79) SHA1(5286905d9bde697845a98bd77f31f2a96a8874fc) )
 	ROM_LOAD( "sa_a3_u5.bin", 0x8000, 0x2000,  CRC(85cbcdc4) SHA1(97e01e96c885ab7af4c3a3b586eb40374d54f12f) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "spaceace", 0, NO_DUMP )
 ROM_END
 
@@ -1019,7 +1019,7 @@ ROM_START( spaceaa2 )		/* revision A2 */
 	ROM_LOAD( "sa_a2_u4.bin", 0x6000, 0x2000,  CRC(57db2a79) SHA1(5286905d9bde697845a98bd77f31f2a96a8874fc) )
 	ROM_LOAD( "sa_a2_u5.bin", 0x8000, 0x2000,  CRC(85cbcdc4) SHA1(97e01e96c885ab7af4c3a3b586eb40374d54f12f) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "spaceace", 0, NO_DUMP )
 ROM_END
 
@@ -1031,7 +1031,7 @@ ROM_START( spaceaa )		/* revision A */
 	ROM_LOAD( "sa_a_u4.bin", 0x6000, 0x2000,  CRC(57db2a79) SHA1(5286905d9bde697845a98bd77f31f2a96a8874fc) )
 	ROM_LOAD( "sa_a_u5.bin", 0x8000, 0x2000,  CRC(85cbcdc4) SHA1(97e01e96c885ab7af4c3a3b586eb40374d54f12f) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "spaceace", 0, NO_DUMP )
 ROM_END
 
@@ -1046,7 +1046,7 @@ ROM_START( saeuro )		/* Italian Sidam version */
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "sa_u33a.bin", 0x0000, 0x2000, CRC(a8c14612) SHA1(dbcf90b929e714f328bdcb0d8cd7c9e7d08a8be7) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "saeuro", 0, NO_DUMP )
 ROM_END
 

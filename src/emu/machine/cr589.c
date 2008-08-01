@@ -108,20 +108,25 @@ static void cr589_write_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 	}
 }
 
-static void cr589_alloc_instance( SCSIInstance *scsiInstance, int diskId )
+static void cr589_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
 {
 	SCSICr589 *our_this = SCSIThis( &SCSIClassCr589, scsiInstance );
+	char tag[256];
 
 	our_this->download = 0;
 	memcpy( &our_this->buffer[ identity_offset ], "MATSHITACD-ROM CR-589   GS0N", 28 );
 
-	state_save_register_item( "cr589", diskId, our_this->download );
-	state_save_register_item_array( "cr589", diskId, our_this->buffer );
-	state_save_register_item( "cr589", diskId, our_this->bufferOffset );
+	state_save_combine_module_and_tag(tag, "cr589", diskregion);
+
+	state_save_register_item( tag, 0, our_this->download );
+	state_save_register_item_array( tag, 0, our_this->buffer );
+	state_save_register_item( tag, 0, our_this->bufferOffset );
 }
 
 static int cr589_dispatch( int operation, void *file, INT64 intparm, void *ptrparm )
 {
+	SCSIAllocInstanceParams *params;
+
 	switch( operation )
 	{
 		case SCSIOP_EXEC_COMMAND:
@@ -136,8 +141,9 @@ static int cr589_dispatch( int operation, void *file, INT64 intparm, void *ptrpa
 			return 0;
 
 		case SCSIOP_ALLOC_INSTANCE:
+			params = ptrparm;
 			SCSIBase( &SCSIClassCr589, operation, file, intparm, ptrparm );
-			cr589_alloc_instance( *((SCSIInstance **) ptrparm), intparm );
+			cr589_alloc_instance( params->instance, params->diskregion );
 			return 0;
 	}
 

@@ -353,7 +353,7 @@ static MACHINE_DRIVER_START( lgp )
 
 	MDRV_MACHINE_START(lgp)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, 0, "laserdisc")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000)
 
 /*  video */
 

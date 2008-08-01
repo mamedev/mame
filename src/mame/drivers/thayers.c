@@ -769,7 +769,7 @@ static MACHINE_DRIVER_START( thayers )
 	MDRV_MACHINE_START(thayers)
 	MDRV_MACHINE_RESET(thayers)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR7820, 0, "laserdisc")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR7820)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -796,7 +796,7 @@ ROM_START( thayers )
 	ROM_REGION( 0x400, "mcu", 0 )
 	ROM_LOAD( "tq_cop.bin", 0x000, 0x400, CRC(6748e6b3) SHA1(5d7d1ecb57c1501ef6a2d9691eecc9970586606b) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "thayers", 0, NO_DUMP )
 ROM_END
 
@@ -808,7 +808,7 @@ ROM_START( thayersa )
 	ROM_REGION( 0x400, "mcu", 0 )
 	ROM_LOAD( "tq_cop.bin", 0x000, 0x400, CRC(6748e6b3) SHA1(5d7d1ecb57c1501ef6a2d9691eecc9970586606b) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "thayers", 0, NO_DUMP )
 ROM_END
 

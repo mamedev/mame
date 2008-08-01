@@ -97,17 +97,22 @@ static int scsidev_get_command( SCSIInstance *scsiInstance, void **command )
 	return our_this->commandLength;
 }
 
-static void scsidev_alloc_instance( SCSIInstance *scsiInstance, int diskId )
+static void scsidev_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
 {
 	SCSIDev *our_this = SCSIThis( &SCSIClassDevice, scsiInstance );
+	char tag[256];
 
-	state_save_register_item_array( "scsidev", diskId, our_this->command );
-	state_save_register_item( "scsidev", diskId, our_this->commandLength );
-	state_save_register_item( "scsidev", diskId, our_this->phase );
+	state_save_combine_module_and_tag(tag, "scsidev", diskregion);
+
+	state_save_register_item_array( tag, 0, our_this->command );
+	state_save_register_item( tag, 0, our_this->commandLength );
+	state_save_register_item( tag, 0, our_this->phase );
 }
 
 static int scsidev_dispatch( int operation, void *file, INT64 intparm, void *ptrparm )
 {
+	SCSIAllocInstanceParams *params;
+
 	switch( operation )
 	{
 		case SCSIOP_EXEC_COMMAND:
@@ -136,8 +141,9 @@ static int scsidev_dispatch( int operation, void *file, INT64 intparm, void *ptr
 			return scsidev_get_command( file, ptrparm );
 
 		case SCSIOP_ALLOC_INSTANCE:
-			*((SCSIInstance **) ptrparm) = SCSIMalloc( file );
-			scsidev_alloc_instance( *((SCSIInstance **) ptrparm), intparm );
+			params = ptrparm;
+			params->instance = SCSIMalloc( file );
+			scsidev_alloc_instance( params->instance, params->diskregion );
 			return 0;
 
 		case SCSIOP_DELETE_INSTANCE:

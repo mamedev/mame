@@ -654,7 +654,7 @@ static MACHINE_DRIVER_START(gamecstl)
 	MDRV_DEVICE_ADD( "pic8259_2", PIC8259 )
 	MDRV_DEVICE_CONFIG( gamecstl_pic8259_2_config )
 
-	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
+	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 
@@ -740,7 +740,7 @@ ROM_START(gamecstl)
 	ROM_REGION(0x08100, "gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "ide" )
 	DISK_IMAGE( "gamecstl", 0, MD5(501ddbebb530b8fd67eb64a4a2de3e35) SHA1(2477468ef1c1d4529057064a319ebfe9fd8facd7) )
 ROM_END
 

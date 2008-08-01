@@ -348,7 +348,7 @@ static MACHINE_DRIVER_START( superdq )
 	MDRV_MACHINE_START(superdq)
 	MDRV_MACHINE_RESET(superdq)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, 0, "laserdisc")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER)
@@ -397,7 +397,7 @@ ROM_START( superdq )		/* long scenes */
 	ROM_REGION( 0x0020, "proms", ROMREGION_DISPOSE )
 	ROM_LOAD( "sdq-cprm.bin", 0x0000, 0x0020, CRC(96701569) SHA1(b0f40373735d1af0c62e5ab06045a064b4eb1794) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "superdq", 0, NO_DUMP )
 ROM_END
 
@@ -411,7 +411,7 @@ ROM_START( superdqs )		/* short scenes */
 	ROM_REGION( 0x0020, "proms", ROMREGION_DISPOSE )
 	ROM_LOAD( "sdq-cprm.bin", 0x0000, 0x0020, CRC(96701569) SHA1(b0f40373735d1af0c62e5ab06045a064b4eb1794) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "superdq", 0, NO_DUMP )
 ROM_END
 
@@ -425,7 +425,7 @@ ROM_START( superdqa )		/* short scenes, alternate */
 	ROM_REGION( 0x0020, "proms", ROMREGION_DISPOSE )
 	ROM_LOAD( "sdq-cprm.bin", 0x0000, 0x0020, CRC(96701569) SHA1(b0f40373735d1af0c62e5ab06045a064b4eb1794) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "superdq", 0, NO_DUMP )
 ROM_END
 

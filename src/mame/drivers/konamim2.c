@@ -457,7 +457,7 @@ static CDE_DMA cde_dma[2];
 
 static void cde_init(void)
 {
-	cdrom_file *cd = cdrom_open(get_disk_handle(0));
+	cdrom_file *cd = cdrom_open(get_disk_handle("cdrom"));
 	const cdrom_toc *toc = cdrom_get_toc(cd);
 
 	if (cd)
@@ -1166,7 +1166,7 @@ ROM_START(polystar)
 	ROM_REGION( 0x80, "user2", 0 ) /* serial eeprom */
 	ROM_LOAD( "93c46.7k",  0x000000, 0x000080, CRC(66d02984) SHA1(d07c57d198c611b6ff67a783c20a3d038ba34cd1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE( "623jaa02", 0, MD5(6071c1b70c190fa7c50676eb5308e024) SHA1(a7dc6086d0244b5472f61b41992623c7a9dc2e9c))
 ROM_END
 
@@ -1174,7 +1174,7 @@ ROM_START(btltryst)
 	ROM_REGION64_BE(0x200000, "user1", 0)	/* boot rom */
 	ROM_LOAD16_WORD("636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b))
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE( "btltryst", 0, MD5(4286d25a896d1450705f742cccd26ef2) SHA1(becc606b8480f6a09365b611565d83cfdc82b0b3))
 ROM_END
 
@@ -1185,7 +1185,7 @@ ROM_START(heatof11)
 	ROM_REGION( 0x2000, "user2", 0 ) /* timekeeper eeprom */
 	ROM_LOAD( "dallas.5e",  0x000000, 0x002000, CRC(8611ff09) SHA1(6410236947d99c552c4a1f7dd5fd8c7a5ae4cba1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE( "heatof11", 0, MD5(1eef9f191439f13d1a867629226b0230) SHA1(87599d03aecadf5d119d05173bdef2940bcce515))
 ROM_END
 
@@ -1204,7 +1204,7 @@ ROM_START(hellngt)
 	ROM_REGION( 0x1000, "user2", 0 ) /* timekeeper eeprom */
 	ROM_LOAD( "m48t58y.u1",  0x000000, 0x001000, CRC(169bb8f4) SHA1(55c0bafab5d309fe69156489186e232aa87ca0dd) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE( "810eaa02", 0, MD5(250a1b9cc2a25aed6c27321dd8f4f8a2) SHA1(d2f48a389f8091e03ada81c255231c7957d1aee3))
 ROM_END
 
@@ -1215,7 +1215,7 @@ ROM_START(totlvice)
 	ROM_REGION( 0x100000, "user2", 0 ) /* sound rom on sub board */
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE( "639jad01", 0, MD5(bc3156be374e7a99040763bf0cea7ad3) SHA1(c4503d9954c72dd8f70521f313f0338528116c26))
 ROM_END
 

@@ -2447,7 +2447,7 @@ static TIMER_CALLBACK( fastboot_timer_callback )
 static const SCSIConfigTable dev_table =
 {
 	1,                                      /* 1 SCSI device */
-	{ { SCSI_ID_1, 0, SCSI_DEVICE_CDROM } } /* SCSI ID 2, using CD 0, and it's a CD-ROM */
+	{ { SCSI_ID_1, "cdrom", SCSI_DEVICE_CDROM } } /* SCSI ID 2, using CD 0, and it's a CD-ROM */
 };
 
 static const struct WD33C93interface scsi_intf =
@@ -2709,7 +2709,7 @@ ROM_START( sfiii )
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "sf3000", 0, MD5(cdc5c5423bd8c053de7cdd927dc60da7) SHA1(cc72c9eb2096f4d51f2cf6df18f29fd79d05067c) )
 ROM_END
 
@@ -2720,7 +2720,7 @@ ROM_START( sfiiiu )
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "sf3000", 0, MD5(cdc5c5423bd8c053de7cdd927dc60da7) SHA1(cc72c9eb2096f4d51f2cf6df18f29fd79d05067c) )
 ROM_END
 
@@ -2731,7 +2731,7 @@ ROM_START( sfiii2 )
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "3ga000", 0, MD5(941c7e8d0838db9880ea7bf169ad310d) SHA1(76e9fdef020c4b85a10aa8828a63e67c7dca22bd) )
 ROM_END
 
@@ -2742,7 +2742,7 @@ ROM_START( sfiii2u )
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "3ga000", 0, MD5(941c7e8d0838db9880ea7bf169ad310d) SHA1(76e9fdef020c4b85a10aa8828a63e67c7dca22bd) )
 ROM_END
 
@@ -2753,7 +2753,7 @@ ROM_START( sfiii3 )
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "33s000", 0, MD5(f159ad85cc94ced3ddb9ef5e92173a9f) SHA1(47c7ae0f2dc47c7d28bdf66d378a3aaba4c99c75) )
 ROM_END
 
@@ -2764,7 +2764,7 @@ ROM_START( sfiii3a )
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "cap-33s-2", 0, SHA1(24e78b8c66fb1573ffd642ee51607f3b53ed40b7) MD5(cf63f3dbcc2653b95709133fe79c7225) )
 ROM_END
 
@@ -2775,7 +2775,7 @@ ROM_START( redearth )
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "wzd000", 0, MD5(028ff12a4ce34118dd0091e87c8cdd08) SHA1(6d4e6b7fff4ff3f04e349479fa5a1cbe63e673b8) )
 ROM_END
 
@@ -2786,7 +2786,7 @@ ROM_START( warzard )
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "wzd000", 0, MD5(028ff12a4ce34118dd0091e87c8cdd08) SHA1(6d4e6b7fff4ff3f04e349479fa5a1cbe63e673b8) )
 ROM_END
 
@@ -2798,7 +2798,7 @@ ROM_START( jojo )
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "jjk000", 0, MD5(05440ecf90e836207a27a99c817a3328) SHA1(d5a11315ac21e573ffe78e63602ec2cb420f361f) )
 ROM_END
 
@@ -2809,7 +2809,7 @@ ROM_START( jojoalt )
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "cap-jjk-160", 0, SHA1(74fb14d838d98c3e10baa08e6f7b2464d840dcf0) MD5(93cc16f11a88c8f5268cb96baebc0a13) )
 ROM_END
 
@@ -2820,7 +2820,7 @@ ROM_START( jojoba )
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "jjm000", 0, MD5(bf6b90334bf1f6bd8dbfed737face2d6) SHA1(688520bb83ccbf4b31c3bfe26bd0cc8292a8c558) )
 ROM_END
 

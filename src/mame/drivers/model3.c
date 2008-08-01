@@ -958,7 +958,7 @@ static const SCSIConfigTable scsi_dev_table =
 {
 	1, /* 1 SCSI device */
 	{
-		{ SCSI_ID_0, 0, SCSI_DEVICE_HARDDISK } /* SCSI ID 0, using HD 0, HD */
+		{ SCSI_ID_0, "disk", SCSI_DEVICE_HARDDISK } /* SCSI ID 0, using HD 0, HD */
 	}
 };
 

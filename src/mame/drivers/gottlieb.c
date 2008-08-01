@@ -1780,7 +1780,7 @@ static MACHINE_DRIVER_START( g2laser )
 	
 	MDRV_MACHINE_START(laserdisc)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210, 0, "laserdisc")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210)
 
 	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(laserdisc_custom_interface)

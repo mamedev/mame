@@ -291,7 +291,7 @@ static const SCSIConfigTable dev_table =
 {
 	1, /* 1 SCSI device */
 	{
-		{ SCSI_ID_4, 0, SCSI_DEVICE_CDROM } /* SCSI ID 4, using CHD 0, and it's a CD-ROM */
+		{ SCSI_ID_4, "cdrom", SCSI_DEVICE_CDROM } /* SCSI ID 4, using CHD 0, and it's a CD-ROM */
 	}
 };
 
@@ -792,7 +792,7 @@ ROM_START( susume )
 
 	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
 	ROM_LOAD( "susume.25c",   0x000000, 0x000080, CRC(52f17df7) SHA1(b8ad7787b0692713439d7d9bebfa0c801c806006) )
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "gv027j1", 0, MD5(4443754686d399c3ad12349ac2565f94) SHA1(36676b7bd63e20ce6126280a3f7a3e3ea0a4b8c0) )
 ROM_END
 
@@ -802,7 +802,7 @@ ROM_START( hyperath )
 	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
 	ROM_LOAD( "hyperath.25c", 0x000000, 0x000080, CRC(20a8c435) SHA1(a0f203a999757fba68b391c525ac4b9684a57ba9) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "hyperath", 0, MD5(a777d62bc998768e53d3d764d96cd990) SHA1(dfe0a68258cf33ca09639a752611302b361698e8) )
 ROM_END
 
@@ -812,7 +812,7 @@ ROM_START( pbball96 )
 	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
 	ROM_LOAD( "pbball96.25c", 0x000000, 0x000080, CRC(405a7fc9) SHA1(e2d978f49748ba3c4a425188abcd3d272ec23907) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "pbball96", 0, MD5(5962a38e2af6299659f53613956cd9ed) SHA1(a056138fc68bd1580b1de89b622b159150413a3f) )
 ROM_END
 
@@ -822,7 +822,7 @@ ROM_START( weddingr )
 	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
 	ROM_LOAD( "weddingr.25c", 0x000000, 0x000080, CRC(b90509a0) SHA1(41510a0ceded81dcb26a70eba97636d38d3742c3) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "weddingr", 0, MD5(cacc28156b037e13098f3624ae92ab85) SHA1(e6481c367ad24aa285e51c01221a169b1b74b15f) )
 ROM_END
 
@@ -832,7 +832,7 @@ ROM_START( simpbowl )
 	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
 	ROM_LOAD( "simpbowl.25c", 0x000000, 0x000080, CRC(2c61050c) SHA1(16ae7f81cbe841c429c5c7326cf83e87db1782bf) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "simpbowl", 0, MD5(47702fc060f3f1fbb2dba84ea3544a4a) SHA1(791ce11b0645fd5c3f5b30483bad879f26bb97db) )
 ROM_END
 
@@ -842,7 +842,7 @@ ROM_START( btchamp )
 	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
 	ROM_LOAD( "btchmp.25c", 0x000000, 0x000080, CRC(6d02ea54) SHA1(d3babf481fd89db3aec17f589d0d3d999a2aa6e1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "btchamp", 0, MD5(edc387207bc878b3a4044441e77d25f7) SHA1(e1a75a034d83cffa44268eb30653ba334cc6252d) )
 ROM_END
 
@@ -852,7 +852,7 @@ ROM_START( kdeadeye )
 	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
 	ROM_LOAD( "kdeadeye.25c", 0x000000, 0x000080, CRC(3935d2df) SHA1(cbb855c475269077803c380dbc3621e522efe51e) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "kdeadeye", 0, MD5(5109d61ab8791a6d622499b51e613a8c) SHA1(2b413a2a22e1959fb4f71b67ba51c6c8e0d58970) )
 ROM_END
 
@@ -862,7 +862,7 @@ ROM_START( nagano98 )
 	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
 	ROM_LOAD( "nagano98.25c",  0x000000, 0x000080, CRC(b64b7451) SHA1(a77a37e0cc580934d1e7e05d523bae0acd2c1480) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "nagano98", 0, MD5(cbedbd2953b70f214e72179b2cc0dcd8) SHA1(21d14864cdd34c6e052f3577f8d805dce49fcab6) )
 ROM_END
 
@@ -872,7 +872,7 @@ ROM_START( tokimosh )
 	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
         ROM_LOAD( "tokimosh.25c", 0x000000, 0x000080, CRC(e57b833f) SHA1(f18a0974a6be69dc179706643aab837ff61c2738) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "755jaa01", 0, MD5(221a0e871de10b50947c8fcd8820eafa) SHA1(d633937885b6f7c1615a9aa97f79cfc1f817c955) )
 ROM_END
 
@@ -882,7 +882,7 @@ ROM_START( tokimosp )
 	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
 	ROM_LOAD( "tokimosp.25c", 0x000000, 0x000080, CRC(af4cdd87) SHA1(97041e287e4c80066043967450779b81b62b2b8e) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "756jab01", 0, MD5(3c814208a8d9aafdb4989369f4222dba) SHA1(3766e0750484cd5d9da0c570aee4639300da5399) )
 ROM_END
 

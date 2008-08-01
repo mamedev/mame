@@ -1,8 +1,12 @@
 #include "scsi.h"
 
-void SCSIAllocInstance( const SCSIClass *scsiClass, SCSIInstance **instance, int diskId )
+void SCSIAllocInstance( const SCSIClass *scsiClass, SCSIInstance **instance, const char *diskregion )
 {
-	scsiClass->dispatch( SCSIOP_ALLOC_INSTANCE, (void *)scsiClass, diskId, instance );
+	SCSIAllocInstanceParams params;
+	params.instance = NULL;
+	params.diskregion = diskregion;
+	scsiClass->dispatch( SCSIOP_ALLOC_INSTANCE, (void *)scsiClass, 0, &params );
+	*instance = params.instance;
 }
 
 void SCSIDeleteInstance( SCSIInstance *instance )

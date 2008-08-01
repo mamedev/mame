@@ -1046,7 +1046,7 @@ static MACHINE_DRIVER_START( midvplus )
 	MDRV_MACHINE_RESET(midvplus)
 	MDRV_NVRAM_HANDLER(midway_serial_pic2)
 
-	MDRV_IDE_CONTROLLER_ADD("ide", 0, NULL)
+	MDRV_IDE_CONTROLLER_ADD("ide", NULL)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(dcs2_audio_2115)
@@ -1389,7 +1389,7 @@ ROM_START( wargods ) /* Boot EPROM Version 1.0, Game Type: 452 (12/11/1995) */
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
 	ROM_LOAD( "u41.rom", 0x000000, 0x20000, CRC(398c54cc) SHA1(6c4b5d6ec5c844dcbf181f9d86a9196a088ed2db) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "ide" )
 	DISK_IMAGE( "wargods", 0, MD5(9a41ae319a67fc626377b6d9ea34c860) SHA1(4b02f8f33027a0e7b2c750c10da1fe22222b3e1e) )
 ROM_END
 

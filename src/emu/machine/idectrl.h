@@ -24,8 +24,9 @@
 typedef struct _ide_config ide_config;
 struct _ide_config
 {
-	UINT32	disknum;
 	void 	(*interrupt)(const device_config *device, int state);
+	const char *master;		/* name of master region (defaults to device tag) */
+	const char *slave;		/* name of slave region (defaults to NULL) */
 };
 
 
@@ -34,10 +35,13 @@ struct _ide_config
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_IDE_CONTROLLER_ADD(_tag, _disknum, _callback) \
+#define MDRV_IDE_CONTROLLER_ADD(_tag, _callback) \
 	MDRV_DEVICE_ADD(_tag, IDE_CONTROLLER) \
-	MDRV_DEVICE_CONFIG_DATA32(ide_config, disknum, _disknum) \
 	MDRV_DEVICE_CONFIG_DATAPTR(ide_config, interrupt, _callback)
+
+#define MDRV_IDE_CONTROLLER_REGIONS(_master, _slave) \
+	MDRV_DEVICE_CONFIG_DATAPTR(ide_config, master, _master) \
+	MDRV_DEVICE_CONFIG_DATAPTR(ide_config, master, _slave)
 
 #define MDRV_IDE_CONTROLLER_REMOVE(_tag) \
 	MDRV_DEVICE_REMOVE(_tag, IDE_CONTROLLER)

@@ -32,6 +32,7 @@ typedef struct _open_chd open_chd;
 struct _open_chd
 {
 	open_chd *			next;					/* pointer to next in the list */
+	const char *		region;					/* disk region we came from */
 	chd_file *			origchd;				/* handle to the original CHD */
 	mame_file *			origfile;				/* file handle to the original CHD file */
 	chd_file *			diffchd;				/* handle to the diff CHD */
@@ -67,12 +68,13 @@ static void rom_exit(running_machine *machine);
     HARD DISK HANDLING
 ***************************************************************************/
 
-chd_file *get_disk_handle(int diskindex)
+chd_file *get_disk_handle(const char *region)
 {
 	open_chd *curdisk;
-	for (curdisk = chd_list; curdisk != NULL && diskindex-- != 0; curdisk = curdisk->next) ;
-	if (curdisk != NULL)
-		return (curdisk->diffchd != NULL) ? curdisk->diffchd : curdisk->origchd;
+
+	for (curdisk = chd_list; curdisk != NULL; curdisk = curdisk->next)
+		if (strcmp(curdisk->region, region) == 0)
+			return (curdisk->diffchd != NULL) ? curdisk->diffchd : curdisk->origchd;
 	return NULL;
 }
 
@@ -961,10 +963,12 @@ done:
     for a region
 -------------------------------------------------*/
 
-static void process_disk_entries(rom_load_data *romdata, const rom_entry *romp)
+static void process_disk_entries(rom_load_data *romdata, const char *regiontag, const rom_entry *romp)
 {
+	astring *filename = astring_alloc();
+
 	/* loop until we hit the end of this region */
-	while (!ROMENTRY_ISREGIONEND(romp))
+	for ( ; !ROMENTRY_ISREGIONEND(romp); romp++)
 	{
 		/* handle files */
 		if (ROMENTRY_ISFILE(romp))
@@ -972,11 +976,13 @@ static void process_disk_entries(rom_load_data *romdata, const rom_entry *romp)
 			char acthash[HASH_BUF_SIZE];
 			open_chd chd = { 0 };
 			chd_header header;
-			astring *filename;
 			chd_error err;
+			
+			/* note the region we are in */
+			chd.region = regiontag;
 
 			/* make the filename of the source */
-			filename = astring_assemble_2(astring_alloc(), ROM_GETNAME(romp), ".chd");
+			filename = astring_assemble_2(filename, ROM_GETNAME(romp), ".chd");
 
 			/* first open the source drive */
 			LOG(("Opening disk image: %s\n", astring_c(filename)));
@@ -993,7 +999,7 @@ static void process_disk_entries(rom_load_data *romdata, const rom_entry *romp)
 					romdata->warnings++;
 				else
 					romdata->errors++;
-				goto next;
+				continue;
 			}
 
 			/* get the header and extract the MD5/SHA1 */
@@ -1027,7 +1033,7 @@ static void process_disk_entries(rom_load_data *romdata, const rom_entry *romp)
 					else
 						sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s: CAN'T OPEN DIFF FILE\n", astring_c(filename));
 					romdata->errors++;
-					goto next;
+					continue;
 				}
 			}
 
@@ -1036,11 +1042,9 @@ static void process_disk_entries(rom_load_data *romdata, const rom_entry *romp)
 			*chd_list_tailptr = auto_malloc(sizeof(**chd_list_tailptr));
 			**chd_list_tailptr = chd;
 			chd_list_tailptr = &(*chd_list_tailptr)->next;
-next:
-			romp++;
-			astring_free(filename);
 		}
 	}
+	astring_free(filename);
 }
 
 
@@ -1148,7 +1152,7 @@ void rom_init(running_machine *machine, const rom_entry *romp)
 		if (ROMREGION_ISROMDATA(region))
 			process_rom_entries(&romdata, region + 1);
 		else if (ROMREGION_ISDISKDATA(region))
-			process_disk_entries(&romdata, region + 1);
+			process_disk_entries(&romdata, regiontag, region + 1);
 	}
 
 	/* now go back and post-process all the regions */

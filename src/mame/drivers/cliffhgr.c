@@ -745,7 +745,7 @@ static MACHINE_DRIVER_START( cliffhgr )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210, 0, "laserdisc")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210)
 
 	/* start with the TMS9928a video configuration */
 	MDRV_IMPORT_FROM(tms9928a)
@@ -785,7 +785,7 @@ ROM_START( cliffhgr )
 	ROM_LOAD( "cliff_u4.bin",	0x6000, 0x2000, CRC(906b2af1) SHA1(65fadd2fec90f47c91ac4928f342c79ab8bc6ef0) )
 	ROM_LOAD( "cliff_u5.bin",	0x8000, 0x2000, CRC(5922e710) SHA1(10637baba4d16dc333aeb0ab88ee251f44e1a115) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "cliffhgr", 0, NO_DUMP )
 ROM_END
 
@@ -796,7 +796,7 @@ ROM_START( cliffhga )
 	ROM_LOAD( "cliff_alt_2.bin",	0x4000, 0x2000, CRC(045f895d) SHA1(364e259a9630d87ca917c7a9dc1a94d6f0d0eba5) )
 	ROM_LOAD( "cliff_alt_3.bin",	0x6000, 0x2000, CRC(54cdb4a1) SHA1(6b1d73aec029af4a88ca2f883b4ed706d153592d) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "cliffhgr", 0, NO_DUMP )
 ROM_END
 
@@ -808,7 +808,7 @@ ROM_START( goaltogo )
 	ROM_LOAD( "gtg.rm3",	0x6000, 0x2000, CRC(ec305f5e) SHA1(e205fac699db4ca28a87f56f89cc6cf185ad540d) )
 	ROM_LOAD( "gtg.rm4",	0x8000, 0x2000, CRC(9e4c8aa2) SHA1(002c0940d3890141f85f98f854fd30cc1e340d45) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "goaltog1", 0, NO_DUMP )
 ROM_END
 

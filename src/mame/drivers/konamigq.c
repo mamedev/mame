@@ -324,7 +324,7 @@ static const SCSIConfigTable dev_table =
 {
 	1, /* 1 SCSI device */
 	{
-		{ SCSI_ID_0, 0, SCSI_DEVICE_HARDDISK } /* SCSI ID 0, using CHD 0, and it's a HDD */
+		{ SCSI_ID_0, "disk", SCSI_DEVICE_HARDDISK } /* SCSI ID 0, using CHD 0, and it's a HDD */
 	}
 };
 
@@ -506,7 +506,7 @@ ROM_START( cryptklr )
 	ROM_REGION32_LE( 0x080000, "user1", 0 ) /* bios */
 	ROM_LOAD( "420b03.27p",   0x0000000, 0x080000, CRC(aab391b1) SHA1(bf9dc7c0c8168c22a4be266fe6a66d3738df916b) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "disk" )
 	DISK_IMAGE( "420uaa04", 0, MD5(179464886f58a2e14b284e3813227a86) SHA1(18fe867c44982bacf0d3ff8453487cd06425a6b7) )
 ROM_END
 

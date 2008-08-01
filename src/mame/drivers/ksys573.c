@@ -255,6 +255,8 @@ static int security_cart_number = 0;
 static int chiptype[ 2 ];
 static int has_ds2401[ 2 ];
 
+static const char *diskregions[] = { "disk0", "cdrom1" };
+
 /* EEPROM handlers */
 
 static void (*nvram_handler_security_cart_0)( running_machine *machine, mame_file *file, int read_or_write );
@@ -883,7 +885,7 @@ static void atapi_exit(running_machine* machine)
 
 	for( i = 0; i < 2; i++ )
 	{
-		if( get_disk_handle( i ) != NULL )
+		if( get_disk_handle( diskregions[i] ) != NULL )
 		{
 			SCSIDeleteInstance( available_cdroms[ i ] );
 		}
@@ -911,9 +913,9 @@ static void atapi_init(running_machine *machine)
 
 	for( i = 0; i < 2; i++ )
 	{
-		if( get_disk_handle( i ) != NULL )
+		if( get_disk_handle( diskregions[i] ) != NULL )
 		{
-			SCSIAllocInstance( &SCSIClassCr589, &available_cdroms[ i ], i );
+			SCSIAllocInstance( &SCSIClassCr589, &available_cdroms[ i ], diskregions[i] );
 		}
 		else
 		{
@@ -3027,7 +3029,7 @@ ROM_START( bassangl )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "765jaa02", 0, MD5(11693b1234458c238ed613ef37f71245) SHA1(d820f8166b7d5ffcf41e7a70c8c4c4d1c207c1bd) )
 ROM_END
 
@@ -3038,7 +3040,7 @@ ROM_START( cr589fw )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "700b04", 0, MD5(4847e008189b7c700f2129ecb362b924) SHA1(13ac92eb242de48317924b9c725f9f693a263cf5) )
 ROM_END
 
@@ -3049,7 +3051,7 @@ ROM_START( cr589fwa )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "700a04", 0, MD5(211850ed73d05ccbf5951f1fe19a6767) SHA1(bf7865629775a34a8f8b628053e97f25b51ade2e) )
 ROM_END
 
@@ -3063,7 +3065,7 @@ ROM_START( darkhleg )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "706jaa02", 0, MD5(4f096051df039b0d104d4c0fff5dadb8) SHA1(4c8d976096c2da6d01804a44957daf9b50103c90) )
 ROM_END
 
@@ -3083,7 +3085,7 @@ ROM_START( ddrextrm )
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gcc36ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "c36jaa02", 0, MD5(83fa51031d826d603c0371b18180aeda) SHA1(a1591cb4f1da7e460de57afb17a85592719243e0) )
 ROM_END
 
@@ -3097,7 +3099,7 @@ ROM_START( ddru )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "845uaa02", 0, MD5(32d52ee2b37559d7413788c87085f37c) SHA1(e82610e1a34fba144499f9ee892ac882d1e96853) )
 ROM_END
 
@@ -3111,7 +3113,7 @@ ROM_START( ddrj )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "845jba02", 0, MD5(314f64301c3429312770ecdeb975d285) SHA1(8ebd9a68bbea3d9947a95d896347b0fea2145e4a) )
 ROM_END
 
@@ -3132,8 +3134,10 @@ ROM_START( ddrja )
 	ROM_LOAD( "gc845jaa.31h",  0xc00000, 0x200000, NO_DUMP )
 	ROM_LOAD( "gc845jaa.27h",  0xe00000, 0x200000, NO_DUMP )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "845jaa02", 0, MD5(045237b7ba76f393f69dd95eae14b61a) SHA1(eb59d00300424be89817ce3f8d7e68b8cf0f7943) )
+
+	DISK_REGION( "cdrom1" )
 	DISK_IMAGE_READONLY( "845jaa01", 1, NO_DUMP ) // if this even exists
 ROM_END
 
@@ -3154,8 +3158,10 @@ ROM_START( ddrjb )
 	ROM_LOAD( "gc845jab.31h",  0xc00000, 0x200000, NO_DUMP )
 	ROM_LOAD( "gc845jab.27h",  0xe00000, 0x200000, NO_DUMP )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "845jab02", 0, MD5(ebaaf265a1a7efae93cd745a67ea2cb2) SHA1(10ee3081065ebf5a814abbd30c8dee91b384a849) )
+
+	DISK_REGION( "cdrom1" )
 	DISK_IMAGE_READONLY( "845jab01", 1, NO_DUMP ) // if this even exists
 ROM_END
 
@@ -3169,7 +3175,7 @@ ROM_START( ddra )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "845aaa02", 0, MD5(2ab58fc647d35673861788a78df2afba) SHA1(fe2d18cdab7a3088f7c876ce531d64a2f3ae9294) )
 ROM_END
 
@@ -3183,7 +3189,7 @@ ROM_START( ddr2m )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "895jaa02", 0, MD5(f83ea1459c51aba2e16830b775444db3) SHA1(f1d47440ec7ba902f0fc5cad241729613f24fce1) )
 ROM_END
 
@@ -3197,8 +3203,10 @@ ROM_START( ddr2mc )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "896jaa01", 0, MD5(3cab3bc6d9459360da8f6784dd861067) SHA1(cb99e52eac5223509e914648d9b5dec59ed242f8) )
+
+	DISK_REGION( "cdrom1" )
 	DISK_IMAGE_READONLY( "895jaa02", 1, MD5(f83ea1459c51aba2e16830b775444db3) SHA1(f1d47440ec7ba902f0fc5cad241729613f24fce1) )
 ROM_END
 
@@ -3212,8 +3220,10 @@ ROM_START( ddr2mc2 )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "984jaa01", 0, MD5(945de47f526007f7c607c398b9b6275a) SHA1(da257e5a553a75439970393bdafc581f6971f946) )
+
+	DISK_REGION( "cdrom1" )
 	DISK_IMAGE_READONLY( "895jaa02", 1, MD5(f83ea1459c51aba2e16830b775444db3) SHA1(f1d47440ec7ba902f0fc5cad241729613f24fce1) )
 ROM_END
 
@@ -3230,7 +3240,7 @@ ROM_START( ddr2ml )
 	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "885jaa02", 0, MD5(696e39fa7113f61181875bffca13a1b4) SHA1(ece1d34a3bdbe07b608429abe30802bc7327a94a) )
 ROM_END
 
@@ -3256,7 +3266,7 @@ ROM_START( ddr3ma )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gn887aa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "887aaa02", 0, MD5(20a95a94413dfba836fd1b0d7923dbfc) SHA1(75500b4393519f1f9bce7c9bdfd45ef365a8672c) )
 ROM_END
 
@@ -3282,7 +3292,7 @@ ROM_START( ddr3mj )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gn887ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "887jaa02", 0, MD5(c2241d1277a98d6a8cafd3aed0c9b9da) SHA1(04f639c3e72aa6dd546ea5b5b84fb3fcb10acc46) )
 ROM_END
 
@@ -3308,7 +3318,7 @@ ROM_START( ddr3mk )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gn887kb.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "887kba02", 0, MD5(3ebd603c800158697c968caf187a7cc6) SHA1(8feb5dcada45e6f6aa0695439dc718fafb978b4d) )
 ROM_END
 
@@ -3334,7 +3344,7 @@ ROM_START( ddr3mka )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gn887ka.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "887kaa02", 0, MD5(9ecee52213411d4a518f4724c87ee9d3) SHA1(10af2af753c5a54d1d3ac40a9ccc3e0324183f4d) )
 ROM_END
 
@@ -3360,7 +3370,7 @@ ROM_START( ddr3mp )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gca22ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "a22jaa02", 0, MD5(b386ecc1d54e2ac73c16057af9220aa6) SHA1(cc4fba48dfff96f0ac85a438dab95e00891aeac5) )
 ROM_END
 
@@ -3386,7 +3396,7 @@ ROM_START( ddr4m )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gca33aa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "a33aaa02", 0, BAD_DUMP MD5(d843cba35726f3b0af357f712b8870a4) SHA1(40456e772c39c339828dd4726766ef2e0981d3a1) )
 ROM_END
 
@@ -3412,7 +3422,7 @@ ROM_START( ddr4mj )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gca33ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "a33jaa02", 0, MD5(855456931374d1c99dfd44c52a0a3178) SHA1(ad7672bf30becc9030c4fa097cc60deecad6f36d) )
 ROM_END
 
@@ -3438,7 +3448,7 @@ ROM_START( ddr4ms )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gca33ab.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "a33aba02", 0, MD5(d843cba35726f3b0af357f712b8870a4) SHA1(40456e772c39c339828dd4726766ef2e0981d3a1) )
 ROM_END
 
@@ -3464,7 +3474,7 @@ ROM_START( ddr4msj )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gca33jb.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "a33jba02", 0, BAD_DUMP MD5(855456931374d1c99dfd44c52a0a3178) SHA1(ad7672bf30becc9030c4fa097cc60deecad6f36d) )
 ROM_END
 
@@ -3493,7 +3503,7 @@ ROM_START( ddr4mp )
 	ROM_REGION( 0x002000, "user11", 0 ) /* timekeeper */
 	ROM_LOAD( "gca34ja.22h",  0x000000, 0x002000, CRC(80575c1f) SHA1(a0594ca0f75bc7d49b645e835e9fa48a73c3c9c7) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "a34jaa02", 0, MD5(d8292d7f1e359d308b779e44fd0809ef) SHA1(23aadca5274bff5f130357701c1ab269943b387d) )
 ROM_END
 
@@ -3522,7 +3532,7 @@ ROM_START( ddr4mps )
 	ROM_REGION( 0x002000, "user11", 0 ) /* timekeeper */
 	ROM_LOAD( "gca34jb.22h",  0x000000, 0x002000, CRC(bc6c8bd7) SHA1(10ceec5c7bc5ca9fca88f3c083a7d97012982079) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "a34jba02", 0, BAD_DUMP MD5(d8292d7f1e359d308b779e44fd0809ef) SHA1(23aadca5274bff5f130357701c1ab269943b387d) )
 ROM_END
 
@@ -3542,7 +3552,7 @@ ROM_START( ddr5m )
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gca27ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "a27jaa02", 0, MD5(502ecebf4d2e931f6b75b6a22b7d620c) SHA1(2edb3a0160c2783db6b0ddfce0f7c9ebb35b481f) )
 ROM_END
 
@@ -3559,8 +3569,10 @@ ROM_START( ddrbocd )
 	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
 	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "892jaa01", 0, MD5(b29b63bafdd35f38662ff8daf5fc59f7) SHA1(c929c488d206e055e756ca506c3b1ff430a46aaa) )
+
+	DISK_REGION( "cdrom1" )
 	DISK_IMAGE_READONLY( "895jaa02", 1, MD5(f83ea1459c51aba2e16830b775444db3) SHA1(f1d47440ec7ba902f0fc5cad241729613f24fce1) )
 ROM_END
 
@@ -3583,7 +3595,7 @@ ROM_START( ddrs2k )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gc905aa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "905aaa02", 0, MD5(8b753bae1b4cbd5c8b641eb723b660a1) SHA1(cfd40cee9380588dc2ced107ace2a7486d91944d) )
 ROM_END
 
@@ -3606,7 +3618,7 @@ ROM_START( ddrs2kj )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gc905aa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "905jaa02", 0, MD5(098496f8d9b5ac0357f093a62d6d59f0) SHA1(37f9aff936a51b3482ae4717227993106be8b476) )
 ROM_END
 
@@ -3626,7 +3638,7 @@ ROM_START( ddrmax )
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gcb19ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "b19jaa02", 0, MD5(0f080892f7e5ad0d83e6db70e4cb80d7) SHA1(59361e85641f2deda88ccbc2cd1634523f1c1a3b) )
 ROM_END
 
@@ -3646,7 +3658,7 @@ ROM_START( ddrmax2 )
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gcb20ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "b20jaa02", 0, MD5(2d57e32a263b355391a94f45c145d0fe) SHA1(e43c34bd113ef20e579ce7c6248288a257a5ccde) )
 ROM_END
 
@@ -3663,7 +3675,7 @@ ROM_START( ddrsbm )
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gq894ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "894jaa02", 0, MD5(05f3cd86796f41353528999ac3fbd26b) SHA1(5b65ac6bc2497b3ab99542f5acae3a64895f221d) )
 ROM_END
 
@@ -3680,7 +3692,7 @@ ROM_START( ddrusa )
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gka44ua.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "a44uaa02", 0, MD5(f9694956bab44593784fa728c6b53712) SHA1(e40b52ce3b1e90e3ec9190b83ba875c4ab1b0f2f) )
 ROM_END
 
@@ -3699,8 +3711,10 @@ ROM_START( drmn )
 	ROM_REGION( 0x002000, "user11", 0 ) /* timekeeper */
 	ROM_LOAD( "gq881ja.22h",  0x000000, 0x002000, CRC(e834d5ec) SHA1(1c845811e43d7dfec657da288b5a38b8bc9c8366) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "881jad01", 0, MD5(8191ad7747f5ac87a40534f53a2a6cd4) SHA1(61bfd356d262f53f1ab55654aba2981fb8eb1420) ) // upgrade or bootleg?
+
+	DISK_REGION( "cdrom1" )
 	DISK_IMAGE_READONLY( "881jaa02", 1, NO_DUMP )
 ROM_END
 
@@ -3723,7 +3737,7 @@ ROM_START( drmn2m )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gn912ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "912jab", 0, BAD_DUMP MD5(60dadc836f00f22d50b5b634250aa624) SHA1(5316b2e2e89af7bc038a3febc91525edac91fe7e) )
 ROM_END
 
@@ -3746,8 +3760,10 @@ ROM_START( drmn2mpu )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gn912ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "912jab",  0, BAD_DUMP MD5(60dadc836f00f22d50b5b634250aa624) SHA1(5316b2e2e89af7bc038a3febc91525edac91fe7e) )
+
+	DISK_REGION( "cdrom1" )
 	DISK_IMAGE_READONLY( "912za01", 1, BAD_DUMP MD5(1d3fa130a3a6c8433c276e609b373e4f) SHA1(121ca6df16084a01c88ef26167b13053c9adc7ce) )
 ROM_END
 
@@ -3770,7 +3786,7 @@ ROM_START( drmn3m )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gca23ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "a23jaa02", 0, MD5(3b6477be8e66e447cc3f94047c28a2a2) SHA1(4c607eb2b212785520d1c6dc21d013fe6f489741) )
 ROM_END
 
@@ -3787,7 +3803,7 @@ ROM_START( dmx )
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "ge874ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "874jaa", 0, BAD_DUMP MD5(457f6e55aec68537ae47c6045de1ee26) SHA1(ff6332e032b1528691a87c5001bf808d6a8f5ef7) )
 ROM_END
 
@@ -3804,7 +3820,7 @@ ROM_START( dmx2m )
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gca39ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "a39jaa02", 0, MD5(3106d45c868ad30e47f7873ea1dffc8a) SHA1(20df1b5636622d8c0e45623bd1af6bc1249fec65) )
 ROM_END
 
@@ -3823,7 +3839,7 @@ ROM_START( dmx2majp )
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gca38ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "a38jaa02", 0, MD5(3c4070547d17605db68a3db333865eb0) SHA1(e9fe714bb0a5354b199b1fb7b33f366db502c03a) )
 ROM_END
 
@@ -3840,7 +3856,7 @@ ROM_START( dncfrks )
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gk874ka.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "874kaa", 0, BAD_DUMP MD5(5e02c8dba12f949ce99834e597d8d08d) SHA1(659281e1b63c5ff0616b27d7f87a4e7f1c493372) )
 ROM_END
 
@@ -3860,7 +3876,7 @@ ROM_START( dsem2 )
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gkc23ea.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "c23eaa02", 0, MD5(e7275ba9f53334ac528afaa278df7153) SHA1(661f0b53ab64fc746b8e3b7ff3dd32d2bed852ac) )
 ROM_END
 
@@ -3886,7 +3902,7 @@ ROM_START( dsfdct )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gc910jc.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "910jca02", 0, MD5(c909982a234dbd59388892bd627a466e) SHA1(687ce1d480eb13e78289171b6c56fd5b1e7d5d9e) )
 ROM_END
 
@@ -3912,7 +3928,7 @@ ROM_START( dsfdcta )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gc910ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "910jaa02", 0, MD5(e5380280b5cbb10822391f74866f8bee) SHA1(3d17320f56be7edb1be6b1bd53269d452f71123d) )
 ROM_END
 
@@ -3929,7 +3945,7 @@ ROM_START( dsftkd )
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gn884ja.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "884jaa02", 0, MD5(d73444ab74efb8587c2bf455e3ec0d13) SHA1(92522380b92333b10d401fda4f81592073f3e601) )
 ROM_END
 
@@ -3943,7 +3959,7 @@ ROM_START( dstage )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "845ea", 0, BAD_DUMP MD5(32d52ee2b37559d7413788c87085f37c) SHA1(e82610e1a34fba144499f9ee892ac882d1e96853) )
 ROM_END
 
@@ -3957,7 +3973,7 @@ ROM_START( fbait2bc )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "865uab02", 0, MD5(5a253a58417539f9b0cb9726311f73d5) SHA1(86ccbaac30e9e2d7d0ad6ae65a4f53f606f50525) )
 ROM_END
 
@@ -3971,7 +3987,7 @@ ROM_START( fbaitbc )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "765uab02", 0, MD5(56d8a23bb592932631f8f81b9797fce6) SHA1(dda131b8655e3c4394e50749fe3a1e468f9df353) )
 ROM_END
 
@@ -3985,7 +4001,7 @@ ROM_START( fbaitmc )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "889ea", 0, BAD_DUMP MD5(43eae52edd38019f0836897ea8def527) SHA1(2e6937c265c222ac2cea50fbf32201ade425ee30) )
 ROM_END
 
@@ -3999,7 +4015,7 @@ ROM_START( fbaitmca )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "889aa", 0, BAD_DUMP MD5(43eae52edd38019f0836897ea8def527) SHA1(2e6937c265c222ac2cea50fbf32201ade425ee30) )
 ROM_END
 
@@ -4013,7 +4029,7 @@ ROM_START( fbaitmcj )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "889ja", 0, BAD_DUMP MD5(43eae52edd38019f0836897ea8def527) SHA1(2e6937c265c222ac2cea50fbf32201ade425ee30) )
 ROM_END
 
@@ -4027,7 +4043,7 @@ ROM_START( fbaitmcu )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "889ua", 0, BAD_DUMP MD5(43eae52edd38019f0836897ea8def527) SHA1(2e6937c265c222ac2cea50fbf32201ade425ee30) )
 ROM_END
 
@@ -4041,7 +4057,7 @@ ROM_START( gtrfrks )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "886ea", 0, BAD_DUMP MD5(b8b39a6e48867fdad640bd256273bdfc) SHA1(2277c6268b8327be8d7636d4812920e5d3b353cd) )
 ROM_END
 
@@ -4055,7 +4071,7 @@ ROM_START( gtrfrksu )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "886ua", 0, BAD_DUMP MD5(b8b39a6e48867fdad640bd256273bdfc) SHA1(2277c6268b8327be8d7636d4812920e5d3b353cd) )
 ROM_END
 
@@ -4069,7 +4085,7 @@ ROM_START( gtrfrksj )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "886ja", 0, BAD_DUMP MD5(b8b39a6e48867fdad640bd256273bdfc) SHA1(2277c6268b8327be8d7636d4812920e5d3b353cd) )
 ROM_END
 
@@ -4083,7 +4099,7 @@ ROM_START( gtrfrksa )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "886aa", 0, BAD_DUMP MD5(b8b39a6e48867fdad640bd256273bdfc) SHA1(2277c6268b8327be8d7636d4812920e5d3b353cd) )
 ROM_END
 
@@ -4103,7 +4119,7 @@ ROM_START( gtrfrk2m )
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gq883jad.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "929jbb02", 0, BAD_DUMP MD5(dfe595184dd55046da6fe93bb14b83be) SHA1(c76d5c11422b2ef1750e92a1edac2812666aadae) )
 ROM_END
 
@@ -4129,8 +4145,10 @@ ROM_START( gtrfrk3m )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "ge949jab.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "949jac01", 0, MD5(0f78f8e06edd3b8fa0abed22155d06d9) SHA1(3e43a5018aa88ed78c9e2fb50f65489a6c7de093) )
+
+	DISK_REGION( "cdrom1" )
 	DISK_IMAGE_READONLY( "949jab02", 1, MD5(331a7516a33d9cf9f04b8c9aa5de5fc1) SHA1(9aae90c6b0f5c31f47a420f876c0dbc81d43b756) )
 ROM_END
 
@@ -4156,7 +4174,7 @@ ROM_START( gtfrk3ma )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "ge949jab.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "949jab02", 0, MD5(331a7516a33d9cf9f04b8c9aa5de5fc1) SHA1(9aae90c6b0f5c31f47a420f876c0dbc81d43b756) )
 ROM_END
 
@@ -4176,7 +4194,7 @@ ROM_START( gtfrk3mb )
 	ROM_REGION( 0x000008, "user9", 0 ) /* game security cart id */
 	ROM_LOAD( "ge949jaa.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "949jaz02", 0, MD5(22f7e1e61ea5f627e28c32f2209b5138) SHA1(62bd62cafb4bd4a1e393071f5e55d5ab57e3a880) )
 ROM_END
 
@@ -4202,7 +4220,7 @@ ROM_START( gtrfrk4m )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gea24ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "a24jaa02", 0, MD5(1e113d8f5601b0b4f38852894717e486) SHA1(f0748312663a9683fd5a115c16f135cb58b993b1) )
 ROM_END
 
@@ -4224,7 +4242,7 @@ ROM_START( gtrfrk5m )
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gea26jaa.u6",    0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "a26jaa02", 0, MD5(885b18ce273770330aefa0276911c046) SHA1(635aee062df45c83b080612d29101fe70c14979d) )
 ROM_END
 
@@ -4244,7 +4262,7 @@ ROM_START( gtrfrk6m )
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gcb06ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "b06jaa02", 0, MD5(8191da2660bb645fcfee9fb60baef242) SHA1(e8be8bdc0cbfb95a0a56ab89f39de3089d31f305) )
 ROM_END
 
@@ -4266,7 +4284,7 @@ ROM_START( gtrfrk7m )
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gcb17jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "b17jaa02", 0, MD5(65b47fbf7d682e8dc8b2a3137aaab9b7) SHA1(bf8eb8f857c08595bb1c19f470ac689400ee0cab) )
 ROM_END
 
@@ -4286,7 +4304,7 @@ ROM_START( gtfrk11m )
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gcd39ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "d39jaa02", 0, MD5(4730dd81132cdac6f0cb7cc4c9753329) SHA1(b9425ab6bc7305eac2fef9799b7d46b18462ea84) )
 ROM_END
 
@@ -4300,7 +4318,7 @@ ROM_START( konam80a )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "826aaa01", 0, BAD_DUMP MD5(456f683c5d47dd73cfb73ce80b8a7351) SHA1(452c94088ffefe42e61c978b48d425e7094a5af6) )
 ROM_END
 
@@ -4314,7 +4332,7 @@ ROM_START( konam80j )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "826jaa01", 0, MD5(456f683c5d47dd73cfb73ce80b8a7351) SHA1(452c94088ffefe42e61c978b48d425e7094a5af6) )
 ROM_END
 
@@ -4328,7 +4346,7 @@ ROM_START( konam80k )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "826kaa01", 0, BAD_DUMP MD5(456f683c5d47dd73cfb73ce80b8a7351) SHA1(452c94088ffefe42e61c978b48d425e7094a5af6) )
 ROM_END
 
@@ -4342,7 +4360,7 @@ ROM_START( konam80s )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "826eaa01", 0, BAD_DUMP MD5(456f683c5d47dd73cfb73ce80b8a7351) SHA1(452c94088ffefe42e61c978b48d425e7094a5af6) )
 ROM_END
 
@@ -4356,7 +4374,7 @@ ROM_START( konam80u )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "826uaa01", 0, MD5(456f683c5d47dd73cfb73ce80b8a7351) SHA1(452c94088ffefe42e61c978b48d425e7094a5af6) )
 ROM_END
 
@@ -4370,7 +4388,7 @@ ROM_START( pbballex )
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "802jab02", 0, MD5(52bb53327ba48f87dcb030d5e50fe94f) SHA1(67ddce1ad7e436c18e08d5a8c77f3259dbf30572) )
 ROM_END
 
@@ -4393,7 +4411,7 @@ ROM_START( pcnfrk3m )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gca23ka.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "a23kaa02", 0, MD5(26a270851944d86d0b00db5a302de5ce) SHA1(5feaedf614c68932accc441f77c05c7bce67b2f3) )
 ROM_END
 
@@ -4410,7 +4428,7 @@ ROM_START( salarymc )
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gca18jaa.u6",  0x000000, 0x000008, CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "a18ja", 0, BAD_DUMP MD5(51d6cd5e34b6ee5601d8519a50be5cdc) SHA1(364a927a45ff83ee3cac66637359d6cfb44ea2fc) )
 ROM_END
 

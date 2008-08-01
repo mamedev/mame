@@ -883,9 +883,9 @@ static void atapi_init(running_machine *machine)
 	atapi_cdata_wait = 0;
 
 	// allocate two SCSI CD-ROM devices
-	SCSIAllocInstance( SCSI_DEVICE_CDROM, &atapi_device_data[0], 0 );
+	SCSIAllocInstance( SCSI_DEVICE_CDROM, &atapi_device_data[0], "scsi0" );
 	// TODO: the slave drive can be either CD-ROM, DVD-ROM or HDD
-	SCSIAllocInstance( SCSI_DEVICE_CDROM, &atapi_device_data[1], 1 );
+	SCSIAllocInstance( SCSI_DEVICE_CDROM, &atapi_device_data[1], "scsi1" );
 	add_exit_callback(machine, atapi_exit);
 }
 
@@ -2340,7 +2340,7 @@ ROM_START( ppp )
 	ROM_REGION(0xc0, "user2", 0)	// Security dongle
 	ROM_LOAD("gq977-ja", 0x00, 0xc0, BAD_DUMP CRC(55b5abdb) SHA1(d8da5bac005235480a1815bd0a79c3e8a63ebad1))
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "scsi0" )
 	DISK_IMAGE_READONLY( "977jaa01", 0, MD5(9abc766b72dab28db920f3d264fc2254) SHA1(05bce40c3b241cd1f634d6688ec179a86f57da9f) )
 
 	// TODO: the audio CD is not dumped
@@ -2355,8 +2355,10 @@ ROM_START( kbm )
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
 	ROM_LOAD("gq974-ja", 0x00, 0xc0, BAD_DUMP CRC(4578f29b) SHA1(faaeaf6357c1e86e898e7017566cfd2fc7ee3d6f))
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "scsi0" )
 	DISK_IMAGE_READONLY( "974jac01", 0, SHA1(18179bf23519d5b0c82c72e8f47dfaa4d2c4a3e2) MD5(cb68cf69e55aa33429f149f474e2c96e) )
+
+	DISK_REGION( "scsi1" )
 	DISK_IMAGE_READONLY( "974jaa02", 1, SHA1(8d78a91d98967a232c4b98628e2db25df0a7f8bd) MD5(5cb0100791294559fedccc2a9a46fd86) )
 ROM_END
 
@@ -2369,8 +2371,10 @@ ROM_START( kbm2nd )
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
 	ROM_LOAD("gca01-ja", 0x00, 0xc0, BAD_DUMP CRC(2bda339d) SHA1(031cb3f44e7a89cd62a9ba948f3d19d53a325abd))
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "scsi0" )
 	DISK_IMAGE_READONLY( "a01jaa01", 0, SHA1(87c21dc6b9fe8d9f696985cfd9dc14a23f0932fe) MD5(0eff2ca8ebef1fd8815d1d7cb0c2383a) )
+
+	DISK_REGION( "scsi1" )
 	DISK_IMAGE_READONLY( "a01jaa02", 1, SHA1(fabfcc02f97c867c361df7b9539e6b77f369b73f) MD5(25679474e987d0dd83a0db2bad24bc14) )
 ROM_END
 
@@ -2383,8 +2387,10 @@ ROM_START( kbm3rd )
 	ROM_REGION(0xc0, "user2", 0)	// Security dongle
 	ROM_LOAD("gca12-ja", 0x00, 0xc0, BAD_DUMP CRC(cf01dc15) SHA1(da8d208233487ebe65a0a9826fc72f1f459baa26))
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "scsi0" )
 	DISK_IMAGE_READONLY( "a12jaa01", 0, MD5(130a11bd229d9c30bd6d9ffeaf94926e) SHA1(6b595b17260b0ca17d04d7911616d5ff88158f26) )
+
+	DISK_REGION( "scsi1" )
 	DISK_IMAGE_READONLY( "a12jaa02", 1, MD5(10ff654cf3d9b833ecbe72a395e7bb60) SHA1(4adddc8e028111169889bfb99007238da5f4d330) )
 ROM_END
 
@@ -2400,8 +2406,10 @@ ROM_START( popn7 )
 	ROM_REGION(0x80000, "audio", 0)			// SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "scsi0" )
 	DISK_IMAGE_READONLY( "b00jab01", 0, SHA1(7462586f67b5c3b015ac581ad0afc089fcd6f537) MD5(af9a249b23783d53ff27ea7dc7e6735c) )
+
+	DISK_REGION( "scsi1" )
 	DISK_IMAGE_READONLY( "b00jaa02", 1, SHA1(fea9439f14304d865830fb34f8781346d95a1df7) MD5(cf4c4f7c2321fcca6d86e8c144261752) )
 ROM_END
 
@@ -2414,8 +2422,10 @@ ROM_START( ppd )
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
 	ROM_LOAD("gq977-ko", 0x00, 0xc0, BAD_DUMP CRC(ee743323) SHA1(2042e45879795557ad3cc21b37962f6bf54da60d))
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "scsi0" )
 	DISK_IMAGE_READONLY( "977kaa01", 0, SHA1(7069c1e42bf994ccdfcf6ff0dda9c5de94f1cc65) MD5(f499cb458d823200dc96fe9cef5c08c8) )
+
+	DISK_REGION( "scsi1" )
 	DISK_IMAGE_READONLY( "977kaa02", 1, SHA1(45d5cda77f789351260bbd6f9c47a5fa93998133) MD5(b58978a81931058fe28825b6147b1bed) )
 ROM_END
 
@@ -2428,8 +2438,10 @@ ROM_START( ppp11 )
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
 	ROM_LOAD("gq977-ja", 0x00, 0xc0, BAD_DUMP CRC(55b5abdb) SHA1(d8da5bac005235480a1815bd0a79c3e8a63ebad1))
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "scsi0" )
 	DISK_IMAGE_READONLY( "gc977jaa01", 0, SHA1(aa43526971dad6502e4b9583d8f5c18d93ced820) MD5(161ab0096d8def5ef133eec872afc645) )
+
+	DISK_REGION( "scsi1" )
 	DISK_IMAGE_READONLY( "gc977jaa02", 1, SHA1(4a0edf424e091c33db91b00edf7c7246754cc8bb) MD5(9cb7cb79d2f0a47e994cfb91847ca190) )
 ROM_END
 

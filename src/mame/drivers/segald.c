@@ -350,7 +350,7 @@ static MACHINE_DRIVER_START( astron )
 
 	MDRV_MACHINE_START(astron)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, 0, "laserdisc")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000)
 
 /*  video */
 

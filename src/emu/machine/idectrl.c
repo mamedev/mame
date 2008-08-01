@@ -1684,7 +1684,8 @@ static DEVICE_START( ide_controller )
 
 	/* set MAME harddisk handle */
 	config = device->inline_config;
-	ide->disk = hard_disk_open(get_disk_handle(config->disknum));
+	ide->disk = hard_disk_open(get_disk_handle((config->master != NULL) ? config->master : device->tag));
+	assert_always(config->slave == NULL, "IDE controller does not yet support slave drives\n");
 
 	/* get and copy the geometry */
 	if (ide->disk != NULL)

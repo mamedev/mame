@@ -1057,7 +1057,7 @@ static MACHINE_DRIVER_START(mediagx)
 	MDRV_DEVICE_ADD( "pic8259_2", PIC8259 )
 	MDRV_DEVICE_CONFIG( mediagx_pic8259_2_config )
 
-	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
+	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 
@@ -1235,7 +1235,7 @@ ROM_START(a51site4)
 	ROM_REGION(0x08100, "gfx1", 0)
     ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
-	DISK_REGION( "disks" )
+	DISK_REGION( "ide" )
 	DISK_IMAGE( "a51site4", 0, MD5(be0dd1a6f0bba175c25da3d056fa426d) SHA1(49dee1b903a37b99266cc3e19227942c3cf75821) )
 ROM_END
 

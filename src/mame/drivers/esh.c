@@ -290,7 +290,7 @@ static MACHINE_DRIVER_START( esh )
 
 	MDRV_MACHINE_START(esh)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, 0, "laserdisc")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000)
 
 /*  video */
 

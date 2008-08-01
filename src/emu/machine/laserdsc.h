@@ -64,8 +64,6 @@ typedef struct _laserdisc_config laserdisc_config;
 struct _laserdisc_config
 {
 	int			type;
-	int			disknum;
-	const char *soundtag;
 };
 
 
@@ -74,11 +72,9 @@ struct _laserdisc_config
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_LASERDISC_ADD(_tag, _type, _disknum, _soundtag) \
+#define MDRV_LASERDISC_ADD(_tag, _type) \
 	MDRV_DEVICE_ADD(_tag, LASERDISC) \
-	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, type, LASERDISC_TYPE_##_type) \
-	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, disknum, _disknum) \
-	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, soundtag, _soundtag)
+	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, type, LASERDISC_TYPE_##_type)
 
 #define MDRV_LASERDISC_REMOVE(_tag, _type) \
 	MDRV_DEVICE_REMOVE(_tag, _type)

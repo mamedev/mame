@@ -24,6 +24,12 @@ typedef struct
 	const SCSIClass *scsiClass;
 } SCSIInstance;
 
+typedef struct
+{
+	SCSIInstance *instance;
+	const char *diskregion;
+} SCSIAllocInstanceParams;
+
 // commands accepted by a SCSI device's dispatch handler
 enum
 {
@@ -44,7 +50,7 @@ enum
 typedef struct scsiconfigitem
 {
 	int scsiID;
-	int diskID;
+	const char *diskregion;
 	const SCSIClass *scsiClass;
 } SCSIConfigItem;
 
@@ -77,7 +83,7 @@ enum
 #define SCSI_PHASE_MESSAGE_OUT ( 6 )
 #define SCSI_PHASE_MESSAGE_IN ( 7 )
 
-extern void SCSIAllocInstance( const SCSIClass *scsiClass, SCSIInstance **instance, int diskId );
+extern void SCSIAllocInstance( const SCSIClass *scsiClass, SCSIInstance **instance, const char *diskregion );
 extern void SCSIDeleteInstance( SCSIInstance *instance );
 extern void SCSISetDevice( SCSIInstance *instance, void *device );
 extern void SCSIGetDevice( SCSIInstance *instance, void **device );

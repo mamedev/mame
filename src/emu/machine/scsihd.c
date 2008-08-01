@@ -222,20 +222,23 @@ static void scsihd_write_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 	}
 }
 
-static void scsihd_alloc_instance( SCSIInstance *scsiInstance, int diskId )
+static void scsihd_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
 {
 	SCSIHd *our_this = SCSIThis( &SCSIClassHARDDISK, scsiInstance );
+	char tag[256];
 
 	our_this->lba = 0;
 	our_this->blocks = 0;
 
-	state_save_register_item( "scsihd", diskId, our_this->lba );
-	state_save_register_item( "scsihd", diskId, our_this->blocks );
+	state_save_combine_module_and_tag(tag, "scsihd", diskregion);
+
+	state_save_register_item( tag, 0, our_this->lba );
+	state_save_register_item( tag, 0, our_this->blocks );
 
 #ifdef MESS
-	our_this->disk = mess_hd_get_hard_disk_file_by_number( diskId );
+	our_this->disk = mess_hd_get_hard_disk_file_by_number( diskregion );
 #else
-	our_this->disk = hard_disk_open(get_disk_handle( diskId ));
+	our_this->disk = hard_disk_open(get_disk_handle( diskregion ));
 
 	if (!our_this->disk)
 	{
@@ -270,6 +273,8 @@ static void scsihd_set_device( SCSIInstance *scsiInstance, hard_disk_file *disk 
 
 static int scsihd_dispatch(int operation, void *file, INT64 intparm, void *ptrparm)
 {
+	SCSIAllocInstanceParams *params;
+
 	switch (operation)
 	{
 		case SCSIOP_EXEC_COMMAND:
@@ -284,8 +289,9 @@ static int scsihd_dispatch(int operation, void *file, INT64 intparm, void *ptrpa
 			return 0;
 
 		case SCSIOP_ALLOC_INSTANCE:
+			params = ptrparm;
 			SCSIBase( &SCSIClassHARDDISK, operation, file, intparm, ptrparm );
-			scsihd_alloc_instance( *((SCSIInstance **) ptrparm), intparm );
+			scsihd_alloc_instance( params->instance, params->diskregion );
 			return 0;
 
 		case SCSIOP_DELETE_INSTANCE:

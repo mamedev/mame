@@ -1417,9 +1417,9 @@ static DEVICE_START( laserdisc )
 
 	/* copy config data to the live state */
 	ld->type = config->type;
-	ld->disc = get_disk_handle(config->disknum);
+	ld->disc = get_disk_handle(device->tag);
 	for (sndnum = 0; sndnum < MAX_SOUND; sndnum++)
-		if (device->machine->config->sound[sndnum].tag != NULL && strcmp(device->machine->config->sound[sndnum].tag, config->soundtag) == 0)
+		if (device->machine->config->sound[sndnum].tag != NULL && strcmp(device->machine->config->sound[sndnum].tag, device->tag) == 0)
 			sndnum_to_sndti(sndnum, &ld->audiocustom);
 
 	/* get the disc metadata and extract the ld */

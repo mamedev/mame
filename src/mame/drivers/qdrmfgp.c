@@ -659,7 +659,7 @@ static MACHINE_DRIVER_START( qdrmfgp )
 	MDRV_MACHINE_RESET(qdrmfgp)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
-	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
+	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -694,7 +694,7 @@ static MACHINE_DRIVER_START( qdrmfgp2 )
 	MDRV_MACHINE_RESET(qdrmfgp2)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
-	MDRV_IDE_CONTROLLER_ADD("ide", 0, gp2_ide_interrupt)
+	MDRV_IDE_CONTROLLER_ADD("ide", gp2_ide_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -737,7 +737,7 @@ ROM_START( qdrmfgp )
 	ROM_LOAD( "gq_460_a07.14h", 0x000000, 0x80000, CRC(67d8ea6b) SHA1(11af1b5a33de2a6e24823964d210bef193ecefe4) )
 	ROM_LOAD( "gq_460_a06.12h", 0x080000, 0x80000, CRC(97ed5a77) SHA1(68600fd8d914451284cf181fb4bd5872860fb9ad) )
 
-	DISK_REGION( "disks" )			/* IDE HARD DRIVE */
+	DISK_REGION( "ide" )			/* IDE HARD DRIVE */
 	DISK_IMAGE( "gq460a08", 0, MD5(b79eebad38782e6713ab0bd7560817a2) SHA1(0cae7769fbb603d3c3e3627dde84a6c5a9b1062d) )
 ROM_END
 
@@ -754,7 +754,7 @@ ROM_START( qdrmfgp2 )
 	ROM_LOAD( "ge_557_a07.19h", 0x000000, 0x80000, CRC(7491e0c8) SHA1(6459ab5e7af052ef7a1c4ce01cd844c0f4319f2e) )
 	ROM_LOAD( "ge_557_a08.19k", 0x080000, 0x80000, CRC(3da2b20c) SHA1(fdc2cdc27f3299f541944a78ce36ed33a7926056) )
 
-	DISK_REGION( "disks" )			/* IDE HARD DRIVE */
+	DISK_REGION( "ide" )			/* IDE HARD DRIVE */
 	DISK_IMAGE( "ge557a09", 0, MD5(df5039dc4e9dbb1f02ec408d839a42db) SHA1(5e836dbace34c9c1b107cce6a50071a4205a1534) )
 ROM_END
 

@@ -791,7 +791,7 @@ extern void wd33c93_init( const struct WD33C93interface *interface )
 	// try to open the devices
 	for (i = 0; i < interface->scsidevs->devs_present; i++)
 	{
-		SCSIAllocInstance( interface->scsidevs->devices[i].scsiClass, &devices[interface->scsidevs->devices[i].scsiID], interface->scsidevs->devices[i].diskID );
+		SCSIAllocInstance( interface->scsidevs->devices[i].scsiClass, &devices[interface->scsidevs->devices[i].scsiID], interface->scsidevs->devices[i].diskregion );
 	}
 
 	/* allocate a timer for commands */
