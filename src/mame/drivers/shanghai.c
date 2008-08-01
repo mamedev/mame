@@ -700,10 +700,10 @@ static VIDEO_UPDATE( shanghai )
 	int x,y,b;
 
 
-	b = 2 * (((HD63484_reg[0xcc/2] & 0x001f) << 16) + HD63484_reg[0xce/2]);
+	b = 2 * (((HD63484_reg[0xcc/2] & 0x000f) << 16) + HD63484_reg[0xce/2]);
 	for (y = 0;y < 280;y++)
 	{
-		for (x = 0;x < 384;x++)
+		for (x = 0 ; x<384 ; x++)
 		{
 			b &= (HD63484_RAM_SIZE-1);
 			*BITMAP_ADDR16(bitmap, y, x) = HD63484_ram[b];
@@ -719,10 +719,11 @@ static VIDEO_UPDATE( shanghai )
 		int w = (HD63484_reg[0x92/2] & 0xff) * 4;
 		if (sx < 0) sx = 0;	/* not sure about this (shangha2 title screen) */
 
-		b = 2 * (((HD63484_reg[0xdc/2] & 0x001f) << 16) + HD63484_reg[0xde/2]);
-		for (y = sy;y <= sy+h && y < 280;y++)
+		b = 2 * (((HD63484_reg[0xdc/2] & 0x000f) << 16) + HD63484_reg[0xde/2]);
+
+		for (y = sy ; y<sy+h && y<280 ; y++)
 		{
-			for (x = 0;x < 384;x++)
+			for (x = 0 ; x < 384 ; x++)
 			{
 				b &= (HD63484_RAM_SIZE-1);
 				if (x <= w && x + sx >= 0 && x+sx < 384)
@@ -732,6 +733,7 @@ static VIDEO_UPDATE( shanghai )
 			}
 		}
 	}
+
 	return 0;
 }
 
