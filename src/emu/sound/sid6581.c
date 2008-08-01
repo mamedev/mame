@@ -61,14 +61,14 @@ static void sid_reset(void *token)
 
 static void *sid6581_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	return sid_start(sndindex, clock, config, MOS6581);
+	return sid_start(tag, sndindex, clock, config, MOS6581);
 }
 
 
 
 static void *sid8580_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	return sid_start(sndindex, clock, config, MOS8580);
+	return sid_start(tag, sndindex, clock, config, MOS8580);
 }
 
 
