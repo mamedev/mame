@@ -261,6 +261,14 @@ void cpunum_set_input_line(running_machine *machine, int cpunum, int line, int s
 }
 
 
+void cputag_set_input_line(running_machine *machine, const char *tag, int line, int state)
+{
+	int cpunum = mame_find_cpu_index(machine, tag);
+	assert(cpunum != -1);
+	cpunum_set_input_line(machine, cpunum, line, state);
+}
+
+
 void cpunum_set_input_line_vector(int cpunum, int line, int vector)
 {
 	if (cpunum < cpu_gettotalcpu() && line >= 0 && line < MAX_INPUT_LINES)
@@ -304,6 +312,12 @@ void cpunum_set_input_line_and_vector(running_machine *machine, int cpunum, int 
 }
 
 
+void cputag_set_input_line_and_vector(running_machine *machine, const char *tag, int line, int state, int vector)
+{
+	int cpunum = mame_find_cpu_index(machine, tag);
+	assert(cpunum != -1);
+	cpunum_set_input_line_and_vector(machine, cpunum, line, state, vector);
+}
 
 
 #if 0
