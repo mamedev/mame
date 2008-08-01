@@ -143,11 +143,11 @@ static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 		default:
 		case 0x0000: dstep1 =  1; dstep2 = -384 - ax * dstep1; break;
 		case 0x0100: dstep1 =  1; dstep2 =  384 - ax * dstep1; break;
-		case 0x0200: dstep1 = -1; dstep2 = -384 - ax * dstep1; break;
-		case 0x0300: dstep1 = -1; dstep2 =  384 - ax * dstep1; break;
+		case 0x0200: dstep1 = -1; dstep2 = -384 + ax * dstep1; break;
+		case 0x0300: dstep1 = -1; dstep2 =  384 + ax * dstep1; break;
 		case 0x0400: dstep1 = -384; dstep2 =  1 - ay * dstep1; break;
 		case 0x0500: dstep1 =  384; dstep2 =  1 - ay * dstep1; break;
-		case 0x0600: dstep1 = -384; dstep2 = -1 - ay * dstep1; break;
+		case 0x0600: dstep1 = -384; dstep2 = -1 + ay * dstep1; break;
 		case 0x0700: dstep1 =  384; dstep2 = -1 + ay * dstep1; break; // used by kothello
 	}
 
@@ -222,14 +222,14 @@ static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 			ay = _ay;
 			if (_ax < 0)
 			{
-				src = (src + dstep2) & (HD63484_RAM_SIZE-1);
+				src = (src - 1 + ay * 384) & (HD63484_RAM_SIZE-1);
 				*dst = (*dst + dstep2) & (HD63484_RAM_SIZE-1);
 				if (ax == 0) break;
 				ax++;
 			}
 			else
 			{
-				src = (src - dstep2) & (HD63484_RAM_SIZE-1);
+				src = (src + 1 - ay * 384) & (HD63484_RAM_SIZE-1);
 				*dst = (*dst + dstep2) & (HD63484_RAM_SIZE-1);
 				if (ax == 0) break;
 				ax--;
