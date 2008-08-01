@@ -3809,6 +3809,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( fvipers )	/* 1995 */
 	DRIVER( gunblade )	/* 1995 */
 	DRIVER( indy500 )	/* 1995 */
+	DRIVER( indy500d )	/* 1995 */
 	DRIVER( skytargt )	/* 1995 */
 	DRIVER( schamp )	/* 1996 */
 	DRIVER( lastbrnx )	/* 1996 */
