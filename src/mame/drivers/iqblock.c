@@ -86,12 +86,6 @@ static WRITE8_HANDLER( iqblock_irqack_w )
 	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
-static READ8_HANDLER( iqblock_irqack_r )
-{
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
-	return 0;
-}
-
 static READ8_HANDLER( extrarom_r )
 {
 	return memory_region(machine, "user1")[offset];
@@ -144,25 +138,6 @@ static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x7000, 0x7fff) AM_READ(iqblock_bgvideoram_r)
 	AM_RANGE(0x8000, 0xffff) AM_READ(extrarom_r)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pokerigs_portmap, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w)
-//  AM_RANGE(0x6000, 0x603f) AM_WRITE(iqblock_fgscroll_w)
-//  AM_RANGE(0x6800, 0x69ff) AM_WRITE(iqblock_fgvideoram_w)
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(iqblock_bgvideoram_w)
-	AM_RANGE(0x5080, 0x5083) AM_DEVWRITE(PPI8255, "ppi8255", ppi8255_w)
-	AM_RANGE(0x5080, 0x5083) AM_DEVREAD(PPI8255, "ppi8255", ppi8255_r)
-	AM_RANGE(0x5090, 0x5090) AM_READ(input_port_3_r) AM_WRITENOP
-	AM_RANGE(0x5091, 0x5091) AM_READNOP AM_WRITENOP
-	AM_RANGE(0x50a0, 0x50a0) AM_READ(input_port_4_r)
-	AM_RANGE(0x50b0, 0x50b0) AM_WRITE(YM2413_register_port_0_w) // UM3567_register_port_0_w
-	AM_RANGE(0x50b1, 0x50b1) AM_WRITE(YM2413_data_port_0_w) // UM3567_data_port_0_w
-	AM_RANGE(0x50c0, 0x50c0) AM_READ(iqblock_irqack_r)
-//  AM_RANGE(0x7000, 0x7fff) AM_READ(iqblock_bgvideoram_r)
-//  AM_RANGE(0x8000, 0xffff) AM_READ(extrarom_r)
-ADDRESS_MAP_END
-
 
 static INPUT_PORTS_START( iqblock )
 	PORT_START
@@ -357,39 +332,6 @@ static MACHINE_DRIVER_START( cabaret )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( pokerigs )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z180,12000000/2)	/* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(pokerigs_portmap,0)
-	MDRV_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)
-
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf )
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 30*8-1)
-
-	MDRV_GFXDECODE(cabaret)
-	MDRV_PALETTE_LENGTH(1024)
-
-	MDRV_VIDEO_START(iqblock)
-	MDRV_VIDEO_UPDATE(iqblock)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
-
-
 
 /***************************************************************************
 
@@ -447,58 +389,6 @@ ROM_START( cabaret )
 	ROM_LOAD( "cg-1.u40",  0x0000, 0x4000, CRC(7dee8b1f) SHA1(80dbdf6aab9b02cc000956b7894023552428e6a1) )
 	ROM_LOAD( "cg-2.u41",  0x4000, 0x4000, CRC(ce8dea39) SHA1(b30d1678a7b98cd821d2ce7383a83cb7c9f31b5f) )
 	ROM_LOAD( "cg-3.u42",  0x8000, 0x4000, CRC(7e1f821f) SHA1(b709d49f9d1890fe3b8ca7f90affc0017a0ad95e) )
-ROM_END
-
-/*
-
-1x ZILOG Z0840006PSC-Z80CPU (main)
-1x YM2413 (sound)
-1x NEC D8255AC (label: ORIGINAL BY IGS 102986)
-1x oscillator 12.000MHz (main)
-1x oscillator 3.579545MHz (sound)
-
-1x custom QFP80 label AMT001
-1x custom QFP80 label IGS002
-1x custom DIP40 label IGS003 (under chip label 8255)
-ROMs 3x MX27C1000DC (4,5,6)
-1x NM27C256Q (7)
-1x 27C512 (200)
-2x PEEL18CV8P (8,9)
-1x PAL16L8ACN (31)
-2x PEEL18CV8P (12,14) <-> UNREADABLE, protected!
-
-Note 1x 10x2 edge connector (con1) (looks like a coin payout)
-1x 36x2 edge connector (con2)
-1x pushbutton (sw6)
-5x 8 switches dips (sw1-5)
-1x trimmer (volume)
-----------------------
-IGS PCB NO-T0039-8
-
-*/
-
-ROM_START( pokerigs )
-	// code at 0xf000 looks like startup code
-	ROM_REGION( 0x20000, "main", 0 ) /* DIP28 Code */
-	ROM_LOAD( "champingv-200g.u23", 0x00000, 0x10000, CRC(696cb684) SHA1(ce9e5bed83d0bd3b115f556cc89e3293ac6b69c3) )
-
-	ROM_REGION( 0x60000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "cpoker4.u4",   0x00000, 0x20000, CRC(860be7c9) SHA1(41bc58713076276aeefc44c7ea903549692b0224) )
-	ROM_LOAD( "cpoker5.u5",   0x20000, 0x20000, CRC(a68b305f) SHA1(f872d2bf7ab194145dffe6b254ae0ad66aa6a497) )
-	ROM_LOAD( "cpoker6.u6",   0x40000, 0x20000, CRC(f3e61b24) SHA1(b18998defb6e51daef4ac5a5865674565ffb9029) )
-
-	//copy?
-	ROM_REGION( 0x60000, "gfx2", ROMREGION_DISPOSE )
-	ROM_COPY( "gfx1", 0, 0, 0x60000 )
-
-	ROM_REGION( 0x8000, "user1", 0 )
-	ROM_LOAD( "cpoker7.u22",  0x00000, 0x8000, CRC(dae3ecda) SHA1(c881e143ec600c5a931f26cd097da6353e1da7c3) )
-
-	// convert them to the pld format
-	ROM_REGION( 0x2000, "plds", ROMREGION_DISPOSE )
-	ROM_LOAD( "ag-u31.u31",   0x00000, 0x000b60, CRC(fd36baf2) SHA1(caac8bf47bc958395f97b6191569196efe3b3eaa) )
-	ROM_LOAD( "ag-u8.u8",     0x00000, 0x0015e2, CRC(c0308c63) SHA1(16819a5c147fef38a235675fa4442da9fa8a6618) )
-	ROM_LOAD( "ag-u9.u9",     0x00000, 0x0015e2, CRC(2e8039a3) SHA1(e39635ee9485a5ccd28526f1af7ec2e3294b0aec) )
 ROM_END
 
 static DRIVER_INIT( iqblock )
@@ -565,46 +455,8 @@ static DRIVER_INIT( cabaret )
 	iqblock_video_type=0;
 }
 
-static DRIVER_INIT( pokerigs )
-{
-	UINT8 *rom = memory_region(machine, "main");
-	int i;
-
-	/* decrypt the program ROM */
-	for (i = 0;i < 0x10000;i++)
-	{
-		if((i & 0x200) && (i & 0x80))
-		{
-			rom[i] ^= ((~i & 2) >> 1);
-		}
-		else
-		{
-			rom[i] ^= 0x01;
-		}
-
-		if((i & 0x30) != 0x10)
-		{
-			rom[i] ^= 0x20;
-		}
-
-		if((i & 0x900) == 0x900 && ((i & 0xc0) == 0x40 || (i & 0xc0) == 0xc0))
-		{
-			rom[i] ^= 0x02;
-		}
-	}
-
-
-	/* initialize pointers for I/O mapped RAM */
-	paletteram         = rom + 0x12000;
-	paletteram_2       = rom + 0x12800;
-	iqblock_fgvideoram = rom + 0x16800;
-	iqblock_bgvideoram = rom + 0x17000;
-	iqblock_video_type=0;
-}
-
 
 GAME( 1993, iqblock,  0, iqblock,  iqblock, iqblock,  ROT0, "IGS", "IQ-Block", 0 )
 GAME( 1993, grndtour, 0, iqblock,  iqblock, grndtour, ROT0, "IGS", "Grand Tour", 0 )
 
 GAME( 19??, cabaret,  0, cabaret,  iqblock, cabaret,  ROT0, "IGS", "Cabaret", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1995, pokerigs, 0, pokerigs, iqblock, pokerigs, ROT0, "IGS", "Poker? (IGS)", GAME_NOT_WORKING )

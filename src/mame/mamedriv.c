@@ -7266,7 +7266,8 @@ Other Sun games
 	DRIVER( goldstar )	/* (c) 198? IGS */
 	DRIVER( goldstbl )	/* (c) 198? IGS */
 	DRIVER( moonlght )	/* bootleg */
- 	DRIVER( cpoker )	/* (c) 198? IGS */
+ 	DRIVER( cpoker )	/* (c) 1993? IGS */
+ 	DRIVER( cpokert )	/* (c) 1993? Tuning */
 	DRIVER( csk227it )	/* (c) 198? IGS */
 	DRIVER( csk234it )	/* (c) 198? IGS */
 	DRIVER( stellecu )	/* (c) 1998 */
@@ -7274,7 +7275,6 @@ Other Sun games
 	DRIVER( grndtour )	/* (c) 1993 */
 	DRIVER( cabaret )
 	DRIVER( jingbell )	/* (c) 1995? */
-	DRIVER( pokerigs )	/* (c) 1995 */
 	DRIVER( lhb )		/* (c) 1995 */
 	DRIVER( lhba )		/* (c) 1995 */
 	DRIVER( dbc )		/* (c) 199? */
