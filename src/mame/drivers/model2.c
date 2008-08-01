@@ -3163,7 +3163,7 @@ ROM_START( pltkids )
 	ROM_LOAD("mpr-21280.sd4", 0x0600000, 0x200000, CRC(aa548124) SHA1(a94adfe16b5c3236746451c181ccd3e1c27432f4) )
 ROM_END
 
-ROM_START( indy500 )
+ROM_START( indy500 ) /* Defaults to Twin (Stand Alone) Cab version.  2 credits to start - Can be set to Deluxe setting in service mode */
 	ROM_REGION( 0x200000, "main", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-18254a.15", 0x000000, 0x080000, CRC(ad0f1fc5) SHA1(0bff35fc1d892aaffbf1a3965bf3109c54839f4b) )
 	ROM_LOAD32_WORD("epr-18255a.16", 0x000002, 0x080000, CRC(784daab8) SHA1(299e87f8ec7bdefa6f94f4ab65e29e91f290611e) )
@@ -3215,7 +3215,7 @@ ROM_START( indy500 )
 	ROM_LOAD("mpr-18244.35", 0x0600000, 0x200000, CRC(bfa75beb) SHA1(fec89260d887e90ee9c2803e2eaf937cf9bfa10b) )
 ROM_END
 
-ROM_START( indy500d ) /* Deluxe Cab version?  3 credits to start vs 2 for indy500 set */
+ROM_START( indy500d ) /* Defaults to Deluxe (Stand Alone) Cab version.  3 credits to start - Can be set to Twin setting in service mode */
 	ROM_REGION( 0x200000, "main", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-18251a.15", 0x000000, 0x080000, CRC(fdabb40b) SHA1(e60a4814b54b76c7c0a4d9cf2b093c577c2f6ecf) )
 	ROM_LOAD32_WORD("epr-18252a.16", 0x000002, 0x080000, CRC(4935832a) SHA1(8fc9244fd0eaf93d016f4494604e5a70bf1f7303) )
@@ -4408,8 +4408,8 @@ GAME( 1994, vstriker,        0, model2b, model2, 0,       ROT0, "Sega", "Virtua 
 GAME( 1994, vstrikro, vstriker, model2b, model2, 0,       ROT0, "Sega", "Virtua Striker", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, fvipers,         0, model2b, model2, 0,       ROT0, "Sega", "Fighting Vipers", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, gunblade,        0, model2b, model2, 0,       ROT0, "Sega", "Gunblade NY", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, indy500,         0, model2b, model2, 0,       ROT0, "Sega", "Indianapolis 500", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, indy500d,  indy500, model2b, model2, 0,       ROT0, "Sega", "Indianapolis 500 Deluxe", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, indy500,         0, model2b, model2, 0,       ROT0, "Sega", "INDY 500 Twin", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, indy500d,  indy500, model2b, model2, 0,       ROT0, "Sega", "INDY 500 Deluxe", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, schamp,          0, model2b, model2, 0,       ROT0, "Sega", "Sonic The Fighters", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, lastbrnx,        0, model2b, model2, 0,       ROT0, "Sega", "Last Bronx (Export, Rev A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, lastbrnj, lastbrnx, model2b, model2, 0,       ROT0, "Sega", "Last Bronx (Japan, Rev A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
