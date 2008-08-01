@@ -87,6 +87,9 @@ WRITE8_HANDLER(discrete_sound_w)
 			stream_update(info->discrete_stream);
 
 			*node_data = new_data;
+
+			/* Update the node output here so we don't have to do it each step */
+			node->output[0] = *node_data * DSS_INPUT__GAIN + DSS_INPUT__OFFSET;
 		}
 	}
 	else
@@ -109,37 +112,29 @@ WRITE8_HANDLER(discrete_sound_w)
  * input[6]    -
  *
  ************************************************************************/
-#define DSS_ADJUSTMENT__ENABLE	(*(node->input[0]))
-#define DSS_ADJUSTMENT__MIN		(*(node->input[1]))
-#define DSS_ADJUSTMENT__MAX		(*(node->input[2]))
-#define DSS_ADJUSTMENT__LOG		(*(node->input[3]))
-#define DSS_ADJUSTMENT__PORT	(*(node->input[4]))
-#define DSS_ADJUSTMENT__PMIN	(*(node->input[5]))
-#define DSS_ADJUSTMENT__PMAX	(*(node->input[6]))
+#define DSS_ADJUSTMENT__MIN		(*(node->input[0]))
+#define DSS_ADJUSTMENT__MAX		(*(node->input[1]))
+#define DSS_ADJUSTMENT__LOG		(*(node->input[2]))
+#define DSS_ADJUSTMENT__PORT	(*(node->input[3]))
+#define DSS_ADJUSTMENT__PMIN	(*(node->input[4]))
+#define DSS_ADJUSTMENT__PMAX	(*(node->input[5]))
 
 static void dss_adjustment_step(node_description *node)
 {
-	if (DSS_ADJUSTMENT__ENABLE)
-	{
-		struct dss_adjustment_context *context = node->context;
-		INT32 rawportval = input_port_read_direct(context->port);
+	struct dss_adjustment_context *context = node->context;
+	INT32 rawportval = input_port_read_direct(context->port);
 
-		/* only recompute if the value changed from last time */
-		if (rawportval != context->lastpval)
-		{
-			double portval = (double)(rawportval - context->pmin) * context->pscale;
-			double scaledval = portval * context->scale + context->min;
-
-			context->lastpval = rawportval;
-			if (DSS_ADJUSTMENT__LOG == 0)
-				node->output[0] = scaledval;
-			else
-				node->output[0] = pow(10, scaledval);
-		}
-	}
-	else
+	/* only recompute if the value changed from last time */
+	if (rawportval != context->lastpval)
 	{
-		node->output[0] = 0;
+		double portval = (double)(rawportval - context->pmin) * context->pscale;
+		double scaledval = portval * context->scale + context->min;
+
+		context->lastpval = rawportval;
+		if (DSS_ADJUSTMENT__LOG == 0)
+			node->output[0] = scaledval;
+		else
+			node->output[0] = pow(10, scaledval);
 	}
 }
 
@@ -191,7 +186,7 @@ static void dss_adjustment_reset(node_description *node)
  ************************************************************************/
 #define DSS_CONSTANT__INIT	(*(node->input[0]))
 
-static void dss_constant_step(node_description *node)
+static void dss_constant_reset(node_description *node)
 {
 	node->output[0]= DSS_CONSTANT__INIT;
 }
@@ -207,13 +202,6 @@ static void dss_constant_step(node_description *node)
  * input[3]    - Current data value
  *
  ************************************************************************/
-static void dss_input_step(node_description *node)
-{
-	UINT8 *node_data = node->context;
-
-	node->output[0] = *node_data * DSS_INPUT__GAIN + DSS_INPUT__OFFSET;
-}
-
 static void dss_input_reset(node_description *node)
 {
 	UINT8 *node_data = node->context;
@@ -231,7 +219,7 @@ static void dss_input_reset(node_description *node)
 			*node_data = (DSS_INPUT__INIT == 0) ? 1 : 0;
 			break;
 	}
-	dss_input_step(node);
+	node->output[0] = *node_data * DSS_INPUT__GAIN + DSS_INPUT__OFFSET;
 }
 
 static void dss_input_pulse_step(node_description *node)

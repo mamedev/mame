@@ -42,7 +42,7 @@ DISCRETE_SOUND_START(hitme)
 	DISCRETE_INPUT_PULSE(HITME_OUT1, 0)
 
  	/* This represents the resistor at R3, which controls the speed of the sound effects */
-	DISCRETE_ADJUSTMENT_TAG(HITME_GAME_SPEED,1,0.0,25000.0,DISC_LINADJ,"R3")
+	DISCRETE_ADJUSTMENT_TAG(HITME_GAME_SPEED,0.0,25000.0,DISC_LINADJ,"R3")
 
 	/* The clock for the main downcounter is a "404", or LS123 retriggerable multivibrator.
      * It is clocked by IPH2 (8.945MHz/16 = 559kHz), then triggers a pulse which is adjustable

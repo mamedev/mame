@@ -749,7 +749,7 @@ static DISCRETE_SOUND_START(boothill)
 	/* The low value of the pot is set to 75000.  A real 1M pot will never go to 0 anyways.
        This will give the control more apparent volume range.
        The music way overpowers the rest of the sounds anyways. */
-	DISCRETE_ADJUSTMENT_TAG(BOOTHILL_MUSIC_ADJ, 1, RES_M(1), 75000, DISC_LOGADJ, "MUSIC_ADJ")
+	DISCRETE_ADJUSTMENT_TAG(BOOTHILL_MUSIC_ADJ, RES_M(1), 75000, DISC_LOGADJ, "MUSIC_ADJ")
 
 	/************************************************
      * Tone generator
@@ -942,8 +942,8 @@ static DISCRETE_SOUND_START(checkmat)
 	/* This is needed because the original controls are infinite, but the UI only gives 100 steps. */
 	/* Also real variable resistors never hit 0 ohms.  There is always some resistance. */
 	/* R309 mostly just increases the Boom clipping, making it sound bassier. */
-	DISCRETE_ADJUSTMENT_TAG(CHECKMAT_R309, 1, RES_K(100), 1000, DISC_LOGADJ, "R309")
-	DISCRETE_ADJUSTMENT_TAG(CHECKMAT_R411, 1, RES_M(1), 1000, DISC_LOGADJ, "R411")
+	DISCRETE_ADJUSTMENT_TAG(CHECKMAT_R309, RES_K(100), 1000, DISC_LOGADJ, "R309")
+	DISCRETE_ADJUSTMENT_TAG(CHECKMAT_R411, RES_M(1), 1000, DISC_LOGADJ, "R411")
 
 	/************************************************
      * Boom Sound
@@ -1218,7 +1218,7 @@ static DISCRETE_SOUND_START(desertgu)
 	/* The low value of the pot is set to 75000.  A real 1M pot will never go to 0 anyways. */
 	/* This will give the control more apparent volume range. */
 	/* The music way overpowers the rest of the sounds anyways. */
-	DISCRETE_ADJUSTMENT_TAG(DESERTGU_MUSIC_ADJ, 1, RES_M(1), 75000, DISC_LOGADJ, "MUSIC_ADJ")
+	DISCRETE_ADJUSTMENT_TAG(DESERTGU_MUSIC_ADJ, RES_M(1), 75000, DISC_LOGADJ, "MUSIC_ADJ")
 
 	/************************************************
      * Tone generator
@@ -1513,7 +1513,7 @@ static DISCRETE_SOUND_START(dplay)
 	/* The low value of the pot is set to 1000.  A real 1M pot will never go to 0 anyways. */
 	/* This will give the control more apparent volume range. */
 	/* The music way overpowers the rest of the sounds anyways. */
-	DISCRETE_ADJUSTMENT_TAG(DPLAY_MUSIC_ADJ, 1, RES_M(1), 1000, DISC_LOGADJ, "MUSIC_ADJ")
+	DISCRETE_ADJUSTMENT_TAG(DPLAY_MUSIC_ADJ, RES_M(1), 1000, DISC_LOGADJ, "MUSIC_ADJ")
 
 	/************************************************
      * Music and Tone Generator
@@ -1942,7 +1942,7 @@ static DISCRETE_SOUND_START(clowns)
 	/* The low value of the pot is set to 7000.  A real 1M pot will never go to 0 anyways. */
 	/* This will give the control more apparent volume range. */
 	/* The music way overpowers the rest of the sounds anyways. */
-	DISCRETE_ADJUSTMENT_TAG(CLOWNS_MUSIC_ADJ, 1, RES_M(1), 7000, DISC_LOGADJ, "MUSIC_ADJ")
+	DISCRETE_ADJUSTMENT_TAG(CLOWNS_MUSIC_ADJ, RES_M(1), 7000, DISC_LOGADJ, "MUSIC_ADJ")
 
 	/************************************************
      * Tone generator

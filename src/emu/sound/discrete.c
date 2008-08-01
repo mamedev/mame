@@ -169,10 +169,10 @@ static const discrete_module module_list[] =
 
 	/* from disc_inp.c */
 	{ DSS_ADJUSTMENT  ,"DSS_ADJUSTMENT"  , 1 ,sizeof(struct dss_adjustment_context)  ,dss_adjustment_reset  ,dss_adjustment_step  },
-	{ DSS_CONSTANT    ,"DSS_CONSTANT"    , 1 ,0                                      ,NULL                  ,dss_constant_step    },
-	{ DSS_INPUT_DATA  ,"DSS_INPUT_DATA"  , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_step       },
-	{ DSS_INPUT_LOGIC ,"DSS_INPUT_LOGIC" , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_step       },
-	{ DSS_INPUT_NOT   ,"DSS_INPUT_NOT"   , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_step       },
+	{ DSS_CONSTANT    ,"DSS_CONSTANT"    , 1 ,0                                      ,dss_constant_reset    ,NULL                 },
+	{ DSS_INPUT_DATA  ,"DSS_INPUT_DATA"  , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,NULL                 },
+	{ DSS_INPUT_LOGIC ,"DSS_INPUT_LOGIC" , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,NULL                 },
+	{ DSS_INPUT_NOT   ,"DSS_INPUT_NOT"   , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,NULL                 },
 	{ DSS_INPUT_PULSE ,"DSS_INPUT_PULSE" , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_pulse_step },
 	{ DSS_INPUT_STREAM,"DSS_INPUT_STREAM", 1 ,0                                      ,dss_input_stream_reset,dss_input_stream_step},
 

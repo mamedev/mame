@@ -429,10 +429,10 @@ DISCRETE_SOUND_START(polaris)
 
 	/* We will cheat and just use the controls to scale the amplitude. */
 	/* It is the same as taking the (0 to 50k)/50k */
-	DISCRETE_ADJUSTMENT_TAG(POLARIS_ADJ_VR1, 1, 0, 1, DISC_LINADJ, "VR1")
-	DISCRETE_ADJUSTMENT_TAG(POLARIS_ADJ_VR2, 1, 0, 1, DISC_LINADJ, "VR2")
+	DISCRETE_ADJUSTMENT_TAG(POLARIS_ADJ_VR1, 0, 1, DISC_LINADJ, "VR1")
+	DISCRETE_ADJUSTMENT_TAG(POLARIS_ADJ_VR2, 0, 1, DISC_LINADJ, "VR2")
 	/* Extra cheating for VR3.  We will include the resistor scaling. */
-	DISCRETE_ADJUSTMENT_TAG(POLARIS_ADJ_VR3, 1, 0, 0.5376, DISC_LINADJ, "VR3")
+	DISCRETE_ADJUSTMENT_TAG(POLARIS_ADJ_VR3, 0, 0.5376, DISC_LINADJ, "VR3")
 
 /******************************************************************************
  *
@@ -724,9 +724,9 @@ DISCRETE_SOUND_START(schaser)
 	/* We will set them to adjust the realitive     */
 	/* gains.                                       */
 	/************************************************/
-	DISCRETE_ADJUSTMENT_TAG(SCHASER_VR1, 1, 0, RES_K(50)/(RES_K(50) + RES_K(470)), DISC_LINADJ, "VR1")
-	DISCRETE_ADJUSTMENT_TAG(SCHASER_VR2, 1, 0, RES_K(50)/(RES_K(50) + 560 + RES_K(6.8) + RES_K(2)), DISC_LINADJ, "VR2")
-	DISCRETE_ADJUSTMENT_TAG(SCHASER_VR3, 1, 0, RES_K(50)/(RES_K(50) + 560 + RES_K(6.8) + RES_K(10)), DISC_LINADJ, "VR3")
+	DISCRETE_ADJUSTMENT_TAG(SCHASER_VR1, 0, RES_K(50)/(RES_K(50) + RES_K(470)), DISC_LINADJ, "VR1")
+	DISCRETE_ADJUSTMENT_TAG(SCHASER_VR2, 0, RES_K(50)/(RES_K(50) + 560 + RES_K(6.8) + RES_K(2)), DISC_LINADJ, "VR2")
+	DISCRETE_ADJUSTMENT_TAG(SCHASER_VR3, 0, RES_K(50)/(RES_K(50) + 560 + RES_K(6.8) + RES_K(10)), DISC_LINADJ, "VR3")
 
 	/************************************************/
 	/* Dot selection just selects between 4V and 8V */

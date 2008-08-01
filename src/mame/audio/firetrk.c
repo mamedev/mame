@@ -207,7 +207,7 @@ DISCRETE_SOUND_START(firetrk)
 	/* drive a modulo 12 counter, with div6 & div12 */
 	/* summed as the output of the circuit.         */
 	/************************************************/
-	DISCRETE_ADJUSTMENT_TAG(NODE_20, 1,
+	DISCRETE_ADJUSTMENT_TAG(NODE_20,
 				RES_K(260),	// R26 + R27 @ max
 				RES_K(10),	// R26 + R27 @ min
 				DISC_LOGADJ, "R27")
@@ -411,7 +411,7 @@ DISCRETE_SOUND_START(superbug)
 	/* latch (4 bit). This freqency is then used to */
 	/* drive a modulo 12 counter.                   */
 	/************************************************/
-	DISCRETE_ADJUSTMENT_TAG(NODE_20, 1,
+	DISCRETE_ADJUSTMENT_TAG(NODE_20,
 				RES_K(260),	// R12 + R62 @ max
 				RES_K(10),	// R12 + R62 @ min
 				DISC_LOGADJ, "R62")
@@ -596,7 +596,7 @@ DISCRETE_SOUND_START(montecar)
 	/* driver a modulo 12 counter, with div6, 4 & 3 */
 	/* summed as the output of the circuit.         */
 	/************************************************/
-	DISCRETE_ADJUSTMENT_TAG(NODE_20, 1,
+	DISCRETE_ADJUSTMENT_TAG(NODE_20,
 				RES_K(260),	// R87 + R89 @ max
 				RES_K(10),	// R87 + R89 @ min
 				DISC_LOGADJ, "R89")
@@ -631,7 +631,7 @@ DISCRETE_SOUND_START(montecar)
 	/************************************************/
 	DISCRETE_COMP_ADDER(NODE_30, 1, MONTECAR_DRONE_LOUD_DATA, &montecar_drone_vol_res)	// make sure to change the node value in the mixer table if you change this node number
 
-	DISCRETE_ADJUSTMENT_TAG(NODE_40, 1,
+	DISCRETE_ADJUSTMENT_TAG(NODE_40,
 				RES_K(260),	// R85 + R88 @ max
 				RES_K(10),	// R85 + R88 @ min
 				DISC_LOGADJ, "R88")

@@ -125,9 +125,9 @@
  * DISCRETE_SOUND_START(STRUCTURENAME)
  * DISCRETE_SOUND_END
  *
- * DISCRETE_ADJUSTMENT(NODE,ENAB,MIN,MAX,LOGLIN,PORT)
- * DISCRETE_ADJUSTMENT_TAG(NODE,ENAB,MIN,MAX,LOGLIN,TAG)
- * DISCRETE_ADJUSTMENTX(NODE,ENAB,MIN,MAX,LOGLIN,PORT,PMIN,PMAX)
+ * DISCRETE_ADJUSTMENT(NODE,MIN,MAX,LOGLIN,PORT)
+ * DISCRETE_ADJUSTMENT_TAG(NODE,MIN,MAX,LOGLIN,TAG)
+ * DISCRETE_ADJUSTMENTX(NODE,MIN,MAX,LOGLIN,PORT,PMIN,PMAX)
  * DISCRETE_CONSTANT(NODE,CONST0)
  * DISCRETE_INPUT_DATA(NODE)
  * DISCRETE_INPUTX_DATA(NODE,GAIN,OFFSET,INIT)
@@ -272,14 +272,12 @@
  *  Declaration syntax
  *
  *     DISCRETE_ADJUSTMENT(name of node,
- *                         enable node or static value,
  *                         static minimum value the node can take,
  *                         static maximum value the node can take,
  *                         log/linear scale 0=Linear !0=Logarithmic,
  *                         input port number of the adjuster)
  *
  *     DISCRETE_ADJUSTMENT_TAG(name of node,
- *                             enable node or static value,
  *                             static minimum value the node can take,
  *                             static maximum value the node can take,
  *                             log/linear scale 0=Linear !0=Logarithmic,
@@ -292,7 +290,7 @@
  *
  *  Example config line
  *
- *     DISCRETE_ADJUSTMENT(NODE_01,1,0.0,5.0,DISC_LINADJ,0,5)
+ *     DISCRETE_ADJUSTMENT(NODE_01,0.0,5.0,DISC_LINADJ,0,5)
  *
  *  Define an adjustment slider that takes a 0-100 input from input
  *  port #5, scaling between 0.0 and 5.0. Adjustment scaling is Linear.
@@ -3930,9 +3928,9 @@ enum
 #define DISCRETE_SOUND_END                                              { NODE_00, DSS_NULL     , 0, { NODE_NC }, { 0 } ,NULL  ,"End Marker" }  };
 
 /* from disc_inp.c */
-#define DISCRETE_ADJUSTMENT(NODE,ENAB,MIN,MAX,LOGLIN,PORT)              { NODE, DSS_ADJUSTMENT  , 7, { ENAB,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,MIN,MAX,LOGLIN,PORT,0   ,100  }, NULL  , "DISCRETE_ADJUSTMENT"  },
-#define DISCRETE_ADJUSTMENT_TAG(NODE,ENAB,MIN,MAX,LOGLIN,TAG)           { NODE, DSS_ADJUSTMENT  , 7, { ENAB,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,MIN,MAX,LOGLIN,0   ,0   ,100  }, TAG   , "DISCRETE_ADJUSTMENT_TAG" },
-#define DISCRETE_ADJUSTMENTX(NODE,ENAB,MIN,MAX,LOGLIN,PORT,PMIN,PMAX)   { NODE, DSS_ADJUSTMENT  , 7, { ENAB,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,MIN,MAX,LOGLIN,PORT,PMIN,PMAX }, NULL  , "DISCRETE_ADJUSTMENTX"  },
+#define DISCRETE_ADJUSTMENT(NODE,MIN,MAX,LOGLIN,PORT)                   { NODE, DSS_ADJUSTMENT  , 7, { NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { MIN,MAX,LOGLIN,PORT,0   ,100  }, NULL  , "DISCRETE_ADJUSTMENT"  },
+#define DISCRETE_ADJUSTMENT_TAG(NODE,MIN,MAX,LOGLIN,TAG)                { NODE, DSS_ADJUSTMENT  , 7, { NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { MIN,MAX,LOGLIN,0   ,0   ,100  }, TAG   , "DISCRETE_ADJUSTMENT_TAG" },
+#define DISCRETE_ADJUSTMENTX(NODE,MIN,MAX,LOGLIN,PORT,PMIN,PMAX)        { NODE, DSS_ADJUSTMENT  , 7, { NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { MIN,MAX,LOGLIN,PORT,PMIN,PMAX }, NULL  , "DISCRETE_ADJUSTMENTX"  },
 #define DISCRETE_CONSTANT(NODE,CONST)                                   { NODE, DSS_CONSTANT    , 1, { NODE_NC }, { CONST } ,NULL  ,"Constant" },
 #define DISCRETE_INPUT_DATA(NODE)                                       { NODE, DSS_INPUT_DATA  , 3, { NODE_NC,NODE_NC,NODE_NC }, { 1,0,0 }, NULL, "Input Data" },
 #define DISCRETE_INPUTX_DATA(NODE,GAIN,OFFSET,INIT)                     { NODE, DSS_INPUT_DATA  , 3, { NODE_NC,NODE_NC,NODE_NC }, { GAIN,OFFSET,INIT }, NULL, "InputX Data" },
