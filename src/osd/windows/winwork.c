@@ -492,7 +492,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 
 osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_callback callback, INT32 numitems, void *parambase, INT32 paramstep, UINT32 flags)
 {
-	osd_work_item *itemlist = NULL;
+	osd_work_item *itemlist = NULL, *lastitem = NULL;
 	osd_work_item **item_tailptr = &itemlist;
 	INT32 lockslot;
 	int itemnum;
@@ -528,6 +528,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		item->done = FALSE;
 
 		// advance to the next
+		lastitem = item;
 		*item_tailptr = item;
 		item_tailptr = &item->next;
 		parambase = (UINT8 *)parambase + paramstep;
@@ -571,7 +572,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		worker_thread_process(queue, &queue->thread[0]);
 
 	// only return the item if it won't get released automatically
-	return (flags & WORK_ITEM_FLAG_AUTO_RELEASE) ? NULL : *item_tailptr;
+	return (flags & WORK_ITEM_FLAG_AUTO_RELEASE) ? NULL : lastitem;
 }
 
 

@@ -101,7 +101,15 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 			if (srcabs[curbit + 1 + 0] != srcabs[curbit + 1 + 1] || srcabs[curbit - 1 + 0] != srcabs[curbit - 1 + 1])
 			{
 				/* only continue if we're still in the running */
-				if (++error < besterr)
+				if ((error += 1) < besterr)
+					continue;
+			}
+			
+			/* off-by-two? */
+			if (srcabs[curbit + 2 + 0] != srcabs[curbit + 2 + 1] || srcabs[curbit - 2 + 0] != srcabs[curbit - 2 + 1])
+			{
+				/* only continue if we're still in the running */
+				if ((error += 2) < besterr)
 					continue;
 			}
 

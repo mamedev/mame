@@ -191,11 +191,11 @@ static int usage(void)
 	printf("   or: chdman -createhd inputhd.raw output.chd [inputoffs [cylinders heads sectors [sectorsize [hunksize]]]]\n");
 	printf("   or: chdman -createblankhd output.chd cylinders heads sectors [sectorsize [hunksize]]\n");
 	printf("   or: chdman -createcd input.toc output.chd\n");
-	printf("   or: chdman -createav input.avi inputmeta.txt output.chd [firstframe [numframes]]\n");
+	printf("   or: chdman -createav input.avi output.chd [firstframe [numframes]]\n");
 	printf("   or: chdman -copydata input.chd output.chd\n");
 	printf("   or: chdman -extract input.chd output.raw\n");
 	printf("   or: chdman -extractcd input.chd output.toc output.bin\n");
-	printf("   or: chdman -extractav input.chd output.avi outputmeta.txt [firstframe [numframes]]\n");
+	printf("   or: chdman -extractav input.chd output.avi [firstframe [numframes]]\n");
 	printf("   or: chdman -verify input.chd\n");
 	printf("   or: chdman -verifyfix input.chd\n");
 	printf("   or: chdman -update input.chd output.chd\n");
@@ -718,61 +718,34 @@ cleanup:
 
 static int do_createav(int argc, char *argv[], int param)
 {
-	UINT32 fps_times_1million, width, height, interlaced, channels, rate, metabytes = 0, totalframes;
+	UINT32 fps_times_1million, width, height, interlaced, channels, rate, totalframes;
 	UINT32 max_samples_per_frame, bytes_per_frame, firstframe, numframes;
-	const char *inputfile, *metafile, *outputfile;
+	const char *inputfile, *outputfile;
 	bitmap_t videobitmap = { 0 };
 	const avi_movie_info *info;
 	const chd_header *header;
-	char metadata[256];
 	chd_file *chd = NULL;
 	avi_file *avi = NULL;
 	UINT8 *cache = NULL;
 	double ratio = 1.0;
-	FILE *meta = NULL;
+	char metadata[256];
 	avi_error avierr;
 	chd_error err;
 	UINT32 framenum;
 
-	/* require 5-7 args total */
-	if (argc < 5 || argc > 7)
+	/* require 4-6 args total */
+	if (argc < 4 || argc > 6)
 		return usage();
 
 	/* extract the first few parameters */
 	inputfile = argv[2];
-	metafile = argv[3];
-	outputfile = argv[4];
-	firstframe = (argc > 5) ? atoi(argv[5]) : 0;
-	numframes = (argc > 6) ? atoi(argv[6]) : 1000000;
+	outputfile = argv[3];
+	firstframe = (argc > 4) ? atoi(argv[4]) : 0;
+	numframes = (argc > 5) ? atoi(argv[5]) : 1000000;
 
 	/* print some info */
 	printf("Input file:   %s\n", inputfile);
-	printf("Meta file:    %s\n", (metafile == NULL) ? "(none)" : metafile);
 	printf("Output file:  %s\n", outputfile);
-
-	/* open the meta file */
-	if (metafile != NULL)
-	{
-		meta = fopen(metafile, "r");
-		if (meta == NULL)
-		{
-			fprintf(stderr, "Error opening meta file\n");
-			err = CHDERR_INVALID_FILE;
-			goto cleanup;
-		}
-		if (fgets(metadata, sizeof(metadata), meta) == NULL || sscanf(metadata, "chdmeta %d\n", &metabytes) != 1)
-		{
-			fprintf(stderr, "Invalid data header in metafile\n");
-			err = CHDERR_INVALID_FILE;
-			goto cleanup;
-		}
-		if (metabytes > 255)
-		{
-			fprintf(stderr, "Metadata too large (255 bytes maximum)\n");
-			err = CHDERR_INVALID_FILE;
-			goto cleanup;
-		}
-	}
 
 	/* open the source file */
 	avierr = avi_open(inputfile, &avi);
@@ -813,7 +786,6 @@ static int do_createav(int argc, char *argv[], int param)
 	printf("Frame rate:   %d.%06d\n", fps_times_1million / 1000000, fps_times_1million % 1000000);
 	printf("Frame size:   %d x %d %s\n", width, height, interlaced ? "interlaced" : "non-interlaced");
 	printf("Audio:        %d channels at %d Hz\n", channels, rate);
-	printf("Metadata:     %d bytes/frame\n", metabytes);
 	printf("Total frames: %d (%02d:%02d:%02d)\n", totalframes,
 			(UINT32)((UINT64)totalframes * 1000000 / fps_times_1million / 60 / 60),
 			(UINT32)(((UINT64)totalframes * 1000000 / fps_times_1million / 60) % 60),
@@ -831,7 +803,7 @@ static int do_createav(int argc, char *argv[], int param)
 
 	/* determine the number of bytes per frame */
 	max_samples_per_frame = ((UINT64)rate * 1000000 + fps_times_1million - 1) / fps_times_1million;
-	bytes_per_frame = 12 + metabytes + channels * max_samples_per_frame * 2 + width * height * 2;
+	bytes_per_frame = 12 + channels * max_samples_per_frame * 2 + width * height * 2;
 
 	/* create the new CHD */
 	err = chd_create(outputfile, (UINT64)numframes * (UINT64)bytes_per_frame, bytes_per_frame, CHDCOMPRESSION_AV, NULL);
@@ -851,7 +823,7 @@ static int do_createav(int argc, char *argv[], int param)
 	header = chd_get_header(chd);
 
 	/* write the metadata */
-	sprintf(metadata, AV_METADATA_FORMAT, fps_times_1million / 1000000, fps_times_1million % 1000000, width, height, interlaced, channels, rate, metabytes);
+	sprintf(metadata, AV_METADATA_FORMAT, fps_times_1million / 1000000, fps_times_1million % 1000000, width, height, interlaced, channels, rate);
 	err = chd_set_metadata(chd, AV_METADATA_TAG, 0, metadata, strlen(metadata) + 1);
 	if (err != CHDERR_NONE)
 	{
@@ -873,7 +845,7 @@ static int do_createav(int argc, char *argv[], int param)
 	cache[1] = 'h';
 	cache[2] = 'a';
 	cache[3] = 'v';
-	cache[4] = metabytes;
+	cache[4] = 0;
 	cache[5] = channels;
 	cache[6] = max_samples_per_frame >> 8;
 	cache[7] = max_samples_per_frame;
@@ -892,24 +864,6 @@ static int do_createav(int argc, char *argv[], int param)
 	{
 		/* progress */
 		progress(framenum == 0, "Compressing hunk %d/%d... (ratio=%d%%)  \r", framenum, header->totalhunks, (int)(100.0 * ratio));
-
-		/* read the metadata */
-		if (metabytes > 0)
-		{
-			memset(&cache[12], 0, metabytes);
-			if (meta != NULL && fgets(metadata, sizeof(metadata), meta) != NULL)
-			{
-				int metaoffs, stroffs, length = strlen(metadata);
-
-				for (metaoffs = stroffs = 0; metaoffs < metabytes && stroffs < length; metaoffs++, stroffs += 2)
-				{
-					int data;
-					if (sscanf(&metadata[stroffs], "%02X", &data) != 1)
-						break;
-					cache[12 + metaoffs] = data;
-				}
-			}
-		}
 
 		/* read the frame into its proper format in the cache */
 		avierr = read_avi_frame(avi, firstframe + framenum, cache, &videobitmap, interlaced, bytes_per_frame);
@@ -938,8 +892,6 @@ cleanup:
 		avi_close(avi);
 	if (chd != NULL)
 		chd_close(chd);
-	if (meta != NULL)
-		fclose(meta);
 	if (cache != NULL)
 		free(cache);
 	if (videobitmap.base != NULL)
@@ -1468,8 +1420,8 @@ cleanup:
 
 static int do_extractav(int argc, char *argv[], int param)
 {
-	int fps, fpsfrac, width, height, interlaced, channels, rate, metabytes, totalframes;
-	const char *inputfile, *metafile, *outputfile;
+	int fps, fpsfrac, width, height, interlaced, channels, rate, totalframes;
+	const char *inputfile, *outputfile;
 	int firstframe, numframes;
 	bitmap_t videobitmap = { 0 };
 	UINT32 fps_times_1million;
@@ -1479,26 +1431,23 @@ static int do_extractav(int argc, char *argv[], int param)
 	avi_movie_info info;
 	char metadata[256];
 	void *hunk = NULL;
-	FILE *meta = NULL;
 	avi_error avierr;
 	chd_error err;
 	int framenum;
 
-	/* require 5-7 args total */
-	if (argc < 5 || argc > 7)
+	/* require 4-6 args total */
+	if (argc < 4 || argc > 6)
 		return usage();
 
 	/* extract the data */
 	inputfile = argv[2];
 	outputfile = argv[3];
-	metafile = argv[4];
-	firstframe = (argc > 5) ? atoi(argv[5]) : 0;
-	numframes = (argc > 6) ? atoi(argv[6]) : 1000000;
+	firstframe = (argc > 4) ? atoi(argv[4]) : 0;
+	numframes = (argc > 5) ? atoi(argv[5]) : 1000000;
 
 	/* print some info */
 	printf("Input file:   %s\n", inputfile);
 	printf("Output file:  %s\n", outputfile);
-	printf("Meta file:    %s\n", (metafile == NULL) ? "(none)" : metafile);
 
 	/* get the header */
 	err = chd_open(inputfile, CHD_OPEN_READ, NULL, &chd);
@@ -1518,7 +1467,7 @@ static int do_extractav(int argc, char *argv[], int param)
 	}
 
 	/* extract the info */
-	if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate, &metabytes) != 8)
+	if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
 	{
 		fprintf(stderr, "Improperly formatted metadata\n");
 		err = CHDERR_INVALID_METADATA;
@@ -1554,14 +1503,10 @@ static int do_extractav(int argc, char *argv[], int param)
 	printf("Frame rate:   %d.%06d\n", fps_times_1million / 1000000, fps_times_1million % 1000000);
 	printf("Frame size:   %d x %d %s\n", width, height, interlaced ? "interlaced" : "non-interlaced");
 	printf("Audio:        %d channels at %d Hz\n", channels, rate);
-	printf("Metadata:     %d bytes/frame\n", metabytes);
 	printf("Total frames: %d (%02d:%02d:%02d)\n", totalframes,
 			(UINT32)((UINT64)totalframes * 1000000 / fps_times_1million / 60 / 60),
 			(UINT32)(((UINT64)totalframes * 1000000 / fps_times_1million / 60) % 60),
 			(UINT32)(((UINT64)totalframes * 1000000 / fps_times_1million) % 60));
-
-	if (metabytes > 0 && metafile == NULL)
-		fprintf(stderr, "Warning: per-frame metadata included but not extracted\n");
 
 	/* allocate memory to hold a hunk */
 	hunk = malloc(header->hunkbytes);
@@ -1595,19 +1540,6 @@ static int do_extractav(int argc, char *argv[], int param)
 		goto cleanup;
 	}
 
-	/* create the metadata file */
-	if (metafile != NULL && metabytes > 0)
-	{
-		meta = fopen(metafile, "w");
-		if (meta == NULL)
-		{
-			fprintf(stderr, "Error opening meta file '%s': %s\n", metafile, avi_error_string(avierr));
-			err = CHDERR_CANT_CREATE_FILE;
-			goto cleanup;
-		}
-		fprintf(meta, "chdmeta %d\n", metabytes);
-	}
-
 	/* loop over hunks, reading and writing */
 	for (framenum = 0; framenum < numframes; framenum++)
 	{
@@ -1620,15 +1552,6 @@ static int do_extractav(int argc, char *argv[], int param)
 		{
 			fprintf(stderr, "Error reading hunk %d from CHD file: %s\n", firstframe + framenum, error_string(err));
 			goto cleanup;
-		}
-
-		/* write the metadata */
-		if (meta != NULL)
-		{
-			int metaoffs;
-			for (metaoffs = 0; metaoffs < metabytes; metaoffs++)
-				fprintf(meta, "%02X", ((UINT8 *)hunk)[12 + metaoffs]);
-			fprintf(meta, "\n");
 		}
 
 		/* write the hunk to the file */
@@ -1652,13 +1575,8 @@ cleanup:
 		free(videobitmap.base);
 	if (chd != NULL)
 		chd_close(chd);
-	if (meta != NULL)
-		fclose(meta);
 	if (err != CHDERR_NONE)
-	{
 		osd_rmfile(outputfile);
-		osd_rmfile(metafile);
-	}
 	return (err != CHDERR_NONE);
 }
 

@@ -43,11 +43,10 @@ enum
 #define LASERDISC_OUTPUT_LINES		4
 
 /* laserdisc field codes */
-#define LASERDISC_CODE_FRAME_FLAGS	0
-#define LASERDISC_CODE_WHITE_FLAG	1
-#define LASERDISC_CODE_LINE16		2
-#define LASERDISC_CODE_LINE17		3
-#define LASERDISC_CODE_LINE18		4
+#define LASERDISC_CODE_WHITE_FLAG	0
+#define LASERDISC_CODE_LINE16		1
+#define LASERDISC_CODE_LINE17		2
+#define LASERDISC_CODE_LINE18		3
 
 /* device configuration */
 enum

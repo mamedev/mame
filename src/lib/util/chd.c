@@ -2827,7 +2827,7 @@ static chd_error av_codec_config(chd_file *chd, int param, void *config)
 
 static chd_error av_codec_postinit(chd_file *chd)
 {
-	int fps, fpsfrac, width, height, interlaced, channels, rate, metabytes;
+	int fps, fpsfrac, width, height, interlaced, channels, rate;
 	UINT32 fps_times_1million, max_samples_per_frame, bytes_per_frame;
 	av_codec_data *data = chd->codecdata;
 	char metadata[256];
@@ -2843,13 +2843,13 @@ static chd_error av_codec_postinit(chd_file *chd)
 		return err;
 
 	/* extract the info */
-	if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate, &metabytes) != 8)
+	if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
 		return CHDERR_INVALID_METADATA;
 
 	/* compute the bytes per frame */
 	fps_times_1million = fps * 1000000 + fpsfrac;
 	max_samples_per_frame = ((UINT64)rate * 1000000 + fps_times_1million - 1) / fps_times_1million;
-	bytes_per_frame = 12 + metabytes + channels * max_samples_per_frame * 2 + width * height * 2;
+	bytes_per_frame = 12 + channels * max_samples_per_frame * 2 + width * height * 2;
 	if (bytes_per_frame > chd->header.hunkbytes)
 		return CHDERR_INVALID_METADATA;
 
