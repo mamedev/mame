@@ -225,6 +225,7 @@ struct _laserdisc_state
 
 	/* video data */
 	bitmap_t *			videoframe[3];			/* currently cached frames */
+	bitmap_t *			videovisframe[3];		/* wrapper around videoframe with only visible lines */
 	UINT8				videofields[3];			/* number of fields in each frame */
 	UINT32				videoframenum[3];		/* frame number contained in each frame */
 	UINT8				videoindex;				/* index of the current video buffer */
@@ -952,7 +953,7 @@ UINT32 laserdisc_get_video(const device_config *device, bitmap_t **bitmap)
 	}
 	else
 	{
-		*bitmap = ld->videoframe[frameindex];
+		*bitmap = ld->videovisframe[frameindex];
 		return ld->videoframenum[frameindex];
 	}
 }
@@ -1450,6 +1451,10 @@ static DEVICE_START( laserdisc )
 	for (index = 0; index < ARRAY_LENGTH(ld->videofields); index++)
 	{
 		ld->videoframe[index] = auto_bitmap_alloc(width, height * 2, BITMAP_FORMAT_YUY16);
+		ld->videovisframe[index] = auto_malloc(sizeof(*ld->videovisframe[index]));
+		*ld->videovisframe[index] = *ld->videoframe[index];
+		ld->videovisframe[index]->base = BITMAP_ADDR16(ld->videovisframe[index], 44, 0);
+		ld->videovisframe[index]->height -= 44;
 		fillbitmap_yuy16(ld->videoframe[index], 40, 109, 240);
 	}
 	ld->emptyframe = auto_bitmap_alloc(width, height * 2, BITMAP_FORMAT_YUY16);
