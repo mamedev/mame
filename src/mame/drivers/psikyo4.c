@@ -215,7 +215,7 @@ static READ32_HANDLER( ps4_eeprom_r )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		return (input_port_read(machine, "JP4")<<16) | ((eeprom_read_bit() << 20)); /* EEPROM */
+		return ((input_port_read(machine, "JP4")&0x3)<<16) | ((eeprom_read_bit() << 20)); /* EEPROM */
 	}
 
 //  logerror("Unk EEPROM read mask %x\n", mem_mask);
