@@ -2451,7 +2451,7 @@ GAME( 1991, svolly91, pspikes,  pspikes,  pspikes,  0, ROT0,   "Video System Co.
 GAME( 1991, pspikesb, pspikes,  pspikesb, pspikesb, 0, ROT0,   "bootleg",          "Power Spikes (bootleg)", GAME_NO_COCKTAIL )
 GAME( 1991, spikes91, pspikes,  spikes91, pspikes,  0, ROT0,   "bootleg",          "1991 Spikes (Italian bootleg)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
 GAME( 1991, pspikesc, pspikes,  pspikesc, pspikesc, 0, ROT0,   "bootleg",          "Power Spikes (China)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
-GAME( 1991, karatblz, 0,        karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (World?)", GAME_NO_COCKTAIL )
+GAME( 1991, karatblz, 0,        karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (World)", GAME_NO_COCKTAIL )
 GAME( 1991, karatblu, karatblz, karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (US)", GAME_NO_COCKTAIL )
 GAME( 1991, karatblj, karatblz, karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (Japan)", GAME_NO_COCKTAIL )
 GAME( 1991, turbofrc, 0,        turbofrc, turbofrc, 0, ROT270, "Video System Co.", "Turbo Force", GAME_NO_COCKTAIL )
