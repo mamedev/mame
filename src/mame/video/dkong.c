@@ -575,7 +575,41 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	dkong_state *state = machine->driver_data;
 	int offs;
 
-	/* Draw the sprites. */
+	/* Draw the sprites. There are two pecularities which have been mentioned by
+	 * a Donkey Kong II author at CAX 2008: 
+	 * 1) On real hardware, sprites wrap around from the right to the left instead 
+	 *    of clipping.
+	 * 2) On real hardware, there is a limit of 16 sprites per scanline.  
+	 *    Sprites after the 16th (starting from the left) simply don't show.
+	 * 
+	 * 1. is being handled in the code below. 
+	 * FIXME: 2. would require rendering one scanline at a time and counting the
+	 * sprites on the scanline. This is in line with the real hardware which buffers
+	 * the sprite data for one scanline. The ram is 64x9 and a sprite takes 4 bytes.
+	 * ==> 16 sprites per scanline.
+	 * 
+	 * TODO: 9th bit is not understood right now.
+	 *
+	 * This is quite different from galaxian. The dkong hardware updates sprites
+	 * only once every frame by dma. The number of sprites can not be processed
+	 * directly, Thus the preselection. The buffering takes place 2 scanlines 
+	 * before the sprite is rendered.
+	 * 
+	 * A sprite will be drawn:
+	 * a) FlipQ = 1 : (sprite_y + 0xF9 + (scanline ^ 0xFF)) & 0xF0 == 0xF0
+	 * b) FlipQ = 0 : (sprite_y + 0xF7 + scanline) & 0xF0 == 0xF0
+	 * 
+	 * FlipQ = 1 ("Normal Play"):
+	 * 
+	 * sprite_y = 0x20
+	 * 
+	 * scanline
+	 * 0x10, 0xEF, 0x208, 0x00
+	 * 0x18, 0xE7, 0x200, 0x00
+	 * 0x19, 0xE6, 0x1FF, 0xF0
+	 * 0x20, 0xDF, 0x1F8, 0xF0
+	 * 
+	 */
 	for (offs = state->sprite_bank<<9;offs < (state->sprite_bank<<9) + 0x200 /* sprite_ram_size */; offs += 4)
 	{
 		if (state->sprite_ram[offs])
