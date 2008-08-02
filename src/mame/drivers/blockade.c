@@ -109,27 +109,17 @@ static WRITE8_HANDLER( blockade_coin_latch_w )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_ROM) AM_MIRROR(0x6000)
-    AM_RANGE(0x8000, 0x83ff) AM_READ(SMH_RAM) AM_MIRROR(0x6c00)
-    AM_RANGE(0x9000, 0x90ff) AM_READ(SMH_RAM) AM_MIRROR(0x6f00)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+    AM_RANGE(0x0000, 0x07ff) AM_ROM AM_MIRROR(0x6000)
+    AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(blockade_videoram_w) AM_BASE(&videoram) AM_MIRROR(0x6c00)
+    AM_RANGE(0x9000, 0x90ff) AM_RAM AM_MIRROR(0x6f00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_ROM) AM_MIRROR(0x6000)
-    AM_RANGE(0x8000, 0x83ff) AM_WRITE(blockade_videoram_w) AM_BASE(&videoram) AM_MIRROR(0x6c00)
-    AM_RANGE(0x9000, 0x90ff) AM_WRITE(SMH_RAM) AM_MIRROR(0x6f00)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-    AM_RANGE(0x01, 0x01) AM_READ(blockade_input_port_0_r)
+static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
+    AM_RANGE(0x01, 0x01) AM_READWRITE(blockade_input_port_0_r, blockade_coin_latch_w)
     AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1")
-    AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-    AM_RANGE(0x01, 0x01) AM_WRITE(blockade_coin_latch_w)
     AM_RANGE(0x02, 0x02) AM_WRITE(blockade_sound_freq_w)
+    AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2")
     AM_RANGE(0x04, 0x04) AM_WRITE(blockade_env_on_w)
     AM_RANGE(0x08, 0x08) AM_WRITE(blockade_env_off_w)
 ADDRESS_MAP_END
@@ -450,8 +440,8 @@ static MACHINE_DRIVER_START( blockade )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", 8080, 2079000)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_IO_MAP(main_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", blockade_interrupt)
 
 	/* video hardware */

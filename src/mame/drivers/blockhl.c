@@ -66,44 +66,31 @@ static WRITE8_HANDLER( blockhl_sh_irqtrigger_w )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(blockhl_sh_irqtrigger_w)
+	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW3")
 	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("P1")
 	AM_RANGE(0x1f96, 0x1f96) AM_READ_PORT("P2")
 	AM_RANGE(0x1f97, 0x1f97) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1f98, 0x1f98) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0000, 0x3fff) AM_READ(K052109_051960_r)
-	AM_RANGE(0x4000, 0x57ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x5800, 0x5fff) AM_READ(bankedram_r)
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(K052109_051960_r, K052109_051960_w)
+	AM_RANGE(0x4000, 0x57ff) AM_RAM
+	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(&ram)
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(blockhl_sh_irqtrigger_w)
-	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(K052109_051960_w)
-	AM_RANGE(0x4000, 0x57ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x5800, 0x5fff) AM_WRITE(bankedram_w) AM_BASE(&ram)
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc001, 0xc001) AM_READ(YM2151_status_port_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0xc001, 0xc001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0xe00c, 0xe00d) AM_WRITE(SMH_NOP)		/* leftover from missing 007232? */
 ADDRESS_MAP_END
+
 
 /***************************************************************************
 
@@ -209,11 +196,11 @@ static MACHINE_DRIVER_START( blockhl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", KONAMI,3000000)		/* Konami custom 052526 */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", blockhl_interrupt)
 
 	MDRV_CPU_ADD("audio", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
 	MDRV_MACHINE_RESET(blockhl)
 

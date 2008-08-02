@@ -138,47 +138,34 @@ static READ8_HANDLER( bombjack_soundlatch_r )
 }
 
 
-
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x97ff) AM_READ(SMH_RAM)	/* including video and color RAM */
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("P1")
-	AM_RANGE(0xb001, 0xb001) AM_READ_PORT("P2")
-	AM_RANGE(0xb002, 0xb002) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb003, 0xb003) AM_READ(SMH_NOP)	/* watchdog reset? */
-	AM_RANGE(0xb004, 0xb004) AM_READ_PORT("DSW1")
-	AM_RANGE(0xb005, 0xb005) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x93ff) AM_WRITE(bombjack_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_WRITE(bombjack_colorram_w) AM_BASE(&colorram)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x8fff) AM_RAM
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bombjack_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(bombjack_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x9820, 0x987f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9a00, 0x9a00) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x9c00, 0x9cff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
 	AM_RANGE(0x9e00, 0x9e00) AM_WRITE(bombjack_background_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("P1")
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xb001, 0xb001) AM_READ_PORT("P2")
+	AM_RANGE(0xb002, 0xb002) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xb003, 0xb003) AM_READ(SMH_NOP)	/* watchdog reset? */
+	AM_RANGE(0xb004, 0xb004) AM_READ_PORT("DSW1")
 	AM_RANGE(0xb004, 0xb004) AM_WRITE(bombjack_flipscreen_w)
+	AM_RANGE(0xb005, 0xb005) AM_READ_PORT("DSW2")
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(bombjack_soundlatch_w)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bombjack_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ(bombjack_soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bombjack_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( bombjack_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( audio_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_write_port_0_w)
@@ -323,10 +310,10 @@ static const gfx_layout spritelayout2 =
 };
 
 static GFXDECODE_START( bombjack )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout1,      0, 16 )	/* characters */
-	GFXDECODE_ENTRY( "gfx2", 0x0000, charlayout2,      0, 16 )	/* background tiles */
-	GFXDECODE_ENTRY( "gfx3", 0x0000, spritelayout1,    0, 16 )	/* normal sprites */
-	GFXDECODE_ENTRY( "gfx3", 0x1000, spritelayout2,    0, 16 )	/* large sprites */
+	GFXDECODE_ENTRY( "chars",   0x0000, charlayout1,      0, 16 )	/* characters */
+	GFXDECODE_ENTRY( "tiles",   0x0000, charlayout2,      0, 16 )	/* background tiles */
+	GFXDECODE_ENTRY( "sprites", 0x0000, spritelayout1,    0, 16 )	/* normal sprites */
+	GFXDECODE_ENTRY( "sprites", 0x1000, spritelayout2,    0, 16 )	/* large sprites */
 GFXDECODE_END
 
 
@@ -336,12 +323,12 @@ static MACHINE_DRIVER_START( bombjack )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audio", Z80, 3072000)	/* 3.072 MHz????? */
-	MDRV_CPU_PROGRAM_MAP(bombjack_sound_readmem,bombjack_sound_writemem)
-	MDRV_CPU_IO_MAP(0,bombjack_sound_writeport)
+	MDRV_CPU_PROGRAM_MAP(audio_map,0)
+	MDRV_CPU_IO_MAP(audio_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_MACHINE_START(bombjack)
@@ -392,17 +379,17 @@ ROM_START( bombjack )
 	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for sound board */
 	ROM_LOAD( "01_h03t.bin",  0x0000, 0x2000, CRC(8407917d) SHA1(318face9f7a7ab6c7eeac773995040425e780aaf) )
 
-	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x3000, "chars", ROMREGION_DISPOSE )
 	ROM_LOAD( "03_e08t.bin",  0x0000, 0x1000, CRC(9f0470d5) SHA1(94ef52ef47b4399a03528fe3efeac9c1d6983446) )	/* chars */
 	ROM_LOAD( "04_h08t.bin",  0x1000, 0x1000, CRC(81ec12e6) SHA1(e29ba193f21aa898499187603b25d2e226a07c7b) )
 	ROM_LOAD( "05_k08t.bin",  0x2000, 0x1000, CRC(e87ec8b1) SHA1(a66808ef2d62fca2854396898b86bac9be5f17a3) )
 
-	ROM_REGION( 0x6000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, "tiles", ROMREGION_DISPOSE )
 	ROM_LOAD( "06_l08t.bin",  0x0000, 0x2000, CRC(51eebd89) SHA1(515128a3971fcb97b60c5b6bdd2b03026aec1921) )	/* background tiles */
 	ROM_LOAD( "07_n08t.bin",  0x2000, 0x2000, CRC(9dd98e9d) SHA1(6db6006a6e20ff7c243d88293ca53681c4703ea5) )
 	ROM_LOAD( "08_r08t.bin",  0x4000, 0x2000, CRC(3155ee7d) SHA1(e7897dca4c145f10b7d975b8ef0e4d8aa9354c25) )
 
-	ROM_REGION( 0x6000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, "sprites", ROMREGION_DISPOSE )
 	ROM_LOAD( "16_m07b.bin",  0x0000, 0x2000, CRC(94694097) SHA1(de71bcd67f97d05527f2504fc8430be333fb9ec2) )	/* sprites */
 	ROM_LOAD( "15_l07b.bin",  0x2000, 0x2000, CRC(013f58f2) SHA1(20c64593ab9fcb04cefbce0cd5d17ce3ff26441b) )
 	ROM_LOAD( "14_j07b.bin",  0x4000, 0x2000, CRC(101c858d) SHA1(ed1746c15cdb04fae888601d940183d5c7702282) )
@@ -422,17 +409,17 @@ ROM_START( bombjac2 )
 	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for sound board */
 	ROM_LOAD( "01_h03t.bin",  0x0000, 0x2000, CRC(8407917d) SHA1(318face9f7a7ab6c7eeac773995040425e780aaf) )
 
-	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x3000, "chars", ROMREGION_DISPOSE )
 	ROM_LOAD( "03_e08t.bin",  0x0000, 0x1000, CRC(9f0470d5) SHA1(94ef52ef47b4399a03528fe3efeac9c1d6983446) )	/* chars */
 	ROM_LOAD( "04_h08t.bin",  0x1000, 0x1000, CRC(81ec12e6) SHA1(e29ba193f21aa898499187603b25d2e226a07c7b) )
 	ROM_LOAD( "05_k08t.bin",  0x2000, 0x1000, CRC(e87ec8b1) SHA1(a66808ef2d62fca2854396898b86bac9be5f17a3) )
 
-	ROM_REGION( 0x6000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, "tiles", ROMREGION_DISPOSE )
 	ROM_LOAD( "06_l08t.bin",  0x0000, 0x2000, CRC(51eebd89) SHA1(515128a3971fcb97b60c5b6bdd2b03026aec1921) )	/* background tiles */
 	ROM_LOAD( "07_n08t.bin",  0x2000, 0x2000, CRC(9dd98e9d) SHA1(6db6006a6e20ff7c243d88293ca53681c4703ea5) )
 	ROM_LOAD( "08_r08t.bin",  0x4000, 0x2000, CRC(3155ee7d) SHA1(e7897dca4c145f10b7d975b8ef0e4d8aa9354c25) )
 
-	ROM_REGION( 0x6000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, "sprites", ROMREGION_DISPOSE )
 	ROM_LOAD( "16_m07b.bin",  0x0000, 0x2000, CRC(94694097) SHA1(de71bcd67f97d05527f2504fc8430be333fb9ec2) )	/* sprites */
 	ROM_LOAD( "15_l07b.bin",  0x2000, 0x2000, CRC(013f58f2) SHA1(20c64593ab9fcb04cefbce0cd5d17ce3ff26441b) )
 	ROM_LOAD( "14_j07b.bin",  0x4000, 0x2000, CRC(101c858d) SHA1(ed1746c15cdb04fae888601d940183d5c7702282) )

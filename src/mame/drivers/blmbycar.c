@@ -113,45 +113,31 @@ static READ16_HANDLER( blmbycar_opt_wheel_r )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( blmbycar_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM					)	// ROM
-	AM_RANGE(0xfec000, 0xfeffff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0x200000, 0x2005ff) AM_READ(SMH_RAM					)	// Palette
-	AM_RANGE(0x200600, 0x203fff) AM_READ(SMH_RAM					)	//
-	AM_RANGE(0x204000, 0x2045ff) AM_READ(SMH_RAM					)	// Palette
-	AM_RANGE(0x204600, 0x207fff) AM_READ(SMH_RAM					)	//
-	AM_RANGE(0x104000, 0x105fff) AM_READ(SMH_RAM					)	// Layer 1
-	AM_RANGE(0x106000, 0x107fff) AM_READ(SMH_RAM					)	// Layer 0
-	AM_RANGE(0x440000, 0x441fff) AM_READ(SMH_RAM					)	//
-	AM_RANGE(0x444000, 0x445fff) AM_READ(SMH_RAM					)	// Sprites (size?)
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x700004, 0x700005) AM_READ(blmbycar_opt_wheel_r		)	// Wheel (optical)
-	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("UNK")
-	AM_RANGE(0x700008, 0x700009) AM_READ(blmbycar_pot_wheel_r		)	// Wheel (potentiometer)
-	AM_RANGE(0x70000e, 0x70000f) AM_READ(OKIM6295_status_0_lsb_r	)	// Sound
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( blmbycar_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM								)	// ROM
-	AM_RANGE(0xfec000, 0xfeffff) AM_WRITE(SMH_RAM								)	// RAM
-	AM_RANGE(0x100000, 0x103fff) AM_WRITE(SMH_RAM								)	//
-	AM_RANGE(0x104000, 0x105fff) AM_WRITE(blmbycar_vram_1_w) AM_BASE(&blmbycar_vram_1	)	// Layer 1
-	AM_RANGE(0x106000, 0x107fff) AM_WRITE(blmbycar_vram_0_w) AM_BASE(&blmbycar_vram_0	)	// Layer 0
-	AM_RANGE(0x108000, 0x10bfff) AM_WRITE(SMH_RAM								)	//
-	AM_RANGE(0x10c000, 0x10c003) AM_WRITE(SMH_RAM) AM_BASE(&blmbycar_scroll_1			)	// Scroll 1
-	AM_RANGE(0x10c004, 0x10c007) AM_WRITE(SMH_RAM) AM_BASE(&blmbycar_scroll_0			)	// Scroll 0
-	AM_RANGE(0x200000, 0x2005ff) AM_WRITE(blmbycar_palette_w					)	// Palette
-	AM_RANGE(0x200600, 0x203fff) AM_WRITE(SMH_RAM								)	//
-	AM_RANGE(0x204000, 0x2045ff) AM_WRITE(blmbycar_palette_w) AM_BASE(&paletteram16		)	// Palette
-	AM_RANGE(0x204600, 0x207fff) AM_WRITE(SMH_RAM								)	//
-	AM_RANGE(0x440000, 0x441fff) AM_WRITE(SMH_RAM								)	//
-	AM_RANGE(0x444000, 0x445fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites (size?)
-	AM_RANGE(0x70000a, 0x70000b) AM_WRITE(SMH_NOP								)	// ? Wheel
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(blmbycar_okibank_w					)	// Sound
-	AM_RANGE(0x70000e, 0x70000f) AM_WRITE(OKIM6295_data_0_lsb_w					)	//
-	AM_RANGE(0x70006a, 0x70006b) AM_WRITE(blmbycar_pot_wheel_reset_w			)	// Wheel (potentiometer)
-	AM_RANGE(0x70007a, 0x70007b) AM_WRITE(blmbycar_pot_wheel_shift_w			)	//
+static ADDRESS_MAP_START( blmbycar_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0xfec000, 0xfeffff) AM_RAM
+	AM_RANGE(0x100000, 0x103fff) AM_WRITE(SMH_RAM											)	//
+	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(blmbycar_vram_1_w) AM_BASE(&blmbycar_vram_1	)	// Layer 1
+	AM_RANGE(0x106000, 0x107fff) AM_RAM_WRITE(blmbycar_vram_0_w) AM_BASE(&blmbycar_vram_0	)	// Layer 0
+	AM_RANGE(0x108000, 0x10bfff) AM_WRITE(SMH_RAM											)	//
+	AM_RANGE(0x10c000, 0x10c003) AM_WRITE(SMH_RAM) AM_BASE(&blmbycar_scroll_1				)	// Scroll 1
+	AM_RANGE(0x10c004, 0x10c007) AM_WRITE(SMH_RAM) AM_BASE(&blmbycar_scroll_0				)	// Scroll 0
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(blmbycar_palette_w							)	// Palette
+	AM_RANGE(0x200600, 0x203fff) AM_RAM
+	AM_RANGE(0x204000, 0x2045ff) AM_RAM_WRITE(blmbycar_palette_w) AM_BASE(&paletteram16		)	// Palette
+	AM_RANGE(0x204600, 0x207fff) AM_RAM
+	AM_RANGE(0x440000, 0x441fff) AM_RAM
+	AM_RANGE(0x444000, 0x445fff) AM_RAM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites (size?)
+	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW"											)
+	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2"										)
+	AM_RANGE(0x700004, 0x700005) AM_READ(blmbycar_opt_wheel_r								)	// Wheel (optical)
+	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("UNK"											)
+	AM_RANGE(0x700008, 0x700009) AM_READ(blmbycar_pot_wheel_r								)	// Wheel (potentiometer)
+	AM_RANGE(0x70000a, 0x70000b) AM_WRITE(SMH_NOP											)	// ? Wheel
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(blmbycar_okibank_w								)	// Sound
+	AM_RANGE(0x70000e, 0x70000f) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)	// Sound
+	AM_RANGE(0x70006a, 0x70006b) AM_WRITE(blmbycar_pot_wheel_reset_w						)	// Wheel (potentiometer)
+	AM_RANGE(0x70007a, 0x70007b) AM_WRITE(blmbycar_pot_wheel_shift_w						)	//
 ADDRESS_MAP_END
 
 static READ16_HANDLER( waterball_unk_r )
@@ -163,42 +149,28 @@ static READ16_HANDLER( waterball_unk_r )
 	return retvalue;
 }
 
-static ADDRESS_MAP_START( watrball_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM					)	// ROM
-	AM_RANGE(0xfec000, 0xfeffff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0x200000, 0x2005ff) AM_READ(SMH_RAM					)	// Palette
-	AM_RANGE(0x200600, 0x203fff) AM_READ(SMH_RAM					)	//
-	AM_RANGE(0x204000, 0x2045ff) AM_READ(SMH_RAM					)	// Palette
-	AM_RANGE(0x204600, 0x207fff) AM_READ(SMH_RAM					)	//
-	AM_RANGE(0x104000, 0x105fff) AM_READ(SMH_RAM					)	// Layer 1
-	AM_RANGE(0x106000, 0x107fff) AM_READ(SMH_RAM					)	// Layer 0
-	AM_RANGE(0x440000, 0x441fff) AM_READ(SMH_RAM					)	//
-	AM_RANGE(0x444000, 0x445fff) AM_READ(SMH_RAM					)	// Sprites (size?)
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x700006, 0x700007) AM_READ(SMH_NOP	            	)   // read
-	AM_RANGE(0x700008, 0x700009) AM_READ(waterball_unk_r	     	)   // 0x0008 must toggle
-	AM_RANGE(0x70000e, 0x70000f) AM_READ(OKIM6295_status_0_lsb_r	)	// Sound
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( watrball_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM								)	// ROM
-	AM_RANGE(0xfec000, 0xfeffff) AM_WRITE(SMH_RAM								)	// RAM
-	AM_RANGE(0x100000, 0x103fff) AM_WRITE(SMH_RAM								)	//
-	AM_RANGE(0x104000, 0x105fff) AM_WRITE(blmbycar_vram_1_w) AM_BASE(&blmbycar_vram_1	)	// Layer 1
-	AM_RANGE(0x106000, 0x107fff) AM_WRITE(blmbycar_vram_0_w) AM_BASE(&blmbycar_vram_0	)	// Layer 0
-	AM_RANGE(0x108000, 0x10bfff) AM_WRITE(SMH_RAM								)	//
-	AM_RANGE(0x10c000, 0x10c003) AM_WRITE(SMH_RAM) AM_BASE(&blmbycar_scroll_1			)	// Scroll 1
-	AM_RANGE(0x10c004, 0x10c007) AM_WRITE(SMH_RAM) AM_BASE(&blmbycar_scroll_0			)	// Scroll 0
-	AM_RANGE(0x200000, 0x2005ff) AM_WRITE(blmbycar_palette_w					)	// Palette
-	AM_RANGE(0x200600, 0x203fff) AM_WRITE(SMH_RAM								)	//
-	AM_RANGE(0x204000, 0x2045ff) AM_WRITE(blmbycar_palette_w) AM_BASE(&paletteram16		)	// Palette
-	AM_RANGE(0x204600, 0x207fff) AM_WRITE(SMH_RAM								)	//
-	AM_RANGE(0x440000, 0x441fff) AM_WRITE(SMH_RAM								)	//
-	AM_RANGE(0x444000, 0x445fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites (size?)
-	AM_RANGE(0x70000a, 0x70000b) AM_WRITE(SMH_NOP								)	// ?? busy
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(blmbycar_okibank_w					)	// Sound
-	AM_RANGE(0x70000e, 0x70000f) AM_WRITE(OKIM6295_data_0_lsb_w					)	//
+static ADDRESS_MAP_START( watrball_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0xfec000, 0xfeffff) AM_RAM
+	AM_RANGE(0x100000, 0x103fff) AM_WRITE(SMH_RAM											)	//
+	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(blmbycar_vram_1_w) AM_BASE(&blmbycar_vram_1	)	// Layer 1
+	AM_RANGE(0x106000, 0x107fff) AM_RAM_WRITE(blmbycar_vram_0_w) AM_BASE(&blmbycar_vram_0	)	// Layer 0
+	AM_RANGE(0x108000, 0x10bfff) AM_WRITE(SMH_RAM											)	//
+	AM_RANGE(0x10c000, 0x10c003) AM_WRITE(SMH_RAM) AM_BASE(&blmbycar_scroll_1				)	// Scroll 1
+	AM_RANGE(0x10c004, 0x10c007) AM_WRITE(SMH_RAM) AM_BASE(&blmbycar_scroll_0				)	// Scroll 0
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(blmbycar_palette_w							)	// Palette
+	AM_RANGE(0x200600, 0x203fff) AM_RAM
+	AM_RANGE(0x204000, 0x2045ff) AM_RAM_WRITE(blmbycar_palette_w) AM_BASE(&paletteram16		)	// Palette
+	AM_RANGE(0x204600, 0x207fff) AM_RAM
+	AM_RANGE(0x440000, 0x441fff) AM_RAM
+	AM_RANGE(0x444000, 0x445fff) AM_RAM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites (size?)
+	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW"											)
+	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2"										)
+	AM_RANGE(0x700006, 0x700007) AM_READ(SMH_NOP	            							)   // read
+	AM_RANGE(0x700008, 0x700009) AM_READ(waterball_unk_r	     							)   // 0x0008 must toggle
+	AM_RANGE(0x70000a, 0x70000b) AM_WRITE(SMH_NOP											)	// ?? busy
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(blmbycar_okibank_w								)	// Sound
+	AM_RANGE(0x70000e, 0x70000f) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)	//
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -367,7 +339,7 @@ static const gfx_layout layout_16x16x4 =
 
 /* Layers both use the first $20 color codes. Sprites the next $10 */
 static GFXDECODE_START( blmbycar )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x0, 0x30 ) // [0] Layers + Sprites
+	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 0x0, 0x30 ) // [0] Layers + Sprites
 GFXDECODE_END
 
 
@@ -384,7 +356,7 @@ static MACHINE_DRIVER_START( blmbycar )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M68000, 10000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(blmbycar_readmem,blmbycar_writemem)
+	MDRV_CPU_PROGRAM_MAP(blmbycar_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	/* video hardware */
@@ -414,7 +386,7 @@ static MACHINE_DRIVER_START( watrball )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M68000, 10000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(watrball_readmem,watrball_writemem)
+	MDRV_CPU_PROGRAM_MAP(watrball_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	/* video hardware */
@@ -467,7 +439,7 @@ ROM_START( blmbycar )
 	ROM_LOAD16_BYTE( "bcrom4.bin", 0x000000, 0x080000, CRC(06d490ba) SHA1(6d113561b474bf613c6b91c9525a52025ae65ab7) )
 	ROM_LOAD16_BYTE( "bcrom6.bin", 0x000001, 0x080000, CRC(33aca664) SHA1(04fff492654d3edac62e9d35808e5946bcc78cbb) )
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x200000, "sprites", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "bc_rom7",   0x000000, 0x080000, CRC(e55ca79b) SHA1(4453a6ae0518832f437ab701c28cb2f32920f8ba) )
 	ROM_LOAD( "bc_rom8",   0x080000, 0x080000, CRC(cdf38c96) SHA1(3273c29b6a01a7296d06fc653120f8c615195d2c) )
 	ROM_LOAD( "bc_rom9",   0x100000, 0x080000, CRC(0337ab3d) SHA1(18c72cd640c7b599390dffaeb670f5832202bf06) )
@@ -484,7 +456,7 @@ ROM_START( blmbycau )
 	ROM_LOAD16_BYTE( "bc_rom4", 0x000000, 0x080000, CRC(76f054a2) SHA1(198efd152b13033e5249119ca48b9e0f6351b0b9) )
 	ROM_LOAD16_BYTE( "bc_rom6", 0x000001, 0x080000, CRC(2570b4c5) SHA1(706465950023a6ef7c85ceb9c76246d7556b3859) )
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x200000, "sprites", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "bc_rom7",   0x000000, 0x080000, CRC(e55ca79b) SHA1(4453a6ae0518832f437ab701c28cb2f32920f8ba) )
 	ROM_LOAD( "bc_rom8",   0x080000, 0x080000, CRC(cdf38c96) SHA1(3273c29b6a01a7296d06fc653120f8c615195d2c) )
 	ROM_LOAD( "bc_rom9",   0x100000, 0x080000, CRC(0337ab3d) SHA1(18c72cd640c7b599390dffaeb670f5832202bf06) )
@@ -517,7 +489,7 @@ ROM_START( watrball )
 	ROM_LOAD16_BYTE( "rom4.bin", 0x000000, 0x020000, CRC(bfbfa720) SHA1(d6d14c0ba545eb7adee7190da2d3db1c6dd00d75) )
 	ROM_LOAD16_BYTE( "rom6.bin", 0x000001, 0x020000, CRC(acff9b01) SHA1(b85671bcc4f03fdf05eb1c9b5d4143e33ec1d7db) )
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x200000, "sprites", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "rom7.bin",   0x000000, 0x080000, CRC(e7e5c311) SHA1(5af1a666bf23c5505d120d81fb942f5c49341861) )
 	ROM_LOAD( "rom8.bin",   0x080000, 0x080000, CRC(fd27ce6e) SHA1(a472a8cc25818427d2870518649780146e51835b) )
 	ROM_LOAD( "rom9.bin",   0x100000, 0x080000, CRC(122cc0ad) SHA1(27cdb19fa082089e47c5cdb44742cfd93aa23a00) )

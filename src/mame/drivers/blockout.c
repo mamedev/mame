@@ -45,48 +45,31 @@ static WRITE16_HANDLER( blockout_sound_command_w )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P1")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P2")
 	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x100006, 0x100007) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW2")
-	AM_RANGE(0x180000, 0x1bffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1d4000, 0x1dffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1f4000, 0x1fffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x200000, 0x207fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x208000, 0x21ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x280200, 0x2805ff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x100014, 0x100015) AM_WRITE(blockout_sound_command_w)
 	AM_RANGE(0x100016, 0x100017) AM_WRITE(SMH_NOP)	/* don't know, maybe reset sound CPU */
-	AM_RANGE(0x180000, 0x1bffff) AM_WRITE(blockout_videoram_w) AM_BASE(&blockout_videoram)
-	AM_RANGE(0x1d4000, 0x1dffff) AM_WRITE(SMH_RAM)	/* work RAM */
-	AM_RANGE(0x1f4000, 0x1fffff) AM_WRITE(SMH_RAM)	/* work RAM */
-	AM_RANGE(0x200000, 0x207fff) AM_WRITE(SMH_RAM) AM_BASE(&blockout_frontvideoram)
-	AM_RANGE(0x208000, 0x21ffff) AM_WRITE(SMH_RAM)	/* ??? */
+	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_BASE(&blockout_videoram)
+	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM	/* work RAM */
+	AM_RANGE(0x1f4000, 0x1fffff) AM_RAM	/* work RAM */
+	AM_RANGE(0x200000, 0x207fff) AM_RAM_WRITE(SMH_RAM) AM_BASE(&blockout_frontvideoram)
+	AM_RANGE(0x208000, 0x21ffff) AM_RAM	/* ??? */
 	AM_RANGE(0x280002, 0x280003) AM_WRITE(blockout_frontcolor_w)
-	AM_RANGE(0x280200, 0x2805ff) AM_WRITE(blockout_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_BASE(&paletteram16)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8801, 0x8801) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0x9800, 0x9800) AM_READ(OKIM6295_status_0_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x8801, 0x8801) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0x8801, 0x8801) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0x9800, 0x9800) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 
@@ -201,11 +184,11 @@ static MACHINE_DRIVER_START( blockout )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M68000, 10000000)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(blockout_interrupt,2)
 
 	MDRV_CPU_ADD("audio", Z80, 3579545)	/* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

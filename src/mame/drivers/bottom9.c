@@ -130,53 +130,35 @@ static WRITE8_HANDLER( sound_bank_w )
 }
 
 
-
-static ADDRESS_MAP_START( bottom9_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(bottom9_bankedram1_r)
-	AM_RANGE(0x1fd0, 0x1fd0) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1fd1, 0x1fd1) AM_READ_PORT("P1")
-	AM_RANGE(0x1fd2, 0x1fd2) AM_READ_PORT("P2")
-	AM_RANGE(0x1fd3, 0x1fd3) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1fe0, 0x1fe0) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2000, 0x27ff) AM_READ(bottom9_bankedram2_r)
-	AM_RANGE(0x0000, 0x3fff) AM_READ(K052109_051960_r)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( bottom9_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(bottom9_bankedram1_w)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(bottom9_bankedram1_r, bottom9_bankedram1_w)
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x1f90, 0x1f90) AM_WRITE(bottom9_1f90_w)
 	AM_RANGE(0x1fa0, 0x1fa0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1fb0, 0x1fb0) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x1fc0, 0x1fc0) AM_WRITE(bottom9_sh_irqtrigger_w)
+	AM_RANGE(0x1fd0, 0x1fd0) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x1fd1, 0x1fd1) AM_READ_PORT("P1")
+	AM_RANGE(0x1fd2, 0x1fd2) AM_READ_PORT("P2")
+	AM_RANGE(0x1fd3, 0x1fd3) AM_READ_PORT("DSW1")
+	AM_RANGE(0x1fe0, 0x1fe0) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1ff0, 0x1fff) AM_WRITE(K051316_ctrl_0_w)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(bottom9_bankedram2_w) AM_BASE(&paletteram)
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(K052109_051960_w)
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(bottom9_bankedram2_r, bottom9_bankedram2_w) AM_BASE(&paletteram)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(K052109_051960_r, K052109_051960_w)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bottom9_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa00d) AM_READ(K007232_read_port_0_r)
-	AM_RANGE(0xb000, 0xb00d) AM_READ(K007232_read_port_1_r)
-	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( bottom9_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)
-	AM_RANGE(0xa000, 0xa00d) AM_WRITE(K007232_write_port_0_w)
-	AM_RANGE(0xb000, 0xb00d) AM_WRITE(K007232_write_port_1_w)
+	AM_RANGE(0xa000, 0xa00d) AM_READWRITE(K007232_read_port_0_r, K007232_write_port_0_w)
+	AM_RANGE(0xb000, 0xb00d) AM_READWRITE(K007232_read_port_1_r, K007232_write_port_1_w)
+	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(nmi_enable_w)
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( bottom9 )
@@ -324,11 +306,11 @@ static MACHINE_DRIVER_START( bottom9 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M6809, 2000000) /* ? */
-	MDRV_CPU_PROGRAM_MAP(bottom9_readmem,bottom9_writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", bottom9_interrupt)
 
 	MDRV_CPU_ADD("audio", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(bottom9_sound_readmem,bottom9_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(bottom9_sound_interrupt,8)	/* irq is triggered by the main CPU */
 
 	/* video hardware */
