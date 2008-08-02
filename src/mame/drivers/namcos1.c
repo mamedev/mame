@@ -1793,7 +1793,129 @@ ROM_START( wldcourt )
 	ROM_LOAD( "wc1_obj3.bin",       0x60000, 0x10000, CRC(1aa2dbc8) SHA1(dc100fd85aca8b4c29d2100dba43dd4093976633) )
 ROM_END
 
-/* Splatter House */
+/*
+Splatter House
+Namco, 198x
+
+This game runs on Namco System 1 hardware
+
+PCB Layout
+----------
+
+Top Board
+
+
+(8617963201)
+(8617961201)
+|---------------------------------------------------------------------------|
+|  TRB           LA4460  LA4460                                             |
+|  BAS                                                                      |
+|  BAL                             CHR8.U8                                  |
+|          LA4520  JP4                                                JP3   |
+|    TS7630                                                                 |
+|                                  |-----|                                  |
+|  VOL                             | 123 |               JP2  PRG7.T10      |
+|                                  |-----|                                  |
+|        TL084  TL084                                         PRG6.S10      |
+|                                                                           |
+|                                                             PRG5.P10      |
+|J    MB3771 4066  YM3012                                                   |
+|A                                                            PRG4.N10      |
+|M   PAL1                                                                   |
+|M          64A1.M4                CHR7.M8     OBJ7.M9        PRG3.M10      |
+|A                                                                          |
+|                                  CHR6.L8     OBJ6.L9        PRG2.L10      |
+|                                                                           |
+|           VOICE5.K4              CHR5.K8     OBJ5.K9        PRG1.K10      |
+|                                                                           |
+|           VOICE4.H4              CHR4.H8     OBJ4.H9        PRG0.H10      |
+|                                                                           |
+|           VOICE3.F4              CHR3.F8     OBJ3.F9   JP1  KEYCUS(181)   |
+|                                                                           |
+|           VOICE2.E4              CHR2.E8     OBJ2.E9                      |
+|                                                                           |
+|           VOICE1.B4              CHR1.B8     OBJ1.B9        SOUND1.B10    |
+|   LB1760                                                                  |
+|           VOICE0.A4              CHR0.A8     OBJ0.A9        SOUND0.A10    |
+|   DSW                                                                     |
+|                                                                           |
+|---------------------------------------------------------------------------|
+Notes:
+      PAL1 - MMI Pal16L8, labelled 'SYS87A-R' (DIP20)
+      JP1  - Configures ROM types, setting: 1-2
+      JP2  - Configures ROM types, setting: 1-2
+      JP3  - Configures ROM types, setting: 2-3
+      JP4  - Used to set speaker output to STEREO/MONO
+      TRB  - Treble Adjustment Pot
+      BAS  - Bass Adjustment Pot
+      BAL  - Balance Adjustment Pot
+      VOL  - Master Volume Pot
+      
+      Namco Custom ICs -
+                        123 (QFP80)
+                        181 (DIP28, KEYCUS, Splatter House)
+                        64A1 (DIP40, 63701 MCU)
+
+
+Bottom Board                        
+
+8617961101
+(8617963101)
+|-----------------------------------------------------------------|
+|3.579545MHz   YM2151        6809                         6809    |
+|                                                                 |
+|              2064          2064                         6809    |
+|2816                                                             |
+|                                                                 |
+|                                                                 |
+|            |-----|                           62256-10           |
+|            | 121 |                                              |
+|            |     |                                              |
+|            |-----|                           |-----|            |
+|                                              |117  |            |
+|                                              |     |            |
+|                                              |-----|            |
+|                                                                 |
+|        PAL2                   2064                              |
+|                                                                 |
+|                                                                 |
+|                                              62256-8*           |
+| 6116                          30                                |
+|                                                                 |
+|              2064                            |-----|            |
+|                                              |133  |            |
+|              2064                            |     |  2064      |
+|                                              |-----|            |
+|              2064                    6116                       |
+| |-----|                                               2064      |
+| |C116 |                              6116                       |
+| |     |     |-----|                                  48         |
+| |-----|     |C120 |           39        49.152MHz               |
+|             |     |                                             |
+|             |-----|                                  27         |
+|-----------------------------------------------------------------|
+Notes:
+      6809  - Hitachi HD68B09EP CPUs, running at 8.000MHz (all 3)
+      YM2151- Running at 3.579545MHz
+      PAL2  - MMI Pal16L8, labelled 'SYS87A-C' (DIP20)
+      2816  - 2K x8 EEPROM (DIP24)
+      6116  - 2K x8 SRAM (DIP24)
+      2064  - 8K x8 SRAM (DIP28)
+      62256 - 32K x8 SRAM (DIP28)
+              * Note, a -8 part must be used at this location or the PCB will not boot
+              
+      Namco Custom ICs -
+                        30 (SDIP64)
+                        39 (DIP42)
+                        48 (SDIP64)
+                        27 (DIP42)
+                        121 (QFP64)
+                        C116 (QFP80)
+                        C120 (QFP64)
+                        117 (QFP64)
+                        133 (QFP64)
+
+*/
 ROM_START( splatter )
 	ROM_REGION( 0x2c000, "audio", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "sh1_snd0.bin",       0x0c000, 0x10000, CRC(90abd4ad) SHA1(caeba5befcf57d90671786c7ef1ce49d54821949) )

@@ -1062,6 +1062,164 @@ ROM_START( vshoot )
 	ROM_LOAD( "vsjsha-0.5m", 0, 0x80000, CRC(78335ea4) SHA1(d4b9f179b1b456a866354ea308664c036de6414d) )
 ROM_END
 
+/*
+
+The Outfoxies
+Namco, 1994
+
+This game runs on Namco NB-2 hardware.
+
+
+Main Board
+----------
+
+NB-2 MAIN PCB       8639960102  (8639970102)
+|------------------------------------------------------------------------|
+||----------------------------------------------------------------------||
+||  J103                     J104                            J105       ||
+||VOL CY7C185                                                           ||
+||458 CY7C185     156      123      C384  C384  C384    LH52250    C355 ||
+||JP5 CY7C185                                      JP11 LH52250         ||
+||LA4705                                                                ||
+||LC78815  C116  LH52250    OU1SHAS.12S            OU1SHAR.18S          ||
+||               LH52250        JP8                    JP10             ||
+|| JP4                                                                  ||
+||                                                                      ||
+||--------------------NB-2-MASK-ROM-PCB-(ON-TOP)------------------------||
+|J                                                                       |
+|    JP3                                                                 |
+|A   JP2            145                            PAL1      187         |
+|      OU1VOI0.6N   VSYNC                  LH52250                       |
+|M                  HSYNC                  LH52250                       |
+|      C352                       169      LH52250    TC511632 (x4)      |
+|M            137  48.384MHz               LH52250                       |
+|                                                                        |
+|A SW1  75                                                               |
+|                         JP7                         TC511632 (x4)      |
+|                       PAL3      C383                                   |
+|          C382                                                          |
+| M5M1008            OU2MPRU.11D        JP9               BR28C16  C390  |
+| M5M1008  PAL2      OU2MPRL.11C   68EC020     C385                      |
+| OU1SPR0.5B                 JP6                            OU1DAT1.20B  |
+|        JP1                                                             |
+|                                                           OU1DAT0.20A  |
+|------------------------------------------------------------------------|
+
+ROM Board
+---------
+
+NB-2 MASK ROM PCB   8639969800  (8639979800)
+-------------------------------------------------------------------------|
+|   J103                     J104                            J105        |
+|OU1SCR0.1D  OU1ROT0.3D                                                  |
+|                                                                        |
+|            OU1ROT1.3C  OU1OBJ0L.4C OU1OBJ3L.6C OU1OBJ0U.8C OU1OBJ3U.9C |
+|                                                                        |
+|            OU1ROT2.3B  OU1OBJ1L.4B OU1OBJ4L.6B OU1OBJ1U.8B OU1OBJ4U.9B |
+|                                                                        |
+|                        OU1OBJ2L.4A             OU1OBJ2U.8A             |
+|------------------------------------------------------------------------|
+
+Notes:
+
+CLOCKs
+------
+MASTER clock 48.384 MHz
+68020 clock: 24.192MHz (MASTER / 2)
+HSYNC: 15.75kHz
+VSYNC: 59.7Hz
+
+DIPs
+----
+SW1: 2 position, both are OFF. Position 1 toggles TEST mode, position 2 is freeze.
+
+RAM
+---
+TC511632FL  x 8 (SOP40, 32k x16)
+M5M51008AFP x 2 (SOP32, 128k x8)
+LH52250AN   x 8 (SOP28, 32k x8)
+CY7C185     x 3 (SOP28, 8k x8)
+
+NAMCO CUSTOM CHIPS
+------------------
+75       (QFP80)
+123      (QFP80)
+137      (NDIP28)
+145      (QFP80)
+156      (QFP64)
+169      (QFP120)
+187      (QFP120)
+C116     (QFP64)
+C352     (QFP100)
+C355     (QFP160)
+C382     (QFP120)
+C383     (QFP100)
+C384 x 3 (QFP48)
+C385     (QFP144)
+C390     (DIP32, KEYCUS)
+
+OTHER
+-----
+BR28C16 (DIP24, EEPROM)
+2 gold pins labelled HSYNC & VSYNC, connected to Namco custom chip 145
+3 connectors for ROM PCB, labelled J103 (SCROLL), J104 (ROTATE), J105 (OBJECT)
+
+PALs
+----
+PAL1 PALCE16V8 (NAMCO CODE = NB2-1, PCB says "MIXER")
+PAL2 PAL16L8   (NAMCO CODE = NB1-2, PCB says "DEC75")  (note! PAL is NB1-2)
+PAL3 PAL16L8   (NAMCO CODE = NB2-2, PCB says "SIZE")
+
+JUMPERs
+-------
+JP1     4M   O-O O   1M    Config jumper for ROM size, 4M = 27C4002, 1M = 27C1024
+JP2     A20  O O-O   GND   Config jumper for ROM size, GND = 16M, A20 = 32M
+JP3     A20  O O-O   GND   Config jumper for ROM size, GND = 16M, A20 = 32M
+JP4          O-O           (2 pins shorted, hardwired on PCB)
+JP5     1    O O O   L     (hardwired on PCB, not shorted)
+JP6     1M   O O-O   4M    Config jumper for ROM size, 1M = 27C1024, 4M = 27C240
+JP7          O O-O   /WDR  (hardwired on PCB)
+JP8     GND  O-O O   A20   Config jumper for ROM size, GND = 16M, A20 = 32M
+JP9     CON  O-O O   COFF  (hardwired on PCB)
+JP10    GND  O-O O   A20   Config jumper for ROM size, GND = 16M, A20 = 32M
+JP11    355  O O-O   F32   (hardwired on PCB)
+
+ROMs, Main PCB
+--------------
+Filename /      PCB       ROM
+ROM Label       Label     Type
+------------------------------------------------------------------------------
+ou1dat0.20a     DATA0     27C4002       Shared Data
+ou1dat1.20b     DATA1     27C4002       Shared Data
+ou2mprl.11c     PRGL      27C4002       \ Main program
+ou2mpru.11d     PRGU      27C4002       /
+ou1spr0.5b      SPRG      27C240        Sound program, linked to C352 and C382
+ou1voi0.6n      VOICE0    MB8316200B    Sound voices
+ou1shas.12s     SHAPE-S   16M MASK      Shape
+ou1shar.18s     SHAPE-R   16M MASK      Shape
+
+ROMs, MASK ROM PCB (All ROMs surface mounted)
+------------------
+Filename /      PCB       ROM
+ROM Label       Label     Type
+------------------------------------------------
+ou1scr0.1d      SCR0      MB8316200B (16M SOP44)
+ou1rot0.3d      ROT0      MB8316200B (16M SOP44)
+ou1rot1.3c      ROT1      MB8316200B (16M SOP44)
+ou1rot2.3b      ROT2      MB8316200B (16M SOP44)
+ou1obj0l.4c     OBJ0L     MB8316200B (16M SOP44)
+ou1obj1l.4b     OBJ1L     MB8316200B (16M SOP44)
+ou1obj2l.4a     OBJ2L     MB8316200B (16M SOP44)
+ou1obj3l.6c     OBJ3L     MB8316200B (16M SOP44)
+ou1obj4l.6b     OBJ4L     MB8316200B (16M SOP44)
+ou1obj0u.8c     OBJ0U     MB8316200B (16M SOP44)
+ou1obj1u.8b     OBJ1U     MB8316200B (16M SOP44)
+ou1obj2u.8a     OBJ2U     MB8316200B (16M SOP44)
+ou1obj3u.9c     OBJ3U     MB8316200B (16M SOP44)
+ou1obj4u.9b     OBJ4U     MB8316200B (16M SOP44)
+
+*/
+
 ROM_START( outfxies )
 	ROM_REGION( 0x100000, "main", 0 ) /* main program */
 	ROM_LOAD32_WORD( "ou2mprl.11c", 0x00002, 0x80000, CRC(f414a32e) SHA1(9733ab087cfde1b8fb5b676d8a2eb5325ebdbb56) )

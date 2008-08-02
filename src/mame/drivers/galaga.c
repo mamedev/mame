@@ -2144,6 +2144,169 @@ ROM_END
 /**********************************************************************************************
   Galaga & clones
 **********************************************************************************************/
+/*
+
+Galaga
+Namco/Midway, 1982
+
+PCB Layout
+----------
+
+Top board
+
+23149611 (23149631
+|------------------------------------------|
+|                         LM324            |
+|          04M_G01.3N                      |
+|                       Z80        5400    |
+|          04K_G02.3M                      |
+|                                          |
+|   0600   04J_G03.3L                    |-|
+|                                 DSW1   |
+|          04H_G04.3K             DSW2   |-|
+|                                          |
+|   0801   04E_G05.3J   Z80               4|
+|                                         4|
+|                                         W|
+|          *            5100              A|
+|   0801                                  Y|
+|                                TD62064   |
+|          04D_G06.3E   Z80                |
+|                                        |-|
+|   0801                                 |
+|          *                             |-|
+|                       0702     VOL       |
+|                                    MB3730|
+|GG1-1.1D                                  |
+|                       GG1-2.5C           |
+|       3101                               |
+|       3101  4066                18.432MHz|
+|------------------------------------------|
+Notes:
+      GG1-1.1D & GG1-2.5C are PROMs, type MB7052 (equivalent to TBP24S10 and 82S129).
+      All other ROMs are 2732 EPROMs (i.e. 04*.*).
+      *: Unpopulated sockets
+      
+      VSync           : 60.606060Hz
+      Z80 clocks (all): 1.536MHz
+      5400 clock      : 1.536MHz
+      5100 clock      : 1.536MHz
+
+      3101   : 16bytes x4 bit Bipolar SRAM, compatible with 7489, MB461 & AM31L01 (trivia - This was Intel's first product, released in 1969!)
+      MB3730 : Sound AMP
+      TD62064: Darlington transistor for driving coin counters.
+      4066   : Quad Bilateral Switch logic IC, used to mix several sound sources to one output.
+      
+      NAMCO customs:
+                    0600 (DIP28): Bus Interface IC
+                    0801 (DIP28): Multi CPU Bus Controller IC
+                    5100 (DIP42): Controls player input, coins, DSW's (custom 4 bit I/O Microcontroller)
+                    0702 (DIP28): Sync Generator/Clock Divider IC
+                    5400 (DIP28): MUX 4-channel Audio Generator IC. Generates 'death bang'.
+                                  This is not a Z80 with swapped pins as many sites have reported.
+
+      Pinouts: 
+      Galaga PCB edge connector pinouts 
+
+      Parts Side    Pin   Pin Solder Side 
+      ----------------------------------
+      Logic Ground   A     1  Logic Ground 
+      Speaker +      B     2  Speaker - 
+                     C     3  Coin Counter 1 
+      P1 Start Lamp  D     4  P2 Start Lamp 
+      +12            E     5  +12 
+      +5             F     6  +5 
+      Ground         H     7  Ground 
+      Service Credit J     8  Test 
+      Coin 1         K     9  Coin 2 
+      Player 1 Start L     10 Player 2 Start 
+      P1 Fire        M     11 P2 Fire 
+      P1 Left        N     12 P2 Left 
+                     P     13 
+      P1 Right       R     14 P2 Right 
+                     S     15  
+                     T     16 
+                     U     17 
+                     V     18 
+                     W     19 
+                     X     20 
+      Coin Counter 2 Y     21 Cocktail Mode 
+      Ground         Z     22 Ground 
+
+      Pin21: Ground this pin for cocktail mode 
+ 
+  
+Bottom board
+
+23149612 (23149632
+|------------------------------------------|
+| 0700     GG1-4.2N           GG1-5.5N     |
+|                        *             RGBS|
+| 0015                                     |
+|                                          |
+|              2114                        |
+| 6116                               8147  |
+|              2114    07M_G08.4L          |
+|                                    8147  |
+|              2114                        |
+| 0400                               8147  |
+|              2114                        |
+|                                    8147  |
+|              2114    0200                |
+|                                          |
+|              2114                        |
+|                      07H_G09.4F    8147  |
+|                                          |
+|                                    8147  |
+|                                          |
+|                      07E_G10.4D    8147  |
+|                                          |
+|                                    8147  |
+| GG1-3.1C                                 |
+|                                          |
+|                                          |
+|------------------------------------------|
+Notes:
+      RGBS: Video output socket (Red, Green Blue, Sync to monitor)
+      GG1*  are PROMs, type MB7052 (equivalent to TBP24S10 and 82S129).
+      All other ROMs are 2732 EPROMs.
+      *: Unpopulated socket
+      
+      2114    : 1K x4 SRAM
+      6116    : 2K x8 SRAM
+      8147    : 4K x1 SRAM (Note - you can remove the eight 8147 RAMs and install two 2148s (1K x 4) in their place at positions 6H and 6B.
+
+      Bootup RAM Errors
+      Error Code    Meaning 
+      RAM OK        All RAMs are good 
+      RAM 0L        RAM located on Video PC board at position 1K is bad 
+      RAM 0H        RAM located on Video PC board at position 1K is bad 
+      RAM 1L        RAM located on Video PC board at position 1K is bad 
+      RAM 1H        RAM located on Video PC board at position 1K is bad 
+      RAM 2L        RAM located on Video PC board at position 3E is bad 
+      RAM 2H        RAM located on Video PC board at position 3F is bad 
+      RAM 3L        RAM located on Video PC board at position 3K is bad 
+      RAM 3H        RAM located on Video PC board at position 3L is bad 
+      RAM 4L        RAM located on Video PC board at position 3H is bad 
+      RAM 4H        RAM located on Video PC board at position 3J is bad 
+
+      Bootup ROM Errors 
+      Error Code   Meaning 
+      ROM OK       All ROMs are good 
+      ROM 01       ROM located on CPU PC board at position 3N is bad 
+      ROM 02       ROM located on CPU PC board at position 3M is bad 
+      ROM 03       ROM located on CPU PC board at position 3L is bad 
+      ROM 04       ROM located on CPU PC board at position 3K is bad 
+      ROM 11       ROM located on CPU PC board at position 3J is bad 
+      ROM 21       ROM located on CPU PC board at position 3E is bad 
+
+      NAMCO customs:
+                    0015 (DIP28): Video RAM addresser IC
+                    0200 (DIP28): Graphics ROM Data Custom Shift Register IC
+                    0400 (DIP28): Motion Object and Scratch RAM to CPU Bus Interface IC
+                    0702 (DIP28): Sync Generator/Clock Divider IC
+
+*/
 
 #define GALAGA_CUSTOMS \
 	ROM_REGION_NAMCO_54XX( CPUTAG_54XX ) \
