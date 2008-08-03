@@ -195,7 +195,7 @@ static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 			if (opcode & 0x0800)
 			{
 				if (ay == 0) break;
-				else if (ay > 0)
+				if (_ay > 0)
 				{
 					src = (src - 384) & (HD63484_RAM_SIZE-1);
 					*dst = (*dst + dstep1) & (HD63484_RAM_SIZE-1);
@@ -325,8 +325,9 @@ static void HD63484_command_w(UINT16 cmd)
 			logerror("%04x ",fifo[i]);
 		logerror("\n");
 
-		if (fifo[0] == 0x0400)	/* ORG */
+		if (fifo[0] == 0x0400) { /* ORG */
 			org = ((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4);
+		}
 		else if ((fifo[0] & 0xffe0) == 0x0800)	/* WPR */
 		{
 			if (fifo[0] == 0x0800)
@@ -359,33 +360,91 @@ logerror("unsupported register\n");
 		}
 		else if (fifo[0] == 0x5800)	/* CLR */
 		{
-rwp *= 2;
-			doclr(fifo[0],fifo[1],&rwp,2*fifo[2]+1,fifo[3]);
-rwp /= 2;
+			int ax = 2*fifo[2];
+
+			rwp *= 2;
+			if (fifo[2] & 0x8000) { rwp += 1; ax -= 1; } else { ax += 1; }
+
+			doclr(fifo[0],fifo[1],&rwp,ax,fifo[3]);
+
+			if (fifo[2] & 0x8000) rwp -= 1;
+			rwp /= 2;
+
+			/*
+			{
+				int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
+				if (fifo2<0) fifo2 *= -1;
+				if (fifo3<0) fifo3 *= -1;
+				rwp += ((fifo2+1)*(fifo3+1));
+			}
+			*/
 		}
 		else if ((fifo[0] & 0xfffc) == 0x5c00)	/* SCLR */
 		{
-rwp *= 2;
-			doclr(fifo[0],fifo[1],&rwp,2*fifo[2]+1,fifo[3]);
-rwp /= 2;
+			int ax = 2*fifo[2];
+
+			rwp *= 2;
+			if (fifo[2] & 0x8000) { rwp += 1; ax -= 1; } else { ax += 1; }
+
+			doclr(fifo[0],fifo[1],&rwp,ax,fifo[3]);
+
+			if (fifo[2] & 0x8000) rwp -= 1;
+			rwp /= 2;
+
+			/*
+			{
+				int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
+				if (fifo2<0) fifo2 *= -1;
+				if (fifo3<0) fifo3 *= -1;
+				rwp += ((fifo2+1)*(fifo3+1));
+			}
+			*/
 		}
 		else if ((fifo[0] & 0xf0ff) == 0x6000)	/* CPY */
 		{
-			int src;
+			int src,ax;
 
-			src = ((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4);
-rwp *= 2;
-			docpy(fifo[0],2*src,&rwp,2*fifo[3]+1,fifo[4]);
-rwp /= 2;
+			ax = 2*fifo[3];
+			src = (((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4))*2;
+			rwp *= 2;
+			if (fifo[3] & 0x8000) { rwp += 1; src += 1; ax -= 1; } else { ax += 1; }
+
+			docpy(fifo[0],src,&rwp,ax,fifo[4]);
+
+			if (fifo[3] & 0x8000) rwp -= 1;
+			rwp /= 2;
+
+			/*
+			{
+				int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
+				if (fifo2<0) fifo2 *= -1;
+				if (fifo3<0) fifo3 *= -1;
+				rwp += ((fifo2+1)*(fifo3+1));
+			}
+			*/
 		}
 		else if ((fifo[0] & 0xf0fc) == 0x7000)	/* SCPY */
 		{
-			int src;
+			int src,ax;
 
-			src = ((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4);
-rwp *= 2;
-			docpy(fifo[0],2*src,&rwp,2*fifo[3]+1,fifo[4]);
-rwp /= 2;
+			ax = 2*fifo[3];
+			src = (((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4))*2;
+			rwp *= 2;
+			if (fifo[3] & 0x8000) { rwp += 1; src += 1; ax -= 1; } else { ax += 1; }
+
+			docpy(fifo[0],src,&rwp,ax,fifo[4]);
+
+			if (fifo[3] & 0x8000) rwp -= 1;
+			rwp /= 2;
+
+			/*
+			{
+				int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
+				if (fifo2<0) fifo2 *= -1;
+				if (fifo3<0) fifo3 *= -1;
+				rwp += ((fifo2+1)*(fifo3+1));
+			}
+			*/
 		}
 		else if (fifo[0] == 0x8000)	/* AMOVE */
 		{
@@ -595,6 +654,7 @@ rwp /= 2;
 
 			pcx = fifo[1];
 			pcy = fifo[2];
+
 			src = (2*org + pcx - pcy * 384) & (HD63484_RAM_SIZE-1);
 			dst = (2*org + cpx - cpy * 384) & (HD63484_RAM_SIZE-1);
 
