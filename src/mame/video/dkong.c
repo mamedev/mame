@@ -574,7 +574,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	dkong_state *state = machine->driver_data;
 	int offs;
-
+	int scanline_vf;	/* buffering scanline including flip */
+	int scanline_vfc;  		/* line buffering scanline including flip - this is the cached scanline_vf*/
+	int scanline; 		/* current scanline */
+	int add_y;
+	int add_x;
+	int num_sprt;
+	
 	/* Draw the sprites. There are two pecularities which have been mentioned by
 	 * a Donkey Kong II author at CAX 2008: 
 	 * 1) On real hardware, sprites wrap around from the right to the left instead 
@@ -582,22 +588,23 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	 * 2) On real hardware, there is a limit of 16 sprites per scanline.  
 	 *    Sprites after the 16th (starting from the left) simply don't show.
 	 * 
-	 * 1. is being handled in the code below. 
-	 * FIXME: 2. would require rendering one scanline at a time and counting the
-	 * sprites on the scanline. This is in line with the real hardware which buffers
-	 * the sprite data for one scanline. The ram is 64x9 and a sprite takes 4 bytes.
+	 * 2) is in line with the real hardware which buffers the sprite data 
+	 * for one scanline. The ram is 64x9 and a sprite takes 4 bytes.
 	 * ==> 16 sprites per scanline.
 	 * 
 	 * TODO: 9th bit is not understood right now.
 	 *
+	 * 1) is due to limitation of signals to 8 bit. 
+	 *
 	 * This is quite different from galaxian. The dkong hardware updates sprites
 	 * only once every frame by dma. The number of sprites can not be processed
-	 * directly, Thus the preselection. The buffering takes place 2 scanlines 
-	 * before the sprite is rendered.
+	 * directly, Thus the preselection. The buffering takes place during the 
+	 * active phase of the video signal. The scanline is than rendered into the linebuffer
+	 * during HBLANK.
 	 * 
 	 * A sprite will be drawn:
-	 * a) FlipQ = 1 : (sprite_y + 0xF9 + (scanline ^ 0xFF)) & 0xF0 == 0xF0
-	 * b) FlipQ = 0 : (sprite_y + 0xF7 + scanline) & 0xF0 == 0xF0
+	 * a) FlipQ = 1 : (sprite_y + 0xF9 + scanline) & 0xF0 == 0xF0
+	 * b) FlipQ = 0 : (sprite_y + 0xF7 + (scanline ^ 0xFF)) & 0xF0 == 0xF0
 	 * 
 	 * FlipQ = 1 ("Normal Play"):
 	 * 
@@ -610,9 +617,30 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	 * 0x20, 0xDF, 0x1F8, 0xF0
 	 * 
 	 */
-	for (offs = state->sprite_bank<<9;offs < (state->sprite_bank<<9) + 0x200 /* sprite_ram_size */; offs += 4)
+	
+	scanline_vf = (cliprect->max_y - 1) & 0xFF;
+	scanline_vfc = (cliprect->max_y - 1) & 0xFF;
+	scanline = cliprect->max_y & 0xFF;
+
+	if (state->flip)
 	{
-		if (state->sprite_ram[offs])
+		scanline_vf ^= 0xFF;
+		scanline_vfc ^= 0xFF;
+		add_y = 0xF7;
+		add_x = 0xF7;
+	}
+	else
+	{
+		add_y = 0xF9;
+		add_x = 0xF7;
+	}
+	
+	for (offs = state->sprite_bank<<9, num_sprt=0; (num_sprt < 16) && (offs < (state->sprite_bank<<9) + 0x200) /* sprite_ram_size */; offs += 4)
+	{
+		int y = state->sprite_ram[offs];
+		int do_draw = (((y + add_y + 1 + scanline_vf) & 0xF0) == 0xF0) ? 1 : 0;
+		
+		if (do_draw)
 		{
 			/* sprite_ram[offs + 2] & 0x40 is used by Donkey Kong 3 only */
 			/* sprite_ram[offs + 2] & 0x30 don't seem to be used (they are */
@@ -620,29 +648,25 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			/* has similar hardware, uses a memory mapped port to change */
 			/* palette bank, so it's limited to 16 color codes) */
 
-			int x,y;
+			int x = state->sprite_ram[offs + 3];
 
-			x = state->sprite_ram[offs + 3] - 8;
-			y = 240 - state->sprite_ram[offs] + 7;
-
+			/* On the real board, the x and y are read inverted after the first
+			 * buffer stage. This due to the fact that the 82S09 delivers complements
+			 * of stored data on read!
+			 */ 
+			
+			x = (x + add_x + 1) & 0xFF;
+			if (state->flip)
+				x ^= 0xFF;
+			y = (y + add_y + 1 + scanline_vfc) & 0x0F;
+			
 			if (state->flip)
 			{
-				x = 240 - x;
-				y = VTOTAL - VBEND - y - 8;
-
 				drawgfx(bitmap,machine->gfx[1],
 						(state->sprite_ram[offs + 1] & 0x7f) + ((state->sprite_ram[offs + 2] & mask_bank) << shift_bits),
 						(state->sprite_ram[offs + 2] & 0x0f) + 16 * state->palette_bank,
-						!(state->sprite_ram[offs + 2] & 0x80),!(state->sprite_ram[offs + 1] & 0x80),
-						x,y,
-						cliprect,TRANSPARENCY_PEN,0);
-
-				/* draw with wrap around - this fixes the 'beheading' bug */
-				drawgfx(bitmap,machine->gfx[1],
-						(state->sprite_ram[offs + 1] & 0x7f) + ((state->sprite_ram[offs + 2] & mask_bank) << shift_bits),
-						(state->sprite_ram[offs + 2] & 0x0f) + 16 * state->palette_bank,
-						(state->sprite_ram[offs + 2] & 0x80),(state->sprite_ram[offs + 1] & 0x80),
-						x-256,y,
+						!(state->sprite_ram[offs + 2] & 0x80),(state->sprite_ram[offs + 1] & 0x80),
+						x-15, scanline-y,
 						cliprect,TRANSPARENCY_PEN,0);
 			}
 			else
@@ -651,17 +675,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						(state->sprite_ram[offs + 1] & 0x7f) + ((state->sprite_ram[offs + 2] & mask_bank) << shift_bits),
 						(state->sprite_ram[offs + 2] & 0x0f) + 16 * state->palette_bank,
 						(state->sprite_ram[offs + 2] & 0x80),(state->sprite_ram[offs + 1] & 0x80),
-						x,y,
-						cliprect,TRANSPARENCY_PEN,0);
-
-				/* draw with wrap around - this fixes the 'beheading' bug */
-				drawgfx(bitmap,machine->gfx[1],
-						(state->sprite_ram[offs + 1] & 0x7f) + ((state->sprite_ram[offs + 2] & mask_bank) << shift_bits),
-						(state->sprite_ram[offs + 2] & 0x0f) + 16 * state->palette_bank,
-						(state->sprite_ram[offs + 2] & 0x80),(state->sprite_ram[offs + 1] & 0x80),
-						x+256,y,
+						x, scanline-y,
 						cliprect,TRANSPARENCY_PEN,0);
 			}
+			
+			num_sprt++;
 		}
 	}
 }
@@ -823,8 +841,7 @@ static void radarscp_draw_background(running_machine *machine, dkong_state *stat
 	}
 }
 
-
-static TIMER_CALLBACK( scanline_callback )
+static void radarscp_scanline(running_machine *machine, int scanline)
 {
 	dkong_state *state = machine->driver_data;
 	const UINT8 *table = memory_region(machine, "gfx3");
@@ -832,7 +849,6 @@ static TIMER_CALLBACK( scanline_callback )
 	int 			x,y,offset;
 	UINT16 			*pixel;
 	static int		counter=0;
-	int scanline = param;
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	y = scanline;
@@ -860,6 +876,19 @@ static TIMER_CALLBACK( scanline_callback )
 	}
 	while ((counter < table_len) && ( x < 4 * (table[counter|offset] & 0x7f)))
 		counter++;
+}
+
+static TIMER_CALLBACK( scanline_callback )
+{
+	dkong_state *state = machine->driver_data;
+	int scanline = param;
+
+	if ((state->hardware_type == HARDWARE_TRS02) || (state->hardware_type == HARDWARE_TRS01))
+		radarscp_scanline(machine, scanline);
+
+	/* update any video up to the current scanline */
+	video_screen_update_now(machine->primary_screen);
+
 	scanline = (scanline+1) % VTOTAL;
 	/* come back at the next appropriate scanline */
 	timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
@@ -913,10 +942,6 @@ static VIDEO_START( dkong_base )
 	state_save_register_global(state->sig_ansn);
 	state_save_register_global(state->grid_col);
 	state_save_register_global(state->flip);
-
-	/* this must be registered here - hmmm */
-	//state_save_register_global(flip_screen_get());
-
 }
 
 VIDEO_START( dkong )
@@ -925,12 +950,13 @@ VIDEO_START( dkong )
 
 	VIDEO_START_CALL(dkong_base);
 
+	state->scanline_timer = timer_alloc(scanline_callback, NULL);
+	timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+
 	switch (state->hardware_type)
 	{
 		case HARDWARE_TRS02:
 			state->bg_bits = video_screen_auto_bitmap_alloc(machine->primary_screen);
-			state->scanline_timer = timer_alloc(scanline_callback, NULL);
-			timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 		    /* fall through */
 		case HARDWARE_TKG04:
 		case HARDWARE_TKG02:
@@ -942,9 +968,6 @@ VIDEO_START( dkong )
 			tilemap_set_scrolldx(state->bg_tilemap, 0, 128);
 
 			state->bg_bits = video_screen_auto_bitmap_alloc(machine->primary_screen);
-
-			state->scanline_timer = timer_alloc(scanline_callback, NULL);
-			timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 			break;
 		default:
 			fatalerror("Invalid hardware type in dkong_video_start");
