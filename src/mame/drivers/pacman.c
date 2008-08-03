@@ -4882,6 +4882,77 @@ ROM_START( nmouseb )
 	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )   /*timing - not used */
 ROM_END
 
+
+/*
+Wood Pecker
+Amenip, 1981
+
+This game uses a fairly large epoxy-filled plug-in security module which
+connects to a DIP40 socket on the main board.
+The module contains all of the program code and a Z80 plus some logic glue.
+
+Main PCB Layout
+---------------
+
+|--------------|---------------|------------------------|
+|    18.432MHz | DIP40         |     PR.4A              |
+|              |               |                        |
+|              |               |                        |
+|              |       DIP28   |              6148      |
+|-|            |               |                        |
+  |            |DIP24  DIP24   |A.5E                    |
+|-|            |               |                        |
+|3             |DIP24  DIP24   |B.5F                    |
+|6       DSW   |               |                        |
+|W             |DIP24  DIP24   |C.5H  2114              |
+|A     PR.8H   |               |                        |
+|Y             |DIP24  DIP24   |D.5J  2114              |
+|              |               |                        |
+|-|            |---------------|      2114  PR.3K  PR.1K|
+  |                                                     |
+|-|                                   2114              |
+|                                                       |
+|                                     2114              |
+|                                                       |
+|                                     2114              |
+|                                                       |
+|-------------------------------------------------------|
+Notes:
+      DIP24      - Empty sockets
+      DIP40      - Location where daughter board module connects to main board
+      DIP28      - Empty socket
+      2114/6148  - RAM
+      A/B/C/D    - 2716 2K x8 EPROMs (DIP24)
+      DSW        - 8-position Dip Switch
+      PR.4A/3K/1K- 82S129 Bipolar PROMs (DIP16)
+      PR.8H      - 82S123 Bipolar PROM (DIP16)
+
+
+Daughter Board PCB Layout
+-------------------------
+
+|---------------|
+|DIP40          |
+|               |
+|               |
+|  Z80   74LS244|
+|               |
+|74LS244 74LS244|
+|74LS04         |
+|74LS10         |
+|74LS138   ROM  |
+|               |
+|ROM       ROM  |
+|               |
+|ROM       ROM  |
+|---------------|
+Notes:
+      All IC's shown
+      Z80   - Sharp LH0080 Z80 CPU, running at 3.072MHz [18.432/6] (DIP40)
+      ROM   - 2732 4K x8 EPROMs (DIP24)
+      DIP40 - 40 pins extended from bottom of module for connection to main board
+*/
+
 ROM_START( woodpek )
 	ROM_REGION( 0x10000, "main",0 )
 	/* roms dumped from epoxy block */

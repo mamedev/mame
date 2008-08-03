@@ -930,6 +930,90 @@ ROM_START( onna34ra )
 	ROM_LOAD( "a52-11.32v",   0x1c000, 0x4000, CRC(d1dda6b3) SHA1(fadf1404e8a03ec7e3fafb6281d33bc73bb5c473) )
 ROM_END
 
+
+/*
+Victorious Nine
+Taito, 1984
+
+Hardware is similar to Elevator Action (uses same pinouts for wiring harness also)
+
+Top Board (Sound)
+---------
+PCB No: J1100005A K1100011A (plus a sticker... K1100014A)
+CPU   : NEC D780 (Z80)
+SOUND : OKI M5232 (x1), YM2149 (x1), LM3900 (x3), TA7630 (x1)
+XTAL  : 8.000MHz
+RAM   : M5M5517 (=6116, x1)
+OTHER : Volume Pot (x1)
+PALs  : None
+PROMs : None
+DIPSW : None
+
+			Byte
+ROMs : (All type 2764)	C'sum
+------------------------------
+A16_12.8		059Bh
+A16_13.9		3F12h
+A16_14.10		CC99h
+A16_15.37		9D55h
+A16_16.38		B04Dh
+A16_17.39		90B1h
+
+*************
+
+
+2nd Board (Small PCB contains ROMs ONLY, plugs into three empty sockets on 3rd PCB)
+---------
+PCB No: J9100006A K9100009A
+
+			Byte
+ROMs : (All type 2764)	C'sum
+------------------------------
+A16_19.1		22E3h
+A16_20.2		D3AEh
+A16_21.3		DB99h
+A16_22.4		B4CDh
+A16_23.5		92C8h
+A16_24.6		1641h
+
+*************
+
+
+3rd PCB (Main Board with connectors G and H)
+-------
+PCB No: J1100007A K1100013A (plus 2 stickers... K1100027A  M4300007B)
+CPU   : NEC D780 (Z80, plus one unpopulated socket for another Z80 CPU)
+XTAL  : 8.000MHz
+RAM   : M5M5517 (=6116, x1)
+OTHER : MC68705P5S (labelled "A16 18", read-protected and not dumped)
+DIPSW : 8 position (x3, see archive for DSW info)
+PALs  : None
+PROMs : None
+ROMs  : None
+
+*************
+
+
+4th PCB (Video with connector T)
+-------
+PCB No: J1100006A K1100012A
+XTAL  : 18.432MHz
+RAM   : 2148 (x9), M5M5517 (x1)
+
+			Byte
+ROMs : (All type 2764)	C'sum
+------------------------------
+A16_04.5		64A6h
+A16_05-1.6		5DB1h
+A16_06-1.7		25E2h
+A16_07-2.8		E61Eh
+A16_08.88		2718h
+A16_09-1.89		57AAh
+A16_10.90		7A95h
+A16_11-1.91		4DD6h
+
+*/
+
 ROM_START( victnine )
 	ROM_REGION( 0x10000, "main", 0 )	/* 64k for the first CPU */
 	ROM_LOAD( "a16-19.1",     0x0000, 0x2000, CRC(deb7c439) SHA1(e87c8f95bc31d8450a3deed7a14b5fe139778d47) )

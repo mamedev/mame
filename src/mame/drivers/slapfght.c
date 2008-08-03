@@ -13,6 +13,99 @@ slapfigh - Arcade ROMs from Japan http://home.onestop.net/j_rom/
 slapboot - Unknown source
 slpboota - ROMS Dumped by KW 29/12/97 from unmarked Slap Fight board (bootleg?)
 
+
+Slap Fight/Alcon
+1986 Taito Corporation
+
+Slap Fight and Alcon are the same PCBs exactly, with just 4 ROMs changed. The same MCU is
+common to Slap Fight and Alcon.
+Tiger Heli is almost exactly the same PCB but a few chips have different placings and there's
+more EPROM locations on one of the boards (although they're not populated).
+Also, Tiger Heli has a 22-way edge connector, while Alcon/Slap Fight is JAMMA.
+
+PCB Layouts - Top Board
+-----------------------
+
+Alcon -        M6100186A
+               860100714
+
+Slap Fight -   M6100179A
+               860090333
+
+
+8606S MADE IN JAPAN
+|--------------------------------------------------|
+|VOL ROM21.12Q                 2148                |
+|MB3730                        2148                |
+|    ROM19.12P                 2148                |
+|                              2148                |
+|    ROM20.12M                         6264        |
+|                                                  |
+|                                      6264        |
+|                                                  |
+|J                 A77_12.8J A77_11.6J 6264        |
+|A    AY3-8910                                     |
+|M                 A77_10.8H A77_09.6H 6264        |
+|M    DSW1  DSW2                                   |
+|A                                       2148      |
+|     AY3-8910                                     |
+|                                          ROM16.1E|
+|                                                  |
+|  A77_02.12D                              ROM17.1C|
+|                                                  |
+|                                     ROM18.2B     |
+|  Z80A   2016                                     |
+|                                                  |
+|-----|----------|--------------|----------|-------|
+      |----------|              |----------|
+Notes:
+      AY3-8910 clock - 1.500MHz (36/24)
+      Z80A clock - 3.000MHz (36/12)
+      VSync - 57Hz
+      HSync - 14.97kHz
+      A77_02 - 2764 EPROM
+      A77_09 to A77_12 - 27256 EPROM
+      ROM18 - 18S030 PROM
+      ROM16, ROM17, ROM19, ROM20, ROM21 - 82S129 PROM
+
+
+Bottom Board
+------------
+
+8606M MADE IN JAPAN
+|--------------------------------------------------|
+|                        A77_13.6A                 |
+|                                                  |
+|    ROM14.2C                          ROM15.8B    |
+|                                                  |
+|                                                  |
+|              2016      A77_04.6F                 |
+|                                           36MHz  |
+|              2016      A77_03.6G                 |
+|                                                  |
+|                                                  |
+|                                                  |
+|                                                  |
+|                                                  |
+|                        A77_08.6K                 |
+|                                                  |
+|                        A77_07.6M         2016    |
+|     2016                                         |
+|              2016      A77_06.6N       A77_01.8N |
+|                                                  |
+|              2016      A77_05.6P       A77_00.8P |
+|                                           Z80B   |
+|-----|----------|--------------|----------|-------|
+      |----------|              |----------|
+Notes:
+      Z80B clock - 6.000MHz (36/6)
+      ROM14, ROM15 - 82S129 PROM
+      A77_00, A77_01 - 27256 EPROM (replace with A77_00-1, A77_01-1 on Alcon)
+      A77_05 to A77_08 - 27256 EPROM
+      A77_03, A77_04 - 2764 EPROM (replace with A77_03-1, A77_04-1 on Alcon)
+      A77_13 - Motorola MC68705P5S Micro-Controller (protected). Clock 3.000MHz
+
+
 PCB Details from slpboota boardset:
 
 Upper PCB (Sound board)
@@ -1084,6 +1177,97 @@ ROM_START( perfrmau )
 	ROM_LOAD( "ci10.12",    0x100, 0x0100, CRC(59490887) SHA1(c894edecbcfc67972ad893cd7c8197d07862a20a) )
 	ROM_LOAD( "ci09r1.13",  0x200, 0x0020, CRC(d9e92f6f) SHA1(7dc2939267b7d2b1eeeca906cc6151fab2cf1cc4) )
 ROM_END
+
+
+/*
+Tiger Heli
+1985 Taito Corporation
+
+The Tiger Heli PCB is almost exactly the same PCB as Slap Fight/Alcon but a few chips
+have different placings and there's more EPROM locations on one of the boards 
+(although they're not populated).
+Also, Tiger Heli has a 22-way edge connector, while Alcon/Slap Fight is JAMMA.
+
+
+PCB Layouts - Top Board
+-----------------------
+
+Tiger Heli -   M6100111A
+               850011401
+
+GX-511-A MADE IN JAPAN
+|--------------------------------------------------|
+|VOL ROM21.12Q                 2148                |
+|MB3712                        2148                |
+|    ROM19.12P                 2148                |
+|                              2148                |
+|    ROM20.12M                         6264        |
+|                                                  |
+|                                      6264        |
+|                                                  |
+|2                 A47_13.8J A47_12.6J 6264        |
+|2    AY3-8910                                     |
+|W                 A47_11.8H A47_10.6H 6264        |
+|A    DSW1  DSW2                                   |
+|Y                                       2148      |
+|     AY3-8910                                     |
+|                                   PAL    ROM16.1E|
+|                                                  |
+|  A47_03.12D                              ROM17.1C|
+|                                                  |
+|                                     ROM18.2B     |
+|  Z80A   2016                                     |
+|                                                  |
+|-----|----------|--------------|----------|-------|
+      |----------|              |----------|
+Notes:
+      AY3-8910 clock - 3.000MHz (36/12)
+      Z80A clock - 3.000MHz (36/12)
+      VSync - 57Hz
+      HSync - 15.02kHz
+      A47_03 - 2764 EPROM
+      A47_10 to A47_13 - 27128 EPROM
+      ROM18 - 18S030 PROM
+      ROM16, ROM17, ROM19, ROM20, ROM21 - 82S129 PROM
+
+
+Bottom Board
+------------
+
+GX-511-B MADE IN JAPAN
+|--------------------------------------------------|
+|                        A47_14.6A                 |
+|                                                  |
+|    ROM14.2C                          ROM15.8B    |
+|                                                  |
+|                                                  |
+|              2016      A47_05.6F                 |
+|                                           36MHz  |
+|              2016      A47_04.6G                 |
+|                                                  |
+|                                                  |
+|                                                  |
+|                                                  |
+|                                                  |
+|                                        A47_02.8K |
+|                                                  |
+|              A47_09.4M A47_08.6M       X         |
+|     2016                                         |
+|              2016      A47_07.6N       A47_01.8N |
+|                                                  |
+|              2016      A47_06.6P       A47_00.8P |
+|                                           Z80B   |
+|-----|----------|--------------|----------|-------|
+      |----------|              |----------|
+Notes:
+      Z80B clock - 6.000MHz (36/6)
+      ROM14, ROM15 - 82S129 PROM
+      A47_00 to A47_02 - 27128 EPROM
+      A47_06 to A47_09 - 27128 EPROM
+      A47_04, A47_05 - 2764 EPROM
+      A47_14 - Motorola DA68237 15-00011-001 (MC68705P3-compatible) Micro-Controller (Not protected). Clock 3.000MHz
+      X - Unpopulated socket
+*/
 
 ROM_START( tigerh )
 	ROM_REGION( 0x10000, "main", 0 )

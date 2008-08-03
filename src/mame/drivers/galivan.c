@@ -959,6 +959,74 @@ ROM_START( youmab )
 ROM_END
 
 
+/*
+Youma Ninpou Chou (bootleg hardware)
+Nichibutsu, 1986
+
+Top PCB
+-------
+CPU  : Z80B
+OSC  : 12.0000MHz
+RAM  : TMM2015 (x1), HM6264 (x1)
+DIPSW: 8 position (x2)
+ROMs :
+       1 - 4  near Z80B (type 27c256)
+       5 - 6  on opposite side of PCB (type 27c128)
+       7 - 10 adjacent to 5 & 6 (type 27c256)
+
+PROMs: pr.6e \
+       pr.7e  | Type 82s129, near ROMs 1 - 4
+       pr.8e /
+
+Bottom PCB
+----------
+CPU  : Z80A
+OSC  : 21.400MHz, 8.000MHz
+RAM  : HM6116 (x1, near Z80), UM6114 (=2148, x4)
+SOUND: YM3526, Y3014, LM324 (x2)
+ROMs :
+       11 - 12 near Z80 (11 = type 27C128, 12 = 27c256)
+       13 - 16 on opposite side of PCB (type 27c256)
+
+PROMs: pr.7h \
+       pr.2e /  type 82s129, near ROMs 13 - 16
+       
+ROMIDENT Reference:
+-------------------
+1.1D         [692ae497] NOT FOUND!
+10.18F       [bbd2e51c] = NINJEMAK.11  from Ninja Emaki (Nichibutsu)
+                        = YNC-11.BIN   from Youma Ninpou Chou (Nichibutsu, Ninja Emaki jpn)
+11.13B       [3d1cd329] = NINJEMAK.12  from Ninja Emaki (Nichibutsu)
+                        = YNC-12.BIN   from Youma Ninpou Chou (Nichibutsu, Ninja Emaki jpn)
+12.15B       [ac3a0b81] = NINJEMAK.13  from Ninja Emaki (Nichibutsu)
+                        = YNC-13.BIN   from Youma Ninpou Chou (Nichibutsu, Ninja Emaki jpn)
+13.1H        [bff332d3] = NINJEMAK.14  from Ninja Emaki (Nichibutsu)
+                        = YNC-14.BIN   from Youma Ninpou Chou (Nichibutsu, Ninja Emaki jpn)
+14.3H        [56430ed4] = NINJEMAK.15  from Ninja Emaki (Nichibutsu)
+                        = YNC-15.BIN   from Youma Ninpou Chou (Nichibutsu, Ninja Emaki jpn)
+15.4H        [8df93fed] = NINJEMAK.16  from Ninja Emaki (Nichibutsu)
+                        = YNC-16.BIN   from Youma Ninpou Chou (Nichibutsu, Ninja Emaki jpn)
+16.6H        [a3efd0fc] = NINJEMAK.17  from Ninja Emaki (Nichibutsu)
+                        = YNC-17.BIN   from Youma Ninpou Chou (Nichibutsu, Ninja Emaki jpn)
+2.2D         [99aee3bc] NOT FOUND!
+3.4D         [ebf61afc] NOT FOUND!
+4.7D         [a1954f44] = YNC-4.BIN    from Youma Ninpou Chou (Nichibutsu, Ninja Emaki jpn)
+5.17D        [1da7a651] = NINJEMAK.6   from Ninja Emaki (Nichibutsu)
+                        = YNC-6.BIN    from Youma Ninpou Chou (Nichibutsu, Ninja Emaki jpn)
+6.18D        [80c20d36] = NINJEMAK.7   from Ninja Emaki (Nichibutsu)
+                        = YNC-7.BIN    from Youma Ninpou Chou (Nichibutsu, Ninja Emaki jpn)
+7.13F        [655f0a58] = YNC-8.BIN    from Youma Ninpou Chou (Nichibutsu, Ninja Emaki jpn)
+8.15F        [934e1703] = NINJEMAK.9   from Ninja Emaki (Nichibutsu)
+                        = YNC-9.BIN    from Youma Ninpou Chou (Nichibutsu, Ninja Emaki jpn)
+9.16F        [955b5c45] = NINJEMAK.10  from Ninja Emaki (Nichibutsu)
+                        = YNC-10.BIN   from Youma Ninpou Chou (Nichibutsu, Ninja Emaki jpn)
+PR.2E        [23bade78] = YNCP-2D.BIN  from Youma Ninpou Chou (Nichibutsu, Ninja Emaki jpn)
+PR.6E        [ea47b91a] = YNCP-6E.BIN  from Youma Ninpou Chou (Nichibutsu, Ninja Emaki jpn)
+PR.7E        [6d66da81] NOT FOUND!
+PR.7H        [262d0809] = YNCP-7F.BIN  from Youma Ninpou Chou (Nichibutsu, Ninja Emaki jpn)
+PR.8E        [ffb4b287] = YNCP-8E.BIN  from Youma Ninpou Chou (Nichibutsu, Ninja Emaki jpn)
+*/
+
 ROM_START( youmab2 )
 	ROM_REGION( 0x18000, "main", 0 )	/* main cpu code */
 	ROM_LOAD( "1.1d",	  0x00000, 0x8000, CRC(692ae497) SHA1(572e5a1eae9b0bb48f65dce5de2df5c5ae95a3bd) )

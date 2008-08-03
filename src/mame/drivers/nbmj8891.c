@@ -3500,6 +3500,36 @@ ROM_START( mjnanpau )
 	ROM_LOAD( "mnst_m1.bin", 0x00000, 0x40000, CRC(77ba1eaf) SHA1(bde55b4d2938f44fd07ff7d5b5a845f2ea64b4fc) )	// same as housemnq/5i.bin gfx data
 ROM_END
 
+
+/*
+Pairs
+System Ten Co. Ltd., 1989
+
+Hardware is by Nichibutsu with official seal, All ROMs 
+have official Nichibutsu stickers on them.
+
+PCB No: GH1701
+CPU   : Z80B
+SOUND : YM3812, Y3014B
+OSC   : 20.000MHz
+RAM   : SONY CXK5814P-35L (x2), MCM514256 (x2), SANYO LC3517AL-10 (x1)
+DIPSW : 8 position (x2)
+OTHER : Unknown 40 Pin DIP (surface scratched, near Z80, PCB doesn't work at all if it is removed)
+        Unknown 40 Pin DIP (surface scratched, made by Fujitsu, near gfx ROMs)
+        Volume Pot (x2, labelled VOICE and MAIN)
+        2 Unpopulated sockets for what appears to be 2 more M514256 RAMs (located next to the two M514256 RAMs)
+PALs  : (x2, one near gfx ROMs, other near Z80)
+PROMs : None
+
+ROMs  : (All ROMs type 27C512)
+------------------------------
+1.J2      \ Main Program (3 grouped together)
+2.K2       |Possibly one of them is sound related or for use with unknown 40 pin DIP IC?
+3.J3      /
+
+4.C8 -> 18.H10  GFX
+*/
+
 ROM_START( pairsnb )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "3.bin",   0x00000, 0x10000, CRC(86cb9301) SHA1(ab0c1d01aac9a6e689ebf7a45e6cfae6e47bec85) )
