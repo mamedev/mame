@@ -94,8 +94,8 @@ write:
 
 #include "mario.h"
 
-static READ8_HANDLER(mario_dma_read_byte);
-static WRITE8_HANDLER(mario_dma_write_byte);
+static READ8_DEVICE_HANDLER(mario_dma_read_byte);
+static WRITE8_DEVICE_HANDLER(mario_dma_write_byte);
 
 /*************************************
  *
@@ -125,7 +125,7 @@ static const z80dma_interface mario_dma =
  *
  *************************************/
 
-static READ8_HANDLER(mario_dma_read_byte)
+static READ8_DEVICE_HANDLER(mario_dma_read_byte)
 {
 	UINT8 result;
 
@@ -136,7 +136,7 @@ static READ8_HANDLER(mario_dma_read_byte)
 	return result;
 }
 
-static WRITE8_HANDLER(mario_dma_write_byte)
+static WRITE8_DEVICE_HANDLER(mario_dma_write_byte)
 {
 	cpuintrf_push_context(0);
 	program_write_byte(offset, data);

@@ -64,7 +64,7 @@ struct _dma8257_t
 
 static TIMER_CALLBACK( dma8257_timerproc );
 static TIMER_CALLBACK( dma8257_msbflip_timerproc );
-static void dma8257_update_status(running_machine *machine, dma8257_t *dma8257);
+static void dma8257_update_status(const device_config *device);
 
 
 /* ----------------------------------------------------------------------- */
@@ -76,8 +76,9 @@ INLINE dma8257_t *get_safe_token(const device_config *device) {
 	return ( dma8257_t * ) device->token;
 }
 
-static int dma8257_do_operation(running_machine *machine, dma8257_t *dma8257, int channel)
+static int dma8257_do_operation(const device_config *device, int channel)
 {
+	dma8257_t *dma8257 = get_safe_token(device);
 	int done;
 	UINT8 data;
 	UINT8 mode;
@@ -87,18 +88,18 @@ static int dma8257_do_operation(running_machine *machine, dma8257_t *dma8257, in
 	{
 		dma8257->status |=  (0x01 << channel);
 		if (dma8257->intf->out_tc[channel])
-			dma8257->intf->out_tc[channel](machine, 0, ASSERT_LINE);
+			dma8257->intf->out_tc[channel](device, 0, ASSERT_LINE);
 	}
 	switch(mode) {
 	case 1:
 		if (dma8257->intf->memory_read!=NULL) {
-			data = dma8257->intf->memory_read(machine, dma8257->address[channel]);
+			data = dma8257->intf->memory_read(device, dma8257->address[channel]);
 		} else {
 			data = 0;
 			logerror("8257: No memory read function defined.\n");
 		}
 		if (dma8257->intf->channel_write[channel]!=NULL) {
-			dma8257->intf->channel_write[channel](machine, 0, data);
+			dma8257->intf->channel_write[channel](device, 0, data);
 		} else {
 			logerror("8257: No channel write function for channel %d defined.\n",channel);
 		}
@@ -110,14 +111,14 @@ static int dma8257_do_operation(running_machine *machine, dma8257_t *dma8257, in
 
 	case 2:
 		if (dma8257->intf->channel_read[channel]!=NULL) {
-			data = dma8257->intf->channel_read[channel](machine, 0);
+			data = dma8257->intf->channel_read[channel](device, 0);
 		} else {
 			data = 0;
 			logerror("8257: No channel read function for channel %d defined.\n",channel);
 		}
 
 		if (dma8257->intf->memory_write!=NULL) {
-			dma8257->intf->memory_write(machine, dma8257->address[channel], data);
+			dma8257->intf->memory_write(device, dma8257->address[channel], data);
 		} else {
 			logerror("8257: No memory write function defined.\n");
 		}
@@ -143,7 +144,7 @@ static int dma8257_do_operation(running_machine *machine, dma8257_t *dma8257, in
 			dma8257->registers[5] = dma8257->registers[7];
 		}
 		if (dma8257->intf->out_tc[channel])
-			dma8257->intf->out_tc[channel](machine, 0, CLEAR_LINE);
+			dma8257->intf->out_tc[channel](device, 0, CLEAR_LINE);
 	}
 	return done;
 }
@@ -152,7 +153,8 @@ static int dma8257_do_operation(running_machine *machine, dma8257_t *dma8257, in
 
 static TIMER_CALLBACK( dma8257_timerproc )
 {
-	dma8257_t *dma8257 = ptr;
+	const device_config *device = ptr;
+	dma8257_t *dma8257 = get_safe_token(device);
 	int i, channel = 0, rr;
 	int done;
 
@@ -164,14 +166,14 @@ static TIMER_CALLBACK( dma8257_timerproc )
 			if (dma8257->mode & dma8257->drq & (1 << channel))
 				break;
 	}
-	done = dma8257_do_operation(machine, dma8257, channel);
+	done = dma8257_do_operation(device, channel);
 
 	dma8257->rr = (channel + 1) & 0x03;
 
 	if (done)
 	{
 		dma8257->drq    &= ~(0x01 << channel);
-		dma8257_update_status(machine, dma8257);
+		dma8257_update_status(device);
   		if (!(DMA_MODE_AUTOLOAD(dma8257->mode) && channel==2)) {
 			if (DMA_MODE_TCSTOP(dma8257->mode)) {
 				dma8257->mode &= ~(0x01 << channel);
@@ -184,14 +186,16 @@ static TIMER_CALLBACK( dma8257_timerproc )
 
 static TIMER_CALLBACK( dma8257_msbflip_timerproc )
 {
-	dma8257_t *dma8257 = ptr;
+	const device_config *device = ptr;
+	dma8257_t *dma8257 = get_safe_token(device);
 	dma8257->msb ^= 1;
 }
 
 
 
-static void dma8257_update_status(running_machine *machine, dma8257_t *dma8257)
+static void dma8257_update_status(const device_config *device)
 {
+	dma8257_t *dma8257 = get_safe_token(device);
 	UINT16 pending_transfer;
 	attotime next;
 
@@ -216,7 +220,7 @@ static void dma8257_update_status(running_machine *machine, dma8257_t *dma8257)
 	/* set the halt line */
 	if (dma8257->intf && dma8257->intf->cpunum >= 0)
 	{
-		cpunum_set_input_line(machine, dma8257->intf->cpunum, INPUT_LINE_HALT,
+		cpunum_set_input_line(device->machine, dma8257->intf->cpunum, INPUT_LINE_HALT,
 			pending_transfer ? ASSERT_LINE : CLEAR_LINE);
 	}
 
@@ -320,9 +324,10 @@ WRITE8_DEVICE_HANDLER( dma8257_w )
 
 static TIMER_CALLBACK( dma8257_drq_write_callback )
 {
+	const device_config *device = ptr;
+	dma8257_t *dma8257 = get_safe_token(device);
 	int channel = param >> 1;
 	int state = param & 0x01;
-	dma8257_t *dma8257 = ptr;
 
 	/* normalize state */
 	if (state)
@@ -337,17 +342,16 @@ static TIMER_CALLBACK( dma8257_drq_write_callback )
 	else
 		dma8257->drq &= ~(0x01 << channel);
 
-	dma8257_update_status(machine, dma8257);
+	dma8257_update_status(device);
 }
 
 
 
 WRITE8_DEVICE_HANDLER( dma8257_drq_w )
 {
-	dma8257_t *dma8257 = get_safe_token(device);
 	int param = (offset << 1) | (data ? 1 : 0);
 
-	timer_call_after_resynch(dma8257, param, dma8257_drq_write_callback);
+	timer_call_after_resynch((void *) device, param, dma8257_drq_write_callback);
 }
 
 
@@ -369,8 +373,8 @@ static DEVICE_START( dma8257 )
 	dma8257->intf = device->static_config;
 
 	dma8257->status = 0x0f;
-	dma8257->timer = timer_alloc(dma8257_timerproc, dma8257);
-	dma8257->msbflip_timer = timer_alloc(dma8257_msbflip_timerproc, dma8257);
+	dma8257->timer = timer_alloc(dma8257_timerproc, (void *) device);
+	dma8257->msbflip_timer = timer_alloc(dma8257_msbflip_timerproc, (void *) device);
 
 	state_save_combine_module_and_tag(unique_tag, "dma8257", device->tag);
 
@@ -394,7 +398,7 @@ static DEVICE_RESET( dma8257 )
 
 	dma8257->status &= 0xf0;
 	dma8257->mode = 0;
-	dma8257_update_status(device->machine, dma8257 );
+	dma8257_update_status(device);
 }
 
 

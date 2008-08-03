@@ -88,7 +88,6 @@
 typedef struct _z80dma_t z80dma_t;
 struct _z80dma_t
 {
-	running_machine *machine;
 	const z80dma_interface *intf;
 	emu_timer *timer;
 
@@ -111,7 +110,7 @@ struct _z80dma_t
 };
 
 static TIMER_CALLBACK( z80dma_timerproc );
-static void z80dma_update_status(running_machine *machine, z80dma_t *z80dma);
+static void z80dma_update_status(const device_config *device);
 
 /* ----------------------------------------------------------------------- */
 
@@ -122,8 +121,9 @@ INLINE z80dma_t *get_safe_token(const device_config *device) {
 	return ( z80dma_t * ) device->token;
 }
 
-static void z80dma_do_read(z80dma_t *cntx)
+static void z80dma_do_read(const device_config *device)
 {
+	z80dma_t *cntx = get_safe_token(device);
 	UINT8 mode;
 
 	mode = TRANSFER_MODE(cntx);
@@ -132,17 +132,17 @@ static void z80dma_do_read(z80dma_t *cntx)
 			if (PORTA_IS_SOURCE(cntx))
 			{
 				if (PORTA_MEMORY(cntx))
-					cntx->latch = cntx->intf->memory_read(cntx->machine, cntx->addressA);
+					cntx->latch = cntx->intf->memory_read(device, cntx->addressA);
 				else
-					cntx->latch = cntx->intf->portA_read(cntx->machine, cntx->addressA);
+					cntx->latch = cntx->intf->portA_read(device, cntx->addressA);
 				cntx->addressA += PORTA_STEP(cntx);
 			}
 			else
 			{
 				if (PORTB_MEMORY(cntx))
-					cntx->latch = cntx->intf->memory_read(cntx->machine, cntx->addressB);
+					cntx->latch = cntx->intf->memory_read(device, cntx->addressB);
 				else
-					cntx->latch = cntx->intf->portB_read(cntx->machine, cntx->addressB);
+					cntx->latch = cntx->intf->portB_read(device, cntx->addressB);
 				cntx->addressB += PORTB_STEP(cntx);
 			}
 			break;
@@ -153,8 +153,9 @@ static void z80dma_do_read(z80dma_t *cntx)
 	}
 }
 
-static int z80dma_do_write(z80dma_t *cntx)
+static int z80dma_do_write(const device_config *device)
 {
+	z80dma_t *cntx = get_safe_token(device);
 	int done;
 	UINT8 mode;
 
@@ -168,17 +169,17 @@ static int z80dma_do_write(z80dma_t *cntx)
 			if (PORTA_IS_SOURCE(cntx))
 			{
 				if (PORTB_MEMORY(cntx))
-					cntx->intf->memory_write(cntx->machine, cntx->addressB, cntx->latch);
+					cntx->intf->memory_write(device, cntx->addressB, cntx->latch);
 				else
-					cntx->intf->portB_write(cntx->machine, cntx->addressB, cntx->latch);
+					cntx->intf->portB_write(device, cntx->addressB, cntx->latch);
 				cntx->addressB += PORTB_STEP(cntx);
 			}
 			else
 			{
 				if (PORTA_MEMORY(cntx))
-					cntx->intf->memory_write(cntx->machine, cntx->addressA, cntx->latch);
+					cntx->intf->memory_write(device, cntx->addressA, cntx->latch);
 				else
-					cntx->intf->portB_write(cntx->machine, cntx->addressA, cntx->latch);
+					cntx->intf->portB_write(device, cntx->addressA, cntx->latch);
 				cntx->addressA += PORTA_STEP(cntx);
 			}
 			cntx->count--;
@@ -198,7 +199,8 @@ static int z80dma_do_write(z80dma_t *cntx)
 
 static TIMER_CALLBACK( z80dma_timerproc )
 {
-	z80dma_t *cntx = ptr;
+	const device_config *device = ptr;
+	z80dma_t *cntx = get_safe_token(device);
 	int done;
 
 	if (--cntx->cur_cycle)
@@ -207,26 +209,27 @@ static TIMER_CALLBACK( z80dma_timerproc )
 	}
 	if (cntx->is_read)
 	{
-		z80dma_do_read(cntx);
+		z80dma_do_read(device);
 		done = 0;
 		cntx->is_read = 0;
 		cntx->cur_cycle = (PORTA_IS_SOURCE(cntx) ? PORTA_CYCLE_LEN(cntx) : PORTB_CYCLE_LEN(cntx));
 	}
 	else
 	{
-		done = z80dma_do_write(cntx);
+		done = z80dma_do_write(device);
 		cntx->is_read = 1;
 		cntx->cur_cycle = (PORTB_IS_SOURCE(cntx) ? PORTA_CYCLE_LEN(cntx) : PORTB_CYCLE_LEN(cntx));
 	}
 	if (done)
 	{
 		cntx->dma_enabled = 0; //FIXME: Correct?
-		z80dma_update_status(machine, cntx);
+		z80dma_update_status(device);
 	}
 }
 
-static void z80dma_update_status(running_machine *machine, z80dma_t *z80dma)
+static void z80dma_update_status(const device_config *device)
 {
+	z80dma_t *z80dma = get_safe_token(device);
 	UINT16 pending_transfer;
 	attotime next;
 
@@ -254,7 +257,7 @@ static void z80dma_update_status(running_machine *machine, z80dma_t *z80dma)
 	if (z80dma->intf && z80dma->intf->cpunum >= 0)
 	{
 		//FIXME: Synchronization is done by BUSREQ!
-		cpunum_set_input_line(machine, z80dma->intf->cpunum, INPUT_LINE_HALT,
+		cpunum_set_input_line(device->machine, z80dma->intf->cpunum, INPUT_LINE_HALT,
 			pending_transfer ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
@@ -385,14 +388,15 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 
 static TIMER_CALLBACK( z80dma_rdy_write_callback )
 {
+	const device_config *device = ptr;
 	int state = param & 0x01;
-	z80dma_t *cntx = ptr;
+	z80dma_t *cntx = get_safe_token(device);
 
 	/* normalize state */
 	cntx->rdy = 1 ^ state ^ READY_ACTIVE_HIGH(cntx);
 	cntx->status = (cntx->status & 0xFD) | (cntx->rdy<<1);
 
-	z80dma_update_status(machine, cntx);
+	z80dma_update_status(device);
 }
 
 
@@ -405,7 +409,7 @@ WRITE8_DEVICE_HANDLER( z80dma_rdy_w)
 
 	param = (data ? 1 : 0);
 	LOG(("RDY: %d Active High: %d\n", data, READY_ACTIVE_HIGH(z80dma)));
-	timer_call_after_resynch(z80dma, param, z80dma_rdy_write_callback);
+	timer_call_after_resynch((void *) device, param, z80dma_rdy_write_callback);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -422,11 +426,9 @@ static DEVICE_START( z80dma )
 	assert(device->tag != NULL);
 	assert(strlen(device->tag) < 20);
 
-	//z80dma->device_type = device_type;
-	z80dma->machine = device->machine;
 	z80dma->intf = device->static_config;
 
-	z80dma->timer = timer_alloc(z80dma_timerproc, z80dma);
+	z80dma->timer = timer_alloc(z80dma_timerproc, (void *) device);
 
 	state_save_combine_module_and_tag(unique_tag, "z80dma", device->tag);
 
@@ -456,7 +458,7 @@ static DEVICE_RESET( z80dma )
 	z80dma->rdy = 0;
 	z80dma->num_follow = 0;
 	z80dma->dma_enabled = 0;
-	z80dma_update_status(device->machine, z80dma);
+	z80dma_update_status(device);
 }
 
 

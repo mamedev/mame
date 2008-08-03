@@ -19,14 +19,14 @@ struct _z80dma_interface
 	int clockhz;
 
 	/* accessors to main memory */
-	read8_machine_func	memory_read;
-	write8_machine_func	memory_write;
+	read8_device_func	memory_read;
+	write8_device_func	memory_write;
 
 	/* port accesors */
-	read8_machine_func	portA_read;
-	write8_machine_func	portA_write;
-	read8_machine_func	portB_read;
-	write8_machine_func	portB_write;
+	read8_device_func	portA_read;
+	write8_device_func	portA_write;
+	read8_device_func	portB_read;
+	write8_device_func	portB_write;
 
 	/* interrupt callback - not implemented */
 	/* void (*irqcb)(int state); */

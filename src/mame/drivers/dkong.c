@@ -320,12 +320,12 @@ Donkey Kong Junior Notes
  *
  *************************************/
 
-static READ8_HANDLER( hb_dma_read_byte );
-static WRITE8_HANDLER( hb_dma_write_byte );
-static READ8_HANDLER( dk_dma_read_byte );
-static WRITE8_HANDLER( dk_dma_write_byte );
-static READ8_HANDLER( p8257_ctl_r );
-static WRITE8_HANDLER( p8257_ctl_w );
+static READ8_DEVICE_HANDLER( hb_dma_read_byte );
+static WRITE8_DEVICE_HANDLER( hb_dma_write_byte );
+static READ8_DEVICE_HANDLER( dk_dma_read_byte );
+static WRITE8_DEVICE_HANDLER( dk_dma_write_byte );
+static READ8_DEVICE_HANDLER( p8257_ctl_r );
+static WRITE8_DEVICE_HANDLER( p8257_ctl_w );
 
 /*************************************
  *
@@ -477,7 +477,7 @@ static MACHINE_RESET( drakton )
  *
  *************************************/
 
-static READ8_HANDLER( dk_dma_read_byte )
+static READ8_DEVICE_HANDLER( dk_dma_read_byte )
 {
 	UINT8 result;
 
@@ -488,16 +488,16 @@ static READ8_HANDLER( dk_dma_read_byte )
 	return result;
 }
 
-static WRITE8_HANDLER( dk_dma_write_byte )
+static WRITE8_DEVICE_HANDLER( dk_dma_write_byte )
 {
 	cpuintrf_push_context(0);
 	program_write_byte(offset, data);
 	cpuintrf_pop_context();
 }
 
-static READ8_HANDLER( hb_dma_read_byte )
+static READ8_DEVICE_HANDLER( hb_dma_read_byte )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = device->machine->driver_data;
 	int	  bucket = state->rev_map[(offset>>10) & 0x1ff];
 	int   addr;
 	UINT8 data;
@@ -514,9 +514,9 @@ static READ8_HANDLER( hb_dma_read_byte )
 	return data;
 }
 
-static WRITE8_HANDLER( hb_dma_write_byte )
+static WRITE8_DEVICE_HANDLER( hb_dma_write_byte )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = device->machine->driver_data;
 	int	  bucket = state->rev_map[(offset>>10) & 0x1ff];
 	int   addr;
 
@@ -530,15 +530,15 @@ static WRITE8_HANDLER( hb_dma_write_byte )
 	cpuintrf_pop_context();
 }
 
-static READ8_HANDLER( p8257_ctl_r )
+static READ8_DEVICE_HANDLER( p8257_ctl_r )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = device->machine->driver_data;
 	return state->dma_latch;
 }
 
-static WRITE8_HANDLER( p8257_ctl_w )
+static WRITE8_DEVICE_HANDLER( p8257_ctl_w )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = device->machine->driver_data;
 	state->dma_latch = data;
 }
 

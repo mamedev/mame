@@ -28,15 +28,15 @@ struct _dma8257_interface
 	int clockhz;
 
 	/* accessors to main memory */
-	read8_machine_func	memory_read;
-	write8_machine_func	memory_write;
+	read8_device_func	memory_read;
+	write8_device_func	memory_write;
 
 	/* channel accesors */
-	read8_machine_func	channel_read[DMA8257_NUM_CHANNELS];
-	write8_machine_func	channel_write[DMA8257_NUM_CHANNELS];
+	read8_device_func	channel_read[DMA8257_NUM_CHANNELS];
+	write8_device_func	channel_write[DMA8257_NUM_CHANNELS];
 
 	/* function to call when DMA completes */
-	write8_machine_func out_tc[DMA8257_NUM_CHANNELS];
+	write8_device_func out_tc[DMA8257_NUM_CHANNELS];
 };
 
 /* device interface */

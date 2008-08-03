@@ -15,6 +15,7 @@
 #include "debugger.h"
 #include "s2650.h"
 #include "s2650cpu.h"
+#include "deprecat.h"
 
 /* define this to have some interrupt information logged */
 #define VERBOSE 0
@@ -40,6 +41,7 @@ typedef struct {
     UINT16  ras[8]; /* 8 return address stack entries */
 	UINT8	irq_state;
     int     (*irq_callback)(int irqline);
+    read16_machine_func addr_rewrite;
 }   s2650_Regs;
 
 static s2650_Regs S;
@@ -170,7 +172,7 @@ static void s2650_set_sense(int state);
  ***************************************************************/
 INLINE UINT8 ROP(void)
 {
-	UINT8 result = cpu_readop(S.page + S.iar);
+	UINT8 result = cpu_readop(S.addr_rewrite(Machine, S.page + S.iar, 0));
 	S.iar = (S.iar + 1) & PMSK;
 	return result;
 }
@@ -181,7 +183,7 @@ INLINE UINT8 ROP(void)
  ***************************************************************/
 INLINE UINT8 ARG(void)
 {
-	UINT8 result = cpu_readop_arg(S.page + S.iar);
+	UINT8 result = cpu_readop_arg(S.addr_rewrite(Machine, S.page + S.iar, 0));
 	S.iar = (S.iar + 1) & PMSK;
 	return result;
 }
@@ -190,7 +192,8 @@ INLINE UINT8 ARG(void)
  * RDMEM
  * read memory byte from addr
  ***************************************************************/
-#define RDMEM(addr) program_read_byte_8le(addr)
+#define RDMEM(addr) program_read_byte_8le(S.addr_rewrite(Machine, addr, 0))
+
 
 /***************************************************************
  * handy table to build PC relative offsets
@@ -507,7 +510,7 @@ static const int S2650_relative[0x100] =
  * Store source register to memory addr (CC unchanged)
  ***************************************************************/
 #define M_STR(address,source)									\
-	program_write_byte_8le(address, source)
+	program_write_byte_8le(S.addr_rewrite(Machine, address, 0), source)
 
 /***************************************************************
  * M_AND
@@ -765,10 +768,16 @@ static void ABS_EA(void) _ABS_EA()
 static void BRA_EA(void) _BRA_EA()
 #endif
 
+static READ16_HANDLER( default_rewrite )
+{
+	return offset;
+}
+
 static void s2650_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	S.irq_callback = irqcallback;
-
+	S.addr_rewrite = (config ? config : &default_rewrite );
+	
 	state_save_register_item("s2650", index, S.ppc);
 	state_save_register_item("s2650", index, S.page);
 	state_save_register_item("s2650", index, S.iar);
@@ -786,8 +795,10 @@ static void s2650_init(int index, int clock, const void *config, int (*irqcallba
 static void s2650_reset(void)
 {
 	int (*save_irqcallback)(int) = S.irq_callback;
+	read16_machine_func save_addr_rewrite  = S.addr_rewrite;
 	memset(&S, 0, sizeof(S));
 	S.irq_callback = save_irqcallback;
+	S.addr_rewrite = save_addr_rewrite;
 	S.psl = COM | WC;
 	S.psu = 0;
 }
