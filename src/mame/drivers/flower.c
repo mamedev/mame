@@ -36,6 +36,37 @@ CHIP #  POSITION   TYPE
 12       16E         "       "
 13       17E         "       "
 14       19E         "       "
+
+                Upright or Cocktail cabinet
+     Two 8-Way joysticks with three (3) fire buttons each
+
+    Button 1: Laser    Button 2: Missle    Button 3: Cutter
+
+                        44 Pin Edge Connector
+          Solder Side             |             Parts Side
+------------------------------------------------------------------
+             GND             |  1 | 2  |             GND
+             GND             |  3 | 4  |             GND
+             +5V             |  5 | 6  |             +5V
+             +5V             |  7 | 8  |             +5V
+             +12V            |  9 | 10 |             +5V
+         Speaker (-)         | 11 | 12 |        Speaker (+)
+       Player 1 - Up         | 13 | 14 |       Player 1 - Down
+       Player 1 - Left       | 15 | 16 |       Player 1 - Right
+       Player 1 - Laser      | 17 | 18 |       Player 1 - Missile
+       Player 1 - Cutter     | 19 | 20 |
+       Player 2 - Up         | 21 | 22 |       Player 2 - Down
+       Player 2 - Left       | 23 | 24 |       Player 2 - Right
+       Player 2 - Laser      | 25 | 26 |       Player 2 - Missile
+       Player 2 - Cutter     | 27 | 28 |
+        Coin Switch 1        | 29 | 30 |       Player 1 Start
+       Player 2 Start        | 31 | 32 |
+                             | 33 | 34 |
+       Coin Counter 1        | 35 | 36 |
+        Video Sync           | 37 | 38 |        Video Blue
+        Video Green          | 39 | 40 |        Video Red
+             GND             | 41 | 42 |           GND
+             GND             | 43 | 44 |           GND
 */
 
 #include "driver.h"
