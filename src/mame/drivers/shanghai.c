@@ -16,12 +16,9 @@ settings, but music runs too fast.
 
 * kothello
 
-To Do: Find Dip Switches
-
-Notes: Currently, the game needs 5 coins to give 1 credit. If you use the 
-Service Coin you can start the game after a single coin, but the credits 
-are updated on screen only once every 5 coins. Both these issues are
-probably due to the game code reading some Coinage bit from Dips.
+Notes: If you use the key labeled as 'Service Coin' you can start the game 
+with a single 'coin' no matter the Coingae Setting, but the credit is not
+displayed.
 
 ***************************************************************************/
 
@@ -781,13 +778,13 @@ static VIDEO_UPDATE( shanghai )
 
 		b = 2 * (((HD63484_reg[0xdc/2] & 0x000f) << 16) + HD63484_reg[0xde/2]);
 
-		for (y = sy ; y<=sy+h && y<280 ; y++)
+		for (y = sy ; y <= sy + h && y < 280 ; y++)
 		{
 			for (x = 0 ; x < 384 ; x++)
 			{
-				b &= (HD63484_RAM_SIZE-1);
-				if (x <= w && x + sx >= 0 && x+sx < 384)
-					*BITMAP_ADDR16(bitmap, y, x+sx) = HD63484_ram[b];
+				b &= (HD63484_RAM_SIZE - 1);
+				if (x <= w && x + sx >= 0 && x + sx < 384)
+					*BITMAP_ADDR16(bitmap, y, x + sx) = HD63484_ram[b];
 
 				b++;
 			}
@@ -901,6 +898,32 @@ static INPUT_PORTS_START( kothello )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("DSW")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1077,6 +1100,17 @@ static const struct YM2203interface sh_ym2203_interface =
 };
 
 
+const struct YM2203interface kothello_ym2203_interface =
+{
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		input_port_4_r,
+		NULL, NULL, NULL
+	},
+	seibu_ym2203_irqhandler
+};
+
 
 static MACHINE_DRIVER_START( shanghai )
 
@@ -1169,7 +1203,16 @@ static MACHINE_DRIVER_START( kothello )
 	MDRV_VIDEO_UPDATE(shanghai)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM2203_INTERFACE(14318180/4)
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	/* same as standard seibu ym2203, but "ym1" also reads "DSW" */
+	MDRV_SOUND_ADD("ym1", YM2203, 14318180/4)
+	MDRV_SOUND_CONFIG(kothello_ym2203_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+
+	MDRV_SOUND_ADD("ym2", YM2203, 14318180/4)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+
 	SEIBU_SOUND_SYSTEM_ADPCM_INTERFACE
 MACHINE_DRIVER_END
 
