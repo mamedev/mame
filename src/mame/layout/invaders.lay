@@ -14,7 +14,7 @@
 			<color red="0.125" green="1" blue="0.125" />
 		</rect>
 		<rect>
-			<bounds left="0" top="32" right="224" bottom="64" />
+			<bounds left="0" top="32" right="224" bottom="62" />
 			<color red="1" green="0.125" blue="0.125" />
 		</rect>
 	</element>
