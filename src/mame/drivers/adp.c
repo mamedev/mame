@@ -902,9 +902,26 @@ static VIDEO_UPDATE(adp)
 
 static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x800080, 0x80009f) AM_NOP // sound?
+	AM_RANGE(0x800180, 0x80019f) AM_NOP // sound?
 	AM_RANGE(0x8000a0, 0x8000a1) AM_READWRITE(HD63484_status_r, HD63484_address_w) // bad
 	AM_RANGE(0x8000a2, 0x8000a3) AM_READWRITE(HD63484_data_r, HD63484_data_w) // bad
+	AM_RANGE(0x800084, 0xffbfff) AM_RAM // used?
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( quickjac_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w) // bad
+	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w) // bad
+	AM_RANGE(0x800084, 0xffbfff) AM_RAM // used?
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( backgamn_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x600000, 0x60001f) AM_NOP // sound?
+	AM_RANGE(0x503ffa, 0x503ffb) AM_READWRITE(HD63484_status_r, HD63484_address_w) // bad
+	AM_RANGE(0x503ffc, 0x503ffd) AM_READWRITE(HD63484_data_r, HD63484_data_w) // bad
 	AM_RANGE(0x800084, 0xffbfff) AM_RAM // used?
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -913,9 +930,53 @@ static INPUT_PORTS_START( adp )
 
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( adp )
+static MACHINE_DRIVER_START( quickjac )
+	MDRV_CPU_ADD("main", M68000, 8000000)
+	MDRV_CPU_PROGRAM_MAP(quickjac_mem, 0)
+
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(640, 480)
+	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_PALETTE_LENGTH(0x100)
+
+	MDRV_PALETTE_INIT(adp)
+	MDRV_VIDEO_START(adp)
+	MDRV_VIDEO_UPDATE(adp)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("ay", AY8910, 3686400/2)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( skattv )
 	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(skattv_mem, 0)
+
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(640, 480)
+	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_PALETTE_LENGTH(0x100)
+
+	MDRV_PALETTE_INIT(adp)
+	MDRV_VIDEO_START(adp)
+	MDRV_VIDEO_UPDATE(adp)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("ay", AY8910, 3686400/2)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( backgamn )
+	MDRV_CPU_ADD("main", M68000, 8000000)
+	MDRV_CPU_PROGRAM_MAP(backgamn_mem, 0)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -990,9 +1051,9 @@ ROM_START( fashiong )
 	ROM_LOAD16_BYTE( "m48z08posz.bin", 0x0001, 0x2000, CRC(7c5a4b78) SHA1(262d0d7f5b24e356ab54eb2450bbaa90e3fb5464) )
 ROM_END
 
-GAME( 1990, backgamn,        0, adp,    adp,    0, ROT0,  "ADP", "Backgammon", GAME_NOT_WORKING )
-GAME( 1993, quickjac,        0, adp,    adp,    0, ROT0,  "ADP", "Quick Jack", GAME_NOT_WORKING )
-GAME( 1994, skattv,          0, adp,    adp,    0, ROT0,  "ADP", "Skat TV", GAME_NOT_WORKING )
-GAME( 1995, skattva,    skattv, adp,    adp,    0, ROT0,  "ADP", "Skat TV (version TS3)", GAME_NOT_WORKING )
-GAME( 1997, fashiong,        0, adp,    adp,    0, ROT0,  "ADP", "Fashion Gambler", GAME_NOT_WORKING )
+GAME( 1990, backgamn,        0, backgamn,    adp,    0, ROT0,  "ADP", "Backgammon", GAME_NOT_WORKING )
+GAME( 1993, quickjac,        0, quickjac,    adp,    0, ROT0,  "ADP", "Quick Jack", GAME_NOT_WORKING )
+GAME( 1994, skattv,          0, skattv,      adp,    0, ROT0,  "ADP", "Skat TV", GAME_NOT_WORKING )
+GAME( 1995, skattva,    skattv, skattv,      adp,    0, ROT0,  "ADP", "Skat TV (version TS3)", GAME_NOT_WORKING )
+GAME( 1997, fashiong,        0, skattv,      adp,    0, ROT0,  "ADP", "Fashion Gambler", GAME_NOT_WORKING )
 
