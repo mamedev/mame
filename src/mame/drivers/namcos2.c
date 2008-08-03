@@ -4416,7 +4416,115 @@ ROM_START( bubbletr )
 	ROM_LOAD( "bt1-voi1.bin",  0x000000, 0x080000,  CRC(08b3a089) SHA1(5023c2c0d0a94f0a2f98605d9b93d2d6ce626aa8) )
 ROM_END
 
-/* LUCKY & WILD */
+
+/*
+Lucky & Wild
+Namco, 1989
+
+PCB Layout
+----------
+
+Top Board
+
+8618963905  (8618961805)
+|--------------------------------------------------------------------|
+| TA7630  C116     M5M5178                                 49.152MHz |
+|  TL084  TL084    M5M5178                                      137  |
+| LC7881           M5M5178       9S*      LW1_CHR-3.11S  LW1_DAT0.13S|
+| LA4700     156         123     9R*      LW1_CHR-2.11R  LW1_DAT2.13R|
+|                           LW1_CHR-5.9P  LW1_CHR-1.11P  LW1_DAT1.13P|
+|140           LW1_SHA-0.7N LW1_CHR-4.9N  LW1_CHR-0.11N  LW1_DAT3.13N|
+|      3N*                                                           |
+|  LW1_VOI-1.3M          145  84256                                  |
+|J LW1_VOI-2.3L               84256       65256          65256       |
+|A                                                                   |
+|M   8464       2018                      LW1SP0.11K     LW1SP1.13K  |
+|M              2018                                                 |
+|A   YM2151                  LW1SND0.7J                              |
+|          121  6809            7G*            68000         148     |
+|          SYS87B-1(PAL)   8464                                      |
+|               SYS87B-2B(PAL)                                       |
+|        3F(C68PRG)*                                                 |
+|                                                                    |
+|   DSW(8)    C68                                                    |
+| 3.579545MHz            CY7C132                                     |
+|    149                      SYS87B-3(PAL)     62256       62256    |
+|                                  139                               | 
+|                                     HN58C65  LW2MP0.11D  LW2MP1.13D|
+|                               M5M5179               68000      148 |
+|--------------------------------------------------------------------|
+Notes:
+      68000 clock : xx MHz
+      6809 clock  : xx MHz
+      YM2151 clock: xx MHz
+      *           : Unpopulated socket
+
+      Namco customs:
+                    C116 (QFP80)
+                    156  (QFP64)
+                    123  (QFP80)
+                    145  (QFP80)
+                    148  (QFP64, x2)
+                    139  (QFP64)
+                    C68  (QFP80)
+                    149  (DIP28)
+                    137  (DIP28)
+                    140  (QFP120)
+                    121  (QFP64)
+
+
+Bottom Board
+
+SYSTEM2 VIDEO(E)
+8618962600
+8618962599
+8618962400
+(8618964200)
+
+|--------------------------------------------------------------------|
+|                            33.300MHz   137                         |
+|   G272DEC(PAL)    KEYCUS   TC15832       TC15832     LW1_ROZ-0.23B |
+|                            TC15832       TC15832     LW1_ROZ-1.23C |
+| CY7C199                    TC15832       TC15832     LW1_ROZ-2.23E |
+| CY7C199                    TC15832       TC15832 G272PRI(PAL)  23J*|
+|                            TC15832       TC15832               23K*|
+|                            TC15832       TC15832               23L*|
+|                            TC15832       TC15832               23P*|
+| C355       187             TC15832       TC15832               23R*|
+|                                                                    |
+|                                                      DSW2(6)       |
+|                                                                    |
+| LW1_OBJ-0.3P                                                       |
+|                                                                    |
+| LW1_OBJ-4.3P                                                       |
+|                                                                    |
+| LW1_OBJ-2.3P                                                       |
+|                                                                    |
+| LW1_OBJ-6.3P                                                       |
+|                                                                    |
+| LW1_OBJ-1.3P            LW1_LD8.10W                                |
+|                                                                    |
+| LW1_OBJ-5.3P                                169                    |
+|                                                                    |
+| LW1_OBJ-3.3P    45                  373                            |
+|                                             84256                  |
+| LW1_OBJ-7.3P                                84256   LW1_RZS-0.20Z  |
+|DSW1(6)                                      84256                  |
+|--------------------------------------------------------------------|
+Notes:
+      KEYCUS      : socket not populated
+      LW1_LD8.10W : PROM type MB7118      
+      *           : Unpopulated socket
+
+      Namco customs:
+                    45   (QFP80)
+                    C355 (QFP160)
+                    187  (QFP120)
+                    137  (DIP28)
+                    169  (QFP120)
+                    373  (SDIP64)
+*/
+
 ROM_START( luckywld )
 	ROM_REGION( 0x040000, "main", 0 ) /* Master CPU */
 	ROM_LOAD16_BYTE( "lw2mp0.11d",	0x000000, 0x020000, CRC(368306bb) SHA1(e529ff2cc8baed8fd9cb1c010ad0c9f46c5e5f97) )

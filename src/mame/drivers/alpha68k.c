@@ -2339,6 +2339,62 @@ ROM_START( kyros )
 	ROM_LOAD( "0.1t",      0x0000,0x2000, CRC(5d0acb4c) SHA1(52fcdcb2bf6d6ada04aa447b5526c39848bf587f) )
 ROM_END
 
+
+/*
+Kyros No Yakata
+Alpha Denshi, 1986
+
+PCB Layout:
+
+Main Board
+|----------------------------------------------------------|
+|                                                          |
+| 0.1T                                              24MHz  |
+|                                                          |
+| 15.3T                                                    |
+|         PROMG.4R          5814                           |
+| 16.5T   PROMR.5R PROMH.5P 5814                  DSW1(8)  |
+|         PROMB.6R PROML.6P                                |
+| 17.7T                                           MCU      |
+|                             2016 2016                    |
+| 18.9T   9.9S 8.9R           2016 2016                    |
+|                                                          |
+| 19.11T                            68000 2016 2.10C 4.10A |
+|              14.12R  12.12N             2016             |
+| 20.13T           13.12P  11.12M              1.13C 3.13A |
+|                                                          |
+|----------------------------------------------------------|
+
+Sound Board
+|---------------------|
+|                     |
+|                     |
+| YM3014              |
+|                     |
+| YM2203    AY-3-8910 |
+|                     |
+|           AY-3-8910 |
+|                     |
+|                     |
+|                     |
+| 2.1F 2114           |
+|      2114           |
+| 1.1D          16MHz |
+|                     |
+|  Z80                |
+|                     |
+|---------------------|
+
+Notes:
+        68k clock: 6.000MHz
+        Z80 clock: 4.000MHz
+            VSync: 60Hz
+            HSync: 15.20kHz
+  AY-3-8910 clock: 2.000MHz
+     YM2203 clock: 2.000MHz
+Unknown MCU clock: 3.000MHz (measured on pin 5)
+*/
+
 ROM_START( kyrosj )
 	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD16_BYTE( "2j.10c",0x00000,  0x4000, CRC(b324c11b) SHA1(9330ee0db8555a3623118c7bc5363b4f6fa87dbc) )

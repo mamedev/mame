@@ -2031,6 +2031,45 @@ ROM_START( kagekia )
 ROM_END
 
 
+/*
+Chuka Taisen
+Taito, 1988
+
+PCB Layout
+
+|--------------------------------------------------|
+|    SETA                     SETA         12MHz   |
+|    X1-003     6116          X1-001               |
+|               6116          YM3906               |
+|    SETA       6116                               |
+|    X1-006     6116                               |
+|                                                  |
+|                             SETA                 |
+|                             X1-002A              |
+|                                                  |
+|       DSWB                                       |
+|J                                   B44-01.8      |
+|A                      PRG10.32                   |
+|M      DSWA            PRG11.31     B44-05.7      |
+|M                      6264                       |
+|A                                   B44-02.6      |
+|     YM3014                                       |
+|                                    B44-06.5      |
+|             B06-101.36(PAL)                      |
+|                                    B44-03.4      |
+|       YM2203   Z80B                              |
+|                    B06-11.35(PAL)  B44-07.3      |
+|                B44_12.38                         |
+|   SETA                             B44-04.2      |
+|   X1-004         Z80B                            |
+|                    B06-12.26(PAL)  B44-08.1      |
+|                    B06-11.25(PAL)                |
+|--------------------------------------------------|
+Notes:
+      6264: 8K x8 SRAM
+      6116: 2K x8 SRAM
+*/
+
 ROM_START( chukatai )
 	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b44-10", 0x00000, 0x08000, CRC(8c69e008) SHA1(7825965f517f3562a508345b7c0d32b8a57bd38a) )
@@ -2102,6 +2141,79 @@ ROM_START( chukataj )
 	ROM_LOAD( "b44-07.a04", 0xc0000, 0x20000, CRC(3e0e737e) SHA1(f8d62c7b69c79da9df7ef5ce454060d3645e5884) )
 	ROM_LOAD( "b44-08.a02", 0xe0000, 0x20000, CRC(6cb1e8fc) SHA1(4ab0c2cce1de2616044a9bfb9bf17f95a49baffd) )
 ROM_END
+
+
+/*
+The New Zealand Story
+Taito, 1988
+
+This PCB runs on Taito/Seta hardware.
+
+PCB Layout
+----------
+
+M6100356A (on PCB)
+PO-043A (Seta number; on PCB)
+|---------------------------------------------------|
+|     VOL  HA17408           B53-26.U34  DSWB DSWA  |
+|      4558       YM2203 Z80  62256              Z80|
+|      4558 YM3014                                  |
+|                                                   |
+|                                  B06-13           |
+|                                   (PAL)           |
+|                                                   |
+|                                                   |
+|                               6264       B53-25.U3|
+|J     TESTSW                                       |
+|A                                                  |
+|M                                                  |
+|M                                 B06-101          |
+|A                                  (PAL)           |
+|---------------------------------------------------| <- ROM Board above 
+|                                              DIP40|    main PCB
+|               X1-001A                             |
+|                                                   |
+|    X1-004                                         |
+|               X1-002A       12MHz                 |
+|                                                   |
+|                                                   |
+|   X1-006                              6264        |
+|X1-007     DIP40  DIP40  DIP40  DIP40     B53-24.U1|
+|---------------------------------------------------|
+Notes:
+      All Z80 CPU's running at 6.000MHz (12/2)
+      YM2203 running at 3.000MHz (12/4)
+      VSync 60Hz
+      DIP40 - Empty sockets used for connection of ROM board
+      Seta Custom IC's -
+                        X1-001A
+                        X1-002A
+                        X1-004
+                        X1-006
+                        X1-007
+                        
+
+ROM Board
+---------
+K9100209A
+J9100159A SUB PCB
+K9100209A N. Z. LAND STORY (sticker)
+|---------------------------------------------------|
+|                                  PAL(B53-15)      |
+|     B53_20     B53_18      B53_16     Z80B   DIP40|
+|B53_21    B53_19     B53_17                        |
+|                                                   |
+|                                                   |
+|                                                   |
+|B53_23                                             |
+|    B53_22                                         |
+|           DIP40  DIP40  DIP40  DIP40     62256    |
+|---------------------------------------------------|
+Notes:
+      Z80 clock 6.000MHz
+      DIP40 - connection pins joining to Main PCB DIP40 sockets
+      All ROMs are 27010 (DIP32)
+*/
 
 ROM_START( tnzs )
 	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */

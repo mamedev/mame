@@ -968,6 +968,75 @@ ROM_START( butasan )
 	ROM_LOAD( "buta-02.prm",  0x00100, 0x00100, CRC(0dcb18fc) SHA1(0b097b873c9484981f87a5e3d1af767f901ae05f) )
 ROM_END
 
+
+/*
+Bombs Away
+Jaleco, 1988
+
+PCB Layout
+----------
+
+BB-8744
+|------------------------------------------|
+|         1      Z80(1)          4         |
+|         6116      5MHz                  |-|
+|VOL      YM2203                 5        | |
+|4558     YM2203      Z80(2)              | |
+|4558 YM3014                     6        | |
+|     YM3014                              | |
+|J          6116                6264      | |
+|A                                        |-|
+|M                                         |
+|M                                         |
+|A                                        |-|
+|                                         | |
+|                                         | |
+|                2   62256                | |
+| DSW1                                    | |
+|                3   62256                | |
+| DSW2    82S137                          |-|
+|                                          |
+|------------------------------------------|
+Notes:
+      Z80(1) clock - 5.000MHz
+      Z80(2) clock - 6.000MHz [12/2]
+      YM2203 clock - 1.500MHz [12/8, both]
+      VSync - 54Hz
+      HSync - 15.25kHz
+
+
+BB-8745
+|--------------------------------|
+|                                |
+|                      |-----|  |-|
+|                      |N8633|  | |
+|                      |-S   |  | |
+|                      |-----|  | |
+|  82S123                       | |
+|              |-----|          | |
+|              |N8633|          |-|
+|              |-V   |           |
+|2018          |     |           |
+|2018        7 |6116 |    12MHz |-|
+|              |-----|          | |
+|      |-----|                  | |
+|      |N8633|                  | |
+|      |-V64 |                  | |
+|      |     |                  | |
+| 9  8 |6264 |                  |-|
+|      |-----|                   |
+|--------------------------------|
+Notes:
+      3 soldered-in 'modules' are located on this PCB.
+      N-8633-V 6-7 TOYOCOM
+      N-8633-V64 6-7 TOYOCOM
+      N-8633-S 6-7 TOYOCOM
+      The 2 larger ones have 62 pins, 31 pins on each side of a small PCB. The PCB contains some
+      surface mounted logic chips and some surface mounted RAM.
+      The smaller module has 40 pins, 20 pins on each side of a small PCB. The PCB contains only
+      logic on both sides.
+*/
+
 ROM_START( bombsa )
 	ROM_REGION( 0x30000, "main", 0 )					/* Main CPU */
 	ROM_LOAD( "4.7a", 0x00000, 0x08000, CRC(0191f6a7) SHA1(10a0434abbf4be068751e65c81b1a211729e3742) )

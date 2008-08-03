@@ -2612,6 +2612,92 @@ ROM_START( ghostb3 )
 	ROM_LOAD( "dz20a.11d", 0x0400, 0x0400, CRC(d8fe2d99) SHA1(56f8fcf2f871c7d52d4299a5b9988401ada4319d) )
 ROM_END
 
+
+/*
+Meikyuu Hunter G (also known as Maze Hunter)
+Data East, 1987
+
+PCB Layout
+----------
+
+DE-0273-1
+|-------------------------------------------------------------|
+|  2018           DW09                       DW00             |
+|  2018                                                       |
+|                 DW08                                       |-|
+|   |---------|                                       6264   | |
+|   |         |   DW07                                       | |
+|   |L7A0072  |                                              | |
+|   |DATA EAST|   DW06                                       | |
+|   |BAC 06   |                                              | |
+|J  |---------|                                              | |
+|A                               DW19                        |-|
+|M                                                            |
+|M     DSW1       DSW2           DW18                         |
+|A                                                           |-|
+|                 6116     |---|                             | |
+|                          | H |                             | |
+|                 DW05     | D | DW04                        | |
+|                          | 6 |                      2018   | |
+|   65C02         YM3812   | 3 | DW03                        | |
+|                          | C |                             | |
+|   YM2203        YM3014   | 0 | DW02                        |-|
+|                 YM3014   | 9 |                              |
+|         VOL  UPC324      |---| DW01-5         i8751H  8MHz  |
+|-------------------------------------------------------------|
+Notes:
+      2018           - 2K x8 SRAM (DIP24)
+      6116           - 2K x8 SRAM (DIP24)
+      6264           - 8K x8 SRAM (DIP28)
+      6502 CPU clock - 1.500MHz
+      6309 CPU clock - 3.000MHz
+      YM2203 clock   - 1.500MHz
+      8751 clock     - 8.000MHz (contents secured)
+      YM3812 clock   - 3.000MHz
+      VSync          - 58Hz
+      HSync          - 15.68kHz
+      ROMs -
+            DW00/DW01/DW05      - 27C256
+            DW02/DW03/DW04      \
+            DW06/DW07/DW08/DW09 / 27C512
+            DW18 - Fujitsu MB7132, compatible with Philips 82S181
+            DW19 - Fujitsu MB7122, compatible with Philips 82S137
+
+
+DE-0259-1
+|-------------------------------------------------------------|
+|                                                             |
+|                        2018                                 |
+|   2018                                                     |-|
+|                        2018                                | |
+|                                          2018              | |
+|   2018                                   2018              | |
+|                                                            | |
+|                        DW10                   |-------|    | |
+|                                               |       |    | |
+|                        DW11  2018             | DRL40 |    |-|
+|                                               |       |     |
+|                        DW12                   |-------|     |
+|                                                            |-|
+|                        DW13  2018                          | |
+|      VSC30                                    |-------|    | |
+|                        DW14                   |       |    | |
+|                                               | DRL40 |    | |
+|                        DW15  2018             |       |    | |
+| HMC20                                         |-------|    | |
+|                        DW16                                |-|
+|                                                             |
+|12MHz                   DW17  2018                           |
+|-------------------------------------------------------------|
+Notes:
+      2018 - 2K x8 SRAM (DIP24)
+      All ROMs 27512
+      DECO Custom ICs -
+                        DECO VSC30 M60348 6102 (DIP40)
+                        DECO HMC20 M60232 722001 (DIP28)
+                        DATA EAST DRL40 TC17G042AF 8053 8702A (x2, QFP144)
+*/
+
 ROM_START( meikyuh )
 	ROM_REGION( 0x40000, "main", 0 )
 	ROM_LOAD( "dw-01-5.1d", 0x08000, 0x08000, CRC(87610c39) SHA1(47b83e7decd18f117d00a9f55c42da93b337c04a) )

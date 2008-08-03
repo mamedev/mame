@@ -1472,6 +1472,140 @@ ROM_START( buckrogn )
 ROM_END
 
 
+/*
+Buck Rogers Zoom 909 (early version of Buck Rogers Planet of Zoom)
+Sega, 1982
+
+PCB Layouts
+-----------
+
+Top
+---
+834-5122 (Sound Board)
+|------------------------------------------------------|
+|                                                      |
+|             4066  555     LM324  LM324  LM324        |
+|                                                      |
+| 7404  7407  4066  555 555 MB4391                     |
+|                                                      |
+| 40175 40175 7438  7439    MB4391 MB4391 LM324        |
+|                                                      |
+| 53323   53323  IR3702     IR3702 LM324  LM324  P138MM|
+|                                                5837N |
+| 53323   53323  53323      IR3702                     |
+|                                           LA4460 VOL |
+|------------------------------------------------------| 
+Notes:
+      All IC's shown.
+
+      
+Middle
+------
+834-5120  171-5011  CPU BOARD  (sticker 834-5142)
+|------------------------------------------------------|
+|D8279    D8255  EPR-5200  Z80   20MHz    SEGA         |
+|    PR-5199     6116                     315-5014     |
+|                                                      |
+|    EPR-5203  8264                                    |
+|              8264                       6116         |
+|              8264                          EPR-5217B |
+|                                                      |
+|                                         *  EPR-5218B |
+|2                                                     |
+|2    PR-5198                                          |
+|W                                                     |
+|A                                              2148   |
+|Y         6116                                        |
+|                                               2148   |
+|                          PR-5195  PR-5194            |
+|               PR-5197                         2148   |
+|      EPR-5201                                        |
+|                                               2148   |
+|      EPR-5202                                        |
+|                                                      |
+| DSW2  DSW1                                   PR-5196 |
+|                                                      |
+| D8255                                                |
+|                                                      |
+|------------------------------------------------------|
+Notes:
+      6116          : 2K  x8 SRAM
+      8264          : 64K x4 DRAM
+      2148          : 1K  x4 SRAM
+      Z80 clock     : 5.000MHz
+      315-5014 clock: measured 3.766MHz to 3.815MHz on pin6; moving slowly!? (NOTE! This is an encrypted Z80)
+      VSync         : 60Hz
+      VCO voltage   : 1.43 Volts 
+                      Note! This is guessed to make the sprites a reasonable size. A shot of the title screen 
+                      after coinup from a real machine would help to fix the real voltage and give the correct
+                      sprite sizes. Note in MAME the Buck Rogers title isn't centered because of the guessed
+                      voltage, though I'm sure it's very close.
+                      Is it like that on the real machine?
+
+      Label           ROM Type
+      EPR-5200.66     2732
+      EPR-5201.102    2716
+      EPR-5202.103    2716
+      EPR-5203.91     2764
+      EPR-5217B.3     27128
+      EPR-5218B.4     27128
+      PR-5194.39      TBP18S030 (compatible with 82S123)
+      PR-5195.53      TBP18S030 (compatible with 82S123)
+      PR-5196.10      TBP28S46N (compatible with 82S141)
+      PR-5197.78      TBP28S46N (compatible with 82S141)
+      PR-5198.93      TBP28S46N (compatible with 82S141)
+      PR-5199.95      82S181
+      *               Empty socket
+      
+      
+Bottom
+------
+(sticker 834-5151)  171-5012  ROM BOARD 
+|------------------------------------------------------|
+|                                                      |
+|                                                      |
+| EPR-5214  EPR-5211  EPR-5208      *                  |
+|                                                      |
+| EPR-5215  EPR-5212  EPR-5209  EPR-5206               |
+|                                                      |
+|                                                      |
+|                                                      |
+|                                                      |
+|                                          NEC         |
+|                                          uPC624      |
+|                                                      |
+|                                               NEC    |
+|                                               C159A  |
+|                                                      |
+|                                          TL084  TL084|
+|                                                      |
+|                                                 4066 |
+|                                                 4066 |
+| EPR-5216  EPR-5213  EPR-5231  EPR-5207               |
+|                                                75365 |
+|    *          *         *         *            75365 |
+|                                                      |
+|                                                      |
+|------------------------------------------------------|
+Notes:
+      Label          ROM Type
+      EPR-5206.43    27128
+      EPR-5207.52    27128
+      EPR-5208.58    2764
+      EPR-5209.59    27128
+      EPR-5211.74    2764
+      EPR-5212.75    27128
+      EPR-5213.84    2764
+      EPR-5214.90    2764
+      EPR-5215.91    27128
+      EPR-5216.100   2764
+      EPR-5231.68    27128
+      *              Empty socket
+
+      Note! On my PCB, ROMs 58 and 74 match. It could be 
+      wrong, but the PCB appears to work perfectly.
+*/
+
 ROM_START( zoom909 )
 	ROM_REGION( 0xc000, "main", 0 )
 	ROM_LOAD( "epr-5217b.cpu-ic3",  0x0000, 0x4000, CRC(1b56e7dd) SHA1(ccf638c318ebce754ac9628271d2064e05ced35c) )	/* encrypted */

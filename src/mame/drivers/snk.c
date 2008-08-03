@@ -1497,8 +1497,57 @@ ROM_START( fitegol2 )
 	ROM_LOAD( "pal20l8a.6r", 0x0400, 0x0144, CRC(0f011673) SHA1(383e6f6e78daec9c874d5b48378111ca60f5ed64) )
 ROM_END
 
-ROM_START( countryc )
 
+/*
+Country Club
+SNK, 1988
+
+TOP PCB (sound board)
+-------
+PCB No: A7004
+CPU   : Z80
+SOUND : YM3812, Y3014B
+XTAL  : 4.000MHz
+RAM   : 6116 (x1)
+DIPSW : 8 position (x2)
+ROMs  : 
+        cc1.1f		27c512             sound program
+
+
+2nd PCB (CPU board)
+-------
+PCB No: A5001UP02-01
+CPU   : Z80 (x2)
+RAM   : 6116 (x4), 2148 (x4)
+OTHER : PALs (x2), TC4584 (used for trackball/spinner control)
+ROMs  : 
+        cc2.2e		27c128  	\ 
+        cc3.2g		  ''		 | for Z80 #1
+        cc4.2h		  ''		/ 
+        cc5.4e		  ''		\
+        cc6.4g		  ''		 | for Z80 #2
+        cc7.4h		  ''		/
+        cc8.7e		27c256		\
+        cc9.7g		  ''		 | gfx
+        cc10.7h		  ''		/
+	cc1pr.5f	63s441		\
+	cc2pr.5g	  ''		 | proms
+	cc3pr.5h	  ''		/
+
+
+3rd PCB (Video board)
+-------
+PCB No: A5001UP01-01
+XTAL  : 13.400MHz
+RAM   : 6116 (x1), 6264 (x2)
+OTHER : PAL (x1)
+ROMs  : 
+        cc11.1e		27c128  	\ 
+        cc13.2d		  ''		 | gfx
+        cc12.2c		  ''		/ 
+*/
+
+ROM_START( countryc )
 	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for cpuA code */
 	ROM_LOAD( "cc2.2e",  0x0000, 0x04000,  CRC(43d205e0) SHA1(d32f597bf2b70e326e68583cb95e0beeea34d5d0) )
 	ROM_LOAD( "cc3.2g",  0x4000, 0x04000,  CRC(7290770f) SHA1(41184047e3e21f6ff4f724d59f4c6f34b19bcfc1) )
@@ -1528,7 +1577,6 @@ ROM_START( countryc )
 	ROM_LOAD( "cc10.7h",  0x00000, 0x8000, CRC(90091667) SHA1(d0d3813a0c3ac7e9e9ab824292dccb27c2087ea7) )
 	ROM_LOAD( "cc9.7g",   0x08000, 0x8000, CRC(56249142) SHA1(10b703f15977ba21757aee3d212790372b35cc66) )
 	ROM_LOAD( "cc8.7e",   0x10000, 0x8000, CRC(55943065) SHA1(ea545c6e8666c915994836d2f2cfc02db35e37c1) )
-
 ROM_END
 
 /***********************************************************************/

@@ -218,6 +218,36 @@ static MACHINE_DRIVER_START( homerun )
 
 MACHINE_DRIVER_END
 
+
+/*
+Moero Pro Yakyuu Homerun Kyousou
+Jaleco, 1988
+
+PCB Layout
+----------
+
+HR-8847
+-----------------------------------
+| YM2203    Z80B         6264     |
+|YM3014 DSW(8)     HOMERUN.43     |
+|    D7756C   6264                |
+|                                 |
+|J  640KhZ   HOMERUN.60           |
+|A 2018                           |
+|M      2018    2018          8255|
+|M          2018                  |
+|A                                |
+|                                 |
+|                                 |
+| HOMERUN.120                20MHz|
+-----------------------------------
+
+Notes:
+      Z80 clock: 5.000MHz
+          VSync: 60Hz
+          HSync: 15.21kHz
+*/
+
 ROM_START( homerun )
 	ROM_REGION( 0x30000, "main", 0 )
 	ROM_LOAD( "homerun.43",        0x0000, 0x4000, CRC(e759e476) SHA1(ad4f356ff26209033320a3e6353e4d4d9beb59c1) )

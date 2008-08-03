@@ -2285,6 +2285,138 @@ ROM_START( frontlin )
 	ROM_LOAD( "eb16.22",      0x0000, 0x0100, CRC(b833b5ea) SHA1(d233f1bf8a3e6cd876853ffd721b9b64c61c9047) )
 ROM_END
 
+
+/*
+Elevator Action (4 Board Version, typical Taito SJ hardware)
+Taito, 1983
+
+Manual shows two versions, 4-board without protection, and 
+5-board, using an additional 68705 MCU.
+
+PCB Layout
+----------
+
+Bottom Board (Main CPU)
+
+WWO70003A
+KNN00013 (sticker)
+|---------------------------------------------| 
+|        IC64   IC52  Z80   2016              | 
+|        IC65   *                            |-|
+|        IC66   IC54                         | |
+|        IC67   IC55                       P | |
+|        IC68   2016                         | |
+|        IC69   2016                         | |
+|1                                           |-|
+|8                                            | 
+|W T                                          | 
+|A                                            | 
+|Y                                           |-|
+|                                            | |
+|         2114                             Q | |
+|         2114                               | |
+|                                            | |
+| 8MHz                                       |-|
+| 12MHz                                       | 
+|---------------------------------------------| 
+Notes:
+      T    - 18 way connector for power
+      IC*  - 2732 EPROMs
+      *    - Empty DIP24 socket
+      2016 - 2kx8 SRAM
+      2114 - 1kx4 SRAM
+      Z80  - clock 4MHz [8/2]
+      P, Q - Flat cable connectors joining to middle PCB
+
+
+Middle Board (Video)
+
+WWO70002A
+EBN00002 (sticker)
+ |---------------------------------------------| 
+ |           AM93422   AM93422                 | 
+|-|                                           |-|
+| |                                           | |
+| | P                                       R | |
+| |                              2114         | |
+| |                              2114         | |
+|-|                                           |-|
+ |                                             | 
+ |                                             | 
+ |                                             | 
+|-|                                           |-|
+| |   2016                                    | |
+| | Q 2016                       IC22       S | |
+| |   2016                                    | |
+| |   2016                                    | |
+|-|   2016                                    |-|
+ |    2016                                     | 
+ |---------------------------------------------| 
+Notes:
+      Lots of logic chips, not much else....
+      2016    - 2kx8 SRAM
+      AM93422 - AMD AM93422 256x4 SRAM
+      2114    - 1kx4 SRAM
+      IC22    - MMI 6301 256x4 Bi-polar PROM
+      R,S,P,Q - Flat cable connectors joining to top and bottom PCB
+      
+
+Top Board (Sound)
+
+WW070001A
+WWN00001A
+KNN00012 (sticker)
+KNK00504 (sticker)
+|---------------------------------------------|
+|VOL-BG VOL MB3730  Z80      2114      *      |
+|                  AY3-8910  2114      *     |-|
+|H                 AY3-8910                  | |
+|                  AY3-8910            IC71 S| |
+|                                            | |
+|                                      IC70  | |
+|2                                           |-|
+|2                                    NE555   |
+|W G                                          |
+|A               PAL                          |
+|Y                                           |-|
+|                                            | |
+|                                 82S09      | |
+|                                           R| |
+|                                            | |
+|                                AY3-8910    |-|
+|         6MHz        SWC   SWB   SWA         |
+|---------------------------------------------|
+Notes:
+      Board contains MANY resistors and capacitors in the sound section.
+      Z80 - clock 3MHz [6/2]
+      AY-3-8910 - clock 1.5MHz [6/4]
+      IC* - 2732 EPROMs
+      * - Empty DIP24 sockets
+      PAL - marked 'WW-15'. Chip is 'painted' black, under the paint it reads MMI PAL16L8 ;-)
+      82S09 - Signetics 82S09 576-bit (64x9) Bi-Polar RAM
+      G - 22-way edge connector
+      H - 12-pin power connector
+      R, S - Flat cable connectors joining to middle PCB
+      VSync - xx Hz
+      HSync - xx kHz
+
+
+ROM Daughterboard (on top of Sound PCB)
+
+WWO70004
+KNN00014
+|---------------------------|
+|              IC6    IC3   |
+|                           |
+|E       IC8   IC5    IC2   |
+|                           |
+|        IC7   IC4    IC1   |
+|---------------------------|
+Notes:
+      E - 30-pin connector joining to sound PCB.
+      IC* - 2732 EPROMs
+*/
+
 ROM_START( elevator )
 	ROM_REGION( 0x12000, "main", 0 )
 	ROM_LOAD( "ea-ic69.bin",  0x0000, 0x1000, CRC(24e277ef) SHA1(764e3b3a34bf0ec849d58023f710e5b0a0d0ccb5) )

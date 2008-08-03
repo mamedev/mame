@@ -3876,6 +3876,73 @@ ROM_START( chasehqj )
 	ROM_LOAD( "pal16l8b-b52-125.ic112", 0x2800, 0x0104, CRC(7628c557) SHA1(11bf628e091dc02e0c2e17ae726061ac04705a54) )
 ROM_END
 
+
+/*
+Enforce
+Taito, 198?/199?
+
+Taito Z hardware
+PCB No: K1100406A J1100175A (CPU PCB)
+        K1100407A J1100176A (VIDEO PCB)
+
+CPU: MC68000P12 (x2)
+SND: Z80, YM2610, TCO040IOC, YM3016F
+OSC: 26.686MHz, 24.000MHz, 16.000MHz
+DIPs: 8 Position (x2)
+
+Taito Chips:
+CPU board - TCO100SCN, TCO140SYT, TCO170ABT, TCO110PCR
+Video Board - TCO150ROD, TCO050VDZ (x3), TCO020VAR
+
+Ram: CPU BOARD - 6264 (x9), 43256 (x2), 
+     VIDEO BOARD - 2018 (x10), 6264 (x2)
+
+PALs/PROMs: 
+CPU BOARD - All located near/around the 68000's
+b58-15 (PAL20L8)
+b58-16 (PAL20L8)
+b58-14 (PAL20L8)
+b58-13 (PAL16L8)
+b58-11 (PAL16L8)
+b58-12 (PAL16L8)
+
+VIDEO BOARD - 
+b58-22 (PAL16L8) \
+b58-23 (63s141)   |  near TCO150ROD
+b58-24 (63s141)  /
+
+b58-20 (PAL16L8) \
+b58-21 (PAL16R4)  |
+b58-17 (PAL16L8)  |  near TCO020VAR
+b58-18 (PAL16R4) /
+
+b58-25 (63S141)      near b58-27
+b58-19 (PAL16R4)     near b58-04/03/02/01
+
+ROMs:
+CPU BOARD - b58-18 , 27C010  \
+	    b58-19 , 27C010   |  68k Program
+	    b58-26 , 27C010   |
+	    b58-27 , 27C010  /
+
+	    b58-07 , 27C4096 \
+	    b58-08 , 27C4096  |
+	    b58-09 , 27C4100  |  near TCO100SCN & TCO140SYT
+	    b58-10 , 27C4096 /
+
+	    b58-32 , 27C512      z80 program
+
+VIDEO PCB - b58-06 , 27C4100     near TCO150ROD
+
+	    b58-26a, 27C512      ?
+	    b58-27 , LH5763      ?
+
+	    b58-01 , 27C4100 \
+	    b58-02 , 27C4100  |
+	    b58-03 , 27C4100  |  near TCO050VDZ's
+	    b58-04 , 27C4100 /
+*/
+
 ROM_START( enforce )
 	ROM_REGION( 0x40000, "main", 0 )	/* 256K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE( "b58-27.27", 0x00000, 0x20000, CRC(a1aa0191) SHA1(193d936e1bfe0da4ac984aba65d3e4e6c93a4c11) )

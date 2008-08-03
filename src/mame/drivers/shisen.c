@@ -390,6 +390,45 @@ ROM_START( shisen )
 	ROM_LOAD( "ic05.05",      0x30000, 0x10000, CRC(92ffe22a) SHA1(19dcaf6e25bb7498d4ab19fa0a63f3326b9bff8f) )
 ROM_END
 
+
+/*
+Match It
+Tamtex, 1989
+
+
+CPU   : Z80A
+SOUND : Z80A, YM2151, YM3012, LM324, GL4558
+DIPSW : 8 position (x2)
+XTAL  : 3.579545MHz, 24.000MHz
+RAM   : GM76C88-12D (=6264, x3), 6116 (x3)
+PROMs : None
+PALs  : PAL16L8 (x3)
+
+ROMs  : (All ROMs type 27C512)
+
+1.2C     Sound Program
+
+2.11D  \     
+3.11C  / Main Program 
+
+4.3J   \
+5.4J   |
+6.5J   |
+7.6J   |
+8.1L   |
+9.2L   |
+10.3L  |
+11.5L  | GFX
+12.6L  |
+13.7L  |
+14.8L  |
+15.10L |
+16.11L |
+17.12L |
+18.13L |
+19.14L /
+*/
+
 ROM_START( matchit )
 	ROM_REGION( 0x30000, "main", 0 )	/* 64k+128k for main CPU */
 	ROM_LOAD( "2.11d",      0x00000, 0x10000, CRC(299815f7) SHA1(dd25f69d3c825e12e5c2e24b5bbfda9c39400345) )

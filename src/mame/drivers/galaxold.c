@@ -885,7 +885,6 @@ static ADDRESS_MAP_START( racknrol_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ckongg_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-
 	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x9000, 0x93ff) AM_READ(galaxold_videoram_r)
@@ -894,7 +893,6 @@ static ADDRESS_MAP_START( ckongg_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc400, 0xc400) AM_READ(input_port_1_r)
 	AM_RANGE(0xc800, 0xc800) AM_READ(input_port_2_r)
 	AM_RANGE(0xcc00, 0xcc00) AM_READ(watchdog_reset_r)
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ckongg_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -921,7 +919,6 @@ static ADDRESS_MAP_START( ckongg_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kkgalax_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-
 	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x9000, 0x93ff) AM_READ(galaxold_videoram_r)
@@ -930,7 +927,6 @@ static ADDRESS_MAP_START( kkgalax_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_1_r)
 	AM_RANGE(0xb000, 0xb000) AM_READ(input_port_2_r)
 //  AM_RANGE(0xcc00, 0xcc00) AM_READ(watchdog_reset_r)
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kkgalax_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -3131,6 +3127,46 @@ ROM_START( catacomb )
        (the game is unplayable with a Galaxian PROM) but which was intended for use with the kit is unclear */
 	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
+
+
+/*
+Crazy Kong
+Bootleg, 1982
+
+PCB Layout
+----------
+
+|----------------------------------------------|
+|        AY3-8910    MB7051          2125 2125 |
+| LM3900     ROM.5S  MB7051          2125 2125 |
+|                    MB7051          2125 2125 |
+|            ROM.5R                            |
+|                                              |
+|1           ROM.5N                            |
+|8                                             |
+|W           ROM.5M               ROM.11N      |
+|A                                ROM.11L      |
+|Y           ROM.5K          2114 ROM.11K      |
+|   VOL                      2114 ROM.11H      |
+|            ROM.5H 2114                       |
+|  Z80              2114                       |
+|            ROM.5F                            |
+|     2114                                     |
+|     2114   ROM.5D              5101 ROM.11C  |
+|                                              |
+|HA1368 DSW(8) 6116  18.432MHz   5101 ROM.11A  |
+|----------------------------------------------|
+Notes:
+      Z80     : Clock running at 3.072MHz (18.432/6)
+      AY3-8910: Clock running at 1.536MHz (18.432/12)
+      2125    : 1K x1 SRAM (DIP16)
+      2114    : 1K x4 SRAM (DIP18)
+      6116    : 2K x8 SRAM (DIP24)
+      5101    : 256 x4 SRAM (SDIP22)
+      LM3900  : National Semiconductor LM3900 Quadruple Norton Operational Amplifier (DIP14)
+      HA1368  : Hitachi HA1368 18V, 4.5A, 5.3W Audio Power Amplifier IC
+      MB7051  : Hitachi MB7051 32bytes x8 Bipolar PROM (DIP16)
+*/
 
 ROM_START( ckongg )
 	ROM_REGION( 0x10000, "main", 0 )
