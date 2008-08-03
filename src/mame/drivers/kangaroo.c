@@ -90,7 +90,7 @@
 
     E000-E3FF  R/W   D  D  D  D  D  D  D  D   1K Working RAM
 
-    E400-E400   R    D  D  D  D  D  D  D  D   Option Switch (DSW0 8 way dipswitch)
+    E400        R    D  D  D  D  D  D  D  D   Option Switch (DSW0 8 way dipswitch)
 
     E800        W    D  D  D  D  D  D  D  D   Low  Byte\ Start Address of Data in Pictures ROM for DMA
     E801        W    D  D  D  D  D  D  D  D   High Byte/
