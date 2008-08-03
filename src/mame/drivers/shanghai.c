@@ -781,7 +781,7 @@ static VIDEO_UPDATE( shanghai )
 
 		b = 2 * (((HD63484_reg[0xdc/2] & 0x000f) << 16) + HD63484_reg[0xde/2]);
 
-		for (y = sy ; y<sy+h && y<280 ; y++)
+		for (y = sy ; y<=sy+h && y<280 ; y++)
 		{
 			for (x = 0 ; x < 384 ; x++)
 			{
