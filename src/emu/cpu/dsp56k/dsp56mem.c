@@ -508,7 +508,7 @@ static void RREQ_bit_set(UINT8 value)
 /**************************************/
 /* Command Vector Register (CVR) Bits */
 /**************************************/
-static UINT8 HV_bits() { return (CVR & 0x1f); }
+static UINT8 HV_bits(void) { return (CVR & 0x1f); }
 
 static void CVR_set(UINT8 value)
 {
