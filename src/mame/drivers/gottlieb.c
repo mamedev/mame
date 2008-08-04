@@ -182,13 +182,20 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
+#include "sound/custom.h"
 #include "sound/sp0250.h"
+#include "streams.h"
 #include "gottlieb.h"
 
 
+#define LOG_AUDIO_DECODE	(0)
 
 #define SYSTEM_CLOCK		XTAL_20MHz
 #define CPU_CLOCK			XTAL_15MHz
+#define NTSC_CLOCK			XTAL_14_31818MHz
+#define LASERDISC_CLOCK		PERIOD_OF_555_ASTABLE(16000, 10000, 0.001e-6)
+
+#define AUDIORAM_SIZE		0x400
 
 
 
@@ -198,20 +205,24 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
  *
  *************************************/
 
-static UINT8 *audiobuffer_region;
-static int track[2];
-static int joympx;
+static UINT8 joystick_select;
+static UINT8 track[2];
 
-static int current_frame = 1;
-static int laserdisc_playing;
-static int lasermpx;
-static int audioptr;
-static int audioready=1;
-static int skipfirstbyte;
-static int discready;
-static int lastcmd;
-static int odd_field;
-static int access_time;
+static const device_config *laserdisc;
+static emu_timer *laserdisc_bit_timer;
+static emu_timer *laserdisc_philips_timer;
+static UINT8 laserdisc_select;
+static UINT8 laserdisc_status;
+static UINT16 laserdisc_philips_code;
+
+static UINT8 *laserdisc_audio_buffer;
+static UINT16 laserdisc_audio_address;
+static INT16 laserdisc_last_samples[2];
+static attotime laserdisc_last_time;
+static attotime laserdisc_last_clock;
+static UINT8 laserdisc_zero_seen;
+static UINT8 laserdisc_audio_bits;
+static UINT8 laserdisc_audio_bit_count;
 
 
 
@@ -221,8 +232,10 @@ static int access_time;
  *
  *************************************/
 
+static TIMER_CALLBACK( laserdisc_bit_callback );
+static TIMER_CALLBACK( laserdisc_philips_callback );
 static READ8_HANDLER( laserdisc_status_r );
-static WRITE8_HANDLER( laserdisc_mpx_w );
+static WRITE8_HANDLER( laserdisc_select_w );
 static WRITE8_HANDLER( laserdisc_command_w );
 
 
@@ -233,17 +246,53 @@ static WRITE8_HANDLER( laserdisc_command_w );
  *
  *************************************/
 
-static MACHINE_START( laserdisc )
+static MACHINE_START( gottlieb )
 {
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05805, 0x05807, 0, 0x07f8, laserdisc_status_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05805, 0x05805, 0, 0x07f8, laserdisc_command_w);	/* command for the player */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05806, 0x05806, 0, 0x07f8, laserdisc_mpx_w);
+	/* register for save states */
+	state_save_register_global(joystick_select);
+	state_save_register_global_array(track);
+
+	/* see if we have a laserdisc */
+	laserdisc = device_list_first(machine->config->devicelist, LASERDISC);
+	if (laserdisc != NULL)
+	{
+		/* attach to the I/O ports */
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05805, 0x05807, 0, 0x07f8, laserdisc_status_r);
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05805, 0x05805, 0, 0x07f8, laserdisc_command_w);	/* command for the player */
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05806, 0x05806, 0, 0x07f8, laserdisc_select_w);
+
+		/* allocate a timer for serial transmission, and one for philips code processing */
+		laserdisc_bit_timer = timer_alloc(laserdisc_bit_callback, NULL);
+		laserdisc_philips_timer = timer_alloc(laserdisc_philips_callback, NULL);
+		
+		/* create some audio RAM */
+		laserdisc_audio_buffer = auto_malloc(AUDIORAM_SIZE);
+		laserdisc_status = 0x38;
+		
+		/* more save state registration */
+		state_save_register_global(laserdisc_select);
+		state_save_register_global(laserdisc_status);
+		state_save_register_global(laserdisc_philips_code);
+
+		state_save_register_global_pointer(laserdisc_audio_buffer, AUDIORAM_SIZE);
+		state_save_register_global(laserdisc_audio_address);
+		state_save_register_global_array(laserdisc_last_samples);
+		state_save_register_global(laserdisc_last_time.seconds);
+		state_save_register_global(laserdisc_last_time.attoseconds);
+		state_save_register_global(laserdisc_last_clock.seconds);
+		state_save_register_global(laserdisc_last_clock.attoseconds);
+		state_save_register_global(laserdisc_zero_seen);
+		state_save_register_global(laserdisc_audio_bits);
+		state_save_register_global(laserdisc_audio_bit_count);
+	}
 }
 
- 
+
 static MACHINE_RESET( gottlieb )
 {
-	audiobuffer_region = memory_region(machine, "user1");
+	/* if we have a laserdisc, reset our philips code callback for the next line 17 */
+	if (laserdisc != NULL)
+		timer_adjust_oneshot(laserdisc_philips_timer, video_screen_get_time_until_pos(machine->primary_screen, 17, 0), 17);
 }
 
 
@@ -274,7 +323,7 @@ static WRITE8_HANDLER( gottlieb_analog_reset_w )
 static CUSTOM_INPUT( stooges_joystick_r )
 {
 	static const char *joyport[] = { "P1JOY", "P2JOY", "P3JOY", NULL };
-	return (joyport[joympx & 3] != NULL) ? input_port_read(field->port->machine, joyport[joympx & 3]) : 0xff;
+	return (joyport[joystick_select & 3] != NULL) ? input_port_read(field->port->machine, joyport[joystick_select & 3]) : 0xff;
 }
 
 
@@ -288,7 +337,7 @@ static CUSTOM_INPUT( stooges_joystick_r )
 static WRITE8_HANDLER( general_output_w )
 {
 	/* bits 0-3 control video features, and are different for laserdisc games */
-	if (device_list_first(machine->config->devicelist, LASERDISC) == NULL)
+	if (laserdisc == NULL)
 		gottlieb_video_control_w(machine, offset, data);
 	else
 		gottlieb_laserdisc_video_control_w(machine, offset, data);
@@ -317,145 +366,290 @@ static WRITE8_HANDLER( reactor_output_w )
 static WRITE8_HANDLER( stooges_output_w )
 {
 	general_output_w(machine, offset, data & ~0x60);
-	joympx = (data >> 5) & 0x03;
+	joystick_select = (data >> 5) & 0x03;
 }
 
 
 
 /*************************************
  *
- *  Laserdisc interface
+ *  Laserdisc I/O interface
  *
  *************************************/
 
-/* The only sure thing I know about the Philips 24-bit frame number code is that the
- * 4 most significant bits are 1's and these four 1's are used to detect a valid frame
- * number when shifting bits from right to left...
- * From the audio code it seems it's a simple BCD numbering...
- * (what happens when four consecutive 1's are inside the number, eg 00078 ?)
- * Only 19 bits are returned to the game machine, this gives a max frame number of 79999.
- * The size of the audio buffer is 1024 bytes. When it is full, the "audio buffer ready"
- * flag is raised, and the frame decoder tries again to synchronize with a 0x67 pattern
- * Each 1024-byte buffer contains target data for 53 frames;
- * target data for each frame is 19-bytes long including one byte of checksum
- * and the frame number code of the first of these 53 frames is stored at the beginning
- * This gives a total of 1+3+3+19*53=1014 bytes, the 10 last bytes are ignored
- */
-
 static READ8_HANDLER( laserdisc_status_r )
 {
-	int tmp;
-	switch (offset)
+	/* IP5 reads low 8 bits of philips code */
+	if (offset == 0)
+		return laserdisc_philips_code;
+
+	/* IP6 reads middle 8 bits of philips code */
+	if (offset == 1)
+		return laserdisc_philips_code >> 8;
+
+	/* IP7 reads either status or audio detect, depending on the select */
+	if (laserdisc_select)
 	{
-		case 0:
-			tmp = current_frame % 100;
-			logerror("LSB frame read: %d\n",tmp);
-			return ((tmp / 10) << 4) | (tmp % 10);
-
-		case 1:
-			tmp = (current_frame / 100) % 100;
-			logerror("MSB frame read: %d\n",tmp);
-			return ((tmp / 10) << 4) | (tmp % 10);
-
-		case 2:
-			if (lasermpx == 1)
-			{
-				/* bits 0-2 frame number MSN */
-				/* bit 3 audio buffer ready */
-				/* bit 4 ready to send new laserdisc command? */
-				/* bit 5 disc ready */
-				/* bit 6 break in audio trasmission */
-				/* bit 7 missing audio clock */
-				return ((current_frame / 10000) & 0x7) | (audioready << 3) | 0x10 | (discready << 5);
-			}
-			else
-			{	/* read audio buffer */
-				if (skipfirstbyte) audioptr++;
-				skipfirstbyte = 0;
-				if (audiobuffer_region)
-				{
-					logerror("audio bufread: %02x\n",audiobuffer_region[audioptr]);
-					return audiobuffer_region[audioptr++];
-				}
-				else
-				{
-					logerror("audiobuffer is null !!");
-					return 0xFF; /* don't know what to do in this case ;-) */
-				}
-			}
-			break;
-	}
-
-	return 0;
-}
-
-static WRITE8_HANDLER( laserdisc_mpx_w )
-{
-	lasermpx = data & 1;
-	if (lasermpx==0) skipfirstbyte=1;	/* first byte of the 1K buffer (0x67) is not returned... */
-}
-
-static WRITE8_HANDLER( laserdisc_command_w )
-{
-	static int loop;
-	int cmd;
-
-	/* commands are written in three steps, the first two the command is */
-	/* written (maybe one to load the latch, the other to start the send), */
-	/* the third 0 (maybe to clear the latch) */
-	if (data == 0) return;
-	if (loop++ & 1) return;
-
-	if ((data & 0xe0) != 0x20)
-	{
-logerror("error: laserdisc command %02x\n",data);
-		return;
-	}
-
-	cmd =	((data & 0x10) >> 4) |
-			((data & 0x08) >> 2) |
-			((data & 0x04) >> 0) |
-			((data & 0x02) << 2) |
-			((data & 0x01) << 4);
-
-logerror("laserdisc command %02x -> %02x\n",data,cmd);
-	if (lastcmd == 0x0b && (cmd & 0x10))	/* seek frame # */
-	{
-		current_frame = current_frame * 10 + (cmd & 0x0f);
-		while (current_frame >= 100000)
-			current_frame -= 100000;
-		audioptr = -1;
+		/* bits 0-2 frame number MSN */
+		/* bit 3 audio buffer ready */
+		/* bit 4 ready to send new laserdisc command? */
+		/* bit 5 disc ready */
+		/* bit 6 break in audio trasmission */
+		/* bit 7 missing audio clock */
+		return laserdisc_status;
 	}
 	else
 	{
-		if (cmd == 0x04)					/* step forward */
-		{
-			laserdisc_playing = 0;
-			current_frame++;
-		}
-		if (cmd == 0x05) 					/* play */
-		{
-			laserdisc_playing = 1;
-			discready = 1;
-		}
-		if (cmd == 0x0b)					/* seek frame */
-		{
-			laserdisc_playing = 0;
-			discready = 0;
-			access_time = 60;		/* 1s access time */
-		}
-		if (cmd == 0x0f)	 				/* stop */
-		{
-			laserdisc_playing = 0;
-			discready = 0;
-		}
-		lastcmd = cmd;
+		UINT8 result = laserdisc_audio_buffer[laserdisc_audio_address++];
+		laserdisc_audio_address %= AUDIORAM_SIZE;
+		return result;
 	}
+	return 0;
+}
+
+
+static WRITE8_HANDLER( laserdisc_select_w )
+{
+	/* selects between reading audio data and reading status */
+	laserdisc_select = data & 1;
+}
+
+
+static WRITE8_HANDLER( laserdisc_command_w )
+{
+	/* a write here latches data into a 8-bit register and starts
+	   a sequence of events that sends serial data to the player */
+
+	/* set a timer to clock the bits through; a total of 12 bits are clocked */
+	timer_adjust_oneshot(laserdisc_bit_timer, attotime_mul(LASERDISC_CLOCK, 10), (12 << 16) | data);
+
+	/* it also clears bit 4 of the status (will be set when transmission is complete) */
+	laserdisc_status &= ~0x10;
 }
 
 
 
 /*************************************
+ *
+ *  Laserdisc command/status interfacing
+ *
+ *************************************/
+
+static TIMER_CALLBACK( laserdisc_philips_callback )
+{
+	int newcode = laserdisc_get_field_code(laserdisc, (param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18);
+
+	/* the PR8210 sends line 17/18 data on each frame; the laserdisc interface
+	   board receives notification and latches the most recent frame number */
+	   
+	/* the logic detects a valid code when the top 4 bits are all 1s */
+	if ((newcode & 0xf00000) == 0xf00000)
+	{
+		laserdisc_philips_code = newcode;
+		laserdisc_status = (laserdisc_status & ~0x07) | ((newcode >> 16) & 7);
+	}
+	
+	/* toggle to the next one */
+	param = (param == 17) ? 18 : 17;
+	timer_adjust_oneshot(laserdisc_philips_timer, video_screen_get_time_until_pos(machine->primary_screen, param, 0), param);
+}
+
+
+static TIMER_CALLBACK( laserdisc_bit_off_callback )
+{
+	/* deassert the control line */
+	laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, CLEAR_LINE);
+}
+
+
+static TIMER_CALLBACK( laserdisc_bit_callback )
+{
+	UINT8 bitsleft = param >> 16;
+	UINT8 data = param;
+	attotime duration;
+	
+	/* assert the line and set a timer for deassertion */
+   	laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, ASSERT_LINE);
+	timer_set(attotime_mul(LASERDISC_CLOCK, 10), NULL, 0, laserdisc_bit_off_callback);
+	
+	/* determine how long for the next command; there is a 555 timer with a 
+	   variable resistor controlling the timing of the pulses. Nominally, the 
+	   555 runs at 40083Hz, is divided by 10, and then is divided by 4 for a 
+	   0 bit or 8 for a 1 bit. This gives 998usec per 0 pulse or 1996usec 
+	   per 1 pulse. */
+	duration = attotime_mul(LASERDISC_CLOCK, 10 * ((data & 0x80) ? 8 : 4));
+	data <<= 1;
+	
+	/* if we're not out of bits, set a timer for the next one; else set the ready bit */
+	if (bitsleft-- != 0)
+		timer_adjust_oneshot(laserdisc_bit_timer, duration, (bitsleft << 16) | data);
+	else
+		laserdisc_status |= 0x10;
+}
+
+
+
+/*************************************
+ *
+ *  Laserdisc sound channel
+ *
+ *************************************/
+
+INLINE void audio_end_state(void)
+{
+	/* this occurs either when the "break in transmission" condition is hit (no zero crossings
+	   for 400usec) or when the entire audio buffer is full */
+	laserdisc_status |= 0x08;
+	laserdisc_audio_bit_count = 0;
+	laserdisc_audio_address = 0;
+	if (laserdisc_audio_address != 0)
+		printf("Got %d bytes\n", laserdisc_audio_address);
+}
+
+
+static void audio_process_clock(int logit)
+{
+	/* clock the bit through the shift register */
+	laserdisc_audio_bits >>= 1;
+	if (laserdisc_zero_seen)
+		laserdisc_audio_bits |= 0x80;
+	laserdisc_zero_seen = 0;
+
+	/* if the buffer ready flag is set, then we are looking for the magic $67 pattern */
+	if (laserdisc_status & 0x08)
+	{
+		if (laserdisc_audio_bits == 0x67)
+		{
+			if (logit) 
+				logerror(" -- got 0x67");
+			laserdisc_status &= ~0x08;
+			laserdisc_audio_address = 0;
+		}
+	}
+	
+	/* otherwise, we keep clocking bytes into the audio buffer */
+	else
+	{
+		laserdisc_audio_bit_count++;
+		
+		/* if we collect 8 bits, add to the buffer */
+		if (laserdisc_audio_bit_count == 8)
+		{
+			if (logit) 
+				logerror(" -- got new byte %02X", laserdisc_audio_bits);
+			laserdisc_audio_bit_count = 0;
+			laserdisc_audio_buffer[laserdisc_audio_address++] = laserdisc_audio_bits;
+			
+			/* if we collect a full buffer, signal */
+			if (laserdisc_audio_address >= AUDIORAM_SIZE)
+				audio_end_state();
+		}
+	}
+}
+
+			
+static void audio_handle_zero_crossing(attotime zerotime, int logit)
+{
+	/* compute time from last clock */
+	attotime deltaclock = attotime_sub(zerotime, laserdisc_last_clock);
+	if (logit) 
+		logerror(" -- zero @ %s (delta=%s)", attotime_string(zerotime, 6), attotime_string(deltaclock, 6));
+	
+	/* if we are within 150usec, we count as a bit */
+	if (attotime_compare(deltaclock, ATTOTIME_IN_USEC(150)) < 0)
+	{
+		if (logit) 
+			logerror(" -- count as bit");
+		laserdisc_zero_seen++;
+		return;
+	}
+	
+	/* if we are within 215usec, we count as a clock */
+	else if (attotime_compare(deltaclock, ATTOTIME_IN_USEC(215)) < 0)
+	{
+		if (logit) 
+			logerror(" -- clock, bit=%d", laserdisc_zero_seen);
+		laserdisc_last_clock = zerotime;
+	}
+	
+	/* if we are outside of 215usec, we are technically a missing clock
+	   however, due to sampling errors, it is best to assume this is just
+	   an out-of-skew clock, so we correct it if we are within 75usec */
+	else if (attotime_compare(deltaclock, ATTOTIME_IN_USEC(275)) < 0)
+	{
+		if (logit)
+			logerror(" -- skewed clock, correcting");
+		laserdisc_last_clock = attotime_add(laserdisc_last_clock, ATTOTIME_IN_USEC(200));
+	}
+	
+	/* we'll count anything more than 275us as an actual missing clock */
+	else
+	{
+		if (logit)
+			logerror(" -- missing clock");
+		laserdisc_last_clock = zerotime;
+	}
+	
+	/* we have a clock, process it */
+	audio_process_clock(logit);
+}
+
+
+static void laserdisc_audio_process(const device_config *device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1)
+{
+	int logit = LOG_AUDIO_DECODE && input_code_pressed(KEYCODE_L);
+	attotime time_per_sample = ATTOTIME_IN_HZ(samplerate);
+	attotime curtime = laserdisc_last_time;
+	int cursamp;
+	
+	if (logit)
+		logerror("--------------\n");
+
+	/* iterate over samples */
+	for (cursamp = 0; cursamp < samples; cursamp++)
+	{
+		INT16 sample = ch1[cursamp];
+
+		/* start by logging the current sample and time */
+		if (logit)
+			logerror("%s: %d", attotime_string(attotime_add(attotime_add(curtime, time_per_sample), time_per_sample), 6), sample);
+
+		/* if we are past the "break in transmission" time, reset everything */
+		if (attotime_compare(attotime_sub(curtime, laserdisc_last_clock), ATTOTIME_IN_USEC(400)) > 0)
+			audio_end_state();
+		
+		/* if this sample reinforces that the previous one ended a zero crossing, count it */
+		if ((sample >= 256 && laserdisc_last_samples[1] >= 0 && laserdisc_last_samples[0] < 0) ||
+			(sample <= -256 && laserdisc_last_samples[1] <= 0 && laserdisc_last_samples[0] > 0))
+		{
+			attotime zerotime;
+			int fractime;
+
+			/* compute the fractional position of the 0-crossing, between the two samples involved */
+			fractime = (-laserdisc_last_samples[0] * 1000) / (laserdisc_last_samples[1] - laserdisc_last_samples[0]);
+			
+			/* use this fraction to compute the approximate actual zero crossing time */
+			zerotime = attotime_add(curtime, attotime_div(attotime_mul(time_per_sample, fractime), 1000));
+
+			/* determine if this is a clock; if it is, process */
+			audio_handle_zero_crossing(zerotime, logit);
+		}
+		if (logit) 
+			logerror(" \n");
+
+		/* update our sample tracking and advance time */
+		laserdisc_last_samples[0] = laserdisc_last_samples[1];
+		laserdisc_last_samples[1] = sample;
+		curtime = attotime_add(curtime, time_per_sample);
+	}
+
+	/* remember the last time */
+	laserdisc_last_time = curtime;
+}
+
+ 
+ 
+ /*************************************
  *
  *  Interrupt generation
  *
@@ -473,27 +667,18 @@ static INTERRUPT_GEN( gottlieb_interrupt )
 	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, nmi_clear);
 
-	if (access_time > 0) {
-		access_time--;
-		if (access_time == 0)
-			discready = 1;
-	} else if (laserdisc_playing) {
-		odd_field ^= 1;
-		if (odd_field)		/* the manual says the video frame number is only present in the odd field) */
-		{
-			current_frame++;
-logerror("current frame : %d\n",current_frame);
-
-			if (current_frame%53==0)
-			{
-				int seq = current_frame / 53;
-				if (seq >= 44) {	/* 44*53 frames without target data at the beginning of the disc */
-					audioptr = (seq - 44)*1024;
-					audioready = 1;
-				}
-			}
-			else audioready = 0;
-		}
+	/* if we have a laserdisc, update it */
+	if (laserdisc != NULL)
+	{
+		bitmap_t *dummy;
+		
+		laserdisc_vsync(laserdisc);
+		
+		/* set the "disc ready" bit, which basically indicates whether or not we have a proper video frame */
+		if (laserdisc_get_video(laserdisc, &dummy) == 0)
+			laserdisc_status &= ~0x20;
+		else
+			laserdisc_status |= 0x20;
 	}
 }
 
@@ -601,83 +786,124 @@ static INPUT_PORTS_START( reactor )
 	PORT_BIT ( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT ( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT ( 0xc0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("SB1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
-	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
+	
+	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mplanets )
+
+static INPUT_PORTS_START( qbert )
 	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "10000" )
-	PORT_DIPSETTING(    0x02, "12000" )
-	PORT_DIPNAME( 0x08, 0x00, "Allow Round Select" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x14, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x14, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x02, 0x02, "Kicker" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x08, 0x00, "Auto Round Advance (Cheat)")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "SW5" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "SW7" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "SW8" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	/* 0x40 must be connected to the IP16 line */
 
 	PORT_START_TAG("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x3c, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
 
 	PORT_START_TAG("IN2")	/* trackball H not used */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN3")	/* trackball V (dial) */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "1TRACKY")
+	PORT_START_TAG("IN3")	/* trackball V not used */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("IN4")      /* joystick */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	
+	PORT_INCLUDE(gottlieb1_sound)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( insector )
+	PORT_START_TAG("DSW")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "25000" )
+	PORT_DIPSETTING(    0x01, "30000" )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Demo mode" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x50, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN2")	/* trackball H not used */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("IN3")	/* trackball V not used */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-
-	PORT_START_TAG("SB1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
-	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
-
-	PORT_START_TAG("TRACKY")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	
+	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( tylz )
 	PORT_START_TAG("DSW")
@@ -739,57 +965,159 @@ static INPUT_PORTS_START( tylz )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START_TAG("SB1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
-	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
+	
+	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( qbert )
+
+static INPUT_PORTS_START( argusg )
 	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Kicker" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x08, 0x00, "Auto Round Advance (Cheat)")
+	PORT_DIPNAME( 0x22, 0x02, "Bonus Human" )
+	PORT_DIPSETTING(    0x00, "15000" )
+	PORT_DIPSETTING(    0x02, "20000" )
+	PORT_DIPSETTING(    0x20, "25000" )
+	PORT_DIPSETTING(    0x22, "30000" )
+	PORT_DIPNAME( 0x14, 0x10, "Initial Humans" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x10, "6" )
+	PORT_DIPSETTING(    0x04, "8" )
+	PORT_DIPSETTING(    0x14, "10" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "SW5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "SW7" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "SW8" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-	/* 0x40 must be connected to the IP16 line */
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard )  )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START_TAG("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN2")	/* trackball H */
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "0TRACKX")
+
+	PORT_START_TAG("IN3")	/* trackball V */
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "1TRACKY")
+
+/* NOTE: Buttons are shared for both players; are mirrored to each side of the controller */
+	PORT_START_TAG("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START_TAG("TRACKX")
+	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(15) PORT_KEYDELTA(20)
+
+	PORT_START_TAG("TRACKY")
+	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(15) PORT_KEYDELTA(20)
+	
+	PORT_INCLUDE(gottlieb1_sound)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( mplanets )
+	PORT_START_TAG("DSW")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "10000" )
+	PORT_DIPSETTING(    0x02, "12000" )
+	PORT_DIPNAME( 0x08, 0x00, "Allow Round Select" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x14, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x14, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Hardest ) )
+
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x3c, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START_TAG("IN2")	/* trackball H not used */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("IN3")	/* trackball V (dial) */
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "1TRACKY")
+
+	PORT_START_TAG("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+
+	PORT_START_TAG("TRACKY")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
+	
+	PORT_INCLUDE(gottlieb1_sound)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( krull )
+	PORT_START_TAG("DSW")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x08, "5" )
+	PORT_DIPNAME( 0x14, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x14, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x20, 0x00, "Hexagon" )
+	PORT_DIPSETTING(    0x00, "Roving" )
+	PORT_DIPSETTING(    0x20, "Stationary" )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x40, "30000 30000" )
+	PORT_DIPSETTING(    0x00, "30000 50000" )
+	PORT_DIPSETTING(    0x80, "40000 50000" )
+	PORT_DIPSETTING(    0xc0, "50000 75000" )
+
+	PORT_START_TAG("IN1")
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 
 	PORT_START_TAG("IN2")	/* trackball H not used */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -797,28 +1125,75 @@ static INPUT_PORTS_START( qbert )
 	PORT_START_TAG("IN3")	/* trackball V not used */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN4")      /* joystick */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_START_TAG("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
+	
+	PORT_INCLUDE(gottlieb1_sound)
+INPUT_PORTS_END
 
-	PORT_START_TAG("SB1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
-	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
+
+static INPUT_PORTS_START( kngtmare )
+	PORT_START_TAG("DSW")
+	PORT_DIPNAME( 0x11, 0x11, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x11, DEF_STR( 1C_1C ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START_TAG("IN1")	/* ? */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN2")	/* trackball H not used */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("IN3")	/* trackball V not used */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("IN4")	/* ? */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_2WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_2WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
+	
+	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( qbertqub )
 	PORT_START_TAG("DSW")
@@ -877,44 +1252,46 @@ static INPUT_PORTS_START( qbertqub )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("SB1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
-	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
+	
+	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( krull )
+
+static INPUT_PORTS_START( curvebal )
 	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x08, 0x00, "2 Players Game" )
+	PORT_DIPSETTING(    0x08, "1 Credit" )
+	PORT_DIPSETTING(    0x00, "2 Credits" )
+	PORT_DIPNAME( 0x11, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x11, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "Coins" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x08, "5" )
-	PORT_DIPNAME( 0x14, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x14, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x20, 0x00, "Hexagon" )
-	PORT_DIPSETTING(    0x00, "Roving" )
-	PORT_DIPSETTING(    0x20, "Stationary" )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x40, "30000 30000" )
-	PORT_DIPSETTING(    0x00, "30000 50000" )
-	PORT_DIPSETTING(    0x80, "40000 50000" )
-	PORT_DIPSETTING(    0xc0, "50000 75000" )
+	PORT_DIPSETTING(    0x20, DEF_STR( French ) )
+	/* TODO: coinage is different when French is selected */
+/* PORT_DIPNAME( 0xc2, 0x00, "French Coinage" )
+PORT_DIPSETTING(    0x42, "A 3/1 B 1/2" )
+PORT_DIPSETTING(    0x82, "A 1/5 B 1/2" )
+PORT_DIPSETTING(    0x02, "A 2/1 B 2/3" )
+PORT_DIPSETTING(    0xc0, "A 2/1 B 2/1" )
+PORT_DIPSETTING(    0x80, "A 1/1 B 1/2" )
+PORT_DIPSETTING(    0x40, "A 1/1 B 1/3" )
+PORT_DIPSETTING(    0x00, "A 1/1 B 1/1" )
+PORT_DIPSETTING(    0xc2, DEF_STR( Free_Play ) ) */
+	PORT_DIPNAME( 0xc2, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x42, "A 4/1 B 1/1" )
+	PORT_DIPSETTING(    0x82, "A 3/1 B 1/1" )
+	PORT_DIPSETTING(    0x02, "A 2/1 B 1/1" )
+	PORT_DIPSETTING(    0xc0, "A 2/1 B 2/1" )
+	PORT_DIPSETTING(    0x80, "A 2/1 B 1/2" )
+	PORT_DIPSETTING(    0x40, "A 2/1 B 1/3" )
+	PORT_DIPSETTING(    0x00, "A 1/1 B 1/1" )
+	PORT_DIPSETTING(    0xc2, DEF_STR( Free_Play ) )
 
 	PORT_START_TAG("IN1")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
@@ -923,8 +1300,8 @@ static INPUT_PORTS_START( krull )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START_TAG("IN2")	/* trackball H not used */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -933,27 +1310,74 @@ static INPUT_PORTS_START( krull )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
-
-	PORT_START_TAG("SB1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
-	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Swing") PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pitch Left") PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Pitch Right") PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Bunt") PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	
+	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( screwloo )
+	PORT_START_TAG("DSW")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Demo mode" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "1st Bonus Atom at" )
+	PORT_DIPSETTING(    0x00, "5000" )
+	PORT_DIPSETTING(    0x04, "20000" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x50, 0x40, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x20, 0x00, "1st Bonus Hand at" )
+	PORT_DIPSETTING(    0x00, "25000" )
+	PORT_DIPSETTING(    0x20, "50000" )
+	PORT_DIPNAME( 0x80, 0x00, "Hands" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x80, "5" )
+
+	PORT_START_TAG("IN1")
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_8WAY
+
+	PORT_START_TAG("IN2")	/* trackball H not used */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("IN3")	/* trackball V not used */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Start 2P") PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Start 1P") PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_INCLUDE(gottlieb2_sound)
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( mach3 )
 	PORT_START_TAG("DSW")
@@ -1010,6 +1434,7 @@ static INPUT_PORTS_START( mach3 )
 	PORT_INCLUDE(gottlieb2_sound)
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( usvsthem )
 	PORT_START_TAG("DSW")
 	/* TODO: values are different for 5 lives */
@@ -1065,6 +1490,7 @@ static INPUT_PORTS_START( usvsthem )
 
 	PORT_INCLUDE(gottlieb2_sound)
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( 3stooges )
 	PORT_START_TAG("DSW")
@@ -1136,200 +1562,6 @@ static INPUT_PORTS_START( 3stooges )
 	PORT_INCLUDE(gottlieb2_sound)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( curvebal )
-	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x08, 0x00, "2 Players Game" )
-	PORT_DIPSETTING(    0x08, "1 Credit" )
-	PORT_DIPSETTING(    0x00, "2 Credits" )
-	PORT_DIPNAME( 0x11, 0x00, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x11, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Coins" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( French ) )
-	/* TODO: coinage is different when French is selected */
-/* PORT_DIPNAME( 0xc2, 0x00, "French Coinage" )
-PORT_DIPSETTING(    0x42, "A 3/1 B 1/2" )
-PORT_DIPSETTING(    0x82, "A 1/5 B 1/2" )
-PORT_DIPSETTING(    0x02, "A 2/1 B 2/3" )
-PORT_DIPSETTING(    0xc0, "A 2/1 B 2/1" )
-PORT_DIPSETTING(    0x80, "A 1/1 B 1/2" )
-PORT_DIPSETTING(    0x40, "A 1/1 B 1/3" )
-PORT_DIPSETTING(    0x00, "A 1/1 B 1/1" )
-PORT_DIPSETTING(    0xc2, DEF_STR( Free_Play ) ) */
-	PORT_DIPNAME( 0xc2, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x42, "A 4/1 B 1/1" )
-	PORT_DIPSETTING(    0x82, "A 3/1 B 1/1" )
-	PORT_DIPSETTING(    0x02, "A 2/1 B 1/1" )
-	PORT_DIPSETTING(    0xc0, "A 2/1 B 2/1" )
-	PORT_DIPSETTING(    0x80, "A 2/1 B 1/2" )
-	PORT_DIPSETTING(    0x40, "A 2/1 B 1/3" )
-	PORT_DIPSETTING(    0x00, "A 1/1 B 1/1" )
-	PORT_DIPSETTING(    0xc2, DEF_STR( Free_Play ) )
-
-	PORT_START_TAG("IN1")
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN2")	/* trackball H not used */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START_TAG("IN3")	/* trackball V not used */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START_TAG("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Swing") PORT_PLAYER(1)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pitch Left") PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Pitch Right") PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Bunt") PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("SB1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
-	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( screwloo )
-	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Demo mode" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "1st Bonus Atom at" )
-	PORT_DIPSETTING(    0x00, "5000" )
-	PORT_DIPSETTING(    0x04, "20000" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x50, 0x40, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_2C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x50, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x20, 0x00, "1st Bonus Hand at" )
-	PORT_DIPSETTING(    0x00, "25000" )
-	PORT_DIPSETTING(    0x20, "50000" )
-	PORT_DIPNAME( 0x80, 0x00, "Hands" )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x80, "5" )
-
-	PORT_START_TAG("IN1")
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_8WAY
-
-	PORT_START_TAG("IN2")	/* trackball H not used */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START_TAG("IN3")	/* trackball V not used */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START_TAG("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Start 2P") PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Start 1P") PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_INCLUDE(gottlieb2_sound)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( insector )
-	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "25000" )
-	PORT_DIPSETTING(    0x01, "30000" )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Demo mode" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x50, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x50, DEF_STR( 2C_2C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
-
-	PORT_START_TAG("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN2")	/* trackball H not used */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START_TAG("IN3")	/* trackball V not used */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START_TAG("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-
-	PORT_START_TAG("SB1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
-	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( vidvince )
 	PORT_START_TAG("DSW")
@@ -1384,6 +1616,7 @@ static INPUT_PORTS_START( vidvince )
 
 	PORT_INCLUDE(gottlieb2_sound)
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( wizwarz )
 /* TODO: Bonus Life and Bonus Mine values are dependent upon each other */
@@ -1443,139 +1676,6 @@ static INPUT_PORTS_START( wizwarz )
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
 
 	PORT_INCLUDE(gottlieb2_sound)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( argusg )
-	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x22, 0x02, "Bonus Human" )
-	PORT_DIPSETTING(    0x00, "15000" )
-	PORT_DIPSETTING(    0x02, "20000" )
-	PORT_DIPSETTING(    0x20, "25000" )
-	PORT_DIPSETTING(    0x22, "30000" )
-	PORT_DIPNAME( 0x14, 0x10, "Initial Humans" )
-	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPSETTING(    0x10, "6" )
-	PORT_DIPSETTING(    0x04, "8" )
-	PORT_DIPSETTING(    0x14, "10" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Hard )  )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START_TAG("IN1")
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Select in Service Mode") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN2")	/* trackball H */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "0TRACKX")
-
-	PORT_START_TAG("IN3")	/* trackball V */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "1TRACKY")
-
-/* NOTE: Buttons are shared for both players; are mirrored to each side of the controller */
-	PORT_START_TAG("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("SB1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
-	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
-
-	PORT_START_TAG("TRACKX")
-	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(15) PORT_KEYDELTA(20)
-
-	PORT_START_TAG("TRACKY")
-	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(15) PORT_KEYDELTA(20)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( kngtmare )
-	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x11, 0x11, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x11, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START_TAG("IN1")	/* ? */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN2")	/* trackball H not used */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START_TAG("IN3")	/* trackball V not used */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START_TAG("IN4")	/* ? */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_2WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_2WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
-
-	PORT_START_TAG("SB1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
-	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
 INPUT_PORTS_END
 
 
@@ -1724,9 +1824,6 @@ static const struct Samplesinterface reactor_samples_interface =
 	reactor_sample_names
 };
 
-#define gottlieb_samples_interface qbert_samples_interface	/* not used */
-#define krull_samples_interface qbert_samples_interface		/* not used */
-
 
 
 /*************************************
@@ -1742,6 +1839,7 @@ static MACHINE_DRIVER_START( gottlieb_core )
 	MDRV_CPU_PROGRAM_MAP(gottlieb_map,0)
 	MDRV_CPU_VBLANK_INT("main", gottlieb_interrupt)
 
+	MDRV_MACHINE_START(gottlieb)
 	MDRV_MACHINE_RESET(gottlieb)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 	MDRV_WATCHDOG_VBLANK_INIT(16)
@@ -1749,7 +1847,7 @@ static MACHINE_DRIVER_START( gottlieb_core )
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(SYSTEM_CLOCK/4, 318, 0, 256, 256, 0, 240)
+	MDRV_SCREEN_RAW_PARAMS(SYSTEM_CLOCK/4, GOTTLIEB_VIDEO_HCOUNT, 0, GOTTLIEB_VIDEO_HBLANK, GOTTLIEB_VIDEO_VCOUNT, 0, GOTTLIEB_VIDEO_VBLANK)
 
 	MDRV_GFXDECODE(gfxdecode)
 	MDRV_PALETTE_LENGTH(16)
@@ -1778,14 +1876,20 @@ static MACHINE_DRIVER_START( g2laser )
 	MDRV_IMPORT_FROM(gottlieb_core)
 	MDRV_IMPORT_FROM(gottlieb_soundrev2)
 	
-	MDRV_MACHINE_START(laserdisc)
-
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210)
+	MDRV_LASERDISC_AUDIO(laserdisc_audio_process)
+
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER)
+	MDRV_VIDEO_START(gottlieb_laserdisc)
+	MDRV_VIDEO_UPDATE(gottlieb_laserdisc)
+
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_RAW_PARAMS(NTSC_CLOCK, 910, 0, 720, 525.0/2, 0, 480/2)
 
 	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
-	MDRV_SOUND_ROUTE(1, "mono", 1.0)
+	/* right channel is processed as data */
 MACHINE_DRIVER_END
 
 
@@ -2266,8 +2370,8 @@ ROM_START( mach3 )
 	ROM_LOAD( "mach3fg1.bin", 0x4000, 0x2000, CRC(9b88767b) SHA1(8071e11906b3f0026f9a210cc5a236d95ca1f659) )
 	ROM_LOAD( "mach3fg0.bin", 0x6000, 0x2000, CRC(0bae12a5) SHA1(7bc0b82ccab0e4498a7a2a9dc85f03125f25826e) )
 
-	ROM_REGION( 1024*1024, "user1", 0)	/* about 30 min of target data from laserdisc */
-	ROM_LOAD( "m3target.bin", 0, 1024*1024, CRC(6e779a6f) SHA1(e556ad438e637a71f17ea04088de10b39b45f8df) )
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "mach3", 0, NO_DUMP )
 ROM_END
 
 
@@ -2290,6 +2394,9 @@ ROM_START( cobram3 )
 	ROM_LOAD( "bh08",   0x4000, 0x2000, CRC(d6439e2f) SHA1(84a6e574f76313ce065d8765f21bdda8fe5a9a7b) )
 	ROM_LOAD( "bh07",   0x8000, 0x2000, CRC(f94668d2) SHA1(b5c3a54cf80097ac447a8140bd5877a66712e240) )
 	ROM_LOAD( "bh06",   0xc000, 0x2000, CRC(ab6c7cf1) SHA1(3625f2e00a333552036bff99af25edeac5915d78) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "cobracom", 0, NO_DUMP )
 ROM_END
 
 
@@ -2316,6 +2423,9 @@ ROM_START( usvsthem )
 	ROM_LOAD( "usvs.fg2",     0x4000, 0x4000, CRC(d3990707) SHA1(81d58f6bc6ec04b95036f81c4cd3516d0adf348e) )
 	ROM_LOAD( "usvs.fg1",     0x8000, 0x4000, CRC(a2057430) SHA1(e24aa35cb27fa41b75f5c01f4c083dc6eeb04c0d) )
 	ROM_LOAD( "usvs.fg0",     0xc000, 0x4000, CRC(7734e53f) SHA1(c1307596ba098c98e741f3c00686b514587e1d0a) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "usvsthem", 0, NO_DUMP )
 ROM_END
 
 

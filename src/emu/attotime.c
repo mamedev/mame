@@ -358,6 +358,12 @@ const char *attotime_string(attotime _time, int precision)
 	else if (precision <= 9)
 	{
 		UINT32 upper = _time.attoseconds / ATTOSECONDS_PER_SECOND_SQRT;
+		int temp = precision;
+		while (temp < 9)
+		{
+			upper /= 10;
+			temp++;
+		}
 		sprintf(buffer, "%d.%0*d", _time.seconds, precision, upper);
 	}
 
@@ -366,6 +372,12 @@ const char *attotime_string(attotime _time, int precision)
 	{
 		UINT32 lower;
 		UINT32 upper = divu_64x32_rem(_time.attoseconds, ATTOSECONDS_PER_SECOND_SQRT, &lower);
+		int temp = precision;
+		while (temp < 18)
+		{
+			lower /= 10;
+			temp++;
+		}
 		sprintf(buffer, "%d.%09d%0*d", _time.seconds, upper, precision - 9, lower);
 	}
 	return buffer;

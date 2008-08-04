@@ -31,12 +31,11 @@ static UINT8 nmi_state;
 
 static UINT8 speech_control;
 static UINT8 sp0250_drq;
+static UINT8 last_command;
 
 static UINT8 *dac_data;
 static UINT8 *psg_latch;
 static UINT8 *sp0250_latch;
-
-static UINT8 last_command;
 
 
 static void gottlieb1_sh_w(const device_config *riot, UINT8 data);
@@ -341,6 +340,28 @@ MACHINE_DRIVER_START( gottlieb_soundrev1 )
 MACHINE_DRIVER_END
 
 
+
+/*************************************
+ *
+ *  Rev. 1 input ports
+ *
+ *************************************/
+
+INPUT_PORTS_START( gottlieb1_sound )
+	PORT_START_TAG("SB1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SB1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SB1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SB1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SB1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SB1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SB1:3" )
+	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
+INPUT_PORTS_END
+
+	
 
 /*************************************
  *

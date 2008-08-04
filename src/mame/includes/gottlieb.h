@@ -7,6 +7,12 @@
 #include "machine/6532riot.h"
 
 
+#define GOTTLIEB_VIDEO_HCOUNT	318
+#define GOTTLIEB_VIDEO_HBLANK	256
+#define GOTTLIEB_VIDEO_VCOUNT	256
+#define GOTTLIEB_VIDEO_VBLANK	240
+
+
 /*----------- defined in audio/gottlieb.c -----------*/
 
 WRITE8_HANDLER( gottlieb_sh_w );
@@ -14,6 +20,7 @@ WRITE8_HANDLER( gottlieb_sh_w );
 MACHINE_DRIVER_EXTERN( gottlieb_soundrev1 );
 MACHINE_DRIVER_EXTERN( gottlieb_soundrev2 );
 
+INPUT_PORTS_EXTERN( gottlieb1_sound );
 INPUT_PORTS_EXTERN( gottlieb2_sound );
 
 
@@ -31,4 +38,6 @@ extern WRITE8_HANDLER( gottlieb_laserdisc_video_control_w );
 extern WRITE8_HANDLER( gottlieb_paletteram_w );
 
 VIDEO_START( gottlieb );
+VIDEO_START( gottlieb_laserdisc );
 VIDEO_UPDATE( gottlieb );
+VIDEO_UPDATE( gottlieb_laserdisc );

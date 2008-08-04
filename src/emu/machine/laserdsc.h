@@ -27,7 +27,7 @@ enum
 	LASERDISC_TYPE_PIONEER_PR8210,			/* Pioneer PR-8210 / LD-V1100 */
 	LASERDISC_TYPE_PIONEER_LDV1000,			/* Pioneer LD-V1000 */
 	LASERDISC_TYPE_PHILLIPS_22VP932,		/* Phillips 22VP932 (PAL) */
-	LASERDISC_TYPE_SONY_LDP1450,			/* Sony LDP-1450 */
+	LASERDISC_TYPE_SONY_LDP1450				/* Sony LDP-1450 */
 };
 
 /* laserdisc control lines */
@@ -60,10 +60,13 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef void (*laserdisc_audio_func)(const device_config *device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1);
+
 typedef struct _laserdisc_config laserdisc_config;
 struct _laserdisc_config
 {
-	int			type;
+	int						type;
+	laserdisc_audio_func	audio;
 };
 
 
@@ -76,6 +79,9 @@ struct _laserdisc_config
 	MDRV_DEVICE_ADD(_tag, LASERDISC) \
 	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, type, LASERDISC_TYPE_##_type)
 
+#define MDRV_LASERDISC_AUDIO(_func) \
+	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, audio, _func)
+	
 #define MDRV_LASERDISC_REMOVE(_tag, _type) \
 	MDRV_DEVICE_REMOVE(_tag, _type)
 
@@ -93,17 +99,44 @@ extern const struct CustomSound_interface laserdisc_custom_interface;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
+
+/* ----- core control and status ----- */
+
+/* call this once per field (i.e., 59.94 times/second for NTSC) */
 void laserdisc_vsync(const device_config *device);
+
+/* return a textual description of the current state (for debugging) */
 const char *laserdisc_describe_state(const device_config *device);
+
+/* get a bitmap for the current frame (and the frame number) */
 UINT32 laserdisc_get_video(const device_config *device, bitmap_t **bitmap);
+
+/* return the raw philips or white flag codes */
 UINT32 laserdisc_get_field_code(const device_config *device, UINT8 code);
 
+
+
+/* ----- input and output ----- */
+
+/* write to the parallel data port of the player */
 void laserdisc_data_w(const device_config *device, UINT8 data);
+
+/* assert or clear a signal line connected to the player */
 void laserdisc_line_w(const device_config *device, UINT8 line, UINT8 newstate);
+
+/* read from the parallel data port of the player */
 UINT8 laserdisc_data_r(const device_config *device);
+
+/* read the state of a signal line connected to the player */
 UINT8 laserdisc_line_r(const device_config *device, UINT8 line);
 
+
+
+/* ----- player specifics ----- */
+
+/* specify the "slow" speed of the Pioneer PR-7820 */
 void pr7820_set_slow_speed(const device_config *device, double frame_rate_scaler);
+
 
 
 /* ----- device interface ----- */

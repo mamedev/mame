@@ -5,6 +5,8 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "gottlieb.h"
+#include "machine/laserdsc.h"
 #include "video/resnet.h"
 
 UINT8 *gottlieb_charram;
@@ -12,11 +14,15 @@ UINT8 *gottlieb_charram;
 UINT8 gottlieb_gfxcharlo;
 UINT8 gottlieb_gfxcharhi;
 
-static int background_priority = 0;
-static int spritebank;
+static UINT8 background_priority = 0;
+static UINT8 spritebank;
 
 static tilemap *bg_tilemap;
 static double weights[4];
+
+static render_texture *video_texture;
+static render_texture *overlay_texture;
+static const rectangle overlay_clip = { 0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8 };
 
 
 
@@ -41,7 +47,7 @@ WRITE8_HANDLER( gottlieb_paletteram_w )
 	val = paletteram[offset | 1];
 	r = combine_4_weights(weights, (val >> 0) & 1, (val >> 1) & 1, (val >> 2) & 1, (val >> 3) & 1);
 
-	palette_set_color(machine, offset / 2, MAKE_RGB(r, g, b));
+	palette_set_color(machine, offset / 2, MAKE_ARGB(((offset & ~1) == 0) ? 0x00 : 0xff, r, g, b));
 }
 
 
@@ -89,6 +95,7 @@ WRITE8_HANDLER( gottlieb_laserdisc_video_control_w )
 	/* bit 2 video enable (0 = black screen) */
 
 	/* bit 3 genlock control (1 = show laserdisc image) */
+	render_container_set_palette_alpha(render_container_get_screen(machine->primary_screen), 0, (data & 0x08) ? 0x00 : 0xff);
 }
 
 
@@ -150,6 +157,27 @@ VIDEO_START( gottlieb )
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 	tilemap_set_scrolldx(bg_tilemap, 0, 318 - 256);
+	
+	/* save some state */
+	state_save_register_global(background_priority);
+	state_save_register_global(spritebank);
+}
+
+
+VIDEO_START( gottlieb_laserdisc )
+{
+	/* handle normal video */
+	VIDEO_START_CALL(gottlieb);
+	
+	/* allocate an overlay texture */
+	overlay_texture = render_texture_alloc(NULL, NULL);
+	if (overlay_texture == NULL)
+		fatalerror("Out of memory allocating overlay texture");
+
+	/* allocate a video texture */
+	video_texture = render_texture_alloc(NULL, NULL);
+	if (video_texture == NULL)
+		fatalerror("Out of memory allocating video texture");
 }
 
 
@@ -207,5 +235,39 @@ VIDEO_UPDATE( gottlieb )
 	if (background_priority)
 		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
+	return 0;
+}
+
+
+VIDEO_UPDATE( gottlieb_laserdisc )
+{
+	const device_config *laserdisc = device_list_first(screen->machine->config->devicelist, LASERDISC);
+	rectangle clip = *cliprect;
+	bitmap_t *video_bitmap;
+	
+	/* scale the cliprect to the screen and render it */
+	clip.min_x = 0;
+	clip.max_x = GOTTLIEB_VIDEO_HBLANK - 1;
+	clip.min_y = cliprect->min_y * GOTTLIEB_VIDEO_VCOUNT / bitmap->height;
+	clip.max_y = (cliprect->max_y + 1) * GOTTLIEB_VIDEO_VCOUNT / bitmap->height - 1;
+	video_update_gottlieb(screen, bitmap, &clip);
+	
+	/* if this is the last update, handle it */
+	if (cliprect->max_y == video_screen_get_visible_area(screen)->max_y)
+	{
+		/* update the texture with the overlay contents */
+		render_texture_set_bitmap(overlay_texture, bitmap, &overlay_clip, 0, TEXFORMAT_PALETTEA16);
+	
+		/* now talk to the laserdisc */
+		laserdisc_get_video(laserdisc, &video_bitmap);
+		if (video_bitmap != NULL)
+			render_texture_set_bitmap(video_texture, video_bitmap, NULL, 0, TEXFORMAT_YUY16);
+		
+		/* add both quads to the screen */
+		render_container_empty(render_container_get_screen(screen));
+		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
+	}
+	
 	return 0;
 }

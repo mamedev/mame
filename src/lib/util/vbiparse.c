@@ -18,6 +18,7 @@
 ***************************************************************************/
 
 #define MAX_SOURCE_WIDTH	1024
+#define MAX_CLOCK_DIFF		3
 
 
 
@@ -92,29 +93,21 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 		for (x = 1; x < expectedbits; x++)
 		{
 			int curbit = firstedge + (double)x * clock;
+			int offby;
 
-			/* exact match? */
-			if (srcabs[curbit + 0] != srcabs[curbit + 1])
-				continue;
-
-			/* off-by-one? */
-			if (srcabs[curbit + 1 + 0] != srcabs[curbit + 1 + 1] || srcabs[curbit - 1 + 0] != srcabs[curbit - 1 + 1])
-			{
-				/* only continue if we're still in the running */
-				if ((error += 1) < besterr)
-					continue;
-			}
+			/* look for a match that is off by an amount up to the maximum */
+			for (offby = 0; offby <= MAX_CLOCK_DIFF; offby++)
+				if (srcabs[curbit + offby + 0] != srcabs[curbit + offby + 1] || srcabs[curbit - offby + 0] != srcabs[curbit - offby + 1])
+					break;
 			
-			/* off-by-two? */
-			if (srcabs[curbit + 2 + 0] != srcabs[curbit + 2 + 1] || srcabs[curbit - 2 + 0] != srcabs[curbit - 2 + 1])
-			{
-				/* only continue if we're still in the running */
-				if ((error += 2) < besterr)
-					continue;
-			}
+			/* if we never found the edge, fail immediately */
+			if (offby > MAX_CLOCK_DIFF)
+				break;
 
-			/* anything else fails immediately */
-			break;
+			/* only continue if we're still in the running */
+			error += offby;
+			if (error >= besterr)
+				break;
 		}
 
 		/* if we got to the end, this is the best candidate so far */
