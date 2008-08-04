@@ -344,8 +344,8 @@ static void set_irq_line(int irqline, int state)
 
 	// If the reset line isn't asserted, service interrupts
 	// TODO: Is it right to immediately service interrupts?
-	if (core.reset_state != TRUE)
-		pcu_service_interrupts();
+	//if (core.reset_state != TRUE)
+	//	pcu_service_interrupts();
 }
 
 
@@ -451,7 +451,10 @@ static int dsp56k_execute(int cycles)
 	core.interrupt_cycles = 0;
 
 	while(dsp56k_icount > 0)
+	{
 		execute_one();
+		pcu_service_interrupts();		/* TODO: There is definitely something un-right about this */
+	}
 
 	dsp56k_icount -= core.interrupt_cycles;
 	core.interrupt_cycles = 0;

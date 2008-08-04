@@ -409,7 +409,6 @@ static void HCP_bit_set(UINT16 value)
 	HSR &= ~(0x0004);
 	HSR |=  (value << 2);
 
-	// TODO: Define Host Command through the IRQ structure
 	if (value && HCIE_bit())
 		dsp56k_add_pending_interrupt("Host Command");
 }
@@ -509,6 +508,8 @@ static void RREQ_bit_set(UINT8 value)
 /**************************************/
 /* Command Vector Register (CVR) Bits */
 /**************************************/
+static UINT8 HV_bits() { return (CVR & 0x1f); }
+
 static void CVR_set(UINT8 value)
 {
 	/* A single, unified place to run all callbacks for each of the bits */
@@ -521,9 +522,6 @@ static void HC_bit_set(UINT8 value)
 	value = value & 0x01;
 	CVR &= ~(0x80);
 	CVR |=  (value << 7);
-
-	// TODO: 5-9 Do I push a host-command interrupt here?  Doesn't seem like it, but maybe i'll have to poll for it somewhere else?
-	// TODO: 5-9 The exception routine clears this bit after it executes.
 
 	HCP_bit_set(value);	// 5-9 & 5-11
 }

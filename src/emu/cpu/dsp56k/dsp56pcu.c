@@ -172,6 +172,13 @@ static void pcu_reset(void)
 /***************************************************************************
     INTERRUPT HANDLING
 ***************************************************************************/
+typedef struct
+{
+	UINT16 irq_vector;
+	char   irq_source[128];
+} dsp56k_irq_data;
+
+static dsp56k_irq_data dsp56k_interrupt_sources[32];
 
 // TODO: Figure out how to switch on level versus edge-triggered.
 static void pcu_service_interrupts(void)
@@ -181,27 +188,43 @@ static void pcu_service_interrupts(void)
 	// Count list of pending interrupts
 	int num_servicable = dsp56k_count_pending_interrupts();
 
-	if (num_servicable == 0) return;
+	if (num_servicable == 0) 
+		return;
 
-	// Sort list
+	// Sort list according to priority
 	dsp56k_sort_pending_interrupts(num_servicable);
 
 	// Service each interrupt in order
+	// TODO: This just *can't* be right :)
 	for (i = 0; i < num_servicable; i++)
 	{
+		const int interrupt_index = core.PCU.pending_interrupts[i];
+	
 		// Get the priority of the interrupt - a return value of -1 means disabled!
-		INT8 priority = dsp56k_get_irq_priority(core.PCU.pending_interrupts[i]);
+		INT8 priority = dsp56k_get_irq_priority(interrupt_index);
 
 		// 1-12 Make sure you're not masked out against the Interrupt Mask Bits (disabled is handled for free here)
 		if (priority >= I_bits())
 		{
-			// If you're acceptable to go, execute the interrupt
-
-			// TODO: 5-7 Remember the host command input has a floating vector.  Do it up right.
-			// TODO: 5-9 5-11 Gotta' Clear HI (HCP & HC) when taking this exception too!
+			// Are you anything but the Host Command interrupt?
+			if (interrupt_index != 22)
+			{
+				// Execute a normal interrupt
+				PC = dsp56k_interrupt_sources[interrupt_index].irq_vector;
+			}
+			else
+			{
+				// The host command input has a floating vector.
+				const UINT16 irq_vector = HV_bits() << 1;
+				PC = irq_vector;
+				
+				// TODO: 5-9 5-11 Gotta' Clear HC (HCP gets it too) when taking this exception!
+				HC_bit_set(0);
+			}
 		}
 	}
-
+	
+	dsp56k_clear_pending_interrupts();
 }
 
 //
@@ -218,17 +241,10 @@ static void dsp56k_add_pending_interrupt(const char* name)
 		if (core.PCU.pending_interrupts[i] == -1)
 		{
 			core.PCU.pending_interrupts[i] = irq_index;
+			break;
 		}
 	}
 }
-
-typedef struct
-{
-	UINT16 irq_vector;
-	char   irq_source[128];
-} dsp56k_irq_data;
-
-static dsp56k_irq_data dsp56k_interrupt_sources[32];
 
 static void dsp56k_set_irq_source(UINT8 irq_num, UINT16 iv, const char* source)
 {
@@ -263,7 +279,7 @@ static void dsp56k_irq_table_init(void)
 	dsp56k_set_irq_source(19, 0x0026, "Host DMA Transmit Data");
 	dsp56k_set_irq_source(20, 0x0028, "Host Receive Data");
 	dsp56k_set_irq_source(21, 0x002a, "Host Transmit Data");
-	dsp56k_set_irq_source(22, 0x002c, "Host Command 0 (Default)");
+	dsp56k_set_irq_source(22, 0x002c, "Host Command");				/* Default vector for the host command */
 	dsp56k_set_irq_source(23, 0x002e, "Codec Receive/Transmit");
 	dsp56k_set_irq_source(24, 0x0030, "Host Command 1");
 	dsp56k_set_irq_source(25, 0x0032, "Host Command 2");
@@ -383,7 +399,7 @@ static int dsp56k_get_irq_index_by_tag(const char* tag)
 	int i;
 	for (i = 0; i < 32; i++)
 	{
-		if (!strcmp(tag, dsp56k_interrupt_sources[i].irq_source))
+		if (strcmp(tag, dsp56k_interrupt_sources[i].irq_source) == 0)
 		{
 			return i;
 		}

@@ -294,7 +294,7 @@ static void RREQ_bit_set(UINT8 value);
 static void CVR_set(UINT8 value);
 
 //static UINT8 HC_bit();
-//static UINT8 HV_bits();
+static UINT8 HV_bits();
 
 static void HC_bit_set(UINT8 value);
 static void HV_bits_set(UINT8 value);
