@@ -1116,7 +1116,7 @@ static DEVICE_RESET( pit8253 ) {
 		timer->count = timer->value = timer->latch = 0;
 		timer->lowcount = 0;
 		timer->gate = 1;
-		timer->output = 0;
+		timer->output = 2;	/* output is undetermined */
 		timer->latched_count = 0;
 		timer->latched_status = 0;
 		timer->null_count = 1;
