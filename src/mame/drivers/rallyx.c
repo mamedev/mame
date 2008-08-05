@@ -22,6 +22,7 @@ standard Konami sound hardware of that era (slave Z80 + 2xAY-3-8910).
 Also, the Konami design includes an optional starfield generator, only used
 by Tactician.
 
+Rally X video chip appears to be DIP28 Fujitsu MB884x with 2K internal ROM stamped 8050
 
 Rally X Memory map:
 ------------------
