@@ -139,6 +139,8 @@ struct dss_trianglewave_context
 	double phase;
 };
 
+#define DSS_INV_TAB_SIZE	500
+
 struct dss_inverter_osc_context
 {
 	double	w;
@@ -151,6 +153,7 @@ struct dss_inverter_osc_context
 	double  C;
 	double	tf_a;
 	double	tf_b;
+	double  tf_tab[DSS_INV_TAB_SIZE];
 };
 
 /************************************************************************
@@ -1478,7 +1481,7 @@ static void dss_squarewave2_reset(node_description *node)
 #define DSS_INVERTER_OSC__C			(*(node->input[4]))
 #define DSS_INVERTER_OSC__R2		(*(node->input[5]))
 
-static double dss_inverter_tf(node_description *node, double x)
+INLINE double dss_inverter_tftab(node_description *node, double x)
 {
 	const discrete_inverter_osc_desc *info = node->custom;
 	struct dss_inverter_osc_context *context = node->context;
@@ -1488,6 +1491,18 @@ static double dss_inverter_tf(node_description *node, double x)
 	 	return info->vB * exp(-context->tf_a * pow(x,context->tf_b));
 	else
 		return info->vB;
+}
+
+INLINE double dss_inverter_tf(node_description *node, double x)
+{
+	const discrete_inverter_osc_desc *info = node->custom;
+	struct dss_inverter_osc_context *context = node->context;
+	if (x < 0.0)
+		return info->vB;
+	else if (x <= info->vB)
+		return context->tf_tab[(int)((double)(DSS_INV_TAB_SIZE-1) * x / info->vB)];
+	else 
+		return context->tf_tab[DSS_INV_TAB_SIZE];
 }
 
 static void dss_inverter_osc_step(node_description *node)
@@ -1539,12 +1554,12 @@ static void dss_inverter_osc_step(node_description *node)
 				diff = vG3 * (context->Rp / (context->Rp + context->R1))
 				     - (context->vCap + vG2)
 				     + vI*(context->R1 / (context->Rp + context->R1));
-				diff = diff - diff * exp(context->wc * discrete_current_context->sample_time);
+				diff = diff - diff * context->wc;
 			}
 			else
 			{
 				diff = vG3 - (context->vCap + vG2);
-				diff = diff - diff * exp(context->w * discrete_current_context->sample_time);
+				diff = diff - diff * context->w;
 			}
 			break;
 		case DISC_OSC_INVERTER_IS_TYPE4:
@@ -1600,10 +1615,11 @@ static void dss_inverter_osc_reset(node_description *node)
 {
 	struct dss_inverter_osc_context *context = node->context;
 	const discrete_inverter_osc_desc *info = node->custom;
+	int i;
 
 	/* exponent */
-	context->w = -1.0 / (DSS_INVERTER_OSC__RC * DSS_INVERTER_OSC__C);
-	context->wc = -1.0 / ((DSS_INVERTER_OSC__RC * DSS_INVERTER_OSC__RP) / (DSS_INVERTER_OSC__RP + DSS_INVERTER_OSC__RC) * DSS_INVERTER_OSC__C);
+	context->w = exp(-discrete_current_context->sample_time / (DSS_INVERTER_OSC__RC * DSS_INVERTER_OSC__C));
+	context->wc = exp(-discrete_current_context->sample_time / ((DSS_INVERTER_OSC__RC * DSS_INVERTER_OSC__RP) / (DSS_INVERTER_OSC__RP + DSS_INVERTER_OSC__RC) * DSS_INVERTER_OSC__C));
 	node->output[0] = 0;
 	context->vCap = 0;
 	context->vG2_old = 0;
@@ -1614,6 +1630,11 @@ static void dss_inverter_osc_reset(node_description *node)
 	context->tf_b = (log(0.0 - log(info->vOutLow/info->vB)) - log(0.0 - log((info->vOutHigh/info->vB))) ) / log(info->vInRise / info->vInFall);
 	context->tf_a = log(0.0 - log(info->vOutLow/info->vB)) - context->tf_b * log(info->vInRise/info->vB);
 	context->tf_a = exp(context->tf_a);
+
+	for (i = 0; i < DSS_INV_TAB_SIZE; i++)
+	{
+		context->tf_tab[i] = dss_inverter_tftab(node, (double) i / (double)(DSS_INV_TAB_SIZE-1) * info->vB);
+	}
 }
 
 /************************************************************************

@@ -979,49 +979,68 @@ static void dst_mixer_step(node_description *node)
 	{
 		rTotal = context->rTotal;
 
-		for(bit=0; bit < context->size; bit++)
+		if (context->type & DISC_MIXER_HAS_R_NODE)
 		{
-			rTemp = info->r[bit];
-			connected = 1;
-			vTemp = DST_MIXER__IN(bit);
-
-			if (info->rNode[bit])
+			for(bit=0; bit < context->size; bit++)
 			{
-				/* a node has the posibility of being disconnected from the circuit. */
-				if (*context->rNode[bit] == 0)
-					connected = 0;
-				else
+				rTemp = info->r[bit];
+				connected = 1;
+				vTemp = DST_MIXER__IN(bit);
+	
+				if (info->rNode[bit])
 				{
-					rTemp += *context->rNode[bit];
-					rTotal += 1.0 / rTemp;
-					if (info->c[bit] != 0)
+					/* a node has the posibility of being disconnected from the circuit. */
+					if (*context->rNode[bit] == 0)
+						connected = 0;
+					else
 					{
-						switch (context->type & DISC_MIXER_TYPE_MASK)
+						rTemp += *context->rNode[bit];
+						rTotal += 1.0 / rTemp;
+						if (info->c[bit] != 0)
 						{
-							case DISC_MIXER_IS_RESISTOR:
-								/* is there an rF? */
-								if (info->rF != 0)
-								{
-									rTemp2 = 1.0 / ((1.0 / rTemp) + (1.0 / info->rF));
+							switch (context->type & DISC_MIXER_TYPE_MASK)
+							{
+								case DISC_MIXER_IS_RESISTOR:
+									/* is there an rF? */
+									if (info->rF != 0)
+									{
+										rTemp2 = 1.0 / ((1.0 / rTemp) + (1.0 / info->rF));
+										break;
+									}
+									/* else, fall through and just use the resistor value */
+								case DISC_MIXER_IS_OP_AMP:
+									rTemp2 = rTemp;
 									break;
-								}
-								/* else, fall through and just use the resistor value */
-							case DISC_MIXER_IS_OP_AMP:
-								rTemp2 = rTemp;
-								break;
-							case DISC_MIXER_IS_OP_AMP_WITH_RI:
-								rTemp2 = rTemp + info->rI;
-								break;
+								case DISC_MIXER_IS_OP_AMP_WITH_RI:
+									rTemp2 = rTemp + info->rI;
+									break;
+							}
+							/* Re-calculate exponent if resistor is a node */
+							context->exponent_rc[bit] = -1.0 / (rTemp2 * info->c[bit]  * discrete_current_context->sample_rate);
+							context->exponent_rc[bit] = 1.0 - exp(context->exponent_rc[bit]);
 						}
-						/* Re-calculate exponent if resistor is a node */
-						context->exponent_rc[bit] = -1.0 / (rTemp2 * info->c[bit]  * discrete_current_context->sample_rate);
-						context->exponent_rc[bit] = 1.0 - exp(context->exponent_rc[bit]);
 					}
 				}
+	
+				if (connected)
+				{
+					if (info->c[bit] != 0)
+					{
+						/* do input high pass filtering if needed. */
+						context->vCap[bit] += (vTemp - info->vRef - context->vCap[bit]) * context->exponent_rc[bit];
+						vTemp -= context->vCap[bit];
+					}
+					i += (((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP) ? info->vRef - vTemp : vTemp) / rTemp;
+				}
 			}
-
-			if (connected)
+		}
+		else
+		{
+			for (bit = 0; bit < context->size; bit++)
 			{
+				rTemp = info->r[bit];
+				vTemp = DST_MIXER__IN(bit);
+	
 				if (info->c[bit] != 0)
 				{
 					/* do input high pass filtering if needed. */
@@ -1031,8 +1050,10 @@ static void dst_mixer_step(node_description *node)
 				i += (((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP) ? info->vRef - vTemp : vTemp) / rTemp;
 			}
 		}
-
-		if ((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP_WITH_RI) i += info->vRef / info->rI;
+		
+		if ((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP_WITH_RI) 
+			i += info->vRef / info->rI;
+		
 		rTotal = 1.0 / rTotal;
 
 		/* If resistor network or has rI then Millman is used.
@@ -1508,20 +1529,19 @@ static void dst_aswitch_step(node_description *node)
 
 #define MAX_TRANS_STACK	16
 
-double dst_transform_pop(double *stack,int *pointer)
+INLINE double dst_transform_pop(double *stack,int *pointer)
 {
-	double value;
 	//decrement THEN read
-	if(*pointer>0) (*pointer)--;
-	value=stack[*pointer];
-	return value;
+	assert(*pointer > 0);
+	(*pointer)--;
+	return stack[*pointer];
 }
 
-double dst_transform_push(double *stack,int *pointer,double value)
+INLINE void dst_transform_push(double *stack,int *pointer,double value)
 {
 	//Store THEN increment
-	if(*pointer<MAX_TRANS_STACK) stack[(*pointer)++]=value;
-	return value;
+	assert(*pointer < MAX_TRANS_STACK); 
+	stack[(*pointer)++]=value;
 }
 
 static void dst_transform_step(node_description *node)
@@ -1529,105 +1549,86 @@ static void dst_transform_step(node_description *node)
 	if(DST_TRANSFORM__ENABLE)
 	{
 		double trans_stack[MAX_TRANS_STACK];
-		double result,number1,number2;
+		double number1,top;
 		int	trans_stack_ptr=0;
 
 		const char *fPTR = node->custom;
 		node->output[0]=0;
 
+		top = HUGE_VAL;
+		
 		while(*fPTR!=0)
 		{
 			switch (*fPTR++)
 			{
 				case '*':
-					number2=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					number1=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					result=number1*number2;
-					dst_transform_push(trans_stack,&trans_stack_ptr,result);
+					number1 = dst_transform_pop(trans_stack,&trans_stack_ptr);
+					top = number1 * top;
 					break;
 				case '/':
-					number2=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					number1=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					result=number1/number2;
-					dst_transform_push(trans_stack,&trans_stack_ptr,result);
+					number1 = dst_transform_pop(trans_stack,&trans_stack_ptr);
+					top = number1 / top;
 					break;
 				case '+':
-					number2=dst_transform_pop(trans_stack,&trans_stack_ptr);
 					number1=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					result=number1+number2;
-					dst_transform_push(trans_stack,&trans_stack_ptr,result);
+					top = number1 + top;
 					break;
 				case '-':
-					number2=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					number1=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					result=number1-number2;
-					dst_transform_push(trans_stack,&trans_stack_ptr,result);
+					number1 = dst_transform_pop(trans_stack,&trans_stack_ptr);
+					top = number1 - top;
 					break;
 				case '0':
-					dst_transform_push(trans_stack,&trans_stack_ptr,DST_TRANSFORM__IN0);
+					dst_transform_push(trans_stack,&trans_stack_ptr, top);
+					top = DST_TRANSFORM__IN0;
 					break;
 				case '1':
-					dst_transform_push(trans_stack,&trans_stack_ptr,DST_TRANSFORM__IN1);
+					dst_transform_push(trans_stack,&trans_stack_ptr, top);
+					top = DST_TRANSFORM__IN1;
 					break;
 				case '2':
-					dst_transform_push(trans_stack,&trans_stack_ptr,DST_TRANSFORM__IN2);
+					dst_transform_push(trans_stack,&trans_stack_ptr, top);
+					top = DST_TRANSFORM__IN2;
 					break;
 				case '3':
-					dst_transform_push(trans_stack,&trans_stack_ptr,DST_TRANSFORM__IN3);
+					dst_transform_push(trans_stack,&trans_stack_ptr, top);
+					top = DST_TRANSFORM__IN3;
 					break;
 				case '4':
-					dst_transform_push(trans_stack,&trans_stack_ptr,DST_TRANSFORM__IN4);
+					dst_transform_push(trans_stack,&trans_stack_ptr, top);
+					top = DST_TRANSFORM__IN4;
 					break;
 				case 'P':
-					result=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					dst_transform_push(trans_stack,&trans_stack_ptr,result);
-					dst_transform_push(trans_stack,&trans_stack_ptr,result);
+					dst_transform_push(trans_stack,&trans_stack_ptr, top);
 					break;
 				case 'i':	// * -1
-					number1=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					result=-number1;
-					dst_transform_push(trans_stack,&trans_stack_ptr,result);
+					top = -top;
 					break;
 				case '!':	// Logical NOT of Last Value
-					number1=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					result=!number1;
-					dst_transform_push(trans_stack,&trans_stack_ptr,result);
+					top = !top;
 					break;
 				case '=':	// Logical =
-					number2=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					number1=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					result=(int)number1 == (int)number2;
-					dst_transform_push(trans_stack,&trans_stack_ptr,result);
+					number1 = dst_transform_pop(trans_stack,&trans_stack_ptr);
+					top = (int)number1 == (int)top;
 					break;
 				case '>':	// Logical >
-					number2=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					number1=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					result=number1 > number2;
-					dst_transform_push(trans_stack,&trans_stack_ptr,result);
+					number1 = dst_transform_pop(trans_stack,&trans_stack_ptr);
+					top = number1 > top;
 					break;
 				case '<':	// Logical <
-					number2=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					number1=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					result=number1 < number2;
-					dst_transform_push(trans_stack,&trans_stack_ptr,result);
+					number1 = dst_transform_pop(trans_stack,&trans_stack_ptr);
+					top = number1 < top;
 					break;
 				case '&':	// Bitwise AND
-					number2=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					number1=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					result=(int)number1 & (int)number2;
-					dst_transform_push(trans_stack,&trans_stack_ptr,result);
+					number1 = dst_transform_pop(trans_stack,&trans_stack_ptr);
+					top = (int)number1 & (int)top;
 					break;
 				case '|':	// Bitwise OR
-					number2=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					number1=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					result=(int)number1 | (int)number2;
-					dst_transform_push(trans_stack,&trans_stack_ptr,result);
+					number1 = dst_transform_pop(trans_stack,&trans_stack_ptr);
+					top = (int)number1 | (int)top;
 					break;
 				case '^':	// Bitwise XOR
-					number2=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					number1=dst_transform_pop(trans_stack,&trans_stack_ptr);
-					result=(int)number1 ^ (int)number2;
-					dst_transform_push(trans_stack,&trans_stack_ptr,result);
+					number1 = dst_transform_pop(trans_stack,&trans_stack_ptr);
+					top = (int)number1 ^ (int)top;
 					break;
 				default:
 					discrete_log("dst_transform_step - Invalid function type/variable passed");
@@ -1635,7 +1636,7 @@ static void dst_transform_step(node_description *node)
 					break;
 			}
 		}
-		node->output[0]=dst_transform_pop(trans_stack,&trans_stack_ptr);
+		node->output[0] = top;
 	}
 	else
 	{

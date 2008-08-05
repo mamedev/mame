@@ -74,6 +74,8 @@ struct dst_rcdisc_context
 	double vCE;			// RCINTEGRATE
 	double exponent0;
 	double exponent1;
+	double exp_exponent0;// RCINTEGRATE
+	double exp_exponent1;// RCINTEGRATE
 };
 
 struct dst_rcdisc4_context
@@ -638,7 +640,7 @@ static void dst_rcdisc2_step(node_description *node)
 	/* exponential based in difference between input/output   */
 
 	diff = ((DST_RCDISC2__ENABLE == 0) ? DST_RCDISC2__IN0 : DST_RCDISC2__IN1) - node->output[0];
-	diff = diff - (diff * exp(discrete_current_context->sample_time / ((DST_RCDISC2__ENABLE == 0) ? context->exponent0 : context->exponent1)));
+	diff = diff - (diff * ((DST_RCDISC2__ENABLE == 0) ? context->exp_exponent0 : context->exp_exponent1));
 	node->output[0] += diff;
 }
 
@@ -650,8 +652,10 @@ static void dst_rcdisc2_reset(node_description *node)
 
 	context->state = 0;
 	context->t = 0;
-	context->exponent0=-1.0 * DST_RCDISC2__R0 * DST_RCDISC2__C;
-	context->exponent1=-1.0 * DST_RCDISC2__R1 * DST_RCDISC2__C;
+	context->exponent0 =-1.0 * DST_RCDISC2__R0 * DST_RCDISC2__C;
+	context->exponent1 =-1.0 * DST_RCDISC2__R1 * DST_RCDISC2__C;
+	context->exp_exponent0 = exp(discrete_current_context->sample_time/context->exponent0);
+	context->exp_exponent1 = exp(discrete_current_context->sample_time/context->exponent1);
 }
 
 /************************************************************************
@@ -939,8 +943,8 @@ static void  dst_rcintegrate_step(node_description *node)
 		{
 			/* discharge .... */
 			diff = 0 - context->vCap;
-			iC = 0.0 - context->C / context->exponent1 * diff*exp(dt / context->exponent1); // iC
-			diff = diff - (diff * exp(dt / context->exponent1));
+			iC = 0.0 - context->C / context->exponent1 * diff * context->exp_exponent1; // iC
+			diff = diff - (diff * context->exp_exponent1);
 			context->vCap += diff;
 			iQ = 0;
 			vE = context->vCap*context->R2/(context->R1+context->R2);
@@ -950,8 +954,8 @@ static void  dst_rcintegrate_step(node_description *node)
 		{
 			/* charging */
 			diff = (vP - context->vCE) * context->f - context->vCap;
-			iC = 0.0 - context->C / context->exponent0 * diff*exp(dt / context->exponent0); // iC
-			diff = diff - (diff * exp(dt / context->exponent0));
+			iC = 0.0 - context->C / context->exponent0 * diff * context->exp_exponent0; // iC
+			diff = diff - (diff * context->exp_exponent0);
 			context->vCap += diff;
 			iQ = iC + (iC * context->R1 + context->vCap) / context->R2;
 			RG = (vP - context->vCE)/iQ;
@@ -991,11 +995,11 @@ static void  dst_rcintegrate_step(node_description *node)
 		node->output[0]=0;
 	}
 }
-
 static void dst_rcintegrate_reset(node_description *node)
 {
 	struct dst_rcdisc_context *context = node->context;
 	double r;
+	double dt = discrete_current_context->sample_time;
 
 	node->output[0]=0;
 
@@ -1013,6 +1017,8 @@ static void dst_rcintegrate_reset(node_description *node)
 	context->f = DST_RCINTEGRATE__R2/(DST_RCINTEGRATE__R2+DST_RCINTEGRATE__R3);
 	context->exponent0 = -1.0 * r * context->f * DST_RCINTEGRATE__C;
 	context->exponent1 = -1.0 * (DST_RCINTEGRATE__R1 + DST_RCINTEGRATE__R2) * DST_RCINTEGRATE__C;
+	context->exp_exponent0 = exp(dt / context->exponent0);
+	context->exp_exponent1 = exp(dt / context->exponent1);
 }
 
 
