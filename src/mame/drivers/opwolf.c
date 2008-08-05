@@ -6,7 +6,7 @@ Operation Wolf  (c) Taito 1987
 David Graves, Jarek Burczynski
 C-Chip emulation by Bryan McPhail
 
-Sources:        MAME Rastan driver
+Sources:    MAME Rastan driver
             MAME Taito F2 driver
             Raine source - many thanks to Richard Bush
               and the Raine Team.
@@ -18,6 +18,14 @@ Sound   : Z80 & YM2151 & MSM5205
 Operation Wolf uses similar hardware to Rainbow Islands and Rastan.
 The screen layout and registers and sprites appear to be identical.
 
+Taito TC0030CMD chip labeled B20-18 (at least for the US boards)
+Taito PC060HA likes like it might be a DIP28 Fujitsu MB884x chip
+There are 4 socketted PALs (DIP20 type PAL16L8ACN) labeled B20-09
+      through B20-12 (not read)
+
+OSC:  Main board: 16MHz, 12MHz & 26.686MHz
+     Sound board: 8MHz (Next to Z80 & YM2151)
+CPU: TS68000CP8 (Rated for 8MHz)
 
 Gun Travel
 ----------
@@ -92,6 +100,11 @@ register. So what is controlling priority.
 
 
 ***************************************************************************/
+
+/* Define clocks based on actual OSC on the PCB */
+
+#define CPU_CLOCK		(XTAL_16MHz / 2)	/* clock for 68020 */
+#define SOUND_CPU_CLOCK		(XTAL_8MHz / 2)		/* clock for Z80 sound CPU */
 
 #include "driver.h"
 #include "taitoipt.h"
@@ -558,11 +571,11 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( opwolf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000 )	/* 12 MHz */
+	MDRV_CPU_ADD("main", M68000, CPU_CLOCK )	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(opwolf_readmem,opwolf_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000 )	/* 4 MHz */
+	MDRV_CPU_ADD("audio", Z80, SOUND_CPU_CLOCK )	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
 
 	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
@@ -587,7 +600,7 @@ static MACHINE_DRIVER_START( opwolf )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ym", YM2151, 4000000)
+	MDRV_SOUND_ADD("ym", YM2151, SOUND_CPU_CLOCK )	/* 4 MHz */
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.75)
 	MDRV_SOUND_ROUTE(1, "right", 0.75)
@@ -604,17 +617,17 @@ static MACHINE_DRIVER_START( opwolf )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( opwolfb )
+static MACHINE_DRIVER_START( opwolfb ) /* OSC clocks unknown for the bootleg, but changed to match original sets */
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz ??? */
+	MDRV_CPU_ADD("main", M68000, CPU_CLOCK )	/* 8 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(opwolfb_readmem,opwolfb_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("audio", Z80, SOUND_CPU_CLOCK )	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
 
-	MDRV_CPU_ADD("sub", Z80, 4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("sub", Z80, SOUND_CPU_CLOCK )	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sub_z80_readmem,sub_z80_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -639,7 +652,7 @@ static MACHINE_DRIVER_START( opwolfb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ym", YM2151, 4000000)
+	MDRV_SOUND_ADD("ym", YM2151, SOUND_CPU_CLOCK )
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.75)
 	MDRV_SOUND_ROUTE(1, "right", 0.75)
@@ -691,7 +704,7 @@ ROM_START( opwolfa )
 	ROM_LOAD16_BYTE( "b20-05-02.40",  0x00000, 0x10000, CRC(3ffbfe3a) SHA1(e41257e6af18bab4e36267a0c25a6aaa742972d2) )
 	ROM_LOAD16_BYTE( "b20-03-02.30",  0x00001, 0x10000, CRC(fdabd8a5) SHA1(866ec6168489024b8d157f2d5b1553d7f6e3d9b7) )
 	ROM_LOAD16_BYTE( "b20-04.39",     0x20000, 0x10000, CRC(216b4838) SHA1(2851cae00bb3e32e20f35fdab8ed6f149e658363) )
-	ROM_LOAD16_BYTE( "b20-17",        0x20001, 0x10000, CRC(6043188e) SHA1(3a6f4836b1c19d37713f5714a947276baf1df50c) )
+	ROM_LOAD16_BYTE( "b20-17.29",     0x20001, 0x10000, CRC(6043188e) SHA1(3a6f4836b1c19d37713f5714a947276baf1df50c) )
 
 	ROM_REGION( 0x20000, "audio", 0 )      /* sound cpu */
 	ROM_LOAD( "b20-07.10",  0x00000, 0x04000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
@@ -708,12 +721,12 @@ ROM_START( opwolfa )
 ROM_END
 
 
-ROM_START( opwolfu )
+ROM_START( opwolfu ) /* Taito TC0030 C-Chip labeled B20-18 (yes, it has a specific label on it) */
 	ROM_REGION( 0x40000, "main", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "b20-05-02.40",  0x00000, 0x10000, CRC(3ffbfe3a) SHA1(e41257e6af18bab4e36267a0c25a6aaa742972d2) )
 	ROM_LOAD16_BYTE( "b20-03-02.30",  0x00001, 0x10000, CRC(fdabd8a5) SHA1(866ec6168489024b8d157f2d5b1553d7f6e3d9b7) )
 	ROM_LOAD16_BYTE( "b20-04.39",     0x20000, 0x10000, CRC(216b4838) SHA1(2851cae00bb3e32e20f35fdab8ed6f149e658363) )
-	ROM_LOAD16_BYTE( "opwlf.29",      0x20001, 0x10000, CRC(b71bc44c) SHA1(5b404bd7630f01517ab98bda40ca43c11268035a) )
+	ROM_LOAD16_BYTE( "b20-19.29",     0x20001, 0x10000, CRC(b71bc44c) SHA1(5b404bd7630f01517ab98bda40ca43c11268035a) )
 
 	ROM_REGION( 0x20000, "audio", 0 )      /* sound cpu */
 	ROM_LOAD( "b20-07.10",  0x00000, 0x04000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
