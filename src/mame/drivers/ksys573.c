@@ -255,7 +255,7 @@ static int security_cart_number = 0;
 static int chiptype[ 2 ];
 static int has_ds2401[ 2 ];
 
-static const char *diskregions[] = { "disk0", "cdrom1" };
+static const char *diskregions[] = { "cdrom0", "cdrom1" };
 
 /* EEPROM handlers */
 
