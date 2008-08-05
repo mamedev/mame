@@ -958,17 +958,17 @@ ROM_START( rallyx )
 	ROM_LOAD( "8e",           0x0000, 0x1000, CRC(277c1de5) SHA1(30bc57263e8dad870c501c76bce6f42d69ab9e00) )
 
 	ROM_REGION( 0x0100, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "im5623.8m",    0x0000, 0x0100, CRC(3c16f62c) SHA1(7a3800be410e306cf85753b9953ffc5575afbcd6) )  /* dots */
+	ROM_LOAD( "rx-6.8m",   0x0000, 0x0100, CRC(3c16f62c) SHA1(7a3800be410e306cf85753b9953ffc5575afbcd6) )  /* Prom type: IM5623    - dots */
 
 	ROM_REGION( 0x0160, "proms", 0 )
-	ROM_LOAD( "m3-7603.11n",  0x0000, 0x0020, CRC(c7865434) SHA1(70c1c9610ba6f1ead77f347e7132958958bccb31) )  /* palette */
-	ROM_LOAD( "im5623.8p",    0x0020, 0x0100, CRC(834d4fda) SHA1(617864d3df0917a513e8255ad8d96ae7a04da5a1) )  /* lookup table */
-	ROM_LOAD( "r-2.4n",       0x0120, 0x0020, CRC(8f574815) SHA1(4f84162db9d58b64742c67dc689eb665b9862fb3) )  /* video layout (not used) */
-	ROM_LOAD( "r-3.7k",       0x0140, 0x0020, CRC(b8861096) SHA1(26fad384ed7a1a1e0ba719b5578e2dbb09334a25) )  /* video timing (not used) */
+	ROM_LOAD( "rx-1.11n",  0x0000, 0x0020, CRC(c7865434) SHA1(70c1c9610ba6f1ead77f347e7132958958bccb31) )  /* Prom type: M3-7603-5 - palette */
+	ROM_LOAD( "rx-7.8p",   0x0020, 0x0100, CRC(834d4fda) SHA1(617864d3df0917a513e8255ad8d96ae7a04da5a1) )  /* Prom type: IM5623    - lookup table */
+	ROM_LOAD( "rx-2.4n",   0x0120, 0x0020, CRC(8f574815) SHA1(4f84162db9d58b64742c67dc689eb665b9862fb3) )  /* Prom type: N82S123N  - video layout (not used) */
+	ROM_LOAD( "rx1-3.7k",  0x0140, 0x0020, CRC(b8861096) SHA1(26fad384ed7a1a1e0ba719b5578e2dbb09334a25) )  /* Prom type: M3-7603-5 - video timing (not used) */
 
 	ROM_REGION( 0x0200, "namco", 0 ) /* sound proms */
-	ROM_LOAD( "im5623.3p",    0x0000, 0x0100, CRC(4bad7017) SHA1(3e6da9d798f5e07fa18d6ce7d0b148be98c766d5) )
-	ROM_LOAD( "im5623.2m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  /* timing - not used */
+	ROM_LOAD( "rx-5.3p",    0x0000, 0x0100, CRC(4bad7017) SHA1(3e6da9d798f5e07fa18d6ce7d0b148be98c766d5) )  /* Prom type: IM5623  */
+	ROM_LOAD( "rx-4.2m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  /* Prom type: IM5623 - not used */
 ROM_END
 
 ROM_START( rallyxm )
@@ -979,20 +979,17 @@ ROM_START( rallyxm )
 	ROM_LOAD( "1k",           0x3000, 0x1000, CRC(473ab447) SHA1(f0a37ccc48c97c53672f754ca2ac37dc0dc91a9f) )
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "8e",           0x0000, 0x1000, CRC(277c1de5) SHA1(30bc57263e8dad870c501c76bce6f42d69ab9e00) )
-
-	ROM_REGION( 0x0100, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "im5623.8m",    0x0000, 0x0100, CRC(3c16f62c) SHA1(7a3800be410e306cf85753b9953ffc5575afbcd6) )  /* dots */
+	ROM_LOAD( "rx-6.8m",   0x0000, 0x0100, CRC(3c16f62c) SHA1(7a3800be410e306cf85753b9953ffc5575afbcd6) )  /* Prom type: IM5623    - dots */
 
 	ROM_REGION( 0x0160, "proms", 0 )
-	ROM_LOAD( "m3-7603.11n",  0x0000, 0x0020, CRC(c7865434) SHA1(70c1c9610ba6f1ead77f347e7132958958bccb31) )  /* palette */
-	ROM_LOAD( "im5623.8p",    0x0020, 0x0100, CRC(834d4fda) SHA1(617864d3df0917a513e8255ad8d96ae7a04da5a1) )  /* lookup table */
-	ROM_LOAD( "r-2.4n",       0x0120, 0x0020, CRC(8f574815) SHA1(4f84162db9d58b64742c67dc689eb665b9862fb3) )  /* video layout (not used) */
-	ROM_LOAD( "r-3.7k",       0x0140, 0x0020, CRC(b8861096) SHA1(26fad384ed7a1a1e0ba719b5578e2dbb09334a25) )  /* video timing (not used) */
+	ROM_LOAD( "rx-1.11n",  0x0000, 0x0020, CRC(c7865434) SHA1(70c1c9610ba6f1ead77f347e7132958958bccb31) )  /* Prom type: M3-7603-5 - palette */
+	ROM_LOAD( "rx-7.8p",   0x0020, 0x0100, CRC(834d4fda) SHA1(617864d3df0917a513e8255ad8d96ae7a04da5a1) )  /* Prom type: IM5623    - lookup table */
+	ROM_LOAD( "rx-2.4n",   0x0120, 0x0020, CRC(8f574815) SHA1(4f84162db9d58b64742c67dc689eb665b9862fb3) )  /* Prom type: N82S123N  - video layout (not used) */
+	ROM_LOAD( "rx1-3.7k",  0x0140, 0x0020, CRC(b8861096) SHA1(26fad384ed7a1a1e0ba719b5578e2dbb09334a25) )  /* Prom type: M3-7603-5 - video timing (not used) */
 
 	ROM_REGION( 0x0200, "namco", 0 ) /* sound proms */
-	ROM_LOAD( "im5623.3p",    0x0000, 0x0100, CRC(4bad7017) SHA1(3e6da9d798f5e07fa18d6ce7d0b148be98c766d5) )
-	ROM_LOAD( "im5623.2m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  /* timing - not used */
+	ROM_LOAD( "rx-5.3p",    0x0000, 0x0100, CRC(4bad7017) SHA1(3e6da9d798f5e07fa18d6ce7d0b148be98c766d5) )  /* Prom type: IM5623  */
+	ROM_LOAD( "rx-4.2m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  /* Prom type: IM5623 - not used */
 ROM_END
 
 ROM_START( nrallyx )
@@ -1006,17 +1003,17 @@ ROM_START( nrallyx )
 	ROM_LOAD( "nrallyx.8e",   0x0000, 0x1000, CRC(ca7a174a) SHA1(dc553df18c45ba399661122be75b71d6cb54d6a2) )
 
 	ROM_REGION( 0x0100, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "im5623.8m",    0x0000, 0x0100, CRC(3c16f62c) SHA1(7a3800be410e306cf85753b9953ffc5575afbcd6) )  /* dots */
+	ROM_LOAD( "rx-6.8m",      0x0000, 0x0100, CRC(3c16f62c) SHA1(7a3800be410e306cf85753b9953ffc5575afbcd6) )  /* Prom type: IM5623    - dots */
 
 	ROM_REGION( 0x0160, "proms", 0 )
-	ROM_LOAD( "nrallyx.pr1",  0x0000, 0x0020, CRC(a0a49017) SHA1(494c920a157e9f876d533c1b0146275a366c4989) )  /* palette */
-	ROM_LOAD( "nrallyx.pr2",  0x0020, 0x0100, CRC(b2b7ca15) SHA1(e604d58f2f20ebf042f28b01e74eddeacf5baba9) )  /* lookup table */
-	ROM_LOAD( "r-2.4n",       0x0120, 0x0020, CRC(8f574815) SHA1(4f84162db9d58b64742c67dc689eb665b9862fb3) )  /* video layout (not used) */
-	ROM_LOAD( "r-3.7k",       0x0140, 0x0020, CRC(b8861096) SHA1(26fad384ed7a1a1e0ba719b5578e2dbb09334a25) )  /* video timing (not used) */
+	ROM_LOAD( "nrallyx.pr1",  0x0000, 0x0020, CRC(a0a49017) SHA1(494c920a157e9f876d533c1b0146275a366c4989) )  /* Prom type: M3-7603-5 - palette */
+	ROM_LOAD( "nrallyx.pr2",  0x0020, 0x0100, CRC(b2b7ca15) SHA1(e604d58f2f20ebf042f28b01e74eddeacf5baba9) )  /* Prom type: IM5623    - lookup table */
+	ROM_LOAD( "rx-2.4n",      0x0120, 0x0020, CRC(8f574815) SHA1(4f84162db9d58b64742c67dc689eb665b9862fb3) )  /* Prom type: N82S123N  - video layout (not used) */
+	ROM_LOAD( "rx1-3.7k",     0x0140, 0x0020, CRC(b8861096) SHA1(26fad384ed7a1a1e0ba719b5578e2dbb09334a25) )  /* Prom type: M3-7603-5 - video timing (not used) */
 
 	ROM_REGION( 0x0200, "namco", 0 ) /* sound proms */
-	ROM_LOAD( "nrallyx.spr",  0x0000, 0x0100, CRC(b75c4e87) SHA1(450f79a5ae09e34f7624d37769815baf93c0028e) )
-	ROM_LOAD( "im5623.2m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  /* timing - not used */
+	ROM_LOAD( "nrallyx.spr",  0x0000, 0x0100, CRC(b75c4e87) SHA1(450f79a5ae09e34f7624d37769815baf93c0028e) )  /* Prom type: IM5623  */
+	ROM_LOAD( "rx-4.2m",      0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  /* Prom type: IM5623 - not used */
 ROM_END
 
 
