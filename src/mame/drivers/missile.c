@@ -8,6 +8,95 @@
     Known issues:
         * none at this time
 
+******************************************************************************************
+
+Missile Command
+Atari, 1979
+
+PCB Layout
+----------
+
+MISSILE COMMAND
+A035467-04
+ATARI (C)79
+|---------------------------------------------------------------------|
+|                           T_5MHz   T_10MHz                          |
+|    MC14584     MC14584         10MHz               RESET_SW         |
+|J19                    T_HSYNC              T_R/W02         UM6502A  |
+|                 T_WDOG_DIS                           T_-5V          |
+|   T_BW_VID                                                       X  |
+|-|                                                                X  |
+  |        T_START2                        MM5290J-3               X  |
+|-|J20     T_START1   T_GND     T_GND      MM5290J-3     035820-01.H1 |
+|2         T_SLAM                          MM5290J-3     035821-01.JK1|
+|2         T_COINR  T_COINC                MM5290J-3     035822-01.KL1|
+|W  T_TEST T_COINL                                     T_GND          |
+|A         T_AUD2           N82S25         MM5290J-3     035823-01.MN1|
+|Y         T_AUD1             035826-01.L6 MM5290J-3               X  |
+|-|           LM324   T_VSYNC              MM5290J-3   T_+12V         |
+  |                   C012294B-01          MM5290J-3     035824-01.NP1|
+|-|T_+5V    DSW(8)     DSW(8)                       X   035825-01.R1  |
+|---------------------------------------------------------------------|
+Notes:
+       UM6502A     - 6502 CPU, clock input is on pin 37. This is a little strange because it
+                     measures 1.17240MHz. It was assumed to be 1.25MHz [10/8]. This might be
+                     caused by old components that are out of spec now, but the PCB does run 
+                     flawlessly, and the other clocks measure correctly so I'm not sure what's going on.
+       C012294B-01 - 'Pokey' sound chip, clock 1.25MHz on pin 7 [10/8]
+       035826-01   - MMI 6331 bipolar PROM
+       MM5290J-3   - National Semiconductor MM5290J-3 16kx1 DRAM (=TMM416, uPD416, MK4116, TMS4116 etc)
+       MC14584     - Hex Schmitt Trigger
+       82S25       - Signetics 64-bit (16x4) bipolar scratch pad memory (=3101, 74S189, 7489, 9410 etc)
+       LM324       - Low Power Quad Operational Amplifier
+       J20         - 22-Way edge connector (for upright)
+       J19         - 12-Way edge connector (additional controls for cocktail)
+       T_*         - Test points
+       X           - Empty location for DIP24 device (no socket)
+       HSYNC       - 15.618kHz
+       VSYNC       - 61.0076Hz
+
+
+       Edge Connector J20 Pinout
+       -------------------------
+       GND                  A | 1   GND
+       + 5V                 B | 2   + 5V
+       + 12V                C | 3 
+       - 5V                 D | 4 
+       Audio 1 Out          E | 5   Audio 2 Out
+       HSync                F | 6   VSync
+       Start2 LED           H | 7   Left Fire
+       Center Fire          J | 8   Right Fire
+       Right Coin           K | 9   Left Coin
+       Video Blue           L | 10  Video Red
+       Video Green          M | 11  Left Coin Counter
+       Center Coin Counter  N | 12  Right Coin Counter
+       Start 1 LED          P | 13  Start Button 1
+       Test Switch          R | 14  Slam Switch
+       Center Coin Slot*    S | 15  Start Button 2
+       Vert. Trackball Dir. T | 16  Vert. Trackball Clock
+       Horiz. Trackball Clk U | 17  Horiz. Trackball Dir.
+                            V | 18  Comp Sync
+       NC                   W | 19  - 5V
+       NC                   X | 20  + 12V
+       + 5V                 Y | 21  + 5V
+       GND                  Z | 22  GND
+
+
+       Edge Connector J19 Pinout (Only used in cocktail version)
+       -------------------------
+                              A | 1  
+                              B | 2 
+                              C | 3 
+       Right Fire Button 2    D | 4 
+       Center Fire Button 2   E | 5   Left Fire Button 2
+                              F | 6 
+       Cocktail               H | 7 
+                              J | 8 
+       Horiz. Trkball Dir. 2  K | 9   Vert. Trackball Dir. 2
+       Horiz. Trkball Clock 2 L | 10  Vert. Trackball Clock 2
+                              M | 11
+                              N | 12
+
 ****************************************************************************
 
     Horizontal sync chain:
@@ -236,7 +325,7 @@
     as well as set 2. Missile Command set 1 will not work with the SMA board. It would
         appear set 1 and set 2 as labeled by mame are reversed.
 
-******************************************************************************************/
+*****************************************************************************************/
 
 #include "driver.h"
 #include "sound/pokey.h"

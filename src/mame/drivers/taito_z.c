@@ -128,25 +128,112 @@ B33-01
 Notes: IC-41 Is 271001 Listed as JH1 (unsocketed / unused)
        IC-42 Is 271001 Listed as JL1 (unsocketed / unused)
 
+****************************************************************************
 
+Aquajack
+Taito, 1990
 
-Aquajack top board (Guru)
+This game runs on Taito Z hardware
+
+Main PCB Layout
+---------------
+
+J1100196A
+K1100456A
+K1100457A AQUA JACK (sticker)
+|--------------------------------------------------------------------------|
+|B77-17.1 2063  B77-07.33           B77-05.105         DSWA(8)  DSWB(8)    |
+|         2063                                        |------|             |
+| |---------|  |---------|               |---------|  |TAITO | 2063      |-|
+| |  TAITO  |  |  TAITO  |               |  TAITO  |  |TC0110| TC0070RGB |
+| |TC0050VDZ|  |TC0150ROD| B77-19.46     |TC0100SCN|  |PCR   | 2063      |-|
+| |(QFP100) |  |(QFP160) |               |(QFP160) |  |------|             |
+| |         |  |         |               |         |          MB3771       |
+| |---------|  |---------|               |---------|  |------|             |
+|                                     58257  58257    |TAITO |        (G) 2|
+| 2018         |---------|                            |TC0220| TC0060DCA  8|
+| 2018         |  TAITO  |   |---------|              |IOC   | TC0060DCA  W|
+| 2018         |TC0020VAR|   |  TAITO  |              |------|            A|
+| 2018         |(QFP124) |   |TC0320OBR| 2063        TL074    MB3735      Y|
+|              |         |   |(QFP144) |             TL074       VOL       |
+| 2018         |---------|   |         | B77_20.54   YM3016                |
+| 2018         B77-18.37     |---------| Z80         YM2610              |-|
+| 2018         B77-06.39                                      MB3735     |
+| 2018      |---------|                              |---------| VOL     |-|
+|           |  TAITO  |                  16MHz  TL074|  TAITO  |           |
+|           |TC0050VDZ|                              |TC0100SYT| B77-15.89 |
+| B77-01.13 |(QFP100) |       2018      B77-08.57    |(QFP120) |          |-|
+|           |         |       2018      B77-09.58    |         |          | |
+| B77-02.14 |---------|      |--------------|        |---------|          | |
+|           |---------|      |  MC68000P12  |                          (M)| |
+| B77-03.15 |  TAITO  |      |--------------|        2063                 | |
+|           |TC0050VDZ|                              2063                 |-|
+| B77-04.16 |(QFP100) |   B77-14.60       B77_23.67|---------|             |
+|           |         |   B77-13.51       2063     |  TAITO  | B77-16.94   |
+|           |---------|  |--------------|          |TC0170ABT|             |
+|                        |  MC68000P12  | B77_24.69|(QFP120) |        24MHz|
+| B77_25.17   B77_22.31  |--------------| 2063     |         | 26.686MHz   |
+| 2063        2063                                 |---------|             |
+|--------------------------------------------------------------------------|
+Notes:
+      68000 - Motorola MC68000P12 CPUs, running at 12.000MHz [24/2]
+        Z80 - Zilog Z0840004PSC Z80 CPU, running at 4.000MHz [16/4]
+     YM2610 - Yahama YM2610 sound chip, running at 8.000MHz [16/2]
+       2063 - Toshiba TMM2063 8K x8 SRAM (DIP28)
+       2018 - Toshiba TMM2018 2K x8 SRAM (DIP24)
+      58257 - Sony CXK58257 32K x8 SRAM (DIP28)
+     MB3771 - Fujitsu MB3771 System Reset IC (DIP8)
+        (G) - 28-Way Connector (Not JAMMA)
+        (M) - 50-pin Flat Cable Connector Joining Main PCB To Analog Control PCB
+
+		OSC: 26.686, 24.000, 16.000
+
+     Taito custom ICs -
+                       TC0070RGB - RGB/Video Mixer (Ceramic Flat Pack SIP25)
+                       TC0060DCA - Digital to Analog Conversion for Audio (Ceramic Flat Pack SIP20)
+                       TC0100SYT - Sound Communication
+                       TC0220IOC - Input/Output. This chip also provides the master reset via the MB3771. It probably does more things too,
+                                   including video output. For example, if the harness is connected backwards, this chip blows and kills 
+                                   the PCB. Even manually resetting the 68000's cannot restart the PCB, and it just shows a wavey pattern 
+                                   on screen.
+                       TC0110PCR - Pallete Generator
+                       TC0100SCN - Tilemap Generator
+                       TC0150ROD - Road Generator
+                       TC0050VDZ - \ Motion Object Generator Combo?
+                       TC0170ABT - /
+                       TC0020VAR - ?
+                       TC0320OBR - Road Object Generator? (tied to TC0150ROD)
+
+    ROMs -
+          
+          
+Analog Control PCB
 ------------------
+J9100175A
+K9100227A ADII PCB
+K9100227A AQUA JACK (sticker)
+|------------------|
+|                  |
+|    74LS244      |-|
+|                 | |
+|                 | |
+|    ADC0809      | |
+|              (M)| |
+|                 | |
+|    74LS245      | |
+|(H)              | |
+|                 | |
+|    74HC74       | |
+|                 |-|
+|        4.9152MHz |
+|------------------|
+Notes:
+      All components listed
 
-68000-12 x 2
-OSC: 26.686, 24.000, 16.000
-I dont see any recognisable sound chips, but I do see a YM3016F
+      (H) - 6 pin connector for attachment of Analog Controls
+      (M) - 50-pin Flat Cable Connector For Joining Analog Control PCB to Main PCB
+  ADC0809 - Texas Instruments ADC0809N Analog To Digital Convertor IC (DIP28)
 
-TCO110PCR
-TCO220IOC
-TCO100SCN
-TCO140SYT
-TCO3200BR
-TCO150ROD
-TCO020VAR
-TCO050VDZ
-TCO050VDZ
-TCO050VDZ
 
 ChaseHQ (Guru)
 -------

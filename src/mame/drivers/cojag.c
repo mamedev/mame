@@ -92,6 +92,125 @@
     jspkr left/right/subwoofer output
     hdpower 4 pin PC power connector for HD
 
+****************************************************************************
+
+Area 51 (Time Warner Interactive License)
+Atari/Mesa Logic, 1995
+
+This game runs on Atari Cojag 68k hardware.
+
+PCB Layouts
+-----------
+
+Main Board:
+
+COJAG A053538
+ATARI GAMES (C) 1994
+(Atari comment near AMP - 'MMM, DONUTS.')
+|--------------------------------------------------|
+|TDA1554Q  TEA6320T   AK4310            JXCLKTRM   |
+|JSPKR     ST91D314                        XC7336  |
+|         JSP1 JWELLSR  PAL4  PAL5                 |
+|   JSP4  JSP2 PAL1            45160 45160  *   *  |
+| HDPOWER JSP3 JWELLSB                        JXBUS|
+| SELFTEST     PAL2     PAL6   45160 45160  *   *  |
+|     LED      JWELLSG                             |
+|     LED              |------|45160 45160  *   *  |
+|J    LED              |JAGUAR|                    |
+|A                     | CPU  |45160 45160  *   *  |
+|M                     |      |                    |
+|M                     |------|                    |
+|A                                                 |
+|   14.31818MHz        |------|                    |
+|   LM613              |JAGUAR|                    |
+|   52MHz  PAL3        | DSP  |                    |
+|                      |      |                    |
+|  JSYNC               |------|                    |
+|  JVUPDN           DIP8                           |
+|              A1010B                              |
+|JPLY3   JVCR            VT83C461                  |
+|                                                  |
+|                               LED                |
+|  JPLY4    JGUN2  JGUN1  JIDEB                    |
+|--------------------------------------------------|
+Notes:
+      JAGUAR CPU - Atari Jaguar CPU (QFP208)
+      JAGUAR DSP - Atari Jaguar DSP (QFP160)
+      45160      - TMS45160DZ-70 512K x16 DRAM (SOJ40)
+                   Note: This RAM is in banks. There are 4 banks, each bank is 2MBytes x 64bit
+                   Only banks 0 and 1 are populated.
+      *          - Unpopulated DRAM positions (banks 2 and 3)
+      TDA1554Q   - Philips TDA1554Q power AMP
+      TEA6320T   - Philips TEA6320T op AMP (SOP32)
+      AK4310     - AKM AK4310VM (SOIC24)
+      ST91D314   - STS Microelectronics ST91D314 3403 op AMP (SOIC14)
+      PAL1       - ATMEL ATF16V8B PAL (labelled '136105-0006', PLCC20)
+      PAL2       - ATMEL ATF16V8B PAL (labelled '136105-0006', PLCC20)
+      PAL3       - ATMEL ATF16V8B PAL (labelled '136105-0007', PLCC20)
+      PAL4, PAL5 - Philips PL22V10-10A PAL (labelled 'MYF 136105-0008', PLCC28)
+      PAL6       - ATMEL ATF16V8B (labelled '136105-0005', PLCC20)
+      A1010B     - ACTEL A1010B Complex Programmable Logic Device (labeled 'MYF 136105-0010', PLCC44)
+      XC7336     - Xilinx XC7336 Complex PRogrammable Logic Device (labelled 'MYF 136105-0009', PLCC44)
+      VT83C461   - VIA VT83C461 IDE Hard Drive Controller (QFP100)
+      LM613      - (DIP16)
+      SELFTEST   - Test Switch
+      HDPOWER    - Standard (PC-type) 4 pin hard drive power connector
+      JSP1       - 3 pin jumper block, set to 2-3
+      JSP2       - 3 pin jumper block, set to 2-3
+      JSP3       - 3 pin jumper block, jumper not installed
+      JSP4       - 3 pin jumper block, set to 2-3
+      JWELLSR    - 3 pin jumper block, set to 2-3
+      JWELLSB    - 3 pin jumper block, set to 2-3
+      JWELLSG    - 3 pin jumper block, set to 2-3
+      JSYNC      - 3 pin jumper block, jumper not installed
+      JVUPDN     - 3 pin jumper block, jumper not installed
+      JVCR       - 3 pin jumper block, jumper not installed
+      JXCLKTRM   - 2 pin header, not shorted
+      JPLY3      - Connector for player 3 controls
+      JPLY4      - Connector for player 4 controls
+      JGUN1      - Connector for player 1 gun
+      JGUN2      - Connector for player 2 gun
+      JIDEB      - Connector for 40 pin IDE cable connected to Quantum Fireball 1080AT IDE hard drive (C/H/S = 2112/16/63)
+      JSPKR      - Connector for left/right speaker for stereo sound output
+      DIP8       - Unpopulated DIP8 socket
+      JXBUS      - 96 pin connector to top board
+
+
+Top Board:
+
+EC20X32
+A053448
+ATARI GAMES (C) 1994
+|------------------------------|
+|               136105-0002C.3P|
+| 71256                        |
+|               136105-0001C.3M|
+| 71256                        |
+|               136105-0000C.3K|
+| 71256                        |
+|               136105-0003C.3H|
+| 71256                        |
+|              LED             |
+|                              |
+| AT28C16  DS1232   XC7354     |
+|                              |
+|                              |
+|      MC68EC020               |
+|                              |
+| 50MHz                        |
+|------------------------------|
+Notes:
+      MC68EC020       - Motorola 68EC020FG25 CPU clocked at 25MHz (QFP100)
+      AT28C16         - ATMEL 2k x8 EEPROM (DIP24)
+      XC7354          - Xilinx XC7354 Complex Programmable Logic Device (labelled 'MYF 136105-0004', PLCC68, socketed)
+      DS1232          - Dallas DS1232 System Reset IC (DIP8)
+      71256           - 32K x8 SRAM (SOJ28)
+      136105-0002C.3P - 27C040 EPROM (labelled 'AREA 51 136105-0002C (C)1995 ATARI GMS CS 55FE', DIP32)
+      136105-0001C.3M - 27C040 EPROM (labelled 'AREA 51 136105-0001C (C)1995 ATARI GMS CS 3DFD', DIP32)
+      136105-0000C.3K - 27C040 EPROM (labelled 'AREA 51 136105-0000C (C)1995 ATARI GMS CS 63FC', DIP32)
+      136105-0003C.3H - 27C040 EPROM (labelled 'AREA 51 136105-0003C (C)1995 ATARI GMS CS 45FF', DIP32)
+
+****************************************************************************
 
 Maximum Force
 Atari, 1997
