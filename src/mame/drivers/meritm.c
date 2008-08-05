@@ -39,13 +39,28 @@
   Megatouch III Tournament Edition (c)1996
   Megatouch IV (c)1996
   Megatouch IV Tournament Edition (c)1996
-  *Super Megatouch IV (c) 1996
+  *Super Megatouch IV (c) 1996  (rom labels 9255-41-0x, see below)
   *Megatouch 5 (c)1997
   *Megatouch 5 Tournament Edition (c)1997
   Megatouch 6 (c)1998
   *Megatouch 7 Encore (c)2000
 
   * indicates that game needs to be dumped or redumped
+
+Custom Program Versions (from Super Megatouch IV manual):
+
+PROGRAM#    Program Version      Program Differences
+---------------------------------------------------------------------------------------------
+9255-41-01  Standard Version     Includes all Options, no Restrictions
+9255-41-02  Minnesota Version    Excludes Casino Games
+9255-41-06  California Version   Excludes Poker Double-up feature & No Free Game in Solitaire
+9255-41-07  New Jersey Version   Includes 2-Coin Limit with Lockout Coil
+9255-41-50  Bi-Lingual ENG/GER   Same as Standard Version, Without Word/Casino Games
+9255-41-57  Internation Version  Same as Standard Version, Without Word Games
+9255-41-60  Bi-Lingual ENG/FRE   Same as Standard Version, Without Word/Casino Games
+9255-41-62  No Free Credit       Same as Standard Version, With No Free Credit
+9255-41-70  Australia Version    Same as Standard Version with Special Question Set
+9255-41-71  South Africa Ver.    Same as Standard Version with Special Question Set
 
   Notes/ToDo:
   - offset for top V9938 layer is hardcoded, probably should be taken from V9938 setup
