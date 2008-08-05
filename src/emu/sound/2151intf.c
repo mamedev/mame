@@ -84,18 +84,21 @@ static int lastreg0,lastreg1,lastreg2;
 READ8_HANDLER( YM2151_status_port_0_r )
 {
 	struct ym2151_info *token = sndti_token(SOUND_YM2151, 0);
+	stream_update(token->stream);
 	return YM2151ReadStatus(token->chip);
 }
 
 READ8_HANDLER( YM2151_status_port_1_r )
 {
 	struct ym2151_info *token = sndti_token(SOUND_YM2151, 1);
+	stream_update(token->stream);
 	return YM2151ReadStatus(token->chip);
 }
 
 READ8_HANDLER( YM2151_status_port_2_r )
 {
 	struct ym2151_info *token = sndti_token(SOUND_YM2151, 2);
+	stream_update(token->stream);
 	return YM2151ReadStatus(token->chip);
 }
 
