@@ -19,7 +19,7 @@ Operation Wolf uses similar hardware to Rainbow Islands and Rastan.
 The screen layout and registers and sprites appear to be identical.
 
 Taito TC0030CMD chip labeled B20-18 (at least for the US boards)
-Taito PC060HA likes like it might be a DIP28 Fujitsu MB884x chip
+Taito PC060HA looks like it might be a DIP28 Fujitsu MB884x chip
 There are 4 socketted PALs (DIP20 type PAL16L8ACN) labeled B20-09
       through B20-12 (not read)
 
@@ -103,7 +103,7 @@ register. So what is controlling priority.
 
 /* Define clocks based on actual OSC on the PCB */
 
-#define CPU_CLOCK		(XTAL_16MHz / 2)	/* clock for 68020 */
+#define CPU_CLOCK		(XTAL_16MHz / 2)	/* clock for 68000 */
 #define SOUND_CPU_CLOCK		(XTAL_8MHz / 2)		/* clock for Z80 sound CPU */
 
 #include "driver.h"
